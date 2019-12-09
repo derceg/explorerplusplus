@@ -427,13 +427,8 @@ private:
 	BOOL					HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd);
 	void					HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, int iCmd);
 
-	/* Listview selection file tests. */
-	void					BuildListViewFileSelectionList(HWND hListView,std::list<std::wstring> *pFileSelectionList);
-	HRESULT					TestListViewItemAttributes(int item, SFGAOF attributes) const;
-	HRESULT					GetListViewSelectionAttributes(SFGAOF *pItemAttributes) const;
-	HRESULT					GetListViewItemAttributes(int item, SFGAOF *pItemAttributes) const;
-	HRESULT					GetTreeViewSelectionAttributes(SFGAOF *pItemAttributes) const;
-	HRESULT					GetSelectionAttributes(SFGAOF *pItemAttributes) const;
+	/* File selection tests. */
+	BOOL					AnyItemsSelected() const;
 	bool					CanCreate() const;
 	BOOL					CanCut() const;
 	BOOL					CanCopy() const;
@@ -442,6 +437,14 @@ private:
 	BOOL					CanShowFileProperties() const;
 	BOOL					CanPaste() const;
 	BOOL					TestItemAttributes(SFGAOF attributes) const;
+	HRESULT					GetSelectionAttributes(SFGAOF *pItemAttributes) const;
+
+	void					BuildListViewFileSelectionList(HWND hListView,std::list<std::wstring> *pFileSelectionList);
+	HRESULT					TestListViewItemAttributes(int item, SFGAOF attributes) const;
+	HRESULT					GetListViewSelectionAttributes(SFGAOF *pItemAttributes) const;
+	HRESULT					GetListViewItemAttributes(const Tab &tab, int item, SFGAOF *pItemAttributes) const;
+
+	HRESULT					GetTreeViewSelectionAttributes(SFGAOF *pItemAttributes) const;
 
 	/* Display window file information. */
 	void					UpdateDisplayWindow(const Tab &tab);
@@ -487,7 +490,6 @@ private:
 	void					CreateStatusBar(void);
 	void					InitializeDisplayWindow();
 	int						CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer);
-	BOOL					AnyItemsSelected(void);
 	void					ShowMainRebarBand(HWND hwnd,BOOL bShow);
 	BOOL					OnMouseWheel(MousewheelSource_t MousewheelSource,WPARAM wParam,LPARAM lParam);
 	void					CycleViewState(BOOL bCycleForward);
