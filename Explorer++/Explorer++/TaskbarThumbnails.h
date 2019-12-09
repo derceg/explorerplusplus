@@ -55,7 +55,7 @@ private:
 	void OnNavigationCompleted(const Tab &tab);
 	void SetTabProxyIcon(const Tab &tab);
 	void InvalidateTaskbarThumbnailBitmap(const Tab &tab);
-	void UpdateTaskbarThumbnailTtitle(const Tab &tab);
+	void UpdateTaskbarThumbnailTitle(const Tab &tab);
 
 	IExplorerplusplus *m_expp;
 	TabContainer *m_tabContainer;

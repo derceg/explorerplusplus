@@ -106,7 +106,7 @@ LRESULT CALLBACK TaskbarThumbnails::MainWndProc(HWND hwnd,UINT uMsg,WPARAM wPara
 
 			RegisterTab(itr->hProxy,EMPTY_STRING,bActive);
 
-			UpdateTaskbarThumbnailTtitle(tab);
+			UpdateTaskbarThumbnailTitle(tab);
 			SetTabProxyIcon(tab);
 		}
 
@@ -219,7 +219,7 @@ void TaskbarThumbnails::CreateTabProxy(int iTabId,BOOL bSwitchToNewTab)
 
 			const Tab &tab = m_tabContainer->GetTab(iTabId);
 			SetTabProxyIcon(tab);
-			UpdateTaskbarThumbnailTtitle(tab);
+			UpdateTaskbarThumbnailTitle(tab);
 		}
 	}
 }
@@ -612,10 +612,10 @@ void TaskbarThumbnails::OnNavigationCompleted(const Tab &tab)
 {
 	InvalidateTaskbarThumbnailBitmap(tab);
 	SetTabProxyIcon(tab);
-	UpdateTaskbarThumbnailTtitle(tab);
+	UpdateTaskbarThumbnailTitle(tab);
 }
 
-void TaskbarThumbnails::UpdateTaskbarThumbnailTtitle(const Tab &tab)
+void TaskbarThumbnails::UpdateTaskbarThumbnailTitle(const Tab &tab)
 {
 	if (!m_bTaskbarInitialised)
 	{
