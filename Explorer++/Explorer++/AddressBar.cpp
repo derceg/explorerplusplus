@@ -323,7 +323,8 @@ void AddressBar::UpdateTextAndIcon(const Tab &tab)
 	{
 		iconIndex = m_defaultFolderIconIndex;
 
-		entry->historyEntryUpdatedSignal.AddObserver(boost::bind(&AddressBar::OnHistoryEntryUpdated, this, _1, _2));
+		m_historyEntryUpdatedConnection = entry->historyEntryUpdatedSignal.AddObserver(
+			boost::bind(&AddressBar::OnHistoryEntryUpdated, this, _1, _2));
 	}
 
 	SendMessage(m_hwnd, CB_RESETCONTENT, 0, 0);
