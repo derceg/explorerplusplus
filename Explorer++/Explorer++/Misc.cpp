@@ -338,7 +338,7 @@ void Explorerplusplus::OnSelectColumns()
 	CSelectColumnsDialog SelectColumnsDialog(m_hLanguageModule,IDD_SELECTCOLUMNS,m_hContainer,this,m_tabContainer,this);
 	SelectColumnsDialog.ShowModalDialog();
 
-	UpdateSortMenuItems();
+	UpdateSortMenuItems(m_tabContainer->GetSelectedTab());
 }
 
 CStatusBar *Explorerplusplus::GetStatusBar()

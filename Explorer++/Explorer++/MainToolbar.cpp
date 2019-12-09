@@ -805,7 +805,8 @@ void MainToolbar::ShowToolbarViewsDropdown()
 
 void MainToolbar::CreateViewsMenu(POINT *ptOrigin)
 {
-	ViewMode viewMode = m_pexpp->GetActiveShellBrowser()->GetViewMode();
+	const Tab &tab = m_pexpp->GetTabContainer()->GetSelectedTab();
+	ViewMode viewMode = tab.GetShellBrowser()->GetViewMode();
 
 	HMENU viewsMenu = m_pexpp->BuildViewsMenu();
 
@@ -833,7 +834,7 @@ void MainToolbar::UpdateToolbarButtonStates()
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Forward, tab.GetNavigationController()->CanGoForward());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Up, tab.GetNavigationController()->CanGoUp());
 
-	BOOL bVirtualFolder = m_pexpp->GetActiveShellBrowser()->InVirtualFolder();
+	BOOL bVirtualFolder = tab.GetShellBrowser()->InVirtualFolder();
 
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::CopyTo, m_pexpp->CanCopy() && GetFocus() != m_pexpp->GetTreeView());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::MoveTo, m_pexpp->CanCut() && GetFocus() != m_pexpp->GetTreeView());
@@ -843,8 +844,8 @@ void MainToolbar::UpdateToolbarButtonStates()
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Properties, m_pexpp->CanShowFileProperties());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Delete, m_pexpp->CanDelete());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::DeletePermanently, m_pexpp->CanDelete());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::SplitFile, m_pexpp->GetActiveShellBrowser()->GetNumSelectedFiles() == 1);
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::MergeFiles, m_pexpp->GetActiveShellBrowser()->GetNumSelectedFiles() > 1);
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::SplitFile, tab.GetShellBrowser()->GetNumSelectedFiles() == 1);
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::MergeFiles, tab.GetShellBrowser()->GetNumSelectedFiles() > 1);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::OpenCommandPrompt, !bVirtualFolder);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::NewFolder, m_pexpp->CanCreate());
 }

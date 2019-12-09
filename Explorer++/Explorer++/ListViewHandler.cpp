@@ -631,8 +631,8 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 	if(m_bCountingUp || m_bCountingDown || m_bInverted)
 		return;
 
-	UpdateDisplayWindow();
-	UpdateStatusBarText();
+	UpdateDisplayWindow(tab);
+	UpdateStatusBarText(tab);
 	m_mainToolbar->UpdateToolbarButtonStates();
 }
 

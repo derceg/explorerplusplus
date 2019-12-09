@@ -84,7 +84,7 @@ void Explorerplusplus::OnStartedBrowsing(int iTabId, const TCHAR *szFolderPath)
 	}
 }
 
-HRESULT Explorerplusplus::UpdateStatusBarText(void)
+HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 {
 	FolderInfo_t	FolderInfo;
 	int				nTotal;
@@ -97,9 +97,9 @@ HRESULT Explorerplusplus::UpdateStatusBarText(void)
 	TCHAR			*szNumSelected = NULL;
 	int				res;
 
-	nTotal = m_pActiveShellBrowser->GetNumItems();
-	nFilesSelected = m_pActiveShellBrowser->GetNumSelectedFiles();
-	nFoldersSelected = m_pActiveShellBrowser->GetNumSelectedFolders();
+	nTotal = tab.GetShellBrowser()->GetNumItems();
+	nFilesSelected = tab.GetShellBrowser()->GetNumSelectedFiles();
+	nFoldersSelected = tab.GetShellBrowser()->GetNumSelectedFolders();
 
 	if ((nFilesSelected + nFoldersSelected) != 0)
 	{
@@ -152,14 +152,14 @@ HRESULT Explorerplusplus::UpdateStatusBarText(void)
 
 	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM)0 | 0, (LPARAM)szItemsSelected);
 
-	if (m_pActiveShellBrowser->InVirtualFolder())
+	if (tab.GetShellBrowser()->InVirtualFolder())
 	{
 		LoadString(m_hLanguageModule, IDS_GENERAL_VIRTUALFOLDER, lpszSizeBuffer,
 			SIZEOF_ARRAY(lpszSizeBuffer));
 	}
 	else
 	{
-		m_pActiveShellBrowser->GetFolderInfo(&FolderInfo);
+		tab.GetShellBrowser()->GetFolderInfo(&FolderInfo);
 
 		if ((nFilesSelected + nFoldersSelected) == 0)
 		{

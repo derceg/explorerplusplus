@@ -18,11 +18,11 @@
 
 const int SORT_MENU_RESOURCE_BLOCK_SIZE = 1000;
 
-void Explorerplusplus::UpdateSortMenuItems()
+void Explorerplusplus::UpdateSortMenuItems(const Tab &tab)
 {
 	DeleteSortMenuItems();
 
-	auto sortModes = m_pActiveShellBrowser->GetAvailableSortModes();
+	auto sortModes = tab.GetShellBrowser()->GetAvailableSortModes();
 	std::vector<SortMenuItem> newSortMenuItems;
 
 	for (SortMode sortMode : sortModes)
@@ -81,10 +81,10 @@ void Explorerplusplus::DeleteSortMenuItems()
 	}
 }
 
-void Explorerplusplus::SetSortMenuItemStates()
+void Explorerplusplus::SetSortMenuItemStates(const Tab &tab)
 {
-	const SortMode sortMode = m_pActiveShellBrowser->GetSortMode();
-	BOOL bShowInGroups = m_pActiveShellBrowser->GetShowInGroups();
+	const SortMode sortMode = tab.GetShellBrowser()->GetSortMode();
+	BOOL bShowInGroups = tab.GetShellBrowser()->GetShowInGroups();
 
 	/* Go through both the sort by and group by menus and
 	remove all the checkmarks. Alternatively, could remember
@@ -138,7 +138,7 @@ void Explorerplusplus::SetSortMenuItemStates()
 
 	CheckMenuRadioItem(activeMenu, firstItem, lastItem, itemToCheck, MF_BYCOMMAND);
 
-	if (m_pActiveShellBrowser->GetSortAscending())
+	if (tab.GetShellBrowser()->GetSortAscending())
 	{
 		itemToCheck = IDM_SORT_ASCENDING;
 	}

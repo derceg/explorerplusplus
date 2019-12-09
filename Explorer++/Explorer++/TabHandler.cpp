@@ -72,11 +72,10 @@ void Explorerplusplus::OnNavigationCompleted(const Tab &tab)
 		m_CurrentDirectory = tab.GetShellBrowser()->GetDirectory();
 		SetCurrentDirectory(m_CurrentDirectory.c_str());
 
-		UpdateSortMenuItems();
-
 		m_nSelected = 0;
 
-		UpdateWindowStates();
+		UpdateSortMenuItems(tab);
+		UpdateWindowStates(tab);
 	}
 
 	HandleDirectoryMonitoring(tab.GetId());
@@ -226,14 +225,13 @@ void Explorerplusplus::OnTabSelected(const Tab &tab)
 	directory. Although this is not needed internally, context
 	menu extensions may need the current directory to be
 	set correctly. */
-	m_CurrentDirectory = m_pActiveShellBrowser->GetDirectory();
+	m_CurrentDirectory = tab.GetShellBrowser()->GetDirectory();
 	SetCurrentDirectory(m_CurrentDirectory.c_str());
 
-	m_nSelected = m_pActiveShellBrowser->GetNumSelected();
+	m_nSelected = tab.GetShellBrowser()->GetNumSelected();
 
-	UpdateSortMenuItems();
-
-	UpdateWindowStates();
+	UpdateSortMenuItems(tab);
+	UpdateWindowStates(tab);
 
 	/* Show the new listview. */
 	ShowWindow(m_hActiveListView,SW_SHOW);

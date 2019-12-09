@@ -110,7 +110,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		break;
 
 	case WM_USER_UPDATEWINDOWS:
-		UpdateWindowStates();
+		UpdateWindowStates(m_tabContainer->GetSelectedTab());
 		break;
 
 	case WM_USER_FILESADDED:
@@ -533,35 +533,35 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		break;
 
 	case IDM_VIEW_EXTRALARGEICONS:
-		m_pActiveShellBrowser->SetViewMode(ViewMode::ExtraLargeIcons);
+		m_tabContainer->GetSelectedTab().GetShellBrowser()->SetViewMode(ViewMode::ExtraLargeIcons);
 		break;
 
 	case IDM_VIEW_LARGEICONS:
-		m_pActiveShellBrowser->SetViewMode(ViewMode::LargeIcons);
+		m_tabContainer->GetSelectedTab().GetShellBrowser()->SetViewMode(ViewMode::LargeIcons);
 		break;
 
 	case IDM_VIEW_ICONS:
-		m_pActiveShellBrowser->SetViewMode(ViewMode::Icons);
+		m_tabContainer->GetSelectedTab().GetShellBrowser()->SetViewMode(ViewMode::Icons);
 		break;
 
 	case IDM_VIEW_SMALLICONS:
-		m_pActiveShellBrowser->SetViewMode(ViewMode::SmallIcons);
+		m_tabContainer->GetSelectedTab().GetShellBrowser()->SetViewMode(ViewMode::SmallIcons);
 		break;
 
 	case IDM_VIEW_LIST:
-		m_pActiveShellBrowser->SetViewMode(ViewMode::List);
+		m_tabContainer->GetSelectedTab().GetShellBrowser()->SetViewMode(ViewMode::List);
 		break;
 
 	case IDM_VIEW_DETAILS:
-		m_pActiveShellBrowser->SetViewMode(ViewMode::Details);
+		m_tabContainer->GetSelectedTab().GetShellBrowser()->SetViewMode(ViewMode::Details);
 		break;
 
 	case IDM_VIEW_THUMBNAILS:
-		m_pActiveShellBrowser->SetViewMode(ViewMode::Thumbnails);
+		m_tabContainer->GetSelectedTab().GetShellBrowser()->SetViewMode(ViewMode::Thumbnails);
 		break;
 
 	case IDM_VIEW_TILES:
-		m_pActiveShellBrowser->SetViewMode(ViewMode::Tiles);
+		m_tabContainer->GetSelectedTab().GetShellBrowser()->SetViewMode(ViewMode::Tiles);
 		break;
 
 	case IDM_VIEW_CHANGEDISPLAYCOLOURS:
@@ -1081,7 +1081,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		break;
 
 	case IDM_VIEW_AUTOARRANGE:
-		m_pActiveShellBrowser->SetAutoArrange(!m_pActiveShellBrowser->GetAutoArrange());
+		m_tabContainer->GetSelectedTab().GetShellBrowser()->SetAutoArrange(!m_tabContainer->GetSelectedTab().GetShellBrowser()->GetAutoArrange());
 		break;
 
 	case IDM_VIEW_SHOWHIDDENFILES:

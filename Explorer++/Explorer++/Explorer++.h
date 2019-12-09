@@ -390,13 +390,13 @@ private:
 	void					MapTabAttributeValue(WCHAR *wszName, WCHAR *wszValue, TabSettings &tabSettings, FolderSettings &folderSettings);
 
 	/* Window state update. */
-	void					UpdateWindowStates(void);
+	void					UpdateWindowStates(const Tab &tab);
 	void					UpdateTreeViewSelection();
 	void					SetStatusBarParts(int width);
 	void					ResizeWindows(void);
 	void					SetListViewInitialPosition(HWND hListView);
 	void					AdjustFolderPanePosition(void);
-	HRESULT					UpdateStatusBarText(void);
+	HRESULT					UpdateStatusBarText(const Tab &tab);
 	void					ToggleFolders(void);
 	void					UpdateLayout();
 
@@ -405,10 +405,10 @@ private:
 	BOOL					VerifyLanguageVersion(const TCHAR *szLanguageModule) const;
 
 	/* Sort menu. */
-	void					UpdateSortMenuItems();
+	void					UpdateSortMenuItems(const Tab &tab);
 	void					InsertSortMenuItems();
 	void					DeleteSortMenuItems();
-	void					SetSortMenuItemStates();
+	void					SetSortMenuItemStates(const Tab &tab);
 
 	/* File operations. */
 	void					CopyToFolder(bool move);
@@ -442,10 +442,10 @@ private:
 	BOOL					TestItemAttributes(SFGAOF attributes) const;
 
 	/* Display window file information. */
-	void					UpdateDisplayWindow(void);
-	void					UpdateDisplayWindowForZeroFiles(void);
-	void					UpdateDisplayWindowForOneFile(void);
-	void					UpdateDisplayWindowForMultipleFiles(void);
+	void					UpdateDisplayWindow(const Tab &tab);
+	void					UpdateDisplayWindowForZeroFiles(const Tab &tab);
+	void					UpdateDisplayWindowForOneFile(const Tab &tab);
+	void					UpdateDisplayWindowForMultipleFiles(const Tab &tab);
 
 	/* Columns. */
 	void					CopyColumnInfoToClipboard(void);

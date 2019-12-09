@@ -21,12 +21,12 @@
 #include <shobjidl.h>
 #include <list>
 
-void Explorerplusplus::UpdateWindowStates(void)
+void Explorerplusplus::UpdateWindowStates(const Tab &tab)
 {
-	m_CurrentDirectory = m_pActiveShellBrowser->GetDirectory();
+	m_CurrentDirectory = tab.GetShellBrowser()->GetDirectory();
 
-	UpdateStatusBarText();
-	UpdateDisplayWindow();
+	UpdateStatusBarText(tab);
+	UpdateDisplayWindow(tab);
 }
 
 /*
@@ -35,8 +35,10 @@ void Explorerplusplus::UpdateWindowStates(void)
 */
 void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 {
-	ViewMode viewMode = m_pActiveShellBrowser->GetViewMode();
-	BOOL bVirtualFolder = m_pActiveShellBrowser->InVirtualFolder();
+	const Tab &tab = m_tabContainer->GetSelectedTab();
+
+	ViewMode viewMode = tab.GetShellBrowser()->GetViewMode();
+	BOOL bVirtualFolder = tab.GetShellBrowser()->InVirtualFolder();
 
 	lEnableMenuItem(hProgramMenu,IDM_FILE_COPYITEMPATH,AnyItemsSelected());
 	lEnableMenuItem(hProgramMenu,IDM_FILE_COPYUNIVERSALFILEPATHS,AnyItemsSelected());
@@ -75,18 +77,16 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_DRIVES,m_config->showDrivesToolbar);
 	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_APPLICATIONTOOLBAR,m_config->showApplicationToolbar);
 	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_LOCKTOOLBARS,m_config->lockToolbars);
-	lCheckMenuItem(hProgramMenu,IDM_VIEW_SHOWHIDDENFILES,m_pActiveShellBrowser->GetShowHidden());
-	lCheckMenuItem(hProgramMenu,IDM_FILTER_APPLYFILTER,m_pActiveShellBrowser->GetFilterStatus());
+	lCheckMenuItem(hProgramMenu,IDM_VIEW_SHOWHIDDENFILES,tab.GetShellBrowser()->GetShowHidden());
+	lCheckMenuItem(hProgramMenu,IDM_FILTER_APPLYFILTER,tab.GetShellBrowser()->GetFilterStatus());
 
 	lEnableMenuItem(hProgramMenu,IDM_ACTIONS_NEWFOLDER,CanCreate());
-	lEnableMenuItem(hProgramMenu,IDM_ACTIONS_SPLITFILE,(m_pActiveShellBrowser->GetNumSelectedFiles() == 1) && !bVirtualFolder);
+	lEnableMenuItem(hProgramMenu,IDM_ACTIONS_SPLITFILE,(tab.GetShellBrowser()->GetNumSelectedFiles() == 1) && !bVirtualFolder);
 	lEnableMenuItem(hProgramMenu,IDM_ACTIONS_MERGEFILES,m_nSelected > 1);
 	lEnableMenuItem(hProgramMenu,IDM_ACTIONS_DESTROYFILES,m_nSelected);
 
 	UINT ItemToCheck = GetViewModeMenuId(viewMode);
 	CheckMenuRadioItem(hProgramMenu,IDM_VIEW_THUMBNAILS,IDM_VIEW_EXTRALARGEICONS,ItemToCheck,MF_BYCOMMAND);
-
-	const Tab &tab = m_tabContainer->GetSelectedTab();
 
 	lEnableMenuItem(hProgramMenu,IDM_GO_BACK,tab.GetNavigationController()->CanGoBack());
 	lEnableMenuItem(hProgramMenu,IDM_GO_FORWARD,tab.GetNavigationController()->CanGoForward());
@@ -116,8 +116,8 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 		lEnableMenuItem(hProgramMenu,IDM_VIEW_GROUPBY,TRUE);
 
 		lEnableMenuItem(hProgramMenu,IDM_VIEW_AUTOARRANGE,TRUE);
-		lCheckMenuItem(hProgramMenu,IDM_VIEW_AUTOARRANGE,m_pActiveShellBrowser->GetAutoArrange());
+		lCheckMenuItem(hProgramMenu,IDM_VIEW_AUTOARRANGE,tab.GetShellBrowser()->GetAutoArrange());
 	}
 
-	SetSortMenuItemStates();
+	SetSortMenuItemStates(tab);
 }

@@ -720,7 +720,8 @@ void Explorerplusplus::OnToolbarViews()
 
 void Explorerplusplus::CycleViewState(BOOL bCycleForward)
 {
-	ViewMode viewMode = m_pActiveShellBrowser->GetViewMode();
+	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	ViewMode viewMode = selectedTab.GetShellBrowser()->GetViewMode();
 	ViewMode newViewMode;
 
 	if(bCycleForward)
@@ -732,19 +733,21 @@ void Explorerplusplus::CycleViewState(BOOL bCycleForward)
 		newViewMode = GetPreviousViewMode(VIEW_MODES, viewMode);
 	}
 
-	m_pActiveShellBrowser->SetViewMode(newViewMode);
+	selectedTab.GetShellBrowser()->SetViewMode(newViewMode);
 }
 
 void Explorerplusplus::OnSortByAscending(BOOL bSortAscending)
 {
-	if(bSortAscending != m_pActiveShellBrowser->GetSortAscending())
-	{
-		m_pActiveShellBrowser->SetSortAscending(bSortAscending);
+	Tab &selectedTab = m_tabContainer->GetSelectedTab();
 
-		SortMode sortMode = m_pActiveShellBrowser->GetSortMode();
+	if(bSortAscending != selectedTab.GetShellBrowser()->GetSortAscending())
+	{
+		selectedTab.GetShellBrowser()->SetSortAscending(bSortAscending);
+
+		SortMode sortMode = selectedTab.GetShellBrowser()->GetSortMode();
 
 		/* It is quicker to re-sort the folder than refresh it. */
-		m_pActiveShellBrowser->SortFolder(sortMode);
+		selectedTab.GetShellBrowser()->SortFolder(sortMode);
 	}
 }
 
@@ -1038,10 +1041,12 @@ void Explorerplusplus::OnDirectoryModified(int iTabId)
 	   the display window)
 	*/
 
-	if(iTabId == m_tabContainer->GetSelectedTab().GetId())
+	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
+
+	if(iTabId == selectedTab.GetId())
 	{
-		UpdateStatusBarText();
-		UpdateDisplayWindow();
+		UpdateStatusBarText(selectedTab);
+		UpdateDisplayWindow(selectedTab);
 	}
 }
 
@@ -1365,39 +1370,41 @@ LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)
 
 void Explorerplusplus::OnSortBy(SortMode sortMode)
 {
-	SortMode currentSortMode = m_pActiveShellBrowser->GetSortMode();
+	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	SortMode currentSortMode = selectedTab.GetShellBrowser()->GetSortMode();
 
-	if(!m_pActiveShellBrowser->GetShowInGroups() &&
+	if(!selectedTab.GetShellBrowser()->GetShowInGroups() &&
 		sortMode == currentSortMode)
 	{
-		m_pActiveShellBrowser->SetSortAscending(!m_pActiveShellBrowser->GetSortAscending());
+		selectedTab.GetShellBrowser()->SetSortAscending(!selectedTab.GetShellBrowser()->GetSortAscending());
 	}
-	else if(m_pActiveShellBrowser->GetShowInGroups())
+	else if(selectedTab.GetShellBrowser()->GetShowInGroups())
 	{
-		m_pActiveShellBrowser->SetShowInGroups(FALSE);
+		selectedTab.GetShellBrowser()->SetShowInGroups(FALSE);
 	}
 
-	m_pActiveShellBrowser->SortFolder(sortMode);
+	selectedTab.GetShellBrowser()->SortFolder(sortMode);
 }
 
 void Explorerplusplus::OnGroupBy(SortMode sortMode)
 {
-	SortMode currentSortMode = m_pActiveShellBrowser->GetSortMode();
+	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	SortMode currentSortMode = selectedTab.GetShellBrowser()->GetSortMode();
 
 	/* If group view is already enabled, and the current sort
 	mode matches the supplied sort mode, toggle the ascending/
 	descending flag. */
-	if(m_pActiveShellBrowser->GetShowInGroups() &&
+	if(selectedTab.GetShellBrowser()->GetShowInGroups() &&
 		sortMode == currentSortMode)
 	{
-		m_pActiveShellBrowser->SetSortAscending(!m_pActiveShellBrowser->GetSortAscending());
+		selectedTab.GetShellBrowser()->SetSortAscending(!selectedTab.GetShellBrowser()->GetSortAscending());
 	}
-	else if(!m_pActiveShellBrowser->GetShowInGroups())
+	else if(!selectedTab.GetShellBrowser()->GetShowInGroups())
 	{
-		m_pActiveShellBrowser->SetShowInGroupsFlag(TRUE);
+		selectedTab.GetShellBrowser()->SetShowInGroupsFlag(TRUE);
 	}
 
-	m_pActiveShellBrowser->SortFolder(sortMode);
+	selectedTab.GetShellBrowser()->SortFolder(sortMode);
 }
 
 void Explorerplusplus::SaveAllSettings()
@@ -1500,8 +1507,7 @@ void Explorerplusplus::SetLanguage(DWORD language)
 
 void Explorerplusplus::OnShowHiddenFiles()
 {
-	m_pActiveShellBrowser->SetShowHidden(!m_pActiveShellBrowser->GetShowHidden());
-
 	Tab &tab = m_tabContainer->GetSelectedTab();
+	tab.GetShellBrowser()->SetShowHidden(!tab.GetShellBrowser()->GetShowHidden());
 	RefreshTab(tab);
 }
