@@ -18,35 +18,6 @@ Navigation::Navigation(std::shared_ptr<Config> config, IExplorerplusplus *expp) 
 	});
 }
 
-void Navigation::OnBrowseBack()
-{
-	OnGoToOffset(-1);
-}
-
-void Navigation::OnBrowseForward()
-{
-	OnGoToOffset(1);
-}
-
-void Navigation::OnGoToOffset(int offset)
-{
-	Tab &tab = m_tabContainer->GetSelectedTab();
-
-	if (tab.GetLockState() != Tab::LockState::AddressLocked)
-	{
-		tab.GetNavigationController()->GoToOffset(offset);
-	}
-	else
-	{
-		auto entry = tab.GetNavigationController()->GetEntry(offset);
-
-		if (entry)
-		{
-			m_tabContainer->CreateNewTab(entry->GetPidl().get(), TabSettings(_selected = true));
-		}
-	}
-}
-
 void Navigation::OnNavigateHome()
 {
 	HRESULT hr = BrowseFolderInCurrentTab(m_config->defaultTabDirectory.c_str());

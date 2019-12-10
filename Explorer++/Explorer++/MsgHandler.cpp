@@ -898,13 +898,12 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 		/* This will cancel any menu that may be shown
 		at the moment. */
 		SendMessage(m_hContainer,WM_CANCELMODE,0,0);
-
-		m_navigation->OnBrowseBack();
+		OnGoBack();
 		break;
 
 	case APPCOMMAND_BROWSER_FORWARD:
 		SendMessage(m_hContainer,WM_CANCELMODE,0,0);
-		m_navigation->OnBrowseForward();
+		OnGoForward();
 		break;
 
 	case APPCOMMAND_BROWSER_HOME:

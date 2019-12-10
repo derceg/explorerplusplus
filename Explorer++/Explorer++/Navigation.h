@@ -15,9 +15,6 @@ public:
 
 	Navigation(std::shared_ptr<Config> config, IExplorerplusplus *expp);
 
-	void OnBrowseBack();
-	void OnBrowseForward();
-	void OnGoToOffset(int offset);
 	void OnNavigateHome();
 	void OnNavigateUp();
 	void OnGotoFolder(int FolderCSIDL);

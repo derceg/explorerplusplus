@@ -280,3 +280,21 @@ void Explorerplusplus::OnResolveLink()
 		}
 	}
 }
+
+HRESULT Explorerplusplus::OnGoBack()
+{
+	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	return selectedTab.GetNavigationController()->GoBack();
+}
+
+HRESULT Explorerplusplus::OnGoForward()
+{
+	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	return selectedTab.GetNavigationController()->GoForward();
+}
+
+HRESULT Explorerplusplus::OnGoToOffset(int offset)
+{
+	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	return selectedTab.GetNavigationController()->GoToOffset(offset);
+}

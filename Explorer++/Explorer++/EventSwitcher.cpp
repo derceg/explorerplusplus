@@ -216,14 +216,15 @@ BOOL Explorerplusplus::OnMouseWheel(MousewheelSource_t MousewheelSource, WPARAM 
 			{
 				for (int i = 0; i < abs(m_zDeltaTotal / WHEEL_DELTA); i++)
 				{
-					m_navigation->OnBrowseBack();
+					// TODO: Navigate directly to offset.
+					OnGoBack();
 				}
 			}
 			else
 			{
 				for (int i = 0; i < abs(m_zDeltaTotal / WHEEL_DELTA); i++)
 				{
-					m_navigation->OnBrowseForward();
+					OnGoForward();
 				}
 			}
 		}

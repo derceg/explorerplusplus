@@ -231,6 +231,10 @@ private:
 	void					OnCheckForUpdates();
 	void					OnAbout();
 
+	HRESULT					OnGoBack();
+	HRESULT					OnGoForward();
+	HRESULT					OnGoToOffset(int offset);
+
 	int						HighlightSimilarFiles(HWND ListView) const;
 
 	/* Main toolbar-specific handlers. */

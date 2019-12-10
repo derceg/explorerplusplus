@@ -787,7 +787,8 @@ void MainToolbar::ShowHistoryMenu(HistoryType historyType, const POINT &pt)
 		cmd = -cmd;
 	}
 
-	m_navigation->OnGoToOffset(cmd);
+	Tab &selectedTab = m_pexpp->GetTabContainer()->GetSelectedTab();
+	selectedTab.GetNavigationController()->GoToOffset(cmd);
 }
 
 void MainToolbar::ShowToolbarViewsDropdown()

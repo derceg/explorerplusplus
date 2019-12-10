@@ -5,16 +5,18 @@
 #include "stdafx.h"
 #include "NavigationController.h"
 
-NavigationController::NavigationController(CShellBrowser *shellBrowser) :
+NavigationController::NavigationController(CShellBrowser *shellBrowser, TabNavigationInterface *tabNavigation) :
 	m_shellBrowser(shellBrowser),
+	m_tabNavigation(tabNavigation),
 	m_currentEntry(-1)
 {
 	Initialize();
 }
 
-NavigationController::NavigationController(CShellBrowser *shellBrowser,
+NavigationController::NavigationController(CShellBrowser *shellBrowser, TabNavigationInterface *tabNavigation,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries, int currentEntry) :
 	m_shellBrowser(shellBrowser),
+	m_tabNavigation(tabNavigation),
 	m_entries(CopyPreservedHistoryEntries(preservedEntries)),
 	m_currentEntry(currentEntry)
 {
@@ -24,7 +26,7 @@ NavigationController::NavigationController(CShellBrowser *shellBrowser,
 void NavigationController::Initialize()
 {
 	m_connections.push_back(m_shellBrowser->navigationCompletedSignal.AddObserver(
-		boost::bind(&NavigationController::OnNavigationCompleted, this, _1, _2)));
+		boost::bind(&NavigationController::OnNavigationCompleted, this, _1, _2), boost::signals2::at_front));
 }
 
 std::vector<std::unique_ptr<HistoryEntry>> NavigationController::CopyPreservedHistoryEntries(
@@ -204,7 +206,7 @@ HRESULT NavigationController::GoToOffset(int offset)
 		return E_FAIL;
 	}
 
-	return m_shellBrowser->BrowseFolder(entry->GetPidl().get(), false);
+	return BrowseFolder(entry->GetPidl().get(), false);
 }
 
 HRESULT NavigationController::GoUp()
@@ -225,4 +227,19 @@ HRESULT NavigationController::Refresh()
 {
 	auto pidl = m_shellBrowser->GetDirectoryIdl();
 	return m_shellBrowser->BrowseFolder(pidl.get(), false);
+}
+
+HRESULT NavigationController::BrowseFolder(PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
+{
+	if (m_navigationMode == NavigationMode::ForceNewTab)
+	{
+		return m_tabNavigation->CreateNewTab(pidl, true);
+	}
+
+	return m_shellBrowser->BrowseFolder(pidl, addHistoryEntry);
+}
+
+void NavigationController::SetNavigationMode(NavigationMode navigationMode)
+{
+	m_navigationMode = navigationMode;
 }

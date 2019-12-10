@@ -31,7 +31,7 @@ Tab::Tab(IExplorerplusplus *expp, TabNavigationInterface *tabNavigation,
 		expp->GetMainWindow(), expp->GetCachedIcons(), expp->GetConfig(), tabNavigation,
 		folderSettingsFinal, initialColumns);
 
-	m_navigationController = std::make_unique<NavigationController>(m_shellBrowser);
+	m_navigationController = std::make_unique<NavigationController>(m_shellBrowser, tabNavigation);
 }
 
 Tab::Tab(const PreservedTab &preservedTab, IExplorerplusplus *expp, TabNavigationInterface *tabNavigation) :
@@ -45,7 +45,7 @@ Tab::Tab(const PreservedTab &preservedTab, IExplorerplusplus *expp, TabNavigatio
 		tabNavigation, preservedTab.preservedFolderState.folderSettings, boost::none);
 
 	m_navigationController = std::make_unique<NavigationController>(m_shellBrowser,
-		preservedTab.history, preservedTab.currentEntry);
+		tabNavigation, preservedTab.history, preservedTab.currentEntry);
 }
 
 int Tab::GetId() const
@@ -119,6 +119,18 @@ void Tab::SetLockState(LockState lockState)
 	}
 
 	m_lockState = lockState;
+
+	switch (lockState)
+	{
+	case Tab::LockState::NotLocked:
+		m_navigationController->SetNavigationMode(NavigationController::NavigationMode::Normal);
+		break;
+
+	case Tab::LockState::Locked:
+	case Tab::LockState::AddressLocked:
+		m_navigationController->SetNavigationMode(NavigationController::NavigationMode::ForceNewTab);
+		break;
+	}
 
 	m_tabUpdatedSignal(*this, PropertyType::LockState);
 }

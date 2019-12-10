@@ -1185,12 +1185,12 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 
 	case ToolbarButton::Back:
 	case IDM_GO_BACK:
-		m_navigation->OnBrowseBack();
+		OnGoBack();
 		break;
 
 	case ToolbarButton::Forward:
 	case IDM_GO_FORWARD:
-		m_navigation->OnBrowseForward();
+		OnGoForward();
 		break;
 
 	case ToolbarButton::Up:
@@ -1689,7 +1689,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 							iCmd = iCmd - ID_REBAR_MENU_FORWARD_START;
 						}
 
-						m_navigation->OnGoToOffset(iCmd);
+						OnGoToOffset(iCmd);
 					}
 					else
 					{
