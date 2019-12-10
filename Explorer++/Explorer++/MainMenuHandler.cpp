@@ -298,3 +298,17 @@ HRESULT Explorerplusplus::OnGoToOffset(int offset)
 	Tab &selectedTab = m_tabContainer->GetSelectedTab();
 	return selectedTab.GetNavigationController()->GoToOffset(offset);
 }
+
+HRESULT Explorerplusplus::OnGotoKnownFolder(REFKNOWNFOLDERID knownFolderId)
+{
+	unique_pidl_absolute pidl;
+	HRESULT hr = SHGetKnownFolderIDList(knownFolderId, KF_FLAG_DEFAULT, nullptr, wil::out_param(pidl));
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	return selectedTab.GetNavigationController()->BrowseFolder(pidl.get());
+}

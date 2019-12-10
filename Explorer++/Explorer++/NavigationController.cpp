@@ -229,6 +229,11 @@ HRESULT NavigationController::Refresh()
 	return m_shellBrowser->BrowseFolder(pidl.get(), false);
 }
 
+HRESULT NavigationController::BrowseFolder(PCIDLIST_ABSOLUTE pidl)
+{
+	return BrowseFolder(pidl, true);
+}
+
 HRESULT NavigationController::BrowseFolder(PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
 {
 	if (m_navigationMode == NavigationMode::ForceNewTab)

@@ -17,7 +17,6 @@ public:
 
 	void OnNavigateHome();
 	void OnNavigateUp();
-	void OnGotoFolder(int FolderCSIDL);
 
 	HRESULT BrowseFolderInCurrentTab(const TCHAR *szPath);
 	HRESULT BrowseFolder(Tab &tab, const TCHAR *szPath);

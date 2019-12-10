@@ -1199,47 +1199,47 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		break;
 
 	case IDM_GO_MYCOMPUTER:
-		m_navigation->OnGotoFolder(CSIDL_DRIVES);
+		OnGotoKnownFolder(FOLDERID_ComputerFolder);
 		break;
 
 	case IDM_GO_MYDOCUMENTS:
-		m_navigation->OnGotoFolder(CSIDL_PERSONAL);
+		OnGotoKnownFolder(FOLDERID_Documents);
 		break;
 
 	case IDM_GO_MYMUSIC:
-		m_navigation->OnGotoFolder(CSIDL_MYMUSIC);
+		OnGotoKnownFolder(FOLDERID_Music);
 		break;
 
 	case IDM_GO_MYPICTURES:
-		m_navigation->OnGotoFolder(CSIDL_MYPICTURES);
+		OnGotoKnownFolder(FOLDERID_Pictures);
 		break;
 
 	case IDM_GO_DESKTOP:
-		m_navigation->OnGotoFolder(CSIDL_DESKTOP);
+		OnGotoKnownFolder(FOLDERID_Desktop);
 		break;
 
 	case IDM_GO_RECYCLEBIN:
-		m_navigation->OnGotoFolder(CSIDL_BITBUCKET);
+		OnGotoKnownFolder(FOLDERID_RecycleBinFolder);
 		break;
 
 	case IDM_GO_CONTROLPANEL:
-		m_navigation->OnGotoFolder(CSIDL_CONTROLS);
+		OnGotoKnownFolder(FOLDERID_ControlPanelFolder);
 		break;
 
 	case IDM_GO_PRINTERS:
-		m_navigation->OnGotoFolder(CSIDL_PRINTERS);
+		OnGotoKnownFolder(FOLDERID_PrintersFolder);
 		break;
 
 	case IDM_GO_CDBURNING:
-		m_navigation->OnGotoFolder(CSIDL_CDBURN_AREA);
+		OnGotoKnownFolder(FOLDERID_CDBurning);
 		break;
 
 	case IDM_GO_MYNETWORKPLACES:
-		m_navigation->OnGotoFolder(CSIDL_NETWORK);
+		OnGotoKnownFolder(FOLDERID_NetworkFolder);
 		break;
 
 	case IDM_GO_NETWORKCONNECTIONS:
-		m_navigation->OnGotoFolder(CSIDL_CONNECTIONS);
+		OnGotoKnownFolder(FOLDERID_ConnectionsFolder);
 		break;
 
 	case ToolbarButton::AddBookmark:

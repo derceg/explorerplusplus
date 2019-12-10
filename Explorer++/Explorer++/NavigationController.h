@@ -42,6 +42,8 @@ public:
 
 	HRESULT Refresh();
 
+	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidl);
+
 	void SetNavigationMode(NavigationMode navigationMode);
 
 private:
@@ -55,7 +57,7 @@ private:
 	void AddEntry(std::unique_ptr<HistoryEntry> entry);
 	HistoryEntry *GetEntryAndUpdateIndex(int offset);
 
-	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry = true);
+	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
 
 	std::vector<std::unique_ptr<HistoryEntry>> m_entries;
 	int m_currentEntry;

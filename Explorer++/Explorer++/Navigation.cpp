@@ -63,22 +63,6 @@ void Navigation::OnNavigateUp()
 	}
 }
 
-/*
-* Navigates to the folder specified by the incoming
-* csidl.
-*/
-void Navigation::OnGotoFolder(int FolderCSIDL)
-{
-	unique_pidl_absolute pidl;
-	HRESULT hr = SHGetFolderLocation(NULL, FolderCSIDL, NULL, 0, wil::out_param(pidl));
-
-	/* Don't use SUCCEEDED(hr). */
-	if(hr == S_OK)
-	{
-		BrowseFolderInCurrentTab(pidl.get());
-	}
-}
-
 HRESULT Navigation::BrowseFolderInCurrentTab(const TCHAR *szPath)
 {
 	Tab &tab = m_tabContainer->GetSelectedTab();
