@@ -15,16 +15,7 @@ Navigation::Navigation(std::shared_ptr<Config> config, IExplorerplusplus *expp) 
 {
 	m_expp->AddTabsInitializedObserver([this] {
 		m_tabContainer = m_expp->GetTabContainer();
-		m_tabContainer->tabCreatedSignal.AddObserver(boost::bind(&Navigation::OnTabCreated, this, _1, _2), boost::signals2::at_front);
 	});
-}
-
-void Navigation::OnTabCreated(int tabId, BOOL switchToNewTab)
-{
-	UNREFERENCED_PARAMETER(switchToNewTab);
-
-	const Tab &tab = m_tabContainer->GetTab(tabId);
-	navigationCompletedSignal.m_signal(tab);
 }
 
 void Navigation::OnBrowseBack()
@@ -40,14 +31,10 @@ void Navigation::OnBrowseForward()
 void Navigation::OnGoToOffset(int offset)
 {
 	Tab &tab = m_tabContainer->GetSelectedTab();
-	HRESULT hr = E_FAIL;
-	int resultingTabId = -1;
 
 	if (tab.GetLockState() != Tab::LockState::AddressLocked)
 	{
-		hr = tab.GetNavigationController()->GoToOffset(offset);
-
-		resultingTabId = tab.GetId();
+		tab.GetNavigationController()->GoToOffset(offset);
 	}
 	else
 	{
@@ -55,14 +42,8 @@ void Navigation::OnGoToOffset(int offset)
 
 		if (entry)
 		{
-			hr = m_tabContainer->CreateNewTab(entry->GetPidl().get(), TabSettings(_selected = true), nullptr, boost::none, &resultingTabId);
+			m_tabContainer->CreateNewTab(entry->GetPidl().get(), TabSettings(_selected = true));
 		}
-	}
-
-	if (SUCCEEDED(hr))
-	{
-		const Tab &resultingTab = m_tabContainer->GetTab(resultingTabId);
-		navigationCompletedSignal.m_signal(resultingTab);
 	}
 }
 
@@ -102,8 +83,6 @@ void Navigation::OnNavigateUp()
 	if (SUCCEEDED(hr))
 	{
 		const Tab &resultingTab = m_tabContainer->GetTab(resultingTabId);
-		navigationCompletedSignal.m_signal(resultingTab);
-
 		std::wstring directory = resultingTab.GetShellBrowser()->GetDirectory();
 
 		TCHAR directoryFileName[MAX_PATH];
@@ -175,23 +154,14 @@ new tab will be created instead). */
 HRESULT Navigation::BrowseFolder(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory)
 {
 	HRESULT hr = E_FAIL;
-	int resultingTabId = -1;
 
 	if (tab.GetLockState() != Tab::LockState::AddressLocked)
 	{
 		hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory);
-
-		resultingTabId = tab.GetId();
 	}
 	else
 	{
-		hr = m_tabContainer->CreateNewTab(pidlDirectory, TabSettings(_selected = true), nullptr, boost::none, &resultingTabId);
-	}
-
-	if(SUCCEEDED(hr))
-	{
-		const Tab &resultingTab = m_tabContainer->GetTab(resultingTabId);
-		navigationCompletedSignal.m_signal(resultingTab);
+		hr = m_tabContainer->CreateNewTab(pidlDirectory, TabSettings(_selected = true));
 	}
 
 	return hr;

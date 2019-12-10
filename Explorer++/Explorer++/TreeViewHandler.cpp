@@ -73,7 +73,7 @@ void Explorerplusplus::CreateFolderControls(void)
 		UpdateTreeViewSelection();
 	});
 
-	m_navigation->navigationCompletedSignal.AddObserver([this] (const Tab &tab) {
+	m_tabContainer->tabNavigationCompletedSignal.AddObserver([this] (const Tab &tab) {
 		UNREFERENCED_PARAMETER(tab);
 
 		UpdateTreeViewSelection();

@@ -5,7 +5,6 @@
 #pragma once
 
 #include "CoreInterface.h"
-#include "Navigation.h"
 #include "Tab.h"
 #include "TabContainer.h"
 #include "../Helper/Macros.h"
@@ -18,7 +17,7 @@ class TaskbarThumbnails
 public:
 
 	static TaskbarThumbnails *Create(IExplorerplusplus *expp, TabContainer *tabContainer,
-		Navigation *navigation, HINSTANCE instance, std::shared_ptr<Config> config);
+		HINSTANCE instance, std::shared_ptr<Config> config);
 
 private:
 
@@ -33,7 +32,7 @@ private:
 	};
 
 	TaskbarThumbnails(IExplorerplusplus *expp, TabContainer *tabContainer,
-		Navigation *navigation, HINSTANCE instance, std::shared_ptr<Config> config);
+		HINSTANCE instance, std::shared_ptr<Config> config);
 	~TaskbarThumbnails() = default;
 
 	static LRESULT CALLBACK MainWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
@@ -59,7 +58,6 @@ private:
 
 	IExplorerplusplus *m_expp;
 	TabContainer *m_tabContainer;
-	Navigation *m_navigation;
 	HINSTANCE m_instance;
 
 	ITaskbarList4 *m_pTaskbarList;

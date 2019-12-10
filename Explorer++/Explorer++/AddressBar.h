@@ -6,7 +6,6 @@
 
 #include "CoreInterface.h"
 #include "MainToolbar.h"
-#include "Navigation.h"
 #include "../Helper/BaseWindow.h"
 #include "../Helper/Macros.h"
 #include "../Helper/WindowSubclassWrapper.h"
@@ -16,16 +15,14 @@ class AddressBar : public CBaseWindow
 {
 public:
 
-	static AddressBar *Create(HWND parent, IExplorerplusplus *expp,
-		Navigation *navigation, MainToolbar *mainToolbar);
+	static AddressBar *Create(HWND parent, IExplorerplusplus *expp, MainToolbar *mainToolbar);
 
 private:
 
 	static const UINT_PTR SUBCLASS_ID = 0;
 	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
-	AddressBar(HWND parent, IExplorerplusplus *expp, Navigation *navigation,
-		MainToolbar *mainToolbar);
+	AddressBar(HWND parent, IExplorerplusplus *expp, MainToolbar *mainToolbar);
 	~AddressBar() = default;
 
 	static HWND CreateAddressBar(HWND parent);
@@ -46,7 +43,6 @@ private:
 	void OnHistoryEntryUpdated(const HistoryEntry &entry, HistoryEntry::PropertyType propertyType);
 
 	IExplorerplusplus *m_expp;
-	Navigation *m_navigation;
 	MainToolbar *m_mainToolbar;
 
 	boost::signals2::scoped_connection m_historyEntryUpdatedConnection;

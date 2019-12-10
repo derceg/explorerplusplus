@@ -5,7 +5,7 @@
 #pragma once
 
 #include "CoreInterface.h"
-#include "Navigation.h"
+#include "Tab.h"
 #include "../Helper/BaseWindow.h"
 
 struct Config;
@@ -14,13 +14,13 @@ class MainWindow : CBaseWindow
 {
 public:
 
-	static MainWindow *Create(HWND hwnd, std::shared_ptr<Config> config,
-		HINSTANCE instance, IExplorerplusplus *expp, Navigation *navigation);
+	static MainWindow *Create(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
+		IExplorerplusplus *expp);
 
 private:
 
 	MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
-		IExplorerplusplus *expp, Navigation *navigation);
+		IExplorerplusplus *expp);
 	~MainWindow() = default;
 
 	void OnNavigationCompleted(const Tab &tab);
@@ -36,7 +36,6 @@ private:
 	std::shared_ptr<Config> m_config;
 	HINSTANCE m_instance;
 	IExplorerplusplus *m_expp;
-	Navigation *m_navigation;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

@@ -13,17 +13,14 @@
 #include <wil/resource.h>
 #include <functional>
 
-AddressBar *AddressBar::Create(HWND parent, IExplorerplusplus *expp,
-	Navigation *navigation, MainToolbar *mainToolbar)
+AddressBar *AddressBar::Create(HWND parent, IExplorerplusplus *expp, MainToolbar *mainToolbar)
 {
-	return new AddressBar(parent, expp, navigation, mainToolbar);
+	return new AddressBar(parent, expp, mainToolbar);
 }
 
-AddressBar::AddressBar(HWND parent, IExplorerplusplus *expp, Navigation *navigation,
-	MainToolbar *mainToolbar) :
+AddressBar::AddressBar(HWND parent, IExplorerplusplus *expp, MainToolbar *mainToolbar) :
 	CBaseWindow(CreateAddressBar(parent)),
 	m_expp(expp),
-	m_navigation(navigation),
 	m_mainToolbar(mainToolbar),
 	m_defaultFolderIconIndex(GetDefaultFolderIconIndex())
 {
@@ -53,10 +50,11 @@ void AddressBar::Initialize(HWND parent)
 		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	m_expp->AddTabsInitializedObserver([this] {
-		m_connections.push_back(m_expp->GetTabContainer()->tabSelectedSignal.AddObserver(boost::bind(&AddressBar::OnTabSelected, this, _1)));
+		m_connections.push_back(m_expp->GetTabContainer()->tabSelectedSignal.AddObserver(
+			boost::bind(&AddressBar::OnTabSelected, this, _1)));
+		m_connections.push_back(m_expp->GetTabContainer()->tabNavigationCompletedSignal.AddObserver(
+			boost::bind(&AddressBar::OnNavigationCompleted, this, _1)));
 	});
-
-	m_connections.push_back(m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&AddressBar::OnNavigationCompleted, this, _1)));
 }
 
 LRESULT CALLBACK AddressBar::EditSubclassStub(HWND hwnd, UINT uMsg,

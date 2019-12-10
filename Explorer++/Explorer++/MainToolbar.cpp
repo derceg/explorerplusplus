@@ -162,11 +162,13 @@ void MainToolbar::Initialize(HWND parent)
 		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	m_pexpp->AddTabsInitializedObserver([this] {
-		m_connections.push_back(m_pexpp->GetTabContainer()->tabSelectedSignal.AddObserver(boost::bind(&MainToolbar::OnTabSelected, this, _1)));
+		m_connections.push_back(m_pexpp->GetTabContainer()->tabSelectedSignal.AddObserver(
+			boost::bind(&MainToolbar::OnTabSelected, this, _1)));
+		m_connections.push_back(m_pexpp->GetTabContainer()->tabNavigationCompletedSignal.AddObserver(
+			boost::bind(&MainToolbar::OnNavigationCompleted, this, _1)));
 	});
 
 	m_connections.push_back(m_config->useLargeToolbarIcons.addObserver(boost::bind(&MainToolbar::OnUseLargeToolbarIconsUpdated, this, _1)));
-	m_connections.push_back(m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&MainToolbar::OnNavigationCompleted, this, _1)));
 }
 
 void MainToolbar::SetTooolbarImageList()

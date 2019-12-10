@@ -46,7 +46,7 @@ void Explorerplusplus::OnCreate()
 
 	m_navigation = std::make_unique<Navigation>(m_config, this);
 
-	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_hLanguageModule, this, m_navigation.get());
+	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_hLanguageModule, this);
 
 	InitializeMainMenu();
 
@@ -68,7 +68,7 @@ void Explorerplusplus::OnCreate()
 	size initially. */
 	ResizeWindows();
 
-	m_taskbarThumbnails = TaskbarThumbnails::Create(this, m_tabContainer, m_navigation.get(), m_hLanguageModule, m_config);
+	m_taskbarThumbnails = TaskbarThumbnails::Create(this, m_tabContainer, m_hLanguageModule, m_config);
 
 	RestoreTabs(pLoadSave);
 	delete pLoadSave;

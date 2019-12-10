@@ -106,10 +106,9 @@ void TabContainer::Initialize(HWND parent)
 	m_windowSubclasses.push_back(WindowSubclassWrapper(parent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	m_connections.push_back(tabCreatedSignal.AddObserver(boost::bind(&TabContainer::OnTabCreated, this, _1, _2)));
-	m_connections.push_back(tabRemovedSignal.AddObserver(boost::bind(&TabContainer::OnTabRemoved, this, _1)));
+	m_connections.push_back(tabNavigationCompletedSignal.AddObserver(boost::bind(&TabContainer::OnNavigationCompleted, this, _1)));
 	m_connections.push_back(tabSelectedSignal.AddObserver(boost::bind(&TabContainer::OnTabSelected, this, _1)));
-
-	m_connections.push_back(m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&TabContainer::OnNavigationCompleted, this, _1)));
+	m_connections.push_back(tabRemovedSignal.AddObserver(boost::bind(&TabContainer::OnTabRemoved, this, _1)));
 
 	m_connections.push_back(m_config->alwaysShowTabBar.addObserver(boost::bind(&TabContainer::OnAlwaysShowTabBarUpdated, this, _1)));
 	m_connections.push_back(m_config->forceSameTabWidth.addObserver(boost::bind(&TabContainer::OnForceSameTabWidthUpdated, this, _1)));
@@ -918,6 +917,18 @@ HRESULT TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 		selected = *tabSettings.selected;
 	}
 
+	// Capturing the tab by reference here is safe, since the tab object is
+	// guaranteed to exist whenever this method is called.
+	tab.GetShellBrowser()->navigationCompletedSignal.AddObserver([this, &tab] (PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry) {
+		UNREFERENCED_PARAMETER(pidlDirectory);
+		UNREFERENCED_PARAMETER(addHistoryEntry);
+
+		// Re-broadcast the event. This allows other classes to be notified of
+		// navigations in any tab, without having to observe navigation events
+		// for each tab individually.
+		tabNavigationCompletedSignal.m_signal(tab);
+	});
+
 	HRESULT hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory, addHistoryEntry);
 
 	if (hr != S_OK)
@@ -933,9 +944,7 @@ HRESULT TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 
 		if (previousIndex != -1)
 		{
-			m_tabContainerInterface->OnTabSelected(tab);
-
-			OnTabSelected(tab);
+			tabSelectedSignal.m_signal(tab);
 		}
 	}
 

@@ -29,11 +29,7 @@ public:
 
 	void OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory);
 
-	SignalWrapper<Navigation, void(const Tab &tab)> navigationCompletedSignal;
-
 private:
-
-	void OnTabCreated(int tabId, BOOL switchToNewTab);
 
 	std::shared_ptr<Config> m_config;
 	IExplorerplusplus *m_expp;
