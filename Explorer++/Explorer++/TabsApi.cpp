@@ -14,10 +14,9 @@
 #pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
 Plugins::TabsApi::TabsApi(IExplorerplusplus *expp, TabContainer *tabContainer,
-	TabInterface *tabInterface, Navigation *navigation) :
+	Navigation *navigation) :
 	m_expp(expp),
 	m_tabContainer(tabContainer),
-	m_tabInterface(tabInterface),
 	m_navigation(navigation)
 {
 
@@ -236,7 +235,7 @@ void Plugins::TabsApi::refresh(int tabId)
 		return;
 	}
 
-	m_tabInterface->RefreshTab(*tabInternal);
+	tabInternal->GetNavigationController()->Refresh();
 }
 
 int Plugins::TabsApi::move(int tabId, int newIndex)

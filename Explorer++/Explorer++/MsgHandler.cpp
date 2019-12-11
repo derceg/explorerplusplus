@@ -958,7 +958,7 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 void Explorerplusplus::OnRefresh()
 {
 	Tab &tab = m_tabContainer->GetSelectedTab();
-	RefreshTab(tab);
+	tab.GetNavigationController()->Refresh();
 }
 
 void Explorerplusplus::CopyColumnInfoToClipboard(void)
@@ -1508,5 +1508,5 @@ void Explorerplusplus::OnShowHiddenFiles()
 {
 	Tab &tab = m_tabContainer->GetSelectedTab();
 	tab.GetShellBrowser()->SetShowHidden(!tab.GetShellBrowser()->GetShowHidden());
-	RefreshTab(tab);
+	tab.GetNavigationController()->Refresh();
 }

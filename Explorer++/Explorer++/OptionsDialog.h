@@ -16,7 +16,7 @@ class OptionsDialog
 public:
 
 	static OptionsDialog *Create(std::shared_ptr<Config> config, HINSTANCE instance, IExplorerplusplus *expp,
-		TabContainer *tabContainer, TabInterface *tabInterface);
+		TabContainer *tabContainer);
 
 	HWND Show(HWND parentWindow);
 
@@ -33,7 +33,7 @@ private:
 	static const UINT_PTR PROP_SHEET_SUBCLASS_ID = 0;
 
 	OptionsDialog(std::shared_ptr<Config> config, HINSTANCE instance, IExplorerplusplus *expp,
-		TabContainer *tabContainer, TabInterface *tabInterface);
+		TabContainer *tabContainer);
 	~OptionsDialog() = default;
 
 	PROPSHEETPAGE GeneratePropertySheetDefinition(const OptionsDialogSheetInfo &sheetInfo);
@@ -73,7 +73,6 @@ private:
 	DpiCompatibility m_dpiCompat;
 
 	TabContainer *m_tabContainer;
-	TabInterface *m_tabInterface;
 
 	wil::unique_hicon m_optionsDialogIcon;
 	wil::unique_hicon m_newTabDirectoryIcon;

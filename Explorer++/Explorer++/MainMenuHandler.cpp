@@ -143,7 +143,7 @@ void Explorerplusplus::OnShowOptions()
 {
 	if(g_hwndOptions == NULL)
 	{
-		OptionsDialog *optionsDialog = OptionsDialog::Create(m_config, m_hLanguageModule, this, m_tabContainer, this);
+		OptionsDialog *optionsDialog = OptionsDialog::Create(m_config, m_hLanguageModule, this, m_tabContainer);
 		g_hwndOptions = optionsDialog->Show(m_hContainer);
 	}
 	else

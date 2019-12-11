@@ -37,19 +37,18 @@ const std::map<UINT, Icon> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
 };
 
 TabContainer *TabContainer::Create(HWND parent, TabContainerInterface *tabContainer,
-	TabInterface *tabInterface, TabNavigationInterface *tabNavigation, Navigation *navigation,
-	IExplorerplusplus *expp, CachedIcons *cachedIcons, HINSTANCE instance, std::shared_ptr<Config> config)
+	TabNavigationInterface *tabNavigation, Navigation *navigation, IExplorerplusplus *expp,
+	CachedIcons *cachedIcons, HINSTANCE instance, std::shared_ptr<Config> config)
 {
-	return new TabContainer(parent, tabContainer, tabInterface, tabNavigation, navigation, expp,
+	return new TabContainer(parent, tabContainer, tabNavigation, navigation, expp,
 		cachedIcons, instance, config);
 }
 
-TabContainer::TabContainer(HWND parent, TabContainerInterface *tabContainer, TabInterface *tabInterface,
+TabContainer::TabContainer(HWND parent, TabContainerInterface *tabContainer,
 	TabNavigationInterface *tabNavigation, Navigation *navigation, IExplorerplusplus *expp,
 	CachedIcons *cachedIcons, HINSTANCE instance, std::shared_ptr<Config> config) :
 	CBaseWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
 	m_tabContainerInterface(tabContainer),
-	m_tabInterface(tabInterface),
 	m_tabNavigation(tabNavigation),
 	m_navigation(navigation),
 	m_expp(expp),
@@ -418,7 +417,7 @@ void TabContainer::ProcessTabCommand(UINT uMenuID, Tab &tab)
 			break;
 
 		case IDM_TAB_REFRESH:
-			m_tabInterface->RefreshTab(tab);
+			OnRefreshTab(tab);
 			break;
 
 		case IDM_TAB_REFRESHALL:
@@ -465,11 +464,16 @@ void TabContainer::OnOpenParentInNewTab(const Tab &tab)
 	}
 }
 
+void TabContainer::OnRefreshTab(Tab &tab)
+{
+	tab.GetNavigationController()->Refresh();
+}
+
 void TabContainer::OnRefreshAllTabs()
 {
 	for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
 	{
-		m_tabInterface->RefreshTab(*tab);
+		tab->GetNavigationController()->Refresh();
 	}
 }
 

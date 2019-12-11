@@ -285,7 +285,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 					m_pActiveShellBrowser->ImportColumns(currentColumns);
 
 					Tab &tab = m_tabContainer->GetSelectedTab();
-					RefreshTab(tab);
+					tab.GetNavigationController()->Refresh();
 
 					return TRUE;
 				}
@@ -1011,7 +1011,7 @@ void Explorerplusplus::OnListViewHeaderMenuItemSelected(int menuItemId,
 	if (menuItemId == 1)
 	{
 		Tab &tab = m_tabContainer->GetSelectedTab();
-		RefreshTab(tab);
+		tab.GetNavigationController()->Refresh();
 	}
 }
 

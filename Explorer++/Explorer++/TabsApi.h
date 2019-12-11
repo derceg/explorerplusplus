@@ -10,7 +10,6 @@
 #include "ShellBrowser/ViewModes.h"
 #include "Tab.h"
 #include "TabContainer.h"
-#include "TabInterface.h"
 #include "../Helper/StringHelper.h"
 #include "../ThirdParty/Sol/forward.hpp"
 
@@ -82,7 +81,7 @@ namespace Plugins
 			}
 		};
 
-		TabsApi(IExplorerplusplus *expp, TabContainer *tabContainer, TabInterface *tabInterface, Navigation *navigation);
+		TabsApi(IExplorerplusplus *expp, TabContainer *tabContainer, Navigation *navigation);
 
 		std::vector<Tab> getAll();
 		boost::optional<Tab> get(int tabId);
@@ -99,7 +98,6 @@ namespace Plugins
 
 		IExplorerplusplus *m_expp;
 		TabContainer *m_tabContainer;
-		TabInterface *m_tabInterface;
 		Navigation *m_navigation;
 	};
 }

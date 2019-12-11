@@ -6,7 +6,6 @@
 
 #include "CoreInterface.h"
 #include "TabContainer.h"
-#include "TabInterface.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 

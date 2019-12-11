@@ -14,7 +14,6 @@
 #include "ShellBrowser/ViewModes.h"
 #include "Tab.h"
 #include "TabContainerInterface.h"
-#include "TabInterface.h"
 #include "TabNavigationInterface.h"
 #include "TabRestorer.h"
 #include "TabRestorerUI.h"
@@ -72,8 +71,7 @@ __interface IDirectoryMonitor;
 class CMyTreeView;
 
 class Explorerplusplus : public IExplorerplusplus, public TabContainerInterface,
-	public TabInterface, public TabNavigationInterface, public IFileContextMenuExternal,
-	public PluginInterface
+	public TabNavigationInterface, public IFileContextMenuExternal, public PluginInterface
 {
 	friend CLoadSaveRegistry;
 	friend CLoadSaveXML;
@@ -299,7 +297,6 @@ private:
 	void					ShowTabBar();
 	void					HideTabBar();
 	HRESULT					RestoreTabs(ILoadSave *pLoadSave);
-	HRESULT					RefreshTab(const Tab &tab);
 
 	/* TabNavigationInterface methods. */
 	HRESULT					CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected);
@@ -309,7 +306,6 @@ private:
 	/* PluginInterface. */
 	IExplorerplusplus		*GetCoreInterface();
 	TabContainer			*GetTabContainer();
-	TabInterface			*GetTabInterface();
 	Navigation				*GetNavigation();
 	Plugins::PluginMenuManager	*GetPluginMenuManager();
 	UiTheming				*GetUiTheming();

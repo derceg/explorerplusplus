@@ -9,7 +9,6 @@
 #include "SignalWrapper.h"
 #include "Tab.h"
 #include "TabContainerInterface.h"
-#include "TabInterface.h"
 #include "TabNavigationInterface.h"
 #include "../Helper/BaseWindow.h"
 #include "../Helper/DpiCompatibility.h"
@@ -73,9 +72,8 @@ class TabContainer : public CBaseWindow
 public:
 
 	static TabContainer *Create(HWND parent, TabContainerInterface *tabContainer,
-		TabInterface *tabInterface, TabNavigationInterface *tabNavigation,
-		Navigation *navigation, IExplorerplusplus *expp, CachedIcons *cachedIcons,
-		HINSTANCE instance, std::shared_ptr<Config> config);
+		TabNavigationInterface *tabNavigation, Navigation *navigation, IExplorerplusplus *expp,
+		CachedIcons *cachedIcons, HINSTANCE instance, std::shared_ptr<Config> config);
 
 	HRESULT CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {},
 		const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none,
@@ -124,9 +122,9 @@ private:
 
 	static const int ICON_SIZE_96DPI = 16;
 
-	TabContainer(HWND parent, TabContainerInterface *tabContainer, TabInterface *tabInterface,
-		TabNavigationInterface *tabNavigation, Navigation *navigation, IExplorerplusplus *expp,
-		CachedIcons *cachedIcons, HINSTANCE instance, std::shared_ptr<Config> config);
+	TabContainer(HWND parent, TabContainerInterface *tabContainer, TabNavigationInterface *tabNavigation,
+		Navigation *navigation, IExplorerplusplus *expp, CachedIcons *cachedIcons, HINSTANCE instance,
+		std::shared_ptr<Config> config);
 	~TabContainer();
 
 	static HWND CreateTabControl(HWND parent, BOOL forceSameTabWidth);
@@ -157,6 +155,7 @@ private:
 	void AddImagesToTabContextMenu(HMENU menu, std::vector<wil::unique_hbitmap> &menuImages);
 	void ProcessTabCommand(UINT uMenuID, Tab &tab);
 	void OnOpenParentInNewTab(const Tab &tab);
+	void OnRefreshTab(Tab &tab);
 	void OnRefreshAllTabs();
 	void OnRenameTab(const Tab &tab);
 	void OnLockTab(Tab &tab);
@@ -199,7 +198,6 @@ private:
 	int m_tabIconLockIndex;
 
 	TabContainerInterface *m_tabContainerInterface;
-	TabInterface *m_tabInterface;
 	TabNavigationInterface *m_tabNavigation;
 	Navigation *m_navigation;
 	IExplorerplusplus *m_expp;

@@ -10,14 +10,12 @@
 #include "PluginCommandManager.h"
 #include "PluginMenuManager.h"
 #include "TabContainer.h"
-#include "TabInterface.h"
 #include "UiTheming.h"
 
 __interface PluginInterface
 {
 	IExplorerplusplus *GetCoreInterface();
 	TabContainer *GetTabContainer();
-	TabInterface *GetTabInterface();
 	Navigation *GetNavigation();
 	Plugins::PluginMenuManager *GetPluginMenuManager();
 	UiTheming *GetUiTheming();

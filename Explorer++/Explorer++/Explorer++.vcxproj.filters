@@ -561,9 +561,6 @@
     <ClInclude Include="Tab.h">
       <Filter>Tabs</Filter>
     </ClInclude>
-    <ClInclude Include="TabInterface.h">
-      <Filter>Tabs</Filter>
-    </ClInclude>
     <ClInclude Include="TabContainerInterface.h">
       <Filter>Tabs</Filter>
     </ClInclude>

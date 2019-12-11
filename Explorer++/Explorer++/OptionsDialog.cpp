@@ -57,18 +57,17 @@ static const FileSize_t FILE_SIZES[] = {
 TCHAR g_szNewTabDirectory[MAX_PATH];
 
 OptionsDialog *OptionsDialog::Create(std::shared_ptr<Config> config, HINSTANCE instance,
-	IExplorerplusplus *expp, TabContainer *tabContainer, TabInterface *tabInterface)
+	IExplorerplusplus *expp, TabContainer *tabContainer)
 {
-	return new OptionsDialog(config, instance, expp, tabContainer, tabInterface);
+	return new OptionsDialog(config, instance, expp, tabContainer);
 }
 
 OptionsDialog::OptionsDialog(std::shared_ptr<Config> config, HINSTANCE instance,
-	IExplorerplusplus *expp, TabContainer *tabContainer, TabInterface *tabInterface) :
+	IExplorerplusplus *expp, TabContainer *tabContainer) :
 	m_config(config),
 	m_instance(instance),
 	m_expp(expp),
-	m_tabContainer(tabContainer),
-	m_tabInterface(tabInterface)
+	m_tabContainer(tabContainer)
 {
 
 }
@@ -641,7 +640,7 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wPar
 
 						for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
 						{
-							m_tabInterface->RefreshTab(*tab);
+							tab->GetNavigationController()->Refresh();
 
 							NListView::ListView_ActivateOneClickSelect(tab->GetShellBrowser()->GetListView(),
 								m_config->globalFolderSettings.oneClickActivate,

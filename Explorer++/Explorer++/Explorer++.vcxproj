@@ -695,7 +695,6 @@
     <ClInclude Include="TabContainerInterface.h" />
     <ClInclude Include="TabCreated.h" />
     <ClInclude Include="TabDropHandler.h" />
-    <ClInclude Include="TabInterface.h" />
     <ClInclude Include="TabMoved.h" />
     <ClInclude Include="TabNavigationInterface.h" />
     <ClInclude Include="TabProperties.h" />
