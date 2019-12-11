@@ -192,7 +192,7 @@ private:
 	void					OnSelectTabByIndex(int iTab);
 
 	/* Main menu handlers. */
-	void					OnNewTab();
+	HRESULT					OnNewTab();
 	bool					OnCloseTab();
 	void					OnSaveDirectoryListing() const;
 	void					OnCloneWindow();

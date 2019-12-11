@@ -80,46 +80,37 @@ void Explorerplusplus::OnNavigationCompleted(const Tab &tab)
 	HandleDirectoryMonitoring(tab.GetId());
 }
 
-/*
-* Creates a new tab. If a folder is selected,
-* that folder is opened in a new tab, else
-* the default directory is opened.
-*/
-void Explorerplusplus::OnNewTab()
+/* Creates a new tab. If a folder is selected, that folder is opened in a new
+ * tab, else the default directory is opened. */
+HRESULT Explorerplusplus::OnNewTab()
 {
-	bool folderSelected = false;
-
 	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
 	int selectionIndex = ListView_GetNextItem(selectedTab.GetShellBrowser()->GetListView(),
 		-1, LVNI_FOCUSED | LVNI_SELECTED);
 
 	if(selectionIndex != -1)
 	{
-		TCHAR FullItemPath[MAX_PATH];
+		auto fileFindData = selectedTab.GetShellBrowser()->GetItemFileFindData(selectionIndex);
 
-		/* An item is selected, so get its full pathname. */
-		selectedTab.GetShellBrowser()->GetItemFullName(selectionIndex, FullItemPath, SIZEOF_ARRAY(FullItemPath));
-
-		/* If the selected item is a folder, open that folder
-		in a new tab, else just use the default new tab directory. */
-		if(PathIsDirectory(FullItemPath))
+		/* If the selected item is a folder, open that folder in a new tab, else
+		 * just use the default new tab directory. */
+		if(WI_IsFlagSet(fileFindData.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
 		{
-			folderSelected = true;
-			m_tabContainer->CreateNewTab(FullItemPath, TabSettings(_selected = true));
+			auto pidl = selectedTab.GetShellBrowser()->GetItemCompleteIdl(selectionIndex);
+			return m_tabContainer->CreateNewTab(pidl.get(), TabSettings(_selected = true));
 		}
 	}
 
-	/* Either no items are selected, or the focused + selected
-	item was not a folder; open the default tab directory. */
-	if(!folderSelected)
+	/* Either no items are selected, or the focused + selected item was not a
+	 * folder; open the default tab directory. */
+	HRESULT hr = m_tabContainer->CreateNewTab(m_config->defaultTabDirectory.c_str(), TabSettings(_selected = true));
+
+	if (FAILED(hr))
 	{
-		HRESULT hr = m_tabContainer->CreateNewTab(m_config->defaultTabDirectory.c_str(), TabSettings(_selected = true));
-
-		if (FAILED(hr))
-		{
-			m_tabContainer->CreateNewTab(m_config->defaultTabDirectoryStatic.c_str(), TabSettings(_selected = true));
-		}
+		hr = m_tabContainer->CreateNewTab(m_config->defaultTabDirectoryStatic.c_str(), TabSettings(_selected = true));
 	}
+
+	return hr;
 }
 
 HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
