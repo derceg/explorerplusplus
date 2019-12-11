@@ -69,7 +69,6 @@ public:
 	FolderSettings		GetFolderSettings() const;
 
 	/* Navigation. */
-	HRESULT				BrowseFolder(const TCHAR *szPath, bool addHistoryEntry = true);
 	HRESULT				BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true);
 
 	/* Drag and Drop. */

@@ -4,28 +4,16 @@
 
 #include "stdafx.h"
 #include "Navigation.h"
-#include "MainResource.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 
-Navigation::Navigation(std::shared_ptr<Config> config, IExplorerplusplus *expp) :
-	m_config(config),
+Navigation::Navigation(IExplorerplusplus *expp) :
 	m_expp(expp),
 	m_tabContainer(nullptr)
 {
 	m_expp->AddTabsInitializedObserver([this] {
 		m_tabContainer = m_expp->GetTabContainer();
 	});
-}
-
-void Navigation::OnNavigateHome()
-{
-	HRESULT hr = BrowseFolderInCurrentTab(m_config->defaultTabDirectory.c_str());
-
-	if(FAILED(hr))
-	{
-		BrowseFolderInCurrentTab(m_config->defaultTabDirectoryStatic.c_str());
-	}
 }
 
 void Navigation::OnNavigateUp()
@@ -66,60 +54,13 @@ void Navigation::OnNavigateUp()
 HRESULT Navigation::BrowseFolderInCurrentTab(const TCHAR *szPath)
 {
 	Tab &tab = m_tabContainer->GetSelectedTab();
-	return BrowseFolder(tab, szPath);
-}
-
-/*
-Browses to the specified folder within the _current_
-tab. Also performs path expansion, meaning paths with
-embedded environment variables will be handled automatically.
-
-NOTE: All user-facing functions MUST send their paths
-through here, rather than converting them to an idl
-themselves (so that path expansion and any other required
-processing can occur here).
-
-The ONLY times an idl should be sent are:
-- When loading directories on startup
-- When navigating to a folder on the 'Go' menu
-*/
-HRESULT Navigation::BrowseFolder(Tab &tab, const TCHAR *szPath)
-{
-	/* Doesn't matter if we can't get the pidl here,
-	as some paths will be relative, or will be filled
-	by the shellbrowser (e.g. when browsing back/forward). */
-	unique_pidl_absolute pidl;
-	HRESULT hr = SHParseDisplayName(szPath, nullptr, wil::out_param(pidl), 0, nullptr);
-
-	BrowseFolder(tab, pidl.get());
-
-	return hr;
+	return tab.GetNavigationController()->BrowseFolder(szPath);
 }
 
 HRESULT Navigation::BrowseFolderInCurrentTab(PCIDLIST_ABSOLUTE pidlDirectory)
 {
 	Tab &tab = m_tabContainer->GetSelectedTab();
-	return BrowseFolder(tab, pidlDirectory);
-}
-
-/* ALL calls to browse a folder in a particular tab MUST
-pass through this function. This ensures that tabs that
-have their addresses locked will not change directory (a
-new tab will be created instead). */
-HRESULT Navigation::BrowseFolder(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory)
-{
-	HRESULT hr = E_FAIL;
-
-	if (tab.GetLockState() != Tab::LockState::AddressLocked)
-	{
-		hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory);
-	}
-	else
-	{
-		hr = m_tabContainer->CreateNewTab(pidlDirectory, TabSettings(_selected = true));
-	}
-
-	return hr;
+	return tab.GetNavigationController()->BrowseFolder(pidlDirectory);
 }
 
 void Navigation::OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory)

@@ -229,6 +229,19 @@ HRESULT NavigationController::Refresh()
 	return m_shellBrowser->BrowseFolder(pidl.get(), false);
 }
 
+HRESULT NavigationController::BrowseFolder(const std::wstring &path)
+{
+	unique_pidl_absolute pidlDirectory;
+	HRESULT hr = SHParseDisplayName(path.c_str(), nullptr, wil::out_param(pidlDirectory), 0, nullptr);
+
+	if (SUCCEEDED(hr))
+	{
+		hr = BrowseFolder(pidlDirectory.get(), true);
+	}
+
+	return hr;
+}
+
 HRESULT NavigationController::BrowseFolder(PCIDLIST_ABSOLUTE pidl)
 {
 	return BrowseFolder(pidl, true);

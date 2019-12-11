@@ -299,7 +299,7 @@ HRESULT Explorerplusplus::OnGoToOffset(int offset)
 	return selectedTab.GetNavigationController()->GoToOffset(offset);
 }
 
-HRESULT Explorerplusplus::OnGotoKnownFolder(REFKNOWNFOLDERID knownFolderId)
+HRESULT Explorerplusplus::OnGoToKnownFolder(REFKNOWNFOLDERID knownFolderId)
 {
 	unique_pidl_absolute pidl;
 	HRESULT hr = SHGetKnownFolderIDList(knownFolderId, KF_FLAG_DEFAULT, nullptr, wil::out_param(pidl));
@@ -311,4 +311,17 @@ HRESULT Explorerplusplus::OnGotoKnownFolder(REFKNOWNFOLDERID knownFolderId)
 
 	Tab &selectedTab = m_tabContainer->GetSelectedTab();
 	return selectedTab.GetNavigationController()->BrowseFolder(pidl.get());
+}
+
+HRESULT Explorerplusplus::OnGoHome()
+{
+	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	HRESULT hr = selectedTab.GetNavigationController()->BrowseFolder(m_config->defaultTabDirectory);
+
+	if (FAILED(hr))
+	{
+		hr = selectedTab.GetNavigationController()->BrowseFolder(m_config->defaultTabDirectoryStatic);
+	}
+
+	return hr;
 }

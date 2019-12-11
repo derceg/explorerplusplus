@@ -17,19 +17,6 @@
 #include <wil/com.h>
 #include <list>
 
-HRESULT CShellBrowser::BrowseFolder(const TCHAR *szPath, bool addHistoryEntry)
-{
-	unique_pidl_absolute pidlDirectory;
-	HRESULT hr = SHParseDisplayName(szPath, nullptr, wil::out_param(pidlDirectory), 0, nullptr);
-
-	if (SUCCEEDED(hr))
-	{
-		hr = BrowseFolder(pidlDirectory.get(), addHistoryEntry);
-	}
-
-	return hr;
-}
-
 HRESULT CShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)
 {
 	SetCursor(LoadCursor(NULL, IDC_WAIT));

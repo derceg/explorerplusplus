@@ -234,7 +234,8 @@ private:
 	HRESULT					OnGoBack();
 	HRESULT					OnGoForward();
 	HRESULT					OnGoToOffset(int offset);
-	HRESULT					OnGotoKnownFolder(REFKNOWNFOLDERID knownFolderId);
+	HRESULT					OnGoHome();
+	HRESULT					OnGoToKnownFolder(REFKNOWNFOLDERID knownFolderId);
 
 	int						HighlightSimilarFiles(HWND ListView) const;
 

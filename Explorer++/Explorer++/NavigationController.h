@@ -42,6 +42,7 @@ public:
 
 	HRESULT Refresh();
 
+	HRESULT BrowseFolder(const std::wstring &path);
 	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidl);
 
 	void SetNavigationMode(NavigationMode navigationMode);

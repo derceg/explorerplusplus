@@ -907,7 +907,7 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 		break;
 
 	case APPCOMMAND_BROWSER_HOME:
-		m_navigation->OnNavigateHome();
+		OnGoHome();
 		break;
 
 	case APPCOMMAND_BROWSER_FAVORITES:

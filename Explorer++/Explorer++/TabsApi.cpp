@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "TabsAPI.h"
+#include "Config.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/SortModes.h"
 #include "TabProperties.h"
@@ -193,7 +194,7 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 
 	if (location && !location->empty())
 	{
-		m_navigation->BrowseFolder(*tabInternal, location->c_str());
+		tabInternal->GetNavigationController()->BrowseFolder(*location);
 	}
 
 	boost::optional<std::wstring> name = properties[TabConstants::NAME];

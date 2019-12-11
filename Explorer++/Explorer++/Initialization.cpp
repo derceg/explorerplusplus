@@ -44,7 +44,7 @@ void Explorerplusplus::OnCreate()
 
 	SetLanguageModule();
 
-	m_navigation = std::make_unique<Navigation>(m_config, this);
+	m_navigation = std::make_unique<Navigation>(this);
 
 	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_hLanguageModule, this);
 
