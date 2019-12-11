@@ -13,7 +13,6 @@
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
 #include "Tab.h"
-#include "TabContainerInterface.h"
 #include "TabNavigationInterface.h"
 #include "TabRestorer.h"
 #include "TabRestorerUI.h"
@@ -70,8 +69,8 @@ __interface IDirectoryMonitor;
 
 class CMyTreeView;
 
-class Explorerplusplus : public IExplorerplusplus, public TabContainerInterface,
-	public TabNavigationInterface, public IFileContextMenuExternal, public PluginInterface
+class Explorerplusplus : public IExplorerplusplus, public TabNavigationInterface,
+	public IFileContextMenuExternal, public PluginInterface
 {
 	friend CLoadSaveRegistry;
 	friend CLoadSaveXML;

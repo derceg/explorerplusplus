@@ -36,19 +36,18 @@ const std::map<UINT, Icon> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
 	{ IDM_TAB_CLOSETAB, Icon::CloseTab }
 };
 
-TabContainer *TabContainer::Create(HWND parent, TabContainerInterface *tabContainer,
-	TabNavigationInterface *tabNavigation, Navigation *navigation, IExplorerplusplus *expp,
-	CachedIcons *cachedIcons, HINSTANCE instance, std::shared_ptr<Config> config)
+TabContainer *TabContainer::Create(HWND parent, TabNavigationInterface *tabNavigation,
+	Navigation *navigation, IExplorerplusplus *expp, CachedIcons *cachedIcons,
+	HINSTANCE instance, std::shared_ptr<Config> config)
 {
-	return new TabContainer(parent, tabContainer, tabNavigation, navigation, expp,
+	return new TabContainer(parent, tabNavigation, navigation, expp,
 		cachedIcons, instance, config);
 }
 
-TabContainer::TabContainer(HWND parent, TabContainerInterface *tabContainer,
-	TabNavigationInterface *tabNavigation, Navigation *navigation, IExplorerplusplus *expp,
-	CachedIcons *cachedIcons, HINSTANCE instance, std::shared_ptr<Config> config) :
+TabContainer::TabContainer(HWND parent, TabNavigationInterface *tabNavigation,
+	Navigation *navigation, IExplorerplusplus *expp, CachedIcons *cachedIcons,
+	HINSTANCE instance, std::shared_ptr<Config> config) :
 	CBaseWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
-	m_tabContainerInterface(tabContainer),
 	m_tabNavigation(tabNavigation),
 	m_navigation(navigation),
 	m_expp(expp),

@@ -8,7 +8,6 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "SignalWrapper.h"
 #include "Tab.h"
-#include "TabContainerInterface.h"
 #include "TabNavigationInterface.h"
 #include "../Helper/BaseWindow.h"
 #include "../Helper/DpiCompatibility.h"
@@ -71,9 +70,9 @@ class TabContainer : public CBaseWindow
 {
 public:
 
-	static TabContainer *Create(HWND parent, TabContainerInterface *tabContainer,
-		TabNavigationInterface *tabNavigation, Navigation *navigation, IExplorerplusplus *expp,
-		CachedIcons *cachedIcons, HINSTANCE instance, std::shared_ptr<Config> config);
+	static TabContainer *Create(HWND parent, TabNavigationInterface *tabNavigation,
+		Navigation *navigation, IExplorerplusplus *expp, CachedIcons *cachedIcons,
+		HINSTANCE instance, std::shared_ptr<Config> config);
 
 	HRESULT CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {},
 		const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none,
@@ -122,8 +121,8 @@ private:
 
 	static const int ICON_SIZE_96DPI = 16;
 
-	TabContainer(HWND parent, TabContainerInterface *tabContainer, TabNavigationInterface *tabNavigation,
-		Navigation *navigation, IExplorerplusplus *expp, CachedIcons *cachedIcons, HINSTANCE instance,
+	TabContainer(HWND parent, TabNavigationInterface *tabNavigation, Navigation *navigation,
+		IExplorerplusplus *expp, CachedIcons *cachedIcons, HINSTANCE instance,
 		std::shared_ptr<Config> config);
 	~TabContainer();
 
@@ -197,7 +196,6 @@ private:
 	int m_defaultFolderIconIndex;
 	int m_tabIconLockIndex;
 
-	TabContainerInterface *m_tabContainerInterface;
 	TabNavigationInterface *m_tabNavigation;
 	Navigation *m_navigation;
 	IExplorerplusplus *m_expp;
