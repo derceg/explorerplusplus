@@ -185,7 +185,6 @@ private:
 		unique_pidl_child	pridl;
 		WIN32_FIND_DATA	wfd;
 		TCHAR			szDisplayName[MAX_PATH];
-		BOOL			bIconRetrieved;
 		int				iIcon;
 
 		/* These are only used for drives. They are
