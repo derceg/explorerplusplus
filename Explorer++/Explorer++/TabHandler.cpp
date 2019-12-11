@@ -168,17 +168,6 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 		return E_FAIL;
 	}
 
-	/* Tabs created on startup will NOT have
-	any automatic updates. The only thing that
-	needs to be done is to monitor each
-	directory. The tab that is finally switched
-	to will have an associated update of window
-	states. */
-	for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
-	{
-		HandleDirectoryMonitoring(tab->GetId());
-	}
-
 	if(!m_config->alwaysShowTabBar.get())
 	{
 		if(nTabsCreated == 1)
