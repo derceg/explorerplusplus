@@ -622,8 +622,7 @@ void Explorerplusplus::OnDrawClipboard()
 		}
 	}
 
-	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)ToolbarButton::Paste,
-		!m_pActiveShellBrowser->InVirtualFolder() && IsClipboardFormatAvailable(CF_HDROP));
+	SendMessage(m_mainToolbar->GetHWND(), TB_ENABLEBUTTON, ToolbarButton::Paste, CanPaste());
 
 	if(m_hNextClipboardViewer != NULL)
 	{

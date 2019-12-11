@@ -104,7 +104,8 @@ void Explorerplusplus::OnSearch()
 {
 	if(g_hwndSearch == NULL)
 	{
-		std::wstring currentDirectory = m_pActiveShellBrowser->GetDirectory();
+		Tab &selectedTab = m_tabContainer->GetSelectedTab();
+		std::wstring currentDirectory = selectedTab.GetShellBrowser()->GetDirectory();
 
 		CSearchDialog *SearchDialog = new CSearchDialog(m_hLanguageModule, IDD_SEARCH, m_hContainer,
 			currentDirectory, this, m_tabContainer);
