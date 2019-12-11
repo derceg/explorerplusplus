@@ -74,8 +74,6 @@ __interface IExplorerplusplus
 	void			SaveAllSettings();
 	BOOL			GetSavePreferencesToXmlFile() const;
 	void			SetSavePreferencesToXmlFile(BOOL savePreferencesToXmlFile);
-	DWORD			GetLanguage() const;
-	void			SetLanguage(DWORD language);
 
 	boost::signals2::connection	AddTabsInitializedObserver(const TabsInitializedSignal::slot_type &observer);
 	boost::signals2::connection	AddMainMenuPreShowObserver(const MainMenuPreShowSignal::slot_type &observer);

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "Config.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "../Helper/ProcessHelper.h"
@@ -13,7 +14,7 @@
 * on user preferences and system language.
 * The default language is English.
 */
-void Explorerplusplus::SetLanguageModule(void)
+void Explorerplusplus::SetLanguageModule()
 {
 	HANDLE			hFindFile;
 	WIN32_FIND_DATA	wfd;
@@ -39,11 +40,7 @@ void Explorerplusplus::SetLanguageModule(void)
 
 		if(bRet)
 		{
-			m_Language = wLanguage;
-		}
-		else
-		{
-			m_Language = LANG_ENGLISH;
+			m_config->language = wLanguage;
 		}
 	}
 	else
@@ -54,11 +51,11 @@ void Explorerplusplus::SetLanguageModule(void)
 			default language. */
 			LanguageID = GetUserDefaultUILanguage();
 
-			m_Language = PRIMARYLANGID(LanguageID);
+			m_config->language = PRIMARYLANGID(LanguageID);
 		}
 	}
 
-	if(m_Language == LANG_ENGLISH)
+	if(m_config->language == LANG_ENGLISH)
 	{
 		m_hLanguageModule = GetModuleHandle(NULL);
 	}
@@ -83,7 +80,7 @@ void Explorerplusplus::SetLanguageModule(void)
 
 			BOOL bLanguageMismatch = FALSE;
 
-			if(bRet && (wLanguage == m_Language))
+			if(bRet && (wLanguage == m_config->language))
 			{
 				/* Using translation DLL's built for other versions of
 				the executable will most likely crash the program due
@@ -107,7 +104,7 @@ void Explorerplusplus::SetLanguageModule(void)
 					PathAppend(szFullFileName, wfd.cFileName);
 					bRet = GetFileLanguage(szFullFileName, &wLanguage);
 
-					if(bRet && (wLanguage == m_Language))
+					if(bRet && (wLanguage == m_config->language))
 					{
 						if(VerifyLanguageVersion(szFullFileName))
 						{
@@ -222,7 +219,7 @@ void Explorerplusplus::SetLanguageModule(void)
 	{
 		m_hLanguageModule = GetModuleHandle(NULL);
 
-		m_Language = LANG_ENGLISH;
+		m_config->language = LANG_ENGLISH;
 	}
 }
 

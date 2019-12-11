@@ -145,7 +145,7 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey, _T("IconTheme"), m_config->iconTheme);
 
-		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("Language"),m_Language);
+		NRegistrySettings::SaveDwordToRegistry(hSettingsKey, _T("Language"), m_config->language);
 
 		/* Global settings. */
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ShowHiddenGlobal"), m_config->defaultFolderSettings.showHidden);
@@ -295,10 +295,13 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 			m_config->iconTheme = IconTheme::_from_integral(dwordValue);
 		}
 
-		lStatus = NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("Language"),(LPDWORD)&m_Language);
+		lStatus = NRegistrySettings::ReadDwordFromRegistry(hSettingsKey, _T("Language"), &dwordValue);
 
-		if(lStatus == ERROR_SUCCESS)
+		if (lStatus == ERROR_SUCCESS)
+		{
+			m_config->language = dwordValue;
 			m_bLanguageLoaded = TRUE;
+		}
 
 		/* Global settings. */
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("ShowHiddenGlobal"),(LPDWORD)&m_config->defaultFolderSettings.showHidden);

@@ -404,7 +404,7 @@ private:
 	void					UpdateLayout();
 
 	/* Languages. */
-	void					SetLanguageModule(void);
+	void					SetLanguageModule();
 	BOOL					VerifyLanguageVersion(const TCHAR *szLanguageModule) const;
 
 	/* Sort menu. */
@@ -476,8 +476,6 @@ private:
 	CachedIcons				*GetCachedIcons();
 	BOOL					GetSavePreferencesToXmlFile() const;
 	void					SetSavePreferencesToXmlFile(BOOL savePreferencesToXmlFile);
-	DWORD					GetLanguage() const;
-	void					SetLanguage(DWORD language);
 
 	/* Menus. */
 	void					InitializeMainMenu();
@@ -524,7 +522,6 @@ private:
 	HWND					m_hNextClipboardViewer;
 	std::wstring			m_CurrentDirectory;
 	TCHAR					m_OldTreeViewFileName[MAX_PATH];
-	DWORD					m_Language;
 	BOOL					m_bTreeViewRightClick;
 	BOOL					m_bSelectingTreeViewDirectory;
 	BOOL					m_bAttemptToolbarRestore;

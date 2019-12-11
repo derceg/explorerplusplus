@@ -417,7 +417,7 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 						iSel = static_cast<int>(SendDlgItemMessage(hDlg,IDC_OPTIONS_LANGUAGE,CB_GETCURSEL,0,0));
 
 						int language = GetLanguageIDFromIndex(hDlg, iSel);
-						m_expp->SetLanguage(language);
+						m_config->language = language;
 
 						m_expp->SaveAllSettings();
 					}
@@ -1251,7 +1251,7 @@ void OptionsDialog::AddLanguages(HWND hDlg)
 
 			if(bRet)
 			{
-				if(wLanguage == m_expp->GetLanguage())
+				if(wLanguage == m_config->language)
 				{
 					iSel = iIndex;
 				}

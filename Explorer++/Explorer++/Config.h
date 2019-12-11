@@ -33,6 +33,7 @@ struct Config
 	Config() :
 		defaultTabDirectoryStatic(GetComputerFolderPath())
 	{
+		language = LANG_ENGLISH;
 		iconTheme = IconTheme::Color;
 		startupMode = STARTUP_PREVIOUSTABS;
 		defaultTabDirectory = GetComputerFolderPath();
@@ -121,6 +122,7 @@ struct Config
 	static const UINT DEFAULT_DISPLAYWINDOW_HEIGHT = 90;
 	static const UINT DEFAULT_TREEVIEW_WIDTH = 208;
 
+	DWORD language;
 	IconTheme iconTheme;
 	StartupMode_t startupMode;
 	std::wstring defaultTabDirectory;

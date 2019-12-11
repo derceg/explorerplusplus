@@ -1493,16 +1493,6 @@ void Explorerplusplus::SetSavePreferencesToXmlFile(BOOL savePreferencesToXmlFile
 	m_bSavePreferencesToXMLFile = savePreferencesToXmlFile;
 }
 
-DWORD Explorerplusplus::GetLanguage() const
-{
-	return m_Language;
-}
-
-void Explorerplusplus::SetLanguage(DWORD language)
-{
-	m_Language = language;
-}
-
 void Explorerplusplus::OnShowHiddenFiles()
 {
 	Tab &tab = m_tabContainer->GetSelectedTab();
