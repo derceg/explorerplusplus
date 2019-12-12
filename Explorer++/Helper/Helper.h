@@ -50,7 +50,7 @@ BOOL			FormatUserName(PSID sid, TCHAR *userName, size_t cchMax);
 BOOL			GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,UINT cchMax,const TCHAR *InitialDirectory);
 
 /* General helper functions. */
-HINSTANCE		StartCommandPrompt(const TCHAR *Directory, bool Elevated);
+HINSTANCE		StartCommandPrompt(const std::wstring &Directory, bool Elevated);
 void			GetCPUBrandString(char *pszCPUBrand, UINT cchBuf);
 void			SetFORMATETC(FORMATETC *pftc, CLIPFORMAT cfFormat, DVTARGETDEVICE *ptd, DWORD dwAspect, LONG lindex, DWORD tymed);
 bool			IsKeyDown(int nVirtKey);

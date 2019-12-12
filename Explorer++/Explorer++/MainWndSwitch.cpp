@@ -351,11 +351,11 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 
 	case ToolbarButton::OpenCommandPrompt:
 	case IDM_FILE_OPENCOMMANDPROMPT:
-		StartCommandPrompt(m_CurrentDirectory.c_str(), false);
+		StartCommandPrompt(m_CurrentDirectory, false);
 		break;
 
 	case IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR:
-		StartCommandPrompt(m_CurrentDirectory.c_str(), true);
+		StartCommandPrompt(m_CurrentDirectory, true);
 		break;
 
 	case IDM_FILE_COPYFOLDERPATH:

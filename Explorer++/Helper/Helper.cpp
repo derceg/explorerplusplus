@@ -125,7 +125,7 @@ BOOL CreateFriendlySystemTimeString(const SYSTEMTIME *localSystemTime,
 	return FALSE;
 }
 
-HINSTANCE StartCommandPrompt(const TCHAR *Directory, bool Elevated)
+HINSTANCE StartCommandPrompt(const std::wstring &Directory, bool Elevated)
 {
 	HINSTANCE hNewInstance = NULL;
 
@@ -140,17 +140,19 @@ HINSTANCE StartCommandPrompt(const TCHAR *Directory, bool Elevated)
 		if(szRet != NULL)
 		{
 			TCHAR Operation[32];
+			std::wstring Parameters(_T(""));
 
 			if(Elevated)
 			{
 				StringCchCopy(Operation, SIZEOF_ARRAY(Operation), _T("runas"));
+				Parameters = _T("/K cd /d ") + Directory;
 			}
 			else
 			{
 				StringCchCopy(Operation, SIZEOF_ARRAY(Operation), _T("open"));
 			}
 
-			hNewInstance = ShellExecute(NULL, Operation, CommandPath, NULL, Directory,
+			hNewInstance = ShellExecute(NULL, Operation, CommandPath, Parameters.c_str(), Directory.c_str(),
 				SW_SHOWNORMAL);
 		}
 	}
