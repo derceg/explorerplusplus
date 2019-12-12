@@ -146,18 +146,6 @@ void Explorerplusplus::OnRightClick(NMHDR *nmhdr)
 
 		OnListViewRClick(&CursorPos);
 	}
-	else if(nmhdr->hwndFrom == ListView_GetHeader(m_hActiveListView))
-	{
-		/* The header on the active listview was right-clicked. */
-		POINT CursorPos;
-		DWORD dwPos;
-
-		dwPos = GetMessagePos();
-		CursorPos.x = GET_X_LPARAM(dwPos);
-		CursorPos.y = GET_Y_LPARAM(dwPos);
-
-		OnListViewHeaderRClick(&CursorPos);
-	}
 }
 
 void Explorerplusplus::OnPaste()

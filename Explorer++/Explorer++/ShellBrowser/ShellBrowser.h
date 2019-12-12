@@ -325,6 +325,8 @@ private:
 	void				QueueInfoTipTask(int internalIndex, const std::wstring &existingInfoTip);
 	static boost::optional<InfoTipResult>	GetInfoTipAsync(HWND listView, int infoTipResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo, const Config &config, HINSTANCE instance, bool virtualFolder);
 	void				ProcessInfoTipResult(int infoTipResultId);
+	void				OnListViewHeaderRightClick(const POINTS &cursorPos);
+	void				OnListViewHeaderMenuItemSelected(int menuItemId, const std::unordered_map<int, UINT> &menuItemMappings);
 
 	ItemInfo_t			&GetItemByIndex(int index);
 	int					GetItemInternalIndex(int item) const;

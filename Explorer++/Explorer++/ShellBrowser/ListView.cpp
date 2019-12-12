@@ -6,9 +6,39 @@
 #include "ShellBrowser.h"
 #include "Config.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/ShellHelper.h"
 #include <boost/format.hpp>
+
+const std::vector<unsigned int> COMMON_REAL_FOLDER_COLUMNS =
+{ CM_NAME, CM_TYPE, CM_SIZE, CM_DATEMODIFIED,
+CM_AUTHORS, CM_TITLE };
+
+const std::vector<unsigned int> COMMON_CONTROL_PANEL_COLUMNS =
+{ CM_NAME, CM_VIRTUALCOMMENTS };
+
+const std::vector<unsigned int> COMMON_MY_COMPUTER_COLUMNS =
+{ CM_NAME, CM_TYPE, CM_TOTALSIZE,
+CM_FREESPACE, CM_VIRTUALCOMMENTS,
+CM_FILESYSTEM };
+
+const std::vector<unsigned int> COMMON_NETWORK_CONNECTIONS_COLUMNS =
+{ CM_NAME, CM_TYPE, CM_NETWORKADAPTER_STATUS,
+CM_OWNER };
+
+const std::vector<unsigned int> COMMON_NETWORK_COLUMNS =
+{ CM_NAME, CM_VIRTUALCOMMENTS };
+
+const std::vector<unsigned int> COMMON_PRINTERS_COLUMNS =
+{ CM_NAME, CM_NUMPRINTERDOCUMENTS, CM_PRINTERSTATUS,
+CM_PRINTERCOMMENTS, CM_PRINTERLOCATION };
+
+const std::vector<unsigned int> COMMON_RECYCLE_BIN_COLUMNS =
+{ CM_NAME, CM_ORIGINALLOCATION, CM_DATEDELETED,
+CM_SIZE, CM_TYPE, CM_DATEMODIFIED };
+
+std::vector<unsigned int> GetColumnHeaderMenuList(const std::wstring &directory);
 
 LRESULT CALLBACK CShellBrowser::ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
@@ -82,6 +112,18 @@ LRESULT CALLBACK CShellBrowser::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM 
 			case LVN_COLUMNCLICK:
 				ColumnClicked(reinterpret_cast<NMLISTVIEW *>(lParam)->iSubItem);
 				break;
+			}
+		}
+		else if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == ListView_GetHeader(m_hListView))
+		{
+			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
+			{
+			case NM_RCLICK:
+			{
+				DWORD messagePos = GetMessagePos();
+				OnListViewHeaderRightClick(MAKEPOINTS(messagePos));
+			}
+			break;
 			}
 		}
 		break;
@@ -466,4 +508,135 @@ void CShellBrowser::ShowPropertiesForSelectedFiles() const
 
 	auto pidlDirectory = GetDirectoryIdl();
 	ShowMultipleFileProperties(pidlDirectory.get(), rawPidls.data(), m_hOwner, static_cast<int>(rawPidls.size()));
+}
+
+void CShellBrowser::OnListViewHeaderRightClick(const POINTS &cursorPos)
+{
+	wil::unique_hmenu headerPopupMenu(LoadMenu(m_hResourceModule, MAKEINTRESOURCE(IDR_HEADER_MENU)));
+	HMENU headerMenu = GetSubMenu(headerPopupMenu.get(), 0);
+
+	auto commonColumns = GetColumnHeaderMenuList(m_CurDir);
+
+	std::unordered_map<int, UINT> menuItemMappings;
+	int totalInserted = 0;
+	int commonColumnPosition = 0;
+
+	for (const auto &column : *m_pActiveColumns)
+	{
+		auto itr = std::find(commonColumns.begin(), commonColumns.end(), column.id);
+		bool inCommonColumns = (itr != commonColumns.end());
+
+		if (!column.bChecked && !inCommonColumns)
+		{
+			continue;
+		}
+
+		MENUITEMINFO mii;
+		mii.cbSize = sizeof(mii);
+		mii.fMask = MIIM_STRING | MIIM_STATE | MIIM_ID;
+
+		std::wstring columnText = ResourceHelper::LoadString(m_hResourceModule,
+			LookupColumnNameStringIndex(column.id));
+
+		if (column.bChecked)
+		{
+			mii.fState = MFS_CHECKED;
+		}
+		else
+		{
+			mii.fState = MFS_ENABLED;
+		}
+
+		int currentPosition;
+
+		if (inCommonColumns)
+		{
+			// The common columns always appear first, whether they're checked
+			// or not.
+			currentPosition = commonColumnPosition;
+			commonColumnPosition++;
+		}
+		else
+		{
+			currentPosition = totalInserted;
+		}
+
+		int id = totalInserted + 1;
+
+		mii.dwTypeData = columnText.data();
+		mii.wID = id;
+		InsertMenuItem(headerMenu, currentPosition, TRUE, &mii);
+
+		menuItemMappings.insert({ id, column.id });
+
+		totalInserted++;
+	}
+
+	int cmd = TrackPopupMenu(headerMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD,
+		cursorPos.x, cursorPos.y, 0, m_hListView, NULL);
+
+	if (cmd == 0)
+	{
+		return;
+	}
+
+	OnListViewHeaderMenuItemSelected(cmd, menuItemMappings);
+}
+
+std::vector<unsigned int> GetColumnHeaderMenuList(const std::wstring &directory)
+{
+	if (CompareVirtualFolders(directory.c_str(), CSIDL_DRIVES))
+	{
+		return COMMON_MY_COMPUTER_COLUMNS;
+	}
+	else if (CompareVirtualFolders(directory.c_str(), CSIDL_CONTROLS))
+	{
+		return COMMON_CONTROL_PANEL_COLUMNS;
+	}
+	else if (CompareVirtualFolders(directory.c_str(), CSIDL_BITBUCKET))
+	{
+		return COMMON_RECYCLE_BIN_COLUMNS;
+	}
+	else if (CompareVirtualFolders(directory.c_str(), CSIDL_CONNECTIONS))
+	{
+		return COMMON_NETWORK_CONNECTIONS_COLUMNS;
+	}
+	else if (CompareVirtualFolders(directory.c_str(), CSIDL_NETWORK))
+	{
+		return COMMON_NETWORK_COLUMNS;
+	}
+	else if (CompareVirtualFolders(directory.c_str(), CSIDL_PRINTERS))
+	{
+		return COMMON_PRINTERS_COLUMNS;
+	}
+	else
+	{
+		return COMMON_REAL_FOLDER_COLUMNS;
+	}
+}
+
+void CShellBrowser::OnListViewHeaderMenuItemSelected(int menuItemId,
+	const std::unordered_map<int, UINT> &menuItemMappings)
+{
+	auto currentColumns = ExportCurrentColumns();
+
+	UINT columnId = menuItemMappings.at(menuItemId);
+	auto itr = std::find_if(currentColumns.begin(), currentColumns.end(), [columnId] (const Column_t &column) {
+		return column.id == columnId;
+	});
+
+	if (itr == currentColumns.end())
+	{
+		return;
+	}
+
+	itr->bChecked = !itr->bChecked;
+
+	ImportColumns(currentColumns);
+
+	// If it was the first column that was changed, need to refresh all columns.
+	if (menuItemId == 1)
+	{
+		m_navigationController->Refresh();
+	}
 }
