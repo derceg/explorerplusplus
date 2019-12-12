@@ -331,33 +331,6 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 			}
 			break;
 
-		case VK_BACK:
-			if(IsKeyDown(VK_CONTROL) &&
-				!IsKeyDown(VK_SHIFT) &&
-				!IsKeyDown(VK_MENU))
-			{
-				auto pidl = m_pActiveShellBrowser->GetDirectoryIdl();
-
-				TCHAR szRoot[MAX_PATH];
-				HRESULT hr = GetDisplayName(pidl.get(),szRoot,SIZEOF_ARRAY(szRoot),SHGDN_FORPARSING);
-
-				if(SUCCEEDED(hr))
-				{
-					BOOL bRes = PathStripToRoot(szRoot);
-
-					if(bRes)
-					{
-						/* Go to the root of this directory. */
-						m_navigation->BrowseFolderInCurrentTab(szRoot);
-					}
-				}
-			}
-			else
-			{
-				m_navigation->OnNavigateUp();
-			}
-			break;
-
 		case 'A':
 			if(IsKeyDown(VK_CONTROL) &&
 				!IsKeyDown(VK_SHIFT) &&

@@ -8,6 +8,7 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/CachedIcons.h"
+#include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
 #include <boost/format.hpp>
 
@@ -107,6 +108,10 @@ LRESULT CALLBACK CShellBrowser::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM 
 
 			case LVN_GETINFOTIP:
 				return OnListViewGetInfoTip(reinterpret_cast<NMLVGETINFOTIP *>(lParam));
+				break;
+
+			case LVN_KEYDOWN:
+				OnListViewKeyDown(reinterpret_cast<NMLVKEYDOWN *>(lParam));
 				break;
 
 			case LVN_COLUMNCLICK:
@@ -422,6 +427,36 @@ void CShellBrowser::ProcessInfoTipResult(int infoTipResultId)
 	infoTip.iSubItem = 0;
 	infoTip.pszText = infoTipText;
 	ListView_SetInfoTip(m_hListView, &infoTip);
+}
+
+void CShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
+{
+	switch (lvKeyDown->wVKey)
+	{
+	case VK_BACK:
+		if (IsKeyDown(VK_CONTROL) &&
+			!IsKeyDown(VK_SHIFT) &&
+			!IsKeyDown(VK_MENU))
+		{
+			TCHAR szRoot[MAX_PATH];
+			HRESULT hr = GetDisplayName(m_directoryState.pidlDirectory.get(), szRoot, SIZEOF_ARRAY(szRoot), SHGDN_FORPARSING);
+
+			if (SUCCEEDED(hr))
+			{
+				BOOL bRes = PathStripToRoot(szRoot);
+
+				if (bRes)
+				{
+					m_navigationController->BrowseFolder(szRoot);
+				}
+			}
+		}
+		else
+		{
+			m_navigationController->GoUp();
+		}
+		break;
+	}
 }
 
 CShellBrowser::ItemInfo_t &CShellBrowser::GetItemByIndex(int index)
