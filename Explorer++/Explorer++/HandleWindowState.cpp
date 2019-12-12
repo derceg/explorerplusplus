@@ -40,12 +40,15 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	ViewMode viewMode = tab.GetShellBrowser()->GetViewMode();
 	BOOL bVirtualFolder = tab.GetShellBrowser()->InVirtualFolder();
 
+	int numSelected = tab.GetShellBrowser()->GetNumSelected();
+	bool anySelected = (numSelected > 0);
+
 	lEnableMenuItem(hProgramMenu,IDM_FILE_COPYITEMPATH,AnyItemsSelected());
 	lEnableMenuItem(hProgramMenu,IDM_FILE_COPYUNIVERSALFILEPATHS,AnyItemsSelected());
 	lEnableMenuItem(hProgramMenu,IDM_FILE_SETFILEATTRIBUTES,AnyItemsSelected());
 	lEnableMenuItem(hProgramMenu,IDM_FILE_OPENCOMMANDPROMPT,!bVirtualFolder);
 	lEnableMenuItem(hProgramMenu,IDM_FILE_SAVEDIRECTORYLISTING,!bVirtualFolder);
-	lEnableMenuItem(hProgramMenu,IDM_FILE_COPYCOLUMNTEXT,m_nSelected && (viewMode == +ViewMode::Details));
+	lEnableMenuItem(hProgramMenu,IDM_FILE_COPYCOLUMNTEXT,anySelected && (viewMode == +ViewMode::Details));
 
 	lEnableMenuItem(hProgramMenu,IDM_FILE_RENAME,CanRename());
 	lEnableMenuItem(hProgramMenu,IDM_FILE_DELETE,CanDelete());
@@ -64,9 +67,9 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_CUT,CanCut());
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_COPYTOFOLDER,CanCopy() && GetFocus() != m_hTreeView);
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_MOVETOFOLDER,CanCut() && GetFocus() != m_hTreeView);
-	lEnableMenuItem(hProgramMenu,IDM_EDIT_WILDCARDDESELECT,m_nSelected);
-	lEnableMenuItem(hProgramMenu,IDM_EDIT_SELECTNONE,m_nSelected);
-	lEnableMenuItem(hProgramMenu,IDM_EDIT_RESOLVELINK,m_nSelected);
+	lEnableMenuItem(hProgramMenu,IDM_EDIT_WILDCARDDESELECT,anySelected);
+	lEnableMenuItem(hProgramMenu,IDM_EDIT_SELECTNONE,anySelected);
+	lEnableMenuItem(hProgramMenu,IDM_EDIT_RESOLVELINK,anySelected);
 
 	lCheckMenuItem(hProgramMenu,IDM_VIEW_STATUSBAR,m_config->showStatusBar);
 	lCheckMenuItem(hProgramMenu,IDM_VIEW_FOLDERS, m_config->showFolders);
@@ -82,8 +85,8 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 
 	lEnableMenuItem(hProgramMenu,IDM_ACTIONS_NEWFOLDER,CanCreate());
 	lEnableMenuItem(hProgramMenu,IDM_ACTIONS_SPLITFILE,(tab.GetShellBrowser()->GetNumSelectedFiles() == 1) && !bVirtualFolder);
-	lEnableMenuItem(hProgramMenu,IDM_ACTIONS_MERGEFILES,m_nSelected > 1);
-	lEnableMenuItem(hProgramMenu,IDM_ACTIONS_DESTROYFILES,m_nSelected);
+	lEnableMenuItem(hProgramMenu,IDM_ACTIONS_MERGEFILES,tab.GetShellBrowser()->GetNumSelectedFiles() > 1);
+	lEnableMenuItem(hProgramMenu,IDM_ACTIONS_DESTROYFILES,anySelected);
 
 	UINT ItemToCheck = GetViewModeMenuId(viewMode);
 	CheckMenuRadioItem(hProgramMenu,IDM_VIEW_THUMBNAILS,IDM_VIEW_EXTRALARGEICONS,ItemToCheck,MF_BYCOMMAND);
