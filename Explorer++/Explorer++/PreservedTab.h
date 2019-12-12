@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "PreservedHistoryEntry.h"
+#include "ShellBrowser/PreservedHistoryEntry.h"
 #include "ShellBrowser/PreservedFolderState.h"
 #include "Tab.h"
 #include "../Helper/Macros.h"
@@ -15,7 +15,7 @@ struct PreservedTab
 		id(tab.GetId()),
 		index(index),
 		history(CopyHistoryEntries(tab)),
-		currentEntry(tab.GetNavigationController()->GetCurrentIndex()),
+		currentEntry(tab.GetShellBrowser()->GetNavigationController()->GetCurrentIndex()),
 		useCustomName(tab.GetUseCustomName()),
 		customName(tab.GetUseCustomName() ? tab.GetName() : std::wstring()),
 		lockState(tab.GetLockState()),
@@ -44,9 +44,9 @@ private:
 	{
 		std::vector<std::unique_ptr<PreservedHistoryEntry>> history;
 
-		for (int i = 0; i < tab.GetNavigationController()->GetNumHistoryEntries(); i++)
+		for (int i = 0; i < tab.GetShellBrowser()->GetNavigationController()->GetNumHistoryEntries(); i++)
 		{
-			auto entry = std::make_unique<PreservedHistoryEntry>(*tab.GetNavigationController()->GetEntryAtIndex(i));
+			auto entry = std::make_unique<PreservedHistoryEntry>(*tab.GetShellBrowser()->GetNavigationController()->GetEntryAtIndex(i));
 			history.push_back(std::move(entry));
 		}
 

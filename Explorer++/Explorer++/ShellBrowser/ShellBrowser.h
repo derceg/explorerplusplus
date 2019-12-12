@@ -7,6 +7,8 @@
 #include "ColumnDataRetrieval.h"
 #include "Columns.h"
 #include "FolderSettings.h"
+#include "NavigationController.h"
+#include "NavigatorInterface.h"
 #include "SignalWrapper.h"
 #include "SortModes.h"
 #include "TabNavigationInterface.h"
@@ -50,8 +52,9 @@ typedef struct
 struct BasicItemInfo_t;
 class CachedIcons;
 struct Config;
+struct PreservedFolderState;
 
-class CShellBrowser : public IDropTarget, public IDropFilesCallback
+class CShellBrowser : public IDropTarget, public IDropFilesCallback, public NavigatorInterface
 {
 public:
 
@@ -59,17 +62,22 @@ public:
 		CachedIcons *cachedIcons, const Config *config, TabNavigationInterface *tabNavigation,
 		const FolderSettings &folderSettings, boost::optional<FolderColumns> initialColumns);
 
+	static CShellBrowser *CreateFromPreserved(int id, HINSTANCE resourceInstance, HWND hOwner,
+		CachedIcons *cachedIcons, const Config *config, TabNavigationInterface *tabNavigation,
+		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
+		const PreservedFolderState &preservedFolderState);
+
 	/* IUnknown methods. */
 	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
 	ULONG __stdcall		AddRef(void);
 	ULONG __stdcall		Release(void);
 
 	HWND				GetListView() const;
-	IconFetcher			*GetIconFetcher();
 	FolderSettings		GetFolderSettings() const;
 
-	/* Navigation. */
-	HRESULT				BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true);
+	NavigationController	*GetNavigationController() const;
+	boost::signals2::connection	AddNavigationCompletedObserver(const NavigationCompletedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back);
 
 	/* Drag and Drop. */
 	void				DragStarted(int iFirstItem,POINT *ptCursor);
@@ -159,9 +167,6 @@ public:
 	void				OnDeviceChange(WPARAM wParam,LPARAM lParam);
 
 	void				OnGridlinesSettingChanged();
-
-	// Signals
-	SignalWrapper<CShellBrowser, void(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)> navigationCompletedSignal;
 
 private:
 
@@ -270,6 +275,10 @@ private:
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
 
 	CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
+		const Config *config, TabNavigationInterface *tabNavigation,
+		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
+		const PreservedFolderState &preservedFolderState);
+	CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
 		const Config *config, TabNavigationInterface *tabNavigation, const FolderSettings &folderSettings,
 		boost::optional<FolderColumns> initialColumns);
 	~CShellBrowser();
@@ -279,6 +288,9 @@ private:
 	BOOL				GhostItemInternal(int iItem,BOOL bGhost);
 	void				DetermineFolderVirtual(PCIDLIST_ABSOLUTE pidlDirectory);
 	void				VerifySortMode();
+
+	/* NavigatorInterface methods. */
+	HRESULT				BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true);
 
 	/* Browsing support. */
 	HRESULT				EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory);
@@ -426,6 +438,9 @@ private:
 
 	HWND				m_hListView;
 	HWND				m_hOwner;
+
+	NavigationCompletedSignal	m_navigationCompletedSignal;
+	std::unique_ptr<NavigationController>	m_navigationController;
 
 	TabNavigationInterface	*m_tabNavigation;
 

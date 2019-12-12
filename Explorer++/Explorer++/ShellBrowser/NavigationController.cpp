@@ -5,18 +5,22 @@
 #include "stdafx.h"
 #include "NavigationController.h"
 
-NavigationController::NavigationController(CShellBrowser *shellBrowser, TabNavigationInterface *tabNavigation) :
-	m_shellBrowser(shellBrowser),
+NavigationController::NavigationController(NavigatorInterface *navigator, TabNavigationInterface *tabNavigation,
+	IconFetcher *iconFetcher) :
+	m_navigator(navigator),
 	m_tabNavigation(tabNavigation),
+	m_iconFetcher(iconFetcher),
 	m_currentEntry(-1)
 {
 	Initialize();
 }
 
-NavigationController::NavigationController(CShellBrowser *shellBrowser, TabNavigationInterface *tabNavigation,
-	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries, int currentEntry) :
-	m_shellBrowser(shellBrowser),
+NavigationController::NavigationController(NavigatorInterface *navigator, TabNavigationInterface *tabNavigation,
+	IconFetcher *iconFetcher, const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
+	int currentEntry) :
+	m_navigator(navigator),
 	m_tabNavigation(tabNavigation),
+	m_iconFetcher(iconFetcher),
 	m_entries(CopyPreservedHistoryEntries(preservedEntries)),
 	m_currentEntry(currentEntry)
 {
@@ -25,8 +29,9 @@ NavigationController::NavigationController(CShellBrowser *shellBrowser, TabNavig
 
 void NavigationController::Initialize()
 {
-	m_connections.push_back(m_shellBrowser->navigationCompletedSignal.AddObserver(
-		boost::bind(&NavigationController::OnNavigationCompleted, this, _1, _2), boost::signals2::at_front));
+	m_connections.push_back(m_navigator->AddNavigationCompletedObserver(
+		boost::bind(&NavigationController::OnNavigationCompleted, this, _1, _2),
+		boost::signals2::at_front));
 }
 
 std::vector<std::unique_ptr<HistoryEntry>> NavigationController::CopyPreservedHistoryEntries(
@@ -60,7 +65,7 @@ void NavigationController::AddEntry(std::unique_ptr<HistoryEntry> entry)
 	// This will implicitly remove all "forward" entries.
 	m_entries.resize(m_currentEntry + 1);
 
-	m_shellBrowser->GetIconFetcher()->QueueIconTask(entry->GetPidl().get(), [this, index = m_currentEntry + 1, id = entry->GetId()]
+	m_iconFetcher->QueueIconTask(entry->GetPidl().get(), [this, index = m_currentEntry + 1, id = entry->GetId()]
 	(PCIDLIST_ABSOLUTE pidl, int iconIndex) {
 		UNREFERENCED_PARAMETER(pidl);
 
@@ -84,6 +89,11 @@ void NavigationController::AddEntry(std::unique_ptr<HistoryEntry> entry)
 int NavigationController::GetNumHistoryEntries() const
 {
 	return static_cast<int>(m_entries.size());
+}
+
+HistoryEntry *NavigationController::GetCurrentEntry() const
+{
+	return GetEntryAtIndex(GetCurrentIndex());
 }
 
 int NavigationController::GetCurrentIndex() const
@@ -149,8 +159,14 @@ bool NavigationController::CanGoForward() const
 
 bool NavigationController::CanGoUp() const
 {
-	auto pidl = m_shellBrowser->GetDirectoryIdl();
-	return !IsNamespaceRoot(pidl.get());
+	auto currentEntry = GetCurrentEntry();
+
+	if (!currentEntry)
+	{
+		return false;
+	}
+
+	return !IsNamespaceRoot(currentEntry->GetPidl().get());
 }
 
 std::vector<HistoryEntry *> NavigationController::GetBackHistory() const
@@ -211,40 +227,47 @@ HRESULT NavigationController::GoToOffset(int offset)
 
 HRESULT NavigationController::GoUp()
 {
+	auto currentEntry = GetCurrentEntry();
+
+	if (!currentEntry)
+	{
+		return E_FAIL;
+	}
+
 	unique_pidl_absolute pidlParent;
-	auto pidl = m_shellBrowser->GetDirectoryIdl();
-	HRESULT hr = GetVirtualParentPath(pidl.get(), wil::out_param(pidlParent));
+	HRESULT hr = GetVirtualParentPath(currentEntry->GetPidl().get(), wil::out_param(pidlParent));
 
 	if (FAILED(hr))
 	{
 		return hr;
 	}
 
-	return m_shellBrowser->BrowseFolder(pidlParent.get());
+	return m_navigator->BrowseFolder(pidlParent.get());
 }
 
 HRESULT NavigationController::Refresh()
 {
-	auto pidl = m_shellBrowser->GetDirectoryIdl();
-	return m_shellBrowser->BrowseFolder(pidl.get(), false);
+	auto currentEntry = GetCurrentEntry();
+
+	if (!currentEntry)
+	{
+		return E_FAIL;
+	}
+
+	return m_navigator->BrowseFolder(currentEntry->GetPidl().get(), false);
 }
 
-HRESULT NavigationController::BrowseFolder(const std::wstring &path)
+HRESULT NavigationController::BrowseFolder(const std::wstring &path, bool addHistoryEntry)
 {
 	unique_pidl_absolute pidlDirectory;
 	HRESULT hr = SHParseDisplayName(path.c_str(), nullptr, wil::out_param(pidlDirectory), 0, nullptr);
 
 	if (SUCCEEDED(hr))
 	{
-		hr = BrowseFolder(pidlDirectory.get(), true);
+		hr = BrowseFolder(pidlDirectory.get(), addHistoryEntry);
 	}
 
 	return hr;
-}
-
-HRESULT NavigationController::BrowseFolder(PCIDLIST_ABSOLUTE pidl)
-{
-	return BrowseFolder(pidl, true);
 }
 
 HRESULT NavigationController::BrowseFolder(PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
@@ -254,7 +277,7 @@ HRESULT NavigationController::BrowseFolder(PCIDLIST_ABSOLUTE pidl, bool addHisto
 		return m_tabNavigation->CreateNewTab(pidl, true);
 	}
 
-	return m_shellBrowser->BrowseFolder(pidl, addHistoryEntry);
+	return m_navigator->BrowseFolder(pidl, addHistoryEntry);
 }
 
 void NavigationController::SetNavigationMode(NavigationMode navigationMode)

@@ -90,7 +90,7 @@ HRESULT CShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHis
 
 	m_uniqueFolderId++;
 
-	navigationCompletedSignal.m_signal(pidlDirectory, addHistoryEntry);
+	m_navigationCompletedSignal(pidlDirectory, addHistoryEntry);
 
 	return S_OK;
 }
@@ -520,4 +520,15 @@ void CShellBrowser::PlayNavigationSound() const
 		PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART), NULL,
 			SND_RESOURCE | SND_ASYNC);
 	}
+}
+
+NavigationController *CShellBrowser::GetNavigationController() const
+{
+	return m_navigationController.get();
+}
+
+boost::signals2::connection CShellBrowser::AddNavigationCompletedObserver(const NavigationCompletedSignal::slot_type &observer,
+	boost::signals2::connect_position position)
+{
+	return m_navigationCompletedSignal.connect(observer, position);
 }

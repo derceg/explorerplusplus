@@ -193,7 +193,7 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 
 	if (location && !location->empty())
 	{
-		tabInternal->GetNavigationController()->BrowseFolder(*location);
+		tabInternal->GetShellBrowser()->GetNavigationController()->BrowseFolder(*location);
 	}
 
 	boost::optional<std::wstring> name = properties[TabConstants::NAME];
@@ -235,7 +235,7 @@ void Plugins::TabsApi::refresh(int tabId)
 		return;
 	}
 
-	tabInternal->GetNavigationController()->Refresh();
+	tabInternal->GetShellBrowser()->GetNavigationController()->Refresh();
 }
 
 int Plugins::TabsApi::move(int tabId, int newIndex)

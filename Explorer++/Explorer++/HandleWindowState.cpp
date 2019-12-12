@@ -88,9 +88,9 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	UINT ItemToCheck = GetViewModeMenuId(viewMode);
 	CheckMenuRadioItem(hProgramMenu,IDM_VIEW_THUMBNAILS,IDM_VIEW_EXTRALARGEICONS,ItemToCheck,MF_BYCOMMAND);
 
-	lEnableMenuItem(hProgramMenu,IDM_GO_BACK,tab.GetNavigationController()->CanGoBack());
-	lEnableMenuItem(hProgramMenu,IDM_GO_FORWARD,tab.GetNavigationController()->CanGoForward());
-	lEnableMenuItem(hProgramMenu,IDM_GO_UPONELEVEL,tab.GetNavigationController()->CanGoUp());
+	lEnableMenuItem(hProgramMenu,IDM_GO_BACK,tab.GetShellBrowser()->GetNavigationController()->CanGoBack());
+	lEnableMenuItem(hProgramMenu,IDM_GO_FORWARD,tab.GetShellBrowser()->GetNavigationController()->CanGoForward());
+	lEnableMenuItem(hProgramMenu,IDM_GO_UPONELEVEL,tab.GetShellBrowser()->GetNavigationController()->CanGoUp());
 
 	lEnableMenuItem(hProgramMenu,IDM_VIEW_AUTOSIZECOLUMNS,viewMode == +ViewMode::Details);
 

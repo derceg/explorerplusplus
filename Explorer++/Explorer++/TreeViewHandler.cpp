@@ -381,7 +381,7 @@ void Explorerplusplus::OnTreeViewHolderWindowTimer(void)
 		!CompareIdls(pidlDirectory.get(),pidlCurrentDirectory.get()))
 	{
 		Tab &selectedTab = m_tabContainer->GetSelectedTab();
-		selectedTab.GetNavigationController()->BrowseFolder(pidlDirectory.get());
+		selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(pidlDirectory.get());
 
 		if(m_config->treeViewAutoExpandSelected)
 		{

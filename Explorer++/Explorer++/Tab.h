@@ -5,7 +5,6 @@
 #pragma once
 
 #include "CoreInterface.h"
-#include "NavigationController.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "TabNavigationInterface.h"
@@ -41,8 +40,6 @@ public:
 
 	int GetId() const;
 
-	NavigationController *GetNavigationController() const;
-
 	CShellBrowser *GetShellBrowser() const;
 
 	std::wstring GetName() const;
@@ -69,7 +66,6 @@ private:
 	static int idCounter;
 	const int m_id;
 
-	std::unique_ptr<NavigationController> m_navigationController;
 	CShellBrowser *m_shellBrowser;
 
 	bool m_useCustomName;

@@ -24,7 +24,7 @@ void Navigation::OnNavigateUp()
 
 	if (tab.GetLockState() != Tab::LockState::AddressLocked)
 	{
-		hr = tab.GetNavigationController()->GoUp();
+		hr = tab.GetShellBrowser()->GetNavigationController()->GoUp();
 
 		resultingTabId = tab.GetId();
 	}
@@ -54,13 +54,13 @@ void Navigation::OnNavigateUp()
 HRESULT Navigation::BrowseFolderInCurrentTab(const TCHAR *szPath)
 {
 	Tab &tab = m_tabContainer->GetSelectedTab();
-	return tab.GetNavigationController()->BrowseFolder(szPath);
+	return tab.GetShellBrowser()->GetNavigationController()->BrowseFolder(szPath);
 }
 
 HRESULT Navigation::BrowseFolderInCurrentTab(PCIDLIST_ABSOLUTE pidlDirectory)
 {
 	Tab &tab = m_tabContainer->GetSelectedTab();
-	return tab.GetNavigationController()->BrowseFolder(pidlDirectory);
+	return tab.GetShellBrowser()->GetNavigationController()->BrowseFolder(pidlDirectory);
 }
 
 void Navigation::OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory)

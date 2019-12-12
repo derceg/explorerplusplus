@@ -270,7 +270,7 @@ void CSelectColumnsDialog::OnOk()
 	if(m_bColumnsSwapped)
 	{
 		Tab &selectedTab = m_tabContainer->GetSelectedTab();
-		selectedTab.GetNavigationController()->Refresh();
+		selectedTab.GetShellBrowser()->GetNavigationController()->Refresh();
 	}
 
 	EndDialog(m_hDlg,1);

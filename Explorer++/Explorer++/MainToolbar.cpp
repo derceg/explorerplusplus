@@ -647,7 +647,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 
 	if (ptbgit->iItem == ToolbarButton::Back)
 	{
-		auto entry = tab.GetNavigationController()->GetEntry(-1);
+		auto entry = tab.GetShellBrowser()->GetNavigationController()->GetEntry(-1);
 
 		if (entry)
 		{
@@ -661,7 +661,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 	}
 	else if (ptbgit->iItem == ToolbarButton::Forward)
 	{
-		auto entry = tab.GetNavigationController()->GetEntry(1);
+		auto entry = tab.GetShellBrowser()->GetNavigationController()->GetEntry(1);
 
 		if (entry)
 		{
@@ -719,11 +719,11 @@ void MainToolbar::ShowHistoryMenu(HistoryType historyType, const POINT &pt)
 
 	if (historyType == HistoryType::Back)
 	{
-		history = tab.GetNavigationController()->GetBackHistory();
+		history = tab.GetShellBrowser()->GetNavigationController()->GetBackHistory();
 	}
 	else
 	{
-		history = tab.GetNavigationController()->GetForwardHistory();
+		history = tab.GetShellBrowser()->GetNavigationController()->GetForwardHistory();
 	}
 
 	if (history.empty())
@@ -788,7 +788,7 @@ void MainToolbar::ShowHistoryMenu(HistoryType historyType, const POINT &pt)
 	}
 
 	Tab &selectedTab = m_pexpp->GetTabContainer()->GetSelectedTab();
-	selectedTab.GetNavigationController()->GoToOffset(cmd);
+	selectedTab.GetShellBrowser()->GetNavigationController()->GoToOffset(cmd);
 }
 
 void MainToolbar::ShowToolbarViewsDropdown()
@@ -833,9 +833,9 @@ void MainToolbar::UpdateToolbarButtonStates()
 {
 	const Tab &tab = m_pexpp->GetTabContainer()->GetSelectedTab();
 
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Back, tab.GetNavigationController()->CanGoBack());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Forward, tab.GetNavigationController()->CanGoForward());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Up, tab.GetNavigationController()->CanGoUp());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Back, tab.GetShellBrowser()->GetNavigationController()->CanGoBack());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Forward, tab.GetShellBrowser()->GetNavigationController()->CanGoForward());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Up, tab.GetShellBrowser()->GetNavigationController()->CanGoUp());
 
 	BOOL bVirtualFolder = tab.GetShellBrowser()->InVirtualFolder();
 

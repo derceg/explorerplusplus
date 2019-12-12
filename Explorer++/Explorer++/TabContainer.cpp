@@ -465,14 +465,14 @@ void TabContainer::OnOpenParentInNewTab(const Tab &tab)
 
 void TabContainer::OnRefreshTab(Tab &tab)
 {
-	tab.GetNavigationController()->Refresh();
+	tab.GetShellBrowser()->GetNavigationController()->Refresh();
 }
 
 void TabContainer::OnRefreshAllTabs()
 {
 	for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
 	{
-		tab->GetNavigationController()->Refresh();
+		tab->GetShellBrowser()->GetNavigationController()->Refresh();
 	}
 }
 
@@ -922,7 +922,7 @@ HRESULT TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 
 	// Capturing the tab by reference here is safe, since the tab object is
 	// guaranteed to exist whenever this method is called.
-	tab.GetShellBrowser()->navigationCompletedSignal.AddObserver([this, &tab] (PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry) {
+	tab.GetShellBrowser()->AddNavigationCompletedObserver([this, &tab] (PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry) {
 		UNREFERENCED_PARAMETER(pidlDirectory);
 		UNREFERENCED_PARAMETER(addHistoryEntry);
 
@@ -932,7 +932,7 @@ HRESULT TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 		tabNavigationCompletedSignal.m_signal(tab);
 	});
 
-	HRESULT hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory, addHistoryEntry);
+	HRESULT hr = tab.GetShellBrowser()->GetNavigationController()->BrowseFolder(pidlDirectory, addHistoryEntry);
 
 	if (hr != S_OK)
 	{

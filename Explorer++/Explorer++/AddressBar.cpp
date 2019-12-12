@@ -286,7 +286,7 @@ void AddressBar::UpdateTextAndIcon(const Tab &tab)
 	// (if necessary).
 	m_historyEntryUpdatedConnection.disconnect();
 
-	auto entry = tab.GetNavigationController()->GetEntryAtIndex(tab.GetNavigationController()->GetCurrentIndex());
+	auto entry = tab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
 
 	auto cachedFullPath = entry->GetFullPathForDisplay();
 	std::optional<std::wstring> text;

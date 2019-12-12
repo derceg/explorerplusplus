@@ -7,6 +7,7 @@
 #include "Config.h"
 #include "ItemData.h"
 #include "MainResource.h"
+#include "PreservedFolderState.h"
 #include "SortModes.h"
 #include "ViewModes.h"
 #include "../Helper/Controls.h"
@@ -72,9 +73,29 @@ CShellBrowser *CShellBrowser::CreateNew(int id, HINSTANCE resourceInstance, HWND
 		folderSettings, initialColumns);
 }
 
+CShellBrowser *CShellBrowser::CreateFromPreserved(int id, HINSTANCE resourceInstance, HWND hOwner,
+	CachedIcons *cachedIcons, const Config *config, TabNavigationInterface *tabNavigation,
+	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
+	const PreservedFolderState &preservedFolderState)
+{
+	return new CShellBrowser(id, resourceInstance, hOwner, cachedIcons, config, tabNavigation,
+		history, currentEntry, preservedFolderState);
+}
+
 CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
 	CachedIcons *cachedIcons, const Config *config, TabNavigationInterface *tabNavigation,
-	const FolderSettings &folderSettings, boost::optional<FolderColumns> initialColumns) :
+	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
+	const PreservedFolderState &preservedFolderState) :
+	CShellBrowser(id, resourceInstance, hOwner, cachedIcons, config, tabNavigation,
+		preservedFolderState.folderSettings, boost::none)
+{
+	m_navigationController = std::make_unique<NavigationController>(this, tabNavigation, m_iconFetcher.get(),
+		history, currentEntry);
+}
+
+CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
+	const Config *config, TabNavigationInterface *tabNavigation, const FolderSettings &folderSettings,
+	boost::optional<FolderColumns> initialColumns) :
 	m_ID(id),
 	m_hResourceModule(resourceInstance),
 	m_hOwner(hOwner),
@@ -94,6 +115,7 @@ CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
 
 	m_hListView = SetUpListView(hOwner);
 	m_iconFetcher = std::make_unique<IconFetcher>(m_hListView, cachedIcons);
+	m_navigationController = std::make_unique<NavigationController>(this, tabNavigation, m_iconFetcher.get());
 
 	InitializeDragDropHelpers();
 
@@ -1443,11 +1465,6 @@ BasicItemInfo_t CShellBrowser::getBasicItemInfo(int internalIndex) const
 HWND CShellBrowser::GetListView() const
 {
 	return m_hListView;
-}
-
-IconFetcher *CShellBrowser::GetIconFetcher()
-{
-	return m_iconFetcher.get();
 }
 
 FolderSettings CShellBrowser::GetFolderSettings() const

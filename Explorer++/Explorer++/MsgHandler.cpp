@@ -957,7 +957,7 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 void Explorerplusplus::OnRefresh()
 {
 	Tab &tab = m_tabContainer->GetSelectedTab();
-	tab.GetNavigationController()->Refresh();
+	tab.GetShellBrowser()->GetNavigationController()->Refresh();
 }
 
 void Explorerplusplus::CopyColumnInfoToClipboard(void)
@@ -1216,7 +1216,7 @@ void Explorerplusplus::OnAssocChanged()
 	/* Now, go through each tab, and refresh each icon. */
 	for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
 	{
-		tab->GetNavigationController()->Refresh();
+		tab->GetShellBrowser()->GetNavigationController()->Refresh();
 	}
 
 	/* Now, refresh the treeview. */
@@ -1497,5 +1497,5 @@ void Explorerplusplus::OnShowHiddenFiles()
 {
 	Tab &tab = m_tabContainer->GetSelectedTab();
 	tab.GetShellBrowser()->SetShowHidden(!tab.GetShellBrowser()->GetShowHidden());
-	tab.GetNavigationController()->Refresh();
+	tab.GetShellBrowser()->GetNavigationController()->Refresh();
 }

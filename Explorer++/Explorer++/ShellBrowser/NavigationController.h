@@ -5,9 +5,11 @@
 #pragma once
 
 #include "HistoryEntry.h"
+#include "NavigatorInterface.h"
 #include "PreservedHistoryEntry.h"
-#include "ShellBrowser/ShellBrowser.h"
 #include "TabNavigationInterface.h"
+#include "../Helper/IconFetcher.h"
+#include "../Helper/Macros.h"
 #include <boost/signals2.hpp>
 
 class NavigationController
@@ -20,11 +22,14 @@ public:
 		ForceNewTab
 	};
 
-	NavigationController(CShellBrowser *shellBrowser, TabNavigationInterface *tabNavigation);
-	NavigationController(CShellBrowser *shellBrowser, TabNavigationInterface *tabNavigation,
-		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries, int currentEntry);
+	NavigationController(NavigatorInterface *navigator, TabNavigationInterface *tabNavigation,
+		IconFetcher *iconFetcher);
+	NavigationController(NavigatorInterface *navigator, TabNavigationInterface *tabNavigation,
+		IconFetcher *iconFetcher, const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
+		int currentEntry);
 
 	int GetNumHistoryEntries() const;
+	HistoryEntry *GetCurrentEntry() const;
 	int GetCurrentIndex() const;
 	HistoryEntry *GetEntry(int offset) const;
 	HistoryEntry *GetEntryAtIndex(int index) const;
@@ -42,12 +47,14 @@ public:
 
 	HRESULT Refresh();
 
-	HRESULT BrowseFolder(const std::wstring &path);
-	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidl);
+	HRESULT BrowseFolder(const std::wstring &path, bool addHistoryEntry = true);
+	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry = true);
 
 	void SetNavigationMode(NavigationMode navigationMode);
 
 private:
+
+	DISALLOW_COPY_AND_ASSIGN(NavigationController);
 
 	void Initialize();
 
@@ -58,15 +65,16 @@ private:
 	void AddEntry(std::unique_ptr<HistoryEntry> entry);
 	HistoryEntry *GetEntryAndUpdateIndex(int offset);
 
-	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
-
 	std::vector<std::unique_ptr<HistoryEntry>> m_entries;
 	int m_currentEntry;
 
-	CShellBrowser *m_shellBrowser;
+
+	NavigatorInterface *m_navigator;
 
 	TabNavigationInterface *m_tabNavigation;
 	NavigationMode m_navigationMode = NavigationMode::Normal;
+
+	IconFetcher *m_iconFetcher;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

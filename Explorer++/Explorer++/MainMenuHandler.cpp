@@ -285,19 +285,19 @@ void Explorerplusplus::OnResolveLink()
 HRESULT Explorerplusplus::OnGoBack()
 {
 	Tab &selectedTab = m_tabContainer->GetSelectedTab();
-	return selectedTab.GetNavigationController()->GoBack();
+	return selectedTab.GetShellBrowser()->GetNavigationController()->GoBack();
 }
 
 HRESULT Explorerplusplus::OnGoForward()
 {
 	Tab &selectedTab = m_tabContainer->GetSelectedTab();
-	return selectedTab.GetNavigationController()->GoForward();
+	return selectedTab.GetShellBrowser()->GetNavigationController()->GoForward();
 }
 
 HRESULT Explorerplusplus::OnGoToOffset(int offset)
 {
 	Tab &selectedTab = m_tabContainer->GetSelectedTab();
-	return selectedTab.GetNavigationController()->GoToOffset(offset);
+	return selectedTab.GetShellBrowser()->GetNavigationController()->GoToOffset(offset);
 }
 
 HRESULT Explorerplusplus::OnGoToKnownFolder(REFKNOWNFOLDERID knownFolderId)
@@ -311,17 +311,17 @@ HRESULT Explorerplusplus::OnGoToKnownFolder(REFKNOWNFOLDERID knownFolderId)
 	}
 
 	Tab &selectedTab = m_tabContainer->GetSelectedTab();
-	return selectedTab.GetNavigationController()->BrowseFolder(pidl.get());
+	return selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(pidl.get());
 }
 
 HRESULT Explorerplusplus::OnGoHome()
 {
 	Tab &selectedTab = m_tabContainer->GetSelectedTab();
-	HRESULT hr = selectedTab.GetNavigationController()->BrowseFolder(m_config->defaultTabDirectory);
+	HRESULT hr = selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(m_config->defaultTabDirectory);
 
 	if (FAILED(hr))
 	{
-		hr = selectedTab.GetNavigationController()->BrowseFolder(m_config->defaultTabDirectoryStatic);
+		hr = selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(m_config->defaultTabDirectoryStatic);
 	}
 
 	return hr;
