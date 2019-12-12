@@ -403,24 +403,6 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 	if(tab.GetShellBrowser()->IsDragging())
 		return;
 
-	HWND listView = tab.GetShellBrowser()->GetListView();
-
-	if(ItemChanged->uChanged == LVIF_STATE &&
-		((LVIS_STATEIMAGEMASK & ItemChanged->uNewState) >> 12) != 0 &&
-		((LVIS_STATEIMAGEMASK & ItemChanged->uOldState) >> 12) != 0)
-	{
-		if(ListView_GetCheckState(listView,ItemChanged->iItem))
-		{
-			NListView::ListView_SelectItem(listView,ItemChanged->iItem,TRUE);
-		}
-		else
-		{
-			NListView::ListView_SelectItem(listView,ItemChanged->iItem,FALSE);
-		}
-
-		return;
-	}
-
 	if((ItemChanged->uNewState & LVIS_SELECTED) &&
 	(ItemChanged->uOldState & LVIS_SELECTED))
 		return;
@@ -432,17 +414,6 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 		Selected  = FALSE;
 	else
 		return;
-
-	if(Selected)
-	{
-		if(ListView_GetCheckState(listView,ItemChanged->iItem) == 0)
-			ListView_SetCheckState(listView,ItemChanged->iItem,TRUE);
-	}
-	else
-	{
-		if(ListView_GetCheckState(listView,ItemChanged->iItem) != 0)
-			ListView_SetCheckState(listView,ItemChanged->iItem,FALSE);
-	}
 
 	/* The selection for this tab has changed, so invalidate any
 	folder size calculations that are occurring for this tab

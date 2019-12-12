@@ -9,6 +9,7 @@
 #include "ResourceHelper.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ListViewHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <boost/format.hpp>
 
@@ -108,6 +109,10 @@ LRESULT CALLBACK CShellBrowser::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM 
 
 			case LVN_GETINFOTIP:
 				return OnListViewGetInfoTip(reinterpret_cast<NMLVGETINFOTIP *>(lParam));
+				break;
+
+			case LVN_ITEMCHANGED:
+				OnListViewItemChanged(reinterpret_cast<NMLISTVIEW *>(lParam));
 				break;
 
 			case LVN_KEYDOWN:
@@ -427,6 +432,32 @@ void CShellBrowser::ProcessInfoTipResult(int infoTipResultId)
 	infoTip.iSubItem = 0;
 	infoTip.pszText = infoTipText;
 	ListView_SetInfoTip(m_hListView, &infoTip);
+}
+
+void CShellBrowser::OnListViewItemChanged(const NMLISTVIEW *changeData)
+{
+	if (m_config->checkBoxSelection && changeData->uChanged == LVIF_STATE)
+	{
+		if ((LVIS_STATEIMAGEMASK & changeData->uNewState) != 0)
+		{
+			bool checked = ((changeData->uNewState & LVIS_STATEIMAGEMASK) >> 12) == 2;
+			NListView::ListView_SelectItem(m_hListView, changeData->iItem, checked);
+		}
+		else
+		{
+			bool previouslySelected = WI_IsFlagSet(changeData->uOldState, LVIS_SELECTED);
+			bool currentlySelected = WI_IsFlagSet(changeData->uNewState, LVIS_SELECTED);
+
+			if (!previouslySelected && currentlySelected)
+			{
+				ListView_SetCheckState(m_hListView, changeData->iItem, TRUE);
+			}
+			else if (previouslySelected && !currentlySelected)
+			{
+				ListView_SetCheckState(m_hListView, changeData->iItem, FALSE);
+			}
+		}
+	}
 }
 
 void CShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
