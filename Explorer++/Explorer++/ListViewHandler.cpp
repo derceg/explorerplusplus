@@ -57,10 +57,6 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 			m_mainToolbar->UpdateToolbarButtonStates();
 			break;
 
-		case WM_LBUTTONDOWN:
-			OnListViewLButtonDown(wParam,lParam);
-			break;
-
 		case WM_LBUTTONDBLCLK:
 			{
 				LV_HITTESTINFO	ht;
@@ -270,33 +266,6 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 	return DefSubclassProc(ListView,msg,wParam,lParam);
 }
 
-void Explorerplusplus::OnListViewLButtonDown(WPARAM wParam,LPARAM lParam)
-{
-	LV_HITTESTINFO HitTestInfo;
-
-	HitTestInfo.pt.x	= LOWORD(lParam);
-	HitTestInfo.pt.y	= HIWORD(lParam);
-
-	/* Test to see if the mouse click was
-	on an item or not. */
-	ListView_HitTest(m_hActiveListView,&HitTestInfo);
-
-	/* If the mouse click was not on an item,
-	then assume we are counting down the number
-	of items selected. */
-	if(HitTestInfo.flags == LVHT_NOWHERE)
-	{
-		m_bSelectionFromNowhere = TRUE;
-
-		if(!(wParam & MK_CONTROL) && m_nSelected > 1)
-			m_bCountingDown = TRUE;
-	}
-	else
-	{
-		m_bSelectionFromNowhere = FALSE;
-	}
-}
-
 LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 {
 	LV_KEYDOWN	*lv_key = NULL;
@@ -336,7 +305,6 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 				!IsKeyDown(VK_SHIFT) &&
 				!IsKeyDown(VK_MENU))
 			{
-				m_bCountingUp = TRUE;
 				NListView::ListView_SelectAllItems(m_hActiveListView,TRUE);
 				SetFocus(m_hActiveListView);
 			}
@@ -356,8 +324,6 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 				!IsKeyDown(VK_SHIFT) &&
 				!IsKeyDown(VK_MENU))
 			{
-				m_bInverted = TRUE;
-				m_nSelectedOnInvert = m_nSelected;
 				NListView::ListView_InvertSelection(m_hActiveListView);
 				SetFocus(m_hActiveListView);
 			}
@@ -429,39 +395,10 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 		}
 	}
 
-	/* Only update internal selection info
-	if the listview that sent the change
-	notification is active. */
-	if(m_tabContainer->IsTabSelected(tab))
-	{
-		if(Selected)
-		{
-			m_nSelected++;
-
-			if(m_nSelected == ListView_GetItemCount(m_hActiveListView))
-				m_bCountingUp = FALSE;
-		}
-		else
-		{
-			m_nSelected--;
-
-			if(m_nSelected <= 1)
-				m_bCountingDown = FALSE;
-		}
-	}
-
 	tab.GetShellBrowser()->UpdateFileSelectionInfo(
 	(int)ItemChanged->lParam,Selected);
 
-	if((ListView_GetItemCount(m_hActiveListView) - m_nSelected) == m_nSelectedOnInvert)
-		m_bInverted = FALSE;
-
-	if(m_bCountingUp || m_bCountingDown || m_bInverted)
-		return;
-
-	UpdateDisplayWindow(tab);
-	UpdateStatusBarText(tab);
-	m_mainToolbar->UpdateToolbarButtonStates();
+	SetTimer(m_hContainer, LISTVIEW_ITEM_CHANGED_TIMER_ID, LISTVIEW_ITEM_CHANGED_TIMEOUT, nullptr);
 }
 
 int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)

@@ -71,8 +71,6 @@ void Explorerplusplus::OnNavigationCompleted(const Tab &tab)
 		m_CurrentDirectory = tab.GetShellBrowser()->GetDirectory();
 		SetCurrentDirectory(m_CurrentDirectory.c_str());
 
-		m_nSelected = 0;
-
 		UpdateSortMenuItems(tab);
 		UpdateWindowStates(tab);
 	}
@@ -205,8 +203,6 @@ void Explorerplusplus::OnTabSelected(const Tab &tab)
 	set correctly. */
 	m_CurrentDirectory = tab.GetShellBrowser()->GetDirectory();
 	SetCurrentDirectory(m_CurrentDirectory.c_str());
-
-	m_nSelected = tab.GetShellBrowser()->GetNumSelected();
 
 	UpdateSortMenuItems(tab);
 	UpdateWindowStates(tab);

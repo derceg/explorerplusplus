@@ -107,6 +107,16 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		{
 			SaveAllSettings();
 		}
+		else if (wParam == LISTVIEW_ITEM_CHANGED_TIMER_ID)
+		{
+			Tab &selectedTab = m_tabContainer->GetSelectedTab();
+
+			UpdateDisplayWindow(selectedTab);
+			UpdateStatusBarText(selectedTab);
+			m_mainToolbar->UpdateToolbarButtonStates();
+
+			KillTimer(m_hContainer, LISTVIEW_ITEM_CHANGED_TIMER_ID);
+		}
 		break;
 
 	case WM_USER_UPDATEWINDOWS:
@@ -437,14 +447,11 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		break;
 
 	case IDM_EDIT_SELECTALL:
-		m_bCountingUp = TRUE;
 		NListView::ListView_SelectAllItems(m_hActiveListView, TRUE);
 		SetFocus(m_hActiveListView);
 		break;
 
 	case IDM_EDIT_INVERTSELECTION:
-		m_bInverted = TRUE;
-		m_nSelectedOnInvert = m_nSelected;
 		NListView::ListView_InvertSelection(m_hActiveListView);
 		SetFocus(m_hActiveListView);
 		break;
@@ -455,7 +462,6 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		break;
 
 	case IDM_EDIT_SELECTNONE:
-		m_bCountingDown = TRUE;
 		NListView::ListView_SelectAllItems(m_hActiveListView, FALSE);
 		SetFocus(m_hActiveListView);
 		break;
@@ -1441,7 +1447,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 	switch(nmhdr->code)
 	{
 		case NM_CLICK:
-			if(m_config->globalFolderSettings.oneClickActivate && !m_bSelectionFromNowhere)
+			if(m_config->globalFolderSettings.oneClickActivate)
 			{
 				OnListViewDoubleClick(&((NMITEMACTIVATE *)lParam)->hdr);
 			}

@@ -113,6 +113,9 @@ private:
 	static const UINT_PTR AUTOSAVE_TIMER_ID = 100000;
 	static const UINT AUTOSAVE_TIMEOUT = 30000;
 
+	static const UINT_PTR LISTVIEW_ITEM_CHANGED_TIMER_ID = 100001;
+	static const UINT LISTVIEW_ITEM_CHANGED_TIMEOUT = 50;
+
 	// Represents the maximum number of icons that can be cached. This cache is
 	// shared between various components in the application.
 	static const int MAX_CACHED_ICONS = 1000;
@@ -240,7 +243,6 @@ private:
 	void					OnToolbarViews();
 
 	/* ListView private message handlers. */
-	void					OnListViewLButtonDown(WPARAM wParam,LPARAM lParam);
 	void					OnListViewDoubleClick(NMHDR *nmhdr);
 	void					OnListViewFileRename();
 	void					OnListViewFileRenameSingle();
@@ -593,14 +595,6 @@ private:
 	/* Display window folder sizes. */
 	std::list<DWFolderSize_t>	m_DWFolderSizes;
 	int						m_iDWFolderSizeUniqueId;
-
-	/* ListView selection. */
-	BOOL					m_bCountingUp;
-	BOOL					m_bCountingDown;
-	BOOL					m_bInverted;
-	BOOL					m_bSelectionFromNowhere;
-	int						m_nSelected;
-	int						m_nSelectedOnInvert;
 
 	/* Copy/cut. */
 	IDataObject				*m_pClipboardDataObject;
