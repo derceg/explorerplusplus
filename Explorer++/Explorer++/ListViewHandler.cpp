@@ -1170,7 +1170,7 @@ int Explorerplusplus::HighlightSimilarFiles(HWND ListView) const
 
 void Explorerplusplus::OpenAllSelectedItems(BOOL bOpenInNewTab)
 {
-	BOOL	m_bSeenDirectory = FALSE;
+	BOOL	bSeenDirectory = FALSE;
 	DWORD	dwAttributes;
 	int		iItem = -1;
 	int		iFolderItem = -1;
@@ -1181,7 +1181,7 @@ void Explorerplusplus::OpenAllSelectedItems(BOOL bOpenInNewTab)
 
 		if((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 		{
-			m_bSeenDirectory = TRUE;
+			bSeenDirectory = TRUE;
 			iFolderItem = iItem;
 		}
 		else
@@ -1190,7 +1190,7 @@ void Explorerplusplus::OpenAllSelectedItems(BOOL bOpenInNewTab)
 		}
 	}
 
-	if(m_bSeenDirectory)
+	if(bSeenDirectory)
 		OpenListViewItem(iFolderItem,bOpenInNewTab,FALSE);
 }
 
