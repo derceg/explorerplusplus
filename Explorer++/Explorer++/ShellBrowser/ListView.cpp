@@ -512,6 +512,26 @@ void CShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 {
 	switch (lvKeyDown->wVKey)
 	{
+	case 'A':
+		if (IsKeyDown(VK_CONTROL) &&
+			!IsKeyDown(VK_SHIFT) &&
+			!IsKeyDown(VK_MENU))
+		{
+			NListView::ListView_SelectAllItems(m_hListView, TRUE);
+			SetFocus(m_hListView);
+		}
+		break;
+
+	case 'I':
+		if (IsKeyDown(VK_CONTROL) &&
+			!IsKeyDown(VK_SHIFT) &&
+			!IsKeyDown(VK_MENU))
+		{
+			NListView::ListView_InvertSelection(m_hListView);
+			SetFocus(m_hListView);
+		}
+		break;
+
 	case VK_BACK:
 		if (IsKeyDown(VK_CONTROL) &&
 			!IsKeyDown(VK_SHIFT) &&

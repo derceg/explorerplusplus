@@ -300,32 +300,12 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 			}
 			break;
 
-		case 'A':
-			if(IsKeyDown(VK_CONTROL) &&
-				!IsKeyDown(VK_SHIFT) &&
-				!IsKeyDown(VK_MENU))
-			{
-				NListView::ListView_SelectAllItems(m_hActiveListView,TRUE);
-				SetFocus(m_hActiveListView);
-			}
-			break;
-
 		case 'C':
 			if(IsKeyDown(VK_CONTROL) &&
 				!IsKeyDown(VK_SHIFT) &&
 				!IsKeyDown(VK_MENU))
 			{
 				OnListViewCopy(TRUE);
-			}
-			break;
-
-		case 'I':
-			if(IsKeyDown(VK_CONTROL) &&
-				!IsKeyDown(VK_SHIFT) &&
-				!IsKeyDown(VK_MENU))
-			{
-				NListView::ListView_InvertSelection(m_hActiveListView);
-				SetFocus(m_hActiveListView);
 			}
 			break;
 
