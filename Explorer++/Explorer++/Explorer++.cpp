@@ -68,7 +68,7 @@ Explorerplusplus::Explorerplusplus(HWND hwnd) :
 	m_zDeltaTotal					= 0;
 	m_InitializationFinished.set(false);
 
-	m_bBlockNext = FALSE;
+	m_blockNextListViewSelection = FALSE;
 
 	m_ColorRules = NColorRuleHelper::GetDefaultColorRules();
 

@@ -80,6 +80,10 @@ Bug fixes:
   resetting the toolbar or by adding that individual button),
   the state of the button wouldn't be set correctly. Even if the
   folders pane was shown, the button wouldn't be checked. Fixed.
+- When using the "list" view mode, right-clicking the empty space
+  in a row would inconsistently result in the item being
+  selected. Now, an item is only selected if you right-click its
+  filename label.
 - There was an issue that prevented labels in the treeview from
   being unfolded. Now, if you move the mouse over a treeview
   label that's only partially visible, the rest of the label will

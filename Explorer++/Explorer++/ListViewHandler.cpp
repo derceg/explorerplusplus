@@ -121,7 +121,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 
 						if(!PtInRect(&rc,lvhti.pt))
 						{
-							m_bBlockNext = TRUE;
+							m_blockNextListViewSelection = TRUE;
 						}
 					}
 				}
@@ -137,7 +137,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 			m_bDragCancelled = FALSE;
 			m_bDragAllowed = FALSE;
 
-			m_bBlockNext = FALSE;
+			m_blockNextListViewSelection = FALSE;
 			break;
 
 		/* If no item is currently been dragged, and the last drag
@@ -146,7 +146,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 		mouse button was clicked, it was over an item, start dragging. */
 		case WM_MOUSEMOVE:
 			{
-				m_bBlockNext = FALSE;
+				m_blockNextListViewSelection = FALSE;
 				if(!m_bDragging && !m_bDragCancelled && m_bDragAllowed)
 				{
 					if((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON)
@@ -329,6 +329,38 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 	}
 
 	return 0;
+}
+
+BOOL Explorerplusplus::OnListViewItemChanging(const NMLISTVIEW *changeData)
+{
+	if (changeData->uChanged != LVIF_STATE)
+	{
+		return FALSE;
+	}
+
+	int tabId = DetermineListViewObjectIndex(changeData->hdr.hwndFrom);
+
+	if (tabId == -1)
+	{
+		return FALSE;
+	}
+
+	Tab &tab = m_tabContainer->GetTab(tabId);
+	ViewMode viewMode = tab.GetShellBrowser()->GetViewMode();
+
+	bool previouslySelected = WI_IsFlagSet(changeData->uOldState, LVIS_SELECTED);
+	bool currentlySelected = WI_IsFlagSet(changeData->uNewState, LVIS_SELECTED);
+
+	if (viewMode == +ViewMode::List && !previouslySelected && currentlySelected)
+	{
+		if (m_blockNextListViewSelection)
+		{
+			m_blockNextListViewSelection = FALSE;
+			return TRUE;
+		}
+	}
+
+	return FALSE;
 }
 
 int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)

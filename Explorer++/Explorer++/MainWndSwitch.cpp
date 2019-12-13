@@ -1470,29 +1470,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 			break;
 
 		case LVN_ITEMCHANGING:
-			{
-				int tabId = DetermineListViewObjectIndex(hwnd);
-
-				if (tabId == -1)
-				{
-					return FALSE;
-				}
-
-				Tab &tab = m_tabContainer->GetTab(tabId);
-
-				UINT uViewMode = tab.GetShellBrowser()->GetViewMode();
-
-				if(uViewMode == ViewMode::List)
-				{
-					if(m_bBlockNext)
-					{
-						m_bBlockNext = FALSE;
-						return TRUE;
-					}
-				}
-
-				return FALSE;
-			}
+			return OnListViewItemChanging(reinterpret_cast<NMLISTVIEW *>(lParam));
 			break;
 
 		case LVN_BEGINDRAG:
