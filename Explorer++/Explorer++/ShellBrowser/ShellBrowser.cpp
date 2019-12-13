@@ -415,37 +415,6 @@ void CShellBrowser::OnGridlinesSettingChanged()
 	NListView::ListView_SetGridlines(m_hListView, m_config->globalFolderSettings.showGridlines);
 }
 
-void CShellBrowser::UpdateFileSelectionInfo(int iCacheIndex,BOOL Selected)
-{
-	ULARGE_INTEGER	ulFileSize;
-	BOOL			IsFolder;
-
-	IsFolder = (m_itemInfoMap.at(iCacheIndex).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-	== FILE_ATTRIBUTE_DIRECTORY;
-
-	ulFileSize.LowPart = m_itemInfoMap.at(iCacheIndex).wfd.nFileSizeLow;
-	ulFileSize.HighPart = m_itemInfoMap.at(iCacheIndex).wfd.nFileSizeHigh;
-
-	if(Selected)
-	{
-		if(IsFolder)
-			m_NumFoldersSelected++;
-		else
-			m_NumFilesSelected++;
-
-		m_ulFileSelectionSize.QuadPart += ulFileSize.QuadPart;
-	}
-	else
-	{
-		if(IsFolder)
-			m_NumFoldersSelected--;
-		else
-			m_NumFilesSelected--;
-
-		m_ulFileSelectionSize.QuadPart -= ulFileSize.QuadPart;
-	}
-}
-
 BOOL CShellBrowser::IsFilenameFiltered(const TCHAR *FileName) const
 {
 	if(CheckWildcardMatch(m_folderSettings.filter.c_str(),FileName,m_folderSettings.filterCaseSensitive))
@@ -1169,11 +1138,6 @@ BOOL CShellBrowser::SetShowHidden(BOOL bShowHidden)
 	m_folderSettings.showHidden = bShowHidden;
 
 	return m_folderSettings.showHidden;
-}
-
-BOOL CShellBrowser::IsDragging() const
-{
-	return m_bPerformingDrag;
 }
 
 std::vector<SortMode> CShellBrowser::GetAvailableSortModes() const

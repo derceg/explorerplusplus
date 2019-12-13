@@ -248,7 +248,6 @@ private:
 	void					OnListViewFileRenameSingle();
 	void					OnListViewFileRenameMultiple();
 	LRESULT					OnListViewKeyDown(LPARAM lParam);
-	void					OnListViewItemChanged(LPARAM lParam);
 	HRESULT					OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType);
 	BOOL					OnListViewBeginLabelEdit(LPARAM lParam);
 	BOOL					OnListViewEndLabelEdit(LPARAM lParam);
@@ -295,6 +294,7 @@ private:
 	void					ShowTabBar();
 	void					HideTabBar();
 	HRESULT					RestoreTabs(ILoadSave *pLoadSave);
+	void					OnTabListViewSelectionChanged(const Tab &tab);
 
 	/* TabNavigationInterface methods. */
 	HRESULT					CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected);

@@ -436,27 +436,75 @@ void CShellBrowser::ProcessInfoTipResult(int infoTipResultId)
 
 void CShellBrowser::OnListViewItemChanged(const NMLISTVIEW *changeData)
 {
-	if (m_config->checkBoxSelection && changeData->uChanged == LVIF_STATE)
+	if (changeData->uChanged != LVIF_STATE)
 	{
-		if ((LVIS_STATEIMAGEMASK & changeData->uNewState) != 0)
-		{
-			bool checked = ((changeData->uNewState & LVIS_STATEIMAGEMASK) >> 12) == 2;
-			NListView::ListView_SelectItem(m_hListView, changeData->iItem, checked);
-		}
-		else
-		{
-			bool previouslySelected = WI_IsFlagSet(changeData->uOldState, LVIS_SELECTED);
-			bool currentlySelected = WI_IsFlagSet(changeData->uNewState, LVIS_SELECTED);
+		return;
+	}
 
-			if (!previouslySelected && currentlySelected)
-			{
-				ListView_SetCheckState(m_hListView, changeData->iItem, TRUE);
-			}
-			else if (previouslySelected && !currentlySelected)
-			{
-				ListView_SetCheckState(m_hListView, changeData->iItem, FALSE);
-			}
+	if (m_config->checkBoxSelection && (LVIS_STATEIMAGEMASK & changeData->uNewState) != 0)
+	{
+		bool checked = ((changeData->uNewState & LVIS_STATEIMAGEMASK) >> 12) == 2;
+		NListView::ListView_SelectItem(m_hListView, changeData->iItem, checked);
+	}
+
+	bool previouslySelected = WI_IsFlagSet(changeData->uOldState, LVIS_SELECTED);
+	bool currentlySelected = WI_IsFlagSet(changeData->uNewState, LVIS_SELECTED);
+
+	if (previouslySelected == currentlySelected)
+	{
+		return;
+	}
+
+	if (m_bPerformingDrag)
+	{
+		return;
+	}
+
+	if (m_config->checkBoxSelection)
+	{
+		if (!previouslySelected && currentlySelected)
+		{
+			ListView_SetCheckState(m_hListView, changeData->iItem, TRUE);
 		}
+		else if (previouslySelected && !currentlySelected)
+		{
+			ListView_SetCheckState(m_hListView, changeData->iItem, FALSE);
+		}
+	}
+
+	UpdateFileSelectionInfo(static_cast<int>(changeData->lParam), currentlySelected);
+
+	listViewSelectionChanged.m_signal();
+}
+
+void CShellBrowser::UpdateFileSelectionInfo(int internalIndex, BOOL Selected)
+{
+	ULARGE_INTEGER	ulFileSize;
+	BOOL			IsFolder;
+
+	IsFolder = (m_itemInfoMap.at(internalIndex).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		== FILE_ATTRIBUTE_DIRECTORY;
+
+	ulFileSize.LowPart = m_itemInfoMap.at(internalIndex).wfd.nFileSizeLow;
+	ulFileSize.HighPart = m_itemInfoMap.at(internalIndex).wfd.nFileSizeHigh;
+
+	if (Selected)
+	{
+		if (IsFolder)
+			m_NumFoldersSelected++;
+		else
+			m_NumFilesSelected++;
+
+		m_ulFileSelectionSize.QuadPart += ulFileSize.QuadPart;
+	}
+	else
+	{
+		if (IsFolder)
+			m_NumFoldersSelected--;
+		else
+			m_NumFilesSelected--;
+
+		m_ulFileSelectionSize.QuadPart -= ulFileSize.QuadPart;
 	}
 }
 

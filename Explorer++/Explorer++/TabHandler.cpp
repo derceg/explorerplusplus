@@ -38,6 +38,8 @@ void Explorerplusplus::InitializeTabs()
 	m_tabContainer->tabNavigationCompletedSignal.AddObserver(boost::bind(&Explorerplusplus::OnNavigationCompleted, this, _1), boost::signals2::at_front);
 	m_tabContainer->tabSelectedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabSelected, this, _1), boost::signals2::at_front);
 
+	m_tabContainer->tabListViewSelectionChanged.AddObserver(boost::bind(&Explorerplusplus::OnTabListViewSelectionChanged, this, _1), boost::signals2::at_front);
+
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_tabContainer->GetHWND());
 	int tabWindowHeight = MulDiv(TAB_WINDOW_HEIGHT_96DPI, dpi, USER_DEFAULT_SCREEN_DPI);
 	SetWindowPos(m_tabContainer->GetHWND(), nullptr, 0, 0, 0, tabWindowHeight, SWP_NOMOVE | SWP_NOZORDER);
@@ -253,4 +255,24 @@ void Explorerplusplus::HideTabBar()
 HRESULT Explorerplusplus::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected)
 {
 	return m_tabContainer->CreateNewTab(pidlDirectory, TabSettings(_selected = selected));
+}
+
+void Explorerplusplus::OnTabListViewSelectionChanged(const Tab &tab)
+{
+	/* The selection for this tab has changed, so invalidate any
+	folder size calculations that are occurring for this tab
+	(applies only to folder sizes that will be shown in the display
+	window). */
+	for (auto &item : m_DWFolderSizes)
+	{
+		if (item.iTabId == tab.GetId())
+		{
+			item.bValid = FALSE;
+		}
+	}
+
+	if (m_tabContainer->IsTabSelected(tab))
+	{
+		SetTimer(m_hContainer, LISTVIEW_ITEM_CHANGED_TIMER_ID, LISTVIEW_ITEM_CHANGED_TIMEOUT, nullptr);
+	}
 }

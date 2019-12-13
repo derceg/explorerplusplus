@@ -351,56 +351,6 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 	return 0;
 }
 
-void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
-{
-	NMLISTVIEW	*ItemChanged = NULL;
-	int			iObjectIndex;
-	BOOL		Selected;
-
-	ItemChanged = (NM_LISTVIEW FAR *)lParam;
-
-	iObjectIndex = DetermineListViewObjectIndex(ItemChanged->hdr.hwndFrom);
-
-	if(iObjectIndex == -1)
-		return;
-
-	Tab &tab = m_tabContainer->GetTab(iObjectIndex);
-
-	if(tab.GetShellBrowser()->IsDragging())
-		return;
-
-	if((ItemChanged->uNewState & LVIS_SELECTED) &&
-	(ItemChanged->uOldState & LVIS_SELECTED))
-		return;
-
-	/* Only proceed if an item was selected or deselected. */
-	if(ItemChanged->uNewState & LVIS_SELECTED)
-		Selected = TRUE;
-	else if(ItemChanged->uOldState & LVIS_SELECTED)
-		Selected  = FALSE;
-	else
-		return;
-
-	/* The selection for this tab has changed, so invalidate any
-	folder size calculations that are occurring for this tab
-	(applies only to folder sizes that will be shown in the display
-	window). */
-	std::list<DWFolderSize_t>::iterator itr;
-
-	for(itr = m_DWFolderSizes.begin();itr != m_DWFolderSizes.end();itr++)
-	{
-		if(itr->iTabId == iObjectIndex)
-		{
-			itr->bValid = FALSE;
-		}
-	}
-
-	tab.GetShellBrowser()->UpdateFileSelectionInfo(
-	(int)ItemChanged->lParam,Selected);
-
-	SetTimer(m_hContainer, LISTVIEW_ITEM_CHANGED_TIMER_ID, LISTVIEW_ITEM_CHANGED_TIMEOUT, nullptr);
-}
-
 int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 {
 	for (auto &item : m_tabContainer->GetAllTabs())

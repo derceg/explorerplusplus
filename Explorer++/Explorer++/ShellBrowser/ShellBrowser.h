@@ -87,9 +87,6 @@ public:
 	HRESULT _stdcall	DragLeave(void);
 	HRESULT _stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect);
 
-	/* Drag and Drop support. */
-	BOOL				IsDragging() const;
-
 	/* Get/Set current state. */
 	unique_pidl_absolute	GetDirectoryIdl() const;
 	std::wstring		GetDirectory() const;
@@ -143,7 +140,6 @@ public:
 	BOOL				GetFilterCaseSensitive(void) const;
 	void				SetFilterCaseSensitive(BOOL bCaseSensitive);
 
-	void				UpdateFileSelectionInfo(int,BOOL);
 	int					SelectFiles(const TCHAR *FileNamePattern);
 	void				GetFolderInfo(FolderInfo_t *pFolderInfo);
 	int					LocateFileItemIndex(const TCHAR *szFileName) const;
@@ -167,6 +163,9 @@ public:
 	void				OnDeviceChange(WPARAM wParam,LPARAM lParam);
 
 	void				OnGridlinesSettingChanged();
+
+	// Signals
+	SignalWrapper<CShellBrowser, void()> listViewSelectionChanged;
 
 private:
 
@@ -326,6 +325,7 @@ private:
 	static boost::optional<InfoTipResult>	GetInfoTipAsync(HWND listView, int infoTipResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo, const Config &config, HINSTANCE instance, bool virtualFolder);
 	void				ProcessInfoTipResult(int infoTipResultId);
 	void				OnListViewItemChanged(const NMLISTVIEW *changeData);
+	void				UpdateFileSelectionInfo(int internalIndex, BOOL Selected);
 	void				OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown);
 	void				OnListViewHeaderRightClick(const POINTS &cursorPos);
 	void				OnListViewHeaderMenuItemSelected(int menuItemId, const std::unordered_map<int, UINT> &menuItemMappings);

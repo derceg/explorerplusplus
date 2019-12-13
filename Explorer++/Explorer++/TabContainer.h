@@ -114,6 +114,8 @@ public:
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabPreRemovalSignal;
 	SignalWrapper<TabContainer, void(int tabId)> tabRemovedSignal;
 
+	SignalWrapper<TabContainer, void(const Tab &tab)> tabListViewSelectionChanged;
+
 private:
 
 	static const UINT_PTR SUBCLASS_ID = 0;
