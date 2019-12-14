@@ -18,20 +18,20 @@ int CALLBACK SortByAdded(const VariantBookmark &BookmarkItem1,const VariantBookm
 int CALLBACK SortByLastModified(const VariantBookmark &BookmarkItem1,const VariantBookmark &BookmarkItem2);
 
 VariantBookmark &NBookmarkHelper::GetBookmarkItem(CBookmarkFolder &ParentBookmarkFolder,
-	const GUID &guid)
+	const std::wstring &guid)
 {
 	auto itr = std::find_if(ParentBookmarkFolder.begin(),ParentBookmarkFolder.end(),
-		[guid](VariantBookmark &variantBookmark) -> BOOL
+		[&guid](VariantBookmark &variantBookmark) -> BOOL
 		{
 			if(variantBookmark.type() == typeid(CBookmarkFolder))
 			{
 				CBookmarkFolder BookmarkFolder = boost::get<CBookmarkFolder>(variantBookmark);
-				return IsEqualGUID(BookmarkFolder.GetGUID(),guid);
+				return BookmarkFolder.GetGUID() == guid;
 			}
 			else
 			{
 				CBookmark Bookmark = boost::get<CBookmark>(variantBookmark);
-				return IsEqualGUID(Bookmark.GetGUID(),guid);
+				return Bookmark.GetGUID() == guid;
 			}
 		}
 	);

@@ -4,29 +4,10 @@
 
 #pragma once
 
-#include <unordered_set>
 #include "../Helper/Bookmark.h"
 
 namespace NBookmarkHelper
 {
-	struct GuidEq
-	{
-		bool operator () (const GUID &guid1,const GUID &guid2) const
-		{
-			return (IsEqualGUID(guid1,guid2) == TRUE);
-		}
-	};
-
-	struct GuidHash
-	{
-		size_t operator () (const GUID &guid) const
-		{
-			return guid.Data1;
-		}
-	};
-
-	typedef std::unordered_set<GUID,GuidHash,GuidEq> setExpansion_t;
-
 	enum SortMode_t
 	{
 		SM_NAME = 1,
@@ -43,7 +24,7 @@ namespace NBookmarkHelper
 	static TCHAR *TOOLBAR_GUID = _T("00000000-0000-0000-0000-000000000002");
 	static TCHAR *MENU_GUID = _T("00000000-0000-0000-0000-000000000003");
 
-	int CALLBACK		Sort(SortMode_t SortMode, const VariantBookmark &BookmarkItem1, const VariantBookmark &BookmarkItem2);
+	int CALLBACK Sort(SortMode_t SortMode, const VariantBookmark &BookmarkItem1, const VariantBookmark &BookmarkItem2);
 
-	VariantBookmark		&GetBookmarkItem(CBookmarkFolder &ParentBookmarkFolder, const GUID &guid);
+	VariantBookmark &GetBookmarkItem(CBookmarkFolder &ParentBookmarkFolder, const std::wstring &guid);
 }

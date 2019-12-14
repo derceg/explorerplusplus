@@ -15,6 +15,7 @@
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
 #include <stack>
+#include <unordered_set>
 
 class CManageBookmarksDialog;
 
@@ -55,14 +56,14 @@ private:
 
 	void SetupDefaultColumns();
 
-	std::vector<ColumnInfo_t>		m_vectorColumnInfo;
+	std::vector<ColumnInfo_t> m_vectorColumnInfo;
 
-	bool							m_bInitialized;
-	GUID							m_guidSelected;
-	NBookmarkHelper::setExpansion_t	m_setExpansion;
+	bool m_bInitialized;
+	std::wstring m_guidSelected;
+	std::unordered_set<std::wstring> m_setExpansion;
 
-	NBookmarkHelper::SortMode_t		m_SortMode;
-	bool							m_bSortAscending;
+	NBookmarkHelper::SortMode_t m_SortMode;
+	bool m_bSortAscending;
 };
 
 class CManageBookmarksDialog : public CBaseDialog, public NBookmark::IBookmarkItemNotification
@@ -77,10 +78,10 @@ public:
 
 	void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position);
 	void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
-	void	OnBookmarkModified(const GUID &guid);
-	void	OnBookmarkFolderModified(const GUID &guid);
-	void	OnBookmarkRemoved(const GUID &guid);
-	void	OnBookmarkFolderRemoved(const GUID &guid);
+	void	OnBookmarkModified(const std::wstring &guid);
+	void	OnBookmarkFolderModified(const std::wstring &guid);
+	void	OnBookmarkRemoved(const std::wstring &guid);
+	void	OnBookmarkFolderRemoved(const std::wstring &guid);
 
 protected:
 
@@ -123,7 +124,7 @@ private:
 	void		UpdateToolbarState();
 
 	void		OnNewFolder();
-	void		OnDeleteBookmark(const GUID &guid);
+	void		OnDeleteBookmark(const std::wstring &guid);
 
 	void		OnDblClk(NMHDR *pnmhdr);
 	void		OnRClick(NMHDR *pnmhdr);
@@ -152,13 +153,13 @@ private:
 
 	CBookmarkFolder &m_AllBookmarks;
 
-	GUID m_guidCurrentFolder;
+	std::wstring m_guidCurrentFolder;
 
 	bool m_bNewFolderAdded;
-	GUID m_guidNewFolder;
+	std::wstring m_guidNewFolder;
 
-	std::stack<GUID> m_stackBack;
-	std::stack<GUID> m_stackForward;
+	std::stack<std::wstring> m_stackBack;
+	std::stack<std::wstring> m_stackForward;
 	bool m_bSaveHistory;
 
 	CBookmarkTreeView *m_pBookmarkTreeView;

@@ -756,3 +756,17 @@ bool IsKeyDown(int nVirtKey)
 
 	return (status != 0);
 }
+
+std::wstring CreateGUID()
+{
+	GUID guid;
+	CoCreateGuid(&guid);
+
+	TCHAR guidString[128];
+	StringFromGUID2(guid, guidString, SIZEOF_ARRAY(guidString));
+
+	std::wstring finalValue = guidString;
+	finalValue = finalValue.substr(1, finalValue.length() - 2);
+
+	return finalValue;
+}

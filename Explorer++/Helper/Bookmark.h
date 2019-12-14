@@ -4,9 +4,10 @@
 
 #pragma once
 
-#include <list>
-#include <vector>
 #include <boost/variant.hpp>
+#include <list>
+#include <optional>
+#include <vector>
 
 class CBookmark;
 class CBookmarkFolder;
@@ -18,11 +19,11 @@ namespace NBookmark
 		void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position);
 		void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
 
-		void	OnBookmarkModified(const GUID &guid);
-		void	OnBookmarkFolderModified(const GUID &guid);
+		void	OnBookmarkModified(const std::wstring &guid);
+		void	OnBookmarkFolderModified(const std::wstring &guid);
 
-		void	OnBookmarkRemoved(const GUID &guid);
-		void	OnBookmarkFolderRemoved(const GUID &guid);
+		void	OnBookmarkRemoved(const std::wstring &guid);
+		void	OnBookmarkFolderRemoved(const std::wstring &guid);
 	};
 }
 
@@ -32,15 +33,13 @@ class CBookmarkFolder
 {
 public:
 
-	static CBookmarkFolder	Create(const std::wstring &strName,GUID &guid);
-	static CBookmarkFolder	Create(const std::wstring &strName);
-	static CBookmarkFolder	*CreateNew(const std::wstring &strName,GUID &guid);
-	static CBookmarkFolder	*CreateNew(const std::wstring &strName);
+	static CBookmarkFolder	Create(const std::wstring &strName, std::optional<std::wstring> guid = std::nullopt);
+	static CBookmarkFolder	*CreateNew(const std::wstring &strName, std::optional<std::wstring> guid = std::nullopt);
 	static CBookmarkFolder	UnserializeFromRegistry(const std::wstring &strKey);
 
 	void			SerializeToRegistry(const std::wstring &strKey);
 
-	GUID			GetGUID() const;
+	std::wstring GetGUID() const;
 
 	std::wstring	GetName() const;
 	void			SetName(const std::wstring &strName);
@@ -77,14 +76,14 @@ private:
 		INITIALIZATION_TYPE_REGISTRY
 	};
 
-	CBookmarkFolder(const std::wstring &str,InitializationType_t InitializationType,GUID *guid);
+	CBookmarkFolder(const std::wstring &str, InitializationType_t InitializationType, std::optional<std::wstring> guid);
 
-	void			Initialize(const std::wstring &strName,GUID *guid);
+	void			Initialize(const std::wstring &name, std::optional<std::wstring> guid);
 	void			InitializeFromRegistry(const std::wstring &strKey);
 
 	void			UpdateModificationTime();
 
-	GUID			m_guid;
+	std::wstring	m_guid;
 
 	std::wstring	m_strName;
 
@@ -113,7 +112,7 @@ public:
 
 	void			SerializeToRegistry(const std::wstring &strKey);
 
-	GUID			GetGUID() const;
+	std::wstring	GetGUID() const;
 
 	std::wstring	GetName() const;
 	std::wstring	GetLocation() const;
@@ -140,7 +139,7 @@ private:
 
 	void			UpdateModificationTime();
 
-	GUID			m_guid;
+	std::wstring	m_guid;
 
 	std::wstring	m_strName;
 	std::wstring	m_strLocation;
@@ -164,10 +163,10 @@ public:
 
 	void	NotifyObserversBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position);
 	void	NotifyObserversBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
-	void	NotifyObserversBookmarkModified(const GUID &guid);
-	void	NotifyObserversBookmarkFolderModified(const GUID &guid);
-	void	NotifyObserversBookmarkRemoved(const GUID &guid);
-	void	NotifyObserversBookmarkFolderRemoved(const GUID &guid);
+	void	NotifyObserversBookmarkModified(const std::wstring &guid);
+	void	NotifyObserversBookmarkFolderModified(const std::wstring &guid);
+	void	NotifyObserversBookmarkRemoved(const std::wstring &guid);
+	void	NotifyObserversBookmarkFolderRemoved(const std::wstring &guid);
 
 private:
 
@@ -186,7 +185,9 @@ private:
 	CBookmarkItemNotifier(const CBookmarkItemNotifier &);
 	CBookmarkItemNotifier & operator=(const CBookmarkItemNotifier &);
 
-	void	NotifyObservers(NotificationType_t NotificationType,const CBookmarkFolder *pParentBookmarkFolder,const CBookmarkFolder *pBookmarkFolder,const CBookmark *pBookmark,const GUID *pguid,std::size_t Position);
+	void	NotifyObservers(NotificationType_t NotificationType, const CBookmarkFolder *pParentBookmarkFolder,
+		const CBookmarkFolder *pBookmarkFolder, const CBookmark *pBookmark, std::optional<std::wstring> guid,
+		std::size_t Position);
 
 	std::list<NBookmark::IBookmarkItemNotification *>	m_listObservers;
 };

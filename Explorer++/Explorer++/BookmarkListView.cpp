@@ -62,7 +62,7 @@ int CBookmarkListView::InsertBookmarkIntoListView(const CBookmark &Bookmark, int
 }
 
 int CBookmarkListView::InsertBookmarkItemIntoListView(const std::wstring &strName,
-	const GUID &guid, bool bFolder, int iPosition)
+	const std::wstring &guid, bool bFolder, int iPosition)
 {
 	assert(iPosition >= 0 && iPosition <= ListView_GetItemCount(m_hListView));
 
@@ -89,7 +89,7 @@ int CBookmarkListView::InsertBookmarkItemIntoListView(const std::wstring &strNam
 	lvi.lParam = m_uIDCounter;
 	int iItem = ListView_InsertItem(m_hListView, &lvi);
 
-	m_mapID.insert(std::make_pair(m_uIDCounter, guid));
+	m_mapID.insert({ m_uIDCounter, guid });
 	++m_uIDCounter;
 
 	return iItem;

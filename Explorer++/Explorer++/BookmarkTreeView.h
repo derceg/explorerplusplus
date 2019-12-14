@@ -12,27 +12,28 @@
 #include "../Helper/WindowSubclassWrapper.h"
 #include <wil/resource.h>
 #include <unordered_map>
+#include <unordered_set>
 
 class CBookmarkTreeView
 {
 public:
 
 	CBookmarkTreeView(HWND hTreeView, HINSTANCE hInstance, IExplorerplusplus *expp,
-		CBookmarkFolder *pAllBookmarks, const GUID &guidSelected,
-		const NBookmarkHelper::setExpansion_t &setExpansion);
+		CBookmarkFolder *pAllBookmarks, const std::wstring &guidSelected,
+		const std::unordered_set<std::wstring> &setExpansion);
 
 	CBookmarkFolder					&GetBookmarkFolderFromTreeView(HTREEITEM hItem);
 
 	HTREEITEM						BookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder, const CBookmarkFolder &BookmarkFolder, std::size_t Position);
-	void							BookmarkFolderModified(const GUID &guid);
-	void							BookmarkFolderRemoved(const GUID &guid);
+	void							BookmarkFolderModified(const std::wstring &guid);
+	void							BookmarkFolderRemoved(const std::wstring &guid);
 
 	void							CreateNewFolder();
-	void							SelectFolder(const GUID &guid);
+	void							SelectFolder(const std::wstring &guid);
 
 private:
 
-	typedef std::unordered_map<GUID, HTREEITEM, NBookmarkHelper::GuidHash, NBookmarkHelper::GuidEq> ItemMap_t;
+	using ItemMap_t = std::unordered_map<std::wstring, HTREEITEM>;
 
 	static const UINT_PTR			SUBCLASS_ID = 0;
 	static const UINT_PTR			PARENT_SUBCLASS_ID = 0;
@@ -46,7 +47,7 @@ private:
 	static LRESULT CALLBACK			TreeViewEditProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK				TreeViewEditProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
-	void							SetupTreeView(const GUID &guidSelected, const NBookmarkHelper::setExpansion_t &setExpansion);
+	void							SetupTreeView(const std::wstring &guidSelected, const std::unordered_set<std::wstring> &setExpansion);
 
 	HTREEITEM						InsertFolderIntoTreeView(HTREEITEM hParent, const CBookmarkFolder &BookmarkFolder, std::size_t Position);
 	void							InsertFoldersIntoTreeViewRecursive(HTREEITEM hParent, const CBookmarkFolder &BookmarkFolder);
@@ -68,12 +69,12 @@ private:
 
 	CBookmarkFolder *m_pAllBookmarks;
 
-	std::unordered_map<UINT, GUID> m_mapID;
+	std::unordered_map<UINT, std::wstring> m_mapID;
 	ItemMap_t m_mapItem;
 	UINT m_uIDCounter;
 
 	bool m_bNewFolderCreated;
-	GUID m_NewFolderGUID;
+	std::wstring m_NewFolderGUID;
 
 	std::vector<WindowSubclassWrapper> m_windowSubclasses;
 };

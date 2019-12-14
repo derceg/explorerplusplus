@@ -19,7 +19,7 @@ class CBookmarksToolbarDropHandler : public IDropTarget
 {
 public:
 
-	CBookmarksToolbarDropHandler(HWND hToolbar,CBookmarkFolder &AllBookmarks,const GUID &guidBookmarksToolbar);
+	CBookmarksToolbarDropHandler(HWND hToolbar, CBookmarkFolder &AllBookmarks, const std::wstring &guidBookmarksToolbar);
 	~CBookmarksToolbarDropHandler();
 
 	/* IUnknown methods. */
@@ -40,15 +40,15 @@ private:
 	int					GetToolbarPositionIndex(const POINTL &pt,bool &bAfter);
 	void				RemoveInsertionMark();
 
-	ULONG				m_ulRefCount;
+	ULONG m_ulRefCount;
 
-	HWND				m_hToolbar;
-	CBookmarkFolder		&m_AllBookmarks;
-	GUID				m_guidBookmarksToolbar;
+	HWND m_hToolbar;
+	CBookmarkFolder &m_AllBookmarks;
+	std::wstring m_guidBookmarksToolbar;
 
-	IDragSourceHelper	*m_pDragSourceHelper;
-	IDropTargetHelper	*m_pDropTargetHelper;
-	bool				m_bAcceptData;
+	IDragSourceHelper *m_pDragSourceHelper;
+	IDropTargetHelper *m_pDropTargetHelper;
+	bool m_bAcceptData;
 };
 
 class CBookmarksToolbar : public NBookmark::IBookmarkItemNotification
@@ -56,17 +56,17 @@ class CBookmarksToolbar : public NBookmark::IBookmarkItemNotification
 public:
 
 	CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
-		Navigation *navigation, CBookmarkFolder &AllBookmarks, const GUID &guidBookmarksToolbar,
+		Navigation *navigation, CBookmarkFolder &AllBookmarks, const std::wstring &guidBookmarksToolbar,
 		UINT uIDStart, UINT uIDEnd);
 	~CBookmarksToolbar();
 
 	/* IBookmarkItemNotification methods. */
 	void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position);
 	void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
-	void	OnBookmarkModified(const GUID &guid);
-	void	OnBookmarkFolderModified(const GUID &guid);
-	void	OnBookmarkRemoved(const GUID &guid);
-	void	OnBookmarkFolderRemoved(const GUID &guid);
+	void	OnBookmarkModified(const std::wstring &guid);
+	void	OnBookmarkFolderModified(const std::wstring &guid);
+	void	OnBookmarkRemoved(const std::wstring &guid);
+	void	OnBookmarkFolderRemoved(const std::wstring &guid);
 
 private:
 
@@ -88,11 +88,11 @@ private:
 	void	InsertBookmark(const CBookmark &Bookmark,std::size_t Position);
 	void	InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder);
 	void	InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder,std::size_t Position);
-	void	InsertBookmarkItem(const std::wstring &strName,const GUID &guid,bool bFolder,std::size_t Position);
+	void	InsertBookmarkItem(const std::wstring &strName, const std::wstring &guid, bool bFolder, std::size_t Position);
 
-	void	ModifyBookmarkItem(const GUID &guid,bool bFolder);
+	void	ModifyBookmarkItem(const std::wstring &guid, bool bFolder);
 
-	void	RemoveBookmarkItem(const GUID &guid);
+	void	RemoveBookmarkItem(const std::wstring &guid);
 
 	void	OpenBookmarkItemInNewTab(const VariantBookmark &variantBookmarkItem);
 
@@ -107,7 +107,7 @@ private:
 
 	void	OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow);
 
-	int		GetBookmarkItemIndex(const GUID &guid);
+	int		GetBookmarkItemIndex(const std::wstring &guid);
 
 	VariantBookmark	*GetBookmarkItemFromToolbarIndex(int index);
 
@@ -122,9 +122,9 @@ private:
 	Navigation *m_navigation;
 
 	CBookmarkFolder &m_AllBookmarks;
-	GUID m_guidBookmarksToolbar;
+	std::wstring m_guidBookmarksToolbar;
 
-	std::unordered_map<UINT,GUID> m_mapID;
+	std::unordered_map<UINT, std::wstring> m_mapID;
 	UINT m_uIDStart;
 	UINT m_uIDEnd;
 	UINT m_uIDCounter;

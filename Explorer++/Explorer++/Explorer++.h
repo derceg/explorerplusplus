@@ -345,7 +345,7 @@ private:
 	void					ValidateSingleColumnSet(int iColumnSet, std::vector<Column_t> &columns);
 	void					ApplyToolbarSettings(void);
 	void					TestConfigFile(void);
-	void					InitializeBookmarks(void);
+	void					InitializeBookmarks();
 
 	/* Registry settings. */
 	LONG					LoadGenericSettingsFromRegistry();
@@ -577,8 +577,6 @@ private:
 
 	/* Bookmarks. */
 	CBookmarkFolder *		m_bfAllBookmarks;
-	GUID					m_guidBookmarksToolbar;
-	GUID					m_guidBookmarksMenu;
 	CBookmarksToolbar		*m_pBookmarksToolbar;
 
 	/* Customize colors. */

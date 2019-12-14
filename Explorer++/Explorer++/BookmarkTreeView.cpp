@@ -9,8 +9,8 @@
 #include <stack>
 
 CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView, HINSTANCE hInstance,
-	IExplorerplusplus *expp, CBookmarkFolder *pAllBookmarks, const GUID &guidSelected,
-	const NBookmarkHelper::setExpansion_t &setExpansion) :
+	IExplorerplusplus *expp, CBookmarkFolder *pAllBookmarks, const std::wstring &guidSelected,
+	const std::unordered_set<std::wstring> &setExpansion) :
 	m_hTreeView(hTreeView),
 	m_instance(hInstance),
 	m_pAllBookmarks(pAllBookmarks),
@@ -148,7 +148,7 @@ LRESULT CALLBACK CBookmarkTreeView::TreeViewEditProc(HWND hwnd, UINT Msg, WPARAM
 	return DefSubclassProc(hwnd, Msg, wParam, lParam);
 }
 
-void CBookmarkTreeView::SetupTreeView(const GUID &guidSelected, const NBookmarkHelper::setExpansion_t &setExpansion)
+void CBookmarkTreeView::SetupTreeView(const std::wstring &guidSelected, const std::unordered_set<std::wstring> &setExpansion)
 {
 	TreeView_DeleteAllItems(m_hTreeView);
 
@@ -287,8 +287,7 @@ HTREEITEM CBookmarkTreeView::BookmarkFolderAdded(const CBookmarkFolder &ParentBo
 		TreeView_SetItem(m_hTreeView, &tvi);
 	}
 
-	if (m_bNewFolderCreated &&
-		IsEqualGUID(BookmarkFolder.GetGUID(), m_NewFolderGUID))
+	if (m_bNewFolderCreated && BookmarkFolder.GetGUID() == m_NewFolderGUID)
 	{
 		/* If a new folder has been created, it will be selected,
 		as it is assumed that the user intends to place any
@@ -303,7 +302,7 @@ HTREEITEM CBookmarkTreeView::BookmarkFolderAdded(const CBookmarkFolder &ParentBo
 	return hItem;
 }
 
-void CBookmarkTreeView::BookmarkFolderModified(const GUID &guid)
+void CBookmarkTreeView::BookmarkFolderModified(const std::wstring &guid)
 {
 	auto itr = m_mapItem.find(guid);
 	assert(itr != m_mapItem.end());
@@ -323,7 +322,7 @@ void CBookmarkTreeView::BookmarkFolderModified(const GUID &guid)
 	TreeView_SetItem(m_hTreeView, &tvi);
 }
 
-void CBookmarkTreeView::BookmarkFolderRemoved(const GUID &guid)
+void CBookmarkTreeView::BookmarkFolderRemoved(const std::wstring &guid)
 {
 	auto itr = m_mapItem.find(guid);
 	assert(itr != m_mapItem.end());
@@ -438,7 +437,7 @@ void CBookmarkTreeView::CreateNewFolder()
 	ParentBookmarkFolder.InsertBookmarkFolder(NewBookmarkFolder);
 }
 
-void CBookmarkTreeView::SelectFolder(const GUID &guid)
+void CBookmarkTreeView::SelectFolder(const std::wstring &guid)
 {
 	auto itr = m_mapItem.find(guid);
 

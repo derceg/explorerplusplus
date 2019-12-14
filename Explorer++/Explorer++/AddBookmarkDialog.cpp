@@ -278,22 +278,22 @@ void CAddBookmarkDialog::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBook
 	m_pBookmarkTreeView->BookmarkFolderAdded(ParentBookmarkFolder,BookmarkFolder,Position);
 }
 
-void CAddBookmarkDialog::OnBookmarkModified(const GUID &guid)
+void CAddBookmarkDialog::OnBookmarkModified(const std::wstring &guid)
 {
 	UNREFERENCED_PARAMETER(guid);
 }
 
-void CAddBookmarkDialog::OnBookmarkFolderModified(const GUID &guid)
+void CAddBookmarkDialog::OnBookmarkFolderModified(const std::wstring &guid)
 {
 	m_pBookmarkTreeView->BookmarkFolderModified(guid);
 }
 
-void CAddBookmarkDialog::OnBookmarkRemoved(const GUID &guid)
+void CAddBookmarkDialog::OnBookmarkRemoved(const std::wstring &guid)
 {
 	UNREFERENCED_PARAMETER(guid);
 }
 
-void CAddBookmarkDialog::OnBookmarkFolderRemoved(const GUID &guid)
+void CAddBookmarkDialog::OnBookmarkFolderRemoved(const std::wstring &guid)
 {
 	m_pBookmarkTreeView->BookmarkFolderRemoved(guid);
 }

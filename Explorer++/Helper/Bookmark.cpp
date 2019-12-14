@@ -3,14 +3,13 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include <list>
-#include <algorithm>
 #include "Bookmark.h"
-#include "RegistrySettings.h"
 #include "Helper.h"
-#include "StringHelper.h"
 #include "Macros.h"
-
+#include "RegistrySettings.h"
+#include "StringHelper.h"
+#include <algorithm>
+#include <list>
 
 CBookmark CBookmark::Create(const std::wstring &strName, const std::wstring &strLocation, const std::wstring &strDescription)
 {
@@ -23,12 +22,12 @@ CBookmark CBookmark::UnserializeFromRegistry(const std::wstring &strKey)
 }
 
 CBookmark::CBookmark(const std::wstring &strName,const std::wstring &strLocation,const std::wstring &strDescription) :
+	m_guid(CreateGUID()),
 	m_strName(strName),
 	m_strLocation(strLocation),
 	m_strDescription(strDescription),
 	m_iVisitCount(0)
 {
-	CoCreateGuid(&m_guid);
 	GetSystemTimeAsFileTime(&m_ftCreated);
 	m_ftModified = m_ftCreated;
 }
@@ -48,14 +47,7 @@ void CBookmark::InitializeFromRegistry(const std::wstring &strKey)
 		return;
 	}
 
-	std::wstring stringGuid;
-	NRegistrySettings::ReadStringFromRegistry(hKey, _T("GUID"), stringGuid);
-	stringGuid = stringGuid.substr(1, stringGuid.length() - 2);
-
-	TCHAR stringGuidTemp[128];
-	StringCchCopy(stringGuidTemp, SIZEOF_ARRAY(stringGuidTemp), stringGuid.c_str());
-	UuidFromString(reinterpret_cast<RPC_WSTR>(stringGuidTemp), &m_guid);
-
+	NRegistrySettings::ReadStringFromRegistry(hKey, _T("GUID"), m_guid);
 	NRegistrySettings::ReadStringFromRegistry(hKey, _T("Name"), m_strName);
 	NRegistrySettings::ReadStringFromRegistry(hKey, _T("Location"), m_strLocation);
 	NRegistrySettings::ReadStringFromRegistry(hKey, _T("Description"), m_strDescription);
@@ -81,9 +73,7 @@ void CBookmark::SerializeToRegistry(const std::wstring &strKey)
 
 	if (lRes == ERROR_SUCCESS)
 	{
-		TCHAR guidString[128];
-		StringFromGUID2(m_guid, guidString, SIZEOF_ARRAY(guidString));
-		NRegistrySettings::SaveStringToRegistry(hKey, _T("GUID"), guidString);
+		NRegistrySettings::SaveStringToRegistry(hKey, _T("GUID"), m_guid.c_str());
 		NRegistrySettings::SaveStringToRegistry(hKey, _T("Name"), m_strName.c_str());
 		NRegistrySettings::SaveStringToRegistry(hKey, _T("Location"), m_strLocation.c_str());
 		NRegistrySettings::SaveStringToRegistry(hKey, _T("Description"), m_strDescription.c_str());
@@ -141,7 +131,7 @@ void CBookmark::SetDescription(const std::wstring &strDescription)
 	CBookmarkItemNotifier::GetInstance().NotifyObserversBookmarkModified(m_guid);
 }
 
-GUID CBookmark::GetGUID() const
+std::wstring CBookmark::GetGUID() const
 {
 	return m_guid;
 }
@@ -179,32 +169,23 @@ void CBookmark::UpdateModificationTime()
 	GetSystemTimeAsFileTime(&m_ftModified);
 }
 
-CBookmarkFolder CBookmarkFolder::Create(const std::wstring &strName,GUID &guid)
+CBookmarkFolder CBookmarkFolder::Create(const std::wstring &strName, std::optional<std::wstring> guid)
 {
-	return CBookmarkFolder(strName,INITIALIZATION_TYPE_NORMAL,&guid);
+	return CBookmarkFolder(strName, INITIALIZATION_TYPE_NORMAL, guid);
 }
 
-CBookmarkFolder CBookmarkFolder::Create(const std::wstring &strName)
+CBookmarkFolder *CBookmarkFolder::CreateNew(const std::wstring &strName, std::optional<std::wstring> guid)
 {
-	return CBookmarkFolder(strName,INITIALIZATION_TYPE_NORMAL,NULL);
-}
-
-CBookmarkFolder *CBookmarkFolder::CreateNew(const std::wstring &strName,GUID &guid)
-{
-	return new CBookmarkFolder(strName,INITIALIZATION_TYPE_NORMAL,&guid);
-}
-
-CBookmarkFolder *CBookmarkFolder::CreateNew(const std::wstring &strName)
-{
-	return new CBookmarkFolder(strName,INITIALIZATION_TYPE_NORMAL,NULL);
+	return new CBookmarkFolder(strName, INITIALIZATION_TYPE_NORMAL, guid);
 }
 
 CBookmarkFolder CBookmarkFolder::UnserializeFromRegistry(const std::wstring &strKey)
 {
-	return CBookmarkFolder(strKey,INITIALIZATION_TYPE_REGISTRY, NULL);
+	return CBookmarkFolder(strKey, INITIALIZATION_TYPE_REGISTRY, std::nullopt);
 }
 
-CBookmarkFolder::CBookmarkFolder(const std::wstring &str,InitializationType_t InitializationType,GUID *guid)
+CBookmarkFolder::CBookmarkFolder(const std::wstring &str, InitializationType_t InitializationType,
+	std::optional<std::wstring> guid)
 {
 	switch(InitializationType)
 	{
@@ -218,18 +199,18 @@ CBookmarkFolder::CBookmarkFolder(const std::wstring &str,InitializationType_t In
 	}
 }
 
-void CBookmarkFolder::Initialize(const std::wstring &strName,GUID *guid)
+void CBookmarkFolder::Initialize(const std::wstring &name, std::optional<std::wstring> guid)
 {
-	if(guid != NULL)
+	if(guid)
 	{
 		m_guid = *guid;
 	}
 	else
 	{
-		CoCreateGuid(&m_guid);
+		m_guid = CreateGUID();
 	}
 
-	m_strName = strName;
+	m_strName = name;
 	m_nChildFolders = 0;
 
 	GetSystemTimeAsFileTime(&m_ftCreated);
@@ -244,14 +225,7 @@ void CBookmarkFolder::InitializeFromRegistry(const std::wstring &strKey)
 
 	if(lRes == ERROR_SUCCESS)
 	{
-		std::wstring stringGuid;
-		NRegistrySettings::ReadStringFromRegistry(hKey,_T("GUID"),stringGuid);
-		stringGuid = stringGuid.substr(1,stringGuid.length() - 2);
-
-		TCHAR stringGuidTemp[128];
-		StringCchCopy(stringGuidTemp,SIZEOF_ARRAY(stringGuidTemp),stringGuid.c_str());
-		UuidFromString(reinterpret_cast<RPC_WSTR>(stringGuidTemp),&m_guid);
-
+		NRegistrySettings::ReadStringFromRegistry(hKey,_T("GUID"), m_guid);
 		NRegistrySettings::ReadStringFromRegistry(hKey,_T("Name"),m_strName);
 		NRegistrySettings::ReadDwordFromRegistry(hKey,_T("DateCreatedLow"),&m_ftCreated.dwLowDateTime);
 		NRegistrySettings::ReadDwordFromRegistry(hKey,_T("DateCreatedHigh"),&m_ftCreated.dwHighDateTime);
@@ -294,9 +268,7 @@ void CBookmarkFolder::SerializeToRegistry(const std::wstring &strKey)
 
 	if(lRes == ERROR_SUCCESS)
 	{
-		TCHAR guidString[128];
-		StringFromGUID2(m_guid,guidString,SIZEOF_ARRAY(guidString));
-		NRegistrySettings::SaveStringToRegistry(hKey,_T("GUID"),guidString);
+		NRegistrySettings::SaveStringToRegistry(hKey,_T("GUID"),m_guid.c_str());
 		NRegistrySettings::SaveStringToRegistry(hKey,_T("Name"),m_strName.c_str());
 		NRegistrySettings::SaveDwordToRegistry(hKey,_T("DateCreatedLow"),m_ftCreated.dwLowDateTime);
 		NRegistrySettings::SaveDwordToRegistry(hKey,_T("DateCreatedHigh"),m_ftCreated.dwHighDateTime);
@@ -341,7 +313,7 @@ void CBookmarkFolder::SetName(const std::wstring &strName)
 	CBookmarkItemNotifier::GetInstance().NotifyObserversBookmarkFolderModified(m_guid);
 }
 
-GUID CBookmarkFolder::GetGUID() const
+std::wstring CBookmarkFolder::GetGUID() const
 {
 	return m_guid;
 }
@@ -466,41 +438,41 @@ void CBookmarkItemNotifier::RemoveObserver(NBookmark::IBookmarkItemNotification 
 	}
 }
 
-void CBookmarkItemNotifier::NotifyObserversBookmarkModified(const GUID &guid)
+void CBookmarkItemNotifier::NotifyObserversBookmarkModified(const std::wstring &guid)
 {
-	NotifyObservers(NOTIFY_BOOKMARK_MODIFIED,NULL,NULL,NULL,&guid,0);
+	NotifyObservers(NOTIFY_BOOKMARK_MODIFIED,NULL,NULL,NULL,guid,0);
 }
 
-void CBookmarkItemNotifier::NotifyObserversBookmarkFolderModified(const GUID &guid)
+void CBookmarkItemNotifier::NotifyObserversBookmarkFolderModified(const std::wstring &guid)
 {
-	NotifyObservers(NOTIFY_BOOKMARK_FOLDER_MODIFIED,NULL,NULL,NULL,&guid,0);
+	NotifyObservers(NOTIFY_BOOKMARK_FOLDER_MODIFIED,NULL,NULL,NULL,guid,0);
 }
 
 void CBookmarkItemNotifier::NotifyObserversBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,
 	const CBookmark &Bookmark,std::size_t Position)
 {
-	NotifyObservers(NOTIFY_BOOKMARK_ADDED,&ParentBookmarkFolder,NULL,&Bookmark,NULL,Position);
+	NotifyObservers(NOTIFY_BOOKMARK_ADDED,&ParentBookmarkFolder,NULL,&Bookmark,std::nullopt,Position);
 }
 
 void CBookmarkItemNotifier::NotifyObserversBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,
 	const CBookmarkFolder &BookmarkFolder,std::size_t Position)
 {
-	NotifyObservers(NOTIFY_BOOKMARK_FOLDER_ADDED,&ParentBookmarkFolder,&BookmarkFolder,NULL,NULL,Position);
+	NotifyObservers(NOTIFY_BOOKMARK_FOLDER_ADDED,&ParentBookmarkFolder,&BookmarkFolder,NULL,std::nullopt,Position);
 }
 
-void CBookmarkItemNotifier::NotifyObserversBookmarkRemoved(const GUID &guid)
+void CBookmarkItemNotifier::NotifyObserversBookmarkRemoved(const std::wstring &guid)
 {
-	NotifyObservers(NOTIFY_BOOKMARK_REMOVED,NULL,NULL,NULL,&guid,0);
+	NotifyObservers(NOTIFY_BOOKMARK_REMOVED,NULL,NULL,NULL,guid,0);
 }
 
-void CBookmarkItemNotifier::NotifyObserversBookmarkFolderRemoved(const GUID &guid)
+void CBookmarkItemNotifier::NotifyObserversBookmarkFolderRemoved(const std::wstring &guid)
 {
-	NotifyObservers(NOTIFY_BOOMARK_FOLDER_REMOVED,NULL,NULL,NULL,&guid,0);
+	NotifyObservers(NOTIFY_BOOMARK_FOLDER_REMOVED,NULL,NULL,NULL,guid,0);
 }
 
 void CBookmarkItemNotifier::NotifyObservers(NotificationType_t NotificationType,
-	const CBookmarkFolder *pParentBookmarkFolder,const CBookmarkFolder *pBookmarkFolder,
-	const CBookmark *pBookmark,const GUID *pguid,std::size_t Position)
+	const CBookmarkFolder *pParentBookmarkFolder, const CBookmarkFolder *pBookmarkFolder,
+	const CBookmark *pBookmark, std::optional<std::wstring> guid, std::size_t Position)
 {
 	for(auto pbin : m_listObservers)
 	{
@@ -515,19 +487,19 @@ void CBookmarkItemNotifier::NotifyObservers(NotificationType_t NotificationType,
 			break;
 
 		case NOTIFY_BOOKMARK_MODIFIED:
-			pbin->OnBookmarkModified(*pguid);
+			pbin->OnBookmarkModified(*guid);
 			break;
 
 		case NOTIFY_BOOKMARK_FOLDER_MODIFIED:
-			pbin->OnBookmarkFolderModified(*pguid);
+			pbin->OnBookmarkFolderModified(*guid);
 			break;
 
 		case NOTIFY_BOOKMARK_REMOVED:
-			pbin->OnBookmarkRemoved(*pguid);
+			pbin->OnBookmarkRemoved(*guid);
 			break;
 
 		case NOTIFY_BOOMARK_FOLDER_REMOVED:
-			pbin->OnBookmarkFolderRemoved(*pguid);
+			pbin->OnBookmarkFolderRemoved(*guid);
 			break;
 		}
 	}

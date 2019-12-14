@@ -406,7 +406,7 @@ void CManageBookmarksDialog::OnNewFolder()
 	ParentBookmarkFolder.InsertBookmarkFolder(NewBookmarkFolder);
 }
 
-void CManageBookmarksDialog::OnDeleteBookmark(const GUID &guid)
+void CManageBookmarksDialog::OnDeleteBookmark(const std::wstring &guid)
 {
 	UNREFERENCED_PARAMETER(guid);
 
@@ -863,7 +863,7 @@ void CManageBookmarksDialog::OnTvnSelChanged(NMTREEVIEW *pnmtv)
 
 	CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(pnmtv->itemNew.hItem);
 
-	if(IsEqualGUID(BookmarkFolder.GetGUID(),m_guidCurrentFolder))
+	if(BookmarkFolder.GetGUID() == m_guidCurrentFolder)
 	{
 		return;
 	}
@@ -928,7 +928,7 @@ void CManageBookmarksDialog::BrowseBack()
 		return;
 	}
 
-	GUID guid = m_stackBack.top();
+	std::wstring guid = m_stackBack.top();
 	m_stackBack.pop();
 	m_stackForward.push(m_guidCurrentFolder);
 
@@ -943,7 +943,7 @@ void CManageBookmarksDialog::BrowseForward()
 		return;
 	}
 
-	GUID guid = m_stackForward.top();
+	std::wstring guid = m_stackForward.top();
 	m_stackForward.pop();
 	m_stackBack.push(m_guidCurrentFolder);
 
@@ -960,7 +960,7 @@ void CManageBookmarksDialog::UpdateToolbarState()
 void CManageBookmarksDialog::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,
 	const CBookmark &Bookmark,std::size_t Position)
 {
-	if(IsEqualGUID(ParentBookmarkFolder.GetGUID(),m_guidCurrentFolder))
+	if(ParentBookmarkFolder.GetGUID() == m_guidCurrentFolder)
 	{
 		m_pBookmarkListView->InsertBookmarkIntoListView(Bookmark,static_cast<int>(Position));
 	}
@@ -971,11 +971,11 @@ void CManageBookmarksDialog::OnBookmarkFolderAdded(const CBookmarkFolder &Parent
 {
 	m_pBookmarkTreeView->BookmarkFolderAdded(ParentBookmarkFolder,BookmarkFolder,Position);
 
-	if(IsEqualGUID(ParentBookmarkFolder.GetGUID(),m_guidCurrentFolder))
+	if(ParentBookmarkFolder.GetGUID() == m_guidCurrentFolder)
 	{
 		int iItem = m_pBookmarkListView->InsertBookmarkFolderIntoListView(BookmarkFolder,static_cast<int>(Position));
 
-		if(IsEqualGUID(BookmarkFolder.GetGUID(),m_guidNewFolder))
+		if(BookmarkFolder.GetGUID() == m_guidNewFolder)
 		{
 			HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
 
@@ -989,26 +989,26 @@ void CManageBookmarksDialog::OnBookmarkFolderAdded(const CBookmarkFolder &Parent
 	}
 }
 
-void CManageBookmarksDialog::OnBookmarkModified(const GUID &guid)
+void CManageBookmarksDialog::OnBookmarkModified(const std::wstring &guid)
 {
 	UNREFERENCED_PARAMETER(guid);
 
 	/* TODO: Notify listview if necessary. */
 }
 
-void CManageBookmarksDialog::OnBookmarkFolderModified(const GUID &guid)
+void CManageBookmarksDialog::OnBookmarkFolderModified(const std::wstring &guid)
 {
 	m_pBookmarkTreeView->BookmarkFolderModified(guid);
 }
 
-void CManageBookmarksDialog::OnBookmarkRemoved(const GUID &guid)
+void CManageBookmarksDialog::OnBookmarkRemoved(const std::wstring &guid)
 {
 	UNREFERENCED_PARAMETER(guid);
 
 	/* TODO: Notify listview if necessary. */
 }
 
-void CManageBookmarksDialog::OnBookmarkFolderRemoved(const GUID &guid)
+void CManageBookmarksDialog::OnBookmarkFolderRemoved(const std::wstring &guid)
 {
 	m_pBookmarkTreeView->BookmarkFolderRemoved(guid);
 

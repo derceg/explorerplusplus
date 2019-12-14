@@ -18,21 +18,21 @@ public:
 
 	CBookmarkListView(HWND hListView, IExplorerplusplus *expp);
 
-	void							InsertBookmarksIntoListView(const CBookmarkFolder &BookmarkFolder);
-	int								InsertBookmarkFolderIntoListView(const CBookmarkFolder &BookmarkFolder, int iPosition);
-	int								InsertBookmarkIntoListView(const CBookmark &Bookmark, int iPosition);
-	VariantBookmark					&GetBookmarkItemFromListView(CBookmarkFolder &ParentBookmarkFolder, int iItem);
-	VariantBookmark					&GetBookmarkItemFromListViewlParam(CBookmarkFolder &ParentBookmarkFolder, LPARAM lParam);
+	void InsertBookmarksIntoListView(const CBookmarkFolder &BookmarkFolder);
+	int InsertBookmarkFolderIntoListView(const CBookmarkFolder &BookmarkFolder, int iPosition);
+	int InsertBookmarkIntoListView(const CBookmark &Bookmark, int iPosition);
+	VariantBookmark &GetBookmarkItemFromListView(CBookmarkFolder &ParentBookmarkFolder, int iItem);
+	VariantBookmark &GetBookmarkItemFromListViewlParam(CBookmarkFolder &ParentBookmarkFolder, LPARAM lParam);
 
 private:
 
-	int								InsertBookmarkItemIntoListView(const std::wstring &strName, const GUID &guid, bool bFolder, int iPosition);
+	int InsertBookmarkItemIntoListView(const std::wstring &strName, const std::wstring &guid, bool bFolder, int iPosition);
 
 	HWND m_hListView;
 	DpiCompatibility m_dpiCompat;
 	wil::unique_himagelist m_imageList;
 	IconImageListMapping m_imageListMappings;
 
-	std::unordered_map<UINT, GUID> m_mapID;
+	std::unordered_map<UINT, std::wstring> m_mapID;
 	UINT m_uIDCounter;
 };

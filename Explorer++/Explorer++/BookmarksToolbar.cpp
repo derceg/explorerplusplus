@@ -14,7 +14,7 @@
 #include <algorithm>
 
 CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
-	Navigation *navigation, CBookmarkFolder &AllBookmarks, const GUID &guidBookmarksToolbar,
+	Navigation *navigation, CBookmarkFolder &AllBookmarks, const std::wstring &guidBookmarksToolbar,
 	UINT uIDStart, UINT uIDEnd) :
 	m_hToolbar(hToolbar),
 	m_instance(instance),
@@ -460,7 +460,7 @@ void CBookmarksToolbar::InsertBookmarkFolder(const CBookmarkFolder &BookmarkFold
 }
 
 void CBookmarksToolbar::InsertBookmarkItem(const std::wstring &strName,
-	const GUID &guid,bool bFolder,std::size_t Position)
+	const std::wstring &guid, bool bFolder, std::size_t Position)
 {
 	assert(Position <= static_cast<std::size_t>(SendMessage(m_hToolbar,TB_BUTTONCOUNT,0,0)));
 
@@ -494,7 +494,7 @@ void CBookmarksToolbar::InsertBookmarkItem(const std::wstring &strName,
 void CBookmarksToolbar::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,
 	const CBookmark &Bookmark,std::size_t Position)
 {
-	if(IsEqualGUID(ParentBookmarkFolder.GetGUID(),m_guidBookmarksToolbar))
+	if(ParentBookmarkFolder.GetGUID() == m_guidBookmarksToolbar)
 	{
 		InsertBookmark(Bookmark,Position);
 	}
@@ -503,33 +503,33 @@ void CBookmarksToolbar::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFol
 void CBookmarksToolbar::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,
 	const CBookmarkFolder &BookmarkFolder,std::size_t Position)
 {
-	if(IsEqualGUID(ParentBookmarkFolder.GetGUID(),m_guidBookmarksToolbar))
+	if(ParentBookmarkFolder.GetGUID() == m_guidBookmarksToolbar)
 	{
 		InsertBookmarkFolder(BookmarkFolder,Position);
 	}
 }
 
-void CBookmarksToolbar::OnBookmarkModified(const GUID &guid)
+void CBookmarksToolbar::OnBookmarkModified(const std::wstring &guid)
 {
 	ModifyBookmarkItem(guid,false);
 }
 
-void CBookmarksToolbar::OnBookmarkFolderModified(const GUID &guid)
+void CBookmarksToolbar::OnBookmarkFolderModified(const std::wstring &guid)
 {
 	ModifyBookmarkItem(guid,true);
 }
 
-void CBookmarksToolbar::OnBookmarkRemoved(const GUID &guid)
+void CBookmarksToolbar::OnBookmarkRemoved(const std::wstring &guid)
 {
 	RemoveBookmarkItem(guid);	
 }
 
-void CBookmarksToolbar::OnBookmarkFolderRemoved(const GUID &guid)
+void CBookmarksToolbar::OnBookmarkFolderRemoved(const std::wstring &guid)
 {
 	RemoveBookmarkItem(guid);
 }
 
-void CBookmarksToolbar::ModifyBookmarkItem(const GUID &guid,bool bFolder)
+void CBookmarksToolbar::ModifyBookmarkItem(const std::wstring &guid, bool bFolder)
 {
 	int iIndex = GetBookmarkItemIndex(guid);
 
@@ -566,7 +566,7 @@ void CBookmarksToolbar::ModifyBookmarkItem(const GUID &guid,bool bFolder)
 	}
 }
 
-void CBookmarksToolbar::RemoveBookmarkItem(const GUID &guid)
+void CBookmarksToolbar::RemoveBookmarkItem(const std::wstring &guid)
 {
 	int iIndex = GetBookmarkItemIndex(guid);
 
@@ -633,7 +633,7 @@ VariantBookmark *CBookmarksToolbar::GetBookmarkItemFromToolbarIndex(int index)
 	return &variantBookmarkItem;
 }
 
-int CBookmarksToolbar::GetBookmarkItemIndex(const GUID &guid)
+int CBookmarksToolbar::GetBookmarkItemIndex(const std::wstring &guid)
 {
 	int iIndex = -1;
 	int nButtons = static_cast<int>(SendMessage(m_hToolbar,TB_BUTTONCOUNT,0,0));
@@ -645,8 +645,7 @@ int CBookmarksToolbar::GetBookmarkItemIndex(const GUID &guid)
 
 		auto itr = m_mapID.find(static_cast<UINT>(tb.dwData));
 
-		if(itr != m_mapID.end() &&
-			IsEqualGUID(itr->second,guid))
+		if(itr != m_mapID.end() && itr->second == guid)
 		{
 			iIndex = i;
 			break;
@@ -657,11 +656,11 @@ int CBookmarksToolbar::GetBookmarkItemIndex(const GUID &guid)
 }
 
 CBookmarksToolbarDropHandler::CBookmarksToolbarDropHandler(HWND hToolbar,
-	CBookmarkFolder &AllBookmarks,const GUID &guidBookmarksToolbar) :
-m_ulRefCount(1),
-m_hToolbar(hToolbar),
-m_AllBookmarks(AllBookmarks),
-m_guidBookmarksToolbar(guidBookmarksToolbar)
+	CBookmarkFolder &AllBookmarks, const std::wstring &guidBookmarksToolbar) :
+	m_ulRefCount(1),
+	m_hToolbar(hToolbar),
+	m_AllBookmarks(AllBookmarks),
+	m_guidBookmarksToolbar(guidBookmarksToolbar)
 {
 	CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_INPROC_SERVER,
 		IID_PPV_ARGS(&m_pDragSourceHelper));

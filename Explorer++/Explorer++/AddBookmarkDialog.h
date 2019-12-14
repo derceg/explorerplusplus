@@ -33,9 +33,9 @@ private:
 	CAddBookmarkDialogPersistentSettings(const CAddBookmarkDialogPersistentSettings &);
 	CAddBookmarkDialogPersistentSettings & operator=(const CAddBookmarkDialogPersistentSettings &);
 
-	bool							m_bInitialized;
-	GUID							m_guidSelected;
-	NBookmarkHelper::setExpansion_t	m_setExpansion;
+	bool m_bInitialized;
+	std::wstring m_guidSelected;
+	std::unordered_set<std::wstring> m_setExpansion;
 };
 
 class CAddBookmarkDialog : public CBaseDialog, public NBookmark::IBookmarkItemNotification
@@ -47,10 +47,10 @@ public:
 
 	void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position);
 	void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
-	void	OnBookmarkModified(const GUID &guid);
-	void	OnBookmarkFolderModified(const GUID &guid);
-	void	OnBookmarkRemoved(const GUID &guid);
-	void	OnBookmarkFolderRemoved(const GUID &guid);
+	void	OnBookmarkModified(const std::wstring &guid);
+	void	OnBookmarkFolderModified(const std::wstring &guid);
+	void	OnBookmarkRemoved(const std::wstring &guid);
+	void	OnBookmarkFolderRemoved(const std::wstring &guid);
 
 protected:
 
