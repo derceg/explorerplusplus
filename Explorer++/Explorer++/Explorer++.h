@@ -258,7 +258,7 @@ private:
 	void					OnListViewItemRClick(POINT *pCursorPos);
 	void					OnListViewCopyItemPath(void) const;
 	void					OnListViewCopyUniversalPaths(void) const;
-	void					OnListViewSetFileAttributes(void) const;
+	void					OnListViewSetFileAttributes() const;
 	void					OnListViewPaste(void);
 
 	/* TreeView private message handlers. */

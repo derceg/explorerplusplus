@@ -7,6 +7,7 @@
 #include "Config.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "SetFileAttributesDialog.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
@@ -773,4 +774,28 @@ void CShellBrowser::OnListViewHeaderMenuItemSelected(int menuItemId,
 	{
 		m_navigationController->Refresh();
 	}
+}
+
+void CShellBrowser::SetFileAttributesForSelection()
+{
+	std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t> sfaiList;
+	int index = -1;
+
+	while ((index = ListView_GetNextItem(m_hListView, index, LVNI_SELECTED)) != -1)
+	{
+		NSetFileAttributesDialogExternal::SetFileAttributesInfo_t sfai;
+
+		const ItemInfo_t &item = GetItemByIndex(index);
+		sfai.wfd = item.wfd;
+
+		GetDisplayName(item.pidlComplete.get(), sfai.szFullFileName,
+			static_cast<UINT>(std::size(sfai.szFullFileName)), SHGDN_FORPARSING);
+
+		sfaiList.push_back(sfai);
+	}
+
+	CSetFileAttributesDialog SetFileAttributesDialog(m_hResourceModule,
+		IDD_SETFILEATTRIBUTES, m_hListView, sfaiList);
+
+	SetFileAttributesDialog.ShowModalDialog();
 }

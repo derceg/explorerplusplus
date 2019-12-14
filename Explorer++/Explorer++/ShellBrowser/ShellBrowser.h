@@ -140,6 +140,8 @@ public:
 	BOOL				GetFilterCaseSensitive(void) const;
 	void				SetFilterCaseSensitive(BOOL bCaseSensitive);
 
+	void				SetFileAttributesForSelection();
+
 	int					SelectFiles(const TCHAR *FileNamePattern);
 	void				GetFolderInfo(FolderInfo_t *pFolderInfo);
 	int					LocateFileItemIndex(const TCHAR *szFileName) const;

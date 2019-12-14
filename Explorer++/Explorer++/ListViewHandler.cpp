@@ -1070,32 +1070,10 @@ HRESULT Explorerplusplus::OnListViewCopy(BOOL bCopy)
 	return hr;
 }
 
-void Explorerplusplus::OnListViewSetFileAttributes(void) const
+void Explorerplusplus::OnListViewSetFileAttributes() const
 {
-	if(ListView_GetSelectedCount(m_hActiveListView) > 0)
-	{
-		int iSel = -1;
-
-		std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t> sfaiList;
-
-		while((iSel = ListView_GetNextItem(m_hActiveListView,
-			iSel,LVNI_SELECTED)) != -1)
-		{
-			NSetFileAttributesDialogExternal::SetFileAttributesInfo_t sfai;
-
-			m_pActiveShellBrowser->GetItemFullName(iSel,sfai.szFullFileName,SIZEOF_ARRAY(sfai.szFullFileName));
-
-			WIN32_FIND_DATA wfd = m_pActiveShellBrowser->GetItemFileFindData(iSel);
-			sfai.wfd = wfd;
-
-			sfaiList.push_back(sfai);
-		}
-
-		CSetFileAttributesDialog SetFileAttributesDialog(m_hLanguageModule,
-			IDD_SETFILEATTRIBUTES,m_hContainer,sfaiList);
-
-		SetFileAttributesDialog.ShowModalDialog();
-	}
+	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	selectedTab.GetShellBrowser()->SetFileAttributesForSelection();
 }
 
 void Explorerplusplus::OnListViewPaste(void)
