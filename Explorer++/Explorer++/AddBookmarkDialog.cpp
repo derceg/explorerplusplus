@@ -15,9 +15,9 @@
 
 const TCHAR CAddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmark");
 
-CAddBookmarkDialog::CAddBookmarkDialog(HINSTANCE hInstance, int iResource, HWND hParent,
-	IExplorerplusplus *expp, CBookmarkFolder &AllBookmarks, CBookmark &Bookmark) :
-	CBaseDialog(hInstance, iResource, hParent, true),
+CAddBookmarkDialog::CAddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
+	CBookmarkFolder &AllBookmarks, CBookmark &Bookmark) :
+	CBaseDialog(hInstance, IDD_ADD_BOOKMARK, hParent, true),
 	m_expp(expp),
 	m_AllBookmarks(AllBookmarks),
 	m_Bookmark(Bookmark),

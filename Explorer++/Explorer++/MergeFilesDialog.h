@@ -55,9 +55,9 @@ class CMergeFilesDialog : public CBaseDialog
 {
 public:
 
-	CMergeFilesDialog(HINSTANCE hInstance, int iResource, HWND hParent,
-		IExplorerplusplus *expp, std::wstring strOutputDirectory,
-		std::list<std::wstring> FullFilenameList, BOOL bShowFriendlyDates);
+	CMergeFilesDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
+		std::wstring strOutputDirectory, std::list<std::wstring> FullFilenameList,
+		BOOL bShowFriendlyDates);
 	~CMergeFilesDialog();
 
 protected:

@@ -11,7 +11,7 @@ class CAboutDialog : public CBaseDialog
 {
 public:
 
-	CAboutDialog(HINSTANCE hInstance,int iResource,HWND hParent);
+	CAboutDialog(HINSTANCE hInstance, HWND hParent);
 
 protected:
 

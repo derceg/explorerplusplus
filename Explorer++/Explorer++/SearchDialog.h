@@ -136,7 +136,7 @@ class CSearchDialog : public CBaseDialog, public IFileContextMenuExternal
 {
 public:
 
-	CSearchDialog(HINSTANCE hInstance, int iResource, HWND hParent, std::wstring_view searchDirectory,
+	CSearchDialog(HINSTANCE hInstance, HWND hParent, std::wstring_view searchDirectory,
 		IExplorerplusplus *pexpp, TabContainer *tabContainer);
 	~CSearchDialog();
 

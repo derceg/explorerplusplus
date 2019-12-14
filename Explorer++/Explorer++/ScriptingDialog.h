@@ -10,7 +10,7 @@ class ScriptingDialog : public CBaseDialog
 {
 public:
 
-	ScriptingDialog(HINSTANCE hInstance, int iResource, HWND hParent, PluginInterface *pluginInterface);
+	ScriptingDialog(HINSTANCE hInstance, HWND hParent, PluginInterface *pluginInterface);
 
 protected:
 

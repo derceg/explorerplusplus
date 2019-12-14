@@ -36,8 +36,8 @@ class CCustomizeColorsDialog : public CBaseDialog
 {
 public:
 
-	CCustomizeColorsDialog(HINSTANCE hInstance, int iResource, HWND hParent,
-		IExplorerplusplus *expp, std::vector<NColorRuleHelper::ColorRule_t> *pColorRuleList);
+	CCustomizeColorsDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
+		std::vector<NColorRuleHelper::ColorRule_t> *pColorRuleList);
 
 protected:
 

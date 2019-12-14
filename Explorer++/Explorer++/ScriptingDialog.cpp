@@ -10,9 +10,8 @@
 #include "../Helper/WindowHelper.h"
 #include <boost/algorithm/string.hpp>
 
-ScriptingDialog::ScriptingDialog(HINSTANCE hInstance, int iResource, HWND hParent,
-	PluginInterface *pluginInterface) :
-	CBaseDialog(hInstance, iResource, hParent, true),
+ScriptingDialog::ScriptingDialog(HINSTANCE hInstance, HWND hParent, PluginInterface *pluginInterface) :
+	CBaseDialog(hInstance, IDD_SCRIPTING, hParent, true),
 	m_luaPlugin(L"", Plugins::Manifest(), pluginInterface)
 {
 	m_luaPlugin.GetLuaState().open_libraries(sol::lib::base);

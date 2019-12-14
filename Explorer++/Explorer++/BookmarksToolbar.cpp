@@ -381,7 +381,7 @@ void CBookmarksToolbar::OnNewBookmark()
 	GetDisplayName(currentDirectory.c_str(), displayName, SIZEOF_ARRAY(displayName), SHGDN_INFOLDER);
 	CBookmark Bookmark = CBookmark::Create(displayName, currentDirectory, EMPTY_STRING);
 
-	CAddBookmarkDialog AddBookmarkDialog(m_instance, IDD_ADD_BOOKMARK, m_hToolbar, m_pexpp, m_AllBookmarks, Bookmark);
+	CAddBookmarkDialog AddBookmarkDialog(m_instance, m_hToolbar, m_pexpp, m_AllBookmarks, Bookmark);
 	AddBookmarkDialog.ShowModalDialog();
 }
 

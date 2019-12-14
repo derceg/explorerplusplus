@@ -8,8 +8,8 @@
 #include "ResourceHelper.h"
 
 CApplicationToolbarButtonDialog::CApplicationToolbarButtonDialog(HINSTANCE hInstance,
-	int iResource,HWND hParent,ApplicationButton_t *Button,bool IsNew) :
-	CBaseDialog(hInstance, iResource, hParent, false),
+	HWND hParent, ApplicationButton_t *Button, bool IsNew) :
+	CBaseDialog(hInstance, IDD_EDITAPPLICATIONBUTTON, hParent, false),
 	m_Button(Button),
 	m_IsNew(IsNew)
 {

@@ -34,7 +34,7 @@ class CSelectColumnsDialog : public CBaseDialog
 {
 public:
 
-	CSelectColumnsDialog(HINSTANCE hInstance, int iResource, HWND hParent, IExplorerplusplus *pexpp,
+	CSelectColumnsDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp,
 		TabContainer *tabContainer);
 
 protected:

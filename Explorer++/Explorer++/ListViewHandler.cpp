@@ -952,8 +952,8 @@ void Explorerplusplus::OnListViewFileRenameMultiple()
 		return;
 	}
 
-	CMassRenameDialog CMassRenameDialog(m_hLanguageModule, IDD_MASSRENAME,
-		m_hContainer, this, FullFilenameList, &m_FileActionHandler);
+	CMassRenameDialog CMassRenameDialog(m_hLanguageModule, m_hContainer, this,
+		FullFilenameList, &m_FileActionHandler);
 	CMassRenameDialog.ShowModalDialog();
 }
 

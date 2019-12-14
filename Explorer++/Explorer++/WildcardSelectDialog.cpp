@@ -19,9 +19,9 @@ const TCHAR CWildcardSelectDialogPersistentSettings::SETTINGS_KEY[] = _T("Wildca
 const TCHAR CWildcardSelectDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
 const TCHAR CWildcardSelectDialogPersistentSettings::SETTING_CURRENT_TEXT[] = _T("CurrentText");
 
-CWildcardSelectDialog::CWildcardSelectDialog(HINSTANCE hInstance,
-	int iResource,HWND hParent,BOOL bSelect,IExplorerplusplus *pexpp) :
-CBaseDialog(hInstance,iResource,hParent,true)
+CWildcardSelectDialog::CWildcardSelectDialog(HINSTANCE hInstance, HWND hParent,
+	BOOL bSelect, IExplorerplusplus *pexpp) :
+	CBaseDialog(hInstance, IDD_WILDCARDSELECT, hParent, true)
 {
 	m_bSelect = bSelect;
 	m_pexpp = pexpp;

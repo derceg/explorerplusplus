@@ -39,9 +39,9 @@ const TCHAR CSplitFileDialogPersistentSettings::SETTINGS_KEY[] = _T("SplitFile")
 const TCHAR CSplitFileDialogPersistentSettings::SETTING_SIZE[] = _T("Size");
 const TCHAR CSplitFileDialogPersistentSettings::SETTING_SIZE_GROUP[] = _T("SizeGroup");
 
-CSplitFileDialog::CSplitFileDialog(HINSTANCE hInstance, int iResource, HWND hParent,
-	IExplorerplusplus *expp, std::wstring strFullFilename) :
-	CBaseDialog(hInstance, iResource, hParent, false),
+CSplitFileDialog::CSplitFileDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
+	std::wstring strFullFilename) :
+	CBaseDialog(hInstance, IDD_SPLITFILE, hParent, false),
 	m_expp(expp),
 	m_strFullFilename(strFullFilename),
 	m_bSplittingFile(false),

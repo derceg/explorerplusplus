@@ -1029,7 +1029,7 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 				case IDC_BUTTON_DEFAULTCOLUMNS:
 					{
 						CSetDefaultColumnsDialog SetDefaultColumnsDialog(m_instance,
-							IDD_SETDEFAULTCOLUMNS, hDlg, m_config->globalFolderSettings.folderColumns);
+							hDlg, m_config->globalFolderSettings.folderColumns);
 						SetDefaultColumnsDialog.ShowModalDialog();
 					}
 					break;

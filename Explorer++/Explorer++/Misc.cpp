@@ -335,7 +335,7 @@ int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize)
 
 void Explorerplusplus::OnSelectColumns()
 {
-	CSelectColumnsDialog SelectColumnsDialog(m_hLanguageModule, IDD_SELECTCOLUMNS, m_hContainer, this, m_tabContainer);
+	CSelectColumnsDialog SelectColumnsDialog(m_hLanguageModule, m_hContainer, this, m_tabContainer);
 	SelectColumnsDialog.ShowModalDialog();
 
 	UpdateSortMenuItems(m_tabContainer->GetSelectedTab());

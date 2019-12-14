@@ -31,10 +31,10 @@ namespace NMergeFilesDialog
 
 const TCHAR CMergeFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("MergeFiles");
 
-CMergeFilesDialog::CMergeFilesDialog(HINSTANCE hInstance, int iResource, HWND hParent,
+CMergeFilesDialog::CMergeFilesDialog(HINSTANCE hInstance, HWND hParent,
 	IExplorerplusplus *expp, std::wstring strOutputDirectory,
 	std::list<std::wstring> FullFilenameList, BOOL bShowFriendlyDates) :
-	CBaseDialog(hInstance, iResource, hParent, true),
+	CBaseDialog(hInstance, IDD_MERGEFILES, hParent, true),
 	m_expp(expp),
 	m_strOutputDirectory(strOutputDirectory),
 	m_FullFilenameList(FullFilenameList),

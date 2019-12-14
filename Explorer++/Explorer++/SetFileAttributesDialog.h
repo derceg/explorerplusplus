@@ -41,7 +41,8 @@ class CSetFileAttributesDialog : public CBaseDialog
 {
 public:
 
-	CSetFileAttributesDialog(HINSTANCE hInstance,int iResource,HWND hParent,std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t> sfaiList);
+	CSetFileAttributesDialog(HINSTANCE hInstance, HWND hParent,
+		std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t> sfaiList);
 
 protected:
 

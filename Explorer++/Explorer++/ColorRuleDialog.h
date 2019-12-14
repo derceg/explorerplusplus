@@ -45,7 +45,7 @@ class CColorRuleDialog : public CBaseDialog
 {
 public:
 
-	CColorRuleDialog(HINSTANCE hInstance,int iResource,HWND hParent,NColorRuleHelper::ColorRule_t *pColorRule,BOOL bEdit);
+	CColorRuleDialog(HINSTANCE hInstance, HWND hParent, NColorRuleHelper::ColorRule_t *pColorRule, BOOL bEdit);
 
 	LRESULT CALLBACK	StaticColorProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 

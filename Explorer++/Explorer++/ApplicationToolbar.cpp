@@ -269,8 +269,7 @@ void CApplicationToolbar::ShowNewItemDialog()
 	ApplicationButton_t Button;
 	Button.ShowNameOnToolbar = TRUE;
 
-	CApplicationToolbarButtonDialog ApplicationToolbarButtonDialog(m_hInstance,
-		IDD_EDITAPPLICATIONBUTTON,m_hwnd,&Button,true);
+	CApplicationToolbarButtonDialog ApplicationToolbarButtonDialog(m_hInstance, m_hwnd, &Button, true);
 	INT_PTR ret = ApplicationToolbarButtonDialog.ShowModalDialog();
 
 	if(ret == 1)
@@ -405,7 +404,7 @@ void CApplicationToolbar::ShowItemProperties(int iItem)
 	if(Button != NULL)
 	{
 		CApplicationToolbarButtonDialog ApplicationToolbarButtonDialog(m_hInstance,
-			IDD_EDITAPPLICATIONBUTTON,m_hwnd,Button,false);
+			m_hwnd, Button, false);
 		INT_PTR ret = ApplicationToolbarButtonDialog.ShowModalDialog();
 
 		if(ret == 1)

@@ -48,7 +48,7 @@ class CMassRenameDialog : public CBaseDialog
 {
 public:
 
-	CMassRenameDialog(HINSTANCE hInstance, int iResource, HWND hParent, IExplorerplusplus *expp,
+	CMassRenameDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
 		std::list<std::wstring> FullFilenameList, CFileActionHandler *pFileActionHandler);
 
 protected:

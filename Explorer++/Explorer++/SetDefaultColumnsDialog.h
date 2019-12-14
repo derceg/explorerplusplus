@@ -58,8 +58,7 @@ class CSetDefaultColumnsDialog : public CBaseDialog
 {
 public:
 
-	CSetDefaultColumnsDialog(HINSTANCE hInstance, int iResource, HWND hParent,
-		FolderColumns &folderColumns);
+	CSetDefaultColumnsDialog(HINSTANCE hInstance, HWND hParent, FolderColumns &folderColumns);
 
 protected:
 

@@ -1256,7 +1256,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		GetDisplayName(currentDirectory.c_str(), szDisplayName, SIZEOF_ARRAY(szDisplayName), SHGDN_INFOLDER);
 		CBookmark Bookmark = CBookmark::Create(szDisplayName, currentDirectory, EMPTY_STRING);
 
-		CAddBookmarkDialog AddBookmarkDialog(m_hLanguageModule, IDD_ADD_BOOKMARK, hwnd, this, *m_bfAllBookmarks, Bookmark);
+		CAddBookmarkDialog AddBookmarkDialog(m_hLanguageModule, hwnd, this, *m_bfAllBookmarks, Bookmark);
 		AddBookmarkDialog.ShowModalDialog();
 	}
 	break;
@@ -1265,7 +1265,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 	case IDM_BOOKMARKS_MANAGEBOOKMARKS:
 		if (g_hwndManageBookmarks == NULL)
 		{
-			CManageBookmarksDialog *pManageBookmarksDialog = new CManageBookmarksDialog(m_hLanguageModule, IDD_MANAGE_BOOKMARKS,
+			CManageBookmarksDialog *pManageBookmarksDialog = new CManageBookmarksDialog(m_hLanguageModule,
 				hwnd, this, m_navigation.get(), *m_bfAllBookmarks);
 			g_hwndManageBookmarks = pManageBookmarksDialog->ShowModelessDialog(new CModelessDialogNotification());
 		}

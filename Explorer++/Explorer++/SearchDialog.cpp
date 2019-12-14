@@ -51,10 +51,9 @@ const TCHAR CSearchDialogPersistentSettings::SETTING_SORT_ASCENDING[] = _T("Sort
 const TCHAR CSearchDialogPersistentSettings::SETTING_DIRECTORY_LIST[] = _T("Directory");
 const TCHAR CSearchDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
 
-CSearchDialog::CSearchDialog(HINSTANCE hInstance, int iResource,
-	HWND hParent, std::wstring_view searchDirectory, IExplorerplusplus *pexpp,
-	TabContainer *tabContainer) :
-	CBaseDialog(hInstance, iResource, hParent, true),
+CSearchDialog::CSearchDialog(HINSTANCE hInstance, HWND hParent, std::wstring_view searchDirectory,
+	IExplorerplusplus *pexpp, TabContainer *tabContainer) :
+	CBaseDialog(hInstance, IDD_SEARCH, hParent, true),
 	m_searchDirectory(searchDirectory),
 	m_pexpp(pexpp),
 	m_tabContainer(tabContainer),

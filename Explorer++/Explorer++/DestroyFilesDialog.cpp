@@ -17,9 +17,9 @@ const TCHAR CDestroyFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("DestroyF
 const TCHAR CDestroyFilesDialogPersistentSettings::SETTING_OVERWRITE_METHOD[] = _T("OverwriteMethod");
 
 CDestroyFilesDialog::CDestroyFilesDialog(HINSTANCE hInstance,
-	int iResource,HWND hParent,std::list<std::wstring> FullFilenameList,
+	HWND hParent, std::list<std::wstring> FullFilenameList,
 	BOOL bShowFriendlyDates) :
-CBaseDialog(hInstance,iResource,hParent,true)
+	CBaseDialog(hInstance, IDD_DESTROYFILES, hParent, true)
 {
 	m_FullFilenameList = FullFilenameList;
 	m_bShowFriendlyDates = bShowFriendlyDates;

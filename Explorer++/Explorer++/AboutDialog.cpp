@@ -13,9 +13,8 @@
 #include "../Helper/WindowHelper.h"
 #include <list>
 
-
-CAboutDialog::CAboutDialog(HINSTANCE hInstance,int iResource,HWND hParent) :
-CBaseDialog(hInstance,iResource,hParent,false)
+CAboutDialog::CAboutDialog(HINSTANCE hInstance, HWND hParent) :
+	CBaseDialog(hInstance, IDD_ABOUT, hParent, false)
 {
 	
 }

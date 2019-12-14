@@ -15,14 +15,13 @@
 #include "../Helper/XMLSettings.h"
 #include <algorithm>
 
-
 const TCHAR CSetDefaultColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SetDefaultColumns");
 
 const TCHAR CSetDefaultColumnsDialogPersistentSettings::SETTING_FOLDER_TYPE[] = _T("Folder");
 
-CSetDefaultColumnsDialog::CSetDefaultColumnsDialog(HINSTANCE hInstance, int iResource,
-	HWND hParent, FolderColumns &folderColumns) :
-	CBaseDialog(hInstance,iResource,hParent,true),
+CSetDefaultColumnsDialog::CSetDefaultColumnsDialog(HINSTANCE hInstance, HWND hParent,
+	FolderColumns &folderColumns) :
+	CBaseDialog(hInstance, IDD_SETDEFAULTCOLUMNS, hParent, true),
 	m_folderColumns(folderColumns)
 {
 	m_psdcdps = &CSetDefaultColumnsDialogPersistentSettings::GetInstance();

@@ -26,9 +26,9 @@ const COLORREF CColorRuleDialogPersistentSettings::DEFAULT_INITIAL_COLOR = RGB(0
 const TCHAR CColorRuleDialogPersistentSettings::SETTING_INITIAL_COLOR[] = _T("InitialColor");
 const TCHAR CColorRuleDialogPersistentSettings::SETTING_CUSTOM_COLORS[] = _T("CustomColors");
 
-CColorRuleDialog::CColorRuleDialog(HINSTANCE hInstance,
-	int iResource,HWND hParent,NColorRuleHelper::ColorRule_t *pColorRule,BOOL bEdit) :
-CBaseDialog(hInstance,iResource,hParent,false)
+CColorRuleDialog::CColorRuleDialog(HINSTANCE hInstance, HWND hParent,
+	NColorRuleHelper::ColorRule_t *pColorRule, BOOL bEdit) :
+	CBaseDialog(hInstance, IDD_NEWCOLORRULE, hParent, false)
 {
 	m_pColorRule = pColorRule;
 	m_bEdit = bEdit;

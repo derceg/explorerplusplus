@@ -478,8 +478,7 @@ void TabContainer::OnRefreshAllTabs()
 
 void TabContainer::OnRenameTab(const Tab &tab)
 {
-	CRenameTabDialog RenameTabDialog(m_instance, IDD_RENAMETAB, m_expp->GetMainWindow(),
-		tab.GetId(), this);
+	CRenameTabDialog RenameTabDialog(m_instance, m_expp->GetMainWindow(), tab.GetId(), this);
 	RenameTabDialog.ShowModalDialog();
 }
 

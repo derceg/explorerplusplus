@@ -19,9 +19,8 @@ const TCHAR CFilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");
 
 const TCHAR CFilterDialogPersistentSettings::SETTING_FILTER_LIST[] = _T("Filter");
 
-CFilterDialog::CFilterDialog(HINSTANCE hInstance,
-	int iResource,HWND hParent,IExplorerplusplus *pexpp) :
-CBaseDialog(hInstance,iResource,hParent,true)
+CFilterDialog::CFilterDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp) :
+	CBaseDialog(hInstance, IDD_FILTER, hParent, true)
 {
 	m_pexpp = pexpp;
 

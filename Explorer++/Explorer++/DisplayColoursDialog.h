@@ -31,7 +31,8 @@ class CDisplayColoursDialog : public CBaseDialog
 {
 public:
 
-	CDisplayColoursDialog(HINSTANCE hInstance,int iResource,HWND hParent,HWND hDisplayWindow,COLORREF DefaultCenterColor,COLORREF DefaultSurroundingColor);
+	CDisplayColoursDialog(HINSTANCE hInstance, HWND hParent, HWND hDisplayWindow,
+		COLORREF DefaultCenterColor, COLORREF DefaultSurroundingColor);
 
 protected:
 

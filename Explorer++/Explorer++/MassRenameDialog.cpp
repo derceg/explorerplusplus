@@ -32,10 +32,10 @@ const TCHAR CMassRenameDialogPersistentSettings::SETTINGS_KEY[] = _T("MassRename
 const TCHAR CMassRenameDialogPersistentSettings::SETTING_COLUMN_WIDTH_1[] = _T("ColumnWidth1");
 const TCHAR CMassRenameDialogPersistentSettings::SETTING_COLUMN_WIDTH_2[] = _T("ColumnWidth2");
 
-CMassRenameDialog::CMassRenameDialog(HINSTANCE hInstance, int iResource, HWND hParent,
+CMassRenameDialog::CMassRenameDialog(HINSTANCE hInstance, HWND hParent,
 	IExplorerplusplus *expp, std::list<std::wstring> FullFilenameList,
 	CFileActionHandler *pFileActionHandler) :
-	CBaseDialog(hInstance, iResource, hParent, true),
+	CBaseDialog(hInstance, IDD_MASSRENAME, hParent, true),
 	m_expp(expp),
 	m_FullFilenameList(FullFilenameList),
 	m_pFileActionHandler(pFileActionHandler)

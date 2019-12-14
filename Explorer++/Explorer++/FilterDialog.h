@@ -45,7 +45,7 @@ class CFilterDialog : public CBaseDialog
 {
 public:
 
-	CFilterDialog(HINSTANCE hInstance,int iResource,HWND hParent,IExplorerplusplus *pexpp);
+	CFilterDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp);
 
 protected:
 

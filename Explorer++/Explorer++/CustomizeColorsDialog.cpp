@@ -16,9 +16,9 @@
 
 const TCHAR CCustomizeColorsDialogPersistentSettings::SETTINGS_KEY[] = _T("CustomizeColors");
 
-CCustomizeColorsDialog::CCustomizeColorsDialog(HINSTANCE hInstance, int iResource,
-	HWND hParent, IExplorerplusplus *expp, std::vector<NColorRuleHelper::ColorRule_t> *pColorRuleList) :
-	CBaseDialog(hInstance, iResource, hParent, true),
+CCustomizeColorsDialog::CCustomizeColorsDialog(HINSTANCE hInstance, HWND hParent,
+	IExplorerplusplus *expp, std::vector<NColorRuleHelper::ColorRule_t> *pColorRuleList) :
+	CBaseDialog(hInstance, IDD_CUSTOMIZECOLORS, hParent, true),
 	m_expp(expp),
 	m_pColorRuleList(pColorRuleList)
 {
@@ -235,7 +235,7 @@ void CCustomizeColorsDialog::OnNew()
 
 	NColorRuleHelper::ColorRule_t ColorRule;
 
-	CColorRuleDialog ColorRuleDialog(GetInstance(),IDD_NEWCOLORRULE,m_hDlg,&ColorRule,FALSE);
+	CColorRuleDialog ColorRuleDialog(GetInstance(), m_hDlg, &ColorRule, FALSE);
 
 	INT_PTR iRet = ColorRuleDialog.ShowModalDialog();
 
@@ -265,8 +265,7 @@ void CCustomizeColorsDialog::OnEdit()
 
 void CCustomizeColorsDialog::EditColorRule(int iSelected)
 {
-	CColorRuleDialog ColorRuleDialog(GetInstance(),IDD_NEWCOLORRULE,m_hDlg,
-		&(*m_pColorRuleList)[iSelected],TRUE);
+	CColorRuleDialog ColorRuleDialog(GetInstance(), m_hDlg, &(*m_pColorRuleList)[iSelected], TRUE);
 
 	INT_PTR iRet = ColorRuleDialog.ShowModalDialog();
 

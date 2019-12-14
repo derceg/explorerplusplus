@@ -74,8 +74,8 @@ class CSplitFileDialog : public CBaseDialog
 {
 public:
 
-	CSplitFileDialog(HINSTANCE hInstance, int iResource, HWND hParent,
-		IExplorerplusplus *expp, std::wstring strFullFilename);
+	CSplitFileDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
+		std::wstring strFullFilename);
 	~CSplitFileDialog();
 
 protected:

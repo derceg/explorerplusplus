@@ -33,8 +33,7 @@ class CRenameTabDialog : public CBaseDialog
 {
 public:
 
-	CRenameTabDialog(HINSTANCE hInstance, int iResource, HWND hParent,
-		int tabId, TabContainer *tabContainer);
+	CRenameTabDialog(HINSTANCE hInstance, HWND hParent, int tabId, TabContainer *tabContainer);
 
 protected:
 

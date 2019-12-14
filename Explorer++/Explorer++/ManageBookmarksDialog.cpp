@@ -20,9 +20,9 @@ namespace NManageBookmarksDialog
 
 const TCHAR CManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
-CManageBookmarksDialog::CManageBookmarksDialog(HINSTANCE hInstance, int iResource, HWND hParent,
+CManageBookmarksDialog::CManageBookmarksDialog(HINSTANCE hInstance, HWND hParent,
 	IExplorerplusplus *pexpp, Navigation *navigation, CBookmarkFolder &AllBookmarks) :
-	CBaseDialog(hInstance, iResource, hParent, true),
+	CBaseDialog(hInstance, IDD_MANAGE_BOOKMARKS, hParent, true),
 	m_pexpp(pexpp),
 	m_navigation(navigation),
 	m_AllBookmarks(AllBookmarks),

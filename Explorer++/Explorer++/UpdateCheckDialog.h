@@ -31,7 +31,7 @@ class CUpdateCheckDialog : public CBaseDialog
 {
 public:
 
-	CUpdateCheckDialog(HINSTANCE hInstance,int iResource,HWND hParent);
+	CUpdateCheckDialog(HINSTANCE hInstance, HWND hParent);
 
 protected:
 

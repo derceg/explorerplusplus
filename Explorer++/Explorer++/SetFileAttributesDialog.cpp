@@ -12,10 +12,9 @@
 
 const TCHAR CSetFileAttributesDialogPersistentSettings::SETTINGS_KEY[] = _T("SetFileAttributes");
 
-CSetFileAttributesDialog::CSetFileAttributesDialog(HINSTANCE hInstance,
-	int iResource,HWND hParent,std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t>
-	sfaiList) :
-CBaseDialog(hInstance,iResource,hParent,false)
+CSetFileAttributesDialog::CSetFileAttributesDialog(HINSTANCE hInstance, HWND hParent,
+	std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t> sfaiList) :
+	CBaseDialog(hInstance, IDD_SETFILEATTRIBUTES, hParent, false)
 {
 	assert(sfaiList.size() > 0);
 

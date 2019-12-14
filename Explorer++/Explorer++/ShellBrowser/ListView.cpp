@@ -794,8 +794,7 @@ void CShellBrowser::SetFileAttributesForSelection()
 		sfaiList.push_back(sfai);
 	}
 
-	CSetFileAttributesDialog SetFileAttributesDialog(m_hResourceModule,
-		IDD_SETFILEATTRIBUTES, m_hListView, sfaiList);
+	CSetFileAttributesDialog SetFileAttributesDialog(m_hResourceModule, m_hListView, sfaiList);
 
 	SetFileAttributesDialog.ShowModalDialog();
 }

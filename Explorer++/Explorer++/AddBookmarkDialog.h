@@ -42,8 +42,8 @@ class CAddBookmarkDialog : public CBaseDialog, public NBookmark::IBookmarkItemNo
 {
 public:
 
-	CAddBookmarkDialog(HINSTANCE hInstance, int iResource, HWND hParent,
-		IExplorerplusplus *expp, CBookmarkFolder &AllBookmarks, CBookmark &Bookmark);
+	CAddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
+		CBookmarkFolder &AllBookmarks, CBookmark &Bookmark);
 
 	void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position);
 	void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);

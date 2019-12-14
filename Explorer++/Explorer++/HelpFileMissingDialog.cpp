@@ -8,8 +8,8 @@
 #include "../Helper/Helper.h"
 #include "../Helper/WindowHelper.h"
 
-CHelpFileMissingDialog::CHelpFileMissingDialog(HINSTANCE hInstance,int iResource,HWND hParent) :
-CBaseDialog(hInstance,iResource,hParent,false)
+CHelpFileMissingDialog::CHelpFileMissingDialog(HINSTANCE hInstance, HWND hParent) :
+	CBaseDialog(hInstance, IDD_HELPFILEMISSING, hParent, false)
 {
 	
 }

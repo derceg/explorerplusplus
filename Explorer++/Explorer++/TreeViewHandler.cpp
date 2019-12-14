@@ -663,8 +663,7 @@ void Explorerplusplus::OnTreeViewSetFileAttributes(void) const
 
 			sfaiList.push_back(sfai);
 
-			CSetFileAttributesDialog SetFileAttributesDialog(m_hLanguageModule,
-				IDD_SETFILEATTRIBUTES,m_hContainer,sfaiList);
+			CSetFileAttributesDialog SetFileAttributesDialog(m_hLanguageModule, m_hContainer, sfaiList);
 
 			SetFileAttributesDialog.ShowModalDialog();
 		}

@@ -12,9 +12,9 @@
 
 const TCHAR CDisplayColoursDialogPersistentSettings::SETTINGS_KEY[] = _T("DisplayColors");
 
-CDisplayColoursDialog::CDisplayColoursDialog(HINSTANCE hInstance,int iResource,
-	HWND hParent,HWND hDisplayWindow,COLORREF DefaultCenterColor,COLORREF DefaultSurroundingColor) :
-	CBaseDialog(hInstance, iResource, hParent, false),
+CDisplayColoursDialog::CDisplayColoursDialog(HINSTANCE hInstance, HWND hParent,
+	HWND hDisplayWindow, COLORREF DefaultCenterColor, COLORREF DefaultSurroundingColor) :
+	CBaseDialog(hInstance, IDD_DISPLAYCOLOURS, hParent, false),
 	m_hDisplayWindow(hDisplayWindow),
 	m_DefaultCenterColor(DefaultCenterColor),
 	m_DefaultSurroundingColor(DefaultSurroundingColor)

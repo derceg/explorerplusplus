@@ -50,7 +50,7 @@ class CWildcardSelectDialog : public CBaseDialog
 {
 public:
 
-	CWildcardSelectDialog(HINSTANCE hInstance,int iResource,HWND hParent,BOOL bSelect,IExplorerplusplus *pexpp);
+	CWildcardSelectDialog(HINSTANCE hInstance, HWND hParent, BOOL bSelect, IExplorerplusplus *pexpp);
 
 protected:
 
