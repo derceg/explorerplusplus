@@ -20,9 +20,6 @@ public:
 
 	static CBookmarkFolder	Create(const std::wstring &strName, std::optional<std::wstring> guid = std::nullopt);
 	static CBookmarkFolder	*CreateNew(const std::wstring &strName, std::optional<std::wstring> guid = std::nullopt);
-	static CBookmarkFolder	UnserializeFromRegistry(const std::wstring &strKey);
-
-	void			SerializeToRegistry(const std::wstring &strKey);
 
 	std::wstring GetGUID() const;
 
@@ -56,15 +53,12 @@ private:
 
 	enum InitializationType_t
 	{
-		INITIALIZATION_TYPE_NORMAL,
-		INITIALIZATION_TYPE_UNSERIALIZE,
-		INITIALIZATION_TYPE_REGISTRY
+		INITIALIZATION_TYPE_NORMAL
 	};
 
 	CBookmarkFolder(const std::wstring &str, InitializationType_t InitializationType, std::optional<std::wstring> guid);
 
 	void			Initialize(const std::wstring &name, std::optional<std::wstring> guid);
-	void			InitializeFromRegistry(const std::wstring &strKey);
 
 	void			UpdateModificationTime();
 
@@ -93,9 +87,6 @@ class CBookmark
 public:
 
 	static CBookmark Create(const std::wstring &strName, const std::wstring &strLocation, const std::wstring &strDescription);
-	static CBookmark UnserializeFromRegistry(const std::wstring &strKey);
-
-	void			SerializeToRegistry(const std::wstring &strKey);
 
 	std::wstring	GetGUID() const;
 
@@ -117,10 +108,7 @@ public:
 
 private:
 
-	CBookmark(const std::wstring &strKey);
 	CBookmark(const std::wstring &strName, const std::wstring &strLocation, const std::wstring &strDescription);
-
-	void			InitializeFromRegistry(const std::wstring &strKey);
 
 	void			UpdateModificationTime();
 
