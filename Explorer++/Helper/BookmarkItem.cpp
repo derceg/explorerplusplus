@@ -10,6 +10,7 @@ BookmarkItem::BookmarkItem(std::optional<std::wstring> guid, std::wstring_view n
 	std::optional<std::wstring> location) :
 	m_type(location ? Type::Bookmark : Type::Folder),
 	m_guid(guid ? *guid : CreateGUID()),
+	m_parent(nullptr),
 	m_name(name)
 {
 	GetSystemTimeAsFileTime(&m_dateCreated);
@@ -54,6 +55,8 @@ void BookmarkItem::AddChild(std::unique_ptr<BookmarkItem> bookmarkItem, size_t i
 	{
 		index = m_children.size();
 	}
+
+	bookmarkItem->m_parent = this;
 
 	m_children.insert(m_children.begin() + index, std::move(bookmarkItem));
 }

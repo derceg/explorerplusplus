@@ -43,6 +43,8 @@ private:
 	const Type m_type;
 	std::wstring m_guid;
 
+	BookmarkItem *m_parent;
+
 	std::wstring m_name;
 
 	FILETIME m_dateCreated;
