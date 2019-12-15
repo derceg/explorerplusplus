@@ -66,7 +66,7 @@ private:
 	bool m_bSortAscending;
 };
 
-class CManageBookmarksDialog : public CBaseDialog, public NBookmark::IBookmarkItemNotification
+class CManageBookmarksDialog : public CBaseDialog
 {
 public:
 
@@ -90,7 +90,6 @@ protected:
 	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
 	INT_PTR	OnNotify(NMHDR *pnmhdr);
 	INT_PTR	OnClose();
-	INT_PTR	OnDestroy();
 	INT_PTR	OnNcDestroy();
 
 	void	SaveState();

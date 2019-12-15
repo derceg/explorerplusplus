@@ -55,8 +55,6 @@ INT_PTR CManageBookmarksDialog::OnInitDialog()
 	SetupTreeView();
 	SetupListView();
 
-	CBookmarkItemNotifier::GetInstance().AddObserver(this);
-
 	UpdateToolbarState();
 
 	SetFocus(GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW));
@@ -1047,13 +1045,6 @@ void CManageBookmarksDialog::OnCancel()
 INT_PTR CManageBookmarksDialog::OnClose()
 {
 	DestroyWindow(m_hDlg);
-	return 0;
-}
-
-INT_PTR CManageBookmarksDialog::OnDestroy()
-{
-	CBookmarkItemNotifier::GetInstance().RemoveObserver(this);
-
 	return 0;
 }
 

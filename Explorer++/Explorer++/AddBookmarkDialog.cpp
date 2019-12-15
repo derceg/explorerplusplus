@@ -59,8 +59,6 @@ INT_PTR CAddBookmarkDialog::OnInitDialog()
 	SendMessage(hEditName,EM_SETSEL,0,-1);
 	SetFocus(hEditName);
 
-	CBookmarkItemNotifier::GetInstance().AddObserver(this);
-
 	m_pabdps->RestoreDialogPosition(m_hDlg,true);
 
 	return 0;
@@ -247,13 +245,6 @@ void CAddBookmarkDialog::SaveTreeViewExpansionState(HWND hTreeView,HTREEITEM hIt
 INT_PTR CAddBookmarkDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
-	return 0;
-}
-
-INT_PTR CAddBookmarkDialog::OnDestroy()
-{
-	CBookmarkItemNotifier::GetInstance().RemoveObserver(this);
-
 	return 0;
 }
 

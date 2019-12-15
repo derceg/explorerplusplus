@@ -27,8 +27,6 @@ CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplore
 	m_uIDCounter(0)
 {
 	InitializeToolbar();
-
-	CBookmarkItemNotifier::GetInstance().AddObserver(this);
 }
 
 void CBookmarksToolbar::InitializeToolbar()
@@ -62,8 +60,6 @@ void CBookmarksToolbar::InitializeToolbar()
 CBookmarksToolbar::~CBookmarksToolbar()
 {
 	m_pbtdh->Release();
-
-	CBookmarkItemNotifier::GetInstance().RemoveObserver(this);
 }
 
 LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProcStub(HWND hwnd,UINT uMsg,

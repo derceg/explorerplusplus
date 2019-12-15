@@ -51,7 +51,7 @@ private:
 	bool m_bAcceptData;
 };
 
-class CBookmarksToolbar : public NBookmark::IBookmarkItemNotification
+class CBookmarksToolbar
 {
 public:
 

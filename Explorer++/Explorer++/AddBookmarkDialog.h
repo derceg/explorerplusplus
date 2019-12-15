@@ -38,7 +38,7 @@ private:
 	std::unordered_set<std::wstring> m_setExpansion;
 };
 
-class CAddBookmarkDialog : public CBaseDialog, public NBookmark::IBookmarkItemNotification
+class CAddBookmarkDialog : public CBaseDialog
 {
 public:
 
@@ -58,7 +58,6 @@ protected:
 	INT_PTR	OnCtlColorEdit(HWND hwnd,HDC hdc);
 	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
 	INT_PTR	OnClose();
-	INT_PTR	OnDestroy();
 	INT_PTR	OnNcDestroy();
 
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
