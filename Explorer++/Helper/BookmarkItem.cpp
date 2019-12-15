@@ -39,6 +39,20 @@ void BookmarkItem::SetName(std::wstring_view name)
 	UpdateModificationTime();
 }
 
+std::wstring BookmarkItem::GetLocation() const
+{
+	return m_location;
+}
+
+void BookmarkItem::SetLocation(std::wstring_view location)
+{
+	assert(m_type == Type::Bookmark);
+
+	m_location = location;
+
+	UpdateModificationTime();
+}
+
 FILETIME BookmarkItem::GetDateCreated() const
 {
 	return m_dateCreated;
@@ -49,9 +63,14 @@ FILETIME BookmarkItem::GetDateModified() const
 	return m_dateModified;
 }
 
+void BookmarkItem::AddChild(std::unique_ptr<BookmarkItem> bookmarkItem)
+{
+	AddChild(std::move(bookmarkItem), m_children.size());
+}
+
 void BookmarkItem::AddChild(std::unique_ptr<BookmarkItem> bookmarkItem, size_t index)
 {
-	if (index >= m_children.size())
+	if (index > m_children.size())
 	{
 		index = m_children.size();
 	}
@@ -59,6 +78,30 @@ void BookmarkItem::AddChild(std::unique_ptr<BookmarkItem> bookmarkItem, size_t i
 	bookmarkItem->m_parent = this;
 
 	m_children.insert(m_children.begin() + index, std::move(bookmarkItem));
+}
+
+void BookmarkItem::RemoveChild(size_t index)
+{
+	if (index >= m_children.size())
+	{
+		return;
+	}
+
+	m_children.erase(m_children.begin() + index);
+}
+
+std::optional<size_t> BookmarkItem::GetChildIndex(const BookmarkItem *bookmarkItem) const
+{
+	auto itr = std::find_if(m_children.begin(), m_children.end(), [bookmarkItem] (const auto &item) {
+		return item.get() == bookmarkItem;
+	});
+
+	if (itr == m_children.end())
+	{
+		return std::nullopt;
+	}
+
+	return itr - m_children.begin();
 }
 
 const std::vector<std::unique_ptr<BookmarkItem>> &BookmarkItem::GetChildren() const
