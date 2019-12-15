@@ -11,7 +11,8 @@ BookmarkItem::BookmarkItem(std::optional<std::wstring> guid, std::wstring_view n
 	m_type(location ? Type::Bookmark : Type::Folder),
 	m_guid(guid ? *guid : CreateGUID()),
 	m_parent(nullptr),
-	m_name(name)
+	m_name(name),
+	m_location(location ? *location : std::wstring())
 {
 	GetSystemTimeAsFileTime(&m_dateCreated);
 	m_dateModified = m_dateCreated;
