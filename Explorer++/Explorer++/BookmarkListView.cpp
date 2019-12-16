@@ -8,8 +8,7 @@
 #include "../Helper/Macros.h"
 
 CBookmarkListView::CBookmarkListView(HWND hListView, IExplorerplusplus *expp) :
-	m_hListView(hListView),
-	m_uIDCounter(0)
+	m_hListView(hListView)
 {
 	SetWindowTheme(hListView, L"Explorer", NULL);
 	ListView_SetExtendedListViewStyleEx(hListView,
@@ -24,54 +23,30 @@ CBookmarkListView::CBookmarkListView(HWND hListView, IExplorerplusplus *expp) :
 	ListView_SetImageList(hListView, m_imageList.get(), LVSIL_SMALL);
 }
 
-void CBookmarkListView::InsertBookmarksIntoListView(const CBookmarkFolder &BookmarkFolder)
+void CBookmarkListView::InsertBookmarksIntoListView(BookmarkItem *bookmarkItem)
 {
 	ListView_DeleteAllItems(m_hListView);
-	m_uIDCounter = 0;
-	m_mapID.clear();
 
-	int iItem = 0;
+	int position = 0;
 
-	for (auto itr = BookmarkFolder.begin(); itr != BookmarkFolder.end(); ++itr)
+	for (auto &childItem : bookmarkItem->GetChildren())
 	{
-		if (itr->type() == typeid(CBookmarkFolder))
-		{
-			const CBookmarkFolder &CurrentBookmarkFolder = boost::get<CBookmarkFolder>(*itr);
-			InsertBookmarkFolderIntoListView(CurrentBookmarkFolder, iItem);
-		}
-		else
-		{
-			const CBookmark &CurrentBookmark = boost::get<CBookmark>(*itr);
-			InsertBookmarkIntoListView(CurrentBookmark, iItem);
-		}
+		InsertBookmarkItemIntoListView(childItem.get(), position);
 
-		++iItem;
+		position++;
 	}
 }
 
-int CBookmarkListView::InsertBookmarkFolderIntoListView(const CBookmarkFolder &BookmarkFolder, int iPosition)
+int CBookmarkListView::InsertBookmarkItemIntoListView(BookmarkItem *bookmarkItem, int position)
 {
-	return InsertBookmarkItemIntoListView(BookmarkFolder.GetName(),
-		BookmarkFolder.GetGUID(), true, iPosition);
-}
-
-int CBookmarkListView::InsertBookmarkIntoListView(const CBookmark &Bookmark, int iPosition)
-{
-	return InsertBookmarkItemIntoListView(Bookmark.GetName(),
-		Bookmark.GetGUID(), false, iPosition);
-}
-
-int CBookmarkListView::InsertBookmarkItemIntoListView(const std::wstring &strName,
-	const std::wstring &guid, bool bFolder, int iPosition)
-{
-	assert(iPosition >= 0 && iPosition <= ListView_GetItemCount(m_hListView));
+	assert(position >= 0 && position <= ListView_GetItemCount(m_hListView));
 
 	TCHAR szName[256];
-	StringCchCopy(szName, SIZEOF_ARRAY(szName), strName.c_str());
+	StringCchCopy(szName, SIZEOF_ARRAY(szName), bookmarkItem->GetName().c_str());
 
 	int iImage;
 
-	if (bFolder)
+	if (bookmarkItem->GetType() == BookmarkItem::Type::Folder)
 	{
 		iImage = m_imageListMappings.at(Icon::Folder);
 	}
@@ -82,20 +57,17 @@ int CBookmarkListView::InsertBookmarkItemIntoListView(const std::wstring &strNam
 
 	LVITEM lvi;
 	lvi.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
-	lvi.iItem = iPosition;
+	lvi.iItem = position;
 	lvi.iSubItem = 0;
 	lvi.iImage = iImage;
 	lvi.pszText = szName;
-	lvi.lParam = m_uIDCounter;
+	lvi.lParam = reinterpret_cast<LPARAM>(bookmarkItem);
 	int iItem = ListView_InsertItem(m_hListView, &lvi);
-
-	m_mapID.insert({ m_uIDCounter, guid });
-	++m_uIDCounter;
 
 	return iItem;
 }
 
-VariantBookmark &CBookmarkListView::GetBookmarkItemFromListView(CBookmarkFolder &ParentBookmarkFolder, int iItem)
+BookmarkItem *CBookmarkListView::GetBookmarkItemFromListView(int iItem)
 {
 	LVITEM lvi;
 	lvi.mask = LVIF_PARAM;
@@ -103,15 +75,10 @@ VariantBookmark &CBookmarkListView::GetBookmarkItemFromListView(CBookmarkFolder 
 	lvi.iSubItem = 0;
 	ListView_GetItem(m_hListView, &lvi);
 
-	VariantBookmark &variantBookmark = GetBookmarkItemFromListViewlParam(ParentBookmarkFolder, lvi.lParam);
-
-	return variantBookmark;
+	return reinterpret_cast<BookmarkItem *>(lvi.lParam);
 }
 
-VariantBookmark &CBookmarkListView::GetBookmarkItemFromListViewlParam(CBookmarkFolder &ParentBookmarkFolder, LPARAM lParam)
+BookmarkItem *CBookmarkListView::GetBookmarkItemFromListViewlParam(LPARAM lParam)
 {
-	auto itr = m_mapID.find(static_cast<UINT>(lParam));
-	VariantBookmark &variantBookmark = NBookmarkHelper::GetBookmarkItem(ParentBookmarkFolder, itr->second);
-
-	return variantBookmark;
+	return reinterpret_cast<BookmarkItem *>(lParam);
 }
