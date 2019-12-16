@@ -13,8 +13,8 @@ BookmarkMenu::BookmarkMenu(HINSTANCE instance) :
 
 }
 
-BOOL BookmarkMenu::ShowMenu(HWND parentWindow, const CBookmarkFolder &parentBookmark, const POINT &pt,
-	const std::function<void(const CBookmark &)> &callback)
+BOOL BookmarkMenu::ShowMenu(HWND parentWindow, const BookmarkItem *bookmarkItem,
+	const POINT &pt, MenuCallback callback)
 {
 	HMENU menu = CreatePopupMenu();
 
@@ -25,7 +25,7 @@ BOOL BookmarkMenu::ShowMenu(HWND parentWindow, const CBookmarkFolder &parentBook
 
 	m_idCounter = 1;
 	m_menuItemMap.clear();
-	BOOL res = BuildBookmarksMenu(menu, parentBookmark, 0);
+	BOOL res = BuildBookmarksMenu(menu, bookmarkItem, 0);
 
 	if (!res)
 	{
@@ -44,28 +44,26 @@ BOOL BookmarkMenu::ShowMenu(HWND parentWindow, const CBookmarkFolder &parentBook
 	return TRUE;
 }
 
-BOOL BookmarkMenu::BuildBookmarksMenu(HMENU menu, const CBookmarkFolder &parent, int startPosition)
+BOOL BookmarkMenu::BuildBookmarksMenu(HMENU menu, const BookmarkItem *bookmarkItem, int startPosition)
 {
-	int position = startPosition;
-
-	if (!parent.HasChildren())
+	if (bookmarkItem->GetChildren().empty())
 	{
-		return AddEmptyBookmarkFolderToMenu(menu, position);
+		return AddEmptyBookmarkFolderToMenu(menu, startPosition);
 	}
 
-	for (const auto &variantBookmark : parent)
+	int position = startPosition;
+
+	for (auto &childItem : bookmarkItem->GetChildren())
 	{
 		BOOL res;
 
-		if (variantBookmark.type() == typeid(CBookmarkFolder))
+		if (childItem->GetType() == BookmarkItem::Type::Folder)
 		{
-			const CBookmarkFolder &bookmarkFolder = boost::get<CBookmarkFolder>(variantBookmark);
-			res = AddBookmarkFolderToMenu(menu, bookmarkFolder, position);
+			res = AddBookmarkFolderToMenu(menu, bookmarkItem, position);
 		}
 		else
 		{
-			const CBookmark &bookmark = boost::get<CBookmark>(variantBookmark);
-			res = AddBookmarkToMenu(menu, bookmark, position);
+			res = AddBookmarkToMenu(menu, bookmarkItem, position);
 		}
 
 		if (!res)
@@ -97,10 +95,10 @@ BOOL BookmarkMenu::AddEmptyBookmarkFolderToMenu(HMENU menu, int position)
 	return InsertMenuItem(menu, position, TRUE, &mii);
 }
 
-BOOL BookmarkMenu::AddBookmarkFolderToMenu(HMENU menu, const CBookmarkFolder &bookmarkFolder, int position)
+BOOL BookmarkMenu::AddBookmarkFolderToMenu(HMENU menu, const BookmarkItem *bookmarkItem, int position)
 {
 	TCHAR bookmarkFolderName[256];
-	StringCchCopy(bookmarkFolderName, SIZEOF_ARRAY(bookmarkFolderName), bookmarkFolder.GetName().c_str());
+	StringCchCopy(bookmarkFolderName, SIZEOF_ARRAY(bookmarkFolderName), bookmarkItem->GetName().c_str());
 
 	HMENU subMenu = CreateMenu();
 
@@ -121,13 +119,13 @@ BOOL BookmarkMenu::AddBookmarkFolderToMenu(HMENU menu, const CBookmarkFolder &bo
 		return FALSE;
 	}
 
-	return BuildBookmarksMenu(subMenu, bookmarkFolder, 0);
+	return BuildBookmarksMenu(subMenu, bookmarkItem, 0);
 }
 
-BOOL BookmarkMenu::AddBookmarkToMenu(HMENU menu, const CBookmark &bookmark, int position)
+BOOL BookmarkMenu::AddBookmarkToMenu(HMENU menu, const BookmarkItem *bookmarkItem, int position)
 {
 	TCHAR bookmarkName[256];
-	StringCchCopy(bookmarkName, SIZEOF_ARRAY(bookmarkName), bookmark.GetName().c_str());
+	StringCchCopy(bookmarkName, SIZEOF_ARRAY(bookmarkName), bookmarkItem->GetName().c_str());
 
 	int id = m_idCounter++;
 
@@ -143,12 +141,12 @@ BOOL BookmarkMenu::AddBookmarkToMenu(HMENU menu, const CBookmark &bookmark, int 
 		return FALSE;
 	}
 
-	m_menuItemMap.insert(std::make_pair(id, &bookmark));
+	m_menuItemMap.insert({ id, bookmarkItem });
 
 	return res;
 }
 
-void BookmarkMenu::OnMenuItemSelected(int menuItemId, const std::function<void(const CBookmark &)> &callback)
+void BookmarkMenu::OnMenuItemSelected(int menuItemId, MenuCallback callback)
 {
 	auto itr = m_menuItemMap.find(menuItemId);
 
@@ -162,5 +160,5 @@ void BookmarkMenu::OnMenuItemSelected(int menuItemId, const std::function<void(c
 		return;
 	}
 
-	callback(*itr->second);
+	callback(itr->second);
 }

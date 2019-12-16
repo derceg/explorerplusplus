@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/Bookmark.h"
+#include "../Helper/BookmarkItem.h"
 #include <functional>
 #include <unordered_map>
 
@@ -12,21 +12,23 @@ class BookmarkMenu
 {
 public:
 
+	using MenuCallback = std::function<void(const BookmarkItem *bookmarkItem)>;
+
 	BookmarkMenu(HINSTANCE instance);
 
-	BOOL ShowMenu(HWND parentWindow, const CBookmarkFolder &parentBookmark, const POINT &pt,
-		const std::function<void(const CBookmark &)> &callback = nullptr);
+	BOOL ShowMenu(HWND parentWindow, const BookmarkItem *bookmarkItem, const POINT &pt,
+		MenuCallback callback = nullptr);
 
 private:
 
-	BOOL BuildBookmarksMenu(HMENU menu, const CBookmarkFolder &parent, int startPosition);
+	BOOL BuildBookmarksMenu(HMENU menu, const BookmarkItem *bookmarkItem, int startPosition);
 	BOOL AddEmptyBookmarkFolderToMenu(HMENU menu, int position);
-	BOOL AddBookmarkFolderToMenu(HMENU menu, const CBookmarkFolder &bookmarkFolder, int position);
-	BOOL AddBookmarkToMenu(HMENU menu, const CBookmark &bookmark, int position);
-	void OnMenuItemSelected(int menuItemId, const std::function<void(const CBookmark &)> &callback = nullptr);
+	BOOL AddBookmarkFolderToMenu(HMENU menu, const BookmarkItem *bookmarkItem, int position);
+	BOOL AddBookmarkToMenu(HMENU menu, const BookmarkItem *bookmarkItem, int position);
+	void OnMenuItemSelected(int menuItemId, MenuCallback callback);
 
 	HINSTANCE m_instance;
 
 	int m_idCounter;
-	std::unordered_map<int, const CBookmark *> m_menuItemMap;
+	std::unordered_map<int, const BookmarkItem *> m_menuItemMap;
 };
