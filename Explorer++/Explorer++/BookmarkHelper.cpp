@@ -17,6 +17,16 @@ int CALLBACK SortByVisitCount(const VariantBookmark &BookmarkItem1,const Variant
 int CALLBACK SortByAdded(const VariantBookmark &BookmarkItem1,const VariantBookmark &BookmarkItem2);
 int CALLBACK SortByLastModified(const VariantBookmark &BookmarkItem1,const VariantBookmark &BookmarkItem2);
 
+bool NBookmarkHelper::IsFolder(const std::unique_ptr<BookmarkItem> &bookmarkItem)
+{
+	return bookmarkItem->IsFolder();
+}
+
+bool NBookmarkHelper::IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem)
+{
+	return bookmarkItem->IsBookmark();
+}
+
 VariantBookmark &NBookmarkHelper::GetBookmarkItem(CBookmarkFolder &ParentBookmarkFolder,
 	const std::wstring &guid)
 {

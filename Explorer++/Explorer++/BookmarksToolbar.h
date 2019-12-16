@@ -4,22 +4,20 @@
 
 #pragma once
 
-#include "BookmarkHelper.h"
+#include "BookmarkTree.h"
 #include "CoreInterface.h"
 #include "Navigation.h"
 #include "ResourceHelper.h"
 #include "../Helper/Bookmark.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowSubclassWrapper.h"
-#include <boost/optional.hpp>
 #include <wil/resource.h>
-#include <unordered_map>
 
 class CBookmarksToolbarDropHandler : public IDropTarget
 {
 public:
 
-	CBookmarksToolbarDropHandler(HWND hToolbar, CBookmarkFolder &AllBookmarks, const std::wstring &guidBookmarksToolbar);
+	CBookmarksToolbarDropHandler(HWND hToolbar, BookmarkTree *bookmarkTree);
 	~CBookmarksToolbarDropHandler();
 
 	/* IUnknown methods. */
@@ -43,8 +41,7 @@ private:
 	ULONG m_ulRefCount;
 
 	HWND m_hToolbar;
-	CBookmarkFolder &m_AllBookmarks;
-	std::wstring m_guidBookmarksToolbar;
+	BookmarkTree *m_bookmarkTree;
 
 	IDragSourceHelper *m_pDragSourceHelper;
 	IDropTargetHelper *m_pDropTargetHelper;
@@ -56,17 +53,17 @@ class CBookmarksToolbar
 public:
 
 	CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
-		Navigation *navigation, CBookmarkFolder &AllBookmarks, const std::wstring &guidBookmarksToolbar,
-		UINT uIDStart, UINT uIDEnd);
+		Navigation *navigation, BookmarkTree *bookmarkTree, UINT uIDStart, UINT uIDEnd);
 	~CBookmarksToolbar();
 
+	// TODO: Update.
 	/* IBookmarkItemNotification methods. */
-	void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position);
+	/*void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position);
 	void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
 	void	OnBookmarkModified(const std::wstring &guid);
 	void	OnBookmarkFolderModified(const std::wstring &guid);
 	void	OnBookmarkRemoved(const std::wstring &guid);
-	void	OnBookmarkFolderRemoved(const std::wstring &guid);
+	void	OnBookmarkFolderRemoved(const std::wstring &guid);*/
 
 private:
 
@@ -84,24 +81,21 @@ private:
 	void	InitializeToolbar();
 
 	void	InsertBookmarkItems();
-	void	InsertBookmark(const CBookmark &Bookmark);
-	void	InsertBookmark(const CBookmark &Bookmark,std::size_t Position);
-	void	InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder);
-	void	InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder,std::size_t Position);
-	void	InsertBookmarkItem(const std::wstring &strName, const std::wstring &guid, bool bFolder, std::size_t Position);
+	void	InsertBookmarkItem(BookmarkItem *bookmarkItem, int position);
 
-	void	ModifyBookmarkItem(const std::wstring &guid, bool bFolder);
+	// TODO: Update.
+	//void	ModifyBookmarkItem(const std::wstring &guid, bool bFolder);
 
 	void	RemoveBookmarkItem(const std::wstring &guid);
 
-	void	OpenBookmarkItemInNewTab(const VariantBookmark &variantBookmarkItem);
+	void	OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem);
 
 	bool	OnCommand(WPARAM wParam, LPARAM lParam);
 	bool	OnButtonClick(int command);
 	BOOL	OnRightClick(const NMMOUSE *nmm);
-	void	OnRightClickMenuItemSelected(int menuItemId, const VariantBookmark &variantBookmark);
-	void	ShowBookmarkFolderMenu(const CBookmarkFolder &bookmarkFolder, int command, int index);
-	void	OnBookmarkMenuItemClicked(const CBookmark &bookmark);
+	void	OnRightClickMenuItemSelected(int menuItemId, const BookmarkItem *bookmarkItem);
+	void	ShowBookmarkFolderMenu(const BookmarkItem *bookmarkItem, int command, int index);
+	void	OnBookmarkMenuItemClicked(const BookmarkItem *bookmarkItem);
 	void	OnNewBookmark();
 	bool	OnGetInfoTip(NMTBGETINFOTIP *infoTip);
 
@@ -109,7 +103,7 @@ private:
 
 	int		GetBookmarkItemIndex(const std::wstring &guid);
 
-	VariantBookmark	*GetBookmarkItemFromToolbarIndex(int index);
+	BookmarkItem	*GetBookmarkItemFromToolbarIndex(int index);
 
 	HWND m_hToolbar;
 	DpiCompatibility m_dpiCompat;
@@ -121,10 +115,8 @@ private:
 	IExplorerplusplus *m_pexpp;
 	Navigation *m_navigation;
 
-	CBookmarkFolder &m_AllBookmarks;
-	std::wstring m_guidBookmarksToolbar;
+	BookmarkTree *m_bookmarkTree;
 
-	std::unordered_map<UINT, std::wstring> m_mapID;
 	UINT m_uIDStart;
 	UINT m_uIDEnd;
 	UINT m_uIDCounter;

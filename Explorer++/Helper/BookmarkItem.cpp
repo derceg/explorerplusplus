@@ -18,6 +18,16 @@ BookmarkItem::BookmarkItem(std::optional<std::wstring> guid, std::wstring_view n
 	m_dateModified = m_dateCreated;
 }
 
+bool BookmarkItem::IsFolder() const
+{
+	return m_type == Type::Folder;
+}
+
+bool BookmarkItem::IsBookmark() const
+{
+	return m_type == Type::Bookmark;
+}
+
 BookmarkItem::Type BookmarkItem::GetType() const
 {
 	return m_type;

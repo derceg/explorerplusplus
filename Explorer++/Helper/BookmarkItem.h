@@ -21,7 +21,10 @@ public:
 	BookmarkItem(std::optional<std::wstring> guid, std::wstring_view name,
 		std::optional<std::wstring> location);
 
+	bool IsFolder() const;
+	bool IsBookmark() const;
 	Type GetType() const;
+
 	std::wstring GetGUID() const;
 
 	std::wstring GetName() const;

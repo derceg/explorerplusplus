@@ -11,17 +11,16 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
+#include <boost/range/adaptor/filtered.hpp>
 #include <algorithm>
 
 CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
-	Navigation *navigation, CBookmarkFolder &AllBookmarks, const std::wstring &guidBookmarksToolbar,
-	UINT uIDStart, UINT uIDEnd) :
+	Navigation *navigation, BookmarkTree *bookmarkTree, UINT uIDStart, UINT uIDEnd) :
 	m_hToolbar(hToolbar),
 	m_instance(instance),
 	m_pexpp(pexpp),
 	m_navigation(navigation),
-	m_AllBookmarks(AllBookmarks),
-	m_guidBookmarksToolbar(guidBookmarksToolbar),
+	m_bookmarkTree(bookmarkTree),
 	m_uIDStart(uIDStart),
 	m_uIDEnd(uIDEnd),
 	m_uIDCounter(0)
@@ -42,8 +41,8 @@ void CBookmarksToolbar::InitializeToolbar()
 		m_pexpp->GetIconResourceLoader(), iconWidth, iconHeight, { Icon::Folder, Icon::Bookmarks});
 	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(m_imageList.get()));
 
-	m_pbtdh = new CBookmarksToolbarDropHandler(m_hToolbar,m_AllBookmarks,m_guidBookmarksToolbar);
-	RegisterDragDrop(m_hToolbar,m_pbtdh);
+	m_pbtdh = new CBookmarksToolbarDropHandler(m_hToolbar, m_bookmarkTree);
+	RegisterDragDrop(m_hToolbar, m_pbtdh);
 
 	m_windowSubclasses.push_back(WindowSubclassWrapper(m_hToolbar, BookmarksToolbarProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
@@ -93,9 +92,11 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPA
 				TBBUTTON tbButton;
 				SendMessage(m_hToolbar,TB_GETBUTTON,iIndex,reinterpret_cast<LPARAM>(&tbButton));
 
-				if (auto variantBookmarkItem = GetBookmarkItemFromToolbarIndex(iIndex))
+				auto bookmarkItem = GetBookmarkItemFromToolbarIndex(iIndex);
+
+				if (bookmarkItem)
 				{
-					OpenBookmarkItemInNewTab(*variantBookmarkItem);
+					OpenBookmarkItemInNewTab(bookmarkItem);
 				}
 			}
 		}
@@ -112,25 +113,18 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPA
 // If the specified item is a bookmark, it will be opened in a new tab.
 // If it's a bookmark folder, each of its children will be opened in new
 // tabs.
-void CBookmarksToolbar::OpenBookmarkItemInNewTab(const VariantBookmark &variantBookmarkItem)
+void CBookmarksToolbar::OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem)
 {
-	if (variantBookmarkItem.type() == typeid(CBookmarkFolder))
+	if (bookmarkItem->IsFolder())
 	{
-		const CBookmarkFolder &bookmarkFolder = boost::get<CBookmarkFolder>(variantBookmarkItem);
-
-		for (auto variantBookmarkChild : bookmarkFolder)
+		for (auto &childItem : bookmarkItem->GetChildren() | boost::adaptors::filtered(NBookmarkHelper::IsBookmark))
 		{
-			if (variantBookmarkChild.type() == typeid(CBookmark))
-			{
-				const CBookmark &bookmark = boost::get<CBookmark>(variantBookmarkChild);
-				m_pexpp->GetTabContainer()->CreateNewTab(bookmark.GetLocation().c_str());
-			}
+			m_pexpp->GetTabContainer()->CreateNewTab(childItem->GetLocation().c_str());
 		}
 	}
 	else
 	{
-		const CBookmark &bookmark = boost::get<CBookmark>(variantBookmarkItem);
-		m_pexpp->GetTabContainer()->CreateNewTab(bookmark.GetLocation().c_str());
+		m_pexpp->GetTabContainer()->CreateNewTab(bookmarkItem->GetLocation().c_str());
 	}
 }
 
@@ -195,9 +189,9 @@ BOOL CBookmarksToolbar::OnRightClick(const NMMOUSE *nmm)
 		return FALSE;
 	}
 
-	auto variantBookmarkItem = GetBookmarkItemFromToolbarIndex(index);
+	auto bookmarkItem = GetBookmarkItemFromToolbarIndex(index);
 
-	if (!variantBookmarkItem)
+	if (!bookmarkItem)
 	{
 		return FALSE;
 	}
@@ -223,28 +217,27 @@ BOOL CBookmarksToolbar::OnRightClick(const NMMOUSE *nmm)
 
 	if (menuItemId != 0)
 	{
-		OnRightClickMenuItemSelected(menuItemId, *variantBookmarkItem);
+		OnRightClickMenuItemSelected(menuItemId, bookmarkItem);
 	}
 
 	return TRUE;
 }
 
-void CBookmarksToolbar::OnRightClickMenuItemSelected(int menuItemId, const VariantBookmark &variantBookmark)
+void CBookmarksToolbar::OnRightClickMenuItemSelected(int menuItemId, const BookmarkItem *bookmarkItem)
 {
 	switch (menuItemId)
 	{
 	case IDM_BT_OPEN:
 	{
-		if (variantBookmark.type() == typeid(CBookmark))
+		if (bookmarkItem->IsBookmark())
 		{
-			const CBookmark &bookmark = boost::get<CBookmark>(variantBookmark);
-			m_navigation->BrowseFolderInCurrentTab(bookmark.GetLocation().c_str());
+			m_navigation->BrowseFolderInCurrentTab(bookmarkItem->GetLocation().c_str());
 		}
 	}
 		break;
 
 	case IDM_BT_OPENINNEWTAB:
-		OpenBookmarkItemInNewTab(variantBookmark);
+		OpenBookmarkItemInNewTab(bookmarkItem);
 		break;
 
 	case IDM_BT_NEWBOOKMARK:
@@ -306,28 +299,26 @@ bool CBookmarksToolbar::OnButtonClick(int command)
 		return false;
 	}
 
-	auto variantBookmarkItem = GetBookmarkItemFromToolbarIndex(index);
+	auto bookmarkItem = GetBookmarkItemFromToolbarIndex(index);
 
-	if (!variantBookmarkItem)
+	if (!bookmarkItem)
 	{
 		return false;
 	}
 
-	if (variantBookmarkItem->type() == typeid(CBookmarkFolder))
+	if (bookmarkItem->IsFolder())
 	{
-		const CBookmarkFolder &bookmarkFolder = boost::get<CBookmarkFolder>(*variantBookmarkItem);
-		ShowBookmarkFolderMenu(bookmarkFolder, command, index);
+		ShowBookmarkFolderMenu(bookmarkItem, command, index);
 	}
 	else
 	{
-		CBookmark &bookmark = boost::get<CBookmark>(*variantBookmarkItem);
-		m_navigation->BrowseFolderInCurrentTab(bookmark.GetLocation().c_str());
+		m_navigation->BrowseFolderInCurrentTab(bookmarkItem->GetLocation().c_str());
 	}
 
 	return true;
 }
 
-void CBookmarksToolbar::ShowBookmarkFolderMenu(const CBookmarkFolder &bookmarkFolder, int command, int index)
+void CBookmarksToolbar::ShowBookmarkFolderMenu(const BookmarkItem *bookmarkItem, int command, int index)
 {
 	RECT rc;
 	BOOL res = static_cast<BOOL>(SendMessage(m_hToolbar, TB_GETITEMRECT, index, reinterpret_cast<LPARAM>(&rc)));
@@ -359,15 +350,17 @@ void CBookmarksToolbar::ShowBookmarkFolderMenu(const CBookmarkFolder &bookmarkFo
 	POINT pt;
 	pt.x = rc.left;
 	pt.y = rc.bottom;
-	bookmarkMenu.ShowMenu(m_hToolbar, bookmarkFolder, pt ,
-		boost::bind(&CBookmarksToolbar::OnBookmarkMenuItemClicked, this, _1));
+	bookmarkMenu.ShowMenu(m_hToolbar, bookmarkItem, pt ,
+		std::bind(&CBookmarksToolbar::OnBookmarkMenuItemClicked, this, std::placeholders::_1));
 
 	SendMessage(m_hToolbar, TB_SETSTATE, command, MAKEWORD(state & ~TBSTATE_PRESSED, 0));
 }
 
-void CBookmarksToolbar::OnBookmarkMenuItemClicked(const CBookmark &bookmark)
+void CBookmarksToolbar::OnBookmarkMenuItemClicked(const BookmarkItem *bookmarkItem)
 {
-	m_navigation->BrowseFolderInCurrentTab(bookmark.GetLocation().c_str());
+	assert(bookmarkItem->IsBookmark());
+
+	m_navigation->BrowseFolderInCurrentTab(bookmarkItem->GetLocation().c_str());
 }
 
 void CBookmarksToolbar::OnNewBookmark()
@@ -377,8 +370,9 @@ void CBookmarksToolbar::OnNewBookmark()
 	GetDisplayName(currentDirectory.c_str(), displayName, SIZEOF_ARRAY(displayName), SHGDN_INFOLDER);
 	CBookmark Bookmark = CBookmark::Create(displayName, currentDirectory, EMPTY_STRING);
 
-	CAddBookmarkDialog AddBookmarkDialog(m_instance, m_hToolbar, m_pexpp, m_AllBookmarks, Bookmark);
-	AddBookmarkDialog.ShowModalDialog();
+	// TODO: Update.
+	/*CAddBookmarkDialog AddBookmarkDialog(m_instance, m_hToolbar, m_pexpp, m_AllBookmarks, Bookmark);
+	AddBookmarkDialog.ShowModalDialog();*/
 }
 
 bool CBookmarksToolbar::OnGetInfoTip(NMTBGETINFOTIP *infoTip)
@@ -390,19 +384,17 @@ bool CBookmarksToolbar::OnGetInfoTip(NMTBGETINFOTIP *infoTip)
 		return false;
 	}
 
-	auto variantBookmarkItem = GetBookmarkItemFromToolbarIndex(index);
+	auto bookmarkItem = GetBookmarkItemFromToolbarIndex(index);
 
-	if (!variantBookmarkItem)
+	if (!bookmarkItem)
 	{
 		return false;
 	}
 
-	if (variantBookmarkItem->type() == typeid(CBookmark))
+	if (bookmarkItem->IsBookmark())
 	{
-		CBookmark &Bookmark = boost::get<CBookmark>(*variantBookmarkItem);
-
 		StringCchPrintf(infoTip->pszText, infoTip->cchTextMax, _T("%s\n%s"),
-			Bookmark.GetName().c_str(), Bookmark.GetLocation().c_str());
+			bookmarkItem->GetName().c_str(), bookmarkItem->GetLocation().c_str());
 
 		return true;
 	}
@@ -412,60 +404,26 @@ bool CBookmarksToolbar::OnGetInfoTip(NMTBGETINFOTIP *infoTip)
 
 void CBookmarksToolbar::InsertBookmarkItems()
 {
-	/* The bookmarks toolbar folder should always be a direct child
-	of the root. */
-	auto variantBookmarksToolbar = NBookmarkHelper::GetBookmarkItem(m_AllBookmarks,m_guidBookmarksToolbar);
-	assert(variantBookmarksToolbar.type() == typeid(CBookmarkFolder));
-	const CBookmarkFolder &BookmarksToolbarFolder = boost::get<CBookmarkFolder>(variantBookmarksToolbar);
+	int position = 0;
 
-	for(const auto &variantBookmark : BookmarksToolbarFolder)
+	for (const auto &bookmarkItem : m_bookmarkTree->GetBookmarksToolbarFolder()->GetChildren())
 	{
-		if(variantBookmark.type() == typeid(CBookmarkFolder))
-		{
-			const CBookmarkFolder &BookmarkFolder = boost::get<CBookmarkFolder>(variantBookmark);
-			InsertBookmarkFolder(BookmarkFolder);
-		}
-		else
-		{
-			const CBookmark &Bookmark = boost::get<CBookmark>(variantBookmark);
-			InsertBookmark(Bookmark);
-		}
+		InsertBookmarkItem(bookmarkItem.get(), position);
+
+		position++;
 	}
 }
 
-void CBookmarksToolbar::InsertBookmark(const CBookmark &Bookmark)
+void CBookmarksToolbar::InsertBookmarkItem(BookmarkItem *bookmarkItem, int position)
 {
-	int nButtons = static_cast<int>(SendMessage(m_hToolbar,TB_BUTTONCOUNT,0,0));
-	InsertBookmark(Bookmark,nButtons);
-}
-
-void CBookmarksToolbar::InsertBookmark(const CBookmark &Bookmark,std::size_t Position)
-{
-	InsertBookmarkItem(Bookmark.GetName(),Bookmark.GetGUID(),false,Position);
-}
-
-void CBookmarksToolbar::InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder)
-{
-	int nButtons = static_cast<int>(SendMessage(m_hToolbar,TB_BUTTONCOUNT,0,0));
-	InsertBookmarkFolder(BookmarkFolder,nButtons);
-}
-
-void CBookmarksToolbar::InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder,std::size_t Position)
-{
-	InsertBookmarkItem(BookmarkFolder.GetName(),BookmarkFolder.GetGUID(),true,Position);
-}
-
-void CBookmarksToolbar::InsertBookmarkItem(const std::wstring &strName,
-	const std::wstring &guid, bool bFolder, std::size_t Position)
-{
-	assert(Position <= static_cast<std::size_t>(SendMessage(m_hToolbar,TB_BUTTONCOUNT,0,0)));
+	assert(position <= static_cast<std::size_t>(SendMessage(m_hToolbar, TB_BUTTONCOUNT, 0, 0)));
 
 	TCHAR szName[256];
-	StringCchCopy(szName,SIZEOF_ARRAY(szName),strName.c_str());
+	StringCchCopy(szName, SIZEOF_ARRAY(szName), bookmarkItem->GetName().c_str());
 
 	int iImage;
 
-	if(bFolder)
+	if(bookmarkItem->IsFolder())
 	{
 		iImage = m_imageListMappings.at(Icon::Folder);
 	}
@@ -479,88 +437,89 @@ void CBookmarksToolbar::InsertBookmarkItem(const std::wstring &strName,
 	tbb.idCommand	= m_uIDStart + m_uIDCounter;
 	tbb.fsState		= TBSTATE_ENABLED;
 	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE|BTNS_SHOWTEXT|BTNS_NOPREFIX;
-	tbb.dwData		= m_uIDCounter;
+	tbb.dwData		= reinterpret_cast<DWORD_PTR>(bookmarkItem);
 	tbb.iString		= reinterpret_cast<INT_PTR>(szName);
-	SendMessage(m_hToolbar,TB_INSERTBUTTON,Position,reinterpret_cast<LPARAM>(&tbb));
+	SendMessage(m_hToolbar, TB_INSERTBUTTON, position, reinterpret_cast<LPARAM>(&tbb));
 
-	m_mapID.insert(std::make_pair(m_uIDCounter,guid));
 	++m_uIDCounter;
 }
 
-void CBookmarksToolbar::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,
-	const CBookmark &Bookmark,std::size_t Position)
-{
-	if(ParentBookmarkFolder.GetGUID() == m_guidBookmarksToolbar)
-	{
-		InsertBookmark(Bookmark,Position);
-	}
-}
-
-void CBookmarksToolbar::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,
-	const CBookmarkFolder &BookmarkFolder,std::size_t Position)
-{
-	if(ParentBookmarkFolder.GetGUID() == m_guidBookmarksToolbar)
-	{
-		InsertBookmarkFolder(BookmarkFolder,Position);
-	}
-}
-
-void CBookmarksToolbar::OnBookmarkModified(const std::wstring &guid)
-{
-	ModifyBookmarkItem(guid,false);
-}
-
-void CBookmarksToolbar::OnBookmarkFolderModified(const std::wstring &guid)
-{
-	ModifyBookmarkItem(guid,true);
-}
-
-void CBookmarksToolbar::OnBookmarkRemoved(const std::wstring &guid)
-{
-	RemoveBookmarkItem(guid);	
-}
-
-void CBookmarksToolbar::OnBookmarkFolderRemoved(const std::wstring &guid)
-{
-	RemoveBookmarkItem(guid);
-}
-
-void CBookmarksToolbar::ModifyBookmarkItem(const std::wstring &guid, bool bFolder)
-{
-	int iIndex = GetBookmarkItemIndex(guid);
-
-	if(iIndex != -1)
-	{
-		auto variantBookmarksToolbar = NBookmarkHelper::GetBookmarkItem(m_AllBookmarks,m_guidBookmarksToolbar);
-		CBookmarkFolder &BookmarksToolbarFolder = boost::get<CBookmarkFolder>(variantBookmarksToolbar);
-
-		auto variantBookmarkItem = NBookmarkHelper::GetBookmarkItem(BookmarksToolbarFolder,guid);
-
-		TCHAR szText[128];
-
-		if(bFolder)
-		{
-			assert(variantBookmarkItem.type() == typeid(CBookmarkFolder));
-			CBookmarkFolder &BookmarkFolder = boost::get<CBookmarkFolder>(variantBookmarkItem);
-
-			StringCchCopy(szText,SIZEOF_ARRAY(szText),BookmarkFolder.GetName().c_str());
-		}
-		else
-		{
-			assert(variantBookmarkItem.type() == typeid(CBookmark));
-			CBookmark &Bookmark = boost::get<CBookmark>(variantBookmarkItem);
-
-			StringCchCopy(szText,SIZEOF_ARRAY(szText),Bookmark.GetName().c_str());
-		}
-
-		TBBUTTONINFO tbbi;
-		tbbi.cbSize		= sizeof(tbbi);
-		tbbi.dwMask		= TBIF_BYINDEX|TBIF_TEXT;
-		tbbi.pszText	= szText;
-
-		SendMessage(m_hToolbar,TB_SETBUTTONINFO,iIndex,reinterpret_cast<LPARAM>(&tbbi));
-	}
-}
+// TODO: Update.
+//void CBookmarksToolbar::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,
+//	const CBookmark &Bookmark,std::size_t Position)
+//{
+//	
+//	if(ParentBookmarkFolder.GetGUID() == m_guidBookmarksToolbar)
+//	{
+//		InsertBookmark(Bookmark,Position);
+//	}
+//}
+//
+//void CBookmarksToolbar::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,
+//	const CBookmarkFolder &BookmarkFolder,std::size_t Position)
+//{
+//	if(ParentBookmarkFolder.GetGUID() == m_guidBookmarksToolbar)
+//	{
+//		InsertBookmarkFolder(BookmarkFolder,Position);
+//	}
+//}
+//
+//void CBookmarksToolbar::OnBookmarkModified(const std::wstring &guid)
+//{
+//	ModifyBookmarkItem(guid,false);
+//}
+//
+//void CBookmarksToolbar::OnBookmarkFolderModified(const std::wstring &guid)
+//{
+//	ModifyBookmarkItem(guid,true);
+//}
+//
+//void CBookmarksToolbar::OnBookmarkRemoved(const std::wstring &guid)
+//{
+//	RemoveBookmarkItem(guid);	
+//}
+//
+//void CBookmarksToolbar::OnBookmarkFolderRemoved(const std::wstring &guid)
+//{
+//	RemoveBookmarkItem(guid);
+//}
+//
+//void CBookmarksToolbar::ModifyBookmarkItem(const std::wstring &guid, bool bFolder)
+//{
+//	int iIndex = GetBookmarkItemIndex(guid);
+//
+//	if(iIndex != -1)
+//	{
+//		auto variantBookmarksToolbar = NBookmarkHelper::GetBookmarkItem(m_AllBookmarks,m_guidBookmarksToolbar);
+//		CBookmarkFolder &BookmarksToolbarFolder = boost::get<CBookmarkFolder>(variantBookmarksToolbar);
+//
+//		auto variantBookmarkItem = NBookmarkHelper::GetBookmarkItem(BookmarksToolbarFolder,guid);
+//
+//		TCHAR szText[128];
+//
+//		if(bFolder)
+//		{
+//			assert(variantBookmarkItem.type() == typeid(CBookmarkFolder));
+//			CBookmarkFolder &BookmarkFolder = boost::get<CBookmarkFolder>(variantBookmarkItem);
+//
+//			StringCchCopy(szText,SIZEOF_ARRAY(szText),BookmarkFolder.GetName().c_str());
+//		}
+//		else
+//		{
+//			assert(variantBookmarkItem.type() == typeid(CBookmark));
+//			CBookmark &Bookmark = boost::get<CBookmark>(variantBookmarkItem);
+//
+//			StringCchCopy(szText,SIZEOF_ARRAY(szText),Bookmark.GetName().c_str());
+//		}
+//
+//		TBBUTTONINFO tbbi;
+//		tbbi.cbSize		= sizeof(tbbi);
+//		tbbi.dwMask		= TBIF_BYINDEX|TBIF_TEXT;
+//		tbbi.pszText	= szText;
+//
+//		SendMessage(m_hToolbar,TB_SETBUTTONINFO,iIndex,reinterpret_cast<LPARAM>(&tbbi));
+//	}
+//}
 
 void CBookmarksToolbar::RemoveBookmarkItem(const std::wstring &guid)
 {
@@ -572,8 +531,6 @@ void CBookmarksToolbar::RemoveBookmarkItem(const std::wstring &guid)
 
 		/* TODO: */
 		//UpdateToolbarBandSizing(m_hMainRebar,m_hBookmarksToolbar);
-
-		m_mapID.erase(iIndex);
 	}
 }
 
@@ -605,7 +562,7 @@ void CBookmarksToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindo
 	InsertMenuItem(menu, IDM_TOOLBARS_CUSTOMIZE, FALSE, &mii);
 }
 
-VariantBookmark *CBookmarksToolbar::GetBookmarkItemFromToolbarIndex(int index)
+BookmarkItem *CBookmarksToolbar::GetBookmarkItemFromToolbarIndex(int index)
 {
 	TBBUTTON tbButton;
 	BOOL ret = static_cast<BOOL>(SendMessage(m_hToolbar, TB_GETBUTTON, index, reinterpret_cast<LPARAM>(&tbButton)));
@@ -615,18 +572,7 @@ VariantBookmark *CBookmarksToolbar::GetBookmarkItemFromToolbarIndex(int index)
 		return nullptr;
 	}
 
-	auto itr = m_mapID.find(static_cast<UINT>(tbButton.dwData));
-
-	if (itr == m_mapID.end())
-	{
-		return nullptr;
-	}
-
-	auto &variantBookmarksToolbar = NBookmarkHelper::GetBookmarkItem(m_AllBookmarks, m_guidBookmarksToolbar);
-	CBookmarkFolder &BookmarksToolbarFolder = boost::get<CBookmarkFolder>(variantBookmarksToolbar);
-
-	auto &variantBookmarkItem = NBookmarkHelper::GetBookmarkItem(BookmarksToolbarFolder, itr->second);
-	return &variantBookmarkItem;
+	return reinterpret_cast<BookmarkItem *>(tbButton.dwData);
 }
 
 int CBookmarksToolbar::GetBookmarkItemIndex(const std::wstring &guid)
@@ -639,9 +585,9 @@ int CBookmarksToolbar::GetBookmarkItemIndex(const std::wstring &guid)
 		TBBUTTON tb;
 		SendMessage(m_hToolbar,TB_GETBUTTON,i,reinterpret_cast<LPARAM>(&tb));
 
-		auto itr = m_mapID.find(static_cast<UINT>(tb.dwData));
+		BookmarkItem *bookmarkItem = reinterpret_cast<BookmarkItem *>(tb.dwData);
 
-		if(itr != m_mapID.end() && itr->second == guid)
+		if(bookmarkItem->GetGUID() == guid)
 		{
 			iIndex = i;
 			break;
@@ -651,12 +597,10 @@ int CBookmarksToolbar::GetBookmarkItemIndex(const std::wstring &guid)
 	return iIndex;
 }
 
-CBookmarksToolbarDropHandler::CBookmarksToolbarDropHandler(HWND hToolbar,
-	CBookmarkFolder &AllBookmarks, const std::wstring &guidBookmarksToolbar) :
+CBookmarksToolbarDropHandler::CBookmarksToolbarDropHandler(HWND hToolbar, BookmarkTree *bookmarkTree) :
 	m_ulRefCount(1),
 	m_hToolbar(hToolbar),
-	m_AllBookmarks(AllBookmarks),
-	m_guidBookmarksToolbar(guidBookmarksToolbar)
+	m_bookmarkTree(bookmarkTree)
 {
 	CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_INPROC_SERVER,
 		IID_PPV_ARGS(&m_pDragSourceHelper));
@@ -870,13 +814,8 @@ HRESULT __stdcall CBookmarksToolbarDropHandler::Drop(IDataObject *pDataObject,
 					TCHAR szDisplayName[MAX_PATH];
 					GetDisplayName(szFullFileName,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_INFOLDER);
 
-					CBookmark Bookmark = CBookmark::Create(szDisplayName, szFullFileName, EMPTY_STRING);
-
-					auto variantBookmarksToolbar = NBookmarkHelper::GetBookmarkItem(m_AllBookmarks,m_guidBookmarksToolbar);
-					assert(variantBookmarksToolbar.type() == typeid(CBookmarkFolder));
-					CBookmarkFolder &BookmarksToolbarFolder = boost::get<CBookmarkFolder>(variantBookmarksToolbar);
-
-					BookmarksToolbarFolder.InsertBookmark(Bookmark,iPosition + i);
+					auto bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt, szDisplayName, szFullFileName);
+					m_bookmarkTree->GetBookmarksToolbarFolder()->AddChild(std::move(bookmarkItem), iPosition + i);
 				}
 			}
 

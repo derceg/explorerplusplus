@@ -5,6 +5,7 @@
 #pragma once
 
 #include "../Helper/Bookmark.h"
+#include "../Helper/BookmarkItem.h"
 
 namespace NBookmarkHelper
 {
@@ -23,6 +24,9 @@ namespace NBookmarkHelper
 	static TCHAR *ROOT_GUID = _T("00000000-0000-0000-0000-000000000001");
 	static TCHAR *TOOLBAR_GUID = _T("00000000-0000-0000-0000-000000000002");
 	static TCHAR *MENU_GUID = _T("00000000-0000-0000-0000-000000000003");
+
+	bool IsFolder(const std::unique_ptr<BookmarkItem> &bookmarkItem);
+	bool IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem);
 
 	int CALLBACK Sort(SortMode_t SortMode, const VariantBookmark &BookmarkItem1, const VariantBookmark &BookmarkItem2);
 
