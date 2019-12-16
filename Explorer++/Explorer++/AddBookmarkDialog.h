@@ -5,10 +5,11 @@
 #pragma once
 
 #include "BookmarkHelper.h"
+#include "BookmarkTree.h"
 #include "BookmarkTreeView.h"
 #include "CoreInterface.h"
 #include "../Helper/BaseDialog.h"
-#include "../Helper/Bookmark.h"
+#include "../Helper/BookmarkItem.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
 #include <wil/resource.h>
@@ -43,14 +44,7 @@ class CAddBookmarkDialog : public CBaseDialog
 public:
 
 	CAddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
-		CBookmarkFolder &AllBookmarks, CBookmark &Bookmark);
-
-	void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position);
-	void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
-	void	OnBookmarkModified(const std::wstring &guid);
-	void	OnBookmarkFolderModified(const std::wstring &guid);
-	void	OnBookmarkRemoved(const std::wstring &guid);
-	void	OnBookmarkFolderRemoved(const std::wstring &guid);
+		BookmarkTree *bookmarkTree, std::unique_ptr<BookmarkItem> bookmarkItem);
 
 protected:
 
@@ -79,8 +73,8 @@ private:
 
 	IExplorerplusplus *m_expp;
 
-	CBookmarkFolder &m_AllBookmarks;
-	CBookmark &m_Bookmark;
+	BookmarkTree *m_bookmarkTree;
+	std::unique_ptr<BookmarkItem> m_bookmarkItem;
 
 	CBookmarkTreeView *m_pBookmarkTreeView;
 

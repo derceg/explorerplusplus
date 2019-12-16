@@ -5,22 +5,20 @@
 #include "stdafx.h"
 #include "AddBookmarkDialog.h"
 #include "BookmarkHelper.h"
-#include "Explorer++_internal.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
-#include <stack>
 
 const TCHAR CAddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmark");
 
 CAddBookmarkDialog::CAddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
-	CBookmarkFolder &AllBookmarks, CBookmark &Bookmark) :
+	BookmarkTree *bookmarkTree, std::unique_ptr<BookmarkItem> bookmarkItem) :
 	CBaseDialog(hInstance, IDD_ADD_BOOKMARK, hParent, true),
 	m_expp(expp),
-	m_AllBookmarks(AllBookmarks),
-	m_Bookmark(Bookmark),
+	m_bookmarkTree(bookmarkTree),
+	m_bookmarkItem(std::move(bookmarkItem)),
 	m_ErrorBrush(CreateSolidBrush(ERROR_BACKGROUND_COLOR))
 {
 	m_pabdps = &CAddBookmarkDialogPersistentSettings::GetInstance();
@@ -32,8 +30,10 @@ CAddBookmarkDialog::CAddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplo
 	that. */
 	if(!m_pabdps->m_bInitialized)
 	{
-		m_pabdps->m_guidSelected = AllBookmarks.GetGUID();
-		m_pabdps->m_setExpansion.insert(AllBookmarks.GetGUID());
+		auto rootGuid = m_bookmarkTree->GetRoot()->GetGUID();
+
+		m_pabdps->m_guidSelected = rootGuid;
+		m_pabdps->m_setExpansion.insert(rootGuid);
 
 		m_pabdps->m_bInitialized = true;
 	}
@@ -41,18 +41,17 @@ CAddBookmarkDialog::CAddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplo
 
 INT_PTR CAddBookmarkDialog::OnInitDialog()
 {
-	SetDlgItemText(m_hDlg,IDC_BOOKMARK_NAME,m_Bookmark.GetName().c_str());
-	SetDlgItemText(m_hDlg,IDC_BOOKMARK_LOCATION,m_Bookmark.GetLocation().c_str());
+	SetDlgItemText(m_hDlg, IDC_BOOKMARK_NAME, m_bookmarkItem->GetName().c_str());
+	SetDlgItemText(m_hDlg, IDC_BOOKMARK_LOCATION, m_bookmarkItem->GetLocation().c_str());
 
-	if(m_Bookmark.GetName().size() == 0 ||
-		m_Bookmark.GetLocation().size() == 0)
+	if(m_bookmarkItem->GetName().empty() || m_bookmarkItem->GetLocation().empty())
 	{
 		EnableWindow(GetDlgItem(m_hDlg,IDOK),FALSE);
 	}
 
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
 
-	m_pBookmarkTreeView = new CBookmarkTreeView(hTreeView,GetInstance(),m_expp,&m_AllBookmarks,
+	m_pBookmarkTreeView = new CBookmarkTreeView(hTreeView,GetInstance(),m_expp,m_bookmarkTree,
 		m_pabdps->m_guidSelected,m_pabdps->m_setExpansion);
 
 	HWND hEditName = GetDlgItem(m_hDlg,IDC_BOOKMARK_NAME);
@@ -176,22 +175,23 @@ INT_PTR CAddBookmarkDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 void CAddBookmarkDialog::OnOk()
 {
 	HWND hName = GetDlgItem(m_hDlg,IDC_BOOKMARK_NAME);
-	std::wstring strName;
-	GetWindowString(hName,strName);
+	std::wstring name;
+	GetWindowString(hName,name);
 
 	HWND hLocation = GetDlgItem(m_hDlg,IDC_BOOKMARK_LOCATION);
-	std::wstring strLocation;
-	GetWindowString(hLocation,strLocation);
+	std::wstring location;
+	GetWindowString(hLocation,location);
 
-	if(strName.size() > 0 &&
-		strLocation.size() > 0)
+	if(!name.empty() && !location.empty())
 	{
 		HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
 		HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
-		CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
+		auto bookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
 
-		CBookmark Bookmark = CBookmark::Create(strName,strLocation,_T(""));
-		BookmarkFolder.InsertBookmark(Bookmark);
+		m_bookmarkItem->SetName(name);
+		m_bookmarkItem->SetLocation(location);
+
+		bookmarkFolder->AddChild(std::move(m_bookmarkItem));
 	}
 
 	EndDialog(m_hDlg,1);
@@ -216,8 +216,8 @@ void CAddBookmarkDialog::SaveTreeViewState()
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
 
 	HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
-	CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
-	m_pabdps->m_guidSelected = BookmarkFolder.GetGUID();
+	const auto bookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
+	m_pabdps->m_guidSelected = bookmarkFolder->GetGUID();
 
 	m_pabdps->m_setExpansion.clear();
 	SaveTreeViewExpansionState(hTreeView,TreeView_GetRoot(hTreeView));
@@ -229,8 +229,8 @@ void CAddBookmarkDialog::SaveTreeViewExpansionState(HWND hTreeView,HTREEITEM hIt
 
 	if(uState & TVIS_EXPANDED)
 	{
-		CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hItem);
-		m_pabdps->m_setExpansion.insert(BookmarkFolder.GetGUID());
+		const auto bookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hItem);
+		m_pabdps->m_setExpansion.insert(bookmarkFolder->GetGUID());
 
 		HTREEITEM hChild = TreeView_GetChild(hTreeView,hItem);
 		SaveTreeViewExpansionState(hTreeView,hChild);
@@ -253,40 +253,6 @@ INT_PTR CAddBookmarkDialog::OnNcDestroy()
 	delete m_pBookmarkTreeView;
 
 	return 0;
-}
-
-void CAddBookmarkDialog::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,
-	const CBookmark &Bookmark,std::size_t Position)
-{
-	UNREFERENCED_PARAMETER(ParentBookmarkFolder);
-	UNREFERENCED_PARAMETER(Bookmark);
-	UNREFERENCED_PARAMETER(Position);
-}
-
-void CAddBookmarkDialog::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,
-	const CBookmarkFolder &BookmarkFolder,std::size_t Position)
-{
-	m_pBookmarkTreeView->BookmarkFolderAdded(ParentBookmarkFolder,BookmarkFolder,Position);
-}
-
-void CAddBookmarkDialog::OnBookmarkModified(const std::wstring &guid)
-{
-	UNREFERENCED_PARAMETER(guid);
-}
-
-void CAddBookmarkDialog::OnBookmarkFolderModified(const std::wstring &guid)
-{
-	m_pBookmarkTreeView->BookmarkFolderModified(guid);
-}
-
-void CAddBookmarkDialog::OnBookmarkRemoved(const std::wstring &guid)
-{
-	UNREFERENCED_PARAMETER(guid);
-}
-
-void CAddBookmarkDialog::OnBookmarkFolderRemoved(const std::wstring &guid)
-{
-	m_pBookmarkTreeView->BookmarkFolderRemoved(guid);
 }
 
 CAddBookmarkDialogPersistentSettings::CAddBookmarkDialogPersistentSettings() :
