@@ -125,6 +125,15 @@ std::optional<size_t> BookmarkItem::GetChildIndex(const BookmarkItem *bookmarkIt
 	return itr - m_children.begin();
 }
 
+bool BookmarkItem::HasChildFolder() const
+{
+	auto itr = std::find_if(m_children.begin(), m_children.end(), [] (const auto &item) {
+		return item->IsFolder();
+	});
+
+	return (itr != m_children.end());
+}
+
 const std::vector<std::unique_ptr<BookmarkItem>> &BookmarkItem::GetChildren() const
 {
 	return m_children;
