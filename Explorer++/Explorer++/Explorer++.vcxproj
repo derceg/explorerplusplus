@@ -459,6 +459,7 @@
     <ClCompile Include="ApplicationToolbar.cpp" />
     <ClCompile Include="ApplicationToolbarButtonDialog.cpp" />
     <ClCompile Include="ApplicationToolbarDropHandler.cpp" />
+    <ClCompile Include="BookmarkTree.cpp" />
     <ClCompile Include="ShellBrowser\HistoryEntry.cpp" />
     <ClCompile Include="ShellBrowser\NavigationController.cpp" />
     <ClCompile Include="SortMenuHandler.cpp" />
@@ -603,6 +604,7 @@
     <ClInclude Include="BookmarkListView.h" />
     <ClInclude Include="BookmarkMenu.h" />
     <ClInclude Include="BookmarksToolbar.h" />
+    <ClInclude Include="BookmarkTree.h" />
     <ClInclude Include="BookmarkTreeView.h" />
     <ClInclude Include="ColorRuleDialog.h" />
     <ClInclude Include="ColorRuleHelper.h" />

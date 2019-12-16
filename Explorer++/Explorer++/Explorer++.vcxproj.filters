@@ -367,6 +367,9 @@
     <ClCompile Include="ShellBrowser\NavigationController.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="BookmarkTree.cpp">
+      <Filter>Bookmarks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -743,6 +746,9 @@
     </ClInclude>
     <ClInclude Include="ShellBrowser\PreservedHistoryEntry.h">
       <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="BookmarkTree.h">
+      <Filter>Bookmarks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

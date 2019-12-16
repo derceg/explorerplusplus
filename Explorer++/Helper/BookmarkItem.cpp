@@ -59,9 +59,19 @@ FILETIME BookmarkItem::GetDateCreated() const
 	return m_dateCreated;
 }
 
+void BookmarkItem::SetDateCreated(const FILETIME &dateCreated)
+{
+	m_dateCreated = dateCreated;
+}
+
 FILETIME BookmarkItem::GetDateModified() const
 {
 	return m_dateModified;
+}
+
+void BookmarkItem::SetDateModified(const FILETIME &dateModified)
+{
+	m_dateModified = dateModified;
 }
 
 void BookmarkItem::AddChild(std::unique_ptr<BookmarkItem> bookmarkItem)

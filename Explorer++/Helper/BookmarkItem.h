@@ -14,8 +14,8 @@ public:
 
 	enum class Type
 	{
-		Folder,
-		Bookmark
+		Folder = 0,
+		Bookmark = 1
 	};
 
 	BookmarkItem(std::optional<std::wstring> guid, std::wstring_view name,
@@ -31,7 +31,10 @@ public:
 	void SetLocation(std::wstring_view location);
 
 	FILETIME GetDateCreated() const;
+	void SetDateCreated(const FILETIME &dateCreated);
+
 	FILETIME GetDateModified() const;
+	void SetDateModified(const FILETIME &dateModified);
 
 	void AddChild(std::unique_ptr<BookmarkItem> bookmarkItem);
 	void AddChild(std::unique_ptr<BookmarkItem> bookmarkItem, size_t index);
