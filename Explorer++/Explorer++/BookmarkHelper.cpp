@@ -4,18 +4,14 @@
 
 #include "stdafx.h"
 #include "BookmarkHelper.h"
-#include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "../Helper/Macros.h"
 #include <algorithm>
-#include <stack>
 
-int CALLBACK SortByName(const VariantBookmark &BookmarkItem1,const VariantBookmark &BookmarkItem2);
-int CALLBACK SortByLocation(const VariantBookmark &BookmarkItem1,const VariantBookmark &BookmarkItem2);
-int CALLBACK SortByVisitDate(const VariantBookmark &BookmarkItem1,const VariantBookmark &BookmarkItem2);
-int CALLBACK SortByVisitCount(const VariantBookmark &BookmarkItem1,const VariantBookmark &BookmarkItem2);
-int CALLBACK SortByAdded(const VariantBookmark &BookmarkItem1,const VariantBookmark &BookmarkItem2);
-int CALLBACK SortByLastModified(const VariantBookmark &BookmarkItem1,const VariantBookmark &BookmarkItem2);
+int CALLBACK SortByName(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
+int CALLBACK SortByLocation(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
+int CALLBACK SortByDateAdded(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
+int CALLBACK SortByDateModified(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
 
 bool NBookmarkHelper::IsFolder(const std::unique_ptr<BookmarkItem> &bookmarkItem)
 {
@@ -51,16 +47,16 @@ VariantBookmark &NBookmarkHelper::GetBookmarkItem(CBookmarkFolder &ParentBookmar
 	return *itr;
 }
 
-int CALLBACK NBookmarkHelper::Sort(SortMode_t SortMode,const VariantBookmark &BookmarkItem1,
-	const VariantBookmark &BookmarkItem2)
+int CALLBACK NBookmarkHelper::Sort(SortMode_t SortMode, const BookmarkItem *firstItem,
+	const BookmarkItem *secondItem)
 {
-	if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
-		BookmarkItem2.type() == typeid(CBookmark))
+	if(firstItem->GetType() == BookmarkItem::Type::Folder &&
+		secondItem->GetType() == BookmarkItem::Type::Bookmark)
 	{
 		return -1;
 	}
-	else if(BookmarkItem1.type() == typeid(CBookmark) &&
-		BookmarkItem2.type() == typeid(CBookmarkFolder))
+	else if(firstItem->GetType() == BookmarkItem::Type::Bookmark &&
+		secondItem->GetType() == BookmarkItem::Type::Folder)
 	{
 		return 1;
 	}
@@ -71,27 +67,19 @@ int CALLBACK NBookmarkHelper::Sort(SortMode_t SortMode,const VariantBookmark &Bo
 		switch(SortMode)
 		{
 		case SM_NAME:
-			iRes = SortByName(BookmarkItem1,BookmarkItem2);
+			iRes = SortByName(firstItem,secondItem);
 			break;
 
 		case SM_LOCATION:
-			iRes = SortByLocation(BookmarkItem1,BookmarkItem2);
+			iRes = SortByLocation(firstItem,secondItem);
 			break;
 
-		case SM_VISIT_DATE:
-			iRes = SortByVisitDate(BookmarkItem1,BookmarkItem2);
+		case SM_DATE_ADDED:
+			iRes = SortByDateAdded(firstItem,secondItem);
 			break;
 
-		case SM_VISIT_COUNT:
-			iRes = SortByVisitCount(BookmarkItem1,BookmarkItem2);
-			break;
-
-		case SM_ADDED:
-			iRes = SortByAdded(BookmarkItem1,BookmarkItem2);
-			break;
-
-		case SM_LAST_MODIFIED:
-			iRes = SortByLastModified(BookmarkItem1,BookmarkItem2);
+		case SM_DATE_MODIFIED:
+			iRes = SortByDateModified(firstItem,secondItem);
 			break;
 
 		default:
@@ -103,128 +91,48 @@ int CALLBACK NBookmarkHelper::Sort(SortMode_t SortMode,const VariantBookmark &Bo
 	}
 }
 
-int CALLBACK SortByName(const VariantBookmark &BookmarkItem1,
-	const VariantBookmark &BookmarkItem2)
+int CALLBACK SortByName(const BookmarkItem *firstItem,
+	const BookmarkItem *secondItem)
 {
-	if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
-		BookmarkItem2.type() == typeid(CBookmarkFolder))
-	{
-		const CBookmarkFolder &BookmarkFolder1 = boost::get<CBookmarkFolder>(BookmarkItem1);
-		const CBookmarkFolder &BookmarkFolder2 = boost::get<CBookmarkFolder>(BookmarkItem2);
-
-		return BookmarkFolder1.GetName().compare(BookmarkFolder2.GetName());
-	}
-	else
-	{
-		const CBookmark &Bookmark1 = boost::get<CBookmark>(BookmarkItem1);
-		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem2);
-
-		return Bookmark1.GetName().compare(Bookmark2.GetName());
-	}
+	return firstItem->GetName().compare(secondItem->GetName());
 }
 
-int CALLBACK SortByLocation(const VariantBookmark &BookmarkItem1,
-	const VariantBookmark &BookmarkItem2)
+int CALLBACK SortByLocation(const BookmarkItem *firstItem,
+	const BookmarkItem *secondItem)
 {
-	if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
-		BookmarkItem2.type() == typeid(CBookmarkFolder))
+	if(firstItem->GetType() == BookmarkItem::Type::Folder &&
+		secondItem->GetType() == BookmarkItem::Type::Folder)
 	{
 		return 0;
 	}
+	else if (firstItem->GetType() == BookmarkItem::Type::Folder &&
+		secondItem->GetType() == BookmarkItem::Type::Bookmark)
+	{
+		return -1;
+	}
+	else if (firstItem->GetType() == BookmarkItem::Type::Bookmark &&
+		secondItem->GetType() == BookmarkItem::Type::Folder)
+	{
+		return 1;
+	}
 	else
 	{
-		const CBookmark &Bookmark1 = boost::get<CBookmark>(BookmarkItem1);
-		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem2);
-
-		return Bookmark1.GetLocation().compare(Bookmark2.GetLocation());
+		return firstItem->GetLocation().compare(secondItem->GetLocation());
 	}
 }
 
-int CALLBACK SortByVisitDate(const VariantBookmark &BookmarkItem1,
-	const VariantBookmark &BookmarkItem2)
+int CALLBACK SortByDateAdded(const BookmarkItem *firstItem,
+	const BookmarkItem *secondItem)
 {
-	if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
-		BookmarkItem2.type() == typeid(CBookmarkFolder))
-	{
-		return 0;
-	}
-	else
-	{
-		const CBookmark &Bookmark1 = boost::get<CBookmark>(BookmarkItem1);
-		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem2);
-
-		FILETIME ft1 = Bookmark1.GetDateLastVisited();
-		FILETIME ft2 = Bookmark2.GetDateLastVisited();
-
-		return CompareFileTime(&ft1,&ft2);
-	}
+	FILETIME firstItemDateCreated = firstItem->GetDateCreated();
+	FILETIME secondItemDateCreated = secondItem->GetDateCreated();
+	return CompareFileTime(&firstItemDateCreated, &secondItemDateCreated);
 }
 
-int CALLBACK SortByVisitCount(const VariantBookmark &BookmarkItem1,
-	const VariantBookmark &BookmarkItem2)
+int CALLBACK SortByDateModified(const BookmarkItem *firstItem,
+	const BookmarkItem *secondItem)
 {
-	if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
-		BookmarkItem2.type() == typeid(CBookmarkFolder))
-	{
-		return 0;
-	}
-	else
-	{
-		const CBookmark &Bookmark1 = boost::get<CBookmark>(BookmarkItem1);
-		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem2);
-
-		return Bookmark1.GetVisitCount() - Bookmark2.GetVisitCount();
-	}
-}
-
-int CALLBACK SortByAdded(const VariantBookmark &BookmarkItem1,
-	const VariantBookmark &BookmarkItem2)
-{
-	if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
-		BookmarkItem2.type() == typeid(CBookmarkFolder))
-	{
-		const CBookmarkFolder &BookmarkFolder1 = boost::get<CBookmarkFolder>(BookmarkItem1);
-		const CBookmarkFolder &BookmarkFolder2 = boost::get<CBookmarkFolder>(BookmarkItem2);
-
-		FILETIME ft1 = BookmarkFolder1.GetDateCreated();
-		FILETIME ft2 = BookmarkFolder2.GetDateCreated();
-
-		return CompareFileTime(&ft1,&ft2);
-	}
-	else
-	{
-		const CBookmark &Bookmark1 = boost::get<CBookmark>(BookmarkItem1);
-		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem2);
-
-		FILETIME ft1 = Bookmark1.GetDateCreated();
-		FILETIME ft2 = Bookmark2.GetDateCreated();
-
-		return CompareFileTime(&ft1,&ft2);
-	}
-}
-
-int CALLBACK SortByLastModified(const VariantBookmark &BookmarkItem1,
-	const VariantBookmark &BookmarkItem2)
-{
-	if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
-		BookmarkItem2.type() == typeid(CBookmarkFolder))
-	{
-		const CBookmarkFolder &BookmarkFolder1 = boost::get<CBookmarkFolder>(BookmarkItem1);
-		const CBookmarkFolder &BookmarkFolder2 = boost::get<CBookmarkFolder>(BookmarkItem2);
-
-		FILETIME ft1 = BookmarkFolder1.GetDateModified();
-		FILETIME ft2 = BookmarkFolder2.GetDateModified();
-
-		return CompareFileTime(&ft1,&ft2);
-	}
-	else
-	{
-		const CBookmark &Bookmark1 = boost::get<CBookmark>(BookmarkItem1);
-		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem2);
-
-		FILETIME ft1 = Bookmark1.GetDateModified();
-		FILETIME ft2 = Bookmark2.GetDateModified();
-
-		return CompareFileTime(&ft1,&ft2);
-	}
+	FILETIME firstItemDateModified = firstItem->GetDateModified();
+	FILETIME secondItemDateModified = secondItem->GetDateModified();
+	return CompareFileTime(&firstItemDateModified, &secondItemDateModified);
 }

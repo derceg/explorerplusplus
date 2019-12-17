@@ -6,12 +6,12 @@
 
 #include "BookmarkHelper.h"
 #include "BookmarkListView.h"
+#include "BookmarkTree.h"
 #include "BookmarkTreeView.h"
 #include "CoreInterface.h"
 #include "Navigation.h"
 #include "ResourceHelper.h"
 #include "../Helper/BaseDialog.h"
-#include "../Helper/Bookmark.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
 #include <stack>
@@ -33,10 +33,8 @@ private:
 	{
 		COLUMN_TYPE_NAME = 1,
 		COLUMN_TYPE_LOCATION = 2,
-		COLUMN_TYPE_VISIT_DATE = 3,
-		COLUMN_TYPE_VISIT_COUNT = 4,
-		COLUMN_TYPE_ADDED = 5,
-		COLUMN_TYPE_LAST_MODIFIED = 6
+		COLUMN_TYPE_DATE_CREATED = 3,
+		COLUMN_TYPE_DATE_MODIFIED = 4
 	};
 
 	struct ColumnInfo_t
@@ -71,17 +69,13 @@ class CManageBookmarksDialog : public CBaseDialog
 public:
 
 	CManageBookmarksDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp,
-		Navigation *navigation, CBookmarkFolder &AllBookmarks);
+		Navigation *navigation, BookmarkTree *bookmarkTree);
 	~CManageBookmarksDialog();
 
 	int CALLBACK		SortBookmarks(LPARAM lParam1,LPARAM lParam2);
 
-	void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position);
-	void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
-	void	OnBookmarkModified(const std::wstring &guid);
-	void	OnBookmarkFolderModified(const std::wstring &guid);
-	void	OnBookmarkRemoved(const std::wstring &guid);
-	void	OnBookmarkFolderRemoved(const std::wstring &guid);
+	// TODO: Update.
+	//void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
 
 protected:
 
@@ -112,13 +106,16 @@ private:
 	void		SortListViewItems(NBookmarkHelper::SortMode_t SortMode);
 
 	void		GetColumnString(CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,UINT cchBuf);
-	void		GetBookmarkItemColumnInfo(const VariantBookmark &variantBookmark, CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType, TCHAR *szColumn, size_t cchBuf);
-	void		GetBookmarkColumnInfo(const CBookmark &Bookmark,CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf);
-	void		GetBookmarkFolderColumnInfo(const CBookmarkFolder &BookmarkFolder,CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf);
+	void		GetBookmarkItemColumnInfo(const BookmarkItem *bookmarkItem,
+		CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType, TCHAR *szColumn, size_t cchBuf);
+	void		GetBookmarkColumnInfo(const BookmarkItem *bookmarkItem,
+		CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType, TCHAR *szColumn, size_t cchBuf);
+	void		GetBookmarkFolderColumnInfo(const BookmarkItem *bookmarkItem,
+		CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType, TCHAR *szColumn, size_t cchBuf);
 
 	void		BrowseBack();
 	void		BrowseForward();
-	void		BrowseBookmarkFolder(const CBookmarkFolder &BookmarkFolder);
+	void		BrowseBookmarkFolder(BookmarkItem *bookmarkItem);
 
 	void		UpdateToolbarState();
 
@@ -150,7 +147,7 @@ private:
 	IExplorerplusplus *m_pexpp;
 	Navigation *m_navigation;
 
-	CBookmarkFolder &m_AllBookmarks;
+	BookmarkTree *m_bookmarkTree;
 
 	std::wstring m_guidCurrentFolder;
 

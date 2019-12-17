@@ -15,18 +15,18 @@
 
 namespace NManageBookmarksDialog
 {
-	int CALLBACK		SortBookmarksStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+	int CALLBACK SortBookmarksStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
 }
 
 const TCHAR CManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
 CManageBookmarksDialog::CManageBookmarksDialog(HINSTANCE hInstance, HWND hParent,
-	IExplorerplusplus *pexpp, Navigation *navigation, CBookmarkFolder &AllBookmarks) :
+	IExplorerplusplus *pexpp, Navigation *navigation, BookmarkTree *bookmarkTree) :
 	CBaseDialog(hInstance, IDD_MANAGE_BOOKMARKS, hParent, true),
 	m_pexpp(pexpp),
 	m_navigation(navigation),
-	m_AllBookmarks(AllBookmarks),
-	m_guidCurrentFolder(AllBookmarks.GetGUID()),
+	m_bookmarkTree(bookmarkTree),
+	m_guidCurrentFolder(bookmarkTree->GetRoot()->GetGUID()),
 	m_bNewFolderAdded(false),
 	m_bListViewInitialized(false),
 	m_bSaveHistory(true)
@@ -35,8 +35,10 @@ CManageBookmarksDialog::CManageBookmarksDialog(HINSTANCE hInstance, HWND hParent
 
 	if(!m_pmbdps->m_bInitialized)
 	{
-		m_pmbdps->m_guidSelected = AllBookmarks.GetGUID();
-		m_pmbdps->m_setExpansion.insert(AllBookmarks.GetGUID());
+		auto rootGuid = bookmarkTree->GetRoot()->GetGUID();
+
+		m_pmbdps->m_guidSelected = rootGuid;
+		m_pmbdps->m_setExpansion.insert(rootGuid);
 
 		m_pmbdps->m_bInitialized = true;
 	}
@@ -146,10 +148,10 @@ void CManageBookmarksDialog::SetupToolbar()
 
 void CManageBookmarksDialog::SetupTreeView()
 {
-	HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
+	HWND hTreeView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW);
 
-	m_pBookmarkTreeView = new CBookmarkTreeView(hTreeView,GetInstance(),m_pexpp,&m_AllBookmarks,
-		m_pmbdps->m_guidSelected,m_pmbdps->m_setExpansion);
+	m_pBookmarkTreeView = new CBookmarkTreeView(hTreeView, GetInstance(), m_pexpp, m_bookmarkTree,
+		m_pmbdps->m_guidSelected, m_pmbdps->m_setExpansion);
 }
 
 void CManageBookmarksDialog::SetupListView()
@@ -177,13 +179,13 @@ void CManageBookmarksDialog::SetupListView()
 		}
 	}
 
-	m_pBookmarkListView->InsertBookmarksIntoListView(m_AllBookmarks);
+	m_pBookmarkListView->InsertBookmarksIntoListView(m_bookmarkTree->GetRoot());
 
 	int iItem = 0;
 
 	/* Update the data for each of the sub-items. */
 	/* TODO: This needs to be done by CBookmarkListView. */
-	for(auto itr = m_AllBookmarks.begin();itr != m_AllBookmarks.end();++itr)
+	for(const auto &childItem : m_bookmarkTree->GetRoot()->GetChildren())
 	{
 		int iSubItem = 1;
 
@@ -194,7 +196,7 @@ void CManageBookmarksDialog::SetupListView()
 			if(ci.bActive && ci.ColumnType != CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_NAME)
 			{
 				TCHAR szColumn[256];
-				GetBookmarkItemColumnInfo(*itr,ci.ColumnType,szColumn,SIZEOF_ARRAY(szColumn));
+				GetBookmarkItemColumnInfo(childItem.get(),ci.ColumnType,szColumn,SIZEOF_ARRAY(szColumn));
 				ListView_SetItemText(hListView,iItem,iSubItem,szColumn);
 
 				++iSubItem;
@@ -230,16 +232,12 @@ int CALLBACK NManageBookmarksDialog::SortBookmarksStub(LPARAM lParam1,LPARAM lPa
 
 int CALLBACK CManageBookmarksDialog::SortBookmarks(LPARAM lParam1,LPARAM lParam2)
 {
-	HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
-	HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
-	CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
+	auto firstItem = m_pBookmarkListView->GetBookmarkItemFromListViewlParam(lParam1);
+	auto secondItem = m_pBookmarkListView->GetBookmarkItemFromListViewlParam(lParam2);
 
-	const VariantBookmark &variantBookmark1 = m_pBookmarkListView->GetBookmarkItemFromListViewlParam(BookmarkFolder,lParam1);
-	const VariantBookmark &variantBookmark2 = m_pBookmarkListView->GetBookmarkItemFromListViewlParam(BookmarkFolder,lParam2);
+	int iRes = NBookmarkHelper::Sort(m_pmbdps->m_SortMode, firstItem, secondItem);
 
-	int iRes = NBookmarkHelper::Sort(m_pmbdps->m_SortMode,variantBookmark1,variantBookmark2);
-
-	if(!m_pmbdps->m_bSortAscending)
+	if (!m_pmbdps->m_bSortAscending)
 	{
 		iRes = -iRes;
 	}
@@ -301,20 +299,12 @@ INT_PTR CManageBookmarksDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 		SortListViewItems(NBookmarkHelper::SM_LOCATION);
 		break;
 
-	case IDM_MB_VIEW_SORTBYVISITDATE:
-		SortListViewItems(NBookmarkHelper::SM_VISIT_DATE);
-		break;
-
-	case IDM_MB_VIEW_SORTBYVISITCOUNT:
-		SortListViewItems(NBookmarkHelper::SM_VISIT_COUNT);
-		break;
-
 	case IDM_MB_VIEW_SORTBYADDED:
-		SortListViewItems(NBookmarkHelper::SM_ADDED);
+		SortListViewItems(NBookmarkHelper::SM_DATE_ADDED);
 		break;
 
 	case IDM_MB_VIEW_SORTBYLASTMODIFIED:
-		SortListViewItems(NBookmarkHelper::SM_LAST_MODIFIED);
+		SortListViewItems(NBookmarkHelper::SM_DATE_MODIFIED);
 		break;
 
 	case IDM_MB_VIEW_SORTASCENDING:
@@ -384,24 +374,23 @@ INT_PTR CManageBookmarksDialog::OnNotify(NMHDR *pnmhdr)
 
 void CManageBookmarksDialog::OnNewFolder()
 {
-	TCHAR szTemp[64];
-	LoadString(GetInstance(),IDS_BOOKMARKS_NEWBOOKMARKFOLDER,szTemp,SIZEOF_ARRAY(szTemp));
-	CBookmarkFolder NewBookmarkFolder = CBookmarkFolder::Create(szTemp);
+	std::wstring newBookmarkFolderName = ResourceHelper::LoadString(GetInstance(), IDS_BOOKMARKS_NEWBOOKMARKFOLDER);
+	auto newBookmarkFolder = std::make_unique<BookmarkItem>(std::nullopt, newBookmarkFolderName, std::nullopt);
 
 	/* Save the folder GUID, so that it can be selected and
 	placed into edit mode once the bookmark notification
 	comes through. */
 	m_bNewFolderAdded = true;
-	m_guidNewFolder = NewBookmarkFolder.GetGUID();
+	m_guidNewFolder = newBookmarkFolder->GetGUID();
 
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
 	HTREEITEM hSelectedItem = TreeView_GetSelection(hTreeView);
 
 	assert(hSelectedItem != NULL);
 
-	CBookmarkFolder &ParentBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(
+	auto bookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(
 		hSelectedItem);
-	ParentBookmarkFolder.InsertBookmarkFolder(NewBookmarkFolder);
+	bookmarkFolder->AddChild(std::move(newBookmarkFolder));
 }
 
 void CManageBookmarksDialog::OnDeleteBookmark(const std::wstring &guid)
@@ -506,14 +495,14 @@ void CManageBookmarksDialog::OnListViewHeaderRClick()
 
 				HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
 				HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
-				CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
+				const auto bookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
 
 				int iBookmarkItem = 0;
 
-				for(auto itrBookmarks = BookmarkFolder.begin();itrBookmarks != BookmarkFolder.end();++itrBookmarks)
+				for(auto &childItem : bookmarkFolder->GetChildren())
 				{
 					TCHAR szColumn[256];
-					GetBookmarkItemColumnInfo(*itrBookmarks,itr->ColumnType,szColumn,SIZEOF_ARRAY(szColumn));
+					GetBookmarkItemColumnInfo(childItem.get(),itr->ColumnType,szColumn,SIZEOF_ARRAY(szColumn));
 					ListView_SetItemText(hListView,iBookmarkItem,iColumn,szColumn);
 
 					++iBookmarkItem;
@@ -539,25 +528,8 @@ BOOL CManageBookmarksDialog::OnLvnEndLabelEdit(NMLVDISPINFO *pnmlvdi)
 	if(pnmlvdi->item.pszText != NULL &&
 		lstrlen(pnmlvdi->item.pszText) > 0)
 	{
-		HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
-		HTREEITEM hSelectedItem = TreeView_GetSelection(hTreeView);
-
-		assert(hSelectedItem != NULL);
-
-		CBookmarkFolder &ParentBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelectedItem);
-		VariantBookmark &variantBookmark = m_pBookmarkListView->GetBookmarkItemFromListView(
-			ParentBookmarkFolder,pnmlvdi->item.iItem);
-
-		if(variantBookmark.type() == typeid(CBookmarkFolder))
-		{
-			CBookmarkFolder &BookmarkFolder = boost::get<CBookmarkFolder>(variantBookmark);
-			BookmarkFolder.SetName(pnmlvdi->item.pszText);
-		}
-		else if(variantBookmark.type() == typeid(CBookmark))
-		{
-			CBookmark &Bookmark = boost::get<CBookmark>(variantBookmark);
-			Bookmark.SetName(pnmlvdi->item.pszText);
-		}
+		auto bookmarkItem = m_pBookmarkListView->GetBookmarkItemFromListView(pnmlvdi->item.iItem);
+		bookmarkItem->SetName(pnmlvdi->item.pszText);
 
 		SetWindowLongPtr(m_hDlg,DWLP_MSGRESULT,TRUE);
 		return TRUE;
@@ -621,19 +593,11 @@ void CManageBookmarksDialog::GetColumnString(CManageBookmarksDialogPersistentSet
 		uResourceID = IDS_MANAGE_BOOKMARKS_COLUMN_LOCATION;
 		break;
 
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_VISIT_DATE:
-		uResourceID = IDS_MANAGE_BOOKMARKS_COLUMN_VISIT_DATE;
-		break;
-
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_VISIT_COUNT:
-		uResourceID = IDS_MANAGE_BOOKMARKS_COLUMN_VISIT_COUNT;
-		break;
-
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_ADDED:
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_DATE_CREATED:
 		uResourceID = IDS_MANAGE_BOOKMARKS_COLUMN_ADDED;
 		break;
 
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_LAST_MODIFIED:
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_DATE_MODIFIED:
 		uResourceID = IDS_MANAGE_BOOKMARKS_COLUMN_LAST_MODIFIED;
 		break;
 
@@ -645,60 +609,45 @@ void CManageBookmarksDialog::GetColumnString(CManageBookmarksDialogPersistentSet
 	LoadString(GetInstance(),uResourceID,szColumn,cchBuf);
 }
 
-void CManageBookmarksDialog::GetBookmarkItemColumnInfo(const VariantBookmark &variantBookmark,
-	CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf)
+void CManageBookmarksDialog::GetBookmarkItemColumnInfo(const BookmarkItem *bookmarkItem,
+	CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType, TCHAR *szColumn, size_t cchBuf)
 {
-	if(variantBookmark.type() == typeid(CBookmarkFolder))
+	if(bookmarkItem->IsFolder())
 	{
-		const CBookmarkFolder &BookmarkFolder = boost::get<CBookmarkFolder>(variantBookmark);
-		GetBookmarkFolderColumnInfo(BookmarkFolder,ColumnType,szColumn,cchBuf);
+		GetBookmarkFolderColumnInfo(bookmarkItem,ColumnType,szColumn,cchBuf);
 	}
 	else
 	{
-		const CBookmark &Bookmark = boost::get<CBookmark>(variantBookmark);
-		GetBookmarkColumnInfo(Bookmark,ColumnType,szColumn,cchBuf);
+		GetBookmarkColumnInfo(bookmarkItem,ColumnType,szColumn,cchBuf);
 	}
 }
 
-void CManageBookmarksDialog::GetBookmarkColumnInfo(const CBookmark &Bookmark,
-	CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,
-	TCHAR *szColumn,size_t cchBuf)
+void CManageBookmarksDialog::GetBookmarkColumnInfo(const BookmarkItem *bookmarkItem,
+	CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType, TCHAR *szColumn, size_t cchBuf)
 {
 	switch(ColumnType)
 	{
 	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_NAME:
-		StringCchCopy(szColumn,cchBuf,Bookmark.GetName().c_str());
+		StringCchCopy(szColumn,cchBuf, bookmarkItem->GetName().c_str());
 		break;
 
 	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_LOCATION:
-		StringCchCopy(szColumn,cchBuf,Bookmark.GetLocation().c_str());
+		StringCchCopy(szColumn,cchBuf, bookmarkItem->GetLocation().c_str());
 		break;
 
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_VISIT_DATE:
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_DATE_CREATED:
 		{
 			/* TODO: Friendly dates. */
-			FILETIME ftLastVisited = Bookmark.GetDateLastVisited();
-			CreateFileTimeString(&ftLastVisited,szColumn,static_cast<int>(cchBuf),FALSE);
+			FILETIME dateCreated = bookmarkItem->GetDateCreated();
+			CreateFileTimeString(&dateCreated, szColumn, static_cast<int>(cchBuf), FALSE);
 		}
 		break;
 
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_VISIT_COUNT:
-		StringCchPrintf(szColumn,cchBuf,_T("%d"),Bookmark.GetVisitCount());
-		break;
-
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_ADDED:
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_DATE_MODIFIED:
 		{
 			/* TODO: Friendly dates. */
-			FILETIME ftCreated = Bookmark.GetDateCreated();
-			CreateFileTimeString(&ftCreated,szColumn,static_cast<int>(cchBuf),FALSE);
-		}
-		break;
-
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_LAST_MODIFIED:
-		{
-			/* TODO: Friendly dates. */
-			FILETIME ftModified = Bookmark.GetDateModified();
-			CreateFileTimeString(&ftModified,szColumn,static_cast<int>(cchBuf),FALSE);
+			FILETIME dateModified = bookmarkItem->GetDateModified();
+			CreateFileTimeString(&dateModified, szColumn, static_cast<int>(cchBuf), FALSE);
 		}
 		break;
 
@@ -708,40 +657,32 @@ void CManageBookmarksDialog::GetBookmarkColumnInfo(const CBookmark &Bookmark,
 	}
 }
 
-void CManageBookmarksDialog::GetBookmarkFolderColumnInfo(const CBookmarkFolder &BookmarkFolder,
-	CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf)
+void CManageBookmarksDialog::GetBookmarkFolderColumnInfo(const BookmarkItem *bookmarkItem,
+	CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType, TCHAR *szColumn, size_t cchBuf)
 {
 	switch(ColumnType)
 	{
 	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_NAME:
-		StringCchCopy(szColumn,cchBuf,BookmarkFolder.GetName().c_str());
+		StringCchCopy(szColumn,cchBuf, bookmarkItem->GetName().c_str());
 		break;
 
 	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_LOCATION:
 		StringCchCopy(szColumn,cchBuf,EMPTY_STRING);
 		break;
 
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_VISIT_DATE:
-		StringCchCopy(szColumn,cchBuf,EMPTY_STRING);
-		break;
-
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_VISIT_COUNT:
-		StringCchCopy(szColumn,cchBuf,EMPTY_STRING);
-		break;
-
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_ADDED:
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_DATE_CREATED:
 		{
 			/* TODO: Friendly dates. */
-			FILETIME ftCreated = BookmarkFolder.GetDateCreated();
-			CreateFileTimeString(&ftCreated,szColumn,static_cast<int>(cchBuf),FALSE);
+			FILETIME dateCreated = bookmarkItem->GetDateCreated();
+			CreateFileTimeString(&dateCreated, szColumn, static_cast<int>(cchBuf), FALSE);
 		}
 		break;
 
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_LAST_MODIFIED:
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_DATE_MODIFIED:
 		{
 			/* TODO: Friendly dates. */
-			FILETIME ftModified = BookmarkFolder.GetDateModified();
-			CreateFileTimeString(&ftModified,szColumn,static_cast<int>(cchBuf),FALSE);
+			FILETIME dateModified = bookmarkItem->GetDateModified();
+			CreateFileTimeString(&dateModified, szColumn, static_cast<int>(cchBuf), FALSE);
 		}
 		break;
 
@@ -795,19 +736,11 @@ void CManageBookmarksDialog::ShowViewMenu()
 		uCheck = IDM_MB_VIEW_SORTBYLOCATION;
 		break;
 
-	case NBookmarkHelper::SM_VISIT_DATE:
-		uCheck = IDM_MB_VIEW_SORTBYVISITDATE;
-		break;
-
-	case NBookmarkHelper::SM_VISIT_COUNT:
-		uCheck = IDM_MB_VIEW_SORTBYVISITCOUNT;
-		break;
-
-	case NBookmarkHelper::SM_ADDED:
+	case NBookmarkHelper::SM_DATE_ADDED:
 		uCheck = IDM_MB_VIEW_SORTBYADDED;
 		break;
 
-	case NBookmarkHelper::SM_LAST_MODIFIED:
+	case NBookmarkHelper::SM_DATE_MODIFIED:
 		uCheck = IDM_MB_VIEW_SORTBYLASTMODIFIED;
 		break;
 	}
@@ -859,14 +792,14 @@ void CManageBookmarksDialog::OnTvnSelChanged(NMTREEVIEW *pnmtv)
 		return;
 	}
 
-	CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(pnmtv->itemNew.hItem);
+	auto bookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(pnmtv->itemNew.hItem);
 
-	if(BookmarkFolder.GetGUID() == m_guidCurrentFolder)
+	if(bookmarkFolder->GetGUID() == m_guidCurrentFolder)
 	{
 		return;
 	}
 
-	BrowseBookmarkFolder(BookmarkFolder);
+	BrowseBookmarkFolder(bookmarkFolder);
 }
 
 void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)
@@ -882,26 +815,20 @@ void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)
 			return;
 		}
 
-		HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
-		HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
-		CBookmarkFolder &ParentBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
-		const VariantBookmark &variantBookmark = m_pBookmarkListView->GetBookmarkItemFromListView(
-			ParentBookmarkFolder,pnmia->iItem);
+		auto bookmarkItem = m_pBookmarkListView->GetBookmarkItemFromListView(pnmia->iItem);
 
-		if(variantBookmark.type() == typeid(CBookmarkFolder))
+		if(bookmarkItem->IsFolder())
 		{
-			const CBookmarkFolder &BookmarkFolder = boost::get<CBookmarkFolder>(variantBookmark);
-			BrowseBookmarkFolder(BookmarkFolder);
+			BrowseBookmarkFolder(bookmarkItem);
 		}
-		else if(variantBookmark.type() == typeid(CBookmark))
+		else
 		{
-			const CBookmark &Bookmark = boost::get<CBookmark>(variantBookmark);
-			m_navigation->BrowseFolderInCurrentTab(Bookmark.GetLocation().c_str());
+			m_navigation->BrowseFolderInCurrentTab(bookmarkItem->GetLocation().c_str());
 		}
 	}
 }
 
-void CManageBookmarksDialog::BrowseBookmarkFolder(const CBookmarkFolder &BookmarkFolder)
+void CManageBookmarksDialog::BrowseBookmarkFolder(BookmarkItem *bookmarkItem)
 {
 	/* Temporary flag used to indicate whether history should
 	be saved. It will be reset each time a folder is browsed. */
@@ -912,9 +839,9 @@ void CManageBookmarksDialog::BrowseBookmarkFolder(const CBookmarkFolder &Bookmar
 
 	m_bSaveHistory = true;
 
-	m_guidCurrentFolder = BookmarkFolder.GetGUID();
-	m_pBookmarkTreeView->SelectFolder(BookmarkFolder.GetGUID());
-	m_pBookmarkListView->InsertBookmarksIntoListView(BookmarkFolder);
+	m_guidCurrentFolder = bookmarkItem->GetGUID();
+	m_pBookmarkTreeView->SelectFolder(bookmarkItem->GetGUID());
+	m_pBookmarkListView->InsertBookmarksIntoListView(bookmarkItem);
 
 	UpdateToolbarState();
 }
@@ -955,63 +882,27 @@ void CManageBookmarksDialog::UpdateToolbarState()
 	SendMessage(m_hToolbar,TB_ENABLEBUTTON,TOOLBAR_ID_FORWARD,m_stackForward.size() != 0);
 }
 
-void CManageBookmarksDialog::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,
-	const CBookmark &Bookmark,std::size_t Position)
-{
-	if(ParentBookmarkFolder.GetGUID() == m_guidCurrentFolder)
-	{
-		m_pBookmarkListView->InsertBookmarkIntoListView(Bookmark,static_cast<int>(Position));
-	}
-}
-
-void CManageBookmarksDialog::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,
-	const CBookmarkFolder &BookmarkFolder,std::size_t Position)
-{
-	m_pBookmarkTreeView->BookmarkFolderAdded(ParentBookmarkFolder,BookmarkFolder,Position);
-
-	if(ParentBookmarkFolder.GetGUID() == m_guidCurrentFolder)
-	{
-		int iItem = m_pBookmarkListView->InsertBookmarkFolderIntoListView(BookmarkFolder,static_cast<int>(Position));
-
-		if(BookmarkFolder.GetGUID() == m_guidNewFolder)
-		{
-			HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
-
-			SetFocus(hListView);
-			NListView::ListView_SelectAllItems(hListView,FALSE);
-			NListView::ListView_SelectItem(hListView,iItem,TRUE);
-			ListView_EditLabel(hListView,iItem);
-
-			m_bNewFolderAdded = false;
-		}
-	}
-}
-
-void CManageBookmarksDialog::OnBookmarkModified(const std::wstring &guid)
-{
-	UNREFERENCED_PARAMETER(guid);
-
-	/* TODO: Notify listview if necessary. */
-}
-
-void CManageBookmarksDialog::OnBookmarkFolderModified(const std::wstring &guid)
-{
-	m_pBookmarkTreeView->BookmarkFolderModified(guid);
-}
-
-void CManageBookmarksDialog::OnBookmarkRemoved(const std::wstring &guid)
-{
-	UNREFERENCED_PARAMETER(guid);
-
-	/* TODO: Notify listview if necessary. */
-}
-
-void CManageBookmarksDialog::OnBookmarkFolderRemoved(const std::wstring &guid)
-{
-	m_pBookmarkTreeView->BookmarkFolderRemoved(guid);
-
-	/* TODO: Remove the deleted folder from the history list. */
-}
+// TODO: Update.
+//void CManageBookmarksDialog::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,
+//	const CBookmarkFolder &BookmarkFolder,std::size_t Position)
+//{
+//	if(ParentBookmarkFolder.GetGUID() == m_guidCurrentFolder)
+//	{
+//		int iItem = m_pBookmarkListView->InsertBookmarkFolderIntoListView(BookmarkFolder,static_cast<int>(Position));
+//
+//		if(BookmarkFolder.GetGUID() == m_guidNewFolder)
+//		{
+//			HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
+//
+//			SetFocus(hListView);
+//			NListView::ListView_SelectAllItems(hListView,FALSE);
+//			NListView::ListView_SelectItem(hListView,iItem,TRUE);
+//			ListView_EditLabel(hListView,iItem);
+//
+//			m_bNewFolderAdded = false;
+//		}
+//	}
+//}
 
 void CManageBookmarksDialog::OnRClick(NMHDR *pnmhdr)
 {
@@ -1075,10 +966,10 @@ void CManageBookmarksDialog::SaveState()
 }
 
 CManageBookmarksDialogPersistentSettings::CManageBookmarksDialogPersistentSettings() :
-m_bInitialized(false),
-m_SortMode(NBookmarkHelper::SM_NAME),
-m_bSortAscending(true),
-CDialogSettings(SETTINGS_KEY)
+	m_bInitialized(false),
+	m_SortMode(NBookmarkHelper::SM_NAME),
+	m_bSortAscending(true),
+	CDialogSettings(SETTINGS_KEY)
 {
 	SetupDefaultColumns();
 
@@ -1105,22 +996,12 @@ void CManageBookmarksDialogPersistentSettings::SetupDefaultColumns()
 	ci.bActive		= TRUE;
 	m_vectorColumnInfo.push_back(ci);
 
-	ci.ColumnType	= COLUMN_TYPE_VISIT_DATE;
+	ci.ColumnType	= COLUMN_TYPE_DATE_CREATED;
 	ci.iWidth		= DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
 	ci.bActive		= FALSE;
 	m_vectorColumnInfo.push_back(ci);
 
-	ci.ColumnType	= COLUMN_TYPE_VISIT_COUNT;
-	ci.iWidth		= DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
-	ci.bActive		= FALSE;
-	m_vectorColumnInfo.push_back(ci);
-
-	ci.ColumnType	= COLUMN_TYPE_ADDED;
-	ci.iWidth		= DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
-	ci.bActive		= FALSE;
-	m_vectorColumnInfo.push_back(ci);
-
-	ci.ColumnType	= COLUMN_TYPE_LAST_MODIFIED;
+	ci.ColumnType	= COLUMN_TYPE_DATE_MODIFIED;
 	ci.iWidth		= DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
 	ci.bActive		= FALSE;
 	m_vectorColumnInfo.push_back(ci);

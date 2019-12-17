@@ -13,10 +13,8 @@ namespace NBookmarkHelper
 	{
 		SM_NAME = 1,
 		SM_LOCATION = 2,
-		SM_VISIT_DATE = 3,
-		SM_VISIT_COUNT = 4,
-		SM_ADDED = 5,
-		SM_LAST_MODIFIED = 6
+		SM_DATE_ADDED = 3,
+		SM_DATE_MODIFIED = 4
 	};
 
 	/* These GUID's are statically defined, so that they will
@@ -28,7 +26,7 @@ namespace NBookmarkHelper
 	bool IsFolder(const std::unique_ptr<BookmarkItem> &bookmarkItem);
 	bool IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem);
 
-	int CALLBACK Sort(SortMode_t SortMode, const VariantBookmark &BookmarkItem1, const VariantBookmark &BookmarkItem2);
+	int CALLBACK Sort(SortMode_t SortMode, const BookmarkItem *firstItem, const BookmarkItem *secondItem);
 
 	VariantBookmark &GetBookmarkItem(CBookmarkFolder &ParentBookmarkFolder, const std::wstring &guid);
 }
