@@ -5,11 +5,11 @@
 #pragma once
 
 #include "BookmarkHelper.h"
+#include "BookmarkItem.h"
 #include "BookmarkTree.h"
 #include "BookmarkTreeView.h"
 #include "CoreInterface.h"
 #include "../Helper/BaseDialog.h"
-#include "../Helper/BookmarkItem.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
 #include <wil/resource.h>

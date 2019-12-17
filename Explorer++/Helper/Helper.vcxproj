@@ -282,7 +282,6 @@
     <ClCompile Include="BaseDialog.cpp" />
     <ClCompile Include="BaseWindow.cpp" />
     <ClCompile Include="Bookmark.cpp" />
-    <ClCompile Include="BookmarkItem.cpp" />
     <ClCompile Include="CachedIcons.cpp" />
     <ClCompile Include="ComboBox.cpp" />
     <ClCompile Include="ComboBoxHelper.cpp" />
@@ -348,7 +347,6 @@
     <ClInclude Include="BaseDialog.h" />
     <ClInclude Include="BaseWindow.h" />
     <ClInclude Include="Bookmark.h" />
-    <ClInclude Include="BookmarkItem.h" />
     <ClInclude Include="CachedIcons.h" />
     <ClInclude Include="ComboBox.h" />
     <ClInclude Include="ComboBoxHelper.h" />

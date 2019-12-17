@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "BookmarkItem.h"
-#include "Helper.h"
+#include "../Helper/Helper.h"
 
 BookmarkItem::BookmarkItem(std::optional<std::wstring> guid, std::wstring_view name,
 	std::optional<std::wstring> location) :

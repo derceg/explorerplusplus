@@ -370,6 +370,9 @@
     <ClCompile Include="BookmarkTree.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
+    <ClCompile Include="BookmarkItem.cpp">
+      <Filter>Bookmarks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -748,6 +751,9 @@
       <Filter>ShellBrowser</Filter>
     </ClInclude>
     <ClInclude Include="BookmarkTree.h">
+      <Filter>Bookmarks</Filter>
+    </ClInclude>
+    <ClInclude Include="BookmarkItem.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
   </ItemGroup>

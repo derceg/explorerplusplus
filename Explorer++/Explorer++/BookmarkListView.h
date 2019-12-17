@@ -5,10 +5,10 @@
 #pragma once
 
 #include "BookmarkHelper.h"
+#include "BookmarkItem.h"
 #include "BookmarkTree.h"
 #include "CoreInterface.h"
 #include "ResourceHelper.h"
-#include "../Helper/BookmarkItem.h"
 #include "../Helper/DpiCompatibility.h"
 #include <wil/resource.h>
 

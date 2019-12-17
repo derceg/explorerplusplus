@@ -127,9 +127,6 @@
     <ClCompile Include="IconFetcher.cpp">
       <Filter>Shell</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkItem.cpp">
-      <Filter>Bookmarks</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
@@ -266,9 +263,6 @@
     </ClInclude>
     <ClInclude Include="IconFetcher.h">
       <Filter>Shell</Filter>
-    </ClInclude>
-    <ClInclude Include="BookmarkItem.h">
-      <Filter>Bookmarks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

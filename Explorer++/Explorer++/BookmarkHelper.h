@@ -4,8 +4,7 @@
 
 #pragma once
 
-#include "../Helper/Bookmark.h"
-#include "../Helper/BookmarkItem.h"
+#include "BookmarkItem.h"
 
 namespace NBookmarkHelper
 {
