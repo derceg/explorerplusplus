@@ -8,7 +8,6 @@
 #include "CoreInterface.h"
 #include "Navigation.h"
 #include "ResourceHelper.h"
-#include "../Helper/Bookmark.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <wil/resource.h>

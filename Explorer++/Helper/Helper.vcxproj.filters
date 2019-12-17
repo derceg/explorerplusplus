@@ -52,9 +52,6 @@
     <ClCompile Include="SetDefaultFileManager.cpp">
       <Filter>Shell\Shell Integration</Filter>
     </ClCompile>
-    <ClCompile Include="Bookmark.cpp">
-      <Filter>Bookmarks</Filter>
-    </ClCompile>
     <ClCompile Include="DropHandler.cpp">
       <Filter>Drag and Drop</Filter>
     </ClCompile>
@@ -152,9 +149,6 @@
     </ClInclude>
     <ClInclude Include="StatusBar.h">
       <Filter>Control Support</Filter>
-    </ClInclude>
-    <ClInclude Include="Bookmark.h">
-      <Filter>Bookmarks</Filter>
     </ClInclude>
     <ClInclude Include="DropHandler.h">
       <Filter>Drag and Drop</Filter>
@@ -280,9 +274,6 @@
     </Filter>
     <Filter Include="Shell\Shell Integration">
       <UniqueIdentifier>{91c6f3d8-5038-415b-be81-a252e07c6526}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Bookmarks">
-      <UniqueIdentifier>{81017066-bf1f-450a-9080-da0c057abfc1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Drag and Drop">
       <UniqueIdentifier>{dd33bfdb-859c-4f78-bc0d-21d67122afee}</UniqueIdentifier>

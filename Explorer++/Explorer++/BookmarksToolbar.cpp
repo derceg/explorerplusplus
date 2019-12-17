@@ -365,14 +365,14 @@ void CBookmarksToolbar::OnBookmarkMenuItemClicked(const BookmarkItem *bookmarkIt
 
 void CBookmarksToolbar::OnNewBookmark()
 {
-	TCHAR displayName[MAX_PATH];
-	std::wstring currentDirectory = m_pexpp->GetActiveShellBrowser()->GetDirectory();
-	GetDisplayName(currentDirectory.c_str(), displayName, SIZEOF_ARRAY(displayName), SHGDN_INFOLDER);
-	CBookmark Bookmark = CBookmark::Create(displayName, currentDirectory, EMPTY_STRING);
+	const Tab &selectedTab = m_pexpp->GetTabContainer()->GetSelectedTab();
+	auto entry = selectedTab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
 
-	// TODO: Update.
-	/*CAddBookmarkDialog AddBookmarkDialog(m_instance, m_hToolbar, m_pexpp, m_AllBookmarks, Bookmark);
-	AddBookmarkDialog.ShowModalDialog();*/
+	auto bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt, entry->GetDisplayName(),
+		selectedTab.GetShellBrowser()->GetDirectory());
+
+	CAddBookmarkDialog AddBookmarkDialog(m_instance, m_hToolbar, m_pexpp, m_bookmarkTree, std::move(bookmarkItem));
+	AddBookmarkDialog.ShowModalDialog();
 }
 
 bool CBookmarksToolbar::OnGetInfoTip(NMTBGETINFOTIP *infoTip)

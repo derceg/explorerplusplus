@@ -11,7 +11,6 @@
 #include "Explorer++_internal.h"
 #include "MainToolbar.h"
 #include "../DisplayWindow/DisplayWindow.h"
-#include "../Helper/Bookmark.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/Macros.h"
 #include <boost/range/adaptor/map.hpp>

@@ -7,7 +7,6 @@
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
-#include "../Helper/Bookmark.h"
 
 class CNewBookmarkFolderDialog;
 
