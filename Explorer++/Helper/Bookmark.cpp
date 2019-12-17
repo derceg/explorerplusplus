@@ -100,23 +100,17 @@ void CBookmark::UpdateModificationTime()
 
 CBookmarkFolder CBookmarkFolder::Create(const std::wstring &strName, std::optional<std::wstring> guid)
 {
-	return CBookmarkFolder(strName, INITIALIZATION_TYPE_NORMAL, guid);
+	return CBookmarkFolder(strName, guid);
 }
 
 CBookmarkFolder *CBookmarkFolder::CreateNew(const std::wstring &strName, std::optional<std::wstring> guid)
 {
-	return new CBookmarkFolder(strName, INITIALIZATION_TYPE_NORMAL, guid);
+	return new CBookmarkFolder(strName, guid);
 }
 
-CBookmarkFolder::CBookmarkFolder(const std::wstring &str, InitializationType_t InitializationType,
-	std::optional<std::wstring> guid)
+CBookmarkFolder::CBookmarkFolder(const std::wstring &str, std::optional<std::wstring> guid)
 {
-	switch(InitializationType)
-	{
-	default:
-		Initialize(str,guid);
-		break;
-	}
+	Initialize(str, guid);
 }
 
 void CBookmarkFolder::Initialize(const std::wstring &name, std::optional<std::wstring> guid)

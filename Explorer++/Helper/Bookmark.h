@@ -51,12 +51,7 @@ public:
 
 private:
 
-	enum InitializationType_t
-	{
-		INITIALIZATION_TYPE_NORMAL
-	};
-
-	CBookmarkFolder(const std::wstring &str, InitializationType_t InitializationType, std::optional<std::wstring> guid);
+	CBookmarkFolder(const std::wstring &str, std::optional<std::wstring> guid);
 
 	void			Initialize(const std::wstring &name, std::optional<std::wstring> guid);
 

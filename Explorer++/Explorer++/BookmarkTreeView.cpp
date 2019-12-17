@@ -391,6 +391,8 @@ void CBookmarkTreeView::OnRClick(NMHDR *pnmhdr)
 
 void CBookmarkTreeView::OnTvnDeleteItem(NMTREEVIEW *pnmtv)
 {
+	UNREFERENCED_PARAMETER(pnmtv);
+
 	// TODO: Update.
 	//m_mapItem.erase(itrItem);
 }

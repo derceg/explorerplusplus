@@ -34,7 +34,6 @@
 void Explorerplusplus::OnCreate()
 {
 	InitializeMainToolbars();
-	InitializeBookmarks();
 
 	ILoadSave *pLoadSave = NULL;
 	LoadAllSettings(&pLoadSave);
@@ -95,22 +94,6 @@ void Explorerplusplus::OnCreate()
 	SetTimer(m_hContainer, AUTOSAVE_TIMER_ID, AUTOSAVE_TIMEOUT, nullptr);
 
 	m_InitializationFinished.set(true);
-}
-
-void Explorerplusplus::InitializeBookmarks()
-{
-	TCHAR szTemp[64];
-
-	LoadString(m_hLanguageModule,IDS_BOOKMARKS_ALLBOOKMARKS,szTemp,SIZEOF_ARRAY(szTemp));
-	m_bfAllBookmarks = CBookmarkFolder::CreateNew(szTemp, NBookmarkHelper::ROOT_GUID);
-
-	LoadString(m_hLanguageModule,IDS_BOOKMARKS_BOOKMARKSTOOLBAR,szTemp,SIZEOF_ARRAY(szTemp));
-	CBookmarkFolder bfBookmarksToolbar = CBookmarkFolder::Create(szTemp, NBookmarkHelper::TOOLBAR_GUID);
-	m_bfAllBookmarks->InsertBookmarkFolder(bfBookmarksToolbar);
-
-	LoadString(m_hLanguageModule,IDS_BOOKMARKS_BOOKMARKSMENU,szTemp,SIZEOF_ARRAY(szTemp));
-	CBookmarkFolder bfBookmarksMenu = CBookmarkFolder::Create(szTemp, NBookmarkHelper::MENU_GUID);
-	m_bfAllBookmarks->InsertBookmarkFolder(bfBookmarksMenu);
 }
 
 void Explorerplusplus::InitializeDisplayWindow()

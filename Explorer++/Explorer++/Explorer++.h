@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "BookmarkTree.h"
 #include "CoreInterface.h"
 #include "IconResourceLoader.h"
 #include "PluginCommandManager.h"
@@ -62,8 +63,6 @@ namespace Plugins
 class CShellBrowser;
 class TabContainer;
 class TaskbarThumbnails;
-
-class CBookmarkFolder;
 
 __interface IDirectoryMonitor;
 
@@ -345,7 +344,6 @@ private:
 	void					ValidateSingleColumnSet(int iColumnSet, std::vector<Column_t> &columns);
 	void					ApplyToolbarSettings(void);
 	void					TestConfigFile(void);
-	void					InitializeBookmarks();
 
 	/* Registry settings. */
 	LONG					LoadGenericSettingsFromRegistry();
@@ -576,7 +574,7 @@ private:
 	std::vector<boost::signals2::scoped_connection>	m_connections;
 
 	/* Bookmarks. */
-	CBookmarkFolder *		m_bfAllBookmarks;
+	BookmarkTree			m_bookmarkTree;
 	CBookmarksToolbar		*m_pBookmarksToolbar;
 
 	/* Customize colors. */

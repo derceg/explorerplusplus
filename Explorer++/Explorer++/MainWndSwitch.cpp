@@ -1251,12 +1251,13 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 	case ToolbarButton::AddBookmark:
 	case IDM_BOOKMARKS_BOOKMARKTHISTAB:
 	{
-		TCHAR szDisplayName[MAX_PATH];
-		std::wstring currentDirectory = m_pActiveShellBrowser->GetDirectory();
-		GetDisplayName(currentDirectory.c_str(), szDisplayName, SIZEOF_ARRAY(szDisplayName), SHGDN_INFOLDER);
-		CBookmark Bookmark = CBookmark::Create(szDisplayName, currentDirectory, EMPTY_STRING);
+		const Tab &selectedTab = m_tabContainer->GetSelectedTab();
+		auto entry = selectedTab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
 
-		CAddBookmarkDialog AddBookmarkDialog(m_hLanguageModule, hwnd, this, *m_bfAllBookmarks, Bookmark);
+		auto bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt, entry->GetDisplayName(),
+			selectedTab.GetShellBrowser()->GetDirectory());
+
+		CAddBookmarkDialog AddBookmarkDialog(m_hLanguageModule, hwnd, this, &m_bookmarkTree, std::move(bookmarkItem));
 		AddBookmarkDialog.ShowModalDialog();
 	}
 	break;
@@ -1266,7 +1267,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		if (g_hwndManageBookmarks == NULL)
 		{
 			CManageBookmarksDialog *pManageBookmarksDialog = new CManageBookmarksDialog(m_hLanguageModule,
-				hwnd, this, m_navigation.get(), *m_bfAllBookmarks);
+				hwnd, this, m_navigation.get(), &m_bookmarkTree);
 			g_hwndManageBookmarks = pManageBookmarksDialog->ShowModelessDialog(new CModelessDialogNotification());
 		}
 		else
