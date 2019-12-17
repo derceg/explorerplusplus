@@ -23,30 +23,6 @@ bool NBookmarkHelper::IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkIt
 	return bookmarkItem->IsBookmark();
 }
 
-VariantBookmark &NBookmarkHelper::GetBookmarkItem(CBookmarkFolder &ParentBookmarkFolder,
-	const std::wstring &guid)
-{
-	auto itr = std::find_if(ParentBookmarkFolder.begin(),ParentBookmarkFolder.end(),
-		[&guid](VariantBookmark &variantBookmark) -> BOOL
-		{
-			if(variantBookmark.type() == typeid(CBookmarkFolder))
-			{
-				CBookmarkFolder BookmarkFolder = boost::get<CBookmarkFolder>(variantBookmark);
-				return BookmarkFolder.GetGUID() == guid;
-			}
-			else
-			{
-				CBookmark Bookmark = boost::get<CBookmark>(variantBookmark);
-				return Bookmark.GetGUID() == guid;
-			}
-		}
-	);
-
-	assert(itr != ParentBookmarkFolder.end());
-
-	return *itr;
-}
-
 int CALLBACK NBookmarkHelper::Sort(SortMode_t SortMode, const BookmarkItem *firstItem,
 	const BookmarkItem *secondItem)
 {

@@ -27,6 +27,4 @@ namespace NBookmarkHelper
 	bool IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem);
 
 	int CALLBACK Sort(SortMode_t SortMode, const BookmarkItem *firstItem, const BookmarkItem *secondItem);
-
-	VariantBookmark &GetBookmarkItem(CBookmarkFolder &ParentBookmarkFolder, const std::wstring &guid);
 }
