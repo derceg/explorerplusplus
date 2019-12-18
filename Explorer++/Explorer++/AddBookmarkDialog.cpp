@@ -191,7 +191,7 @@ void CAddBookmarkDialog::OnOk()
 		m_bookmarkItem->SetName(name);
 		m_bookmarkItem->SetLocation(location);
 
-		bookmarkFolder->AddChild(std::move(m_bookmarkItem));
+		m_bookmarkTree->AddBookmarkItem(bookmarkFolder, std::move(m_bookmarkItem), bookmarkFolder->GetChildren().size());
 	}
 
 	EndDialog(m_hDlg,1);
