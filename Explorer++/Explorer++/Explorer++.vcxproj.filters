@@ -25,9 +25,6 @@
     <ClCompile Include="ManageBookmarksDialog.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="NewBookmarkFolderDialog.cpp">
-      <Filter>Bookmarks</Filter>
-    </ClCompile>
     <ClCompile Include="CustomizeColorsDialog.cpp">
       <Filter>Color Rules</Filter>
     </ClCompile>
@@ -373,6 +370,9 @@
     <ClCompile Include="BookmarkItem.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
+    <ClCompile Include="AddBookmarkFolderDialog.cpp">
+      <Filter>Bookmarks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -464,9 +464,6 @@
     </ClInclude>
     <ClInclude Include="MergeFilesDialog.h">
       <Filter>General Dialogs</Filter>
-    </ClInclude>
-    <ClInclude Include="NewBookmarkFolderDialog.h">
-      <Filter>Bookmarks</Filter>
     </ClInclude>
     <ClInclude Include="DefaultColumns.h">
       <Filter>Core</Filter>
@@ -754,6 +751,9 @@
       <Filter>Bookmarks</Filter>
     </ClInclude>
     <ClInclude Include="BookmarkItem.h">
+      <Filter>Bookmarks</Filter>
+    </ClInclude>
+    <ClInclude Include="AddBookmarkFolderDialog.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
   </ItemGroup>

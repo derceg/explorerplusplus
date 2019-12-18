@@ -519,7 +519,7 @@
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="MsgHandler.cpp" />
     <ClCompile Include="Navigation.cpp" />
-    <ClCompile Include="NewBookmarkFolderDialog.cpp" />
+    <ClCompile Include="AddBookmarkFolderDialog.cpp" />
     <ClCompile Include="OptionsDialog.cpp" />
     <ClCompile Include="PluginCommandManager.cpp" />
     <ClCompile Include="PluginInitialization.cpp" />
@@ -658,7 +658,7 @@
     <ClInclude Include="MergeFilesDialog.h" />
     <ClInclude Include="ModelessDialogs.h" />
     <ClInclude Include="Navigation.h" />
-    <ClInclude Include="NewBookmarkFolderDialog.h" />
+    <ClInclude Include="AddBookmarkFolderDialog.h" />
     <ClInclude Include="NoTranslationResource.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="OptionsDialog.h" />
