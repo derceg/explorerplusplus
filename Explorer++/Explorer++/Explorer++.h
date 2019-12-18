@@ -356,8 +356,8 @@ private:
 	void					SaveColumnWidthsToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::vector<Column_t> *pColumns);
 	void					LoadDefaultColumnsFromRegistry();
 	void					SaveDefaultColumnsToRegistry();
-	void					SaveBookmarksToRegistry(void);
-	void					LoadBookmarksFromRegistry(void);
+	void					SaveBookmarksToRegistry();
+	void					LoadBookmarksFromRegistry();
 	void					LoadApplicationToolbarFromRegistry();
 	void					SaveApplicationToolbarToRegistry();
 	void					SaveToolbarInformationToRegistry(void);
