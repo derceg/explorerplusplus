@@ -57,11 +57,7 @@ public:
 
 	// TODO: Update.
 	/* IBookmarkItemNotification methods. */
-	/*void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position);
-	void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
-	void	OnBookmarkModified(const std::wstring &guid);
-	void	OnBookmarkFolderModified(const std::wstring &guid);
-	void	OnBookmarkRemoved(const std::wstring &guid);
+	/*void	OnBookmarkRemoved(const std::wstring &guid);
 	void	OnBookmarkFolderRemoved(const std::wstring &guid);*/
 
 private:
@@ -82,9 +78,6 @@ private:
 	void	InsertBookmarkItems();
 	void	InsertBookmarkItem(BookmarkItem *bookmarkItem, int position);
 
-	// TODO: Update.
-	//void	ModifyBookmarkItem(const std::wstring &guid, bool bFolder);
-
 	void	RemoveBookmarkItem(const std::wstring &guid);
 
 	void	OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem);
@@ -100,9 +93,12 @@ private:
 
 	void	OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow);
 
-	int		GetBookmarkItemIndex(const std::wstring &guid);
+	std::optional<int>	GetBookmarkItemIndex(const BookmarkItem *bookmarkItem) const;
 
 	BookmarkItem	*GetBookmarkItemFromToolbarIndex(int index);
+
+	void	OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t index);
+	void	OnBookmarkUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);
 
 	HWND m_hToolbar;
 	DpiCompatibility m_dpiCompat;
