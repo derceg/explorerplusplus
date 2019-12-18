@@ -10,6 +10,7 @@
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowSubclassWrapper.h"
+#include <boost/signals2.hpp>
 #include <wil/resource.h>
 
 class CBookmarksToolbarDropHandler : public IDropTarget
@@ -93,8 +94,8 @@ private:
 	BookmarkItem	*GetBookmarkItemFromToolbarIndex(int index);
 
 	void	OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t index);
-	void	OnBookmarkUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);
-	void	OnBookmarkPreRemoval(BookmarkItem &bookmarkItem);
+	void	OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);
+	void	OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem);
 
 	HWND m_hToolbar;
 	DpiCompatibility m_dpiCompat;

@@ -56,9 +56,9 @@ void CBookmarksToolbar::InitializeToolbar()
 	m_connections.push_back(m_bookmarkTree->bookmarkItemAddedSignal.AddObserver(
 		std::bind(&CBookmarksToolbar::OnBookmarkItemAdded, this, std::placeholders::_1, std::placeholders::_2)));
 	m_connections.push_back(m_bookmarkTree->bookmarkItemUpdatedSignal.AddObserver(
-		std::bind(&CBookmarksToolbar::OnBookmarkUpdated, this, std::placeholders::_1, std::placeholders::_2)));
+		std::bind(&CBookmarksToolbar::OnBookmarkItemUpdated, this, std::placeholders::_1, std::placeholders::_2)));
 	m_connections.push_back(m_bookmarkTree->bookmarkItemPreRemovalSignal.AddObserver(
-		std::bind(&CBookmarksToolbar::OnBookmarkPreRemoval, this, std::placeholders::_1)));
+		std::bind(&CBookmarksToolbar::OnBookmarkItemPreRemoval, this, std::placeholders::_1)));
 	m_connections.push_back(m_pexpp->AddToolbarContextMenuObserver(
 		std::bind(&CBookmarksToolbar::OnToolbarContextMenuPreShow, this, std::placeholders::_1, std::placeholders::_2)));
 }
@@ -459,7 +459,7 @@ void CBookmarksToolbar::OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t i
 	}
 }
 
-void CBookmarksToolbar::OnBookmarkUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType)
+void CBookmarksToolbar::OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType)
 {
 	if (propertyType != BookmarkItem::PropertyType::Name)
 	{
@@ -483,7 +483,7 @@ void CBookmarksToolbar::OnBookmarkUpdated(BookmarkItem &bookmarkItem, BookmarkIt
 	SendMessage(m_hToolbar, TB_SETBUTTONINFO, *index, reinterpret_cast<LPARAM>(&tbbi));
 }
 
-void CBookmarksToolbar::OnBookmarkPreRemoval(BookmarkItem &bookmarkItem)
+void CBookmarksToolbar::OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem)
 {
 	RemoveBookmarkItem(&bookmarkItem);
 }

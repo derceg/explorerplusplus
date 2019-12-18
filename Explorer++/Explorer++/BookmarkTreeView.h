@@ -11,6 +11,7 @@
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowSubclassWrapper.h"
+#include <boost/signals2.hpp>
 #include <wil/resource.h>
 #include <unordered_map>
 #include <unordered_set>
@@ -24,11 +25,6 @@ public:
 		const std::unordered_set<std::wstring> &setExpansion);
 
 	BookmarkItem *GetBookmarkFolderFromTreeView(HTREEITEM hItem);
-
-	// TODO: Update.
-	/*HTREEITEM BookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder, const CBookmarkFolder &BookmarkFolder, std::size_t Position);
-	void BookmarkFolderModified(const std::wstring &guid);
-	void BookmarkFolderRemoved(const std::wstring &guid);*/
 
 	void CreateNewFolder();
 	void SelectFolder(const std::wstring &guid);
@@ -58,9 +54,12 @@ private:
 	void OnTreeViewRename();
 	void OnTvnBeginLabelEdit();
 	BOOL OnTvnEndLabelEdit(NMTVDISPINFO *pnmtvdi);
-	void OnTvnDeleteItem(NMTREEVIEW *pnmtv);
 
 	void OnRClick(NMHDR *pnmhdr);
+
+	void OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t index);
+	void OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);
+	void OnBookmarkItemRemoved(const std::wstring &guid);
 
 	HWND m_hTreeView;
 	DpiCompatibility m_dpiCompat;
@@ -77,4 +76,5 @@ private:
 	std::wstring m_NewFolderGUID;
 
 	std::vector<WindowSubclassWrapper> m_windowSubclasses;
+	std::vector<boost::signals2::scoped_connection> m_connections;
 };
