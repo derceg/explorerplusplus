@@ -5,6 +5,7 @@
 #pragma once
 
 #include "BookmarkItem.h"
+#include "SignalWrapper.h"
 
 class BookmarkTree
 {
@@ -16,10 +17,23 @@ public:
 	BookmarkItem *GetBookmarksToolbarFolder();
 	BookmarkItem *GetBookmarksMenuFolder();
 
+	void AddBookmarkItem(BookmarkItem *parent, std::unique_ptr<BookmarkItem> bookmarkItem, size_t index);
+	void RemoveBookmarkItem(BookmarkItem *bookmarkItem);
+
 	void LoadRegistrySettings(HKEY parentKey);
 	void SaveRegistrySettings(HKEY parentKey);
 
+	// Signals
+	SignalWrapper<BookmarkTree, void(BookmarkItem &bookmarkItem, size_t index)> bookmarkItemAddedSignal;
+	SignalWrapper<BookmarkTree, void(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType)> bookmarkItemUpdatedSignal;
+	SignalWrapper<BookmarkTree, void(BookmarkItem &bookmarkItem)> bookmarkItemPreRemovalSignal;
+	SignalWrapper<BookmarkTree, void(const std::wstring &guid)> bookmarkItemRemovedSignal;
+
 private:
+
+	bool IsPermanentNode(const BookmarkItem *bookmarkItem) const;
+
+	void OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);
 
 	void LoadPermanentFolderFromRegistry(HKEY parentKey, BookmarkItem *bookmarkItem, const std::wstring &name);
 	void LoadBookmarkChildrenFromRegistry(HKEY parentKey, BookmarkItem *parentBookmarkItem);

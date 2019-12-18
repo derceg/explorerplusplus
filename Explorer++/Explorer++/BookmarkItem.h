@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "SignalWrapper.h"
 #include "../Helper/Macros.h"
 #include <optional>
 #include <vector>
@@ -18,12 +19,22 @@ public:
 		Bookmark = 1
 	};
 
+	enum class PropertyType
+	{
+		Name,
+		Location,
+		DateCreated,
+		DateModified
+	};
+
 	BookmarkItem(std::optional<std::wstring> guid, std::wstring_view name,
 		std::optional<std::wstring> location);
 
 	bool IsFolder() const;
 	bool IsBookmark() const;
 	Type GetType() const;
+
+	BookmarkItem *GetParent();
 
 	std::wstring GetGUID() const;
 
@@ -47,6 +58,9 @@ public:
 	std::optional<size_t> GetChildIndex(const BookmarkItem *bookmarkItem) const;
 
 	const std::vector<std::unique_ptr<BookmarkItem>> &GetChildren() const;
+
+	// Signals
+	SignalWrapper<BookmarkItem, void(BookmarkItem &bookmarkItem, PropertyType propertyType)> updatedSignal;
 
 private:
 

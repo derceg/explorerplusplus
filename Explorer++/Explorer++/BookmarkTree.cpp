@@ -42,6 +42,53 @@ BookmarkItem *BookmarkTree::GetBookmarksMenuFolder()
 	return m_bookmarksMenu;
 }
 
+void BookmarkTree::AddBookmarkItem(BookmarkItem *parent, std::unique_ptr<BookmarkItem> bookmarkItem, size_t index)
+{
+	bookmarkItem->updatedSignal.AddObserver(std::bind(&BookmarkTree::OnBookmarkItemUpdated, this,
+		std::placeholders::_1, std::placeholders::_2), boost::signals2::at_front);
+
+	BookmarkItem *rawBookmarkItem = bookmarkItem.get();
+	parent->AddChild(std::move(bookmarkItem), index);
+	bookmarkItemAddedSignal.m_signal(*rawBookmarkItem, index);
+}
+
+void BookmarkTree::RemoveBookmarkItem(BookmarkItem *bookmarkItem)
+{
+	if (IsPermanentNode(bookmarkItem))
+	{
+		return;
+	}
+
+	bookmarkItemPreRemovalSignal.m_signal(*bookmarkItem);
+
+	BookmarkItem *parent = bookmarkItem->GetParent();
+	assert(bookmarkItem->GetParent() != nullptr);
+
+	std::wstring guid = bookmarkItem->GetGUID();
+
+	auto childIndex = parent->GetChildIndex(bookmarkItem);
+	assert(childIndex);
+	parent->RemoveChild(*childIndex);
+	bookmarkItemRemovedSignal.m_signal(guid);
+}
+
+void BookmarkTree::OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType)
+{
+	bookmarkItemUpdatedSignal.m_signal(bookmarkItem, propertyType);
+}
+
+bool BookmarkTree::IsPermanentNode(const BookmarkItem *bookmarkItem) const
+{
+	if (bookmarkItem == &m_root
+		|| bookmarkItem == m_bookmarksToolbar
+		|| bookmarkItem == m_bookmarksMenu)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 void BookmarkTree::LoadRegistrySettings(HKEY parentKey)
 {
 	LoadPermanentFolderFromRegistry(parentKey, m_bookmarksToolbar, BOOKMARKS_TOOLBAR_NODE_NAME);
@@ -67,7 +114,7 @@ void BookmarkTree::LoadBookmarkChildrenFromRegistry(HKEY parentKey, BookmarkItem
 	while (RegOpenKeyEx(parentKey, std::to_wstring(index).c_str(), 0, KEY_READ, &childKey) == ERROR_SUCCESS)
 	{
 		auto childBookmarkItem = LoadBookmarkItemFromRegistry(childKey.get());
-		parentBookmarkItem->AddChild(std::move(childBookmarkItem));
+		AddBookmarkItem(parentBookmarkItem, std::move(childBookmarkItem), index);
 
 		index++;
 	}
