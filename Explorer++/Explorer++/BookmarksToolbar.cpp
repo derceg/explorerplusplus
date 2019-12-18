@@ -57,6 +57,8 @@ void CBookmarksToolbar::InitializeToolbar()
 		std::bind(&CBookmarksToolbar::OnBookmarkItemAdded, this, std::placeholders::_1, std::placeholders::_2)));
 	m_connections.push_back(m_bookmarkTree->bookmarkItemUpdatedSignal.AddObserver(
 		std::bind(&CBookmarksToolbar::OnBookmarkUpdated, this, std::placeholders::_1, std::placeholders::_2)));
+	m_connections.push_back(m_bookmarkTree->bookmarkItemPreRemovalSignal.AddObserver(
+		std::bind(&CBookmarksToolbar::OnBookmarkPreRemoval, this, std::placeholders::_1)));
 	m_connections.push_back(m_pexpp->AddToolbarContextMenuObserver(
 		std::bind(&CBookmarksToolbar::OnToolbarContextMenuPreShow, this, std::placeholders::_1, std::placeholders::_2)));
 }
@@ -228,7 +230,7 @@ BOOL CBookmarksToolbar::OnRightClick(const NMMOUSE *nmm)
 	return TRUE;
 }
 
-void CBookmarksToolbar::OnRightClickMenuItemSelected(int menuItemId, const BookmarkItem *bookmarkItem)
+void CBookmarksToolbar::OnRightClickMenuItemSelected(int menuItemId, BookmarkItem *bookmarkItem)
 {
 	switch (menuItemId)
 	{
@@ -254,7 +256,7 @@ void CBookmarksToolbar::OnRightClickMenuItemSelected(int menuItemId, const Bookm
 		break;
 
 	case IDM_BT_DELETE:
-		/* TODO: Handle menu item. */
+		m_bookmarkTree->RemoveBookmarkItem(bookmarkItem);
 		break;
 
 	case IDM_BT_PROPERTIES:
@@ -457,16 +459,6 @@ void CBookmarksToolbar::OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t i
 	}
 }
 
-//void CBookmarksToolbar::OnBookmarkRemoved(const std::wstring &guid)
-//{
-//	RemoveBookmarkItem(guid);	
-//}
-//
-//void CBookmarksToolbar::OnBookmarkFolderRemoved(const std::wstring &guid)
-//{
-//	RemoveBookmarkItem(guid);
-//}
-
 void CBookmarksToolbar::OnBookmarkUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType)
 {
 	if (propertyType != BookmarkItem::PropertyType::Name)
@@ -491,20 +483,20 @@ void CBookmarksToolbar::OnBookmarkUpdated(BookmarkItem &bookmarkItem, BookmarkIt
 	SendMessage(m_hToolbar, TB_SETBUTTONINFO, *index, reinterpret_cast<LPARAM>(&tbbi));
 }
 
-void CBookmarksToolbar::RemoveBookmarkItem(const std::wstring &guid)
+void CBookmarksToolbar::OnBookmarkPreRemoval(BookmarkItem &bookmarkItem)
 {
-	UNREFERENCED_PARAMETER(guid);
+	RemoveBookmarkItem(&bookmarkItem);
+}
 
-	// TODO: Update.
-	//int iIndex = GetBookmarkItemIndex(guid);
+void CBookmarksToolbar::RemoveBookmarkItem(const BookmarkItem *bookmarkItem)
+{
+	auto index = GetBookmarkItemIndex(bookmarkItem);
+	assert(index);
 
-	//if(iIndex != -1)
-	//{
-	//	SendMessage(m_hToolbar,TB_DELETEBUTTON,iIndex,0);
+	SendMessage(m_hToolbar, TB_DELETEBUTTON, *index, 0);
 
-	//	/* TODO: */
-	//	//UpdateToolbarBandSizing(m_hMainRebar,m_hBookmarksToolbar);
-	//}
+	/* TODO: */
+	//UpdateToolbarBandSizing(m_hMainRebar,m_hBookmarksToolbar);
 }
 
 void CBookmarksToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow)

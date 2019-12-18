@@ -55,11 +55,6 @@ public:
 		Navigation *navigation, BookmarkTree *bookmarkTree, UINT uIDStart, UINT uIDEnd);
 	~CBookmarksToolbar();
 
-	// TODO: Update.
-	/* IBookmarkItemNotification methods. */
-	/*void	OnBookmarkRemoved(const std::wstring &guid);
-	void	OnBookmarkFolderRemoved(const std::wstring &guid);*/
-
 private:
 
 	CBookmarksToolbar & operator = (const CBookmarksToolbar &bt);
@@ -78,14 +73,14 @@ private:
 	void	InsertBookmarkItems();
 	void	InsertBookmarkItem(BookmarkItem *bookmarkItem, int position);
 
-	void	RemoveBookmarkItem(const std::wstring &guid);
+	void	RemoveBookmarkItem(const BookmarkItem *bookmarkItem);
 
 	void	OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem);
 
 	bool	OnCommand(WPARAM wParam, LPARAM lParam);
 	bool	OnButtonClick(int command);
 	BOOL	OnRightClick(const NMMOUSE *nmm);
-	void	OnRightClickMenuItemSelected(int menuItemId, const BookmarkItem *bookmarkItem);
+	void	OnRightClickMenuItemSelected(int menuItemId, BookmarkItem *bookmarkItem);
 	void	ShowBookmarkFolderMenu(const BookmarkItem *bookmarkItem, int command, int index);
 	void	OnBookmarkMenuItemClicked(const BookmarkItem *bookmarkItem);
 	void	OnNewBookmark();
@@ -99,6 +94,7 @@ private:
 
 	void	OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t index);
 	void	OnBookmarkUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);
+	void	OnBookmarkPreRemoval(BookmarkItem &bookmarkItem);
 
 	HWND m_hToolbar;
 	DpiCompatibility m_dpiCompat;
