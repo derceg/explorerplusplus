@@ -423,7 +423,7 @@ void CBookmarksToolbar::InsertBookmarkItems()
 
 void CBookmarksToolbar::InsertBookmarkItem(BookmarkItem *bookmarkItem, int position)
 {
-	assert(position <= static_cast<std::size_t>(SendMessage(m_hToolbar, TB_BUTTONCOUNT, 0, 0)));
+	assert(position <= SendMessage(m_hToolbar, TB_BUTTONCOUNT, 0, 0));
 
 	TCHAR szName[256];
 	StringCchCopy(szName, SIZEOF_ARRAY(szName), bookmarkItem->GetName().c_str());
