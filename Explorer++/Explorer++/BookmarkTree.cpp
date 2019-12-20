@@ -37,7 +37,17 @@ BookmarkItem *BookmarkTree::GetBookmarksToolbarFolder()
 	return m_bookmarksToolbar;
 }
 
+const BookmarkItem *BookmarkTree::GetBookmarksToolbarFolder() const
+{
+	return m_bookmarksToolbar;
+}
+
 BookmarkItem *BookmarkTree::GetBookmarksMenuFolder()
+{
+	return m_bookmarksMenu;
+}
+
+const BookmarkItem *BookmarkTree::GetBookmarksMenuFolder() const
 {
 	return m_bookmarksMenu;
 }

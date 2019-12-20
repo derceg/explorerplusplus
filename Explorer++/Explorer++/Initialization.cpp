@@ -11,6 +11,7 @@
 #include "LoadSaveInterface.h"
 #include "MainResource.h"
 #include "MainWindow.h"
+#include "MenuRanges.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ViewModes.h"
 #include "TaskbarThumbnails.h"
@@ -42,6 +43,8 @@ void Explorerplusplus::OnCreate()
 	m_iconResourceLoader = std::make_unique<IconResourceLoader>(m_config->iconTheme);
 
 	SetLanguageModule();
+
+	m_bookmarksMainMenu = std::make_unique<BookmarksMainMenu>(this, &m_bookmarkTree, MenuIdRange{ MENU_BOOKMARK_STARTID, MENU_BOOKMARK_ENDID });
 
 	m_navigation = std::make_unique<Navigation>(this);
 

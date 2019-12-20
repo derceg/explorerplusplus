@@ -15,7 +15,9 @@ public:
 
 	BookmarkItem *GetRoot();
 	BookmarkItem *GetBookmarksToolbarFolder();
+	const BookmarkItem *GetBookmarksToolbarFolder() const;
 	BookmarkItem *GetBookmarksMenuFolder();
+	const BookmarkItem *GetBookmarksMenuFolder() const;
 
 	void AddBookmarkItem(BookmarkItem *parent, std::unique_ptr<BookmarkItem> bookmarkItem, size_t index);
 	void RemoveBookmarkItem(BookmarkItem *bookmarkItem);

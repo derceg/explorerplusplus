@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "BookmarksMainMenu.h"
 #include "BookmarkTree.h"
 #include "CoreInterface.h"
 #include "IconResourceLoader.h"
@@ -575,6 +576,7 @@ private:
 
 	/* Bookmarks. */
 	BookmarkTree			m_bookmarkTree;
+	std::unique_ptr<BookmarksMainMenu> m_bookmarksMainMenu;
 	CBookmarksToolbar		*m_pBookmarksToolbar;
 
 	/* Customize colors. */

@@ -5,8 +5,8 @@
 #pragma once
 
 #include "BookmarkItem.h"
+#include "BookmarkMenuBuilder.h"
 #include <functional>
-#include <unordered_map>
 
 class BookmarkMenu
 {
@@ -21,14 +21,12 @@ public:
 
 private:
 
-	BOOL BuildBookmarksMenu(HMENU menu, const BookmarkItem *bookmarkItem, int startPosition);
-	BOOL AddEmptyBookmarkFolderToMenu(HMENU menu, int position);
-	BOOL AddBookmarkFolderToMenu(HMENU menu, const BookmarkItem *bookmarkItem, int position);
-	BOOL AddBookmarkToMenu(HMENU menu, const BookmarkItem *bookmarkItem, int position);
-	void OnMenuItemSelected(int menuItemId, MenuCallback callback);
+	static const int MIN_ID = 1;
+	static const int MAX_ID = 1000;
+
+	void OnMenuItemSelected(int menuItemId, BookmarkMenuBuilder::ItemMap &menuItemMappings,
+		MenuCallback callback);
 
 	HINSTANCE m_instance;
-
-	int m_idCounter;
-	std::unordered_map<int, const BookmarkItem *> m_menuItemMap;
+	BookmarkMenuBuilder m_menuBuilder;
 };

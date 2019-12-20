@@ -4,4 +4,10 @@
 
 #pragma once
 
+struct MenuIdRange
+{
+	int startId;
+	int endId;
+};
+
 void UpdateMenuAcceleratorStrings(HMENU menu, HACCEL acceleratorTable);

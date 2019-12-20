@@ -314,7 +314,8 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 	if (HIWORD(wParam) == 0 && LOWORD(wParam) >= MENU_BOOKMARK_STARTID &&
 		LOWORD(wParam) <= MENU_BOOKMARK_ENDID)
 	{
-		/* TODO: [Bookmarks] Open bookmark. */
+		m_bookmarksMainMenu->OnMenuItemClicked(LOWORD(wParam));
+		return 0;
 	}
 	else if (HIWORD(wParam) == 0 && LOWORD(wParam) >= MENU_RECENT_TABS_STARTID &&
 		LOWORD(wParam) < MENU_RECENT_TABS_ENDID)

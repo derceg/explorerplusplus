@@ -373,6 +373,12 @@
     <ClCompile Include="AddBookmarkFolderDialog.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
+    <ClCompile Include="BookmarkMenuBuilder.cpp">
+      <Filter>Bookmarks</Filter>
+    </ClCompile>
+    <ClCompile Include="BookmarksMainMenu.cpp">
+      <Filter>Bookmarks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -754,6 +760,12 @@
       <Filter>Bookmarks</Filter>
     </ClInclude>
     <ClInclude Include="AddBookmarkFolderDialog.h">
+      <Filter>Bookmarks</Filter>
+    </ClInclude>
+    <ClInclude Include="BookmarkMenuBuilder.h">
+      <Filter>Bookmarks</Filter>
+    </ClInclude>
+    <ClInclude Include="BookmarksMainMenu.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
   </ItemGroup>
