@@ -57,6 +57,9 @@ void CBookmarksToolbar::InitializeToolbar()
 		std::bind(&CBookmarksToolbar::OnBookmarkItemAdded, this, std::placeholders::_1, std::placeholders::_2)));
 	m_connections.push_back(m_bookmarkTree->bookmarkItemUpdatedSignal.AddObserver(
 		std::bind(&CBookmarksToolbar::OnBookmarkItemUpdated, this, std::placeholders::_1, std::placeholders::_2)));
+	m_connections.push_back(m_bookmarkTree->bookmarkItemMovedSignal.AddObserver(
+		std::bind(&CBookmarksToolbar::OnBookmarkItemMoved, this, std::placeholders::_1, std::placeholders::_2,
+			std::placeholders::_3, std::placeholders::_4, std::placeholders::_5)));
 	m_connections.push_back(m_bookmarkTree->bookmarkItemPreRemovalSignal.AddObserver(
 		std::bind(&CBookmarksToolbar::OnBookmarkItemPreRemoval, this, std::placeholders::_1)));
 	m_connections.push_back(m_pexpp->AddToolbarContextMenuObserver(
@@ -484,6 +487,22 @@ void CBookmarksToolbar::OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, Bookma
 	tbbi.dwMask = TBIF_BYINDEX | TBIF_TEXT;
 	tbbi.pszText = name;
 	SendMessage(m_hToolbar, TB_SETBUTTONINFO, *index, reinterpret_cast<LPARAM>(&tbbi));
+}
+
+void CBookmarksToolbar::OnBookmarkItemMoved(BookmarkItem *bookmarkItem, const BookmarkItem *oldParent,
+	size_t oldIndex, const BookmarkItem *newParent, size_t newIndex)
+{
+	UNREFERENCED_PARAMETER(oldIndex);
+
+	if (oldParent == m_bookmarkTree->GetBookmarksToolbarFolder())
+	{
+		RemoveBookmarkItem(bookmarkItem);
+	}
+
+	if (newParent == m_bookmarkTree->GetBookmarksToolbarFolder())
+	{
+		InsertBookmarkItem(bookmarkItem, static_cast<int>(newIndex));
+	}
 }
 
 void CBookmarksToolbar::OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem)

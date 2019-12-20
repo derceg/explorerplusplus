@@ -96,6 +96,8 @@ private:
 
 	void	OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t index);
 	void	OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);
+	void	OnBookmarkItemMoved(BookmarkItem *bookmarkItem, const BookmarkItem *oldParent, size_t oldIndex,
+		const BookmarkItem *newParent, size_t newIndex);
 	void	OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem);
 
 	HWND m_hToolbar;

@@ -75,7 +75,8 @@ void BookmarkTree::MoveBookmarkItem(BookmarkItem *bookmarkItem, BookmarkItem *ne
 	auto item = oldParent->RemoveChild(*oldIndex);
 	newParent->AddChild(std::move(item), index);
 
-	bookmarkItemMovedSignal.m_signal(*bookmarkItem, *oldParent, *oldIndex);
+	bookmarkItemMovedSignal.m_signal(bookmarkItem, oldParent, *oldIndex,
+		newParent, index);
 }
 
 void BookmarkTree::RemoveBookmarkItem(BookmarkItem *bookmarkItem)

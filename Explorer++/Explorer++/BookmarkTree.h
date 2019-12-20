@@ -29,7 +29,8 @@ public:
 	// Signals
 	SignalWrapper<BookmarkTree, void(BookmarkItem &bookmarkItem, size_t index)> bookmarkItemAddedSignal;
 	SignalWrapper<BookmarkTree, void(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType)> bookmarkItemUpdatedSignal;
-	SignalWrapper<BookmarkTree, void(BookmarkItem &bookmarkItem, const BookmarkItem &oldParent, size_t oldIndex)> bookmarkItemMovedSignal;
+	SignalWrapper<BookmarkTree, void(BookmarkItem *bookmarkItem, const BookmarkItem *oldParent, size_t oldIndex,
+		const BookmarkItem *newParent, size_t newIndex)> bookmarkItemMovedSignal;
 	SignalWrapper<BookmarkTree, void(BookmarkItem &bookmarkItem)> bookmarkItemPreRemovalSignal;
 	SignalWrapper<BookmarkTree, void(const std::wstring &guid)> bookmarkItemRemovedSignal;
 
