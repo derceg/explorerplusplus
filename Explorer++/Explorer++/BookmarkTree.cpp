@@ -62,6 +62,22 @@ void BookmarkTree::AddBookmarkItem(BookmarkItem *parent, std::unique_ptr<Bookmar
 	bookmarkItemAddedSignal.m_signal(*rawBookmarkItem, index);
 }
 
+void BookmarkTree::MoveBookmarkItem(BookmarkItem *bookmarkItem, BookmarkItem *newParent, size_t index)
+{
+	BookmarkItem *oldParent = bookmarkItem->GetParent();
+	auto oldIndex = oldParent->GetChildIndex(bookmarkItem);
+
+	if (oldParent == newParent && index == *oldIndex)
+	{
+		return;
+	}
+
+	auto item = oldParent->RemoveChild(*oldIndex);
+	newParent->AddChild(std::move(item), index);
+
+	bookmarkItemMovedSignal.m_signal(*bookmarkItem, *oldParent, *oldIndex);
+}
+
 void BookmarkTree::RemoveBookmarkItem(BookmarkItem *bookmarkItem)
 {
 	if (IsPermanentNode(bookmarkItem))

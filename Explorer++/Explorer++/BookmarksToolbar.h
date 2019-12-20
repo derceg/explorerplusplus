@@ -85,6 +85,7 @@ private:
 	void	ShowBookmarkFolderMenu(const BookmarkItem *bookmarkItem, int command, int index);
 	void	OnBookmarkMenuItemClicked(const BookmarkItem *bookmarkItem);
 	void	OnNewBookmark();
+	void	OnEditBookmarkItem(BookmarkItem *bookmarkItem);
 	bool	OnGetInfoTip(NMTBGETINFOTIP *infoTip);
 
 	void	OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow);

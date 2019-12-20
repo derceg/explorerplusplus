@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "BookmarkHelper.h"
+#include "AddBookmarkDialog.h"
 #include "MainResource.h"
 #include "../Helper/Macros.h"
 #include <algorithm>
@@ -111,4 +112,56 @@ int CALLBACK SortByDateModified(const BookmarkItem *firstItem,
 	FILETIME firstItemDateModified = firstItem->GetDateModified();
 	FILETIME secondItemDateModified = secondItem->GetDateModified();
 	return CompareFileTime(&firstItemDateModified, &secondItemDateModified);
+}
+
+void NBookmarkHelper::AddBookmark(BookmarkTree *bookmarkTree, HMODULE resoureceModule,
+	HWND parentWindow, TabContainer *tabContainer, IExplorerplusplus *coreInterface)
+{
+	const Tab &selectedTab = tabContainer->GetSelectedTab();
+	auto entry = selectedTab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
+
+	auto bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt, entry->GetDisplayName(),
+		selectedTab.GetShellBrowser()->GetDirectory());
+	BookmarkItem *selectedParentFolder = nullptr;
+
+	CAddBookmarkDialog AddBookmarkDialog(resoureceModule, parentWindow, coreInterface,
+		bookmarkTree, bookmarkItem.get(), &selectedParentFolder);
+	auto res = AddBookmarkDialog.ShowModalDialog();
+
+	if (res == CBaseDialog::RETURN_OK)
+	{
+		assert(selectedParentFolder != nullptr);
+		bookmarkTree->AddBookmarkItem(selectedParentFolder, std::move(bookmarkItem),
+			selectedParentFolder->GetChildren().size());
+	}
+}
+
+void NBookmarkHelper::EditBookmark(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
+	HMODULE resoureceModule, HWND parentWindow, IExplorerplusplus *coreInterface)
+{
+	BookmarkItem *selectedParentFolder = nullptr;
+	CAddBookmarkDialog AddBookmarkDialog(resoureceModule, parentWindow, coreInterface,
+		bookmarkTree, bookmarkItem, &selectedParentFolder);
+	auto res = AddBookmarkDialog.ShowModalDialog();
+
+	if (res == CBaseDialog::RETURN_OK)
+	{
+		assert(selectedParentFolder != nullptr);
+
+		size_t newIndex;
+
+		// The bookmark properties will have already been updated, so the only
+		// thing that needs to be done is to move the bookmark to the correct
+		// folder.
+		if (selectedParentFolder == bookmarkItem->GetParent())
+		{
+			newIndex = *bookmarkItem->GetParent()->GetChildIndex(bookmarkItem);
+		}
+		else
+		{
+			newIndex = selectedParentFolder->GetChildren().size();
+		}
+
+		bookmarkTree->MoveBookmarkItem(bookmarkItem, selectedParentFolder, newIndex);
+	}
 }

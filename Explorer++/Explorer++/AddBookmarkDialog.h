@@ -44,7 +44,8 @@ class CAddBookmarkDialog : public CBaseDialog
 public:
 
 	CAddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
-		BookmarkTree *bookmarkTree, std::unique_ptr<BookmarkItem> bookmarkItem);
+		BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
+		BookmarkItem **selectedParentFolder);
 
 protected:
 
@@ -74,7 +75,8 @@ private:
 	IExplorerplusplus *m_expp;
 
 	BookmarkTree *m_bookmarkTree;
-	std::unique_ptr<BookmarkItem> m_bookmarkItem;
+	BookmarkItem *m_bookmarkItem;
+	BookmarkItem **m_selectedParentFolder;
 
 	CBookmarkTreeView *m_pBookmarkTreeView;
 

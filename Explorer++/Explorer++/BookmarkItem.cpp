@@ -114,18 +114,28 @@ void BookmarkItem::AddChild(std::unique_ptr<BookmarkItem> bookmarkItem, size_t i
 	bookmarkItem->m_parent = this;
 
 	m_children.insert(m_children.begin() + index, std::move(bookmarkItem));
+
+	UpdateModificationTime();
 }
 
-void BookmarkItem::RemoveChild(size_t index)
+std::unique_ptr<BookmarkItem> BookmarkItem::RemoveChild(size_t index)
 {
 	assert(m_type == Type::Folder);
 
 	if (index >= m_children.size())
 	{
-		return;
+		return nullptr;
 	}
 
+	m_children[index]->m_parent = nullptr;
+
+	auto erasedItem = std::move(m_children[index]);
+
 	m_children.erase(m_children.begin() + index);
+
+	UpdateModificationTime();
+
+	return erasedItem;
 }
 
 std::optional<size_t> BookmarkItem::GetChildIndex(const BookmarkItem *bookmarkItem) const

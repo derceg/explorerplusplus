@@ -5,6 +5,9 @@
 #pragma once
 
 #include "BookmarkItem.h"
+#include "BookmarkTree.h"
+#include "CoreInterface.h"
+#include "TabContainer.h"
 
 namespace NBookmarkHelper
 {
@@ -26,4 +29,9 @@ namespace NBookmarkHelper
 	bool IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem);
 
 	int CALLBACK Sort(SortMode_t SortMode, const BookmarkItem *firstItem, const BookmarkItem *secondItem);
+
+	void AddBookmark(BookmarkTree *bookmarkTree, HMODULE resoureceModule, HWND parentWindow,
+		TabContainer *tabContainer, IExplorerplusplus *coreInterface);
+	void EditBookmark(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree, HMODULE resoureceModule,
+		HWND parentWindow, IExplorerplusplus *coreInterface);
 }

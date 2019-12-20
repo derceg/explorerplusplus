@@ -20,6 +20,7 @@ public:
 	const BookmarkItem *GetBookmarksMenuFolder() const;
 
 	void AddBookmarkItem(BookmarkItem *parent, std::unique_ptr<BookmarkItem> bookmarkItem, size_t index);
+	void MoveBookmarkItem(BookmarkItem *bookmarkItem, BookmarkItem *newParent, size_t index);
 	void RemoveBookmarkItem(BookmarkItem *bookmarkItem);
 
 	void LoadRegistrySettings(HKEY parentKey);
@@ -28,6 +29,7 @@ public:
 	// Signals
 	SignalWrapper<BookmarkTree, void(BookmarkItem &bookmarkItem, size_t index)> bookmarkItemAddedSignal;
 	SignalWrapper<BookmarkTree, void(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType)> bookmarkItemUpdatedSignal;
+	SignalWrapper<BookmarkTree, void(BookmarkItem &bookmarkItem, const BookmarkItem &oldParent, size_t oldIndex)> bookmarkItemMovedSignal;
 	SignalWrapper<BookmarkTree, void(BookmarkItem &bookmarkItem)> bookmarkItemPreRemovalSignal;
 	SignalWrapper<BookmarkTree, void(const std::wstring &guid)> bookmarkItemRemovedSignal;
 

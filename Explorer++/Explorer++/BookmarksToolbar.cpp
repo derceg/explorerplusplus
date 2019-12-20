@@ -260,7 +260,7 @@ void CBookmarksToolbar::OnRightClickMenuItemSelected(int menuItemId, BookmarkIte
 		break;
 
 	case IDM_BT_PROPERTIES:
-		/* TODO: Handle menu item. */
+		OnEditBookmarkItem(bookmarkItem);
 		break;
 	}
 }
@@ -372,14 +372,17 @@ void CBookmarksToolbar::OnBookmarkMenuItemClicked(const BookmarkItem *bookmarkIt
 
 void CBookmarksToolbar::OnNewBookmark()
 {
-	const Tab &selectedTab = m_pexpp->GetTabContainer()->GetSelectedTab();
-	auto entry = selectedTab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
+	NBookmarkHelper::AddBookmark(m_bookmarkTree, m_instance, m_hToolbar,
+		m_pexpp->GetTabContainer(), m_pexpp);
+}
 
-	auto bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt, entry->GetDisplayName(),
-		selectedTab.GetShellBrowser()->GetDirectory());
-
-	CAddBookmarkDialog AddBookmarkDialog(m_instance, m_hToolbar, m_pexpp, m_bookmarkTree, std::move(bookmarkItem));
-	AddBookmarkDialog.ShowModalDialog();
+void CBookmarksToolbar::OnEditBookmarkItem(BookmarkItem *bookmarkItem)
+{
+	if (bookmarkItem->IsBookmark())
+	{
+		NBookmarkHelper::EditBookmark(bookmarkItem, m_bookmarkTree, m_instance,
+			m_hToolbar, m_pexpp);
+	}
 }
 
 bool CBookmarksToolbar::OnGetInfoTip(NMTBGETINFOTIP *infoTip)

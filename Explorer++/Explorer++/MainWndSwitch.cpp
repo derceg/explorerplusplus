@@ -1251,17 +1251,9 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 
 	case ToolbarButton::AddBookmark:
 	case IDM_BOOKMARKS_BOOKMARKTHISTAB:
-	{
-		const Tab &selectedTab = m_tabContainer->GetSelectedTab();
-		auto entry = selectedTab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
-
-		auto bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt, entry->GetDisplayName(),
-			selectedTab.GetShellBrowser()->GetDirectory());
-
-		CAddBookmarkDialog AddBookmarkDialog(m_hLanguageModule, hwnd, this, &m_bookmarkTree, std::move(bookmarkItem));
-		AddBookmarkDialog.ShowModalDialog();
-	}
-	break;
+		NBookmarkHelper::AddBookmark(&m_bookmarkTree, m_hLanguageModule, hwnd,
+			m_tabContainer, this);
+		break;
 
 	case ToolbarButton::Bookmarks:
 	case IDM_BOOKMARKS_MANAGEBOOKMARKS:

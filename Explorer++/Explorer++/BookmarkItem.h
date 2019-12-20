@@ -52,7 +52,7 @@ public:
 
 	void AddChild(std::unique_ptr<BookmarkItem> bookmarkItem);
 	void AddChild(std::unique_ptr<BookmarkItem> bookmarkItem, size_t index);
-	void RemoveChild(size_t index);
+	std::unique_ptr<BookmarkItem> RemoveChild(size_t index);
 	bool HasChildFolder() const;
 
 	std::optional<size_t> GetChildIndex(const BookmarkItem *bookmarkItem) const;

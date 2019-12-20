@@ -14,11 +14,12 @@
 const TCHAR CAddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmark");
 
 CAddBookmarkDialog::CAddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
-	BookmarkTree *bookmarkTree, std::unique_ptr<BookmarkItem> bookmarkItem) :
+	BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem, BookmarkItem **selectedParentFolder) :
 	CBaseDialog(hInstance, IDD_ADD_BOOKMARK, hParent, true),
 	m_expp(expp),
 	m_bookmarkTree(bookmarkTree),
-	m_bookmarkItem(std::move(bookmarkItem)),
+	m_bookmarkItem(bookmarkItem),
+	m_selectedParentFolder(selectedParentFolder),
 	m_ErrorBrush(CreateSolidBrush(ERROR_BACKGROUND_COLOR))
 {
 	m_pabdps = &CAddBookmarkDialogPersistentSettings::GetInstance();
@@ -36,6 +37,13 @@ CAddBookmarkDialog::CAddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplo
 		m_pabdps->m_setExpansion.insert(rootGuid);
 
 		m_pabdps->m_bInitialized = true;
+	}
+
+	BookmarkItem *parent = bookmarkItem->GetParent();
+
+	if (parent)
+	{
+		m_pabdps->m_guidSelected = parent->GetGUID();
 	}
 }
 
@@ -186,20 +194,21 @@ void CAddBookmarkDialog::OnOk()
 	{
 		HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
 		HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
-		auto bookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
+		*m_selectedParentFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
 
 		m_bookmarkItem->SetName(name);
 		m_bookmarkItem->SetLocation(location);
 
-		m_bookmarkTree->AddBookmarkItem(bookmarkFolder, std::move(m_bookmarkItem), bookmarkFolder->GetChildren().size());
+		EndDialog(m_hDlg, RETURN_OK);
+		return;
 	}
 
-	EndDialog(m_hDlg,1);
+	EndDialog(m_hDlg, RETURN_CANCEL);
 }
 
 void CAddBookmarkDialog::OnCancel()
 {
-	EndDialog(m_hDlg,0);
+	EndDialog(m_hDlg, RETURN_CANCEL);
 }
 
 void CAddBookmarkDialog::SaveState()
@@ -244,7 +253,7 @@ void CAddBookmarkDialog::SaveTreeViewExpansionState(HWND hTreeView,HTREEITEM hIt
 
 INT_PTR CAddBookmarkDialog::OnClose()
 {
-	EndDialog(m_hDlg,0);
+	EndDialog(m_hDlg, RETURN_CANCEL);
 	return 0;
 }
 
