@@ -63,14 +63,16 @@ private:
 
 	CAddBookmarkDialog & operator = (const CAddBookmarkDialog &abd);
 
-	void		GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
-	void		SaveState();
+	void UpdateDialogForBookmarkFolder();
 
-	void		OnOk();
-	void		OnCancel();
+	void GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	void SaveState();
 
-	void		SaveTreeViewState();
-	void		SaveTreeViewExpansionState(HWND hTreeView,HTREEITEM hItem);
+	void OnOk();
+	void OnCancel();
+
+	void SaveTreeViewState();
+	void SaveTreeViewExpansionState(HWND hTreeView,HTREEITEM hItem);
 
 	IExplorerplusplus *m_expp;
 

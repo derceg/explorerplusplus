@@ -33,7 +33,6 @@
 #define IDD_SETDEFAULTCOLUMNS           187
 #define IDR_VIEWS_MENU                  195
 #define IDR_TOOLBAR_MENU                196
-#define IDD_NEWBOOKMARKFOLDER           211
 #define IDD_RENAMETAB                   213
 #define IDD_EDITAPPLICATIONBUTTON       216
 #define IDR_APPLICATIONTOOLBAR_MENU     217
@@ -228,7 +227,6 @@
 #define IDC_BOOKMARK_CREATEIN           1164
 #define IDC_BOOKMARK_LOCATION           1165
 #define IDC_BOOKMARK_NEWFOLDER          1166
-#define IDC_NEWFOLDER_NAME              1170
 #define IDC_BOOKMARK_SEPARATOR          1172
 #define IDC_STATIC_LOCATION             1173
 #define IDC_STATIC_DESCRIPTION          1174
@@ -899,7 +897,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        321
+#define _APS_NEXT_RESOURCE_VALUE        322
 #define _APS_NEXT_COMMAND_VALUE         40522
 #define _APS_NEXT_CONTROL_VALUE         1328
 #define _APS_NEXT_SYMED_VALUE           101

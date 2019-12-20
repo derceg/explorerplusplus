@@ -251,11 +251,11 @@ void CBookmarksToolbar::OnRightClickMenuItemSelected(int menuItemId, BookmarkIte
 		break;
 
 	case IDM_BT_NEWBOOKMARK:
-		OnNewBookmark();
+		OnNewBookmarkItem(BookmarkItem::Type::Bookmark);
 		break;
 
 	case IDM_BT_NEWFOLDER:
-		/* TODO: Handle menu item. */
+		OnNewBookmarkItem(BookmarkItem::Type::Folder);
 		break;
 
 	case IDM_BT_DELETE:
@@ -287,12 +287,11 @@ bool CBookmarksToolbar::OnCommand(WPARAM wParam, LPARAM lParam)
 		switch (LOWORD(wParam))
 		{
 		case IDM_BT_NEWBOOKMARK:
-			OnNewBookmark();
+			OnNewBookmarkItem(BookmarkItem::Type::Bookmark);
 			return true;
 
 		case IDM_BT_NEWFOLDER:
-			/* TODO: Show new bookmark
-			folder dialog. */
+			OnNewBookmarkItem(BookmarkItem::Type::Folder);
 			return true;
 		}
 	}
@@ -373,19 +372,16 @@ void CBookmarksToolbar::OnBookmarkMenuItemClicked(const BookmarkItem *bookmarkIt
 	m_navigation->BrowseFolderInCurrentTab(bookmarkItem->GetLocation().c_str());
 }
 
-void CBookmarksToolbar::OnNewBookmark()
+void CBookmarksToolbar::OnNewBookmarkItem(BookmarkItem::Type type)
 {
-	NBookmarkHelper::AddBookmark(m_bookmarkTree, m_instance, m_hToolbar,
+	NBookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, m_instance, m_hToolbar,
 		m_pexpp->GetTabContainer(), m_pexpp);
 }
 
 void CBookmarksToolbar::OnEditBookmarkItem(BookmarkItem *bookmarkItem)
 {
-	if (bookmarkItem->IsBookmark())
-	{
-		NBookmarkHelper::EditBookmark(bookmarkItem, m_bookmarkTree, m_instance,
-			m_hToolbar, m_pexpp);
-	}
+	NBookmarkHelper::EditBookmarkItem(bookmarkItem, m_bookmarkTree, m_instance,
+		m_hToolbar, m_pexpp);
 }
 
 bool CBookmarksToolbar::OnGetInfoTip(NMTBGETINFOTIP *infoTip)
@@ -842,10 +838,3 @@ void CBookmarksToolbarDropHandler::RemoveInsertionMark()
 	tbim.iButton = -1;
 	SendMessage(m_hToolbar,TB_SETINSERTMARK,0,reinterpret_cast<LPARAM>(&tbim));
 }
-
-/* TODO: */
-//void Explorerplusplus::BookmarkToolbarNewFolder(int iItem)
-//{
-//	CNewBookmarkFolderDialog NewBookmarkFolderDialog(g_hLanguageModule,IDD_NEWBOOKMARKFOLDER,m_hContainer);
-//	NewBookmarkFolderDialog.ShowModalDialog();
-//}

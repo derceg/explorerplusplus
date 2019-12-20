@@ -370,9 +370,6 @@
     <ClCompile Include="BookmarkItem.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="AddBookmarkFolderDialog.cpp">
-      <Filter>Bookmarks</Filter>
-    </ClCompile>
     <ClCompile Include="BookmarkMenuBuilder.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
@@ -757,9 +754,6 @@
       <Filter>Bookmarks</Filter>
     </ClInclude>
     <ClInclude Include="BookmarkItem.h">
-      <Filter>Bookmarks</Filter>
-    </ClInclude>
-    <ClInclude Include="AddBookmarkFolderDialog.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
     <ClInclude Include="BookmarkMenuBuilder.h">

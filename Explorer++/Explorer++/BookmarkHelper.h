@@ -30,8 +30,8 @@ namespace NBookmarkHelper
 
 	int CALLBACK Sort(SortMode_t SortMode, const BookmarkItem *firstItem, const BookmarkItem *secondItem);
 
-	void AddBookmark(BookmarkTree *bookmarkTree, HMODULE resoureceModule, HWND parentWindow,
-		TabContainer *tabContainer, IExplorerplusplus *coreInterface);
-	void EditBookmark(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree, HMODULE resoureceModule,
+	void AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type, HMODULE resoureceModule,
+		HWND parentWindow, TabContainer *tabContainer, IExplorerplusplus *coreInterface);
+	void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree, HMODULE resoureceModule,
 		HWND parentWindow, IExplorerplusplus *coreInterface);
 }

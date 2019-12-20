@@ -84,7 +84,7 @@ private:
 	void	OnRightClickMenuItemSelected(int menuItemId, BookmarkItem *bookmarkItem);
 	void	ShowBookmarkFolderMenu(const BookmarkItem *bookmarkItem, int command, int index);
 	void	OnBookmarkMenuItemClicked(const BookmarkItem *bookmarkItem);
-	void	OnNewBookmark();
+	void	OnNewBookmarkItem(BookmarkItem::Type type);
 	void	OnEditBookmarkItem(BookmarkItem *bookmarkItem);
 	bool	OnGetInfoTip(NMTBGETINFOTIP *infoTip);
 

@@ -114,14 +114,26 @@ int CALLBACK SortByDateModified(const BookmarkItem *firstItem,
 	return CompareFileTime(&firstItemDateModified, &secondItemDateModified);
 }
 
-void NBookmarkHelper::AddBookmark(BookmarkTree *bookmarkTree, HMODULE resoureceModule,
-	HWND parentWindow, TabContainer *tabContainer, IExplorerplusplus *coreInterface)
+void NBookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
+	HMODULE resoureceModule, HWND parentWindow, TabContainer *tabContainer,
+	IExplorerplusplus *coreInterface)
 {
-	const Tab &selectedTab = tabContainer->GetSelectedTab();
-	auto entry = selectedTab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
+	std::unique_ptr<BookmarkItem> bookmarkItem;
 
-	auto bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt, entry->GetDisplayName(),
-		selectedTab.GetShellBrowser()->GetDirectory());
+	if (type == BookmarkItem::Type::Bookmark)
+	{
+		const Tab &selectedTab = tabContainer->GetSelectedTab();
+		auto entry = selectedTab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
+
+		bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt, entry->GetDisplayName(),
+			selectedTab.GetShellBrowser()->GetDirectory());
+	}
+	else
+	{
+		bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt,
+			ResourceHelper::LoadString(resoureceModule, IDS_BOOKMARKS_NEWBOOKMARKFOLDER), std::nullopt);
+	}
+	
 	BookmarkItem *selectedParentFolder = nullptr;
 
 	CAddBookmarkDialog AddBookmarkDialog(resoureceModule, parentWindow, coreInterface,
@@ -136,7 +148,7 @@ void NBookmarkHelper::AddBookmark(BookmarkTree *bookmarkTree, HMODULE resoureceM
 	}
 }
 
-void NBookmarkHelper::EditBookmark(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
+void NBookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
 	HMODULE resoureceModule, HWND parentWindow, IExplorerplusplus *coreInterface)
 {
 	BookmarkItem *selectedParentFolder = nullptr;
