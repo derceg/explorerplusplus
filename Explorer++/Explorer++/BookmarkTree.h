@@ -18,6 +18,8 @@ public:
 	const BookmarkItem *GetBookmarksToolbarFolder() const;
 	BookmarkItem *GetBookmarksMenuFolder();
 	const BookmarkItem *GetBookmarksMenuFolder() const;
+	BookmarkItem *GetOtherBookmarksFolder();
+	const BookmarkItem *GetOtherBookmarksFolder() const;
 
 	void AddBookmarkItem(BookmarkItem *parent, std::unique_ptr<BookmarkItem> bookmarkItem, size_t index);
 	void MoveBookmarkItem(BookmarkItem *bookmarkItem, BookmarkItem *newParent, size_t index);
@@ -51,4 +53,5 @@ private:
 	BookmarkItem m_root;
 	BookmarkItem *m_bookmarksToolbar;
 	BookmarkItem *m_bookmarksMenu;
+	BookmarkItem *m_otherBookmarks;
 };

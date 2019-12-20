@@ -24,6 +24,7 @@ namespace NBookmarkHelper
 	static TCHAR *ROOT_GUID = _T("00000000-0000-0000-0000-000000000001");
 	static TCHAR *TOOLBAR_GUID = _T("00000000-0000-0000-0000-000000000002");
 	static TCHAR *MENU_GUID = _T("00000000-0000-0000-0000-000000000003");
+	static TCHAR *OTHER_GUID = _T("00000000-0000-0000-0000-000000000004");
 
 	bool IsFolder(const std::unique_ptr<BookmarkItem> &bookmarkItem);
 	bool IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem);

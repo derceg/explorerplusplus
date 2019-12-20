@@ -12,6 +12,7 @@
 
 const WCHAR BOOKMARKS_TOOLBAR_NODE_NAME[] = L"BookmarksToolbar";
 const WCHAR BOOKMARKS_MENU_NODE_NAME[] = L"BookmarksMenu";
+const WCHAR OTHER_BOOKMARKS_NODE_NAME[] = L"OtherBookmarks";
 
 BookmarkTree::BookmarkTree() :
 	m_root(NBookmarkHelper::ROOT_GUID, ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_ALLBOOKMARKS), std::nullopt)
@@ -25,6 +26,11 @@ BookmarkTree::BookmarkTree() :
 		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_BOOKMARKSMENU), std::nullopt);
 	m_bookmarksMenu = bookmarksMenuFolder.get();
 	m_root.AddChild(std::move(bookmarksMenuFolder));
+
+	auto otherBookmarksFolder = std::make_unique<BookmarkItem>(NBookmarkHelper::OTHER_GUID,
+		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_OTHER_BOOKMARKS), std::nullopt);
+	m_otherBookmarks = otherBookmarksFolder.get();
+	m_root.AddChild(std::move(otherBookmarksFolder));
 }
 
 BookmarkItem *BookmarkTree::GetRoot()
@@ -50,6 +56,16 @@ BookmarkItem *BookmarkTree::GetBookmarksMenuFolder()
 const BookmarkItem *BookmarkTree::GetBookmarksMenuFolder() const
 {
 	return m_bookmarksMenu;
+}
+
+BookmarkItem *BookmarkTree::GetOtherBookmarksFolder()
+{
+	return m_otherBookmarks;
+}
+
+const BookmarkItem *BookmarkTree::GetOtherBookmarksFolder() const
+{
+	return m_otherBookmarks;
 }
 
 void BookmarkTree::AddBookmarkItem(BookmarkItem *parent, std::unique_ptr<BookmarkItem> bookmarkItem, size_t index)
@@ -108,7 +124,8 @@ bool BookmarkTree::IsPermanentNode(const BookmarkItem *bookmarkItem) const
 {
 	if (bookmarkItem == &m_root
 		|| bookmarkItem == m_bookmarksToolbar
-		|| bookmarkItem == m_bookmarksMenu)
+		|| bookmarkItem == m_bookmarksMenu
+		|| bookmarkItem == m_otherBookmarks)
 	{
 		return true;
 	}
@@ -120,6 +137,7 @@ void BookmarkTree::LoadRegistrySettings(HKEY parentKey)
 {
 	LoadPermanentFolderFromRegistry(parentKey, m_bookmarksToolbar, BOOKMARKS_TOOLBAR_NODE_NAME);
 	LoadPermanentFolderFromRegistry(parentKey, m_bookmarksMenu, BOOKMARKS_MENU_NODE_NAME);
+	LoadPermanentFolderFromRegistry(parentKey, m_otherBookmarks, OTHER_BOOKMARKS_NODE_NAME);
 }
 
 void BookmarkTree::LoadPermanentFolderFromRegistry(HKEY parentKey, BookmarkItem *bookmarkItem, const std::wstring &name)
@@ -194,6 +212,7 @@ void BookmarkTree::SaveRegistrySettings(HKEY parentKey)
 {
 	SavePermanentFolderToRegistry(parentKey, m_bookmarksToolbar, BOOKMARKS_TOOLBAR_NODE_NAME);
 	SavePermanentFolderToRegistry(parentKey, m_bookmarksMenu, BOOKMARKS_MENU_NODE_NAME);
+	SavePermanentFolderToRegistry(parentKey, m_otherBookmarks, OTHER_BOOKMARKS_NODE_NAME);
 }
 
 void BookmarkTree::SavePermanentFolderToRegistry(HKEY parentKey, const BookmarkItem *bookmarkItem, const std::wstring &name)
