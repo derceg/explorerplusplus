@@ -31,10 +31,7 @@ CAddBookmarkDialog::CAddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplo
 	that. */
 	if(!m_pabdps->m_bInitialized)
 	{
-		auto rootGuid = m_bookmarkTree->GetRoot()->GetGUID();
-
-		m_pabdps->m_guidSelected = rootGuid;
-		m_pabdps->m_setExpansion.insert(rootGuid);
+		m_pabdps->m_guidSelected = m_bookmarkTree->GetBookmarksToolbarFolder()->GetGUID();
 
 		m_pabdps->m_bInitialized = true;
 	}

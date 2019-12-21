@@ -151,8 +151,7 @@ void CBookmarkTreeView::SetupTreeView(const std::wstring &guidSelected, const st
 {
 	TreeView_DeleteAllItems(m_hTreeView);
 
-	HTREEITEM hRoot = InsertFolderIntoTreeView(nullptr, m_bookmarkTree->GetRoot(), 0);
-	InsertFoldersIntoTreeViewRecursive(hRoot, m_bookmarkTree->GetRoot());
+	InsertFoldersIntoTreeViewRecursive(nullptr, m_bookmarkTree->GetRoot());
 
 	for(const auto &guidExpanded : setExpansion)
 	{

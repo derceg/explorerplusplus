@@ -26,7 +26,7 @@ CManageBookmarksDialog::CManageBookmarksDialog(HINSTANCE hInstance, HWND hParent
 	m_pexpp(pexpp),
 	m_navigation(navigation),
 	m_bookmarkTree(bookmarkTree),
-	m_guidCurrentFolder(bookmarkTree->GetRoot()->GetGUID()),
+	m_guidCurrentFolder(bookmarkTree->GetBookmarksToolbarFolder()->GetGUID()),
 	m_bNewFolderAdded(false),
 	m_bListViewInitialized(false),
 	m_bSaveHistory(true)
@@ -35,10 +35,7 @@ CManageBookmarksDialog::CManageBookmarksDialog(HINSTANCE hInstance, HWND hParent
 
 	if(!m_pmbdps->m_bInitialized)
 	{
-		auto rootGuid = bookmarkTree->GetRoot()->GetGUID();
-
-		m_pmbdps->m_guidSelected = rootGuid;
-		m_pmbdps->m_setExpansion.insert(rootGuid);
+		m_pmbdps->m_guidSelected = m_bookmarkTree->GetBookmarksToolbarFolder()->GetGUID();
 
 		m_pmbdps->m_bInitialized = true;
 	}
