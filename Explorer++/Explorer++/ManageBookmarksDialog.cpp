@@ -904,7 +904,6 @@ void CManageBookmarksDialog::UpdateToolbarState()
 void CManageBookmarksDialog::OnRClick(NMHDR *pnmhdr)
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
-	HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
 
 	if(pnmhdr->hwndFrom == hListView)
 	{
@@ -913,10 +912,6 @@ void CManageBookmarksDialog::OnRClick(NMHDR *pnmhdr)
 	else if(pnmhdr->hwndFrom == ListView_GetHeader(hListView))
 	{
 		OnListViewHeaderRClick();
-	}
-	else if(pnmhdr->hwndFrom == hTreeView)
-	{
-
 	}
 }
 
