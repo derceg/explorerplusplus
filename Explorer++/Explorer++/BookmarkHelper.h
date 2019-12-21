@@ -35,4 +35,5 @@ namespace BookmarkHelper
 		HWND parentWindow, TabContainer *tabContainer, IExplorerplusplus *coreInterface);
 	void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree, HMODULE resoureceModule,
 		HWND parentWindow, IExplorerplusplus *coreInterface);
+	void OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem, IExplorerplusplus *expp);
 }

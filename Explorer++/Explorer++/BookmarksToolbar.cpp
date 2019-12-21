@@ -11,7 +11,6 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
-#include <boost/range/adaptor/filtered.hpp>
 #include <algorithm>
 
 CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
@@ -23,6 +22,7 @@ CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplore
 	m_bookmarkTree(bookmarkTree),
 	m_uIDStart(uIDStart),
 	m_uIDEnd(uIDEnd),
+	m_bookmarkContextMenu(bookmarkTree, instance, pexpp),
 	m_uIDCounter(0)
 {
 	InitializeToolbar();
@@ -106,7 +106,7 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPA
 
 				if (bookmarkItem)
 				{
-					OpenBookmarkItemInNewTab(bookmarkItem);
+					BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_pexpp);
 				}
 			}
 		}
@@ -118,24 +118,6 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPA
 	}
 
 	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
-}
-
-// If the specified item is a bookmark, it will be opened in a new tab.
-// If it's a bookmark folder, each of its children will be opened in new
-// tabs.
-void CBookmarksToolbar::OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem)
-{
-	if (bookmarkItem->IsFolder())
-	{
-		for (auto &childItem : bookmarkItem->GetChildren() | boost::adaptors::filtered(BookmarkHelper::IsBookmark))
-		{
-			m_pexpp->GetTabContainer()->CreateNewTab(childItem->GetLocation().c_str());
-		}
-	}
-	else
-	{
-		m_pexpp->GetTabContainer()->CreateNewTab(bookmarkItem->GetLocation().c_str());
-	}
 }
 
 LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarParentProcStub(HWND hwnd,UINT uMsg,
@@ -206,15 +188,6 @@ BOOL CBookmarksToolbar::OnRightClick(const NMMOUSE *nmm)
 		return FALSE;
 	}
 
-	auto parentMenu = wil::unique_hmenu(LoadMenu(m_instance, MAKEINTRESOURCE(IDR_BOOKMARKSTOOLBAR_RCLICK_MENU)));
-
-	if (!parentMenu)
-	{
-		return FALSE;
-	}
-
-	HMENU menu = GetSubMenu(parentMenu.get(), 0);
-
 	POINT pt = nmm->pt;
 	BOOL res = ClientToScreen(m_hToolbar, &pt);
 
@@ -223,49 +196,9 @@ BOOL CBookmarksToolbar::OnRightClick(const NMMOUSE *nmm)
 		return FALSE;
 	}
 
-	int menuItemId = TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RETURNCMD, pt.x, pt.y, 0, GetParent(m_hToolbar), NULL);
-
-	if (menuItemId != 0)
-	{
-		OnRightClickMenuItemSelected(menuItemId, bookmarkItem);
-	}
+	m_bookmarkContextMenu.ShowMenu(m_hToolbar, bookmarkItem, pt);
 
 	return TRUE;
-}
-
-void CBookmarksToolbar::OnRightClickMenuItemSelected(int menuItemId, BookmarkItem *bookmarkItem)
-{
-	switch (menuItemId)
-	{
-	case IDM_BT_OPEN:
-	{
-		if (bookmarkItem->IsBookmark())
-		{
-			m_navigation->BrowseFolderInCurrentTab(bookmarkItem->GetLocation().c_str());
-		}
-	}
-		break;
-
-	case IDM_BT_OPENINNEWTAB:
-		OpenBookmarkItemInNewTab(bookmarkItem);
-		break;
-
-	case IDM_BT_NEWBOOKMARK:
-		OnNewBookmarkItem(BookmarkItem::Type::Bookmark);
-		break;
-
-	case IDM_BT_NEWFOLDER:
-		OnNewBookmarkItem(BookmarkItem::Type::Folder);
-		break;
-
-	case IDM_BT_DELETE:
-		m_bookmarkTree->RemoveBookmarkItem(bookmarkItem);
-		break;
-
-	case IDM_BT_PROPERTIES:
-		OnEditBookmarkItem(bookmarkItem);
-		break;
-	}
 }
 
 bool CBookmarksToolbar::OnCommand(WPARAM wParam, LPARAM lParam)
@@ -359,7 +292,7 @@ void CBookmarksToolbar::ShowBookmarkFolderMenu(const BookmarkItem *bookmarkItem,
 	POINT pt;
 	pt.x = rc.left;
 	pt.y = rc.bottom;
-	bookmarkMenu.ShowMenu(m_hToolbar, bookmarkItem, pt ,
+	bookmarkMenu.ShowMenu(m_hToolbar, bookmarkItem, pt,
 		std::bind(&CBookmarksToolbar::OnBookmarkMenuItemClicked, this, std::placeholders::_1));
 
 	SendMessage(m_hToolbar, TB_SETSTATE, command, MAKEWORD(state & ~TBSTATE_PRESSED, 0));

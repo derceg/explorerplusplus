@@ -7,6 +7,7 @@
 #include "AddBookmarkDialog.h"
 #include "MainResource.h"
 #include "../Helper/Macros.h"
+#include <boost/range/adaptor/filtered.hpp>
 #include <algorithm>
 
 int CALLBACK SortByName(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
@@ -175,5 +176,23 @@ void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *
 		}
 
 		bookmarkTree->MoveBookmarkItem(bookmarkItem, selectedParentFolder, newIndex);
+	}
+}
+
+// If the specified item is a bookmark, it will be opened in a new tab.
+// If it's a bookmark folder, each of its children will be opened in new
+// tabs.
+void BookmarkHelper::OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem, IExplorerplusplus *expp)
+{
+	if (bookmarkItem->IsFolder())
+	{
+		for (auto &childItem : bookmarkItem->GetChildren() | boost::adaptors::filtered(IsBookmark))
+		{
+			expp->GetTabContainer()->CreateNewTab(childItem->GetLocation().c_str());
+		}
+	}
+	else
+	{
+		expp->GetTabContainer()->CreateNewTab(bookmarkItem->GetLocation().c_str());
 	}
 }

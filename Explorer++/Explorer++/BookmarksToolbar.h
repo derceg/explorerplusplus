@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "BookmarkContextMenu.h"
 #include "BookmarkTree.h"
 #include "CoreInterface.h"
 #include "Navigation.h"
@@ -76,12 +77,9 @@ private:
 
 	void	RemoveBookmarkItem(const BookmarkItem *bookmarkItem);
 
-	void	OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem);
-
 	bool	OnCommand(WPARAM wParam, LPARAM lParam);
 	bool	OnButtonClick(int command);
 	BOOL	OnRightClick(const NMMOUSE *nmm);
-	void	OnRightClickMenuItemSelected(int menuItemId, BookmarkItem *bookmarkItem);
 	void	ShowBookmarkFolderMenu(const BookmarkItem *bookmarkItem, int command, int index);
 	void	OnBookmarkMenuItemClicked(const BookmarkItem *bookmarkItem);
 	void	OnNewBookmarkItem(BookmarkItem::Type type);
@@ -111,6 +109,7 @@ private:
 	Navigation *m_navigation;
 
 	BookmarkTree *m_bookmarkTree;
+	BookmarkContextMenu m_bookmarkContextMenu;
 
 	UINT m_uIDStart;
 	UINT m_uIDEnd;

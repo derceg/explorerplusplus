@@ -459,6 +459,7 @@
     <ClCompile Include="ApplicationToolbar.cpp" />
     <ClCompile Include="ApplicationToolbarButtonDialog.cpp" />
     <ClCompile Include="ApplicationToolbarDropHandler.cpp" />
+    <ClCompile Include="BookmarkContextMenu.cpp" />
     <ClCompile Include="BookmarkItem.cpp" />
     <ClCompile Include="BookmarksMainMenu.cpp" />
     <ClCompile Include="BookmarkMenuBuilder.cpp" />
@@ -602,6 +603,7 @@
     <ClInclude Include="ApplicationToolbar.h" />
     <ClInclude Include="ApplicationToolbarButtonDialog.h" />
     <ClInclude Include="ApplicationToolbarDropHandler.h" />
+    <ClInclude Include="BookmarkContextMenu.h" />
     <ClInclude Include="BookmarkHelper.h" />
     <ClInclude Include="BookmarkItem.h" />
     <ClInclude Include="BookmarkListView.h" />
