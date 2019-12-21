@@ -70,6 +70,12 @@ const BookmarkItem *BookmarkTree::GetOtherBookmarksFolder() const
 
 void BookmarkTree::AddBookmarkItem(BookmarkItem *parent, std::unique_ptr<BookmarkItem> bookmarkItem, size_t index)
 {
+	if (parent == &m_root)
+	{
+		assert(false);
+		return;
+	}
+
 	bookmarkItem->updatedSignal.AddObserver(std::bind(&BookmarkTree::OnBookmarkItemUpdated, this,
 		std::placeholders::_1, std::placeholders::_2), boost::signals2::at_front);
 
@@ -80,6 +86,12 @@ void BookmarkTree::AddBookmarkItem(BookmarkItem *parent, std::unique_ptr<Bookmar
 
 void BookmarkTree::MoveBookmarkItem(BookmarkItem *bookmarkItem, BookmarkItem *newParent, size_t index)
 {
+	if (newParent == &m_root || IsPermanentNode(bookmarkItem))
+	{
+		assert(false);
+		return;
+	}
+
 	BookmarkItem *oldParent = bookmarkItem->GetParent();
 	auto oldIndex = oldParent->GetChildIndex(bookmarkItem);
 
@@ -99,6 +111,7 @@ void BookmarkTree::RemoveBookmarkItem(BookmarkItem *bookmarkItem)
 {
 	if (IsPermanentNode(bookmarkItem))
 	{
+		assert(false);
 		return;
 	}
 
