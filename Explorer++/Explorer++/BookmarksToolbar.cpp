@@ -127,7 +127,7 @@ void CBookmarksToolbar::OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkIte
 {
 	if (bookmarkItem->IsFolder())
 	{
-		for (auto &childItem : bookmarkItem->GetChildren() | boost::adaptors::filtered(NBookmarkHelper::IsBookmark))
+		for (auto &childItem : bookmarkItem->GetChildren() | boost::adaptors::filtered(BookmarkHelper::IsBookmark))
 		{
 			m_pexpp->GetTabContainer()->CreateNewTab(childItem->GetLocation().c_str());
 		}
@@ -374,13 +374,13 @@ void CBookmarksToolbar::OnBookmarkMenuItemClicked(const BookmarkItem *bookmarkIt
 
 void CBookmarksToolbar::OnNewBookmarkItem(BookmarkItem::Type type)
 {
-	NBookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, m_instance, m_hToolbar,
+	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, m_instance, m_hToolbar,
 		m_pexpp->GetTabContainer(), m_pexpp);
 }
 
 void CBookmarksToolbar::OnEditBookmarkItem(BookmarkItem *bookmarkItem)
 {
-	NBookmarkHelper::EditBookmarkItem(bookmarkItem, m_bookmarkTree, m_instance,
+	BookmarkHelper::EditBookmarkItem(bookmarkItem, m_bookmarkTree, m_instance,
 		m_hToolbar, m_pexpp);
 }
 

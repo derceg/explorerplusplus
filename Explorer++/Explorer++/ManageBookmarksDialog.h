@@ -60,7 +60,7 @@ private:
 	std::wstring m_guidSelected;
 	std::unordered_set<std::wstring> m_setExpansion;
 
-	NBookmarkHelper::SortMode_t m_SortMode;
+	BookmarkHelper::SortMode_t m_SortMode;
 	bool m_bSortAscending;
 };
 
@@ -103,7 +103,7 @@ private:
 	void		SetupTreeView();
 	void		SetupListView();
 
-	void		SortListViewItems(NBookmarkHelper::SortMode_t SortMode);
+	void		SortListViewItems(BookmarkHelper::SortMode_t SortMode);
 
 	void		GetColumnString(CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,UINT cchBuf);
 	void		GetBookmarkItemColumnInfo(const BookmarkItem *bookmarkItem,

@@ -9,7 +9,7 @@
 #include "CoreInterface.h"
 #include "TabContainer.h"
 
-namespace NBookmarkHelper
+namespace BookmarkHelper
 {
 	enum SortMode_t
 	{

@@ -213,7 +213,7 @@ void CManageBookmarksDialog::SetupListView()
 	m_bListViewInitialized = true;
 }
 
-void CManageBookmarksDialog::SortListViewItems(NBookmarkHelper::SortMode_t SortMode)
+void CManageBookmarksDialog::SortListViewItems(BookmarkHelper::SortMode_t SortMode)
 {
 	m_pmbdps->m_SortMode = SortMode;
 
@@ -235,7 +235,7 @@ int CALLBACK CManageBookmarksDialog::SortBookmarks(LPARAM lParam1,LPARAM lParam2
 	auto firstItem = m_pBookmarkListView->GetBookmarkItemFromListViewlParam(lParam1);
 	auto secondItem = m_pBookmarkListView->GetBookmarkItemFromListViewlParam(lParam2);
 
-	int iRes = NBookmarkHelper::Sort(m_pmbdps->m_SortMode, firstItem, secondItem);
+	int iRes = BookmarkHelper::Sort(m_pmbdps->m_SortMode, firstItem, secondItem);
 
 	if (!m_pmbdps->m_bSortAscending)
 	{
@@ -292,19 +292,19 @@ INT_PTR CManageBookmarksDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 		break;
 
 	case IDM_MB_VIEW_SORTBYNAME:
-		SortListViewItems(NBookmarkHelper::SM_NAME);
+		SortListViewItems(BookmarkHelper::SM_NAME);
 		break;
 
 	case IDM_MB_VIEW_SORTBYLOCATION:
-		SortListViewItems(NBookmarkHelper::SM_LOCATION);
+		SortListViewItems(BookmarkHelper::SM_LOCATION);
 		break;
 
 	case IDM_MB_VIEW_SORTBYADDED:
-		SortListViewItems(NBookmarkHelper::SM_DATE_ADDED);
+		SortListViewItems(BookmarkHelper::SM_DATE_ADDED);
 		break;
 
 	case IDM_MB_VIEW_SORTBYLASTMODIFIED:
-		SortListViewItems(NBookmarkHelper::SM_DATE_MODIFIED);
+		SortListViewItems(BookmarkHelper::SM_DATE_MODIFIED);
 		break;
 
 	case IDM_MB_VIEW_SORTASCENDING:
@@ -728,19 +728,19 @@ void CManageBookmarksDialog::ShowViewMenu()
 
 	switch(m_pmbdps->m_SortMode)
 	{
-	case NBookmarkHelper::SM_NAME:
+	case BookmarkHelper::SM_NAME:
 		uCheck = IDM_MB_VIEW_SORTBYNAME;
 		break;
 
-	case NBookmarkHelper::SM_LOCATION:
+	case BookmarkHelper::SM_LOCATION:
 		uCheck = IDM_MB_VIEW_SORTBYLOCATION;
 		break;
 
-	case NBookmarkHelper::SM_DATE_ADDED:
+	case BookmarkHelper::SM_DATE_ADDED:
 		uCheck = IDM_MB_VIEW_SORTBYADDED;
 		break;
 
-	case NBookmarkHelper::SM_DATE_MODIFIED:
+	case BookmarkHelper::SM_DATE_MODIFIED:
 		uCheck = IDM_MB_VIEW_SORTBYLASTMODIFIED;
 		break;
 	}
@@ -967,7 +967,7 @@ void CManageBookmarksDialog::SaveState()
 
 CManageBookmarksDialogPersistentSettings::CManageBookmarksDialogPersistentSettings() :
 	m_bInitialized(false),
-	m_SortMode(NBookmarkHelper::SM_NAME),
+	m_SortMode(BookmarkHelper::SM_NAME),
 	m_bSortAscending(true),
 	CDialogSettings(SETTINGS_KEY)
 {

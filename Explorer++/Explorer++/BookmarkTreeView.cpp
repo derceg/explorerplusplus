@@ -181,7 +181,7 @@ void CBookmarkTreeView::InsertFoldersIntoTreeViewRecursive(HTREEITEM hParent, Bo
 {
 	int position = 0;
 
-	for (auto &child : bookmarkItem->GetChildren() | boost::adaptors::filtered(NBookmarkHelper::IsFolder))
+	for (auto &child : bookmarkItem->GetChildren() | boost::adaptors::filtered(BookmarkHelper::IsFolder))
 	{
 		HTREEITEM hCurrentItem = InsertFolderIntoTreeView(hParent, child.get(), position);
 		position++;

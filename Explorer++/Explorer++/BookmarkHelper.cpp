@@ -14,17 +14,17 @@ int CALLBACK SortByLocation(const BookmarkItem *firstItem, const BookmarkItem *s
 int CALLBACK SortByDateAdded(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
 int CALLBACK SortByDateModified(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
 
-bool NBookmarkHelper::IsFolder(const std::unique_ptr<BookmarkItem> &bookmarkItem)
+bool BookmarkHelper::IsFolder(const std::unique_ptr<BookmarkItem> &bookmarkItem)
 {
 	return bookmarkItem->IsFolder();
 }
 
-bool NBookmarkHelper::IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem)
+bool BookmarkHelper::IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem)
 {
 	return bookmarkItem->IsBookmark();
 }
 
-int CALLBACK NBookmarkHelper::Sort(SortMode_t SortMode, const BookmarkItem *firstItem,
+int CALLBACK BookmarkHelper::Sort(SortMode_t SortMode, const BookmarkItem *firstItem,
 	const BookmarkItem *secondItem)
 {
 	if(firstItem->GetType() == BookmarkItem::Type::Folder &&
@@ -114,7 +114,7 @@ int CALLBACK SortByDateModified(const BookmarkItem *firstItem,
 	return CompareFileTime(&firstItemDateModified, &secondItemDateModified);
 }
 
-void NBookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
+void BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
 	HMODULE resoureceModule, HWND parentWindow, TabContainer *tabContainer,
 	IExplorerplusplus *coreInterface)
 {
@@ -148,7 +148,7 @@ void NBookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::
 	}
 }
 
-void NBookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
+void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
 	HMODULE resoureceModule, HWND parentWindow, IExplorerplusplus *coreInterface)
 {
 	BookmarkItem *selectedParentFolder = nullptr;
