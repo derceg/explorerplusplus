@@ -12,12 +12,13 @@ BookmarkContextMenu::BookmarkContextMenu(BookmarkTree *bookmarkTree, HMODULE res
 	IExplorerplusplus *expp) :
 	m_bookmarkTree(bookmarkTree),
 	m_resourceModule(resourceModule),
-	m_expp(expp)
+	m_expp(expp),
+	m_showingMenu(false)
 {
 
 }
 
-BOOL BookmarkContextMenu::ShowMenu(HWND parentWindow, BookmarkItem *bookmarkItem, const POINT &pt)
+BOOL BookmarkContextMenu::ShowMenu(HWND parentWindow, BookmarkItem *bookmarkItem, const POINT &pt, bool recursive)
 {
 	auto parentMenu = wil::unique_hmenu(LoadMenu(m_resourceModule, MAKEINTRESOURCE(IDR_BOOKMARKSTOOLBAR_RCLICK_MENU)));
 
@@ -27,7 +28,21 @@ BOOL BookmarkContextMenu::ShowMenu(HWND parentWindow, BookmarkItem *bookmarkItem
 	}
 
 	HMENU menu = GetSubMenu(parentMenu.get(), 0);
-	int menuItemId = TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RETURNCMD, pt.x, pt.y, 0, parentWindow, nullptr);
+
+	UINT flags = TPM_LEFTALIGN | TPM_RETURNCMD;
+
+	if (recursive)
+	{
+		// This flag is needed to show the popup menu when another menu is
+		// already being shown.
+		WI_SetFlag(flags, TPM_RECURSE);
+	}
+
+	m_showingMenu = true;
+
+	int menuItemId = TrackPopupMenu(menu, flags, pt.x, pt.y, 0, parentWindow, nullptr);
+
+	m_showingMenu = false;
 
 	if (menuItemId != 0)
 	{
@@ -81,4 +96,9 @@ void BookmarkContextMenu::OnEditBookmarkItem(BookmarkItem *bookmarkItem, HWND pa
 {
 	BookmarkHelper::EditBookmarkItem(bookmarkItem, m_bookmarkTree, m_resourceModule,
 		parentWindow, m_expp);
+}
+
+bool BookmarkContextMenu::IsShowingMenu() const
+{
+	return m_showingMenu;
 }

@@ -12,19 +12,19 @@ class BookmarkMenuBuilder
 {
 public:
 
-	using ItemMap = std::unordered_map<int, const BookmarkItem *>;
+	using ItemMap = std::unordered_map<int, BookmarkItem *>;
 
 	BookmarkMenuBuilder(HMODULE resourceModule);
 
-	BOOL BuildMenu(HMENU menu, const BookmarkItem *bookmarkItem, const MenuIdRange &menuIdRange,
+	BOOL BuildMenu(HMENU menu, BookmarkItem *bookmarkItem, const MenuIdRange &menuIdRange,
 		int startPosition, ItemMap &itemMap);
 
 private:
 
-	BOOL BuildMenu(HMENU menu, const BookmarkItem *bookmarkItem, int startPosition, ItemMap &itemMap);
+	BOOL BuildMenu(HMENU menu, BookmarkItem *bookmarkItem, int startPosition, ItemMap &itemMap);
 	BOOL AddEmptyBookmarkFolderToMenu(HMENU menu, int position);
-	BOOL AddBookmarkFolderToMenu(HMENU menu, const BookmarkItem *bookmarkItem, int position, ItemMap &itemMap);
-	BOOL AddBookmarkToMenu(HMENU menu, const BookmarkItem *bookmarkItem, int position, ItemMap &itemMap);
+	BOOL AddBookmarkFolderToMenu(HMENU menu, BookmarkItem *bookmarkItem, int position, ItemMap &itemMap);
+	BOOL AddBookmarkToMenu(HMENU menu, BookmarkItem *bookmarkItem, int position, ItemMap &itemMap);
 
 	HMODULE m_resourceModule;
 	MenuIdRange m_menuIdRange;

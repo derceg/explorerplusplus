@@ -14,7 +14,8 @@ public:
 
 	BookmarkContextMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule, IExplorerplusplus *expp);
 
-	BOOL ShowMenu(HWND parentWindow, BookmarkItem *bookmarkItem, const POINT &pt);
+	BOOL ShowMenu(HWND parentWindow, BookmarkItem *bookmarkItem, const POINT &pt, bool recursive = false);
+	bool IsShowingMenu() const;
 
 private:
 
@@ -25,4 +26,5 @@ private:
 	BookmarkTree *m_bookmarkTree;
 	HMODULE m_resourceModule;
 	IExplorerplusplus *m_expp;
+	bool m_showingMenu;
 };

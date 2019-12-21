@@ -14,9 +14,11 @@ BookmarkMenuBuilder::BookmarkMenuBuilder(HMODULE resourceModule) :
 
 }
 
-BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, const BookmarkItem *bookmarkItem,
+BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, BookmarkItem *bookmarkItem,
 	const MenuIdRange &menuIdRange, int startPosition, ItemMap &itemMap)
 {
+	assert(bookmarkItem->IsFolder());
+
 	m_menuIdRange = menuIdRange;
 	m_idCounter = menuIdRange.startId;
 	itemMap.clear();
@@ -24,7 +26,7 @@ BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, const BookmarkItem *bookmarkItem
 	return BuildMenu(menu, bookmarkItem, startPosition, itemMap);
 }
 
-BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, const BookmarkItem *bookmarkItem,
+BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, BookmarkItem *bookmarkItem,
 	int startPosition, ItemMap &itemMap)
 {
 	if (bookmarkItem->GetChildren().empty())
@@ -71,7 +73,7 @@ BOOL BookmarkMenuBuilder::AddEmptyBookmarkFolderToMenu(HMENU menu, int position)
 	return InsertMenuItem(menu, position, TRUE, &mii);
 }
 
-BOOL BookmarkMenuBuilder::AddBookmarkFolderToMenu(HMENU menu, const BookmarkItem *bookmarkItem,
+BOOL BookmarkMenuBuilder::AddBookmarkFolderToMenu(HMENU menu, BookmarkItem *bookmarkItem,
 	int position, ItemMap &itemMap)
 {
 	HMENU subMenu = CreatePopupMenu();
@@ -98,7 +100,7 @@ BOOL BookmarkMenuBuilder::AddBookmarkFolderToMenu(HMENU menu, const BookmarkItem
 	return BuildMenu(subMenu, bookmarkItem, 0, itemMap);
 }
 
-BOOL BookmarkMenuBuilder::AddBookmarkToMenu(HMENU menu, const BookmarkItem *bookmarkItem,
+BOOL BookmarkMenuBuilder::AddBookmarkToMenu(HMENU menu, BookmarkItem *bookmarkItem,
 	int position, ItemMap &itemMap)
 {
 	int id = m_idCounter++;

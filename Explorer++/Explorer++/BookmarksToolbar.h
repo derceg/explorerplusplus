@@ -5,6 +5,7 @@
 #pragma once
 
 #include "BookmarkContextMenu.h"
+#include "BookmarkMenu.h"
 #include "BookmarkTree.h"
 #include "CoreInterface.h"
 #include "Navigation.h"
@@ -80,7 +81,7 @@ private:
 	bool	OnCommand(WPARAM wParam, LPARAM lParam);
 	bool	OnButtonClick(int command);
 	BOOL	OnRightClick(const NMMOUSE *nmm);
-	void	ShowBookmarkFolderMenu(const BookmarkItem *bookmarkItem, int command, int index);
+	void	ShowBookmarkFolderMenu(BookmarkItem *bookmarkItem, int command, int index);
 	void	OnBookmarkMenuItemClicked(const BookmarkItem *bookmarkItem);
 	void	OnNewBookmarkItem(BookmarkItem::Type type);
 	void	OnEditBookmarkItem(BookmarkItem *bookmarkItem);
@@ -110,6 +111,7 @@ private:
 
 	BookmarkTree *m_bookmarkTree;
 	BookmarkContextMenu m_bookmarkContextMenu;
+	BookmarkMenu m_bookmarkMenu;
 
 	UINT m_uIDStart;
 	UINT m_uIDEnd;

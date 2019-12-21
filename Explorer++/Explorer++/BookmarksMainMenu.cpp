@@ -8,7 +8,7 @@
 #include "ResourceHelper.h"
 #include "TabContainer.h"
 
-BookmarksMainMenu::BookmarksMainMenu(IExplorerplusplus *expp, const BookmarkTree *bookmarkTree,
+BookmarksMainMenu::BookmarksMainMenu(IExplorerplusplus *expp, BookmarkTree *bookmarkTree,
 	const MenuIdRange &menuIdRange) :
 	m_expp(expp),
 	m_bookmarkTree(bookmarkTree),
@@ -84,7 +84,7 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(std::vector<wil::uni
 
 void BookmarksMainMenu::AddBookmarkItemsToMenu(HMENU menu, int position, BookmarkMenuBuilder::ItemMap &menuItemMappings)
 {
-	const BookmarkItem *bookmarksMenuFolder = m_bookmarkTree->GetBookmarksMenuFolder();
+	BookmarkItem *bookmarksMenuFolder = m_bookmarkTree->GetBookmarksMenuFolder();
 
 	if (bookmarksMenuFolder->GetChildren().empty())
 	{
@@ -103,7 +103,7 @@ void BookmarksMainMenu::AddBookmarkItemsToMenu(HMENU menu, int position, Bookmar
 
 void BookmarksMainMenu::AddOtherBookmarksToMenu(HMENU menu, int position, BookmarkMenuBuilder::ItemMap &menuItemMappings)
 {
-	const BookmarkItem *otherBookmarksFolder = m_bookmarkTree->GetOtherBookmarksFolder();
+	BookmarkItem *otherBookmarksFolder = m_bookmarkTree->GetOtherBookmarksFolder();
 
 	if (otherBookmarksFolder->GetChildren().empty())
 	{

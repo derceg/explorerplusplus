@@ -16,7 +16,7 @@ class BookmarksMainMenu
 {
 public:
 
-	BookmarksMainMenu(IExplorerplusplus *expp, const BookmarkTree *bookmarkTree,
+	BookmarksMainMenu(IExplorerplusplus *expp, BookmarkTree *bookmarkTree,
 		const MenuIdRange &menuIdRange);
 	~BookmarksMainMenu();
 
@@ -31,7 +31,7 @@ private:
 	void AddOtherBookmarksToMenu(HMENU menu, int position, BookmarkMenuBuilder::ItemMap &menuItemMappings);
 
 	IExplorerplusplus *m_expp;
-	const BookmarkTree *m_bookmarkTree;
+	BookmarkTree *m_bookmarkTree;
 	MenuIdRange m_menuIdRange;
 	BookmarkMenuBuilder m_menuBuilder;
 

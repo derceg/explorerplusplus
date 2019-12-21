@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "BookmarksToolbar.h"
 #include "AddBookmarkDialog.h"
-#include "BookmarkMenu.h"
 #include "MainResource.h"
 #include "TabContainer.h"
 #include "../Helper/Macros.h"
@@ -23,6 +22,7 @@ CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplore
 	m_uIDStart(uIDStart),
 	m_uIDEnd(uIDEnd),
 	m_bookmarkContextMenu(bookmarkTree, instance, pexpp),
+	m_bookmarkMenu(bookmarkTree, instance, pexpp, hToolbar),
 	m_uIDCounter(0)
 {
 	InitializeToolbar();
@@ -260,7 +260,7 @@ bool CBookmarksToolbar::OnButtonClick(int command)
 	return true;
 }
 
-void CBookmarksToolbar::ShowBookmarkFolderMenu(const BookmarkItem *bookmarkItem, int command, int index)
+void CBookmarksToolbar::ShowBookmarkFolderMenu(BookmarkItem *bookmarkItem, int command, int index)
 {
 	RECT rc;
 	BOOL res = static_cast<BOOL>(SendMessage(m_hToolbar, TB_GETITEMRECT, index, reinterpret_cast<LPARAM>(&rc)));
@@ -287,13 +287,11 @@ void CBookmarksToolbar::ShowBookmarkFolderMenu(const BookmarkItem *bookmarkItem,
 
 	SendMessage(m_hToolbar, TB_SETSTATE, command, MAKEWORD(state | TBSTATE_PRESSED, 0));
 
-	BookmarkMenu bookmarkMenu(m_instance);
-
 	POINT pt;
 	pt.x = rc.left;
 	pt.y = rc.bottom;
-	bookmarkMenu.ShowMenu(m_hToolbar, bookmarkItem, pt,
-		std::bind(&CBookmarksToolbar::OnBookmarkMenuItemClicked, this, std::placeholders::_1));
+	m_bookmarkMenu.ShowMenu(bookmarkItem, pt, std::bind(&CBookmarksToolbar::OnBookmarkMenuItemClicked,
+		this, std::placeholders::_1));
 
 	SendMessage(m_hToolbar, TB_SETSTATE, command, MAKEWORD(state & ~TBSTATE_PRESSED, 0));
 }
