@@ -27,6 +27,8 @@ private:
 	void OnMainMenuPreShow(HMENU mainMenu);
 	wil::unique_hmenu BuildMainBookmarksMenu(std::vector<wil::unique_hbitmap> &menuImages,
 		BookmarkMenuBuilder::ItemMap &menuItemMappings);
+	void AddBookmarkItemsToMenu(HMENU menu, int position, BookmarkMenuBuilder::ItemMap &menuItemMappings);
+	void AddOtherBookmarksToMenu(HMENU menu, int position, BookmarkMenuBuilder::ItemMap &menuItemMappings);
 
 	IExplorerplusplus *m_expp;
 	const BookmarkTree *m_bookmarkTree;
