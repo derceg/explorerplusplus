@@ -18,7 +18,7 @@ public:
 
 	CBookmarkListView(HWND hListView, IExplorerplusplus *expp);
 
-	void InsertBookmarksIntoListView(BookmarkItem *bookmarkItem);
+	void NavigateToBookmarkFolder(BookmarkItem *bookmarkItem);
 	BookmarkItem *GetBookmarkItemFromListView(int iItem);
 	BookmarkItem *GetBookmarkItemFromListViewlParam(LPARAM lParam);
 
@@ -30,4 +30,6 @@ private:
 	DpiCompatibility m_dpiCompat;
 	wil::unique_himagelist m_imageList;
 	IconImageListMapping m_imageListMappings;
+
+	BookmarkItem *m_currentBookmarkFolder;
 };

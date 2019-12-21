@@ -176,7 +176,7 @@ void CManageBookmarksDialog::SetupListView()
 		}
 	}
 
-	m_pBookmarkListView->InsertBookmarksIntoListView(m_bookmarkTree->GetRoot());
+	m_pBookmarkListView->NavigateToBookmarkFolder(m_bookmarkTree->GetRoot());
 
 	int iItem = 0;
 
@@ -838,7 +838,7 @@ void CManageBookmarksDialog::BrowseBookmarkFolder(BookmarkItem *bookmarkItem)
 
 	m_guidCurrentFolder = bookmarkItem->GetGUID();
 	m_pBookmarkTreeView->SelectFolder(bookmarkItem->GetGUID());
-	m_pBookmarkListView->InsertBookmarksIntoListView(bookmarkItem);
+	m_pBookmarkListView->NavigateToBookmarkFolder(bookmarkItem);
 
 	UpdateToolbarState();
 }

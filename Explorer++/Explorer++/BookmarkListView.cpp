@@ -23,8 +23,12 @@ CBookmarkListView::CBookmarkListView(HWND hListView, IExplorerplusplus *expp) :
 	ListView_SetImageList(hListView, m_imageList.get(), LVSIL_SMALL);
 }
 
-void CBookmarkListView::InsertBookmarksIntoListView(BookmarkItem *bookmarkItem)
+void CBookmarkListView::NavigateToBookmarkFolder(BookmarkItem *bookmarkItem)
 {
+	assert(bookmarkItem->IsFolder());
+
+	m_currentBookmarkFolder = bookmarkItem;
+
 	ListView_DeleteAllItems(m_hListView);
 
 	int position = 0;
