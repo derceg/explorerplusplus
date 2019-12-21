@@ -66,7 +66,7 @@ LRESULT CALLBACK CBookmarkTreeView::TreeViewProc(HWND hwnd, UINT Msg, WPARAM wPa
 				break;
 
 			case IDM_BOOKMARK_TREEVIEW_RLICK_DELETE:
-				/* TODO: Handle menu item. */
+				OnDelete();
 				break;
 
 			case IDM_BOOKMARK_TREEVIEW_RLICK_NEW_FOLDER:
@@ -357,6 +357,14 @@ BOOL CBookmarkTreeView::OnTvnEndLabelEdit(NMTVDISPINFO *pnmtvdi)
 	}
 
 	return FALSE;
+}
+
+void CBookmarkTreeView::OnDelete()
+{
+	HTREEITEM hSelectedItem = TreeView_GetSelection(m_hTreeView);
+	auto bookmarkFolder = GetBookmarkFolderFromTreeView(hSelectedItem);
+
+	m_bookmarkTree->RemoveBookmarkItem(bookmarkFolder);
 }
 
 void CBookmarkTreeView::OnRClick(NMHDR *pnmhdr)

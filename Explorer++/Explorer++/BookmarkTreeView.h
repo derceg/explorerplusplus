@@ -54,6 +54,7 @@ private:
 	void OnTreeViewRename();
 	void OnTvnBeginLabelEdit();
 	BOOL OnTvnEndLabelEdit(NMTVDISPINFO *pnmtvdi);
+	void OnDelete();
 
 	void OnRClick(NMHDR *pnmhdr);
 
