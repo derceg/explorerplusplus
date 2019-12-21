@@ -74,7 +74,7 @@ BOOL BookmarkMenuBuilder::AddEmptyBookmarkFolderToMenu(HMENU menu, int position)
 BOOL BookmarkMenuBuilder::AddBookmarkFolderToMenu(HMENU menu, const BookmarkItem *bookmarkItem,
 	int position, ItemMap &itemMap)
 {
-	HMENU subMenu = CreateMenu();
+	HMENU subMenu = CreatePopupMenu();
 
 	if (subMenu == nullptr)
 	{
