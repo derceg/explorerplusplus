@@ -7,6 +7,7 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/MenuHelper.h"
 #include <boost/range/adaptor/filtered.hpp>
 #include <stack>
 
@@ -384,14 +385,21 @@ void CBookmarkTreeView::OnRClick(NMHDR *pnmhdr)
 	ScreenToClient(m_hTreeView, &tvhti.pt);
 	HTREEITEM hItem = TreeView_HitTest(m_hTreeView, &tvhti);
 
-	if (hItem != NULL)
+	if (hItem == nullptr)
 	{
-		TreeView_SelectItem(m_hTreeView, hItem);
-
-		HMENU hMenu = LoadMenu(m_instance, MAKEINTRESOURCE(IDR_BOOKMARK_TREEVIEW_RCLICK_MENU));
-		TrackPopupMenu(GetSubMenu(hMenu, 0), TPM_LEFTALIGN, ptCursor.x, ptCursor.y, 0, m_hTreeView, NULL);
-		DestroyMenu(hMenu);
+		return;
 	}
+
+	TreeView_SelectItem(m_hTreeView, hItem);
+
+	auto bookmarkFolder = GetBookmarkFolderFromTreeView(hItem);
+
+	wil::unique_hmenu menu(LoadMenu(m_instance, MAKEINTRESOURCE(IDR_BOOKMARK_TREEVIEW_RCLICK_MENU)));
+
+	lEnableMenuItem(menu.get(), IDM_BOOKMARK_TREEVIEW_RLICK_RENAME, !m_bookmarkTree->IsPermanentNode(bookmarkFolder));
+	lEnableMenuItem(menu.get(), IDM_BOOKMARK_TREEVIEW_RLICK_DELETE, !m_bookmarkTree->IsPermanentNode(bookmarkFolder));
+
+	TrackPopupMenu(GetSubMenu(menu.get(), 0), TPM_LEFTALIGN, ptCursor.x, ptCursor.y, 0, m_hTreeView, NULL);
 }
 
 void CBookmarkTreeView::CreateNewFolder()

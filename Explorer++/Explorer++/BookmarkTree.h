@@ -21,6 +21,8 @@ public:
 	BookmarkItem *GetOtherBookmarksFolder();
 	const BookmarkItem *GetOtherBookmarksFolder() const;
 
+	bool IsPermanentNode(const BookmarkItem *bookmarkItem) const;
+
 	void AddBookmarkItem(BookmarkItem *parent, std::unique_ptr<BookmarkItem> bookmarkItem, size_t index);
 	void MoveBookmarkItem(BookmarkItem *bookmarkItem, BookmarkItem *newParent, size_t index);
 	void RemoveBookmarkItem(BookmarkItem *bookmarkItem);
@@ -37,8 +39,6 @@ public:
 	SignalWrapper<BookmarkTree, void(const std::wstring &guid)> bookmarkItemRemovedSignal;
 
 private:
-
-	bool IsPermanentNode(const BookmarkItem *bookmarkItem) const;
 
 	void OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);
 
