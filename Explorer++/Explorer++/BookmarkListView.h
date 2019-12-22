@@ -17,7 +17,8 @@ class CBookmarkListView
 {
 public:
 
-	CBookmarkListView(HWND hListView, HMODULE resourceModule, IExplorerplusplus *expp);
+	CBookmarkListView(HWND hListView, HMODULE resourceModule, BookmarkTree *bookmarkTree,
+		IExplorerplusplus *expp);
 
 	void NavigateToBookmarkFolder(BookmarkItem *bookmarkItem);
 	BookmarkItem *GetBookmarkItemFromListView(int iItem);
@@ -34,6 +35,8 @@ private:
 	int InsertBookmarkItemIntoListView(BookmarkItem *bookmarkItem, int position);
 
 	void OnRClick(const NMITEMACTIVATE *itemActivate);
+	BOOL OnBeginLabelEdit(NMLVDISPINFO *dispInfo);
+	BOOL OnEndLabelEdit(NMLVDISPINFO *dispInfo);
 
 	HWND m_hListView;
 	HMODULE m_resourceModule;
@@ -41,6 +44,7 @@ private:
 	wil::unique_himagelist m_imageList;
 	IconImageListMapping m_imageListMappings;
 
+	BookmarkTree *m_bookmarkTree;
 	BookmarkItem *m_currentBookmarkFolder;
 
 	std::vector<WindowSubclassWrapper> m_windowSubclasses;

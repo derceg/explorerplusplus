@@ -155,7 +155,7 @@ void CManageBookmarksDialog::SetupListView()
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
 
-	m_pBookmarkListView = new CBookmarkListView(hListView, GetInstance(), m_pexpp);
+	m_pBookmarkListView = new CBookmarkListView(hListView, GetInstance(), m_bookmarkTree, m_pexpp);
 
 	int iColumn = 0;
 
@@ -266,7 +266,17 @@ INT_PTR CManageBookmarksDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
-	switch(LOWORD(wParam))
+	if (HIWORD(wParam) == 0 || HIWORD(wParam) == 1)
+	{
+		return HandleMenuOrAccelerator(wParam);
+	}
+
+	return 1;
+}
+
+LRESULT CManageBookmarksDialog::HandleMenuOrAccelerator(WPARAM wParam)
+{
+	switch (LOWORD(wParam))
 	{
 	case TOOLBAR_ID_BACK:
 		BrowseBack();
@@ -355,10 +365,6 @@ INT_PTR CManageBookmarksDialog::OnNotify(NMHDR *pnmhdr)
 
 	case TVN_SELCHANGED:
 		OnTvnSelChanged(reinterpret_cast<NMTREEVIEW *>(pnmhdr));
-		break;
-
-	case LVN_ENDLABELEDIT:
-		return OnLvnEndLabelEdit(reinterpret_cast<NMLVDISPINFO *>(pnmhdr));
 		break;
 
 	case LVN_KEYDOWN:
@@ -491,22 +497,6 @@ void CManageBookmarksDialog::OnListViewHeaderRClick()
 			}
 		}
 	}
-}
-
-BOOL CManageBookmarksDialog::OnLvnEndLabelEdit(NMLVDISPINFO *pnmlvdi)
-{
-	if(pnmlvdi->item.pszText != NULL &&
-		lstrlen(pnmlvdi->item.pszText) > 0)
-	{
-		auto bookmarkItem = m_pBookmarkListView->GetBookmarkItemFromListView(pnmlvdi->item.iItem);
-		bookmarkItem->SetName(pnmlvdi->item.pszText);
-
-		SetWindowLongPtr(m_hDlg,DWLP_MSGRESULT,TRUE);
-		return TRUE;
-	}
-
-	SetWindowLongPtr(m_hDlg,DWLP_MSGRESULT,FALSE);
-	return FALSE;
 }
 
 void CManageBookmarksDialog::OnLvnKeyDown(NMLVKEYDOWN *pnmlvkd)

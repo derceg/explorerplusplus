@@ -119,6 +119,8 @@ private:
 
 	void		UpdateToolbarState();
 
+	LRESULT		HandleMenuOrAccelerator(WPARAM wParam);
+
 	void		OnNewFolder();
 	void		OnDeleteBookmark(const std::wstring &guid);
 
@@ -132,7 +134,6 @@ private:
 	void		OnTvnSelChanged(NMTREEVIEW *pnmtv);
 
 	void		OnListViewHeaderRClick();
-	BOOL		OnLvnEndLabelEdit(NMLVDISPINFO *pnmlvdi);
 	void		OnLvnKeyDown(NMLVKEYDOWN *pnmlvkd);
 	void		OnListViewRename();
 

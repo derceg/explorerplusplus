@@ -7,9 +7,11 @@
 #include "MainResource.h"
 #include "../Helper/Macros.h"
 
-CBookmarkListView::CBookmarkListView(HWND hListView, HMODULE resourceModule, IExplorerplusplus *expp) :
+CBookmarkListView::CBookmarkListView(HWND hListView, HMODULE resourceModule,
+	BookmarkTree *bookmarkTree, IExplorerplusplus *expp) :
 	m_hListView(hListView),
-	m_resourceModule(resourceModule)
+	m_resourceModule(resourceModule),
+	m_bookmarkTree(bookmarkTree)
 {
 	SetWindowTheme(hListView, L"Explorer", NULL);
 	ListView_SetExtendedListViewStyleEx(hListView,
@@ -48,6 +50,14 @@ LRESULT CALLBACK CBookmarkListView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM w
 			case NM_RCLICK:
 				OnRClick(reinterpret_cast<NMITEMACTIVATE *>(lParam));
 				return TRUE;
+				break;
+
+			case LVN_BEGINLABELEDIT:
+				return OnBeginLabelEdit(reinterpret_cast<NMLVDISPINFO *>(lParam));
+				break;
+
+			case LVN_ENDLABELEDIT:
+				return OnEndLabelEdit(reinterpret_cast<NMLVDISPINFO *>(lParam));
 				break;
 			}
 		}
@@ -131,4 +141,35 @@ void CBookmarkListView::OnRClick(const NMITEMACTIVATE *itemActivate)
 
 	TrackPopupMenu(GetSubMenu(hMenu, 0), TPM_LEFTALIGN, pt.x, pt.y, 0, m_hListView, NULL);
 	DestroyMenu(hMenu);
+}
+
+BOOL CBookmarkListView::OnBeginLabelEdit(NMLVDISPINFO *dispInfo)
+{
+	auto bookmarkItem = GetBookmarkItemFromListView(dispInfo->item.iItem);
+
+	if (m_bookmarkTree->IsPermanentNode(bookmarkItem))
+	{
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+BOOL CBookmarkListView::OnEndLabelEdit(NMLVDISPINFO *dispInfo)
+{
+	if (dispInfo->item.pszText == nullptr && lstrlen(dispInfo->item.pszText) == 0)
+	{
+		return FALSE;
+	}
+
+	auto bookmarkItem = GetBookmarkItemFromListView(dispInfo->item.iItem);
+
+	if (m_bookmarkTree->IsPermanentNode(bookmarkItem))
+	{
+		return FALSE;
+	}
+
+	bookmarkItem->SetName(dispInfo->item.pszText);
+
+	return TRUE;
 }
