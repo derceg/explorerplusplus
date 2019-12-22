@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "BookmarkListView.h"
 #include "MainResource.h"
+#include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 
 CBookmarkListView::CBookmarkListView(HWND hListView, HMODULE resourceModule,
@@ -58,6 +59,10 @@ LRESULT CALLBACK CBookmarkListView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM w
 
 			case LVN_ENDLABELEDIT:
 				return OnEndLabelEdit(reinterpret_cast<NMLVDISPINFO *>(lParam));
+				break;
+
+			case LVN_KEYDOWN:
+				OnKeyDown(reinterpret_cast<NMLVKEYDOWN *>(lParam));
 				break;
 			}
 		}
@@ -143,7 +148,7 @@ void CBookmarkListView::OnRClick(const NMITEMACTIVATE *itemActivate)
 	DestroyMenu(hMenu);
 }
 
-BOOL CBookmarkListView::OnBeginLabelEdit(NMLVDISPINFO *dispInfo)
+BOOL CBookmarkListView::OnBeginLabelEdit(const NMLVDISPINFO *dispInfo)
 {
 	auto bookmarkItem = GetBookmarkItemFromListView(dispInfo->item.iItem);
 
@@ -155,7 +160,7 @@ BOOL CBookmarkListView::OnBeginLabelEdit(NMLVDISPINFO *dispInfo)
 	return FALSE;
 }
 
-BOOL CBookmarkListView::OnEndLabelEdit(NMLVDISPINFO *dispInfo)
+BOOL CBookmarkListView::OnEndLabelEdit(const NMLVDISPINFO *dispInfo)
 {
 	if (dispInfo->item.pszText == nullptr && lstrlen(dispInfo->item.pszText) == 0)
 	{
@@ -172,4 +177,40 @@ BOOL CBookmarkListView::OnEndLabelEdit(NMLVDISPINFO *dispInfo)
 	bookmarkItem->SetName(dispInfo->item.pszText);
 
 	return TRUE;
+}
+
+void CBookmarkListView::OnKeyDown(const NMLVKEYDOWN *keyDown)
+{
+	switch (keyDown->wVKey)
+	{
+	case VK_F2:
+		OnRename();
+		break;
+
+	case 'A':
+		if (IsKeyDown(VK_CONTROL) &&
+			!IsKeyDown(VK_SHIFT) &&
+			!IsKeyDown(VK_MENU))
+		{
+			NListView::ListView_SelectAllItems(m_hListView, TRUE);
+		}
+		break;
+
+	/* TODO: */
+	case VK_RETURN:
+		break;
+
+	case VK_DELETE:
+		break;
+	}
+}
+
+void CBookmarkListView::OnRename()
+{
+	int item = ListView_GetNextItem(m_hListView, -1, LVNI_SELECTED);
+
+	if (item != -1)
+	{
+		ListView_EditLabel(m_hListView, item);
+	}
 }

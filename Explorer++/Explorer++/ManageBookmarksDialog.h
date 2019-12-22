@@ -134,8 +134,6 @@ private:
 	void		OnTvnSelChanged(NMTREEVIEW *pnmtv);
 
 	void		OnListViewHeaderRClick();
-	void		OnLvnKeyDown(NMLVKEYDOWN *pnmlvkd);
-	void		OnListViewRename();
 
 	void		OnOk();
 	void		OnCancel();

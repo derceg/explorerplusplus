@@ -35,8 +35,10 @@ private:
 	int InsertBookmarkItemIntoListView(BookmarkItem *bookmarkItem, int position);
 
 	void OnRClick(const NMITEMACTIVATE *itemActivate);
-	BOOL OnBeginLabelEdit(NMLVDISPINFO *dispInfo);
-	BOOL OnEndLabelEdit(NMLVDISPINFO *dispInfo);
+	BOOL OnBeginLabelEdit(const NMLVDISPINFO *dispInfo);
+	BOOL OnEndLabelEdit(const NMLVDISPINFO *dispInfo);
+	void OnKeyDown(const NMLVKEYDOWN *keyDown);
+	void OnRename();
 
 	HWND m_hListView;
 	HMODULE m_resourceModule;

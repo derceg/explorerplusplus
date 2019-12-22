@@ -366,10 +366,6 @@ INT_PTR CManageBookmarksDialog::OnNotify(NMHDR *pnmhdr)
 	case TVN_SELCHANGED:
 		OnTvnSelChanged(reinterpret_cast<NMTREEVIEW *>(pnmhdr));
 		break;
-
-	case LVN_KEYDOWN:
-		OnLvnKeyDown(reinterpret_cast<NMLVKEYDOWN *>(pnmhdr));
-		break;
 	}
 
 	return 0;
@@ -496,45 +492,6 @@ void CManageBookmarksDialog::OnListViewHeaderRClick()
 				++iColumn;
 			}
 		}
-	}
-}
-
-void CManageBookmarksDialog::OnLvnKeyDown(NMLVKEYDOWN *pnmlvkd)
-{
-	switch(pnmlvkd->wVKey)
-	{
-	case VK_F2:
-		OnListViewRename();
-		break;
-
-	case 'A':
-		if(IsKeyDown(VK_CONTROL) &&
-			!IsKeyDown(VK_SHIFT) &&
-			!IsKeyDown(VK_MENU))
-		{
-			HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
-			NListView::ListView_SelectAllItems(hListView,TRUE);
-			SetFocus(hListView);
-		}
-		break;
-
-	/* TODO: */
-	case VK_RETURN:
-		break;
-
-	case VK_DELETE:
-		break;
-	}
-}
-
-void CManageBookmarksDialog::OnListViewRename()
-{
-	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
-	int iItem = ListView_GetNextItem(hListView,-1,LVNI_SELECTED);
-
-	if(iItem != -1)
-	{
-		ListView_EditLabel(hListView,iItem);
 	}
 }
 
