@@ -389,7 +389,7 @@ void CManageBookmarksDialog::OnNewFolder()
 
 	auto bookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(
 		hSelectedItem);
-	bookmarkFolder->AddChild(std::move(newBookmarkFolder));
+	m_bookmarkTree->AddBookmarkItem(bookmarkFolder, std::move(newBookmarkFolder), bookmarkFolder->GetChildren().size());
 }
 
 void CManageBookmarksDialog::OnDeleteBookmark(const std::wstring &guid)
