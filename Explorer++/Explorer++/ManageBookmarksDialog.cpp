@@ -155,7 +155,7 @@ void CManageBookmarksDialog::SetupListView()
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
 
-	m_pBookmarkListView = new CBookmarkListView(hListView, m_pexpp);
+	m_pBookmarkListView = new CBookmarkListView(hListView, GetInstance(), m_pexpp);
 
 	int iColumn = 0;
 
@@ -395,33 +395,6 @@ void CManageBookmarksDialog::OnDeleteBookmark(const std::wstring &guid)
 	UNREFERENCED_PARAMETER(guid);
 
 	/* TODO: Move the bookmark/bookmark folder to the trash folder. */
-}
-
-void CManageBookmarksDialog::OnListViewRClick()
-{
-	DWORD dwCursorPos = GetMessagePos();
-
-	POINT ptCursor;
-	ptCursor.x = GET_X_LPARAM(dwCursorPos);
-	ptCursor.y = GET_Y_LPARAM(dwCursorPos);
-
-	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
-
-	LVHITTESTINFO lvhti;
-	lvhti.pt = ptCursor;
-	ScreenToClient(hListView,&lvhti.pt);
-	int iItem = ListView_HitTest(hListView,&lvhti);
-
-	if(iItem == -1)
-	{
-		return;
-	}
-
-	HMENU hMenu = LoadMenu(GetInstance(),MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_BOOKMARK_RCLICK_MENU));
-	SetMenuDefaultItem(GetSubMenu(hMenu,0),IDM_MB_BOOKMARK_OPEN,FALSE);
-
-	TrackPopupMenu(GetSubMenu(hMenu,0),TPM_LEFTALIGN,ptCursor.x,ptCursor.y,0,m_hDlg,NULL);
-	DestroyMenu(hMenu);
 }
 
 void CManageBookmarksDialog::OnListViewHeaderRClick()
@@ -905,11 +878,7 @@ void CManageBookmarksDialog::OnRClick(NMHDR *pnmhdr)
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
 
-	if(pnmhdr->hwndFrom == hListView)
-	{
-		OnListViewRClick();
-	}
-	else if(pnmhdr->hwndFrom == ListView_GetHeader(hListView))
+	if(pnmhdr->hwndFrom == ListView_GetHeader(hListView))
 	{
 		OnListViewHeaderRClick();
 	}

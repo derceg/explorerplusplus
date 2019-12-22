@@ -10,13 +10,14 @@
 #include "CoreInterface.h"
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/WindowSubclassWrapper.h"
 #include <wil/resource.h>
 
 class CBookmarkListView
 {
 public:
 
-	CBookmarkListView(HWND hListView, IExplorerplusplus *expp);
+	CBookmarkListView(HWND hListView, HMODULE resourceModule, IExplorerplusplus *expp);
 
 	void NavigateToBookmarkFolder(BookmarkItem *bookmarkItem);
 	BookmarkItem *GetBookmarkItemFromListView(int iItem);
@@ -24,12 +25,23 @@ public:
 
 private:
 
+	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
+
+	static LRESULT CALLBACK ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
+		LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
 	int InsertBookmarkItemIntoListView(BookmarkItem *bookmarkItem, int position);
 
+	void OnRClick(const NMITEMACTIVATE *itemActivate);
+
 	HWND m_hListView;
+	HMODULE m_resourceModule;
 	DpiCompatibility m_dpiCompat;
 	wil::unique_himagelist m_imageList;
 	IconImageListMapping m_imageListMappings;
 
 	BookmarkItem *m_currentBookmarkFolder;
+
+	std::vector<WindowSubclassWrapper> m_windowSubclasses;
 };
