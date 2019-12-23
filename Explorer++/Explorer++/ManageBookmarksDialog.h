@@ -29,21 +29,6 @@ private:
 
 	friend CManageBookmarksDialog;
 
-	enum ColumnType_t
-	{
-		COLUMN_TYPE_NAME = 1,
-		COLUMN_TYPE_LOCATION = 2,
-		COLUMN_TYPE_DATE_CREATED = 3,
-		COLUMN_TYPE_DATE_MODIFIED = 4
-	};
-
-	struct ColumnInfo_t
-	{
-		ColumnType_t	ColumnType;
-		int				iWidth;
-		bool			bActive;
-	};
-
 	static const TCHAR SETTINGS_KEY[];
 	static const int DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH = 180;
 
@@ -54,7 +39,7 @@ private:
 
 	void SetupDefaultColumns();
 
-	std::vector<ColumnInfo_t> m_vectorColumnInfo;
+	std::vector<CBookmarkListView::Column> m_listViewColumns;
 
 	bool m_bInitialized;
 	std::wstring m_guidSelected;
@@ -84,6 +69,7 @@ protected:
 	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
 	INT_PTR	OnNotify(NMHDR *pnmhdr);
 	INT_PTR	OnClose();
+	INT_PTR	OnDestroy();
 	INT_PTR	OnNcDestroy();
 
 	void	SaveState();
@@ -105,14 +91,6 @@ private:
 
 	void		SortListViewItems(BookmarkHelper::SortMode_t SortMode);
 
-	void		GetColumnString(CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,UINT cchBuf);
-	void		GetBookmarkItemColumnInfo(const BookmarkItem *bookmarkItem,
-		CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType, TCHAR *szColumn, size_t cchBuf);
-	void		GetBookmarkColumnInfo(const BookmarkItem *bookmarkItem,
-		CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType, TCHAR *szColumn, size_t cchBuf);
-	void		GetBookmarkFolderColumnInfo(const BookmarkItem *bookmarkItem,
-		CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType, TCHAR *szColumn, size_t cchBuf);
-
 	void		BrowseBack();
 	void		BrowseForward();
 	void		BrowseBookmarkFolder(BookmarkItem *bookmarkItem);
@@ -125,15 +103,12 @@ private:
 	void		OnDeleteBookmark(const std::wstring &guid);
 
 	void		OnDblClk(NMHDR *pnmhdr);
-	void		OnRClick(NMHDR *pnmhdr);
 
 	void		OnTbnDropDown(NMTOOLBAR *nmtb);
 	void		ShowViewMenu();
 	void		ShowOrganizeMenu();
 
 	void		OnTvnSelChanged(NMTREEVIEW *pnmtv);
-
-	void		OnListViewHeaderRClick();
 
 	void		OnOk();
 	void		OnCancel();

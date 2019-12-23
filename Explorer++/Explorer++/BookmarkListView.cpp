@@ -5,14 +5,18 @@
 #include "stdafx.h"
 #include "BookmarkListView.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
+#include <boost/range/adaptor/filtered.hpp>
+#include <boost/range/adaptor/indexed.hpp>
 
 CBookmarkListView::CBookmarkListView(HWND hListView, HMODULE resourceModule,
-	BookmarkTree *bookmarkTree, IExplorerplusplus *expp) :
+	BookmarkTree *bookmarkTree, IExplorerplusplus *expp, const std::vector<Column> &initialColumns) :
 	m_hListView(hListView),
 	m_resourceModule(resourceModule),
-	m_bookmarkTree(bookmarkTree)
+	m_bookmarkTree(bookmarkTree),
+	m_columns(initialColumns)
 {
 	SetWindowTheme(hListView, L"Explorer", NULL);
 	ListView_SetExtendedListViewStyleEx(hListView,
@@ -26,8 +30,99 @@ CBookmarkListView::CBookmarkListView(HWND hListView, HMODULE resourceModule,
 		iconWidth, iconHeight, {Icon::Folder, Icon::Bookmarks});
 	ListView_SetImageList(hListView, m_imageList.get(), LVSIL_SMALL);
 
+	InsertColumns(initialColumns);
+
 	m_windowSubclasses.push_back(WindowSubclassWrapper(GetParent(m_hListView), ParentWndProcStub,
 		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+}
+
+void CBookmarkListView::InsertColumns(const std::vector<Column> &columns)
+{
+	for (const auto &column : columns | boost::adaptors::filtered(IsColumnActive) | boost::adaptors::indexed(0))
+	{
+		InsertColumn(column.value(), static_cast<int>(column.index()));
+	}
+}
+
+void CBookmarkListView::InsertColumn(const Column &column, int index)
+{
+	std::wstring columnText = GetColumnText(column.columnType);
+
+	LVCOLUMN lvColumn;
+	lvColumn.mask = LVCF_TEXT | LVCF_WIDTH;
+	lvColumn.pszText = columnText.data();
+	lvColumn.cx = column.width;
+	int insertedIndex = ListView_InsertColumn(m_hListView, index, &lvColumn);
+
+	HWND header = ListView_GetHeader(m_hListView);
+
+	HDITEM hdItem;
+	hdItem.mask = HDI_LPARAM;
+	hdItem.lParam = static_cast<LPARAM>(column.columnType);
+	Header_SetItem(header, insertedIndex, &hdItem);
+}
+
+std::wstring CBookmarkListView::GetColumnText(ColumnType columnType)
+{
+	UINT resourceId = GetColumnTextResourceId(columnType);
+	return ResourceHelper::LoadString(m_resourceModule, resourceId);
+}
+
+std::vector<CBookmarkListView::Column> CBookmarkListView::GetColumns()
+{
+	int index = 0;
+
+	for (auto &column : m_columns | boost::adaptors::filtered(IsColumnActive))
+	{
+		column.width = ListView_GetColumnWidth(m_hListView, index++);
+	}
+
+	return m_columns;
+}
+
+bool CBookmarkListView::IsColumnActive(const Column &column)
+{
+	return column.active;
+}
+
+std::optional<CBookmarkListView::ColumnType> CBookmarkListView::GetColumnTypeByIndex(int index) const
+{
+	HWND hHeader = ListView_GetHeader(m_hListView);
+
+	HDITEM hdItem;
+	hdItem.mask = HDI_LPARAM;
+	BOOL res = Header_GetItem(hHeader, index, &hdItem);
+
+	if (!res)
+	{
+		return std::nullopt;
+	}
+
+	return static_cast<ColumnType>(hdItem.lParam);
+}
+
+UINT CBookmarkListView::GetColumnTextResourceId(ColumnType columnType)
+{
+	switch (columnType)
+	{
+	case ColumnType::Name:
+		return IDS_BOOKMARKS_COLUMN_NAME;
+		break;
+
+	case ColumnType::Location:
+		return IDS_BOOKMARKS_COLUMN_LOCATION;
+		break;
+
+	case ColumnType::DateCreated:
+		return IDS_BOOKMARKS_COLUMN_DATE_CREATED;
+		break;
+
+	case ColumnType::DateModified:
+		return IDS_BOOKMARKS_COLUMN_DATE_MODIFIED;
+		break;
+	}
+
+	throw std::runtime_error("Bookmark column string resource not found");
 }
 
 LRESULT CALLBACK CBookmarkListView::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
@@ -53,6 +148,10 @@ LRESULT CALLBACK CBookmarkListView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM w
 				return TRUE;
 				break;
 
+			case LVN_GETDISPINFO:
+				OnGetDispInfo(reinterpret_cast<NMLVDISPINFO *>(lParam));
+				break;
+
 			case LVN_BEGINLABELEDIT:
 				return OnBeginLabelEdit(reinterpret_cast<NMLVDISPINFO *>(lParam));
 				break;
@@ -64,6 +163,21 @@ LRESULT CALLBACK CBookmarkListView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM w
 			case LVN_KEYDOWN:
 				OnKeyDown(reinterpret_cast<NMLVKEYDOWN *>(lParam));
 				break;
+			}
+		}
+		else if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == ListView_GetHeader(m_hListView))
+		{
+			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
+			{
+			case NM_RCLICK:
+			{
+				POINT pt;
+				DWORD messagePos = GetMessagePos();
+				POINTSTOPOINT(pt, MAKEPOINTS(messagePos));
+				OnHeaderRClick(pt);
+				return TRUE;
+			}
+			break;
 			}
 		}
 		break;
@@ -148,6 +262,75 @@ void CBookmarkListView::OnRClick(const NMITEMACTIVATE *itemActivate)
 	DestroyMenu(hMenu);
 }
 
+void CBookmarkListView::OnGetDispInfo(NMLVDISPINFO *dispInfo)
+{
+	if (WI_IsFlagSet(dispInfo->item.mask, LVIF_TEXT))
+	{
+		auto bookmarkItem = GetBookmarkItemFromListView(dispInfo->item.iItem);
+
+		auto columnType = GetColumnTypeByIndex(dispInfo->item.iSubItem);
+		assert(columnType);
+
+		std::wstring columnText = GetBookmarkItemColumnInfo(bookmarkItem, *columnType);
+
+		StringCchCopy(dispInfo->item.pszText, dispInfo->item.cchTextMax, columnText.c_str());
+
+		WI_SetFlag(dispInfo->item.mask, LVIF_DI_SETITEM);
+	}
+}
+
+std::wstring CBookmarkListView::GetBookmarkItemColumnInfo(const BookmarkItem *bookmarkItem,
+	ColumnType columnType)
+{
+	switch (columnType)
+	{
+	case ColumnType::Name:
+		return bookmarkItem->GetName();
+		break;
+
+	case ColumnType::Location:
+		if (bookmarkItem->IsBookmark())
+		{
+			return bookmarkItem->GetLocation();
+		}
+		else
+		{
+			return std::wstring();
+		}
+		break;
+
+	case ColumnType::DateCreated:
+	{
+		FILETIME dateCreated = bookmarkItem->GetDateCreated();
+		return FormatDate(&dateCreated);
+	}
+	break;
+
+	case ColumnType::DateModified:
+	{
+		FILETIME dateModified = bookmarkItem->GetDateModified();
+		return FormatDate(&dateModified);
+	}
+	break;
+	}
+
+	throw std::runtime_error("Bookmark column type not found");
+}
+
+std::wstring CBookmarkListView::FormatDate(const FILETIME *date)
+{
+	/* TODO: Friendly dates. */
+	TCHAR formattedDate[256];
+	BOOL res = CreateFileTimeString(date, formattedDate, std::size(formattedDate), FALSE);
+
+	if (res)
+	{
+		return formattedDate;
+	}
+
+	return std::wstring();
+}
+
 BOOL CBookmarkListView::OnBeginLabelEdit(const NMLVDISPINFO *dispInfo)
 {
 	auto bookmarkItem = GetBookmarkItemFromListView(dispInfo->item.iItem);
@@ -213,4 +396,99 @@ void CBookmarkListView::OnRename()
 	{
 		ListView_EditLabel(m_hListView, item);
 	}
+}
+
+void CBookmarkListView::OnHeaderRClick(const POINT &pt)
+{
+	auto menu = BuildHeaderContextMenu();
+
+	if (!menu)
+	{
+		return;
+	}
+
+	int cmd = TrackPopupMenu(menu.get(), TPM_LEFTALIGN | TPM_RETURNCMD, pt.x, pt.y, 0, m_hListView, nullptr);
+
+	if (cmd != 0)
+	{
+		OnHeaderContextMenuItemSelected(cmd);
+	}
+}
+
+wil::unique_hmenu CBookmarkListView::BuildHeaderContextMenu()
+{
+	wil::unique_hmenu menu(CreatePopupMenu());
+
+	if (!menu)
+	{
+		return nullptr;
+	}
+
+	int index = 0;
+
+	for (const auto &column : m_columns)
+	{
+		std::wstring columnText = GetColumnText(column.columnType);
+
+		MENUITEMINFO mii;
+		mii.cbSize = sizeof(mii);
+		mii.fMask = MIIM_ID | MIIM_STRING | MIIM_STATE;
+		mii.wID = static_cast<int>(column.columnType);
+		mii.dwTypeData = columnText.data();
+		mii.fState = 0;
+
+		if (column.active)
+		{
+			mii.fState |= MFS_CHECKED;
+		}
+
+		/* The name column cannot be removed. */
+		if (column.columnType == ColumnType::Name)
+		{
+			mii.fState |= MFS_DISABLED;
+		}
+
+		InsertMenuItem(menu.get(), index++, TRUE, &mii);
+	}
+
+	return menu;
+}
+
+void CBookmarkListView::OnHeaderContextMenuItemSelected(int menuItemId)
+{
+	ColumnType columnType = static_cast<ColumnType>(menuItemId);
+
+	auto itr = std::find_if(m_columns.begin(), m_columns.end(), [columnType] (const Column &column) {
+		return column.columnType == columnType;
+	});
+
+	assert(itr != m_columns.end());
+
+	auto index = std::count_if(m_columns.begin(), itr, [] (const Column &column) {
+		return column.active;
+	});
+
+	bool nowActive = !itr->active;
+
+	if (nowActive)
+	{
+		InsertColumn(*itr, static_cast<int>(index));
+
+		// TODO: Update.
+		/*for (const auto &childItem : bookmarkFolder->GetChildren())
+		{
+			TCHAR szColumn[256];
+			GetBookmarkItemColumnInfo(childItem.get(), itr->ColumnType, szColumn, SIZEOF_ARRAY(szColumn));
+			ListView_SetItemText(hListView, iBookmarkItem, iColumn, szColumn);
+
+			++iBookmarkItem;
+		}*/
+	}
+	else
+	{
+		itr->width = ListView_GetColumnWidth(m_hListView, index);
+		ListView_DeleteColumn(m_hListView, index);
+	}
+
+	itr->active = nowActive;
 }

@@ -155,53 +155,10 @@ void CManageBookmarksDialog::SetupListView()
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
 
-	m_pBookmarkListView = new CBookmarkListView(hListView, GetInstance(), m_bookmarkTree, m_pexpp);
-
-	int iColumn = 0;
-
-	for(const auto &ci : m_pmbdps->m_vectorColumnInfo)
-	{
-		if(ci.bActive)
-		{
-			LVCOLUMN lvCol;
-			TCHAR szTemp[128];
-
-			GetColumnString(ci.ColumnType,szTemp,SIZEOF_ARRAY(szTemp));
-			lvCol.mask		= LVCF_TEXT|LVCF_WIDTH;
-			lvCol.pszText	= szTemp;
-			lvCol.cx		= ci.iWidth;
-			ListView_InsertColumn(hListView,iColumn,&lvCol);
-
-			++iColumn;
-		}
-	}
+	m_pBookmarkListView = new CBookmarkListView(hListView, GetInstance(), m_bookmarkTree,
+		m_pexpp, m_pmbdps->m_listViewColumns);
 
 	m_pBookmarkListView->NavigateToBookmarkFolder(m_bookmarkTree->GetRoot());
-
-	int iItem = 0;
-
-	/* Update the data for each of the sub-items. */
-	/* TODO: This needs to be done by CBookmarkListView. */
-	for(const auto &childItem : m_bookmarkTree->GetRoot()->GetChildren())
-	{
-		int iSubItem = 1;
-
-		for(const auto &ci : m_pmbdps->m_vectorColumnInfo)
-		{
-			/* The name column will always appear first in
-			the set of columns and can be skipped here. */
-			if(ci.bActive && ci.ColumnType != CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_NAME)
-			{
-				TCHAR szColumn[256];
-				GetBookmarkItemColumnInfo(childItem.get(),ci.ColumnType,szColumn,SIZEOF_ARRAY(szColumn));
-				ListView_SetItemText(hListView,iItem,iSubItem,szColumn);
-
-				++iSubItem;
-			}
-		}
-
-		++iItem;
-	}
 
 	ListView_SortItems(hListView,NManageBookmarksDialog::SortBookmarksStub,reinterpret_cast<LPARAM>(this));
 
@@ -355,10 +312,6 @@ INT_PTR CManageBookmarksDialog::OnNotify(NMHDR *pnmhdr)
 		OnDblClk(pnmhdr);
 		break;
 
-	case NM_RCLICK:
-		OnRClick(pnmhdr);
-		break;
-
 	case TBN_DROPDOWN:
 		OnTbnDropDown(reinterpret_cast<NMTOOLBAR *>(pnmhdr));
 		break;
@@ -397,216 +350,6 @@ void CManageBookmarksDialog::OnDeleteBookmark(const std::wstring &guid)
 	UNREFERENCED_PARAMETER(guid);
 
 	/* TODO: Move the bookmark/bookmark folder to the trash folder. */
-}
-
-void CManageBookmarksDialog::OnListViewHeaderRClick()
-{
-	DWORD dwCursorPos = GetMessagePos();
-
-	POINT ptCursor;
-	ptCursor.x = GET_X_LPARAM(dwCursorPos);
-	ptCursor.y = GET_Y_LPARAM(dwCursorPos);
-
-	HMENU hMenu = CreatePopupMenu();
-	int iMenuItem = 0;
-
-	for(const auto &ci : m_pmbdps->m_vectorColumnInfo)
-	{
-		TCHAR szColumn[128];
-		GetColumnString(ci.ColumnType,szColumn,SIZEOF_ARRAY(szColumn));
-
-		MENUITEMINFO mii;
-		mii.cbSize		= sizeof(mii);
-		mii.fMask		= MIIM_ID|MIIM_STRING|MIIM_STATE;
-		mii.wID			= ci.ColumnType;
-		mii.dwTypeData	= szColumn;
-		mii.fState		= 0;
-
-		if(ci.bActive)
-		{
-			mii.fState |= MFS_CHECKED;
-		}
-
-		/* The name column cannot be removed. */
-		if(ci.ColumnType == CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_NAME)
-		{
-			mii.fState |= MFS_DISABLED;
-		}
-
-		InsertMenuItem(hMenu,iMenuItem,TRUE,&mii);
-
-		++iMenuItem;
-	}
-
-	int iCmd = TrackPopupMenu(hMenu,TPM_LEFTALIGN|TPM_RETURNCMD,ptCursor.x,ptCursor.y,0,m_hDlg,NULL);
-	DestroyMenu(hMenu);
-
-	int iColumn = 0;
-
-	for(auto itr = m_pmbdps->m_vectorColumnInfo.begin();itr != m_pmbdps->m_vectorColumnInfo.end();++itr)
-	{
-		if(itr->ColumnType == iCmd)
-		{
-			HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
-
-			if(itr->bActive)
-			{
-				itr->iWidth = ListView_GetColumnWidth(hListView,iColumn);
-				ListView_DeleteColumn(hListView,iColumn);
-			}
-			else
-			{
-				LVCOLUMN lvCol;
-				TCHAR szTemp[128];
-
-				GetColumnString(itr->ColumnType,szTemp,SIZEOF_ARRAY(szTemp));
-				lvCol.mask		= LVCF_TEXT|LVCF_WIDTH;
-				lvCol.pszText	= szTemp;
-				lvCol.cx		= itr->iWidth;
-				ListView_InsertColumn(hListView,iColumn,&lvCol);
-
-				HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
-				HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
-				const auto bookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
-
-				int iBookmarkItem = 0;
-
-				for(auto &childItem : bookmarkFolder->GetChildren())
-				{
-					TCHAR szColumn[256];
-					GetBookmarkItemColumnInfo(childItem.get(),itr->ColumnType,szColumn,SIZEOF_ARRAY(szColumn));
-					ListView_SetItemText(hListView,iBookmarkItem,iColumn,szColumn);
-
-					++iBookmarkItem;
-				}
-			}
-
-			itr->bActive = !itr->bActive;
-
-			break;
-		}
-		else
-		{
-			if(itr->bActive)
-			{
-				++iColumn;
-			}
-		}
-	}
-}
-
-void CManageBookmarksDialog::GetColumnString(CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,
-	TCHAR *szColumn,UINT cchBuf)
-{
-	UINT uResourceID = 0;
-
-	switch(ColumnType)
-	{
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_NAME:
-		uResourceID = IDS_MANAGE_BOOKMARKS_COLUMN_NAME;
-		break;
-
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_LOCATION:
-		uResourceID = IDS_MANAGE_BOOKMARKS_COLUMN_LOCATION;
-		break;
-
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_DATE_CREATED:
-		uResourceID = IDS_MANAGE_BOOKMARKS_COLUMN_ADDED;
-		break;
-
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_DATE_MODIFIED:
-		uResourceID = IDS_MANAGE_BOOKMARKS_COLUMN_LAST_MODIFIED;
-		break;
-
-	default:
-		assert(FALSE);
-		break;
-	}
-
-	LoadString(GetInstance(),uResourceID,szColumn,cchBuf);
-}
-
-void CManageBookmarksDialog::GetBookmarkItemColumnInfo(const BookmarkItem *bookmarkItem,
-	CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType, TCHAR *szColumn, size_t cchBuf)
-{
-	if(bookmarkItem->IsFolder())
-	{
-		GetBookmarkFolderColumnInfo(bookmarkItem,ColumnType,szColumn,cchBuf);
-	}
-	else
-	{
-		GetBookmarkColumnInfo(bookmarkItem,ColumnType,szColumn,cchBuf);
-	}
-}
-
-void CManageBookmarksDialog::GetBookmarkColumnInfo(const BookmarkItem *bookmarkItem,
-	CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType, TCHAR *szColumn, size_t cchBuf)
-{
-	switch(ColumnType)
-	{
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_NAME:
-		StringCchCopy(szColumn,cchBuf, bookmarkItem->GetName().c_str());
-		break;
-
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_LOCATION:
-		StringCchCopy(szColumn,cchBuf, bookmarkItem->GetLocation().c_str());
-		break;
-
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_DATE_CREATED:
-		{
-			/* TODO: Friendly dates. */
-			FILETIME dateCreated = bookmarkItem->GetDateCreated();
-			CreateFileTimeString(&dateCreated, szColumn, static_cast<int>(cchBuf), FALSE);
-		}
-		break;
-
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_DATE_MODIFIED:
-		{
-			/* TODO: Friendly dates. */
-			FILETIME dateModified = bookmarkItem->GetDateModified();
-			CreateFileTimeString(&dateModified, szColumn, static_cast<int>(cchBuf), FALSE);
-		}
-		break;
-
-	default:
-		assert(FALSE);
-		break;
-	}
-}
-
-void CManageBookmarksDialog::GetBookmarkFolderColumnInfo(const BookmarkItem *bookmarkItem,
-	CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType, TCHAR *szColumn, size_t cchBuf)
-{
-	switch(ColumnType)
-	{
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_NAME:
-		StringCchCopy(szColumn,cchBuf, bookmarkItem->GetName().c_str());
-		break;
-
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_LOCATION:
-		StringCchCopy(szColumn,cchBuf,EMPTY_STRING);
-		break;
-
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_DATE_CREATED:
-		{
-			/* TODO: Friendly dates. */
-			FILETIME dateCreated = bookmarkItem->GetDateCreated();
-			CreateFileTimeString(&dateCreated, szColumn, static_cast<int>(cchBuf), FALSE);
-		}
-		break;
-
-	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_DATE_MODIFIED:
-		{
-			/* TODO: Friendly dates. */
-			FILETIME dateModified = bookmarkItem->GetDateModified();
-			CreateFileTimeString(&dateModified, szColumn, static_cast<int>(cchBuf), FALSE);
-		}
-		break;
-
-	default:
-		assert(FALSE);
-		break;
-	}
 }
 
 void CManageBookmarksDialog::OnTbnDropDown(NMTOOLBAR *nmtb)
@@ -821,16 +564,6 @@ void CManageBookmarksDialog::UpdateToolbarState()
 //	}
 //}
 
-void CManageBookmarksDialog::OnRClick(NMHDR *pnmhdr)
-{
-	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
-
-	if(pnmhdr->hwndFrom == ListView_GetHeader(hListView))
-	{
-		OnListViewHeaderRClick();
-	}
-}
-
 void CManageBookmarksDialog::OnOk()
 {
 	DestroyWindow(m_hDlg);
@@ -847,6 +580,12 @@ INT_PTR CManageBookmarksDialog::OnClose()
 	return 0;
 }
 
+INT_PTR	CManageBookmarksDialog::OnDestroy()
+{
+	m_pmbdps->m_listViewColumns = m_pBookmarkListView->GetColumns();
+	return 0;
+}
+
 INT_PTR CManageBookmarksDialog::OnNcDestroy()
 {
 	delete this;
@@ -858,18 +597,6 @@ void CManageBookmarksDialog::SaveState()
 {
 	m_pmbdps->SaveDialogPosition(m_hDlg);
 
-	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
-	int iColumn = 0;
-
-	for(auto itr = m_pmbdps->m_vectorColumnInfo.begin();itr != m_pmbdps->m_vectorColumnInfo.end();++itr)
-	{
-		if(itr->bActive)
-		{
-			itr->iWidth = ListView_GetColumnWidth(hListView,iColumn);
-			++iColumn;
-		}
-	}
-
 	m_pmbdps->m_bStateSaved = TRUE;
 }
 
@@ -880,8 +607,6 @@ CManageBookmarksDialogPersistentSettings::CManageBookmarksDialogPersistentSettin
 	CDialogSettings(SETTINGS_KEY)
 {
 	SetupDefaultColumns();
-
-	/* TODO: Save listview selection information. */
 }
 
 CManageBookmarksDialogPersistentSettings& CManageBookmarksDialogPersistentSettings::GetInstance()
@@ -892,25 +617,25 @@ CManageBookmarksDialogPersistentSettings& CManageBookmarksDialogPersistentSettin
 
 void CManageBookmarksDialogPersistentSettings::SetupDefaultColumns()
 {
-	ColumnInfo_t ci;
+	CBookmarkListView::Column column;
 
-	ci.ColumnType	= COLUMN_TYPE_NAME;
-	ci.iWidth		= DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
-	ci.bActive		= TRUE;
-	m_vectorColumnInfo.push_back(ci);
+	column.columnType = CBookmarkListView::ColumnType::Name;
+	column.width = DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
+	column.active = true;
+	m_listViewColumns.push_back(column);
 
-	ci.ColumnType	= COLUMN_TYPE_LOCATION;
-	ci.iWidth		= DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
-	ci.bActive		= TRUE;
-	m_vectorColumnInfo.push_back(ci);
+	column.columnType = CBookmarkListView::ColumnType::Location;
+	column.width = DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
+	column.active = true;
+	m_listViewColumns.push_back(column);
 
-	ci.ColumnType	= COLUMN_TYPE_DATE_CREATED;
-	ci.iWidth		= DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
-	ci.bActive		= FALSE;
-	m_vectorColumnInfo.push_back(ci);
+	column.columnType = CBookmarkListView::ColumnType::DateCreated;
+	column.width = DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
+	column.active = false;
+	m_listViewColumns.push_back(column);
 
-	ci.ColumnType	= COLUMN_TYPE_DATE_MODIFIED;
-	ci.iWidth		= DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
-	ci.bActive		= FALSE;
-	m_vectorColumnInfo.push_back(ci);
+	column.columnType = CBookmarkListView::ColumnType::DateModified;
+	column.width = DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
+	column.active = false;
+	m_listViewColumns.push_back(column);
 }
