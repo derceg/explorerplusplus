@@ -38,6 +38,11 @@ BookmarkItem *BookmarkItem::GetParent()
 	return m_parent;
 }
 
+const BookmarkItem *BookmarkItem::GetParent() const
+{
+	return m_parent;
+}
+
 std::wstring BookmarkItem::GetGUID() const
 {
 	return m_guid;

@@ -44,9 +44,6 @@ private:
 	bool m_bInitialized;
 	std::wstring m_guidSelected;
 	std::unordered_set<std::wstring> m_setExpansion;
-
-	BookmarkHelper::SortMode_t m_SortMode;
-	bool m_bSortAscending;
 };
 
 class CManageBookmarksDialog : public CBaseDialog
@@ -56,8 +53,6 @@ public:
 	CManageBookmarksDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp,
 		Navigation *navigation, BookmarkTree *bookmarkTree);
 	~CManageBookmarksDialog();
-
-	int CALLBACK		SortBookmarks(LPARAM lParam1,LPARAM lParam2);
 
 	// TODO: Update.
 	//void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
@@ -88,8 +83,6 @@ private:
 	void		SetupToolbar();
 	void		SetupTreeView();
 	void		SetupListView();
-
-	void		SortListViewItems(BookmarkHelper::SortMode_t SortMode);
 
 	void		BrowseBack();
 	void		BrowseForward();

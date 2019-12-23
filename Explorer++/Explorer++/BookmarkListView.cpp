@@ -16,7 +16,9 @@ CBookmarkListView::CBookmarkListView(HWND hListView, HMODULE resourceModule,
 	m_hListView(hListView),
 	m_resourceModule(resourceModule),
 	m_bookmarkTree(bookmarkTree),
-	m_columns(initialColumns)
+	m_columns(initialColumns),
+	m_sortMode(BookmarkHelper::SortMode::Default),
+	m_sortAscending(true)
 {
 	SetWindowTheme(hListView, L"Explorer", NULL);
 	ListView_SetExtendedListViewStyleEx(hListView,
@@ -245,9 +247,58 @@ BookmarkItem *CBookmarkListView::GetBookmarkItemFromListView(int iItem)
 	return reinterpret_cast<BookmarkItem *>(lvi.lParam);
 }
 
-BookmarkItem *CBookmarkListView::GetBookmarkItemFromListViewlParam(LPARAM lParam)
+void CBookmarkListView::SortItems()
 {
-	return reinterpret_cast<BookmarkItem *>(lParam);
+	ListView_SortItems(m_hListView, SortBookmarksStub, reinterpret_cast<LPARAM>(this));
+}
+
+int CALLBACK CBookmarkListView::SortBookmarksStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
+{
+	CBookmarkListView *listView = reinterpret_cast<CBookmarkListView *>(lParamSort);
+
+	return listView->SortBookmarks(lParam1, lParam2);
+}
+
+int CALLBACK CBookmarkListView::SortBookmarks(LPARAM lParam1, LPARAM lParam2)
+{
+	auto firstItem = reinterpret_cast<BookmarkItem *>(lParam1);
+	auto secondItem = reinterpret_cast<BookmarkItem *>(lParam2);
+
+	int iRes = BookmarkHelper::Sort(m_sortMode, firstItem, secondItem);
+
+	// When using the default sort mode (in which items are sorted according to
+	// their position within the parent folder), the items are always in
+	// ascending order.
+	if (!m_sortAscending && m_sortMode != BookmarkHelper::SortMode::Default)
+	{
+		iRes = -iRes;
+	}
+
+	return iRes;
+}
+
+BookmarkHelper::SortMode CBookmarkListView::GetSortMode() const
+{
+	return m_sortMode;
+}
+
+void CBookmarkListView::SetSortMode(BookmarkHelper::SortMode sortMode)
+{
+	m_sortMode = sortMode;
+
+	SortItems();
+}
+
+bool CBookmarkListView::GetSortAscending() const
+{
+	return m_sortAscending;
+}
+
+void CBookmarkListView::SetSortAscending(bool sortAscending)
+{
+	m_sortAscending = sortAscending;
+
+	SortItems();
 }
 
 void CBookmarkListView::OnRClick(const NMITEMACTIVATE *itemActivate)

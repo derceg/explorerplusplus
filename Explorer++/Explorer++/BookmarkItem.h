@@ -35,6 +35,7 @@ public:
 	Type GetType() const;
 
 	BookmarkItem *GetParent();
+	const BookmarkItem *GetParent() const;
 
 	std::wstring GetGUID() const;
 

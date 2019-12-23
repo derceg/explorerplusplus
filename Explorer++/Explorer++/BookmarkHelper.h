@@ -11,12 +11,13 @@
 
 namespace BookmarkHelper
 {
-	enum SortMode_t
+	enum class SortMode
 	{
-		SM_NAME = 1,
-		SM_LOCATION = 2,
-		SM_DATE_ADDED = 3,
-		SM_DATE_MODIFIED = 4
+		Default = 0,
+		Name = 1,
+		Location = 2,
+		DateCreated = 3,
+		DateModified = 4
 	};
 
 	/* These GUID's are statically defined, so that they will
@@ -29,7 +30,7 @@ namespace BookmarkHelper
 	bool IsFolder(const std::unique_ptr<BookmarkItem> &bookmarkItem);
 	bool IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem);
 
-	int CALLBACK Sort(SortMode_t SortMode, const BookmarkItem *firstItem, const BookmarkItem *secondItem);
+	int CALLBACK Sort(SortMode sortMode, const BookmarkItem *firstItem, const BookmarkItem *secondItem);
 
 	void AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type, HMODULE resoureceModule,
 		HWND parentWindow, TabContainer *tabContainer, IExplorerplusplus *coreInterface);

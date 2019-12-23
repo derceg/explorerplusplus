@@ -13,11 +13,6 @@
 #include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
 
-namespace NManageBookmarksDialog
-{
-	int CALLBACK SortBookmarksStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-}
-
 const TCHAR CManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
 CManageBookmarksDialog::CManageBookmarksDialog(HINSTANCE hInstance, HWND hParent,
@@ -160,43 +155,7 @@ void CManageBookmarksDialog::SetupListView()
 
 	m_pBookmarkListView->NavigateToBookmarkFolder(m_bookmarkTree->GetRoot());
 
-	ListView_SortItems(hListView,NManageBookmarksDialog::SortBookmarksStub,reinterpret_cast<LPARAM>(this));
-
-	NListView::ListView_SelectItem(hListView,0,TRUE);
-
 	m_bListViewInitialized = true;
-}
-
-void CManageBookmarksDialog::SortListViewItems(BookmarkHelper::SortMode_t SortMode)
-{
-	m_pmbdps->m_SortMode = SortMode;
-
-	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
-	ListView_SortItems(hListView,NManageBookmarksDialog::SortBookmarksStub,reinterpret_cast<LPARAM>(this));
-}
-
-int CALLBACK NManageBookmarksDialog::SortBookmarksStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	assert(lParamSort != NULL);
-
-	CManageBookmarksDialog *pmbd = reinterpret_cast<CManageBookmarksDialog *>(lParamSort);
-
-	return pmbd->SortBookmarks(lParam1,lParam2);
-}
-
-int CALLBACK CManageBookmarksDialog::SortBookmarks(LPARAM lParam1,LPARAM lParam2)
-{
-	auto firstItem = m_pBookmarkListView->GetBookmarkItemFromListViewlParam(lParam1);
-	auto secondItem = m_pBookmarkListView->GetBookmarkItemFromListViewlParam(lParam2);
-
-	int iRes = BookmarkHelper::Sort(m_pmbdps->m_SortMode, firstItem, secondItem);
-
-	if (!m_pmbdps->m_bSortAscending)
-	{
-		iRes = -iRes;
-	}
-
-	return iRes;
 }
 
 INT_PTR CManageBookmarksDialog::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD dwKeys)
@@ -255,30 +214,32 @@ LRESULT CManageBookmarksDialog::HandleMenuOrAccelerator(WPARAM wParam)
 		OnNewFolder();
 		break;
 
+	case IDM_MB_VIEW_SORT_BY_DEFAULT:
+		m_pBookmarkListView->SetSortMode(BookmarkHelper::SortMode::Name);
+		break;
+
 	case IDM_MB_VIEW_SORTBYNAME:
-		SortListViewItems(BookmarkHelper::SM_NAME);
+		m_pBookmarkListView->SetSortMode(BookmarkHelper::SortMode::Name);
 		break;
 
 	case IDM_MB_VIEW_SORTBYLOCATION:
-		SortListViewItems(BookmarkHelper::SM_LOCATION);
+		m_pBookmarkListView->SetSortMode(BookmarkHelper::SortMode::Location);
 		break;
 
 	case IDM_MB_VIEW_SORTBYADDED:
-		SortListViewItems(BookmarkHelper::SM_DATE_ADDED);
+		m_pBookmarkListView->SetSortMode(BookmarkHelper::SortMode::DateCreated);
 		break;
 
 	case IDM_MB_VIEW_SORTBYLASTMODIFIED:
-		SortListViewItems(BookmarkHelper::SM_DATE_MODIFIED);
+		m_pBookmarkListView->SetSortMode(BookmarkHelper::SortMode::DateModified);
 		break;
 
 	case IDM_MB_VIEW_SORTASCENDING:
-		m_pmbdps->m_bSortAscending = true;
-		SortListViewItems(m_pmbdps->m_SortMode);
+		m_pBookmarkListView->SetSortAscending(true);
 		break;
 
 	case IDM_MB_VIEW_SORTDESCENDING:
-		m_pmbdps->m_bSortAscending = false;
-		SortListViewItems(m_pmbdps->m_SortMode);
+		m_pBookmarkListView->SetSortAscending(false);
 		break;
 
 		/* TODO: */
@@ -375,7 +336,36 @@ void CManageBookmarksDialog::ShowViewMenu()
 
 	UINT uCheck;
 
-	if(m_pmbdps->m_bSortAscending)
+	switch(m_pBookmarkListView->GetSortMode())
+	{
+	case BookmarkHelper::SortMode::Default:
+		uCheck = IDM_MB_VIEW_SORT_BY_DEFAULT;
+		break;
+
+	case BookmarkHelper::SortMode::Name:
+		uCheck = IDM_MB_VIEW_SORTBYNAME;
+		break;
+
+	case BookmarkHelper::SortMode::Location:
+		uCheck = IDM_MB_VIEW_SORTBYLOCATION;
+		break;
+
+	case BookmarkHelper::SortMode::DateCreated:
+		uCheck = IDM_MB_VIEW_SORTBYADDED;
+		break;
+
+	case BookmarkHelper::SortMode::DateModified:
+		uCheck = IDM_MB_VIEW_SORTBYLASTMODIFIED;
+		break;
+
+	default:
+		uCheck = IDM_MB_VIEW_SORT_BY_DEFAULT;
+		break;
+	}
+
+	CheckMenuRadioItem(hMenu, IDM_MB_VIEW_SORTBYNAME, IDM_MB_VIEW_SORT_BY_DEFAULT, uCheck, MF_BYCOMMAND);
+
+	if (m_pBookmarkListView->GetSortAscending())
 	{
 		uCheck = IDM_MB_VIEW_SORTASCENDING;
 	}
@@ -384,28 +374,7 @@ void CManageBookmarksDialog::ShowViewMenu()
 		uCheck = IDM_MB_VIEW_SORTDESCENDING;
 	}
 
-	CheckMenuRadioItem(hMenu,IDM_MB_VIEW_SORTASCENDING,IDM_MB_VIEW_SORTDESCENDING,uCheck,MF_BYCOMMAND);
-
-	switch(m_pmbdps->m_SortMode)
-	{
-	case BookmarkHelper::SM_NAME:
-		uCheck = IDM_MB_VIEW_SORTBYNAME;
-		break;
-
-	case BookmarkHelper::SM_LOCATION:
-		uCheck = IDM_MB_VIEW_SORTBYLOCATION;
-		break;
-
-	case BookmarkHelper::SM_DATE_ADDED:
-		uCheck = IDM_MB_VIEW_SORTBYADDED;
-		break;
-
-	case BookmarkHelper::SM_DATE_MODIFIED:
-		uCheck = IDM_MB_VIEW_SORTBYLASTMODIFIED;
-		break;
-	}
-
-	CheckMenuRadioItem(hMenu,IDM_MB_VIEW_SORTBYNAME,IDM_MB_VIEW_SORTBYLASTMODIFIED,uCheck,MF_BYCOMMAND);
+	CheckMenuRadioItem(hMenu, IDM_MB_VIEW_SORTASCENDING, IDM_MB_VIEW_SORTDESCENDING, uCheck, MF_BYCOMMAND);
 
 	RECT rcButton;
 	SendMessage(m_hToolbar,TB_GETRECT,TOOLBAR_ID_VIEWS,reinterpret_cast<LPARAM>(&rcButton));
@@ -602,8 +571,6 @@ void CManageBookmarksDialog::SaveState()
 
 CManageBookmarksDialogPersistentSettings::CManageBookmarksDialogPersistentSettings() :
 	m_bInitialized(false),
-	m_SortMode(BookmarkHelper::SM_NAME),
-	m_bSortAscending(true),
 	CDialogSettings(SETTINGS_KEY)
 {
 	SetupDefaultColumns();

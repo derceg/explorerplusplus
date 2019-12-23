@@ -10,6 +10,7 @@
 #include <boost/range/adaptor/filtered.hpp>
 #include <algorithm>
 
+int CALLBACK SortByDefault(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
 int CALLBACK SortByName(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
 int CALLBACK SortByLocation(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
 int CALLBACK SortByDateAdded(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
@@ -25,16 +26,14 @@ bool BookmarkHelper::IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkIte
 	return bookmarkItem->IsBookmark();
 }
 
-int CALLBACK BookmarkHelper::Sort(SortMode_t SortMode, const BookmarkItem *firstItem,
+int CALLBACK BookmarkHelper::Sort(SortMode sortMode, const BookmarkItem *firstItem,
 	const BookmarkItem *secondItem)
 {
-	if(firstItem->GetType() == BookmarkItem::Type::Folder &&
-		secondItem->GetType() == BookmarkItem::Type::Bookmark)
+	if(firstItem->IsFolder() && secondItem->IsBookmark())
 	{
 		return -1;
 	}
-	else if(firstItem->GetType() == BookmarkItem::Type::Bookmark &&
-		secondItem->GetType() == BookmarkItem::Type::Folder)
+	else if(firstItem->IsBookmark() && secondItem->IsFolder())
 	{
 		return 1;
 	}
@@ -42,21 +41,25 @@ int CALLBACK BookmarkHelper::Sort(SortMode_t SortMode, const BookmarkItem *first
 	{
 		int iRes = 0;
 
-		switch(SortMode)
+		switch(sortMode)
 		{
-		case SM_NAME:
+		case SortMode::Default:
+			iRes = SortByDefault(firstItem, secondItem);
+			break;
+
+		case SortMode::Name:
 			iRes = SortByName(firstItem,secondItem);
 			break;
 
-		case SM_LOCATION:
+		case SortMode::Location:
 			iRes = SortByLocation(firstItem,secondItem);
 			break;
 
-		case SM_DATE_ADDED:
+		case SortMode::DateCreated:
 			iRes = SortByDateAdded(firstItem,secondItem);
 			break;
 
-		case SM_DATE_MODIFIED:
+		case SortMode::DateModified:
 			iRes = SortByDateModified(firstItem,secondItem);
 			break;
 
@@ -69,29 +72,26 @@ int CALLBACK BookmarkHelper::Sort(SortMode_t SortMode, const BookmarkItem *first
 	}
 }
 
+int CALLBACK SortByDefault(const BookmarkItem *firstItem,
+	const BookmarkItem *secondItem)
+{
+	auto firstIndex = firstItem->GetParent()->GetChildIndex(firstItem);
+	auto secondIndex = secondItem->GetParent()->GetChildIndex(secondItem);
+	return static_cast<int>(*firstIndex) - static_cast<int>(*secondIndex);
+}
+
 int CALLBACK SortByName(const BookmarkItem *firstItem,
 	const BookmarkItem *secondItem)
 {
-	return firstItem->GetName().compare(secondItem->GetName());
+	return StrCmpLogicalW(firstItem->GetName().c_str(), secondItem->GetName().c_str());
 }
 
 int CALLBACK SortByLocation(const BookmarkItem *firstItem,
 	const BookmarkItem *secondItem)
 {
-	if(firstItem->GetType() == BookmarkItem::Type::Folder &&
-		secondItem->GetType() == BookmarkItem::Type::Folder)
+	if(firstItem->IsFolder() && secondItem->IsFolder())
 	{
-		return 0;
-	}
-	else if (firstItem->GetType() == BookmarkItem::Type::Folder &&
-		secondItem->GetType() == BookmarkItem::Type::Bookmark)
-	{
-		return -1;
-	}
-	else if (firstItem->GetType() == BookmarkItem::Type::Bookmark &&
-		secondItem->GetType() == BookmarkItem::Type::Folder)
-	{
-		return 1;
+		return SortByName(firstItem, secondItem);
 	}
 	else
 	{

@@ -38,9 +38,12 @@ public:
 
 	void NavigateToBookmarkFolder(BookmarkItem *bookmarkItem);
 	BookmarkItem *GetBookmarkItemFromListView(int iItem);
-	BookmarkItem *GetBookmarkItemFromListViewlParam(LPARAM lParam);
 
 	std::vector<Column> GetColumns();
+	BookmarkHelper::SortMode GetSortMode() const;
+	void SetSortMode(BookmarkHelper::SortMode sortMode);
+	bool GetSortAscending() const;
+	void SetSortAscending(bool sortAscending);
 
 private:
 
@@ -60,6 +63,10 @@ private:
 	int InsertBookmarkItemIntoListView(BookmarkItem *bookmarkItem, int position);
 	std::wstring GetBookmarkItemColumnInfo(const BookmarkItem *bookmarkItem, ColumnType columnType);
 	static std::wstring FormatDate(const FILETIME *date);
+
+	void SortItems();
+	static int CALLBACK SortBookmarksStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
+	int CALLBACK SortBookmarks(LPARAM lParam1, LPARAM lParam2);
 
 	void OnRClick(const NMITEMACTIVATE *itemActivate);
 	void OnGetDispInfo(NMLVDISPINFO *dispInfo);
@@ -81,6 +88,8 @@ private:
 
 	BookmarkTree *m_bookmarkTree;
 	BookmarkItem *m_currentBookmarkFolder;
+	BookmarkHelper::SortMode m_sortMode;
+	bool m_sortAscending;
 
 	std::vector<WindowSubclassWrapper> m_windowSubclasses;
 };
