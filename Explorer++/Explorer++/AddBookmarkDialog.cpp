@@ -65,8 +65,8 @@ INT_PTR CAddBookmarkDialog::OnInitDialog()
 
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
 
-	m_pBookmarkTreeView = new CBookmarkTreeView(hTreeView,GetInstance(),m_expp,m_bookmarkTree,
-		m_pabdps->m_guidSelected,m_pabdps->m_setExpansion);
+	m_pBookmarkTreeView = new CBookmarkTreeView(hTreeView, GetInstance(), m_expp, m_bookmarkTree,
+		m_pabdps->m_setExpansion, m_pabdps->m_guidSelected);
 
 	HWND hEditName = GetDlgItem(m_hDlg,IDC_BOOKMARK_NAME);
 	SendMessage(hEditName,EM_SETSEL,0,-1);

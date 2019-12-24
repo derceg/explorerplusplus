@@ -11,9 +11,9 @@
 #include <boost/range/adaptor/filtered.hpp>
 #include <stack>
 
-CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView, HINSTANCE hInstance,
-	IExplorerplusplus *expp, BookmarkTree *bookmarkTree, const std::wstring &guidSelected,
-	const std::unordered_set<std::wstring> &setExpansion) :
+CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView, HINSTANCE hInstance, IExplorerplusplus *expp,
+	BookmarkTree *bookmarkTree, const std::unordered_set<std::wstring> &setExpansion,
+	std::optional<std::wstring> guidSelected) :
 	m_hTreeView(hTreeView),
 	m_instance(hInstance),
 	m_bookmarkTree(bookmarkTree),
@@ -33,7 +33,7 @@ CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView, HINSTANCE hInstance,
 		iconWidth, iconHeight, { Icon::Folder});
 	TreeView_SetImageList(hTreeView, m_imageList.get(), TVSIL_NORMAL);
 
-	SetupTreeView(guidSelected, setExpansion);
+	SetupTreeView(setExpansion, guidSelected);
 
 	m_connections.push_back(m_bookmarkTree->bookmarkItemAddedSignal.AddObserver(
 		std::bind(&CBookmarkTreeView::OnBookmarkItemAdded, this, std::placeholders::_1, std::placeholders::_2)));
@@ -99,15 +99,19 @@ LRESULT CALLBACK CBookmarkTreeView::TreeViewParentProc(HWND hwnd, UINT Msg, WPAR
 		switch (reinterpret_cast<NMHDR *>(lParam)->code)
 		{
 		case TVN_KEYDOWN:
-			OnTvnKeyDown(reinterpret_cast<NMTVKEYDOWN *>(lParam));
+			OnKeyDown(reinterpret_cast<NMTVKEYDOWN *>(lParam));
 			break;
 
 		case TVN_BEGINLABELEDIT:
-			OnTvnBeginLabelEdit();
+			OnBeginLabelEdit();
 			break;
 
 		case TVN_ENDLABELEDIT:
-			return OnTvnEndLabelEdit(reinterpret_cast<NMTVDISPINFO *>(lParam));
+			return OnEndLabelEdit(reinterpret_cast<NMTVDISPINFO *>(lParam));
+			break;
+
+		case TVN_SELCHANGED:
+			OnSelChanged(reinterpret_cast<NMTREEVIEW *>(lParam));
 			break;
 
 		case NM_RCLICK:
@@ -148,7 +152,8 @@ LRESULT CALLBACK CBookmarkTreeView::TreeViewEditProc(HWND hwnd, UINT Msg, WPARAM
 	return DefSubclassProc(hwnd, Msg, wParam, lParam);
 }
 
-void CBookmarkTreeView::SetupTreeView(const std::wstring &guidSelected, const std::unordered_set<std::wstring> &setExpansion)
+void CBookmarkTreeView::SetupTreeView(const std::unordered_set<std::wstring> &setExpansion,
+	std::optional<std::wstring> guidSelected)
 {
 	TreeView_DeleteAllItems(m_hTreeView);
 
@@ -169,11 +174,14 @@ void CBookmarkTreeView::SetupTreeView(const std::wstring &guidSelected, const st
 		}
 	}
 
-	auto itrSelected = m_mapItem.find(guidSelected);
-
-	if (itrSelected != m_mapItem.end())
+	if (guidSelected)
 	{
-		TreeView_SelectItem(m_hTreeView, itrSelected->second);
+		auto itrSelected = m_mapItem.find(*guidSelected);
+
+		if (itrSelected != m_mapItem.end())
+		{
+			TreeView_SelectItem(m_hTreeView, itrSelected->second);
+		}
 	}
 }
 
@@ -320,7 +328,7 @@ void CBookmarkTreeView::OnBookmarkItemRemoved(const std::wstring &guid)
 	m_mapItem.erase(itr);
 }
 
-void CBookmarkTreeView::OnTvnKeyDown(NMTVKEYDOWN *pnmtvkd)
+void CBookmarkTreeView::OnKeyDown(const NMTVKEYDOWN *pnmtvkd)
 {
 	switch (pnmtvkd->wVKey)
 	{
@@ -336,13 +344,13 @@ void CBookmarkTreeView::OnTreeViewRename()
 	TreeView_EditLabel(m_hTreeView, hSelectedItem);
 }
 
-void CBookmarkTreeView::OnTvnBeginLabelEdit()
+void CBookmarkTreeView::OnBeginLabelEdit()
 {
 	HWND hEdit = TreeView_GetEditControl(m_hTreeView);
 	SetWindowSubclass(hEdit, TreeViewEditProcStub, 0, reinterpret_cast<DWORD_PTR>(this));
 }
 
-BOOL CBookmarkTreeView::OnTvnEndLabelEdit(NMTVDISPINFO *pnmtvdi)
+BOOL CBookmarkTreeView::OnEndLabelEdit(const NMTVDISPINFO *pnmtvdi)
 {
 	HWND hEdit = TreeView_GetEditControl(m_hTreeView);
 	RemoveWindowSubclass(hEdit, TreeViewEditProcStub, 0);
@@ -359,6 +367,12 @@ BOOL CBookmarkTreeView::OnTvnEndLabelEdit(NMTVDISPINFO *pnmtvdi)
 	return FALSE;
 }
 
+void CBookmarkTreeView::OnSelChanged(const NMTREEVIEW *treeView)
+{
+	auto bookmarkFolder = GetBookmarkFolderFromTreeView(treeView->itemNew.hItem);
+	selectionChangedSignal.m_signal(bookmarkFolder);
+}
+
 void CBookmarkTreeView::OnDelete()
 {
 	HTREEITEM hSelectedItem = TreeView_GetSelection(m_hTreeView);
@@ -367,7 +381,7 @@ void CBookmarkTreeView::OnDelete()
 	m_bookmarkTree->RemoveBookmarkItem(bookmarkFolder);
 }
 
-void CBookmarkTreeView::OnRClick(NMHDR *pnmhdr)
+void CBookmarkTreeView::OnRClick(const NMHDR *pnmhdr)
 {
 	if (pnmhdr->hwndFrom != m_hTreeView)
 	{

@@ -16,6 +16,7 @@ CBookmarkListView::CBookmarkListView(HWND hListView, HMODULE resourceModule,
 	m_hListView(hListView),
 	m_resourceModule(resourceModule),
 	m_bookmarkTree(bookmarkTree),
+	m_expp(expp),
 	m_columns(initialColumns),
 	m_sortMode(BookmarkHelper::SortMode::Default),
 	m_sortAscending(true)
@@ -145,6 +146,10 @@ LRESULT CALLBACK CBookmarkListView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM w
 		{
 			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
 			{
+			case NM_DBLCLK:
+				OnDblClk(reinterpret_cast<NMITEMACTIVATE *>(lParam));
+				break;
+
 			case NM_RCLICK:
 				OnRClick(reinterpret_cast<NMITEMACTIVATE *>(lParam));
 				return TRUE;
@@ -188,22 +193,24 @@ LRESULT CALLBACK CBookmarkListView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM w
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-void CBookmarkListView::NavigateToBookmarkFolder(BookmarkItem *bookmarkItem)
+void CBookmarkListView::NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder)
 {
-	assert(bookmarkItem->IsFolder());
+	assert(bookmarkFolder->IsFolder());
 
-	m_currentBookmarkFolder = bookmarkItem;
+	m_currentBookmarkFolder = bookmarkFolder;
 
 	ListView_DeleteAllItems(m_hListView);
 
 	int position = 0;
 
-	for (auto &childItem : bookmarkItem->GetChildren())
+	for (auto &childItem : bookmarkFolder->GetChildren())
 	{
 		InsertBookmarkItemIntoListView(childItem.get(), position);
 
 		position++;
 	}
+
+	navigationSignal.m_signal(bookmarkFolder);
 }
 
 int CBookmarkListView::InsertBookmarkItemIntoListView(BookmarkItem *bookmarkItem, int position)
@@ -299,6 +306,26 @@ void CBookmarkListView::SetSortAscending(bool sortAscending)
 	m_sortAscending = sortAscending;
 
 	SortItems();
+}
+
+void CBookmarkListView::OnDblClk(const NMITEMACTIVATE *itemActivate)
+{
+	if (itemActivate->iItem == -1)
+	{
+		return;
+	}
+
+	auto bookmarkItem = GetBookmarkItemFromListView(itemActivate->iItem);
+
+	if (bookmarkItem->IsFolder())
+	{
+		NavigateToBookmarkFolder(bookmarkItem);
+	}
+	else
+	{
+		Tab &selectedTab = m_expp->GetTabContainer()->GetSelectedTab();
+		selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(bookmarkItem->GetLocation().c_str());
+	}
 }
 
 void CBookmarkListView::OnRClick(const NMITEMACTIVATE *itemActivate)

@@ -9,10 +9,12 @@
 #include "BookmarkTree.h"
 #include "CoreInterface.h"
 #include "ResourceHelper.h"
+#include "SignalWrapper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
+#include <optional>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -21,13 +23,16 @@ class CBookmarkTreeView
 public:
 
 	CBookmarkTreeView(HWND hTreeView, HINSTANCE hInstance, IExplorerplusplus *expp,
-		BookmarkTree *bookmarkTree, const std::wstring &guidSelected,
-		const std::unordered_set<std::wstring> &setExpansion);
+		BookmarkTree *bookmarkTree, const std::unordered_set<std::wstring> &setExpansion,
+		std::optional<std::wstring> guidSelected = std::nullopt);
 
 	BookmarkItem *GetBookmarkFolderFromTreeView(HTREEITEM hItem);
 
 	void CreateNewFolder();
 	void SelectFolder(const std::wstring &guid);
+
+	// Signals
+	SignalWrapper<CBookmarkTreeView, void(BookmarkItem *bookmarkFolder)> selectionChangedSignal;
 
 private:
 
@@ -45,18 +50,19 @@ private:
 	static LRESULT CALLBACK TreeViewEditProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK TreeViewEditProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
-	void SetupTreeView(const std::wstring &guidSelected, const std::unordered_set<std::wstring> &setExpansion);
+	void SetupTreeView(const std::unordered_set<std::wstring> &setExpansion, std::optional<std::wstring> guidSelected);
 
 	void InsertFoldersIntoTreeViewRecursive(HTREEITEM hParent, BookmarkItem *bookmarkItem);
 	HTREEITEM InsertFolderIntoTreeView(HTREEITEM hParent, BookmarkItem *bookmarkFolder, int position);
 
-	void OnTvnKeyDown(NMTVKEYDOWN *pnmtvkd);
+	void OnKeyDown(const NMTVKEYDOWN *pnmtvkd);
 	void OnTreeViewRename();
-	void OnTvnBeginLabelEdit();
-	BOOL OnTvnEndLabelEdit(NMTVDISPINFO *pnmtvdi);
+	void OnBeginLabelEdit();
+	BOOL OnEndLabelEdit(const NMTVDISPINFO *pnmtvdi);
+	void OnSelChanged(const NMTREEVIEW *treeView);
 	void OnDelete();
 
-	void OnRClick(NMHDR *pnmhdr);
+	void OnRClick(const NMHDR *pnmhdr);
 
 	void OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t index);
 	void OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);

@@ -21,25 +21,21 @@ CManageBookmarksDialog::CManageBookmarksDialog(HINSTANCE hInstance, HWND hParent
 	m_pexpp(pexpp),
 	m_navigation(navigation),
 	m_bookmarkTree(bookmarkTree),
-	m_guidCurrentFolder(bookmarkTree->GetBookmarksToolbarFolder()->GetGUID()),
 	m_bNewFolderAdded(false),
-	m_bListViewInitialized(false),
 	m_bSaveHistory(true)
 {
 	m_pmbdps = &CManageBookmarksDialogPersistentSettings::GetInstance();
 
 	if(!m_pmbdps->m_bInitialized)
 	{
-		m_pmbdps->m_guidSelected = m_bookmarkTree->GetBookmarksToolbarFolder()->GetGUID();
-
 		m_pmbdps->m_bInitialized = true;
 	}
 }
 
 CManageBookmarksDialog::~CManageBookmarksDialog()
 {
-	delete m_pBookmarkTreeView;
-	delete m_pBookmarkListView;
+	delete m_bookmarkTreeView;
+	delete m_bookmarkListView;
 }
 
 INT_PTR CManageBookmarksDialog::OnInitDialog()
@@ -49,7 +45,7 @@ INT_PTR CManageBookmarksDialog::OnInitDialog()
 	SetupTreeView();
 	SetupListView();
 
-	UpdateToolbarState();
+	m_bookmarkListView->NavigateToBookmarkFolder(m_bookmarkTree->GetBookmarksToolbarFolder());
 
 	SetFocus(GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW));
 
@@ -142,20 +138,22 @@ void CManageBookmarksDialog::SetupTreeView()
 {
 	HWND hTreeView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW);
 
-	m_pBookmarkTreeView = new CBookmarkTreeView(hTreeView, GetInstance(), m_pexpp, m_bookmarkTree,
-		m_pmbdps->m_guidSelected, m_pmbdps->m_setExpansion);
+	m_bookmarkTreeView = new CBookmarkTreeView(hTreeView, GetInstance(), m_pexpp,
+		m_bookmarkTree, m_pmbdps->m_setExpansion);
+
+	m_connections.push_back(m_bookmarkTreeView->selectionChangedSignal.AddObserver(
+		std::bind(&CManageBookmarksDialog::OnTreeViewSelectionChanged, this, std::placeholders::_1)));
 }
 
 void CManageBookmarksDialog::SetupListView()
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
 
-	m_pBookmarkListView = new CBookmarkListView(hListView, GetInstance(), m_bookmarkTree,
+	m_bookmarkListView = new CBookmarkListView(hListView, GetInstance(), m_bookmarkTree,
 		m_pexpp, m_pmbdps->m_listViewColumns);
 
-	m_pBookmarkListView->NavigateToBookmarkFolder(m_bookmarkTree->GetRoot());
-
-	m_bListViewInitialized = true;
+	m_connections.push_back(m_bookmarkListView->navigationSignal.AddObserver(
+		std::bind(&CManageBookmarksDialog::OnListViewNavigation, this, std::placeholders::_1)));
 }
 
 INT_PTR CManageBookmarksDialog::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD dwKeys)
@@ -215,31 +213,31 @@ LRESULT CManageBookmarksDialog::HandleMenuOrAccelerator(WPARAM wParam)
 		break;
 
 	case IDM_MB_VIEW_SORT_BY_DEFAULT:
-		m_pBookmarkListView->SetSortMode(BookmarkHelper::SortMode::Name);
+		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::Name);
 		break;
 
 	case IDM_MB_VIEW_SORTBYNAME:
-		m_pBookmarkListView->SetSortMode(BookmarkHelper::SortMode::Name);
+		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::Name);
 		break;
 
 	case IDM_MB_VIEW_SORTBYLOCATION:
-		m_pBookmarkListView->SetSortMode(BookmarkHelper::SortMode::Location);
+		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::Location);
 		break;
 
 	case IDM_MB_VIEW_SORTBYADDED:
-		m_pBookmarkListView->SetSortMode(BookmarkHelper::SortMode::DateCreated);
+		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::DateCreated);
 		break;
 
 	case IDM_MB_VIEW_SORTBYLASTMODIFIED:
-		m_pBookmarkListView->SetSortMode(BookmarkHelper::SortMode::DateModified);
+		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::DateModified);
 		break;
 
 	case IDM_MB_VIEW_SORTASCENDING:
-		m_pBookmarkListView->SetSortAscending(true);
+		m_bookmarkListView->SetSortAscending(true);
 		break;
 
 	case IDM_MB_VIEW_SORTDESCENDING:
-		m_pBookmarkListView->SetSortAscending(false);
+		m_bookmarkListView->SetSortAscending(false);
 		break;
 
 		/* TODO: */
@@ -269,16 +267,8 @@ INT_PTR CManageBookmarksDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
-	case NM_DBLCLK:
-		OnDblClk(pnmhdr);
-		break;
-
 	case TBN_DROPDOWN:
 		OnTbnDropDown(reinterpret_cast<NMTOOLBAR *>(pnmhdr));
-		break;
-
-	case TVN_SELCHANGED:
-		OnTvnSelChanged(reinterpret_cast<NMTREEVIEW *>(pnmhdr));
 		break;
 	}
 
@@ -301,7 +291,7 @@ void CManageBookmarksDialog::OnNewFolder()
 
 	assert(hSelectedItem != NULL);
 
-	auto bookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(
+	auto bookmarkFolder = m_bookmarkTreeView->GetBookmarkFolderFromTreeView(
 		hSelectedItem);
 	m_bookmarkTree->AddBookmarkItem(bookmarkFolder, std::move(newBookmarkFolder), bookmarkFolder->GetChildren().size());
 }
@@ -336,7 +326,7 @@ void CManageBookmarksDialog::ShowViewMenu()
 
 	UINT uCheck;
 
-	switch(m_pBookmarkListView->GetSortMode())
+	switch(m_bookmarkListView->GetSortMode())
 	{
 	case BookmarkHelper::SortMode::Default:
 		uCheck = IDM_MB_VIEW_SORT_BY_DEFAULT;
@@ -365,7 +355,7 @@ void CManageBookmarksDialog::ShowViewMenu()
 
 	CheckMenuRadioItem(hMenu, IDM_MB_VIEW_SORTBYNAME, IDM_MB_VIEW_SORT_BY_DEFAULT, uCheck, MF_BYCOMMAND);
 
-	if (m_pBookmarkListView->GetSortAscending())
+	if (m_bookmarkListView->GetSortAscending())
 	{
 		uCheck = IDM_MB_VIEW_SORTASCENDING;
 	}
@@ -411,66 +401,29 @@ void CManageBookmarksDialog::ShowOrganizeMenu()
 	SendMessage(m_hToolbar,TB_SETSTATE,TOOLBAR_ID_ORGANIZE,MAKEWORD(dwButtonState,0));
 }
 
-void CManageBookmarksDialog::OnTvnSelChanged(NMTREEVIEW *pnmtv)
+void CManageBookmarksDialog::OnTreeViewSelectionChanged(BookmarkItem *bookmarkFolder)
 {
-	/* This message will come in once before the listview has been
-	properly initialized (due to the selection been set in
-	the treeview), and can be ignored. */
-	if(!m_bListViewInitialized)
+	if (bookmarkFolder->GetGUID() == m_guidCurrentFolder)
 	{
 		return;
 	}
 
-	auto bookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(pnmtv->itemNew.hItem);
-
-	if(bookmarkFolder->GetGUID() == m_guidCurrentFolder)
-	{
-		return;
-	}
-
-	BrowseBookmarkFolder(bookmarkFolder);
+	m_bookmarkListView->NavigateToBookmarkFolder(bookmarkFolder);
 }
 
-void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)
-{
-	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
-
-	if(pnmhdr->hwndFrom == hListView)
-	{
-		NMITEMACTIVATE *pnmia = reinterpret_cast<NMITEMACTIVATE *>(pnmhdr);
-
-		if(pnmia->iItem == -1)
-		{
-			return;
-		}
-
-		auto bookmarkItem = m_pBookmarkListView->GetBookmarkItemFromListView(pnmia->iItem);
-
-		if(bookmarkItem->IsFolder())
-		{
-			BrowseBookmarkFolder(bookmarkItem);
-		}
-		else
-		{
-			m_navigation->BrowseFolderInCurrentTab(bookmarkItem->GetLocation().c_str());
-		}
-	}
-}
-
-void CManageBookmarksDialog::BrowseBookmarkFolder(BookmarkItem *bookmarkItem)
+void CManageBookmarksDialog::OnListViewNavigation(BookmarkItem *bookmarkFolder)
 {
 	/* Temporary flag used to indicate whether history should
 	be saved. It will be reset each time a folder is browsed. */
-	if(m_bSaveHistory)
+	if (m_bSaveHistory)
 	{
 		m_stackBack.push(m_guidCurrentFolder);
 	}
 
 	m_bSaveHistory = true;
 
-	m_guidCurrentFolder = bookmarkItem->GetGUID();
-	m_pBookmarkTreeView->SelectFolder(bookmarkItem->GetGUID());
-	m_pBookmarkListView->NavigateToBookmarkFolder(bookmarkItem);
+	m_guidCurrentFolder = bookmarkFolder->GetGUID();
+	m_bookmarkTreeView->SelectFolder(bookmarkFolder->GetGUID());
 
 	UpdateToolbarState();
 }
@@ -487,7 +440,7 @@ void CManageBookmarksDialog::BrowseBack()
 	m_stackForward.push(m_guidCurrentFolder);
 
 	m_bSaveHistory = false;
-	m_pBookmarkTreeView->SelectFolder(guid);
+	m_bookmarkTreeView->SelectFolder(guid);
 }
 
 void CManageBookmarksDialog::BrowseForward()
@@ -502,7 +455,7 @@ void CManageBookmarksDialog::BrowseForward()
 	m_stackBack.push(m_guidCurrentFolder);
 
 	m_bSaveHistory = false;
-	m_pBookmarkTreeView->SelectFolder(guid);
+	m_bookmarkTreeView->SelectFolder(guid);
 }
 
 void CManageBookmarksDialog::UpdateToolbarState()
@@ -551,7 +504,7 @@ INT_PTR CManageBookmarksDialog::OnClose()
 
 INT_PTR	CManageBookmarksDialog::OnDestroy()
 {
-	m_pmbdps->m_listViewColumns = m_pBookmarkListView->GetColumns();
+	m_pmbdps->m_listViewColumns = m_bookmarkListView->GetColumns();
 	return 0;
 }
 

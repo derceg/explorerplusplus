@@ -9,6 +9,7 @@
 #include "BookmarkTree.h"
 #include "CoreInterface.h"
 #include "ResourceHelper.h"
+#include "SignalWrapper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <wil/resource.h>
@@ -36,14 +37,16 @@ public:
 	CBookmarkListView(HWND hListView, HMODULE resourceModule, BookmarkTree *bookmarkTree,
 		IExplorerplusplus *expp, const std::vector<Column> &initialColumns);
 
-	void NavigateToBookmarkFolder(BookmarkItem *bookmarkItem);
-	BookmarkItem *GetBookmarkItemFromListView(int iItem);
+	void NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder);
 
 	std::vector<Column> GetColumns();
 	BookmarkHelper::SortMode GetSortMode() const;
 	void SetSortMode(BookmarkHelper::SortMode sortMode);
 	bool GetSortAscending() const;
 	void SetSortAscending(bool sortAscending);
+
+	// Signals
+	SignalWrapper<CBookmarkListView, void(BookmarkItem *bookmarkFolder)> navigationSignal;
 
 private:
 
@@ -64,10 +67,13 @@ private:
 	std::wstring GetBookmarkItemColumnInfo(const BookmarkItem *bookmarkItem, ColumnType columnType);
 	static std::wstring FormatDate(const FILETIME *date);
 
+	BookmarkItem *GetBookmarkItemFromListView(int iItem);
+
 	void SortItems();
 	static int CALLBACK SortBookmarksStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 	int CALLBACK SortBookmarks(LPARAM lParam1, LPARAM lParam2);
 
+	void OnDblClk(const NMITEMACTIVATE *itemActivate);
 	void OnRClick(const NMITEMACTIVATE *itemActivate);
 	void OnGetDispInfo(NMLVDISPINFO *dispInfo);
 	BOOL OnBeginLabelEdit(const NMLVDISPINFO *dispInfo);
@@ -81,6 +87,7 @@ private:
 
 	HWND m_hListView;
 	HMODULE m_resourceModule;
+	IExplorerplusplus *m_expp;
 	DpiCompatibility m_dpiCompat;
 	wil::unique_himagelist m_imageList;
 	IconImageListMapping m_imageListMappings;

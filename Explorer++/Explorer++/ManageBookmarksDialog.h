@@ -14,6 +14,7 @@
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
+#include <boost/signals2.hpp>
 #include <stack>
 #include <unordered_set>
 
@@ -42,7 +43,6 @@ private:
 	std::vector<CBookmarkListView::Column> m_listViewColumns;
 
 	bool m_bInitialized;
-	std::wstring m_guidSelected;
 	std::unordered_set<std::wstring> m_setExpansion;
 };
 
@@ -86,7 +86,9 @@ private:
 
 	void		BrowseBack();
 	void		BrowseForward();
-	void		BrowseBookmarkFolder(BookmarkItem *bookmarkItem);
+
+	void		OnTreeViewSelectionChanged(BookmarkItem *bookmarkFolder);
+	void		OnListViewNavigation(BookmarkItem *bookmarkFolder);
 
 	void		UpdateToolbarState();
 
@@ -95,13 +97,9 @@ private:
 	void		OnNewFolder();
 	void		OnDeleteBookmark(const std::wstring &guid);
 
-	void		OnDblClk(NMHDR *pnmhdr);
-
 	void		OnTbnDropDown(NMTOOLBAR *nmtb);
 	void		ShowViewMenu();
 	void		ShowOrganizeMenu();
-
-	void		OnTvnSelChanged(NMTREEVIEW *pnmtv);
 
 	void		OnOk();
 	void		OnCancel();
@@ -124,10 +122,10 @@ private:
 	std::stack<std::wstring> m_stackForward;
 	bool m_bSaveHistory;
 
-	CBookmarkTreeView *m_pBookmarkTreeView;
+	CBookmarkTreeView *m_bookmarkTreeView;
+	CBookmarkListView *m_bookmarkListView;
 
-	bool m_bListViewInitialized;
-	CBookmarkListView *m_pBookmarkListView;
+	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	CManageBookmarksDialogPersistentSettings *m_pmbdps;
 };
