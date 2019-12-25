@@ -8,7 +8,6 @@
 #include "TimeHelper.h"
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <wil/resource.h>
 
 enum VersionSubBlockType_t
 {
@@ -721,33 +720,54 @@ BOOL CopyTextToClipboard(const std::wstring &str)
 		return FALSE;
 	}
 
+	auto cleanup = wil::scope_exit([] {
+		CloseClipboard();
+	});
+
 	EmptyClipboard();
 
-	size_t stringSize = (str.size() + 1) * sizeof(TCHAR);
-	HGLOBAL hGlobal = GlobalAlloc(GMEM_MOVEABLE, stringSize);
-	BOOL bRes = FALSE;
+	auto global = CreateGlobalFromString(str);
 
-	if(hGlobal != NULL)
+	if (!global)
 	{
-		LPVOID pMem = GlobalLock(hGlobal);
-
-		if(pMem != NULL)
-		{
-			memcpy(pMem, str.c_str(), stringSize);
-			GlobalUnlock(hGlobal);
-
-			HANDLE hData = SetClipboardData(CF_UNICODETEXT, hGlobal);
-
-			if(hData != NULL)
-			{
-				bRes = TRUE;
-			}
-		}
+		return FALSE;
 	}
 
-	CloseClipboard();
+	HANDLE clipboardData = SetClipboardData(CF_UNICODETEXT, global.get());
 
-	return bRes;
+	if (!clipboardData)
+	{
+		return FALSE;
+	}
+
+	// SetClipboardData() takes ownership of the data passed to it. Therefore,
+	// it's important that the ownership of the data is relinquished here if the
+	// call to SetClipboardData() succeeded.
+	global.release();
+
+	return TRUE;
+}
+
+wil::unique_hglobal CreateGlobalFromString(const std::wstring &str)
+{
+	size_t stringSize = (str.size() + 1) * sizeof(WCHAR);
+	wil::unique_hglobal global(GlobalAlloc(GMEM_MOVEABLE, stringSize));
+
+	if (!global)
+	{
+		return nullptr;
+	}
+
+	wil::unique_hglobal_locked mem(global.get());
+
+	if (!mem)
+	{
+		return nullptr;
+	}
+
+	memcpy(mem.get(), str.c_str(), stringSize);
+
+	return global;
 }
 
 bool IsKeyDown(int nVirtKey)
