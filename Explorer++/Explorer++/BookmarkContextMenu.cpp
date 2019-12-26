@@ -6,6 +6,7 @@
 #include "BookmarkContextMenu.h"
 #include "BookmarkHelper.h"
 #include "MainResource.h"
+#include "../Helper/Helper.h"
 #include <wil/resource.h>
 
 BookmarkContextMenu::BookmarkContextMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule,
@@ -74,6 +75,19 @@ void BookmarkContextMenu::OnMenuItemSelected(int menuItemId, BookmarkItem *bookm
 
 	case IDM_BT_NEWFOLDER:
 		OnNewBookmarkItem(BookmarkItem::Type::Folder, parentWindow);
+		break;
+
+	case IDM_BT_COPY:
+	{
+		if (bookmarkItem->IsFolder())
+		{
+			CopyTextToClipboard(bookmarkItem->GetName());
+		}
+		else
+		{
+			CopyTextToClipboard(bookmarkItem->GetLocation());
+		}
+	}
 		break;
 
 	case IDM_BT_DELETE:
