@@ -4,18 +4,42 @@
 
 #include "stdafx.h"
 #include "BookmarkItem.h"
-#include "../Helper/Helper.h"
 
 BookmarkItem::BookmarkItem(std::optional<std::wstring> guid, std::wstring_view name,
 	std::optional<std::wstring> location) :
 	m_type(location ? Type::Bookmark : Type::Folder),
 	m_guid(guid ? *guid : CreateGUID()),
-	m_parent(nullptr),
 	m_name(name),
 	m_location(location ? *location : std::wstring())
 {
-	GetSystemTimeAsFileTime(&m_dateCreated);
-	m_dateModified = m_dateCreated;
+
+}
+
+BookmarkItem::BookmarkItem(std::wstring_view name, std::wstring location) :
+	m_type(Type::Bookmark),
+	m_name(name),
+	m_location(location)
+{
+
+}
+
+BookmarkItem::BookmarkItem(std::wstring_view name, std::vector<std::unique_ptr<BookmarkItem>> &&children) :
+	m_type(Type::Folder),
+	m_name(name),
+	m_children(std::move(children))
+{
+	for (auto &child : m_children)
+	{
+		child->m_parent = this;
+	}
+}
+
+FILETIME BookmarkItem::GetCurrentDate()
+{
+	FILETIME fileTime;
+	GetSystemTimeAsFileTime(&fileTime);
+
+	return fileTime;
 }
 
 bool BookmarkItem::IsFolder() const

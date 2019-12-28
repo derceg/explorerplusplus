@@ -5,10 +5,15 @@
 #pragma once
 
 #include "SignalWrapper.h"
+#include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
+#include "cereal/types/string.hpp"
+#include "cereal/types/vector.hpp"
 #include <optional>
 #include <vector>
 
+// Represents both a bookmark and a bookmark folder. Each folder has the ability
+// to contain other bookmark items.
 class BookmarkItem
 {
 public:
@@ -26,6 +31,34 @@ public:
 		DateCreated,
 		DateModified
 	};
+
+	friend class cereal::access;
+
+	template <class Archive>
+	void serialize(Archive &archive)
+	{
+		archive(m_type, m_name, m_location, m_children);
+	}
+
+	template <class Archive>
+	static void load_and_construct(Archive &archive, cereal::construct<BookmarkItem> &construct)
+	{
+		Type type;
+		std::wstring name;
+		std::wstring location;
+		std::vector<std::unique_ptr<BookmarkItem>> children;
+
+		archive(type, name, location, children);
+
+		if (type == Type::Bookmark)
+		{
+			construct(name, location);
+		}
+		else
+		{
+			construct(name, std::move(children));
+		}
+	}
 
 	BookmarkItem(std::optional<std::wstring> guid, std::wstring_view name,
 		std::optional<std::wstring> location);
@@ -67,19 +100,29 @@ private:
 
 	DISALLOW_COPY_AND_ASSIGN(BookmarkItem);
 
+	// Used exclusively when deserializing. The advantage here mainly comes from
+	// the second of these methods. It allows the list of children to be
+	// directly imported. Without that method, you would have to call AddChild()
+	// for each child item and there's no need to do that when you already have
+	// a list of the children in the correct format.
+	BookmarkItem(std::wstring_view name, std::wstring location);
+	BookmarkItem(std::wstring_view name, std::vector<std::unique_ptr<BookmarkItem>> &&children);
+
+	static FILETIME GetCurrentDate();
+
 	void UpdateModificationTime();
 
 	const Type m_type;
-	std::wstring m_guid;
+	std::wstring m_guid = CreateGUID();
 
-	BookmarkItem *m_parent;
+	BookmarkItem *m_parent = nullptr;
 
 	std::wstring m_name;
 
 	std::wstring m_location;
 
-	FILETIME m_dateCreated;
-	FILETIME m_dateModified;
+	FILETIME m_dateCreated = GetCurrentDate();
+	FILETIME m_dateModified = m_dateCreated;
 
 	std::vector<std::unique_ptr<BookmarkItem>> m_children;
 };
