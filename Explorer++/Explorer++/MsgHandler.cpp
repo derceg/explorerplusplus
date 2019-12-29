@@ -16,6 +16,7 @@
 #include "ShellBrowser/ViewModes.h"
 #include "ToolbarButtons.h"
 #include "ViewModeHelper.h"
+#include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/Controls.h"
 #include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/Logging.h"
@@ -1006,7 +1007,8 @@ void Explorerplusplus::CopyColumnInfoToClipboard(void)
 	/* Remove the trailing newline. */
 	strColumnInfo = strColumnInfo.substr(0,strColumnInfo.size() - 2);
 
-	CopyTextToClipboard(strColumnInfo);
+	BulkClipboardWriter clipboardWriter;
+	clipboardWriter.WriteText(strColumnInfo);
 }
 
 void Explorerplusplus::ToggleFilterStatus()

@@ -281,7 +281,9 @@
   <ItemGroup>
     <ClCompile Include="BaseDialog.cpp" />
     <ClCompile Include="BaseWindow.cpp" />
+    <ClCompile Include="BulkClipboardWriter.cpp" />
     <ClCompile Include="CachedIcons.cpp" />
+    <ClCompile Include="Clipboard.cpp" />
     <ClCompile Include="ComboBox.cpp" />
     <ClCompile Include="ComboBoxHelper.cpp" />
     <ClCompile Include="ContextMenuManager.cpp" />
@@ -345,7 +347,9 @@
     <ClInclude Include="..\targetver.h" />
     <ClInclude Include="BaseDialog.h" />
     <ClInclude Include="BaseWindow.h" />
+    <ClInclude Include="BulkClipboardWriter.h" />
     <ClInclude Include="CachedIcons.h" />
+    <ClInclude Include="Clipboard.h" />
     <ClInclude Include="ComboBox.h" />
     <ClInclude Include="ComboBoxHelper.h" />
     <ClInclude Include="ContextMenuManager.h" />

@@ -19,6 +19,7 @@
 #include "ShellBrowser/Columns.h"
 #include "ShellBrowser/ViewModes.h"
 #include "ViewModeHelper.h"
+#include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/ContextMenuManager.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DropHandler.h"
@@ -977,7 +978,8 @@ void Explorerplusplus::OnListViewCopyItemPath(void) const
 
 	strItemPaths = strItemPaths.substr(0,strItemPaths.size() - 2);
 
-	CopyTextToClipboard(strItemPaths);
+	BulkClipboardWriter clipboardWriter;
+	clipboardWriter.WriteText(strItemPaths);
 }
 
 void Explorerplusplus::OnListViewCopyUniversalPaths(void) const
@@ -1014,7 +1016,8 @@ void Explorerplusplus::OnListViewCopyUniversalPaths(void) const
 
 	strUniversalPaths = strUniversalPaths.substr(0,strUniversalPaths.size() - 2);
 
-	CopyTextToClipboard(strUniversalPaths);
+	BulkClipboardWriter clipboardWriter;
+	clipboardWriter.WriteText(strUniversalPaths);
 }
 
 HRESULT Explorerplusplus::OnListViewCopy(BOOL bCopy)

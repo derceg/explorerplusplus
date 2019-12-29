@@ -10,6 +10,7 @@
 #include "MainToolbar.h"
 #include "Navigation.h"
 #include "SetFileAttributesDialog.h"
+#include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/Helper.h"
@@ -292,7 +293,9 @@ void Explorerplusplus::OnTreeViewCopyItemPath(void) const
 
 		TCHAR szFullFileName[MAX_PATH];
 		GetDisplayName(pidl.get(),szFullFileName,SIZEOF_ARRAY(szFullFileName),SHGDN_FORPARSING);
-		CopyTextToClipboard(szFullFileName);
+
+		BulkClipboardWriter clipboardWriter;
+		clipboardWriter.WriteText(szFullFileName);
 	}
 }
 
@@ -316,10 +319,16 @@ void Explorerplusplus::OnTreeViewCopyUniversalPaths(void) const
 		dwRet = WNetGetUniversalName(szFullFileName,UNIVERSAL_NAME_INFO_LEVEL,
 			(void **)&uni,&dwBufferSize);
 
-		if(dwRet == NO_ERROR)
-			CopyTextToClipboard(uni.lpUniversalName);
+		BulkClipboardWriter clipboardWriter;
+
+		if (dwRet == NO_ERROR)
+		{
+			clipboardWriter.WriteText(uni.lpUniversalName);
+		}
 		else
-			CopyTextToClipboard(szFullFileName);
+		{
+			clipboardWriter.WriteText(szFullFileName);
+		}
 	}
 }
 

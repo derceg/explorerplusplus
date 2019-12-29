@@ -22,6 +22,7 @@
 #include "TabBacking.h"
 #include "ToolbarButtons.h"
 #include "../DisplayWindow/DisplayWindow.h"
+#include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
@@ -367,7 +368,10 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		break;
 
 	case IDM_FILE_COPYFOLDERPATH:
-		CopyTextToClipboard(m_CurrentDirectory);
+	{
+		BulkClipboardWriter clipboardWriter;
+		clipboardWriter.WriteText(m_CurrentDirectory);
+	}
 		break;
 
 	case IDM_FILE_COPYITEMPATH:

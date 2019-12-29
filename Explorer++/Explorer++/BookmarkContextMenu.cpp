@@ -6,6 +6,7 @@
 #include "BookmarkContextMenu.h"
 #include "BookmarkHelper.h"
 #include "MainResource.h"
+#include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/Helper.h"
 #include <wil/resource.h>
 
@@ -79,13 +80,15 @@ void BookmarkContextMenu::OnMenuItemSelected(int menuItemId, BookmarkItem *bookm
 
 	case IDM_BT_COPY:
 	{
+		BulkClipboardWriter clipboardWriter;
+
 		if (bookmarkItem->IsFolder())
 		{
-			CopyTextToClipboard(bookmarkItem->GetName());
+			clipboardWriter.WriteText(bookmarkItem->GetName());
 		}
 		else
 		{
-			CopyTextToClipboard(bookmarkItem->GetLocation());
+			clipboardWriter.WriteText(bookmarkItem->GetLocation());
 		}
 	}
 		break;
