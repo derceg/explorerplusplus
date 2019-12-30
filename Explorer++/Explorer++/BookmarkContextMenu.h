@@ -21,6 +21,8 @@ private:
 
 	void OnMenuItemSelected(int menuItemId, BookmarkItem *bookmarkItem, HWND parentWindow);
 	void OnNewBookmarkItem(BookmarkItem::Type type, HWND parentWindow);
+	void OnCopy(BookmarkItem *bookmarkItem, bool cut);
+	void OnPaste(BookmarkItem *selectedBookmarkItem);
 	void OnEditBookmarkItem(BookmarkItem *bookmarkItem, HWND parentWindow);
 
 	BookmarkTree *m_bookmarkTree;

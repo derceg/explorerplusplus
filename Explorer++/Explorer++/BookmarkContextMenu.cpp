@@ -4,9 +4,9 @@
 
 #include "stdafx.h"
 #include "BookmarkContextMenu.h"
+#include "BookmarkClipboard.h"
 #include "BookmarkHelper.h"
 #include "MainResource.h"
-#include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/Helper.h"
 #include <wil/resource.h>
 
@@ -48,6 +48,10 @@ BOOL BookmarkContextMenu::ShowMenu(HWND parentWindow, BookmarkItem *bookmarkItem
 
 	if (menuItemId != 0)
 	{
+		// If this menu is being shown on top of another menu, the original menu
+		// should be closed when an item from this menu has been selected.
+		EndMenu();
+
 		OnMenuItemSelected(menuItemId, bookmarkItem, parentWindow);
 	}
 
@@ -78,19 +82,16 @@ void BookmarkContextMenu::OnMenuItemSelected(int menuItemId, BookmarkItem *bookm
 		OnNewBookmarkItem(BookmarkItem::Type::Folder, parentWindow);
 		break;
 
-	case IDM_BT_COPY:
-	{
-		BulkClipboardWriter clipboardWriter;
+	case IDM_BT_CUT:
+		OnCopy(bookmarkItem, true);
+		break;
 
-		if (bookmarkItem->IsFolder())
-		{
-			clipboardWriter.WriteText(bookmarkItem->GetName());
-		}
-		else
-		{
-			clipboardWriter.WriteText(bookmarkItem->GetLocation());
-		}
-	}
+	case IDM_BT_COPY:
+		OnCopy(bookmarkItem, false);
+		break;
+
+	case IDM_BT_PASTE:
+		OnPaste(bookmarkItem);
 		break;
 
 	case IDM_BT_DELETE:
@@ -107,6 +108,48 @@ void BookmarkContextMenu::OnNewBookmarkItem(BookmarkItem::Type type, HWND parent
 {
 	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, m_resourceModule, parentWindow,
 		m_expp->GetTabContainer(), m_expp);
+}
+
+void BookmarkContextMenu::OnCopy(BookmarkItem *bookmarkItem, bool cut)
+{
+	const auto &children = bookmarkItem->GetParent()->GetChildren();
+
+	auto itr = std::find_if(children.begin(), children.end(), [bookmarkItem] (const auto &child) {
+		return child.get() == bookmarkItem;
+	});
+
+	assert(itr != children.end());
+
+	BookmarkClipboard bookmarkClipboard;
+	bool res = bookmarkClipboard.WriteBookmark(*itr);
+
+	if (cut && res)
+	{
+		m_bookmarkTree->RemoveBookmarkItem(bookmarkItem);
+	}
+}
+
+void BookmarkContextMenu::OnPaste(BookmarkItem *selectedBookmarkItem)
+{
+	BookmarkClipboard bookmarkClipboard;
+	auto copiedBookmarkItem = bookmarkClipboard.ReadBookmark();
+
+	if (!copiedBookmarkItem)
+	{
+		return;
+	}
+
+	if (selectedBookmarkItem->IsFolder())
+	{
+		m_bookmarkTree->AddBookmarkItem(selectedBookmarkItem, std::move(copiedBookmarkItem),
+			selectedBookmarkItem->GetChildren().size());
+	}
+	else
+	{
+		BookmarkItem *parent = selectedBookmarkItem->GetParent();
+		m_bookmarkTree->AddBookmarkItem(parent, std::move(copiedBookmarkItem),
+			*parent->GetChildIndex(selectedBookmarkItem) + 1);
+	}
 }
 
 void BookmarkContextMenu::OnEditBookmarkItem(BookmarkItem *bookmarkItem, HWND parentWindow)

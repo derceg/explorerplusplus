@@ -434,7 +434,10 @@ void CBookmarksToolbar::OnBookmarkItemMoved(BookmarkItem *bookmarkItem, const Bo
 
 void CBookmarksToolbar::OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem)
 {
-	RemoveBookmarkItem(&bookmarkItem);
+	if (bookmarkItem.GetParent() == m_bookmarkTree->GetBookmarksToolbarFolder())
+	{
+		RemoveBookmarkItem(&bookmarkItem);
+	}
 }
 
 void CBookmarksToolbar::RemoveBookmarkItem(const BookmarkItem *bookmarkItem)
