@@ -249,7 +249,7 @@ void Explorerplusplus::OnToolbarRClick(HWND sourceWindow)
 	ptCursor.y = GET_Y_LPARAM(dwPos);
 
 	// Give any observers a chance to modify the menu.
-	m_toolbarContextMenuSignal(menu, sourceWindow);
+	m_toolbarContextMenuSignal(menu, sourceWindow, ptCursor);
 
 	TrackPopupMenu(menu, TPM_LEFTALIGN, ptCursor.x, ptCursor.y, 0, m_hMainRebar, NULL);
 }

@@ -79,7 +79,8 @@ void CApplicationToolbar::Initialize(HWND hParent)
 
 	AddButtonsToToolbar();
 
-	m_connections.push_back(m_pexpp->AddToolbarContextMenuObserver(boost::bind(&CApplicationToolbar::OnToolbarContextMenuPreShow, this, _1, _2)));
+	m_connections.push_back(m_pexpp->AddToolbarContextMenuObserver(
+		boost::bind(&CApplicationToolbar::OnToolbarContextMenuPreShow, this, _1, _2, _3)));
 }
 
 CApplicationToolbar::~CApplicationToolbar()
@@ -444,8 +445,10 @@ void CApplicationToolbar::DeleteItem(int iItem)
 	}
 }
 
-void CApplicationToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow)
+void CApplicationToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt)
 {
+	UNREFERENCED_PARAMETER(pt);
+
 	if (sourceWindow != m_hwnd)
 	{
 		return;

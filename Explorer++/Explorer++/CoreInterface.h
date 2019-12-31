@@ -10,7 +10,7 @@
 
 typedef boost::signals2::signal<void()> TabsInitializedSignal;
 typedef boost::signals2::signal<void(HMENU mainMenu)> MainMenuPreShowSignal;
-typedef boost::signals2::signal<void(HMENU menu, HWND sourceWindow)> ToolbarContextMenuSignal;
+typedef boost::signals2::signal<void(HMENU menu, HWND sourceWindow, const POINT &pt)> ToolbarContextMenuSignal;
 
 enum MousewheelSource_t
 {

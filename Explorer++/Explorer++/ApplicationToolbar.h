@@ -92,7 +92,7 @@ private:
 	void				AddButtonToToolbar(const ApplicationButton_t &Button);
 	void				UpdateButton(int iItem);
 
-	void				OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow);
+	void				OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt);
 
 	ApplicationInfo_t	ProcessCommand(const std::wstring &Command);
 	ApplicationButton_t	*MapToolbarButtonToItem(int index);

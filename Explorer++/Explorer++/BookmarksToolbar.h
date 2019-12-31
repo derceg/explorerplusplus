@@ -14,6 +14,7 @@
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
+#include <optional>
 
 class CBookmarksToolbarDropHandler : public IDropTarget
 {
@@ -84,10 +85,12 @@ private:
 	void	ShowBookmarkFolderMenu(BookmarkItem *bookmarkItem, int command, int index);
 	void	OnBookmarkMenuItemClicked(const BookmarkItem *bookmarkItem);
 	void	OnNewBookmarkItem(BookmarkItem::Type type);
+	void	OnPaste();
+	int		FindNextButtonIndex(const POINT &ptClient);
 	void	OnEditBookmarkItem(BookmarkItem *bookmarkItem);
 	bool	OnGetInfoTip(NMTBGETINFOTIP *infoTip);
 
-	void	OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow);
+	void	OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt);
 
 	std::optional<int>	GetBookmarkItemIndex(const BookmarkItem *bookmarkItem) const;
 
@@ -116,6 +119,8 @@ private:
 	UINT m_uIDStart;
 	UINT m_uIDEnd;
 	UINT m_uIDCounter;
+
+	std::optional<POINT> m_contextMenuLocation;
 
 	CBookmarksToolbarDropHandler *m_pbtdh;
 

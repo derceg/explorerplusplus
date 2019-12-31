@@ -5,7 +5,9 @@
 #include "stdafx.h"
 #include "BookmarksToolbar.h"
 #include "AddBookmarkDialog.h"
+#include "BookmarkClipboard.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "TabContainer.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
@@ -63,7 +65,8 @@ void CBookmarksToolbar::InitializeToolbar()
 	m_connections.push_back(m_bookmarkTree->bookmarkItemPreRemovalSignal.AddObserver(
 		std::bind(&CBookmarksToolbar::OnBookmarkItemPreRemoval, this, std::placeholders::_1)));
 	m_connections.push_back(m_pexpp->AddToolbarContextMenuObserver(
-		std::bind(&CBookmarksToolbar::OnToolbarContextMenuPreShow, this, std::placeholders::_1, std::placeholders::_2)));
+		std::bind(&CBookmarksToolbar::OnToolbarContextMenuPreShow, this, std::placeholders::_1,
+			std::placeholders::_2, std::placeholders::_3)));
 }
 
 CBookmarksToolbar::~CBookmarksToolbar()
@@ -226,6 +229,10 @@ bool CBookmarksToolbar::OnCommand(WPARAM wParam, LPARAM lParam)
 		case IDM_BT_NEWFOLDER:
 			OnNewBookmarkItem(BookmarkItem::Type::Folder);
 			return true;
+
+		case IDM_BT_PASTE:
+			OnPaste();
+			return true;
 		}
 	}
 
@@ -307,6 +314,51 @@ void CBookmarksToolbar::OnNewBookmarkItem(BookmarkItem::Type type)
 {
 	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, m_instance, m_hToolbar,
 		m_pexpp->GetTabContainer(), m_pexpp);
+}
+
+void CBookmarksToolbar::OnPaste()
+{
+	BookmarkClipboard bookmarkClipboard;
+	auto copiedBookmarkItem = bookmarkClipboard.ReadBookmark();
+
+	if (!copiedBookmarkItem)
+	{
+		return;
+	}
+
+	assert(m_contextMenuLocation);
+
+	POINT ptClient = *m_contextMenuLocation;
+	ScreenToClient(m_hToolbar, &ptClient);
+	int newIndex = FindNextButtonIndex(ptClient);
+
+	m_bookmarkTree->AddBookmarkItem(m_bookmarkTree->GetBookmarksToolbarFolder(), std::move(copiedBookmarkItem), newIndex);
+
+	m_contextMenuLocation.reset();
+}
+
+// Returns the index of the button that comes after the specified point. If the
+// point is past the last button on the toolbar, this index will be one past the
+// last button (or 0 if there are no buttons).
+int CBookmarksToolbar::FindNextButtonIndex(const POINT &ptClient)
+{
+	int numButtons = static_cast<int>(SendMessage(m_hToolbar, TB_BUTTONCOUNT, 0, 0));
+	int nextIndex = 0;
+
+	for (int i = 0; i < numButtons; i++)
+	{
+		RECT rc;
+		SendMessage(m_hToolbar, TB_GETITEMRECT, i, reinterpret_cast<LPARAM>(&rc));
+
+		if (ptClient.x < rc.right)
+		{
+			break;
+		}
+
+		nextIndex = i + 1;
+	}
+
+	return nextIndex;
 }
 
 void CBookmarksToolbar::OnEditBookmarkItem(BookmarkItem *bookmarkItem)
@@ -451,32 +503,49 @@ void CBookmarksToolbar::RemoveBookmarkItem(const BookmarkItem *bookmarkItem)
 	//UpdateToolbarBandSizing(m_hMainRebar,m_hBookmarksToolbar);
 }
 
-void CBookmarksToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow)
+void CBookmarksToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt)
 {
 	if (sourceWindow != m_hToolbar)
 	{
 		return;
 	}
 
-	TCHAR newBookmark[64];
-	LoadString(m_instance, IDS_BOOKMARKS_TOOLBAR_NEW_BOOKMARK, newBookmark, SIZEOF_ARRAY(newBookmark));
+	std::wstring newBookmark = ResourceHelper::LoadString(m_instance, IDS_BOOKMARKS_TOOLBAR_NEW_BOOKMARK);
 
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
 	mii.fMask = MIIM_ID | MIIM_STRING;
-	mii.dwTypeData = newBookmark;
+	mii.dwTypeData = newBookmark.data();
 	mii.wID = IDM_BT_NEWBOOKMARK;
-
 	InsertMenuItem(menu, IDM_TOOLBARS_CUSTOMIZE, FALSE, &mii);
 
-	TCHAR newBookmarkFolder[64];
-	LoadString(m_instance, IDS_BOOKMARKS_TOOLBAR_NEW_FOLDER, newBookmarkFolder, SIZEOF_ARRAY(newBookmarkFolder));
+	std::wstring newBookmarkFolder = ResourceHelper::LoadString(m_instance, IDS_BOOKMARKS_TOOLBAR_NEW_FOLDER);
 
 	mii.fMask = MIIM_ID | MIIM_STRING;
-	mii.dwTypeData = newBookmarkFolder;
+	mii.dwTypeData = newBookmarkFolder.data();
 	mii.wID = IDM_BT_NEWFOLDER;
-
 	InsertMenuItem(menu, IDM_TOOLBARS_CUSTOMIZE, FALSE, &mii);
+
+	std::wstring paste = ResourceHelper::LoadString(m_instance, IDS_BOOKMARKS_TOOLBAR_PASTE);
+
+	UINT state = MFS_DISABLED;
+
+	if (IsClipboardFormatAvailable(BookmarkClipboard::GetClipboardFormat()))
+	{
+		state = MFS_ENABLED;
+	}
+
+	mii.fMask = MIIM_ID | MIIM_STRING | MIIM_STATE;
+	mii.dwTypeData = paste.data();
+	mii.wID = IDM_BT_PASTE;
+	mii.fState = state;
+	InsertMenuItem(menu, IDM_TOOLBARS_CUSTOMIZE, FALSE, &mii);
+
+	// TODO: It would be better to have a callback function invoked when a menu
+	// item is selected, rather than handling the selection in WM_COMMAND. That
+	// way, the point here wouldn't need to be saved (it could be passed
+	// directly to the callback instead).
+	m_contextMenuLocation = pt;
 }
 
 BookmarkItem *CBookmarksToolbar::GetBookmarkItemFromToolbarIndex(int index)
