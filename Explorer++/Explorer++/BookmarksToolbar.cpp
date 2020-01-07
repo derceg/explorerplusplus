@@ -90,28 +90,9 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPA
 	{
 	case WM_MBUTTONUP:
 		{
-			DWORD dwPos = GetMessagePos();
-
-			POINT ptCursor;
-			ptCursor.x = GET_X_LPARAM(dwPos);
-			ptCursor.y = GET_Y_LPARAM(dwPos);
-			MapWindowPoints(HWND_DESKTOP,m_hToolbar,&ptCursor,1);
-
-			int iIndex = static_cast<int>(SendMessage(m_hToolbar,TB_HITTEST,0,
-				reinterpret_cast<LPARAM>(&ptCursor)));
-
-			if(iIndex >= 0)
-			{
-				TBBUTTON tbButton;
-				SendMessage(m_hToolbar,TB_GETBUTTON,iIndex,reinterpret_cast<LPARAM>(&tbButton));
-
-				auto bookmarkItem = GetBookmarkItemFromToolbarIndex(iIndex);
-
-				if (bookmarkItem)
-				{
-					BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_pexpp);
-				}
-			}
+			POINT pt;
+			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+			OnMButtonUp(pt);
 		}
 		break;
 
@@ -121,6 +102,24 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPA
 	}
 
 	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
+}
+
+void CBookmarksToolbar::OnMButtonUp(const POINT &pt)
+{
+	int index = static_cast<int>(SendMessage(m_hToolbar, TB_HITTEST, 0,
+		reinterpret_cast<LPARAM>(&pt)));
+
+	if (index < 0)
+	{
+		return;
+	}
+
+	auto bookmarkItem = GetBookmarkItemFromToolbarIndex(index);
+
+	if (bookmarkItem)
+	{
+		BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_pexpp);
+	}
 }
 
 LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarParentProcStub(HWND hwnd,UINT uMsg,

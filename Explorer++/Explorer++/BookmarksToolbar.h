@@ -79,6 +79,7 @@ private:
 
 	void	RemoveBookmarkItem(const BookmarkItem *bookmarkItem);
 
+	void	OnMButtonUp(const POINT &pt);
 	bool	OnCommand(WPARAM wParam, LPARAM lParam);
 	bool	OnButtonClick(int command);
 	BOOL	OnRightClick(const NMMOUSE *nmm);
