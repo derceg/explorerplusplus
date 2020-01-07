@@ -166,7 +166,7 @@ private:
 	void		RestoreState(void);
 	DWORD		GetCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,POINTL *ptl);
 	BOOL		CheckItemLocations(IDataObject *pDataObject,HTREEITEM hItem,int iDroppedItem);
-	HRESULT		OnBeginDrag(int iItemId,DragTypes_t DragType);
+	HRESULT		OnBeginDrag(int iItemId,DragType dragType);
 
 	/* Icon refresh. */
 	void		RefreshAllIconsInternal(HTREEITEM hFirstSibling);
@@ -211,7 +211,7 @@ private:
 	BOOL				m_bDragCancelled;
 	BOOL				m_bDragAllowed;
 	BOOL				m_bDataAccept;
-	DragTypes_t			m_DragType;
+	DragType			m_DragType;
 
 	/* Directory modification. */
 	std::list<AlteredFile_t>	m_AlteredList;

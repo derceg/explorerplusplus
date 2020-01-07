@@ -82,7 +82,7 @@ HRESULT CDropHandler::GetDropFormats(std::list<FORMATETC> &ftcList)
 }
 
 void CDropHandler::Drop(IDataObject *pDataObject,DWORD grfKeyState,
-POINTL ptl,DWORD *pdwEffect,HWND hwndDrop,DragTypes_t DragType,
+POINTL ptl,DWORD *pdwEffect,HWND hwndDrop,DragType dragType,
 TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,
 BOOL bRenameOnCollision)
 {
@@ -91,18 +91,18 @@ BOOL bRenameOnCollision)
 	m_ptl				= ptl;
 	m_dwEffect			= *pdwEffect;
 	m_hwndDrop			= hwndDrop;
-	m_DragType			= DragType;
+	m_DragType			= dragType;
 	m_szDestDirectory	= szDestDirectory;
 	m_pDropFilesCallback	= pDropFilesCallback;
 	m_bRenameOnCollision	= bRenameOnCollision;
 
 	switch(m_DragType)
 	{
-	case DragTypes_t::DRAG_TYPE_LEFTCLICK:
+	case DragType::LeftClick:
 		HandleLeftClickDrop(m_pDataObject,&m_ptl);
 		break;
 
-	case DragTypes_t::DRAG_TYPE_RIGHTCLICK:
+	case DragType::RightClick:
 		HandleRightClickDrop();
 		break;
 	}

@@ -551,7 +551,7 @@ private:
 	IDropTargetHelper *	m_pDropTargetHelper;
 	std::list<DroppedFile_t>	m_DroppedFileNameList;
 	std::list<DraggedFile_t>	m_DraggedFilesList;
-	DragTypes_t			m_DragType;
+	DragType			m_DragType;
 	POINT				m_ptDraggedOffset;
 	BOOL				m_bDataAccept;
 	BOOL				m_bDragging;

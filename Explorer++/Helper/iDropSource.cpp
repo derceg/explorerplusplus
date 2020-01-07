@@ -14,7 +14,7 @@ class CDropSource : public IDropSource
 {
 public:
 
-	CDropSource(DragTypes_t DragType);
+	CDropSource(DragType dragType);
 
 	HRESULT		__stdcall	QueryInterface(REFIID iid, void **ppvObject);
 	ULONG		__stdcall	AddRef(void);
@@ -26,25 +26,25 @@ public:
 private:
 
 	LONG		m_lRefCount;
-	DragTypes_t	m_DragType;
+	DragType	m_DragType;
 };
 
-HRESULT CreateDropSource(IDropSource **ppDropSource,DragTypes_t DragType)
+HRESULT CreateDropSource(IDropSource **ppDropSource,DragType dragType)
 {
 	if(ppDropSource == NULL)
 	{
 		return E_FAIL;
 	}
 
-	*ppDropSource = new CDropSource(DragType);
+	*ppDropSource = new CDropSource(dragType);
 
 	return S_OK;
 }
 
-CDropSource::CDropSource(DragTypes_t DragType)
+CDropSource::CDropSource(DragType dragType)
 {
 	m_lRefCount = 1;
-	m_DragType = DragType;
+	m_DragType = dragType;
 }
 
 /* IUnknown interface members. */
@@ -90,14 +90,14 @@ HRESULT _stdcall CDropSource::QueryContinueDrag(BOOL fEscapePressed,DWORD grfKey
 {
 	DWORD dwStopButton = 0;
 
-	if(m_DragType == DragTypes_t::DRAG_TYPE_LEFTCLICK)
+	if(m_DragType == DragType::LeftClick)
 	{
 		if((grfKeyState & MK_LBUTTON) == 0)
 			return DRAGDROP_S_DROP;
 
 		dwStopButton = MK_RBUTTON;
 	}
-	else if(m_DragType == DragTypes_t::DRAG_TYPE_RIGHTCLICK)
+	else if(m_DragType == DragType::RightClick)
 	{
 		if((grfKeyState & MK_RBUTTON) == 0)
 			return DRAGDROP_S_DROP;

@@ -48,6 +48,6 @@ private:
 	IDropTargetHelper	*m_pDropTargetHelper;
 	bool				m_AcceptData;
 	int					m_TabHoverIndex;
-	DragTypes_t			m_DragType;
+	DragType			m_DragType;
 	std::wstring		m_RepresentativeDrive;
 };

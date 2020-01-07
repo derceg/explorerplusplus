@@ -249,7 +249,7 @@ private:
 	void					OnListViewFileRenameMultiple();
 	LRESULT					OnListViewKeyDown(LPARAM lParam);
 	BOOL					OnListViewItemChanging(const NMLISTVIEW *changeData);
-	HRESULT					OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType);
+	HRESULT					OnListViewBeginDrag(LPARAM lParam,DragType dragType);
 	BOOL					OnListViewBeginLabelEdit(LPARAM lParam);
 	BOOL					OnListViewEndLabelEdit(LPARAM lParam);
 	void					OnListViewFileDelete(bool permanent);

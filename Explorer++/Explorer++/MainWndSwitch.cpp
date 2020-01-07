@@ -1472,7 +1472,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 			break;
 
 		case LVN_BEGINDRAG:
-			OnListViewBeginDrag(lParam,DragTypes_t::DRAG_TYPE_LEFTCLICK);
+			OnListViewBeginDrag(lParam,DragType::LeftClick);
 			break;
 
 		case LVN_BEGINLABELEDIT:

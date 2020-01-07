@@ -176,7 +176,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 							nmlv.iItem = 0;
 							nmlv.ptAction = pt;
 
-							hr = OnListViewBeginDrag((LPARAM)&nmlv,DragTypes_t::DRAG_TYPE_RIGHTCLICK);
+							hr = OnListViewBeginDrag((LPARAM)&nmlv,DragType::RightClick);
 
 							if(hr == DRAGDROP_S_CANCEL)
 							{
@@ -699,7 +699,7 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 	}
 }
 
-HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType)
+HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragType dragType)
 {
 	IDropSource			*pDropSource = NULL;
 	IDragSourceHelper	*pDragSourceHelper = NULL;
@@ -746,7 +746,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 
 	if(SUCCEEDED(hr))
 	{
-		hr = CreateDropSource(&pDropSource,DragType);
+		hr = CreateDropSource(&pDropSource, dragType);
 
 		if(SUCCEEDED(hr))
 		{

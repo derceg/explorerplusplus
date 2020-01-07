@@ -167,7 +167,7 @@ LRESULT CALLBACK CMyTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, L
 
 							if(bRet)
 							{
-								hr = OnBeginDrag((int)tvItem.lParam,DragTypes_t::DRAG_TYPE_RIGHTCLICK);
+								hr = OnBeginDrag((int)tvItem.lParam,DragType::RightClick);
 
 								if(hr == DRAGDROP_S_CANCEL)
 								{
@@ -220,7 +220,7 @@ LRESULT CALLBACK CMyTreeView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 			case TVN_BEGINDRAG:
 			{
 				NMTREEVIEW *pnmTreeView = reinterpret_cast<NMTREEVIEW *>(lParam);
-				OnBeginDrag(static_cast<int>(pnmTreeView->itemNew.lParam), DragTypes_t::DRAG_TYPE_LEFTCLICK);
+				OnBeginDrag(static_cast<int>(pnmTreeView->itemNew.lParam), DragType::LeftClick);
 			}
 			break;
 
@@ -1607,7 +1607,7 @@ void CMyTreeView::RefreshAllIconsInternal(HTREEITEM hFirstSibling)
 	}
 }
 
-HRESULT CMyTreeView::OnBeginDrag(int iItemId,DragTypes_t DragType)
+HRESULT CMyTreeView::OnBeginDrag(int iItemId,DragType dragType)
 {
 	IDataObject			*pDataObject = NULL;
 	IDragSourceHelper	*pDragSourceHelper = NULL;
@@ -1633,7 +1633,7 @@ HRESULT CMyTreeView::OnBeginDrag(int iItemId,DragTypes_t DragType)
 
 			pDragSourceHelper->InitializeFromWindow(m_hTreeView,&pt,pDataObject);
 
-			m_DragType = DragType;
+			m_DragType = dragType;
 
 			hr = DoDragDrop(pDataObject,this,DROPEFFECT_COPY|DROPEFFECT_MOVE|
 				DROPEFFECT_LINK,&Effect);

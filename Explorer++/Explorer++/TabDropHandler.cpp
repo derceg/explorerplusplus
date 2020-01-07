@@ -127,11 +127,11 @@ HRESULT __stdcall CTabDropHandler::DragEnter(IDataObject *pDataObject,DWORD grfK
 
 	if(grfKeyState & MK_LBUTTON)
 	{
-		m_DragType = DragTypes_t::DRAG_TYPE_LEFTCLICK;
+		m_DragType = DragType::LeftClick;
 	}
 	else
 	{
-		m_DragType = DragTypes_t::DRAG_TYPE_RIGHTCLICK;
+		m_DragType = DragType::RightClick;
 	}
 
 	m_pDropTargetHelper->DragEnter(m_hTabCtrl,pDataObject,reinterpret_cast<POINT *>(&pt),*pdwEffect);

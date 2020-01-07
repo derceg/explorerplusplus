@@ -9,10 +9,10 @@
 #include "FileOperations.h"
 #include "ReferenceCount.h"
 
-enum class DragTypes_t
+enum class DragType
 {
-	DRAG_TYPE_LEFTCLICK,
-	DRAG_TYPE_RIGHTCLICK
+	LeftClick,
+	RightClick
 };
 
 /* TODO: Switch to IReferenceCount in the future.
@@ -33,7 +33,7 @@ public:
 
 	static HRESULT		GetDropFormats(std::list<FORMATETC> &ftcList);
 
-	void	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect,HWND hwndDrop,DragTypes_t DragType,TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,BOOL bRenameOnCollision);
+	void	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect,HWND hwndDrop,DragType dragType,TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,BOOL bRenameOnCollision);
 	void	CopyClipboardData(IDataObject *pDataObject,HWND hwndDrop,TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,BOOL bRenameOnCollision);
 
 private:
@@ -76,7 +76,7 @@ private:
 	POINTL				m_ptl;
 	DWORD				m_dwEffect;
 	HWND				m_hwndDrop;
-	DragTypes_t			m_DragType;
+	DragType			m_DragType;
 	TCHAR				*m_szDestDirectory;
 	BOOL				m_bRenameOnCollision;
 };
