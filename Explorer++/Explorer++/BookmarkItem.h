@@ -12,6 +12,10 @@
 #include <optional>
 #include <vector>
 
+class BookmarkItem;
+
+using BookmarkItems = std::vector<std::unique_ptr<BookmarkItem>>;
+
 // Represents both a bookmark and a bookmark folder. Each folder has the ability
 // to contain other bookmark items.
 class BookmarkItem
@@ -46,7 +50,7 @@ public:
 		Type type;
 		std::wstring name;
 		std::wstring location;
-		std::vector<std::unique_ptr<BookmarkItem>> children;
+		BookmarkItems children;
 
 		archive(type, name, location, children);
 
@@ -91,7 +95,7 @@ public:
 
 	std::optional<size_t> GetChildIndex(const BookmarkItem *bookmarkItem) const;
 
-	const std::vector<std::unique_ptr<BookmarkItem>> &GetChildren() const;
+	const BookmarkItems &GetChildren() const;
 
 	// Signals
 	SignalWrapper<BookmarkItem, void(BookmarkItem &bookmarkItem, PropertyType propertyType)> updatedSignal;
@@ -106,7 +110,7 @@ private:
 	// for each child item and there's no need to do that when you already have
 	// a list of the children in the correct format.
 	BookmarkItem(std::wstring_view name, std::wstring location);
-	BookmarkItem(std::wstring_view name, std::vector<std::unique_ptr<BookmarkItem>> &&children);
+	BookmarkItem(std::wstring_view name, BookmarkItems &&children);
 
 	static FILETIME GetCurrentDate();
 
@@ -124,5 +128,5 @@ private:
 	FILETIME m_dateCreated = GetCurrentDate();
 	FILETIME m_dateModified = m_dateCreated;
 
-	std::vector<std::unique_ptr<BookmarkItem>> m_children;
+	BookmarkItems m_children;
 };

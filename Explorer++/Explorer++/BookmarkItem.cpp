@@ -23,7 +23,7 @@ BookmarkItem::BookmarkItem(std::wstring_view name, std::wstring location) :
 
 }
 
-BookmarkItem::BookmarkItem(std::wstring_view name, std::vector<std::unique_ptr<BookmarkItem>> &&children) :
+BookmarkItem::BookmarkItem(std::wstring_view name, BookmarkItems &&children) :
 	m_type(Type::Folder),
 	m_name(name),
 	m_children(std::move(children))
@@ -194,7 +194,7 @@ bool BookmarkItem::HasChildFolder() const
 	return (itr != m_children.end());
 }
 
-const std::vector<std::unique_ptr<BookmarkItem>> &BookmarkItem::GetChildren() const
+const BookmarkItems &BookmarkItem::GetChildren() const
 {
 	assert(m_type == Type::Folder);
 
