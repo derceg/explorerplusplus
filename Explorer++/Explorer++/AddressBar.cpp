@@ -164,7 +164,7 @@ void AddressBar::OnBeginDrag()
 
 	if (SUCCEEDED(hr))
 	{
-		hr = CreateDropSource(&pDropSource, DRAG_TYPE_LEFTCLICK);
+		hr = CreateDropSource(&pDropSource, DragTypes_t::DRAG_TYPE_LEFTCLICK);
 
 		if (SUCCEEDED(hr))
 		{

@@ -167,7 +167,7 @@ LRESULT CALLBACK CMyTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, L
 
 							if(bRet)
 							{
-								hr = OnBeginDrag((int)tvItem.lParam,DRAG_TYPE_RIGHTCLICK);
+								hr = OnBeginDrag((int)tvItem.lParam,DragTypes_t::DRAG_TYPE_RIGHTCLICK);
 
 								if(hr == DRAGDROP_S_CANCEL)
 								{
@@ -220,7 +220,7 @@ LRESULT CALLBACK CMyTreeView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 			case TVN_BEGINDRAG:
 			{
 				NMTREEVIEW *pnmTreeView = reinterpret_cast<NMTREEVIEW *>(lParam);
-				OnBeginDrag(static_cast<int>(pnmTreeView->itemNew.lParam), DRAG_TYPE_LEFTCLICK);
+				OnBeginDrag(static_cast<int>(pnmTreeView->itemNew.lParam), DragTypes_t::DRAG_TYPE_LEFTCLICK);
 			}
 			break;
 

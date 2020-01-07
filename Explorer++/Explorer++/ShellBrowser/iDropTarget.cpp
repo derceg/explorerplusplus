@@ -77,9 +77,9 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 	}
 
 	if(grfKeyState & MK_LBUTTON)
-		m_DragType = DRAG_TYPE_LEFTCLICK;
+		m_DragType = DragTypes_t::DRAG_TYPE_LEFTCLICK;
 	else if(grfKeyState & MK_RBUTTON)
-		m_DragType = DRAG_TYPE_RIGHTCLICK;
+		m_DragType = DragTypes_t::DRAG_TYPE_RIGHTCLICK;
 
 	pt.x = ptl.x;
 	pt.y = ptl.y;
@@ -439,7 +439,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 	{
 		BOOL bHandled = FALSE;
 
-		if(m_DragType == DRAG_TYPE_LEFTCLICK && m_bDragging && !m_bOverFolder)
+		if(m_DragType == DragTypes_t::DRAG_TYPE_LEFTCLICK && m_bDragging && !m_bOverFolder)
 		{
 			hr = pDataObject->GetData(&ftcHDrop,&stg);
 

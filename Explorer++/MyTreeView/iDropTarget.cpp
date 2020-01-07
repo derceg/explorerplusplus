@@ -68,9 +68,9 @@ DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 		DragScrollTimerProc);
 
 	if(grfKeyState & MK_LBUTTON)
-		m_DragType = DRAG_TYPE_LEFTCLICK;
+		m_DragType = DragTypes_t::DRAG_TYPE_LEFTCLICK;
 	else if(grfKeyState & MK_RBUTTON)
-		m_DragType = DRAG_TYPE_RIGHTCLICK;
+		m_DragType = DragTypes_t::DRAG_TYPE_RIGHTCLICK;
 
 	/* Notify the drop target helper that an object has been dragged into
 	the window. */

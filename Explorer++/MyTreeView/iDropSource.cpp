@@ -9,14 +9,14 @@ HRESULT _stdcall CMyTreeView::QueryContinueDrag(BOOL fEscapePressed,DWORD grfKey
 {
 	DWORD dwStopButton = 0;
 
-	if(m_DragType == DRAG_TYPE_LEFTCLICK)
+	if(m_DragType == DragTypes_t::DRAG_TYPE_LEFTCLICK)
 	{
 		if((grfKeyState & MK_LBUTTON) == 0)
 			return DRAGDROP_S_DROP;
 
 		dwStopButton = MK_RBUTTON;
 	}
-	else if(m_DragType == DRAG_TYPE_RIGHTCLICK)
+	else if(m_DragType == DragTypes_t::DRAG_TYPE_RIGHTCLICK)
 	{
 		if((grfKeyState & MK_RBUTTON) == 0)
 			return DRAGDROP_S_DROP;

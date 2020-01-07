@@ -176,7 +176,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 							nmlv.iItem = 0;
 							nmlv.ptAction = pt;
 
-							hr = OnListViewBeginDrag((LPARAM)&nmlv,DRAG_TYPE_RIGHTCLICK);
+							hr = OnListViewBeginDrag((LPARAM)&nmlv,DragTypes_t::DRAG_TYPE_RIGHTCLICK);
 
 							if(hr == DRAGDROP_S_CANCEL)
 							{

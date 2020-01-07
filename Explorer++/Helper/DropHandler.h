@@ -9,7 +9,7 @@
 #include "FileOperations.h"
 #include "ReferenceCount.h"
 
-enum DragTypes_t
+enum class DragTypes_t
 {
 	DRAG_TYPE_LEFTCLICK,
 	DRAG_TYPE_RIGHTCLICK

@@ -98,11 +98,11 @@ BOOL bRenameOnCollision)
 
 	switch(m_DragType)
 	{
-	case DRAG_TYPE_LEFTCLICK:
+	case DragTypes_t::DRAG_TYPE_LEFTCLICK:
 		HandleLeftClickDrop(m_pDataObject,&m_ptl);
 		break;
 
-	case DRAG_TYPE_RIGHTCLICK:
+	case DragTypes_t::DRAG_TYPE_RIGHTCLICK:
 		HandleRightClickDrop();
 		break;
 	}
