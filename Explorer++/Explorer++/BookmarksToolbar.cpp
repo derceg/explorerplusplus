@@ -43,8 +43,8 @@ void CBookmarksToolbar::InitializeToolbar()
 		m_pexpp->GetIconResourceLoader(), iconWidth, iconHeight, { Icon::Folder, Icon::Bookmarks});
 	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(m_imageList.get()));
 
-	m_pbtdh = new CBookmarksToolbarDropHandler(m_hToolbar, m_bookmarkTree);
-	RegisterDragDrop(m_hToolbar, m_pbtdh);
+	m_dropHandler = new CBookmarksToolbarDropHandler(m_hToolbar, m_bookmarkTree);
+	RegisterDragDrop(m_hToolbar, m_dropHandler);
 
 	m_windowSubclasses.push_back(WindowSubclassWrapper(m_hToolbar, BookmarksToolbarProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
@@ -71,7 +71,7 @@ void CBookmarksToolbar::InitializeToolbar()
 
 CBookmarksToolbar::~CBookmarksToolbar()
 {
-	m_pbtdh->Release();
+	m_dropHandler->Release();
 }
 
 LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProcStub(HWND hwnd,UINT uMsg,

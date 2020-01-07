@@ -122,7 +122,7 @@ private:
 
 	std::optional<POINT> m_contextMenuLocation;
 
-	CBookmarksToolbarDropHandler *m_pbtdh;
+	CBookmarksToolbarDropHandler *m_dropHandler;
 
 	std::vector<WindowSubclassWrapper> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
