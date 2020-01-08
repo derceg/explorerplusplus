@@ -7,8 +7,8 @@
 #include "SignalWrapper.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
-#include "cereal/types/string.hpp"
-#include "cereal/types/vector.hpp"
+#include "../ThirdParty/cereal/types/string.hpp"
+#include "../ThirdParty/cereal/types/vector.hpp"
 #include <optional>
 #include <vector>
 
@@ -93,7 +93,8 @@ public:
 	std::unique_ptr<BookmarkItem> RemoveChild(size_t index);
 	bool HasChildFolder() const;
 
-	std::optional<size_t> GetChildIndex(const BookmarkItem *bookmarkItem) const;
+	size_t GetChildIndex(const BookmarkItem *bookmarkItem) const;
+	const std::unique_ptr<BookmarkItem> &GetChildOwnedPtr(const BookmarkItem *bookmarkItem) const;
 
 	const BookmarkItems &GetChildren() const;
 

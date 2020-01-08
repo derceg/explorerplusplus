@@ -759,10 +759,9 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragType dragType)
 			BuildHDropList(&ftc[0],&stg[0],FilenameList);
 			BuildShellIDList(&ftc[1],&stg[1],pidlDirectory.get(),rawPidls);
 
-			IDataObject *pDataObject = NULL;
+			IDataObject *pDataObject = CreateDataObject(ftc,stg,2);
+
 			IDataObjectAsyncCapability *pAsyncCapability = NULL;
-			
-			hr = CreateDataObject(ftc,stg,&pDataObject,2);
 			pDataObject->QueryInterface(IID_PPV_ARGS(&pAsyncCapability));
 
 			assert(pAsyncCapability != NULL);

@@ -109,17 +109,17 @@ void BookmarkTree::MoveBookmarkItem(BookmarkItem *bookmarkItem, BookmarkItem *ne
 	}
 
 	BookmarkItem *oldParent = bookmarkItem->GetParent();
-	auto oldIndex = oldParent->GetChildIndex(bookmarkItem);
+	size_t oldIndex = oldParent->GetChildIndex(bookmarkItem);
 
-	if (oldParent == newParent && index == *oldIndex)
+	if (oldParent == newParent && index == oldIndex)
 	{
 		return;
 	}
 
-	auto item = oldParent->RemoveChild(*oldIndex);
+	auto item = oldParent->RemoveChild(oldIndex);
 	newParent->AddChild(std::move(item), index);
 
-	bookmarkItemMovedSignal.m_signal(bookmarkItem, oldParent, *oldIndex,
+	bookmarkItemMovedSignal.m_signal(bookmarkItem, oldParent, oldIndex,
 		newParent, index);
 }
 
@@ -138,9 +138,8 @@ void BookmarkTree::RemoveBookmarkItem(BookmarkItem *bookmarkItem)
 
 	std::wstring guid = bookmarkItem->GetGUID();
 
-	auto childIndex = parent->GetChildIndex(bookmarkItem);
-	assert(childIndex);
-	parent->RemoveChild(*childIndex);
+	size_t childIndex = parent->GetChildIndex(bookmarkItem);
+	parent->RemoveChild(childIndex);
 	bookmarkItemRemovedSignal.m_signal(guid);
 }
 

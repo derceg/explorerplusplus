@@ -79,6 +79,11 @@ private:
 
 	void	RemoveBookmarkItem(const BookmarkItem *bookmarkItem);
 
+	void	OnLButtonDown(const POINT &pt);
+	void	OnMouseMove(int keys, const POINT &pt);
+	void	StartDrag(DragType dragType, const POINT &pt);
+	void	OnLButtonUp();
+	void	ResetDragFlags();
 	void	OnMButtonUp(const POINT &pt);
 	bool	OnCommand(WPARAM wParam, LPARAM lParam);
 	bool	OnButtonClick(int command);
@@ -124,6 +129,8 @@ private:
 	std::optional<POINT> m_contextMenuLocation;
 
 	CBookmarksToolbarDropHandler *m_dropHandler;
+	std::optional<POINT> m_leftButtonDownPoint;
+	bool m_withinDrag;
 
 	std::vector<WindowSubclassWrapper> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;

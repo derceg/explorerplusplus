@@ -244,11 +244,9 @@ void AddressBar::OnBeginDrag()
 			stg[1].hGlobal = hglb;
 			stg[1].tymed = TYMED_HGLOBAL;
 
-			IDataObject *pDataObject = NULL;
+			IDataObject *pDataObject = CreateDataObject(ftc, stg, 2);
+
 			POINT pt = { 0,0 };
-
-			hr = CreateDataObject(ftc, stg, &pDataObject, 2);
-
 			pDragSourceHelper->InitializeFromWindow(m_hwnd, &pt, pDataObject);
 
 			DWORD dwEffect;

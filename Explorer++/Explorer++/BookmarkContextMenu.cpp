@@ -112,16 +112,10 @@ void BookmarkContextMenu::OnNewBookmarkItem(BookmarkItem::Type type, HWND parent
 
 void BookmarkContextMenu::OnCopy(BookmarkItem *bookmarkItem, bool cut)
 {
-	const auto &children = bookmarkItem->GetParent()->GetChildren();
-
-	auto itr = std::find_if(children.begin(), children.end(), [bookmarkItem] (const auto &child) {
-		return child.get() == bookmarkItem;
-	});
-
-	assert(itr != children.end());
+	auto &ownedPtr = bookmarkItem->GetParent()->GetChildOwnedPtr(bookmarkItem);
 
 	BookmarkClipboard bookmarkClipboard;
-	bool res = bookmarkClipboard.WriteBookmark(*itr);
+	bool res = bookmarkClipboard.WriteBookmark(ownedPtr);
 
 	if (cut && res)
 	{
@@ -148,7 +142,7 @@ void BookmarkContextMenu::OnPaste(BookmarkItem *selectedBookmarkItem)
 	{
 		BookmarkItem *parent = selectedBookmarkItem->GetParent();
 		m_bookmarkTree->AddBookmarkItem(parent, std::move(copiedBookmarkItem),
-			*parent->GetChildIndex(selectedBookmarkItem) + 1);
+			parent->GetChildIndex(selectedBookmarkItem) + 1);
 	}
 }
 

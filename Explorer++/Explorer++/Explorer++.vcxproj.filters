@@ -382,6 +382,9 @@
     <ClCompile Include="BookmarkClipboard.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
+    <ClCompile Include="BookmarkDataExchange.cpp">
+      <Filter>Bookmarks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -772,6 +775,9 @@
       <Filter>Bookmarks</Filter>
     </ClInclude>
     <ClInclude Include="BookmarkClipboard.h">
+      <Filter>Bookmarks</Filter>
+    </ClInclude>
+    <ClInclude Include="BookmarkDataExchange.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
   </ItemGroup>

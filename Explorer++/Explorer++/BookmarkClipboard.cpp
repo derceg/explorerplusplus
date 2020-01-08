@@ -4,10 +4,9 @@
 
 #include "stdafx.h"
 #include "BookmarkClipboard.h"
+#include "BookmarkDataExchange.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/StringHelper.h"
-#include "cereal/archives/binary.hpp"
-#include "cereal/types/memory.hpp"
 
 const WCHAR BookmarkClipboard::CLIPBOARD_FORMAT_STRING[] = L"explorerplusplus/bookmark";
 
@@ -32,13 +31,7 @@ std::unique_ptr<BookmarkItem> BookmarkClipboard::ReadBookmark()
 		return nullptr;
 	}
 
-	std::stringstream ss(*data);
-	cereal::BinaryInputArchive inputArchive(ss);
-
-	std::unique_ptr<BookmarkItem> bookmarkItem;
-	inputArchive(bookmarkItem);
-
-	return bookmarkItem;
+	return BookmarkDataExchange::UnserializeBookmarkItem(*data);
 }
 
 bool BookmarkClipboard::WriteBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem)
@@ -55,11 +48,8 @@ bool BookmarkClipboard::WriteBookmark(const std::unique_ptr<BookmarkItem> &bookm
 		textWritten = clipboardWriter.WriteText(bookmarkItem->GetLocation());
 	}
 
-	std::stringstream ss;
-	cereal::BinaryOutputArchive outputArchive(ss);
-
-	outputArchive(bookmarkItem);
-	bool bookmarkWritten = clipboardWriter.WriteCustomData(GetClipboardFormat(), ss.str());
+	std::string data = BookmarkDataExchange::SerializeBookmarkItem(bookmarkItem);
+	bool bookmarkWritten = clipboardWriter.WriteCustomData(GetClipboardFormat(), data);
 
 	return textWritten && bookmarkWritten;
 }

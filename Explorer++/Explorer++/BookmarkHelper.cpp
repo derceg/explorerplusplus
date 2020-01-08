@@ -75,9 +75,9 @@ int CALLBACK BookmarkHelper::Sort(SortMode sortMode, const BookmarkItem *firstIt
 int CALLBACK SortByDefault(const BookmarkItem *firstItem,
 	const BookmarkItem *secondItem)
 {
-	auto firstIndex = firstItem->GetParent()->GetChildIndex(firstItem);
-	auto secondIndex = secondItem->GetParent()->GetChildIndex(secondItem);
-	return static_cast<int>(*firstIndex) - static_cast<int>(*secondIndex);
+	size_t firstIndex = firstItem->GetParent()->GetChildIndex(firstItem);
+	size_t secondIndex = secondItem->GetParent()->GetChildIndex(secondItem);
+	return static_cast<int>(firstIndex) - static_cast<int>(secondIndex);
 }
 
 int CALLBACK SortByName(const BookmarkItem *firstItem,
@@ -168,7 +168,7 @@ void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *
 		// folder.
 		if (selectedParentFolder == bookmarkItem->GetParent())
 		{
-			newIndex = *bookmarkItem->GetParent()->GetChildIndex(bookmarkItem);
+			newIndex = bookmarkItem->GetParent()->GetChildIndex(bookmarkItem);
 		}
 		else
 		{

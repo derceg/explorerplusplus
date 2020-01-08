@@ -485,20 +485,17 @@ BOOL bMove,IDataObject **pClipboardDataObject)
 			stg[1].hGlobal = hglb;
 			stg[1].tymed = TYMED_HGLOBAL;
 
-			hr = CreateDataObject(ftc, stg, pClipboardDataObject, 2);
+			*pClipboardDataObject = CreateDataObject(ftc, stg, 2);
+
+			IDataObjectAsyncCapability *pAsyncCapability = NULL;
+			hr = (*pClipboardDataObject)->QueryInterface(IID_PPV_ARGS(&pAsyncCapability));
 
 			if(SUCCEEDED(hr))
 			{
-				IDataObjectAsyncCapability *pAsyncCapability = NULL;
-				hr = (*pClipboardDataObject)->QueryInterface(IID_PPV_ARGS(&pAsyncCapability));
+				pAsyncCapability->SetAsyncMode(TRUE);
+				pAsyncCapability->Release();
 
-				if(SUCCEEDED(hr))
-				{
-					pAsyncCapability->SetAsyncMode(TRUE);
-					pAsyncCapability->Release();
-
-					hr = OleSetClipboard(*pClipboardDataObject);
-				}
+				hr = OleSetClipboard(*pClipboardDataObject);
 			}
 		}
 	}

@@ -4,6 +4,4 @@
 
 #pragma once
 
-#include <shlobj.h>
-
-IDataObject *CreateDataObject(FORMATETC *pFormatEtc, STGMEDIUM *pMedium, int count);
+STGMEDIUM GetStgMediumForGlobal(HGLOBAL global);

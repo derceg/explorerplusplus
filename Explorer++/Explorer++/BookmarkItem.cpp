@@ -167,7 +167,7 @@ std::unique_ptr<BookmarkItem> BookmarkItem::RemoveChild(size_t index)
 	return erasedItem;
 }
 
-std::optional<size_t> BookmarkItem::GetChildIndex(const BookmarkItem *bookmarkItem) const
+size_t BookmarkItem::GetChildIndex(const BookmarkItem *bookmarkItem) const
 {
 	assert(m_type == Type::Folder);
 
@@ -177,10 +177,26 @@ std::optional<size_t> BookmarkItem::GetChildIndex(const BookmarkItem *bookmarkIt
 
 	if (itr == m_children.end())
 	{
-		return std::nullopt;
+		throw std::invalid_argument("BookmarkItem not found");
 	}
 
 	return itr - m_children.begin();
+}
+
+const std::unique_ptr<BookmarkItem> &BookmarkItem::GetChildOwnedPtr(const BookmarkItem *bookmarkItem) const
+{
+	assert(m_type == Type::Folder);
+
+	auto itr = std::find_if(m_children.begin(), m_children.end(), [bookmarkItem] (const auto &item) {
+		return item.get() == bookmarkItem;
+	});
+
+	if (itr == m_children.end())
+	{
+		throw std::invalid_argument("BookmarkItem not found");
+	}
+
+	return *itr;
 }
 
 bool BookmarkItem::HasChildFolder() const

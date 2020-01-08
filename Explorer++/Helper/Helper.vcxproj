@@ -297,6 +297,7 @@
     </ClCompile>
     <ClCompile Include="DialogSettings.cpp" />
     <ClCompile Include="DpiCompatibility.cpp" />
+    <ClCompile Include="DragDropHelper.cpp" />
     <ClCompile Include="DriveInfo.cpp" />
     <ClCompile Include="DropHandler.cpp" />
     <ClCompile Include="FileActionHandler.cpp" />
@@ -354,8 +355,10 @@
     <ClInclude Include="ComboBoxHelper.h" />
     <ClInclude Include="ContextMenuManager.h" />
     <ClInclude Include="Controls.h" />
+    <ClInclude Include="DataExchangeHelper.h" />
     <ClInclude Include="DialogSettings.h" />
     <ClInclude Include="DpiCompatibility.h" />
+    <ClInclude Include="DragDropHelper.h" />
     <ClInclude Include="DriveInfo.h" />
     <ClInclude Include="DropHandler.h" />
     <ClInclude Include="FileActionHandler.h" />

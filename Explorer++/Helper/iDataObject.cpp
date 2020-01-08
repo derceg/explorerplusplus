@@ -54,11 +54,9 @@ private:
 	BOOL							m_bDoOpAsync;
 };
 
-HRESULT CreateDataObject(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,IDataObject **pDataObject,int count)
+IDataObject *CreateDataObject(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,int count)
 {
-	*pDataObject = new CDataObject(pFormatEtc,pMedium,count);
-
-	return S_OK;
+	return new CDataObject(pFormatEtc,pMedium,count);
 }
 
 CDataObject::CDataObject(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,int count)

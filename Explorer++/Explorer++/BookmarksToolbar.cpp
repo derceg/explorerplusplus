@@ -6,12 +6,16 @@
 #include "BookmarksToolbar.h"
 #include "AddBookmarkDialog.h"
 #include "BookmarkClipboard.h"
+#include "BookmarkDataExchange.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "TabContainer.h"
+#include "../Helper/iDropSource.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
+#include <wil/com.h>
+#include <wil/common.h>
 #include <algorithm>
 
 CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
@@ -25,7 +29,8 @@ CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplore
 	m_uIDEnd(uIDEnd),
 	m_bookmarkContextMenu(bookmarkTree, instance, pexpp),
 	m_bookmarkMenu(bookmarkTree, instance, pexpp, hToolbar),
-	m_uIDCounter(0)
+	m_uIDCounter(0),
+	m_withinDrag(false)
 {
 	InitializeToolbar();
 }
@@ -88,6 +93,26 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPA
 {
 	switch(uMsg)
 	{
+	case WM_LBUTTONDOWN:
+	{
+		POINT pt;
+		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+		OnLButtonDown(pt);
+	}
+		break;
+
+	case WM_MOUSEMOVE:
+	{
+		POINT pt;
+		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+		OnMouseMove(static_cast<int>(wParam), pt);
+	}
+		break;
+
+	case WM_LBUTTONUP:
+		OnLButtonUp();
+		break;
+
 	case WM_MBUTTONUP:
 		{
 			POINT pt;
@@ -102,6 +127,92 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPA
 	}
 
 	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
+}
+
+void CBookmarksToolbar::OnLButtonDown(const POINT &pt)
+{
+	// The cursor point saved below will be used to determine whether or not to
+	// enter a drag loop when the mouse moves. Note that although there's a
+	// TBN_BEGINDRAG message, it appears that it's sent as soon as a mouse
+	// button goes down (even if the mouse hasn't moved while the button is
+	// down). Therefore, there's not much point using it.
+	// Additionally, that event is also sent when the right button goes down,
+	// though a drag should only begin when the left button goes down.
+	m_leftButtonDownPoint = pt;
+	m_withinDrag = false;
+}
+
+void CBookmarksToolbar::OnMouseMove(int keys, const POINT &pt)
+{
+	if (!WI_IsFlagSet(keys, MK_LBUTTON))
+	{
+		ResetDragFlags();
+		return;
+	}
+
+	if (m_withinDrag)
+	{
+		return;
+	}
+
+	RECT rect = {m_leftButtonDownPoint->x, m_leftButtonDownPoint->y, m_leftButtonDownPoint->x, m_leftButtonDownPoint->y};
+	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hToolbar);
+	InflateRect(&rect, m_dpiCompat.GetSystemMetricsForDpi(SM_CXDRAG, dpi), m_dpiCompat.GetSystemMetricsForDpi(SM_CYDRAG, dpi));
+
+	if (!PtInRect(&rect, pt))
+	{
+		StartDrag(DragType::LeftClick, *m_leftButtonDownPoint);
+	}
+}
+
+void CBookmarksToolbar::StartDrag(DragType dragType, const POINT &pt)
+{
+	int index = static_cast<int>(SendMessage(m_hToolbar, TB_HITTEST, 0,
+		reinterpret_cast<LPARAM>(&pt)));
+
+	if (index < 0)
+	{
+		return;
+	}
+
+	wil::com_ptr<IDragSourceHelper> dragSourceHelper;
+	HRESULT hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_ALL,
+		IID_PPV_ARGS(&dragSourceHelper));
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	wil::com_ptr<IDropSource> dropSource;
+	hr = CreateDropSource(&dropSource, dragType);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	BookmarkItem *bookmarkItem = GetBookmarkItemFromToolbarIndex(index);
+	auto &ownedPtr = bookmarkItem->GetParent()->GetChildOwnedPtr(bookmarkItem);
+	auto dataObject = BookmarkDataExchange::CreateDataObject(ownedPtr);
+
+	m_withinDrag = true;
+
+	DWORD effect;
+	DoDragDrop(dataObject.get(), dropSource.get(), DROPEFFECT_MOVE, &effect);
+
+	m_withinDrag = false;
+}
+
+void CBookmarksToolbar::OnLButtonUp()
+{
+	ResetDragFlags();
+}
+
+void CBookmarksToolbar::ResetDragFlags()
+{
+	m_leftButtonDownPoint.reset();
+	m_withinDrag = false;
 }
 
 void CBookmarksToolbar::OnMButtonUp(const POINT &pt)

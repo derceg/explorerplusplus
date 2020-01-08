@@ -53,16 +53,16 @@
       <Filter>Shell\Shell Integration</Filter>
     </ClCompile>
     <ClCompile Include="DropHandler.cpp">
-      <Filter>Drag and Drop</Filter>
+      <Filter>Data Exchange\Drag and Drop</Filter>
     </ClCompile>
     <ClCompile Include="iDataObject.cpp">
-      <Filter>Drag and Drop</Filter>
+      <Filter>Data Exchange\Drag and Drop</Filter>
     </ClCompile>
     <ClCompile Include="iEnumFormatEtc.cpp">
-      <Filter>Drag and Drop</Filter>
+      <Filter>Data Exchange\Drag and Drop</Filter>
     </ClCompile>
     <ClCompile Include="iDropSource.cpp">
-      <Filter>Drag and Drop</Filter>
+      <Filter>Data Exchange\Drag and Drop</Filter>
     </ClCompile>
     <ClCompile Include="BaseWindow.cpp">
       <Filter>Miscellaneous</Filter>
@@ -124,11 +124,14 @@
     <ClCompile Include="IconFetcher.cpp">
       <Filter>Shell</Filter>
     </ClCompile>
-    <ClCompile Include="Clipboard.cpp">
-      <Filter>Miscellaneous</Filter>
+    <ClCompile Include="DragDropHelper.cpp">
+      <Filter>Data Exchange\Drag and Drop</Filter>
     </ClCompile>
     <ClCompile Include="BulkClipboardWriter.cpp">
-      <Filter>Miscellaneous</Filter>
+      <Filter>Data Exchange\Clipboard</Filter>
+    </ClCompile>
+    <ClCompile Include="Clipboard.cpp">
+      <Filter>Data Exchange\Clipboard</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -157,16 +160,16 @@
       <Filter>Control Support</Filter>
     </ClInclude>
     <ClInclude Include="DropHandler.h">
-      <Filter>Drag and Drop</Filter>
+      <Filter>Data Exchange\Drag and Drop</Filter>
     </ClInclude>
     <ClInclude Include="iDataObject.h">
-      <Filter>Drag and Drop</Filter>
+      <Filter>Data Exchange\Drag and Drop</Filter>
     </ClInclude>
     <ClInclude Include="iDropSource.h">
-      <Filter>Drag and Drop</Filter>
+      <Filter>Data Exchange\Drag and Drop</Filter>
     </ClInclude>
     <ClInclude Include="iEnumFormatEtc.h">
-      <Filter>Drag and Drop</Filter>
+      <Filter>Data Exchange\Drag and Drop</Filter>
     </ClInclude>
     <ClInclude Include="BaseWindow.h">
       <Filter>Miscellaneous</Filter>
@@ -264,11 +267,17 @@
     <ClInclude Include="IconFetcher.h">
       <Filter>Shell</Filter>
     </ClInclude>
-    <ClInclude Include="Clipboard.h">
-      <Filter>Miscellaneous</Filter>
+    <ClInclude Include="DragDropHelper.h">
+      <Filter>Data Exchange\Drag and Drop</Filter>
     </ClInclude>
     <ClInclude Include="BulkClipboardWriter.h">
-      <Filter>Miscellaneous</Filter>
+      <Filter>Data Exchange\Clipboard</Filter>
+    </ClInclude>
+    <ClInclude Include="Clipboard.h">
+      <Filter>Data Exchange\Clipboard</Filter>
+    </ClInclude>
+    <ClInclude Include="DataExchangeHelper.h">
+      <Filter>Data Exchange</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -287,11 +296,17 @@
     <Filter Include="Shell\Shell Integration">
       <UniqueIdentifier>{91c6f3d8-5038-415b-be81-a252e07c6526}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Drag and Drop">
-      <UniqueIdentifier>{dd33bfdb-859c-4f78-bc0d-21d67122afee}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Miscellaneous">
       <UniqueIdentifier>{a38722e8-52ce-4c89-9647-355edcdc155d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data Exchange">
+      <UniqueIdentifier>{b86cae7a-06a5-4db7-982e-d9d65f046d20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data Exchange\Drag and Drop">
+      <UniqueIdentifier>{dd33bfdb-859c-4f78-bc0d-21d67122afee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data Exchange\Clipboard">
+      <UniqueIdentifier>{defee36d-97c6-4793-8684-0b6b287f85ce}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
