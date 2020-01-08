@@ -1,10 +1,15 @@
 version: 1.4.0.{build}
 image: Visual Studio 2019
+
 configuration: Release
 
 platform:
 - Win32
 - x64
+
+branches:
+  except:
+  - l10n_master
 
 environment:
   PFX_ENC_PASS:
