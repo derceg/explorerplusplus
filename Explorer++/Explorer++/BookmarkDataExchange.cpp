@@ -23,7 +23,7 @@ wil::com_ptr<IDataObject> BookmarkDataExchange::CreateDataObject(const std::uniq
 	FORMATETC formatEtc = GetFormatEtc();
 
 	std::string data = SerializeBookmarkItem(bookmarkItem);
-	auto global = WriteStringToGlobal(data);
+	auto global = WriteBinaryDataToGlobal(data);
 	STGMEDIUM stgMedium = GetStgMediumForGlobal(global.get());
 
 	wil::com_ptr<IDataObject> dataObject(CreateDataObject(&formatEtc, &stgMedium, 1));

@@ -24,12 +24,6 @@ public:
 
 private:
 
-	template <class T>
-	std::optional<T> ReadData(UINT format);
-
-	template <class T>
-	bool WriteData(UINT format, const T &data);
-
 	bool WriteDataToClipboard(UINT format, wil::unique_hglobal global);
 
 	bool m_clipboardOpened;

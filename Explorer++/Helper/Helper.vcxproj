@@ -295,6 +295,7 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
     </ClCompile>
+    <ClCompile Include="DataExchangeHelper.cpp" />
     <ClCompile Include="DialogSettings.cpp" />
     <ClCompile Include="DpiCompatibility.cpp" />
     <ClCompile Include="DragDropHelper.cpp" />

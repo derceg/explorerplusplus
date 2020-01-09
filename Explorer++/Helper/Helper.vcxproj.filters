@@ -133,6 +133,9 @@
     <ClCompile Include="Clipboard.cpp">
       <Filter>Data Exchange\Clipboard</Filter>
     </ClCompile>
+    <ClCompile Include="DataExchangeHelper.cpp">
+      <Filter>Data Exchange</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
