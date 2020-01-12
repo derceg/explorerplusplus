@@ -203,11 +203,11 @@ bool BookmarkItem::HasChildFolder() const
 {
 	assert(m_type == Type::Folder);
 
-	auto itr = std::find_if(m_children.begin(), m_children.end(), [] (const auto &item) {
+	bool anyChildFolders = std::any_of(m_children.begin(), m_children.end(), [] (const auto &item) {
 		return item->IsFolder();
 	});
 
-	return (itr != m_children.end());
+	return anyChildFolders;
 }
 
 const BookmarkItems &BookmarkItem::GetChildren() const
