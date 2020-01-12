@@ -96,3 +96,4 @@ required for VS 2010. */
 #include <list>
 #include <memory>
 #include <sstream>
+#include <vector>

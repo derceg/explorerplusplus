@@ -5,6 +5,7 @@
 #pragma once
 
 #include "BookmarkContextMenu.h"
+#include "BookmarkItem.h"
 #include "BookmarkMenu.h"
 #include "BookmarkTree.h"
 #include "CoreInterface.h"
@@ -16,11 +17,20 @@
 #include <wil/resource.h>
 #include <optional>
 
+class BookmarksToolbarInterface
+{
+public:
+
+	virtual BookmarkItem *GetBookmarkItemFromToolbarIndex(int index) = 0;
+	virtual int FindNextButtonIndex(const POINT &ptClient) = 0;
+};
+
 class CBookmarksToolbarDropHandler : public IDropTarget
 {
 public:
 
-	CBookmarksToolbarDropHandler(HWND hToolbar, BookmarkTree *bookmarkTree);
+	CBookmarksToolbarDropHandler(BookmarksToolbarInterface *bookmarksToolbarInterface,
+		HWND hToolbar, BookmarkTree *bookmarkTree);
 	~CBookmarksToolbarDropHandler();
 
 	/* IUnknown methods. */
@@ -30,28 +40,42 @@ public:
 
 private:
 
+	struct BookmarkDropTarget
+	{
+		BookmarkItem *parentFolder;
+		size_t position;
+		int selectedButtonIndex;
+	};
+
 	CBookmarksToolbarDropHandler & operator = (const CBookmarksToolbarDropHandler &btdh);
 
 	/* IDropTarget methods. */
-	HRESULT __stdcall	DragEnter(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
-	HRESULT __stdcall	DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
-	HRESULT __stdcall	DragLeave(void);
-	HRESULT __stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
+	HRESULT __stdcall DragEnter(IDataObject *pDataObject, DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect);
+	HRESULT __stdcall DragOver(DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect);
+	HRESULT __stdcall DragLeave();
+	HRESULT __stdcall Drop(IDataObject *pDataObject, DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect);
 
-	int					GetToolbarPositionIndex(const POINTL &pt,bool &bAfter);
-	void				RemoveInsertionMark();
+	DWORD GetDropEffect(IDataObject *pDataObject);
+
+	BookmarkDropTarget GetDropTarget(const POINT &pt);
+	void ResetToolbarState();
+	void RemoveInsertionMark();
+	void SetButtonPressedState(int index, bool pressed);
 
 	ULONG m_ulRefCount;
 
+	BookmarksToolbarInterface *m_bookmarksToolbarInterface;
 	HWND m_hToolbar;
 	BookmarkTree *m_bookmarkTree;
 
 	IDragSourceHelper *m_pDragSourceHelper;
 	IDropTargetHelper *m_pDropTargetHelper;
-	bool m_bAcceptData;
+
+	DWORD m_cachedDropEffect;
+	std::optional<int> m_previousDropButton;
 };
 
-class CBookmarksToolbar
+class CBookmarksToolbar : private BookmarksToolbarInterface
 {
 public:
 

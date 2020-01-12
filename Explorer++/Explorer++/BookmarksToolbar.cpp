@@ -10,6 +10,7 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "TabContainer.h"
+#include "../Helper/DataExchangeHelper.h"
 #include "../Helper/iDropSource.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
@@ -48,7 +49,7 @@ void CBookmarksToolbar::InitializeToolbar()
 		m_pexpp->GetIconResourceLoader(), iconWidth, iconHeight, { Icon::Folder, Icon::Bookmarks});
 	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(m_imageList.get()));
 
-	m_dropHandler = new CBookmarksToolbarDropHandler(m_hToolbar, m_bookmarkTree);
+	m_dropHandler = new CBookmarksToolbarDropHandler(this, m_hToolbar, m_bookmarkTree);
 	RegisterDragDrop(m_hToolbar, m_dropHandler);
 
 	m_windowSubclasses.push_back(WindowSubclassWrapper(m_hToolbar, BookmarksToolbarProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
@@ -691,8 +692,10 @@ std::optional<int> CBookmarksToolbar::GetBookmarkItemIndex(const BookmarkItem *b
 	return std::nullopt;
 }
 
-CBookmarksToolbarDropHandler::CBookmarksToolbarDropHandler(HWND hToolbar, BookmarkTree *bookmarkTree) :
+CBookmarksToolbarDropHandler::CBookmarksToolbarDropHandler(BookmarksToolbarInterface *bookmarksToolbarInterface,
+	HWND hToolbar, BookmarkTree *bookmarkTree) :
 	m_ulRefCount(1),
+	m_bookmarksToolbarInterface(bookmarksToolbarInterface),
 	m_hToolbar(hToolbar),
 	m_bookmarkTree(bookmarkTree)
 {
@@ -747,117 +750,104 @@ ULONG __stdcall CBookmarksToolbarDropHandler::Release(void)
 }
 
 HRESULT __stdcall CBookmarksToolbarDropHandler::DragEnter(IDataObject *pDataObject,
-	DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
+	DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect)
 {
 	UNREFERENCED_PARAMETER(grfKeyState);
 
-	bool m_bValid = false;
-	bool m_bAllFolders = true;
+	DWORD dropEffect = GetDropEffect(pDataObject);
 
-	FORMATETC ftc = {CF_HDROP,0,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
-	STGMEDIUM stg;
+	m_cachedDropEffect = dropEffect;
+	*pdwEffect = dropEffect;
 
-	HRESULT hr = pDataObject->GetData(&ftc,&stg);
-
-	if(hr == S_OK)
-	{
-		DROPFILES *pdf = reinterpret_cast<DROPFILES *>(GlobalLock(stg.hGlobal));
-
-		if(pdf != NULL)
-		{
-			m_bValid = true;
-
-			UINT nDroppedFiles = DragQueryFile(reinterpret_cast<HDROP>(pdf),0xFFFFFFFF,NULL,NULL);
-
-			for(UINT i = 0;i < nDroppedFiles;i++)
-			{
-				TCHAR szFullFileName[MAX_PATH];
-				DragQueryFile(reinterpret_cast<HDROP>(pdf),i,szFullFileName,
-					SIZEOF_ARRAY(szFullFileName));
-
-				if(!PathIsDirectory(szFullFileName))
-				{
-					m_bAllFolders = false;
-					break;
-				}
-			}
-
-			GlobalUnlock(stg.hGlobal);
-		}
-
-		ReleaseStgMedium(&stg);
-	}
-
-	if(m_bValid &&
-		m_bAllFolders)
-	{
-		*pdwEffect = DROPEFFECT_COPY;
-
-		m_bAcceptData = true;
-	}
-	else
-	{
-		*pdwEffect = DROPEFFECT_NONE;
-
-		m_bAcceptData = false;
-	}
-
-	m_pDropTargetHelper->DragEnter(m_hToolbar,pDataObject,reinterpret_cast<POINT *>(&pt),*pdwEffect);
+	POINT pt = { ptl.x, ptl.y };
+	m_pDropTargetHelper->DragEnter(m_hToolbar, pDataObject, &pt, dropEffect);
 
 	return S_OK;
+}
+
+DWORD CBookmarksToolbarDropHandler::GetDropEffect(IDataObject *pDataObject)
+{
+	FORMATETC bookmarkFormatEtc = BookmarkDataExchange::GetFormatEtc();
+	HRESULT hr = pDataObject->QueryGetData(&bookmarkFormatEtc);
+
+	if (hr == S_OK)
+	{
+		return DROPEFFECT_MOVE;
+	}
+
+	FORMATETC droppedFilesFormatEtc = GetDroppedFilesFormatEtc();
+	hr = pDataObject->QueryGetData(&droppedFilesFormatEtc);
+
+	if (hr == S_OK)
+	{
+		auto droppedFiles = ExtractDroppedFilesList(pDataObject);
+
+		bool allFolders = std::all_of(droppedFiles.begin(), droppedFiles.end(), [] (const std::wstring &path) {
+			return PathIsDirectory(path.c_str());
+		});
+
+		if (!droppedFiles.empty() && allFolders)
+		{
+			return DROPEFFECT_COPY;
+		}
+	}
+
+	return DROPEFFECT_NONE;
 }
 
 HRESULT __stdcall CBookmarksToolbarDropHandler::DragOver(DWORD grfKeyState,
-	POINTL pt,DWORD *pdwEffect)
+	POINTL ptl, DWORD *pdwEffect)
 {
 	UNREFERENCED_PARAMETER(grfKeyState);
 
-	if(m_bAcceptData)
+	*pdwEffect = m_cachedDropEffect;
+
+	if (m_previousDropButton)
 	{
-		*pdwEffect = DROPEFFECT_COPY;
-	}
-	else
-	{
-		*pdwEffect = DROPEFFECT_NONE;
+		SetButtonPressedState(*m_previousDropButton, false);
 	}
 
-	bool bAfter;
-	int iButton = GetToolbarPositionIndex(pt,bAfter);
+	POINT pt = { ptl.x, ptl.y };
+	auto [parentFolder, position, selectedButtonIndex] = GetDropTarget(pt);
 
-	if(iButton < 0)
+	if (parentFolder == m_bookmarkTree->GetBookmarksToolbarFolder())
 	{
-		int nButtons = static_cast<int>(SendMessage(m_hToolbar,TB_BUTTONCOUNT,0,0));
+		DWORD flags;
+		int numButtons = static_cast<int>(SendMessage(m_hToolbar, TB_BUTTONCOUNT, 0, 0));
 
-		TBINSERTMARK tbim;
-		tbim.iButton = nButtons - 1;
-		tbim.dwFlags = TBIMHT_AFTER;
-		SendMessage(m_hToolbar,TB_SETINSERTMARK,0,reinterpret_cast<LPARAM>(&tbim));
-	}
-	else
-	{
-		TBINSERTMARK tbim;
-
-		if(bAfter)
+		if (position == numButtons)
 		{
-			tbim.dwFlags = TBIMHT_AFTER;
+			position--;
+			flags = TBIMHT_AFTER;
 		}
 		else
 		{
-			tbim.dwFlags = 0;
+			flags = 0;
 		}
 
-		tbim.iButton = iButton;
-		SendMessage(m_hToolbar,TB_SETINSERTMARK,0,reinterpret_cast<LPARAM>(&tbim));
+		TBINSERTMARK tbim;
+		tbim.iButton = static_cast<int>(position);
+		tbim.dwFlags = flags;
+		SendMessage(m_hToolbar, TB_SETINSERTMARK, 0, reinterpret_cast<LPARAM>(&tbim));
+
+		m_previousDropButton.reset();
+	}
+	else
+	{
+		RemoveInsertionMark();
+
+		SetButtonPressedState(selectedButtonIndex, true);
+		m_previousDropButton = selectedButtonIndex;
 	}
 
-	m_pDropTargetHelper->DragOver(reinterpret_cast<POINT *>(&pt),*pdwEffect);
+	m_pDropTargetHelper->DragOver(&pt, *pdwEffect);
 
 	return S_OK;
 }
 
-HRESULT __stdcall CBookmarksToolbarDropHandler::DragLeave(void)
+HRESULT __stdcall CBookmarksToolbarDropHandler::DragLeave()
 {
-	RemoveInsertionMark();
+	ResetToolbarState();
 
 	m_pDropTargetHelper->DragLeave();
 
@@ -865,51 +855,39 @@ HRESULT __stdcall CBookmarksToolbarDropHandler::DragLeave(void)
 }
 
 HRESULT __stdcall CBookmarksToolbarDropHandler::Drop(IDataObject *pDataObject,
-	DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
+	DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect)
 {
 	UNREFERENCED_PARAMETER(grfKeyState);
 
-	FORMATETC ftc = {CF_HDROP,0,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+	POINT pt = { ptl.x, ptl.y };
+	auto [parentFolder, position, selectedButtonIndex] = GetDropTarget(pt);	
+
+	FORMATETC droppedFilesFormatEtc = GetDroppedFilesFormatEtc();
 	STGMEDIUM stg;
 
-	HRESULT hr = pDataObject->GetData(&ftc,&stg);
+	HRESULT hr = pDataObject->GetData(&droppedFilesFormatEtc, &stg);
 
-	if(hr == S_OK)
+	if (hr == S_OK)
 	{
 		DROPFILES *pdf = reinterpret_cast<DROPFILES *>(GlobalLock(stg.hGlobal));
 
-		if(pdf != NULL)
+		if (pdf != NULL)
 		{
-			bool bAfter;
-			int iPosition = GetToolbarPositionIndex(pt,bAfter);
+			UINT nDroppedFiles = DragQueryFile(reinterpret_cast<HDROP>(pdf), 0xFFFFFFFF, NULL, NULL);
 
-			if(iPosition < 0)
-			{
-				iPosition = static_cast<int>(SendMessage(m_hToolbar,TB_BUTTONCOUNT,0,0));
-			}
-			else
-			{
-				if(bAfter)
-				{
-					iPosition++;
-				}
-			}
-
-			UINT nDroppedFiles = DragQueryFile(reinterpret_cast<HDROP>(pdf),0xFFFFFFFF,NULL,NULL);
-
-			for(UINT i = 0;i < nDroppedFiles;i++)
+			for (UINT i = 0; i < nDroppedFiles; i++)
 			{
 				TCHAR szFullFileName[MAX_PATH];
-				DragQueryFile(reinterpret_cast<HDROP>(pdf),i,szFullFileName,
+				DragQueryFile(reinterpret_cast<HDROP>(pdf), i, szFullFileName,
 					SIZEOF_ARRAY(szFullFileName));
 
-				if(PathIsDirectory(szFullFileName))
+				if (PathIsDirectory(szFullFileName))
 				{
 					TCHAR szDisplayName[MAX_PATH];
-					GetDisplayName(szFullFileName,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_INFOLDER);
+					GetDisplayName(szFullFileName, szDisplayName, SIZEOF_ARRAY(szDisplayName), SHGDN_INFOLDER);
 
 					auto bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt, szDisplayName, szFullFileName);
-					m_bookmarkTree->AddBookmarkItem(m_bookmarkTree->GetBookmarksToolbarFolder(), std::move(bookmarkItem), iPosition + i);
+					m_bookmarkTree->AddBookmarkItem(parentFolder, std::move(bookmarkItem), position + i);
 				}
 			}
 
@@ -919,35 +897,97 @@ HRESULT __stdcall CBookmarksToolbarDropHandler::Drop(IDataObject *pDataObject,
 		ReleaseStgMedium(&stg);
 	}
 
-	RemoveInsertionMark();
-	m_pDropTargetHelper->Drop(pDataObject,reinterpret_cast<POINT *>(&pt),*pdwEffect);
+	ResetToolbarState();
+	m_pDropTargetHelper->Drop(pDataObject,&pt,*pdwEffect);
 
 	return S_OK;
 }
 
-int CBookmarksToolbarDropHandler::GetToolbarPositionIndex(const POINTL &pt,bool &bAfter)
+CBookmarksToolbarDropHandler::BookmarkDropTarget CBookmarksToolbarDropHandler::GetDropTarget(const POINT &pt)
 {
-	POINT ptClient;
-	ptClient.x = pt.x;
-	ptClient.y = pt.y;
-	ScreenToClient(m_hToolbar,&ptClient);
-	int iButton = static_cast<int>(SendMessage(m_hToolbar,TB_HITTEST,
-		0,reinterpret_cast<LPARAM>(&ptClient)));
+	POINT ptClient = pt;
+	ScreenToClient(m_hToolbar, &ptClient);
+	int index = static_cast<int>(SendMessage(m_hToolbar, TB_HITTEST, 0, reinterpret_cast<LPARAM>(&ptClient)));
 
-	if(iButton >= 0)
+	BookmarkItem *parentFolder = nullptr;
+	size_t position;
+
+	if (index >= 0)
 	{
-		RECT rc;
-		SendMessage(m_hToolbar,TB_GETITEMRECT,iButton,reinterpret_cast<LPARAM>(&rc));
+		auto bookmarkItem = m_bookmarksToolbarInterface->GetBookmarkItemFromToolbarIndex(index);
 
-		bAfter = (ptClient.x > (rc.left + GetRectWidth(&rc) / 2)) ? true : false;
+		if (bookmarkItem->IsFolder())
+		{
+			parentFolder = bookmarkItem;
+			position = bookmarkItem->GetChildren().size();
+		}
+		else
+		{
+			parentFolder = m_bookmarkTree->GetBookmarksToolbarFolder();
+			position = index;
+
+			RECT rc;
+			SendMessage(m_hToolbar, TB_GETITEMRECT, index, reinterpret_cast<LPARAM>(&rc));
+
+			if (ptClient.x > (rc.left + GetRectWidth(&rc) / 2))
+			{
+				position++;
+			}
+		}
+	}
+	else
+	{
+		parentFolder = m_bookmarkTree->GetBookmarksToolbarFolder();
+		position = m_bookmarksToolbarInterface->FindNextButtonIndex(ptClient);
 	}
 
-	return iButton;
+	return { parentFolder, position, index };
+}
+
+void CBookmarksToolbarDropHandler::ResetToolbarState()
+{
+	RemoveInsertionMark();
+
+	if (m_previousDropButton)
+	{
+		SetButtonPressedState(*m_previousDropButton, false);
+
+		m_previousDropButton.reset();
+	}
 }
 
 void CBookmarksToolbarDropHandler::RemoveInsertionMark()
 {
 	TBINSERTMARK tbim;
 	tbim.iButton = -1;
-	SendMessage(m_hToolbar,TB_SETINSERTMARK,0,reinterpret_cast<LPARAM>(&tbim));
+	SendMessage(m_hToolbar, TB_SETINSERTMARK, 0, reinterpret_cast<LPARAM>(&tbim));
+}
+
+void CBookmarksToolbarDropHandler::SetButtonPressedState(int index, bool pressed)
+{
+	TBBUTTON tbButton;
+	BOOL res = static_cast<BOOL>(SendMessage(m_hToolbar, TB_GETBUTTON, index, reinterpret_cast<LPARAM>(&tbButton)));
+
+	if (!res)
+	{
+		return;
+	}
+
+	auto state = SendMessage(m_hToolbar, TB_GETSTATE, tbButton.idCommand, 0);
+
+	if (state == -1)
+	{
+		return;
+	}
+
+	if (pressed)
+	{
+		WI_SetFlag(state, TBSTATE_PRESSED);
+	}
+	else
+	{
+		WI_ClearFlag(state, TBSTATE_PRESSED);
+	}
+
+	SendMessage(m_hToolbar, TB_SETSTATE, tbButton.idCommand, MAKEWORD(state, 0));
 }

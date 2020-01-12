@@ -75,3 +75,57 @@ wil::unique_hglobal WriteDataToGlobal(const void *data, size_t size)
 
 	return global;
 }
+
+FORMATETC GetDroppedFilesFormatEtc()
+{
+	static FORMATETC formatEtc = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+	return formatEtc;
+}
+
+std::vector<std::wstring> ExtractDroppedFilesList(IDataObject *dataObject)
+{
+	FORMATETC droppedFilesFormatEtc = GetDroppedFilesFormatEtc();
+	wil::unique_stg_medium stgMedium;
+	HRESULT hr = dataObject->GetData(&droppedFilesFormatEtc, &stgMedium);
+
+	if (hr != S_OK)
+	{
+		return {};
+	}
+
+	wil::unique_hglobal_locked mem(stgMedium.hGlobal);
+
+	if (!mem)
+	{
+		return {};
+	}
+
+	auto *dropFiles = static_cast<DROPFILES *>(mem.get());
+	UINT numDroppedFiles = DragQueryFile(reinterpret_cast<HDROP>(dropFiles), 0xFFFFFFFF, nullptr, 0);
+	std::vector<std::wstring> droppedFiles;
+
+	for (UINT i = 0; i < numDroppedFiles; i++)
+	{
+		UINT numCharacters = DragQueryFile(reinterpret_cast<HDROP>(dropFiles), i, nullptr, 0);
+
+		if (numCharacters == 0)
+		{
+			continue;
+		}
+
+		std::wstring fullFileName;
+		fullFileName.resize(numCharacters + 1);
+
+		UINT charactersCopied = DragQueryFile(reinterpret_cast<HDROP>(dropFiles), i, fullFileName.data(),
+			static_cast<UINT>(fullFileName.capacity()));
+
+		if (charactersCopied == 0)
+		{
+			continue;
+		}
+
+		droppedFiles.push_back(fullFileName);
+	}
+
+	return droppedFiles;
+}
