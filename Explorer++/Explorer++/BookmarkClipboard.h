@@ -19,5 +19,5 @@ public:
 
 private:
 
-	static const WCHAR CLIPBOARD_FORMAT_STRING[];
+	static inline const WCHAR CLIPBOARD_FORMAT_STRING[] = L"explorerplusplus/bookmark";
 };

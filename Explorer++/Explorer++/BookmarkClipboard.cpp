@@ -8,8 +8,6 @@
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/StringHelper.h"
 
-const WCHAR BookmarkClipboard::CLIPBOARD_FORMAT_STRING[] = L"explorerplusplus/bookmark";
-
 BookmarkClipboard::BookmarkClipboard()
 {
 
