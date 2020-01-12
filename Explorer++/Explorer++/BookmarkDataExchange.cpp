@@ -47,7 +47,7 @@ std::string BookmarkDataExchange::SerializeBookmarkItem(const std::unique_ptr<Bo
 	return ss.str();
 }
 
-std::unique_ptr<BookmarkItem> BookmarkDataExchange::UnserializeBookmarkItem(const std::string &data)
+std::unique_ptr<BookmarkItem> BookmarkDataExchange::DeserializeBookmarkItem(const std::string &data)
 {
 	std::stringstream ss(data);
 	cereal::BinaryInputArchive inputArchive(ss);

@@ -12,5 +12,5 @@ namespace BookmarkDataExchange
 	FORMATETC GetFormatEtc();
 	wil::com_ptr<IDataObject> CreateDataObject(const std::unique_ptr<BookmarkItem> &bookmarkItem);
 	std::string SerializeBookmarkItem(const std::unique_ptr<BookmarkItem> &bookmarkItem);
-	std::unique_ptr<BookmarkItem> UnserializeBookmarkItem(const std::string &data);
+	std::unique_ptr<BookmarkItem> DeserializeBookmarkItem(const std::string &data);
 }

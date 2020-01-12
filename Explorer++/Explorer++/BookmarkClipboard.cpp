@@ -29,7 +29,7 @@ std::unique_ptr<BookmarkItem> BookmarkClipboard::ReadBookmark()
 		return nullptr;
 	}
 
-	return BookmarkDataExchange::UnserializeBookmarkItem(*data);
+	return BookmarkDataExchange::DeserializeBookmarkItem(*data);
 }
 
 bool BookmarkClipboard::WriteBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem)
