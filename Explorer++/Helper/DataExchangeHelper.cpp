@@ -76,6 +76,13 @@ wil::unique_hglobal WriteDataToGlobal(const void *data, size_t size)
 	return global;
 }
 
+bool IsDropFormatAvailable(IDataObject *dataObject, const FORMATETC &formatEtc)
+{
+	FORMATETC formatEtcCopy = formatEtc;
+	HRESULT hr = dataObject->QueryGetData(&formatEtcCopy);
+	return (hr == S_OK);
+}
+
 FORMATETC GetDroppedFilesFormatEtc()
 {
 	static FORMATETC formatEtc = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };

@@ -12,5 +12,6 @@ wil::unique_hglobal WriteStringToGlobal(const std::wstring &str);
 std::optional<std::string> ReadBinaryDataFromGlobal(HGLOBAL global);
 wil::unique_hglobal WriteBinaryDataToGlobal(const std::string &data);
 
+bool IsDropFormatAvailable(IDataObject *dataObject, const FORMATETC &formatEtc);
 FORMATETC GetDroppedFilesFormatEtc();
 std::vector<std::wstring> ExtractDroppedFilesList(IDataObject *dataObject);

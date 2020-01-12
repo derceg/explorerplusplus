@@ -767,18 +767,11 @@ HRESULT __stdcall CBookmarksToolbarDropHandler::DragEnter(IDataObject *pDataObje
 
 DWORD CBookmarksToolbarDropHandler::GetDropEffect(IDataObject *pDataObject)
 {
-	FORMATETC bookmarkFormatEtc = BookmarkDataExchange::GetFormatEtc();
-	HRESULT hr = pDataObject->QueryGetData(&bookmarkFormatEtc);
-
-	if (hr == S_OK)
+	if (IsDropFormatAvailable(pDataObject, BookmarkDataExchange::GetFormatEtc()))
 	{
 		return DROPEFFECT_MOVE;
 	}
-
-	FORMATETC droppedFilesFormatEtc = GetDroppedFilesFormatEtc();
-	hr = pDataObject->QueryGetData(&droppedFilesFormatEtc);
-
-	if (hr == S_OK)
+	else if (IsDropFormatAvailable(pDataObject, GetDroppedFilesFormatEtc()))
 	{
 		auto droppedFiles = ExtractDroppedFilesList(pDataObject);
 
