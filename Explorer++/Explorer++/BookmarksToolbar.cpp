@@ -904,20 +904,37 @@ CBookmarksToolbarDropHandler::BookmarkDropTarget CBookmarksToolbarDropHandler::G
 	{
 		auto bookmarkItem = m_bookmarksToolbarInterface->GetBookmarkItemFromToolbarIndex(index);
 
+		RECT buttonRect;
+		SendMessage(m_hToolbar, TB_GETITEMRECT, index, reinterpret_cast<LPARAM>(&buttonRect));
+
 		if (bookmarkItem->IsFolder())
 		{
-			parentFolder = bookmarkItem;
-			position = bookmarkItem->GetChildren().size();
+			RECT folderCentralRect = buttonRect;
+			int indent = static_cast<int>(FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE * GetRectWidth(&buttonRect));
+			InflateRect(&folderCentralRect, -indent, 0);
+
+			if (ptClient.x < folderCentralRect.left)
+			{
+				parentFolder = m_bookmarkTree->GetBookmarksToolbarFolder();
+				position = index;
+			}
+			else if (ptClient.x > folderCentralRect.right)
+			{
+				parentFolder = m_bookmarkTree->GetBookmarksToolbarFolder();
+				position = index + 1;
+			}
+			else
+			{
+				parentFolder = bookmarkItem;
+				position = bookmarkItem->GetChildren().size();
+			}
 		}
 		else
 		{
 			parentFolder = m_bookmarkTree->GetBookmarksToolbarFolder();
 			position = index;
 
-			RECT rc;
-			SendMessage(m_hToolbar, TB_GETITEMRECT, index, reinterpret_cast<LPARAM>(&rc));
-
-			if (ptClient.x > (rc.left + GetRectWidth(&rc) / 2))
+			if (ptClient.x > (buttonRect.left + GetRectWidth(&buttonRect) / 2))
 			{
 				position++;
 			}

@@ -49,6 +49,19 @@ private:
 		int selectedButtonIndex;
 	};
 
+	// When an item is dragged over a folder on the bookmarks toolbar, the drop
+	// target should be set to the folder only if the dragged item is over the
+	// main part of the button for the folder. This is to allow the dragged item
+	// to be positioned before or after the folder if the item is currently over
+	// the left or right edge of the button.
+	// This is especially important when there's no horizontal padding between
+	// buttons, as there would be no space before or after the button that would
+	// allow you to correctly set the position.
+	// The constant here represents how far the left/right edges of the button
+	// are indented, as a percentage of the total size of the button, in order
+	// to determine whether an item is over the main portion of the button.
+	static inline const double FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE = 0.2;
+
 	CBookmarksToolbarDropHandler & operator = (const CBookmarksToolbarDropHandler &btdh);
 
 	/* IDropTarget methods. */
