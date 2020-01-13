@@ -103,7 +103,7 @@ LRESULT CALLBACK CBookmarkTreeView::TreeViewParentProc(HWND hwnd, UINT Msg, WPAR
 			break;
 
 		case TVN_BEGINLABELEDIT:
-			OnBeginLabelEdit();
+			return OnBeginLabelEdit(reinterpret_cast<NMTVDISPINFO *>(lParam));
 			break;
 
 		case TVN_ENDLABELEDIT:
@@ -344,22 +344,31 @@ void CBookmarkTreeView::OnTreeViewRename()
 	TreeView_EditLabel(m_hTreeView, hSelectedItem);
 }
 
-void CBookmarkTreeView::OnBeginLabelEdit()
+BOOL CBookmarkTreeView::OnBeginLabelEdit(const NMTVDISPINFO *dispInfo)
 {
+	auto bookmarkFolder = GetBookmarkFolderFromTreeView(dispInfo->item.hItem);
+
+	if (m_bookmarkTree->IsPermanentNode(bookmarkFolder))
+	{
+		return TRUE;
+	}
+
 	HWND hEdit = TreeView_GetEditControl(m_hTreeView);
 	SetWindowSubclass(hEdit, TreeViewEditProcStub, 0, reinterpret_cast<DWORD_PTR>(this));
+
+	return FALSE;
 }
 
-BOOL CBookmarkTreeView::OnEndLabelEdit(const NMTVDISPINFO *pnmtvdi)
+BOOL CBookmarkTreeView::OnEndLabelEdit(const NMTVDISPINFO *dispInfo)
 {
 	HWND hEdit = TreeView_GetEditControl(m_hTreeView);
 	RemoveWindowSubclass(hEdit, TreeViewEditProcStub, 0);
 
-	if (pnmtvdi->item.pszText != NULL &&
-		lstrlen(pnmtvdi->item.pszText) > 0)
+	if (dispInfo->item.pszText != NULL &&
+		lstrlen(dispInfo->item.pszText) > 0)
 	{
-		auto bookmarkFolder = GetBookmarkFolderFromTreeView(pnmtvdi->item.hItem);
-		bookmarkFolder->SetName(pnmtvdi->item.pszText);
+		auto bookmarkFolder = GetBookmarkFolderFromTreeView(dispInfo->item.hItem);
+		bookmarkFolder->SetName(dispInfo->item.pszText);
 
 		return TRUE;
 	}
