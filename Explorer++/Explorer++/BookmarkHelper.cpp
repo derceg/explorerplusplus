@@ -16,6 +16,8 @@ int CALLBACK SortByLocation(const BookmarkItem *firstItem, const BookmarkItem *s
 int CALLBACK SortByDateAdded(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
 int CALLBACK SortByDateModified(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
 
+BookmarkItem *GetBookmarkItemByIdResursive(BookmarkItem *bookmarkItem, std::wstring_view guid);
+
 bool BookmarkHelper::IsFolder(const std::unique_ptr<BookmarkItem> &bookmarkItem)
 {
 	return bookmarkItem->IsFolder();
@@ -195,4 +197,34 @@ void BookmarkHelper::OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem, 
 	{
 		expp->GetTabContainer()->CreateNewTab(bookmarkItem->GetLocation().c_str());
 	}
+}
+
+BookmarkItem *BookmarkHelper::GetBookmarkItemById(BookmarkTree *bookmarkTree, std::wstring_view guid)
+{
+	return GetBookmarkItemByIdResursive(bookmarkTree->GetRoot(), guid);
+}
+
+BookmarkItem *GetBookmarkItemByIdResursive(BookmarkItem *bookmarkItem, std::wstring_view guid)
+{
+	if (bookmarkItem->GetGUID() == guid)
+	{
+		return bookmarkItem;
+	}
+
+	if (!bookmarkItem->IsFolder())
+	{
+		return nullptr;
+	}
+
+	for (auto &child : bookmarkItem->GetChildren())
+	{
+		BookmarkItem *result = GetBookmarkItemByIdResursive(child.get(), guid);
+
+		if (result)
+		{
+			return result;
+		}
+	}
+
+	return nullptr;
 }
