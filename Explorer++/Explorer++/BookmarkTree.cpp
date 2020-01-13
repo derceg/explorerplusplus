@@ -107,6 +107,11 @@ void BookmarkTree::MoveBookmarkItem(BookmarkItem *bookmarkItem, BookmarkItem *ne
 		return;
 	}
 
+	if (oldParent == newParent && index > oldIndex)
+	{
+		index--;
+	}
+
 	auto item = oldParent->RemoveChild(oldIndex);
 	newParent->AddChild(std::move(item), index);
 
