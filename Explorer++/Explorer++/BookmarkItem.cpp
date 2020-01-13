@@ -15,7 +15,9 @@ BookmarkItem::BookmarkItem(std::optional<std::wstring> guid, std::wstring_view n
 
 }
 
-BookmarkItem::BookmarkItem(std::wstring_view name, std::wstring location) :
+// Bookmark deserialization constructor.
+BookmarkItem::BookmarkItem(std::wstring_view originalGuid, std::wstring_view name, std::wstring location) :
+	m_originalGuid(originalGuid),
 	m_type(Type::Bookmark),
 	m_name(name),
 	m_location(location)
@@ -23,7 +25,9 @@ BookmarkItem::BookmarkItem(std::wstring_view name, std::wstring location) :
 
 }
 
-BookmarkItem::BookmarkItem(std::wstring_view name, BookmarkItems &&children) :
+// Bookmark folder deserialization constructor.
+BookmarkItem::BookmarkItem(std::wstring_view originalGuid, std::wstring_view name, BookmarkItems &&children) :
+	m_originalGuid(originalGuid),
 	m_type(Type::Folder),
 	m_name(name),
 	m_children(std::move(children))
@@ -70,6 +74,16 @@ const BookmarkItem *BookmarkItem::GetParent() const
 std::wstring BookmarkItem::GetGUID() const
 {
 	return m_guid;
+}
+
+std::optional<std::wstring> BookmarkItem::GetOriginalGUID() const
+{
+	return m_originalGuid;
+}
+
+void BookmarkItem::ClearOriginalGUID()
+{
+	m_originalGuid.reset();
 }
 
 std::wstring BookmarkItem::GetName() const
@@ -220,4 +234,19 @@ const BookmarkItems &BookmarkItem::GetChildren() const
 void BookmarkItem::UpdateModificationTime()
 {
 	GetSystemTimeAsFileTime(&m_dateModified);
+}
+
+void BookmarkItem::VisitRecursively(std::function<void(BookmarkItem * currentItem)> callback)
+{
+	callback(this);
+
+	if (!IsFolder())
+	{
+		return;
+	}
+
+	for (auto &child : m_children)
+	{
+		child->VisitRecursively(callback);
+	}
 }

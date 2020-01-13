@@ -40,8 +40,6 @@ public:
 
 private:
 
-	void AddBookmarkItemUpdatedObservers(BookmarkItem *bookmarkItem);
-
 	void OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);
 
 	void LoadPermanentFolderFromRegistry(HKEY parentKey, BookmarkItem *bookmarkItem, const std::wstring &name);
