@@ -30,8 +30,7 @@ CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplore
 	m_uIDEnd(uIDEnd),
 	m_bookmarkContextMenu(bookmarkTree, instance, pexpp),
 	m_bookmarkMenu(bookmarkTree, instance, pexpp, hToolbar),
-	m_uIDCounter(0),
-	m_withinDrag(false)
+	m_uIDCounter(0)
 {
 	InitializeToolbar();
 }
@@ -140,18 +139,17 @@ void CBookmarksToolbar::OnLButtonDown(const POINT &pt)
 	// Additionally, that event is also sent when the right button goes down,
 	// though a drag should only begin when the left button goes down.
 	m_leftButtonDownPoint = pt;
-	m_withinDrag = false;
 }
 
 void CBookmarksToolbar::OnMouseMove(int keys, const POINT &pt)
 {
-	if (!WI_IsFlagSet(keys, MK_LBUTTON))
+	if (!m_leftButtonDownPoint || !WI_IsFlagSet(keys, MK_LBUTTON))
 	{
-		ResetDragFlags();
+		m_leftButtonDownPoint.reset();
 		return;
 	}
 
-	if (m_withinDrag)
+	if (m_dropHandler->IsWithinDrag())
 	{
 		return;
 	}
@@ -197,23 +195,13 @@ void CBookmarksToolbar::StartDrag(DragType dragType, const POINT &pt)
 	auto &ownedPtr = bookmarkItem->GetParent()->GetChildOwnedPtr(bookmarkItem);
 	auto dataObject = BookmarkDataExchange::CreateDataObject(ownedPtr);
 
-	m_withinDrag = true;
-
 	DWORD effect;
 	DoDragDrop(dataObject.get(), dropSource.get(), DROPEFFECT_MOVE, &effect);
-
-	m_withinDrag = false;
 }
 
 void CBookmarksToolbar::OnLButtonUp()
 {
-	ResetDragFlags();
-}
-
-void CBookmarksToolbar::ResetDragFlags()
-{
 	m_leftButtonDownPoint.reset();
-	m_withinDrag = false;
 }
 
 void CBookmarksToolbar::OnMButtonUp(const POINT &pt)
@@ -697,7 +685,8 @@ CBookmarksToolbarDropHandler::CBookmarksToolbarDropHandler(BookmarksToolbarInter
 	m_ulRefCount(1),
 	m_bookmarksToolbarInterface(bookmarksToolbarInterface),
 	m_hToolbar(hToolbar),
-	m_bookmarkTree(bookmarkTree)
+	m_bookmarkTree(bookmarkTree),
+	m_withinDrag(false)
 {
 	CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_INPROC_SERVER,
 		IID_PPV_ARGS(&m_pDragSourceHelper));
@@ -761,6 +750,8 @@ HRESULT __stdcall CBookmarksToolbarDropHandler::DragEnter(IDataObject *pDataObje
 
 	POINT pt = { ptl.x, ptl.y };
 	m_pDropTargetHelper->DragEnter(m_hToolbar, pDataObject, &pt, dropEffect);
+
+	m_withinDrag = true;
 
 	return S_OK;
 }
@@ -844,6 +835,8 @@ HRESULT __stdcall CBookmarksToolbarDropHandler::DragLeave()
 
 	m_pDropTargetHelper->DragLeave();
 
+	m_withinDrag = false;
+
 	return S_OK;
 }
 
@@ -892,6 +885,8 @@ HRESULT __stdcall CBookmarksToolbarDropHandler::Drop(IDataObject *pDataObject,
 
 	ResetToolbarState();
 	m_pDropTargetHelper->Drop(pDataObject,&pt,*pdwEffect);
+
+	m_withinDrag = false;
 
 	return S_OK;
 }
@@ -983,4 +978,9 @@ void CBookmarksToolbarDropHandler::SetButtonPressedState(int index, bool pressed
 	}
 
 	SendMessage(m_hToolbar, TB_SETSTATE, tbButton.idCommand, MAKEWORD(state, 0));
+}
+
+bool CBookmarksToolbarDropHandler::IsWithinDrag() const
+{
+	return m_withinDrag;
 }

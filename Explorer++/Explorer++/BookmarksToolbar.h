@@ -34,9 +34,11 @@ public:
 	~CBookmarksToolbarDropHandler();
 
 	/* IUnknown methods. */
-	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
-	ULONG __stdcall		AddRef(void);
-	ULONG __stdcall		Release(void);
+	HRESULT __stdcall QueryInterface(REFIID iid,void **ppvObject);
+	ULONG __stdcall AddRef(void);
+	ULONG __stdcall Release(void);
+
+	bool IsWithinDrag() const;
 
 private:
 
@@ -71,6 +73,7 @@ private:
 	IDragSourceHelper *m_pDragSourceHelper;
 	IDropTargetHelper *m_pDropTargetHelper;
 
+	bool m_withinDrag;
 	DWORD m_cachedDropEffect;
 	std::optional<int> m_previousDropButton;
 };
@@ -107,7 +110,6 @@ private:
 	void	OnMouseMove(int keys, const POINT &pt);
 	void	StartDrag(DragType dragType, const POINT &pt);
 	void	OnLButtonUp();
-	void	ResetDragFlags();
 	void	OnMButtonUp(const POINT &pt);
 	bool	OnCommand(WPARAM wParam, LPARAM lParam);
 	bool	OnButtonClick(int command);
@@ -154,7 +156,6 @@ private:
 
 	CBookmarksToolbarDropHandler *m_dropHandler;
 	std::optional<POINT> m_leftButtonDownPoint;
-	bool m_withinDrag;
 
 	std::vector<WindowSubclassWrapper> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
