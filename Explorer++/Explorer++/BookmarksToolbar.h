@@ -72,6 +72,8 @@ private:
 
 	DWORD GetDropEffect(IDataObject *pDataObject);
 
+	BookmarkItems CreateBookmarkItemsFromDroppedFiles(IDataObject *dataObject);
+
 	BookmarkDropTarget GetDropTarget(const POINT &pt);
 	void ResetToolbarState();
 	void RemoveInsertionMark();

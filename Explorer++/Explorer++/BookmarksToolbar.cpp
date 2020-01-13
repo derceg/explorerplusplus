@@ -7,6 +7,7 @@
 #include "AddBookmarkDialog.h"
 #include "BookmarkClipboard.h"
 #include "BookmarkDataExchange.h"
+#include "BookmarkHelper.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "TabContainer.h"
@@ -846,41 +847,32 @@ HRESULT __stdcall CBookmarksToolbarDropHandler::Drop(IDataObject *pDataObject,
 	UNREFERENCED_PARAMETER(grfKeyState);
 
 	POINT pt = { ptl.x, ptl.y };
-	auto [parentFolder, position, selectedButtonIndex] = GetDropTarget(pt);	
+	auto [parentFolder, position, selectedButtonIndex] = GetDropTarget(pt);
 
-	FORMATETC droppedFilesFormatEtc = GetDroppedFilesFormatEtc();
-	STGMEDIUM stg;
-
-	HRESULT hr = pDataObject->GetData(&droppedFilesFormatEtc, &stg);
-
-	if (hr == S_OK)
+	if (IsDropFormatAvailable(pDataObject, BookmarkDataExchange::GetFormatEtc()))
 	{
-		DROPFILES *pdf = reinterpret_cast<DROPFILES *>(GlobalLock(stg.hGlobal));
+		auto bookmarkItem = BookmarkDataExchange::ExtractBookmarkItem(pDataObject);
 
-		if (pdf != NULL)
+		if (bookmarkItem)
 		{
-			UINT nDroppedFiles = DragQueryFile(reinterpret_cast<HDROP>(pdf), 0xFFFFFFFF, NULL, NULL);
+			auto exingBookmarkItem = BookmarkHelper::GetBookmarkItemById(m_bookmarkTree, *bookmarkItem->GetOriginalGUID());
 
-			for (UINT i = 0; i < nDroppedFiles; i++)
+			if (exingBookmarkItem)
 			{
-				TCHAR szFullFileName[MAX_PATH];
-				DragQueryFile(reinterpret_cast<HDROP>(pdf), i, szFullFileName,
-					SIZEOF_ARRAY(szFullFileName));
-
-				if (PathIsDirectory(szFullFileName))
-				{
-					TCHAR szDisplayName[MAX_PATH];
-					GetDisplayName(szFullFileName, szDisplayName, SIZEOF_ARRAY(szDisplayName), SHGDN_INFOLDER);
-
-					auto bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt, szDisplayName, szFullFileName);
-					m_bookmarkTree->AddBookmarkItem(parentFolder, std::move(bookmarkItem), position + i);
-				}
+				m_bookmarkTree->MoveBookmarkItem(exingBookmarkItem, parentFolder, position);
 			}
-
-			GlobalUnlock(stg.hGlobal);
 		}
+	}
+	else if (IsDropFormatAvailable(pDataObject, GetDroppedFilesFormatEtc()))
+	{
+		BookmarkItems bookmarkItems = CreateBookmarkItemsFromDroppedFiles(pDataObject);
+		size_t i = 0;
 
-		ReleaseStgMedium(&stg);
+		for (auto &bookmarkItem : bookmarkItems)
+		{
+			m_bookmarkTree->AddBookmarkItem(parentFolder, std::move(bookmarkItem), position + i);
+			i++;
+		}
 	}
 
 	ResetToolbarState();
@@ -889,6 +881,28 @@ HRESULT __stdcall CBookmarksToolbarDropHandler::Drop(IDataObject *pDataObject,
 	m_withinDrag = false;
 
 	return S_OK;
+}
+
+BookmarkItems CBookmarksToolbarDropHandler::CreateBookmarkItemsFromDroppedFiles(IDataObject *dataObject)
+{
+	BookmarkItems bookmarkItems;
+	auto droppedFiles = ExtractDroppedFilesList(dataObject);
+
+	for (auto &droppedFile : droppedFiles)
+	{
+		if (!PathIsDirectory(droppedFile.c_str()))
+		{
+			continue;
+		}
+
+		TCHAR displayName[MAX_PATH];
+		GetDisplayName(droppedFile.c_str(), displayName, SIZEOF_ARRAY(displayName), SHGDN_INFOLDER);
+
+		auto bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt, displayName, droppedFile.c_str());
+		bookmarkItems.push_back(std::move(bookmarkItem));
+	}
+
+	return bookmarkItems;
 }
 
 CBookmarksToolbarDropHandler::BookmarkDropTarget CBookmarksToolbarDropHandler::GetDropTarget(const POINT &pt)
