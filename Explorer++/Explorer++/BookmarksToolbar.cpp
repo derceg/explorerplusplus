@@ -152,6 +152,8 @@ void CBookmarksToolbar::OnMouseMove(int keys, const POINT &pt)
 	if (!PtInRect(&rect, pt))
 	{
 		StartDrag(DragType::LeftClick, *m_leftButtonDownPoint);
+
+		m_leftButtonDownPoint.reset();
 	}
 }
 
