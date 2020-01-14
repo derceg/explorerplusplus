@@ -700,7 +700,7 @@ DWORD CBookmarksToolbar::DragOver(DWORD keyState, POINT pt, DWORD effect)
 		DWORD flags;
 		int numButtons = static_cast<int>(SendMessage(m_hToolbar, TB_BUTTONCOUNT, 0, 0));
 
-		if (position == numButtons)
+		if (position == static_cast<size_t>(numButtons))
 		{
 			position--;
 			flags = TBIMHT_AFTER;
