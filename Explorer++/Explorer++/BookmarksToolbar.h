@@ -12,33 +12,19 @@
 #include "Navigation.h"
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/DropTarget.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/signals2.hpp>
+#include <wil/com.h>
 #include <wil/resource.h>
 #include <optional>
 
-class BookmarksToolbarInterface
+class CBookmarksToolbar : private DropTargetInternal
 {
 public:
 
-	virtual BookmarkItem *GetBookmarkItemFromToolbarIndex(int index) = 0;
-	virtual int FindNextButtonIndex(const POINT &ptClient) = 0;
-};
-
-class CBookmarksToolbarDropHandler : public IDropTarget
-{
-public:
-
-	CBookmarksToolbarDropHandler(BookmarksToolbarInterface *bookmarksToolbarInterface,
-		HWND hToolbar, BookmarkTree *bookmarkTree);
-	~CBookmarksToolbarDropHandler();
-
-	/* IUnknown methods. */
-	HRESULT __stdcall QueryInterface(REFIID iid,void **ppvObject);
-	ULONG __stdcall AddRef(void);
-	ULONG __stdcall Release(void);
-
-	bool IsWithinDrag() const;
+	CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
+		Navigation *navigation, BookmarkTree *bookmarkTree, UINT uIDStart, UINT uIDEnd);
 
 private:
 
@@ -48,6 +34,11 @@ private:
 		size_t position;
 		int selectedButtonIndex;
 	};
+
+	CBookmarksToolbar & operator = (const CBookmarksToolbar &bt);
+
+	static inline const UINT_PTR SUBCLASS_ID = 0;
+	static inline const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
 	// When an item is dragged over a folder on the bookmarks toolbar, the drop
 	// target should be set to the folder only if the dragged item is over the
@@ -61,52 +52,6 @@ private:
 	// are indented, as a percentage of the total size of the button, in order
 	// to determine whether an item is over the main portion of the button.
 	static inline const double FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE = 0.2;
-
-	CBookmarksToolbarDropHandler & operator = (const CBookmarksToolbarDropHandler &btdh);
-
-	/* IDropTarget methods. */
-	HRESULT __stdcall DragEnter(IDataObject *pDataObject, DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect);
-	HRESULT __stdcall DragOver(DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect);
-	HRESULT __stdcall DragLeave();
-	HRESULT __stdcall Drop(IDataObject *pDataObject, DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect);
-
-	DWORD GetDropEffect(IDataObject *pDataObject);
-
-	BookmarkItems CreateBookmarkItemsFromDroppedFiles(IDataObject *dataObject);
-
-	BookmarkDropTarget GetDropTarget(const POINT &pt);
-	void ResetToolbarState();
-	void RemoveInsertionMark();
-	void SetButtonPressedState(int index, bool pressed);
-
-	ULONG m_ulRefCount;
-
-	BookmarksToolbarInterface *m_bookmarksToolbarInterface;
-	HWND m_hToolbar;
-	BookmarkTree *m_bookmarkTree;
-
-	IDragSourceHelper *m_pDragSourceHelper;
-	IDropTargetHelper *m_pDropTargetHelper;
-
-	bool m_withinDrag;
-	DWORD m_cachedDropEffect;
-	std::optional<int> m_previousDropButton;
-};
-
-class CBookmarksToolbar : private BookmarksToolbarInterface
-{
-public:
-
-	CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
-		Navigation *navigation, BookmarkTree *bookmarkTree, UINT uIDStart, UINT uIDEnd);
-	~CBookmarksToolbar();
-
-private:
-
-	CBookmarksToolbar & operator = (const CBookmarksToolbar &bt);
-
-	static const UINT_PTR SUBCLASS_ID = 0;
-	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
 	static LRESULT CALLBACK	BookmarksToolbarProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK	BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
@@ -149,6 +94,19 @@ private:
 		const BookmarkItem *newParent, size_t newIndex);
 	void	OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem);
 
+	// DropTargetInternal methods.
+	DWORD DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
+	DWORD DragOver(DWORD keyState, POINT pt, DWORD effect) override;
+	void DragLeave() override;
+	DWORD Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
+
+	DWORD GetDropEffect(IDataObject *dataObject);
+	BookmarkDropTarget GetDropTarget(const POINT &pt);
+	void SetButtonPressedState(int index, bool pressed);
+	BookmarkItems CreateBookmarkItemsFromDroppedFiles(IDataObject *dataObject);
+	void ResetToolbarState();
+	void RemoveInsertionMark();
+
 	HWND m_hToolbar;
 	DpiCompatibility m_dpiCompat;
 	wil::unique_himagelist m_imageList;
@@ -169,8 +127,11 @@ private:
 
 	std::optional<POINT> m_contextMenuLocation;
 
-	CBookmarksToolbarDropHandler *m_dropHandler;
+	// Drag and drop.
+	wil::com_ptr<DropTarget> m_dropTarget;
 	std::optional<POINT> m_leftButtonDownPoint;
+	DWORD m_cachedDropEffect;
+	std::optional<int> m_previousDropButton;
 
 	std::vector<WindowSubclassWrapper> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
