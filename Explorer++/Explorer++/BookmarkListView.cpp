@@ -8,6 +8,7 @@
 #include "ResourceHelper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/WindowHelper.h"
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/adaptor/indexed.hpp>
 
@@ -34,6 +35,8 @@ CBookmarkListView::CBookmarkListView(HWND hListView, HMODULE resourceModule,
 	ListView_SetImageList(hListView, m_imageList.get(), LVSIL_SMALL);
 
 	InsertColumns(initialColumns);
+
+	m_dropTarget = DropTarget::Create(m_hListView, this);
 
 	m_windowSubclasses.push_back(WindowSubclassWrapper(GetParent(m_hListView), ParentWndProcStub,
 		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
@@ -569,4 +572,184 @@ void CBookmarkListView::OnHeaderContextMenuItemSelected(int menuItemId)
 	}
 
 	itr->active = nowActive;
+}
+
+DWORD CBookmarkListView::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
+{
+	UNREFERENCED_PARAMETER(keyState);
+	UNREFERENCED_PARAMETER(pt);
+	UNREFERENCED_PARAMETER(effect);
+
+	m_bookmarkDropInfo = std::make_unique<BookmarkDropInfo>(dataObject, m_bookmarkTree);
+
+	return m_bookmarkDropInfo->GetDropEffect();
+}
+
+DWORD CBookmarkListView::DragOver(DWORD keyState, POINT pt, DWORD effect)
+{
+	UNREFERENCED_PARAMETER(keyState);
+	UNREFERENCED_PARAMETER(effect);
+
+	if (m_previousDropItem)
+	{
+		ListView_SetItemState(m_hListView, *m_previousDropItem, 0, LVIS_DROPHILITED);
+	}
+
+	auto [parentFolder, position, selectedItemIndex] = GetDropTarget(pt);
+
+	if (parentFolder == m_currentBookmarkFolder)
+	{
+		DWORD flags;
+		int numItems = ListView_GetItemCount(m_hListView);
+
+		if (position == static_cast<size_t>(numItems))
+		{
+			position--;
+			flags = LVIM_AFTER;
+		}
+		else
+		{
+			flags = 0;
+		}
+
+		LVINSERTMARK insertMark;
+		insertMark.cbSize = sizeof(insertMark);
+		insertMark.dwFlags = flags;
+		insertMark.iItem = static_cast<int>(position);
+		ListView_SetInsertMark(m_hListView, &insertMark);
+
+		m_previousDropItem.reset();
+	}
+	else
+	{
+		RemoveInsertionMark();
+
+		ListView_SetItemState(m_hListView, selectedItemIndex, LVIS_DROPHILITED, LVIS_DROPHILITED);
+		m_previousDropItem = selectedItemIndex;
+	}
+
+	return m_bookmarkDropInfo->GetDropEffect();
+}
+
+void CBookmarkListView::DragLeave()
+{
+	ResetDragDropState();
+}
+
+DWORD CBookmarkListView::Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
+{
+	UNREFERENCED_PARAMETER(dataObject);
+	UNREFERENCED_PARAMETER(keyState);
+	UNREFERENCED_PARAMETER(effect);
+
+	auto [parentFolder, position, selectedItemIndex] = GetDropTarget(pt);
+	DWORD finalEffect = m_bookmarkDropInfo->PerformDrop(parentFolder, position);
+
+	ResetDragDropState();
+
+	return finalEffect;
+}
+
+CBookmarkListView::BookmarkDropTarget CBookmarkListView::GetDropTarget(const POINT &pt)
+{
+	POINT ptClient = pt;
+	ScreenToClient(m_hListView, &ptClient);
+
+	LVHITTESTINFO hitTestInfo;
+	hitTestInfo.pt = ptClient;
+	ListView_HitTest(m_hListView, &hitTestInfo);
+
+	BookmarkItem *parentFolder = nullptr;
+	size_t position;
+
+	if (WI_IsFlagSet(hitTestInfo.flags, LVHT_NOWHERE))
+	{
+		parentFolder = m_currentBookmarkFolder;
+		position = FindNextItemIndex(ptClient);
+	}
+	else
+	{
+		auto bookmarkItem = GetBookmarkItemFromListView(hitTestInfo.iItem);
+
+		RECT itemRect;
+		ListView_GetItemRect(m_hListView, hitTestInfo.iItem, &itemRect, LVIR_BOUNDS);
+
+		if (bookmarkItem->IsFolder())
+		{
+			RECT folderCentralRect = itemRect;
+			int indent = static_cast<int>(FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE * GetRectHeight(&itemRect));
+			InflateRect(&folderCentralRect, 0, -indent);
+
+			if (ptClient.y < folderCentralRect.top)
+			{
+				parentFolder = m_currentBookmarkFolder;
+				position = hitTestInfo.iItem;
+			}
+			else if (ptClient.y > folderCentralRect.bottom)
+			{
+				parentFolder = m_currentBookmarkFolder;
+				position = hitTestInfo.iItem + 1;
+			}
+			else
+			{
+				parentFolder = bookmarkItem;
+				position = bookmarkItem->GetChildren().size();
+			}
+		}
+		else
+		{
+			parentFolder = m_currentBookmarkFolder;
+			position = hitTestInfo.iItem;
+
+			if (ptClient.y > (itemRect.top + GetRectHeight(&itemRect) / 2))
+			{
+				position++;
+			}
+		}
+	}
+
+	return { parentFolder, position, hitTestInfo.iItem };
+}
+
+int CBookmarkListView::FindNextItemIndex(const POINT &ptClient)
+{
+	int numItems = ListView_GetItemCount(m_hListView);
+	int nextIndex = 0;
+
+	for (int i = 0; i < numItems; i++)
+	{
+		RECT rc;
+		ListView_GetItemRect(m_hListView, i, &rc, LVIR_BOUNDS);
+
+		if (ptClient.y < rc.top)
+		{
+			break;
+		}
+
+		nextIndex = i + 1;
+	}
+
+	return nextIndex;
+}
+
+void CBookmarkListView::ResetDragDropState()
+{
+	RemoveInsertionMark();
+
+	if (m_previousDropItem)
+	{
+		ListView_SetItemState(m_hListView, *m_previousDropItem, 0, LVIS_DROPHILITED);
+		m_previousDropItem.reset();
+	}
+
+	m_bookmarkDropInfo.reset();
+}
+
+void CBookmarkListView::RemoveInsertionMark()
+{
+	LVINSERTMARK insertMark;
+	insertMark.cbSize = sizeof(insertMark);
+	insertMark.dwFlags = 0;
+	insertMark.iItem = -1;
+	ListView_SetInsertMark(m_hListView, &insertMark);
 }
