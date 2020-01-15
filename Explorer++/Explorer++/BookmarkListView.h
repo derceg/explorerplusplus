@@ -94,6 +94,9 @@ private:
 	void OnKeyDown(const NMLVKEYDOWN *keyDown);
 	void OnBeginDrag(const NMLISTVIEW *listView);
 	void OnRename();
+	void OnDelete();
+
+	std::vector<BookmarkItem *> GetSelectedBookmarkItems();
 
 	void OnHeaderRClick(const POINT &pt);
 	wil::unique_hmenu BuildHeaderContextMenu();

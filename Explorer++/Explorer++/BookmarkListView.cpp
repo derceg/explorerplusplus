@@ -481,6 +481,7 @@ void CBookmarkListView::OnKeyDown(const NMLVKEYDOWN *keyDown)
 		break;
 
 	case VK_DELETE:
+		OnDelete();
 		break;
 	}
 }
@@ -520,6 +521,30 @@ void CBookmarkListView::OnRename()
 	{
 		ListView_EditLabel(m_hListView, item);
 	}
+}
+
+void CBookmarkListView::OnDelete()
+{
+	std::vector<BookmarkItem *> bookmarkItems = GetSelectedBookmarkItems();
+
+	for (BookmarkItem *bookmarkItem : bookmarkItems)
+	{
+		m_bookmarkTree->RemoveBookmarkItem(bookmarkItem);
+	}
+}
+
+std::vector<BookmarkItem *> CBookmarkListView::GetSelectedBookmarkItems()
+{
+	std::vector<BookmarkItem *> bookmarksItems;
+	int index = -1;
+
+	while ((index = ListView_GetNextItem(m_hListView, index, LVNI_SELECTED)) != -1)
+	{
+		BookmarkItem *bookmarkItem = GetBookmarkItemFromListView(index);
+		bookmarksItems.push_back(bookmarkItem);
+	}
+
+	return bookmarksItems;
 }
 
 void CBookmarkListView::OnHeaderRClick(const POINT &pt)
