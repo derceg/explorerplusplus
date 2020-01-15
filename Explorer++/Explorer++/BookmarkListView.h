@@ -14,6 +14,7 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/DropTarget.h"
 #include "../Helper/WindowSubclassWrapper.h"
+#include <boost/signals2.hpp>
 #include <wil/com.h>
 #include <wil/resource.h>
 #include <optional>
@@ -97,6 +98,18 @@ private:
 	wil::unique_hmenu BuildHeaderContextMenu();
 	void OnHeaderContextMenuItemSelected(int menuItemId);
 
+	void OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t index);
+	void OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);
+	void OnBookmarkItemMoved(BookmarkItem *bookmarkItem, const BookmarkItem *oldParent,
+		size_t oldIndex, const BookmarkItem *newParent, size_t newIndex);
+	void OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem);
+
+	void RemoveBookmarkItem(const BookmarkItem *bookmarkItem);
+	std::optional<int> GetBookmarkItemIndex(const BookmarkItem *bookmarkItem) const;
+	ColumnType MapPropertyTypeToColumnType(BookmarkItem::PropertyType propertyType) const;
+	Column &GetColumnByType(ColumnType columnType);
+	int GetColumnIndexByType(ColumnType columnType) const;
+
 	// DropTargetInternal methods.
 	DWORD DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
 	DWORD DragOver(DWORD keyState, POINT pt, DWORD effect) override;
@@ -126,4 +139,5 @@ private:
 	std::optional<int> m_previousDropItem;
 
 	std::vector<WindowSubclassWrapper> m_windowSubclasses;
+	std::vector<boost::signals2::scoped_connection> m_connections;
 };

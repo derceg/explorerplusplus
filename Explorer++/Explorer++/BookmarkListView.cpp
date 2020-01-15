@@ -40,6 +40,16 @@ CBookmarkListView::CBookmarkListView(HWND hListView, HMODULE resourceModule,
 
 	m_windowSubclasses.push_back(WindowSubclassWrapper(GetParent(m_hListView), ParentWndProcStub,
 		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+
+	m_connections.push_back(m_bookmarkTree->bookmarkItemAddedSignal.AddObserver(
+		std::bind(&CBookmarkListView::OnBookmarkItemAdded, this, std::placeholders::_1, std::placeholders::_2)));
+	m_connections.push_back(m_bookmarkTree->bookmarkItemUpdatedSignal.AddObserver(
+		std::bind(&CBookmarkListView::OnBookmarkItemUpdated, this, std::placeholders::_1, std::placeholders::_2)));
+	m_connections.push_back(m_bookmarkTree->bookmarkItemMovedSignal.AddObserver(
+		std::bind(&CBookmarkListView::OnBookmarkItemMoved, this, std::placeholders::_1, std::placeholders::_2,
+			std::placeholders::_3, std::placeholders::_4, std::placeholders::_5)));
+	m_connections.push_back(m_bookmarkTree->bookmarkItemPreRemovalSignal.AddObserver(
+		std::bind(&CBookmarkListView::OnBookmarkItemPreRemoval, this, std::placeholders::_1)));
 }
 
 void CBookmarkListView::InsertColumns(const std::vector<Column> &columns)
@@ -538,22 +548,14 @@ wil::unique_hmenu CBookmarkListView::BuildHeaderContextMenu()
 void CBookmarkListView::OnHeaderContextMenuItemSelected(int menuItemId)
 {
 	ColumnType columnType = static_cast<ColumnType>(menuItemId);
+	Column &column = GetColumnByType(columnType);
+	int columnIndex = GetColumnIndexByType(columnType);
 
-	auto itr = std::find_if(m_columns.begin(), m_columns.end(), [columnType] (const Column &column) {
-		return column.columnType == columnType;
-	});
-
-	assert(itr != m_columns.end());
-
-	auto index = std::count_if(m_columns.begin(), itr, [] (const Column &column) {
-		return column.active;
-	});
-
-	bool nowActive = !itr->active;
+	bool nowActive = !column.active;
 
 	if (nowActive)
 	{
-		InsertColumn(*itr, static_cast<int>(index));
+		InsertColumn(column, columnIndex);
 
 		// TODO: Update.
 		/*for (const auto &childItem : bookmarkFolder->GetChildren())
@@ -567,11 +569,140 @@ void CBookmarkListView::OnHeaderContextMenuItemSelected(int menuItemId)
 	}
 	else
 	{
-		itr->width = ListView_GetColumnWidth(m_hListView, index);
-		ListView_DeleteColumn(m_hListView, index);
+		column.width = ListView_GetColumnWidth(m_hListView, columnIndex);
+		ListView_DeleteColumn(m_hListView, columnIndex);
 	}
 
-	itr->active = nowActive;
+	column.active = nowActive;
+}
+
+void CBookmarkListView::OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t index)
+{
+	if (bookmarkItem.GetParent() == m_currentBookmarkFolder)
+	{
+		InsertBookmarkItemIntoListView(&bookmarkItem, static_cast<int>(index));
+	}
+}
+
+void CBookmarkListView::OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType)
+{
+	if (bookmarkItem.GetParent() != m_currentBookmarkFolder)
+	{
+		return;
+	}
+
+	auto index = GetBookmarkItemIndex(&bookmarkItem);
+	assert(index);
+
+	ColumnType columnType = MapPropertyTypeToColumnType(propertyType);
+	Column &column = GetColumnByType(columnType);
+
+	if (!column.active)
+	{
+		return;
+	}
+
+	int columnIndex = GetColumnIndexByType(columnType);
+	std::wstring columnText = GetBookmarkItemColumnInfo(&bookmarkItem, columnType);
+	ListView_SetItemText(m_hListView, *index, columnIndex, columnText.data());
+}
+
+void CBookmarkListView::OnBookmarkItemMoved(BookmarkItem *bookmarkItem, const BookmarkItem *oldParent,
+	size_t oldIndex, const BookmarkItem *newParent, size_t newIndex)
+{
+	UNREFERENCED_PARAMETER(oldIndex);
+
+	if (oldParent == m_currentBookmarkFolder)
+	{
+		RemoveBookmarkItem(bookmarkItem);
+	}
+
+	if (newParent == m_currentBookmarkFolder)
+	{
+		InsertBookmarkItemIntoListView(bookmarkItem, static_cast<int>(newIndex));
+	}
+}
+
+void CBookmarkListView::OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem)
+{
+	if (bookmarkItem.GetParent() == m_currentBookmarkFolder)
+	{
+		RemoveBookmarkItem(&bookmarkItem);
+	}
+}
+
+void CBookmarkListView::RemoveBookmarkItem(const BookmarkItem *bookmarkItem)
+{
+	auto index = GetBookmarkItemIndex(bookmarkItem);
+	assert(index);
+
+	ListView_DeleteItem(m_hListView, *index);
+}
+
+std::optional<int> CBookmarkListView::GetBookmarkItemIndex(const BookmarkItem *bookmarkItem) const
+{
+	LVFINDINFO findInfo;
+	findInfo.flags = LVFI_PARAM;
+	findInfo.lParam = reinterpret_cast<LPARAM>(bookmarkItem);
+	int index = ListView_FindItem(m_hListView, -1, &findInfo);
+
+	if (index == -1)
+	{
+		return std::nullopt;
+	}
+
+	return index;
+}
+
+CBookmarkListView::ColumnType CBookmarkListView::MapPropertyTypeToColumnType(BookmarkItem::PropertyType propertyType) const
+{
+	switch (propertyType)
+	{
+	case BookmarkItem::PropertyType::Name:
+		return ColumnType::Name;
+
+	case BookmarkItem::PropertyType::Location:
+		return ColumnType::Location;
+
+	case BookmarkItem::PropertyType::DateCreated:
+		return ColumnType::DateCreated;
+
+	case BookmarkItem::PropertyType::DateModified:
+		return ColumnType::DateModified;
+
+	default:
+		throw std::runtime_error("Bookmark column not found");
+		break;
+	}
+}
+
+CBookmarkListView::Column &CBookmarkListView::GetColumnByType(ColumnType columnType)
+{
+	auto itr = std::find_if(m_columns.begin(), m_columns.end(), [columnType] (const Column &column) {
+		return column.columnType == columnType;
+	});
+
+	assert(itr != m_columns.end());
+
+	return *itr;
+}
+
+// If the specified column is active, this function returns the index of the
+// column (as it appears in the listview). If it's not active, the function will
+// return the index the column would be shown at, if it were active.
+int CBookmarkListView::GetColumnIndexByType(ColumnType columnType) const
+{
+	auto itr = std::find_if(m_columns.begin(), m_columns.end(), [columnType] (const Column &column) {
+		return column.columnType == columnType;
+	});
+
+	assert(itr != m_columns.end());
+
+	auto columnIndex = std::count_if(m_columns.begin(), itr, [] (const Column &column) {
+		return column.active;
+	});
+
+	return static_cast<int>(columnIndex);
 }
 
 DWORD CBookmarkListView::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
