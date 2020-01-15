@@ -18,7 +18,7 @@ DropTarget::DropTarget(HWND hwnd, DropTargetInternal *dropTargetInternal) :
 {
 	RegisterDragDrop(hwnd, this);
 
-	m_windowSubclasses.push_back(WindowSubclassWrapper(hwnd, WndProc, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(WindowSubclassWrapper(hwnd, WndProc, SUBCLASS_ID, 0));
 }
 
 LRESULT CALLBACK DropTarget::WndProc(HWND hwnd, UINT msg, WPARAM wParam,
