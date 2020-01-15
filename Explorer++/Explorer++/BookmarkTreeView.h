@@ -60,6 +60,7 @@ private:
 	BOOL OnBeginLabelEdit(const NMTVDISPINFO *dispInfo);
 	BOOL OnEndLabelEdit(const NMTVDISPINFO *pnmtvdi);
 	void OnSelChanged(const NMTREEVIEW *treeView);
+	void OnBeginDrag(const NMTREEVIEW *treeView);
 	void OnDelete();
 
 	void OnRClick(const NMHDR *pnmhdr);

@@ -4,8 +4,10 @@
 
 #include "stdafx.h"
 #include "BookmarkTreeView.h"
+#include "BookmarkDataExchange.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "../Helper/iDropSource.h"
 #include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
 #include <boost/range/adaptor/filtered.hpp>
@@ -112,6 +114,10 @@ LRESULT CALLBACK CBookmarkTreeView::TreeViewParentProc(HWND hwnd, UINT Msg, WPAR
 
 		case TVN_SELCHANGED:
 			OnSelChanged(reinterpret_cast<NMTREEVIEW *>(lParam));
+			break;
+
+		case TVN_BEGINDRAG:
+			OnBeginDrag(reinterpret_cast<NMTREEVIEW *>(lParam));
 			break;
 
 		case NM_RCLICK:
@@ -385,6 +391,39 @@ void CBookmarkTreeView::OnSelChanged(const NMTREEVIEW *treeView)
 {
 	auto bookmarkFolder = GetBookmarkFolderFromTreeView(treeView->itemNew.hItem);
 	selectionChangedSignal.m_signal(bookmarkFolder);
+}
+
+void CBookmarkTreeView::OnBeginDrag(const NMTREEVIEW *treeView)
+{
+	auto bookmarkFolder = GetBookmarkFolderFromTreeView(treeView->itemNew.hItem);
+
+	if (m_bookmarkTree->IsPermanentNode(bookmarkFolder))
+	{
+		return;
+	}
+
+	wil::com_ptr<IDropSource> dropSource;
+	HRESULT hr = CreateDropSource(&dropSource, DragType::LeftClick);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	auto &ownedPtr = bookmarkFolder->GetParent()->GetChildOwnedPtr(bookmarkFolder);
+	auto dataObject = BookmarkDataExchange::CreateDataObject(ownedPtr);
+
+	wil::com_ptr<IDragSourceHelper> dragSourceHelper;
+	hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_ALL,
+		IID_PPV_ARGS(&dragSourceHelper));
+
+	if (SUCCEEDED(hr))
+	{
+		dragSourceHelper->InitializeFromWindow(m_hTreeView, nullptr, dataObject.get());
+	}
+
+	DWORD effect;
+	DoDragDrop(dataObject.get(), dropSource.get(), DROPEFFECT_MOVE, &effect);
 }
 
 void CBookmarkTreeView::OnDelete()
