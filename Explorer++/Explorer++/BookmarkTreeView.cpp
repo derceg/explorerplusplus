@@ -39,8 +39,8 @@ CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView, HINSTANCE hInstance, IExplo
 		std::bind(&CBookmarkTreeView::OnBookmarkItemAdded, this, std::placeholders::_1, std::placeholders::_2)));
 	m_connections.push_back(m_bookmarkTree->bookmarkItemUpdatedSignal.AddObserver(
 		std::bind(&CBookmarkTreeView::OnBookmarkItemUpdated, this, std::placeholders::_1, std::placeholders::_2)));
-	m_connections.push_back(m_bookmarkTree->bookmarkItemRemovedSignal.AddObserver(
-		std::bind(&CBookmarkTreeView::OnBookmarkItemRemoved, this, std::placeholders::_1)));
+	m_connections.push_back(m_bookmarkTree->bookmarkItemPreRemovalSignal.AddObserver(
+		std::bind(&CBookmarkTreeView::OnBookmarkItemPreRemoval, this, std::placeholders::_1)));
 }
 
 LRESULT CALLBACK CBookmarkTreeView::BookmarkTreeViewProcStub(HWND hwnd, UINT uMsg,
@@ -315,9 +315,14 @@ void CBookmarkTreeView::OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, Bookma
 	TreeView_SetItem(m_hTreeView, &tvi);
 }
 
-void CBookmarkTreeView::OnBookmarkItemRemoved(const std::wstring &guid)
+void CBookmarkTreeView::OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem)
 {
-	auto itr = m_mapItem.find(guid);
+	if (!bookmarkItem.IsFolder())
+	{
+		return;
+	}
+
+	auto itr = m_mapItem.find(bookmarkItem.GetGUID());
 	assert(itr != m_mapItem.end());
 
 	/* TODO: Should collapse parent if it no longer

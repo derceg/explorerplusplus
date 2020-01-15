@@ -66,7 +66,7 @@ private:
 
 	void OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t index);
 	void OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);
-	void OnBookmarkItemRemoved(const std::wstring &guid);
+	void OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem);
 
 	HWND m_hTreeView;
 	DpiCompatibility m_dpiCompat;
