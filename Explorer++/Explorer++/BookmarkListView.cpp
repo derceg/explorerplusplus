@@ -4,8 +4,10 @@
 
 #include "stdafx.h"
 #include "BookmarkListView.h"
+#include "BookmarkDataExchange.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "../Helper/iDropSource.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
@@ -182,6 +184,10 @@ LRESULT CALLBACK CBookmarkListView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM w
 
 			case LVN_KEYDOWN:
 				OnKeyDown(reinterpret_cast<NMLVKEYDOWN *>(lParam));
+				break;
+
+			case LVN_BEGINDRAG:
+				OnBeginDrag(reinterpret_cast<NMLISTVIEW *>(lParam));
 				break;
 			}
 		}
@@ -477,6 +483,33 @@ void CBookmarkListView::OnKeyDown(const NMLVKEYDOWN *keyDown)
 	case VK_DELETE:
 		break;
 	}
+}
+
+void CBookmarkListView::OnBeginDrag(const NMLISTVIEW *listView)
+{
+	wil::com_ptr<IDropSource> dropSource;
+	HRESULT hr = CreateDropSource(&dropSource, DragType::LeftClick);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	BookmarkItem *bookmarkItem = GetBookmarkItemFromListView(listView->iItem);
+	auto &ownedPtr = bookmarkItem->GetParent()->GetChildOwnedPtr(bookmarkItem);
+	auto dataObject = BookmarkDataExchange::CreateDataObject(ownedPtr);
+
+	wil::com_ptr<IDragSourceHelper> dragSourceHelper;
+	hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_ALL,
+		IID_PPV_ARGS(&dragSourceHelper));
+
+	if (SUCCEEDED(hr))
+	{
+		dragSourceHelper->InitializeFromWindow(m_hListView, nullptr, dataObject.get());
+	}
+
+	DWORD effect;
+	DoDragDrop(dataObject.get(), dropSource.get(), DROPEFFECT_MOVE, &effect);
 }
 
 void CBookmarkListView::OnRename()

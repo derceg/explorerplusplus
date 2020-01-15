@@ -92,6 +92,7 @@ private:
 	BOOL OnBeginLabelEdit(const NMLVDISPINFO *dispInfo);
 	BOOL OnEndLabelEdit(const NMLVDISPINFO *dispInfo);
 	void OnKeyDown(const NMLVKEYDOWN *keyDown);
+	void OnBeginDrag(const NMLISTVIEW *listView);
 	void OnRename();
 
 	void OnHeaderRClick(const POINT &pt);
