@@ -37,27 +37,6 @@ wil::com_ptr<IDataObject> BookmarkDataExchange::CreateDataObject(const std::uniq
 	return dataObject;
 }
 
-std::unique_ptr<BookmarkItem> BookmarkDataExchange::ExtractBookmarkItem(IDataObject *dataObject)
-{
-	FORMATETC formatEtc = GetFormatEtc();
-	wil::unique_stg_medium stgMedium;
-	HRESULT hr = dataObject->GetData(&formatEtc, &stgMedium);
-
-	if (hr != S_OK)
-	{
-		return nullptr;
-	}
-
-	auto data = ReadBinaryDataFromGlobal(stgMedium.hGlobal);
-
-	if (!data)
-	{
-		return nullptr;
-	}
-
-	return BookmarkDataExchange::DeserializeBookmarkItem(*data);
-}
-
 std::string BookmarkDataExchange::SerializeBookmarkItem(const std::unique_ptr<BookmarkItem> &bookmarkItem)
 {
 	std::stringstream ss;

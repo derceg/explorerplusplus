@@ -679,8 +679,9 @@ DWORD CBookmarksToolbar::DragEnter(IDataObject *dataObject, DWORD keyState, POIN
 	UNREFERENCED_PARAMETER(pt);
 	UNREFERENCED_PARAMETER(effect);
 
-	m_cachedDropEffect = GetDropEffect(dataObject);
-	return m_cachedDropEffect;
+	m_bookmarkDropInfo = std::make_unique<BookmarkDropInfo>(dataObject, m_bookmarkTree);
+
+	return m_bookmarkDropInfo->GetDropEffect();
 }
 
 DWORD CBookmarksToolbar::DragOver(DWORD keyState, POINT pt, DWORD effect)
@@ -725,82 +726,26 @@ DWORD CBookmarksToolbar::DragOver(DWORD keyState, POINT pt, DWORD effect)
 		m_previousDropButton = selectedButtonIndex;
 	}
 
-	return m_cachedDropEffect;
+	return m_bookmarkDropInfo->GetDropEffect();
 }
 
 void CBookmarksToolbar::DragLeave()
 {
-	ResetToolbarState();
+	ResetDragDropState();
 }
 
 DWORD CBookmarksToolbar::Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
 {
+	UNREFERENCED_PARAMETER(dataObject);
 	UNREFERENCED_PARAMETER(keyState);
 	UNREFERENCED_PARAMETER(effect);
 
-	DWORD finalEffect = DROPEFFECT_NONE;
 	auto [parentFolder, position, selectedButtonIndex] = GetDropTarget(pt);
+	DWORD finalEffect = m_bookmarkDropInfo->PerformDrop(parentFolder, position);
 
-	if (IsDropFormatAvailable(dataObject, BookmarkDataExchange::GetFormatEtc()))
-	{
-		auto bookmarkItem = BookmarkDataExchange::ExtractBookmarkItem(dataObject);
-
-		if (bookmarkItem)
-		{
-			auto exingBookmarkItem = BookmarkHelper::GetBookmarkItemById(m_bookmarkTree, *bookmarkItem->GetOriginalGUID());
-
-			if (exingBookmarkItem)
-			{
-				m_bookmarkTree->MoveBookmarkItem(exingBookmarkItem, parentFolder, position);
-
-				finalEffect = DROPEFFECT_MOVE;
-			}
-		}
-	}
-	else if (IsDropFormatAvailable(dataObject, GetDroppedFilesFormatEtc()))
-	{
-		BookmarkItems bookmarkItems = CreateBookmarkItemsFromDroppedFiles(dataObject);
-		size_t i = 0;
-
-		for (auto &bookmarkItem : bookmarkItems)
-		{
-			m_bookmarkTree->AddBookmarkItem(parentFolder, std::move(bookmarkItem), position + i);
-			i++;
-		}
-
-		if (!bookmarkItems.empty())
-		{
-			finalEffect = DROPEFFECT_COPY;
-		}
-	}
-
-	ResetToolbarState();
+	ResetDragDropState();
 
 	return finalEffect;
-}
-
-DWORD CBookmarksToolbar::GetDropEffect(IDataObject *dataObject)
-{
-	if (IsDropFormatAvailable(dataObject, BookmarkDataExchange::GetFormatEtc()))
-	{
-		// TODO: Should block drop if a folder is dragged over itself.
-		return DROPEFFECT_MOVE;
-	}
-	else if (IsDropFormatAvailable(dataObject, GetDroppedFilesFormatEtc()))
-	{
-		auto droppedFiles = ExtractDroppedFilesList(dataObject);
-
-		bool allFolders = std::all_of(droppedFiles.begin(), droppedFiles.end(), [] (const std::wstring &path) {
-			return PathIsDirectory(path.c_str());
-		});
-
-		if (!droppedFiles.empty() && allFolders)
-		{
-			return DROPEFFECT_COPY;
-		}
-	}
-
-	return DROPEFFECT_NONE;
 }
 
 CBookmarksToolbar::BookmarkDropTarget CBookmarksToolbar::GetDropTarget(const POINT &pt)
@@ -890,29 +835,7 @@ void CBookmarksToolbar::SetButtonPressedState(int index, bool pressed)
 	SendMessage(m_hToolbar, TB_SETSTATE, tbButton.idCommand, MAKEWORD(state, 0));
 }
 
-BookmarkItems CBookmarksToolbar::CreateBookmarkItemsFromDroppedFiles(IDataObject *dataObject)
-{
-	BookmarkItems bookmarkItems;
-	auto droppedFiles = ExtractDroppedFilesList(dataObject);
-
-	for (auto &droppedFile : droppedFiles)
-	{
-		if (!PathIsDirectory(droppedFile.c_str()))
-		{
-			continue;
-		}
-
-		TCHAR displayName[MAX_PATH];
-		GetDisplayName(droppedFile.c_str(), displayName, SIZEOF_ARRAY(displayName), SHGDN_INFOLDER);
-
-		auto bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt, displayName, droppedFile.c_str());
-		bookmarkItems.push_back(std::move(bookmarkItem));
-	}
-
-	return bookmarkItems;
-}
-
-void CBookmarksToolbar::ResetToolbarState()
+void CBookmarksToolbar::ResetDragDropState()
 {
 	RemoveInsertionMark();
 
@@ -922,6 +845,8 @@ void CBookmarksToolbar::ResetToolbarState()
 
 		m_previousDropButton.reset();
 	}
+
+	m_bookmarkDropInfo.reset();
 }
 
 void CBookmarksToolbar::RemoveInsertionMark()

@@ -462,6 +462,7 @@
     <ClCompile Include="BookmarkClipboard.cpp" />
     <ClCompile Include="BookmarkContextMenu.cpp" />
     <ClCompile Include="BookmarkDataExchange.cpp" />
+    <ClCompile Include="BookmarkDropInfo.cpp" />
     <ClCompile Include="BookmarkItem.cpp" />
     <ClCompile Include="BookmarksMainMenu.cpp" />
     <ClCompile Include="BookmarkMenuBuilder.cpp" />
@@ -608,6 +609,7 @@
     <ClInclude Include="BookmarkClipboard.h" />
     <ClInclude Include="BookmarkContextMenu.h" />
     <ClInclude Include="BookmarkDataExchange.h" />
+    <ClInclude Include="BookmarkDropInfo.h" />
     <ClInclude Include="BookmarkHelper.h" />
     <ClInclude Include="BookmarkItem.h" />
     <ClInclude Include="BookmarkListView.h" />

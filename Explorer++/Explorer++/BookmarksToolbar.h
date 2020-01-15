@@ -5,6 +5,7 @@
 #pragma once
 
 #include "BookmarkContextMenu.h"
+#include "BookmarkDropInfo.h"
 #include "BookmarkItem.h"
 #include "BookmarkMenu.h"
 #include "BookmarkTree.h"
@@ -100,11 +101,9 @@ private:
 	void DragLeave() override;
 	DWORD Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
 
-	DWORD GetDropEffect(IDataObject *dataObject);
 	BookmarkDropTarget GetDropTarget(const POINT &pt);
 	void SetButtonPressedState(int index, bool pressed);
-	BookmarkItems CreateBookmarkItemsFromDroppedFiles(IDataObject *dataObject);
-	void ResetToolbarState();
+	void ResetDragDropState();
 	void RemoveInsertionMark();
 
 	HWND m_hToolbar;
@@ -129,8 +128,8 @@ private:
 
 	// Drag and drop.
 	wil::com_ptr<DropTarget> m_dropTarget;
+	std::unique_ptr<BookmarkDropInfo> m_bookmarkDropInfo;
 	std::optional<POINT> m_leftButtonDownPoint;
-	DWORD m_cachedDropEffect;
 	std::optional<int> m_previousDropButton;
 
 	std::vector<WindowSubclassWrapper> m_windowSubclasses;
