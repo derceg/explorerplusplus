@@ -781,45 +781,20 @@ DWORD CBookmarkListView::DragOver(DWORD keyState, POINT pt, DWORD effect)
 	UNREFERENCED_PARAMETER(keyState);
 	UNREFERENCED_PARAMETER(effect);
 
-	if (m_previousDropItem)
+	auto dropTarget = GetDropTarget(pt);
+	DWORD targetEffect = m_bookmarkDropInfo->GetDropEffect(dropTarget.parentFolder);
+
+	if (targetEffect != DROPEFFECT_NONE)
 	{
-		ListView_SetItemState(m_hListView, *m_previousDropItem, 0, LVIS_DROPHILITED);
-	}
-
-	auto [parentFolder, position, selectedItemIndex] = GetDropTarget(pt);
-
-	if (parentFolder == m_currentBookmarkFolder)
-	{
-		DWORD flags;
-		int numItems = ListView_GetItemCount(m_hListView);
-
-		if (position == static_cast<size_t>(numItems))
-		{
-			position--;
-			flags = LVIM_AFTER;
-		}
-		else
-		{
-			flags = 0;
-		}
-
-		LVINSERTMARK insertMark;
-		insertMark.cbSize = sizeof(insertMark);
-		insertMark.dwFlags = flags;
-		insertMark.iItem = static_cast<int>(position);
-		ListView_SetInsertMark(m_hListView, &insertMark);
-
-		m_previousDropItem.reset();
+		UpdateUiForDropTarget(dropTarget);
 	}
 	else
 	{
 		RemoveInsertionMark();
-
-		ListView_SetItemState(m_hListView, selectedItemIndex, LVIS_DROPHILITED, LVIS_DROPHILITED);
-		m_previousDropItem = selectedItemIndex;
+		RemoveDropHighlight();
 	}
 
-	return m_bookmarkDropInfo->GetDropEffect(parentFolder);
+	return targetEffect;
 }
 
 void CBookmarkListView::DragLeave()
@@ -923,15 +898,45 @@ int CBookmarkListView::FindNextItemIndex(const POINT &ptClient)
 	return nextIndex;
 }
 
+void CBookmarkListView::UpdateUiForDropTarget(const BookmarkDropTarget &dropTarget)
+{
+	RemoveDropHighlight();
+
+	if (dropTarget.parentFolder == m_currentBookmarkFolder)
+	{
+		DWORD flags;
+		int numItems = ListView_GetItemCount(m_hListView);
+		size_t finalPosition = dropTarget.position;
+
+		if (finalPosition == static_cast<size_t>(numItems))
+		{
+			finalPosition--;
+			flags = LVIM_AFTER;
+		}
+		else
+		{
+			flags = 0;
+		}
+
+		LVINSERTMARK insertMark;
+		insertMark.cbSize = sizeof(insertMark);
+		insertMark.dwFlags = flags;
+		insertMark.iItem = static_cast<int>(finalPosition);
+		ListView_SetInsertMark(m_hListView, &insertMark);
+	}
+	else
+	{
+		RemoveInsertionMark();
+
+		ListView_SetItemState(m_hListView, dropTarget.selectedItemIndex, LVIS_DROPHILITED, LVIS_DROPHILITED);
+		m_previousDropItem = dropTarget.selectedItemIndex;
+	}
+}
+
 void CBookmarkListView::ResetDragDropState()
 {
 	RemoveInsertionMark();
-
-	if (m_previousDropItem)
-	{
-		ListView_SetItemState(m_hListView, *m_previousDropItem, 0, LVIS_DROPHILITED);
-		m_previousDropItem.reset();
-	}
+	RemoveDropHighlight();
 
 	m_bookmarkDropInfo.reset();
 }
@@ -943,4 +948,13 @@ void CBookmarkListView::RemoveInsertionMark()
 	insertMark.dwFlags = 0;
 	insertMark.iItem = -1;
 	ListView_SetInsertMark(m_hListView, &insertMark);
+}
+
+void CBookmarkListView::RemoveDropHighlight()
+{
+	if (m_previousDropItem)
+	{
+		ListView_SetItemState(m_hListView, *m_previousDropItem, 0, LVIS_DROPHILITED);
+		m_previousDropItem.reset();
+	}
 }

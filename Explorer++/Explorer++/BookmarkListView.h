@@ -122,8 +122,10 @@ private:
 
 	BookmarkDropTarget GetDropTarget(const POINT &pt);
 	int FindNextItemIndex(const POINT &ptClient);
+	void UpdateUiForDropTarget(const BookmarkDropTarget &dropTarget);
 	void ResetDragDropState();
 	void RemoveInsertionMark();
+	void RemoveDropHighlight();
 
 	HWND m_hListView;
 	HMODULE m_resourceModule;
