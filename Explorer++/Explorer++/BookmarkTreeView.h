@@ -108,6 +108,8 @@ private:
 	wil::com_ptr<DropTarget> m_dropTarget;
 	std::unique_ptr<BookmarkDropInfo> m_bookmarkDropInfo;
 	std::optional<HTREEITEM> m_previousDropItem;
+	std::optional<POINT> m_previousDragOverPoint;
+	std::optional<BookmarkDropTarget> m_previousDropTarget;
 
 	std::vector<WindowSubclassWrapper> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;

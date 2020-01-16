@@ -523,12 +523,31 @@ DWORD CBookmarkTreeView::DragOver(DWORD keyState, POINT pt, DWORD effect)
 	UNREFERENCED_PARAMETER(keyState);
 	UNREFERENCED_PARAMETER(effect);
 
+	if (m_previousDragOverPoint
+		&& pt.x == m_previousDragOverPoint->x
+		&& pt.y == m_previousDragOverPoint->y)
+	{
+		return m_bookmarkDropInfo->GetDropEffect();
+	}
+
+	m_previousDragOverPoint = pt;
+
+	auto dropTarget = GetDropTarget(pt);
+
+	if (m_previousDropTarget
+		&& m_previousDropTarget->parentFolder == dropTarget.parentFolder
+		&& m_previousDropTarget->position == dropTarget.position
+		&& m_previousDropTarget->selectedItem == dropTarget.selectedItem)
+	{
+		return m_bookmarkDropInfo->GetDropEffect();
+	}
+
+	m_previousDropTarget = dropTarget;
+
 	if (m_previousDropItem)
 	{
 		TreeView_SetItemState(m_hTreeView, *m_previousDropItem, 0, TVIS_DROPHILITED);
 	}
-
-	auto dropTarget = GetDropTarget(pt);
 
 	if (dropTarget.selectedItem)
 	{
@@ -695,6 +714,8 @@ void CBookmarkTreeView::ResetDragDropState()
 	}
 
 	m_bookmarkDropInfo.reset();
+	m_previousDragOverPoint.reset();
+	m_previousDropTarget.reset();
 }
 
 void CBookmarkTreeView::RemoveInsertionMark()
