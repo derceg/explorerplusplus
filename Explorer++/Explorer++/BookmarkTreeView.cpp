@@ -546,59 +546,18 @@ DWORD CBookmarkTreeView::DragOver(DWORD keyState, POINT pt, DWORD effect)
 
 	m_previousDropTarget = dropTarget;
 
-	if (m_previousDropItem)
-	{
-		TreeView_SetItemState(m_hTreeView, *m_previousDropItem, 0, TVIS_DROPHILITED);
-	}
+	DWORD targetEffect = m_bookmarkDropInfo->GetDropEffect(dropTarget.parentFolder);
 
-	if (dropTarget.selectedItem)
+	if (targetEffect != DROPEFFECT_NONE)
 	{
-		RemoveInsertionMark();
-
-		TreeView_SetItemState(m_hTreeView, dropTarget.selectedItem, TVIS_DROPHILITED, TVIS_DROPHILITED);
-		m_previousDropItem = dropTarget.selectedItem;
+		UpdateUiForDropTarget(dropTarget);
 	}
 	else
 	{
-		HTREEITEM treeItem;
-		BOOL after;
-
-		auto &children = dropTarget.parentFolder->GetChildren();
-		auto insertItr = children.begin() + dropTarget.position;
-
-		auto nextFolderItr = std::find_if(insertItr, children.end(), [] (auto &child) {
-			return child->IsFolder();
-		});
-
-		// If the cursor is not over a folder, it means that it's within a
-		// particular parent folder. That parent must have at least one child
-		// folder, since if it didn't, that would mean that the folder wouldn't
-		// be expanded and the only possible positions would be within the
-		// grandparent folder, either before or after the parent (but not within
-		// it).
-		if (nextFolderItr == children.end())
-		{
-			auto reverseInsertItr = children.rbegin() + (children.size() - dropTarget.position);
-
-			auto previousFolderItr = std::find_if(reverseInsertItr, children.rend(), [] (auto &child) {
-				return child->IsFolder();
-			});
-
-			treeItem = m_mapItem.at((*previousFolderItr)->GetGUID());
-			after = TRUE;
-		}
-		else
-		{
-			treeItem = m_mapItem.at((*nextFolderItr)->GetGUID());
-			after = FALSE;
-		}
-
-		TreeView_SetInsertMark(m_hTreeView, treeItem, after);
-
-		m_previousDropItem.reset();
+		RemoveInsertionMark();
+		RemoveDropHighlight();
 	}
 
-	DWORD targetEffect = m_bookmarkDropInfo->GetDropEffect(dropTarget.parentFolder);
 	m_previousDropEffect = targetEffect;
 
 	return targetEffect;
@@ -708,15 +667,60 @@ HTREEITEM CBookmarkTreeView::FindNextItem(const POINT &ptClient) const
 	return treeItem;
 }
 
+void CBookmarkTreeView::UpdateUiForDropTarget(const BookmarkDropTarget &dropTarget)
+{
+	RemoveDropHighlight();
+
+	if (dropTarget.selectedItem)
+	{
+		RemoveInsertionMark();
+
+		TreeView_SetItemState(m_hTreeView, dropTarget.selectedItem, TVIS_DROPHILITED, TVIS_DROPHILITED);
+		m_previousDropItem = dropTarget.selectedItem;
+	}
+	else
+	{
+		HTREEITEM treeItem;
+		BOOL after;
+
+		auto &children = dropTarget.parentFolder->GetChildren();
+		auto insertItr = children.begin() + dropTarget.position;
+
+		auto nextFolderItr = std::find_if(insertItr, children.end(), [] (auto &child) {
+			return child->IsFolder();
+		});
+
+		// If the cursor is not over a folder, it means that it's within a
+		// particular parent folder. That parent must have at least one child
+		// folder, since if it didn't, that would mean that the folder wouldn't
+		// be expanded and the only possible positions would be within the
+		// grandparent folder, either before or after the parent (but not within
+		// it).
+		if (nextFolderItr == children.end())
+		{
+			auto reverseInsertItr = children.rbegin() + (children.size() - dropTarget.position);
+
+			auto previousFolderItr = std::find_if(reverseInsertItr, children.rend(), [] (auto &child) {
+				return child->IsFolder();
+			});
+
+			treeItem = m_mapItem.at((*previousFolderItr)->GetGUID());
+			after = TRUE;
+		}
+		else
+		{
+			treeItem = m_mapItem.at((*nextFolderItr)->GetGUID());
+			after = FALSE;
+		}
+
+		TreeView_SetInsertMark(m_hTreeView, treeItem, after);
+	}
+}
+
 void CBookmarkTreeView::ResetDragDropState()
 {
 	RemoveInsertionMark();
-
-	if (m_previousDropItem)
-	{
-		TreeView_SetItemState(m_hTreeView, *m_previousDropItem, 0, TVIS_DROPHILITED);
-		m_previousDropItem.reset();
-	}
+	RemoveDropHighlight();
 
 	m_bookmarkDropInfo.reset();
 	m_previousDragOverPoint.reset();
@@ -726,4 +730,13 @@ void CBookmarkTreeView::ResetDragDropState()
 void CBookmarkTreeView::RemoveInsertionMark()
 {
 	TreeView_SetInsertMark(m_hTreeView, nullptr, FALSE);
+}
+
+void CBookmarkTreeView::RemoveDropHighlight()
+{
+	if (m_previousDropItem)
+	{
+		TreeView_SetItemState(m_hTreeView, *m_previousDropItem, 0, TVIS_DROPHILITED);
+		m_previousDropItem.reset();
+	}
 }

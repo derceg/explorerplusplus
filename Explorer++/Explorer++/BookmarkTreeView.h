@@ -88,8 +88,10 @@ private:
 
 	BookmarkDropTarget GetDropTarget(const POINT &pt);
 	HTREEITEM FindNextItem(const POINT &ptClient) const;
+	void UpdateUiForDropTarget(const BookmarkDropTarget &dropTarget);
 	void ResetDragDropState();
 	void RemoveInsertionMark();
+	void RemoveDropHighlight();
 
 	HWND m_hTreeView;
 	DpiCompatibility m_dpiCompat;
