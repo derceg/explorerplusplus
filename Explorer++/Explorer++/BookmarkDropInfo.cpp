@@ -16,8 +16,15 @@ BookmarkDropInfo::BookmarkDropInfo(IDataObject *dataObject, BookmarkTree *bookma
 
 }
 
-DWORD BookmarkDropInfo::GetDropEffect()
+DWORD BookmarkDropInfo::GetDropEffect(BookmarkItem *parentFolder)
 {
+	assert(parentFolder->IsFolder());
+
+	if (!m_bookmarkTree->CanAddChildren(parentFolder))
+	{
+		return DROPEFFECT_NONE;
+	}
+
 	if (!m_dropEffect)
 	{
 		m_dropEffect = DetermineDropEffect();
@@ -55,7 +62,7 @@ DWORD BookmarkDropInfo::PerformDrop(BookmarkItem *parentFolder, size_t position)
 	assert(parentFolder->IsFolder());
 
 	BookmarkItems bookmarkItems = ExtractBookmarkItems();
-	DWORD targetEffect = GetDropEffect();
+	DWORD targetEffect = GetDropEffect(parentFolder);
 	DWORD finalEffect = DROPEFFECT_NONE;
 	size_t i = 0;
 

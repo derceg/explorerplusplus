@@ -21,6 +21,7 @@ public:
 	BookmarkItem *GetOtherBookmarksFolder();
 	const BookmarkItem *GetOtherBookmarksFolder() const;
 
+	bool CanAddChildren(const BookmarkItem *bookmarkItem) const;
 	bool IsPermanentNode(const BookmarkItem *bookmarkItem) const;
 
 	void AddBookmarkItem(BookmarkItem *parent, std::unique_ptr<BookmarkItem> bookmarkItem, size_t index);

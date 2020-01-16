@@ -771,7 +771,9 @@ DWORD CBookmarkListView::DragEnter(IDataObject *dataObject, DWORD keyState, POIN
 
 	m_bookmarkDropInfo = std::make_unique<BookmarkDropInfo>(dataObject, m_bookmarkTree);
 
-	return m_bookmarkDropInfo->GetDropEffect();
+	auto dropTarget = GetDropTarget(pt);
+
+	return m_bookmarkDropInfo->GetDropEffect(dropTarget.parentFolder);
 }
 
 DWORD CBookmarkListView::DragOver(DWORD keyState, POINT pt, DWORD effect)
@@ -817,7 +819,7 @@ DWORD CBookmarkListView::DragOver(DWORD keyState, POINT pt, DWORD effect)
 		m_previousDropItem = selectedItemIndex;
 	}
 
-	return m_bookmarkDropInfo->GetDropEffect();
+	return m_bookmarkDropInfo->GetDropEffect(parentFolder);
 }
 
 void CBookmarkListView::DragLeave()

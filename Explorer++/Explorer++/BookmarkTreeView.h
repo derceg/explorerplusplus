@@ -110,6 +110,7 @@ private:
 	std::optional<HTREEITEM> m_previousDropItem;
 	std::optional<POINT> m_previousDragOverPoint;
 	std::optional<BookmarkDropTarget> m_previousDropTarget;
+	DWORD m_previousDropEffect;
 
 	std::vector<WindowSubclassWrapper> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;

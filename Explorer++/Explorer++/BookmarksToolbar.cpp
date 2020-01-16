@@ -681,7 +681,9 @@ DWORD CBookmarksToolbar::DragEnter(IDataObject *dataObject, DWORD keyState, POIN
 
 	m_bookmarkDropInfo = std::make_unique<BookmarkDropInfo>(dataObject, m_bookmarkTree);
 
-	return m_bookmarkDropInfo->GetDropEffect();
+	auto dropTarget = GetDropTarget(pt);
+
+	return m_bookmarkDropInfo->GetDropEffect(dropTarget.parentFolder);
 }
 
 DWORD CBookmarksToolbar::DragOver(DWORD keyState, POINT pt, DWORD effect)
@@ -726,7 +728,7 @@ DWORD CBookmarksToolbar::DragOver(DWORD keyState, POINT pt, DWORD effect)
 		m_previousDropButton = selectedButtonIndex;
 	}
 
-	return m_bookmarkDropInfo->GetDropEffect();
+	return m_bookmarkDropInfo->GetDropEffect(parentFolder);
 }
 
 void CBookmarksToolbar::DragLeave()

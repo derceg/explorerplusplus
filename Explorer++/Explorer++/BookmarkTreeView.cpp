@@ -515,7 +515,9 @@ DWORD CBookmarkTreeView::DragEnter(IDataObject *dataObject, DWORD keyState, POIN
 
 	m_bookmarkDropInfo = std::make_unique<BookmarkDropInfo>(dataObject, m_bookmarkTree);
 
-	return m_bookmarkDropInfo->GetDropEffect();
+	auto dropTarget = GetDropTarget(pt);
+
+	return m_bookmarkDropInfo->GetDropEffect(dropTarget.parentFolder);
 }
 
 DWORD CBookmarkTreeView::DragOver(DWORD keyState, POINT pt, DWORD effect)
@@ -527,7 +529,7 @@ DWORD CBookmarkTreeView::DragOver(DWORD keyState, POINT pt, DWORD effect)
 		&& pt.x == m_previousDragOverPoint->x
 		&& pt.y == m_previousDragOverPoint->y)
 	{
-		return m_bookmarkDropInfo->GetDropEffect();
+		return m_previousDropEffect;
 	}
 
 	m_previousDragOverPoint = pt;
@@ -539,7 +541,7 @@ DWORD CBookmarkTreeView::DragOver(DWORD keyState, POINT pt, DWORD effect)
 		&& m_previousDropTarget->position == dropTarget.position
 		&& m_previousDropTarget->selectedItem == dropTarget.selectedItem)
 	{
-		return m_bookmarkDropInfo->GetDropEffect();
+		return m_previousDropEffect;
 	}
 
 	m_previousDropTarget = dropTarget;
@@ -596,7 +598,10 @@ DWORD CBookmarkTreeView::DragOver(DWORD keyState, POINT pt, DWORD effect)
 		m_previousDropItem.reset();
 	}
 
-	return m_bookmarkDropInfo->GetDropEffect();
+	DWORD targetEffect = m_bookmarkDropInfo->GetDropEffect(dropTarget.parentFolder);
+	m_previousDropEffect = targetEffect;
+
+	return targetEffect;
 }
 
 void CBookmarkTreeView::DragLeave()

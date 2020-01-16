@@ -14,7 +14,7 @@ public:
 
 	BookmarkDropInfo(IDataObject *dataObject, BookmarkTree *bookmarkTree);
 
-	DWORD GetDropEffect();
+	DWORD GetDropEffect(BookmarkItem *parentFolder);
 	DWORD PerformDrop(BookmarkItem *parentFolder, size_t position);
 
 private:
