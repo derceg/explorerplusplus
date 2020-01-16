@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "BookmarkDropInfo.h"
 #include "BookmarkHelper.h"
 #include "BookmarkItem.h"
 #include "BookmarkTree.h"
@@ -11,6 +12,7 @@
 #include "ResourceHelper.h"
 #include "SignalWrapper.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/DropTarget.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
@@ -18,7 +20,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-class CBookmarkTreeView
+class CBookmarkTreeView : private DropTargetInternal
 {
 public:
 
@@ -38,8 +40,17 @@ private:
 
 	using ItemMap_t = std::unordered_map<std::wstring, HTREEITEM>;
 
-	static const UINT_PTR SUBCLASS_ID = 0;
-	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
+	struct BookmarkDropTarget
+	{
+		BookmarkItem *parentFolder;
+		size_t position;
+		HTREEITEM selectedItem;
+	};
+
+	static inline const UINT_PTR SUBCLASS_ID = 0;
+	static inline const UINT_PTR PARENT_SUBCLASS_ID = 0;
+
+	static inline const double FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE = 0.2;
 
 	static LRESULT CALLBACK BookmarkTreeViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK TreeViewProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam);
@@ -69,6 +80,17 @@ private:
 	void OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);
 	void OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem);
 
+	// DropTargetInternal methods.
+	DWORD DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
+	DWORD DragOver(DWORD keyState, POINT pt, DWORD effect) override;
+	void DragLeave() override;
+	DWORD Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
+
+	BookmarkDropTarget GetDropTarget(const POINT &pt);
+	HTREEITEM FindNextItem(const POINT &ptClient) const;
+	void ResetDragDropState();
+	void RemoveInsertionMark();
+
 	HWND m_hTreeView;
 	DpiCompatibility m_dpiCompat;
 	wil::unique_himagelist m_imageList;
@@ -82,6 +104,10 @@ private:
 
 	bool m_bNewFolderCreated;
 	std::wstring m_NewFolderGUID;
+
+	wil::com_ptr<DropTarget> m_dropTarget;
+	std::unique_ptr<BookmarkDropInfo> m_bookmarkDropInfo;
+	std::optional<HTREEITEM> m_previousDropItem;
 
 	std::vector<WindowSubclassWrapper> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;

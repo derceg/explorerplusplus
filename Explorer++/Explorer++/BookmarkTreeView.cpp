@@ -10,6 +10,7 @@
 #include "../Helper/iDropSource.h"
 #include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
+#include "../Helper/WindowHelper.h"
 #include <boost/range/adaptor/filtered.hpp>
 #include <stack>
 
@@ -34,6 +35,8 @@ CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView, HINSTANCE hInstance, IExplo
 	std::tie(m_imageList, m_imageListMappings) = ResourceHelper::CreateIconImageList(expp->GetIconResourceLoader(),
 		iconWidth, iconHeight, { Icon::Folder});
 	TreeView_SetImageList(hTreeView, m_imageList.get(), TVSIL_NORMAL);
+
+	m_dropTarget = DropTarget::Create(m_hTreeView, this);
 
 	SetupTreeView(setExpansion, guidSelected);
 
@@ -502,4 +505,199 @@ BookmarkItem *CBookmarkTreeView::GetBookmarkFolderFromTreeView(HTREEITEM hItem)
 	TreeView_GetItem(m_hTreeView, &tvi);
 
 	return reinterpret_cast<BookmarkItem *>(tvi.lParam);
+}
+
+DWORD CBookmarkTreeView::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
+{
+	UNREFERENCED_PARAMETER(keyState);
+	UNREFERENCED_PARAMETER(pt);
+	UNREFERENCED_PARAMETER(effect);
+
+	m_bookmarkDropInfo = std::make_unique<BookmarkDropInfo>(dataObject, m_bookmarkTree);
+
+	return m_bookmarkDropInfo->GetDropEffect();
+}
+
+DWORD CBookmarkTreeView::DragOver(DWORD keyState, POINT pt, DWORD effect)
+{
+	UNREFERENCED_PARAMETER(keyState);
+	UNREFERENCED_PARAMETER(effect);
+
+	if (m_previousDropItem)
+	{
+		TreeView_SetItemState(m_hTreeView, *m_previousDropItem, 0, TVIS_DROPHILITED);
+	}
+
+	auto dropTarget = GetDropTarget(pt);
+
+	if (dropTarget.selectedItem)
+	{
+		RemoveInsertionMark();
+
+		TreeView_SetItemState(m_hTreeView, dropTarget.selectedItem, TVIS_DROPHILITED, TVIS_DROPHILITED);
+		m_previousDropItem = dropTarget.selectedItem;
+	}
+	else
+	{
+		HTREEITEM treeItem;
+		BOOL after;
+
+		auto &children = dropTarget.parentFolder->GetChildren();
+		auto insertItr = children.begin() + dropTarget.position;
+
+		auto nextFolderItr = std::find_if(insertItr, children.end(), [] (auto &child) {
+			return child->IsFolder();
+		});
+
+		// If the cursor is not over a folder, it means that it's within a
+		// particular parent folder. That parent must have at least one child
+		// folder, since if it didn't, that would mean that the folder wouldn't
+		// be expanded and the only possible positions would be within the
+		// grandparent folder, either before or after the parent (but not within
+		// it).
+		if (nextFolderItr == children.end())
+		{
+			auto reverseInsertItr = children.rbegin() + (children.size() - dropTarget.position);
+
+			auto previousFolderItr = std::find_if(reverseInsertItr, children.rend(), [] (auto &child) {
+				return child->IsFolder();
+			});
+
+			treeItem = m_mapItem.at((*previousFolderItr)->GetGUID());
+			after = TRUE;
+		}
+		else
+		{
+			treeItem = m_mapItem.at((*nextFolderItr)->GetGUID());
+			after = FALSE;
+		}
+
+		TreeView_SetInsertMark(m_hTreeView, treeItem, after);
+
+		m_previousDropItem.reset();
+	}
+
+	return m_bookmarkDropInfo->GetDropEffect();
+}
+
+void CBookmarkTreeView::DragLeave()
+{
+	ResetDragDropState();
+}
+
+DWORD CBookmarkTreeView::Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
+{
+	UNREFERENCED_PARAMETER(dataObject);
+	UNREFERENCED_PARAMETER(keyState);
+	UNREFERENCED_PARAMETER(effect);
+
+	auto [parentFolder, position, selectedItemIndex] = GetDropTarget(pt);
+	DWORD finalEffect = m_bookmarkDropInfo->PerformDrop(parentFolder, position);
+
+	ResetDragDropState();
+
+	return finalEffect;
+}
+
+CBookmarkTreeView::BookmarkDropTarget CBookmarkTreeView::GetDropTarget(const POINT &pt)
+{
+	POINT ptClient = pt;
+	ScreenToClient(m_hTreeView, &ptClient);
+
+	TVHITTESTINFO hitTestInfo;
+	hitTestInfo.pt = ptClient;
+	HTREEITEM treeItem = TreeView_HitTest(m_hTreeView, &hitTestInfo);
+
+	BookmarkItem *parentFolder = nullptr;
+	BookmarkItem *selectedFolder = nullptr;
+	HTREEITEM selectedItem = nullptr;
+	size_t position;
+
+	if (treeItem)
+	{
+		auto bookmarkFolder = GetBookmarkFolderFromTreeView(treeItem);
+
+		RECT itemRect;
+		TreeView_GetItemRect(m_hTreeView, treeItem, &itemRect, FALSE);
+
+		RECT folderCentralRect = itemRect;
+		int indent = static_cast<int>(FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE * GetRectHeight(&itemRect));
+		InflateRect(&folderCentralRect, 0, -indent);
+
+		if (ptClient.y < folderCentralRect.top)
+		{
+			parentFolder = bookmarkFolder->GetParent();
+			position = bookmarkFolder->GetParent()->GetChildIndex(bookmarkFolder);
+		}
+		else if (ptClient.y > folderCentralRect.bottom)
+		{
+			parentFolder = bookmarkFolder->GetParent();
+			position = bookmarkFolder->GetParent()->GetChildIndex(bookmarkFolder) + 1;
+		}
+		else
+		{
+			parentFolder = bookmarkFolder;
+			position = bookmarkFolder->GetChildren().size();
+
+			selectedItem = treeItem;
+		}
+
+		selectedFolder = bookmarkFolder;
+	}
+	else
+	{
+		HTREEITEM nextItem = FindNextItem(ptClient);
+
+		if (nextItem)
+		{
+			auto nextBookmarkFolder = GetBookmarkFolderFromTreeView(nextItem);
+			parentFolder = nextBookmarkFolder->GetParent();
+			position = nextBookmarkFolder->GetParent()->GetChildIndex(nextBookmarkFolder);
+		}
+		else
+		{
+			parentFolder = m_bookmarkTree->GetRoot();
+			position = m_bookmarkTree->GetRoot()->GetChildren().size();
+		}
+	}
+
+	return { parentFolder, position, selectedItem };
+}
+
+HTREEITEM CBookmarkTreeView::FindNextItem(const POINT &ptClient) const
+{
+	HTREEITEM treeItem = TreeView_GetFirstVisible(m_hTreeView);
+
+	do 
+	{
+		RECT rc;
+		TreeView_GetItemRect(m_hTreeView, treeItem, &rc, FALSE);
+
+		if (ptClient.y < rc.top)
+		{
+			break;
+		}
+
+		treeItem = TreeView_GetNextVisible(m_hTreeView, treeItem);
+	} while (treeItem != nullptr);
+
+	return treeItem;
+}
+
+void CBookmarkTreeView::ResetDragDropState()
+{
+	RemoveInsertionMark();
+
+	if (m_previousDropItem)
+	{
+		TreeView_SetItemState(m_hTreeView, *m_previousDropItem, 0, TVIS_DROPHILITED);
+		m_previousDropItem.reset();
+	}
+
+	m_bookmarkDropInfo.reset();
+}
+
+void CBookmarkTreeView::RemoveInsertionMark()
+{
+	TreeView_SetInsertMark(m_hTreeView, nullptr, FALSE);
 }
