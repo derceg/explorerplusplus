@@ -676,7 +676,6 @@ std::optional<int> CBookmarksToolbar::GetBookmarkItemIndex(const BookmarkItem *b
 DWORD CBookmarksToolbar::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
 {
 	UNREFERENCED_PARAMETER(keyState);
-	UNREFERENCED_PARAMETER(pt);
 	UNREFERENCED_PARAMETER(effect);
 
 	m_bookmarkDropInfo = std::make_unique<BookmarkDropInfo>(dataObject, m_bookmarkTree);
@@ -696,16 +695,17 @@ DWORD CBookmarksToolbar::DragOver(DWORD keyState, POINT pt, DWORD effect)
 		SetButtonPressedState(*m_previousDropButton, false);
 	}
 
-	auto [parentFolder, position, selectedButtonIndex] = GetDropTarget(pt);
+	auto dropTarget = GetDropTarget(pt);
 
-	if (parentFolder == m_bookmarkTree->GetBookmarksToolbarFolder())
+	if (dropTarget.parentFolder == m_bookmarkTree->GetBookmarksToolbarFolder())
 	{
 		DWORD flags;
 		int numButtons = static_cast<int>(SendMessage(m_hToolbar, TB_BUTTONCOUNT, 0, 0));
+		size_t finalPosition = dropTarget.position;
 
-		if (position == static_cast<size_t>(numButtons))
+		if (finalPosition == static_cast<size_t>(numButtons))
 		{
-			position--;
+			finalPosition--;
 			flags = TBIMHT_AFTER;
 		}
 		else
@@ -714,7 +714,7 @@ DWORD CBookmarksToolbar::DragOver(DWORD keyState, POINT pt, DWORD effect)
 		}
 
 		TBINSERTMARK tbim;
-		tbim.iButton = static_cast<int>(position);
+		tbim.iButton = static_cast<int>(finalPosition);
 		tbim.dwFlags = flags;
 		SendMessage(m_hToolbar, TB_SETINSERTMARK, 0, reinterpret_cast<LPARAM>(&tbim));
 
@@ -724,11 +724,14 @@ DWORD CBookmarksToolbar::DragOver(DWORD keyState, POINT pt, DWORD effect)
 	{
 		RemoveInsertionMark();
 
-		SetButtonPressedState(selectedButtonIndex, true);
-		m_previousDropButton = selectedButtonIndex;
+		auto selectedButtonIndex = GetBookmarkItemIndex(dropTarget.parentFolder);
+		assert(selectedButtonIndex);
+
+		SetButtonPressedState(*selectedButtonIndex, true);
+		m_previousDropButton = *selectedButtonIndex;
 	}
 
-	return m_bookmarkDropInfo->GetDropEffect(parentFolder);
+	return m_bookmarkDropInfo->GetDropEffect(dropTarget.parentFolder);
 }
 
 void CBookmarksToolbar::DragLeave()
@@ -742,8 +745,8 @@ DWORD CBookmarksToolbar::Drop(IDataObject *dataObject, DWORD keyState, POINT pt,
 	UNREFERENCED_PARAMETER(keyState);
 	UNREFERENCED_PARAMETER(effect);
 
-	auto [parentFolder, position, selectedButtonIndex] = GetDropTarget(pt);
-	DWORD finalEffect = m_bookmarkDropInfo->PerformDrop(parentFolder, position);
+	auto dropTarget = GetDropTarget(pt);
+	DWORD finalEffect = m_bookmarkDropInfo->PerformDrop(dropTarget.parentFolder, dropTarget.position);
 
 	ResetDragDropState();
 
@@ -805,7 +808,7 @@ CBookmarksToolbar::BookmarkDropTarget CBookmarksToolbar::GetDropTarget(const POI
 		position = FindNextButtonIndex(ptClient);
 	}
 
-	return { parentFolder, position, index };
+	return { parentFolder, position };
 }
 
 void CBookmarksToolbar::SetButtonPressedState(int index, bool pressed)

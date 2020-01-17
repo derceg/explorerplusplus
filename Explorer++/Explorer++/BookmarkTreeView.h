@@ -44,7 +44,7 @@ private:
 	{
 		BookmarkItem *parentFolder;
 		size_t position;
-		HTREEITEM selectedItem;
+		bool parentFolderSelected;
 	};
 
 	static inline const UINT_PTR SUBCLASS_ID = 0;

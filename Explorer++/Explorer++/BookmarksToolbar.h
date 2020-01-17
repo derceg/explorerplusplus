@@ -33,7 +33,6 @@ private:
 	{
 		BookmarkItem *parentFolder;
 		size_t position;
-		int selectedButtonIndex;
 	};
 
 	CBookmarksToolbar & operator = (const CBookmarksToolbar &bt);

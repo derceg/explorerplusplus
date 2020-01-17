@@ -510,7 +510,6 @@ BookmarkItem *CBookmarkTreeView::GetBookmarkFolderFromTreeView(HTREEITEM hItem)
 DWORD CBookmarkTreeView::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
 {
 	UNREFERENCED_PARAMETER(keyState);
-	UNREFERENCED_PARAMETER(pt);
 	UNREFERENCED_PARAMETER(effect);
 
 	m_bookmarkDropInfo = std::make_unique<BookmarkDropInfo>(dataObject, m_bookmarkTree);
@@ -539,7 +538,7 @@ DWORD CBookmarkTreeView::DragOver(DWORD keyState, POINT pt, DWORD effect)
 	if (m_previousDropTarget
 		&& m_previousDropTarget->parentFolder == dropTarget.parentFolder
 		&& m_previousDropTarget->position == dropTarget.position
-		&& m_previousDropTarget->selectedItem == dropTarget.selectedItem)
+		&& m_previousDropTarget->parentFolderSelected == dropTarget.parentFolderSelected)
 	{
 		return m_previousDropEffect;
 	}
@@ -574,8 +573,8 @@ DWORD CBookmarkTreeView::Drop(IDataObject *dataObject, DWORD keyState, POINT pt,
 	UNREFERENCED_PARAMETER(keyState);
 	UNREFERENCED_PARAMETER(effect);
 
-	auto [parentFolder, position, selectedItemIndex] = GetDropTarget(pt);
-	DWORD finalEffect = m_bookmarkDropInfo->PerformDrop(parentFolder, position);
+	auto dropTarget = GetDropTarget(pt);
+	DWORD finalEffect = m_bookmarkDropInfo->PerformDrop(dropTarget.parentFolder, dropTarget.position);
 
 	ResetDragDropState();
 
@@ -592,8 +591,7 @@ CBookmarkTreeView::BookmarkDropTarget CBookmarkTreeView::GetDropTarget(const POI
 	HTREEITEM treeItem = TreeView_HitTest(m_hTreeView, &hitTestInfo);
 
 	BookmarkItem *parentFolder = nullptr;
-	BookmarkItem *selectedFolder = nullptr;
-	HTREEITEM selectedItem = nullptr;
+	bool parentFolderSelected = false;
 	size_t position;
 
 	if (treeItem)
@@ -621,11 +619,8 @@ CBookmarkTreeView::BookmarkDropTarget CBookmarkTreeView::GetDropTarget(const POI
 		{
 			parentFolder = bookmarkFolder;
 			position = bookmarkFolder->GetChildren().size();
-
-			selectedItem = treeItem;
+			parentFolderSelected = true;
 		}
-
-		selectedFolder = bookmarkFolder;
 	}
 	else
 	{
@@ -644,7 +639,7 @@ CBookmarkTreeView::BookmarkDropTarget CBookmarkTreeView::GetDropTarget(const POI
 		}
 	}
 
-	return { parentFolder, position, selectedItem };
+	return { parentFolder, position, parentFolderSelected };
 }
 
 HTREEITEM CBookmarkTreeView::FindNextItem(const POINT &ptClient) const
@@ -671,12 +666,14 @@ void CBookmarkTreeView::UpdateUiForDropTarget(const BookmarkDropTarget &dropTarg
 {
 	RemoveDropHighlight();
 
-	if (dropTarget.selectedItem)
+	if (dropTarget.parentFolderSelected)
 	{
 		RemoveInsertionMark();
 
-		TreeView_SetItemState(m_hTreeView, dropTarget.selectedItem, TVIS_DROPHILITED, TVIS_DROPHILITED);
-		m_previousDropItem = dropTarget.selectedItem;
+		HTREEITEM selectedItem = m_mapItem.at(dropTarget.parentFolder->GetGUID());
+
+		TreeView_SetItemState(m_hTreeView, selectedItem, TVIS_DROPHILITED, TVIS_DROPHILITED);
+		m_previousDropItem = selectedItem;
 	}
 	else
 	{

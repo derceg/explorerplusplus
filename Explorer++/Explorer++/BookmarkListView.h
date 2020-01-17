@@ -58,7 +58,6 @@ private:
 	{
 		BookmarkItem *parentFolder;
 		size_t position;
-		int selectedItemIndex;
 	};
 
 	static inline const UINT_PTR PARENT_SUBCLASS_ID = 0;
