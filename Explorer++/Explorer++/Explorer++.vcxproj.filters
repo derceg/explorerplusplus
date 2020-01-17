@@ -388,6 +388,9 @@
     <ClCompile Include="BookmarkDropInfo.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
+    <ClCompile Include="BookmarkDropTargetWindow.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -785,6 +788,9 @@
     </ClInclude>
     <ClInclude Include="BookmarkDropInfo.h">
       <Filter>Bookmarks</Filter>
+    </ClInclude>
+    <ClInclude Include="BookmarkDropTargetWindow.h">
+      <Filter>Bookmarks\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

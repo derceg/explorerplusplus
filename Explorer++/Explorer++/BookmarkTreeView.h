@@ -5,6 +5,7 @@
 #pragma once
 
 #include "BookmarkDropInfo.h"
+#include "BookmarkDropTargetWindow.h"
 #include "BookmarkHelper.h"
 #include "BookmarkItem.h"
 #include "BookmarkTree.h"
@@ -12,7 +13,6 @@
 #include "ResourceHelper.h"
 #include "SignalWrapper.h"
 #include "../Helper/DpiCompatibility.h"
-#include "../Helper/DropTarget.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
@@ -20,7 +20,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-class CBookmarkTreeView : private DropTargetInternal
+class CBookmarkTreeView : private BookmarkDropTargetWindow
 {
 public:
 
@@ -39,13 +39,6 @@ public:
 private:
 
 	using ItemMap_t = std::unordered_map<std::wstring, HTREEITEM>;
-
-	struct BookmarkDropTarget
-	{
-		BookmarkItem *parentFolder;
-		size_t position;
-		bool parentFolderSelected;
-	};
 
 	static inline const UINT_PTR SUBCLASS_ID = 0;
 	static inline const UINT_PTR PARENT_SUBCLASS_ID = 0;
@@ -80,16 +73,10 @@ private:
 	void OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);
 	void OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem);
 
-	// DropTargetInternal methods.
-	DWORD DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
-	DWORD DragOver(DWORD keyState, POINT pt, DWORD effect) override;
-	void DragLeave() override;
-	DWORD Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
-
-	BookmarkDropTarget GetDropTarget(const POINT &pt);
+	DropLocation GetDropLocation(const POINT &pt) override;
 	HTREEITEM FindNextItem(const POINT &ptClient) const;
-	void UpdateUiForDropTarget(const BookmarkDropTarget &dropTarget);
-	void ResetDragDropState();
+	void UpdateUiForDropLocation(const DropLocation &dropLocation) override;
+	void ResetDropUiState() override;
 	void RemoveInsertionMark();
 	void RemoveDropHighlight();
 
@@ -107,12 +94,7 @@ private:
 	bool m_bNewFolderCreated;
 	std::wstring m_NewFolderGUID;
 
-	wil::com_ptr<DropTarget> m_dropTarget;
-	std::unique_ptr<BookmarkDropInfo> m_bookmarkDropInfo;
 	std::optional<HTREEITEM> m_previousDropItem;
-	std::optional<POINT> m_previousDragOverPoint;
-	std::optional<BookmarkDropTarget> m_previousDropTarget;
-	DWORD m_previousDropEffect;
 
 	std::vector<WindowSubclassWrapper> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;

@@ -5,6 +5,7 @@
 #pragma once
 
 #include "BookmarkDropInfo.h"
+#include "BookmarkDropTargetWindow.h"
 #include "BookmarkHelper.h"
 #include "BookmarkItem.h"
 #include "BookmarkTree.h"
@@ -12,14 +13,13 @@
 #include "ResourceHelper.h"
 #include "SignalWrapper.h"
 #include "../Helper/DpiCompatibility.h"
-#include "../Helper/DropTarget.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/signals2.hpp>
 #include <wil/com.h>
 #include <wil/resource.h>
 #include <optional>
 
-class CBookmarkListView : private DropTargetInternal
+class CBookmarkListView : private BookmarkDropTargetWindow
 {
 public:
 
@@ -53,12 +53,6 @@ public:
 	SignalWrapper<CBookmarkListView, void(BookmarkItem *bookmarkFolder)> navigationSignal;
 
 private:
-
-	struct BookmarkDropTarget
-	{
-		BookmarkItem *parentFolder;
-		size_t position;
-	};
 
 	static inline const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
@@ -113,16 +107,10 @@ private:
 	Column &GetColumnByType(ColumnType columnType);
 	int GetColumnIndexByType(ColumnType columnType) const;
 
-	// DropTargetInternal methods.
-	DWORD DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
-	DWORD DragOver(DWORD keyState, POINT pt, DWORD effect) override;
-	void DragLeave() override;
-	DWORD Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
-
-	BookmarkDropTarget GetDropTarget(const POINT &pt);
+	DropLocation GetDropLocation(const POINT &pt) override;
 	int FindNextItemIndex(const POINT &ptClient);
-	void UpdateUiForDropTarget(const BookmarkDropTarget &dropTarget);
-	void ResetDragDropState();
+	void UpdateUiForDropLocation(const DropLocation &dropLocation) override;
+	void ResetDropUiState() override;
 	void RemoveInsertionMark();
 	void RemoveDropHighlight();
 
@@ -139,8 +127,6 @@ private:
 	BookmarkHelper::SortMode m_sortMode;
 	bool m_sortAscending;
 
-	wil::com_ptr<DropTarget> m_dropTarget;
-	std::unique_ptr<BookmarkDropInfo> m_bookmarkDropInfo;
 	std::optional<int> m_previousDropItem;
 
 	std::vector<WindowSubclassWrapper> m_windowSubclasses;

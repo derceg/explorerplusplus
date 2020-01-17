@@ -16,6 +16,7 @@
 
 CBookmarkListView::CBookmarkListView(HWND hListView, HMODULE resourceModule,
 	BookmarkTree *bookmarkTree, IExplorerplusplus *expp, const std::vector<Column> &initialColumns) :
+	BookmarkDropTargetWindow(hListView, bookmarkTree),
 	m_hListView(hListView),
 	m_resourceModule(resourceModule),
 	m_bookmarkTree(bookmarkTree),
@@ -37,8 +38,6 @@ CBookmarkListView::CBookmarkListView(HWND hListView, HMODULE resourceModule,
 	ListView_SetImageList(hListView, m_imageList.get(), LVSIL_SMALL);
 
 	InsertColumns(initialColumns);
-
-	m_dropTarget = DropTarget::Create(m_hListView, this);
 
 	m_windowSubclasses.push_back(WindowSubclassWrapper(GetParent(m_hListView), ParentWndProcStub,
 		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
@@ -763,59 +762,7 @@ int CBookmarkListView::GetColumnIndexByType(ColumnType columnType) const
 	return static_cast<int>(columnIndex);
 }
 
-DWORD CBookmarkListView::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
-{
-	UNREFERENCED_PARAMETER(keyState);
-	UNREFERENCED_PARAMETER(effect);
-
-	m_bookmarkDropInfo = std::make_unique<BookmarkDropInfo>(dataObject, m_bookmarkTree);
-
-	auto dropTarget = GetDropTarget(pt);
-
-	return m_bookmarkDropInfo->GetDropEffect(dropTarget.parentFolder);
-}
-
-DWORD CBookmarkListView::DragOver(DWORD keyState, POINT pt, DWORD effect)
-{
-	UNREFERENCED_PARAMETER(keyState);
-	UNREFERENCED_PARAMETER(effect);
-
-	auto dropTarget = GetDropTarget(pt);
-	DWORD targetEffect = m_bookmarkDropInfo->GetDropEffect(dropTarget.parentFolder);
-
-	if (targetEffect != DROPEFFECT_NONE)
-	{
-		UpdateUiForDropTarget(dropTarget);
-	}
-	else
-	{
-		RemoveInsertionMark();
-		RemoveDropHighlight();
-	}
-
-	return targetEffect;
-}
-
-void CBookmarkListView::DragLeave()
-{
-	ResetDragDropState();
-}
-
-DWORD CBookmarkListView::Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
-{
-	UNREFERENCED_PARAMETER(dataObject);
-	UNREFERENCED_PARAMETER(keyState);
-	UNREFERENCED_PARAMETER(effect);
-
-	auto dropTarget = GetDropTarget(pt);
-	DWORD finalEffect = m_bookmarkDropInfo->PerformDrop(dropTarget.parentFolder, dropTarget.position);
-
-	ResetDragDropState();
-
-	return finalEffect;
-}
-
-CBookmarkListView::BookmarkDropTarget CBookmarkListView::GetDropTarget(const POINT &pt)
+CBookmarkListView::DropLocation CBookmarkListView::GetDropLocation(const POINT &pt)
 {
 	POINT ptClient = pt;
 	ScreenToClient(m_hListView, &ptClient);
@@ -826,6 +773,7 @@ CBookmarkListView::BookmarkDropTarget CBookmarkListView::GetDropTarget(const POI
 
 	BookmarkItem *parentFolder = nullptr;
 	size_t position;
+	bool parentFolderSelected = false;
 
 	if (WI_IsFlagSet(hitTestInfo.flags, LVHT_NOWHERE))
 	{
@@ -859,6 +807,7 @@ CBookmarkListView::BookmarkDropTarget CBookmarkListView::GetDropTarget(const POI
 			{
 				parentFolder = bookmarkItem;
 				position = bookmarkItem->GetChildren().size();
+				parentFolderSelected = true;
 			}
 		}
 		else
@@ -873,7 +822,7 @@ CBookmarkListView::BookmarkDropTarget CBookmarkListView::GetDropTarget(const POI
 		}
 	}
 
-	return { parentFolder, position };
+	return { parentFolder, position, parentFolderSelected };
 }
 
 int CBookmarkListView::FindNextItemIndex(const POINT &ptClient)
@@ -897,15 +846,15 @@ int CBookmarkListView::FindNextItemIndex(const POINT &ptClient)
 	return nextIndex;
 }
 
-void CBookmarkListView::UpdateUiForDropTarget(const BookmarkDropTarget &dropTarget)
+void CBookmarkListView::UpdateUiForDropLocation(const DropLocation &dropLocation)
 {
 	RemoveDropHighlight();
 
-	if (dropTarget.parentFolder == m_currentBookmarkFolder)
+	if (dropLocation.parentFolder == m_currentBookmarkFolder)
 	{
 		DWORD flags;
 		int numItems = ListView_GetItemCount(m_hListView);
-		size_t finalPosition = dropTarget.position;
+		size_t finalPosition = dropLocation.position;
 
 		if (finalPosition == static_cast<size_t>(numItems))
 		{
@@ -927,7 +876,7 @@ void CBookmarkListView::UpdateUiForDropTarget(const BookmarkDropTarget &dropTarg
 	{
 		RemoveInsertionMark();
 
-		auto selectedItemIndex = GetBookmarkItemIndex(dropTarget.parentFolder);
+		auto selectedItemIndex = GetBookmarkItemIndex(dropLocation.parentFolder);
 		assert(selectedItemIndex);
 
 		ListView_SetItemState(m_hListView, *selectedItemIndex, LVIS_DROPHILITED, LVIS_DROPHILITED);
@@ -935,12 +884,10 @@ void CBookmarkListView::UpdateUiForDropTarget(const BookmarkDropTarget &dropTarg
 	}
 }
 
-void CBookmarkListView::ResetDragDropState()
+void CBookmarkListView::ResetDropUiState()
 {
 	RemoveInsertionMark();
 	RemoveDropHighlight();
-
-	m_bookmarkDropInfo.reset();
 }
 
 void CBookmarkListView::RemoveInsertionMark()

@@ -6,6 +6,7 @@
 
 #include "BookmarkContextMenu.h"
 #include "BookmarkDropInfo.h"
+#include "BookmarkDropTargetWindow.h"
 #include "BookmarkItem.h"
 #include "BookmarkMenu.h"
 #include "BookmarkTree.h"
@@ -13,14 +14,13 @@
 #include "Navigation.h"
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
-#include "../Helper/DropTarget.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/signals2.hpp>
 #include <wil/com.h>
 #include <wil/resource.h>
 #include <optional>
 
-class CBookmarksToolbar : private DropTargetInternal
+class CBookmarksToolbar : private BookmarkDropTargetWindow
 {
 public:
 
@@ -28,12 +28,6 @@ public:
 		Navigation *navigation, BookmarkTree *bookmarkTree, UINT uIDStart, UINT uIDEnd);
 
 private:
-
-	struct BookmarkDropTarget
-	{
-		BookmarkItem *parentFolder;
-		size_t position;
-	};
 
 	CBookmarksToolbar & operator = (const CBookmarksToolbar &bt);
 
@@ -94,16 +88,12 @@ private:
 		const BookmarkItem *newParent, size_t newIndex);
 	void	OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem);
 
-	// DropTargetInternal methods.
-	DWORD DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
-	DWORD DragOver(DWORD keyState, POINT pt, DWORD effect) override;
-	void DragLeave() override;
-	DWORD Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
-
-	BookmarkDropTarget GetDropTarget(const POINT &pt);
+	DropLocation GetDropLocation(const POINT &pt) override;
+	void UpdateUiForDropLocation(const DropLocation &dropLocation) override;
+	void ResetDropUiState() override;
 	void SetButtonPressedState(int index, bool pressed);
-	void ResetDragDropState();
 	void RemoveInsertionMark();
+	void RemoveDropHighlight();
 
 	HWND m_hToolbar;
 	DpiCompatibility m_dpiCompat;
@@ -126,8 +116,6 @@ private:
 	std::optional<POINT> m_contextMenuLocation;
 
 	// Drag and drop.
-	wil::com_ptr<DropTarget> m_dropTarget;
-	std::unique_ptr<BookmarkDropInfo> m_bookmarkDropInfo;
 	std::optional<POINT> m_leftButtonDownPoint;
 	std::optional<int> m_previousDropButton;
 

@@ -22,6 +22,7 @@
 
 CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
 	Navigation *navigation, BookmarkTree *bookmarkTree, UINT uIDStart, UINT uIDEnd) :
+	BookmarkDropTargetWindow(hToolbar, bookmarkTree),
 	m_hToolbar(hToolbar),
 	m_instance(instance),
 	m_pexpp(pexpp),
@@ -48,8 +49,6 @@ void CBookmarksToolbar::InitializeToolbar()
 	std::tie(m_imageList, m_imageListMappings) = ResourceHelper::CreateIconImageList(
 		m_pexpp->GetIconResourceLoader(), iconWidth, iconHeight, { Icon::Folder, Icon::Bookmarks});
 	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(m_imageList.get()));
-
-	m_dropTarget = DropTarget::Create(m_hToolbar, this);
 
 	m_windowSubclasses.push_back(WindowSubclassWrapper(m_hToolbar, BookmarksToolbarProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
@@ -140,7 +139,7 @@ void CBookmarksToolbar::OnMouseMove(int keys, const POINT &pt)
 		return;
 	}
 
-	if (m_dropTarget->IsWithinDrag())
+	if (IsWithinDrag())
 	{
 		return;
 	}
@@ -673,87 +672,7 @@ std::optional<int> CBookmarksToolbar::GetBookmarkItemIndex(const BookmarkItem *b
 	return std::nullopt;
 }
 
-DWORD CBookmarksToolbar::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
-{
-	UNREFERENCED_PARAMETER(keyState);
-	UNREFERENCED_PARAMETER(effect);
-
-	m_bookmarkDropInfo = std::make_unique<BookmarkDropInfo>(dataObject, m_bookmarkTree);
-
-	auto dropTarget = GetDropTarget(pt);
-
-	return m_bookmarkDropInfo->GetDropEffect(dropTarget.parentFolder);
-}
-
-DWORD CBookmarksToolbar::DragOver(DWORD keyState, POINT pt, DWORD effect)
-{
-	UNREFERENCED_PARAMETER(keyState);
-	UNREFERENCED_PARAMETER(effect);
-
-	if (m_previousDropButton)
-	{
-		SetButtonPressedState(*m_previousDropButton, false);
-	}
-
-	auto dropTarget = GetDropTarget(pt);
-
-	if (dropTarget.parentFolder == m_bookmarkTree->GetBookmarksToolbarFolder())
-	{
-		DWORD flags;
-		int numButtons = static_cast<int>(SendMessage(m_hToolbar, TB_BUTTONCOUNT, 0, 0));
-		size_t finalPosition = dropTarget.position;
-
-		if (finalPosition == static_cast<size_t>(numButtons))
-		{
-			finalPosition--;
-			flags = TBIMHT_AFTER;
-		}
-		else
-		{
-			flags = 0;
-		}
-
-		TBINSERTMARK tbim;
-		tbim.iButton = static_cast<int>(finalPosition);
-		tbim.dwFlags = flags;
-		SendMessage(m_hToolbar, TB_SETINSERTMARK, 0, reinterpret_cast<LPARAM>(&tbim));
-
-		m_previousDropButton.reset();
-	}
-	else
-	{
-		RemoveInsertionMark();
-
-		auto selectedButtonIndex = GetBookmarkItemIndex(dropTarget.parentFolder);
-		assert(selectedButtonIndex);
-
-		SetButtonPressedState(*selectedButtonIndex, true);
-		m_previousDropButton = *selectedButtonIndex;
-	}
-
-	return m_bookmarkDropInfo->GetDropEffect(dropTarget.parentFolder);
-}
-
-void CBookmarksToolbar::DragLeave()
-{
-	ResetDragDropState();
-}
-
-DWORD CBookmarksToolbar::Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
-{
-	UNREFERENCED_PARAMETER(dataObject);
-	UNREFERENCED_PARAMETER(keyState);
-	UNREFERENCED_PARAMETER(effect);
-
-	auto dropTarget = GetDropTarget(pt);
-	DWORD finalEffect = m_bookmarkDropInfo->PerformDrop(dropTarget.parentFolder, dropTarget.position);
-
-	ResetDragDropState();
-
-	return finalEffect;
-}
-
-CBookmarksToolbar::BookmarkDropTarget CBookmarksToolbar::GetDropTarget(const POINT &pt)
+CBookmarksToolbar::DropLocation CBookmarksToolbar::GetDropLocation(const POINT &pt)
 {
 	POINT ptClient = pt;
 	ScreenToClient(m_hToolbar, &ptClient);
@@ -761,6 +680,7 @@ CBookmarksToolbar::BookmarkDropTarget CBookmarksToolbar::GetDropTarget(const POI
 
 	BookmarkItem *parentFolder = nullptr;
 	size_t position;
+	bool parentFolderSelected = false;
 
 	if (index >= 0)
 	{
@@ -789,6 +709,7 @@ CBookmarksToolbar::BookmarkDropTarget CBookmarksToolbar::GetDropTarget(const POI
 			{
 				parentFolder = bookmarkItem;
 				position = bookmarkItem->GetChildren().size();
+				parentFolderSelected = true;
 			}
 		}
 		else
@@ -808,7 +729,46 @@ CBookmarksToolbar::BookmarkDropTarget CBookmarksToolbar::GetDropTarget(const POI
 		position = FindNextButtonIndex(ptClient);
 	}
 
-	return { parentFolder, position };
+	return { parentFolder, position, parentFolderSelected };
+}
+
+void CBookmarksToolbar::UpdateUiForDropLocation(const DropLocation &dropLocation)
+{
+	RemoveDropHighlight();
+
+	if (dropLocation.parentFolder == m_bookmarkTree->GetBookmarksToolbarFolder())
+	{
+		DWORD flags;
+		int numButtons = static_cast<int>(SendMessage(m_hToolbar, TB_BUTTONCOUNT, 0, 0));
+		size_t finalPosition = dropLocation.position;
+
+		if (finalPosition == static_cast<size_t>(numButtons))
+		{
+			finalPosition--;
+			flags = TBIMHT_AFTER;
+		}
+		else
+		{
+			flags = 0;
+		}
+
+		TBINSERTMARK tbim;
+		tbim.iButton = static_cast<int>(finalPosition);
+		tbim.dwFlags = flags;
+		SendMessage(m_hToolbar, TB_SETINSERTMARK, 0, reinterpret_cast<LPARAM>(&tbim));
+
+		m_previousDropButton.reset();
+	}
+	else
+	{
+		RemoveInsertionMark();
+
+		auto selectedButtonIndex = GetBookmarkItemIndex(dropLocation.parentFolder);
+		assert(selectedButtonIndex);
+
+		SetButtonPressedState(*selectedButtonIndex, true);
+		m_previousDropButton = *selectedButtonIndex;
+	}
 }
 
 void CBookmarksToolbar::SetButtonPressedState(int index, bool pressed)
@@ -840,18 +800,10 @@ void CBookmarksToolbar::SetButtonPressedState(int index, bool pressed)
 	SendMessage(m_hToolbar, TB_SETSTATE, tbButton.idCommand, MAKEWORD(state, 0));
 }
 
-void CBookmarksToolbar::ResetDragDropState()
+void CBookmarksToolbar::ResetDropUiState()
 {
 	RemoveInsertionMark();
-
-	if (m_previousDropButton)
-	{
-		SetButtonPressedState(*m_previousDropButton, false);
-
-		m_previousDropButton.reset();
-	}
-
-	m_bookmarkDropInfo.reset();
+	RemoveDropHighlight();
 }
 
 void CBookmarksToolbar::RemoveInsertionMark()
@@ -859,4 +811,13 @@ void CBookmarksToolbar::RemoveInsertionMark()
 	TBINSERTMARK tbim;
 	tbim.iButton = -1;
 	SendMessage(m_hToolbar, TB_SETINSERTMARK, 0, reinterpret_cast<LPARAM>(&tbim));
+}
+
+void CBookmarksToolbar::RemoveDropHighlight()
+{
+	if (m_previousDropButton)
+	{
+		SetButtonPressedState(*m_previousDropButton, false);
+		m_previousDropButton.reset();
+	}
 }
