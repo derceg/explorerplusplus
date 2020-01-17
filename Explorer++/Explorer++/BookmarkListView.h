@@ -19,7 +19,7 @@
 #include <wil/resource.h>
 #include <optional>
 
-class CBookmarkListView : private BookmarkDropTargetWindow
+class BookmarkListView : private BookmarkDropTargetWindow
 {
 public:
 
@@ -38,7 +38,7 @@ public:
 		bool active;
 	};
 
-	CBookmarkListView(HWND hListView, HMODULE resourceModule, BookmarkTree *bookmarkTree,
+	BookmarkListView(HWND hListView, HMODULE resourceModule, BookmarkTree *bookmarkTree,
 		IExplorerplusplus *expp, const std::vector<Column> &initialColumns);
 
 	void NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder);
@@ -50,7 +50,7 @@ public:
 	void SetSortAscending(bool sortAscending);
 
 	// Signals
-	SignalWrapper<CBookmarkListView, void(BookmarkItem *bookmarkFolder)> navigationSignal;
+	SignalWrapper<BookmarkListView, void(BookmarkItem *bookmarkFolder)> navigationSignal;
 
 private:
 

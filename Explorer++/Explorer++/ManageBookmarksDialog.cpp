@@ -15,7 +15,7 @@
 
 const TCHAR CManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
-CManageBookmarksDialog::CManageBookmarksDialog(HINSTANCE hInstance, HWND hParent,
+ManageBookmarksDialog::ManageBookmarksDialog(HINSTANCE hInstance, HWND hParent,
 	IExplorerplusplus *pexpp, Navigation *navigation, BookmarkTree *bookmarkTree) :
 	CBaseDialog(hInstance, IDD_MANAGE_BOOKMARKS, hParent, true),
 	m_pexpp(pexpp),
@@ -32,13 +32,13 @@ CManageBookmarksDialog::CManageBookmarksDialog(HINSTANCE hInstance, HWND hParent
 	}
 }
 
-CManageBookmarksDialog::~CManageBookmarksDialog()
+ManageBookmarksDialog::~ManageBookmarksDialog()
 {
 	delete m_bookmarkTreeView;
 	delete m_bookmarkListView;
 }
 
-INT_PTR CManageBookmarksDialog::OnInitDialog()
+INT_PTR ManageBookmarksDialog::OnInitDialog()
 {
 	/* TODO: Enable drag and drop for listview and treeview. */
 	SetupToolbar();
@@ -52,12 +52,12 @@ INT_PTR CManageBookmarksDialog::OnInitDialog()
 	return 0;
 }
 
-wil::unique_hicon CManageBookmarksDialog::GetDialogIcon(int iconWidth, int iconHeight) const
+wil::unique_hicon ManageBookmarksDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
 	return m_pexpp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::Bookmarks, iconWidth, iconHeight);
 }
 
-void CManageBookmarksDialog::SetupToolbar()
+void ManageBookmarksDialog::SetupToolbar()
 {
 	m_hToolbar = CreateToolbar(m_hDlg,
 		WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|WS_CLIPCHILDREN|
@@ -134,29 +134,29 @@ void CManageBookmarksDialog::SetupToolbar()
 		rcListView.right - rcTreeView.left,HIWORD(dwButtonSize),0);
 }
 
-void CManageBookmarksDialog::SetupTreeView()
+void ManageBookmarksDialog::SetupTreeView()
 {
 	HWND hTreeView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW);
 
-	m_bookmarkTreeView = new CBookmarkTreeView(hTreeView, GetInstance(), m_pexpp,
+	m_bookmarkTreeView = new BookmarkTreeView(hTreeView, GetInstance(), m_pexpp,
 		m_bookmarkTree, m_pmbdps->m_setExpansion);
 
 	m_connections.push_back(m_bookmarkTreeView->selectionChangedSignal.AddObserver(
-		std::bind(&CManageBookmarksDialog::OnTreeViewSelectionChanged, this, std::placeholders::_1)));
+		std::bind(&ManageBookmarksDialog::OnTreeViewSelectionChanged, this, std::placeholders::_1)));
 }
 
-void CManageBookmarksDialog::SetupListView()
+void ManageBookmarksDialog::SetupListView()
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
 
-	m_bookmarkListView = new CBookmarkListView(hListView, GetInstance(), m_bookmarkTree,
+	m_bookmarkListView = new BookmarkListView(hListView, GetInstance(), m_bookmarkTree,
 		m_pexpp, m_pmbdps->m_listViewColumns);
 
 	m_connections.push_back(m_bookmarkListView->navigationSignal.AddObserver(
-		std::bind(&CManageBookmarksDialog::OnListViewNavigation, this, std::placeholders::_1)));
+		std::bind(&ManageBookmarksDialog::OnListViewNavigation, this, std::placeholders::_1)));
 }
 
-INT_PTR CManageBookmarksDialog::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD dwKeys)
+INT_PTR ManageBookmarksDialog::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD dwKeys)
 {
 	UNREFERENCED_PARAMETER(dwKeys);
 	UNREFERENCED_PARAMETER(uDevice);
@@ -176,7 +176,7 @@ INT_PTR CManageBookmarksDialog::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DW
 	return 0;
 }
 
-INT_PTR CManageBookmarksDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR ManageBookmarksDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -188,7 +188,7 @@ INT_PTR CManageBookmarksDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 1;
 }
 
-LRESULT CManageBookmarksDialog::HandleMenuOrAccelerator(WPARAM wParam)
+LRESULT ManageBookmarksDialog::HandleMenuOrAccelerator(WPARAM wParam)
 {
 	switch (LOWORD(wParam))
 	{
@@ -263,7 +263,7 @@ LRESULT CManageBookmarksDialog::HandleMenuOrAccelerator(WPARAM wParam)
 	return 0;
 }
 
-INT_PTR CManageBookmarksDialog::OnNotify(NMHDR *pnmhdr)
+INT_PTR ManageBookmarksDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
@@ -275,7 +275,7 @@ INT_PTR CManageBookmarksDialog::OnNotify(NMHDR *pnmhdr)
 	return 0;
 }
 
-void CManageBookmarksDialog::OnNewFolder()
+void ManageBookmarksDialog::OnNewFolder()
 {
 	std::wstring newBookmarkFolderName = ResourceHelper::LoadString(GetInstance(), IDS_BOOKMARKS_NEWBOOKMARKFOLDER);
 	auto newBookmarkFolder = std::make_unique<BookmarkItem>(std::nullopt, newBookmarkFolderName, std::nullopt);
@@ -296,14 +296,14 @@ void CManageBookmarksDialog::OnNewFolder()
 	m_bookmarkTree->AddBookmarkItem(bookmarkFolder, std::move(newBookmarkFolder), bookmarkFolder->GetChildren().size());
 }
 
-void CManageBookmarksDialog::OnDeleteBookmark(const std::wstring &guid)
+void ManageBookmarksDialog::OnDeleteBookmark(const std::wstring &guid)
 {
 	UNREFERENCED_PARAMETER(guid);
 
 	/* TODO: Move the bookmark/bookmark folder to the trash folder. */
 }
 
-void CManageBookmarksDialog::OnTbnDropDown(NMTOOLBAR *nmtb)
+void ManageBookmarksDialog::OnTbnDropDown(NMTOOLBAR *nmtb)
 {
 	switch(nmtb->iItem)
 	{
@@ -317,7 +317,7 @@ void CManageBookmarksDialog::OnTbnDropDown(NMTOOLBAR *nmtb)
 	}
 }
 
-void CManageBookmarksDialog::ShowViewMenu()
+void ManageBookmarksDialog::ShowViewMenu()
 {
 	DWORD dwButtonState = static_cast<DWORD>(SendMessage(m_hToolbar,TB_GETSTATE,TOOLBAR_ID_VIEWS,MAKEWORD(TBSTATE_PRESSED,0)));
 	SendMessage(m_hToolbar,TB_SETSTATE,TOOLBAR_ID_VIEWS,MAKEWORD(dwButtonState|TBSTATE_PRESSED,0));
@@ -380,7 +380,7 @@ void CManageBookmarksDialog::ShowViewMenu()
 	SendMessage(m_hToolbar,TB_SETSTATE,TOOLBAR_ID_VIEWS,MAKEWORD(dwButtonState,0));
 }
 
-void CManageBookmarksDialog::ShowOrganizeMenu()
+void ManageBookmarksDialog::ShowOrganizeMenu()
 {
 	DWORD dwButtonState = static_cast<DWORD>(SendMessage(m_hToolbar,TB_GETSTATE,TOOLBAR_ID_ORGANIZE,MAKEWORD(TBSTATE_PRESSED,0)));
 	SendMessage(m_hToolbar,TB_SETSTATE,TOOLBAR_ID_ORGANIZE,MAKEWORD(dwButtonState|TBSTATE_PRESSED,0));
@@ -401,7 +401,7 @@ void CManageBookmarksDialog::ShowOrganizeMenu()
 	SendMessage(m_hToolbar,TB_SETSTATE,TOOLBAR_ID_ORGANIZE,MAKEWORD(dwButtonState,0));
 }
 
-void CManageBookmarksDialog::OnTreeViewSelectionChanged(BookmarkItem *bookmarkFolder)
+void ManageBookmarksDialog::OnTreeViewSelectionChanged(BookmarkItem *bookmarkFolder)
 {
 	if (bookmarkFolder->GetGUID() == m_guidCurrentFolder)
 	{
@@ -411,7 +411,7 @@ void CManageBookmarksDialog::OnTreeViewSelectionChanged(BookmarkItem *bookmarkFo
 	m_bookmarkListView->NavigateToBookmarkFolder(bookmarkFolder);
 }
 
-void CManageBookmarksDialog::OnListViewNavigation(BookmarkItem *bookmarkFolder)
+void ManageBookmarksDialog::OnListViewNavigation(BookmarkItem *bookmarkFolder)
 {
 	/* Temporary flag used to indicate whether history should
 	be saved. It will be reset each time a folder is browsed. */
@@ -428,7 +428,7 @@ void CManageBookmarksDialog::OnListViewNavigation(BookmarkItem *bookmarkFolder)
 	UpdateToolbarState();
 }
 
-void CManageBookmarksDialog::BrowseBack()
+void ManageBookmarksDialog::BrowseBack()
 {
 	if(m_stackBack.size() == 0)
 	{
@@ -443,7 +443,7 @@ void CManageBookmarksDialog::BrowseBack()
 	m_bookmarkTreeView->SelectFolder(guid);
 }
 
-void CManageBookmarksDialog::BrowseForward()
+void ManageBookmarksDialog::BrowseForward()
 {
 	if(m_stackForward.size() == 0)
 	{
@@ -458,7 +458,7 @@ void CManageBookmarksDialog::BrowseForward()
 	m_bookmarkTreeView->SelectFolder(guid);
 }
 
-void CManageBookmarksDialog::UpdateToolbarState()
+void ManageBookmarksDialog::UpdateToolbarState()
 {
 	SendMessage(m_hToolbar,TB_ENABLEBUTTON,TOOLBAR_ID_BACK,m_stackBack.size() != 0);
 	SendMessage(m_hToolbar,TB_ENABLEBUTTON,TOOLBAR_ID_FORWARD,m_stackForward.size() != 0);
@@ -486,36 +486,36 @@ void CManageBookmarksDialog::UpdateToolbarState()
 //	}
 //}
 
-void CManageBookmarksDialog::OnOk()
+void ManageBookmarksDialog::OnOk()
 {
 	DestroyWindow(m_hDlg);
 }
 
-void CManageBookmarksDialog::OnCancel()
+void ManageBookmarksDialog::OnCancel()
 {
 	DestroyWindow(m_hDlg);
 }
 
-INT_PTR CManageBookmarksDialog::OnClose()
+INT_PTR ManageBookmarksDialog::OnClose()
 {
 	DestroyWindow(m_hDlg);
 	return 0;
 }
 
-INT_PTR	CManageBookmarksDialog::OnDestroy()
+INT_PTR	ManageBookmarksDialog::OnDestroy()
 {
 	m_pmbdps->m_listViewColumns = m_bookmarkListView->GetColumns();
 	return 0;
 }
 
-INT_PTR CManageBookmarksDialog::OnNcDestroy()
+INT_PTR ManageBookmarksDialog::OnNcDestroy()
 {
 	delete this;
 
 	return 0;
 }
 
-void CManageBookmarksDialog::SaveState()
+void ManageBookmarksDialog::SaveState()
 {
 	m_pmbdps->SaveDialogPosition(m_hDlg);
 
@@ -537,24 +537,24 @@ CManageBookmarksDialogPersistentSettings& CManageBookmarksDialogPersistentSettin
 
 void CManageBookmarksDialogPersistentSettings::SetupDefaultColumns()
 {
-	CBookmarkListView::Column column;
+	BookmarkListView::Column column;
 
-	column.columnType = CBookmarkListView::ColumnType::Name;
+	column.columnType = BookmarkListView::ColumnType::Name;
 	column.width = DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
 	column.active = true;
 	m_listViewColumns.push_back(column);
 
-	column.columnType = CBookmarkListView::ColumnType::Location;
+	column.columnType = BookmarkListView::ColumnType::Location;
 	column.width = DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
 	column.active = true;
 	m_listViewColumns.push_back(column);
 
-	column.columnType = CBookmarkListView::ColumnType::DateCreated;
+	column.columnType = BookmarkListView::ColumnType::DateCreated;
 	column.width = DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
 	column.active = false;
 	m_listViewColumns.push_back(column);
 
-	column.columnType = CBookmarkListView::ColumnType::DateModified;
+	column.columnType = BookmarkListView::ColumnType::DateModified;
 	column.width = DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
 	column.active = false;
 	m_listViewColumns.push_back(column);

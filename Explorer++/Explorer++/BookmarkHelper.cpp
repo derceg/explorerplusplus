@@ -139,7 +139,7 @@ void BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::T
 	
 	BookmarkItem *selectedParentFolder = nullptr;
 
-	CAddBookmarkDialog AddBookmarkDialog(resoureceModule, parentWindow, coreInterface,
+	AddBookmarkDialog AddBookmarkDialog(resoureceModule, parentWindow, coreInterface,
 		bookmarkTree, bookmarkItem.get(), &selectedParentFolder);
 	auto res = AddBookmarkDialog.ShowModalDialog();
 
@@ -155,7 +155,7 @@ void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *
 	HMODULE resoureceModule, HWND parentWindow, IExplorerplusplus *coreInterface)
 {
 	BookmarkItem *selectedParentFolder = nullptr;
-	CAddBookmarkDialog AddBookmarkDialog(resoureceModule, parentWindow, coreInterface,
+	AddBookmarkDialog AddBookmarkDialog(resoureceModule, parentWindow, coreInterface,
 		bookmarkTree, bookmarkItem, &selectedParentFolder);
 	auto res = AddBookmarkDialog.ShowModalDialog();
 

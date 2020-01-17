@@ -20,11 +20,11 @@
 #include <unordered_map>
 #include <unordered_set>
 
-class CBookmarkTreeView : private BookmarkDropTargetWindow
+class BookmarkTreeView : private BookmarkDropTargetWindow
 {
 public:
 
-	CBookmarkTreeView(HWND hTreeView, HINSTANCE hInstance, IExplorerplusplus *expp,
+	BookmarkTreeView(HWND hTreeView, HINSTANCE hInstance, IExplorerplusplus *expp,
 		BookmarkTree *bookmarkTree, const std::unordered_set<std::wstring> &setExpansion,
 		std::optional<std::wstring> guidSelected = std::nullopt);
 
@@ -34,7 +34,7 @@ public:
 	void SelectFolder(const std::wstring &guid);
 
 	// Signals
-	SignalWrapper<CBookmarkTreeView, void(BookmarkItem *bookmarkFolder)> selectionChangedSignal;
+	SignalWrapper<BookmarkTreeView, void(BookmarkItem *bookmarkFolder)> selectionChangedSignal;
 
 private:
 

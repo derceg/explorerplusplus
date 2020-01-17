@@ -18,7 +18,7 @@
 #include <stack>
 #include <unordered_set>
 
-class CManageBookmarksDialog;
+class ManageBookmarksDialog;
 
 class CManageBookmarksDialogPersistentSettings : public CDialogSettings
 {
@@ -28,7 +28,7 @@ public:
 
 private:
 
-	friend CManageBookmarksDialog;
+	friend ManageBookmarksDialog;
 
 	static const TCHAR SETTINGS_KEY[];
 	static const int DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH = 180;
@@ -40,19 +40,19 @@ private:
 
 	void SetupDefaultColumns();
 
-	std::vector<CBookmarkListView::Column> m_listViewColumns;
+	std::vector<BookmarkListView::Column> m_listViewColumns;
 
 	bool m_bInitialized;
 	std::unordered_set<std::wstring> m_setExpansion;
 };
 
-class CManageBookmarksDialog : public CBaseDialog
+class ManageBookmarksDialog : public CBaseDialog
 {
 public:
 
-	CManageBookmarksDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp,
+	ManageBookmarksDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp,
 		Navigation *navigation, BookmarkTree *bookmarkTree);
-	~CManageBookmarksDialog();
+	~ManageBookmarksDialog();
 
 	// TODO: Update.
 	//void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
@@ -78,7 +78,7 @@ private:
 	static const int TOOLBAR_ID_ORGANIZE		= 10002;
 	static const int TOOLBAR_ID_VIEWS			= 10003;
 
-	CManageBookmarksDialog & operator = (const CManageBookmarksDialog &mbd);
+	ManageBookmarksDialog & operator = (const ManageBookmarksDialog &mbd);
 
 	void		SetupToolbar();
 	void		SetupTreeView();
@@ -122,8 +122,8 @@ private:
 	std::stack<std::wstring> m_stackForward;
 	bool m_bSaveHistory;
 
-	CBookmarkTreeView *m_bookmarkTreeView;
-	CBookmarkListView *m_bookmarkListView;
+	BookmarkTreeView *m_bookmarkTreeView;
+	BookmarkListView *m_bookmarkListView;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 

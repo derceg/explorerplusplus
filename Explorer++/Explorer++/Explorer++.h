@@ -39,7 +39,7 @@
 // Forward declarations.
 class AddressBar;
 class CApplicationToolbar;
-class CBookmarksToolbar;
+class BookmarksToolbar;
 
 namespace NColorRuleHelper
 {
@@ -577,7 +577,7 @@ private:
 	/* Bookmarks. */
 	BookmarkTree			m_bookmarkTree;
 	std::unique_ptr<BookmarksMainMenu> m_bookmarksMainMenu;
-	CBookmarksToolbar		*m_pBookmarksToolbar;
+	BookmarksToolbar		*m_pBookmarksToolbar;
 
 	/* Customize colors. */
 	std::vector<NColorRuleHelper::ColorRule_t>	m_ColorRules;

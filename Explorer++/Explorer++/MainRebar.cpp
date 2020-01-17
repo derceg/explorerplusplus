@@ -313,7 +313,7 @@ void Explorerplusplus::CreateBookmarksToolbar(void)
 		TBSTYLE_EX_MIXEDBUTTONS | TBSTYLE_EX_DRAWDDARROWS |
 		TBSTYLE_EX_DOUBLEBUFFER | TBSTYLE_EX_HIDECLIPPEDBUTTONS);
 
-	m_pBookmarksToolbar = new CBookmarksToolbar(m_hBookmarksToolbar, m_hLanguageModule, this,
+	m_pBookmarksToolbar = new BookmarksToolbar(m_hBookmarksToolbar, m_hLanguageModule, this,
 		m_navigation.get(), &m_bookmarkTree, TOOLBAR_BOOKMARK_START, TOOLBAR_BOOKMARK_END);
 }
 

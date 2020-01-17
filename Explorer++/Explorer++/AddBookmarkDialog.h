@@ -15,7 +15,7 @@
 #include <wil/resource.h>
 #include <unordered_set>
 
-class CAddBookmarkDialog;
+class AddBookmarkDialog;
 
 class CAddBookmarkDialogPersistentSettings : public CDialogSettings
 {
@@ -25,7 +25,7 @@ public:
 
 private:
 
-	friend CAddBookmarkDialog;
+	friend AddBookmarkDialog;
 
 	static const TCHAR SETTINGS_KEY[];
 
@@ -39,11 +39,11 @@ private:
 	std::unordered_set<std::wstring> m_setExpansion;
 };
 
-class CAddBookmarkDialog : public CBaseDialog
+class AddBookmarkDialog : public CBaseDialog
 {
 public:
 
-	CAddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
+	AddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
 		BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
 		BookmarkItem **selectedParentFolder);
 
@@ -61,7 +61,7 @@ private:
 
 	static const COLORREF ERROR_BACKGROUND_COLOR = RGB(255,188,188);
 
-	CAddBookmarkDialog & operator = (const CAddBookmarkDialog &abd);
+	AddBookmarkDialog & operator = (const AddBookmarkDialog &abd);
 
 	void UpdateDialogForBookmarkFolder();
 
@@ -80,7 +80,7 @@ private:
 	BookmarkItem *m_bookmarkItem;
 	BookmarkItem **m_selectedParentFolder;
 
-	CBookmarkTreeView *m_pBookmarkTreeView;
+	BookmarkTreeView *m_pBookmarkTreeView;
 
 	wil::unique_hbrush m_ErrorBrush;
 

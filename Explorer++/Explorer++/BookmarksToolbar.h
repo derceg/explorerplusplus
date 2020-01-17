@@ -20,16 +20,16 @@
 #include <wil/resource.h>
 #include <optional>
 
-class CBookmarksToolbar : private BookmarkDropTargetWindow
+class BookmarksToolbar : private BookmarkDropTargetWindow
 {
 public:
 
-	CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
+	BookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
 		Navigation *navigation, BookmarkTree *bookmarkTree, UINT uIDStart, UINT uIDEnd);
 
 private:
 
-	CBookmarksToolbar & operator = (const CBookmarksToolbar &bt);
+	BookmarksToolbar & operator = (const BookmarksToolbar &bt);
 
 	static inline const UINT_PTR SUBCLASS_ID = 0;
 	static inline const UINT_PTR PARENT_SUBCLASS_ID = 0;
