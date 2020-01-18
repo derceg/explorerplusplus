@@ -41,6 +41,13 @@ public:
 
 private:
 
+	// These GUID's are statically defined, so that they will always be the same
+	// across separate instances of the process.
+	static inline const TCHAR *ROOT_FOLDER_GUID = _T("00000000-0000-0000-0000-000000000001");
+	static inline const TCHAR *TOOLBAR_FOLDER_GUID = _T("00000000-0000-0000-0000-000000000002");
+	static inline const TCHAR *MENU_FOLDER_GUID = _T("00000000-0000-0000-0000-000000000003");
+	static inline const TCHAR *OTHER_FOLDER_GUID = _T("00000000-0000-0000-0000-000000000004");
+
 	void OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);
 
 	void LoadPermanentFolderFromRegistry(HKEY parentKey, BookmarkItem *bookmarkItem, const std::wstring &name);

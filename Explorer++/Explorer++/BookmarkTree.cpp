@@ -15,19 +15,19 @@ const WCHAR BOOKMARKS_MENU_NODE_NAME[] = L"BookmarksMenu";
 const WCHAR OTHER_BOOKMARKS_NODE_NAME[] = L"OtherBookmarks";
 
 BookmarkTree::BookmarkTree() :
-	m_root(BookmarkHelper::ROOT_GUID, ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_ALLBOOKMARKS), std::nullopt)
+	m_root(ROOT_FOLDER_GUID, ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_ALLBOOKMARKS), std::nullopt)
 {
-	auto bookmarksToolbarFolder = std::make_unique<BookmarkItem>(BookmarkHelper::TOOLBAR_GUID,
+	auto bookmarksToolbarFolder = std::make_unique<BookmarkItem>(TOOLBAR_FOLDER_GUID,
 		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_BOOKMARKSTOOLBAR), std::nullopt);
 	m_bookmarksToolbar = bookmarksToolbarFolder.get();
 	m_root.AddChild(std::move(bookmarksToolbarFolder));
 
-	auto bookmarksMenuFolder = std::make_unique<BookmarkItem>(BookmarkHelper::MENU_GUID,
+	auto bookmarksMenuFolder = std::make_unique<BookmarkItem>(MENU_FOLDER_GUID,
 		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_BOOKMARKSMENU), std::nullopt);
 	m_bookmarksMenu = bookmarksMenuFolder.get();
 	m_root.AddChild(std::move(bookmarksMenuFolder));
 
-	auto otherBookmarksFolder = std::make_unique<BookmarkItem>(BookmarkHelper::OTHER_GUID,
+	auto otherBookmarksFolder = std::make_unique<BookmarkItem>(OTHER_FOLDER_GUID,
 		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_OTHER_BOOKMARKS), std::nullopt);
 	m_otherBookmarks = otherBookmarksFolder.get();
 	m_root.AddChild(std::move(otherBookmarksFolder));
