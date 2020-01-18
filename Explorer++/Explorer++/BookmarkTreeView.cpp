@@ -389,8 +389,6 @@ void BookmarkTreeView::RemoveBookmarkItem(const BookmarkItem *bookmarkItem)
 	auto itr = m_mapItem.find(bookmarkItem->GetGUID());
 	assert(itr != m_mapItem.end());
 
-	/* TODO: Should change selection if required (i.e. if the deleted bookmark
-	 * was selected). */
 	TreeView_DeleteItem(m_hTreeView, itr->second);
 
 	auto parentItr = m_mapItem.find(bookmarkItem->GetParent()->GetGUID());
