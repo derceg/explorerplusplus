@@ -7,12 +7,12 @@
 #include "TabContainer.h"
 #include "../Helper/DropHandler.h"
 
-class CTabDropHandler : public IDropTarget
+class TabDropHandler : public IDropTarget
 {
 public:
 
-	CTabDropHandler(HWND hTabCtrl, TabContainer *tabContainer);
-	~CTabDropHandler();
+	TabDropHandler(HWND hTabCtrl, TabContainer *tabContainer);
+	~TabDropHandler();
 
 	/* IUnknown methods. */
 	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);

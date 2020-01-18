@@ -12,7 +12,7 @@ struct PreservedFolderState
 {
 public:
 
-	PreservedFolderState(const CShellBrowser *shellBrowser) :
+	PreservedFolderState(const ShellBrowser *shellBrowser) :
 		folderSettings(shellBrowser->GetFolderSettings())
 	{
 

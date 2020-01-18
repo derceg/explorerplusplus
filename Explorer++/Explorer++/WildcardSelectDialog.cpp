@@ -14,22 +14,22 @@
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
 
-const TCHAR CWildcardSelectDialogPersistentSettings::SETTINGS_KEY[] = _T("WildcardSelect");
+const TCHAR WildcardSelectDialogPersistentSettings::SETTINGS_KEY[] = _T("WildcardSelect");
 
-const TCHAR CWildcardSelectDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
-const TCHAR CWildcardSelectDialogPersistentSettings::SETTING_CURRENT_TEXT[] = _T("CurrentText");
+const TCHAR WildcardSelectDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
+const TCHAR WildcardSelectDialogPersistentSettings::SETTING_CURRENT_TEXT[] = _T("CurrentText");
 
-CWildcardSelectDialog::CWildcardSelectDialog(HINSTANCE hInstance, HWND hParent,
+WildcardSelectDialog::WildcardSelectDialog(HINSTANCE hInstance, HWND hParent,
 	BOOL bSelect, IExplorerplusplus *pexpp) :
-	CBaseDialog(hInstance, IDD_WILDCARDSELECT, hParent, true)
+	BaseDialog(hInstance, IDD_WILDCARDSELECT, hParent, true)
 {
 	m_bSelect = bSelect;
 	m_pexpp = pexpp;
 
-	m_pwsdps = &CWildcardSelectDialogPersistentSettings::GetInstance();
+	m_pwsdps = &WildcardSelectDialogPersistentSettings::GetInstance();
 }
 
-INT_PTR CWildcardSelectDialog::OnInitDialog()
+INT_PTR WildcardSelectDialog::OnInitDialog()
 {
 	m_icon.reset(LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN)));
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
@@ -58,35 +58,35 @@ INT_PTR CWildcardSelectDialog::OnInitDialog()
 	return 0;
 }
 
-void CWildcardSelectDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,
-	std::list<CResizableDialog::Control_t> &ControlList)
+void WildcardSelectDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+	std::list<ResizableDialog::Control_t> &ControlList)
 {
-	dsc = CBaseDialog::DIALOG_SIZE_CONSTRAINT_X;
+	dsc = BaseDialog::DIALOG_SIZE_CONSTRAINT_X;
 
-	CResizableDialog::Control_t Control;
+	ResizableDialog::Control_t Control;
 
 	Control.iID = IDC_SELECTGROUP_COMBOBOX;
-	Control.Type = CResizableDialog::TYPE_RESIZE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	Control.Type = ResizableDialog::TYPE_RESIZE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_X;
 	ControlList.push_back(Control);
 
 	Control.iID = IDOK;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 
 	Control.iID = IDCANCEL;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_GRIPPER;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 }
 
-INT_PTR CWildcardSelectDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR WildcardSelectDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -104,7 +104,7 @@ INT_PTR CWildcardSelectDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-void CWildcardSelectDialog::OnOk()
+void WildcardSelectDialog::OnOk()
 {
 	TCHAR szPattern[512];
 
@@ -139,7 +139,7 @@ void CWildcardSelectDialog::OnOk()
 	EndDialog(m_hDlg,1);
 }
 
-void CWildcardSelectDialog::SelectItems(TCHAR *szPattern)
+void WildcardSelectDialog::SelectItems(TCHAR *szPattern)
 {
 	HWND hListView = m_pexpp->GetActiveListView();
 
@@ -157,18 +157,18 @@ void CWildcardSelectDialog::SelectItems(TCHAR *szPattern)
 	}
 }
 
-void CWildcardSelectDialog::OnCancel()
+void WildcardSelectDialog::OnCancel()
 {
 	EndDialog(m_hDlg,0);
 }
 
-INT_PTR CWildcardSelectDialog::OnClose()
+INT_PTR WildcardSelectDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-void CWildcardSelectDialog::SaveState()
+void WildcardSelectDialog::SaveState()
 {
 	m_pwsdps->SaveDialogPosition(m_hDlg);
 
@@ -178,39 +178,39 @@ void CWildcardSelectDialog::SaveState()
 	m_pwsdps->m_bStateSaved = TRUE;
 }
 
-CWildcardSelectDialogPersistentSettings::CWildcardSelectDialogPersistentSettings() :
-CDialogSettings(SETTINGS_KEY)
+WildcardSelectDialogPersistentSettings::WildcardSelectDialogPersistentSettings() :
+DialogSettings(SETTINGS_KEY)
 {
 	StringCchCopy(m_szPattern,SIZEOF_ARRAY(m_szPattern),EMPTY_STRING);
 }
 
-CWildcardSelectDialogPersistentSettings& CWildcardSelectDialogPersistentSettings::GetInstance()
+WildcardSelectDialogPersistentSettings& WildcardSelectDialogPersistentSettings::GetInstance()
 {
-	static CWildcardSelectDialogPersistentSettings wsdps;
+	static WildcardSelectDialogPersistentSettings wsdps;
 	return wsdps;
 }
 
-void CWildcardSelectDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
+void WildcardSelectDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
 	NRegistrySettings::SaveStringListToRegistry(hKey, SETTING_PATTERN_LIST, m_PatternList);
 	NRegistrySettings::SaveStringToRegistry(hKey, SETTING_CURRENT_TEXT, m_szPattern);
 }
 
-void CWildcardSelectDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
+void WildcardSelectDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
 	NRegistrySettings::ReadStringListFromRegistry(hKey, SETTING_PATTERN_LIST, m_PatternList);
 	NRegistrySettings::ReadStringFromRegistry(hKey, SETTING_CURRENT_TEXT, m_szPattern,
 		SIZEOF_ARRAY(m_szPattern));
 }
 
-void CWildcardSelectDialogPersistentSettings::SaveExtraXMLSettings(
+void WildcardSelectDialogPersistentSettings::SaveExtraXMLSettings(
 	IXMLDOMDocument *pXMLDom,IXMLDOMElement *pParentNode)
 {
 	NXMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_PATTERN_LIST, m_PatternList);
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_CURRENT_TEXT, m_szPattern);
 }
 
-void CWildcardSelectDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
+void WildcardSelectDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
 {
 	if(CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, bstrName, lstrlen(SETTING_PATTERN_LIST),
 		SETTING_PATTERN_LIST, lstrlen(SETTING_PATTERN_LIST)) == CSTR_EQUAL)

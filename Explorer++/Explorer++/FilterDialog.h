@@ -11,26 +11,26 @@
 #include <MsXml2.h>
 #include <objbase.h>
 
-class CFilterDialog;
+class FilterDialog;
 
-class CFilterDialogPersistentSettings : public CDialogSettings
+class FilterDialogPersistentSettings : public DialogSettings
 {
 public:
 
-	static CFilterDialogPersistentSettings &GetInstance();
+	static FilterDialogPersistentSettings &GetInstance();
 
 private:
 
-	friend CFilterDialog;
+	friend FilterDialog;
 
 	static const TCHAR SETTINGS_KEY[];
 
 	static const TCHAR SETTING_FILTER_LIST[];
 
-	CFilterDialogPersistentSettings();
+	FilterDialogPersistentSettings();
 
-	CFilterDialogPersistentSettings(const CFilterDialogPersistentSettings &);
-	CFilterDialogPersistentSettings & operator=(const CFilterDialogPersistentSettings &);
+	FilterDialogPersistentSettings(const FilterDialogPersistentSettings &);
+	FilterDialogPersistentSettings & operator=(const FilterDialogPersistentSettings &);
 
 	void SaveExtraRegistrySettings(HKEY hKey);
 	void LoadExtraRegistrySettings(HKEY hKey);
@@ -41,11 +41,11 @@ private:
 	std::list<std::wstring>	m_FilterList;
 };
 
-class CFilterDialog : public CBaseDialog
+class FilterDialog : public BaseDialog
 {
 public:
 
-	CFilterDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp);
+	FilterDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp);
 
 protected:
 
@@ -57,7 +57,7 @@ protected:
 
 private:
 
-	void				GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	void				GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList);
 	void				SaveState();
 
 	void				OnOk();
@@ -65,5 +65,5 @@ private:
 
 	IExplorerplusplus *m_pexpp;
 
-	CFilterDialogPersistentSettings *m_pfdps;
+	FilterDialogPersistentSettings *m_pfdps;
 };

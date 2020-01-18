@@ -10,17 +10,17 @@
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/ResizableDialog.h"
 
-class CMassRenameDialog;
+class MassRenameDialog;
 
-class CMassRenameDialogPersistentSettings : public CDialogSettings
+class MassRenameDialogPersistentSettings : public DialogSettings
 {
 public:
 
-	static CMassRenameDialogPersistentSettings &GetInstance();
+	static MassRenameDialogPersistentSettings &GetInstance();
 
 private:
 
-	friend CMassRenameDialog;
+	friend MassRenameDialog;
 
 	static const TCHAR SETTINGS_KEY[];
 
@@ -29,10 +29,10 @@ private:
 
 	static const int DEFAULT_MASS_RENAME_COLUMN_WIDTH = 250;
 
-	CMassRenameDialogPersistentSettings();
+	MassRenameDialogPersistentSettings();
 
-	CMassRenameDialogPersistentSettings(const CMassRenameDialogPersistentSettings &);
-	CMassRenameDialogPersistentSettings & operator=(const CMassRenameDialogPersistentSettings &);
+	MassRenameDialogPersistentSettings(const MassRenameDialogPersistentSettings &);
+	MassRenameDialogPersistentSettings & operator=(const MassRenameDialogPersistentSettings &);
 
 	void SaveExtraRegistrySettings(HKEY hKey);
 	void LoadExtraRegistrySettings(HKEY hKey);
@@ -44,12 +44,12 @@ private:
 	int	m_iColumnWidth2;
 };
 
-class CMassRenameDialog : public CBaseDialog
+class MassRenameDialog : public BaseDialog
 {
 public:
 
-	CMassRenameDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
-		std::list<std::wstring> FullFilenameList, CFileActionHandler *pFileActionHandler);
+	MassRenameDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
+		std::list<std::wstring> FullFilenameList, FileActionHandler *pFileActionHandler);
 
 protected:
 
@@ -61,7 +61,7 @@ protected:
 
 private:
 
-	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	void	GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList);
 	void	SaveState();
 
 	void	OnOk();
@@ -72,7 +72,7 @@ private:
 	IExplorerplusplus *m_expp;
 	std::list<std::wstring> m_FullFilenameList;
 	wil::unique_hicon m_moreIcon;
-	CFileActionHandler *m_pFileActionHandler;
+	FileActionHandler *m_pFileActionHandler;
 
-	CMassRenameDialogPersistentSettings *m_pmrdps;
+	MassRenameDialogPersistentSettings *m_pmrdps;
 };

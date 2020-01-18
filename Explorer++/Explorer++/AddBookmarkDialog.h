@@ -17,11 +17,11 @@
 
 class AddBookmarkDialog;
 
-class CAddBookmarkDialogPersistentSettings : public CDialogSettings
+class AddBookmarkDialogPersistentSettings : public DialogSettings
 {
 public:
 
-	static CAddBookmarkDialogPersistentSettings &GetInstance();
+	static AddBookmarkDialogPersistentSettings &GetInstance();
 
 private:
 
@@ -29,17 +29,17 @@ private:
 
 	static const TCHAR SETTINGS_KEY[];
 
-	CAddBookmarkDialogPersistentSettings();
+	AddBookmarkDialogPersistentSettings();
 
-	CAddBookmarkDialogPersistentSettings(const CAddBookmarkDialogPersistentSettings &);
-	CAddBookmarkDialogPersistentSettings & operator=(const CAddBookmarkDialogPersistentSettings &);
+	AddBookmarkDialogPersistentSettings(const AddBookmarkDialogPersistentSettings &);
+	AddBookmarkDialogPersistentSettings & operator=(const AddBookmarkDialogPersistentSettings &);
 
 	bool m_bInitialized;
 	std::wstring m_guidSelected;
 	std::unordered_set<std::wstring> m_setExpansion;
 };
 
-class AddBookmarkDialog : public CBaseDialog
+class AddBookmarkDialog : public BaseDialog
 {
 public:
 
@@ -65,7 +65,7 @@ private:
 
 	void UpdateDialogForBookmarkFolder();
 
-	void GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList);
 	void SaveState();
 
 	void OnOk();
@@ -84,5 +84,5 @@ private:
 
 	wil::unique_hbrush m_ErrorBrush;
 
-	CAddBookmarkDialogPersistentSettings *m_pabdps;
+	AddBookmarkDialogPersistentSettings *m_pabdps;
 };

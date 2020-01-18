@@ -7,12 +7,12 @@
 #include "iEnumFormatEtc.h"
 
 
-class CEnumFormatEtc : public IEnumFORMATETC
+class EnumFormatEtc : public IEnumFORMATETC
 {
 public:
 
-	CEnumFormatEtc(const std::list<FORMATETC> &feList);
-	~CEnumFormatEtc();
+	EnumFormatEtc(const std::list<FORMATETC> &feList);
+	~EnumFormatEtc();
 
 	HRESULT		__stdcall	QueryInterface(REFIID iid, void **ppvObject);
 	ULONG		__stdcall	AddRef(void);
@@ -34,12 +34,12 @@ private:
 
 HRESULT CreateEnumFormatEtc(const std::list<FORMATETC> &feList,IEnumFORMATETC **ppEnumFormatEtc)
 {
-	*ppEnumFormatEtc = new CEnumFormatEtc(feList);
+	*ppEnumFormatEtc = new EnumFormatEtc(feList);
 
 	return S_OK;
 }
 
-CEnumFormatEtc::CEnumFormatEtc(const std::list<FORMATETC> &feList)
+EnumFormatEtc::EnumFormatEtc(const std::list<FORMATETC> &feList)
 {
 	m_lRefCount = 1;
 	m_iIndex = 0;
@@ -64,7 +64,7 @@ CEnumFormatEtc::CEnumFormatEtc(const std::list<FORMATETC> &feList)
 	m_iNumFormats = static_cast<int>(feList.size());
 }
 
-CEnumFormatEtc::~CEnumFormatEtc()
+EnumFormatEtc::~EnumFormatEtc()
 {
 	for(auto fe : m_feList)
 	{
@@ -76,7 +76,7 @@ CEnumFormatEtc::~CEnumFormatEtc()
 }
 
 /* IUnknown interface members. */
-HRESULT __stdcall CEnumFormatEtc::QueryInterface(REFIID iid, void **ppvObject)
+HRESULT __stdcall EnumFormatEtc::QueryInterface(REFIID iid, void **ppvObject)
 {
 	*ppvObject = NULL;
 
@@ -94,12 +94,12 @@ HRESULT __stdcall CEnumFormatEtc::QueryInterface(REFIID iid, void **ppvObject)
 	return E_NOINTERFACE;
 }
 
-ULONG __stdcall CEnumFormatEtc::AddRef(void)
+ULONG __stdcall EnumFormatEtc::AddRef(void)
 {
 	return InterlockedIncrement(&m_lRefCount);
 }
 
-ULONG __stdcall CEnumFormatEtc::Release(void)
+ULONG __stdcall EnumFormatEtc::Release(void)
 {
 	LONG lCount = InterlockedDecrement(&m_lRefCount);
 
@@ -113,7 +113,7 @@ ULONG __stdcall CEnumFormatEtc::Release(void)
 }
 
 
-HRESULT __stdcall CEnumFormatEtc::Next(ULONG celt,FORMATETC *rgelt,ULONG *pceltFetched)
+HRESULT __stdcall EnumFormatEtc::Next(ULONG celt,FORMATETC *rgelt,ULONG *pceltFetched)
 {
 	UNREFERENCED_PARAMETER(celt);
 
@@ -157,19 +157,19 @@ HRESULT __stdcall CEnumFormatEtc::Next(ULONG celt,FORMATETC *rgelt,ULONG *pceltF
 	return S_OK;
 }
 
-HRESULT __stdcall CEnumFormatEtc::Skip(ULONG celt)
+HRESULT __stdcall EnumFormatEtc::Skip(ULONG celt)
 {
 	m_iIndex += celt;
 	return S_OK;
 }
 
-HRESULT __stdcall CEnumFormatEtc::Reset(void)
+HRESULT __stdcall EnumFormatEtc::Reset(void)
 {
 	m_iIndex = 0;
 	return S_OK;
 }
 
-HRESULT __stdcall CEnumFormatEtc::Clone(IEnumFORMATETC **ppEnum)
+HRESULT __stdcall EnumFormatEtc::Clone(IEnumFORMATETC **ppEnum)
 {
 	UNREFERENCED_PARAMETER(ppEnum);
 

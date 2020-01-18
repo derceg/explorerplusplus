@@ -19,7 +19,7 @@ AddressBar *AddressBar::Create(HWND parent, IExplorerplusplus *expp, MainToolbar
 }
 
 AddressBar::AddressBar(HWND parent, IExplorerplusplus *expp, MainToolbar *mainToolbar) :
-	CBaseWindow(CreateAddressBar(parent)),
+	BaseWindow(CreateAddressBar(parent)),
 	m_expp(expp),
 	m_mainToolbar(mainToolbar),
 	m_defaultFolderIconIndex(GetDefaultFolderIconIndex())

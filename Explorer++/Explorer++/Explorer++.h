@@ -38,7 +38,7 @@
 
 // Forward declarations.
 class AddressBar;
-class CApplicationToolbar;
+class ApplicationToolbar;
 class BookmarksToolbar;
 
 namespace NColorRuleHelper
@@ -46,12 +46,12 @@ namespace NColorRuleHelper
 	struct ColorRule_t;
 }
 
-class CDrivesToolbar;
+class DrivesToolbar;
 struct Config;
 struct ColumnWidth_t;
 class ILoadSave;
-class CLoadSaveRegistry;
-class CLoadSaveXML;
+class LoadSaveRegistry;
+class LoadSaveXML;
 class MainToolbar;
 class MainWindow;
 class Navigation;
@@ -61,19 +61,19 @@ namespace Plugins
 	class PluginManager;
 }
 
-class CShellBrowser;
+class ShellBrowser;
 class TabContainer;
 class TaskbarThumbnails;
 
 __interface IDirectoryMonitor;
 
-class CMyTreeView;
+class MyTreeView;
 
 class Explorerplusplus : public IExplorerplusplus, public TabNavigationInterface,
 	public IFileContextMenuExternal, public PluginInterface
 {
-	friend CLoadSaveRegistry;
-	friend CLoadSaveXML;
+	friend LoadSaveRegistry;
+	friend LoadSaveXML;
 
 	friend LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
@@ -467,7 +467,7 @@ private:
 	HMODULE					GetLanguageModule() const;
 	HWND					GetMainWindow() const;
 	HWND					GetActiveListView() const;
-	CShellBrowser			*GetActiveShellBrowser() const;
+	ShellBrowser			*GetActiveShellBrowser() const;
 	TabContainer			*GetTabContainer() const;
 	HWND					GetTreeView() const;
 	IDirectoryMonitor		*GetDirectoryMonitor() const;
@@ -492,7 +492,7 @@ private:
 	BOOL					OnMouseWheel(MousewheelSource_t MousewheelSource,WPARAM wParam,LPARAM lParam);
 	void					CycleViewState(BOOL bCycleForward);
 	HMENU					CreateRebarHistoryMenu(BOOL bBack);
-	CStatusBar				*GetStatusBar();
+	StatusBar				*GetStatusBar();
 	void					HandleDirectoryMonitoring(int iTabId);
 	int						DetermineListViewObjectIndex(HWND hListView);
 
@@ -511,8 +511,8 @@ private:
 	HWND					m_hBookmarksToolbar;
 
 	IDirectoryMonitor *		m_pDirMon;
-	CMyTreeView *			m_pMyTreeView;
-	CStatusBar *			m_pStatusBar;
+	MyTreeView *			m_pMyTreeView;
+	StatusBar *			m_pStatusBar;
 
 	HMODULE					m_hLanguageModule;
 
@@ -564,7 +564,7 @@ private:
 	Plugins::PluginCommandManager	m_pluginCommandManager;
 
 	HWND					m_hActiveListView;
-	CShellBrowser *			m_pActiveShellBrowser;
+	ShellBrowser *			m_pActiveShellBrowser;
 
 	/* User options variables. */
 	std::shared_ptr<Config>	m_config;	
@@ -583,13 +583,13 @@ private:
 	std::vector<NColorRuleHelper::ColorRule_t>	m_ColorRules;
 
 	/* Undo support. */
-	CFileActionHandler		m_FileActionHandler;
+	FileActionHandler		m_FileActionHandler;
 
 	/* Toolbars. */
 	REBARBANDINFO			m_ToolbarInformation[NUM_MAIN_TOOLBARS];
 	MainToolbar				*m_mainToolbar;
-	CDrivesToolbar			*m_pDrivesToolbar;
-	CApplicationToolbar		*m_pApplicationToolbar;
+	DrivesToolbar			*m_pDrivesToolbar;
+	ApplicationToolbar		*m_pApplicationToolbar;
 
 	/* Display window folder sizes. */
 	std::list<DWFolderSize_t>	m_DWFolderSizes;

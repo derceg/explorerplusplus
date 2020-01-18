@@ -13,14 +13,14 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/Logging.h"
 
-CNewMenuClient::CNewMenuClient(IExplorerplusplus *pexpp) :
+NewMenuClient::NewMenuClient(IExplorerplusplus *pexpp) :
 m_pexpp(pexpp),
 m_RefCount(1)
 {
 
 }
 
-HRESULT __stdcall CNewMenuClient::QueryInterface(REFIID iid,void **ppvObject)
+HRESULT __stdcall NewMenuClient::QueryInterface(REFIID iid,void **ppvObject)
 {
 	*ppvObject = NULL;
 
@@ -42,12 +42,12 @@ HRESULT __stdcall CNewMenuClient::QueryInterface(REFIID iid,void **ppvObject)
 	return E_NOINTERFACE;
 }
 
-ULONG __stdcall CNewMenuClient::AddRef(void)
+ULONG __stdcall NewMenuClient::AddRef(void)
 {
 	return ++m_RefCount;
 }
 
-ULONG __stdcall CNewMenuClient::Release(void)
+ULONG __stdcall NewMenuClient::Release(void)
 {
 	m_RefCount--;
 	
@@ -60,7 +60,7 @@ ULONG __stdcall CNewMenuClient::Release(void)
 	return m_RefCount;
 }
 
-HRESULT CNewMenuClient::IncludeItems(NMCII_FLAGS *pFlags)
+HRESULT NewMenuClient::IncludeItems(NMCII_FLAGS *pFlags)
 {
 	/* pFlags will be one of:
 	NMCII_ITEMS
@@ -80,7 +80,7 @@ HRESULT CNewMenuClient::IncludeItems(NMCII_FLAGS *pFlags)
 	return S_OK;
 }
 
-HRESULT CNewMenuClient::SelectAndEditItem(PCIDLIST_ABSOLUTE pidlItem,NMCSAEI_FLAGS flags)
+HRESULT NewMenuClient::SelectAndEditItem(PCIDLIST_ABSOLUTE pidlItem,NMCSAEI_FLAGS flags)
 {
 	switch(flags)
 	{

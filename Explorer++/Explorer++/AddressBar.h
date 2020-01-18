@@ -11,7 +11,7 @@
 #include "../Helper/WindowSubclassWrapper.h"
 #include <optional>
 
-class AddressBar : public CBaseWindow
+class AddressBar : public BaseWindow
 {
 public:
 

@@ -6,7 +6,7 @@
 #include "UiTheming.h"
 #include "../Helper/BaseDialog.h"
 
-class ScriptingDialog : public CBaseDialog
+class ScriptingDialog : public BaseDialog
 {
 public:
 
@@ -22,7 +22,7 @@ protected:
 
 private:
 
-	void GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList);
 
 	std::wstring FormatResult(const sol::protected_function_result &result);
 	void AppendToLog(const std::wstring &command, const std::wstring &result);

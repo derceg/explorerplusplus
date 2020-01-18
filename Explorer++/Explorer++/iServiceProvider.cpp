@@ -11,14 +11,14 @@
 #include "INewMenuClient.h"
 
 
-CServiceProvider::CServiceProvider(IExplorerplusplus *pexpp) :
+ServiceProvider::ServiceProvider(IExplorerplusplus *pexpp) :
 m_pexpp(pexpp),
 m_RefCount(1)
 {
 
 }
 
-HRESULT __stdcall CServiceProvider::QueryInterface(REFIID iid,void **ppvObject)
+HRESULT __stdcall ServiceProvider::QueryInterface(REFIID iid,void **ppvObject)
 {
 	*ppvObject = NULL;
 
@@ -40,12 +40,12 @@ HRESULT __stdcall CServiceProvider::QueryInterface(REFIID iid,void **ppvObject)
 	return E_NOINTERFACE;
 }
 
-ULONG __stdcall CServiceProvider::AddRef(void)
+ULONG __stdcall ServiceProvider::AddRef(void)
 {
 	return ++m_RefCount;
 }
 
-ULONG __stdcall CServiceProvider::Release(void)
+ULONG __stdcall ServiceProvider::Release(void)
 {
 	m_RefCount--;
 	
@@ -58,7 +58,7 @@ ULONG __stdcall CServiceProvider::Release(void)
 	return m_RefCount;
 }
 
-HRESULT CServiceProvider::QueryService(REFGUID guidService,REFIID riid,void **ppv)
+HRESULT ServiceProvider::QueryService(REFGUID guidService,REFIID riid,void **ppv)
 {
 	/* Technically, this parameter should
 	probably be validated, but in this case
@@ -73,7 +73,7 @@ HRESULT CServiceProvider::QueryService(REFGUID guidService,REFIID riid,void **pp
 
 	if(riid == IID_INewMenuClient)
 	{
-		*ppv = new CNewMenuClient(m_pexpp);
+		*ppv = new NewMenuClient(m_pexpp);
 	}
 
 	if(*ppv)

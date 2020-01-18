@@ -12,7 +12,7 @@
 #include "../Helper/FileOperations.h"
 #include "../Helper/Macros.h"
 
-BOOL CFileActionHandler::RenameFiles(const RenamedItems_t &itemList)
+BOOL FileActionHandler::RenameFiles(const RenamedItems_t &itemList)
 {
 	RenamedItems_t renamedItems;
 
@@ -56,7 +56,7 @@ BOOL CFileActionHandler::RenameFiles(const RenamedItems_t &itemList)
 	return FALSE;
 }
 
-HRESULT CFileActionHandler::DeleteFiles(HWND hwnd, DeletedItems_t &deletedItems,
+HRESULT FileActionHandler::DeleteFiles(HWND hwnd, DeletedItems_t &deletedItems,
 	bool permanent, bool silent)
 {
 	HRESULT hr = NFileOperations::DeleteFiles(hwnd, deletedItems, permanent, silent);
@@ -72,7 +72,7 @@ HRESULT CFileActionHandler::DeleteFiles(HWND hwnd, DeletedItems_t &deletedItems,
 	return hr;
 }
 
-void CFileActionHandler::Undo()
+void FileActionHandler::Undo()
 {
 	if(!m_stackFileActions.empty())
 	{
@@ -99,7 +99,7 @@ void CFileActionHandler::Undo()
 	}
 }
 
-void CFileActionHandler::UndoRenameOperation(const RenamedItems_t &renamedItemList)
+void FileActionHandler::UndoRenameOperation(const RenamedItems_t &renamedItemList)
 {
 	RenamedItems_t UndoList;
 
@@ -116,7 +116,7 @@ void CFileActionHandler::UndoRenameOperation(const RenamedItems_t &renamedItemLi
 	RenameFiles(UndoList);
 }
 
-void CFileActionHandler::UndoDeleteOperation(const DeletedItems_t &deletedItemList)
+void FileActionHandler::UndoDeleteOperation(const DeletedItems_t &deletedItemList)
 {
 	UNREFERENCED_PARAMETER(deletedItemList);
 
@@ -128,7 +128,7 @@ void CFileActionHandler::UndoDeleteOperation(const DeletedItems_t &deletedItemLi
 	 - Push delete action onto stack. */
 }
 
-BOOL CFileActionHandler::CanUndo() const
+BOOL FileActionHandler::CanUndo() const
 {
 	return !m_stackFileActions.empty();
 }

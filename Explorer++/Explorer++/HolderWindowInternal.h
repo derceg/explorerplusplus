@@ -6,11 +6,11 @@
 
 #include "../Helper/DpiCompatibility.h"
 
-class CHolderWindow
+class HolderWindow
 {
 public:
 
-	CHolderWindow(HWND hHolder);
+	HolderWindow(HWND hHolder);
 
 	LRESULT CALLBACK	HolderWndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 

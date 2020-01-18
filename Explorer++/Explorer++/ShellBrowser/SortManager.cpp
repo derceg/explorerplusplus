@@ -11,7 +11,7 @@
 #include <propkey.h>
 #include <cassert>
 
-void CShellBrowser::SortFolder(SortMode sortMode)
+void ShellBrowser::SortFolder(SortMode sortMode)
 {
 	m_folderSettings.sortMode = sortMode;
 
@@ -35,14 +35,14 @@ void CShellBrowser::SortFolder(SortMode sortMode)
 	}
 }
 
-int CALLBACK CShellBrowser::SortStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
+int CALLBACK ShellBrowser::SortStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	ShellBrowser *pShellBrowser = reinterpret_cast<ShellBrowser *>(lParamSort);
 	return pShellBrowser->Sort(static_cast<int>(lParam1),static_cast<int>(lParam2));
 }
 
 /* Also see NBookmarkHelper::Sort. */
-int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
+int CALLBACK ShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 {
 	int ComparisonResult = 0;
 

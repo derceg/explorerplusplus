@@ -8,30 +8,30 @@
 #include "../Helper/DialogSettings.h"
 #include "../Helper/Macros.h"
 
-class CUpdateCheckDialog;
+class UpdateCheckDialog;
 
-class CUpdateCheckDialogPersistentSettings : public CDialogSettings
+class UpdateCheckDialogPersistentSettings : public DialogSettings
 {
 public:
 
-	static CUpdateCheckDialogPersistentSettings &GetInstance();
+	static UpdateCheckDialogPersistentSettings &GetInstance();
 
 private:
 
-	friend CUpdateCheckDialog;
+	friend UpdateCheckDialog;
 
 	static const TCHAR SETTINGS_KEY[];
 
-	CUpdateCheckDialogPersistentSettings();
+	UpdateCheckDialogPersistentSettings();
 
-	DISALLOW_COPY_AND_ASSIGN(CUpdateCheckDialogPersistentSettings);
+	DISALLOW_COPY_AND_ASSIGN(UpdateCheckDialogPersistentSettings);
 };
 
-class CUpdateCheckDialog : public CBaseDialog
+class UpdateCheckDialog : public BaseDialog
 {
 public:
 
-	CUpdateCheckDialog(HINSTANCE hInstance, HWND hParent);
+	UpdateCheckDialog(HINSTANCE hInstance, HWND hParent);
 
 protected:
 
@@ -73,5 +73,5 @@ private:
 
 	bool m_UpdateCheckComplete;
 
-	CUpdateCheckDialogPersistentSettings	*m_pucdps;
+	UpdateCheckDialogPersistentSettings	*m_pucdps;
 };

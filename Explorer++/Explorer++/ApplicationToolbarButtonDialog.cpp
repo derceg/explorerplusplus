@@ -7,16 +7,16 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 
-CApplicationToolbarButtonDialog::CApplicationToolbarButtonDialog(HINSTANCE hInstance,
+ApplicationToolbarButtonDialog::ApplicationToolbarButtonDialog(HINSTANCE hInstance,
 	HWND hParent, ApplicationButton_t *Button, bool IsNew) :
-	CBaseDialog(hInstance, IDD_EDITAPPLICATIONBUTTON, hParent, false),
+	BaseDialog(hInstance, IDD_EDITAPPLICATIONBUTTON, hParent, false),
 	m_Button(Button),
 	m_IsNew(IsNew)
 {
 	
 }
 
-INT_PTR CApplicationToolbarButtonDialog::OnInitDialog()
+INT_PTR ApplicationToolbarButtonDialog::OnInitDialog()
 {
 	if(m_IsNew)
 	{
@@ -43,7 +43,7 @@ INT_PTR CApplicationToolbarButtonDialog::OnInitDialog()
 	return 0;
 }
 
-INT_PTR CApplicationToolbarButtonDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR ApplicationToolbarButtonDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -85,7 +85,7 @@ INT_PTR CApplicationToolbarButtonDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-void CApplicationToolbarButtonDialog::OnChooseFile()
+void ApplicationToolbarButtonDialog::OnChooseFile()
 {
 	/* TODO: Text needs to be localized. */
 	const TCHAR *Filter = _T("Programs (*.exe)\0*.exe\0All Files\0*.*\0\0");
@@ -120,7 +120,7 @@ void CApplicationToolbarButtonDialog::OnChooseFile()
 	}
 }
 
-void CApplicationToolbarButtonDialog::OnOk()
+void ApplicationToolbarButtonDialog::OnOk()
 {
 	TCHAR Name[512];
 	GetDlgItemText(m_hDlg,IDC_APP_EDIT_NAME,Name,SIZEOF_ARRAY(Name));
@@ -149,12 +149,12 @@ void CApplicationToolbarButtonDialog::OnOk()
 	EndDialog(m_hDlg,1);
 }
 
-void CApplicationToolbarButtonDialog::OnCancel()
+void ApplicationToolbarButtonDialog::OnCancel()
 {
 	EndDialog(m_hDlg,0);
 }
 
-INT_PTR CApplicationToolbarButtonDialog::OnClose()
+INT_PTR ApplicationToolbarButtonDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;

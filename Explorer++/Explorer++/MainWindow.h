@@ -10,7 +10,7 @@
 
 struct Config;
 
-class MainWindow : CBaseWindow
+class MainWindow : BaseWindow
 {
 public:
 

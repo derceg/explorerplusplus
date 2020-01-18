@@ -29,12 +29,12 @@ namespace NMergeFilesDialog
 	DWORD WINAPI	MergeFilesThread(LPVOID pParam);
 }
 
-const TCHAR CMergeFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("MergeFiles");
+const TCHAR MergeFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("MergeFiles");
 
-CMergeFilesDialog::CMergeFilesDialog(HINSTANCE hInstance, HWND hParent,
+MergeFilesDialog::MergeFilesDialog(HINSTANCE hInstance, HWND hParent,
 	IExplorerplusplus *expp, std::wstring strOutputDirectory,
 	std::list<std::wstring> FullFilenameList, BOOL bShowFriendlyDates) :
-	CBaseDialog(hInstance, IDD_MERGEFILES, hParent, true),
+	BaseDialog(hInstance, IDD_MERGEFILES, hParent, true),
 	m_expp(expp),
 	m_strOutputDirectory(strOutputDirectory),
 	m_FullFilenameList(FullFilenameList),
@@ -43,10 +43,10 @@ CMergeFilesDialog::CMergeFilesDialog(HINSTANCE hInstance, HWND hParent,
 	m_bStopMerging(false),
 	m_pMergeFiles(nullptr)
 {
-	m_pmfdps = &CMergeFilesDialogPersistentSettings::GetInstance();
+	m_pmfdps = &MergeFilesDialogPersistentSettings::GetInstance();
 }
 
-CMergeFilesDialog::~CMergeFilesDialog()
+MergeFilesDialog::~MergeFilesDialog()
 {
 	if(m_pMergeFiles != NULL)
 	{
@@ -60,7 +60,7 @@ bool CompareFilenames(std::wstring strFirst,std::wstring strSecond)
 	return (StrCmpLogicalW(strFirst.c_str(),strSecond.c_str()) <= 0);
 }
 
-INT_PTR CMergeFilesDialog::OnInitDialog()
+INT_PTR MergeFilesDialog::OnInitDialog()
 {
 	std::wregex rxPattern;
 	bool bAllMatchPattern = true;
@@ -193,90 +193,90 @@ INT_PTR CMergeFilesDialog::OnInitDialog()
 	return 0;
 }
 
-wil::unique_hicon CMergeFilesDialog::GetDialogIcon(int iconWidth, int iconHeight) const
+wil::unique_hicon MergeFilesDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
 	return m_expp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::MergeFiles, iconWidth, iconHeight);
 }
 
-void CMergeFilesDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,
-	std::list<CResizableDialog::Control_t> &ControlList)
+void MergeFilesDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+	std::list<ResizableDialog::Control_t> &ControlList)
 {
-	dsc = CBaseDialog::DIALOG_SIZE_CONSTRAINT_NONE;
+	dsc = BaseDialog::DIALOG_SIZE_CONSTRAINT_NONE;
 
-	CResizableDialog::Control_t Control;
+	ResizableDialog::Control_t Control;
 
 	Control.iID = IDC_MERGE_LISTVIEW;
-	Control.Type = CResizableDialog::TYPE_RESIZE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_RESIZE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_MERGE_BUTTON_MOVEUP;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_X;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_MERGE_BUTTON_MOVEDOWN;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_X;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_MERGE_STATIC_OUTPUT;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_Y;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_MERGE_EDIT_FILENAME;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_Y;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_MERGE_EDIT_FILENAME;
-	Control.Type = CResizableDialog::TYPE_RESIZE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	Control.Type = ResizableDialog::TYPE_RESIZE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_X;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_MERGE_BUTTON_OUTPUT;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_MERGE_PROGRESS;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_Y;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_MERGE_PROGRESS;
-	Control.Type = CResizableDialog::TYPE_RESIZE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	Control.Type = ResizableDialog::TYPE_RESIZE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_X;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_MERGE_STATIC_ETCHED;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_Y;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_MERGE_STATIC_ETCHED;
-	Control.Type = CResizableDialog::TYPE_RESIZE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	Control.Type = ResizableDialog::TYPE_RESIZE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_X;
 	ControlList.push_back(Control);
 
 	Control.iID = IDOK;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 
 	Control.iID = IDCANCEL;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_GRIPPER;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 }
 
-INT_PTR CMergeFilesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR MergeFilesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -306,13 +306,13 @@ INT_PTR CMergeFilesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-INT_PTR CMergeFilesDialog::OnClose()
+INT_PTR MergeFilesDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-INT_PTR CMergeFilesDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR MergeFilesDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -353,13 +353,13 @@ INT_PTR CMergeFilesDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lPara
 	return 0;
 }
 
-void CMergeFilesDialog::SaveState()
+void MergeFilesDialog::SaveState()
 {
 	m_pmfdps->SaveDialogPosition(m_hDlg);
 	m_pmfdps->m_bStateSaved = TRUE;
 }
 
-void CMergeFilesDialog::OnOk()
+void MergeFilesDialog::OnOk()
 {
 	if(!m_bMergingFiles)
 	{
@@ -379,7 +379,7 @@ void CMergeFilesDialog::OnOk()
 		TCHAR szOutputFileName[MAX_PATH];
 		GetWindowText(hOutputFileName,szOutputFileName,SIZEOF_ARRAY(szOutputFileName));
 
-		m_pMergeFiles = new CMergeFiles(m_hDlg,szOutputFileName,m_FullFilenameList);
+		m_pMergeFiles = new MergeFiles(m_hDlg,szOutputFileName,m_FullFilenameList);
 
 		SendDlgItemMessage(m_hDlg,IDC_MERGE_PROGRESS,PBM_SETPOS,0,0);
 
@@ -407,7 +407,7 @@ void CMergeFilesDialog::OnOk()
 	}
 }
 
-void CMergeFilesDialog::OnCancel()
+void MergeFilesDialog::OnCancel()
 {
 	if(m_bMergingFiles)
 	{
@@ -419,7 +419,7 @@ void CMergeFilesDialog::OnCancel()
 	}
 }
 
-void CMergeFilesDialog::OnChangeOutputDirectory()
+void MergeFilesDialog::OnChangeOutputDirectory()
 {
 	TCHAR szTitle[128];
 	LoadString(GetInstance(),IDS_MERGE_SELECTDESTINATION,
@@ -448,7 +448,7 @@ void CMergeFilesDialog::OnChangeOutputDirectory()
 	SetDlgItemText(m_hDlg, IDC_MERGE_EDIT_FILENAME, parsingName);
 }
 
-void CMergeFilesDialog::OnMove(bool bUp)
+void MergeFilesDialog::OnMove(bool bUp)
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MERGE_LISTVIEW);
 	int iSelected = ListView_GetNextItem(hListView,-1,LVNI_SELECTED);
@@ -484,7 +484,7 @@ void CMergeFilesDialog::OnMove(bool bUp)
 	}
 }
 
-void CMergeFilesDialog::OnFinished()
+void MergeFilesDialog::OnFinished()
 {
 	assert(m_pMergeFiles != NULL);
 
@@ -505,13 +505,13 @@ DWORD WINAPI NMergeFilesDialog::MergeFilesThread(LPVOID pParam)
 {
 	assert(pParam != NULL);
 
-	CMergeFiles *pMergeFiles = reinterpret_cast<CMergeFiles *>(pParam);
+	MergeFiles *pMergeFiles = reinterpret_cast<MergeFiles *>(pParam);
 	pMergeFiles->StartMerging();
 
 	return 0;
 }
 
-CMergeFiles::CMergeFiles(HWND hDlg,std::wstring strOutputFilename,std::list<std::wstring> FullFilenameList)
+MergeFiles::MergeFiles(HWND hDlg,std::wstring strOutputFilename,std::list<std::wstring> FullFilenameList)
 {
 	m_hDlg				= hDlg;
 	m_strOutputFilename	= strOutputFilename;
@@ -522,12 +522,12 @@ CMergeFiles::CMergeFiles(HWND hDlg,std::wstring strOutputFilename,std::list<std:
 	InitializeCriticalSection(&m_csStop);
 }
 
-CMergeFiles::~CMergeFiles()
+MergeFiles::~MergeFiles()
 {
 	DeleteCriticalSection(&m_csStop);
 }
 
-void CMergeFiles::StartMerging()
+void MergeFiles::StartMerging()
 {
 	LARGE_INTEGER lMergeFileSize;
 	int nFilesMerged = 1;
@@ -592,21 +592,21 @@ void CMergeFiles::StartMerging()
 	SendMessage(m_hDlg,NMergeFilesDialog::WM_APP_MERGINGFINISHED,0,0);
 }
 
-void CMergeFiles::StopMerging()
+void MergeFiles::StopMerging()
 {
 	EnterCriticalSection(&m_csStop);
 	m_bstopMerging = true;
 	LeaveCriticalSection(&m_csStop);
 }
 
-CMergeFilesDialogPersistentSettings::CMergeFilesDialogPersistentSettings() :
-CDialogSettings(SETTINGS_KEY)
+MergeFilesDialogPersistentSettings::MergeFilesDialogPersistentSettings() :
+DialogSettings(SETTINGS_KEY)
 {
 
 }
 
-CMergeFilesDialogPersistentSettings& CMergeFilesDialogPersistentSettings::GetInstance()
+MergeFilesDialogPersistentSettings& MergeFilesDialogPersistentSettings::GetInstance()
 {
-	static CMergeFilesDialogPersistentSettings mfdps;
+	static MergeFilesDialogPersistentSettings mfdps;
 	return mfdps;
 }

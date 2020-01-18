@@ -30,15 +30,15 @@
 #include "Macros.h"
 
 
-UINT_PTR CComboBox::m_StaticSubclassCounter = 0;
+UINT_PTR ComboBox::m_StaticSubclassCounter = 0;
 
-CComboBox *CComboBox::CreateNew(HWND hComboBox)
+ComboBox *ComboBox::CreateNew(HWND hComboBox)
 {
-	return new CComboBox(hComboBox);
+	return new ComboBox(hComboBox);
 }
 
-CComboBox::CComboBox(HWND hComboBox) :
-CBaseWindow(hComboBox),
+ComboBox::ComboBox(HWND hComboBox) :
+BaseWindow(hComboBox),
 m_SubclassCounter(m_StaticSubclassCounter++),
 m_SuppressAutocomplete(false)
 {
@@ -51,7 +51,7 @@ m_SuppressAutocomplete(false)
 	SetWindowSubclass(GetParent(m_hwnd),ComboBoxParentProcStub,m_SubclassCounter,reinterpret_cast<DWORD_PTR>(this));
 }
 
-INT_PTR CComboBox::OnDestroy()
+INT_PTR ComboBox::OnDestroy()
 {
 	COMBOBOXINFO cbi;
 	cbi.cbSize = sizeof(cbi);
@@ -63,17 +63,17 @@ INT_PTR CComboBox::OnDestroy()
 	return 0;
 }
 
-LRESULT CALLBACK CComboBox::ComboBoxEditProcStub(HWND hwnd,UINT uMsg,
+LRESULT CALLBACK ComboBox::ComboBoxEditProcStub(HWND hwnd,UINT uMsg,
 	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	CComboBox *pcb = reinterpret_cast<CComboBox *>(dwRefData);
+	ComboBox *pcb = reinterpret_cast<ComboBox *>(dwRefData);
 
 	return pcb->ComboBoxEditProc(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK CComboBox::ComboBoxEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK ComboBox::ComboBoxEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(Msg)
 	{
@@ -89,17 +89,17 @@ LRESULT CALLBACK CComboBox::ComboBoxEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LP
 	return DefSubclassProc(hwnd,Msg,wParam,lParam);
 }
 
-LRESULT CALLBACK CComboBox::ComboBoxParentProcStub(HWND hwnd,UINT uMsg,
+LRESULT CALLBACK ComboBox::ComboBoxParentProcStub(HWND hwnd,UINT uMsg,
 	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	CComboBox *pcb = reinterpret_cast<CComboBox *>(dwRefData);
+	ComboBox *pcb = reinterpret_cast<ComboBox *>(dwRefData);
 
 	return pcb->ComboBoxParentProc(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK CComboBox::ComboBoxParentProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK ComboBox::ComboBoxParentProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(Msg)
 	{
@@ -122,7 +122,7 @@ LRESULT CALLBACK CComboBox::ComboBoxParentProc(HWND hwnd,UINT Msg,WPARAM wParam,
 	return DefSubclassProc(hwnd,Msg,wParam,lParam);
 }
 
-INT_PTR CComboBox::OnCBNEditChange()
+INT_PTR ComboBox::OnCBNEditChange()
 {
 	if(m_SuppressAutocomplete)
 	{

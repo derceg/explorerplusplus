@@ -34,14 +34,14 @@ namespace NSplitFileDialog
 	DWORD WINAPI	SplitFileThreadProcStub(LPVOID pParam);
 }
 
-const TCHAR CSplitFileDialogPersistentSettings::SETTINGS_KEY[] = _T("SplitFile");
+const TCHAR SplitFileDialogPersistentSettings::SETTINGS_KEY[] = _T("SplitFile");
 
-const TCHAR CSplitFileDialogPersistentSettings::SETTING_SIZE[] = _T("Size");
-const TCHAR CSplitFileDialogPersistentSettings::SETTING_SIZE_GROUP[] = _T("SizeGroup");
+const TCHAR SplitFileDialogPersistentSettings::SETTING_SIZE[] = _T("Size");
+const TCHAR SplitFileDialogPersistentSettings::SETTING_SIZE_GROUP[] = _T("SizeGroup");
 
-CSplitFileDialog::CSplitFileDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
+SplitFileDialog::SplitFileDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
 	std::wstring strFullFilename) :
-	CBaseDialog(hInstance, IDD_SPLITFILE, hParent, false),
+	BaseDialog(hInstance, IDD_SPLITFILE, hParent, false),
 	m_expp(expp),
 	m_strFullFilename(strFullFilename),
 	m_bSplittingFile(false),
@@ -49,10 +49,10 @@ CSplitFileDialog::CSplitFileDialog(HINSTANCE hInstance, HWND hParent, IExplorerp
 	m_CurrentError(ERROR_NONE),
 	m_pSplitFile(nullptr)
 {
-	m_psfdps = &CSplitFileDialogPersistentSettings::GetInstance();
+	m_psfdps = &SplitFileDialogPersistentSettings::GetInstance();
 }
 
-CSplitFileDialog::~CSplitFileDialog()
+SplitFileDialog::~SplitFileDialog()
 {
 	if(m_pSplitFile != NULL)
 	{
@@ -61,7 +61,7 @@ CSplitFileDialog::~CSplitFileDialog()
 	}
 }
 
-INT_PTR CSplitFileDialog::OnInitDialog()
+INT_PTR SplitFileDialog::OnInitDialog()
 {
 	SHFILEINFO shfi;
 	DWORD_PTR dwRes = SHGetFileInfo(m_strFullFilename.c_str(),0,&shfi,sizeof(shfi),SHGFI_ICON);
@@ -154,12 +154,12 @@ INT_PTR CSplitFileDialog::OnInitDialog()
 	return 0;
 }
 
-wil::unique_hicon CSplitFileDialog::GetDialogIcon(int iconWidth, int iconHeight) const
+wil::unique_hicon SplitFileDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
 	return m_expp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::SplitFiles, iconWidth, iconHeight);
 }
 
-INT_PTR CSplitFileDialog::OnTimer(int iTimerID)
+INT_PTR SplitFileDialog::OnTimer(int iTimerID)
 {
 	if(iTimerID == ELPASED_TIMER_ID)
 	{
@@ -176,7 +176,7 @@ INT_PTR CSplitFileDialog::OnTimer(int iTimerID)
 	return 0;
 }
 
-INT_PTR CSplitFileDialog::OnCtlColorStatic(HWND hwnd,HDC hdc)
+INT_PTR SplitFileDialog::OnCtlColorStatic(HWND hwnd,HDC hdc)
 {
 	if(hwnd == GetDlgItem(m_hDlg,IDC_SPLIT_STATIC_FILENAMEHELPER))
 	{
@@ -189,7 +189,7 @@ INT_PTR CSplitFileDialog::OnCtlColorStatic(HWND hwnd,HDC hdc)
 	return 0;
 }
 
-INT_PTR CSplitFileDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR SplitFileDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -254,20 +254,20 @@ INT_PTR CSplitFileDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-INT_PTR CSplitFileDialog::OnClose()
+INT_PTR SplitFileDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-INT_PTR CSplitFileDialog::OnDestroy()
+INT_PTR SplitFileDialog::OnDestroy()
 {
 	DeleteObject(m_hHelperTextFont);
 
 	return 0;
 }
 
-void CSplitFileDialog::SaveState()
+void SplitFileDialog::SaveState()
 {
 	m_psfdps->SaveDialogPosition(m_hDlg);
 
@@ -277,7 +277,7 @@ void CSplitFileDialog::SaveState()
 	m_psfdps->m_bStateSaved = TRUE;
 }
 
-INT_PTR CSplitFileDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR SplitFileDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -320,7 +320,7 @@ INT_PTR CSplitFileDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam
 	return 0;
 }
 
-void CSplitFileDialog::OnOk()
+void SplitFileDialog::OnOk()
 {
 	if(!m_bSplittingFile)
 	{
@@ -428,7 +428,7 @@ void CSplitFileDialog::OnOk()
 			}
 		}
 
-		m_pSplitFile = new CSplitFile(m_hDlg,m_strFullFilename,strOutputFilename,
+		m_pSplitFile = new SplitFile(m_hDlg,m_strFullFilename,strOutputFilename,
 			strOutputDirectory,uSplitSize);
 
 		GetDlgItemText(m_hDlg,IDOK,m_szOk,SIZEOF_ARRAY(m_szOk));
@@ -462,7 +462,7 @@ void CSplitFileDialog::OnOk()
 	}
 }
 
-void CSplitFileDialog::OnCancel()
+void SplitFileDialog::OnCancel()
 {
 	if(m_bSplittingFile)
 	{
@@ -474,7 +474,7 @@ void CSplitFileDialog::OnCancel()
 	}
 }
 
-void CSplitFileDialog::OnChangeOutputDirectory()
+void SplitFileDialog::OnChangeOutputDirectory()
 {
 	TCHAR szTitle[128];
 	LoadString(GetInstance(),IDS_SPLITFILEDIALOG_DIRECTORYTITLE,
@@ -503,7 +503,7 @@ void CSplitFileDialog::OnChangeOutputDirectory()
 	SetDlgItemText(m_hDlg, IDC_SPLIT_EDIT_OUTPUT, parsingName);
 }
 
-void CSplitFileDialog::OnSplitFinished()
+void SplitFileDialog::OnSplitFinished()
 {
 	TCHAR szTemp[64];
 
@@ -540,13 +540,13 @@ DWORD WINAPI NSplitFileDialog::SplitFileThreadProcStub(LPVOID pParam)
 {
 	assert(pParam != NULL);
 
-	CSplitFile *pSplitFile = reinterpret_cast<CSplitFile *>(pParam);
-	pSplitFile->SplitFile();
+	SplitFile *pSplitFile = reinterpret_cast<SplitFile *>(pParam);
+	pSplitFile->Split();
 
 	return 0;
 }
 
-CSplitFile::CSplitFile(HWND hDlg,std::wstring strFullFilename,
+SplitFile::SplitFile(HWND hDlg,std::wstring strFullFilename,
 	std::wstring strOutputFilename,std::wstring strOutputDirectory,
 	UINT uSplitSize)
 {
@@ -561,12 +561,12 @@ CSplitFile::CSplitFile(HWND hDlg,std::wstring strFullFilename,
 	InitializeCriticalSection(&m_csStop);
 }
 
-CSplitFile::~CSplitFile()
+SplitFile::~SplitFile()
 {
 	DeleteCriticalSection(&m_csStop);
 }
 
-void CSplitFile::SplitFile()
+void SplitFile::Split()
 {
 	HANDLE hInputFile = CreateFile(m_strFullFilename.c_str(),GENERIC_READ,
 		FILE_SHARE_READ,NULL,OPEN_EXISTING,0,NULL);
@@ -588,14 +588,14 @@ void CSplitFile::SplitFile()
 	PostMessage(m_hDlg,NSplitFileDialog::WM_APP_SETTOTALSPLITCOUNT,
 		static_cast<WPARAM>(nSplits),0);
 
-	SplitFileInternal(hInputFile,lFileSize);
+	SplitInternal(hInputFile,lFileSize);
 
 	CloseHandle(hInputFile);
 
 	SendMessage(m_hDlg,NSplitFileDialog::WM_APP_SPLITFINISHED,0,0);
 }
 
-void CSplitFile::SplitFileInternal(HANDLE hInputFile,const LARGE_INTEGER &lFileSize)
+void SplitFile::SplitInternal(HANDLE hInputFile,const LARGE_INTEGER &lFileSize)
 {
 	LARGE_INTEGER lRunningSplitSize = {0};
 
@@ -642,7 +642,7 @@ void CSplitFile::SplitFileInternal(HANDLE hInputFile,const LARGE_INTEGER &lFileS
 	delete[] pBuffer;
 }
 
-void CSplitFile::ProcessFilename(int nSplitsMade,std::wstring &strOutputFullFilename)
+void SplitFile::ProcessFilename(int nSplitsMade,std::wstring &strOutputFullFilename)
 {
 	std::wstring strOutputFilename = m_strOutputFilename;
 
@@ -653,46 +653,46 @@ void CSplitFile::ProcessFilename(int nSplitsMade,std::wstring &strOutputFullFile
 	strOutputFullFilename = m_strOutputDirectory + _T("\\") + strOutputFilename;
 }
 
-void CSplitFile::StopSplitting()
+void SplitFile::StopSplitting()
 {
 	EnterCriticalSection(&m_csStop);
 	m_bStopSplitting = true;
 	LeaveCriticalSection(&m_csStop);
 }
 
-CSplitFileDialogPersistentSettings::CSplitFileDialogPersistentSettings() :
-CDialogSettings(SETTINGS_KEY)
+SplitFileDialogPersistentSettings::SplitFileDialogPersistentSettings() :
+DialogSettings(SETTINGS_KEY)
 {
 	m_strSplitSize = _T("10");
 	m_strSplitGroup = _T("KB");
 }
 
-CSplitFileDialogPersistentSettings& CSplitFileDialogPersistentSettings::GetInstance()
+SplitFileDialogPersistentSettings& SplitFileDialogPersistentSettings::GetInstance()
 {
-	static CSplitFileDialogPersistentSettings sfadps;
+	static SplitFileDialogPersistentSettings sfadps;
 	return sfadps;
 }
 
-void CSplitFileDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
+void SplitFileDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
 	NRegistrySettings::SaveStringToRegistry(hKey, SETTING_SIZE, m_strSplitSize.c_str());
 	NRegistrySettings::SaveStringToRegistry(hKey, SETTING_SIZE_GROUP, m_strSplitGroup.c_str());
 }
 
-void CSplitFileDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
+void SplitFileDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
 	NRegistrySettings::ReadStringFromRegistry(hKey, SETTING_SIZE, m_strSplitSize);
 	NRegistrySettings::ReadStringFromRegistry(hKey, SETTING_SIZE_GROUP, m_strSplitGroup);
 }
 
-void CSplitFileDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
+void SplitFileDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
 	IXMLDOMElement *pParentNode)
 {
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SIZE, m_strSplitSize.c_str());
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SIZE_GROUP, m_strSplitGroup.c_str());
 }
 
-void CSplitFileDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
+void SplitFileDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
 {
 	if(lstrcmpi(bstrName, SETTING_SIZE) == 0)
 	{

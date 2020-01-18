@@ -10,7 +10,7 @@
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/XMLSettings.h"
 
-CLoadSaveXML::CLoadSaveXML(Explorerplusplus *pContainer, BOOL bLoad) :
+LoadSaveXML::LoadSaveXML(Explorerplusplus *pContainer, BOOL bLoad) :
 	m_pContainer(pContainer),
 	m_bLoad(bLoad)
 {
@@ -27,7 +27,7 @@ CLoadSaveXML::CLoadSaveXML(Explorerplusplus *pContainer, BOOL bLoad) :
 	}
 }
 
-CLoadSaveXML::~CLoadSaveXML()
+LoadSaveXML::~LoadSaveXML()
 {
 	if (m_bLoad)
 		ReleaseLoadEnvironment();
@@ -35,7 +35,7 @@ CLoadSaveXML::~CLoadSaveXML()
 		ReleaseSaveEnvironment();
 }
 
-void CLoadSaveXML::InitializeLoadEnvironment()
+void LoadSaveXML::InitializeLoadEnvironment()
 {
 	TCHAR szConfigFile[MAX_PATH];
 	VARIANT_BOOL status;
@@ -66,7 +66,7 @@ clean:
 	return;
 }
 
-void CLoadSaveXML::ReleaseLoadEnvironment()
+void LoadSaveXML::ReleaseLoadEnvironment()
 {
 	if (m_bLoadedCorrectly)
 	{
@@ -75,7 +75,7 @@ void CLoadSaveXML::ReleaseLoadEnvironment()
 	}
 }
 
-void CLoadSaveXML::InitializeSaveEnvironment()
+void LoadSaveXML::InitializeSaveEnvironment()
 {
 	IXMLDOMProcessingInstruction *pi = NULL;
 	IXMLDOMComment *pc = NULL;
@@ -129,7 +129,7 @@ clean:
 	if (pc) pc->Release();
 }
 
-void CLoadSaveXML::ReleaseSaveEnvironment()
+void LoadSaveXML::ReleaseSaveEnvironment()
 {
 	HANDLE	hProcess;
 	TCHAR	szConfigFile[MAX_PATH];
@@ -163,82 +163,82 @@ void CLoadSaveXML::ReleaseSaveEnvironment()
 	m_pXMLDom = NULL;
 }
 
-void CLoadSaveXML::LoadGenericSettings()
+void LoadSaveXML::LoadGenericSettings()
 {
 	m_pContainer->LoadGenericSettingsFromXML(m_pXMLDom);
 }
 
-void CLoadSaveXML::LoadBookmarks()
+void LoadSaveXML::LoadBookmarks()
 {
 	m_pContainer->LoadBookmarksFromXML(m_pXMLDom);
 }
 
-int CLoadSaveXML::LoadPreviousTabs()
+int LoadSaveXML::LoadPreviousTabs()
 {
 	return m_pContainer->LoadTabSettingsFromXML(m_pXMLDom);
 }
 
-void CLoadSaveXML::LoadDefaultColumns()
+void LoadSaveXML::LoadDefaultColumns()
 {
 	m_pContainer->LoadDefaultColumnsFromXML(m_pXMLDom);
 }
 
-void CLoadSaveXML::LoadApplicationToolbar()
+void LoadSaveXML::LoadApplicationToolbar()
 {
 	m_pContainer->LoadApplicationToolbarFromXML(m_pXMLDom);
 }
 
-void CLoadSaveXML::LoadToolbarInformation()
+void LoadSaveXML::LoadToolbarInformation()
 {
 	m_pContainer->LoadToolbarInformationFromXML(m_pXMLDom);
 }
 
-void CLoadSaveXML::LoadColorRules()
+void LoadSaveXML::LoadColorRules()
 {
 	NColorRuleHelper::LoadColorRulesFromXML(m_pXMLDom, m_pContainer->m_ColorRules);
 }
 
-void CLoadSaveXML::LoadDialogStates()
+void LoadSaveXML::LoadDialogStates()
 {
 	m_pContainer->LoadDialogStatesFromXML(m_pXMLDom);
 }
 
-void CLoadSaveXML::SaveGenericSettings()
+void LoadSaveXML::SaveGenericSettings()
 {
 	m_pContainer->SaveGenericSettingsToXML(m_pXMLDom, m_pRoot);
 }
 
-void CLoadSaveXML::SaveBookmarks()
+void LoadSaveXML::SaveBookmarks()
 {
 	m_pContainer->SaveBookmarksToXML(m_pXMLDom, m_pRoot);
 }
 
-void CLoadSaveXML::SaveTabs()
+void LoadSaveXML::SaveTabs()
 {
 	m_pContainer->SaveTabSettingsToXML(m_pXMLDom, m_pRoot);
 }
 
-void CLoadSaveXML::SaveDefaultColumns()
+void LoadSaveXML::SaveDefaultColumns()
 {
 	m_pContainer->SaveDefaultColumnsToXML(m_pXMLDom, m_pRoot);
 }
 
-void CLoadSaveXML::SaveApplicationToolbar()
+void LoadSaveXML::SaveApplicationToolbar()
 {
 	m_pContainer->SaveApplicationToolbarToXML(m_pXMLDom, m_pRoot);
 }
 
-void CLoadSaveXML::SaveToolbarInformation()
+void LoadSaveXML::SaveToolbarInformation()
 {
 	m_pContainer->SaveToolbarInformationToXML(m_pXMLDom, m_pRoot);
 }
 
-void CLoadSaveXML::SaveColorRules()
+void LoadSaveXML::SaveColorRules()
 {
 	NColorRuleHelper::SaveColorRulesToXML(m_pXMLDom, m_pRoot, m_pContainer->m_ColorRules);
 }
 
-void CLoadSaveXML::SaveDialogStates()
+void LoadSaveXML::SaveDialogStates()
 {
 	m_pContainer->SaveDialogStatesToXML(m_pXMLDom, m_pRoot);
 }

@@ -12,22 +12,22 @@
 #include "../Helper/StringHelper.h"
 #include "../Helper/XMLSettings.h"
 
-const TCHAR CDestroyFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("DestroyFiles");
+const TCHAR DestroyFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("DestroyFiles");
 
-const TCHAR CDestroyFilesDialogPersistentSettings::SETTING_OVERWRITE_METHOD[] = _T("OverwriteMethod");
+const TCHAR DestroyFilesDialogPersistentSettings::SETTING_OVERWRITE_METHOD[] = _T("OverwriteMethod");
 
-CDestroyFilesDialog::CDestroyFilesDialog(HINSTANCE hInstance,
+DestroyFilesDialog::DestroyFilesDialog(HINSTANCE hInstance,
 	HWND hParent, std::list<std::wstring> FullFilenameList,
 	BOOL bShowFriendlyDates) :
-	CBaseDialog(hInstance, IDD_DESTROYFILES, hParent, true)
+	BaseDialog(hInstance, IDD_DESTROYFILES, hParent, true)
 {
 	m_FullFilenameList = FullFilenameList;
 	m_bShowFriendlyDates = bShowFriendlyDates;
 
-	m_pdfdps = &CDestroyFilesDialogPersistentSettings::GetInstance();
+	m_pdfdps = &DestroyFilesDialogPersistentSettings::GetInstance();
 }
 
-INT_PTR CDestroyFilesDialog::OnInitDialog()
+INT_PTR DestroyFilesDialog::OnInitDialog()
 {
 	m_icon.reset(LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN)));
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
@@ -132,65 +132,65 @@ INT_PTR CDestroyFilesDialog::OnInitDialog()
 	return 0;
 }
 
-void CDestroyFilesDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,
-	std::list<CResizableDialog::Control_t> &ControlList)
+void DestroyFilesDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+	std::list<ResizableDialog::Control_t> &ControlList)
 {
-	dsc = CBaseDialog::DIALOG_SIZE_CONSTRAINT_NONE;
+	dsc = BaseDialog::DIALOG_SIZE_CONSTRAINT_NONE;
 
-	CResizableDialog::Control_t Control;
+	ResizableDialog::Control_t Control;
 
 	Control.iID = IDC_DESTROYFILES_LISTVIEW;
-	Control.Type = CResizableDialog::TYPE_RESIZE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_RESIZE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_GROUP;
-	Control.Type = CResizableDialog::TYPE_RESIZE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	Control.Type = ResizableDialog::TYPE_RESIZE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_X;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_GROUP;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_Y;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_DESTROYFILES_RADIO_ONEPASS;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_Y;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_DESTROYFILES_RADIO_THREEPASS;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_Y;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_DESTROYFILES_STATIC_WARNING_MESSAGE;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_Y;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_DESTROYFILES_STATIC_WARNING_MESSAGE;
-	Control.Type = CResizableDialog::TYPE_RESIZE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	Control.Type = ResizableDialog::TYPE_RESIZE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_X;
 	ControlList.push_back(Control);
 
 	Control.iID = IDOK;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 
 	Control.iID = IDCANCEL;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_GRIPPER;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 }
 
-INT_PTR CDestroyFilesDialog::OnCtlColorStatic(HWND hwnd,HDC hdc)
+INT_PTR DestroyFilesDialog::OnCtlColorStatic(HWND hwnd,HDC hdc)
 {
 	if(hwnd == GetDlgItem(m_hDlg,IDC_DESTROYFILES_STATIC_WARNING_MESSAGE))
 	{
@@ -202,7 +202,7 @@ INT_PTR CDestroyFilesDialog::OnCtlColorStatic(HWND hwnd,HDC hdc)
 	return 0;
 }
 
-INT_PTR CDestroyFilesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR DestroyFilesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -220,13 +220,13 @@ INT_PTR CDestroyFilesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-INT_PTR CDestroyFilesDialog::OnClose()
+INT_PTR DestroyFilesDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-void CDestroyFilesDialog::SaveState()
+void DestroyFilesDialog::SaveState()
 {
 	m_pdfdps->SaveDialogPosition(m_hDlg);
 
@@ -242,7 +242,7 @@ void CDestroyFilesDialog::SaveState()
 	m_pdfdps->m_bStateSaved = TRUE;
 }
 
-void CDestroyFilesDialog::OnOk()
+void DestroyFilesDialog::OnOk()
 {
 	TCHAR szConfirmation[128];
 	LoadString(GetInstance(),IDS_DESTROY_FILES_CONFIRMATION,
@@ -265,12 +265,12 @@ void CDestroyFilesDialog::OnOk()
 	}
 }
 
-void CDestroyFilesDialog::OnCancel()
+void DestroyFilesDialog::OnCancel()
 {
 	EndDialog(m_hDlg,0);
 }
 
-void CDestroyFilesDialog::OnConfirmDestroy()
+void DestroyFilesDialog::OnConfirmDestroy()
 {
 	NFileOperations::OverwriteMethod_t OverwriteMethod;
 
@@ -292,35 +292,35 @@ void CDestroyFilesDialog::OnConfirmDestroy()
 	EndDialog(m_hDlg,1);
 }
 
-CDestroyFilesDialogPersistentSettings::CDestroyFilesDialogPersistentSettings() :
-CDialogSettings(SETTINGS_KEY)
+DestroyFilesDialogPersistentSettings::DestroyFilesDialogPersistentSettings() :
+DialogSettings(SETTINGS_KEY)
 {
 	m_uOverwriteMethod = NFileOperations::OVERWRITE_ONEPASS;
 }
 
-CDestroyFilesDialogPersistentSettings& CDestroyFilesDialogPersistentSettings::GetInstance()
+DestroyFilesDialogPersistentSettings& DestroyFilesDialogPersistentSettings::GetInstance()
 {
-	static CDestroyFilesDialogPersistentSettings dfdps;
+	static DestroyFilesDialogPersistentSettings dfdps;
 	return dfdps;
 }
 
-void CDestroyFilesDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
+void DestroyFilesDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
 	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_OVERWRITE_METHOD, m_uOverwriteMethod);
 }
 
-void CDestroyFilesDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
+void DestroyFilesDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
 	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_OVERWRITE_METHOD, reinterpret_cast<LPDWORD>(&m_uOverwriteMethod));
 }
 
-void CDestroyFilesDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
+void DestroyFilesDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
 	IXMLDOMElement *pParentNode)
 {
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_OVERWRITE_METHOD, NXMLSettings::EncodeIntValue(m_uOverwriteMethod));
 }
 
-void CDestroyFilesDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
+void DestroyFilesDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
 {
 	if(lstrcmpi(bstrName, SETTING_OVERWRITE_METHOD) == 0)
 	{

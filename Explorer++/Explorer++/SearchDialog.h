@@ -19,18 +19,18 @@
 #include <unordered_map>
 #include <vector>
 
-class CSearchDialog;
+class SearchDialog;
 
 /* Manages settings for the search dialog. */
-class CSearchDialogPersistentSettings : public CDialogSettings
+class SearchDialogPersistentSettings : public DialogSettings
 {
 public:
 
-	static CSearchDialogPersistentSettings &GetInstance();
+	static SearchDialogPersistentSettings &GetInstance();
 
 private:
 
-	friend CSearchDialog;
+	friend SearchDialog;
 
 	static const TCHAR SETTINGS_KEY[];
 
@@ -66,10 +66,10 @@ private:
 		bool		bSortAscending;
 	};
 
-	CSearchDialogPersistentSettings();
+	SearchDialogPersistentSettings();
 
-	CSearchDialogPersistentSettings(const CSearchDialogPersistentSettings &);
-	CSearchDialogPersistentSettings & operator=(const CSearchDialogPersistentSettings &);
+	SearchDialogPersistentSettings(const SearchDialogPersistentSettings &);
+	SearchDialogPersistentSettings & operator=(const SearchDialogPersistentSettings &);
 
 	void						SaveExtraRegistrySettings(HKEY hKey);
 	void						LoadExtraRegistrySettings(HKEY hKey);
@@ -99,12 +99,12 @@ private:
 	int							m_iColumnWidth2;
 };
 
-class CSearch : public CReferenceCount
+class Search : public ReferenceCount
 {
 public:
 	
-	CSearch(HWND hDlg,TCHAR *szBaseDirectory,TCHAR *szPattern,DWORD dwAttributes,BOOL bUseRegularExpressions,BOOL bCaseInsensitive,BOOL bSearchSubFolders);
-	~CSearch();
+	Search(HWND hDlg,TCHAR *szBaseDirectory,TCHAR *szPattern,DWORD dwAttributes,BOOL bUseRegularExpressions,BOOL bCaseInsensitive,BOOL bSearchSubFolders);
+	~Search();
 
 	void				StartSearching();
 	void				StopSearching();
@@ -132,13 +132,13 @@ private:
 	int					m_iFilesFound;
 };
 
-class CSearchDialog : public CBaseDialog, public IFileContextMenuExternal
+class SearchDialog : public BaseDialog, public IFileContextMenuExternal
 {
 public:
 
-	CSearchDialog(HINSTANCE hInstance, HWND hParent, std::wstring_view searchDirectory,
+	SearchDialog(HINSTANCE hInstance, HWND hParent, std::wstring_view searchDirectory,
 		IExplorerplusplus *pexpp, TabContainer *tabContainer);
-	~CSearchDialog();
+	~SearchDialog();
 
 	/* IFileContextMenuExternal methods. */
 	void			AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, HMENU hMenu);
@@ -174,7 +174,7 @@ private:
 
 	static const int MENU_ID_OPEN_FILE_LOCATION = (MAX_SHELL_MENU_ID + 1);
 
-	void						GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	void						GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList);
 	void						SaveState();
 
 	void						OnSearch();
@@ -189,7 +189,7 @@ private:
 	BOOL m_bStopSearching;
 	TCHAR m_szSearchButton[32];
 
-	CSearch *m_pSearch;
+	Search *m_pSearch;
 
 	/* Listview item information. */
 	std::list<PIDLIST_ABSOLUTE> m_AwaitingSearchItems;
@@ -202,5 +202,5 @@ private:
 	IExplorerplusplus *m_pexpp;
 	TabContainer *m_tabContainer;
 
-	CSearchDialogPersistentSettings *m_sdps;
+	SearchDialogPersistentSettings *m_sdps;
 };

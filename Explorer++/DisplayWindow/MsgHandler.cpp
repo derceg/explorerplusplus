@@ -37,7 +37,7 @@ at the top and bottom of the thumbnail. */
 
 std::list<ThumbnailEntry_t>	g_ThumbnailEntries;
 
-void CDisplayWindow::DrawGradientFill(HDC hdc,RECT *rc)
+void DisplayWindow::DrawGradientFill(HDC hdc,RECT *rc)
 {
 	if(m_hBitmapBackground)
 	{
@@ -71,7 +71,7 @@ void CDisplayWindow::DrawGradientFill(HDC hdc,RECT *rc)
 	SelectObject(m_hdcBackground, originalBackgroundObject);
 }
 
-void CDisplayWindow::PatchBackground(HDC hdc,RECT *rc,RECT *UpdateRect)
+void DisplayWindow::PatchBackground(HDC hdc,RECT *rc,RECT *UpdateRect)
 {
 	HDC hdcMem	= CreateCompatibleDC(hdc);
 	HBITMAP hBitmap	= CreateCompatibleBitmap(hdc,rc->right-rc->left,rc->bottom-rc->top);
@@ -98,7 +98,7 @@ void CDisplayWindow::PatchBackground(HDC hdc,RECT *rc,RECT *UpdateRect)
 	DeleteDC(hdcMem);
 }
 
-void CDisplayWindow::DrawThumbnail(HDC hdcMem)
+void DisplayWindow::DrawThumbnail(HDC hdcMem)
 {
 	if(!m_bThumbnailExtracted)
 	{
@@ -126,9 +126,9 @@ void CDisplayWindow::DrawThumbnail(HDC hdcMem)
 
 DWORD WINAPI Thread_ExtractThumbnailImage(LPVOID lpParameter)
 {
-	CDisplayWindow *pdw = NULL;
+	DisplayWindow *pdw = NULL;
 
-	pdw = (CDisplayWindow *)((ThumbnailEntry_t *)lpParameter)->pdw;
+	pdw = (DisplayWindow *)((ThumbnailEntry_t *)lpParameter)->pdw;
 
 	CoInitializeEx(0,COINIT_APARTMENTTHREADED);
 
@@ -144,7 +144,7 @@ DWORD WINAPI Thread_ExtractThumbnailImage(LPVOID lpParameter)
 	return 0;
 }
 
-void CDisplayWindow::ExtractThumbnailImage(void)
+void DisplayWindow::ExtractThumbnailImage(void)
 {
 	ThumbnailEntry_t te;
 
@@ -157,7 +157,7 @@ void CDisplayWindow::ExtractThumbnailImage(void)
 	CloseHandle(hThread);
 }
 
-void CDisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
+void DisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 {
 	IExtractImage *pExtractImage = NULL;
 	IShellFolder *pShellFolder = NULL;
@@ -264,7 +264,7 @@ void CDisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 	}
 }
 
-void CDisplayWindow::PaintText(HDC hdc,unsigned int x)
+void DisplayWindow::PaintText(HDC hdc,unsigned int x)
 {
 	RECT rcClient;
 	RECT rcText;
@@ -318,12 +318,12 @@ void CDisplayWindow::PaintText(HDC hdc,unsigned int x)
 	SelectObject(hdc,hOriginalObject);
 }
 
-void CDisplayWindow::TransparentTextOut(HDC hdc,TCHAR *Text,RECT *prcText)
+void DisplayWindow::TransparentTextOut(HDC hdc,TCHAR *Text,RECT *prcText)
 {
 	DrawText(hdc,Text,lstrlen(Text),prcText,DT_LEFT|DT_NOPREFIX);
 }
 
-LONG CDisplayWindow::OnMouseMove(LPARAM lParam)
+LONG DisplayWindow::OnMouseMove(LPARAM lParam)
 {
 	POINT			CursorPos;
 	static POINT	PrevCursorPos;
@@ -378,7 +378,7 @@ LONG CDisplayWindow::OnMouseMove(LPARAM lParam)
 	return 1;
 }
 
-void CDisplayWindow::OnLButtonDown(LPARAM lParam)
+void DisplayWindow::OnLButtonDown(LPARAM lParam)
 {
 	POINT	CursorPos;
 	RECT	rc;
@@ -417,7 +417,7 @@ void CDisplayWindow::OnLButtonDown(LPARAM lParam)
 	}
 }
 
-void CDisplayWindow::OnRButtonUp(WPARAM wParam,LPARAM lParam)
+void DisplayWindow::OnRButtonUp(WPARAM wParam,LPARAM lParam)
 {
 	POINT pt;
 	RECT rc;
@@ -440,7 +440,7 @@ void CDisplayWindow::OnRButtonUp(WPARAM wParam,LPARAM lParam)
 	}
 }
 
-void CDisplayWindow::CancelThumbnailExtraction(void)
+void DisplayWindow::CancelThumbnailExtraction(void)
 {
 	std::list<ThumbnailEntry_t>::iterator itr;
 
@@ -454,7 +454,7 @@ void CDisplayWindow::CancelThumbnailExtraction(void)
 	LeaveCriticalSection(&m_csDWThumbnails);
 }
 
-void CDisplayWindow::OnSetThumbnailFile(WPARAM wParam,LPARAM lParam)
+void DisplayWindow::OnSetThumbnailFile(WPARAM wParam,LPARAM lParam)
 {
 	m_bShowThumbnail = (BOOL)lParam;
 
@@ -474,7 +474,7 @@ void CDisplayWindow::OnSetThumbnailFile(WPARAM wParam,LPARAM lParam)
 	}
 }
 
-void CDisplayWindow::OnSize(int width, int height)
+void DisplayWindow::OnSize(int width, int height)
 {
 	HDC		hdc;
 	RECT	rc;
@@ -489,14 +489,14 @@ void CDisplayWindow::OnSize(int width, int height)
 	RedrawWindow(m_hDisplayWindow,NULL,NULL,RDW_INVALIDATE);
 }
 
-void CDisplayWindow::OnSetFont(HFONT hFont)
+void DisplayWindow::OnSetFont(HFONT hFont)
 {
 	m_hDisplayFont = hFont;
 
 	RedrawWindow(m_hDisplayWindow,NULL,NULL,RDW_INVALIDATE);
 }
 
-void CDisplayWindow::OnSetTextColor(COLORREF hColor)
+void DisplayWindow::OnSetTextColor(COLORREF hColor)
 {
 	m_TextColor = hColor;
 

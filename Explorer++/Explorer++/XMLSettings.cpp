@@ -1409,7 +1409,7 @@ void Explorerplusplus::LoadApplicationToolbarFromXML(IXMLDOMDocument *pXMLDom)
 
 	if(hr == S_OK)
 	{
-		CApplicationToolbarPersistentSettings::GetInstance().LoadXMLSettings(pNode);
+		ApplicationToolbarPersistentSettings::GetInstance().LoadXMLSettings(pNode);
 	}
 
 clean:
@@ -1434,7 +1434,7 @@ IXMLDOMElement *pRoot)
 	SysFreeString(bstr);
 	bstr = NULL;
 
-	CApplicationToolbarPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
+	ApplicationToolbarPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
 

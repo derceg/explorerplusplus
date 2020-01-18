@@ -43,15 +43,15 @@ CM_SIZE, CM_TYPE, CM_DATEMODIFIED };
 
 std::vector<unsigned int> GetColumnHeaderMenuList(const std::wstring &directory);
 
-LRESULT CALLBACK CShellBrowser::ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK ShellBrowser::ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	CShellBrowser *shellBrowser = reinterpret_cast<CShellBrowser *>(dwRefData);
+	ShellBrowser *shellBrowser = reinterpret_cast<ShellBrowser *>(dwRefData);
 	return shellBrowser->ListViewProc(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK CShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -87,15 +87,15 @@ LRESULT CALLBACK CShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK CShellBrowser::ListViewParentProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK ShellBrowser::ListViewParentProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	CShellBrowser *shellBrowser = reinterpret_cast<CShellBrowser *>(dwRefData);
+	ShellBrowser *shellBrowser = reinterpret_cast<ShellBrowser *>(dwRefData);
 	return shellBrowser->ListViewParentProc(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK CShellBrowser::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ShellBrowser::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -143,7 +143,7 @@ LRESULT CALLBACK CShellBrowser::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-void CShellBrowser::OnListViewMButtonDown(const POINT *pt)
+void ShellBrowser::OnListViewMButtonDown(const POINT *pt)
 {
 	LV_HITTESTINFO ht;
 	ht.pt = *pt;
@@ -161,7 +161,7 @@ void CShellBrowser::OnListViewMButtonDown(const POINT *pt)
 	}
 }
 
-void CShellBrowser::OnListViewMButtonUp(const POINT *pt)
+void ShellBrowser::OnListViewMButtonUp(const POINT *pt)
 {
 	LV_HITTESTINFO	ht;
 	ht.pt = *pt;
@@ -189,7 +189,7 @@ void CShellBrowser::OnListViewMButtonUp(const POINT *pt)
 	m_tabNavigation->CreateNewTab(itemInfo.pidlComplete.get(), false);
 }
 
-void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
+void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 {
 	NMLVDISPINFO	*pnmv = NULL;
 	LVITEM			*plvItem = NULL;
@@ -271,7 +271,7 @@ void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 	plvItem->mask |= LVIF_DI_SETITEM;
 }
 
-boost::optional<int> CShellBrowser::GetCachedIconIndex(const ItemInfo_t &itemInfo)
+boost::optional<int> ShellBrowser::GetCachedIconIndex(const ItemInfo_t &itemInfo)
 {
 	TCHAR filePath[MAX_PATH];
 	HRESULT hr = GetDisplayName(itemInfo.pidlComplete.get(),
@@ -292,7 +292,7 @@ boost::optional<int> CShellBrowser::GetCachedIconIndex(const ItemInfo_t &itemInf
 	return cachedItr->iconIndex;
 }
 
-void CShellBrowser::ProcessIconResult(int internalIndex, int iconIndex)
+void ShellBrowser::ProcessIconResult(int internalIndex, int iconIndex)
 {
 	auto index = LocateItemByInternalIndex(internalIndex);
 
@@ -311,7 +311,7 @@ void CShellBrowser::ProcessIconResult(int internalIndex, int iconIndex)
 	ListView_SetItem(m_hListView, &lvItem);
 }
 
-LRESULT CShellBrowser::OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip)
+LRESULT ShellBrowser::OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip)
 {
 	if (m_config->showInfoTips)
 	{
@@ -324,7 +324,7 @@ LRESULT CShellBrowser::OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip)
 	return 0;
 }
 
-void CShellBrowser::QueueInfoTipTask(int internalIndex, const std::wstring &existingInfoTip)
+void ShellBrowser::QueueInfoTipTask(int internalIndex, const std::wstring &existingInfoTip)
 {
 	int infoTipResultId = m_infoTipResultIDCounter++;
 
@@ -354,7 +354,7 @@ void CShellBrowser::QueueInfoTipTask(int internalIndex, const std::wstring &exis
 	m_infoTipResults.insert({ infoTipResultId, std::move(result) });
 }
 
-boost::optional<CShellBrowser::InfoTipResult> CShellBrowser::GetInfoTipAsync(HWND listView, int infoTipResultId,
+boost::optional<ShellBrowser::InfoTipResult> ShellBrowser::GetInfoTipAsync(HWND listView, int infoTipResultId,
 	int internalIndex, const BasicItemInfo_t &basicItemInfo, const Config &config, HINSTANCE instance, bool virtualFolder)
 {
 	std::wstring infoTip;
@@ -399,7 +399,7 @@ boost::optional<CShellBrowser::InfoTipResult> CShellBrowser::GetInfoTipAsync(HWN
 	return result;
 }
 
-void CShellBrowser::ProcessInfoTipResult(int infoTipResultId)
+void ShellBrowser::ProcessInfoTipResult(int infoTipResultId)
 {
 	auto itr = m_infoTipResults.find(infoTipResultId);
 
@@ -435,7 +435,7 @@ void CShellBrowser::ProcessInfoTipResult(int infoTipResultId)
 	ListView_SetInfoTip(m_hListView, &infoTip);
 }
 
-void CShellBrowser::OnListViewItemChanged(const NMLISTVIEW *changeData)
+void ShellBrowser::OnListViewItemChanged(const NMLISTVIEW *changeData)
 {
 	if (changeData->uChanged != LVIF_STATE)
 	{
@@ -478,7 +478,7 @@ void CShellBrowser::OnListViewItemChanged(const NMLISTVIEW *changeData)
 	listViewSelectionChanged.m_signal();
 }
 
-void CShellBrowser::UpdateFileSelectionInfo(int internalIndex, BOOL Selected)
+void ShellBrowser::UpdateFileSelectionInfo(int internalIndex, BOOL Selected)
 {
 	ULARGE_INTEGER	ulFileSize;
 	BOOL			IsFolder;
@@ -509,7 +509,7 @@ void CShellBrowser::UpdateFileSelectionInfo(int internalIndex, BOOL Selected)
 	}
 }
 
-void CShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
+void ShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 {
 	switch (lvKeyDown->wVKey)
 	{
@@ -559,13 +559,13 @@ void CShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 	}
 }
 
-CShellBrowser::ItemInfo_t &CShellBrowser::GetItemByIndex(int index)
+ShellBrowser::ItemInfo_t &ShellBrowser::GetItemByIndex(int index)
 {
 	int internalIndex = GetItemInternalIndex(index);
 	return m_itemInfoMap.at(internalIndex);
 }
 
-int CShellBrowser::GetItemInternalIndex(int item) const
+int ShellBrowser::GetItemInternalIndex(int item) const
 {
 	LVITEM lvItem;
 	lvItem.mask = LVIF_PARAM;
@@ -581,17 +581,17 @@ int CShellBrowser::GetItemInternalIndex(int item) const
 	return static_cast<int>(lvItem.lParam);
 }
 
-BOOL CShellBrowser::GhostItem(int iItem)
+BOOL ShellBrowser::GhostItem(int iItem)
 {
 	return GhostItemInternal(iItem, TRUE);
 }
 
-BOOL CShellBrowser::DeghostItem(int iItem)
+BOOL ShellBrowser::DeghostItem(int iItem)
 {
 	return GhostItemInternal(iItem, FALSE);
 }
 
-BOOL CShellBrowser::GhostItemInternal(int iItem, BOOL bGhost)
+BOOL ShellBrowser::GhostItemInternal(int iItem, BOOL bGhost)
 {
 	LVITEM	lvItem;
 	BOOL	bRet;
@@ -621,7 +621,7 @@ BOOL CShellBrowser::GhostItemInternal(int iItem, BOOL bGhost)
 	return TRUE;
 }
 
-void CShellBrowser::ShowPropertiesForSelectedFiles() const
+void ShellBrowser::ShowPropertiesForSelectedFiles() const
 {
 	std::vector<unique_pidl_child> pidls;
 	std::vector<PCITEMID_CHILD> rawPidls;
@@ -645,7 +645,7 @@ void CShellBrowser::ShowPropertiesForSelectedFiles() const
 	ShowMultipleFileProperties(pidlDirectory.get(), rawPidls.data(), m_hOwner, static_cast<int>(rawPidls.size()));
 }
 
-void CShellBrowser::OnListViewHeaderRightClick(const POINTS &cursorPos)
+void ShellBrowser::OnListViewHeaderRightClick(const POINTS &cursorPos)
 {
 	wil::unique_hmenu headerPopupMenu(LoadMenu(m_hResourceModule, MAKEINTRESOURCE(IDR_HEADER_MENU)));
 	HMENU headerMenu = GetSubMenu(headerPopupMenu.get(), 0);
@@ -750,7 +750,7 @@ std::vector<unsigned int> GetColumnHeaderMenuList(const std::wstring &directory)
 	}
 }
 
-void CShellBrowser::OnListViewHeaderMenuItemSelected(int menuItemId,
+void ShellBrowser::OnListViewHeaderMenuItemSelected(int menuItemId,
 	const std::unordered_map<int, UINT> &menuItemMappings)
 {
 	auto currentColumns = ExportCurrentColumns();
@@ -776,7 +776,7 @@ void CShellBrowser::OnListViewHeaderMenuItemSelected(int menuItemId,
 	}
 }
 
-void CShellBrowser::SetFileAttributesForSelection()
+void ShellBrowser::SetFileAttributesForSelection()
 {
 	std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t> sfaiList;
 	int index = -1;
@@ -794,7 +794,6 @@ void CShellBrowser::SetFileAttributesForSelection()
 		sfaiList.push_back(sfai);
 	}
 
-	CSetFileAttributesDialog SetFileAttributesDialog(m_hResourceModule, m_hListView, sfaiList);
-
-	SetFileAttributesDialog.ShowModalDialog();
+	SetFileAttributesDialog setFileAttributesDialog(m_hResourceModule, m_hListView, sfaiList);
+	setFileAttributesDialog.ShowModalDialog();
 }

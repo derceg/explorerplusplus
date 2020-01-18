@@ -13,13 +13,13 @@
 #include "../Helper/WindowHelper.h"
 #include <list>
 
-CAboutDialog::CAboutDialog(HINSTANCE hInstance, HWND hParent) :
-	CBaseDialog(hInstance, IDD_ABOUT, hParent, false)
+AboutDialog::AboutDialog(HINSTANCE hInstance, HWND hParent) :
+	BaseDialog(hInstance, IDD_ABOUT, hParent, false)
 {
 	
 }
 
-INT_PTR CAboutDialog::OnInitDialog()
+INT_PTR AboutDialog::OnInitDialog()
 {
 	m_icon.reset(reinterpret_cast<HICON>(LoadImage(GetModuleHandle(0),
 		MAKEINTRESOURCE(IDI_MAIN),IMAGE_ICON,
@@ -65,7 +65,7 @@ INT_PTR CAboutDialog::OnInitDialog()
 	return TRUE;
 }
 
-INT_PTR CAboutDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR AboutDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -83,7 +83,7 @@ INT_PTR CAboutDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-INT_PTR CAboutDialog::OnNotify(NMHDR *pnmhdr)
+INT_PTR AboutDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
@@ -104,7 +104,7 @@ INT_PTR CAboutDialog::OnNotify(NMHDR *pnmhdr)
 	return 0;
 }
 
-INT_PTR CAboutDialog::OnClose()
+INT_PTR AboutDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;

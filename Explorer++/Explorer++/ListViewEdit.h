@@ -7,11 +7,11 @@
 #include "CoreInterface.h"
 #include "../Helper/BaseWindow.h"
 
-class CListViewEdit : CBaseWindow
+class ListViewEdit : BaseWindow
 {
 public:
 
-	static CListViewEdit *CreateNew(HWND hwnd,int ItemIndex,IExplorerplusplus *pexpp);
+	static ListViewEdit *CreateNew(HWND hwnd,int ItemIndex,IExplorerplusplus *pexpp);
 
 protected:
 
@@ -28,7 +28,7 @@ private:
 		RENAME_ENTIRE
 	};
 
-	CListViewEdit(HWND hwnd,int ItemIndex,IExplorerplusplus *pexpp);
+	ListViewEdit(HWND hwnd,int ItemIndex,IExplorerplusplus *pexpp);
 
 	int					GetExtensionIndex();
 

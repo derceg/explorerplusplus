@@ -6,7 +6,7 @@
 #include "ShellBrowser.h"
 #include "Config.h"
 
-void CShellBrowser::InsertTileViewColumns()
+void ShellBrowser::InsertTileViewColumns()
 {
 	LVTILEVIEWINFO lvtvi;
 	LVCOLUMN lvColumn;
@@ -33,14 +33,14 @@ void CShellBrowser::InsertTileViewColumns()
 	ListView_SetTileViewInfo(m_hListView, &lvtvi);
 }
 
-void CShellBrowser::DeleteTileViewColumns()
+void ShellBrowser::DeleteTileViewColumns()
 {
 	ListView_DeleteColumn(m_hListView, 3);
 	ListView_DeleteColumn(m_hListView, 2);
 	ListView_DeleteColumn(m_hListView, 1);
 }
 
-void CShellBrowser::SetTileViewInfo()
+void ShellBrowser::SetTileViewInfo()
 {
 	LVITEM lvItem;
 	BOOL bRes;
@@ -64,7 +64,7 @@ void CShellBrowser::SetTileViewInfo()
 }
 
 /* TODO: Make this function configurable. */
-void CShellBrowser::SetTileViewItemInfo(int iItem, int iItemInternal)
+void ShellBrowser::SetTileViewItemInfo(int iItem, int iItemInternal)
 {
 	SHFILEINFO shfi;
 	LVTILEINFO lvti;

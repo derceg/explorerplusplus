@@ -12,7 +12,7 @@
 LRESULT CALLBACK ShellMenuHookProcStub(HWND hwnd,UINT Msg,WPARAM wParam,
 	LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
-CFileContextMenuManager::CFileContextMenuManager(HWND hwnd,
+FileContextMenuManager::FileContextMenuManager(HWND hwnd,
 	PCIDLIST_ABSOLUTE pidlParent, const std::vector<PCITEMID_CHILD> &pidlItems) :
 	m_hwnd(hwnd),
 	m_pidlParent(ILCloneFull(pidlParent))
@@ -73,7 +73,7 @@ CFileContextMenuManager::CFileContextMenuManager(HWND hwnd,
 	}
 }
 
-CFileContextMenuManager::~CFileContextMenuManager()
+FileContextMenuManager::~FileContextMenuManager()
 {
 	for(auto pidl : m_pidlItems)
 	{
@@ -81,8 +81,8 @@ CFileContextMenuManager::~CFileContextMenuManager()
 	}
 }
 
-HRESULT CFileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme,
-	int iMinID,int iMaxID,const POINT *ppt,CStatusBar *pStatusBar,
+HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme,
+	int iMinID,int iMaxID,const POINT *ppt,StatusBar *pStatusBar,
 	DWORD_PTR dwData,BOOL bRename,BOOL bExtended)
 {
 	if(m_pActualContext == NULL)
@@ -205,12 +205,12 @@ LRESULT CALLBACK ShellMenuHookProcStub(HWND hwnd,UINT Msg,WPARAM wParam,
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	CFileContextMenuManager *pfcmm = reinterpret_cast<CFileContextMenuManager *>(dwRefData);
+	FileContextMenuManager *pfcmm = reinterpret_cast<FileContextMenuManager *>(dwRefData);
 
 	return pfcmm->ShellMenuHookProc(hwnd,Msg,wParam,lParam);
 }
 
-LRESULT CALLBACK CFileContextMenuManager::ShellMenuHookProc(HWND hwnd,UINT uMsg,WPARAM wParam,
+LRESULT CALLBACK FileContextMenuManager::ShellMenuHookProc(HWND hwnd,UINT uMsg,WPARAM wParam,
 	LPARAM lParam)
 {
 	switch(uMsg)

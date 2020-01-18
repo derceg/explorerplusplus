@@ -46,7 +46,7 @@ void Explorerplusplus::CreateFolderControls(void)
 	SetWindowTheme(m_hTreeView,L"Explorer",NULL);
 
 	SetWindowLongPtr(m_hTreeView,GWL_EXSTYLE,WS_EX_CLIENTEDGE);
-	m_pMyTreeView = new CMyTreeView(m_hTreeView, m_hHolder, m_pDirMon, &m_cachedIcons);
+	m_pMyTreeView = new MyTreeView(m_hTreeView, m_hHolder, m_pDirMon, &m_cachedIcons);
 
 	/* Now, subclass the treeview again. This is needed for messages
 	such as WM_MOUSEWHEEL, which need to be intercepted before they
@@ -245,14 +245,14 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 				std::vector<PCITEMID_CHILD> pidlItems;
 				pidlItems.push_back(pidlRelative);
 
-				CFileContextMenuManager fcmm(m_hContainer, pidlParent.get(), pidlItems);
+				FileContextMenuManager fcmm(m_hContainer, pidlParent.get(), pidlItems);
 
 				FileContextMenuInfo_t fcmi;
 				fcmi.uFrom = FROM_TREEVIEW;
 
-				CStatusBar StatusBar(m_hStatusBar);
+				StatusBar statusBar(m_hStatusBar);
 
-				fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,ppt,&StatusBar,
+				fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,ppt,&statusBar,
 					reinterpret_cast<DWORD_PTR>(&fcmi),TRUE,IsKeyDown(VK_SHIFT));
 			}
 		}
@@ -475,13 +475,13 @@ int Explorerplusplus::OnTreeViewEndLabelEdit(LPARAM lParam)
 		return FALSE;
 	}
 
-	CFileActionHandler::RenamedItem_t RenamedItem;
+	FileActionHandler::RenamedItem_t RenamedItem;
 	RenamedItem.strOldFilename = m_OldTreeViewFileName;
 	RenamedItem.strNewFilename = NewFileName;
 
 	TrimStringRight(RenamedItem.strNewFilename,_T(" "));
 
-	std::list<CFileActionHandler::RenamedItem_t> RenamedItemList;
+	std::list<FileActionHandler::RenamedItem_t> RenamedItemList;
 	RenamedItemList.push_back(RenamedItem);
 	m_FileActionHandler.RenameFiles(RenamedItemList);
 
@@ -672,9 +672,8 @@ void Explorerplusplus::OnTreeViewSetFileAttributes(void) const
 
 			sfaiList.push_back(sfai);
 
-			CSetFileAttributesDialog SetFileAttributesDialog(m_hLanguageModule, m_hContainer, sfaiList);
-
-			SetFileAttributesDialog.ShowModalDialog();
+			SetFileAttributesDialog setFileAttributesDialog(m_hLanguageModule, m_hContainer, sfaiList);
+			setFileAttributesDialog.ShowModalDialog();
 		}
 	}
 }
@@ -694,7 +693,7 @@ void Explorerplusplus::OnTreeViewPaste(void)
 
 		if(hr == S_OK)
 		{
-			CDropHandler *pDropHandler = CDropHandler::CreateNew();
+			DropHandler *pDropHandler = DropHandler::CreateNew();
 
 			auto pidl = m_pMyTreeView->GetItemPidl(hItem);
 

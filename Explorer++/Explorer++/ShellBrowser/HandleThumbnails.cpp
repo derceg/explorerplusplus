@@ -18,7 +18,7 @@
 #define THUMBNAIL_TYPE_ICON			0
 #define THUMBNAIL_TYPE_EXTRACTED	1
 
-void CShellBrowser::SetupThumbnailsView(void)
+void ShellBrowser::SetupThumbnailsView(void)
 {
 	HIMAGELIST himl;
 	LVITEM lvItem;
@@ -58,7 +58,7 @@ void CShellBrowser::SetupThumbnailsView(void)
 	m_bThumbnailsSetup = TRUE;
 }
 
-void CShellBrowser::RemoveThumbnailsView(void)
+void ShellBrowser::RemoveThumbnailsView(void)
 {
 	LVITEM		lvItem;
 	HIMAGELIST	himl;
@@ -93,7 +93,7 @@ void CShellBrowser::RemoveThumbnailsView(void)
 	m_bThumbnailsSetup = FALSE;
 }
 
-void CShellBrowser::QueueThumbnailTask(int internalIndex)
+void ShellBrowser::QueueThumbnailTask(int internalIndex)
 {
 	int thumbnailResultID = m_thumbnailResultIDCounter++;
 
@@ -108,7 +108,7 @@ void CShellBrowser::QueueThumbnailTask(int internalIndex)
 	m_thumbnailResults.insert({ thumbnailResultID, std::move(result) });
 }
 
-boost::optional<CShellBrowser::ThumbnailResult_t> CShellBrowser::FindThumbnailAsync(HWND listView,
+boost::optional<ShellBrowser::ThumbnailResult_t> ShellBrowser::FindThumbnailAsync(HWND listView,
 	int thumbnailResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo)
 {
 	IShellFolder *pShellFolder = nullptr;
@@ -170,7 +170,7 @@ boost::optional<CShellBrowser::ThumbnailResult_t> CShellBrowser::FindThumbnailAs
 	return result;
 }
 
-void CShellBrowser::ProcessThumbnailResult(int thumbnailResultId)
+void ShellBrowser::ProcessThumbnailResult(int thumbnailResultId)
 {
 	auto itr = m_thumbnailResults.find(thumbnailResultId);
 
@@ -210,20 +210,20 @@ void CShellBrowser::ProcessThumbnailResult(int thumbnailResultId)
 }
 
 /* Draws a thumbnail based on an items icon. */
-int CShellBrowser::GetIconThumbnail(int iInternalIndex) const
+int ShellBrowser::GetIconThumbnail(int iInternalIndex) const
 {
 	return GetThumbnailInternal(THUMBNAIL_TYPE_ICON,iInternalIndex,
 		NULL);
 }
 
 /* Draws an items extracted thumbnail. */
-int CShellBrowser::GetExtractedThumbnail(HBITMAP hThumbnailBitmap) const
+int ShellBrowser::GetExtractedThumbnail(HBITMAP hThumbnailBitmap) const
 {
 	return GetThumbnailInternal(THUMBNAIL_TYPE_EXTRACTED,0,
 		hThumbnailBitmap);
 }
 
-int CShellBrowser::GetThumbnailInternal(int iType,
+int ShellBrowser::GetThumbnailInternal(int iType,
 int iInternalIndex,HBITMAP hThumbnailBitmap) const
 {
 	HDC hdc;
@@ -270,7 +270,7 @@ int iInternalIndex,HBITMAP hThumbnailBitmap) const
 	return iImage;
 }
 
-void CShellBrowser::DrawIconThumbnailInternal(HDC hdcBacking,int iInternalIndex) const
+void ShellBrowser::DrawIconThumbnailInternal(HDC hdcBacking,int iInternalIndex) const
 {
 	HICON hIcon;
 	SHFILEINFO shfi;
@@ -290,7 +290,7 @@ void CShellBrowser::DrawIconThumbnailInternal(HDC hdcBacking,int iInternalIndex)
 	DestroyIcon(hIcon);
 }
 
-void CShellBrowser::DrawThumbnailInternal(HDC hdcBacking,HBITMAP hThumbnailBitmap) const
+void ShellBrowser::DrawThumbnailInternal(HDC hdcBacking,HBITMAP hThumbnailBitmap) const
 {
 	HDC hdcThumbnail;
 	HBITMAP hThumbnailBitmapOld;

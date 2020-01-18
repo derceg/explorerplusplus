@@ -7,20 +7,20 @@
 #include "StatusBar.h"
 
 
-CStatusBar::CStatusBar(HWND hwnd) :
+StatusBar::StatusBar(HWND hwnd) :
 m_hwnd(hwnd)
 {
 	m_bAlteredStatusBarParts = false;
 	m_nParts = 0;
 }
 
-void CStatusBar::SetPartText(int iPart, const TCHAR *szText)
+void StatusBar::SetPartText(int iPart, const TCHAR *szText)
 {
 	SendMessage(m_hwnd,SB_SETTEXT,MAKEWORD(iPart,0),
 		reinterpret_cast<LPARAM>(szText));
 }
 
-void CStatusBar::HandleStatusBarMenuOpen(void)
+void StatusBar::HandleStatusBarMenuOpen(void)
 {
 	if(!m_bAlteredStatusBarParts)
 	{
@@ -57,7 +57,7 @@ void CStatusBar::HandleStatusBarMenuOpen(void)
 	}
 }
 
-void CStatusBar::HandleStatusBarMenuClose(void)
+void StatusBar::HandleStatusBarMenuClose(void)
 {
 	int i = 0;
 

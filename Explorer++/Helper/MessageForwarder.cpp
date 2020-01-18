@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "MessageForwarder.h"
 
-INT_PTR CMessageForwarder::ForwardMessage(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR MessageForwarder::ForwardMessage(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	m_hwnd = hwnd;
 	m_uMsg = uMsg;
@@ -91,19 +91,19 @@ INT_PTR CMessageForwarder::ForwardMessage(HWND hwnd,UINT uMsg,WPARAM wParam,LPAR
 	return GetDefaultReturnValue(hwnd,uMsg,wParam,lParam);
 }
 
-INT_PTR CMessageForwarder::OnInitDialog()
+INT_PTR MessageForwarder::OnInitDialog()
 {
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
-INT_PTR CMessageForwarder::OnTimer(int iTimerID)
+INT_PTR MessageForwarder::OnTimer(int iTimerID)
 {
 	UNREFERENCED_PARAMETER(iTimerID);
 
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
-INT_PTR CMessageForwarder::OnCtlColorStatic(HWND hwnd,HDC hdc)
+INT_PTR MessageForwarder::OnCtlColorStatic(HWND hwnd,HDC hdc)
 {
 	UNREFERENCED_PARAMETER(hwnd);
 	UNREFERENCED_PARAMETER(hdc);
@@ -111,7 +111,7 @@ INT_PTR CMessageForwarder::OnCtlColorStatic(HWND hwnd,HDC hdc)
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
-INT_PTR CMessageForwarder::OnCtlColorEdit(HWND hwnd,HDC hdc)
+INT_PTR MessageForwarder::OnCtlColorEdit(HWND hwnd,HDC hdc)
 {
 	UNREFERENCED_PARAMETER(hwnd);
 	UNREFERENCED_PARAMETER(hdc);
@@ -119,21 +119,21 @@ INT_PTR CMessageForwarder::OnCtlColorEdit(HWND hwnd,HDC hdc)
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
-INT_PTR CMessageForwarder::OnHScroll(HWND hwnd)
+INT_PTR MessageForwarder::OnHScroll(HWND hwnd)
 {
 	UNREFERENCED_PARAMETER(hwnd);
 
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
-INT_PTR CMessageForwarder::OnMButtonUp(const POINTS *pts)
+INT_PTR MessageForwarder::OnMButtonUp(const POINTS *pts)
 {
 	UNREFERENCED_PARAMETER(pts);
 
 	return GetDefaultReturnValue(m_hwnd, m_uMsg, m_wParam, m_lParam);
 }
 
-INT_PTR CMessageForwarder::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD dwKeys)
+INT_PTR MessageForwarder::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD dwKeys)
 {
 	UNREFERENCED_PARAMETER(hwnd);
 	UNREFERENCED_PARAMETER(uCmd);
@@ -143,7 +143,7 @@ INT_PTR CMessageForwarder::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD d
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
-INT_PTR CMessageForwarder::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR MessageForwarder::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(wParam);
 	UNREFERENCED_PARAMETER(lParam);
@@ -151,21 +151,21 @@ INT_PTR CMessageForwarder::OnCommand(WPARAM wParam,LPARAM lParam)
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
-INT_PTR CMessageForwarder::OnNotify(NMHDR *pnmhdr)
+INT_PTR MessageForwarder::OnNotify(NMHDR *pnmhdr)
 {
 	UNREFERENCED_PARAMETER(pnmhdr);
 
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
-INT_PTR CMessageForwarder::OnGetMinMaxInfo(LPMINMAXINFO pmmi)
+INT_PTR MessageForwarder::OnGetMinMaxInfo(LPMINMAXINFO pmmi)
 {
 	UNREFERENCED_PARAMETER(pmmi);
 
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
-INT_PTR CMessageForwarder::OnSize(int iType,int iWidth,int iHeight)
+INT_PTR MessageForwarder::OnSize(int iType,int iWidth,int iHeight)
 {
 	UNREFERENCED_PARAMETER(iType);
 	UNREFERENCED_PARAMETER(iWidth);
@@ -174,28 +174,28 @@ INT_PTR CMessageForwarder::OnSize(int iType,int iWidth,int iHeight)
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
-INT_PTR CMessageForwarder::OnClose()
+INT_PTR MessageForwarder::OnClose()
 {
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
-INT_PTR CMessageForwarder::OnDestroy()
+INT_PTR MessageForwarder::OnDestroy()
 {
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
-INT_PTR CMessageForwarder::OnNcDestroy()
+INT_PTR MessageForwarder::OnNcDestroy()
 {
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
-void CMessageForwarder::OnEMSetSel(WPARAM &wParam,LPARAM &lParam)
+void MessageForwarder::OnEMSetSel(WPARAM &wParam,LPARAM &lParam)
 {
 	UNREFERENCED_PARAMETER(wParam);
 	UNREFERENCED_PARAMETER(lParam);
 }
 
-INT_PTR CMessageForwarder::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR MessageForwarder::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(uMsg);
 	UNREFERENCED_PARAMETER(wParam);

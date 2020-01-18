@@ -6,44 +6,44 @@
 #include "BaseWindow.h"
 
 
-CBaseWindow::CBaseWindow(HWND hwnd) :
-CMessageForwarder(),
+BaseWindow::BaseWindow(HWND hwnd) :
+MessageForwarder(),
 m_hwnd(hwnd)
 {
 	SetWindowSubclass(hwnd, BaseWindowProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 }
 
-CBaseWindow::~CBaseWindow()
+BaseWindow::~BaseWindow()
 {
 	RemoveWindowSubclass(m_hwnd, BaseWindowProcStub, SUBCLASS_ID);
 }
 
-HWND CBaseWindow::GetHWND() const
+HWND BaseWindow::GetHWND() const
 {
 	return m_hwnd;
 }
 
-LRESULT CALLBACK CBaseWindow::BaseWindowProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,
+LRESULT CALLBACK BaseWindow::BaseWindowProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,
 	UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	CBaseWindow *pbw = reinterpret_cast<CBaseWindow *>(dwRefData);
+	BaseWindow *pbw = reinterpret_cast<BaseWindow *>(dwRefData);
 
 	return pbw->BaseWindowProc(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK CBaseWindow::BaseWindowProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK BaseWindow::BaseWindowProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	return ForwardMessage(hwnd,uMsg,wParam,lParam);
 }
 
-INT_PTR CBaseWindow::GetDefaultReturnValue(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR BaseWindow::GetDefaultReturnValue(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
 }
 
-INT_PTR CBaseWindow::OnNcDestroy()
+INT_PTR BaseWindow::OnNcDestroy()
 {
 	delete this;
 	return 0;

@@ -28,21 +28,21 @@ __interface IFileContextMenuExternal
 	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, int iCmd);
 };
 
-class CFileContextMenuManager
+class FileContextMenuManager
 {
 public:
 
-	CFileContextMenuManager(HWND hwnd, PCIDLIST_ABSOLUTE pidlParent, const std::vector<PCITEMID_CHILD> &pidlItems);
-	~CFileContextMenuManager();
+	FileContextMenuManager(HWND hwnd, PCIDLIST_ABSOLUTE pidlParent, const std::vector<PCITEMID_CHILD> &pidlItems);
+	~FileContextMenuManager();
 
 	/* Shows the context menu. */
-	HRESULT				ShowMenu(IFileContextMenuExternal *pfcme,int iMinID,int iMaxID,const POINT *ppt,CStatusBar *pStatusBar,DWORD_PTR dwData,BOOL bRename = FALSE,BOOL bExtended = FALSE);
+	HRESULT				ShowMenu(IFileContextMenuExternal *pfcme,int iMinID,int iMaxID,const POINT *ppt,StatusBar *pStatusBar,DWORD_PTR dwData,BOOL bRename = FALSE,BOOL bExtended = FALSE);
 
 	LRESULT CALLBACK	ShellMenuHookProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 private:
 
-	DISALLOW_COPY_AND_ASSIGN(CFileContextMenuManager);
+	DISALLOW_COPY_AND_ASSIGN(FileContextMenuManager);
 
 	static const int CONTEXT_MENU_SUBCLASS_ID = 1;
 
@@ -55,7 +55,7 @@ private:
 	int m_iMinID;
 	int m_iMaxID;
 
-	CStatusBar *m_pStatusBar;
+	StatusBar *m_pStatusBar;
 
 	const unique_pidl_absolute m_pidlParent;
 	std::vector<PITEMID_CHILD> m_pidlItems;

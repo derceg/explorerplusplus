@@ -10,11 +10,11 @@
 #include "iDropSource.h"
 
 
-class CDropSource : public IDropSource
+class DropSource : public IDropSource
 {
 public:
 
-	CDropSource(DragType dragType);
+	DropSource(DragType dragType);
 
 	HRESULT		__stdcall	QueryInterface(REFIID iid, void **ppvObject);
 	ULONG		__stdcall	AddRef(void);
@@ -36,19 +36,19 @@ HRESULT CreateDropSource(IDropSource **ppDropSource,DragType dragType)
 		return E_FAIL;
 	}
 
-	*ppDropSource = new CDropSource(dragType);
+	*ppDropSource = new DropSource(dragType);
 
 	return S_OK;
 }
 
-CDropSource::CDropSource(DragType dragType)
+DropSource::DropSource(DragType dragType)
 {
 	m_lRefCount = 1;
 	m_DragType = dragType;
 }
 
 /* IUnknown interface members. */
-HRESULT __stdcall CDropSource::QueryInterface(REFIID iid, void **ppvObject)
+HRESULT __stdcall DropSource::QueryInterface(REFIID iid, void **ppvObject)
 {
 	*ppvObject = NULL;
 
@@ -67,12 +67,12 @@ HRESULT __stdcall CDropSource::QueryInterface(REFIID iid, void **ppvObject)
 	return E_NOINTERFACE;
 }
 
-ULONG __stdcall CDropSource::AddRef(void)
+ULONG __stdcall DropSource::AddRef(void)
 {
 	return InterlockedIncrement(&m_lRefCount);
 }
 
-ULONG __stdcall CDropSource::Release(void)
+ULONG __stdcall DropSource::Release(void)
 {
 	LONG lCount = InterlockedDecrement(&m_lRefCount);
 
@@ -86,7 +86,7 @@ ULONG __stdcall CDropSource::Release(void)
 }
 
 
-HRESULT _stdcall CDropSource::QueryContinueDrag(BOOL fEscapePressed,DWORD grfKeyState)
+HRESULT _stdcall DropSource::QueryContinueDrag(BOOL fEscapePressed,DWORD grfKeyState)
 {
 	DWORD dwStopButton = 0;
 
@@ -111,7 +111,7 @@ HRESULT _stdcall CDropSource::QueryContinueDrag(BOOL fEscapePressed,DWORD grfKey
 	return S_OK;
 }
 
-HRESULT _stdcall CDropSource::GiveFeedback(DWORD dwEffect)
+HRESULT _stdcall DropSource::GiveFeedback(DWORD dwEffect)
 {
 	UNREFERENCED_PARAMETER(dwEffect);
 

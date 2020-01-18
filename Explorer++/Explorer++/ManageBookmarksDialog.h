@@ -20,11 +20,11 @@
 
 class ManageBookmarksDialog;
 
-class CManageBookmarksDialogPersistentSettings : public CDialogSettings
+class ManageBookmarksDialogPersistentSettings : public DialogSettings
 {
 public:
 
-	static CManageBookmarksDialogPersistentSettings &GetInstance();
+	static ManageBookmarksDialogPersistentSettings &GetInstance();
 
 private:
 
@@ -33,10 +33,10 @@ private:
 	static const TCHAR SETTINGS_KEY[];
 	static const int DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH = 180;
 
-	CManageBookmarksDialogPersistentSettings();
+	ManageBookmarksDialogPersistentSettings();
 
-	CManageBookmarksDialogPersistentSettings(const CManageBookmarksDialogPersistentSettings &);
-	CManageBookmarksDialogPersistentSettings & operator=(const CManageBookmarksDialogPersistentSettings &);
+	ManageBookmarksDialogPersistentSettings(const ManageBookmarksDialogPersistentSettings &);
+	ManageBookmarksDialogPersistentSettings & operator=(const ManageBookmarksDialogPersistentSettings &);
 
 	void SetupDefaultColumns();
 
@@ -46,7 +46,7 @@ private:
 	std::unordered_set<std::wstring> m_setExpansion;
 };
 
-class ManageBookmarksDialog : public CBaseDialog
+class ManageBookmarksDialog : public BaseDialog
 {
 public:
 
@@ -127,5 +127,5 @@ private:
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
-	CManageBookmarksDialogPersistentSettings *m_pmbdps;
+	ManageBookmarksDialogPersistentSettings *m_pmbdps;
 };

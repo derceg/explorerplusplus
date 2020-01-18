@@ -54,15 +54,15 @@ class CachedIcons;
 struct Config;
 struct PreservedFolderState;
 
-class CShellBrowser : public IDropTarget, public IDropFilesCallback, public NavigatorInterface
+class ShellBrowser : public IDropTarget, public IDropFilesCallback, public NavigatorInterface
 {
 public:
 
-	static CShellBrowser *CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner,
+	static ShellBrowser *CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner,
 		CachedIcons *cachedIcons, const Config *config, TabNavigationInterface *tabNavigation,
 		const FolderSettings &folderSettings, boost::optional<FolderColumns> initialColumns);
 
-	static CShellBrowser *CreateFromPreserved(int id, HINSTANCE resourceInstance, HWND hOwner,
+	static ShellBrowser *CreateFromPreserved(int id, HINSTANCE resourceInstance, HWND hOwner,
 		CachedIcons *cachedIcons, const Config *config, TabNavigationInterface *tabNavigation,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 		const PreservedFolderState &preservedFolderState);
@@ -167,11 +167,11 @@ public:
 	void				OnGridlinesSettingChanged();
 
 	// Signals
-	SignalWrapper<CShellBrowser, void()> listViewSelectionChanged;
+	SignalWrapper<ShellBrowser, void()> listViewSelectionChanged;
 
 private:
 
-	DISALLOW_COPY_AND_ASSIGN(CShellBrowser);
+	DISALLOW_COPY_AND_ASSIGN(ShellBrowser);
 
 	struct DirectoryState
 	{
@@ -275,14 +275,14 @@ private:
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
 
-	CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
+	ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
 		const Config *config, TabNavigationInterface *tabNavigation,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 		const PreservedFolderState &preservedFolderState);
-	CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
+	ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
 		const Config *config, TabNavigationInterface *tabNavigation, const FolderSettings &folderSettings,
 		boost::optional<FolderColumns> initialColumns);
-	~CShellBrowser();
+	~ShellBrowser();
 
 	HWND				SetUpListView(HWND parent);
 	int					GenerateUniqueItemId();

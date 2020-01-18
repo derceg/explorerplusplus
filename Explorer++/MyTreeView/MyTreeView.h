@@ -13,7 +13,7 @@
 
 class CachedIcons;
 
-class CMyTreeView : public IDropTarget, public IDropSource
+class MyTreeView : public IDropTarget, public IDropSource
 {
 public:
 
@@ -22,8 +22,8 @@ public:
 	ULONG __stdcall		AddRef(void);
 	ULONG __stdcall		Release(void);
 
-	CMyTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pDirMon, CachedIcons *cachedIcons);
-	~CMyTreeView();
+	MyTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pDirMon, CachedIcons *cachedIcons);
+	~MyTreeView();
 
 	/* Drop source functions. */
 	HRESULT _stdcall	QueryContinueDrag(BOOL fEscapePressed,DWORD gfrKeyState);
@@ -101,7 +101,7 @@ private:
 	typedef struct
 	{
 		TCHAR szPath[MAX_PATH];
-		CMyTreeView *pMyTreeView;
+		MyTreeView *pMyTreeView;
 	} DirectoryAltered_t;
 
 	typedef struct

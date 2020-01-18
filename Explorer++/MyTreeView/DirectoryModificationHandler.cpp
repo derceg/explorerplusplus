@@ -11,7 +11,7 @@
 const UINT DIRECTORYMODIFIED_TIMER_ID = 0;
 const UINT DIRECTORYMODIFIED_TIMER_ELAPSE = 500;
 
-void CMyTreeView::DirectoryAltered(void)
+void MyTreeView::DirectoryAltered(void)
 {
 	EnterCriticalSection(&m_cs);
 
@@ -76,7 +76,7 @@ void CMyTreeView::DirectoryAltered(void)
 
 /* TODO: Will have to change this. If AddItem() fails for some
 reason, then add the item to the tracking list. */
-void CMyTreeView::DirectoryAlteredAddFile(const TCHAR *szFullFileName)
+void MyTreeView::DirectoryAlteredAddFile(const TCHAR *szFullFileName)
 {
 	/* We'll use this as a litmus test to check whether or not
 	the file actually exists. */
@@ -100,7 +100,7 @@ void CMyTreeView::DirectoryAlteredAddFile(const TCHAR *szFullFileName)
 	}
 }
 
-void CMyTreeView::DirectoryAlteredRemoveFile(const TCHAR *szFullFileName)
+void MyTreeView::DirectoryAlteredRemoveFile(const TCHAR *szFullFileName)
 {
 	TCHAR szParent[MAX_PATH];
 	HTREEITEM hItem;
@@ -156,7 +156,7 @@ void CMyTreeView::DirectoryAlteredRemoveFile(const TCHAR *szFullFileName)
 	}
 }
 
-void CMyTreeView::DirectoryAlteredRenameFile(const TCHAR *szFullFileName)
+void MyTreeView::DirectoryAlteredRenameFile(const TCHAR *szFullFileName)
 {
 	HTREEITEM hItem;
 	HTREEITEM hDeskItem;
@@ -267,15 +267,15 @@ void CMyTreeView::DirectoryAlteredRenameFile(const TCHAR *szFullFileName)
 	}
 }
 
-void CMyTreeView::DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData)
+void MyTreeView::DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData)
 {
 	DirectoryAltered_t	*pDirectoryAltered = NULL;
-	CMyTreeView			*pMyTreeView = NULL;
+	MyTreeView			*pMyTreeView = NULL;
 	TCHAR				szFullFileName[MAX_PATH];
 
 	pDirectoryAltered = (DirectoryAltered_t *)pData;
 
-	pMyTreeView = (CMyTreeView *)pDirectoryAltered->pMyTreeView;
+	pMyTreeView = (MyTreeView *)pDirectoryAltered->pMyTreeView;
 
 	StringCchCopy(szFullFileName, SIZEOF_ARRAY(szFullFileName), pDirectoryAltered->szPath);
 	if(!PathAppend(szFullFileName, szFileName))
@@ -286,7 +286,7 @@ void CMyTreeView::DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwActi
 	pMyTreeView->DirectoryModified(dwAction,szFullFileName);
 }
 
-void CMyTreeView::DirectoryModified(DWORD dwAction, const TCHAR *szFullFileName)
+void MyTreeView::DirectoryModified(DWORD dwAction, const TCHAR *szFullFileName)
 {
 	EnterCriticalSection(&m_cs);
 
@@ -303,7 +303,7 @@ void CMyTreeView::DirectoryModified(DWORD dwAction, const TCHAR *szFullFileName)
 	LeaveCriticalSection(&m_cs);
 }
 
-void CMyTreeView::AddDrive(const TCHAR *szDrive)
+void MyTreeView::AddDrive(const TCHAR *szDrive)
 {
 	PIDLIST_ABSOLUTE pidlMyComputer = NULL;
 	HRESULT hr = SHGetFolderLocation(NULL,CSIDL_DRIVES,NULL,0,&pidlMyComputer);
@@ -321,7 +321,7 @@ void CMyTreeView::AddDrive(const TCHAR *szDrive)
 	}
 }
 
-void CMyTreeView::AddItem(const TCHAR *szFullFileName)
+void MyTreeView::AddItem(const TCHAR *szFullFileName)
 {
 	TCHAR			szDirectory[MAX_PATH];
 	HTREEITEM		hParent;
@@ -363,7 +363,7 @@ void CMyTreeView::AddItem(const TCHAR *szFullFileName)
 	}
 }
 
-void CMyTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileName)
+void MyTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileName)
 {
 	IShellFolder	*pShellFolder = NULL;
 	PIDLIST_ABSOLUTE	pidlComplete = NULL;
@@ -458,7 +458,7 @@ void CMyTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileName)
 the items display text, and updating it's pidl. Note that the children of
 this item MUST ALL BE UPDATED as well, since their pidl's will also
 change. */
-void CMyTreeView::RenameItem(HTREEITEM hItem, const TCHAR *szFullFileName)
+void MyTreeView::RenameItem(HTREEITEM hItem, const TCHAR *szFullFileName)
 {
 	TVITEMEX	tvItem;
 	PIDLIST_ABSOLUTE	pidlParent;
@@ -502,7 +502,7 @@ void CMyTreeView::RenameItem(HTREEITEM hItem, const TCHAR *szFullFileName)
 	}
 }
 
-void CMyTreeView::UpdateChildren(HTREEITEM hParent, PCIDLIST_ABSOLUTE pidlParent)
+void MyTreeView::UpdateChildren(HTREEITEM hParent, PCIDLIST_ABSOLUTE pidlParent)
 {
 	HTREEITEM hChild;
 	TVITEMEX tvItem;
@@ -540,7 +540,7 @@ void CMyTreeView::UpdateChildren(HTREEITEM hParent, PCIDLIST_ABSOLUTE pidlParent
 	}
 }
 
-PCIDLIST_ABSOLUTE CMyTreeView::UpdateItemInfo(PCIDLIST_ABSOLUTE pidlParent, int iItemId)
+PCIDLIST_ABSOLUTE MyTreeView::UpdateItemInfo(PCIDLIST_ABSOLUTE pidlParent, int iItemId)
 {
 	ItemInfo_t &itemInfo = m_itemInfoMap.at(iItemId);
 	itemInfo.pidl.reset(ILCombine(pidlParent, itemInfo.pridl.get()));
@@ -548,7 +548,7 @@ PCIDLIST_ABSOLUTE CMyTreeView::UpdateItemInfo(PCIDLIST_ABSOLUTE pidlParent, int 
 	return itemInfo.pidl.get();
 }
 
-void CMyTreeView::RemoveItem(const TCHAR *szFullFileName)
+void MyTreeView::RemoveItem(const TCHAR *szFullFileName)
 {
 	HTREEITEM hItem;
 
@@ -560,13 +560,13 @@ void CMyTreeView::RemoveItem(const TCHAR *szFullFileName)
 	}
 }
 
-void CMyTreeView::RemoveItem(HTREEITEM hItem)
+void MyTreeView::RemoveItem(HTREEITEM hItem)
 {
 	EraseItems(hItem);
 	TreeView_DeleteItem(m_hTreeView,hItem);
 }
 
-void CMyTreeView::UpdateParent(const TCHAR *szParent)
+void MyTreeView::UpdateParent(const TCHAR *szParent)
 {
 	HTREEITEM hParent;
 
@@ -575,7 +575,7 @@ void CMyTreeView::UpdateParent(const TCHAR *szParent)
 	UpdateParent(hParent);
 }
 
-void CMyTreeView::UpdateParent(HTREEITEM hParent)
+void MyTreeView::UpdateParent(HTREEITEM hParent)
 {
 	if(hParent != NULL)
 	{

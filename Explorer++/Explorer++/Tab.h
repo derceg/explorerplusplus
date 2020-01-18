@@ -40,7 +40,7 @@ public:
 
 	int GetId() const;
 
-	CShellBrowser *GetShellBrowser() const;
+	ShellBrowser *GetShellBrowser() const;
 
 	std::wstring GetName() const;
 	bool GetUseCustomName() const;
@@ -66,7 +66,7 @@ private:
 	static int idCounter;
 	const int m_id;
 
-	CShellBrowser *m_shellBrowser;
+	ShellBrowser *m_shellBrowser;
 
 	bool m_useCustomName;
 	std::wstring m_customName;

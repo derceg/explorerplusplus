@@ -10,12 +10,12 @@ __interface IReferenceCount
 	ULONG	Release();
 };
 
-class CReferenceCount : public IReferenceCount
+class ReferenceCount : public IReferenceCount
 {
 public:
 
-	CReferenceCount();
-	virtual ~CReferenceCount() = default;
+	ReferenceCount();
+	virtual ~ReferenceCount() = default;
 
 	ULONG	AddRef();
 	ULONG	Release();

@@ -109,7 +109,7 @@ MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE instance, IExplorerplusp
 
 MainToolbar::MainToolbar(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
 	Navigation *navigation, std::shared_ptr<Config> config) :
-	CBaseWindow(CreateMainToolbar(parent)),
+	BaseWindow(CreateMainToolbar(parent)),
 	m_persistentSettings(&MainToolbarPersistentSettings::GetInstance()),
 	m_instance(instance),
 	m_pexpp(pexpp),

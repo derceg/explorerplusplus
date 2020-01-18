@@ -20,7 +20,7 @@ __interface IModelessDialogNotification : public IReferenceCount
 For instance, provides the ability for a class to manage
 a dialog without having to handle the dialog procedure
 directly. */
-class CBaseDialog : public CMessageForwarder
+class BaseDialog : public MessageForwarder
 {
 	friend INT_PTR CALLBACK BaseDialogProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
@@ -36,8 +36,8 @@ public:
 	static const int RETURN_CANCEL = 0;
 	static const int RETURN_OK = 1;
 
-	CBaseDialog(HINSTANCE hInstance,int iResource,HWND hParent,bool bResizable);
-	virtual ~CBaseDialog() = default;
+	BaseDialog(HINSTANCE hInstance,int iResource,HWND hParent,bool bResizable);
+	virtual ~BaseDialog() = default;
 
 	INT_PTR			ShowModalDialog();
 	HWND			ShowModelessDialog(IModelessDialogNotification *pmdn = NULL);
@@ -56,11 +56,11 @@ protected:
 
 private:
 
-	DISALLOW_COPY_AND_ASSIGN(CBaseDialog);
+	DISALLOW_COPY_AND_ASSIGN(BaseDialog);
 
 	INT_PTR CALLBACK	BaseDialogProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
-	virtual void	GetResizableControlInformation(DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	virtual void	GetResizableControlInformation(DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList);
 	virtual void	SaveState();
 
 	const HINSTANCE m_hInstance;
@@ -75,5 +75,5 @@ private:
 	/* Used only with resizable dialogs. */
 	const bool m_bResizable;
 	DialogSizeConstraint m_dsc;
-	std::unique_ptr<CResizableDialog> m_prd;
+	std::unique_ptr<ResizableDialog> m_prd;
 };

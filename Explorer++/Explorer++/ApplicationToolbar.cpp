@@ -27,17 +27,17 @@
 #include "../Helper/XMLSettings.h"
 #include <boost\algorithm\string.hpp>
 
-const TCHAR CApplicationToolbarPersistentSettings::SETTING_NAME[] = _T("Name");
-const TCHAR CApplicationToolbarPersistentSettings::SETTING_COMMAND[] = _T("Command");
-const TCHAR CApplicationToolbarPersistentSettings::SETTING_SHOW_NAME_ON_TOOLBAR[] = _T("ShowNameOnToolbar");
+const TCHAR ApplicationToolbarPersistentSettings::SETTING_NAME[] = _T("Name");
+const TCHAR ApplicationToolbarPersistentSettings::SETTING_COMMAND[] = _T("Command");
+const TCHAR ApplicationToolbarPersistentSettings::SETTING_SHOW_NAME_ON_TOOLBAR[] = _T("ShowNameOnToolbar");
 
-CApplicationToolbar *CApplicationToolbar::Create(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp)
+ApplicationToolbar *ApplicationToolbar::Create(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp)
 {
-	return new CApplicationToolbar(hParent, uIDStart, uIDEnd, hInstance, pexpp);
+	return new ApplicationToolbar(hParent, uIDStart, uIDEnd, hInstance, pexpp);
 }
 
-CApplicationToolbar::CApplicationToolbar(HWND hParent,UINT uIDStart,UINT uIDEnd,HINSTANCE hInstance,IExplorerplusplus *pexpp) :
-CBaseWindow(CreateApplicationToolbar(hParent)),
+ApplicationToolbar::ApplicationToolbar(HWND hParent,UINT uIDStart,UINT uIDEnd,HINSTANCE hInstance,IExplorerplusplus *pexpp) :
+BaseWindow(CreateApplicationToolbar(hParent)),
 m_hInstance(hInstance),
 m_uIDStart(uIDStart),
 m_uIDEnd(uIDEnd),
@@ -46,7 +46,7 @@ m_pexpp(pexpp)
 	Initialize(hParent);
 }
 
-HWND CApplicationToolbar::CreateApplicationToolbar(HWND hParent)
+HWND ApplicationToolbar::CreateApplicationToolbar(HWND hParent)
 {
 	return CreateToolbar(hParent, WS_CHILD | WS_VISIBLE |
 		WS_CLIPSIBLINGS | WS_CLIPCHILDREN | TBSTYLE_TOOLTIPS | TBSTYLE_LIST |
@@ -55,9 +55,9 @@ HWND CApplicationToolbar::CreateApplicationToolbar(HWND hParent)
 		TBSTYLE_EX_DOUBLEBUFFER | TBSTYLE_EX_HIDECLIPPEDBUTTONS);
 }
 
-void CApplicationToolbar::Initialize(HWND hParent)
+void ApplicationToolbar::Initialize(HWND hParent)
 {
-	m_atps = &CApplicationToolbarPersistentSettings::GetInstance();
+	m_atps = &ApplicationToolbarPersistentSettings::GetInstance();
 
 	SendMessage(m_hwnd,TB_BUTTONSTRUCTSIZE,static_cast<WPARAM>(sizeof(TBBUTTON)),0);
 
@@ -71,7 +71,7 @@ void CApplicationToolbar::Initialize(HWND hParent)
 
 	SendMessage(m_hwnd,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(himlSmall));
 
-	m_patd = new CApplicationToolbarDropHandler(m_hwnd, this);
+	m_patd = new ApplicationToolbarDropHandler(m_hwnd, this);
 	RegisterDragDrop(m_hwnd,m_patd);
 
 	m_windowSubclasses.push_back(WindowSubclassWrapper(hParent, ParentWndProcStub,
@@ -80,25 +80,25 @@ void CApplicationToolbar::Initialize(HWND hParent)
 	AddButtonsToToolbar();
 
 	m_connections.push_back(m_pexpp->AddToolbarContextMenuObserver(
-		boost::bind(&CApplicationToolbar::OnToolbarContextMenuPreShow, this, _1, _2, _3)));
+		boost::bind(&ApplicationToolbar::OnToolbarContextMenuPreShow, this, _1, _2, _3)));
 }
 
-CApplicationToolbar::~CApplicationToolbar()
+ApplicationToolbar::~ApplicationToolbar()
 {
 	RevokeDragDrop(m_hwnd);
 	m_patd->Release();
 }
 
-LRESULT CALLBACK CApplicationToolbar::ParentWndProcStub(HWND hwnd,UINT uMsg,
+LRESULT CALLBACK ApplicationToolbar::ParentWndProcStub(HWND hwnd,UINT uMsg,
 	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	CApplicationToolbar *pat = reinterpret_cast<CApplicationToolbar *>(dwRefData);
+	ApplicationToolbar *pat = reinterpret_cast<ApplicationToolbar *>(dwRefData);
 	return pat->ParentWndProc(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK CApplicationToolbar::ParentWndProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK ApplicationToolbar::ParentWndProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -187,7 +187,7 @@ LRESULT CALLBACK CApplicationToolbar::ParentWndProc(HWND hwnd,UINT uMsg,WPARAM w
 	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
 }
 
-void CApplicationToolbar::AddButtonsToToolbar()
+void ApplicationToolbar::AddButtonsToToolbar()
 {
 	for(const auto &Button : m_atps->m_Buttons)
 	{
@@ -195,7 +195,7 @@ void CApplicationToolbar::AddButtonsToToolbar()
 	}
 }
 
-void CApplicationToolbar::AddButtonToToolbar(const ApplicationButton_t &Button)
+void ApplicationToolbar::AddButtonToToolbar(const ApplicationButton_t &Button)
 {
 	ApplicationInfo_t ai = ProcessCommand(Button.Command);
 
@@ -229,7 +229,7 @@ void CApplicationToolbar::AddButtonToToolbar(const ApplicationButton_t &Button)
 	UpdateToolbarBandSizing(GetParent(m_hwnd),m_hwnd);
 }
 
-void CApplicationToolbar::UpdateButton(int iItem)
+void ApplicationToolbar::UpdateButton(int iItem)
 {
 	ApplicationButton_t *Button = MapToolbarButtonToItem(iItem);
 
@@ -265,13 +265,13 @@ void CApplicationToolbar::UpdateButton(int iItem)
 	}
 }
 
-void CApplicationToolbar::ShowNewItemDialog()
+void ApplicationToolbar::ShowNewItemDialog()
 {
 	ApplicationButton_t Button;
 	Button.ShowNameOnToolbar = TRUE;
 
-	CApplicationToolbarButtonDialog ApplicationToolbarButtonDialog(m_hInstance, m_hwnd, &Button, true);
-	INT_PTR ret = ApplicationToolbarButtonDialog.ShowModalDialog();
+	ApplicationToolbarButtonDialog applicationToolbarButtonDialog(m_hInstance, m_hwnd, &Button, true);
+	INT_PTR ret = applicationToolbarButtonDialog.ShowModalDialog();
 
 	if(ret == 1)
 	{
@@ -282,7 +282,7 @@ void CApplicationToolbar::ShowNewItemDialog()
 	}
 }
 
-void CApplicationToolbar::AddNewItem(const std::wstring &name, const std::wstring &command,
+void ApplicationToolbar::AddNewItem(const std::wstring &name, const std::wstring &command,
 	BOOL showNameOnToolbar)
 {
 	ApplicationButton_t button;
@@ -298,7 +298,7 @@ void CApplicationToolbar::AddNewItem(const std::wstring &name, const std::wstrin
 they will be passed to the application along
 with the default parameters (i.e. those attached
 to the button). */
-void CApplicationToolbar::OpenItem(int iItem, std::wstring *parameters)
+void ApplicationToolbar::OpenItem(int iItem, std::wstring *parameters)
 {
 	assert(iItem >= 0 && static_cast<size_t>(iItem) < m_atps->m_Buttons.size());
 
@@ -333,7 +333,7 @@ expanded) and a parameter list.
 Two supported styles:
 1. "[command]" [parameters] (used if the command contains spaces)
 2. [command] [parameters] */
-CApplicationToolbar::ApplicationInfo_t CApplicationToolbar::ProcessCommand(const std::wstring &Command)
+ApplicationToolbar::ApplicationInfo_t ApplicationToolbar::ProcessCommand(const std::wstring &Command)
 {
 	ApplicationInfo_t ai;
 
@@ -396,7 +396,7 @@ CApplicationToolbar::ApplicationInfo_t CApplicationToolbar::ProcessCommand(const
 	return ai;
 }
 
-void CApplicationToolbar::ShowItemProperties(int iItem)
+void ApplicationToolbar::ShowItemProperties(int iItem)
 {
 	assert(iItem >= 0 && static_cast<size_t>(iItem) < m_atps->m_Buttons.size());
 
@@ -404,7 +404,7 @@ void CApplicationToolbar::ShowItemProperties(int iItem)
 
 	if(Button != NULL)
 	{
-		CApplicationToolbarButtonDialog ApplicationToolbarButtonDialog(m_hInstance,
+		ApplicationToolbarButtonDialog ApplicationToolbarButtonDialog(m_hInstance,
 			m_hwnd, Button, false);
 		INT_PTR ret = ApplicationToolbarButtonDialog.ShowModalDialog();
 
@@ -415,7 +415,7 @@ void CApplicationToolbar::ShowItemProperties(int iItem)
 	}
 }
 
-void CApplicationToolbar::DeleteItem(int iItem)
+void ApplicationToolbar::DeleteItem(int iItem)
 {
 	assert(iItem >= 0 && static_cast<size_t>(iItem) < m_atps->m_Buttons.size());
 
@@ -445,7 +445,7 @@ void CApplicationToolbar::DeleteItem(int iItem)
 	}
 }
 
-void CApplicationToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt)
+void ApplicationToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt)
 {
 	UNREFERENCED_PARAMETER(pt);
 
@@ -465,7 +465,7 @@ void CApplicationToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWin
 	InsertMenuItem(menu, IDM_TOOLBARS_CUSTOMIZE, FALSE, &mii);
 }
 
-ApplicationButton_t *CApplicationToolbar::MapToolbarButtonToItem(int iIndex)
+ApplicationButton_t *ApplicationToolbar::MapToolbarButtonToItem(int iIndex)
 {
 	if(iIndex == -1)
 	{
@@ -490,19 +490,19 @@ ApplicationButton_t *CApplicationToolbar::MapToolbarButtonToItem(int iIndex)
 	return NULL;
 }
 
-CApplicationToolbarPersistentSettings::CApplicationToolbarPersistentSettings() :
+ApplicationToolbarPersistentSettings::ApplicationToolbarPersistentSettings() :
 m_IDCounter(0)
 {
 
 }
 
-CApplicationToolbarPersistentSettings& CApplicationToolbarPersistentSettings::GetInstance()
+ApplicationToolbarPersistentSettings& ApplicationToolbarPersistentSettings::GetInstance()
 {
-	static CApplicationToolbarPersistentSettings atps;
+	static ApplicationToolbarPersistentSettings atps;
 	return atps;
 }
 
-void CApplicationToolbarPersistentSettings::LoadRegistrySettings(HKEY hParentKey)
+void ApplicationToolbarPersistentSettings::LoadRegistrySettings(HKEY hParentKey)
 {
 	TCHAR	szItemKey[256];
 	int		i = 0;
@@ -538,7 +538,7 @@ void CApplicationToolbarPersistentSettings::LoadRegistrySettings(HKEY hParentKey
 	}
 }
 
-void CApplicationToolbarPersistentSettings::SaveRegistrySettings(HKEY hParentKey)
+void ApplicationToolbarPersistentSettings::SaveRegistrySettings(HKEY hParentKey)
 {
 	int index = 0;
 
@@ -564,7 +564,7 @@ void CApplicationToolbarPersistentSettings::SaveRegistrySettings(HKEY hParentKey
 	}
 }
 
-void CApplicationToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
+void ApplicationToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
 {
 	TCHAR szName[512];
 	TCHAR szCommand[512];
@@ -631,7 +631,7 @@ void CApplicationToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
 	}
 }
 
-void CApplicationToolbarPersistentSettings::SaveXMLSettings(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pe)
+void ApplicationToolbarPersistentSettings::SaveXMLSettings(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pe)
 {
 	BSTR bstr_wsntt = SysAllocString(L"\n\t\t");
 
@@ -650,7 +650,7 @@ void CApplicationToolbarPersistentSettings::SaveXMLSettings(IXMLDOMDocument *pXM
 	SysFreeString(bstr_wsntt);
 }
 
-bool CApplicationToolbarPersistentSettings::AddButton(const std::wstring &name, const std::wstring &command,
+bool ApplicationToolbarPersistentSettings::AddButton(const std::wstring &name, const std::wstring &command,
 	BOOL showNameOnToolbar, ApplicationButton_t *buttonOut)
 {
 	if(name.length() == 0 ||

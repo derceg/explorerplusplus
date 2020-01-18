@@ -11,7 +11,7 @@
 #include "ResizableDialog.h"
 
 
-CResizableDialog::CResizableDialog(HWND hDlg,
+ResizableDialog::ResizableDialog(HWND hDlg,
 	const std::list<Control_t> &ControlList) :
 	m_hDlg(hDlg)
 {
@@ -51,7 +51,7 @@ CResizableDialog::CResizableDialog(HWND hDlg,
 	}
 }
 
-void CResizableDialog::UpdateControls(int iWidth,int iHeight)
+void ResizableDialog::UpdateControls(int iWidth,int iHeight)
 {
 	HWND hCtrl;
 	RECT rc;

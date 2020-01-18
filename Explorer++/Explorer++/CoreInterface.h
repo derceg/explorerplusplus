@@ -21,7 +21,7 @@ enum MousewheelSource_t
 
 class CachedIcons;
 struct Config;
-class CShellBrowser;
+class ShellBrowser;
 __interface IDirectoryMonitor;
 class TabContainer;
 
@@ -36,7 +36,7 @@ __interface IExplorerplusplus
 	HWND			GetMainWindow() const;
 
 	HWND			GetActiveListView() const;
-	CShellBrowser	*GetActiveShellBrowser() const;
+	ShellBrowser	*GetActiveShellBrowser() const;
 
 	TabContainer	*GetTabContainer() const;
 	IDirectoryMonitor	*GetDirectoryMonitor() const;
@@ -49,7 +49,7 @@ __interface IExplorerplusplus
 	void			OpenItem(const TCHAR *szItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
 	void			OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
 
-	CStatusBar		*GetStatusBar();
+	StatusBar		*GetStatusBar();
 
 	void			OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters);
 

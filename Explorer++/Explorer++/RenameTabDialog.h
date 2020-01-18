@@ -9,31 +9,31 @@
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 
-class CRenameTabDialog;
+class RenameTabDialog;
 
-class CRenameTabDialogPersistentSettings : public CDialogSettings
+class RenameTabDialogPersistentSettings : public DialogSettings
 {
 public:
 
-	static CRenameTabDialogPersistentSettings &GetInstance();
+	static RenameTabDialogPersistentSettings &GetInstance();
 
 private:
 
-	friend CRenameTabDialog;
+	friend RenameTabDialog;
 
 	static const TCHAR SETTINGS_KEY[];
 
-	CRenameTabDialogPersistentSettings();
+	RenameTabDialogPersistentSettings();
 
-	CRenameTabDialogPersistentSettings(const CRenameTabDialogPersistentSettings &);
-	CRenameTabDialogPersistentSettings & operator=(const CRenameTabDialogPersistentSettings &);
+	RenameTabDialogPersistentSettings(const RenameTabDialogPersistentSettings &);
+	RenameTabDialogPersistentSettings & operator=(const RenameTabDialogPersistentSettings &);
 };
 
-class CRenameTabDialog : public CBaseDialog
+class RenameTabDialog : public BaseDialog
 {
 public:
 
-	CRenameTabDialog(HINSTANCE hInstance, HWND hParent, int tabId, TabContainer *tabContainer);
+	RenameTabDialog(HINSTANCE hInstance, HWND hParent, int tabId, TabContainer *tabContainer);
 
 protected:
 
@@ -52,7 +52,7 @@ private:
 
 	void	OnTabClosed(int tabId);
 
-	CRenameTabDialogPersistentSettings	*m_prtdps;
+	RenameTabDialogPersistentSettings	*m_prtdps;
 
 	TabContainer	*m_tabContainer;
 	int		m_tabId;

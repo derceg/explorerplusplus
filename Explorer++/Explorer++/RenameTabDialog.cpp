@@ -11,20 +11,20 @@
 #include "../Helper/Macros.h"
 
 
-const TCHAR CRenameTabDialogPersistentSettings::SETTINGS_KEY[] = _T("RenameTab");
+const TCHAR RenameTabDialogPersistentSettings::SETTINGS_KEY[] = _T("RenameTab");
 
-CRenameTabDialog::CRenameTabDialog(HINSTANCE hInstance, HWND hParent, int tabId,
+RenameTabDialog::RenameTabDialog(HINSTANCE hInstance, HWND hParent, int tabId,
 	TabContainer *tabContainer) :
-	CBaseDialog(hInstance, IDD_RENAMETAB, hParent, false),
+	BaseDialog(hInstance, IDD_RENAMETAB, hParent, false),
 	m_tabId(tabId),
 	m_tabContainer(tabContainer)
 {
-	m_prtdps = &CRenameTabDialogPersistentSettings::GetInstance();
+	m_prtdps = &RenameTabDialogPersistentSettings::GetInstance();
 
-	m_connections.push_back(m_tabContainer->tabRemovedSignal.AddObserver(boost::bind(&CRenameTabDialog::OnTabClosed, this, _1)));
+	m_connections.push_back(m_tabContainer->tabRemovedSignal.AddObserver(boost::bind(&RenameTabDialog::OnTabClosed, this, _1)));
 }
 
-INT_PTR CRenameTabDialog::OnInitDialog()
+INT_PTR RenameTabDialog::OnInitDialog()
 {
 	HWND hEditName = GetDlgItem(m_hDlg,IDC_RENAMETAB_NEWTABNAME);
 
@@ -46,7 +46,7 @@ INT_PTR CRenameTabDialog::OnInitDialog()
 	return 0;
 }
 
-INT_PTR CRenameTabDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR RenameTabDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -72,20 +72,20 @@ INT_PTR CRenameTabDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-INT_PTR CRenameTabDialog::OnClose()
+INT_PTR RenameTabDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-void CRenameTabDialog::OnUseFolderName()
+void RenameTabDialog::OnUseFolderName()
 {
 	HWND hEditName = GetDlgItem(m_hDlg,IDC_RENAMETAB_NEWTABNAME);
 
 	EnableWindow(hEditName,FALSE);
 }
 
-void CRenameTabDialog::OnUseCustomName()
+void RenameTabDialog::OnUseCustomName()
 {
 	HWND hEditName = GetDlgItem(m_hDlg,IDC_RENAMETAB_NEWTABNAME);
 
@@ -93,7 +93,7 @@ void CRenameTabDialog::OnUseCustomName()
 	SetFocus(hEditName);
 }
 
-void CRenameTabDialog::OnOk()
+void RenameTabDialog::OnOk()
 {
 	TCHAR szTabText[MAX_PATH];
 
@@ -120,12 +120,12 @@ void CRenameTabDialog::OnOk()
 	EndDialog(m_hDlg,1);
 }
 
-void CRenameTabDialog::OnCancel()
+void RenameTabDialog::OnCancel()
 {
 	EndDialog(m_hDlg,0);
 }
 
-void CRenameTabDialog::OnTabClosed(int tabId)
+void RenameTabDialog::OnTabClosed(int tabId)
 {
 	if (tabId == m_tabId)
 	{
@@ -137,21 +137,21 @@ void CRenameTabDialog::OnTabClosed(int tabId)
 	}
 }
 
-void CRenameTabDialog::SaveState()
+void RenameTabDialog::SaveState()
 {
 	m_prtdps->SaveDialogPosition(m_hDlg);
 
 	m_prtdps->m_bStateSaved = TRUE;
 }
 
-CRenameTabDialogPersistentSettings::CRenameTabDialogPersistentSettings() :
-CDialogSettings(SETTINGS_KEY)
+RenameTabDialogPersistentSettings::RenameTabDialogPersistentSettings() :
+DialogSettings(SETTINGS_KEY)
 {
 
 }
 
-CRenameTabDialogPersistentSettings& CRenameTabDialogPersistentSettings::GetInstance()
+RenameTabDialogPersistentSettings& RenameTabDialogPersistentSettings::GetInstance()
 {
-	static CRenameTabDialogPersistentSettings sfadps;
+	static RenameTabDialogPersistentSettings sfadps;
 	return sfadps;
 }

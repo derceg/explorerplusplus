@@ -10,12 +10,12 @@
 #include <string>
 #include "Macros.h"
 
-class CDialogSettings
+class DialogSettings
 {
 public:
 
-	CDialogSettings(const TCHAR *szSettingsKey,bool bSavePosition = true);
-	virtual ~CDialogSettings() = default;
+	DialogSettings(const TCHAR *szSettingsKey,bool bSavePosition = true);
+	virtual ~DialogSettings() = default;
 
 	void			SaveRegistrySettings(HKEY hParentKey);
 	void			LoadRegistrySettings(HKEY hParentKey);
@@ -34,7 +34,7 @@ protected:
 
 private:
 
-	DISALLOW_COPY_AND_ASSIGN(CDialogSettings);
+	DISALLOW_COPY_AND_ASSIGN(DialogSettings);
 
 	static const TCHAR SETTING_POSITION[];
 	static const TCHAR SETTING_POSITION_X[];

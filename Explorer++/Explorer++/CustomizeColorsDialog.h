@@ -12,31 +12,31 @@
 #include "../Helper/ResizableDialog.h"
 #include <vector>
 
-class CCustomizeColorsDialog;
+class CustomizeColorsDialog;
 
-class CCustomizeColorsDialogPersistentSettings : public CDialogSettings
+class CustomizeColorsDialogPersistentSettings : public DialogSettings
 {
 public:
 
-	static CCustomizeColorsDialogPersistentSettings &GetInstance();
+	static CustomizeColorsDialogPersistentSettings &GetInstance();
 
 private:
 
-	friend CCustomizeColorsDialog;
+	friend CustomizeColorsDialog;
 
 	static const TCHAR SETTINGS_KEY[];
 
-	CCustomizeColorsDialogPersistentSettings();
+	CustomizeColorsDialogPersistentSettings();
 
-	CCustomizeColorsDialogPersistentSettings(const CCustomizeColorsDialogPersistentSettings &);
-	CCustomizeColorsDialogPersistentSettings & operator=(const CCustomizeColorsDialogPersistentSettings &);
+	CustomizeColorsDialogPersistentSettings(const CustomizeColorsDialogPersistentSettings &);
+	CustomizeColorsDialogPersistentSettings & operator=(const CustomizeColorsDialogPersistentSettings &);
 };
 
-class CCustomizeColorsDialog : public CBaseDialog
+class CustomizeColorsDialog : public BaseDialog
 {
 public:
 
-	CCustomizeColorsDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
+	CustomizeColorsDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
 		std::vector<NColorRuleHelper::ColorRule_t> *pColorRuleList);
 
 protected:
@@ -50,7 +50,7 @@ protected:
 
 private:
 
-	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	void	GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList);
 	void	SaveState();
 
 	void	OnNew();
@@ -67,5 +67,5 @@ private:
 
 	std::vector<NColorRuleHelper::ColorRule_t> *m_pColorRuleList;
 
-	CCustomizeColorsDialogPersistentSettings *m_pccdps;
+	CustomizeColorsDialogPersistentSettings *m_pccdps;
 };

@@ -8,17 +8,17 @@
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 
-class CColorRuleDialog;
+class ColorRuleDialog;
 
-class CColorRuleDialogPersistentSettings : public CDialogSettings
+class ColorRuleDialogPersistentSettings : public DialogSettings
 {
 public:
 
-	static CColorRuleDialogPersistentSettings &GetInstance();
+	static ColorRuleDialogPersistentSettings &GetInstance();
 
 private:
 
-	friend CColorRuleDialog;
+	friend ColorRuleDialog;
 
 	static const TCHAR SETTINGS_KEY[];
 	static const COLORREF DEFAULT_INITIAL_COLOR;
@@ -26,10 +26,10 @@ private:
 	static const TCHAR SETTING_INITIAL_COLOR[];
 	static const TCHAR SETTING_CUSTOM_COLORS[];
 
-	CColorRuleDialogPersistentSettings();
+	ColorRuleDialogPersistentSettings();
 
-	CColorRuleDialogPersistentSettings(const CColorRuleDialogPersistentSettings &);
-	CColorRuleDialogPersistentSettings & operator=(const CColorRuleDialogPersistentSettings &);
+	ColorRuleDialogPersistentSettings(const ColorRuleDialogPersistentSettings &);
+	ColorRuleDialogPersistentSettings & operator=(const ColorRuleDialogPersistentSettings &);
 
 	void		SaveExtraRegistrySettings(HKEY hKey);
 	void		LoadExtraRegistrySettings(HKEY hKey);
@@ -41,11 +41,11 @@ private:
 	COLORREF	m_cfCustomColors[16];
 };
 
-class CColorRuleDialog : public CBaseDialog
+class ColorRuleDialog : public BaseDialog
 {
 public:
 
-	CColorRuleDialog(HINSTANCE hInstance, HWND hParent, NColorRuleHelper::ColorRule_t *pColorRule, BOOL bEdit);
+	ColorRuleDialog(HINSTANCE hInstance, HWND hParent, NColorRuleHelper::ColorRule_t *pColorRule, BOOL bEdit);
 
 	LRESULT CALLBACK	StaticColorProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
@@ -69,5 +69,5 @@ private:
 
 	COLORREF	m_cfCurrentColor;
 
-	CColorRuleDialogPersistentSettings	*m_pcrdps;
+	ColorRuleDialogPersistentSettings	*m_pcrdps;
 };

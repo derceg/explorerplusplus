@@ -10,19 +10,19 @@
 #include <list>
 
 
-const TCHAR CDisplayColoursDialogPersistentSettings::SETTINGS_KEY[] = _T("DisplayColors");
+const TCHAR DisplayColoursDialogPersistentSettings::SETTINGS_KEY[] = _T("DisplayColors");
 
-CDisplayColoursDialog::CDisplayColoursDialog(HINSTANCE hInstance, HWND hParent,
+DisplayColoursDialog::DisplayColoursDialog(HINSTANCE hInstance, HWND hParent,
 	HWND hDisplayWindow, COLORREF DefaultCenterColor, COLORREF DefaultSurroundingColor) :
-	CBaseDialog(hInstance, IDD_DISPLAYCOLOURS, hParent, false),
+	BaseDialog(hInstance, IDD_DISPLAYCOLOURS, hParent, false),
 	m_hDisplayWindow(hDisplayWindow),
 	m_DefaultCenterColor(DefaultCenterColor),
 	m_DefaultSurroundingColor(DefaultSurroundingColor)
 {
-	m_pdcdps = &CDisplayColoursDialogPersistentSettings::GetInstance();
+	m_pdcdps = &DisplayColoursDialogPersistentSettings::GetInstance();
 }
 
-INT_PTR CDisplayColoursDialog::OnInitDialog()
+INT_PTR DisplayColoursDialog::OnInitDialog()
 {
 	InitializeColorGroups();
 	InitializePreviewWindow();
@@ -32,7 +32,7 @@ INT_PTR CDisplayColoursDialog::OnInitDialog()
 	return 0;
 }
 
-void CDisplayColoursDialog::InitializeColorGroups()
+void DisplayColoursDialog::InitializeColorGroups()
 {
 	m_CenterGroup[0].SliderId	= IDC_SLIDER_CENTRE_RED;
 	m_CenterGroup[0].EditId		= IDC_EDIT_CENTRE_RED;
@@ -63,7 +63,7 @@ void CDisplayColoursDialog::InitializeColorGroups()
 	InitializeColorGroupControls(m_SurroundingGroup);
 }
 
-void CDisplayColoursDialog::InitializeColorGroupControls(ColorGroup_t ColorGroup[NUM_COLORS])
+void DisplayColoursDialog::InitializeColorGroupControls(ColorGroup_t ColorGroup[NUM_COLORS])
 {
 	for(int i = 0;i < NUM_COLORS;i++)
 	{
@@ -73,7 +73,7 @@ void CDisplayColoursDialog::InitializeColorGroupControls(ColorGroup_t ColorGroup
 	}
 }
 
-void CDisplayColoursDialog::SetColorGroupValues(ColorGroup_t ColorGroup[NUM_COLORS],COLORREF Color)
+void DisplayColoursDialog::SetColorGroupValues(ColorGroup_t ColorGroup[NUM_COLORS],COLORREF Color)
 {
 	for(int i = 0;i < NUM_COLORS;i++)
 	{
@@ -103,7 +103,7 @@ void CDisplayColoursDialog::SetColorGroupValues(ColorGroup_t ColorGroup[NUM_COLO
 	}
 }
 
-void CDisplayColoursDialog::InitializePreviewWindow()
+void DisplayColoursDialog::InitializePreviewWindow()
 {
 	COLORREF CentreColor = static_cast<COLORREF>(SendMessage(m_hDisplayWindow,DWM_GETCENTRECOLOR,0,0));
 	COLORREF SurroundColor = static_cast<COLORREF>(SendMessage(m_hDisplayWindow,DWM_GETSURROUNDCOLOR,0,0));
@@ -149,7 +149,7 @@ void CDisplayColoursDialog::InitializePreviewWindow()
 	SetColorGroupValues(m_SurroundingGroup,SurroundColor);
 }
 
-INT_PTR CDisplayColoursDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR DisplayColoursDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -187,7 +187,7 @@ INT_PTR CDisplayColoursDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-void CDisplayColoursDialog::OnRestoreDefaults()
+void DisplayColoursDialog::OnRestoreDefaults()
 {
 	/* TODO: Need to delete old display window fonts. */
 	//DeleteFont(m_DisplayWindowFont);
@@ -210,7 +210,7 @@ void CDisplayColoursDialog::OnRestoreDefaults()
 	SetColorGroupValues(m_SurroundingGroup,m_DefaultSurroundingColor);
 }
 
-void CDisplayColoursDialog::OnChooseFont()
+void DisplayColoursDialog::OnChooseFont()
 {
 	HFONT hFont;
 	DisplayWindow_GetFont(m_hPreviewDisplayWindow,reinterpret_cast<WPARAM>(&hFont));
@@ -240,7 +240,7 @@ void CDisplayColoursDialog::OnChooseFont()
 	}
 }
 
-INT_PTR CDisplayColoursDialog::OnHScroll(HWND hwnd)
+INT_PTR DisplayColoursDialog::OnHScroll(HWND hwnd)
 {
 	UNREFERENCED_PARAMETER(hwnd);
 
@@ -250,7 +250,7 @@ INT_PTR CDisplayColoursDialog::OnHScroll(HWND hwnd)
 	return 0;
 }
 
-void CDisplayColoursDialog::UpdateEditControlsFromSlider(ColorGroup_t ColorGroup[NUM_COLORS])
+void DisplayColoursDialog::UpdateEditControlsFromSlider(ColorGroup_t ColorGroup[NUM_COLORS])
 {
 	for(int i = 0;i < NUM_COLORS;i++)
 	{
@@ -263,7 +263,7 @@ void CDisplayColoursDialog::UpdateEditControlsFromSlider(ColorGroup_t ColorGroup
 	}
 }
 
-COLORREF CDisplayColoursDialog::GetColorFromSliderGroup(ColorGroup_t ColorGroup[NUM_COLORS])
+COLORREF DisplayColoursDialog::GetColorFromSliderGroup(ColorGroup_t ColorGroup[NUM_COLORS])
 {
 	UINT r = 0;
 	UINT g = 0;
@@ -296,7 +296,7 @@ COLORREF CDisplayColoursDialog::GetColorFromSliderGroup(ColorGroup_t ColorGroup[
 	return RGB(r,g,b);
 }
 
-void CDisplayColoursDialog::OnEnChange(UINT ControlID)
+void DisplayColoursDialog::OnEnChange(UINT ControlID)
 {
 	BOOL Translated;
 	UINT Value = GetDlgItemInt(m_hDlg,ControlID,&Translated,FALSE);
@@ -353,7 +353,7 @@ void CDisplayColoursDialog::OnEnChange(UINT ControlID)
 	}
 }
 
-void CDisplayColoursDialog::OnOk()
+void DisplayColoursDialog::OnOk()
 {
 	COLORREF CenterColor = GetColorFromSliderGroup(m_CenterGroup);
 	SendMessage(m_hDisplayWindow,DWM_SETCENTRECOLOR,CenterColor,0);
@@ -367,38 +367,38 @@ void CDisplayColoursDialog::OnOk()
 	EndDialog(m_hDlg,1);
 }
 
-void CDisplayColoursDialog::OnCancel()
+void DisplayColoursDialog::OnCancel()
 {
 	EndDialog(m_hDlg,0);
 }
 
-INT_PTR CDisplayColoursDialog::OnClose()
+INT_PTR DisplayColoursDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-INT_PTR CDisplayColoursDialog::OnDestroy()
+INT_PTR DisplayColoursDialog::OnDestroy()
 {
 	DestroyIcon(m_hDisplayWindowIcon);
 	return 0;
 }
 
-void CDisplayColoursDialog::SaveState()
+void DisplayColoursDialog::SaveState()
 {
 	m_pdcdps->SaveDialogPosition(m_hDlg);
 
 	m_pdcdps->m_bStateSaved = TRUE;
 }
 
-CDisplayColoursDialogPersistentSettings::CDisplayColoursDialogPersistentSettings() :
-CDialogSettings(SETTINGS_KEY)
+DisplayColoursDialogPersistentSettings::DisplayColoursDialogPersistentSettings() :
+DialogSettings(SETTINGS_KEY)
 {
 	
 }
 
-CDisplayColoursDialogPersistentSettings& CDisplayColoursDialogPersistentSettings::GetInstance()
+DisplayColoursDialogPersistentSettings& DisplayColoursDialogPersistentSettings::GetInstance()
 {
-	static CDisplayColoursDialogPersistentSettings dcdps;
+	static DisplayColoursDialogPersistentSettings dcdps;
 	return dcdps;
 }

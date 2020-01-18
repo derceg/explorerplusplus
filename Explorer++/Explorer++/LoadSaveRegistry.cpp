@@ -7,88 +7,88 @@
 #include "ColorRuleHelper.h"
 #include "Explorer++.h"
 
-CLoadSaveRegistry::CLoadSaveRegistry(Explorerplusplus *pContainer) :
+LoadSaveRegistry::LoadSaveRegistry(Explorerplusplus *pContainer) :
 	m_pContainer(pContainer)
 {
 
 }
 
-void CLoadSaveRegistry::LoadGenericSettings()
+void LoadSaveRegistry::LoadGenericSettings()
 {
 	m_pContainer->LoadGenericSettingsFromRegistry();
 }
 
-void CLoadSaveRegistry::LoadBookmarks()
+void LoadSaveRegistry::LoadBookmarks()
 {
 	m_pContainer->LoadBookmarksFromRegistry();
 }
 
-int CLoadSaveRegistry::LoadPreviousTabs()
+int LoadSaveRegistry::LoadPreviousTabs()
 {
 	return m_pContainer->LoadTabSettingsFromRegistry();
 }
 
-void CLoadSaveRegistry::LoadDefaultColumns()
+void LoadSaveRegistry::LoadDefaultColumns()
 {
 	m_pContainer->LoadDefaultColumnsFromRegistry();
 }
 
-void CLoadSaveRegistry::LoadApplicationToolbar()
+void LoadSaveRegistry::LoadApplicationToolbar()
 {
 	m_pContainer->LoadApplicationToolbarFromRegistry();
 }
 
-void CLoadSaveRegistry::LoadToolbarInformation()
+void LoadSaveRegistry::LoadToolbarInformation()
 {
 	m_pContainer->LoadToolbarInformationFromRegistry();
 }
 
-void CLoadSaveRegistry::LoadColorRules()
+void LoadSaveRegistry::LoadColorRules()
 {
 	NColorRuleHelper::LoadColorRulesFromRegistry(m_pContainer->m_ColorRules);
 }
 
-void CLoadSaveRegistry::LoadDialogStates()
+void LoadSaveRegistry::LoadDialogStates()
 {
 	m_pContainer->LoadDialogStatesFromRegistry();
 }
 
-void CLoadSaveRegistry::SaveGenericSettings()
+void LoadSaveRegistry::SaveGenericSettings()
 {
 	m_pContainer->SaveGenericSettingsToRegistry();
 }
 
-void CLoadSaveRegistry::SaveBookmarks()
+void LoadSaveRegistry::SaveBookmarks()
 {
 	m_pContainer->SaveBookmarksToRegistry();
 }
 
-void CLoadSaveRegistry::SaveTabs()
+void LoadSaveRegistry::SaveTabs()
 {
 	m_pContainer->SaveTabSettingsToRegistry();
 }
 
-void CLoadSaveRegistry::SaveDefaultColumns()
+void LoadSaveRegistry::SaveDefaultColumns()
 {
 	m_pContainer->SaveDefaultColumnsToRegistry();
 }
 
-void CLoadSaveRegistry::SaveApplicationToolbar()
+void LoadSaveRegistry::SaveApplicationToolbar()
 {
 	m_pContainer->SaveApplicationToolbarToRegistry();
 }
 
-void CLoadSaveRegistry::SaveToolbarInformation()
+void LoadSaveRegistry::SaveToolbarInformation()
 {
 	m_pContainer->SaveToolbarInformationToRegistry();
 }
 
-void CLoadSaveRegistry::SaveColorRules()
+void LoadSaveRegistry::SaveColorRules()
 {
 	NColorRuleHelper::SaveColorRulesToRegistry(m_pContainer->m_ColorRules);
 }
 
-void CLoadSaveRegistry::SaveDialogStates()
+void LoadSaveRegistry::SaveDialogStates()
 {
 	m_pContainer->SaveDialogStatesToRegistry();
 }

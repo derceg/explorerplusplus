@@ -27,7 +27,7 @@ namespace Plugins
 			bool showHidden;
 			bool autoArrange;
 
-			FolderSettings(const CShellBrowser &shellBrowser)
+			FolderSettings(const ShellBrowser &shellBrowser)
 			{
 				sortMode = shellBrowser.GetSortMode();
 				viewMode = shellBrowser.GetViewMode();

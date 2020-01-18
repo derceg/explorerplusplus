@@ -6,11 +6,11 @@
 
 #include "BaseWindow.h"
 
-class CComboBox : public CBaseWindow
+class ComboBox : public BaseWindow
 {
 public:
 
-	static CComboBox *CreateNew(HWND hComboBox);
+	static ComboBox *CreateNew(HWND hComboBox);
 
 protected:
 
@@ -18,10 +18,10 @@ protected:
 
 private:
 
-	DISALLOW_COPY_AND_ASSIGN(CComboBox);
+	DISALLOW_COPY_AND_ASSIGN(ComboBox);
 
-	CComboBox(HWND hComboBox);
-	~CComboBox() = default;
+	ComboBox(HWND hComboBox);
+	~ComboBox() = default;
 
 	static LRESULT CALLBACK ComboBoxEditProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK ComboBoxEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);

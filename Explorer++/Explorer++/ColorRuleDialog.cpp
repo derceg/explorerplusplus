@@ -20,23 +20,23 @@ namespace NColorRuleDialog
 		WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 }
 
-const TCHAR CColorRuleDialogPersistentSettings::SETTINGS_KEY[] = _T("ColorRules");
-const COLORREF CColorRuleDialogPersistentSettings::DEFAULT_INITIAL_COLOR = RGB(0,94,138);
+const TCHAR ColorRuleDialogPersistentSettings::SETTINGS_KEY[] = _T("ColorRules");
+const COLORREF ColorRuleDialogPersistentSettings::DEFAULT_INITIAL_COLOR = RGB(0,94,138);
 
-const TCHAR CColorRuleDialogPersistentSettings::SETTING_INITIAL_COLOR[] = _T("InitialColor");
-const TCHAR CColorRuleDialogPersistentSettings::SETTING_CUSTOM_COLORS[] = _T("CustomColors");
+const TCHAR ColorRuleDialogPersistentSettings::SETTING_INITIAL_COLOR[] = _T("InitialColor");
+const TCHAR ColorRuleDialogPersistentSettings::SETTING_CUSTOM_COLORS[] = _T("CustomColors");
 
-CColorRuleDialog::CColorRuleDialog(HINSTANCE hInstance, HWND hParent,
+ColorRuleDialog::ColorRuleDialog(HINSTANCE hInstance, HWND hParent,
 	NColorRuleHelper::ColorRule_t *pColorRule, BOOL bEdit) :
-	CBaseDialog(hInstance, IDD_NEWCOLORRULE, hParent, false)
+	BaseDialog(hInstance, IDD_NEWCOLORRULE, hParent, false)
 {
 	m_pColorRule = pColorRule;
 	m_bEdit = bEdit;
 
-	m_pcrdps = &CColorRuleDialogPersistentSettings::GetInstance();
+	m_pcrdps = &ColorRuleDialogPersistentSettings::GetInstance();
 }
 
-INT_PTR CColorRuleDialog::OnInitDialog()
+INT_PTR ColorRuleDialog::OnInitDialog()
 {
 	if(m_bEdit)
 	{
@@ -88,7 +88,7 @@ INT_PTR CColorRuleDialog::OnInitDialog()
 	return 0;
 }
 
-INT_PTR CColorRuleDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR ColorRuleDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -122,7 +122,7 @@ INT_PTR CColorRuleDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-void CColorRuleDialog::OnOk()
+void ColorRuleDialog::OnOk()
 {
 	GetWindowString(GetDlgItem(m_hDlg,IDC_EDIT_DESCRIPTION),m_pColorRule->strDescription);
 	GetWindowString(GetDlgItem(m_hDlg,IDC_EDIT_FILENAMEPATTERN),m_pColorRule->strFilterPattern);
@@ -154,25 +154,25 @@ void CColorRuleDialog::OnOk()
 	EndDialog(m_hDlg,1);
 }
 
-void CColorRuleDialog::OnCancel()
+void ColorRuleDialog::OnCancel()
 {
 	EndDialog(m_hDlg,0);
 }
 
-INT_PTR CColorRuleDialog::OnClose()
+INT_PTR ColorRuleDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-void CColorRuleDialog::SaveState()
+void ColorRuleDialog::SaveState()
 {
 	m_pcrdps->SaveDialogPosition(m_hDlg);
 
 	m_pcrdps->m_bStateSaved = TRUE;
 }
 
-void CColorRuleDialog::OnChangeColor()
+void ColorRuleDialog::OnChangeColor()
 {
 	CHOOSECOLOR cc;
 	cc.lStructSize	= sizeof(cc);
@@ -201,12 +201,12 @@ WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	CColorRuleDialog *pcrd = reinterpret_cast<CColorRuleDialog *>(dwRefData);
+	ColorRuleDialog *pcrd = reinterpret_cast<ColorRuleDialog *>(dwRefData);
 
 	return pcrd->StaticColorProc(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK CColorRuleDialog::StaticColorProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK ColorRuleDialog::StaticColorProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(Msg)
 	{
@@ -228,8 +228,8 @@ LRESULT CALLBACK CColorRuleDialog::StaticColorProc(HWND hwnd,UINT Msg,WPARAM wPa
 	return DefSubclassProc(hwnd,Msg,wParam,lParam);
 }
 
-CColorRuleDialogPersistentSettings::CColorRuleDialogPersistentSettings() :
-CDialogSettings(SETTINGS_KEY)
+ColorRuleDialogPersistentSettings::ColorRuleDialogPersistentSettings() :
+DialogSettings(SETTINGS_KEY)
 {
 	m_cfInitialColor = DEFAULT_INITIAL_COLOR;
 
@@ -239,13 +239,13 @@ CDialogSettings(SETTINGS_KEY)
 	}
 }
 
-CColorRuleDialogPersistentSettings& CColorRuleDialogPersistentSettings::GetInstance()
+ColorRuleDialogPersistentSettings& ColorRuleDialogPersistentSettings::GetInstance()
 {
-	static CColorRuleDialogPersistentSettings sfadps;
+	static ColorRuleDialogPersistentSettings sfadps;
 	return sfadps;
 }
 
-void CColorRuleDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
+void ColorRuleDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
 	RegSetValueEx(hKey,SETTING_INITIAL_COLOR,0,REG_BINARY,
 		reinterpret_cast<LPBYTE>(&m_cfInitialColor),
@@ -256,7 +256,7 @@ void CColorRuleDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 		sizeof(m_cfCustomColors));
 }
 
-void CColorRuleDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
+void ColorRuleDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
 	DWORD dwSize = sizeof(m_cfInitialColor);
 	RegQueryValueEx(hKey,SETTING_INITIAL_COLOR,NULL,NULL,
@@ -267,7 +267,7 @@ void CColorRuleDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 		reinterpret_cast<LPBYTE>(&m_cfCustomColors),&dwSize);
 }
 
-void CColorRuleDialogPersistentSettings::SaveExtraXMLSettings(
+void ColorRuleDialogPersistentSettings::SaveExtraXMLSettings(
 	IXMLDOMDocument *pXMLDom,IXMLDOMElement *pParentNode)
 {
 	TCHAR szNode[32];
@@ -287,7 +287,7 @@ void CColorRuleDialogPersistentSettings::SaveExtraXMLSettings(
 	}
 }
 
-void CColorRuleDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
+void ColorRuleDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
 {
 	if(CheckWildcardMatch(_T("r*"),bstrName,TRUE) ||
 		CheckWildcardMatch(_T("g*"),bstrName,TRUE) ||

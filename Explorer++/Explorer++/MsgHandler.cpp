@@ -87,7 +87,7 @@ void Explorerplusplus::LoadAllSettings(ILoadSave **pLoadSave)
 	methods to be different. */
 	if(m_bLoadSettingsFromXML)
 	{
-		*pLoadSave = new CLoadSaveXML(this,TRUE);
+		*pLoadSave = new LoadSaveXML(this,TRUE);
 
 		/* When loading from the config file, also
 		set the option to save back to it on exit. */
@@ -95,7 +95,7 @@ void Explorerplusplus::LoadAllSettings(ILoadSave **pLoadSave)
 	}
 	else
 	{
-		*pLoadSave = new CLoadSaveRegistry(this);
+		*pLoadSave = new LoadSaveRegistry(this);
 	}
 
 	(*pLoadSave)->LoadBookmarks();
@@ -973,7 +973,7 @@ void Explorerplusplus::CopyColumnInfoToClipboard(void)
 		if(column.bChecked)
 		{
 			TCHAR szText[64];
-			LoadString(m_hLanguageModule,CShellBrowser::LookupColumnNameStringIndex(column.id),szText,SIZEOF_ARRAY(szText));
+			LoadString(m_hLanguageModule,ShellBrowser::LookupColumnNameStringIndex(column.id),szText,SIZEOF_ARRAY(szText));
 
 			strColumnInfo += std::wstring(szText) + _T("\t");
 
@@ -1414,9 +1414,9 @@ void Explorerplusplus::SaveAllSettings()
 	ILoadSave *pLoadSave = NULL;
 
 	if(m_bSavePreferencesToXMLFile)
-		pLoadSave = new CLoadSaveXML(this,FALSE);
+		pLoadSave = new LoadSaveXML(this,FALSE);
 	else
-		pLoadSave = new CLoadSaveRegistry(this);
+		pLoadSave = new LoadSaveRegistry(this);
 
 	pLoadSave->SaveGenericSettings();
 	pLoadSave->SaveTabs();
@@ -1450,7 +1450,7 @@ HWND Explorerplusplus::GetActiveListView() const
 	return m_hActiveListView;
 }
 
-CShellBrowser *Explorerplusplus::GetActiveShellBrowser() const
+ShellBrowser *Explorerplusplus::GetActiveShellBrowser() const
 {
 	return m_pActiveShellBrowser;
 }

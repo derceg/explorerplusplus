@@ -47,7 +47,7 @@ TabContainer *TabContainer::Create(HWND parent, TabNavigationInterface *tabNavig
 TabContainer::TabContainer(HWND parent, TabNavigationInterface *tabNavigation,
 	Navigation *navigation, IExplorerplusplus *expp, CachedIcons *cachedIcons,
 	HINSTANCE instance, std::shared_ptr<Config> config) :
-	CBaseWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
+	BaseWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
 	m_tabNavigation(tabNavigation),
 	m_navigation(navigation),
 	m_expp(expp),
@@ -96,7 +96,7 @@ void TabContainer::Initialize(HWND parent)
 
 	AddDefaultTabIcons(m_tabCtrlImageList.get());
 
-	CTabDropHandler *pTabDropHandler = new CTabDropHandler(m_hwnd, this);
+	TabDropHandler *pTabDropHandler = new TabDropHandler(m_hwnd, this);
 	RegisterDragDrop(m_hwnd, pTabDropHandler);
 	pTabDropHandler->Release();
 
@@ -478,8 +478,8 @@ void TabContainer::OnRefreshAllTabs()
 
 void TabContainer::OnRenameTab(const Tab &tab)
 {
-	CRenameTabDialog RenameTabDialog(m_instance, m_expp->GetMainWindow(), tab.GetId(), this);
-	RenameTabDialog.ShowModalDialog();
+	RenameTabDialog renameTabDialog(m_instance, m_expp->GetMainWindow(), tab.GetId(), this);
+	renameTabDialog.ShowModalDialog();
 }
 
 void TabContainer::OnLockTab(Tab &tab)

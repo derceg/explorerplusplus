@@ -66,7 +66,7 @@ struct TabSettings : TabSettingsImpl
 	)
 };
 
-class TabContainer : public CBaseWindow
+class TabContainer : public BaseWindow
 {
 public:
 

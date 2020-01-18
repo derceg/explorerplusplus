@@ -14,7 +14,7 @@ For controls that do move/resize, they
 may be constrained along one axis.
 For example, a particular control may
 resize/move horizontally, but not vertically. */
-class CResizableDialog
+class ResizableDialog
 {
 public:
 
@@ -38,13 +38,13 @@ public:
 		ControlConstraint	Constraint;
 	};
 
-	CResizableDialog(HWND hDlg,const std::list<Control_t> &ControlList);
+	ResizableDialog(HWND hDlg,const std::list<Control_t> &ControlList);
 
 	void	UpdateControls(int iWidth,int iHeight);
 
 private:
 
-	DISALLOW_COPY_AND_ASSIGN(CResizableDialog);
+	DISALLOW_COPY_AND_ASSIGN(ResizableDialog);
 
 	struct ControlInternal_t
 	{

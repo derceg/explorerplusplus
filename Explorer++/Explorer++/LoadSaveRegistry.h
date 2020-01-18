@@ -8,11 +8,11 @@
 
 class Explorerplusplus;
 
-class CLoadSaveRegistry : public ILoadSave
+class LoadSaveRegistry : public ILoadSave
 {
 public:
 
-	CLoadSaveRegistry(Explorerplusplus *pContainer);
+	LoadSaveRegistry(Explorerplusplus *pContainer);
 
 	/* Loading functions. */
 	void	LoadGenericSettings();

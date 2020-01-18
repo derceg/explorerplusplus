@@ -10,31 +10,31 @@
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
 
-class CSelectColumnsDialog;
+class SelectColumnsDialog;
 
-class CSelectColumnsDialogPersistentSettings : public CDialogSettings
+class SelectColumnsDialogPersistentSettings : public DialogSettings
 {
 public:
 
-	static CSelectColumnsDialogPersistentSettings &GetInstance();
+	static SelectColumnsDialogPersistentSettings &GetInstance();
 
 private:
 
-	friend CSelectColumnsDialog;
+	friend SelectColumnsDialog;
 
 	static const TCHAR SETTINGS_KEY[];
 
-	CSelectColumnsDialogPersistentSettings();
+	SelectColumnsDialogPersistentSettings();
 
-	CSelectColumnsDialogPersistentSettings(const CSelectColumnsDialogPersistentSettings &);
-	CSelectColumnsDialogPersistentSettings & operator=(const CSelectColumnsDialogPersistentSettings &);
+	SelectColumnsDialogPersistentSettings(const SelectColumnsDialogPersistentSettings &);
+	SelectColumnsDialogPersistentSettings & operator=(const SelectColumnsDialogPersistentSettings &);
 };
 
-class CSelectColumnsDialog : public CBaseDialog
+class SelectColumnsDialog : public BaseDialog
 {
 public:
 
-	CSelectColumnsDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp,
+	SelectColumnsDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp,
 		TabContainer *tabContainer);
 
 protected:
@@ -50,7 +50,7 @@ private:
 
 	bool	CompareColumns(const Column_t &column1, const Column_t &column2);
 
-	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	void	GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList);
 	void	SaveState();
 
 	void	OnOk();
@@ -63,5 +63,5 @@ private:
 	TabContainer *m_tabContainer;
 	BOOL m_bColumnsSwapped;
 
-	CSelectColumnsDialogPersistentSettings *m_pscdps;
+	SelectColumnsDialogPersistentSettings *m_pscdps;
 };

@@ -9,7 +9,7 @@
 #include "ShellHelper.h"
 #include "StatusBar.h"
 
-class CContextMenuManager
+class ContextMenuManager
 {
 public:
 
@@ -21,17 +21,17 @@ public:
 
 	/* Loads the context menu handlers bound to
 	a specific registry key. */
-	CContextMenuManager(ContextMenuType_t ContextMenuType, PCIDLIST_ABSOLUTE pidlDirectory, IDataObject *pDataObject,
+	ContextMenuManager(ContextMenuType_t ContextMenuType, PCIDLIST_ABSOLUTE pidlDirectory, IDataObject *pDataObject,
 		IUnknown *pUnkSite, const std::vector<std::wstring> &blacklistedCLSIDEntries);
 
 	/* Releases the DLL's as well as the IUnknown
 	interfaces. */
-	~CContextMenuManager();
+	~ContextMenuManager();
 
 	/* This will show the specified menu. Note that before
 	the menu is shown, this method will insert any loaded
 	shell extensions at the specified position. */
-	bool	ShowMenu(HWND hwnd,HMENU hMenu,UINT uIDPrevious,UINT uMinID,UINT uMaxID,const POINT &pt,CStatusBar &StatusBar);
+	bool	ShowMenu(HWND hwnd,HMENU hMenu,UINT uIDPrevious,UINT uMinID,UINT uMaxID,const POINT &pt,StatusBar &StatusBar);
 
 private:
 
@@ -83,5 +83,5 @@ private:
 
 	UINT							m_uMinID;
 	UINT							m_uMaxID;
-	CStatusBar						*m_pStatusBar;
+	StatusBar						*m_pStatusBar;
 };

@@ -8,7 +8,7 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/Macros.h"
 
-CTabDropHandler::CTabDropHandler(HWND hTabCtrl, TabContainer *tabContainer) :
+TabDropHandler::TabDropHandler(HWND hTabCtrl, TabContainer *tabContainer) :
 	m_hTabCtrl(hTabCtrl),
 	m_RefCount(1),
 	m_tabContainer(tabContainer)
@@ -21,13 +21,13 @@ CTabDropHandler::CTabDropHandler(HWND hTabCtrl, TabContainer *tabContainer) :
 	m_pDragSourceHelper->QueryInterface(IID_PPV_ARGS(&m_pDropTargetHelper));
 }
 
-CTabDropHandler::~CTabDropHandler()
+TabDropHandler::~TabDropHandler()
 {
 	m_pDropTargetHelper->Release();
 	m_pDragSourceHelper->Release();
 }
 
-HRESULT __stdcall CTabDropHandler::QueryInterface(REFIID iid,void **ppvObject)
+HRESULT __stdcall TabDropHandler::QueryInterface(REFIID iid,void **ppvObject)
 {
 	*ppvObject = NULL;
 
@@ -49,12 +49,12 @@ HRESULT __stdcall CTabDropHandler::QueryInterface(REFIID iid,void **ppvObject)
 	return E_NOINTERFACE;
 }
 
-ULONG __stdcall CTabDropHandler::AddRef(void)
+ULONG __stdcall TabDropHandler::AddRef(void)
 {
 	return ++m_RefCount;
 }
 
-ULONG __stdcall CTabDropHandler::Release(void)
+ULONG __stdcall TabDropHandler::Release(void)
 {
 	m_RefCount--;
 	
@@ -67,17 +67,17 @@ ULONG __stdcall CTabDropHandler::Release(void)
 	return m_RefCount;
 }
 
-LRESULT CALLBACK CTabDropHandler::TabCtrlProcStub(HWND hwnd,UINT uMsg,
+LRESULT CALLBACK TabDropHandler::TabCtrlProcStub(HWND hwnd,UINT uMsg,
 	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	CTabDropHandler *ptdh = reinterpret_cast<CTabDropHandler *>(dwRefData);
+	TabDropHandler *ptdh = reinterpret_cast<TabDropHandler *>(dwRefData);
 
 	return ptdh->TabCtrlProc(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK CTabDropHandler::TabCtrlProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK TabDropHandler::TabCtrlProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -99,13 +99,13 @@ LRESULT CALLBACK CTabDropHandler::TabCtrlProc(HWND hwnd,UINT uMsg,WPARAM wParam,
 	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
 }
 
-HRESULT __stdcall CTabDropHandler::DragEnter(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
+HRESULT __stdcall TabDropHandler::DragEnter(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 {
 	m_AcceptData = false;
 	m_TabHoverIndex = m_tabContainer->GetSelectedTabIndex();
 
 	std::list<FORMATETC> ftcList;
-	CDropHandler::GetDropFormats(ftcList);
+	DropHandler::GetDropFormats(ftcList);
 
 	for(auto ftc : ftcList)
 	{
@@ -139,7 +139,7 @@ HRESULT __stdcall CTabDropHandler::DragEnter(IDataObject *pDataObject,DWORD grfK
 	return S_OK;
 }
 
-void CTabDropHandler::GetRepresentativeSourceDrive(IDataObject *pDataObject,CLIPFORMAT Format)
+void TabDropHandler::GetRepresentativeSourceDrive(IDataObject *pDataObject,CLIPFORMAT Format)
 {
 	switch(Format)
 	{
@@ -153,7 +153,7 @@ void CTabDropHandler::GetRepresentativeSourceDrive(IDataObject *pDataObject,CLIP
 	}
 }
 
-void CTabDropHandler::GetRepresentativeSourceDriveHDrop(IDataObject *pDataObject)
+void TabDropHandler::GetRepresentativeSourceDriveHDrop(IDataObject *pDataObject)
 {
 	FORMATETC ftc = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 	STGMEDIUM stg;
@@ -185,7 +185,7 @@ void CTabDropHandler::GetRepresentativeSourceDriveHDrop(IDataObject *pDataObject
 	}
 }
 
-DWORD CTabDropHandler::DetermineCurrentDragEffect(int iTab,DWORD grfKeyState,DWORD CurrentDropEffect)
+DWORD TabDropHandler::DetermineCurrentDragEffect(int iTab,DWORD grfKeyState,DWORD CurrentDropEffect)
 {
 	DWORD DropEffect = DROPEFFECT_NONE;
 
@@ -204,7 +204,7 @@ DWORD CTabDropHandler::DetermineCurrentDragEffect(int iTab,DWORD grfKeyState,DWO
 	return DropEffect;
 }
 
-HRESULT __stdcall CTabDropHandler::DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
+HRESULT __stdcall TabDropHandler::DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 {
 	TCHITTESTINFO tchti;
 	tchti.pt.x = pt.x;
@@ -237,7 +237,7 @@ HRESULT __stdcall CTabDropHandler::DragOver(DWORD grfKeyState,POINTL pt,DWORD *p
 	return S_OK;
 }
 
-HRESULT __stdcall CTabDropHandler::DragLeave(void)
+HRESULT __stdcall TabDropHandler::DragLeave(void)
 {
 	KillTimer(m_hTabCtrl,TIMER_ID);
 	m_pDropTargetHelper->DragLeave();
@@ -245,7 +245,7 @@ HRESULT __stdcall CTabDropHandler::DragLeave(void)
 	return S_OK;
 }
 
-HRESULT __stdcall CTabDropHandler::Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
+HRESULT __stdcall TabDropHandler::Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 {
 	KillTimer(m_hTabCtrl,TIMER_ID);
 
@@ -262,7 +262,7 @@ HRESULT __stdcall CTabDropHandler::Drop(IDataObject *pDataObject,DWORD grfKeySta
 
 		std::wstring destDirectory = tab.GetShellBrowser()->GetDirectory();
 
-		CDropHandler *pDropHandler = CDropHandler::CreateNew();
+		DropHandler *pDropHandler = DropHandler::CreateNew();
 		pDropHandler->Drop(pDataObject, grfKeyState, pt, pdwEffect, m_hTabCtrl,
 			m_DragType, destDirectory.data(), NULL, FALSE);
 		pDropHandler->Release();

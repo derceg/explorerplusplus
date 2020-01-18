@@ -7,11 +7,11 @@
 #include "../Helper/BaseDialog.h"
 #include <wil/resource.h>
 
-class CAboutDialog : public CBaseDialog
+class AboutDialog : public BaseDialog
 {
 public:
 
-	CAboutDialog(HINSTANCE hInstance, HWND hParent);
+	AboutDialog(HINSTANCE hInstance, HWND hParent);
 
 protected:
 

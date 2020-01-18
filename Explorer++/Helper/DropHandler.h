@@ -22,14 +22,14 @@ __interface IDropFilesCallback : public IUnknown
 	void OnDropFile(const std::list<std::wstring> &PastedFileList, const POINT *ppt);
 };
 
-class CDropHandler : public CReferenceCount
+class DropHandler : public ReferenceCount
 {
 public:
 
 	/* As this class is reference counted, the constructor
 	and destructor are both private. Use this method to
 	get a new instance of this class. */
-	static CDropHandler	*CreateNew();
+	static DropHandler	*CreateNew();
 
 	static HRESULT		GetDropFormats(std::list<FORMATETC> &ftcList);
 
@@ -38,8 +38,8 @@ public:
 
 private:
 
-	CDropHandler() = default;
-	~CDropHandler() = default;
+	DropHandler() = default;
+	~DropHandler() = default;
 
 	void	HandleLeftClickDrop(IDataObject *pDataObject,POINTL *pptl);
 	void	HandleRightClickDrop(void);

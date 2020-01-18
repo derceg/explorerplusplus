@@ -17,31 +17,31 @@ namespace NSetFileAttributesDialogExternal
 	};
 }
 
-class CSetFileAttributesDialog;
+class SetFileAttributesDialog;
 
-class CSetFileAttributesDialogPersistentSettings : public CDialogSettings
+class SetFileAttributesDialogPersistentSettings : public DialogSettings
 {
 public:
 
-	static CSetFileAttributesDialogPersistentSettings &GetInstance();
+	static SetFileAttributesDialogPersistentSettings &GetInstance();
 
 private:
 
-	friend CSetFileAttributesDialog;
+	friend SetFileAttributesDialog;
 
 	static const TCHAR SETTINGS_KEY[];
 
-	CSetFileAttributesDialogPersistentSettings();
+	SetFileAttributesDialogPersistentSettings();
 
-	CSetFileAttributesDialogPersistentSettings(const CSetFileAttributesDialogPersistentSettings &);
-	CSetFileAttributesDialogPersistentSettings & operator=(const CSetFileAttributesDialogPersistentSettings &);
+	SetFileAttributesDialogPersistentSettings(const SetFileAttributesDialogPersistentSettings &);
+	SetFileAttributesDialogPersistentSettings & operator=(const SetFileAttributesDialogPersistentSettings &);
 };
 
-class CSetFileAttributesDialog : public CBaseDialog
+class SetFileAttributesDialog : public BaseDialog
 {
 public:
 
-	CSetFileAttributesDialog(HINSTANCE hInstance, HWND hParent,
+	SetFileAttributesDialog(HINSTANCE hInstance, HWND hParent,
 		std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t> sfaiList);
 
 protected:
@@ -87,7 +87,7 @@ private:
 	std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t>	m_FileList;
 	std::list<Attribute_t>	m_AttributeList;
 
-	CSetFileAttributesDialogPersistentSettings	*m_psfadps;
+	SetFileAttributesDialogPersistentSettings	*m_psfadps;
 
 	SYSTEMTIME m_LocalWrite;
 	SYSTEMTIME m_LocalCreation;

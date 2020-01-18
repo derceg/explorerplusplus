@@ -27,19 +27,19 @@ namespace
 	static const UINT GBYTE = 1024 * 1024 *1024;
 }
 
-BOOL CShellBrowser::GetShowInGroups(void) const
+BOOL ShellBrowser::GetShowInGroups(void) const
 {
 	return m_folderSettings.showInGroups;
 }
 
 /* Simply sets the grouping flag, without actually moving
 items into groups. */
-void CShellBrowser::SetShowInGroupsFlag(BOOL bShowInGroups)
+void ShellBrowser::SetShowInGroupsFlag(BOOL bShowInGroups)
 {
 	m_folderSettings.showInGroups = bShowInGroups;
 }
 
-void CShellBrowser::SetShowInGroups(BOOL bShowInGroups)
+void ShellBrowser::SetShowInGroups(BOOL bShowInGroups)
 {
 	m_folderSettings.showInGroups = bShowInGroups;
 
@@ -55,13 +55,13 @@ void CShellBrowser::SetShowInGroups(BOOL bShowInGroups)
 	}
 }
 
-INT CALLBACK CShellBrowser::GroupNameComparisonStub(INT Group1_ID, INT Group2_ID, void *pvData)
+INT CALLBACK ShellBrowser::GroupNameComparisonStub(INT Group1_ID, INT Group2_ID, void *pvData)
 {
-	CShellBrowser *shellBrowser = reinterpret_cast<CShellBrowser *>(pvData);
+	ShellBrowser *shellBrowser = reinterpret_cast<ShellBrowser *>(pvData);
 	return shellBrowser->GroupNameComparison(Group1_ID, Group2_ID);
 }
 
-INT CALLBACK CShellBrowser::GroupNameComparison(INT Group1_ID, INT Group2_ID)
+INT CALLBACK ShellBrowser::GroupNameComparison(INT Group1_ID, INT Group2_ID)
 {
 	int iReturnValue;
 
@@ -93,13 +93,13 @@ INT CALLBACK CShellBrowser::GroupNameComparison(INT Group1_ID, INT Group2_ID)
 	return iReturnValue;
 }
 
-INT CALLBACK CShellBrowser::GroupFreeSpaceComparisonStub(INT Group1_ID, INT Group2_ID, void *pvData)
+INT CALLBACK ShellBrowser::GroupFreeSpaceComparisonStub(INT Group1_ID, INT Group2_ID, void *pvData)
 {
-	CShellBrowser *shellBrowser = reinterpret_cast<CShellBrowser *>(pvData);
+	ShellBrowser *shellBrowser = reinterpret_cast<ShellBrowser *>(pvData);
 	return shellBrowser->GroupFreeSpaceComparison(Group1_ID, Group2_ID);
 }
 
-INT CALLBACK CShellBrowser::GroupFreeSpaceComparison(INT Group1_ID, INT Group2_ID)
+INT CALLBACK ShellBrowser::GroupFreeSpaceComparison(INT Group1_ID, INT Group2_ID)
 {
 	int iReturnValue;
 
@@ -131,7 +131,7 @@ INT CALLBACK CShellBrowser::GroupFreeSpaceComparison(INT Group1_ID, INT Group2_I
 	return iReturnValue;
 }
 
-std::wstring CShellBrowser::RetrieveGroupHeader(int groupId)
+std::wstring ShellBrowser::RetrieveGroupHeader(int groupId)
 {
 	auto itr = std::find_if(m_GroupList.begin(), m_GroupList.end(), [groupId] (const TypeGroup_t &group) {
 		return group.iGroupId == groupId;
@@ -144,7 +144,7 @@ std::wstring CShellBrowser::RetrieveGroupHeader(int groupId)
  * Determines the id of the group the specified
  * item belongs to.
  */
-int CShellBrowser::DetermineItemGroup(int iItemInternal)
+int ShellBrowser::DetermineItemGroup(int iItemInternal)
 {
 	BasicItemInfo_t basicItemInfo = getBasicItemInfo(iItemInternal);
 	PFNLVGROUPCOMPARE groupComparison = nullptr;
@@ -337,7 +337,7 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
  * into its sorted position with the specified
  * header text.
  */
-int CShellBrowser::CheckGroup(std::wstring_view groupHeader, PFNLVGROUPCOMPARE groupComparison)
+int ShellBrowser::CheckGroup(std::wstring_view groupHeader, PFNLVGROUPCOMPARE groupComparison)
 {
 	auto itr = std::find_if(m_GroupList.begin(), m_GroupList.end(), [groupHeader] (const TypeGroup_t &group) {
 		return group.header == groupHeader;
@@ -393,7 +393,7 @@ int CShellBrowser::CheckGroup(std::wstring_view groupHeader, PFNLVGROUPCOMPARE g
  * is non-NULL.
  */
 /* TODO: These groups have changed as of Windows Visa.*/
-std::wstring CShellBrowser::DetermineItemNameGroup(const BasicItemInfo_t &itemInfo) const
+std::wstring ShellBrowser::DetermineItemNameGroup(const BasicItemInfo_t &itemInfo) const
 {
 	/* Take the first character of the item's name,
 	and use it to determine which group it belongs to. */
@@ -415,7 +415,7 @@ std::wstring CShellBrowser::DetermineItemNameGroup(const BasicItemInfo_t &itemIn
  * Also returns the text header for the group when szGroupHeader
  * is non-NULL.
  */
-std::wstring CShellBrowser::DetermineItemSizeGroup(const BasicItemInfo_t &itemInfo) const
+std::wstring ShellBrowser::DetermineItemSizeGroup(const BasicItemInfo_t &itemInfo) const
 {
 	TCHAR *SizeGroups[] = {_T("Folders"),_T("Tiny"),_T("Small"),_T("Medium"),_T("Large"),_T("Huge")};
 	int SizeGroupLimits[] = {0,0,32 * KBYTE,100 * KBYTE,MBYTE,10 * MBYTE};
@@ -453,7 +453,7 @@ std::wstring CShellBrowser::DetermineItemSizeGroup(const BasicItemInfo_t &itemIn
  * is non-NULL.
  */
 /* TODO: These groups have changed as of Windows Vista. */
-std::wstring CShellBrowser::DetermineItemTotalSizeGroup(const BasicItemInfo_t &itemInfo) const
+std::wstring ShellBrowser::DetermineItemTotalSizeGroup(const BasicItemInfo_t &itemInfo) const
 {
 	IShellFolder *pShellFolder	= NULL;
 	PCITEMID_CHILD pidlRelative	= NULL;
@@ -504,7 +504,7 @@ std::wstring CShellBrowser::DetermineItemTotalSizeGroup(const BasicItemInfo_t &i
 	return SizeGroups[iSize];
 }
 
-std::wstring CShellBrowser::DetermineItemTypeGroupVirtual(const BasicItemInfo_t &itemInfo) const
+std::wstring ShellBrowser::DetermineItemTypeGroupVirtual(const BasicItemInfo_t &itemInfo) const
 {
 	SHFILEINFO shfi;
 	SHGetFileInfo((LPTSTR)itemInfo.pidlComplete.get(), 0, &shfi, sizeof(shfi),
@@ -513,7 +513,7 @@ std::wstring CShellBrowser::DetermineItemTypeGroupVirtual(const BasicItemInfo_t 
 	return shfi.szTypeName;
 }
 
-std::wstring CShellBrowser::DetermineItemDateGroup(const BasicItemInfo_t &itemInfo, GroupByDateType dateType) const
+std::wstring ShellBrowser::DetermineItemDateGroup(const BasicItemInfo_t &itemInfo, GroupByDateType dateType) const
 {
 	using namespace boost::gregorian;
 	using namespace boost::posix_time;
@@ -621,7 +621,7 @@ std::wstring CShellBrowser::DetermineItemDateGroup(const BasicItemInfo_t &itemIn
 	return ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_DATE_LONG_AGO);
 }
 
-std::wstring CShellBrowser::DetermineItemSummaryGroup(const BasicItemInfo_t &itemInfo,
+std::wstring ShellBrowser::DetermineItemSummaryGroup(const BasicItemInfo_t &itemInfo,
 	const SHCOLUMNID *pscid, const GlobalFolderSettings &globalFolderSettings) const
 {
 	TCHAR szDetail[512];
@@ -638,7 +638,7 @@ std::wstring CShellBrowser::DetermineItemSummaryGroup(const BasicItemInfo_t &ite
 }
 
 /* TODO: Need to sort based on percentage free. */
-std::wstring CShellBrowser::DetermineItemFreeSpaceGroup(const BasicItemInfo_t &itemInfo) const
+std::wstring ShellBrowser::DetermineItemFreeSpaceGroup(const BasicItemInfo_t &itemInfo) const
 {
 	TCHAR szFreeSpace[MAX_PATH];
 	IShellFolder *pShellFolder	= NULL;
@@ -684,7 +684,7 @@ std::wstring CShellBrowser::DetermineItemFreeSpaceGroup(const BasicItemInfo_t &i
 	return szFreeSpace;
 }
 
-std::wstring CShellBrowser::DetermineItemAttributeGroup(const BasicItemInfo_t &itemInfo) const
+std::wstring ShellBrowser::DetermineItemAttributeGroup(const BasicItemInfo_t &itemInfo) const
 {
 	std::wstring fullFileName = itemInfo.getFullPath();
 
@@ -694,7 +694,7 @@ std::wstring CShellBrowser::DetermineItemAttributeGroup(const BasicItemInfo_t &i
 	return szAttributes;
 }
 
-std::wstring CShellBrowser::DetermineItemOwnerGroup(const BasicItemInfo_t &itemInfo) const
+std::wstring ShellBrowser::DetermineItemOwnerGroup(const BasicItemInfo_t &itemInfo) const
 {
 	std::wstring fullFileName = itemInfo.getFullPath();
 
@@ -709,7 +709,7 @@ std::wstring CShellBrowser::DetermineItemOwnerGroup(const BasicItemInfo_t &itemI
 	return std::wstring();
 }
 
-std::wstring CShellBrowser::DetermineItemVersionGroup(const BasicItemInfo_t &itemInfo, const TCHAR *szVersionType) const
+std::wstring ShellBrowser::DetermineItemVersionGroup(const BasicItemInfo_t &itemInfo, const TCHAR *szVersionType) const
 {
 	std::wstring fullFileName = itemInfo.getFullPath();
 
@@ -725,7 +725,7 @@ std::wstring CShellBrowser::DetermineItemVersionGroup(const BasicItemInfo_t &ite
 	return L"Unspecified";
 }
 
-std::wstring CShellBrowser::DetermineItemCameraPropertyGroup(const BasicItemInfo_t &itemInfo, PROPID PropertyId) const
+std::wstring ShellBrowser::DetermineItemCameraPropertyGroup(const BasicItemInfo_t &itemInfo, PROPID PropertyId) const
 {
 	std::wstring fullFileName = itemInfo.getFullPath();
 
@@ -741,7 +741,7 @@ std::wstring CShellBrowser::DetermineItemCameraPropertyGroup(const BasicItemInfo
 	return L"Other";
 }
 
-std::wstring CShellBrowser::DetermineItemExtensionGroup(const BasicItemInfo_t &itemInfo) const
+std::wstring ShellBrowser::DetermineItemExtensionGroup(const BasicItemInfo_t &itemInfo) const
 {
 	if (WI_IsFlagSet(itemInfo.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
 	{
@@ -760,7 +760,7 @@ std::wstring CShellBrowser::DetermineItemExtensionGroup(const BasicItemInfo_t &i
 	return ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_EXTENSION_NONE);
 }
 
-std::wstring CShellBrowser::DetermineItemFileSystemGroup(const BasicItemInfo_t &itemInfo) const
+std::wstring ShellBrowser::DetermineItemFileSystemGroup(const BasicItemInfo_t &itemInfo) const
 {
 	IShellFolder *pShellFolder	= NULL;
 	PCITEMID_CHILD pidlRelative	= NULL;
@@ -799,7 +799,7 @@ std::wstring CShellBrowser::DetermineItemFileSystemGroup(const BasicItemInfo_t &
 }
 
 /* TODO: Fix. Need to check for each adapter. */
-std::wstring CShellBrowser::DetermineItemNetworkStatus(const BasicItemInfo_t &itemInfo) const
+std::wstring ShellBrowser::DetermineItemNetworkStatus(const BasicItemInfo_t &itemInfo) const
 {
 	/* When this function is
 	properly implemented, this
@@ -855,7 +855,7 @@ std::wstring CShellBrowser::DetermineItemNetworkStatus(const BasicItemInfo_t &it
 	return szStatus;
 }
 
-void CShellBrowser::InsertItemIntoGroup(int iItem,int iGroupId)
+void ShellBrowser::InsertItemIntoGroup(int iItem,int iGroupId)
 {
 	LVITEM Item;
 
@@ -867,7 +867,7 @@ void CShellBrowser::InsertItemIntoGroup(int iItem,int iGroupId)
 	ListView_SetItem(m_hListView,&Item);
 }
 
-void CShellBrowser::MoveItemsIntoGroups(void)
+void ShellBrowser::MoveItemsIntoGroups(void)
 {
 	LVITEM Item;
 	int nItems;

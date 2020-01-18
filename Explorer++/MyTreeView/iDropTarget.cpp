@@ -26,7 +26,7 @@ UINT_PTR idEvent,DWORD dwTime);
 HTREEITEM	g_hExpand = NULL;
 BOOL		g_bAllowScroll = FALSE;
 
-HRESULT _stdcall CMyTreeView::DragEnter(IDataObject *pDataObject,
+HRESULT _stdcall MyTreeView::DragEnter(IDataObject *pDataObject,
 DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 {
 	m_pDataObject = pDataObject;
@@ -34,7 +34,7 @@ DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 	m_bDragging = TRUE;
 
 	std::list<FORMATETC> ftcList;
-	CDropHandler::GetDropFormats(ftcList);
+	DropHandler::GetDropFormats(ftcList);
 
 	BOOL bDataAccept = FALSE;
 
@@ -90,7 +90,7 @@ void CALLBACK DragScrollTimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwT
 	KillTimer(hwnd,DRAGSCROLL_TIMER_ID);
 }
 
-DWORD CMyTreeView::GetCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,POINTL *ptl)
+DWORD MyTreeView::GetCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,POINTL *ptl)
 {
 	TVHITTESTINFO	tvhi;
 	HTREEITEM		hItem;
@@ -129,7 +129,7 @@ void CALLBACK DragExpandTimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwT
 	KillTimer(hwnd,DRAGEXPAND_TIMER_ID);
 }
 
-HRESULT _stdcall CMyTreeView::DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
+HRESULT _stdcall MyTreeView::DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 {
 	TVHITTESTINFO tvht;
 	RECT rc;
@@ -187,7 +187,7 @@ if the files come from different drives,
 whether this operation is classed as a copy
 or move is only based on the location of the
 first file). */
-BOOL CMyTreeView::CheckItemLocations(IDataObject *pDataObject,HTREEITEM hItem,
+BOOL MyTreeView::CheckItemLocations(IDataObject *pDataObject,HTREEITEM hItem,
 int iDroppedItem)
 {
 	FORMATETC	ftc;
@@ -239,7 +239,7 @@ int iDroppedItem)
 	return bOnSameDrive;
 }
 
-HRESULT _stdcall CMyTreeView::DragLeave(void)
+HRESULT _stdcall MyTreeView::DragLeave(void)
 {
 	RestoreState();
 
@@ -250,7 +250,7 @@ HRESULT _stdcall CMyTreeView::DragLeave(void)
 	return S_OK;
 }
 
-HRESULT _stdcall CMyTreeView::Drop(IDataObject *pDataObject,DWORD grfKeyState,
+HRESULT _stdcall MyTreeView::Drop(IDataObject *pDataObject,DWORD grfKeyState,
 POINTL pt,DWORD *pdwEffect)
 {
 	KillTimer(m_hTreeView,DRAGEXPAND_TIMER_ID);
@@ -270,7 +270,7 @@ POINTL pt,DWORD *pdwEffect)
 		TCHAR szDestDirectory[MAX_PATH];
 		GetDisplayName(pidlDirectory.get(),szDestDirectory,SIZEOF_ARRAY(szDestDirectory),SHGDN_FORPARSING);
 
-		CDropHandler *pDropHandler = CDropHandler::CreateNew();
+		DropHandler *pDropHandler = DropHandler::CreateNew();
 		pDropHandler->Drop(pDataObject,
 			grfKeyState,pt,pdwEffect,m_hTreeView,
 			m_DragType,szDestDirectory,NULL,FALSE);
@@ -284,7 +284,7 @@ POINTL pt,DWORD *pdwEffect)
 	return S_OK;
 }
 
-void CMyTreeView::RestoreState(void)
+void MyTreeView::RestoreState(void)
 {
 	TreeView_Select(m_hTreeView,NULL,TVGN_DROPHILITE);
 

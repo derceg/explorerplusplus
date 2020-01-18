@@ -10,26 +10,26 @@
 #include "../Helper/FileOperations.h"
 #include <wil/resource.h>
 
-class CDestroyFilesDialog;
+class DestroyFilesDialog;
 
-class CDestroyFilesDialogPersistentSettings : public CDialogSettings
+class DestroyFilesDialogPersistentSettings : public DialogSettings
 {
 public:
 
-	static CDestroyFilesDialogPersistentSettings &GetInstance();
+	static DestroyFilesDialogPersistentSettings &GetInstance();
 
 private:
 
-	friend CDestroyFilesDialog;
+	friend DestroyFilesDialog;
 
 	static const TCHAR SETTINGS_KEY[];
 
 	static const TCHAR SETTING_OVERWRITE_METHOD[];
 
-	CDestroyFilesDialogPersistentSettings();
+	DestroyFilesDialogPersistentSettings();
 
-	CDestroyFilesDialogPersistentSettings(const CDestroyFilesDialogPersistentSettings &);
-	CDestroyFilesDialogPersistentSettings & operator=(const CDestroyFilesDialogPersistentSettings &);
+	DestroyFilesDialogPersistentSettings(const DestroyFilesDialogPersistentSettings &);
+	DestroyFilesDialogPersistentSettings & operator=(const DestroyFilesDialogPersistentSettings &);
 
 	void SaveExtraRegistrySettings(HKEY hKey);
 	void LoadExtraRegistrySettings(HKEY hKey);
@@ -40,11 +40,11 @@ private:
 	NFileOperations::OverwriteMethod_t	m_uOverwriteMethod;
 };
 
-class CDestroyFilesDialog : public CBaseDialog
+class DestroyFilesDialog : public BaseDialog
 {
 public:
 
-	CDestroyFilesDialog(HINSTANCE hInstance, HWND hParent, std::list<std::wstring> FullFilenameList, BOOL bShowFriendlyDates);
+	DestroyFilesDialog(HINSTANCE hInstance, HWND hParent, std::list<std::wstring> FullFilenameList, BOOL bShowFriendlyDates);
 
 protected:
 
@@ -55,7 +55,7 @@ protected:
 
 private:
 
-	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	void	GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList);
 	void	SaveState();
 
 	void	OnOk();
@@ -66,7 +66,7 @@ private:
 
 	wil::unique_hicon	m_icon;
 
-	CDestroyFilesDialogPersistentSettings	*m_pdfdps;
+	DestroyFilesDialogPersistentSettings	*m_pdfdps;
 
 	BOOL	m_bShowFriendlyDates;
 };

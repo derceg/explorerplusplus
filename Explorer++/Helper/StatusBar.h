@@ -8,11 +8,11 @@
 #include <string>
 #include "Macros.h"
 
-class CStatusBar
+class StatusBar
 {
 public:
 
-	CStatusBar(HWND hwnd);
+	StatusBar(HWND hwnd);
 
 	void			SetPartText(int iPart, const TCHAR *szText);
 
@@ -21,7 +21,7 @@ public:
 
 private:
 
-	DISALLOW_COPY_AND_ASSIGN(CStatusBar);
+	DISALLOW_COPY_AND_ASSIGN(StatusBar);
 
 	const HWND		m_hwnd;
 

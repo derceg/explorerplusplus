@@ -14,11 +14,11 @@
 #include <list>
 #include <unordered_map>
 
-class CDrivesToolbar : public CBaseWindow, public IFileContextMenuExternal, public NHardwareChangeNotifier::INotification
+class DrivesToolbar : public BaseWindow, public IFileContextMenuExternal, public NHardwareChangeNotifier::INotification
 {
 public:
 
-	static CDrivesToolbar	*Create(HWND hParent, UINT uIDStart, UINT uIDEnd,
+	static DrivesToolbar	*Create(HWND hParent, UINT uIDStart, UINT uIDEnd,
 		HINSTANCE hInstance, IExplorerplusplus *pexpp, Navigation *navigation);
 
 	/* IFileContextMenuExternal methods. */
@@ -50,9 +50,9 @@ private:
 	static LRESULT CALLBACK DrivesToolbarParentProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
-	CDrivesToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance,
+	DrivesToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance,
 		IExplorerplusplus *pexpp, Navigation *navigation);
-	~CDrivesToolbar();
+	~DrivesToolbar();
 
 	static HWND	CreateDrivesToolbar(HWND hParent);
 

@@ -15,19 +15,19 @@
 #include "../Helper/XMLSettings.h"
 #include <algorithm>
 
-const TCHAR CSetDefaultColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SetDefaultColumns");
+const TCHAR SetDefaultColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SetDefaultColumns");
 
-const TCHAR CSetDefaultColumnsDialogPersistentSettings::SETTING_FOLDER_TYPE[] = _T("Folder");
+const TCHAR SetDefaultColumnsDialogPersistentSettings::SETTING_FOLDER_TYPE[] = _T("Folder");
 
-CSetDefaultColumnsDialog::CSetDefaultColumnsDialog(HINSTANCE hInstance, HWND hParent,
+SetDefaultColumnsDialog::SetDefaultColumnsDialog(HINSTANCE hInstance, HWND hParent,
 	FolderColumns &folderColumns) :
-	CBaseDialog(hInstance, IDD_SETDEFAULTCOLUMNS, hParent, true),
+	BaseDialog(hInstance, IDD_SETDEFAULTCOLUMNS, hParent, true),
 	m_folderColumns(folderColumns)
 {
-	m_psdcdps = &CSetDefaultColumnsDialogPersistentSettings::GetInstance();
+	m_psdcdps = &SetDefaultColumnsDialogPersistentSettings::GetInstance();
 }
 
-INT_PTR CSetDefaultColumnsDialog::OnInitDialog()
+INT_PTR SetDefaultColumnsDialog::OnInitDialog()
 {
 	m_icon.reset(LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN)));
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
@@ -92,70 +92,70 @@ INT_PTR CSetDefaultColumnsDialog::OnInitDialog()
 	return 0;
 }
 
-void CSetDefaultColumnsDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,
-	std::list<CResizableDialog::Control_t> &ControlList)
+void SetDefaultColumnsDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+	std::list<ResizableDialog::Control_t> &ControlList)
 {
-	dsc = CBaseDialog::DIALOG_SIZE_CONSTRAINT_NONE;
+	dsc = BaseDialog::DIALOG_SIZE_CONSTRAINT_NONE;
 
-	CResizableDialog::Control_t Control;
+	ResizableDialog::Control_t Control;
 
 	Control.iID = IDC_COLUMNS_LISTVIEW;
-	Control.Type = CResizableDialog::TYPE_RESIZE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_RESIZE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_COLUMNS_MOVEUP;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_X;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_COLUMNS_MOVEDOWN;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_X;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_STATIC_DESCRIPTION;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_Y;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_DEFAULTCOLUMNS_DESCRIPTION;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_Y;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_DEFAULTCOLUMNS_DESCRIPTION;
-	Control.Type = CResizableDialog::TYPE_RESIZE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	Control.Type = ResizableDialog::TYPE_RESIZE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_X;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_STATIC_ETCHEDHORZ;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_Y;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_STATIC_ETCHEDHORZ;
-	Control.Type = CResizableDialog::TYPE_RESIZE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	Control.Type = ResizableDialog::TYPE_RESIZE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_X;
 	ControlList.push_back(Control);
 
 	Control.iID = IDOK;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 
 	Control.iID = IDCANCEL;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_GRIPPER;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 }
 
-INT_PTR CSetDefaultColumnsDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR SetDefaultColumnsDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -188,7 +188,7 @@ INT_PTR CSetDefaultColumnsDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-INT_PTR CSetDefaultColumnsDialog::OnNotify(NMHDR *pnmhdr)
+INT_PTR SetDefaultColumnsDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
@@ -200,13 +200,13 @@ INT_PTR CSetDefaultColumnsDialog::OnNotify(NMHDR *pnmhdr)
 	return 0;
 }
 
-INT_PTR CSetDefaultColumnsDialog::OnClose()
+INT_PTR SetDefaultColumnsDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-void CSetDefaultColumnsDialog::SaveState()
+void SetDefaultColumnsDialog::SaveState()
 {
 	m_psdcdps->SaveDialogPosition(m_hDlg);
 
@@ -217,7 +217,7 @@ void CSetDefaultColumnsDialog::SaveState()
 	m_psdcdps->m_bStateSaved = TRUE;
 }
 
-void CSetDefaultColumnsDialog::OnOk()
+void SetDefaultColumnsDialog::OnOk()
 {
 	HWND hComboBox = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_COMBOBOX);
 	int iSelected = static_cast<int>(SendMessage(hComboBox,CB_GETCURSEL,0,0));
@@ -229,12 +229,12 @@ void CSetDefaultColumnsDialog::OnOk()
 	EndDialog(m_hDlg,1);
 }
 
-void CSetDefaultColumnsDialog::OnCancel()
+void SetDefaultColumnsDialog::OnCancel()
 {
 	EndDialog(m_hDlg,0);
 }
 
-void CSetDefaultColumnsDialog::OnCbnSelChange()
+void SetDefaultColumnsDialog::OnCbnSelChange()
 {
 	HWND hComboBox = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_COMBOBOX);
 	int iSelected = static_cast<int>(SendMessage(hComboBox,CB_GETCURSEL,0,0));
@@ -249,7 +249,7 @@ void CSetDefaultColumnsDialog::OnCbnSelChange()
 	m_PreviousFolderType = itr->second;
 }
 
-void CSetDefaultColumnsDialog::SaveCurrentColumnState(FolderType_t FolderType)
+void SetDefaultColumnsDialog::SaveCurrentColumnState(FolderType_t FolderType)
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_LISTVIEW);
 
@@ -280,7 +280,7 @@ void CSetDefaultColumnsDialog::SaveCurrentColumnState(FolderType_t FolderType)
 	currentColumns = tempColumns;
 }
 
-void CSetDefaultColumnsDialog::SetupFolderColumns(FolderType_t FolderType)
+void SetDefaultColumnsDialog::SetupFolderColumns(FolderType_t FolderType)
 {
 	auto columns = GetCurrentColumnList(FolderType);
 
@@ -292,7 +292,7 @@ void CSetDefaultColumnsDialog::SetupFolderColumns(FolderType_t FolderType)
 	for(const auto &column : columns)
 	{
 		TCHAR szText[64];
-		LoadString(GetInstance(),CShellBrowser::LookupColumnNameStringIndex(column.id),
+		LoadString(GetInstance(),ShellBrowser::LookupColumnNameStringIndex(column.id),
 			szText,SIZEOF_ARRAY(szText));
 
 		LVITEM lvItem;
@@ -311,7 +311,7 @@ void CSetDefaultColumnsDialog::SetupFolderColumns(FolderType_t FolderType)
 	NListView::ListView_SelectItem(hListView,0,TRUE);
 }
 
-std::vector<Column_t> &CSetDefaultColumnsDialog::GetCurrentColumnList(FolderType_t FolderType)
+std::vector<Column_t> &SetDefaultColumnsDialog::GetCurrentColumnList(FolderType_t FolderType)
 {
 	switch(FolderType)
 	{
@@ -347,7 +347,7 @@ std::vector<Column_t> &CSetDefaultColumnsDialog::GetCurrentColumnList(FolderType
 	throw std::runtime_error("Unknown folder type selected");
 }
 
-void CSetDefaultColumnsDialog::OnLvnItemChanged(NMLISTVIEW *pnmlv)
+void SetDefaultColumnsDialog::OnLvnItemChanged(NMLISTVIEW *pnmlv)
 {
 	if(pnmlv->uNewState & LVIS_SELECTED)
 	{
@@ -359,7 +359,7 @@ void CSetDefaultColumnsDialog::OnLvnItemChanged(NMLISTVIEW *pnmlv)
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(hListView,&lvItem);
 
-		int iDescriptionStringIndex = CShellBrowser::LookupColumnDescriptionStringIndex(static_cast<int>(lvItem.lParam));
+		int iDescriptionStringIndex = ShellBrowser::LookupColumnDescriptionStringIndex(static_cast<int>(lvItem.lParam));
 
 		TCHAR szColumnDescription[128];
 		LoadString(GetInstance(),iDescriptionStringIndex,szColumnDescription,
@@ -368,7 +368,7 @@ void CSetDefaultColumnsDialog::OnLvnItemChanged(NMLISTVIEW *pnmlv)
 	}
 }
 
-void CSetDefaultColumnsDialog::OnMoveColumn(bool bUp)
+void SetDefaultColumnsDialog::OnMoveColumn(bool bUp)
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_COLUMNS_LISTVIEW);
 
@@ -389,35 +389,35 @@ void CSetDefaultColumnsDialog::OnMoveColumn(bool bUp)
 	}
 }
 
-CSetDefaultColumnsDialogPersistentSettings::CSetDefaultColumnsDialogPersistentSettings() :
-CDialogSettings(SETTINGS_KEY)
+SetDefaultColumnsDialogPersistentSettings::SetDefaultColumnsDialogPersistentSettings() :
+DialogSettings(SETTINGS_KEY)
 {
 	m_FolderType = FOLDER_TYPE_GENERAL;
 }
 
-CSetDefaultColumnsDialogPersistentSettings& CSetDefaultColumnsDialogPersistentSettings::GetInstance()
+SetDefaultColumnsDialogPersistentSettings& SetDefaultColumnsDialogPersistentSettings::GetInstance()
 {
-	static CSetDefaultColumnsDialogPersistentSettings mfdps;
+	static SetDefaultColumnsDialogPersistentSettings mfdps;
 	return mfdps;
 }
 
-void CSetDefaultColumnsDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
+void SetDefaultColumnsDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
 	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_FOLDER_TYPE, m_FolderType);
 }
 
-void CSetDefaultColumnsDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
+void SetDefaultColumnsDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
 	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_FOLDER_TYPE, reinterpret_cast<DWORD *>(&m_FolderType));
 }
 
-void CSetDefaultColumnsDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
+void SetDefaultColumnsDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
 	IXMLDOMElement *pParentNode)
 {
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_FOLDER_TYPE, NXMLSettings::EncodeIntValue(m_FolderType));
 }
 
-void CSetDefaultColumnsDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
+void SetDefaultColumnsDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
 {
 	if(lstrcmpi(bstrName, SETTING_FOLDER_TYPE) == 0)
 	{

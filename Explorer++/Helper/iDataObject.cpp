@@ -13,12 +13,12 @@ struct DataObjectInternal
 	STGMEDIUM	stg;
 };
 
-class CDataObject : public IDataObject, public IDataObjectAsyncCapability
+class DataObject : public IDataObject, public IDataObjectAsyncCapability
 {
 public:
 
-	CDataObject(FORMATETC *,STGMEDIUM *,int);
-	~CDataObject();
+	DataObject(FORMATETC *,STGMEDIUM *,int);
+	~DataObject();
 
 	HRESULT		__stdcall	QueryInterface(REFIID iid, void **ppvObject);
 	ULONG		__stdcall	AddRef(void);
@@ -56,10 +56,10 @@ private:
 
 IDataObject *CreateDataObject(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,int count)
 {
-	return new CDataObject(pFormatEtc,pMedium,count);
+	return new DataObject(pFormatEtc,pMedium,count);
 }
 
-CDataObject::CDataObject(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,int count)
+DataObject::DataObject(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,int count)
 {
 	m_lRefCount = 1;
 
@@ -74,7 +74,7 @@ CDataObject::CDataObject(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,int count)
 	m_bInOperation = FALSE;
 }
 
-CDataObject::~CDataObject()
+DataObject::~DataObject()
 {
 	for(auto dao : m_daoList)
 	{
@@ -83,7 +83,7 @@ CDataObject::~CDataObject()
 }
 
 /* IUnknown interface members. */
-HRESULT __stdcall CDataObject::QueryInterface(REFIID iid, void **ppvObject)
+HRESULT __stdcall DataObject::QueryInterface(REFIID iid, void **ppvObject)
 {
 	if(ppvObject == NULL)
 	{
@@ -111,12 +111,12 @@ HRESULT __stdcall CDataObject::QueryInterface(REFIID iid, void **ppvObject)
 	return E_NOINTERFACE;
 }
 
-ULONG __stdcall CDataObject::AddRef(void)
+ULONG __stdcall DataObject::AddRef(void)
 {
 	return InterlockedIncrement(&m_lRefCount);
 }
 
-ULONG __stdcall CDataObject::Release(void)
+ULONG __stdcall DataObject::Release(void)
 {
 	LONG lCount = InterlockedDecrement(&m_lRefCount);
 
@@ -129,7 +129,7 @@ ULONG __stdcall CDataObject::Release(void)
 	return lCount;
 }
 
-HRESULT __stdcall CDataObject::GetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium)
+HRESULT __stdcall DataObject::GetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium)
 {
 	if(pFormatEtc == NULL || pMedium == NULL)
 	{
@@ -161,7 +161,7 @@ HRESULT __stdcall CDataObject::GetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium)
 	return DV_E_FORMATETC;
 }
 
-BOOL CDataObject::DuplicateStorageMedium(STGMEDIUM *pstgDest, const STGMEDIUM *pstgSrc, const FORMATETC *pftc)
+BOOL DataObject::DuplicateStorageMedium(STGMEDIUM *pstgDest, const STGMEDIUM *pstgSrc, const FORMATETC *pftc)
 {
 	pstgDest->tymed = pstgSrc->tymed;
 	pstgDest->pUnkForRelease = NULL;
@@ -202,7 +202,7 @@ BOOL CDataObject::DuplicateStorageMedium(STGMEDIUM *pstgDest, const STGMEDIUM *p
 	return success;
 }
 
-BOOL CDataObject::DuplicateData(STGMEDIUM *pstgDest, const STGMEDIUM *pstgSrc, const FORMATETC *pftc)
+BOOL DataObject::DuplicateData(STGMEDIUM *pstgDest, const STGMEDIUM *pstgSrc, const FORMATETC *pftc)
 {
 	HANDLE hData = OleDuplicateData(pstgSrc->hGlobal,pftc->cfFormat,0);
 
@@ -237,7 +237,7 @@ BOOL CDataObject::DuplicateData(STGMEDIUM *pstgDest, const STGMEDIUM *pstgSrc, c
 	return TRUE;
 }
 
-HRESULT __stdcall CDataObject::GetDataHere(FORMATETC *pFormatEtc,STGMEDIUM *pMedium)
+HRESULT __stdcall DataObject::GetDataHere(FORMATETC *pFormatEtc,STGMEDIUM *pMedium)
 {
 	UNREFERENCED_PARAMETER(pFormatEtc);
 	UNREFERENCED_PARAMETER(pMedium);
@@ -245,7 +245,7 @@ HRESULT __stdcall CDataObject::GetDataHere(FORMATETC *pFormatEtc,STGMEDIUM *pMed
 	return DV_E_TYMED;
 }
 
-HRESULT	__stdcall CDataObject::QueryGetData(FORMATETC *pFormatEtc)
+HRESULT	__stdcall DataObject::QueryGetData(FORMATETC *pFormatEtc)
 {
 	if(pFormatEtc == NULL)
 	{
@@ -265,7 +265,7 @@ HRESULT	__stdcall CDataObject::QueryGetData(FORMATETC *pFormatEtc)
 	return DV_E_FORMATETC;
 }
 
-HRESULT __stdcall CDataObject::GetCanonicalFormatEtc(FORMATETC *pFormatEtcIn,FORMATETC *pFormatEtcOut)
+HRESULT __stdcall DataObject::GetCanonicalFormatEtc(FORMATETC *pFormatEtcIn,FORMATETC *pFormatEtcOut)
 {
 	UNREFERENCED_PARAMETER(pFormatEtcIn);
 
@@ -279,7 +279,7 @@ HRESULT __stdcall CDataObject::GetCanonicalFormatEtc(FORMATETC *pFormatEtcIn,FOR
 	return E_NOTIMPL;
 }
 
-HRESULT __stdcall CDataObject::SetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,BOOL fRelease)
+HRESULT __stdcall DataObject::SetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,BOOL fRelease)
 {
 	if(pFormatEtc == NULL || pMedium == NULL)
 	{
@@ -309,7 +309,7 @@ HRESULT __stdcall CDataObject::SetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,
 	return S_OK;
 }
 
-HRESULT __stdcall CDataObject::EnumFormatEtc(DWORD dwDirection,IEnumFORMATETC **ppEnumFormatEtc)
+HRESULT __stdcall DataObject::EnumFormatEtc(DWORD dwDirection,IEnumFORMATETC **ppEnumFormatEtc)
 {
 	if(ppEnumFormatEtc == NULL)
 	{
@@ -331,7 +331,7 @@ HRESULT __stdcall CDataObject::EnumFormatEtc(DWORD dwDirection,IEnumFORMATETC **
 	return E_NOTIMPL;
 }
 
-HRESULT __stdcall CDataObject::DAdvise(FORMATETC *pFormatEtc,DWORD advf,IAdviseSink *pAdvSink,DWORD *pdwConnection)
+HRESULT __stdcall DataObject::DAdvise(FORMATETC *pFormatEtc,DWORD advf,IAdviseSink *pAdvSink,DWORD *pdwConnection)
 {
 	UNREFERENCED_PARAMETER(pFormatEtc);
 	UNREFERENCED_PARAMETER(advf);
@@ -341,14 +341,14 @@ HRESULT __stdcall CDataObject::DAdvise(FORMATETC *pFormatEtc,DWORD advf,IAdviseS
 	return E_NOTIMPL;
 }
 
-HRESULT __stdcall CDataObject::DUnadvise(DWORD dwConnection)
+HRESULT __stdcall DataObject::DUnadvise(DWORD dwConnection)
 {
 	UNREFERENCED_PARAMETER(dwConnection);
 
 	return OLE_E_ADVISENOTSUPPORTED;
 }
 
-HRESULT __stdcall CDataObject::EnumDAdvise(IEnumSTATDATA **ppenumAdvise)
+HRESULT __stdcall DataObject::EnumDAdvise(IEnumSTATDATA **ppenumAdvise)
 {
 	UNREFERENCED_PARAMETER(ppenumAdvise);
 
@@ -359,7 +359,7 @@ HRESULT __stdcall CDataObject::EnumDAdvise(IEnumSTATDATA **ppenumAdvise)
 when dropping the CF_HDROP format into
 Windows Explorer.
 See: http://us.generation-nt.com/iasyncoperation-idataobject-help-45020022.html */
-HRESULT __stdcall CDataObject::EndOperation(HRESULT hResult,
+HRESULT __stdcall DataObject::EndOperation(HRESULT hResult,
 IBindCtx *pbcReserved,DWORD dwEffects)
 {
 	UNREFERENCED_PARAMETER(hResult);
@@ -370,28 +370,28 @@ IBindCtx *pbcReserved,DWORD dwEffects)
 	return S_OK;
 }
 
-HRESULT __stdcall CDataObject::GetAsyncMode(BOOL *pfIsOpAsync)
+HRESULT __stdcall DataObject::GetAsyncMode(BOOL *pfIsOpAsync)
 {
 	*pfIsOpAsync = m_bDoOpAsync;
 
 	return S_OK;
 }
 
-HRESULT __stdcall CDataObject::InOperation(BOOL *pfInAsyncOp)
+HRESULT __stdcall DataObject::InOperation(BOOL *pfInAsyncOp)
 {
 	*pfInAsyncOp = m_bInOperation;
 
 	return S_OK;
 }
 
-HRESULT __stdcall CDataObject::SetAsyncMode(BOOL fDoOpAsync)
+HRESULT __stdcall DataObject::SetAsyncMode(BOOL fDoOpAsync)
 {
 	m_bDoOpAsync = fDoOpAsync;
 
 	return S_OK;
 }
 
-HRESULT __stdcall CDataObject::StartOperation(IBindCtx *pbcReserved)
+HRESULT __stdcall DataObject::StartOperation(IBindCtx *pbcReserved)
 {
 	UNREFERENCED_PARAMETER(pbcReserved);
 

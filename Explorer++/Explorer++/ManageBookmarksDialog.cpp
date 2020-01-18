@@ -13,18 +13,18 @@
 #include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
 
-const TCHAR CManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
+const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
 ManageBookmarksDialog::ManageBookmarksDialog(HINSTANCE hInstance, HWND hParent,
 	IExplorerplusplus *pexpp, Navigation *navigation, BookmarkTree *bookmarkTree) :
-	CBaseDialog(hInstance, IDD_MANAGE_BOOKMARKS, hParent, true),
+	BaseDialog(hInstance, IDD_MANAGE_BOOKMARKS, hParent, true),
 	m_pexpp(pexpp),
 	m_navigation(navigation),
 	m_bookmarkTree(bookmarkTree),
 	m_bNewFolderAdded(false),
 	m_bSaveHistory(true)
 {
-	m_pmbdps = &CManageBookmarksDialogPersistentSettings::GetInstance();
+	m_pmbdps = &ManageBookmarksDialogPersistentSettings::GetInstance();
 
 	if(!m_pmbdps->m_bInitialized)
 	{
@@ -522,20 +522,20 @@ void ManageBookmarksDialog::SaveState()
 	m_pmbdps->m_bStateSaved = TRUE;
 }
 
-CManageBookmarksDialogPersistentSettings::CManageBookmarksDialogPersistentSettings() :
+ManageBookmarksDialogPersistentSettings::ManageBookmarksDialogPersistentSettings() :
 	m_bInitialized(false),
-	CDialogSettings(SETTINGS_KEY)
+	DialogSettings(SETTINGS_KEY)
 {
 	SetupDefaultColumns();
 }
 
-CManageBookmarksDialogPersistentSettings& CManageBookmarksDialogPersistentSettings::GetInstance()
+ManageBookmarksDialogPersistentSettings& ManageBookmarksDialogPersistentSettings::GetInstance()
 {
-	static CManageBookmarksDialogPersistentSettings mbdps;
+	static ManageBookmarksDialogPersistentSettings mbdps;
 	return mbdps;
 }
 
-void CManageBookmarksDialogPersistentSettings::SetupDefaultColumns()
+void ManageBookmarksDialogPersistentSettings::SetupDefaultColumns()
 {
 	BookmarkListView::Column column;
 

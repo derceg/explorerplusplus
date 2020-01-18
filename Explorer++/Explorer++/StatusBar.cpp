@@ -19,7 +19,7 @@ void Explorerplusplus::CreateStatusBar(void)
 	}
 
 	m_hStatusBar = ::CreateStatusBar(m_hContainer, Style);
-	m_pStatusBar = new CStatusBar(m_hStatusBar);
+	m_pStatusBar = new StatusBar(m_hStatusBar);
 
 	int width = 0;
 

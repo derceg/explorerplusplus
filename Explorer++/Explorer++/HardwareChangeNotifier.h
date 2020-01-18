@@ -15,11 +15,11 @@ namespace NHardwareChangeNotifier
 	};
 }
 
-class CHardwareChangeNotifier
+class HardwareChangeNotifier
 {
 public:
 
-	static CHardwareChangeNotifier &GetInstance();
+	static HardwareChangeNotifier &GetInstance();
 
 	void	AddObserver(NHardwareChangeNotifier::INotification *hcn);
 	void	RemoveObserver(NHardwareChangeNotifier::INotification *hcn);
@@ -35,10 +35,10 @@ private:
 		NOTIFY_DEVICE_REMOVAL_COMPLETE
 	};
 
-	CHardwareChangeNotifier();
+	HardwareChangeNotifier();
 
-	CHardwareChangeNotifier(const CHardwareChangeNotifier &);
-	CHardwareChangeNotifier & operator=(const CHardwareChangeNotifier &);
+	HardwareChangeNotifier(const HardwareChangeNotifier &);
+	HardwareChangeNotifier & operator=(const HardwareChangeNotifier &);
 
 	void	NotifyObservers(NotificationType_t NotificationType,DEV_BROADCAST_HDR *dbh);
 

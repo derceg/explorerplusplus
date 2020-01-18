@@ -19,7 +19,7 @@
 BOOL g_bNewFileRenamed = FALSE;
 static int iRenamedItem;
 
-void CShellBrowser::DirectoryAltered(void)
+void ShellBrowser::DirectoryAltered(void)
 {
 	BOOL bNewItemCreated;
 
@@ -151,7 +151,7 @@ void CALLBACK TimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)
 	SendMessage(hwnd,WM_USER_FILESADDED,(WPARAM)idEvent,0);
 }
 
-void CShellBrowser::FilesModified(DWORD Action,const TCHAR *FileName,
+void ShellBrowser::FilesModified(DWORD Action,const TCHAR *FileName,
 int EventId,int iFolderIndex)
 {
 	EnterCriticalSection(&m_csDirectoryAltered);
@@ -169,7 +169,7 @@ int EventId,int iFolderIndex)
 	LeaveCriticalSection(&m_csDirectoryAltered);
 }
 
-void CShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
+void ShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 {
 	IShellFolder	*pShellFolder = NULL;
 	PCITEMID_CHILD	pidlRelative = NULL;
@@ -263,7 +263,7 @@ void CShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 	}
 }
 
-void CShellBrowser::RemoveItemInternal(const TCHAR *szFileName)
+void ShellBrowser::RemoveItemInternal(const TCHAR *szFileName)
 {
 	std::list<Added_t>::iterator itr;
 	int iItemInternal;
@@ -293,7 +293,7 @@ void CShellBrowser::RemoveItemInternal(const TCHAR *szFileName)
 /*
  * Modifies the attributes of an item currently in the listview.
  */
-void CShellBrowser::ModifyItemInternal(const TCHAR *FileName)
+void ShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 {
 	HANDLE			hFirstFile;
 	ULARGE_INTEGER	ulFileSize;
@@ -455,7 +455,7 @@ void CShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 	}
 }
 
-void CShellBrowser::OnFileActionRenamedOldName(const TCHAR *szFileName)
+void ShellBrowser::OnFileActionRenamedOldName(const TCHAR *szFileName)
 {
 	std::list<Added_t>::iterator itrAdded;
 	BOOL bFileHandled = FALSE;
@@ -485,7 +485,7 @@ void CShellBrowser::OnFileActionRenamedOldName(const TCHAR *szFileName)
 	}
 }
 
-void CShellBrowser::OnFileActionRenamedNewName(const TCHAR *szFileName)
+void ShellBrowser::OnFileActionRenamedNewName(const TCHAR *szFileName)
 {
 	if(g_bNewFileRenamed)
 	{
@@ -507,7 +507,7 @@ void CShellBrowser::OnFileActionRenamedNewName(const TCHAR *szFileName)
 adds items as well as the code that finds their icons.
 ALL changes to an items name/internal properties/icon/overlay icon
 should go through a central function. */
-void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
+void ShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 {
 	IShellFolder	*pShellFolder = NULL;
 	PCITEMID_CHILD	pidlRelative = NULL;

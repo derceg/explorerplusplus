@@ -21,7 +21,7 @@
 ATOM				RegisterHolderWindowClass(void);
 LRESULT CALLBACK	HolderWndProcStub(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 
-CHolderWindow::CHolderWindow(HWND hHolder)
+HolderWindow::HolderWindow(HWND hHolder)
 {
 	m_hHolder = hHolder;
 	m_bHolderResizing	= FALSE;
@@ -34,7 +34,7 @@ ATOM RegisterHolderWindowClass(void)
 	wc.style			= 0;
 	wc.lpfnWndProc		= HolderWndProcStub;
 	wc.cbClsExtra		= 0;
-	wc.cbWndExtra		= sizeof(CHolderWindow *);
+	wc.cbWndExtra		= sizeof(HolderWindow *);
 	wc.hInstance		= GetModuleHandle(0);
 	wc.hIcon			= NULL;
 	wc.hCursor			= LoadCursor(NULL,IDC_ARROW);
@@ -59,13 +59,13 @@ HWND CreateHolderWindow(HWND hParent,TCHAR *szWindowName,UINT uStyle)
 
 LRESULT CALLBACK HolderWndProcStub(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
-	CHolderWindow *pHolderWindow = (CHolderWindow *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
+	HolderWindow *pHolderWindow = (HolderWindow *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
 
 	switch(msg)
 	{
 		case WM_CREATE:
 			{
-				pHolderWindow = new CHolderWindow(hwnd);
+				pHolderWindow = new HolderWindow(hwnd);
 
 				SetWindowLongPtr(hwnd,GWLP_USERDATA,(LONG_PTR)pHolderWindow);
 			}
@@ -80,7 +80,7 @@ LRESULT CALLBACK HolderWndProcStub(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lPara
 	return pHolderWindow->HolderWndProc(hwnd,msg,wParam,lParam);
 }
 
-LRESULT CALLBACK CHolderWindow::HolderWndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK HolderWindow::HolderWndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(msg)
 	{
@@ -108,7 +108,7 @@ LRESULT CALLBACK CHolderWindow::HolderWndProc(HWND hwnd,UINT msg,WPARAM wParam,L
  * Draws the window text onto the holder
  * window.
  */
-void CHolderWindow::OnHolderWindowPaint(HWND hwnd)
+void HolderWindow::OnHolderWindowPaint(HWND hwnd)
 {
 	PAINTSTRUCT ps;
 	NONCLIENTMETRICS ncm;
@@ -140,7 +140,7 @@ void CHolderWindow::OnHolderWindowPaint(HWND hwnd)
 	EndPaint(hwnd,&ps);
 }
 
-void CHolderWindow::OnHolderWindowLButtonDown(LPARAM lParam)
+void HolderWindow::OnHolderWindowLButtonDown(LPARAM lParam)
 {
 	POINTS CursorPos;
 	RECT rc;
@@ -159,14 +159,14 @@ void CHolderWindow::OnHolderWindowLButtonDown(LPARAM lParam)
 	}
 }
 
-void CHolderWindow::OnHolderWindowLButtonUp(void)
+void HolderWindow::OnHolderWindowLButtonUp(void)
 {
 	m_bHolderResizing = FALSE;
 
 	ReleaseCapture();
 }
 
-int CHolderWindow::OnHolderWindowMouseMove(LPARAM lParam)
+int HolderWindow::OnHolderWindowMouseMove(LPARAM lParam)
 {
 	static POINTS	ptsPrevCursor;
 	POINTS			ptsCursor;

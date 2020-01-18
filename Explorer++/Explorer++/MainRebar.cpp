@@ -319,13 +319,13 @@ void Explorerplusplus::CreateBookmarksToolbar(void)
 
 void Explorerplusplus::CreateDrivesToolbar(void)
 {
-	m_pDrivesToolbar = CDrivesToolbar::Create(m_hMainRebar, TOOLBAR_DRIVES_ID_START,
+	m_pDrivesToolbar = DrivesToolbar::Create(m_hMainRebar, TOOLBAR_DRIVES_ID_START,
 		TOOLBAR_DRIVES_ID_END, m_hLanguageModule, this, m_navigation.get());
 }
 
 void Explorerplusplus::CreateApplicationToolbar()
 {
-	m_pApplicationToolbar = CApplicationToolbar::Create(m_hMainRebar, TOOLBAR_APPLICATIONS_ID_START,
+	m_pApplicationToolbar = ApplicationToolbar::Create(m_hMainRebar, TOOLBAR_APPLICATIONS_ID_START,
 		TOOLBAR_APPLICATIONS_ID_END, m_hLanguageModule, this);
 }
 

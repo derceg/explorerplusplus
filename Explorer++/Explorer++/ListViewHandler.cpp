@@ -397,7 +397,7 @@ BOOL Explorerplusplus::OnListViewBeginLabelEdit(LPARAM lParam)
 		return TRUE;
 	}
 
-	CListViewEdit::CreateNew(hEdit,reinterpret_cast<NMLVDISPINFO *>(lParam)->item.iItem,this);
+	ListViewEdit::CreateNew(hEdit,reinterpret_cast<NMLVDISPINFO *>(lParam)->item.iItem,this);
 
 	m_bListViewRenaming = TRUE;
 
@@ -515,13 +515,13 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 	if (lstrcmp(OldFileName, NewFileName) == 0)
 		return FALSE;
 
-	CFileActionHandler::RenamedItem_t RenamedItem;
+	FileActionHandler::RenamedItem_t RenamedItem;
 	RenamedItem.strOldFilename = OldFileName;
 	RenamedItem.strNewFilename = NewFileName;
 
 	TrimStringRight(RenamedItem.strNewFilename,_T(" "));
 
-	std::list<CFileActionHandler::RenamedItem_t> RenamedItemList;
+	std::list<FileActionHandler::RenamedItem_t> RenamedItemList;
 	RenamedItemList.push_back(RenamedItem);
 	ret = m_FileActionHandler.RenameFiles(RenamedItemList);
 
@@ -609,9 +609,9 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 
 		if(SUCCEEDED(hr))
 		{
-			CServiceProvider ServiceProvider(this);
-			CContextMenuManager cmm(CContextMenuManager::CONTEXT_MENU_TYPE_BACKGROUND, pidlDirectory.get(),
-				pDataObject.get(), &ServiceProvider, BLACKLISTED_BACKGROUND_MENU_CLSID_ENTRIES);
+			ServiceProvider serviceProvider(this);
+			ContextMenuManager cmm(ContextMenuManager::CONTEXT_MENU_TYPE_BACKGROUND, pidlDirectory.get(),
+				pDataObject.get(), &serviceProvider, BLACKLISTED_BACKGROUND_MENU_CLSID_ENTRIES);
 
 			cmm.ShowMenu(m_hContainer,hMenu,IDM_FILE_COPYFOLDERPATH,MIN_SHELL_MENU_ID,
 				MAX_SHELL_MENU_ID,*pCursorPos,*m_pStatusBar);
@@ -687,14 +687,14 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 
 		auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
-		CFileContextMenuManager fcmm(m_hActiveListView, pidlDirectory.get(), pidlItems);
+		FileContextMenuManager fcmm(m_hActiveListView, pidlDirectory.get(), pidlItems);
 
 		FileContextMenuInfo_t fcmi;
 		fcmi.uFrom = FROM_LISTVIEW;
 
-		CStatusBar StatusBar(m_hStatusBar);
+		StatusBar statusBar(m_hStatusBar);
 
-		fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,pCursorPos,&StatusBar,
+		fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,pCursorPos,&statusBar,
 			reinterpret_cast<DWORD_PTR>(&fcmi),TRUE,IsKeyDown(VK_SHIFT));
 	}
 }
@@ -952,9 +952,9 @@ void Explorerplusplus::OnListViewFileRenameMultiple()
 		return;
 	}
 
-	CMassRenameDialog CMassRenameDialog(m_hLanguageModule, m_hContainer, this,
+	MassRenameDialog massRenameDialog(m_hLanguageModule, m_hContainer, this,
 		FullFilenameList, &m_FileActionHandler);
-	CMassRenameDialog.ShowModalDialog();
+	massRenameDialog.ShowModalDialog();
 }
 
 void Explorerplusplus::OnListViewCopyItemPath(void) const
@@ -1099,10 +1099,10 @@ void Explorerplusplus::OnListViewPaste(void)
 		/* Also, the string must be double NULL terminated. */
 		szDestination[lstrlen(szDestination) + 1] = '\0';
 
-		CDropHandler *pDropHandler = CDropHandler::CreateNew();
-		CDropFilesCallback *DropFilesCallback = new CDropFilesCallback(this);
+		DropHandler *pDropHandler = DropHandler::CreateNew();
+		DropFilesCallback *dropFilesCallback = new DropFilesCallback(this);
 		pDropHandler->CopyClipboardData(pClipboardObject,m_hContainer,szDestination,
-			DropFilesCallback,!m_config->overwriteExistingFilesConfirmation);
+			dropFilesCallback,!m_config->overwriteExistingFilesConfirmation);
 		pDropHandler->Release();
 
 		pClipboardObject->Release();

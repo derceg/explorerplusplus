@@ -997,7 +997,7 @@ void Explorerplusplus::LoadApplicationToolbarFromRegistry()
 
 	if(ReturnValue == ERROR_SUCCESS)
 	{
-		CApplicationToolbarPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
+		ApplicationToolbarPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -1013,7 +1013,7 @@ void Explorerplusplus::SaveApplicationToolbarToRegistry()
 
 	if(ReturnValue == ERROR_SUCCESS)
 	{
-		CApplicationToolbarPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
+		ApplicationToolbarPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}

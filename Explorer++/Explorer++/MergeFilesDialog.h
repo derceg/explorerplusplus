@@ -10,32 +10,32 @@
 #include "../Helper/ReferenceCount.h"
 #include "../Helper/ResizableDialog.h"
 
-class CMergeFilesDialog;
+class MergeFilesDialog;
 
-class CMergeFilesDialogPersistentSettings : public CDialogSettings
+class MergeFilesDialogPersistentSettings : public DialogSettings
 {
 public:
 
-	static CMergeFilesDialogPersistentSettings &GetInstance();
+	static MergeFilesDialogPersistentSettings &GetInstance();
 
 private:
 
-	friend CMergeFilesDialog;
+	friend MergeFilesDialog;
 
 	static const TCHAR SETTINGS_KEY[];
 
-	CMergeFilesDialogPersistentSettings();
+	MergeFilesDialogPersistentSettings();
 
-	CMergeFilesDialogPersistentSettings(const CMergeFilesDialogPersistentSettings &);
-	CMergeFilesDialogPersistentSettings & operator=(const CMergeFilesDialogPersistentSettings &);
+	MergeFilesDialogPersistentSettings(const MergeFilesDialogPersistentSettings &);
+	MergeFilesDialogPersistentSettings & operator=(const MergeFilesDialogPersistentSettings &);
 };
 
-class CMergeFiles : public CReferenceCount
+class MergeFiles : public ReferenceCount
 {
 public:
 	
-	CMergeFiles(HWND hDlg,std::wstring strOutputFilename,std::list<std::wstring> FullFilenameList);
-	~CMergeFiles();
+	MergeFiles(HWND hDlg,std::wstring strOutputFilename,std::list<std::wstring> FullFilenameList);
+	~MergeFiles();
 
 	void					StartMerging();
 	void					StopMerging();
@@ -51,14 +51,14 @@ private:
 	bool					m_bstopMerging;
 };
 
-class CMergeFilesDialog : public CBaseDialog
+class MergeFilesDialog : public BaseDialog
 {
 public:
 
-	CMergeFilesDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
+	MergeFilesDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
 		std::wstring strOutputDirectory, std::list<std::wstring> FullFilenameList,
 		BOOL bShowFriendlyDates);
-	~CMergeFilesDialog();
+	~MergeFilesDialog();
 
 protected:
 
@@ -72,7 +72,7 @@ protected:
 
 private:
 
-	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	void	GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList);
 	void	SaveState();
 
 	void	OnOk();
@@ -87,10 +87,10 @@ private:
 	std::list<std::wstring> m_FullFilenameList;
 	BOOL m_bShowFriendlyDates;
 
-	CMergeFiles *m_pMergeFiles;
+	MergeFiles *m_pMergeFiles;
 	bool m_bMergingFiles;
 	bool m_bStopMerging;
 	TCHAR m_szOk[32];
 
-	CMergeFilesDialogPersistentSettings *m_pmfdps;
+	MergeFilesDialogPersistentSettings *m_pmfdps;
 };

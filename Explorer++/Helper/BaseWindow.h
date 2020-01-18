@@ -15,7 +15,7 @@ automatically delete itself.
 Note that derived classes can
 also safely delete the object
 before the window is destroyed. */
-class CBaseWindow : public CMessageForwarder
+class BaseWindow : public MessageForwarder
 {
 public:
 
@@ -26,8 +26,8 @@ public:
 
 protected:
 
-	CBaseWindow(HWND hwnd);
-	virtual ~CBaseWindow();
+	BaseWindow(HWND hwnd);
+	virtual ~BaseWindow();
 
 	INT_PTR	GetDefaultReturnValue(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
@@ -37,7 +37,7 @@ protected:
 
 private:
 
-	DISALLOW_COPY_AND_ASSIGN(CBaseWindow);
+	DISALLOW_COPY_AND_ASSIGN(BaseWindow);
 
 	static const UINT_PTR SUBCLASS_ID = 0;
 

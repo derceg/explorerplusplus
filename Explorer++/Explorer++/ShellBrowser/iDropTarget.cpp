@@ -24,7 +24,7 @@
 #define X_SCROLL_AMOUNT	10
 #define Y_SCROLL_AMOUNT	10
 
-HRESULT _stdcall CShellBrowser::DragEnter(IDataObject *pDataObject,
+HRESULT _stdcall ShellBrowser::DragEnter(IDataObject *pDataObject,
 DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 {
 	HRESULT hReturn;
@@ -44,7 +44,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 	else
 	{
 		std::list<FORMATETC> ftcList;
-		CDropHandler::GetDropFormats(ftcList);
+		DropHandler::GetDropFormats(ftcList);
 
 		BOOL bDataAccept = FALSE;
 
@@ -91,7 +91,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 	return hReturn;
 }
 
-HRESULT _stdcall CShellBrowser::DragOver(DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
+HRESULT _stdcall ShellBrowser::DragOver(DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 {
 	RECT	rc;
 	POINT	pt;
@@ -134,7 +134,7 @@ if the files come from different drives,
 whether this operation is classed as a copy
 or move is only based on the location of the
 first file). */
-DWORD CShellBrowser::CheckItemLocations(IDataObject *pDataObject,int iDroppedItem)
+DWORD ShellBrowser::CheckItemLocations(IDataObject *pDataObject,int iDroppedItem)
 {
 	FORMATETC	ftc;
 	STGMEDIUM	stg;
@@ -224,7 +224,7 @@ These are handled by:
 3. DragOver()
 4. DragLeave()
 */
-void CShellBrowser::HandleDragSelection(const POINT *ppt)
+void ShellBrowser::HandleDragSelection(const POINT *ppt)
 {
 	LVHITTESTINFO	info;
 	BOOL			bClash = FALSE;
@@ -324,7 +324,7 @@ void CShellBrowser::HandleDragSelection(const POINT *ppt)
 	}
 }
 
-HRESULT _stdcall CShellBrowser::DragLeave(void)
+HRESULT _stdcall ShellBrowser::DragLeave(void)
 {
 	m_pDropTargetHelper->DragLeave();
 
@@ -341,7 +341,7 @@ HRESULT _stdcall CShellBrowser::DragLeave(void)
 	return S_OK;
 }
 
-void CShellBrowser::OnDropFile(const std::list<std::wstring> &PastedFileList, const POINT *ppt)
+void ShellBrowser::OnDropFile(const std::list<std::wstring> &PastedFileList, const POINT *ppt)
 {
 	DroppedFile_t DroppedFile;
 	POINT ptOrigin;
@@ -388,7 +388,7 @@ If Ctrl is held down, then the operation is a copy.
 If no modifiers are held down and the source and destination are on the same drive, then the operation is a move. 
 If no modifiers are held down and the source and destination are on different drives, then the operation is a copy.
 */
-HRESULT _stdcall CShellBrowser::Drop(IDataObject *pDataObject,
+HRESULT _stdcall ShellBrowser::Drop(IDataObject *pDataObject,
 DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 {
 	FORMATETC		ftcHDrop = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
@@ -472,7 +472,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 
 		if(!bHandled)
 		{
-			CDropHandler *pDropHandler = CDropHandler::CreateNew();
+			DropHandler *pDropHandler = DropHandler::CreateNew();
 
 			/* The drop handler will call Release(), so we
 			need to AddRef() here. In the future, this should
@@ -515,17 +515,17 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 /* TODO: This isn't declared. */
 int CALLBACK SortTemporaryStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	ShellBrowser *pShellBrowser = reinterpret_cast<ShellBrowser *>(lParamSort);
 	return pShellBrowser->SortTemporary(lParam1,lParam2);
 }
 
-int CALLBACK CShellBrowser::SortTemporary(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK ShellBrowser::SortTemporary(LPARAM lParam1,LPARAM lParam2)
 {
 	return m_itemInfoMap.at(static_cast<int>(lParam1)).iRelativeSort -
 		m_itemInfoMap.at(static_cast<int>(lParam2)).iRelativeSort;
 }
 
-void CShellBrowser::RepositionLocalFiles(const POINT *ppt)
+void ShellBrowser::RepositionLocalFiles(const POINT *ppt)
 {
 	std::list<DraggedFile_t>::iterator	itr;
 	POINT							pt;
@@ -750,7 +750,7 @@ void CShellBrowser::RepositionLocalFiles(const POINT *ppt)
 	m_bPerformingDrag = FALSE;
 }
 
-void CShellBrowser::ScrollListViewFromCursor(HWND hListView, const POINT *CursorPos)
+void ShellBrowser::ScrollListViewFromCursor(HWND hListView, const POINT *CursorPos)
 {
 	RECT		rc;
 	LONG_PTR	fStyle;

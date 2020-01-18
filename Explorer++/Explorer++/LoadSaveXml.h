@@ -10,12 +10,12 @@
 
 class Explorerplusplus;
 
-class CLoadSaveXML : public ILoadSave
+class LoadSaveXML : public ILoadSave
 {
 public:
 
-	CLoadSaveXML(Explorerplusplus *pContainer, BOOL bLoad);
-	~CLoadSaveXML();
+	LoadSaveXML(Explorerplusplus *pContainer, BOOL bLoad);
+	~LoadSaveXML();
 
 	/* Loading functions. */
 	void	LoadGenericSettings();

@@ -15,19 +15,19 @@
 #include "../Helper/XMLSettings.h"
 #include <list>
 
-const TCHAR CFilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");
+const TCHAR FilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");
 
-const TCHAR CFilterDialogPersistentSettings::SETTING_FILTER_LIST[] = _T("Filter");
+const TCHAR FilterDialogPersistentSettings::SETTING_FILTER_LIST[] = _T("Filter");
 
-CFilterDialog::CFilterDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp) :
-	CBaseDialog(hInstance, IDD_FILTER, hParent, true)
+FilterDialog::FilterDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp) :
+	BaseDialog(hInstance, IDD_FILTER, hParent, true)
 {
 	m_pexpp = pexpp;
 
-	m_pfdps = &CFilterDialogPersistentSettings::GetInstance();
+	m_pfdps = &FilterDialogPersistentSettings::GetInstance();
 }
 
-INT_PTR CFilterDialog::OnInitDialog()
+INT_PTR FilterDialog::OnInitDialog()
 {
 	HWND hComboBox = GetDlgItem(m_hDlg,IDC_FILTER_COMBOBOX);
 
@@ -53,40 +53,40 @@ INT_PTR CFilterDialog::OnInitDialog()
 	return 0;
 }
 
-wil::unique_hicon CFilterDialog::GetDialogIcon(int iconWidth, int iconHeight) const
+wil::unique_hicon FilterDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
 	return m_pexpp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::Filter, iconWidth, iconHeight);
 }
 
-void CFilterDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,
-	std::list<CResizableDialog::Control_t> &ControlList)
+void FilterDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+	std::list<ResizableDialog::Control_t> &ControlList)
 {
-	dsc = CBaseDialog::DIALOG_SIZE_CONSTRAINT_X;
+	dsc = BaseDialog::DIALOG_SIZE_CONSTRAINT_X;
 
-	CResizableDialog::Control_t Control;
+	ResizableDialog::Control_t Control;
 
 	Control.iID = IDC_FILTER_COMBOBOX;
-	Control.Type = CResizableDialog::TYPE_RESIZE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	Control.Type = ResizableDialog::TYPE_RESIZE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_X;
 	ControlList.push_back(Control);
 
 	Control.iID = IDOK;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 
 	Control.iID = IDCANCEL;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_GRIPPER;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 }
 
-INT_PTR CFilterDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR FilterDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -104,13 +104,13 @@ INT_PTR CFilterDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-INT_PTR CFilterDialog::OnClose()
+INT_PTR FilterDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-void CFilterDialog::OnOk()
+void FilterDialog::OnOk()
 {
 	HWND hComboBox = GetDlgItem(m_hDlg,IDC_FILTER_COMBOBOX);
 
@@ -153,47 +153,47 @@ void CFilterDialog::OnOk()
 	EndDialog(m_hDlg,1);
 }
 
-void CFilterDialog::OnCancel()
+void FilterDialog::OnCancel()
 {
 	EndDialog(m_hDlg,0);
 }
 
-void CFilterDialog::SaveState()
+void FilterDialog::SaveState()
 {
 	m_pfdps->SaveDialogPosition(m_hDlg);
 
 	m_pfdps->m_bStateSaved = TRUE;
 }
 
-CFilterDialogPersistentSettings::CFilterDialogPersistentSettings() :
-CDialogSettings(SETTINGS_KEY)
+FilterDialogPersistentSettings::FilterDialogPersistentSettings() :
+DialogSettings(SETTINGS_KEY)
 {
 
 }
 
-CFilterDialogPersistentSettings& CFilterDialogPersistentSettings::GetInstance()
+FilterDialogPersistentSettings& FilterDialogPersistentSettings::GetInstance()
 {
-	static CFilterDialogPersistentSettings sfadps;
+	static FilterDialogPersistentSettings sfadps;
 	return sfadps;
 }
 
-void CFilterDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
+void FilterDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
 	NRegistrySettings::SaveStringListToRegistry(hKey, SETTING_FILTER_LIST, m_FilterList);
 }
 
-void CFilterDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
+void FilterDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
 	NRegistrySettings::ReadStringListFromRegistry(hKey, SETTING_FILTER_LIST, m_FilterList);
 }
 
-void CFilterDialogPersistentSettings::SaveExtraXMLSettings(
+void FilterDialogPersistentSettings::SaveExtraXMLSettings(
 	IXMLDOMDocument *pXMLDom,IXMLDOMElement *pParentNode)
 {
 	NXMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_FILTER_LIST, m_FilterList);
 }
 
-void CFilterDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
+void FilterDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
 {
 	if(CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, bstrName, lstrlen(SETTING_FILTER_LIST),
 		SETTING_FILTER_LIST, lstrlen(SETTING_FILTER_LIST)) == CSTR_EQUAL)

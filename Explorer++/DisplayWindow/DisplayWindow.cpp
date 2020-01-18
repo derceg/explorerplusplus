@@ -42,7 +42,7 @@ namespace
 		wc.style			= 0;
 		wc.lpfnWndProc		= DisplayWindowProcStub;
 		wc.cbClsExtra		= 0;
-		wc.cbWndExtra		= sizeof(CDisplayWindow *);
+		wc.cbWndExtra		= sizeof(DisplayWindow *);
 		wc.hInstance		= GetModuleHandle(NULL);
 		wc.hIcon			= NULL;
 		wc.hCursor			= LoadCursor(NULL,IDC_ARROW);
@@ -72,7 +72,7 @@ HWND CreateDisplayWindow(HWND Parent,DWInitialSettings_t *pSettings)
 	return hDisplayWindow;
 }
 
-CDisplayWindow::CDisplayWindow(HWND hDisplayWindow,DWInitialSettings_t *pInitialSettings) :
+DisplayWindow::DisplayWindow(HWND hDisplayWindow,DWInitialSettings_t *pInitialSettings) :
 	m_hDisplayWindow(hDisplayWindow),
 	m_TextColor(pInitialSettings->TextColor),
 	m_CentreColor(pInitialSettings->CentreColor),
@@ -95,7 +95,7 @@ CDisplayWindow::CDisplayWindow(HWND hDisplayWindow,DWInitialSettings_t *pInitial
 	InitializeCriticalSection(&m_csDWThumbnails);
 }
 
-CDisplayWindow::~CDisplayWindow()
+DisplayWindow::~DisplayWindow()
 {
 	DeleteCriticalSection(&m_csDWThumbnails);
 
@@ -112,10 +112,10 @@ CDisplayWindow::~CDisplayWindow()
 	}
 }
 
-LRESULT CALLBACK DisplayWindowProcStub(HWND DisplayWindow,UINT msg,
+LRESULT CALLBACK DisplayWindowProcStub(HWND hwnd,UINT msg,
 WPARAM wParam,LPARAM lParam)
 {
-	CDisplayWindow *pdw = reinterpret_cast<CDisplayWindow *>(GetWindowLongPtr(DisplayWindow,GWLP_USERDATA));
+	DisplayWindow *pdw = reinterpret_cast<DisplayWindow *>(GetWindowLongPtr(hwnd,GWLP_USERDATA));
 
 	switch(msg)
 	{
@@ -124,8 +124,8 @@ WPARAM wParam,LPARAM lParam)
 				DWInitialSettings_t *pSettings = reinterpret_cast<DWInitialSettings_t *>(
 					reinterpret_cast<CREATESTRUCT *>(lParam)->lpCreateParams);
 
-				pdw = new CDisplayWindow(DisplayWindow,pSettings);
-				SetWindowLongPtr(DisplayWindow,GWLP_USERDATA,reinterpret_cast<LONG_PTR>(pdw));
+				pdw = new DisplayWindow(hwnd,pSettings);
+				SetWindowLongPtr(hwnd,GWLP_USERDATA,reinterpret_cast<LONG_PTR>(pdw));
 			}
 			break;
 
@@ -135,10 +135,10 @@ WPARAM wParam,LPARAM lParam)
 			break;
 	}
 
-	return pdw->DisplayWindowProc(DisplayWindow,msg,wParam,lParam);
+	return pdw->DisplayWindowProc(hwnd,msg,wParam,lParam);
 }
 
-LRESULT CALLBACK CDisplayWindow::DisplayWindowProc(HWND DisplayWindow,UINT msg,
+LRESULT CALLBACK DisplayWindow::DisplayWindowProc(HWND DisplayWindow,UINT msg,
 WPARAM wParam,LPARAM lParam)
 {
 	switch(msg)

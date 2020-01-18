@@ -8,7 +8,7 @@
 #include <vector>
 #include <stack>
 
-class CFileActionHandler
+class FileActionHandler
 {
 public:
 

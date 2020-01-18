@@ -17,7 +17,7 @@
 #include <wil/com.h>
 #include <list>
 
-HRESULT CShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)
+HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)
 {
 	SetCursor(LoadCursor(NULL, IDC_WAIT));
 
@@ -95,7 +95,7 @@ HRESULT CShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHis
 	return S_OK;
 }
 
-void CShellBrowser::ClearPendingResults()
+void ShellBrowser::ClearPendingResults()
 {
 	m_columnThreadPool.clear_queue();
 	m_columnResults.clear();
@@ -109,7 +109,7 @@ void CShellBrowser::ClearPendingResults()
 	m_infoTipResults.clear();
 }
 
-void CShellBrowser::ResetFolderState()
+void ShellBrowser::ResetFolderState()
 {
 	/* If we're in thumbnails view, destroy the current
 	imagelist, and create a new one. */
@@ -139,7 +139,7 @@ void CShellBrowser::ResetFolderState()
 	m_AwaitingAddList.clear();
 }
 
-HRESULT CShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
+HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 {
 	DetermineFolderVirtual(pidlDirectory);
 
@@ -207,14 +207,14 @@ HRESULT CShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 	return hr;
 }
 
-HRESULT CShellBrowser::AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory,
+HRESULT ShellBrowser::AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory,
 	PCITEMID_CHILD pidlChild, const TCHAR *szFileName, int iItemIndex, BOOL bPosition)
 {
 	int uItemId = SetItemInformation(pidlDirectory, pidlChild, szFileName);
 	return AddItemInternal(iItemIndex, uItemId, bPosition);
 }
 
-HRESULT CShellBrowser::AddItemInternal(int iItemIndex, int iItemId, BOOL bPosition)
+HRESULT ShellBrowser::AddItemInternal(int iItemIndex, int iItemId, BOOL bPosition)
 {
 	AwaitingAdd_t AwaitingAdd;
 
@@ -236,7 +236,7 @@ HRESULT CShellBrowser::AddItemInternal(int iItemIndex, int iItemId, BOOL bPositi
 	return S_OK;
 }
 
-int CShellBrowser::SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory,
+int ShellBrowser::SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory,
 	PCITEMID_CHILD pidlChild, const TCHAR *szFileName)
 {
 	HANDLE			hFirstFile;
@@ -297,7 +297,7 @@ int CShellBrowser::SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory,
 	return uItemId;
 }
 
-void CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
+void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 {
 	int nPrevItems = ListView_GetItemCount(m_hListView);
 
@@ -421,7 +421,7 @@ void CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	m_AwaitingAddList.clear();
 }
 
-void CShellBrowser::ApplyFolderEmptyBackgroundImage(bool apply)
+void ShellBrowser::ApplyFolderEmptyBackgroundImage(bool apply)
 {
 	if (apply)
 	{
@@ -433,7 +433,7 @@ void CShellBrowser::ApplyFolderEmptyBackgroundImage(bool apply)
 	}
 }
 
-void CShellBrowser::ApplyFilteringBackgroundImage(bool apply)
+void ShellBrowser::ApplyFilteringBackgroundImage(bool apply)
 {
 	if (apply)
 	{
@@ -445,7 +445,7 @@ void CShellBrowser::ApplyFilteringBackgroundImage(bool apply)
 	}
 }
 
-BOOL CShellBrowser::IsFileFiltered(const ItemInfo_t &itemInfo) const
+BOOL ShellBrowser::IsFileFiltered(const ItemInfo_t &itemInfo) const
 {
 	BOOL bHideSystemFile	= FALSE;
 	BOOL bFilenameFiltered	= FALSE;
@@ -465,7 +465,7 @@ BOOL CShellBrowser::IsFileFiltered(const ItemInfo_t &itemInfo) const
 	return bFilenameFiltered || bHideSystemFile;
 }
 
-void CShellBrowser::RemoveItem(int iItemInternal)
+void ShellBrowser::RemoveItem(int iItemInternal)
 {
 	ULARGE_INTEGER	ulFileSize;
 	LVFINDINFO		lvfi;
@@ -513,7 +513,7 @@ void CShellBrowser::RemoveItem(int iItemInternal)
 	}
 }
 
-void CShellBrowser::PlayNavigationSound() const
+void ShellBrowser::PlayNavigationSound() const
 {
 	if (m_config->playNavigationSound)
 	{
@@ -522,12 +522,12 @@ void CShellBrowser::PlayNavigationSound() const
 	}
 }
 
-NavigationController *CShellBrowser::GetNavigationController() const
+NavigationController *ShellBrowser::GetNavigationController() const
 {
 	return m_navigationController.get();
 }
 
-boost::signals2::connection CShellBrowser::AddNavigationCompletedObserver(const NavigationCompletedSignal::slot_type &observer,
+boost::signals2::connection ShellBrowser::AddNavigationCompletedObserver(const NavigationCompletedSignal::slot_type &observer,
 	boost::signals2::connect_position position)
 {
 	return m_navigationCompletedSignal.connect(observer, position);

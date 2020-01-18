@@ -7,31 +7,31 @@
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 
-class CDisplayColoursDialog;
+class DisplayColoursDialog;
 
-class CDisplayColoursDialogPersistentSettings : public CDialogSettings
+class DisplayColoursDialogPersistentSettings : public DialogSettings
 {
 public:
 
-	static CDisplayColoursDialogPersistentSettings &GetInstance();
+	static DisplayColoursDialogPersistentSettings &GetInstance();
 
 private:
 
-	friend CDisplayColoursDialog;
+	friend DisplayColoursDialog;
 
 	static const TCHAR SETTINGS_KEY[];
 
-	CDisplayColoursDialogPersistentSettings();
+	DisplayColoursDialogPersistentSettings();
 
-	CDisplayColoursDialogPersistentSettings(const CDisplayColoursDialogPersistentSettings &);
-	CDisplayColoursDialogPersistentSettings & operator=(const CDisplayColoursDialogPersistentSettings &);
+	DisplayColoursDialogPersistentSettings(const DisplayColoursDialogPersistentSettings &);
+	DisplayColoursDialogPersistentSettings & operator=(const DisplayColoursDialogPersistentSettings &);
 };
 
-class CDisplayColoursDialog : public CBaseDialog
+class DisplayColoursDialog : public BaseDialog
 {
 public:
 
-	CDisplayColoursDialog(HINSTANCE hInstance, HWND hParent, HWND hDisplayWindow,
+	DisplayColoursDialog(HINSTANCE hInstance, HWND hParent, HWND hDisplayWindow,
 		COLORREF DefaultCenterColor, COLORREF DefaultSurroundingColor);
 
 protected:
@@ -92,5 +92,5 @@ private:
 	COLORREF		m_DefaultCenterColor;
 	COLORREF		m_DefaultSurroundingColor;
 
-	CDisplayColoursDialogPersistentSettings	*m_pdcdps;
+	DisplayColoursDialogPersistentSettings	*m_pdcdps;
 };

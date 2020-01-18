@@ -40,7 +40,7 @@ private:
 	std::vector<ToolbarButton> m_toolbarButtons;
 };
 
-class MainToolbar : public CBaseWindow
+class MainToolbar : public BaseWindow
 {
 public:
 

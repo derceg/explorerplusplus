@@ -10,20 +10,20 @@
 #include <list>
 
 
-const TCHAR CSetFileAttributesDialogPersistentSettings::SETTINGS_KEY[] = _T("SetFileAttributes");
+const TCHAR SetFileAttributesDialogPersistentSettings::SETTINGS_KEY[] = _T("SetFileAttributes");
 
-CSetFileAttributesDialog::CSetFileAttributesDialog(HINSTANCE hInstance, HWND hParent,
+SetFileAttributesDialog::SetFileAttributesDialog(HINSTANCE hInstance, HWND hParent,
 	std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t> sfaiList) :
-	CBaseDialog(hInstance, IDD_SETFILEATTRIBUTES, hParent, false)
+	BaseDialog(hInstance, IDD_SETFILEATTRIBUTES, hParent, false)
 {
 	assert(sfaiList.size() > 0);
 
 	m_FileList = sfaiList;
 
-	m_psfadps = &CSetFileAttributesDialogPersistentSettings::GetInstance();
+	m_psfadps = &SetFileAttributesDialogPersistentSettings::GetInstance();
 }
 
-INT_PTR CSetFileAttributesDialog::OnInitDialog()
+INT_PTR SetFileAttributesDialog::OnInitDialog()
 {
 	InitializeAttributesStructure();
 	InitializeDateFields();
@@ -75,7 +75,7 @@ INT_PTR CSetFileAttributesDialog::OnInitDialog()
 	return 0;
 }
 
-void CSetFileAttributesDialog::InitializeDateFields()
+void SetFileAttributesDialog::InitializeDateFields()
 {
 	WIN32_FIND_DATA *pwfd = &(m_FileList.begin()->wfd);
 
@@ -107,7 +107,7 @@ void CSetFileAttributesDialog::InitializeDateFields()
 	EnableWindow(GetDlgItem(m_hDlg,IDC_ACCESS_RESET),FALSE);
 }
 
-void CSetFileAttributesDialog::InitializeAttributesStructure(void)
+void SetFileAttributesDialog::InitializeAttributesStructure(void)
 {
 	Attribute_t Attribute;
 
@@ -137,7 +137,7 @@ void CSetFileAttributesDialog::InitializeAttributesStructure(void)
 	m_AttributeList.push_back(Attribute);
 }
 
-INT_PTR CSetFileAttributesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR SetFileAttributesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -167,7 +167,7 @@ INT_PTR CSetFileAttributesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-INT_PTR CSetFileAttributesDialog::OnNotify(NMHDR *pnmhdr)
+INT_PTR SetFileAttributesDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
@@ -202,13 +202,13 @@ INT_PTR CSetFileAttributesDialog::OnNotify(NMHDR *pnmhdr)
 	return 0;
 }
 
-INT_PTR CSetFileAttributesDialog::OnClose()
+INT_PTR SetFileAttributesDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-void CSetFileAttributesDialog::OnOk()
+void SetFileAttributesDialog::OnOk()
 {
 	FILETIME *plw = NULL;
 	FILETIME *plc = NULL;
@@ -314,12 +314,12 @@ void CSetFileAttributesDialog::OnOk()
 	EndDialog(m_hDlg,1);
 }
 
-void CSetFileAttributesDialog::OnCancel()
+void SetFileAttributesDialog::OnCancel()
 {
 	EndDialog(m_hDlg,0);
 }
 
-void CSetFileAttributesDialog::OnDateReset(DateTimeType_t DateTimeType)
+void SetFileAttributesDialog::OnDateReset(DateTimeType_t DateTimeType)
 {
 	switch(DateTimeType)
 	{
@@ -340,14 +340,14 @@ void CSetFileAttributesDialog::OnDateReset(DateTimeType_t DateTimeType)
 	}
 }
 
-void CSetFileAttributesDialog::SaveState()
+void SetFileAttributesDialog::SaveState()
 {
 	m_psfadps->SaveDialogPosition(m_hDlg);
 
 	m_psfadps->m_bStateSaved = TRUE;
 }
 
-void CSetFileAttributesDialog::SetAttributeCheckState(HWND hwnd,
+void SetFileAttributesDialog::SetAttributeCheckState(HWND hwnd,
 	int nAttributes,int nSelected)
 {
 	UINT CheckState;
@@ -362,7 +362,7 @@ void CSetFileAttributesDialog::SetAttributeCheckState(HWND hwnd,
 	SendMessage(hwnd,BM_SETCHECK,CheckState,0);
 }
 
-void CSetFileAttributesDialog::ResetButtonState(HWND hwnd,BOOL bReset)
+void SetFileAttributesDialog::ResetButtonState(HWND hwnd,BOOL bReset)
 {
 	if(!bReset)
 		return;
@@ -370,14 +370,14 @@ void CSetFileAttributesDialog::ResetButtonState(HWND hwnd,BOOL bReset)
 	SendMessage(hwnd,BM_SETSTYLE,BS_AUTOCHECKBOX,MAKELPARAM(FALSE,0));
 }
 
-CSetFileAttributesDialogPersistentSettings::CSetFileAttributesDialogPersistentSettings() :
-CDialogSettings(SETTINGS_KEY)
+SetFileAttributesDialogPersistentSettings::SetFileAttributesDialogPersistentSettings() :
+DialogSettings(SETTINGS_KEY)
 {
 
 }
 
-CSetFileAttributesDialogPersistentSettings& CSetFileAttributesDialogPersistentSettings::GetInstance()
+SetFileAttributesDialogPersistentSettings& SetFileAttributesDialogPersistentSettings::GetInstance()
 {
-	static CSetFileAttributesDialogPersistentSettings sfadps;
+	static SetFileAttributesDialogPersistentSettings sfadps;
 	return sfadps;
 }

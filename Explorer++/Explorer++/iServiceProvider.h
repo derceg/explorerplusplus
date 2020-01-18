@@ -6,11 +6,11 @@
 
 #include "CoreInterface.h"
 
-class CServiceProvider : public IServiceProvider
+class ServiceProvider : public IServiceProvider
 {
 public:
 
-	CServiceProvider(IExplorerplusplus *pexpp);
+	ServiceProvider(IExplorerplusplus *pexpp);
 
 private:
 

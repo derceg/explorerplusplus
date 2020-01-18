@@ -87,14 +87,14 @@ typedef struct
 
 static int g_ObjectCount = 0;
 
-class CDisplayWindow
+class DisplayWindow
 {
-	friend LRESULT CALLBACK DisplayWindowProcStub(HWND DisplayWindow,UINT msg,WPARAM wParam,LPARAM lParam);
+	friend LRESULT CALLBACK DisplayWindowProcStub(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 
 public:
 
-	CDisplayWindow(HWND hDisplayWindow,DWInitialSettings_t *pInitialSettings);
-	~CDisplayWindow();
+	DisplayWindow(HWND hDisplayWindow,DWInitialSettings_t *pInitialSettings);
+	~DisplayWindow();
 
 	void	ExtractThumbnailImageInternal(ThumbnailEntry_t *pte);
 

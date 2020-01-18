@@ -257,11 +257,11 @@ LRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 	switch(wParam)
 	{
 	case DBT_DEVICEARRIVAL:
-		CHardwareChangeNotifier::GetInstance().NotifyDeviceArrival(reinterpret_cast<DEV_BROADCAST_HDR *>(lParam));
+		HardwareChangeNotifier::GetInstance().NotifyDeviceArrival(reinterpret_cast<DEV_BROADCAST_HDR *>(lParam));
 		break;
 
 	case DBT_DEVICEREMOVECOMPLETE:
-		CHardwareChangeNotifier::GetInstance().NotifyDeviceRemovalComplete(reinterpret_cast<DEV_BROADCAST_HDR *>(lParam));
+		HardwareChangeNotifier::GetInstance().NotifyDeviceRemovalComplete(reinterpret_cast<DEV_BROADCAST_HDR *>(lParam));
 		break;
 	}
 
@@ -335,13 +335,13 @@ int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize)
 
 void Explorerplusplus::OnSelectColumns()
 {
-	CSelectColumnsDialog SelectColumnsDialog(m_hLanguageModule, m_hContainer, this, m_tabContainer);
-	SelectColumnsDialog.ShowModalDialog();
+	SelectColumnsDialog selectColumnsDialog(m_hLanguageModule, m_hContainer, this, m_tabContainer);
+	selectColumnsDialog.ShowModalDialog();
 
 	UpdateSortMenuItems(m_tabContainer->GetSelectedTab());
 }
 
-CStatusBar *Explorerplusplus::GetStatusBar()
+StatusBar *Explorerplusplus::GetStatusBar()
 {
 	return m_pStatusBar;
 }

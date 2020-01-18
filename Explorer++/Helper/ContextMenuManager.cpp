@@ -16,9 +16,9 @@
 #include "Macros.h"
 
 
-const TCHAR CContextMenuManager::CMH_FOLDER_DRAG_AND_DROP[] = _T("Folder\\ShellEx\\DragDropHandlers");
-const TCHAR CContextMenuManager::CMH_DIRECTORY_BACKGROUND[] = _T("Directory\\Background\\shellex\\ContextMenuHandlers");
-const TCHAR CContextMenuManager::CMH_DIRECTORY_DRAG_AND_DROP[] = _T("Directory\\shellex\\DragDropHandlers");
+const TCHAR ContextMenuManager::CMH_FOLDER_DRAG_AND_DROP[] = _T("Folder\\ShellEx\\DragDropHandlers");
+const TCHAR ContextMenuManager::CMH_DIRECTORY_BACKGROUND[] = _T("Directory\\Background\\shellex\\ContextMenuHandlers");
+const TCHAR ContextMenuManager::CMH_DIRECTORY_DRAG_AND_DROP[] = _T("Directory\\shellex\\DragDropHandlers");
 
 /* The following steps are taken when showing shell
 extensions on an existing menu:
@@ -26,7 +26,7 @@ extensions on an existing menu:
 2. Build and show menu.
 3. Pass selection to shell extension (if necessary).
 4. Release shell extensions (also free the DLL's they reside in). */
-CContextMenuManager::CContextMenuManager(ContextMenuType_t ContextMenuType,
+ContextMenuManager::ContextMenuManager(ContextMenuType_t ContextMenuType,
 	PCIDLIST_ABSOLUTE pidlDirectory,IDataObject *pDataObject,IUnknown *pUnkSite,
 	const std::vector<std::wstring> &blacklistedCLSIDEntries)
 {
@@ -128,7 +128,7 @@ CContextMenuManager::CContextMenuManager(ContextMenuType_t ContextMenuType,
 	}
 }
 
-CContextMenuManager::~CContextMenuManager()
+ContextMenuManager::~ContextMenuManager()
 {
 	/* Release the IContextMenu interfaces. */
 	for(auto MenuHandler : m_MenuHandlers)
@@ -151,9 +151,9 @@ CContextMenuManager::~CContextMenuManager()
 	}
 }
 
-bool CContextMenuManager::ShowMenu(HWND hwnd,HMENU hMenu,
+bool ContextMenuManager::ShowMenu(HWND hwnd,HMENU hMenu,
 	UINT uIDPrevious,UINT uMinID,UINT uMaxID,const POINT &pt,
-	CStatusBar &StatusBar)
+	StatusBar &statusBar)
 {
 	if(hwnd == NULL ||
 		hMenu == NULL ||
@@ -165,7 +165,7 @@ bool CContextMenuManager::ShowMenu(HWND hwnd,HMENU hMenu,
 
 	m_uMinID = uMinID;
 	m_uMaxID = uMaxID;
-	m_pStatusBar = &StatusBar;
+	m_pStatusBar = &statusBar;
 
 	AddMenuEntries(hMenu,uIDPrevious,uMinID,uMaxID);
 
@@ -197,7 +197,7 @@ bool CContextMenuManager::ShowMenu(HWND hwnd,HMENU hMenu,
 	return true;
 }
 
-void CContextMenuManager::AddMenuEntries(HMENU hMenu,
+void ContextMenuManager::AddMenuEntries(HMENU hMenu,
 	UINT uIDPrevious,int iMinID,int iMaxID)
 {
 	/* Shell extension menu items will be inserted
@@ -251,7 +251,7 @@ void CContextMenuManager::AddMenuEntries(HMENU hMenu,
 	RemoveDuplicateSeperators(hMenu);
 }
 
-void CContextMenuManager::RemoveDuplicateSeperators(HMENU hMenu)
+void ContextMenuManager::RemoveDuplicateSeperators(HMENU hMenu)
 {
 	std::vector<int> DeletionVector;
 
@@ -280,12 +280,12 @@ void CContextMenuManager::RemoveDuplicateSeperators(HMENU hMenu)
 	}
 }
 
-LRESULT CALLBACK CContextMenuManager::ContextMenuHookProc(HWND hwnd,UINT uMsg,
+LRESULT CALLBACK ContextMenuManager::ContextMenuHookProc(HWND hwnd,UINT uMsg,
 	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	CContextMenuManager *pcmm = reinterpret_cast<CContextMenuManager *>(dwRefData);
+	ContextMenuManager *pcmm = reinterpret_cast<ContextMenuManager *>(dwRefData);
 
 	switch(uMsg)
 	{
@@ -348,7 +348,7 @@ LRESULT CALLBACK CContextMenuManager::ContextMenuHookProc(HWND hwnd,UINT uMsg,
 	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
 }
 
-HRESULT CContextMenuManager::HandleMenuMessage(UINT uMsg,WPARAM wParam,
+HRESULT ContextMenuManager::HandleMenuMessage(UINT uMsg,WPARAM wParam,
 	LPARAM lParam,LRESULT &lRes)
 {
 	UINT uItemID = static_cast<UINT>(-1);
@@ -402,7 +402,7 @@ HRESULT CContextMenuManager::HandleMenuMessage(UINT uMsg,WPARAM wParam,
 
 /* See http://blogs.msdn.com/b/oldnewthing/archive/2004/09/28/235242.aspx for potential
 issues with this. */
-HRESULT CContextMenuManager::GetMenuHelperText(UINT uID,TCHAR *szText,UINT cchMax)
+HRESULT ContextMenuManager::GetMenuHelperText(UINT uID,TCHAR *szText,UINT cchMax)
 {
 	HRESULT hr = E_FAIL;
 
@@ -424,7 +424,7 @@ HRESULT CContextMenuManager::GetMenuHelperText(UINT uID,TCHAR *szText,UINT cchMa
 	return hr;
 }
 
-int CContextMenuManager::GetMenuItemPos(HMENU hMenu,UINT uID)
+int ContextMenuManager::GetMenuItemPos(HMENU hMenu,UINT uID)
 {
 	int iPos = -1;
 
@@ -440,7 +440,7 @@ int CContextMenuManager::GetMenuItemPos(HMENU hMenu,UINT uID)
 	return iPos;
 }
 
-void CContextMenuManager::InvokeMenuEntry(HWND hwnd,UINT uCmd)
+void ContextMenuManager::InvokeMenuEntry(HWND hwnd,UINT uCmd)
 {
 	for(auto MenuHandler : m_MenuHandlers)
 	{
@@ -462,7 +462,7 @@ void CContextMenuManager::InvokeMenuEntry(HWND hwnd,UINT uCmd)
 	}
 }
 
-CContextMenuManager::ItemType_t CContextMenuManager::GetItemType(PCIDLIST_ABSOLUTE pidl)
+ContextMenuManager::ItemType_t ContextMenuManager::GetItemType(PCIDLIST_ABSOLUTE pidl)
 {
 	SFGAOF Attributes = SFGAO_FOLDER|SFGAO_FILESYSTEM;
 	GetItemAttributes(pidl,&Attributes);

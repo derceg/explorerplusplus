@@ -12,8 +12,8 @@
 #include <objbase.h>
 #include <vector>
 
-class CApplicationToolbar;
-class CApplicationToolbarDropHandler;
+class ApplicationToolbar;
+class ApplicationToolbarDropHandler;
 
 struct ApplicationButton_t
 {
@@ -24,11 +24,11 @@ struct ApplicationButton_t
 	int				ID;
 };
 
-class CApplicationToolbarPersistentSettings
+class ApplicationToolbarPersistentSettings
 {
 public:
 
-	static CApplicationToolbarPersistentSettings &GetInstance();
+	static ApplicationToolbarPersistentSettings &GetInstance();
 
 	void	SaveRegistrySettings(HKEY hParentKey);
 	void	LoadRegistrySettings(HKEY hParentKey);
@@ -38,16 +38,16 @@ public:
 
 private:
 
-	friend CApplicationToolbar;
+	friend ApplicationToolbar;
 
 	static const TCHAR SETTING_NAME[];
 	static const TCHAR SETTING_COMMAND[];
 	static const TCHAR SETTING_SHOW_NAME_ON_TOOLBAR[];
 
-	CApplicationToolbarPersistentSettings();
+	ApplicationToolbarPersistentSettings();
 
-	CApplicationToolbarPersistentSettings(const CApplicationToolbarPersistentSettings &);
-	CApplicationToolbarPersistentSettings & operator=(const CApplicationToolbarPersistentSettings &);
+	ApplicationToolbarPersistentSettings(const ApplicationToolbarPersistentSettings &);
+	ApplicationToolbarPersistentSettings & operator=(const ApplicationToolbarPersistentSettings &);
 
 	bool AddButton(const std::wstring &name, const std::wstring &command,
 		BOOL showNameOnToolbar, ApplicationButton_t *buttonOut);
@@ -56,11 +56,11 @@ private:
 	int m_IDCounter;
 };
 
-class CApplicationToolbar : public CBaseWindow
+class ApplicationToolbar : public BaseWindow
 {
 public:
 
-	static CApplicationToolbar *Create(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp);
+	static ApplicationToolbar *Create(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp);
 
 	void				ShowNewItemDialog();
 	void				AddNewItem(const std::wstring &name, const std::wstring &command, BOOL showNameOnToolbar);
@@ -81,8 +81,8 @@ private:
 	static LRESULT CALLBACK ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	CApplicationToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp);
-	~CApplicationToolbar();
+	ApplicationToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp);
+	~ApplicationToolbar();
 
 	static HWND			CreateApplicationToolbar(HWND hParent);
 
@@ -106,9 +106,9 @@ private:
 
 	IExplorerplusplus	*m_pexpp;
 
-	CApplicationToolbarDropHandler	*m_patd;
+	ApplicationToolbarDropHandler	*m_patd;
 
-	CApplicationToolbarPersistentSettings	*m_atps;
+	ApplicationToolbarPersistentSettings	*m_atps;
 
 	std::vector<WindowSubclassWrapper> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection>	m_connections;

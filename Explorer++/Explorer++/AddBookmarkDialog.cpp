@@ -11,18 +11,18 @@
 #include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
 
-const TCHAR CAddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmark");
+const TCHAR AddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmark");
 
 AddBookmarkDialog::AddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
 	BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem, BookmarkItem **selectedParentFolder) :
-	CBaseDialog(hInstance, IDD_ADD_BOOKMARK, hParent, true),
+	BaseDialog(hInstance, IDD_ADD_BOOKMARK, hParent, true),
 	m_expp(expp),
 	m_bookmarkTree(bookmarkTree),
 	m_bookmarkItem(bookmarkItem),
 	m_selectedParentFolder(selectedParentFolder),
 	m_ErrorBrush(CreateSolidBrush(ERROR_BACKGROUND_COLOR))
 {
-	m_pabdps = &CAddBookmarkDialogPersistentSettings::GetInstance();
+	m_pabdps = &AddBookmarkDialogPersistentSettings::GetInstance();
 
 	/* If the singleton settings class has not been initialized
 	yet, mark the root bookmark as selected and expanded. This
@@ -127,46 +127,46 @@ wil::unique_hicon AddBookmarkDialog::GetDialogIcon(int iconWidth, int iconHeight
 	return m_expp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::AddBookmark, iconWidth, iconHeight);
 }
 
-void AddBookmarkDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,
-	std::list<CResizableDialog::Control_t> &ControlList)
+void AddBookmarkDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+	std::list<ResizableDialog::Control_t> &ControlList)
 {
-	dsc = CBaseDialog::DIALOG_SIZE_CONSTRAINT_NONE;
+	dsc = BaseDialog::DIALOG_SIZE_CONSTRAINT_NONE;
 
-	CResizableDialog::Control_t Control;
+	ResizableDialog::Control_t Control;
 
 	Control.iID = IDC_BOOKMARK_NAME;
-	Control.Type = CResizableDialog::TYPE_RESIZE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	Control.Type = ResizableDialog::TYPE_RESIZE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_X;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_BOOKMARK_LOCATION;
-	Control.Type = CResizableDialog::TYPE_RESIZE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	Control.Type = ResizableDialog::TYPE_RESIZE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_X;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_BOOKMARK_TREEVIEW;
-	Control.Type = CResizableDialog::TYPE_RESIZE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_RESIZE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_BOOKMARK_NEWFOLDER;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_Y;
 	ControlList.push_back(Control);
 
 	Control.iID = IDOK;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 
 	Control.iID = IDCANCEL;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 
 	Control.iID = IDC_GRIPPER;
-	Control.Type = CResizableDialog::TYPE_MOVE;
-	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	Control.Type = ResizableDialog::TYPE_MOVE;
+	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 }
 
@@ -322,14 +322,14 @@ INT_PTR AddBookmarkDialog::OnNcDestroy()
 	return 0;
 }
 
-CAddBookmarkDialogPersistentSettings::CAddBookmarkDialogPersistentSettings() :
-CDialogSettings(SETTINGS_KEY)
+AddBookmarkDialogPersistentSettings::AddBookmarkDialogPersistentSettings() :
+DialogSettings(SETTINGS_KEY)
 {
 	m_bInitialized = false;
 }
 
-CAddBookmarkDialogPersistentSettings& CAddBookmarkDialogPersistentSettings::GetInstance()
+AddBookmarkDialogPersistentSettings& AddBookmarkDialogPersistentSettings::GetInstance()
 {
-	static CAddBookmarkDialogPersistentSettings abdps;
+	static AddBookmarkDialogPersistentSettings abdps;
 	return abdps;
 }

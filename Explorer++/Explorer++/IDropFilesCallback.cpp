@@ -12,14 +12,14 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include <list>
 
-CDropFilesCallback::CDropFilesCallback(IExplorerplusplus *pexpp) :
+DropFilesCallback::DropFilesCallback(IExplorerplusplus *pexpp) :
 m_pexpp(pexpp),
 m_RefCount(1)
 {
 
 }
 
-HRESULT __stdcall CDropFilesCallback::QueryInterface(REFIID iid,void **ppvObject)
+HRESULT __stdcall DropFilesCallback::QueryInterface(REFIID iid,void **ppvObject)
 {
 	*ppvObject = NULL;
 
@@ -37,12 +37,12 @@ HRESULT __stdcall CDropFilesCallback::QueryInterface(REFIID iid,void **ppvObject
 	return E_NOINTERFACE;
 }
 
-ULONG __stdcall CDropFilesCallback::AddRef(void)
+ULONG __stdcall DropFilesCallback::AddRef(void)
 {
 	return ++m_RefCount;
 }
 
-ULONG __stdcall CDropFilesCallback::Release(void)
+ULONG __stdcall DropFilesCallback::Release(void)
 {
 	m_RefCount--;
 	
@@ -55,7 +55,7 @@ ULONG __stdcall CDropFilesCallback::Release(void)
 	return m_RefCount;
 }
 
-void CDropFilesCallback::OnDropFile(const std::list<std::wstring> &PastedFileList, const POINT *ppt)
+void DropFilesCallback::OnDropFile(const std::list<std::wstring> &PastedFileList, const POINT *ppt)
 {
 	UNREFERENCED_PARAMETER(ppt);
 

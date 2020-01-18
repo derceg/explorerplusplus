@@ -24,17 +24,17 @@
 #include <vector>
 
 
-const TCHAR CUpdateCheckDialogPersistentSettings::SETTINGS_KEY[] = _T("UpdateCheck");
-const TCHAR CUpdateCheckDialog::VERSION_FILE_URL[] = _T("https://explorerplusplus.com/software/version.txt");
+const TCHAR UpdateCheckDialogPersistentSettings::SETTINGS_KEY[] = _T("UpdateCheck");
+const TCHAR UpdateCheckDialog::VERSION_FILE_URL[] = _T("https://explorerplusplus.com/software/version.txt");
 
-CUpdateCheckDialog::CUpdateCheckDialog(HINSTANCE hInstance, HWND hParent) :
-	CBaseDialog(hInstance, IDD_UPDATECHECK, hParent, false),
+UpdateCheckDialog::UpdateCheckDialog(HINSTANCE hInstance, HWND hParent) :
+	BaseDialog(hInstance, IDD_UPDATECHECK, hParent, false),
 	m_UpdateCheckComplete(false)
 {
-	m_pucdps = &CUpdateCheckDialogPersistentSettings::GetInstance();
+	m_pucdps = &UpdateCheckDialogPersistentSettings::GetInstance();
 }
 
-INT_PTR CUpdateCheckDialog::OnInitDialog()
+INT_PTR UpdateCheckDialog::OnInitDialog()
 {
 	SetDlgItemText(m_hDlg,IDC_STATIC_CURRENT_VERSION,VERSION_STRING_W);
 
@@ -56,7 +56,7 @@ INT_PTR CUpdateCheckDialog::OnInitDialog()
 	return 0;
 }
 
-DWORD WINAPI CUpdateCheckDialog::UpdateCheckThread(LPVOID pParam)
+DWORD WINAPI UpdateCheckDialog::UpdateCheckThread(LPVOID pParam)
 {
 	assert(pParam != NULL);
 
@@ -65,15 +65,15 @@ DWORD WINAPI CUpdateCheckDialog::UpdateCheckThread(LPVOID pParam)
 	return 0;
 }
 
-void CUpdateCheckDialog::PerformUpdateCheck(HWND hDlg)
+void UpdateCheckDialog::PerformUpdateCheck(HWND hDlg)
 {
 	TCHAR TempPath[MAX_PATH];
 	DWORD PathRes = GetTempPath(SIZEOF_ARRAY(TempPath),TempPath);
 
 	if(PathRes == 0)
 	{
-		PostMessage(hDlg,CUpdateCheckDialog::WM_APP_UPDATE_CHECK_COMPLETE,
-			CUpdateCheckDialog::UPDATE_CHECK_ERROR,0);
+		PostMessage(hDlg,UpdateCheckDialog::WM_APP_UPDATE_CHECK_COMPLETE,
+			UpdateCheckDialog::UPDATE_CHECK_ERROR,0);
 		return;
 	}
 
@@ -82,8 +82,8 @@ void CUpdateCheckDialog::PerformUpdateCheck(HWND hDlg)
 
 	if(FileRes == 0)
 	{
-		PostMessage(hDlg,CUpdateCheckDialog::WM_APP_UPDATE_CHECK_COMPLETE,
-			CUpdateCheckDialog::UPDATE_CHECK_ERROR,0);
+		PostMessage(hDlg,UpdateCheckDialog::WM_APP_UPDATE_CHECK_COMPLETE,
+			UpdateCheckDialog::UPDATE_CHECK_ERROR,0);
 		return;
 	}
 
@@ -93,8 +93,8 @@ void CUpdateCheckDialog::PerformUpdateCheck(HWND hDlg)
 	will be deleted first. This ensures that the
 	version check is not performed against an
 	outdated file. */
-	DeleteUrlCacheEntry(CUpdateCheckDialog::VERSION_FILE_URL);
-	HRESULT hr = URLDownloadToFile(NULL,CUpdateCheckDialog::VERSION_FILE_URL,TempFileName,0,NULL);
+	DeleteUrlCacheEntry(UpdateCheckDialog::VERSION_FILE_URL);
+	HRESULT hr = URLDownloadToFile(NULL,UpdateCheckDialog::VERSION_FILE_URL,TempFileName,0,NULL);
 
 	if(SUCCEEDED(hr))
 	{
@@ -116,14 +116,14 @@ void CUpdateCheckDialog::PerformUpdateCheck(HWND hDlg)
 
 				try
 				{
-					CUpdateCheckDialog::Version_t Version;
+					UpdateCheckDialog::Version_t Version;
 					Version.MajorVersion = boost::lexical_cast<int>(VersionNumberComponents.at(0));
 					Version.MinorVersion = boost::lexical_cast<int>(VersionNumberComponents.at(1));
 					Version.MicroVersion = boost::lexical_cast<int>(VersionNumberComponents.at(2));
 					MultiByteToWideChar(CP_ACP,0,VersionNumber,-1,Version.VersionString,SIZEOF_ARRAY(Version.VersionString));
 
-					SendMessage(hDlg,CUpdateCheckDialog::WM_APP_UPDATE_CHECK_COMPLETE,
-						CUpdateCheckDialog::UPDATE_CHECK_SUCCESS,reinterpret_cast<LPARAM>(&Version));
+					SendMessage(hDlg,UpdateCheckDialog::WM_APP_UPDATE_CHECK_COMPLETE,
+						UpdateCheckDialog::UPDATE_CHECK_SUCCESS,reinterpret_cast<LPARAM>(&Version));
 
 					VersionRetrieved = true;
 				}
@@ -141,14 +141,14 @@ void CUpdateCheckDialog::PerformUpdateCheck(HWND hDlg)
 
 	if(!VersionRetrieved)
 	{
-		PostMessage(hDlg,CUpdateCheckDialog::WM_APP_UPDATE_CHECK_COMPLETE,
-			CUpdateCheckDialog::UPDATE_CHECK_ERROR,0);
+		PostMessage(hDlg,UpdateCheckDialog::WM_APP_UPDATE_CHECK_COMPLETE,
+			UpdateCheckDialog::UPDATE_CHECK_ERROR,0);
 	}
 
 	DeleteFile(TempFileName);
 }
 
-INT_PTR CUpdateCheckDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR UpdateCheckDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -176,14 +176,14 @@ INT_PTR CUpdateCheckDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lPar
 	return 0;
 }
 
-void CUpdateCheckDialog::OnUpdateCheckError()
+void UpdateCheckDialog::OnUpdateCheckError()
 {
 	TCHAR szTemp[64];
 	LoadString(GetInstance(),IDS_UPDATE_CHECK_ERROR,szTemp,SIZEOF_ARRAY(szTemp));
 	SetDlgItemText(m_hDlg,IDC_STATIC_UPDATE_STATUS,szTemp);
 }
 
-void CUpdateCheckDialog::OnUpdateCheckSuccess(Version_t *Version)
+void UpdateCheckDialog::OnUpdateCheckSuccess(Version_t *Version)
 {
 	TCHAR szStatus[128];
 	TCHAR szTemp[128];
@@ -204,7 +204,7 @@ void CUpdateCheckDialog::OnUpdateCheckSuccess(Version_t *Version)
 	SetDlgItemText(m_hDlg,IDC_STATIC_UPDATE_STATUS,szStatus);
 }
 
-INT_PTR CUpdateCheckDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR UpdateCheckDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -222,7 +222,7 @@ INT_PTR CUpdateCheckDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-INT_PTR CUpdateCheckDialog::OnTimer(int iTimerID)
+INT_PTR UpdateCheckDialog::OnTimer(int iTimerID)
 {
 	UNREFERENCED_PARAMETER(iTimerID);
 
@@ -253,7 +253,7 @@ INT_PTR CUpdateCheckDialog::OnTimer(int iTimerID)
 	return 0;
 }
 
-INT_PTR CUpdateCheckDialog::OnNotify(NMHDR *pnmhdr)
+INT_PTR UpdateCheckDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
@@ -270,27 +270,27 @@ INT_PTR CUpdateCheckDialog::OnNotify(NMHDR *pnmhdr)
 	return 0;
 }
 
-INT_PTR CUpdateCheckDialog::OnClose()
+INT_PTR UpdateCheckDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-void CUpdateCheckDialog::SaveState()
+void UpdateCheckDialog::SaveState()
 {
 	m_pucdps->SaveDialogPosition(m_hDlg);
 
 	m_pucdps->m_bStateSaved = TRUE;
 }
 
-CUpdateCheckDialogPersistentSettings::CUpdateCheckDialogPersistentSettings() :
-CDialogSettings(SETTINGS_KEY)
+UpdateCheckDialogPersistentSettings::UpdateCheckDialogPersistentSettings() :
+DialogSettings(SETTINGS_KEY)
 {
 	
 }
 
-CUpdateCheckDialogPersistentSettings& CUpdateCheckDialogPersistentSettings::GetInstance()
+UpdateCheckDialogPersistentSettings& UpdateCheckDialogPersistentSettings::GetInstance()
 {
-	static CUpdateCheckDialogPersistentSettings ucdps;
+	static UpdateCheckDialogPersistentSettings ucdps;
 	return ucdps;
 }

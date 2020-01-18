@@ -17,20 +17,20 @@
 #include "Macros.h"
 
 
-const TCHAR CDialogSettings::SETTING_POSITION[] = _T("Position");
-const TCHAR CDialogSettings::SETTING_POSITION_X[] = _T("PosX");
-const TCHAR CDialogSettings::SETTING_POSITION_Y[] = _T("PosY");
-const TCHAR CDialogSettings::SETTING_WIDTH[] = _T("Width");
-const TCHAR CDialogSettings::SETTING_HEIGHT[] = _T("Height");
+const TCHAR DialogSettings::SETTING_POSITION[] = _T("Position");
+const TCHAR DialogSettings::SETTING_POSITION_X[] = _T("PosX");
+const TCHAR DialogSettings::SETTING_POSITION_Y[] = _T("PosY");
+const TCHAR DialogSettings::SETTING_WIDTH[] = _T("Width");
+const TCHAR DialogSettings::SETTING_HEIGHT[] = _T("Height");
 
-CDialogSettings::CDialogSettings(const TCHAR *szSettingsKey,bool bSavePosition) :
+DialogSettings::DialogSettings(const TCHAR *szSettingsKey,bool bSavePosition) :
 m_szSettingsKey(szSettingsKey),
 m_bSavePosition(bSavePosition)
 {
 	m_bStateSaved = FALSE;
 }
 
-void CDialogSettings::SaveRegistrySettings(HKEY hParentKey)
+void DialogSettings::SaveRegistrySettings(HKEY hParentKey)
 {
 	if(!m_bStateSaved)
 	{
@@ -62,7 +62,7 @@ void CDialogSettings::SaveRegistrySettings(HKEY hParentKey)
 	}
 }
 
-void CDialogSettings::LoadRegistrySettings(HKEY hParentKey)
+void DialogSettings::LoadRegistrySettings(HKEY hParentKey)
 {
 	HKEY hKey;
 	LONG lRes;
@@ -92,7 +92,7 @@ void CDialogSettings::LoadRegistrySettings(HKEY hParentKey)
 	}
 }
 
-void CDialogSettings::SaveXMLSettings(IXMLDOMDocument *pXMLDom,
+void DialogSettings::SaveXMLSettings(IXMLDOMDocument *pXMLDom,
 	IXMLDOMElement *pe)
 {
 	if(!m_bStateSaved)
@@ -122,7 +122,7 @@ void CDialogSettings::SaveXMLSettings(IXMLDOMDocument *pXMLDom,
 	SaveExtraXMLSettings(pXMLDom,pParentNode);
 }
 
-void CDialogSettings::LoadXMLSettings(IXMLDOMNamedNodeMap *pam,long lChildNodes)
+void DialogSettings::LoadXMLSettings(IXMLDOMNamedNodeMap *pam,long lChildNodes)
 {
 	IXMLDOMNode *pNode = NULL;
 	BSTR bstrName;
@@ -172,7 +172,7 @@ void CDialogSettings::LoadXMLSettings(IXMLDOMNamedNodeMap *pam,long lChildNodes)
 	m_bStateSaved = TRUE;
 }
 
-bool CDialogSettings::GetSettingsKey(TCHAR *out, size_t cchMax) const
+bool DialogSettings::GetSettingsKey(TCHAR *out, size_t cchMax) const
 {
 	if(cchMax < (m_szSettingsKey.length() + 1))
 	{
@@ -186,29 +186,29 @@ bool CDialogSettings::GetSettingsKey(TCHAR *out, size_t cchMax) const
 /* No extra values are saved or loaded by default.
 Derived class should override these to save any
 dialog specific values they need. */
-void CDialogSettings::SaveExtraRegistrySettings(HKEY hKey)
+void DialogSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
 	UNREFERENCED_PARAMETER(hKey);
 }
 
-void CDialogSettings::LoadExtraRegistrySettings(HKEY hKey)
+void DialogSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
 	UNREFERENCED_PARAMETER(hKey);
 }
 
-void CDialogSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pParentNode)
+void DialogSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pParentNode)
 {
 	UNREFERENCED_PARAMETER(pXMLDom);
 	UNREFERENCED_PARAMETER(pParentNode);
 }
 
-void CDialogSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
+void DialogSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
 {
 	UNREFERENCED_PARAMETER(bstrName);
 	UNREFERENCED_PARAMETER(bstrValue);
 }
 
-void CDialogSettings::SaveDialogPosition(HWND hDlg)
+void DialogSettings::SaveDialogPosition(HWND hDlg)
 {
 	RECT rc;
 	GetWindowRect(hDlg,&rc);
@@ -218,7 +218,7 @@ void CDialogSettings::SaveDialogPosition(HWND hDlg)
 	m_iHeight = GetRectHeight(&rc);
 }
 
-void CDialogSettings::RestoreDialogPosition(HWND hDlg,bool bRestoreSize)
+void DialogSettings::RestoreDialogPosition(HWND hDlg,bool bRestoreSize)
 {
 	if(m_bStateSaved)
 	{

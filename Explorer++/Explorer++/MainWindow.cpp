@@ -19,7 +19,7 @@ MainWindow *MainWindow::Create(HWND hwnd, std::shared_ptr<Config> config, HINSTA
 
 MainWindow::MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
 	IExplorerplusplus *expp) :
-	CBaseWindow(hwnd),
+	BaseWindow(hwnd),
 	m_hwnd(hwnd),
 	m_config(config),
 	m_instance(instance),

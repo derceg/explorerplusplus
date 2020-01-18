@@ -33,23 +33,23 @@ namespace
 	GetInstance is stable throughout the lifetime of
 	the program (which is true, as these are all
 	singletons). */
-	CDialogSettings* const DIALOG_SETTINGS[] = {
-		&CSearchDialogPersistentSettings::GetInstance(),
-		&CWildcardSelectDialogPersistentSettings::GetInstance(),
-		&CSetFileAttributesDialogPersistentSettings::GetInstance(),
-		&CRenameTabDialogPersistentSettings::GetInstance(),
-		&CMassRenameDialogPersistentSettings::GetInstance(),
-		&CFilterDialogPersistentSettings::GetInstance(),
-		&CColorRuleDialogPersistentSettings::GetInstance(),
-		&CCustomizeColorsDialogPersistentSettings::GetInstance(),
-		&CSplitFileDialogPersistentSettings::GetInstance(),
-		&CDestroyFilesDialogPersistentSettings::GetInstance(),
-		&CMergeFilesDialogPersistentSettings::GetInstance(),
-		&CSelectColumnsDialogPersistentSettings::GetInstance(),
-		&CSetDefaultColumnsDialogPersistentSettings::GetInstance(),
-		&CAddBookmarkDialogPersistentSettings::GetInstance(),
-		&CDisplayColoursDialogPersistentSettings::GetInstance(),
-		&CUpdateCheckDialogPersistentSettings::GetInstance()
+	DialogSettings* const DIALOG_SETTINGS[] = {
+		&SearchDialogPersistentSettings::GetInstance(),
+		&WildcardSelectDialogPersistentSettings::GetInstance(),
+		&SetFileAttributesDialogPersistentSettings::GetInstance(),
+		&RenameTabDialogPersistentSettings::GetInstance(),
+		&MassRenameDialogPersistentSettings::GetInstance(),
+		&FilterDialogPersistentSettings::GetInstance(),
+		&ColorRuleDialogPersistentSettings::GetInstance(),
+		&CustomizeColorsDialogPersistentSettings::GetInstance(),
+		&SplitFileDialogPersistentSettings::GetInstance(),
+		&DestroyFilesDialogPersistentSettings::GetInstance(),
+		&MergeFilesDialogPersistentSettings::GetInstance(),
+		&SelectColumnsDialogPersistentSettings::GetInstance(),
+		&SetDefaultColumnsDialogPersistentSettings::GetInstance(),
+		&AddBookmarkDialogPersistentSettings::GetInstance(),
+		&DisplayColoursDialogPersistentSettings::GetInstance(),
+		&UpdateCheckDialogPersistentSettings::GetInstance()
 	};
 }
 
@@ -60,7 +60,7 @@ void Explorerplusplus::LoadDialogStatesFromRegistry(void)
 
 	if(ReturnValue == ERROR_SUCCESS)
 	{
-		for(CDialogSettings *ds : DIALOG_SETTINGS)
+		for(DialogSettings *ds : DIALOG_SETTINGS)
 		{
 			ds->LoadRegistrySettings(hKey);
 		}
@@ -77,7 +77,7 @@ void Explorerplusplus::SaveDialogStatesToRegistry(void)
 
 	if(ReturnValue == ERROR_SUCCESS)
 	{
-		for(CDialogSettings *ds : DIALOG_SETTINGS)
+		for(DialogSettings *ds : DIALOG_SETTINGS)
 		{
 			ds->SaveRegistrySettings(hKey);
 		}
@@ -140,7 +140,7 @@ void Explorerplusplus::LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom)
 						pChildNode->get_nodeName(&bstrName);
 						pChildNode->get_text(&bstrValue);
 
-						for(CDialogSettings *ds : DIALOG_SETTINGS)
+						for(DialogSettings *ds : DIALOG_SETTINGS)
 						{
 							TCHAR settingsKey[64];
 							bool success = ds->GetSettingsKey(settingsKey, SIZEOF_ARRAY(settingsKey));
@@ -185,7 +185,7 @@ IXMLDOMElement *pRoot)
 	SysFreeString(bstr);
 	bstr = NULL;
 
-	for(CDialogSettings *ds : DIALOG_SETTINGS)
+	for(DialogSettings *ds : DIALOG_SETTINGS)
 	{
 		ds->SaveXMLSettings(pXMLDom, pe);
 	}

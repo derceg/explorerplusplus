@@ -27,7 +27,7 @@ Tab::Tab(IExplorerplusplus *expp, TabNavigationInterface *tabNavigation,
 		folderSettingsFinal = expp->GetConfig()->defaultFolderSettings;
 	}
 
-	m_shellBrowser = CShellBrowser::CreateNew(m_id, expp->GetLanguageModule(),
+	m_shellBrowser = ShellBrowser::CreateNew(m_id, expp->GetLanguageModule(),
 		expp->GetMainWindow(), expp->GetCachedIcons(), expp->GetConfig(), tabNavigation,
 		folderSettingsFinal, initialColumns);
 }
@@ -38,7 +38,7 @@ Tab::Tab(const PreservedTab &preservedTab, IExplorerplusplus *expp, TabNavigatio
 	m_customName(preservedTab.customName),
 	m_lockState(preservedTab.lockState)
 {
-	m_shellBrowser = CShellBrowser::CreateFromPreserved(m_id, expp->GetLanguageModule(),
+	m_shellBrowser = ShellBrowser::CreateFromPreserved(m_id, expp->GetLanguageModule(),
 		expp->GetMainWindow(), expp->GetCachedIcons(), expp->GetConfig(),
 		tabNavigation, preservedTab.history, preservedTab.currentEntry,
 		preservedTab.preservedFolderState);
@@ -49,7 +49,7 @@ int Tab::GetId() const
 	return m_id;
 }
 
-CShellBrowser *Tab::GetShellBrowser() const
+ShellBrowser *Tab::GetShellBrowser() const
 {
 	return m_shellBrowser;
 }

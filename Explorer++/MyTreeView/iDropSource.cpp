@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "MyTreeView.h"
 
-HRESULT _stdcall CMyTreeView::QueryContinueDrag(BOOL fEscapePressed,DWORD grfKeyState)
+HRESULT _stdcall MyTreeView::QueryContinueDrag(BOOL fEscapePressed,DWORD grfKeyState)
 {
 	DWORD dwStopButton = 0;
 
@@ -30,7 +30,7 @@ HRESULT _stdcall CMyTreeView::QueryContinueDrag(BOOL fEscapePressed,DWORD grfKey
 	return S_OK;
 }
 
-HRESULT _stdcall CMyTreeView::GiveFeedback(DWORD dwEffect)
+HRESULT _stdcall MyTreeView::GiveFeedback(DWORD dwEffect)
 {
 	UNREFERENCED_PARAMETER(dwEffect);
 

@@ -143,7 +143,7 @@ void BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::T
 		bookmarkTree, bookmarkItem.get(), &selectedParentFolder);
 	auto res = AddBookmarkDialog.ShowModalDialog();
 
-	if (res == CBaseDialog::RETURN_OK)
+	if (res == BaseDialog::RETURN_OK)
 	{
 		assert(selectedParentFolder != nullptr);
 		bookmarkTree->AddBookmarkItem(selectedParentFolder, std::move(bookmarkItem),
@@ -159,7 +159,7 @@ void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *
 		bookmarkTree, bookmarkItem, &selectedParentFolder);
 	auto res = AddBookmarkDialog.ShowModalDialog();
 
-	if (res == CBaseDialog::RETURN_OK)
+	if (res == BaseDialog::RETURN_OK)
 	{
 		assert(selectedParentFolder != nullptr);
 
