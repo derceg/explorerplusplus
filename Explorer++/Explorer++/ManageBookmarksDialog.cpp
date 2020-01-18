@@ -40,7 +40,6 @@ ManageBookmarksDialog::~ManageBookmarksDialog()
 
 INT_PTR ManageBookmarksDialog::OnInitDialog()
 {
-	/* TODO: Enable drag and drop for listview and treeview. */
 	SetupToolbar();
 	SetupTreeView();
 	SetupListView();
