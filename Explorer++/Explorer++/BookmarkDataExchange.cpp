@@ -18,11 +18,11 @@ FORMATETC BookmarkDataExchange::GetFormatEtc()
 	return formatEtc;
 }
 
-wil::com_ptr<IDataObject> BookmarkDataExchange::CreateDataObject(const std::unique_ptr<BookmarkItem> &bookmarkItem)
+wil::com_ptr<IDataObject> BookmarkDataExchange::CreateDataObject(const OwnedRefBookmarkItems &bookmarkItems)
 {
 	FORMATETC formatEtc = GetFormatEtc();
 
-	std::string data = SerializeBookmarkItem(bookmarkItem);
+	std::string data = SerializeBookmarkItems(bookmarkItems);
 	auto global = WriteBinaryDataToGlobal(data);
 	STGMEDIUM stgMedium = GetStgMediumForGlobal(global.get());
 
@@ -37,23 +37,48 @@ wil::com_ptr<IDataObject> BookmarkDataExchange::CreateDataObject(const std::uniq
 	return dataObject;
 }
 
-std::string BookmarkDataExchange::SerializeBookmarkItem(const std::unique_ptr<BookmarkItem> &bookmarkItem)
+std::string BookmarkDataExchange::SerializeBookmarkItems(const OwnedRefBookmarkItems &bookmarkItems)
 {
-	std::stringstream ss;
-	cereal::BinaryOutputArchive outputArchive(ss);
+	std::vector<std::string> serializedBookmarkItems;
 
-	outputArchive(bookmarkItem);
+	for (auto &bookmarkItem : bookmarkItems)
+	{
+		std::stringstream stringstream;
+		cereal::BinaryOutputArchive outputArchive(stringstream);
 
-	return ss.str();
+		outputArchive(bookmarkItem.get());
+
+		serializedBookmarkItems.push_back(stringstream.str());
+	}
+
+	std::stringstream mainStringstream;
+	cereal::BinaryOutputArchive mainOutputArchive(mainStringstream);
+
+	mainOutputArchive(serializedBookmarkItems);
+
+	return mainStringstream.str();
 }
 
-std::unique_ptr<BookmarkItem> BookmarkDataExchange::DeserializeBookmarkItem(const std::string &data)
+BookmarkItems BookmarkDataExchange::DeserializeBookmarkItems(const std::string &data)
 {
-	std::stringstream ss(data);
-	cereal::BinaryInputArchive inputArchive(ss);
+	std::stringstream mainStringstream(data);
+	cereal::BinaryInputArchive mainInputArchive(mainStringstream);
 
-	std::unique_ptr<BookmarkItem> bookmarkItem;
-	inputArchive(bookmarkItem);
+	std::vector<std::string> serializedBookmarkItems;
+	mainInputArchive(serializedBookmarkItems);
 
-	return bookmarkItem;
+	BookmarkItems bookmarkItems;
+
+	for (auto &serializedBookmarkItem : serializedBookmarkItems)
+	{
+		std::stringstream stringstream(serializedBookmarkItem);
+		cereal::BinaryInputArchive inputArchive(stringstream);
+
+		std::unique_ptr<BookmarkItem> bookmarkItem;
+		inputArchive(bookmarkItem);
+
+		bookmarkItems.push_back(std::move(bookmarkItem));
+	}
+
+	return bookmarkItems;
 }

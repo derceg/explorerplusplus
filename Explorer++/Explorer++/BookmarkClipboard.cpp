@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "BookmarkClipboard.h"
-#include "BookmarkDataExchange.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/StringHelper.h"
 
@@ -19,35 +18,35 @@ UINT BookmarkClipboard::GetClipboardFormat()
 	return clipboardFormat;
 }
 
-std::unique_ptr<BookmarkItem> BookmarkClipboard::ReadBookmark()
+BookmarkItems BookmarkClipboard::ReadBookmarks()
 {
 	Clipboard clipboard;
 	auto data = clipboard.ReadCustomData(GetClipboardFormat());
 
 	if (!data)
 	{
-		return nullptr;
+		return {};
 	}
 
-	return BookmarkDataExchange::DeserializeBookmarkItem(*data);
+	return BookmarkDataExchange::DeserializeBookmarkItems(*data);
 }
 
-bool BookmarkClipboard::WriteBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem)
+bool BookmarkClipboard::WriteBookmarks(const OwnedRefBookmarkItems &bookmarkItems)
 {
 	BulkClipboardWriter clipboardWriter;
-	bool textWritten;
 
-	if (bookmarkItem->IsFolder())
+	for (auto &bookmarkItem : bookmarkItems)
 	{
-		textWritten = clipboardWriter.WriteText(bookmarkItem->GetName());
-	}
-	else
-	{
-		textWritten = clipboardWriter.WriteText(bookmarkItem->GetLocation());
+		if (bookmarkItem.get()->IsFolder())
+		{
+			clipboardWriter.WriteText(bookmarkItem.get()->GetName());
+		}
+		else
+		{
+			clipboardWriter.WriteText(bookmarkItem.get()->GetLocation());
+		}
 	}
 
-	std::string data = BookmarkDataExchange::SerializeBookmarkItem(bookmarkItem);
-	bool bookmarkWritten = clipboardWriter.WriteCustomData(GetClipboardFormat(), data);
-
-	return textWritten && bookmarkWritten;
+	std::string data = BookmarkDataExchange::SerializeBookmarkItems(bookmarkItems);
+	return clipboardWriter.WriteCustomData(GetClipboardFormat(), data);
 }

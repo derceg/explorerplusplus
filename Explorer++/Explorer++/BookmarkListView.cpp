@@ -497,7 +497,7 @@ void BookmarkListView::OnBeginDrag(const NMLISTVIEW *listView)
 
 	BookmarkItem *bookmarkItem = GetBookmarkItemFromListView(listView->iItem);
 	auto &ownedPtr = bookmarkItem->GetParent()->GetChildOwnedPtr(bookmarkItem);
-	auto dataObject = BookmarkDataExchange::CreateDataObject(ownedPtr);
+	auto dataObject = BookmarkDataExchange::CreateDataObject({ ownedPtr });
 
 	wil::com_ptr<IDragSourceHelper> dragSourceHelper;
 	hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_ALL,

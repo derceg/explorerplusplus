@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "BookmarkDataExchange.h"
 #include "BookmarkItem.h"
 
 class BookmarkClipboard
@@ -12,12 +13,12 @@ public:
 
 	BookmarkClipboard();
 
-	std::unique_ptr<BookmarkItem> ReadBookmark();
-	bool WriteBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem);
+	BookmarkItems ReadBookmarks();
+	bool WriteBookmarks(const OwnedRefBookmarkItems &bookmarkItems);
 
 	static UINT GetClipboardFormat();
 
 private:
 
-	static inline const WCHAR CLIPBOARD_FORMAT_STRING[] = L"explorerplusplus/bookmark";
+	static inline const WCHAR CLIPBOARD_FORMAT_STRING[] = L"explorerplusplus/bookmarks";
 };

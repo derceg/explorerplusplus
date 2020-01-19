@@ -185,7 +185,7 @@ void BookmarksToolbar::StartDrag(DragType dragType, const POINT &pt)
 
 	BookmarkItem *bookmarkItem = GetBookmarkItemFromToolbarIndex(index);
 	auto &ownedPtr = bookmarkItem->GetParent()->GetChildOwnedPtr(bookmarkItem);
-	auto dataObject = BookmarkDataExchange::CreateDataObject(ownedPtr);
+	auto dataObject = BookmarkDataExchange::CreateDataObject({ ownedPtr });
 
 	DWORD effect;
 	DoDragDrop(dataObject.get(), dropSource.get(), DROPEFFECT_MOVE, &effect);
@@ -410,20 +410,20 @@ void BookmarksToolbar::OnNewBookmarkItem(BookmarkItem::Type type)
 void BookmarksToolbar::OnPaste()
 {
 	BookmarkClipboard bookmarkClipboard;
-	auto copiedBookmarkItem = bookmarkClipboard.ReadBookmark();
-
-	if (!copiedBookmarkItem)
-	{
-		return;
-	}
+	auto bookmarkItems = bookmarkClipboard.ReadBookmarks();
 
 	assert(m_contextMenuLocation);
 
 	POINT ptClient = *m_contextMenuLocation;
 	ScreenToClient(m_hToolbar, &ptClient);
 	int newIndex = FindNextButtonIndex(ptClient);
+	int i = 0;
 
-	m_bookmarkTree->AddBookmarkItem(m_bookmarkTree->GetBookmarksToolbarFolder(), std::move(copiedBookmarkItem), newIndex);
+	for (auto &bookmarkItem : bookmarkItems)
+	{
+		m_bookmarkTree->AddBookmarkItem(m_bookmarkTree->GetBookmarksToolbarFolder(), std::move(bookmarkItem), newIndex + i);
+		i++;
+	}
 
 	m_contextMenuLocation.reset();
 }

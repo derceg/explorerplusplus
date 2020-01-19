@@ -482,7 +482,7 @@ void BookmarkTreeView::OnBeginDrag(const NMTREEVIEW *treeView)
 	}
 
 	auto &ownedPtr = bookmarkFolder->GetParent()->GetChildOwnedPtr(bookmarkFolder);
-	auto dataObject = BookmarkDataExchange::CreateDataObject(ownedPtr);
+	auto dataObject = BookmarkDataExchange::CreateDataObject({ ownedPtr });
 
 	wil::com_ptr<IDragSourceHelper> dragSourceHelper;
 	hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_ALL,

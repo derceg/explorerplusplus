@@ -115,7 +115,7 @@ void BookmarkContextMenu::OnCopy(BookmarkItem *bookmarkItem, bool cut)
 	auto &ownedPtr = bookmarkItem->GetParent()->GetChildOwnedPtr(bookmarkItem);
 
 	BookmarkClipboard bookmarkClipboard;
-	bool res = bookmarkClipboard.WriteBookmark(ownedPtr);
+	bool res = bookmarkClipboard.WriteBookmarks({ ownedPtr });
 
 	if (cut && res)
 	{
@@ -126,23 +126,24 @@ void BookmarkContextMenu::OnCopy(BookmarkItem *bookmarkItem, bool cut)
 void BookmarkContextMenu::OnPaste(BookmarkItem *selectedBookmarkItem)
 {
 	BookmarkClipboard bookmarkClipboard;
-	auto copiedBookmarkItem = bookmarkClipboard.ReadBookmark();
+	auto bookmarkItems = bookmarkClipboard.ReadBookmarks();
+	int i = 0;
 
-	if (!copiedBookmarkItem)
+	for (auto &bookmarkItem : bookmarkItems)
 	{
-		return;
-	}
+		if (selectedBookmarkItem->IsFolder())
+		{
+			m_bookmarkTree->AddBookmarkItem(selectedBookmarkItem, std::move(bookmarkItem),
+				selectedBookmarkItem->GetChildren().size() + i);
+		}
+		else
+		{
+			BookmarkItem *parent = selectedBookmarkItem->GetParent();
+			m_bookmarkTree->AddBookmarkItem(parent, std::move(bookmarkItem),
+				parent->GetChildIndex(selectedBookmarkItem) + i + 1);
+		}
 
-	if (selectedBookmarkItem->IsFolder())
-	{
-		m_bookmarkTree->AddBookmarkItem(selectedBookmarkItem, std::move(copiedBookmarkItem),
-			selectedBookmarkItem->GetChildren().size());
-	}
-	else
-	{
-		BookmarkItem *parent = selectedBookmarkItem->GetParent();
-		m_bookmarkTree->AddBookmarkItem(parent, std::move(copiedBookmarkItem),
-			parent->GetChildIndex(selectedBookmarkItem) + 1);
+		i++;
 	}
 }
 

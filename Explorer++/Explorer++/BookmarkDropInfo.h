@@ -34,7 +34,7 @@ private:
 	static bool CanMoveBookmarkItemIntoFolder(BookmarkItem *bookmarkItem, BookmarkItem *parentFolder);
 	ExtractedInfo &GetExtractedInfo();
 	ExtractedInfo ExtractBookmarkItems();
-	std::unique_ptr<BookmarkItem> ExtractBookmarkItemFromCustomFormat();
+	BookmarkItems ExtractBookmarkItemsFromCustomFormat();
 	BookmarkItems ExtractBookmarkItemsFromHDrop();
 
 	IDataObject *m_dataObject;
