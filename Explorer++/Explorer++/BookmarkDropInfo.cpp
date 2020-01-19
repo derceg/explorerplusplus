@@ -25,33 +25,31 @@ DWORD BookmarkDropInfo::GetDropEffect(BookmarkItem *parentFolder)
 		return DROPEFFECT_NONE;
 	}
 
-	if (!m_dropEffect)
+	auto &extractedInfo = GetExtractedInfo();
+
+	if (extractedInfo.bookmarkItems.empty())
 	{
-		m_dropEffect = DetermineDropEffect();
+		return DROPEFFECT_NONE;
 	}
 
-	return *m_dropEffect;
-}
-
-DWORD BookmarkDropInfo::DetermineDropEffect()
-{
-	if (IsDropFormatAvailable(m_dataObject, BookmarkDataExchange::GetFormatEtc()))
+	if (*extractedInfo.extractionSource == ExtractionSource::HDrop)
 	{
-		// TODO: Should block drop if a folder is dragged over itself.
-		return DROPEFFECT_MOVE;
+		return DROPEFFECT_COPY;
 	}
-	else if (IsDropFormatAvailable(m_dataObject, GetDroppedFilesFormatEtc()))
+	else if (*extractedInfo.extractionSource == ExtractionSource::CustomFormat)
 	{
-		auto droppedFiles = ExtractDroppedFilesList(m_dataObject);
-
-		bool allFolders = std::all_of(droppedFiles.begin(), droppedFiles.end(), [] (const std::wstring &path) {
-			return PathIsDirectory(path.c_str());
-		});
-
-		if (!droppedFiles.empty() && allFolders)
+		if (extractedInfo.bookmarkItems.size() == 1)
 		{
-			return DROPEFFECT_COPY;
+			auto existingBookmarkItem = BookmarkHelper::GetBookmarkItemById(m_bookmarkTree, *extractedInfo.bookmarkItems[0]->GetOriginalGUID());
+
+			if (!existingBookmarkItem ||
+				(existingBookmarkItem && !CanMoveBookmarkItemIntoFolder(existingBookmarkItem, parentFolder)))
+			{
+				return DROPEFFECT_NONE;
+			}
 		}
+
+		return DROPEFFECT_MOVE;
 	}
 
 	return DROPEFFECT_NONE;
@@ -61,12 +59,12 @@ DWORD BookmarkDropInfo::PerformDrop(BookmarkItem *parentFolder, size_t position)
 {
 	assert(parentFolder->IsFolder());
 
-	BookmarkItems bookmarkItems = ExtractBookmarkItems();
+	auto &extractedInfo = GetExtractedInfo();
 	DWORD targetEffect = GetDropEffect(parentFolder);
 	DWORD finalEffect = DROPEFFECT_NONE;
 	size_t i = 0;
 
-	for (auto &bookmarkItem : bookmarkItems)
+	for (auto &bookmarkItem : extractedInfo.bookmarkItems)
 	{
 		if (targetEffect == DROPEFFECT_COPY)
 		{
@@ -74,18 +72,18 @@ DWORD BookmarkDropInfo::PerformDrop(BookmarkItem *parentFolder, size_t position)
 		}
 		else if (targetEffect == DROPEFFECT_MOVE)
 		{
-			auto exingBookmarkItem = BookmarkHelper::GetBookmarkItemById(m_bookmarkTree, *bookmarkItem->GetOriginalGUID());
+			auto existingBookmarkItem = BookmarkHelper::GetBookmarkItemById(m_bookmarkTree, *bookmarkItem->GetOriginalGUID());
 
-			if (exingBookmarkItem)
+			if (existingBookmarkItem && CanMoveBookmarkItemIntoFolder(existingBookmarkItem, parentFolder))
 			{
-				m_bookmarkTree->MoveBookmarkItem(exingBookmarkItem, parentFolder, position + i);
+				m_bookmarkTree->MoveBookmarkItem(existingBookmarkItem, parentFolder, position + i);
 			}
 		}
 
 		i++;
 	}
 
-	if (!bookmarkItems.empty())
+	if (!extractedInfo.bookmarkItems.empty())
 	{
 		finalEffect = targetEffect;
 	}
@@ -93,25 +91,49 @@ DWORD BookmarkDropInfo::PerformDrop(BookmarkItem *parentFolder, size_t position)
 	return finalEffect;
 }
 
-BookmarkItems BookmarkDropInfo::ExtractBookmarkItems()
+bool BookmarkDropInfo::CanMoveBookmarkItemIntoFolder(BookmarkItem *bookmarkItem, BookmarkItem *parentFolder)
 {
+	if (bookmarkItem->IsBookmark()
+		|| (bookmarkItem->IsFolder() && !BookmarkHelper::IsAncestor(parentFolder, bookmarkItem)))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+BookmarkDropInfo::ExtractedInfo &BookmarkDropInfo::GetExtractedInfo()
+{
+	if (!m_extractedInfo)
+	{
+		m_extractedInfo = ExtractBookmarkItems();
+	}
+
+	return *m_extractedInfo;
+}
+
+BookmarkDropInfo::ExtractedInfo BookmarkDropInfo::ExtractBookmarkItems()
+{
+	BookmarkItems bookmarkItems;
+	std::optional<ExtractionSource> extractionSource;
+
 	if (IsDropFormatAvailable(m_dataObject, BookmarkDataExchange::GetFormatEtc()))
 	{
 		auto bookmarkItem = ExtractBookmarkItemFromCustomFormat();
 
 		if (bookmarkItem)
 		{
-			BookmarkItems bookmarkItems;
 			bookmarkItems.push_back(std::move(bookmarkItem));
-			return bookmarkItems;
+			extractionSource = ExtractionSource::CustomFormat;
 		}
 	}
 	else if (IsDropFormatAvailable(m_dataObject, GetDroppedFilesFormatEtc()))
 	{
-		return ExtractBookmarkItemsFromHDrop();
+		bookmarkItems = ExtractBookmarkItemsFromHDrop();
+		extractionSource = ExtractionSource::HDrop;
 	}
 
-	return {};
+	return { std::move(bookmarkItems), extractionSource };
 }
 
 std::unique_ptr<BookmarkItem> BookmarkDropInfo::ExtractBookmarkItemFromCustomFormat()

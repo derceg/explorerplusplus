@@ -228,3 +228,20 @@ BookmarkItem *GetBookmarkItemByIdResursive(BookmarkItem *bookmarkItem, std::wstr
 
 	return nullptr;
 }
+
+bool BookmarkHelper::IsAncestor(BookmarkItem *bookmarkItem, BookmarkItem *possibleAncestor)
+{
+	if (bookmarkItem == possibleAncestor)
+	{
+		return true;
+	}
+
+	BookmarkItem *parent = bookmarkItem->GetParent();
+
+	if (!parent)
+	{
+		return false;
+	}
+
+	return IsAncestor(parent, possibleAncestor);
+}

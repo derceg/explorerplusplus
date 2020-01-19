@@ -19,13 +19,25 @@ public:
 
 private:
 
-	DWORD DetermineDropEffect();
+	enum class ExtractionSource
+	{
+		CustomFormat,
+		HDrop
+	};
 
-	BookmarkItems ExtractBookmarkItems();
+	struct ExtractedInfo
+	{
+		BookmarkItems bookmarkItems;
+		std::optional<ExtractionSource> extractionSource;
+	};
+
+	static bool CanMoveBookmarkItemIntoFolder(BookmarkItem *bookmarkItem, BookmarkItem *parentFolder);
+	ExtractedInfo &GetExtractedInfo();
+	ExtractedInfo ExtractBookmarkItems();
 	std::unique_ptr<BookmarkItem> ExtractBookmarkItemFromCustomFormat();
 	BookmarkItems ExtractBookmarkItemsFromHDrop();
 
 	IDataObject *m_dataObject;
 	BookmarkTree *m_bookmarkTree;
-	std::optional<DWORD> m_dropEffect;
+	std::optional<ExtractedInfo> m_extractedInfo;
 };

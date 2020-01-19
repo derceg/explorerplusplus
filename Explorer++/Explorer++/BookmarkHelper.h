@@ -32,4 +32,6 @@ namespace BookmarkHelper
 	void OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem, IExplorerplusplus *expp);
 
 	BookmarkItem *GetBookmarkItemById(BookmarkTree *bookmarkTree, std::wstring_view guid);
+
+	bool IsAncestor(BookmarkItem *bookmarkItem, BookmarkItem *possibleAncestor);
 }
