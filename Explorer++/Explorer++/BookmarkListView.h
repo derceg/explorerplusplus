@@ -54,6 +54,8 @@ public:
 
 private:
 
+	using RawBookmarkItems = std::vector<BookmarkItem *>;
+
 	static inline const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
 	static inline const double FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE = 0.2;
@@ -85,11 +87,11 @@ private:
 	BOOL OnBeginLabelEdit(const NMLVDISPINFO *dispInfo);
 	BOOL OnEndLabelEdit(const NMLVDISPINFO *dispInfo);
 	void OnKeyDown(const NMLVKEYDOWN *keyDown);
-	void OnBeginDrag(const NMLISTVIEW *listView);
+	void OnBeginDrag();
 	void OnRename();
 	void OnDelete();
 
-	std::vector<BookmarkItem *> GetSelectedBookmarkItems();
+	RawBookmarkItems GetSelectedBookmarkItems();
 
 	void OnHeaderRClick(const POINT &pt);
 	wil::unique_hmenu BuildHeaderContextMenu();

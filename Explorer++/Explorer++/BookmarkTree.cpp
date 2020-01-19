@@ -86,6 +86,11 @@ void BookmarkTree::AddBookmarkItem(BookmarkItem *parent, std::unique_ptr<Bookmar
 			std::placeholders::_1, std::placeholders::_2), boost::signals2::at_front);
 	});
 
+	if (index > parent->GetChildren().size())
+	{
+		index = parent->GetChildren().size();
+	}
+
 	BookmarkItem *rawBookmarkItem = bookmarkItem.get();
 	parent->AddChild(std::move(bookmarkItem), index);
 	bookmarkItemAddedSignal.m_signal(*rawBookmarkItem, index);
@@ -102,14 +107,19 @@ void BookmarkTree::MoveBookmarkItem(BookmarkItem *bookmarkItem, BookmarkItem *ne
 	BookmarkItem *oldParent = bookmarkItem->GetParent();
 	size_t oldIndex = oldParent->GetChildIndex(bookmarkItem);
 
-	if (oldParent == newParent && index == oldIndex)
+	if (index > newParent->GetChildren().size())
 	{
-		return;
+		index = newParent->GetChildren().size();
 	}
 
 	if (oldParent == newParent && index > oldIndex)
 	{
 		index--;
+	}
+
+	if (oldParent == newParent && index == oldIndex)
+	{
+		return;
 	}
 
 	auto item = oldParent->RemoveChild(oldIndex);

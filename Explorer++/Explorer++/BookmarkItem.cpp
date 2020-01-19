@@ -148,11 +148,7 @@ void BookmarkItem::AddChild(std::unique_ptr<BookmarkItem> bookmarkItem)
 void BookmarkItem::AddChild(std::unique_ptr<BookmarkItem> bookmarkItem, size_t index)
 {
 	assert(m_type == Type::Folder);
-
-	if (index > m_children.size())
-	{
-		index = m_children.size();
-	}
+	assert(index <= m_children.size());
 
 	bookmarkItem->m_parent = this;
 

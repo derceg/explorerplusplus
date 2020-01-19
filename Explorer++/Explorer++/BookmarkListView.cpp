@@ -186,7 +186,7 @@ LRESULT CALLBACK BookmarkListView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wP
 				break;
 
 			case LVN_BEGINDRAG:
-				OnBeginDrag(reinterpret_cast<NMLISTVIEW *>(lParam));
+				OnBeginDrag();
 				break;
 			}
 		}
@@ -485,7 +485,7 @@ void BookmarkListView::OnKeyDown(const NMLVKEYDOWN *keyDown)
 	}
 }
 
-void BookmarkListView::OnBeginDrag(const NMLISTVIEW *listView)
+void BookmarkListView::OnBeginDrag()
 {
 	wil::com_ptr<IDropSource> dropSource;
 	HRESULT hr = CreateDropSource(&dropSource, DragType::LeftClick);
@@ -495,9 +495,22 @@ void BookmarkListView::OnBeginDrag(const NMLISTVIEW *listView)
 		return;
 	}
 
-	BookmarkItem *bookmarkItem = GetBookmarkItemFromListView(listView->iItem);
-	auto &ownedPtr = bookmarkItem->GetParent()->GetChildOwnedPtr(bookmarkItem);
-	auto dataObject = BookmarkDataExchange::CreateDataObject({ ownedPtr });
+	auto rawBookmarkItems = GetSelectedBookmarkItems();
+
+	if (rawBookmarkItems.empty())
+	{
+		return;
+	}
+
+	OwnedRefBookmarkItems bookmarkItems;
+
+	for (auto &rawBookmarkItem : rawBookmarkItems)
+	{
+		auto &ownedPtr = rawBookmarkItem->GetParent()->GetChildOwnedPtr(rawBookmarkItem);
+		bookmarkItems.push_back(ownedPtr);
+	}
+
+	auto dataObject = BookmarkDataExchange::CreateDataObject(bookmarkItems);
 
 	wil::com_ptr<IDragSourceHelper> dragSourceHelper;
 	hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_ALL,
@@ -524,17 +537,17 @@ void BookmarkListView::OnRename()
 
 void BookmarkListView::OnDelete()
 {
-	std::vector<BookmarkItem *> bookmarkItems = GetSelectedBookmarkItems();
+	auto rawBookmarkItems = GetSelectedBookmarkItems();
 
-	for (BookmarkItem *bookmarkItem : bookmarkItems)
+	for (BookmarkItem *bookmarkItem : rawBookmarkItems)
 	{
 		m_bookmarkTree->RemoveBookmarkItem(bookmarkItem);
 	}
 }
 
-std::vector<BookmarkItem *> BookmarkListView::GetSelectedBookmarkItems()
+BookmarkListView::RawBookmarkItems BookmarkListView::GetSelectedBookmarkItems()
 {
-	std::vector<BookmarkItem *> bookmarksItems;
+	RawBookmarkItems bookmarksItems;
 	int index = -1;
 
 	while ((index = ListView_GetNextItem(m_hListView, index, LVNI_SELECTED)) != -1)
