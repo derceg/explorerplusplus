@@ -626,16 +626,6 @@ void BookmarkListView::OnHeaderContextMenuItemSelected(int menuItemId)
 	if (nowActive)
 	{
 		InsertColumn(column, columnIndex);
-
-		// TODO: Update.
-		/*for (const auto &childItem : bookmarkFolder->GetChildren())
-		{
-			TCHAR szColumn[256];
-			GetBookmarkItemColumnInfo(childItem.get(), itr->ColumnType, szColumn, SIZEOF_ARRAY(szColumn));
-			ListView_SetItemText(hListView, iBookmarkItem, iColumn, szColumn);
-
-			++iBookmarkItem;
-		}*/
 	}
 	else
 	{
