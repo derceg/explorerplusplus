@@ -290,7 +290,8 @@ BOOL BookmarksToolbar::OnRightClick(const NMMOUSE *nmm)
 		return FALSE;
 	}
 
-	m_bookmarkContextMenu.ShowMenu(m_hToolbar, bookmarkItem, pt);
+	m_bookmarkContextMenu.ShowMenu(m_hToolbar, m_bookmarkTree->GetBookmarksToolbarFolder(),
+		{ bookmarkItem }, pt);
 
 	return TRUE;
 }

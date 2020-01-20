@@ -82,7 +82,7 @@ void BookmarkMenu::OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt)
 		return;
 	}
 
-	m_bookmarkContextMenu.ShowMenu(m_parentWindow, itr->second, pt, true);
+	m_bookmarkContextMenu.ShowMenu(m_parentWindow, itr->second->GetParent(), { itr->second } , pt, true);
 }
 
 BOOL BookmarkMenu::ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt, MenuCallback callback)

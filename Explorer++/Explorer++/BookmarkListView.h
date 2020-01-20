@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "BookmarkContextMenu.h"
 #include "BookmarkDropInfo.h"
 #include "BookmarkDropTargetWindow.h"
 #include "BookmarkHelper.h"
@@ -53,8 +54,6 @@ public:
 	SignalWrapper<BookmarkListView, void(BookmarkItem *bookmarkFolder)> navigationSignal;
 
 private:
-
-	using RawBookmarkItems = std::vector<BookmarkItem *>;
 
 	static inline const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
@@ -128,6 +127,7 @@ private:
 	BookmarkItem *m_currentBookmarkFolder;
 	BookmarkHelper::SortMode m_sortMode;
 	bool m_sortAscending;
+	BookmarkContextMenu m_bookmarkContextMenu;
 
 	std::optional<int> m_previousDropItem;
 

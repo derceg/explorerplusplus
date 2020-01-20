@@ -23,7 +23,8 @@ BookmarkListView::BookmarkListView(HWND hListView, HMODULE resourceModule,
 	m_expp(expp),
 	m_columns(initialColumns),
 	m_sortMode(BookmarkHelper::SortMode::Default),
-	m_sortAscending(true)
+	m_sortAscending(true),
+	m_bookmarkContextMenu(bookmarkTree, resourceModule, expp)
 {
 	SetWindowTheme(hListView, L"Explorer", NULL);
 	ListView_SetExtendedListViewStyleEx(hListView,
@@ -348,14 +349,16 @@ void BookmarkListView::OnDblClk(const NMITEMACTIVATE *itemActivate)
 
 void BookmarkListView::OnRClick(const NMITEMACTIVATE *itemActivate)
 {
-	HMENU hMenu = LoadMenu(m_resourceModule, MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_BOOKMARK_RCLICK_MENU));
-	SetMenuDefaultItem(GetSubMenu(hMenu, 0), IDM_MB_BOOKMARK_OPEN, FALSE);
+	auto rawBookmarkItems = GetSelectedBookmarkItems();
 
-	POINT pt = itemActivate->ptAction;
-	ClientToScreen(m_hListView, &pt);
+	POINT ptScreen = itemActivate->ptAction;
+	ClientToScreen(m_hListView, &ptScreen);
 
-	TrackPopupMenu(GetSubMenu(hMenu, 0), TPM_LEFTALIGN, pt.x, pt.y, 0, m_hListView, NULL);
-	DestroyMenu(hMenu);
+	if (!rawBookmarkItems.empty())
+	{
+		m_bookmarkContextMenu.ShowMenu(m_hListView, m_currentBookmarkFolder,
+			rawBookmarkItems, ptScreen);
+	}
 }
 
 void BookmarkListView::OnGetDispInfo(NMLVDISPINFO *dispInfo)
@@ -545,7 +548,7 @@ void BookmarkListView::OnDelete()
 	}
 }
 
-BookmarkListView::RawBookmarkItems BookmarkListView::GetSelectedBookmarkItems()
+RawBookmarkItems BookmarkListView::GetSelectedBookmarkItems()
 {
 	RawBookmarkItems bookmarksItems;
 	int index = -1;

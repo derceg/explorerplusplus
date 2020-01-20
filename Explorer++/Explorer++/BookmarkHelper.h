@@ -9,6 +9,8 @@
 #include "CoreInterface.h"
 #include "TabContainer.h"
 
+using RawBookmarkItems = std::vector<BookmarkItem *>;
+
 namespace BookmarkHelper
 {
 	enum class SortMode

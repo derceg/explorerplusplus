@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "BookmarkHelper.h"
 #include "BookmarkItem.h"
 #include "BookmarkTree.h"
 #include "CoreInterface.h"
@@ -14,15 +15,22 @@ public:
 
 	BookmarkContextMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule, IExplorerplusplus *expp);
 
-	BOOL ShowMenu(HWND parentWindow, BookmarkItem *bookmarkItem, const POINT &pt, bool recursive = false);
+	BOOL ShowMenu(HWND parentWindow, BookmarkItem *parentFolder, const RawBookmarkItems &bookmarkItems,
+		const POINT &ptScreen, bool recursive = false);
 	bool IsShowingMenu() const;
 
 private:
 
-	void OnMenuItemSelected(int menuItemId, BookmarkItem *bookmarkItem, HWND parentWindow);
+	void SetUpMenu(HMENU menu, const RawBookmarkItems &bookmarkItems);
+	void SetMenuItemStates(HMENU menu);
+
+	void OnMenuItemSelected(int menuItemId, BookmarkItem *parentFolder, const RawBookmarkItems &bookmarkItems,
+		HWND parentWindow);
+	void OnOpenAll(const RawBookmarkItems &bookmarkItems);
 	void OnNewBookmarkItem(BookmarkItem::Type type, HWND parentWindow);
-	void OnCopy(BookmarkItem *bookmarkItem, bool cut);
+	void OnCopy(const RawBookmarkItems &bookmarkItems, bool cut);
 	void OnPaste(BookmarkItem *selectedBookmarkItem);
+	void OnDelete(const RawBookmarkItems &bookmarkItems);
 	void OnEditBookmarkItem(BookmarkItem *bookmarkItem, HWND parentWindow);
 
 	BookmarkTree *m_bookmarkTree;

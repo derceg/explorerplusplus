@@ -239,17 +239,6 @@ LRESULT ManageBookmarksDialog::HandleMenuOrAccelerator(WPARAM wParam)
 		m_bookmarkListView->SetSortAscending(false);
 		break;
 
-		/* TODO: */
-	case IDM_MB_BOOKMARK_OPEN:
-		break;
-
-	case IDM_MB_BOOKMARK_OPENINNEWTAB:
-		break;
-
-	case IDM_MB_BOOKMARK_DELETE:
-		//OnDeleteBookmark();
-		break;
-
 	case IDOK:
 		OnOk();
 		break;
