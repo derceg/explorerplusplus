@@ -117,7 +117,7 @@ int CALLBACK SortByDateModified(const BookmarkItem *firstItem,
 	return CompareFileTime(&firstItemDateModified, &secondItemDateModified);
 }
 
-void BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
+BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
 	BookmarkItem *defaultParentSelection, HMODULE resoureceModule, HWND parentWindow,
 	TabContainer *tabContainer, IExplorerplusplus *coreInterface)
 {
@@ -136,7 +136,8 @@ void BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::T
 		bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt,
 			ResourceHelper::LoadString(resoureceModule, IDS_BOOKMARKS_NEWBOOKMARKFOLDER), std::nullopt);
 	}
-	
+
+	BookmarkItem *rawBookmarkItem = bookmarkItem.get();
 	BookmarkItem *selectedParentFolder = nullptr;
 
 	AddBookmarkDialog addBookmarkDialog(resoureceModule, parentWindow, coreInterface,
@@ -148,7 +149,11 @@ void BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::T
 		assert(selectedParentFolder != nullptr);
 		bookmarkTree->AddBookmarkItem(selectedParentFolder, std::move(bookmarkItem),
 			selectedParentFolder->GetChildren().size());
+
+		return rawBookmarkItem;
 	}
+
+	return nullptr;
 }
 
 void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,

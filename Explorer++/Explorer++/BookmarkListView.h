@@ -84,6 +84,7 @@ private:
 	void OnRClick(const NMITEMACTIVATE *itemActivate);
 	void ShowBackgroundContextMenu(const POINT &ptScreen);
 	void OnMenuItemSelected(int menuItemId);
+	void OnNewBookmark();
 	void OnNewFolder();
 	void OnGetDispInfo(NMLVDISPINFO *dispInfo);
 	BOOL OnBeginLabelEdit(const NMLVDISPINFO *dispInfo);

@@ -390,9 +390,7 @@ void BookmarkListView::OnMenuItemSelected(int menuItemId)
 	switch (menuItemId)
 	{
 	case IDM_BOOKMARKS_NEW_BOOKMARK:
-		BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
-			m_currentBookmarkFolder, m_resourceModule, m_hListView, m_expp->GetTabContainer(),
-			m_expp);
+		OnNewBookmark();
 		break;
 
 	case IDM_BOOKMARKS_NEW_FOLDER:
@@ -403,6 +401,29 @@ void BookmarkListView::OnMenuItemSelected(int menuItemId)
 		assert(false);
 		break;
 	}
+}
+
+void BookmarkListView::OnNewBookmark()
+{
+	auto bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
+		m_currentBookmarkFolder, m_resourceModule, m_hListView, m_expp->GetTabContainer(),
+		m_expp);
+
+	if (!bookmark)
+	{
+		return;
+	}
+
+	if (bookmark->GetParent() != m_currentBookmarkFolder)
+	{
+		return;
+	}
+
+	auto index = GetBookmarkItemIndex(bookmark);
+	assert(index);
+
+	SetFocus(m_hListView);
+	NListView::ListView_SelectItem(m_hListView, *index, TRUE);
 }
 
 void BookmarkListView::OnNewFolder()
