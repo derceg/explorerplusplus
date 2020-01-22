@@ -40,7 +40,7 @@ MassRenameDialog::MassRenameDialog(HINSTANCE hInstance, HWND hParent,
 	m_FullFilenameList(FullFilenameList),
 	m_pFileActionHandler(pFileActionHandler)
 {
-	m_pmrdps = &MassRenameDialogPersistentSettings::GetInstance();
+	m_persistentSettings = &MassRenameDialogPersistentSettings::GetInstance();
 }
 
 INT_PTR MassRenameDialog::OnInitDialog()
@@ -73,8 +73,8 @@ INT_PTR MassRenameDialog::OnInitDialog()
 	lvCol.pszText	= previewNameText.data();
 	ListView_InsertColumn(hListView,2,&lvCol);
 
-	SendMessage(hListView,LVM_SETCOLUMNWIDTH,0,m_pmrdps->m_iColumnWidth1);
-	SendMessage(hListView,LVM_SETCOLUMNWIDTH,1,m_pmrdps->m_iColumnWidth2);
+	SendMessage(hListView,LVM_SETCOLUMNWIDTH,0,m_persistentSettings->m_iColumnWidth1);
+	SendMessage(hListView,LVM_SETCOLUMNWIDTH,1,m_persistentSettings->m_iColumnWidth2);
 
 	LVITEM lvItem;
 	SHFILEINFO shfi;
@@ -112,7 +112,7 @@ INT_PTR MassRenameDialog::OnInitDialog()
 		EM_SETSEL,0,-1);
 	SetFocus(GetDlgItem(m_hDlg,IDC_MASSRENAME_EDIT));
 
-	m_pmrdps->RestoreDialogPosition(m_hDlg,true);
+	m_persistentSettings->RestoreDialogPosition(m_hDlg,true);
 
 	return 0;
 }
@@ -324,13 +324,13 @@ void MassRenameDialog::OnCancel()
 
 void MassRenameDialog::SaveState()
 {
-	m_pmrdps->SaveDialogPosition(m_hDlg);
+	m_persistentSettings->SaveDialogPosition(m_hDlg);
 
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MASSRENAME_FILELISTVIEW);
-	m_pmrdps->m_iColumnWidth1 = ListView_GetColumnWidth(hListView,0);
-	m_pmrdps->m_iColumnWidth2 = ListView_GetColumnWidth(hListView,1);
+	m_persistentSettings->m_iColumnWidth1 = ListView_GetColumnWidth(hListView,0);
+	m_persistentSettings->m_iColumnWidth2 = ListView_GetColumnWidth(hListView,1);
 
-	m_pmrdps->m_bStateSaved = TRUE;
+	m_persistentSettings->m_bStateSaved = TRUE;
 }
 
 void MassRenameDialog::ProcessFileName(const std::wstring &strTarget,

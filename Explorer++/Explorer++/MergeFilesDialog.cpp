@@ -43,7 +43,7 @@ MergeFilesDialog::MergeFilesDialog(HINSTANCE hInstance, HWND hParent,
 	m_bStopMerging(false),
 	m_pMergeFiles(nullptr)
 {
-	m_pmfdps = &MergeFilesDialogPersistentSettings::GetInstance();
+	m_persistentSettings = &MergeFilesDialogPersistentSettings::GetInstance();
 }
 
 MergeFilesDialog::~MergeFilesDialog()
@@ -188,7 +188,7 @@ INT_PTR MergeFilesDialog::OnInitDialog()
 	SendMessage(GetDlgItem(m_hDlg,IDC_MERGE_EDIT_FILENAME),EM_SETSEL,0,-1);
 	SetFocus(GetDlgItem(m_hDlg,IDC_MERGE_EDIT_FILENAME));
 
-	m_pmfdps->RestoreDialogPosition(m_hDlg,true);
+	m_persistentSettings->RestoreDialogPosition(m_hDlg,true);
 
 	return 0;
 }
@@ -355,8 +355,8 @@ INT_PTR MergeFilesDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam
 
 void MergeFilesDialog::SaveState()
 {
-	m_pmfdps->SaveDialogPosition(m_hDlg);
-	m_pmfdps->m_bStateSaved = TRUE;
+	m_persistentSettings->SaveDialogPosition(m_hDlg);
+	m_persistentSettings->m_bStateSaved = TRUE;
 }
 
 void MergeFilesDialog::OnOk()

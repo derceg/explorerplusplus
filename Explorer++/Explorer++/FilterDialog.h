@@ -65,5 +65,5 @@ private:
 
 	IExplorerplusplus *m_pexpp;
 
-	FilterDialogPersistentSettings *m_pfdps;
+	FilterDialogPersistentSettings *m_persistentSettings;
 };

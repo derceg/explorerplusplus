@@ -63,5 +63,5 @@ private:
 	TabContainer *m_tabContainer;
 	BOOL m_bColumnsSwapped;
 
-	SelectColumnsDialogPersistentSettings *m_pscdps;
+	SelectColumnsDialogPersistentSettings *m_persistentSettings;
 };

@@ -84,5 +84,5 @@ private:
 
 	wil::unique_hbrush m_ErrorBrush;
 
-	AddBookmarkDialogPersistentSettings *m_pabdps;
+	AddBookmarkDialogPersistentSettings *m_persistentSettings;
 };

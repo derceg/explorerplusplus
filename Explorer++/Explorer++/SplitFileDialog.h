@@ -142,5 +142,5 @@ private:
 
 	ErrorType_t m_CurrentError;
 
-	SplitFileDialogPersistentSettings *m_psfdps;
+	SplitFileDialogPersistentSettings *m_persistentSettings;
 };

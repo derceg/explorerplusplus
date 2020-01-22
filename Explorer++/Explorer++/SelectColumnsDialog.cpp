@@ -24,7 +24,7 @@ SelectColumnsDialog::SelectColumnsDialog(HINSTANCE hInstance, HWND hParent,
 	m_tabContainer(tabContainer),
 	m_bColumnsSwapped(FALSE)
 {
-	m_pscdps = &SelectColumnsDialogPersistentSettings::GetInstance();
+	m_persistentSettings = &SelectColumnsDialogPersistentSettings::GetInstance();
 }
 
 INT_PTR SelectColumnsDialog::OnInitDialog()
@@ -70,7 +70,7 @@ INT_PTR SelectColumnsDialog::OnInitDialog()
 	NListView::ListView_SelectItem(hListView,0,TRUE);
 	SetFocus(hListView);
 
-	m_pscdps->RestoreDialogPosition(m_hDlg,true);
+	m_persistentSettings->RestoreDialogPosition(m_hDlg,true);
 
 	return 0;
 }
@@ -235,8 +235,8 @@ INT_PTR SelectColumnsDialog::OnClose()
 
 void SelectColumnsDialog::SaveState()
 {
-	m_pscdps->SaveDialogPosition(m_hDlg);
-	m_pscdps->m_bStateSaved = TRUE;
+	m_persistentSettings->SaveDialogPosition(m_hDlg);
+	m_persistentSettings->m_bStateSaved = TRUE;
 }
 
 void SelectColumnsDialog::OnOk()

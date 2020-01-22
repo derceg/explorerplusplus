@@ -92,5 +92,5 @@ private:
 	bool m_bStopMerging;
 	TCHAR m_szOk[32];
 
-	MergeFilesDialogPersistentSettings *m_pmfdps;
+	MergeFilesDialogPersistentSettings *m_persistentSettings;
 };

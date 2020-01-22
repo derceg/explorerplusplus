@@ -202,5 +202,5 @@ private:
 	IExplorerplusplus *m_pexpp;
 	TabContainer *m_tabContainer;
 
-	SearchDialogPersistentSettings *m_sdps;
+	SearchDialogPersistentSettings *m_persistentSettings;
 };

@@ -74,5 +74,5 @@ private:
 	wil::unique_hicon m_moreIcon;
 	FileActionHandler *m_pFileActionHandler;
 
-	MassRenameDialogPersistentSettings *m_pmrdps;
+	MassRenameDialogPersistentSettings *m_persistentSettings;
 };

@@ -23,29 +23,29 @@ AddBookmarkDialog::AddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplore
 	m_selectedParentFolder(selectedParentFolder),
 	m_ErrorBrush(CreateSolidBrush(ERROR_BACKGROUND_COLOR))
 {
-	m_pabdps = &AddBookmarkDialogPersistentSettings::GetInstance();
+	m_persistentSettings = &AddBookmarkDialogPersistentSettings::GetInstance();
 
 	/* If the singleton settings class has not been initialized
 	yet, mark the root bookmark as selected and expanded. This
 	is only needed the first time this dialog is shown, as
 	selection and expansion info will be saved each time after
 	that. */
-	if(!m_pabdps->m_bInitialized)
+	if(!m_persistentSettings->m_bInitialized)
 	{
-		m_pabdps->m_guidSelected = m_bookmarkTree->GetBookmarksToolbarFolder()->GetGUID();
+		m_persistentSettings->m_guidSelected = m_bookmarkTree->GetBookmarksToolbarFolder()->GetGUID();
 
-		m_pabdps->m_bInitialized = true;
+		m_persistentSettings->m_bInitialized = true;
 	}
 
 	BookmarkItem *parent = bookmarkItem->GetParent();
 
 	if (parent)
 	{
-		m_pabdps->m_guidSelected = parent->GetGUID();
+		m_persistentSettings->m_guidSelected = parent->GetGUID();
 	}
 	else if (defaultParentSelection)
 	{
-		m_pabdps->m_guidSelected = defaultParentSelection->GetGUID();
+		m_persistentSettings->m_guidSelected = defaultParentSelection->GetGUID();
 	}
 }
 
@@ -71,13 +71,13 @@ INT_PTR AddBookmarkDialog::OnInitDialog()
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
 
 	m_pBookmarkTreeView = new BookmarkTreeView(hTreeView, GetInstance(), m_expp, m_bookmarkTree,
-		m_pabdps->m_setExpansion, m_pabdps->m_guidSelected);
+		m_persistentSettings->m_setExpansion, m_persistentSettings->m_guidSelected);
 
 	HWND hEditName = GetDlgItem(m_hDlg,IDC_BOOKMARK_NAME);
 	SendMessage(hEditName,EM_SETSEL,0,-1);
 	SetFocus(hEditName);
 
-	m_pabdps->RestoreDialogPosition(m_hDlg,false);
+	m_persistentSettings->RestoreDialogPosition(m_hDlg,false);
 
 	return 0;
 }
@@ -276,11 +276,11 @@ void AddBookmarkDialog::OnCancel()
 
 void AddBookmarkDialog::SaveState()
 {
-	m_pabdps->SaveDialogPosition(m_hDlg);
+	m_persistentSettings->SaveDialogPosition(m_hDlg);
 
 	SaveTreeViewState();
 
-	m_pabdps->m_bStateSaved = TRUE;
+	m_persistentSettings->m_bStateSaved = TRUE;
 }
 
 void AddBookmarkDialog::SaveTreeViewState()
@@ -289,9 +289,9 @@ void AddBookmarkDialog::SaveTreeViewState()
 
 	HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
 	const auto bookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
-	m_pabdps->m_guidSelected = bookmarkFolder->GetGUID();
+	m_persistentSettings->m_guidSelected = bookmarkFolder->GetGUID();
 
-	m_pabdps->m_setExpansion.clear();
+	m_persistentSettings->m_setExpansion.clear();
 	SaveTreeViewExpansionState(hTreeView,TreeView_GetRoot(hTreeView));
 }
 
@@ -302,7 +302,7 @@ void AddBookmarkDialog::SaveTreeViewExpansionState(HWND hTreeView,HTREEITEM hIte
 	if(uState & TVIS_EXPANDED)
 	{
 		const auto bookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hItem);
-		m_pabdps->m_setExpansion.insert(bookmarkFolder->GetGUID());
+		m_persistentSettings->m_setExpansion.insert(bookmarkFolder->GetGUID());
 
 		HTREEITEM hChild = TreeView_GetChild(hTreeView,hItem);
 		SaveTreeViewExpansionState(hTreeView,hChild);

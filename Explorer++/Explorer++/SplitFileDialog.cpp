@@ -49,7 +49,7 @@ SplitFileDialog::SplitFileDialog(HINSTANCE hInstance, HWND hParent, IExplorerplu
 	m_CurrentError(ERROR_NONE),
 	m_pSplitFile(nullptr)
 {
-	m_psfdps = &SplitFileDialogPersistentSettings::GetInstance();
+	m_persistentSettings = &SplitFileDialogPersistentSettings::GetInstance();
 }
 
 SplitFileDialog::~SplitFileDialog()
@@ -121,10 +121,10 @@ INT_PTR SplitFileDialog::OnInitDialog()
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szTemp)));
 	m_SizeMap.insert(std::unordered_map<int,SizeType_t>::value_type(iPos,SIZE_TYPE_GB));
 
-	SendMessage(hComboBox,CB_SELECTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(m_psfdps->m_strSplitGroup.c_str()));
+	SendMessage(hComboBox,CB_SELECTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(m_persistentSettings->m_strSplitGroup.c_str()));
 
 	HWND hEditSize = GetDlgItem(m_hDlg,IDC_SPLIT_EDIT_SIZE);
-	SetWindowText(hEditSize,m_psfdps->m_strSplitSize.c_str());
+	SetWindowText(hEditSize,m_persistentSettings->m_strSplitSize.c_str());
 	SendMessage(hEditSize,EM_SETSEL,0,-1);
 	SetFocus(hEditSize);
 
@@ -149,7 +149,7 @@ INT_PTR SplitFileDialog::OnInitDialog()
 
 	SetDlgItemText(m_hDlg,IDC_SPLIT_STATIC_ELAPSEDTIME,_T("00:00:00"));
 
-	m_psfdps->RestoreDialogPosition(m_hDlg,false);
+	m_persistentSettings->RestoreDialogPosition(m_hDlg,false);
 
 	return 0;
 }
@@ -269,12 +269,12 @@ INT_PTR SplitFileDialog::OnDestroy()
 
 void SplitFileDialog::SaveState()
 {
-	m_psfdps->SaveDialogPosition(m_hDlg);
+	m_persistentSettings->SaveDialogPosition(m_hDlg);
 
-	GetWindowString(GetDlgItem(m_hDlg,IDC_SPLIT_EDIT_SIZE),m_psfdps->m_strSplitSize);
-	GetWindowString(GetDlgItem(m_hDlg,IDC_SPLIT_COMBOBOX_SIZES),m_psfdps->m_strSplitGroup);
+	GetWindowString(GetDlgItem(m_hDlg,IDC_SPLIT_EDIT_SIZE),m_persistentSettings->m_strSplitSize);
+	GetWindowString(GetDlgItem(m_hDlg,IDC_SPLIT_COMBOBOX_SIZES),m_persistentSettings->m_strSplitGroup);
 
-	m_psfdps->m_bStateSaved = TRUE;
+	m_persistentSettings->m_bStateSaved = TRUE;
 }
 
 INT_PTR SplitFileDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)

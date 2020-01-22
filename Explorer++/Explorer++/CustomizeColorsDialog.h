@@ -67,5 +67,5 @@ private:
 
 	std::vector<NColorRuleHelper::ColorRule_t> *m_pColorRuleList;
 
-	CustomizeColorsDialogPersistentSettings *m_pccdps;
+	CustomizeColorsDialogPersistentSettings *m_persistentSettings;
 };
