@@ -64,6 +64,7 @@ private:
 	AddBookmarkDialog & operator = (const AddBookmarkDialog &abd);
 
 	void UpdateDialogForBookmarkFolder();
+	void SetDialogTitle();
 
 	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList);
 	void SaveState();

@@ -56,6 +56,8 @@ INT_PTR AddBookmarkDialog::OnInitDialog()
 		UpdateDialogForBookmarkFolder();
 	}
 
+	SetDialogTitle();
+
 	SetDlgItemText(m_hDlg, IDC_BOOKMARK_NAME, m_bookmarkItem->GetName().c_str());
 
 	if (m_bookmarkItem->IsBookmark())
@@ -125,6 +127,38 @@ void AddBookmarkDialog::UpdateDialogForBookmarkFolder()
 
 	SetWindowPos(m_hDlg, nullptr, 0, 0, GetRectWidth(&dialogRect), GetRectHeight(&dialogRect),
 		SWP_NOMOVE | SWP_NOZORDER);
+}
+
+void AddBookmarkDialog::SetDialogTitle()
+{
+	auto existingBookmarkItem = BookmarkHelper::GetBookmarkItemById(m_bookmarkTree, m_bookmarkItem->GetGUID());
+	UINT stringId;
+
+	if (existingBookmarkItem)
+	{
+		if (m_bookmarkItem->IsBookmark())
+		{
+			stringId = IDS_ADD_BOOKMARK_TITLE_EDIT_BOOKMARK;
+		}
+		else
+		{
+			stringId = IDS_ADD_BOOKMARK_TITLE_EDIT_FOLDER;
+		}
+	}
+	else
+	{
+		if (m_bookmarkItem->IsBookmark())
+		{
+			stringId = IDS_ADD_BOOKMARK_TITLE_ADD_BOOKMARK;
+		}
+		else
+		{
+			stringId = IDS_ADD_BOOKMARK_TITLE_ADD_FOLDER;
+		}
+	}
+
+	std::wstring dialogTitle = ResourceHelper::LoadString(GetInstance(), stringId);
+	SetWindowText(m_hDlg, dialogTitle.c_str());
 }
 
 wil::unique_hicon AddBookmarkDialog::GetDialogIcon(int iconWidth, int iconHeight) const
