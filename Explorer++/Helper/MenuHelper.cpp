@@ -14,6 +14,6 @@ void lCheckMenuItem(HMENU hMenu, UINT ItemID, BOOL bCheck)
 
 void lEnableMenuItem(HMENU hMenu, UINT ItemID, BOOL bEnable)
 {
-	UINT state = bEnable ? MF_ENABLED : MF_GRAYED;
+	UINT state = bEnable ? MF_ENABLED : MF_DISABLED;
 	EnableMenuItem(hMenu, ItemID, state);
 }
