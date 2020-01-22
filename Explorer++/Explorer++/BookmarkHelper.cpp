@@ -139,9 +139,9 @@ void BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::T
 	
 	BookmarkItem *selectedParentFolder = nullptr;
 
-	AddBookmarkDialog AddBookmarkDialog(resoureceModule, parentWindow, coreInterface,
+	AddBookmarkDialog addBookmarkDialog(resoureceModule, parentWindow, coreInterface,
 		bookmarkTree, bookmarkItem.get(), &selectedParentFolder);
-	auto res = AddBookmarkDialog.ShowModalDialog();
+	auto res = addBookmarkDialog.ShowModalDialog();
 
 	if (res == BaseDialog::RETURN_OK)
 	{
