@@ -24,11 +24,11 @@ ManageBookmarksDialog::ManageBookmarksDialog(HINSTANCE hInstance, HWND hParent,
 	m_bNewFolderAdded(false),
 	m_bSaveHistory(true)
 {
-	m_pmbdps = &ManageBookmarksDialogPersistentSettings::GetInstance();
+	m_persistentSettings = &ManageBookmarksDialogPersistentSettings::GetInstance();
 
-	if(!m_pmbdps->m_bInitialized)
+	if(!m_persistentSettings->m_bInitialized)
 	{
-		m_pmbdps->m_bInitialized = true;
+		m_persistentSettings->m_bInitialized = true;
 	}
 }
 
@@ -47,6 +47,8 @@ INT_PTR ManageBookmarksDialog::OnInitDialog()
 	m_bookmarkListView->NavigateToBookmarkFolder(m_bookmarkTree->GetBookmarksToolbarFolder());
 
 	SetFocus(GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW));
+
+	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 
 	return 0;
 }
@@ -138,7 +140,7 @@ void ManageBookmarksDialog::SetupTreeView()
 	HWND hTreeView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW);
 
 	m_bookmarkTreeView = new BookmarkTreeView(hTreeView, GetInstance(), m_pexpp,
-		m_bookmarkTree, m_pmbdps->m_setExpansion);
+		m_bookmarkTree, m_persistentSettings->m_setExpansion);
 
 	m_connections.push_back(m_bookmarkTreeView->selectionChangedSignal.AddObserver(
 		std::bind(&ManageBookmarksDialog::OnTreeViewSelectionChanged, this, std::placeholders::_1)));
@@ -149,7 +151,7 @@ void ManageBookmarksDialog::SetupListView()
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
 
 	m_bookmarkListView = new BookmarkListView(hListView, GetInstance(), m_bookmarkTree,
-		m_pexpp, m_pmbdps->m_listViewColumns);
+		m_pexpp, m_persistentSettings->m_listViewColumns);
 
 	m_connections.push_back(m_bookmarkListView->navigationSignal.AddObserver(
 		std::bind(&ManageBookmarksDialog::OnListViewNavigation, this, std::placeholders::_1)));
@@ -492,7 +494,7 @@ INT_PTR ManageBookmarksDialog::OnClose()
 
 INT_PTR	ManageBookmarksDialog::OnDestroy()
 {
-	m_pmbdps->m_listViewColumns = m_bookmarkListView->GetColumns();
+	m_persistentSettings->m_listViewColumns = m_bookmarkListView->GetColumns();
 	return 0;
 }
 
@@ -505,9 +507,9 @@ INT_PTR ManageBookmarksDialog::OnNcDestroy()
 
 void ManageBookmarksDialog::SaveState()
 {
-	m_pmbdps->SaveDialogPosition(m_hDlg);
+	m_persistentSettings->SaveDialogPosition(m_hDlg);
 
-	m_pmbdps->m_bStateSaved = TRUE;
+	m_persistentSettings->m_bStateSaved = TRUE;
 }
 
 ManageBookmarksDialogPersistentSettings::ManageBookmarksDialogPersistentSettings() :

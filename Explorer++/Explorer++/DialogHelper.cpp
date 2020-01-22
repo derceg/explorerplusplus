@@ -11,6 +11,7 @@
 #include "DestroyFilesDialog.h"
 #include "DisplayColoursDialog.h"
 #include "FilterDialog.h"
+#include "ManageBookmarksDialog.h"
 #include "MassRenameDialog.h"
 #include "MergeFilesDialog.h"
 #include "RenameTabDialog.h"
@@ -48,6 +49,7 @@ namespace
 		&SelectColumnsDialogPersistentSettings::GetInstance(),
 		&SetDefaultColumnsDialogPersistentSettings::GetInstance(),
 		&AddBookmarkDialogPersistentSettings::GetInstance(),
+		&ManageBookmarksDialogPersistentSettings::GetInstance(),
 		&DisplayColoursDialogPersistentSettings::GetInstance(),
 		&UpdateCheckDialogPersistentSettings::GetInstance()
 	};

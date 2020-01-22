@@ -127,5 +127,5 @@ private:
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
-	ManageBookmarksDialogPersistentSettings *m_pmbdps;
+	ManageBookmarksDialogPersistentSettings *m_persistentSettings;
 };
