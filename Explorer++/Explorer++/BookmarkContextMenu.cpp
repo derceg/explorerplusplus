@@ -67,7 +67,14 @@ BOOL BookmarkContextMenu::ShowMenu(HWND parentWindow, BookmarkItem *parentFolder
 		// should be closed when an item from this menu has been selected.
 		EndMenu();
 
-		OnMenuItemSelected(menuItemId, parentFolder, bookmarkItems, parentWindow);
+		BookmarkItem *targetParentFolder = parentFolder;
+
+		if (bookmarkItems.size() == 1 && bookmarkItems[0]->IsFolder())
+		{
+			targetParentFolder = bookmarkItems[0];
+		}
+
+		OnMenuItemSelected(menuItemId, targetParentFolder, bookmarkItems, parentWindow);
 	}
 
 	return TRUE;
@@ -163,11 +170,11 @@ void BookmarkContextMenu::OnMenuItemSelected(int menuItemId, BookmarkItem *paren
 		break;
 
 	case IDM_BOOKMARKS_NEW_BOOKMARK:
-		OnNewBookmarkItem(BookmarkItem::Type::Bookmark, parentWindow);
+		OnNewBookmarkItem(BookmarkItem::Type::Bookmark, parentFolder, parentWindow);
 		break;
 
 	case IDM_BOOKMARKS_NEW_FOLDER:
-		OnNewBookmarkItem(BookmarkItem::Type::Folder, parentWindow);
+		OnNewBookmarkItem(BookmarkItem::Type::Folder, parentFolder, parentWindow);
 		break;
 
 	case IDM_BOOKMARKS_CUT:
@@ -205,9 +212,10 @@ void BookmarkContextMenu::OnOpenAll(const RawBookmarkItems &bookmarkItems)
 	}
 }
 
-void BookmarkContextMenu::OnNewBookmarkItem(BookmarkItem::Type type, HWND parentWindow)
+void BookmarkContextMenu::OnNewBookmarkItem(BookmarkItem::Type type, BookmarkItem *parentFolder,
+	HWND parentWindow)
 {
-	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, m_resourceModule, parentWindow,
+	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, parentFolder, m_resourceModule, parentWindow,
 		m_expp->GetTabContainer(), m_expp);
 }
 

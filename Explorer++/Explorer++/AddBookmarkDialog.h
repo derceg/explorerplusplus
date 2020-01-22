@@ -44,7 +44,7 @@ class AddBookmarkDialog : public BaseDialog
 public:
 
 	AddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
-		BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
+		BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem, BookmarkItem *defaultParentSelection,
 		BookmarkItem **selectedParentFolder);
 
 protected:

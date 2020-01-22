@@ -54,9 +54,6 @@ public:
 		Navigation *navigation, BookmarkTree *bookmarkTree);
 	~ManageBookmarksDialog();
 
-	// TODO: Update.
-	//void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
-
 protected:
 
 	INT_PTR	OnInitDialog();

@@ -82,6 +82,9 @@ private:
 
 	void OnDblClk(const NMITEMACTIVATE *itemActivate);
 	void OnRClick(const NMITEMACTIVATE *itemActivate);
+	void ShowBackgroundContextMenu(const POINT &ptScreen);
+	void OnMenuItemSelected(int menuItemId);
+	void OnNewFolder();
 	void OnGetDispInfo(NMLVDISPINFO *dispInfo);
 	BOOL OnBeginLabelEdit(const NMLVDISPINFO *dispInfo);
 	BOOL OnEndLabelEdit(const NMLVDISPINFO *dispInfo);

@@ -14,7 +14,8 @@
 const TCHAR AddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmark");
 
 AddBookmarkDialog::AddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
-	BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem, BookmarkItem **selectedParentFolder) :
+	BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem, BookmarkItem *defaultParentSelection,
+	BookmarkItem **selectedParentFolder) :
 	BaseDialog(hInstance, IDD_ADD_BOOKMARK, hParent, true),
 	m_expp(expp),
 	m_bookmarkTree(bookmarkTree),
@@ -41,6 +42,10 @@ AddBookmarkDialog::AddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplore
 	if (parent)
 	{
 		m_pabdps->m_guidSelected = parent->GetGUID();
+	}
+	else if (defaultParentSelection)
+	{
+		m_pabdps->m_guidSelected = defaultParentSelection->GetGUID();
 	}
 }
 

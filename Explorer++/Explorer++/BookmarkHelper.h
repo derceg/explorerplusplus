@@ -27,8 +27,9 @@ namespace BookmarkHelper
 
 	int CALLBACK Sort(SortMode sortMode, const BookmarkItem *firstItem, const BookmarkItem *secondItem);
 
-	void AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type, HMODULE resoureceModule,
-		HWND parentWindow, TabContainer *tabContainer, IExplorerplusplus *coreInterface);
+	void AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
+		BookmarkItem *defaultParentSelection, HMODULE resoureceModule, HWND parentWindow,
+		TabContainer *tabContainer, IExplorerplusplus *coreInterface);
 	void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree, HMODULE resoureceModule,
 		HWND parentWindow, IExplorerplusplus *coreInterface);
 	void OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem, IExplorerplusplus *expp);

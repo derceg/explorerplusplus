@@ -1256,7 +1256,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 	case ToolbarButton::AddBookmark:
 	case IDM_BOOKMARKS_BOOKMARKTHISTAB:
 		BookmarkHelper::AddBookmarkItem(&m_bookmarkTree, BookmarkItem::Type::Bookmark,
-			m_hLanguageModule, hwnd, m_tabContainer, this);
+			nullptr, m_hLanguageModule, hwnd, m_tabContainer, this);
 		break;
 
 	case ToolbarButton::Bookmarks:

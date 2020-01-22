@@ -118,8 +118,8 @@ int CALLBACK SortByDateModified(const BookmarkItem *firstItem,
 }
 
 void BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
-	HMODULE resoureceModule, HWND parentWindow, TabContainer *tabContainer,
-	IExplorerplusplus *coreInterface)
+	BookmarkItem *defaultParentSelection, HMODULE resoureceModule, HWND parentWindow,
+	TabContainer *tabContainer, IExplorerplusplus *coreInterface)
 {
 	std::unique_ptr<BookmarkItem> bookmarkItem;
 
@@ -140,7 +140,7 @@ void BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::T
 	BookmarkItem *selectedParentFolder = nullptr;
 
 	AddBookmarkDialog addBookmarkDialog(resoureceModule, parentWindow, coreInterface,
-		bookmarkTree, bookmarkItem.get(), &selectedParentFolder);
+		bookmarkTree, bookmarkItem.get(), defaultParentSelection, &selectedParentFolder);
 	auto res = addBookmarkDialog.ShowModalDialog();
 
 	if (res == BaseDialog::RETURN_OK)
@@ -156,7 +156,7 @@ void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *
 {
 	BookmarkItem *selectedParentFolder = nullptr;
 	AddBookmarkDialog AddBookmarkDialog(resoureceModule, parentWindow, coreInterface,
-		bookmarkTree, bookmarkItem, &selectedParentFolder);
+		bookmarkTree, bookmarkItem, nullptr, &selectedParentFolder);
 	auto res = AddBookmarkDialog.ShowModalDialog();
 
 	if (res == BaseDialog::RETURN_OK)

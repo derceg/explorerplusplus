@@ -454,28 +454,6 @@ void ManageBookmarksDialog::UpdateToolbarState()
 	SendMessage(m_hToolbar,TB_ENABLEBUTTON,TOOLBAR_ID_FORWARD,m_stackForward.size() != 0);
 }
 
-// TODO: Update.
-//void CManageBookmarksDialog::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,
-//	const CBookmarkFolder &BookmarkFolder,std::size_t Position)
-//{
-//	if(ParentBookmarkFolder.GetGUID() == m_guidCurrentFolder)
-//	{
-//		int iItem = m_pBookmarkListView->InsertBookmarkFolderIntoListView(BookmarkFolder,static_cast<int>(Position));
-//
-//		if(BookmarkFolder.GetGUID() == m_guidNewFolder)
-//		{
-//			HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
-//
-//			SetFocus(hListView);
-//			NListView::ListView_SelectAllItems(hListView,FALSE);
-//			NListView::ListView_SelectItem(hListView,iItem,TRUE);
-//			ListView_EditLabel(hListView,iItem);
-//
-//			m_bNewFolderAdded = false;
-//		}
-//	}
-//}
-
 void ManageBookmarksDialog::OnOk()
 {
 	DestroyWindow(m_hDlg);

@@ -354,11 +354,71 @@ void BookmarkListView::OnRClick(const NMITEMACTIVATE *itemActivate)
 	POINT ptScreen = itemActivate->ptAction;
 	ClientToScreen(m_hListView, &ptScreen);
 
-	if (!rawBookmarkItems.empty())
+	if (rawBookmarkItems.empty())
+	{
+		ShowBackgroundContextMenu(ptScreen);
+	}
+	else
 	{
 		m_bookmarkContextMenu.ShowMenu(m_hListView, m_currentBookmarkFolder,
 			rawBookmarkItems, ptScreen);
 	}
+}
+
+void BookmarkListView::ShowBackgroundContextMenu(const POINT &ptScreen)
+{
+	wil::unique_hmenu parentMenu(LoadMenu(m_resourceModule, MAKEINTRESOURCE(IDR_BOOKMARK_LISTVIEW_CONTEXT_MENU)));
+
+	if (!parentMenu)
+	{
+		return;
+	}
+
+	HMENU menu = GetSubMenu(parentMenu.get(), 0);
+
+	int menuItemId = TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RETURNCMD, ptScreen.x,
+		ptScreen.y, 0, m_hListView, nullptr);
+
+	if (menuItemId != 0)
+	{
+		OnMenuItemSelected(menuItemId);
+	}
+}
+
+void BookmarkListView::OnMenuItemSelected(int menuItemId)
+{
+	switch (menuItemId)
+	{
+	case IDM_BOOKMARKS_NEW_BOOKMARK:
+		BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
+			m_currentBookmarkFolder, m_resourceModule, m_hListView, m_expp->GetTabContainer(),
+			m_expp);
+		break;
+
+	case IDM_BOOKMARKS_NEW_FOLDER:
+		OnNewFolder();
+		break;
+
+	default:
+		assert(false);
+		break;
+	}
+}
+
+void BookmarkListView::OnNewFolder()
+{
+	auto bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt,
+		ResourceHelper::LoadString(m_resourceModule, IDS_BOOKMARKS_NEWBOOKMARKFOLDER), std::nullopt);
+	auto rawBookmarkItem = bookmarkItem.get();
+
+	m_bookmarkTree->AddBookmarkItem(m_currentBookmarkFolder, std::move(bookmarkItem),
+		m_currentBookmarkFolder->GetChildren().size());
+
+	auto index = GetBookmarkItemIndex(rawBookmarkItem);
+	assert(index);
+
+	SetFocus(m_hListView);
+	ListView_EditLabel(m_hListView, *index);
 }
 
 void BookmarkListView::OnGetDispInfo(NMLVDISPINFO *dispInfo)

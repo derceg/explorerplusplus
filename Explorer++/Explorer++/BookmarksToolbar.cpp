@@ -404,8 +404,8 @@ void BookmarksToolbar::OnBookmarkMenuItemClicked(const BookmarkItem *bookmarkIte
 
 void BookmarksToolbar::OnNewBookmarkItem(BookmarkItem::Type type)
 {
-	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, m_instance, m_hToolbar,
-		m_pexpp->GetTabContainer(), m_pexpp);
+	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, m_bookmarkTree->GetBookmarksToolbarFolder(),
+		m_instance, m_hToolbar, m_pexpp->GetTabContainer(), m_pexpp);
 }
 
 void BookmarksToolbar::OnPaste()
