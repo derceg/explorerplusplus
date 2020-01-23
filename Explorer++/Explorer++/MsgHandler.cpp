@@ -1465,6 +1465,11 @@ TabContainer *Explorerplusplus::GetTabContainer() const
 	return m_tabContainer;
 }
 
+TabRestorer *Explorerplusplus::GetTabRestorer() const
+{
+	return m_tabRestorer.get();
+}
+
 HWND Explorerplusplus::GetTreeView() const
 {
 	return m_hTreeView;

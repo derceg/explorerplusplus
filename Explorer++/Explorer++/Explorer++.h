@@ -469,6 +469,7 @@ private:
 	HWND					GetActiveListView() const;
 	ShellBrowser			*GetActiveShellBrowser() const;
 	TabContainer			*GetTabContainer() const;
+	TabRestorer				*GetTabRestorer() const;
 	HWND					GetTreeView() const;
 	IDirectoryMonitor		*GetDirectoryMonitor() const;
 	IconResourceLoader		*GetIconResourceLoader() const;

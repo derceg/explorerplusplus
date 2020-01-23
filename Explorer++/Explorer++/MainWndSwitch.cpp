@@ -229,12 +229,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 			}
 			else
 			{
-				HRESULT hr = m_tabContainer->CreateNewTab(m_config->defaultTabDirectory.c_str(), TabSettings(_selected = true));
-
-				if (FAILED(hr))
-				{
-					m_tabContainer->CreateNewTab(m_config->defaultTabDirectoryStatic.c_str(), TabSettings(_selected = true));
-				}
+				m_tabContainer->CreateNewTabInDefaultDirectory(TabSettings(_selected = true));
 			}
 
 			return TRUE;

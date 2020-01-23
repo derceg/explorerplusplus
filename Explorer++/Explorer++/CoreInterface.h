@@ -24,6 +24,7 @@ struct Config;
 class ShellBrowser;
 __interface IDirectoryMonitor;
 class TabContainer;
+class TabRestorer;
 
 /* Basic interface between Explorerplusplus
 and some of the other components (such as the
@@ -39,6 +40,7 @@ __interface IExplorerplusplus
 	ShellBrowser	*GetActiveShellBrowser() const;
 
 	TabContainer	*GetTabContainer() const;
+	TabRestorer		*GetTabRestorer() const;
 	IDirectoryMonitor	*GetDirectoryMonitor() const;
 
 	IconResourceLoader	*GetIconResourceLoader() const;

@@ -19,6 +19,7 @@
 #include <functional>
 #include <unordered_map>
 
+class BookmarkTree;
 class CachedIcons;
 struct Config;
 class Navigation;
@@ -72,8 +73,9 @@ public:
 
 	static TabContainer *Create(HWND parent, TabNavigationInterface *tabNavigation,
 		Navigation *navigation, IExplorerplusplus *expp, CachedIcons *cachedIcons,
-		HINSTANCE instance, std::shared_ptr<Config> config);
+		BookmarkTree *bookmarkTree, HINSTANCE instance, std::shared_ptr<Config> config);
 
+	HRESULT CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
 	HRESULT CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {},
 		const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none,
 		int *newTabId = nullptr);
@@ -124,8 +126,8 @@ private:
 	static const int ICON_SIZE_96DPI = 16;
 
 	TabContainer(HWND parent, TabNavigationInterface *tabNavigation, Navigation *navigation,
-		IExplorerplusplus *expp, CachedIcons *cachedIcons, HINSTANCE instance,
-		std::shared_ptr<Config> config);
+		IExplorerplusplus *expp, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
+		HINSTANCE instance, std::shared_ptr<Config> config);
 	~TabContainer();
 
 	static HWND CreateTabControl(HWND parent, BOOL forceSameTabWidth);
@@ -164,6 +166,8 @@ private:
 	void OnCloseOtherTabs(int index);
 	void OnCloseTabsToRight(int index);
 
+	void ShowBackgroundContextMenu(const POINT &ptClient);
+	void OnBackgroundMenuItemSelected(int menuItemId);
 	void OnGetDispInfo(NMTTDISPINFO *dispInfo);
 
 	void OnTabCreated(int tabId, BOOL switchToNewTab);
@@ -218,4 +222,6 @@ private:
 	int m_draggedTabStartIndex;
 	int m_draggedTabEndIndex;
 	RECT m_rcDraggedTab;
+
+	BookmarkTree *m_bookmarkTree;
 };

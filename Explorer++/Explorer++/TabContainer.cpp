@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "TabContainer.h"
+#include "BookmarkHelper.h"
 #include "Config.h"
 #include "Explorer++_internal.h"
 #include "Icon.h"
@@ -15,6 +16,7 @@
 #include "ResourceHelper.h"
 #include "TabBacking.h"
 #include "TabDropHandler.h"
+#include "TabRestorer.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/Controls.h"
 #include "../Helper/IconFetcher.h"
@@ -38,20 +40,21 @@ const std::map<UINT, Icon> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
 
 TabContainer *TabContainer::Create(HWND parent, TabNavigationInterface *tabNavigation,
 	Navigation *navigation, IExplorerplusplus *expp, CachedIcons *cachedIcons,
-	HINSTANCE instance, std::shared_ptr<Config> config)
+	BookmarkTree *bookmarkTree, HINSTANCE instance, std::shared_ptr<Config> config)
 {
 	return new TabContainer(parent, tabNavigation, navigation, expp,
-		cachedIcons, instance, config);
+		cachedIcons, bookmarkTree, instance, config);
 }
 
 TabContainer::TabContainer(HWND parent, TabNavigationInterface *tabNavigation,
 	Navigation *navigation, IExplorerplusplus *expp, CachedIcons *cachedIcons,
-	HINSTANCE instance, std::shared_ptr<Config> config) :
+	BookmarkTree *bookmarkTree, HINSTANCE instance, std::shared_ptr<Config> config) :
 	BaseWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
 	m_tabNavigation(tabNavigation),
 	m_navigation(navigation),
 	m_expp(expp),
 	m_cachedIcons(cachedIcons),
+	m_bookmarkTree(bookmarkTree),
 	m_instance(instance),
 	m_config(config),
 	m_bTabBeenDragged(FALSE),
@@ -546,15 +549,16 @@ LRESULT CALLBACK TabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam
 	switch (uMsg)
 	{
 	case WM_LBUTTONDBLCLK:
-	{
-		HRESULT hr = CreateNewTab(m_config->defaultTabDirectory.c_str(), TabSettings(_selected = true));
+		CreateNewTabInDefaultDirectory(TabSettings(_selected = true));
+		break;
 
-		if (FAILED(hr))
-		{
-			CreateNewTab(m_config->defaultTabDirectoryStatic.c_str(), TabSettings(_selected = true));
-		}
+	case WM_RBUTTONUP:
+	{
+		POINT ptClient;
+		POINTSTOPOINT(ptClient, MAKEPOINTS(lParam));
+		ShowBackgroundContextMenu(ptClient);
 	}
-	break;
+		break;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
@@ -580,6 +584,56 @@ LRESULT CALLBACK TabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
+}
+
+void TabContainer::ShowBackgroundContextMenu(const POINT &ptClient)
+{
+	wil::unique_hmenu parentMenu(LoadMenu(m_instance, MAKEINTRESOURCE(IDR_TAB_CONTAINER_CONTEXT_MENU)));
+
+	if (!parentMenu)
+	{
+		return;
+	}
+
+	HMENU menu = GetSubMenu(parentMenu.get(), 0);
+
+	if (m_expp->GetTabRestorer()->GetClosedTabs().empty())
+	{
+		lEnableMenuItem(menu, IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB, FALSE);
+	}
+
+	POINT ptScreen = ptClient;
+	ClientToScreen(m_hwnd, &ptScreen);
+
+	int menuItemId = TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RETURNCMD, ptScreen.x,
+		ptScreen.y, 0, m_hwnd, nullptr);
+
+	if (menuItemId != 0)
+	{
+		OnBackgroundMenuItemSelected(menuItemId);
+	}
+}
+
+void TabContainer::OnBackgroundMenuItemSelected(int menuItemId)
+{
+	switch (menuItemId)
+	{
+	case IDM_TAB_CONTAINER_NEW_TAB:
+		CreateNewTabInDefaultDirectory(TabSettings(_selected = true));
+		break;
+
+	case IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB:
+		m_expp->GetTabRestorer()->RestoreLastTab();
+		break;
+
+	case IDM_TAB_CONTAINER_BOOKMARK_ALL_TABS:
+		BookmarkHelper::BookmarkAllTabs(m_bookmarkTree, m_instance, m_hwnd, m_expp);
+		break;
+
+	default:
+		assert(false);
+		break;
+	}
 }
 
 void TabContainer::OnGetDispInfo(NMTTDISPINFO *dispInfo)
@@ -797,6 +851,18 @@ void TabContainer::SetTabIconFromImageList(const Tab &tab, int imageIndex)
 	{
 		TabCtrl_RemoveImage(m_hwnd, previousImageIndex);
 	}
+}
+
+HRESULT TabContainer::CreateNewTabInDefaultDirectory(const TabSettings &tabSettings)
+{
+	HRESULT hr = CreateNewTab(m_config->defaultTabDirectory.c_str(), tabSettings);
+
+	if (FAILED(hr))
+	{
+		hr = CreateNewTab(m_config->defaultTabDirectoryStatic.c_str(), tabSettings);
+	}
+
+	return hr;
 }
 
 HRESULT TabContainer::CreateNewTab(const TCHAR *TabDirectory,
