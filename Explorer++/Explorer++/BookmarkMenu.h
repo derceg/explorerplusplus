@@ -34,11 +34,12 @@ private:
 
 	static const UINT_PTR SUBCLASS_ID = 0;
 
-	static LRESULT CALLBACK ParentWindowSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	static LRESULT CALLBACK ParentWindowSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam,
+		LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	void OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt);
-	void OnMenuItemSelected(int menuItemId, BookmarkMenuBuilder::ItemMap &menuItemMappings,
+	void OnMenuItemSelected(int menuItemId, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings,
 		MenuCallback callback);
 
 	HWND m_parentWindow;
@@ -47,7 +48,7 @@ private:
 	BookmarkContextMenu m_bookmarkContextMenu;
 
 	bool m_showingMenu;
-	BookmarkMenuBuilder::ItemMap *m_menuItemMappings;
+	BookmarkMenuBuilder::ItemPositionMap *m_menuItemPositionMappings;
 
 	std::vector<WindowSubclassWrapper> m_windowSubclasses;
 };

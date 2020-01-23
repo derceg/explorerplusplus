@@ -15,23 +15,23 @@ BookmarkMenuBuilder::BookmarkMenuBuilder(HMODULE resourceModule) :
 }
 
 BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, BookmarkItem *bookmarkItem,
-	const MenuIdRange &menuIdRange, int startPosition, ItemMap &itemMap)
+	const MenuIdRange &menuIdRange, int startPosition, ItemIdMap &itemIdMap,
+	ItemPositionMap *itemPositionMap)
 {
 	assert(bookmarkItem->IsFolder());
 
 	m_menuIdRange = menuIdRange;
 	m_idCounter = menuIdRange.startId;
-	itemMap.clear();
 
-	return BuildMenu(menu, bookmarkItem, startPosition, itemMap);
+	return BuildMenu(menu, bookmarkItem, startPosition, itemIdMap, itemPositionMap);
 }
 
 BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, BookmarkItem *bookmarkItem,
-	int startPosition, ItemMap &itemMap)
+	int startPosition, ItemIdMap &itemIdMap, ItemPositionMap *itemPositionMap)
 {
 	if (bookmarkItem->GetChildren().empty())
 	{
-		return AddEmptyBookmarkFolderToMenu(menu, startPosition);
+		return AddEmptyBookmarkFolderToMenu(menu, bookmarkItem, startPosition, itemPositionMap);
 	}
 
 	int position = startPosition;
@@ -42,11 +42,11 @@ BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, BookmarkItem *bookmarkItem,
 
 		if (childItem->IsFolder())
 		{
-			res = AddBookmarkFolderToMenu(menu, childItem.get(), position, itemMap);
+			res = AddBookmarkFolderToMenu(menu, childItem.get(), position, itemIdMap, itemPositionMap);
 		}
 		else
 		{
-			res = AddBookmarkToMenu(menu, childItem.get(), position, itemMap);
+			res = AddBookmarkToMenu(menu, childItem.get(), position, itemIdMap, itemPositionMap);
 		}
 
 		if (!res)
@@ -60,7 +60,8 @@ BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, BookmarkItem *bookmarkItem,
 	return TRUE;
 }
 
-BOOL BookmarkMenuBuilder::AddEmptyBookmarkFolderToMenu(HMENU menu, int position)
+BOOL BookmarkMenuBuilder::AddEmptyBookmarkFolderToMenu(HMENU menu, BookmarkItem *bookmarkItem,
+	int position, ItemPositionMap *itemPositionMap)
 {
 	std::wstring bookmarkFolderEmpty = ResourceHelper::LoadString(m_resourceModule, IDS_BOOKMARK_FOLDER_EMPTY);
 	std::wstring menuText = (boost::wformat(L"(%s)") % bookmarkFolderEmpty).str();
@@ -70,11 +71,29 @@ BOOL BookmarkMenuBuilder::AddEmptyBookmarkFolderToMenu(HMENU menu, int position)
 	mii.fMask = MIIM_STRING | MIIM_STATE;
 	mii.fState = MFS_DISABLED;
 	mii.dwTypeData = menuText.data();
-	return InsertMenuItem(menu, position, TRUE, &mii);
+	BOOL res = InsertMenuItem(menu, position, TRUE, &mii);
+
+	if (!res)
+	{
+		return FALSE;
+	}
+
+	if (itemPositionMap)
+	{
+		// If you right-click the empty item shown in a bookmark drop-down in
+		// Chrome/Firefox, the parent item will be used as the target of any
+		// context menu operations (e.g. selecting "Copy" will copy the parent
+		// folder).
+		// To enable similar behavior here, the empty item is mapped to the
+		// parent.
+		itemPositionMap->insert({ { menu, position }, bookmarkItem });
+	}
+
+	return res;
 }
 
 BOOL BookmarkMenuBuilder::AddBookmarkFolderToMenu(HMENU menu, BookmarkItem *bookmarkItem,
-	int position, ItemMap &itemMap)
+	int position, ItemIdMap &itemIdMap, ItemPositionMap *itemPositionMap)
 {
 	HMENU subMenu = CreatePopupMenu();
 
@@ -97,11 +116,16 @@ BOOL BookmarkMenuBuilder::AddBookmarkFolderToMenu(HMENU menu, BookmarkItem *book
 		return FALSE;
 	}
 
-	return BuildMenu(subMenu, bookmarkItem, 0, itemMap);
+	if (itemPositionMap)
+	{
+		itemPositionMap->insert({ { menu, position }, bookmarkItem });
+	}
+
+	return BuildMenu(subMenu, bookmarkItem, 0, itemIdMap, itemPositionMap);
 }
 
 BOOL BookmarkMenuBuilder::AddBookmarkToMenu(HMENU menu, BookmarkItem *bookmarkItem,
-	int position, ItemMap &itemMap)
+	int position, ItemIdMap &itemIdMap, ItemPositionMap *itemPositionMap)
 {
 	int id = m_idCounter++;
 
@@ -124,7 +148,12 @@ BOOL BookmarkMenuBuilder::AddBookmarkToMenu(HMENU menu, BookmarkItem *bookmarkIt
 		return FALSE;
 	}
 
-	itemMap.insert({ id, bookmarkItem });
+	itemIdMap.insert({ id, bookmarkItem });
+
+	if (itemPositionMap)
+	{
+		itemPositionMap->insert({ { menu, position }, bookmarkItem });
+	}
 
 	return res;
 }

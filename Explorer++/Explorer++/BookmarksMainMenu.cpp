@@ -31,8 +31,8 @@ BookmarksMainMenu::~BookmarksMainMenu()
 void BookmarksMainMenu::OnMainMenuPreShow(HMENU mainMenu)
 {
 	std::vector<wil::unique_hbitmap> menuImages;
-	BookmarkMenuBuilder::ItemMap menuItemMappings;
-	auto bookmarksMenu = BuildMainBookmarksMenu(menuImages, menuItemMappings);
+	BookmarkMenuBuilder::ItemIdMap menuItemIdMappings;
+	auto bookmarksMenu = BuildMainBookmarksMenu(menuImages, menuItemIdMappings);
 
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
@@ -42,11 +42,11 @@ void BookmarksMainMenu::OnMainMenuPreShow(HMENU mainMenu)
 
 	m_bookmarksMenu = std::move(bookmarksMenu);
 	m_menuImages = std::move(menuImages);
-	m_menuItemMappings = menuItemMappings;
+	m_menuItemIdMappings = menuItemIdMappings;
 }
 
 wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(std::vector<wil::unique_hbitmap> &menuImages,
-	BookmarkMenuBuilder::ItemMap &menuItemMappings)
+	BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings)
 {
 	wil::unique_hmenu menu(CreatePopupMenu());
 
@@ -76,13 +76,13 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(std::vector<wil::uni
 	ResourceHelper::SetMenuItemImage(menu.get(), IDM_BOOKMARKS_MANAGEBOOKMARKS,
 		m_expp->GetIconResourceLoader(), Icon::Bookmarks, dpi, menuImages);
 
-	AddBookmarkItemsToMenu(menu.get(), GetMenuItemCount(menu.get()), menuItemMappings);
-	AddOtherBookmarksToMenu(menu.get(), GetMenuItemCount(menu.get()), menuItemMappings);
+	AddBookmarkItemsToMenu(menu.get(), GetMenuItemCount(menu.get()), menuItemIdMappings);
+	AddOtherBookmarksToMenu(menu.get(), GetMenuItemCount(menu.get()), menuItemIdMappings);
 
 	return menu;
 }
 
-void BookmarksMainMenu::AddBookmarkItemsToMenu(HMENU menu, int position, BookmarkMenuBuilder::ItemMap &menuItemMappings)
+void BookmarksMainMenu::AddBookmarkItemsToMenu(HMENU menu, int position, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings)
 {
 	BookmarkItem *bookmarksMenuFolder = m_bookmarkTree->GetBookmarksMenuFolder();
 
@@ -98,10 +98,10 @@ void BookmarksMainMenu::AddBookmarkItemsToMenu(HMENU menu, int position, Bookmar
 	InsertMenuItem(menu, position++, TRUE, &mii);
 
 	m_menuBuilder.BuildMenu(menu, bookmarksMenuFolder, m_menuIdRange,
-		position, menuItemMappings);
+		position, menuItemIdMappings);
 }
 
-void BookmarksMainMenu::AddOtherBookmarksToMenu(HMENU menu, int position, BookmarkMenuBuilder::ItemMap &menuItemMappings)
+void BookmarksMainMenu::AddOtherBookmarksToMenu(HMENU menu, int position, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings)
 {
 	BookmarkItem *otherBookmarksFolder = m_bookmarkTree->GetOtherBookmarksFolder();
 
@@ -119,7 +119,7 @@ void BookmarksMainMenu::AddOtherBookmarksToMenu(HMENU menu, int position, Bookma
 	// Note that as DestroyMenu is recursive, this menu will be destroyed when
 	// its parent menu is.
 	HMENU subMenu = CreatePopupMenu();
-	m_menuBuilder.BuildMenu(subMenu, otherBookmarksFolder, m_menuIdRange, 0, menuItemMappings);
+	m_menuBuilder.BuildMenu(subMenu, otherBookmarksFolder, m_menuIdRange, 0, menuItemIdMappings);
 
 	std::wstring otherBookmarksName = otherBookmarksFolder->GetName();
 
@@ -133,9 +133,9 @@ void BookmarksMainMenu::AddOtherBookmarksToMenu(HMENU menu, int position, Bookma
 
 void BookmarksMainMenu::OnMenuItemClicked(int menuItemId)
 {
-	auto itr = m_menuItemMappings.find(menuItemId);
+	auto itr = m_menuItemIdMappings.find(menuItemId);
 
-	if (itr == m_menuItemMappings.end())
+	if (itr == m_menuItemIdMappings.end())
 	{
 		return;
 	}
