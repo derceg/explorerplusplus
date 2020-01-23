@@ -50,6 +50,8 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(std::vector<wil::uni
 {
 	wil::unique_hmenu menu(CreatePopupMenu());
 
+	UINT dpi = m_dpiCompat.GetDpiForWindow(m_expp->GetMainWindow());
+
 	std::wstring bookmarkThisTabText = ResourceHelper::LoadString(m_expp->GetLanguageModule(), IDS_MENU_BOOKMARK_THIS_TAB);
 
 	MENUITEMINFO mii;
@@ -59,10 +61,17 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(std::vector<wil::uni
 	mii.dwTypeData = bookmarkThisTabText.data();
 	InsertMenuItem(menu.get(), 0, TRUE, &mii);
 
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_expp->GetMainWindow());
-
 	ResourceHelper::SetMenuItemImage(menu.get(), IDM_BOOKMARKS_BOOKMARKTHISTAB,
 		m_expp->GetIconResourceLoader(), Icon::AddBookmark, dpi, menuImages);
+
+	std::wstring bookmarkAllTabsText = ResourceHelper::LoadString(m_expp->GetLanguageModule(), IDS_MENU_BOOKMARK_ALL_TABS);
+
+	ZeroMemory(&mii, sizeof(mii));
+	mii.cbSize = sizeof(mii);
+	mii.fMask = MIIM_ID | MIIM_STRING;
+	mii.wID = IDM_BOOKMARKS_BOOKMARK_ALL_TABS;
+	mii.dwTypeData = bookmarkAllTabsText.data();
+	InsertMenuItem(menu.get(), 1, TRUE, &mii);
 
 	std::wstring manageBookmarksText = ResourceHelper::LoadString(m_expp->GetLanguageModule() , IDS_MENU_MANAGE_BOOKMARKS);
 
@@ -71,7 +80,7 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(std::vector<wil::uni
 	mii.fMask = MIIM_ID | MIIM_STRING;
 	mii.wID = IDM_BOOKMARKS_MANAGEBOOKMARKS;
 	mii.dwTypeData = manageBookmarksText.data();
-	InsertMenuItem(menu.get(), 1, TRUE, &mii);
+	InsertMenuItem(menu.get(), 2, TRUE, &mii);
 
 	ResourceHelper::SetMenuItemImage(menu.get(), IDM_BOOKMARKS_MANAGEBOOKMARKS,
 		m_expp->GetIconResourceLoader(), Icon::Bookmarks, dpi, menuImages);

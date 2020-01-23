@@ -15,12 +15,13 @@ const TCHAR AddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmar
 
 AddBookmarkDialog::AddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
 	BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem, BookmarkItem *defaultParentSelection,
-	BookmarkItem **selectedParentFolder) :
+	BookmarkItem **selectedParentFolder, std::optional<std::wstring> customDialogTitle) :
 	BaseDialog(hInstance, IDD_ADD_BOOKMARK, hParent, true),
 	m_expp(expp),
 	m_bookmarkTree(bookmarkTree),
 	m_bookmarkItem(bookmarkItem),
 	m_selectedParentFolder(selectedParentFolder),
+	m_customDialogTitle(customDialogTitle),
 	m_ErrorBrush(CreateSolidBrush(ERROR_BACKGROUND_COLOR))
 {
 	m_persistentSettings = &AddBookmarkDialogPersistentSettings::GetInstance();
@@ -131,6 +132,17 @@ void AddBookmarkDialog::UpdateDialogForBookmarkFolder()
 
 void AddBookmarkDialog::SetDialogTitle()
 {
+	std::wstring dialogTitle = LoadDialogTitle();
+	SetWindowText(m_hDlg, dialogTitle.c_str());
+}
+
+std::wstring AddBookmarkDialog::LoadDialogTitle()
+{
+	if (m_customDialogTitle)
+	{
+		return *m_customDialogTitle;
+	}
+
 	auto existingBookmarkItem = BookmarkHelper::GetBookmarkItemById(m_bookmarkTree, m_bookmarkItem->GetGUID());
 	UINT stringId;
 
@@ -157,8 +169,7 @@ void AddBookmarkDialog::SetDialogTitle()
 		}
 	}
 
-	std::wstring dialogTitle = ResourceHelper::LoadString(GetInstance(), stringId);
-	SetWindowText(m_hDlg, dialogTitle.c_str());
+	return ResourceHelper::LoadString(GetInstance(), stringId);
 }
 
 wil::unique_hicon AddBookmarkDialog::GetDialogIcon(int iconWidth, int iconHeight) const

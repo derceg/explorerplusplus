@@ -1259,6 +1259,10 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 			nullptr, m_hLanguageModule, hwnd, m_tabContainer, this);
 		break;
 
+	case IDM_BOOKMARKS_BOOKMARK_ALL_TABS:
+		BookmarkHelper::BookmarkAllTabs(&m_bookmarkTree, m_hLanguageModule, hwnd, this);
+		break;
+
 	case ToolbarButton::Bookmarks:
 	case IDM_BOOKMARKS_MANAGEBOOKMARKS:
 		if (g_hwndManageBookmarks == NULL)

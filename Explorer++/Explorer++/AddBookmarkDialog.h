@@ -13,6 +13,7 @@
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
 #include <wil/resource.h>
+#include <optional>
 #include <unordered_set>
 
 class AddBookmarkDialog;
@@ -45,7 +46,7 @@ public:
 
 	AddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
 		BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem, BookmarkItem *defaultParentSelection,
-		BookmarkItem **selectedParentFolder);
+		BookmarkItem **selectedParentFolder, std::optional<std::wstring> customDialogTitle = std::nullopt);
 
 protected:
 
@@ -65,6 +66,7 @@ private:
 
 	void UpdateDialogForBookmarkFolder();
 	void SetDialogTitle();
+	std::wstring LoadDialogTitle();
 
 	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList);
 	void SaveState();
@@ -80,6 +82,7 @@ private:
 	BookmarkTree *m_bookmarkTree;
 	BookmarkItem *m_bookmarkItem;
 	BookmarkItem **m_selectedParentFolder;
+	std::optional<std::wstring> m_customDialogTitle;
 
 	BookmarkTreeView *m_pBookmarkTreeView;
 

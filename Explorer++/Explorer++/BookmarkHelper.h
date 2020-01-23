@@ -8,6 +8,7 @@
 #include "BookmarkTree.h"
 #include "CoreInterface.h"
 #include "TabContainer.h"
+#include <optional>
 
 using RawBookmarkItems = std::vector<BookmarkItem *>;
 
@@ -27,9 +28,12 @@ namespace BookmarkHelper
 
 	int CALLBACK Sort(SortMode sortMode, const BookmarkItem *firstItem, const BookmarkItem *secondItem);
 
+	void BookmarkAllTabs(BookmarkTree *bookmarkTree, HMODULE resoureceModule, HWND parentWindow,
+		IExplorerplusplus *coreInterface);
 	BookmarkItem *AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
 		BookmarkItem *defaultParentSelection, HMODULE resoureceModule, HWND parentWindow,
-		TabContainer *tabContainer, IExplorerplusplus *coreInterface);
+		TabContainer *tabContainer, IExplorerplusplus *coreInterface,
+		std::optional<std::wstring> customDialogTitle = std::nullopt);
 	void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree, HMODULE resoureceModule,
 		HWND parentWindow, IExplorerplusplus *coreInterface);
 	void OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem, IExplorerplusplus *expp);

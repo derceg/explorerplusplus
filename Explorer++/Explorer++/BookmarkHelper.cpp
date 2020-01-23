@@ -117,9 +117,37 @@ int CALLBACK SortByDateModified(const BookmarkItem *firstItem,
 	return CompareFileTime(&firstItemDateModified, &secondItemDateModified);
 }
 
+void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree, HMODULE resoureceModule,
+	HWND parentWindow, IExplorerplusplus *coreInterface)
+{
+	std::wstring bookmarkAllTabsText = ResourceHelper::LoadString(resoureceModule, IDS_ADD_BOOKMARK_TITLE_BOOKMARK_ALL_TABS);
+	auto bookmarkFolder = AddBookmarkItem(bookmarkTree, BookmarkItem::Type::Folder,
+		nullptr, resoureceModule, parentWindow, coreInterface->GetTabContainer(), coreInterface,
+		bookmarkAllTabsText);
+
+	if (!bookmarkFolder)
+	{
+		return;
+	}
+
+	size_t index = 0;
+
+	for (auto tabRef : coreInterface->GetTabContainer()->GetAllTabsInOrder())
+	{
+		auto &tab = tabRef.get();
+		auto entry = tab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
+		auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, entry->GetDisplayName(),
+			tab.GetShellBrowser()->GetDirectory());
+
+		bookmarkTree->AddBookmarkItem(bookmarkFolder, std::move(bookmark), index);
+
+		index++;
+	}
+}
+
 BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
 	BookmarkItem *defaultParentSelection, HMODULE resoureceModule, HWND parentWindow,
-	TabContainer *tabContainer, IExplorerplusplus *coreInterface)
+	TabContainer *tabContainer, IExplorerplusplus *coreInterface, std::optional<std::wstring> customDialogTitle)
 {
 	std::unique_ptr<BookmarkItem> bookmarkItem;
 
@@ -140,8 +168,8 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 	BookmarkItem *rawBookmarkItem = bookmarkItem.get();
 	BookmarkItem *selectedParentFolder = nullptr;
 
-	AddBookmarkDialog addBookmarkDialog(resoureceModule, parentWindow, coreInterface,
-		bookmarkTree, bookmarkItem.get(), defaultParentSelection, &selectedParentFolder);
+	AddBookmarkDialog addBookmarkDialog(resoureceModule, parentWindow, coreInterface, bookmarkTree,
+		bookmarkItem.get(), defaultParentSelection, &selectedParentFolder, customDialogTitle);
 	auto res = addBookmarkDialog.ShowModalDialog();
 
 	if (res == BaseDialog::RETURN_OK)
