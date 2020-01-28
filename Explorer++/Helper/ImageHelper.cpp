@@ -269,3 +269,15 @@ std::unique_ptr<Gdiplus::Bitmap> ImageHelper::LoadGdiplusBitmapFromPNG(HINSTANCE
 
 	return bitmap;
 }
+
+int ImageHelper::CopyImageListIcon(HIMAGELIST destination, HIMAGELIST source, int sourceIconIndex)
+{
+	wil::unique_hicon icon(ImageList_GetIcon(source, sourceIconIndex, ILD_NORMAL));
+
+	if (!icon)
+	{
+		return -1;
+	}
+
+	return ImageList_AddIcon(destination, icon.get());
+}

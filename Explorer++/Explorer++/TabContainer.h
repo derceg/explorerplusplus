@@ -183,7 +183,6 @@ private:
 	void UpdateTabNameInWindow(const Tab &tab);
 	void SetTabIcon(const Tab &tab);
 	void SetTabIconFromSystemImageList(const Tab &tab, int systemIconIndex);
-	int AddSystemImageListIconToTabImageList(int systemIconIndex);
 	void SetTabIconFromImageList(const Tab &tab, int imageIndex);
 
 	void InsertNewTab(int index, int tabId, PCIDLIST_ABSOLUTE pidlDirectory, boost::optional<std::wstring> customName);

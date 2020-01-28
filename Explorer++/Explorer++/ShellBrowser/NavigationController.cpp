@@ -66,9 +66,7 @@ void NavigationController::AddEntry(std::unique_ptr<HistoryEntry> entry)
 	m_entries.resize(m_currentEntry + 1);
 
 	m_iconFetcher->QueueIconTask(entry->GetPidl().get(), [this, index = m_currentEntry + 1, id = entry->GetId()]
-	(PCIDLIST_ABSOLUTE pidl, int iconIndex) {
-		UNREFERENCED_PARAMETER(pidl);
-
+	(int iconIndex) {
 		if (index >= GetNumHistoryEntries())
 		{
 			return;

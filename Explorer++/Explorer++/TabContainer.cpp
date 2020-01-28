@@ -121,7 +121,8 @@ void TabContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
 	wil::unique_hbitmap bitmap = m_expp->GetIconResourceLoader()->LoadBitmapFromPNGForDpi(Icon::Lock, ICON_SIZE_96DPI, ICON_SIZE_96DPI, dpi);
 	m_tabIconLockIndex = ImageList_Add(himlTab, bitmap.get(), nullptr);
 
-	m_defaultFolderIconIndex = AddSystemImageListIconToTabImageList(m_defaultFolderIconSystemImageListIndex);
+	m_defaultFolderIconIndex = ImageHelper::CopyImageListIcon(m_tabCtrlImageList.get(),
+		reinterpret_cast<HIMAGELIST>(m_systemImageList.get()), m_defaultFolderIconSystemImageListIndex);
 }
 
 bool TabContainer::IsDefaultIcon(int iconIndex)
@@ -773,9 +774,7 @@ void TabContainer::SetTabIcon(const Tab &tab)
 		auto pidlDirectory = tab.GetShellBrowser()->GetDirectoryIdl();
 
 		m_iconFetcher.QueueIconTask(pidlDirectory.get(),
-			[this, tabId = tab.GetId(), folderId = tab.GetShellBrowser()->GetUniqueFolderId()] (PCIDLIST_ABSOLUTE pidl, int iconIndex) {
-				UNREFERENCED_PARAMETER(pidl);
-
+			[this, tabId = tab.GetId(), folderId = tab.GetShellBrowser()->GetUniqueFolderId()] (int iconIndex) {
 				auto tab = GetTabOptional(tabId);
 
 				if (!tab)
@@ -802,25 +801,13 @@ void TabContainer::SetTabIconFromSystemImageList(const Tab &tab, int systemIconI
 		return;
 	}
 
-	int index = AddSystemImageListIconToTabImageList(systemIconIndex);
+	int index = ImageHelper::CopyImageListIcon(m_tabCtrlImageList.get(),
+		reinterpret_cast<HIMAGELIST>(m_systemImageList.get()), systemIconIndex);
 
 	if (index != -1)
 	{
 		SetTabIconFromImageList(tab, index);
 	}
-}
-
-int TabContainer::AddSystemImageListIconToTabImageList(int systemIconIndex)
-{
-	wil::unique_hicon icon;
-	HRESULT hr = m_systemImageList->GetIcon(systemIconIndex, ILD_NORMAL, &icon);
-
-	if (FAILED(hr))
-	{
-		return - 1;
-	}
-
-	return ImageList_AddIcon(TabCtrl_GetImageList(m_hwnd), icon.get());
 }
 
 void TabContainer::SetTabIconFromImageList(const Tab &tab, int imageIndex)

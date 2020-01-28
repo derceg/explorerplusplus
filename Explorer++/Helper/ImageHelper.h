@@ -21,4 +21,5 @@ namespace ImageHelper
 	HBITMAP IconToBitmapPARGB32(HICON hicon, int width, int height);
 
 	std::unique_ptr<Gdiplus::Bitmap> LoadGdiplusBitmapFromPNG(HINSTANCE instance, UINT resourceId);
+	int CopyImageListIcon(HIMAGELIST destination, HIMAGELIST source, int sourceIconIndex);
 }
