@@ -17,4 +17,6 @@ namespace NRegistrySettings
 	LONG	ReadStringFromRegistry(HKEY hKey,std::wstring strKey,std::wstring &strOutput);
 	LONG	SaveStringListToRegistry(HKEY hKey,const TCHAR *szBaseKeyName,const std::list<std::wstring> &strList);
 	LONG	ReadStringListFromRegistry(HKEY hKey,const TCHAR *szBaseKeyName,std::list<std::wstring> &strList);
+	bool	SaveDateTime(HKEY key, const std::wstring &baseKeyName, const FILETIME &dateTime);
+	bool	ReadDateTime(HKEY key, const std::wstring &baseKeyName, FILETIME &dateTime);
 }

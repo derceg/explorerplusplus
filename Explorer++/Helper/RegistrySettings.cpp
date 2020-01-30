@@ -8,7 +8,6 @@
 #include "RegistrySettings.h"
 #include "Macros.h"
 
-
 LONG NRegistrySettings::SaveDwordToRegistry(HKEY hKey,const TCHAR *szKey,DWORD dwValue)
 {
 	return RegSetValueEx(hKey,szKey,0,REG_DWORD,reinterpret_cast<const BYTE *>(&dwValue),sizeof(dwValue));
@@ -136,4 +135,20 @@ LONG NRegistrySettings::ReadStringListFromRegistry(HKEY hKey,const TCHAR *szBase
 	}
 
 	return lRes;
+}
+
+bool NRegistrySettings::SaveDateTime(HKEY key, const std::wstring &baseKeyName, const FILETIME &dateTime)
+{
+	LONG res1 = SaveDwordToRegistry(key, (baseKeyName + L"Low").c_str(), dateTime.dwLowDateTime);
+	LONG res2 = SaveDwordToRegistry(key, (baseKeyName + L"High").c_str(), dateTime.dwHighDateTime);
+
+	return (res1 == ERROR_SUCCESS && res2 == ERROR_SUCCESS);
+}
+
+bool NRegistrySettings::ReadDateTime(HKEY key, const std::wstring &baseKeyName, FILETIME &dateTime)
+{
+	LONG res1 = ReadDwordFromRegistry(key, (baseKeyName + L"Low").c_str(), &dateTime.dwLowDateTime);
+	LONG res2 = ReadDwordFromRegistry(key, (baseKeyName + L"High").c_str(), &dateTime.dwHighDateTime);
+
+	return (res1 == ERROR_SUCCESS && res2 == ERROR_SUCCESS);
 }

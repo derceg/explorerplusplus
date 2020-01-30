@@ -186,6 +186,22 @@ void BookmarkTree::LoadPermanentFolderFromRegistry(HKEY parentKey, BookmarkItem 
 
 	if (res == ERROR_SUCCESS)
 	{
+		FILETIME dateCreated;
+		bool dateRes = NRegistrySettings::ReadDateTime(childKey.get(), _T("DateCreated"), dateCreated);
+
+		if (dateRes)
+		{
+			bookmarkItem->SetDateCreated(dateCreated);
+		}
+
+		FILETIME dateModified;
+		dateRes = NRegistrySettings::ReadDateTime(childKey.get(), _T("DateModified"), dateModified);
+
+		if (dateRes)
+		{
+			bookmarkItem->SetDateModified(dateModified);
+		}
+
 		LoadBookmarkChildrenFromRegistry(childKey.get(), bookmarkItem);
 	}
 }
@@ -228,15 +244,11 @@ std::unique_ptr<BookmarkItem> BookmarkTree::LoadBookmarkItemFromRegistry(HKEY ke
 	auto bookmarkItem = std::make_unique<BookmarkItem>(guid, name, locationOptional);
 
 	FILETIME dateCreated;
-	NRegistrySettings::ReadDwordFromRegistry(key, _T("DateCreatedLow"), &dateCreated.dwLowDateTime);
-	NRegistrySettings::ReadDwordFromRegistry(key, _T("DateCreatedHigh"), &dateCreated.dwHighDateTime);
-
+	NRegistrySettings::ReadDateTime(key, _T("DateCreated"), dateCreated);
 	bookmarkItem->SetDateCreated(dateCreated);
 
 	FILETIME dateModified;
-	NRegistrySettings::ReadDwordFromRegistry(key, _T("DateModifiedLow"), &dateModified.dwLowDateTime);
-	NRegistrySettings::ReadDwordFromRegistry(key, _T("DateModifiedHigh"), &dateModified.dwHighDateTime);
-
+	NRegistrySettings::ReadDateTime(key, _T("DateModified"), dateModified);
 	bookmarkItem->SetDateModified(dateModified);
 
 	if (type == static_cast<int>(BookmarkItem::Type::Folder))
@@ -262,6 +274,9 @@ void BookmarkTree::SavePermanentFolderToRegistry(HKEY parentKey, const BookmarkI
 
 	if (res == ERROR_SUCCESS)
 	{
+		NRegistrySettings::SaveDateTime(childKey.get(), _T("DateCreated"), bookmarkItem->GetDateCreated());
+		NRegistrySettings::SaveDateTime(childKey.get(), _T("DateModified"), bookmarkItem->GetDateModified());
+
 		SaveBookmarkChildrenToRegistry(childKey.get(), bookmarkItem);
 	}
 }
@@ -296,10 +311,8 @@ void BookmarkTree::SaveBookmarkItemToRegistry(HKEY key, const BookmarkItem *book
 		NRegistrySettings::SaveStringToRegistry(key, _T("Location"), bookmarkItem->GetLocation().c_str());
 	}
 
-	NRegistrySettings::SaveDwordToRegistry(key, _T("DateCreatedLow"), bookmarkItem->GetDateCreated().dwLowDateTime);
-	NRegistrySettings::SaveDwordToRegistry(key, _T("DateCreatedHigh"), bookmarkItem->GetDateCreated().dwHighDateTime);
-	NRegistrySettings::SaveDwordToRegistry(key, _T("DateModifiedLow"), bookmarkItem->GetDateModified().dwLowDateTime);
-	NRegistrySettings::SaveDwordToRegistry(key, _T("DateModifiedHigh"), bookmarkItem->GetDateModified().dwHighDateTime);
+	NRegistrySettings::SaveDateTime(key, _T("DateCreated"), bookmarkItem->GetDateCreated());
+	NRegistrySettings::SaveDateTime(key, _T("DateModified"), bookmarkItem->GetDateModified());
 
 	if (bookmarkItem->GetType() == BookmarkItem::Type::Folder)
 	{
