@@ -374,7 +374,7 @@ private:
 	void					SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe);
 	int						LoadColumnFromXML(IXMLDOMNode *pNode, std::vector<Column_t> &outputColumns);
 	void					SaveColumnToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pColumnsNode, const std::vector<Column_t> &columns, const TCHAR *szColumnSet, int iIndent);
-	int						LoadBookmarksFromXML(IXMLDOMDocument *pXMLDom);
+	void					LoadBookmarksFromXML(IXMLDOMDocument *pXMLDom);
 	void					SaveBookmarksToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	int						LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom);
 	void					SaveDefaultColumnsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);

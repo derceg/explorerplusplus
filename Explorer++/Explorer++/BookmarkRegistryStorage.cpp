@@ -14,13 +14,11 @@ namespace V2
 	const TCHAR bookmarksKeyPath[] = _T("Software\\Explorer++\\Bookmarksv2");
 
 	void Load(HKEY parentKey, BookmarkTree *bookmarkTree);
-
 	void LoadPermanentFolder(HKEY parentKey, BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem, const std::wstring &name);
 	void LoadBookmarkChildren(HKEY parentKey, BookmarkTree *bookmarkTree, BookmarkItem *parentBookmarkItem);
 	std::unique_ptr<BookmarkItem> LoadBookmarkItem(HKEY key, BookmarkTree *bookmarkTree);
 
 	void Save(HKEY parentKey, BookmarkTree *bookmarkTree);
-
 	void SavePermanentFolder(HKEY parentKey, const BookmarkItem *bookmarkItem, const std::wstring &name);
 	void SaveBookmarkChildren(HKEY parentKey, const BookmarkItem *parentBookmarkItem);
 	void SaveBookmarkItem(HKEY key, const BookmarkItem *bookmarkItem);
