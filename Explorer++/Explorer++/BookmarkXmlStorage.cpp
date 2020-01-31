@@ -23,9 +23,12 @@ void SaveBookmarkItem(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
 
 void BookmarkXmlStorage::Load(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree)
 {
-	LoadPermanentFolder(parentNode, bookmarkTree, bookmarkTree->GetBookmarksToolbarFolder(), BOOKMARKS_TOOLBAR_NODE_NAME);
-	LoadPermanentFolder(parentNode, bookmarkTree, bookmarkTree->GetBookmarksMenuFolder(), BOOKMARKS_MENU_NODE_NAME);
-	LoadPermanentFolder(parentNode, bookmarkTree, bookmarkTree->GetOtherBookmarksFolder(), OTHER_BOOKMARKS_NODE_NAME);
+	LoadPermanentFolder(parentNode, bookmarkTree, bookmarkTree->GetBookmarksToolbarFolder(),
+		BookmarkStorage::BOOKMARKS_TOOLBAR_NODE_NAME);
+	LoadPermanentFolder(parentNode, bookmarkTree, bookmarkTree->GetBookmarksMenuFolder(),
+		BookmarkStorage::BOOKMARKS_MENU_NODE_NAME);
+	LoadPermanentFolder(parentNode, bookmarkTree, bookmarkTree->GetOtherBookmarksFolder(),
+		BookmarkStorage::OTHER_BOOKMARKS_NODE_NAME);
 }
 
 void LoadPermanentFolder(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
@@ -114,11 +117,15 @@ std::unique_ptr<BookmarkItem> LoadBookmarkItem(IXMLDOMNode *parentNode, Bookmark
 	return bookmarkItem;
 }
 
-void BookmarkXmlStorage::Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode, BookmarkTree *bookmarkTree, int indent)
+void BookmarkXmlStorage::Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
+	BookmarkTree *bookmarkTree, int indent)
 {
-	SavePermanentFolder(xmlDocument, parentNode, bookmarkTree->GetBookmarksToolbarFolder(), BOOKMARKS_TOOLBAR_NODE_NAME, indent);
-	SavePermanentFolder(xmlDocument, parentNode, bookmarkTree->GetBookmarksMenuFolder(), BOOKMARKS_MENU_NODE_NAME, indent);
-	SavePermanentFolder(xmlDocument, parentNode, bookmarkTree->GetOtherBookmarksFolder(), OTHER_BOOKMARKS_NODE_NAME, indent);
+	SavePermanentFolder(xmlDocument, parentNode, bookmarkTree->GetBookmarksToolbarFolder(),
+		BookmarkStorage::BOOKMARKS_TOOLBAR_NODE_NAME, indent);
+	SavePermanentFolder(xmlDocument, parentNode, bookmarkTree->GetBookmarksMenuFolder(),
+		BookmarkStorage::BOOKMARKS_MENU_NODE_NAME, indent);
+	SavePermanentFolder(xmlDocument, parentNode, bookmarkTree->GetOtherBookmarksFolder(),
+		BookmarkStorage::OTHER_BOOKMARKS_NODE_NAME, indent);
 }
 
 void SavePermanentFolder(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,

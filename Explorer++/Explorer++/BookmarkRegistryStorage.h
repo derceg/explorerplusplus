@@ -8,6 +8,6 @@
 
 namespace BookmarkRegistryStorage
 {
-	void Load(HKEY parentKey, BookmarkTree *bookmarkTree);
-	void Save(HKEY parentKey, BookmarkTree *bookmarkTree);
+	void Load(BookmarkTree *bookmarkTree);
+	void Save(BookmarkTree *bookmarkTree);
 }
