@@ -24,10 +24,16 @@ namespace NXMLSettings
 	const TCHAR	*EncodeBoolValue(BOOL value);
 	BOOL	DecodeBoolValue(const TCHAR *value);
 	WCHAR	*EncodeIntValue(int iValue);
-	int		DecodeIntValue(WCHAR *wszValue);
+	int		DecodeIntValue(const WCHAR *wszValue);
 	COLORREF	ReadXMLColorData(IXMLDOMNode *pNode);
 	Gdiplus::Color	ReadXMLColorData2(IXMLDOMNode *pNode);
 	HFONT	ReadXMLFontData(IXMLDOMNode *pNode);
+
+	bool	ReadDateTime(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &baseKeyName, FILETIME &dateTime);
+	void	SaveDateTime(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode, const std::wstring &baseKeyName,
+		const FILETIME &dateTime);
+	HRESULT	GetIntFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name, int &outputValue);
+	HRESULT	GetStringFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name, std::wstring &outputValue);
 
 	void	SafeBSTRRelease(BSTR bstr);
 }

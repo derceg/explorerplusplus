@@ -31,6 +31,9 @@ public:
 	void LoadRegistrySettings(HKEY parentKey);
 	void SaveRegistrySettings(HKEY parentKey);
 
+	void LoadXmlSettings(IXMLDOMNode *parentNode);
+	void SaveXmlSettings(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode, int indent);
+
 	// Signals
 	SignalWrapper<BookmarkTree, void(BookmarkItem &bookmarkItem, size_t index)> bookmarkItemAddedSignal;
 	SignalWrapper<BookmarkTree, void(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType)> bookmarkItemUpdatedSignal;
@@ -57,6 +60,17 @@ private:
 	void SavePermanentFolderToRegistry(HKEY parentKey, const BookmarkItem *bookmarkItem, const std::wstring &name);
 	void SaveBookmarkChildrenToRegistry(HKEY parentKey, const BookmarkItem *parentBookmarkItem);
 	void SaveBookmarkItemToRegistry(HKEY key, const BookmarkItem *bookmarkItem);
+
+	void LoadPermanentFolderFromXmlFile(IXMLDOMNode *parentNode, BookmarkItem *bookmarkItem, const std::wstring &name);
+	void LoadBookmarkChildrenFromXmlFile(IXMLDOMNode *parentNode, BookmarkItem *parentBookmarkItem);
+	std::unique_ptr<BookmarkItem> LoadBookmarkItemFromXmlFile(IXMLDOMNode *parentNode);
+
+	void SavePermanentFolderToXmlFile(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
+		const BookmarkItem *bookmarkItem, const std::wstring &name, int indent);
+	void SaveBookmarkChildrenToXmlFile(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
+		const BookmarkItem *parentBookmarkItem, int indent);
+	void SaveBookmarkItemToXmlFile(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
+		const BookmarkItem *bookmarkItem, int indent);
 
 	BookmarkItem m_root;
 	BookmarkItem *m_bookmarksToolbar;

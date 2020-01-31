@@ -11,7 +11,8 @@
 #include "XMLSettings.h"
 #include "Helper.h"
 #include "Macros.h"
-
+#include <wil/com.h>
+#include <comdef.h>
 
 static const TCHAR BOOL_YES[] = _T("yes");
 static const TCHAR BOOL_NO[] = _T("no");
@@ -282,7 +283,7 @@ WCHAR *NXMLSettings::EncodeIntValue(int iValue)
 	return wszDest;
 }
 
-int NXMLSettings::DecodeIntValue(WCHAR *wszValue)
+int NXMLSettings::DecodeIntValue(const WCHAR *wszValue)
 {
 	return _wtoi(wszValue);
 }
@@ -426,6 +427,71 @@ HFONT NXMLSettings::ReadXMLFontData(IXMLDOMNode *pNode)
 	FontInfo.lfQuality			= PROOF_QUALITY;
 
 	return CreateFontIndirect(&FontInfo);
+}
+
+bool NXMLSettings::ReadDateTime(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &baseKeyName,
+	FILETIME &dateTime)
+{
+	std::wstring lowDateTime;
+	std::wstring highDateTime;
+	HRESULT hr1 = GetStringFromMap(attributeMap, (baseKeyName + L"Low").c_str(), lowDateTime);
+	HRESULT hr2 = GetStringFromMap(attributeMap, (baseKeyName + L"High").c_str(), highDateTime);
+
+	if (FAILED(hr1) || FAILED(hr2))
+	{
+		return false;
+	}
+
+	dateTime.dwLowDateTime = stoul(lowDateTime);
+	dateTime.dwHighDateTime = stoul(highDateTime);
+
+	return true;
+}
+
+void NXMLSettings::SaveDateTime(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
+	const std::wstring &baseKeyName, const FILETIME &dateTime)
+{
+	AddAttributeToNode(xmlDocument, parentNode, (baseKeyName + L"Low").c_str(), std::to_wstring(dateTime.dwLowDateTime).c_str());
+	AddAttributeToNode(xmlDocument, parentNode, (baseKeyName + L"High").c_str(), std::to_wstring(dateTime.dwHighDateTime).c_str());
+}
+
+HRESULT NXMLSettings::GetIntFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name, int &outputValue)
+{
+	std::wstring outputString;
+	HRESULT hr = GetStringFromMap(attributeMap, name, outputString);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	outputValue = DecodeIntValue(outputString.c_str());
+
+	return hr;
+}
+
+HRESULT NXMLSettings::GetStringFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name, std::wstring &outputValue)
+{
+	wil::com_ptr<IXMLDOMNode> node;
+	auto nodeName = wil::make_bstr(name.c_str());
+	HRESULT hr = attributeMap->getNamedItem(nodeName.get(), &node);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	BSTR value;
+	hr = node->get_text(&value);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	outputValue = _bstr_t(value);
+
+	return hr;
 }
 
 void NXMLSettings::SafeBSTRRelease(BSTR bstr)

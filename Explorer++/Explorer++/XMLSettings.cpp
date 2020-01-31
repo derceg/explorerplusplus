@@ -110,6 +110,9 @@ will need to be changed correspondingly. */
 #define HASH_PLAYNAVIGATIONSOUND	1987363412
 #define HASH_ICON_THEME				3998265761
 
+const TCHAR BOOKMARKS_KEY_V1[] = _T("Bookmarks");
+const TCHAR BOOKMARKS_KEY_V2[] = _T("Bookmarksv2");
+
 struct ColumnXMLSaveData
 {
 	TCHAR			szName[64];
@@ -992,25 +995,25 @@ int Explorerplusplus::LoadColumnFromXML(IXMLDOMNode *pNode, std::vector<Column_t
 
 int Explorerplusplus::LoadBookmarksFromXML(IXMLDOMDocument *pXMLDom)
 {
-	IXMLDOMNodeList		*pNodes = NULL;
-	IXMLDOMNode			*pNode = NULL;
-	BSTR						bstr = NULL;
-	HRESULT						hr;
+	IXMLDOMNode *pNode = NULL;
+	BSTR bstr = NULL;
+	HRESULT hr;
 
-	if(!pXMLDom)
+	if (!pXMLDom)
+	{
 		goto clean;
+	}
 
-	bstr = SysAllocString(L"//Bookmark");
+	bstr = SysAllocString((std::wstring(L"/ExplorerPlusPlus/") + std::wstring(BOOKMARKS_KEY_V2)).c_str());
 	hr = pXMLDom->selectSingleNode(bstr,&pNode);
 
 	if(hr == S_OK)
 	{
-		/* TODO: Load bookmarks. */
+		m_bookmarkTree.LoadXmlSettings(pNode);
 	}
 
 clean:
 	if (bstr) SysFreeString(bstr);
-	if (pNodes) pNodes->Release();
 	if (pNode) pNode->Release();
 
 	return 0;
@@ -1019,18 +1022,18 @@ clean:
 void Explorerplusplus::SaveBookmarksToXML(IXMLDOMDocument *pXMLDom,
 IXMLDOMElement *pRoot)
 {
-	IXMLDOMElement		*pe = NULL;
-	BSTR						bstr_wsnt = SysAllocString(L"\n\t");
-	BSTR						bstr;
+	IXMLDOMElement *pe = NULL;
+	BSTR bstr_wsnt = SysAllocString(L"\n\t");
+	BSTR bstr;
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pRoot);
 
-	bstr = SysAllocString(L"Bookmarks");
+	bstr = SysAllocString(BOOKMARKS_KEY_V2);
 	pXMLDom->createElement(bstr,&pe);
 	SysFreeString(bstr);
 	bstr = NULL;
 
-	/* TODO: Save bookmarks. */
+	m_bookmarkTree.SaveXmlSettings(pXMLDom, pe, 2);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
 
