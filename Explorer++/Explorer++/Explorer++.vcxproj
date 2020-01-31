@@ -465,9 +465,11 @@
     <ClCompile Include="BookmarkDropInfo.cpp" />
     <ClCompile Include="BookmarkDropTargetWindow.cpp" />
     <ClCompile Include="BookmarkItem.cpp" />
+    <ClCompile Include="BookmarkRegistryStorage.cpp" />
     <ClCompile Include="BookmarksMainMenu.cpp" />
     <ClCompile Include="BookmarkMenuBuilder.cpp" />
     <ClCompile Include="BookmarkTree.cpp" />
+    <ClCompile Include="BookmarkXmlStorage.cpp" />
     <ClCompile Include="ShellBrowser\HistoryEntry.cpp" />
     <ClCompile Include="ShellBrowser\NavigationController.cpp" />
     <ClCompile Include="SortMenuHandler.cpp" />
@@ -615,12 +617,15 @@
     <ClInclude Include="BookmarkHelper.h" />
     <ClInclude Include="BookmarkItem.h" />
     <ClInclude Include="BookmarkListView.h" />
+    <ClInclude Include="BookmarkRegistryStorage.h" />
     <ClInclude Include="BookmarksMainMenu.h" />
     <ClInclude Include="BookmarkMenu.h" />
     <ClInclude Include="BookmarkMenuBuilder.h" />
     <ClInclude Include="BookmarksToolbar.h" />
+    <ClInclude Include="BookmarkStorage.h" />
     <ClInclude Include="BookmarkTree.h" />
     <ClInclude Include="BookmarkTreeView.h" />
+    <ClInclude Include="BookmarkXmlStorage.h" />
     <ClInclude Include="ColorRuleDialog.h" />
     <ClInclude Include="ColorRuleHelper.h" />
     <ClInclude Include="CommandInvoked.h" />

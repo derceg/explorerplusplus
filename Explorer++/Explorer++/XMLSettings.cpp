@@ -16,6 +16,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "ApplicationToolbar.h"
+#include "BookmarkXmlStorage.h"
 #include "ColorRuleHelper.h"
 #include "Config.h"
 #include "Explorer++_internal.h"
@@ -1009,7 +1010,7 @@ int Explorerplusplus::LoadBookmarksFromXML(IXMLDOMDocument *pXMLDom)
 
 	if(hr == S_OK)
 	{
-		m_bookmarkTree.LoadXmlSettings(pNode);
+		BookmarkXmlStorage::Load(pNode, &m_bookmarkTree);
 	}
 
 clean:
@@ -1033,7 +1034,7 @@ IXMLDOMElement *pRoot)
 	SysFreeString(bstr);
 	bstr = NULL;
 
-	m_bookmarkTree.SaveXmlSettings(pXMLDom, pe, 2);
+	BookmarkXmlStorage::Save(pXMLDom, pe, &m_bookmarkTree, 2);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
 

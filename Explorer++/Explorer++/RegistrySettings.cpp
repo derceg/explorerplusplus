@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "ApplicationToolbar.h"
+#include "BookmarkRegistryStorage.h"
 #include "ColorRuleHelper.h"
 #include "Config.h"
 #include "DefaultColumns.h"
@@ -437,7 +438,7 @@ void Explorerplusplus::SaveBookmarksToRegistry()
 
 	if (res == ERROR_SUCCESS)
 	{
-		m_bookmarkTree.SaveRegistrySettings(bookmarksKey.get());
+		BookmarkRegistryStorage::Save(bookmarksKey.get(), &m_bookmarkTree);
 	}
 }
 
@@ -448,7 +449,7 @@ void Explorerplusplus::LoadBookmarksFromRegistry()
 
 	if (res == ERROR_SUCCESS)
 	{
-		m_bookmarkTree.LoadRegistrySettings(bookmarksKey.get());
+		BookmarkRegistryStorage::Load(bookmarksKey.get(), &m_bookmarkTree);
 	}
 }
 
