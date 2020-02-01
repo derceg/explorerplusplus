@@ -77,7 +77,7 @@ void IconFetcher::QueueIconTask(std::wstring_view path, Callback callback)
 			return std::nullopt;
 		}
 
-		auto iconIndex = FindIconAsync(iconResultID, pidl.get());
+		auto iconIndex = FindIconAsync(pidl.get());
 
 		if (!iconIndex)
 		{
@@ -109,7 +109,7 @@ void IconFetcher::QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback)
 	auto iconResult = m_iconThreadPool.push([this, iconResultID, basicItemInfo] (int id) -> std::optional<IconResult> {
 		UNREFERENCED_PARAMETER(id);
 
-		auto iconIndex = FindIconAsync(iconResultID, basicItemInfo.pidl.get());
+		auto iconIndex = FindIconAsync(basicItemInfo.pidl.get());
 
 		if (!iconIndex)
 		{
@@ -139,7 +139,7 @@ void IconFetcher::QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback)
 	m_iconResults.insert({ iconResultID, std::move(futureResult) });
 }
 
-std::optional<int> IconFetcher::FindIconAsync(int iconResultId, PCIDLIST_ABSOLUTE pidl)
+std::optional<int> IconFetcher::FindIconAsync(PCIDLIST_ABSOLUTE pidl)
 {
 	// Must use SHGFI_ICON here, rather than SHGFO_SYSICONINDEX, or else 
 	// icon overlays won't be applied.
