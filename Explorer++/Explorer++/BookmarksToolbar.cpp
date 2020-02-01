@@ -393,14 +393,7 @@ void BookmarksToolbar::ShowBookmarkFolderMenu(BookmarkItem *bookmarkItem, int co
 		return;
 	}
 
-	auto state = SendMessage(m_hToolbar, TB_GETSTATE, command, 0);
-
-	if (state == -1)
-	{
-		return;
-	}
-
-	SendMessage(m_hToolbar, TB_SETSTATE, command, MAKEWORD(state | TBSTATE_PRESSED, 0));
+	SendMessage(m_hToolbar, TB_PRESSBUTTON, command, MAKEWORD(TRUE, 0));
 
 	POINT pt;
 	pt.x = rc.left;
@@ -408,7 +401,7 @@ void BookmarksToolbar::ShowBookmarkFolderMenu(BookmarkItem *bookmarkItem, int co
 	m_bookmarkMenu.ShowMenu(bookmarkItem, pt, std::bind(&BookmarksToolbar::OnBookmarkMenuItemClicked,
 		this, std::placeholders::_1));
 
-	SendMessage(m_hToolbar, TB_SETSTATE, command, MAKEWORD(state & ~TBSTATE_PRESSED, 0));
+	SendMessage(m_hToolbar, TB_PRESSBUTTON, command, MAKEWORD(FALSE, 0));
 }
 
 void BookmarksToolbar::OnBookmarkMenuItemClicked(const BookmarkItem *bookmarkItem)
@@ -878,23 +871,7 @@ void BookmarksToolbar::SetButtonPressedState(int index, bool pressed)
 		return;
 	}
 
-	auto state = SendMessage(m_hToolbar, TB_GETSTATE, tbButton.idCommand, 0);
-
-	if (state == -1)
-	{
-		return;
-	}
-
-	if (pressed)
-	{
-		WI_SetFlag(state, TBSTATE_PRESSED);
-	}
-	else
-	{
-		WI_ClearFlag(state, TBSTATE_PRESSED);
-	}
-
-	SendMessage(m_hToolbar, TB_SETSTATE, tbButton.idCommand, MAKEWORD(state, 0));
+	SendMessage(m_hToolbar, TB_PRESSBUTTON, tbButton.idCommand, MAKEWORD(pressed, 0));
 }
 
 void BookmarksToolbar::ResetDropUiState()
