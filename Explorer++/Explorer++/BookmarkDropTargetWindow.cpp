@@ -18,9 +18,9 @@ DWORD BookmarkDropTargetWindow::DragEnter(IDataObject *dataObject, DWORD keyStat
 
 	m_bookmarkDropInfo = std::make_unique<BookmarkDropInfo>(dataObject, m_bookmarkTree);
 
-	auto dropTarget = GetDropLocation(pt);
+	auto dropLocation = GetDropLocation(pt);
 
-	return m_bookmarkDropInfo->GetDropEffect(dropTarget.parentFolder);
+	return m_bookmarkDropInfo->GetDropEffect(dropLocation.parentFolder);
 }
 
 DWORD BookmarkDropTargetWindow::DragOver(DWORD keyState, POINT pt, DWORD effect)
@@ -37,23 +37,23 @@ DWORD BookmarkDropTargetWindow::DragOver(DWORD keyState, POINT pt, DWORD effect)
 
 	m_previousDragOverPoint = pt;
 
-	auto dropTarget = GetDropLocation(pt);
+	auto dropLocation = GetDropLocation(pt);
 
 	if (m_previousDropLocation
-		&& m_previousDropLocation->parentFolder == dropTarget.parentFolder
-		&& m_previousDropLocation->position == dropTarget.position
-		&& m_previousDropLocation->parentFolderSelected == dropTarget.parentFolderSelected)
+		&& m_previousDropLocation->parentFolder == dropLocation.parentFolder
+		&& m_previousDropLocation->position == dropLocation.position
+		&& m_previousDropLocation->parentFolderSelected == dropLocation.parentFolderSelected)
 	{
 		return m_previousDropEffect;
 	}
 
-	m_previousDropLocation = dropTarget;
+	m_previousDropLocation = dropLocation;
 
-	DWORD targetEffect = m_bookmarkDropInfo->GetDropEffect(dropTarget.parentFolder);
+	DWORD targetEffect = m_bookmarkDropInfo->GetDropEffect(dropLocation.parentFolder);
 
 	if (targetEffect != DROPEFFECT_NONE)
 	{
-		UpdateUiForDropLocation(dropTarget);
+		UpdateUiForDropLocation(dropLocation);
 	}
 	else
 	{
@@ -76,8 +76,8 @@ DWORD BookmarkDropTargetWindow::Drop(IDataObject *dataObject, DWORD keyState, PO
 	UNREFERENCED_PARAMETER(keyState);
 	UNREFERENCED_PARAMETER(effect);
 
-	auto dropTarget = GetDropLocation(pt);
-	DWORD finalEffect = m_bookmarkDropInfo->PerformDrop(dropTarget.parentFolder, dropTarget.position);
+	auto dropLocation = GetDropLocation(pt);
+	DWORD finalEffect = m_bookmarkDropInfo->PerformDrop(dropLocation.parentFolder, dropLocation.position);
 
 	ResetDropState();
 
