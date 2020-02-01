@@ -270,7 +270,7 @@ HRESULT NavigationController::BrowseFolder(const std::wstring &path, bool addHis
 
 HRESULT NavigationController::BrowseFolder(PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
 {
-	if (m_navigationMode == NavigationMode::ForceNewTab)
+	if (m_navigationMode == NavigationMode::ForceNewTab && GetCurrentEntry() != nullptr)
 	{
 		return m_tabNavigation->CreateNewTab(pidl, true);
 	}
