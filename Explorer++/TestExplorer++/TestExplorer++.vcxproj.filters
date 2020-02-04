@@ -14,6 +14,9 @@
     <ClCompile Include="TestBookmarkItem.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
+    <ClCompile Include="TestBookmarkClipboard.cpp">
+      <Filter>Bookmarks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />

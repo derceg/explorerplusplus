@@ -61,6 +61,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug-LLVM|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TestBookmarkClipboard.cpp" />
     <ClCompile Include="TestBookmarkItem.cpp" />
     <ClCompile Include="TestCachedIcons.cpp" />
     <ClCompile Include="TestManifest.cpp" />
