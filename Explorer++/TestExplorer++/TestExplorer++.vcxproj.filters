@@ -8,9 +8,6 @@
       <Filter>ShellBrowser</Filter>
     </ClCompile>
     <ClCompile Include="TestViewModeHelper.cpp" />
-    <ClCompile Include="TestPathManager.cpp">
-      <Filter>ShellBrowser</Filter>
-    </ClCompile>
     <ClCompile Include="TestBookmarkItem.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>

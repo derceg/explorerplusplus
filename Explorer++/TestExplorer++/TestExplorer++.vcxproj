@@ -65,7 +65,6 @@
     <ClCompile Include="TestBookmarkItem.cpp" />
     <ClCompile Include="TestCachedIcons.cpp" />
     <ClCompile Include="TestManifest.cpp" />
-    <ClCompile Include="TestPathManager.cpp" />
     <ClCompile Include="TestViewModeHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
