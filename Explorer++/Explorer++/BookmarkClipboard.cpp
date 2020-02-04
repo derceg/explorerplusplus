@@ -6,6 +6,7 @@
 #include "BookmarkClipboard.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/StringHelper.h"
+#include <boost/algorithm/string/join.hpp>
 
 BookmarkClipboard::BookmarkClipboard()
 {
@@ -34,18 +35,22 @@ BookmarkItems BookmarkClipboard::ReadBookmarks()
 bool BookmarkClipboard::WriteBookmarks(const OwnedRefBookmarkItems &bookmarkItems)
 {
 	BulkClipboardWriter clipboardWriter;
+	std::vector<std::wstring> lines;
 
 	for (auto &bookmarkItem : bookmarkItems)
 	{
 		if (bookmarkItem.get()->IsFolder())
 		{
-			clipboardWriter.WriteText(bookmarkItem.get()->GetName());
+			lines.push_back(bookmarkItem.get()->GetName());
 		}
 		else
 		{
-			clipboardWriter.WriteText(bookmarkItem.get()->GetLocation());
+			lines.push_back(bookmarkItem.get()->GetLocation());
 		}
 	}
+
+	std::wstring text = boost::algorithm::join(lines, L"\n");
+	clipboardWriter.WriteText(text);
 
 	std::string data = BookmarkDataExchange::SerializeBookmarkItems(bookmarkItems);
 	return clipboardWriter.WriteCustomData(GetClipboardFormat(), data);
