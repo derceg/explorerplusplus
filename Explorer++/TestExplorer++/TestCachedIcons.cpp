@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "../Explorer++/ShellBrowser/CachedIcons.h"
+#include "../Helper/CachedIcons.h"
 
 TEST(TestCachedIcons, TestMaxSize)
 {

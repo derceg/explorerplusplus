@@ -4,15 +4,15 @@
     <ClCompile Include="TestAcceleratorParser.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="TestManifest.cpp" />
-    <ClCompile Include="TestCachedIcons.cpp">
-      <Filter>ShellBrowser</Filter>
-    </ClCompile>
     <ClCompile Include="TestViewModeHelper.cpp" />
     <ClCompile Include="TestBookmarkItem.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
     <ClCompile Include="TestBookmarkClipboard.cpp">
       <Filter>Bookmarks</Filter>
+    </ClCompile>
+    <ClCompile Include="TestCachedIcons.cpp">
+      <Filter>Helper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -22,11 +22,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="ShellBrowser">
-      <UniqueIdentifier>{5008b879-90f9-4547-b71c-247c2a2f174a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Bookmarks">
       <UniqueIdentifier>{7dd3ae31-2bd9-4bf2-99c5-8bf64e5f1f5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helper">
+      <UniqueIdentifier>{486e737f-f618-476b-a8e5-4baef24e3c9c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
