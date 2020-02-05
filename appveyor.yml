@@ -70,7 +70,7 @@ after_build:
 
 test_script:
 - ps: >-
-    cd $env:APPVEYOR_BUILD_FOLDER\Explorer++\$env:PLATFORM\$env:CONFIGURATION
+    cd $env:APPVEYOR_BUILD_FOLDER\Explorer++\TestExplorer++\$env:PLATFORM\$env:CONFIGURATION
 
 
     # Run the tests.
