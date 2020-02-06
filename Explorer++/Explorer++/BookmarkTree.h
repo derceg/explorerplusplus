@@ -6,6 +6,7 @@
 
 #include "BookmarkItem.h"
 #include "SignalWrapper.h"
+#include <tchar.h>
 
 class BookmarkTree
 {

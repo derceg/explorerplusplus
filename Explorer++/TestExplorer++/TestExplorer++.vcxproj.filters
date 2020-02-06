@@ -8,6 +8,9 @@
     <ClCompile Include="TestBookmarkItem.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
+    <ClCompile Include="TestBookmarkTree.cpp">
+      <Filter>Bookmarks</Filter>
+    </ClCompile>
     <ClCompile Include="TestBookmarkClipboard.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
@@ -28,5 +31,13 @@
     <Filter Include="Helper">
       <UniqueIdentifier>{486e737f-f618-476b-a8e5-4baef24e3c9c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{d79645af-c720-443f-aeb6-c40b1167b6bb}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TestExplorer++.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

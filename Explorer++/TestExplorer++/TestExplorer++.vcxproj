@@ -93,6 +93,7 @@
     </ClCompile>
     <ClCompile Include="TestBookmarkClipboard.cpp" />
     <ClCompile Include="TestBookmarkItem.cpp" />
+    <ClCompile Include="TestBookmarkTree.cpp" />
     <ClCompile Include="TestCachedIcons.cpp" />
     <ClCompile Include="TestManifest.cpp" />
     <ClCompile Include="TestViewModeHelper.cpp" />
@@ -104,6 +105,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TestExplorer++.rc" />
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
