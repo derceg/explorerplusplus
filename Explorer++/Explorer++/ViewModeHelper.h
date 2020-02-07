@@ -6,6 +6,7 @@
 
 #include "ShellBrowser/ViewModes.h"
 #include <array>
+#include <cassert>
 
 const std::array<ViewMode, 8> VIEW_MODES = {
 	ViewMode::ExtraLargeIcons,

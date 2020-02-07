@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // See LICENSE in the top level directory
 
-#include "pch.h"
 #include "../Explorer++/BookmarkTree.h"
+#include <gtest/gtest.h>
 
 TEST(BookmarkTreeTest, BasicTests) {
 	BookmarkTree bookmarkTree;

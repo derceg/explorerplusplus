@@ -2,7 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="TestAcceleratorParser.cpp" />
-    <ClCompile Include="pch.cpp" />
     <ClCompile Include="TestManifest.cpp" />
     <ClCompile Include="TestViewModeHelper.cpp" />
     <ClCompile Include="TestBookmarkItem.cpp">
@@ -17,9 +16,9 @@
     <ClCompile Include="TestCachedIcons.cpp">
       <Filter>Helper</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="pch.h" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\gtest\gtest-all.cc" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\gmock\gmock-all.cc" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

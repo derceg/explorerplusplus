@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // See LICENSE in the top level directory
 
-#include "pch.h"
 #include "../Explorer++/ViewModeHelper.h"
+#include <gtest/gtest.h>
 #include <array>
 
 std::array<ViewMode, 8> viewModes = {
