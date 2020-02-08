@@ -80,14 +80,14 @@
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="TestAcceleratorParser.cpp" />
-    <ClCompile Include="TestBookmarkClipboard.cpp" />
-    <ClCompile Include="TestBookmarkItem.cpp" />
-    <ClCompile Include="TestBookmarkTree.cpp" />
-    <ClCompile Include="TestCachedIcons.cpp" />
-    <ClCompile Include="TestManifest.cpp" />
-    <ClCompile Include="TestNavigationController.cpp" />
-    <ClCompile Include="TestViewModeHelper.cpp" />
+    <ClCompile Include="AcceleratorParserTest.cpp" />
+    <ClCompile Include="BookmarkClipboardTest.cpp" />
+    <ClCompile Include="BookmarkItemTest.cpp" />
+    <ClCompile Include="BookmarkTreeTest.cpp" />
+    <ClCompile Include="CachedIconsTest.cpp" />
+    <ClCompile Include="ManifestTest.cpp" />
+    <ClCompile Include="NavigationControllerTest.cpp" />
+    <ClCompile Include="ViewModeHelperTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Explorer++\Explorer++.vcxproj">
