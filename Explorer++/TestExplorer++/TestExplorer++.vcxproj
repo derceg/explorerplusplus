@@ -79,6 +79,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
+    <ClCompile Include="BookmarkDropInfoTest.cpp" />
     <ClCompile Include="DataObjectTest.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="AcceleratorParserTest.cpp" />
@@ -100,6 +101,9 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BookmarkTreeHelper.h" />
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
@@ -143,7 +147,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\$(Platform)\$(Configuration);$(ProjectDir)..\Explorer++\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -163,7 +167,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\$(Platform)\$(Configuration);$(ProjectDir)..\Explorer++\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -184,7 +188,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(ProjectDir)..\$(Platform)\$(Configuration);$(ProjectDir)..\Explorer++\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-LLVM|x64'">
@@ -204,7 +208,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(ProjectDir)..\$(Platform)\$(Configuration);$(ProjectDir)..\Explorer++\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -224,7 +228,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>$(ProjectDir)..\$(Platform)\$(Configuration);$(ProjectDir)..\Explorer++\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -244,7 +248,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>$(ProjectDir)..\$(Platform)\$(Configuration);$(ProjectDir)..\Explorer++\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
