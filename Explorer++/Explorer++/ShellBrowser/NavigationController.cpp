@@ -6,7 +6,7 @@
 #include "NavigationController.h"
 
 NavigationController::NavigationController(NavigatorInterface *navigator, TabNavigationInterface *tabNavigation,
-	IconFetcher *iconFetcher) :
+	IconFetcherInterface *iconFetcher) :
 	m_navigator(navigator),
 	m_tabNavigation(tabNavigation),
 	m_iconFetcher(iconFetcher),
@@ -16,7 +16,7 @@ NavigationController::NavigationController(NavigatorInterface *navigator, TabNav
 }
 
 NavigationController::NavigationController(NavigatorInterface *navigator, TabNavigationInterface *tabNavigation,
-	IconFetcher *iconFetcher, const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
+	IconFetcherInterface *iconFetcher, const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
 	int currentEntry) :
 	m_navigator(navigator),
 	m_tabNavigation(tabNavigation),
@@ -65,6 +65,8 @@ void NavigationController::AddEntry(std::unique_ptr<HistoryEntry> entry)
 	// This will implicitly remove all "forward" entries.
 	m_entries.resize(m_currentEntry + 1);
 
+	// TODO: It would probably be better to do this somewhere else, since this
+	// class is focused on navigation.
 	m_iconFetcher->QueueIconTask(entry->GetPidl().get(), [this, index = m_currentEntry + 1, id = entry->GetId()]
 	(int iconIndex) {
 		if (index >= GetNumHistoryEntries())

@@ -14,18 +14,27 @@
 
 class CachedIcons;
 
-class IconFetcher
+class IconFetcherInterface
 {
 public:
 
 	using Callback = std::function<void(int iconIndex)>;
 
-	IconFetcher(HWND hwnd, CachedIcons *cachedIcons);
-	~IconFetcher();
+	virtual void QueueIconTask(std::wstring_view path, Callback callback) = 0;
+	virtual void QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback) = 0;
+	virtual void ClearQueue() = 0;
+};
 
-	void QueueIconTask(std::wstring_view path, Callback callback);
-	void QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback);
-	void ClearQueue();
+class IconFetcher : public IconFetcherInterface
+{
+public:
+
+	IconFetcher(HWND hwnd, CachedIcons *cachedIcons);
+	virtual ~IconFetcher();
+
+	void QueueIconTask(std::wstring_view path, Callback callback) override;
+	void QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback) override;
+	void ClearQueue() override;
 
 private:
 

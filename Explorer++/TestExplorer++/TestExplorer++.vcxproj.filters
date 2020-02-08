@@ -16,6 +16,9 @@
     <ClCompile Include="TestCachedIcons.cpp">
       <Filter>Helper</Filter>
     </ClCompile>
+    <ClCompile Include="TestNavigationController.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\gtest\gtest-all.cc" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\gmock\gmock-all.cc" />
@@ -29,6 +32,9 @@
     </Filter>
     <Filter Include="Helper">
       <UniqueIdentifier>{486e737f-f618-476b-a8e5-4baef24e3c9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ShellBrowser">
+      <UniqueIdentifier>{7ac66260-1cf9-4a66-b10f-9746b340444d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{d79645af-c720-443f-aeb6-c40b1167b6bb}</UniqueIdentifier>
