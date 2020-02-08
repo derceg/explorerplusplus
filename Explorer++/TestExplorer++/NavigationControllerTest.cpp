@@ -12,6 +12,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+using namespace testing;
+
 class NavigatorFake : public NavigatorInterface
 {
 public:
@@ -87,7 +89,7 @@ public:
 	MOCK_METHOD(void, ClearQueue, (), (override));
 };
 
-class NavigationControllerTest : public testing::Test
+class NavigationControllerTest : public Test
 {
 protected:
 
@@ -119,7 +121,7 @@ protected:
 	NavigationController m_navigationController;
 };
 
-class NavigationControllerPreservedTest : public testing::Test
+class NavigationControllerPreservedTest : public Test
 {
 protected:
 
@@ -338,7 +340,7 @@ TEST_F(NavigationControllerTest, NavigationMode) {
 	unique_pidl_absolute pidl(SHSimpleIDListFromPath(L"C:\\Fake"));
 	ASSERT_TRUE(pidl);
 
-	EXPECT_CALL(m_navigator, BrowseFolderImpl(pidl.get(), testing::_));
+	EXPECT_CALL(m_navigator, BrowseFolderImpl(pidl.get(), _));
 
 	// By default, all navigations should proceed in the current tab.
 	EXPECT_CALL(m_tabNavigation, CreateNewTab)
@@ -352,7 +354,7 @@ TEST_F(NavigationControllerTest, NavigationMode) {
 	EXPECT_CALL(m_navigator, BrowseFolderImpl)
 		.Times(0);
 
-	EXPECT_CALL(m_tabNavigation, CreateNewTab(pidl.get(), testing::_));
+	EXPECT_CALL(m_tabNavigation, CreateNewTab(pidl.get(), _));
 
 	hr = m_navigationController.BrowseFolder(pidl.get());
 	ASSERT_HRESULT_SUCCEEDED(hr);
