@@ -6,6 +6,8 @@
 
 #include <wil/resource.h>
 #include <optional>
+#include <string>
+#include <vector>
 
 std::optional<std::wstring> ReadStringFromGlobal(HGLOBAL global);
 wil::unique_hglobal WriteStringToGlobal(const std::wstring &str);

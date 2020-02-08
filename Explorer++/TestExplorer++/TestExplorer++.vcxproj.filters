@@ -22,6 +22,9 @@
     <ClCompile Include="AcceleratorParserTest.cpp" />
     <ClCompile Include="ManifestTest.cpp" />
     <ClCompile Include="ViewModeHelperTest.cpp" />
+    <ClCompile Include="DataObjectTest.cpp">
+      <Filter>Helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
