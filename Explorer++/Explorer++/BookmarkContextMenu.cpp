@@ -16,6 +16,7 @@ BookmarkContextMenu::BookmarkContextMenu(BookmarkTree *bookmarkTree, HMODULE res
 	m_bookmarkTree(bookmarkTree),
 	m_resourceModule(resourceModule),
 	m_expp(expp),
+	m_controller(bookmarkTree, resourceModule, expp),
 	m_showingMenu(false)
 {
 
@@ -74,7 +75,7 @@ BOOL BookmarkContextMenu::ShowMenu(HWND parentWindow, BookmarkItem *parentFolder
 			targetParentFolder = bookmarkItems[0];
 		}
 
-		OnMenuItemSelected(menuItemId, targetParentFolder, bookmarkItems, parentWindow);
+		m_controller.OnMenuItemSelected(menuItemId, targetParentFolder, bookmarkItems, parentWindow);
 	}
 
 	return TRUE;
@@ -144,139 +145,6 @@ void BookmarkContextMenu::SetUpMenu(HMENU menu, const RawBookmarkItems &bookmark
 void BookmarkContextMenu::SetMenuItemStates(HMENU menu)
 {
 	lEnableMenuItem(menu, IDM_BOOKMARKS_PASTE, IsClipboardFormatAvailable(BookmarkClipboard::GetClipboardFormat()));
-}
-
-void BookmarkContextMenu::OnMenuItemSelected(int menuItemId, BookmarkItem *parentFolder,
-	const RawBookmarkItems &bookmarkItems, HWND parentWindow)
-{
-	switch (menuItemId)
-	{
-	case IDM_BOOKMARKS_OPEN:
-	{
-		assert(bookmarkItems.size() == 1 && bookmarkItems[0]->IsBookmark());
-
-		Tab &selectedTab = m_expp->GetTabContainer()->GetSelectedTab();
-		selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(bookmarkItems[0]->GetLocation().c_str());
-	}
-		break;
-
-	case IDM_BOOKMARKS_OPEN_IN_NEW_TAB:
-		assert(bookmarkItems.size() == 1 && bookmarkItems[0]->IsBookmark());
-		BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItems[0], m_expp);
-		break;
-
-	case IDM_BOOKMARKS_OPEN_ALL:
-		OnOpenAll(bookmarkItems);
-		break;
-
-	case IDM_BOOKMARKS_NEW_BOOKMARK:
-		OnNewBookmarkItem(BookmarkItem::Type::Bookmark, parentFolder, parentWindow);
-		break;
-
-	case IDM_BOOKMARKS_NEW_FOLDER:
-		OnNewBookmarkItem(BookmarkItem::Type::Folder, parentFolder, parentWindow);
-		break;
-
-	case IDM_BOOKMARKS_CUT:
-		OnCopy(bookmarkItems, true);
-		break;
-
-	case IDM_BOOKMARKS_COPY:
-		OnCopy(bookmarkItems, false);
-		break;
-
-	case IDM_BOOKMARKS_PASTE:
-		OnPaste(parentFolder);
-		break;
-
-	case IDM_BOOKMARKS_DELETE:
-		OnDelete(bookmarkItems);
-		break;
-
-	case IDM_BOOKMARKS_PROPERTIES:
-		assert(bookmarkItems.size() == 1);
-		OnEditBookmarkItem(bookmarkItems[0], parentWindow);
-		break;
-
-	default:
-		assert(false);
-		break;
-	}
-}
-
-void BookmarkContextMenu::OnOpenAll(const RawBookmarkItems &bookmarkItems)
-{
-	for (auto bookmarkItem : bookmarkItems)
-	{
-		BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_expp);
-	}
-}
-
-void BookmarkContextMenu::OnNewBookmarkItem(BookmarkItem::Type type, BookmarkItem *parentFolder,
-	HWND parentWindow)
-{
-	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, parentFolder, m_resourceModule, parentWindow,
-		m_expp->GetTabContainer(), m_expp);
-}
-
-void BookmarkContextMenu::OnCopy(const RawBookmarkItems &bookmarkItems, bool cut)
-{
-	OwnedRefBookmarkItems ownedBookmarkItems;
-
-	for (auto bookmarkItem : bookmarkItems)
-	{
-		auto &ownedPtr = bookmarkItem->GetParent()->GetChildOwnedPtr(bookmarkItem);
-		ownedBookmarkItems.push_back(ownedPtr);
-	}
-
-	BookmarkClipboard bookmarkClipboard;
-	bool res = bookmarkClipboard.WriteBookmarks(ownedBookmarkItems);
-
-	if (cut && res)
-	{
-		for (auto bookmarkItem : bookmarkItems)
-		{
-			m_bookmarkTree->RemoveBookmarkItem(bookmarkItem);
-		}
-	}
-}
-
-void BookmarkContextMenu::OnPaste(BookmarkItem *parentFolder)
-{
-	BookmarkClipboard bookmarkClipboard;
-	auto bookmarkItems = bookmarkClipboard.ReadBookmarks();
-	int i = 0;
-
-	for (auto &bookmarkItem : bookmarkItems)
-	{
-		if (parentFolder->IsFolder())
-		{
-			m_bookmarkTree->AddBookmarkItem(parentFolder, std::move(bookmarkItem),
-				parentFolder->GetChildren().size() + i);
-		}
-		else
-		{
-			BookmarkItem *parent = parentFolder->GetParent();
-			m_bookmarkTree->AddBookmarkItem(parent, std::move(bookmarkItem),
-				parent->GetChildIndex(parentFolder) + i + 1);
-		}
-
-		i++;
-	}
-}
-
-void BookmarkContextMenu::OnDelete(const RawBookmarkItems &bookmarkItems)
-{
-	for (auto bookmarkItem : bookmarkItems)
-	{
-		m_bookmarkTree->RemoveBookmarkItem(bookmarkItem);
-	}
-}
-
-void BookmarkContextMenu::OnEditBookmarkItem(BookmarkItem *bookmarkItem, HWND parentWindow)
-{
-	BookmarkHelper::EditBookmarkItem(bookmarkItem, m_bookmarkTree, m_resourceModule,
-		parentWindow, m_expp);
 }
 
 bool BookmarkContextMenu::IsShowingMenu() const

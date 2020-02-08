@@ -397,6 +397,9 @@
     <ClCompile Include="BookmarkXmlStorage.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
+    <ClCompile Include="BookmarkContextMenuController.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -806,6 +809,9 @@
     </ClInclude>
     <ClInclude Include="BookmarkStorage.h">
       <Filter>Bookmarks</Filter>
+    </ClInclude>
+    <ClInclude Include="BookmarkContextMenuController.h">
+      <Filter>Bookmarks\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

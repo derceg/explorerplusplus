@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "BookmarkContextMenuController.h"
 #include "BookmarkHelper.h"
 #include "BookmarkItem.h"
 #include "BookmarkTree.h"
@@ -24,17 +25,9 @@ private:
 	void SetUpMenu(HMENU menu, const RawBookmarkItems &bookmarkItems);
 	void SetMenuItemStates(HMENU menu);
 
-	void OnMenuItemSelected(int menuItemId, BookmarkItem *parentFolder, const RawBookmarkItems &bookmarkItems,
-		HWND parentWindow);
-	void OnOpenAll(const RawBookmarkItems &bookmarkItems);
-	void OnNewBookmarkItem(BookmarkItem::Type type, BookmarkItem *parentFolder, HWND parentWindow);
-	void OnCopy(const RawBookmarkItems &bookmarkItems, bool cut);
-	void OnPaste(BookmarkItem *selectedBookmarkItem);
-	void OnDelete(const RawBookmarkItems &bookmarkItems);
-	void OnEditBookmarkItem(BookmarkItem *bookmarkItem, HWND parentWindow);
-
 	BookmarkTree *m_bookmarkTree;
 	HMODULE m_resourceModule;
 	IExplorerplusplus *m_expp;
+	BookmarkContextMenuController m_controller;
 	bool m_showingMenu;
 };

@@ -461,6 +461,7 @@
     <ClCompile Include="ApplicationToolbarDropHandler.cpp" />
     <ClCompile Include="BookmarkClipboard.cpp" />
     <ClCompile Include="BookmarkContextMenu.cpp" />
+    <ClCompile Include="BookmarkContextMenuController.cpp" />
     <ClCompile Include="BookmarkDataExchange.cpp" />
     <ClCompile Include="BookmarkDropInfo.cpp" />
     <ClCompile Include="BookmarkDropTargetWindow.cpp" />
@@ -611,6 +612,7 @@
     <ClInclude Include="ApplicationToolbarDropHandler.h" />
     <ClInclude Include="BookmarkClipboard.h" />
     <ClInclude Include="BookmarkContextMenu.h" />
+    <ClInclude Include="BookmarkContextMenuController.h" />
     <ClInclude Include="BookmarkDataExchange.h" />
     <ClInclude Include="BookmarkDropInfo.h" />
     <ClInclude Include="BookmarkDropTargetWindow.h" />
