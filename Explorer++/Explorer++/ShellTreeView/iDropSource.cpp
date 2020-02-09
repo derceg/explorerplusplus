@@ -3,9 +3,9 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "MyTreeView.h"
+#include "ShellTreeView.h"
 
-HRESULT _stdcall MyTreeView::QueryContinueDrag(BOOL fEscapePressed,DWORD grfKeyState)
+HRESULT _stdcall ShellTreeView::QueryContinueDrag(BOOL fEscapePressed,DWORD grfKeyState)
 {
 	DWORD dwStopButton = 0;
 
@@ -30,7 +30,7 @@ HRESULT _stdcall MyTreeView::QueryContinueDrag(BOOL fEscapePressed,DWORD grfKeyS
 	return S_OK;
 }
 
-HRESULT _stdcall MyTreeView::GiveFeedback(DWORD dwEffect)
+HRESULT _stdcall ShellTreeView::GiveFeedback(DWORD dwEffect)
 {
 	UNREFERENCED_PARAMETER(dwEffect);
 

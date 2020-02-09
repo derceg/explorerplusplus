@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "MyTreeView.h"
+#include "ShellTreeView.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
@@ -26,7 +26,7 @@ UINT_PTR idEvent,DWORD dwTime);
 HTREEITEM	g_hExpand = NULL;
 BOOL		g_bAllowScroll = FALSE;
 
-HRESULT _stdcall MyTreeView::DragEnter(IDataObject *pDataObject,
+HRESULT _stdcall ShellTreeView::DragEnter(IDataObject *pDataObject,
 DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 {
 	m_pDataObject = pDataObject;
@@ -90,7 +90,7 @@ void CALLBACK DragScrollTimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwT
 	KillTimer(hwnd,DRAGSCROLL_TIMER_ID);
 }
 
-DWORD MyTreeView::GetCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,POINTL *ptl)
+DWORD ShellTreeView::GetCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,POINTL *ptl)
 {
 	TVHITTESTINFO	tvhi;
 	HTREEITEM		hItem;
@@ -129,7 +129,7 @@ void CALLBACK DragExpandTimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwT
 	KillTimer(hwnd,DRAGEXPAND_TIMER_ID);
 }
 
-HRESULT _stdcall MyTreeView::DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
+HRESULT _stdcall ShellTreeView::DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 {
 	TVHITTESTINFO tvht;
 	RECT rc;
@@ -187,7 +187,7 @@ if the files come from different drives,
 whether this operation is classed as a copy
 or move is only based on the location of the
 first file). */
-BOOL MyTreeView::CheckItemLocations(IDataObject *pDataObject,HTREEITEM hItem,
+BOOL ShellTreeView::CheckItemLocations(IDataObject *pDataObject,HTREEITEM hItem,
 int iDroppedItem)
 {
 	FORMATETC	ftc;
@@ -239,7 +239,7 @@ int iDroppedItem)
 	return bOnSameDrive;
 }
 
-HRESULT _stdcall MyTreeView::DragLeave(void)
+HRESULT _stdcall ShellTreeView::DragLeave(void)
 {
 	RestoreState();
 
@@ -250,7 +250,7 @@ HRESULT _stdcall MyTreeView::DragLeave(void)
 	return S_OK;
 }
 
-HRESULT _stdcall MyTreeView::Drop(IDataObject *pDataObject,DWORD grfKeyState,
+HRESULT _stdcall ShellTreeView::Drop(IDataObject *pDataObject,DWORD grfKeyState,
 POINTL pt,DWORD *pdwEffect)
 {
 	KillTimer(m_hTreeView,DRAGEXPAND_TIMER_ID);
@@ -284,7 +284,7 @@ POINTL pt,DWORD *pdwEffect)
 	return S_OK;
 }
 
-void MyTreeView::RestoreState(void)
+void ShellTreeView::RestoreState(void)
 {
 	TreeView_Select(m_hTreeView,NULL,TVGN_DROPHILITE);
 

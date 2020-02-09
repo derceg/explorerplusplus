@@ -15,7 +15,7 @@
  */
 
 #include "stdafx.h"
-#include "MyTreeView.h"
+#include "ShellTreeView.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/DriveInfo.h"
 #include "../Helper/Helper.h"
@@ -27,7 +27,7 @@
 int CALLBACK		CompareItemsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
 DWORD WINAPI		Thread_MonitorAllDrives(LPVOID pParam);
 
-MyTreeView::MyTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pDirMon, CachedIcons *cachedIcons) :
+ShellTreeView::ShellTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pDirMon, CachedIcons *cachedIcons) :
 	m_hTreeView(hTreeView),
 	m_pDirMon(pDirMon),
 	m_cachedIcons(cachedIcons),
@@ -71,7 +71,7 @@ MyTreeView::MyTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pDirMon,
 	CloseHandle(hThread);
 }
 
-MyTreeView::~MyTreeView()
+ShellTreeView::~ShellTreeView()
 {
 	DeleteCriticalSection(&m_cs);
 
@@ -87,17 +87,17 @@ MyTreeView::~MyTreeView()
 	m_subfoldersThreadPool.push(uninitializeComTask);
 }
 
-LRESULT CALLBACK MyTreeView::TreeViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
+LRESULT CALLBACK ShellTreeView::TreeViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
 	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	MyTreeView *pMyTreeView = reinterpret_cast<MyTreeView *>(dwRefData);
+	ShellTreeView *shellTreeView = reinterpret_cast<ShellTreeView *>(dwRefData);
 
-	return pMyTreeView->TreeViewProc(hwnd,uMsg,wParam,lParam);
+	return shellTreeView->TreeViewProc(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK MyTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch(msg)
 	{
@@ -200,15 +200,15 @@ LRESULT CALLBACK MyTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LP
 	return DefSubclassProc(hwnd,msg,wParam,lParam);
 }
 
-LRESULT CALLBACK MyTreeView::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK ShellTreeView::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	MyTreeView *treeView = reinterpret_cast<MyTreeView *>(dwRefData);
+	ShellTreeView *treeView = reinterpret_cast<ShellTreeView *>(dwRefData);
 	return treeView->ParentWndProc(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK MyTreeView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ShellTreeView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -239,7 +239,7 @@ LRESULT CALLBACK MyTreeView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-HTREEITEM MyTreeView::AddRoot()
+HTREEITEM ShellTreeView::AddRoot()
 {
 	TreeView_DeleteAllItems(m_hTreeView);
 
@@ -280,7 +280,7 @@ HTREEITEM MyTreeView::AddRoot()
 	return hDesktop;
 }
 
-HRESULT MyTreeView::ExpandDirectory(HTREEITEM hParent)
+HRESULT ShellTreeView::ExpandDirectory(HTREEITEM hParent)
 {
 	auto pidlDirectory = GetItemPidl(hParent);
 
@@ -295,7 +295,7 @@ HRESULT MyTreeView::ExpandDirectory(HTREEITEM hParent)
 	return hr;
 }
 
-void MyTreeView::OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi)
+void ShellTreeView::OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi)
 {
 	TVITEM *ptvItem = &pnmtvdi->item;
 
@@ -328,7 +328,7 @@ void MyTreeView::OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi)
 	ptvItem->mask |= TVIF_DI_SETITEM;
 }
 
-std::optional<int> MyTreeView::GetCachedIconIndex(const ItemInfo_t &itemInfo)
+std::optional<int> ShellTreeView::GetCachedIconIndex(const ItemInfo_t &itemInfo)
 {
 	TCHAR filePath[MAX_PATH];
 	HRESULT hr = GetDisplayName(itemInfo.pidl.get(), filePath, SIZEOF_ARRAY(filePath), SHGDN_FORPARSING);
@@ -348,7 +348,7 @@ std::optional<int> MyTreeView::GetCachedIconIndex(const ItemInfo_t &itemInfo)
 	return cachedItr->iconIndex;
 }
 
-void MyTreeView::QueueIconTask(HTREEITEM item, int internalIndex)
+void ShellTreeView::QueueIconTask(HTREEITEM item, int internalIndex)
 {
 	const ItemInfo_t &itemInfo = m_itemInfoMap.at(internalIndex);
 
@@ -366,7 +366,7 @@ void MyTreeView::QueueIconTask(HTREEITEM item, int internalIndex)
 	m_iconResults.insert({ iconResultID, std::move(result) });
 }
 
-std::optional<MyTreeView::IconResult> MyTreeView::FindIconAsync(HWND treeView,
+std::optional<ShellTreeView::IconResult> ShellTreeView::FindIconAsync(HWND treeView,
 	int iconResultId, HTREEITEM item, int internalIndex, PCIDLIST_ABSOLUTE pidl)
 {
 	SHFILEINFO shfi;
@@ -390,7 +390,7 @@ std::optional<MyTreeView::IconResult> MyTreeView::FindIconAsync(HWND treeView,
 	return result;
 }
 
-void MyTreeView::ProcessIconResult(int iconResultId)
+void ShellTreeView::ProcessIconResult(int iconResultId)
 {
 	auto itr = m_iconResults.find(iconResultId);
 
@@ -430,7 +430,7 @@ void MyTreeView::ProcessIconResult(int iconResultId)
 	TreeView_SetItem(m_hTreeView, &tvItem);
 }
 
-void MyTreeView::QueueSubfoldersTask(HTREEITEM item)
+void ShellTreeView::QueueSubfoldersTask(HTREEITEM item)
 {
 	BasicItemInfo basicItemInfo;
 	basicItemInfo.pidl = GetItemPidl(item);
@@ -446,7 +446,7 @@ void MyTreeView::QueueSubfoldersTask(HTREEITEM item)
 	m_subfoldersResults.insert({ subfoldersResultID, std::move(result) });
 }
 
-std::optional<MyTreeView::SubfoldersResult> MyTreeView::CheckSubfoldersAsync(HWND treeView,
+std::optional<ShellTreeView::SubfoldersResult> ShellTreeView::CheckSubfoldersAsync(HWND treeView,
 	int subfoldersResultId, HTREEITEM item, PCIDLIST_ABSOLUTE pidl)
 {
 	wil::com_ptr<IShellFolder> pShellFolder;
@@ -475,7 +475,7 @@ std::optional<MyTreeView::SubfoldersResult> MyTreeView::CheckSubfoldersAsync(HWN
 	return result;
 }
 
-void MyTreeView::ProcessSubfoldersResult(int subfoldersResultId)
+void ShellTreeView::ProcessSubfoldersResult(int subfoldersResultId)
 {
 	auto itr = m_subfoldersResults.find(subfoldersResultId);
 
@@ -509,7 +509,7 @@ void MyTreeView::ProcessSubfoldersResult(int subfoldersResultId)
 	TreeView_SetItem(m_hTreeView, &tvItem);
 }
 
-void MyTreeView::OnItemExpanding(const NMTREEVIEW *nmtv)
+void ShellTreeView::OnItemExpanding(const NMTREEVIEW *nmtv)
 {
 	HTREEITEM parentItem = nmtv->itemNew.hItem;
 
@@ -553,14 +553,14 @@ void MyTreeView::OnItemExpanding(const NMTREEVIEW *nmtv)
 Each set is ordered alphabetically. */
 int CALLBACK CompareItemsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	MyTreeView *pMyTreeView = NULL;
+	ShellTreeView *shellTreeView = NULL;
 
-	pMyTreeView = (MyTreeView *)lParamSort;
+	shellTreeView = (ShellTreeView *)lParamSort;
 
-	return pMyTreeView->CompareItems(lParam1,lParam2);
+	return shellTreeView->CompareItems(lParam1,lParam2);
 }
 
-int CALLBACK MyTreeView::CompareItems(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK ShellTreeView::CompareItems(LPARAM lParam1,LPARAM lParam2)
 {
 	TCHAR szDisplayName1[MAX_PATH];
 	TCHAR szDisplayName2[MAX_PATH];
@@ -608,7 +608,7 @@ int CALLBACK MyTreeView::CompareItems(LPARAM lParam1,LPARAM lParam2)
 	}
 }
 
-void MyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSOLUTE pidlDirectory,
+void ShellTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSOLUTE pidlDirectory,
 	HTREEITEM hParent)
 {
 	SHCONTF EnumFlags = SHCONTF_FOLDERS;
@@ -685,12 +685,12 @@ void MyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSOL
 	SendMessage(m_hTreeView, WM_SETREDRAW, TRUE, 0);
 }
 
-int MyTreeView::GenerateUniqueItemId()
+int ShellTreeView::GenerateUniqueItemId()
 {
 	return m_itemIDCounter++;
 }
 
-HTREEITEM MyTreeView::DetermineItemSortedPosition(HTREEITEM hParent, const TCHAR *szItem)
+HTREEITEM ShellTreeView::DetermineItemSortedPosition(HTREEITEM hParent, const TCHAR *szItem)
 {
 	HTREEITEM	htInsertAfter = NULL;
 
@@ -752,7 +752,7 @@ HTREEITEM MyTreeView::DetermineItemSortedPosition(HTREEITEM hParent, const TCHAR
 	return htInsertAfter;
 }
 
-HTREEITEM MyTreeView::DetermineDriveSortedPosition(HTREEITEM hParent, const TCHAR *szItemName)
+HTREEITEM ShellTreeView::DetermineDriveSortedPosition(HTREEITEM hParent, const TCHAR *szItemName)
 {
 	HTREEITEM	htItem;
 	HTREEITEM	hPreviousItem;
@@ -797,7 +797,7 @@ HTREEITEM MyTreeView::DetermineDriveSortedPosition(HTREEITEM hParent, const TCHA
 	return htItem;
 }
 
-unique_pidl_absolute MyTreeView::GetItemPidl(HTREEITEM hTreeItem)
+unique_pidl_absolute ShellTreeView::GetItemPidl(HTREEITEM hTreeItem)
 {
 	TVITEMEX tvItemEx;
 	tvItemEx.mask = TVIF_HANDLE | TVIF_PARAM;
@@ -810,7 +810,7 @@ unique_pidl_absolute MyTreeView::GetItemPidl(HTREEITEM hTreeItem)
 	return pidl;
 }
 
-HTREEITEM MyTreeView::LocateItem(PCIDLIST_ABSOLUTE pidlDirectory)
+HTREEITEM ShellTreeView::LocateItem(PCIDLIST_ABSOLUTE pidlDirectory)
 {
 	return LocateItemInternal(pidlDirectory,FALSE);
 }
@@ -831,7 +831,7 @@ folder in Windows 7 has a display name of
 direct path lookup will fail. */
 /* TODO: Store parsing name with each item, and
 match against that. */
-HTREEITEM MyTreeView::LocateDeletedItem(const TCHAR *szFullFileName)
+HTREEITEM ShellTreeView::LocateDeletedItem(const TCHAR *szFullFileName)
 {
 	HTREEITEM hItem = NULL;
 	PIDLIST_ABSOLUTE pidl = NULL;
@@ -889,7 +889,7 @@ HTREEITEM MyTreeView::LocateDeletedItem(const TCHAR *szFullFileName)
 	return hItem;
 }
 
-HTREEITEM MyTreeView::LocateExistingItem(const TCHAR *szParsingPath)
+HTREEITEM ShellTreeView::LocateExistingItem(const TCHAR *szParsingPath)
 {
 	unique_pidl_absolute pidl;
 	HRESULT hr = SHParseDisplayName(szParsingPath, nullptr, wil::out_param(pidl), 0, nullptr);
@@ -902,12 +902,12 @@ HTREEITEM MyTreeView::LocateExistingItem(const TCHAR *szParsingPath)
 	return NULL;
 }
 
-HTREEITEM MyTreeView::LocateExistingItem(PCIDLIST_ABSOLUTE pidlDirectory)
+HTREEITEM ShellTreeView::LocateExistingItem(PCIDLIST_ABSOLUTE pidlDirectory)
 {
 	return LocateItemInternal(pidlDirectory,TRUE);
 }
 
-HTREEITEM MyTreeView::LocateItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, BOOL bOnlyLocateExistingItem)
+HTREEITEM ShellTreeView::LocateItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, BOOL bOnlyLocateExistingItem)
 {
 	HTREEITEM	hRoot;
 	HTREEITEM	hItem;
@@ -967,7 +967,7 @@ HTREEITEM MyTreeView::LocateItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, BOOL b
 	return hItem;
 }
 
-HTREEITEM MyTreeView::LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand)
+HTREEITEM ShellTreeView::LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand)
 {
 	HTREEITEM		hMyComputer;
 	HTREEITEM		hItem;
@@ -1063,7 +1063,7 @@ HTREEITEM MyTreeView::LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand)
 
 /* Locate an item which is a Desktop (sub)child, if visible.
    Does not expand any item */
-HTREEITEM MyTreeView::LocateItemOnDesktopTree(const TCHAR *szFullFileName)
+HTREEITEM ShellTreeView::LocateItemOnDesktopTree(const TCHAR *szFullFileName)
 {
 	HTREEITEM	hItem;
 	TVITEMEX	tvItem;
@@ -1133,7 +1133,7 @@ HTREEITEM MyTreeView::LocateItemOnDesktopTree(const TCHAR *szFullFileName)
 	return hItem;
 }
 
-void MyTreeView::EraseItems(HTREEITEM hParent)
+void ShellTreeView::EraseItems(HTREEITEM hParent)
 {
 	HTREEITEM hItem = TreeView_GetChild(m_hTreeView, hParent);
 
@@ -1155,7 +1155,7 @@ void MyTreeView::EraseItems(HTREEITEM hParent)
 	}
 }
 
-LRESULT CALLBACK MyTreeView::OnDeviceChange(WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK ShellTreeView::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 {
 	switch(wParam)
 	{
@@ -1350,12 +1350,12 @@ LRESULT CALLBACK MyTreeView::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 
 DWORD WINAPI Thread_MonitorAllDrives(LPVOID pParam)
 {
-	MyTreeView *pMyTreeView = NULL;
+	ShellTreeView *shellTreeView = NULL;
 	TCHAR	*pszDriveStrings = NULL;
 	TCHAR	*ptrDrive = NULL;
 	DWORD	dwSize;
 
-	pMyTreeView = (MyTreeView *)pParam;
+	shellTreeView = (ShellTreeView *)pParam;
 
 	dwSize = GetLogicalDriveStrings(0,NULL);
 
@@ -1372,7 +1372,7 @@ DWORD WINAPI Thread_MonitorAllDrives(LPVOID pParam)
 
 		while(*ptrDrive != '\0')
 		{
-			pMyTreeView->MonitorDrivePublic(ptrDrive);
+			shellTreeView->MonitorDrivePublic(ptrDrive);
 
 			ptrDrive += lstrlen(ptrDrive) + 1;
 		}
@@ -1383,12 +1383,12 @@ DWORD WINAPI Thread_MonitorAllDrives(LPVOID pParam)
 	return 1;
 }
 
-void MyTreeView::MonitorDrivePublic(const TCHAR *szDrive)
+void ShellTreeView::MonitorDrivePublic(const TCHAR *szDrive)
 {
 	MonitorDrive(szDrive);
 }
 
-void MyTreeView::MonitorDrive(const TCHAR *szDrive)
+void ShellTreeView::MonitorDrive(const TCHAR *szDrive)
 {
 	DirectoryAltered_t		*pDirectoryAltered = NULL;
 	DEV_BROADCAST_HANDLE	dbv;
@@ -1411,10 +1411,10 @@ void MyTreeView::MonitorDrive(const TCHAR *szDrive)
 			pDirectoryAltered = (DirectoryAltered_t *)malloc(sizeof(DirectoryAltered_t));
 
 			StringCchCopy(pDirectoryAltered->szPath, SIZEOF_ARRAY(pDirectoryAltered->szPath), szDrive);
-			pDirectoryAltered->pMyTreeView	= this;
+			pDirectoryAltered->shellTreeView	= this;
 
 			iMonitorId = m_pDirMon->WatchDirectory(hDrive,szDrive,FILE_NOTIFY_CHANGE_DIR_NAME,
-				MyTreeView::DirectoryAlteredCallback,TRUE,(void *)pDirectoryAltered);
+				ShellTreeView::DirectoryAlteredCallback,TRUE,(void *)pDirectoryAltered);
 
 			dbv.dbch_size		= sizeof(dbv);
 			dbv.dbch_devicetype	= DBT_DEVTYP_HANDLE;
@@ -1439,7 +1439,7 @@ void MyTreeView::MonitorDrive(const TCHAR *szDrive)
 	}
 }
 
-HRESULT MyTreeView::InitializeDragDropHelpers(void)
+HRESULT ShellTreeView::InitializeDragDropHelpers(void)
 {
 	HRESULT hr;
 
@@ -1466,7 +1466,7 @@ HRESULT MyTreeView::InitializeDragDropHelpers(void)
 }
 
 /* IUnknown interface members. */
-HRESULT __stdcall MyTreeView::QueryInterface(REFIID iid, void **ppvObject)
+HRESULT __stdcall ShellTreeView::QueryInterface(REFIID iid, void **ppvObject)
 {
 	if(ppvObject == NULL)
 	{
@@ -1502,12 +1502,12 @@ HRESULT __stdcall MyTreeView::QueryInterface(REFIID iid, void **ppvObject)
 	return E_NOINTERFACE;
 }
 
-ULONG __stdcall MyTreeView::AddRef(void)
+ULONG __stdcall ShellTreeView::AddRef(void)
 {
 	return ++m_iRefCount;
 }
 
-ULONG __stdcall MyTreeView::Release(void)
+ULONG __stdcall ShellTreeView::Release(void)
 {
 	m_iRefCount--;
 	
@@ -1520,17 +1520,17 @@ ULONG __stdcall MyTreeView::Release(void)
 	return m_iRefCount;
 }
 
-BOOL MyTreeView::QueryDragging(void)
+BOOL ShellTreeView::QueryDragging(void)
 {
 	return m_bDragging;
 }
 
-void MyTreeView::SetShowHidden(BOOL bShowHidden)
+void ShellTreeView::SetShowHidden(BOOL bShowHidden)
 {
 	m_bShowHidden = bShowHidden;
 }
 
-void MyTreeView::RefreshAllIcons(void)
+void ShellTreeView::RefreshAllIcons(void)
 {
 	HTREEITEM hRoot = TreeView_GetRoot(m_hTreeView);
 
@@ -1554,7 +1554,7 @@ void MyTreeView::RefreshAllIcons(void)
 	RefreshAllIconsInternal(TreeView_GetChild(m_hTreeView,hRoot));
 }
 
-void MyTreeView::RefreshAllIconsInternal(HTREEITEM hFirstSibling)
+void ShellTreeView::RefreshAllIconsInternal(HTREEITEM hFirstSibling)
 {
 	HTREEITEM	hNextSibling;
 	HTREEITEM	hChild;
@@ -1607,7 +1607,7 @@ void MyTreeView::RefreshAllIconsInternal(HTREEITEM hFirstSibling)
 	}
 }
 
-HRESULT MyTreeView::OnBeginDrag(int iItemId,DragType dragType)
+HRESULT ShellTreeView::OnBeginDrag(int iItemId,DragType dragType)
 {
 	IDataObject			*pDataObject = NULL;
 	IDragSourceHelper	*pDragSourceHelper = NULL;
@@ -1650,7 +1650,7 @@ HRESULT MyTreeView::OnBeginDrag(int iItemId,DragType dragType)
 	return hr;
 }
 
-BOOL MyTreeView::IsDesktop(const TCHAR *szPath)
+BOOL ShellTreeView::IsDesktop(const TCHAR *szPath)
 {
 	TCHAR szDesktop[MAX_PATH];
 
@@ -1659,7 +1659,7 @@ BOOL MyTreeView::IsDesktop(const TCHAR *szPath)
 	return (lstrcmp(szPath,szDesktop) == 0);
 }
 
-BOOL MyTreeView::IsDesktopSubChild(const TCHAR *szFullFileName)
+BOOL ShellTreeView::IsDesktopSubChild(const TCHAR *szFullFileName)
 {
 	TCHAR szDesktop[MAX_PATH];
 

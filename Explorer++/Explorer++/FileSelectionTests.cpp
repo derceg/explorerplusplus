@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "MyTreeView/MyTreeView.h"
+#include "ShellTreeView/ShellTreeView.h"
 
 BOOL Explorerplusplus::AnyItemsSelected() const
 {
@@ -166,7 +166,7 @@ HRESULT Explorerplusplus::GetTreeViewSelectionAttributes(SFGAOF *pItemAttributes
 
 	if (hItem != NULL)
 	{
-		auto pidl = m_pMyTreeView->GetItemPidl(hItem);
+		auto pidl = m_shellTreeView->GetItemPidl(hItem);
 		hr = GetItemAttributes(pidl.get(), pItemAttributes);
 	}
 
@@ -203,7 +203,7 @@ BOOL Explorerplusplus::CanPaste() const
 
 		if (hItem != NULL)
 		{
-			auto pidl = m_pMyTreeView->GetItemPidl(hItem);
+			auto pidl = m_shellTreeView->GetItemPidl(hItem);
 
 			SFGAOF attributes = SFGAO_FILESYSTEM;
 			HRESULT hr = GetItemAttributes(pidl.get(), &attributes);

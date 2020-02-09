@@ -67,7 +67,7 @@ class TaskbarThumbnails;
 
 __interface IDirectoryMonitor;
 
-class MyTreeView;
+class ShellTreeView;
 
 class Explorerplusplus : public IExplorerplusplus, public TabNavigationInterface,
 	public IFileContextMenuExternal, public PluginInterface
@@ -512,7 +512,7 @@ private:
 	HWND					m_hBookmarksToolbar;
 
 	IDirectoryMonitor *		m_pDirMon;
-	MyTreeView *			m_pMyTreeView;
+	ShellTreeView *			m_shellTreeView;
 	StatusBar *			m_pStatusBar;
 
 	HMODULE					m_hLanguageModule;

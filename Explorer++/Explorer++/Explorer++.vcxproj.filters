@@ -400,17 +400,17 @@
     <ClCompile Include="BookmarkContextMenuController.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
-    <ClCompile Include="MyTreeView\DirectoryModificationHandler.cpp">
-      <Filter>MyTreeView</Filter>
+    <ClCompile Include="ShellTreeView\DirectoryModificationHandler.cpp">
+      <Filter>ShellTreeView</Filter>
     </ClCompile>
-    <ClCompile Include="MyTreeView\iDropSource.cpp">
-      <Filter>MyTreeView</Filter>
+    <ClCompile Include="ShellTreeView\iDropSource.cpp">
+      <Filter>ShellTreeView</Filter>
     </ClCompile>
-    <ClCompile Include="MyTreeView\iDropTarget.cpp">
-      <Filter>MyTreeView</Filter>
+    <ClCompile Include="ShellTreeView\iDropTarget.cpp">
+      <Filter>ShellTreeView</Filter>
     </ClCompile>
-    <ClCompile Include="MyTreeView\MyTreeView.cpp">
-      <Filter>MyTreeView</Filter>
+    <ClCompile Include="ShellTreeView\ShellTreeView.cpp">
+      <Filter>ShellTreeView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -825,8 +825,8 @@
     <ClInclude Include="BookmarkContextMenuController.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
-    <ClInclude Include="MyTreeView\MyTreeView.h">
-      <Filter>MyTreeView</Filter>
+    <ClInclude Include="ShellTreeView\ShellTreeView.h">
+      <Filter>ShellTreeView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -934,8 +934,8 @@
     <Filter Include="Bookmarks\UI">
       <UniqueIdentifier>{ce3e8ee9-017a-43b7-b601-015d3d2d1b4c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MyTreeView">
-      <UniqueIdentifier>{1ba747be-b194-45dc-abc3-d6ef2eb81de0}</UniqueIdentifier>
+    <Filter Include="ShellTreeView">
+      <UniqueIdentifier>{e9f8553a-d212-4c0f-a749-708a1664278c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

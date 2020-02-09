@@ -11,10 +11,10 @@
 #include "LoadSaveRegistry.h"
 #include "LoadSaveXml.h"
 #include "MainResource.h"
-#include "MyTreeView/MyTreeView.h"
 #include "Navigation.h"
 #include "PluginManager.h"
 #include "ShellBrowser/ViewModes.h"
+#include "ShellTreeView/ShellTreeView.h"
 #include "ToolbarButtons.h"
 #include "ViewModeHelper.h"
 #include "../Helper/BulkClipboardWriter.h"
@@ -1222,7 +1222,7 @@ void Explorerplusplus::OnAssocChanged()
 	}
 
 	/* Now, refresh the treeview. */
-	m_pMyTreeView->RefreshAllIcons();
+	m_shellTreeView->RefreshAllIcons();
 
 	/* TODO: Update the address bar. */
 }
