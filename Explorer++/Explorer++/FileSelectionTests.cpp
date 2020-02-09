@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "../MyTreeView/MyTreeView.h"
+#include "MyTreeView/MyTreeView.h"
 
 BOOL Explorerplusplus::AnyItemsSelected() const
 {

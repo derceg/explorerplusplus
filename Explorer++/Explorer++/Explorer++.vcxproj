@@ -168,6 +168,7 @@
       <DisableSpecificWarnings>4714</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0c09</Culture>
@@ -197,7 +198,7 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\MyTreeView\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-LLVM|Win32'">
@@ -220,6 +221,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0c09</Culture>
@@ -249,7 +251,7 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\MyTreeView\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -275,6 +277,7 @@
       <DisableSpecificWarnings>4714</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0c09</Culture>
@@ -301,7 +304,7 @@
       </AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\MyTreeView\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-LLVM|x64'">
@@ -328,6 +331,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0c09</Culture>
@@ -354,7 +358,7 @@
       </AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\MyTreeView\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -377,6 +381,7 @@
       <DisableSpecificWarnings>4714</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
       <ResourceOutputFileName>$(IntDir)Explorer++Main.res</ResourceOutputFileName>
@@ -399,7 +404,7 @@
       </AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\MyTreeView\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -425,6 +430,7 @@
       <DisableSpecificWarnings>4714</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
       <ResourceOutputFileName>$(IntDir)Explorer++Main.res</ResourceOutputFileName>
@@ -446,7 +452,7 @@
       </AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\MyTreeView\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -471,6 +477,10 @@
     <ClCompile Include="BookmarkMenuBuilder.cpp" />
     <ClCompile Include="BookmarkTree.cpp" />
     <ClCompile Include="BookmarkXmlStorage.cpp" />
+    <ClCompile Include="MyTreeView\DirectoryModificationHandler.cpp" />
+    <ClCompile Include="MyTreeView\iDropSource.cpp" />
+    <ClCompile Include="MyTreeView\iDropTarget.cpp" />
+    <ClCompile Include="MyTreeView\MyTreeView.cpp" />
     <ClCompile Include="ShellBrowser\HistoryEntry.cpp" />
     <ClCompile Include="ShellBrowser\NavigationController.cpp" />
     <ClCompile Include="SortMenuHandler.cpp" />
@@ -677,6 +687,7 @@
     <ClInclude Include="MenuRanges.h" />
     <ClInclude Include="MergeFilesDialog.h" />
     <ClInclude Include="ModelessDialogs.h" />
+    <ClInclude Include="MyTreeView\MyTreeView.h" />
     <ClInclude Include="Navigation.h" />
     <ClInclude Include="NoTranslationResource.h" />
     <ClInclude Include="Config.h" />
@@ -787,10 +798,6 @@
     </ProjectReference>
     <ProjectReference Include="..\Lua\Lua.vcxproj">
       <Project>{0977324a-4826-461a-a3b6-d88affd444d2}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\MyTreeView\MyTreeView.vcxproj">
-      <Project>{074ce152-1c5c-4b88-9c59-fd7f8c171321}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

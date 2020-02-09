@@ -400,6 +400,18 @@
     <ClCompile Include="BookmarkContextMenuController.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
+    <ClCompile Include="MyTreeView\DirectoryModificationHandler.cpp">
+      <Filter>MyTreeView</Filter>
+    </ClCompile>
+    <ClCompile Include="MyTreeView\iDropSource.cpp">
+      <Filter>MyTreeView</Filter>
+    </ClCompile>
+    <ClCompile Include="MyTreeView\iDropTarget.cpp">
+      <Filter>MyTreeView</Filter>
+    </ClCompile>
+    <ClCompile Include="MyTreeView\MyTreeView.cpp">
+      <Filter>MyTreeView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -813,6 +825,9 @@
     <ClInclude Include="BookmarkContextMenuController.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
+    <ClInclude Include="MyTreeView\MyTreeView.h">
+      <Filter>MyTreeView</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -918,6 +933,9 @@
     </Filter>
     <Filter Include="Bookmarks\UI">
       <UniqueIdentifier>{ce3e8ee9-017a-43b7-b601-015d3d2d1b4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MyTreeView">
+      <UniqueIdentifier>{1ba747be-b194-45dc-abc3-d6ef2eb81de0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

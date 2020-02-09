@@ -16,6 +16,7 @@
 #include "ManageBookmarksDialog.h"
 #include "MenuRanges.h"
 #include "ModelessDialogs.h"
+#include "MyTreeView/MyTreeView.h"
 #include "Navigation.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
@@ -28,8 +29,6 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
-#include "../MyTreeView/MyTreeView.h"
-
 
 static const int FOLDER_SIZE_LINE_INDEX = 1;
 

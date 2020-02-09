@@ -8,6 +8,7 @@
 #include "HolderWindow.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
+#include "MyTreeView/MyTreeView.h"
 #include "Navigation.h"
 #include "SetFileAttributesDialog.h"
 #include "../Helper/BulkClipboardWriter.h"
@@ -16,7 +17,6 @@
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
-#include "../MyTreeView/MyTreeView.h"
 
 #define TREEVIEW_FOLDER_OPEN_DELAY	500
 #define FOLDERS_TOOLBAR_CLOSE		6000

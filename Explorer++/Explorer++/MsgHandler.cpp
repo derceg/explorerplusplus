@@ -11,6 +11,7 @@
 #include "LoadSaveRegistry.h"
 #include "LoadSaveXml.h"
 #include "MainResource.h"
+#include "MyTreeView/MyTreeView.h"
 #include "Navigation.h"
 #include "PluginManager.h"
 #include "ShellBrowser/ViewModes.h"
@@ -25,7 +26,6 @@
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
-#include "../MyTreeView/MyTreeView.h"
 #include <boost/range/adaptor/map.hpp>
 
 /* The treeview is offset by a small

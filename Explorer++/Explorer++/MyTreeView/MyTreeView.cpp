@@ -996,7 +996,7 @@ HTREEITEM MyTreeView::LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand)
 	if(hItem == NULL)
 		return NULL;
 
-	ptr = cstrtok_s(FullItemPathCopy,_T("\\"),&next_token);
+	ptr = wcstok_s(FullItemPathCopy,_T("\\"),&next_token);
 
 	StringCchCopy(ItemText,SIZEOF_ARRAY(ItemText),ptr);
 	StringCchCat(ItemText,SIZEOF_ARRAY(ItemText),_T("\\"));
@@ -1026,7 +1026,7 @@ HTREEITEM MyTreeView::LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand)
 
 	Item.mask = TVIF_TEXT;
 
-	while((ptr = cstrtok_s(NULL,_T("\\"),&next_token)) != NULL)
+	while((ptr = wcstok_s(NULL,_T("\\"),&next_token)) != NULL)
 	{
 		if(TreeView_GetChild(m_hTreeView,hItem) == NULL)
 		{
@@ -1094,7 +1094,7 @@ HTREEITEM MyTreeView::LocateItemOnDesktopTree(const TCHAR *szFullFileName)
 	}
 	
 	next_token = NULL;
-	pItemName = cstrtok_s(pItemName,_T("\\"),&next_token);
+	pItemName = wcstok_s(pItemName,_T("\\"),&next_token);
 
 	hItem = TreeView_GetRoot(m_hTreeView);
 
@@ -1127,7 +1127,7 @@ HTREEITEM MyTreeView::LocateItemOnDesktopTree(const TCHAR *szFullFileName)
 		}
 
 		// Item found, pass to sub-level
-		pItemName = cstrtok_s(next_token,_T("\\"),&next_token);
+		pItemName = wcstok_s(next_token,_T("\\"),&next_token);
 	}
 
 	return hItem;
