@@ -198,7 +198,7 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-LLVM|Win32'">
@@ -251,7 +251,7 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -304,7 +304,7 @@
       </AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-LLVM|x64'">
@@ -358,7 +358,7 @@
       </AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -404,7 +404,7 @@
       </AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -452,7 +452,7 @@
       </AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -477,6 +477,8 @@
     <ClCompile Include="BookmarkMenuBuilder.cpp" />
     <ClCompile Include="BookmarkTree.cpp" />
     <ClCompile Include="BookmarkXmlStorage.cpp" />
+    <ClCompile Include="DisplayWindow\DisplayWindow.cpp" />
+    <ClCompile Include="DisplayWindow\MsgHandler.cpp" />
     <ClCompile Include="ShellBrowser\HistoryEntry.cpp" />
     <ClCompile Include="ShellBrowser\NavigationController.cpp" />
     <ClCompile Include="ShellTreeView\DirectoryModificationHandler.cpp" />
@@ -650,6 +652,7 @@
     <ClInclude Include="DestroyFilesDialog.h" />
     <ClInclude Include="DialogHelper.h" />
     <ClInclude Include="DisplayColoursDialog.h" />
+    <ClInclude Include="DisplayWindow\DisplayWindow.h" />
     <ClInclude Include="DrivesToolbar.h" />
     <ClInclude Include="BetterEnumsWrapper.h" />
     <ClInclude Include="Event.h" />
@@ -788,10 +791,6 @@
     <Manifest Include="Explorer++.exe.manifest" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DisplayWindow\DisplayWindow.vcxproj">
-      <Project>{2e9b7b3e-476e-4745-b05e-abc34819daf2}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
     <ProjectReference Include="..\Helper\Helper.vcxproj">
       <Project>{faadbe00-9376-45f8-aeac-1ba3a8e58a1d}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

@@ -412,6 +412,12 @@
     <ClCompile Include="ShellTreeView\ShellTreeView.cpp">
       <Filter>ShellTreeView</Filter>
     </ClCompile>
+    <ClCompile Include="DisplayWindow\DisplayWindow.cpp">
+      <Filter>DisplayWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="DisplayWindow\MsgHandler.cpp">
+      <Filter>DisplayWindow</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -828,6 +834,9 @@
     <ClInclude Include="ShellTreeView\ShellTreeView.h">
       <Filter>ShellTreeView</Filter>
     </ClInclude>
+    <ClInclude Include="DisplayWindow\DisplayWindow.h">
+      <Filter>DisplayWindow</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -936,6 +945,9 @@
     </Filter>
     <Filter Include="ShellTreeView">
       <UniqueIdentifier>{e9f8553a-d212-4c0f-a749-708a1664278c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DisplayWindow">
+      <UniqueIdentifier>{fae666be-a68a-4fd0-91cd-01523513a8d4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

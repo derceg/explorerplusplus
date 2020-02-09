@@ -4,8 +4,8 @@
 
 #include "stdafx.h"
 #include "DisplayColoursDialog.h"
+#include "DisplayWindow/DisplayWindow.h"
 #include "MainResource.h"
-#include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/Macros.h"
 #include <list>
 

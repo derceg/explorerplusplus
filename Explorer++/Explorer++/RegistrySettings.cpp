@@ -9,9 +9,9 @@
 #include "ColorRuleHelper.h"
 #include "Config.h"
 #include "DefaultColumns.h"
+#include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"
 #include "MainToolbar.h"
-#include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/Macros.h"
 #include <boost/range/adaptor/map.hpp>
