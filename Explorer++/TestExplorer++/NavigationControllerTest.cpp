@@ -381,9 +381,9 @@ TEST_F(NavigationControllerPreservedTest, SecondIndexIsCurrent) {
 TEST_F(NavigationControllerPreservedTest, CheckEntries) {
 	SetUp(0);
 
-	for (int i = 0; i < m_preservedEntries.size(); i++)
+	for (size_t i = 0; i < m_preservedEntries.size(); i++)
 	{
-		auto entry = m_navigationController->GetEntryAtIndex(i);
+		auto entry = m_navigationController->GetEntryAtIndex(static_cast<int>(i));
 		ASSERT_NE(entry, nullptr);
 		EXPECT_TRUE(CompareIdls(entry->GetPidl().get(), m_preservedEntries[i]->pidl.get()));
 	}
