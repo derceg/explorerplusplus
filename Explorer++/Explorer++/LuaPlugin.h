@@ -6,8 +6,6 @@
 
 #include "Manifest.h"
 #include "PluginInterface.h"
-#include "PluginMenuManager.h"
-#include "UiTheming.h"
 #include "../ThirdParty/Sol/forward.hpp"
 
 namespace Plugins

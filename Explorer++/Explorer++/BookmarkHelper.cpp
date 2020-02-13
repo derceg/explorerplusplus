@@ -7,7 +7,6 @@
 #include "AddBookmarkDialog.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
-#include "../Helper/Macros.h"
 #include <boost/range/adaptor/filtered.hpp>
 #include <algorithm>
 

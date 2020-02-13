@@ -9,7 +9,6 @@
 #include "BookmarkMenuBuilder.h"
 #include "BookmarkTree.h"
 #include "../Helper/WindowSubclassWrapper.h"
-#include <wil/resource.h>
 #include <functional>
 
 __interface IExplorerplusplus;

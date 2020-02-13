@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "BookmarkDropInfo.h"
 #include "BookmarkDropTargetWindow.h"
 #include "BookmarkHelper.h"
 #include "BookmarkItem.h"

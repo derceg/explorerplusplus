@@ -13,7 +13,6 @@
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/range/adaptor/filtered.hpp>
-#include <stack>
 
 BookmarkTreeView::BookmarkTreeView(HWND hTreeView, HINSTANCE hInstance, IExplorerplusplus *expp,
 	BookmarkTree *bookmarkTree, const std::unordered_set<std::wstring> &setExpansion,

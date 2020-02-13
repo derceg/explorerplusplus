@@ -18,7 +18,6 @@
 #include "ShellTreeView.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/DriveInfo.h"
-#include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/com.h>

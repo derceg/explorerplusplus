@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "ShellTreeView.h"
 #include "../Helper/DropHandler.h"
-#include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 

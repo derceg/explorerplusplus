@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "BookmarkHelper.h"
 #include "BookmarkListView.h"
 #include "BookmarkTree.h"
 #include "BookmarkTreeView.h"
@@ -12,7 +11,6 @@
 #include "ResourceHelper.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
-#include "../Helper/ResizableDialog.h"
 #include <boost/signals2.hpp>
 #include <stack>
 #include <unordered_set>

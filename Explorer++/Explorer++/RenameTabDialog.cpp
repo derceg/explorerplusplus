@@ -5,8 +5,6 @@
 #include "stdafx.h"
 #include "RenameTabDialog.h"
 #include "MainResource.h"
-#include "../Helper/Helper.h"
-#include "../Helper/ShellHelper.h"
 #include "../Helper/Macros.h"
 
 

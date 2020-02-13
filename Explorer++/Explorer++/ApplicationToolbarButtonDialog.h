@@ -6,7 +6,6 @@
 
 #include "ApplicationToolbar.h"
 #include "../Helper/BaseDialog.h"
-#include "../Helper/DialogSettings.h"
 
 class ApplicationToolbarButtonDialog : public BaseDialog
 {

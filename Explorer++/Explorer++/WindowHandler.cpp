@@ -7,15 +7,10 @@
 #include "ApplicationToolbar.h"
 #include "BookmarksToolbar.h"
 #include "Config.h"
-#include "DrivesToolbar.h"
 #include "IconResourceLoader.h"
-#include "MainResource.h"
 #include "MainToolbar.h"
 #include "ToolbarButtons.h"
 #include "../Helper/Controls.h"
-#include "../Helper/FileContextMenuManager.h"
-#include "../Helper/Macros.h"
-#include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
 
 HWND Explorerplusplus::CreateTabToolbar(HWND hParent,int idCommand,TCHAR *szTip)

@@ -4,8 +4,6 @@
 
 #include "stdafx.h"
 #include "BookmarkMenu.h"
-#include "MainResource.h"
-#include "../Helper/Macros.h"
 
 BookmarkMenu::BookmarkMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule,
 	IExplorerplusplus *expp, HWND parentWindow) :

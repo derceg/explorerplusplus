@@ -7,7 +7,6 @@
 #include "DisplayWindow/DisplayWindow.h"
 #include "MainResource.h"
 #include "../Helper/Macros.h"
-#include <list>
 
 
 const TCHAR DisplayColoursDialogPersistentSettings::SETTINGS_KEY[] = _T("DisplayColors");

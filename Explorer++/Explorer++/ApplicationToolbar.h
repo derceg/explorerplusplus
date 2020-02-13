@@ -7,7 +7,6 @@
 #include "ApplicationToolbarDropHandler.h"
 #include "../Helper/BaseWindow.h"
 #include "../Helper/WindowSubclassWrapper.h"
-#include <MsXml2.h>
 #include <objbase.h>
 #include <vector>
 

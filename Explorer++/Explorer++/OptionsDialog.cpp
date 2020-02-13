@@ -16,7 +16,6 @@
 #include "CoreInterface.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
-#include "ModelessDialogs.h"
 #include "ResourceHelper.h"
 #include "SetDefaultColumnsDialog.h"
 #include "ShellBrowser/ViewModes.h"

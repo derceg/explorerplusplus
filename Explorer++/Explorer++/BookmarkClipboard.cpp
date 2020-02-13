@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "BookmarkClipboard.h"
 #include "../Helper/BulkClipboardWriter.h"
-#include "../Helper/StringHelper.h"
 #include <boost/algorithm/string/join.hpp>
 
 BookmarkClipboard::BookmarkClipboard()

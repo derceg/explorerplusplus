@@ -17,19 +17,15 @@
 #include "Explorer++.h"
 #include "ApplicationToolbar.h"
 #include "BookmarkXmlStorage.h"
-#include "ColorRuleHelper.h"
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"
 #include "MainToolbar.h"
 #include "ShellBrowser/Columns.h"
-#include "ToolbarButtons.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/XMLSettings.h"
 #include <boost/range/adaptor/map.hpp>
-#include <MsXml2.h>
-#include <objbase.h>
 
 #define COLUMN_TYPE_GENERIC			0
 #define COLUMN_TYPE_MYCOMPUTER		1

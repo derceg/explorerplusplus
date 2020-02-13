@@ -12,7 +12,6 @@
 #include "../Helper/ShellHelper.h"
 #include <wil/common.h>
 #include <wil/resource.h>
-#include <functional>
 
 AddressBar *AddressBar::Create(HWND parent, IExplorerplusplus *expp, MainToolbar *mainToolbar)
 {

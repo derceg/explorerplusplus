@@ -5,10 +5,6 @@
 #include "stdafx.h"
 #include "ShellBrowser.h"
 #include "ViewModes.h"
-#include "../Helper/Controls.h"
-#include "../Helper/FileOperations.h"
-#include "../Helper/FolderSize.h"
-#include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
 #include <boost/scope_exit.hpp>
 #include <list>

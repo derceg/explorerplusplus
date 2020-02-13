@@ -7,10 +7,8 @@
 #include "MainResource.h"
 #include "Version.h"
 #include "../Helper/BaseDialog.h"
-#include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
-#include <list>
 
 AboutDialog::AboutDialog(HINSTANCE hInstance, HWND hParent) :
 	BaseDialog(hInstance, IDD_ABOUT, hParent, false)

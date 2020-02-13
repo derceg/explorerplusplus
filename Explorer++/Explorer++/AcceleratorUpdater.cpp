@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "AcceleratorUpdater.h"
-#include "AcceleratorMappings.h"
 
 AcceleratorUpdater::AcceleratorUpdater(HACCEL *acceleratorTable) :
 	m_acceleratorTable(acceleratorTable)

@@ -10,7 +10,6 @@
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/serialization/strong_typedef.hpp>
-#include <list>
 #include <unordered_map>
 
 __interface IExplorerplusplus;

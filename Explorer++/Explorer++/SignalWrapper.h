@@ -5,7 +5,6 @@
 #pragma once
 
 #include <boost/signals2.hpp>
-#include <utility>
 
 // This class wraps a signal object and is designed to be embedded as a public
 // data member within another class. It has the following functionality:

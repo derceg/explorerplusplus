@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "Navigation.h"
 #include "CoreInterface.h"
-#include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 
 Navigation::Navigation(IExplorerplusplus *expp) :

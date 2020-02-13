@@ -7,17 +7,10 @@
 #include "BookmarksToolbar.h"
 #include "ColorRuleHelper.h"
 #include "Config.h"
-#include "DefaultColumns.h"
 #include "Explorer++_internal.h"
-#include "IconResourceLoader.h"
-#include "iServiceProvider.h"
-#include "MainResource.h"
 #include "MenuRanges.h"
 #include "PluginManager.h"
-#include "ResourceHelper.h"
-#include "ShellBrowser/ViewModes.h"
 #include "../Helper/iDirectoryMonitor.h"
-#include "../Helper/ShellHelper.h"
 
 /* These entries correspond to shell
 extensions that are known to be

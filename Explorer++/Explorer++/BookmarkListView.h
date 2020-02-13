@@ -5,7 +5,6 @@
 #pragma once
 
 #include "BookmarkContextMenu.h"
-#include "BookmarkDropInfo.h"
 #include "BookmarkDropTargetWindow.h"
 #include "BookmarkHelper.h"
 #include "BookmarkItem.h"
@@ -15,7 +14,6 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/signals2.hpp>
-#include <wil/com.h>
 #include <wil/resource.h>
 #include <optional>
 

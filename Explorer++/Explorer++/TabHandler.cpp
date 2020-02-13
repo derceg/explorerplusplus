@@ -6,22 +6,11 @@
 #include "Explorer++.h"
 #include "Config.h"
 #include "LoadSaveInterface.h"
-#include "MainResource.h"
 #include "MenuRanges.h"
 #include "RenameTabDialog.h"
 #include "ShellBrowser/ShellBrowser.h"
-#include "ShellBrowser/SortModes.h"
 #include "TabContainer.h"
-#include "../Helper/Helper.h"
-#include "../Helper/iDirectoryMonitor.h"
-#include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
-#include "../Helper/MenuHelper.h"
-#include "../Helper/ShellHelper.h"
-#include "../Helper/TabHelper.h"
-#include <boost/algorithm/string.hpp>
-#include <boost/range/adaptor/map.hpp>
-#include <algorithm>
 #include <list>
 
 static const UINT TAB_WINDOW_HEIGHT_96DPI = 24;

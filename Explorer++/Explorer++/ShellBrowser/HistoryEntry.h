@@ -7,7 +7,6 @@
 #include "SignalWrapper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
-#include <ShlObj.h>
 #include <optional>
 
 struct PreservedHistoryEntry;

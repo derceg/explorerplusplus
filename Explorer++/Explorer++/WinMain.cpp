@@ -19,7 +19,6 @@
 #include "XMLSettings.h"
 #include "../Helper/Logging.h"
 #include "../Helper/Macros.h"
-#include "../Helper/ProcessHelper.h"
 #include "../ThirdParty/CLI11/CLI11.hpp"
 #include <boost/scope_exit.hpp>
 #include <wil/resource.h>

@@ -6,7 +6,6 @@
 #include "Explorer++.h"
 #include "ApplicationToolbar.h"
 #include "BookmarkRegistryStorage.h"
-#include "ColorRuleHelper.h"
 #include "Config.h"
 #include "DefaultColumns.h"
 #include "DisplayWindow/DisplayWindow.h"

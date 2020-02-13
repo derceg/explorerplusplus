@@ -9,9 +9,7 @@
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "../Helper/Controls.h"
-#include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
-#include "../Helper/WindowHelper.h"
 
 const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 

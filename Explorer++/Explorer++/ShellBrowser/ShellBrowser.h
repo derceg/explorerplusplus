@@ -18,7 +18,6 @@
 #include "../Helper/IconFetcher.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/StringHelper.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
 #include <boost/optional.hpp>

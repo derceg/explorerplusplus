@@ -26,10 +26,7 @@
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
-#include <boost/scope_exit.hpp>
 #include <wil/com.h>
-
-#pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
 void Explorerplusplus::OnChangeDisplayColors()
 {

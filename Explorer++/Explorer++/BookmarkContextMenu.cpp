@@ -8,7 +8,6 @@
 #include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
-#include "../Helper/Helper.h"
 #include "../Helper/MenuHelper.h"
 #include <wil/resource.h>
 

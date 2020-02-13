@@ -8,7 +8,6 @@
 #include "HolderWindow.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
-#include "Navigation.h"
 #include "SetFileAttributesDialog.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "../Helper/BulkClipboardWriter.h"

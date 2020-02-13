@@ -9,7 +9,6 @@
 #include "DefaultToolbarButtons.h"
 #include "Icon.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
 #include "ShellBrowser/ViewModes.h"
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
@@ -17,7 +16,6 @@
 #include "../Helper/Macros.h"
 #include "../Helper/XMLSettings.h"
 #include <boost/bimap.hpp>
-#include <gdiplus.h>
 
 // Enable C4062: enumerator 'identifier' in switch of enum 'enumeration' is not handled
 #pragma warning(default:4062)

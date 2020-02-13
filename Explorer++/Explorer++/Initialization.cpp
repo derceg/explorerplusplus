@@ -4,26 +4,19 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "BookmarkHelper.h"
 #include "Config.h"
-#include "CustomizeColorsDialog.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"
 #include "LoadSaveInterface.h"
 #include "MainResource.h"
 #include "MainWindow.h"
 #include "MenuRanges.h"
-#include "ResourceHelper.h"
 #include "ShellBrowser/ViewModes.h"
 #include "TaskbarThumbnails.h"
 #include "ViewModeHelper.h"
-#include "../Helper/Controls.h"
-#include "../Helper/FileOperations.h"
-#include "../Helper/Helper.h"
 #include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
-#include <list>
 
 /*
 * Main window creation.

@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "PluginMenuManager.h"
 #include "MainResource.h"
-#include "../Helper/Macros.h"
 #include <boost/iterator/counting_iterator.hpp>
 
 Plugins::PluginMenuManager::PluginMenuManager(HWND mainWindow, int startId, int endId) :

@@ -13,7 +13,6 @@
 #include "PluginMenuManager.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/SortModes.h"
-#include "ShellBrowser/ViewModes.h"
 #include "Tab.h"
 #include "TabNavigationInterface.h"
 #include "TabRestorer.h"
@@ -24,10 +23,8 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/FileContextMenuManager.h"
-#include <boost/optional.hpp>
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
-#include <unordered_map>
 
 /* Sent when a folder size calculation has finished. */
 #define WM_APP_FOLDERSIZECOMPLETED	WM_APP + 3

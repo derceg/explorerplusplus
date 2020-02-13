@@ -10,9 +10,7 @@
 #include "MainResource.h"
 #include "SortModes.h"
 #include "ViewModes.h"
-#include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
-#include "../Helper/ShellHelper.h"
 #include <cassert>
 #include <list>
 

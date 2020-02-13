@@ -2,8 +2,6 @@
 
 #include "LuaPlugin.h"
 #include "PluginInterface.h"
-#include "PluginMenuManager.h"
-#include "UiTheming.h"
 #include "../Helper/BaseDialog.h"
 
 class ScriptingDialog : public BaseDialog

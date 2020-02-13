@@ -5,7 +5,6 @@
 #pragma once
 
 #include "Accelerator.h"
-#include <boost/optional.hpp>
 
 class AcceleratorUpdater
 {
