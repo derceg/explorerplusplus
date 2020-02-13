@@ -7,8 +7,15 @@
 #include "Accelerator.h"
 #include "../ThirdParty/Sol/sol.hpp"
 #include <nlohmann/json.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
+
+namespace boost
+{
+	namespace filesystem
+	{
+		class path;
+	}
+}
 
 namespace Plugins
 {

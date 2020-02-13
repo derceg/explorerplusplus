@@ -6,7 +6,14 @@
 
 #include "LuaPlugin.h"
 #include "PluginInterface.h"
-#include <boost/filesystem.hpp>
+
+namespace boost
+{
+	namespace filesystem
+	{
+		class path;
+	}
+}
 
 namespace Plugins
 {

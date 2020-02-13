@@ -7,6 +7,7 @@
 #include "AcceleratorMappings.h"
 #include "AcceleratorParser.h"
 #include "../Helper/StringHelper.h"
+#include <boost/filesystem.hpp>
 #include <fstream>
 
 void Plugins::from_json(const nlohmann::json &json, Manifest &manifest)

@@ -6,6 +6,7 @@
 #include "PluginManager.h"
 #include "Manifest.h"
 #include "../ThirdParty/Sol/forward.hpp"
+#include <boost/filesystem.hpp>
 
 const std::wstring Plugins::PluginManager::MANIFEST_NAME = L"plugin.json";
 

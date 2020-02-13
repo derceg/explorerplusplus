@@ -10,7 +10,6 @@
 #include "TabNavigationInterface.h"
 #include "../Helper/Macros.h"
 #include <boost/optional.hpp>
-#include <boost/parameter.hpp>
 #include <boost/signals2.hpp>
 
 struct PreservedTab;

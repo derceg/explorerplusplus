@@ -13,6 +13,7 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/optional.hpp>
+#include <boost/parameter.hpp>
 #include <boost/signals2.hpp>
 #include <wil/com.h>
 #include <wil/resource.h>
