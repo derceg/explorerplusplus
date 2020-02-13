@@ -58,7 +58,7 @@ private:
 
 	void Initialize();
 
-	static std::vector<std::unique_ptr<HistoryEntry>> NavigationController::CopyPreservedHistoryEntries(
+	static std::vector<std::unique_ptr<HistoryEntry>> CopyPreservedHistoryEntries(
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries);
 
 	void OnNavigationCompleted(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry);
