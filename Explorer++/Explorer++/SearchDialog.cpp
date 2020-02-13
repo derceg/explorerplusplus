@@ -441,7 +441,7 @@ void SearchDialog::SaveEntry(int comboBoxId, boost::circular_buffer<std::wstring
 
 	std::wstring strEntry(entry);
 	auto itr = std::find_if(buffer.begin(), buffer.end(),
-		[strEntry] (const std::wstring Pattern)
+		[strEntry] (const std::wstring &Pattern)
 	{
 		return Pattern.compare(strEntry) == 0;
 	});

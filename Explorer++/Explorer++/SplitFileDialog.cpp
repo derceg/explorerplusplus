@@ -40,7 +40,7 @@ const TCHAR SplitFileDialogPersistentSettings::SETTING_SIZE[] = _T("Size");
 const TCHAR SplitFileDialogPersistentSettings::SETTING_SIZE_GROUP[] = _T("SizeGroup");
 
 SplitFileDialog::SplitFileDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
-	std::wstring strFullFilename) :
+	const std::wstring &strFullFilename) :
 	BaseDialog(hInstance, IDD_SPLITFILE, hParent, false),
 	m_expp(expp),
 	m_strFullFilename(strFullFilename),
@@ -546,8 +546,8 @@ DWORD WINAPI NSplitFileDialog::SplitFileThreadProcStub(LPVOID pParam)
 	return 0;
 }
 
-SplitFile::SplitFile(HWND hDlg,std::wstring strFullFilename,
-	std::wstring strOutputFilename,std::wstring strOutputDirectory,
+SplitFile::SplitFile(HWND hDlg, const std::wstring &strFullFilename,
+	const std::wstring &strOutputFilename, const std::wstring &strOutputDirectory,
 	UINT uSplitSize)
 {
 	m_hDlg					= hDlg;

@@ -32,9 +32,11 @@ namespace NMergeFilesDialog
 
 const TCHAR MergeFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("MergeFiles");
 
+bool CompareFilenames(const std::wstring &strFirst, const std::wstring &strSecond);
+
 MergeFilesDialog::MergeFilesDialog(HINSTANCE hInstance, HWND hParent,
-	IExplorerplusplus *expp, std::wstring strOutputDirectory,
-	std::list<std::wstring> FullFilenameList, BOOL bShowFriendlyDates) :
+	IExplorerplusplus *expp, const std::wstring &strOutputDirectory,
+	const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates) :
 	BaseDialog(hInstance, IDD_MERGEFILES, hParent, true),
 	m_expp(expp),
 	m_strOutputDirectory(strOutputDirectory),
@@ -56,7 +58,7 @@ MergeFilesDialog::~MergeFilesDialog()
 	}
 }
 
-bool CompareFilenames(std::wstring strFirst,std::wstring strSecond)
+bool CompareFilenames(const std::wstring &strFirst, const std::wstring &strSecond)
 {
 	return (StrCmpLogicalW(strFirst.c_str(),strSecond.c_str()) <= 0);
 }
@@ -512,7 +514,7 @@ DWORD WINAPI NMergeFilesDialog::MergeFilesThread(LPVOID pParam)
 	return 0;
 }
 
-MergeFiles::MergeFiles(HWND hDlg,std::wstring strOutputFilename,std::list<std::wstring> FullFilenameList)
+MergeFiles::MergeFiles(HWND hDlg, const std::wstring &strOutputFilename, const std::list<std::wstring> &FullFilenameList)
 {
 	m_hDlg				= hDlg;
 	m_strOutputFilename	= strOutputFilename;

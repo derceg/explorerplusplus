@@ -47,7 +47,8 @@ class SplitFile : public ReferenceCount
 {
 public:
 	
-	SplitFile(HWND hDlg,std::wstring strFullFilename,std::wstring strOutputFilename,std::wstring strOutputDirectory,UINT uSplitSize);
+	SplitFile(HWND hDlg, const std::wstring &strFullFilename, const std::wstring &strOutputFilename,
+		const std::wstring &strOutputDirectory, UINT uSplitSize);
 	~SplitFile();
 
 	void	Split();
@@ -74,7 +75,7 @@ class SplitFileDialog : public BaseDialog
 public:
 
 	SplitFileDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
-		std::wstring strFullFilename);
+		const std::wstring &strFullFilename);
 	~SplitFileDialog();
 
 protected:

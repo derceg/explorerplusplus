@@ -12,7 +12,7 @@ public:
 
 	AcceleratorUpdater(HACCEL *acceleratorTable);
 
-	void update(std::vector<ShortcutKey> shortcutKeys);
+	void update(const std::vector<ShortcutKey> &shortcutKeys);
 
 private:
 

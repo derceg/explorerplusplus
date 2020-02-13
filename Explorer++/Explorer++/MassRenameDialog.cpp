@@ -33,7 +33,7 @@ const TCHAR MassRenameDialogPersistentSettings::SETTING_COLUMN_WIDTH_1[] = _T("C
 const TCHAR MassRenameDialogPersistentSettings::SETTING_COLUMN_WIDTH_2[] = _T("ColumnWidth2");
 
 MassRenameDialog::MassRenameDialog(HINSTANCE hInstance, HWND hParent,
-	IExplorerplusplus *expp, std::list<std::wstring> FullFilenameList,
+	IExplorerplusplus *expp, const std::list<std::wstring> &FullFilenameList,
 	FileActionHandler *pFileActionHandler) :
 	BaseDialog(hInstance, IDD_MASSRENAME, hParent, true),
 	m_expp(expp),

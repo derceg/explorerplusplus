@@ -44,7 +44,8 @@ class DestroyFilesDialog : public BaseDialog
 {
 public:
 
-	DestroyFilesDialog(HINSTANCE hInstance, HWND hParent, std::list<std::wstring> FullFilenameList, BOOL bShowFriendlyDates);
+	DestroyFilesDialog(HINSTANCE hInstance, HWND hParent, const std::list<std::wstring> &FullFilenameList,
+		BOOL bShowFriendlyDates);
 
 protected:
 

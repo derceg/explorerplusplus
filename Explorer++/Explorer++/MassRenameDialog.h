@@ -49,7 +49,7 @@ class MassRenameDialog : public BaseDialog
 public:
 
 	MassRenameDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
-		std::list<std::wstring> FullFilenameList, FileActionHandler *pFileActionHandler);
+		const std::list<std::wstring> &FullFilenameList, FileActionHandler *pFileActionHandler);
 
 protected:
 

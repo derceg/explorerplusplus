@@ -34,7 +34,7 @@ class MergeFiles : public ReferenceCount
 {
 public:
 	
-	MergeFiles(HWND hDlg,std::wstring strOutputFilename,std::list<std::wstring> FullFilenameList);
+	MergeFiles(HWND hDlg, const std::wstring &strOutputFilename, const std::list<std::wstring> &FullFilenameList);
 	~MergeFiles();
 
 	void					StartMerging();
@@ -56,7 +56,7 @@ class MergeFilesDialog : public BaseDialog
 public:
 
 	MergeFilesDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
-		std::wstring strOutputDirectory, std::list<std::wstring> FullFilenameList,
+		const std::wstring &strOutputDirectory, const std::list<std::wstring> &FullFilenameList,
 		BOOL bShowFriendlyDates);
 	~MergeFilesDialog();
 

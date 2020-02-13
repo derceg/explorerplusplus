@@ -42,7 +42,7 @@ class SetFileAttributesDialog : public BaseDialog
 public:
 
 	SetFileAttributesDialog(HINSTANCE hInstance, HWND hParent,
-		std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t> sfaiList);
+		const std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t> &sfaiList);
 
 protected:
 
