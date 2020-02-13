@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "TabsAPI.h"
+#include "TabsApi.h"
 #include "Config.h"
 #include "CoreInterface.h"
 #include "ShellBrowser/FolderSettings.h"
