@@ -310,7 +310,6 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 
 		m_tabContainer->SelectTab(*tab);
 		return 0;
-		break;
 
 	case WM_SETFOCUS:
 		SetFocus(tab->GetShellBrowser()->GetListView());
@@ -341,7 +340,6 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 	case WM_DWMSENDICONICTHUMBNAIL:
 		OnDwmSendIconicThumbnail(hwnd, *tab, HIWORD(lParam), LOWORD(lParam));
 		return 0;
-		break;
 
 	case WM_DWMSENDICONICLIVEPREVIEWBITMAP:
 		{
@@ -375,7 +373,6 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 
 			return 0;
 		}
-		break;
 
 	case WM_CLOSE:
 		{

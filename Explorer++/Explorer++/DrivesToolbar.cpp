@@ -229,7 +229,6 @@ LRESULT CALLBACK DrivesToolbar::DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPAR
 
 					return 0;
 				}
-				break;
 			}
 		}
 		break;

@@ -231,19 +231,15 @@ LRESULT CALLBACK MainToolbar::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 			{
 			case TBN_QUERYINSERT:
 				return OnTBQueryInsert();
-				break;
 
 			case TBN_QUERYDELETE:
 				return OnTBQueryDelete();
-				break;
 
 			case TBN_GETBUTTONINFO:
 				return OnTBGetButtonInfo(lParam);
-				break;
 
 			case TBN_RESTORE:
 				return OnTBRestore();
-				break;
 
 			case TBN_GETINFOTIP:
 				OnTBGetInfoTip(lParam);
@@ -259,11 +255,9 @@ LRESULT CALLBACK MainToolbar::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 
 			case TBN_DROPDOWN:
 				return OnTbnDropDown(reinterpret_cast<NMTOOLBAR *>(lParam));
-				break;
 
 			case TBN_INITCUSTOMIZE:
 				return TBNRF_HIDEHELP;
-				break;
 			}
 		}
 		break;
@@ -372,23 +366,18 @@ BYTE MainToolbar::LookupToolbarButtonExtraStyles(ToolbarButton button) const
 	{
 	case ToolbarButton::Back:
 		return BTNS_DROPDOWN;
-		break;
 
 	case ToolbarButton::Forward:
 		return BTNS_DROPDOWN;
-		break;
 
 	case ToolbarButton::Folders:
 		return BTNS_SHOWTEXT | BTNS_CHECK;
-		break;
 
 	case ToolbarButton::Views:
 		return BTNS_DROPDOWN;
-		break;
 
 	default:
 		return 0;
-		break;
 	}
 }
 
@@ -398,99 +387,75 @@ int MainToolbar::LookupToolbarButtonTextID(ToolbarButton button) const
 	{
 	case ToolbarButton::Separator:
 		return IDS_SEPARATOR;
-		break;
 
 	case ToolbarButton::Back:
 		return IDS_TOOLBAR_BACK;
-		break;
 
 	case ToolbarButton::Forward:
 		return IDS_TOOLBAR_FORWARD;
-		break;
 
 	case ToolbarButton::Up:
 		return IDS_TOOLBAR_UP;
-		break;
 
 	case ToolbarButton::Folders:
 		return IDS_TOOLBAR_FOLDERS;
-		break;
 
 	case ToolbarButton::CopyTo:
 		return IDS_TOOLBAR_COPYTO;
-		break;
 
 	case ToolbarButton::MoveTo:
 		return IDS_TOOLBAR_MOVETO;
-		break;
 
 	case ToolbarButton::NewFolder:
 		return IDS_TOOLBAR_NEWFOLDER;
-		break;
 
 	case ToolbarButton::Copy:
 		return IDS_TOOLBAR_COPY;
-		break;
 
 	case ToolbarButton::Cut:
 		return IDS_TOOLBAR_CUT;
-		break;
 
 	case ToolbarButton::Paste:
 		return IDS_TOOLBAR_PASTE;
-		break;
 
 	case ToolbarButton::Delete:
 		return IDS_TOOLBAR_DELETE;
-		break;
 
 	case ToolbarButton::DeletePermanently:
 		return IDS_TOOLBAR_DELETEPERMANENTLY;
-		break;
 
 	case ToolbarButton::Views:
 		return IDS_TOOLBAR_VIEWS;
-		break;
 
 	case ToolbarButton::Search:
 		return IDS_TOOLBAR_SEARCH;
-		break;
 
 	case ToolbarButton::Properties:
 		return IDS_TOOLBAR_PROPERTIES;
-		break;
 
 	case ToolbarButton::Refresh:
 		return IDS_TOOLBAR_REFRESH;
-		break;
 
 	case ToolbarButton::AddBookmark:
 		return IDS_TOOLBAR_ADDBOOKMARK;
-		break;
 
 	case ToolbarButton::Bookmarks:
 		return IDS_TOOLBAR_MANAGEBOOKMARKS;
-		break;
 
 	case ToolbarButton::NewTab:
 		return IDS_TOOLBAR_NEWTAB;
-		break;
 
 	case ToolbarButton::OpenCommandPrompt:
 		return IDS_TOOLBAR_OPENCOMMANDPROMPT;
-		break;
 
 	case ToolbarButton::SplitFile:
 		return IDS_TOOLBAR_SPLIT_FILE;
-		break;
 
 	case ToolbarButton::MergeFiles:
 		return IDS_TOOLBAR_MERGE_FILES;
-		break;
 
 	case ToolbarButton::CloseTab:
 		return IDS_TOOLBAR_CLOSE_TAB;
-		break;
 	}
 
 	return 0;

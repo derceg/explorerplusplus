@@ -106,7 +106,6 @@ LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam,
 
 		case WM_DEVICECHANGE:
 			return OnDeviceChange(wParam,lParam);
-			break;
 
 		case WM_RBUTTONDOWN:
 			if((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON)
@@ -1253,7 +1252,6 @@ LRESULT CALLBACK ShellTreeView::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 
 				return TRUE;
 			}
-			break;
 
 		case DBT_DEVICEQUERYREMOVEFAILED:
 			{
@@ -1341,7 +1339,6 @@ LRESULT CALLBACK ShellTreeView::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 
 				return TRUE;
 			}
-			break;
 	}
 
 	return FALSE;

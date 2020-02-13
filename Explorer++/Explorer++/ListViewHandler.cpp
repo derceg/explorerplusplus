@@ -197,7 +197,6 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 			{
 			case HDN_BEGINDRAG:
 				return FALSE;
-				break;
 
 			case HDN_ENDDRAG:
 				{
@@ -256,7 +255,6 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 
 					return TRUE;
 				}
-				break;
 			}
 			break;
 	}

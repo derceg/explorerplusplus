@@ -315,31 +315,24 @@ std::vector<Column_t> &SetDefaultColumnsDialog::GetCurrentColumnList(FolderType_
 	{
 	case FOLDER_TYPE_GENERAL:
 		return m_folderColumns.realFolderColumns;
-		break;
 
 	case FOLDER_TYPE_COMPUTER:
 		return m_folderColumns.myComputerColumns;
-		break;
 
 	case FOLDER_TYPE_CONTROL_PANEL:
 		return m_folderColumns.controlPanelColumns;
-		break;
 
 	case FOLDER_TYPE_NETWORK:
 		return m_folderColumns.networkConnectionsColumns;
-		break;
 
 	case FOLDER_TYPE_NETWORK_PLACES:
 		return m_folderColumns.myNetworkPlacesColumns;
-		break;
 
 	case FOLDER_TYPE_PRINTERS:
 		return m_folderColumns.printersColumns;
-		break;
 
 	case FOLDER_TYPE_RECYCLE_BIN:
 		return m_folderColumns.recycleBinColumns;
-		break;
 	}
 
 	throw std::runtime_error("Unknown folder type selected");

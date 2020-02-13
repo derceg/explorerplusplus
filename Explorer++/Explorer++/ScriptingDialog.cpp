@@ -116,7 +116,6 @@ std::wstring ScriptingDialog::FormatResult(const sol::protected_function_result 
 		bool boolResult = result.get<bool>();
 		return std::to_wstring(boolResult);
 	}
-		break;
 
 	default:
 		return result.get<std::wstring>();

@@ -138,7 +138,6 @@ LRESULT CALLBACK OptionsDialog::PropSheetProc(HWND hwnd, UINT uMsg, WPARAM wPara
 	case WM_NCDESTROY:
 		delete this;
 		return 0;
-		break;
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
@@ -1204,15 +1203,12 @@ UINT GetIconThemeStringResourceId(IconTheme iconTheme)
 	{
 	case IconTheme::Color:
 		return IDS_ICON_THEME_COLOR;
-		break;
 
 	case IconTheme::Windows10:
 		return IDS_ICON_THEME_WINDOWS_10;
-		break;
 
 	default:
 		throw std::runtime_error("IconTheme value not found");
-		break;
 	}
 }
 

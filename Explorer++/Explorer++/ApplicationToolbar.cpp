@@ -179,7 +179,6 @@ LRESULT CALLBACK ApplicationToolbar::ParentWndProc(HWND hwnd,UINT uMsg,WPARAM wP
 
 					return 0;
 				}
-				break;
 			}
 		}
 		break;

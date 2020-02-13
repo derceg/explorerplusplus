@@ -126,19 +126,15 @@ UINT BookmarkListView::GetColumnTextResourceId(ColumnType columnType)
 	{
 	case ColumnType::Name:
 		return IDS_BOOKMARKS_COLUMN_NAME;
-		break;
 
 	case ColumnType::Location:
 		return IDS_BOOKMARKS_COLUMN_LOCATION;
-		break;
 
 	case ColumnType::DateCreated:
 		return IDS_BOOKMARKS_COLUMN_DATE_CREATED;
-		break;
 
 	case ColumnType::DateModified:
 		return IDS_BOOKMARKS_COLUMN_DATE_MODIFIED;
-		break;
 	}
 
 	throw std::runtime_error("Bookmark column string resource not found");
@@ -169,7 +165,6 @@ LRESULT CALLBACK BookmarkListView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wP
 			case NM_RCLICK:
 				OnRClick(reinterpret_cast<NMITEMACTIVATE *>(lParam));
 				return TRUE;
-				break;
 
 			case LVN_GETDISPINFO:
 				OnGetDispInfo(reinterpret_cast<NMLVDISPINFO *>(lParam));
@@ -177,11 +172,9 @@ LRESULT CALLBACK BookmarkListView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wP
 
 			case LVN_BEGINLABELEDIT:
 				return OnBeginLabelEdit(reinterpret_cast<NMLVDISPINFO *>(lParam));
-				break;
 
 			case LVN_ENDLABELEDIT:
 				return OnEndLabelEdit(reinterpret_cast<NMLVDISPINFO *>(lParam));
-				break;
 
 			case LVN_KEYDOWN:
 				OnKeyDown(reinterpret_cast<NMLVKEYDOWN *>(lParam));
@@ -204,7 +197,6 @@ LRESULT CALLBACK BookmarkListView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wP
 				OnHeaderRClick(pt);
 				return TRUE;
 			}
-			break;
 			}
 		}
 		break;
@@ -467,7 +459,6 @@ std::wstring BookmarkListView::GetBookmarkItemColumnInfo(const BookmarkItem *boo
 	{
 	case ColumnType::Name:
 		return bookmarkItem->GetName();
-		break;
 
 	case ColumnType::Location:
 		if (bookmarkItem->IsBookmark())
@@ -478,21 +469,18 @@ std::wstring BookmarkListView::GetBookmarkItemColumnInfo(const BookmarkItem *boo
 		{
 			return std::wstring();
 		}
-		break;
 
 	case ColumnType::DateCreated:
 	{
 		FILETIME dateCreated = bookmarkItem->GetDateCreated();
 		return FormatDate(&dateCreated);
 	}
-	break;
 
 	case ColumnType::DateModified:
 	{
 		FILETIME dateModified = bookmarkItem->GetDateModified();
 		return FormatDate(&dateModified);
 	}
-	break;
 	}
 
 	throw std::runtime_error("Bookmark column type not found");
@@ -817,7 +805,6 @@ BookmarkListView::ColumnType BookmarkListView::MapPropertyTypeToColumnType(Bookm
 
 	default:
 		throw std::runtime_error("Bookmark column not found");
-		break;
 	}
 }
 

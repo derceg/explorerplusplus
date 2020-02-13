@@ -74,7 +74,6 @@ LRESULT CALLBACK HolderWndProcStub(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lPara
 		case WM_NCDESTROY:
 			delete pHolderWindow;
 			return 0;
-			break;
 	}
 
 	return pHolderWindow->HolderWndProc(hwnd,msg,wParam,lParam);
@@ -94,7 +93,6 @@ LRESULT CALLBACK HolderWindow::HolderWndProc(HWND hwnd,UINT msg,WPARAM wParam,LP
 
 		case WM_MOUSEMOVE:
 			return OnHolderWindowMouseMove(lParam);
-			break;
 
 		case WM_PAINT:
 			OnHolderWindowPaint(hwnd);

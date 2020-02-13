@@ -562,11 +562,9 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 	{
 	case WM_NOTIFY:
 		return TreeViewHolderWindowNotifyHandler(hwnd, msg, wParam, lParam);
-		break;
 
 	case WM_COMMAND:
 		return TreeViewHolderWindowCommandHandler(wParam);
-		break;
 
 	case WM_TIMER:
 		OnTreeViewHolderWindowTimer();
@@ -599,7 +597,6 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowNotifyHandler(HWND hwnd,
 
 	case TVN_KEYDOWN:
 		return OnTreeViewKeyDown(lParam);
-		break;
 
 	case NM_RCLICK:
 		{

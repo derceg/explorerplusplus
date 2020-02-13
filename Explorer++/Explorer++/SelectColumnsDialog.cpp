@@ -216,7 +216,6 @@ INT_PTR SelectColumnsDialog::OnNotify(NMHDR *pnmhdr)
 		SetWindowLongPtr(m_hDlg, DWLP_MSGRESULT, res);
 		return TRUE;
 	}
-		break;
 
 	case LVN_ITEMCHANGED:
 		OnLvnItemChanged(reinterpret_cast<NMLISTVIEW *>(pnmhdr));

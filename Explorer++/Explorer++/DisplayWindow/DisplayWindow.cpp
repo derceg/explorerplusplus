@@ -132,7 +132,6 @@ WPARAM wParam,LPARAM lParam)
 		case WM_NCDESTROY:
 			delete pdw;
 			return 0;
-			break;
 	}
 
 	return pdw->DisplayWindowProc(hwnd,msg,wParam,lParam);
@@ -154,7 +153,6 @@ WPARAM wParam,LPARAM lParam)
 
 		case WM_MOUSEMOVE:
 			return OnMouseMove(lParam);
-			break;
 
 		case WM_LBUTTONDOWN:
 			OnLButtonDown(lParam);
@@ -243,11 +241,9 @@ WPARAM wParam,LPARAM lParam)
 
 		case DWM_GETCENTRECOLOR:
 			return m_CentreColor.ToCOLORREF();
-			break;
 
 		case DWM_GETSURROUNDCOLOR:
 			return m_SurroundColor.ToCOLORREF();
-			break;
 
 		case DWM_SETCENTRECOLOR:
 			{
@@ -287,7 +283,6 @@ WPARAM wParam,LPARAM lParam)
 
 		case DWM_GETTEXTCOLOR:
 			return m_TextColor;
-			break;
 
 		case DWM_SETTEXTCOLOR:
 			OnSetTextColor((COLORREF)wParam);
@@ -307,7 +302,6 @@ WPARAM wParam,LPARAM lParam)
 			PatchBackground(hdc,&rc,&UpdateRect);
 			ReleaseDC(DisplayWindow,hdc);
 			return 1;
-			break;
 
 		case WM_SIZE:
 			OnSize(LOWORD(lParam), HIWORD(lParam));

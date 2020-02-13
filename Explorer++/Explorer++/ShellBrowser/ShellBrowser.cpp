@@ -519,7 +519,6 @@ int ShellBrowser::LocateFileItemInternalIndex(const TCHAR *szFileName) const
 			(lstrcmp(m_itemInfoMap.at((int)lvItem.lParam).wfd.cAlternateFileName,szFileName) == 0))
 		{
 			return (int)lvItem.lParam;
-			break;
 		}
 	}
 

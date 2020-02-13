@@ -222,7 +222,6 @@ LRESULT CALLBACK ColorRuleDialog::StaticColorProc(HWND hwnd,UINT Msg,WPARAM wPar
 
 			return 1;
 		}
-		break;
 	}
 
 	return DefSubclassProc(hwnd,Msg,wParam,lParam);

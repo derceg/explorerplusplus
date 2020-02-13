@@ -1310,7 +1310,6 @@ LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)
 		{
 		case CDDS_PREPAINT:
 			return CDRF_NOTIFYITEMDRAW;
-			break;
 
 		case CDDS_ITEMPREPAINT:
 			{

@@ -111,11 +111,9 @@ LRESULT CALLBACK BookmarkTreeView::TreeViewParentProc(HWND hwnd, UINT Msg, WPARA
 
 		case TVN_BEGINLABELEDIT:
 			return OnBeginLabelEdit(reinterpret_cast<NMTVDISPINFO *>(lParam));
-			break;
 
 		case TVN_ENDLABELEDIT:
 			return OnEndLabelEdit(reinterpret_cast<NMTVDISPINFO *>(lParam));
-			break;
 
 		case TVN_SELCHANGED:
 			OnSelChanged(reinterpret_cast<NMTREEVIEW *>(lParam));
@@ -155,7 +153,6 @@ LRESULT CALLBACK BookmarkTreeView::TreeViewEditProc(HWND hwnd, UINT Msg, WPARAM 
 		case VK_ESCAPE:
 		case VK_RETURN:
 			return DLGC_WANTALLKEYS;
-			break;
 		}
 		break;
 	}

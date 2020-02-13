@@ -62,7 +62,6 @@ LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 			SetWindowLongPtr(hwnd,GWLP_USERDATA,0);
 			delete pContainer;
 			return 0;
-			break;
 	}
 
 	/* Jump across to the member window function (will handle all requests). */
@@ -83,7 +82,6 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 	case WM_SETFOCUS:
 		OnSetFocus();
 		return 0;
-		break;
 
 	case WM_INITMENU:
 		SetProgramMenuItemStates(reinterpret_cast<HMENU>(wParam));
@@ -233,7 +231,6 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 
 			return TRUE;
 		}
-		break;
 
 	case WM_NDW_RCLICK:
 		{
@@ -265,28 +262,22 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 
 	case WM_COMMAND:
 		return CommandHandler(hwnd,wParam);
-		break;
 
 	case WM_NOTIFY:
 		return NotifyHandler(hwnd, Msg, wParam, lParam);
-		break;
 
 	case WM_SIZE:
 		return OnSize(LOWORD(lParam),HIWORD(lParam));
-		break;
 
 	case WM_DPICHANGED:
 		OnDpiChanged(reinterpret_cast<RECT *>(lParam));
 		return 0;
-		break;
 
 	case WM_CLOSE:
 		return OnClose();
-		break;
 
 	case WM_DESTROY:
 		return OnDestroy();
-		break;
 	}
 
 	return DefWindowProc(hwnd,Msg,wParam,lParam);
@@ -1438,15 +1429,12 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 
 		case NM_CUSTOMDRAW:
 			return OnCustomDraw(lParam);
-			break;
 
 		case LVN_KEYDOWN:
 			return OnListViewKeyDown(lParam);
-			break;
 
 		case LVN_ITEMCHANGING:
 			return OnListViewItemChanging(reinterpret_cast<NMLISTVIEW *>(lParam));
-			break;
 
 		case LVN_BEGINDRAG:
 			OnListViewBeginDrag(lParam,DragType::LeftClick);
@@ -1454,11 +1442,9 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 
 		case LVN_BEGINLABELEDIT:
 			return OnListViewBeginLabelEdit(lParam);
-			break;
 
 		case LVN_ENDLABELEDIT:
 			return OnListViewEndLabelEdit(lParam);
-			break;
 
 		case TBN_ENDADJUST:
 			UpdateToolbarBandSizing(m_hMainRebar,((NMHDR *)lParam)->hwndFrom);
@@ -1467,7 +1453,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 		case RBN_BEGINDRAG:
 			SendMessage(m_hMainRebar,RB_DRAGMOVE,0,-1);
 			return 0;
-			break;
 
 		case RBN_HEIGHTCHANGE:
 			/* The listview and treeview may

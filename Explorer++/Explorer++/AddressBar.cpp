@@ -77,7 +77,6 @@ LRESULT CALLBACK AddressBar::EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LP
 		case VK_RETURN:
 			OnGo();
 			return 0;
-			break;
 		}
 		break;
 

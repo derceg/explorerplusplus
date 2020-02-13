@@ -108,15 +108,12 @@ int SortByDate(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo
 	{
 	case DATE_TYPE_CREATED:
 		return CompareFileTime(&itemInfo1.wfd.ftCreationTime, &itemInfo2.wfd.ftCreationTime);
-		break;
 
 	case DATE_TYPE_MODIFIED:
 		return CompareFileTime(&itemInfo1.wfd.ftLastWriteTime, &itemInfo2.wfd.ftLastWriteTime);
-		break;
 
 	case DATE_TYPE_ACCESSED:
 		return CompareFileTime(&itemInfo1.wfd.ftLastAccessTime, &itemInfo2.wfd.ftLastAccessTime);
-		break;
 
 	default:
 		assert(false);

@@ -216,7 +216,6 @@ LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd, UINT msg, WPARAM wPa
 			OnToolbarRClick(pnmm->hdr.hwndFrom);
 		}
 		return TRUE;
-		break;
 		}
 		break;
 	}
