@@ -196,6 +196,6 @@ void FilterDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bst
 	if(CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, bstrName, lstrlen(SETTING_FILTER_LIST),
 		SETTING_FILTER_LIST, lstrlen(SETTING_FILTER_LIST)) == CSTR_EQUAL)
 	{
-		m_FilterList.push_back(bstrValue);
+		m_FilterList.emplace_back(bstrValue);
 	}
 }

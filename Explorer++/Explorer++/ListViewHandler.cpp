@@ -939,7 +939,7 @@ void Explorerplusplus::OnListViewFileRenameMultiple()
 		}
 
 		m_pActiveShellBrowser->GetItemFullName(iIndex, szFullFilename, SIZEOF_ARRAY(szFullFilename));
-		FullFilenameList.push_back(szFullFilename);
+		FullFilenameList.emplace_back(szFullFilename);
 	}
 
 	if (FullFilenameList.empty())
@@ -1055,7 +1055,7 @@ HRESULT Explorerplusplus::OnListViewCopy(BOOL bCopy)
 			{
 				m_pActiveShellBrowser->GetItemDisplayName(iItem,SIZEOF_ARRAY(szFilename),
 					szFilename);
-				m_CutFileNameList.push_back(szFilename);
+				m_CutFileNameList.emplace_back(szFilename);
 
 				m_pActiveShellBrowser->GhostItem(iItem);
 			}

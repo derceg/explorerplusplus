@@ -48,12 +48,12 @@ void BookmarksToolbar::InitializeToolbar()
 
 	SetUpToolbarImageList();
 
-	m_windowSubclasses.push_back(WindowSubclassWrapper(m_hToolbar, BookmarksToolbarProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.emplace_back(m_hToolbar, BookmarksToolbarProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
 	/* Also subclass the parent window, so that WM_COMMAND/WM_NOTIFY messages
 	can be caught. */
-	m_windowSubclasses.push_back(WindowSubclassWrapper(GetParent(m_hToolbar), BookmarksToolbarParentProcStub, PARENT_SUBCLASS_ID,
-		reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.emplace_back(GetParent(m_hToolbar), BookmarksToolbarParentProcStub, PARENT_SUBCLASS_ID,
+		reinterpret_cast<DWORD_PTR>(this));
 
 	InsertBookmarkItems();
 

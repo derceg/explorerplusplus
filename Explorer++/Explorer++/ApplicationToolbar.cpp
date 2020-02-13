@@ -75,8 +75,8 @@ void ApplicationToolbar::Initialize(HWND hParent)
 	m_patd = new ApplicationToolbarDropHandler(m_hwnd, this);
 	RegisterDragDrop(m_hwnd,m_patd);
 
-	m_windowSubclasses.push_back(WindowSubclassWrapper(hParent, ParentWndProcStub,
-		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.emplace_back(hParent, ParentWndProcStub, PARENT_SUBCLASS_ID,
+		reinterpret_cast<DWORD_PTR>(this));
 
 	AddButtonsToToolbar();
 

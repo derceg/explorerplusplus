@@ -214,7 +214,7 @@ void WildcardSelectDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,
 	if(CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, bstrName, lstrlen(SETTING_PATTERN_LIST),
 		SETTING_PATTERN_LIST, lstrlen(SETTING_PATTERN_LIST)) == CSTR_EQUAL)
 	{
-		m_PatternList.push_back(bstrValue);
+		m_PatternList.emplace_back(bstrValue);
 	}
 	else if(lstrcmpi(bstrName, SETTING_CURRENT_TEXT) == 0)
 	{

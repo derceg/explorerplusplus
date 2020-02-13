@@ -116,17 +116,17 @@ std::wstring BuildAcceleratorString(const ACCEL &accelerator)
 
 	if ((accelerator.fVirt & FCONTROL) == FCONTROL)
 	{
-		acceleratorParts.push_back(L"Ctrl");
+		acceleratorParts.emplace_back(L"Ctrl");
 	}
 
 	if ((accelerator.fVirt & FALT) == FALT)
 	{
-		acceleratorParts.push_back(L"Alt");
+		acceleratorParts.emplace_back(L"Alt");
 	}
 
 	if ((accelerator.fVirt & FSHIFT) == FSHIFT)
 	{
-		acceleratorParts.push_back(L"Shift");
+		acceleratorParts.emplace_back(L"Shift");
 	}
 
 	acceleratorParts.push_back(keyString);

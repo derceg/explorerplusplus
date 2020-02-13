@@ -156,8 +156,8 @@ void MainToolbar::Initialize(HWND parent)
 	AddButtonsToToolbar(m_persistentSettings->m_toolbarButtons);
 	UpdateConfigDependentButtonStates();
 
-	m_windowSubclasses.push_back(WindowSubclassWrapper(parent, ParentWndProcStub,
-		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.emplace_back(parent, ParentWndProcStub, PARENT_SUBCLASS_ID,
+		reinterpret_cast<DWORD_PTR>(this));
 
 	m_pexpp->AddTabsInitializedObserver([this] {
 		m_connections.push_back(m_pexpp->GetTabContainer()->tabSelectedSignal.AddObserver(

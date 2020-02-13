@@ -53,7 +53,7 @@ void Explorerplusplus::OnMergeFiles()
 	{
 		TCHAR szFullFilename[MAX_PATH];
 		m_pActiveShellBrowser->GetItemFullName(iItem, szFullFilename, SIZEOF_ARRAY(szFullFilename));
-		FullFilenameList.push_back(szFullFilename);
+		FullFilenameList.emplace_back(szFullFilename);
 	}
 
 	MergeFilesDialog mergeFilesDialog(m_hLanguageModule, m_hContainer, this, currentDirectory,
@@ -84,7 +84,7 @@ void Explorerplusplus::OnDestroyFiles()
 	{
 		TCHAR szFullFilename[MAX_PATH];
 		m_pActiveShellBrowser->GetItemFullName(iItem, szFullFilename, SIZEOF_ARRAY(szFullFilename));
-		FullFilenameList.push_back(szFullFilename);
+		FullFilenameList.emplace_back(szFullFilename);
 	}
 
 	DestroyFilesDialog destroyFilesDialog(m_hLanguageModule, m_hContainer,

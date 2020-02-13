@@ -209,11 +209,11 @@ HWND ShellBrowser::SetUpListView(HWND parent)
 
 	SetWindowTheme(hListView, L"Explorer", NULL);
 
-	m_windowSubclasses.push_back(WindowSubclassWrapper(hListView, ListViewProcStub,
-		LISTVIEW_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.emplace_back(hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID,
+		reinterpret_cast<DWORD_PTR>(this));
 
-	m_windowSubclasses.push_back(WindowSubclassWrapper(parent, ListViewParentProcStub,
-		listViewParentSubclassIdCounter++, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.emplace_back(parent, ListViewParentProcStub,
+		listViewParentSubclassIdCounter++, reinterpret_cast<DWORD_PTR>(this));
 
 	return hListView;
 }

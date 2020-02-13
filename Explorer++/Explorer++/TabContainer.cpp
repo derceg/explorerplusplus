@@ -101,8 +101,8 @@ void TabContainer::Initialize(HWND parent)
 	RegisterDragDrop(m_hwnd, pTabDropHandler);
 	pTabDropHandler->Release();
 
-	m_windowSubclasses.push_back(WindowSubclassWrapper(m_hwnd, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
-	m_windowSubclasses.push_back(WindowSubclassWrapper(parent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.emplace_back(m_hwnd, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.emplace_back(parent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
 	m_connections.push_back(tabCreatedSignal.AddObserver(boost::bind(&TabContainer::OnTabCreated, this, _1, _2)));
 	m_connections.push_back(tabNavigationCompletedSignal.AddObserver(boost::bind(&TabContainer::OnNavigationCompleted, this, _1)));
@@ -1285,7 +1285,7 @@ std::vector<std::reference_wrapper<const Tab>> TabContainer::GetAllTabsInOrder()
 
 	for (const auto &tab : m_tabs | boost::adaptors::map_values)
 	{
-		sortedTabs.push_back(*tab);
+		sortedTabs.emplace_back(*tab);
 	}
 
 	// The Tab class is non-copyable, so there are essentially two ways of

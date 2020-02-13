@@ -102,8 +102,8 @@ HWND OptionsDialog::Show(HWND parentWindow)
 	psh.pfnCallback	= nullptr;
 	HWND propertySheet = reinterpret_cast<HWND>(PropertySheet(&psh));
 
-	m_windowSubclasses.push_back(WindowSubclassWrapper(propertySheet, PropSheetProcStub,
-		PROP_SHEET_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.emplace_back(propertySheet, PropSheetProcStub,
+		PROP_SHEET_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
 	CenterWindow(parentWindow, propertySheet);
 

@@ -40,14 +40,14 @@ void AddressBar::Initialize(HWND parent)
 	SendMessage(m_hwnd, CBEM_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(SmallIcons));
 
 	HWND hEdit = reinterpret_cast<HWND>(SendMessage(m_hwnd, CBEM_GETEDITCONTROL, 0, 0));
-	m_windowSubclasses.push_back(WindowSubclassWrapper(hEdit, EditSubclassStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.emplace_back(hEdit, EditSubclassStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
 	/* Turn on auto complete for the edit control within the combobox.
 	This will let the os complete paths as they are typed. */
 	SHAutoComplete(hEdit, SHACF_FILESYSTEM | SHACF_AUTOSUGGEST_FORCE_ON);
 
-	m_windowSubclasses.push_back(WindowSubclassWrapper(parent, ParentWndProcStub,
-		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.emplace_back(parent, ParentWndProcStub, PARENT_SUBCLASS_ID,
+		reinterpret_cast<DWORD_PTR>(this));
 
 	m_expp->AddTabsInitializedObserver([this] {
 		m_connections.push_back(m_expp->GetTabContainer()->tabSelectedSignal.AddObserver(

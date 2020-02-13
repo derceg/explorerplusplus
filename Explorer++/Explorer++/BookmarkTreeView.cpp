@@ -23,10 +23,10 @@ BookmarkTreeView::BookmarkTreeView(HWND hTreeView, HINSTANCE hInstance, IExplore
 	m_bookmarkTree(bookmarkTree),
 	m_bNewFolderCreated(false)
 {
-	m_windowSubclasses.push_back(WindowSubclassWrapper(hTreeView, BookmarkTreeViewProcStub,
-		SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
-	m_windowSubclasses.push_back(WindowSubclassWrapper(GetParent(hTreeView), BookmarkTreeViewParentProcStub,
-		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.emplace_back(hTreeView, BookmarkTreeViewProcStub,
+		SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.emplace_back(GetParent(hTreeView), BookmarkTreeViewParentProcStub,
+		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
 	SetWindowTheme(hTreeView, L"Explorer", NULL);
 

@@ -164,7 +164,7 @@ boost::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(const CommandL
 		TCHAR szParsingPath[MAX_PATH];
 		DecodePath(strToWstr(directory).c_str(), processDirectoryPath.wstring().c_str(), szParsingPath, SIZEOF_ARRAY(szParsingPath));
 
-		g_commandLineDirectories.push_back(szParsingPath);
+		g_commandLineDirectories.emplace_back(szParsingPath);
 	}
 
 	return boost::none;
