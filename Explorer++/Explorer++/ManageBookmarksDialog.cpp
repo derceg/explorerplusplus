@@ -418,7 +418,7 @@ void ManageBookmarksDialog::OnListViewNavigation(BookmarkItem *bookmarkFolder)
 
 void ManageBookmarksDialog::BrowseBack()
 {
-	if(m_stackBack.size() == 0)
+	if(m_stackBack.empty())
 	{
 		return;
 	}
@@ -433,7 +433,7 @@ void ManageBookmarksDialog::BrowseBack()
 
 void ManageBookmarksDialog::BrowseForward()
 {
-	if(m_stackForward.size() == 0)
+	if(m_stackForward.empty())
 	{
 		return;
 	}
@@ -448,8 +448,8 @@ void ManageBookmarksDialog::BrowseForward()
 
 void ManageBookmarksDialog::UpdateToolbarState()
 {
-	SendMessage(m_hToolbar,TB_ENABLEBUTTON,TOOLBAR_ID_BACK,m_stackBack.size() != 0);
-	SendMessage(m_hToolbar,TB_ENABLEBUTTON,TOOLBAR_ID_FORWARD,m_stackForward.size() != 0);
+	SendMessage(m_hToolbar,TB_ENABLEBUTTON,TOOLBAR_ID_BACK,!m_stackBack.empty());
+	SendMessage(m_hToolbar,TB_ENABLEBUTTON,TOOLBAR_ID_FORWARD,!m_stackForward.empty());
 }
 
 void ManageBookmarksDialog::OnOk()

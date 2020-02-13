@@ -364,7 +364,7 @@ HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 		history = tab.GetShellBrowser()->GetNavigationController()->GetForwardHistory();
 	}
 
-	if (history.size() > 0)
+	if (!history.empty())
 	{
 		int i = 0;
 

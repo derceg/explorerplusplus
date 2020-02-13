@@ -72,7 +72,7 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		/* If ppidl is NULL, open the item specified by pidlParent
 		in the current listview. If ppidl is not NULL, open each
 		of the items specified in ppidl. */
-		if(pidlItems.size() == 0)
+		if(pidlItems.empty())
 		{
 			OpenItem(pidlParent,FALSE,FALSE);
 		}
@@ -143,7 +143,7 @@ void Explorerplusplus::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 				TCHAR szParsingPath[MAX_PATH];
 				BOOL bOpenInNewTab;
 
-				if(pidlItems.size() != 0)
+				if(!pidlItems.empty())
 				{
 					pidlComplete.reset(ILCombine(pidlParent, pidlItems[0]));
 

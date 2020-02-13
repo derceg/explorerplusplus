@@ -16,7 +16,7 @@ SetFileAttributesDialog::SetFileAttributesDialog(HINSTANCE hInstance, HWND hPare
 	const std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t> &sfaiList) :
 	BaseDialog(hInstance, IDD_SETFILEATTRIBUTES, hParent, false)
 {
-	assert(sfaiList.size() > 0);
+	assert(!sfaiList.empty());
 
 	m_FileList = sfaiList;
 

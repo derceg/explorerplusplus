@@ -195,7 +195,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	control panel. If the command line only refers
 	to folders that are children of the control panel,
 	pass those folders to Windows Explorer, then exit. */
-	if(g_commandLineDirectories.size() > 0)
+	if(!g_commandLineDirectories.empty())
 	{
 		unique_pidl_absolute pidlControlPanel;
 		HRESULT hr = SHGetFolderLocation(NULL,
@@ -264,7 +264,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 				}
 			}
 
-			if(g_commandLineDirectories.size() == 0)
+			if(g_commandLineDirectories.empty())
 			{
 				shouldExit = true;
 			}

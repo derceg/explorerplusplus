@@ -973,7 +973,7 @@ int Explorerplusplus::LoadColumnFromXML(IXMLDOMNode *pNode, std::vector<Column_t
 				}
 				else if(lstrcmp(bstrName,szWidth) == 0)
 				{
-					if(outputColumns.size() > 0)
+					if(!outputColumns.empty())
 					{
 						outputColumns.back().iWidth = NXMLSettings::DecodeIntValue(bstrValue);
 					}
