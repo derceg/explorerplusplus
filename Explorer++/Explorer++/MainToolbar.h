@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "CoreInterface.h"
 #include "DefaultToolbarButtons.h"
 #include "IconResourceLoader.h"
 #include "Navigation.h"
@@ -16,6 +15,7 @@
 #include <unordered_map>
 
 struct Config;
+__interface IExplorerplusplus;
 class MainToolbar;
 
 class MainToolbarPersistentSettings

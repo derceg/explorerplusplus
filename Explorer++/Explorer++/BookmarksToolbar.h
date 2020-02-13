@@ -10,7 +10,6 @@
 #include "BookmarkItem.h"
 #include "BookmarkMenu.h"
 #include "BookmarkTree.h"
-#include "CoreInterface.h"
 #include "Navigation.h"
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
@@ -20,6 +19,8 @@
 #include <wil/com.h>
 #include <wil/resource.h>
 #include <optional>
+
+__interface IExplorerplusplus;
 
 class BookmarksToolbar : private BookmarkDropTargetWindow
 {

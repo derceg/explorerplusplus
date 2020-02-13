@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ListViewEdit.h"
+#include "CoreInterface.h"
 #include "Explorer++_internal.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/Helper.h"

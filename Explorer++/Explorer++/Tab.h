@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "CoreInterface.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "TabNavigationInterface.h"
@@ -12,6 +11,7 @@
 #include <boost/optional.hpp>
 #include <boost/signals2.hpp>
 
+__interface IExplorerplusplus;
 struct PreservedTab;
 
 class Tab

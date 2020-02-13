@@ -6,11 +6,12 @@
 
 #include "BookmarkMenuBuilder.h"
 #include "BookmarkTree.h"
-#include "CoreInterface.h"
 #include "MenuHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
+
+__interface IExplorerplusplus;
 
 class BookmarksMainMenu
 {

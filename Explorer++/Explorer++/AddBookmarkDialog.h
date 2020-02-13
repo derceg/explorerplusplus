@@ -8,7 +8,6 @@
 #include "BookmarkItem.h"
 #include "BookmarkTree.h"
 #include "BookmarkTreeView.h"
-#include "CoreInterface.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
@@ -17,6 +16,7 @@
 #include <unordered_set>
 
 class AddBookmarkDialog;
+__interface IExplorerplusplus;
 
 class AddBookmarkDialogPersistentSettings : public DialogSettings
 {

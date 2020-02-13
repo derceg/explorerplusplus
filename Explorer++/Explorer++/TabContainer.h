@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "CoreInterface.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "SignalWrapper.h"
 #include "Tab.h"
@@ -23,6 +22,7 @@
 class BookmarkTree;
 class CachedIcons;
 struct Config;
+__interface IExplorerplusplus;
 class Navigation;
 struct PreservedTab;
 

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "FilterDialog.h"
+#include "CoreInterface.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"

@@ -4,10 +4,11 @@
 
 #pragma once
 
-#include "CoreInterface.h"
 #include "Tab.h"
 #include "TabContainer.h"
 #include <boost/signals2.hpp>
+
+__interface IExplorerplusplus;
 
 class UiTheming
 {

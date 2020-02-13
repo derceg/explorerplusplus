@@ -5,11 +5,12 @@
 #pragma once
 
 #include "Config.h"
-#include "CoreInterface.h"
 #include "TabContainer.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <wil/resource.h>
+
+__interface IExplorerplusplus;
 
 class OptionsDialog
 {

@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Tab.h"
 #include "Config.h"
+#include "CoreInterface.h"
 #include "PreservedTab.h"
 #include <wil/resource.h>
 

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "UiTheming.h"
+#include "CoreInterface.h"
 
 UiTheming::UiTheming(IExplorerplusplus *expp, TabContainer *tabContainer) :
 	m_expp(expp),

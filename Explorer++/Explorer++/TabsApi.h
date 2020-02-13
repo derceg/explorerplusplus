@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "CoreInterface.h"
 #include "Navigation.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
@@ -12,6 +11,8 @@
 #include "TabContainer.h"
 #include "../Helper/StringHelper.h"
 #include "../ThirdParty/Sol/forward.hpp"
+
+__interface IExplorerplusplus;
 
 namespace Plugins
 {

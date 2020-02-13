@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "CoreInterface.h"
+__interface IExplorerplusplus;
 
 class NewMenuClient : public INewMenuClient
 {

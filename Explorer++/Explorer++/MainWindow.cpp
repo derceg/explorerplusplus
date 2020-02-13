@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "MainWindow.h"
 #include "Config.h"
+#include "CoreInterface.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "TabContainer.h"

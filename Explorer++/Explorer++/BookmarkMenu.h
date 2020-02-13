@@ -8,10 +8,11 @@
 #include "BookmarkItem.h"
 #include "BookmarkMenuBuilder.h"
 #include "BookmarkTree.h"
-#include "CoreInterface.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <wil/resource.h>
 #include <functional>
+
+__interface IExplorerplusplus;
 
 // Although it's not necessary, this class is effectively designed to be held
 // for the lifetime of its parent class. Doing so is more efficient, as the

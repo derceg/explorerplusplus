@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "BookmarkTreeView.h"
 #include "BookmarkDataExchange.h"
+#include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/iDropSource.h"

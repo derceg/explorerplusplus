@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "BookmarkContextMenu.h"
 #include "BookmarkClipboard.h"
+#include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/Helper.h"

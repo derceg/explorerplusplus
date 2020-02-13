@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include "CoreInterface.h"
 #include "../Helper/BaseWindow.h"
+
+__interface IExplorerplusplus;
 
 class ListViewEdit : BaseWindow
 {

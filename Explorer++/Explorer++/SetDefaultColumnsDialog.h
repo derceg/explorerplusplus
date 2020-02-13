@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "CoreInterface.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/BaseDialog.h"

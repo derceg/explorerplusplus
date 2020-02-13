@@ -17,6 +17,7 @@
 #include "ApplicationToolbar.h"
 #include "ApplicationToolbarButtonDialog.h"
 #include "ApplicationToolbarDropHandler.h"
+#include "CoreInterface.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"

@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "CoreInterface.h"
 #include "HardwareChangeNotifier.h"
 #include "Navigation.h"
 #include "../Helper/BaseWindow.h"
@@ -13,6 +12,8 @@
 #include <boost/serialization/strong_typedef.hpp>
 #include <list>
 #include <unordered_map>
+
+__interface IExplorerplusplus;
 
 class DrivesToolbar : public BaseWindow, public IFileContextMenuExternal, public NHardwareChangeNotifier::INotification
 {

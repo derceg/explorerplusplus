@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "AddressBar.h"
+#include "CoreInterface.h"
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
 #include "../Helper/iDataObject.h"

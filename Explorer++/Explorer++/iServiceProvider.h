@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "CoreInterface.h"
+__interface IExplorerplusplus;
 
 class ServiceProvider : public IServiceProvider
 {

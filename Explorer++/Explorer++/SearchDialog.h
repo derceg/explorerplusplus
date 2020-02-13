@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "CoreInterface.h"
 #include "TabContainer.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
@@ -19,6 +18,7 @@
 #include <unordered_map>
 #include <vector>
 
+__interface IExplorerplusplus;
 class SearchDialog;
 
 /* Manages settings for the search dialog. */

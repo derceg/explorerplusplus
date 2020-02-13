@@ -6,11 +6,12 @@
 
 #include "BookmarkItem.h"
 #include "BookmarkTree.h"
-#include "CoreInterface.h"
 #include "TabContainer.h"
 #include <optional>
 
 using RawBookmarkItems = std::vector<BookmarkItem *>;
+
+__interface IExplorerplusplus;
 
 namespace BookmarkHelper
 {

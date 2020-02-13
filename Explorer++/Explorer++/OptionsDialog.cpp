@@ -13,6 +13,7 @@
 #include "stdafx.h"
 #include "OptionsDialog.h"
 #include "Config.h"
+#include "CoreInterface.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ModelessDialogs.h"

@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include "CoreInterface.h"
 #include "TabContainer.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
 
+__interface IExplorerplusplus;
 class SelectColumnsDialog;
 
 class SelectColumnsDialogPersistentSettings : public DialogSettings

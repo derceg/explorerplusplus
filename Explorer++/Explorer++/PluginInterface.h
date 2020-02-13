@@ -5,12 +5,13 @@
 #pragma once
 
 #include "AcceleratorUpdater.h"
-#include "CoreInterface.h"
 #include "Navigation.h"
 #include "PluginCommandManager.h"
 #include "PluginMenuManager.h"
 #include "TabContainer.h"
 #include "UiTheming.h"
+
+__interface IExplorerplusplus;
 
 __interface PluginInterface
 {

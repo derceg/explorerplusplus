@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "BookmarksMainMenu.h"
+#include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "TabContainer.h"

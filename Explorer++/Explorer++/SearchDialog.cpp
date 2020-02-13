@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "SearchDialog.h"
+#include "CoreInterface.h"
 #include "DialogHelper.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"

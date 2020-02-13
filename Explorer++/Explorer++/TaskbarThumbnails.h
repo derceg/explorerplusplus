@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include "CoreInterface.h"
 #include "Tab.h"
 #include "TabContainer.h"
 #include "../Helper/Macros.h"
 #include <wil/resource.h>
 
 struct Config;
+__interface IExplorerplusplus;
 
 class TaskbarThumbnails
 {

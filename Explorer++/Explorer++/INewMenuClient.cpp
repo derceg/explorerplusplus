@@ -10,6 +10,7 @@
 
 #include "stdafx.h"
 #include "INewMenuClient.h"
+#include "CoreInterface.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/Logging.h"
 

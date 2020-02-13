@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "WildcardSelectDialog.h"
+#include "CoreInterface.h"
 #include "MainResource.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/BaseDialog.h"

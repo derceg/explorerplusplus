@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "CoreInterface.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ReferenceCount.h"
@@ -12,6 +11,7 @@
 #include <string>
 #include <unordered_map>
 
+__interface IExplorerplusplus;
 class SplitFileDialog;
 
 class SplitFileDialogPersistentSettings : public DialogSettings

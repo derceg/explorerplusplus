@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "CustomizeColorsDialog.h"
 #include "ColorRuleDialog.h"
+#include "CoreInterface.h"
 #include "Explorer++_internal.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"

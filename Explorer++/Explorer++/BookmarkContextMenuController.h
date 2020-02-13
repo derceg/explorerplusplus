@@ -7,7 +7,8 @@
 #include "BookmarkHelper.h"
 #include "BookmarkItem.h"
 #include "BookmarkTree.h"
-#include "CoreInterface.h"
+
+__interface IExplorerplusplus;
 
 class BookmarkContextMenuController
 {

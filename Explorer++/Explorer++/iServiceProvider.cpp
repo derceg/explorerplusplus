@@ -8,8 +8,8 @@
 
 #include "stdafx.h"
 #include "iServiceProvider.h"
+#include "CoreInterface.h"
 #include "INewMenuClient.h"
-
 
 ServiceProvider::ServiceProvider(IExplorerplusplus *pexpp) :
 m_pexpp(pexpp),

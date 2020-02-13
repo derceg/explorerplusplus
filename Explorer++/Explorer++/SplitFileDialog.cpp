@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "SplitFileDialog.h"
+#include "CoreInterface.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"

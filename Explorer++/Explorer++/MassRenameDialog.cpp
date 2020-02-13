@@ -15,6 +15,7 @@
 
 #include "stdafx.h"
 #include "MassRenameDialog.h"
+#include "CoreInterface.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"

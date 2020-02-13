@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include "CoreInterface.h"
 #include "Tab.h"
 #include "../Helper/BaseWindow.h"
 
 struct Config;
+__interface IExplorerplusplus;
 
 class MainWindow : BaseWindow
 {

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "TabRestorerUI.h"
+#include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/ImageHelper.h"

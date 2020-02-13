@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include "CoreInterface.h"
 #include "../Helper/DropHandler.h"
+
+__interface IExplorerplusplus;
 
 class DropFilesCallback : public IDropFilesCallback
 {

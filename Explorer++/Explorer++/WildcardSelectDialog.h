@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "CoreInterface.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
@@ -14,6 +13,7 @@
 #include <list>
 #include <string>
 
+__interface IExplorerplusplus;
 class WildcardSelectDialog;
 
 class WildcardSelectDialogPersistentSettings : public DialogSettings

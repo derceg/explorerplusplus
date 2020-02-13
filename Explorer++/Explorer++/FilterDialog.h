@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "CoreInterface.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
@@ -12,6 +11,7 @@
 #include <objbase.h>
 
 class FilterDialog;
+__interface IExplorerplusplus;
 
 class FilterDialogPersistentSettings : public DialogSettings
 {

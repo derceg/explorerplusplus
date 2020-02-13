@@ -5,13 +5,13 @@
 #pragma once
 
 #include "ColorRuleHelper.h"
-#include "CoreInterface.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
 #include <vector>
 
 class CustomizeColorsDialog;
+__interface IExplorerplusplus;
 
 class CustomizeColorsDialogPersistentSettings : public DialogSettings
 {
