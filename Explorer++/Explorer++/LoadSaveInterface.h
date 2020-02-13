@@ -11,7 +11,7 @@ class ILoadSave
 {
 public:
 
-	virtual ~ILoadSave() {};
+	virtual ~ILoadSave() = default;
 
 	/* Loading functions. */
 	virtual void	LoadGenericSettings() = 0;

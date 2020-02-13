@@ -5,12 +5,6 @@
 #include "stdafx.h"
 #include "HardwareChangeNotifier.h"
 
-
-HardwareChangeNotifier::HardwareChangeNotifier()
-{
-
-}
-
 HardwareChangeNotifier& HardwareChangeNotifier::GetInstance()
 {
 	static HardwareChangeNotifier hcn;

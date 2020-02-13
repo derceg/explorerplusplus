@@ -35,7 +35,7 @@ private:
 		NOTIFY_DEVICE_REMOVAL_COMPLETE
 	};
 
-	HardwareChangeNotifier();
+	HardwareChangeNotifier() = default;
 
 	HardwareChangeNotifier(const HardwareChangeNotifier &);
 	HardwareChangeNotifier & operator=(const HardwareChangeNotifier &);

@@ -11,8 +11,6 @@ class BookmarkClipboard
 {
 public:
 
-	BookmarkClipboard();
-
 	BookmarkItems ReadBookmarks();
 	bool WriteBookmarks(const OwnedRefBookmarkItems &bookmarkItems);
 

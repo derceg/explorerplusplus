@@ -7,11 +7,6 @@
 #include "../Helper/BulkClipboardWriter.h"
 #include <boost/algorithm/string/join.hpp>
 
-BookmarkClipboard::BookmarkClipboard()
-{
-
-}
-
 UINT BookmarkClipboard::GetClipboardFormat()
 {
 	static UINT clipboardFormat = RegisterClipboardFormat(CLIPBOARD_FORMAT_STRING);
