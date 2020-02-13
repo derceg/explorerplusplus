@@ -36,11 +36,11 @@ private:
 	WildcardSelectDialogPersistentSettings(const WildcardSelectDialogPersistentSettings &);
 	WildcardSelectDialogPersistentSettings & operator=(const WildcardSelectDialogPersistentSettings &);
 
-	void			SaveExtraRegistrySettings(HKEY hKey);
-	void			LoadExtraRegistrySettings(HKEY hKey);
+	void			SaveExtraRegistrySettings(HKEY hKey) override;
+	void			LoadExtraRegistrySettings(HKEY hKey) override;
 
-	void			SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode);
-	void			LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue);
+	void			SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode) override;
+	void			LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue) override;
 
 	TCHAR			m_szPattern[256];
 	std::list<std::wstring>	m_PatternList;
@@ -54,14 +54,14 @@ public:
 
 protected:
 
-	INT_PTR	OnInitDialog();
-	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
-	INT_PTR	OnClose();
+	INT_PTR	OnInitDialog() override;
+	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam) override;
+	INT_PTR	OnClose() override;
 
 private:
 
-	void				GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList);
-	void				SaveState();
+	void				GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList) override;
+	void				SaveState() override;
 
 	void				OnOk();
 	void				OnCancel();

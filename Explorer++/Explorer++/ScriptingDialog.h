@@ -12,15 +12,15 @@ public:
 
 protected:
 
-	INT_PTR OnInitDialog();
-	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam);
+	INT_PTR OnInitDialog() override;
+	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
 	void OnRun();
-	INT_PTR OnClose();
-	INT_PTR	OnNcDestroy();
+	INT_PTR OnClose() override;
+	INT_PTR	OnNcDestroy() override;
 
 private:
 
-	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList);
+	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList) override;
 
 	std::wstring FormatResult(const sol::protected_function_result &result);
 	void AppendToLog(const std::wstring &command, const std::wstring &result);

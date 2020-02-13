@@ -18,24 +18,24 @@ public:
 	~LoadSaveXML();
 
 	/* Loading functions. */
-	void	LoadGenericSettings();
-	void	LoadBookmarks();
-	int		LoadPreviousTabs();
-	void	LoadDefaultColumns();
-	void	LoadApplicationToolbar();
-	void	LoadToolbarInformation();
-	void	LoadColorRules();
-	void	LoadDialogStates();
+	void	LoadGenericSettings() override;
+	void	LoadBookmarks() override;
+	int		LoadPreviousTabs() override;
+	void	LoadDefaultColumns() override;
+	void	LoadApplicationToolbar() override;
+	void	LoadToolbarInformation() override;
+	void	LoadColorRules() override;
+	void	LoadDialogStates() override;
 
 	/* Saving functions. */
-	void	SaveGenericSettings();
-	void	SaveBookmarks();
-	void	SaveTabs();
-	void	SaveDefaultColumns();
-	void	SaveApplicationToolbar();
-	void	SaveToolbarInformation();
-	void	SaveColorRules();
-	void	SaveDialogStates();
+	void	SaveGenericSettings() override;
+	void	SaveBookmarks() override;
+	void	SaveTabs() override;
+	void	SaveDefaultColumns() override;
+	void	SaveApplicationToolbar() override;
+	void	SaveToolbarInformation() override;
+	void	SaveColorRules() override;
+	void	SaveDialogStates() override;
 
 private:
 

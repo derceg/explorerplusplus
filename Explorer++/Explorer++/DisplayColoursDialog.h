@@ -36,13 +36,13 @@ public:
 
 protected:
 
-	INT_PTR	OnInitDialog();
-	INT_PTR	OnHScroll(HWND hwnd);
-	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
-	INT_PTR	OnClose();
-	INT_PTR	OnDestroy();
+	INT_PTR	OnInitDialog() override;
+	INT_PTR	OnHScroll(HWND hwnd) override;
+	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam) override;
+	INT_PTR	OnClose() override;
+	INT_PTR	OnDestroy() override;
 
-	void	SaveState();
+	void	SaveState() override;
 
 private:
 

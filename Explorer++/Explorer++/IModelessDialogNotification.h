@@ -13,13 +13,13 @@ public:
 
 	ModelessDialogNotification();
 
-	ULONG AddRef();
-	ULONG Release();
+	ULONG AddRef() override;
+	ULONG Release() override;
 
 private:
 
 	/* IModelessDialogNotification methods. */
-	void OnModelessDialogDestroy(int iResource);
+	void OnModelessDialogDestroy(int iResource) override;
 
 	ULONG m_RefCount;
 };

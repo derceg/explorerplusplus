@@ -22,13 +22,13 @@ public:
 		HINSTANCE hInstance, IExplorerplusplus *pexpp, Navigation *navigation);
 
 	/* IFileContextMenuExternal methods. */
-	void	AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, HMENU hMenu);
-	BOOL	HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd);
-	void	HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, int iCmd);
+	void	AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, HMENU hMenu) override;
+	BOOL	HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd) override;
+	void	HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, int iCmd) override;
 
 protected:
 
-	INT_PTR	OnMButtonUp(const POINTS *pts);
+	INT_PTR	OnMButtonUp(const POINTS *pts) override;
 
 private:
 
@@ -68,8 +68,8 @@ private:
 
 	void		UpdateDriveIcon(const std::wstring &DrivePath);
 
-	void		OnDeviceArrival(DEV_BROADCAST_HDR *dbh);
-	void		OnDeviceRemoveComplete(DEV_BROADCAST_HDR *dbh);
+	void		OnDeviceArrival(DEV_BROADCAST_HDR *dbh) override;
+	void		OnDeviceRemoveComplete(DEV_BROADCAST_HDR *dbh) override;
 
 	HINSTANCE m_hInstance;
 

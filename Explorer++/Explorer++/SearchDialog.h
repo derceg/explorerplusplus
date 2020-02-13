@@ -71,11 +71,11 @@ private:
 	SearchDialogPersistentSettings(const SearchDialogPersistentSettings &);
 	SearchDialogPersistentSettings & operator=(const SearchDialogPersistentSettings &);
 
-	void						SaveExtraRegistrySettings(HKEY hKey);
-	void						LoadExtraRegistrySettings(HKEY hKey);
+	void						SaveExtraRegistrySettings(HKEY hKey) override;
+	void						LoadExtraRegistrySettings(HKEY hKey) override;
 
-	void						SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode);
-	void						LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue);
+	void						SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode) override;
+	void						LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue) override;
 
 	template <typename T> void	CircularBufferToList(const boost::circular_buffer<T> &cb,std::list<T> &list);
 	template <typename T> void	ListToCircularBuffer(const std::list<T> &list,boost::circular_buffer<T> &cb);
@@ -141,9 +141,9 @@ public:
 	~SearchDialog();
 
 	/* IFileContextMenuExternal methods. */
-	void			AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, HMENU hMenu);
-	BOOL			HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd);
-	void			HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, int iCmd);
+	void			AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, HMENU hMenu) override;
+	BOOL			HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd) override;
+	void			HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, int iCmd) override;
 
 	/* Sorting methods. */
 	int CALLBACK	SortResults(LPARAM lParam1,LPARAM lParam2);
@@ -152,14 +152,14 @@ public:
 
 protected:
 
-	INT_PTR	OnInitDialog();
-	INT_PTR	OnTimer(int iTimerID);
-	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
-	INT_PTR	OnNotify(NMHDR *pnmhdr);
-	INT_PTR	OnClose();
-	INT_PTR	OnNcDestroy();
+	INT_PTR	OnInitDialog() override;
+	INT_PTR	OnTimer(int iTimerID) override;
+	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam) override;
+	INT_PTR	OnNotify(NMHDR *pnmhdr) override;
+	INT_PTR	OnClose() override;
+	INT_PTR	OnNcDestroy() override;
 
-	INT_PTR	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam);
+	INT_PTR	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam) override;
 
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 
@@ -174,8 +174,8 @@ private:
 
 	static const int MENU_ID_OPEN_FILE_LOCATION = (MAX_SHELL_MENU_ID + 1);
 
-	void						GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList);
-	void						SaveState();
+	void						GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList) override;
+	void						SaveState() override;
 
 	void						OnSearch();
 	void						StartSearching();

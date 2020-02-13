@@ -15,9 +15,9 @@ public:
 	~TabDropHandler();
 
 	/* IUnknown methods. */
-	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
-	ULONG __stdcall		AddRef(void);
-	ULONG __stdcall		Release(void);
+	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject) override;
+	ULONG __stdcall		AddRef(void) override;
+	ULONG __stdcall		Release(void) override;
 
 private:
 
@@ -27,10 +27,10 @@ private:
 	static const int TIMEOUT_VALUE = 500;
 
 	/* IDropTarget methods. */
-	HRESULT __stdcall	DragEnter(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
-	HRESULT __stdcall	DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
-	HRESULT __stdcall	DragLeave(void);
-	HRESULT __stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
+	HRESULT __stdcall	DragEnter(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect) override;
+	HRESULT __stdcall	DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect) override;
+	HRESULT __stdcall	DragLeave(void) override;
+	HRESULT __stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect) override;
 
 	static LRESULT CALLBACK	TabCtrlProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK	TabCtrlProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);

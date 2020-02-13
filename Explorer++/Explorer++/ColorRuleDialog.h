@@ -31,11 +31,11 @@ private:
 	ColorRuleDialogPersistentSettings(const ColorRuleDialogPersistentSettings &);
 	ColorRuleDialogPersistentSettings & operator=(const ColorRuleDialogPersistentSettings &);
 
-	void		SaveExtraRegistrySettings(HKEY hKey);
-	void		LoadExtraRegistrySettings(HKEY hKey);
+	void		SaveExtraRegistrySettings(HKEY hKey) override;
+	void		LoadExtraRegistrySettings(HKEY hKey) override;
 
-	void		SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode);
-	void		LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue);
+	void		SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode) override;
+	void		LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue) override;
 
 	COLORREF	m_cfInitialColor;
 	COLORREF	m_cfCustomColors[16];
@@ -51,11 +51,11 @@ public:
 
 protected:
 
-	INT_PTR	OnInitDialog();
-	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
-	INT_PTR	OnClose();
+	INT_PTR	OnInitDialog() override;
+	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam) override;
+	INT_PTR	OnClose() override;
 
-	void	SaveState();
+	void	SaveState() override;
 
 private:
 

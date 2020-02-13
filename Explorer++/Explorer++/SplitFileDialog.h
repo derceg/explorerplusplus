@@ -33,11 +33,11 @@ private:
 	SplitFileDialogPersistentSettings(const SplitFileDialogPersistentSettings &);
 	SplitFileDialogPersistentSettings & operator=(const SplitFileDialogPersistentSettings &);
 
-	void			SaveExtraRegistrySettings(HKEY hKey);
-	void			LoadExtraRegistrySettings(HKEY hKey);
+	void			SaveExtraRegistrySettings(HKEY hKey) override;
+	void			LoadExtraRegistrySettings(HKEY hKey) override;
 
-	void			SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode);
-	void			LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue);
+	void			SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode) override;
+	void			LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue) override;
 
 	std::wstring	m_strSplitSize;
 	std::wstring	m_strSplitGroup;
@@ -79,16 +79,16 @@ public:
 
 protected:
 
-	INT_PTR	OnInitDialog();
-	INT_PTR	OnTimer(int iTimerID);
-	INT_PTR	OnCtlColorStatic(HWND hwnd,HDC hdc);
-	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
-	INT_PTR	OnClose();
-	INT_PTR	OnDestroy();
+	INT_PTR	OnInitDialog() override;
+	INT_PTR	OnTimer(int iTimerID) override;
+	INT_PTR	OnCtlColorStatic(HWND hwnd,HDC hdc) override;
+	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam) override;
+	INT_PTR	OnClose() override;
+	INT_PTR	OnDestroy() override;
 
-	void	SaveState();
+	void	SaveState() override;
 
-	INT_PTR	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam);
+	INT_PTR	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam) override;
 
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 

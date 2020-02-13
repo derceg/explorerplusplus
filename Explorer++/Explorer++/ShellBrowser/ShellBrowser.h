@@ -67,24 +67,24 @@ public:
 		const PreservedFolderState &preservedFolderState);
 
 	/* IUnknown methods. */
-	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
-	ULONG __stdcall		AddRef(void);
-	ULONG __stdcall		Release(void);
+	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject) override;
+	ULONG __stdcall		AddRef(void) override;
+	ULONG __stdcall		Release(void) override;
 
 	HWND				GetListView() const;
 	FolderSettings		GetFolderSettings() const;
 
 	NavigationController	*GetNavigationController() const;
 	boost::signals2::connection	AddNavigationCompletedObserver(const NavigationCompletedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back);
+		boost::signals2::connect_position position = boost::signals2::at_back) override;
 
 	/* Drag and Drop. */
 	void				DragStarted(int iFirstItem,POINT *ptCursor);
 	void				DragStopped(void);
-	HRESULT _stdcall	DragEnter(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
-	HRESULT _stdcall	DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
-	HRESULT _stdcall	DragLeave(void);
-	HRESULT _stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect);
+	HRESULT _stdcall	DragEnter(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect) override;
+	HRESULT _stdcall	DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect) override;
+	HRESULT _stdcall	DragLeave(void) override;
+	HRESULT _stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect) override;
 
 	/* Get/Set current state. */
 	unique_pidl_absolute	GetDirectoryIdl() const;
@@ -290,7 +290,7 @@ private:
 	void				VerifySortMode();
 
 	/* NavigatorInterface methods. */
-	HRESULT				BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true);
+	HRESULT				BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true) override;
 
 	/* Browsing support. */
 	HRESULT				EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory);
@@ -429,7 +429,7 @@ private:
 	void				RepositionLocalFiles(const POINT *ppt);
 	void				ScrollListViewFromCursor(HWND hListView, const POINT *CursorPos);
 	void				PositionDroppedItems(void);
-	void				OnDropFile(const std::list<std::wstring> &PastedFileList, const POINT *ppt);
+	void				OnDropFile(const std::list<std::wstring> &PastedFileList, const POINT *ppt) override;
 
 	/* Miscellaneous. */
 	BOOL				CompareVirtualFolders(UINT uFolderCSIDL) const;

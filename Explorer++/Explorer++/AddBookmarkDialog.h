@@ -50,11 +50,11 @@ public:
 
 protected:
 
-	INT_PTR	OnInitDialog();
-	INT_PTR	OnCtlColorEdit(HWND hwnd,HDC hdc);
-	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
-	INT_PTR	OnClose();
-	INT_PTR	OnNcDestroy();
+	INT_PTR	OnInitDialog() override;
+	INT_PTR	OnCtlColorEdit(HWND hwnd,HDC hdc) override;
+	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam) override;
+	INT_PTR	OnClose() override;
+	INT_PTR	OnNcDestroy() override;
 
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 
@@ -68,8 +68,8 @@ private:
 	void SetDialogTitle();
 	std::wstring LoadDialogTitle();
 
-	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList);
-	void SaveState();
+	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList) override;
+	void SaveState() override;
 
 	void OnOk();
 	void OnCancel();

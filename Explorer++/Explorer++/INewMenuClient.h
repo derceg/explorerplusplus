@@ -31,13 +31,13 @@ private:
 	static const int NMCSAEI_EDIT_WINDOWS_10 = 0x0003;
 
 	/* IUnknown methods. */
-	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
-	ULONG __stdcall		AddRef(void);
-	ULONG __stdcall		Release(void);
+	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject) override;
+	ULONG __stdcall		AddRef(void) override;
+	ULONG __stdcall		Release(void) override;
 
 	/* INewMenuClient methods. */
-	HRESULT __stdcall	IncludeItems(NMCII_FLAGS *pFlags);
-	HRESULT __stdcall	SelectAndEditItem(PCIDLIST_ABSOLUTE pidlItem,NMCSAEI_FLAGS flags);
+	HRESULT __stdcall	IncludeItems(NMCII_FLAGS *pFlags) override;
+	HRESULT __stdcall	SelectAndEditItem(PCIDLIST_ABSOLUTE pidlItem,NMCSAEI_FLAGS flags) override;
 
 	ULONG				m_RefCount;
 	IExplorerplusplus	*m_pexpp;
