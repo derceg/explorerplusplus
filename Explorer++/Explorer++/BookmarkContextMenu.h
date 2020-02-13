@@ -7,8 +7,8 @@
 #include "BookmarkContextMenuController.h"
 #include "BookmarkHelper.h"
 #include "BookmarkItem.h"
-#include "BookmarkTree.h"
 
+class BookmarkTree;
 __interface IExplorerplusplus;
 
 class BookmarkContextMenu
@@ -26,9 +26,7 @@ private:
 	void SetUpMenu(HMENU menu, const RawBookmarkItems &bookmarkItems);
 	void SetMenuItemStates(HMENU menu);
 
-	BookmarkTree *m_bookmarkTree;
 	HMODULE m_resourceModule;
-	IExplorerplusplus *m_expp;
 	BookmarkContextMenuController m_controller;
 	bool m_showingMenu;
 };

@@ -266,7 +266,7 @@ void Explorerplusplus::CreateAddressBar()
 
 void Explorerplusplus::CreateMainToolbar()
 {
-	m_mainToolbar = MainToolbar::Create(m_hMainRebar, m_hLanguageModule, this, m_navigation.get(), m_config);
+	m_mainToolbar = MainToolbar::Create(m_hMainRebar, m_hLanguageModule, this, m_config);
 
 	// This should be done in the MainToolbar class. However, the TB_SAVERESTORE
 	// message needs to be sent to the toolbar window. That's incompatible with

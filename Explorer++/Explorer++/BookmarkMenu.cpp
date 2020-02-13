@@ -8,7 +8,6 @@
 BookmarkMenu::BookmarkMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule,
 	IExplorerplusplus *expp, HWND parentWindow) :
 	m_parentWindow(parentWindow),
-	m_instance(resourceModule),
 	m_menuBuilder(resourceModule),
 	m_bookmarkContextMenu(bookmarkTree, resourceModule, expp),
 	m_showingMenu(false),

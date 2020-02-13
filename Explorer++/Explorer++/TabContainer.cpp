@@ -10,7 +10,6 @@
 #include "Icon.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
-#include "Navigation.h"
 #include "PreservedTab.h"
 #include "RenameTabDialog.h"
 #include "ResourceHelper.h"
@@ -39,19 +38,18 @@ const std::map<UINT, Icon> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
 };
 
 TabContainer *TabContainer::Create(HWND parent, TabNavigationInterface *tabNavigation,
-	Navigation *navigation, IExplorerplusplus *expp, CachedIcons *cachedIcons,
-	BookmarkTree *bookmarkTree, HINSTANCE instance, std::shared_ptr<Config> config)
+	IExplorerplusplus *expp, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
+	HINSTANCE instance, std::shared_ptr<Config> config)
 {
-	return new TabContainer(parent, tabNavigation, navigation, expp,
-		cachedIcons, bookmarkTree, instance, config);
+	return new TabContainer(parent, tabNavigation, expp, cachedIcons, bookmarkTree,
+		instance, config);
 }
 
 TabContainer::TabContainer(HWND parent, TabNavigationInterface *tabNavigation,
-	Navigation *navigation, IExplorerplusplus *expp, CachedIcons *cachedIcons,
-	BookmarkTree *bookmarkTree, HINSTANCE instance, std::shared_ptr<Config> config) :
+	IExplorerplusplus *expp, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
+	HINSTANCE instance, std::shared_ptr<Config> config) :
 	BaseWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
 	m_tabNavigation(tabNavigation),
-	m_navigation(navigation),
 	m_expp(expp),
 	m_cachedIcons(cachedIcons),
 	m_bookmarkTree(bookmarkTree),

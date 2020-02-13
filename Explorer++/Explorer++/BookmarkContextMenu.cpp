@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "BookmarkContextMenu.h"
 #include "BookmarkClipboard.h"
-#include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/MenuHelper.h"
@@ -13,9 +12,7 @@
 
 BookmarkContextMenu::BookmarkContextMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule,
 	IExplorerplusplus *expp) :
-	m_bookmarkTree(bookmarkTree),
 	m_resourceModule(resourceModule),
-	m_expp(expp),
 	m_controller(bookmarkTree, resourceModule, expp),
 	m_showingMenu(false)
 {

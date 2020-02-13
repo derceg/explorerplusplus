@@ -6,7 +6,7 @@
 
 #include "DefaultToolbarButtons.h"
 #include "IconResourceLoader.h"
-#include "Navigation.h"
+#include "Tab.h"
 #include "../Helper/BaseWindow.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowSubclassWrapper.h"
@@ -45,7 +45,7 @@ class MainToolbar : public BaseWindow
 public:
 
 	static MainToolbar *Create(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
-		Navigation *navigation, std::shared_ptr<Config> config);
+		std::shared_ptr<Config> config);
 
 	void UpdateConfigDependentButtonStates();
 	void UpdateToolbarButtonStates();
@@ -61,7 +61,7 @@ private:
 	};
 
 	MainToolbar(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
-		Navigation *navigation, std::shared_ptr<Config> config);
+		std::shared_ptr<Config> config);
 	~MainToolbar() = default;
 
 	static HWND CreateMainToolbar(HWND parent);
@@ -105,7 +105,6 @@ private:
 
 	HINSTANCE m_instance;
 	IExplorerplusplus *m_pexpp;
-	Navigation *m_navigation;
 	std::shared_ptr<Config> m_config;
 
 	DpiCompatibility m_dpiCompat;

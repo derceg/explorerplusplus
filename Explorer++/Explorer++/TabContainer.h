@@ -73,8 +73,8 @@ class TabContainer : public BaseWindow
 public:
 
 	static TabContainer *Create(HWND parent, TabNavigationInterface *tabNavigation,
-		Navigation *navigation, IExplorerplusplus *expp, CachedIcons *cachedIcons,
-		BookmarkTree *bookmarkTree, HINSTANCE instance, std::shared_ptr<Config> config);
+		IExplorerplusplus *expp, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
+		HINSTANCE instance, std::shared_ptr<Config> config);
 
 	HRESULT CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
 	HRESULT CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {},
@@ -126,9 +126,9 @@ private:
 
 	static const int ICON_SIZE_96DPI = 16;
 
-	TabContainer(HWND parent, TabNavigationInterface *tabNavigation, Navigation *navigation,
-		IExplorerplusplus *expp, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-		HINSTANCE instance, std::shared_ptr<Config> config);
+	TabContainer(HWND parent, TabNavigationInterface *tabNavigation, IExplorerplusplus *expp,
+		CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, HINSTANCE instance,
+		std::shared_ptr<Config> config);
 	~TabContainer();
 
 	static HWND CreateTabControl(HWND parent, BOOL forceSameTabWidth);
@@ -203,7 +203,6 @@ private:
 	int m_tabIconLockIndex;
 
 	TabNavigationInterface *m_tabNavigation;
-	Navigation *m_navigation;
 	IExplorerplusplus *m_expp;
 
 	HINSTANCE m_instance;

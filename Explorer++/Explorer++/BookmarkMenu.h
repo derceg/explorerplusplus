@@ -43,7 +43,6 @@ private:
 		MenuCallback callback);
 
 	HWND m_parentWindow;
-	HINSTANCE m_instance;
 	BookmarkMenuBuilder m_menuBuilder;
 	BookmarkContextMenu m_bookmarkContextMenu;
 

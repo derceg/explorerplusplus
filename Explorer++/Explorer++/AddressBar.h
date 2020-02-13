@@ -5,6 +5,7 @@
 #pragma once
 
 #include "MainToolbar.h"
+#include "Tab.h"
 #include "../Helper/BaseWindow.h"
 #include "../Helper/WindowSubclassWrapper.h"
 

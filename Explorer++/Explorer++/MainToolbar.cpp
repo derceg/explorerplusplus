@@ -101,18 +101,17 @@ const boost::bimap<ToolbarButton, std::wstring> TOOLBAR_BUTTON_XML_NAME_MAPPINGS
 #pragma warning(pop)
 
 MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
-	Navigation *navigation, std::shared_ptr<Config> config)
+	std::shared_ptr<Config> config)
 {
-	return new MainToolbar(parent, instance, pexpp, navigation, config);
+	return new MainToolbar(parent, instance, pexpp, config);
 }
 
 MainToolbar::MainToolbar(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
-	Navigation *navigation, std::shared_ptr<Config> config) :
+	std::shared_ptr<Config> config) :
 	BaseWindow(CreateMainToolbar(parent)),
 	m_persistentSettings(&MainToolbarPersistentSettings::GetInstance()),
 	m_instance(instance),
 	m_pexpp(pexpp),
-	m_navigation(navigation),
 	m_config(config)
 {
 	Initialize(parent);
