@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "SetDefaultColumnsDialog.h"
-#include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/Helper.h"

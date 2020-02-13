@@ -8,7 +8,6 @@
 #include "BookmarksToolbar.h"
 #include "Config.h"
 #include "DrivesToolbar.h"
-#include "Explorer++_internal.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "MainToolbar.h"

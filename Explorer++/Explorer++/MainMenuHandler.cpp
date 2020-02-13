@@ -9,6 +9,7 @@
 #include "CustomizeColorsDialog.h"
 #include "DestroyFilesDialog.h"
 #include "DisplayColoursDialog.h"
+#include "Explorer++_internal.h"
 #include "FileProgressSink.h"
 #include "FilterDialog.h"
 #include "HelpFileMissingDialog.h"

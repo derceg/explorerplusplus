@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "AboutDialog.h"
-#include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "Version.h"
 #include "../Helper/BaseDialog.h"

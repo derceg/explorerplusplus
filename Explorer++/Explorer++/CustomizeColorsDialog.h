@@ -6,7 +6,6 @@
 
 #include "ColorRuleHelper.h"
 #include "CoreInterface.h"
-#include "Explorer++_internal.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"

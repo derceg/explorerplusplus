@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "DrivesToolbar.h"
-#include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "TabContainer.h"

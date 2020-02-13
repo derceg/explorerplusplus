@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "ColorRuleHelper.h"
-#include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"

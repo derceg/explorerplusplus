@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "IModelessDialogNotification.h"
-#include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ModelessDialogs.h"
 

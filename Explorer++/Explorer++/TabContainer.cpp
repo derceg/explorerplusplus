@@ -6,7 +6,6 @@
 #include "TabContainer.h"
 #include "BookmarkHelper.h"
 #include "Config.h"
-#include "Explorer++_internal.h"
 #include "Icon.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
