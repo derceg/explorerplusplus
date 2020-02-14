@@ -84,6 +84,8 @@ Bug fixes:
   in a row would inconsistently result in the item being
   selected. Now, an item is only selected if you right-click its
   filename label.
+- When loading from the XML config file, the initial color in the
+  color rule dialog wasn't been loaded correctly. Fixed.
 - There was an issue that prevented labels in the treeview from
   being unfolded. Now, if you move the mouse over a treeview
   label that's only partially visible, the rest of the label will

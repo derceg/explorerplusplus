@@ -328,8 +328,8 @@ void ColorRuleDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR 
 		if(lstrcmpi(_T("InitialColor_r"),bstrName) == 0)
 			m_cfInitialColor = RGB(c,GetGValue(m_cfInitialColor),GetBValue(m_cfInitialColor));
 		else if(lstrcmpi(_T("InitialColor_g"),bstrName) == 0)
-			m_cfInitialColor = RGB(c,GetGValue(m_cfInitialColor),GetBValue(m_cfInitialColor));
+			m_cfInitialColor = RGB(GetRValue(m_cfInitialColor),c,GetBValue(m_cfInitialColor));
 		else if(lstrcmpi(_T("InitialColor_b"),bstrName) == 0)
-			m_cfInitialColor = RGB(c,GetGValue(m_cfInitialColor),GetBValue(m_cfInitialColor));
+			m_cfInitialColor = RGB(GetRValue(m_cfInitialColor),GetGValue(m_cfInitialColor),c);
 	}
 }
