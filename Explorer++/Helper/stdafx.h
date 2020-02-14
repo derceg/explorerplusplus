@@ -11,18 +11,6 @@
 
 #include "..\targetver.h"
 
-#ifdef UNICODE
-#define _ctoi _wtoi
-#else
-#define _ctoi atoi
-#endif
-
-#ifdef UNICODE
-#define cstrtok_s wcstok_s
-#else
-#define cstrtok_s strtok_s
-#endif
-
 #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES	1
 #define STRICT
 

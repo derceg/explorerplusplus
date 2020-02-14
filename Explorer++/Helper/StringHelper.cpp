@@ -185,7 +185,7 @@ BOOL CheckWildcardMatch(const TCHAR *szWildcard, const TCHAR *szString, BOOL bCa
 
 		StringCchCopy(szWildcardPattern, SIZEOF_ARRAY(szWildcardPattern), szWildcard);
 
-		szSinglePattern = cstrtok_s(szWildcardPattern, _T(":"), &szRemainingPattern);
+		szSinglePattern = wcstok_s(szWildcardPattern, _T(":"), &szRemainingPattern);
 		PathRemoveBlanks(szSinglePattern);
 
 		while(szSinglePattern != NULL)
@@ -196,7 +196,7 @@ BOOL CheckWildcardMatch(const TCHAR *szWildcard, const TCHAR *szString, BOOL bCa
 			}
 
 			szSearchPattern = szRemainingPattern;
-			szSinglePattern = cstrtok_s(szSearchPattern, _T(":"), &szRemainingPattern);
+			szSinglePattern = wcstok_s(szSearchPattern, _T(":"), &szRemainingPattern);
 			PathRemoveBlanks(szSinglePattern);
 		}
 	}

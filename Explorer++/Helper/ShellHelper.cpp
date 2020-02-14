@@ -1343,12 +1343,8 @@ HRESULT ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory,
 	if(SUCCEEDED(hr))
 	{
 		/* Action string MUST be ANSI. */
-#ifdef UNICODE
 		WideCharToMultiByte(CP_ACP, 0, szAction, -1, szActionA,
 			SIZEOF_ARRAY(szActionA), NULL, NULL);
-#else
-		StringCchCopy(szActionA, SIZEOF_ARRAY(szActionA), szAction);
-#endif
 
 		cmici.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmici.fMask = fMask;

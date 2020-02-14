@@ -11,12 +11,6 @@
 
 #include "..\targetver.h"
 
-#ifdef UNICODE
-#define _itot_s _itow_s
-#else
-#define _itot_s _itoa_s
-#endif
-
 #define STRICT
 
 #define ISOLATION_AWARE_ENABLED	1
