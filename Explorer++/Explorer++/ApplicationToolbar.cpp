@@ -357,12 +357,12 @@ ApplicationToolbar::ApplicationInfo_t ApplicationToolbar::ProcessCommand(const s
 	if(TempCommand.at(0) == _T('\"'))
 	{
 		SubstringStart = 1;
-		SubstringEnd = TempCommand.find(_T("\""),1);
+		SubstringEnd = TempCommand.find('"');
 	}
 	else
 	{
 		SubstringStart = 0;
-		SubstringEnd = TempCommand.find_first_of(_T(" "));
+		SubstringEnd = TempCommand.find_first_of(' ');
 	}
 
 	if(SubstringEnd != std::wstring::npos)
