@@ -76,7 +76,7 @@ wil::unique_hmenu TabRestorerUI::BuildRecentlyClosedTabsMenu(std::vector<wil::un
 	{
 		auto currentEntry = closedTab->history.at(closedTab->currentEntry).get();
 
-		std::wstring menuText = currentEntry->displayName.data();
+		std::wstring menuText = currentEntry->displayName;
 
 		if (numInserted == 0)
 		{

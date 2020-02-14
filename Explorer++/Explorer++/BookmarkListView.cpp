@@ -336,7 +336,7 @@ void BookmarkListView::OnDblClk(const NMITEMACTIVATE *itemActivate)
 	else
 	{
 		Tab &selectedTab = m_expp->GetTabContainer()->GetSelectedTab();
-		selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(bookmarkItem->GetLocation().c_str());
+		selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(bookmarkItem->GetLocation());
 	}
 }
 
