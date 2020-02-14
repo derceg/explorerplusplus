@@ -324,7 +324,7 @@ private:
 	void					CreateBookmarksToolbar(void);
 	void					CreateDrivesToolbar(void);
 	void					CreateApplicationToolbar();
-	HWND					CreateTabToolbar(HWND hParent,int idCommand,TCHAR *szTip);
+	HWND					CreateTabToolbar(HWND hParent, int idCommand, const std::wstring &tip);
 
 	/* Main toolbars. */
 	void					InitializeMainToolbars(void);

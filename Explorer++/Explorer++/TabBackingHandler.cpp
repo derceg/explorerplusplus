@@ -10,6 +10,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "TabBacking.h"
 #include "../Helper/Macros.h"
 
@@ -21,9 +22,8 @@ void Explorerplusplus::CreateTabBacking()
 
 	/* Create the toolbar that will appear on the tab control.
 	Only contains the close button used to close tabs. */
-	TCHAR szTabCloseTip[64];
-	LoadString(m_hLanguageModule, IDS_TAB_CLOSE_TIP, szTabCloseTip, SIZEOF_ARRAY(szTabCloseTip));
-	m_hTabWindowToolbar = CreateTabToolbar(m_hTabBacking, TABTOOLBAR_CLOSE, szTabCloseTip);
+	m_hTabWindowToolbar = CreateTabToolbar(m_hTabBacking, TABTOOLBAR_CLOSE,
+		ResourceHelper::LoadString(m_hLanguageModule, IDS_TAB_CLOSE_TIP));
 
 	AddTabsInitializedObserver(boost::bind(&Explorerplusplus::OnTabsInitialized, this));
 }

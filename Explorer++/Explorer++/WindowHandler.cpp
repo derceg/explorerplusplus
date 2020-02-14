@@ -13,7 +13,7 @@
 #include "../Helper/Controls.h"
 #include "../Helper/WindowHelper.h"
 
-HWND Explorerplusplus::CreateTabToolbar(HWND hParent,int idCommand,TCHAR *szTip)
+HWND Explorerplusplus::CreateTabToolbar(HWND hParent,int idCommand,const std::wstring &tip)
 {
 	HWND TabToolbar = CreateToolbar(hParent,WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|
 		TBSTYLE_TOOLTIPS|TBSTYLE_LIST|TBSTYLE_TRANSPARENT|TBSTYLE_FLAT|CCS_NODIVIDER|
@@ -39,7 +39,7 @@ HWND Explorerplusplus::CreateTabToolbar(HWND hParent,int idCommand,TCHAR *szTip)
 	tbButton.fsState	= TBSTATE_ENABLED;
 	tbButton.fsStyle	= TBSTYLE_BUTTON|TBSTYLE_AUTOSIZE;
 	tbButton.dwData		= 0;
-	tbButton.iString	= reinterpret_cast<INT_PTR>(szTip);
+	tbButton.iString	= reinterpret_cast<INT_PTR>(tip.c_str());
 	SendMessage(TabToolbar,TB_INSERTBUTTON,0,reinterpret_cast<LPARAM>(&tbButton));
 
 	SendMessage(TabToolbar,TB_AUTOSIZE,0,0);

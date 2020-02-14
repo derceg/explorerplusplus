@@ -8,6 +8,7 @@
 #include "HolderWindow.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
+#include "ResourceHelper.h"
 #include "SetFileAttributesDialog.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "../Helper/BulkClipboardWriter.h"
@@ -52,8 +53,8 @@ void Explorerplusplus::CreateFolderControls(void)
 	reach the window procedure provided by ShellTreeView. */
 	SetWindowSubclass(m_hTreeView,TreeViewSubclassStub,1,(DWORD_PTR)this);
 
-	LoadString(m_hLanguageModule,IDS_HIDEFOLDERSPANE,szTemp,SIZEOF_ARRAY(szTemp));
-	m_hFoldersToolbar = CreateTabToolbar(m_hHolder,FOLDERS_TOOLBAR_CLOSE,szTemp);
+	m_hFoldersToolbar = CreateTabToolbar(m_hHolder, FOLDERS_TOOLBAR_CLOSE,
+		ResourceHelper::LoadString(m_hLanguageModule, IDS_HIDEFOLDERSPANE));
 
 	m_InitializationFinished.addObserver([this] (bool newValue) {
 		if (newValue)
