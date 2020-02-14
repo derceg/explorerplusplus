@@ -62,7 +62,7 @@ private:
 	void OnKeyDown(const NMTVKEYDOWN *pnmtvkd);
 	void OnTreeViewRename();
 	BOOL OnBeginLabelEdit(const NMTVDISPINFO *dispInfo);
-	BOOL OnEndLabelEdit(const NMTVDISPINFO *pnmtvdi);
+	BOOL OnEndLabelEdit(const NMTVDISPINFO *dispInfo);
 	void OnSelChanged(const NMTREEVIEW *treeView);
 	void OnBeginDrag(const NMTREEVIEW *treeView);
 	void OnDelete();

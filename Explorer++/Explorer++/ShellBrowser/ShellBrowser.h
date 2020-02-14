@@ -137,7 +137,7 @@ public:
 	BOOL				GetFilterStatus(void) const;
 	void				SetFilterStatus(BOOL bFilter);
 	BOOL				GetFilterCaseSensitive(void) const;
-	void				SetFilterCaseSensitive(BOOL bCaseSensitive);
+	void				SetFilterCaseSensitive(BOOL filterCaseSensitive);
 
 	void				SetFileAttributesForSelection();
 

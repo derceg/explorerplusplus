@@ -24,7 +24,7 @@ private:
 	void OnOpenAll(const RawBookmarkItems &bookmarkItems);
 	void OnNewBookmarkItem(BookmarkItem::Type type, BookmarkItem *parentFolder, HWND parentWindow);
 	void OnCopy(const RawBookmarkItems &bookmarkItems, bool cut);
-	void OnPaste(BookmarkItem *selectedBookmarkItem);
+	void OnPaste(BookmarkItem *parentFolder);
 	void OnDelete(const RawBookmarkItems &bookmarkItems);
 	void OnEditBookmarkItem(BookmarkItem *bookmarkItem, HWND parentWindow);
 

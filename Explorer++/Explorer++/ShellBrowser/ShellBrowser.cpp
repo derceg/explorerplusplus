@@ -1008,9 +1008,9 @@ BOOL ShellBrowser::GetFilterStatus(void) const
 	return m_folderSettings.applyFilter;
 }
 
-void ShellBrowser::SetFilterCaseSensitive(BOOL bFilterCaseSensitive)
+void ShellBrowser::SetFilterCaseSensitive(BOOL filterCaseSensitive)
 {
-	m_folderSettings.filterCaseSensitive = bFilterCaseSensitive;
+	m_folderSettings.filterCaseSensitive = filterCaseSensitive;
 }
 
 BOOL ShellBrowser::GetFilterCaseSensitive(void) const
