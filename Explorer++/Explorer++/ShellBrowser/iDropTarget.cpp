@@ -157,7 +157,7 @@ DWORD ShellBrowser::CheckItemLocations(IDataObject *pDataObject,int iDroppedItem
 		if(pdf != nullptr)
 		{
 			/* Request a count of the number of files that have been dropped. */
-			nDroppedFiles = DragQueryFile((HDROP)pdf,0xFFFFFFFF, nullptr,NULL);
+			nDroppedFiles = DragQueryFile((HDROP)pdf,0xFFFFFFFF, nullptr,0);
 
 			if(iDroppedItem < nDroppedFiles)
 			{
@@ -447,7 +447,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 
 				if(pdf != nullptr)
 				{
-					nDroppedFiles = DragQueryFile((HDROP)pdf,0xFFFFFFFF, nullptr,NULL);
+					nDroppedFiles = DragQueryFile((HDROP)pdf,0xFFFFFFFF, nullptr,0);
 
 					/* The drop effect will be the same for all files
 					that are been dragged locally. */

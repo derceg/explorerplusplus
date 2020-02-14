@@ -166,7 +166,7 @@ void TabDropHandler::GetRepresentativeSourceDriveHDrop(IDataObject *pDataObject)
 
 		if(pdf != nullptr)
 		{
-			int nDroppedFiles = DragQueryFile(reinterpret_cast<HDROP>(pdf),0xFFFFFFFF, nullptr,NULL);
+			int nDroppedFiles = DragQueryFile(reinterpret_cast<HDROP>(pdf),0xFFFFFFFF, nullptr,0);
 
 			if(nDroppedFiles >= 1)
 			{

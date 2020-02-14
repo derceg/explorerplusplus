@@ -163,7 +163,7 @@ HRESULT _stdcall ApplicationToolbarDropHandler::Drop(IDataObject *pDataObject,
 
 void ApplicationToolbarDropHandler::OpenExistingButton(DROPFILES *df, int buttonIndex)
 {
-	int numFiles = DragQueryFile(reinterpret_cast<HDROP>(df), 0xFFFFFFFF, nullptr, NULL);
+	int numFiles = DragQueryFile(reinterpret_cast<HDROP>(df), 0xFFFFFFFF, nullptr, 0);
 
 	std::wstring parameters;
 
@@ -187,7 +187,7 @@ void ApplicationToolbarDropHandler::OpenExistingButton(DROPFILES *df, int button
 
 void ApplicationToolbarDropHandler::AddNewButton(DROPFILES *df)
 {
-	int numFiles = DragQueryFile(reinterpret_cast<HDROP>(df), 0xFFFFFFFF, nullptr, NULL);
+	int numFiles = DragQueryFile(reinterpret_cast<HDROP>(df), 0xFFFFFFFF, nullptr, 0);
 
 	for(int i = 0; i < numFiles; i++)
 	{

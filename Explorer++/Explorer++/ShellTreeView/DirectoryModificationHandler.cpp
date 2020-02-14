@@ -402,7 +402,7 @@ void ShellTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileNam
 		}
 		else
 		{
-			SHGetFileInfo(szFullFileName,NULL,&shfi,
+			SHGetFileInfo(szFullFileName,0,&shfi,
 				sizeof(shfi),SHGFI_SYSICONINDEX);
 
 			hr = SHBindToParent(pidlComplete, IID_PPV_ARGS(&pShellFolder), &pidlRelative);
@@ -485,7 +485,7 @@ void ShellTreeView::RenameItem(HTREEITEM hItem, const TCHAR *szFullFileName)
 
 		if(SUCCEEDED(hr))
 		{
-			SHGetFileInfo(szFullFileName,NULL,&shfi,sizeof(shfi),SHGFI_SYSICONINDEX);
+			SHGetFileInfo(szFullFileName,0,&shfi,sizeof(shfi),SHGFI_SYSICONINDEX);
 
 			tvItem.mask				= TVIF_HANDLE|TVIF_TEXT|TVIF_IMAGE|TVIF_SELECTEDIMAGE;
 			tvItem.hItem			= hItem;

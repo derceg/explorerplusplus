@@ -81,7 +81,7 @@ void Explorerplusplus::UpdateDisplayWindowForZeroFiles(const Tab &tab)
 
 		/* Folder type. */
 		SHFILEINFO shfi;
-		SHGetFileInfo(reinterpret_cast<LPCTSTR>(pidlDirectory.get()), NULL, &shfi, sizeof(shfi), SHGFI_PIDL | SHGFI_TYPENAME);
+		SHGetFileInfo(reinterpret_cast<LPCTSTR>(pidlDirectory.get()), 0, &shfi, sizeof(shfi), SHGFI_PIDL | SHGFI_TYPENAME);
 		DisplayWindow_BufferText(m_hDisplayWindow, shfi.szTypeName);
 	}
 }

@@ -109,8 +109,8 @@ void ApplicationToolbarButtonDialog::OnChooseFile()
 	ofn.lCustData			= NULL;
 	ofn.lpfnHook			= nullptr;
 	ofn.pvReserved			= nullptr;
-	ofn.dwReserved			= NULL;
-	ofn.FlagsEx				= NULL;
+	ofn.dwReserved			= 0;
+	ofn.FlagsEx				= 0;
 
 	BOOL bRet = GetOpenFileName(&ofn);
 

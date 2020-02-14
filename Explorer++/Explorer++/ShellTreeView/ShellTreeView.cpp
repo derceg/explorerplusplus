@@ -983,7 +983,7 @@ HTREEITEM ShellTreeView::LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand)
 	PathRemoveBackslash(FullItemPathCopy);
 
 	unique_pidl_absolute pidlMyComputer;
-	SHGetFolderLocation(nullptr,CSIDL_DRIVES, nullptr,NULL,wil::out_param(pidlMyComputer));
+	SHGetFolderLocation(nullptr,CSIDL_DRIVES, nullptr,0,wil::out_param(pidlMyComputer));
 
 	hMyComputer = LocateItem(pidlMyComputer.get());
 

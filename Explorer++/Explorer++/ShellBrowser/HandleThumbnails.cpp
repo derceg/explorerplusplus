@@ -282,7 +282,7 @@ void ShellBrowser::DrawIconThumbnailInternal(HDC hdcBacking,int iInternalIndex) 
 
 	DrawIconEx(hdcBacking,(THUMBNAIL_ITEM_WIDTH - iIconWidth) / 2,
 		(THUMBNAIL_ITEM_HEIGHT - iIconHeight) / 2,hIcon,0,0,
-		NULL, nullptr,DI_NORMAL);
+		0, nullptr,DI_NORMAL);
 	DestroyIcon(hIcon);
 }
 

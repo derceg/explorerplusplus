@@ -83,7 +83,7 @@ void DisplayWindow::PatchBackground(HDC hdc,RECT *rc,RECT *UpdateRect)
 
 	PaintText(hdcMem,m_LeftIndent);
 	DrawIconEx(hdcMem,MAIN_ICON_LEFT,MAIN_ICON_TOP,m_hMainIcon,
-		MAIN_ICON_WIDTH,MAIN_ICON_HEIGHT,NULL, nullptr,DI_NORMAL);
+		MAIN_ICON_WIDTH,MAIN_ICON_HEIGHT,0, nullptr,DI_NORMAL);
 
 	if(m_bShowThumbnail)
 	{
