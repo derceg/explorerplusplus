@@ -75,7 +75,7 @@ void Explorerplusplus::SaveDialogStatesToRegistry(void)
 {
 	HKEY hKey;
 	LONG ReturnValue = RegCreateKeyEx(HKEY_CURRENT_USER,DIALOGS_REGISTRY_KEY,
-		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,NULL);
+		0, nullptr,REG_OPTION_NON_VOLATILE,KEY_WRITE, nullptr,&hKey, nullptr);
 
 	if(ReturnValue == ERROR_SUCCESS)
 	{
@@ -90,18 +90,18 @@ void Explorerplusplus::SaveDialogStatesToRegistry(void)
 
 void Explorerplusplus::LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom)
 {
-	IXMLDOMNodeList		*pNodes = NULL;
-	IXMLDOMNode			*pNode = NULL;
-	IXMLDOMNamedNodeMap	*am = NULL;
-	IXMLDOMNode			*pChildNode = NULL;
+	IXMLDOMNodeList		*pNodes = nullptr;
+	IXMLDOMNode			*pNode = nullptr;
+	IXMLDOMNamedNodeMap	*am = nullptr;
+	IXMLDOMNode			*pChildNode = nullptr;
 	BSTR						bstrName;
 	BSTR						bstrValue;
-	BSTR						bstr = NULL;
+	BSTR						bstr = nullptr;
 	HRESULT						hr;
 	long						length;
 	long						lChildNodes;
 
-	if(pXMLDom == NULL)
+	if(pXMLDom == nullptr)
 		goto clean;
 
 	TCHAR tempNodeSelector[64];
@@ -163,7 +163,7 @@ void Explorerplusplus::LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom)
 			}
 
 			pNode->Release();
-			pNode = NULL;
+			pNode = nullptr;
 		}
 	}
 
@@ -176,8 +176,8 @@ clean:
 void Explorerplusplus::SaveDialogStatesToXML(IXMLDOMDocument *pXMLDom,
 IXMLDOMElement *pRoot)
 {
-	IXMLDOMElement	*pe = NULL;
-	BSTR					bstr = NULL;
+	IXMLDOMElement	*pe = nullptr;
+	BSTR					bstr = nullptr;
 	BSTR					bstr_wsnt = SysAllocString(L"\n\t");
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pRoot);
@@ -185,7 +185,7 @@ IXMLDOMElement *pRoot)
 	bstr = SysAllocString(DIALOGS_XML_KEY);
 	pXMLDom->createElement(bstr,&pe);
 	SysFreeString(bstr);
-	bstr = NULL;
+	bstr = nullptr;
 
 	for(DialogSettings *ds : DIALOG_SETTINGS)
 	{
@@ -196,5 +196,5 @@ IXMLDOMElement *pRoot)
 
 	NXMLSettings::AppendChildToParent(pe,pRoot);
 	pe->Release();
-	pe = NULL;
+	pe = nullptr;
 }

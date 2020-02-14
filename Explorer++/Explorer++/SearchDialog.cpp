@@ -69,7 +69,7 @@ SearchDialog::SearchDialog(HINSTANCE hInstance, HWND hParent, std::wstring_view 
 
 SearchDialog::~SearchDialog()
 {
-	if(m_pSearch != NULL)
+	if(m_pSearch != nullptr)
 	{
 		m_pSearch->StopSearching();
 		m_pSearch->Release();
@@ -89,10 +89,10 @@ INT_PTR SearchDialog::OnInitDialog()
 		LVS_EX_GRIDLINES|LVS_EX_DOUBLEBUFFER);
 
 	HIMAGELIST himlSmall;
-	Shell_GetImageLists(NULL,&himlSmall);
+	Shell_GetImageLists(nullptr,&himlSmall);
 	ListView_SetImageList(hListView,himlSmall,LVSIL_SMALL);
 
-	SetWindowTheme(hListView,L"Explorer",NULL);
+	SetWindowTheme(hListView,L"Explorer", nullptr);
 
 	int i = 0;
 
@@ -267,7 +267,7 @@ INT_PTR SearchDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 			GetDlgItemText(m_hDlg,IDC_COMBO_DIRECTORY,szDirectory,SIZEOF_ARRAY(szDirectory));
 
 			bi.hwndOwner		= m_hDlg;
-			bi.pidlRoot			= NULL;
+			bi.pidlRoot			= nullptr;
 			bi.pszDisplayName	= szDisplayName;
 			bi.lpszTitle		= szTitle;
 			bi.ulFlags			= BIF_RETURNONLYFSDIRS|BIF_NEWDIALOGSTYLE;
@@ -275,7 +275,7 @@ INT_PTR SearchDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 			bi.lParam			= reinterpret_cast<LPARAM>(szDirectory);
 			unique_pidl_absolute pidl(SHBrowseForFolder(&bi));
 
-			if(pidl != NULL)
+			if(pidl != nullptr)
 			{
 				GetDisplayName(pidl.get(),szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
 				SetDlgItemText(m_hDlg,IDC_COMBO_DIRECTORY,szParsingPath);
@@ -429,8 +429,8 @@ void SearchDialog::StartSearching()
 	m_bSearching = TRUE;
 
 	/* Create a background thread, and search using it... */
-	HANDLE hThread = CreateThread(NULL, 0, NSearchDialog::SearchThread,
-		reinterpret_cast<LPVOID>(m_pSearch), 0, NULL);
+	HANDLE hThread = CreateThread(nullptr, 0, NSearchDialog::SearchThread,
+		reinterpret_cast<LPVOID>(m_pSearch), 0, nullptr);
 	CloseHandle(hThread);
 }
 
@@ -475,7 +475,7 @@ void SearchDialog::StopSearching()
 {
 	m_bStopSearching = TRUE;
 
-	if(m_pSearch != NULL)
+	if(m_pSearch != nullptr)
 	{
 		/* Note that m_pSearch does not need to be
 		released here. Once the search object finishes,
@@ -719,8 +719,8 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 			{
 				PNMLINK pnmlink = reinterpret_cast<PNMLINK>(pnmhdr);
 
-				ShellExecute(NULL,L"open",pnmlink->item.szUrl,
-					NULL,NULL,SW_SHOW);
+				ShellExecute(nullptr,L"open",pnmlink->item.szUrl,
+					nullptr, nullptr,SW_SHOW);
 			}
 		}
 		break;
@@ -817,7 +817,7 @@ INT_PTR SearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 				if(m_bSetSearchTimer)
 				{
 					SetTimer(m_hDlg,SEARCH_PROCESSITEMS_TIMER_ID,
-						SEARCH_PROCESSITEMS_TIMER_ELAPSED,NULL);
+						SEARCH_PROCESSITEMS_TIMER_ELAPSED, nullptr);
 
 					m_bSetSearchTimer = FALSE;
 				}
@@ -848,10 +848,10 @@ INT_PTR SearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 					SetDlgItemText(m_hDlg,IDC_STATIC_STATUS,szTemp);
 				}
 
-				assert(m_pSearch != NULL);
+				assert(m_pSearch != nullptr);
 
 				m_pSearch->Release();
-				m_pSearch = NULL;
+				m_pSearch = nullptr;
 
 				m_bSearching = FALSE;
 				m_bStopSearching = FALSE;
@@ -862,7 +862,7 @@ INT_PTR SearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 		case NSearchDialog::WM_APP_SEARCHCHANGEDDIRECTORY:
 			{
 				TCHAR szStatus[512];
-				TCHAR *pszDirectory = NULL;
+				TCHAR *pszDirectory = nullptr;
 
 				pszDirectory = reinterpret_cast<TCHAR *>(wParam);
 
@@ -890,10 +890,10 @@ INT_PTR SearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 					szTemp,SIZEOF_ARRAY(szTemp));
 				SetDlgItemText(m_hDlg,IDC_LINK_STATUS,szTemp);
 
-				assert(m_pSearch != NULL);
+				assert(m_pSearch != nullptr);
 
 				m_pSearch->Release();
-				m_pSearch = NULL;
+				m_pSearch = nullptr;
 
 				m_bSearching = FALSE;
 				m_bStopSearching = FALSE;
@@ -981,7 +981,7 @@ INT_PTR SearchDialog::OnNcDestroy()
 
 DWORD WINAPI NSearchDialog::SearchThread(LPVOID pParam)
 {
-	assert(pParam != NULL);
+	assert(pParam != nullptr);
 
 	Search *pSearch = reinterpret_cast<Search *>(pParam);
 	pSearch->StartSearching();
@@ -1085,8 +1085,8 @@ void Search::SearchDirectory(const TCHAR *szDirectory)
 void Search::SearchDirectoryInternal(const TCHAR *szSearchDirectory,
 	std::list<std::wstring> *pSubFolderList)
 {
-	assert(szSearchDirectory != NULL);
-	assert(pSubFolderList != NULL);
+	assert(szSearchDirectory != nullptr);
+	assert(pSubFolderList != nullptr);
 
 	WIN32_FIND_DATA wfd;
 	TCHAR szSearchTerm[MAX_PATH];

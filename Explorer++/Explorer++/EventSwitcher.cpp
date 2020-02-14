@@ -236,9 +236,9 @@ BOOL Explorerplusplus::OnMouseWheel(MousewheelSource_t MousewheelSource, WPARAM 
 	{
 		bMessageHandled = TRUE;
 
-		HWND hUpDown = FindWindowEx(m_tabContainer->GetHWND(), NULL, UPDOWN_CLASS, NULL);
+		HWND hUpDown = FindWindowEx(m_tabContainer->GetHWND(), nullptr, UPDOWN_CLASS, nullptr);
 
-		if (hUpDown != NULL)
+		if (hUpDown != nullptr)
 		{
 			BOOL bSuccess;
 			int iPos = static_cast<int>(SendMessage(hUpDown, UDM_GETPOS32, 0, reinterpret_cast<LPARAM>(&bSuccess)));

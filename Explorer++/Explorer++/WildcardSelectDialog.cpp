@@ -30,7 +30,7 @@ WildcardSelectDialog::WildcardSelectDialog(HINSTANCE hInstance, HWND hParent,
 
 INT_PTR WildcardSelectDialog::OnInitDialog()
 {
-	m_icon.reset(LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN)));
+	m_icon.reset(LoadIcon(GetModuleHandle(nullptr),MAKEINTRESOURCE(IDI_MAIN)));
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
 
 	HWND hComboBox = GetDlgItem(m_hDlg,IDC_SELECTGROUP_COMBOBOX);

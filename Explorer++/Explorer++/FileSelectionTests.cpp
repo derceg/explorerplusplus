@@ -21,7 +21,7 @@ BOOL Explorerplusplus::AnyItemsSelected() const
 	}
 	else if (hFocus == m_hTreeView)
 	{
-		if (TreeView_GetSelection(m_hTreeView) != NULL)
+		if (TreeView_GetSelection(m_hTreeView) != nullptr)
 		{
 			return TRUE;
 		}
@@ -164,7 +164,7 @@ HRESULT Explorerplusplus::GetTreeViewSelectionAttributes(SFGAOF *pItemAttributes
 	HRESULT hr = E_FAIL;
 	HTREEITEM hItem = TreeView_GetSelection(m_hTreeView);
 
-	if (hItem != NULL)
+	if (hItem != nullptr)
 	{
 		auto pidl = m_shellTreeView->GetItemPidl(hItem);
 		hr = GetItemAttributes(pidl.get(), pItemAttributes);
@@ -201,7 +201,7 @@ BOOL Explorerplusplus::CanPaste() const
 	{
 		HTREEITEM hItem = TreeView_GetSelection(m_hTreeView);
 
-		if (hItem != NULL)
+		if (hItem != nullptr)
 		{
 			auto pidl = m_shellTreeView->GetItemPidl(hItem);
 

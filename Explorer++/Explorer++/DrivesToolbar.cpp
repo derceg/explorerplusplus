@@ -54,7 +54,7 @@ void DrivesToolbar::Initialize(HWND hParent)
 	SendMessage(m_hwnd,TB_BUTTONSTRUCTSIZE,sizeof(TBBUTTON),0);
 
 	HIMAGELIST himlSmall;
-	Shell_GetImageLists(NULL,&himlSmall);
+	Shell_GetImageLists(nullptr,&himlSmall);
 
 	int iconWidth;
 	int iconHeight;
@@ -239,7 +239,7 @@ LRESULT CALLBACK DrivesToolbar::DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPAR
 
 void DrivesToolbar::InsertDrives()
 {
-	DWORD dwSize = GetLogicalDriveStrings(0,NULL);
+	DWORD dwSize = GetLogicalDriveStrings(0, nullptr);
 
 	auto driveStrings = std::make_unique<TCHAR[]>(dwSize);
 	dwSize = GetLogicalDriveStrings(dwSize,driveStrings.get());

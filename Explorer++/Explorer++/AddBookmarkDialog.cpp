@@ -258,7 +258,7 @@ INT_PTR AddBookmarkDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 			{
 				/* Used to ensure the edit controls are redrawn properly when
 				changing the background color. */
-				InvalidateRect(GetDlgItem(m_hDlg, LOWORD(wParam)), NULL, TRUE);
+				InvalidateRect(GetDlgItem(m_hDlg, LOWORD(wParam)), nullptr, TRUE);
 			}
 			break;
 		}
@@ -352,7 +352,7 @@ void AddBookmarkDialog::SaveTreeViewExpansionState(HWND hTreeView,HTREEITEM hIte
 		HTREEITEM hChild = TreeView_GetChild(hTreeView,hItem);
 		SaveTreeViewExpansionState(hTreeView,hChild);
 
-		while((hChild = TreeView_GetNextSibling(hTreeView,hChild)) != NULL)
+		while((hChild = TreeView_GetNextSibling(hTreeView,hChild)) != nullptr)
 		{
 			SaveTreeViewExpansionState(hTreeView,hChild);
 		}

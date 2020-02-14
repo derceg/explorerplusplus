@@ -112,14 +112,14 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 
 	if(!m_config->showTabBarAtBottom)
 	{
-		SetWindowPos(hListView,NULL,IndentLeft,IndentTop,
+		SetWindowPos(hListView, nullptr,IndentLeft,IndentTop,
 			MainWindowWidth - IndentLeft,MainWindowHeight -
 			IndentBottom - IndentTop,
 			SWP_HIDEWINDOW|SWP_NOZORDER);
 	}
 	else
 	{
-		SetWindowPos(hListView,NULL,IndentLeft,IndentTop,
+		SetWindowPos(hListView, nullptr,IndentLeft,IndentTop,
 			MainWindowWidth - IndentLeft,MainWindowHeight -
 			IndentBottom - IndentTop - tabWindowHeight,
 			SWP_HIDEWINDOW|SWP_NOZORDER);

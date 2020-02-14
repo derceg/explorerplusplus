@@ -18,7 +18,7 @@ AboutDialog::AboutDialog(HINSTANCE hInstance, HWND hParent) :
 
 INT_PTR AboutDialog::OnInitDialog()
 {
-	m_icon.reset(reinterpret_cast<HICON>(LoadImage(GetModuleHandle(0),
+	m_icon.reset(reinterpret_cast<HICON>(LoadImage(GetModuleHandle(nullptr),
 		MAKEINTRESOURCE(IDI_MAIN),IMAGE_ICON,
 		32,32,LR_VGACOLOR)));
 
@@ -91,8 +91,8 @@ INT_PTR AboutDialog::OnNotify(NMHDR *pnmhdr)
 			{
 				PNMLINK pnmlink = reinterpret_cast<PNMLINK>(pnmhdr);
 
-				ShellExecute(NULL,L"open",pnmlink->item.szUrl,
-					NULL,NULL,SW_SHOW);
+				ShellExecute(nullptr,L"open",pnmlink->item.szUrl,
+					nullptr, nullptr,SW_SHOW);
 			}
 		}
 		break;

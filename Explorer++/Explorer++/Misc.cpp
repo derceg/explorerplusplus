@@ -40,9 +40,9 @@ void Explorerplusplus::ValidateColumns(FolderColumns &folderColumns)
 void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet, std::vector<Column_t> &columns)
 {
 	Column_t					Column;
-	int							*pColumnMap = NULL;
+	int							*pColumnMap = nullptr;
 	BOOL						bFound = FALSE;
-	const Column_t				*pColumns = NULL;
+	const Column_t				*pColumns = nullptr;
 	unsigned int				iTotalColumnSize = 0;
 	unsigned int				i = 0;
 
@@ -206,7 +206,7 @@ void Explorerplusplus::AdjustFolderPanePosition(void)
 		RECT rcHolder;
 		GetClientRect(m_hHolder,&rcHolder);
 
-		SetWindowPos(m_hHolder,NULL,0,IndentTop,rcHolder.right,
+		SetWindowPos(m_hHolder, nullptr,0,IndentTop,rcHolder.right,
 		height-IndentBottom-IndentTop,SWP_SHOWWINDOW|SWP_NOZORDER);
 	}
 }
@@ -286,8 +286,8 @@ Possible bugs:
 void Explorerplusplus::DirectoryAlteredCallback(const TCHAR *szFileName,DWORD dwAction,
 void *pData)
 {
-	DirectoryAltered_t	*pDirectoryAltered = NULL;
-	Explorerplusplus			*pContainer = NULL;
+	DirectoryAltered_t	*pDirectoryAltered = nullptr;
+	Explorerplusplus			*pContainer = nullptr;
 
 	pDirectoryAltered = (DirectoryAltered_t *)pData;
 	pContainer = (Explorerplusplus *)pDirectoryAltered->pData;
@@ -318,7 +318,7 @@ int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize)
 	UNREFERENCED_PARAMETER(nFolders);
 	UNREFERENCED_PARAMETER(nFiles);
 
-	DWFolderSizeCompletion_t *pDWFolderSizeCompletion = NULL;
+	DWFolderSizeCompletion_t *pDWFolderSizeCompletion = nullptr;
 
 	pDWFolderSizeCompletion = (DWFolderSizeCompletion_t *)malloc(sizeof(DWFolderSizeCompletion_t));
 

@@ -129,7 +129,7 @@ void ManageBookmarksDialog::SetupToolbar()
 	MapWindowPoints(HWND_DESKTOP, m_hDlg, reinterpret_cast<LPPOINT>(&rcListView), 2);
 
 	DWORD dwButtonSize = static_cast<DWORD>(SendMessage(m_hToolbar,TB_GETBUTTONSIZE,0,0));
-	SetWindowPos(m_hToolbar,NULL,rcTreeView.left,(rcTreeView.top - HIWORD(dwButtonSize)) / 2,
+	SetWindowPos(m_hToolbar, nullptr,rcTreeView.left,(rcTreeView.top - HIWORD(dwButtonSize)) / 2,
 		rcListView.right - rcTreeView.left,HIWORD(dwButtonSize),0);
 }
 
@@ -277,7 +277,7 @@ void ManageBookmarksDialog::OnNewFolder()
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
 	HTREEITEM hSelectedItem = TreeView_GetSelection(hTreeView);
 
-	assert(hSelectedItem != NULL);
+	assert(hSelectedItem != nullptr);
 
 	auto bookmarkFolder = m_bookmarkTreeView->GetBookmarkFolderFromTreeView(
 		hSelectedItem);
@@ -362,7 +362,7 @@ void ManageBookmarksDialog::ShowViewMenu()
 	pt.y = rcButton.bottom;
 	ClientToScreen(m_hToolbar,&pt);
 
-	TrackPopupMenu(GetSubMenu(hMenu,0),TPM_LEFTALIGN,pt.x,pt.y,0,m_hDlg,NULL);
+	TrackPopupMenu(GetSubMenu(hMenu,0),TPM_LEFTALIGN,pt.x,pt.y,0,m_hDlg, nullptr);
 	DestroyMenu(hMenu);
 
 	SendMessage(m_hToolbar,TB_SETSTATE,TOOLBAR_ID_VIEWS,MAKEWORD(dwButtonState,0));
@@ -383,7 +383,7 @@ void ManageBookmarksDialog::ShowOrganizeMenu()
 	pt.y = rcButton.bottom;
 	ClientToScreen(m_hToolbar,&pt);
 
-	TrackPopupMenu(GetSubMenu(hMenu,0),TPM_LEFTALIGN,pt.x,pt.y,0,m_hDlg,NULL);
+	TrackPopupMenu(GetSubMenu(hMenu,0),TPM_LEFTALIGN,pt.x,pt.y,0,m_hDlg, nullptr);
 	DestroyMenu(hMenu);
 
 	SendMessage(m_hToolbar,TB_SETSTATE,TOOLBAR_ID_ORGANIZE,MAKEWORD(dwButtonState,0));

@@ -51,7 +51,7 @@ MergeFilesDialog::MergeFilesDialog(HINSTANCE hInstance, HWND hParent,
 
 MergeFilesDialog::~MergeFilesDialog()
 {
-	if(m_pMergeFiles != NULL)
+	if(m_pMergeFiles != nullptr)
 	{
 		m_pMergeFiles->StopMerging();
 		m_pMergeFiles->Release();
@@ -107,10 +107,10 @@ INT_PTR MergeFilesDialog::OnInitDialog()
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MERGE_LISTVIEW);
 
 	HIMAGELIST himlSmall;
-	Shell_GetImageLists(NULL,&himlSmall);
+	Shell_GetImageLists(nullptr,&himlSmall);
 	ListView_SetImageList(hListView,himlSmall,LVSIL_SMALL);
 
-	SetWindowTheme(hListView,L"Explorer",NULL);
+	SetWindowTheme(hListView,L"Explorer", nullptr);
 
 	ListView_SetExtendedListViewStyleEx(hListView,
 		LVS_EX_DOUBLEBUFFER|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES,
@@ -340,10 +340,10 @@ INT_PTR MergeFilesDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam
 				szTemp,SIZEOF_ARRAY(szTemp));
 			MessageBox(m_hDlg,szTemp,NExplorerplusplus::APP_NAME,MB_ICONWARNING|MB_OK);
 
-			assert(m_pMergeFiles != NULL);
+			assert(m_pMergeFiles != nullptr);
 
 			m_pMergeFiles->Release();
-			m_pMergeFiles = NULL;
+			m_pMergeFiles = nullptr;
 
 			m_bMergingFiles = false;
 			m_bStopMerging = false;
@@ -394,8 +394,8 @@ void MergeFilesDialog::OnOk()
 
 		m_bMergingFiles = true;
 
-		HANDLE hThread = CreateThread(NULL,0,NMergeFilesDialog::MergeFilesThread,
-			reinterpret_cast<LPVOID>(m_pMergeFiles),0,NULL);
+		HANDLE hThread = CreateThread(nullptr,0,NMergeFilesDialog::MergeFilesThread,
+			reinterpret_cast<LPVOID>(m_pMergeFiles),0, nullptr);
 		SetThreadPriority(hThread,THREAD_PRIORITY_LOWEST);
 		CloseHandle(hThread);
 	}
@@ -403,7 +403,7 @@ void MergeFilesDialog::OnOk()
 	{
 		m_bStopMerging = true;
 
-		if(m_pMergeFiles != NULL)
+		if(m_pMergeFiles != nullptr)
 		{
 			m_pMergeFiles->StopMerging();
 		}
@@ -489,10 +489,10 @@ void MergeFilesDialog::OnMove(bool bUp)
 
 void MergeFilesDialog::OnFinished()
 {
-	assert(m_pMergeFiles != NULL);
+	assert(m_pMergeFiles != nullptr);
 
 	m_pMergeFiles->Release();
-	m_pMergeFiles = NULL;
+	m_pMergeFiles = nullptr;
 
 	m_bMergingFiles = false;
 	m_bStopMerging = false;
@@ -506,7 +506,7 @@ void MergeFilesDialog::OnFinished()
 
 DWORD WINAPI NMergeFilesDialog::MergeFilesThread(LPVOID pParam)
 {
-	assert(pParam != NULL);
+	assert(pParam != nullptr);
 
 	MergeFiles *pMergeFiles = reinterpret_cast<MergeFiles *>(pParam);
 	pMergeFiles->StartMerging();
@@ -537,7 +537,7 @@ void MergeFiles::StartMerging()
 	bool bStop = false;
 
 	HANDLE hOutputFile = CreateFile(m_strOutputFilename.c_str(),GENERIC_WRITE,
-		0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
+		0, nullptr,CREATE_NEW,FILE_ATTRIBUTE_NORMAL, nullptr);
 
 	if(hOutputFile == INVALID_HANDLE_VALUE)
 	{
@@ -556,7 +556,7 @@ void MergeFiles::StartMerging()
 		}
 
 		HANDLE hInputFile = CreateFile(strFullFilename.c_str(),GENERIC_READ,FILE_SHARE_READ,
-			NULL,OPEN_EXISTING,0,NULL);
+			nullptr,OPEN_EXISTING,0, nullptr);
 
 		if(hInputFile != INVALID_HANDLE_VALUE)
 		{
@@ -568,11 +568,11 @@ void MergeFiles::StartMerging()
 
 				DWORD dwNumberOfBytesRead;
 				ReadFile(hInputFile,reinterpret_cast<LPVOID>(buffer.get()),static_cast<DWORD>(lMergeFileSize.LowPart),
-					&dwNumberOfBytesRead,NULL);
+					&dwNumberOfBytesRead, nullptr);
 
 				DWORD dwNumberOfBytesWritten;
 				WriteFile(hOutputFile,reinterpret_cast<LPCVOID>(buffer.get()),dwNumberOfBytesRead,
-					&dwNumberOfBytesWritten,NULL);
+					&dwNumberOfBytesWritten, nullptr);
 			}
 
 			CloseHandle(hInputFile);

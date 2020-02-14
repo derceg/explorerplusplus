@@ -30,7 +30,7 @@ INT_PTR CustomizeColorsDialog::OnInitDialog()
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_COLORRULES);
 
-	SetWindowTheme(hListView,L"Explorer",NULL);
+	SetWindowTheme(hListView,L"Explorer", nullptr);
 
 	ListView_SetExtendedListViewStyleEx(hListView,
 		LVS_EX_DOUBLEBUFFER|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES,

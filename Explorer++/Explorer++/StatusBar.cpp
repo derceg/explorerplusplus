@@ -94,7 +94,7 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 	TCHAR			lpszSizeBuffer[32];
 	TCHAR			szBuffer[64];
 	TCHAR			szTemp[64];
-	TCHAR			*szNumSelected = NULL;
+	TCHAR			*szNumSelected = nullptr;
 	int				res;
 
 	nTotal = tab.GetShellBrowser()->GetNumItems();
@@ -210,7 +210,7 @@ int Explorerplusplus::CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szB
 	if (GetDiskFreeSpaceEx(szPath, &BytesAvailableToCaller,
 		&TotalNumberOfBytes, &TotalNumberOfFreeBytes) == 0)
 	{
-		szBuffer = NULL;
+		szBuffer = nullptr;
 		return -1;
 	}
 
@@ -225,7 +225,7 @@ int Explorerplusplus::CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szB
 	if (nBuffer > lstrlen(szFreeSpaceString))
 		StringCchCopy(szBuffer, nBuffer, szFreeSpaceString);
 	else
-		szBuffer = NULL;
+		szBuffer = nullptr;
 
 	return lstrlen(szFreeSpaceString);
 }

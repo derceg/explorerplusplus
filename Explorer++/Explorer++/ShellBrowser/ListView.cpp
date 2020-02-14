@@ -190,8 +190,8 @@ void ShellBrowser::OnListViewMButtonUp(const POINT *pt)
 
 void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 {
-	NMLVDISPINFO	*pnmv = NULL;
-	LVITEM			*plvItem = NULL;
+	NMLVDISPINFO	*pnmv = nullptr;
+	LVITEM			*plvItem = nullptr;
 
 	pnmv = (NMLVDISPINFO *)lParam;
 	plvItem = &pnmv->item;
@@ -703,7 +703,7 @@ void ShellBrowser::OnListViewHeaderRightClick(const POINTS &cursorPos)
 	}
 
 	int cmd = TrackPopupMenu(headerMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD,
-		cursorPos.x, cursorPos.y, 0, m_hListView, NULL);
+		cursorPos.x, cursorPos.y, 0, m_hListView, nullptr);
 
 	if (cmd == 0)
 	{

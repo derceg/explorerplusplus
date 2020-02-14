@@ -148,7 +148,7 @@ void ShellBrowser::PlaceColumns()
 
 	m_nActiveColumns = 0;
 
-	if(m_pActiveColumns != NULL)
+	if(m_pActiveColumns != nullptr)
 	{
 		for(auto itr = m_pActiveColumns->begin();itr != m_pActiveColumns->end();itr++)
 		{

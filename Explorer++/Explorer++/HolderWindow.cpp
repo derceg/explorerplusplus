@@ -35,11 +35,11 @@ ATOM RegisterHolderWindowClass(void)
 	wc.lpfnWndProc		= HolderWndProcStub;
 	wc.cbClsExtra		= 0;
 	wc.cbWndExtra		= sizeof(HolderWindow *);
-	wc.hInstance		= GetModuleHandle(0);
-	wc.hIcon			= NULL;
-	wc.hCursor			= LoadCursor(NULL,IDC_ARROW);
+	wc.hInstance		= GetModuleHandle(nullptr);
+	wc.hIcon			= nullptr;
+	wc.hCursor			= LoadCursor(nullptr,IDC_ARROW);
 	wc.hbrBackground	= (HBRUSH)GetSysColorBrush(COLOR_BTNFACE);
-	wc.lpszMenuName		= NULL;
+	wc.lpszMenuName		= nullptr;
 	wc.lpszClassName	= HOLDER_CLASS_NAME;
 
 	return RegisterClass(&wc);
@@ -52,7 +52,7 @@ HWND CreateHolderWindow(HWND hParent,TCHAR *szWindowName,UINT uStyle)
 	RegisterHolderWindowClass();
 
 	hHolder = CreateWindowEx(0,HOLDER_CLASS_NAME,szWindowName,
-		uStyle,0,0,0,0,hParent,NULL,GetModuleHandle(0),NULL);
+		uStyle,0,0,0,0,hParent, nullptr,GetModuleHandle(nullptr), nullptr);
 
 	return hHolder;
 }
@@ -148,7 +148,7 @@ void HolderWindow::OnHolderWindowLButtonDown(LPARAM lParam)
 
 	if(CursorPos.x >= (rc.right - 10))
 	{
-		SetCursor(LoadCursor(NULL,IDC_SIZEWE));
+		SetCursor(LoadCursor(nullptr,IDC_SIZEWE));
 
 		m_bHolderResizing = TRUE;
 
@@ -191,7 +191,7 @@ int HolderWindow::OnHolderWindowMouseMove(LPARAM lParam)
 
 	if(ptsCursor.x >= (rc.right - 10))
 	{
-		SetCursor(LoadCursor(NULL,IDC_SIZEWE));
+		SetCursor(LoadCursor(nullptr,IDC_SIZEWE));
 	}
 
 	return 0;

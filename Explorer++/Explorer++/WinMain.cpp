@@ -69,9 +69,9 @@ ATOM RegisterMainWindowClass(HINSTANCE hInstance)
 	wcex.hInstance		= hInstance;
 	wcex.hIcon			= (HICON)LoadImage(hInstance,MAKEINTRESOURCE(IDI_MAIN),IMAGE_ICON,GetSystemMetrics(SM_CXICON),GetSystemMetrics(SM_CYICON),LR_DEFAULTCOLOR);
 	wcex.hIconSm		= (HICON)LoadImage(hInstance,MAKEINTRESOURCE(IDI_MAIN),IMAGE_ICON,GetSystemMetrics(SM_CXSMICON),GetSystemMetrics(SM_CYSMICON),LR_DEFAULTCOLOR);
-	wcex.hCursor		= LoadCursor(NULL,IDC_ARROW);
-	wcex.hbrBackground	= (HBRUSH)NULL;
-	wcex.lpszMenuName	= NULL;
+	wcex.hCursor		= LoadCursor(nullptr,IDC_ARROW);
+	wcex.hbrBackground	= (HBRUSH)nullptr;
+	wcex.lpszMenuName	= nullptr;
 	wcex.lpszClassName	= NExplorerplusplus::CLASS_NAME;
 	return RegisterClassEx(&wcex);
 }
@@ -89,11 +89,11 @@ LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS *pExceptionInf
 
 	hDbgHelp = LoadLibrary(_T("Dbghelp.dll"));
 
-	if(hDbgHelp != NULL)
+	if(hDbgHelp != nullptr)
 	{
 		pMiniDumpWriteDump = (MINIDUMPWRITEDUMP)GetProcAddress(hDbgHelp,"MiniDumpWriteDump");
 
-		if(pMiniDumpWriteDump != NULL)
+		if(pMiniDumpWriteDump != nullptr)
 		{
 			GetLocalTime(&stLocalTime);
 
@@ -103,8 +103,8 @@ LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS *pExceptionInf
 				_T("%s\\%s%s-%02d%02d%04d-%02d%02d%02d.dmp"),
 				szPath,NExplorerplusplus::APP_NAME,VERSION_STRING_W,stLocalTime.wDay,stLocalTime.wMonth,
 				stLocalTime.wYear,stLocalTime.wHour,stLocalTime.wMinute,stLocalTime.wSecond);
-			hFile = CreateFile(szFileName,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,
-				FILE_ATTRIBUTE_NORMAL,NULL);
+			hFile = CreateFile(szFileName,GENERIC_WRITE,0, nullptr,CREATE_ALWAYS,
+				FILE_ATTRIBUTE_NORMAL, nullptr);
 
 			if(hFile != INVALID_HANDLE_VALUE)
 			{
@@ -113,7 +113,7 @@ LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS *pExceptionInf
 				mei.ClientPointers		= NULL;
 
 				pMiniDumpWriteDump(GetCurrentProcess(),GetCurrentProcessId(),hFile,
-					MiniDumpNormal,&mei,NULL,NULL);
+					MiniDumpNormal,&mei, nullptr, nullptr);
 
 				/* If this is enabled, it needs to have a proper error message, and block
 				access to the main window. */
@@ -198,8 +198,8 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	if(!g_commandLineDirectories.empty())
 	{
 		unique_pidl_absolute pidlControlPanel;
-		HRESULT hr = SHGetFolderLocation(NULL,
-			CSIDL_CONTROLS,NULL,0,wil::out_param(pidlControlPanel));
+		HRESULT hr = SHGetFolderLocation(nullptr,
+			CSIDL_CONTROLS, nullptr,0,wil::out_param(pidlControlPanel));
 
 		if(SUCCEEDED(hr))
 		{
@@ -250,8 +250,8 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 						/* This is a child of the control panel,
 						so send it to Windows Explorer to open
 						directly. */
-						ShellExecute(NULL,_T("open"),szExplorerPath,
-							itr->c_str(),NULL,SW_SHOWNORMAL);
+						ShellExecute(nullptr,_T("open"),szExplorerPath,
+							itr->c_str(), nullptr,SW_SHOWNORMAL);
 
 						itr = g_commandLineDirectories.erase(itr);
 					}
@@ -295,7 +295,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	if the first instance is run, and multiple instances are allowed,
 	and then disallowed, still need to be able to load back to the
 	original instance. */
-	wil::unique_mutex applicationMutex(CreateMutex(NULL,TRUE,_T("Explorer++")));
+	wil::unique_mutex applicationMutex(CreateMutex(nullptr,TRUE,_T("Explorer++")));
 
 	if(!bAllowMultipleInstances)
 	{
@@ -303,9 +303,9 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 		{
 			HWND hPrev;
 
-			hPrev = FindWindow(NExplorerplusplus::CLASS_NAME,NULL);
+			hPrev = FindWindow(NExplorerplusplus::CLASS_NAME, nullptr);
 
-			if(hPrev != NULL)
+			if(hPrev != nullptr)
 			{
 				if(!g_commandLineDirectories.empty())
 				{
@@ -326,7 +326,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 					COPYDATASTRUCT cds;
 
 					cds.cbData	= 0;
-					cds.lpData	= NULL;
+					cds.lpData	= nullptr;
 					SendMessage(hPrev,WM_COPYDATA,NULL,reinterpret_cast<LPARAM>(&cds));
 				}
 
@@ -344,7 +344,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 
 	if(res == 0)
 	{
-		MessageBox(NULL,_T("Could not register class"),NExplorerplusplus::APP_NAME,
+		MessageBox(nullptr,_T("Could not register class"),NExplorerplusplus::APP_NAME,
 			MB_OK|MB_ICONERROR);
 
 		return 0;
@@ -364,14 +364,14 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	CW_USEDEFAULT,
 	CW_USEDEFAULT,
 	CW_USEDEFAULT,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
 	hInstance,
-	NULL);
+	nullptr);
 
-	if(hwnd == NULL)
+	if(hwnd == nullptr)
 	{
-		MessageBox(NULL,_T("Could not create main window."),NExplorerplusplus::APP_NAME,
+		MessageBox(nullptr,_T("Could not create main window."),NExplorerplusplus::APP_NAME,
 			MB_OK|MB_ICONERROR);
 
 		return 0;
@@ -427,15 +427,15 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	SetWindowPlacement(hwnd,&wndpl);
 	UpdateWindow(hwnd);
 
-	g_hwndSearch = NULL;
-	g_hwndRunScript = NULL;
-	g_hwndOptions = NULL;
-	g_hwndManageBookmarks = NULL;
+	g_hwndSearch = nullptr;
+	g_hwndRunScript = nullptr;
+	g_hwndOptions = nullptr;
+	g_hwndManageBookmarks = nullptr;
 
 	MSG msg;
 
 	/* Enter the message loop... */
-	while(GetMessage(&msg,NULL,0,0) > 0)
+	while(GetMessage(&msg, nullptr,0,0) > 0)
 	{
 		/* TranslateMessage() must be in the inner loop,
 		otherwise various accelerator keys (such as tab)
@@ -452,10 +452,10 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 			}
 		}
 
-		if(PropSheet_GetCurrentPageHwnd(g_hwndOptions) == NULL)
+		if(PropSheet_GetCurrentPageHwnd(g_hwndOptions) == nullptr)
 		{
 			DestroyWindow(g_hwndOptions);
-			g_hwndOptions = NULL;
+			g_hwndOptions = nullptr;
 		}
 	}
 

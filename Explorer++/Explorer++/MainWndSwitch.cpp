@@ -65,7 +65,7 @@ LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 	}
 
 	/* Jump across to the member window function (will handle all requests). */
-	if(pContainer != NULL)
+	if(pContainer != nullptr)
 		return pContainer->WindowProcedure(hwnd,Msg,wParam,lParam);
 	else
 		return DefWindowProc(hwnd,Msg,wParam,lParam);
@@ -167,7 +167,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 
 	case WM_APP_FOLDERSIZECOMPLETED:
 		{
-			DWFolderSizeCompletion_t *pDWFolderSizeCompletion = NULL;
+			DWFolderSizeCompletion_t *pDWFolderSizeCompletion = nullptr;
 			TCHAR szFolderSize[32];
 			TCHAR szSizeString[64];
 			TCHAR szTotalSize[64];
@@ -220,7 +220,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		{
 			COPYDATASTRUCT *pcds = reinterpret_cast<COPYDATASTRUCT *>(lParam);
 
-			if (pcds->lpData != NULL)
+			if (pcds->lpData != nullptr)
 			{
 				m_tabContainer->CreateNewTab((TCHAR *)pcds->lpData, TabSettings(_selected = true));
 			}
@@ -1107,22 +1107,22 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		auto pidl = m_pActiveShellBrowser->GetDirectoryIdl();
 
 		unique_pidl_absolute pidlDrives;
-		SHGetFolderLocation(NULL, CSIDL_DRIVES, NULL, 0, wil::out_param(pidlDrives));
+		SHGetFolderLocation(nullptr, CSIDL_DRIVES, nullptr, 0, wil::out_param(pidlDrives));
 
 		unique_pidl_absolute pidlControls;
-		SHGetFolderLocation(NULL, CSIDL_CONTROLS, NULL, 0, wil::out_param(pidlControls));
+		SHGetFolderLocation(nullptr, CSIDL_CONTROLS, nullptr, 0, wil::out_param(pidlControls));
 
 		unique_pidl_absolute pidlBitBucket;
-		SHGetFolderLocation(NULL, CSIDL_BITBUCKET, NULL, 0, wil::out_param(pidlBitBucket));
+		SHGetFolderLocation(nullptr, CSIDL_BITBUCKET, nullptr, 0, wil::out_param(pidlBitBucket));
 
 		unique_pidl_absolute pidlPrinters;
-		SHGetFolderLocation(NULL, CSIDL_PRINTERS, NULL, 0, wil::out_param(pidlPrinters));
+		SHGetFolderLocation(nullptr, CSIDL_PRINTERS, nullptr, 0, wil::out_param(pidlPrinters));
 
 		unique_pidl_absolute pidlConnections;
-		SHGetFolderLocation(NULL, CSIDL_CONNECTIONS, NULL, 0, wil::out_param(pidlConnections));
+		SHGetFolderLocation(nullptr, CSIDL_CONNECTIONS, nullptr, 0, wil::out_param(pidlConnections));
 
 		unique_pidl_absolute pidlNetwork;
-		SHGetFolderLocation(NULL, CSIDL_NETWORK, NULL, 0, wil::out_param(pidlNetwork));
+		SHGetFolderLocation(nullptr, CSIDL_NETWORK, nullptr, 0, wil::out_param(pidlNetwork));
 
 		IShellFolder *pShellFolder;
 		SHGetDesktopFolder(&pShellFolder);
@@ -1250,7 +1250,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 
 	case ToolbarButton::Bookmarks:
 	case IDM_BOOKMARKS_MANAGEBOOKMARKS:
-		if (g_hwndManageBookmarks == NULL)
+		if (g_hwndManageBookmarks == nullptr)
 		{
 			ManageBookmarksDialog *pManageBookmarksDialog = new ManageBookmarksDialog(m_hLanguageModule,
 				hwnd, this, m_navigation.get(), &m_bookmarkTree);
@@ -1464,8 +1464,8 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 
 		case RBN_CHEVRONPUSHED:
 			{
-				NMREBARCHEVRON *pnmrc = NULL;
-				HWND hToolbar = NULL;
+				NMREBARCHEVRON *pnmrc = nullptr;
+				HWND hToolbar = nullptr;
 				HMENU hMenu;
 				HIMAGELIST himlSmall;
 				MENUITEMINFO mii;
@@ -1486,7 +1486,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 
 				HIMAGELIST himlMenu = nullptr;
 
-				Shell_GetImageLists(NULL,&himlSmall);
+				Shell_GetImageLists(nullptr,&himlSmall);
 
 				switch(pnmrc->wID)
 				{
@@ -1544,11 +1544,11 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 									StringCchCopy(szText,SIZEOF_ARRAY(szText),(LPCWSTR)tbButton.iString);
 								}
 
-								HMENU hSubMenu = NULL;
+								HMENU hSubMenu = nullptr;
 								UINT fMask;
 
 								fMask = MIIM_ID|MIIM_STRING;
-								hSubMenu = NULL;
+								hSubMenu = nullptr;
 
 								switch(pnmrc->wID)
 								{
@@ -1607,7 +1607,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 				int iCmd;
 
 				iCmd = TrackPopupMenu(hMenu,uFlags,
-					ptMenu.x,ptMenu.y,0,m_hMainRebar,NULL);
+					ptMenu.x,ptMenu.y,0,m_hMainRebar, nullptr);
 
 				if(iCmd != 0)
 				{

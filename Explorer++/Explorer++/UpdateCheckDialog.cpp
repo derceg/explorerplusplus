@@ -42,13 +42,13 @@ INT_PTR UpdateCheckDialog::OnInitDialog()
 	LoadString(GetInstance(),IDS_UPDATE_CHECK_STATUS,szTemp,SIZEOF_ARRAY(szTemp));
 	SetDlgItemText(m_hDlg,IDC_STATIC_UPDATE_STATUS,szTemp);
 
-	SetTimer(m_hDlg,0,STATUS_TIMER_ELAPSED,NULL);
+	SetTimer(m_hDlg,0,STATUS_TIMER_ELAPSED, nullptr);
 
 	/* The actual version check will be performed in a background
 	thread (to avoid blocking the main thread while the version
 	file is downloaded). */
-	HANDLE hThread = CreateThread(NULL,0,UpdateCheckThread,
-		reinterpret_cast<LPVOID>(m_hDlg),0,NULL);
+	HANDLE hThread = CreateThread(nullptr,0,UpdateCheckThread,
+		reinterpret_cast<LPVOID>(m_hDlg),0, nullptr);
 	CloseHandle(hThread);
 
 	m_pucdps->RestoreDialogPosition(m_hDlg,false);
@@ -58,7 +58,7 @@ INT_PTR UpdateCheckDialog::OnInitDialog()
 
 DWORD WINAPI UpdateCheckDialog::UpdateCheckThread(LPVOID pParam)
 {
-	assert(pParam != NULL);
+	assert(pParam != nullptr);
 
 	PerformUpdateCheck(reinterpret_cast<HWND>(pParam));
 
@@ -94,17 +94,17 @@ void UpdateCheckDialog::PerformUpdateCheck(HWND hDlg)
 	version check is not performed against an
 	outdated file. */
 	DeleteUrlCacheEntry(UpdateCheckDialog::VERSION_FILE_URL);
-	HRESULT hr = URLDownloadToFile(NULL,UpdateCheckDialog::VERSION_FILE_URL,TempFileName,0,NULL);
+	HRESULT hr = URLDownloadToFile(nullptr,UpdateCheckDialog::VERSION_FILE_URL,TempFileName,0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
-		HANDLE hFile = CreateFile(TempFileName,GENERIC_READ,0,NULL,OPEN_EXISTING,0,NULL);
+		HANDLE hFile = CreateFile(TempFileName,GENERIC_READ,0, nullptr,OPEN_EXISTING,0, nullptr);
 
 		if(hFile != INVALID_HANDLE_VALUE)
 		{
 			char VersionNumber[16];
 			DWORD NumBytesRead;
-			BOOL ReadRes = ReadFile(hFile,VersionNumber,sizeof(VersionNumber) - 1,&NumBytesRead,NULL);
+			BOOL ReadRes = ReadFile(hFile,VersionNumber,sizeof(VersionNumber) - 1,&NumBytesRead, nullptr);
 
 			if(ReadRes && NumBytesRead > 0)
 			{
@@ -262,7 +262,7 @@ INT_PTR UpdateCheckDialog::OnNotify(NMHDR *pnmhdr)
 		if(pnmhdr->hwndFrom == GetDlgItem(m_hDlg,IDC_SYSLINK_DOWNLOAD))
 		{
 			PNMLINK pnmlink = reinterpret_cast<PNMLINK>(pnmhdr);
-			ShellExecute(NULL,L"open",pnmlink->item.szUrl,NULL,NULL,SW_SHOW);
+			ShellExecute(nullptr,L"open",pnmlink->item.szUrl, nullptr, nullptr,SW_SHOW);
 		}
 		break;
 	}

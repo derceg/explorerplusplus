@@ -23,7 +23,7 @@ m_RefCount(1)
 
 HRESULT __stdcall NewMenuClient::QueryInterface(REFIID iid,void **ppvObject)
 {
-	*ppvObject = NULL;
+	*ppvObject = nullptr;
 
 	if(iid == IID_IUnknown)
 	{

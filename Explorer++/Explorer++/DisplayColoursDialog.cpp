@@ -110,7 +110,7 @@ void DisplayColoursDialog::InitializePreviewWindow()
 	DisplayWindow_GetFont(m_hDisplayWindow,reinterpret_cast<WPARAM>(&m_hDisplayFont));
 	m_TextColor = DisplayWindow_GetTextColor(m_hDisplayWindow);
 
-	m_hDisplayWindowIcon = reinterpret_cast<HICON>(LoadImage(GetModuleHandle(NULL),
+	m_hDisplayWindowIcon = reinterpret_cast<HICON>(LoadImage(GetModuleHandle(nullptr),
 		MAKEINTRESOURCE(IDI_DISPLAYWINDOW),IMAGE_ICON,0,0,LR_CREATEDIBSECTION));
 
 	DWInitialSettings_t InitialSettings;
@@ -142,7 +142,7 @@ void DisplayColoursDialog::InitializePreviewWindow()
 
 	RECT rc;
 	GetWindowRect(hStatic,&rc);
-	SetWindowPos(m_hPreviewDisplayWindow,NULL,0,0,rc.right,rc.bottom,SWP_SHOWWINDOW|SWP_NOZORDER);
+	SetWindowPos(m_hPreviewDisplayWindow, nullptr,0,0,rc.right,rc.bottom,SWP_SHOWWINDOW|SWP_NOZORDER);
 
 	SetColorGroupValues(m_CenterGroup,CentreColor);
 	SetColorGroupValues(m_SurroundingGroup,SurroundColor);
@@ -255,7 +255,7 @@ void DisplayColoursDialog::UpdateEditControlsFromSlider(ColorGroup_t ColorGroup[
 	{
 		UINT ColorComponent = static_cast<UINT>(SendDlgItemMessage(m_hDlg,ColorGroup[i].SliderId,TBM_GETPOS,0,0));
 
-		if(GetDlgItemInt(m_hDlg,ColorGroup[i].EditId,NULL,FALSE) != ColorComponent)
+		if(GetDlgItemInt(m_hDlg,ColorGroup[i].EditId, nullptr,FALSE) != ColorComponent)
 		{
 			SetDlgItemInt(m_hDlg,ColorGroup[i].EditId,ColorComponent,FALSE);
 		}
@@ -305,7 +305,7 @@ void DisplayColoursDialog::OnEnChange(UINT ControlID)
 		return;
 	}
 
-	HWND hTrackBar = NULL;
+	HWND hTrackBar = nullptr;
 
 	switch(ControlID)
 	{

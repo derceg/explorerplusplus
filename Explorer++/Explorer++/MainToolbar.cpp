@@ -781,7 +781,7 @@ void MainToolbar::CreateViewsMenu(POINT *ptOrigin)
 		ItemToCheck, MF_BYCOMMAND);
 
 	TrackPopupMenu(viewsMenu, TPM_LEFTALIGN, ptOrigin->x, ptOrigin->y,
-		0, m_hwnd, NULL);
+		0, m_hwnd, nullptr);
 }
 
 // For some of the buttons on the toolbar, their state depends on an item from
@@ -845,8 +845,8 @@ MainToolbarPersistentSettings &MainToolbarPersistentSettings::GetInstance()
 
 void MainToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
 {
-	IXMLDOMNode *pChildNode = NULL;
-	IXMLDOMNamedNodeMap *am = NULL;
+	IXMLDOMNode *pChildNode = nullptr;
+	IXMLDOMNamedNodeMap *am = nullptr;
 	BSTR bstrValue;
 
 	std::vector<ToolbarButton> toolbarButtons;

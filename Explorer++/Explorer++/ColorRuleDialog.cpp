@@ -192,7 +192,7 @@ void ColorRuleDialog::OnChangeColor()
 		if(!m_bEdit)
 			m_pcrdps->m_cfInitialColor = cc.rgbResult;
 
-		InvalidateRect(GetDlgItem(m_hDlg,IDC_STATIC_COLOR),NULL,TRUE);
+		InvalidateRect(GetDlgItem(m_hDlg,IDC_STATIC_COLOR), nullptr,TRUE);
 	}
 }
 
@@ -258,11 +258,11 @@ void ColorRuleDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 void ColorRuleDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
 	DWORD dwSize = sizeof(m_cfInitialColor);
-	RegQueryValueEx(hKey,SETTING_INITIAL_COLOR,NULL,NULL,
+	RegQueryValueEx(hKey,SETTING_INITIAL_COLOR, nullptr, nullptr,
 		reinterpret_cast<LPBYTE>(&m_cfInitialColor),&dwSize);
 
 	dwSize = sizeof(m_cfCustomColors);
-	RegQueryValueEx(hKey,SETTING_CUSTOM_COLORS,NULL,NULL,
+	RegQueryValueEx(hKey,SETTING_CUSTOM_COLORS, nullptr, nullptr,
 		reinterpret_cast<LPBYTE>(&m_cfCustomColors),&dwSize);
 }
 

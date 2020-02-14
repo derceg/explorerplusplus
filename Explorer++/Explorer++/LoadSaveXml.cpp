@@ -71,16 +71,16 @@ void LoadSaveXML::ReleaseLoadEnvironment()
 	if (m_bLoadedCorrectly)
 	{
 		m_pXMLDom->Release();
-		m_pXMLDom = NULL;
+		m_pXMLDom = nullptr;
 	}
 }
 
 void LoadSaveXML::InitializeSaveEnvironment()
 {
-	IXMLDOMProcessingInstruction *pi = NULL;
-	IXMLDOMComment *pc = NULL;
-	BSTR									bstr = NULL;
-	BSTR									bstr1 = NULL;
+	IXMLDOMProcessingInstruction *pi = nullptr;
+	IXMLDOMComment *pc = nullptr;
+	BSTR									bstr = nullptr;
+	BSTR									bstr1 = nullptr;
 	BSTR									bstr_wsnt = SysAllocString(L"\n\t");
 
 	m_pXMLDom = NXMLSettings::DomFromCOM();
@@ -95,27 +95,27 @@ void LoadSaveXML::InitializeSaveEnvironment()
 	NXMLSettings::AppendChildToParent(pi, m_pXMLDom);
 
 	pi->Release();
-	pi = NULL;
+	pi = nullptr;
 	SysFreeString(bstr);
-	bstr = NULL;
+	bstr = nullptr;
 	SysFreeString(bstr1);
-	bstr1 = NULL;
+	bstr1 = nullptr;
 
 	/* Short header comment, explaining file purpose. */
 	bstr = SysAllocString(L" Preference file for Explorer++ ");
 	m_pXMLDom->createComment(bstr, &pc);
 	NXMLSettings::AppendChildToParent(pc, m_pXMLDom);
 	SysFreeString(bstr);
-	bstr = NULL;
+	bstr = nullptr;
 	pc->Release();
-	pc = NULL;
+	pc = nullptr;
 
 	/* Create the root element. CANNOT use '+' signs
 	within the element name. */
 	bstr = SysAllocString(L"ExplorerPlusPlus");
 	m_pXMLDom->createElement(bstr, &m_pRoot);
 	SysFreeString(bstr);
-	bstr = NULL;
+	bstr = nullptr;
 
 	NXMLSettings::AppendChildToParent(m_pRoot, m_pXMLDom);
 
@@ -135,7 +135,7 @@ void LoadSaveXML::ReleaseSaveEnvironment()
 	TCHAR	szConfigFile[MAX_PATH];
 	DWORD	dwProcessId;
 	BSTR	bstr_wsn = SysAllocString(L"\n");
-	BSTR	bstr = NULL;
+	BSTR	bstr = nullptr;
 	VARIANT	var;
 
 	NXMLSettings::AddWhiteSpaceToNode(m_pXMLDom, bstr_wsn, m_pRoot);
@@ -147,7 +147,7 @@ void LoadSaveXML::ReleaseSaveEnvironment()
 	then save the configuration file in that directory. */
 	dwProcessId = GetCurrentProcessId();
 	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, dwProcessId);
-	GetModuleFileNameEx(hProcess, NULL, szConfigFile, SIZEOF_ARRAY(szConfigFile));
+	GetModuleFileNameEx(hProcess, nullptr, szConfigFile, SIZEOF_ARRAY(szConfigFile));
 	CloseHandle(hProcess);
 
 	PathRemoveFileSpec(szConfigFile);
@@ -157,10 +157,10 @@ void LoadSaveXML::ReleaseSaveEnvironment()
 	m_pXMLDom->save(var);
 
 	m_pRoot->Release();
-	m_pRoot = NULL;
+	m_pRoot = nullptr;
 
 	m_pXMLDom->Release();
-	m_pXMLDom = NULL;
+	m_pXMLDom = nullptr;
 }
 
 void LoadSaveXML::LoadGenericSettings()

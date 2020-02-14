@@ -264,7 +264,7 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 
 		case WM_NOTIFY:
 		{
-			NMHDR	*nmhdr = NULL;
+			NMHDR	*nmhdr = nullptr;
 			nmhdr = (NMHDR *)lParam;
 
 			switch(nmhdr->code)
@@ -575,7 +575,7 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wPar
 
 		case WM_NOTIFY:
 			{
-				NMHDR	*nmhdr = NULL;
+				NMHDR	*nmhdr = nullptr;
 				nmhdr = (NMHDR *)lParam;
 
 				switch(nmhdr->code)
@@ -600,7 +600,7 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wPar
 						m_config->globalFolderSettings.oneClickActivate = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_SINGLECLICK)
 							== BST_CHECKED);
 
-						m_config->globalFolderSettings.oneClickActivateHoverTime = GetDlgItemInt(hDlg,IDC_OPTIONS_HOVER_TIME,NULL,FALSE);
+						m_config->globalFolderSettings.oneClickActivateHoverTime = GetDlgItemInt(hDlg,IDC_OPTIONS_HOVER_TIME, nullptr,FALSE);
 
 						m_config->overwriteExistingFilesConfirmation = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION)
 							== BST_CHECKED);
@@ -742,7 +742,7 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPA
 
 	case WM_NOTIFY:
 		{
-			NMHDR	*nmhdr = NULL;
+			NMHDR	*nmhdr = nullptr;
 			nmhdr = (NMHDR *)lParam;
 
 			switch(nmhdr->code)
@@ -900,7 +900,7 @@ INT_PTR CALLBACK OptionsDialog::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wPara
 
 		case WM_NOTIFY:
 			{
-				NMHDR	*nmhdr = NULL;
+				NMHDR	*nmhdr = nullptr;
 				nmhdr = (NMHDR *)lParam;
 
 				switch(nmhdr->code)
@@ -1038,7 +1038,7 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 
 		case WM_NOTIFY:
 			{
-				NMHDR	*nmhdr = NULL;
+				NMHDR	*nmhdr = nullptr;
 				nmhdr = (NMHDR *)lParam;
 
 				switch(nmhdr->code)
@@ -1101,10 +1101,10 @@ void OptionsDialog::OnDefaultSettingsNewTabDir(HWND hDlg)
 		StringCchCopy(g_szNewTabDirectory,SIZEOF_ARRAY(g_szNewTabDirectory),
 		szNewTabDir);
 
-	CoInitializeEx(NULL,COINIT_APARTMENTTHREADED);
+	CoInitializeEx(nullptr,COINIT_APARTMENTTHREADED);
 
 	bi.hwndOwner		= hDlg;
-	bi.pidlRoot			= NULL;
+	bi.pidlRoot			= nullptr;
 	bi.pszDisplayName	= szDisplayName;
 	bi.lpszTitle		= helperText.c_str();
 	bi.ulFlags			= BIF_NEWDIALOGSTYLE;
@@ -1114,7 +1114,7 @@ void OptionsDialog::OnDefaultSettingsNewTabDir(HWND hDlg)
 
 	CoUninitialize();
 
-	if(pidl != NULL)
+	if(pidl != nullptr)
 	{
 		hEdit = GetDlgItem(hDlg,IDC_DEFAULT_NEWTABDIR_EDIT);
 

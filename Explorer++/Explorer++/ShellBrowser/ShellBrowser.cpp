@@ -28,7 +28,7 @@ int ShellBrowser::listViewParentSubclassIdCounter = 0;
 /* IUnknown interface members. */
 HRESULT __stdcall ShellBrowser::QueryInterface(REFIID iid, void **ppvObject)
 {
-	*ppvObject = NULL;
+	*ppvObject = nullptr;
 
 	if (iid == IID_IUnknown)
 	{
@@ -125,7 +125,7 @@ ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, Cach
 	m_bThumbnailsSetup = FALSE;
 	m_nCurrentColumns = 0;
 	m_iDirMonitorId = -1;
-	m_pActiveColumns = NULL;
+	m_pActiveColumns = nullptr;
 	m_bPerformingDrag = FALSE;
 	m_nActiveColumns = 0;
 	m_bNewItemCreated = FALSE;
@@ -144,7 +144,7 @@ ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, Cach
 	m_thumbnailThreadPool.push([] (int id) {
 		UNREFERENCED_PARAMETER(id);
 
-		CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 	});
 }
 
@@ -207,7 +207,7 @@ HWND ShellBrowser::SetUpListView(HWND parent)
 	NListView::ListView_ActivateOneClickSelect(m_hListView, m_config->globalFolderSettings.oneClickActivate,
 		m_config->globalFolderSettings.oneClickActivateHoverTime);
 
-	SetWindowTheme(hListView, L"Explorer", NULL);
+	SetWindowTheme(hListView, L"Explorer", nullptr);
 
 	m_windowSubclasses.emplace_back(hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID,
 		reinterpret_cast<DWORD_PTR>(this));
@@ -386,7 +386,7 @@ HRESULT ShellBrowser::InitializeDragDropHelpers(void)
 	HRESULT hr;
 
 	/* Initialize the drag source helper, and use it to initialize the drop target helper. */
-	hr = CoCreateInstance(CLSID_DragDropHelper, NULL, CLSCTX_INPROC_SERVER,
+	hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_INPROC_SERVER,
 		IID_PPV_ARGS(&m_pDragSourceHelper));
 
 	if (SUCCEEDED(hr))
@@ -631,7 +631,7 @@ BOOL ShellBrowser::CanCreate(void) const
 {
 	BOOL bCanCreate = FALSE;
 	unique_pidl_absolute pidl;
-	HRESULT hr = SHGetFolderLocation(NULL,CSIDL_DESKTOP,NULL,0,wil::out_param(pidl));
+	HRESULT hr = SHGetFolderLocation(nullptr,CSIDL_DESKTOP, nullptr,0,wil::out_param(pidl));
 
 	if(SUCCEEDED(hr))
 	{
@@ -1250,13 +1250,13 @@ void ShellBrowser::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 			drives toolbar as necessary. */
 		case DBT_DEVICEARRIVAL:
 			{
-				DEV_BROADCAST_HDR *dbh = NULL;
+				DEV_BROADCAST_HDR *dbh = nullptr;
 
 				dbh = (DEV_BROADCAST_HDR *)lParam;
 
 				if(dbh->dbch_devicetype == DBT_DEVTYP_VOLUME)
 				{
-					DEV_BROADCAST_VOLUME	*pdbv = NULL;
+					DEV_BROADCAST_VOLUME	*pdbv = nullptr;
 					TCHAR					chDrive;
 					TCHAR					szDrive[4];
 
@@ -1281,13 +1281,13 @@ void ShellBrowser::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 
 		case DBT_DEVICEREMOVECOMPLETE:
 			{
-				DEV_BROADCAST_HDR				*dbh = NULL;
+				DEV_BROADCAST_HDR				*dbh = nullptr;
 
 				dbh = (DEV_BROADCAST_HDR *)lParam;
 
 				if(dbh->dbch_devicetype == DBT_DEVTYP_VOLUME)
 				{
-					DEV_BROADCAST_VOLUME	*pdbv = NULL;
+					DEV_BROADCAST_VOLUME	*pdbv = nullptr;
 					TCHAR					chDrive;
 					TCHAR					szDrive[4];
 

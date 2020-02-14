@@ -79,7 +79,7 @@ void ShellTreeView::DirectoryAlteredAddFile(const TCHAR *szFullFileName)
 {
 	/* We'll use this as a litmus test to check whether or not
 	the file actually exists. */
-	PIDLIST_ABSOLUTE pidlComplete = NULL;
+	PIDLIST_ABSOLUTE pidlComplete = nullptr;
 	HRESULT hr = SHParseDisplayName(szFullFileName, nullptr, &pidlComplete, 0, nullptr);
 
 	if(SUCCEEDED(hr))
@@ -114,13 +114,13 @@ void ShellTreeView::DirectoryAlteredRemoveFile(const TCHAR *szFullFileName)
 	hDeskParent = LocateItemOnDesktopTree(szParent);  
 	hDeskItem	= LocateItemOnDesktopTree(szFullFileName); 
 
-	if(hDeskItem != NULL)
+	if(hDeskItem != nullptr)
 	{
 		RemoveItem(hDeskItem);
 	}
 
 	hItem = LocateDeletedItem(szFullFileName);
-	if(hItem != NULL)
+	if(hItem != nullptr)
 	{
 		RemoveItem(szFullFileName);
 	}
@@ -131,7 +131,7 @@ void ShellTreeView::DirectoryAlteredRemoveFile(const TCHAR *szFullFileName)
 	UpdateParent(hDeskParent);
 	UpdateParent(szParent);
 
-	if(hDeskItem == NULL && hItem == NULL)
+	if(hDeskItem == nullptr && hItem == nullptr)
 	{
 		/* The file does not currently exist within the treeview.
 		   It should appear in the tracking list however. */
@@ -167,7 +167,7 @@ void ShellTreeView::DirectoryAlteredRenameFile(const TCHAR *szFullFileName)
 		  (i.e. c:\users\'username'\Desktop) */
 	hDeskItem = LocateItemOnDesktopTree(m_szAlteredOldFileName);  
 
-	if(hDeskItem != NULL)
+	if(hDeskItem != nullptr)
 	{
 		// Update root item
 		RenameItem(hDeskItem,szFullFileName);
@@ -176,7 +176,7 @@ void ShellTreeView::DirectoryAlteredRenameFile(const TCHAR *szFullFileName)
 	/* Check if the file currently exists in the treeview. */
 	hItem = LocateItemByPath(m_szAlteredOldFileName,FALSE);
 
-	if(hItem != NULL)
+	if(hItem != nullptr)
 	{
 		RenameItem(hItem,szFullFileName);
 
@@ -185,7 +185,7 @@ void ShellTreeView::DirectoryAlteredRenameFile(const TCHAR *szFullFileName)
 		HTREEITEM hSelection = TreeView_GetSelection(m_hTreeView);
 		HTREEITEM hAncestor = hSelection;
 
-		while(hAncestor != hItem && hAncestor != NULL) 
+		while(hAncestor != hItem && hAncestor != nullptr) 
 		{
 			hAncestor = TreeView_GetParent(m_hTreeView,hAncestor);
 		} 
@@ -200,7 +200,7 @@ void ShellTreeView::DirectoryAlteredRenameFile(const TCHAR *szFullFileName)
 
 			HWND hParent = GetParent(m_hTreeView);
 
-			if(bRes && hParent != NULL)
+			if(bRes && hParent != nullptr)
 			{
 				NMTREEVIEW nmtv;
 
@@ -268,8 +268,8 @@ void ShellTreeView::DirectoryAlteredRenameFile(const TCHAR *szFullFileName)
 
 void ShellTreeView::DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData)
 {
-	DirectoryAltered_t	*pDirectoryAltered = NULL;
-	ShellTreeView		*shellTreeView = NULL;
+	DirectoryAltered_t	*pDirectoryAltered = nullptr;
+	ShellTreeView		*shellTreeView = nullptr;
 	TCHAR				szFullFileName[MAX_PATH];
 
 	pDirectoryAltered = (DirectoryAltered_t *)pData;
@@ -290,7 +290,7 @@ void ShellTreeView::DirectoryModified(DWORD dwAction, const TCHAR *szFullFileNam
 	EnterCriticalSection(&m_cs);
 
 	SetTimer(m_hTreeView,DIRECTORYMODIFIED_TIMER_ID,
-		DIRECTORYMODIFIED_TIMER_ELAPSE,NULL);
+		DIRECTORYMODIFIED_TIMER_ELAPSE, nullptr);
 
 	AlteredFile_t af;
 
@@ -304,14 +304,14 @@ void ShellTreeView::DirectoryModified(DWORD dwAction, const TCHAR *szFullFileNam
 
 void ShellTreeView::AddDrive(const TCHAR *szDrive)
 {
-	PIDLIST_ABSOLUTE pidlMyComputer = NULL;
-	HRESULT hr = SHGetFolderLocation(NULL,CSIDL_DRIVES,NULL,0,&pidlMyComputer);
+	PIDLIST_ABSOLUTE pidlMyComputer = nullptr;
+	HRESULT hr = SHGetFolderLocation(nullptr,CSIDL_DRIVES, nullptr,0,&pidlMyComputer);
 
 	if(hr == S_OK)
 	{
 		HTREEITEM hMyComputer = LocateExistingItem(pidlMyComputer);
 
-		if(hMyComputer != NULL)
+		if(hMyComputer != nullptr)
 		{
 			AddItemInternal(hMyComputer,szDrive);
 		}
@@ -347,12 +347,12 @@ void ShellTreeView::AddItem(const TCHAR *szFullFileName)
 		/* If this items' parent isn't currently shown on the
 		treeview and the item is not on the desktop, exit without
 		doing anything further. */
-		if(hParent == NULL && hDeskParent == NULL)
+		if(hParent == nullptr && hDeskParent == nullptr)
 			return;
 
 		AddItemInternal(hParent,szFullFileName);
 
-		if(hDeskParent != NULL)
+		if(hDeskParent != nullptr)
 		{
 			/* If the item is on the desktop, it is a special
 			case. We need to update the treeview also starting
@@ -364,9 +364,9 @@ void ShellTreeView::AddItem(const TCHAR *szFullFileName)
 
 void ShellTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileName)
 {
-	IShellFolder	*pShellFolder = NULL;
-	PIDLIST_ABSOLUTE	pidlComplete = NULL;
-	PCITEMID_CHILD	pidlRelative = NULL;
+	IShellFolder	*pShellFolder = nullptr;
+	PIDLIST_ABSOLUTE	pidlComplete = nullptr;
+	PCITEMID_CHILD	pidlRelative = nullptr;
 	HTREEITEM		hItem;
 	TVITEMEX		tvItem;
 	TVINSERTSTRUCT	tvis;
@@ -435,7 +435,7 @@ void ShellTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileNam
 					tvItem.lParam			= (LPARAM)iItemId;
 					tvItem.cChildren		= nChildren;
 
-					if(hParent != NULL)
+					if(hParent != nullptr)
 					{
 						tvis.hParent			= hParent;
 						tvis.hInsertAfter		= DetermineItemSortedPosition(hParent,szFullFileName);
@@ -466,7 +466,7 @@ void ShellTreeView::RenameItem(HTREEITEM hItem, const TCHAR *szFullFileName)
 	HRESULT		hr;
 	BOOL		res;
 
-	if(hItem == NULL)
+	if(hItem == nullptr)
 		return;
 
 	tvItem.mask		= TVIF_PARAM;
@@ -505,12 +505,12 @@ void ShellTreeView::UpdateChildren(HTREEITEM hParent, PCIDLIST_ABSOLUTE pidlPare
 {
 	HTREEITEM hChild;
 	TVITEMEX tvItem;
-	PCIDLIST_ABSOLUTE pidl = NULL;
+	PCIDLIST_ABSOLUTE pidl = nullptr;
 	BOOL bRes;
 
 	hChild = TreeView_GetChild(m_hTreeView,hParent);
 
-	if(hChild != NULL)
+	if(hChild != nullptr)
 	{
 		tvItem.mask		= TVIF_PARAM;
 		tvItem.hItem	= hChild;
@@ -522,7 +522,7 @@ void ShellTreeView::UpdateChildren(HTREEITEM hParent, PCIDLIST_ABSOLUTE pidlPare
 
 			UpdateChildren(hChild,pidl);
 
-			while((hChild = TreeView_GetNextItem(m_hTreeView,hChild,TVGN_NEXT)) != NULL)
+			while((hChild = TreeView_GetNextItem(m_hTreeView,hChild,TVGN_NEXT)) != nullptr)
 			{
 				tvItem.mask		= TVIF_PARAM;
 				tvItem.hItem	= hChild;
@@ -553,7 +553,7 @@ void ShellTreeView::RemoveItem(const TCHAR *szFullFileName)
 
 	hItem = LocateDeletedItem(szFullFileName);
 
-	if(hItem != NULL)
+	if(hItem != nullptr)
 	{
 		RemoveItem(hItem);
 	}
@@ -576,7 +576,7 @@ void ShellTreeView::UpdateParent(const TCHAR *szParent)
 
 void ShellTreeView::UpdateParent(HTREEITEM hParent)
 {
-	if(hParent != NULL)
+	if(hParent != nullptr)
 	{
 		TVITEM tvItem;
 		SFGAOF Attributes = SFGAO_HASSUBFOLDER;

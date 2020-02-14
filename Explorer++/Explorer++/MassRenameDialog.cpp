@@ -52,13 +52,13 @@ INT_PTR MassRenameDialog::OnInitDialog()
 
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MASSRENAME_FILELISTVIEW);
 
-	SetWindowTheme(hListView,L"Explorer",NULL);
+	SetWindowTheme(hListView,L"Explorer", nullptr);
 	ListView_SetExtendedListViewStyleEx(hListView,
 		LVS_EX_DOUBLEBUFFER|LVS_EX_SUBITEMIMAGES|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES,
 		LVS_EX_DOUBLEBUFFER|LVS_EX_SUBITEMIMAGES|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES);
 
 	HIMAGELIST himlSmall;
-	Shell_GetImageLists(NULL,&himlSmall);
+	Shell_GetImageLists(nullptr,&himlSmall);
 	ListView_SetImageList(hListView,himlSmall,LVSIL_SMALL);
 
 	LVCOLUMN lvCol;
@@ -217,7 +217,7 @@ INT_PTR MassRenameDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 				GetWindowRect(GetDlgItem(m_hDlg,IDC_MASSRENAME_MORE),&rc);
 
 				UINT uCmd = TrackPopupMenu(hMenu,TPM_LEFTALIGN|TPM_VERTICAL|TPM_RETURNCMD,
-					rc.right,rc.top,0,m_hDlg,NULL);
+					rc.right,rc.top,0,m_hDlg, nullptr);
 
 				switch(uCmd)
 				{

@@ -29,7 +29,7 @@ void Explorerplusplus::OnCreate()
 {
 	InitializeMainToolbars();
 
-	ILoadSave *pLoadSave = NULL;
+	ILoadSave *pLoadSave = nullptr;
 	LoadAllSettings(&pLoadSave);
 	ApplyToolbarSettings();
 
@@ -72,7 +72,7 @@ void Explorerplusplus::OnCreate()
 	// been created.
 	SHChangeNotifyEntry shcne;
 	shcne.fRecursive = TRUE;
-	shcne.pidl = NULL;
+	shcne.pidl = nullptr;
 	m_SHChangeNotifyID = SHChangeNotifyRegister(m_hContainer, SHCNRF_ShellLevel,
 		SHCNE_ASSOCCHANGED, WM_APP_ASSOCCHANGED, 1, &shcne);
 
@@ -99,7 +99,7 @@ void Explorerplusplus::InitializeDisplayWindow()
 	InitialSettings.SurroundColor	= m_config->displayWindowSurroundColor;
 	InitialSettings.TextColor		= m_config->displayWindowTextColor;
 	InitialSettings.hFont			= m_config->displayWindowFont;
-	InitialSettings.hIcon			= (HICON)LoadImage(GetModuleHandle(0),
+	InitialSettings.hIcon			= (HICON)LoadImage(GetModuleHandle(nullptr),
 		MAKEINTRESOURCE(IDI_DISPLAYWINDOW),IMAGE_ICON,
 		0,0,LR_CREATEDIBSECTION);
 

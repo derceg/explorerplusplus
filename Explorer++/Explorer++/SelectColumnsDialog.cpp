@@ -29,7 +29,7 @@ SelectColumnsDialog::SelectColumnsDialog(HINSTANCE hInstance, HWND hParent,
 INT_PTR SelectColumnsDialog::OnInitDialog()
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_COLUMNS_LISTVIEW);
-	SetWindowTheme(hListView,L"Explorer",NULL);
+	SetWindowTheme(hListView,L"Explorer", nullptr);
 
 	ListView_SetExtendedListViewStyleEx(hListView,
 		LVS_EX_CHECKBOXES,LVS_EX_CHECKBOXES);

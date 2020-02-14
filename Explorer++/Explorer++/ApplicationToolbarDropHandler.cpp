@@ -12,7 +12,7 @@ m_RefCount(1),
 m_toolbar(toolbar),
 m_hToolbar(hToolbar)
 {
-	HRESULT hr = CoCreateInstance(CLSID_DragDropHelper, NULL, CLSCTX_INPROC_SERVER,
+	HRESULT hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_INPROC_SERVER,
 		IID_PPV_ARGS(&m_pDragSourceHelper));
 
 	if(SUCCEEDED(hr))
@@ -23,12 +23,12 @@ m_hToolbar(hToolbar)
 
 HRESULT __stdcall ApplicationToolbarDropHandler::QueryInterface(REFIID iid, void **ppvObject)
 {
-	if(ppvObject == NULL)
+	if(ppvObject == nullptr)
 	{
 		return E_POINTER;
 	}
 
-	*ppvObject = NULL;
+	*ppvObject = nullptr;
 
 	if(iid == IID_IUnknown)
 	{
@@ -111,7 +111,7 @@ HRESULT _stdcall ApplicationToolbarDropHandler::DragLeave(void)
 
 FORMATETC ApplicationToolbarDropHandler::GetSupportedDropFormat()
 {
-	FORMATETC ftc = {CF_HDROP, 0, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+	FORMATETC ftc = {CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
 	return ftc;
 }
 
@@ -130,7 +130,7 @@ HRESULT _stdcall ApplicationToolbarDropHandler::Drop(IDataObject *pDataObject,
 
 		DROPFILES *df = reinterpret_cast<DROPFILES *>(GlobalLock(stg.hGlobal));
 
-		if(df != NULL)
+		if(df != nullptr)
 		{
 			POINT pt;
 			pt.x = ptl.x;
@@ -163,7 +163,7 @@ HRESULT _stdcall ApplicationToolbarDropHandler::Drop(IDataObject *pDataObject,
 
 void ApplicationToolbarDropHandler::OpenExistingButton(DROPFILES *df, int buttonIndex)
 {
-	int numFiles = DragQueryFile(reinterpret_cast<HDROP>(df), 0xFFFFFFFF, NULL, NULL);
+	int numFiles = DragQueryFile(reinterpret_cast<HDROP>(df), 0xFFFFFFFF, nullptr, NULL);
 
 	std::wstring parameters;
 
@@ -187,7 +187,7 @@ void ApplicationToolbarDropHandler::OpenExistingButton(DROPFILES *df, int button
 
 void ApplicationToolbarDropHandler::AddNewButton(DROPFILES *df)
 {
-	int numFiles = DragQueryFile(reinterpret_cast<HDROP>(df), 0xFFFFFFFF, NULL, NULL);
+	int numFiles = DragQueryFile(reinterpret_cast<HDROP>(df), 0xFFFFFFFF, nullptr, NULL);
 
 	for(int i = 0; i < numFiles; i++)
 	{

@@ -83,7 +83,7 @@ void DisplayWindow::PatchBackground(HDC hdc,RECT *rc,RECT *UpdateRect)
 
 	PaintText(hdcMem,m_LeftIndent);
 	DrawIconEx(hdcMem,MAIN_ICON_LEFT,MAIN_ICON_TOP,m_hMainIcon,
-		MAIN_ICON_WIDTH,MAIN_ICON_HEIGHT,NULL,NULL,DI_NORMAL);
+		MAIN_ICON_WIDTH,MAIN_ICON_HEIGHT,NULL, nullptr,DI_NORMAL);
 
 	if(m_bShowThumbnail)
 	{
@@ -126,11 +126,11 @@ void DisplayWindow::DrawThumbnail(HDC hdcMem)
 
 DWORD WINAPI Thread_ExtractThumbnailImage(LPVOID lpParameter)
 {
-	DisplayWindow *pdw = NULL;
+	DisplayWindow *pdw = nullptr;
 
 	pdw = (DisplayWindow *)((ThumbnailEntry_t *)lpParameter)->pdw;
 
-	CoInitializeEx(0,COINIT_APARTMENTTHREADED);
+	CoInitializeEx(nullptr,COINIT_APARTMENTTHREADED);
 
 	SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_BELOW_NORMAL);
 
@@ -152,18 +152,18 @@ void DisplayWindow::ExtractThumbnailImage(void)
 	te.bCancelled	= FALSE;
 	g_ThumbnailEntries.push_back(te);
 
-	HANDLE hThread = CreateThread(NULL,0,Thread_ExtractThumbnailImage,
-		(LPVOID)&g_ThumbnailEntries.back(),0,NULL);
+	HANDLE hThread = CreateThread(nullptr,0,Thread_ExtractThumbnailImage,
+		(LPVOID)&g_ThumbnailEntries.back(),0, nullptr);
 	CloseHandle(hThread);
 }
 
 void DisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 {
-	IExtractImage *pExtractImage = NULL;
-	IShellFolder *pShellFolder = NULL;
-	LPITEMIDLIST pidlParent = NULL;
-	LPITEMIDLIST pidlFull = NULL;
-	LPITEMIDLIST pridl = NULL;
+	IExtractImage *pExtractImage = nullptr;
+	IShellFolder *pShellFolder = nullptr;
+	LPITEMIDLIST pidlParent = nullptr;
+	LPITEMIDLIST pidlFull = nullptr;
+	LPITEMIDLIST pridl = nullptr;
 	HBITMAP hBitmap;
 	BITMAP bm;
 	RECT rc;
@@ -189,7 +189,7 @@ void DisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 
 		if(SUCCEEDED(hr))
 		{
-			hr = GetUIObjectOf(pShellFolder, NULL, 1, (LPCITEMIDLIST *) &pridl,
+			hr = GetUIObjectOf(pShellFolder, nullptr, 1, (LPCITEMIDLIST *) &pridl,
 				IID_PPV_ARGS(&pExtractImage));
 
 			if(SUCCEEDED(hr))
@@ -239,7 +239,7 @@ void DisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 							if(!pte->bCancelled)
 							{
 								m_bThumbnailExtractionFailed = FALSE;
-								InvalidateRect(m_hDisplayWindow,NULL,FALSE);
+								InvalidateRect(m_hDisplayWindow, nullptr,FALSE);
 							}
 
 							LeaveCriticalSection(&m_csDWThumbnails);
@@ -247,7 +247,7 @@ void DisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 						else
 						{
 							m_bThumbnailExtractionFailed = TRUE;
-							m_hbmThumbnail = NULL;
+							m_hbmThumbnail = nullptr;
 						}
 					}
 				}
@@ -354,7 +354,7 @@ LONG DisplayWindow::OnMouseMove(LPARAM lParam)
 
 	if(CursorPos.y <= (rc.top + 5))
 	{
-		SetCursor(LoadCursor(NULL,IDC_SIZENS));
+		SetCursor(LoadCursor(nullptr,IDC_SIZENS));
 	}
 
 	/* If there is a thumbnail preview
@@ -371,7 +371,7 @@ LONG DisplayWindow::OnMouseMove(LPARAM lParam)
 
 		if(PtInRect(&rcThumbnail,CursorPos))
 		{
-			SetCursor(LoadCursor(NULL,IDC_HAND));
+			SetCursor(LoadCursor(nullptr,IDC_HAND));
 		}
 	}
 
@@ -390,7 +390,7 @@ void DisplayWindow::OnLButtonDown(LPARAM lParam)
 
 	if(CursorPos.y <= (rc.top + 5))
 	{
-		SetCursor(LoadCursor(NULL,IDC_SIZENS));
+		SetCursor(LoadCursor(nullptr,IDC_SIZENS));
 		m_bSizing = TRUE;
 		SetFocus(m_hDisplayWindow);
 		SetCapture(m_hDisplayWindow);
@@ -410,9 +410,9 @@ void DisplayWindow::OnLButtonDown(LPARAM lParam)
 		if(PtInRect(&rcThumbnail,CursorPos))
 		{
 			/* TODO: Parent should be notified. */
-			SetCursor(LoadCursor(NULL,IDC_HAND));
+			SetCursor(LoadCursor(nullptr,IDC_HAND));
 			ShellExecute(m_hDisplayWindow,_T("open"),
-			m_ImageFile,NULL,NULL,SW_SHOW);
+			m_ImageFile, nullptr, nullptr,SW_SHOW);
 		}
 	}
 }
@@ -486,19 +486,19 @@ void DisplayWindow::OnSize(int width, int height)
 
 	ReleaseDC(m_hDisplayWindow,hdc);
 
-	RedrawWindow(m_hDisplayWindow,NULL,NULL,RDW_INVALIDATE);
+	RedrawWindow(m_hDisplayWindow, nullptr, nullptr,RDW_INVALIDATE);
 }
 
 void DisplayWindow::OnSetFont(HFONT hFont)
 {
 	m_hDisplayFont = hFont;
 
-	RedrawWindow(m_hDisplayWindow,NULL,NULL,RDW_INVALIDATE);
+	RedrawWindow(m_hDisplayWindow, nullptr, nullptr,RDW_INVALIDATE);
 }
 
 void DisplayWindow::OnSetTextColor(COLORREF hColor)
 {
 	m_TextColor = hColor;
 
-	RedrawWindow(m_hDisplayWindow,NULL,NULL,RDW_INVALIDATE);
+	RedrawWindow(m_hDisplayWindow, nullptr, nullptr,RDW_INVALIDATE);
 }

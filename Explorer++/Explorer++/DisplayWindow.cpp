@@ -40,7 +40,7 @@ void Explorerplusplus::UpdateDisplayWindowForZeroFiles(const Tab &tab)
 	auto pidlDirectory = tab.GetShellBrowser()->GetDirectoryIdl();
 
 	unique_pidl_absolute pidlComputer;
-	SHGetFolderLocation(NULL, CSIDL_DRIVES, NULL, 0, wil::out_param(pidlComputer));
+	SHGetFolderLocation(nullptr, CSIDL_DRIVES, nullptr, 0, wil::out_param(pidlComputer));
 
 	if (CompareIdls(pidlDirectory.get(), pidlComputer.get()))
 	{
@@ -122,8 +122,8 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 			if (((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
 				FILE_ATTRIBUTE_DIRECTORY) && m_config->globalFolderSettings.showFolderSizes)
 			{
-				FolderSize_t	*pfs = NULL;
-				FolderSizeExtraInfo_t	*pfsei = NULL;
+				FolderSize_t	*pfs = nullptr;
+				FolderSizeExtraInfo_t	*pfsei = nullptr;
 				DWFolderSize_t	DWFolderSize;
 				TCHAR			szDisplayText[256];
 				TCHAR			szTotalSize[64];
@@ -132,11 +132,11 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 
 				pfs = (FolderSize_t *)malloc(sizeof(FolderSize_t));
 
-				if (pfs != NULL)
+				if (pfs != nullptr)
 				{
 					pfsei = (FolderSizeExtraInfo_t *)malloc(sizeof(FolderSizeExtraInfo_t));
 
-					if (pfsei != NULL)
+					if (pfsei != nullptr)
 					{
 						pfsei->pContainer = (void *)this;
 						pfsei->uId = m_iDWFolderSizeUniqueId;
@@ -160,7 +160,7 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 						DWFolderSize.bValid = TRUE;
 						m_DWFolderSizes.push_back(DWFolderSize);
 
-						HANDLE hThread = CreateThread(NULL, 0, Thread_CalculateFolderSize, (LPVOID)pfs, 0, &ThreadId);
+						HANDLE hThread = CreateThread(nullptr, 0, Thread_CalculateFolderSize, (LPVOID)pfs, 0, &ThreadId);
 						CloseHandle(hThread);
 
 						m_iDWFolderSizeUniqueId++;
@@ -199,7 +199,7 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 				TCHAR szTemp[64];
 				UINT uWidth;
 				UINT uHeight;
-				Gdiplus::Image *pimg = NULL;
+				Gdiplus::Image *pimg = nullptr;
 
 				pimg = new Gdiplus::Image(szFullItemName, FALSE);
 
@@ -317,7 +317,7 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 				TCHAR szTemp[64];
 				ULARGE_INTEGER ulTotalNumberOfBytes;
 				ULARGE_INTEGER ulTotalNumberOfFreeBytes;
-				BOOL bRet = GetDiskFreeSpaceEx(szFullItemName, NULL, &ulTotalNumberOfBytes, &ulTotalNumberOfFreeBytes);
+				BOOL bRet = GetDiskFreeSpaceEx(szFullItemName, nullptr, &ulTotalNumberOfBytes, &ulTotalNumberOfFreeBytes);
 
 				if (bRet)
 				{
@@ -334,7 +334,7 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 				}
 
 				TCHAR szFileSystem[MAX_PATH + 1];
-				bRet = GetVolumeInformation(szFullItemName, NULL, 0, NULL, NULL, NULL, szFileSystem, SIZEOF_ARRAY(szFileSystem));
+				bRet = GetVolumeInformation(szFullItemName, nullptr, 0, nullptr, nullptr, nullptr, szFileSystem, SIZEOF_ARRAY(szFileSystem));
 
 				if (bRet)
 				{

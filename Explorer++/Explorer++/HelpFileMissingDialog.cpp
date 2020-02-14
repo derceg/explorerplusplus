@@ -50,8 +50,8 @@ INT_PTR HelpFileMissingDialog::OnNotify(NMHDR *pnmhdr)
 				pnmhdr->hwndFrom == GetDlgItem(m_hDlg, IDC_SYSLINK_READTHEDOCS))
 			{
 				PNMLINK pnmlink = reinterpret_cast<PNMLINK>(pnmhdr);
-				ShellExecute(NULL,L"open",pnmlink->item.szUrl,
-					NULL,NULL,SW_SHOW);
+				ShellExecute(nullptr,L"open",pnmlink->item.szUrl,
+					nullptr, nullptr,SW_SHOW);
 			}
 		}
 		break;

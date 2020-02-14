@@ -23,7 +23,7 @@ void ShellBrowser::SetupThumbnailsView(void)
 
 	nItems = ListView_GetItemCount(m_hListView);
 
-	IImageList *pImageList = NULL;
+	IImageList *pImageList = nullptr;
 
 	/* Need to get the normal (32x32) image list for thumbnails, so that
 	the regular size icon is shown for items with a thumbnail that hasn't
@@ -121,7 +121,7 @@ boost::optional<ShellBrowser::ThumbnailResult_t> ShellBrowser::FindThumbnailAsyn
 
 	IExtractImage *pExtractImage = nullptr;
 	auto pridl = basicItemInfo.pridl.get();
-	hr = GetUIObjectOf(pShellFolder, NULL, 1, const_cast<PCUITEMID_CHILD *>(&pridl), IID_PPV_ARGS(&pExtractImage));
+	hr = GetUIObjectOf(pShellFolder, nullptr, 1, const_cast<PCUITEMID_CHILD *>(&pridl), IID_PPV_ARGS(&pExtractImage));
 
 	if (FAILED(hr))
 	{
@@ -209,7 +209,7 @@ void ShellBrowser::ProcessThumbnailResult(int thumbnailResultId)
 int ShellBrowser::GetIconThumbnail(int iInternalIndex) const
 {
 	return GetThumbnailInternal(THUMBNAIL_TYPE_ICON,iInternalIndex,
-		NULL);
+		nullptr);
 }
 
 /* Draws an items extracted thumbnail. */
@@ -258,7 +258,7 @@ int iInternalIndex,HBITMAP hThumbnailBitmap) const
 
 	/* Add the new bitmap to the imagelist. */
 	himl = ListView_GetImageList(m_hListView,LVSIL_NORMAL);
-	iImage = ImageList_Add(himl,hBackingBitmap,NULL);
+	iImage = ImageList_Add(himl,hBackingBitmap, nullptr);
 
 	/* Now delete the backing bitmap. */
 	DeleteObject(hBackingBitmap);
@@ -282,7 +282,7 @@ void ShellBrowser::DrawIconThumbnailInternal(HDC hdcBacking,int iInternalIndex) 
 
 	DrawIconEx(hdcBacking,(THUMBNAIL_ITEM_WIDTH - iIconWidth) / 2,
 		(THUMBNAIL_ITEM_HEIGHT - iIconHeight) / 2,hIcon,0,0,
-		NULL,NULL,DI_NORMAL);
+		NULL, nullptr,DI_NORMAL);
 	DestroyIcon(hIcon);
 }
 

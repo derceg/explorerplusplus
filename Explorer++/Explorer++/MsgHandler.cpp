@@ -60,8 +60,8 @@ BOOL TestConfigFileInternal(void)
 	PathRemoveFileSpec(szConfigFile);
 	PathAppend(szConfigFile,NExplorerplusplus::XML_FILENAME);
 
-	hConfigFile = CreateFile(szConfigFile,GENERIC_READ,FILE_SHARE_READ,NULL,
-		OPEN_EXISTING,0,NULL);
+	hConfigFile = CreateFile(szConfigFile,GENERIC_READ,FILE_SHARE_READ, nullptr,
+		OPEN_EXISTING,0, nullptr);
 
 	if(hConfigFile != INVALID_HANDLE_VALUE)
 	{
@@ -125,7 +125,7 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, 
 	BOOL bControlPanelParent = FALSE;
 
 	unique_pidl_absolute pidlControlPanel;
-	HRESULT hr = SHGetFolderLocation(NULL,CSIDL_CONTROLS,NULL,0,wil::out_param(pidlControlPanel));
+	HRESULT hr = SHGetFolderLocation(nullptr,CSIDL_CONTROLS, nullptr,0,wil::out_param(pidlControlPanel));
 
 	if(SUCCEEDED(hr))
 	{
@@ -270,7 +270,7 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, 
 			2. Non-folder items can be opened directly (regardless of
 			whether or not they're children of the control panel). */
 			ShellExecute(m_hContainer,_T("open"),szExplorerPath,
-				szParsingPath,NULL,SW_SHOWNORMAL);
+				szParsingPath, nullptr,SW_SHOWNORMAL);
 		}
 		else
 		{
@@ -389,7 +389,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	SetWindowPos(m_hTabBacking,m_hDisplayWindow,iTabBackingLeft,
 		iTabTop,iTabBackingWidth,tabWindowHeight,uFlags);
 
-	SetWindowPos(m_tabContainer->GetHWND(),NULL,0,0,iTabBackingWidth - 25,
+	SetWindowPos(m_tabContainer->GetHWND(), nullptr,0,0,iTabBackingWidth - 25,
 		tabWindowHeight,SWP_SHOWWINDOW|SWP_NOZORDER);
 
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hContainer);
@@ -400,7 +400,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	int scaledCloseToolbarXOffset = MulDiv(CLOSE_TOOLBAR_X_OFFSET, dpi, USER_DEFAULT_SCREEN_DPI);
 	int scaledCloseToolbarYOffset = MulDiv(CLOSE_TOOLBAR_Y_OFFSET, dpi, USER_DEFAULT_SCREEN_DPI);
 
-	SetWindowPos(m_hTabWindowToolbar, NULL, iTabBackingWidth - scaledCloseToolbarWidth - scaledCloseToolbarXOffset,
+	SetWindowPos(m_hTabWindowToolbar, nullptr, iTabBackingWidth - scaledCloseToolbarWidth - scaledCloseToolbarXOffset,
 		scaledCloseToolbarYOffset, scaledCloseToolbarWidth, scaledCloseToolbarHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
 
 	if(m_config->extendTabControl &&
@@ -428,22 +428,22 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	iHolderWidth = m_config->treeViewWidth;
 
-	SetWindowPos(m_hHolder,NULL,0,iHolderTop,
+	SetWindowPos(m_hHolder, nullptr,0,iHolderTop,
 		iHolderWidth,iHolderHeight,SWP_NOZORDER);
 
 	/* The treeview is only slightly smaller than the holder
 	window, in both the x and y-directions. */
-	SetWindowPos(m_hTreeView,NULL,TREEVIEW_X_CLEARANCE,tabWindowHeight,
+	SetWindowPos(m_hTreeView, nullptr,TREEVIEW_X_CLEARANCE,tabWindowHeight,
 		iHolderWidth - TREEVIEW_HOLDER_CLEARANCE - TREEVIEW_X_CLEARANCE,
 		iHolderHeight - tabWindowHeight,SWP_NOZORDER);
 
-	SetWindowPos(m_hFoldersToolbar, NULL, iHolderWidth - scaledCloseToolbarWidth - scaledCloseToolbarXOffset,
+	SetWindowPos(m_hFoldersToolbar, nullptr, iHolderWidth - scaledCloseToolbarWidth - scaledCloseToolbarXOffset,
 		scaledCloseToolbarYOffset, scaledCloseToolbarWidth, scaledCloseToolbarHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
 
 
 	/* <---- Display window ----> */
 
-	SetWindowPos(m_hDisplayWindow,NULL,0,MainWindowHeight - IndentBottom,
+	SetWindowPos(m_hDisplayWindow, nullptr,0,MainWindowHeight - IndentBottom,
 		MainWindowWidth, m_config->displayWindowHeight,SWP_SHOWWINDOW|SWP_NOZORDER);
 
 
@@ -460,7 +460,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 		if(!m_config->showTabBarAtBottom)
 		{
-			SetWindowPos(tab->GetShellBrowser()->GetListView(),NULL,IndentLeft,IndentTop,
+			SetWindowPos(tab->GetShellBrowser()->GetListView(), nullptr,IndentLeft,IndentTop,
 				MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop,
 				uFlags);
 		}
@@ -468,13 +468,13 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 		{
 			if(m_bShowTabBar)
 			{
-				SetWindowPos(tab->GetShellBrowser()->GetListView(),NULL,IndentLeft,IndentTop,
+				SetWindowPos(tab->GetShellBrowser()->GetListView(), nullptr,IndentLeft,IndentTop,
 					MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop - tabWindowHeight,
 					uFlags);
 			}
 			else
 			{
-				SetWindowPos(tab->GetShellBrowser()->GetListView(),NULL,IndentLeft,IndentTop,
+				SetWindowPos(tab->GetShellBrowser()->GetListView(), nullptr,IndentLeft,IndentTop,
 					MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop,
 					uFlags);
 			}
@@ -508,7 +508,7 @@ void Explorerplusplus::OnDpiChanged(const RECT *updatedWindowRect)
 
 int Explorerplusplus::OnDestroy()
 {
-	if(m_pClipboardDataObject != NULL)
+	if(m_pClipboardDataObject != nullptr)
 	{
 		if(OleIsCurrentClipboard(m_pClipboardDataObject) == S_OK)
 		{
@@ -577,7 +577,7 @@ void Explorerplusplus::OnSetFocus()
  */
 void Explorerplusplus::OnDrawClipboard()
 {
-	if(m_pClipboardDataObject != NULL)
+	if(m_pClipboardDataObject != nullptr)
 	{
 		if(OleIsCurrentClipboard(m_pClipboardDataObject) == S_FALSE)
 		{
@@ -605,7 +605,7 @@ void Explorerplusplus::OnDrawClipboard()
 			m_CutFileNameList.clear();
 
 			/* Deghost any cut treeview items. */
-			if(m_hCutTreeViewItem != NULL)
+			if(m_hCutTreeViewItem != nullptr)
 			{
 				TVITEM tvItem;
 
@@ -615,17 +615,17 @@ void Explorerplusplus::OnDrawClipboard()
 				tvItem.stateMask	= TVIS_CUT;
 				TreeView_SetItem(m_hTreeView,&tvItem);
 
-				m_hCutTreeViewItem = NULL;
+				m_hCutTreeViewItem = nullptr;
 			}
 
 			m_pClipboardDataObject->Release();
-			m_pClipboardDataObject = NULL;
+			m_pClipboardDataObject = nullptr;
 		}
 	}
 
 	SendMessage(m_mainToolbar->GetHWND(), TB_ENABLEBUTTON, ToolbarButton::Paste, CanPaste());
 
-	if(m_hNextClipboardViewer != NULL)
+	if(m_hNextClipboardViewer != nullptr)
 	{
 		/* Forward the message to the next window in the chain. */
 		SendMessage(m_hNextClipboardViewer, WM_DRAWCLIPBOARD, 0, 0);
@@ -640,13 +640,13 @@ void Explorerplusplus::OnChangeCBChain(WPARAM wParam,LPARAM lParam)
 {
 	if((HWND)wParam == m_hNextClipboardViewer)
 		m_hNextClipboardViewer = (HWND)lParam;
-	else if(m_hNextClipboardViewer != NULL)
+	else if(m_hNextClipboardViewer != nullptr)
 		SendMessage(m_hNextClipboardViewer,WM_CHANGECBCHAIN,wParam,lParam);
 }
 
 void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 {
-	DirectoryAltered_t	*pDirectoryAltered = NULL;
+	DirectoryAltered_t	*pDirectoryAltered = nullptr;
 	int					iDirMonitorId;
 
 	Tab &tab = m_tabContainer->GetTab(iTabId);
@@ -1139,7 +1139,7 @@ void Explorerplusplus::OnIdaRClick()
 
 		ptOrigin.y += (rcItem.bottom - rcItem.top) / 2;
 
-		if(hSelection != NULL)
+		if(hSelection != nullptr)
 		{
 			OnTreeViewRightClick((WPARAM)hSelection,(LPARAM)&ptOrigin);
 		}
@@ -1193,13 +1193,13 @@ void Explorerplusplus::OnAssocChanged()
 		StringCchPrintf(szTemp,SIZEOF_ARRAY(szTemp),_T("%d"),dwShellIconSize + 1);
 		NRegistrySettings::SaveStringToRegistry(hKey,_T("Shell Icon Size"),szTemp);
 
-		if(FileIconInit != NULL)
+		if(FileIconInit != nullptr)
 			FileIconInit(TRUE);
 
 		/* Now, set it back to the original value. */
 		NRegistrySettings::SaveStringToRegistry(hKey,_T("Shell Icon Size"),szShellIconSize);
 
-		if(FileIconInit != NULL)
+		if(FileIconInit != nullptr)
 			FileIconInit(FALSE);
 
 		RegCloseKey(hKey);
@@ -1272,11 +1272,11 @@ void Explorerplusplus::OnNdwRClick(POINT *pt)
 {
 	HMENU hMenu = LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_DISPLAYWINDOW_RCLICK));
 
-	if(hMenu != NULL)
+	if(hMenu != nullptr)
 	{
 		HMENU hPopupMenu = GetSubMenu(hMenu, 0);
 
-		if(hPopupMenu != NULL)
+		if(hPopupMenu != nullptr)
 		{
 			POINT ptCopy = *pt;
 			BOOL bRes = ClientToScreen(m_hDisplayWindow, &ptCopy);
@@ -1284,7 +1284,7 @@ void Explorerplusplus::OnNdwRClick(POINT *pt)
 			if(bRes)
 			{
 				TrackPopupMenu(hPopupMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL,
-					ptCopy.x, ptCopy.y, 0, m_hContainer, NULL);
+					ptCopy.x, ptCopy.y, 0, m_hContainer, nullptr);
 			}
 		}
 
@@ -1294,8 +1294,8 @@ void Explorerplusplus::OnNdwRClick(POINT *pt)
 
 LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)
 {
-	NMLVCUSTOMDRAW *pnmlvcd = NULL;
-	NMCUSTOMDRAW *pnmcd = NULL;
+	NMLVCUSTOMDRAW *pnmlvcd = nullptr;
+	NMCUSTOMDRAW *pnmcd = nullptr;
 
 	pnmlvcd = (NMLVCUSTOMDRAW *)lParam;
 
@@ -1407,7 +1407,7 @@ void Explorerplusplus::SaveAllSettings()
 {
 	m_iLastSelectedTab = m_tabContainer->GetSelectedTabIndex();
 
-	ILoadSave *pLoadSave = NULL;
+	ILoadSave *pLoadSave = nullptr;
 
 	if(m_bSavePreferencesToXMLFile)
 		pLoadSave = new LoadSaveXML(this,FALSE);

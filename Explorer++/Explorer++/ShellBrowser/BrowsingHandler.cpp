@@ -15,10 +15,10 @@
 
 HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)
 {
-	SetCursor(LoadCursor(NULL, IDC_WAIT));
+	SetCursor(LoadCursor(nullptr, IDC_WAIT));
 
 	auto resetCursor = wil::scope_exit([] {
-		SetCursor(LoadCursor(NULL, IDC_ARROW));
+		SetCursor(LoadCursor(nullptr, IDC_ARROW));
 	});
 
 	if(m_bFolderVisited)
@@ -513,7 +513,7 @@ void ShellBrowser::PlayNavigationSound() const
 {
 	if (m_config->playNavigationSound)
 	{
-		PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART), NULL,
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART), nullptr,
 			SND_RESOURCE | SND_ASYNC);
 	}
 }

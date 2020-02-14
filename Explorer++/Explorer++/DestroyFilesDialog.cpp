@@ -29,16 +29,16 @@ DestroyFilesDialog::DestroyFilesDialog(HINSTANCE hInstance,
 
 INT_PTR DestroyFilesDialog::OnInitDialog()
 {
-	m_icon.reset(LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN)));
+	m_icon.reset(LoadIcon(GetModuleHandle(nullptr),MAKEINTRESOURCE(IDI_MAIN)));
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
 
 	HWND hListView = GetDlgItem(m_hDlg,IDC_DESTROYFILES_LISTVIEW);
 
 	HIMAGELIST himlSmall;
-	Shell_GetImageLists(NULL,&himlSmall);
+	Shell_GetImageLists(nullptr,&himlSmall);
 	ListView_SetImageList(hListView,himlSmall,LVSIL_SMALL);
 
-	SetWindowTheme(hListView,L"Explorer",NULL);
+	SetWindowTheme(hListView,L"Explorer", nullptr);
 
 	ListView_SetExtendedListViewStyleEx(hListView,
 		LVS_EX_DOUBLEBUFFER|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES,

@@ -70,7 +70,7 @@ namespace
 		DWORD dwIndex = 0;
 		DWORD dwKeyLength = SIZEOF_ARRAY(szKeyName);
 
-		while(RegEnumKeyEx(hKey,dwIndex++,szKeyName,&dwKeyLength,NULL,NULL,NULL,NULL) == ERROR_SUCCESS)
+		while(RegEnumKeyEx(hKey,dwIndex++,szKeyName,&dwKeyLength, nullptr, nullptr, nullptr, nullptr) == ERROR_SUCCESS)
 		{
 			HKEY hKeyChild;
 			LONG Res = RegOpenKeyEx(hKey,szKeyName,0,KEY_READ,&hKeyChild);
@@ -90,7 +90,7 @@ namespace
 
 				DWORD dwType = REG_BINARY;
 				DWORD dwSize = sizeof(ColorRule.rgbColour);
-				RegQueryValueEx(hKeyChild,_T("Color"),0,&dwType,reinterpret_cast<LPBYTE>(&ColorRule.rgbColour),&dwSize);
+				RegQueryValueEx(hKeyChild,_T("Color"),nullptr,&dwType,reinterpret_cast<LPBYTE>(&ColorRule.rgbColour),&dwSize);
 
 				if(lDescriptionStatus == ERROR_SUCCESS && lFilenamePatternStatus == ERROR_SUCCESS)
 				{
@@ -111,7 +111,7 @@ void NColorRuleHelper::SaveColorRulesToRegistry(const std::vector<NColorRuleHelp
 
 	HKEY hKey;
 	LONG lRes = RegCreateKeyEx(HKEY_CURRENT_USER,REG_COLORS_KEY,
-		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,NULL);
+		0, nullptr,REG_OPTION_NON_VOLATILE,KEY_WRITE, nullptr,&hKey, nullptr);
 
 	if(lRes == ERROR_SUCCESS)
 	{
@@ -135,7 +135,7 @@ namespace
 		_itow_s(iCount,szKeyName,SIZEOF_ARRAY(szKeyName),10);
 
 		HKEY hKeyChild;
-		LONG Res = RegCreateKeyEx(hKey,szKeyName,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKeyChild,NULL);
+		LONG Res = RegCreateKeyEx(hKey,szKeyName,0, nullptr,REG_OPTION_NON_VOLATILE,KEY_WRITE, nullptr,&hKeyChild, nullptr);
 
 		if(Res == ERROR_SUCCESS)
 		{
@@ -153,8 +153,8 @@ namespace
 void NColorRuleHelper::LoadColorRulesFromXML(IXMLDOMDocument *pXMLDom,
 	std::vector<NColorRuleHelper::ColorRule_t> &ColorRules)
 {
-	IXMLDOMNode *pNode = NULL;
-	BSTR bstr = NULL;
+	IXMLDOMNode *pNode = nullptr;
+	BSTR bstr = nullptr;
 
 	if(!pXMLDom)
 		goto clean;
@@ -179,9 +179,9 @@ namespace
 {
 	void LoadColorRulesFromXMLInternal(IXMLDOMNode *pNode,std::vector<NColorRuleHelper::ColorRule_t> &ColorRules)
 	{
-		IXMLDOMNamedNodeMap *am = NULL;
-		IXMLDOMNode *pAttributeNode = NULL;
-		IXMLDOMNode *pNextSibling = NULL;
+		IXMLDOMNamedNodeMap *am = nullptr;
+		IXMLDOMNode *pAttributeNode = nullptr;
+		IXMLDOMNode *pNextSibling = nullptr;
 		NColorRuleHelper::ColorRule_t ColorRule;
 		BOOL bDescriptionFound = FALSE;
 		BOOL bFilenamePatternFound = FALSE;
@@ -267,7 +267,7 @@ namespace
 void NColorRuleHelper::SaveColorRulesToXML(IXMLDOMDocument *pXMLDom,
 IXMLDOMElement *pRoot,const std::vector<NColorRuleHelper::ColorRule_t> &ColorRules)
 {
-	IXMLDOMElement *pe = NULL;
+	IXMLDOMElement *pe = nullptr;
 	BSTR bstr_wsnt = SysAllocString(L"\n\t");
 	BSTR bstr;
 
@@ -286,7 +286,7 @@ IXMLDOMElement *pRoot,const std::vector<NColorRuleHelper::ColorRule_t> &ColorRul
 
 	NXMLSettings::AppendChildToParent(pe, pRoot);
 	pe->Release();
-	pe = NULL;
+	pe = nullptr;
 
 	SysFreeString(bstr_wsnt);
 }
@@ -296,7 +296,7 @@ namespace
 	void SaveColorRulesToXMLInternal(IXMLDOMDocument *pXMLDom,
 		IXMLDOMElement *pe,const NColorRuleHelper::ColorRule_t &ColorRule)
 	{
-		IXMLDOMElement *pParentNode = NULL;
+		IXMLDOMElement *pParentNode = nullptr;
 		BSTR bstr_indent;
 		WCHAR wszIndent[128];
 		static int iIndent = 2;

@@ -57,7 +57,7 @@ void Explorerplusplus::SetLanguageModule()
 
 	if(m_config->language == LANG_ENGLISH)
 	{
-		m_hLanguageModule = GetModuleHandle(NULL);
+		m_hLanguageModule = GetModuleHandle(nullptr);
 	}
 	else
 	{
@@ -131,93 +131,93 @@ void Explorerplusplus::SetLanguageModule()
 				switch(wLanguage)
 				{
 				case LANG_CHINESE_SIMPLIFIED:
-					LoadString(GetModuleHandle(NULL), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_CHINESE_SIMPLIFIED,
+					LoadString(GetModuleHandle(nullptr), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_CHINESE_SIMPLIFIED,
 						szTemp, SIZEOF_ARRAY(szTemp));
 					break;
 
 				case LANG_CZECH:
-					LoadString(GetModuleHandle(NULL), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_CZECH,
+					LoadString(GetModuleHandle(nullptr), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_CZECH,
 						szTemp, SIZEOF_ARRAY(szTemp));
 					break;
 
 				case LANG_DANISH:
-					LoadString(GetModuleHandle(NULL), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_DANISH,
+					LoadString(GetModuleHandle(nullptr), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_DANISH,
 						szTemp, SIZEOF_ARRAY(szTemp));
 					break;
 
 				case LANG_DUTCH:
-					LoadString(GetModuleHandle(NULL), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_DUTCH,
+					LoadString(GetModuleHandle(nullptr), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_DUTCH,
 						szTemp, SIZEOF_ARRAY(szTemp));
 					break;
 
 				case LANG_FRENCH:
-					LoadString(GetModuleHandle(NULL), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_FRENCH,
+					LoadString(GetModuleHandle(nullptr), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_FRENCH,
 						szTemp, SIZEOF_ARRAY(szTemp));
 					break;
 
 				case LANG_GERMAN:
-					LoadString(GetModuleHandle(NULL), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_GERMAN,
+					LoadString(GetModuleHandle(nullptr), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_GERMAN,
 						szTemp, SIZEOF_ARRAY(szTemp));
 					break;
 
 				case LANG_ITALIAN:
-					LoadString(GetModuleHandle(NULL), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_ITALIAN,
+					LoadString(GetModuleHandle(nullptr), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_ITALIAN,
 						szTemp, SIZEOF_ARRAY(szTemp));
 					break;
 
 				case LANG_JAPANESE:
-					LoadString(GetModuleHandle(NULL), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_JAPANESE,
+					LoadString(GetModuleHandle(nullptr), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_JAPANESE,
 						szTemp, SIZEOF_ARRAY(szTemp));
 					break;
 
 				case LANG_KOREAN:
-					LoadString(GetModuleHandle(NULL), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_KOREAN,
+					LoadString(GetModuleHandle(nullptr), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_KOREAN,
 						szTemp, SIZEOF_ARRAY(szTemp));
 					break;
 
 				case LANG_NORWEGIAN:
-					LoadString(GetModuleHandle(NULL), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_NORWEGIAN,
+					LoadString(GetModuleHandle(nullptr), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_NORWEGIAN,
 						szTemp, SIZEOF_ARRAY(szTemp));
 					break;
 
 				case LANG_PORTUGUESE:
-					LoadString(GetModuleHandle(NULL), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_PORTUGUESE,
+					LoadString(GetModuleHandle(nullptr), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_PORTUGUESE,
 						szTemp, SIZEOF_ARRAY(szTemp));
 					break;
 
 				case LANG_ROMANIAN:
-					LoadString(GetModuleHandle(NULL), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_ROMANIAN,
+					LoadString(GetModuleHandle(nullptr), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_ROMANIAN,
 						szTemp, SIZEOF_ARRAY(szTemp));
 					break;
 
 				case LANG_RUSSIAN:
-					LoadString(GetModuleHandle(NULL), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_RUSSIAN,
+					LoadString(GetModuleHandle(nullptr), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_RUSSIAN,
 						szTemp, SIZEOF_ARRAY(szTemp));
 					break;
 
 				case LANG_SPANISH:
-					LoadString(GetModuleHandle(NULL), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_SPANISH,
+					LoadString(GetModuleHandle(nullptr), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_SPANISH,
 						szTemp, SIZEOF_ARRAY(szTemp));
 					break;
 
 				default:
-					LoadString(GetModuleHandle(NULL), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH,
+					LoadString(GetModuleHandle(nullptr), IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH,
 						szTemp, SIZEOF_ARRAY(szTemp));
 					break;
 				}
 
 				/* Main window hasn't been constructed yet, so this
 				message box doesn't have any owner window. */
-				MessageBox(NULL, szTemp, NExplorerplusplus::APP_NAME, MB_ICONWARNING);
+				MessageBox(nullptr, szTemp, NExplorerplusplus::APP_NAME, MB_ICONWARNING);
 			}
 		}
 	}
 
 	/* The language DLL was not found/could not be loaded.
 	Use the default internal resource set. */
-	if(m_hLanguageModule == NULL)
+	if(m_hLanguageModule == nullptr)
 	{
-		m_hLanguageModule = GetModuleHandle(NULL);
+		m_hLanguageModule = GetModuleHandle(nullptr);
 
 		m_config->language = LANG_ENGLISH;
 	}

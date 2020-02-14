@@ -188,7 +188,7 @@ removes it if it does. */
 std::wstring ProcessItemFileName(const BasicItemInfo_t &itemInfo, const GlobalFolderSettings &globalFolderSettings)
 {
 	BOOL bHideExtension = FALSE;
-	TCHAR *pExt = NULL;
+	TCHAR *pExt = nullptr;
 
 	if (globalFolderSettings.hideLinkExtension &&
 		((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
@@ -493,7 +493,7 @@ std::wstring GetVersionColumnText(const BasicItemInfo_t &itemInfo, VersionInfoTy
 std::wstring GetShortcutToColumnText(const BasicItemInfo_t &itemInfo)
 {
 	TCHAR ResolvedLinkPath[MAX_PATH];
-	HRESULT hr = NFileOperations::ResolveLink(NULL, SLR_NO_UI, itemInfo.getFullPath().c_str(),
+	HRESULT hr = NFileOperations::ResolveLink(nullptr, SLR_NO_UI, itemInfo.getFullPath().c_str(),
 		ResolvedLinkPath, SIZEOF_ARRAY(ResolvedLinkPath));
 
 	if (FAILED(hr))
@@ -568,7 +568,7 @@ std::wstring GetFileSystemColumnText(const BasicItemInfo_t &itemInfo)
 	}
 
 	TCHAR FileSystemName[MAX_PATH];
-	BOOL Res = GetVolumeInformation(FullFileName, NULL, 0, NULL, NULL, NULL, FileSystemName,
+	BOOL Res = GetVolumeInformation(FullFileName, nullptr, 0, nullptr, nullptr, nullptr, FileSystemName,
 		SIZEOF_ARRAY(FileSystemName));
 
 	if (!Res)
@@ -603,12 +603,12 @@ std::wstring GetPrinterColumnText(const BasicItemInfo_t &itemInfo, PrinterInform
 	StringCchCopy(itemDisplayName, SIZEOF_ARRAY(itemDisplayName), itemInfo.szDisplayName);
 
 	HANDLE hPrinter;
-	BOOL Res = OpenPrinter(itemDisplayName, &hPrinter, NULL);
+	BOOL Res = OpenPrinter(itemDisplayName, &hPrinter, nullptr);
 
 	if (Res)
 	{
 		DWORD BytesNeeded;
-		GetPrinter(hPrinter, 2, NULL, 0, &BytesNeeded);
+		GetPrinter(hPrinter, 2, nullptr, 0, &BytesNeeded);
 
 		PRINTER_INFO_2 *PrinterInfo2 = reinterpret_cast<PRINTER_INFO_2 *>(new char[BytesNeeded]);
 		Res = GetPrinter(hPrinter, 2, reinterpret_cast<LPBYTE>(PrinterInfo2), BytesNeeded, &BytesNeeded);
@@ -628,23 +628,23 @@ std::wstring GetPrinterColumnText(const BasicItemInfo_t &itemInfo, PrinterInform
 				if (Res)
 				{
 					StringCchCopyEx(PrinterInformation, SIZEOF_ARRAY(PrinterInformation),
-						szStatus, NULL, NULL, STRSAFE_IGNORE_NULLS);
+						szStatus, nullptr, nullptr, STRSAFE_IGNORE_NULLS);
 				}
 				break;
 
 			case PRINTER_INFORMATION_TYPE_COMMENTS:
 				StringCchCopyEx(PrinterInformation, SIZEOF_ARRAY(PrinterInformation),
-					PrinterInfo2->pComment, NULL, NULL, STRSAFE_IGNORE_NULLS);
+					PrinterInfo2->pComment, nullptr, nullptr, STRSAFE_IGNORE_NULLS);
 				break;
 
 			case PRINTER_INFORMATION_TYPE_LOCATION:
 				StringCchCopyEx(PrinterInformation, SIZEOF_ARRAY(PrinterInformation),
-					PrinterInfo2->pLocation, NULL, NULL, STRSAFE_IGNORE_NULLS);
+					PrinterInfo2->pLocation, nullptr, nullptr, STRSAFE_IGNORE_NULLS);
 				break;
 
 			case PRINTER_INFORMATION_TYPE_MODEL:
 				StringCchCopyEx(PrinterInformation, SIZEOF_ARRAY(PrinterInformation),
-					PrinterInfo2->pDriverName, NULL, NULL, STRSAFE_IGNORE_NULLS);
+					PrinterInfo2->pDriverName, nullptr, nullptr, STRSAFE_IGNORE_NULLS);
 				break;
 
 			default:
@@ -711,13 +711,13 @@ BOOL GetPrinterStatusDescription(DWORD dwStatus, TCHAR *szStatus, size_t cchMax)
 std::wstring GetNetworkAdapterColumnText(const BasicItemInfo_t &itemInfo)
 {
 	ULONG OutBufLen = 0;
-	GetAdaptersAddresses(AF_UNSPEC, 0, NULL, NULL, &OutBufLen);
+	GetAdaptersAddresses(AF_UNSPEC, 0, nullptr, nullptr, &OutBufLen);
 	IP_ADAPTER_ADDRESSES *AdapterAddresses = reinterpret_cast<IP_ADAPTER_ADDRESSES *>(new char[OutBufLen]);
-	GetAdaptersAddresses(AF_UNSPEC, 0, NULL, AdapterAddresses, &OutBufLen);
+	GetAdaptersAddresses(AF_UNSPEC, 0, nullptr, AdapterAddresses, &OutBufLen);
 
 	IP_ADAPTER_ADDRESSES *AdapaterAddress = AdapterAddresses;
 
-	while (AdapaterAddress != NULL &&
+	while (AdapaterAddress != nullptr &&
 		lstrcmp(AdapaterAddress->FriendlyName, itemInfo.wfd.cFileName) != 0)
 	{
 		AdapaterAddress = AdapaterAddress->Next;
@@ -766,7 +766,7 @@ std::wstring GetMediaMetadataColumnText(const BasicItemInfo_t &itemInfo, MediaMe
 {
 	const TCHAR *AttributeName = GetMediaMetadataAttributeName(MediaMetaDataType);
 
-	BYTE *TempBuffer = NULL;
+	BYTE *TempBuffer = nullptr;
 	HRESULT hr = GetMediaMetadata(itemInfo.getFullPath().c_str(), AttributeName, &TempBuffer);
 
 	if (!SUCCEEDED(hr))
@@ -933,7 +933,7 @@ const TCHAR *GetMediaMetadataAttributeName(MediaMetadataType_t MediaMetaDataType
 		break;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 std::wstring GetDriveSpaceColumnText(const BasicItemInfo_t &itemInfo, bool TotalSize, const GlobalFolderSettings &globalFolderSettings)
@@ -968,7 +968,7 @@ BOOL GetDriveSpaceColumnRawData(const BasicItemInfo_t &itemInfo, bool TotalSize,
 
 	ULARGE_INTEGER TotalBytes;
 	ULARGE_INTEGER FreeBytes;
-	BOOL Res = GetDiskFreeSpaceEx(FullFileName, NULL, &TotalBytes, &FreeBytes);
+	BOOL Res = GetDiskFreeSpaceEx(FullFileName, nullptr, &TotalBytes, &FreeBytes);
 
 	if (TotalSize)
 	{

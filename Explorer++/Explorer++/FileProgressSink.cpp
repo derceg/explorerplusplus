@@ -27,7 +27,7 @@ HRESULT STDMETHODCALLTYPE FileProgressSink::QueryInterface(REFIID riid, void **p
 	static const QITAB qit[] =
 	{
 		QITABENT(FileProgressSink, IFileOperationProgressSink),
-		{0}
+		{nullptr}
 	};
 	#pragma warning(pop)
 

@@ -20,7 +20,7 @@ m_RefCount(1)
 
 HRESULT __stdcall ServiceProvider::QueryInterface(REFIID iid,void **ppvObject)
 {
-	*ppvObject = NULL;
+	*ppvObject = nullptr;
 
 	if(iid == IID_IUnknown)
 	{
@@ -69,7 +69,7 @@ HRESULT ServiceProvider::QueryService(REFGUID guidService,REFIID riid,void **ppv
 	menu). */
 	UNREFERENCED_PARAMETER(guidService);
 
-	*ppv = NULL;
+	*ppv = nullptr;
 
 	if(riid == IID_INewMenuClient)
 	{

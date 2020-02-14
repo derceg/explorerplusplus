@@ -100,7 +100,7 @@ void Explorerplusplus::OnWildcardSelect(BOOL bSelect)
 
 void Explorerplusplus::OnSearch()
 {
-	if(g_hwndSearch == NULL)
+	if(g_hwndSearch == nullptr)
 	{
 		Tab &selectedTab = m_tabContainer->GetSelectedTab();
 		std::wstring currentDirectory = selectedTab.GetShellBrowser()->GetDirectory();
@@ -122,12 +122,12 @@ void Explorerplusplus::OnCustomizeColors()
 
 	/* Causes the active listview to redraw (therefore
 	applying any updated color schemes). */
-	InvalidateRect(m_hActiveListView, NULL, FALSE);
+	InvalidateRect(m_hActiveListView, nullptr, FALSE);
 }
 
 void Explorerplusplus::OnRunScript()
 {
-	if (g_hwndRunScript == NULL)
+	if (g_hwndRunScript == nullptr)
 	{
 		ScriptingDialog *scriptingDialog = new ScriptingDialog(m_hLanguageModule, m_hContainer, this);
 		g_hwndRunScript = scriptingDialog->ShowModelessDialog(new ModelessDialogNotification());
@@ -140,7 +140,7 @@ void Explorerplusplus::OnRunScript()
 
 void Explorerplusplus::OnShowOptions()
 {
-	if(g_hwndOptions == NULL)
+	if(g_hwndOptions == nullptr)
 	{
 		OptionsDialog *optionsDialog = OptionsDialog::Create(m_config, m_hLanguageModule, this, m_tabContainer);
 		g_hwndOptions = optionsDialog->Show(m_hContainer);
@@ -165,7 +165,7 @@ void Explorerplusplus::OnShowHelp()
 
 	if(SUCCEEDED(hr))
 	{
-		BOOL bRes = ExecuteFileAction(m_hContainer, NULL, NULL, NULL, pidl.get());
+		BOOL bRes = ExecuteFileAction(m_hContainer, nullptr, nullptr, nullptr, pidl.get());
 
 		if(bRes)
 		{

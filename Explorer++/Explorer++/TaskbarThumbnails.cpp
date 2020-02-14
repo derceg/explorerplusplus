@@ -82,12 +82,12 @@ LRESULT CALLBACK TaskbarThumbnails::MainWndProc(HWND hwnd,UINT uMsg,WPARAM wPara
 {
 	if(uMsg == m_uTaskbarButtonCreatedMessage)
 	{
-		if(m_pTaskbarList != NULL)
+		if(m_pTaskbarList != nullptr)
 		{
 			m_pTaskbarList->Release();
 		}
 
-		CoCreateInstance(CLSID_TaskbarList,NULL,CLSCTX_INPROC_SERVER,
+		CoCreateInstance(CLSID_TaskbarList, nullptr,CLSCTX_INPROC_SERVER,
 			IID_PPV_ARGS(&m_pTaskbarList));
 		m_pTaskbarList->HrInit();
 
@@ -147,12 +147,12 @@ ATOM TaskbarThumbnails::RegisterTabProxyClass(const TCHAR *szClassName)
 	wcex.lpfnWndProc	= TabProxyWndProcStub;
 	wcex.cbClsExtra		= 0;
 	wcex.cbWndExtra		= sizeof(TabProxy_t *);
-	wcex.hInstance		= GetModuleHandle(NULL);
-	wcex.hIcon			= NULL;
-	wcex.hIconSm		= NULL;
-	wcex.hCursor		= LoadCursor(NULL,IDC_ARROW);
-	wcex.hbrBackground	= NULL;
-	wcex.lpszMenuName	= NULL;
+	wcex.hInstance		= GetModuleHandle(nullptr);
+	wcex.hIcon			= nullptr;
+	wcex.hIconSm		= nullptr;
+	wcex.hCursor		= LoadCursor(nullptr,IDC_ARROW);
+	wcex.hbrBackground	= nullptr;
+	wcex.lpszMenuName	= nullptr;
 	wcex.lpszClassName	= szClassName;
 
 	return RegisterClassEx(&wcex);
@@ -187,7 +187,7 @@ void TaskbarThumbnails::CreateTabProxy(int iTabId,BOOL bSwitchToNewTab)
 
 	if(aRet != 0)
 	{
-		TabProxy_t *ptp = NULL;
+		TabProxy_t *ptp = nullptr;
 
 		ptp = (TabProxy_t *)malloc(sizeof(TabProxy_t));
 
@@ -195,9 +195,9 @@ void TaskbarThumbnails::CreateTabProxy(int iTabId,BOOL bSwitchToNewTab)
 		ptp->iTabId = iTabId;
 
 		hTabProxy = CreateWindow(szClassName,EMPTY_STRING,WS_OVERLAPPEDWINDOW,
-			0,0,0,0,NULL,NULL,GetModuleHandle(0),(LPVOID)ptp);
+			0,0,0,0,nullptr,nullptr,GetModuleHandle(nullptr),(LPVOID)ptp);
 
-		if(hTabProxy != NULL)
+		if(hTabProxy != nullptr)
 		{
 			DwmSetWindowAttribute(hTabProxy,DWMWA_FORCE_ICONIC_REPRESENTATION,
 				&bValue,sizeof(BOOL));
@@ -237,7 +237,7 @@ void TaskbarThumbnails::RemoveTabProxy(int iTabId)
 				DestroyWindow(itr->hProxy);
 				free(ptp);
 
-				UnregisterClass(reinterpret_cast<LPCWSTR>(MAKEWORD(itr->atomClass, 0)), GetModuleHandle(0));
+				UnregisterClass(reinterpret_cast<LPCWSTR>(MAKEWORD(itr->atomClass, 0)), GetModuleHandle(nullptr));
 
 				m_TabProxyList.erase(itr);
 				break;
@@ -263,7 +263,7 @@ void TaskbarThumbnails::RegisterTab(HWND hTabProxy, const TCHAR *szDisplayName, 
 	/* Register and insert the tab into the current list of
 	taskbar thumbnails. */
 	m_pTaskbarList->RegisterTab(hTabProxy, m_expp->GetMainWindow());
-	m_pTaskbarList->SetTabOrder(hTabProxy,NULL);
+	m_pTaskbarList->SetTabOrder(hTabProxy, nullptr);
 
 	m_pTaskbarList->SetThumbnailTooltip(hTabProxy,szDisplayName);
 
@@ -288,7 +288,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProcStub(HWND hwnd,UINT Msg,WPARA
 		break;
 	}
 
-	if(ptp != NULL)
+	if(ptp != nullptr)
 		return ptp->taskbarThumbnails->TabProxyWndProc(hwnd,Msg,wParam,lParam,ptp->iTabId);
 	else
 		return DefWindowProc(hwnd,Msg,wParam,lParam);
@@ -404,9 +404,9 @@ void TaskbarThumbnails::OnDwmSendIconicThumbnail(HWND tabProxy, const Tab &tab, 
 	case, use a static 'No Preview Available' bitmap. */
 	if (IsIconic(m_expp->GetMainWindow()))
 	{
-		hbmTab.reset(static_cast<HBITMAP>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDB_NOPREVIEWAVAILABLE), IMAGE_BITMAP, 0, 0, 0)));
+		hbmTab.reset(static_cast<HBITMAP>(LoadImage(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDB_NOPREVIEWAVAILABLE), IMAGE_BITMAP, 0, 0, 0)));
 
-		SetBitmapDimensionEx(hbmTab.get(), 223, 130, NULL);
+		SetBitmapDimensionEx(hbmTab.get(), 223, 130, nullptr);
 	}
 	else
 	{
@@ -582,7 +582,7 @@ void TaskbarThumbnails::OnTabSelectionChanged(const Tab &tab)
 			tell the taskbar to reposition it. */
 			if (index == (nTabs - 1))
 			{
-				m_pTaskbarList->SetTabOrder(tabProxyInfo.hProxy, NULL);
+				m_pTaskbarList->SetTabOrder(tabProxyInfo.hProxy, nullptr);
 			}
 			else
 			{

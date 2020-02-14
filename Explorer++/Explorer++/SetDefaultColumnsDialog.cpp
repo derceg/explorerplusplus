@@ -27,7 +27,7 @@ SetDefaultColumnsDialog::SetDefaultColumnsDialog(HINSTANCE hInstance, HWND hPare
 
 INT_PTR SetDefaultColumnsDialog::OnInitDialog()
 {
-	m_icon.reset(LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN)));
+	m_icon.reset(LoadIcon(GetModuleHandle(nullptr),MAKEINTRESOURCE(IDI_MAIN)));
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
 
 	HWND hComboBox = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_COMBOBOX);
@@ -71,7 +71,7 @@ INT_PTR SetDefaultColumnsDialog::OnInitDialog()
 	m_PreviousFolderType = m_psdcdps->m_FolderType;
 
 	HWND hListView = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_LISTVIEW);
-	SetWindowTheme(hListView, L"Explorer", NULL);
+	SetWindowTheme(hListView, L"Explorer", nullptr);
 
 	ListView_SetExtendedListViewStyleEx(hListView,
 	LVS_EX_CHECKBOXES,LVS_EX_CHECKBOXES);

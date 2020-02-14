@@ -37,15 +37,15 @@ void ModelessDialogNotification::OnModelessDialogDestroy(int iResource)
 	switch(iResource)
 	{
 	case IDD_SEARCH:
-		g_hwndSearch = NULL;
+		g_hwndSearch = nullptr;
 		break;
 
 	case IDD_SCRIPTING:
-		g_hwndRunScript = NULL;
+		g_hwndRunScript = nullptr;
 		break;
 
 	case IDD_MANAGE_BOOKMARKS:
-		g_hwndManageBookmarks = NULL;
+		g_hwndManageBookmarks = nullptr;
 		break;
 	}
 }

@@ -167,8 +167,8 @@ int EventId,int iFolderIndex)
 
 void ShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 {
-	IShellFolder	*pShellFolder = NULL;
-	PCITEMID_CHILD	pidlRelative = NULL;
+	IShellFolder	*pShellFolder = nullptr;
+	PCITEMID_CHILD	pidlRelative = nullptr;
 	Added_t			Added;
 	TCHAR			FullFileName[MAX_PATH];
 	TCHAR			szDisplayName[MAX_PATH];
@@ -420,7 +420,7 @@ void ShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 
 			if(m_folderSettings.viewMode == +ViewMode::Details)
 			{
-				if(m_pActiveColumns != NULL)
+				if(m_pActiveColumns != nullptr)
 				{
 					for(auto itrColumn = m_pActiveColumns->begin();itrColumn != m_pActiveColumns->end();itrColumn++)
 					{
@@ -505,8 +505,8 @@ ALL changes to an items name/internal properties/icon/overlay icon
 should go through a central function. */
 void ShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 {
-	IShellFolder	*pShellFolder = NULL;
-	PCITEMID_CHILD	pidlRelative = NULL;
+	IShellFolder	*pShellFolder = nullptr;
+	PCITEMID_CHILD	pidlRelative = nullptr;
 	SHFILEINFO		shfi;
 	LVFINDINFO		lvfi;
 	TCHAR			szDisplayName[MAX_PATH];

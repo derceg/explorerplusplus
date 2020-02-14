@@ -22,7 +22,7 @@ UINT_PTR idEvent,DWORD dwTime);
 void CALLBACK DragScrollTimerProc(HWND hwnd,UINT uMsg,
 UINT_PTR idEvent,DWORD dwTime);
 
-HTREEITEM	g_hExpand = NULL;
+HTREEITEM	g_hExpand = nullptr;
 BOOL		g_bAllowScroll = FALSE;
 
 HRESULT _stdcall ShellTreeView::DragEnter(IDataObject *pDataObject,
@@ -61,7 +61,7 @@ DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 		*pdwEffect		= DROPEFFECT_NONE;
 	}
 
-	g_hExpand = NULL;
+	g_hExpand = nullptr;
 
 	SetTimer(m_hTreeView,DRAGSCROLL_TIMER_ID,DRAGSCROLL_TIMER_ELAPSE,
 		DragScrollTimerProc);
@@ -102,7 +102,7 @@ DWORD ShellTreeView::GetCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffec
 
 	hItem = (HTREEITEM)SendMessage(m_hTreeView,TVM_HITTEST,0,(LPARAM)&tvhi);
 
-	if(hItem != NULL)
+	if(hItem != nullptr)
 	{
 		bOnSameDrive = CheckItemLocations(m_pDataObject,hItem,0);
 
@@ -161,7 +161,7 @@ HRESULT _stdcall ShellTreeView::DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwE
 	TreeView_HitTest(m_hTreeView,&tvht);
 
 	/* Is the mouse actually over an item? */
-	if(!(tvht.flags & LVHT_NOWHERE) && (tvht.hItem != NULL))
+	if(!(tvht.flags & LVHT_NOWHERE) && (tvht.hItem != nullptr))
 	{
 		/* The mouse is over an item, so select that item. */
 		TreeView_Select(m_hTreeView,tvht.hItem,TVGN_DROPHILITE);
@@ -191,7 +191,7 @@ int iDroppedItem)
 {
 	FORMATETC	ftc;
 	STGMEDIUM	stg;
-	DROPFILES	*pdf = NULL;
+	DROPFILES	*pdf = nullptr;
 	TCHAR		szDestDirectory[MAX_PATH];
 	TCHAR		szFullFileName[MAX_PATH];
 	HRESULT		hr;
@@ -199,7 +199,7 @@ int iDroppedItem)
 	int			nDroppedFiles;
 
 	ftc.cfFormat	= CF_HDROP;
-	ftc.ptd			= NULL;
+	ftc.ptd			= nullptr;
 	ftc.dwAspect	= DVASPECT_CONTENT;
 	ftc.lindex		= -1;
 	ftc.tymed		= TYMED_HGLOBAL;
@@ -210,10 +210,10 @@ int iDroppedItem)
 	{
 		pdf = (DROPFILES *)GlobalLock(stg.hGlobal);
 
-		if(pdf != NULL)
+		if(pdf != nullptr)
 		{
 			/* Request a count of the number of files that have been dropped. */
-			nDroppedFiles = DragQueryFile((HDROP)pdf,0xFFFFFFFF,NULL,NULL);
+			nDroppedFiles = DragQueryFile((HDROP)pdf,0xFFFFFFFF, nullptr,NULL);
 
 			if(iDroppedItem < nDroppedFiles)
 			{
@@ -262,7 +262,7 @@ POINTL pt,DWORD *pdwEffect)
 	TreeView_HitTest(m_hTreeView,&tvht);
 
 	/* Is the mouse actually over an item? */
-	if(!(tvht.flags & LVHT_NOWHERE) && (tvht.hItem != NULL) && m_bDataAccept)
+	if(!(tvht.flags & LVHT_NOWHERE) && (tvht.hItem != nullptr) && m_bDataAccept)
 	{
 		auto pidlDirectory = GetItemPidl(tvht.hItem);
 
@@ -272,7 +272,7 @@ POINTL pt,DWORD *pdwEffect)
 		DropHandler *pDropHandler = DropHandler::CreateNew();
 		pDropHandler->Drop(pDataObject,
 			grfKeyState,pt,pdwEffect,m_hTreeView,
-			m_DragType,szDestDirectory,NULL,FALSE);
+			m_DragType,szDestDirectory, nullptr,FALSE);
 		pDropHandler->Release();
 	}
 
@@ -285,7 +285,7 @@ POINTL pt,DWORD *pdwEffect)
 
 void ShellTreeView::RestoreState(void)
 {
-	TreeView_Select(m_hTreeView,NULL,TVGN_DROPHILITE);
+	TreeView_Select(m_hTreeView,nullptr,TVGN_DROPHILITE);
 
 	g_bAllowScroll = FALSE;
 	m_bDragging = FALSE;

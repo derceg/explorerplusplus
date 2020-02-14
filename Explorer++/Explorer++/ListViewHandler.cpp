@@ -205,7 +205,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 					items are shifted down one. Therefore,
 					take the item out of its position in the
 					list, and move it into its new position. */
-					NMHEADER *pnmHeader = NULL;
+					NMHEADER *pnmHeader = nullptr;
 					Column_t Column;
 					int i = 0;
 
@@ -264,7 +264,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 
 LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 {
-	LV_KEYDOWN	*lv_key = NULL;
+	LV_KEYDOWN	*lv_key = nullptr;
 
 	lv_key = (LV_KEYDOWN *)lParam;
 
@@ -387,7 +387,7 @@ BOOL Explorerplusplus::OnListViewBeginLabelEdit(LPARAM lParam)
 	it does not work in Windows XP. */
 	HWND hEdit = ListView_GetEditControl(m_hActiveListView);
 
-	if(hEdit == NULL)
+	if(hEdit == nullptr)
 	{
 		return TRUE;
 	}
@@ -401,8 +401,8 @@ BOOL Explorerplusplus::OnListViewBeginLabelEdit(LPARAM lParam)
 
 BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 {
-	NMLVDISPINFO	*pdi = NULL;
-	LVITEM			*pItem = NULL;
+	NMLVDISPINFO	*pdi = nullptr;
+	LVITEM			*pItem = nullptr;
 	TCHAR			NewFileName[MAX_PATH + 1];
 	TCHAR			OldFileName[MAX_PATH + 1];
 	TCHAR			OldName[MAX_PATH];
@@ -418,7 +418,7 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 	m_bListViewRenaming = FALSE;
 
 	/* Did the user cancel the editing? */
-	if(pItem->pszText == NULL)
+	if(pItem->pszText == nullptr)
 		return FALSE;
 
 	/* Is the new filename empty? */
@@ -449,15 +449,15 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 
 	See: http://msdn.microsoft.com/en-us/library/aa365247.aspx
 	*/
-	if(StrChr(pItem->pszText,'\\') != NULL ||
-		StrChr(pItem->pszText,'/') != NULL ||
-		StrChr(pItem->pszText,':') != NULL ||
-		StrChr(pItem->pszText,'*') != NULL ||
-		StrChr(pItem->pszText,'?') != NULL ||
-		StrChr(pItem->pszText,'"') != NULL ||
-		StrChr(pItem->pszText,'<') != NULL ||
-		StrChr(pItem->pszText,'>') != NULL ||
-		StrChr(pItem->pszText,'|') != NULL)
+	if(StrChr(pItem->pszText,'\\') != nullptr ||
+		StrChr(pItem->pszText,'/') != nullptr ||
+		StrChr(pItem->pszText,':') != nullptr ||
+		StrChr(pItem->pszText,'*') != nullptr ||
+		StrChr(pItem->pszText,'?') != nullptr ||
+		StrChr(pItem->pszText,'"') != nullptr ||
+		StrChr(pItem->pszText,'<') != nullptr ||
+		StrChr(pItem->pszText,'>') != nullptr ||
+		StrChr(pItem->pszText,'|') != nullptr)
 	{
 		LoadString(m_hLanguageModule,IDS_ERR_FILENAMEINVALID,
 			szError,SIZEOF_ARRAY(szError));
@@ -498,7 +498,7 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 		off. */
 		if(bExtensionHidden)
 		{
-			TCHAR	*szExt = NULL;
+			TCHAR	*szExt = nullptr;
 
 			szExt = PathFindExtension(OldName);
 
@@ -600,7 +600,7 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 	if(SUCCEEDED(hr))
 	{
 		wil::com_ptr<IDataObject> pDataObject;
-		hr = GetUIObjectOf(pShellFolder.get(), NULL, 1, &pidlChildFolder, IID_PPV_ARGS(&pDataObject));
+		hr = GetUIObjectOf(pShellFolder.get(), nullptr, 1, &pidlChildFolder, IID_PPV_ARGS(&pDataObject));
 
 		if(SUCCEEDED(hr))
 		{
@@ -696,9 +696,9 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 
 HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragType dragType)
 {
-	IDropSource			*pDropSource = NULL;
-	IDragSourceHelper	*pDragSourceHelper = NULL;
-	NMLISTVIEW			*pnmlv = NULL;
+	IDropSource			*pDropSource = nullptr;
+	IDragSourceHelper	*pDragSourceHelper = nullptr;
+	NMLISTVIEW			*pnmlv = nullptr;
 	POINT				pt = {0,0};
 	HRESULT				hr;
 	int					iDragStartObjectIndex;
@@ -736,7 +736,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragType dragType)
 		FilenameList.push_back(stringFilename);
 	}
 
-	hr = CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_ALL,
+	hr = CoCreateInstance(CLSID_DragDropHelper, nullptr,CLSCTX_ALL,
 		IID_PPV_ARGS(&pDragSourceHelper));
 
 	if(SUCCEEDED(hr))
@@ -756,10 +756,10 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragType dragType)
 
 			IDataObject *pDataObject = CreateDataObject(ftc,stg,2);
 
-			IDataObjectAsyncCapability *pAsyncCapability = NULL;
+			IDataObjectAsyncCapability *pAsyncCapability = nullptr;
 			pDataObject->QueryInterface(IID_PPV_ARGS(&pAsyncCapability));
 
-			assert(pAsyncCapability != NULL);
+			assert(pAsyncCapability != nullptr);
 
 			/* Docs mention setting the argument to VARIANT_TRUE/VARIANT_FALSE.
 			But the argument is a BOOL, so we'll go with regular TRUE/FALSE. */
@@ -1016,14 +1016,14 @@ void Explorerplusplus::OnListViewCopyUniversalPaths(void) const
 
 HRESULT Explorerplusplus::OnListViewCopy(BOOL bCopy)
 {
-	IDataObject		*pClipboardDataObject = NULL;
+	IDataObject		*pClipboardDataObject = nullptr;
 	int				iItem = -1;
 	HRESULT			hr;
 
 	if(!CanCopy())
 		return E_FAIL;
 
-	SetCursor(LoadCursor(NULL,IDC_WAIT));
+	SetCursor(LoadCursor(nullptr,IDC_WAIT));
 
 	std::list<std::wstring> FileNameList;
 
@@ -1062,7 +1062,7 @@ HRESULT Explorerplusplus::OnListViewCopy(BOOL bCopy)
 		}
 	}
 
-	SetCursor(LoadCursor(NULL,IDC_ARROW));
+	SetCursor(LoadCursor(nullptr,IDC_ARROW));
 
 	return hr;
 }
@@ -1075,7 +1075,7 @@ void Explorerplusplus::OnListViewSetFileAttributes() const
 
 void Explorerplusplus::OnListViewPaste(void)
 {
-	IDataObject *pClipboardObject = NULL;
+	IDataObject *pClipboardObject = nullptr;
 	HRESULT hr;
 
 	hr = OleGetClipboard(&pClipboardObject);
@@ -1107,7 +1107,7 @@ void Explorerplusplus::OnListViewPaste(void)
 void Explorerplusplus::BuildListViewFileSelectionList(HWND hListView,
 	std::list<std::wstring> *pFileSelectionList)
 {
-	if(pFileSelectionList == NULL)
+	if(pFileSelectionList == nullptr)
 	{
 		return;
 	}
@@ -1206,7 +1206,7 @@ void Explorerplusplus::OpenListViewItem(int iItem, BOOL bOpenInNewTab, BOOL bOpe
 	auto pidl = m_pActiveShellBrowser->GetDirectoryIdl();
 	auto ridl = m_pActiveShellBrowser->GetItemChildIdl(iItem);
 
-	if(ridl != NULL)
+	if(ridl != nullptr)
 	{
 		unique_pidl_absolute pidlComplete(ILCombine(pidl.get(), ridl.get()));
 		OpenItem(pidlComplete.get(), bOpenInNewTab, bOpenInNewWindow);

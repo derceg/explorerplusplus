@@ -117,7 +117,7 @@ HRESULT _stdcall ShellBrowser::DragOver(DWORD grfKeyState,POINTL ptl,DWORD *pdwE
 		if(!m_bOverFolder)
 			NListView::ListView_PositionInsertMark(m_hListView,&pt);
 		else
-			NListView::ListView_PositionInsertMark(m_hListView,NULL);
+			NListView::ListView_PositionInsertMark(m_hListView, nullptr);
 	}
 
 	return S_OK;
@@ -136,14 +136,14 @@ DWORD ShellBrowser::CheckItemLocations(IDataObject *pDataObject,int iDroppedItem
 {
 	FORMATETC	ftc;
 	STGMEDIUM	stg;
-	DROPFILES	*pdf = NULL;
+	DROPFILES	*pdf = nullptr;
 	TCHAR		szFullFileName[MAX_PATH];
 	HRESULT		hr;
 	BOOL		bOnSameDrive = FALSE;
 	int			nDroppedFiles;
 
 	ftc.cfFormat	= CF_HDROP;
-	ftc.ptd			= NULL;
+	ftc.ptd			= nullptr;
 	ftc.dwAspect	= DVASPECT_CONTENT;
 	ftc.lindex		= -1;
 	ftc.tymed		= TYMED_HGLOBAL;
@@ -154,10 +154,10 @@ DWORD ShellBrowser::CheckItemLocations(IDataObject *pDataObject,int iDroppedItem
 	{
 		pdf = (DROPFILES *)GlobalLock(stg.hGlobal);
 
-		if(pdf != NULL)
+		if(pdf != nullptr)
 		{
 			/* Request a count of the number of files that have been dropped. */
-			nDroppedFiles = DragQueryFile((HDROP)pdf,0xFFFFFFFF,NULL,NULL);
+			nDroppedFiles = DragQueryFile((HDROP)pdf,0xFFFFFFFF, nullptr,NULL);
 
 			if(iDroppedItem < nDroppedFiles)
 			{
@@ -326,7 +326,7 @@ HRESULT _stdcall ShellBrowser::DragLeave(void)
 {
 	m_pDropTargetHelper->DragLeave();
 
-	NListView::ListView_PositionInsertMark(m_hListView,NULL);
+	NListView::ListView_PositionInsertMark(m_hListView, nullptr);
 
 	if(m_bDeselectDropFolder)
 	{
@@ -389,9 +389,9 @@ If no modifiers are held down and the source and destination are on different dr
 HRESULT _stdcall ShellBrowser::Drop(IDataObject *pDataObject,
 DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 {
-	FORMATETC		ftcHDrop = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+	FORMATETC		ftcHDrop = {CF_HDROP, nullptr,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 	STGMEDIUM		stg;
-	DROPFILES		*pdf = NULL;
+	DROPFILES		*pdf = nullptr;
 	POINT			pt;
 	HRESULT			hr;
 	DWORD			dwEffect;
@@ -445,9 +445,9 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 			{
 				pdf = (DROPFILES *)GlobalLock(stg.hGlobal);
 
-				if(pdf != NULL)
+				if(pdf != nullptr)
 				{
-					nDroppedFiles = DragQueryFile((HDROP)pdf,0xFFFFFFFF,NULL,NULL);
+					nDroppedFiles = DragQueryFile((HDROP)pdf,0xFFFFFFFF, nullptr,NULL);
 
 					/* The drop effect will be the same for all files
 					that are been dragged locally. */
@@ -503,7 +503,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 	}*/
 
 	/* Remove the insertion mark from the listview. */
-	NListView::ListView_PositionInsertMark(m_hListView,NULL);
+	NListView::ListView_PositionInsertMark(m_hListView, nullptr);
 
 	//m_bPerformingDrag = FALSE;
 
