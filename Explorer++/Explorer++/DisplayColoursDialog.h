@@ -65,7 +65,6 @@ private:
 
 	void			OnRestoreDefaults();
 	void			OnChooseFont();
-	void			OnHScroll();
 	void			OnEnChange(UINT ControlID);
 
 	void			OnOk();

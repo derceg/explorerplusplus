@@ -174,7 +174,6 @@ private:
 	HTREEITEM	LocateExistingItem(const TCHAR *szParsingPath);
 	HTREEITEM	LocateExistingItem(PCIDLIST_ABSOLUTE pidlDirectory);
 	HTREEITEM	LocateItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, BOOL bOnlyLocateExistingItem);
-	void		MonitorAllDrives(void);
 	void		MonitorDrive(const TCHAR *szDrive);
 	HTREEITEM	DetermineDriveSortedPosition(HTREEITEM hParent, const TCHAR *szItemName);
 	HTREEITEM	DetermineItemSortedPosition(HTREEITEM hParent, const TCHAR *szItem);

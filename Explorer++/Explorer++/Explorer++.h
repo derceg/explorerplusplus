@@ -316,7 +316,6 @@ private:
 	void					SetProgramMenuItemStates(HMENU hProgramMenu);
 
 	/* Control creation. */
-	HWND					CreateMainListView(HWND hParent);
 	void					CreateMainControls(void);
 	void					CreateFolderControls(void);
 	void					CreateAddressBar();
