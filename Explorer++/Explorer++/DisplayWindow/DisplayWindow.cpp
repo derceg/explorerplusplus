@@ -26,8 +26,8 @@
 
 namespace
 {
-	static const TCHAR CLASS_NAME[] = _T("DisplayWindow");
-	static const TCHAR WINDOW_NAME[] = _T("DisplayWindow");
+	const TCHAR CLASS_NAME[] = _T("DisplayWindow");
+	const TCHAR WINDOW_NAME[] = _T("DisplayWindow");
 }
 
 ULONG_PTR token;

@@ -22,9 +22,9 @@
 
 namespace
 {
-	static const UINT KBYTE = 1024;
-	static const UINT MBYTE = 1024 * 1024;
-	static const UINT GBYTE = 1024 * 1024 *1024;
+	const UINT KBYTE = 1024;
+	const UINT MBYTE = 1024 * 1024;
+	const UINT GBYTE = 1024 * 1024 *1024;
 }
 
 BOOL ShellBrowser::GetShowInGroups(void) const
