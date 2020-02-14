@@ -4,14 +4,17 @@
 
 #pragma once
 
-#include "AcceleratorUpdater.h"
-#include "Navigation.h"
-#include "PluginCommandManager.h"
-#include "PluginMenuManager.h"
-#include "TabContainer.h"
-#include "UiTheming.h"
-
+class AcceleratorUpdater;
 __interface IExplorerplusplus;
+class Navigation;
+class TabContainer;
+class UiTheming;
+
+namespace Plugins
+{
+	class PluginCommandManager;
+	class PluginMenuManager;
+}
 
 __interface PluginInterface
 {

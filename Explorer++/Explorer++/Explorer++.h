@@ -4,10 +4,12 @@
 
 #pragma once
 
+#include "AcceleratorUpdater.h"
 #include "BookmarksMainMenu.h"
 #include "BookmarkTree.h"
 #include "CoreInterface.h"
 #include "IconResourceLoader.h"
+#include "Navigation.h"
 #include "PluginCommandManager.h"
 #include "PluginInterface.h"
 #include "PluginMenuManager.h"
@@ -51,7 +53,6 @@ class LoadSaveRegistry;
 class LoadSaveXML;
 class MainToolbar;
 class MainWindow;
-class Navigation;
 
 namespace Plugins
 {
