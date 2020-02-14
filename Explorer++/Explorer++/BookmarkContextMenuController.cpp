@@ -7,6 +7,7 @@
 #include "BookmarkClipboard.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
+#include "TabContainer.h"
 
 BookmarkContextMenuController::BookmarkContextMenuController(BookmarkTree *bookmarkTree,
 	HMODULE resourceModule, IExplorerplusplus *expp) :

@@ -8,6 +8,7 @@
 #include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "TabContainer.h"
 #include "../Helper/iDropSource.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"

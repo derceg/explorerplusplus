@@ -5,8 +5,10 @@
 #include "stdafx.h"
 #include "BookmarkHelper.h"
 #include "AddBookmarkDialog.h"
+#include "BookmarkTree.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
+#include "TabContainer.h"
 #include <boost/range/adaptor/filtered.hpp>
 #include <algorithm>
 

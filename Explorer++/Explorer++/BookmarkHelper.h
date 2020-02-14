@@ -5,13 +5,13 @@
 #pragma once
 
 #include "BookmarkItem.h"
-#include "BookmarkTree.h"
-#include "TabContainer.h"
 #include <optional>
 
-using RawBookmarkItems = std::vector<BookmarkItem *>;
-
+class BookmarkTree;
 __interface IExplorerplusplus;
+class TabContainer;
+
+using RawBookmarkItems = std::vector<BookmarkItem *>;
 
 namespace BookmarkHelper
 {
