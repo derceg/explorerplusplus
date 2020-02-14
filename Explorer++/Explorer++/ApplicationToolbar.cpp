@@ -214,7 +214,6 @@ void ApplicationToolbar::AddButtonToToolbar(const ApplicationButton_t &Button)
 	tbButton.fsState	= TBSTATE_ENABLED;
 	tbButton.fsStyle	= BTNS_AUTOSIZE|BTNS_SHOWTEXT;
 	tbButton.dwData		= Button.ID;
-	tbButton.iString	= NULL;
 
 	if(Button.ShowNameOnToolbar)
 	{

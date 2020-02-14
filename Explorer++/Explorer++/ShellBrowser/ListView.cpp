@@ -192,11 +192,9 @@ void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 {
 	NMLVDISPINFO	*pnmv = NULL;
 	LVITEM			*plvItem = NULL;
-	NMHDR			*nmhdr = NULL;
 
 	pnmv = (NMLVDISPINFO *)lParam;
 	plvItem = &pnmv->item;
-	nmhdr = &pnmv->hdr;
 
 	int internalIndex = static_cast<int>(plvItem->lParam);
 

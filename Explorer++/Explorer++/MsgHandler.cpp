@@ -878,15 +878,12 @@ void Explorerplusplus::OnLockToolbars()
 
 void Explorerplusplus::OnShellNewItemCreated(LPARAM lParam)
 {
-	HWND	hEdit;
-	int		iRenamedItem;
-
-	iRenamedItem = (int)lParam;
+	int iRenamedItem = (int)lParam;
 
 	if(iRenamedItem != -1)
 	{
 		/* Start editing the label for this item. */
-		hEdit = ListView_EditLabel(m_hActiveListView,iRenamedItem);
+		ListView_EditLabel(m_hActiveListView,iRenamedItem);
 	}
 }
 
