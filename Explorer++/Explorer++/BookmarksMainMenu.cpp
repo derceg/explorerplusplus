@@ -4,9 +4,11 @@
 
 #include "stdafx.h"
 #include "BookmarksMainMenu.h"
+#include "BookmarkTree.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "ShellBrowser/NavigationController.h"
 #include "TabContainer.h"
 
 BookmarksMainMenu::BookmarksMainMenu(IExplorerplusplus *expp, BookmarkTree *bookmarkTree,

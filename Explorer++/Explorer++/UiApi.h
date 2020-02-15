@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "UiTheming.h"
+class UiTheming;
 
 namespace Plugins
 {

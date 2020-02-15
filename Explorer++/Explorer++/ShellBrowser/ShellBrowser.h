@@ -7,15 +7,12 @@
 #include "ColumnDataRetrieval.h"
 #include "Columns.h"
 #include "FolderSettings.h"
-#include "NavigationController.h"
 #include "NavigatorInterface.h"
 #include "SignalWrapper.h"
 #include "SortModes.h"
 #include "TabNavigationInterface.h"
 #include "ViewModes.h"
 #include "../Helper/DropHandler.h"
-#include "../Helper/Helper.h"
-#include "../Helper/IconFetcher.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowSubclassWrapper.h"
@@ -32,6 +29,14 @@
 #define WM_USER_NEWITEMINSERTED		(WM_APP + 200)
 #define WM_USER_DIRECTORYMODIFIED	(WM_APP + 204)
 
+struct BasicItemInfo_t;
+class CachedIcons;
+struct Config;
+class IconFetcher;
+class NavigationController;
+struct PreservedFolderState;
+struct PreservedHistoryEntry;
+
 typedef struct
 {
 	ULARGE_INTEGER TotalFolderSize;
@@ -47,11 +52,6 @@ typedef struct
 	Mimics the feature available in Windows Vista and later. */
 	int nItems;
 } TypeGroup_t;
-
-struct BasicItemInfo_t;
-class CachedIcons;
-struct Config;
-struct PreservedFolderState;
 
 class ShellBrowser : public IDropTarget, public IDropFilesCallback, public NavigatorInterface
 {

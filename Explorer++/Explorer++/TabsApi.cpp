@@ -6,10 +6,54 @@
 #include "TabsApi.h"
 #include "Config.h"
 #include "CoreInterface.h"
+#include "Navigation.h"
 #include "ShellBrowser/FolderSettings.h"
+#include "ShellBrowser/NavigationController.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/SortModes.h"
+#include "TabContainer.h"
 #include "TabProperties.h"
 #include "../ThirdParty/Sol/sol.hpp"
+
+Plugins::TabsApi::FolderSettings::FolderSettings(const ShellBrowser &shellBrowser)
+{
+	sortMode = shellBrowser.GetSortMode();
+	viewMode = shellBrowser.GetViewMode();
+	sortAscending = shellBrowser.GetSortAscending();
+	showInGroups = shellBrowser.GetShowInGroups();
+	showHidden = shellBrowser.GetShowHidden();
+	autoArrange = shellBrowser.GetAutoArrange();
+}
+
+std::wstring Plugins::TabsApi::FolderSettings::toString()
+{
+	return _T("sortMode = ") + strToWstr(sortMode._to_string())
+		+ _T(", viewMode = ") + strToWstr(viewMode._to_string())
+		+ _T(", sortAscending = ") + std::to_wstring(sortAscending)
+		+ _T(", showInGroups = ") + std::to_wstring(showInGroups)
+		+ _T(", showHidden = ") + std::to_wstring(showHidden)
+		+ _T(", autoArrange = ") + std::to_wstring(autoArrange);
+}
+
+Plugins::TabsApi::Tab::Tab(const ::Tab &tabInternal) :
+	folderSettings(*tabInternal.GetShellBrowser())
+{
+	id = tabInternal.GetId();
+	location = tabInternal.GetShellBrowser()->GetDirectory();
+	name = tabInternal.GetName();
+	locked = (tabInternal.GetLockState() == ::Tab::LockState::Locked);
+	addressLocked = (tabInternal.GetLockState() == ::Tab::LockState::AddressLocked);
+}
+
+std::wstring Plugins::TabsApi::Tab::toString()
+{
+	return _T("id = ") + std::to_wstring(id)
+		+ _T(", location = ") + location
+		+ _T(", name = ") + name
+		+ _T(", locked = ") + std::to_wstring(locked)
+		+ _T(", addressLocked = ") + std::to_wstring(addressLocked)
+		+ _T(", folderSettings = {") + folderSettings.toString() + _T("}");
+}
 
 Plugins::TabsApi::TabsApi(IExplorerplusplus *expp, TabContainer *tabContainer,
 	Navigation *navigation) :

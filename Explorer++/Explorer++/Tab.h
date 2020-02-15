@@ -4,15 +4,16 @@
 
 #pragma once
 
-#include "ShellBrowser/FolderSettings.h"
-#include "ShellBrowser/ShellBrowser.h"
 #include "TabNavigationInterface.h"
 #include "../Helper/Macros.h"
 #include <boost/optional.hpp>
 #include <boost/signals2.hpp>
 
+struct FolderColumns;
+struct FolderSettings;
 __interface IExplorerplusplus;
 struct PreservedTab;
+class ShellBrowser;
 
 class Tab
 {

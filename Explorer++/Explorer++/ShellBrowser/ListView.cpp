@@ -6,10 +6,12 @@
 #include "ShellBrowser.h"
 #include "Config.h"
 #include "MainResource.h"
+#include "NavigationController.h"
 #include "ResourceHelper.h"
 #include "SetFileAttributesDialog.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/Helper.h"
+#include "../Helper/IconFetcher.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <boost/format.hpp>

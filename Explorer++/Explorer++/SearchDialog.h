@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "TabContainer.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/FileContextMenuManager.h"
@@ -20,6 +19,7 @@
 
 __interface IExplorerplusplus;
 class SearchDialog;
+class TabContainer;
 
 /* Manages settings for the search dialog. */
 class SearchDialogPersistentSettings : public DialogSettings

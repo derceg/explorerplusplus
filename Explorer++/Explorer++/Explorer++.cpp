@@ -4,12 +4,15 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "BookmarksMainMenu.h"
 #include "BookmarksToolbar.h"
 #include "ColorRuleHelper.h"
 #include "Config.h"
 #include "Explorer++_internal.h"
 #include "MenuRanges.h"
 #include "PluginManager.h"
+#include "TabRestorerUI.h"
+#include "UiTheming.h"
 #include "../Helper/iDirectoryMonitor.h"
 
 /* These entries correspond to shell

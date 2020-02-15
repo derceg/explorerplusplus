@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "BookmarkTree.h"
+class BookmarkTree;
 
 namespace BookmarkXmlStorage
 {

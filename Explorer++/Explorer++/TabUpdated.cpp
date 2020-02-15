@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "TabUpdated.h"
+#include "TabContainer.h"
 #include "TabsApi.h"
 #include "../ThirdParty/Sol/sol.hpp"
 

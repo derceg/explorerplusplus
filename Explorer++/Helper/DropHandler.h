@@ -5,7 +5,6 @@
 #pragma once
 
 #include <list>
-#include "Helper.h"
 #include "FileOperations.h"
 #include "ReferenceCount.h"
 

@@ -3,10 +3,11 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include <list>
 #include "TabDropHandler.h"
-#include "../Helper/ShellHelper.h"
+#include "TabContainer.h"
 #include "../Helper/Macros.h"
+#include "../Helper/ShellHelper.h"
+#include <list>
 
 TabDropHandler::TabDropHandler(HWND hTabCtrl, TabContainer *tabContainer) :
 	m_hTabCtrl(hTabCtrl),

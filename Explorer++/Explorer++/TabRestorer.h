@@ -5,9 +5,10 @@
 #pragma once
 
 #include "PreservedTab.h"
-#include "TabContainer.h"
 #include "../Helper/Macros.h"
 #include <boost/signals2.hpp>
+
+class TabContainer;
 
 class TabRestorer
 {

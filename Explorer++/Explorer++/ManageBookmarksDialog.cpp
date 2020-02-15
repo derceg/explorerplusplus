@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ManageBookmarksDialog.h"
 #include "BookmarkHelper.h"
+#include "BookmarkTree.h"
 #include "CoreInterface.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"

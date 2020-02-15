@@ -9,6 +9,7 @@
 #include "Config.h"
 #include "IconResourceLoader.h"
 #include "MainToolbar.h"
+#include "TabContainer.h"
 #include "ToolbarButtons.h"
 #include "../Helper/Controls.h"
 #include "../Helper/WindowHelper.h"

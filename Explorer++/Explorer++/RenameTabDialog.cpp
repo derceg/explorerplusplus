@@ -5,8 +5,8 @@
 #include "stdafx.h"
 #include "RenameTabDialog.h"
 #include "MainResource.h"
+#include "TabContainer.h"
 #include "../Helper/Macros.h"
-
 
 const TCHAR RenameTabDialogPersistentSettings::SETTINGS_KEY[] = _T("RenameTab");
 

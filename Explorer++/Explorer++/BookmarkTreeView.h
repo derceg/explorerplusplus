@@ -7,7 +7,6 @@
 #include "BookmarkDropTargetWindow.h"
 #include "BookmarkHelper.h"
 #include "BookmarkItem.h"
-#include "BookmarkTree.h"
 #include "ResourceHelper.h"
 #include "SignalWrapper.h"
 #include "../Helper/DpiCompatibility.h"
@@ -18,6 +17,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
+class BookmarkTree;
 __interface IExplorerplusplus;
 
 class BookmarkTreeView : private BookmarkDropTargetWindow

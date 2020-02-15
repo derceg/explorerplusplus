@@ -5,7 +5,8 @@
 #pragma once
 
 #include "Event.h"
-#include "TabContainer.h"
+
+class TabContainer;
 
 namespace Plugins
 {

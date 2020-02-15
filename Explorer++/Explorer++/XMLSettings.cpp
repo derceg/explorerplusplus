@@ -22,6 +22,7 @@
 #include "Explorer++_internal.h"
 #include "MainToolbar.h"
 #include "ShellBrowser/Columns.h"
+#include "TabContainer.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/XMLSettings.h"

@@ -11,6 +11,7 @@
 #include "../Helper/Controls.h"
 #include "../Helper/DriveInfo.h"
 #include "../Helper/FileContextMenuManager.h"
+#include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 

@@ -9,6 +9,7 @@
 #include "DefaultToolbarButtons.h"
 #include "Icon.h"
 #include "MainResource.h"
+#include "ShellBrowser/NavigationController.h"
 #include "ShellBrowser/ViewModes.h"
 #include "TabContainer.h"
 #include "../Helper/Controls.h"

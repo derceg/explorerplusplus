@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include "TabContainer.h"
 #include "../Helper/DropHandler.h"
+
+class TabContainer;
 
 class TabDropHandler : public IDropTarget
 {

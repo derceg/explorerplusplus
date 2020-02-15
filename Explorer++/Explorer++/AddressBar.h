@@ -4,12 +4,13 @@
 
 #pragma once
 
-#include "MainToolbar.h"
-#include "Tab.h"
+#include "ShellBrowser/HistoryEntry.h"
 #include "../Helper/BaseWindow.h"
 #include "../Helper/WindowSubclassWrapper.h"
 
 __interface IExplorerplusplus;
+class MainToolbar;
+class Tab;
 
 class AddressBar : public BaseWindow
 {

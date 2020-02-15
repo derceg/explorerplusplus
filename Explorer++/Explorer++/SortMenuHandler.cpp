@@ -6,6 +6,7 @@
 #include "Explorer++.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/SortModes.h"
 #include "SortModeHelper.h"
 #include "../Helper/MenuHelper.h"

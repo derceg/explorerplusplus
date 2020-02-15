@@ -6,6 +6,7 @@
 #include "BookmarkXmlStorage.h"
 #include "BookmarkItem.h"
 #include "BookmarkStorage.h"
+#include "BookmarkTree.h"
 #include "../Helper/XMLSettings.h"
 #include <wil/com.h>
 

@@ -6,6 +6,7 @@
 #include "Explorer++.h"
 #include "Config.h"
 #include "MainResource.h"
+#include "TabContainer.h"
 #include "../Helper/Controls.h"
 #include "../Helper/WindowHelper.h"
 

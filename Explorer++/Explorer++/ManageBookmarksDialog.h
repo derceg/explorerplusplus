@@ -5,7 +5,6 @@
 #pragma once
 
 #include "BookmarkListView.h"
-#include "BookmarkTree.h"
 #include "BookmarkTreeView.h"
 #include "Navigation.h"
 #include "ResourceHelper.h"
@@ -15,6 +14,7 @@
 #include <stack>
 #include <unordered_set>
 
+class BookmarkTree;
 __interface IExplorerplusplus;
 class ManageBookmarksDialog;
 

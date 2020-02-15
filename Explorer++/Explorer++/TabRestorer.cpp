@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "TabRestorer.h"
+#include "TabContainer.h"
 
 TabRestorer::TabRestorer(TabContainer *tabContainer) :
 	m_tabContainer(tabContainer)

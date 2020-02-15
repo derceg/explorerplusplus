@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "UiApi.h"
+#include "UiTheming.h"
 #include "../Helper/Rgb.h"
 
 Plugins::UiApi::UiApi(UiTheming *uiTheming) :

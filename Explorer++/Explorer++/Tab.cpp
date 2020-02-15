@@ -7,6 +7,8 @@
 #include "Config.h"
 #include "CoreInterface.h"
 #include "PreservedTab.h"
+#include "ShellBrowser/FolderSettings.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include <wil/resource.h>
 
 int Tab::idCounter = 1;

@@ -5,12 +5,12 @@
 #pragma once
 
 #include "BookmarkMenuBuilder.h"
-#include "BookmarkTree.h"
 #include "MenuHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
 
+class BookmarkTree;
 __interface IExplorerplusplus;
 
 class BookmarksMainMenu

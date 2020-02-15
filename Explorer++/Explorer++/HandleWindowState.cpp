@@ -6,7 +6,9 @@
 #include "Explorer++.h"
 #include "Config.h"
 #include "MainResource.h"
+#include "ShellBrowser/NavigationController.h"
 #include "ShellBrowser/ViewModes.h"
+#include "TabContainer.h"
 #include "../Helper/MenuHelper.h"
 
 void Explorerplusplus::UpdateWindowStates(const Tab &tab)

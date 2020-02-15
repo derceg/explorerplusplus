@@ -4,10 +4,6 @@
 
 #pragma once
 
-#include "BookmarkHelper.h"
-#include "BookmarkItem.h"
-#include "BookmarkTree.h"
-#include "BookmarkTreeView.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
@@ -16,6 +12,9 @@
 #include <unordered_set>
 
 class AddBookmarkDialog;
+class BookmarkItem;
+class BookmarkTree;
+class BookmarkTreeView;
 __interface IExplorerplusplus;
 
 class AddBookmarkDialogPersistentSettings : public DialogSettings

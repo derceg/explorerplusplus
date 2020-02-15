@@ -10,6 +10,7 @@
 #include "RenameTabDialog.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
+#include "TabRestorerUI.h"
 #include "../Helper/Macros.h"
 #include <list>
 

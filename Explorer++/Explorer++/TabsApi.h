@@ -4,15 +4,17 @@
 
 #pragma once
 
-#include "Navigation.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
 #include "Tab.h"
-#include "TabContainer.h"
 #include "../Helper/StringHelper.h"
 #include "../ThirdParty/Sol/forward.hpp"
 
 __interface IExplorerplusplus;
+class Navigation;
+class ShellBrowser;
+class TabContainer;
+struct TabSettings;
 
 namespace Plugins
 {
@@ -28,25 +30,8 @@ namespace Plugins
 			bool showHidden;
 			bool autoArrange;
 
-			FolderSettings(const ShellBrowser &shellBrowser)
-			{
-				sortMode = shellBrowser.GetSortMode();
-				viewMode = shellBrowser.GetViewMode();
-				sortAscending = shellBrowser.GetSortAscending();
-				showInGroups = shellBrowser.GetShowInGroups();
-				showHidden = shellBrowser.GetShowHidden();
-				autoArrange = shellBrowser.GetAutoArrange();
-			}
-
-			std::wstring toString()
-			{
-				return _T("sortMode = ") + strToWstr(sortMode._to_string())
-					+ _T(", viewMode = ") + strToWstr(viewMode._to_string())
-					+ _T(", sortAscending = ") + std::to_wstring(sortAscending)
-					+ _T(", showInGroups = ") + std::to_wstring(showInGroups)
-					+ _T(", showHidden = ") + std::to_wstring(showHidden)
-					+ _T(", autoArrange = ") + std::to_wstring(autoArrange);
-			}
+			FolderSettings(const ShellBrowser &shellBrowser);
+			std::wstring toString();
 		};
 
 		struct Tab
@@ -61,25 +46,8 @@ namespace Plugins
 
 			FolderSettings folderSettings;
 
-			Tab(const ::Tab &tabInternal) :
-				folderSettings(*tabInternal.GetShellBrowser())
-			{
-				id = tabInternal.GetId();
-				location = tabInternal.GetShellBrowser()->GetDirectory();
-				name = tabInternal.GetName();
-				locked = (tabInternal.GetLockState() == ::Tab::LockState::Locked);
-				addressLocked = (tabInternal.GetLockState() == ::Tab::LockState::AddressLocked);
-			}
-
-			std::wstring toString()
-			{
-				return _T("id = ") + std::to_wstring(id)
-					+ _T(", location = ") + location
-					+ _T(", name = ") + name
-					+ _T(", locked = ") + std::to_wstring(locked)
-					+ _T(", addressLocked = ") + std::to_wstring(addressLocked)
-					+ _T(", folderSettings = {") + folderSettings.toString() + _T("}");
-			}
+			Tab(const ::Tab &tabInternal);
+			std::wstring toString();
 		};
 
 		TabsApi(IExplorerplusplus *expp, TabContainer *tabContainer, Navigation *navigation);

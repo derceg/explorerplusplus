@@ -5,8 +5,10 @@
 #include "stdafx.h"
 #include "BookmarkContextMenuController.h"
 #include "BookmarkClipboard.h"
+#include "BookmarkTree.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
+#include "ShellBrowser/NavigationController.h"
 #include "TabContainer.h"
 
 BookmarkContextMenuController::BookmarkContextMenuController(BookmarkTree *bookmarkTree,

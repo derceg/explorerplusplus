@@ -5,12 +5,12 @@
 #pragma once
 
 #include "Tab.h"
-#include "TabContainer.h"
 #include "../Helper/Macros.h"
 #include <wil/resource.h>
 
 struct Config;
 __interface IExplorerplusplus;
+class TabContainer;
 
 class TaskbarThumbnails
 {

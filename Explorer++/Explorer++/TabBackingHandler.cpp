@@ -12,6 +12,7 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "TabBacking.h"
+#include "TabContainer.h"
 #include "../Helper/Macros.h"
 
 void Explorerplusplus::CreateTabBacking()

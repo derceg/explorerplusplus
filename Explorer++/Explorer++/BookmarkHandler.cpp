@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Navigation.h"
+#include "TabContainer.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 

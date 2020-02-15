@@ -10,6 +10,7 @@
 #include "TabNavigationInterface.h"
 #include "../Helper/BaseWindow.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/IconFetcher.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/optional.hpp>
 #include <boost/parameter.hpp>

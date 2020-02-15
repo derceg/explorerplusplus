@@ -5,8 +5,9 @@
 #pragma once
 
 #include "BookmarkItem.h"
-#include "BookmarkTree.h"
 #include <optional>
+
+class BookmarkTree;
 
 class BookmarkDropInfo
 {

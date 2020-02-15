@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "TabMoved.h"
+#include "TabContainer.h"
 #include "../ThirdParty/Sol/sol.hpp"
 
 Plugins::TabMoved::TabMoved(TabContainer *tabContainer) :

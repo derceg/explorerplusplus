@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "ShellTreeView/ShellTreeView.h"
+#include "TabContainer.h"
 
 BOOL Explorerplusplus::AnyItemsSelected() const
 {

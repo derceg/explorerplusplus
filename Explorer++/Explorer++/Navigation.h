@@ -4,9 +4,8 @@
 
 #pragma once
 
-#include "TabContainer.h"
-
 __interface IExplorerplusplus;
+class TabContainer;
 
 class Navigation
 {

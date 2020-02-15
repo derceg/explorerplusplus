@@ -4,13 +4,14 @@
 
 #pragma once
 
-#include "TabContainer.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
 
+struct Column_t;
 __interface IExplorerplusplus;
 class SelectColumnsDialog;
+class TabContainer;
 
 class SelectColumnsDialogPersistentSettings : public DialogSettings
 {

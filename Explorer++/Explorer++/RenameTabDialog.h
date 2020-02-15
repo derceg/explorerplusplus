@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include "TabContainer.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 
 class RenameTabDialog;
+class TabContainer;
 
 class RenameTabDialogPersistentSettings : public DialogSettings
 {

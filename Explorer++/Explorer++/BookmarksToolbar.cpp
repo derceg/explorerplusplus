@@ -8,6 +8,7 @@
 #include "BookmarkClipboard.h"
 #include "BookmarkDataExchange.h"
 #include "BookmarkHelper.h"
+#include "BookmarkTree.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"

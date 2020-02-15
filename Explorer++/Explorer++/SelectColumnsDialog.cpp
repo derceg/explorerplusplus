@@ -8,7 +8,10 @@
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "ShellBrowser/Columns.h"
+#include "ShellBrowser/NavigationController.h"
 #include "ShellBrowser/ShellBrowser.h"
+#include "TabContainer.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include <algorithm>

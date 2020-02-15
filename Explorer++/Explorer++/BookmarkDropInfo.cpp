@@ -6,6 +6,7 @@
 #include "BookmarkDropInfo.h"
 #include "BookmarkDataExchange.h"
 #include "BookmarkHelper.h"
+#include "BookmarkTree.h"
 #include "../Helper/DataExchangeHelper.h"
 #include "../Helper/ShellHelper.h"
 

@@ -10,9 +10,9 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "MainResource.h"
-#include "../Helper/ShellHelper.h"
+#include "TabContainer.h"
 #include "../Helper/Macros.h"
-
+#include "../Helper/ShellHelper.h"
 
 #define MENU_OPEN_IN_NEW_TAB	(MAX_SHELL_MENU_ID + 1)
 

@@ -7,6 +7,7 @@
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "MainResource.h"
+#include "TabContainer.h"
 #include "../Helper/FolderSize.h"
 #include "../Helper/ShellHelper.h"
 

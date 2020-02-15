@@ -7,6 +7,7 @@
 #include "Config.h"
 #include "MainResource.h"
 #include "ViewModes.h"
+#include "../Helper/IconFetcher.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"

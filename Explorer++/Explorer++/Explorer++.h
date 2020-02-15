@@ -5,24 +5,20 @@
 #pragma once
 
 #include "AcceleratorUpdater.h"
-#include "BookmarksMainMenu.h"
 #include "BookmarkTree.h"
 #include "CoreInterface.h"
-#include "IconResourceLoader.h"
 #include "Navigation.h"
 #include "PluginCommandManager.h"
 #include "PluginInterface.h"
 #include "PluginMenuManager.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/Columns.h"
 #include "ShellBrowser/SortModes.h"
 #include "Tab.h"
 #include "TabNavigationInterface.h"
-#include "TabRestorer.h"
-#include "TabRestorerUI.h"
-#include "UiTheming.h"
 #include "ValueWrapper.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/DropHandler.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/FileContextMenuManager.h"
 #include <boost/signals2.hpp>
@@ -38,34 +34,36 @@
 // Forward declarations.
 class AddressBar;
 class ApplicationToolbar;
+class BookmarksMainMenu;
 class BookmarksToolbar;
+struct ColumnWidth_t;
+struct Config;
+class DrivesToolbar;
+class IconResourceLoader;
+__interface IDirectoryMonitor;
+class ILoadSave;
+class LoadSaveRegistry;
+class LoadSaveXML;
+class MainToolbar;
+class MainWindow;
+class ShellBrowser;
+class ShellTreeView;
+class TabContainer;
+class TabRestorer;
+class TabRestorerUI;
+struct TabSettings;
+class TaskbarThumbnails;
+class UiTheming;
 
 namespace NColorRuleHelper
 {
 	struct ColorRule_t;
 }
 
-class DrivesToolbar;
-struct Config;
-struct ColumnWidth_t;
-class ILoadSave;
-class LoadSaveRegistry;
-class LoadSaveXML;
-class MainToolbar;
-class MainWindow;
-
 namespace Plugins
 {
 	class PluginManager;
 }
-
-class ShellBrowser;
-class TabContainer;
-class TaskbarThumbnails;
-
-__interface IDirectoryMonitor;
-
-class ShellTreeView;
 
 class Explorerplusplus : public IExplorerplusplus, public TabNavigationInterface,
 	public IFileContextMenuExternal, public PluginInterface

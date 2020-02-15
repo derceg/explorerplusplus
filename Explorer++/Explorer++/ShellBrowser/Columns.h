@@ -4,20 +4,20 @@
 
 #pragma once
 
-typedef struct
+struct Column_t
 {
 	unsigned int id;
 	BOOL bChecked;
 	int iWidth;
-} Column_t;
+};
 
-typedef struct
+struct ColumnOld_t
 {
 	unsigned int id;
 	BOOL bChecked;
-} ColumnOld_t;
+};
 
-typedef enum
+enum COLUMNS
 {
 	CM_NAME = 1,
 	CM_TYPE = 2,
@@ -103,4 +103,4 @@ typedef enum
 
 	/* Printer columns. */
 	CM_PRINTERMODEL = 64
-} COLUMNS;
+};
