@@ -4,9 +4,10 @@
 
 #pragma once
 
-#include "FolderSettings.h"
-#include "ItemData.h"
 #include <string>
+
+struct BasicItemInfo_t;
+struct GlobalFolderSettings;
 
 enum TimeType_t
 {

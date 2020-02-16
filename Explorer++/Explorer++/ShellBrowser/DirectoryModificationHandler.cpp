@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ShellBrowser.h"
 #include "Config.h"
+#include "ItemData.h"
 #include "ViewModes.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Logging.h"

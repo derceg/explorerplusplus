@@ -7,6 +7,7 @@
 #include "ColumnDataRetrieval.h"
 #include "Columns.h"
 #include "Config.h"
+#include "ItemData.h"
 #include "MainResource.h"
 #include "SortModes.h"
 #include "ViewModes.h"

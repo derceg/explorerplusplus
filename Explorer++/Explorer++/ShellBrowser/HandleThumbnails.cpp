@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ShellBrowser.h"
+#include "ItemData.h"
 #include "ViewModes.h"
 #include "../Helper/ShellHelper.h"
 #include <boost/scope_exit.hpp>

@@ -5,6 +5,8 @@
 #include "stdafx.h"
 #include "ColumnDataRetrieval.h"
 #include "Columns.h"
+#include "FolderSettings.h"
+#include "ItemData.h"
 #include "../Helper/DriveInfo.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/FolderSize.h"
