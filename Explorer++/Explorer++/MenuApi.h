@@ -7,6 +7,7 @@
 #include "PluginMenuManager.h"
 #include "../ThirdParty/Sol/forward.hpp"
 #include <boost/signals2.hpp>
+#include <optional>
 #include <unordered_map>
 
 namespace Plugins
@@ -18,7 +19,7 @@ namespace Plugins
 		MenuApi(PluginMenuManager *pluginMenuManager);
 		~MenuApi();
 
-		boost::optional<int> create(const std::wstring &text, sol::protected_function callback);
+		std::optional<int> create(const std::wstring &text, sol::protected_function callback);
 		void remove(int menuItemId);
 
 	private:

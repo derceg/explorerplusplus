@@ -66,7 +66,7 @@ ULONG __stdcall ShellBrowser::Release(void)
 
 ShellBrowser *ShellBrowser::CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner,
 	CachedIcons *cachedIcons, const Config *config, TabNavigationInterface *tabNavigation,
-	const FolderSettings &folderSettings, boost::optional<FolderColumns> initialColumns)
+	const FolderSettings &folderSettings, std::optional<FolderColumns> initialColumns)
 {
 	return new ShellBrowser(id, resourceInstance, hOwner, cachedIcons, config, tabNavigation,
 		folderSettings, initialColumns);
@@ -86,7 +86,7 @@ ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState) :
 	ShellBrowser(id, resourceInstance, hOwner, cachedIcons, config, tabNavigation,
-		preservedFolderState.folderSettings, boost::none)
+		preservedFolderState.folderSettings, std::nullopt)
 {
 	m_navigationController = std::make_unique<NavigationController>(this, tabNavigation, m_iconFetcher.get(),
 		history, currentEntry);
@@ -94,7 +94,7 @@ ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
 
 ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
 	const Config *config, TabNavigationInterface *tabNavigation, const FolderSettings &folderSettings,
-	boost::optional<FolderColumns> initialColumns) :
+	std::optional<FolderColumns> initialColumns) :
 	m_ID(id),
 	m_hResourceModule(resourceInstance),
 	m_hOwner(hOwner),
@@ -527,7 +527,7 @@ int ShellBrowser::LocateFileItemInternalIndex(const TCHAR *szFileName) const
 	return -1;
 }
 
-boost::optional<int> ShellBrowser::LocateItemByInternalIndex(int internalIndex) const
+std::optional<int> ShellBrowser::LocateItemByInternalIndex(int internalIndex) const
 {
 	LVFINDINFO lvfi;
 	lvfi.flags = LVFI_PARAM;
@@ -536,7 +536,7 @@ boost::optional<int> ShellBrowser::LocateItemByInternalIndex(int internalIndex) 
 
 	if (item == -1)
 	{
-		return boost::none;
+		return std::nullopt;
 	}
 
 	return item;

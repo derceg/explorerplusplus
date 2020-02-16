@@ -268,7 +268,7 @@ void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 	plvItem->mask |= LVIF_DI_SETITEM;
 }
 
-boost::optional<int> ShellBrowser::GetCachedIconIndex(const ItemInfo_t &itemInfo)
+std::optional<int> ShellBrowser::GetCachedIconIndex(const ItemInfo_t &itemInfo)
 {
 	TCHAR filePath[MAX_PATH];
 	HRESULT hr = GetDisplayName(itemInfo.pidlComplete.get(),
@@ -276,14 +276,14 @@ boost::optional<int> ShellBrowser::GetCachedIconIndex(const ItemInfo_t &itemInfo
 
 	if (FAILED(hr))
 	{
-		return boost::none;
+		return std::nullopt;
 	}
 
 	auto cachedItr = m_cachedIcons->findByPath(filePath);
 
 	if (cachedItr == m_cachedIcons->end())
 	{
-		return boost::none;
+		return std::nullopt;
 	}
 
 	return cachedItr->iconIndex;
@@ -351,7 +351,7 @@ void ShellBrowser::QueueInfoTipTask(int internalIndex, const std::wstring &exist
 	m_infoTipResults.insert({ infoTipResultId, std::move(result) });
 }
 
-boost::optional<ShellBrowser::InfoTipResult> ShellBrowser::GetInfoTipAsync(HWND listView, int infoTipResultId,
+std::optional<ShellBrowser::InfoTipResult> ShellBrowser::GetInfoTipAsync(HWND listView, int infoTipResultId,
 	int internalIndex, const BasicItemInfo_t &basicItemInfo, const Config &config, HINSTANCE instance, bool virtualFolder)
 {
 	std::wstring infoTip;
@@ -365,7 +365,7 @@ boost::optional<ShellBrowser::InfoTipResult> ShellBrowser::GetInfoTipAsync(HWND 
 
 		if (FAILED(hr))
 		{
-			return boost::none;
+			return std::nullopt;
 		}
 
 		infoTip = infoTipText;
@@ -381,7 +381,7 @@ boost::optional<ShellBrowser::InfoTipResult> ShellBrowser::GetInfoTipAsync(HWND 
 
 		if (!fileTimeResult)
 		{
-			return boost::none;
+			return std::nullopt;
 		}
 
 		infoTip = str(boost::wformat(_T("%s: %s")) % dateModified % fileModificationText);

@@ -7,7 +7,7 @@
 #include "Accelerator.h"
 #include "../ThirdParty/Sol/sol.hpp"
 #include <nlohmann/json.hpp>
-#include <boost/optional.hpp>
+#include <optional>
 
 namespace boost
 {
@@ -22,12 +22,12 @@ namespace Plugins
 	struct PluginAccelerator
 	{
 		std::wstring acceleratorString;
-		boost::optional<Accelerator> accelerator;
+		std::optional<Accelerator> accelerator;
 	};
 
 	struct PluginShortcutKey
 	{
-		boost::optional<int> command;
+		std::optional<int> command;
 		std::vector<PluginAccelerator> pluginAccelerators;
 	};
 
@@ -35,7 +35,7 @@ namespace Plugins
 	{
 		std::wstring name;
 		std::wstring acceleratorString;
-		boost::optional<Accelerator> accelerator;
+		std::optional<Accelerator> accelerator;
 		std::wstring description;
 	};
 
@@ -71,7 +71,7 @@ namespace Plugins
 	void from_json(const nlohmann::json &json, PluginShortcutKey &shortcutKey);
 	void from_json(const nlohmann::json &json, PluginAccelerator &pluginAccelerator);
 
-	boost::optional<Manifest> parseManifest(const boost::filesystem::path &manifestPath);
+	std::optional<Manifest> parseManifest(const boost::filesystem::path &manifestPath);
 }
 
 namespace nlohmann

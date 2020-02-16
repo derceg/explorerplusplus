@@ -99,7 +99,7 @@ void ShellBrowser::ProcessColumnResult(int columnResultId)
 	m_columnResults.erase(itr);
 }
 
-boost::optional<int> ShellBrowser::GetColumnIndexById(unsigned int id) const
+std::optional<int> ShellBrowser::GetColumnIndexById(unsigned int id) const
 {
 	HWND header = ListView_GetHeader(m_hListView);
 
@@ -122,10 +122,10 @@ boost::optional<int> ShellBrowser::GetColumnIndexById(unsigned int id) const
 		}
 	}
 
-	return boost::none;
+	return std::nullopt;
 }
 
-boost::optional<unsigned int> ShellBrowser::GetColumnIdByIndex(int index) const
+std::optional<unsigned int> ShellBrowser::GetColumnIdByIndex(int index) const
 {
 	HWND hHeader = ListView_GetHeader(m_hListView);
 
@@ -135,7 +135,7 @@ boost::optional<unsigned int> ShellBrowser::GetColumnIdByIndex(int index) const
 
 	if (!res)
 	{
-		return boost::none;
+		return std::nullopt;
 	}
 
 	return static_cast<unsigned int>(hdItem.lParam);

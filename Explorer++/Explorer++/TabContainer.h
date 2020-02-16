@@ -12,12 +12,12 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/IconFetcher.h"
 #include "../Helper/WindowSubclassWrapper.h"
-#include <boost/optional.hpp>
 #include <boost/parameter.hpp>
 #include <boost/signals2.hpp>
 #include <wil/com.h>
 #include <wil/resource.h>
 #include <functional>
+#include <optional>
 #include <unordered_map>
 
 class BookmarkTree;
@@ -41,16 +41,16 @@ struct TabSettingsImpl
 	template <class ArgumentPack>
 	TabSettingsImpl(const ArgumentPack &args)
 	{
-		name = args[_name | boost::none];
-		lockState = args[_lockState | boost::none];
-		index = args[_index | boost::none];
-		selected = args[_selected | boost::none];
+		name = args[_name | std::nullopt];
+		lockState = args[_lockState | std::nullopt];
+		index = args[_index | std::nullopt];
+		selected = args[_selected | std::nullopt];
 	}
 
-	boost::optional<std::wstring> name;
-	boost::optional<Tab::LockState> lockState;
-	boost::optional<int> index;
-	boost::optional<bool> selected;
+	std::optional<std::wstring> name;
+	std::optional<Tab::LockState> lockState;
+	std::optional<int> index;
+	std::optional<bool> selected;
 };
 
 // Used when creating a tab.
@@ -79,11 +79,11 @@ public:
 
 	HRESULT CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
 	HRESULT CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {},
-		const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none,
+		const FolderSettings *folderSettings = nullptr, std::optional<FolderColumns> initialColumns = std::nullopt,
 		int *newTabId = nullptr);
 	HRESULT CreateNewTab(const PreservedTab &preservedTab, int *newTabId = nullptr);
 	HRESULT CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings = {},
-		const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none,
+		const FolderSettings *folderSettings = nullptr, std::optional<FolderColumns> initialColumns = std::nullopt,
 		int *newTabId = nullptr);
 
 	Tab &GetTab(int tabId);
@@ -187,7 +187,7 @@ private:
 	void SetTabIconFromSystemImageList(const Tab &tab, int systemIconIndex);
 	void SetTabIconFromImageList(const Tab &tab, int imageIndex);
 
-	void InsertNewTab(int index, int tabId, PCIDLIST_ABSOLUTE pidlDirectory, boost::optional<std::wstring> customName);
+	void InsertNewTab(int index, int tabId, PCIDLIST_ABSOLUTE pidlDirectory, std::optional<std::wstring> customName);
 
 	void RemoveTabFromControl(const Tab &tab);
 

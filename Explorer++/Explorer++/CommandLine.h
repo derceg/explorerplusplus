@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <boost/optional.hpp>
+#include <optional>
 
 namespace CommandLine
 {
@@ -13,5 +13,5 @@ namespace CommandLine
 		int exitCode;
 	};
 
-	boost::optional<ExitInfo> ProcessCommandLine();
+	std::optional<ExitInfo> ProcessCommandLine();
 }

@@ -77,13 +77,13 @@ std::vector<Plugins::TabsApi::Tab> Plugins::TabsApi::getAll()
 	return tabs;
 }
 
-boost::optional<Plugins::TabsApi::Tab> Plugins::TabsApi::get(int tabId)
+std::optional<Plugins::TabsApi::Tab> Plugins::TabsApi::get(int tabId)
 {
 	auto tabInternal = m_tabContainer->GetTabOptional(tabId);
 
 	if (!tabInternal)
 	{
-		return boost::none;
+		return std::nullopt;
 	}
 
 	Tab tab(*tabInternal);
@@ -93,7 +93,7 @@ boost::optional<Plugins::TabsApi::Tab> Plugins::TabsApi::get(int tabId)
 
 int Plugins::TabsApi::create(sol::table createProperties)
 {
-	boost::optional<std::wstring> location = createProperties[TabConstants::LOCATION];
+	sol::optional<std::wstring> location = createProperties[TabConstants::LOCATION];
 
 	if (!location || location->empty())
 	{
@@ -113,7 +113,7 @@ int Plugins::TabsApi::create(sol::table createProperties)
 
 	::FolderSettings folderSettings = m_expp->GetConfig()->defaultFolderSettings;
 
-	boost::optional<sol::table> folderSettingsTable = createProperties[TabConstants::FOLDER_SETTINGS];
+	sol::optional<sol::table> folderSettingsTable = createProperties[TabConstants::FOLDER_SETTINGS];
 
 	if (folderSettingsTable)
 	{
@@ -121,7 +121,7 @@ int Plugins::TabsApi::create(sol::table createProperties)
 	}
 
 	int tabId;
-	hr = m_tabContainer->CreateNewTab(pidlDirectory.get(), tabSettings, &folderSettings, boost::none, &tabId);
+	hr = m_tabContainer->CreateNewTab(pidlDirectory.get(), tabSettings, &folderSettings, std::nullopt, &tabId);
 
 	if (FAILED(hr))
 	{
@@ -135,14 +135,14 @@ int Plugins::TabsApi::create(sol::table createProperties)
 
 void Plugins::TabsApi::extractTabPropertiesForCreation(sol::table createProperties, TabSettings &tabSettings)
 {
-	boost::optional<std::wstring> name = createProperties[TabConstants::NAME];
+	sol::optional<std::wstring> name = createProperties[TabConstants::NAME];
 
 	if (name && !name->empty())
 	{
-		tabSettings.name = name;
+		tabSettings.name = *name;
 	}
 
-	boost::optional<int> index = createProperties[TabConstants::INDEX];
+	sol::optional<int> index = createProperties[TabConstants::INDEX];
 
 	if (index)
 	{
@@ -161,14 +161,14 @@ void Plugins::TabsApi::extractTabPropertiesForCreation(sol::table createProperti
 		tabSettings.index = finalIndex;
 	}
 
-	boost::optional<bool> active = createProperties[TabConstants::ACTIVE];
+	sol::optional<bool> active = createProperties[TabConstants::ACTIVE];
 
 	if (active)
 	{
 		tabSettings.selected = *active;
 	}
 
-	boost::optional<int> lockState = createProperties[TabConstants::LOCK_STATE];
+	sol::optional<int> lockState = createProperties[TabConstants::LOCK_STATE];
 
 	// TODO: Verify that lockState has a valid value.
 	if (lockState)
@@ -179,42 +179,42 @@ void Plugins::TabsApi::extractTabPropertiesForCreation(sol::table createProperti
 
 void Plugins::TabsApi::extractFolderSettingsForCreation(sol::table folderSettingsTable, ::FolderSettings &folderSettings)
 {
-	boost::optional<int> sortMode = folderSettingsTable[FolderSettingsConstants::SORT_MODE];
+	sol::optional<int> sortMode = folderSettingsTable[FolderSettingsConstants::SORT_MODE];
 
 	if (sortMode && SortMode::_is_valid(*sortMode))
 	{
 		folderSettings.sortMode = SortMode::_from_integral(*sortMode);
 	}
 	
-	boost::optional<int> viewMode = folderSettingsTable[FolderSettingsConstants::VIEW_MODE];
+	sol::optional<int> viewMode = folderSettingsTable[FolderSettingsConstants::VIEW_MODE];
 
 	if (viewMode && ViewMode::_is_valid(*viewMode))
 	{
 		folderSettings.viewMode = ViewMode::_from_integral(*viewMode);
 	}
 
-	boost::optional<bool> autoArrange = folderSettingsTable[FolderSettingsConstants::AUTO_ARRANGE];
+	sol::optional<bool> autoArrange = folderSettingsTable[FolderSettingsConstants::AUTO_ARRANGE];
 
 	if (autoArrange)
 	{
 		folderSettings.autoArrange = *autoArrange;
 	}
 
-	boost::optional<bool> sortAscending = folderSettingsTable[FolderSettingsConstants::SORT_ASCENDING];
+	sol::optional<bool> sortAscending = folderSettingsTable[FolderSettingsConstants::SORT_ASCENDING];
 
 	if (sortAscending)
 	{
 		folderSettings.sortAscending = *sortAscending;
 	}
 
-	boost::optional<bool> showInGroups = folderSettingsTable[FolderSettingsConstants::SHOW_IN_GROUPS];
+	sol::optional<bool> showInGroups = folderSettingsTable[FolderSettingsConstants::SHOW_IN_GROUPS];
 
 	if (showInGroups)
 	{
 		folderSettings.showInGroups = *showInGroups;
 	}
 
-	boost::optional<bool> showHidden = folderSettingsTable[FolderSettingsConstants::SHOW_HIDDEN];
+	sol::optional<bool> showHidden = folderSettingsTable[FolderSettingsConstants::SHOW_HIDDEN];
 
 	if (showHidden)
 	{
@@ -231,14 +231,14 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 		return;
 	}
 
-	boost::optional<std::wstring> location = properties[TabConstants::LOCATION];
+	sol::optional<std::wstring> location = properties[TabConstants::LOCATION];
 
 	if (location && !location->empty())
 	{
 		tabInternal->GetShellBrowser()->GetNavigationController()->BrowseFolder(*location);
 	}
 
-	boost::optional<std::wstring> name = properties[TabConstants::NAME];
+	sol::optional<std::wstring> name = properties[TabConstants::NAME];
 
 	if (name)
 	{
@@ -252,7 +252,7 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 		}
 	}
 
-	boost::optional<int> lockState = properties[TabConstants::LOCK_STATE];
+	sol::optional<int> lockState = properties[TabConstants::LOCK_STATE];
 
 	// TODO: Verify that lockState has a valid value.
 	if (lockState)
@@ -260,7 +260,7 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 		tabInternal->SetLockState(static_cast<::Tab::LockState> (*lockState));
 	}
 
-	boost::optional<bool> active = properties[TabConstants::ACTIVE];
+	sol::optional<bool> active = properties[TabConstants::ACTIVE];
 
 	if (active && *active)
 	{

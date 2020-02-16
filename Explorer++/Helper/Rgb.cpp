@@ -8,7 +8,7 @@
 
 unsigned int convertHexStrToUint(const std::wstring &str);
 
-boost::optional<COLORREF> parseRGBString(const std::wstring &color)
+std::optional<COLORREF> parseRGBString(const std::wstring &color)
 {
 	std::wregex regex(L"#[a-f\\d]{6}", std::regex_constants::icase);
 
@@ -16,7 +16,7 @@ boost::optional<COLORREF> parseRGBString(const std::wstring &color)
 
 	if (!match)
 	{
-		return boost::none;
+		return std::nullopt;
 	}
 
 	unsigned int r;

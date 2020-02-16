@@ -17,10 +17,10 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
-#include <boost/optional.hpp>
 #include <wil/resource.h>
 #include <future>
 #include <list>
+#include <optional>
 #include <unordered_map>
 
 #define WM_USER_UPDATEWINDOWS		(WM_APP + 17)
@@ -59,7 +59,7 @@ public:
 
 	static ShellBrowser *CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner,
 		CachedIcons *cachedIcons, const Config *config, TabNavigationInterface *tabNavigation,
-		const FolderSettings &folderSettings, boost::optional<FolderColumns> initialColumns);
+		const FolderSettings &folderSettings, std::optional<FolderColumns> initialColumns);
 
 	static ShellBrowser *CreateFromPreserved(int id, HINSTANCE resourceInstance, HWND hOwner,
 		CachedIcons *cachedIcons, const Config *config, TabNavigationInterface *tabNavigation,
@@ -280,7 +280,7 @@ private:
 		const PreservedFolderState &preservedFolderState);
 	ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
 		const Config *config, TabNavigationInterface *tabNavigation, const FolderSettings &folderSettings,
-		boost::optional<FolderColumns> initialColumns);
+		std::optional<FolderColumns> initialColumns);
 	~ShellBrowser();
 
 	HWND				SetUpListView(HWND parent);
@@ -323,7 +323,7 @@ private:
 	void				OnListViewGetDisplayInfo(LPARAM lParam);
 	LRESULT				OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip);
 	void				QueueInfoTipTask(int internalIndex, const std::wstring &existingInfoTip);
-	static boost::optional<InfoTipResult>	GetInfoTipAsync(HWND listView, int infoTipResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo, const Config &config, HINSTANCE instance, bool virtualFolder);
+	static std::optional<InfoTipResult>	GetInfoTipAsync(HWND listView, int infoTipResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo, const Config &config, HINSTANCE instance, bool virtualFolder);
 	void				ProcessInfoTipResult(int infoTipResultId);
 	void				OnListViewItemChanged(const NMLISTVIEW *changeData);
 	void				UpdateFileSelectionInfo(int internalIndex, BOOL Selected);
@@ -348,8 +348,8 @@ private:
 	void				GetColumnInternal(unsigned int id,Column_t *pci) const;
 	void				SaveColumnWidths();
 	void				ProcessColumnResult(int columnResultId);
-	boost::optional<int>	GetColumnIndexById(unsigned int id) const;
-	boost::optional<unsigned int>	GetColumnIdByIndex(int index) const;
+	std::optional<int>	GetColumnIndexById(unsigned int id) const;
+	std::optional<unsigned int>	GetColumnIdByIndex(int index) const;
 
 	/* Device change support. */
 	void				UpdateDriveIcon(const TCHAR *szDrive);
@@ -402,11 +402,11 @@ private:
 
 	/* Listview icons. */
 	void				ProcessIconResult(int internalIndex, int iconIndex);
-	boost::optional<int>	GetCachedIconIndex(const ItemInfo_t &itemInfo);
+	std::optional<int>	GetCachedIconIndex(const ItemInfo_t &itemInfo);
 
 	/* Thumbnails view. */
 	void				QueueThumbnailTask(int internalIndex);
-	static boost::optional<ThumbnailResult_t>	FindThumbnailAsync(HWND listView, int thumbnailResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo);
+	static std::optional<ThumbnailResult_t>	FindThumbnailAsync(HWND listView, int thumbnailResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo);
 	void				ProcessThumbnailResult(int thumbnailResultId);
 	void				SetupThumbnailsView(void);
 	void				RemoveThumbnailsView(void);
@@ -434,7 +434,7 @@ private:
 	/* Miscellaneous. */
 	BOOL				CompareVirtualFolders(UINT uFolderCSIDL) const;
 	int					LocateFileItemInternalIndex(const TCHAR *szFileName) const;
-	boost::optional<int>	LocateItemByInternalIndex(int internalIndex) const;
+	std::optional<int>	LocateItemByInternalIndex(int internalIndex) const;
 	void				ApplyHeaderSortArrow();
 	void				QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName,UINT cchMax) const;
 
@@ -474,11 +474,11 @@ private:
 	CachedIcons			*m_cachedIcons;
 
 	ctpl::thread_pool	m_thumbnailThreadPool;
-	std::unordered_map<int, std::future<boost::optional<ThumbnailResult_t>>> m_thumbnailResults;
+	std::unordered_map<int, std::future<std::optional<ThumbnailResult_t>>> m_thumbnailResults;
 	int					m_thumbnailResultIDCounter;
 
 	ctpl::thread_pool	m_infoTipsThreadPool;
-	std::unordered_map<int, std::future<boost::optional<InfoTipResult>>> m_infoTipResults;
+	std::unordered_map<int, std::future<std::optional<InfoTipResult>>> m_infoTipResults;
 	int					m_infoTipResultIDCounter;
 
 	/* Cached folder size data. */

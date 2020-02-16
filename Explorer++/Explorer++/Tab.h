@@ -6,8 +6,8 @@
 
 #include "TabNavigationInterface.h"
 #include "../Helper/Macros.h"
-#include <boost/optional.hpp>
 #include <boost/signals2.hpp>
+#include <optional>
 
 struct FolderColumns;
 struct FolderSettings;
@@ -35,7 +35,7 @@ public:
 	typedef boost::signals2::signal<void(const Tab &tab, PropertyType propertyType)> TabUpdatedSignal;
 
 	Tab(IExplorerplusplus *expp, TabNavigationInterface *tabNavigation, const FolderSettings *folderSettings,
-		boost::optional<FolderColumns> initialColumns);
+		std::optional<FolderColumns> initialColumns);
 	Tab(const PreservedTab &preservedTab, IExplorerplusplus *expp, TabNavigationInterface *tabNavigation);
 
 	int GetId() const;

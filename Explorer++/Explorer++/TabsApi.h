@@ -9,6 +9,7 @@
 #include "Tab.h"
 #include "../Helper/StringHelper.h"
 #include "../ThirdParty/Sol/forward.hpp"
+#include <optional>
 
 __interface IExplorerplusplus;
 class Navigation;
@@ -53,7 +54,7 @@ namespace Plugins
 		TabsApi(IExplorerplusplus *expp, TabContainer *tabContainer, Navigation *navigation);
 
 		std::vector<Tab> getAll();
-		boost::optional<Tab> get(int tabId);
+		std::optional<Tab> get(int tabId);
 		int create(sol::table createProperties);
 		void update(int tabId, sol::table properties);
 		void refresh(int tabId);

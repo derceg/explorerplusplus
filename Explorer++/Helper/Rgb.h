@@ -4,6 +4,6 @@
 
 #pragma once
 
-#include <boost/optional.hpp>
+#include <optional>
 
-boost::optional<COLORREF> parseRGBString(const std::wstring &color);
+std::optional<COLORREF> parseRGBString(const std::wstring &color);

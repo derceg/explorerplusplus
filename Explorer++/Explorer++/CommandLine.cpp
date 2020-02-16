@@ -30,13 +30,13 @@ struct CommandLineSettings
 	std::vector<std::string> directories;
 };
 
-boost::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(const CommandLineSettings& commandLineSettings);
+std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(const CommandLineSettings& commandLineSettings);
 void OnClearRegistrySettings();
 void OnRemoveAsDefault();
 void OnSetAsDefault();
 void OnJumplistNewTab();
 
-boost::optional<CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
+std::optional<CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
 {
 	CLI::App app("Explorer++");
 
@@ -114,7 +114,7 @@ boost::optional<CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
 	return ProcessCommandLineSettings(commandLineSettings);
 }
 
-boost::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(const CommandLineSettings& commandLineSettings)
+std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(const CommandLineSettings& commandLineSettings)
 {
 	if (commandLineSettings.jumplistNewTab)
 	{
@@ -167,7 +167,7 @@ boost::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(const CommandL
 		g_commandLineDirectories.emplace_back(szParsingPath);
 	}
 
-	return boost::none;
+	return std::nullopt;
 }
 
 void OnClearRegistrySettings()

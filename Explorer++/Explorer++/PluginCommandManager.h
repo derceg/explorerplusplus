@@ -6,8 +6,8 @@
 
 #include "Accelerator.h"
 #include "Manifest.h"
-#include <boost/optional.hpp>
 #include <boost/signals2.hpp>
+#include <optional>
 #include <unordered_map>
 
 namespace Plugins
@@ -42,7 +42,7 @@ namespace Plugins
 
 		std::unordered_map<int, PluginCommand> m_registeredCommands;
 
-		boost::optional<int> generateId();
+		std::optional<int> generateId();
 
 		CommandInvokedSignal m_commandInvokedSignal;
 	};

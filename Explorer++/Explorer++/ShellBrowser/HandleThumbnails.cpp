@@ -104,7 +104,7 @@ void ShellBrowser::QueueThumbnailTask(int internalIndex)
 	m_thumbnailResults.insert({ thumbnailResultID, std::move(result) });
 }
 
-boost::optional<ShellBrowser::ThumbnailResult_t> ShellBrowser::FindThumbnailAsync(HWND listView,
+std::optional<ShellBrowser::ThumbnailResult_t> ShellBrowser::FindThumbnailAsync(HWND listView,
 	int thumbnailResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo)
 {
 	IShellFolder *pShellFolder = nullptr;
@@ -112,7 +112,7 @@ boost::optional<ShellBrowser::ThumbnailResult_t> ShellBrowser::FindThumbnailAsyn
 
 	if (FAILED(hr))
 	{
-		return boost::none;
+		return std::nullopt;
 	}
 
 	BOOST_SCOPE_EXIT(pShellFolder) {
@@ -125,7 +125,7 @@ boost::optional<ShellBrowser::ThumbnailResult_t> ShellBrowser::FindThumbnailAsyn
 
 	if (FAILED(hr))
 	{
-		return boost::none;
+		return std::nullopt;
 	}
 
 	BOOST_SCOPE_EXIT(pExtractImage) {
@@ -146,7 +146,7 @@ boost::optional<ShellBrowser::ThumbnailResult_t> ShellBrowser::FindThumbnailAsyn
 
 	if (FAILED(hr))
 	{
-		return boost::none;
+		return std::nullopt;
 	}
 
 	wil::unique_hbitmap thumbnailBitmap;
@@ -154,7 +154,7 @@ boost::optional<ShellBrowser::ThumbnailResult_t> ShellBrowser::FindThumbnailAsyn
 
 	if (FAILED(hr))
 	{
-		return boost::none;
+		return std::nullopt;
 	}
 
 	PostMessage(listView, WM_APP_THUMBNAIL_RESULT_READY, thumbnailResultId, 0);

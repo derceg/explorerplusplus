@@ -5,9 +5,9 @@
 #pragma once
 
 #include "Accelerator.h"
-#include <boost/optional.hpp>
+#include <optional>
 
 namespace Plugins
 {
-	boost::optional<Accelerator> parseAccelerator(const std::wstring &acceleratorString);
+	std::optional<Accelerator> parseAccelerator(const std::wstring &acceleratorString);
 }

@@ -10,7 +10,7 @@ const std::wstring KEY_CTRL = L"Ctrl";
 const std::wstring KEY_SHIFT = L"Shift";
 const std::wstring KEY_ALT = L"Alt";
 
-boost::optional<Accelerator> Plugins::parseAccelerator(const std::wstring &acceleratorString)
+std::optional<Accelerator> Plugins::parseAccelerator(const std::wstring &acceleratorString)
 {
 	std::vector<std::wstring> tokens;
 	boost::split(tokens, acceleratorString, boost::is_any_of(L"+"));
@@ -20,7 +20,7 @@ boost::optional<Accelerator> Plugins::parseAccelerator(const std::wstring &accel
 	// combination isn't valid.
 	if (tokens.size() < 2)
 	{
-		return boost::none;
+		return std::nullopt;
 	}
 
 	BYTE modifiers = FVIRTKEY;
@@ -55,7 +55,7 @@ boost::optional<Accelerator> Plugins::parseAccelerator(const std::wstring &accel
 		}
 		else
 		{
-			return boost::none;
+			return std::nullopt;
 		}
 	}
 
@@ -68,7 +68,7 @@ boost::optional<Accelerator> Plugins::parseAccelerator(const std::wstring &accel
 	// shortcut modifier.
 	if (key == 0 || (ctrl && alt) || (!ctrl && !shift && !alt) || (!ctrl && shift && !alt))
 	{
-		return boost::none;
+		return std::nullopt;
 	}
 
 	Accelerator accelerator;

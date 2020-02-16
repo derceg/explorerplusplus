@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <boost/optional.hpp>
 #include <boost/signals2.hpp>
+#include <optional>
 #include <set>
 
 namespace Plugins
@@ -18,7 +18,7 @@ namespace Plugins
 
 		PluginMenuManager(HWND mainWindow, int startId, int endId);
 
-		boost::optional<int> AddItemToMainMenu(const std::wstring &text);
+		std::optional<int> AddItemToMainMenu(const std::wstring &text);
 		void RemoveItemFromMainMenu(int menuItemId);
 
 		boost::signals2::connection AddMenuClickedObserver(const PluginMenuClickedSignal::slot_type &observer);
@@ -27,7 +27,7 @@ namespace Plugins
 
 	private:
 
-		boost::optional<int> GeneratePluginMenuItemId();
+		std::optional<int> GeneratePluginMenuItemId();
 		void ReleasePluginMenuItemId(int id);
 
 		const HWND m_mainWindow;

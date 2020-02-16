@@ -852,7 +852,7 @@ HRESULT TabContainer::CreateNewTabInDefaultDirectory(const TabSettings &tabSetti
 
 HRESULT TabContainer::CreateNewTab(const TCHAR *TabDirectory,
 	const TabSettings &tabSettings, const FolderSettings *folderSettings,
-	boost::optional<FolderColumns> initialColumns, int *newTabId)
+	std::optional<FolderColumns> initialColumns, int *newTabId)
 {
 	/* Attempt to expand the path (in the event that
 	it contains embedded environment variables). */
@@ -898,7 +898,7 @@ HRESULT TabContainer::CreateNewTab(const PreservedTab &preservedTab, int *newTab
 
 HRESULT TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory,
 	const TabSettings &tabSettings, const FolderSettings *folderSettings,
-	boost::optional<FolderColumns> initialColumns, int *newTabId)
+	std::optional<FolderColumns> initialColumns, int *newTabId)
 {
 	if (!CheckIdl(pidlDirectory) || !IsIdlDirectory(pidlDirectory))
 	{
@@ -1021,7 +1021,7 @@ HRESULT TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 	return S_OK;
 }
 
-void TabContainer::InsertNewTab(int index, int tabId, PCIDLIST_ABSOLUTE pidlDirectory, boost::optional<std::wstring> customName)
+void TabContainer::InsertNewTab(int index, int tabId, PCIDLIST_ABSOLUTE pidlDirectory, std::optional<std::wstring> customName)
 {
 	std::wstring name;
 
