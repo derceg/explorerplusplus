@@ -8,6 +8,7 @@
 #include "CoreInterface.h"
 #include "PreservedTab.h"
 #include "ShellBrowser/FolderSettings.h"
+#include "ShellBrowser/NavigationController.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include <wil/resource.h>
 

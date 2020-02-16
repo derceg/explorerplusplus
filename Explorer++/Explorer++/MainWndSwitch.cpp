@@ -20,6 +20,7 @@
 #include "MenuRanges.h"
 #include "ModelessDialogs.h"
 #include "Navigation.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
 #include "ShellTreeView/ShellTreeView.h"

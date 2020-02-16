@@ -418,6 +418,15 @@
     <ClCompile Include="DisplayWindow\MsgHandler.cpp">
       <Filter>DisplayWindow</Filter>
     </ClCompile>
+    <ClCompile Include="ShellBrowser\PreservedFolderState.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBrowser\PreservedHistoryEntry.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="PreservedTab.cpp">
+      <Filter>Tabs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">

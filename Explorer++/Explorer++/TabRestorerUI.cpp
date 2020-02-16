@@ -7,6 +7,7 @@
 #include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "ShellBrowser/PreservedHistoryEntry.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <boost/range/adaptor/sliced.hpp>

@@ -4,23 +4,17 @@
 
 #pragma once
 
-#include "HistoryEntry.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include <optional>
+
+class HistoryEntry;
 
 struct PreservedHistoryEntry
 {
 public:
 
-	PreservedHistoryEntry(const HistoryEntry &entry) :
-		id(entry.GetId()),
-		pidl(ILCloneFull(entry.GetPidl().get())),
-		displayName(entry.GetDisplayName()),
-		systemIconIndex(entry.GetSystemIconIndex())
-	{
-
-	}
+	PreservedHistoryEntry(const HistoryEntry &entry);
 
 	const int id;
 

@@ -5,18 +5,15 @@
 #pragma once
 
 #include "FolderSettings.h"
-#include "ShellBrowser.h"
 #include "../Helper/Macros.h"
+
+class ShellBrowser;
 
 struct PreservedFolderState
 {
 public:
 
-	PreservedFolderState(const ShellBrowser *shellBrowser) :
-		folderSettings(shellBrowser->GetFolderSettings())
-	{
-
-	}
+	PreservedFolderState(const ShellBrowser *shellBrowser);
 
 	FolderSettings folderSettings;
 

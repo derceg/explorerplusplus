@@ -479,8 +479,11 @@
     <ClCompile Include="BookmarkXmlStorage.cpp" />
     <ClCompile Include="DisplayWindow\DisplayWindow.cpp" />
     <ClCompile Include="DisplayWindow\MsgHandler.cpp" />
+    <ClCompile Include="PreservedTab.cpp" />
     <ClCompile Include="ShellBrowser\HistoryEntry.cpp" />
     <ClCompile Include="ShellBrowser\NavigationController.cpp" />
+    <ClCompile Include="ShellBrowser\PreservedFolderState.cpp" />
+    <ClCompile Include="ShellBrowser\PreservedHistoryEntry.cpp" />
     <ClCompile Include="ShellTreeView\DirectoryModificationHandler.cpp" />
     <ClCompile Include="ShellTreeView\iDropSource.cpp" />
     <ClCompile Include="ShellTreeView\iDropTarget.cpp" />
