@@ -18,6 +18,7 @@
 #include "TabUpdated.h"
 #include "UiApi.h"
 #include "UiTheming.h"
+#include "../ThirdParty/Sol/sol.hpp"
 
 void BindTabsAPI(sol::state &state, IExplorerplusplus *expp, TabContainer *tabContainer, Navigation *navigation);
 void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager);

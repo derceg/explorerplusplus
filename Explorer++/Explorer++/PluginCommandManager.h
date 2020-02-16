@@ -5,13 +5,14 @@
 #pragma once
 
 #include "Accelerator.h"
-#include "Manifest.h"
 #include <boost/signals2.hpp>
 #include <optional>
 #include <unordered_map>
 
 namespace Plugins
 {
+	struct Command;
+
 	class PluginCommandManager
 	{
 	public:
