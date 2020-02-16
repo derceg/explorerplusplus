@@ -5,7 +5,6 @@
 #pragma once
 
 #include "ShellBrowser/FolderSettings.h"
-#include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
