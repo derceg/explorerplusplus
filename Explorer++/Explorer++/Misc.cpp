@@ -12,6 +12,7 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
+#include "../Helper/FileOperations.h"
 #include "../Helper/Logging.h"
 #include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"

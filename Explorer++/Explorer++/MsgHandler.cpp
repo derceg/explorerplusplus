@@ -23,6 +23,7 @@
 #include "ViewModeHelper.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/Controls.h"
+#include "../Helper/FileOperations.h"
 #include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/Logging.h"
 #include "../Helper/Macros.h"

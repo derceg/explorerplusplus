@@ -25,6 +25,7 @@
 #include "../Helper/DropHandler.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/FileContextMenuManager.h"
+#include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/iDataObject.h"
 #include "../Helper/iDropSource.h"

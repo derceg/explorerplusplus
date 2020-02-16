@@ -3,15 +3,14 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include <list>
 #include "DropHandler.h"
+#include "ContextMenuManager.h"
+#include "FileOperations.h"
 #include "Helper.h"
+#include "Logging.h"
+#include "Macros.h"
 #include "RegistrySettings.h"
 #include "ShellHelper.h"
-#include "ContextMenuManager.h"
-#include "Macros.h"
-#include "Logging.h"
-
 
 #define WM_APP_COPYOPERATIONFINISHED	(WM_APP + 1)
 #define SUBCLASS_ID	10000
