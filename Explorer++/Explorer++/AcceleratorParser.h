@@ -6,6 +6,7 @@
 
 #include "Accelerator.h"
 #include <optional>
+#include <string>
 
 namespace Plugins
 {

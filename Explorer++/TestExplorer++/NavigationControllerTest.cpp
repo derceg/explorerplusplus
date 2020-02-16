@@ -11,6 +11,7 @@
 #include "../Helper/ShellHelper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <ShlObj.h>
 
 using namespace testing;
 

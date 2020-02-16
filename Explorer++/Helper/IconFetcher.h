@@ -7,6 +7,7 @@
 #include "ShellHelper.h"
 #include "WindowSubclassWrapper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
+#include <ShlObj.h>
 #include <future>
 #include <functional>
 #include <optional>
