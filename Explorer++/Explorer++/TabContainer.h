@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/FolderSettings.h"
 #include "SignalWrapper.h"
 #include "Tab.h"
 #include "TabNavigationInterface.h"

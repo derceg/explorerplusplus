@@ -11,6 +11,7 @@
 #include "ResourceHelper.h"
 #include "SetFileAttributesDialog.h"
 #include "ShellBrowser/NavigationController.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "TabContainer.h"
 #include "../Helper/BulkClipboardWriter.h"

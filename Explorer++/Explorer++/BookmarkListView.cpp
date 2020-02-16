@@ -10,6 +10,7 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/NavigationController.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
 #include "../Helper/iDropSource.h"
 #include "../Helper/ListViewHelper.h"

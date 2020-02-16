@@ -19,6 +19,7 @@
 #include "ResourceHelper.h"
 #include "SetDefaultColumnsDialog.h"
 #include "ShellBrowser/NavigationController.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ViewModes.h"
 #include "TabContainer.h"
 #include "ViewModeHelper.h"

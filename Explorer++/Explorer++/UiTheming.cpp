@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "UiTheming.h"
 #include "CoreInterface.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "Tab.h"
 #include "TabContainer.h"
 

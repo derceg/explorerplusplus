@@ -11,6 +11,7 @@
 #include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"
 #include "MainToolbar.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/Macros.h"

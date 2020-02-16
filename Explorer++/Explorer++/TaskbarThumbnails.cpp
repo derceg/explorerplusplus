@@ -13,6 +13,7 @@
 #include "CoreInterface.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"

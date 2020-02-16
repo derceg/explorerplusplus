@@ -7,6 +7,7 @@
 #include "Config.h"
 #include "MainResource.h"
 #include "ShellBrowser/NavigationController.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ViewModes.h"
 #include "TabContainer.h"
 #include "../Helper/MenuHelper.h"

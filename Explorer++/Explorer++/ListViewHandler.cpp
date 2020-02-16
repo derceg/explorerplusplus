@@ -16,6 +16,7 @@
 #include "SetFileAttributesDialog.h"
 #include "ShellBrowser/Columns.h"
 #include "ShellBrowser/NavigationController.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ViewModes.h"
 #include "TabContainer.h"
 #include "ViewModeHelper.h"

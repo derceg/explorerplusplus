@@ -13,6 +13,7 @@
 #include "MainResource.h"
 #include "MainToolbar.h"
 #include "ShellBrowser/NavigationController.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
 #include "../Helper/MenuHelper.h"

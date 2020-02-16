@@ -15,6 +15,7 @@
 #include "Navigation.h"
 #include "PluginManager.h"
 #include "ShellBrowser/NavigationController.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ViewModes.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "TabContainer.h"

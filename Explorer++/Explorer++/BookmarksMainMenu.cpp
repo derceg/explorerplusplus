@@ -9,6 +9,7 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/NavigationController.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
 
 BookmarksMainMenu::BookmarksMainMenu(IExplorerplusplus *expp, BookmarkTree *bookmarkTree,

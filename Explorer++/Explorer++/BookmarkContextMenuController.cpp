@@ -9,6 +9,7 @@
 #include "CoreInterface.h"
 #include "MainResource.h"
 #include "ShellBrowser/NavigationController.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
 
 BookmarkContextMenuController::BookmarkContextMenuController(BookmarkTree *bookmarkTree,
