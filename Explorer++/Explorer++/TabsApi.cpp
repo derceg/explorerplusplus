@@ -120,7 +120,7 @@ int Plugins::TabsApi::create(sol::table createProperties)
 		extractFolderSettingsForCreation(*folderSettingsTable, folderSettings);
 	}
 
-	int tabId;
+	int tabId = -1;
 	hr = m_tabContainer->CreateNewTab(pidlDirectory.get(), tabSettings, &folderSettings, std::nullopt, &tabId);
 
 	if (FAILED(hr))
