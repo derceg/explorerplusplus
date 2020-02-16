@@ -81,3 +81,7 @@
 #include "../ThirdParty/cereal/types/memory.hpp"
 #include "../ThirdParty/cereal/types/string.hpp"
 #include "../ThirdParty/cereal/types/vector.hpp"
+
+#include "../ThirdParty/CTPL/cpl_stl.h"
+
+#include "../ThirdParty/Sol/sol.hpp"
