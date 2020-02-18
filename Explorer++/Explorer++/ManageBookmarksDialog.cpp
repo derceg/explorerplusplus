@@ -20,8 +20,7 @@ ManageBookmarksDialog::ManageBookmarksDialog(HINSTANCE hInstance, HWND hParent,
 	m_pexpp(pexpp),
 	m_navigation(navigation),
 	m_bookmarkTree(bookmarkTree),
-	m_bNewFolderAdded(false),
-	m_bSaveHistory(true)
+	m_bNewFolderAdded(false)
 {
 	m_persistentSettings = &ManageBookmarksDialogPersistentSettings::GetInstance();
 
@@ -43,7 +42,8 @@ INT_PTR ManageBookmarksDialog::OnInitDialog()
 	SetupTreeView();
 	SetupListView();
 
-	m_bookmarkListView->NavigateToBookmarkFolder(m_bookmarkTree->GetBookmarksToolbarFolder());
+	m_navigationController = std::make_unique<BookmarkNavigationController>(m_bookmarkTree, m_bookmarkListView);
+	m_navigationController->BrowseFolder(m_bookmarkTree->GetBookmarksToolbarFolder());
 
 	SetFocus(GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW));
 
@@ -152,8 +152,8 @@ void ManageBookmarksDialog::SetupListView()
 	m_bookmarkListView = new BookmarkListView(hListView, GetInstance(), m_bookmarkTree,
 		m_pexpp, m_persistentSettings->m_listViewColumns);
 
-	m_connections.push_back(m_bookmarkListView->navigationSignal.AddObserver(
-		std::bind(&ManageBookmarksDialog::OnListViewNavigation, this, std::placeholders::_1)));
+	m_connections.push_back(m_bookmarkListView->AddNavigationCompletedObserver(
+		std::bind(&ManageBookmarksDialog::OnListViewNavigation, this, std::placeholders::_1, std::placeholders::_2)));
 }
 
 INT_PTR ManageBookmarksDialog::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD dwKeys)
@@ -165,11 +165,11 @@ INT_PTR ManageBookmarksDialog::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWO
 	switch(uCmd)
 	{
 	case APPCOMMAND_BROWSER_BACKWARD:
-		BrowseBack();
+		m_navigationController->GoBack();
 		break;
 
 	case APPCOMMAND_BROWSER_FORWARD:
-		BrowseForward();
+		m_navigationController->GoForward();
 		break;
 	}
 
@@ -193,11 +193,11 @@ LRESULT ManageBookmarksDialog::HandleMenuOrAccelerator(WPARAM wParam)
 	switch (LOWORD(wParam))
 	{
 	case TOOLBAR_ID_BACK:
-		BrowseBack();
+		m_navigationController->GoBack();
 		break;
 
 	case TOOLBAR_ID_FORWARD:
-		BrowseForward();
+		m_navigationController->GoForward();
 		break;
 
 	case TOOLBAR_ID_ORGANIZE:
@@ -397,19 +397,12 @@ void ManageBookmarksDialog::OnTreeViewSelectionChanged(BookmarkItem *bookmarkFol
 		return;
 	}
 
-	m_bookmarkListView->NavigateToBookmarkFolder(bookmarkFolder);
+	m_navigationController->BrowseFolder(bookmarkFolder);
 }
 
-void ManageBookmarksDialog::OnListViewNavigation(BookmarkItem *bookmarkFolder)
+void ManageBookmarksDialog::OnListViewNavigation(BookmarkItem *bookmarkFolder, bool addHistoryEntry)
 {
-	/* Temporary flag used to indicate whether history should
-	be saved. It will be reset each time a folder is browsed. */
-	if (m_bSaveHistory)
-	{
-		m_stackBack.push(m_guidCurrentFolder);
-	}
-
-	m_bSaveHistory = true;
+	UNREFERENCED_PARAMETER(addHistoryEntry);
 
 	m_guidCurrentFolder = bookmarkFolder->GetGUID();
 	m_bookmarkTreeView->SelectFolder(bookmarkFolder->GetGUID());
@@ -417,40 +410,10 @@ void ManageBookmarksDialog::OnListViewNavigation(BookmarkItem *bookmarkFolder)
 	UpdateToolbarState();
 }
 
-void ManageBookmarksDialog::BrowseBack()
-{
-	if(m_stackBack.empty())
-	{
-		return;
-	}
-
-	std::wstring guid = m_stackBack.top();
-	m_stackBack.pop();
-	m_stackForward.push(m_guidCurrentFolder);
-
-	m_bSaveHistory = false;
-	m_bookmarkTreeView->SelectFolder(guid);
-}
-
-void ManageBookmarksDialog::BrowseForward()
-{
-	if(m_stackForward.empty())
-	{
-		return;
-	}
-
-	std::wstring guid = m_stackForward.top();
-	m_stackForward.pop();
-	m_stackBack.push(m_guidCurrentFolder);
-
-	m_bSaveHistory = false;
-	m_bookmarkTreeView->SelectFolder(guid);
-}
-
 void ManageBookmarksDialog::UpdateToolbarState()
 {
-	SendMessage(m_hToolbar,TB_ENABLEBUTTON,TOOLBAR_ID_BACK,!m_stackBack.empty());
-	SendMessage(m_hToolbar,TB_ENABLEBUTTON,TOOLBAR_ID_FORWARD,!m_stackForward.empty());
+	SendMessage(m_hToolbar, TB_ENABLEBUTTON, TOOLBAR_ID_BACK, m_navigationController->CanGoBack());
+	SendMessage(m_hToolbar, TB_ENABLEBUTTON, TOOLBAR_ID_FORWARD, m_navigationController->CanGoForward());
 }
 
 void ManageBookmarksDialog::OnOk()

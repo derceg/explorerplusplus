@@ -5,8 +5,8 @@
 #include "stdafx.h"
 #include "Navigation.h"
 #include "CoreInterface.h"
-#include "ShellBrowser/NavigationController.h"
 #include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainer.h"
 #include "../Helper/ShellHelper.h"
 

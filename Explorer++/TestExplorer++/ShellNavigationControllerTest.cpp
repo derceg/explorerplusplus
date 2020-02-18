@@ -3,9 +3,9 @@
 // See LICENSE in the top level directory
 
 #include "../Explorer++/ShellBrowser/HistoryEntry.h"
-#include "../Explorer++/ShellBrowser/NavigationController.h"
 #include "../Explorer++/ShellBrowser/NavigatorInterface.h"
 #include "../Explorer++/ShellBrowser/PreservedHistoryEntry.h"
+#include "../Explorer++/ShellBrowser/ShellNavigationController.h"
 #include "../Explorer++/TabNavigationInterface.h"
 #include "../Helper/IconFetcher.h"
 #include "../Helper/ShellHelper.h"
@@ -90,11 +90,11 @@ public:
 	MOCK_METHOD(void, ClearQueue, (), (override));
 };
 
-class NavigationControllerTest : public Test
+class ShellNavigationControllerTest : public Test
 {
 protected:
 
-	NavigationControllerTest() :
+	ShellNavigationControllerTest() :
 		m_navigationController(&m_navigator, &m_tabNavigation, &m_iconFetcher)
 	{
 
@@ -119,10 +119,10 @@ protected:
 	NavigatorMock m_navigator;
 	TabNavigationMock m_tabNavigation;
 	IconFetcherMock m_iconFetcher;
-	NavigationController m_navigationController;
+	ShellNavigationController m_navigationController;
 };
 
-class NavigationControllerPreservedTest : public Test
+class ShellNavigationControllerPreservedTest : public Test
 {
 protected:
 
@@ -134,7 +134,7 @@ protected:
 		preservedEntry = CreatePreservedHistoryEntry(L"C:\\Fake2");
 		m_preservedEntries.push_back(std::move(preservedEntry));
 
-		m_navigationController = std::make_unique<NavigationController>(&m_navigator,
+		m_navigationController = std::make_unique<ShellNavigationController>(&m_navigator,
 			&m_tabNavigation, &m_iconFetcher, m_preservedEntries, currentEntry);
 	}
 
@@ -162,12 +162,12 @@ protected:
 	NavigatorMock m_navigator;
 	TabNavigationMock m_tabNavigation;
 	IconFetcherMock m_iconFetcher;
-	std::unique_ptr<NavigationController> m_navigationController;
+	std::unique_ptr<ShellNavigationController> m_navigationController;
 
 	std::vector<std::unique_ptr<PreservedHistoryEntry>> m_preservedEntries;
 };
 
-TEST_F(NavigationControllerTest, Refresh) {
+TEST_F(ShellNavigationControllerTest, Refresh) {
 	// Shouldn't be able to refresh when no navigation has occurred yet.
 	HRESULT hr = m_navigationController.Refresh();
 	ASSERT_HRESULT_FAILED(hr);
@@ -184,7 +184,7 @@ TEST_F(NavigationControllerTest, Refresh) {
 	EXPECT_EQ(m_navigationController.GetNumHistoryEntries(), 1);
 }
 
-TEST_F(NavigationControllerTest, BackForward) {
+TEST_F(ShellNavigationControllerTest, BackForward) {
 	HRESULT hr = NavigateToFolder(L"C:\\Fake1");
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
@@ -239,7 +239,7 @@ TEST_F(NavigationControllerTest, BackForward) {
 	EXPECT_EQ(m_navigationController.GetNumHistoryEntries(), 2);
 }
 
-TEST_F(NavigationControllerTest, RetrieveHistory) {
+TEST_F(ShellNavigationControllerTest, RetrieveHistory) {
 	HRESULT hr = NavigateToFolder(L"C:\\Fake1");
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
@@ -277,7 +277,7 @@ TEST_F(NavigationControllerTest, RetrieveHistory) {
 	EXPECT_EQ(history.size(), 1);
 }
 
-TEST_F(NavigationControllerTest, GoUp) {
+TEST_F(ShellNavigationControllerTest, GoUp) {
 	HRESULT hr = NavigateToFolder(L"C:\\Fake");
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
@@ -300,7 +300,7 @@ TEST_F(NavigationControllerTest, GoUp) {
 	EXPECT_HRESULT_FAILED(hr);
 }
 
-TEST_F(NavigationControllerTest, GetEntry) {
+TEST_F(ShellNavigationControllerTest, GetEntry) {
 	auto entry = m_navigationController.GetCurrentEntry();
 	EXPECT_EQ(entry, nullptr);
 
@@ -337,7 +337,7 @@ TEST_F(NavigationControllerTest, GetEntry) {
 	EXPECT_TRUE(CompareIdls(entry->GetPidl().get(), pidl1.get()));
 }
 
-TEST_F(NavigationControllerTest, NavigationMode) {
+TEST_F(ShellNavigationControllerTest, NavigationMode) {
 	unique_pidl_absolute pidl(SHSimpleIDListFromPath(L"C:\\Fake"));
 	ASSERT_TRUE(pidl);
 
@@ -350,7 +350,7 @@ TEST_F(NavigationControllerTest, NavigationMode) {
 	HRESULT hr = m_navigationController.BrowseFolder(pidl.get());
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
-	m_navigationController.SetNavigationMode(NavigationController::NavigationMode::ForceNewTab);
+	m_navigationController.SetNavigationMode(ShellNavigationController::NavigationMode::ForceNewTab);
 
 	EXPECT_CALL(m_navigator, BrowseFolderImpl)
 		.Times(0);
@@ -361,7 +361,7 @@ TEST_F(NavigationControllerTest, NavigationMode) {
 	ASSERT_HRESULT_SUCCEEDED(hr);
 }
 
-TEST_F(NavigationControllerPreservedTest, FirstIndexIsCurrent) {
+TEST_F(ShellNavigationControllerPreservedTest, FirstIndexIsCurrent) {
 	SetUp(0);
 
 	EXPECT_EQ(m_navigationController->GetCurrentIndex(), 0);
@@ -370,7 +370,7 @@ TEST_F(NavigationControllerPreservedTest, FirstIndexIsCurrent) {
 	EXPECT_EQ(m_navigationController->GetNumHistoryEntries(), 2);
 }
 
-TEST_F(NavigationControllerPreservedTest, SecondIndexIsCurrent) {
+TEST_F(ShellNavigationControllerPreservedTest, SecondIndexIsCurrent) {
 	SetUp(1);
 
 	EXPECT_EQ(m_navigationController->GetCurrentIndex(), 1);
@@ -379,7 +379,7 @@ TEST_F(NavigationControllerPreservedTest, SecondIndexIsCurrent) {
 	EXPECT_EQ(m_navigationController->GetNumHistoryEntries(), 2);
 }
 
-TEST_F(NavigationControllerPreservedTest, CheckEntries) {
+TEST_F(ShellNavigationControllerPreservedTest, CheckEntries) {
 	SetUp(0);
 
 	for (size_t i = 0; i < m_preservedEntries.size(); i++)

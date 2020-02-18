@@ -8,8 +8,8 @@
 #include "CoreInterface.h"
 #include "PreservedTab.h"
 #include "ShellBrowser/FolderSettings.h"
-#include "ShellBrowser/NavigationController.h"
 #include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellNavigationController.h"
 #include <wil/resource.h>
 
 int Tab::idCounter = 1;
@@ -118,12 +118,12 @@ void Tab::SetLockState(LockState lockState)
 	switch (lockState)
 	{
 	case Tab::LockState::NotLocked:
-		m_shellBrowser->GetNavigationController()->SetNavigationMode(NavigationController::NavigationMode::Normal);
+		m_shellBrowser->GetNavigationController()->SetNavigationMode(ShellNavigationController::NavigationMode::Normal);
 		break;
 
 	case Tab::LockState::Locked:
 	case Tab::LockState::AddressLocked:
-		m_shellBrowser->GetNavigationController()->SetNavigationMode(NavigationController::NavigationMode::ForceNewTab);
+		m_shellBrowser->GetNavigationController()->SetNavigationMode(ShellNavigationController::NavigationMode::ForceNewTab);
 		break;
 	}
 

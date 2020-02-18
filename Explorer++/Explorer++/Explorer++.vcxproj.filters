@@ -343,9 +343,6 @@
     <ClCompile Include="ShellBrowser\HistoryEntry.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
-    <ClCompile Include="ShellBrowser\NavigationController.cpp">
-      <Filter>ShellBrowser</Filter>
-    </ClCompile>
     <ClCompile Include="BookmarkTree.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
@@ -426,6 +423,12 @@
     </ClCompile>
     <ClCompile Include="PreservedTab.cpp">
       <Filter>Tabs</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBrowser\ShellNavigationController.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="BookmarkNavigationController.cpp">
+      <Filter>Bookmarks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -777,9 +780,6 @@
     <ClInclude Include="ShellBrowser\HistoryEntry.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="ShellBrowser\NavigationController.h">
-      <Filter>ShellBrowser</Filter>
-    </ClInclude>
     <ClInclude Include="ShellBrowser\PreservedHistoryEntry.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
@@ -845,6 +845,18 @@
     </ClInclude>
     <ClInclude Include="DisplayWindow\DisplayWindow.h">
       <Filter>DisplayWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowser\ShellNavigationController.h">
+      <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="NavigationController.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="BookmarkNavigationController.h">
+      <Filter>Bookmarks</Filter>
+    </ClInclude>
+    <ClInclude Include="BookmarkNavigatorInterface.h">
+      <Filter>Bookmarks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -520,7 +520,7 @@ void ShellBrowser::PlayNavigationSound() const
 	}
 }
 
-NavigationController *ShellBrowser::GetNavigationController() const
+ShellNavigationController *ShellBrowser::GetNavigationController() const
 {
 	return m_navigationController.get();
 }

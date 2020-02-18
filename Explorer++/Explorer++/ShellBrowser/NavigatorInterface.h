@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <boost/signals2.hpp>
+
 typedef boost::signals2::signal<void(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)> NavigationCompletedSignal;
 
 __interface NavigatorInterface

@@ -5,6 +5,7 @@
 #pragma once
 
 #include "BookmarkListView.h"
+#include "BookmarkNavigationController.h"
 #include "BookmarkTreeView.h"
 #include "Navigation.h"
 #include "ResourceHelper.h"
@@ -79,11 +80,8 @@ private:
 	void		SetupTreeView();
 	void		SetupListView();
 
-	void		BrowseBack();
-	void		BrowseForward();
-
 	void		OnTreeViewSelectionChanged(BookmarkItem *bookmarkFolder);
-	void		OnListViewNavigation(BookmarkItem *bookmarkFolder);
+	void		OnListViewNavigation(BookmarkItem *bookmarkFolder, bool addHistoryEntry);
 
 	void		UpdateToolbarState();
 
@@ -113,12 +111,10 @@ private:
 	bool m_bNewFolderAdded;
 	std::wstring m_guidNewFolder;
 
-	std::stack<std::wstring> m_stackBack;
-	std::stack<std::wstring> m_stackForward;
-	bool m_bSaveHistory;
-
 	BookmarkTreeView *m_bookmarkTreeView;
 	BookmarkListView *m_bookmarkListView;
+
+	std::unique_ptr<BookmarkNavigationController> m_navigationController;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 

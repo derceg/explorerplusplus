@@ -33,9 +33,9 @@ struct BasicItemInfo_t;
 class CachedIcons;
 struct Config;
 class IconFetcher;
-class NavigationController;
 struct PreservedFolderState;
 struct PreservedHistoryEntry;
+class ShellNavigationController;
 
 typedef struct
 {
@@ -74,7 +74,7 @@ public:
 	HWND				GetListView() const;
 	FolderSettings		GetFolderSettings() const;
 
-	NavigationController	*GetNavigationController() const;
+	ShellNavigationController	*GetNavigationController() const;
 	boost::signals2::connection	AddNavigationCompletedObserver(const NavigationCompletedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;
 
@@ -445,7 +445,7 @@ private:
 	HWND				m_hOwner;
 
 	NavigationCompletedSignal	m_navigationCompletedSignal;
-	std::unique_ptr<NavigationController>	m_navigationController;
+	std::unique_ptr<ShellNavigationController>	m_navigationController;
 
 	TabNavigationInterface	*m_tabNavigation;
 

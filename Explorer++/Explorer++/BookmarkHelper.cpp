@@ -9,8 +9,8 @@
 #include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
-#include "ShellBrowser/NavigationController.h"
 #include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainer.h"
 #include <boost/range/adaptor/filtered.hpp>
 #include <algorithm>

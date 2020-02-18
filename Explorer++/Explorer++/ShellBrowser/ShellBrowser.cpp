@@ -7,8 +7,8 @@
 #include "Config.h"
 #include "ItemData.h"
 #include "MainResource.h"
-#include "NavigationController.h"
 #include "PreservedFolderState.h"
+#include "ShellNavigationController.h"
 #include "SortModes.h"
 #include "ViewModes.h"
 #include "../Helper/Controls.h"
@@ -88,7 +88,7 @@ ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
 	ShellBrowser(id, resourceInstance, hOwner, cachedIcons, config, tabNavigation,
 		preservedFolderState.folderSettings, std::nullopt)
 {
-	m_navigationController = std::make_unique<NavigationController>(this, tabNavigation, m_iconFetcher.get(),
+	m_navigationController = std::make_unique<ShellNavigationController>(this, tabNavigation, m_iconFetcher.get(),
 		history, currentEntry);
 }
 
@@ -114,7 +114,7 @@ ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, Cach
 
 	m_hListView = SetUpListView(hOwner);
 	m_iconFetcher = std::make_unique<IconFetcher>(m_hListView, cachedIcons);
-	m_navigationController = std::make_unique<NavigationController>(this, tabNavigation, m_iconFetcher.get());
+	m_navigationController = std::make_unique<ShellNavigationController>(this, tabNavigation, m_iconFetcher.get());
 
 	InitializeDragDropHelpers();
 

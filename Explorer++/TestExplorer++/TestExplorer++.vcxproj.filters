@@ -16,9 +16,6 @@
     <ClCompile Include="CachedIconsTest.cpp">
       <Filter>Helper</Filter>
     </ClCompile>
-    <ClCompile Include="NavigationControllerTest.cpp">
-      <Filter>ShellBrowser</Filter>
-    </ClCompile>
     <ClCompile Include="AcceleratorParserTest.cpp" />
     <ClCompile Include="ManifestTest.cpp" />
     <ClCompile Include="ViewModeHelperTest.cpp" />
@@ -27,6 +24,9 @@
     </ClCompile>
     <ClCompile Include="DataObjectTest.cpp">
       <Filter>Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellNavigationControllerTest.cpp">
+      <Filter>ShellBrowser</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -9,8 +9,8 @@
 #include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
-#include "ShellBrowser/NavigationController.h"
 #include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainer.h"
 #include "../Helper/iDropSource.h"
 #include "../Helper/ListViewHelper.h"
@@ -209,7 +209,7 @@ LRESULT CALLBACK BookmarkListView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wP
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-void BookmarkListView::NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder)
+void BookmarkListView::NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder, bool addHistoryEntry)
 {
 	assert(bookmarkFolder->IsFolder());
 
@@ -226,7 +226,13 @@ void BookmarkListView::NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder)
 		position++;
 	}
 
-	navigationSignal.m_signal(bookmarkFolder);
+	m_navigationCompletedSignal(bookmarkFolder, addHistoryEntry);
+}
+
+boost::signals2::connection BookmarkListView::AddNavigationCompletedObserver(const BookmarkNavigationCompletedSignal::slot_type &observer,
+	boost::signals2::connect_position position)
+{
+	return m_navigationCompletedSignal.connect(observer, position);
 }
 
 int BookmarkListView::InsertBookmarkItemIntoListView(BookmarkItem *bookmarkItem, int position)
@@ -335,7 +341,7 @@ void BookmarkListView::OnDblClk(const NMITEMACTIVATE *itemActivate)
 
 	if (bookmarkItem->IsFolder())
 	{
-		NavigateToBookmarkFolder(bookmarkItem);
+		NavigateToBookmarkFolder(bookmarkItem, true);
 	}
 	else
 	{

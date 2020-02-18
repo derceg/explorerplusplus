@@ -472,6 +472,7 @@
     <ClCompile Include="BookmarkDropInfo.cpp" />
     <ClCompile Include="BookmarkDropTargetWindow.cpp" />
     <ClCompile Include="BookmarkItem.cpp" />
+    <ClCompile Include="BookmarkNavigationController.cpp" />
     <ClCompile Include="BookmarkRegistryStorage.cpp" />
     <ClCompile Include="BookmarksMainMenu.cpp" />
     <ClCompile Include="BookmarkMenuBuilder.cpp" />
@@ -481,7 +482,7 @@
     <ClCompile Include="DisplayWindow\MsgHandler.cpp" />
     <ClCompile Include="PreservedTab.cpp" />
     <ClCompile Include="ShellBrowser\HistoryEntry.cpp" />
-    <ClCompile Include="ShellBrowser\NavigationController.cpp" />
+    <ClCompile Include="ShellBrowser\ShellNavigationController.cpp" />
     <ClCompile Include="ShellBrowser\PreservedFolderState.cpp" />
     <ClCompile Include="ShellBrowser\PreservedHistoryEntry.cpp" />
     <ClCompile Include="ShellTreeView\DirectoryModificationHandler.cpp" />
@@ -634,6 +635,8 @@
     <ClInclude Include="BookmarkHelper.h" />
     <ClInclude Include="BookmarkItem.h" />
     <ClInclude Include="BookmarkListView.h" />
+    <ClInclude Include="BookmarkNavigationController.h" />
+    <ClInclude Include="BookmarkNavigatorInterface.h" />
     <ClInclude Include="BookmarkRegistryStorage.h" />
     <ClInclude Include="BookmarksMainMenu.h" />
     <ClInclude Include="BookmarkMenu.h" />
@@ -694,6 +697,7 @@
     <ClInclude Include="MergeFilesDialog.h" />
     <ClInclude Include="ModelessDialogs.h" />
     <ClInclude Include="Navigation.h" />
+    <ClInclude Include="NavigationController.h" />
     <ClInclude Include="NoTranslationResource.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="OptionsDialog.h" />
@@ -716,7 +720,7 @@
     <ClInclude Include="ShellBrowser\Columns.h" />
     <ClInclude Include="ShellBrowser\FolderSettings.h" />
     <ClInclude Include="ShellBrowser\HistoryEntry.h" />
-    <ClInclude Include="ShellBrowser\NavigationController.h" />
+    <ClInclude Include="ShellBrowser\ShellNavigationController.h" />
     <ClInclude Include="ShellBrowser\NavigatorInterface.h" />
     <ClInclude Include="ShellBrowser\PreservedFolderState.h" />
     <ClInclude Include="ShellBrowser\PreservedHistoryEntry.h" />

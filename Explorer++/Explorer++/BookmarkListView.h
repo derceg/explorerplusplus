@@ -8,6 +8,7 @@
 #include "BookmarkDropTargetWindow.h"
 #include "BookmarkHelper.h"
 #include "BookmarkItem.h"
+#include "BookmarkNavigatorInterface.h"
 #include "ResourceHelper.h"
 #include "SignalWrapper.h"
 #include "../Helper/DpiCompatibility.h"
@@ -19,7 +20,7 @@
 class BookmarkTree;
 __interface IExplorerplusplus;
 
-class BookmarkListView : private BookmarkDropTargetWindow
+class BookmarkListView : public BookmarkNavigatorInterface, private BookmarkDropTargetWindow
 {
 public:
 
@@ -41,16 +42,15 @@ public:
 	BookmarkListView(HWND hListView, HMODULE resourceModule, BookmarkTree *bookmarkTree,
 		IExplorerplusplus *expp, const std::vector<Column> &initialColumns);
 
-	void NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder);
+	void NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder, bool addHistoryEntry) override;
+	boost::signals2::connection AddNavigationCompletedObserver(const BookmarkNavigationCompletedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override;
 
 	std::vector<Column> GetColumns();
 	BookmarkHelper::SortMode GetSortMode() const;
 	void SetSortMode(BookmarkHelper::SortMode sortMode);
 	bool GetSortAscending() const;
 	void SetSortAscending(bool sortAscending);
-
-	// Signals
-	SignalWrapper<BookmarkListView, void(BookmarkItem *bookmarkFolder)> navigationSignal;
 
 private:
 
@@ -131,6 +131,8 @@ private:
 	BookmarkHelper::SortMode m_sortMode;
 	bool m_sortAscending;
 	BookmarkContextMenu m_bookmarkContextMenu;
+
+	BookmarkNavigationCompletedSignal m_navigationCompletedSignal;
 
 	std::optional<int> m_previousDropItem;
 

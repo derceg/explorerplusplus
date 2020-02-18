@@ -88,7 +88,7 @@
     <ClCompile Include="BookmarkTreeTest.cpp" />
     <ClCompile Include="CachedIconsTest.cpp" />
     <ClCompile Include="ManifestTest.cpp" />
-    <ClCompile Include="NavigationControllerTest.cpp" />
+    <ClCompile Include="ShellNavigationControllerTest.cpp" />
     <ClCompile Include="ViewModeHelperTest.cpp" />
   </ItemGroup>
   <ItemGroup>
