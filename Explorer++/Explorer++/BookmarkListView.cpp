@@ -563,7 +563,7 @@ void BookmarkListView::OnKeyDown(const NMLVKEYDOWN *keyDown)
 		break;
 
 	case VK_DELETE:
-		OnDelete();
+		DeleteSelection();
 		break;
 	}
 }
@@ -618,13 +618,16 @@ void BookmarkListView::OnRename()
 	}
 }
 
-void BookmarkListView::OnDelete()
+void BookmarkListView::DeleteSelection()
 {
 	auto rawBookmarkItems = GetSelectedBookmarkItems();
 
 	for (BookmarkItem *bookmarkItem : rawBookmarkItems)
 	{
-		m_bookmarkTree->RemoveBookmarkItem(bookmarkItem);
+		if (!m_bookmarkTree->IsPermanentNode(bookmarkItem))
+		{
+			m_bookmarkTree->RemoveBookmarkItem(bookmarkItem);
+		}
 	}
 }
 

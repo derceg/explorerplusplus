@@ -32,6 +32,7 @@ public:
 
 	void CreateNewFolder();
 	void SelectFolder(const std::wstring &guid);
+	void DeleteSelection();
 
 	// Signals
 	SignalWrapper<BookmarkTreeView, void(BookmarkItem *bookmarkFolder)> selectionChangedSignal;
@@ -65,7 +66,6 @@ private:
 	BOOL OnEndLabelEdit(const NMTVDISPINFO *dispInfo);
 	void OnSelChanged(const NMTREEVIEW *treeView);
 	void OnBeginDrag(const NMTREEVIEW *treeView);
-	void OnDelete();
 
 	void OnRClick(const NMHDR *pnmhdr);
 

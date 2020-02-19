@@ -10,6 +10,7 @@
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "../Helper/Controls.h"
+#include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 
 const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
@@ -212,6 +213,14 @@ LRESULT ManageBookmarksDialog::HandleMenuOrAccelerator(WPARAM wParam)
 		OnNewFolder();
 		break;
 
+	case IDM_MB_ORGANIZE_SELECTALL:
+		OnSelectAll();
+		break;
+
+	case IDM_MB_ORGANIZE_DELETE:
+		OnDelete();
+		break;
+
 	case IDM_MB_VIEW_SORT_BY_DEFAULT:
 		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::Name);
 		break;
@@ -285,11 +294,29 @@ void ManageBookmarksDialog::OnNewFolder()
 	m_bookmarkTree->AddBookmarkItem(bookmarkFolder, std::move(newBookmarkFolder), bookmarkFolder->GetChildren().size());
 }
 
-void ManageBookmarksDialog::OnDeleteBookmark(const std::wstring &guid)
+void ManageBookmarksDialog::OnSelectAll()
 {
-	UNREFERENCED_PARAMETER(guid);
+	HWND focus = GetFocus();
+	HWND listView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW);
 
-	/* TODO: Move the bookmark/bookmark folder to the trash folder. */
+	if (focus == listView)
+	{
+		NListView::ListView_SelectAllItems(listView, TRUE);
+	}
+}
+
+void ManageBookmarksDialog::OnDelete()
+{
+	HWND focus = GetFocus();
+
+	if (focus == GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW))
+	{
+		m_bookmarkListView->DeleteSelection();
+	}
+	else if (focus == GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW))
+	{
+		m_bookmarkTreeView->DeleteSelection();
+	}
 }
 
 void ManageBookmarksDialog::OnTbnDropDown(NMTOOLBAR *nmtb)

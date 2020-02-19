@@ -88,7 +88,8 @@ private:
 	LRESULT		HandleMenuOrAccelerator(WPARAM wParam);
 
 	void		OnNewFolder();
-	void		OnDeleteBookmark(const std::wstring &guid);
+	void		OnSelectAll();
+	void		OnDelete();
 
 	void		OnTbnDropDown(NMTOOLBAR *nmtb);
 	void		ShowViewMenu();

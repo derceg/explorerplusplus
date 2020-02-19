@@ -46,6 +46,8 @@ public:
 	boost::signals2::connection AddNavigationCompletedObserver(const BookmarkNavigationCompletedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;
 
+	void DeleteSelection();
+
 	std::vector<Column> GetColumns();
 	BookmarkHelper::SortMode GetSortMode() const;
 	void SetSortMode(BookmarkHelper::SortMode sortMode);
@@ -91,7 +93,6 @@ private:
 	void OnKeyDown(const NMLVKEYDOWN *keyDown);
 	void OnBeginDrag();
 	void OnRename();
-	void OnDelete();
 
 	RawBookmarkItems GetSelectedBookmarkItems();
 

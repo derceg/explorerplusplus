@@ -75,7 +75,7 @@ LRESULT CALLBACK BookmarkTreeView::TreeViewProc(HWND hwnd, UINT Msg, WPARAM wPar
 				break;
 
 			case IDM_BOOKMARK_TREEVIEW_RLICK_DELETE:
-				OnDelete();
+				DeleteSelection();
 				break;
 
 			case IDM_BOOKMARK_TREEVIEW_RLICK_NEW_FOLDER:
@@ -495,12 +495,15 @@ void BookmarkTreeView::OnBeginDrag(const NMTREEVIEW *treeView)
 	DoDragDrop(dataObject.get(), dropSource.get(), DROPEFFECT_MOVE, &effect);
 }
 
-void BookmarkTreeView::OnDelete()
+void BookmarkTreeView::DeleteSelection()
 {
 	HTREEITEM hSelectedItem = TreeView_GetSelection(m_hTreeView);
 	auto bookmarkFolder = GetBookmarkFolderFromTreeView(hSelectedItem);
 
-	m_bookmarkTree->RemoveBookmarkItem(bookmarkFolder);
+	if (!m_bookmarkTree->IsPermanentNode(bookmarkFolder))
+	{
+		m_bookmarkTree->RemoveBookmarkItem(bookmarkFolder);
+	}
 }
 
 void BookmarkTreeView::OnRClick(const NMHDR *pnmhdr)
