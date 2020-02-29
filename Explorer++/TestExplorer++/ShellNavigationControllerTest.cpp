@@ -278,7 +278,9 @@ TEST_F(ShellNavigationControllerTest, RetrieveHistory) {
 }
 
 TEST_F(ShellNavigationControllerTest, GoUp) {
-	HRESULT hr = NavigateToFolder(L"C:\\Fake");
+	unique_pidl_absolute pidlFolder(SHSimpleIDListFromPath(L"C:\\Fake"));
+	ASSERT_TRUE(pidlFolder);
+	HRESULT hr = m_navigationController.BrowseFolder(pidlFolder.get());
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	EXPECT_TRUE(m_navigationController.CanGoUp());
@@ -286,18 +288,29 @@ TEST_F(ShellNavigationControllerTest, GoUp) {
 	hr = m_navigationController.GoUp();
 	EXPECT_HRESULT_SUCCEEDED(hr);
 
+	auto entry = m_navigationController.GetCurrentEntry();
+	ASSERT_NE(entry, nullptr);
+
+	unique_pidl_absolute pidlParent(SHSimpleIDListFromPath(L"C:\\"));
+	ASSERT_TRUE(pidlParent);
+	EXPECT_TRUE(CompareIdls(entry->GetPidl().get(), pidlParent.get()));
+
 	// The desktop folder is the root of the shell namespace.
-	unique_pidl_absolute pidl;
-	hr = SHGetKnownFolderIDList(FOLDERID_Desktop, KF_FLAG_DEFAULT, nullptr, wil::out_param(pidl));
+	unique_pidl_absolute pidlDesktop;
+	hr = SHGetKnownFolderIDList(FOLDERID_Desktop, KF_FLAG_DEFAULT, nullptr, wil::out_param(pidlDesktop));
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
-	hr = m_navigationController.BrowseFolder(pidl.get());
+	hr = m_navigationController.BrowseFolder(pidlDesktop.get());
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	EXPECT_FALSE(m_navigationController.CanGoUp());
 
 	hr = m_navigationController.GoUp();
 	EXPECT_HRESULT_FAILED(hr);
+
+	entry = m_navigationController.GetCurrentEntry();
+	ASSERT_NE(entry, nullptr);
+	EXPECT_TRUE(CompareIdls(entry->GetPidl().get(), pidlDesktop.get()));
 }
 
 TEST_F(ShellNavigationControllerTest, GetEntry) {
