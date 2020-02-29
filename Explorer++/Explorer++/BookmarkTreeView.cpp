@@ -415,6 +415,10 @@ void BookmarkTreeView::OnKeyDown(const NMTVKEYDOWN *pnmtvkd)
 	case VK_F2:
 		OnTreeViewRename();
 		break;
+
+	case VK_DELETE:
+		DeleteSelection();
+		break;
 	}
 }
 
