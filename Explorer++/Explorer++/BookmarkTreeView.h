@@ -32,6 +32,7 @@ public:
 
 	void CreateNewFolder();
 	void SelectFolder(const std::wstring &guid);
+	bool CanDelete();
 	void DeleteSelection();
 
 	// Signals

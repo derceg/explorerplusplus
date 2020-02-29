@@ -5,6 +5,8 @@
 #include "stdafx.h"
 #include "BookmarkHelper.h"
 #include "AddBookmarkDialog.h"
+#include "BookmarkClipboard.h"
+#include "BookmarkDataExchange.h"
 #include "BookmarkTree.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
@@ -234,6 +236,53 @@ void BookmarkHelper::OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem, 
 	else
 	{
 		expp->GetTabContainer()->CreateNewTab(bookmarkItem->GetLocation().c_str());
+	}
+}
+
+// Cuts/copies the selected bookmark items. Each bookmark item needs to be part
+// of the specified bookmark tree.
+bool BookmarkHelper::CopyBookmarkItems(BookmarkTree *bookmarkTree, const RawBookmarkItems &bookmarkItems, bool cut)
+{
+	OwnedRefBookmarkItems ownedBookmarkItems;
+
+	for (auto bookmarkItem : bookmarkItems)
+	{
+		auto &ownedPtr = bookmarkItem->GetParent()->GetChildOwnedPtr(bookmarkItem);
+		ownedBookmarkItems.push_back(ownedPtr);
+	}
+
+	BookmarkClipboard bookmarkClipboard;
+	bool res = bookmarkClipboard.WriteBookmarks(ownedBookmarkItems);
+
+	if (cut && res)
+	{
+		for (auto bookmarkItem : bookmarkItems)
+		{
+			if (!bookmarkTree->IsPermanentNode(bookmarkItem))
+			{
+				bookmarkTree->RemoveBookmarkItem(bookmarkItem);
+			}
+		}
+	}
+
+	return res;
+}
+
+// Note that the parent folder must be a part of the specified bookmark tree.
+void BookmarkHelper::PasteBookmarkItems(BookmarkTree *bookmarkTree, BookmarkItem *parentFolder)
+{
+	assert(parentFolder->IsFolder());
+
+	BookmarkClipboard bookmarkClipboard;
+	auto bookmarkItems = bookmarkClipboard.ReadBookmarks();
+	int i = 0;
+
+	for (auto &bookmarkItem : bookmarkItems)
+	{
+		bookmarkTree->AddBookmarkItem(parentFolder, std::move(bookmarkItem),
+			parentFolder->GetChildren().size() + i);
+
+		i++;
 	}
 }
 

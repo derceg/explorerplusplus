@@ -15,6 +15,7 @@
 #include "../Helper/Controls.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/MenuHelper.h"
 
 const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
@@ -23,8 +24,7 @@ ManageBookmarksDialog::ManageBookmarksDialog(HINSTANCE hInstance, HWND hParent,
 	BaseDialog(hInstance, IDD_MANAGE_BOOKMARKS, hParent, true),
 	m_pexpp(pexpp),
 	m_navigation(navigation),
-	m_bookmarkTree(bookmarkTree),
-	m_bNewFolderAdded(false)
+	m_bookmarkTree(bookmarkTree)
 {
 	m_persistentSettings = &ManageBookmarksDialogPersistentSettings::GetInstance();
 
@@ -212,18 +212,6 @@ LRESULT ManageBookmarksDialog::HandleMenuOrAccelerator(WPARAM wParam)
 		ShowViewMenu();
 		break;
 
-	case IDM_MB_ORGANIZE_NEWFOLDER:
-		OnNewFolder();
-		break;
-
-	case IDM_MB_ORGANIZE_SELECTALL:
-		OnSelectAll();
-		break;
-
-	case IDM_MB_ORGANIZE_DELETE:
-		OnDelete();
-		break;
-
 	case IDM_MB_VIEW_SORT_BY_DEFAULT:
 		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::Name);
 		break;
@@ -274,52 +262,6 @@ INT_PTR ManageBookmarksDialog::OnNotify(NMHDR *pnmhdr)
 	}
 
 	return 0;
-}
-
-void ManageBookmarksDialog::OnNewFolder()
-{
-	std::wstring newBookmarkFolderName = ResourceHelper::LoadString(GetInstance(), IDS_BOOKMARKS_NEWBOOKMARKFOLDER);
-	auto newBookmarkFolder = std::make_unique<BookmarkItem>(std::nullopt, newBookmarkFolderName, std::nullopt);
-
-	/* Save the folder GUID, so that it can be selected and
-	placed into edit mode once the bookmark notification
-	comes through. */
-	m_bNewFolderAdded = true;
-	m_guidNewFolder = newBookmarkFolder->GetGUID();
-
-	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
-	HTREEITEM hSelectedItem = TreeView_GetSelection(hTreeView);
-
-	assert(hSelectedItem != nullptr);
-
-	auto bookmarkFolder = m_bookmarkTreeView->GetBookmarkFolderFromTreeView(
-		hSelectedItem);
-	m_bookmarkTree->AddBookmarkItem(bookmarkFolder, std::move(newBookmarkFolder), bookmarkFolder->GetChildren().size());
-}
-
-void ManageBookmarksDialog::OnSelectAll()
-{
-	HWND focus = GetFocus();
-	HWND listView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW);
-
-	if (focus == listView)
-	{
-		NListView::ListView_SelectAllItems(listView, TRUE);
-	}
-}
-
-void ManageBookmarksDialog::OnDelete()
-{
-	HWND focus = GetFocus();
-
-	if (focus == GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW))
-	{
-		m_bookmarkListView->DeleteSelection();
-	}
-	else if (focus == GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW))
-	{
-		m_bookmarkTreeView->DeleteSelection();
-	}
 }
 
 void ManageBookmarksDialog::OnTbnDropDown(NMTOOLBAR *nmtb)
@@ -401,28 +343,200 @@ void ManageBookmarksDialog::ShowViewMenu()
 
 void ManageBookmarksDialog::ShowOrganizeMenu()
 {
-	DWORD dwButtonState = static_cast<DWORD>(SendMessage(m_hToolbar,TB_GETSTATE,TOOLBAR_ID_ORGANIZE,MAKEWORD(TBSTATE_PRESSED,0)));
-	SendMessage(m_hToolbar,TB_SETSTATE,TOOLBAR_ID_ORGANIZE,MAKEWORD(dwButtonState|TBSTATE_PRESSED,0));
+	wil::unique_hmenu parentMenu(LoadMenu(GetInstance(), MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_ORGANIZE_MENU)));
 
-	HMENU hMenu = LoadMenu(GetInstance(),MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_ORGANIZE_MENU));
+	if (!parentMenu)
+	{
+		return;
+	}
 
-	RECT rcButton;
-	SendMessage(m_hToolbar,TB_GETRECT,TOOLBAR_ID_ORGANIZE,reinterpret_cast<LPARAM>(&rcButton));
+	HMENU menu = GetSubMenu(parentMenu.get(), 0);
+
+	SetOrganizeMenuItemStates(menu);
+
+	RECT rc;
+	BOOL res = static_cast<BOOL>(SendMessage(m_hToolbar, TB_GETRECT, TOOLBAR_ID_ORGANIZE, reinterpret_cast<LPARAM>(&rc)));
+
+	if (!res)
+	{
+		return;
+	}
 
 	POINT pt;
-	pt.x = rcButton.left;
-	pt.y = rcButton.bottom;
-	ClientToScreen(m_hToolbar,&pt);
+	pt.x = rc.left;
+	pt.y = rc.bottom;
+	res = ClientToScreen(m_hToolbar, &pt);
 
-	TrackPopupMenu(GetSubMenu(hMenu,0),TPM_LEFTALIGN,pt.x,pt.y,0,m_hDlg, nullptr);
-	DestroyMenu(hMenu);
+	if (!res)
+	{
+		return;
+	}
 
-	SendMessage(m_hToolbar,TB_SETSTATE,TOOLBAR_ID_ORGANIZE,MAKEWORD(dwButtonState,0));
+	SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_ORGANIZE, MAKEWORD(TRUE, 0));
+
+	int menuItemId = TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RETURNCMD, pt.x, pt.y, 0, m_hDlg, nullptr);
+
+	if (menuItemId != 0)
+	{
+		OnOrganizeMenuItemSelected(menuItemId);
+	}
+
+	SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_ORGANIZE, MAKEWORD(FALSE, 0));
+}
+
+void ManageBookmarksDialog::SetOrganizeMenuItemStates(HMENU menu)
+{
+	HWND focus = GetFocus();
+	HWND listView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW);
+	HWND treeView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW);
+
+	lEnableMenuItem(menu, IDM_MB_ORGANIZE_NEWBOOKMARK, focus == listView || focus == treeView);
+	lEnableMenuItem(menu, IDM_MB_ORGANIZE_NEWFOLDER, focus == listView || focus == treeView);
+	lEnableMenuItem(menu, IDM_MB_ORGANIZE_SELECTALL, focus == listView);
+
+	bool canDelete = false;
+
+	if (focus == listView)
+	{
+		canDelete = m_bookmarkListView->CanDelete();
+	}
+	else if (focus == treeView)
+	{
+		canDelete = m_bookmarkTreeView->CanDelete();
+	}
+
+	lEnableMenuItem(menu, IDM_MB_ORGANIZE_DELETE, canDelete);
+}
+
+void ManageBookmarksDialog::OnOrganizeMenuItemSelected(int menuItemId)
+{
+	switch (menuItemId)
+	{
+	case IDM_MB_ORGANIZE_NEWBOOKMARK:
+		OnNewBookmark();
+		break;
+
+	case IDM_MB_ORGANIZE_NEWFOLDER:
+		OnNewFolder();
+		break;
+
+	case IDM_MB_ORGANIZE_CUT:
+		OnCopy(true);
+		break;
+
+	case IDM_MB_ORGANIZE_COPY:
+		OnCopy(false);
+		break;
+
+	case IDM_MB_ORGANIZE_PASTE:
+		OnPaste();
+		break;
+
+	case IDM_MB_ORGANIZE_DELETE:
+		OnDelete();
+		break;
+
+	case IDM_MB_ORGANIZE_SELECTALL:
+		OnSelectAll();
+		break;
+	}
+}
+
+void ManageBookmarksDialog::OnNewBookmark()
+{
+	HWND focus = GetFocus();
+	HWND listView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW);
+	HWND treeView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW);
+
+	if (focus != listView && focus != treeView)
+	{
+		return;
+	}
+
+	auto bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
+		m_currentBookmarkFolder, m_pexpp->GetLanguageModule(), focus, m_pexpp->GetTabContainer(), m_pexpp);
+
+	if (!bookmark
+		|| focus != listView
+		|| bookmark->GetParent() != m_currentBookmarkFolder)
+	{
+		return;
+	}
+
+	m_bookmarkListView->SelectItem(bookmark);
+}
+
+void ManageBookmarksDialog::OnNewFolder()
+{
+	HWND focus = GetFocus();
+
+	if (focus == GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW))
+	{
+		m_bookmarkListView->CreateNewFolder();
+	}
+	else if (focus == GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW))
+	{
+		m_bookmarkTreeView->CreateNewFolder();
+	}
+}
+
+void ManageBookmarksDialog::OnCopy(bool cut)
+{
+	HWND focus = GetFocus();
+	RawBookmarkItems selectedItems;
+
+	if (focus == GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW))
+	{
+		selectedItems = m_bookmarkListView->GetSelectedBookmarkItems();
+	}
+	else if (focus == GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW))
+	{
+		// The treeview selection and current folder are always the same, as
+		// they're kept in sync with each other.
+		selectedItems.push_back(m_currentBookmarkFolder);
+	}
+
+	if (selectedItems.empty())
+	{
+		return;
+	}
+
+	BookmarkHelper::CopyBookmarkItems(m_bookmarkTree, selectedItems, cut);
+}
+
+void ManageBookmarksDialog::OnPaste()
+{
+	BookmarkHelper::PasteBookmarkItems(m_bookmarkTree, m_currentBookmarkFolder);
+}
+
+void ManageBookmarksDialog::OnDelete()
+{
+	HWND focus = GetFocus();
+
+	if (focus == GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW))
+	{
+		m_bookmarkListView->DeleteSelection();
+	}
+	else if (focus == GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW))
+	{
+		m_bookmarkTreeView->DeleteSelection();
+	}
+}
+
+void ManageBookmarksDialog::OnSelectAll()
+{
+	HWND focus = GetFocus();
+	HWND listView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW);
+
+	if (focus == listView)
+	{
+		NListView::ListView_SelectAllItems(listView, TRUE);
+	}
 }
 
 void ManageBookmarksDialog::OnTreeViewSelectionChanged(BookmarkItem *bookmarkFolder)
 {
-	if (bookmarkFolder->GetGUID() == m_guidCurrentFolder)
+	if (bookmarkFolder == m_currentBookmarkFolder)
 	{
 		return;
 	}
@@ -434,7 +548,7 @@ void ManageBookmarksDialog::OnListViewNavigation(BookmarkItem *bookmarkFolder, b
 {
 	UNREFERENCED_PARAMETER(addHistoryEntry);
 
-	m_guidCurrentFolder = bookmarkFolder->GetGUID();
+	m_currentBookmarkFolder = bookmarkFolder;
 	m_bookmarkTreeView->SelectFolder(bookmarkFolder->GetGUID());
 
 	UpdateToolbarState();

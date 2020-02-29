@@ -397,7 +397,7 @@ void BookmarkListView::OnMenuItemSelected(int menuItemId)
 		break;
 
 	case IDM_BOOKMARKS_NEW_FOLDER:
-		OnNewFolder();
+		CreateNewFolder();
 		break;
 
 	default:
@@ -422,14 +422,38 @@ void BookmarkListView::OnNewBookmark()
 		return;
 	}
 
-	auto index = GetBookmarkItemIndex(bookmark);
-	assert(index);
+	SelectItem(bookmark);
+}
+
+RawBookmarkItems BookmarkListView::GetSelectedBookmarkItems()
+{
+	RawBookmarkItems bookmarksItems;
+	int index = -1;
+
+	while ((index = ListView_GetNextItem(m_hListView, index, LVNI_SELECTED)) != -1)
+	{
+		BookmarkItem *bookmarkItem = GetBookmarkItemFromListView(index);
+		bookmarksItems.push_back(bookmarkItem);
+	}
+
+	return bookmarksItems;
+}
+
+void BookmarkListView::SelectItem(const BookmarkItem *bookmarkItem)
+{
+	auto index = GetBookmarkItemIndex(bookmarkItem);
+
+	if (!index)
+	{
+		return;
+	}
 
 	SetFocus(m_hListView);
+	NListView::ListView_SelectAllItems(m_hListView, FALSE);
 	NListView::ListView_SelectItem(m_hListView, *index, TRUE);
 }
 
-void BookmarkListView::OnNewFolder()
+void BookmarkListView::CreateNewFolder()
 {
 	auto bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt,
 		ResourceHelper::LoadString(m_resourceModule, IDS_BOOKMARKS_NEWBOOKMARKFOLDER), std::nullopt);
@@ -618,6 +642,23 @@ void BookmarkListView::OnRename()
 	}
 }
 
+bool BookmarkListView::CanDelete()
+{
+	auto rawBookmarkItems = GetSelectedBookmarkItems();
+	bool nonPermanentNodeSelected = false;
+
+	for (BookmarkItem *bookmarkItem : rawBookmarkItems)
+	{
+		if (!m_bookmarkTree->IsPermanentNode(bookmarkItem))
+		{
+			nonPermanentNodeSelected = true;
+			break;
+		}
+	}
+
+	return nonPermanentNodeSelected;
+}
+
 void BookmarkListView::DeleteSelection()
 {
 	auto rawBookmarkItems = GetSelectedBookmarkItems();
@@ -629,20 +670,6 @@ void BookmarkListView::DeleteSelection()
 			m_bookmarkTree->RemoveBookmarkItem(bookmarkItem);
 		}
 	}
-}
-
-RawBookmarkItems BookmarkListView::GetSelectedBookmarkItems()
-{
-	RawBookmarkItems bookmarksItems;
-	int index = -1;
-
-	while ((index = ListView_GetNextItem(m_hListView, index, LVNI_SELECTED)) != -1)
-	{
-		BookmarkItem *bookmarkItem = GetBookmarkItemFromListView(index);
-		bookmarksItems.push_back(bookmarkItem);
-	}
-
-	return bookmarksItems;
 }
 
 void BookmarkListView::OnHeaderRClick(const POINT &pt)

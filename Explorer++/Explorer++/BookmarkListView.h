@@ -46,6 +46,10 @@ public:
 	boost::signals2::connection AddNavigationCompletedObserver(const BookmarkNavigationCompletedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;
 
+	RawBookmarkItems GetSelectedBookmarkItems();
+	void SelectItem(const BookmarkItem *bookmarkItem);
+	void CreateNewFolder();
+	bool CanDelete();
 	void DeleteSelection();
 
 	std::vector<Column> GetColumns();
@@ -86,15 +90,12 @@ private:
 	void ShowBackgroundContextMenu(const POINT &ptScreen);
 	void OnMenuItemSelected(int menuItemId);
 	void OnNewBookmark();
-	void OnNewFolder();
 	void OnGetDispInfo(NMLVDISPINFO *dispInfo);
 	BOOL OnBeginLabelEdit(const NMLVDISPINFO *dispInfo);
 	BOOL OnEndLabelEdit(const NMLVDISPINFO *dispInfo);
 	void OnKeyDown(const NMLVKEYDOWN *keyDown);
 	void OnBeginDrag();
 	void OnRename();
-
-	RawBookmarkItems GetSelectedBookmarkItems();
 
 	void OnHeaderRClick(const POINT &pt);
 	wil::unique_hmenu BuildHeaderContextMenu();

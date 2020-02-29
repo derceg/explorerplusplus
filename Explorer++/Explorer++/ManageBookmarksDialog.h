@@ -86,13 +86,19 @@ private:
 
 	LRESULT		HandleMenuOrAccelerator(WPARAM wParam);
 
-	void		OnNewFolder();
-	void		OnSelectAll();
-	void		OnDelete();
-
 	void		OnTbnDropDown(NMTOOLBAR *nmtb);
 	void		ShowViewMenu();
+
+	// Organize menu
 	void		ShowOrganizeMenu();
+	void		SetOrganizeMenuItemStates(HMENU menu);
+	void		OnOrganizeMenuItemSelected(int menuItemId);
+	void		OnNewBookmark();
+	void		OnNewFolder();
+	void		OnCopy(bool cut);
+	void		OnPaste();
+	void		OnDelete();
+	void		OnSelectAll();
 
 	void		OnOk();
 	void		OnCancel();
@@ -106,10 +112,7 @@ private:
 
 	BookmarkTree *m_bookmarkTree;
 
-	std::wstring m_guidCurrentFolder;
-
-	bool m_bNewFolderAdded;
-	std::wstring m_guidNewFolder;
+	BookmarkItem *m_currentBookmarkFolder;
 
 	BookmarkTreeView *m_bookmarkTreeView;
 	BookmarkListView *m_bookmarkListView;

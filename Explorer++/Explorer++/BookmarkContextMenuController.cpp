@@ -96,48 +96,12 @@ void BookmarkContextMenuController::OnNewBookmarkItem(BookmarkItem::Type type, B
 
 void BookmarkContextMenuController::OnCopy(const RawBookmarkItems &bookmarkItems, bool cut)
 {
-	OwnedRefBookmarkItems ownedBookmarkItems;
-
-	for (auto bookmarkItem : bookmarkItems)
-	{
-		auto &ownedPtr = bookmarkItem->GetParent()->GetChildOwnedPtr(bookmarkItem);
-		ownedBookmarkItems.push_back(ownedPtr);
-	}
-
-	BookmarkClipboard bookmarkClipboard;
-	bool res = bookmarkClipboard.WriteBookmarks(ownedBookmarkItems);
-
-	if (cut && res)
-	{
-		for (auto bookmarkItem : bookmarkItems)
-		{
-			m_bookmarkTree->RemoveBookmarkItem(bookmarkItem);
-		}
-	}
+	BookmarkHelper::CopyBookmarkItems(m_bookmarkTree, bookmarkItems, cut);
 }
 
 void BookmarkContextMenuController::OnPaste(BookmarkItem *parentFolder)
 {
-	BookmarkClipboard bookmarkClipboard;
-	auto bookmarkItems = bookmarkClipboard.ReadBookmarks();
-	int i = 0;
-
-	for (auto &bookmarkItem : bookmarkItems)
-	{
-		if (parentFolder->IsFolder())
-		{
-			m_bookmarkTree->AddBookmarkItem(parentFolder, std::move(bookmarkItem),
-				parentFolder->GetChildren().size() + i);
-		}
-		else
-		{
-			BookmarkItem *parent = parentFolder->GetParent();
-			m_bookmarkTree->AddBookmarkItem(parent, std::move(bookmarkItem),
-				parent->GetChildIndex(parentFolder) + i + 1);
-		}
-
-		i++;
-	}
+	BookmarkHelper::PasteBookmarkItems(m_bookmarkTree, parentFolder);
 }
 
 void BookmarkContextMenuController::OnDelete(const RawBookmarkItems &bookmarkItems)

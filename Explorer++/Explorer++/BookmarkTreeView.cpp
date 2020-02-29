@@ -495,6 +495,14 @@ void BookmarkTreeView::OnBeginDrag(const NMTREEVIEW *treeView)
 	DoDragDrop(dataObject.get(), dropSource.get(), DROPEFFECT_MOVE, &effect);
 }
 
+bool BookmarkTreeView::CanDelete()
+{
+	HTREEITEM hSelectedItem = TreeView_GetSelection(m_hTreeView);
+	auto bookmarkFolder = GetBookmarkFolderFromTreeView(hSelectedItem);
+
+	return !m_bookmarkTree->IsPermanentNode(bookmarkFolder);
+}
+
 void BookmarkTreeView::DeleteSelection()
 {
 	HTREEITEM hSelectedItem = TreeView_GetSelection(m_hTreeView);

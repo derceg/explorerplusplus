@@ -39,6 +39,9 @@ namespace BookmarkHelper
 		HWND parentWindow, IExplorerplusplus *coreInterface);
 	void OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem, IExplorerplusplus *expp);
 
+	bool CopyBookmarkItems(BookmarkTree *bookmarkTree, const RawBookmarkItems &bookmarkItems, bool cut);
+	void PasteBookmarkItems(BookmarkTree *bookmarkTree, BookmarkItem *parentFolder);
+
 	BookmarkItem *GetBookmarkItemById(BookmarkTree *bookmarkTree, std::wstring_view guid);
 
 	bool IsAncestor(BookmarkItem *bookmarkItem, BookmarkItem *possibleAncestor);
