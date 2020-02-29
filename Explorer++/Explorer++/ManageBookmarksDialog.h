@@ -5,19 +5,18 @@
 #pragma once
 
 #include "BookmarkListView.h"
-#include "BookmarkNavigationController.h"
-#include "BookmarkTreeView.h"
-#include "Navigation.h"
 #include "ResourceHelper.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include <boost/signals2.hpp>
-#include <stack>
 #include <unordered_set>
 
+class BookmarkNavigationController;
 class BookmarkTree;
+class BookmarkTreeView;
 __interface IExplorerplusplus;
 class ManageBookmarksDialog;
+class Navigation;
 
 class ManageBookmarksDialogPersistentSettings : public DialogSettings
 {
