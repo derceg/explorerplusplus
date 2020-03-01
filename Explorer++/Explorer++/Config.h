@@ -16,6 +16,8 @@
 
 static const int DEFAULT_LISTVIEW_HOVER_TIME = 500;
 
+// These values are used to save/load configuration data and should not be
+// changed.
 enum StartupMode_t
 {
 	STARTUP_PREVIOUSTABS = 1,
