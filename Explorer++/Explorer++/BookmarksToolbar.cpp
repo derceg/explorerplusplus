@@ -436,7 +436,7 @@ void BookmarksToolbar::OnToolbarContextMenuItemClicked(int menuItemId)
 void BookmarksToolbar::OnNewBookmarkItem(BookmarkItem::Type type, size_t targetIndex)
 {
 	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, m_bookmarkTree->GetBookmarksToolbarFolder(),
-		targetIndex, m_instance, m_hToolbar, m_pexpp->GetTabContainer(), m_pexpp);
+		targetIndex, m_hToolbar, m_pexpp);
 }
 
 void BookmarksToolbar::OnPaste(size_t targetIndex)

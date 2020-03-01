@@ -90,8 +90,8 @@ void BookmarkContextMenuController::OnOpenAll(const RawBookmarkItems &bookmarkIt
 void BookmarkContextMenuController::OnNewBookmarkItem(BookmarkItem::Type type, BookmarkItem *targetParentFolder,
 	size_t targetIndex, HWND parentWindow)
 {
-	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, targetParentFolder, targetIndex, m_resourceModule,
-		parentWindow, m_expp->GetTabContainer(), m_expp);
+	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, targetParentFolder, targetIndex,
+		parentWindow, m_expp);
 }
 
 void BookmarkContextMenuController::OnCopy(const RawBookmarkItems &bookmarkItems, bool cut)

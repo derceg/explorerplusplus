@@ -32,9 +32,8 @@ namespace BookmarkHelper
 	void BookmarkAllTabs(BookmarkTree *bookmarkTree, HMODULE resoureceModule, HWND parentWindow,
 		IExplorerplusplus *coreInterface);
 	BookmarkItem *AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
-		BookmarkItem *defaultParentSelection, std::optional<size_t> suggestedIndex, HMODULE resoureceModule,
-		HWND parentWindow, TabContainer *tabContainer, IExplorerplusplus *coreInterface,
-		std::optional<std::wstring> customDialogTitle = std::nullopt);
+		BookmarkItem *defaultParentSelection, std::optional<size_t> suggestedIndex, HWND parentWindow,
+		IExplorerplusplus *coreInterface, std::optional<std::wstring> customDialogTitle = std::nullopt);
 	void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree, HMODULE resoureceModule,
 		HWND parentWindow, IExplorerplusplus *coreInterface);
 	void OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem, IExplorerplusplus *expp);

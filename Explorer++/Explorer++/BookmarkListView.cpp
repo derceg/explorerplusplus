@@ -409,8 +409,7 @@ void BookmarkListView::OnMenuItemSelected(int menuItemId)
 void BookmarkListView::OnNewBookmark()
 {
 	auto bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
-		m_currentBookmarkFolder, GetLastSelectedItemIndex() + 1, m_resourceModule, m_hListView,
-		m_expp->GetTabContainer(), m_expp);
+		m_currentBookmarkFolder, GetLastSelectedItemIndex() + 1, m_hListView, m_expp);
 
 	if (!bookmark)
 	{

@@ -461,8 +461,7 @@ void ManageBookmarksDialog::OnNewBookmark()
 	}
 
 	auto bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
-		m_currentBookmarkFolder, targetIndex, m_pexpp->GetLanguageModule(), focus, m_pexpp->GetTabContainer(),
-		m_pexpp);
+		m_currentBookmarkFolder, targetIndex, focus, m_pexpp);
 
 	if (!bookmark
 		|| focus != listView

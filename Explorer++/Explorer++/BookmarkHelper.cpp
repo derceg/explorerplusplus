@@ -129,8 +129,7 @@ void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree, HMODULE resoure
 {
 	std::wstring bookmarkAllTabsText = ResourceHelper::LoadString(resoureceModule, IDS_ADD_BOOKMARK_TITLE_BOOKMARK_ALL_TABS);
 	auto bookmarkFolder = AddBookmarkItem(bookmarkTree, BookmarkItem::Type::Folder,
-		nullptr, std::nullopt, resoureceModule, parentWindow, coreInterface->GetTabContainer(), coreInterface,
-		bookmarkAllTabsText);
+		nullptr, std::nullopt, parentWindow, coreInterface, bookmarkAllTabsText);
 
 	if (!bookmarkFolder)
 	{
@@ -153,15 +152,14 @@ void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree, HMODULE resoure
 }
 
 BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
-	BookmarkItem *defaultParentSelection, std::optional<size_t> suggestedIndex, HMODULE resoureceModule,
-	HWND parentWindow, TabContainer *tabContainer, IExplorerplusplus *coreInterface,
-	std::optional<std::wstring> customDialogTitle)
+	BookmarkItem *defaultParentSelection, std::optional<size_t> suggestedIndex, HWND parentWindow,
+	IExplorerplusplus *coreInterface, std::optional<std::wstring> customDialogTitle)
 {
 	std::unique_ptr<BookmarkItem> bookmarkItem;
 
 	if (type == BookmarkItem::Type::Bookmark)
 	{
-		const Tab &selectedTab = tabContainer->GetSelectedTab();
+		const Tab &selectedTab = coreInterface->GetTabContainer()->GetSelectedTab();
 		auto entry = selectedTab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
 
 		bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt, entry->GetDisplayName(),
@@ -170,14 +168,16 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 	else
 	{
 		bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt,
-			ResourceHelper::LoadString(resoureceModule, IDS_BOOKMARKS_NEWBOOKMARKFOLDER), std::nullopt);
+			ResourceHelper::LoadString(coreInterface->GetLanguageModule(),
+				IDS_BOOKMARKS_NEWBOOKMARKFOLDER), std::nullopt);
 	}
 
 	BookmarkItem *rawBookmarkItem = bookmarkItem.get();
 	BookmarkItem *selectedParentFolder = nullptr;
 
-	AddBookmarkDialog addBookmarkDialog(resoureceModule, parentWindow, coreInterface, bookmarkTree,
-		bookmarkItem.get(), defaultParentSelection, &selectedParentFolder, customDialogTitle);
+	AddBookmarkDialog addBookmarkDialog(coreInterface->GetLanguageModule(), parentWindow,
+		coreInterface, bookmarkTree, bookmarkItem.get(), defaultParentSelection,
+		&selectedParentFolder, customDialogTitle);
 	auto res = addBookmarkDialog.ShowModalDialog();
 
 	if (res == BaseDialog::RETURN_OK)
