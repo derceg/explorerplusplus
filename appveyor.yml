@@ -17,6 +17,13 @@ environment:
   PFX_PASS:
     secure: rgMy2ixSiaW0sk2CwaHwO5pK8U98ynzt/jjiGNRSYPfaAcOTRZ5oX+fsgqn6qP54
 
+init:
+- ps: >-
+    if ($env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH -eq "l10n_master") {
+        Write-Host "Skipping l10n_master branch pull request"
+        Exit-AppveyorBuild
+    }
+
 # Decrypt the code signing certificate.
 install:
 - cmd: >-
