@@ -56,6 +56,34 @@ INT_PTR ManageBookmarksDialog::OnInitDialog()
 	return 0;
 }
 
+void ManageBookmarksDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+	std::list<ResizableDialog::Control_t> &controlList)
+{
+	dsc = BaseDialog::DIALOG_SIZE_CONSTRAINT_NONE;
+
+	ResizableDialog::Control_t control;
+
+	control.iID = IDC_MANAGEBOOKMARKS_TREEVIEW;
+	control.Type = ResizableDialog::TYPE_RESIZE;
+	control.Constraint = ResizableDialog::CONSTRAINT_Y;
+	controlList.push_back(control);
+
+	control.iID = IDC_MANAGEBOOKMARKS_LISTVIEW;
+	control.Type = ResizableDialog::TYPE_RESIZE;
+	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
+	controlList.push_back(control);
+
+	control.iID = IDOK;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
+	controlList.push_back(control);
+
+	control.iID = IDC_GRIPPER;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
+	controlList.push_back(control);
+}
+
 wil::unique_hicon ManageBookmarksDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
 	return m_pexpp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::Bookmarks, iconWidth, iconHeight);

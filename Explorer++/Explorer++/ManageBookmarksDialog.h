@@ -8,6 +8,7 @@
 #include "ResourceHelper.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
+#include "../Helper/ResizableDialog.h"
 #include <boost/signals2.hpp>
 #include <unordered_set>
 
@@ -74,6 +75,8 @@ private:
 	static const int TOOLBAR_ID_VIEWS			= 10003;
 
 	ManageBookmarksDialog & operator = (const ManageBookmarksDialog &mbd);
+
+	void		GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &controlList) override;
 
 	void		SetupToolbar();
 	void		SetupTreeView();
