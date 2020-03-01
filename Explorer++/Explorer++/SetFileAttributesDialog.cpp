@@ -144,15 +144,15 @@ INT_PTR SetFileAttributesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	switch(LOWORD(wParam))
 	{
 	case IDC_MODIFICATION_RESET:
-		OnDateReset(DATE_TIME_MODIFIED);
+		OnDateReset(DateTimeType::Modified);
 		break;
 
 	case IDC_CREATION_RESET:
-		OnDateReset(DATE_TIME_CREATED);
+		OnDateReset(DateTimeType::Created);
 		break;
 
 	case IDC_ACCESS_RESET:
-		OnDateReset(DATE_TIME_ACCESSED);
+		OnDateReset(DateTimeType::Accessed);
 		break;
 
 	case IDOK:
@@ -319,21 +319,21 @@ void SetFileAttributesDialog::OnCancel()
 	EndDialog(m_hDlg,0);
 }
 
-void SetFileAttributesDialog::OnDateReset(DateTimeType_t DateTimeType)
+void SetFileAttributesDialog::OnDateReset(DateTimeType dateTimeType)
 {
-	switch(DateTimeType)
+	switch(dateTimeType)
 	{
-	case DATE_TIME_MODIFIED:
+	case DateTimeType::Modified:
 		DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_MODIFICATIONDATE),GDT_VALID,&m_LocalWrite);
 		DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_MODIFICATIONTIME),GDT_VALID,&m_LocalWrite);
 		break;
 
-	case DATE_TIME_CREATED:
+	case DateTimeType::Created:
 		DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_CREATIONDATE),GDT_VALID,&m_LocalCreation);
 		DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_CREATIONTIME),GDT_VALID,&m_LocalCreation);
 		break;
 
-	case DATE_TIME_ACCESSED:
+	case DateTimeType::Accessed:
 		DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_ACCESSDATE),GDT_VALID,&m_LocalCreation);
 		DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_ACCESSTIME),GDT_VALID,&m_LocalCreation);
 		break;

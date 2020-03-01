@@ -22,11 +22,11 @@ protected:
 
 private:
 
-	enum RenameStage_t
+	enum class RenameStage
 	{
-		RENAME_FILENAME,
-		RENAME_EXTENSION,
-		RENAME_ENTIRE
+		Filename,
+		Extension,
+		Entire
 	};
 
 	ListViewEdit(HWND hwnd,int ItemIndex,IExplorerplusplus *pexpp);
@@ -36,6 +36,6 @@ private:
 	IExplorerplusplus	*m_pexpp;
 
 	int					m_ItemIndex;
-	RenameStage_t		m_RenameStage;
+	RenameStage		m_RenameStage;
 	bool				m_BeginRename;
 };

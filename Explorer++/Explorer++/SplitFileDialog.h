@@ -95,21 +95,21 @@ protected:
 
 private:
 
-	enum SizeType_t
+	enum class SizeType
 	{
-		SIZE_TYPE_BYTES,
-		SIZE_TYPE_KB,
-		SIZE_TYPE_MB,
-		SIZE_TYPE_GB,
+		Bytes,
+		KB,
+		MB,
+		GB,
 	};
 
-	enum ErrorType_t
+	enum class ErrorType
 	{
-		ERROR_NONE,
-		ERROR_OUTPUT_FILENAME_EMPTY,
-		ERROR_OUTPUT_FILENAME_CONSTANT,
-		ERROR_OUTPUT_DIRECTORY_EMPTY,
-		ERROR_SPLIT_SIZE
+		None,
+		OutputFilenameEmpty,
+		OutputFilenameConstant,
+		OutputDirectoryEmpty,
+		SplitSize
 	};
 
 	static const COLORREF HELPER_TEXT_COLOR = RGB(120,120,120);
@@ -132,7 +132,7 @@ private:
 	bool m_bSplittingFile;
 	bool m_bStopSplitting;
 
-	std::unordered_map<int,SizeType_t> m_SizeMap;
+	std::unordered_map<int,SizeType> m_SizeMap;
 
 	SplitFile *m_pSplitFile;
 	HFONT m_hHelperTextFont;
@@ -140,7 +140,7 @@ private:
 	TCHAR m_szOk[32];
 	UINT m_uElapsedTime;
 
-	ErrorType_t m_CurrentError;
+	ErrorType m_CurrentError;
 
 	SplitFileDialogPersistentSettings *m_persistentSettings;
 };

@@ -29,25 +29,25 @@ void HardwareChangeNotifier::RemoveObserver(NHardwareChangeNotifier::INotificati
 
 void HardwareChangeNotifier::NotifyDeviceArrival(DEV_BROADCAST_HDR *dbh)
 {
-	NotifyObservers(NOTIFY_DEVICE_ARRIVAL,dbh);
+	NotifyObservers(NotificationType::Arrival,dbh);
 }
 
 void HardwareChangeNotifier::NotifyDeviceRemovalComplete(DEV_BROADCAST_HDR *dbh)
 {
-	NotifyObservers(NOTIFY_DEVICE_REMOVAL_COMPLETE,dbh);
+	NotifyObservers(NotificationType::RemovalComplete,dbh);
 }
 
-void HardwareChangeNotifier::NotifyObservers(NotificationType_t NotificationType,DEV_BROADCAST_HDR *dbh)
+void HardwareChangeNotifier::NotifyObservers(NotificationType notificationType,DEV_BROADCAST_HDR *dbh)
 {
 	for(const auto &hcn : m_Observers)
 	{
-		switch(NotificationType)
+		switch(notificationType)
 		{
-		case NOTIFY_DEVICE_ARRIVAL:
+		case NotificationType::Arrival:
 			hcn->OnDeviceArrival(dbh);
 			break;
 
-		case NOTIFY_DEVICE_REMOVAL_COMPLETE:
+		case NotificationType::RemovalComplete:
 			hcn->OnDeviceRemoveComplete(dbh);
 			break;
 		}

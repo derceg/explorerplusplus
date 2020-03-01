@@ -33,31 +33,31 @@ INT_PTR DisplayColoursDialog::OnInitDialog()
 
 void DisplayColoursDialog::InitializeColorGroups()
 {
-	m_CenterGroup[0].SliderId	= IDC_SLIDER_CENTRE_RED;
-	m_CenterGroup[0].EditId		= IDC_EDIT_CENTRE_RED;
-	m_CenterGroup[0].Color		= COLOR_RED;
+	m_CenterGroup[0].sliderId	= IDC_SLIDER_CENTRE_RED;
+	m_CenterGroup[0].editId		= IDC_EDIT_CENTRE_RED;
+	m_CenterGroup[0].color		= Color::Red;
 
-	m_CenterGroup[1].SliderId	= IDC_SLIDER_CENTRE_GREEN;
-	m_CenterGroup[1].EditId		= IDC_EDIT_CENTRE_GREEN;
-	m_CenterGroup[1].Color		= COLOR_GREEN;
+	m_CenterGroup[1].sliderId	= IDC_SLIDER_CENTRE_GREEN;
+	m_CenterGroup[1].editId		= IDC_EDIT_CENTRE_GREEN;
+	m_CenterGroup[1].color		= Color::Green;
 
-	m_CenterGroup[2].SliderId	= IDC_SLIDER_CENTRE_BLUE;
-	m_CenterGroup[2].EditId		= IDC_EDIT_CENTRE_BLUE;
-	m_CenterGroup[2].Color		= COLOR_BLUE;
+	m_CenterGroup[2].sliderId	= IDC_SLIDER_CENTRE_BLUE;
+	m_CenterGroup[2].editId		= IDC_EDIT_CENTRE_BLUE;
+	m_CenterGroup[2].color		= Color::Blue;
 
 	InitializeColorGroupControls(m_CenterGroup);
 
-	m_SurroundingGroup[0].SliderId	= IDC_SLIDER_SURROUND_RED;
-	m_SurroundingGroup[0].EditId	= IDC_EDIT_SURROUND_RED;
-	m_SurroundingGroup[0].Color	= COLOR_RED;
+	m_SurroundingGroup[0].sliderId	= IDC_SLIDER_SURROUND_RED;
+	m_SurroundingGroup[0].editId	= IDC_EDIT_SURROUND_RED;
+	m_SurroundingGroup[0].color	= Color::Red;
 
-	m_SurroundingGroup[1].SliderId	= IDC_SLIDER_SURROUND_GREEN;
-	m_SurroundingGroup[1].EditId	= IDC_EDIT_SURROUND_GREEN;
-	m_SurroundingGroup[1].Color	= COLOR_GREEN;
+	m_SurroundingGroup[1].sliderId	= IDC_SLIDER_SURROUND_GREEN;
+	m_SurroundingGroup[1].editId	= IDC_EDIT_SURROUND_GREEN;
+	m_SurroundingGroup[1].color	= Color::Green;
 
-	m_SurroundingGroup[2].SliderId	= IDC_SLIDER_SURROUND_BLUE;
-	m_SurroundingGroup[2].EditId	= IDC_EDIT_SURROUND_BLUE;
-	m_SurroundingGroup[2].Color	= COLOR_BLUE;
+	m_SurroundingGroup[2].sliderId	= IDC_SLIDER_SURROUND_BLUE;
+	m_SurroundingGroup[2].editId	= IDC_EDIT_SURROUND_BLUE;
+	m_SurroundingGroup[2].color	= Color::Blue;
 
 	InitializeColorGroupControls(m_SurroundingGroup);
 }
@@ -66,30 +66,30 @@ void DisplayColoursDialog::InitializeColorGroupControls(ColorGroup_t ColorGroup[
 {
 	for(int i = 0;i < NUM_COLORS;i++)
 	{
-		SendDlgItemMessage(m_hDlg,ColorGroup[i].SliderId,TBM_SETTICFREQ,TICK_REQUENCY,0);
-		SendDlgItemMessage(m_hDlg,ColorGroup[i].SliderId,TBM_SETRANGE,TRUE,MAKELONG(0,255));
-		SendDlgItemMessage(m_hDlg,ColorGroup[i].EditId,EM_SETLIMITTEXT,3,0);
+		SendDlgItemMessage(m_hDlg,ColorGroup[i].sliderId,TBM_SETTICFREQ,TICK_REQUENCY,0);
+		SendDlgItemMessage(m_hDlg,ColorGroup[i].sliderId,TBM_SETRANGE,TRUE,MAKELONG(0,255));
+		SendDlgItemMessage(m_hDlg,ColorGroup[i].editId,EM_SETLIMITTEXT,3,0);
 	}
 }
 
-void DisplayColoursDialog::SetColorGroupValues(ColorGroup_t ColorGroup[NUM_COLORS],COLORREF Color)
+void DisplayColoursDialog::SetColorGroupValues(ColorGroup_t ColorGroup[NUM_COLORS],COLORREF color)
 {
 	for(int i = 0;i < NUM_COLORS;i++)
 	{
 		UINT ColorComponent = 0;
 
-		switch(ColorGroup[i].Color)
+		switch(ColorGroup[i].color)
 		{
-		case COLOR_RED:
-			ColorComponent = GetRValue(Color);
+		case Color::Red:
+			ColorComponent = GetRValue(color);
 			break;
 
-		case COLOR_GREEN:
-			ColorComponent = GetGValue(Color);
+		case Color::Green:
+			ColorComponent = GetGValue(color);
 			break;
 
-		case COLOR_BLUE:
-			ColorComponent = GetBValue(Color);
+		case Color::Blue:
+			ColorComponent = GetBValue(color);
 			break;
 
 		default:
@@ -97,8 +97,8 @@ void DisplayColoursDialog::SetColorGroupValues(ColorGroup_t ColorGroup[NUM_COLOR
 			break;
 		}
 
-		SetDlgItemInt(m_hDlg,ColorGroup[i].EditId,ColorComponent,FALSE);
-		SendDlgItemMessage(m_hDlg,ColorGroup[i].SliderId,TBM_SETPOS,TRUE,ColorComponent);
+		SetDlgItemInt(m_hDlg,ColorGroup[i].editId,ColorComponent,FALSE);
+		SendDlgItemMessage(m_hDlg,ColorGroup[i].sliderId,TBM_SETPOS,TRUE,ColorComponent);
 	}
 }
 
@@ -253,11 +253,11 @@ void DisplayColoursDialog::UpdateEditControlsFromSlider(ColorGroup_t ColorGroup[
 {
 	for(int i = 0;i < NUM_COLORS;i++)
 	{
-		UINT ColorComponent = static_cast<UINT>(SendDlgItemMessage(m_hDlg,ColorGroup[i].SliderId,TBM_GETPOS,0,0));
+		UINT ColorComponent = static_cast<UINT>(SendDlgItemMessage(m_hDlg,ColorGroup[i].sliderId,TBM_GETPOS,0,0));
 
-		if(GetDlgItemInt(m_hDlg,ColorGroup[i].EditId, nullptr,FALSE) != ColorComponent)
+		if(GetDlgItemInt(m_hDlg,ColorGroup[i].editId, nullptr,FALSE) != ColorComponent)
 		{
-			SetDlgItemInt(m_hDlg,ColorGroup[i].EditId,ColorComponent,FALSE);
+			SetDlgItemInt(m_hDlg,ColorGroup[i].editId,ColorComponent,FALSE);
 		}
 	}
 }
@@ -270,19 +270,19 @@ COLORREF DisplayColoursDialog::GetColorFromSliderGroup(ColorGroup_t ColorGroup[N
 
 	for(int i = 0;i < NUM_COLORS;i++)
 	{
-		UINT ColorComponent = static_cast<UINT>(SendDlgItemMessage(m_hDlg,ColorGroup[i].SliderId,TBM_GETPOS,0,0));
+		UINT ColorComponent = static_cast<UINT>(SendDlgItemMessage(m_hDlg,ColorGroup[i].sliderId,TBM_GETPOS,0,0));
 
-		switch(ColorGroup[i].Color)
+		switch(ColorGroup[i].color)
 		{
-		case COLOR_RED:
+		case Color::Red:
 			r = ColorComponent;
 			break;
 
-		case COLOR_GREEN:
+		case Color::Green:
 			g = ColorComponent;
 			break;
 
-		case COLOR_BLUE:
+		case Color::Blue:
 			b = ColorComponent;
 			break;
 

@@ -46,7 +46,7 @@ SplitFileDialog::SplitFileDialog(HINSTANCE hInstance, HWND hParent, IExplorerplu
 	m_strFullFilename(strFullFilename),
 	m_bSplittingFile(false),
 	m_bStopSplitting(false),
-	m_CurrentError(ERROR_NONE),
+	m_CurrentError(ErrorType::None),
 	m_pSplitFile(nullptr)
 {
 	m_persistentSettings = &SplitFileDialogPersistentSettings::GetInstance();
@@ -110,16 +110,16 @@ INT_PTR SplitFileDialog::OnInitDialog()
 
 	LoadString(GetInstance(),IDS_SPLIT_FILE_SIZE_BYTES,szTemp,SIZEOF_ARRAY(szTemp));
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szTemp)));
-	m_SizeMap.insert(std::unordered_map<int,SizeType_t>::value_type(iPos,SIZE_TYPE_BYTES));
+	m_SizeMap.insert(std::unordered_map<int,SizeType>::value_type(iPos,SizeType::Bytes));
 	LoadString(GetInstance(),IDS_SPLIT_FILE_SIZE_KB,szTemp,SIZEOF_ARRAY(szTemp));
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szTemp)));
-	m_SizeMap.insert(std::unordered_map<int,SizeType_t>::value_type(iPos,SIZE_TYPE_KB));
+	m_SizeMap.insert(std::unordered_map<int,SizeType>::value_type(iPos,SizeType::KB));
 	LoadString(GetInstance(),IDS_SPLIT_FILE_SIZE_MB,szTemp,SIZEOF_ARRAY(szTemp));
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szTemp)));
-	m_SizeMap.insert(std::unordered_map<int,SizeType_t>::value_type(iPos,SIZE_TYPE_MB));
+	m_SizeMap.insert(std::unordered_map<int,SizeType>::value_type(iPos,SizeType::MB));
 	LoadString(GetInstance(),IDS_SPLIT_FILE_SIZE_GB,szTemp,SIZEOF_ARRAY(szTemp));
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szTemp)));
-	m_SizeMap.insert(std::unordered_map<int,SizeType_t>::value_type(iPos,SIZE_TYPE_GB));
+	m_SizeMap.insert(std::unordered_map<int,SizeType>::value_type(iPos,SizeType::GB));
 
 	SendMessage(hComboBox,CB_SELECTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(m_persistentSettings->m_strSplitGroup.c_str()));
 
@@ -203,19 +203,19 @@ INT_PTR SplitFileDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 
 				switch(m_CurrentError)
 				{
-				case ERROR_OUTPUT_FILENAME_EMPTY:
+				case ErrorType::OutputFilenameEmpty:
 					bHideError = (LOWORD(wParam) == IDC_SPLIT_EDIT_OUTPUTFILENAME);
 					break;
 
-				case ERROR_OUTPUT_FILENAME_CONSTANT:
+				case ErrorType::OutputFilenameConstant:
 					bHideError = (LOWORD(wParam) == IDC_SPLIT_EDIT_OUTPUTFILENAME);
 					break;
 
-				case ERROR_OUTPUT_DIRECTORY_EMPTY:
+				case ErrorType::OutputDirectoryEmpty:
 					bHideError = (LOWORD(wParam) == IDC_SPLIT_EDIT_OUTPUT);
 					break;
 
-				case ERROR_SPLIT_SIZE:
+				case ErrorType::SplitSize:
 					bHideError = (LOWORD(wParam) == IDC_SPLIT_EDIT_SIZE);
 					break;
 				}
@@ -227,7 +227,7 @@ INT_PTR SplitFileDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 					hide the error message. */
 					SetDlgItemText(m_hDlg,IDC_SPLIT_STATIC_MESSAGE,EMPTY_STRING);
 
-					m_CurrentError = ERROR_NONE;
+					m_CurrentError = ErrorType::None;
 				}
 			}
 			break;
@@ -335,7 +335,7 @@ void SplitFileDialog::OnOk()
 
 			SetDlgItemText(m_hDlg,IDC_SPLIT_STATIC_MESSAGE,szTemp);
 
-			m_CurrentError = ERROR_OUTPUT_FILENAME_EMPTY;
+			m_CurrentError = ErrorType::OutputFilenameEmpty;
 
 			SetFocus(hOutputFilename);
 			return;
@@ -356,7 +356,7 @@ void SplitFileDialog::OnOk()
 
 			SetDlgItemText(m_hDlg,IDC_SPLIT_STATIC_MESSAGE,szTemp);
 
-			m_CurrentError = ERROR_OUTPUT_FILENAME_CONSTANT;
+			m_CurrentError = ErrorType::OutputFilenameConstant;
 
 			SetFocus(hOutputFilename);
 			return;
@@ -373,7 +373,7 @@ void SplitFileDialog::OnOk()
 
 			SetDlgItemText(m_hDlg,IDC_SPLIT_STATIC_MESSAGE,szTemp);
 
-			m_CurrentError = ERROR_OUTPUT_DIRECTORY_EMPTY;
+			m_CurrentError = ErrorType::OutputDirectoryEmpty;
 
 			SetFocus(hEditOutputDirectory);
 			return;
@@ -394,7 +394,7 @@ void SplitFileDialog::OnOk()
 
 			SetDlgItemText(m_hDlg,IDC_SPLIT_STATIC_MESSAGE,szTemp);
 
-			m_CurrentError = ERROR_SPLIT_SIZE;
+			m_CurrentError = ErrorType::SplitSize;
 
 			SetFocus(GetDlgItem(m_hDlg,IDC_SPLIT_EDIT_SIZE));
 			return;
@@ -409,20 +409,20 @@ void SplitFileDialog::OnOk()
 		{
 			switch(itr->second)
 			{
-			case SIZE_TYPE_BYTES:
+			case SizeType::Bytes:
 				/* Nothing needs to be done, as the selection
 				is in bytes. */
 				break;
 
-			case SIZE_TYPE_KB:
+			case SizeType::KB:
 				uSplitSize *= KB;
 				break;
 
-			case SIZE_TYPE_MB:
+			case SizeType::MB:
 				uSplitSize *= MB;
 				break;
 
-			case SIZE_TYPE_GB:
+			case SizeType::GB:
 				uSplitSize *= GB;
 				break;
 			}

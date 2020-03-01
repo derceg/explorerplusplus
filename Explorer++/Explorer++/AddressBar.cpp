@@ -90,7 +90,7 @@ LRESULT CALLBACK AddressBar::EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LP
 		break;
 
 	case WM_MOUSEWHEEL:
-		if (m_expp->OnMouseWheel(MOUSEWHEEL_SOURCE_OTHER, wParam, lParam))
+		if (m_expp->OnMouseWheel(MousewheelSource::Other, wParam, lParam))
 		{
 			return 0;
 		}

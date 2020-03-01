@@ -494,7 +494,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("HideSystemFilesGlobal"),NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.hideSystemFiles));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("InfoTipType"),NXMLSettings::EncodeIntValue(m_config->infoTipType));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("InfoTipType"),NXMLSettings::EncodeIntValue(static_cast<int>(m_config->infoTipType)));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("InsertSorted"),NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.insertSorted));
 
@@ -574,11 +574,8 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SizeDisplayFormat"),NXMLSettings::EncodeIntValue(m_config->globalFolderSettings.sizeDisplayFormat));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SortAscendingGlobal"),NXMLSettings::EncodeBoolValue(m_config->defaultFolderSettings.sortAscending));
-
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	_itow_s(m_config->startupMode,szValue,SIZEOF_ARRAY(szValue),10);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("StartupMode"),szValue);
-
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("StartupMode"),NXMLSettings::EncodeIntValue(static_cast<int>(m_config->startupMode)));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SynchronizeTreeview"),NXMLSettings::EncodeBoolValue(m_config->synchronizeTreeview));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -1647,7 +1644,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_STARTUPMODE:
-		m_config->startupMode = static_cast<StartupMode_t>(NXMLSettings::DecodeIntValue(wszValue));
+		m_config->startupMode = static_cast<StartupMode>(NXMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_SYNCHRONIZETREEVIEW:
@@ -1733,7 +1730,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_INFOTIPTYPE:
-		m_config->infoTipType = static_cast<InfoTipType_t>(NXMLSettings::DecodeIntValue(wszValue));
+		m_config->infoTipType = static_cast<InfoTipType>(NXMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_ICON_THEME:

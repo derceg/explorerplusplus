@@ -165,7 +165,7 @@ void Explorerplusplus::OnPaste()
 	}
 }
 
-BOOL Explorerplusplus::OnMouseWheel(MousewheelSource_t MousewheelSource, WPARAM wParam, LPARAM lParam)
+BOOL Explorerplusplus::OnMouseWheel(MousewheelSource mousewheelSource, WPARAM wParam, LPARAM lParam)
 {
 	short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
 	m_zDeltaTotal += zDelta;
@@ -219,7 +219,7 @@ BOOL Explorerplusplus::OnMouseWheel(MousewheelSource_t MousewheelSource, WPARAM 
 		}
 		else
 		{
-			if (MousewheelSource != MOUSEWHEEL_SOURCE_LISTVIEW)
+			if (mousewheelSource != MousewheelSource::ListView)
 			{
 				bMessageHandled = TRUE;
 				SendMessage(m_hActiveListView, WM_MOUSEWHEEL, wParam, lParam);
@@ -228,7 +228,7 @@ BOOL Explorerplusplus::OnMouseWheel(MousewheelSource_t MousewheelSource, WPARAM 
 	}
 	else if (hwnd == m_hTreeView)
 	{
-		if (MousewheelSource != MOUSEWHEEL_SOURCE_TREEVIEW)
+		if (mousewheelSource != MousewheelSource::TreeView)
 		{
 			bMessageHandled = TRUE;
 			SendMessage(m_hTreeView, WM_MOUSEWHEEL, wParam, lParam);

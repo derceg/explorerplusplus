@@ -111,11 +111,11 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ShowDisplayWindow"),m_config->showDisplayWindow);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ShowFolderSizes"),m_config->globalFolderSettings.showFolderSizes);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("DisableFolderSizesNetworkRemovable"),m_config->globalFolderSettings.disableFolderSizesNetworkRemovable);
-		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("StartupMode"), m_config->startupMode);
+		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("StartupMode"), static_cast<DWORD>(m_config->startupMode));
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("NextToCurrent"),m_config->openNewTabNextToCurrent);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ConfirmCloseTabs"), m_config->confirmCloseTabs);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ShowInfoTips"), m_config->showInfoTips);
-		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("InfoTipType"), m_config->infoTipType);
+		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("InfoTipType"), static_cast<DWORD>(m_config->infoTipType));
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("TreeViewDelayEnabled"),m_config->treeViewDelayEnabled);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("LockToolbars"), m_config->lockToolbars);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ExtendTabControl"),m_config->extendTabControl);
@@ -234,11 +234,9 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("ShowDisplayWindow"),(LPDWORD)&m_config->showDisplayWindow);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("ShowFolderSizes"),(LPDWORD)&m_config->globalFolderSettings.showFolderSizes);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("DisableFolderSizesNetworkRemovable"),(LPDWORD)&m_config->globalFolderSettings.disableFolderSizesNetworkRemovable);
-		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("StartupMode"),(LPDWORD)&m_config->startupMode);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("NextToCurrent"),(LPDWORD)&m_config->openNewTabNextToCurrent);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("ConfirmCloseTabs"),(LPDWORD)&m_config->confirmCloseTabs);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("ShowInfoTips"),(LPDWORD)&m_config->showInfoTips);
-		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("InfoTipType"),(LPDWORD)&m_config->infoTipType);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("TreeViewDelayEnabled"),(LPDWORD)&m_config->treeViewDelayEnabled);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("LockToolbars"),(LPDWORD)&m_config->lockToolbars);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("ExtendTabControl"),(LPDWORD)&m_config->extendTabControl);
@@ -261,6 +259,12 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey, _T("ForceSameTabWidth"), &numericValue);
 		m_config->forceSameTabWidth.set(numericValue);
+
+		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey, _T("StartupMode"), &numericValue);
+		m_config->startupMode = static_cast<StartupMode>(numericValue);
+
+		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey, _T("InfoTipType"), &numericValue);
+		m_config->infoTipType = static_cast<InfoTipType>(numericValue);
 
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("AllowMultipleInstances"),(LPDWORD)&m_config->allowMultipleInstances);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("OneClickActivate"),(LPDWORD)&m_config->globalFolderSettings.oneClickActivate);

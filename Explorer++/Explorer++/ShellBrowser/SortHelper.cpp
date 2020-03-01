@@ -102,17 +102,17 @@ int SortByType(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo
 	return StrCmpLogicalW(Type1.c_str(), Type2.c_str());
 }
 
-int SortByDate(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, DateType_t DateType)
+int SortByDate(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, DateType dateType)
 {
-	switch (DateType)
+	switch (dateType)
 	{
-	case DATE_TYPE_CREATED:
+	case DateType::Created:
 		return CompareFileTime(&itemInfo1.wfd.ftCreationTime, &itemInfo2.wfd.ftCreationTime);
 
-	case DATE_TYPE_MODIFIED:
+	case DateType::Modified:
 		return CompareFileTime(&itemInfo1.wfd.ftLastWriteTime, &itemInfo2.wfd.ftLastWriteTime);
 
-	case DATE_TYPE_ACCESSED:
+	case DateType::Accessed:
 		return CompareFileTime(&itemInfo1.wfd.ftLastAccessTime, &itemInfo2.wfd.ftLastAccessTime);
 
 	default:
@@ -213,10 +213,10 @@ int SortByOwner(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInf
 	return StrCmpLogicalW(Owner1.c_str(), Owner2.c_str());
 }
 
-int SortByVersionInfo(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, VersionInfoType_t VersioninfoType)
+int SortByVersionInfo(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, VersionInfoType versionInfoType)
 {
-	std::wstring VersionInfo1 = GetVersionColumnText(itemInfo1, VersioninfoType);
-	std::wstring VersionInfo2 = GetVersionColumnText(itemInfo2, VersioninfoType);
+	std::wstring VersionInfo1 = GetVersionColumnText(itemInfo1, versionInfoType);
+	std::wstring VersionInfo2 = GetVersionColumnText(itemInfo2, versionInfoType);
 
 	return StrCmpLogicalW(VersionInfo1.c_str(), VersionInfo2.c_str());
 }
@@ -297,10 +297,10 @@ int SortByFileSystem(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &it
 	return StrCmpLogicalW(FileSystemName1.c_str(), FileSystemName2.c_str());
 }
 
-int SortByPrinterProperty(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, PrinterInformationType_t PrinterInformationType)
+int SortByPrinterProperty(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, PrinterInformationType printerInformationType)
 {
-	std::wstring PrinterInformation1 = GetPrinterColumnText(itemInfo1, PrinterInformationType);
-	std::wstring PrinterInformation2 = GetPrinterColumnText(itemInfo2, PrinterInformationType);
+	std::wstring PrinterInformation1 = GetPrinterColumnText(itemInfo1, printerInformationType);
+	std::wstring PrinterInformation2 = GetPrinterColumnText(itemInfo2, printerInformationType);
 
 	return StrCmpLogicalW(PrinterInformation1.c_str(), PrinterInformation2.c_str());
 }
@@ -313,10 +313,10 @@ int SortByNetworkAdapterStatus(const BasicItemInfo_t &itemInfo1, const BasicItem
 	return StrCmpLogicalW(Status1.c_str(), Status2.c_str());
 }
 
-int SortByMediaMetadata(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, MediaMetadataType_t MediaMetaDataType)
+int SortByMediaMetadata(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, MediaMetadataType mediaMetadataType)
 {
-	std::wstring MediaMetadata1 = GetMediaMetadataColumnText(itemInfo1, MediaMetaDataType);
-	std::wstring MediaMetadata2 = GetMediaMetadataColumnText(itemInfo2, MediaMetaDataType);
+	std::wstring MediaMetadata1 = GetMediaMetadataColumnText(itemInfo1, mediaMetadataType);
+	std::wstring MediaMetadata2 = GetMediaMetadataColumnText(itemInfo2, mediaMetadataType);
 
 	return StrCmpLogicalW(MediaMetadata1.c_str(), MediaMetadata2.c_str());
 }

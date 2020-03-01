@@ -359,7 +359,7 @@ std::optional<ShellBrowser::InfoTipResult> ShellBrowser::GetInfoTipAsync(HWND li
 
 	/* Use Explorer infotips if the option is selected, or this is a
 	virtual folder. Otherwise, show the modified date. */
-	if ((config.infoTipType == INFOTIP_SYSTEM) || virtualFolder)
+	if ((config.infoTipType == InfoTipType::System) || virtualFolder)
 	{
 		TCHAR infoTipText[256];
 		HRESULT hr = GetItemInfoTip(basicItemInfo.pidlComplete.get(), infoTipText, SIZEOF_ARRAY(infoTipText));

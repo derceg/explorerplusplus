@@ -160,7 +160,7 @@ WPARAM wParam,LPARAM lParam)
 		break;
 
 	case WM_MOUSEWHEEL:
-		if(OnMouseWheel(MOUSEWHEEL_SOURCE_TREEVIEW,wParam,lParam))
+		if(OnMouseWheel(MousewheelSource::TreeView,wParam,lParam))
 		{
 			return 0;
 		}

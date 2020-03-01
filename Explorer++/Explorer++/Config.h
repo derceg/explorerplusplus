@@ -18,16 +18,16 @@ static const int DEFAULT_LISTVIEW_HOVER_TIME = 500;
 
 // These values are used to save/load configuration data and should not be
 // changed.
-enum StartupMode_t
+enum class StartupMode
 {
-	STARTUP_PREVIOUSTABS = 1,
-	STARTUP_DEFAULTFOLDER = 2
+	PreviousTabs = 1,
+	DefaultFolder = 2
 };
 
-enum InfoTipType_t
+enum class InfoTipType
 {
-	INFOTIP_SYSTEM = 0,
-	INFOTIP_CUSTOM = 1
+	System = 0,
+	Custom = 1
 };
 
 struct Config
@@ -37,7 +37,7 @@ struct Config
 	{
 		language = LANG_ENGLISH;
 		iconTheme = IconTheme::Color;
-		startupMode = STARTUP_PREVIOUSTABS;
+		startupMode = StartupMode::PreviousTabs;
 		defaultTabDirectory = GetComputerFolderPath();
 		showStatusBar = TRUE;
 		showFolders = TRUE;
@@ -73,7 +73,7 @@ struct Config
 		replaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_NONE;
 
 		showInfoTips = TRUE;
-		infoTipType = INFOTIP_SYSTEM;
+		infoTipType = InfoTipType::System;
 
 		showFullTitlePath.set(FALSE);
 		showUserNameInTitleBar.set(FALSE);
@@ -126,7 +126,7 @@ struct Config
 
 	DWORD language;
 	IconTheme iconTheme;
-	StartupMode_t startupMode;
+	StartupMode startupMode;
 	std::wstring defaultTabDirectory;
 	const std::wstring defaultTabDirectoryStatic;
 	BOOL showStatusBar;
@@ -163,7 +163,7 @@ struct Config
 	NDefaultFileManager::ReplaceExplorerModes_t replaceExplorerMode;
 
 	BOOL showInfoTips;
-	InfoTipType_t infoTipType;
+	InfoTipType infoTipType;
 
 	// Main window
 	ValueWrapper<BOOL> showFullTitlePath;

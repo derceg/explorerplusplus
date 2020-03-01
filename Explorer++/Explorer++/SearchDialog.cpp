@@ -517,7 +517,7 @@ void SearchDialog::UpdateListViewHeader()
 
 	for(const auto &ci : m_persistentSettings->m_Columns)
 	{
-		if(ci.SortMode == m_persistentSettings->m_SortMode)
+		if(ci.sortMode == m_persistentSettings->m_SortMode)
 		{
 			break;
 		}
@@ -557,11 +557,11 @@ int CALLBACK SearchDialog::SortResults(LPARAM lParam1,LPARAM lParam2)
 
 	switch(m_persistentSettings->m_SortMode)
 	{
-	case SearchDialogPersistentSettings::SORT_NAME:
+	case SearchDialogPersistentSettings::SortMode::Name:
 		iRes = SortResultsByName(lParam1,lParam2);
 		break;
 
-	case SearchDialogPersistentSettings::SORT_PATH:
+	case SearchDialogPersistentSettings::SortMode::Path:
 		iRes = SortResultsByPath(lParam1,lParam2);
 		break;
 	}
@@ -783,13 +783,13 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 
 			/* If the column clicked matches the current sort mode,
 			flip the sort direction, else switch to that sort mode. */
-			if(m_persistentSettings->m_Columns[pnmlv->iSubItem].SortMode == m_persistentSettings->m_SortMode)
+			if(m_persistentSettings->m_Columns[pnmlv->iSubItem].sortMode == m_persistentSettings->m_SortMode)
 			{
 				m_persistentSettings->m_bSortAscending = !m_persistentSettings->m_bSortAscending;
 			}
 			else
 			{
-				m_persistentSettings->m_SortMode = m_persistentSettings->m_Columns[pnmlv->iSubItem].SortMode;
+				m_persistentSettings->m_SortMode = m_persistentSettings->m_Columns[pnmlv->iSubItem].sortMode;
 				m_persistentSettings->m_bSortAscending = m_persistentSettings->m_Columns[pnmlv->iSubItem].bSortAscending;
 			}
 
@@ -1253,17 +1253,17 @@ SearchDialogPersistentSettings::SearchDialogPersistentSettings() :
 		EMPTY_STRING);
 
 	ColumnInfo_t ci;
-	ci.SortMode			= SORT_NAME;
+	ci.sortMode			= SortMode::Name;
 	ci.uStringID		= IDS_SEARCH_COLUMN_NAME;
 	ci.bSortAscending	= true;
 	m_Columns.push_back(ci);
 
-	ci.SortMode			= SORT_PATH;
+	ci.sortMode			= SortMode::Path;
 	ci.uStringID		= IDS_SEARCH_COLUMN_PATH;
 	ci.bSortAscending	= true;
 	m_Columns.push_back(ci);
 
-	m_SortMode			= m_Columns.front().SortMode;
+	m_SortMode			= m_Columns.front().sortMode;
 	m_bSortAscending	= m_Columns.front().bSortAscending;
 }
 
@@ -1285,7 +1285,7 @@ void SearchDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_HIDDEN, m_bHidden);
 	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_READ_ONLY, m_bReadOnly);
 	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_SYSTEM, m_bSystem);
-	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_SORT_MODE, m_SortMode);
+	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_SORT_MODE, static_cast<DWORD>(m_SortMode));
 	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_SORT_ASCENDING, m_bSortAscending);
 
 	std::list<std::wstring> SearchDirectoriesList;
@@ -1309,8 +1309,11 @@ void SearchDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_HIDDEN, reinterpret_cast<LPDWORD>(&m_bHidden));
 	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_READ_ONLY, reinterpret_cast<LPDWORD>(&m_bReadOnly));
 	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_SYSTEM, reinterpret_cast<LPDWORD>(&m_bSystem));
-	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_SORT_MODE, reinterpret_cast<LPDWORD>(&m_SortMode));
 	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_SORT_ASCENDING, reinterpret_cast<LPDWORD>(&m_bSortAscending));
+
+	DWORD value;
+	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_SORT_MODE, &value);
+	m_SortMode = static_cast<SortMode>(value);
 
 	std::list<std::wstring> SearchDirectoriesList;
 	NRegistrySettings::ReadStringListFromRegistry(hKey, SETTING_DIRECTORY_LIST, SearchDirectoriesList);
@@ -1334,7 +1337,7 @@ void SearchDialogPersistentSettings::SaveExtraXMLSettings(
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_HIDDEN, NXMLSettings::EncodeBoolValue(m_bHidden));
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_READ_ONLY, NXMLSettings::EncodeBoolValue(m_bReadOnly));
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SYSTEM, NXMLSettings::EncodeBoolValue(m_bSystem));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SORT_MODE, NXMLSettings::EncodeIntValue(m_SortMode));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SORT_MODE, NXMLSettings::EncodeIntValue(static_cast<int>(m_SortMode)));
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SORT_ASCENDING, NXMLSettings::EncodeBoolValue(m_bSortAscending));
 
 	std::list<std::wstring> SearchDirectoriesList;
@@ -1390,18 +1393,7 @@ void SearchDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bst
 	}
 	else if(lstrcmpi(bstrName, SETTING_SORT_MODE) == 0)
 	{
-		int SortMode = NXMLSettings::DecodeIntValue(bstrValue);
-
-		switch(SortMode)
-		{
-		case SORT_NAME:
-			m_SortMode = SORT_NAME;
-			break;
-
-		case SORT_PATH:
-			m_SortMode = SORT_PATH;
-			break;
-		}
+		m_SortMode = static_cast<SortMode>(NXMLSettings::DecodeIntValue(bstrValue));
 	}
 	else if(lstrcmpi(bstrName, SETTING_SORT_ASCENDING) == 0)
 	{

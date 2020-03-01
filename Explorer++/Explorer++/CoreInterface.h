@@ -10,11 +10,11 @@ typedef boost::signals2::signal<void()> TabsInitializedSignal;
 typedef boost::signals2::signal<void(HMENU mainMenu)> MainMenuPreShowSignal;
 typedef boost::signals2::signal<void(HMENU menu, HWND sourceWindow, const POINT &pt)> ToolbarContextMenuSignal;
 
-enum MousewheelSource_t
+enum class MousewheelSource
 {
-	MOUSEWHEEL_SOURCE_LISTVIEW,
-	MOUSEWHEEL_SOURCE_TREEVIEW,
-	MOUSEWHEEL_SOURCE_OTHER
+	ListView,
+	TreeView,
+	Other
 };
 
 class CachedIcons;
@@ -65,7 +65,7 @@ __interface IExplorerplusplus
 	BOOL			CanShowFileProperties() const;
 	BOOL			CanPaste() const;
 
-	BOOL			OnMouseWheel(MousewheelSource_t MousewheelSource, WPARAM wParam, LPARAM lParam);
+	BOOL			OnMouseWheel(MousewheelSource mousewheelSource, WPARAM wParam, LPARAM lParam);
 
 	void			ShowTabBar();
 	void			HideTabBar();

@@ -67,11 +67,11 @@ private:
 		BOOL bReversed;
 	} Attribute_t;
 
-	enum DateTimeType_t
+	enum class DateTimeType
 	{
-		DATE_TIME_MODIFIED,
-		DATE_TIME_CREATED,
-		DATE_TIME_ACCESSED
+		Modified,
+		Created,
+		Accessed
 	};
 
 	void	InitializeAttributesStructure(void);
@@ -80,7 +80,7 @@ private:
 	void	SetAttributeCheckState(HWND hwnd,int nAttributes,int nSelected);
 
 	void	InitializeDateFields();
-	void	OnDateReset(DateTimeType_t DateTimeType);
+	void	OnDateReset(DateTimeType dateTimeType);
 	void	OnOk();
 	void	OnCancel();
 

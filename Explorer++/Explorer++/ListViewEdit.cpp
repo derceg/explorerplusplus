@@ -20,7 +20,7 @@ ListViewEdit::ListViewEdit(HWND hwnd,int ItemIndex,IExplorerplusplus *pexpp) :
 BaseWindow(hwnd),
 m_ItemIndex(ItemIndex),
 m_pexpp(pexpp),
-m_RenameStage(RENAME_FILENAME),
+m_RenameStage(RenameStage::Filename),
 m_BeginRename(true)
 {
 	
@@ -67,19 +67,19 @@ INT_PTR ListViewEdit::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 				{
 					switch(m_RenameStage)
 					{
-					case RENAME_FILENAME:
+					case RenameStage::Filename:
 						SendMessage(m_hwnd,EM_SETSEL,Index + 1,-1);
-						m_RenameStage = RENAME_EXTENSION;
+						m_RenameStage = RenameStage::Extension;
 						break;
 
-					case RENAME_EXTENSION:
+					case RenameStage::Extension:
 						SendMessage(m_hwnd,EM_SETSEL,0,-1);
-						m_RenameStage = RENAME_ENTIRE;
+						m_RenameStage = RenameStage::Entire;
 						break;
 
-					case RENAME_ENTIRE:
+					case RenameStage::Entire:
 						SendMessage(m_hwnd,EM_SETSEL,0,Index);
-						m_RenameStage = RENAME_FILENAME;
+						m_RenameStage = RenameStage::Filename;
 						break;
 
 					default:

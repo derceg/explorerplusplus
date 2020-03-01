@@ -49,15 +49,15 @@ private:
 	static const TCHAR SETTING_SORT_MODE[];
 	static const TCHAR SETTING_SORT_ASCENDING[];
 
-	enum SortMode_t
+	enum class SortMode
 	{
-		SORT_NAME = 1,
-		SORT_PATH = 2
+		Name = 1,
+		Path = 2
 	};
 
 	struct ColumnInfo_t
 	{
-		SortMode_t	SortMode;
+		SortMode	sortMode;
 		UINT		uStringID;
 
 		/* Indicates whether the sort direction
@@ -92,7 +92,7 @@ private:
 	BOOL						m_bSystem;
 
 	std::vector<ColumnInfo_t>	m_Columns;
-	SortMode_t					m_SortMode;
+	SortMode					m_SortMode;
 	BOOL						m_bSortAscending;
 
 	int							m_iColumnWidth1;

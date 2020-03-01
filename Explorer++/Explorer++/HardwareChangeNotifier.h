@@ -29,10 +29,10 @@ public:
 
 private:
 
-	enum NotificationType_t
+	enum class NotificationType
 	{
-		NOTIFY_DEVICE_ARRIVAL,
-		NOTIFY_DEVICE_REMOVAL_COMPLETE
+		Arrival,
+		RemovalComplete
 	};
 
 	HardwareChangeNotifier() = default;
@@ -40,7 +40,7 @@ private:
 	HardwareChangeNotifier(const HardwareChangeNotifier &);
 	HardwareChangeNotifier & operator=(const HardwareChangeNotifier &);
 
-	void	NotifyObservers(NotificationType_t NotificationType,DEV_BROADCAST_HDR *dbh);
+	void	NotifyObservers(NotificationType notificationType,DEV_BROADCAST_HDR *dbh);
 
 	std::list<NHardwareChangeNotifier::INotification *>	m_Observers;
 };

@@ -129,7 +129,7 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 	}
 	else
 	{
-		if(m_config->startupMode == STARTUP_PREVIOUSTABS)
+		if(m_config->startupMode == StartupMode::PreviousTabs)
 			nTabsCreated = pLoadSave->LoadPreviousTabs();
 	}
 

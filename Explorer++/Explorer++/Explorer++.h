@@ -485,7 +485,7 @@ private:
 	void					InitializeDisplayWindow();
 	int						CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer);
 	void					ShowMainRebarBand(HWND hwnd,BOOL bShow);
-	BOOL					OnMouseWheel(MousewheelSource_t MousewheelSource,WPARAM wParam,LPARAM lParam) override;
+	BOOL					OnMouseWheel(MousewheelSource mousewheelSource,WPARAM wParam,LPARAM lParam) override;
 	void					CycleViewState(BOOL bCycleForward);
 	HMENU					CreateRebarHistoryMenu(BOOL bBack);
 	StatusBar				*GetStatusBar() override;

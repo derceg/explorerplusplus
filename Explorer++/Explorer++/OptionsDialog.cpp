@@ -176,17 +176,17 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 
 				switch(m_config->startupMode)
 				{
-				case STARTUP_PREVIOUSTABS:
+				case StartupMode::PreviousTabs:
 					nIDButton = IDC_STARTUP_PREVIOUSTABS;
 					break;
 
-				case STARTUP_DEFAULTFOLDER:
+				case StartupMode::DefaultFolder:
 					nIDButton = IDC_STARTUP_DEFAULTFOLDER;
 					break;
 
 				default:
 					nIDButton = IDC_STARTUP_PREVIOUSTABS;
-					m_config->startupMode = STARTUP_PREVIOUSTABS;
+					m_config->startupMode = StartupMode::PreviousTabs;
 					break;
 				}
 				CheckDlgButton(hDlg,nIDButton,BST_CHECKED);
@@ -284,9 +284,9 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 						int iSel;
 
 						if(IsDlgButtonChecked(hDlg,IDC_STARTUP_PREVIOUSTABS) == BST_CHECKED)
-							m_config->startupMode = STARTUP_PREVIOUSTABS;
+							m_config->startupMode = StartupMode::PreviousTabs;
 						else if(IsDlgButtonChecked(hDlg,IDC_STARTUP_DEFAULTFOLDER) == BST_CHECKED)
-							m_config->startupMode = STARTUP_DEFAULTFOLDER;
+							m_config->startupMode = StartupMode::DefaultFolder;
 
 						if(IsDlgButtonChecked(hDlg,IDC_OPTION_REPLACEEXPLORER_NONE) == BST_CHECKED)
 							ReplaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_NONE;
@@ -494,7 +494,7 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wPar
 				if(m_config->showInfoTips)
 					CheckDlgButton(hDlg,IDC_OPTIONS_CHECK_SHOWINFOTIPS,BST_CHECKED);
 
-				if(m_config->infoTipType == INFOTIP_SYSTEM)
+				if(m_config->infoTipType == InfoTipType::System)
 					CheckDlgButton(hDlg,IDC_OPTIONS_RADIO_SYSTEMINFOTIPS,BST_CHECKED);
 				else
 					CheckDlgButton(hDlg,IDC_OPTIONS_RADIO_CUSTOMINFOTIPS,BST_CHECKED);
@@ -632,9 +632,9 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wPar
 							== BST_CHECKED);
 
 						if(IsDlgButtonChecked(hDlg,IDC_OPTIONS_RADIO_SYSTEMINFOTIPS) == BST_CHECKED)
-							m_config->infoTipType = INFOTIP_SYSTEM;
+							m_config->infoTipType = InfoTipType::System;
 						else
-							m_config->infoTipType = INFOTIP_CUSTOM;
+							m_config->infoTipType = InfoTipType::Custom;
 
 						hCBSize = GetDlgItem(hDlg,IDC_COMBO_FILESIZES);
 

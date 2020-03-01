@@ -46,18 +46,18 @@ protected:
 
 private:
 
-	enum Color_t
+	enum class Color
 	{
-		COLOR_RED,
-		COLOR_GREEN,
-		COLOR_BLUE
+		Red,
+		Green,
+		Blue
 	};
 
 	struct ColorGroup_t
 	{
-		UINT	SliderId;
-		UINT	EditId;
-		Color_t	Color;
+		UINT	sliderId;
+		UINT	editId;
+		Color	color;
 	};
 
 	static const int	NUM_COLORS = 3;
@@ -72,7 +72,7 @@ private:
 
 	void			InitializeColorGroups();
 	void			InitializeColorGroupControls(ColorGroup_t ColorGroup[NUM_COLORS]);
-	void			SetColorGroupValues(ColorGroup_t ColorGroup[NUM_COLORS],COLORREF Color);
+	void			SetColorGroupValues(ColorGroup_t ColorGroup[NUM_COLORS],COLORREF color);
 	void			InitializePreviewWindow();
 
 	void			UpdateEditControlsFromSlider(ColorGroup_t ColorGroup[NUM_COLORS]);

@@ -190,7 +190,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 			break;
 
 		case WM_MOUSEWHEEL:
-			if(OnMouseWheel(MOUSEWHEEL_SOURCE_LISTVIEW,wParam,lParam))
+			if(OnMouseWheel(MousewheelSource::ListView,wParam,lParam))
 			{
 				return 0;
 			}
