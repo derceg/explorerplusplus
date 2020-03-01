@@ -333,15 +333,9 @@ bool BookmarksToolbar::OnCommand(WPARAM wParam, LPARAM lParam)
 		switch (LOWORD(wParam))
 		{
 		case IDM_BT_NEWBOOKMARK:
-			OnNewBookmarkItem(BookmarkItem::Type::Bookmark);
-			return true;
-
 		case IDM_BT_NEWFOLDER:
-			OnNewBookmarkItem(BookmarkItem::Type::Folder);
-			return true;
-
 		case IDM_BT_PASTE:
-			OnPaste();
+			OnToolbarContextMenuItemClicked(LOWORD(wParam));
 			return true;
 		}
 	}
@@ -413,31 +407,41 @@ void BookmarksToolbar::OnBookmarkMenuItemClicked(const BookmarkItem *bookmarkIte
 	m_navigation->BrowseFolderInCurrentTab(bookmarkItem->GetLocation().c_str());
 }
 
-void BookmarksToolbar::OnNewBookmarkItem(BookmarkItem::Type type)
+void BookmarksToolbar::OnToolbarContextMenuItemClicked(int menuItemId)
 {
-	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, m_bookmarkTree->GetBookmarksToolbarFolder(),
-		m_instance, m_hToolbar, m_pexpp->GetTabContainer(), m_pexpp);
-}
-
-void BookmarksToolbar::OnPaste()
-{
-	BookmarkClipboard bookmarkClipboard;
-	auto bookmarkItems = bookmarkClipboard.ReadBookmarks();
-
 	assert(m_contextMenuLocation);
 
 	POINT ptClient = *m_contextMenuLocation;
 	ScreenToClient(m_hToolbar, &ptClient);
-	int newIndex = FindNextButtonIndex(ptClient);
-	int i = 0;
+	int targetIndex = FindNextButtonIndex(ptClient);
 
-	for (auto &bookmarkItem : bookmarkItems)
+	switch (menuItemId)
 	{
-		m_bookmarkTree->AddBookmarkItem(m_bookmarkTree->GetBookmarksToolbarFolder(), std::move(bookmarkItem), newIndex + i);
-		i++;
+	case IDM_BT_NEWBOOKMARK:
+		OnNewBookmarkItem(BookmarkItem::Type::Bookmark, targetIndex);
+		break;
+
+	case IDM_BT_NEWFOLDER:
+		OnNewBookmarkItem(BookmarkItem::Type::Folder, targetIndex);
+		break;
+
+	case IDM_BT_PASTE:
+		OnPaste(targetIndex);
+		break;
 	}
 
 	m_contextMenuLocation.reset();
+}
+
+void BookmarksToolbar::OnNewBookmarkItem(BookmarkItem::Type type, size_t targetIndex)
+{
+	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, m_bookmarkTree->GetBookmarksToolbarFolder(),
+		targetIndex, m_instance, m_hToolbar, m_pexpp->GetTabContainer(), m_pexpp);
+}
+
+void BookmarksToolbar::OnPaste(size_t targetIndex)
+{
+	BookmarkHelper::PasteBookmarkItems(m_bookmarkTree, m_bookmarkTree->GetBookmarksToolbarFolder(), targetIndex);
 }
 
 // Returns the index of the button that comes after the specified point. If the

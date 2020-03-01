@@ -21,8 +21,8 @@ BookmarkContextMenuController::BookmarkContextMenuController(BookmarkTree *bookm
 
 }
 
-void BookmarkContextMenuController::OnMenuItemSelected(int menuItemId, BookmarkItem *parentFolder,
-	const RawBookmarkItems &bookmarkItems, HWND parentWindow)
+void BookmarkContextMenuController::OnMenuItemSelected(int menuItemId, BookmarkItem *targetParentFolder,
+	size_t targetIndex, const RawBookmarkItems &bookmarkItems, HWND parentWindow)
 {
 	switch (menuItemId)
 	{
@@ -45,11 +45,11 @@ void BookmarkContextMenuController::OnMenuItemSelected(int menuItemId, BookmarkI
 		break;
 
 	case IDM_BOOKMARKS_NEW_BOOKMARK:
-		OnNewBookmarkItem(BookmarkItem::Type::Bookmark, parentFolder, parentWindow);
+		OnNewBookmarkItem(BookmarkItem::Type::Bookmark, targetParentFolder, targetIndex, parentWindow);
 		break;
 
 	case IDM_BOOKMARKS_NEW_FOLDER:
-		OnNewBookmarkItem(BookmarkItem::Type::Folder, parentFolder, parentWindow);
+		OnNewBookmarkItem(BookmarkItem::Type::Folder, targetParentFolder, targetIndex, parentWindow);
 		break;
 
 	case IDM_BOOKMARKS_CUT:
@@ -61,7 +61,7 @@ void BookmarkContextMenuController::OnMenuItemSelected(int menuItemId, BookmarkI
 		break;
 
 	case IDM_BOOKMARKS_PASTE:
-		OnPaste(parentFolder);
+		OnPaste(targetParentFolder, targetIndex);
 		break;
 
 	case IDM_BOOKMARKS_DELETE:
@@ -87,11 +87,11 @@ void BookmarkContextMenuController::OnOpenAll(const RawBookmarkItems &bookmarkIt
 	}
 }
 
-void BookmarkContextMenuController::OnNewBookmarkItem(BookmarkItem::Type type, BookmarkItem *parentFolder,
-	HWND parentWindow)
+void BookmarkContextMenuController::OnNewBookmarkItem(BookmarkItem::Type type, BookmarkItem *targetParentFolder,
+	size_t targetIndex, HWND parentWindow)
 {
-	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, parentFolder, m_resourceModule, parentWindow,
-		m_expp->GetTabContainer(), m_expp);
+	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, targetParentFolder, targetIndex, m_resourceModule,
+		parentWindow, m_expp->GetTabContainer(), m_expp);
 }
 
 void BookmarkContextMenuController::OnCopy(const RawBookmarkItems &bookmarkItems, bool cut)
@@ -99,9 +99,9 @@ void BookmarkContextMenuController::OnCopy(const RawBookmarkItems &bookmarkItems
 	BookmarkHelper::CopyBookmarkItems(m_bookmarkTree, bookmarkItems, cut);
 }
 
-void BookmarkContextMenuController::OnPaste(BookmarkItem *parentFolder)
+void BookmarkContextMenuController::OnPaste(BookmarkItem *targetParentFolder, size_t targetIndex)
 {
-	BookmarkHelper::PasteBookmarkItems(m_bookmarkTree, parentFolder);
+	BookmarkHelper::PasteBookmarkItems(m_bookmarkTree, targetParentFolder, targetIndex);
 }
 
 void BookmarkContextMenuController::OnDelete(const RawBookmarkItems &bookmarkItems)

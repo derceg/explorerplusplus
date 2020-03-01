@@ -65,14 +65,28 @@ BOOL BookmarkContextMenu::ShowMenu(HWND parentWindow, BookmarkItem *parentFolder
 		// should be closed when an item from this menu has been selected.
 		EndMenu();
 
-		BookmarkItem *targetParentFolder = parentFolder;
+		BookmarkItem *targetParentFolder;
+		size_t targetIndex;
 
 		if (bookmarkItems.size() == 1 && bookmarkItems[0]->IsFolder())
 		{
 			targetParentFolder = bookmarkItems[0];
+			targetIndex = targetParentFolder->GetChildren().size();
+		}
+		else
+		{
+			targetParentFolder = parentFolder;
+
+			auto lastItem = std::max_element(bookmarkItems.begin(), bookmarkItems.end(),
+				[targetParentFolder] (BookmarkItem *first, BookmarkItem *second) {
+					return targetParentFolder->GetChildIndex(first) < targetParentFolder->GetChildIndex(second);
+				}
+			);
+
+			targetIndex = targetParentFolder->GetChildIndex(*lastItem) + 1;
 		}
 
-		m_controller.OnMenuItemSelected(menuItemId, targetParentFolder, bookmarkItems, parentWindow);
+		m_controller.OnMenuItemSelected(menuItemId, targetParentFolder, targetIndex, bookmarkItems, parentWindow);
 	}
 
 	return TRUE;

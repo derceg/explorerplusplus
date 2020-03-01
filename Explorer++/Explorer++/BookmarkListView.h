@@ -46,6 +46,7 @@ public:
 	boost::signals2::connection AddNavigationCompletedObserver(const BookmarkNavigationCompletedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;
 
+	int GetLastSelectedItemIndex() const;
 	RawBookmarkItems GetSelectedBookmarkItems();
 	void SelectItem(const BookmarkItem *bookmarkItem);
 	void CreateNewFolder();

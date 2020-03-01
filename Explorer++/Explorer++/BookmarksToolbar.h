@@ -75,11 +75,14 @@ private:
 	BOOL	OnRightClick(const NMMOUSE *nmm);
 	void	ShowBookmarkFolderMenu(BookmarkItem *bookmarkItem, int command, int index);
 	void	OnBookmarkMenuItemClicked(const BookmarkItem *bookmarkItem);
-	void	OnNewBookmarkItem(BookmarkItem::Type type);
-	void	OnPaste();
 	int		FindNextButtonIndex(const POINT &ptClient);
 	void	OnEditBookmarkItem(BookmarkItem *bookmarkItem);
 	bool	OnGetInfoTip(NMTBGETINFOTIP *infoTip);
+
+	// Toolbar context menu
+	void	OnToolbarContextMenuItemClicked(int menuItemId);
+	void	OnNewBookmarkItem(BookmarkItem::Type type, size_t targetIndex);
+	void	OnPaste(size_t targetIndex);
 
 	void	OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt);
 

@@ -129,7 +129,7 @@ void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree, HMODULE resoure
 {
 	std::wstring bookmarkAllTabsText = ResourceHelper::LoadString(resoureceModule, IDS_ADD_BOOKMARK_TITLE_BOOKMARK_ALL_TABS);
 	auto bookmarkFolder = AddBookmarkItem(bookmarkTree, BookmarkItem::Type::Folder,
-		nullptr, resoureceModule, parentWindow, coreInterface->GetTabContainer(), coreInterface,
+		nullptr, std::nullopt, resoureceModule, parentWindow, coreInterface->GetTabContainer(), coreInterface,
 		bookmarkAllTabsText);
 
 	if (!bookmarkFolder)
@@ -153,8 +153,9 @@ void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree, HMODULE resoure
 }
 
 BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
-	BookmarkItem *defaultParentSelection, HMODULE resoureceModule, HWND parentWindow,
-	TabContainer *tabContainer, IExplorerplusplus *coreInterface, std::optional<std::wstring> customDialogTitle)
+	BookmarkItem *defaultParentSelection, std::optional<size_t> suggestedIndex, HMODULE resoureceModule,
+	HWND parentWindow, TabContainer *tabContainer, IExplorerplusplus *coreInterface,
+	std::optional<std::wstring> customDialogTitle)
 {
 	std::unique_ptr<BookmarkItem> bookmarkItem;
 
@@ -182,8 +183,19 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 	if (res == BaseDialog::RETURN_OK)
 	{
 		assert(selectedParentFolder != nullptr);
-		bookmarkTree->AddBookmarkItem(selectedParentFolder, std::move(bookmarkItem),
-			selectedParentFolder->GetChildren().size());
+
+		size_t targetIndex;
+
+		if (selectedParentFolder == defaultParentSelection && suggestedIndex)
+		{
+			targetIndex = *suggestedIndex;
+		}
+		else
+		{
+			targetIndex = selectedParentFolder->GetChildren().size();
+		}
+
+		bookmarkTree->AddBookmarkItem(selectedParentFolder, std::move(bookmarkItem), targetIndex);
 
 		return rawBookmarkItem;
 	}
@@ -269,7 +281,7 @@ bool BookmarkHelper::CopyBookmarkItems(BookmarkTree *bookmarkTree, const RawBook
 }
 
 // Note that the parent folder must be a part of the specified bookmark tree.
-void BookmarkHelper::PasteBookmarkItems(BookmarkTree *bookmarkTree, BookmarkItem *parentFolder)
+void BookmarkHelper::PasteBookmarkItems(BookmarkTree *bookmarkTree, BookmarkItem *parentFolder, size_t index)
 {
 	assert(parentFolder->IsFolder());
 
@@ -279,8 +291,7 @@ void BookmarkHelper::PasteBookmarkItems(BookmarkTree *bookmarkTree, BookmarkItem
 
 	for (auto &bookmarkItem : bookmarkItems)
 	{
-		bookmarkTree->AddBookmarkItem(parentFolder, std::move(bookmarkItem),
-			parentFolder->GetChildren().size() + i);
+		bookmarkTree->AddBookmarkItem(parentFolder, std::move(bookmarkItem), index + i);
 
 		i++;
 	}

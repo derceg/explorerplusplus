@@ -453,8 +453,16 @@ void ManageBookmarksDialog::OnNewBookmark()
 		return;
 	}
 
+	std::optional<size_t> targetIndex;
+
+	if (focus == listView)
+	{
+		targetIndex = m_bookmarkListView->GetLastSelectedItemIndex() + 1;
+	}
+
 	auto bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
-		m_currentBookmarkFolder, m_pexpp->GetLanguageModule(), focus, m_pexpp->GetTabContainer(), m_pexpp);
+		m_currentBookmarkFolder, targetIndex, m_pexpp->GetLanguageModule(), focus, m_pexpp->GetTabContainer(),
+		m_pexpp);
 
 	if (!bookmark
 		|| focus != listView
@@ -506,7 +514,19 @@ void ManageBookmarksDialog::OnCopy(bool cut)
 
 void ManageBookmarksDialog::OnPaste()
 {
-	BookmarkHelper::PasteBookmarkItems(m_bookmarkTree, m_currentBookmarkFolder);
+	HWND focus = GetFocus();
+	size_t targetIndex;
+
+	if (focus == GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW))
+	{
+		targetIndex = m_bookmarkListView->GetLastSelectedItemIndex() + 1;
+	}
+	else
+	{
+		targetIndex = m_currentBookmarkFolder->GetChildren().size();
+	}
+
+	BookmarkHelper::PasteBookmarkItems(m_bookmarkTree, m_currentBookmarkFolder, targetIndex);
 }
 
 void ManageBookmarksDialog::OnDelete()
