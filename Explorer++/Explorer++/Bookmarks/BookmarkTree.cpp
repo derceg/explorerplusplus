@@ -1,0 +1,173 @@
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+#include "stdafx.h"
+#include "Bookmarks/BookmarkTree.h"
+#include "Bookmarks/BookmarkHelper.h"
+#include "MainResource.h"
+#include "ResourceHelper.h"
+
+BookmarkTree::BookmarkTree() :
+	m_root(ROOT_FOLDER_GUID,
+		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_ALLBOOKMARKS),
+		std::nullopt)
+{
+	auto bookmarksToolbarFolder = std::make_unique<BookmarkItem>(TOOLBAR_FOLDER_GUID,
+		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_BOOKMARKSTOOLBAR),
+		std::nullopt);
+	m_bookmarksToolbar = bookmarksToolbarFolder.get();
+	m_root.AddChild(std::move(bookmarksToolbarFolder));
+
+	auto bookmarksMenuFolder = std::make_unique<BookmarkItem>(MENU_FOLDER_GUID,
+		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_BOOKMARKSMENU),
+		std::nullopt);
+	m_bookmarksMenu = bookmarksMenuFolder.get();
+	m_root.AddChild(std::move(bookmarksMenuFolder));
+
+	auto otherBookmarksFolder = std::make_unique<BookmarkItem>(OTHER_FOLDER_GUID,
+		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_OTHER_BOOKMARKS),
+		std::nullopt);
+	m_otherBookmarks = otherBookmarksFolder.get();
+	m_root.AddChild(std::move(otherBookmarksFolder));
+}
+
+BookmarkItem *BookmarkTree::GetRoot()
+{
+	return &m_root;
+}
+
+BookmarkItem *BookmarkTree::GetBookmarksToolbarFolder()
+{
+	return m_bookmarksToolbar;
+}
+
+const BookmarkItem *BookmarkTree::GetBookmarksToolbarFolder() const
+{
+	return m_bookmarksToolbar;
+}
+
+BookmarkItem *BookmarkTree::GetBookmarksMenuFolder()
+{
+	return m_bookmarksMenu;
+}
+
+const BookmarkItem *BookmarkTree::GetBookmarksMenuFolder() const
+{
+	return m_bookmarksMenu;
+}
+
+BookmarkItem *BookmarkTree::GetOtherBookmarksFolder()
+{
+	return m_otherBookmarks;
+}
+
+const BookmarkItem *BookmarkTree::GetOtherBookmarksFolder() const
+{
+	return m_otherBookmarks;
+}
+
+void BookmarkTree::AddBookmarkItem(
+	BookmarkItem *parent, std::unique_ptr<BookmarkItem> bookmarkItem, size_t index)
+{
+	if (!CanAddChildren(parent))
+	{
+		assert(false);
+		return;
+	}
+
+	bookmarkItem->VisitRecursively([this](BookmarkItem *currentItem) {
+		currentItem->ClearOriginalGUID();
+
+		// Adds an observer to each bookmark item that's being added. This is
+		// needed so that this class can broadcast an event whenever an
+		// individual bookmark item is updated.
+		currentItem->updatedSignal.AddObserver(std::bind(&BookmarkTree::OnBookmarkItemUpdated, this,
+												   std::placeholders::_1, std::placeholders::_2),
+			boost::signals2::at_front);
+	});
+
+	if (index > parent->GetChildren().size())
+	{
+		index = parent->GetChildren().size();
+	}
+
+	BookmarkItem *rawBookmarkItem = bookmarkItem.get();
+	parent->AddChild(std::move(bookmarkItem), index);
+	bookmarkItemAddedSignal.m_signal(*rawBookmarkItem, index);
+}
+
+void BookmarkTree::MoveBookmarkItem(
+	BookmarkItem *bookmarkItem, BookmarkItem *newParent, size_t index)
+{
+	if (!CanAddChildren(newParent) || IsPermanentNode(bookmarkItem))
+	{
+		assert(false);
+		return;
+	}
+
+	BookmarkItem *oldParent = bookmarkItem->GetParent();
+	size_t oldIndex = oldParent->GetChildIndex(bookmarkItem);
+
+	if (index > newParent->GetChildren().size())
+	{
+		index = newParent->GetChildren().size();
+	}
+
+	if (oldParent == newParent && index > oldIndex)
+	{
+		index--;
+	}
+
+	if (oldParent == newParent && index == oldIndex)
+	{
+		return;
+	}
+
+	auto item = oldParent->RemoveChild(oldIndex);
+	newParent->AddChild(std::move(item), index);
+
+	bookmarkItemMovedSignal.m_signal(bookmarkItem, oldParent, oldIndex, newParent, index);
+}
+
+void BookmarkTree::RemoveBookmarkItem(BookmarkItem *bookmarkItem)
+{
+	if (IsPermanentNode(bookmarkItem))
+	{
+		assert(false);
+		return;
+	}
+
+	bookmarkItemPreRemovalSignal.m_signal(*bookmarkItem);
+
+	BookmarkItem *parent = bookmarkItem->GetParent();
+	assert(bookmarkItem->GetParent() != nullptr);
+
+	std::wstring guid = bookmarkItem->GetGUID();
+
+	size_t childIndex = parent->GetChildIndex(bookmarkItem);
+	parent->RemoveChild(childIndex);
+	bookmarkItemRemovedSignal.m_signal(guid);
+}
+
+void BookmarkTree::OnBookmarkItemUpdated(
+	BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType)
+{
+	bookmarkItemUpdatedSignal.m_signal(bookmarkItem, propertyType);
+}
+
+bool BookmarkTree::CanAddChildren(const BookmarkItem *bookmarkItem) const
+{
+	return bookmarkItem != &m_root;
+}
+
+bool BookmarkTree::IsPermanentNode(const BookmarkItem *bookmarkItem) const
+{
+	if (bookmarkItem == &m_root || bookmarkItem == m_bookmarksToolbar
+		|| bookmarkItem == m_bookmarksMenu || bookmarkItem == m_otherBookmarks)
+	{
+		return true;
+	}
+
+	return false;
+}

@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "TabContainer.h"
-#include "BookmarkHelper.h"
+#include "Bookmarks/BookmarkHelper.h"
 #include "Config.h"
 #include "CoreInterface.h"
 #include "Icon.h"

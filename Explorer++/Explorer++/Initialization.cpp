@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "BookmarksMainMenu.h"
+#include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"

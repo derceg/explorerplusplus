@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Explorer++/BookmarkItem.h"
+#include "Bookmarks/BookmarkItem.h"
 #include <gmock/gmock.h>
 
 class BookmarkTreeObserver

@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // See LICENSE in the top level directory
 
-#include "BookmarkTree.h"
+#include "Bookmarks/BookmarkDataExchange.h"
+#include "Bookmarks/BookmarkDropInfo.h"
+#include "Bookmarks/BookmarkTree.h"
 #include "BookmarkTreeHelper.h"
-#include "../Explorer++/BookmarkDataExchange.h"
-#include "../Explorer++/BookmarkDropInfo.h"
 #include "../Helper/DataExchangeHelper.h"
 #include "../Helper/DragDropHelper.h"
 #include "../Helper/iDataObject.h"

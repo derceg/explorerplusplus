@@ -5,7 +5,7 @@
 #pragma once
 
 #include "AcceleratorUpdater.h"
-#include "BookmarkTree.h"
+#include "Bookmarks/BookmarkTree.h"
 #include "CoreInterface.h"
 #include "Navigation.h"
 #include "PluginCommandManager.h"

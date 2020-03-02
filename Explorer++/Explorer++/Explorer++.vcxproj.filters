@@ -10,10 +10,10 @@
     <ClCompile Include="ApplicationToolbarDropHandler.cpp">
       <Filter>Application Toolbar</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkHandler.cpp">
+    <ClCompile Include="Bookmarks\BookmarkHandler.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkHelper.cpp">
+    <ClCompile Include="Bookmarks\BookmarkHelper.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
     <ClCompile Include="CustomizeColorsDialog.cpp">
@@ -343,58 +343,58 @@
     <ClCompile Include="ShellBrowser\HistoryEntry.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkTree.cpp">
+    <ClCompile Include="Bookmarks\BookmarkTree.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkItem.cpp">
+    <ClCompile Include="Bookmarks\BookmarkItem.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkClipboard.cpp">
+    <ClCompile Include="Bookmarks\BookmarkClipboard.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkDataExchange.cpp">
+    <ClCompile Include="Bookmarks\BookmarkDataExchange.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="AddBookmarkDialog.cpp">
+    <ClCompile Include="Bookmarks\UI\AddBookmarkDialog.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkContextMenu.cpp">
+    <ClCompile Include="Bookmarks\UI\BookmarkContextMenu.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkListView.cpp">
+    <ClCompile Include="Bookmarks\UI\BookmarkListView.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkMenu.cpp">
+    <ClCompile Include="Bookmarks\UI\BookmarkMenu.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkMenuBuilder.cpp">
+    <ClCompile Include="Bookmarks\UI\BookmarkMenuBuilder.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarksMainMenu.cpp">
+    <ClCompile Include="Bookmarks\UI\BookmarksMainMenu.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarksToolbar.cpp">
+    <ClCompile Include="Bookmarks\UI\BookmarksToolbar.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkTreeView.cpp">
+    <ClCompile Include="Bookmarks\UI\BookmarkTreeView.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
-    <ClCompile Include="ManageBookmarksDialog.cpp">
+    <ClCompile Include="Bookmarks\UI\ManageBookmarksDialog.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkDropInfo.cpp">
+    <ClCompile Include="Bookmarks\BookmarkDropInfo.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkDropTargetWindow.cpp">
+    <ClCompile Include="Bookmarks\UI\BookmarkDropTargetWindow.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkRegistryStorage.cpp">
+    <ClCompile Include="Bookmarks\BookmarkRegistryStorage.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkXmlStorage.cpp">
+    <ClCompile Include="Bookmarks\BookmarkXmlStorage.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkContextMenuController.cpp">
+    <ClCompile Include="Bookmarks\UI\BookmarkContextMenuController.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
     <ClCompile Include="ShellTreeView\DirectoryModificationHandler.cpp">
@@ -427,7 +427,7 @@
     <ClCompile Include="ShellBrowser\ShellNavigationController.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkNavigationController.cpp">
+    <ClCompile Include="Bookmarks\BookmarkNavigationController.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
   </ItemGroup>
@@ -441,7 +441,7 @@
     <ClInclude Include="ApplicationToolbarDropHandler.h">
       <Filter>Application Toolbar</Filter>
     </ClInclude>
-    <ClInclude Include="BookmarkHelper.h">
+    <ClInclude Include="Bookmarks\BookmarkHelper.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
     <ClInclude Include="ColorRuleDialog.h">
@@ -783,61 +783,61 @@
     <ClInclude Include="ShellBrowser\PreservedHistoryEntry.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="BookmarkTree.h">
+    <ClInclude Include="Bookmarks\BookmarkTree.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
-    <ClInclude Include="BookmarkItem.h">
+    <ClInclude Include="Bookmarks\BookmarkItem.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
-    <ClInclude Include="BookmarkClipboard.h">
+    <ClInclude Include="Bookmarks\BookmarkClipboard.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
-    <ClInclude Include="BookmarkDataExchange.h">
+    <ClInclude Include="Bookmarks\BookmarkDataExchange.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
-    <ClInclude Include="AddBookmarkDialog.h">
+    <ClInclude Include="Bookmarks\UI\AddBookmarkDialog.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
-    <ClInclude Include="BookmarkContextMenu.h">
+    <ClInclude Include="Bookmarks\UI\BookmarkContextMenu.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
-    <ClInclude Include="BookmarkListView.h">
+    <ClInclude Include="Bookmarks\UI\BookmarkListView.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
-    <ClInclude Include="BookmarkMenu.h">
+    <ClInclude Include="Bookmarks\UI\BookmarkMenu.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
-    <ClInclude Include="BookmarkMenuBuilder.h">
+    <ClInclude Include="Bookmarks\UI\BookmarkMenuBuilder.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
-    <ClInclude Include="BookmarksMainMenu.h">
+    <ClInclude Include="Bookmarks\UI\BookmarksMainMenu.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
-    <ClInclude Include="BookmarksToolbar.h">
+    <ClInclude Include="Bookmarks\UI\BookmarksToolbar.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
-    <ClInclude Include="BookmarkTreeView.h">
+    <ClInclude Include="Bookmarks\UI\BookmarkTreeView.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
-    <ClInclude Include="ManageBookmarksDialog.h">
+    <ClInclude Include="Bookmarks\UI\ManageBookmarksDialog.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
-    <ClInclude Include="BookmarkDropInfo.h">
+    <ClInclude Include="Bookmarks\BookmarkDropInfo.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
-    <ClInclude Include="BookmarkDropTargetWindow.h">
+    <ClInclude Include="Bookmarks\UI\BookmarkDropTargetWindow.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
-    <ClInclude Include="BookmarkRegistryStorage.h">
+    <ClInclude Include="Bookmarks\BookmarkRegistryStorage.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
-    <ClInclude Include="BookmarkXmlStorage.h">
+    <ClInclude Include="Bookmarks\BookmarkXmlStorage.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
-    <ClInclude Include="BookmarkStorage.h">
+    <ClInclude Include="Bookmarks\BookmarkStorage.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
-    <ClInclude Include="BookmarkContextMenuController.h">
+    <ClInclude Include="Bookmarks\UI\BookmarkContextMenuController.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
     <ClInclude Include="ShellTreeView\ShellTreeView.h">
@@ -852,10 +852,10 @@
     <ClInclude Include="NavigationController.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="BookmarkNavigationController.h">
+    <ClInclude Include="Bookmarks\BookmarkNavigationController.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
-    <ClInclude Include="BookmarkNavigatorInterface.h">
+    <ClInclude Include="Bookmarks\BookmarkNavigatorInterface.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
   </ItemGroup>

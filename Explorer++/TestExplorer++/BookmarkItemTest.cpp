@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // See LICENSE in the top level directory
 
-#include "../Explorer++/BookmarkItem.h"
+#include "Bookmarks/BookmarkItem.h"
 #include <gtest/gtest.h>
 
 TEST(BookmarkItemTest, CreateAndUpdate) {

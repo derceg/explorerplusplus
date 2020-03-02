@@ -16,7 +16,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "ApplicationToolbar.h"
-#include "BookmarkXmlStorage.h"
+#include "Bookmarks/BookmarkXmlStorage.h"
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"

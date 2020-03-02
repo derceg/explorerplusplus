@@ -198,7 +198,7 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\UI\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-LLVM|Win32'">
@@ -251,7 +251,7 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\UI\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -304,7 +304,7 @@
       </AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\UI\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-LLVM|x64'">
@@ -358,7 +358,7 @@
       </AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\UI\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -404,7 +404,7 @@
       </AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\UI\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -452,32 +452,32 @@
       </AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\UI\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AboutDialog.cpp" />
     <ClCompile Include="AcceleratorParser.cpp" />
     <ClCompile Include="AcceleratorUpdater.cpp" />
-    <ClCompile Include="AddBookmarkDialog.cpp" />
+    <ClCompile Include="Bookmarks\UI\AddBookmarkDialog.cpp" />
     <ClCompile Include="AddressBar.cpp" />
     <ClCompile Include="ApiBinding.cpp" />
     <ClCompile Include="ApplicationToolbar.cpp" />
     <ClCompile Include="ApplicationToolbarButtonDialog.cpp" />
     <ClCompile Include="ApplicationToolbarDropHandler.cpp" />
-    <ClCompile Include="BookmarkClipboard.cpp" />
-    <ClCompile Include="BookmarkContextMenu.cpp" />
-    <ClCompile Include="BookmarkContextMenuController.cpp" />
-    <ClCompile Include="BookmarkDataExchange.cpp" />
-    <ClCompile Include="BookmarkDropInfo.cpp" />
-    <ClCompile Include="BookmarkDropTargetWindow.cpp" />
-    <ClCompile Include="BookmarkItem.cpp" />
-    <ClCompile Include="BookmarkNavigationController.cpp" />
-    <ClCompile Include="BookmarkRegistryStorage.cpp" />
-    <ClCompile Include="BookmarksMainMenu.cpp" />
-    <ClCompile Include="BookmarkMenuBuilder.cpp" />
-    <ClCompile Include="BookmarkTree.cpp" />
-    <ClCompile Include="BookmarkXmlStorage.cpp" />
+    <ClCompile Include="Bookmarks\BookmarkClipboard.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarkContextMenu.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarkContextMenuController.cpp" />
+    <ClCompile Include="Bookmarks\BookmarkDataExchange.cpp" />
+    <ClCompile Include="Bookmarks\BookmarkDropInfo.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarkDropTargetWindow.cpp" />
+    <ClCompile Include="Bookmarks\BookmarkItem.cpp" />
+    <ClCompile Include="Bookmarks\BookmarkNavigationController.cpp" />
+    <ClCompile Include="Bookmarks\BookmarkRegistryStorage.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarksMainMenu.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarkMenuBuilder.cpp" />
+    <ClCompile Include="Bookmarks\BookmarkTree.cpp" />
+    <ClCompile Include="Bookmarks\BookmarkXmlStorage.cpp" />
     <ClCompile Include="DisplayWindow\DisplayWindow.cpp" />
     <ClCompile Include="DisplayWindow\MsgHandler.cpp" />
     <ClCompile Include="PreservedTab.cpp" />
@@ -490,12 +490,12 @@
     <ClCompile Include="ShellTreeView\iDropTarget.cpp" />
     <ClCompile Include="ShellTreeView\ShellTreeView.cpp" />
     <ClCompile Include="SortMenuHandler.cpp" />
-    <ClCompile Include="BookmarkHandler.cpp" />
-    <ClCompile Include="BookmarkHelper.cpp" />
-    <ClCompile Include="BookmarkListView.cpp" />
-    <ClCompile Include="BookmarkMenu.cpp" />
-    <ClCompile Include="BookmarksToolbar.cpp" />
-    <ClCompile Include="BookmarkTreeView.cpp" />
+    <ClCompile Include="Bookmarks\BookmarkHandler.cpp" />
+    <ClCompile Include="Bookmarks\BookmarkHelper.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarkListView.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarkMenu.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarksToolbar.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarkTreeView.cpp" />
     <ClCompile Include="ColorRuleDialog.cpp" />
     <ClCompile Include="ColorRuleHelper.cpp" />
     <ClCompile Include="CommandInvoked.cpp" />
@@ -537,7 +537,7 @@
     <ClCompile Include="MainRebar.cpp" />
     <ClCompile Include="MainToolbar.cpp" />
     <ClCompile Include="MainWndSwitch.cpp" />
-    <ClCompile Include="ManageBookmarksDialog.cpp" />
+    <ClCompile Include="Bookmarks\UI\ManageBookmarksDialog.cpp" />
     <ClCompile Include="Manifest.cpp" />
     <ClCompile Include="MassRenameDialog.cpp" />
     <ClCompile Include="MenuApi.cpp" />
@@ -620,32 +620,32 @@
     <ClInclude Include="AcceleratorMappings.h" />
     <ClInclude Include="AcceleratorParser.h" />
     <ClInclude Include="AcceleratorUpdater.h" />
-    <ClInclude Include="AddBookmarkDialog.h" />
+    <ClInclude Include="Bookmarks\UI\AddBookmarkDialog.h" />
     <ClInclude Include="AddressBar.h" />
     <ClInclude Include="ApiBinding.h" />
     <ClInclude Include="ApplicationToolbar.h" />
     <ClInclude Include="ApplicationToolbarButtonDialog.h" />
     <ClInclude Include="ApplicationToolbarDropHandler.h" />
-    <ClInclude Include="BookmarkClipboard.h" />
-    <ClInclude Include="BookmarkContextMenu.h" />
-    <ClInclude Include="BookmarkContextMenuController.h" />
-    <ClInclude Include="BookmarkDataExchange.h" />
-    <ClInclude Include="BookmarkDropInfo.h" />
-    <ClInclude Include="BookmarkDropTargetWindow.h" />
-    <ClInclude Include="BookmarkHelper.h" />
-    <ClInclude Include="BookmarkItem.h" />
-    <ClInclude Include="BookmarkListView.h" />
-    <ClInclude Include="BookmarkNavigationController.h" />
-    <ClInclude Include="BookmarkNavigatorInterface.h" />
-    <ClInclude Include="BookmarkRegistryStorage.h" />
-    <ClInclude Include="BookmarksMainMenu.h" />
-    <ClInclude Include="BookmarkMenu.h" />
-    <ClInclude Include="BookmarkMenuBuilder.h" />
-    <ClInclude Include="BookmarksToolbar.h" />
-    <ClInclude Include="BookmarkStorage.h" />
-    <ClInclude Include="BookmarkTree.h" />
-    <ClInclude Include="BookmarkTreeView.h" />
-    <ClInclude Include="BookmarkXmlStorage.h" />
+    <ClInclude Include="Bookmarks\BookmarkClipboard.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarkContextMenu.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarkContextMenuController.h" />
+    <ClInclude Include="Bookmarks\BookmarkDataExchange.h" />
+    <ClInclude Include="Bookmarks\BookmarkDropInfo.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarkDropTargetWindow.h" />
+    <ClInclude Include="Bookmarks\BookmarkHelper.h" />
+    <ClInclude Include="Bookmarks\BookmarkItem.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarkListView.h" />
+    <ClInclude Include="Bookmarks\BookmarkNavigationController.h" />
+    <ClInclude Include="Bookmarks\BookmarkNavigatorInterface.h" />
+    <ClInclude Include="Bookmarks\BookmarkRegistryStorage.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarksMainMenu.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarkMenu.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarkMenuBuilder.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarksToolbar.h" />
+    <ClInclude Include="Bookmarks\BookmarkStorage.h" />
+    <ClInclude Include="Bookmarks\BookmarkTree.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarkTreeView.h" />
+    <ClInclude Include="Bookmarks\BookmarkXmlStorage.h" />
     <ClInclude Include="ColorRuleDialog.h" />
     <ClInclude Include="ColorRuleHelper.h" />
     <ClInclude Include="CommandInvoked.h" />
@@ -688,7 +688,7 @@
     <ClInclude Include="MainResource.h" />
     <ClInclude Include="MainToolbar.h" />
     <ClInclude Include="MainWindow.h" />
-    <ClInclude Include="ManageBookmarksDialog.h" />
+    <ClInclude Include="Bookmarks\UI\ManageBookmarksDialog.h" />
     <ClInclude Include="Manifest.h" />
     <ClInclude Include="MassRenameDialog.h" />
     <ClInclude Include="MenuApi.h" />

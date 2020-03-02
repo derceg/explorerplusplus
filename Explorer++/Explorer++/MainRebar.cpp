@@ -6,7 +6,7 @@
 #include "Explorer++.h"
 #include "AddressBar.h"
 #include "ApplicationToolbar.h"
-#include "BookmarksToolbar.h"
+#include "Bookmarks/UI/BookmarksToolbar.h"
 #include "Config.h"
 #include "DrivesToolbar.h"
 #include "Explorer++_internal.h"

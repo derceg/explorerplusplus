@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "ApplicationToolbar.h"
-#include "BookmarkRegistryStorage.h"
+#include "Bookmarks/BookmarkRegistryStorage.h"
 #include "Config.h"
 #include "DefaultColumns.h"
 #include "DisplayWindow/DisplayWindow.h"

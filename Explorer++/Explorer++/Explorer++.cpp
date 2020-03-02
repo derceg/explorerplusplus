@@ -4,8 +4,8 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "BookmarksMainMenu.h"
-#include "BookmarksToolbar.h"
+#include "Bookmarks/UI/BookmarksMainMenu.h"
+#include "Bookmarks/UI/BookmarksToolbar.h"
 #include "ColorRuleHelper.h"
 #include "Config.h"
 #include "Explorer++_internal.h"

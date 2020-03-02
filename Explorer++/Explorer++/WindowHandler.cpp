@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "ApplicationToolbar.h"
-#include "BookmarksToolbar.h"
+#include "Bookmarks/UI/BookmarksToolbar.h"
 #include "Config.h"
 #include "IconResourceLoader.h"
 #include "MainToolbar.h"
