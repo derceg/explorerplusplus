@@ -14,7 +14,6 @@ BookmarkDropInfo::BookmarkDropInfo(IDataObject *dataObject, BookmarkTree *bookma
 	m_dataObject(dataObject),
 	m_bookmarkTree(bookmarkTree)
 {
-
 }
 
 DWORD BookmarkDropInfo::GetDropEffect(BookmarkItem *parentFolder)
@@ -41,10 +40,12 @@ DWORD BookmarkDropInfo::GetDropEffect(BookmarkItem *parentFolder)
 	{
 		if (extractedInfo.bookmarkItems.size() == 1)
 		{
-			auto existingBookmarkItem = BookmarkHelper::GetBookmarkItemById(m_bookmarkTree, *extractedInfo.bookmarkItems[0]->GetOriginalGUID());
+			auto existingBookmarkItem = BookmarkHelper::GetBookmarkItemById(
+				m_bookmarkTree, *extractedInfo.bookmarkItems[0]->GetOriginalGUID());
 
-			if (!existingBookmarkItem ||
-				(existingBookmarkItem && !CanMoveBookmarkItemIntoFolder(existingBookmarkItem, parentFolder)))
+			if (!existingBookmarkItem
+				|| (existingBookmarkItem
+					&& !CanMoveBookmarkItemIntoFolder(existingBookmarkItem, parentFolder)))
 			{
 				return DROPEFFECT_NONE;
 			}
@@ -73,9 +74,11 @@ DWORD BookmarkDropInfo::PerformDrop(BookmarkItem *parentFolder, size_t position)
 		}
 		else if (targetEffect == DROPEFFECT_MOVE)
 		{
-			auto existingBookmarkItem = BookmarkHelper::GetBookmarkItemById(m_bookmarkTree, *bookmarkItem->GetOriginalGUID());
+			auto existingBookmarkItem = BookmarkHelper::GetBookmarkItemById(
+				m_bookmarkTree, *bookmarkItem->GetOriginalGUID());
 
-			if (existingBookmarkItem && CanMoveBookmarkItemIntoFolder(existingBookmarkItem, parentFolder))
+			if (existingBookmarkItem
+				&& CanMoveBookmarkItemIntoFolder(existingBookmarkItem, parentFolder))
 			{
 				m_bookmarkTree->MoveBookmarkItem(existingBookmarkItem, parentFolder, position + i);
 			}
@@ -92,7 +95,8 @@ DWORD BookmarkDropInfo::PerformDrop(BookmarkItem *parentFolder, size_t position)
 	return finalEffect;
 }
 
-bool BookmarkDropInfo::CanMoveBookmarkItemIntoFolder(BookmarkItem *bookmarkItem, BookmarkItem *parentFolder)
+bool BookmarkDropInfo::CanMoveBookmarkItemIntoFolder(
+	BookmarkItem *bookmarkItem, BookmarkItem *parentFolder)
 {
 	if (bookmarkItem->IsBookmark()
 		|| (bookmarkItem->IsFolder() && !BookmarkHelper::IsAncestor(parentFolder, bookmarkItem)))
@@ -168,7 +172,8 @@ BookmarkItems BookmarkDropInfo::ExtractBookmarkItemsFromHDrop()
 		TCHAR displayName[MAX_PATH];
 		GetDisplayName(droppedFile.c_str(), displayName, SIZEOF_ARRAY(displayName), SHGDN_INFOLDER);
 
-		auto bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt, displayName, droppedFile.c_str());
+		auto bookmarkItem =
+			std::make_unique<BookmarkItem>(std::nullopt, displayName, droppedFile.c_str());
 		bookmarkItems.push_back(std::move(bookmarkItem));
 	}
 

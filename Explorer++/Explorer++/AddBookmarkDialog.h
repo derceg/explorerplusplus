@@ -20,11 +20,9 @@ __interface IExplorerplusplus;
 class AddBookmarkDialogPersistentSettings : public DialogSettings
 {
 public:
-
 	static AddBookmarkDialogPersistentSettings &GetInstance();
 
 private:
-
 	friend AddBookmarkDialog;
 
 	static const TCHAR SETTINGS_KEY[];
@@ -32,7 +30,7 @@ private:
 	AddBookmarkDialogPersistentSettings();
 
 	AddBookmarkDialogPersistentSettings(const AddBookmarkDialogPersistentSettings &);
-	AddBookmarkDialogPersistentSettings & operator=(const AddBookmarkDialogPersistentSettings &);
+	AddBookmarkDialogPersistentSettings &operator=(const AddBookmarkDialogPersistentSettings &);
 
 	bool m_bInitialized;
 	std::wstring m_guidSelected;
@@ -42,39 +40,38 @@ private:
 class AddBookmarkDialog : public BaseDialog
 {
 public:
-
 	AddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
-		BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem, BookmarkItem *defaultParentSelection,
-		BookmarkItem **selectedParentFolder, std::optional<std::wstring> customDialogTitle = std::nullopt);
+		BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
+		BookmarkItem *defaultParentSelection, BookmarkItem **selectedParentFolder,
+		std::optional<std::wstring> customDialogTitle = std::nullopt);
 
 protected:
-
-	INT_PTR	OnInitDialog() override;
-	INT_PTR	OnCtlColorEdit(HWND hwnd,HDC hdc) override;
-	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam) override;
-	INT_PTR	OnClose() override;
-	INT_PTR	OnNcDestroy() override;
+	INT_PTR OnInitDialog() override;
+	INT_PTR OnCtlColorEdit(HWND hwnd, HDC hdc) override;
+	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
+	INT_PTR OnClose() override;
+	INT_PTR OnNcDestroy() override;
 
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 
 private:
+	static const COLORREF ERROR_BACKGROUND_COLOR = RGB(255, 188, 188);
 
-	static const COLORREF ERROR_BACKGROUND_COLOR = RGB(255,188,188);
-
-	AddBookmarkDialog & operator = (const AddBookmarkDialog &abd);
+	AddBookmarkDialog &operator=(const AddBookmarkDialog &abd);
 
 	void UpdateDialogForBookmarkFolder();
 	void SetDialogTitle();
 	std::wstring LoadDialogTitle();
 
-	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList) override;
+	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+		std::list<ResizableDialog::Control_t> &ControlList) override;
 	void SaveState() override;
 
 	void OnOk();
 	void OnCancel();
 
 	void SaveTreeViewState();
-	void SaveTreeViewExpansionState(HWND hTreeView,HTREEITEM hItem);
+	void SaveTreeViewExpansionState(HWND hTreeView, HTREEITEM hItem);
 
 	IExplorerplusplus *m_expp;
 

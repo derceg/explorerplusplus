@@ -12,15 +12,15 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainer.h"
 
-BookmarksMainMenu::BookmarksMainMenu(IExplorerplusplus *expp, BookmarkTree *bookmarkTree,
-	const MenuIdRange &menuIdRange) :
+BookmarksMainMenu::BookmarksMainMenu(
+	IExplorerplusplus *expp, BookmarkTree *bookmarkTree, const MenuIdRange &menuIdRange) :
 	m_expp(expp),
 	m_bookmarkTree(bookmarkTree),
 	m_menuIdRange(menuIdRange),
 	m_menuBuilder(expp->GetLanguageModule())
 {
-	m_connections.push_back(expp->AddMainMenuPreShowObserver(std::bind(&BookmarksMainMenu::OnMainMenuPreShow,
-		this, std::placeholders::_1)));
+	m_connections.push_back(expp->AddMainMenuPreShowObserver(
+		std::bind(&BookmarksMainMenu::OnMainMenuPreShow, this, std::placeholders::_1)));
 }
 
 BookmarksMainMenu::~BookmarksMainMenu()
@@ -49,14 +49,16 @@ void BookmarksMainMenu::OnMainMenuPreShow(HMENU mainMenu)
 	m_menuItemIdMappings = menuItemIdMappings;
 }
 
-wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(std::vector<wil::unique_hbitmap> &menuImages,
+wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(
+	std::vector<wil::unique_hbitmap> &menuImages,
 	BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings)
 {
 	wil::unique_hmenu menu(CreatePopupMenu());
 
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_expp->GetMainWindow());
 
-	std::wstring bookmarkThisTabText = ResourceHelper::LoadString(m_expp->GetLanguageModule(), IDS_MENU_BOOKMARK_THIS_TAB);
+	std::wstring bookmarkThisTabText =
+		ResourceHelper::LoadString(m_expp->GetLanguageModule(), IDS_MENU_BOOKMARK_THIS_TAB);
 
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
@@ -68,7 +70,8 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(std::vector<wil::uni
 	ResourceHelper::SetMenuItemImage(menu.get(), IDM_BOOKMARKS_BOOKMARKTHISTAB,
 		m_expp->GetIconResourceLoader(), Icon::AddBookmark, dpi, menuImages);
 
-	std::wstring bookmarkAllTabsText = ResourceHelper::LoadString(m_expp->GetLanguageModule(), IDS_MENU_BOOKMARK_ALL_TABS);
+	std::wstring bookmarkAllTabsText =
+		ResourceHelper::LoadString(m_expp->GetLanguageModule(), IDS_MENU_BOOKMARK_ALL_TABS);
 
 	ZeroMemory(&mii, sizeof(mii));
 	mii.cbSize = sizeof(mii);
@@ -77,7 +80,8 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(std::vector<wil::uni
 	mii.dwTypeData = bookmarkAllTabsText.data();
 	InsertMenuItem(menu.get(), 1, TRUE, &mii);
 
-	std::wstring manageBookmarksText = ResourceHelper::LoadString(m_expp->GetLanguageModule() , IDS_MENU_MANAGE_BOOKMARKS);
+	std::wstring manageBookmarksText =
+		ResourceHelper::LoadString(m_expp->GetLanguageModule(), IDS_MENU_MANAGE_BOOKMARKS);
 
 	ZeroMemory(&mii, sizeof(mii));
 	mii.cbSize = sizeof(mii);
@@ -95,7 +99,8 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(std::vector<wil::uni
 	return menu;
 }
 
-void BookmarksMainMenu::AddBookmarkItemsToMenu(HMENU menu, int position, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings)
+void BookmarksMainMenu::AddBookmarkItemsToMenu(
+	HMENU menu, int position, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings)
 {
 	BookmarkItem *bookmarksMenuFolder = m_bookmarkTree->GetBookmarksMenuFolder();
 
@@ -110,11 +115,11 @@ void BookmarksMainMenu::AddBookmarkItemsToMenu(HMENU menu, int position, Bookmar
 	mii.fType = MFT_SEPARATOR;
 	InsertMenuItem(menu, position++, TRUE, &mii);
 
-	m_menuBuilder.BuildMenu(menu, bookmarksMenuFolder, m_menuIdRange,
-		position, menuItemIdMappings);
+	m_menuBuilder.BuildMenu(menu, bookmarksMenuFolder, m_menuIdRange, position, menuItemIdMappings);
 }
 
-void BookmarksMainMenu::AddOtherBookmarksToMenu(HMENU menu, int position, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings)
+void BookmarksMainMenu::AddOtherBookmarksToMenu(
+	HMENU menu, int position, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings)
 {
 	BookmarkItem *otherBookmarksFolder = m_bookmarkTree->GetOtherBookmarksFolder();
 

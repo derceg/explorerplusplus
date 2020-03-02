@@ -11,7 +11,8 @@ BookmarkDropTargetWindow::BookmarkDropTargetWindow(HWND hwnd, BookmarkTree *book
 	m_dropTarget = DropTarget::Create(hwnd, this);
 }
 
-DWORD BookmarkDropTargetWindow::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
+DWORD BookmarkDropTargetWindow::DragEnter(
+	IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
 {
 	UNREFERENCED_PARAMETER(keyState);
 	UNREFERENCED_PARAMETER(effect);
@@ -28,8 +29,7 @@ DWORD BookmarkDropTargetWindow::DragOver(DWORD keyState, POINT pt, DWORD effect)
 	UNREFERENCED_PARAMETER(keyState);
 	UNREFERENCED_PARAMETER(effect);
 
-	if (m_previousDragOverPoint
-		&& pt.x == m_previousDragOverPoint->x
+	if (m_previousDragOverPoint && pt.x == m_previousDragOverPoint->x
 		&& pt.y == m_previousDragOverPoint->y)
 	{
 		return m_previousDropEffect;
@@ -39,8 +39,7 @@ DWORD BookmarkDropTargetWindow::DragOver(DWORD keyState, POINT pt, DWORD effect)
 
 	auto dropLocation = GetDropLocation(pt);
 
-	if (m_previousDropLocation
-		&& m_previousDropLocation->parentFolder == dropLocation.parentFolder
+	if (m_previousDropLocation && m_previousDropLocation->parentFolder == dropLocation.parentFolder
 		&& m_previousDropLocation->position == dropLocation.position
 		&& m_previousDropLocation->parentFolderSelected == dropLocation.parentFolderSelected)
 	{
@@ -70,14 +69,16 @@ void BookmarkDropTargetWindow::DragLeave()
 	ResetDropState();
 }
 
-DWORD BookmarkDropTargetWindow::Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
+DWORD BookmarkDropTargetWindow::Drop(
+	IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
 {
 	UNREFERENCED_PARAMETER(dataObject);
 	UNREFERENCED_PARAMETER(keyState);
 	UNREFERENCED_PARAMETER(effect);
 
 	auto dropLocation = GetDropLocation(pt);
-	DWORD finalEffect = m_bookmarkDropInfo->PerformDrop(dropLocation.parentFolder, dropLocation.position);
+	DWORD finalEffect =
+		m_bookmarkDropInfo->PerformDrop(dropLocation.parentFolder, dropLocation.position);
 
 	ResetDropState();
 

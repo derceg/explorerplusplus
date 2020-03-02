@@ -21,7 +21,6 @@ using BookmarkItems = std::vector<std::unique_ptr<BookmarkItem>>;
 class BookmarkItem
 {
 public:
-
 	enum class Type
 	{
 		Folder = 0,
@@ -38,8 +37,7 @@ public:
 
 	friend class cereal::access;
 
-	template <class Archive>
-	void serialize(Archive &archive)
+	template <class Archive> void serialize(Archive &archive)
 	{
 		archive(m_guid, m_type, m_name, m_location, m_children);
 	}
@@ -101,13 +99,13 @@ public:
 
 	const BookmarkItems &GetChildren() const;
 
-	void VisitRecursively(std::function<void(BookmarkItem * currentItem)> callback);
+	void VisitRecursively(std::function<void(BookmarkItem *currentItem)> callback);
 
 	// Signals
-	SignalWrapper<BookmarkItem, void(BookmarkItem &bookmarkItem, PropertyType propertyType)> updatedSignal;
+	SignalWrapper<BookmarkItem, void(BookmarkItem &bookmarkItem, PropertyType propertyType)>
+		updatedSignal;
 
 private:
-
 	DISALLOW_COPY_AND_ASSIGN(BookmarkItem);
 
 	// Used exclusively when deserializing. The advantage here mainly comes from

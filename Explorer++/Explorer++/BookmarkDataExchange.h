@@ -10,7 +10,7 @@
 
 // This type is used when serializing multiple independent bookmark items and is
 // needed for the following reasons:
-// 
+//
 // - cereal doesn't serialize raw pointers at all (it explicitly forbids them).
 //   This means it's not possible to pass a list of BookmarkItem pointers to
 //   serialize.
@@ -32,12 +32,13 @@
 //   in. However, this would mean that there would be some overhead in copying
 //   the items and a method would have to be written to allow items to be
 //   copied, which isn't normally something that needs to be done.
-using OwnedRefBookmarkItems = std::vector<std::reference_wrapper<const std::unique_ptr<BookmarkItem>>>;
+using OwnedRefBookmarkItems =
+	std::vector<std::reference_wrapper<const std::unique_ptr<BookmarkItem>>>;
 
 namespace BookmarkDataExchange
 {
-	FORMATETC GetFormatEtc();
-	wil::com_ptr<IDataObject> CreateDataObject(const OwnedRefBookmarkItems &bookmarkItems);
-	std::string SerializeBookmarkItems(const OwnedRefBookmarkItems &bookmarkItems);
-	BookmarkItems DeserializeBookmarkItems(const std::string &data);
+FORMATETC GetFormatEtc();
+wil::com_ptr<IDataObject> CreateDataObject(const OwnedRefBookmarkItems &bookmarkItems);
+std::string SerializeBookmarkItems(const OwnedRefBookmarkItems &bookmarkItems);
+BookmarkItems DeserializeBookmarkItems(const std::string &data);
 }

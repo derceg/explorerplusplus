@@ -35,14 +35,14 @@ bool BookmarkHelper::IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkIte
 	return bookmarkItem->IsBookmark();
 }
 
-int CALLBACK BookmarkHelper::Sort(SortMode sortMode, const BookmarkItem *firstItem,
-	const BookmarkItem *secondItem)
+int CALLBACK BookmarkHelper::Sort(
+	SortMode sortMode, const BookmarkItem *firstItem, const BookmarkItem *secondItem)
 {
-	if(firstItem->IsFolder() && secondItem->IsBookmark())
+	if (firstItem->IsFolder() && secondItem->IsBookmark())
 	{
 		return -1;
 	}
-	else if(firstItem->IsBookmark() && secondItem->IsFolder())
+	else if (firstItem->IsBookmark() && secondItem->IsFolder())
 	{
 		return 1;
 	}
@@ -50,26 +50,26 @@ int CALLBACK BookmarkHelper::Sort(SortMode sortMode, const BookmarkItem *firstIt
 	{
 		int iRes = 0;
 
-		switch(sortMode)
+		switch (sortMode)
 		{
 		case SortMode::Default:
 			iRes = SortByDefault(firstItem, secondItem);
 			break;
 
 		case SortMode::Name:
-			iRes = SortByName(firstItem,secondItem);
+			iRes = SortByName(firstItem, secondItem);
 			break;
 
 		case SortMode::Location:
-			iRes = SortByLocation(firstItem,secondItem);
+			iRes = SortByLocation(firstItem, secondItem);
 			break;
 
 		case SortMode::DateCreated:
-			iRes = SortByDateAdded(firstItem,secondItem);
+			iRes = SortByDateAdded(firstItem, secondItem);
 			break;
 
 		case SortMode::DateModified:
-			iRes = SortByDateModified(firstItem,secondItem);
+			iRes = SortByDateModified(firstItem, secondItem);
 			break;
 
 		default:
@@ -81,24 +81,21 @@ int CALLBACK BookmarkHelper::Sort(SortMode sortMode, const BookmarkItem *firstIt
 	}
 }
 
-int CALLBACK SortByDefault(const BookmarkItem *firstItem,
-	const BookmarkItem *secondItem)
+int CALLBACK SortByDefault(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
 {
 	size_t firstIndex = firstItem->GetParent()->GetChildIndex(firstItem);
 	size_t secondIndex = secondItem->GetParent()->GetChildIndex(secondItem);
 	return static_cast<int>(firstIndex) - static_cast<int>(secondIndex);
 }
 
-int CALLBACK SortByName(const BookmarkItem *firstItem,
-	const BookmarkItem *secondItem)
+int CALLBACK SortByName(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
 {
 	return StrCmpLogicalW(firstItem->GetName().c_str(), secondItem->GetName().c_str());
 }
 
-int CALLBACK SortByLocation(const BookmarkItem *firstItem,
-	const BookmarkItem *secondItem)
+int CALLBACK SortByLocation(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
 {
-	if(firstItem->IsFolder() && secondItem->IsFolder())
+	if (firstItem->IsFolder() && secondItem->IsFolder())
 	{
 		return SortByName(firstItem, secondItem);
 	}
@@ -108,16 +105,14 @@ int CALLBACK SortByLocation(const BookmarkItem *firstItem,
 	}
 }
 
-int CALLBACK SortByDateAdded(const BookmarkItem *firstItem,
-	const BookmarkItem *secondItem)
+int CALLBACK SortByDateAdded(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
 {
 	FILETIME firstItemDateCreated = firstItem->GetDateCreated();
 	FILETIME secondItemDateCreated = secondItem->GetDateCreated();
 	return CompareFileTime(&firstItemDateCreated, &secondItemDateCreated);
 }
 
-int CALLBACK SortByDateModified(const BookmarkItem *firstItem,
-	const BookmarkItem *secondItem)
+int CALLBACK SortByDateModified(const BookmarkItem *firstItem, const BookmarkItem *secondItem)
 {
 	FILETIME firstItemDateModified = firstItem->GetDateModified();
 	FILETIME secondItemDateModified = secondItem->GetDateModified();
@@ -127,9 +122,10 @@ int CALLBACK SortByDateModified(const BookmarkItem *firstItem,
 void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree, HMODULE resoureceModule,
 	HWND parentWindow, IExplorerplusplus *coreInterface)
 {
-	std::wstring bookmarkAllTabsText = ResourceHelper::LoadString(resoureceModule, IDS_ADD_BOOKMARK_TITLE_BOOKMARK_ALL_TABS);
-	auto bookmarkFolder = AddBookmarkItem(bookmarkTree, BookmarkItem::Type::Folder,
-		nullptr, std::nullopt, parentWindow, coreInterface, bookmarkAllTabsText);
+	std::wstring bookmarkAllTabsText =
+		ResourceHelper::LoadString(resoureceModule, IDS_ADD_BOOKMARK_TITLE_BOOKMARK_ALL_TABS);
+	auto bookmarkFolder = AddBookmarkItem(bookmarkTree, BookmarkItem::Type::Folder, nullptr,
+		std::nullopt, parentWindow, coreInterface, bookmarkAllTabsText);
 
 	if (!bookmarkFolder)
 	{
@@ -142,8 +138,8 @@ void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree, HMODULE resoure
 	{
 		auto &tab = tabRef.get();
 		auto entry = tab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
-		auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, entry->GetDisplayName(),
-			tab.GetShellBrowser()->GetDirectory());
+		auto bookmark = std::make_unique<BookmarkItem>(
+			std::nullopt, entry->GetDisplayName(), tab.GetShellBrowser()->GetDirectory());
 
 		bookmarkTree->AddBookmarkItem(bookmarkFolder, std::move(bookmark), index);
 
@@ -162,14 +158,15 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 		const Tab &selectedTab = coreInterface->GetTabContainer()->GetSelectedTab();
 		auto entry = selectedTab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
 
-		bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt, entry->GetDisplayName(),
-			selectedTab.GetShellBrowser()->GetDirectory());
+		bookmarkItem = std::make_unique<BookmarkItem>(
+			std::nullopt, entry->GetDisplayName(), selectedTab.GetShellBrowser()->GetDirectory());
 	}
 	else
 	{
 		bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt,
-			ResourceHelper::LoadString(coreInterface->GetLanguageModule(),
-				IDS_BOOKMARKS_NEWBOOKMARKFOLDER), std::nullopt);
+			ResourceHelper::LoadString(
+				coreInterface->GetLanguageModule(), IDS_BOOKMARKS_NEWBOOKMARKFOLDER),
+			std::nullopt);
 	}
 
 	BookmarkItem *rawBookmarkItem = bookmarkItem.get();
@@ -207,8 +204,8 @@ void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *
 	HMODULE resoureceModule, HWND parentWindow, IExplorerplusplus *coreInterface)
 {
 	BookmarkItem *selectedParentFolder = nullptr;
-	AddBookmarkDialog AddBookmarkDialog(resoureceModule, parentWindow, coreInterface,
-		bookmarkTree, bookmarkItem, nullptr, &selectedParentFolder);
+	AddBookmarkDialog AddBookmarkDialog(resoureceModule, parentWindow, coreInterface, bookmarkTree,
+		bookmarkItem, nullptr, &selectedParentFolder);
 	auto res = AddBookmarkDialog.ShowModalDialog();
 
 	if (res == BaseDialog::RETURN_OK)
@@ -236,7 +233,8 @@ void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *
 // If the specified item is a bookmark, it will be opened in a new tab.
 // If it's a bookmark folder, each of its children will be opened in new
 // tabs.
-void BookmarkHelper::OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem, IExplorerplusplus *expp)
+void BookmarkHelper::OpenBookmarkItemInNewTab(
+	const BookmarkItem *bookmarkItem, IExplorerplusplus *expp)
 {
 	if (bookmarkItem->IsFolder())
 	{
@@ -253,7 +251,8 @@ void BookmarkHelper::OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem, 
 
 // Cuts/copies the selected bookmark items. Each bookmark item needs to be part
 // of the specified bookmark tree.
-bool BookmarkHelper::CopyBookmarkItems(BookmarkTree *bookmarkTree, const RawBookmarkItems &bookmarkItems, bool cut)
+bool BookmarkHelper::CopyBookmarkItems(
+	BookmarkTree *bookmarkTree, const RawBookmarkItems &bookmarkItems, bool cut)
 {
 	OwnedRefBookmarkItems ownedBookmarkItems;
 
@@ -281,7 +280,8 @@ bool BookmarkHelper::CopyBookmarkItems(BookmarkTree *bookmarkTree, const RawBook
 }
 
 // Note that the parent folder must be a part of the specified bookmark tree.
-void BookmarkHelper::PasteBookmarkItems(BookmarkTree *bookmarkTree, BookmarkItem *parentFolder, size_t index)
+void BookmarkHelper::PasteBookmarkItems(
+	BookmarkTree *bookmarkTree, BookmarkItem *parentFolder, size_t index)
 {
 	assert(parentFolder->IsFolder());
 
@@ -297,7 +297,8 @@ void BookmarkHelper::PasteBookmarkItems(BookmarkTree *bookmarkTree, BookmarkItem
 	}
 }
 
-BookmarkItem *BookmarkHelper::GetBookmarkItemById(BookmarkTree *bookmarkTree, std::wstring_view guid)
+BookmarkItem *BookmarkHelper::GetBookmarkItemById(
+	BookmarkTree *bookmarkTree, std::wstring_view guid)
 {
 	return GetBookmarkItemByIdResursive(bookmarkTree->GetRoot(), guid);
 }

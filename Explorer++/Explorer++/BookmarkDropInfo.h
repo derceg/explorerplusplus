@@ -12,14 +12,12 @@ class BookmarkTree;
 class BookmarkDropInfo
 {
 public:
-
 	BookmarkDropInfo(IDataObject *dataObject, BookmarkTree *bookmarkTree);
 
 	DWORD GetDropEffect(BookmarkItem *parentFolder);
 	DWORD PerformDrop(BookmarkItem *parentFolder, size_t position);
 
 private:
-
 	enum class ExtractionSource
 	{
 		CustomFormat,
@@ -32,7 +30,8 @@ private:
 		std::optional<ExtractionSource> extractionSource;
 	};
 
-	static bool CanMoveBookmarkItemIntoFolder(BookmarkItem *bookmarkItem, BookmarkItem *parentFolder);
+	static bool CanMoveBookmarkItemIntoFolder(
+		BookmarkItem *bookmarkItem, BookmarkItem *parentFolder);
 	ExtractedInfo &GetExtractedInfo();
 	ExtractedInfo ExtractBookmarkItems();
 	BookmarkItems ExtractBookmarkItemsFromCustomFormat();

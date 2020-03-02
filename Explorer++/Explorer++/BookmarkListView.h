@@ -23,7 +23,6 @@ __interface IExplorerplusplus;
 class BookmarkListView : public BookmarkNavigatorInterface, private BookmarkDropTargetWindow
 {
 public:
-
 	enum class ColumnType
 	{
 		Name = 1,
@@ -43,7 +42,8 @@ public:
 		IExplorerplusplus *expp, const std::vector<Column> &initialColumns);
 
 	void NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder, bool addHistoryEntry) override;
-	boost::signals2::connection AddNavigationCompletedObserver(const BookmarkNavigationCompletedSignal::slot_type &observer,
+	boost::signals2::connection AddNavigationCompletedObserver(
+		const BookmarkNavigationCompletedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;
 
 	int GetLastSelectedItemIndex() const;
@@ -60,13 +60,12 @@ public:
 	void SetSortAscending(bool sortAscending);
 
 private:
-
 	static inline const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
 	static inline const double FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE = 0.2;
 
-	static LRESULT CALLBACK ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
-		LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	static LRESULT CALLBACK ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	void InsertColumns(const std::vector<Column> &columns);

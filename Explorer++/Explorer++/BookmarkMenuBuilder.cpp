@@ -8,10 +8,8 @@
 #include "ResourceHelper.h"
 #include <boost/format.hpp>
 
-BookmarkMenuBuilder::BookmarkMenuBuilder(HMODULE resourceModule) :
-	m_resourceModule(resourceModule)
+BookmarkMenuBuilder::BookmarkMenuBuilder(HMODULE resourceModule) : m_resourceModule(resourceModule)
 {
-
 }
 
 BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, BookmarkItem *bookmarkItem,
@@ -26,8 +24,8 @@ BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, BookmarkItem *bookmarkItem,
 	return BuildMenu(menu, bookmarkItem, startPosition, itemIdMap, itemPositionMap);
 }
 
-BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, BookmarkItem *bookmarkItem,
-	int startPosition, ItemIdMap &itemIdMap, ItemPositionMap *itemPositionMap)
+BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, BookmarkItem *bookmarkItem, int startPosition,
+	ItemIdMap &itemIdMap, ItemPositionMap *itemPositionMap)
 {
 	if (bookmarkItem->GetChildren().empty())
 	{
@@ -42,7 +40,8 @@ BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, BookmarkItem *bookmarkItem,
 
 		if (childItem->IsFolder())
 		{
-			res = AddBookmarkFolderToMenu(menu, childItem.get(), position, itemIdMap, itemPositionMap);
+			res = AddBookmarkFolderToMenu(
+				menu, childItem.get(), position, itemIdMap, itemPositionMap);
 		}
 		else
 		{
@@ -60,10 +59,11 @@ BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, BookmarkItem *bookmarkItem,
 	return TRUE;
 }
 
-BOOL BookmarkMenuBuilder::AddEmptyBookmarkFolderToMenu(HMENU menu, BookmarkItem *bookmarkItem,
-	int position, ItemPositionMap *itemPositionMap)
+BOOL BookmarkMenuBuilder::AddEmptyBookmarkFolderToMenu(
+	HMENU menu, BookmarkItem *bookmarkItem, int position, ItemPositionMap *itemPositionMap)
 {
-	std::wstring bookmarkFolderEmpty = ResourceHelper::LoadString(m_resourceModule, IDS_BOOKMARK_FOLDER_EMPTY);
+	std::wstring bookmarkFolderEmpty =
+		ResourceHelper::LoadString(m_resourceModule, IDS_BOOKMARK_FOLDER_EMPTY);
 	std::wstring menuText = (boost::wformat(L"(%s)") % bookmarkFolderEmpty).str();
 
 	MENUITEMINFO mii;
@@ -124,8 +124,8 @@ BOOL BookmarkMenuBuilder::AddBookmarkFolderToMenu(HMENU menu, BookmarkItem *book
 	return BuildMenu(subMenu, bookmarkItem, 0, itemIdMap, itemPositionMap);
 }
 
-BOOL BookmarkMenuBuilder::AddBookmarkToMenu(HMENU menu, BookmarkItem *bookmarkItem,
-	int position, ItemIdMap &itemIdMap, ItemPositionMap *itemPositionMap)
+BOOL BookmarkMenuBuilder::AddBookmarkToMenu(HMENU menu, BookmarkItem *bookmarkItem, int position,
+	ItemIdMap &itemIdMap, ItemPositionMap *itemPositionMap)
 {
 	int id = m_idCounter++;
 

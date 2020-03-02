@@ -8,6 +8,6 @@ class BookmarkTree;
 
 namespace BookmarkRegistryStorage
 {
-	void Load(BookmarkTree *bookmarkTree);
-	void Save(BookmarkTree *bookmarkTree);
+void Load(BookmarkTree *bookmarkTree);
+void Save(BookmarkTree *bookmarkTree);
 }

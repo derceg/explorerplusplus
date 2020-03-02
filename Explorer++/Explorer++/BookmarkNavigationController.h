@@ -14,26 +14,22 @@ class BookmarkTree;
 class BookmarkHistoryEntry
 {
 public:
-
 	BookmarkHistoryEntry(const std::wstring &guid);
 
 	std::wstring getGuid() const;
 
 private:
-
 	std::wstring m_guid;
 };
 
 class BookmarkNavigationController : public NavigationController<BookmarkHistoryEntry, bool>
 {
 public:
-
 	BookmarkNavigationController(BookmarkTree *bookmarkTree, BookmarkNavigatorInterface *navigator);
 
 	bool BrowseFolder(BookmarkItem *bookmarkFolder, bool addHistoryEntry = true);
 
 private:
-
 	DISALLOW_COPY_AND_ASSIGN(BookmarkNavigationController);
 
 	bool BrowseFolder(const BookmarkHistoryEntry *entry, bool addHistoryEntry = true) override;

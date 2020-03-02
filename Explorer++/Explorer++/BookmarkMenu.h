@@ -20,15 +20,14 @@ __interface IExplorerplusplus;
 class BookmarkMenu
 {
 public:
-
 	using MenuCallback = std::function<void(const BookmarkItem *bookmarkItem)>;
 
-	BookmarkMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule, IExplorerplusplus *expp, HWND parentWindow);
+	BookmarkMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule, IExplorerplusplus *expp,
+		HWND parentWindow);
 
 	BOOL ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt, MenuCallback callback = nullptr);
 
 private:
-
 	static const int MIN_ID = 1;
 	static const int MAX_ID = 1000;
 
@@ -39,8 +38,8 @@ private:
 	LRESULT CALLBACK ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	void OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt);
-	void OnMenuItemSelected(int menuItemId, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings,
-		MenuCallback callback);
+	void OnMenuItemSelected(
+		int menuItemId, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings, MenuCallback callback);
 
 	HWND m_parentWindow;
 	BookmarkMenuBuilder m_menuBuilder;

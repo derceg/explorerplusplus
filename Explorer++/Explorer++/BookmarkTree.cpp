@@ -9,20 +9,25 @@
 #include "ResourceHelper.h"
 
 BookmarkTree::BookmarkTree() :
-	m_root(ROOT_FOLDER_GUID, ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_ALLBOOKMARKS), std::nullopt)
+	m_root(ROOT_FOLDER_GUID,
+		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_ALLBOOKMARKS),
+		std::nullopt)
 {
 	auto bookmarksToolbarFolder = std::make_unique<BookmarkItem>(TOOLBAR_FOLDER_GUID,
-		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_BOOKMARKSTOOLBAR), std::nullopt);
+		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_BOOKMARKSTOOLBAR),
+		std::nullopt);
 	m_bookmarksToolbar = bookmarksToolbarFolder.get();
 	m_root.AddChild(std::move(bookmarksToolbarFolder));
 
 	auto bookmarksMenuFolder = std::make_unique<BookmarkItem>(MENU_FOLDER_GUID,
-		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_BOOKMARKSMENU), std::nullopt);
+		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_BOOKMARKSMENU),
+		std::nullopt);
 	m_bookmarksMenu = bookmarksMenuFolder.get();
 	m_root.AddChild(std::move(bookmarksMenuFolder));
 
 	auto otherBookmarksFolder = std::make_unique<BookmarkItem>(OTHER_FOLDER_GUID,
-		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_OTHER_BOOKMARKS), std::nullopt);
+		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_BOOKMARKS_OTHER_BOOKMARKS),
+		std::nullopt);
 	m_otherBookmarks = otherBookmarksFolder.get();
 	m_root.AddChild(std::move(otherBookmarksFolder));
 }
@@ -62,7 +67,8 @@ const BookmarkItem *BookmarkTree::GetOtherBookmarksFolder() const
 	return m_otherBookmarks;
 }
 
-void BookmarkTree::AddBookmarkItem(BookmarkItem *parent, std::unique_ptr<BookmarkItem> bookmarkItem, size_t index)
+void BookmarkTree::AddBookmarkItem(
+	BookmarkItem *parent, std::unique_ptr<BookmarkItem> bookmarkItem, size_t index)
 {
 	if (!CanAddChildren(parent))
 	{
@@ -70,14 +76,15 @@ void BookmarkTree::AddBookmarkItem(BookmarkItem *parent, std::unique_ptr<Bookmar
 		return;
 	}
 
-	bookmarkItem->VisitRecursively([this] (BookmarkItem *currentItem) {
+	bookmarkItem->VisitRecursively([this](BookmarkItem *currentItem) {
 		currentItem->ClearOriginalGUID();
 
 		// Adds an observer to each bookmark item that's being added. This is
 		// needed so that this class can broadcast an event whenever an
 		// individual bookmark item is updated.
 		currentItem->updatedSignal.AddObserver(std::bind(&BookmarkTree::OnBookmarkItemUpdated, this,
-			std::placeholders::_1, std::placeholders::_2), boost::signals2::at_front);
+												   std::placeholders::_1, std::placeholders::_2),
+			boost::signals2::at_front);
 	});
 
 	if (index > parent->GetChildren().size())
@@ -90,7 +97,8 @@ void BookmarkTree::AddBookmarkItem(BookmarkItem *parent, std::unique_ptr<Bookmar
 	bookmarkItemAddedSignal.m_signal(*rawBookmarkItem, index);
 }
 
-void BookmarkTree::MoveBookmarkItem(BookmarkItem *bookmarkItem, BookmarkItem *newParent, size_t index)
+void BookmarkTree::MoveBookmarkItem(
+	BookmarkItem *bookmarkItem, BookmarkItem *newParent, size_t index)
 {
 	if (!CanAddChildren(newParent) || IsPermanentNode(bookmarkItem))
 	{
@@ -119,8 +127,7 @@ void BookmarkTree::MoveBookmarkItem(BookmarkItem *bookmarkItem, BookmarkItem *ne
 	auto item = oldParent->RemoveChild(oldIndex);
 	newParent->AddChild(std::move(item), index);
 
-	bookmarkItemMovedSignal.m_signal(bookmarkItem, oldParent, oldIndex,
-		newParent, index);
+	bookmarkItemMovedSignal.m_signal(bookmarkItem, oldParent, oldIndex, newParent, index);
 }
 
 void BookmarkTree::RemoveBookmarkItem(BookmarkItem *bookmarkItem)
@@ -143,7 +150,8 @@ void BookmarkTree::RemoveBookmarkItem(BookmarkItem *bookmarkItem)
 	bookmarkItemRemovedSignal.m_signal(guid);
 }
 
-void BookmarkTree::OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType)
+void BookmarkTree::OnBookmarkItemUpdated(
+	BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType)
 {
 	bookmarkItemUpdatedSignal.m_signal(bookmarkItem, propertyType);
 }
@@ -155,10 +163,8 @@ bool BookmarkTree::CanAddChildren(const BookmarkItem *bookmarkItem) const
 
 bool BookmarkTree::IsPermanentNode(const BookmarkItem *bookmarkItem) const
 {
-	if (bookmarkItem == &m_root
-		|| bookmarkItem == m_bookmarksToolbar
-		|| bookmarkItem == m_bookmarksMenu
-		|| bookmarkItem == m_otherBookmarks)
+	if (bookmarkItem == &m_root || bookmarkItem == m_bookmarksToolbar
+		|| bookmarkItem == m_bookmarksMenu || bookmarkItem == m_otherBookmarks)
 	{
 		return true;
 	}

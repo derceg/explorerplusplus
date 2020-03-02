@@ -10,13 +10,12 @@
 #include "../Helper/MenuHelper.h"
 #include <wil/resource.h>
 
-BookmarkContextMenu::BookmarkContextMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule,
-	IExplorerplusplus *expp) :
+BookmarkContextMenu::BookmarkContextMenu(
+	BookmarkTree *bookmarkTree, HMODULE resourceModule, IExplorerplusplus *expp) :
 	m_resourceModule(resourceModule),
 	m_controller(bookmarkTree, resourceModule, expp),
 	m_showingMenu(false)
 {
-
 }
 
 BOOL BookmarkContextMenu::ShowMenu(HWND parentWindow, BookmarkItem *parentFolder,
@@ -28,11 +27,13 @@ BOOL BookmarkContextMenu::ShowMenu(HWND parentWindow, BookmarkItem *parentFolder
 
 	if (bookmarkItems.size() == 1)
 	{
-		parentMenu.reset(LoadMenu(m_resourceModule, MAKEINTRESOURCE(IDR_SINGLE_BOOKMARK_CONTEXT_MENU)));
+		parentMenu.reset(
+			LoadMenu(m_resourceModule, MAKEINTRESOURCE(IDR_SINGLE_BOOKMARK_CONTEXT_MENU)));
 	}
 	else
 	{
-		parentMenu.reset(LoadMenu(m_resourceModule, MAKEINTRESOURCE(IDR_MULTIPLE_BOOKMARK_CONTEXT_MENU)));
+		parentMenu.reset(
+			LoadMenu(m_resourceModule, MAKEINTRESOURCE(IDR_MULTIPLE_BOOKMARK_CONTEXT_MENU)));
 	}
 
 	if (!parentMenu)
@@ -78,15 +79,16 @@ BOOL BookmarkContextMenu::ShowMenu(HWND parentWindow, BookmarkItem *parentFolder
 			targetParentFolder = parentFolder;
 
 			auto lastItem = std::max_element(bookmarkItems.begin(), bookmarkItems.end(),
-				[targetParentFolder] (BookmarkItem *first, BookmarkItem *second) {
-					return targetParentFolder->GetChildIndex(first) < targetParentFolder->GetChildIndex(second);
-				}
-			);
+				[targetParentFolder](BookmarkItem *first, BookmarkItem *second) {
+					return targetParentFolder->GetChildIndex(first)
+						< targetParentFolder->GetChildIndex(second);
+				});
 
 			targetIndex = targetParentFolder->GetChildIndex(*lastItem) + 1;
 		}
 
-		m_controller.OnMenuItemSelected(menuItemId, targetParentFolder, targetIndex, bookmarkItems, parentWindow);
+		m_controller.OnMenuItemSelected(
+			menuItemId, targetParentFolder, targetIndex, bookmarkItems, parentWindow);
 	}
 
 	return TRUE;
@@ -125,9 +127,8 @@ void BookmarkContextMenu::SetUpMenu(HMENU menu, const RawBookmarkItems &bookmark
 			{
 				auto &children = bookmarkItem->GetChildren();
 
-				auto numChildBookmarks = std::count_if(children.begin(), children.end(), [] (auto &child) {
-					return child->IsBookmark();
-				});
+				auto numChildBookmarks = std::count_if(children.begin(), children.end(),
+					[](auto &child) { return child->IsBookmark(); });
 
 				totalBookmarks += static_cast<int>(numChildBookmarks);
 			}
@@ -139,7 +140,8 @@ void BookmarkContextMenu::SetUpMenu(HMENU menu, const RawBookmarkItems &bookmark
 		}
 		else
 		{
-			std::wstring openAll = ResourceHelper::LoadString(m_resourceModule, IDS_BOOKMARK_OPEN_ALL);
+			std::wstring openAll =
+				ResourceHelper::LoadString(m_resourceModule, IDS_BOOKMARK_OPEN_ALL);
 			openAll += L"\t" + std::to_wstring(totalBookmarks);
 
 			MENUITEMINFO menuItemInfo;
@@ -155,7 +157,8 @@ void BookmarkContextMenu::SetUpMenu(HMENU menu, const RawBookmarkItems &bookmark
 
 void BookmarkContextMenu::SetMenuItemStates(HMENU menu)
 {
-	lEnableMenuItem(menu, IDM_BOOKMARKS_PASTE, IsClipboardFormatAvailable(BookmarkClipboard::GetClipboardFormat()));
+	lEnableMenuItem(menu, IDM_BOOKMARKS_PASTE,
+		IsClipboardFormatAvailable(BookmarkClipboard::GetClipboardFormat()));
 }
 
 bool BookmarkContextMenu::IsShowingMenu() const

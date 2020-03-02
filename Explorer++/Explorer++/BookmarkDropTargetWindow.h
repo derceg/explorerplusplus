@@ -12,7 +12,6 @@
 class BookmarkDropTargetWindow : private DropTargetInternal
 {
 protected:
-
 	struct DropLocation
 	{
 		BookmarkItem *parentFolder;
@@ -30,7 +29,6 @@ protected:
 	bool IsWithinDrag() const;
 
 private:
-
 	// DropTargetInternal methods.
 	DWORD DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
 	DWORD DragOver(DWORD keyState, POINT pt, DWORD effect) override;

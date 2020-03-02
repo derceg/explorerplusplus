@@ -13,12 +13,12 @@ BookmarkMenu::BookmarkMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule,
 	m_showingMenu(false),
 	m_menuItemPositionMappings(nullptr)
 {
-	m_windowSubclasses.emplace_back(parentWindow, ParentWindowSubclassStub,
-		SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.emplace_back(
+		parentWindow, ParentWindowSubclassStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 }
 
-LRESULT CALLBACK BookmarkMenu::ParentWindowSubclassStub(HWND hwnd, UINT uMsg,
-	WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK BookmarkMenu::ParentWindowSubclassStub(
+	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -26,7 +26,8 @@ LRESULT CALLBACK BookmarkMenu::ParentWindowSubclassStub(HWND hwnd, UINT uMsg,
 	return bookmarkMenu->ParentWindowSubclass(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK BookmarkMenu::ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK BookmarkMenu::ParentWindowSubclass(
+	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -72,7 +73,8 @@ void BookmarkMenu::OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt)
 		return;
 	}
 
-	m_bookmarkContextMenu.ShowMenu(m_parentWindow, itr->second->GetParent(), { itr->second } , pt, true);
+	m_bookmarkContextMenu.ShowMenu(
+		m_parentWindow, itr->second->GetParent(), { itr->second }, pt, true);
 }
 
 BOOL BookmarkMenu::ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt, MenuCallback callback)
@@ -97,7 +99,8 @@ BOOL BookmarkMenu::ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt, MenuCal
 	m_showingMenu = true;
 	m_menuItemPositionMappings = &menuItemPositionMappings;
 
-	int cmd = TrackPopupMenu(menu.get(), TPM_LEFTALIGN | TPM_RETURNCMD, pt.x, pt.y, 0, m_parentWindow, nullptr);
+	int cmd = TrackPopupMenu(
+		menu.get(), TPM_LEFTALIGN | TPM_RETURNCMD, pt.x, pt.y, 0, m_parentWindow, nullptr);
 
 	m_showingMenu = false;
 	m_menuItemPositionMappings = nullptr;
@@ -110,8 +113,8 @@ BOOL BookmarkMenu::ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt, MenuCal
 	return TRUE;
 }
 
-void BookmarkMenu::OnMenuItemSelected(int menuItemId, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings,
-	MenuCallback callback)
+void BookmarkMenu::OnMenuItemSelected(
+	int menuItemId, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings, MenuCallback callback)
 {
 	auto itr = menuItemIdMappings.find(menuItemId);
 

@@ -7,16 +7,19 @@
 #include "BookmarkHelper.h"
 #include "BookmarkNavigatorInterface.h"
 
-BookmarkNavigationController::BookmarkNavigationController(BookmarkTree *bookmarkTree, BookmarkNavigatorInterface *navigator) :
+BookmarkNavigationController::BookmarkNavigationController(
+	BookmarkTree *bookmarkTree, BookmarkNavigatorInterface *navigator) :
 	m_bookmarkTree(bookmarkTree),
 	m_navigator(navigator)
 {
 	m_connections.push_back(m_navigator->AddNavigationCompletedObserver(
-		std::bind(&BookmarkNavigationController::OnNavigationCompleted, this, std::placeholders::_1, std::placeholders::_2),
+		std::bind(&BookmarkNavigationController::OnNavigationCompleted, this, std::placeholders::_1,
+			std::placeholders::_2),
 		boost::signals2::at_front));
 }
 
-bool BookmarkNavigationController::BrowseFolder(const BookmarkHistoryEntry *entry, bool addHistoryEntry)
+bool BookmarkNavigationController::BrowseFolder(
+	const BookmarkHistoryEntry *entry, bool addHistoryEntry)
 {
 	auto bookmarkFolder = BookmarkHelper::GetBookmarkItemById(m_bookmarkTree, entry->getGuid());
 
@@ -42,7 +45,8 @@ bool BookmarkNavigationController::GetFailureValue()
 	return false;
 }
 
-void BookmarkNavigationController::OnNavigationCompleted(BookmarkItem *bookmarkFolder, bool addHistoryEntry)
+void BookmarkNavigationController::OnNavigationCompleted(
+	BookmarkItem *bookmarkFolder, bool addHistoryEntry)
 {
 	if (addHistoryEntry)
 	{
@@ -51,10 +55,8 @@ void BookmarkNavigationController::OnNavigationCompleted(BookmarkItem *bookmarkF
 	}
 }
 
-BookmarkHistoryEntry::BookmarkHistoryEntry(const std::wstring &guid) :
-	m_guid(guid)
+BookmarkHistoryEntry::BookmarkHistoryEntry(const std::wstring &guid) : m_guid(guid)
 {
-
 }
 
 std::wstring BookmarkHistoryEntry::getGuid() const

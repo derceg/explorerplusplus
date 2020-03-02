@@ -11,18 +11,18 @@
 
 HRESULT Explorerplusplus::ExpandAndBrowsePath(const TCHAR *szPath)
 {
-	return ExpandAndBrowsePath(szPath,FALSE,FALSE);
+	return ExpandAndBrowsePath(szPath, FALSE, FALSE);
 }
 
 /* Browses to the specified path. The path may
 have any environment variables expanded (if
 necessary). */
-HRESULT Explorerplusplus::ExpandAndBrowsePath(const TCHAR *szPath, BOOL bOpenInNewTab, BOOL bSwitchToNewTab)
+HRESULT Explorerplusplus::ExpandAndBrowsePath(
+	const TCHAR *szPath, BOOL bOpenInNewTab, BOOL bSwitchToNewTab)
 {
 	TCHAR szExpandedPath[MAX_PATH];
 
-	MyExpandEnvironmentStrings(szPath,
-		szExpandedPath,SIZEOF_ARRAY(szExpandedPath));
+	MyExpandEnvironmentStrings(szPath, szExpandedPath, SIZEOF_ARRAY(szExpandedPath));
 
 	if (bOpenInNewTab)
 	{

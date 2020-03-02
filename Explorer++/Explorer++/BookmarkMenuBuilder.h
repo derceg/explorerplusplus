@@ -13,7 +13,6 @@
 class BookmarkMenuBuilder
 {
 public:
-
 	// Maps menu item IDs to bookmark items. Note that IDs will only be set for
 	// bookmarks (and not bookmark folders).
 	using ItemIdMap = std::unordered_map<int, BookmarkItem *>;
@@ -21,7 +20,8 @@ public:
 	// Maps menu item positions to bookmark items. Works for both bookmarks and
 	// bookmark folders.
 	using MenuPositionPair = std::pair<HMENU, int>;
-	using ItemPositionMap = std::unordered_map<MenuPositionPair, BookmarkItem *, boost::hash<MenuPositionPair>>;
+	using ItemPositionMap =
+		std::unordered_map<MenuPositionPair, BookmarkItem *, boost::hash<MenuPositionPair>>;
 
 	BookmarkMenuBuilder(HMODULE resourceModule);
 
@@ -29,15 +29,14 @@ public:
 		int startPosition, ItemIdMap &itemIdMap, ItemPositionMap *itemPositionMap = nullptr);
 
 private:
-
 	BOOL BuildMenu(HMENU menu, BookmarkItem *bookmarkItem, int startPosition, ItemIdMap &itemIdMap,
 		ItemPositionMap *itemPositionMap);
-	BOOL AddEmptyBookmarkFolderToMenu(HMENU menu, BookmarkItem *bookmarkItem, int position,
-		ItemPositionMap *itemPositionMap);
+	BOOL AddEmptyBookmarkFolderToMenu(
+		HMENU menu, BookmarkItem *bookmarkItem, int position, ItemPositionMap *itemPositionMap);
 	BOOL AddBookmarkFolderToMenu(HMENU menu, BookmarkItem *bookmarkItem, int position,
 		ItemIdMap &itemIdMap, ItemPositionMap *itemPositionMap);
-	BOOL AddBookmarkToMenu(HMENU menu, BookmarkItem *bookmarkItem, int position, ItemIdMap &itemIdMap,
-		ItemPositionMap *itemPositionMap);
+	BOOL AddBookmarkToMenu(HMENU menu, BookmarkItem *bookmarkItem, int position,
+		ItemIdMap &itemIdMap, ItemPositionMap *itemPositionMap);
 
 	HMODULE m_resourceModule;
 	MenuIdRange m_menuIdRange;

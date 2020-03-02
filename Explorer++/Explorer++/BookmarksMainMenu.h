@@ -16,20 +16,20 @@ __interface IExplorerplusplus;
 class BookmarksMainMenu
 {
 public:
-
-	BookmarksMainMenu(IExplorerplusplus *expp, BookmarkTree *bookmarkTree,
-		const MenuIdRange &menuIdRange);
+	BookmarksMainMenu(
+		IExplorerplusplus *expp, BookmarkTree *bookmarkTree, const MenuIdRange &menuIdRange);
 	~BookmarksMainMenu();
 
 	void OnMenuItemClicked(int menuItemId);
 
 private:
-
 	void OnMainMenuPreShow(HMENU mainMenu);
 	wil::unique_hmenu BuildMainBookmarksMenu(std::vector<wil::unique_hbitmap> &menuImages,
 		BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings);
-	void AddBookmarkItemsToMenu(HMENU menu, int position, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings);
-	void AddOtherBookmarksToMenu(HMENU menu, int position, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings);
+	void AddBookmarkItemsToMenu(
+		HMENU menu, int position, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings);
+	void AddOtherBookmarksToMenu(
+		HMENU menu, int position, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings);
 
 	IExplorerplusplus *m_expp;
 	BookmarkTree *m_bookmarkTree;

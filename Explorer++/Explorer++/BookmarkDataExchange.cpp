@@ -13,12 +13,13 @@
 
 FORMATETC BookmarkDataExchange::GetFormatEtc()
 {
-	static FORMATETC formatEtc = { static_cast<CLIPFORMAT>(BookmarkClipboard::GetClipboardFormat()), nullptr,
-		DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+	static FORMATETC formatEtc = { static_cast<CLIPFORMAT>(BookmarkClipboard::GetClipboardFormat()),
+		nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 	return formatEtc;
 }
 
-wil::com_ptr<IDataObject> BookmarkDataExchange::CreateDataObject(const OwnedRefBookmarkItems &bookmarkItems)
+wil::com_ptr<IDataObject> BookmarkDataExchange::CreateDataObject(
+	const OwnedRefBookmarkItems &bookmarkItems)
 {
 	FORMATETC formatEtc = GetFormatEtc();
 
