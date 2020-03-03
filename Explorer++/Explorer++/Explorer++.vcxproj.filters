@@ -214,40 +214,40 @@
     <ClCompile Include="ScriptingDialog.cpp">
       <Filter>General Dialogs</Filter>
     </ClCompile>
-    <ClCompile Include="LuaPlugin.cpp">
+    <ClCompile Include="Plugins\LuaPlugin.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
-    <ClCompile Include="ApiBinding.cpp">
+    <ClCompile Include="Plugins\ApiBinding.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
-    <ClCompile Include="MenuApi.cpp">
+    <ClCompile Include="Plugins\MenuApi.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
-    <ClCompile Include="PluginMenuManager.cpp">
+    <ClCompile Include="Plugins\PluginMenuManager.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
-    <ClCompile Include="Manifest.cpp">
+    <ClCompile Include="Plugins\Manifest.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
-    <ClCompile Include="PluginManager.cpp">
+    <ClCompile Include="Plugins\PluginManager.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
     <ClCompile Include="PluginInitialization.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="UiApi.cpp">
+    <ClCompile Include="Plugins\UiApi.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
     <ClCompile Include="UiTheming.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="AcceleratorParser.cpp">
+    <ClCompile Include="Plugins\AcceleratorParser.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
     <ClCompile Include="MainRebar.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="PluginCommandManager.cpp">
+    <ClCompile Include="Plugins\PluginCommandManager.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
     <ClCompile Include="PluginInterface.cpp">
@@ -259,28 +259,28 @@
     <ClCompile Include="Tab.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
-    <ClCompile Include="Event.cpp">
+    <ClCompile Include="Plugins\Event.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
-    <ClCompile Include="TabsApi.cpp">
+    <ClCompile Include="Plugins\TabsApi\TabsApi.cpp">
       <Filter>Plugins\TabsApi</Filter>
     </ClCompile>
-    <ClCompile Include="TabCreated.cpp">
+    <ClCompile Include="Plugins\TabsApi\Events\TabCreated.cpp">
       <Filter>Plugins\TabsApi\Events</Filter>
     </ClCompile>
-    <ClCompile Include="TabMoved.cpp">
+    <ClCompile Include="Plugins\TabsApi\Events\TabMoved.cpp">
       <Filter>Plugins\TabsApi\Events</Filter>
     </ClCompile>
-    <ClCompile Include="TabRemoved.cpp">
+    <ClCompile Include="Plugins\TabsApi\Events\TabRemoved.cpp">
       <Filter>Plugins\TabsApi\Events</Filter>
     </ClCompile>
-    <ClCompile Include="CommandInvoked.cpp">
+    <ClCompile Include="Plugins\CommandApi\Events\CommandInvoked.cpp">
       <Filter>Plugins\CommandApi\Events</Filter>
     </ClCompile>
-    <ClCompile Include="TabUpdated.cpp">
+    <ClCompile Include="Plugins\TabsApi\Events\TabUpdated.cpp">
       <Filter>Plugins\TabsApi\Events</Filter>
     </ClCompile>
-    <ClCompile Include="TabProperties.cpp">
+    <ClCompile Include="Plugins\TabsApi\TabProperties.cpp">
       <Filter>Plugins\TabsApi</Filter>
     </ClCompile>
     <ClCompile Include="AddressBar.cpp">
@@ -597,40 +597,40 @@
     <ClInclude Include="ScriptingDialog.h">
       <Filter>General Dialogs</Filter>
     </ClInclude>
-    <ClInclude Include="LuaPlugin.h">
+    <ClInclude Include="Plugins\LuaPlugin.h">
       <Filter>Plugins</Filter>
     </ClInclude>
-    <ClInclude Include="ApiBinding.h">
+    <ClInclude Include="Plugins\ApiBinding.h">
       <Filter>Plugins</Filter>
     </ClInclude>
     <ClInclude Include="Tab.h">
       <Filter>Tabs</Filter>
     </ClInclude>
-    <ClInclude Include="MenuApi.h">
+    <ClInclude Include="Plugins\MenuApi.h">
       <Filter>Plugins</Filter>
     </ClInclude>
-    <ClInclude Include="PluginMenuManager.h">
+    <ClInclude Include="Plugins\PluginMenuManager.h">
       <Filter>Plugins</Filter>
     </ClInclude>
-    <ClInclude Include="Manifest.h">
+    <ClInclude Include="Plugins\Manifest.h">
       <Filter>Plugins</Filter>
     </ClInclude>
-    <ClInclude Include="PluginManager.h">
+    <ClInclude Include="Plugins\PluginManager.h">
       <Filter>Plugins</Filter>
     </ClInclude>
-    <ClInclude Include="UiApi.h">
+    <ClInclude Include="Plugins\UiApi.h">
       <Filter>Plugins</Filter>
     </ClInclude>
     <ClInclude Include="UiTheming.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="AcceleratorParser.h">
+    <ClInclude Include="Plugins\AcceleratorParser.h">
       <Filter>Plugins</Filter>
     </ClInclude>
     <ClInclude Include="Accelerator.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="PluginCommandManager.h">
+    <ClInclude Include="Plugins\PluginCommandManager.h">
       <Filter>Plugins</Filter>
     </ClInclude>
     <ClInclude Include="MenuRanges.h">
@@ -642,31 +642,31 @@
     <ClInclude Include="FileProgressSink.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Event.h">
+    <ClInclude Include="Plugins\Event.h">
       <Filter>Plugins</Filter>
     </ClInclude>
-    <ClInclude Include="TabsApi.h">
+    <ClInclude Include="Plugins\TabsApi\TabsApi.h">
       <Filter>Plugins\TabsApi</Filter>
     </ClInclude>
-    <ClInclude Include="TabCreated.h">
+    <ClInclude Include="Plugins\TabsApi\Events\TabCreated.h">
       <Filter>Plugins\TabsApi\Events</Filter>
     </ClInclude>
-    <ClInclude Include="TabMoved.h">
+    <ClInclude Include="Plugins\TabsApi\Events\TabMoved.h">
       <Filter>Plugins\TabsApi\Events</Filter>
     </ClInclude>
-    <ClInclude Include="TabRemoved.h">
+    <ClInclude Include="Plugins\TabsApi\Events\TabRemoved.h">
       <Filter>Plugins\TabsApi\Events</Filter>
     </ClInclude>
-    <ClInclude Include="CommandInvoked.h">
+    <ClInclude Include="Plugins\CommandApi\Events\CommandInvoked.h">
       <Filter>Plugins\CommandApi\Events</Filter>
     </ClInclude>
-    <ClInclude Include="TabUpdated.h">
+    <ClInclude Include="Plugins\TabsApi\Events\TabUpdated.h">
       <Filter>Plugins\TabsApi\Events</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowser\FolderSettings.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="TabProperties.h">
+    <ClInclude Include="Plugins\TabsApi\TabProperties.h">
       <Filter>Plugins\TabsApi</Filter>
     </ClInclude>
     <ClInclude Include="BetterEnumsWrapper.h">

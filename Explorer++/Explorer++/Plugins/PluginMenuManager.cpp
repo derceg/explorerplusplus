@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "PluginMenuManager.h"
+#include "Plugins/PluginMenuManager.h"
 #include "MainResource.h"
 #include <boost/iterator/counting_iterator.hpp>
 

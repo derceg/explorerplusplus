@@ -3,9 +3,9 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "Manifest.h"
+#include "Plugins/Manifest.h"
 #include "AcceleratorMappings.h"
-#include "AcceleratorParser.h"
+#include "Plugins/AcceleratorParser.h"
 #include "../Helper/StringHelper.h"
 #include <boost/filesystem.hpp>
 #include <fstream>

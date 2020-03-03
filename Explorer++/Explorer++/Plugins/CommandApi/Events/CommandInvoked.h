@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "Event.h"
-#include "PluginCommandManager.h"
+#include "Plugins/Event.h"
+#include "Plugins/PluginCommandManager.h"
 
 namespace Plugins
 {

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "PluginMenuManager.h"
+#include "Plugins/PluginMenuManager.h"
 #include "../ThirdParty/Sol/forward.hpp"
 #include <boost/signals2.hpp>
 #include <optional>

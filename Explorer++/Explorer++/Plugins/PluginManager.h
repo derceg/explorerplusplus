@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "LuaPlugin.h"
+#include "Plugins/LuaPlugin.h"
 #include "PluginInterface.h"
 
 namespace boost

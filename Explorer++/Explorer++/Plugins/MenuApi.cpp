@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "MenuApi.h"
+#include "Plugins/MenuApi.h"
 #include "../ThirdParty/Sol/sol.hpp"
 
 Plugins::MenuApi::MenuApi(PluginMenuManager *pluginMenuManager) :

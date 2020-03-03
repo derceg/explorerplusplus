@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "TabRemoved.h"
+#include "Plugins/TabsApi/Events/TabRemoved.h"
 #include "TabContainer.h"
 #include "../ThirdParty/Sol/sol.hpp"
 

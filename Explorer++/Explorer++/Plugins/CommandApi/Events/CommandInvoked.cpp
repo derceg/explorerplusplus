@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "CommandInvoked.h"
+#include "Plugins/CommandApi/Events/CommandInvoked.h"
 #include "../ThirdParty/Sol/sol.hpp"
 
 Plugins::CommandInvoked::CommandInvoked(PluginCommandManager *pluginCommandManager, int pluginId) :

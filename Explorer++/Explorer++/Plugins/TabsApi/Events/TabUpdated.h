@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Event.h"
+#include "Plugins/Event.h"
 #include "Tab.h"
 
 class TabContainer;

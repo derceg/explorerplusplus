@@ -6,7 +6,7 @@
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
 #include "MenuHelper.h"
-#include "PluginManager.h"
+#include "Plugins/PluginManager.h"
 #include "../Helper/ProcessHelper.h"
 #include <boost/filesystem.hpp>
 

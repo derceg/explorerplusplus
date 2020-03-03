@@ -1,7 +1,7 @@
 #pragma once
 
-#include "LuaPlugin.h"
 #include "PluginInterface.h"
+#include "Plugins/LuaPlugin.h"
 #include "../Helper/BaseDialog.h"
 
 class ScriptingDialog : public BaseDialog

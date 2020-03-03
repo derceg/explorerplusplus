@@ -3,8 +3,8 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "PluginCommandManager.h"
-#include "Manifest.h"
+#include "Plugins/PluginCommandManager.h"
+#include "Plugins/Manifest.h"
 #include <boost/algorithm/string.hpp>
 
 Plugins::PluginCommandManager::PluginCommandManager(HACCEL *acceleratorTable, int startId, int endId) :

@@ -13,7 +13,7 @@
 #include "MainResource.h"
 #include "MainToolbar.h"
 #include "Navigation.h"
-#include "PluginManager.h"
+#include "Plugins/PluginManager.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/ViewModes.h"

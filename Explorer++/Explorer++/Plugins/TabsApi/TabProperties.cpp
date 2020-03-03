@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "TabProperties.h"
+#include "Plugins/TabsApi/TabProperties.h"
 
 const char Plugins::TabConstants::LOCATION[] = "location";
 const char Plugins::TabConstants::NAME[] = "name";

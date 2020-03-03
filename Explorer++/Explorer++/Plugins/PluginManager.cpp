@@ -3,10 +3,10 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "PluginManager.h"
+#include "Plugins/PluginManager.h"
 #include "AcceleratorUpdater.h"
-#include "Manifest.h"
-#include "PluginCommandManager.h"
+#include "Plugins/Manifest.h"
+#include "Plugins/PluginCommandManager.h"
 #include "../ThirdParty/Sol/forward.hpp"
 #include <boost/filesystem.hpp>
 

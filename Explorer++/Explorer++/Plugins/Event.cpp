@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "Event.h"
+#include "Plugins/Event.h"
 #include "../ThirdParty/Sol/sol.hpp"
 
 Plugins::Event::Event() :

@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "ScriptingDialog.h"
 #include "MainResource.h"
-#include "Manifest.h"
+#include "Plugins/Manifest.h"
 #include "../Helper/StringHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/algorithm/string.hpp>

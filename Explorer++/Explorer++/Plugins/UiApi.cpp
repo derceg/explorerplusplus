@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "UiApi.h"
+#include "Plugins/UiApi.h"
 #include "UiTheming.h"
 #include "../Helper/Rgb.h"
 

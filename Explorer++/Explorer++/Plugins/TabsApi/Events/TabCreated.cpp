@@ -3,9 +3,9 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "TabCreated.h"
+#include "Plugins/TabsApi/Events/TabCreated.h"
+#include "Plugins/TabsApi/TabsApi.h"
 #include "TabContainer.h"
-#include "TabsApi.h"
 #include "../ThirdParty/Sol/sol.hpp"
 
 Plugins::TabCreated::TabCreated(TabContainer *tabContainer) :

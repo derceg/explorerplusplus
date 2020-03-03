@@ -3,16 +3,16 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "TabsApi.h"
+#include "Plugins/TabsApi/TabsApi.h"
 #include "Config.h"
 #include "CoreInterface.h"
 #include "Navigation.h"
+#include "Plugins/TabsApi/TabProperties.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/SortModes.h"
 #include "TabContainer.h"
-#include "TabProperties.h"
 #include "../ThirdParty/Sol/sol.hpp"
 
 Plugins::TabsApi::FolderSettings::FolderSettings(const ShellBrowser &shellBrowser)

@@ -10,7 +10,7 @@
 #include "Config.h"
 #include "Explorer++_internal.h"
 #include "MenuRanges.h"
-#include "PluginManager.h"
+#include "Plugins/PluginManager.h"
 #include "TabRestorerUI.h"
 #include "UiTheming.h"
 #include "../Helper/iDirectoryMonitor.h"

@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "AcceleratorParser.h"
+#include "Plugins/AcceleratorParser.h"
 #include <boost/algorithm/string.hpp>
 
 const std::wstring KEY_CTRL = L"Ctrl";

@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "Manifest.h"
 #include "PluginInterface.h"
+#include "Plugins/Manifest.h"
 #include "../ThirdParty/Sol/forward.hpp"
 
 namespace Plugins

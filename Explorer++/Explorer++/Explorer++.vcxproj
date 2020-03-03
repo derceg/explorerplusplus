@@ -198,7 +198,7 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\UI\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\UI\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\CommandApi\Events\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\TabsApi\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\TabsApi\Events\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-LLVM|Win32'">
@@ -251,7 +251,7 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\UI\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\UI\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\CommandApi\Events\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\TabsApi\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\TabsApi\Events\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -304,7 +304,7 @@
       </AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\UI\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\UI\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\CommandApi\Events\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\TabsApi\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\TabsApi\Events\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-LLVM|x64'">
@@ -358,7 +358,7 @@
       </AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\UI\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\UI\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\CommandApi\Events\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\TabsApi\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\TabsApi\Events\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -404,7 +404,7 @@
       </AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\UI\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\UI\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\CommandApi\Events\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\TabsApi\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\TabsApi\Events\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -452,16 +452,16 @@
       </AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\UI\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
+      <Command>lib /NOLOGO /OUT:"$(TargetPath).lib" "$(ProjectDir)$(Platform)\$(Configuration)\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Bookmarks\UI\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\DisplayWindow\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\CommandApi\Events\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\TabsApi\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\Plugins\TabsApi\Events\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellBrowser\*.obj" "$(ProjectDir)$(Platform)\$(Configuration)\ShellTreeView\*.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AboutDialog.cpp" />
-    <ClCompile Include="AcceleratorParser.cpp" />
+    <ClCompile Include="Plugins\AcceleratorParser.cpp" />
     <ClCompile Include="AcceleratorUpdater.cpp" />
     <ClCompile Include="Bookmarks\UI\AddBookmarkDialog.cpp" />
     <ClCompile Include="AddressBar.cpp" />
-    <ClCompile Include="ApiBinding.cpp" />
+    <ClCompile Include="Plugins\ApiBinding.cpp" />
     <ClCompile Include="ApplicationToolbar.cpp" />
     <ClCompile Include="ApplicationToolbarButtonDialog.cpp" />
     <ClCompile Include="ApplicationToolbarDropHandler.cpp" />
@@ -498,7 +498,7 @@
     <ClCompile Include="Bookmarks\UI\BookmarkTreeView.cpp" />
     <ClCompile Include="ColorRuleDialog.cpp" />
     <ClCompile Include="ColorRuleHelper.cpp" />
-    <ClCompile Include="CommandInvoked.cpp" />
+    <ClCompile Include="Plugins\CommandApi\Events\CommandInvoked.cpp" />
     <ClCompile Include="CommandLine.cpp" />
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="CustomizeColorsDialog.cpp" />
@@ -507,7 +507,7 @@
     <ClCompile Include="DisplayColoursDialog.cpp" />
     <ClCompile Include="DisplayWindow.cpp" />
     <ClCompile Include="DrivesToolbar.cpp" />
-    <ClCompile Include="Event.cpp" />
+    <ClCompile Include="Plugins\Event.cpp" />
     <ClCompile Include="EventSwitcher.cpp" />
     <ClCompile Include="Explorer++.cpp" />
     <ClCompile Include="FileSelectionTests.cpp" />
@@ -532,24 +532,24 @@
     <ClCompile Include="ListViewEdit.cpp" />
     <ClCompile Include="ListViewHandler.cpp" />
     <ClCompile Include="Logging.cpp" />
-    <ClCompile Include="LuaPlugin.cpp" />
+    <ClCompile Include="Plugins\LuaPlugin.cpp" />
     <ClCompile Include="MainMenuHandler.cpp" />
     <ClCompile Include="MainRebar.cpp" />
     <ClCompile Include="MainToolbar.cpp" />
     <ClCompile Include="MainWndSwitch.cpp" />
     <ClCompile Include="Bookmarks\UI\ManageBookmarksDialog.cpp" />
-    <ClCompile Include="Manifest.cpp" />
+    <ClCompile Include="Plugins\Manifest.cpp" />
     <ClCompile Include="MassRenameDialog.cpp" />
-    <ClCompile Include="MenuApi.cpp" />
+    <ClCompile Include="Plugins\MenuApi.cpp" />
     <ClCompile Include="MergeFilesDialog.cpp" />
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="MsgHandler.cpp" />
     <ClCompile Include="Navigation.cpp" />
     <ClCompile Include="OptionsDialog.cpp" />
-    <ClCompile Include="PluginCommandManager.cpp" />
+    <ClCompile Include="Plugins\PluginCommandManager.cpp" />
     <ClCompile Include="PluginInitialization.cpp" />
-    <ClCompile Include="PluginManager.cpp" />
-    <ClCompile Include="PluginMenuManager.cpp" />
+    <ClCompile Include="Plugins\PluginManager.cpp" />
+    <ClCompile Include="Plugins\PluginMenuManager.cpp" />
     <ClCompile Include="FileProgressSink.cpp" />
     <ClCompile Include="RegistrySettings.cpp" />
     <ClCompile Include="RenameTabDialog.cpp" />
@@ -593,20 +593,20 @@
     <ClCompile Include="Tab.cpp" />
     <ClCompile Include="TabBackingHandler.cpp" />
     <ClCompile Include="TabContainer.cpp" />
-    <ClCompile Include="TabCreated.cpp" />
+    <ClCompile Include="Plugins\TabsApi\Events\TabCreated.cpp" />
     <ClCompile Include="TabDropHandler.cpp" />
     <ClCompile Include="TabHandler.cpp" />
-    <ClCompile Include="TabMoved.cpp" />
-    <ClCompile Include="TabProperties.cpp" />
-    <ClCompile Include="TabRemoved.cpp" />
+    <ClCompile Include="Plugins\TabsApi\Events\TabMoved.cpp" />
+    <ClCompile Include="Plugins\TabsApi\TabProperties.cpp" />
+    <ClCompile Include="Plugins\TabsApi\Events\TabRemoved.cpp" />
     <ClCompile Include="TabRestorer.cpp" />
     <ClCompile Include="TabRestorerUI.cpp" />
-    <ClCompile Include="TabsApi.cpp" />
-    <ClCompile Include="TabUpdated.cpp" />
+    <ClCompile Include="Plugins\TabsApi\TabsApi.cpp" />
+    <ClCompile Include="Plugins\TabsApi\Events\TabUpdated.cpp" />
     <ClCompile Include="TaskbarThumbnails.cpp" />
     <ClCompile Include="UiTheming.cpp" />
     <ClCompile Include="TreeViewHandler.cpp" />
-    <ClCompile Include="UiApi.cpp" />
+    <ClCompile Include="Plugins\UiApi.cpp" />
     <ClCompile Include="UpdateCheckDialog.cpp" />
     <ClCompile Include="WildcardSelectDialog.cpp" />
     <ClCompile Include="WindowHandler.cpp" />
@@ -618,11 +618,11 @@
     <ClInclude Include="AboutDialog.h" />
     <ClInclude Include="Accelerator.h" />
     <ClInclude Include="AcceleratorMappings.h" />
-    <ClInclude Include="AcceleratorParser.h" />
+    <ClInclude Include="Plugins\AcceleratorParser.h" />
     <ClInclude Include="AcceleratorUpdater.h" />
     <ClInclude Include="Bookmarks\UI\AddBookmarkDialog.h" />
     <ClInclude Include="AddressBar.h" />
-    <ClInclude Include="ApiBinding.h" />
+    <ClInclude Include="Plugins\ApiBinding.h" />
     <ClInclude Include="ApplicationToolbar.h" />
     <ClInclude Include="ApplicationToolbarButtonDialog.h" />
     <ClInclude Include="ApplicationToolbarDropHandler.h" />
@@ -648,7 +648,7 @@
     <ClInclude Include="Bookmarks\BookmarkXmlStorage.h" />
     <ClInclude Include="ColorRuleDialog.h" />
     <ClInclude Include="ColorRuleHelper.h" />
-    <ClInclude Include="CommandInvoked.h" />
+    <ClInclude Include="Plugins\CommandApi\Events\CommandInvoked.h" />
     <ClInclude Include="CommandLine.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="CoreInterface.h" />
@@ -661,7 +661,7 @@
     <ClInclude Include="DisplayWindow\DisplayWindow.h" />
     <ClInclude Include="DrivesToolbar.h" />
     <ClInclude Include="BetterEnumsWrapper.h" />
-    <ClInclude Include="Event.h" />
+    <ClInclude Include="Plugins\Event.h" />
     <ClInclude Include="Explorer++.h" />
     <ClInclude Include="Explorer++VersionInfo.h" />
     <ClInclude Include="Explorer++_internal.h" />
@@ -684,14 +684,14 @@
     <ClInclude Include="LoadSaveRegistry.h" />
     <ClInclude Include="LoadSaveXml.h" />
     <ClInclude Include="Logging.h" />
-    <ClInclude Include="LuaPlugin.h" />
+    <ClInclude Include="Plugins\LuaPlugin.h" />
     <ClInclude Include="MainResource.h" />
     <ClInclude Include="MainToolbar.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Bookmarks\UI\ManageBookmarksDialog.h" />
-    <ClInclude Include="Manifest.h" />
+    <ClInclude Include="Plugins\Manifest.h" />
     <ClInclude Include="MassRenameDialog.h" />
-    <ClInclude Include="MenuApi.h" />
+    <ClInclude Include="Plugins\MenuApi.h" />
     <ClInclude Include="MenuHelper.h" />
     <ClInclude Include="MenuRanges.h" />
     <ClInclude Include="MergeFilesDialog.h" />
@@ -701,10 +701,10 @@
     <ClInclude Include="NoTranslationResource.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="OptionsDialog.h" />
-    <ClInclude Include="PluginCommandManager.h" />
+    <ClInclude Include="Plugins\PluginCommandManager.h" />
     <ClInclude Include="PluginInterface.h" />
-    <ClInclude Include="PluginManager.h" />
-    <ClInclude Include="PluginMenuManager.h" />
+    <ClInclude Include="Plugins\PluginManager.h" />
+    <ClInclude Include="Plugins\PluginMenuManager.h" />
     <ClInclude Include="FileProgressSink.h" />
     <ClInclude Include="PreservedTab.h" />
     <ClInclude Include="RegistrySettings.h" />
@@ -737,20 +737,20 @@
     <ClInclude Include="Tab.h" />
     <ClInclude Include="TabBacking.h" />
     <ClInclude Include="TabContainer.h" />
-    <ClInclude Include="TabCreated.h" />
+    <ClInclude Include="Plugins\TabsApi\Events\TabCreated.h" />
     <ClInclude Include="TabDropHandler.h" />
-    <ClInclude Include="TabMoved.h" />
+    <ClInclude Include="Plugins\TabsApi\Events\TabMoved.h" />
     <ClInclude Include="TabNavigationInterface.h" />
-    <ClInclude Include="TabProperties.h" />
-    <ClInclude Include="TabRemoved.h" />
+    <ClInclude Include="Plugins\TabsApi\TabProperties.h" />
+    <ClInclude Include="Plugins\TabsApi\Events\TabRemoved.h" />
     <ClInclude Include="TabRestorer.h" />
     <ClInclude Include="TabRestorerUI.h" />
-    <ClInclude Include="TabsApi.h" />
-    <ClInclude Include="TabUpdated.h" />
+    <ClInclude Include="Plugins\TabsApi\TabsApi.h" />
+    <ClInclude Include="Plugins\TabsApi\Events\TabUpdated.h" />
     <ClInclude Include="TaskbarThumbnails.h" />
     <ClInclude Include="UiTheming.h" />
     <ClInclude Include="ToolbarButtons.h" />
-    <ClInclude Include="UiApi.h" />
+    <ClInclude Include="Plugins\UiApi.h" />
     <ClInclude Include="UpdateCheckDialog.h" />
     <ClInclude Include="ValueWrapper.h" />
     <ClInclude Include="ViewModeHelper.h" />

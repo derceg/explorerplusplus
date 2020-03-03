@@ -3,8 +3,8 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "LuaPlugin.h"
-#include "ApiBinding.h"
+#include "Plugins/LuaPlugin.h"
+#include "Plugins/ApiBinding.h"
 #include "../ThirdParty/Sol/sol.hpp"
 
 int Plugins::LuaPlugin::idCounter = 1;
