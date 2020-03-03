@@ -374,6 +374,31 @@ TEST_F(ShellNavigationControllerTest, NavigationMode) {
 	ASSERT_HRESULT_SUCCEEDED(hr);
 }
 
+TEST_F(ShellNavigationControllerTest, NavigationModeFirstNavigation) {
+	m_navigationController.SetNavigationMode(ShellNavigationController::NavigationMode::ForceNewTab);
+
+	unique_pidl_absolute pidl1(SHSimpleIDListFromPath(L"C:\\Fake1"));
+	ASSERT_TRUE(pidl1);
+
+	// The first navigation in a tab should always take place within that tab, regardless of the
+	// navigation mode in effect.
+	EXPECT_CALL(m_navigator, BrowseFolderImpl(pidl1.get(), _));
+	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
+
+	HRESULT hr = m_navigationController.BrowseFolder(pidl1.get());
+	ASSERT_HRESULT_SUCCEEDED(hr);
+
+	unique_pidl_absolute pidl2(SHSimpleIDListFromPath(L"C:\\Fake2"));
+	ASSERT_TRUE(pidl2);
+
+	// Subsequent navigations should then open in a new tab when necessary.
+	EXPECT_CALL(m_navigator, BrowseFolderImpl).Times(0);
+	EXPECT_CALL(m_tabNavigation, CreateNewTab(pidl2.get(), _));
+
+	hr = m_navigationController.BrowseFolder(pidl2.get());
+	ASSERT_HRESULT_SUCCEEDED(hr);
+}
+
 TEST_F(ShellNavigationControllerPreservedTest, FirstIndexIsCurrent) {
 	SetUp(0);
 
