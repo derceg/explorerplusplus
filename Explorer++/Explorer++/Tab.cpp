@@ -32,8 +32,8 @@ Tab::Tab(IExplorerplusplus *expp, TabNavigationInterface *tabNavigation,
 	}
 
 	m_shellBrowser = ShellBrowser::CreateNew(m_id, expp->GetLanguageModule(),
-		expp->GetMainWindow(), expp->GetCachedIcons(), expp->GetConfig(), tabNavigation,
-		folderSettingsFinal, initialColumns);
+		expp->GetMainWindow(), expp->GetCachedIcons(), expp->GetIconResourceLoader(),
+		expp->GetConfig(), tabNavigation, folderSettingsFinal, initialColumns);
 }
 
 Tab::Tab(const PreservedTab &preservedTab, IExplorerplusplus *expp, TabNavigationInterface *tabNavigation) :
@@ -43,8 +43,8 @@ Tab::Tab(const PreservedTab &preservedTab, IExplorerplusplus *expp, TabNavigatio
 	m_lockState(preservedTab.lockState)
 {
 	m_shellBrowser = ShellBrowser::CreateFromPreserved(m_id, expp->GetLanguageModule(),
-		expp->GetMainWindow(), expp->GetCachedIcons(), expp->GetConfig(),
-		tabNavigation, preservedTab.history, preservedTab.currentEntry,
+		expp->GetMainWindow(), expp->GetCachedIcons(), expp->GetIconResourceLoader(),
+		expp->GetConfig(), tabNavigation, preservedTab.history, preservedTab.currentEntry,
 		preservedTab.preservedFolderState);
 }
 

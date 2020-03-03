@@ -292,6 +292,7 @@ private:
 	void					HideTabBar() override;
 	HRESULT					RestoreTabs(ILoadSave *pLoadSave);
 	void					OnTabListViewSelectionChanged(const Tab &tab);
+	void					OnTabColumnsChanged(const Tab &tab);
 
 	/* TabNavigationInterface methods. */
 	HRESULT					CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected) override;

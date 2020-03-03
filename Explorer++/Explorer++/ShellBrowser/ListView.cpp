@@ -8,6 +8,7 @@
 #include "ItemData.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "SelectColumnsDialog.h"
 #include "SetFileAttributesDialog.h"
 #include "ShellNavigationController.h"
 #include "../Helper/CachedIcons.h"
@@ -751,12 +752,33 @@ std::vector<unsigned int> GetColumnHeaderMenuList(const std::wstring &directory)
 void ShellBrowser::OnListViewHeaderMenuItemSelected(int menuItemId,
 	const std::unordered_map<int, UINT> &menuItemMappings)
 {
+	if (menuItemId == IDM_HEADER_MORE)
+	{
+		OnShowMoreColumnsSelected();
+	}
+	else
+	{
+		OnColumnMenuItemSelected(menuItemId, menuItemMappings);
+	}
+}
+
+void ShellBrowser::OnShowMoreColumnsSelected()
+{
+	SelectColumnsDialog selectColumnsDialog(
+		m_hResourceModule, m_hListView, this, m_iconResourceLoader);
+	selectColumnsDialog.ShowModalDialog();
+}
+
+void ShellBrowser::OnColumnMenuItemSelected(
+	int menuItemId, const std::unordered_map<int, UINT> &menuItemMappings)
+{
 	auto currentColumns = ExportCurrentColumns();
 
 	UINT columnId = menuItemMappings.at(menuItemId);
-	auto itr = std::find_if(currentColumns.begin(), currentColumns.end(), [columnId] (const Column_t &column) {
-		return column.id == columnId;
-	});
+	auto itr = std::find_if(
+		currentColumns.begin(), currentColumns.end(), [columnId](const Column_t &column) {
+			return column.id == columnId;
+		});
 
 	if (itr == currentColumns.end())
 	{

@@ -1379,11 +1379,6 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		OnToolbarViews();
 		break;
 
-		/* Listview column header context menu. */
-	case IDM_HEADER_MORE:
-		OnSelectColumns();
-		break;
-
 		/* Display window menus. */
 	case IDM_DW_HIDEDISPLAYWINDOW:
 		m_config->showDisplayWindow = FALSE;

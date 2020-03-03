@@ -33,6 +33,7 @@ struct BasicItemInfo_t;
 class CachedIcons;
 struct Config;
 class IconFetcher;
+class IconResourceLoader;
 struct PreservedFolderState;
 struct PreservedHistoryEntry;
 class ShellNavigationController;
@@ -58,11 +59,13 @@ class ShellBrowser : public IDropTarget, public IDropFilesCallback, public Navig
 public:
 
 	static ShellBrowser *CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner,
-		CachedIcons *cachedIcons, const Config *config, TabNavigationInterface *tabNavigation,
-		const FolderSettings &folderSettings, std::optional<FolderColumns> initialColumns);
+		CachedIcons *cachedIcons, IconResourceLoader *iconResourceLoader, const Config *config,
+		TabNavigationInterface *tabNavigation, const FolderSettings &folderSettings,
+		std::optional<FolderColumns> initialColumns);
 
 	static ShellBrowser *CreateFromPreserved(int id, HINSTANCE resourceInstance, HWND hOwner,
-		CachedIcons *cachedIcons, const Config *config, TabNavigationInterface *tabNavigation,
+		CachedIcons *cachedIcons, IconResourceLoader *iconResourceLoader, const Config *config,
+		TabNavigationInterface *tabNavigation,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 		const PreservedFolderState &preservedFolderState);
 
@@ -167,6 +170,7 @@ public:
 
 	// Signals
 	SignalWrapper<ShellBrowser, void()> listViewSelectionChanged;
+	SignalWrapper<ShellBrowser, void()> columnsChanged;
 
 private:
 
@@ -275,11 +279,13 @@ private:
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
 
 	ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
-		const Config *config, TabNavigationInterface *tabNavigation,
+		IconResourceLoader *iconResourceLoader, const Config *config,
+		TabNavigationInterface *tabNavigation,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 		const PreservedFolderState &preservedFolderState);
 	ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
-		const Config *config, TabNavigationInterface *tabNavigation, const FolderSettings &folderSettings,
+		IconResourceLoader *iconResourceLoader, const Config *config,
+		TabNavigationInterface *tabNavigation, const FolderSettings &folderSettings,
 		std::optional<FolderColumns> initialColumns);
 	~ShellBrowser();
 
@@ -328,8 +334,12 @@ private:
 	void				OnListViewItemChanged(const NMLISTVIEW *changeData);
 	void				UpdateFileSelectionInfo(int internalIndex, BOOL Selected);
 	void				OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown);
+
+	// Listview header context menu
 	void				OnListViewHeaderRightClick(const POINTS &cursorPos);
 	void				OnListViewHeaderMenuItemSelected(int menuItemId, const std::unordered_map<int, UINT> &menuItemMappings);
+	void				OnShowMoreColumnsSelected();
+	void				OnColumnMenuItemSelected(int menuItemId, const std::unordered_map<int, UINT> &menuItemMappings);
 
 	ItemInfo_t			&GetItemByIndex(int index);
 	int					GetItemInternalIndex(int item) const;
@@ -472,6 +482,8 @@ private:
 
 	std::unique_ptr<IconFetcher> m_iconFetcher;
 	CachedIcons			*m_cachedIcons;
+
+	IconResourceLoader	*m_iconResourceLoader;
 
 	ctpl::thread_pool	m_thumbnailThreadPool;
 	std::unordered_map<int, std::future<std::optional<ThumbnailResult_t>>> m_thumbnailResults;

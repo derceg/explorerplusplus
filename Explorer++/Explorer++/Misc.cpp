@@ -338,10 +338,9 @@ int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize)
 
 void Explorerplusplus::OnSelectColumns()
 {
-	SelectColumnsDialog selectColumnsDialog(m_hLanguageModule, m_hContainer, this, m_tabContainer);
+	SelectColumnsDialog selectColumnsDialog(m_hLanguageModule, m_hContainer,
+		m_tabContainer->GetSelectedTab().GetShellBrowser(), m_iconResourceLoader.get());
 	selectColumnsDialog.ShowModalDialog();
-
-	UpdateSortMenuItems(m_tabContainer->GetSelectedTab());
 }
 
 StatusBar *Explorerplusplus::GetStatusBar()

@@ -4,14 +4,12 @@
 
 #include "stdafx.h"
 #include "SelectColumnsDialog.h"
-#include "CoreInterface.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/Columns.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "TabContainer.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include <algorithm>
@@ -19,11 +17,11 @@
 
 const TCHAR SelectColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SelectColumns");
 
-SelectColumnsDialog::SelectColumnsDialog(HINSTANCE hInstance, HWND hParent,
-	IExplorerplusplus *pexpp, TabContainer *tabContainer) :
+SelectColumnsDialog::SelectColumnsDialog(
+	HINSTANCE hInstance, HWND hParent, ShellBrowser *shellBrowser, IconResourceLoader *iconResourceLoader) :
 	BaseDialog(hInstance, IDD_SELECTCOLUMNS, hParent, true),
-	m_pexpp(pexpp),
-	m_tabContainer(tabContainer),
+	m_shellBrowser(shellBrowser),
+	m_iconResourceLoader(iconResourceLoader),
 	m_bColumnsSwapped(FALSE)
 {
 	m_persistentSettings = &SelectColumnsDialogPersistentSettings::GetInstance();
@@ -41,7 +39,7 @@ INT_PTR SelectColumnsDialog::OnInitDialog()
 	lvColumn.mask = 0;
 	ListView_InsertColumn(hListView,0,&lvColumn);
 
-	auto currentColumns = m_pexpp->GetActiveShellBrowser()->ExportCurrentColumns();
+	auto currentColumns = m_shellBrowser->ExportCurrentColumns();
 
 	std::sort(currentColumns.begin(), currentColumns.end(),
 		std::bind(&SelectColumnsDialog::CompareColumns, this, std::placeholders::_1, std::placeholders::_2));
@@ -79,7 +77,7 @@ INT_PTR SelectColumnsDialog::OnInitDialog()
 
 wil::unique_hicon SelectColumnsDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_pexpp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::SelectColumns, iconWidth, iconHeight);
+	return m_iconResourceLoader->LoadIconFromPNGAndScale(Icon::SelectColumns, iconWidth, iconHeight);
 }
 
 bool SelectColumnsDialog::CompareColumns(const Column_t &column1, const Column_t &column2)
@@ -245,7 +243,7 @@ void SelectColumnsDialog::OnOk()
 	HWND hListView = GetDlgItem(m_hDlg,IDC_COLUMNS_LISTVIEW);
 	std::vector<Column_t> updatedColumns;
 
-	auto currentColumns = m_pexpp->GetActiveShellBrowser()->ExportCurrentColumns();
+	auto currentColumns = m_shellBrowser->ExportCurrentColumns();
 
 	for(int i = 0;i < ListView_GetItemCount(hListView);i++)
 	{
@@ -266,12 +264,11 @@ void SelectColumnsDialog::OnOk()
 		updatedColumns.push_back(Column);
 	}
 
-	m_pexpp->GetActiveShellBrowser()->ImportColumns(updatedColumns);
+	m_shellBrowser->ImportColumns(updatedColumns);
 
 	if(m_bColumnsSwapped)
 	{
-		Tab &selectedTab = m_tabContainer->GetSelectedTab();
-		selectedTab.GetShellBrowser()->GetNavigationController()->Refresh();
+		m_shellBrowser->GetNavigationController()->Refresh();
 	}
 
 	EndDialog(m_hDlg,1);

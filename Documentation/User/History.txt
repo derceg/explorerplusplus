@@ -69,6 +69,9 @@ Bug fixes:
   year/month boundaries weren't being taken into account. This
   meant that a date would only be shown as "Yesterday" if it was
   in the same month/year as the current date. Fixed.
+- When adding or removing a column via the listview header
+  context menu, the sort by/group by menus wouldn't be updated.
+  Fixed.
 - When opening the set file attributes dialog, the creation date
   shown was incorrect. Fixed.
 - The set file attributes dialog wasn't correctly handling the

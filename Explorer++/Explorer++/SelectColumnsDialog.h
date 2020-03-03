@@ -9,9 +9,9 @@
 #include "../Helper/ResizableDialog.h"
 
 struct Column_t;
-__interface IExplorerplusplus;
+class IconResourceLoader;
 class SelectColumnsDialog;
-class TabContainer;
+class ShellBrowser;
 
 class SelectColumnsDialogPersistentSettings : public DialogSettings
 {
@@ -35,8 +35,8 @@ class SelectColumnsDialog : public BaseDialog
 {
 public:
 
-	SelectColumnsDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp,
-		TabContainer *tabContainer);
+	SelectColumnsDialog(HINSTANCE hInstance, HWND hParent, ShellBrowser *shellBrowser,
+		IconResourceLoader *iconResourceLoader);
 
 protected:
 
@@ -60,8 +60,8 @@ private:
 	void	OnLvnItemChanged(const NMLISTVIEW *pnmlv);
 	void	OnMoveColumn(bool bUp);
 
-	IExplorerplusplus *m_pexpp;
-	TabContainer *m_tabContainer;
+	ShellBrowser *m_shellBrowser;
+	IconResourceLoader *m_iconResourceLoader;
 	BOOL m_bColumnsSwapped;
 
 	SelectColumnsDialogPersistentSettings *m_persistentSettings;

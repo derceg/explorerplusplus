@@ -988,6 +988,10 @@ HRESULT TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 		tabListViewSelectionChanged.m_signal(tab);
 	});
 
+	tab.GetShellBrowser()->columnsChanged.AddObserver([this, &tab]() {
+		tabColumnsChanged.m_signal(tab);
+	});
+
 	HRESULT hr = tab.GetShellBrowser()->GetNavigationController()->BrowseFolder(pidlDirectory, addHistoryEntry);
 
 	if (hr != S_OK)

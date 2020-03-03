@@ -65,40 +65,45 @@ ULONG __stdcall ShellBrowser::Release(void)
 }
 
 ShellBrowser *ShellBrowser::CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner,
-	CachedIcons *cachedIcons, const Config *config, TabNavigationInterface *tabNavigation,
-	const FolderSettings &folderSettings, std::optional<FolderColumns> initialColumns)
+	CachedIcons *cachedIcons, IconResourceLoader *iconResourceLoader, const Config *config,
+	TabNavigationInterface *tabNavigation, const FolderSettings &folderSettings,
+	std::optional<FolderColumns> initialColumns)
 {
-	return new ShellBrowser(id, resourceInstance, hOwner, cachedIcons, config, tabNavigation,
-		folderSettings, initialColumns);
+	return new ShellBrowser(id, resourceInstance, hOwner, cachedIcons, iconResourceLoader, config,
+		tabNavigation, folderSettings, initialColumns);
 }
 
 ShellBrowser *ShellBrowser::CreateFromPreserved(int id, HINSTANCE resourceInstance, HWND hOwner,
-	CachedIcons *cachedIcons, const Config *config, TabNavigationInterface *tabNavigation,
+	CachedIcons *cachedIcons, IconResourceLoader *iconResourceLoader, const Config *config,
+	TabNavigationInterface *tabNavigation,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState)
 {
-	return new ShellBrowser(id, resourceInstance, hOwner, cachedIcons, config, tabNavigation,
-		history, currentEntry, preservedFolderState);
+	return new ShellBrowser(id, resourceInstance, hOwner, cachedIcons, iconResourceLoader, config,
+		tabNavigation, history, currentEntry, preservedFolderState);
 }
 
 ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
-	CachedIcons *cachedIcons, const Config *config, TabNavigationInterface *tabNavigation,
+	CachedIcons *cachedIcons, IconResourceLoader *iconResourceLoader, const Config *config,
+	TabNavigationInterface *tabNavigation,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState) :
-	ShellBrowser(id, resourceInstance, hOwner, cachedIcons, config, tabNavigation,
+	ShellBrowser(id, resourceInstance, hOwner, cachedIcons, iconResourceLoader, config, tabNavigation,
 		preservedFolderState.folderSettings, std::nullopt)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(this, tabNavigation, m_iconFetcher.get(),
 		history, currentEntry);
 }
 
-ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
-	const Config *config, TabNavigationInterface *tabNavigation, const FolderSettings &folderSettings,
+ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
+	CachedIcons *cachedIcons, IconResourceLoader *iconResourceLoader, const Config *config,
+	TabNavigationInterface *tabNavigation, const FolderSettings &folderSettings,
 	std::optional<FolderColumns> initialColumns) :
 	m_ID(id),
 	m_hResourceModule(resourceInstance),
 	m_hOwner(hOwner),
 	m_cachedIcons(cachedIcons),
+	m_iconResourceLoader(iconResourceLoader),
 	m_config(config),
 	m_tabNavigation(tabNavigation),
 	m_folderSettings(folderSettings),

@@ -1071,6 +1071,8 @@ void ShellBrowser::ImportColumns(const std::vector<Column_t> &columns)
 	}
 
 	m_bColumnsPlaced = FALSE;
+
+	columnsChanged.m_signal();
 }
 
 void ShellBrowser::GetColumnInternal(unsigned int id, Column_t *pci) const
