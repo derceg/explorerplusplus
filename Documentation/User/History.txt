@@ -105,6 +105,10 @@ Misc:
   Explorer++ from the command line with the --help flag. Each of
   the available options is listed and briefly described. The
   names of some of the options have also been updated.
+- Starting a command prompt via the file menu opens a command
+  prompt in the current directory. Starting an admin command
+  prompt now does the same thing (rather than opening in the
+  default directory).
 - The format used to display dates has been updated. Previously,
   the date and time were separated by a comma. Now, they're
   separated by a space.
