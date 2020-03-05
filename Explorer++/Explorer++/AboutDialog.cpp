@@ -5,10 +5,12 @@
 #include "stdafx.h"
 #include "AboutDialog.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "Version.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
+#include <boost/format.hpp>
 
 AboutDialog::AboutDialog(HINSTANCE hInstance, HWND hParent) :
 	BaseDialog(hInstance, IDD_ABOUT, hParent, false)
@@ -27,35 +29,23 @@ INT_PTR AboutDialog::OnInitDialog()
 	m_mainIcon.reset(static_cast<HICON>(LoadImage(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_MAIN), IMAGE_ICON, 48, 48, LR_DEFAULTCOLOR)));
 	SendDlgItemMessage(m_hDlg, IDC_ABOUT_STATIC_IMAGE, STM_SETICON, reinterpret_cast<WPARAM>(m_mainIcon.get()), 0);
 
-	TCHAR szVersion[64];
-	TCHAR szBuild[64];
-	TCHAR szBuildDate[64];
-	TCHAR szTemp[64];
+	std::wstring versionTemplate = ResourceHelper::LoadString(GetInstance(), IDS_ABOUT_VERSION);
+	std::wstring platform;
 
-	/* Indicate which architecture (32-bit or
-	64-bit) we are building for in the version
-	string.*/
+	// Indicate which platform (32-bit or 64-bit) we are building for in the version string.
 #ifdef WIN64
-	LoadString(GetInstance(),IDS_ABOUT_64BIT_BUILD,
-		szBuild,SIZEOF_ARRAY(szBuild));
+	platform = ResourceHelper::LoadString(GetInstance(), IDS_ABOUT_64BIT_BUILD);
 #else
-	LoadString(GetInstance(),IDS_ABOUT_32BIT_BUILD,
-		szBuild,SIZEOF_ARRAY(szBuild));
+	platform = ResourceHelper::LoadString(GetInstance(), IDS_ABOUT_32BIT_BUILD);
 #endif
 
-	LoadString(GetInstance(),IDS_ABOUT_UNICODE_BUILD,
-		szTemp,SIZEOF_ARRAY(szTemp));
-	StringCchCat(szBuild,SIZEOF_ARRAY(szBuild),_T(" "));
-	StringCchCat(szBuild,SIZEOF_ARRAY(szBuild),szTemp);
+	std::wstring version = (boost::wformat(versionTemplate) % VERSION_STRING_W % platform).str();
 
-	GetDlgItemText(m_hDlg,IDC_STATIC_VERSIONNUMBER,szTemp,SIZEOF_ARRAY(szTemp));
-	StringCchPrintf(szVersion,SIZEOF_ARRAY(szVersion),szTemp,VERSION_STRING_W,szBuild);
-	SetDlgItemText(m_hDlg,IDC_STATIC_VERSIONNUMBER,szVersion);
+	std::wstring buildDateTemplate = ResourceHelper::LoadString(GetInstance(), IDS_ABOUT_BUILD_DATE);
+	std::wstring buildDate = (boost::wformat(buildDateTemplate) % BUILD_DATE_STRING).str();
 
-	GetDlgItemText(m_hDlg,IDC_STATIC_BUILDDATE,szTemp,SIZEOF_ARRAY(szTemp));
-	StringCchPrintf(szBuildDate,SIZEOF_ARRAY(szBuildDate),szTemp,BUILD_DATE_STRING);
-
-	SetDlgItemText(m_hDlg,IDC_STATIC_BUILDDATE,szBuildDate);
+	std::wstring versionInfo = version + L"\r\n\r\n" + buildDate;
+	SetDlgItemText(m_hDlg, IDC_VERSION_INFORMATION, versionInfo.c_str());
 
 	CenterWindow(GetParent(m_hDlg),m_hDlg);
 
