@@ -27,6 +27,7 @@
 #include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/Logging.h"
 #include "../Helper/Macros.h"
+#include "../Helper/MenuHelper.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
@@ -1291,6 +1292,8 @@ void Explorerplusplus::OnNdwRClick(POINT *pt)
 
 		if(hPopupMenu != nullptr)
 		{
+			lCheckMenuItem(hPopupMenu, IDM_DISPLAYWINDOW_VERTICAL, m_config->displayWindowVertical);
+
 			POINT ptCopy = *pt;
 			BOOL bRes = ClientToScreen(m_hDisplayWindow, &ptCopy);
 
