@@ -54,6 +54,8 @@ public:
 	void DeleteSelection();
 
 	std::vector<Column> GetColumns();
+	void ToggleColumn(ColumnType columnType);
+	wil::unique_hmenu BuildColumnsMenu();
 	BookmarkHelper::SortMode GetSortMode() const;
 	void SetSortMode(BookmarkHelper::SortMode sortMode);
 	bool GetSortAscending() const;
@@ -98,7 +100,6 @@ private:
 	void OnRename();
 
 	void OnHeaderRClick(const POINT &pt);
-	wil::unique_hmenu BuildHeaderContextMenu();
 	void OnHeaderContextMenuItemSelected(int menuItemId);
 
 	void OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t index);

@@ -87,7 +87,11 @@ private:
 	LRESULT HandleMenuOrAccelerator(WPARAM wParam);
 
 	void OnTbnDropDown(NMTOOLBAR *nmtb);
+
+	// View menu
 	void ShowViewMenu();
+	void SetViewMenuItemStates(HMENU menu);
+	void OnViewMenuItemSelected(int menuItemId);
 
 	// Organize menu
 	void ShowOrganizeMenu();

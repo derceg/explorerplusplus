@@ -242,34 +242,6 @@ LRESULT ManageBookmarksDialog::HandleMenuOrAccelerator(WPARAM wParam)
 		ShowViewMenu();
 		break;
 
-	case IDM_MB_VIEW_SORT_BY_DEFAULT:
-		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::Name);
-		break;
-
-	case IDM_MB_VIEW_SORTBYNAME:
-		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::Name);
-		break;
-
-	case IDM_MB_VIEW_SORTBYLOCATION:
-		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::Location);
-		break;
-
-	case IDM_MB_VIEW_SORTBYADDED:
-		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::DateCreated);
-		break;
-
-	case IDM_MB_VIEW_SORTBYLASTMODIFIED:
-		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::DateModified);
-		break;
-
-	case IDM_MB_VIEW_SORTASCENDING:
-		m_bookmarkListView->SetSortAscending(true);
-		break;
-
-	case IDM_MB_VIEW_SORTDESCENDING:
-		m_bookmarkListView->SetSortAscending(false);
-		break;
-
 	case IDOK:
 		OnOk();
 		break;
@@ -310,69 +282,168 @@ void ManageBookmarksDialog::OnTbnDropDown(NMTOOLBAR *nmtb)
 
 void ManageBookmarksDialog::ShowViewMenu()
 {
-	DWORD dwButtonState = static_cast<DWORD>(
-		SendMessage(m_hToolbar, TB_GETSTATE, TOOLBAR_ID_VIEWS, MAKEWORD(TBSTATE_PRESSED, 0)));
-	SendMessage(
-		m_hToolbar, TB_SETSTATE, TOOLBAR_ID_VIEWS, MAKEWORD(dwButtonState | TBSTATE_PRESSED, 0));
+	wil::unique_hmenu parentMenu(
+		LoadMenu(GetInstance(), MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_VIEW_MENU)));
 
-	HMENU hMenu = LoadMenu(GetInstance(), MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_VIEW_MENU));
+	if (!parentMenu)
+	{
+		return;
+	}
 
-	UINT uCheck;
+	HMENU menu = GetSubMenu(parentMenu.get(), 0);
+
+	auto columnsMenu = m_bookmarkListView->BuildColumnsMenu();
+
+	if (!columnsMenu)
+	{
+		return;
+	}
+
+	lEnableMenuItem(columnsMenu.get(), static_cast<UINT>(BookmarkListView::ColumnType::Name), FALSE);
+
+	MENUITEMINFO mii;
+	mii.cbSize = sizeof(mii);
+	mii.fMask = MIIM_SUBMENU;
+	mii.hSubMenu = columnsMenu.get();
+	SetMenuItemInfo(menu, IDM_POPUP_SHOW_COLUMNS, FALSE, &mii);
+
+	// As the columns menu is now part of the parent views menu, it will be destroyed when the
+	// parent menu is destroyed.
+	columnsMenu.release();
+
+	SetViewMenuItemStates(menu);
+
+	RECT rc;
+	BOOL res = static_cast<BOOL>(
+		SendMessage(m_hToolbar, TB_GETRECT, TOOLBAR_ID_VIEWS, reinterpret_cast<LPARAM>(&rc)));
+
+	if (!res)
+	{
+		return;
+	}
+
+	POINT pt;
+	pt.x = rc.left;
+	pt.y = rc.bottom;
+	res = ClientToScreen(m_hToolbar, &pt);
+
+	if (!res)
+	{
+		return;
+	}
+
+	SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_VIEWS, MAKEWORD(TRUE, 0));
+
+	int menuItemId =
+		TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RETURNCMD, pt.x, pt.y, 0, m_hDlg, nullptr);
+
+	if (menuItemId != 0)
+	{
+		OnViewMenuItemSelected(menuItemId);
+	}
+
+	SendMessage(m_hToolbar, TB_PRESSBUTTON, TOOLBAR_ID_VIEWS, MAKEWORD(FALSE, 0));
+}
+
+void ManageBookmarksDialog::SetViewMenuItemStates(HMENU menu)
+{
+	UINT itemToCheck;
 
 	switch (m_bookmarkListView->GetSortMode())
 	{
 	case BookmarkHelper::SortMode::Default:
-		uCheck = IDM_MB_VIEW_SORT_BY_DEFAULT;
+		itemToCheck = IDM_MB_VIEW_SORT_BY_DEFAULT;
 		break;
 
 	case BookmarkHelper::SortMode::Name:
-		uCheck = IDM_MB_VIEW_SORTBYNAME;
+		itemToCheck = IDM_MB_VIEW_SORTBYNAME;
 		break;
 
 	case BookmarkHelper::SortMode::Location:
-		uCheck = IDM_MB_VIEW_SORTBYLOCATION;
+		itemToCheck = IDM_MB_VIEW_SORTBYLOCATION;
 		break;
 
 	case BookmarkHelper::SortMode::DateCreated:
-		uCheck = IDM_MB_VIEW_SORTBYADDED;
+		itemToCheck = IDM_MB_VIEW_SORTBYADDED;
 		break;
 
 	case BookmarkHelper::SortMode::DateModified:
-		uCheck = IDM_MB_VIEW_SORTBYLASTMODIFIED;
+		itemToCheck = IDM_MB_VIEW_SORTBYLASTMODIFIED;
 		break;
 
 	default:
-		uCheck = IDM_MB_VIEW_SORT_BY_DEFAULT;
+		itemToCheck = IDM_MB_VIEW_SORT_BY_DEFAULT;
 		break;
 	}
 
 	CheckMenuRadioItem(
-		hMenu, IDM_MB_VIEW_SORTBYNAME, IDM_MB_VIEW_SORT_BY_DEFAULT, uCheck, MF_BYCOMMAND);
+		menu, IDM_MB_VIEW_SORTBYNAME, IDM_MB_VIEW_SORT_BY_DEFAULT, itemToCheck, MF_BYCOMMAND);
 
 	if (m_bookmarkListView->GetSortAscending())
 	{
-		uCheck = IDM_MB_VIEW_SORTASCENDING;
+		itemToCheck = IDM_MB_VIEW_SORTASCENDING;
 	}
 	else
 	{
-		uCheck = IDM_MB_VIEW_SORTDESCENDING;
+		itemToCheck = IDM_MB_VIEW_SORTDESCENDING;
 	}
 
 	CheckMenuRadioItem(
-		hMenu, IDM_MB_VIEW_SORTASCENDING, IDM_MB_VIEW_SORTDESCENDING, uCheck, MF_BYCOMMAND);
+		menu, IDM_MB_VIEW_SORTASCENDING, IDM_MB_VIEW_SORTDESCENDING, itemToCheck, MF_BYCOMMAND);
+}
 
-	RECT rcButton;
-	SendMessage(m_hToolbar, TB_GETRECT, TOOLBAR_ID_VIEWS, reinterpret_cast<LPARAM>(&rcButton));
+void ManageBookmarksDialog::OnViewMenuItemSelected(int menuItemId)
+{
+	switch (menuItemId)
+	{
+	case static_cast<int>(BookmarkListView::ColumnType::Name):
+		m_bookmarkListView->ToggleColumn(BookmarkListView::ColumnType::Name);
+		break;
 
-	POINT pt;
-	pt.x = rcButton.left;
-	pt.y = rcButton.bottom;
-	ClientToScreen(m_hToolbar, &pt);
+	case static_cast<int>(BookmarkListView::ColumnType::Location):
+		m_bookmarkListView->ToggleColumn(BookmarkListView::ColumnType::Location);
+		break;
 
-	TrackPopupMenu(GetSubMenu(hMenu, 0), TPM_LEFTALIGN, pt.x, pt.y, 0, m_hDlg, nullptr);
-	DestroyMenu(hMenu);
+	case static_cast<int>(BookmarkListView::ColumnType::DateCreated):
+		m_bookmarkListView->ToggleColumn(BookmarkListView::ColumnType::DateCreated);
+		break;
 
-	SendMessage(m_hToolbar, TB_SETSTATE, TOOLBAR_ID_VIEWS, MAKEWORD(dwButtonState, 0));
+	case static_cast<int>(BookmarkListView::ColumnType::DateModified):
+		m_bookmarkListView->ToggleColumn(BookmarkListView::ColumnType::DateModified);
+		break;
+
+	case IDM_MB_VIEW_SORT_BY_DEFAULT:
+		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::Name);
+		break;
+
+	case IDM_MB_VIEW_SORTBYNAME:
+		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::Name);
+		break;
+
+	case IDM_MB_VIEW_SORTBYLOCATION:
+		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::Location);
+		break;
+
+	case IDM_MB_VIEW_SORTBYADDED:
+		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::DateCreated);
+		break;
+
+	case IDM_MB_VIEW_SORTBYLASTMODIFIED:
+		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::DateModified);
+		break;
+
+	case IDM_MB_VIEW_SORTASCENDING:
+		m_bookmarkListView->SetSortAscending(true);
+		break;
+
+	case IDM_MB_VIEW_SORTDESCENDING:
+		m_bookmarkListView->SetSortAscending(false);
+		break;
+
+	default:
+		assert(false);
+		break;
+	}
 }
 
 void ManageBookmarksDialog::ShowOrganizeMenu()
@@ -475,6 +546,10 @@ void ManageBookmarksDialog::OnOrganizeMenuItemSelected(int menuItemId)
 
 	case IDM_MB_ORGANIZE_SELECTALL:
 		OnSelectAll();
+		break;
+
+	default:
+		assert(false);
 		break;
 	}
 }

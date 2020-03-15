@@ -713,10 +713,6 @@
 #define ID_SORT_SORTBYVISITCOUNT        40462
 #define ID_SORT_SORTBYADDED             40463
 #define ID_SORT_SORTBYLASTMODIFIED      40464
-#define ID_SHOWCOLUMNS_NAME             40465
-#define ID_SHOWCOLUMNS_LOCATION         40466
-#define ID_SHOWCOLUMNS_ADDED            40469
-#define ID_SHOWCOLUMNS_LASTMODIFIED     40470
 #define ID_POPUP_NEWBOOKMARK40471       40471
 #define ID_POPUP_NEWFOLD                40472
 #define ID_POPUP_NEWSEPARATOR           40473
@@ -778,6 +774,7 @@
 #define IDM_MB_ORGANIZE_COPY            40540
 #define IDM_MB_ORGANIZE_PASTE           40541
 #define IDM_DISPLAYWINDOW_VERTICAL      40542
+#define IDM_POPUP_SHOW_COLUMNS          40543
 #define IDM_SORTBY_NAME                 50000
 #define IDM_SORTBY_SIZE                 50001
 #define IDM_SORTBY_TYPE                 50002
@@ -916,7 +913,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        325
-#define _APS_NEXT_COMMAND_VALUE         40543
+#define _APS_NEXT_COMMAND_VALUE         40544
 #define _APS_NEXT_CONTROL_VALUE         1329
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
