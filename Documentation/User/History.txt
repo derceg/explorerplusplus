@@ -9,6 +9,8 @@ New features:
 - Settings are now automatically saved every 30 seconds. This
   helps to prevent recent tabs or other settings from being lost
   if the application crashes.
+- The display window can now be displayed on the right.
+  Previously, it was always displayed at the bottom.
 - Support for the "Date Deleted" and "Original Location" recycle
   bin columns has been implemented.
 - When renaming a file, it's possible to move to the next item by
