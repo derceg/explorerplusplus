@@ -242,7 +242,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		{
 			POINT pt;
 			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-			OnNdwRClick(&pt);
+			OnDisplayWindowRClick(&pt);
 		}
 		break;
 
@@ -250,7 +250,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		{
 			POINT pt;
 			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-			OnNdwIconRClick(&pt);
+			OnDisplayWindowIconRClick(&pt);
 		}
 		break;
 

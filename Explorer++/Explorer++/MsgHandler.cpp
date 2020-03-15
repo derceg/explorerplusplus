@@ -33,6 +33,7 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/range/adaptor/map.hpp>
+#include <wil/resource.h>
 #include <algorithm>
 
 /* The treeview is offset by a small
@@ -1275,37 +1276,43 @@ void Explorerplusplus::ShowMainRebarBand(HWND hwnd,BOOL bShow)
 	}
 }
 
-void Explorerplusplus::OnNdwIconRClick(POINT *pt)
+void Explorerplusplus::OnDisplayWindowIconRClick(POINT *ptClient)
 {
-	POINT ptCopy = *pt;
-	ClientToScreen(m_hDisplayWindow,&ptCopy);
-	OnListViewRClick(&ptCopy);
+	POINT ptScreen = *ptClient;
+	BOOL res = ClientToScreen(m_hDisplayWindow, &ptScreen);
+
+	if (!res)
+	{
+		return;
+	}
+
+	OnListViewRClick(&ptScreen);
 }
 
-void Explorerplusplus::OnNdwRClick(POINT *pt)
+void Explorerplusplus::OnDisplayWindowRClick(POINT *ptClient)
 {
-	HMENU hMenu = LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_DISPLAYWINDOW_RCLICK));
+	wil::unique_hmenu parentMenu(
+		LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_DISPLAYWINDOW_RCLICK)));
 
-	if(hMenu != nullptr)
+	if (!parentMenu)
 	{
-		HMENU hPopupMenu = GetSubMenu(hMenu, 0);
-
-		if(hPopupMenu != nullptr)
-		{
-			lCheckMenuItem(hPopupMenu, IDM_DISPLAYWINDOW_VERTICAL, m_config->displayWindowVertical);
-
-			POINT ptCopy = *pt;
-			BOOL bRes = ClientToScreen(m_hDisplayWindow, &ptCopy);
-
-			if(bRes)
-			{
-				TrackPopupMenu(hPopupMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL,
-					ptCopy.x, ptCopy.y, 0, m_hContainer, nullptr);
-			}
-		}
-
-		DestroyMenu(hMenu);
+		return;
 	}
+
+	HMENU menu = GetSubMenu(parentMenu.get(), 0);
+
+	lCheckMenuItem(menu, IDM_DISPLAYWINDOW_VERTICAL, m_config->displayWindowVertical);
+
+	POINT ptScreen = *ptClient;
+	BOOL res = ClientToScreen(m_hDisplayWindow, &ptScreen);
+
+	if (!res)
+	{
+		return;
+	}
+
+	TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL, ptScreen.x, ptScreen.y, 0,
+		m_hContainer, nullptr);
 }
 
 LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)

@@ -178,7 +178,6 @@ private:
 	void OnSetFocus();
 	LRESULT OnDeviceChange(WPARAM wParam, LPARAM lParam);
 	LRESULT StatusBarMenuSelect(WPARAM wParam, LPARAM lParam);
-	void OnDisplayWindowResized(WPARAM wParam);
 	void OnStartedBrowsing(int iTabId, const TCHAR *szPath);
 	void OnPreviousWindow();
 	void OnNextWindow();
@@ -187,8 +186,6 @@ private:
 	void OnDirectoryModified(int iTabId);
 	void OnIdaRClick();
 	void OnAssocChanged();
-	void OnNdwRClick(POINT *pt);
-	void OnNdwIconRClick(POINT *pt);
 	LRESULT OnCustomDraw(LPARAM lParam);
 	void OnSelectTabByIndex(int iTab);
 
@@ -457,7 +454,10 @@ private:
 
 	HRESULT GetTreeViewSelectionAttributes(SFGAOF *pItemAttributes) const;
 
-	/* Display window file information. */
+	/* Display window. */
+	void OnDisplayWindowResized(WPARAM wParam);
+	void OnDisplayWindowIconRClick(POINT *ptClient);
+	void OnDisplayWindowRClick(POINT *ptClient);
 	void UpdateDisplayWindow(const Tab &tab);
 	void UpdateDisplayWindowForZeroFiles(const Tab &tab);
 	void UpdateDisplayWindowForOneFile(const Tab &tab);
