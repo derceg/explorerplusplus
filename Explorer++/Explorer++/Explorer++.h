@@ -424,7 +424,7 @@ private:
 	void OpenItem(const TCHAR *szItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow) override;
 	void OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow) override;
 	void OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
-	void OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters) override;
+	void OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters, bool RunAsAdmin) override;
 	HRESULT OnListViewCopy(BOOL bCopy);
 
 	/* File context menu. */
