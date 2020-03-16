@@ -10,6 +10,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "TabContainer.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
@@ -50,14 +51,13 @@ void Explorerplusplus::AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
 
 	if(AddNewTabMenuItem)
 	{
-		MENUITEMINFO mii;
-		TCHAR szTemp[64];
+		std::wstring openInNewTabText = ResourceHelper::LoadString(m_hLanguageModule, IDS_GENERAL_OPEN_IN_NEW_TAB);
 
-		LoadString(m_hLanguageModule,IDS_GENERAL_OPEN_IN_NEW_TAB,szTemp,SIZEOF_ARRAY(szTemp));
+		MENUITEMINFO mii;
 		mii.cbSize		= sizeof(mii);
 		mii.fMask		= MIIM_STRING|MIIM_ID;
 		mii.wID			= MENU_OPEN_IN_NEW_TAB;
-		mii.dwTypeData	= szTemp;
+		mii.dwTypeData	= openInNewTabText.data();
 		InsertMenuItem(hMenu,1,TRUE,&mii);
 	}
 }

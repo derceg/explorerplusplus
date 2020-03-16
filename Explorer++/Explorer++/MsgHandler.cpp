@@ -14,6 +14,7 @@
 #include "MainToolbar.h"
 #include "Navigation.h"
 #include "Plugins/PluginManager.h"
+#include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/ViewModes.h"
@@ -546,9 +547,8 @@ int Explorerplusplus::OnClose()
 {
 	if(m_config->confirmCloseTabs && (m_tabContainer->GetNumTabs() > 1))
 	{
-		TCHAR szTemp[128];
-		LoadString(m_hLanguageModule,IDS_GENERAL_CLOSE_ALL_TABS,szTemp,SIZEOF_ARRAY(szTemp));
-		int response = MessageBox(m_hContainer,szTemp,NExplorerplusplus::APP_NAME,MB_ICONINFORMATION|MB_YESNO);
+		std::wstring message = ResourceHelper::LoadString(m_hLanguageModule,IDS_GENERAL_CLOSE_ALL_TABS);
+		int response = MessageBox(m_hContainer,message.c_str(),NExplorerplusplus::APP_NAME,MB_ICONINFORMATION|MB_YESNO);
 
 		/* If the user clicked no, return without
 		closing. */

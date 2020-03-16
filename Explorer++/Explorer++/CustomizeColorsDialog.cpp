@@ -36,25 +36,20 @@ INT_PTR CustomizeColorsDialog::OnInitDialog()
 		LVS_EX_DOUBLEBUFFER|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES,
 		LVS_EX_DOUBLEBUFFER|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES);
 
-	TCHAR szTemp[128];
-
-	LoadString(GetInstance(),IDS_CUSTOMIZE_COLORS_COLUMN_DESCRIPTION,
-		szTemp,SIZEOF_ARRAY(szTemp));
+	std::wstring text = ResourceHelper::LoadString(GetInstance(),IDS_CUSTOMIZE_COLORS_COLUMN_DESCRIPTION);
 	LVCOLUMN lvColumn;
 	lvColumn.mask		= LVCF_TEXT;
-	lvColumn.pszText	= szTemp;
+	lvColumn.pszText	= text.data();
 	ListView_InsertColumn(hListView,0,&lvColumn);
 
-	LoadString(GetInstance(),IDS_CUSTOMIZE_COLORS_COLUMN_FILENAME_PATTERN,
-		szTemp,SIZEOF_ARRAY(szTemp));
+	text = ResourceHelper::LoadString(GetInstance(),IDS_CUSTOMIZE_COLORS_COLUMN_FILENAME_PATTERN);
 	lvColumn.mask		= LVCF_TEXT;
-	lvColumn.pszText	= szTemp;
+	lvColumn.pszText	= text.data();
 	ListView_InsertColumn(hListView,1,&lvColumn);
 
-	LoadString(GetInstance(),IDS_CUSTOMIZE_COLORS_COLUMN_ATTRIBUTES,
-		szTemp,SIZEOF_ARRAY(szTemp));
+	text = ResourceHelper::LoadString(GetInstance(),IDS_CUSTOMIZE_COLORS_COLUMN_ATTRIBUTES);
 	lvColumn.mask		= LVCF_TEXT;
-	lvColumn.pszText	= szTemp;
+	lvColumn.pszText	= text.data();
 	ListView_InsertColumn(hListView,2,&lvColumn);
 
 	RECT rc;
@@ -333,11 +328,9 @@ void CustomizeColorsDialog::OnDelete()
 
 	if(iSelected != -1)
 	{
-		TCHAR szInfoMsg[128];
-		LoadString(GetInstance(),IDS_COLORRULE_DELETE,
-			szInfoMsg,SIZEOF_ARRAY(szInfoMsg));
+		std::wstring deleteMessage = ResourceHelper::LoadString(GetInstance(),IDS_COLORRULE_DELETE);
 
-		int iRes = MessageBox(m_hDlg,szInfoMsg,
+		int iRes = MessageBox(m_hDlg,deleteMessage.c_str(),
 			NExplorerplusplus::APP_NAME,MB_YESNO|MB_ICONINFORMATION|MB_DEFBUTTON2);
 
 		if(iRes == IDYES)

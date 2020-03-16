@@ -12,6 +12,7 @@
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "Navigation.h"
+#include "ResourceHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
@@ -112,46 +113,45 @@ void ManageBookmarksDialog::SetupToolbar()
 	SendMessage(m_hToolbar, TB_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(m_imageListToolbar.get()));
 
 	TBBUTTON tbb;
-	TCHAR szTemp[64];
 
-	LoadString(GetInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_BACK, szTemp, SIZEOF_ARRAY(szTemp));
+	std::wstring text = ResourceHelper::LoadString(GetInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_BACK);
 
 	tbb.iBitmap = m_imageListToolbarMappings.at(Icon::Back);
 	tbb.idCommand = TOOLBAR_ID_BACK;
 	tbb.fsState = TBSTATE_ENABLED;
 	tbb.fsStyle = BTNS_BUTTON | BTNS_AUTOSIZE;
 	tbb.dwData = 0;
-	tbb.iString = reinterpret_cast<INT_PTR>(szTemp);
+	tbb.iString = reinterpret_cast<INT_PTR>(text.c_str());
 	SendMessage(m_hToolbar, TB_INSERTBUTTON, 0, reinterpret_cast<LPARAM>(&tbb));
 
-	LoadString(GetInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_FORWARD, szTemp, SIZEOF_ARRAY(szTemp));
+	text = ResourceHelper::LoadString(GetInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_FORWARD);
 
 	tbb.iBitmap = m_imageListToolbarMappings.at(Icon::Forward);
 	tbb.idCommand = TOOLBAR_ID_FORWARD;
 	tbb.fsState = TBSTATE_ENABLED;
 	tbb.fsStyle = BTNS_BUTTON | BTNS_AUTOSIZE;
 	tbb.dwData = 0;
-	tbb.iString = reinterpret_cast<INT_PTR>(szTemp);
+	tbb.iString = reinterpret_cast<INT_PTR>(text.c_str());
 	SendMessage(m_hToolbar, TB_INSERTBUTTON, 1, reinterpret_cast<LPARAM>(&tbb));
 
-	LoadString(GetInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_ORGANIZE, szTemp, SIZEOF_ARRAY(szTemp));
+	text = ResourceHelper::LoadString(GetInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_ORGANIZE);
 
 	tbb.iBitmap = m_imageListToolbarMappings.at(Icon::Copy);
 	tbb.idCommand = TOOLBAR_ID_ORGANIZE;
 	tbb.fsState = TBSTATE_ENABLED;
 	tbb.fsStyle = BTNS_BUTTON | BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_DROPDOWN;
 	tbb.dwData = 0;
-	tbb.iString = reinterpret_cast<INT_PTR>(szTemp);
+	tbb.iString = reinterpret_cast<INT_PTR>(text.c_str());
 	SendMessage(m_hToolbar, TB_INSERTBUTTON, 2, reinterpret_cast<LPARAM>(&tbb));
 
-	LoadString(GetInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_VIEWS, szTemp, SIZEOF_ARRAY(szTemp));
+	text = ResourceHelper::LoadString(GetInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_VIEWS);
 
 	tbb.iBitmap = m_imageListToolbarMappings.at(Icon::Views);
 	tbb.idCommand = TOOLBAR_ID_VIEWS;
 	tbb.fsState = TBSTATE_ENABLED;
 	tbb.fsStyle = BTNS_BUTTON | BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_DROPDOWN;
 	tbb.dwData = 0;
-	tbb.iString = reinterpret_cast<INT_PTR>(szTemp);
+	tbb.iString = reinterpret_cast<INT_PTR>(text.c_str());
 	SendMessage(m_hToolbar, TB_INSERTBUTTON, 3, reinterpret_cast<LPARAM>(&tbb));
 
 	RECT rcTreeView;

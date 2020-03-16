@@ -13,6 +13,7 @@
 #include "CoreInterface.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
 #include "../Helper/Macros.h"
@@ -124,12 +125,11 @@ void TaskbarThumbnails::SetupJumplistTasks()
 	TCHAR szCurrentProcess[MAX_PATH];
 	GetProcessImageName(GetCurrentProcessId(),szCurrentProcess,SIZEOF_ARRAY(szCurrentProcess));
 
-	TCHAR szName[256];
-	LoadString(m_instance,IDS_TASKS_NEWTAB,szName,SIZEOF_ARRAY(szName));
+	std::wstring name = ResourceHelper::LoadString(m_instance,IDS_TASKS_NEWTAB);
 
 	/* New tab task. */
 	JumpListTaskInformation jlti;
-	jlti.pszName		= szName;
+	jlti.pszName		= name.c_str();
 	jlti.pszPath		= szCurrentProcess;
 	jlti.pszArguments	= NExplorerplusplus::JUMPLIST_TASK_NEWTAB_ARGUMENT;
 	jlti.pszIconPath	= szCurrentProcess;

@@ -5,12 +5,12 @@
 #include "stdafx.h"
 #include "ColorRuleHelper.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
 #include <comdef.h>
 #include <vector>
-
 
 namespace
 {
@@ -30,17 +30,14 @@ std::vector<NColorRuleHelper::ColorRule_t> NColorRuleHelper::GetDefaultColorRule
 {
 	std::vector<ColorRule_t> ColorRules;
 	ColorRule_t ColorRule;
-	TCHAR szTemp[64];
 
-	LoadString(GetModuleHandle(nullptr),IDS_GENERAL_COLOR_RULE_COMPRESSED,szTemp,SIZEOF_ARRAY(szTemp));
-	ColorRule.strDescription		= szTemp;
+	ColorRule.strDescription		= ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_GENERAL_COLOR_RULE_COMPRESSED);
 	ColorRule.caseInsensitive		= FALSE;
 	ColorRule.rgbColour				= CF_COMPRESSED;
 	ColorRule.dwFilterAttributes	= FILE_ATTRIBUTE_COMPRESSED;
 	ColorRules.push_back(ColorRule);
 
-	LoadString(GetModuleHandle(nullptr),IDS_GENERAL_COLOR_RULE_ENCRYPTED,szTemp,SIZEOF_ARRAY(szTemp));
-	ColorRule.strDescription		= szTemp;
+	ColorRule.strDescription		= ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_GENERAL_COLOR_RULE_ENCRYPTED);
 	ColorRule.caseInsensitive		= FALSE;
 	ColorRule.rgbColour				= CF_ENCRYPTED;
 	ColorRule.dwFilterAttributes	= FILE_ATTRIBUTE_ENCRYPTED;

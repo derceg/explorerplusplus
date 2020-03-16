@@ -412,9 +412,6 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 	TCHAR			NewFileName[MAX_PATH + 1];
 	TCHAR			OldFileName[MAX_PATH + 1];
 	TCHAR			OldName[MAX_PATH];
-	TCHAR			szTemp[128];
-	TCHAR			szError[256];
-	TCHAR			szTitle[256];
 	DWORD			dwAttributes;
 	int				ret;
 
@@ -465,12 +462,10 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 		StrChr(pItem->pszText,'>') != nullptr ||
 		StrChr(pItem->pszText,'|') != nullptr)
 	{
-		LoadString(m_hLanguageModule,IDS_ERR_FILENAMEINVALID,
-			szError,SIZEOF_ARRAY(szError));
-		LoadString(m_hLanguageModule,IDS_ERR_FILENAMEINVALID_MSGTITLE,
-			szTitle,SIZEOF_ARRAY(szTitle));
+		std::wstring error = ResourceHelper::LoadString(m_hLanguageModule,IDS_ERR_FILENAMEINVALID);
+		std::wstring title = ResourceHelper::LoadString(m_hLanguageModule,IDS_ERR_FILENAMEINVALID_MSGTITLE);
 
-		MessageBox(m_hContainer,szError,szTitle,MB_ICONERROR);
+		MessageBox(m_hContainer,error.c_str(),title.c_str(),MB_ICONERROR);
 
 		return 0;
 	}
@@ -529,10 +524,8 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 	/* If the file was not renamed, show an error message. */
 	if(!ret)
 	{
-		LoadString(m_hLanguageModule,IDS_FILERENAMEERROR,szTemp,
-		SIZEOF_ARRAY(szTemp));
-
-		MessageBox(m_hContainer,szTemp,NExplorerplusplus::APP_NAME,
+		std::wstring error = ResourceHelper::LoadString(m_hLanguageModule,IDS_FILERENAMEERROR);
+		MessageBox(m_hContainer,error.c_str(),NExplorerplusplus::APP_NAME,
 			MB_ICONWARNING|MB_OK);
 	}
 

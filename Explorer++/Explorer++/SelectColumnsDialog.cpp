@@ -48,15 +48,13 @@ INT_PTR SelectColumnsDialog::OnInitDialog()
 
 	for(const auto &column : currentColumns)
 	{
-		TCHAR szText[64];
-		LoadString(GetInstance(),ShellBrowser::LookupColumnNameStringIndex(column.id),
-			szText,SIZEOF_ARRAY(szText));
+		std::wstring text = ResourceHelper::LoadString(GetInstance(),ShellBrowser::LookupColumnNameStringIndex(column.id));
 
 		LVITEM lvItem;
 		lvItem.mask		= LVIF_TEXT|LVIF_PARAM;
 		lvItem.iItem	= iItem;
 		lvItem.iSubItem	= 0;
-		lvItem.pszText	= szText;
+		lvItem.pszText	= text.data();
 		lvItem.lParam	= column.id;
 		ListView_InsertItem(hListView,&lvItem);
 
