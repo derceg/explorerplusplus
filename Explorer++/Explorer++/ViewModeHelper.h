@@ -25,11 +25,13 @@ ViewMode GetNextViewMode(const std::array<ViewMode, N> &viewModes, ViewMode view
 	auto itr = std::find(viewModes.begin(), viewModes.end(), viewMode);
 	assert(itr != viewModes.end());
 
-	itr++;
-
-	if (itr == viewModes.end())
+	if (itr == viewModes.begin())
 	{
-		itr = viewModes.begin();
+		itr = viewModes.end() - 1;
+	}
+	else
+	{
+		itr--;
 	}
 
 	return *itr;
@@ -41,13 +43,11 @@ ViewMode GetPreviousViewMode(const std::array<ViewMode, N> &viewModes, ViewMode 
 	auto itr = std::find(viewModes.begin(), viewModes.end(), viewMode);
 	assert(itr != viewModes.end());
 
-	if (itr == viewModes.begin())
+	itr++;
+
+	if (itr == viewModes.end())
 	{
-		itr = viewModes.end() - 1;
-	}
-	else
-	{
-		itr--;
+		itr = viewModes.begin();
 	}
 
 	return *itr;
