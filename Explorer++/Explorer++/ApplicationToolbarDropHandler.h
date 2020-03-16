@@ -11,32 +11,32 @@ class ApplicationToolbar;
 class ApplicationToolbarDropHandler : public IDropTarget
 {
 public:
-
 	ApplicationToolbarDropHandler(HWND hToolbar, ApplicationToolbar *toolbar);
 
 	/* IUnknown methods. */
-	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject) override;
-	ULONG __stdcall		AddRef(void) override;
-	ULONG __stdcall		Release(void) override;
+	HRESULT __stdcall QueryInterface(REFIID iid, void **ppvObject) override;
+	ULONG __stdcall AddRef(void) override;
+	ULONG __stdcall Release(void) override;
 
 	/* Drag and drop. */
-	HRESULT _stdcall	DragEnter(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect) override;
-	HRESULT _stdcall	DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect) override;
-	HRESULT _stdcall	DragLeave(void) override;
-	HRESULT _stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect) override;
+	HRESULT _stdcall DragEnter(
+		IDataObject *pDataObject, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect) override;
+	HRESULT _stdcall DragOver(DWORD grfKeyState, POINTL pt, DWORD *pdwEffect) override;
+	HRESULT _stdcall DragLeave(void) override;
+	HRESULT _stdcall Drop(
+		IDataObject *pDataObject, DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect) override;
 
 private:
+	static FORMATETC GetSupportedDropFormat();
+	void AddNewButton(DROPFILES *df);
+	void OpenExistingButton(DROPFILES *df, int buttonIndex);
 
-	static FORMATETC	GetSupportedDropFormat();
-	void				AddNewButton(DROPFILES *df);
-	void				OpenExistingButton(DROPFILES *df, int buttonIndex);
+	ULONG m_RefCount;
 
-	ULONG				m_RefCount;
-
-	ApplicationToolbar	*m_toolbar;
-	HWND				m_hToolbar;
+	ApplicationToolbar *m_toolbar;
+	HWND m_hToolbar;
 
 	/* Drag and drop. */
-	IDragSourceHelper	*m_pDragSourceHelper;
-	IDropTargetHelper	*m_pDropTargetHelper;
+	IDragSourceHelper *m_pDragSourceHelper;
+	IDropTargetHelper *m_pDropTargetHelper;
 };

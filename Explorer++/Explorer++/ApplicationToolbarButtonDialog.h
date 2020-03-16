@@ -10,22 +10,20 @@
 class ApplicationToolbarButtonDialog : public BaseDialog
 {
 public:
-
-	ApplicationToolbarButtonDialog(HINSTANCE hInstance, HWND hParent, ApplicationButton_t *Button, bool IsNew);
+	ApplicationToolbarButtonDialog(
+		HINSTANCE hInstance, HWND hParent, ApplicationButton_t *Button, bool IsNew);
 
 protected:
-
-	INT_PTR	OnInitDialog() override;
-	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam) override;
-	INT_PTR	OnClose() override;
+	INT_PTR OnInitDialog() override;
+	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
+	INT_PTR OnClose() override;
 
 private:
+	void OnChooseFile();
 
-	void	OnChooseFile();
+	void OnOk();
+	void OnCancel();
 
-	void	OnOk();
-	void	OnCancel();
-
-	ApplicationButton_t	*m_Button;
-	bool				m_IsNew;
+	ApplicationButton_t *m_Button;
+	bool m_IsNew;
 };

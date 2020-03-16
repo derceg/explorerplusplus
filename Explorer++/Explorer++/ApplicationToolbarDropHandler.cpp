@@ -6,16 +6,16 @@
 #include "ApplicationToolbarDropHandler.h"
 #include "../Helper/Macros.h"
 
-
-ApplicationToolbarDropHandler::ApplicationToolbarDropHandler(HWND hToolbar, ApplicationToolbar *toolbar) :
-m_RefCount(1),
-m_toolbar(toolbar),
-m_hToolbar(hToolbar)
+ApplicationToolbarDropHandler::ApplicationToolbarDropHandler(
+	HWND hToolbar, ApplicationToolbar *toolbar) :
+	m_RefCount(1),
+	m_toolbar(toolbar),
+	m_hToolbar(hToolbar)
 {
-	HRESULT hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_INPROC_SERVER,
-		IID_PPV_ARGS(&m_pDragSourceHelper));
+	HRESULT hr = CoCreateInstance(
+		CLSID_DragDropHelper, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_pDragSourceHelper));
 
-	if(SUCCEEDED(hr))
+	if (SUCCEEDED(hr))
 	{
 		hr = m_pDragSourceHelper->QueryInterface(IID_PPV_ARGS(&m_pDropTargetHelper));
 	}
@@ -23,23 +23,23 @@ m_hToolbar(hToolbar)
 
 HRESULT __stdcall ApplicationToolbarDropHandler::QueryInterface(REFIID iid, void **ppvObject)
 {
-	if(ppvObject == nullptr)
+	if (ppvObject == nullptr)
 	{
 		return E_POINTER;
 	}
 
 	*ppvObject = nullptr;
 
-	if(iid == IID_IUnknown)
+	if (iid == IID_IUnknown)
 	{
 		*ppvObject = static_cast<IUnknown *>(this);
 	}
-	else if(iid == IID_IDropTarget)
+	else if (iid == IID_IDropTarget)
 	{
 		*ppvObject = static_cast<IDropTarget *>(this);
 	}
 
-	if(*ppvObject)
+	if (*ppvObject)
 	{
 		AddRef();
 		return S_OK;
@@ -57,7 +57,7 @@ ULONG __stdcall ApplicationToolbarDropHandler::Release(void)
 {
 	m_RefCount--;
 
-	if(m_RefCount == 0)
+	if (m_RefCount == 0)
 	{
 		delete this;
 		return 0;
@@ -66,8 +66,8 @@ ULONG __stdcall ApplicationToolbarDropHandler::Release(void)
 	return m_RefCount;
 }
 
-HRESULT _stdcall ApplicationToolbarDropHandler::DragEnter(IDataObject *pDataObject,
-	DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
+HRESULT _stdcall ApplicationToolbarDropHandler::DragEnter(
+	IDataObject *pDataObject, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
 {
 	UNREFERENCED_PARAMETER(grfKeyState);
 
@@ -76,7 +76,7 @@ HRESULT _stdcall ApplicationToolbarDropHandler::DragEnter(IDataObject *pDataObje
 
 	/* DON'T use SUCCEEDED (QueryGetData() will return S_FALSE on
 	failure). */
-	if(hr == S_OK)
+	if (hr == S_OK)
 	{
 		*pdwEffect = DROPEFFECT_COPY;
 	}
@@ -90,8 +90,8 @@ HRESULT _stdcall ApplicationToolbarDropHandler::DragEnter(IDataObject *pDataObje
 	return hr;
 }
 
-HRESULT _stdcall ApplicationToolbarDropHandler::DragOver(DWORD grfKeyState,
-	POINTL pt, DWORD *pdwEffect)
+HRESULT _stdcall ApplicationToolbarDropHandler::DragOver(
+	DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
 {
 	UNREFERENCED_PARAMETER(grfKeyState);
 
@@ -111,12 +111,12 @@ HRESULT _stdcall ApplicationToolbarDropHandler::DragLeave(void)
 
 FORMATETC ApplicationToolbarDropHandler::GetSupportedDropFormat()
 {
-	FORMATETC ftc = {CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+	FORMATETC ftc = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 	return ftc;
 }
 
-HRESULT _stdcall ApplicationToolbarDropHandler::Drop(IDataObject *pDataObject,
-	DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect)
+HRESULT _stdcall ApplicationToolbarDropHandler::Drop(
+	IDataObject *pDataObject, DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect)
 {
 	UNREFERENCED_PARAMETER(grfKeyState);
 
@@ -124,13 +124,13 @@ HRESULT _stdcall ApplicationToolbarDropHandler::Drop(IDataObject *pDataObject,
 	STGMEDIUM stg;
 	HRESULT hr = pDataObject->GetData(&ftc, &stg);
 
-	if(hr == S_OK)
+	if (hr == S_OK)
 	{
 		m_pDropTargetHelper->Drop(pDataObject, (POINT *) &ptl, *pdwEffect);
 
 		DROPFILES *df = reinterpret_cast<DROPFILES *>(GlobalLock(stg.hGlobal));
 
-		if(df != nullptr)
+		if (df != nullptr)
 		{
 			POINT pt;
 			pt.x = ptl.x;
@@ -141,9 +141,10 @@ HRESULT _stdcall ApplicationToolbarDropHandler::Drop(IDataObject *pDataObject,
 			another toolbar button. If they were, pass
 			the list of dropped files to the application
 			represented by the button. */
-			int buttonIndex = static_cast<int>(SendMessage(m_hToolbar, TB_HITTEST, 0, (LPARAM) &pt));
+			int buttonIndex =
+				static_cast<int>(SendMessage(m_hToolbar, TB_HITTEST, 0, (LPARAM) &pt));
 
-			if(buttonIndex >= 0)
+			if (buttonIndex >= 0)
 			{
 				OpenExistingButton(df, buttonIndex);
 			}
@@ -167,12 +168,12 @@ void ApplicationToolbarDropHandler::OpenExistingButton(DROPFILES *df, int button
 
 	std::wstring parameters;
 
-	for(int i = 0; i < numFiles; i++)
+	for (int i = 0; i < numFiles; i++)
 	{
 		TCHAR path[MAX_PATH];
 		DragQueryFile((HDROP) df, i, path, SIZEOF_ARRAY(path));
 
-		if(i != 0)
+		if (i != 0)
 		{
 			parameters.append(_T(" "));
 		}
@@ -189,7 +190,7 @@ void ApplicationToolbarDropHandler::AddNewButton(DROPFILES *df)
 {
 	int numFiles = DragQueryFile(reinterpret_cast<HDROP>(df), 0xFFFFFFFF, nullptr, 0);
 
-	for(int i = 0; i < numFiles; i++)
+	for (int i = 0; i < numFiles; i++)
 	{
 		TCHAR path[MAX_PATH];
 		DragQueryFile(reinterpret_cast<HDROP>(df), i, path, SIZEOF_ARRAY(path));
@@ -197,8 +198,8 @@ void ApplicationToolbarDropHandler::AddNewButton(DROPFILES *df)
 		DWORD attributes = GetFileAttributes(path);
 
 		/* Ignore folders. */
-		if(attributes != INVALID_FILE_ATTRIBUTES &&
-			(attributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+		if (attributes != INVALID_FILE_ATTRIBUTES
+			&& (attributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 		{
 			continue;
 		}
@@ -209,7 +210,7 @@ void ApplicationToolbarDropHandler::AddNewButton(DROPFILES *df)
 		StringCchCopy(buttonName, SIZEOF_ARRAY(buttonName), path);
 		PathStripPath(buttonName);
 
-		if(buttonName[0] != '.')
+		if (buttonName[0] != '.')
 		{
 			PathRemoveExtension(buttonName);
 		}
