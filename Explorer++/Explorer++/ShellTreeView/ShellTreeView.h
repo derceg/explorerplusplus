@@ -30,7 +30,7 @@ public:
 	HRESULT _stdcall	GiveFeedback(DWORD dwEffect) override;
 
 	/* User functions. */
-	unique_pidl_absolute	GetItemPidl(HTREEITEM hTreeItem);
+	unique_pidl_absolute	GetItemPidl(HTREEITEM hTreeItem) const;
 	HTREEITEM			LocateItem(PCIDLIST_ABSOLUTE pidlDirectory);
 	BOOL				QueryDragging(void);
 	void				SetShowHidden(BOOL bShowHidden);
@@ -48,6 +48,7 @@ public:
 	void				MonitorDrivePublic(const TCHAR *szDrive);
 
 	void				StartRenamingSelectedItem();
+	void				ShowPropertiesOfSelectedItem() const;
 
 private:
 
@@ -143,6 +144,8 @@ private:
 	HTREEITEM	LocateItemOnDesktopTree(const TCHAR *szFullFileName);
 
 	static void	DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData);
+
+	unique_pidl_absolute	GetSelectedItemPidl() const;
 
 	/* Directory modification. */
 	void		DirectoryAlteredAddFile(const TCHAR *szFullFileName);

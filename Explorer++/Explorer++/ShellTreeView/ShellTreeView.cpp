@@ -795,7 +795,13 @@ HTREEITEM ShellTreeView::DetermineDriveSortedPosition(HTREEITEM hParent, const T
 	return htItem;
 }
 
-unique_pidl_absolute ShellTreeView::GetItemPidl(HTREEITEM hTreeItem)
+unique_pidl_absolute ShellTreeView::GetSelectedItemPidl() const
+{
+	HTREEITEM selectedItem = TreeView_GetSelection(m_hTreeView);
+	return GetItemPidl(selectedItem);
+}
+
+unique_pidl_absolute ShellTreeView::GetItemPidl(HTREEITEM hTreeItem) const
 {
 	TVITEMEX tvItemEx;
 	tvItemEx.mask = TVIF_HANDLE | TVIF_PARAM;
@@ -1666,6 +1672,12 @@ BOOL ShellTreeView::IsDesktopSubChild(const TCHAR *szFullFileName)
 
 void ShellTreeView::StartRenamingSelectedItem()
 {
-	HTREEITEM hItem = TreeView_GetSelection(m_hTreeView);
-	TreeView_EditLabel(m_hTreeView, hItem);
+	HTREEITEM selectedItem = TreeView_GetSelection(m_hTreeView);
+	TreeView_EditLabel(m_hTreeView, selectedItem);
+}
+
+void ShellTreeView::ShowPropertiesOfSelectedItem() const
+{
+	auto pidlDirectory = GetSelectedItemPidl();
+	ShowMultipleFileProperties(pidlDirectory.get(), nullptr, m_hTreeView, 0);
 }

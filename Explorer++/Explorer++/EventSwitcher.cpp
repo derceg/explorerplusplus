@@ -131,7 +131,7 @@ void Explorerplusplus::OnShowFileProperties() const
 	}
 	else if(hFocus == m_hTreeView)
 	{
-		OnTreeViewShowFileProperties();
+		m_shellTreeView->ShowPropertiesOfSelectedItem();
 	}
 }
 

@@ -265,19 +265,6 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 	m_bTreeViewRightClick = FALSE;
 }
 
-/*
- * Shows the properties dialog for the currently
- * selected treeview item.
- */
-void Explorerplusplus::OnTreeViewShowFileProperties(void) const
-{
-	HTREEITEM hItem = TreeView_GetSelection(m_hTreeView);
-
-	/* Get the path of the currently selected item. */
-	auto pidlDirectory = m_shellTreeView->GetItemPidl(hItem);
-	ShowMultipleFileProperties(pidlDirectory.get(), nullptr, m_hContainer, 0);
-}
-
 void Explorerplusplus::OnTreeViewCopyItemPath(void) const
 {
 	HTREEITEM hItem = TreeView_GetSelection(m_hTreeView);

@@ -253,7 +253,6 @@ private:
 	/* TreeView private message handlers. */
 	void OnTreeViewFileDelete(BOOL bPermanent);
 	void OnTreeViewRightClick(WPARAM wParam, LPARAM lParam);
-	void OnTreeViewShowFileProperties(void) const;
 	void OnTreeViewSelChanged(LPARAM lParam);
 	int OnTreeViewBeginLabelEdit(LPARAM lParam);
 	int OnTreeViewEndLabelEdit(LPARAM lParam);
