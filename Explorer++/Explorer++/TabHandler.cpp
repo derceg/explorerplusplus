@@ -30,7 +30,6 @@ void Explorerplusplus::InitializeTabs()
 	m_tabContainer->tabSelectedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabSelected, this, _1), boost::signals2::at_front);
 
 	m_tabContainer->tabListViewSelectionChanged.AddObserver(boost::bind(&Explorerplusplus::OnTabListViewSelectionChanged, this, _1), boost::signals2::at_front);
-	m_tabContainer->tabColumnsChanged.AddObserver(boost::bind(&Explorerplusplus::OnTabColumnsChanged, this, _1), boost::signals2::at_front);
 
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_tabContainer->GetHWND());
 	int tabWindowHeight = MulDiv(TAB_WINDOW_HEIGHT_96DPI, dpi, USER_DEFAULT_SCREEN_DPI);
@@ -65,7 +64,6 @@ void Explorerplusplus::OnNavigationCompleted(const Tab &tab)
 		m_CurrentDirectory = tab.GetShellBrowser()->GetDirectory();
 		SetCurrentDirectory(m_CurrentDirectory.c_str());
 
-		UpdateSortMenuItems(tab);
 		UpdateWindowStates(tab);
 	}
 
@@ -188,7 +186,6 @@ void Explorerplusplus::OnTabSelected(const Tab &tab)
 	m_CurrentDirectory = tab.GetShellBrowser()->GetDirectory();
 	SetCurrentDirectory(m_CurrentDirectory.c_str());
 
-	UpdateSortMenuItems(tab);
 	UpdateWindowStates(tab);
 
 	/* Show the new listview. */
@@ -256,13 +253,5 @@ void Explorerplusplus::OnTabListViewSelectionChanged(const Tab &tab)
 	if (m_tabContainer->IsTabSelected(tab))
 	{
 		SetTimer(m_hContainer, LISTVIEW_ITEM_CHANGED_TIMER_ID, LISTVIEW_ITEM_CHANGED_TIMEOUT, nullptr);
-	}
-}
-
-void Explorerplusplus::OnTabColumnsChanged(const Tab &tab)
-{
-	if (m_tabContainer->IsTabSelected(tab))
-	{
-		UpdateSortMenuItems(tab);
 	}
 }

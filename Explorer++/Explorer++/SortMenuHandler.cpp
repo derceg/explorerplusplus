@@ -13,90 +13,59 @@
 
 const int SORT_MENU_RESOURCE_BLOCK_SIZE = 1000;
 
-void Explorerplusplus::UpdateSortMenuItems(const Tab &tab)
+Explorerplusplus::SortMenus Explorerplusplus::BuildSortByAndGroupByMenus(const Tab &tab)
 {
-	DeleteSortMenuItems();
+	auto sortByMenu = CreateDefaultSortByGroupByMenu();
+	auto groupByMenu = CreateDefaultSortByGroupByMenu();
 
 	auto sortModes = tab.GetShellBrowser()->GetAvailableSortModes();
-	std::vector<SortMenuItem> newSortMenuItems;
+	int position = 0;
 
 	for (SortMode sortMode : sortModes)
 	{
-		int SortById = DetermineSortModeMenuId(sortMode);
-		int GroupById = DetermineGroupModeMenuId(sortMode);
+		int sortById = DetermineSortModeMenuId(sortMode);
+		int groupById = DetermineGroupModeMenuId(sortMode);
 
-		if (SortById != -1 && GroupById != -1)
-		{
-			SortMenuItem am;
-			am.SortById = SortById;
-			am.GroupById = GroupById;
-			newSortMenuItems.push_back(am);
-		}
+		UINT stringIndex = GetSortMenuItemStringIndex(sortById);
+		std::wstring menuText = ResourceHelper::LoadString(m_hLanguageModule, stringIndex);
+
+		MenuHelper::AddStringItem(sortByMenu.get(), sortById, menuText, position, TRUE);
+		MenuHelper::AddStringItem(groupByMenu.get(), groupById, menuText, position, TRUE);
+
+		position++;
 	}
 
-	m_sortMenuItems = newSortMenuItems;
+	SetSortMenuItemStates(sortByMenu.get(), groupByMenu.get(), tab);
 
-	InsertSortMenuItems();
+	return { std::move(sortByMenu), std::move(groupByMenu) };
 }
 
-void Explorerplusplus::InsertSortMenuItems()
+wil::unique_hmenu Explorerplusplus::CreateDefaultSortByGroupByMenu()
 {
-	int index = 0;
+	wil::unique_hmenu menu(CreatePopupMenu());
 
-	for(const SortMenuItem &menuItem : m_sortMenuItems)
-	{
-		MENUITEMINFO mi;
+	MenuHelper::AddSeparator(menu.get());
 
-		UINT uStringIndex = GetSortMenuItemStringIndex(menuItem.SortById);
-		std::wstring menuText = ResourceHelper::LoadString(m_hLanguageModule,uStringIndex);
+	std::wstring sortAscending =
+		ResourceHelper::LoadString(m_hLanguageModule, IDS_MENU_SORT_ASCENDING);
+	MenuHelper::AddStringItem(menu.get(), IDM_SORT_ASCENDING, sortAscending);
 
-		mi.cbSize		= sizeof(mi);
-		mi.fMask		= MIIM_ID|MIIM_STRING;
-		mi.dwTypeData	= menuText.data();
-		mi.wID			= menuItem.SortById;
-		InsertMenuItem(m_hSortSubMenu,index,TRUE,&mi);
+	std::wstring sortDescending =
+		ResourceHelper::LoadString(m_hLanguageModule, IDS_MENU_SORT_DESCENDING);
+	MenuHelper::AddStringItem(menu.get(), IDM_SORT_DESCENDING, sortDescending);
 
-		ZeroMemory(&mi,sizeof(mi));
-		mi.cbSize		= sizeof(mi);
-		mi.fMask		= MIIM_ID|MIIM_STRING;
-		mi.dwTypeData	= menuText.data();
-		mi.wID			= menuItem.GroupById;
-		InsertMenuItem(m_hGroupBySubMenu,index,TRUE,&mi);
+	MenuHelper::AddSeparator(menu.get());
 
-		index++;
-	}
+	std::wstring sortByMore = ResourceHelper::LoadString(m_hLanguageModule, IDS_MENU_SORT_MORE);
+	MenuHelper::AddStringItem(menu.get(), IDM_SORTBY_MORE, sortByMore);
+
+	return menu;
 }
 
-void Explorerplusplus::DeleteSortMenuItems()
-{
-	for (const SortMenuItem &menuItem : m_sortMenuItems)
-	{
-		DeleteMenu(m_hSortSubMenu, menuItem.SortById, MF_BYCOMMAND);
-		DeleteMenu(m_hGroupBySubMenu, menuItem.GroupById, MF_BYCOMMAND);
-	}
-}
-
-void Explorerplusplus::SetSortMenuItemStates(const Tab &tab)
+void Explorerplusplus::SetSortMenuItemStates(HMENU sortByMenu, HMENU groupByMenu, const Tab &tab)
 {
 	const SortMode sortMode = tab.GetShellBrowser()->GetSortMode();
-	BOOL bShowInGroups = tab.GetShellBrowser()->GetShowInGroups();
-
-	/* Go through both the sort by and group by menus and
-	remove all the checkmarks. Alternatively, could remember
-	which items have checkmarks, and just uncheck those. */
-	int nItems = GetMenuItemCount(m_hSortSubMenu);
-
-	for (int i = 0; i < nItems; i++)
-	{
-		CheckMenuItem(m_hSortSubMenu, i, MF_BYPOSITION | MF_UNCHECKED);
-	}
-
-	nItems = GetMenuItemCount(m_hGroupBySubMenu);
-
-	for (int i = 0; i < nItems; i++)
-	{
-		CheckMenuItem(m_hGroupBySubMenu, i, MF_BYPOSITION | MF_UNCHECKED);
-	}
+	BOOL showInGroups = tab.GetShellBrowser()->GetShowInGroups();
 
 	HMENU activeMenu;
 	HMENU inactiveMenu;
@@ -104,10 +73,10 @@ void Explorerplusplus::SetSortMenuItemStates(const Tab &tab)
 	UINT firstItem;
 	UINT lastItem;
 
-	if (bShowInGroups)
+	if (showInGroups)
 	{
-		activeMenu = m_hGroupBySubMenu;
-		inactiveMenu = m_hSortSubMenu;
+		activeMenu = groupByMenu;
+		inactiveMenu = sortByMenu;
 
 		itemToCheck = DetermineGroupModeMenuId(sortMode);
 
@@ -116,8 +85,8 @@ void Explorerplusplus::SetSortMenuItemStates(const Tab &tab)
 	}
 	else
 	{
-		activeMenu = m_hSortSubMenu;
-		inactiveMenu = m_hGroupBySubMenu;
+		activeMenu = sortByMenu;
+		inactiveMenu = groupByMenu;
 
 		itemToCheck = DetermineSortModeMenuId(sortMode);
 
@@ -125,11 +94,11 @@ void Explorerplusplus::SetSortMenuItemStates(const Tab &tab)
 		lastItem = IDM_SORTBY_NAME + (SORT_MENU_RESOURCE_BLOCK_SIZE - 1);
 	}
 
-	lEnableMenuItem(inactiveMenu, IDM_SORT_ASCENDING, FALSE);
-	lEnableMenuItem(inactiveMenu, IDM_SORT_DESCENDING, FALSE);
+	MenuHelper::EnableItem(inactiveMenu, IDM_SORT_ASCENDING, FALSE);
+	MenuHelper::EnableItem(inactiveMenu, IDM_SORT_DESCENDING, FALSE);
 
-	lEnableMenuItem(activeMenu, IDM_SORT_ASCENDING, TRUE);
-	lEnableMenuItem(activeMenu, IDM_SORT_DESCENDING, TRUE);
+	MenuHelper::EnableItem(activeMenu, IDM_SORT_ASCENDING, TRUE);
+	MenuHelper::EnableItem(activeMenu, IDM_SORT_DESCENDING, TRUE);
 
 	CheckMenuRadioItem(activeMenu, firstItem, lastItem, itemToCheck, MF_BYCOMMAND);
 
@@ -142,6 +111,6 @@ void Explorerplusplus::SetSortMenuItemStates(const Tab &tab)
 		itemToCheck = IDM_SORT_DESCENDING;
 	}
 
-	CheckMenuRadioItem(activeMenu, IDM_SORT_ASCENDING, IDM_SORT_DESCENDING,
-		itemToCheck, MF_BYCOMMAND);
+	CheckMenuRadioItem(
+		activeMenu, IDM_SORT_ASCENDING, IDM_SORT_DESCENDING, itemToCheck, MF_BYCOMMAND);
 }

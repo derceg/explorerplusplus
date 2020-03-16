@@ -1301,7 +1301,7 @@ void Explorerplusplus::OnDisplayWindowRClick(POINT *ptClient)
 
 	HMENU menu = GetSubMenu(parentMenu.get(), 0);
 
-	lCheckMenuItem(menu, IDM_DISPLAYWINDOW_VERTICAL, m_config->displayWindowVertical);
+	MenuHelper::CheckItem(menu, IDM_DISPLAYWINDOW_VERTICAL, m_config->displayWindowVertical);
 
 	POINT ptScreen = *ptClient;
 	BOOL res = ClientToScreen(m_hDisplayWindow, &ptScreen);

@@ -68,22 +68,6 @@ void Explorerplusplus::InitializeMainMenu()
 
 	DeleteMenu(mainMenu, IDM_VIEW_PLACEHOLDER, MF_BYCOMMAND);
 
-	m_hSortSubMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_SORT_MENU)), 0);
-	m_hGroupBySubMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_GROUPBY_MENU)), 0);
-
-	// Insert the default sort sub menu. This menu will not contain any sort
-	// menu items.
-	MENUITEMINFO mi;
-	mi.cbSize = sizeof(mi);
-	mi.fMask = MIIM_SUBMENU;
-	mi.hSubMenu = m_hSortSubMenu;
-	SetMenuItemInfo(mainMenu, IDM_VIEW_SORTBY, FALSE, &mi);
-
-	mi.cbSize = sizeof(mi);
-	mi.fMask = MIIM_SUBMENU;
-	mi.hSubMenu = m_hGroupBySubMenu;
-	SetMenuItemInfo(mainMenu, IDM_VIEW_GROUPBY, FALSE, &mi);
-
 	SetMainMenuImages();
 
 	SetGoMenuName(mainMenu, IDM_GO_MYCOMPUTER, CSIDL_DRIVES);

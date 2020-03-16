@@ -15,7 +15,6 @@
 #define IDD_FILTER                      139
 #define IDR_MAINMENU                    151
 #define IDR_MAINMENU_RCLICK             155
-#define IDR_SORT_MENU                   156
 #define IDR_TAB_RCLICK                  164
 #define IDD_OPTIONS_TABS                166
 #define IDD_SETFILEATTRIBUTES           167
@@ -39,7 +38,6 @@
 #define IDD_NEWCOLORRULE                220
 #define IDR_MASSRENAME_MENU             223
 #define IDD_SEARCH                      224
-#define IDR_GROUPBY_MENU                225
 #define IDD_OPTIONS_WINDOW              227
 #define IDD_CUSTOMIZECOLORS             228
 #define IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_CHINESE_SIMPLIFIED 232
@@ -151,7 +149,10 @@
 #define IDS_ADD_BOOKMARK_TITLE_BOOKMARK_ALL_TABS 333
 #define IDS_ABOUT_VERSION               334
 #define IDS_ABOUT_BUILD_DATE            335
+#define IDS_MENU_SORT_ASCENDING         336
 #define IDS_BOOKMARK_OPEN_ALL           337
+#define IDS_MENU_SORT_DESCENDING        338
+#define IDS_MENU_SORT_MORE              339
 #define IDC_DEFAULTCOLUMNS_DESCRIPTION  1001
 #define IDC_COLUMNS_DESCRIPTION         1001
 #define IDC_SETTINGS_CHECK_EXTENSIONS   1002

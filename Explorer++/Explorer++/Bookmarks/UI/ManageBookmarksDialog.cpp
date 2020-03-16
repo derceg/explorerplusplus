@@ -299,7 +299,8 @@ void ManageBookmarksDialog::ShowViewMenu()
 		return;
 	}
 
-	lEnableMenuItem(columnsMenu.get(), static_cast<UINT>(BookmarkListView::ColumnType::Name), FALSE);
+	MenuHelper::EnableItem(
+		columnsMenu.get(), static_cast<UINT>(BookmarkListView::ColumnType::Name), FALSE);
 
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
@@ -498,9 +499,11 @@ void ManageBookmarksDialog::SetOrganizeMenuItemStates(HMENU menu)
 	HWND listView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW);
 	HWND treeView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW);
 
-	lEnableMenuItem(menu, IDM_MB_ORGANIZE_NEWBOOKMARK, focus == listView || focus == treeView);
-	lEnableMenuItem(menu, IDM_MB_ORGANIZE_NEWFOLDER, focus == listView || focus == treeView);
-	lEnableMenuItem(menu, IDM_MB_ORGANIZE_SELECTALL, focus == listView);
+	MenuHelper::EnableItem(
+		menu, IDM_MB_ORGANIZE_NEWBOOKMARK, focus == listView || focus == treeView);
+	MenuHelper::EnableItem(
+		menu, IDM_MB_ORGANIZE_NEWFOLDER, focus == listView || focus == treeView);
+	MenuHelper::EnableItem(menu, IDM_MB_ORGANIZE_SELECTALL, focus == listView);
 
 	bool canDelete = false;
 
@@ -513,7 +516,7 @@ void ManageBookmarksDialog::SetOrganizeMenuItemStates(HMENU menu)
 		canDelete = m_bookmarkTreeView->CanDelete();
 	}
 
-	lEnableMenuItem(menu, IDM_MB_ORGANIZE_DELETE, canDelete);
+	MenuHelper::EnableItem(menu, IDM_MB_ORGANIZE_DELETE, canDelete);
 }
 
 void ManageBookmarksDialog::OnOrganizeMenuItemSelected(int menuItemId)

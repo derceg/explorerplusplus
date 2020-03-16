@@ -555,9 +555,9 @@ void BookmarkTreeView::OnRClick(const NMHDR *pnmhdr)
 	wil::unique_hmenu menu(
 		LoadMenu(m_instance, MAKEINTRESOURCE(IDR_BOOKMARK_TREEVIEW_RCLICK_MENU)));
 
-	lEnableMenuItem(menu.get(), IDM_BOOKMARK_TREEVIEW_RLICK_RENAME,
+	MenuHelper::EnableItem(menu.get(), IDM_BOOKMARK_TREEVIEW_RLICK_RENAME,
 		!m_bookmarkTree->IsPermanentNode(bookmarkFolder));
-	lEnableMenuItem(menu.get(), IDM_BOOKMARK_TREEVIEW_RLICK_DELETE,
+	MenuHelper::EnableItem(menu.get(), IDM_BOOKMARK_TREEVIEW_RLICK_DELETE,
 		!m_bookmarkTree->IsPermanentNode(bookmarkFolder));
 
 	TrackPopupMenu(

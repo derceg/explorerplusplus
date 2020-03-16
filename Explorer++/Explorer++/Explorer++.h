@@ -118,10 +118,10 @@ private:
 	// shared between various components in the application.
 	static const int MAX_CACHED_ICONS = 1000;
 
-	struct SortMenuItem
+	struct SortMenus
 	{
-		UINT SortById;
-		UINT GroupById;
+		wil::unique_hmenu sortByMenu;
+		wil::unique_hmenu groupByMenu;
 	};
 
 	struct FileContextMenuInfo_t
@@ -293,7 +293,6 @@ private:
 	void HideTabBar() override;
 	HRESULT RestoreTabs(ILoadSave *pLoadSave);
 	void OnTabListViewSelectionChanged(const Tab &tab);
-	void OnTabColumnsChanged(const Tab &tab);
 
 	/* TabNavigationInterface methods. */
 	HRESULT CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected) override;
@@ -313,7 +312,7 @@ private:
 	void InitializePlugins();
 
 	/* Menus. */
-	HMENU InitializeRightClickMenu(void);
+	wil::unique_hmenu InitializeRightClickMenu();
 	void SetProgramMenuItemStates(HMENU hProgramMenu);
 
 	/* Control creation. */
@@ -411,10 +410,9 @@ private:
 	BOOL VerifyLanguageVersion(const TCHAR *szLanguageModule) const;
 
 	/* Sort menu. */
-	void UpdateSortMenuItems(const Tab &tab);
-	void InsertSortMenuItems();
-	void DeleteSortMenuItems();
-	void SetSortMenuItemStates(const Tab &tab);
+	SortMenus BuildSortByAndGroupByMenus(const Tab &tab);
+	wil::unique_hmenu CreateDefaultSortByGroupByMenu();
+	void SetSortMenuItemStates(HMENU sortByMenu, HMENU groupByMenu, const Tab &tab);
 
 	/* File operations. */
 	void CopyToFolder(bool move);
@@ -628,11 +626,6 @@ private:
 
 	/* Menu images. */
 	std::vector<wil::unique_hbitmap> m_menuImages;
-
-	/* Sort menu. */
-	HMENU m_hSortSubMenu;
-	HMENU m_hGroupBySubMenu;
-	std::vector<SortMenuItem> m_sortMenuItems;
 
 	/* Mousewheel. */
 	int m_zDeltaTotal;

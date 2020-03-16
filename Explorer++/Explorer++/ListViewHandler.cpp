@@ -13,6 +13,7 @@
 #include "MainToolbar.h"
 #include "MassRenameDialog.h"
 #include "Navigation.h"
+#include "ResourceHelper.h"
 #include "SetFileAttributesDialog.h"
 #include "ShellBrowser/Columns.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -590,80 +591,71 @@ void Explorerplusplus::OnListViewRClick(POINT *pCursorPos)
 
 void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 {
-	HMENU hMenu = InitializeRightClickMenu();
+	auto parentMenu = InitializeRightClickMenu();
+	HMENU menu = GetSubMenu(parentMenu.get(), 0);
+
 	auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
 	unique_pidl_absolute pidlParent(ILCloneFull(pidlDirectory.get()));
 	ILRemoveLastID(pidlParent.get());
 
-	PCUITEMID_CHILD pidlChildFolder = ILFindLastID(pidlDirectory.get());
-
 	wil::com_ptr<IShellFolder> pShellFolder;
 	HRESULT hr = BindToIdl(pidlParent.get(), IID_PPV_ARGS(&pShellFolder));
 
-	if(SUCCEEDED(hr))
+	if (FAILED(hr))
 	{
-		wil::com_ptr<IDataObject> pDataObject;
-		hr = GetUIObjectOf(pShellFolder.get(), nullptr, 1, &pidlChildFolder, IID_PPV_ARGS(&pDataObject));
-
-		if(SUCCEEDED(hr))
-		{
-			ServiceProvider serviceProvider(this);
-			ContextMenuManager cmm(ContextMenuManager::CONTEXT_MENU_TYPE_BACKGROUND, pidlDirectory.get(),
-				pDataObject.get(), &serviceProvider, BLACKLISTED_BACKGROUND_MENU_CLSID_ENTRIES);
-
-			cmm.ShowMenu(m_hContainer,hMenu,IDM_FILE_COPYFOLDERPATH,MIN_SHELL_MENU_ID,
-				MAX_SHELL_MENU_ID,*pCursorPos,*m_pStatusBar);
-		}
+		return;
 	}
 
-	DestroyMenu(hMenu);
+	wil::com_ptr<IDataObject> pDataObject;
+	PCUITEMID_CHILD pidlChildFolder = ILFindLastID(pidlDirectory.get());
+	hr =
+		GetUIObjectOf(pShellFolder.get(), nullptr, 1, &pidlChildFolder, IID_PPV_ARGS(&pDataObject));
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	ServiceProvider serviceProvider(this);
+	ContextMenuManager cmm(ContextMenuManager::CONTEXT_MENU_TYPE_BACKGROUND, pidlDirectory.get(),
+		pDataObject.get(), &serviceProvider, BLACKLISTED_BACKGROUND_MENU_CLSID_ENTRIES);
+
+	cmm.ShowMenu(m_hContainer, menu, IDM_FILE_COPYFOLDERPATH, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID,
+		*pCursorPos, *m_pStatusBar);
 }
 
-HMENU Explorerplusplus::InitializeRightClickMenu(void)
+wil::unique_hmenu Explorerplusplus::InitializeRightClickMenu()
 {
-	HMENU hMenu = GetSubMenu(LoadMenu(m_hLanguageModule,
-		MAKEINTRESOURCE(IDR_MAINMENU_RCLICK)),0);
+	wil::unique_hmenu parentMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_MAINMENU_RCLICK)));
 
-	MENUITEMINFO mii;
-
-	for(auto ViewMode : VIEW_MODES)
+	for (auto ViewMode : VIEW_MODES)
 	{
-		TCHAR szTemp[64];
-		LoadString(m_hLanguageModule,GetViewModeMenuStringId(ViewMode),
-			szTemp,SIZEOF_ARRAY(szTemp));
-
-		mii.cbSize		= sizeof(mii);
-		mii.fMask		= MIIM_ID|MIIM_STRING;
-		mii.wID			= GetViewModeMenuId(ViewMode);
-		mii.dwTypeData	= szTemp;
-		InsertMenuItem(hMenu,IDM_RCLICK_VIEW_PLACEHOLDER,FALSE,&mii);
+		std::wstring text =
+			ResourceHelper::LoadString(m_hLanguageModule, GetViewModeMenuStringId(ViewMode));
+		MenuHelper::AddStringItem(parentMenu.get(), GetViewModeMenuId(ViewMode), text,
+			IDM_RCLICK_VIEW_PLACEHOLDER, FALSE);
 	}
 
-	DeleteMenu(hMenu,IDM_RCLICK_VIEW_PLACEHOLDER,MF_BYCOMMAND);
+	DeleteMenu(parentMenu.get(), IDM_RCLICK_VIEW_PLACEHOLDER, MF_BYCOMMAND);
 
-	mii.cbSize		= sizeof(mii);
-	mii.fMask		= MIIM_SUBMENU;
-	mii.hSubMenu	= m_hSortSubMenu;
-	SetMenuItemInfo(hMenu,IDM_POPUP_SORTBY,FALSE,&mii);
+	auto [sortByMenu, groupByMenu] = BuildSortByAndGroupByMenus(m_tabContainer->GetSelectedTab());
 
-	mii.cbSize		= sizeof(mii);
-	mii.fMask		= MIIM_SUBMENU;
-	mii.hSubMenu	= m_hGroupBySubMenu;
-	SetMenuItemInfo(hMenu,IDM_POPUP_GROUPBY,FALSE,&mii);
+	MenuHelper::AttachSubMenu(parentMenu.get(), std::move(sortByMenu), IDM_POPUP_SORTBY, FALSE);
+	MenuHelper::AttachSubMenu(parentMenu.get(), std::move(groupByMenu), IDM_POPUP_GROUPBY, FALSE);
 
-	UINT uViewMode = m_pActiveShellBrowser->GetViewMode();
+	ViewMode viewMode = m_pActiveShellBrowser->GetViewMode();
 
-	if(uViewMode == ViewMode::List)
+	if (viewMode == +ViewMode::List)
 	{
-		lEnableMenuItem(hMenu,IDM_POPUP_GROUPBY,FALSE);
+		MenuHelper::EnableItem(parentMenu.get(), IDM_POPUP_GROUPBY, FALSE);
 	}
 	else
 	{
-		lEnableMenuItem(hMenu,IDM_POPUP_GROUPBY,TRUE);
+		MenuHelper::EnableItem(parentMenu.get(), IDM_POPUP_GROUPBY, TRUE);
 	}
 
-	return hMenu;
+	return parentMenu;
 }
 
 void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)

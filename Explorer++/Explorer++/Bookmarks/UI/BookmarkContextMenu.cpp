@@ -136,7 +136,7 @@ void BookmarkContextMenu::SetUpMenu(HMENU menu, const RawBookmarkItems &bookmark
 
 		if (totalBookmarks == 0)
 		{
-			lEnableMenuItem(menu, IDM_BOOKMARKS_OPEN_ALL, FALSE);
+			MenuHelper::EnableItem(menu, IDM_BOOKMARKS_OPEN_ALL, FALSE);
 		}
 		else
 		{
@@ -157,7 +157,7 @@ void BookmarkContextMenu::SetUpMenu(HMENU menu, const RawBookmarkItems &bookmark
 
 void BookmarkContextMenu::SetMenuItemStates(HMENU menu)
 {
-	lEnableMenuItem(menu, IDM_BOOKMARKS_PASTE,
+	MenuHelper::EnableItem(menu, IDM_BOOKMARKS_PASTE,
 		IsClipboardFormatAvailable(BookmarkClipboard::GetClipboardFormat()));
 }
 

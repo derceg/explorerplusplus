@@ -700,7 +700,7 @@ void BookmarkListView::OnHeaderRClick(const POINT &pt)
 	}
 
 	/* The name column cannot be removed. */
-	lEnableMenuItem(menu.get(), static_cast<UINT>(ColumnType::Name), FALSE);
+	MenuHelper::EnableItem(menu.get(), static_cast<UINT>(ColumnType::Name), FALSE);
 
 	int cmd = TrackPopupMenu(
 		menu.get(), TPM_LEFTALIGN | TPM_RETURNCMD, pt.x, pt.y, 0, m_hListView, nullptr);

@@ -382,9 +382,9 @@ void TabContainer::CreateTabContextMenu(Tab &tab, const POINT &pt)
 	std::vector<wil::unique_hbitmap> menuImages;
 	AddImagesToTabContextMenu(menu, menuImages);
 
-	lCheckMenuItem(menu, IDM_TAB_LOCKTAB, tab.GetLockState() == Tab::LockState::Locked);
-	lCheckMenuItem(menu, IDM_TAB_LOCKTABANDADDRESS, tab.GetLockState() == Tab::LockState::AddressLocked);
-	lEnableMenuItem(menu, IDM_TAB_CLOSETAB, tab.GetLockState() == Tab::LockState::NotLocked);
+	MenuHelper::CheckItem(menu, IDM_TAB_LOCKTAB, tab.GetLockState() == Tab::LockState::Locked);
+	MenuHelper::CheckItem(menu, IDM_TAB_LOCKTABANDADDRESS, tab.GetLockState() == Tab::LockState::AddressLocked);
+	MenuHelper::EnableItem(menu, IDM_TAB_CLOSETAB, tab.GetLockState() == Tab::LockState::NotLocked);
 
 	UINT Command = TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD,
 		pt.x, pt.y, 0, m_hwnd, nullptr);
@@ -600,7 +600,7 @@ void TabContainer::ShowBackgroundContextMenu(const POINT &ptClient)
 
 	if (m_expp->GetTabRestorer()->GetClosedTabs().empty())
 	{
-		lEnableMenuItem(menu, IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB, FALSE);
+		MenuHelper::EnableItem(menu, IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB, FALSE);
 	}
 
 	POINT ptScreen = ptClient;
