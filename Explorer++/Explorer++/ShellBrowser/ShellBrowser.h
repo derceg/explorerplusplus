@@ -96,6 +96,7 @@ public:
 	void				SetAutoArrange(BOOL autoArrange);
 	ViewMode			GetViewMode() const;
 	void				SetViewMode(ViewMode viewMode);
+	void				CycleViewMode(bool cycleForward);
 	SortMode			GetSortMode() const;
 	void				SetSortMode(SortMode sortMode);
 	void				SortFolder(SortMode sortMode);

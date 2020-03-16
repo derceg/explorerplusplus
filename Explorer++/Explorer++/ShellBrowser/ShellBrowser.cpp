@@ -10,6 +10,7 @@
 #include "PreservedFolderState.h"
 #include "ShellNavigationController.h"
 #include "SortModes.h"
+#include "ViewModeHelper.h"
 #include "ViewModes.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DriveInfo.h"
@@ -376,6 +377,22 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 	}
 
 	SendMessage(m_hListView, LVM_SETVIEW, dwStyle, 0);
+}
+
+void ShellBrowser::CycleViewMode(bool cycleForward)
+{
+	ViewMode newViewMode;
+
+	if (cycleForward)
+	{
+		newViewMode = GetNextViewMode(VIEW_MODES, m_folderSettings.viewMode);
+	}
+	else
+	{
+		newViewMode = GetPreviousViewMode(VIEW_MODES, m_folderSettings.viewMode);
+	}
+
+	SetViewMode(newViewMode);
 }
 
 SortMode ShellBrowser::GetSortMode() const

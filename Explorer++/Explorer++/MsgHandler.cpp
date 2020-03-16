@@ -730,25 +730,8 @@ void Explorerplusplus::OnAutoSizeColumns()
 /* Cycle through the current views. */
 void Explorerplusplus::OnToolbarViews()
 {
-	CycleViewState(TRUE);
-}
-
-void Explorerplusplus::CycleViewState(BOOL bCycleForward)
-{
 	Tab &selectedTab = m_tabContainer->GetSelectedTab();
-	ViewMode viewMode = selectedTab.GetShellBrowser()->GetViewMode();
-	ViewMode newViewMode;
-
-	if(bCycleForward)
-	{
-		newViewMode = GetNextViewMode(VIEW_MODES, viewMode);
-	}
-	else
-	{
-		newViewMode = GetPreviousViewMode(VIEW_MODES, viewMode);
-	}
-
-	selectedTab.GetShellBrowser()->SetViewMode(newViewMode);
+	selectedTab.GetShellBrowser()->CycleViewMode(true);
 }
 
 void Explorerplusplus::OnSortByAscending(BOOL bSortAscending)

@@ -192,12 +192,14 @@ BOOL Explorerplusplus::OnMouseWheel(MousewheelSource mousewheelSource, WPARAM wP
 	{
 		if (wParam & MK_CONTROL)
 		{
+			Tab &selectedTab = m_tabContainer->GetSelectedTab();
+
 			/* Switch listview views. For each wheel delta
 			(notch) the wheel is scrolled through, switch
 			the view once. */
 			for (int i = 0; i < abs(m_zDeltaTotal / WHEEL_DELTA); i++)
 			{
-				CycleViewState((m_zDeltaTotal > 0));
+				selectedTab.GetShellBrowser()->CycleViewMode((m_zDeltaTotal > 0));
 			}
 		}
 		else if (wParam & MK_SHIFT)
