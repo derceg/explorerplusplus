@@ -118,12 +118,6 @@ private:
 	// shared between various components in the application.
 	static const int MAX_CACHED_ICONS = 1000;
 
-	struct SortMenus
-	{
-		wil::unique_hmenu sortByMenu;
-		wil::unique_hmenu groupByMenu;
-	};
-
 	struct FileContextMenuInfo_t
 	{
 		UINT uFrom;
@@ -408,11 +402,6 @@ private:
 	/* Languages. */
 	void SetLanguageModule();
 	BOOL VerifyLanguageVersion(const TCHAR *szLanguageModule) const;
-
-	/* Sort menu. */
-	SortMenus BuildSortByAndGroupByMenus(const Tab &tab);
-	wil::unique_hmenu CreateDefaultSortByGroupByMenu();
-	void SetSortMenuItemStates(HMENU sortByMenu, HMENU groupByMenu, const Tab &tab);
 
 	/* File operations. */
 	void CopyToFolder(bool move);

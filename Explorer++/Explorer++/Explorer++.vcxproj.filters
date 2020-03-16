@@ -295,9 +295,6 @@
     <ClCompile Include="LoadSaveXml.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="SortModeHelper.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="MainWindow.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -330,9 +327,6 @@
     </ClCompile>
     <ClCompile Include="ShellBrowser\TileView.cpp">
       <Filter>ShellBrowser</Filter>
-    </ClCompile>
-    <ClCompile Include="SortMenuHandler.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="TabRestorer.cpp">
       <Filter>Tabs</Filter>
@@ -429,6 +423,9 @@
     </ClCompile>
     <ClCompile Include="Bookmarks\BookmarkNavigationController.cpp">
       <Filter>Bookmarks</Filter>
+    </ClCompile>
+    <ClCompile Include="SortMenuBuilder.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -690,9 +687,6 @@
     <ClInclude Include="LoadSaveXml.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="SortModeHelper.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="CoreInterface.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -857,6 +851,9 @@
     </ClInclude>
     <ClInclude Include="Bookmarks\BookmarkNavigatorInterface.h">
       <Filter>Bookmarks</Filter>
+    </ClInclude>
+    <ClInclude Include="SortMenuBuilder.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

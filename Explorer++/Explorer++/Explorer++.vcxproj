@@ -489,7 +489,7 @@
     <ClCompile Include="ShellTreeView\iDropSource.cpp" />
     <ClCompile Include="ShellTreeView\iDropTarget.cpp" />
     <ClCompile Include="ShellTreeView\ShellTreeView.cpp" />
-    <ClCompile Include="SortMenuHandler.cpp" />
+    <ClCompile Include="SortMenuBuilder.cpp" />
     <ClCompile Include="Bookmarks\BookmarkHandler.cpp" />
     <ClCompile Include="Bookmarks\BookmarkHelper.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkListView.cpp" />
@@ -573,7 +573,6 @@
     <ClCompile Include="ShellBrowser\TileView.cpp" />
     <ClCompile Include="ShellBrowser\ViewModes.cpp" />
     <ClCompile Include="ShellContextMenuHandler.cpp" />
-    <ClCompile Include="SortModeHelper.cpp" />
     <ClCompile Include="SplitFileDialog.cpp" />
     <ClCompile Include="StatusBar.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -731,7 +730,7 @@
     <ClInclude Include="ShellBrowser\ViewModes.h" />
     <ClInclude Include="ShellTreeView\ShellTreeView.h" />
     <ClInclude Include="SignalWrapper.h" />
-    <ClInclude Include="SortModeHelper.h" />
+    <ClInclude Include="SortMenuBuilder.h" />
     <ClInclude Include="SplitFileDialog.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Tab.h" />

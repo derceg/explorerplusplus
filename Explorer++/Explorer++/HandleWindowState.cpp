@@ -9,6 +9,7 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/ViewModes.h"
+#include "SortMenuBuilder.h"
 #include "TabContainer.h"
 #include "../Helper/MenuHelper.h"
 
@@ -113,7 +114,8 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 		MenuHelper::CheckItem(hProgramMenu,IDM_VIEW_AUTOARRANGE,tab.GetShellBrowser()->GetAutoArrange());
 	}
 
-	auto [sortByMenu, groupByMenu] = BuildSortByAndGroupByMenus(tab);
+	SortMenuBuilder sortMenuBuilder(m_hLanguageModule);
+	auto [sortByMenu, groupByMenu] = sortMenuBuilder.BuildMenus(tab);
 
 	MenuHelper::AttachSubMenu(hProgramMenu, std::move(sortByMenu), IDM_VIEW_SORTBY, FALSE);
 	MenuHelper::AttachSubMenu(hProgramMenu, std::move(groupByMenu), IDM_VIEW_GROUPBY, FALSE);

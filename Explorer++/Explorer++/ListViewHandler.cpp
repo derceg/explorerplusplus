@@ -19,6 +19,7 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/ViewModes.h"
+#include "SortMenuBuilder.h"
 #include "TabContainer.h"
 #include "ViewModeHelper.h"
 #include "../Helper/BulkClipboardWriter.h"
@@ -639,7 +640,8 @@ wil::unique_hmenu Explorerplusplus::InitializeRightClickMenu()
 
 	DeleteMenu(parentMenu.get(), IDM_RCLICK_VIEW_PLACEHOLDER, MF_BYCOMMAND);
 
-	auto [sortByMenu, groupByMenu] = BuildSortByAndGroupByMenus(m_tabContainer->GetSelectedTab());
+	SortMenuBuilder sortMenuBuilder(m_hLanguageModule);
+	auto [sortByMenu, groupByMenu] = sortMenuBuilder.BuildMenus(m_tabContainer->GetSelectedTab());
 
 	MenuHelper::AttachSubMenu(parentMenu.get(), std::move(sortByMenu), IDM_POPUP_SORTBY, FALSE);
 	MenuHelper::AttachSubMenu(parentMenu.get(), std::move(groupByMenu), IDM_POPUP_GROUPBY, FALSE);

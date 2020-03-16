@@ -3,10 +3,122 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "SortModeHelper.h"
+#include "SortMenuBuilder.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
+#include "ShellBrowser/ShellBrowser.h"
+#include "Tab.h"
+#include "../Helper/MenuHelper.h"
 
-UINT GetSortMenuItemStringIndex(UINT uItemId)
+const int SORT_MENU_RESOURCE_BLOCK_SIZE = 1000;
+
+SortMenuBuilder::SortMenuBuilder(HMODULE resourceModule) : m_resourceModule(resourceModule)
+{
+}
+
+SortMenuBuilder::SortMenus SortMenuBuilder::BuildMenus(const Tab &tab)
+{
+	auto sortByMenu = CreateDefaultMenu();
+	auto groupByMenu = CreateDefaultMenu();
+
+	auto sortModes = tab.GetShellBrowser()->GetAvailableSortModes();
+	int position = 0;
+
+	for (SortMode sortMode : sortModes)
+	{
+		int sortById = DetermineSortModeMenuId(sortMode);
+		int groupById = DetermineGroupModeMenuId(sortMode);
+
+		UINT stringIndex = GetSortMenuItemStringIndex(sortById);
+		std::wstring menuText = ResourceHelper::LoadString(m_resourceModule, stringIndex);
+
+		MenuHelper::AddStringItem(sortByMenu.get(), sortById, menuText, position, TRUE);
+		MenuHelper::AddStringItem(groupByMenu.get(), groupById, menuText, position, TRUE);
+
+		position++;
+	}
+
+	SetMenuItemStates(sortByMenu.get(), groupByMenu.get(), tab);
+
+	return { std::move(sortByMenu), std::move(groupByMenu) };
+}
+
+wil::unique_hmenu SortMenuBuilder::CreateDefaultMenu()
+{
+	wil::unique_hmenu menu(CreatePopupMenu());
+
+	MenuHelper::AddSeparator(menu.get());
+
+	std::wstring sortAscending =
+		ResourceHelper::LoadString(m_resourceModule, IDS_MENU_SORT_ASCENDING);
+	MenuHelper::AddStringItem(menu.get(), IDM_SORT_ASCENDING, sortAscending);
+
+	std::wstring sortDescending =
+		ResourceHelper::LoadString(m_resourceModule, IDS_MENU_SORT_DESCENDING);
+	MenuHelper::AddStringItem(menu.get(), IDM_SORT_DESCENDING, sortDescending);
+
+	MenuHelper::AddSeparator(menu.get());
+
+	std::wstring sortByMore = ResourceHelper::LoadString(m_resourceModule, IDS_MENU_SORT_MORE);
+	MenuHelper::AddStringItem(menu.get(), IDM_SORTBY_MORE, sortByMore);
+
+	return menu;
+}
+
+void SortMenuBuilder::SetMenuItemStates(HMENU sortByMenu, HMENU groupByMenu, const Tab &tab)
+{
+	const SortMode sortMode = tab.GetShellBrowser()->GetSortMode();
+	BOOL showInGroups = tab.GetShellBrowser()->GetShowInGroups();
+
+	HMENU activeMenu;
+	HMENU inactiveMenu;
+	UINT itemToCheck;
+	UINT firstItem;
+	UINT lastItem;
+
+	if (showInGroups)
+	{
+		activeMenu = groupByMenu;
+		inactiveMenu = sortByMenu;
+
+		itemToCheck = DetermineGroupModeMenuId(sortMode);
+
+		firstItem = IDM_GROUPBY_NAME;
+		lastItem = IDM_GROUPBY_NAME + (SORT_MENU_RESOURCE_BLOCK_SIZE - 1);
+	}
+	else
+	{
+		activeMenu = sortByMenu;
+		inactiveMenu = groupByMenu;
+
+		itemToCheck = DetermineSortModeMenuId(sortMode);
+
+		firstItem = IDM_SORTBY_NAME;
+		lastItem = IDM_SORTBY_NAME + (SORT_MENU_RESOURCE_BLOCK_SIZE - 1);
+	}
+
+	MenuHelper::EnableItem(inactiveMenu, IDM_SORT_ASCENDING, FALSE);
+	MenuHelper::EnableItem(inactiveMenu, IDM_SORT_DESCENDING, FALSE);
+
+	MenuHelper::EnableItem(activeMenu, IDM_SORT_ASCENDING, TRUE);
+	MenuHelper::EnableItem(activeMenu, IDM_SORT_DESCENDING, TRUE);
+
+	CheckMenuRadioItem(activeMenu, firstItem, lastItem, itemToCheck, MF_BYCOMMAND);
+
+	if (tab.GetShellBrowser()->GetSortAscending())
+	{
+		itemToCheck = IDM_SORT_ASCENDING;
+	}
+	else
+	{
+		itemToCheck = IDM_SORT_DESCENDING;
+	}
+
+	CheckMenuRadioItem(
+		activeMenu, IDM_SORT_ASCENDING, IDM_SORT_DESCENDING, itemToCheck, MF_BYCOMMAND);
+}
+
+UINT SortMenuBuilder::GetSortMenuItemStringIndex(UINT uItemId)
 {
 	switch (uItemId)
 	{
@@ -204,7 +316,7 @@ UINT GetSortMenuItemStringIndex(UINT uItemId)
 	return 0;
 }
 
-int DetermineSortModeMenuId(SortMode sortMode)
+int SortMenuBuilder::DetermineSortModeMenuId(SortMode sortMode)
 {
 	switch (sortMode)
 	{
@@ -402,7 +514,7 @@ int DetermineSortModeMenuId(SortMode sortMode)
 	return -1;
 }
 
-int DetermineGroupModeMenuId(SortMode sortMode)
+int SortMenuBuilder::DetermineGroupModeMenuId(SortMode sortMode)
 {
 	switch (sortMode)
 	{
