@@ -16,7 +16,6 @@ __interface IExplorerplusplus;
 class TabRestorerUI
 {
 public:
-
 	TabRestorerUI(HINSTANCE instance, IExplorerplusplus *expp, TabRestorer *tabRestorer,
 		int menuStartId, int menuEndId);
 	~TabRestorerUI();
@@ -24,7 +23,6 @@ public:
 	void OnMenuItemClicked(int menuItemId);
 
 private:
-
 	DISALLOW_COPY_AND_ASSIGN(TabRestorerUI);
 
 	static const int MAX_MENU_ITEMS = 10;

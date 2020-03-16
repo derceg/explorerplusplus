@@ -23,17 +23,23 @@ void Explorerplusplus::InitializeTabs()
 	/* The tab backing will hold the tab window. */
 	CreateTabBacking();
 
-	m_tabContainer = TabContainer::Create(m_hTabBacking, this, this, &m_cachedIcons,
-		&m_bookmarkTree, m_hLanguageModule, m_config);
-	m_tabContainer->tabCreatedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabCreated, this, _1, _2), boost::signals2::at_front);
-	m_tabContainer->tabNavigationCompletedSignal.AddObserver(boost::bind(&Explorerplusplus::OnNavigationCompleted, this, _1), boost::signals2::at_front);
-	m_tabContainer->tabSelectedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabSelected, this, _1), boost::signals2::at_front);
+	m_tabContainer = TabContainer::Create(
+		m_hTabBacking, this, this, &m_cachedIcons, &m_bookmarkTree, m_hLanguageModule, m_config);
+	m_tabContainer->tabCreatedSignal.AddObserver(
+		boost::bind(&Explorerplusplus::OnTabCreated, this, _1, _2), boost::signals2::at_front);
+	m_tabContainer->tabNavigationCompletedSignal.AddObserver(
+		boost::bind(&Explorerplusplus::OnNavigationCompleted, this, _1), boost::signals2::at_front);
+	m_tabContainer->tabSelectedSignal.AddObserver(
+		boost::bind(&Explorerplusplus::OnTabSelected, this, _1), boost::signals2::at_front);
 
-	m_tabContainer->tabListViewSelectionChanged.AddObserver(boost::bind(&Explorerplusplus::OnTabListViewSelectionChanged, this, _1), boost::signals2::at_front);
+	m_tabContainer->tabListViewSelectionChanged.AddObserver(
+		boost::bind(&Explorerplusplus::OnTabListViewSelectionChanged, this, _1),
+		boost::signals2::at_front);
 
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_tabContainer->GetHWND());
 	int tabWindowHeight = MulDiv(TAB_WINDOW_HEIGHT_96DPI, dpi, USER_DEFAULT_SCREEN_DPI);
-	SetWindowPos(m_tabContainer->GetHWND(), nullptr, 0, 0, 0, tabWindowHeight, SWP_NOMOVE | SWP_NOZORDER);
+	SetWindowPos(
+		m_tabContainer->GetHWND(), nullptr, 0, 0, 0, tabWindowHeight, SWP_NOMOVE | SWP_NOZORDER);
 
 	m_tabRestorer = std::make_unique<TabRestorer>(m_tabContainer);
 	m_tabRestorerUI = std::make_unique<TabRestorerUI>(m_hLanguageModule, this, m_tabRestorer.get(),
@@ -49,10 +55,12 @@ void Explorerplusplus::OnTabCreated(int tabId, BOOL switchToNewTab)
 	const Tab &tab = m_tabContainer->GetTab(tabId);
 
 	/* TODO: This subclass needs to be removed. */
-	SetWindowSubclass(tab.GetShellBrowser()->GetListView(), ListViewProcStub, 0, reinterpret_cast<DWORD_PTR>(this));
+	SetWindowSubclass(tab.GetShellBrowser()->GetListView(), ListViewProcStub, 0,
+		reinterpret_cast<DWORD_PTR>(this));
 }
 
-boost::signals2::connection Explorerplusplus::AddTabsInitializedObserver(const TabsInitializedSignal::slot_type &observer)
+boost::signals2::connection Explorerplusplus::AddTabsInitializedObserver(
+	const TabsInitializedSignal::slot_type &observer)
 {
 	return m_tabsInitializedSignal.connect(observer);
 }
@@ -75,16 +83,16 @@ void Explorerplusplus::OnNavigationCompleted(const Tab &tab)
 HRESULT Explorerplusplus::OnNewTab()
 {
 	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
-	int selectionIndex = ListView_GetNextItem(selectedTab.GetShellBrowser()->GetListView(),
-		-1, LVNI_FOCUSED | LVNI_SELECTED);
+	int selectionIndex = ListView_GetNextItem(
+		selectedTab.GetShellBrowser()->GetListView(), -1, LVNI_FOCUSED | LVNI_SELECTED);
 
-	if(selectionIndex != -1)
+	if (selectionIndex != -1)
 	{
 		auto fileFindData = selectedTab.GetShellBrowser()->GetItemFileFindData(selectionIndex);
 
 		/* If the selected item is a folder, open that folder in a new tab, else
 		 * just use the default new tab directory. */
-		if(WI_IsFlagSet(fileFindData.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
+		if (WI_IsFlagSet(fileFindData.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
 		{
 			auto pidl = selectedTab.GetShellBrowser()->GetItemCompleteIdl(selectionIndex);
 			return m_tabContainer->CreateNewTab(pidl.get(), TabSettings(_selected = true));
@@ -98,59 +106,59 @@ HRESULT Explorerplusplus::OnNewTab()
 
 HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 {
-	TCHAR							szDirectory[MAX_PATH];
-	HRESULT							hr;
-	int								nTabsCreated = 0;
+	TCHAR szDirectory[MAX_PATH];
+	HRESULT hr;
+	int nTabsCreated = 0;
 
-	if(!g_commandLineDirectories.empty())
+	if (!g_commandLineDirectories.empty())
 	{
-		for(const auto &strDirectory : g_commandLineDirectories)
+		for (const auto &strDirectory : g_commandLineDirectories)
 		{
-			StringCchCopy(szDirectory,SIZEOF_ARRAY(szDirectory),strDirectory.c_str());
+			StringCchCopy(szDirectory, SIZEOF_ARRAY(szDirectory), strDirectory.c_str());
 
-			if(lstrcmp(strDirectory.c_str(),_T("..")) == 0)
+			if (lstrcmp(strDirectory.c_str(), _T("..")) == 0)
 			{
 				/* Get the parent of the current directory,
 				and browse to it. */
-				GetCurrentDirectory(SIZEOF_ARRAY(szDirectory),szDirectory);
+				GetCurrentDirectory(SIZEOF_ARRAY(szDirectory), szDirectory);
 				PathRemoveFileSpec(szDirectory);
 			}
-			else if(lstrcmp(strDirectory.c_str(),_T(".")) == 0)
+			else if (lstrcmp(strDirectory.c_str(), _T(".")) == 0)
 			{
-				GetCurrentDirectory(SIZEOF_ARRAY(szDirectory),szDirectory);
+				GetCurrentDirectory(SIZEOF_ARRAY(szDirectory), szDirectory);
 			}
 
 			hr = m_tabContainer->CreateNewTab(szDirectory, TabSettings(_selected = true));
 
-			if(hr == S_OK)
+			if (hr == S_OK)
 				nTabsCreated++;
 		}
 	}
 	else
 	{
-		if(m_config->startupMode == StartupMode::PreviousTabs)
+		if (m_config->startupMode == StartupMode::PreviousTabs)
 			nTabsCreated = pLoadSave->LoadPreviousTabs();
 	}
 
-	if(nTabsCreated == 0)
+	if (nTabsCreated == 0)
 	{
 		hr = m_tabContainer->CreateNewTabInDefaultDirectory(TabSettings(_selected = true));
 
-		if(hr == S_OK)
+		if (hr == S_OK)
 		{
 			nTabsCreated++;
 		}
 	}
 
-	if(nTabsCreated == 0)
+	if (nTabsCreated == 0)
 	{
 		/* Should never end up here. */
 		return E_FAIL;
 	}
 
-	if(!m_config->alwaysShowTabBar.get())
+	if (!m_config->alwaysShowTabBar.get())
 	{
-		if(nTabsCreated == 1)
+		if (nTabsCreated == 1)
 		{
 			m_bShowTabBar = FALSE;
 		}
@@ -158,8 +166,7 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 
 	/* m_iLastSelectedTab is the tab that was selected when the
 	program was last closed. */
-	if(m_iLastSelectedTab >= m_tabContainer->GetNumTabs() ||
-		m_iLastSelectedTab < 0)
+	if (m_iLastSelectedTab >= m_tabContainer->GetNumTabs() || m_iLastSelectedTab < 0)
 	{
 		m_iLastSelectedTab = 0;
 	}
@@ -174,7 +181,7 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 void Explorerplusplus::OnTabSelected(const Tab &tab)
 {
 	/* Hide the old listview. */
-	ShowWindow(m_hActiveListView,SW_HIDE);
+	ShowWindow(m_hActiveListView, SW_HIDE);
 
 	m_hActiveListView = tab.GetShellBrowser()->GetListView();
 	m_pActiveShellBrowser = tab.GetShellBrowser();
@@ -189,7 +196,7 @@ void Explorerplusplus::OnTabSelected(const Tab &tab)
 	UpdateWindowStates(tab);
 
 	/* Show the new listview. */
-	ShowWindow(m_hActiveListView,SW_SHOW);
+	ShowWindow(m_hActiveListView, SW_SHOW);
 	SetFocus(m_hActiveListView);
 }
 
@@ -198,13 +205,13 @@ void Explorerplusplus::OnSelectTabByIndex(int iTab)
 	int nTabs = m_tabContainer->GetNumTabs();
 	int newIndex;
 
-	if(iTab == -1)
+	if (iTab == -1)
 	{
 		newIndex = nTabs - 1;
 	}
 	else
 	{
-		if(iTab < nTabs)
+		if (iTab < nTabs)
 			newIndex = iTab;
 		else
 			newIndex = nTabs - 1;
@@ -252,6 +259,7 @@ void Explorerplusplus::OnTabListViewSelectionChanged(const Tab &tab)
 
 	if (m_tabContainer->IsTabSelected(tab))
 	{
-		SetTimer(m_hContainer, LISTVIEW_ITEM_CHANGED_TIMER_ID, LISTVIEW_ITEM_CHANGED_TIMEOUT, nullptr);
+		SetTimer(
+			m_hContainer, LISTVIEW_ITEM_CHANGED_TIMER_ID, LISTVIEW_ITEM_CHANGED_TIMEOUT, nullptr);
 	}
 }

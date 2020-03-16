@@ -28,7 +28,6 @@ struct PreservedTab
 	PreservedFolderState preservedFolderState;
 
 private:
-
 	DISALLOW_COPY_AND_ASSIGN(PreservedTab);
 
 	static std::vector<std::unique_ptr<PreservedHistoryEntry>> CopyHistoryEntries(const Tab &tab);

@@ -21,30 +21,32 @@
 #include "../Helper/CachedIcons.h"
 #include "../Helper/Controls.h"
 #include "../Helper/IconFetcher.h"
-#include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/TabHelper.h"
 #include "../Helper/WindowHelper.h"
+#include "../Helper/iDirectoryMonitor.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/map.hpp>
 
 const UINT TAB_CONTROL_STYLES = WS_VISIBLE | WS_CHILD | TCS_FOCUSNEVER | TCS_SINGLELINE
-| TCS_TOOLTIPS | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+	| TCS_TOOLTIPS | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 
+// clang-format off
 const std::map<UINT, Icon> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
 	{ IDM_FILE_NEWTAB, Icon::NewTab },
 	{ IDM_TAB_REFRESH, Icon::Refresh },
 	{ IDM_TAB_CLOSETAB, Icon::CloseTab }
 };
+// clang-format on
 
 TabContainer *TabContainer::Create(HWND parent, TabNavigationInterface *tabNavigation,
 	IExplorerplusplus *expp, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
 	HINSTANCE instance, std::shared_ptr<Config> config)
 {
-	return new TabContainer(parent, tabNavigation, expp, cachedIcons, bookmarkTree,
-		instance, config);
+	return new TabContainer(
+		parent, tabNavigation, expp, cachedIcons, bookmarkTree, instance, config);
 }
 
 TabContainer::TabContainer(HWND parent, TabNavigationInterface *tabNavigation,
@@ -83,18 +85,21 @@ void TabContainer::Initialize(HWND parent)
 
 	NONCLIENTMETRICS ncm;
 	ncm.cbSize = sizeof(ncm);
-	m_dpiCompat.SystemParametersInfoForDpi(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0, dpi);
+	m_dpiCompat.SystemParametersInfoForDpi(
+		SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0, dpi);
 	m_tabFont.reset(CreateFontIndirect(&ncm.lfSmCaptionFont));
 
 	if (m_tabFont)
 	{
-		SendMessage(m_hwnd, WM_SETFONT, reinterpret_cast<WPARAM>(m_tabFont.get()), MAKELPARAM(TRUE, 0));
+		SendMessage(
+			m_hwnd, WM_SETFONT, reinterpret_cast<WPARAM>(m_tabFont.get()), MAKELPARAM(TRUE, 0));
 	}
 
 	SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList));
 
 	int dpiScaledSize = MulDiv(ICON_SIZE_96DPI, dpi, USER_DEFAULT_SCREEN_DPI);
-	m_tabCtrlImageList.reset(ImageList_Create(dpiScaledSize, dpiScaledSize, ILC_COLOR32 | ILC_MASK, 0, 100));
+	m_tabCtrlImageList.reset(
+		ImageList_Create(dpiScaledSize, dpiScaledSize, ILC_COLOR32 | ILC_MASK, 0, 100));
 	TabCtrl_SetImageList(m_hwnd, m_tabCtrlImageList.get());
 
 	AddDefaultTabIcons(m_tabCtrlImageList.get());
@@ -103,26 +108,36 @@ void TabContainer::Initialize(HWND parent)
 	RegisterDragDrop(m_hwnd, pTabDropHandler);
 	pTabDropHandler->Release();
 
-	m_windowSubclasses.emplace_back(m_hwnd, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
-	m_windowSubclasses.emplace_back(parent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.emplace_back(
+		m_hwnd, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.emplace_back(
+		parent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
-	m_connections.push_back(tabCreatedSignal.AddObserver(boost::bind(&TabContainer::OnTabCreated, this, _1, _2)));
-	m_connections.push_back(tabNavigationCompletedSignal.AddObserver(boost::bind(&TabContainer::OnNavigationCompleted, this, _1)));
-	m_connections.push_back(tabSelectedSignal.AddObserver(boost::bind(&TabContainer::OnTabSelected, this, _1)));
-	m_connections.push_back(tabRemovedSignal.AddObserver(boost::bind(&TabContainer::OnTabRemoved, this, _1)));
+	m_connections.push_back(
+		tabCreatedSignal.AddObserver(boost::bind(&TabContainer::OnTabCreated, this, _1, _2)));
+	m_connections.push_back(tabNavigationCompletedSignal.AddObserver(
+		boost::bind(&TabContainer::OnNavigationCompleted, this, _1)));
+	m_connections.push_back(
+		tabSelectedSignal.AddObserver(boost::bind(&TabContainer::OnTabSelected, this, _1)));
+	m_connections.push_back(
+		tabRemovedSignal.AddObserver(boost::bind(&TabContainer::OnTabRemoved, this, _1)));
 
-	m_connections.push_back(m_config->alwaysShowTabBar.addObserver(boost::bind(&TabContainer::OnAlwaysShowTabBarUpdated, this, _1)));
-	m_connections.push_back(m_config->forceSameTabWidth.addObserver(boost::bind(&TabContainer::OnForceSameTabWidthUpdated, this, _1)));
+	m_connections.push_back(m_config->alwaysShowTabBar.addObserver(
+		boost::bind(&TabContainer::OnAlwaysShowTabBarUpdated, this, _1)));
+	m_connections.push_back(m_config->forceSameTabWidth.addObserver(
+		boost::bind(&TabContainer::OnForceSameTabWidthUpdated, this, _1)));
 }
 
 void TabContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
 {
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hwnd);
-	wil::unique_hbitmap bitmap = m_expp->GetIconResourceLoader()->LoadBitmapFromPNGForDpi(Icon::Lock, ICON_SIZE_96DPI, ICON_SIZE_96DPI, dpi);
+	wil::unique_hbitmap bitmap = m_expp->GetIconResourceLoader()->LoadBitmapFromPNGForDpi(
+		Icon::Lock, ICON_SIZE_96DPI, ICON_SIZE_96DPI, dpi);
 	m_tabIconLockIndex = ImageList_Add(himlTab, bitmap.get(), nullptr);
 
 	m_defaultFolderIconIndex = ImageHelper::CopyImageListIcon(m_tabCtrlImageList.get(),
-		reinterpret_cast<HIMAGELIST>(m_systemImageList.get()), m_defaultFolderIconSystemImageListIndex);
+		reinterpret_cast<HIMAGELIST>(m_systemImageList.get()),
+		m_defaultFolderIconSystemImageListIndex);
 }
 
 bool TabContainer::IsDefaultIcon(int iconIndex)
@@ -140,7 +155,8 @@ TabContainer::~TabContainer()
 	RevokeDragDrop(m_hwnd);
 }
 
-LRESULT CALLBACK TabContainer::WndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK TabContainer::WndProcStub(
+	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -152,66 +168,66 @@ LRESULT CALLBACK TabContainer::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
 {
 	switch (uMsg)
 	{
-		case WM_LBUTTONDOWN:
-		{
-			POINT pt;
-			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-			OnTabCtrlLButtonDown(&pt);
-		}
+	case WM_LBUTTONDOWN:
+	{
+		POINT pt;
+		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+		OnTabCtrlLButtonDown(&pt);
+	}
+	break;
+
+	case WM_LBUTTONUP:
+		OnTabCtrlLButtonUp();
 		break;
 
-		case WM_LBUTTONUP:
-			OnTabCtrlLButtonUp();
-			break;
+	case WM_MOUSEMOVE:
+	{
+		POINT pt;
+		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+		OnTabCtrlMouseMove(&pt);
+	}
+	break;
 
-		case WM_MOUSEMOVE:
-		{
-			POINT pt;
-			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-			OnTabCtrlMouseMove(&pt);
-		}
+	case WM_LBUTTONDBLCLK:
+	{
+		POINT pt;
+		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+		OnLButtonDoubleClick(pt);
+	}
+	break;
+
+	case WM_MBUTTONUP:
+	{
+		POINT pt;
+		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+		OnTabCtrlMButtonUp(&pt);
+	}
+	break;
+
+	case WM_RBUTTONUP:
+	{
+		POINT pt;
+		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+		OnTabCtrlRButtonUp(&pt);
+	}
+	break;
+
+	case WM_MENUSELECT:
+		/* Forward the message to the main window so it can
+		handle menu help. */
+		SendMessage(m_expp->GetMainWindow(), WM_MENUSELECT, wParam, lParam);
 		break;
 
-		case WM_LBUTTONDBLCLK:
+	case WM_CAPTURECHANGED:
+	{
+		if ((HWND) lParam != hwnd)
 		{
-			POINT pt;
-			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-			OnLButtonDoubleClick(pt);
+			ReleaseCapture();
 		}
-			break;
 
-		case WM_MBUTTONUP:
-		{
-			POINT pt;
-			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-			OnTabCtrlMButtonUp(&pt);
-		}
-		break;
-
-		case WM_RBUTTONUP:
-		{
-			POINT pt;
-			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-			OnTabCtrlRButtonUp(&pt);
-		}
-		break;
-
-		case WM_MENUSELECT:
-			/* Forward the message to the main window so it can
-			handle menu help. */
-			SendMessage(m_expp->GetMainWindow(), WM_MENUSELECT, wParam, lParam);
-			break;
-
-		case WM_CAPTURECHANGED:
-		{
-			if ((HWND)lParam != hwnd)
-			{
-				ReleaseCapture();
-			}
-
-			m_bTabBeenDragged = FALSE;
-		}
-		break;
+		m_bTabBeenDragged = FALSE;
+	}
+	break;
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
@@ -275,10 +291,8 @@ void TabContainer::OnTabCtrlMouseMove(POINT *pt)
 	- If the cursor is not over the dragged item itself.
 	- If the cursor has passed to the left of the dragged tab, or
 	- If the cursor has passed to the right of the dragged tab. */
-	if (HitTestInfo.flags != TCHT_NOWHERE &&
-		iSwap != iSelected &&
-		(pt->x < m_rcDraggedTab.left ||
-			pt->x > m_rcDraggedTab.right))
+	if (HitTestInfo.flags != TCHT_NOWHERE && iSwap != iSelected
+		&& (pt->x < m_rcDraggedTab.left || pt->x > m_rcDraggedTab.right))
 	{
 		RECT rcSwap;
 
@@ -383,22 +397,26 @@ void TabContainer::CreateTabContextMenu(Tab &tab, const POINT &pt)
 	AddImagesToTabContextMenu(menu, menuImages);
 
 	MenuHelper::CheckItem(menu, IDM_TAB_LOCKTAB, tab.GetLockState() == Tab::LockState::Locked);
-	MenuHelper::CheckItem(menu, IDM_TAB_LOCKTABANDADDRESS, tab.GetLockState() == Tab::LockState::AddressLocked);
+	MenuHelper::CheckItem(
+		menu, IDM_TAB_LOCKTABANDADDRESS, tab.GetLockState() == Tab::LockState::AddressLocked);
 	MenuHelper::EnableItem(menu, IDM_TAB_CLOSETAB, tab.GetLockState() == Tab::LockState::NotLocked);
 
-	UINT Command = TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD,
-		pt.x, pt.y, 0, m_hwnd, nullptr);
+	UINT Command =
+		TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD, pt.x,
+			pt.y, 0, m_hwnd, nullptr);
 
 	ProcessTabCommand(Command, tab);
 }
 
-void TabContainer::AddImagesToTabContextMenu(HMENU menu, std::vector<wil::unique_hbitmap> &menuImages)
+void TabContainer::AddImagesToTabContextMenu(
+	HMENU menu, std::vector<wil::unique_hbitmap> &menuImages)
 {
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hwnd);
 
 	for (const auto &mapping : TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS)
 	{
-		ResourceHelper::SetMenuItemImage(menu, mapping.first, m_expp->GetIconResourceLoader(), mapping.second, dpi, menuImages);
+		ResourceHelper::SetMenuItemImage(
+			menu, mapping.first, m_expp->GetIconResourceLoader(), mapping.second, dpi, menuImages);
 	}
 }
 
@@ -406,50 +424,50 @@ void TabContainer::ProcessTabCommand(UINT uMenuID, Tab &tab)
 {
 	switch (uMenuID)
 	{
-		case IDM_FILE_NEWTAB:
-			/* Send the resulting command back to the main window for processing. */
-			SendMessage(m_expp->GetMainWindow(), WM_COMMAND, MAKEWPARAM(uMenuID, 0), 0);
-			break;
+	case IDM_FILE_NEWTAB:
+		/* Send the resulting command back to the main window for processing. */
+		SendMessage(m_expp->GetMainWindow(), WM_COMMAND, MAKEWPARAM(uMenuID, 0), 0);
+		break;
 
-		case IDM_TAB_DUPLICATETAB:
-			DuplicateTab(tab);
-			break;
+	case IDM_TAB_DUPLICATETAB:
+		DuplicateTab(tab);
+		break;
 
-		case IDM_TAB_OPENPARENTINNEWTAB:
-			OnOpenParentInNewTab(tab);
-			break;
+	case IDM_TAB_OPENPARENTINNEWTAB:
+		OnOpenParentInNewTab(tab);
+		break;
 
-		case IDM_TAB_REFRESH:
-			OnRefreshTab(tab);
-			break;
+	case IDM_TAB_REFRESH:
+		OnRefreshTab(tab);
+		break;
 
-		case IDM_TAB_REFRESHALL:
-			OnRefreshAllTabs();
-			break;
+	case IDM_TAB_REFRESHALL:
+		OnRefreshAllTabs();
+		break;
 
-		case IDM_TAB_RENAMETAB:
-			OnRenameTab(tab);
-			break;
+	case IDM_TAB_RENAMETAB:
+		OnRenameTab(tab);
+		break;
 
-		case IDM_TAB_LOCKTAB:
-			OnLockTab(tab);
-			break;
+	case IDM_TAB_LOCKTAB:
+		OnLockTab(tab);
+		break;
 
-		case IDM_TAB_LOCKTABANDADDRESS:
-			OnLockTabAndAddress(tab);
-			break;
+	case IDM_TAB_LOCKTABANDADDRESS:
+		OnLockTabAndAddress(tab);
+		break;
 
-		case IDM_TAB_CLOSETAB:
-			CloseTab(tab);
-			break;
+	case IDM_TAB_CLOSETAB:
+		CloseTab(tab);
+		break;
 
-		case IDM_TAB_CLOSEOTHERTABS:
-			OnCloseOtherTabs(GetTabIndex(tab));
-			break;
+	case IDM_TAB_CLOSEOTHERTABS:
+		OnCloseOtherTabs(GetTabIndex(tab));
+		break;
 
-		case IDM_TAB_CLOSETABSTORIGHT:
-			OnCloseTabsToRight(GetTabIndex(tab));
-			break;
+	case IDM_TAB_CLOSETABSTORIGHT:
+		OnCloseTabsToRight(GetTabIndex(tab));
+		break;
 	}
 }
 
@@ -537,7 +555,8 @@ void TabContainer::OnCloseTabsToRight(int index)
 	}
 }
 
-LRESULT CALLBACK TabContainer::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK TabContainer::ParentWndProcStub(
+	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -559,7 +578,7 @@ LRESULT CALLBACK TabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam
 		POINTSTOPOINT(ptClient, MAKEPOINTS(lParam));
 		ShowBackgroundContextMenu(ptClient);
 	}
-		break;
+	break;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
@@ -589,7 +608,8 @@ LRESULT CALLBACK TabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam
 
 void TabContainer::ShowBackgroundContextMenu(const POINT &ptClient)
 {
-	wil::unique_hmenu parentMenu(LoadMenu(m_instance, MAKEINTRESOURCE(IDR_TAB_CONTAINER_CONTEXT_MENU)));
+	wil::unique_hmenu parentMenu(
+		LoadMenu(m_instance, MAKEINTRESOURCE(IDR_TAB_CONTAINER_CONTEXT_MENU)));
 
 	if (!parentMenu)
 	{
@@ -606,8 +626,8 @@ void TabContainer::ShowBackgroundContextMenu(const POINT &ptClient)
 	POINT ptScreen = ptClient;
 	ClientToScreen(m_hwnd, &ptScreen);
 
-	int menuItemId = TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RETURNCMD, ptScreen.x,
-		ptScreen.y, 0, m_hwnd, nullptr);
+	int menuItemId = TrackPopupMenu(
+		menu, TPM_LEFTALIGN | TPM_RETURNCMD, ptScreen.x, ptScreen.y, 0, m_hwnd, nullptr);
 
 	if (menuItemId != 0)
 	{
@@ -668,8 +688,7 @@ void TabContainer::OnTabCreated(int tabId, BOOL switchToNewTab)
 	UNREFERENCED_PARAMETER(tabId);
 	UNREFERENCED_PARAMETER(switchToNewTab);
 
-	if (!m_config->alwaysShowTabBar.get() &&
-		(GetNumTabs() > 1))
+	if (!m_config->alwaysShowTabBar.get() && (GetNumTabs() > 1))
 	{
 		m_expp->ShowTabBar();
 	}
@@ -679,8 +698,7 @@ void TabContainer::OnTabRemoved(int tabId)
 {
 	UNREFERENCED_PARAMETER(tabId);
 
-	if (!m_config->alwaysShowTabBar.get() &&
-		(GetNumTabs() == 1))
+	if (!m_config->alwaysShowTabBar.get() && (GetNumTabs() == 1))
 	{
 		m_expp->HideTabBar();
 	}
@@ -754,7 +772,8 @@ void TabContainer::UpdateTabNameInWindow(const Tab &tab)
 void TabContainer::SetTabIcon(const Tab &tab)
 {
 	/* If the tab is locked, use a lock icon. */
-	if (tab.GetLockState() == Tab::LockState::Locked || tab.GetLockState() == Tab::LockState::AddressLocked)
+	if (tab.GetLockState() == Tab::LockState::Locked
+		|| tab.GetLockState() == Tab::LockState::AddressLocked)
 	{
 		SetTabIconFromImageList(tab, m_tabIconLockIndex);
 	}
@@ -774,7 +793,8 @@ void TabContainer::SetTabIcon(const Tab &tab)
 		auto pidlDirectory = tab.GetShellBrowser()->GetDirectoryIdl();
 
 		m_iconFetcher.QueueIconTask(pidlDirectory.get(),
-			[this, tabId = tab.GetId(), folderId = tab.GetShellBrowser()->GetUniqueFolderId()] (int iconIndex) {
+			[this, tabId = tab.GetId(), folderId = tab.GetShellBrowser()->GetUniqueFolderId()](
+				int iconIndex) {
 				auto tab = GetTabOptional(tabId);
 
 				if (!tab)
@@ -788,8 +808,7 @@ void TabContainer::SetTabIcon(const Tab &tab)
 				}
 
 				SetTabIconFromSystemImageList(*tab, iconIndex);
-			}
-		);
+			});
 	}
 }
 
@@ -852,19 +871,19 @@ HRESULT TabContainer::CreateNewTabInDefaultDirectory(const TabSettings &tabSetti
 	return hr;
 }
 
-HRESULT TabContainer::CreateNewTab(const TCHAR *TabDirectory,
-	const TabSettings &tabSettings, const FolderSettings *folderSettings,
-	std::optional<FolderColumns> initialColumns, int *newTabId)
+HRESULT TabContainer::CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings,
+	const FolderSettings *folderSettings, std::optional<FolderColumns> initialColumns,
+	int *newTabId)
 {
 	/* Attempt to expand the path (in the event that
 	it contains embedded environment variables). */
 	TCHAR szExpandedPath[MAX_PATH];
-	BOOL bRet = MyExpandEnvironmentStrings(TabDirectory, szExpandedPath, SIZEOF_ARRAY(szExpandedPath));
+	BOOL bRet =
+		MyExpandEnvironmentStrings(TabDirectory, szExpandedPath, SIZEOF_ARRAY(szExpandedPath));
 
 	if (!bRet)
 	{
-		StringCchCopy(szExpandedPath,
-			SIZEOF_ARRAY(szExpandedPath), TabDirectory);
+		StringCchCopy(szExpandedPath, SIZEOF_ARRAY(szExpandedPath), TabDirectory);
 	}
 
 	unique_pidl_absolute pidl;
@@ -898,9 +917,9 @@ HRESULT TabContainer::CreateNewTab(const PreservedTab &preservedTab, int *newTab
 	return SetUpNewTab(tab, entry->pidl.get(), tabSettings, false, newTabId);
 }
 
-HRESULT TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory,
-	const TabSettings &tabSettings, const FolderSettings *folderSettings,
-	std::optional<FolderColumns> initialColumns, int *newTabId)
+HRESULT TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings,
+	const FolderSettings *folderSettings, std::optional<FolderColumns> initialColumns,
+	int *newTabId)
 {
 	if (!CheckIdl(pidlDirectory) || !IsIdlDirectory(pidlDirectory))
 	{
@@ -974,17 +993,18 @@ HRESULT TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 
 	// Capturing the tab by reference here is safe, since the tab object is
 	// guaranteed to exist whenever this method is called.
-	tab.GetShellBrowser()->AddNavigationCompletedObserver([this, &tab] (PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry) {
-		UNREFERENCED_PARAMETER(pidlDirectory);
-		UNREFERENCED_PARAMETER(addHistoryEntry);
+	tab.GetShellBrowser()->AddNavigationCompletedObserver(
+		[this, &tab](PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry) {
+			UNREFERENCED_PARAMETER(pidlDirectory);
+			UNREFERENCED_PARAMETER(addHistoryEntry);
 
-		// Re-broadcast the event. This allows other classes to be notified of
-		// navigations in any tab, without having to observe navigation events
-		// for each tab individually.
-		tabNavigationCompletedSignal.m_signal(tab);
-	});
+			// Re-broadcast the event. This allows other classes to be notified of
+			// navigations in any tab, without having to observe navigation events
+			// for each tab individually.
+			tabNavigationCompletedSignal.m_signal(tab);
+		});
 
-	tab.GetShellBrowser()->listViewSelectionChanged.AddObserver([this, &tab] () {
+	tab.GetShellBrowser()->listViewSelectionChanged.AddObserver([this, &tab]() {
 		tabListViewSelectionChanged.m_signal(tab);
 	});
 
@@ -992,7 +1012,8 @@ HRESULT TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 		tabColumnsChanged.m_signal(tab);
 	});
 
-	HRESULT hr = tab.GetShellBrowser()->GetNavigationController()->BrowseFolder(pidlDirectory, addHistoryEntry);
+	HRESULT hr = tab.GetShellBrowser()->GetNavigationController()->BrowseFolder(
+		pidlDirectory, addHistoryEntry);
 
 	if (hr != S_OK)
 	{
@@ -1027,7 +1048,8 @@ HRESULT TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 	return S_OK;
 }
 
-void TabContainer::InsertNewTab(int index, int tabId, PCIDLIST_ABSOLUTE pidlDirectory, std::optional<std::wstring> customName)
+void TabContainer::InsertNewTab(
+	int index, int tabId, PCIDLIST_ABSOLUTE pidlDirectory, std::optional<std::wstring> customName)
 {
 	std::wstring name;
 
@@ -1056,15 +1078,15 @@ bool TabContainer::CloseTab(const Tab &tab)
 {
 	const int nTabs = GetNumTabs();
 
-	if (nTabs == 1 &&
-		m_config->closeMainWindowOnTabClose)
+	if (nTabs == 1 && m_config->closeMainWindowOnTabClose)
 	{
 		OnClose();
 		return true;
 	}
 
 	/* The tab is locked. Don't close it. */
-	if (tab.GetLockState() == Tab::LockState::Locked || tab.GetLockState() == Tab::LockState::AddressLocked)
+	if (tab.GetLockState() == Tab::LockState::Locked
+		|| tab.GetLockState() == Tab::LockState::AddressLocked)
 	{
 		return false;
 	}
@@ -1091,7 +1113,9 @@ bool TabContainer::CloseTab(const Tab &tab)
 
 void TabContainer::RemoveTabFromControl(const Tab &tab)
 {
-	m_tabSelectionHistory.erase(std::remove(m_tabSelectionHistory.begin(), m_tabSelectionHistory.end(), tab.GetId()), m_tabSelectionHistory.end());
+	m_tabSelectionHistory.erase(
+		std::remove(m_tabSelectionHistory.begin(), m_tabSelectionHistory.end(), tab.GetId()),
+		m_tabSelectionHistory.end());
 
 	const int index = GetTabIndex(tab);
 
@@ -1296,17 +1320,17 @@ std::vector<std::reference_wrapper<const Tab>> TabContainer::GetAllTabsInOrder()
 
 	// The Tab class is non-copyable, so there are essentially two ways of
 	// retrieving a sorted list of tabs, as far as I can tell:
-	// 
+	//
 	// 1. The first is to maintain a sorted list of tabs while the program is
 	// running. I generally don't think that's a good idea, since it would be
 	// redundant (the tab control already stores that information) and it risks
 	// possible issues (if the two sets get out of sync).
-	// 
+	//
 	// 2. The second is to sort the tabs when needed. Because they're
 	// non-copyable, that can't be done directly. std::reference_wrapper allows
 	// it to be done relatively easily, though. Sorting a set of pointers would
 	// accomplish the same thing.
-	std::sort(sortedTabs.begin(), sortedTabs.end(), [this](const auto & tab1, const auto & tab2) {
+	std::sort(sortedTabs.begin(), sortedTabs.end(), [this](const auto &tab1, const auto &tab2) {
 		return GetTabIndex(tab1.get()) < GetTabIndex(tab2.get());
 	});
 

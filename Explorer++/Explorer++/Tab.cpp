@@ -31,21 +31,22 @@ Tab::Tab(IExplorerplusplus *expp, TabNavigationInterface *tabNavigation,
 		folderSettingsFinal = expp->GetConfig()->defaultFolderSettings;
 	}
 
-	m_shellBrowser = ShellBrowser::CreateNew(m_id, expp->GetLanguageModule(),
-		expp->GetMainWindow(), expp->GetCachedIcons(), expp->GetIconResourceLoader(),
-		expp->GetConfig(), tabNavigation, folderSettingsFinal, initialColumns);
+	m_shellBrowser = ShellBrowser::CreateNew(m_id, expp->GetLanguageModule(), expp->GetMainWindow(),
+		expp->GetCachedIcons(), expp->GetIconResourceLoader(), expp->GetConfig(), tabNavigation,
+		folderSettingsFinal, initialColumns);
 }
 
-Tab::Tab(const PreservedTab &preservedTab, IExplorerplusplus *expp, TabNavigationInterface *tabNavigation) :
+Tab::Tab(const PreservedTab &preservedTab, IExplorerplusplus *expp,
+	TabNavigationInterface *tabNavigation) :
 	m_id(idCounter++),
 	m_useCustomName(preservedTab.useCustomName),
 	m_customName(preservedTab.customName),
 	m_lockState(preservedTab.lockState)
 {
-	m_shellBrowser = ShellBrowser::CreateFromPreserved(m_id, expp->GetLanguageModule(),
-		expp->GetMainWindow(), expp->GetCachedIcons(), expp->GetIconResourceLoader(),
-		expp->GetConfig(), tabNavigation, preservedTab.history, preservedTab.currentEntry,
-		preservedTab.preservedFolderState);
+	m_shellBrowser =
+		ShellBrowser::CreateFromPreserved(m_id, expp->GetLanguageModule(), expp->GetMainWindow(),
+			expp->GetCachedIcons(), expp->GetIconResourceLoader(), expp->GetConfig(), tabNavigation,
+			preservedTab.history, preservedTab.currentEntry, preservedTab.preservedFolderState);
 }
 
 int Tab::GetId() const
@@ -118,12 +119,14 @@ void Tab::SetLockState(LockState lockState)
 	switch (lockState)
 	{
 	case Tab::LockState::NotLocked:
-		m_shellBrowser->GetNavigationController()->SetNavigationMode(ShellNavigationController::NavigationMode::Normal);
+		m_shellBrowser->GetNavigationController()->SetNavigationMode(
+			ShellNavigationController::NavigationMode::Normal);
 		break;
 
 	case Tab::LockState::Locked:
 	case Tab::LockState::AddressLocked:
-		m_shellBrowser->GetNavigationController()->SetNavigationMode(ShellNavigationController::NavigationMode::ForceNewTab);
+		m_shellBrowser->GetNavigationController()->SetNavigationMode(
+			ShellNavigationController::NavigationMode::ForceNewTab);
 		break;
 	}
 

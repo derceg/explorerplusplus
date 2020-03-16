@@ -13,7 +13,6 @@ class TabContainer;
 class TabRestorer
 {
 public:
-
 	TabRestorer(TabContainer *tabContainer);
 
 	const std::vector<std::unique_ptr<PreservedTab>> &GetClosedTabs() const;
@@ -21,7 +20,6 @@ public:
 	void RestoreTabById(int id);
 
 private:
-
 	DISALLOW_COPY_AND_ASSIGN(TabRestorer);
 
 	void OnTabPreRemoval(const Tab &tab);

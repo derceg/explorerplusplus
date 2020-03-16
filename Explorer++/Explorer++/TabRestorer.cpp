@@ -6,10 +6,10 @@
 #include "TabRestorer.h"
 #include "TabContainer.h"
 
-TabRestorer::TabRestorer(TabContainer *tabContainer) :
-	m_tabContainer(tabContainer)
+TabRestorer::TabRestorer(TabContainer *tabContainer) : m_tabContainer(tabContainer)
 {
-	m_connections.push_back(m_tabContainer->tabPreRemovalSignal.AddObserver(boost::bind(&TabRestorer::OnTabPreRemoval, this, _1)));
+	m_connections.push_back(m_tabContainer->tabPreRemovalSignal.AddObserver(
+		boost::bind(&TabRestorer::OnTabPreRemoval, this, _1)));
 }
 
 void TabRestorer::OnTabPreRemoval(const Tab &tab)
@@ -39,9 +39,10 @@ void TabRestorer::RestoreLastTab()
 
 void TabRestorer::RestoreTabById(int id)
 {
-	auto itr = std::find_if(m_closedTabs.begin(), m_closedTabs.end(), [id] (const std::unique_ptr<PreservedTab> &preservedTab) {
-		return preservedTab->id == id;
-	});
+	auto itr = std::find_if(m_closedTabs.begin(), m_closedTabs.end(),
+		[id](const std::unique_ptr<PreservedTab> &preservedTab) {
+			return preservedTab->id == id;
+		});
 
 	if (itr == m_closedTabs.end())
 	{

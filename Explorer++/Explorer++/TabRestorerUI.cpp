@@ -21,9 +21,11 @@ TabRestorerUI::TabRestorerUI(HINSTANCE instance, IExplorerplusplus *expp, TabRes
 	m_menuEndId(menuEndId)
 {
 	SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList));
-	m_defaultFolderIconBitmap = ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), GetDefaultFolderIconIndex());
+	m_defaultFolderIconBitmap =
+		ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), GetDefaultFolderIconIndex());
 
-	m_connections.push_back(m_expp->AddMainMenuPreShowObserver(boost::bind(&TabRestorerUI::OnMainMenuPreShow, this, _1)));
+	m_connections.push_back(m_expp->AddMainMenuPreShowObserver(
+		boost::bind(&TabRestorerUI::OnMainMenuPreShow, this, _1)));
 }
 
 TabRestorerUI::~TabRestorerUI()
@@ -52,8 +54,8 @@ void TabRestorerUI::OnMainMenuPreShow(HMENU mainMenu)
 	m_menuItemMappings = menuItemMappings;
 }
 
-wil::unique_hmenu TabRestorerUI::BuildRecentlyClosedTabsMenu(std::vector<wil::unique_hbitmap> &menuImages,
-	std::unordered_map<int, int> &menuItemMappings)
+wil::unique_hmenu TabRestorerUI::BuildRecentlyClosedTabsMenu(
+	std::vector<wil::unique_hbitmap> &menuImages, std::unordered_map<int, int> &menuItemMappings)
 {
 	wil::unique_hmenu menu(CreatePopupMenu());
 
@@ -73,7 +75,8 @@ wil::unique_hmenu TabRestorerUI::BuildRecentlyClosedTabsMenu(std::vector<wil::un
 	int numInserted = 0;
 
 	for (auto &closedTab : m_tabRestorer->GetClosedTabs()
-		| boost::adaptors::sliced::sliced(0, min(MAX_MENU_ITEMS, m_tabRestorer->GetClosedTabs().size())))
+			| boost::adaptors::sliced::sliced(
+				0, min(MAX_MENU_ITEMS, m_tabRestorer->GetClosedTabs().size())))
 	{
 		auto currentEntry = closedTab->history.at(closedTab->currentEntry).get();
 
@@ -104,7 +107,8 @@ wil::unique_hmenu TabRestorerUI::BuildRecentlyClosedTabsMenu(std::vector<wil::un
 
 		if (iconIndex)
 		{
-			wil::unique_hbitmap iconBitmap = ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), *iconIndex);
+			wil::unique_hbitmap iconBitmap =
+				ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), *iconIndex);
 
 			if (iconBitmap)
 			{
@@ -125,7 +129,7 @@ wil::unique_hmenu TabRestorerUI::BuildRecentlyClosedTabsMenu(std::vector<wil::un
 
 		InsertMenuItem(menu.get(), numInserted, TRUE, &mii);
 
-		menuItemMappings.insert({id, closedTab->id});
+		menuItemMappings.insert({ id, closedTab->id });
 
 		numInserted++;
 	}

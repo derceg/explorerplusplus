@@ -10,20 +10,21 @@
 
 const TCHAR RenameTabDialogPersistentSettings::SETTINGS_KEY[] = _T("RenameTab");
 
-RenameTabDialog::RenameTabDialog(HINSTANCE hInstance, HWND hParent, int tabId,
-	TabContainer *tabContainer) :
+RenameTabDialog::RenameTabDialog(
+	HINSTANCE hInstance, HWND hParent, int tabId, TabContainer *tabContainer) :
 	BaseDialog(hInstance, IDD_RENAMETAB, hParent, false),
 	m_tabId(tabId),
 	m_tabContainer(tabContainer)
 {
 	m_prtdps = &RenameTabDialogPersistentSettings::GetInstance();
 
-	m_connections.push_back(m_tabContainer->tabRemovedSignal.AddObserver(boost::bind(&RenameTabDialog::OnTabClosed, this, _1)));
+	m_connections.push_back(m_tabContainer->tabRemovedSignal.AddObserver(
+		boost::bind(&RenameTabDialog::OnTabClosed, this, _1)));
 }
 
 INT_PTR RenameTabDialog::OnInitDialog()
 {
-	HWND hEditName = GetDlgItem(m_hDlg,IDC_RENAMETAB_NEWTABNAME);
+	HWND hEditName = GetDlgItem(m_hDlg, IDC_RENAMETAB_NEWTABNAME);
 
 	Tab *tab = m_tabContainer->GetTabOptional(m_tabId);
 
@@ -32,22 +33,22 @@ INT_PTR RenameTabDialog::OnInitDialog()
 	/* When this dialog is opened, the 'custom name' option will
 	be selected by default (whether or not that is the actual
 	option that is currently in effect). */
-	CheckDlgButton(m_hDlg,IDC_RENAMETAB_USECUSTOMNAME,BST_CHECKED);
+	CheckDlgButton(m_hDlg, IDC_RENAMETAB_USECUSTOMNAME, BST_CHECKED);
 
-	EnableWindow(hEditName,TRUE);
-	SendMessage(hEditName,EM_SETSEL,0,-1);
+	EnableWindow(hEditName, TRUE);
+	SendMessage(hEditName, EM_SETSEL, 0, -1);
 	SetFocus(hEditName);
 
-	m_prtdps->RestoreDialogPosition(m_hDlg,false);
+	m_prtdps->RestoreDialogPosition(m_hDlg, false);
 
 	return 0;
 }
 
-INT_PTR RenameTabDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR RenameTabDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
-	switch(LOWORD(wParam))
+	switch (LOWORD(wParam))
 	{
 	case IDC_RENAMETAB_USEFOLDERNAME:
 		OnUseFolderName();
@@ -71,22 +72,22 @@ INT_PTR RenameTabDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 
 INT_PTR RenameTabDialog::OnClose()
 {
-	EndDialog(m_hDlg,0);
+	EndDialog(m_hDlg, 0);
 	return 0;
 }
 
 void RenameTabDialog::OnUseFolderName()
 {
-	HWND hEditName = GetDlgItem(m_hDlg,IDC_RENAMETAB_NEWTABNAME);
+	HWND hEditName = GetDlgItem(m_hDlg, IDC_RENAMETAB_NEWTABNAME);
 
-	EnableWindow(hEditName,FALSE);
+	EnableWindow(hEditName, FALSE);
 }
 
 void RenameTabDialog::OnUseCustomName()
 {
-	HWND hEditName = GetDlgItem(m_hDlg,IDC_RENAMETAB_NEWTABNAME);
+	HWND hEditName = GetDlgItem(m_hDlg, IDC_RENAMETAB_NEWTABNAME);
 
-	EnableWindow(hEditName,TRUE);
+	EnableWindow(hEditName, TRUE);
 	SetFocus(hEditName);
 }
 
@@ -94,7 +95,7 @@ void RenameTabDialog::OnOk()
 {
 	TCHAR szTabText[MAX_PATH];
 
-	UINT uCheckStatus = IsDlgButtonChecked(m_hDlg,IDC_RENAMETAB_USEFOLDERNAME);
+	UINT uCheckStatus = IsDlgButtonChecked(m_hDlg, IDC_RENAMETAB_USEFOLDERNAME);
 
 	Tab *tab = m_tabContainer->GetTabOptional(m_tabId);
 
@@ -114,12 +115,12 @@ void RenameTabDialog::OnOk()
 		}
 	}
 
-	EndDialog(m_hDlg,1);
+	EndDialog(m_hDlg, 1);
 }
 
 void RenameTabDialog::OnCancel()
 {
-	EndDialog(m_hDlg,0);
+	EndDialog(m_hDlg, 0);
 }
 
 void RenameTabDialog::OnTabClosed(int tabId)
@@ -142,12 +143,11 @@ void RenameTabDialog::SaveState()
 }
 
 RenameTabDialogPersistentSettings::RenameTabDialogPersistentSettings() :
-DialogSettings(SETTINGS_KEY)
+	DialogSettings(SETTINGS_KEY)
 {
-
 }
 
-RenameTabDialogPersistentSettings& RenameTabDialogPersistentSettings::GetInstance()
+RenameTabDialogPersistentSettings &RenameTabDialogPersistentSettings::GetInstance()
 {
 	static RenameTabDialogPersistentSettings sfadps;
 	return sfadps;

@@ -38,8 +38,7 @@ BOOST_PARAMETER_NAME(lockState)
 // introduced until C++20.
 struct TabSettingsImpl
 {
-	template <class ArgumentPack>
-	TabSettingsImpl(const ArgumentPack &args)
+	template <class ArgumentPack> TabSettingsImpl(const ArgumentPack &args)
 	{
 		name = args[_name | std::nullopt];
 		lockState = args[_lockState | std::nullopt];
@@ -56,6 +55,7 @@ struct TabSettingsImpl
 // Used when creating a tab.
 struct TabSettings : TabSettingsImpl
 {
+	// clang-format off
 	BOOST_PARAMETER_CONSTRUCTOR(
 		TabSettings,
 		(TabSettingsImpl),
@@ -67,24 +67,24 @@ struct TabSettings : TabSettingsImpl
 			(selected, (bool))
 		)
 	)
+	// clang-format on
 };
 
 class TabContainer : public BaseWindow
 {
 public:
-
 	static TabContainer *Create(HWND parent, TabNavigationInterface *tabNavigation,
 		IExplorerplusplus *expp, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
 		HINSTANCE instance, std::shared_ptr<Config> config);
 
 	HRESULT CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
 	HRESULT CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {},
-		const FolderSettings *folderSettings = nullptr, std::optional<FolderColumns> initialColumns = std::nullopt,
-		int *newTabId = nullptr);
+		const FolderSettings *folderSettings = nullptr,
+		std::optional<FolderColumns> initialColumns = std::nullopt, int *newTabId = nullptr);
 	HRESULT CreateNewTab(const PreservedTab &preservedTab, int *newTabId = nullptr);
 	HRESULT CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings = {},
-		const FolderSettings *folderSettings = nullptr, std::optional<FolderColumns> initialColumns = std::nullopt,
-		int *newTabId = nullptr);
+		const FolderSettings *folderSettings = nullptr,
+		std::optional<FolderColumns> initialColumns = std::nullopt, int *newTabId = nullptr);
 
 	Tab &GetTab(int tabId);
 	Tab *GetTabOptional(int tabId);
@@ -112,7 +112,8 @@ public:
 	// Signals
 	SignalWrapper<TabContainer, void(int tabId, BOOL switchToNewTab)> tabCreatedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabNavigationCompletedSignal;
-	SignalWrapper<TabContainer, void(const Tab &tab, Tab::PropertyType propertyType)> tabUpdatedSignal;
+	SignalWrapper<TabContainer, void(const Tab &tab, Tab::PropertyType propertyType)>
+		tabUpdatedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, int fromIndex, int toIndex)> tabMovedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabSelectedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabPreRemovalSignal;
@@ -122,7 +123,6 @@ public:
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabColumnsChanged;
 
 private:
-
 	static const UINT_PTR SUBCLASS_ID = 0;
 	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
@@ -135,10 +135,12 @@ private:
 
 	static HWND CreateTabControl(HWND parent, BOOL forceSameTabWidth);
 
-	static LRESULT CALLBACK WndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	static LRESULT CALLBACK WndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	static LRESULT CALLBACK ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	static LRESULT CALLBACK ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	void Initialize(HWND parent);
@@ -188,7 +190,8 @@ private:
 	void SetTabIconFromSystemImageList(const Tab &tab, int systemIconIndex);
 	void SetTabIconFromImageList(const Tab &tab, int imageIndex);
 
-	void InsertNewTab(int index, int tabId, PCIDLIST_ABSOLUTE pidlDirectory, std::optional<std::wstring> customName);
+	void InsertNewTab(int index, int tabId, PCIDLIST_ABSOLUTE pidlDirectory,
+		std::optional<std::wstring> customName);
 
 	void RemoveTabFromControl(const Tab &tab);
 

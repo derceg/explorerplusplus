@@ -18,7 +18,6 @@ PreservedTab::PreservedTab(const Tab &tab, int index) :
 	lockState(tab.GetLockState()),
 	preservedFolderState(tab.GetShellBrowser())
 {
-
 }
 
 PreservedTab::~PreservedTab() = default;
@@ -27,9 +26,11 @@ std::vector<std::unique_ptr<PreservedHistoryEntry>> PreservedTab::CopyHistoryEnt
 {
 	std::vector<std::unique_ptr<PreservedHistoryEntry>> history;
 
-	for (int i = 0; i < tab.GetShellBrowser()->GetNavigationController()->GetNumHistoryEntries(); i++)
+	for (int i = 0; i < tab.GetShellBrowser()->GetNavigationController()->GetNumHistoryEntries();
+		 i++)
 	{
-		auto entry = std::make_unique<PreservedHistoryEntry>(*tab.GetShellBrowser()->GetNavigationController()->GetEntryAtIndex(i));
+		auto entry = std::make_unique<PreservedHistoryEntry>(
+			*tab.GetShellBrowser()->GetNavigationController()->GetEntryAtIndex(i));
 		history.push_back(std::move(entry));
 	}
 
