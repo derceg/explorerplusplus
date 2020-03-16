@@ -47,6 +47,8 @@ public:
 
 	void				MonitorDrivePublic(const TCHAR *szDrive);
 
+	void				StartRenamingSelectedItem();
+
 private:
 
 	static const UINT_PTR SUBCLASS_ID = 0;

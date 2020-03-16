@@ -1663,3 +1663,9 @@ BOOL ShellTreeView::IsDesktopSubChild(const TCHAR *szFullFileName)
 
 	return (wcsncmp(szFullFileName,szDesktop,lstrlen(szDesktop)) == 0);
 }
+
+void ShellTreeView::StartRenamingSelectedItem()
+{
+	HTREEITEM hItem = TreeView_GetSelection(m_hTreeView);
+	TreeView_EditLabel(m_hTreeView, hItem);
+}

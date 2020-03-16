@@ -170,15 +170,6 @@ WPARAM wParam,LPARAM lParam)
 	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
 }
 
-void Explorerplusplus::OnTreeViewFileRename(void)
-{
-	HTREEITEM hItem;
-
-	SetFocus(m_hTreeView);
-	hItem = TreeView_GetSelection(m_hTreeView);
-	TreeView_EditLabel(m_hTreeView,hItem);
-}
-
 void Explorerplusplus::OnTreeViewFileDelete(BOOL bPermanent)
 {
 	HTREEITEM		hItem, hParentItem;

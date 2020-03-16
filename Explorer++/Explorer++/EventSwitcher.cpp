@@ -11,6 +11,7 @@
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
 #include "ShellBrowser/ShellBrowser.h"
+#include "ShellTreeView/ShellTreeView.h"
 #include "TabContainer.h"
 
 void Explorerplusplus::OnCopyItemPath() const
@@ -80,7 +81,7 @@ void Explorerplusplus::OnFileRename()
 		}
 		else if(hFocus == m_hTreeView)
 		{
-			OnTreeViewFileRename();
+			m_shellTreeView->StartRenamingSelectedItem();
 		}
 	}
 }

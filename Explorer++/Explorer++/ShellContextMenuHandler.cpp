@@ -11,6 +11,7 @@
 #include "Explorer++.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "ShellTreeView/ShellTreeView.h"
 #include "TabContainer.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
@@ -97,7 +98,7 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		}
 		else if(pfcmi->uFrom == FROM_TREEVIEW)
 		{
-			OnTreeViewFileRename();
+			m_shellTreeView->StartRenamingSelectedItem();
 		}
 
 		return TRUE;
