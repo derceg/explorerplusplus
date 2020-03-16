@@ -53,7 +53,7 @@ __interface IExplorerplusplus
 
 	StatusBar		*GetStatusBar();
 
-	void			OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters);
+	void			OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters, bool RunAsAdmin);
 
 	HMENU			BuildViewsMenu();
 
