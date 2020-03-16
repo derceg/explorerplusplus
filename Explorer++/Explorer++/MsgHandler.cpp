@@ -194,7 +194,7 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, 
 			}
 			else
 			{
-				OpenFileItem(pidlItem,EMPTY_STRING);
+				OpenFileItem(pidlItem,EMPTY_STRING,false);
 			}
 		}
 		else if(((uAttributes & SFGAO_FOLDER) && !bControlPanelParent))
@@ -255,7 +255,7 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, 
 				Also, even if the shortcut points to a dead
 				folder, it should still attempted to be
 				opened. */
-				OpenFileItem(pidlItem,EMPTY_STRING);
+				OpenFileItem(pidlItem,EMPTY_STRING,false);
 			}
 		}
 		else if(bControlPanelParent && (uAttributes & SFGAO_FOLDER))
@@ -280,7 +280,7 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, 
 		else
 		{
 			/* File item. */
-			OpenFileItem(pidlItem,EMPTY_STRING);
+			OpenFileItem(pidlItem,EMPTY_STRING,false);
 		}
 	}
 }
