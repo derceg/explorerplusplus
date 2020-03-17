@@ -380,7 +380,6 @@ BYTE MainToolbar::LookupToolbarButtonExtraStyles(ToolbarButton button) const
 
 	case ToolbarButton::OpenCommandPrompt:
 		return BTNS_DROPDOWN;
-		break;
 
 	default:
 		return 0;
