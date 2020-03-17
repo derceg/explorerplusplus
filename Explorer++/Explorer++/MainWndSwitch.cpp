@@ -354,6 +354,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		StartCommandPrompt(m_CurrentDirectory, false);
 		break;
 
+	case IDM_COMMAND_PROMPT_DROPDOWN_AS_ADMIN:
 	case IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR:
 		StartCommandPrompt(m_CurrentDirectory, true);
 		break;
