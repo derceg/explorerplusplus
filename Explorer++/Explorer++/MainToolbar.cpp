@@ -678,7 +678,7 @@ LRESULT MainToolbar::OnTbnDropDown(const NMTOOLBAR *nmtb)
 	}
 	else if (nmtb->iItem == ToolbarButton::OpenCommandPrompt)
 	{
-		ShowCommandPromptDropdown();
+		ShowToolbarCommandPromptDropdown();
 
 		return TBDDRET_DEFAULT;
 	}
@@ -796,7 +796,7 @@ void MainToolbar::CreateViewsMenu(POINT *ptOrigin)
 		0, m_hwnd, nullptr);
 }
 
-void MainToolbar::ShowCommandPromptDropdown()
+void MainToolbar::ShowToolbarCommandPromptDropdown()
 {
 	POINT	ptOrigin;
 	RECT	rcButton;
