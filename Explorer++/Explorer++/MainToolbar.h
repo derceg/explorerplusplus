@@ -93,6 +93,8 @@ private:
 	void ShowHistoryMenu(HistoryType historyType, const POINT &pt);
 	void ShowToolbarViewsDropdown();
 	void CreateViewsMenu(POINT *ptOrigin);
+	void ShowCommandPromptDropdown();
+	void CreateCommandPromptOptionsMenu(POINT* ptOrigin);
 
 	void OnTabSelected(const Tab &tab);
 	void OnNavigationCompleted(const Tab &tab);
