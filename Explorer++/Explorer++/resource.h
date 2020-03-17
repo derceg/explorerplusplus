@@ -31,6 +31,7 @@
 #define IDD_SETDEFAULTCOLUMNS           187
 #define IDR_VIEWS_MENU                  195
 #define IDR_TOOLBAR_MENU                196
+#define IDR_COMMAND_PROMPT_OPTIONS_MENU 197
 #define IDD_RENAMETAB                   213
 #define IDD_EDITAPPLICATIONBUTTON       216
 #define IDR_APPLICATIONTOOLBAR_MENU     217
@@ -909,6 +910,7 @@
 #define IDM_VIEW_DETAILS                60005
 #define IDM_VIEW_LARGEICONS             60007
 #define IDM_VIEW_EXTRALARGEICONS        60008
+#define IDM_COMMAND_PROMPT_DROPDOWN_AS_ADMIN     60009
 
 // Next default values for new objects
 // 
