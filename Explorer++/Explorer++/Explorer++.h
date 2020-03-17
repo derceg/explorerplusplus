@@ -494,6 +494,7 @@ private:
 		const MainMenuPreShowSignal::slot_type &observer) override;
 	HMENU BuildViewsMenu() override;
 	void AddViewModesToMenu(HMENU menu);
+	HMENU BuildCommandPromptOptionsMenu();
 
 	/* Miscellaneous. */
 	void CreateStatusBar(void);
