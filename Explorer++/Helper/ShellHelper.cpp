@@ -561,7 +561,7 @@ HRESULT BuildShellIDList(FORMATETC *pftc, STGMEDIUM *pstg, PCIDLIST_ABSOLUTE pid
 	if(pftc == NULL ||
 		pstg == NULL ||
 		pidlDirectory == NULL ||
-		pidlList.size() == 0)
+		pidlList.empty())
 	{
 		return E_FAIL;
 	}
@@ -973,7 +973,7 @@ BOOL CompareIdls(PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2)
 
 HRESULT AddJumpListTasks(const std::list<JumpListTaskInformation> &TaskList)
 {
-	if(TaskList.size() == 0)
+	if(TaskList.empty())
 	{
 		return E_FAIL;
 	}
