@@ -1380,8 +1380,6 @@ clean:
 	if (bstr) SysFreeString(bstr);
 	if (pNodes) pNodes->Release();
 	if (pNode) pNode->Release();
-
-	return;
 }
 
 void Explorerplusplus::SaveApplicationToolbarToXML(IXMLDOMDocument *pXMLDom,

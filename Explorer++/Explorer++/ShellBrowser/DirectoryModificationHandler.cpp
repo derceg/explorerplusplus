@@ -134,8 +134,6 @@ void ShellBrowser::DirectoryAltered(void)
 	}
 
 	LeaveCriticalSection(&m_csDirectoryAltered);
-
-	return;
 }
 
 void CALLBACK TimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)

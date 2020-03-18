@@ -881,8 +881,6 @@ void Explorerplusplus::LoadDefaultColumnsFromRegistry()
 
 		RegCloseKey(hColumnsKey);
 	}
-
-	return;
 }
 
 void Explorerplusplus::SaveToolbarInformationToRegistry(void)

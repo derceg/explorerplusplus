@@ -168,8 +168,6 @@ void NColorRuleHelper::LoadColorRulesFromXML(IXMLDOMDocument *pXMLDom,
 clean:
 	if (bstr) SysFreeString(bstr);
 	if (pNode) pNode->Release();
-
-	return;
 }
 
 namespace

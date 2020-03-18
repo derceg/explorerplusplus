@@ -62,8 +62,6 @@ void LoadSaveXML::InitializeLoadEnvironment()
 
 clean:
 	if (&var) VariantClear(&var);
-
-	return;
 }
 
 void LoadSaveXML::ReleaseLoadEnvironment()
