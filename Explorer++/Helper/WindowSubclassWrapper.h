@@ -13,7 +13,7 @@ public:
 	WindowSubclassWrapper(HWND hwnd, SUBCLASSPROC subclassProc, UINT_PTR subclassId, DWORD_PTR data);
 	~WindowSubclassWrapper();
 
-	WindowSubclassWrapper(WindowSubclassWrapper &&other);
+	WindowSubclassWrapper(WindowSubclassWrapper &&other) noexcept;
 
 private:
 

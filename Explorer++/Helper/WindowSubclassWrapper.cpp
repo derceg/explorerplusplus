@@ -14,7 +14,7 @@ WindowSubclassWrapper::WindowSubclassWrapper(HWND hwnd, SUBCLASSPROC subclassPro
 	m_subclassInstalled = SetWindowSubclass(hwnd, subclassProc, subclassId, data);
 }
 
-WindowSubclassWrapper::WindowSubclassWrapper(WindowSubclassWrapper &&other) :
+WindowSubclassWrapper::WindowSubclassWrapper(WindowSubclassWrapper &&other) noexcept :
 	m_hwnd(std::exchange(other.m_hwnd, nullptr)),
 	m_subclassProc(std::exchange(other.m_subclassProc, nullptr)),
 	m_subclassId(std::exchange(other.m_subclassId, 0)),
