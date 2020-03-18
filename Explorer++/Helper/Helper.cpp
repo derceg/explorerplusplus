@@ -16,7 +16,7 @@ enum VersionSubBlockType_t
 	STRING_TABLE_VALUE
 };
 
-void EnterAttributeIntoString(BOOL bEnter, TCHAR *String, int Pos, TCHAR chAttribute);
+void EnterAttributeIntoString(BOOL bEnter, TCHAR *string, int pos, TCHAR chAttribute);
 BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType_t subBlockType,
 	WORD *pwLanguage, DWORD *pdwProductVersionLS, DWORD *pdwProductVersionMS,
 	const TCHAR *szVersionInfo, TCHAR *szVersionBuffer, UINT cchMax);
@@ -125,7 +125,7 @@ BOOL CreateFriendlySystemTimeString(const SYSTEMTIME *localSystemTime,
 	return FALSE;
 }
 
-HINSTANCE StartCommandPrompt(const std::wstring &Directory, bool Elevated)
+HINSTANCE StartCommandPrompt(const std::wstring &directory, bool elevated)
 {
 	HINSTANCE hNewInstance = NULL;
 
@@ -142,17 +142,17 @@ HINSTANCE StartCommandPrompt(const std::wstring &Directory, bool Elevated)
 			TCHAR operation[32];
 			std::wstring parameters;
 
-			if(Elevated)
+			if(elevated)
 			{
 				StringCchCopy(operation, SIZEOF_ARRAY(operation), _T("runas"));
-				parameters = _T("/K cd /d ") + Directory;
+				parameters = _T("/K cd /d ") + directory;
 			}
 			else
 			{
 				StringCchCopy(operation, SIZEOF_ARRAY(operation), _T("open"));
 			}
 
-			hNewInstance = ShellExecute(NULL, operation, commandPath, parameters.c_str(), Directory.c_str(),
+			hNewInstance = ShellExecute(NULL, operation, commandPath, parameters.c_str(), directory.c_str(),
 				SW_SHOWNORMAL);
 		}
 	}
@@ -230,15 +230,15 @@ HRESULT BuildFileAttributeString(DWORD dwFileAttributes, TCHAR *szOutput, size_t
 	return StringCchCopy(szOutput, cchMax, szAttributes);
 }
 
-void EnterAttributeIntoString(BOOL bEnter, TCHAR *String, int Pos, TCHAR chAttribute)
+void EnterAttributeIntoString(BOOL bEnter, TCHAR *string, int pos, TCHAR chAttribute)
 {
 	if(bEnter)
 	{
-		String[Pos] = chAttribute;
+		string[pos] = chAttribute;
 	}
 	else
 	{
-		String[Pos] = '-';
+		string[pos] = '-';
 	}
 }
 
@@ -300,7 +300,7 @@ BOOL FormatUserName(PSID sid, TCHAR *userName, size_t cchMax)
 	return success;
 }
 
-BOOL CheckGroupMembership(GroupType_t GroupType)
+BOOL CheckGroupMembership(GroupType_t groupType)
 {
 	SID_IDENTIFIER_AUTHORITY sia = SECURITY_NT_AUTHORITY;
 	PSID psid;
@@ -308,7 +308,7 @@ BOOL CheckGroupMembership(GroupType_t GroupType)
 	BOOL bMember = FALSE;
 	BOOL bRet;
 
-	switch(GroupType)
+	switch(groupType)
 	{
 	case GROUP_ADMINISTRATORS:
 		dwGroup = DOMAIN_ALIAS_RID_ADMINS;
@@ -434,7 +434,7 @@ BOOL ReadImageProperty(const TCHAR *lpszImage, PROPID propId, TCHAR *szProperty,
 	return bSuccess;
 }
 
-BOOL GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,UINT cchMax,const TCHAR *InitialDirectory)
+BOOL GetFileNameFromUser(HWND hwnd,TCHAR *fullFileName,UINT cchMax,const TCHAR *initialDirectory)
 {
 	/* As per the documentation for
 	the OPENFILENAME structure, the
@@ -452,11 +452,11 @@ BOOL GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,UINT cchMax,const TCHAR *
 	ofn.lpstrCustomFilter	= NULL;
 	ofn.nMaxCustFilter		= 0;
 	ofn.nFilterIndex		= 0;
-	ofn.lpstrFile			= FullFileName;
+	ofn.lpstrFile			= fullFileName;
 	ofn.nMaxFile			= cchMax;
 	ofn.lpstrFileTitle		= NULL;
 	ofn.nMaxFileTitle		= 0;
-	ofn.lpstrInitialDir		= InitialDirectory;
+	ofn.lpstrInitialDir		= initialDirectory;
 	ofn.lpstrTitle			= NULL;
 	ofn.Flags				= OFN_ENABLESIZING|OFN_OVERWRITEPROMPT|OFN_EXPLORER;
 	ofn.lpstrDefExt			= _T("txt");

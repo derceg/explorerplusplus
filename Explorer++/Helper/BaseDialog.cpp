@@ -218,10 +218,10 @@ HWND BaseDialog::ShowModelessDialog(IModelessDialogNotification *pmdn)
 }
 
 void BaseDialog::GetResizableControlInformation(DialogSizeConstraint &dsc,
-	std::list<ResizableDialog::Control_t> &ControlList)
+	std::list<ResizableDialog::Control_t> &controlList)
 {
 	UNREFERENCED_PARAMETER(dsc);
-	UNREFERENCED_PARAMETER(ControlList);
+	UNREFERENCED_PARAMETER(controlList);
 }
 
 void BaseDialog::SaveState()

@@ -37,20 +37,20 @@ BOOL			GetFileOwner(const TCHAR *szFile,TCHAR *szOwner,size_t cchMax);
 DWORD			GetNumFileHardLinks(const TCHAR *lpszFileName);
 BOOL			ReadImageProperty(const TCHAR *lpszImage, PROPID propId, TCHAR *szProperty, int cchMax);
 HRESULT			GetMediaMetadata(const TCHAR *szFileName, const TCHAR *szAttribute, BYTE **pszOutput);
-BOOL			IsImage(const TCHAR *FileName);
+BOOL			IsImage(const TCHAR *fileName);
 BOOL			GetFileProductVersion(const TCHAR *szFullFileName, DWORD *pdwProductVersionLS, DWORD *pdwProductVersionMS);
 BOOL			GetFileLanguage(const TCHAR *szFullFileName, WORD *pwLanguage);
 BOOL			GetVersionInfoString(const TCHAR *szFullFileName, const TCHAR *szVersionInfo, TCHAR *szVersionBuffer, UINT cchMax);
 
 /* Ownership and access. */
-BOOL			CheckGroupMembership(GroupType_t GroupType);
+BOOL			CheckGroupMembership(GroupType_t groupType);
 BOOL			FormatUserName(PSID sid, TCHAR *userName, size_t cchMax);
 
 /* User interaction. */
-BOOL			GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,UINT cchMax,const TCHAR *InitialDirectory);
+BOOL			GetFileNameFromUser(HWND hwnd,TCHAR *fullFileName,UINT cchMax,const TCHAR *initialDirectory);
 
 /* General helper functions. */
-HINSTANCE		StartCommandPrompt(const std::wstring &Directory, bool Elevated);
+HINSTANCE		StartCommandPrompt(const std::wstring &directory, bool elevated);
 void			GetCPUBrandString(char *pszCPUBrand, UINT cchBuf);
 void			SetFORMATETC(FORMATETC *pftc, CLIPFORMAT cfFormat, DVTARGETDEVICE *ptd, DWORD dwAspect, LONG lindex, DWORD tymed);
 bool			IsKeyDown(int nVirtKey);

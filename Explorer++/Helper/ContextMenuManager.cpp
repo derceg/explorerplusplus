@@ -26,7 +26,7 @@ extensions on an existing menu:
 2. Build and show menu.
 3. Pass selection to shell extension (if necessary).
 4. Release shell extensions (also free the DLL's they reside in). */
-ContextMenuManager::ContextMenuManager(ContextMenuType_t ContextMenuType,
+ContextMenuManager::ContextMenuManager(ContextMenuType_t contextMenuType,
 	PCIDLIST_ABSOLUTE pidlDirectory,IDataObject *pDataObject,IUnknown *pUnkSite,
 	const std::vector<std::wstring> &blacklistedCLSIDEntries)
 {
@@ -37,18 +37,18 @@ ContextMenuManager::ContextMenuManager(ContextMenuType_t ContextMenuType,
 	switch(itemType)
 	{
 	case ITEM_TYPE_FOLDER:
-		if(ContextMenuType == CONTEXT_MENU_TYPE_DRAG_AND_DROP)
+		if(contextMenuType == CONTEXT_MENU_TYPE_DRAG_AND_DROP)
 		{
 			pszRegContext = CMH_FOLDER_DRAG_AND_DROP;
 		}
 		break;
 
 	case ITEM_TYPE_DIRECTORY:
-		if(ContextMenuType == CONTEXT_MENU_TYPE_BACKGROUND)
+		if(contextMenuType == CONTEXT_MENU_TYPE_BACKGROUND)
 		{
 			pszRegContext = CMH_DIRECTORY_BACKGROUND;
 		}
-		else if(ContextMenuType == CONTEXT_MENU_TYPE_DRAG_AND_DROP)
+		else if(contextMenuType == CONTEXT_MENU_TYPE_DRAG_AND_DROP)
 		{
 			pszRegContext = CMH_DIRECTORY_DRAG_AND_DROP;
 		}

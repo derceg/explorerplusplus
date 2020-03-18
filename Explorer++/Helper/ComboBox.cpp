@@ -73,9 +73,9 @@ LRESULT CALLBACK ComboBox::ComboBoxEditProcStub(HWND hwnd,UINT uMsg,
 	return pcb->ComboBoxEditProc(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK ComboBox::ComboBoxEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK ComboBox::ComboBoxEditProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
-	switch(Msg)
+	switch(msg)
 	{
 	case WM_KEYDOWN:
 		if(wParam == VK_BACK ||
@@ -86,7 +86,7 @@ LRESULT CALLBACK ComboBox::ComboBoxEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LPA
 		break;
 	}
 
-	return DefSubclassProc(hwnd,Msg,wParam,lParam);
+	return DefSubclassProc(hwnd,msg,wParam,lParam);
 }
 
 LRESULT CALLBACK ComboBox::ComboBoxParentProcStub(HWND hwnd,UINT uMsg,
@@ -99,9 +99,9 @@ LRESULT CALLBACK ComboBox::ComboBoxParentProcStub(HWND hwnd,UINT uMsg,
 	return pcb->ComboBoxParentProc(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK ComboBox::ComboBoxParentProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK ComboBox::ComboBoxParentProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
-	switch(Msg)
+	switch(msg)
 	{
 	case WM_COMMAND:
 		if(HIWORD(wParam) != 0)
@@ -119,7 +119,7 @@ LRESULT CALLBACK ComboBox::ComboBoxParentProc(HWND hwnd,UINT Msg,WPARAM wParam,L
 		break;
 	}
 
-	return DefSubclassProc(hwnd,Msg,wParam,lParam);
+	return DefSubclassProc(hwnd,msg,wParam,lParam);
 }
 
 INT_PTR ComboBox::OnCBNEditChange()

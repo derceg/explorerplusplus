@@ -12,7 +12,7 @@
 
 
 ResizableDialog::ResizableDialog(HWND hDlg,
-	const std::list<Control_t> &ControlList) :
+	const std::list<Control_t> &controlList) :
 	m_hDlg(hDlg)
 {
 	ControlInternal_t controlInternal;
@@ -24,7 +24,7 @@ ResizableDialog::ResizableDialog(HWND hDlg,
 
 	/* Loop through each of the controls and
 	find the delta's. */
-	for(const auto &control : ControlList)
+	for(const auto &control : controlList)
 	{
 		controlInternal.iID			= control.iID;
 		controlInternal.Type		= control.Type;

@@ -48,14 +48,14 @@ void MenuHelper::AttachSubMenu(
 	subMenu.release();
 }
 
-void MenuHelper::CheckItem(HMENU hMenu, UINT ItemID, BOOL bCheck)
+void MenuHelper::CheckItem(HMENU hMenu, UINT itemID, BOOL bCheck)
 {
 	UINT state = bCheck ? MF_CHECKED : MF_UNCHECKED;
-	CheckMenuItem(hMenu, ItemID, state);
+	CheckMenuItem(hMenu, itemID, state);
 }
 
-void MenuHelper::EnableItem(HMENU hMenu, UINT ItemID, BOOL bEnable)
+void MenuHelper::EnableItem(HMENU hMenu, UINT itemID, BOOL bEnable)
 {
 	UINT state = bEnable ? MF_ENABLED : MF_DISABLED;
-	EnableMenuItem(hMenu, ItemID, state);
+	EnableMenuItem(hMenu, itemID, state);
 }

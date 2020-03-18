@@ -21,7 +21,7 @@ public:
 
 	/* Loads the context menu handlers bound to
 	a specific registry key. */
-	ContextMenuManager(ContextMenuType_t ContextMenuType, PCIDLIST_ABSOLUTE pidlDirectory, IDataObject *pDataObject,
+	ContextMenuManager(ContextMenuType_t contextMenuType, PCIDLIST_ABSOLUTE pidlDirectory, IDataObject *pDataObject,
 		IUnknown *pUnkSite, const std::vector<std::wstring> &blacklistedCLSIDEntries);
 
 	/* Releases the DLL's as well as the IUnknown
@@ -31,7 +31,7 @@ public:
 	/* This will show the specified menu. Note that before
 	the menu is shown, this method will insert any loaded
 	shell extensions at the specified position. */
-	bool	ShowMenu(HWND hwnd,HMENU hMenu,UINT uIDPrevious,UINT uMinID,UINT uMaxID,const POINT &pt,StatusBar &StatusBar);
+	bool	ShowMenu(HWND hwnd,HMENU hMenu,UINT uIDPrevious,UINT uMinID,UINT uMaxID,const POINT &pt,StatusBar &statusBar);
 
 private:
 
@@ -65,7 +65,7 @@ private:
 	static const TCHAR CMH_DIRECTORY_DRAG_AND_DROP[];
 	static const TCHAR CMH_FOLDER_DRAG_AND_DROP[];
 
-	static LRESULT CALLBACK ContextMenuHookProc(HWND hwnd, UINT Msg, WPARAM wParam,
+	static LRESULT CALLBACK ContextMenuHookProc(HWND hwnd, UINT msg, WPARAM wParam,
 		LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
 	void	AddMenuEntries(HMENU hMenu,UINT uIDPrevious,int iMinID,int iMaxID);

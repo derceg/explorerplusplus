@@ -8,11 +8,11 @@
 #include "Macros.h"
 
 
-BOOL GetClusterSize(const TCHAR *Drive, DWORD *pdwClusterSize)
+BOOL GetClusterSize(const TCHAR *drive, DWORD *pdwClusterSize)
 {
 	DWORD dwSectorsPerCluster;
 	DWORD dwBytesPerSector;
-	BOOL bRet = GetDiskFreeSpace(Drive,&dwSectorsPerCluster,&dwBytesPerSector,NULL,NULL);
+	BOOL bRet = GetDiskFreeSpace(drive,&dwSectorsPerCluster,&dwBytesPerSector,NULL,NULL);
 
 	if(!bRet)
 	{

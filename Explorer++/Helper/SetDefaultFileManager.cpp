@@ -36,9 +36,9 @@ namespace NDefaultFileManagerInternal
 	const TCHAR KEY_FOLDER_SHELL[]		= _T("Folder\\shell");
 	const TCHAR SHELL_DEFAULT_VALUE[]	= _T("none");
 
-	BOOL SetAsDefaultFileManagerInternal(NDefaultFileManager::ReplaceExplorerModes_t ReplacementType,
+	BOOL SetAsDefaultFileManagerInternal(NDefaultFileManager::ReplaceExplorerModes_t replacementType,
 		const TCHAR *szInternalCommand, const TCHAR *szMenuText);
-	BOOL RemoveAsDefaultFileManagerInternal(NDefaultFileManager::ReplaceExplorerModes_t ReplacementType,
+	BOOL RemoveAsDefaultFileManagerInternal(NDefaultFileManager::ReplaceExplorerModes_t replacementType,
 		const TCHAR *szInternalCommand);
 }
 
@@ -54,12 +54,12 @@ BOOL NDefaultFileManager::SetAsDefaultFileManagerAll(const TCHAR *szInternalComm
 		szInternalCommand,szMenuText);
 }
 
-BOOL NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(NDefaultFileManager::ReplaceExplorerModes_t ReplacementType,
+BOOL NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(NDefaultFileManager::ReplaceExplorerModes_t replacementType,
 	const TCHAR *szInternalCommand, const TCHAR *szMenuText)
 {
 	const TCHAR *pszSubKey = NULL;
 
-	switch(ReplacementType)
+	switch(replacementType)
 	{
 	case NDefaultFileManager::REPLACEEXPLORER_ALL:
 		pszSubKey = KEY_FOLDER_SHELL;
@@ -151,13 +151,13 @@ BOOL NDefaultFileManager::RemoveAsDefaultFileManagerAll(const TCHAR *szInternalC
 		szInternalCommand);
 }
 
-BOOL NDefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(NDefaultFileManager::ReplaceExplorerModes_t ReplacementType,
+BOOL NDefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(NDefaultFileManager::ReplaceExplorerModes_t replacementType,
 	const TCHAR *szInternalCommand)
 {
 	const TCHAR *pszSubKey = NULL;
 	const TCHAR *pszDefaultValue = NULL;
 
-	switch(ReplacementType)
+	switch(replacementType)
 	{
 	case NDefaultFileManager::REPLACEEXPLORER_ALL:
 		pszSubKey = KEY_FOLDER_SHELL;

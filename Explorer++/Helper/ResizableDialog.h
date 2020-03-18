@@ -38,7 +38,7 @@ public:
 		ControlConstraint	Constraint;
 	};
 
-	ResizableDialog(HWND hDlg,const std::list<Control_t> &ControlList);
+	ResizableDialog(HWND hDlg,const std::list<Control_t> &controlList);
 
 	void	UpdateControls(int iWidth,int iHeight);
 
