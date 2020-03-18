@@ -146,7 +146,7 @@ HRESULT NFileOperations::CopyFilesToFolder(HWND hOwner, const std::wstring &strT
 	std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move)
 {
 	PIDLIST_ABSOLUTE pidl;
-	BOOL bRes = NFileOperations::CreateBrowseDialog(hOwner,strTitle.c_str(),&pidl);
+	BOOL bRes = NFileOperations::CreateBrowseDialog(hOwner,strTitle,&pidl);
 
 	if(!bRes)
 	{

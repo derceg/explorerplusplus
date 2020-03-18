@@ -434,8 +434,8 @@ bool NXMLSettings::ReadDateTime(IXMLDOMNamedNodeMap *attributeMap, const std::ws
 {
 	std::wstring lowDateTime;
 	std::wstring highDateTime;
-	HRESULT hr1 = GetStringFromMap(attributeMap, (baseKeyName + L"Low").c_str(), lowDateTime);
-	HRESULT hr2 = GetStringFromMap(attributeMap, (baseKeyName + L"High").c_str(), highDateTime);
+	HRESULT hr1 = GetStringFromMap(attributeMap, baseKeyName + L"Low", lowDateTime);
+	HRESULT hr2 = GetStringFromMap(attributeMap, baseKeyName + L"High", highDateTime);
 
 	if (FAILED(hr1) || FAILED(hr2))
 	{
