@@ -237,20 +237,20 @@ void TabContainer::OnTabCtrlLButtonDown(POINT *pt)
 {
 	TCHITTESTINFO info;
 	info.pt = *pt;
-	int ItemNum = TabCtrl_HitTest(m_hwnd, &info);
+	int itemNum = TabCtrl_HitTest(m_hwnd, &info);
 
 	if (info.flags != TCHT_NOWHERE)
 	{
 		/* Save the bounds of the dragged tab. */
-		TabCtrl_GetItemRect(m_hwnd, ItemNum, &m_rcDraggedTab);
+		TabCtrl_GetItemRect(m_hwnd, itemNum, &m_rcDraggedTab);
 
 		/* Capture mouse movement exclusively until
 		the mouse button is released. */
 		SetCapture(m_hwnd);
 
 		m_bTabBeenDragged = TRUE;
-		m_draggedTabStartIndex = ItemNum;
-		m_draggedTabEndIndex = ItemNum;
+		m_draggedTabStartIndex = itemNum;
+		m_draggedTabEndIndex = itemNum;
 	}
 }
 
@@ -282,16 +282,16 @@ void TabContainer::OnTabCtrlMouseMove(POINT *pt)
 	/* Dragged tab. */
 	int iSelected = TabCtrl_GetCurFocus(m_hwnd);
 
-	TCHITTESTINFO HitTestInfo;
-	HitTestInfo.pt = *pt;
-	int iSwap = TabCtrl_HitTest(m_hwnd, &HitTestInfo);
+	TCHITTESTINFO hitTestInfo;
+	hitTestInfo.pt = *pt;
+	int iSwap = TabCtrl_HitTest(m_hwnd, &hitTestInfo);
 
 	/* Check:
 	- If the cursor is over an item.
 	- If the cursor is not over the dragged item itself.
 	- If the cursor has passed to the left of the dragged tab, or
 	- If the cursor has passed to the right of the dragged tab. */
-	if (HitTestInfo.flags != TCHT_NOWHERE && iSwap != iSelected
+	if (hitTestInfo.flags != TCHT_NOWHERE && iSwap != iSelected
 		&& (pt->x < m_rcDraggedTab.left || pt->x > m_rcDraggedTab.right))
 	{
 		RECT rcSwap;
@@ -401,11 +401,11 @@ void TabContainer::CreateTabContextMenu(Tab &tab, const POINT &pt)
 		menu, IDM_TAB_LOCKTABANDADDRESS, tab.GetLockState() == Tab::LockState::AddressLocked);
 	MenuHelper::EnableItem(menu, IDM_TAB_CLOSETAB, tab.GetLockState() == Tab::LockState::NotLocked);
 
-	UINT Command =
+	UINT command =
 		TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD, pt.x,
 			pt.y, 0, m_hwnd, nullptr);
 
-	ProcessTabCommand(Command, tab);
+	ProcessTabCommand(command, tab);
 }
 
 void TabContainer::AddImagesToTabContextMenu(

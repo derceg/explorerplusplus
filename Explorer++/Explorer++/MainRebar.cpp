@@ -96,7 +96,7 @@ void Explorerplusplus::CreateMainControls(void)
 {
 	SIZE	sz;
 	RECT	rc;
-	DWORD	ToolbarSize;
+	DWORD	toolbarSize;
 	TCHAR	szBandText[32];
 	int		i = 0;
 
@@ -116,10 +116,10 @@ void Explorerplusplus::CreateMainControls(void)
 		{
 		case ID_MAINTOOLBAR:
 			CreateMainToolbar();
-			ToolbarSize = (DWORD)SendMessage(m_mainToolbar->GetHWND(), TB_GETBUTTONSIZE, 0, 0);
-			m_ToolbarInformation[i].cyMinChild = HIWORD(ToolbarSize);
-			m_ToolbarInformation[i].cyMaxChild = HIWORD(ToolbarSize);
-			m_ToolbarInformation[i].cyChild = HIWORD(ToolbarSize);
+			toolbarSize = (DWORD)SendMessage(m_mainToolbar->GetHWND(), TB_GETBUTTONSIZE, 0, 0);
+			m_ToolbarInformation[i].cyMinChild = HIWORD(toolbarSize);
+			m_ToolbarInformation[i].cyMaxChild = HIWORD(toolbarSize);
+			m_ToolbarInformation[i].cyChild = HIWORD(toolbarSize);
 			SendMessage(m_mainToolbar->GetHWND(), TB_GETMAXSIZE, 0, (LPARAM)&sz);
 
 			if (m_ToolbarInformation[i].cx == 0)
@@ -140,10 +140,10 @@ void Explorerplusplus::CreateMainControls(void)
 
 		case ID_BOOKMARKSTOOLBAR:
 			CreateBookmarksToolbar();
-			ToolbarSize = (DWORD)SendMessage(m_hBookmarksToolbar, TB_GETBUTTONSIZE, 0, 0);
-			m_ToolbarInformation[i].cyMinChild = HIWORD(ToolbarSize);
-			m_ToolbarInformation[i].cyMaxChild = HIWORD(ToolbarSize);
-			m_ToolbarInformation[i].cyChild = HIWORD(ToolbarSize);
+			toolbarSize = (DWORD)SendMessage(m_hBookmarksToolbar, TB_GETBUTTONSIZE, 0, 0);
+			m_ToolbarInformation[i].cyMinChild = HIWORD(toolbarSize);
+			m_ToolbarInformation[i].cyMaxChild = HIWORD(toolbarSize);
+			m_ToolbarInformation[i].cyChild = HIWORD(toolbarSize);
 			SendMessage(m_hBookmarksToolbar, TB_GETMAXSIZE, 0, (LPARAM)&sz);
 
 			if (m_ToolbarInformation[i].cx == 0)
@@ -155,10 +155,10 @@ void Explorerplusplus::CreateMainControls(void)
 
 		case ID_DRIVESTOOLBAR:
 			CreateDrivesToolbar();
-			ToolbarSize = (DWORD)SendMessage(m_pDrivesToolbar->GetHWND(), TB_GETBUTTONSIZE, 0, 0);
-			m_ToolbarInformation[i].cyMinChild = HIWORD(ToolbarSize);
-			m_ToolbarInformation[i].cyMaxChild = HIWORD(ToolbarSize);
-			m_ToolbarInformation[i].cyChild = HIWORD(ToolbarSize);
+			toolbarSize = (DWORD)SendMessage(m_pDrivesToolbar->GetHWND(), TB_GETBUTTONSIZE, 0, 0);
+			m_ToolbarInformation[i].cyMinChild = HIWORD(toolbarSize);
+			m_ToolbarInformation[i].cyMaxChild = HIWORD(toolbarSize);
+			m_ToolbarInformation[i].cyChild = HIWORD(toolbarSize);
 			SendMessage(m_pDrivesToolbar->GetHWND(), TB_GETMAXSIZE, 0, (LPARAM)&sz);
 
 			if (m_ToolbarInformation[i].cx == 0)
@@ -170,10 +170,10 @@ void Explorerplusplus::CreateMainControls(void)
 
 		case ID_APPLICATIONSTOOLBAR:
 			CreateApplicationToolbar();
-			ToolbarSize = (DWORD)SendMessage(m_pApplicationToolbar->GetHWND(), TB_GETBUTTONSIZE, 0, 0);
-			m_ToolbarInformation[i].cyMinChild = HIWORD(ToolbarSize);
-			m_ToolbarInformation[i].cyMaxChild = HIWORD(ToolbarSize);
-			m_ToolbarInformation[i].cyChild = HIWORD(ToolbarSize);
+			toolbarSize = (DWORD)SendMessage(m_pApplicationToolbar->GetHWND(), TB_GETBUTTONSIZE, 0, 0);
+			m_ToolbarInformation[i].cyMinChild = HIWORD(toolbarSize);
+			m_ToolbarInformation[i].cyMaxChild = HIWORD(toolbarSize);
+			m_ToolbarInformation[i].cyChild = HIWORD(toolbarSize);
 			SendMessage(m_pApplicationToolbar->GetHWND(), TB_GETMAXSIZE, 0, (LPARAM)&sz);
 
 			if (m_ToolbarInformation[i].cx == 0)

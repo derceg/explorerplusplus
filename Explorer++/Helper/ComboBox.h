@@ -31,7 +31,7 @@ private:
 
 	INT_PTR	OnCBNEditChange();
 
-	static UINT_PTR m_StaticSubclassCounter;
+	static UINT_PTR m_staticSubclassCounter;
 
 	UINT_PTR m_SubclassCounter;
 

@@ -173,8 +173,8 @@ LRESULT CALLBACK DrivesToolbar::DrivesToolbarParentProc(
 
 			if (iIndex != -1)
 			{
-				std::wstring Path = GetDrivePath(iIndex);
-				m_navigation->BrowseFolderInCurrentTab(Path.c_str());
+				std::wstring path = GetDrivePath(iIndex);
+				m_navigation->BrowseFolderInCurrentTab(path.c_str());
 			}
 
 			return 0;
@@ -197,11 +197,11 @@ LRESULT CALLBACK DrivesToolbar::DrivesToolbarParentProc(
 
 					if (iIndex != -1)
 					{
-						std::wstring Path = GetDrivePath(iIndex);
+						std::wstring path = GetDrivePath(iIndex);
 
 						unique_pidl_absolute pidlItem;
 						HRESULT hr = SHParseDisplayName(
-							Path.c_str(), nullptr, wil::out_param(pidlItem), 0, nullptr);
+							path.c_str(), nullptr, wil::out_param(pidlItem), 0, nullptr);
 
 						if (SUCCEEDED(hr))
 						{
@@ -229,8 +229,8 @@ LRESULT CALLBACK DrivesToolbar::DrivesToolbarParentProc(
 
 				if (iIndex != -1)
 				{
-					std::wstring Path = GetDrivePath(iIndex);
-					GetItemInfoTip(Path.c_str(), pnmtbgit->pszText, pnmtbgit->cchTextMax);
+					std::wstring path = GetDrivePath(iIndex);
+					GetItemInfoTip(path.c_str(), pnmtbgit->pszText, pnmtbgit->cchTextMax);
 				}
 
 				return 0;
@@ -278,7 +278,7 @@ void DrivesToolbar::InsertDrive(const std::wstring &DrivePath)
 	SHGetFileInfo(
 		DrivePath.c_str(), 0, &shfi, sizeof(shfi), SHGFI_SYSICONINDEX | SHGFI_USEFILEATTRIBUTES);
 
-	int Position = GetSortedPosition(DrivePath);
+	int position = GetSortedPosition(DrivePath);
 
 	TBBUTTON tbButton;
 	tbButton.iBitmap = shfi.iIcon;
@@ -287,7 +287,7 @@ void DrivesToolbar::InsertDrive(const std::wstring &DrivePath)
 	tbButton.fsStyle = BTNS_BUTTON | BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX;
 	tbButton.dwData = m_IDCounter;
 	tbButton.iString = reinterpret_cast<INT_PTR>(szDisplayName);
-	SendMessage(m_hwnd, TB_INSERTBUTTON, Position, reinterpret_cast<LPARAM>(&tbButton));
+	SendMessage(m_hwnd, TB_INSERTBUTTON, position, reinterpret_cast<LPARAM>(&tbButton));
 	UpdateToolbarBandSizing(GetParent(m_hwnd), m_hwnd);
 
 	m_mapID.insert(std::make_pair(m_IDCounter, DrivePath));
@@ -322,7 +322,7 @@ void DrivesToolbar::UpdateDriveIcon(const std::wstring &DrivePath)
 
 int DrivesToolbar::GetSortedPosition(const std::wstring &DrivePath)
 {
-	int Position = 0;
+	int position = 0;
 
 	int nButtons = static_cast<int>(SendMessage(m_hwnd, TB_BUTTONCOUNT, 0, 0));
 
@@ -339,10 +339,10 @@ int DrivesToolbar::GetSortedPosition(const std::wstring &DrivePath)
 			break;
 		}
 
-		Position++;
+		position++;
 	}
 
-	return Position;
+	return position;
 }
 
 DrivesToolbar::DriveInformation_t DrivesToolbar::GetDrivePosition(const std::wstring &DrivePath)

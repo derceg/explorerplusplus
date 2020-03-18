@@ -1064,18 +1064,18 @@ void ShellBrowser::UpdateFiltering(void)
 void ShellBrowser::UnfilterAllItems(void)
 {
 	std::list<int>::iterator	itr;
-	AwaitingAdd_t		AwaitingAdd;
+	AwaitingAdd_t		awaitingAdd;
 
 	for(itr = m_FilteredItemsList.begin();itr != m_FilteredItemsList.end();itr++)
 	{
 		int iSorted = DetermineItemSortedPosition(*itr);
 
-		AwaitingAdd.iItem			= iSorted;
-		AwaitingAdd.bPosition		= TRUE;
-		AwaitingAdd.iAfter			= iSorted - 1;
-		AwaitingAdd.iItemInternal	= *itr;
+		awaitingAdd.iItem			= iSorted;
+		awaitingAdd.bPosition		= TRUE;
+		awaitingAdd.iAfter			= iSorted - 1;
+		awaitingAdd.iItemInternal	= *itr;
 
-		m_AwaitingAddList.push_back(AwaitingAdd);
+		m_AwaitingAddList.push_back(awaitingAdd);
 	}
 
 	m_FilteredItemsList.clear();
@@ -1232,9 +1232,9 @@ void ShellBrowser::SelectItems(const std::list<std::wstring> &PastedFileList)
 
 	m_FileSelectionList.clear();
 
-	for(const auto &PastedFile : PastedFileList)
+	for(const auto &pastedFile : PastedFileList)
 	{
-		int iIndex = LocateFileItemIndex(PastedFile.c_str());
+		int iIndex = LocateFileItemIndex(pastedFile.c_str());
 
 		if(iIndex != -1)
 		{
@@ -1251,7 +1251,7 @@ void ShellBrowser::SelectItems(const std::list<std::wstring> &PastedFileList)
 		}
 		else
 		{
-			m_FileSelectionList.push_back(PastedFile);
+			m_FileSelectionList.push_back(pastedFile);
 		}
 	}
 }

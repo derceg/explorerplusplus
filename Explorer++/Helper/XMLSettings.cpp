@@ -384,7 +384,7 @@ HFONT NXMLSettings::ReadXMLFontData(IXMLDOMNode *pNode)
 {
 	IXMLDOMNode			*pChildNode = NULL;
 	IXMLDOMNamedNodeMap	*am = NULL;
-	LOGFONT						FontInfo;
+	LOGFONT						fontInfo;
 	BSTR						bstrName;
 	BSTR						bstrValue;
 	long						lChildNodes;
@@ -402,31 +402,31 @@ HFONT NXMLSettings::ReadXMLFontData(IXMLDOMNode *pNode)
 		pChildNode->get_text(&bstrValue);
 
 		if(lstrcmp(bstrName,L"Height") == 0)
-			FontInfo.lfHeight = NXMLSettings::DecodeIntValue(bstrValue);
+			fontInfo.lfHeight = NXMLSettings::DecodeIntValue(bstrValue);
 		else if(lstrcmp(bstrName,L"Width") == 0)
-			FontInfo.lfWidth = NXMLSettings::DecodeIntValue(bstrValue);
+			fontInfo.lfWidth = NXMLSettings::DecodeIntValue(bstrValue);
 		else if(lstrcmp(bstrName,L"Weight") == 0)
-			FontInfo.lfWeight = NXMLSettings::DecodeIntValue(bstrValue);
+			fontInfo.lfWeight = NXMLSettings::DecodeIntValue(bstrValue);
 		else if(lstrcmp(bstrName,L"Italic") == 0)
-			FontInfo.lfItalic = (BYTE)NXMLSettings::DecodeBoolValue(bstrValue);
+			fontInfo.lfItalic = (BYTE)NXMLSettings::DecodeBoolValue(bstrValue);
 		else if(lstrcmp(bstrName,L"Underline") == 0)
-			FontInfo.lfUnderline = (BYTE)NXMLSettings::DecodeBoolValue(bstrValue);
+			fontInfo.lfUnderline = (BYTE)NXMLSettings::DecodeBoolValue(bstrValue);
 		else if(lstrcmp(bstrName,L"Strikeout") == 0)
-			FontInfo.lfStrikeOut = (BYTE)NXMLSettings::DecodeBoolValue(bstrValue);
+			fontInfo.lfStrikeOut = (BYTE)NXMLSettings::DecodeBoolValue(bstrValue);
 		else if(lstrcmp(bstrName,L"Font") == 0)
-			StringCchCopy(FontInfo.lfFaceName,SIZEOF_ARRAY(FontInfo.lfFaceName),bstrValue);
+			StringCchCopy(fontInfo.lfFaceName,SIZEOF_ARRAY(fontInfo.lfFaceName),bstrValue);
 	}
 
-	FontInfo.lfWeight			= FW_MEDIUM;
-	FontInfo.lfCharSet			= DEFAULT_CHARSET;
-	FontInfo.lfClipPrecision	= CLIP_DEFAULT_PRECIS;
-	FontInfo.lfEscapement		= 0;
-	FontInfo.lfOrientation		= 0;
-	FontInfo.lfOutPrecision		= OUT_DEFAULT_PRECIS;
-	FontInfo.lfPitchAndFamily	= FIXED_PITCH|FF_MODERN;
-	FontInfo.lfQuality			= PROOF_QUALITY;
+	fontInfo.lfWeight			= FW_MEDIUM;
+	fontInfo.lfCharSet			= DEFAULT_CHARSET;
+	fontInfo.lfClipPrecision	= CLIP_DEFAULT_PRECIS;
+	fontInfo.lfEscapement		= 0;
+	fontInfo.lfOrientation		= 0;
+	fontInfo.lfOutPrecision		= OUT_DEFAULT_PRECIS;
+	fontInfo.lfPitchAndFamily	= FIXED_PITCH|FF_MODERN;
+	fontInfo.lfQuality			= PROOF_QUALITY;
 
-	return CreateFontIndirect(&FontInfo);
+	return CreateFontIndirect(&fontInfo);
 }
 
 bool NXMLSettings::ReadDateTime(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &baseKeyName,

@@ -40,9 +40,9 @@ HWND AddressBar::CreateAddressBar(HWND parent)
 
 void AddressBar::Initialize(HWND parent)
 {
-	HIMAGELIST SmallIcons;
-	Shell_GetImageLists(nullptr, &SmallIcons);
-	SendMessage(m_hwnd, CBEM_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(SmallIcons));
+	HIMAGELIST smallIcons;
+	Shell_GetImageLists(nullptr, &smallIcons);
+	SendMessage(m_hwnd, CBEM_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(smallIcons));
 
 	HWND hEdit = reinterpret_cast<HWND>(SendMessage(m_hwnd, CBEM_GETEDITCONTROL, 0, 0));
 	m_windowSubclasses.emplace_back(hEdit, EditSubclassStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));

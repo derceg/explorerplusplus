@@ -36,13 +36,13 @@ BOOL GetClusterSize(const TCHAR *Drive, DWORD *pdwClusterSize)
 
 TCHAR GetDriveLetterFromMask(ULONG unitmask)
 {
-	int BitNum = 0;
+	int bitNum = 0;
 
 	while(!(unitmask & 0x1))
 	{
 		unitmask >>= 1;
-		BitNum++;
+		bitNum++;
 	}
 
-	return (TCHAR)BitNum + 'A';
+	return (TCHAR)bitNum + 'A';
 }

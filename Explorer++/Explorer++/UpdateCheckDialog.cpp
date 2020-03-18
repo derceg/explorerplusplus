@@ -67,65 +67,65 @@ DWORD WINAPI UpdateCheckDialog::UpdateCheckThread(LPVOID pParam)
 
 void UpdateCheckDialog::PerformUpdateCheck(HWND hDlg)
 {
-	TCHAR TempPath[MAX_PATH];
-	DWORD PathRes = GetTempPath(SIZEOF_ARRAY(TempPath),TempPath);
+	TCHAR tempPath[MAX_PATH];
+	DWORD pathRes = GetTempPath(SIZEOF_ARRAY(tempPath),tempPath);
 
-	if(PathRes == 0)
+	if(pathRes == 0)
 	{
 		PostMessage(hDlg,UpdateCheckDialog::WM_APP_UPDATE_CHECK_COMPLETE,
 			UpdateCheckDialog::UPDATE_CHECK_ERROR,0);
 		return;
 	}
 
-	TCHAR TempFileName[MAX_PATH];
-	UINT FileRes = GetTempFileName(TempPath,_T("exp"),0,TempFileName);
+	TCHAR tempFileName[MAX_PATH];
+	UINT fileRes = GetTempFileName(tempPath,_T("exp"),0,tempFileName);
 
-	if(FileRes == 0)
+	if(fileRes == 0)
 	{
 		PostMessage(hDlg,UpdateCheckDialog::WM_APP_UPDATE_CHECK_COMPLETE,
 			UpdateCheckDialog::UPDATE_CHECK_ERROR,0);
 		return;
 	}
 
-	bool VersionRetrieved = false;
+	bool versionRetrieved = false;
 
 	/* Not that any cached version of this file
 	will be deleted first. This ensures that the
 	version check is not performed against an
 	outdated file. */
 	DeleteUrlCacheEntry(UpdateCheckDialog::VERSION_FILE_URL);
-	HRESULT hr = URLDownloadToFile(nullptr,UpdateCheckDialog::VERSION_FILE_URL,TempFileName,0, nullptr);
+	HRESULT hr = URLDownloadToFile(nullptr,UpdateCheckDialog::VERSION_FILE_URL,tempFileName,0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
-		HANDLE hFile = CreateFile(TempFileName,GENERIC_READ,0, nullptr,OPEN_EXISTING,0, nullptr);
+		HANDLE hFile = CreateFile(tempFileName,GENERIC_READ,0, nullptr,OPEN_EXISTING,0, nullptr);
 
 		if(hFile != INVALID_HANDLE_VALUE)
 		{
-			char VersionNumber[16];
-			DWORD NumBytesRead;
-			BOOL ReadRes = ReadFile(hFile,VersionNumber,sizeof(VersionNumber) - 1,&NumBytesRead, nullptr);
+			char versionNumber[16];
+			DWORD numBytesRead;
+			BOOL readRes = ReadFile(hFile,versionNumber,sizeof(versionNumber) - 1,&numBytesRead, nullptr);
 
-			if(ReadRes && NumBytesRead > 0)
+			if(readRes && numBytesRead > 0)
 			{
-				VersionNumber[NumBytesRead] = '\0';
+				versionNumber[numBytesRead] = '\0';
 
-				std::string VersionNumberString(VersionNumber);
-				std::vector<std::string> VersionNumberComponents;
-				boost::split(VersionNumberComponents,VersionNumberString,boost::is_any_of("."));
+				std::string versionNumberString(versionNumber);
+				std::vector<std::string> versionNumberComponents;
+				boost::split(versionNumberComponents,versionNumberString,boost::is_any_of("."));
 
 				try
 				{
-					UpdateCheckDialog::Version_t Version;
-					Version.MajorVersion = boost::lexical_cast<int>(VersionNumberComponents.at(0));
-					Version.MinorVersion = boost::lexical_cast<int>(VersionNumberComponents.at(1));
-					Version.MicroVersion = boost::lexical_cast<int>(VersionNumberComponents.at(2));
-					MultiByteToWideChar(CP_ACP,0,VersionNumber,-1,Version.VersionString,SIZEOF_ARRAY(Version.VersionString));
+					UpdateCheckDialog::Version_t version;
+					version.MajorVersion = boost::lexical_cast<int>(versionNumberComponents.at(0));
+					version.MinorVersion = boost::lexical_cast<int>(versionNumberComponents.at(1));
+					version.MicroVersion = boost::lexical_cast<int>(versionNumberComponents.at(2));
+					MultiByteToWideChar(CP_ACP,0,versionNumber,-1,version.VersionString,SIZEOF_ARRAY(version.VersionString));
 
 					SendMessage(hDlg,UpdateCheckDialog::WM_APP_UPDATE_CHECK_COMPLETE,
-						UpdateCheckDialog::UPDATE_CHECK_SUCCESS,reinterpret_cast<LPARAM>(&Version));
+						UpdateCheckDialog::UPDATE_CHECK_SUCCESS,reinterpret_cast<LPARAM>(&version));
 
-					VersionRetrieved = true;
+					versionRetrieved = true;
 				}
 				catch(std::out_of_range)
 				{
@@ -139,13 +139,13 @@ void UpdateCheckDialog::PerformUpdateCheck(HWND hDlg)
 		}
 	}
 
-	if(!VersionRetrieved)
+	if(!versionRetrieved)
 	{
 		PostMessage(hDlg,UpdateCheckDialog::WM_APP_UPDATE_CHECK_COMPLETE,
 			UpdateCheckDialog::UPDATE_CHECK_ERROR,0);
 	}
 
-	DeleteFile(TempFileName);
+	DeleteFile(tempFileName);
 }
 
 INT_PTR UpdateCheckDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
@@ -231,23 +231,23 @@ INT_PTR UpdateCheckDialog::OnTimer(int iTimerID)
 		return 0;
 	}
 
-	TCHAR UpdateStatus[64];
-	LoadString(GetInstance(),IDS_UPDATE_CHECK_STATUS,UpdateStatus,SIZEOF_ARRAY(UpdateStatus));
+	TCHAR updateStatus[64];
+	LoadString(GetInstance(),IDS_UPDATE_CHECK_STATUS,updateStatus,SIZEOF_ARRAY(updateStatus));
 
-	static int Step = 0;
+	static int step = 0;
 
-	for(int i = 0;i < Step;i++)
+	for(int i = 0;i < step;i++)
 	{
-		StringCchCat(UpdateStatus,SIZEOF_ARRAY(UpdateStatus),_T("."));
+		StringCchCat(updateStatus,SIZEOF_ARRAY(updateStatus),_T("."));
 	}
 
-	SetDlgItemText(m_hDlg,IDC_STATIC_UPDATE_STATUS,UpdateStatus);
+	SetDlgItemText(m_hDlg,IDC_STATIC_UPDATE_STATUS,updateStatus);
 
-	Step++;
+	step++;
 
-	if(Step > 3)
+	if(step > 3)
 	{
-		Step = 0;
+		step = 0;
 	}
 
 	return 0;

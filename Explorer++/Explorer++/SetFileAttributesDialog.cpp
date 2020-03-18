@@ -36,21 +36,21 @@ INT_PTR SetFileAttributesDialog::OnInitDialog()
 	int nReadOnly = 0;
 	int nIndexed = 0;
 
-	for(const auto &File : m_FileList)
+	for(const auto &file : m_FileList)
 	{
-		if(File.wfd.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)
+		if(file.wfd.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)
 			nArchived++;
 
-		if((File.wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) == FILE_ATTRIBUTE_HIDDEN)
+		if((file.wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) == FILE_ATTRIBUTE_HIDDEN)
 			nHidden++;
 
-		if(File.wfd.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
+		if(file.wfd.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
 			nSystem++;
 
-		if(File.wfd.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
+		if(file.wfd.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
 			nReadOnly++;
 
-		if(!(File.wfd.dwFileAttributes & FILE_ATTRIBUTE_NOT_CONTENT_INDEXED))
+		if(!(file.wfd.dwFileAttributes & FILE_ATTRIBUTE_NOT_CONTENT_INDEXED))
 			nIndexed++;
 	}
 
@@ -109,32 +109,32 @@ void SetFileAttributesDialog::InitializeDateFields()
 
 void SetFileAttributesDialog::InitializeAttributesStructure(void)
 {
-	Attribute_t Attribute;
+	Attribute_t attribute;
 
-	Attribute.Attribute		= FILE_ATTRIBUTE_ARCHIVE;
-	Attribute.uControlId	= IDC_CHECK_ARCHIVE;
-	Attribute.bReversed		= FALSE;
-	m_AttributeList.push_back(Attribute);
+	attribute.Attribute		= FILE_ATTRIBUTE_ARCHIVE;
+	attribute.uControlId	= IDC_CHECK_ARCHIVE;
+	attribute.bReversed		= FALSE;
+	m_AttributeList.push_back(attribute);
 
-	Attribute.Attribute		= FILE_ATTRIBUTE_HIDDEN;
-	Attribute.uControlId	= IDC_CHECK_HIDDEN;
-	Attribute.bReversed		= FALSE;
-	m_AttributeList.push_back(Attribute);
+	attribute.Attribute		= FILE_ATTRIBUTE_HIDDEN;
+	attribute.uControlId	= IDC_CHECK_HIDDEN;
+	attribute.bReversed		= FALSE;
+	m_AttributeList.push_back(attribute);
 
-	Attribute.Attribute		= FILE_ATTRIBUTE_SYSTEM;
-	Attribute.uControlId	= IDC_CHECK_SYSTEM;
-	Attribute.bReversed		= FALSE;
-	m_AttributeList.push_back(Attribute);
+	attribute.Attribute		= FILE_ATTRIBUTE_SYSTEM;
+	attribute.uControlId	= IDC_CHECK_SYSTEM;
+	attribute.bReversed		= FALSE;
+	m_AttributeList.push_back(attribute);
 
-	Attribute.Attribute		= FILE_ATTRIBUTE_READONLY;
-	Attribute.uControlId	= IDC_CHECK_READONLY;
-	Attribute.bReversed		= FALSE;
-	m_AttributeList.push_back(Attribute);
+	attribute.Attribute		= FILE_ATTRIBUTE_READONLY;
+	attribute.uControlId	= IDC_CHECK_READONLY;
+	attribute.bReversed		= FALSE;
+	m_AttributeList.push_back(attribute);
 
-	Attribute.Attribute		= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;
-	Attribute.uControlId	= IDC_CHECK_INDEXED;
-	Attribute.bReversed		= TRUE;
-	m_AttributeList.push_back(Attribute);
+	attribute.Attribute		= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;
+	attribute.uControlId	= IDC_CHECK_INDEXED;
+	attribute.bReversed		= TRUE;
+	m_AttributeList.push_back(attribute);
 }
 
 INT_PTR SetFileAttributesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
@@ -213,95 +213,95 @@ void SetFileAttributesDialog::OnOk()
 	FILETIME *plw = nullptr;
 	FILETIME *plc = nullptr;
 	FILETIME *pla = nullptr;
-	FILETIME LastWriteTime;
-	FILETIME CreationTime;
-	FILETIME AccessTime;
-	DWORD AllFileAttributes = FILE_ATTRIBUTE_NORMAL;
-	DWORD FileAttributes;
+	FILETIME lastWriteTime;
+	FILETIME creationTime;
+	FILETIME accessTime;
+	DWORD allFileAttributes = FILE_ATTRIBUTE_NORMAL;
+	DWORD fileAttributes;
 
 	if(m_bModificationDateEnabled)
 	{
-		SYSTEMTIME LocalWrite;
-		SYSTEMTIME LocalWriteDate;
-		SYSTEMTIME LocalWriteTime;
+		SYSTEMTIME localWrite;
+		SYSTEMTIME localWriteDate;
+		SYSTEMTIME localWriteTime;
 
-		DateTime_GetSystemtime(GetDlgItem(m_hDlg,IDC_MODIFICATIONDATE),&LocalWriteDate);
-		DateTime_GetSystemtime(GetDlgItem(m_hDlg,IDC_MODIFICATIONTIME),&LocalWriteTime);
+		DateTime_GetSystemtime(GetDlgItem(m_hDlg,IDC_MODIFICATIONDATE),&localWriteDate);
+		DateTime_GetSystemtime(GetDlgItem(m_hDlg,IDC_MODIFICATIONTIME),&localWriteTime);
 
-		MergeDateTime(&LocalWrite,&LocalWriteDate,&LocalWriteTime);
+		MergeDateTime(&localWrite,&localWriteDate,&localWriteTime);
 
-		LocalSystemTimeToFileTime(&LocalWrite,&LastWriteTime);
-		plw = &LastWriteTime;
+		LocalSystemTimeToFileTime(&localWrite,&lastWriteTime);
+		plw = &lastWriteTime;
 	}
 
 	if(m_bCreationDateEnabled)
 	{
-		SYSTEMTIME LocalCreation;
-		SYSTEMTIME LocalCreationDate;
-		SYSTEMTIME LocalCreationTime;
+		SYSTEMTIME localCreation;
+		SYSTEMTIME localCreationDate;
+		SYSTEMTIME localCreationTime;
 
-		DateTime_GetSystemtime(GetDlgItem(m_hDlg,IDC_CREATIONDATE),&LocalCreationDate);
-		DateTime_GetSystemtime(GetDlgItem(m_hDlg,IDC_CREATIONTIME),&LocalCreationTime);
+		DateTime_GetSystemtime(GetDlgItem(m_hDlg,IDC_CREATIONDATE),&localCreationDate);
+		DateTime_GetSystemtime(GetDlgItem(m_hDlg,IDC_CREATIONTIME),&localCreationTime);
 
-		MergeDateTime(&LocalCreation,&LocalCreationDate,&LocalCreationTime);
+		MergeDateTime(&localCreation,&localCreationDate,&localCreationTime);
 
-		LocalSystemTimeToFileTime(&LocalCreation,&CreationTime);
-		plc = &CreationTime;
+		LocalSystemTimeToFileTime(&localCreation,&creationTime);
+		plc = &creationTime;
 	}
 
 	if(m_bAccessDateEnabled)
 	{
-		SYSTEMTIME LocalAccess;
-		SYSTEMTIME LocalAccessDate;
-		SYSTEMTIME LocalAccessTime;
+		SYSTEMTIME localAccess;
+		SYSTEMTIME localAccessDate;
+		SYSTEMTIME localAccessTime;
 
-		DateTime_GetSystemtime(GetDlgItem(m_hDlg,IDC_ACCESSDATE),&LocalAccessDate);
-		DateTime_GetSystemtime(GetDlgItem(m_hDlg,IDC_ACCESSTIME),&LocalAccessTime);
+		DateTime_GetSystemtime(GetDlgItem(m_hDlg,IDC_ACCESSDATE),&localAccessDate);
+		DateTime_GetSystemtime(GetDlgItem(m_hDlg,IDC_ACCESSTIME),&localAccessTime);
 
-		MergeDateTime(&LocalAccess,&LocalAccessDate,&LocalAccessTime);
+		MergeDateTime(&localAccess,&localAccessDate,&localAccessTime);
 
-		LocalSystemTimeToFileTime(&LocalAccess,&AccessTime);
-		pla = &AccessTime;
+		LocalSystemTimeToFileTime(&localAccess,&accessTime);
+		pla = &accessTime;
 	}
 
 	/* Build up list of attributes. Add all positive
 	attributes (i.e. those that are active for all files).
 	Any attributes which are indeterminate will not change
 	(note that they are per-file). */
-	for(auto &Attribute : m_AttributeList)
+	for(auto &attribute : m_AttributeList)
 	{
-		Attribute.uChecked = static_cast<UINT>(SendMessage(GetDlgItem(m_hDlg,
-			Attribute.uControlId),BM_GETCHECK,0,0));
+		attribute.uChecked = static_cast<UINT>(SendMessage(GetDlgItem(m_hDlg,
+			attribute.uControlId),BM_GETCHECK,0,0));
 
-		if((!Attribute.bReversed && Attribute.uChecked == BST_CHECKED) ||
-			(Attribute.bReversed && Attribute.uChecked != BST_CHECKED))
+		if((!attribute.bReversed && attribute.uChecked == BST_CHECKED) ||
+			(attribute.bReversed && attribute.uChecked != BST_CHECKED))
 		{
-			AllFileAttributes |= Attribute.Attribute;
+			allFileAttributes |= attribute.Attribute;
 		}
 	}
 
-	for(const auto &File : m_FileList)
+	for(const auto &file : m_FileList)
 	{
-		FileAttributes = AllFileAttributes;
+		fileAttributes = allFileAttributes;
 
-		for(const auto &Attribute : m_AttributeList)
+		for(const auto &attribute : m_AttributeList)
 		{
 			/* If the check box is indeterminate, this attribute will
 			stay the same (i.e. if a file had the attribute applied
 			initially, it will still have it applied, and vice versa). */
-			if(Attribute.uChecked == BST_INDETERMINATE)
+			if(attribute.uChecked == BST_INDETERMINATE)
 			{
-				if((!Attribute.bReversed) &&
-					(File.wfd.dwFileAttributes & Attribute.Attribute))
+				if((!attribute.bReversed) &&
+					(file.wfd.dwFileAttributes & attribute.Attribute))
 				{
-					FileAttributes |= Attribute.Attribute;
+					fileAttributes |= attribute.Attribute;
 				}
 			}
 		}
 
-		SetFileAttributes(File.szFullFileName,FileAttributes);
+		SetFileAttributes(file.szFullFileName,fileAttributes);
 
-		HANDLE hFile = CreateFile(File.szFullFileName,FILE_WRITE_ATTRIBUTES,0,
+		HANDLE hFile = CreateFile(file.szFullFileName,FILE_WRITE_ATTRIBUTES,0,
 			nullptr,OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS, nullptr);
 
 		if(hFile != INVALID_HANDLE_VALUE)
@@ -350,16 +350,16 @@ void SetFileAttributesDialog::SaveState()
 void SetFileAttributesDialog::SetAttributeCheckState(HWND hwnd,
 	int nAttributes,int nSelected)
 {
-	UINT CheckState;
+	UINT checkState;
 
 	if(nAttributes == 0)
-		CheckState = BST_UNCHECKED;
+		checkState = BST_UNCHECKED;
 	else if(nAttributes == nSelected)
-		CheckState = BST_CHECKED;
+		checkState = BST_CHECKED;
 	else
-		CheckState = BST_INDETERMINATE;
+		checkState = BST_INDETERMINATE;
 
-	SendMessage(hwnd,BM_SETCHECK,CheckState,0);
+	SendMessage(hwnd,BM_SETCHECK,checkState,0);
 }
 
 void SetFileAttributesDialog::ResetButtonState(HWND hwnd,BOOL bReset)

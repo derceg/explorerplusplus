@@ -30,11 +30,11 @@ ContextMenuManager::ContextMenuManager(ContextMenuType_t ContextMenuType,
 	PCIDLIST_ABSOLUTE pidlDirectory,IDataObject *pDataObject,IUnknown *pUnkSite,
 	const std::vector<std::wstring> &blacklistedCLSIDEntries)
 {
-	ItemType_t ItemType = GetItemType(pidlDirectory);
+	ItemType_t itemType = GetItemType(pidlDirectory);
 
 	const TCHAR *pszRegContext = NULL;
 
-	switch(ItemType)
+	switch(itemType)
 	{
 	case ITEM_TYPE_FOLDER:
 		if(ContextMenuType == CONTEXT_MENU_TYPE_DRAG_AND_DROP)
@@ -69,18 +69,18 @@ ContextMenuManager::ContextMenuManager(ContextMenuType_t ContextMenuType,
 
 	/* Initialize the shell extensions, and extract
 	an IContextMenu interface. */
-	for(const auto &ContextMenuHandler : m_ContextMenuHandlers)
+	for(const auto &contextMenuHandler : m_ContextMenuHandlers)
 	{
 		IShellExtInit *pShellExtInit = NULL;
 		HRESULT hr;
 
-		IUnknown *pUnknown = ContextMenuHandler.pUnknown;
+		IUnknown *pUnknown = contextMenuHandler.pUnknown;
 
 		hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pShellExtInit));
 
 		if(SUCCEEDED(hr))
 		{
-			MenuHandler_t MenuHandler;
+			MenuHandler_t menuHandler;
 			IContextMenu *pContextMenu = NULL;
 			IContextMenu2 *pContextMenu2 = NULL;
 			IContextMenu3 *pContextMenu3 = NULL;
@@ -102,28 +102,28 @@ ContextMenuManager::ContextMenuManager(ContextMenuType_t ContextMenuType,
 			}
 
 			hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pContextMenu3));
-			MenuHandler.pContextMenuActual = pContextMenu3;
+			menuHandler.pContextMenuActual = pContextMenu3;
 
 			if(FAILED(hr) || pContextMenu3 == NULL)
 			{
 				hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pContextMenu2));
-				MenuHandler.pContextMenuActual = pContextMenu2;
+				menuHandler.pContextMenuActual = pContextMenu2;
 
 				if(FAILED(hr) || pContextMenu2 == NULL)
 				{
 					hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pContextMenu));
-					MenuHandler.pContextMenuActual = pContextMenu;
+					menuHandler.pContextMenuActual = pContextMenu;
 				}
 			}
 
-			MenuHandler.pContextMenu = pContextMenu;
-			MenuHandler.pContextMenu2 = pContextMenu2;
-			MenuHandler.pContextMenu3 = pContextMenu3;
+			menuHandler.pContextMenu = pContextMenu;
+			menuHandler.pContextMenu2 = pContextMenu2;
+			menuHandler.pContextMenu3 = pContextMenu3;
 
-			MenuHandler.uStartID = 0;
-			MenuHandler.uEndID = 0;
+			menuHandler.uStartID = 0;
+			menuHandler.uEndID = 0;
 
-			m_MenuHandlers.push_back(MenuHandler);
+			m_MenuHandlers.push_back(menuHandler);
 		}
 	}
 }
@@ -131,22 +131,22 @@ ContextMenuManager::ContextMenuManager(ContextMenuType_t ContextMenuType,
 ContextMenuManager::~ContextMenuManager()
 {
 	/* Release the IContextMenu interfaces. */
-	for(auto MenuHandler : m_MenuHandlers)
+	for(auto menuHandler : m_MenuHandlers)
 	{
-		if(MenuHandler.pContextMenuActual != NULL)
+		if(menuHandler.pContextMenuActual != NULL)
 		{
-			MenuHandler.pContextMenuActual->Release();
+			menuHandler.pContextMenuActual->Release();
 		}
 	}
 
 	/* ...and free the necessary DLL's. */
-	for(auto ContextMenuHandler : m_ContextMenuHandlers)
+	for(auto contextMenuHandler : m_ContextMenuHandlers)
 	{
-		ContextMenuHandler.pUnknown->Release();
+		contextMenuHandler.pUnknown->Release();
 
-		if(ContextMenuHandler.hDLL != NULL)
+		if(contextMenuHandler.hDLL != NULL)
 		{
-			FreeLibrary(ContextMenuHandler.hDLL);
+			FreeLibrary(contextMenuHandler.hDLL);
 		}
 	}
 }
@@ -253,7 +253,7 @@ void ContextMenuManager::AddMenuEntries(HMENU hMenu,
 
 void ContextMenuManager::RemoveDuplicateSeperators(HMENU hMenu)
 {
-	std::vector<int> DeletionVector;
+	std::vector<int> deletionVector;
 
 	bool bPreviousItemSeperator = false;
 
@@ -268,13 +268,13 @@ void ContextMenuManager::RemoveDuplicateSeperators(HMENU hMenu)
 
 		if(bPreviousItemSeperator && bCurrentItemSeparator)
 		{
-			DeletionVector.push_back(i);
+			deletionVector.push_back(i);
 		}
 
 		bPreviousItemSeperator = bCurrentItemSeparator;
 	}
 
-	for(auto itr = DeletionVector.rbegin();itr != DeletionVector.rend();itr++)
+	for(auto itr = deletionVector.rbegin();itr != deletionVector.rend();itr++)
 	{
 		DeleteMenu(hMenu,*itr,MF_BYPOSITION);
 	}
@@ -378,18 +378,18 @@ HRESULT ContextMenuManager::HandleMenuMessage(UINT uMsg,WPARAM wParam,
 
 	if(uItemID != -1)
 	{
-		for(auto MenuHandler : m_MenuHandlers)
+		for(auto menuHandler : m_MenuHandlers)
 		{
-			if(uItemID >= MenuHandler.uStartID &&
-				uItemID < MenuHandler.uEndID)
+			if(uItemID >= menuHandler.uStartID &&
+				uItemID < menuHandler.uEndID)
 			{
-				if(MenuHandler.pContextMenu3 != NULL)
+				if(menuHandler.pContextMenu3 != NULL)
 				{
-					hr = MenuHandler.pContextMenu3->HandleMenuMsg2(uMsg,wParam,lParam,&lRes);
+					hr = menuHandler.pContextMenu3->HandleMenuMsg2(uMsg,wParam,lParam,&lRes);
 				}
-				else if(MenuHandler.pContextMenu2 != NULL && !bContextMenu3Required)
+				else if(menuHandler.pContextMenu2 != NULL && !bContextMenu3Required)
 				{
-					hr = MenuHandler.pContextMenu2->HandleMenuMsg(uMsg,wParam,lParam);
+					hr = menuHandler.pContextMenu2->HandleMenuMsg(uMsg,wParam,lParam);
 				}
 
 				break;
@@ -406,14 +406,14 @@ HRESULT ContextMenuManager::GetMenuHelperText(UINT uID,TCHAR *szText,UINT cchMax
 {
 	HRESULT hr = E_FAIL;
 
-	for(auto MenuHandler : m_MenuHandlers)
+	for(auto menuHandler : m_MenuHandlers)
 	{
-		if(uID >= MenuHandler.uStartID &&
-			uID < MenuHandler.uEndID)
+		if(uID >= menuHandler.uStartID &&
+			uID < menuHandler.uEndID)
 		{
-			if(MenuHandler.pContextMenuActual != NULL)
+			if(menuHandler.pContextMenuActual != NULL)
 			{
-				hr = MenuHandler.pContextMenuActual->GetCommandString(uID - MenuHandler.uStartID,
+				hr = menuHandler.pContextMenuActual->GetCommandString(uID - menuHandler.uStartID,
 					GCS_HELPTEXT,NULL,reinterpret_cast<LPSTR>(szText),cchMax);
 			}
 
@@ -442,21 +442,21 @@ int ContextMenuManager::GetMenuItemPos(HMENU hMenu,UINT uID)
 
 void ContextMenuManager::InvokeMenuEntry(HWND hwnd,UINT uCmd)
 {
-	for(auto MenuHandler : m_MenuHandlers)
+	for(auto menuHandler : m_MenuHandlers)
 	{
-		if(uCmd >= MenuHandler.uStartID &&
-			uCmd < MenuHandler.uEndID)
+		if(uCmd >= menuHandler.uStartID &&
+			uCmd < menuHandler.uEndID)
 		{
 			CMINVOKECOMMANDINFO	cmici;
 			cmici.cbSize		= sizeof(CMINVOKECOMMANDINFO);
 			cmici.fMask			= 0;
 			cmici.hwnd			= hwnd;
-			cmici.lpVerb		= reinterpret_cast<LPCSTR>(MAKEWORD(uCmd - MenuHandler.uStartID,0));
+			cmici.lpVerb		= reinterpret_cast<LPCSTR>(MAKEWORD(uCmd - menuHandler.uStartID,0));
 			cmici.lpParameters	= NULL;
 			cmici.lpDirectory	= NULL;
 			cmici.nShow			= SW_SHOW;
 
-			MenuHandler.pContextMenuActual->InvokeCommand(&cmici);
+			menuHandler.pContextMenuActual->InvokeCommand(&cmici);
 			break;
 		}
 	}
@@ -464,16 +464,16 @@ void ContextMenuManager::InvokeMenuEntry(HWND hwnd,UINT uCmd)
 
 ContextMenuManager::ItemType_t ContextMenuManager::GetItemType(PCIDLIST_ABSOLUTE pidl)
 {
-	SFGAOF Attributes = SFGAO_FOLDER|SFGAO_FILESYSTEM;
-	GetItemAttributes(pidl,&Attributes);
+	SFGAOF attributes = SFGAO_FOLDER|SFGAO_FILESYSTEM;
+	GetItemAttributes(pidl,&attributes);
 
-	if((Attributes & SFGAO_FOLDER) &&
-		(Attributes & SFGAO_FILESYSTEM))
+	if((attributes & SFGAO_FOLDER) &&
+		(attributes & SFGAO_FILESYSTEM))
 	{
 		return ITEM_TYPE_DIRECTORY;
 	}
-	else if((Attributes & SFGAO_FOLDER) &&
-		!(Attributes & SFGAO_FILESYSTEM))
+	else if((attributes & SFGAO_FOLDER) &&
+		!(attributes & SFGAO_FILESYSTEM))
 	{
 		return ITEM_TYPE_FOLDER;
 	}

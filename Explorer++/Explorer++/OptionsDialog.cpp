@@ -278,7 +278,7 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 						HWND hEdit;
 						TCHAR szNewTabDir[MAX_PATH];
 						TCHAR szVirtualParsingPath[MAX_PATH];
-						NDefaultFileManager::ReplaceExplorerModes_t ReplaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_NONE;
+						NDefaultFileManager::ReplaceExplorerModes_t replaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_NONE;
 						BOOL bSuccess;
 						HRESULT hr;
 						int iSel;
@@ -289,19 +289,19 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 							m_config->startupMode = StartupMode::DefaultFolder;
 
 						if(IsDlgButtonChecked(hDlg,IDC_OPTION_REPLACEEXPLORER_NONE) == BST_CHECKED)
-							ReplaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_NONE;
+							replaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_NONE;
 						else if(IsDlgButtonChecked(hDlg,IDC_OPTION_REPLACEEXPLORER_FILESYSTEM) == BST_CHECKED)
-							ReplaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_FILESYSTEM;
+							replaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_FILESYSTEM;
 						else if(IsDlgButtonChecked(hDlg,IDC_OPTION_REPLACEEXPLORER_ALL) == BST_CHECKED)
-							ReplaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_ALL;
+							replaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_ALL;
 
-						if(m_config->replaceExplorerMode != ReplaceExplorerMode)
+						if(m_config->replaceExplorerMode != replaceExplorerMode)
 						{
 							bSuccess = TRUE;
 
 							std::wstring menuText = ResourceHelper::LoadString(m_instance, IDS_OPEN_IN_EXPLORERPLUSPLUS);
 
-							switch(ReplaceExplorerMode)
+							switch(replaceExplorerMode)
 							{
 							case NDefaultFileManager::REPLACEEXPLORER_NONE:
 								{
@@ -339,7 +339,7 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 
 							if(bSuccess)
 							{
-								m_config->replaceExplorerMode = ReplaceExplorerMode;
+								m_config->replaceExplorerMode = replaceExplorerMode;
 							}
 							else
 							{
@@ -348,7 +348,7 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 
 								int nIDButton;
 
-								switch(ReplaceExplorerMode)
+								switch(replaceExplorerMode)
 								{
 								case NDefaultFileManager::REPLACEEXPLORER_NONE:
 									nIDButton = IDC_OPTION_REPLACEEXPLORER_NONE;
@@ -983,28 +983,28 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 					CheckDlgButton(hDlg,IDC_SORTASCENDINGGLOBAL,BST_CHECKED);
 
 				HWND hComboBox = GetDlgItem(hDlg,IDC_OPTIONS_DEFAULT_VIEW);
-				int SelectedIndex = -1;
+				int selectedIndex = -1;
 
 				for(auto viewMode : VIEW_MODES)
 				{
-					int StringID = GetViewModeMenuStringId(viewMode);
+					int stringId = GetViewModeMenuStringId(viewMode);
 
-					std::wstring viewModeText = ResourceHelper::LoadString(m_instance, StringID);
+					std::wstring viewModeText = ResourceHelper::LoadString(m_instance, stringId);
 
-					int Index = static_cast<int>(SendMessage(hComboBox, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(viewModeText.c_str())));
+					int index = static_cast<int>(SendMessage(hComboBox, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(viewModeText.c_str())));
 
-					if(Index != CB_ERR)
+					if(index != CB_ERR)
 					{
-						SendMessage(hComboBox,CB_SETITEMDATA,Index,viewMode);
+						SendMessage(hComboBox,CB_SETITEMDATA,index,viewMode);
 					}
 
 					if(viewMode == m_config->defaultFolderSettings.viewMode)
 					{
-						SelectedIndex = Index;
+						selectedIndex = index;
 					}
 				}
 
-				SendMessage(hComboBox,CB_SETCURSEL,SelectedIndex,0);
+				SendMessage(hComboBox,CB_SETCURSEL,selectedIndex,0);
 			}
 			break;
 
@@ -1062,9 +1062,9 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 							== BST_CHECKED);
 
 						HWND hComboBox = GetDlgItem(hDlg,IDC_OPTIONS_DEFAULT_VIEW);
-						int SelectedIndex = static_cast<int>(SendMessage(hComboBox,CB_GETCURSEL,0,0));
+						int selectedIndex = static_cast<int>(SendMessage(hComboBox,CB_GETCURSEL,0,0));
 						m_config->defaultFolderSettings.viewMode = ViewMode::_from_integral(
-							static_cast<int>(SendMessage(hComboBox, CB_GETITEMDATA, SelectedIndex, 0)));
+							static_cast<int>(SendMessage(hComboBox, CB_GETITEMDATA, selectedIndex, 0)));
 
 						m_expp->SaveAllSettings();
 					}
@@ -1154,16 +1154,16 @@ void OptionsDialog::DefaultSettingsSetNewTabDir(HWND hEdit, const TCHAR *szPath)
 
 void OptionsDialog::DefaultSettingsSetNewTabDir(HWND hEdit, PCIDLIST_ABSOLUTE pidl)
 {
-	SFGAOF			Attributes;
+	SFGAOF			attributes;
 	DWORD			uNameFlags;
 	TCHAR			szNewTabDir[MAX_PATH];
 
-	Attributes = SFGAO_FILESYSTEM;
+	attributes = SFGAO_FILESYSTEM;
 
 	/* Check if the specified folder is real or virtual. */
-	GetItemAttributes(pidl,&Attributes);
+	GetItemAttributes(pidl,&attributes);
 
-	if(Attributes & SFGAO_FILESYSTEM)
+	if(attributes & SFGAO_FILESYSTEM)
 		uNameFlags = SHGDN_FORPARSING;
 	else
 		uNameFlags = SHGDN_INFOLDER;

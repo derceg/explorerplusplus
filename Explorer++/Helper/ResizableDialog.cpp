@@ -15,7 +15,7 @@ ResizableDialog::ResizableDialog(HWND hDlg,
 	const std::list<Control_t> &ControlList) :
 	m_hDlg(hDlg)
 {
-	ControlInternal_t ControlInternal;
+	ControlInternal_t controlInternal;
 	HWND hwnd;
 	RECT rcDlg;
 	RECT rc;
@@ -24,30 +24,30 @@ ResizableDialog::ResizableDialog(HWND hDlg,
 
 	/* Loop through each of the controls and
 	find the delta's. */
-	for(const auto &Control : ControlList)
+	for(const auto &control : ControlList)
 	{
-		ControlInternal.iID			= Control.iID;
-		ControlInternal.Type		= Control.Type;
-		ControlInternal.Constraint	= Control.Constraint;
+		controlInternal.iID			= control.iID;
+		controlInternal.Type		= control.Type;
+		controlInternal.Constraint	= control.Constraint;
 
-		hwnd = GetDlgItem(m_hDlg,Control.iID);
+		hwnd = GetDlgItem(m_hDlg,control.iID);
 		GetWindowRect(hwnd,&rc);
 		MapWindowPoints(HWND_DESKTOP,m_hDlg,reinterpret_cast<LPPOINT>(&rc),sizeof(RECT) / sizeof(POINT));
 
-		switch(Control.Type)
+		switch(control.Type)
 		{
 		case TYPE_MOVE:
-			ControlInternal.iWidthDelta = rcDlg.right - rc.left;
-			ControlInternal.iHeightDelta = rcDlg.bottom - rc.top;
+			controlInternal.iWidthDelta = rcDlg.right - rc.left;
+			controlInternal.iHeightDelta = rcDlg.bottom - rc.top;
 			break;
 
 		case TYPE_RESIZE:
-			ControlInternal.iWidthDelta = rcDlg.right - rc.right;
-			ControlInternal.iHeightDelta = rcDlg.bottom - rc.bottom;
+			controlInternal.iWidthDelta = rcDlg.right - rc.right;
+			controlInternal.iHeightDelta = rcDlg.bottom - rc.bottom;
 			break;
 		}
 
-		m_ControlList.push_back(ControlInternal);
+		m_ControlList.push_back(controlInternal);
 	}
 }
 
@@ -56,9 +56,9 @@ void ResizableDialog::UpdateControls(int iWidth,int iHeight)
 	HWND hCtrl;
 	RECT rc;
 
-	for(const auto &Control : m_ControlList)
+	for(const auto &control : m_ControlList)
 	{
-		hCtrl = GetDlgItem(m_hDlg,Control.iID);
+		hCtrl = GetDlgItem(m_hDlg,control.iID);
 		GetWindowRect(hCtrl,&rc);
 		MapWindowPoints(HWND_DESKTOP,m_hDlg,reinterpret_cast<LPPOINT>(&rc),sizeof(RECT) / sizeof(POINT));
 
@@ -66,44 +66,44 @@ void ResizableDialog::UpdateControls(int iWidth,int iHeight)
 		Both resizes and movements rely on the fact that two
 		of the edges on a control will always be at a fixed
 		distance from the right/bottom edges of the dialog. */
-		switch(Control.Type)
+		switch(control.Type)
 		{
 		case TYPE_MOVE:
-			switch(Control.Constraint)
+			switch(control.Constraint)
 			{
 			case CONSTRAINT_NONE:
-				SetWindowPos(hCtrl,NULL,iWidth - Control.iWidthDelta,iHeight - Control.iHeightDelta,
+				SetWindowPos(hCtrl,NULL,iWidth - control.iWidthDelta,iHeight - control.iHeightDelta,
 					0,0,SWP_NOSIZE|SWP_NOZORDER);
 				break;
 
 			case CONSTRAINT_X:
-				SetWindowPos(hCtrl,NULL,iWidth - Control.iWidthDelta,rc.top,
+				SetWindowPos(hCtrl,NULL,iWidth - control.iWidthDelta,rc.top,
 					0,0,SWP_NOSIZE|SWP_NOZORDER);
 				break;
 
 			case CONSTRAINT_Y:
-				SetWindowPos(hCtrl,NULL,rc.left,iHeight - Control.iHeightDelta,
+				SetWindowPos(hCtrl,NULL,rc.left,iHeight - control.iHeightDelta,
 					0,0,SWP_NOSIZE|SWP_NOZORDER);
 				break;
 			}
 			break;
 
 		case TYPE_RESIZE:
-			switch(Control.Constraint)
+			switch(control.Constraint)
 			{
 			case CONSTRAINT_NONE:
-				SetWindowPos(hCtrl,NULL,0,0,iWidth - Control.iWidthDelta - rc.left,
-					iHeight - Control.iHeightDelta - rc.top,SWP_NOMOVE|SWP_NOZORDER);
+				SetWindowPos(hCtrl,NULL,0,0,iWidth - control.iWidthDelta - rc.left,
+					iHeight - control.iHeightDelta - rc.top,SWP_NOMOVE|SWP_NOZORDER);
 				break;
 
 			case CONSTRAINT_X:
-				SetWindowPos(hCtrl,NULL,0,0,iWidth - Control.iWidthDelta - rc.left,
+				SetWindowPos(hCtrl,NULL,0,0,iWidth - control.iWidthDelta - rc.left,
 					rc.bottom - rc.top,SWP_NOMOVE|SWP_NOZORDER);
 				break;
 
 			case CONSTRAINT_Y:
 				SetWindowPos(hCtrl,NULL,0,0,rc.right - rc.left,
-					iHeight - Control.iHeightDelta - rc.top,SWP_NOMOVE|SWP_NOZORDER);
+					iHeight - control.iHeightDelta - rc.top,SWP_NOMOVE|SWP_NOZORDER);
 				break;
 			}
 			break;

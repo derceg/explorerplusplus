@@ -974,11 +974,11 @@ std::vector<Column_t> ShellBrowser::ExportCurrentColumns()
 			iColumn++;
 		}
 
-		Column_t Column;
-		Column.id = itr->id;
-		Column.bChecked = itr->bChecked;
-		Column.iWidth = itr->iWidth;
-		columns.push_back(Column);
+		Column_t column;
+		column.id = itr->id;
+		column.bChecked = itr->bChecked;
+		column.iWidth = itr->iWidth;
+		columns.push_back(column);
 	}
 
 	return columns;

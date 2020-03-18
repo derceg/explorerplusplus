@@ -135,10 +135,10 @@ void TaskbarThumbnails::SetupJumplistTasks()
 	jlti.pszIconPath	= szCurrentProcess;
 	jlti.iIcon			= 1;
 
-	std::list<JumpListTaskInformation> TaskList;
-	TaskList.push_back(jlti);
+	std::list<JumpListTaskInformation> taskList;
+	taskList.push_back(jlti);
 
-	AddJumpListTasks(TaskList);
+	AddJumpListTasks(taskList);
 }
 
 ATOM TaskbarThumbnails::RegisterTabProxyClass(const TCHAR *szClassName)

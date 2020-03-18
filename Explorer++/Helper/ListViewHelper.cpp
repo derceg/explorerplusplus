@@ -330,7 +330,7 @@ void NListView::ListView_PositionInsertMark(HWND hListView,const POINT *ppt)
 		return;
 	}
 
-	RECT ItemRect;
+	RECT itemRect;
 	DWORD dwFlags = 0;
 	int iNext;
 	BOOL bRet;
@@ -342,7 +342,7 @@ void NListView::ListView_PositionInsertMark(HWND hListView,const POINT *ppt)
 
 	if(iItem != -1 && item.flags & LVHT_ONITEM)
 	{
-		bRet = ListView_GetItemRect(hListView,item.iItem,&ItemRect,LVIR_BOUNDS);
+		bRet = ListView_GetItemRect(hListView,item.iItem,&itemRect,LVIR_BOUNDS);
 
 		/* If the cursor is on the left side
 		of this item, set the insertion before
@@ -350,7 +350,7 @@ void NListView::ListView_PositionInsertMark(HWND hListView,const POINT *ppt)
 		of this item, set the insertion mark
 		after this item. */
 		if(bRet &&
-			(ppt->x - ItemRect.left) > ((ItemRect.right - ItemRect.left)/2))
+			(ppt->x - itemRect.left) > ((itemRect.right - itemRect.left)/2))
 		{
 			iNext = iItem;
 			dwFlags = LVIM_AFTER;
@@ -384,7 +384,7 @@ void NListView::ListView_PositionInsertMark(HWND hListView,const POINT *ppt)
 			iNext = ListView_FindItem(hListView,-1,&lvfi);
 		}
 
-		bRet = ListView_GetItemRect(hListView,iNext,&ItemRect,LVIR_BOUNDS);
+		bRet = ListView_GetItemRect(hListView,iNext,&itemRect,LVIR_BOUNDS);
 
 		/* This situation only occurs at the
 		end of the row. Prior to this, it is
@@ -395,7 +395,7 @@ void NListView::ListView_PositionInsertMark(HWND hListView,const POINT *ppt)
 		item found will be on the left side of
 		the cursor. */
 		if(bRet &&
-			ppt->x > (ItemRect.left + ((ItemRect.right - ItemRect.left)/2)))
+			ppt->x > (itemRect.left + ((itemRect.right - itemRect.left)/2)))
 		{
 			/* At the end of a row, VK_UP appears to
 			find the next item up. Therefore, if we're
@@ -404,7 +404,7 @@ void NListView::ListView_PositionInsertMark(HWND hListView,const POINT *ppt)
 			one under it instead (if there is an item
 			under it), and anchor the insertion mark
 			there. */
-			if(ppt->y > ItemRect.bottom)
+			if(ppt->y > itemRect.bottom)
 			{
 				int iBelow;
 
@@ -420,15 +420,15 @@ void NListView::ListView_PositionInsertMark(HWND hListView,const POINT *ppt)
 		int nItems = ListView_GetItemCount(hListView);
 
 		/* Last item is at position nItems - 1. */
-		bRet = ListView_GetItemRect(hListView,nItems - 1,&ItemRect,LVIR_BOUNDS);
+		bRet = ListView_GetItemRect(hListView,nItems - 1,&itemRect,LVIR_BOUNDS);
 
 		/* Special case needed for very last item. If cursor is within 0.5 to 1.5 width
 		of last item, and is greater than it's y coordinate, snap the insertion mark to
 		this item. */
 		if(bRet &&
-			ppt->x > (ItemRect.left + ((ItemRect.right - ItemRect.left)/2)) &&
-			ppt->x < (ItemRect.right + ((ItemRect.right - ItemRect.left)/2) + 2) &&
-			ppt->y > ItemRect.top)
+			ppt->x > (itemRect.left + ((itemRect.right - itemRect.left)/2)) &&
+			ppt->x < (itemRect.right + ((itemRect.right - itemRect.left)/2) + 2) &&
+			ppt->y > itemRect.top)
 		{
 			iNext = nItems - 1;
 			dwFlags = LVIM_AFTER;

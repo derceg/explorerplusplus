@@ -19,7 +19,7 @@ void Explorerplusplus::SetLanguageModule()
 {
 	HANDLE			hFindFile;
 	WIN32_FIND_DATA	wfd;
-	LANGID			LanguageID;
+	LANGID			languageId;
 	TCHAR			szLanguageModule[MAX_PATH];
 	TCHAR			szNamePattern[MAX_PATH];
 	TCHAR			szFullFileName[MAX_PATH];
@@ -50,9 +50,9 @@ void Explorerplusplus::SetLanguageModule()
 		{
 			/* No previous language loaded. Try and use the system
 			default language. */
-			LanguageID = GetUserDefaultUILanguage();
+			languageId = GetUserDefaultUILanguage();
 
-			m_config->language = PRIMARYLANGID(LanguageID);
+			m_config->language = PRIMARYLANGID(languageId);
 		}
 	}
 

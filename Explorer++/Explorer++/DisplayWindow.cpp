@@ -130,7 +130,7 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 				TCHAR			szDisplayText[256];
 				TCHAR			szTotalSize[64];
 				TCHAR			szCalculating[64];
-				DWORD			ThreadId;
+				DWORD			threadId;
 
 				pfs = (FolderSize_t *)malloc(sizeof(FolderSize_t));
 
@@ -162,7 +162,7 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 						DWFolderSize.bValid = TRUE;
 						m_DWFolderSizes.push_back(DWFolderSize);
 
-						HANDLE hThread = CreateThread(nullptr, 0, Thread_CalculateFolderSize, (LPVOID)pfs, 0, &ThreadId);
+						HANDLE hThread = CreateThread(nullptr, 0, Thread_CalculateFolderSize, (LPVOID)pfs, 0, &threadId);
 						CloseHandle(hThread);
 
 						m_iDWFolderSizeUniqueId++;
@@ -356,7 +356,7 @@ void Explorerplusplus::UpdateDisplayWindowForMultipleFiles(const Tab &tab)
 	TCHAR			szTotalSizeFragment[32] = EMPTY_STRING;
 	TCHAR			szMore[64];
 	TCHAR			szTotalSizeString[64];
-	FolderInfo_t	FolderInfo;
+	FolderInfo_t	folderInfo;
 	int				nSelected;
 
 	DisplayWindow_SetThumbnailFile(m_hDisplayWindow, EMPTY_STRING, FALSE);
@@ -373,9 +373,9 @@ void Explorerplusplus::UpdateDisplayWindowForMultipleFiles(const Tab &tab)
 
 	if (!tab.GetShellBrowser()->InVirtualFolder())
 	{
-		tab.GetShellBrowser()->GetFolderInfo(&FolderInfo);
+		tab.GetShellBrowser()->GetFolderInfo(&folderInfo);
 
-		FormatSizeString(FolderInfo.TotalSelectionSize, szTotalSizeFragment,
+		FormatSizeString(folderInfo.TotalSelectionSize, szTotalSizeFragment,
 			SIZEOF_ARRAY(szTotalSizeFragment), m_config->globalFolderSettings.forceSize,
 			m_config->globalFolderSettings.sizeDisplayFormat);
 

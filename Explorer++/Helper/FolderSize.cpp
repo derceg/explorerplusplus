@@ -13,8 +13,8 @@ int *nFiles,PULARGE_INTEGER lTotalFolderSize)
 {
 	HANDLE			hFirstFile;
 	WIN32_FIND_DATA	wfd;
-	TCHAR			InitialPath[MAX_PATH + 2];
-	TCHAR			TempPath[MAX_PATH + 2];
+	TCHAR			initialPath[MAX_PATH + 2];
+	TCHAR			tempPath[MAX_PATH + 2];
 	ULARGE_INTEGER	l_TotalFolderSize;
 	ULARGE_INTEGER	r_TotalFolderSize;
 	ULARGE_INTEGER	lFileSize;
@@ -29,10 +29,10 @@ int *nFiles,PULARGE_INTEGER lTotalFolderSize)
 	l_TotalFolderSize.QuadPart	= 0;
 	r_TotalFolderSize.QuadPart	= 0;
 
-	StringCchCopy(InitialPath,SIZEOF_ARRAY(InitialPath),szPath);
-	StringCchCat(InitialPath,SIZEOF_ARRAY(InitialPath),_T("\\*"));
+	StringCchCopy(initialPath,SIZEOF_ARRAY(initialPath),szPath);
+	StringCchCat(initialPath,SIZEOF_ARRAY(initialPath),_T("\\*"));
 
-	hFirstFile = FindFirstFile(InitialPath,&wfd);
+	hFirstFile = FindFirstFile(initialPath,&wfd);
 
 	if(hFirstFile == INVALID_HANDLE_VALUE)
 		return S_OK;
@@ -57,10 +57,10 @@ int *nFiles,PULARGE_INTEGER lTotalFolderSize)
 			{
 				l_NumFolders++;
 
-				StringCchCopy(TempPath,SIZEOF_ARRAY(TempPath),szPath);
-				PathAppend(TempPath,wfd.cFileName);
+				StringCchCopy(tempPath,SIZEOF_ARRAY(tempPath),szPath);
+				PathAppend(tempPath,wfd.cFileName);
 
-				CalculateFolderSize(TempPath,&r_NumFolders,&r_NumFiles,&r_TotalFolderSize);
+				CalculateFolderSize(tempPath,&r_NumFolders,&r_NumFiles,&r_TotalFolderSize);
 
 				l_NumFolders				+= r_NumFolders;
 				l_NumFiles					+= r_NumFiles;

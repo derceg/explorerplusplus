@@ -156,11 +156,11 @@ LRESULT CALLBACK ApplicationToolbar::ParentWndProc(
 					{
 						m_RightClickItem = iIndex;
 
-						HMENU RightClickMenu = GetSubMenu(
+						HMENU rightClickMenu = GetSubMenu(
 							LoadMenu(m_hInstance, MAKEINTRESOURCE(IDR_APPLICATIONTOOLBAR_MENU)), 0);
 
 						ClientToScreen(m_hwnd, &pnmm->pt);
-						TrackPopupMenu(RightClickMenu, TPM_LEFTALIGN, pnmm->pt.x, pnmm->pt.y, 0,
+						TrackPopupMenu(rightClickMenu, TPM_LEFTALIGN, pnmm->pt.x, pnmm->pt.y, 0,
 							m_hwnd, nullptr);
 					}
 
@@ -175,12 +175,12 @@ LRESULT CALLBACK ApplicationToolbar::ParentWndProc(
 
 				int iIndex =
 					static_cast<int>(SendMessage(m_hwnd, TB_COMMANDTOINDEX, pnmtbgit->iItem, 0));
-				ApplicationButton_t *Button = MapToolbarButtonToItem(iIndex);
+				ApplicationButton_t *button = MapToolbarButtonToItem(iIndex);
 
-				if (Button != nullptr)
+				if (button != nullptr)
 				{
 					StringCchPrintf(pnmtbgit->pszText, pnmtbgit->cchTextMax, _T("%s\n%s"),
-						Button->Name.c_str(), Button->Command.c_str());
+						button->Name.c_str(), button->Command.c_str());
 				}
 
 				return 0;
@@ -195,9 +195,9 @@ LRESULT CALLBACK ApplicationToolbar::ParentWndProc(
 
 void ApplicationToolbar::AddButtonsToToolbar()
 {
-	for (const auto &Button : m_atps->m_Buttons)
+	for (const auto &button : m_atps->m_Buttons)
 	{
-		AddButtonToToolbar(Button);
+		AddButtonToToolbar(button);
 	}
 }
 
@@ -237,11 +237,11 @@ void ApplicationToolbar::AddButtonToToolbar(const ApplicationButton_t &Button)
 
 void ApplicationToolbar::UpdateButton(int iItem)
 {
-	ApplicationButton_t *Button = MapToolbarButtonToItem(iItem);
+	ApplicationButton_t *button = MapToolbarButtonToItem(iItem);
 
-	if (Button != nullptr)
+	if (button != nullptr)
 	{
-		ApplicationInfo_t ai = ProcessCommand(Button->Command);
+		ApplicationInfo_t ai = ProcessCommand(button->Command);
 
 		SHFILEINFO shfi;
 		DWORD_PTR ret =
@@ -253,15 +253,15 @@ void ApplicationToolbar::UpdateButton(int iItem)
 		}
 
 		TBBUTTONINFO tbi;
-		TCHAR Name[512];
+		TCHAR name[512];
 		tbi.cbSize = sizeof(tbi);
 		tbi.dwMask = TBIF_BYINDEX | TBIF_IMAGE | TBIF_TEXT;
 		tbi.iImage = shfi.iIcon;
 
-		if (Button->ShowNameOnToolbar)
+		if (button->ShowNameOnToolbar)
 		{
-			StringCchCopy(Name, SIZEOF_ARRAY(Name), Button->Name.c_str());
-			tbi.pszText = Name;
+			StringCchCopy(name, SIZEOF_ARRAY(name), button->Name.c_str());
+			tbi.pszText = name;
 		}
 		else
 		{
@@ -274,19 +274,19 @@ void ApplicationToolbar::UpdateButton(int iItem)
 
 void ApplicationToolbar::ShowNewItemDialog()
 {
-	ApplicationButton_t Button;
-	Button.ShowNameOnToolbar = TRUE;
+	ApplicationButton_t button;
+	button.ShowNameOnToolbar = TRUE;
 
 	ApplicationToolbarButtonDialog applicationToolbarButtonDialog(
-		m_hInstance, m_hwnd, &Button, true);
+		m_hInstance, m_hwnd, &button, true);
 	INT_PTR ret = applicationToolbarButtonDialog.ShowModalDialog();
 
 	if (ret == 1)
 	{
-		Button.ID = m_atps->m_IDCounter++;
-		m_atps->m_Buttons.push_back(Button);
+		button.ID = m_atps->m_IDCounter++;
+		m_atps->m_Buttons.push_back(button);
 
-		AddButtonToToolbar(Button);
+		AddButtonToToolbar(button);
 	}
 }
 
@@ -310,11 +310,11 @@ void ApplicationToolbar::OpenItem(int iItem, std::wstring *parameters)
 {
 	assert(iItem >= 0 && static_cast<size_t>(iItem) < m_atps->m_Buttons.size());
 
-	ApplicationButton_t *Button = MapToolbarButtonToItem(iItem);
+	ApplicationButton_t *button = MapToolbarButtonToItem(iItem);
 
-	if (Button != nullptr)
+	if (button != nullptr)
 	{
-		ApplicationInfo_t ai = ProcessCommand(Button->Command);
+		ApplicationInfo_t ai = ProcessCommand(button->Command);
 
 		unique_pidl_absolute pidl;
 		HRESULT hr =
@@ -350,52 +350,52 @@ ApplicationToolbar::ApplicationInfo_t ApplicationToolbar::ProcessCommand(
 	ai.Application = EMPTY_STRING;
 	ai.Parameters = EMPTY_STRING;
 
-	std::wstring TempCommand = Command;
+	std::wstring tempCommand = Command;
 
 	/* Remove leading/trailing spaces. */
-	boost::trim(TempCommand);
+	boost::trim(tempCommand);
 
-	if (TempCommand.length() == 0)
+	if (tempCommand.length() == 0)
 	{
 		return ai;
 	}
 
-	size_t SubstringStart;
-	size_t SubstringEnd;
-	size_t SubstringLength;
+	size_t substringStart;
+	size_t substringEnd;
+	size_t substringLength;
 
-	if (TempCommand.at(0) == _T('\"'))
+	if (tempCommand.at(0) == _T('\"'))
 	{
-		SubstringStart = 1;
-		SubstringEnd = TempCommand.find('"');
+		substringStart = 1;
+		substringEnd = tempCommand.find('"');
 	}
 	else
 	{
-		SubstringStart = 0;
-		SubstringEnd = TempCommand.find_first_of(' ');
+		substringStart = 0;
+		substringEnd = tempCommand.find_first_of(' ');
 	}
 
-	if (SubstringEnd != std::wstring::npos)
+	if (substringEnd != std::wstring::npos)
 	{
-		SubstringLength = SubstringEnd - SubstringStart;
+		substringLength = substringEnd - substringStart;
 	}
 	else
 	{
-		SubstringLength = std::wstring::npos;
+		substringLength = std::wstring::npos;
 	}
 
-	std::wstring TempApplication = TempCommand.substr(SubstringStart, SubstringLength);
-	boost::trim(TempApplication);
+	std::wstring tempApplication = tempCommand.substr(substringStart, substringLength);
+	boost::trim(tempApplication);
 
-	TCHAR ExpandedApplicationPath[MAX_PATH];
+	TCHAR expandedApplicationPath[MAX_PATH];
 	MyExpandEnvironmentStrings(
-		TempApplication.c_str(), ExpandedApplicationPath, SIZEOF_ARRAY(ExpandedApplicationPath));
+		tempApplication.c_str(), expandedApplicationPath, SIZEOF_ARRAY(expandedApplicationPath));
 
-	ai.Application = ExpandedApplicationPath;
+	ai.Application = expandedApplicationPath;
 
-	if (SubstringEnd != std::wstring::npos)
+	if (substringEnd != std::wstring::npos)
 	{
-		ai.Parameters = TempCommand.substr(SubstringEnd + 1);
+		ai.Parameters = tempCommand.substr(substringEnd + 1);
 		boost::trim(ai.Parameters);
 	}
 	else
@@ -410,13 +410,13 @@ void ApplicationToolbar::ShowItemProperties(int iItem)
 {
 	assert(iItem >= 0 && static_cast<size_t>(iItem) < m_atps->m_Buttons.size());
 
-	ApplicationButton_t *Button = MapToolbarButtonToItem(iItem);
+	ApplicationButton_t *button = MapToolbarButtonToItem(iItem);
 
-	if (Button != nullptr)
+	if (button != nullptr)
 	{
-		ApplicationToolbarButtonDialog ApplicationToolbarButtonDialog(
-			m_hInstance, m_hwnd, Button, false);
-		INT_PTR ret = ApplicationToolbarButtonDialog.ShowModalDialog();
+		ApplicationToolbarButtonDialog applicationToolbarButtonDialog(
+			m_hInstance, m_hwnd, button, false);
+		INT_PTR ret = applicationToolbarButtonDialog.ShowModalDialog();
 
 		if (ret == 1)
 		{
@@ -442,10 +442,10 @@ void ApplicationToolbar::DeleteItem(int iItem)
 
 		if (lResult)
 		{
-			int ID = static_cast<int>(tbButton.dwData);
+			int id = static_cast<int>(tbButton.dwData);
 			auto itr = std::find_if(m_atps->m_Buttons.begin(), m_atps->m_Buttons.end(),
-				[ID](const ApplicationButton_t &Button) {
-					return Button.ID == ID;
+				[id](const ApplicationButton_t &Button) {
+					return Button.ID == id;
 				});
 
 			if (itr != m_atps->m_Buttons.end())
@@ -491,10 +491,10 @@ ApplicationButton_t *ApplicationToolbar::MapToolbarButtonToItem(int iIndex)
 
 	if (lResult)
 	{
-		int ID = static_cast<int>(tbButton.dwData);
+		int id = static_cast<int>(tbButton.dwData);
 		auto itr = std::find_if(m_atps->m_Buttons.begin(), m_atps->m_Buttons.end(),
-			[ID](const ApplicationButton_t &Button) {
-				return Button.ID == ID;
+			[id](const ApplicationButton_t &Button) {
+				return Button.ID == id;
 			});
 
 		if (itr != m_atps->m_Buttons.end())
@@ -523,9 +523,9 @@ void ApplicationToolbarPersistentSettings::LoadRegistrySettings(HKEY hParentKey)
 	StringCchPrintf(szItemKey, SIZEOF_ARRAY(szItemKey), _T("%d"), i);
 
 	HKEY hKeyChild;
-	LONG ReturnValue = RegOpenKeyEx(hParentKey, szItemKey, 0, KEY_READ, &hKeyChild);
+	LONG returnValue = RegOpenKeyEx(hParentKey, szItemKey, 0, KEY_READ, &hKeyChild);
 
-	while (ReturnValue == ERROR_SUCCESS)
+	while (returnValue == ERROR_SUCCESS)
 	{
 		TCHAR szName[512];
 		TCHAR szCommand[512];
@@ -548,7 +548,7 @@ void ApplicationToolbarPersistentSettings::LoadRegistrySettings(HKEY hParentKey)
 		i++;
 
 		StringCchPrintf(szItemKey, SIZEOF_ARRAY(szItemKey), _T("%d"), i);
-		ReturnValue = RegOpenKeyEx(hParentKey, szItemKey, 0, KEY_READ, &hKeyChild);
+		returnValue = RegOpenKeyEx(hParentKey, szItemKey, 0, KEY_READ, &hKeyChild);
 	}
 }
 
@@ -556,22 +556,22 @@ void ApplicationToolbarPersistentSettings::SaveRegistrySettings(HKEY hParentKey)
 {
 	int index = 0;
 
-	for (const auto &Button : m_Buttons)
+	for (const auto &button : m_Buttons)
 	{
 		TCHAR szKeyName[32];
 		_itow_s(index, szKeyName, SIZEOF_ARRAY(szKeyName), 10);
 
 		HKEY hKeyChild;
-		LONG ReturnValue = RegCreateKeyEx(hParentKey, szKeyName, 0, nullptr,
+		LONG returnValue = RegCreateKeyEx(hParentKey, szKeyName, 0, nullptr,
 			REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &hKeyChild, nullptr);
 
-		if (ReturnValue == ERROR_SUCCESS)
+		if (returnValue == ERROR_SUCCESS)
 		{
-			NRegistrySettings::SaveStringToRegistry(hKeyChild, SETTING_NAME, Button.Name.c_str());
+			NRegistrySettings::SaveStringToRegistry(hKeyChild, SETTING_NAME, button.Name.c_str());
 			NRegistrySettings::SaveStringToRegistry(
-				hKeyChild, SETTING_COMMAND, Button.Command.c_str());
+				hKeyChild, SETTING_COMMAND, button.Command.c_str());
 			NRegistrySettings::SaveDwordToRegistry(
-				hKeyChild, SETTING_SHOW_NAME_ON_TOOLBAR, Button.ShowNameOnToolbar);
+				hKeyChild, SETTING_SHOW_NAME_ON_TOOLBAR, button.ShowNameOnToolbar);
 
 			index++;
 
@@ -652,17 +652,17 @@ void ApplicationToolbarPersistentSettings::SaveXMLSettings(
 {
 	BSTR bstr_wsntt = SysAllocString(L"\n\t\t");
 
-	for (const auto &Button : m_Buttons)
+	for (const auto &button : m_Buttons)
 	{
 		NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt, pe);
 
 		IXMLDOMElement *pParentNode = nullptr;
 		NXMLSettings::CreateElementNode(
-			pXMLDom, &pParentNode, pe, _T("ApplicationButton"), Button.Name.c_str());
+			pXMLDom, &pParentNode, pe, _T("ApplicationButton"), button.Name.c_str());
 		NXMLSettings::AddAttributeToNode(
-			pXMLDom, pParentNode, SETTING_COMMAND, Button.Command.c_str());
+			pXMLDom, pParentNode, SETTING_COMMAND, button.Command.c_str());
 		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SHOW_NAME_ON_TOOLBAR,
-			NXMLSettings::EncodeBoolValue(Button.ShowNameOnToolbar));
+			NXMLSettings::EncodeBoolValue(button.ShowNameOnToolbar));
 
 		pParentNode->Release();
 	}

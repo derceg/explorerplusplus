@@ -97,16 +97,16 @@ void Explorerplusplus::OnCreate()
 
 void Explorerplusplus::InitializeDisplayWindow()
 {
-	DWInitialSettings_t InitialSettings;
-	InitialSettings.CentreColor		= m_config->displayWindowCentreColor;
-	InitialSettings.SurroundColor	= m_config->displayWindowSurroundColor;
-	InitialSettings.TextColor		= m_config->displayWindowTextColor;
-	InitialSettings.hFont			= m_config->displayWindowFont;
-	InitialSettings.hIcon			= (HICON)LoadImage(GetModuleHandle(nullptr),
+	DWInitialSettings_t initialSettings;
+	initialSettings.CentreColor		= m_config->displayWindowCentreColor;
+	initialSettings.SurroundColor	= m_config->displayWindowSurroundColor;
+	initialSettings.TextColor		= m_config->displayWindowTextColor;
+	initialSettings.hFont			= m_config->displayWindowFont;
+	initialSettings.hIcon			= (HICON)LoadImage(GetModuleHandle(nullptr),
 		MAKEINTRESOURCE(IDI_DISPLAYWINDOW),IMAGE_ICON,
 		0,0,LR_CREATEDIBSECTION);
 
-	m_hDisplayWindow = CreateDisplayWindow(m_hContainer,&InitialSettings);
+	m_hDisplayWindow = CreateDisplayWindow(m_hContainer,&initialSettings);
 
 	ApplyDisplayWindowPosition();
 }

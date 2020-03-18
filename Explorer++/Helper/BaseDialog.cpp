@@ -11,7 +11,7 @@
 
 namespace
 {
-	std::unordered_map<HWND,BaseDialog *>	g_WindowMap;
+	std::unordered_map<HWND,BaseDialog *>	g_windowMap;
 }
 
 INT_PTR CALLBACK BaseDialogProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
@@ -32,15 +32,15 @@ INT_PTR CALLBACK BaseDialogProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lPa
 			correct object.
 			May also use thunks - see
 			http://www.hackcraft.net/cpp/windowsThunk/ */
-			g_WindowMap.insert(std::unordered_map<HWND,BaseDialog *>::
+			g_windowMap.insert(std::unordered_map<HWND,BaseDialog *>::
 				value_type(hDlg,reinterpret_cast<BaseDialog *>(lParam)));
 		}
 		break;
 	}
 
-	auto itr = g_WindowMap.find(hDlg);
+	auto itr = g_windowMap.find(hDlg);
 
-	if(itr != g_WindowMap.end())
+	if(itr != g_windowMap.end())
 	{
 		return itr->second->BaseDialogProc(hDlg,uMsg,wParam,lParam);
 	}
@@ -70,11 +70,11 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 				m_iMinWidth = GetRectWidth(&rcMain);
 				m_iMinHeight = GetRectHeight(&rcMain);
 
-				std::list<ResizableDialog::Control_t> ControlList;
+				std::list<ResizableDialog::Control_t> controlList;
 				m_dsc = DIALOG_SIZE_CONSTRAINT_NONE;
-				GetResizableControlInformation(m_dsc, ControlList);
+				GetResizableControlInformation(m_dsc, controlList);
 
-				m_prd = std::unique_ptr<ResizableDialog>(new ResizableDialog(m_hDlg, ControlList));
+				m_prd = std::unique_ptr<ResizableDialog>(new ResizableDialog(m_hDlg, controlList));
 			}
 
 			UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
@@ -139,7 +139,7 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 		break;
 
 	case WM_NCDESTROY:
-		g_WindowMap.erase(g_WindowMap.find(hDlg));
+		g_windowMap.erase(g_windowMap.find(hDlg));
 		break;
 	}
 

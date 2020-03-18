@@ -139,14 +139,14 @@ void Explorerplusplus::OnRightClick(NMHDR *nmhdr)
 {
 	if(nmhdr->hwndFrom == m_hActiveListView)
 	{
-		POINT CursorPos;
+		POINT cursorPos;
 		DWORD dwPos;
 
 		dwPos = GetMessagePos();
-		CursorPos.x = GET_X_LPARAM(dwPos);
-		CursorPos.y = GET_Y_LPARAM(dwPos);
+		cursorPos.x = GET_X_LPARAM(dwPos);
+		cursorPos.y = GET_Y_LPARAM(dwPos);
 
-		OnListViewRClick(&CursorPos);
+		OnListViewRClick(&cursorPos);
 	}
 }
 

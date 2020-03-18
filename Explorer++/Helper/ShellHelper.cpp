@@ -501,9 +501,9 @@ HRESULT BuildHDropList(FORMATETC *pftc,STGMEDIUM *pstg,
 
 	uSize = sizeof(DROPFILES);
 
-	for(const auto &Filename : FilenameList)
+	for(const auto &filename : FilenameList)
 	{
-		uSize += static_cast<UINT>((Filename.length() + 1) * sizeof(TCHAR));
+		uSize += static_cast<UINT>((filename.length() + 1) * sizeof(TCHAR));
 	}
 
 	/* The last string is double-null terminated. */
@@ -531,12 +531,12 @@ HRESULT BuildHDropList(FORMATETC *pftc,STGMEDIUM *pstg,
 
 	TCHAR chNull = '\0';
 
-	for(const auto &Filename : FilenameList)
+	for(const auto &filename : FilenameList)
 	{
 		pData = static_cast<LPBYTE>(pcidaData) + sizeof(DROPFILES) + uOffset;
 
-		memcpy(pData,Filename.c_str(),(Filename.length() + 1) * sizeof(TCHAR));
-		uOffset += static_cast<UINT>((Filename.length() + 1) * sizeof(TCHAR));
+		memcpy(pData,filename.c_str(),(filename.length() + 1) * sizeof(TCHAR));
+		uOffset += static_cast<UINT>((filename.length() + 1) * sizeof(TCHAR));
 	}
 
 	/* Copy the last null byte. */
@@ -1147,13 +1147,13 @@ BOOL LoadContextMenuHandlers(const TCHAR *szRegKey,
 					if (std::none_of(blacklistedCLSIDEntries.begin(), blacklistedCLSIDEntries.end(),
 						[&szCLSID](std::wstring blacklistedEntry) { return boost::iequals(szCLSID, blacklistedEntry); }))
 					{
-						ContextMenuHandler_t ContextMenuHandler;
+						ContextMenuHandler_t contextMenuHandler;
 
-						BOOL bRes = LoadIUnknownFromCLSID(szCLSID, &ContextMenuHandler);
+						BOOL bRes = LoadIUnknownFromCLSID(szCLSID, &contextMenuHandler);
 
 						if (bRes)
 						{
-							ContextMenuHandlers.push_back(ContextMenuHandler);
+							ContextMenuHandlers.push_back(contextMenuHandler);
 						}
 					}
 				}

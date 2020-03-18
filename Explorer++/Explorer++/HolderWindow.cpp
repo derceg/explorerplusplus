@@ -140,13 +140,13 @@ void HolderWindow::OnHolderWindowPaint(HWND hwnd)
 
 void HolderWindow::OnHolderWindowLButtonDown(LPARAM lParam)
 {
-	POINTS CursorPos;
+	POINTS cursorPos;
 	RECT rc;
 
-	CursorPos = MAKEPOINTS(lParam);
+	cursorPos = MAKEPOINTS(lParam);
 	GetClientRect(m_hHolder,&rc);
 
-	if(CursorPos.x >= (rc.right - 10))
+	if(cursorPos.x >= (rc.right - 10))
 	{
 		SetCursor(LoadCursor(nullptr,IDC_SIZEWE));
 

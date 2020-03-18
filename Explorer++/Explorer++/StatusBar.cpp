@@ -13,14 +13,14 @@
 
 void Explorerplusplus::CreateStatusBar(void)
 {
-	UINT Style = WS_CHILD | WS_CLIPSIBLINGS | SBARS_SIZEGRIP | WS_CLIPCHILDREN;
+	UINT style = WS_CHILD | WS_CLIPSIBLINGS | SBARS_SIZEGRIP | WS_CLIPCHILDREN;
 
 	if (m_config->showStatusBar)
 	{
-		Style |= WS_VISIBLE;
+		style |= WS_VISIBLE;
 	}
 
-	m_hStatusBar = ::CreateStatusBar(m_hContainer, Style);
+	m_hStatusBar = ::CreateStatusBar(m_hContainer, style);
 	m_pStatusBar = new StatusBar(m_hStatusBar);
 
 	int width = 0;
@@ -38,13 +38,13 @@ void Explorerplusplus::CreateStatusBar(void)
 
 void Explorerplusplus::SetStatusBarParts(int width)
 {
-	int Parts[3];
+	int parts[3];
 
-	Parts[0] = (int)(0.50 * width);
-	Parts[1] = (int)(0.75 * width);
-	Parts[2] = width;
+	parts[0] = (int)(0.50 * width);
+	parts[1] = (int)(0.75 * width);
+	parts[2] = width;
 
-	SendMessage(m_hStatusBar, SB_SETPARTS, 3, (LPARAM)Parts);
+	SendMessage(m_hStatusBar, SB_SETPARTS, 3, (LPARAM)parts);
 }
 
 LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
@@ -88,7 +88,7 @@ void Explorerplusplus::OnStartedBrowsing(int iTabId, const TCHAR *szFolderPath)
 
 HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 {
-	FolderInfo_t	FolderInfo;
+	FolderInfo_t	folderInfo;
 	int				nTotal;
 	int				nFilesSelected;
 	int				nFoldersSelected;
@@ -161,12 +161,12 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 	}
 	else
 	{
-		tab.GetShellBrowser()->GetFolderInfo(&FolderInfo);
+		tab.GetShellBrowser()->GetFolderInfo(&folderInfo);
 
 		if ((nFilesSelected + nFoldersSelected) == 0)
 		{
 			/* No items(files or folders) selected. */
-			FormatSizeString(FolderInfo.TotalFolderSize, lpszSizeBuffer,
+			FormatSizeString(folderInfo.TotalFolderSize, lpszSizeBuffer,
 				SIZEOF_ARRAY(lpszSizeBuffer), m_config->globalFolderSettings.forceSize,
 				m_config->globalFolderSettings.sizeDisplayFormat);
 		}
@@ -181,7 +181,7 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 			{
 				/* Mixture of files and folders selected. Show size of currently
 				selected files. */
-				FormatSizeString(FolderInfo.TotalSelectionSize, lpszSizeBuffer,
+				FormatSizeString(folderInfo.TotalSelectionSize, lpszSizeBuffer,
 					SIZEOF_ARRAY(lpszSizeBuffer), m_config->globalFolderSettings.forceSize,
 					m_config->globalFolderSettings.sizeDisplayFormat);
 			}
@@ -202,27 +202,27 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 
 int Explorerplusplus::CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer)
 {
-	ULARGE_INTEGER	TotalNumberOfBytes;
-	ULARGE_INTEGER	TotalNumberOfFreeBytes;
-	ULARGE_INTEGER	BytesAvailableToCaller;
+	ULARGE_INTEGER	totalNumberOfBytes;
+	ULARGE_INTEGER	totalNumberOfFreeBytes;
+	ULARGE_INTEGER	bytesAvailableToCaller;
 	TCHAR			szFreeSpace[32];
 	TCHAR			szFree[16];
 	TCHAR			szFreeSpaceString[512];
 
-	if (GetDiskFreeSpaceEx(szPath, &BytesAvailableToCaller,
-		&TotalNumberOfBytes, &TotalNumberOfFreeBytes) == 0)
+	if (GetDiskFreeSpaceEx(szPath, &bytesAvailableToCaller,
+		&totalNumberOfBytes, &totalNumberOfFreeBytes) == 0)
 	{
 		szBuffer = nullptr;
 		return -1;
 	}
 
-	FormatSizeString(TotalNumberOfFreeBytes, szFreeSpace,
+	FormatSizeString(totalNumberOfFreeBytes, szFreeSpace,
 		SIZEOF_ARRAY(szFreeSpace));
 
 	LoadString(m_hLanguageModule, IDS_GENERAL_FREE, szFree, SIZEOF_ARRAY(szFree));
 
 	StringCchPrintf(szFreeSpaceString, SIZEOF_ARRAY(szFreeSpace),
-		_T("%s %s (%.0f%%)"), szFreeSpace, szFree, TotalNumberOfFreeBytes.QuadPart * 100.0 / TotalNumberOfBytes.QuadPart);
+		_T("%s %s (%.0f%%)"), szFreeSpace, szFree, totalNumberOfFreeBytes.QuadPart * 100.0 / totalNumberOfBytes.QuadPart);
 
 	if (nBuffer > lstrlen(szFreeSpaceString))
 		StringCchCopy(szBuffer, nBuffer, szFreeSpaceString);

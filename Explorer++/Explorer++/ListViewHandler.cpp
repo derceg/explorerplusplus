@@ -65,14 +65,14 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 			{
 				LV_HITTESTINFO	ht;
 				DWORD			dwPos;
-				POINT			MousePos;
+				POINT			mousePos;
 
 				dwPos = GetMessagePos();
-				MousePos.x = GET_X_LPARAM(dwPos);
-				MousePos.y = GET_Y_LPARAM(dwPos);
-				ScreenToClient(m_hActiveListView,&MousePos);
+				mousePos.x = GET_X_LPARAM(dwPos);
+				mousePos.y = GET_Y_LPARAM(dwPos);
+				ScreenToClient(m_hActiveListView,&mousePos);
 
-				ht.pt = MousePos;
+				ht.pt = mousePos;
 				ListView_HitTest(ListView,&ht);
 
 				/* NM_DBLCLK for the listview is sent both on double clicks
@@ -212,7 +212,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 					take the item out of its position in the
 					list, and move it into its new position. */
 					NMHEADER *pnmHeader = nullptr;
-					Column_t Column;
+					Column_t column;
 					int i = 0;
 
 					pnmHeader = (NMHEADER *)lParam;
@@ -234,7 +234,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 					if(itr != currentColumns.begin())
 						itr--;
 
-					Column = *itr;
+					column = *itr;
 					currentColumns.erase(itr);
 
 					i = 0;
@@ -252,7 +252,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 					if(itr != currentColumns.begin())
 						itr--;
 
-					currentColumns.insert(itr,Column);
+					currentColumns.insert(itr,column);
 
 					m_pActiveShellBrowser->ImportColumns(currentColumns);
 
@@ -270,11 +270,11 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 
 LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 {
-	LV_KEYDOWN	*lv_key = nullptr;
+	LV_KEYDOWN	*keyDown = nullptr;
 
-	lv_key = (LV_KEYDOWN *)lParam;
+	keyDown = (LV_KEYDOWN *)lParam;
 
-	switch(lv_key->wVKey)
+	switch(keyDown->wVKey)
 	{
 		case VK_RETURN:
 			if(IsKeyDown(VK_CONTROL) &&
@@ -409,9 +409,9 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 {
 	NMLVDISPINFO	*pdi = nullptr;
 	LVITEM			*pItem = nullptr;
-	TCHAR			NewFileName[MAX_PATH + 1];
-	TCHAR			OldFileName[MAX_PATH + 1];
-	TCHAR			OldName[MAX_PATH];
+	TCHAR			newFileName[MAX_PATH + 1];
+	TCHAR			oldFileName[MAX_PATH + 1];
+	TCHAR			oldName[MAX_PATH];
 	DWORD			dwAttributes;
 	int				ret;
 
@@ -471,13 +471,13 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 	}
 
 	std::wstring currentDirectory = m_pActiveShellBrowser->GetDirectory();
-	StringCchCopy(NewFileName, SIZEOF_ARRAY(NewFileName), currentDirectory.c_str());
-	StringCchCopy(OldFileName, SIZEOF_ARRAY(OldFileName), currentDirectory.c_str());
+	StringCchCopy(newFileName, SIZEOF_ARRAY(newFileName), currentDirectory.c_str());
+	StringCchCopy(oldFileName, SIZEOF_ARRAY(oldFileName), currentDirectory.c_str());
 
-	m_pActiveShellBrowser->GetItemDisplayName(pItem->iItem,SIZEOF_ARRAY(OldName),OldName);
-	PathAppend(OldFileName,OldName);
+	m_pActiveShellBrowser->GetItemDisplayName(pItem->iItem,SIZEOF_ARRAY(oldName),oldName);
+	PathAppend(oldFileName,oldName);
 
-	BOOL bRes = PathAppend(NewFileName,pItem->pszText);
+	BOOL bRes = PathAppend(newFileName,pItem->pszText);
 
 	if(!bRes)
 	{
@@ -491,7 +491,7 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 		BOOL bExtensionHidden = FALSE;
 
 		bExtensionHidden = (!m_config->globalFolderSettings.showExtensions) ||
-			(m_config->globalFolderSettings.hideLinkExtension && lstrcmpi(PathFindExtension(OldName),_T(".lnk")) == 0);
+			(m_config->globalFolderSettings.hideLinkExtension && lstrcmpi(PathFindExtension(oldName),_T(".lnk")) == 0);
 
 		/* If file extensions are turned off, the new filename
 		will be incorrect (i.e. it will be missing the extension).
@@ -501,25 +501,25 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 		{
 			TCHAR	*szExt = nullptr;
 
-			szExt = PathFindExtension(OldName);
+			szExt = PathFindExtension(oldName);
 
 			if(*szExt == '.')
-				StringCchCat(NewFileName,SIZEOF_ARRAY(NewFileName),szExt);
+				StringCchCat(newFileName,SIZEOF_ARRAY(newFileName),szExt);
 		}
 	}
 
-	if (lstrcmp(OldFileName, NewFileName) == 0)
+	if (lstrcmp(oldFileName, newFileName) == 0)
 		return FALSE;
 
-	FileActionHandler::RenamedItem_t RenamedItem;
-	RenamedItem.strOldFilename = OldFileName;
-	RenamedItem.strNewFilename = NewFileName;
+	FileActionHandler::RenamedItem_t renamedItem;
+	renamedItem.strOldFilename = oldFileName;
+	renamedItem.strNewFilename = newFileName;
 
-	TrimStringRight(RenamedItem.strNewFilename,_T(" "));
+	TrimStringRight(renamedItem.strNewFilename,_T(" "));
 
-	std::list<FileActionHandler::RenamedItem_t> RenamedItemList;
-	RenamedItemList.push_back(RenamedItem);
-	ret = m_FileActionHandler.RenameFiles(RenamedItemList);
+	std::list<FileActionHandler::RenamedItem_t> renamedItemList;
+	renamedItemList.push_back(renamedItem);
+	ret = m_FileActionHandler.RenameFiles(renamedItemList);
 
 	/* If the file was not renamed, show an error message. */
 	if(!ret)
@@ -623,11 +623,11 @@ wil::unique_hmenu Explorerplusplus::InitializeRightClickMenu()
 {
 	wil::unique_hmenu parentMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_MAINMENU_RCLICK)));
 
-	for (auto ViewMode : VIEW_MODES)
+	for (auto viewMode : VIEW_MODES)
 	{
 		std::wstring text =
-			ResourceHelper::LoadString(m_hLanguageModule, GetViewModeMenuStringId(ViewMode));
-		MenuHelper::AddStringItem(parentMenu.get(), GetViewModeMenuId(ViewMode), text,
+			ResourceHelper::LoadString(m_hLanguageModule, GetViewModeMenuStringId(viewMode));
+		MenuHelper::AddStringItem(parentMenu.get(), GetViewModeMenuId(viewMode), text,
 			IDM_RCLICK_VIEW_PLACEHOLDER, FALSE);
 	}
 
@@ -703,7 +703,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragType dragType)
 
 	std::vector<unique_pidl_child> pidls;
 	std::vector<PCITEMID_CHILD> rawPidls;
-	std::list<std::wstring> FilenameList;
+	std::list<std::wstring> filenameList;
 
 	int item = -1;
 
@@ -724,7 +724,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragType dragType)
 
 		std::wstring stringFilename(szFullFilename);
 
-		FilenameList.push_back(stringFilename);
+		filenameList.push_back(stringFilename);
 	}
 
 	hr = CoCreateInstance(CLSID_DragDropHelper, nullptr,CLSCTX_ALL,
@@ -742,7 +742,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragType dragType)
 			/* We'll export two formats:
 			CF_HDROP
 			CFSTR_SHELLIDLIST */
-			BuildHDropList(&ftc[0],&stg[0],FilenameList);
+			BuildHDropList(&ftc[0],&stg[0],filenameList);
 			BuildShellIDList(&ftc[1],&stg[1],pidlDirectory.get(),rawPidls);
 
 			IDataObject *pDataObject = CreateDataObject(ftc,stg,2);
@@ -838,14 +838,14 @@ void Explorerplusplus::OnListViewDoubleClick(NMHDR *nmhdr)
 	{
 		LV_HITTESTINFO	ht;
 		DWORD			dwPos;
-		POINT			MousePos;
+		POINT			mousePos;
 
 		dwPos = GetMessagePos();
-		MousePos.x = GET_X_LPARAM(dwPos);
-		MousePos.y = GET_Y_LPARAM(dwPos);
-		ScreenToClient(m_hActiveListView,&MousePos);
+		mousePos.x = GET_X_LPARAM(dwPos);
+		mousePos.y = GET_Y_LPARAM(dwPos);
+		ScreenToClient(m_hActiveListView,&mousePos);
 
-		ht.pt = MousePos;
+		ht.pt = mousePos;
 		ListView_HitTest(m_hActiveListView,&ht);
 
 		if(ht.flags != LVHT_NOWHERE && ht.iItem != -1)
@@ -915,7 +915,7 @@ void Explorerplusplus::OnListViewFileRenameSingle()
 
 void Explorerplusplus::OnListViewFileRenameMultiple()
 {
-	std::list<std::wstring>	FullFilenameList;
+	std::list<std::wstring>	fullFilenameList;
 	TCHAR szFullFilename[MAX_PATH];
 	int iIndex = -1;
 
@@ -930,16 +930,16 @@ void Explorerplusplus::OnListViewFileRenameMultiple()
 		}
 
 		m_pActiveShellBrowser->GetItemFullName(iIndex, szFullFilename, SIZEOF_ARRAY(szFullFilename));
-		FullFilenameList.emplace_back(szFullFilename);
+		fullFilenameList.emplace_back(szFullFilename);
 	}
 
-	if (FullFilenameList.empty())
+	if (fullFilenameList.empty())
 	{
 		return;
 	}
 
 	MassRenameDialog massRenameDialog(m_hLanguageModule, m_hContainer, this,
-		FullFilenameList, &m_FileActionHandler);
+		fullFilenameList, &m_FileActionHandler);
 	massRenameDialog.ShowModalDialog();
 }
 
@@ -1016,13 +1016,13 @@ HRESULT Explorerplusplus::OnListViewCopy(BOOL bCopy)
 
 	SetCursor(LoadCursor(nullptr,IDC_WAIT));
 
-	std::list<std::wstring> FileNameList;
+	std::list<std::wstring> fileNameList;
 
-	BuildListViewFileSelectionList(m_hActiveListView,&FileNameList);
+	BuildListViewFileSelectionList(m_hActiveListView,&fileNameList);
 
 	if(bCopy)
 	{
-		hr = CopyFiles(FileNameList,&pClipboardDataObject);
+		hr = CopyFiles(fileNameList,&pClipboardDataObject);
 
 		if(SUCCEEDED(hr))
 		{
@@ -1031,7 +1031,7 @@ HRESULT Explorerplusplus::OnListViewCopy(BOOL bCopy)
 	}
 	else
 	{
-		hr = CutFiles(FileNameList,&pClipboardDataObject);
+		hr = CutFiles(fileNameList,&pClipboardDataObject);
 
 		if(SUCCEEDED(hr))
 		{
@@ -1103,7 +1103,7 @@ void Explorerplusplus::BuildListViewFileSelectionList(HWND hListView,
 		return;
 	}
 
-	std::list<std::wstring> FileSelectionList;
+	std::list<std::wstring> fileSelectionList;
 	int iItem = -1;
 
 	while((iItem = ListView_GetNextItem(hListView,
@@ -1115,17 +1115,17 @@ void Explorerplusplus::BuildListViewFileSelectionList(HWND hListView,
 			szFullFileName,SIZEOF_ARRAY(szFullFileName));
 
 		std::wstring stringFileName(szFullFileName);
-		FileSelectionList.push_back(stringFileName);
+		fileSelectionList.push_back(stringFileName);
 	}
 
-	pFileSelectionList->assign(FileSelectionList.begin(),
-		FileSelectionList.end());
+	pFileSelectionList->assign(fileSelectionList.begin(),
+		fileSelectionList.end());
 }
 
 int Explorerplusplus::HighlightSimilarFiles(HWND ListView) const
 {
-	TCHAR	FullFileName[MAX_PATH];
-	TCHAR	TestFile[MAX_PATH];
+	TCHAR	fullFileName[MAX_PATH];
+	TCHAR	testFile[MAX_PATH];
 	HRESULT	hr;
 	BOOL	bSimilarTypes;
 	int		iSelected;
@@ -1139,7 +1139,7 @@ int Explorerplusplus::HighlightSimilarFiles(HWND ListView) const
 	if(iSelected == -1)
 		return -1;
 
-	hr = m_pActiveShellBrowser->GetItemFullName(iSelected,TestFile,SIZEOF_ARRAY(TestFile));
+	hr = m_pActiveShellBrowser->GetItemFullName(iSelected,testFile,SIZEOF_ARRAY(testFile));
 
 	if(SUCCEEDED(hr))
 	{
@@ -1147,9 +1147,9 @@ int Explorerplusplus::HighlightSimilarFiles(HWND ListView) const
 
 		for(i = 0;i < nItems;i++)
 		{
-			m_pActiveShellBrowser->GetItemFullName(i,FullFileName,SIZEOF_ARRAY(FullFileName));
+			m_pActiveShellBrowser->GetItemFullName(i,fullFileName,SIZEOF_ARRAY(fullFileName));
 
-			bSimilarTypes = CompareFileTypes(FullFileName,TestFile);
+			bSimilarTypes = CompareFileTypes(fullFileName,testFile);
 
 			if(bSimilarTypes)
 			{

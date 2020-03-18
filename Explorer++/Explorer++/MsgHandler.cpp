@@ -314,10 +314,10 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 {
 	RECT			rc;
 	UINT			uFlags;
-	int				IndentBottom = 0;
-	int				IndentTop = 0;
-	int				IndentRight = 0;
-	int				IndentLeft = 0;
+	int				indentBottom = 0;
+	int				indentTop = 0;
+	int				indentRight = 0;
+	int				indentLeft = 0;
 	int				iIndentRebar = 0;
 	int				iHolderWidth;
 	int				iHolderHeight;
@@ -339,25 +339,25 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	if(m_config->showStatusBar)
 	{
 		GetWindowRect(m_hStatusBar,&rc);
-		IndentBottom += GetRectHeight(&rc);
+		indentBottom += GetRectHeight(&rc);
 	}
 
 	if(m_config->showDisplayWindow)
 	{
 		if (m_config->displayWindowVertical)
 		{
-			IndentRight += m_config->displayWindowWidth;
+			indentRight += m_config->displayWindowWidth;
 		}
 		else
 		{
-			IndentBottom += m_config->displayWindowHeight;
+			indentBottom += m_config->displayWindowHeight;
 		}
 	}
 
 	if(m_config->showFolders)
 	{
 		GetClientRect(m_hHolder,&rc);
-		IndentLeft = GetRectWidth(&rc);
+		indentLeft = GetRectWidth(&rc);
 	}
 
 	RECT tabWindowRect;
@@ -365,13 +365,13 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	int tabWindowHeight = GetRectHeight(&tabWindowRect);
 
-	IndentTop = iIndentRebar;
+	indentTop = iIndentRebar;
 
 	if(m_bShowTabBar)
 	{
 		if(!m_config->showTabBarAtBottom)
 		{
-			IndentTop += tabWindowHeight;
+			indentTop += tabWindowHeight;
 		}
 	}
 
@@ -384,8 +384,8 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	}
 	else
 	{
-		iTabBackingLeft = IndentLeft;
-		iTabBackingWidth = MainWindowWidth - IndentLeft - IndentRight;
+		iTabBackingLeft = indentLeft;
+		iTabBackingWidth = MainWindowWidth - indentLeft - indentRight;
 	}
 
 	uFlags = m_bShowTabBar?SWP_SHOWWINDOW:SWP_HIDEWINDOW;
@@ -398,7 +398,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	}
 	else
 	{
-		iTabTop = MainWindowHeight - IndentBottom - tabWindowHeight;
+		iTabTop = MainWindowHeight - indentBottom - tabWindowHeight;
 	}
 
 	/* If we're showing the tab bar at the bottom of the listview,
@@ -423,7 +423,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	if(m_config->extendTabControl &&
 		!m_config->showTabBarAtBottom)
 	{
-		iHolderTop = IndentTop;
+		iHolderTop = indentTop;
 	}
 	else
 	{
@@ -436,11 +436,11 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 		m_config->showTabBarAtBottom &&
 		m_bShowTabBar)
 	{
-		iHolderHeight = MainWindowHeight - IndentBottom - iHolderTop - tabWindowHeight;
+		iHolderHeight = MainWindowHeight - indentBottom - iHolderTop - tabWindowHeight;
 	}
 	else
 	{
-		iHolderHeight = MainWindowHeight - IndentBottom - iHolderTop;
+		iHolderHeight = MainWindowHeight - indentBottom - iHolderTop;
 	}
 
 	iHolderWidth = m_config->treeViewWidth;
@@ -462,12 +462,12 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	if (m_config->displayWindowVertical)
 	{
-		SetWindowPos(m_hDisplayWindow,NULL,MainWindowWidth - IndentRight,iIndentRebar,
-			m_config->displayWindowWidth,MainWindowHeight - iIndentRebar - IndentBottom,SWP_SHOWWINDOW|SWP_NOZORDER);
+		SetWindowPos(m_hDisplayWindow,NULL,MainWindowWidth - indentRight,iIndentRebar,
+			m_config->displayWindowWidth,MainWindowHeight - iIndentRebar - indentBottom,SWP_SHOWWINDOW|SWP_NOZORDER);
 	}
 	else
 	{
-		SetWindowPos(m_hDisplayWindow, nullptr,0,MainWindowHeight - IndentBottom,
+		SetWindowPos(m_hDisplayWindow, nullptr,0,MainWindowHeight - indentBottom,
 			MainWindowWidth, m_config->displayWindowHeight,SWP_SHOWWINDOW|SWP_NOZORDER);
 	}
 
@@ -482,15 +482,15 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 			uFlags |= SWP_SHOWWINDOW;
 		}
 
-		int width = MainWindowWidth - IndentLeft - IndentRight;
-		int height = MainWindowHeight - IndentBottom - IndentTop;
+		int width = MainWindowWidth - indentLeft - indentRight;
+		int height = MainWindowHeight - indentBottom - indentTop;
 
 		if (m_config->showTabBarAtBottom && m_bShowTabBar)
 		{
 			height -= tabWindowHeight;
 		}
 
-		SetWindowPos(tab->GetShellBrowser()->GetListView(),NULL,IndentLeft,IndentTop,width,height,uFlags);
+		SetWindowPos(tab->GetShellBrowser()->GetListView(),NULL,indentLeft,indentTop,width,height,uFlags);
 	}
 
 
@@ -1164,7 +1164,7 @@ http://www.eggheadcafe.com/forumarchives/platformsdkshell/Nov2005/post24294253.a
 void Explorerplusplus::OnAssocChanged()
 {
 	typedef BOOL (WINAPI *FII_PROC)(BOOL);
-	FII_PROC FileIconInit;
+	FII_PROC fileIconInit;
 	HKEY hKey;
 	HMODULE hShell32;
 	TCHAR szShellIconSize[32];
@@ -1174,7 +1174,7 @@ void Explorerplusplus::OnAssocChanged()
 
 	hShell32 = LoadLibrary(_T("shell32.dll"));
 
-	FileIconInit = (FII_PROC)GetProcAddress(hShell32,(LPCSTR)660);
+	fileIconInit = (FII_PROC)GetProcAddress(hShell32,(LPCSTR)660);
 
 	res = RegOpenKeyEx(HKEY_CURRENT_USER,
 		_T("Control Panel\\Desktop\\WindowMetrics"),
@@ -1191,14 +1191,14 @@ void Explorerplusplus::OnAssocChanged()
 		StringCchPrintf(szTemp,SIZEOF_ARRAY(szTemp),_T("%d"),dwShellIconSize + 1);
 		NRegistrySettings::SaveStringToRegistry(hKey,_T("Shell Icon Size"),szTemp);
 
-		if(FileIconInit != nullptr)
-			FileIconInit(TRUE);
+		if(fileIconInit != nullptr)
+			fileIconInit(TRUE);
 
 		/* Now, set it back to the original value. */
 		NRegistrySettings::SaveStringToRegistry(hKey,_T("Shell Icon Size"),szShellIconSize);
 
-		if(FileIconInit != nullptr)
-			FileIconInit(FALSE);
+		if(fileIconInit != nullptr)
+			fileIconInit(FALSE);
 
 		RegCloseKey(hKey);
 	}
@@ -1324,15 +1324,15 @@ LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)
 
 				/* Loop through each filter. Decide whether to change the font of the
 				current item based on its filename and/or attributes. */
-				for(const auto &ColorRule : m_ColorRules)
+				for(const auto &colorRule : m_ColorRules)
 				{
 					BOOL bMatchFileName = FALSE;
 					BOOL bMatchAttributes = FALSE;
 
 					/* Only match against the filename if it's not empty. */
-					if(!ColorRule.strFilterPattern.empty())
+					if(!colorRule.strFilterPattern.empty())
 					{
-						if(CheckWildcardMatch(ColorRule.strFilterPattern.c_str(),szFileName,!ColorRule.caseInsensitive) == 1)
+						if(CheckWildcardMatch(colorRule.strFilterPattern.c_str(),szFileName,!colorRule.caseInsensitive) == 1)
 						{
 							bMatchFileName = TRUE;
 						}
@@ -1342,9 +1342,9 @@ LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)
 						bMatchFileName = TRUE;
 					}
 
-					if(ColorRule.dwFilterAttributes != 0)
+					if(colorRule.dwFilterAttributes != 0)
 					{
-						if(ColorRule.dwFilterAttributes & dwAttributes)
+						if(colorRule.dwFilterAttributes & dwAttributes)
 						{
 							bMatchAttributes = TRUE;
 						}
@@ -1356,7 +1356,7 @@ LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)
 
 					if(bMatchFileName && bMatchAttributes)
 					{
-						pnmlvcd->clrText = ColorRule.rgbColour;
+						pnmlvcd->clrText = colorRule.rgbColour;
 						return CDRF_NEWFONT;
 					}
 				}

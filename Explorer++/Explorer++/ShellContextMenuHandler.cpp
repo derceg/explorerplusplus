@@ -25,20 +25,20 @@ void Explorerplusplus::AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
 
 	FileContextMenuInfo_t *pfcmi = reinterpret_cast<FileContextMenuInfo_t *>(dwData);
 
-	bool AddNewTabMenuItem = false;
+	bool addNewTabMenuItem = false;
 
 	if(pfcmi->uFrom == FROM_LISTVIEW)
 	{
 		if(pidlItems.size() == 1)
 		{
-			SFGAOF FileAttributes = SFGAO_FOLDER;
+			SFGAOF fileAttributes = SFGAO_FOLDER;
 
 			unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems.front()));
-			GetItemAttributes(pidlComplete.get(), &FileAttributes);
+			GetItemAttributes(pidlComplete.get(), &fileAttributes);
 
-			if(FileAttributes & SFGAO_FOLDER)
+			if(fileAttributes & SFGAO_FOLDER)
 			{
-				AddNewTabMenuItem = true;
+				addNewTabMenuItem = true;
 			}
 		}
 	}
@@ -47,10 +47,10 @@ void Explorerplusplus::AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
 		/* The treeview only contains folders,
 		so the new tab menu item will always
 		be shown. */
-		AddNewTabMenuItem = true;
+		addNewTabMenuItem = true;
 	}
 
-	if(AddNewTabMenuItem)
+	if(addNewTabMenuItem)
 	{
 		std::wstring openInNewTabText = ResourceHelper::LoadString(m_hLanguageModule, IDS_GENERAL_OPEN_IN_NEW_TAB);
 

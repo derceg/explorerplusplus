@@ -63,14 +63,14 @@ void GetWindowString(HWND hwnd, std::wstring &str)
 
 BOOL lShowWindow(HWND hwnd, BOOL bShowWindow)
 {
-	int WindowShowState;
+	int windowShowState;
 
 	if(bShowWindow)
-		WindowShowState = SW_SHOW;
+		windowShowState = SW_SHOW;
 	else
-		WindowShowState = SW_HIDE;
+		windowShowState = SW_HIDE;
 
-	return ShowWindow(hwnd, WindowShowState);
+	return ShowWindow(hwnd, windowShowState);
 }
 
 BOOL AddWindowStyle(HWND hwnd, UINT fStyle, BOOL bAdd)

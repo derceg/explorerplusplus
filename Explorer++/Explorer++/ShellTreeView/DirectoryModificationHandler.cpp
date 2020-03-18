@@ -371,7 +371,7 @@ void ShellTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileNam
 	TVITEMEX		tvItem;
 	TVINSERTSTRUCT	tvis;
 	SHFILEINFO		shfi;
-	SFGAOF			Attributes;
+	SFGAOF			attributes;
 	TCHAR			szDisplayName[MAX_PATH];
 	HRESULT			hr;
 	BOOL			res;
@@ -409,14 +409,14 @@ void ShellTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileNam
 
 			if(SUCCEEDED(hr))
 			{
-				Attributes = SFGAO_HASSUBFOLDER;
+				attributes = SFGAO_HASSUBFOLDER;
 
 				/* Only retrieve the attributes for this item. */
-				hr = pShellFolder->GetAttributesOf(1,&pidlRelative,&Attributes);
+				hr = pShellFolder->GetAttributesOf(1,&pidlRelative,&attributes);
 
 				if(SUCCEEDED(hr))
 				{
-					if((Attributes & SFGAO_HASSUBFOLDER) != SFGAO_HASSUBFOLDER)
+					if((attributes & SFGAO_HASSUBFOLDER) != SFGAO_HASSUBFOLDER)
 						nChildren = 0;
 					else
 						nChildren = 1;
@@ -579,7 +579,7 @@ void ShellTreeView::UpdateParent(HTREEITEM hParent)
 	if(hParent != nullptr)
 	{
 		TVITEM tvItem;
-		SFGAOF Attributes = SFGAO_HASSUBFOLDER;
+		SFGAOF attributes = SFGAO_HASSUBFOLDER;
 		BOOL bRes;
 		HRESULT hr;
 
@@ -590,13 +590,13 @@ void ShellTreeView::UpdateParent(HTREEITEM hParent)
 		if(bRes)
 		{
 			hr = GetItemAttributes(m_itemInfoMap.at(static_cast<int>(tvItem.lParam)).pidl.get(),
-				&Attributes);
+				&attributes);
 
 			if(SUCCEEDED(hr))
 			{
 				/* If the parent folder no longer has any sub-folders,
 				set its number of children to 0. */
-				if((Attributes & SFGAO_HASSUBFOLDER) != SFGAO_HASSUBFOLDER)
+				if((attributes & SFGAO_HASSUBFOLDER) != SFGAO_HASSUBFOLDER)
 				{
 					tvItem.cChildren = 0;
 					TreeView_Expand(m_hTreeView,hParent,TVE_COLLAPSE);

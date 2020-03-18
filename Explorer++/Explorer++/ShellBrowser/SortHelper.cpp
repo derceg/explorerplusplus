@@ -24,21 +24,21 @@ int SortByName(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo
 		return StrCmpLogicalW(itemInfo1.getFullPath().c_str(), itemInfo2.getFullPath().c_str());
 	}
 
-	std::wstring Name1 = GetNameColumnText(itemInfo1, globalFolderSettings);
-	std::wstring Name2 = GetNameColumnText(itemInfo2, globalFolderSettings);
+	std::wstring name1 = GetNameColumnText(itemInfo1, globalFolderSettings);
+	std::wstring name2 = GetNameColumnText(itemInfo2, globalFolderSettings);
 
-	return StrCmpLogicalW(Name1.c_str(), Name2.c_str());
+	return StrCmpLogicalW(name1.c_str(), name2.c_str());
 }
 
 int SortBySize(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2)
 {
-	bool IsFolder1 = WI_IsFlagSet(itemInfo1.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
-	bool IsFolder2 = WI_IsFlagSet(itemInfo2.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
+	bool isFolder1 = WI_IsFlagSet(itemInfo1.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
+	bool isFolder2 = WI_IsFlagSet(itemInfo2.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
 
 	ULONGLONG size1;
 	ULONGLONG size2;
 
-	if (IsFolder1 && IsFolder2)
+	if (isFolder1 && isFolder2)
 	{
 		// Temporarily disabled.
 		/*auto itr1 = m_cachedFolderSizes.find(InternalIndex1);
@@ -66,11 +66,11 @@ int SortBySize(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo
 	else
 	{
 		// Both items are files (as opposed to folders).
-		ULARGE_INTEGER FileSize1 = { itemInfo1.wfd.nFileSizeLow, itemInfo1.wfd.nFileSizeHigh };
-		ULARGE_INTEGER FileSize2 = { itemInfo2.wfd.nFileSizeLow, itemInfo2.wfd.nFileSizeHigh };
+		ULARGE_INTEGER fileSize1 = { itemInfo1.wfd.nFileSizeLow, itemInfo1.wfd.nFileSizeHigh };
+		ULARGE_INTEGER fileSize2 = { itemInfo2.wfd.nFileSizeLow, itemInfo2.wfd.nFileSizeHigh };
 
-		size1 = FileSize1.QuadPart;
-		size2 = FileSize2.QuadPart;
+		size1 = fileSize1.QuadPart;
+		size2 = fileSize2.QuadPart;
 	}
 
 	if (size1 > size2)
@@ -96,10 +96,10 @@ int SortByType(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo
 		return 1;
 	}
 
-	std::wstring Type1 = GetTypeColumnText(itemInfo1);
-	std::wstring Type2 = GetTypeColumnText(itemInfo2);
+	std::wstring type1 = GetTypeColumnText(itemInfo1);
+	std::wstring type2 = GetTypeColumnText(itemInfo2);
 
-	return StrCmpLogicalW(Type1.c_str(), Type2.c_str());
+	return StrCmpLogicalW(type1.c_str(), type2.c_str());
 }
 
 int SortByDate(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, DateType dateType)
@@ -125,30 +125,30 @@ int SortByDate(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo
 
 int SortByTotalSize(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, bool TotalSize)
 {
-	ULARGE_INTEGER DriveSpace1;
-	BOOL Res1 = GetDriveSpaceColumnRawData(itemInfo1, TotalSize, DriveSpace1);
+	ULARGE_INTEGER driveSpace1;
+	BOOL res1 = GetDriveSpaceColumnRawData(itemInfo1, TotalSize, driveSpace1);
 
-	ULARGE_INTEGER DriveSpace2;
-	BOOL Res2 = GetDriveSpaceColumnRawData(itemInfo2, TotalSize, DriveSpace2);
+	ULARGE_INTEGER driveSpace2;
+	BOOL res2 = GetDriveSpaceColumnRawData(itemInfo2, TotalSize, driveSpace2);
 
-	if (Res1 && !Res2)
+	if (res1 && !res2)
 	{
 		return 1;
 	}
-	else if (!Res1 && Res2)
+	else if (!res1 && res2)
 	{
 		return -1;
 	}
-	else if (!Res1 && !Res2)
+	else if (!res1 && !res2)
 	{
 		return 0;
 	}
 
-	if (DriveSpace1.QuadPart > DriveSpace2.QuadPart)
+	if (driveSpace1.QuadPart > driveSpace2.QuadPart)
 	{
 		return 1;
 	}
-	else if (DriveSpace1.QuadPart < DriveSpace2.QuadPart)
+	else if (driveSpace1.QuadPart < driveSpace2.QuadPart)
 	{
 		return -1;
 	}
@@ -158,38 +158,38 @@ int SortByTotalSize(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &ite
 
 int SortByAttributes(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2)
 {
-	std::wstring AttributeString1 = GetAttributeColumnText(itemInfo1);
-	std::wstring AttributeString2 = GetAttributeColumnText(itemInfo2);
+	std::wstring attributeString1 = GetAttributeColumnText(itemInfo1);
+	std::wstring attributeString2 = GetAttributeColumnText(itemInfo2);
 
-	return StrCmpLogicalW(AttributeString1.c_str(), AttributeString2.c_str());
+	return StrCmpLogicalW(attributeString1.c_str(), attributeString2.c_str());
 }
 
 int SortByRealSize(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2)
 {
-	ULARGE_INTEGER RealFileSize1;
-	bool Res1 = GetRealSizeColumnRawData(itemInfo1, RealFileSize1);
+	ULARGE_INTEGER realFileSize1;
+	bool res1 = GetRealSizeColumnRawData(itemInfo1, realFileSize1);
 
-	ULARGE_INTEGER RealFileSize2;
-	bool Res2 = GetRealSizeColumnRawData(itemInfo2, RealFileSize2);
+	ULARGE_INTEGER realFileSize2;
+	bool res2 = GetRealSizeColumnRawData(itemInfo2, realFileSize2);
 
-	if (Res1 && !Res2)
+	if (res1 && !res2)
 	{
 		return 1;
 	}
-	else if (!Res1 && Res2)
+	else if (!res1 && res2)
 	{
 		return -1;
 	}
-	else if (!Res1 && !Res2)
+	else if (!res1 && !res2)
 	{
 		return 0;
 	}
 
-	if (RealFileSize1.QuadPart > RealFileSize2.QuadPart)
+	if (realFileSize1.QuadPart > realFileSize2.QuadPart)
 	{
 		return 1;
 	}
-	else if (RealFileSize1.QuadPart < RealFileSize2.QuadPart)
+	else if (realFileSize1.QuadPart < realFileSize2.QuadPart)
 	{
 		return -1;
 	}
@@ -199,50 +199,50 @@ int SortByRealSize(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &item
 
 int SortByShortName(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2)
 {
-	std::wstring ShortName1 = GetShortNameColumnText(itemInfo1);
-	std::wstring ShortName2 = GetShortNameColumnText(itemInfo2);
+	std::wstring shortName1 = GetShortNameColumnText(itemInfo1);
+	std::wstring shortName2 = GetShortNameColumnText(itemInfo2);
 
-	return StrCmpLogicalW(ShortName1.c_str(), ShortName2.c_str());
+	return StrCmpLogicalW(shortName1.c_str(), shortName2.c_str());
 }
 
 int SortByOwner(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2)
 {
-	std::wstring Owner1 = GetOwnerColumnText(itemInfo1);
-	std::wstring Owner2 = GetOwnerColumnText(itemInfo2);
+	std::wstring owner1 = GetOwnerColumnText(itemInfo1);
+	std::wstring owner2 = GetOwnerColumnText(itemInfo2);
 
-	return StrCmpLogicalW(Owner1.c_str(), Owner2.c_str());
+	return StrCmpLogicalW(owner1.c_str(), owner2.c_str());
 }
 
 int SortByVersionInfo(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, VersionInfoType versionInfoType)
 {
-	std::wstring VersionInfo1 = GetVersionColumnText(itemInfo1, versionInfoType);
-	std::wstring VersionInfo2 = GetVersionColumnText(itemInfo2, versionInfoType);
+	std::wstring versionInfo1 = GetVersionColumnText(itemInfo1, versionInfoType);
+	std::wstring versionInfo2 = GetVersionColumnText(itemInfo2, versionInfoType);
 
-	return StrCmpLogicalW(VersionInfo1.c_str(), VersionInfo2.c_str());
+	return StrCmpLogicalW(versionInfo1.c_str(), versionInfo2.c_str());
 }
 
 int SortByShortcutTo(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2)
 {
-	std::wstring ResolvedLinkPath1 = GetShortcutToColumnText(itemInfo1);
-	std::wstring ResolvedLinkPath2 = GetShortcutToColumnText(itemInfo2);
+	std::wstring resolvedLinkPath1 = GetShortcutToColumnText(itemInfo1);
+	std::wstring resolvedLinkPath2 = GetShortcutToColumnText(itemInfo2);
 
-	return StrCmpLogicalW(ResolvedLinkPath1.c_str(), ResolvedLinkPath2.c_str());
+	return StrCmpLogicalW(resolvedLinkPath1.c_str(), resolvedLinkPath2.c_str());
 }
 
 int SortByHardlinks(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2)
 {
-	DWORD NumHardLinks1 = GetHardLinksColumnRawData(itemInfo1);
-	DWORD NumHardLinks2 = GetHardLinksColumnRawData(itemInfo2);
+	DWORD numHardLinks1 = GetHardLinksColumnRawData(itemInfo1);
+	DWORD numHardLinks2 = GetHardLinksColumnRawData(itemInfo2);
 
-	return NumHardLinks1 - NumHardLinks2;
+	return numHardLinks1 - numHardLinks2;
 }
 
 int SortByExtension(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2)
 {
-	std::wstring Extension1 = GetExtensionColumnText(itemInfo1);
-	std::wstring Extension2 = GetExtensionColumnText(itemInfo2);
+	std::wstring extension1 = GetExtensionColumnText(itemInfo1);
+	std::wstring extension2 = GetExtensionColumnText(itemInfo2);
 
-	return StrCmpLogicalW(Extension1.c_str(), Extension2.c_str());
+	return StrCmpLogicalW(extension1.c_str(), extension2.c_str());
 }
 
 int SortByItemDetails(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, const SHCOLUMNID *pscid)
@@ -275,48 +275,48 @@ int SortByItemDetails(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &i
 
 int SortByImageProperty(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, PROPID PropertyId)
 {
-	std::wstring ImageProperty1 = GetImageColumnText(itemInfo1, PropertyId);
-	std::wstring ImageProperty2 = GetImageColumnText(itemInfo2, PropertyId);
+	std::wstring imageProperty1 = GetImageColumnText(itemInfo1, PropertyId);
+	std::wstring imageProperty2 = GetImageColumnText(itemInfo2, PropertyId);
 
-	return StrCmpLogicalW(ImageProperty1.c_str(), ImageProperty2.c_str());
+	return StrCmpLogicalW(imageProperty1.c_str(), imageProperty2.c_str());
 }
 
 int SortByVirtualComments(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2)
 {
-	std::wstring Comments1 = GetControlPanelCommentsColumnText(itemInfo1);
-	std::wstring Comments2 = GetControlPanelCommentsColumnText(itemInfo2);
+	std::wstring comments1 = GetControlPanelCommentsColumnText(itemInfo1);
+	std::wstring comments2 = GetControlPanelCommentsColumnText(itemInfo2);
 
-	return StrCmpLogicalW(Comments1.c_str(), Comments2.c_str());
+	return StrCmpLogicalW(comments1.c_str(), comments2.c_str());
 }
 
 int SortByFileSystem(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2)
 {
-	std::wstring FileSystemName1 = GetFileSystemColumnText(itemInfo1);
-	std::wstring FileSystemName2 = GetFileSystemColumnText(itemInfo2);
+	std::wstring fileSystemName1 = GetFileSystemColumnText(itemInfo1);
+	std::wstring fileSystemName2 = GetFileSystemColumnText(itemInfo2);
 
-	return StrCmpLogicalW(FileSystemName1.c_str(), FileSystemName2.c_str());
+	return StrCmpLogicalW(fileSystemName1.c_str(), fileSystemName2.c_str());
 }
 
 int SortByPrinterProperty(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, PrinterInformationType printerInformationType)
 {
-	std::wstring PrinterInformation1 = GetPrinterColumnText(itemInfo1, printerInformationType);
-	std::wstring PrinterInformation2 = GetPrinterColumnText(itemInfo2, printerInformationType);
+	std::wstring printerInformation1 = GetPrinterColumnText(itemInfo1, printerInformationType);
+	std::wstring printerInformation2 = GetPrinterColumnText(itemInfo2, printerInformationType);
 
-	return StrCmpLogicalW(PrinterInformation1.c_str(), PrinterInformation2.c_str());
+	return StrCmpLogicalW(printerInformation1.c_str(), printerInformation2.c_str());
 }
 
 int SortByNetworkAdapterStatus(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2)
 {
-	std::wstring Status1 = GetNetworkAdapterColumnText(itemInfo1);
-	std::wstring Status2 = GetNetworkAdapterColumnText(itemInfo2);
+	std::wstring status1 = GetNetworkAdapterColumnText(itemInfo1);
+	std::wstring status2 = GetNetworkAdapterColumnText(itemInfo2);
 
-	return StrCmpLogicalW(Status1.c_str(), Status2.c_str());
+	return StrCmpLogicalW(status1.c_str(), status2.c_str());
 }
 
 int SortByMediaMetadata(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, MediaMetadataType mediaMetadataType)
 {
-	std::wstring MediaMetadata1 = GetMediaMetadataColumnText(itemInfo1, mediaMetadataType);
-	std::wstring MediaMetadata2 = GetMediaMetadataColumnText(itemInfo2, mediaMetadataType);
+	std::wstring mediaMetadata1 = GetMediaMetadataColumnText(itemInfo1, mediaMetadataType);
+	std::wstring mediaMetadata2 = GetMediaMetadataColumnText(itemInfo2, mediaMetadataType);
 
-	return StrCmpLogicalW(MediaMetadata1.c_str(), MediaMetadata2.c_str());
+	return StrCmpLogicalW(mediaMetadata1.c_str(), mediaMetadata2.c_str());
 }

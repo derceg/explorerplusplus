@@ -86,18 +86,18 @@ INT_PTR ApplicationToolbarButtonDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 void ApplicationToolbarButtonDialog::OnChooseFile()
 {
 	/* TODO: Text needs to be localized. */
-	const TCHAR *Filter = _T("Programs (*.exe)\0*.exe\0All Files\0*.*\0\0");
-	TCHAR FullFileName[MAX_PATH] = EMPTY_STRING;
+	const TCHAR *filter = _T("Programs (*.exe)\0*.exe\0All Files\0*.*\0\0");
+	TCHAR fullFileName[MAX_PATH] = EMPTY_STRING;
 
 	OPENFILENAME ofn;
 	ofn.lStructSize = sizeof(ofn);
 	ofn.hwndOwner = m_hDlg;
-	ofn.lpstrFilter = Filter;
+	ofn.lpstrFilter = filter;
 	ofn.lpstrCustomFilter = nullptr;
 	ofn.nMaxCustFilter = 0;
 	ofn.nFilterIndex = 0;
-	ofn.lpstrFile = FullFileName;
-	ofn.nMaxFile = SIZEOF_ARRAY(FullFileName);
+	ofn.lpstrFile = fullFileName;
+	ofn.nMaxFile = SIZEOF_ARRAY(fullFileName);
 	ofn.lpstrFileTitle = nullptr;
 	ofn.nMaxFileTitle = 0;
 	ofn.lpstrInitialDir = nullptr;
@@ -114,21 +114,21 @@ void ApplicationToolbarButtonDialog::OnChooseFile()
 
 	if (bRet)
 	{
-		SetDlgItemText(m_hDlg, IDC_APP_EDIT_COMMAND, FullFileName);
+		SetDlgItemText(m_hDlg, IDC_APP_EDIT_COMMAND, fullFileName);
 	}
 }
 
 void ApplicationToolbarButtonDialog::OnOk()
 {
-	TCHAR Name[512];
-	GetDlgItemText(m_hDlg, IDC_APP_EDIT_NAME, Name, SIZEOF_ARRAY(Name));
+	TCHAR name[512];
+	GetDlgItemText(m_hDlg, IDC_APP_EDIT_NAME, name, SIZEOF_ARRAY(name));
 
-	TCHAR Command[512];
-	GetDlgItemText(m_hDlg, IDC_APP_EDIT_COMMAND, Command, SIZEOF_ARRAY(Command));
+	TCHAR command[512];
+	GetDlgItemText(m_hDlg, IDC_APP_EDIT_COMMAND, command, SIZEOF_ARRAY(command));
 
 	bool validated = true;
 
-	if (lstrlen(Name) == 0 || lstrlen(Command) == 0)
+	if (lstrlen(name) == 0 || lstrlen(command) == 0)
 	{
 		validated = false;
 	}
@@ -139,8 +139,8 @@ void ApplicationToolbarButtonDialog::OnOk()
 		return;
 	}
 
-	m_Button->Name = Name;
-	m_Button->Command = Command;
+	m_Button->Name = name;
+	m_Button->Command = command;
 	m_Button->ShowNameOnToolbar = IsDlgButtonChecked(m_hDlg, IDC_CHECK_SHOWAPPNAME) == BST_CHECKED;
 
 	EndDialog(m_hDlg, 1);

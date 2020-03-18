@@ -80,8 +80,8 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	MenuHelper::EnableItem(hProgramMenu,IDM_ACTIONS_MERGEFILES,tab.GetShellBrowser()->GetNumSelectedFiles() > 1);
 	MenuHelper::EnableItem(hProgramMenu,IDM_ACTIONS_DESTROYFILES,anySelected);
 
-	UINT ItemToCheck = GetViewModeMenuId(viewMode);
-	CheckMenuRadioItem(hProgramMenu,IDM_VIEW_THUMBNAILS,IDM_VIEW_EXTRALARGEICONS,ItemToCheck,MF_BYCOMMAND);
+	UINT itemToCheck = GetViewModeMenuId(viewMode);
+	CheckMenuRadioItem(hProgramMenu,IDM_VIEW_THUMBNAILS,IDM_VIEW_EXTRALARGEICONS,itemToCheck,MF_BYCOMMAND);
 
 	MenuHelper::EnableItem(hProgramMenu,IDM_GO_BACK,tab.GetShellBrowser()->GetNavigationController()->CanGoBack());
 	MenuHelper::EnableItem(hProgramMenu,IDM_GO_FORWARD,tab.GetShellBrowser()->GetNavigationController()->CanGoForward());

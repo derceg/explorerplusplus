@@ -161,7 +161,7 @@ void DropHandler::HandleLeftClickDrop(IDataObject *pDataObject,POINTL *pptl)
 	}
 
 	HRESULT hrCopy = E_FAIL;
-	std::list<std::wstring> PastedFileList;
+	std::list<std::wstring> pastedFileList;
 
 	if(CheckDropFormatSupported(pDataObject,&m_ftcHDrop))
 	{
@@ -176,42 +176,42 @@ void DropHandler::HandleLeftClickDrop(IDataObject *pDataObject,POINTL *pptl)
 	else if(CheckDropFormatSupported(pDataObject,&m_ftcShellIDList))
 	{
 		LOG(debug) << _T("Helper - Copying CFSTR_SHELLIDLIST data");
-		hrCopy = CopyShellIDListData(pDataObject,PastedFileList);
+		hrCopy = CopyShellIDListData(pDataObject,pastedFileList);
 	}
 	else if(CheckDropFormatSupported(pDataObject,&m_ftcFileDescriptorA))
 	{
 		LOG(debug) << _T("Helper - Copying CFSTR_FILEDESCRIPTORA data");
-		hrCopy = CopyAnsiFileDescriptorData(pDataObject,PastedFileList);
+		hrCopy = CopyAnsiFileDescriptorData(pDataObject,pastedFileList);
 	}
 	else if(CheckDropFormatSupported(pDataObject,&m_ftcFileDescriptorW))
 	{
 		LOG(debug) << _T("Helper - Copying CFSTR_FILEDESCRIPTORW data");
-		hrCopy = CopyUnicodeFileDescriptorData(pDataObject,PastedFileList);
+		hrCopy = CopyUnicodeFileDescriptorData(pDataObject,pastedFileList);
 	}
 	else if(CheckDropFormatSupported(pDataObject,&m_ftcUnicodeText))
 	{
 		LOG(debug) << _T("Helper - Copying CF_UNICODETEXT data");
-		hrCopy = CopyUnicodeTextData(pDataObject,PastedFileList);
+		hrCopy = CopyUnicodeTextData(pDataObject,pastedFileList);
 	}
 	else if(CheckDropFormatSupported(pDataObject,&m_ftcText))
 	{
 		LOG(debug) << _T("Helper - Copying CF_TEXT data");
-		hrCopy = CopyAnsiTextData(pDataObject,PastedFileList);
+		hrCopy = CopyAnsiTextData(pDataObject,pastedFileList);
 	}
 	else if(CheckDropFormatSupported(pDataObject,&m_ftcDIBV5))
 	{
 		LOG(debug) << _T("Helper - Copying CF_DIBV5 data");
-		hrCopy = CopyDIBV5Data(pDataObject,PastedFileList);
+		hrCopy = CopyDIBV5Data(pDataObject,pastedFileList);
 	}
 
 	if(hrCopy == S_OK &&
-		PastedFileList.size() > 0)
+		pastedFileList.size() > 0)
 	{
 		/* The data was copied successfully, so notify
 		the caller via the specified callback interface. */
 		if(m_pDropFilesCallback != NULL)
 		{
-			m_pDropFilesCallback->OnDropFile(PastedFileList,&pt);
+			m_pDropFilesCallback->OnDropFile(pastedFileList,&pt);
 		}
 	}
 }
@@ -893,8 +893,8 @@ Differences between drag and drop/paste:
 */
 void DropHandler::CopyDroppedFiles(const HDROP &hd,BOOL bPreferredEffect,DWORD dwPreferredEffect)
 {
-	std::list<std::wstring> CopyFilenameList;
-	std::list<std::wstring> MoveFilenameList;
+	std::list<std::wstring> copyFilenameList;
+	std::list<std::wstring> moveFilenameList;
 
 	BOOL bRenameOnCollision = m_bRenameOnCollision;
 
@@ -941,11 +941,11 @@ void DropHandler::CopyDroppedFiles(const HDROP &hd,BOOL bPreferredEffect,DWORD d
 
 		if(dwEffect & DROPEFFECT_MOVE)
 		{
-			MoveFilenameList.push_back(szFullFileName);
+			moveFilenameList.push_back(szFullFileName);
 		}
 		else if(dwEffect & DROPEFFECT_COPY)
 		{
-			CopyFilenameList.push_back(szFullFileName);
+			copyFilenameList.push_back(szFullFileName);
 		}
 		else if(dwEffect & DROPEFFECT_LINK)
 		{
@@ -953,8 +953,8 @@ void DropHandler::CopyDroppedFiles(const HDROP &hd,BOOL bPreferredEffect,DWORD d
 		}
 	}
 
-	CopyDroppedFilesInternal(CopyFilenameList,TRUE,bRenameOnCollision);
-	CopyDroppedFilesInternal(MoveFilenameList,FALSE,bRenameOnCollision);
+	CopyDroppedFilesInternal(copyFilenameList,TRUE,bRenameOnCollision);
+	CopyDroppedFilesInternal(moveFilenameList,FALSE,bRenameOnCollision);
 }
 
 void DropHandler::CopyDroppedFilesInternal(const std::list<std::wstring> &FullFilenameList,
@@ -1145,15 +1145,15 @@ BOOL CopyDroppedFilesInternalAsync(PastedFilesInfo_t *ppfi)
 
 	if(bRes)
 	{
-		std::list<std::wstring> FilenameList;
+		std::list<std::wstring> filenameList;
 
-		for(const auto &FullFilename : ppfi->FullFilenameList)
+		for(const auto &fullFilename : ppfi->FullFilenameList)
 		{
 			TCHAR szFilename[MAX_PATH];
-			StringCchCopy(szFilename,SIZEOF_ARRAY(szFilename),FullFilename.c_str());
+			StringCchCopy(szFilename,SIZEOF_ARRAY(szFilename),fullFilename.c_str());
 			PathStripPath(szFilename);
 
-			FilenameList.push_back(szFilename);
+			filenameList.push_back(szFilename);
 		}
 
 		if(shfo.hNameMappings != NULL)
@@ -1162,7 +1162,7 @@ BOOL CopyDroppedFilesInternalAsync(PastedFilesInfo_t *ppfi)
 
 			for(int i = 0;i < static_cast<int>(phtm->uNumberOfMappings);i++)
 			{
-				for(auto itr = FilenameList.begin();itr != FilenameList.end();itr++)
+				for(auto itr = filenameList.begin();itr != filenameList.end();itr++)
 				{
 					TCHAR szOldFileName[MAX_PATH];
 					StringCchCopy(szOldFileName,SIZEOF_ARRAY(szOldFileName),
@@ -1187,7 +1187,7 @@ BOOL CopyDroppedFilesInternalAsync(PastedFilesInfo_t *ppfi)
 
 		if(ppfi->pDropFilesCallback != NULL)
 		{
-			ppfi->pDropFilesCallback->OnDropFile(FilenameList,&ppfi->pt);
+			ppfi->pDropFilesCallback->OnDropFile(filenameList,&ppfi->pt);
 		}
 	}
 

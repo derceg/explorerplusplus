@@ -480,9 +480,9 @@ void ShellBrowser::OnListViewItemChanged(const NMLISTVIEW *changeData)
 void ShellBrowser::UpdateFileSelectionInfo(int internalIndex, BOOL Selected)
 {
 	ULARGE_INTEGER	ulFileSize;
-	BOOL			IsFolder;
+	BOOL			isFolder;
 
-	IsFolder = (m_itemInfoMap.at(internalIndex).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+	isFolder = (m_itemInfoMap.at(internalIndex).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 		== FILE_ATTRIBUTE_DIRECTORY;
 
 	ulFileSize.LowPart = m_itemInfoMap.at(internalIndex).wfd.nFileSizeLow;
@@ -490,7 +490,7 @@ void ShellBrowser::UpdateFileSelectionInfo(int internalIndex, BOOL Selected)
 
 	if (Selected)
 	{
-		if (IsFolder)
+		if (isFolder)
 			m_NumFoldersSelected++;
 		else
 			m_NumFilesSelected++;
@@ -499,7 +499,7 @@ void ShellBrowser::UpdateFileSelectionInfo(int internalIndex, BOOL Selected)
 	}
 	else
 	{
-		if (IsFolder)
+		if (isFolder)
 			m_NumFoldersSelected--;
 		else
 			m_NumFilesSelected--;

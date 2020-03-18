@@ -214,22 +214,22 @@ HRESULT ShellBrowser::AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory,
 
 HRESULT ShellBrowser::AddItemInternal(int iItemIndex, int iItemId, BOOL bPosition)
 {
-	AwaitingAdd_t AwaitingAdd;
+	AwaitingAdd_t awaitingAdd;
 
 	if (iItemIndex == -1)
 	{
-		AwaitingAdd.iItem = m_nTotalItems + static_cast<int>(m_AwaitingAddList.size());
+		awaitingAdd.iItem = m_nTotalItems + static_cast<int>(m_AwaitingAddList.size());
 	}
 	else
 	{
-		AwaitingAdd.iItem = iItemIndex;
+		awaitingAdd.iItem = iItemIndex;
 	}
 
-	AwaitingAdd.iItemInternal = iItemId;
-	AwaitingAdd.bPosition = bPosition;
-	AwaitingAdd.iAfter = iItemIndex - 1;
+	awaitingAdd.iItemInternal = iItemId;
+	awaitingAdd.bPosition = bPosition;
+	awaitingAdd.iAfter = iItemIndex - 1;
 
-	m_AwaitingAddList.push_back(AwaitingAdd);
+	m_AwaitingAddList.push_back(awaitingAdd);
 
 	return S_OK;
 }

@@ -75,15 +75,15 @@ BOOL LoadAllowMultipleInstancesFromRegistry(void)
 LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 {
 	HKEY			hSettingsKey;
-	DWORD			Disposition;
-	LONG			ReturnValue;
+	DWORD			disposition;
+	LONG			returnValue;
 	TBSAVEPARAMS	tbSave;
 
 	/* Open/Create the main key that is used to store data. */
-	ReturnValue = RegCreateKeyEx(HKEY_CURRENT_USER,NExplorerplusplus::REG_SETTINGS_KEY,0, nullptr,
-	REG_OPTION_NON_VOLATILE,KEY_WRITE, nullptr,&hSettingsKey,&Disposition);
+	returnValue = RegCreateKeyEx(HKEY_CURRENT_USER,NExplorerplusplus::REG_SETTINGS_KEY,0, nullptr,
+	REG_OPTION_NON_VOLATILE,KEY_WRITE, nullptr,&hSettingsKey,&disposition);
 
-	if(ReturnValue == ERROR_SUCCESS)
+	if(returnValue == ERROR_SUCCESS)
 	{
 		WINDOWPLACEMENT wndpl;
 
@@ -165,30 +165,30 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("DisplayWindowHeight"), m_config->displayWindowHeight);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("DisplayWindowVertical"), m_config->displayWindowVertical);
 
-		COLORREF CentreColor;
-		COLORREF SurroundColor;
-		COLORREF TextColor;
-		LOGFONT LogFont;
+		COLORREF centreColor;
+		COLORREF surroundColor;
+		COLORREF textColor;
+		LOGFONT logFont;
 		HFONT hFont;
 
-		CentreColor = (COLORREF)SendMessage(m_hDisplayWindow,DWM_GETCENTRECOLOR,0,0);
-		SurroundColor = (COLORREF)SendMessage(m_hDisplayWindow,DWM_GETSURROUNDCOLOR,0,0);
-		TextColor = (COLORREF)SendMessage(m_hDisplayWindow,DWM_GETTEXTCOLOR,0,0);
+		centreColor = (COLORREF)SendMessage(m_hDisplayWindow,DWM_GETCENTRECOLOR,0,0);
+		surroundColor = (COLORREF)SendMessage(m_hDisplayWindow,DWM_GETSURROUNDCOLOR,0,0);
+		textColor = (COLORREF)SendMessage(m_hDisplayWindow,DWM_GETTEXTCOLOR,0,0);
 		SendMessage(m_hDisplayWindow,DWM_GETFONT,(WPARAM)&hFont,0);
 
 		RegSetValueEx(hSettingsKey,_T("DisplayCentreColor"),0,REG_BINARY,
-			(LPBYTE)&CentreColor,sizeof(CentreColor));
+			(LPBYTE)&centreColor,sizeof(centreColor));
 
 		RegSetValueEx(hSettingsKey,_T("DisplaySurroundColor"),0,REG_BINARY,
-			(LPBYTE)&SurroundColor,sizeof(SurroundColor));
+			(LPBYTE)&surroundColor,sizeof(surroundColor));
 
 		RegSetValueEx(hSettingsKey,_T("DisplayTextColor"),0,REG_BINARY,
-			(LPBYTE)&TextColor,sizeof(TextColor));
+			(LPBYTE)&textColor,sizeof(textColor));
 
-		GetObject(hFont,sizeof(LOGFONT),(LPVOID)&LogFont);
+		GetObject(hFont,sizeof(LOGFONT),(LPVOID)&logFont);
 
 		RegSetValueEx(hSettingsKey,_T("DisplayFont"),0,REG_BINARY,
-			(LPBYTE)&LogFont,sizeof(LOGFONT));
+			(LPBYTE)&logFont,sizeof(LOGFONT));
 
 		/* TODO: This should
 		be done within the
@@ -202,23 +202,23 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 		RegCloseKey(hSettingsKey);
 	}
 
-	return ReturnValue;
+	return returnValue;
 }
 
 LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 {
 	HKEY			hSettingsKey;
-	LONG			ReturnValue;
-	LONG			CentreColorStatus = TRUE;
-	LONG			SurroundColorStatus = TRUE;
-	LONG			TextColorStatus = TRUE;
-	LONG			FontStatus = TRUE;
+	LONG			returnValue;
+	LONG			centreColorStatus = TRUE;
+	LONG			surroundColorStatus = TRUE;
+	LONG			textColorStatus = TRUE;
+	LONG			fontStatus = TRUE;
 	LONG			lStatus;
 
 	/* Open/Create the main key that is used to store data. */
-	ReturnValue = RegOpenKeyEx(HKEY_CURRENT_USER, NExplorerplusplus::REG_SETTINGS_KEY,0,KEY_READ,&hSettingsKey);
+	returnValue = RegOpenKeyEx(HKEY_CURRENT_USER, NExplorerplusplus::REG_SETTINGS_KEY,0,KEY_READ,&hSettingsKey);
 
-	if(ReturnValue == ERROR_SUCCESS)
+	if(returnValue == ERROR_SUCCESS)
 	{
 		/* User settings. */
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("LastSelectedTab"),(LPDWORD)&m_iLastSelectedTab);
@@ -324,56 +324,56 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("DisplayWindowHeight"),(LPDWORD)&m_config->displayWindowHeight);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("DisplayWindowVertical"),(LPDWORD)&m_config->displayWindowVertical);
 
-		COLORREF CentreColor;
-		COLORREF SurroundColor;
-		COLORREF TextColor;
+		COLORREF centreColor;
+		COLORREF surroundColor;
+		COLORREF textColor;
 		HFONT hFont;
-		LOGFONT LogFont;
+		LOGFONT logFont;
 		DWORD dwType;
 		DWORD dwSize;
 
 		dwType = REG_BINARY;
-		dwSize = sizeof(SurroundColor);
+		dwSize = sizeof(surroundColor);
 
-		SurroundColorStatus = RegQueryValueEx(hSettingsKey,_T("DisplaySurroundColor"),nullptr,&dwType,(LPBYTE)&SurroundColor,
+		surroundColorStatus = RegQueryValueEx(hSettingsKey,_T("DisplaySurroundColor"),nullptr,&dwType,(LPBYTE)&surroundColor,
 			&dwSize);
 
-		if (SurroundColorStatus == ERROR_SUCCESS)
+		if (surroundColorStatus == ERROR_SUCCESS)
 		{
-			m_config->displayWindowSurroundColor.SetFromCOLORREF(SurroundColor);
+			m_config->displayWindowSurroundColor.SetFromCOLORREF(surroundColor);
 		}
 
 		dwType = REG_BINARY;
-		dwSize = sizeof(CentreColor);
+		dwSize = sizeof(centreColor);
 
-		CentreColorStatus = RegQueryValueEx(hSettingsKey,_T("DisplayCentreColor"),nullptr,&dwType,(LPBYTE)&CentreColor,
+		centreColorStatus = RegQueryValueEx(hSettingsKey,_T("DisplayCentreColor"),nullptr,&dwType,(LPBYTE)&centreColor,
 			&dwSize);
 
-		if (CentreColorStatus == ERROR_SUCCESS)
+		if (centreColorStatus == ERROR_SUCCESS)
 		{
-			m_config->displayWindowCentreColor.SetFromCOLORREF(CentreColor);
+			m_config->displayWindowCentreColor.SetFromCOLORREF(centreColor);
 		}
 
 		dwType = REG_BINARY;
-		dwSize = sizeof(TextColor);
+		dwSize = sizeof(textColor);
 
-		TextColorStatus = RegQueryValueEx(hSettingsKey,_T("DisplayTextColor"),nullptr,&dwType,(LPBYTE)&TextColor,
+		textColorStatus = RegQueryValueEx(hSettingsKey,_T("DisplayTextColor"),nullptr,&dwType,(LPBYTE)&textColor,
 			&dwSize);
 
-		if (TextColorStatus == ERROR_SUCCESS)
+		if (textColorStatus == ERROR_SUCCESS)
 		{
-			m_config->displayWindowTextColor = TextColor;
+			m_config->displayWindowTextColor = textColor;
 		}
 
 		dwType = REG_BINARY;
 		dwSize = sizeof(LOGFONT);
 
-		FontStatus = RegQueryValueEx(hSettingsKey,_T("DisplayFont"),nullptr,&dwType,(LPBYTE)&LogFont,
+		fontStatus = RegQueryValueEx(hSettingsKey,_T("DisplayFont"),nullptr,&dwType,(LPBYTE)&logFont,
 			&dwSize);
 
-		if (FontStatus == ERROR_SUCCESS)
+		if (fontStatus == ERROR_SUCCESS)
 		{
-			hFont = CreateFontIndirect(&LogFont);
+			hFont = CreateFontIndirect(&logFont);
 
 			m_config->displayWindowFont = hFont;
 		}
@@ -383,7 +383,7 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		RegCloseKey(hSettingsKey);
 	}
 
-	return ReturnValue;
+	return returnValue;
 }
 
 void DeleteKey(HKEY hKey)
@@ -393,8 +393,8 @@ void DeleteKey(HKEY hKey)
 	DWORD	dwName;
 	DWORD	nSubKeys;
 	DWORD	nChildSubKeys;
-	DWORD	Disposition;
-	LONG	ReturnValue;
+	DWORD	disposition;
+	LONG	returnValue;
 	int		i = 0;
 
 	/* Enumerate all the previous bookmarks keys and
@@ -409,11 +409,11 @@ void DeleteKey(HKEY hKey)
 			if(RegEnumKeyEx(hKey,i,lpName,&dwName,
 				nullptr, nullptr, nullptr, nullptr) == ERROR_SUCCESS)
 			{
-				ReturnValue = RegCreateKeyEx(hKey,lpName,0,
+				returnValue = RegCreateKeyEx(hKey,lpName,0,
 					nullptr,REG_OPTION_NON_VOLATILE, KEY_WRITE | KEY_ENUMERATE_SUB_KEYS |
-					KEY_QUERY_VALUE | DELETE, nullptr,&hChildKey,&Disposition);
+					KEY_QUERY_VALUE | DELETE, nullptr,&hChildKey,&disposition);
 
-				if(ReturnValue == ERROR_SUCCESS)
+				if(returnValue == ERROR_SUCCESS)
 				{
 					RegQueryInfoKey(hChildKey, nullptr, nullptr, nullptr,&nChildSubKeys,
 						nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
@@ -451,10 +451,10 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 	HKEY	hTabKey;
 	HKEY	hColumnsKey;
 	TCHAR	szItemKey[128];
-	UINT	ViewMode;
-	UINT	SortMode;
-	DWORD	Disposition;
-	LONG	ReturnValue;
+	UINT	viewMode;
+	UINT	sortMode;
+	DWORD	disposition;
+	LONG	returnValue;
 
 	/* First, delete all current tab keys. If these keys
 	are not deleted beforehand, then they may be opened
@@ -462,11 +462,11 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 	closed. */
 	SHDeleteKey(HKEY_CURRENT_USER,REG_TABS_KEY);
 
-	ReturnValue = RegCreateKeyEx(HKEY_CURRENT_USER,REG_TABS_KEY,
+	returnValue = RegCreateKeyEx(HKEY_CURRENT_USER,REG_TABS_KEY,
 		0, nullptr,REG_OPTION_NON_VOLATILE,KEY_WRITE, nullptr,&hKey,
-		&Disposition);
+		&disposition);
 
-	if(ReturnValue == ERROR_SUCCESS)
+	if(returnValue == ERROR_SUCCESS)
 	{
 		int tabNum = 0;
 
@@ -477,22 +477,22 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 			StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
 				_T("%d"),tabNum);
 
-			ReturnValue = RegCreateKeyEx(hKey,szItemKey,0, nullptr,
+			returnValue = RegCreateKeyEx(hKey,szItemKey,0, nullptr,
 				REG_OPTION_NON_VOLATILE,KEY_WRITE,
-				nullptr,&hTabKey,&Disposition);
+				nullptr,&hTabKey,&disposition);
 
-			if(ReturnValue == ERROR_SUCCESS)
+			if(returnValue == ERROR_SUCCESS)
 			{
 				auto pidlDirectory = tab.GetShellBrowser()->GetDirectoryIdl();
 				RegSetValueEx(hTabKey,_T("Directory"),0,REG_BINARY,
 					(LPBYTE)pidlDirectory.get(),ILGetSize(pidlDirectory.get()));
 
-				ViewMode = tab.GetShellBrowser()->GetViewMode();
+				viewMode = tab.GetShellBrowser()->GetViewMode();
 
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ViewMode"),ViewMode);
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ViewMode"),viewMode);
 
-				SortMode = tab.GetShellBrowser()->GetSortMode();
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("SortMode"),SortMode);
+				sortMode = tab.GetShellBrowser()->GetSortMode();
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("SortMode"),sortMode);
 
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("SortAscending"), tab.GetShellBrowser()->GetSortAscending());
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowInGroups"), tab.GetShellBrowser()->GetShowInGroups());
@@ -505,11 +505,11 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 				NRegistrySettings::SaveStringToRegistry(hTabKey,_T("Filter"),filter.c_str());
 
 				/* Now save the tabs columns. */
-				ReturnValue = RegCreateKeyEx(hTabKey,_T("Columns"),
+				returnValue = RegCreateKeyEx(hTabKey,_T("Columns"),
 					0, nullptr,REG_OPTION_NON_VOLATILE,KEY_WRITE, nullptr,&hColumnsKey,
-					&Disposition);
+					&disposition);
 
-				if(ReturnValue == ERROR_SUCCESS)
+				if(returnValue == ERROR_SUCCESS)
 				{
 					FolderColumns folderColumns = tab.GetShellBrowser()->ExportAllColumns();
 
@@ -576,30 +576,30 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 	HKEY				hColumnsKey;
 	TCHAR				szItemKey[128];
 	LPITEMIDLIST		pidlDirectory = nullptr;
-	LONG				ReturnValue;
+	LONG				returnValue;
 	DWORD				cbData;
-	DWORD				Type;
+	DWORD				type;
 	HRESULT				hr;
 	int					nTabsCreated = 0;
 	int					i = 0;
 
-	ReturnValue = RegOpenKeyEx(HKEY_CURRENT_USER,REG_TABS_KEY,0,KEY_READ,&hKey);
+	returnValue = RegOpenKeyEx(HKEY_CURRENT_USER,REG_TABS_KEY,0,KEY_READ,&hKey);
 
-	if(ReturnValue == ERROR_SUCCESS)
+	if(returnValue == ERROR_SUCCESS)
 	{
 		StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
 			_T("%d"),i);
 
-		ReturnValue = RegOpenKeyEx(hKey,szItemKey,0,KEY_READ,&hTabKey);
+		returnValue = RegOpenKeyEx(hKey,szItemKey,0,KEY_READ,&hTabKey);
 
-		while(ReturnValue == ERROR_SUCCESS)
+		while(returnValue == ERROR_SUCCESS)
 		{
 			if(RegQueryValueEx(hTabKey,_T("Directory"),nullptr, nullptr, nullptr,&cbData)
 				== ERROR_SUCCESS)
 			{
 				pidlDirectory = (LPITEMIDLIST)CoTaskMemAlloc(cbData);
 
-				RegQueryValueEx(hTabKey,_T("Directory"),nullptr,&Type,(LPBYTE)pidlDirectory,&cbData);
+				RegQueryValueEx(hTabKey,_T("Directory"),nullptr,&type,(LPBYTE)pidlDirectory,&cbData);
 			}
 
 			FolderSettings folderSettings;
@@ -623,11 +623,11 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 			folderSettings.filter = filter;
 
 			/* Now load this tabs columns. */
-			ReturnValue = RegOpenKeyEx(hTabKey,_T("Columns"),0,KEY_READ,&hColumnsKey);
+			returnValue = RegOpenKeyEx(hTabKey,_T("Columns"),0,KEY_READ,&hColumnsKey);
 
 			FolderColumns initialColumns;
 
-			if(ReturnValue == ERROR_SUCCESS)
+			if(returnValue == ERROR_SUCCESS)
 			{
 				initialColumns.controlPanelColumns = LoadColumnFromRegistry(hColumnsKey,_T("ControlPanelColumns"));
 				initialColumns.myComputerColumns = LoadColumnFromRegistry(hColumnsKey,_T("MyComputerColumns"));
@@ -694,7 +694,7 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 			StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
 				_T("%d"),i);
 
-			ReturnValue = RegOpenKeyEx(hKey,szItemKey,0,KEY_READ,&hTabKey);
+			returnValue = RegOpenKeyEx(hKey,szItemKey,0,KEY_READ,&hTabKey);
 		}
 
 		RegCloseKey(hKey);
@@ -778,27 +778,27 @@ void Explorerplusplus::SaveColumnToRegistry(HKEY hColumnsKey, const TCHAR *szKey
 
 std::vector<Column_t> Explorerplusplus::LoadColumnFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName)
 {
-	ColumnOld_t		ColumnList[64];
-	Column_t		Column;
+	ColumnOld_t		columnList[64];
+	Column_t		column;
 	DWORD			dwSize;
 	DWORD			dwType;
 	unsigned int	i = 0;
 
 	dwType = REG_BINARY;
-	dwSize = sizeof(ColumnList);
+	dwSize = sizeof(columnList);
 
-	RegQueryValueEx(hColumnsKey,szKeyName,nullptr,&dwType,(LPBYTE)ColumnList,
+	RegQueryValueEx(hColumnsKey,szKeyName,nullptr,&dwType,(LPBYTE)columnList,
 		&dwSize);
 
 	std::vector<Column_t> columns;
 
 	for(i = 0;i < dwSize / sizeof(ColumnOld_t);i++)
 	{
-		Column.id = ColumnList[i].id;
-		Column.bChecked = ColumnList[i].bChecked;
-		Column.iWidth = DEFAULT_COLUMN_WIDTH;
+		column.id = columnList[i].id;
+		column.bChecked = columnList[i].bChecked;
+		column.iWidth = DEFAULT_COLUMN_WIDTH;
 
-		columns.push_back(Column);
+		columns.push_back(column);
 	}
 
 	return columns;
@@ -807,14 +807,14 @@ std::vector<Column_t> Explorerplusplus::LoadColumnFromRegistry(HKEY hColumnsKey,
 void Explorerplusplus::SaveDefaultColumnsToRegistry()
 {
 	HKEY			hColumnsKey;
-	DWORD			Disposition;
-	LONG			ReturnValue;
+	DWORD			disposition;
+	LONG			returnValue;
 
 	/* Open/Create the main key that is used to store data. */
-	ReturnValue = RegCreateKeyEx(HKEY_CURRENT_USER,REG_COLUMNS_KEY,0, nullptr,
-	REG_OPTION_NON_VOLATILE,KEY_WRITE, nullptr,&hColumnsKey,&Disposition);
+	returnValue = RegCreateKeyEx(HKEY_CURRENT_USER,REG_COLUMNS_KEY,0, nullptr,
+	REG_OPTION_NON_VOLATILE,KEY_WRITE, nullptr,&hColumnsKey,&disposition);
 
-	if(ReturnValue == ERROR_SUCCESS)
+	if(returnValue == ERROR_SUCCESS)
 	{
 		SaveColumnToRegistry(hColumnsKey,_T("ControlPanelColumns"),&m_config->globalFolderSettings.folderColumns.controlPanelColumns);
 		SaveColumnWidthsToRegistry(hColumnsKey,_T("ControlPanelColumnWidths"),&m_config->globalFolderSettings.folderColumns.controlPanelColumns);
@@ -891,19 +891,19 @@ void Explorerplusplus::SaveToolbarInformationToRegistry(void)
 	HKEY	hToolbarKey;
 	REBARBANDINFO rbi;
 	TCHAR	szItemKey[128];
-	DWORD	Disposition;
-	LONG	ReturnValue;
+	DWORD	disposition;
+	LONG	returnValue;
 	int		nBands = 0;
 	int		i = 0;
 
 	/* First, delete any current rebar key. */
 	SHDeleteKey(HKEY_CURRENT_USER,REG_TOOLBARS_KEY);
 
-	ReturnValue = RegCreateKeyEx(HKEY_CURRENT_USER,REG_TOOLBARS_KEY,
+	returnValue = RegCreateKeyEx(HKEY_CURRENT_USER,REG_TOOLBARS_KEY,
 		0, nullptr,REG_OPTION_NON_VOLATILE,KEY_WRITE, nullptr,&hKey,
-		&Disposition);
+		&disposition);
 
-	if(ReturnValue == ERROR_SUCCESS)
+	if(returnValue == ERROR_SUCCESS)
 	{
 		nBands = (int)SendMessage(m_hMainRebar,RB_GETBANDCOUNT,0,0);
 
@@ -913,11 +913,11 @@ void Explorerplusplus::SaveToolbarInformationToRegistry(void)
 			StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
 				_T("%d"),i);
 
-			ReturnValue = RegCreateKeyEx(hKey,szItemKey,0, nullptr,
+			returnValue = RegCreateKeyEx(hKey,szItemKey,0, nullptr,
 				REG_OPTION_NON_VOLATILE,KEY_WRITE,
-				nullptr,&hToolbarKey,&Disposition);
+				nullptr,&hToolbarKey,&disposition);
 
-			if(ReturnValue == ERROR_SUCCESS)
+			if(returnValue == ERROR_SUCCESS)
 			{
 				rbi.cbSize = sizeof(rbi);
 				rbi.fMask = RBBIM_ID|RBBIM_CHILD|RBBIM_SIZE|RBBIM_STYLE;
@@ -940,19 +940,19 @@ void Explorerplusplus::LoadToolbarInformationFromRegistry(void)
 	HKEY				hKey;
 	HKEY				hToolbarKey;
 	TCHAR				szItemKey[128];
-	LONG				ReturnValue;
+	LONG				deturnValue;
 	int					i = 0;
 
-	ReturnValue = RegOpenKeyEx(HKEY_CURRENT_USER,REG_TOOLBARS_KEY,0,KEY_READ,&hKey);
+	deturnValue = RegOpenKeyEx(HKEY_CURRENT_USER,REG_TOOLBARS_KEY,0,KEY_READ,&hKey);
 
-	if(ReturnValue == ERROR_SUCCESS)
+	if(deturnValue == ERROR_SUCCESS)
 	{
 		StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
 			_T("%d"),i);
 
-		ReturnValue = RegOpenKeyEx(hKey,szItemKey,0,KEY_READ,&hToolbarKey);
+		deturnValue = RegOpenKeyEx(hKey,szItemKey,0,KEY_READ,&hToolbarKey);
 
-		while(ReturnValue == ERROR_SUCCESS)
+		while(deturnValue == ERROR_SUCCESS)
 		{
 			BOOL bUseChevron = FALSE;
 
@@ -976,7 +976,7 @@ void Explorerplusplus::LoadToolbarInformationFromRegistry(void)
 			StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
 				_T("%d"),i);
 
-			ReturnValue = RegOpenKeyEx(hKey,szItemKey,0,KEY_READ,&hToolbarKey);
+			deturnValue = RegOpenKeyEx(hKey,szItemKey,0,KEY_READ,&hToolbarKey);
 		}
 
 		RegCloseKey(hKey);
@@ -986,9 +986,9 @@ void Explorerplusplus::LoadToolbarInformationFromRegistry(void)
 void Explorerplusplus::LoadApplicationToolbarFromRegistry()
 {
 	HKEY hKey;
-	LONG ReturnValue = RegOpenKeyEx(HKEY_CURRENT_USER,REG_APPLICATIONS_KEY,0,KEY_READ,&hKey);
+	LONG returnValue = RegOpenKeyEx(HKEY_CURRENT_USER,REG_APPLICATIONS_KEY,0,KEY_READ,&hKey);
 
-	if(ReturnValue == ERROR_SUCCESS)
+	if(returnValue == ERROR_SUCCESS)
 	{
 		ApplicationToolbarPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 
@@ -1001,10 +1001,10 @@ void Explorerplusplus::SaveApplicationToolbarToRegistry()
 	SHDeleteKey(HKEY_CURRENT_USER,REG_APPLICATIONS_KEY);
 
 	HKEY hKey;
-	LONG ReturnValue = RegCreateKeyEx(HKEY_CURRENT_USER,REG_APPLICATIONS_KEY,
+	LONG returnValue = RegCreateKeyEx(HKEY_CURRENT_USER,REG_APPLICATIONS_KEY,
 		0, nullptr,REG_OPTION_NON_VOLATILE,KEY_WRITE, nullptr,&hKey, nullptr);
 
-	if(ReturnValue == ERROR_SUCCESS)
+	if(returnValue == ERROR_SUCCESS)
 	{
 		ApplicationToolbarPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 

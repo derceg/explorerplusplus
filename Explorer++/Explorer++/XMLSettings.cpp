@@ -429,51 +429,51 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("DisableFolderSizesNetworkRemovable"),
 		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.disableFolderSizesNetworkRemovable));
 
-	COLORREF CentreColor;
+	COLORREF centreColor;
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("Setting"),_T("DisplayCentreColor"));
-	CentreColor = (COLORREF)SendMessage(m_hDisplayWindow,DWM_GETCENTRECOLOR,0,0);
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("r"),NXMLSettings::EncodeIntValue(GetRValue(CentreColor)));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("g"),NXMLSettings::EncodeIntValue(GetGValue(CentreColor)));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("b"),NXMLSettings::EncodeIntValue(GetBValue(CentreColor)));
+	centreColor = (COLORREF)SendMessage(m_hDisplayWindow,DWM_GETCENTRECOLOR,0,0);
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("r"),NXMLSettings::EncodeIntValue(GetRValue(centreColor)));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("g"),NXMLSettings::EncodeIntValue(GetGValue(centreColor)));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("b"),NXMLSettings::EncodeIntValue(GetBValue(centreColor)));
 	pParentNode->Release();
 	pParentNode = nullptr;
 
 	HFONT hFont;
-	LOGFONT FontInfo;
+	LOGFONT fontInfo;
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("Setting"),_T("DisplayFont"));
 	SendMessage(m_hDisplayWindow,DWM_GETFONT,(WPARAM)&hFont,0);
-	GetObject(hFont,sizeof(LOGFONT),&FontInfo);
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Height"),NXMLSettings::EncodeIntValue(FontInfo.lfHeight));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Width"),NXMLSettings::EncodeIntValue(FontInfo.lfWidth));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Weight"),NXMLSettings::EncodeIntValue(FontInfo.lfWeight));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Italic"),NXMLSettings::EncodeBoolValue(FontInfo.lfItalic));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Underline"),NXMLSettings::EncodeBoolValue(FontInfo.lfUnderline));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Strikeout"),NXMLSettings::EncodeBoolValue(FontInfo.lfStrikeOut));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Font"),FontInfo.lfFaceName);
+	GetObject(hFont,sizeof(LOGFONT),&fontInfo);
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Height"),NXMLSettings::EncodeIntValue(fontInfo.lfHeight));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Width"),NXMLSettings::EncodeIntValue(fontInfo.lfWidth));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Weight"),NXMLSettings::EncodeIntValue(fontInfo.lfWeight));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Italic"),NXMLSettings::EncodeBoolValue(fontInfo.lfItalic));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Underline"),NXMLSettings::EncodeBoolValue(fontInfo.lfUnderline));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Strikeout"),NXMLSettings::EncodeBoolValue(fontInfo.lfStrikeOut));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Font"),fontInfo.lfFaceName);
 
-	COLORREF SurroundColor;
+	COLORREF surroundColor;
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("Setting"),_T("DisplaySurroundColor"));
-	SurroundColor = (COLORREF)SendMessage(m_hDisplayWindow,DWM_GETSURROUNDCOLOR,0,0);
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("r"),NXMLSettings::EncodeIntValue(GetRValue(SurroundColor)));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("g"),NXMLSettings::EncodeIntValue(GetGValue(SurroundColor)));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("b"),NXMLSettings::EncodeIntValue(GetBValue(SurroundColor)));
+	surroundColor = (COLORREF)SendMessage(m_hDisplayWindow,DWM_GETSURROUNDCOLOR,0,0);
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("r"),NXMLSettings::EncodeIntValue(GetRValue(surroundColor)));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("g"),NXMLSettings::EncodeIntValue(GetGValue(surroundColor)));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("b"),NXMLSettings::EncodeIntValue(GetBValue(surroundColor)));
 	pParentNode->Release();
 	pParentNode = nullptr;
 
-	COLORREF TextColor;
+	COLORREF textColor;
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("Setting"),_T("DisplayTextColor"));
-	TextColor = (COLORREF)SendMessage(m_hDisplayWindow,DWM_GETTEXTCOLOR,0,0);
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("r"),NXMLSettings::EncodeIntValue(GetRValue(TextColor)));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("g"),NXMLSettings::EncodeIntValue(GetGValue(TextColor)));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("b"),NXMLSettings::EncodeIntValue(GetBValue(TextColor)));
+	textColor = (COLORREF)SendMessage(m_hDisplayWindow,DWM_GETTEXTCOLOR,0,0);
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("r"),NXMLSettings::EncodeIntValue(GetRValue(textColor)));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("g"),NXMLSettings::EncodeIntValue(GetGValue(textColor)));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("b"),NXMLSettings::EncodeIntValue(GetBValue(textColor)));
 	pParentNode->Release();
 	pParentNode = nullptr;
 
@@ -713,41 +713,41 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 							{
 								pColumnNode->get_nextSibling(&pColumnNode);
 
-								std::vector<Column_t> Column;
+								std::vector<Column_t> column;
 								int iColumnType;
 
 								while(pColumnNode != nullptr)
 								{
-									iColumnType = LoadColumnFromXML(pColumnNode,Column);
+									iColumnType = LoadColumnFromXML(pColumnNode,column);
 
 									switch(iColumnType)
 									{
 									case COLUMN_TYPE_GENERIC:
-										initialColumns.realFolderColumns = Column;
+										initialColumns.realFolderColumns = column;
 										break;
 
 									case COLUMN_TYPE_MYCOMPUTER:
-										initialColumns.myComputerColumns = Column;
+										initialColumns.myComputerColumns = column;
 										break;
 
 									case COLUMN_TYPE_CONTROLPANEL:
-										initialColumns.controlPanelColumns = Column;
+										initialColumns.controlPanelColumns = column;
 										break;
 
 									case COLUMN_TYPE_RECYCLEBIN:
-										initialColumns.recycleBinColumns = Column;
+										initialColumns.recycleBinColumns = column;
 										break;
 
 									case COLUMN_TYPE_PRINTERS:
-										initialColumns.printersColumns = Column;
+										initialColumns.printersColumns = column;
 										break;
 
 									case COLUMN_TYPE_NETWORK:
-										initialColumns.networkConnectionsColumns = Column;
+										initialColumns.networkConnectionsColumns = column;
 										break;
 
 									case COLUMN_TYPE_NETWORKPLACES:
-										initialColumns.myNetworkPlacesColumns = Column;
+										initialColumns.myNetworkPlacesColumns = column;
 										break;
 									}
 
@@ -817,8 +817,8 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 	BSTR					bstr_wsnttt = SysAllocString(L"\n\t\t\t");
 	BSTR					bstr = nullptr;
 	TCHAR					szNodeName[32];
-	UINT					SortMode;
-	UINT					ViewMode;
+	UINT					sortMode;
+	UINT					viewMode;
 	int						tabNum = 0;
 
 	for (auto tabRef : m_tabContainer->GetAllTabsInOrder())
@@ -854,11 +854,11 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SortAscending"),
 			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetSortAscending()));
 
-		SortMode = tab.GetShellBrowser()->GetSortMode();
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SortMode"),NXMLSettings::EncodeIntValue(SortMode));
+		sortMode = tab.GetShellBrowser()->GetSortMode();
+		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SortMode"),NXMLSettings::EncodeIntValue(sortMode));
 
-		ViewMode = tab.GetShellBrowser()->GetViewMode();
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ViewMode"),NXMLSettings::EncodeIntValue(ViewMode));
+		viewMode = tab.GetShellBrowser()->GetViewMode();
+		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ViewMode"),NXMLSettings::EncodeIntValue(viewMode));
 
 		bstr = SysAllocString(L"Columns");
 		pXMLDom->createElement(bstr,&pColumnsNode);
@@ -914,7 +914,7 @@ int Explorerplusplus::LoadColumnFromXML(IXMLDOMNode *pNode, std::vector<Column_t
 {
 	IXMLDOMNamedNodeMap	*am = nullptr;
 	IXMLDOMNode			*pAttributeNode = nullptr;
-	Column_t					Column;
+	Column_t					column;
 	BSTR						bstrName;
 	BSTR						bstrValue;
 	TCHAR						szWidth[32];
@@ -971,11 +971,11 @@ int Explorerplusplus::LoadColumnFromXML(IXMLDOMNode *pNode, std::vector<Column_t
 
 				if(lstrcmp(bstrName,ColumnData[j].szName) == 0)
 				{
-					Column.id = ColumnData[j].id;
+					column.id = ColumnData[j].id;
 
-					Column.bChecked	= NXMLSettings::DecodeBoolValue(bstrValue);
+					column.bChecked	= NXMLSettings::DecodeBoolValue(bstrValue);
 
-					outputColumns.push_back(Column);
+					outputColumns.push_back(column);
 					break;
 				}
 				else if(lstrcmp(bstrName,szWidth) == 0)
@@ -1010,7 +1010,7 @@ int Explorerplusplus::LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom)
 	IXMLDOMNodeList	*pNodes = nullptr;
 	IXMLDOMNode		*pNode = nullptr;
 	BSTR			bstr = nullptr;
-	std::vector<Column_t>	ColumnSet;
+	std::vector<Column_t>	columnSet;
 	long			length;
 	int				iColumnType;
 
@@ -1034,36 +1034,36 @@ int Explorerplusplus::LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom)
 		{
 			pNodes->get_item(i, &pNode);
 
-			iColumnType = LoadColumnFromXML(pNode,ColumnSet);
+			iColumnType = LoadColumnFromXML(pNode,columnSet);
 
 			switch(iColumnType)
 			{
 			case COLUMN_TYPE_GENERIC:
-				folderColumns.realFolderColumns = ColumnSet;
+				folderColumns.realFolderColumns = columnSet;
 				break;
 
 			case COLUMN_TYPE_MYCOMPUTER:
-				folderColumns.myComputerColumns = ColumnSet;
+				folderColumns.myComputerColumns = columnSet;
 				break;
 
 			case COLUMN_TYPE_CONTROLPANEL:
-				folderColumns.controlPanelColumns = ColumnSet;
+				folderColumns.controlPanelColumns = columnSet;
 				break;
 
 			case COLUMN_TYPE_RECYCLEBIN:
-				folderColumns.recycleBinColumns = ColumnSet;
+				folderColumns.recycleBinColumns = columnSet;
 				break;
 
 			case COLUMN_TYPE_PRINTERS:
-				folderColumns.printersColumns = ColumnSet;
+				folderColumns.printersColumns = columnSet;
 				break;
 
 			case COLUMN_TYPE_NETWORK:
-				folderColumns.networkConnectionsColumns = ColumnSet;
+				folderColumns.networkConnectionsColumns = columnSet;
 				break;
 
 			case COLUMN_TYPE_NETWORKPLACES:
-				folderColumns.myNetworkPlacesColumns = ColumnSet;
+				folderColumns.myNetworkPlacesColumns = columnSet;
 				break;
 			}
 

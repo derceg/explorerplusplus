@@ -44,274 +44,274 @@ int CALLBACK ShellBrowser::SortStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamS
 /* Also see NBookmarkHelper::Sort. */
 int CALLBACK ShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 {
-	int ComparisonResult = 0;
+	int comparisonResult = 0;
 
 	BasicItemInfo_t basicItemInfo1 = getBasicItemInfo(InternalIndex1);
 	BasicItemInfo_t basicItemInfo2 = getBasicItemInfo(InternalIndex2);
 
-	bool IsFolder1 = ((basicItemInfo1.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
-	bool IsFolder2 = ((basicItemInfo2.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
+	bool isFolder1 = ((basicItemInfo1.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
+	bool isFolder2 = ((basicItemInfo2.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
 	
 	/* Folders will always be sorted separately from files,
 	except in the recycle bin. */
-	if(IsFolder1 && !IsFolder2 && !CompareVirtualFolders(CSIDL_BITBUCKET))
+	if(isFolder1 && !isFolder2 && !CompareVirtualFolders(CSIDL_BITBUCKET))
 	{
-		ComparisonResult = -1;
+		comparisonResult = -1;
 	}
-	else if(!IsFolder1 && IsFolder2 && !CompareVirtualFolders(CSIDL_BITBUCKET))
+	else if(!isFolder1 && isFolder2 && !CompareVirtualFolders(CSIDL_BITBUCKET))
 	{
-		ComparisonResult = 1;
+		comparisonResult = 1;
 	}
 	else
 	{
 		switch(m_folderSettings.sortMode)
 		{
 		case SortMode::Name:
-			ComparisonResult = SortByName(basicItemInfo1, basicItemInfo2, m_config->globalFolderSettings);
+			comparisonResult = SortByName(basicItemInfo1, basicItemInfo2, m_config->globalFolderSettings);
 			break;
 
 		case SortMode::Type:
-			ComparisonResult = SortByType(basicItemInfo1,basicItemInfo2);
+			comparisonResult = SortByType(basicItemInfo1,basicItemInfo2);
 			break;
 
 		case SortMode::Size:
-			ComparisonResult = SortBySize(basicItemInfo1,basicItemInfo2);
+			comparisonResult = SortBySize(basicItemInfo1,basicItemInfo2);
 			break;
 
 		case SortMode::DateModified:
-			ComparisonResult = SortByDate(basicItemInfo1,basicItemInfo2,DateType::Modified);
+			comparisonResult = SortByDate(basicItemInfo1,basicItemInfo2,DateType::Modified);
 			break;
 
 		case SortMode::TotalSize:
-			ComparisonResult = SortByTotalSize(basicItemInfo1,basicItemInfo2,TRUE);
+			comparisonResult = SortByTotalSize(basicItemInfo1,basicItemInfo2,TRUE);
 			break;
 
 		case SortMode::FreeSpace:
-			ComparisonResult = SortByTotalSize(basicItemInfo1,basicItemInfo2,FALSE);
+			comparisonResult = SortByTotalSize(basicItemInfo1,basicItemInfo2,FALSE);
 			break;
 
 		case SortMode::DateDeleted:
-			ComparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2, &SCID_DATE_DELETED);
+			comparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2, &SCID_DATE_DELETED);
 			break;
 
 		case SortMode::OriginalLocation:
-			ComparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2, &SCID_ORIGINAL_LOCATION);
+			comparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2, &SCID_ORIGINAL_LOCATION);
 			break;
 
 		case SortMode::Attributes:
-			ComparisonResult = SortByAttributes(basicItemInfo1, basicItemInfo2);
+			comparisonResult = SortByAttributes(basicItemInfo1, basicItemInfo2);
 			break;
 
 		case SortMode::RealSize:
-			ComparisonResult = SortByRealSize(basicItemInfo1, basicItemInfo2);
+			comparisonResult = SortByRealSize(basicItemInfo1, basicItemInfo2);
 			break;
 
 		case SortMode::ShortName:
-			ComparisonResult = SortByShortName(basicItemInfo1, basicItemInfo2);
+			comparisonResult = SortByShortName(basicItemInfo1, basicItemInfo2);
 			break;
 
 		case SortMode::Owner:
-			ComparisonResult = SortByOwner(basicItemInfo1, basicItemInfo2);
+			comparisonResult = SortByOwner(basicItemInfo1, basicItemInfo2);
 			break;
 
 		case SortMode::ProductName:
-			ComparisonResult = SortByVersionInfo(basicItemInfo1, basicItemInfo2,VersionInfoType::ProductName);
+			comparisonResult = SortByVersionInfo(basicItemInfo1, basicItemInfo2,VersionInfoType::ProductName);
 			break;
 
 		case SortMode::Company:
-			ComparisonResult = SortByVersionInfo(basicItemInfo1, basicItemInfo2,VersionInfoType::Company);
+			comparisonResult = SortByVersionInfo(basicItemInfo1, basicItemInfo2,VersionInfoType::Company);
 			break;
 
 		case SortMode::Description:
-			ComparisonResult = SortByVersionInfo(basicItemInfo1, basicItemInfo2,VersionInfoType::Description);
+			comparisonResult = SortByVersionInfo(basicItemInfo1, basicItemInfo2,VersionInfoType::Description);
 			break;
 
 		case SortMode::FileVersion:
-			ComparisonResult = SortByVersionInfo(basicItemInfo1, basicItemInfo2,VersionInfoType::FileVersion);
+			comparisonResult = SortByVersionInfo(basicItemInfo1, basicItemInfo2,VersionInfoType::FileVersion);
 			break;
 
 		case SortMode::ProductVersion:
-			ComparisonResult = SortByVersionInfo(basicItemInfo1, basicItemInfo2,VersionInfoType::ProductVersion);
+			comparisonResult = SortByVersionInfo(basicItemInfo1, basicItemInfo2,VersionInfoType::ProductVersion);
 			break;
 
 		case SortMode::ShortcutTo:
-			ComparisonResult = SortByShortcutTo(basicItemInfo1, basicItemInfo2);
+			comparisonResult = SortByShortcutTo(basicItemInfo1, basicItemInfo2);
 			break;
 
 		case SortMode::HardLinks:
-			ComparisonResult = SortByHardlinks(basicItemInfo1, basicItemInfo2);
+			comparisonResult = SortByHardlinks(basicItemInfo1, basicItemInfo2);
 			break;
 
 		case SortMode::Extension:
-			ComparisonResult = SortByExtension(basicItemInfo1,basicItemInfo2);
+			comparisonResult = SortByExtension(basicItemInfo1,basicItemInfo2);
 			break;
 
 		case SortMode::Created:
-			ComparisonResult = SortByDate(basicItemInfo1,basicItemInfo2,DateType::Created);
+			comparisonResult = SortByDate(basicItemInfo1,basicItemInfo2,DateType::Created);
 			break;
 
 		case SortMode::Accessed:
-			ComparisonResult = SortByDate(basicItemInfo1,basicItemInfo2,DateType::Accessed);
+			comparisonResult = SortByDate(basicItemInfo1,basicItemInfo2,DateType::Accessed);
 			break;
 
 		case SortMode::Title:
-			ComparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2,&PKEY_Title);
+			comparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2,&PKEY_Title);
 			break;
 
 		case SortMode::Subject:
-			ComparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2,&PKEY_Subject);
+			comparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2,&PKEY_Subject);
 			break;
 
 		case SortMode::Authors:
-			ComparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2,&PKEY_Author);
+			comparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2,&PKEY_Author);
 			break;
 
 		case SortMode::Keywords:
-			ComparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2,&PKEY_Keywords);
+			comparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2,&PKEY_Keywords);
 			break;
 
 		case SortMode::Comments:
-			ComparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2,&PKEY_Comment);
+			comparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2,&PKEY_Comment);
 			break;
 
 		case SortMode::CameraModel:
-			ComparisonResult = SortByImageProperty(basicItemInfo1, basicItemInfo2,PropertyTagEquipModel);
+			comparisonResult = SortByImageProperty(basicItemInfo1, basicItemInfo2,PropertyTagEquipModel);
 			break;
 
 		case SortMode::DateTaken:
-			ComparisonResult = SortByImageProperty(basicItemInfo1, basicItemInfo2,PropertyTagDateTime);
+			comparisonResult = SortByImageProperty(basicItemInfo1, basicItemInfo2,PropertyTagDateTime);
 			break;
 
 		case SortMode::Width:
-			ComparisonResult = SortByImageProperty(basicItemInfo1, basicItemInfo2,PropertyTagImageWidth);
+			comparisonResult = SortByImageProperty(basicItemInfo1, basicItemInfo2,PropertyTagImageWidth);
 			break;
 
 		case SortMode::Height:
-			ComparisonResult = SortByImageProperty(basicItemInfo1, basicItemInfo2,PropertyTagImageHeight);
+			comparisonResult = SortByImageProperty(basicItemInfo1, basicItemInfo2,PropertyTagImageHeight);
 			break;
 
 		case SortMode::VirtualComments:
-			ComparisonResult = SortByVirtualComments(basicItemInfo1, basicItemInfo2);
+			comparisonResult = SortByVirtualComments(basicItemInfo1, basicItemInfo2);
 			break;
 
 		case SortMode::FileSystem:
-			ComparisonResult = SortByFileSystem(basicItemInfo1,basicItemInfo2);
+			comparisonResult = SortByFileSystem(basicItemInfo1,basicItemInfo2);
 			break;
 
 		case SortMode::NumPrinterDocuments:
-			ComparisonResult = SortByPrinterProperty(basicItemInfo1,basicItemInfo2,PrinterInformationType::NumJobs);
+			comparisonResult = SortByPrinterProperty(basicItemInfo1,basicItemInfo2,PrinterInformationType::NumJobs);
 			break;
 
 		case SortMode::PrinterStatus:
-			ComparisonResult = SortByPrinterProperty(basicItemInfo1,basicItemInfo2,PrinterInformationType::Status);
+			comparisonResult = SortByPrinterProperty(basicItemInfo1,basicItemInfo2,PrinterInformationType::Status);
 			break;
 
 		case SortMode::PrinterComments:
-			ComparisonResult = SortByPrinterProperty(basicItemInfo1,basicItemInfo2,PrinterInformationType::Comments);
+			comparisonResult = SortByPrinterProperty(basicItemInfo1,basicItemInfo2,PrinterInformationType::Comments);
 			break;
 
 		case SortMode::PrinterLocation:
-			ComparisonResult = SortByPrinterProperty(basicItemInfo1,basicItemInfo2,PrinterInformationType::Location);
+			comparisonResult = SortByPrinterProperty(basicItemInfo1,basicItemInfo2,PrinterInformationType::Location);
 			break;
 
 		case SortMode::NetworkAdapterStatus:
-			ComparisonResult = SortByNetworkAdapterStatus(basicItemInfo1,basicItemInfo2);
+			comparisonResult = SortByNetworkAdapterStatus(basicItemInfo1,basicItemInfo2);
 			break;
 
 		case SortMode::MediaBitrate:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Bitrate);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Bitrate);
 			break;
 
 		case SortMode::MediaCopyright:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Copyright);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Copyright);
 			break;
 
 		case SortMode::MediaDuration:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Duration);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Duration);
 			break;
 
 		case SortMode::MediaProtected:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Protected);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Protected);
 			break;
 
 		case SortMode::MediaRating:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Rating);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Rating);
 			break;
 
 		case SortMode::MediaAlbumArtist:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::AlbumArtist);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::AlbumArtist);
 			break;
 
 		case SortMode::MediaAlbum:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::AlbumTitle);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::AlbumTitle);
 			break;
 
 		case SortMode::MediaBeatsPerMinute:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::BeatsPerMinute);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::BeatsPerMinute);
 			break;
 
 		case SortMode::MediaComposer:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Composer);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Composer);
 			break;
 
 		case SortMode::MediaConductor:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Conductor);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Conductor);
 			break;
 
 		case SortMode::MediaDirector:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Director);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Director);
 			break;
 
 		case SortMode::MediaGenre:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Genre);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Genre);
 			break;
 
 		case SortMode::MediaLanguage:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Language);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Language);
 			break;
 
 		case SortMode::MediaBroadcastDate:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::BroadcastDate);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::BroadcastDate);
 			break;
 
 		case SortMode::MediaChannel:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Channel);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Channel);
 			break;
 
 		case SortMode::MediaStationName:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::StationName);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::StationName);
 			break;
 
 		case SortMode::MediaMood:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Mood);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Mood);
 			break;
 
 		case SortMode::MediaParentalRating:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::ParentalRating);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::ParentalRating);
 			break;
 
 		case SortMode::MediaParentalRatingReason:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::ParentalRatingReason);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::ParentalRatingReason);
 			break;
 
 		case SortMode::MediaPeriod:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Period);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Period);
 			break;
 
 		case SortMode::MediaProducer:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Producer);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Producer);
 			break;
 
 		case SortMode::MediaPublisher:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Publisher);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Publisher);
 			break;
 
 		case SortMode::MediaWriter:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Writer);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Writer);
 			break;
 
 		case SortMode::MediaYear:
-			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Year);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MediaMetadataType::Year);
 			break;
 
 		default:
@@ -320,18 +320,18 @@ int CALLBACK ShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 		}
 	}
 
-	if(ComparisonResult == 0)
+	if(comparisonResult == 0)
 	{
 		/* By default, items that are equal will be sub-sorted
 		by their display names. */
-		ComparisonResult = StrCmpLogicalW(basicItemInfo1.szDisplayName,
+		comparisonResult = StrCmpLogicalW(basicItemInfo1.szDisplayName,
 			basicItemInfo2.szDisplayName);
 	}
 
 	if(!m_folderSettings.sortAscending)
 	{
-		ComparisonResult = -ComparisonResult;
+		comparisonResult = -comparisonResult;
 	}
 
-	return ComparisonResult;
+	return comparisonResult;
 }

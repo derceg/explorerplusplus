@@ -45,10 +45,10 @@ BOOL FileActionHandler::RenameFiles(const RenamedItems_t &itemList)
 	file was actually renamed. */
 	if(renamedItems.size() > 0)
 	{
-		UndoItem_t UndoItem;
-		UndoItem.Type = FILE_ACTION_RENAMED;
-		UndoItem.renamedItems = renamedItems;	
-		m_stackFileActions.push(UndoItem);
+		UndoItem_t undoItem;
+		undoItem.Type = FILE_ACTION_RENAMED;
+		undoItem.renamedItems = renamedItems;	
+		m_stackFileActions.push(undoItem);
 
 		return TRUE;
 	}
@@ -63,10 +63,10 @@ HRESULT FileActionHandler::DeleteFiles(HWND hwnd, DeletedItems_t &deletedItems,
 
 	if(SUCCEEDED(hr))
 	{
-		UndoItem_t UndoItem;
-		UndoItem.Type = FILE_ACTION_DELETED;
-		UndoItem.deletedItems = deletedItems;
-		m_stackFileActions.push(UndoItem);
+		UndoItem_t undoItem;
+		undoItem.Type = FILE_ACTION_DELETED;
+		undoItem.deletedItems = deletedItems;
+		m_stackFileActions.push(undoItem);
 	}
 
 	return hr;
@@ -101,19 +101,19 @@ void FileActionHandler::Undo()
 
 void FileActionHandler::UndoRenameOperation(const RenamedItems_t &renamedItemList)
 {
-	RenamedItems_t UndoList;
+	RenamedItems_t undoList;
 
 	/* When undoing a rename operation, the new name
 	becomes the old name, and vice versa. */
-	for(const auto &RenamedItem : renamedItemList)
+	for(const auto &renamedItem : renamedItemList)
 	{
-		RenamedItem_t UndoItem;
-		UndoItem.strOldFilename = RenamedItem.strNewFilename;
-		UndoItem.strNewFilename = RenamedItem.strOldFilename;
-		UndoList.push_back(UndoItem);
+		RenamedItem_t undoItem;
+		undoItem.strOldFilename = renamedItem.strNewFilename;
+		undoItem.strNewFilename = renamedItem.strOldFilename;
+		undoList.push_back(undoItem);
 	}
 
-	RenameFiles(UndoList);
+	RenameFiles(undoList);
 }
 
 void FileActionHandler::UndoDeleteOperation(const DeletedItems_t &deletedItemList)

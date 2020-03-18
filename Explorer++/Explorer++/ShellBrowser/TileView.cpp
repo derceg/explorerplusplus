@@ -70,7 +70,7 @@ void ShellBrowser::SetTileViewItemInfo(int iItem, int iItemInternal)
 	LVTILEINFO lvti;
 	UINT uColumns[2] = { 1,2 };
 	int columnFormats[2] = { LVCFMT_LEFT, LVCFMT_LEFT };
-	TCHAR FullFileName[MAX_PATH];
+	TCHAR fullFileName[MAX_PATH];
 
 	lvti.cbSize = sizeof(lvti);
 	lvti.iItem = iItem;
@@ -79,9 +79,9 @@ void ShellBrowser::SetTileViewItemInfo(int iItem, int iItemInternal)
 	lvti.piColFmt = columnFormats;
 	ListView_SetTileInfo(m_hListView, &lvti);
 
-	GetItemFullName(iItem, FullFileName, SIZEOF_ARRAY(FullFileName));
+	GetItemFullName(iItem, fullFileName, SIZEOF_ARRAY(fullFileName));
 
-	SHGetFileInfo(FullFileName, 0,
+	SHGetFileInfo(fullFileName, 0,
 		&shfi, sizeof(SHFILEINFO), SHGFI_TYPENAME);
 
 	ListView_SetItemText(m_hListView, iItem, 1, shfi.szTypeName);

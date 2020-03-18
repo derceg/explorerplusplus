@@ -192,7 +192,7 @@ void TabDropHandler::GetRepresentativeSourceDriveHDrop(IDataObject *pDataObject)
 DWORD TabDropHandler::DetermineCurrentDragEffect(
 	int iTab, DWORD grfKeyState, DWORD CurrentDropEffect)
 {
-	DWORD DropEffect = DROPEFFECT_NONE;
+	DWORD dropEffect = DROPEFFECT_NONE;
 
 	if (iTab != -1)
 	{
@@ -203,12 +203,12 @@ DWORD TabDropHandler::DetermineCurrentDragEffect(
 			std::wstring destDirectory = tab.GetShellBrowser()->GetDirectory();
 			BOOL bOnSameDrive =
 				PathIsSameRoot(destDirectory.c_str(), m_RepresentativeDrive.c_str());
-			DropEffect =
+			dropEffect =
 				::DetermineDragEffect(grfKeyState, CurrentDropEffect, m_AcceptData, bOnSameDrive);
 		}
 	}
 
-	return DropEffect;
+	return dropEffect;
 }
 
 HRESULT __stdcall TabDropHandler::DragOver(DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)

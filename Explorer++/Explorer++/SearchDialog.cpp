@@ -173,77 +173,77 @@ void SearchDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstrai
 {
 	dsc = BaseDialog::DIALOG_SIZE_CONSTRAINT_NONE;
 
-	ResizableDialog::Control_t Control;
+	ResizableDialog::Control_t control;
 
-	Control.iID = IDC_COMBO_NAME;
-	Control.Type = ResizableDialog::TYPE_RESIZE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_X;
-	ControlList.push_back(Control);
+	control.iID = IDC_COMBO_NAME;
+	control.Type = ResizableDialog::TYPE_RESIZE;
+	control.Constraint = ResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(control);
 
-	Control.iID = IDC_COMBO_DIRECTORY;
-	Control.Type = ResizableDialog::TYPE_RESIZE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_X;
-	ControlList.push_back(Control);
+	control.iID = IDC_COMBO_DIRECTORY;
+	control.Type = ResizableDialog::TYPE_RESIZE;
+	control.Constraint = ResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(control);
 
-	Control.iID = IDC_BUTTON_DIRECTORY;
-	Control.Type = ResizableDialog::TYPE_MOVE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_X;
-	ControlList.push_back(Control);
+	control.iID = IDC_BUTTON_DIRECTORY;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(control);
 
-	Control.iID = IDC_LISTVIEW_SEARCHRESULTS;
-	Control.Type = ResizableDialog::TYPE_RESIZE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
-	ControlList.push_back(Control);
+	control.iID = IDC_LISTVIEW_SEARCHRESULTS;
+	control.Type = ResizableDialog::TYPE_RESIZE;
+	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(control);
 
-	Control.iID = IDC_STATIC_STATUSLABEL;
-	Control.Type = ResizableDialog::TYPE_MOVE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_Y;
-	ControlList.push_back(Control);
+	control.iID = IDC_STATIC_STATUSLABEL;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_Y;
+	ControlList.push_back(control);
 
-	Control.iID = IDC_STATIC_STATUS;
-	Control.Type = ResizableDialog::TYPE_MOVE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_Y;
-	ControlList.push_back(Control);
+	control.iID = IDC_STATIC_STATUS;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_Y;
+	ControlList.push_back(control);
 
-	Control.iID = IDC_STATIC_STATUS;
-	Control.Type = ResizableDialog::TYPE_RESIZE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_X;
-	ControlList.push_back(Control);
+	control.iID = IDC_STATIC_STATUS;
+	control.Type = ResizableDialog::TYPE_RESIZE;
+	control.Constraint = ResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(control);
 
-	Control.iID = IDC_LINK_STATUS;
-	Control.Type = ResizableDialog::TYPE_MOVE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_Y;
-	ControlList.push_back(Control);
+	control.iID = IDC_LINK_STATUS;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_Y;
+	ControlList.push_back(control);
 
-	Control.iID = IDC_LINK_STATUS;
-	Control.Type = ResizableDialog::TYPE_RESIZE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_X;
-	ControlList.push_back(Control);
+	control.iID = IDC_LINK_STATUS;
+	control.Type = ResizableDialog::TYPE_RESIZE;
+	control.Constraint = ResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(control);
 
-	Control.iID = IDC_STATIC_ETCHEDHORZ;
-	Control.Type = ResizableDialog::TYPE_MOVE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_Y;
-	ControlList.push_back(Control);
+	control.iID = IDC_STATIC_ETCHEDHORZ;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_Y;
+	ControlList.push_back(control);
 
-	Control.iID = IDC_STATIC_ETCHEDHORZ;
-	Control.Type = ResizableDialog::TYPE_RESIZE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_X;
-	ControlList.push_back(Control);
+	control.iID = IDC_STATIC_ETCHEDHORZ;
+	control.Type = ResizableDialog::TYPE_RESIZE;
+	control.Constraint = ResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(control);
 
-	Control.iID = IDSEARCH;
-	Control.Type = ResizableDialog::TYPE_MOVE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
-	ControlList.push_back(Control);
+	control.iID = IDSEARCH;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(control);
 
-	Control.iID = IDEXIT;
-	Control.Type = ResizableDialog::TYPE_MOVE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
-	ControlList.push_back(Control);
+	control.iID = IDEXIT;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(control);
 
-	Control.iID = IDC_GRIPPER;
-	Control.Type = ResizableDialog::TYPE_MOVE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
-	ControlList.push_back(Control);
+	control.iID = IDC_GRIPPER;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(control);
 }
 
 INT_PTR SearchDialog::OnCommand(WPARAM wParam,LPARAM lParam)
@@ -614,12 +614,12 @@ void SearchDialog::AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
 	UNREFERENCED_PARAMETER(dwData);
 
 	unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems.front()));
-	SFGAOF ItemAttributes = SFGAO_FOLDER;
-	GetItemAttributes(pidlComplete.get(),&ItemAttributes);
+	SFGAOF itemAttributes = SFGAO_FOLDER;
+	GetItemAttributes(pidlComplete.get(),&itemAttributes);
 
 	TCHAR szTemp[64];
 
-	if((ItemAttributes & SFGAO_FOLDER) == SFGAO_FOLDER)
+	if((itemAttributes & SFGAO_FOLDER) == SFGAO_FOLDER)
 	{
 		LoadString(GetInstance(),IDS_SEARCH_OPEN_FOLDER_LOCATION,
 			szTemp,SIZEOF_ARRAY(szTemp));
@@ -1056,9 +1056,9 @@ void Search::SearchDirectory(const TCHAR *szDirectory)
 	SendMessage(m_hDlg,NSearchDialog::WM_APP_SEARCHCHANGEDDIRECTORY,
 		reinterpret_cast<WPARAM>(szDirectory),0);
 
-	std::list<std::wstring> SubFolderList;
+	std::list<std::wstring> subFolderList;
 
-	SearchDirectoryInternal(szDirectory,&SubFolderList);
+	SearchDirectoryInternal(szDirectory,&subFolderList);
 
 	bool bStop = false;
 
@@ -1076,7 +1076,7 @@ void Search::SearchDirectory(const TCHAR *szDirectory)
 
 	if(m_bSearchSubFolders)
 	{
-		for(const auto &strSubFolder : SubFolderList)
+		for(const auto &strSubFolder : subFolderList)
 		{
 			SearchDirectory(strSubFolder.c_str());
 		}
@@ -1288,13 +1288,13 @@ void SearchDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_SORT_MODE, static_cast<DWORD>(m_SortMode));
 	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_SORT_ASCENDING, m_bSortAscending);
 
-	std::list<std::wstring> SearchDirectoriesList;
-	CircularBufferToList(m_searchDirectories, SearchDirectoriesList);
-	NRegistrySettings::SaveStringListToRegistry(hKey, SETTING_DIRECTORY_LIST, SearchDirectoriesList);
+	std::list<std::wstring> searchDirectoriesList;
+	CircularBufferToList(m_searchDirectories, searchDirectoriesList);
+	NRegistrySettings::SaveStringListToRegistry(hKey, SETTING_DIRECTORY_LIST, searchDirectoriesList);
 
-	std::list<std::wstring> SearchPatternList;
-	CircularBufferToList(m_searchPatterns,SearchPatternList);
-	NRegistrySettings::SaveStringListToRegistry(hKey, SETTING_PATTERN_LIST, SearchPatternList);
+	std::list<std::wstring> searchPatternList;
+	CircularBufferToList(m_searchPatterns,searchPatternList);
+	NRegistrySettings::SaveStringListToRegistry(hKey, SETTING_PATTERN_LIST, searchPatternList);
 }
 
 void SearchDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
@@ -1315,13 +1315,13 @@ void SearchDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_SORT_MODE, &value);
 	m_SortMode = static_cast<SortMode>(value);
 
-	std::list<std::wstring> SearchDirectoriesList;
-	NRegistrySettings::ReadStringListFromRegistry(hKey, SETTING_DIRECTORY_LIST, SearchDirectoriesList);
-	ListToCircularBuffer(SearchDirectoriesList, m_searchDirectories);
+	std::list<std::wstring> searchDirectoriesList;
+	NRegistrySettings::ReadStringListFromRegistry(hKey, SETTING_DIRECTORY_LIST, searchDirectoriesList);
+	ListToCircularBuffer(searchDirectoriesList, m_searchDirectories);
 
-	std::list<std::wstring> SearchPatternList;
-	NRegistrySettings::ReadStringListFromRegistry(hKey, SETTING_PATTERN_LIST, SearchPatternList);
-	ListToCircularBuffer(SearchPatternList, m_searchPatterns);
+	std::list<std::wstring> searchPatternList;
+	NRegistrySettings::ReadStringListFromRegistry(hKey, SETTING_PATTERN_LIST, searchPatternList);
+	ListToCircularBuffer(searchPatternList, m_searchPatterns);
 }
 
 void SearchDialogPersistentSettings::SaveExtraXMLSettings(
@@ -1340,13 +1340,13 @@ void SearchDialogPersistentSettings::SaveExtraXMLSettings(
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SORT_MODE, NXMLSettings::EncodeIntValue(static_cast<int>(m_SortMode)));
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SORT_ASCENDING, NXMLSettings::EncodeBoolValue(m_bSortAscending));
 
-	std::list<std::wstring> SearchDirectoriesList;
-	CircularBufferToList(m_searchDirectories, SearchDirectoriesList);
-	NXMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_DIRECTORY_LIST, SearchDirectoriesList);
+	std::list<std::wstring> searchDirectoriesList;
+	CircularBufferToList(m_searchDirectories, searchDirectoriesList);
+	NXMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_DIRECTORY_LIST, searchDirectoriesList);
 
-	std::list<std::wstring> SearchPatternList;
-	CircularBufferToList(m_searchPatterns, SearchPatternList);
-	NXMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_PATTERN_LIST, SearchPatternList);
+	std::list<std::wstring> searchPatternList;
+	CircularBufferToList(m_searchPatterns, searchPatternList);
+	NXMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_PATTERN_LIST, searchPatternList);
 }
 
 void SearchDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
@@ -1415,9 +1415,9 @@ template <typename T>
 void SearchDialogPersistentSettings::CircularBufferToList(const boost::circular_buffer<T> &cb,
 	std::list<T> &list)
 {
-	for(auto Item : cb)
+	for(auto item : cb)
 	{
-		list.push_back(Item);
+		list.push_back(item);
 	}
 }
 
@@ -1425,8 +1425,8 @@ template <typename T>
 void SearchDialogPersistentSettings::ListToCircularBuffer(const std::list<T> &list,
 	boost::circular_buffer<T> &cb)
 {
-	for(auto Item : list)
+	for(auto item : list)
 	{
-		cb.push_back(Item);
+		cb.push_back(item);
 	}
 }

@@ -38,12 +38,12 @@ void ListViewEdit::OnEMSetSel(WPARAM &wParam,LPARAM &lParam)
 		wParam == 0 &&
 		lParam == -1)
 	{
-		int Index = GetExtensionIndex();
+		int index = GetExtensionIndex();
 
-		if(Index != -1)
+		if(index != -1)
 		{
 			wParam = 0;
-			lParam = Index;
+			lParam = index;
 		}
 
 		m_BeginRename = false;
@@ -61,14 +61,14 @@ INT_PTR ListViewEdit::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 		{
 		case VK_F2:
 			{
-				int Index = GetExtensionIndex();
+				int index = GetExtensionIndex();
 
-				if(Index != -1)
+				if(index != -1)
 				{
 					switch(m_RenameStage)
 					{
 					case RenameStage::Filename:
-						SendMessage(m_hwnd,EM_SETSEL,Index + 1,-1);
+						SendMessage(m_hwnd,EM_SETSEL,index + 1,-1);
 						m_RenameStage = RenameStage::Extension;
 						break;
 
@@ -78,7 +78,7 @@ INT_PTR ListViewEdit::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 						break;
 
 					case RenameStage::Entire:
-						SendMessage(m_hwnd,EM_SETSEL,0,Index);
+						SendMessage(m_hwnd,EM_SETSEL,0,index);
 						m_RenameStage = RenameStage::Filename;
 						break;
 
@@ -141,7 +141,7 @@ int ListViewEdit::GetExtensionIndex()
 
 	DWORD dwAttributes = m_pexpp->GetActiveShellBrowser()->GetItemFileFindData(m_ItemIndex).dwFileAttributes;
 
-	int Index = -1;
+	int index = -1;
 
 	if((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) !=
 		FILE_ATTRIBUTE_DIRECTORY)
@@ -150,11 +150,11 @@ int ListViewEdit::GetExtensionIndex()
 		{
 			if(szFileName[i] == '.')
 			{
-				Index = i;
+				index = i;
 				break;
 			}
 		}
 	}
 
-	return Index;
+	return index;
 }

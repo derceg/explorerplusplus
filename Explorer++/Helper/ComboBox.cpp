@@ -30,7 +30,7 @@
 #include "Macros.h"
 
 
-UINT_PTR ComboBox::m_StaticSubclassCounter = 0;
+UINT_PTR ComboBox::m_staticSubclassCounter = 0;
 
 ComboBox *ComboBox::CreateNew(HWND hComboBox)
 {
@@ -39,7 +39,7 @@ ComboBox *ComboBox::CreateNew(HWND hComboBox)
 
 ComboBox::ComboBox(HWND hComboBox) :
 BaseWindow(hComboBox),
-m_SubclassCounter(m_StaticSubclassCounter++),
+m_SubclassCounter(m_staticSubclassCounter++),
 m_SuppressAutocomplete(false)
 {
 	COMBOBOXINFO cbi;
@@ -130,31 +130,31 @@ INT_PTR ComboBox::OnCBNEditChange()
 		return 1;
 	}
 
-	std::wstring CurrentText;
-	GetWindowString(m_hwnd,CurrentText);
+	std::wstring currentText;
+	GetWindowString(m_hwnd,currentText);
 
-	if(CurrentText.length() > 0)
+	if(currentText.length() > 0)
 	{
-		std::list<std::wstring> StringEntries = NComboBox::ComboBox_GetStrings(m_hwnd);
+		std::list<std::wstring> stringEntries = NComboBox::ComboBox_GetStrings(m_hwnd);
 
-		int Index = 0;
+		int index = 0;
 
-		for(const auto &StringEntry : StringEntries)
+		for(const auto &stringEntry : stringEntries)
 		{
-			if(StringEntry.compare(0,CurrentText.length(),CurrentText) == 0)
+			if(stringEntry.compare(0,currentText.length(),currentText) == 0)
 			{
-				DWORD CurrentSelection = ComboBox_GetEditSel(m_hwnd);
+				DWORD currentSelection = ComboBox_GetEditSel(m_hwnd);
 
-				DWORD SelectionStart = LOWORD(CurrentSelection);
-				DWORD SelectionEnd = HIWORD(CurrentSelection);
+				DWORD selectionStart = LOWORD(currentSelection);
+				DWORD selectionEnd = HIWORD(currentSelection);
 
 				/* Autocomplete will only be provided when typing at
 				the end of the text. */
-				if(SelectionStart == CurrentText.length() &&
-					SelectionEnd == CurrentText.length())
+				if(selectionStart == currentText.length() &&
+					selectionEnd == currentText.length())
 				{
 					/* The first matching entry will be used to autocomplete the text. */
-					ComboBox_SetCurSel(m_hwnd,Index);
+					ComboBox_SetCurSel(m_hwnd,index);
 
 					/* It would be better to select the text in reverse (i.e.
 					from the end of the string to the last character the
@@ -166,13 +166,13 @@ INT_PTR ComboBox::OnCBNEditChange()
 					position is greater).
 					Multi-line edit controls and rich edit controls don't
 					have this limitation. */
-					ComboBox_SetEditSel(m_hwnd,CurrentText.length(),-1);
+					ComboBox_SetEditSel(m_hwnd,currentText.length(),-1);
 				}
 
 				break;
 			}
 
-			Index++;
+			index++;
 		}
 	}
 

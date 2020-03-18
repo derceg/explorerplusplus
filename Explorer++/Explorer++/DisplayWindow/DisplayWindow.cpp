@@ -167,15 +167,15 @@ WPARAM wParam,LPARAM lParam)
 			{
 				PAINTSTRUCT ps;
 				HDC hdc;
-				RECT UpdateRect;
+				RECT updateRect;
 				RECT rc;
 
-				GetUpdateRect(DisplayWindow,&UpdateRect,FALSE);
+				GetUpdateRect(DisplayWindow,&updateRect,FALSE);
 				GetClientRect(DisplayWindow,&rc);
 
 				hdc = BeginPaint(DisplayWindow,&ps);
 
-				PatchBackground(hdc,&rc,&UpdateRect);
+				PatchBackground(hdc,&rc,&updateRect);
 
 				EndPaint(DisplayWindow,&ps);
 			}
@@ -297,10 +297,10 @@ WPARAM wParam,LPARAM lParam)
 			HDC hdc;
 			hdc = GetDC(DisplayWindow);
 			RECT rc;
-			RECT UpdateRect;
-			GetUpdateRect(DisplayWindow,&UpdateRect,FALSE);
+			RECT updateRect;
+			GetUpdateRect(DisplayWindow,&updateRect,FALSE);
 			GetClientRect(DisplayWindow,&rc);
-			PatchBackground(hdc,&rc,&UpdateRect);
+			PatchBackground(hdc,&rc,&updateRect);
 			ReleaseDC(DisplayWindow,hdc);
 			return 1;
 

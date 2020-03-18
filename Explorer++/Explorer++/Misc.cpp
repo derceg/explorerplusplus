@@ -46,7 +46,7 @@ void Explorerplusplus::ValidateColumns(FolderColumns &folderColumns)
 
 void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet, std::vector<Column_t> &columns)
 {
-	Column_t					Column;
+	Column_t					column;
 	int							*pColumnMap = nullptr;
 	BOOL						bFound = FALSE;
 	const Column_t				*pColumns = nullptr;
@@ -116,10 +116,10 @@ void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet, std::vector<Colum
 		/* The column is not currently in the set. Add it in. */
 		if(!bFound)
 		{
-			Column.id		= pColumns[i].id;
-			Column.bChecked	= pColumns[i].bChecked;
-			Column.iWidth	= DEFAULT_COLUMN_WIDTH;
-			columns.push_back(Column);
+			column.id		= pColumns[i].id;
+			column.bChecked	= pColumns[i].bChecked;
+			column.iWidth	= DEFAULT_COLUMN_WIDTH;
+			columns.push_back(column);
 		}
 	}
 
@@ -179,8 +179,8 @@ void Explorerplusplus::ApplyToolbarSettings(void)
 void Explorerplusplus::AdjustFolderPanePosition(void)
 {
 	RECT rcMainWindow;
-	int IndentTop		= 0;
-	int IndentBottom	= 0;
+	int indentTop		= 0;
+	int indentBottom	= 0;
 	int height;
 
 	GetClientRect(m_hContainer,&rcMainWindow);
@@ -188,20 +188,20 @@ void Explorerplusplus::AdjustFolderPanePosition(void)
 
 	if(m_hMainRebar)
 	{
-		RECT RebarRect;
+		RECT rebarRect;
 
-		GetWindowRect(m_hMainRebar,&RebarRect);
+		GetWindowRect(m_hMainRebar,&rebarRect);
 
-		IndentTop += RebarRect.bottom - RebarRect.top;
+		indentTop += rebarRect.bottom - rebarRect.top;
 	}
 
 	if(m_config->showStatusBar)
 	{
-		RECT m_hStatusBarRect;
+		RECT statusBarRect;
 
-		GetWindowRect(m_hStatusBar,&m_hStatusBarRect);
+		GetWindowRect(m_hStatusBar,&statusBarRect);
 
-		IndentBottom += m_hStatusBarRect.bottom - m_hStatusBarRect.top;
+		indentBottom += statusBarRect.bottom - statusBarRect.top;
 	}
 
 	if(m_config->showDisplayWindow && !m_config->displayWindowVertical)
@@ -209,7 +209,7 @@ void Explorerplusplus::AdjustFolderPanePosition(void)
 		RECT rcDisplayWindow;
 		GetWindowRect(m_hDisplayWindow, &rcDisplayWindow);
 
-		IndentBottom += rcDisplayWindow.bottom - rcDisplayWindow.top;
+		indentBottom += rcDisplayWindow.bottom - rcDisplayWindow.top;
 	}
 
 	if(m_config->showFolders)
@@ -217,8 +217,8 @@ void Explorerplusplus::AdjustFolderPanePosition(void)
 		RECT rcHolder;
 		GetClientRect(m_hHolder,&rcHolder);
 
-		SetWindowPos(m_hHolder, nullptr,0,IndentTop,rcHolder.right,
-		height-IndentBottom-IndentTop,SWP_SHOWWINDOW|SWP_NOZORDER);
+		SetWindowPos(m_hHolder, nullptr,0,indentTop,rcHolder.right,
+		height-indentBottom-indentTop,SWP_SHOWWINDOW|SWP_NOZORDER);
 	}
 }
 

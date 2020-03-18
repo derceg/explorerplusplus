@@ -49,18 +49,18 @@ void Explorerplusplus::OnMergeFiles()
 {
 	std::wstring currentDirectory = m_pActiveShellBrowser->GetDirectory();
 
-	std::list<std::wstring>	FullFilenameList;
+	std::list<std::wstring>	fullFilenameList;
 	int iItem = -1;
 
 	while((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
 	{
 		TCHAR szFullFilename[MAX_PATH];
 		m_pActiveShellBrowser->GetItemFullName(iItem, szFullFilename, SIZEOF_ARRAY(szFullFilename));
-		FullFilenameList.emplace_back(szFullFilename);
+		fullFilenameList.emplace_back(szFullFilename);
 	}
 
 	MergeFilesDialog mergeFilesDialog(m_hLanguageModule, m_hContainer, this, currentDirectory,
-		FullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
+		fullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
 	mergeFilesDialog.ShowModalDialog();
 }
 
@@ -80,18 +80,18 @@ void Explorerplusplus::OnSplitFile()
 
 void Explorerplusplus::OnDestroyFiles()
 {
-	std::list<std::wstring>	FullFilenameList;
+	std::list<std::wstring>	fullFilenameList;
 	int iItem = -1;
 
 	while((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
 	{
 		TCHAR szFullFilename[MAX_PATH];
 		m_pActiveShellBrowser->GetItemFullName(iItem, szFullFilename, SIZEOF_ARRAY(szFullFilename));
-		FullFilenameList.emplace_back(szFullFilename);
+		fullFilenameList.emplace_back(szFullFilename);
 	}
 
 	DestroyFilesDialog destroyFilesDialog(m_hLanguageModule, m_hContainer,
-		FullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
+		fullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
 	destroyFilesDialog.ShowModalDialog();
 }
 
@@ -197,14 +197,14 @@ void Explorerplusplus::OnAbout()
 
 void Explorerplusplus::OnSaveDirectoryListing() const
 {
-	TCHAR FileName[MAX_PATH];
-	LoadString(m_hLanguageModule, IDS_GENERAL_DIRECTORY_LISTING_FILENAME, FileName, SIZEOF_ARRAY(FileName));
-	StringCchCat(FileName, SIZEOF_ARRAY(FileName), _T(".txt"));
-	BOOL bSaveNameRetrieved = GetFileNameFromUser(m_hContainer, FileName, SIZEOF_ARRAY(FileName), m_CurrentDirectory.c_str());
+	TCHAR fileName[MAX_PATH];
+	LoadString(m_hLanguageModule, IDS_GENERAL_DIRECTORY_LISTING_FILENAME, fileName, SIZEOF_ARRAY(fileName));
+	StringCchCat(fileName, SIZEOF_ARRAY(fileName), _T(".txt"));
+	BOOL bSaveNameRetrieved = GetFileNameFromUser(m_hContainer, fileName, SIZEOF_ARRAY(fileName), m_CurrentDirectory.c_str());
 
 	if(bSaveNameRetrieved)
 	{
-		NFileOperations::SaveDirectoryListing(m_CurrentDirectory, FileName);
+		NFileOperations::SaveDirectoryListing(m_CurrentDirectory, fileName);
 	}
 }
 
@@ -247,7 +247,7 @@ void Explorerplusplus::OnCreateNewFolder()
 
 void Explorerplusplus::OnResolveLink()
 {
-	TCHAR	ShortcutFileName[MAX_PATH];
+	TCHAR	shortcutFileName[MAX_PATH];
 	TCHAR	szFullFileName[MAX_PATH];
 	TCHAR	szPath[MAX_PATH];
 	HRESULT	hr;
@@ -257,9 +257,9 @@ void Explorerplusplus::OnResolveLink()
 
 	if(iItem != -1)
 	{
-		m_pActiveShellBrowser->GetItemFullName(iItem, ShortcutFileName, SIZEOF_ARRAY(ShortcutFileName));
+		m_pActiveShellBrowser->GetItemFullName(iItem, shortcutFileName, SIZEOF_ARRAY(shortcutFileName));
 
-		hr = NFileOperations::ResolveLink(m_hContainer, 0, ShortcutFileName, szFullFileName, SIZEOF_ARRAY(szFullFileName));
+		hr = NFileOperations::ResolveLink(m_hContainer, 0, shortcutFileName, szFullFileName, SIZEOF_ARRAY(szFullFileName));
 
 		if(hr == S_OK)
 		{

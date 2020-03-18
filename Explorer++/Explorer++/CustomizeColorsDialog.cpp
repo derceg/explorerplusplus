@@ -60,9 +60,9 @@ INT_PTR CustomizeColorsDialog::OnInitDialog()
 
 	int iItem = 0;
 
-	for(const auto &ColorRule : *m_pColorRuleList)
+	for(const auto &colorRule : *m_pColorRuleList)
 	{
-		InsertColorRuleIntoListView(hListView,ColorRule,iItem++);
+		InsertColorRuleIntoListView(hListView,colorRule,iItem++);
 	}
 
 	SetFocus(hListView);
@@ -82,52 +82,52 @@ void CustomizeColorsDialog::GetResizableControlInformation(BaseDialog::DialogSiz
 {
 	dsc = BaseDialog::DIALOG_SIZE_CONSTRAINT_NONE;
 
-	ResizableDialog::Control_t Control;
+	ResizableDialog::Control_t control;
 
-	Control.iID = IDC_LISTVIEW_COLORRULES;
-	Control.Type = ResizableDialog::TYPE_RESIZE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
-	ControlList.push_back(Control);
+	control.iID = IDC_LISTVIEW_COLORRULES;
+	control.Type = ResizableDialog::TYPE_RESIZE;
+	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(control);
 
-	Control.iID = IDC_BUTTON_DELETE;
-	Control.Type = ResizableDialog::TYPE_MOVE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_X;
-	ControlList.push_back(Control);
+	control.iID = IDC_BUTTON_DELETE;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(control);
 
-	Control.iID = IDC_BUTTON_MOVEDOWN;
-	Control.Type = ResizableDialog::TYPE_MOVE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_X;
-	ControlList.push_back(Control);
+	control.iID = IDC_BUTTON_MOVEDOWN;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(control);
 
-	Control.iID = IDC_BUTTON_MOVEUP;
-	Control.Type = ResizableDialog::TYPE_MOVE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_X;
-	ControlList.push_back(Control);
+	control.iID = IDC_BUTTON_MOVEUP;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(control);
 
-	Control.iID = IDC_BUTTON_EDIT;
-	Control.Type = ResizableDialog::TYPE_MOVE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_X;
-	ControlList.push_back(Control);
+	control.iID = IDC_BUTTON_EDIT;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(control);
 
-	Control.iID = IDC_BUTTON_NEW;
-	Control.Type = ResizableDialog::TYPE_MOVE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_X;
-	ControlList.push_back(Control);
+	control.iID = IDC_BUTTON_NEW;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(control);
 
-	Control.iID = IDOK;
-	Control.Type = ResizableDialog::TYPE_MOVE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
-	ControlList.push_back(Control);
+	control.iID = IDOK;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(control);
 
-	Control.iID = IDCANCEL;
-	Control.Type = ResizableDialog::TYPE_MOVE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
-	ControlList.push_back(Control);
+	control.iID = IDCANCEL;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(control);
 
-	Control.iID = IDC_GRIPPER;
-	Control.Type = ResizableDialog::TYPE_MOVE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
-	ControlList.push_back(Control);
+	control.iID = IDC_GRIPPER;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(control);
 }
 
 void CustomizeColorsDialog::InsertColorRuleIntoListView(HWND hListView,const NColorRuleHelper::ColorRule_t &ColorRule,
@@ -229,18 +229,18 @@ void CustomizeColorsDialog::OnNew()
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_COLORRULES);
 
-	NColorRuleHelper::ColorRule_t ColorRule;
+	NColorRuleHelper::ColorRule_t colorRule;
 
-	ColorRuleDialog colorRuleDialog(GetInstance(), m_hDlg, &ColorRule, FALSE);
+	ColorRuleDialog colorRuleDialog(GetInstance(), m_hDlg, &colorRule, FALSE);
 
 	INT_PTR iRet = colorRuleDialog.ShowModalDialog();
 
 	if(iRet == 1)
 	{
-		m_pColorRuleList->push_back(ColorRule);
+		m_pColorRuleList->push_back(colorRule);
 
 		int nItems = ListView_GetItemCount(hListView);
-		InsertColorRuleIntoListView(hListView,ColorRule,nItems);
+		InsertColorRuleIntoListView(hListView,colorRule,nItems);
 	}
 
 	SetFocus(m_hDlg);
@@ -261,9 +261,9 @@ void CustomizeColorsDialog::OnEdit()
 
 void CustomizeColorsDialog::EditColorRule(int iSelected)
 {
-	ColorRuleDialog ColorRuleDialog(GetInstance(), m_hDlg, &(*m_pColorRuleList)[iSelected], TRUE);
+	ColorRuleDialog colorRuleDialog(GetInstance(), m_hDlg, &(*m_pColorRuleList)[iSelected], TRUE);
 
-	INT_PTR iRet = ColorRuleDialog.ShowModalDialog();
+	INT_PTR iRet = colorRuleDialog.ShowModalDialog();
 
 	if(iRet == 1)
 	{

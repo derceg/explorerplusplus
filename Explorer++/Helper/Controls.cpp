@@ -31,12 +31,12 @@ HWND CreateTreeView(HWND hParent, DWORD dwStyle)
 	if(hTreeView != NULL)
 	{
 		/* Retrieve the small version of the system image list. */
-		HIMAGELIST SmallIcons;
-		BOOL bRet = Shell_GetImageLists(NULL, &SmallIcons);
+		HIMAGELIST smallIcons;
+		BOOL bRet = Shell_GetImageLists(NULL, &smallIcons);
 
 		if(bRet)
 		{
-			TreeView_SetImageList(hTreeView, SmallIcons, TVSIL_NORMAL);
+			TreeView_SetImageList(hTreeView, smallIcons, TVSIL_NORMAL);
 		}
 	}
 
@@ -99,22 +99,22 @@ BOOL PinStatusBar(HWND hStatusBar, int Width, int Height)
 
 BOOL AddPathsToComboBoxEx(HWND hComboBoxEx, const TCHAR *Path)
 {
-	HIMAGELIST SmallIcons;
-	BOOL bRet = Shell_GetImageLists(NULL, &SmallIcons);
+	HIMAGELIST smallIcons;
+	BOOL bRet = Shell_GetImageLists(NULL, &smallIcons);
 
 	if(!bRet)
 	{
 		return FALSE;
 	}
 
-	SendMessage(hComboBoxEx, CBEM_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(SmallIcons));
+	SendMessage(hComboBoxEx, CBEM_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(smallIcons));
 
 	/* Remove all items that are currently in the list. */
 	SendMessage(hComboBoxEx, CB_RESETCONTENT, 0, 0);
 
-	TCHAR FindPath[MAX_PATH];
-	StringCchCopy(FindPath, SIZEOF_ARRAY(FindPath), Path);
-	bRet = PathAppend(FindPath, _T("*"));
+	TCHAR findPath[MAX_PATH];
+	StringCchCopy(findPath, SIZEOF_ARRAY(findPath), Path);
+	bRet = PathAppend(findPath, _T("*"));
 
 	if(!bRet)
 	{
@@ -122,7 +122,7 @@ BOOL AddPathsToComboBoxEx(HWND hComboBoxEx, const TCHAR *Path)
 	}
 
 	WIN32_FIND_DATA wfd;
-	HANDLE hFirstFile = FindFirstFile(FindPath, &wfd);
+	HANDLE hFirstFile = FindFirstFile(findPath, &wfd);
 
 	if(hFirstFile == INVALID_HANDLE_VALUE)
 	{
@@ -136,8 +136,8 @@ BOOL AddPathsToComboBoxEx(HWND hComboBoxEx, const TCHAR *Path)
 		if((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY &&
 			StrCmp(wfd.cFileName, _T("..")) != 0)
 		{
-			TCHAR FullFileName[MAX_PATH];
-			LPTSTR szRet = PathCombine(FullFileName, Path, wfd.cFileName);
+			TCHAR fullFileName[MAX_PATH];
+			LPTSTR szRet = PathCombine(fullFileName, Path, wfd.cFileName);
 
 			if(szRet == NULL)
 			{

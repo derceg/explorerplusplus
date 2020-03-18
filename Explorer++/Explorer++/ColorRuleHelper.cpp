@@ -28,22 +28,22 @@ namespace
 
 std::vector<NColorRuleHelper::ColorRule_t> NColorRuleHelper::GetDefaultColorRules()
 {
-	std::vector<ColorRule_t> ColorRules;
-	ColorRule_t ColorRule;
+	std::vector<ColorRule_t> colorRules;
+	ColorRule_t colorRule;
 
-	ColorRule.strDescription		= ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_GENERAL_COLOR_RULE_COMPRESSED);
-	ColorRule.caseInsensitive		= FALSE;
-	ColorRule.rgbColour				= CF_COMPRESSED;
-	ColorRule.dwFilterAttributes	= FILE_ATTRIBUTE_COMPRESSED;
-	ColorRules.push_back(ColorRule);
+	colorRule.strDescription		= ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_GENERAL_COLOR_RULE_COMPRESSED);
+	colorRule.caseInsensitive		= FALSE;
+	colorRule.rgbColour				= CF_COMPRESSED;
+	colorRule.dwFilterAttributes	= FILE_ATTRIBUTE_COMPRESSED;
+	colorRules.push_back(colorRule);
 
-	ColorRule.strDescription		= ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_GENERAL_COLOR_RULE_ENCRYPTED);
-	ColorRule.caseInsensitive		= FALSE;
-	ColorRule.rgbColour				= CF_ENCRYPTED;
-	ColorRule.dwFilterAttributes	= FILE_ATTRIBUTE_ENCRYPTED;
-	ColorRules.push_back(ColorRule);
+	colorRule.strDescription		= ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_GENERAL_COLOR_RULE_ENCRYPTED);
+	colorRule.caseInsensitive		= FALSE;
+	colorRule.rgbColour				= CF_ENCRYPTED;
+	colorRule.dwFilterAttributes	= FILE_ATTRIBUTE_ENCRYPTED;
+	colorRules.push_back(colorRule);
 
-	return ColorRules;
+	return colorRules;
 }
 
 void NColorRuleHelper::LoadColorRulesFromRegistry(std::vector<NColorRuleHelper::ColorRule_t> &ColorRules)
@@ -70,28 +70,28 @@ namespace
 		while(RegEnumKeyEx(hKey,dwIndex++,szKeyName,&dwKeyLength, nullptr, nullptr, nullptr, nullptr) == ERROR_SUCCESS)
 		{
 			HKEY hKeyChild;
-			LONG Res = RegOpenKeyEx(hKey,szKeyName,0,KEY_READ,&hKeyChild);
+			LONG res = RegOpenKeyEx(hKey,szKeyName,0,KEY_READ,&hKeyChild);
 
-			if(Res == ERROR_SUCCESS)
+			if(res == ERROR_SUCCESS)
 			{
-				NColorRuleHelper::ColorRule_t ColorRule;
+				NColorRuleHelper::ColorRule_t colorRule;
 
-				ColorRule.caseInsensitive = FALSE;
+				colorRule.caseInsensitive = FALSE;
 
 				LONG lDescriptionStatus = NRegistrySettings::ReadStringFromRegistry(hKeyChild,
-					_T("Description"),ColorRule.strDescription);
+					_T("Description"),colorRule.strDescription);
 				LONG lFilenamePatternStatus = NRegistrySettings::ReadStringFromRegistry(hKeyChild,
-					_T("FilenamePattern"),ColorRule.strFilterPattern);
-				NRegistrySettings::ReadDwordFromRegistry(hKeyChild,_T("CaseInsensitive"),(LPDWORD)&ColorRule.caseInsensitive);
-				NRegistrySettings::ReadDwordFromRegistry(hKeyChild,_T("Attributes"),&ColorRule.dwFilterAttributes);
+					_T("FilenamePattern"),colorRule.strFilterPattern);
+				NRegistrySettings::ReadDwordFromRegistry(hKeyChild,_T("CaseInsensitive"),(LPDWORD)&colorRule.caseInsensitive);
+				NRegistrySettings::ReadDwordFromRegistry(hKeyChild,_T("Attributes"),&colorRule.dwFilterAttributes);
 
 				DWORD dwType = REG_BINARY;
-				DWORD dwSize = sizeof(ColorRule.rgbColour);
-				RegQueryValueEx(hKeyChild,_T("Color"),nullptr,&dwType,reinterpret_cast<LPBYTE>(&ColorRule.rgbColour),&dwSize);
+				DWORD dwSize = sizeof(colorRule.rgbColour);
+				RegQueryValueEx(hKeyChild,_T("Color"),nullptr,&dwType,reinterpret_cast<LPBYTE>(&colorRule.rgbColour),&dwSize);
 
 				if(lDescriptionStatus == ERROR_SUCCESS && lFilenamePatternStatus == ERROR_SUCCESS)
 				{
-					ColorRules.push_back(ColorRule);
+					ColorRules.push_back(colorRule);
 				}
 
 				RegCloseKey(hKeyChild);
@@ -114,9 +114,9 @@ void NColorRuleHelper::SaveColorRulesToRegistry(const std::vector<NColorRuleHelp
 	{
 		int iCount = 0;
 
-		for(const auto &ColorRule : ColorRules)
+		for(const auto &colorRule : ColorRules)
 		{
-			SaveColorRulesToRegistryInternal(hKey,ColorRule,iCount);
+			SaveColorRulesToRegistryInternal(hKey,colorRule,iCount);
 			iCount++;
 		}
 
@@ -132,9 +132,9 @@ namespace
 		_itow_s(iCount,szKeyName,SIZEOF_ARRAY(szKeyName),10);
 
 		HKEY hKeyChild;
-		LONG Res = RegCreateKeyEx(hKey,szKeyName,0, nullptr,REG_OPTION_NON_VOLATILE,KEY_WRITE, nullptr,&hKeyChild, nullptr);
+		LONG res = RegCreateKeyEx(hKey,szKeyName,0, nullptr,REG_OPTION_NON_VOLATILE,KEY_WRITE, nullptr,&hKeyChild, nullptr);
 
-		if(Res == ERROR_SUCCESS)
+		if(res == ERROR_SUCCESS)
 		{
 			NRegistrySettings::SaveStringToRegistry(hKeyChild,_T("Description"),ColorRule.strDescription.c_str());
 			NRegistrySettings::SaveStringToRegistry(hKeyChild,_T("FilenamePattern"),ColorRule.strFilterPattern.c_str());
@@ -179,7 +179,7 @@ namespace
 		IXMLDOMNamedNodeMap *am = nullptr;
 		IXMLDOMNode *pAttributeNode = nullptr;
 		IXMLDOMNode *pNextSibling = nullptr;
-		NColorRuleHelper::ColorRule_t ColorRule;
+		NColorRuleHelper::ColorRule_t colorRule;
 		BOOL bDescriptionFound = FALSE;
 		BOOL bFilenamePatternFound = FALSE;
 		BSTR bstrName;
@@ -197,7 +197,7 @@ namespace
 
 		am->get_length(&nAttributeNodes);
 
-		ColorRule.caseInsensitive = FALSE;
+		colorRule.caseInsensitive = FALSE;
 
 		for(long i = 0;i < nAttributeNodes;i++)
 		{
@@ -208,23 +208,23 @@ namespace
 
 			if(lstrcmpi(bstrName,L"Name") == 0)
 			{
-				ColorRule.strDescription = _bstr_t(bstrValue);
+				colorRule.strDescription = _bstr_t(bstrValue);
 
 				bDescriptionFound = TRUE;
 			}
 			else if(lstrcmpi(bstrName,L"FilenamePattern") == 0)
 			{
-				ColorRule.strFilterPattern = _bstr_t(bstrValue);
+				colorRule.strFilterPattern = _bstr_t(bstrValue);
 
 				bFilenamePatternFound = TRUE;
 			}
 			else if(lstrcmpi(bstrName,L"CaseInsensitive") == 0)
 			{
-				ColorRule.caseInsensitive = NXMLSettings::DecodeBoolValue(bstrValue);
+				colorRule.caseInsensitive = NXMLSettings::DecodeBoolValue(bstrValue);
 			}
 			else if(lstrcmpi(bstrName,L"Attributes") == 0)
 			{
-				ColorRule.dwFilterAttributes = NXMLSettings::DecodeIntValue(bstrValue);
+				colorRule.dwFilterAttributes = NXMLSettings::DecodeIntValue(bstrValue);
 			}
 			else if(lstrcmpi(bstrName,L"r") == 0)
 			{
@@ -242,9 +242,9 @@ namespace
 
 		if(bDescriptionFound && bFilenamePatternFound)
 		{
-			ColorRule.rgbColour = RGB(r,g,b);
+			colorRule.rgbColour = RGB(r,g,b);
 
-			ColorRules.push_back(ColorRule);
+			ColorRules.push_back(colorRule);
 		}
 
 		hr = pNode->get_nextSibling(&pNextSibling);
@@ -274,9 +274,9 @@ IXMLDOMElement *pRoot,const std::vector<NColorRuleHelper::ColorRule_t> &ColorRul
 	pXMLDom->createElement(bstr,&pe);
 	SysFreeString(bstr);
 
-	for(const auto &ColorRule : ColorRules)
+	for(const auto &colorRule : ColorRules)
 	{
-		SaveColorRulesToXMLInternal(pXMLDom,pe,ColorRule);
+		SaveColorRulesToXMLInternal(pXMLDom,pe,colorRule);
 	}
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);

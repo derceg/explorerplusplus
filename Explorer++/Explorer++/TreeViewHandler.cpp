@@ -30,7 +30,7 @@ LRESULT CALLBACK TreeViewSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM l
 
 /* Used to keep track of which item was selected in
 the treeview control. */
-HTREEITEM	g_NewSelectionItem;
+HTREEITEM	g_newSelectionItem;
 
 void Explorerplusplus::CreateFolderControls(void)
 {
@@ -327,21 +327,21 @@ void Explorerplusplus::OnTreeViewCopy(BOOL bCopy)
 	{
 		auto pidl = m_shellTreeView->GetItemPidl(hItem);
 
-		std::list<std::wstring> FileNameList;
+		std::list<std::wstring> fileNameList;
 		TCHAR szFullFileName[MAX_PATH];
 
 		GetDisplayName(pidl.get(),szFullFileName,SIZEOF_ARRAY(szFullFileName),SHGDN_FORPARSING);
 
 		std::wstring stringFileName(szFullFileName);
-		FileNameList.push_back(stringFileName);
+		fileNameList.push_back(stringFileName);
 
 		if(bCopy)
 		{
-			hr = CopyFiles(FileNameList,&pClipboardDataObject);
+			hr = CopyFiles(fileNameList,&pClipboardDataObject);
 		}
 		else
 		{
-			hr = CutFiles(FileNameList,&pClipboardDataObject);
+			hr = CutFiles(fileNameList,&pClipboardDataObject);
 
 			if(SUCCEEDED(hr))
 			{
@@ -365,7 +365,7 @@ void Explorerplusplus::OnTreeViewCopy(BOOL bCopy)
 
 void Explorerplusplus::OnTreeViewHolderWindowTimer(void)
 {
-	auto pidlDirectory = m_shellTreeView->GetItemPidl(g_NewSelectionItem);
+	auto pidlDirectory = m_shellTreeView->GetItemPidl(g_newSelectionItem);
 	auto pidlCurrentDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
 	if(!m_bSelectingTreeViewDirectory && !m_bTreeViewRightClick &&
@@ -376,7 +376,7 @@ void Explorerplusplus::OnTreeViewHolderWindowTimer(void)
 
 		if(m_config->treeViewAutoExpandSelected)
 		{
-			TreeView_Expand(m_hTreeView,g_NewSelectionItem,TVE_EXPAND);
+			TreeView_Expand(m_hTreeView,g_newSelectionItem,TVE_EXPAND);
 		}
 	}
 
@@ -398,7 +398,7 @@ void Explorerplusplus::OnTreeViewSelChanged(LPARAM lParam)
 
 			tvItem = &pnmtv->itemNew;
 
-			g_NewSelectionItem = tvItem->hItem;
+			g_newSelectionItem = tvItem->hItem;
 
 			if(m_config->treeViewDelayEnabled)
 			{
@@ -436,7 +436,7 @@ int Explorerplusplus::OnTreeViewBeginLabelEdit(LPARAM lParam)
 int Explorerplusplus::OnTreeViewEndLabelEdit(LPARAM lParam)
 {
 	NMTVDISPINFO	*pdi = nullptr;
-	TCHAR			NewFileName[MAX_PATH];
+	TCHAR			newFileName[MAX_PATH];
 
 	pdi = (NMTVDISPINFO *)lParam;
 
@@ -448,24 +448,24 @@ int Explorerplusplus::OnTreeViewEndLabelEdit(LPARAM lParam)
 	/* Build the new filename from the text entered
 	and the parent directory component of the old
 	filename. */
-	StringCchCopy(NewFileName,SIZEOF_ARRAY(NewFileName),m_OldTreeViewFileName);
-	PathRemoveFileSpec(NewFileName);
-	BOOL bRes = PathAppend(NewFileName,pdi->item.pszText);
+	StringCchCopy(newFileName,SIZEOF_ARRAY(newFileName),m_OldTreeViewFileName);
+	PathRemoveFileSpec(newFileName);
+	BOOL bRes = PathAppend(newFileName,pdi->item.pszText);
 
 	if(!bRes)
 	{
 		return FALSE;
 	}
 
-	FileActionHandler::RenamedItem_t RenamedItem;
-	RenamedItem.strOldFilename = m_OldTreeViewFileName;
-	RenamedItem.strNewFilename = NewFileName;
+	FileActionHandler::RenamedItem_t renamedItem;
+	renamedItem.strOldFilename = m_OldTreeViewFileName;
+	renamedItem.strNewFilename = newFileName;
 
-	TrimStringRight(RenamedItem.strNewFilename,_T(" "));
+	TrimStringRight(renamedItem.strNewFilename,_T(" "));
 
-	std::list<FileActionHandler::RenamedItem_t> RenamedItemList;
-	RenamedItemList.push_back(RenamedItem);
-	m_FileActionHandler.RenameFiles(RenamedItemList);
+	std::list<FileActionHandler::RenamedItem_t> renamedItemList;
+	renamedItemList.push_back(renamedItem);
+	m_FileActionHandler.RenameFiles(renamedItemList);
 
 	return TRUE;
 }

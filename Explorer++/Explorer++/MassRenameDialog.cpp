@@ -127,37 +127,37 @@ void MassRenameDialog::GetResizableControlInformation(BaseDialog::DialogSizeCons
 {
 	dsc = BaseDialog::DIALOG_SIZE_CONSTRAINT_NONE;
 
-	ResizableDialog::Control_t Control;
+	ResizableDialog::Control_t control;
 
-	Control.iID = IDC_MASSRENAME_EDIT;
-	Control.Type = ResizableDialog::TYPE_RESIZE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_X;
-	ControlList.push_back(Control);
+	control.iID = IDC_MASSRENAME_EDIT;
+	control.Type = ResizableDialog::TYPE_RESIZE;
+	control.Constraint = ResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(control);
 
-	Control.iID = IDC_MASSRENAME_MORE;
-	Control.Type = ResizableDialog::TYPE_MOVE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_X;
-	ControlList.push_back(Control);
+	control.iID = IDC_MASSRENAME_MORE;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(control);
 
-	Control.iID = IDC_MASSRENAME_FILELISTVIEW;
-	Control.Type = ResizableDialog::TYPE_RESIZE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
-	ControlList.push_back(Control);
+	control.iID = IDC_MASSRENAME_FILELISTVIEW;
+	control.Type = ResizableDialog::TYPE_RESIZE;
+	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(control);
 
-	Control.iID = IDOK;
-	Control.Type = ResizableDialog::TYPE_MOVE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
-	ControlList.push_back(Control);
+	control.iID = IDOK;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(control);
 
-	Control.iID = IDCANCEL;
-	Control.Type = ResizableDialog::TYPE_MOVE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
-	ControlList.push_back(Control);
+	control.iID = IDCANCEL;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(control);
 
-	Control.iID = IDC_GRIPPER;
-	Control.Type = ResizableDialog::TYPE_MOVE;
-	Control.Constraint = ResizableDialog::CONSTRAINT_NONE;
-	ControlList.push_back(Control);
+	control.iID = IDC_GRIPPER;
+	control.Type = ResizableDialog::TYPE_MOVE;
+	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(control);
 }
 
 INT_PTR MassRenameDialog::OnCommand(WPARAM wParam,LPARAM lParam)
@@ -286,7 +286,7 @@ void MassRenameDialog::OnOk()
 		return;
 	}
 
-	std::list<FileActionHandler::RenamedItem_t> RenamedItemList;
+	std::list<FileActionHandler::RenamedItem_t> renamedItemList;
 	int iItem = 0;
 
 	for(const auto &strOldFilename : m_FullFilenameList)
@@ -304,15 +304,15 @@ void MassRenameDialog::OnOk()
 		PathRemoveFileSpec(szFilename);
 		strNewFilename = szFilename + std::wstring(_T("\\")) + strNewFilename;
 
-		FileActionHandler::RenamedItem_t RenamedItem;
-		RenamedItem.strOldFilename = strOldFilename;
-		RenamedItem.strNewFilename = strNewFilename;
-		RenamedItemList.push_back(RenamedItem);
+		FileActionHandler::RenamedItem_t renamedItem;
+		renamedItem.strOldFilename = strOldFilename;
+		renamedItem.strNewFilename = strNewFilename;
+		renamedItemList.push_back(renamedItem);
 
 		iItem++;
 	}
 
-	m_pFileActionHandler->RenameFiles(RenamedItemList);
+	m_pFileActionHandler->RenameFiles(renamedItemList);
 
 	EndDialog(m_hDlg,1);
 }

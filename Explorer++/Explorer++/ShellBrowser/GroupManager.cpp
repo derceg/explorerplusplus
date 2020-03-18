@@ -418,8 +418,8 @@ std::wstring ShellBrowser::DetermineItemNameGroup(const BasicItemInfo_t &itemInf
  */
 std::wstring ShellBrowser::DetermineItemSizeGroup(const BasicItemInfo_t &itemInfo) const
 {
-	TCHAR *SizeGroups[] = {_T("Folders"),_T("Tiny"),_T("Small"),_T("Medium"),_T("Large"),_T("Huge")};
-	int SizeGroupLimits[] = {0,0,32 * KBYTE,100 * KBYTE,MBYTE,10 * MBYTE};
+	TCHAR *sizeGroups[] = {_T("Folders"),_T("Tiny"),_T("Small"),_T("Medium"),_T("Large"),_T("Huge")};
+	int sizeGroupLimits[] = {0,0,32 * KBYTE,100 * KBYTE,MBYTE,10 * MBYTE};
 	int nGroups = 6;
 	int iSize;
 	int i;
@@ -434,17 +434,17 @@ std::wstring ShellBrowser::DetermineItemSizeGroup(const BasicItemInfo_t &itemInf
 	{
 		i = nGroups - 1;
 
-		double FileSize = itemInfo.wfd.nFileSizeLow + (itemInfo.wfd.nFileSizeHigh * pow(2.0,32.0));
+		double fileSize = itemInfo.wfd.nFileSizeLow + (itemInfo.wfd.nFileSizeHigh * pow(2.0,32.0));
 
 		/* Check which of the size groups this item belongs to. */
-		while(FileSize < SizeGroupLimits[i]
+		while(fileSize < sizeGroupLimits[i]
 		&& i > 0)
 			i--;
 
 		iSize = i;
 	}
 
-	return SizeGroups[iSize];
+	return sizeGroups[iSize];
 }
 
 /*
@@ -458,23 +458,23 @@ std::wstring ShellBrowser::DetermineItemTotalSizeGroup(const BasicItemInfo_t &it
 {
 	IShellFolder *pShellFolder	= nullptr;
 	PCITEMID_CHILD pidlRelative	= nullptr;
-	TCHAR *SizeGroups[] = {_T("Unspecified"),_T("Small"),_T("Medium"),_T("Huge"),_T("Gigantic")};
+	TCHAR *sizeGroups[] = {_T("Unspecified"),_T("Small"),_T("Medium"),_T("Huge"),_T("Gigantic")};
 	TCHAR szItem[MAX_PATH];
 	STRRET str;
 	ULARGE_INTEGER nTotalBytes;
 	ULARGE_INTEGER nFreeBytes;
 	BOOL bRoot;
 	BOOL bRes = FALSE;
-	ULARGE_INTEGER TotalSizeGroupLimits[6];
+	ULARGE_INTEGER totalSizeGroupLimits[6];
 	int nGroups = 5;
 	int iSize = 0;
 	int i;
 
-	TotalSizeGroupLimits[0].QuadPart	= 0;
-	TotalSizeGroupLimits[1].QuadPart	= 0;
-	TotalSizeGroupLimits[2].QuadPart	= GBYTE;
-	TotalSizeGroupLimits[3].QuadPart	= 20 * TotalSizeGroupLimits[2].QuadPart;
-	TotalSizeGroupLimits[4].QuadPart	= 100 * TotalSizeGroupLimits[2].QuadPart;
+	totalSizeGroupLimits[0].QuadPart	= 0;
+	totalSizeGroupLimits[1].QuadPart	= 0;
+	totalSizeGroupLimits[2].QuadPart	= GBYTE;
+	totalSizeGroupLimits[3].QuadPart	= 20 * totalSizeGroupLimits[2].QuadPart;
+	totalSizeGroupLimits[4].QuadPart	= 100 * totalSizeGroupLimits[2].QuadPart;
 
 	SHBindToParent(itemInfo.pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
@@ -491,7 +491,7 @@ std::wstring ShellBrowser::DetermineItemTotalSizeGroup(const BasicItemInfo_t &it
 
 		i = nGroups - 1;
 
-		while(nTotalBytes.QuadPart < TotalSizeGroupLimits[i].QuadPart && i > 0)
+		while(nTotalBytes.QuadPart < totalSizeGroupLimits[i].QuadPart && i > 0)
 			i--;
 
 		iSize = i;
@@ -502,7 +502,7 @@ std::wstring ShellBrowser::DetermineItemTotalSizeGroup(const BasicItemInfo_t &it
 		iSize = 0;
 	}
 
-	return SizeGroups[iSize];
+	return sizeGroups[iSize];
 }
 
 std::wstring ShellBrowser::DetermineItemTypeGroupVirtual(const BasicItemInfo_t &itemInfo) const
@@ -858,19 +858,19 @@ std::wstring ShellBrowser::DetermineItemNetworkStatus(const BasicItemInfo_t &ite
 
 void ShellBrowser::InsertItemIntoGroup(int iItem,int iGroupId)
 {
-	LVITEM Item;
+	LVITEM item;
 
 	/* Move the item into the group. */
-	Item.mask		= LVIF_GROUPID;
-	Item.iItem		= iItem;
-	Item.iSubItem	= 0;
-	Item.iGroupId	= iGroupId;
-	ListView_SetItem(m_hListView,&Item);
+	item.mask		= LVIF_GROUPID;
+	item.iItem		= iItem;
+	item.iSubItem	= 0;
+	item.iGroupId	= iGroupId;
+	ListView_SetItem(m_hListView,&item);
 }
 
 void ShellBrowser::MoveItemsIntoGroups(void)
 {
-	LVITEM Item;
+	LVITEM item;
 	int nItems;
 	int iGroupId;
 	int i = 0;
@@ -887,12 +887,12 @@ void ShellBrowser::MoveItemsIntoGroups(void)
 
 	for(i = 0;i < nItems ;i++)
 	{
-		Item.mask		= LVIF_PARAM;
-		Item.iItem		= i;
-		Item.iSubItem	= 0;
-		ListView_GetItem(m_hListView,&Item);
+		item.mask		= LVIF_PARAM;
+		item.iItem		= i;
+		item.iSubItem	= 0;
+		ListView_GetItem(m_hListView,&item);
 
-		iGroupId = DetermineItemGroup((int)Item.lParam);
+		iGroupId = DetermineItemGroup((int)item.lParam);
 
 		InsertItemIntoGroup(i,iGroupId);
 	}

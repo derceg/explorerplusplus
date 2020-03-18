@@ -251,12 +251,12 @@ TCHAR *NFileOperations::BuildFilenameList(const std::list<std::wstring> &Filenam
 	TCHAR *pszFilenames = NULL;
 	int iTotalSize = 0;
 
-	for(const auto &Filename : FilenameList)
+	for(const auto &filename : FilenameList)
 	{
 		pszFilenames = reinterpret_cast<TCHAR *>(realloc(pszFilenames,
-			(iTotalSize + Filename.size() + 1) * sizeof(TCHAR)));
-		memcpy(pszFilenames + iTotalSize,Filename.c_str(),(Filename.size() + 1) * sizeof(TCHAR));
-		iTotalSize += static_cast<int>(Filename.size() + 1);
+			(iTotalSize + filename.size() + 1) * sizeof(TCHAR)));
+		memcpy(pszFilenames + iTotalSize,filename.c_str(),(filename.size() + 1) * sizeof(TCHAR));
+		iTotalSize += static_cast<int>(filename.size() + 1);
 	}
 
 	/* The list of strings must end with a second
@@ -325,8 +325,8 @@ BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,cons
 	WIN32_FIND_DATA wfd;
 	HANDLE hFirstFile = FindFirstFile(strSearch.c_str(),&wfd);
 
-	std::list<std::wstring> FolderList;
-	std::list<std::wstring> FileList;
+	std::list<std::wstring> folderList;
+	std::list<std::wstring> fileList;
 	ULARGE_INTEGER ulTotalSize;
 
 	ulTotalSize.QuadPart = 0;
@@ -341,11 +341,11 @@ BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,cons
 			if((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
 			FILE_ATTRIBUTE_DIRECTORY)
 			{
-				FolderList.push_back(wfd.cFileName);
+				folderList.push_back(wfd.cFileName);
 			}
 			else
 			{
-				FileList.push_back(wfd.cFileName);
+				fileList.push_back(wfd.cFileName);
 
 				ulFileSize.LowPart = wfd.nFileSizeLow;
 				ulFileSize.HighPart = wfd.nFileSizeHigh;
@@ -362,11 +362,11 @@ BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,cons
 				if((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
 					FILE_ATTRIBUTE_DIRECTORY)
 				{
-					FolderList.push_back(wfd.cFileName);
+					folderList.push_back(wfd.cFileName);
 				}
 				else
 				{
-					FileList.push_back(wfd.cFileName);
+					fileList.push_back(wfd.cFileName);
 
 					ulFileSize.LowPart = wfd.nFileSizeLow;
 					ulFileSize.HighPart = wfd.nFileSizeHigh;
@@ -385,11 +385,11 @@ BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,cons
 
 	strContents += _T("Statistics\r\n----------\r\n");
 
-	ss << std::fixed << FolderList.size();
+	ss << std::fixed << folderList.size();
 	strContents += _T("Number of folders: ") + ss.str() + std::wstring(_T("\r\n"));
 
 	ss.str(_T(""));
-	ss << std::fixed << FileList.size();
+	ss << std::fixed << fileList.size();
 	strContents += _T("Number of files: ") + ss.str() + std::wstring(_T("\r\n"));
 
 	TCHAR szTotalSize[32];
@@ -398,16 +398,16 @@ BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,cons
 
 	strContents += _T("\r\nFolders\r\n-------\r\n");
 
-	for(const auto &Folder : FolderList)
+	for(const auto &folder : folderList)
 	{
-		strContents += Folder + _T("\r\n");
+		strContents += folder + _T("\r\n");
 	}
 
 	strContents += _T("\r\nFiles\r\n-----\r\n");
 
-	for(const auto &File : FileList)
+	for(const auto &file : fileList)
 	{
-		strContents += File + _T("\r\n");
+		strContents += file + _T("\r\n");
 	}
 
 	/* Remove the trailing newline. */
@@ -516,7 +516,7 @@ int PasteHardLinks(const TCHAR *szDestination)
 /* TODO: Use CDropHandler. */
 int PasteFilesFromClipboardSpecial(const TCHAR *szDestination,PasteType pasteType)
 {
-	IDataObject	*ClipboardObject = NULL;
+	IDataObject	*clipboardObject = NULL;
 	DROPFILES	*pdf = NULL;
 	FORMATETC	ftc;
 	STGMEDIUM	stg;
@@ -527,7 +527,7 @@ int PasteFilesFromClipboardSpecial(const TCHAR *szDestination,PasteType pasteTyp
 	int			nFilesCopied = -1;
 	int			i = 0;
 
-	hr = OleGetClipboard(&ClipboardObject);
+	hr = OleGetClipboard(&clipboardObject);
 
 	if(SUCCEEDED(hr))
 	{
@@ -537,7 +537,7 @@ int PasteFilesFromClipboardSpecial(const TCHAR *szDestination,PasteType pasteTyp
 		ftc.lindex		= -1;
 		ftc.tymed		= TYMED_HGLOBAL;
 
-		hr = ClipboardObject->GetData(&ftc,&stg);
+		hr = clipboardObject->GetData(&ftc,&stg);
 
 		if(SUCCEEDED(hr))
 		{
@@ -577,7 +577,7 @@ int PasteFilesFromClipboardSpecial(const TCHAR *szDestination,PasteType pasteTyp
 
 			ReleaseStgMedium(&stg);
 		}
-		ClipboardObject->Release();
+		clipboardObject->Release();
 	}
 
 	return nFilesCopied;
@@ -728,9 +728,9 @@ void NFileOperations::DeleteFileSecurely(const std::wstring &strFilename,Overwri
 	HANDLE			hFindFile;
 	HCRYPTPROV		hProv;
 	LARGE_INTEGER	lRealFileSize;
-	BYTE			Pass1Data;
-	BYTE			Pass2Data;
-	BYTE			Pass3Data;
+	BYTE			pass1Data;
+	BYTE			pass2Data;
+	BYTE			pass3Data;
 	DWORD			nBytesWritten;
 	BOOL			bFolder;
 	int				i = 0;
@@ -769,11 +769,11 @@ void NFileOperations::DeleteFileSecurely(const std::wstring &strFilename,Overwri
 	write in the first-pass data, 0x00 over
 	the length of the whole file. */
 	SetFilePointer(hFile,0,NULL,FILE_BEGIN);
-	Pass1Data = 0x00;
+	pass1Data = 0x00;
 
 	for(i = 0;i < lRealFileSize.QuadPart;i++)
 	{
-		WriteFile(hFile,(LPVOID)&Pass1Data,1,&nBytesWritten,NULL);
+		WriteFile(hFile,(LPVOID)&pass1Data,1,&nBytesWritten,NULL);
 	}
 
 	if(uOverwriteMethod == OVERWRITE_THREEPASS)
@@ -782,11 +782,11 @@ void NFileOperations::DeleteFileSecurely(const std::wstring &strFilename,Overwri
 		write in the second-pass data, 0xFF over
 		the length of the whole file. */
 		SetFilePointer(hFile,0,NULL,FILE_BEGIN);
-		Pass2Data = 0xFF;
+		pass2Data = 0xFF;
 
 		for(i = 0;i < lRealFileSize.QuadPart;i++)
 		{
-			WriteFile(hFile,(LPVOID)&Pass2Data,1,&nBytesWritten,NULL);
+			WriteFile(hFile,(LPVOID)&pass2Data,1,&nBytesWritten,NULL);
 		}
 
 		SetFilePointer(hFile,0,NULL,FILE_BEGIN);
@@ -795,8 +795,8 @@ void NFileOperations::DeleteFileSecurely(const std::wstring &strFilename,Overwri
 
 		for(i = 0;i < lRealFileSize.QuadPart;i++)
 		{
-			CryptGenRandom(hProv,1,(LPBYTE)&Pass3Data);
-			WriteFile(hFile,(LPVOID)&Pass3Data,1,&nBytesWritten,NULL);
+			CryptGenRandom(hProv,1,(LPBYTE)&pass3Data);
+			WriteFile(hFile,(LPVOID)&pass3Data,1,&nBytesWritten,NULL);
 		}
 
 		CryptAcquireContext(&hProv,_T("SecureDelete"),NULL,PROV_RSA_AES,CRYPT_DELETEKEYSET);

@@ -8,12 +8,12 @@
 
 BOOL LocalSystemTimeToFileTime(const SYSTEMTIME *lpLocalTime, FILETIME *lpFileTime)
 {
-	SYSTEMTIME SystemTime;
-	BOOL result = TzSpecificLocalTimeToSystemTime(NULL, lpLocalTime, &SystemTime);
+	SYSTEMTIME systemTime;
+	BOOL result = TzSpecificLocalTimeToSystemTime(NULL, lpLocalTime, &systemTime);
 
 	if(result)
 	{
-		result = SystemTimeToFileTime(&SystemTime, lpFileTime);
+		result = SystemTimeToFileTime(&systemTime, lpFileTime);
 	}
 
 	return result;
@@ -21,12 +21,12 @@ BOOL LocalSystemTimeToFileTime(const SYSTEMTIME *lpLocalTime, FILETIME *lpFileTi
 
 BOOL FileTimeToLocalSystemTime(const FILETIME *lpFileTime, SYSTEMTIME *lpLocalTime)
 {
-	SYSTEMTIME SystemTime;
-	BOOL result = FileTimeToSystemTime(lpFileTime, &SystemTime);
+	SYSTEMTIME systemTime;
+	BOOL result = FileTimeToSystemTime(lpFileTime, &systemTime);
 
 	if(result)
 	{
-		result = SystemTimeToTzSpecificLocalTime(NULL, &SystemTime, lpLocalTime);
+		result = SystemTimeToTzSpecificLocalTime(NULL, &systemTime, lpLocalTime);
 	}
 
 	return result;
