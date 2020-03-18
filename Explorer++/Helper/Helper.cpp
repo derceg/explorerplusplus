@@ -140,7 +140,7 @@ HINSTANCE StartCommandPrompt(const std::wstring &Directory, bool Elevated)
 		if(szRet != NULL)
 		{
 			TCHAR operation[32];
-			std::wstring parameters(_T(""));
+			std::wstring parameters;
 
 			if(Elevated)
 			{
