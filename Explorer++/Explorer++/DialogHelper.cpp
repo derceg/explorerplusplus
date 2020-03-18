@@ -55,7 +55,7 @@ namespace
 	};
 }
 
-void Explorerplusplus::LoadDialogStatesFromRegistry(void)
+void Explorerplusplus::LoadDialogStatesFromRegistry()
 {
 	HKEY hKey;
 	LONG returnValue = RegOpenKeyEx(HKEY_CURRENT_USER,DIALOGS_REGISTRY_KEY,0,KEY_READ,&hKey);
@@ -71,7 +71,7 @@ void Explorerplusplus::LoadDialogStatesFromRegistry(void)
 	}
 }
 
-void Explorerplusplus::SaveDialogStatesToRegistry(void)
+void Explorerplusplus::SaveDialogStatesToRegistry()
 {
 	HKEY hKey;
 	LONG returnValue = RegCreateKeyEx(HKEY_CURRENT_USER,DIALOGS_REGISTRY_KEY,

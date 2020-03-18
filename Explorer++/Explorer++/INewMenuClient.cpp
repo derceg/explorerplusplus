@@ -43,12 +43,12 @@ HRESULT __stdcall NewMenuClient::QueryInterface(REFIID iid,void **ppvObject)
 	return E_NOINTERFACE;
 }
 
-ULONG __stdcall NewMenuClient::AddRef(void)
+ULONG __stdcall NewMenuClient::AddRef()
 {
 	return ++m_RefCount;
 }
 
-ULONG __stdcall NewMenuClient::Release(void)
+ULONG __stdcall NewMenuClient::Release()
 {
 	m_RefCount--;
 	

@@ -18,7 +18,7 @@ private:
 
 	void	OnHolderWindowPaint(HWND hwnd);
 	void	OnHolderWindowLButtonDown(LPARAM lParam);
-	void	OnHolderWindowLButtonUp(void);
+	void	OnHolderWindowLButtonUp();
 	int		OnHolderWindowMouseMove(LPARAM lParam);
 
 

@@ -120,8 +120,8 @@ private:
 
 	void	OnSize(int width, int height);
 
-	void	ExtractThumbnailImage(void);
-	void	CancelThumbnailExtraction(void);
+	void	ExtractThumbnailImage();
+	void	CancelThumbnailExtraction();
 
 
 	HWND			m_hDisplayWindow;

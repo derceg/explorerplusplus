@@ -11,7 +11,7 @@
 #include "../Helper/Controls.h"
 #include "../Helper/WindowHelper.h"
 
-void Explorerplusplus::CreateStatusBar(void)
+void Explorerplusplus::CreateStatusBar()
 {
 	UINT style = WS_CHILD | WS_CLIPSIBLINGS | SBARS_SIZEGRIP | WS_CLIPCHILDREN;
 

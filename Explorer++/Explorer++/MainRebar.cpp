@@ -36,7 +36,7 @@ DWORD RebarStyles = WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS |
 WS_BORDER | CCS_NODIVIDER | CCS_TOP | CCS_NOPARENTALIGN |
 RBS_BANDBORDERS | RBS_VARHEIGHT;
 
-void Explorerplusplus::InitializeMainToolbars(void)
+void Explorerplusplus::InitializeMainToolbars()
 {
 	/* Initialize the main toolbar styles and settings here. The visibility and gripper
 	styles will be set after the settings have been loaded (needed to keep compatibility
@@ -92,7 +92,7 @@ void Explorerplusplus::InitializeMainToolbars(void)
 	m_ToolbarInformation[4].lpText = nullptr;
 }
 
-void Explorerplusplus::CreateMainControls(void)
+void Explorerplusplus::CreateMainControls()
 {
 	SIZE	sz;
 	RECT	rc;
@@ -310,7 +310,7 @@ void Explorerplusplus::CreateMainToolbar()
 		boost::bind(&Explorerplusplus::OnUseLargeToolbarIconsUpdated, this, _1), boost::signals2::at_back));
 }
 
-void Explorerplusplus::CreateBookmarksToolbar(void)
+void Explorerplusplus::CreateBookmarksToolbar()
 {
 	m_hBookmarksToolbar = CreateToolbar(m_hMainRebar, BookmarkToolbarStyles,
 		TBSTYLE_EX_MIXEDBUTTONS | TBSTYLE_EX_DRAWDDARROWS |
@@ -320,7 +320,7 @@ void Explorerplusplus::CreateBookmarksToolbar(void)
 		m_navigation.get(), &m_bookmarkTree, TOOLBAR_BOOKMARK_START, TOOLBAR_BOOKMARK_END);
 }
 
-void Explorerplusplus::CreateDrivesToolbar(void)
+void Explorerplusplus::CreateDrivesToolbar()
 {
 	m_pDrivesToolbar = DrivesToolbar::Create(m_hMainRebar, TOOLBAR_DRIVES_ID_START,
 		TOOLBAR_DRIVES_ID_END, m_hLanguageModule, this, m_navigation.get());

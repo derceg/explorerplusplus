@@ -19,8 +19,8 @@ public:
 
 	/* IUnknown methods. */
 	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject) override;
-	ULONG __stdcall		AddRef(void) override;
-	ULONG __stdcall		Release(void) override;
+	ULONG __stdcall		AddRef() override;
+	ULONG __stdcall		Release() override;
 
 	ShellTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pDirMon, CachedIcons *cachedIcons);
 	~ShellTreeView();
@@ -32,9 +32,9 @@ public:
 	/* User functions. */
 	unique_pidl_absolute	GetItemPidl(HTREEITEM hTreeItem) const;
 	HTREEITEM			LocateItem(PCIDLIST_ABSOLUTE pidlDirectory);
-	BOOL				QueryDragging(void);
+	BOOL				QueryDragging();
 	void				SetShowHidden(BOOL bShowHidden);
-	void				RefreshAllIcons(void);
+	void				RefreshAllIcons();
 
 	/* Sorting. */
 	int CALLBACK		CompareItems(LPARAM lParam1,LPARAM lParam2);
@@ -42,7 +42,7 @@ public:
 	/* Drag and Drop. */
 	HRESULT _stdcall	DragEnter(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect) override;
 	HRESULT _stdcall	DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect) override;
-	HRESULT _stdcall	DragLeave(void) override;
+	HRESULT _stdcall	DragLeave() override;
 	HRESULT _stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect) override;
 
 	void				MonitorDrivePublic(const TCHAR *szDrive);
@@ -123,7 +123,7 @@ private:
 	HRESULT		ExpandDirectory(HTREEITEM hParent);
 	void		AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSOLUTE pidlDirectory, HTREEITEM hParent);
 	void		DirectoryModified(DWORD dwAction, const TCHAR *szFullFileName);
-	void		DirectoryAltered(void);
+	void		DirectoryAltered();
 	HTREEITEM	AddRoot();
 	void		AddItem(const TCHAR *szFullFileName);
 	void		AddItemInternal(HTREEITEM hParent, const TCHAR *szFullFileName);
@@ -167,8 +167,8 @@ private:
 	int			GenerateUniqueItemId();
 
 	/* Drag and drop. */
-	HRESULT		InitializeDragDropHelpers(void);
-	void		RestoreState(void);
+	HRESULT		InitializeDragDropHelpers();
+	void		RestoreState();
 	DWORD		GetCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,POINTL *ptl);
 	BOOL		CheckItemLocations(IDataObject *pDataObject,HTREEITEM hItem,int iDroppedItem);
 	HRESULT		OnBeginDrag(int iItemId,DragType dragType);

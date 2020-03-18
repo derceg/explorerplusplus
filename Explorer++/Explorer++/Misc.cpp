@@ -131,7 +131,7 @@ void Explorerplusplus::ApplyDisplayWindowPosition()
 	SendMessage(m_hDisplayWindow, WM_USER_DISPLAYWINDOWMOVED, m_config->displayWindowVertical, NULL);
 }
 
-void Explorerplusplus::ApplyToolbarSettings(void)
+void Explorerplusplus::ApplyToolbarSettings()
 {
 	BOOL bVisible = FALSE;
 	int i = 0;
@@ -176,7 +176,7 @@ void Explorerplusplus::ApplyToolbarSettings(void)
 	}
 }
 
-void Explorerplusplus::AdjustFolderPanePosition(void)
+void Explorerplusplus::AdjustFolderPanePosition()
 {
 	RECT rcMainWindow;
 	int indentTop		= 0;

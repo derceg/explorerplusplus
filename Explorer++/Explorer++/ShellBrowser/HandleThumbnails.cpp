@@ -15,7 +15,7 @@
 #define THUMBNAIL_TYPE_ICON			0
 #define THUMBNAIL_TYPE_EXTRACTED	1
 
-void ShellBrowser::SetupThumbnailsView(void)
+void ShellBrowser::SetupThumbnailsView()
 {
 	HIMAGELIST himl;
 	LVITEM lvItem;
@@ -55,7 +55,7 @@ void ShellBrowser::SetupThumbnailsView(void)
 	m_bThumbnailsSetup = TRUE;
 }
 
-void ShellBrowser::RemoveThumbnailsView(void)
+void ShellBrowser::RemoveThumbnailsView()
 {
 	LVITEM		lvItem;
 	HIMAGELIST	himl;

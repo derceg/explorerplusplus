@@ -74,7 +74,7 @@ private:
 		Accessed
 	};
 
-	void	InitializeAttributesStructure(void);
+	void	InitializeAttributesStructure();
 
 	void	ResetButtonState(HWND hwnd,BOOL bReset);
 	void	SetAttributeCheckState(HWND hwnd,int nAttributes,int nSelected);

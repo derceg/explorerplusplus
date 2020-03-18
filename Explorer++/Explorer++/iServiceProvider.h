@@ -16,8 +16,8 @@ private:
 
 	/* IUnknown methods. */
 	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject) override;
-	ULONG __stdcall		AddRef(void) override;
-	ULONG __stdcall		Release(void) override;
+	ULONG __stdcall		AddRef() override;
+	ULONG __stdcall		Release() override;
 
 	/* IServiceProvider methods. */
 	HRESULT	__stdcall	QueryService(REFGUID guidService,REFIID riid,void **ppv) override;

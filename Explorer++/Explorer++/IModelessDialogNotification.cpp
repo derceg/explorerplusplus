@@ -14,12 +14,12 @@ m_RefCount(1)
 
 }
 
-ULONG ModelessDialogNotification::AddRef(void)
+ULONG ModelessDialogNotification::AddRef()
 {
 	return ++m_RefCount;
 }
 
-ULONG ModelessDialogNotification::Release(void)
+ULONG ModelessDialogNotification::Release()
 {
 	m_RefCount--;
 	

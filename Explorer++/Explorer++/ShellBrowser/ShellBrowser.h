@@ -71,8 +71,8 @@ public:
 
 	/* IUnknown methods. */
 	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject) override;
-	ULONG __stdcall		AddRef(void) override;
-	ULONG __stdcall		Release(void) override;
+	ULONG __stdcall		AddRef() override;
+	ULONG __stdcall		Release() override;
 
 	HWND				GetListView() const;
 	FolderSettings		GetFolderSettings() const;
@@ -83,16 +83,16 @@ public:
 
 	/* Drag and Drop. */
 	void				DragStarted(int iFirstItem,POINT *ptCursor);
-	void				DragStopped(void);
+	void				DragStopped();
 	HRESULT _stdcall	DragEnter(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect) override;
 	HRESULT _stdcall	DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect) override;
-	HRESULT _stdcall	DragLeave(void) override;
+	HRESULT _stdcall	DragLeave() override;
 	HRESULT _stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect) override;
 
 	/* Get/Set current state. */
 	unique_pidl_absolute	GetDirectoryIdl() const;
 	std::wstring		GetDirectory() const;
-	BOOL				GetAutoArrange(void) const;
+	BOOL				GetAutoArrange() const;
 	void				SetAutoArrange(BOOL autoArrange);
 	ViewMode			GetViewMode() const;
 	void				SetViewMode(ViewMode viewMode);
@@ -100,23 +100,23 @@ public:
 	SortMode			GetSortMode() const;
 	void				SetSortMode(SortMode sortMode);
 	void				SortFolder(SortMode sortMode);
-	BOOL				GetSortAscending(void) const;
+	BOOL				GetSortAscending() const;
 	BOOL				SetSortAscending(BOOL bAscending);
-	BOOL				GetShowHidden(void) const;
+	BOOL				GetShowHidden() const;
 	BOOL				SetShowHidden(BOOL bShowHidden);
-	int					GetNumItems(void) const;
-	int					GetNumSelectedFiles(void) const;
-	int					GetNumSelectedFolders(void) const;
-	int					GetNumSelected(void) const;
+	int					GetNumItems() const;
+	int					GetNumSelectedFiles() const;
+	int					GetNumSelectedFolders() const;
+	int					GetNumSelected() const;
 
 	/* ID. */
 	int					GetId() const;
 
 	/* Directory modification support. */
 	void				FilesModified(DWORD Action, const TCHAR *FileName, int EventId, int iFolderIndex);
-	void				DirectoryAltered(void);
+	void				DirectoryAltered();
 	void				SetDirMonitorId(int iDirMonitorId);
-	int					GetDirMonitorId(void) const;
+	int					GetDirMonitorId() const;
 	int					GetUniqueFolderId() const;
 
 	/* Item information. */
@@ -138,9 +138,9 @@ public:
 	/* Filtering. */
 	std::wstring		GetFilter() const;
 	void				SetFilter(std::wstring_view filter);
-	BOOL				GetFilterStatus(void) const;
+	BOOL				GetFilterStatus() const;
 	void				SetFilterStatus(BOOL bFilter);
-	BOOL				GetFilterCaseSensitive(void) const;
+	BOOL				GetFilterCaseSensitive() const;
 	void				SetFilterCaseSensitive(BOOL filterCaseSensitive);
 
 	void				SetFileAttributesForSelection();
@@ -150,17 +150,17 @@ public:
 	int					LocateFileItemIndex(const TCHAR *szFileName) const;
 	BOOL				DeghostItem(int iItem);
 	BOOL				GhostItem(int iItem);
-	BOOL				InVirtualFolder(void) const;
-	BOOL				CanCreate(void) const;
+	BOOL				InVirtualFolder() const;
+	BOOL				CanCreate() const;
 
-	BOOL				GetShowInGroups(void) const;
+	BOOL				GetShowInGroups() const;
 	void				SetShowInGroups(BOOL bShowInGroups);
 	void				SetShowInGroupsFlag(BOOL bShowInGroups);
 
 	int CALLBACK		SortTemporary(LPARAM lParam1,LPARAM lParam2);
 
 	std::vector<SortMode>	GetAvailableSortModes() const;
-	size_t				GetNumActiveColumns(void) const;
+	size_t				GetNumActiveColumns() const;
 	void				ImportAllColumns(const FolderColumns &folderColumns);
 	FolderColumns		ExportAllColumns();
 	void				QueueRename(PCIDLIST_ABSOLUTE pidlItem);
@@ -378,10 +378,10 @@ private:
 
 	/* Filtering support. */
 	BOOL				IsFilenameFiltered(const TCHAR *FileName) const;
-	void				RemoveFilteredItems(void);
+	void				RemoveFilteredItems();
 	void				RemoveFilteredItem(int iItem,int iItemInternal);
-	void				UpdateFiltering(void);
-	void				UnfilterAllItems(void);
+	void				UpdateFiltering();
+	void				UnfilterAllItems();
 
 	/* Listview group support (real files). */
 	static INT CALLBACK	GroupNameComparisonStub(INT Group1_ID, INT Group2_ID, void *pvData);
@@ -409,7 +409,7 @@ private:
 	/* Other grouping support. */
 	int					CheckGroup(std::wstring_view groupHeader, PFNLVGROUPCOMPARE groupComparison);
 	void				InsertItemIntoGroup(int iItem,int iGroupId);
-	void				MoveItemsIntoGroups(void);
+	void				MoveItemsIntoGroups();
 
 	/* Listview icons. */
 	void				ProcessIconResult(int internalIndex, int iconIndex);
@@ -419,8 +419,8 @@ private:
 	void				QueueThumbnailTask(int internalIndex);
 	static std::optional<ThumbnailResult_t>	FindThumbnailAsync(HWND listView, int thumbnailResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo);
 	void				ProcessThumbnailResult(int thumbnailResultId);
-	void				SetupThumbnailsView(void);
-	void				RemoveThumbnailsView(void);
+	void				SetupThumbnailsView();
+	void				RemoveThumbnailsView();
 	int					GetIconThumbnail(int iInternalIndex) const;
 	int					GetExtractedThumbnail(HBITMAP hThumbnailBitmap) const;
 	int					GetThumbnailInternal(int iType, int iInternalIndex, HBITMAP hThumbnailBitmap) const;
@@ -434,12 +434,12 @@ private:
 	void				SetTileViewItemInfo(int iItem,int iItemInternal);
 
 	/* Drag and Drop support. */
-	HRESULT				InitializeDragDropHelpers(void);
+	HRESULT				InitializeDragDropHelpers();
 	DWORD				CheckItemLocations(IDataObject *pDataObject,int iDroppedItem);
 	void				HandleDragSelection(const POINT *ppt);
 	void				RepositionLocalFiles(const POINT *ppt);
 	void				ScrollListViewFromCursor(HWND hListView, const POINT *CursorPos);
-	void				PositionDroppedItems(void);
+	void				PositionDroppedItems();
 	void				OnDropFile(const std::list<std::wstring> &PastedFileList, const POINT *ppt) override;
 
 	/* Miscellaneous. */

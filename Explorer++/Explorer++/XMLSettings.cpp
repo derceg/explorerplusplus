@@ -244,7 +244,7 @@ clean:
 	return TRUE;
 }
 
-BOOL LoadAllowMultipleInstancesFromXML(void)
+BOOL LoadAllowMultipleInstancesFromXML()
 {
 	IXMLDOMDocument *pXMLDom;
 	TCHAR szConfigFile[MAX_PATH];

@@ -10,7 +10,7 @@
 const UINT DIRECTORYMODIFIED_TIMER_ID = 0;
 const UINT DIRECTORYMODIFIED_TIMER_ELAPSE = 500;
 
-void ShellTreeView::DirectoryAltered(void)
+void ShellTreeView::DirectoryAltered()
 {
 	EnterCriticalSection(&m_cs);
 

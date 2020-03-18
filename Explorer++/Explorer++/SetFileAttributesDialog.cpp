@@ -107,7 +107,7 @@ void SetFileAttributesDialog::InitializeDateFields()
 	EnableWindow(GetDlgItem(m_hDlg,IDC_ACCESS_RESET),FALSE);
 }
 
-void SetFileAttributesDialog::InitializeAttributesStructure(void)
+void SetFileAttributesDialog::InitializeAttributesStructure()
 {
 	Attribute_t attribute;
 

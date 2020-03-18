@@ -16,8 +16,8 @@ public:
 
 	/* IUnknown methods. */
 	HRESULT __stdcall QueryInterface(REFIID iid, void **ppvObject) override;
-	ULONG __stdcall AddRef(void) override;
-	ULONG __stdcall Release(void) override;
+	ULONG __stdcall AddRef() override;
+	ULONG __stdcall Release() override;
 
 private:
 	static const UINT_PTR SUBCLASS_ID = 1;
@@ -29,7 +29,7 @@ private:
 	HRESULT __stdcall DragEnter(
 		IDataObject *pDataObject, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect) override;
 	HRESULT __stdcall DragOver(DWORD grfKeyState, POINTL pt, DWORD *pdwEffect) override;
-	HRESULT __stdcall DragLeave(void) override;
+	HRESULT __stdcall DragLeave() override;
 	HRESULT __stdcall Drop(
 		IDataObject *pDataObject, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect) override;
 

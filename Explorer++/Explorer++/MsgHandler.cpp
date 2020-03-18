@@ -50,12 +50,12 @@ const int CLOSE_TOOLBAR_HEIGHT = 24;
 const int CLOSE_TOOLBAR_X_OFFSET = 4;
 const int CLOSE_TOOLBAR_Y_OFFSET = 1;
 
-void Explorerplusplus::TestConfigFile(void)
+void Explorerplusplus::TestConfigFile()
 {
 	m_bLoadSettingsFromXML = TestConfigFileInternal();
 }
 
-BOOL TestConfigFileInternal(void)
+BOOL TestConfigFileInternal()
 {
 	HANDLE	hConfigFile;
 	TCHAR	szConfigFile[MAX_PATH];
@@ -956,7 +956,7 @@ void Explorerplusplus::OnRefresh()
 	tab.GetShellBrowser()->GetNavigationController()->Refresh();
 }
 
-void Explorerplusplus::CopyColumnInfoToClipboard(void)
+void Explorerplusplus::CopyColumnInfoToClipboard()
 {
 	auto currentColumns = m_pActiveShellBrowser->ExportCurrentColumns();
 

@@ -32,8 +32,8 @@ private:
 
 	/* IUnknown methods. */
 	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject) override;
-	ULONG __stdcall		AddRef(void) override;
-	ULONG __stdcall		Release(void) override;
+	ULONG __stdcall		AddRef() override;
+	ULONG __stdcall		Release() override;
 
 	/* INewMenuClient methods. */
 	HRESULT __stdcall	IncludeItems(NMCII_FLAGS *pFlags) override;

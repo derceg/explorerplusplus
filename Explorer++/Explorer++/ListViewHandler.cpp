@@ -943,7 +943,7 @@ void Explorerplusplus::OnListViewFileRenameMultiple()
 	massRenameDialog.ShowModalDialog();
 }
 
-void Explorerplusplus::OnListViewCopyItemPath(void) const
+void Explorerplusplus::OnListViewCopyItemPath() const
 {
 	if(ListView_GetSelectedCount(m_hActiveListView) == 0)
 	{
@@ -967,7 +967,7 @@ void Explorerplusplus::OnListViewCopyItemPath(void) const
 	clipboardWriter.WriteText(strItemPaths);
 }
 
-void Explorerplusplus::OnListViewCopyUniversalPaths(void) const
+void Explorerplusplus::OnListViewCopyUniversalPaths() const
 {
 	if(ListView_GetSelectedCount(m_hActiveListView) == 0)
 	{
@@ -1064,7 +1064,7 @@ void Explorerplusplus::OnListViewSetFileAttributes() const
 	selectedTab.GetShellBrowser()->SetFileAttributesForSelection();
 }
 
-void Explorerplusplus::OnListViewPaste(void)
+void Explorerplusplus::OnListViewPaste()
 {
 	IDataObject *pClipboardObject = nullptr;
 	HRESULT hr;

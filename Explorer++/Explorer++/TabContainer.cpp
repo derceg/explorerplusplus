@@ -254,7 +254,7 @@ void TabContainer::OnTabCtrlLButtonDown(POINT *pt)
 	}
 }
 
-void TabContainer::OnTabCtrlLButtonUp(void)
+void TabContainer::OnTabCtrlLButtonUp()
 {
 	if (!m_bTabBeenDragged)
 	{

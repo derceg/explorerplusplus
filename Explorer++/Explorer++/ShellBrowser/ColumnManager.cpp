@@ -892,7 +892,7 @@ void ShellBrowser::ApplyHeaderSortArrow()
 	m_PreviousSortColumnExists = true;
 }
 
-size_t ShellBrowser::GetNumActiveColumns(void) const
+size_t ShellBrowser::GetNumActiveColumns() const
 {
 	return m_pActiveColumns->size();
 }

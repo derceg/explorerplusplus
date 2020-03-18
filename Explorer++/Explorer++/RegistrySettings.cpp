@@ -54,7 +54,7 @@ BOOL LoadWindowPositionFromRegistry(WINDOWPLACEMENT *pwndpl)
 	return bRes;
 }
 
-BOOL LoadAllowMultipleInstancesFromRegistry(void)
+BOOL LoadAllowMultipleInstancesFromRegistry()
 {
 	BOOL bAllowMultipleInstances = TRUE;
 
@@ -445,7 +445,7 @@ void Explorerplusplus::LoadBookmarksFromRegistry()
 	BookmarkRegistryStorage::Load(&m_bookmarkTree);
 }
 
-void Explorerplusplus::SaveTabSettingsToRegistry(void)
+void Explorerplusplus::SaveTabSettingsToRegistry()
 {
 	HKEY	hKey;
 	HKEY	hTabKey;
@@ -883,7 +883,7 @@ void Explorerplusplus::LoadDefaultColumnsFromRegistry()
 	}
 }
 
-void Explorerplusplus::SaveToolbarInformationToRegistry(void)
+void Explorerplusplus::SaveToolbarInformationToRegistry()
 {
 	HKEY	hKey;
 	HKEY	hToolbarKey;
@@ -933,7 +933,7 @@ void Explorerplusplus::SaveToolbarInformationToRegistry(void)
 	}
 }
 
-void Explorerplusplus::LoadToolbarInformationFromRegistry(void)
+void Explorerplusplus::LoadToolbarInformationFromRegistry()
 {
 	HKEY				hKey;
 	HKEY				hToolbarKey;

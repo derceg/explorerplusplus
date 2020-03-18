@@ -28,7 +28,7 @@ namespace
 	const UINT GBYTE = 1024 * 1024 *1024;
 }
 
-BOOL ShellBrowser::GetShowInGroups(void) const
+BOOL ShellBrowser::GetShowInGroups() const
 {
 	return m_folderSettings.showInGroups;
 }
@@ -868,7 +868,7 @@ void ShellBrowser::InsertItemIntoGroup(int iItem,int iGroupId)
 	ListView_SetItem(m_hListView,&item);
 }
 
-void ShellBrowser::MoveItemsIntoGroups(void)
+void ShellBrowser::MoveItemsIntoGroups()
 {
 	LVITEM item;
 	int nItems;

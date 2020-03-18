@@ -32,7 +32,7 @@ LRESULT CALLBACK TreeViewSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM l
 the treeview control. */
 HTREEITEM	g_newSelectionItem;
 
-void Explorerplusplus::CreateFolderControls(void)
+void Explorerplusplus::CreateFolderControls()
 {
 	TCHAR szTemp[32];
 	UINT uStyle = WS_CHILD|WS_CLIPSIBLINGS|WS_CLIPCHILDREN;
@@ -265,7 +265,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 	m_bTreeViewRightClick = FALSE;
 }
 
-void Explorerplusplus::OnTreeViewCopyItemPath(void) const
+void Explorerplusplus::OnTreeViewCopyItemPath() const
 {
 	HTREEITEM hItem = TreeView_GetSelection(m_hTreeView);
 
@@ -281,7 +281,7 @@ void Explorerplusplus::OnTreeViewCopyItemPath(void) const
 	}
 }
 
-void Explorerplusplus::OnTreeViewCopyUniversalPaths(void) const
+void Explorerplusplus::OnTreeViewCopyUniversalPaths() const
 {
 	HTREEITEM		hItem;
 	TCHAR			szFullFileName[MAX_PATH];
@@ -363,7 +363,7 @@ void Explorerplusplus::OnTreeViewCopy(BOOL bCopy)
 	}
 }
 
-void Explorerplusplus::OnTreeViewHolderWindowTimer(void)
+void Explorerplusplus::OnTreeViewHolderWindowTimer()
 {
 	auto pidlDirectory = m_shellTreeView->GetItemPidl(g_newSelectionItem);
 	auto pidlCurrentDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
@@ -626,7 +626,7 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowCommandHandler(WPARAM wPa
 	return 1;
 }
 
-void Explorerplusplus::OnTreeViewSetFileAttributes(void) const
+void Explorerplusplus::OnTreeViewSetFileAttributes() const
 {
 	HTREEITEM hItem = TreeView_GetSelection(m_hTreeView);
 
@@ -657,7 +657,7 @@ void Explorerplusplus::OnTreeViewSetFileAttributes(void) const
 	}
 }
 
-void Explorerplusplus::OnTreeViewPaste(void)
+void Explorerplusplus::OnTreeViewPaste()
 {
 	HTREEITEM hItem;
 	TCHAR szFullFileName[MAX_PATH + 1];

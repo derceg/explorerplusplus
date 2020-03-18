@@ -48,12 +48,12 @@ HRESULT __stdcall ApplicationToolbarDropHandler::QueryInterface(REFIID iid, void
 	return E_NOINTERFACE;
 }
 
-ULONG __stdcall ApplicationToolbarDropHandler::AddRef(void)
+ULONG __stdcall ApplicationToolbarDropHandler::AddRef()
 {
 	return ++m_RefCount;
 }
 
-ULONG __stdcall ApplicationToolbarDropHandler::Release(void)
+ULONG __stdcall ApplicationToolbarDropHandler::Release()
 {
 	m_RefCount--;
 
@@ -102,7 +102,7 @@ HRESULT _stdcall ApplicationToolbarDropHandler::DragOver(
 	return S_OK;
 }
 
-HRESULT _stdcall ApplicationToolbarDropHandler::DragLeave(void)
+HRESULT _stdcall ApplicationToolbarDropHandler::DragLeave()
 {
 	m_pDropTargetHelper->DragLeave();
 

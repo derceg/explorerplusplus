@@ -18,7 +18,7 @@
 
 #define HOLDER_CLASS_NAME	_T("Holder")
 
-ATOM				RegisterHolderWindowClass(void);
+ATOM				RegisterHolderWindowClass();
 LRESULT CALLBACK	HolderWndProcStub(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 
 HolderWindow::HolderWindow(HWND hHolder)
@@ -27,7 +27,7 @@ HolderWindow::HolderWindow(HWND hHolder)
 	m_bHolderResizing	= FALSE;
 }
 
-ATOM RegisterHolderWindowClass(void)
+ATOM RegisterHolderWindowClass()
 {
 	WNDCLASS wc;
 
@@ -157,7 +157,7 @@ void HolderWindow::OnHolderWindowLButtonDown(LPARAM lParam)
 	}
 }
 
-void HolderWindow::OnHolderWindowLButtonUp(void)
+void HolderWindow::OnHolderWindowLButtonUp()
 {
 	m_bHolderResizing = FALSE;
 

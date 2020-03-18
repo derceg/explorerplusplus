@@ -40,12 +40,12 @@ HRESULT __stdcall ServiceProvider::QueryInterface(REFIID iid,void **ppvObject)
 	return E_NOINTERFACE;
 }
 
-ULONG __stdcall ServiceProvider::AddRef(void)
+ULONG __stdcall ServiceProvider::AddRef()
 {
 	return ++m_RefCount;
 }
 
-ULONG __stdcall ServiceProvider::Release(void)
+ULONG __stdcall ServiceProvider::Release()
 {
 	m_RefCount--;
 	

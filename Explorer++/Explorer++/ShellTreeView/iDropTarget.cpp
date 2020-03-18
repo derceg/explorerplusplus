@@ -238,7 +238,7 @@ int iDroppedItem)
 	return bOnSameDrive;
 }
 
-HRESULT _stdcall ShellTreeView::DragLeave(void)
+HRESULT _stdcall ShellTreeView::DragLeave()
 {
 	RestoreState();
 
@@ -283,7 +283,7 @@ POINTL pt,DWORD *pdwEffect)
 	return S_OK;
 }
 
-void ShellTreeView::RestoreState(void)
+void ShellTreeView::RestoreState()
 {
 	TreeView_Select(m_hTreeView,nullptr,TVGN_DROPHILITE);
 

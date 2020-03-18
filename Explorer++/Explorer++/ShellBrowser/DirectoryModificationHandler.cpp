@@ -16,7 +16,7 @@
 BOOL g_bNewFileRenamed = FALSE;
 static int iRenamedItem;
 
-void ShellBrowser::DirectoryAltered(void)
+void ShellBrowser::DirectoryAltered()
 {
 	BOOL bNewItemCreated;
 

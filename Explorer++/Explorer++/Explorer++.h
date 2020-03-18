@@ -245,10 +245,10 @@ private:
 	void OnListViewRClick(POINT *pCursorPos);
 	void OnListViewBackgroundRClick(POINT *pCursorPos);
 	void OnListViewItemRClick(POINT *pCursorPos);
-	void OnListViewCopyItemPath(void) const;
-	void OnListViewCopyUniversalPaths(void) const;
+	void OnListViewCopyItemPath() const;
+	void OnListViewCopyUniversalPaths() const;
 	void OnListViewSetFileAttributes() const;
-	void OnListViewPaste(void);
+	void OnListViewPaste();
 
 	/* TreeView private message handlers. */
 	void OnTreeViewFileDelete(BOOL bPermanent);
@@ -257,17 +257,17 @@ private:
 	int OnTreeViewBeginLabelEdit(LPARAM lParam);
 	int OnTreeViewEndLabelEdit(LPARAM lParam);
 	LRESULT OnTreeViewKeyDown(LPARAM lParam);
-	void OnTreeViewCopyItemPath(void) const;
+	void OnTreeViewCopyItemPath() const;
 	void OnTreeViewCopy(BOOL bCopy);
-	void OnTreeViewSetFileAttributes(void) const;
-	void OnTreeViewCopyUniversalPaths(void) const;
-	void OnTreeViewPaste(void);
+	void OnTreeViewSetFileAttributes() const;
+	void OnTreeViewCopyUniversalPaths() const;
+	void OnTreeViewPaste();
 
 	/* Holder window private message handlers. */
 	LRESULT CALLBACK TreeViewHolderWindowCommandHandler(WPARAM wParam);
 	LRESULT CALLBACK TreeViewHolderWindowNotifyHandler(
 		HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	void OnTreeViewHolderWindowTimer(void);
+	void OnTreeViewHolderWindowTimer();
 
 	/* Tab backing. */
 	void CreateTabBacking();
@@ -308,17 +308,17 @@ private:
 	void SetProgramMenuItemStates(HMENU hProgramMenu);
 
 	/* Control creation. */
-	void CreateMainControls(void);
-	void CreateFolderControls(void);
+	void CreateMainControls();
+	void CreateFolderControls();
 	void CreateAddressBar();
 	void CreateMainToolbar();
-	void CreateBookmarksToolbar(void);
-	void CreateDrivesToolbar(void);
+	void CreateBookmarksToolbar();
+	void CreateDrivesToolbar();
 	void CreateApplicationToolbar();
 	HWND CreateTabToolbar(HWND hParent, int idCommand, const std::wstring &tip);
 
 	/* Main toolbars. */
-	void InitializeMainToolbars(void);
+	void InitializeMainToolbars();
 	void OnUseLargeToolbarIconsUpdated(BOOL newValue);
 	boost::signals2::connection AddToolbarContextMenuObserver(
 		const ToolbarContextMenuSignal::slot_type &observer) override;
@@ -333,13 +333,13 @@ private:
 	void ValidateColumns(FolderColumns &folderColumns);
 	void ValidateSingleColumnSet(int iColumnSet, std::vector<Column_t> &columns);
 	void ApplyDisplayWindowPosition();
-	void ApplyToolbarSettings(void);
-	void TestConfigFile(void);
+	void ApplyToolbarSettings();
+	void TestConfigFile();
 
 	/* Registry settings. */
 	LONG LoadGenericSettingsFromRegistry();
 	LONG SaveGenericSettingsToRegistry();
-	void SaveTabSettingsToRegistry(void);
+	void SaveTabSettingsToRegistry();
 	int LoadTabSettingsFromRegistry();
 	std::vector<Column_t> LoadColumnFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName);
 	void SaveColumnToRegistry(
@@ -354,10 +354,10 @@ private:
 	void LoadBookmarksFromRegistry();
 	void LoadApplicationToolbarFromRegistry();
 	void SaveApplicationToolbarToRegistry();
-	void SaveToolbarInformationToRegistry(void);
-	void LoadToolbarInformationFromRegistry(void);
-	void SaveDialogStatesToRegistry(void);
-	void LoadDialogStatesFromRegistry(void);
+	void SaveToolbarInformationToRegistry();
+	void LoadToolbarInformationFromRegistry();
+	void SaveDialogStatesToRegistry();
+	void LoadDialogStatesFromRegistry();
 
 	/* XML Settings. */
 	void LoadGenericSettingsFromXML(IXMLDOMDocument *pXMLDom);
@@ -390,11 +390,11 @@ private:
 	void UpdateWindowStates(const Tab &tab);
 	void UpdateTreeViewSelection();
 	void SetStatusBarParts(int width);
-	void ResizeWindows(void);
+	void ResizeWindows();
 	void SetListViewInitialPosition(HWND hListView) override;
-	void AdjustFolderPanePosition(void);
+	void AdjustFolderPanePosition();
 	HRESULT UpdateStatusBarText(const Tab &tab);
-	void ToggleFolders(void);
+	void ToggleFolders();
 	void UpdateLayout();
 
 	/* Languages. */
@@ -449,7 +449,7 @@ private:
 	void UpdateDisplayWindowForMultipleFiles(const Tab &tab);
 
 	/* Columns. */
-	void CopyColumnInfoToClipboard(void);
+	void CopyColumnInfoToClipboard();
 
 	/* Bookmark handling. */
 	HRESULT ExpandAndBrowsePath(const TCHAR *szPath);
@@ -483,7 +483,7 @@ private:
 	void AddViewModesToMenu(HMENU menu);
 
 	/* Miscellaneous. */
-	void CreateStatusBar(void);
+	void CreateStatusBar();
 	void InitializeDisplayWindow();
 	int CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer);
 	void ShowMainRebarBand(HWND hwnd, BOOL bShow);

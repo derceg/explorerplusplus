@@ -151,7 +151,7 @@ private:
 		bool addHistoryEntry, int *newTabId);
 
 	void OnTabCtrlLButtonDown(POINT *pt);
-	void OnTabCtrlLButtonUp(void);
+	void OnTabCtrlLButtonUp();
 	void OnTabCtrlMouseMove(POINT *pt);
 
 	void OnLButtonDoubleClick(const POINT &pt);

@@ -48,7 +48,7 @@ HWND Explorerplusplus::CreateTabToolbar(HWND hParent,int idCommand,const std::ws
 	return tabToolbar;
 }
 
-void Explorerplusplus::ResizeWindows(void)
+void Explorerplusplus::ResizeWindows()
 {
 	RECT rc;
 
@@ -130,7 +130,7 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 	SetWindowPos(hListView,NULL,indentLeft,indentTop,width,height,SWP_HIDEWINDOW|SWP_NOZORDER);
 }
 
-void Explorerplusplus::ToggleFolders(void)
+void Explorerplusplus::ToggleFolders()
 {
 	m_config->showFolders = !m_config->showFolders;
 

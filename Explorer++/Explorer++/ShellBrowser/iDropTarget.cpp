@@ -322,7 +322,7 @@ void ShellBrowser::HandleDragSelection(const POINT *ppt)
 	}
 }
 
-HRESULT _stdcall ShellBrowser::DragLeave(void)
+HRESULT _stdcall ShellBrowser::DragLeave()
 {
 	m_pDropTargetHelper->DragLeave();
 

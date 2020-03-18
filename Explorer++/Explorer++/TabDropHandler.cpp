@@ -51,12 +51,12 @@ HRESULT __stdcall TabDropHandler::QueryInterface(REFIID iid, void **ppvObject)
 	return E_NOINTERFACE;
 }
 
-ULONG __stdcall TabDropHandler::AddRef(void)
+ULONG __stdcall TabDropHandler::AddRef()
 {
 	return ++m_RefCount;
 }
 
-ULONG __stdcall TabDropHandler::Release(void)
+ULONG __stdcall TabDropHandler::Release()
 {
 	m_RefCount--;
 
@@ -241,7 +241,7 @@ HRESULT __stdcall TabDropHandler::DragOver(DWORD grfKeyState, POINTL pt, DWORD *
 	return S_OK;
 }
 
-HRESULT __stdcall TabDropHandler::DragLeave(void)
+HRESULT __stdcall TabDropHandler::DragLeave()
 {
 	KillTimer(m_hTabCtrl, TIMER_ID);
 	m_pDropTargetHelper->DragLeave();

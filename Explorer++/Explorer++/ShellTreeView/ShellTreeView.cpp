@@ -1441,7 +1441,7 @@ void ShellTreeView::MonitorDrive(const TCHAR *szDrive)
 	}
 }
 
-HRESULT ShellTreeView::InitializeDragDropHelpers(void)
+HRESULT ShellTreeView::InitializeDragDropHelpers()
 {
 	HRESULT hr;
 
@@ -1504,12 +1504,12 @@ HRESULT __stdcall ShellTreeView::QueryInterface(REFIID iid, void **ppvObject)
 	return E_NOINTERFACE;
 }
 
-ULONG __stdcall ShellTreeView::AddRef(void)
+ULONG __stdcall ShellTreeView::AddRef()
 {
 	return ++m_iRefCount;
 }
 
-ULONG __stdcall ShellTreeView::Release(void)
+ULONG __stdcall ShellTreeView::Release()
 {
 	m_iRefCount--;
 	
@@ -1522,7 +1522,7 @@ ULONG __stdcall ShellTreeView::Release(void)
 	return m_iRefCount;
 }
 
-BOOL ShellTreeView::QueryDragging(void)
+BOOL ShellTreeView::QueryDragging()
 {
 	return m_bDragging;
 }
@@ -1532,7 +1532,7 @@ void ShellTreeView::SetShowHidden(BOOL bShowHidden)
 	m_bShowHidden = bShowHidden;
 }
 
-void ShellTreeView::RefreshAllIcons(void)
+void ShellTreeView::RefreshAllIcons()
 {
 	HTREEITEM hRoot = TreeView_GetRoot(m_hTreeView);
 

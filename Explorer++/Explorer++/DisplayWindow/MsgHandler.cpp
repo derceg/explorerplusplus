@@ -152,7 +152,7 @@ DWORD WINAPI Thread_ExtractThumbnailImage(LPVOID lpParameter)
 	return 0;
 }
 
-void DisplayWindow::ExtractThumbnailImage(void)
+void DisplayWindow::ExtractThumbnailImage()
 {
 	ThumbnailEntry_t te;
 
@@ -449,7 +449,7 @@ void DisplayWindow::OnRButtonUp(WPARAM wParam,LPARAM lParam)
 	}
 }
 
-void DisplayWindow::CancelThumbnailExtraction(void)
+void DisplayWindow::CancelThumbnailExtraction()
 {
 	std::list<ThumbnailEntry_t>::iterator itr;
 
