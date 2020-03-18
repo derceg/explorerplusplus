@@ -56,6 +56,8 @@ __interface IExplorerplusplus
 	void			OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters);
 
 	HMENU			BuildViewsMenu();
+	
+	HMENU			BuildCommandPromptOptionsMenu();
 
 	bool			CanCreate() const;
 	BOOL			CanCut() const;

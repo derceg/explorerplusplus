@@ -378,6 +378,9 @@ BYTE MainToolbar::LookupToolbarButtonExtraStyles(ToolbarButton button) const
 	case ToolbarButton::Views:
 		return BTNS_DROPDOWN;
 
+	case ToolbarButton::OpenCommandPrompt:
+		return BTNS_DROPDOWN;
+
 	default:
 		return 0;
 	}
@@ -672,6 +675,12 @@ LRESULT MainToolbar::OnTbnDropDown(const NMTOOLBAR *nmtb)
 
 		return TBDDRET_DEFAULT;
 	}
+	else if (nmtb->iItem == ToolbarButton::OpenCommandPrompt)
+	{
+		ShowToolbarCommandPromptDropdown();
+
+		return TBDDRET_DEFAULT;
+	}
 
 	return TBDDRET_NODEFAULT;
 }
@@ -784,6 +793,29 @@ void MainToolbar::CreateViewsMenu(POINT *ptOrigin)
 
 	TrackPopupMenu(viewsMenu, TPM_LEFTALIGN, ptOrigin->x, ptOrigin->y,
 		0, m_hwnd, nullptr);
+}
+
+void MainToolbar::ShowToolbarCommandPromptDropdown()
+{
+	POINT	ptOrigin;
+	RECT	rcButton;
+
+	SendMessage(m_hwnd, TB_GETRECT, (WPARAM)ToolbarButton::OpenCommandPrompt, (LPARAM)&rcButton);
+
+	ptOrigin.x = rcButton.left;
+	ptOrigin.y = rcButton.bottom;
+
+	ClientToScreen(m_hwnd, &ptOrigin);
+
+	CreateCommandPromptOptionsMenu(&ptOrigin);
+}
+
+void MainToolbar::CreateCommandPromptOptionsMenu(POINT* ptOrigin)
+{
+	HMENU commandPromptOptionsMenu = m_pexpp->BuildCommandPromptOptionsMenu();
+
+	TrackPopupMenu(commandPromptOptionsMenu, TPM_LEFTALIGN, ptOrigin->x, ptOrigin->y,
+		0, m_hwnd, NULL);
 }
 
 // For some of the buttons on the toolbar, their state depends on an item from

@@ -136,3 +136,9 @@ void Explorerplusplus::AddViewModesToMenu(HMENU menu)
 		InsertMenuItem(menu, IDM_VIEW_PLACEHOLDER, FALSE, &mii);
 	}
 }
+
+HMENU Explorerplusplus::BuildCommandPromptOptionsMenu()
+{
+	HMENU commandPromptOptionsMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_COMMAND_PROMPT_OPTIONS_MENU)), 0);
+	return commandPromptOptionsMenu;
+}
