@@ -846,7 +846,7 @@ HRESULT DropHandler::CopyDIBV5Data(IDataObject *pDataObject,
 	return hr;
 }
 
-void DropHandler::HandleRightClickDrop(void)
+void DropHandler::HandleRightClickDrop()
 {
 	unique_pidl_absolute pidlDirectory;
 	HRESULT hr = SHParseDisplayName(m_szDestDirectory, nullptr, wil::out_param(pidlDirectory), 0, nullptr);

@@ -20,7 +20,7 @@ void StatusBar::SetPartText(int iPart, const TCHAR *szText)
 		reinterpret_cast<LPARAM>(szText));
 }
 
-void StatusBar::HandleStatusBarMenuOpen(void)
+void StatusBar::HandleStatusBarMenuOpen()
 {
 	if(!m_bAlteredStatusBarParts)
 	{
@@ -57,7 +57,7 @@ void StatusBar::HandleStatusBarMenuOpen(void)
 	}
 }
 
-void StatusBar::HandleStatusBarMenuClose(void)
+void StatusBar::HandleStatusBarMenuClose()
 {
 	int i = 0;
 

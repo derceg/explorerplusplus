@@ -21,8 +21,8 @@ public:
 	~DataObject();
 
 	HRESULT		__stdcall	QueryInterface(REFIID iid, void **ppvObject);
-	ULONG		__stdcall	AddRef(void);
-	ULONG		__stdcall	Release(void);
+	ULONG		__stdcall	AddRef();
+	ULONG		__stdcall	Release();
 
 	HRESULT		__stdcall	GetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium);
 	HRESULT		__stdcall	GetDataHere(FORMATETC *pFormatEtc,STGMEDIUM *pMedium);
@@ -111,12 +111,12 @@ HRESULT __stdcall DataObject::QueryInterface(REFIID iid, void **ppvObject)
 	return E_NOINTERFACE;
 }
 
-ULONG __stdcall DataObject::AddRef(void)
+ULONG __stdcall DataObject::AddRef()
 {
 	return InterlockedIncrement(&m_lRefCount);
 }
 
-ULONG __stdcall DataObject::Release(void)
+ULONG __stdcall DataObject::Release()
 {
 	LONG lCount = InterlockedDecrement(&m_lRefCount);
 

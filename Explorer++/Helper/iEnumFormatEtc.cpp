@@ -15,14 +15,14 @@ public:
 	~EnumFormatEtc();
 
 	HRESULT		__stdcall	QueryInterface(REFIID iid, void **ppvObject);
-	ULONG		__stdcall	AddRef(void);
-	ULONG		__stdcall	Release(void);
+	ULONG		__stdcall	AddRef();
+	ULONG		__stdcall	Release();
 
 private:
 
 	HRESULT __stdcall Next(ULONG celt,FORMATETC *rgelt,ULONG *pceltFetched);
 	HRESULT __stdcall Skip(ULONG celt);
-	HRESULT __stdcall Reset(void);
+	HRESULT __stdcall Reset();
 	HRESULT __stdcall Clone(IEnumFORMATETC **ppEnum);
 
 	LONG			m_lRefCount;
@@ -94,12 +94,12 @@ HRESULT __stdcall EnumFormatEtc::QueryInterface(REFIID iid, void **ppvObject)
 	return E_NOINTERFACE;
 }
 
-ULONG __stdcall EnumFormatEtc::AddRef(void)
+ULONG __stdcall EnumFormatEtc::AddRef()
 {
 	return InterlockedIncrement(&m_lRefCount);
 }
 
-ULONG __stdcall EnumFormatEtc::Release(void)
+ULONG __stdcall EnumFormatEtc::Release()
 {
 	LONG lCount = InterlockedDecrement(&m_lRefCount);
 
@@ -163,7 +163,7 @@ HRESULT __stdcall EnumFormatEtc::Skip(ULONG celt)
 	return S_OK;
 }
 
-HRESULT __stdcall EnumFormatEtc::Reset(void)
+HRESULT __stdcall EnumFormatEtc::Reset()
 {
 	m_iIndex = 0;
 	return S_OK;

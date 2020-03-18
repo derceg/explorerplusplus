@@ -16,8 +16,8 @@ public:
 
 	void			SetPartText(int iPart, const TCHAR *szText);
 
-	void			HandleStatusBarMenuOpen(void);
-	void			HandleStatusBarMenuClose(void);
+	void			HandleStatusBarMenuOpen();
+	void			HandleStatusBarMenuClose();
 
 private:
 

@@ -40,7 +40,7 @@ private:
 	~DropHandler() = default;
 
 	void	HandleLeftClickDrop(IDataObject *pDataObject,POINTL *pptl);
-	void	HandleRightClickDrop(void);
+	void	HandleRightClickDrop();
 
 	BOOL	CheckDropFormatSupported(IDataObject *pDataObject,FORMATETC *pftc);
 

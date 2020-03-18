@@ -370,12 +370,12 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT
 	return E_FAIL;
 }
 
-int GetDefaultFolderIconIndex(void)
+int GetDefaultFolderIconIndex()
 {
 	return GetDefaultIcon(DEFAULT_ICON_FOLDER);
 }
 
-int GetDefaultFileIconIndex(void)
+int GetDefaultFileIconIndex()
 {
 	return GetDefaultIcon(DEFAULT_ICON_FILE);
 }

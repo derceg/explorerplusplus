@@ -14,12 +14,12 @@ class DirectoryMonitor : public IDirectoryMonitor
 {
 public:
 
-	DirectoryMonitor(void);
+	DirectoryMonitor();
 	~DirectoryMonitor();
 
 	HRESULT		__stdcall	QueryInterface(REFIID iid, void **ppvObject);
-	ULONG		__stdcall	AddRef(void);
-	ULONG		__stdcall	Release(void);
+	ULONG		__stdcall	AddRef();
+	ULONG		__stdcall	Release();
 
 	int	WatchDirectory(const TCHAR *Directory, UINT WatchFlags,
 		OnDirectoryAltered onDirectoryAltered, BOOL bWatchSubTree,
@@ -83,7 +83,7 @@ HRESULT CreateDirectoryMonitor(IDirectoryMonitor **pDirectoryMonitor)
 	return S_OK;
 }
 
-DirectoryMonitor::DirectoryMonitor(void)
+DirectoryMonitor::DirectoryMonitor()
 {
 	m_iRefCount	= 1;
 	m_UniqueId	= 0;
@@ -130,12 +130,12 @@ HRESULT __stdcall DirectoryMonitor::QueryInterface(REFIID iid, void **ppvObject)
 	return E_NOINTERFACE;
 }
 
-ULONG __stdcall DirectoryMonitor::AddRef(void)
+ULONG __stdcall DirectoryMonitor::AddRef()
 {
 	return ++m_iRefCount;
 }
 
-ULONG __stdcall DirectoryMonitor::Release(void)
+ULONG __stdcall DirectoryMonitor::Release()
 {
 	m_iRefCount--;
 

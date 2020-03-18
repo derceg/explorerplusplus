@@ -17,8 +17,8 @@ public:
 	DropSource(DragType dragType);
 
 	HRESULT		__stdcall	QueryInterface(REFIID iid, void **ppvObject);
-	ULONG		__stdcall	AddRef(void);
-	ULONG		__stdcall	Release(void);
+	ULONG		__stdcall	AddRef();
+	ULONG		__stdcall	Release();
 
 	HRESULT _stdcall	QueryContinueDrag(BOOL fEscapePressed,DWORD gfrKeyState);
 	HRESULT _stdcall	GiveFeedback(DWORD dwEffect);
@@ -67,12 +67,12 @@ HRESULT __stdcall DropSource::QueryInterface(REFIID iid, void **ppvObject)
 	return E_NOINTERFACE;
 }
 
-ULONG __stdcall DropSource::AddRef(void)
+ULONG __stdcall DropSource::AddRef()
 {
 	return InterlockedIncrement(&m_lRefCount);
 }
 
-ULONG __stdcall DropSource::Release(void)
+ULONG __stdcall DropSource::Release()
 {
 	LONG lCount = InterlockedDecrement(&m_lRefCount);
 

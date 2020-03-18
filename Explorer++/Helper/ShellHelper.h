@@ -89,8 +89,8 @@ bool			IsChildOfLibrariesFolder(PCIDLIST_ABSOLUTE pidl);
 DWORD			DetermineDragEffect(DWORD grfKeyState, DWORD dwCurrentEffect, BOOL bDataAccept, BOOL bOnSameDrive);
 
 /* Default icon indices. */
-int				GetDefaultFolderIconIndex(void);
-int				GetDefaultFileIconIndex(void);
+int				GetDefaultFolderIconIndex();
+int				GetDefaultFileIconIndex();
 int				GetDefaultIcon(DefaultIconType defaultIconType);
 
 /* Infotips. */
