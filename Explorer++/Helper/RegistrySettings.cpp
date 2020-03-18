@@ -119,7 +119,7 @@ LONG NRegistrySettings::ReadStringListFromRegistry(HKEY hKey,const TCHAR *szBase
 
 		if(lRes == ERROR_SUCCESS)
 		{
-			strList.push_back(szTemp);
+			strList.emplace_back(szTemp);
 		}
 	} while(lRes == ERROR_SUCCESS);
 

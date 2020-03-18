@@ -779,7 +779,7 @@ HRESULT ConvertVariantStringArrayToString(SAFEARRAY *array, TCHAR *szDetail, siz
 
 		if (SUCCEEDED(hr))
 		{
-			strings.push_back(element);
+			strings.emplace_back(element);
 
 			SysFreeString(element);
 		}

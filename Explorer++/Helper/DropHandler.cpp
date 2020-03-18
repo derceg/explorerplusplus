@@ -584,7 +584,7 @@ HRESULT DropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 
 							if(hr == S_OK)
 							{
-								PastedFileList.push_back(pfgd->fgd[i].cFileName);
+								PastedFileList.emplace_back(pfgd->fgd[i].cFileName);
 
 								bDataCopied = TRUE;
 							}
@@ -624,7 +624,7 @@ HRESULT DropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 				StringCchCopy(szFileName,SIZEOF_ARRAY(szFileName),szFullFileName);
 				PathStripPath(szFileName);
 
-				PastedFileList.push_back(szFileName);
+				PastedFileList.emplace_back(szFileName);
 			}
 
 			FORMATETC ftc;
@@ -690,7 +690,7 @@ HRESULT DropHandler::CopyUnicodeTextData(IDataObject *pDataObject,
 				StringCchCopy(szFileName,SIZEOF_ARRAY(szFileName),szFullFileName);
 				PathStripPath(szFileName);
 
-				PastedFileList.push_back(szFileName);
+				PastedFileList.emplace_back(szFileName);
 			}
 
 			GlobalUnlock(stg.hGlobal);
@@ -734,7 +734,7 @@ HRESULT DropHandler::CopyAnsiTextData(IDataObject *pDataObject,
 					StringCchCopy(szFileName, SIZEOF_ARRAY(szFileName), szFullFileName);
 					PathStripPath(szFileName);
 
-					PastedFileList.push_back(szFileName);
+					PastedFileList.emplace_back(szFileName);
 				}
 			}
 
@@ -833,7 +833,7 @@ HRESULT DropHandler::CopyDIBV5Data(IDataObject *pDataObject,
 
 				delete[] pData;
 
-				PastedFileList.push_back(szFileName);
+				PastedFileList.emplace_back(szFileName);
 			}
 
 			GlobalUnlock(stg.hGlobal);
@@ -941,11 +941,11 @@ void DropHandler::CopyDroppedFiles(const HDROP &hd,BOOL bPreferredEffect,DWORD d
 
 		if(dwEffect & DROPEFFECT_MOVE)
 		{
-			moveFilenameList.push_back(szFullFileName);
+			moveFilenameList.emplace_back(szFullFileName);
 		}
 		else if(dwEffect & DROPEFFECT_COPY)
 		{
-			copyFilenameList.push_back(szFullFileName);
+			copyFilenameList.emplace_back(szFullFileName);
 		}
 		else if(dwEffect & DROPEFFECT_LINK)
 		{
@@ -1153,7 +1153,7 @@ BOOL CopyDroppedFilesInternalAsync(PastedFilesInfo_t *ppfi)
 			StringCchCopy(szFilename,SIZEOF_ARRAY(szFilename),fullFilename.c_str());
 			PathStripPath(szFilename);
 
-			filenameList.push_back(szFilename);
+			filenameList.emplace_back(szFilename);
 		}
 
 		if(shfo.hNameMappings != NULL)

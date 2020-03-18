@@ -41,7 +41,7 @@ void StatusBar::HandleStatusBarMenuOpen(void)
 		{
 			SendMessage(m_hwnd,SB_GETTEXT,i,reinterpret_cast<LPARAM>(szPartText));
 
-			m_TextList.push_back(szPartText);
+			m_TextList.emplace_back(szPartText);
 		}
 
 		m_nParts = nParts;

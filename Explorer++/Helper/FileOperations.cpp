@@ -341,11 +341,11 @@ BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,cons
 			if((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
 			FILE_ATTRIBUTE_DIRECTORY)
 			{
-				folderList.push_back(wfd.cFileName);
+				folderList.emplace_back(wfd.cFileName);
 			}
 			else
 			{
-				fileList.push_back(wfd.cFileName);
+				fileList.emplace_back(wfd.cFileName);
 
 				ulFileSize.LowPart = wfd.nFileSizeLow;
 				ulFileSize.HighPart = wfd.nFileSizeHigh;
@@ -362,11 +362,11 @@ BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,cons
 				if((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
 					FILE_ATTRIBUTE_DIRECTORY)
 				{
-					folderList.push_back(wfd.cFileName);
+					folderList.emplace_back(wfd.cFileName);
 				}
 				else
 				{
-					fileList.push_back(wfd.cFileName);
+					fileList.emplace_back(wfd.cFileName);
 
 					ulFileSize.LowPart = wfd.nFileSizeLow;
 					ulFileSize.HighPart = wfd.nFileSizeHigh;

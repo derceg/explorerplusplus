@@ -19,7 +19,7 @@ std::list<std::wstring> NComboBox::ComboBox_GetStrings(HWND hComboBox)
 		auto entry = std::make_unique<TCHAR[]>(length + 1);
 		ComboBox_GetLBText(hComboBox,i,entry.get());
 
-		entries.push_back(entry.get());
+		entries.emplace_back(entry.get());
 	}
 
 	return entries;
