@@ -354,7 +354,7 @@ private:
 	void				PlaceColumns();
 	void				QueueColumnTask(int itemInternalIndex, int columnIndex);
 	static ColumnResult_t	GetColumnTextAsync(HWND listView, int columnResultId, unsigned int ColumnID, int InternalIndex, const BasicItemInfo_t &basicItemInfo, const GlobalFolderSettings &globalFolderSettings);
-	void				InsertColumn(unsigned int ColumnId,int iColumndIndex,int iWidth);
+	void				InsertColumn(unsigned int ColumnId,int iColumnIndex,int iWidth);
 	void				SetActiveColumnSet();
 	void				GetColumnInternal(unsigned int id,Column_t *pci) const;
 	void				SaveColumnWidths();
