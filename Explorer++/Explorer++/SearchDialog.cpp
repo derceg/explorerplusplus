@@ -133,7 +133,7 @@ INT_PTR SearchDialog::OnInitDialog()
 			reinterpret_cast<LPARAM>(strDirectory.c_str()));
 	}
 
-	for(const auto strPattern : m_persistentSettings->m_searchPatterns)
+	for(const auto &strPattern : m_persistentSettings->m_searchPatterns)
 	{
 		SendDlgItemMessage(m_hDlg,IDC_COMBO_NAME,CB_INSERTSTRING,static_cast<WPARAM>(-1),
 			reinterpret_cast<LPARAM>(strPattern.c_str()));
@@ -1415,7 +1415,7 @@ template <typename T>
 void SearchDialogPersistentSettings::CircularBufferToList(const boost::circular_buffer<T> &cb,
 	std::list<T> &list)
 {
-	for(auto item : cb)
+	for(const auto &item : cb)
 	{
 		list.push_back(item);
 	}
@@ -1425,7 +1425,7 @@ template <typename T>
 void SearchDialogPersistentSettings::ListToCircularBuffer(const std::list<T> &list,
 	boost::circular_buffer<T> &cb)
 {
-	for(auto item : list)
+	for(const auto &item : list)
 	{
 		cb.push_back(item);
 	}
