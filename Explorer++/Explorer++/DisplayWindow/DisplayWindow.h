@@ -103,7 +103,7 @@ private:
 
 	#define BORDER_COLOUR		Gdiplus::Color(128,128,128)
 
-	LRESULT CALLBACK DisplayWindowProc(HWND,UINT,WPARAM,LPARAM);
+	LRESULT CALLBACK DisplayWindowProc(HWND DisplayWindow, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	LONG	OnMouseMove(LPARAM lParam);
 	void	OnLButtonDown(LPARAM lParam);
