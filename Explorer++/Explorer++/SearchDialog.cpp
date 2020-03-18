@@ -445,7 +445,7 @@ void SearchDialog::SaveEntry(int comboBoxId, boost::circular_buffer<std::wstring
 	auto itr = std::find_if(buffer.begin(), buffer.end(),
 		[strEntry] (const std::wstring &Pattern)
 	{
-		return Pattern.compare(strEntry) == 0;
+		return Pattern == strEntry;
 	});
 
 	HWND hComboBox = GetDlgItem(m_hDlg, comboBoxId);
