@@ -1145,7 +1145,7 @@ BOOL LoadContextMenuHandlers(const TCHAR *szRegKey,
 				if(lSubKeyRes == ERROR_SUCCESS)
 				{
 					if (std::none_of(blacklistedCLSIDEntries.begin(), blacklistedCLSIDEntries.end(),
-						[&szCLSID](std::wstring blacklistedEntry) { return boost::iequals(szCLSID, blacklistedEntry); }))
+						[&szCLSID](const std::wstring &blacklistedEntry) { return boost::iequals(szCLSID, blacklistedEntry); }))
 					{
 						ContextMenuHandler_t contextMenuHandler;
 

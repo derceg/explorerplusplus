@@ -339,13 +339,13 @@ void TrimString(std::wstring &str, const std::wstring &strWhitespace)
 	TrimStringRight(str, strWhitespace);
 }
 
-std::string wstrToStr(std::wstring source)
+std::string wstrToStr(const std::wstring &source)
 {
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 	return converter.to_bytes(source);
 }
 
-std::wstring strToWstr(std::string source)
+std::wstring strToWstr(const std::string &source)
 {
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 	return converter.from_bytes(source);

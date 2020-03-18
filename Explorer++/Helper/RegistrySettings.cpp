@@ -62,7 +62,7 @@ LONG NRegistrySettings::ReadStringFromRegistry(HKEY hKey,const TCHAR *szKey,TCHA
 	return lRes;
 }
 
-LONG NRegistrySettings::ReadStringFromRegistry(HKEY hKey,std::wstring strKey,std::wstring &strOutput)
+LONG NRegistrySettings::ReadStringFromRegistry(HKEY hKey,const std::wstring &strKey,std::wstring &strOutput)
 {
 	TCHAR szTemp[512];
 	LONG lRes = NRegistrySettings::ReadStringFromRegistry(hKey,strKey.c_str(),szTemp,SIZEOF_ARRAY(szTemp));
