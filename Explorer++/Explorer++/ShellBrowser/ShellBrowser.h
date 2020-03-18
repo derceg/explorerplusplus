@@ -333,7 +333,7 @@ private:
 	static std::optional<InfoTipResult>	GetInfoTipAsync(HWND listView, int infoTipResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo, const Config &config, HINSTANCE instance, bool virtualFolder);
 	void				ProcessInfoTipResult(int infoTipResultId);
 	void				OnListViewItemChanged(const NMLISTVIEW *changeData);
-	void				UpdateFileSelectionInfo(int internalIndex, BOOL Selected);
+	void				UpdateFileSelectionInfo(int internalIndex, BOOL selected);
 	void				OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown);
 
 	// Listview header context menu
@@ -353,8 +353,8 @@ private:
 	/* Listview column support. */
 	void				PlaceColumns();
 	void				QueueColumnTask(int itemInternalIndex, int columnIndex);
-	static ColumnResult_t	GetColumnTextAsync(HWND listView, int columnResultId, unsigned int ColumnID, int InternalIndex, const BasicItemInfo_t &basicItemInfo, const GlobalFolderSettings &globalFolderSettings);
-	void				InsertColumn(unsigned int ColumnId,int iColumnIndex,int iWidth);
+	static ColumnResult_t	GetColumnTextAsync(HWND listView, int columnResultId, unsigned int columnID, int internalIndex, const BasicItemInfo_t &basicItemInfo, const GlobalFolderSettings &globalFolderSettings);
+	void				InsertColumn(unsigned int columnId,int iColumnIndex,int iWidth);
 	void				SetActiveColumnSet();
 	void				GetColumnInternal(unsigned int id,Column_t *pci) const;
 	void				SaveColumnWidths();

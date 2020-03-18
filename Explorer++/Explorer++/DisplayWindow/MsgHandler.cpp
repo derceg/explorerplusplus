@@ -79,15 +79,15 @@ void DisplayWindow::DrawGradientFill(HDC hdc,RECT *rc)
 	SelectObject(m_hdcBackground, originalBackgroundObject);
 }
 
-void DisplayWindow::PatchBackground(HDC hdc,RECT *rc,RECT *UpdateRect)
+void DisplayWindow::PatchBackground(HDC hdc,RECT *rc,RECT *updateRect)
 {
 	HDC hdcMem	= CreateCompatibleDC(hdc);
 	HBITMAP hBitmap	= CreateCompatibleBitmap(hdc,rc->right-rc->left,rc->bottom-rc->top);
 	HGDIOBJ hOriginalObject = SelectObject(hdcMem,hBitmap);
 
 	/* Draw the stored background on top of the patched area. */
-	BitBlt(hdcMem,UpdateRect->left,UpdateRect->top,rc->right,rc->bottom,m_hdcBackground,
-	UpdateRect->left,UpdateRect->top,SRCCOPY);
+	BitBlt(hdcMem,updateRect->left,updateRect->top,rc->right,rc->bottom,m_hdcBackground,
+	updateRect->left,updateRect->top,SRCCOPY);
 
 	PaintText(hdcMem,m_LeftIndent);
 	DrawIconEx(hdcMem,MAIN_ICON_LEFT,MAIN_ICON_TOP,m_hMainIcon,
@@ -98,8 +98,8 @@ void DisplayWindow::PatchBackground(HDC hdc,RECT *rc,RECT *UpdateRect)
 		DrawThumbnail(hdcMem);
 	}
 
-	BitBlt(hdc,UpdateRect->left,UpdateRect->top,rc->right,rc->bottom,hdcMem,
-	UpdateRect->left,UpdateRect->top,SRCCOPY);
+	BitBlt(hdc,updateRect->left,updateRect->top,rc->right,rc->bottom,hdcMem,
+	updateRect->left,updateRect->top,SRCCOPY);
 
 	SelectObject(hdcMem,hOriginalObject);
 	DeleteObject(hBitmap);
@@ -326,9 +326,9 @@ void DisplayWindow::PaintText(HDC hdc,unsigned int x)
 	SelectObject(hdc,hOriginalObject);
 }
 
-void DisplayWindow::TransparentTextOut(HDC hdc,TCHAR *Text,RECT *prcText)
+void DisplayWindow::TransparentTextOut(HDC hdc,TCHAR *text,RECT *prcText)
 {
-	DrawText(hdc,Text,lstrlen(Text),prcText,DT_LEFT|DT_NOPREFIX);
+	DrawText(hdc,text,lstrlen(text),prcText,DT_LEFT|DT_NOPREFIX);
 }
 
 LONG DisplayWindow::OnMouseMove(LPARAM lParam)

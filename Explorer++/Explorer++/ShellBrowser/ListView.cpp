@@ -477,7 +477,7 @@ void ShellBrowser::OnListViewItemChanged(const NMLISTVIEW *changeData)
 	listViewSelectionChanged.m_signal();
 }
 
-void ShellBrowser::UpdateFileSelectionInfo(int internalIndex, BOOL Selected)
+void ShellBrowser::UpdateFileSelectionInfo(int internalIndex, BOOL selected)
 {
 	ULARGE_INTEGER	ulFileSize;
 	BOOL			isFolder;
@@ -488,7 +488,7 @@ void ShellBrowser::UpdateFileSelectionInfo(int internalIndex, BOOL Selected)
 	ulFileSize.LowPart = m_itemInfoMap.at(internalIndex).wfd.nFileSizeLow;
 	ulFileSize.HighPart = m_itemInfoMap.at(internalIndex).wfd.nFileSizeHigh;
 
-	if (Selected)
+	if (selected)
 	{
 		if (isFolder)
 			m_NumFoldersSelected++;

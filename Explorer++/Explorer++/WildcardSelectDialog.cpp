@@ -57,7 +57,7 @@ INT_PTR WildcardSelectDialog::OnInitDialog()
 }
 
 void WildcardSelectDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-	std::list<ResizableDialog::Control_t> &ControlList)
+	std::list<ResizableDialog::Control_t> &controlList)
 {
 	dsc = BaseDialog::DIALOG_SIZE_CONSTRAINT_X;
 
@@ -66,22 +66,22 @@ void WildcardSelectDialog::GetResizableControlInformation(BaseDialog::DialogSize
 	control.iID = IDC_SELECTGROUP_COMBOBOX;
 	control.Type = ResizableDialog::TYPE_RESIZE;
 	control.Constraint = ResizableDialog::CONSTRAINT_X;
-	ControlList.push_back(control);
+	controlList.push_back(control);
 
 	control.iID = IDOK;
 	control.Type = ResizableDialog::TYPE_MOVE;
 	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
-	ControlList.push_back(control);
+	controlList.push_back(control);
 
 	control.iID = IDCANCEL;
 	control.Type = ResizableDialog::TYPE_MOVE;
 	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
-	ControlList.push_back(control);
+	controlList.push_back(control);
 
 	control.iID = IDC_GRIPPER;
 	control.Type = ResizableDialog::TYPE_MOVE;
 	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
-	ControlList.push_back(control);
+	controlList.push_back(control);
 }
 
 INT_PTR WildcardSelectDialog::OnCommand(WPARAM wParam,LPARAM lParam)

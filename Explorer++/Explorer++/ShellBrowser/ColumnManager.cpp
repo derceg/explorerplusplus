@@ -42,10 +42,10 @@ void ShellBrowser::QueueColumnTask(int itemInternalIndex, int columnIndex)
 	m_columnResults.insert({ columnResultID, std::move(result) });
 }
 
-ShellBrowser::ColumnResult_t ShellBrowser::GetColumnTextAsync(HWND listView, int columnResultId, unsigned int ColumnID,
-	int InternalIndex, const BasicItemInfo_t &basicItemInfo, const GlobalFolderSettings &globalFolderSettings)
+ShellBrowser::ColumnResult_t ShellBrowser::GetColumnTextAsync(HWND listView, int columnResultId, unsigned int columnID,
+	int internalIndex, const BasicItemInfo_t &basicItemInfo, const GlobalFolderSettings &globalFolderSettings)
 {
-	std::wstring columnText = GetColumnText(ColumnID, basicItemInfo, globalFolderSettings);
+	std::wstring columnText = GetColumnText(columnID, basicItemInfo, globalFolderSettings);
 
 	// This message may be delivered before this function has returned.
 	// That doesn't actually matter, since the message handler will
@@ -53,8 +53,8 @@ ShellBrowser::ColumnResult_t ShellBrowser::GetColumnTextAsync(HWND listView, int
 	PostMessage(listView, WM_APP_COLUMN_RESULT_READY, columnResultId, 0);
 
 	ColumnResult_t result;
-	result.itemInternalIndex = InternalIndex;
-	result.columnID = ColumnID;
+	result.itemInternalIndex = internalIndex;
+	result.columnID = columnID;
 	result.columnText = columnText;
 
 	return result;
@@ -177,7 +177,7 @@ void ShellBrowser::PlaceColumns()
 	}
 }
 
-void ShellBrowser::InsertColumn(unsigned int ColumnId,int iColumnIndex,int iWidth)
+void ShellBrowser::InsertColumn(unsigned int columnId,int iColumnIndex,int iWidth)
 {
 	HWND		hHeader;
 	HDITEM		hdItem;
@@ -186,7 +186,7 @@ void ShellBrowser::InsertColumn(unsigned int ColumnId,int iColumnIndex,int iWidt
 	int			iActualColumnIndex;
 	int			iStringIndex;
 
-	iStringIndex = LookupColumnNameStringIndex(ColumnId);
+	iStringIndex = LookupColumnNameStringIndex(columnId);
 
 	LoadString(m_hResourceModule,iStringIndex,
 		szText,SIZEOF_ARRAY(szText));
@@ -195,8 +195,8 @@ void ShellBrowser::InsertColumn(unsigned int ColumnId,int iColumnIndex,int iWidt
 	lvColumn.pszText	= szText;
 	lvColumn.cx			= iWidth;
 
-	if(ColumnId == CM_SIZE || ColumnId == CM_REALSIZE || 
-		ColumnId == CM_TOTALSIZE || ColumnId == CM_FREESPACE)
+	if(columnId == CM_SIZE || columnId == CM_REALSIZE || 
+		columnId == CM_TOTALSIZE || columnId == CM_FREESPACE)
 	{
 		lvColumn.mask	|= LVCF_FMT;
 		lvColumn.fmt	= LVCFMT_RIGHT;
@@ -208,7 +208,7 @@ void ShellBrowser::InsertColumn(unsigned int ColumnId,int iColumnIndex,int iWidt
 
 	/* Store the column's ID with the column itself. */
 	hdItem.mask		= HDI_LPARAM;
-	hdItem.lParam	= ColumnId;
+	hdItem.lParam	= columnId;
 
 	Header_SetItem(hHeader,iActualColumnIndex,&hdItem);
 }

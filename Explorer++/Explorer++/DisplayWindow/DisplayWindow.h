@@ -103,20 +103,20 @@ private:
 
 	#define BORDER_COLOUR		Gdiplus::Color(128,128,128)
 
-	LRESULT CALLBACK DisplayWindowProc(HWND DisplayWindow, UINT msg, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK DisplayWindowProc(HWND displayWindow, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	LONG	OnMouseMove(LPARAM lParam);
 	void	OnLButtonDown(LPARAM lParam);
 	void	OnRButtonUp(WPARAM wParam,LPARAM lParam);
 	void	DrawGradientFill(HDC,RECT *);
 	void	PaintText(HDC,unsigned int);
-	void	TransparentTextOut(HDC hdc,TCHAR *Text,RECT *prcText);
+	void	TransparentTextOut(HDC hdc,TCHAR *text,RECT *prcText);
 	void	DrawThumbnail(HDC hdcMem);
 	void	OnSetThumbnailFile(WPARAM wParam,LPARAM lParam);
 	void	OnSetFont(HFONT hFont);
 	void	OnSetTextColor(COLORREF hColor);
 
-	void	PatchBackground(HDC hdc,RECT *rc,RECT *UpdateRect);
+	void	PatchBackground(HDC hdc,RECT *rc,RECT *updateRect);
 
 	void	OnSize(int width, int height);
 
@@ -157,4 +157,4 @@ private:
 	HFONT			m_hDisplayFont;
 };
 
-HWND CreateDisplayWindow(HWND Parent,DWInitialSettings_t *pSettings);
+HWND CreateDisplayWindow(HWND parent,DWInitialSettings_t *pSettings);

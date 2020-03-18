@@ -61,13 +61,13 @@ namespace
 	}
 }
 
-HWND CreateDisplayWindow(HWND Parent,DWInitialSettings_t *pSettings)
+HWND CreateDisplayWindow(HWND parent,DWInitialSettings_t *pSettings)
 {
 	RegisterDisplayWindowClass();
 
 	HWND hDisplayWindow = CreateWindow(WINDOW_NAME,EMPTY_STRING,
 		WS_VISIBLE|WS_CHILD|WS_CLIPSIBLINGS,0,0,0,0,
-		Parent,nullptr,GetModuleHandle(nullptr),reinterpret_cast<LPVOID>(pSettings));
+		parent,nullptr,GetModuleHandle(nullptr),reinterpret_cast<LPVOID>(pSettings));
 
 	return hDisplayWindow;
 }
@@ -138,13 +138,13 @@ WPARAM wParam,LPARAM lParam)
 	return pdw->DisplayWindowProc(hwnd,msg,wParam,lParam);
 }
 
-LRESULT CALLBACK DisplayWindow::DisplayWindowProc(HWND DisplayWindow,UINT msg,
+LRESULT CALLBACK DisplayWindow::DisplayWindowProc(HWND displayWindow,UINT msg,
 WPARAM wParam,LPARAM lParam)
 {
 	switch(msg)
 	{
 		case WM_CREATE:
-			m_hdcBackground	= CreateCompatibleDC(GetDC(DisplayWindow));
+			m_hdcBackground	= CreateCompatibleDC(GetDC(displayWindow));
 			break;
 
 		case WM_LBUTTONUP:
@@ -170,14 +170,14 @@ WPARAM wParam,LPARAM lParam)
 				RECT updateRect;
 				RECT rc;
 
-				GetUpdateRect(DisplayWindow,&updateRect,FALSE);
-				GetClientRect(DisplayWindow,&rc);
+				GetUpdateRect(displayWindow,&updateRect,FALSE);
+				GetClientRect(displayWindow,&rc);
 
-				hdc = BeginPaint(DisplayWindow,&ps);
+				hdc = BeginPaint(displayWindow,&ps);
 
 				PatchBackground(hdc,&rc,&updateRect);
 
-				EndPaint(DisplayWindow,&ps);
+				EndPaint(displayWindow,&ps);
 			}
 			break;
 
@@ -196,7 +196,7 @@ WPARAM wParam,LPARAM lParam)
 				}
 
 				/* TODO: Optimize? */
-				RedrawWindow(DisplayWindow, nullptr, nullptr,RDW_INVALIDATE);
+				RedrawWindow(displayWindow, nullptr, nullptr,RDW_INVALIDATE);
 			}
 			break;
 
@@ -231,13 +231,13 @@ WPARAM wParam,LPARAM lParam)
 				}
 
 				/* TODO: Optimize? */
-				RedrawWindow(DisplayWindow, nullptr, nullptr,RDW_INVALIDATE);
+				RedrawWindow(displayWindow, nullptr, nullptr,RDW_INVALIDATE);
 			}
 			break;
 
 		case DWM_SETTHUMBNAILFILE:
 			OnSetThumbnailFile(wParam,lParam);
-			RedrawWindow(DisplayWindow, nullptr, nullptr,RDW_INVALIDATE);
+			RedrawWindow(displayWindow, nullptr, nullptr,RDW_INVALIDATE);
 			break;
 
 		case DWM_GETCENTRECOLOR:
@@ -250,12 +250,12 @@ WPARAM wParam,LPARAM lParam)
 			{
 				m_CentreColor.SetFromCOLORREF((COLORREF)wParam);
 				HDC hdc;
-				hdc = GetDC(DisplayWindow);
+				hdc = GetDC(displayWindow);
 				RECT rc;
-				GetClientRect(DisplayWindow,&rc);
+				GetClientRect(displayWindow,&rc);
 				DrawGradientFill(hdc,&rc);
-				ReleaseDC(DisplayWindow,hdc);
-				RedrawWindow(DisplayWindow, nullptr, nullptr,RDW_INVALIDATE);
+				ReleaseDC(displayWindow,hdc);
+				RedrawWindow(displayWindow, nullptr, nullptr,RDW_INVALIDATE);
 			}
 			break;
 
@@ -263,12 +263,12 @@ WPARAM wParam,LPARAM lParam)
 			{
 				m_SurroundColor.SetFromCOLORREF((COLORREF)wParam);
 				HDC hdc;
-				hdc = GetDC(DisplayWindow);
+				hdc = GetDC(displayWindow);
 				RECT rc;
-				GetClientRect(DisplayWindow,&rc);
+				GetClientRect(displayWindow,&rc);
 				DrawGradientFill(hdc,&rc);
-				ReleaseDC(DisplayWindow,hdc);
-				RedrawWindow(DisplayWindow, nullptr, nullptr,RDW_INVALIDATE);
+				ReleaseDC(displayWindow,hdc);
+				RedrawWindow(displayWindow, nullptr, nullptr,RDW_INVALIDATE);
 			}
 			break;
 
@@ -295,13 +295,13 @@ WPARAM wParam,LPARAM lParam)
 
 		case WM_ERASEBKGND:
 			HDC hdc;
-			hdc = GetDC(DisplayWindow);
+			hdc = GetDC(displayWindow);
 			RECT rc;
 			RECT updateRect;
-			GetUpdateRect(DisplayWindow,&updateRect,FALSE);
-			GetClientRect(DisplayWindow,&rc);
+			GetUpdateRect(displayWindow,&updateRect,FALSE);
+			GetClientRect(displayWindow,&rc);
 			PatchBackground(hdc,&rc,&updateRect);
-			ReleaseDC(DisplayWindow,hdc);
+			ReleaseDC(displayWindow,hdc);
 			return 1;
 
 		case WM_SIZE:
@@ -314,5 +314,5 @@ WPARAM wParam,LPARAM lParam)
 			break;
 	}
 
-	return DefWindowProc(DisplayWindow,msg,wParam,lParam);
+	return DefWindowProc(displayWindow,msg,wParam,lParam);
 }
