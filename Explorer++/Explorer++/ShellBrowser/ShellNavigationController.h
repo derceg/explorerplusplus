@@ -29,7 +29,7 @@ public:
 		IconFetcherInterface *iconFetcher, const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
 		int currentEntry);
 
-	bool CanGoUp() const;
+	[[nodiscard]] bool CanGoUp() const;
 	HRESULT GoUp();
 
 	HRESULT Refresh();
