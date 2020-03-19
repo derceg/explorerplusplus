@@ -120,7 +120,7 @@ void DisplayWindow::DrawThumbnail(HDC hdcMem)
 			GetClientRect(m_hDisplayWindow,&rc);
 
 			HDC hdcSrc = CreateCompatibleDC(hdcMem);
-			HBITMAP hBitmapOld = (HBITMAP)SelectObject(hdcSrc,m_hbmThumbnail);
+			auto hBitmapOld = (HBITMAP)SelectObject(hdcSrc,m_hbmThumbnail);
 
 			BitBlt(hdcMem,m_xColumnFinal,THUMB_IMAGE_TOP,
 				GetRectWidth(&rc) - m_xColumnFinal,GetRectHeight(&rc) - THUMB_HEIGHT_DELTA,

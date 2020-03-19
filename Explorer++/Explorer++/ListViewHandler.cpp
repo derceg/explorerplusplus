@@ -42,7 +42,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	Explorerplusplus *pexpp = reinterpret_cast<Explorerplusplus *>(dwRefData);
+	auto *pexpp = reinterpret_cast<Explorerplusplus *>(dwRefData);
 
 	return pexpp->ListViewSubclassProc(hwnd,uMsg,wParam,lParam);
 }
@@ -985,7 +985,7 @@ void Explorerplusplus::OnListViewCopyUniversalPaths() const
 		TCHAR szBuffer[1024];
 
 		DWORD dwBufferSize = SIZEOF_ARRAY(szBuffer);
-		UNIVERSAL_NAME_INFO *puni = reinterpret_cast<UNIVERSAL_NAME_INFO *>(&szBuffer);
+		auto *puni = reinterpret_cast<UNIVERSAL_NAME_INFO *>(&szBuffer);
 		DWORD dwRet = WNetGetUniversalName(szFullFilename,UNIVERSAL_NAME_INFO_LEVEL,
 			reinterpret_cast<LPVOID>(puni),&dwBufferSize);
 
@@ -1086,7 +1086,7 @@ void Explorerplusplus::OnListViewPaste()
 		szDestination[lstrlen(szDestination) + 1] = '\0';
 
 		DropHandler *pDropHandler = DropHandler::CreateNew();
-		DropFilesCallback *dropFilesCallback = new DropFilesCallback(this);
+		auto *dropFilesCallback = new DropFilesCallback(this);
 		pDropHandler->CopyClipboardData(pClipboardObject,m_hContainer,szDestination,
 			dropFilesCallback,!m_config->overwriteExistingFilesConfirmation);
 		pDropHandler->Release();

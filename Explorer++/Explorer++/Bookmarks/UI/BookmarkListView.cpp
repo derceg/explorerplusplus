@@ -153,7 +153,7 @@ LRESULT CALLBACK BookmarkListView::ParentWndProcStub(
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	BookmarkListView *listView = reinterpret_cast<BookmarkListView *>(dwRefData);
+	auto *listView = reinterpret_cast<BookmarkListView *>(dwRefData);
 	return listView->ParentWndProc(hwnd, uMsg, wParam, lParam);
 }
 
@@ -288,7 +288,7 @@ void BookmarkListView::SortItems()
 
 int CALLBACK BookmarkListView::SortBookmarksStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 {
-	BookmarkListView *listView = reinterpret_cast<BookmarkListView *>(lParamSort);
+	auto *listView = reinterpret_cast<BookmarkListView *>(lParamSort);
 
 	return listView->SortBookmarks(lParam1, lParam2);
 }
@@ -746,7 +746,7 @@ wil::unique_hmenu BookmarkListView::BuildColumnsMenu()
 
 void BookmarkListView::OnHeaderContextMenuItemSelected(int menuItemId)
 {
-	ColumnType columnType = static_cast<ColumnType>(menuItemId);
+	auto columnType = static_cast<ColumnType>(menuItemId);
 	ToggleColumn(columnType);
 }
 

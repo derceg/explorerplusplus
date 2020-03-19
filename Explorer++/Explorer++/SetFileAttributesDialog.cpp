@@ -173,7 +173,7 @@ INT_PTR SetFileAttributesDialog::OnNotify(NMHDR *pnmhdr)
 	{
 	case DTN_DATETIMECHANGE:
 		{
-			NMDATETIMECHANGE *pdtc = reinterpret_cast<NMDATETIMECHANGE *>(pnmhdr);
+			auto *pdtc = reinterpret_cast<NMDATETIMECHANGE *>(pnmhdr);
 
 			switch(pnmhdr->idFrom)
 			{

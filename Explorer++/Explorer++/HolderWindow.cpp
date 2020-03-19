@@ -59,7 +59,7 @@ HWND CreateHolderWindow(HWND hParent,TCHAR *szWindowName,UINT uStyle)
 
 LRESULT CALLBACK HolderWndProcStub(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
-	HolderWindow *pHolderWindow = (HolderWindow *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
+	auto *pHolderWindow = (HolderWindow *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
 
 	switch(msg)
 	{

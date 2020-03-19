@@ -108,7 +108,7 @@ void Explorerplusplus::OnSearch()
 		Tab &selectedTab = m_tabContainer->GetSelectedTab();
 		std::wstring currentDirectory = selectedTab.GetShellBrowser()->GetDirectory();
 
-		SearchDialog *searchDialog = new SearchDialog(m_hLanguageModule, m_hContainer,
+		auto *searchDialog = new SearchDialog(m_hLanguageModule, m_hContainer,
 			currentDirectory, this, m_tabContainer);
 		g_hwndSearch = searchDialog->ShowModelessDialog(new ModelessDialogNotification());
 	}
@@ -132,7 +132,7 @@ void Explorerplusplus::OnRunScript()
 {
 	if (g_hwndRunScript == nullptr)
 	{
-		ScriptingDialog *scriptingDialog = new ScriptingDialog(m_hLanguageModule, m_hContainer, this);
+		auto *scriptingDialog = new ScriptingDialog(m_hLanguageModule, m_hContainer, this);
 		g_hwndRunScript = scriptingDialog->ShowModelessDialog(new ModelessDialogNotification());
 	}
 	else

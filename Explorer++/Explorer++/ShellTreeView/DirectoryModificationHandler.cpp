@@ -182,7 +182,7 @@ void ShellTreeView::DirectoryAlteredRenameFile(const TCHAR *szFullFileName)
 
 		/* Notify the parent that the selected item (or one of its ancestors)
 		has been renamed. */
-		HTREEITEM hSelection = TreeView_GetSelection(m_hTreeView);
+		auto hSelection = TreeView_GetSelection(m_hTreeView);
 		HTREEITEM hAncestor = hSelection;
 
 		while(hAncestor != hItem && hAncestor != nullptr) 

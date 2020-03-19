@@ -98,7 +98,7 @@ void DrivesToolbar::OnDeviceArrival(DEV_BROADCAST_HDR *dbh)
 		return;
 	}
 
-	DEV_BROADCAST_VOLUME *pdbv = reinterpret_cast<DEV_BROADCAST_VOLUME *>(dbh);
+	auto *pdbv = reinterpret_cast<DEV_BROADCAST_VOLUME *>(dbh);
 
 	/* Build a string that will form the drive name. */
 	TCHAR szDrive[4];
@@ -131,7 +131,7 @@ void DrivesToolbar::OnDeviceRemoveComplete(DEV_BROADCAST_HDR *dbh)
 		return;
 	}
 
-	DEV_BROADCAST_VOLUME *pdbv = reinterpret_cast<DEV_BROADCAST_VOLUME *>(dbh);
+	auto *pdbv = reinterpret_cast<DEV_BROADCAST_VOLUME *>(dbh);
 
 	TCHAR szDrive[4];
 	TCHAR chDrive = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
@@ -155,7 +155,7 @@ LRESULT CALLBACK DrivesToolbar::DrivesToolbarParentProcStub(
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	DrivesToolbar *pdt = reinterpret_cast<DrivesToolbar *>(dwRefData);
+	auto *pdt = reinterpret_cast<DrivesToolbar *>(dwRefData);
 
 	return pdt->DrivesToolbarParentProc(hwnd, uMsg, wParam, lParam);
 }
@@ -188,7 +188,7 @@ LRESULT CALLBACK DrivesToolbar::DrivesToolbarParentProc(
 			{
 			case NM_RCLICK:
 			{
-				NMMOUSE *pnmm = reinterpret_cast<NMMOUSE *>(lParam);
+				auto *pnmm = reinterpret_cast<NMMOUSE *>(lParam);
 
 				if (pnmm->dwItemSpec != -1)
 				{
@@ -222,7 +222,7 @@ LRESULT CALLBACK DrivesToolbar::DrivesToolbarParentProc(
 
 			case TBN_GETINFOTIP:
 			{
-				NMTBGETINFOTIP *pnmtbgit = reinterpret_cast<NMTBGETINFOTIP *>(lParam);
+				auto *pnmtbgit = reinterpret_cast<NMTBGETINFOTIP *>(lParam);
 
 				int iIndex =
 					static_cast<int>(SendMessage(m_hwnd, TB_COMMANDTOINDEX, pnmtbgit->iItem, 0));

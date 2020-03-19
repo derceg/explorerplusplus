@@ -49,7 +49,7 @@ INT_PTR HelpFileMissingDialog::OnNotify(NMHDR *pnmhdr)
 			if(pnmhdr->hwndFrom == GetDlgItem(m_hDlg,IDC_SYSLINK_DOWNLOAD) ||
 				pnmhdr->hwndFrom == GetDlgItem(m_hDlg, IDC_SYSLINK_READTHEDOCS))
 			{
-				PNMLINK pnmlink = reinterpret_cast<PNMLINK>(pnmhdr);
+				auto pnmlink = reinterpret_cast<PNMLINK>(pnmhdr);
 				ShellExecute(nullptr,L"open",pnmlink->item.szUrl,
 					nullptr, nullptr,SW_SHOW);
 			}

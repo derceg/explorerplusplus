@@ -190,7 +190,7 @@ HWND ShellBrowser::SetUpListView(HWND parent)
 		return nullptr;
 	}
 
-	DWORD dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
+	auto dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
 
 	if (m_config->useFullRowSelect)
 	{

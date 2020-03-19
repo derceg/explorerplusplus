@@ -513,7 +513,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 /* TODO: This isn't declared. */
 int CALLBACK SortTemporaryStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	ShellBrowser *pShellBrowser = reinterpret_cast<ShellBrowser *>(lParamSort);
+	auto *pShellBrowser = reinterpret_cast<ShellBrowser *>(lParamSort);
 	return pShellBrowser->SortTemporary(lParam1,lParam2);
 }
 

@@ -58,7 +58,7 @@ LRESULT CALLBACK BookmarkTreeView::BookmarkTreeViewProcStub(
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	BookmarkTreeView *pbtv = reinterpret_cast<BookmarkTreeView *>(dwRefData);
+	auto *pbtv = reinterpret_cast<BookmarkTreeView *>(dwRefData);
 
 	return pbtv->TreeViewProc(hwnd, uMsg, wParam, lParam);
 }
@@ -96,7 +96,7 @@ LRESULT CALLBACK BookmarkTreeView::BookmarkTreeViewParentProcStub(
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	BookmarkTreeView *pbtv = reinterpret_cast<BookmarkTreeView *>(dwRefData);
+	auto *pbtv = reinterpret_cast<BookmarkTreeView *>(dwRefData);
 
 	return pbtv->TreeViewParentProc(hwnd, uMsg, wParam, lParam);
 }
@@ -142,7 +142,7 @@ LRESULT CALLBACK BookmarkTreeView::TreeViewEditProcStub(
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	BookmarkTreeView *pbtv = reinterpret_cast<BookmarkTreeView *>(dwRefData);
+	auto *pbtv = reinterpret_cast<BookmarkTreeView *>(dwRefData);
 
 	return pbtv->TreeViewEditProc(hwnd, uMsg, wParam, lParam);
 }
@@ -245,11 +245,11 @@ HTREEITEM BookmarkTreeView::InsertFolderIntoTreeView(
 		/* Find the item one *before* Position;
 		the new item will then be inserted one
 		place *after* this. */
-		HTREEITEM hChild = TreeView_GetChild(m_hTreeView, hParent);
+		auto hChild = TreeView_GetChild(m_hTreeView, hParent);
 
 		for (int i = 0; i < (position - 1); i++)
 		{
-			HTREEITEM hNextSibling = TreeView_GetNextSibling(m_hTreeView, hChild);
+			auto hNextSibling = TreeView_GetNextSibling(m_hTreeView, hChild);
 
 			/* Only bookmark folders are inserted into the
 			treeview, so it's possible that the specified position
@@ -269,7 +269,7 @@ HTREEITEM BookmarkTreeView::InsertFolderIntoTreeView(
 	tvis.hParent = hParent;
 	tvis.hInsertAfter = hInsertAfter;
 	tvis.itemex = tviex;
-	HTREEITEM hItem = TreeView_InsertItem(m_hTreeView, &tvis);
+	auto hItem = TreeView_InsertItem(m_hTreeView, &tvis);
 
 	m_mapItem.insert(std::make_pair(bookmarkFolder->GetGUID(), hItem));
 
@@ -400,7 +400,7 @@ void BookmarkTreeView::RemoveBookmarkItem(const BookmarkItem *bookmarkItem)
 	auto parentItr = m_mapItem.find(bookmarkItem->GetParent()->GetGUID());
 	assert(parentItr != m_mapItem.end());
 
-	HTREEITEM firstChild = TreeView_GetChild(m_hTreeView, parentItr->second);
+	auto firstChild = TreeView_GetChild(m_hTreeView, parentItr->second);
 
 	if (!firstChild)
 	{
@@ -432,7 +432,7 @@ void BookmarkTreeView::OnKeyDown(const NMTVKEYDOWN *pnmtvkd)
 
 void BookmarkTreeView::OnTreeViewRename()
 {
-	HTREEITEM hSelectedItem = TreeView_GetSelection(m_hTreeView);
+	auto hSelectedItem = TreeView_GetSelection(m_hTreeView);
 	TreeView_EditLabel(m_hTreeView, hSelectedItem);
 }
 
@@ -508,7 +508,7 @@ void BookmarkTreeView::OnBeginDrag(const NMTREEVIEW *treeView)
 
 bool BookmarkTreeView::CanDelete()
 {
-	HTREEITEM hSelectedItem = TreeView_GetSelection(m_hTreeView);
+	auto hSelectedItem = TreeView_GetSelection(m_hTreeView);
 	auto bookmarkFolder = GetBookmarkFolderFromTreeView(hSelectedItem);
 
 	return !m_bookmarkTree->IsPermanentNode(bookmarkFolder);
@@ -516,7 +516,7 @@ bool BookmarkTreeView::CanDelete()
 
 void BookmarkTreeView::DeleteSelection()
 {
-	HTREEITEM hSelectedItem = TreeView_GetSelection(m_hTreeView);
+	auto hSelectedItem = TreeView_GetSelection(m_hTreeView);
 	auto bookmarkFolder = GetBookmarkFolderFromTreeView(hSelectedItem);
 
 	if (!m_bookmarkTree->IsPermanentNode(bookmarkFolder))
@@ -541,7 +541,7 @@ void BookmarkTreeView::OnRClick(const NMHDR *pnmhdr)
 	TVHITTESTINFO tvhti;
 	tvhti.pt = ptCursor;
 	ScreenToClient(m_hTreeView, &tvhti.pt);
-	HTREEITEM hItem = TreeView_HitTest(m_hTreeView, &tvhti);
+	auto hItem = TreeView_HitTest(m_hTreeView, &tvhti);
 
 	if (hItem == nullptr)
 	{
@@ -574,7 +574,7 @@ void BookmarkTreeView::CreateNewFolder()
 	m_bNewFolderCreated = true;
 	m_NewFolderGUID = newBookmarkFolder->GetGUID();
 
-	HTREEITEM hSelectedItem = TreeView_GetSelection(m_hTreeView);
+	auto hSelectedItem = TreeView_GetSelection(m_hTreeView);
 
 	assert(hSelectedItem != nullptr);
 
@@ -609,7 +609,7 @@ BookmarkTreeView::DropLocation BookmarkTreeView::GetDropLocation(const POINT &pt
 
 	TVHITTESTINFO hitTestInfo;
 	hitTestInfo.pt = ptClient;
-	HTREEITEM treeItem = TreeView_HitTest(m_hTreeView, &hitTestInfo);
+	auto treeItem = TreeView_HitTest(m_hTreeView, &hitTestInfo);
 
 	BookmarkItem *parentFolder = nullptr;
 	size_t position;
@@ -666,7 +666,7 @@ BookmarkTreeView::DropLocation BookmarkTreeView::GetDropLocation(const POINT &pt
 
 HTREEITEM BookmarkTreeView::FindNextItem(const POINT &ptClient) const
 {
-	HTREEITEM treeItem = TreeView_GetFirstVisible(m_hTreeView);
+	auto treeItem = TreeView_GetFirstVisible(m_hTreeView);
 
 	do
 	{

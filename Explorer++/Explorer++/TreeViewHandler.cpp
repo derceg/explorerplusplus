@@ -102,7 +102,7 @@ WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
+	auto *pContainer = (Explorerplusplus *)dwRefData;
 
 	return pContainer->TreeViewSubclass(hwnd,uMsg,wParam,lParam);
 }
@@ -267,7 +267,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 
 void Explorerplusplus::OnTreeViewCopyItemPath() const
 {
-	HTREEITEM hItem = TreeView_GetSelection(m_hTreeView);
+	auto hItem = TreeView_GetSelection(m_hTreeView);
 
 	if(hItem != nullptr)
 	{
@@ -422,7 +422,7 @@ void Explorerplusplus::OnTreeViewSelChanged(LPARAM lParam)
 
 int Explorerplusplus::OnTreeViewBeginLabelEdit(LPARAM lParam)
 {
-	NMTVDISPINFO *pdi = reinterpret_cast<NMTVDISPINFO *>(lParam);
+	auto *pdi = reinterpret_cast<NMTVDISPINFO *>(lParam);
 
 	auto pidl = m_shellTreeView->GetItemPidl(pdi->item.hItem);
 
@@ -533,7 +533,7 @@ WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
+	auto *pContainer = (Explorerplusplus *)dwRefData;
 
 	return pContainer->TreeViewHolderProc(hwnd,uMsg,wParam,lParam);
 }
@@ -628,7 +628,7 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowCommandHandler(WPARAM wPa
 
 void Explorerplusplus::OnTreeViewSetFileAttributes() const
 {
-	HTREEITEM hItem = TreeView_GetSelection(m_hTreeView);
+	auto hItem = TreeView_GetSelection(m_hTreeView);
 
 	if(hItem == nullptr)
 	{

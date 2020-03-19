@@ -22,7 +22,7 @@ LRESULT CALLBACK BookmarkMenu::ParentWindowSubclassStub(
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	BookmarkMenu *bookmarkMenu = reinterpret_cast<BookmarkMenu *>(dwRefData);
+	auto *bookmarkMenu = reinterpret_cast<BookmarkMenu *>(dwRefData);
 	return bookmarkMenu->ParentWindowSubclass(hwnd, uMsg, wParam, lParam);
 }
 

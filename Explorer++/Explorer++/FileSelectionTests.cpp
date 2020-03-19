@@ -164,7 +164,7 @@ HRESULT Explorerplusplus::GetListViewItemAttributes(const Tab &tab, int item, SF
 HRESULT Explorerplusplus::GetTreeViewSelectionAttributes(SFGAOF *pItemAttributes) const
 {
 	HRESULT hr = E_FAIL;
-	HTREEITEM hItem = TreeView_GetSelection(m_hTreeView);
+	auto hItem = TreeView_GetSelection(m_hTreeView);
 
 	if (hItem != nullptr)
 	{
@@ -201,7 +201,7 @@ BOOL Explorerplusplus::CanPaste() const
 	}
 	else if (hFocus == m_hTreeView)
 	{
-		HTREEITEM hItem = TreeView_GetSelection(m_hTreeView);
+		auto hItem = TreeView_GetSelection(m_hTreeView);
 
 		if (hItem != nullptr)
 		{

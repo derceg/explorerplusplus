@@ -101,7 +101,7 @@ LRESULT CALLBACK BookmarksToolbar::BookmarksToolbarProcStub(
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	BookmarksToolbar *pbt = reinterpret_cast<BookmarksToolbar *>(dwRefData);
+	auto *pbt = reinterpret_cast<BookmarksToolbar *>(dwRefData);
 
 	return pbt->BookmarksToolbarProc(hwnd, uMsg, wParam, lParam);
 }
@@ -245,7 +245,7 @@ LRESULT CALLBACK BookmarksToolbar::BookmarksToolbarParentProcStub(
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	BookmarksToolbar *pbt = reinterpret_cast<BookmarksToolbar *>(dwRefData);
+	auto *pbt = reinterpret_cast<BookmarksToolbar *>(dwRefData);
 
 	return pbt->BookmarksToolbarParentProc(hwnd, uMsg, wParam, lParam);
 }
@@ -771,7 +771,7 @@ std::optional<int> BookmarksToolbar::GetBookmarkItemIndexUsingGuid(std::wstring_
 		TBBUTTON tb;
 		SendMessage(m_hToolbar, TB_GETBUTTON, i, reinterpret_cast<LPARAM>(&tb));
 
-		BookmarkItem *currentBookmarkItem = reinterpret_cast<BookmarkItem *>(tb.dwData);
+		auto *currentBookmarkItem = reinterpret_cast<BookmarkItem *>(tb.dwData);
 
 		if (currentBookmarkItem->GetGUID() == guid)
 		{

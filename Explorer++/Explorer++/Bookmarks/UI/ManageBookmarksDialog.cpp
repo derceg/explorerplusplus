@@ -162,7 +162,7 @@ void ManageBookmarksDialog::SetupToolbar()
 	GetWindowRect(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW), &rcListView);
 	MapWindowPoints(HWND_DESKTOP, m_hDlg, reinterpret_cast<LPPOINT>(&rcListView), 2);
 
-	DWORD dwButtonSize = static_cast<DWORD>(SendMessage(m_hToolbar, TB_GETBUTTONSIZE, 0, 0));
+	auto dwButtonSize = static_cast<DWORD>(SendMessage(m_hToolbar, TB_GETBUTTONSIZE, 0, 0));
 	SetWindowPos(m_hToolbar, nullptr, rcTreeView.left, (rcTreeView.top - HIWORD(dwButtonSize)) / 2,
 		rcListView.right - rcTreeView.left, HIWORD(dwButtonSize), 0);
 }

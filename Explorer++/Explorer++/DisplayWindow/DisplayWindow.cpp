@@ -116,13 +116,13 @@ DisplayWindow::~DisplayWindow()
 LRESULT CALLBACK DisplayWindowProcStub(HWND hwnd,UINT msg,
 WPARAM wParam,LPARAM lParam)
 {
-	DisplayWindow *pdw = reinterpret_cast<DisplayWindow *>(GetWindowLongPtr(hwnd,GWLP_USERDATA));
+	auto *pdw = reinterpret_cast<DisplayWindow *>(GetWindowLongPtr(hwnd,GWLP_USERDATA));
 
 	switch(msg)
 	{
 		case WM_CREATE:
 			{
-				DWInitialSettings_t *pSettings = reinterpret_cast<DWInitialSettings_t *>(
+				auto *pSettings = reinterpret_cast<DWInitialSettings_t *>(
 					reinterpret_cast<CREATESTRUCT *>(lParam)->lpCreateParams);
 
 				pdw = new DisplayWindow(hwnd,pSettings);

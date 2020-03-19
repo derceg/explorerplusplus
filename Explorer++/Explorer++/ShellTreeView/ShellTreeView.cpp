@@ -91,7 +91,7 @@ LRESULT CALLBACK ShellTreeView::TreeViewProcStub(HWND hwnd, UINT uMsg, WPARAM wP
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	ShellTreeView *shellTreeView = reinterpret_cast<ShellTreeView *>(dwRefData);
+	auto *shellTreeView = reinterpret_cast<ShellTreeView *>(dwRefData);
 
 	return shellTreeView->TreeViewProc(hwnd,uMsg,wParam,lParam);
 }
@@ -202,7 +202,7 @@ LRESULT CALLBACK ShellTreeView::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM w
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	ShellTreeView *treeView = reinterpret_cast<ShellTreeView *>(dwRefData);
+	auto *treeView = reinterpret_cast<ShellTreeView *>(dwRefData);
 	return treeView->ParentWndProc(hwnd, uMsg, wParam, lParam);
 }
 
@@ -217,7 +217,7 @@ LRESULT CALLBACK ShellTreeView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wPara
 			{
 			case TVN_BEGINDRAG:
 			{
-				NMTREEVIEW *pnmTreeView = reinterpret_cast<NMTREEVIEW *>(lParam);
+				auto *pnmTreeView = reinterpret_cast<NMTREEVIEW *>(lParam);
 				OnBeginDrag(static_cast<int>(pnmTreeView->itemNew.lParam), DragType::LeftClick);
 			}
 			break;
@@ -268,7 +268,7 @@ HTREEITEM ShellTreeView::AddRoot()
 	tvis.hInsertAfter = TVI_LAST;
 	tvis.itemex = tvItem;
 
-	HTREEITEM hDesktop = TreeView_InsertItem(m_hTreeView, &tvis);
+	auto hDesktop = TreeView_InsertItem(m_hTreeView, &tvis);
 
 	if (hDesktop != nullptr)
 	{
@@ -517,7 +517,7 @@ void ShellTreeView::OnItemExpanding(const NMTREEVIEW *nmtv)
 	}
 	else
 	{
-		HTREEITEM hSelection = TreeView_GetSelection(m_hTreeView);
+		auto hSelection = TreeView_GetSelection(m_hTreeView);
 
 		if (hSelection != nullptr)
 		{
@@ -797,7 +797,7 @@ HTREEITEM ShellTreeView::DetermineDriveSortedPosition(HTREEITEM hParent, const T
 
 unique_pidl_absolute ShellTreeView::GetSelectedItemPidl() const
 {
-	HTREEITEM selectedItem = TreeView_GetSelection(m_hTreeView);
+	auto selectedItem = TreeView_GetSelection(m_hTreeView);
 	return GetItemPidl(selectedItem);
 }
 
@@ -1139,7 +1139,7 @@ HTREEITEM ShellTreeView::LocateItemOnDesktopTree(const TCHAR *szFullFileName)
 
 void ShellTreeView::EraseItems(HTREEITEM hParent)
 {
-	HTREEITEM hItem = TreeView_GetChild(m_hTreeView, hParent);
+	auto hItem = TreeView_GetChild(m_hTreeView, hParent);
 
 	while (hItem != nullptr)
 	{
@@ -1534,7 +1534,7 @@ void ShellTreeView::SetShowHidden(BOOL bShowHidden)
 
 void ShellTreeView::RefreshAllIcons()
 {
-	HTREEITEM hRoot = TreeView_GetRoot(m_hTreeView);
+	auto hRoot = TreeView_GetRoot(m_hTreeView);
 
 	TVITEMEX tvItemEx;
 	tvItemEx.mask			= TVIF_HANDLE|TVIF_PARAM;
@@ -1672,7 +1672,7 @@ BOOL ShellTreeView::IsDesktopSubChild(const TCHAR *szFullFileName)
 
 void ShellTreeView::StartRenamingSelectedItem()
 {
-	HTREEITEM selectedItem = TreeView_GetSelection(m_hTreeView);
+	auto selectedItem = TreeView_GetSelection(m_hTreeView);
 	TreeView_EditLabel(m_hTreeView, selectedItem);
 }
 

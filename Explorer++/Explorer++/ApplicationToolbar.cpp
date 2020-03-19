@@ -98,7 +98,7 @@ LRESULT CALLBACK ApplicationToolbar::ParentWndProcStub(
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	ApplicationToolbar *pat = reinterpret_cast<ApplicationToolbar *>(dwRefData);
+	auto *pat = reinterpret_cast<ApplicationToolbar *>(dwRefData);
 	return pat->ParentWndProc(hwnd, uMsg, wParam, lParam);
 }
 
@@ -145,7 +145,7 @@ LRESULT CALLBACK ApplicationToolbar::ParentWndProc(
 			{
 			case NM_RCLICK:
 			{
-				NMMOUSE *pnmm = reinterpret_cast<NMMOUSE *>(lParam);
+				auto *pnmm = reinterpret_cast<NMMOUSE *>(lParam);
 
 				if (pnmm->dwItemSpec != -1)
 				{
@@ -171,7 +171,7 @@ LRESULT CALLBACK ApplicationToolbar::ParentWndProc(
 
 			case TBN_GETINFOTIP:
 			{
-				NMTBGETINFOTIP *pnmtbgit = reinterpret_cast<NMTBGETINFOTIP *>(lParam);
+				auto *pnmtbgit = reinterpret_cast<NMTBGETINFOTIP *>(lParam);
 
 				int iIndex =
 					static_cast<int>(SendMessage(m_hwnd, TB_COMMANDTOINDEX, pnmtbgit->iItem, 0));

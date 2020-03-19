@@ -67,7 +67,7 @@ LRESULT CALLBACK AddressBar::EditSubclassStub(HWND hwnd, UINT uMsg,
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	AddressBar *addressBar = reinterpret_cast<AddressBar *>(dwRefData);
+	auto *addressBar = reinterpret_cast<AddressBar *>(dwRefData);
 
 	return addressBar->EditSubclass(hwnd, uMsg, wParam, lParam);
 }
@@ -104,7 +104,7 @@ LRESULT CALLBACK AddressBar::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wPar
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	AddressBar *addressBar = reinterpret_cast<AddressBar *>(dwRefData);
+	auto *addressBar = reinterpret_cast<AddressBar *>(dwRefData);
 	return addressBar->ParentWndProc(hwnd, uMsg, wParam, lParam);
 }
 
@@ -183,11 +183,11 @@ void AddressBar::OnBeginDrag()
 
 			HGLOBAL hglb = GlobalAlloc(GMEM_MOVEABLE, 1000);
 
-			FILEGROUPDESCRIPTOR *pfgd = static_cast<FILEGROUPDESCRIPTOR *>(GlobalLock(hglb));
+			auto *pfgd = static_cast<FILEGROUPDESCRIPTOR *>(GlobalLock(hglb));
 
 			pfgd->cItems = 1;
 
-			FILEDESCRIPTOR *pfd = (FILEDESCRIPTOR *)((LPBYTE)pfgd + sizeof(UINT));
+			auto *pfd = (FILEDESCRIPTOR *)((LPBYTE)pfgd + sizeof(UINT));
 
 			/* File information (name, size, date created, etc). */
 			pfd[0].dwFlags = FD_ATTRIBUTES | FD_FILESIZE;

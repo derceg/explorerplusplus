@@ -37,7 +37,7 @@ void ShellBrowser::SortFolder(SortMode sortMode)
 
 int CALLBACK ShellBrowser::SortStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	ShellBrowser *pShellBrowser = reinterpret_cast<ShellBrowser *>(lParamSort);
+	auto *pShellBrowser = reinterpret_cast<ShellBrowser *>(lParamSort);
 	return pShellBrowser->Sort(static_cast<int>(lParam1),static_cast<int>(lParam2));
 }
 

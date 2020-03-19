@@ -218,7 +218,7 @@ LRESULT CALLBACK MainToolbar::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wPa
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	MainToolbar *mainToolbar = reinterpret_cast<MainToolbar *>(dwRefData);
+	auto *mainToolbar = reinterpret_cast<MainToolbar *>(dwRefData);
 	return mainToolbar->ParentWndProc(hwnd, uMsg, wParam, lParam);
 }
 
@@ -530,7 +530,7 @@ sent for each button, and the iString parameter must be set to a valid string or
 index. */
 BOOL MainToolbar::OnTBGetButtonInfo(LPARAM lParam)
 {
-	NMTOOLBAR *pnmtb = reinterpret_cast<NMTOOLBAR *>(lParam);
+	auto *pnmtb = reinterpret_cast<NMTOOLBAR *>(lParam);
 
 	if ((pnmtb->iItem >= 0) && (static_cast<std::size_t>(pnmtb->iItem) < (ToolbarButton::_size() - 1)))
 	{
@@ -604,7 +604,7 @@ void MainToolbar::OnTBChange()
 
 void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 {
-	NMTBGETINFOTIP *ptbgit = reinterpret_cast<NMTBGETINFOTIP *>(lParam);
+	auto *ptbgit = reinterpret_cast<NMTBGETINFOTIP *>(lParam);
 
 	StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, EMPTY_STRING);
 

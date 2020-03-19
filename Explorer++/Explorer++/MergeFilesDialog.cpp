@@ -508,7 +508,7 @@ DWORD WINAPI NMergeFilesDialog::MergeFilesThread(LPVOID pParam)
 {
 	assert(pParam != nullptr);
 
-	MergeFiles *pMergeFiles = reinterpret_cast<MergeFiles *>(pParam);
+	auto *pMergeFiles = reinterpret_cast<MergeFiles *>(pParam);
 	pMergeFiles->StartMerging();
 
 	return 0;

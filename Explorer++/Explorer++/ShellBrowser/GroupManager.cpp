@@ -58,7 +58,7 @@ void ShellBrowser::SetShowInGroups(BOOL bShowInGroups)
 
 INT CALLBACK ShellBrowser::GroupNameComparisonStub(INT Group1_ID, INT Group2_ID, void *pvData)
 {
-	ShellBrowser *shellBrowser = reinterpret_cast<ShellBrowser *>(pvData);
+	auto *shellBrowser = reinterpret_cast<ShellBrowser *>(pvData);
 	return shellBrowser->GroupNameComparison(Group1_ID, Group2_ID);
 }
 
@@ -96,7 +96,7 @@ INT CALLBACK ShellBrowser::GroupNameComparison(INT Group1_ID, INT Group2_ID)
 
 INT CALLBACK ShellBrowser::GroupFreeSpaceComparisonStub(INT Group1_ID, INT Group2_ID, void *pvData)
 {
-	ShellBrowser *shellBrowser = reinterpret_cast<ShellBrowser *>(pvData);
+	auto *shellBrowser = reinterpret_cast<ShellBrowser *>(pvData);
 	return shellBrowser->GroupFreeSpaceComparison(Group1_ID, Group2_ID);
 }
 
@@ -553,7 +553,7 @@ std::wstring ShellBrowser::DetermineItemDateGroup(const BasicItemInfo_t &itemInf
 		return ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_UNSPECIFIED);
 	}
 
-	ptime filePosixTime = from_ftime<ptime>(localFileTime);
+	auto filePosixTime = from_ftime<ptime>(localFileTime);
 	date fileDate = filePosixTime.date();
 
 	date today = day_clock::local_day();

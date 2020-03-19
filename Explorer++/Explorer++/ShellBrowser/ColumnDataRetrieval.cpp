@@ -612,7 +612,7 @@ std::wstring GetPrinterColumnText(const BasicItemInfo_t &itemInfo, PrinterInform
 		DWORD bytesNeeded;
 		GetPrinter(hPrinter, 2, nullptr, 0, &bytesNeeded);
 
-		PRINTER_INFO_2 *printerInfo2 = reinterpret_cast<PRINTER_INFO_2 *>(new char[bytesNeeded]);
+		auto *printerInfo2 = reinterpret_cast<PRINTER_INFO_2 *>(new char[bytesNeeded]);
 		res = GetPrinter(hPrinter, 2, reinterpret_cast<LPBYTE>(printerInfo2), bytesNeeded, &bytesNeeded);
 
 		if (res)
@@ -714,7 +714,7 @@ std::wstring GetNetworkAdapterColumnText(const BasicItemInfo_t &itemInfo)
 {
 	ULONG outBufLen = 0;
 	GetAdaptersAddresses(AF_UNSPEC, 0, nullptr, nullptr, &outBufLen);
-	IP_ADAPTER_ADDRESSES *adapterAddresses = reinterpret_cast<IP_ADAPTER_ADDRESSES *>(new char[outBufLen]);
+	auto *adapterAddresses = reinterpret_cast<IP_ADAPTER_ADDRESSES *>(new char[outBufLen]);
 	GetAdaptersAddresses(AF_UNSPEC, 0, nullptr, adapterAddresses, &outBufLen);
 
 	IP_ADAPTER_ADDRESSES *adapaterAddress = adapterAddresses;
@@ -797,7 +797,7 @@ std::wstring GetMediaMetadataColumnText(const BasicItemInfo_t &itemInfo, MediaMe
 
 	case MediaMetadataType::Duration:
 	{
-		boost::posix_time::wtime_facet *facet = new boost::posix_time::wtime_facet();
+		auto *facet = new boost::posix_time::wtime_facet();
 		facet->time_duration_format(L"%H:%M:%S");
 
 		std::wstringstream dateStream;

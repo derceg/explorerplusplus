@@ -131,7 +131,7 @@ LRESULT CALLBACK OptionsDialog::PropSheetProcStub(HWND hwnd, UINT uMsg,
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	OptionsDialog *optionsDialog = reinterpret_cast<OptionsDialog *>(dwRefData);
+	auto *optionsDialog = reinterpret_cast<OptionsDialog *>(dwRefData);
 	return optionsDialog->PropSheetProc(hwnd, uMsg, wParam, lParam);
 }
 
@@ -155,7 +155,7 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProcStub(HWND hDlg,UINT uMsg,WPAR
 	{
 		case WM_INITDIALOG:
 			{
-				PROPSHEETPAGE *ppsp = reinterpret_cast<PROPSHEETPAGE *>(lParam);
+				auto *ppsp = reinterpret_cast<PROPSHEETPAGE *>(lParam);
 				optionsDialog = reinterpret_cast<OptionsDialog *>(ppsp->lParam);
 			}
 			break;
@@ -445,7 +445,7 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProcStub(HWND hDlg,UINT uMsg,WPARAM 
 	{
 		case WM_INITDIALOG:
 			{
-				PROPSHEETPAGE *ppsp = reinterpret_cast<PROPSHEETPAGE *>(lParam);
+				auto *ppsp = reinterpret_cast<PROPSHEETPAGE *>(lParam);
 				optionsDialog = reinterpret_cast<OptionsDialog *>(ppsp->lParam);
 			}
 			break;
@@ -673,7 +673,7 @@ INT_PTR CALLBACK OptionsDialog::WindowProcStub(HWND hDlg,UINT uMsg,WPARAM wParam
 	{
 		case WM_INITDIALOG:
 			{
-				PROPSHEETPAGE *ppsp = reinterpret_cast<PROPSHEETPAGE *>(lParam);
+				auto *ppsp = reinterpret_cast<PROPSHEETPAGE *>(lParam);
 				optionsDialog = reinterpret_cast<OptionsDialog *>(ppsp->lParam);
 			}
 			break;
@@ -798,7 +798,7 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPA
 					{
 						for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
 						{
-							DWORD dwExtendedStyle = ListView_GetExtendedListViewStyle(tab->GetShellBrowser()->GetListView());
+							auto dwExtendedStyle = ListView_GetExtendedListViewStyle(tab->GetShellBrowser()->GetListView());
 
 							if(bCheckBoxSelection)
 							{
@@ -855,7 +855,7 @@ INT_PTR CALLBACK OptionsDialog::TabSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM w
 	{
 		case WM_INITDIALOG:
 			{
-				PROPSHEETPAGE *ppsp = reinterpret_cast<PROPSHEETPAGE *>(lParam);
+				auto *ppsp = reinterpret_cast<PROPSHEETPAGE *>(lParam);
 				optionsDialog = reinterpret_cast<OptionsDialog *>(ppsp->lParam);
 			}
 			break;
@@ -955,7 +955,7 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProcStub(HWND hDlg,UINT uMsg,WPAR
 	{
 		case WM_INITDIALOG:
 			{
-				PROPSHEETPAGE *ppsp = reinterpret_cast<PROPSHEETPAGE *>(lParam);
+				auto *ppsp = reinterpret_cast<PROPSHEETPAGE *>(lParam);
 				optionsDialog = reinterpret_cast<OptionsDialog *>(ppsp->lParam);
 			}
 			break;

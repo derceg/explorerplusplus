@@ -51,7 +51,7 @@ LRESULT CALLBACK ShellBrowser::ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wPa
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	ShellBrowser *shellBrowser = reinterpret_cast<ShellBrowser *>(dwRefData);
+	auto *shellBrowser = reinterpret_cast<ShellBrowser *>(dwRefData);
 	return shellBrowser->ListViewProc(hwnd, uMsg, wParam, lParam);
 }
 
@@ -95,7 +95,7 @@ LRESULT CALLBACK ShellBrowser::ListViewParentProcStub(HWND hwnd, UINT uMsg, WPAR
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	ShellBrowser *shellBrowser = reinterpret_cast<ShellBrowser *>(dwRefData);
+	auto *shellBrowser = reinterpret_cast<ShellBrowser *>(dwRefData);
 	return shellBrowser->ListViewParentProc(hwnd, uMsg, wParam, lParam);
 }
 

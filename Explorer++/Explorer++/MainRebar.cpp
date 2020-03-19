@@ -194,7 +194,7 @@ LRESULT CALLBACK RebarSubclassStub(HWND hwnd, UINT uMsg,
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
+	auto *pContainer = (Explorerplusplus *)dwRefData;
 
 	return pContainer->RebarSubclass(hwnd, uMsg, wParam, lParam);
 }
@@ -216,7 +216,7 @@ LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd, UINT msg, WPARAM wPa
 		{
 		case NM_RCLICK:
 		{
-			LPNMMOUSE pnmm = reinterpret_cast<LPNMMOUSE>(lParam);
+			auto pnmm = reinterpret_cast<LPNMMOUSE>(lParam);
 			OnToolbarRClick(pnmm->hdr.hwndFrom);
 		}
 		return TRUE;
@@ -336,7 +336,7 @@ void Explorerplusplus::OnUseLargeToolbarIconsUpdated(BOOL newValue)
 {
 	UNREFERENCED_PARAMETER(newValue);
 
-	DWORD buttonSize = static_cast<DWORD>(SendMessage(m_mainToolbar->GetHWND(), TB_GETBUTTONSIZE, 0, 0));
+	auto buttonSize = static_cast<DWORD>(SendMessage(m_mainToolbar->GetHWND(), TB_GETBUTTONSIZE, 0, 0));
 
 	REBARBANDINFO bandInfo;
 	bandInfo.cbSize = sizeof(bandInfo);

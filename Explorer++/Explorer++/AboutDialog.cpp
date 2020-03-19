@@ -79,7 +79,7 @@ INT_PTR AboutDialog::OnNotify(NMHDR *pnmhdr)
 		{
 			if(pnmhdr->hwndFrom == GetDlgItem(m_hDlg,IDC_SITELINK))
 			{
-				PNMLINK pnmlink = reinterpret_cast<PNMLINK>(pnmhdr);
+				auto pnmlink = reinterpret_cast<PNMLINK>(pnmhdr);
 
 				ShellExecute(nullptr,L"open",pnmlink->item.szUrl,
 					nullptr, nullptr,SW_SHOW);

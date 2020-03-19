@@ -128,7 +128,7 @@ HRESULT _stdcall ApplicationToolbarDropHandler::Drop(
 	{
 		m_pDropTargetHelper->Drop(pDataObject, (POINT *) &ptl, *pdwEffect);
 
-		DROPFILES *df = reinterpret_cast<DROPFILES *>(GlobalLock(stg.hGlobal));
+		auto *df = reinterpret_cast<DROPFILES *>(GlobalLock(stg.hGlobal));
 
 		if (df != nullptr)
 		{

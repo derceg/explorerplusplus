@@ -104,7 +104,7 @@ void TabContainer::Initialize(HWND parent)
 
 	AddDefaultTabIcons(m_tabCtrlImageList.get());
 
-	TabDropHandler *pTabDropHandler = new TabDropHandler(m_hwnd, this);
+	auto *pTabDropHandler = new TabDropHandler(m_hwnd, this);
 	RegisterDragDrop(m_hwnd, pTabDropHandler);
 	pTabDropHandler->Release();
 
@@ -160,7 +160,7 @@ LRESULT CALLBACK TabContainer::WndProcStub(
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	TabContainer *tabContainer = reinterpret_cast<TabContainer *>(dwRefData);
+	auto *tabContainer = reinterpret_cast<TabContainer *>(dwRefData);
 	return tabContainer->WndProc(hwnd, uMsg, wParam, lParam);
 }
 
@@ -560,7 +560,7 @@ LRESULT CALLBACK TabContainer::ParentWndProcStub(
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	TabContainer *tabContainer = reinterpret_cast<TabContainer *>(dwRefData);
+	auto *tabContainer = reinterpret_cast<TabContainer *>(dwRefData);
 	return tabContainer->ParentWndProc(hwnd, uMsg, wParam, lParam);
 }
 

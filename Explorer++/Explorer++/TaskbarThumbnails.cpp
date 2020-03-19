@@ -76,7 +76,7 @@ LRESULT CALLBACK TaskbarThumbnails::MainWndProcStub(HWND hwnd, UINT uMsg,
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	TaskbarThumbnails *taskbarThumbnails = reinterpret_cast<TaskbarThumbnails *>(dwRefData);
+	auto *taskbarThumbnails = reinterpret_cast<TaskbarThumbnails *>(dwRefData);
 
 	return taskbarThumbnails->MainWndProc(hwnd, uMsg, wParam, lParam);
 }
@@ -235,7 +235,7 @@ void TaskbarThumbnails::RemoveTabProxy(int iTabId)
 			{
 				m_pTaskbarList->UnregisterTab(itr->hProxy);
 
-				TabProxy_t *ptp = reinterpret_cast<TabProxy_t *>(GetWindowLongPtr(itr->hProxy,GWLP_USERDATA));
+				auto *ptp = reinterpret_cast<TabProxy_t *>(GetWindowLongPtr(itr->hProxy,GWLP_USERDATA));
 				DestroyWindow(itr->hProxy);
 				free(ptp);
 
@@ -277,7 +277,7 @@ void TaskbarThumbnails::RegisterTab(HWND hTabProxy, const TCHAR *szDisplayName, 
 
 LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
-	TabProxy_t *ptp = (TabProxy_t *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
+	auto *ptp = (TabProxy_t *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
 
 	switch(Msg)
 	{

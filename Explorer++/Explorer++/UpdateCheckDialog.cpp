@@ -261,7 +261,7 @@ INT_PTR UpdateCheckDialog::OnNotify(NMHDR *pnmhdr)
 	case NM_RETURN:
 		if(pnmhdr->hwndFrom == GetDlgItem(m_hDlg,IDC_SYSLINK_DOWNLOAD))
 		{
-			PNMLINK pnmlink = reinterpret_cast<PNMLINK>(pnmhdr);
+			auto pnmlink = reinterpret_cast<PNMLINK>(pnmhdr);
 			ShellExecute(nullptr,L"open",pnmlink->item.szUrl, nullptr, nullptr,SW_SHOW);
 		}
 		break;

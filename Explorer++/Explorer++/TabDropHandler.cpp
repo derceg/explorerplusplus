@@ -74,7 +74,7 @@ LRESULT CALLBACK TabDropHandler::TabCtrlProcStub(
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	TabDropHandler *ptdh = reinterpret_cast<TabDropHandler *>(dwRefData);
+	auto *ptdh = reinterpret_cast<TabDropHandler *>(dwRefData);
 
 	return ptdh->TabCtrlProc(hwnd, uMsg, wParam, lParam);
 }
@@ -166,7 +166,7 @@ void TabDropHandler::GetRepresentativeSourceDriveHDrop(IDataObject *pDataObject)
 
 	if (hr == S_OK)
 	{
-		DROPFILES *pdf = reinterpret_cast<DROPFILES *>(GlobalLock(stg.hGlobal));
+		auto *pdf = reinterpret_cast<DROPFILES *>(GlobalLock(stg.hGlobal));
 
 		if (pdf != nullptr)
 		{

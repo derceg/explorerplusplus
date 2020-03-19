@@ -113,7 +113,7 @@ void ShellBrowser::ResetFolderState()
 	imagelist, and create a new one. */
 	if (m_folderSettings.viewMode == +ViewMode::Thumbnails)
 	{
-		HIMAGELIST himlOld = ListView_GetImageList(m_hListView, LVSIL_NORMAL);
+		auto himlOld = ListView_GetImageList(m_hListView, LVSIL_NORMAL);
 
 		int nItems = ListView_GetItemCount(m_hListView);
 

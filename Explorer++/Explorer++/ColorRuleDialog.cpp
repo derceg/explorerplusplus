@@ -201,7 +201,7 @@ WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	ColorRuleDialog *pcrd = reinterpret_cast<ColorRuleDialog *>(dwRefData);
+	auto *pcrd = reinterpret_cast<ColorRuleDialog *>(dwRefData);
 
 	return pcrd->StaticColorProc(hwnd,uMsg,wParam,lParam);
 }

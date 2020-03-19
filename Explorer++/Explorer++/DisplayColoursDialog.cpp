@@ -104,8 +104,8 @@ void DisplayColoursDialog::SetColorGroupValues(ColorGroup_t ColorGroup[NUM_COLOR
 
 void DisplayColoursDialog::InitializePreviewWindow()
 {
-	COLORREF centreColor = static_cast<COLORREF>(SendMessage(m_hDisplayWindow,DWM_GETCENTRECOLOR,0,0));
-	COLORREF surroundColor = static_cast<COLORREF>(SendMessage(m_hDisplayWindow,DWM_GETSURROUNDCOLOR,0,0));
+	auto centreColor = static_cast<COLORREF>(SendMessage(m_hDisplayWindow,DWM_GETCENTRECOLOR,0,0));
+	auto surroundColor = static_cast<COLORREF>(SendMessage(m_hDisplayWindow,DWM_GETSURROUNDCOLOR,0,0));
 
 	DisplayWindow_GetFont(m_hDisplayWindow,reinterpret_cast<WPARAM>(&m_hDisplayFont));
 	m_TextColor = DisplayWindow_GetTextColor(m_hDisplayWindow);

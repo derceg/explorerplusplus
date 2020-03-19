@@ -199,7 +199,7 @@ INT_PTR CustomizeColorsDialog::OnNotify(NMHDR *pnmhdr)
 	{
 	case NM_DBLCLK:
 		{
-			NMITEMACTIVATE *pnmItem = reinterpret_cast<NMITEMACTIVATE *>(pnmhdr);
+			auto *pnmItem = reinterpret_cast<NMITEMACTIVATE *>(pnmhdr);
 
 			if(pnmItem->iItem != -1)
 			{

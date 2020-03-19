@@ -303,7 +303,7 @@ int CALLBACK NSearchDialog::BrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam
 
 	assert(lpData != NULL);
 
-	TCHAR *szSearchPattern = reinterpret_cast<TCHAR *>(lpData);
+	auto *szSearchPattern = reinterpret_cast<TCHAR *>(lpData);
 
 	switch(uMsg)
 	{
@@ -546,7 +546,7 @@ int CALLBACK NSearchDialog::SortResultsStub(LPARAM lParam1,LPARAM lParam2,LPARAM
 {
 	assert(lParamSort != NULL);
 
-	SearchDialog *psd = reinterpret_cast<SearchDialog *>(lParamSort);
+	auto *psd = reinterpret_cast<SearchDialog *>(lParamSort);
 
 	return psd->SortResults(lParam1,lParam2);
 }
@@ -719,7 +719,7 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 		{
 			if(pnmhdr->hwndFrom == GetDlgItem(m_hDlg,IDC_LINK_STATUS))
 			{
-				PNMLINK pnmlink = reinterpret_cast<PNMLINK>(pnmhdr);
+				auto pnmlink = reinterpret_cast<PNMLINK>(pnmhdr);
 
 				ShellExecute(nullptr,L"open",pnmlink->item.szUrl,
 					nullptr, nullptr,SW_SHOW);
@@ -779,7 +779,7 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 		{
 			/* A listview header has been clicked,
 			so sort by that column. */
-			NMLISTVIEW *pnmlv = reinterpret_cast<NMLISTVIEW *>(pnmhdr);
+			auto *pnmlv = reinterpret_cast<NMLISTVIEW *>(pnmhdr);
 
 			/* If the column clicked matches the current sort mode,
 			flip the sort direction, else switch to that sort mode. */
@@ -985,7 +985,7 @@ DWORD WINAPI NSearchDialog::SearchThread(LPVOID pParam)
 {
 	assert(pParam != nullptr);
 
-	Search *pSearch = reinterpret_cast<Search *>(pParam);
+	auto *pSearch = reinterpret_cast<Search *>(pParam);
 	pSearch->StartSearching();
 
 	return 0;

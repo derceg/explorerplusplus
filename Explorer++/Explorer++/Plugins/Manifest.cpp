@@ -104,7 +104,7 @@ std::optional<Plugins::Manifest> Plugins::parseManifest(const boost::filesystem:
 		nlohmann::json json;
 		inputStream >> json;
 
-		Manifest manifest = json.get<Manifest>();
+		auto manifest = json.get<Manifest>();
 		return manifest;
 	}
 	catch (nlohmann::json::exception &)

@@ -135,7 +135,7 @@ INT_PTR SplitFileDialog::OnInitDialog()
 		szOutputFilename,NSplitFileDialog::COUNTER_PATTERN);
 	SetDlgItemText(m_hDlg,IDC_SPLIT_EDIT_OUTPUTFILENAME,szOutputFilename);
 
-	HFONT hCurentFont = reinterpret_cast<HFONT>(SendDlgItemMessage(m_hDlg,
+	auto hCurentFont = reinterpret_cast<HFONT>(SendDlgItemMessage(m_hDlg,
 		IDC_SPLIT_STATIC_FILENAMEHELPER,WM_GETFONT,0,0));
 
 	LOGFONT lf;
@@ -540,7 +540,7 @@ DWORD WINAPI NSplitFileDialog::SplitFileThreadProcStub(LPVOID pParam)
 {
 	assert(pParam != nullptr);
 
-	SplitFile *pSplitFile = reinterpret_cast<SplitFile *>(pParam);
+	auto *pSplitFile = reinterpret_cast<SplitFile *>(pParam);
 	pSplitFile->Split();
 
 	return 0;
