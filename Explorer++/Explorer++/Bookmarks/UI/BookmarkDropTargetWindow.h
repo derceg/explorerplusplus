@@ -26,6 +26,7 @@ protected:
 	virtual void UpdateUiForDropLocation(const DropLocation &dropLocation) = 0;
 	virtual void ResetDropUiState() = 0;
 
+	void SetBlockDrop(bool blockDrop);
 	bool IsWithinDrag() const;
 
 private:
@@ -44,4 +45,5 @@ private:
 	std::optional<POINT> m_previousDragOverPoint;
 	std::optional<DropLocation> m_previousDropLocation;
 	DWORD m_previousDropEffect;
+	bool m_blockDrop;
 };

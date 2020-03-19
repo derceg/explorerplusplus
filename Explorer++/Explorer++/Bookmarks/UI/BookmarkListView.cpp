@@ -320,6 +320,10 @@ void BookmarkListView::SetSortMode(BookmarkHelper::SortMode sortMode)
 {
 	m_sortMode = sortMode;
 
+	// It's only possible to drop items when using the default sort mode, since that's the only mode
+	// in which the listview indexes match the bookmark item indexes.
+	SetBlockDrop(sortMode != BookmarkHelper::SortMode::Default);
+
 	SortItems();
 }
 

@@ -12,13 +12,24 @@
 
 BookmarkDropInfo::BookmarkDropInfo(IDataObject *dataObject, BookmarkTree *bookmarkTree) :
 	m_dataObject(dataObject),
-	m_bookmarkTree(bookmarkTree)
+	m_bookmarkTree(bookmarkTree),
+	m_blockDrop(false)
 {
+}
+
+void BookmarkDropInfo::SetBlockDrop(bool blockDrop)
+{
+	m_blockDrop = blockDrop;
 }
 
 DWORD BookmarkDropInfo::GetDropEffect(BookmarkItem *parentFolder)
 {
 	assert(parentFolder->IsFolder());
+
+	if (m_blockDrop)
+	{
+		return DROPEFFECT_NONE;
+	}
 
 	if (!m_bookmarkTree->CanAddChildren(parentFolder))
 	{

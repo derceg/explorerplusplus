@@ -6,7 +6,8 @@
 #include "Bookmarks/UI/BookmarkDropTargetWindow.h"
 
 BookmarkDropTargetWindow::BookmarkDropTargetWindow(HWND hwnd, BookmarkTree *bookmarkTree) :
-	m_bookmarkTree(bookmarkTree)
+	m_bookmarkTree(bookmarkTree),
+	m_blockDrop(false)
 {
 	m_dropTarget = DropTarget::Create(hwnd, this);
 }
@@ -18,6 +19,7 @@ DWORD BookmarkDropTargetWindow::DragEnter(
 	UNREFERENCED_PARAMETER(effect);
 
 	m_bookmarkDropInfo = std::make_unique<BookmarkDropInfo>(dataObject, m_bookmarkTree);
+	m_bookmarkDropInfo->SetBlockDrop(m_blockDrop);
 
 	auto dropLocation = GetDropLocation(pt);
 
@@ -92,6 +94,16 @@ void BookmarkDropTargetWindow::ResetDropState()
 	m_bookmarkDropInfo.reset();
 	m_previousDragOverPoint.reset();
 	m_previousDropLocation.reset();
+}
+
+void BookmarkDropTargetWindow::SetBlockDrop(bool blockDrop)
+{
+	if (m_bookmarkDropInfo)
+	{
+		m_bookmarkDropInfo->SetBlockDrop(blockDrop);
+	}
+
+	m_blockDrop = blockDrop;
 }
 
 bool BookmarkDropTargetWindow::IsWithinDrag() const
