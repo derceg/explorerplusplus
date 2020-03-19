@@ -414,7 +414,7 @@ void ManageBookmarksDialog::OnViewMenuItemSelected(int menuItemId)
 		break;
 
 	case IDM_MB_VIEW_SORT_BY_DEFAULT:
-		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::Name);
+		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::Default);
 		break;
 
 	case IDM_MB_VIEW_SORTBYNAME:
