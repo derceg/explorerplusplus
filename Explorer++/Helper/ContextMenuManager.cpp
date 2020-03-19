@@ -285,7 +285,7 @@ LRESULT CALLBACK ContextMenuManager::ContextMenuHookProc(HWND hwnd,UINT uMsg,
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	ContextMenuManager *pcmm = reinterpret_cast<ContextMenuManager *>(dwRefData);
+	auto *pcmm = reinterpret_cast<ContextMenuManager *>(dwRefData);
 
 	switch(uMsg)
 	{

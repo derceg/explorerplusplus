@@ -40,7 +40,7 @@ BOOL GetProcessOwner(DWORD dwProcessId, TCHAR *szOwner, size_t cchMax)
 
 			if(!bRet && GetLastError() == ERROR_INSUFFICIENT_BUFFER)
 			{
-				TOKEN_USER *pTokenUser = reinterpret_cast<TOKEN_USER *>(GlobalAlloc(GMEM_FIXED, dwSize));
+				auto *pTokenUser = reinterpret_cast<TOKEN_USER *>(GlobalAlloc(GMEM_FIXED, dwSize));
 
 				if(pTokenUser != NULL)
 				{

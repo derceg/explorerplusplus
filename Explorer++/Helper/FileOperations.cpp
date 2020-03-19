@@ -466,7 +466,7 @@ BOOL bMove,IDataObject **pClipboardDataObject)
 
 	if(hglb != NULL)
 	{
-		DWORD *pdwCopyEffect = static_cast<DWORD *>(GlobalLock(hglb));
+		auto *pdwCopyEffect = static_cast<DWORD *>(GlobalLock(hglb));
 
 		if(pdwCopyEffect != NULL)
 		{

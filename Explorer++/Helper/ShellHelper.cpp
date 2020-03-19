@@ -516,9 +516,9 @@ HRESULT BuildHDropList(FORMATETC *pftc,STGMEDIUM *pstg,
 		return E_FAIL;
 	}
 
-	LPVOID pcidaData = static_cast<LPVOID>(GlobalLock(hglbHDrop));
+	auto pcidaData = static_cast<LPVOID>(GlobalLock(hglbHDrop));
 
-	DROPFILES *pdf = static_cast<DROPFILES *>(pcidaData);
+	auto *pdf = static_cast<DROPFILES *>(pcidaData);
 
 	pdf->pFiles = sizeof(DROPFILES);
 	pdf->fNC = FALSE;
@@ -598,7 +598,7 @@ HRESULT BuildShellIDList(FORMATETC *pftc, STGMEDIUM *pstg, PCIDLIST_ABSOLUTE pid
 		return E_FAIL;
 	}
 
-	LPVOID pcidaData = static_cast<LPVOID>(GlobalLock(hglbIDList));
+	auto pcidaData = static_cast<LPVOID>(GlobalLock(hglbIDList));
 
 	CIDA *pcida = static_cast<CIDA *>(pcidaData);
 

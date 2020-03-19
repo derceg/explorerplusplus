@@ -38,7 +38,7 @@ LRESULT CALLBACK IconFetcher::WindowSubclassStub(HWND hwnd, UINT uMsg,
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	IconFetcher *iconFetcher = reinterpret_cast<IconFetcher *>(dwRefData);
+	auto *iconFetcher = reinterpret_cast<IconFetcher *>(dwRefData);
 
 	return iconFetcher->WindowSubclass(hwnd, uMsg, wParam, lParam);
 }

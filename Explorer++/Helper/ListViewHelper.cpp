@@ -88,7 +88,7 @@ void NListView::ListView_FocusItem(HWND hListView,int iItem,BOOL bFocus)
 
 void NListView::ListView_SetGridlines(HWND hListView,BOOL bEnableGridlines)
 {
-	DWORD dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
+	auto dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
 
 	if(bEnableGridlines)
 	{
@@ -145,7 +145,7 @@ BOOL NListView::ListView_SetAutoArrange(HWND hListView,BOOL bAutoArrange)
 
 void NListView::ListView_ActivateOneClickSelect(HWND hListView,BOOL bActivate,UINT uHoverTime)
 {
-	DWORD dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
+	auto dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
 
 	/* The three styles below are used to control one-click
 	selection. */
@@ -192,7 +192,7 @@ void NListView::ListView_ActivateOneClickSelect(HWND hListView,BOOL bActivate,UI
 
 void NListView::ListView_AddRemoveExtendedStyle(HWND hListView,DWORD dwStyle,BOOL bAdd)
 {
-	DWORD dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
+	auto dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
 
 	if(bAdd)
 	{

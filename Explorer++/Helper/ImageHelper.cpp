@@ -169,7 +169,7 @@ HBITMAP ImageHelper::IconToBitmapPARGB32(HICON hicon, int width, int height)
 		{
 			hr = E_FAIL;
 
-			HBITMAP hbmpOld = (HBITMAP)SelectObject(hdcDest, hbmp);
+			auto hbmpOld = (HBITMAP)SelectObject(hdcDest, hbmp);
 			if (hbmpOld)
 			{
 				BLENDFUNCTION bfAlpha = { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };

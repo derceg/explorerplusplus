@@ -20,7 +20,7 @@ void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize,
 {
 	static const TCHAR *SIZE_STRINGS[] = {_T("bytes"), _T("KB"), _T("MB"), _T("GB"), _T("TB"), _T("PB")};
 
-	double fFileSize = static_cast<double>(lFileSize.QuadPart);
+	auto fFileSize = static_cast<double>(lFileSize.QuadPart);
 	int iSizeIndex = 0;
 
 	if(bForceSize)
@@ -130,7 +130,7 @@ TCHAR *PrintCommaLargeNum(LARGE_INTEGER lPrint)
 	static TCHAR szBuffer[14];
 	TCHAR *p = &szBuffer[SIZEOF_ARRAY(szBuffer) - 1];
 	static TCHAR chComma = ',';
-	unsigned long long nTemp = (unsigned long long)(lPrint.LowPart + (lPrint.HighPart * pow(2.0, 32.0)));
+	auto nTemp = (unsigned long long)(lPrint.LowPart + (lPrint.HighPart * pow(2.0, 32.0)));
 	int i = 0;
 
 	if(nTemp == 0)

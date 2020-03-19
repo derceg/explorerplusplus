@@ -53,7 +53,7 @@ void GetWindowString(HWND hwnd, std::wstring &str)
 {
 	int iLen = GetWindowTextLength(hwnd);
 
-	TCHAR *szTemp = new TCHAR[iLen + 1];
+	auto *szTemp = new TCHAR[iLen + 1];
 	GetWindowText(hwnd, szTemp, iLen + 1);
 
 	str = szTemp;

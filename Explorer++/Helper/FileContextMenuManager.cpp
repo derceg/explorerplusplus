@@ -205,7 +205,7 @@ LRESULT CALLBACK ShellMenuHookProcStub(HWND hwnd,UINT Msg,WPARAM wParam,
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	FileContextMenuManager *pfcmm = reinterpret_cast<FileContextMenuManager *>(dwRefData);
+	auto *pfcmm = reinterpret_cast<FileContextMenuManager *>(dwRefData);
 
 	return pfcmm->ShellMenuHookProc(hwnd,Msg,wParam,lParam);
 }

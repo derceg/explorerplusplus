@@ -84,7 +84,7 @@ BOOL CreateFriendlySystemTimeString(const SYSTEMTIME *localSystemTime,
 	TCHAR dateComponent[512];
 	bool dateComponentSet = false;
 
-	ptime inputPosixTime = from_ftime<ptime>(localFileTime);
+	auto inputPosixTime = from_ftime<ptime>(localFileTime);
 	date inputDate = inputPosixTime.date();
 
 	date today = day_clock::local_day();
@@ -382,7 +382,7 @@ BOOL ReadImageProperty(const TCHAR *lpszImage, PROPID propId, TCHAR *szProperty,
 	GdiplusShutdown. By allocating
 	it on the heap, the lifetime
 	can be directly controlled. */
-	Gdiplus::Image *image = new Gdiplus::Image(lpszImage, FALSE);
+	auto *image = new Gdiplus::Image(lpszImage, FALSE);
 
 	if(image->GetLastStatus() == Gdiplus::Ok)
 	{
@@ -402,7 +402,7 @@ BOOL ReadImageProperty(const TCHAR *lpszImage, PROPID propId, TCHAR *szProperty,
 
 			if(size != 0)
 			{
-				Gdiplus::PropertyItem *propertyItem = reinterpret_cast<Gdiplus::PropertyItem *>(malloc(size));
+				auto *propertyItem = reinterpret_cast<Gdiplus::PropertyItem *>(malloc(size));
 
 				if(propertyItem != NULL)
 				{

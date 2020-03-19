@@ -92,7 +92,7 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 	case WM_GETMINMAXINFO:
 		if(m_bResizable)
 		{
-			LPMINMAXINFO pmmi = reinterpret_cast<LPMINMAXINFO>(lParam);
+			auto pmmi = reinterpret_cast<LPMINMAXINFO>(lParam);
 
 			pmmi->ptMinTrackSize.x = m_iMinWidth;
 			pmmi->ptMinTrackSize.y = m_iMinHeight;

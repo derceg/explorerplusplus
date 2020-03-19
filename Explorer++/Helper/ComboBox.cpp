@@ -68,7 +68,7 @@ LRESULT CALLBACK ComboBox::ComboBoxEditProcStub(HWND hwnd,UINT uMsg,
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	ComboBox *pcb = reinterpret_cast<ComboBox *>(dwRefData);
+	auto *pcb = reinterpret_cast<ComboBox *>(dwRefData);
 
 	return pcb->ComboBoxEditProc(hwnd,uMsg,wParam,lParam);
 }
@@ -94,7 +94,7 @@ LRESULT CALLBACK ComboBox::ComboBoxParentProcStub(HWND hwnd,UINT uMsg,
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	ComboBox *pcb = reinterpret_cast<ComboBox *>(dwRefData);
+	auto *pcb = reinterpret_cast<ComboBox *>(dwRefData);
 
 	return pcb->ComboBoxParentProc(hwnd,uMsg,wParam,lParam);
 }

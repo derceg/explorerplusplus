@@ -28,7 +28,7 @@ LRESULT CALLBACK BaseWindow::BaseWindowProcStub(HWND hwnd,UINT uMsg,WPARAM wPara
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	BaseWindow *pbw = reinterpret_cast<BaseWindow *>(dwRefData);
+	auto *pbw = reinterpret_cast<BaseWindow *>(dwRefData);
 
 	return pbw->BaseWindowProc(hwnd,uMsg,wParam,lParam);
 }

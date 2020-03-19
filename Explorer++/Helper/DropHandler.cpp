@@ -261,7 +261,7 @@ HRESULT DropHandler::CopyHDropData(IDataObject *pDataObject,
 
 	if(hr == S_OK)
 	{
-		HDROP hd = reinterpret_cast<HDROP>(GlobalLock(stg.hGlobal));
+		auto hd = reinterpret_cast<HDROP>(GlobalLock(stg.hGlobal));
 
 		if(hd != NULL)
 		{
@@ -296,7 +296,7 @@ HRESULT DropHandler::CopyShellIDListData(IDataObject *pDataObject,
 		{
 			IShellFolder *pShellFolder = NULL;
 
-			LPCITEMIDLIST pidlDirectory = HIDA_GetPIDLFolder(pcida);
+			auto pidlDirectory = HIDA_GetPIDLFolder(pcida);
 
 			hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
 
@@ -340,11 +340,11 @@ HRESULT DropHandler::CopyAnsiFileDescriptorData(IDataObject *pDataObject,
 
 	if(hr == S_OK)
 	{
-		FILEGROUPDESCRIPTORA *pfgda = (FILEGROUPDESCRIPTORA *)GlobalLock(stg.hGlobal);
+		auto *pfgda = (FILEGROUPDESCRIPTORA *)GlobalLock(stg.hGlobal);
 
 		if(pfgda != NULL)
 		{
-			FILEGROUPDESCRIPTORW *pfgdw = (FILEGROUPDESCRIPTORW *)malloc(sizeof(FILEGROUPDESCRIPTORW) + ((pfgda->cItems - 1) * sizeof(FILEDESCRIPTORW)));
+			auto *pfgdw = (FILEGROUPDESCRIPTORW *)malloc(sizeof(FILEGROUPDESCRIPTORW) + ((pfgda->cItems - 1) * sizeof(FILEDESCRIPTORW)));
 
 			if(pfgdw != NULL)
 			{
@@ -401,7 +401,7 @@ HRESULT DropHandler::CopyUnicodeFileDescriptorData(IDataObject *pDataObject,
 
 	if(hr == S_OK)
 	{
-		FILEGROUPDESCRIPTORW *pfgd = (FILEGROUPDESCRIPTORW *)GlobalLock(stg.hGlobal);
+		auto *pfgd = (FILEGROUPDESCRIPTORW *)GlobalLock(stg.hGlobal);
 
 		if(pfgd != NULL)
 		{
@@ -524,7 +524,7 @@ HRESULT DropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 						if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
 							nBytesToWrite = (DWORD)GlobalSize(stgFileContents.hGlobal);
 
-						LPBYTE pTemp = (LPBYTE)GlobalLock(stgFileContents.hGlobal);
+						auto pTemp = (LPBYTE)GlobalLock(stgFileContents.hGlobal);
 
 						if(pTemp != NULL)
 						{
@@ -638,7 +638,7 @@ HRESULT DropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 
 			if(hGlobal != NULL)
 			{
-				DWORD *pdwCopyEffect = (DWORD *) GlobalLock(hGlobal);
+				auto *pdwCopyEffect = (DWORD *) GlobalLock(hGlobal);
 
 				if(pdwCopyEffect != NULL)
 				{
@@ -676,7 +676,7 @@ HRESULT DropHandler::CopyUnicodeTextData(IDataObject *pDataObject,
 
 	if(hr == S_OK)
 	{
-		WCHAR *pText = static_cast<WCHAR *>(GlobalLock(stg.hGlobal));
+		auto *pText = static_cast<WCHAR *>(GlobalLock(stg.hGlobal));
 
 		if(pText != NULL)
 		{
@@ -716,7 +716,7 @@ HRESULT DropHandler::CopyAnsiTextData(IDataObject *pDataObject,
 
 		if(pText != NULL)
 		{
-			WCHAR *pszUnicodeText = new WCHAR[strlen(pText) + 1];
+			auto *pszUnicodeText = new WCHAR[strlen(pText) + 1];
 
 			int iRet = MultiByteToWideChar(CP_ACP,0,pText,-1,pszUnicodeText,
 				static_cast<int>(strlen(pText) + 1));
@@ -759,7 +759,7 @@ HRESULT DropHandler::CopyDIBV5Data(IDataObject *pDataObject,
 
 	if(hr == S_OK)
 	{
-		BITMAPINFO *pbmp = static_cast<BITMAPINFO *>(GlobalLock(stg.hGlobal));
+		auto *pbmp = static_cast<BITMAPINFO *>(GlobalLock(stg.hGlobal));
 
 		if(pbmp != NULL)
 		{
@@ -801,11 +801,11 @@ HRESULT DropHandler::CopyDIBV5Data(IDataObject *pDataObject,
 
 			if(hFile != INVALID_HANDLE_VALUE)
 			{
-				DWORD dwSize = static_cast<DWORD>(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + (GlobalSize(stg.hGlobal) - sizeof(BITMAPINFOHEADER)));
+				auto dwSize = static_cast<DWORD>(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + (GlobalSize(stg.hGlobal) - sizeof(BITMAPINFOHEADER)));
 
-				LPBYTE pData = new BYTE[dwSize];
+				auto pData = new BYTE[dwSize];
 
-				BITMAPFILEHEADER *pbfh = (BITMAPFILEHEADER *)pData;
+				auto *pbfh = (BITMAPFILEHEADER *)pData;
 
 				/* 'BM'. */
 				pbfh->bfType		= 0x4D42;
@@ -815,11 +815,11 @@ HRESULT DropHandler::CopyDIBV5Data(IDataObject *pDataObject,
 				pbfh->bfReserved2	= 0;
 				pbfh->bfOffBits		= sizeof(BITMAPFILEHEADER);
 
-				BITMAPINFOHEADER *pb5h = (BITMAPINFOHEADER *)(pData + sizeof(BITMAPFILEHEADER));
+				auto *pb5h = (BITMAPINFOHEADER *)(pData + sizeof(BITMAPFILEHEADER));
 
 				memcpy(pb5h,&pbmp->bmiHeader,sizeof(BITMAPINFOHEADER));
 
-				RGBQUAD *prgb = (RGBQUAD *)(pData + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER));
+				auto *prgb = (RGBQUAD *)(pData + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER));
 
 				memcpy(prgb,pbmp->bmiColors,GlobalSize(stg.hGlobal) - sizeof(BITMAPINFOHEADER));
 
@@ -965,7 +965,7 @@ void DropHandler::CopyDroppedFilesInternal(const std::list<std::wstring> &FullFi
 		return;
 	}
 
-	PastedFilesInfo_t *ppfi = new PastedFilesInfo_t;
+	auto *ppfi = new PastedFilesInfo_t;
 	ppfi->pReferenceCount		= this;
 	ppfi->hwnd					= m_hwndDrop;
 	ppfi->FullFilenameList		= FullFilenameList;
@@ -1042,7 +1042,7 @@ WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 	{
 	case WM_APP_COPYOPERATIONFINISHED:
 		{
-			AsyncOperationInfo_t *paoi = reinterpret_cast<AsyncOperationInfo_t *>(wParam);
+			auto *paoi = reinterpret_cast<AsyncOperationInfo_t *>(wParam);
 			paoi->pac->EndOperation(paoi->hr,NULL,paoi->dwEffect);
 			paoi->pac->Release();
 
@@ -1067,7 +1067,7 @@ DWORD WINAPI CopyDroppedFilesInternalAsyncStub(LPVOID lpParameter)
 	assert(lpParameter != NULL);
 
 	CoInitializeEx(0,COINIT_APARTMENTTHREADED);
-	PastedFilesInfo_t *ppfi = reinterpret_cast<PastedFilesInfo_t *>(lpParameter);
+	auto *ppfi = reinterpret_cast<PastedFilesInfo_t *>(lpParameter);
 	BOOL bRes = CopyDroppedFilesInternalAsync(ppfi);
 	CoUninitialize();
 
@@ -1158,7 +1158,7 @@ BOOL CopyDroppedFilesInternalAsync(PastedFilesInfo_t *ppfi)
 
 		if(shfo.hNameMappings != NULL)
 		{
-			HANDLETOMAPPINGS *phtm = reinterpret_cast<HANDLETOMAPPINGS *>(shfo.hNameMappings);
+			auto *phtm = reinterpret_cast<HANDLETOMAPPINGS *>(shfo.hNameMappings);
 
 			for(int i = 0;i < static_cast<int>(phtm->uNumberOfMappings);i++)
 			{
