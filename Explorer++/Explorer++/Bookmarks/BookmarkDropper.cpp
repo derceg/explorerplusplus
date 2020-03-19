@@ -3,26 +3,26 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "Bookmarks/BookmarkDropInfo.h"
+#include "Bookmarks/BookmarkDropper.h"
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "../Helper/DataExchangeHelper.h"
 #include "../Helper/ShellHelper.h"
 
-BookmarkDropInfo::BookmarkDropInfo(IDataObject *dataObject, BookmarkTree *bookmarkTree) :
+BookmarkDropper::BookmarkDropper(IDataObject *dataObject, BookmarkTree *bookmarkTree) :
 	m_dataObject(dataObject),
 	m_bookmarkTree(bookmarkTree),
 	m_blockDrop(false)
 {
 }
 
-void BookmarkDropInfo::SetBlockDrop(bool blockDrop)
+void BookmarkDropper::SetBlockDrop(bool blockDrop)
 {
 	m_blockDrop = blockDrop;
 }
 
-DWORD BookmarkDropInfo::GetDropEffect(BookmarkItem *parentFolder)
+DWORD BookmarkDropper::GetDropEffect(BookmarkItem *parentFolder)
 {
 	assert(parentFolder->IsFolder());
 
@@ -68,7 +68,7 @@ DWORD BookmarkDropInfo::GetDropEffect(BookmarkItem *parentFolder)
 	return DROPEFFECT_NONE;
 }
 
-DWORD BookmarkDropInfo::PerformDrop(BookmarkItem *parentFolder, size_t position)
+DWORD BookmarkDropper::PerformDrop(BookmarkItem *parentFolder, size_t position)
 {
 	assert(parentFolder->IsFolder());
 
@@ -106,7 +106,7 @@ DWORD BookmarkDropInfo::PerformDrop(BookmarkItem *parentFolder, size_t position)
 	return finalEffect;
 }
 
-bool BookmarkDropInfo::CanMoveBookmarkItemIntoFolder(
+bool BookmarkDropper::CanMoveBookmarkItemIntoFolder(
 	BookmarkItem *bookmarkItem, BookmarkItem *parentFolder)
 {
 	if (bookmarkItem->IsBookmark()
@@ -118,7 +118,7 @@ bool BookmarkDropInfo::CanMoveBookmarkItemIntoFolder(
 	return false;
 }
 
-BookmarkDropInfo::ExtractedInfo &BookmarkDropInfo::GetExtractedInfo()
+BookmarkDropper::ExtractedInfo &BookmarkDropper::GetExtractedInfo()
 {
 	if (!m_extractedInfo)
 	{
@@ -128,7 +128,7 @@ BookmarkDropInfo::ExtractedInfo &BookmarkDropInfo::GetExtractedInfo()
 	return *m_extractedInfo;
 }
 
-BookmarkDropInfo::ExtractedInfo BookmarkDropInfo::ExtractBookmarkItems()
+BookmarkDropper::ExtractedInfo BookmarkDropper::ExtractBookmarkItems()
 {
 	BookmarkItems bookmarkItems;
 	std::optional<ExtractionSource> extractionSource;
@@ -147,7 +147,7 @@ BookmarkDropInfo::ExtractedInfo BookmarkDropInfo::ExtractBookmarkItems()
 	return { std::move(bookmarkItems), extractionSource };
 }
 
-BookmarkItems BookmarkDropInfo::ExtractBookmarkItemsFromCustomFormat()
+BookmarkItems BookmarkDropper::ExtractBookmarkItemsFromCustomFormat()
 {
 	FORMATETC formatEtc = BookmarkDataExchange::GetFormatEtc();
 	wil::unique_stg_medium stgMedium;
@@ -168,7 +168,7 @@ BookmarkItems BookmarkDropInfo::ExtractBookmarkItemsFromCustomFormat()
 	return BookmarkDataExchange::DeserializeBookmarkItems(*data);
 }
 
-BookmarkItems BookmarkDropInfo::ExtractBookmarkItemsFromHDrop()
+BookmarkItems BookmarkDropper::ExtractBookmarkItemsFromHDrop()
 {
 	BookmarkItems bookmarkItems;
 	auto droppedFiles = ExtractDroppedFilesList(m_dataObject);

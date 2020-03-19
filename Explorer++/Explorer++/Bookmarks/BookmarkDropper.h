@@ -9,10 +9,10 @@
 
 class BookmarkTree;
 
-class BookmarkDropInfo
+class BookmarkDropper
 {
 public:
-	BookmarkDropInfo(IDataObject *dataObject, BookmarkTree *bookmarkTree);
+	BookmarkDropper(IDataObject *dataObject, BookmarkTree *bookmarkTree);
 
 	void SetBlockDrop(bool blockDrop);
 	DWORD GetDropEffect(BookmarkItem *parentFolder);

@@ -376,9 +376,6 @@
     <ClCompile Include="Bookmarks\UI\ManageBookmarksDialog.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Bookmarks\BookmarkDropInfo.cpp">
-      <Filter>Bookmarks</Filter>
-    </ClCompile>
     <ClCompile Include="Bookmarks\UI\BookmarkDropTargetWindow.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
@@ -426,6 +423,9 @@
     </ClCompile>
     <ClCompile Include="SortMenuBuilder.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Bookmarks\BookmarkDropper.cpp">
+      <Filter>Bookmarks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -816,9 +816,6 @@
     <ClInclude Include="Bookmarks\UI\ManageBookmarksDialog.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Bookmarks\BookmarkDropInfo.h">
-      <Filter>Bookmarks</Filter>
-    </ClInclude>
     <ClInclude Include="Bookmarks\UI\BookmarkDropTargetWindow.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
@@ -854,6 +851,9 @@
     </ClInclude>
     <ClInclude Include="SortMenuBuilder.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Bookmarks\BookmarkDropper.h">
+      <Filter>Bookmarks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

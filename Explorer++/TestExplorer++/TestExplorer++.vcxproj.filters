@@ -19,14 +19,14 @@
     <ClCompile Include="AcceleratorParserTest.cpp" />
     <ClCompile Include="ManifestTest.cpp" />
     <ClCompile Include="ViewModeHelperTest.cpp" />
-    <ClCompile Include="BookmarkDropInfoTest.cpp">
-      <Filter>Bookmarks</Filter>
-    </ClCompile>
     <ClCompile Include="DataObjectTest.cpp">
       <Filter>Helper</Filter>
     </ClCompile>
     <ClCompile Include="ShellNavigationControllerTest.cpp">
       <Filter>ShellBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="BookmarkDropperTest.cpp">
+      <Filter>Bookmarks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

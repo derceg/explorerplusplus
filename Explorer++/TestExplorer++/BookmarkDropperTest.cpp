@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "Bookmarks/BookmarkDataExchange.h"
-#include "Bookmarks/BookmarkDropInfo.h"
+#include "Bookmarks/BookmarkDropper.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "BookmarkTreeHelper.h"
 #include "../Helper/DataExchangeHelper.h"
@@ -14,11 +14,11 @@
 
 using namespace testing;
 
-class BookmarkDropInfoValidTest : public Test
+class BookmarkDropperValidTest : public Test
 {
 protected:
 
-	BookmarkDropInfoValidTest()
+	BookmarkDropperValidTest()
 	{
 		auto grandparentFolder = std::make_unique<BookmarkItem>(std::nullopt, L"Test grandparent folder", std::nullopt);
 		m_rawGrandparentFolder = grandparentFolder.get();
@@ -35,23 +35,23 @@ protected:
 		auto &ownedPtr = m_rawGrandparentFolder->GetParent()->GetChildOwnedPtr(m_rawGrandparentFolder);
 		m_dataObject = BookmarkDataExchange::CreateDataObject({ ownedPtr });
 
-		m_dropInfo = std::make_unique<BookmarkDropInfo>(m_dataObject.get(), &m_bookmarkTree);
+		m_dropper = std::make_unique<BookmarkDropper>(m_dataObject.get(), &m_bookmarkTree);
 	}
 
 	BookmarkTree m_bookmarkTree;
 
-	std::unique_ptr<BookmarkDropInfo> m_dropInfo;
+	std::unique_ptr<BookmarkDropper> m_dropper;
 	wil::com_ptr<IDataObject> m_dataObject;
 	BookmarkItem *m_rawGrandparentFolder;
 	BookmarkItem *m_rawParentFolder;
 	BookmarkItem *m_rawBookmark;
 };
 
-class BookmarkDropInfoInvalidTest : public Test
+class BookmarkDropperInvalidTest : public Test
 {
 protected:
 
-	BookmarkDropInfoInvalidTest()
+	BookmarkDropperInvalidTest()
 	{
 		FORMATETC formatEtc = { CF_UNICODETEXT, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 
@@ -62,45 +62,45 @@ protected:
 
 		global.release();
 
-		m_dropInfo = std::make_unique<BookmarkDropInfo>(m_dataObject.get(), &m_bookmarkTree);
+		m_dropper = std::make_unique<BookmarkDropper>(m_dataObject.get(), &m_bookmarkTree);
 	}
 
 	BookmarkTree m_bookmarkTree;
 
-	std::unique_ptr<BookmarkDropInfo> m_dropInfo;
+	std::unique_ptr<BookmarkDropper> m_dropper;
 	wil::com_ptr<IDataObject> m_dataObject;
 };
 
-TEST_F(BookmarkDropInfoValidTest, DropEffect) {
+TEST_F(BookmarkDropperValidTest, DropEffect) {
 	// Drops on the root folder should be blocked.
-	DWORD effect = m_dropInfo->GetDropEffect(m_bookmarkTree.GetRoot());
+	DWORD effect = m_dropper->GetDropEffect(m_bookmarkTree.GetRoot());
 	EXPECT_EQ(effect, DROPEFFECT_NONE);
 
-	effect = m_dropInfo->GetDropEffect(m_bookmarkTree.GetBookmarksMenuFolder());
+	effect = m_dropper->GetDropEffect(m_bookmarkTree.GetBookmarksMenuFolder());
 	EXPECT_EQ(effect, DROPEFFECT_MOVE);
 
-	effect = m_dropInfo->GetDropEffect(m_bookmarkTree.GetBookmarksToolbarFolder());
+	effect = m_dropper->GetDropEffect(m_bookmarkTree.GetBookmarksToolbarFolder());
 	EXPECT_EQ(effect, DROPEFFECT_MOVE);
 
-	effect = m_dropInfo->GetDropEffect(m_bookmarkTree.GetOtherBookmarksFolder());
+	effect = m_dropper->GetDropEffect(m_bookmarkTree.GetOtherBookmarksFolder());
 	EXPECT_EQ(effect, DROPEFFECT_MOVE);
 
 	// An item can't be dropped on itself.
-	effect = m_dropInfo->GetDropEffect(m_rawGrandparentFolder);
+	effect = m_dropper->GetDropEffect(m_rawGrandparentFolder);
 	EXPECT_EQ(effect, DROPEFFECT_NONE);
 
 	// It also can't be dropped on one of its children.
-	effect = m_dropInfo->GetDropEffect(m_rawParentFolder);
+	effect = m_dropper->GetDropEffect(m_rawParentFolder);
 	EXPECT_EQ(effect, DROPEFFECT_NONE);
 }
 
-TEST_F(BookmarkDropInfoValidTest, DropOnRoot) {
-	DWORD effect = m_dropInfo->PerformDrop(m_bookmarkTree.GetRoot(), 0);
+TEST_F(BookmarkDropperValidTest, DropOnRoot) {
+	DWORD effect = m_dropper->PerformDrop(m_bookmarkTree.GetRoot(), 0);
 	EXPECT_EQ(effect, DROPEFFECT_NONE);
 	EXPECT_EQ(m_rawGrandparentFolder->GetParent(), m_bookmarkTree.GetBookmarksMenuFolder());
 }
 
-TEST_F(BookmarkDropInfoValidTest, DropOnFolder) {
+TEST_F(BookmarkDropperValidTest, DropOnFolder) {
 	BookmarkTreeObserver observer;
 
 	m_bookmarkTree.bookmarkItemMovedSignal.AddObserver(
@@ -110,27 +110,27 @@ TEST_F(BookmarkDropInfoValidTest, DropOnFolder) {
 	EXPECT_CALL(observer, OnBookmarkItemMoved(m_rawGrandparentFolder, m_bookmarkTree.GetBookmarksMenuFolder(), 0,
 		m_bookmarkTree.GetBookmarksToolbarFolder(), 0));
 
-	DWORD effect = m_dropInfo->PerformDrop(m_bookmarkTree.GetBookmarksToolbarFolder(), 0);
+	DWORD effect = m_dropper->PerformDrop(m_bookmarkTree.GetBookmarksToolbarFolder(), 0);
 	EXPECT_EQ(effect, DROPEFFECT_MOVE);
 }
 
-TEST_F(BookmarkDropInfoInvalidTest, DropEffect) {
+TEST_F(BookmarkDropperInvalidTest, DropEffect) {
 	// There are no bookmarks contained within the drop, so it shouldn't be
 	// possible to drop anywhere.
-	DWORD effect = m_dropInfo->GetDropEffect(m_bookmarkTree.GetRoot());
+	DWORD effect = m_dropper->GetDropEffect(m_bookmarkTree.GetRoot());
 	EXPECT_EQ(effect, DROPEFFECT_NONE);
 
-	effect = m_dropInfo->GetDropEffect(m_bookmarkTree.GetBookmarksMenuFolder());
+	effect = m_dropper->GetDropEffect(m_bookmarkTree.GetBookmarksMenuFolder());
 	EXPECT_EQ(effect, DROPEFFECT_NONE);
 
-	effect = m_dropInfo->GetDropEffect(m_bookmarkTree.GetBookmarksToolbarFolder());
+	effect = m_dropper->GetDropEffect(m_bookmarkTree.GetBookmarksToolbarFolder());
 	EXPECT_EQ(effect, DROPEFFECT_NONE);
 
-	effect = m_dropInfo->GetDropEffect(m_bookmarkTree.GetOtherBookmarksFolder());
+	effect = m_dropper->GetDropEffect(m_bookmarkTree.GetOtherBookmarksFolder());
 	EXPECT_EQ(effect, DROPEFFECT_NONE);
 }
 
-TEST_F(BookmarkDropInfoInvalidTest, Drop) {
-	DWORD effect = m_dropInfo->PerformDrop(m_bookmarkTree.GetBookmarksMenuFolder(), 0);
+TEST_F(BookmarkDropperInvalidTest, Drop) {
+	DWORD effect = m_dropper->PerformDrop(m_bookmarkTree.GetBookmarksMenuFolder(), 0);
 	EXPECT_EQ(effect, DROPEFFECT_NONE);
 }

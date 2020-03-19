@@ -469,7 +469,7 @@
     <ClCompile Include="Bookmarks\UI\BookmarkContextMenu.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkContextMenuController.cpp" />
     <ClCompile Include="Bookmarks\BookmarkDataExchange.cpp" />
-    <ClCompile Include="Bookmarks\BookmarkDropInfo.cpp" />
+    <ClCompile Include="Bookmarks\BookmarkDropper.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkDropTargetWindow.cpp" />
     <ClCompile Include="Bookmarks\BookmarkItem.cpp" />
     <ClCompile Include="Bookmarks\BookmarkNavigationController.cpp" />
@@ -629,7 +629,7 @@
     <ClInclude Include="Bookmarks\UI\BookmarkContextMenu.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkContextMenuController.h" />
     <ClInclude Include="Bookmarks\BookmarkDataExchange.h" />
-    <ClInclude Include="Bookmarks\BookmarkDropInfo.h" />
+    <ClInclude Include="Bookmarks\BookmarkDropper.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkDropTargetWindow.h" />
     <ClInclude Include="Bookmarks\BookmarkHelper.h" />
     <ClInclude Include="Bookmarks\BookmarkItem.h" />
