@@ -310,7 +310,7 @@ WPARAM wParam,LPARAM lParam)
 
 		case WM_USER_DISPLAYWINDOWMOVED:
 			m_bVertical = (BOOL)wParam;
-			InvalidateRect(m_hDisplayWindow, NULL, TRUE);
+			InvalidateRect(m_hDisplayWindow, nullptr, TRUE);
 			break;
 	}
 

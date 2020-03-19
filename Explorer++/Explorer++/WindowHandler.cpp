@@ -127,7 +127,7 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 		height -= tabWindowHeight;
 	}
 
-	SetWindowPos(hListView,NULL,indentLeft,indentTop,width,height,SWP_HIDEWINDOW|SWP_NOZORDER);
+	SetWindowPos(hListView,nullptr,indentLeft,indentTop,width,height,SWP_HIDEWINDOW|SWP_NOZORDER);
 }
 
 void Explorerplusplus::ToggleFolders()
