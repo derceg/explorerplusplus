@@ -28,7 +28,7 @@ ShellNavigationController::ShellNavigationController(NavigatorInterface *navigat
 
 void ShellNavigationController::Initialize()
 {
-	m_connections.push_back(m_navigator->AddNavigationCompletedObserver(
+	m_connections.emplace_back(m_navigator->AddNavigationCompletedObserver(
 		boost::bind(&ShellNavigationController::OnNavigationCompleted, this, _1, _2),
 		boost::signals2::at_front));
 }
