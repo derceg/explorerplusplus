@@ -115,11 +115,11 @@ void ShellBrowser::DirectoryAltered()
 
 		if(iIndex != -1)
 		{
-			NListView::ListView_SelectItem(m_hListView,iIndex,TRUE);
+			ListViewHelper::SelectItem(m_hListView,iIndex,TRUE);
 
 			if(!bFocusSet)
 			{
-				NListView::ListView_FocusItem(m_hListView,iIndex,TRUE);
+				ListViewHelper::FocusItem(m_hListView,iIndex,TRUE);
 				ListView_EnsureVisible(m_hListView,iIndex,TRUE);
 
 				bFocusSet = TRUE;

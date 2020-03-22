@@ -645,7 +645,7 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wPar
 						{
 							tab->GetShellBrowser()->GetNavigationController()->Refresh();
 
-							NListView::ListView_ActivateOneClickSelect(tab->GetShellBrowser()->GetListView(),
+							ListViewHelper::ActivateOneClickSelect(tab->GetShellBrowser()->GetListView(),
 								m_config->globalFolderSettings.oneClickActivate,
 								m_config->globalFolderSettings.oneClickActivateHoverTime);
 						}
@@ -828,7 +828,7 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPA
 						changes itself. */
 						tab->GetShellBrowser()->OnGridlinesSettingChanged();
 
-						NListView::ListView_AddRemoveExtendedStyle(tab->GetShellBrowser()->GetListView(),
+						ListViewHelper::AddRemoveExtendedStyle(tab->GetShellBrowser()->GetListView(),
 							LVS_EX_FULLROWSELECT,m_config->useFullRowSelect);
 					}
 

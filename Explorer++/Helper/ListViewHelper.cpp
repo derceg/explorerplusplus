@@ -6,11 +6,10 @@
 #include "ListViewHelper.h"
 #include "Macros.h"
 
-
 BOOL GetListViewItem(HWND hListView, LVITEM *pLVItem, UINT mask, UINT stateMask,
 	int iItem, int iSubItem, TCHAR *pszText, int cchMax);
 
-void NListView::ListView_SelectItem(HWND hListView,int iItem,BOOL bSelect)
+void ListViewHelper::SelectItem(HWND hListView,int iItem,BOOL bSelect)
 {
 	UINT uNewState;
 
@@ -26,7 +25,7 @@ void NListView::ListView_SelectItem(HWND hListView,int iItem,BOOL bSelect)
 	ListView_SetItemState(hListView,iItem,uNewState,LVIS_SELECTED);
 }
 
-void NListView::ListView_SelectAllItems(HWND hListView,BOOL bSelect)
+void ListViewHelper::SelectAllItems(HWND hListView,BOOL bSelect)
 {
 	UINT uNewState;
 
@@ -44,7 +43,7 @@ void NListView::ListView_SelectAllItems(HWND hListView,BOOL bSelect)
 	SendMessage(hListView,WM_SETREDRAW,TRUE,0);
 }
 
-int NListView::ListView_InvertSelection(HWND hListView)
+int ListViewHelper::InvertSelection(HWND hListView)
 {
 	int nTotalItems = ListView_GetItemCount(hListView);
 
@@ -56,11 +55,11 @@ int NListView::ListView_InvertSelection(HWND hListView)
 	{
 		if(ListView_GetItemState(hListView,i,LVIS_SELECTED) == LVIS_SELECTED)
 		{
-			ListView_SelectItem(hListView,i,FALSE);
+			SelectItem(hListView,i,FALSE);
 		}
 		else
 		{
-			ListView_SelectItem(hListView,i,TRUE);
+			SelectItem(hListView,i,TRUE);
 			nSelected++;
 		}
 	}
@@ -70,7 +69,7 @@ int NListView::ListView_InvertSelection(HWND hListView)
 	return nSelected;
 }
 
-void NListView::ListView_FocusItem(HWND hListView,int iItem,BOOL bFocus)
+void ListViewHelper::FocusItem(HWND hListView,int iItem,BOOL bFocus)
 {
 	UINT uNewState;
 
@@ -86,7 +85,7 @@ void NListView::ListView_FocusItem(HWND hListView,int iItem,BOOL bFocus)
 	ListView_SetItemState(hListView,iItem,uNewState,LVIS_FOCUSED);
 }
 
-void NListView::ListView_SetGridlines(HWND hListView,BOOL bEnableGridlines)
+void ListViewHelper::SetGridlines(HWND hListView,BOOL bEnableGridlines)
 {
 	auto dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
 
@@ -108,7 +107,7 @@ void NListView::ListView_SetGridlines(HWND hListView,BOOL bEnableGridlines)
 	ListView_SetExtendedListViewStyle(hListView,dwExtendedStyle);
 }
 
-BOOL NListView::ListView_SetAutoArrange(HWND hListView,BOOL bAutoArrange)
+BOOL ListViewHelper::SetAutoArrange(HWND hListView,BOOL bAutoArrange)
 {
 	LONG_PTR lStyle = GetWindowLongPtr(hListView,GWL_STYLE);
 
@@ -143,7 +142,7 @@ BOOL NListView::ListView_SetAutoArrange(HWND hListView,BOOL bAutoArrange)
 	return TRUE;
 }
 
-void NListView::ListView_ActivateOneClickSelect(HWND hListView,BOOL bActivate,UINT uHoverTime)
+void ListViewHelper::ActivateOneClickSelect(HWND hListView,BOOL bActivate,UINT uHoverTime)
 {
 	auto dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
 
@@ -190,7 +189,7 @@ void NListView::ListView_ActivateOneClickSelect(HWND hListView,BOOL bActivate,UI
 	}
 }
 
-void NListView::ListView_AddRemoveExtendedStyle(HWND hListView,DWORD dwStyle,BOOL bAdd)
+void ListViewHelper::AddRemoveExtendedStyle(HWND hListView,DWORD dwStyle,BOOL bAdd)
 {
 	auto dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
 
@@ -216,7 +215,7 @@ void NListView::ListView_AddRemoveExtendedStyle(HWND hListView,DWORD dwStyle,BOO
 listview. uImage should be the index
 of a bitmap resource in the current
 executable. */
-BOOL NListView::ListView_SetBackgroundImage(HWND hListView,UINT uImage)
+BOOL ListViewHelper::SetBackgroundImage(HWND hListView,UINT uImage)
 {
 	TCHAR szModuleName[MAX_PATH];
 	DWORD dwRet = GetModuleFileName(NULL,szModuleName,SIZEOF_ARRAY(szModuleName));
@@ -269,7 +268,7 @@ BOOL GetListViewItem(HWND hListView, LVITEM *pLVItem, UINT mask, UINT stateMask,
 	return ListView_GetItem(hListView, pLVItem);
 }
 
-BOOL NListView::ListView_SwapItems(HWND hListView, int iItem1, int iItem2, BOOL bSwapLPARAM)
+BOOL ListViewHelper::SwapItems(HWND hListView, int iItem1, int iItem2, BOOL bSwapLPARAM)
 {
 	UINT mask = LVIF_IMAGE | LVIF_INDENT | LVIF_STATE | LVIF_TEXT;
 	UINT stateMask = static_cast<UINT>(-1);
@@ -316,7 +315,7 @@ BOOL NListView::ListView_SwapItems(HWND hListView, int iItem1, int iItem2, BOOL 
 	return TRUE;
 }
 
-void NListView::ListView_PositionInsertMark(HWND hListView,const POINT *ppt)
+void ListViewHelper::PositionInsertMark(HWND hListView,const POINT *ppt)
 {
 	/* Remove the insertion mark. */
 	if(ppt == NULL)

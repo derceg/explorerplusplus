@@ -150,7 +150,7 @@ void WildcardSelectDialog::SelectItems(TCHAR *szPattern)
 
 		if(CheckWildcardMatch(szPattern,szFilename,FALSE) == 1)
 		{
-			NListView::ListView_SelectItem(hListView,i,m_bSelect);
+			ListViewHelper::SelectItem(hListView,i,m_bSelect);
 		}
 	}
 }

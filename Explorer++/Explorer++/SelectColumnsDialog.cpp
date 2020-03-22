@@ -65,7 +65,7 @@ INT_PTR SelectColumnsDialog::OnInitDialog()
 
 	ListView_SetColumnWidth(hListView,0,LVSCW_AUTOSIZE);
 
-	NListView::ListView_SelectItem(hListView,0,TRUE);
+	ListViewHelper::SelectItem(hListView,0,TRUE);
 	SetFocus(hListView);
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg,true);
@@ -349,11 +349,11 @@ void SelectColumnsDialog::OnMoveColumn(bool bUp)
 	{
 		if(bUp)
 		{
-			NListView::ListView_SwapItems(hListView,iSelected,iSelected - 1,TRUE);
+			ListViewHelper::SwapItems(hListView,iSelected,iSelected - 1,TRUE);
 		}
 		else
 		{
-			NListView::ListView_SwapItems(hListView,iSelected,iSelected + 1,TRUE);
+			ListViewHelper::SwapItems(hListView,iSelected,iSelected + 1,TRUE);
 		}
 
 		m_bColumnsSwapped = TRUE;

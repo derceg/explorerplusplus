@@ -306,7 +306,7 @@ void SetDefaultColumnsDialog::SetupFolderColumns(FolderType folderType)
 		iItem++;
 	}
 
-	NListView::ListView_SelectItem(hListView,0,TRUE);
+	ListViewHelper::SelectItem(hListView,0,TRUE);
 }
 
 std::vector<Column_t> &SetDefaultColumnsDialog::GetCurrentColumnList(FolderType folderType)
@@ -369,11 +369,11 @@ void SetDefaultColumnsDialog::OnMoveColumn(bool bUp)
 	{
 		if(bUp)
 		{
-			NListView::ListView_SwapItems(hListView,iSelected,iSelected - 1,TRUE);
+			ListViewHelper::SwapItems(hListView,iSelected,iSelected - 1,TRUE);
 		}
 		else
 		{
-			NListView::ListView_SwapItems(hListView,iSelected,iSelected + 1,TRUE);
+			ListViewHelper::SwapItems(hListView,iSelected,iSelected + 1,TRUE);
 		}
 
 		SetFocus(hListView);

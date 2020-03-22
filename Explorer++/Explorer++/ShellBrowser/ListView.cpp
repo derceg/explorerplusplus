@@ -444,7 +444,7 @@ void ShellBrowser::OnListViewItemChanged(const NMLISTVIEW *changeData)
 	if (m_config->checkBoxSelection && (LVIS_STATEIMAGEMASK & changeData->uNewState) != 0)
 	{
 		bool checked = ((changeData->uNewState & LVIS_STATEIMAGEMASK) >> 12) == 2;
-		NListView::ListView_SelectItem(m_hListView, changeData->iItem, checked);
+		ListViewHelper::SelectItem(m_hListView, changeData->iItem, checked);
 	}
 
 	bool previouslySelected = WI_IsFlagSet(changeData->uOldState, LVIS_SELECTED);
@@ -517,7 +517,7 @@ void ShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 			!IsKeyDown(VK_SHIFT) &&
 			!IsKeyDown(VK_MENU))
 		{
-			NListView::ListView_SelectAllItems(m_hListView, TRUE);
+			ListViewHelper::SelectAllItems(m_hListView, TRUE);
 			SetFocus(m_hListView);
 		}
 		break;
@@ -527,7 +527,7 @@ void ShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 			!IsKeyDown(VK_SHIFT) &&
 			!IsKeyDown(VK_MENU))
 		{
-			NListView::ListView_InvertSelection(m_hListView);
+			ListViewHelper::InvertSelection(m_hListView);
 			SetFocus(m_hListView);
 		}
 		break;

@@ -204,15 +204,15 @@ HWND ShellBrowser::SetUpListView(HWND parent)
 
 	ListView_SetExtendedListViewStyle(hListView, dwExtendedStyle);
 
-	NListView::ListView_SetAutoArrange(m_hListView, m_folderSettings.autoArrange);
-	NListView::ListView_SetGridlines(m_hListView, m_config->globalFolderSettings.showGridlines);
+	ListViewHelper::SetAutoArrange(m_hListView, m_folderSettings.autoArrange);
+	ListViewHelper::SetGridlines(m_hListView, m_config->globalFolderSettings.showGridlines);
 
 	if (m_folderSettings.applyFilter)
 	{
-		NListView::ListView_SetBackgroundImage(m_hListView, IDB_FILTERINGAPPLIED);
+		ListViewHelper::SetBackgroundImage(m_hListView, IDB_FILTERINGAPPLIED);
 	}
 
-	NListView::ListView_ActivateOneClickSelect(m_hListView, m_config->globalFolderSettings.oneClickActivate,
+	ListViewHelper::ActivateOneClickSelect(m_hListView, m_config->globalFolderSettings.oneClickActivate,
 		m_config->globalFolderSettings.oneClickActivateHoverTime);
 
 	SetWindowTheme(hListView, L"Explorer", nullptr);
@@ -235,7 +235,7 @@ void ShellBrowser::SetAutoArrange(BOOL autoArrange)
 {
 	m_folderSettings.autoArrange = autoArrange;
 
-	NListView::ListView_SetAutoArrange(m_hListView, m_folderSettings.autoArrange);
+	ListViewHelper::SetAutoArrange(m_hListView, m_folderSettings.autoArrange);
 }
 
 ViewMode ShellBrowser::GetViewMode() const
@@ -433,7 +433,7 @@ int ShellBrowser::GetId() const
 
 void ShellBrowser::OnGridlinesSettingChanged()
 {
-	NListView::ListView_SetGridlines(m_hListView, m_config->globalFolderSettings.showGridlines);
+	ListViewHelper::SetGridlines(m_hListView, m_config->globalFolderSettings.showGridlines);
 }
 
 BOOL ShellBrowser::IsFilenameFiltered(const TCHAR *FileName) const
@@ -498,8 +498,8 @@ int ShellBrowser::SelectFiles(const TCHAR *FileNamePattern)
 
 	if(iItem != -1)
 	{
-		NListView::ListView_FocusItem(m_hListView,iItem,TRUE);
-		NListView::ListView_SelectItem(m_hListView,iItem,TRUE);
+		ListViewHelper::FocusItem(m_hListView,iItem,TRUE);
+		ListViewHelper::SelectItem(m_hListView,iItem,TRUE);
 		ListView_EnsureVisible(m_hListView,iItem,FALSE);
 		return 1;
 	}
@@ -712,7 +712,7 @@ void ShellBrowser::PositionDroppedItems()
 		to be moved. Therefore, if the style is on, turn it
 		off, move the items, and the turn it back on. */
 		if(m_folderSettings.autoArrange)
-			NListView::ListView_SetAutoArrange(m_hListView,FALSE);
+			ListViewHelper::SetAutoArrange(m_hListView,FALSE);
 
 		for(itr = m_DroppedFileNameList.begin();itr != m_DroppedFileNameList.end();)
 		{
@@ -851,8 +851,8 @@ void ShellBrowser::PositionDroppedItems()
 					ListView_SetItemPosition32(m_hListView,iItem,itr->DropPoint.x,itr->DropPoint.y);
 				}
 
-				NListView::ListView_SelectItem(m_hListView,iItem,TRUE);
-				NListView::ListView_FocusItem(m_hListView,iItem,TRUE);
+				ListViewHelper::SelectItem(m_hListView,iItem,TRUE);
+				ListViewHelper::FocusItem(m_hListView,iItem,TRUE);
 
 				itr = m_DroppedFileNameList.erase(itr);
 			}
@@ -863,7 +863,7 @@ void ShellBrowser::PositionDroppedItems()
 		}
 
 		if(m_folderSettings.autoArrange)
-			NListView::ListView_SetAutoArrange(m_hListView,TRUE);
+			ListViewHelper::SetAutoArrange(m_hListView,TRUE);
 	}
 }
 
@@ -1238,12 +1238,12 @@ void ShellBrowser::SelectItems(const std::list<std::wstring> &PastedFileList)
 
 		if(iIndex != -1)
 		{
-			NListView::ListView_SelectItem(m_hListView,iIndex,TRUE);
+			ListViewHelper::SelectItem(m_hListView,iIndex,TRUE);
 
 			if(i == 0)
 			{
 				/* Focus on the first item, and ensure it is visible. */
-				NListView::ListView_FocusItem(m_hListView,iIndex,TRUE);
+				ListViewHelper::FocusItem(m_hListView,iIndex,TRUE);
 				ListView_EnsureVisible(m_hListView,iIndex,FALSE);
 
 				i++;

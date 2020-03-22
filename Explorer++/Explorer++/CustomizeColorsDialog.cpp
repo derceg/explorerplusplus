@@ -317,7 +317,7 @@ void CustomizeColorsDialog::OnMove(BOOL bUp)
 
 		std::iter_swap(itrSelected,itrSwap);
 
-		NListView::ListView_SwapItems(hListView,iSelected,iSwap,FALSE);
+		ListViewHelper::SwapItems(hListView,iSelected,iSwap,FALSE);
 	}
 }
 
@@ -346,7 +346,7 @@ void CustomizeColorsDialog::OnDelete()
 			if(iSelected == (nItems - 1))
 				iSelected--;
 
-			NListView::ListView_SelectItem(hListView,iSelected,TRUE);
+			ListViewHelper::SelectItem(hListView,iSelected,TRUE);
 		}
 
 		SetFocus(hListView);

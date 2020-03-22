@@ -567,8 +567,8 @@ void Explorerplusplus::OnListViewRClick(POINT *pCursorPos)
 			if(ListView_GetItemState(m_hActiveListView,lvhti.iItem,LVIS_SELECTED) !=
 				LVIS_SELECTED)
 			{
-				NListView::ListView_SelectAllItems(m_hActiveListView,FALSE);
-				NListView::ListView_SelectItem(m_hActiveListView,lvhti.iItem,TRUE);
+				ListViewHelper::SelectAllItems(m_hActiveListView,FALSE);
+				ListViewHelper::SelectItem(m_hActiveListView,lvhti.iItem,TRUE);
 			}
 		}
 	}
@@ -1153,12 +1153,12 @@ int Explorerplusplus::HighlightSimilarFiles(HWND ListView) const
 
 			if(bSimilarTypes)
 			{
-				NListView::ListView_SelectItem(ListView,i,TRUE);
+				ListViewHelper::SelectItem(ListView,i,TRUE);
 				nSimilar++;
 			}
 			else
 			{
-				NListView::ListView_SelectItem(ListView,i,FALSE);
+				ListViewHelper::SelectItem(ListView,i,FALSE);
 			}
 		}
 	}

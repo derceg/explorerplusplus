@@ -662,7 +662,7 @@ void ManageBookmarksDialog::OnSelectAll()
 
 	if (focus == listView)
 	{
-		NListView::ListView_SelectAllItems(listView, TRUE);
+		ListViewHelper::SelectAllItems(listView, TRUE);
 	}
 }
 

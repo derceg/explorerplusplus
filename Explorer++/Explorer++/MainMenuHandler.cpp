@@ -222,7 +222,7 @@ void Explorerplusplus::OnCreateNewFolder()
 
 	FileProgressSink *sink = FileProgressSink::CreateNew();
 	sink->SetPostNewItemObserver([this] (PIDLIST_ABSOLUTE pidl) {
-		NListView::ListView_SelectAllItems(m_hActiveListView, FALSE);
+		ListViewHelper::SelectAllItems(m_hActiveListView, FALSE);
 		SetFocus(m_hActiveListView);
 
 		m_pActiveShellBrowser->QueueRename(pidl);

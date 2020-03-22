@@ -115,9 +115,9 @@ HRESULT _stdcall ShellBrowser::DragOver(DWORD grfKeyState,POINTL ptl,DWORD *pdwE
 	if(m_bDataAccept)
 	{
 		if(!m_bOverFolder)
-			NListView::ListView_PositionInsertMark(m_hListView,&pt);
+			ListViewHelper::PositionInsertMark(m_hListView,&pt);
 		else
-			NListView::ListView_PositionInsertMark(m_hListView, nullptr);
+			ListViewHelper::PositionInsertMark(m_hListView, nullptr);
 	}
 
 	return S_OK;
@@ -326,7 +326,7 @@ HRESULT _stdcall ShellBrowser::DragLeave()
 {
 	m_pDropTargetHelper->DragLeave();
 
-	NListView::ListView_PositionInsertMark(m_hListView, nullptr);
+	ListViewHelper::PositionInsertMark(m_hListView, nullptr);
 
 	if(m_bDeselectDropFolder)
 	{
@@ -489,7 +489,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 			files if nothing was actually copied/moved). */
 			if(!m_bOverFolder)
 			{
-				NListView::ListView_SelectAllItems(m_hListView,FALSE);
+				ListViewHelper::SelectAllItems(m_hListView,FALSE);
 			}
 
 			pDropHandler->Release();
@@ -503,7 +503,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 	}*/
 
 	/* Remove the insertion mark from the listview. */
-	NListView::ListView_PositionInsertMark(m_hListView, nullptr);
+	ListViewHelper::PositionInsertMark(m_hListView, nullptr);
 
 	//m_bPerformingDrag = FALSE;
 
@@ -537,7 +537,7 @@ void ShellBrowser::RepositionLocalFiles(const POINT *ppt)
 	to be moved. Therefore, if the style is on, turn it
 	off, move the items, and the turn it back on. */
 	if(m_folderSettings.autoArrange)
-		NListView::ListView_SetAutoArrange(m_hListView,FALSE);
+		ListViewHelper::SetAutoArrange(m_hListView,FALSE);
 
 	for(itr = m_DraggedFilesList.begin();
 		itr != m_DraggedFilesList.end();itr++)
@@ -741,7 +741,7 @@ void ShellBrowser::RepositionLocalFiles(const POINT *ppt)
 	}
 
 	if(m_folderSettings.autoArrange)
-		NListView::ListView_SetAutoArrange(m_hListView,TRUE);
+		ListViewHelper::SetAutoArrange(m_hListView,TRUE);
 
 	m_bDragging = FALSE;
 

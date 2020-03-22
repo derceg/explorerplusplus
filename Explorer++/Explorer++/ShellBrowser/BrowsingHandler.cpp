@@ -322,7 +322,7 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 	if (m_folderSettings.autoArrange)
 	{
-		NListView::ListView_SetAutoArrange(m_hListView, FALSE);
+		ListViewHelper::SetAutoArrange(m_hListView, FALSE);
 	}
 
 	int nAdded = 0;
@@ -409,7 +409,7 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 	if (m_folderSettings.autoArrange)
 	{
-		NListView::ListView_SetAutoArrange(m_hListView, TRUE);
+		ListViewHelper::SetAutoArrange(m_hListView, TRUE);
 	}
 
 	m_nTotalItems = nPrevItems + nAdded;
@@ -423,11 +423,11 @@ void ShellBrowser::ApplyFolderEmptyBackgroundImage(bool apply)
 {
 	if (apply)
 	{
-		NListView::ListView_SetBackgroundImage(m_hListView, IDB_FOLDEREMPTY);
+		ListViewHelper::SetBackgroundImage(m_hListView, IDB_FOLDEREMPTY);
 	}
 	else
 	{
-		NListView::ListView_SetBackgroundImage(m_hListView, NULL);
+		ListViewHelper::SetBackgroundImage(m_hListView, NULL);
 	}
 }
 
@@ -435,11 +435,11 @@ void ShellBrowser::ApplyFilteringBackgroundImage(bool apply)
 {
 	if (apply)
 	{
-		NListView::ListView_SetBackgroundImage(m_hListView, IDB_FILTERINGAPPLIED);
+		ListViewHelper::SetBackgroundImage(m_hListView, IDB_FILTERINGAPPLIED);
 	}
 	else
 	{
-		NListView::ListView_SetBackgroundImage(m_hListView, NULL);
+		ListViewHelper::SetBackgroundImage(m_hListView, NULL);
 	}
 }
 

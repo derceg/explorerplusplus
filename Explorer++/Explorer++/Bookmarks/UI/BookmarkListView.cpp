@@ -472,8 +472,8 @@ void BookmarkListView::SelectItem(const BookmarkItem *bookmarkItem)
 	}
 
 	SetFocus(m_hListView);
-	NListView::ListView_SelectAllItems(m_hListView, FALSE);
-	NListView::ListView_SelectItem(m_hListView, *index, TRUE);
+	ListViewHelper::SelectAllItems(m_hListView, FALSE);
+	ListViewHelper::SelectItem(m_hListView, *index, TRUE);
 }
 
 void BookmarkListView::CreateNewFolder()
@@ -600,7 +600,7 @@ void BookmarkListView::OnKeyDown(const NMLVKEYDOWN *keyDown)
 	case 'A':
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
-			NListView::ListView_SelectAllItems(m_hListView, TRUE);
+			ListViewHelper::SelectAllItems(m_hListView, TRUE);
 		}
 		break;
 

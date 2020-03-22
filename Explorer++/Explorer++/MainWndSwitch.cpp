@@ -443,12 +443,12 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		break;
 
 	case IDM_EDIT_SELECTALL:
-		NListView::ListView_SelectAllItems(m_hActiveListView, TRUE);
+		ListViewHelper::SelectAllItems(m_hActiveListView, TRUE);
 		SetFocus(m_hActiveListView);
 		break;
 
 	case IDM_EDIT_INVERTSELECTION:
-		NListView::ListView_InvertSelection(m_hActiveListView);
+		ListViewHelper::InvertSelection(m_hActiveListView);
 		SetFocus(m_hActiveListView);
 		break;
 
@@ -458,7 +458,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		break;
 
 	case IDM_EDIT_SELECTNONE:
-		NListView::ListView_SelectAllItems(m_hActiveListView, FALSE);
+		ListViewHelper::SelectAllItems(m_hActiveListView, FALSE);
 		SetFocus(m_hActiveListView);
 		break;
 

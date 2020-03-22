@@ -95,7 +95,7 @@ INT_PTR ListViewEdit::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 				HWND hListView = GetParent(m_hwnd);
 
 				int iSel = ListView_GetNextItem(hListView,-1,LVNI_ALL|LVNI_SELECTED);
-				NListView::ListView_SelectItem(hListView,iSel,FALSE);
+				ListViewHelper::SelectItem(hListView,iSel,FALSE);
 
 				int nItems = ListView_GetItemCount(hListView);
 
