@@ -204,15 +204,15 @@ HWND ShellBrowser::SetUpListView(HWND parent)
 
 	ListView_SetExtendedListViewStyle(hListView, dwExtendedStyle);
 
-	ListViewHelper::SetAutoArrange(m_hListView, m_folderSettings.autoArrange);
-	ListViewHelper::SetGridlines(m_hListView, m_config->globalFolderSettings.showGridlines);
+	ListViewHelper::SetAutoArrange(hListView, m_folderSettings.autoArrange);
+	ListViewHelper::SetGridlines(hListView, m_config->globalFolderSettings.showGridlines);
 
 	if (m_folderSettings.applyFilter)
 	{
-		ListViewHelper::SetBackgroundImage(m_hListView, IDB_FILTERINGAPPLIED);
+		ListViewHelper::SetBackgroundImage(hListView, IDB_FILTERINGAPPLIED);
 	}
 
-	ListViewHelper::ActivateOneClickSelect(m_hListView, m_config->globalFolderSettings.oneClickActivate,
+	ListViewHelper::ActivateOneClickSelect(hListView, m_config->globalFolderSettings.oneClickActivate,
 		m_config->globalFolderSettings.oneClickActivateHoverTime);
 
 	SetWindowTheme(hListView, L"Explorer", nullptr);
