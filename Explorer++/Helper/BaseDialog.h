@@ -49,6 +49,8 @@ protected:
 
 	INT_PTR			GetDefaultReturnValue(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
+	void			AddTooltipForControl(int controlId, int stringResourceId);
+
 	HWND m_hDlg;
 	DpiCompatibility m_dpiCompat;
 	int m_iMinWidth;
@@ -76,4 +78,6 @@ private:
 	const bool m_bResizable;
 	DialogSizeConstraint m_dsc;
 	std::unique_ptr<ResizableDialog> m_prd;
+
+	HWND m_tipWnd;
 };

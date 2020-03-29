@@ -82,6 +82,16 @@ HWND CreateTabControl(HWND hParent, DWORD dwStyle)
 	return hTabControl;
 }
 
+HWND CreateTooltipControl(HWND parent, HINSTANCE instance)
+{
+	HWND tipWnd = CreateWindowEx(0, TOOLTIPS_CLASS, nullptr, WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT,
+		CW_USEDEFAULT, CW_USEDEFAULT, parent, nullptr, instance, nullptr);
+
+	SetWindowPos(tipWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+
+	return tipWnd;
+}
+
 BOOL PinStatusBar(HWND hStatusBar, int width, int height)
 {
 	RECT rc;

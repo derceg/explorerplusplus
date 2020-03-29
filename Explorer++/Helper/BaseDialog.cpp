@@ -3,15 +3,26 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include <unordered_map>
-#include "WindowHelper.h"
 #include "BaseDialog.h"
+#include "Controls.h"
 #include "Helper.h"
-
+#include "WindowHelper.h"
+#include <unordered_map>
 
 namespace
 {
 	std::unordered_map<HWND,BaseDialog *>	g_windowMap;
+}
+
+BaseDialog::BaseDialog(HINSTANCE hInstance, int iResource, HWND hParent, bool bResizable) :
+	MessageForwarder(),
+	m_hInstance(hInstance),
+	m_iResource(iResource),
+	m_hParent(hParent),
+	m_bResizable(bResizable)
+{
+	m_prd = NULL;
+	m_bShowingModelessDialog = FALSE;
 }
 
 INT_PTR CALLBACK BaseDialogProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
@@ -86,6 +97,8 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 			{
 				SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
 			}
+
+			m_tipWnd = CreateTooltipControl(m_hDlg, m_hInstance);
 		}
 		break;
 
@@ -164,18 +177,6 @@ INT_PTR BaseDialog::GetDefaultReturnValue(HWND hwnd,UINT uMsg,WPARAM wParam,LPAR
 	return 0;
 }
 
-BaseDialog::BaseDialog(HINSTANCE hInstance,int iResource,
-	HWND hParent,bool bResizable) :
-MessageForwarder(),
-m_hInstance(hInstance),
-m_iResource(iResource),
-m_hParent(hParent),
-m_bResizable(bResizable)
-{
-	m_prd = NULL;
-	m_bShowingModelessDialog = FALSE;
-}
-
 HINSTANCE BaseDialog::GetInstance() const
 {
 	return m_hInstance;
@@ -227,4 +228,16 @@ void BaseDialog::GetResizableControlInformation(DialogSizeConstraint &dsc,
 void BaseDialog::SaveState()
 {
 
+}
+
+void BaseDialog::AddTooltipForControl(int controlId, int stringResourceId)
+{
+	TOOLINFO toolInfo = {};
+	toolInfo.cbSize = sizeof(toolInfo);
+	toolInfo.uFlags = TTF_IDISHWND | TTF_SUBCLASS;
+	toolInfo.hwnd = m_hDlg;
+	toolInfo.uId = reinterpret_cast<UINT_PTR>(GetDlgItem(m_hDlg, controlId));
+	toolInfo.hinst = m_hInstance;
+	toolInfo.lpszText = MAKEINTRESOURCE(stringResourceId);
+	SendMessage(m_tipWnd, TTM_ADDTOOL, 0, reinterpret_cast<LPARAM>(&toolInfo));
 }
