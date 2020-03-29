@@ -75,7 +75,7 @@ wil::unique_hmenu TabRestorerUI::BuildRecentlyClosedTabsMenu(
 	int numInserted = 0;
 
 	for (auto &closedTab : m_tabRestorer->GetClosedTabs()
-			| boost::adaptors::sliced::sliced(
+			| boost::adaptors::sliced(
 				0, min(MAX_MENU_ITEMS, m_tabRestorer->GetClosedTabs().size())))
 	{
 		auto currentEntry = closedTab->history.at(closedTab->currentEntry).get();
