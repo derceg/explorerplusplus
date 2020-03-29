@@ -68,12 +68,6 @@ public:
 private:
 	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
-	struct ApplicationInfo_t
-	{
-		std::wstring Application;
-		std::wstring Parameters;
-	};
-
 	static LRESULT CALLBACK ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -92,7 +86,6 @@ private:
 
 	void OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt);
 
-	ApplicationInfo_t ProcessCommand(const std::wstring &Command);
 	ApplicationButton_t *MapToolbarButtonToItem(int index);
 
 	HINSTANCE m_hInstance;

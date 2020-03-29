@@ -28,6 +28,9 @@
     <ClCompile Include="BookmarkDropperTest.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
+    <ClCompile Include="ApplicationToolbarHelperTest.cpp">
+      <Filter>Application Toolbar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -44,6 +47,9 @@
     </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{d79645af-c720-443f-aeb6-c40b1167b6bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Application Toolbar">
+      <UniqueIdentifier>{50add424-80be-4374-a9f1-c40b3c8f18ec}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

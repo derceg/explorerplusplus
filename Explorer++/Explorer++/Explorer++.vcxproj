@@ -455,6 +455,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AboutDialog.cpp" />
+    <ClCompile Include="ApplicationToolbarHelper.cpp" />
     <ClCompile Include="Plugins\AcceleratorParser.cpp" />
     <ClCompile Include="AcceleratorUpdater.cpp" />
     <ClCompile Include="Bookmarks\UI\AddBookmarkDialog.cpp" />
@@ -615,6 +616,7 @@
     <ClInclude Include="AboutDialog.h" />
     <ClInclude Include="Accelerator.h" />
     <ClInclude Include="AcceleratorMappings.h" />
+    <ClInclude Include="ApplicationToolbarHelper.h" />
     <ClInclude Include="Plugins\AcceleratorParser.h" />
     <ClInclude Include="AcceleratorUpdater.h" />
     <ClInclude Include="Bookmarks\UI\AddBookmarkDialog.h" />

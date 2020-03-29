@@ -79,6 +79,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
+    <ClCompile Include="ApplicationToolbarHelperTest.cpp" />
     <ClCompile Include="BookmarkDropperTest.cpp" />
     <ClCompile Include="DataObjectTest.cpp" />
     <ClCompile Include="Main.cpp" />

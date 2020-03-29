@@ -427,6 +427,9 @@
     <ClCompile Include="Bookmarks\BookmarkDropper.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
+    <ClCompile Include="ApplicationToolbarHelper.cpp">
+      <Filter>Application Toolbar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -854,6 +857,9 @@
     </ClInclude>
     <ClInclude Include="Bookmarks\BookmarkDropper.h">
       <Filter>Bookmarks</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationToolbarHelper.h">
+      <Filter>Application Toolbar</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

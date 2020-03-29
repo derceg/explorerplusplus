@@ -17,6 +17,7 @@
 #include "ApplicationToolbar.h"
 #include "ApplicationToolbarButtonDialog.h"
 #include "ApplicationToolbarDropHandler.h"
+#include "ApplicationToolbarHelper.h"
 #include "CoreInterface.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
@@ -32,6 +33,8 @@ const TCHAR ApplicationToolbarPersistentSettings::SETTING_NAME[] = _T("Name");
 const TCHAR ApplicationToolbarPersistentSettings::SETTING_COMMAND[] = _T("Command");
 const TCHAR ApplicationToolbarPersistentSettings::SETTING_SHOW_NAME_ON_TOOLBAR[] =
 	_T("ShowNameOnToolbar");
+
+using namespace ApplicationToolbarHelper;
 
 ApplicationToolbar *ApplicationToolbar::Create(
 	HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp)
@@ -203,11 +206,11 @@ void ApplicationToolbar::AddButtonsToToolbar()
 
 void ApplicationToolbar::AddButtonToToolbar(const ApplicationButton_t &Button)
 {
-	ApplicationInfo_t ai = ProcessCommand(Button.Command);
+	ApplicationInfo ai = ParseCommandString(Button.Command);
 
 	SHFILEINFO shfi;
 	DWORD_PTR ret =
-		SHGetFileInfo(ai.Application.c_str(), 0, &shfi, sizeof(shfi), SHGFI_SYSICONINDEX);
+		SHGetFileInfo(ai.application.c_str(), 0, &shfi, sizeof(shfi), SHGFI_SYSICONINDEX);
 
 	/* Assign a generic icon if the file was not found. */
 	if (ret == 0)
@@ -241,11 +244,11 @@ void ApplicationToolbar::UpdateButton(int iItem)
 
 	if (button != nullptr)
 	{
-		ApplicationInfo_t ai = ProcessCommand(button->Command);
+		ApplicationInfo ai = ParseCommandString(button->Command);
 
 		SHFILEINFO shfi;
 		DWORD_PTR ret =
-			SHGetFileInfo(ai.Application.c_str(), 0, &shfi, sizeof(shfi), SHGFI_SYSICONINDEX);
+			SHGetFileInfo(ai.application.c_str(), 0, &shfi, sizeof(shfi), SHGFI_SYSICONINDEX);
 
 		if (ret == 0)
 		{
@@ -314,15 +317,15 @@ void ApplicationToolbar::OpenItem(int iItem, std::wstring *parameters)
 
 	if (button != nullptr)
 	{
-		ApplicationInfo_t ai = ProcessCommand(button->Command);
+		ApplicationInfo ai = ParseCommandString(button->Command);
 
 		unique_pidl_absolute pidl;
 		HRESULT hr =
-			SHParseDisplayName(ai.Application.c_str(), nullptr, wil::out_param(pidl), 0, nullptr);
+			SHParseDisplayName(ai.application.c_str(), nullptr, wil::out_param(pidl), 0, nullptr);
 
 		if (SUCCEEDED(hr))
 		{
-			std::wstring combinedParameters = ai.Parameters;
+			std::wstring combinedParameters = ai.parameters;
 
 			if (parameters != nullptr && parameters->length() > 0)
 			{
@@ -333,77 +336,6 @@ void ApplicationToolbar::OpenItem(int iItem, std::wstring *parameters)
 			m_pexpp->OpenFileItem(pidl.get(), combinedParameters.c_str());
 		}
 	}
-}
-
-/* Takes a command string inputted by the user, and splits it
-up into two components: an application path (with any environment strings
-expanded) and a parameter list.
-
-Two supported styles:
-1. "[command]" [parameters] (used if the command contains spaces)
-2. [command] [parameters] */
-ApplicationToolbar::ApplicationInfo_t ApplicationToolbar::ProcessCommand(
-	const std::wstring &Command)
-{
-	ApplicationInfo_t ai;
-
-	ai.Application = EMPTY_STRING;
-	ai.Parameters = EMPTY_STRING;
-
-	std::wstring tempCommand = Command;
-
-	/* Remove leading/trailing spaces. */
-	boost::trim(tempCommand);
-
-	if (tempCommand.length() == 0)
-	{
-		return ai;
-	}
-
-	size_t substringStart;
-	size_t substringEnd;
-	size_t substringLength;
-
-	if (tempCommand.at(0) == _T('\"'))
-	{
-		substringStart = 1;
-		substringEnd = tempCommand.find('"', 1);
-	}
-	else
-	{
-		substringStart = 0;
-		substringEnd = tempCommand.find_first_of(' ');
-	}
-
-	if (substringEnd != std::wstring::npos)
-	{
-		substringLength = substringEnd - substringStart;
-	}
-	else
-	{
-		substringLength = std::wstring::npos;
-	}
-
-	std::wstring tempApplication = tempCommand.substr(substringStart, substringLength);
-	boost::trim(tempApplication);
-
-	TCHAR expandedApplicationPath[MAX_PATH];
-	MyExpandEnvironmentStrings(
-		tempApplication.c_str(), expandedApplicationPath, SIZEOF_ARRAY(expandedApplicationPath));
-
-	ai.Application = expandedApplicationPath;
-
-	if (substringEnd != std::wstring::npos)
-	{
-		ai.Parameters = tempCommand.substr(substringEnd + 1);
-		boost::trim(ai.Parameters);
-	}
-	else
-	{
-		ai.Parameters = EMPTY_STRING;
-	}
-
-	return ai;
 }
 
 void ApplicationToolbar::ShowItemProperties(int iItem)
