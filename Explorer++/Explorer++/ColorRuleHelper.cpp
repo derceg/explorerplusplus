@@ -152,12 +152,13 @@ void NColorRuleHelper::LoadColorRulesFromXML(IXMLDOMDocument *pXMLDom,
 {
 	IXMLDOMNode *pNode = nullptr;
 	BSTR bstr = nullptr;
+	HRESULT hr;
 
 	if(!pXMLDom)
 		goto clean;
 
 	bstr = SysAllocString(L"//ColorRule");
-	HRESULT hr = pXMLDom->selectSingleNode(bstr,&pNode);
+	hr = pXMLDom->selectSingleNode(bstr,&pNode);
 
 	if(hr == S_OK)
 	{

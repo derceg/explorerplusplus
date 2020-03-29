@@ -251,6 +251,16 @@ BOOL LoadAllowMultipleInstancesFromXML()
 	VARIANT_BOOL status;
 	VARIANT var;
 	BOOL bAllowMultipleInstances = TRUE;
+	BSTR bstr = nullptr;
+	IXMLDOMNodeList *pNodes = nullptr;
+	IXMLDOMNode *pNode = nullptr;
+	IXMLDOMNamedNodeMap *am = nullptr;
+	IXMLDOMNode *pNodeAttribute = nullptr;
+	BSTR bstrName;
+	BSTR bstrValue;
+	HRESULT hr;
+	BOOL bFound = FALSE;
+	long length;
 
 	pXMLDom = NXMLSettings::DomFromCOM();
 
@@ -266,17 +276,6 @@ BOOL LoadAllowMultipleInstancesFromXML()
 
 	if(status != VARIANT_TRUE)
 		goto clean;
-
-	BSTR						bstr = nullptr;
-	IXMLDOMNodeList		*pNodes = nullptr;
-	IXMLDOMNode			*pNode = nullptr;
-	IXMLDOMNamedNodeMap	*am = nullptr;
-	IXMLDOMNode			*pNodeAttribute = nullptr;
-	BSTR						bstrName;
-	BSTR						bstrValue;
-	HRESULT						hr;
-	BOOL						bFound = FALSE;
-	long						length;
 
 	bstr = SysAllocString(L"//Settings/*");
 	pXMLDom->selectNodes(bstr, &pNodes);
