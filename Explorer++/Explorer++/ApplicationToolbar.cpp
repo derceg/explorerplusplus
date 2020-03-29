@@ -367,7 +367,7 @@ ApplicationToolbar::ApplicationInfo_t ApplicationToolbar::ProcessCommand(
 	if (tempCommand.at(0) == _T('\"'))
 	{
 		substringStart = 1;
-		substringEnd = tempCommand.find('"');
+		substringEnd = tempCommand.find('"', 1);
 	}
 	else
 	{
