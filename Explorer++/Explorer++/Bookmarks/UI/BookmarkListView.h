@@ -23,17 +23,9 @@ __interface IExplorerplusplus;
 class BookmarkListView : public BookmarkNavigatorInterface, private BookmarkDropTargetWindow
 {
 public:
-	enum class ColumnType
-	{
-		Name = 1,
-		Location = 2,
-		DateCreated = 3,
-		DateModified = 4
-	};
-
 	struct Column
 	{
-		ColumnType columnType;
+		BookmarkHelper::ColumnType columnType;
 		int width;
 		bool active;
 	};
@@ -54,10 +46,10 @@ public:
 	void DeleteSelection();
 
 	std::vector<Column> GetColumns();
-	void ToggleColumn(ColumnType columnType);
+	void ToggleColumn(BookmarkHelper::ColumnType columnType);
 	wil::unique_hmenu BuildColumnsMenu();
-	BookmarkHelper::SortMode GetSortMode() const;
-	void SetSortMode(BookmarkHelper::SortMode sortMode);
+	BookmarkHelper::ColumnType GetSortColumn() const;
+	void SetSortColumn(BookmarkHelper::ColumnType sortColumn);
 	bool GetSortAscending() const;
 	void SetSortAscending(bool sortAscending);
 
@@ -72,13 +64,13 @@ private:
 
 	void InsertColumns(const std::vector<Column> &columns);
 	void InsertColumn(const Column &column, int index);
-	std::wstring GetColumnText(ColumnType columnType);
-	UINT GetColumnTextResourceId(ColumnType columnType);
+	std::wstring GetColumnText(BookmarkHelper::ColumnType columnType);
+	UINT GetColumnTextResourceId(BookmarkHelper::ColumnType columnType);
 	static bool IsColumnActive(const Column &column);
-	std::optional<ColumnType> GetColumnTypeByIndex(int index) const;
+	std::optional<BookmarkHelper::ColumnType> GetColumnTypeByIndex(int index) const;
 
 	int InsertBookmarkItemIntoListView(BookmarkItem *bookmarkItem, int position);
-	std::wstring GetBookmarkItemColumnInfo(const BookmarkItem *bookmarkItem, ColumnType columnType);
+	std::wstring GetBookmarkItemColumnInfo(const BookmarkItem *bookmarkItem, BookmarkHelper::ColumnType columnType);
 	static std::wstring FormatDate(const FILETIME *date);
 
 	BookmarkItem *GetBookmarkItemFromListView(int iItem);
@@ -101,6 +93,9 @@ private:
 
 	void OnHeaderRClick(const POINT &pt);
 	void OnHeaderContextMenuItemSelected(int menuItemId);
+	void UpdateHeader();
+	void ClearColumnSortArrow(BookmarkHelper::ColumnType columnType);
+	void SetColumnSortArrow(BookmarkHelper::ColumnType columnType, bool sortAscending);
 
 	void OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t index);
 	void OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);
@@ -110,9 +105,10 @@ private:
 
 	void RemoveBookmarkItem(const BookmarkItem *bookmarkItem);
 	std::optional<int> GetBookmarkItemIndex(const BookmarkItem *bookmarkItem) const;
-	ColumnType MapPropertyTypeToColumnType(BookmarkItem::PropertyType propertyType) const;
-	Column &GetColumnByType(ColumnType columnType);
-	int GetColumnIndexByType(ColumnType columnType) const;
+	BookmarkHelper::ColumnType MapPropertyTypeToColumnType(BookmarkItem::PropertyType propertyType) const;
+	Column &GetColumnByType(BookmarkHelper::ColumnType columnType);
+	std::optional<int> GetColumnHeaderIndexByType(BookmarkHelper::ColumnType columnType) const;
+	int GetColumnIndexByType(BookmarkHelper::ColumnType columnType) const;
 
 	DropLocation GetDropLocation(const POINT &pt) override;
 	int FindNextItemIndex(const POINT &ptClient);
@@ -131,8 +127,9 @@ private:
 
 	BookmarkTree *m_bookmarkTree;
 	BookmarkItem *m_currentBookmarkFolder;
-	BookmarkHelper::SortMode m_sortMode;
+	BookmarkHelper::ColumnType m_sortColumn;
 	bool m_sortAscending;
+	std::optional<BookmarkHelper::ColumnType> m_previousSortColumn;
 	BookmarkContextMenu m_bookmarkContextMenu;
 
 	BookmarkNavigationCompletedSignal m_navigationCompletedSignal;

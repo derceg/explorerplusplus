@@ -12,6 +12,7 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainer.h"
+#include "../Helper/HeaderHelper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
@@ -29,7 +30,7 @@ BookmarkListView::BookmarkListView(HWND hListView, HMODULE resourceModule,
 	m_bookmarkTree(bookmarkTree),
 	m_expp(expp),
 	m_columns(initialColumns),
-	m_sortMode(BookmarkHelper::SortMode::Default),
+	m_sortColumn(BookmarkHelper::ColumnType::Default),
 	m_sortAscending(true),
 	m_bookmarkContextMenu(bookmarkTree, resourceModule, expp)
 {
@@ -89,7 +90,7 @@ void BookmarkListView::InsertColumn(const Column &column, int index)
 	Header_SetItem(header, insertedIndex, &hdItem);
 }
 
-std::wstring BookmarkListView::GetColumnText(ColumnType columnType)
+std::wstring BookmarkListView::GetColumnText(BookmarkHelper::ColumnType columnType)
 {
 	UINT resourceId = GetColumnTextResourceId(columnType);
 	return ResourceHelper::LoadString(m_resourceModule, resourceId);
@@ -112,7 +113,7 @@ bool BookmarkListView::IsColumnActive(const Column &column)
 	return column.active;
 }
 
-std::optional<BookmarkListView::ColumnType> BookmarkListView::GetColumnTypeByIndex(int index) const
+std::optional<BookmarkHelper::ColumnType> BookmarkListView::GetColumnTypeByIndex(int index) const
 {
 	HWND hHeader = ListView_GetHeader(m_hListView);
 
@@ -125,23 +126,23 @@ std::optional<BookmarkListView::ColumnType> BookmarkListView::GetColumnTypeByInd
 		return std::nullopt;
 	}
 
-	return static_cast<ColumnType>(hdItem.lParam);
+	return static_cast<BookmarkHelper::ColumnType>(hdItem.lParam);
 }
 
-UINT BookmarkListView::GetColumnTextResourceId(ColumnType columnType)
+UINT BookmarkListView::GetColumnTextResourceId(BookmarkHelper::ColumnType columnType)
 {
 	switch (columnType)
 	{
-	case ColumnType::Name:
+	case BookmarkHelper::ColumnType::Name:
 		return IDS_BOOKMARKS_COLUMN_NAME;
 
-	case ColumnType::Location:
+	case BookmarkHelper::ColumnType::Location:
 		return IDS_BOOKMARKS_COLUMN_LOCATION;
 
-	case ColumnType::DateCreated:
+	case BookmarkHelper::ColumnType::DateCreated:
 		return IDS_BOOKMARKS_COLUMN_DATE_CREATED;
 
-	case ColumnType::DateModified:
+	case BookmarkHelper::ColumnType::DateModified:
 		return IDS_BOOKMARKS_COLUMN_DATE_MODIFIED;
 	}
 
@@ -298,12 +299,12 @@ int CALLBACK BookmarkListView::SortBookmarks(LPARAM lParam1, LPARAM lParam2)
 	auto firstItem = reinterpret_cast<BookmarkItem *>(lParam1);
 	auto secondItem = reinterpret_cast<BookmarkItem *>(lParam2);
 
-	int iRes = BookmarkHelper::Sort(m_sortMode, firstItem, secondItem);
+	int iRes = BookmarkHelper::Sort(m_sortColumn, firstItem, secondItem);
 
 	// When using the default sort mode (in which items are sorted according to
 	// their position within the parent folder), the items are always in
 	// ascending order.
-	if (!m_sortAscending && m_sortMode != BookmarkHelper::SortMode::Default)
+	if (!m_sortAscending && m_sortColumn != BookmarkHelper::ColumnType::Default)
 	{
 		iRes = -iRes;
 	}
@@ -311,20 +312,22 @@ int CALLBACK BookmarkListView::SortBookmarks(LPARAM lParam1, LPARAM lParam2)
 	return iRes;
 }
 
-BookmarkHelper::SortMode BookmarkListView::GetSortMode() const
+BookmarkHelper::ColumnType BookmarkListView::GetSortColumn() const
 {
-	return m_sortMode;
+	return m_sortColumn;
 }
 
-void BookmarkListView::SetSortMode(BookmarkHelper::SortMode sortMode)
+void BookmarkListView::SetSortColumn(BookmarkHelper::ColumnType sortColumn)
 {
-	m_sortMode = sortMode;
+	m_previousSortColumn = m_sortColumn;
+	m_sortColumn = sortColumn;
 
 	// It's only possible to drop items when using the default sort mode, since that's the only mode
 	// in which the listview indexes match the bookmark item indexes.
-	SetBlockDrop(sortMode != BookmarkHelper::SortMode::Default);
+	SetBlockDrop(sortColumn != BookmarkHelper::ColumnType::Default);
 
 	SortItems();
+	UpdateHeader();
 }
 
 bool BookmarkListView::GetSortAscending() const
@@ -334,9 +337,59 @@ bool BookmarkListView::GetSortAscending() const
 
 void BookmarkListView::SetSortAscending(bool sortAscending)
 {
+	m_previousSortColumn = m_sortColumn;
 	m_sortAscending = sortAscending;
 
 	SortItems();
+	UpdateHeader();
+}
+
+void BookmarkListView::UpdateHeader()
+{
+	if (m_previousSortColumn)
+	{
+		ClearColumnSortArrow(*m_previousSortColumn);
+	}
+
+	SetColumnSortArrow(m_sortColumn, m_sortAscending);
+}
+
+void BookmarkListView::ClearColumnSortArrow(BookmarkHelper::ColumnType columnType)
+{
+	auto columnIndex = GetColumnHeaderIndexByType(columnType);
+
+	if (!columnIndex)
+	{
+		return;
+	}
+
+	HWND header = ListView_GetHeader(m_hListView);
+	HeaderHelper::AddOrRemoveFormatOptions(header, *columnIndex, HDF_SORTUP | HDF_SORTDOWN, false);
+}
+
+void BookmarkListView::SetColumnSortArrow(BookmarkHelper::ColumnType columnType, bool sortAscending)
+{
+	auto columnIndex = GetColumnHeaderIndexByType(columnType);
+
+	if (!columnIndex)
+	{
+		return;
+	}
+
+	HWND header = ListView_GetHeader(m_hListView);
+
+	int sortOption;
+
+	if (sortAscending)
+	{
+		sortOption = HDF_SORTUP;
+	}
+	else
+	{
+		sortOption = HDF_SORTDOWN;
+	}
+
+	HeaderHelper::AddOrRemoveFormatOptions(header, *columnIndex, sortOption, true);
 }
 
 void BookmarkListView::OnDblClk(const NMITEMACTIVATE *itemActivate)
@@ -511,14 +564,14 @@ void BookmarkListView::OnGetDispInfo(NMLVDISPINFO *dispInfo)
 }
 
 std::wstring BookmarkListView::GetBookmarkItemColumnInfo(
-	const BookmarkItem *bookmarkItem, ColumnType columnType)
+	const BookmarkItem *bookmarkItem, BookmarkHelper::ColumnType columnType)
 {
 	switch (columnType)
 	{
-	case ColumnType::Name:
+	case BookmarkHelper::ColumnType::Name:
 		return bookmarkItem->GetName();
 
-	case ColumnType::Location:
+	case BookmarkHelper::ColumnType::Location:
 		if (bookmarkItem->IsBookmark())
 		{
 			return bookmarkItem->GetLocation();
@@ -528,13 +581,13 @@ std::wstring BookmarkListView::GetBookmarkItemColumnInfo(
 			return std::wstring();
 		}
 
-	case ColumnType::DateCreated:
+	case BookmarkHelper::ColumnType::DateCreated:
 	{
 		FILETIME dateCreated = bookmarkItem->GetDateCreated();
 		return FormatDate(&dateCreated);
 	}
 
-	case ColumnType::DateModified:
+	case BookmarkHelper::ColumnType::DateModified:
 	{
 		FILETIME dateModified = bookmarkItem->GetDateModified();
 		return FormatDate(&dateModified);
@@ -704,7 +757,7 @@ void BookmarkListView::OnHeaderRClick(const POINT &pt)
 	}
 
 	/* The name column cannot be removed. */
-	MenuHelper::EnableItem(menu.get(), static_cast<UINT>(ColumnType::Name), FALSE);
+	MenuHelper::EnableItem(menu.get(), static_cast<UINT>(BookmarkHelper::ColumnType::Name), FALSE);
 
 	int cmd = TrackPopupMenu(
 		menu.get(), TPM_LEFTALIGN | TPM_RETURNCMD, pt.x, pt.y, 0, m_hListView, nullptr);
@@ -750,11 +803,11 @@ wil::unique_hmenu BookmarkListView::BuildColumnsMenu()
 
 void BookmarkListView::OnHeaderContextMenuItemSelected(int menuItemId)
 {
-	auto columnType = static_cast<ColumnType>(menuItemId);
+	auto columnType = static_cast<BookmarkHelper::ColumnType>(menuItemId);
 	ToggleColumn(columnType);
 }
 
-void BookmarkListView::ToggleColumn(ColumnType columnType)
+void BookmarkListView::ToggleColumn(BookmarkHelper::ColumnType columnType)
 {
 	Column &column = GetColumnByType(columnType);
 	int columnIndex = GetColumnIndexByType(columnType);
@@ -793,7 +846,7 @@ void BookmarkListView::OnBookmarkItemUpdated(
 	auto index = GetBookmarkItemIndex(&bookmarkItem);
 	assert(index);
 
-	ColumnType columnType = MapPropertyTypeToColumnType(propertyType);
+	BookmarkHelper::ColumnType columnType = MapPropertyTypeToColumnType(propertyType);
 	Column &column = GetColumnByType(columnType);
 
 	if (!column.active)
@@ -853,29 +906,29 @@ std::optional<int> BookmarkListView::GetBookmarkItemIndex(const BookmarkItem *bo
 	return index;
 }
 
-BookmarkListView::ColumnType BookmarkListView::MapPropertyTypeToColumnType(
+BookmarkHelper::ColumnType BookmarkListView::MapPropertyTypeToColumnType(
 	BookmarkItem::PropertyType propertyType) const
 {
 	switch (propertyType)
 	{
 	case BookmarkItem::PropertyType::Name:
-		return ColumnType::Name;
+		return BookmarkHelper::ColumnType::Name;
 
 	case BookmarkItem::PropertyType::Location:
-		return ColumnType::Location;
+		return BookmarkHelper::ColumnType::Location;
 
 	case BookmarkItem::PropertyType::DateCreated:
-		return ColumnType::DateCreated;
+		return BookmarkHelper::ColumnType::DateCreated;
 
 	case BookmarkItem::PropertyType::DateModified:
-		return ColumnType::DateModified;
+		return BookmarkHelper::ColumnType::DateModified;
 
 	default:
 		throw std::runtime_error("Bookmark column not found");
 	}
 }
 
-BookmarkListView::Column &BookmarkListView::GetColumnByType(ColumnType columnType)
+BookmarkListView::Column &BookmarkListView::GetColumnByType(BookmarkHelper::ColumnType columnType)
 {
 	auto itr = std::find_if(m_columns.begin(), m_columns.end(),
 		[columnType](const Column &column) { return column.columnType == columnType; });
@@ -885,10 +938,35 @@ BookmarkListView::Column &BookmarkListView::GetColumnByType(ColumnType columnTyp
 	return *itr;
 }
 
+// Returns the index of the specified column in the listview header. If the column isn't being
+// shown, an empty value will be returned.
+std::optional<int> BookmarkListView::GetColumnHeaderIndexByType(BookmarkHelper::ColumnType columnType) const
+{
+	auto itr = std::find_if(m_columns.begin(), m_columns.end(), [columnType](const Column &column) {
+		return column.columnType == columnType;
+	});
+
+	if (itr == m_columns.end())
+	{
+		return std::nullopt;
+	}
+
+	if (!itr->active)
+	{
+		return std::nullopt;
+	}
+
+	auto columnIndex = std::count_if(m_columns.begin(), itr, [](const Column &column) {
+		return column.active;
+	});
+
+	return static_cast<int>(columnIndex);
+}
+
 // If the specified column is active, this function returns the index of the
 // column (as it appears in the listview). If it's not active, the function will
 // return the index the column would be shown at, if it were active.
-int BookmarkListView::GetColumnIndexByType(ColumnType columnType) const
+int BookmarkListView::GetColumnIndexByType(BookmarkHelper::ColumnType columnType) const
 {
 	auto itr = std::find_if(m_columns.begin(), m_columns.end(),
 		[columnType](const Column &column) { return column.columnType == columnType; });

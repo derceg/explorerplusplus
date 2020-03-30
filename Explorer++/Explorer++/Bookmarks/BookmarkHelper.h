@@ -15,7 +15,7 @@ using RawBookmarkItems = std::vector<BookmarkItem *>;
 
 namespace BookmarkHelper
 {
-enum class SortMode
+enum class ColumnType
 {
 	Default = 0,
 	Name = 1,
@@ -27,7 +27,8 @@ enum class SortMode
 bool IsFolder(const std::unique_ptr<BookmarkItem> &bookmarkItem);
 bool IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem);
 
-int CALLBACK Sort(SortMode sortMode, const BookmarkItem *firstItem, const BookmarkItem *secondItem);
+int CALLBACK Sort(
+	ColumnType columnType, const BookmarkItem *firstItem, const BookmarkItem *secondItem);
 
 void BookmarkAllTabs(BookmarkTree *bookmarkTree, HMODULE resoureceModule, HWND parentWindow,
 	IExplorerplusplus *coreInterface);

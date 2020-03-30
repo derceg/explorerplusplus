@@ -36,7 +36,7 @@ bool BookmarkHelper::IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkIte
 }
 
 int CALLBACK BookmarkHelper::Sort(
-	SortMode sortMode, const BookmarkItem *firstItem, const BookmarkItem *secondItem)
+	ColumnType columnType, const BookmarkItem *firstItem, const BookmarkItem *secondItem)
 {
 	if (firstItem->IsFolder() && secondItem->IsBookmark())
 	{
@@ -50,25 +50,25 @@ int CALLBACK BookmarkHelper::Sort(
 	{
 		int iRes = 0;
 
-		switch (sortMode)
+		switch (columnType)
 		{
-		case SortMode::Default:
+		case ColumnType::Default:
 			iRes = SortByDefault(firstItem, secondItem);
 			break;
 
-		case SortMode::Name:
+		case ColumnType::Name:
 			iRes = SortByName(firstItem, secondItem);
 			break;
 
-		case SortMode::Location:
+		case ColumnType::Location:
 			iRes = SortByLocation(firstItem, secondItem);
 			break;
 
-		case SortMode::DateCreated:
+		case ColumnType::DateCreated:
 			iRes = SortByDateAdded(firstItem, secondItem);
 			break;
 
-		case SortMode::DateModified:
+		case ColumnType::DateModified:
 			iRes = SortByDateModified(firstItem, secondItem);
 			break;
 

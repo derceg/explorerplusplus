@@ -300,7 +300,7 @@ void ManageBookmarksDialog::ShowViewMenu()
 	}
 
 	MenuHelper::EnableItem(
-		columnsMenu.get(), static_cast<UINT>(BookmarkListView::ColumnType::Name), FALSE);
+		columnsMenu.get(), static_cast<UINT>(BookmarkHelper::ColumnType::Name), FALSE);
 
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
@@ -350,25 +350,25 @@ void ManageBookmarksDialog::SetViewMenuItemStates(HMENU menu)
 {
 	UINT itemToCheck;
 
-	switch (m_bookmarkListView->GetSortMode())
+	switch (m_bookmarkListView->GetSortColumn())
 	{
-	case BookmarkHelper::SortMode::Default:
+	case BookmarkHelper::ColumnType::Default:
 		itemToCheck = IDM_MB_VIEW_SORT_BY_DEFAULT;
 		break;
 
-	case BookmarkHelper::SortMode::Name:
+	case BookmarkHelper::ColumnType::Name:
 		itemToCheck = IDM_MB_VIEW_SORTBYNAME;
 		break;
 
-	case BookmarkHelper::SortMode::Location:
+	case BookmarkHelper::ColumnType::Location:
 		itemToCheck = IDM_MB_VIEW_SORTBYLOCATION;
 		break;
 
-	case BookmarkHelper::SortMode::DateCreated:
+	case BookmarkHelper::ColumnType::DateCreated:
 		itemToCheck = IDM_MB_VIEW_SORTBYADDED;
 		break;
 
-	case BookmarkHelper::SortMode::DateModified:
+	case BookmarkHelper::ColumnType::DateModified:
 		itemToCheck = IDM_MB_VIEW_SORTBYLASTMODIFIED;
 		break;
 
@@ -397,40 +397,40 @@ void ManageBookmarksDialog::OnViewMenuItemSelected(int menuItemId)
 {
 	switch (menuItemId)
 	{
-	case static_cast<int>(BookmarkListView::ColumnType::Name):
-		m_bookmarkListView->ToggleColumn(BookmarkListView::ColumnType::Name);
+	case static_cast<int>(BookmarkHelper::ColumnType::Name):
+		m_bookmarkListView->ToggleColumn(BookmarkHelper::ColumnType::Name);
 		break;
 
-	case static_cast<int>(BookmarkListView::ColumnType::Location):
-		m_bookmarkListView->ToggleColumn(BookmarkListView::ColumnType::Location);
+	case static_cast<int>(BookmarkHelper::ColumnType::Location):
+		m_bookmarkListView->ToggleColumn(BookmarkHelper::ColumnType::Location);
 		break;
 
-	case static_cast<int>(BookmarkListView::ColumnType::DateCreated):
-		m_bookmarkListView->ToggleColumn(BookmarkListView::ColumnType::DateCreated);
+	case static_cast<int>(BookmarkHelper::ColumnType::DateCreated):
+		m_bookmarkListView->ToggleColumn(BookmarkHelper::ColumnType::DateCreated);
 		break;
 
-	case static_cast<int>(BookmarkListView::ColumnType::DateModified):
-		m_bookmarkListView->ToggleColumn(BookmarkListView::ColumnType::DateModified);
+	case static_cast<int>(BookmarkHelper::ColumnType::DateModified):
+		m_bookmarkListView->ToggleColumn(BookmarkHelper::ColumnType::DateModified);
 		break;
 
 	case IDM_MB_VIEW_SORT_BY_DEFAULT:
-		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::Default);
+		m_bookmarkListView->SetSortColumn(BookmarkHelper::ColumnType::Default);
 		break;
 
 	case IDM_MB_VIEW_SORTBYNAME:
-		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::Name);
+		m_bookmarkListView->SetSortColumn(BookmarkHelper::ColumnType::Name);
 		break;
 
 	case IDM_MB_VIEW_SORTBYLOCATION:
-		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::Location);
+		m_bookmarkListView->SetSortColumn(BookmarkHelper::ColumnType::Location);
 		break;
 
 	case IDM_MB_VIEW_SORTBYADDED:
-		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::DateCreated);
+		m_bookmarkListView->SetSortColumn(BookmarkHelper::ColumnType::DateCreated);
 		break;
 
 	case IDM_MB_VIEW_SORTBYLASTMODIFIED:
-		m_bookmarkListView->SetSortMode(BookmarkHelper::SortMode::DateModified);
+		m_bookmarkListView->SetSortColumn(BookmarkHelper::ColumnType::DateModified);
 		break;
 
 	case IDM_MB_VIEW_SORTASCENDING:
@@ -746,22 +746,22 @@ void ManageBookmarksDialogPersistentSettings::SetupDefaultColumns()
 {
 	BookmarkListView::Column column;
 
-	column.columnType = BookmarkListView::ColumnType::Name;
+	column.columnType = BookmarkHelper::ColumnType::Name;
 	column.width = DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
 	column.active = true;
 	m_listViewColumns.push_back(column);
 
-	column.columnType = BookmarkListView::ColumnType::Location;
+	column.columnType = BookmarkHelper::ColumnType::Location;
 	column.width = DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
 	column.active = true;
 	m_listViewColumns.push_back(column);
 
-	column.columnType = BookmarkListView::ColumnType::DateCreated;
+	column.columnType = BookmarkHelper::ColumnType::DateCreated;
 	column.width = DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
 	column.active = false;
 	m_listViewColumns.push_back(column);
 
-	column.columnType = BookmarkListView::ColumnType::DateModified;
+	column.columnType = BookmarkHelper::ColumnType::DateModified;
 	column.width = DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
 	column.active = false;
 	m_listViewColumns.push_back(column);
