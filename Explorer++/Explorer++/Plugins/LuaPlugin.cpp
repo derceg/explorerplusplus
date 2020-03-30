@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "Plugins/LuaPlugin.h"
 #include "Plugins/ApiBinding.h"
-#include "../ThirdParty/Sol/sol.hpp"
+#include "SolWrapper.h"
 
 int Plugins::LuaPlugin::idCounter = 1;
 

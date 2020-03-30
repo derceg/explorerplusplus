@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "Plugins/CommandApi/Events/CommandInvoked.h"
-#include "../ThirdParty/Sol/sol.hpp"
+#include "SolWrapper.h"
 
 Plugins::CommandInvoked::CommandInvoked(PluginCommandManager *pluginCommandManager, int pluginId) :
 	m_pluginCommandManager(pluginCommandManager),

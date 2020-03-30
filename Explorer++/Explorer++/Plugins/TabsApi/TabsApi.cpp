@@ -12,8 +12,8 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/SortModes.h"
+#include "SolWrapper.h"
 #include "TabContainer.h"
-#include "../ThirdParty/Sol/sol.hpp"
 
 Plugins::TabsApi::FolderSettings::FolderSettings(const ShellBrowser &shellBrowser)
 {

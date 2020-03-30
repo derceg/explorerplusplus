@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Accelerator.h"
-#include "../ThirdParty/Sol/sol.hpp"
+#include "SolWrapper.h"
 #include <nlohmann/json.hpp>
 #include <optional>
 

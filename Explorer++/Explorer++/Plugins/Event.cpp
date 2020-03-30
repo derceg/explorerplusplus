@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "Plugins/Event.h"
-#include "../ThirdParty/Sol/sol.hpp"
+#include "SolWrapper.h"
 
 Plugins::Event::Event() :
 	m_connectionIdCounter(1)

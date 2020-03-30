@@ -5,8 +5,8 @@
 #include "stdafx.h"
 #include "Plugins/TabsApi/Events/TabUpdated.h"
 #include "Plugins/TabsApi/TabsApi.h"
+#include "SolWrapper.h"
 #include "TabContainer.h"
-#include "../ThirdParty/Sol/sol.hpp"
 
 Plugins::TabUpdated::TabUpdated(TabContainer *tabContainer) :
 	m_tabContainer(tabContainer)

@@ -84,4 +84,4 @@
 
 #include "../ThirdParty/CTPL/cpl_stl.h"
 
-#include "../ThirdParty/Sol/sol.hpp"
+#include "SolWrapper.h"
