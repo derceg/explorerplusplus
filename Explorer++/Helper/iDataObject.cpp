@@ -17,7 +17,7 @@ class DataObject : public IDataObject, public IDataObjectAsyncCapability
 {
 public:
 
-	DataObject(FORMATETC *,STGMEDIUM *,int);
+	DataObject(FORMATETC *pFormatEtc, STGMEDIUM *pMedium, int count);
 	~DataObject();
 
 	HRESULT		__stdcall	QueryInterface(REFIID iid, void **ppvObject);
