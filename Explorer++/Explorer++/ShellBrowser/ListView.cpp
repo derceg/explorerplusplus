@@ -17,6 +17,7 @@
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <boost/format.hpp>
+#include <wil/common.h>
 
 const std::vector<unsigned int> COMMON_REAL_FOLDER_COLUMNS =
 { CM_NAME, CM_TYPE, CM_SIZE, CM_DATEMODIFIED,
@@ -604,8 +605,10 @@ BOOL ShellBrowser::GhostItemInternal(int iItem, BOOL bGhost)
 	{
 		/* If the file is hidden, prevent changes to its visibility state (i.e.
 		hidden items will ALWAYS be ghosted). */
-		if (m_itemInfoMap.at((int)lvItem.lParam).wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
+		if (WI_IsFlagSet(m_itemInfoMap.at((int)lvItem.lParam).wfd.dwFileAttributes, FILE_ATTRIBUTE_HIDDEN))
+		{
 			return FALSE;
+		}
 
 		if (bGhost)
 		{
