@@ -433,7 +433,7 @@ private:
 
 	void BuildListViewFileSelectionList(
 		HWND hListView, std::list<std::wstring> *pFileSelectionList);
-	HRESULT TestListViewItemAttributes(int item, SFGAOF attributes) const;
+	BOOL TestListViewItemAttributes(int item, SFGAOF attributes) const;
 	HRESULT GetListViewSelectionAttributes(SFGAOF *pItemAttributes) const;
 	HRESULT GetListViewItemAttributes(const Tab &tab, int item, SFGAOF *pItemAttributes) const;
 

@@ -115,7 +115,7 @@ HRESULT Explorerplusplus::GetSelectionAttributes(SFGAOF *pItemAttributes) const
 	return hr;
 }
 
-HRESULT Explorerplusplus::TestListViewItemAttributes(int item, SFGAOF attributes) const
+BOOL Explorerplusplus::TestListViewItemAttributes(int item, SFGAOF attributes) const
 {
 	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
 
