@@ -84,7 +84,7 @@ void BookmarkContextMenuController::OnMenuItemSelected(int menuItemId,
 
 void BookmarkContextMenuController::OnOpenAll(const RawBookmarkItems &bookmarkItems)
 {
-	for (auto bookmarkItem : bookmarkItems)
+	for (auto *bookmarkItem : bookmarkItems)
 	{
 		BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_expp);
 	}
@@ -109,7 +109,7 @@ void BookmarkContextMenuController::OnPaste(BookmarkItem *targetParentFolder, si
 
 void BookmarkContextMenuController::OnDelete(const RawBookmarkItems &bookmarkItems)
 {
-	for (auto bookmarkItem : bookmarkItems)
+	for (auto *bookmarkItem : bookmarkItems)
 	{
 		m_bookmarkTree->RemoveBookmarkItem(bookmarkItem);
 	}

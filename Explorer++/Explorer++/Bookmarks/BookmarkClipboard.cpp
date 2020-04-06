@@ -31,7 +31,7 @@ bool BookmarkClipboard::WriteBookmarks(const OwnedRefBookmarkItems &bookmarkItem
 	BulkClipboardWriter clipboardWriter;
 	std::vector<std::wstring> lines;
 
-	for (auto &bookmarkItem : bookmarkItems)
+	for (const auto &bookmarkItem : bookmarkItems)
 	{
 		if (bookmarkItem.get()->IsFolder())
 		{

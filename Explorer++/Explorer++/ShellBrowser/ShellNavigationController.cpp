@@ -61,7 +61,7 @@ void ShellNavigationController::OnNavigationCompleted(PCIDLIST_ABSOLUTE pidlDire
 		// TODO: It would probably be better to do this somewhere else, since
 		// this class is focused on navigation.
 		m_iconFetcher->QueueIconTask(pidlDirectory, [this, index, entryId] (int iconIndex) {
-			auto entry = GetEntryAtIndex(index);
+			auto *entry = GetEntryAtIndex(index);
 
 			if (!entry || entry->GetId() != entryId)
 			{
@@ -75,7 +75,7 @@ void ShellNavigationController::OnNavigationCompleted(PCIDLIST_ABSOLUTE pidlDire
 
 bool ShellNavigationController::CanGoUp() const
 {
-	auto currentEntry = GetCurrentEntry();
+	auto *currentEntry = GetCurrentEntry();
 
 	if (!currentEntry)
 	{
@@ -87,7 +87,7 @@ bool ShellNavigationController::CanGoUp() const
 
 HRESULT ShellNavigationController::GoUp()
 {
-	auto currentEntry = GetCurrentEntry();
+	auto *currentEntry = GetCurrentEntry();
 
 	if (!currentEntry)
 	{
@@ -107,7 +107,7 @@ HRESULT ShellNavigationController::GoUp()
 
 HRESULT ShellNavigationController::Refresh()
 {
-	auto currentEntry = GetCurrentEntry();
+	auto *currentEntry = GetCurrentEntry();
 
 	if (!currentEntry)
 	{

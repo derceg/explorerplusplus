@@ -117,7 +117,7 @@ void BookmarkContextMenu::SetUpMenu(HMENU menu, const RawBookmarkItems &bookmark
 	{
 		int totalBookmarks = 0;
 
-		for (const auto bookmarkItem : bookmarkItems)
+		for (const auto *bookmarkItem : bookmarkItems)
 		{
 			if (bookmarkItem->IsBookmark())
 			{
@@ -125,7 +125,7 @@ void BookmarkContextMenu::SetUpMenu(HMENU menu, const RawBookmarkItems &bookmark
 			}
 			else
 			{
-				auto &children = bookmarkItem->GetChildren();
+				const auto &children = bookmarkItem->GetChildren();
 
 				auto numChildBookmarks = std::count_if(children.begin(), children.end(),
 					[](auto &child) { return child->IsBookmark(); });
