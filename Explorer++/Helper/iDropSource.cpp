@@ -20,7 +20,7 @@ public:
 	ULONG		__stdcall	AddRef();
 	ULONG		__stdcall	Release();
 
-	HRESULT _stdcall	QueryContinueDrag(BOOL fEscapePressed,DWORD gfrKeyState);
+	HRESULT _stdcall	QueryContinueDrag(BOOL fEscapePressed, DWORD grfKeyState);
 	HRESULT _stdcall	GiveFeedback(DWORD dwEffect);
 
 private:
