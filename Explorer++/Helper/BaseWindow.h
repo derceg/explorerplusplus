@@ -31,7 +31,7 @@ protected:
 
 	INT_PTR	GetDefaultReturnValue(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
-	virtual INT_PTR OnNcDestroy() final;
+	INT_PTR OnNcDestroy() final;
 
 	const HWND m_hwnd;
 
