@@ -12,8 +12,8 @@ IconFetcher::IconFetcher(HWND hwnd, CachedIcons *cachedIcons) :
 	m_iconThreadPool(1),
 	m_iconResultIDCounter(0)
 {
-	m_windowSubclasses.push_back(WindowSubclassWrapper(hwnd, WindowSubclassStub,
-		SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.emplace_back(
+		hwnd, WindowSubclassStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
 	m_iconThreadPool.push([] (int id) {
 		UNREFERENCED_PARAMETER(id);
