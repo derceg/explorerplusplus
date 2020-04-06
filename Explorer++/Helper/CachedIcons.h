@@ -27,8 +27,8 @@ public:
 		>
 	> CachedIconSet;
 
-	typedef CachedIconSet::nth_index<1>::type CachedIconSetByPath;
-	typedef CachedIconSetByPath::iterator iterator;
+	using CachedIconSetByPath = CachedIconSet::nth_index<1>::type;
+	using iterator = CachedIconSetByPath::iterator;
 
 	CachedIcons(std::size_t maxItems);
 
