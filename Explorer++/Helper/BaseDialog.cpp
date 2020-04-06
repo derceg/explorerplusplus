@@ -85,7 +85,7 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 				m_dsc = DIALOG_SIZE_CONSTRAINT_NONE;
 				GetResizableControlInformation(m_dsc, controlList);
 
-				m_prd = std::unique_ptr<ResizableDialog>(new ResizableDialog(m_hDlg, controlList));
+				m_prd = std::make_unique<ResizableDialog>(m_hDlg, controlList);
 			}
 
 			UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
