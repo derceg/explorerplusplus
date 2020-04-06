@@ -27,7 +27,7 @@ FileContextMenuManager::FileContextMenuManager(HWND hwnd,
 
 	m_pActualContext = NULL;
 
-	if(pidlItems.size() == 0)
+	if(pidlItems.empty())
 	{
 		wil::com_ptr<IShellFolder> pShellParentFolder;
 		PCUITEMID_CHILD pidlRelative = NULL;

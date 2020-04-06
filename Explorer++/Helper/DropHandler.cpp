@@ -204,8 +204,7 @@ void DropHandler::HandleLeftClickDrop(IDataObject *pDataObject,POINTL *pptl)
 		hrCopy = CopyDIBV5Data(pDataObject,pastedFileList);
 	}
 
-	if(hrCopy == S_OK &&
-		pastedFileList.size() > 0)
+	if(hrCopy == S_OK && !pastedFileList.empty())
 	{
 		/* The data was copied successfully, so notify
 		the caller via the specified callback interface. */
@@ -960,7 +959,7 @@ void DropHandler::CopyDroppedFiles(const HDROP &hd,BOOL bPreferredEffect,DWORD d
 void DropHandler::CopyDroppedFilesInternal(const std::list<std::wstring> &FullFilenameList,
 	BOOL bCopy,BOOL bRenameOnCollision)
 {
-	if(FullFilenameList.size() == 0)
+	if(FullFilenameList.empty())
 	{
 		return;
 	}

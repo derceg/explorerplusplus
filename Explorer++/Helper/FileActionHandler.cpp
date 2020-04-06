@@ -43,7 +43,7 @@ BOOL FileActionHandler::RenameFiles(const RenamedItems_t &itemList)
 
 	/* Only store an undo operation if at least one
 	file was actually renamed. */
-	if(renamedItems.size() > 0)
+	if(!renamedItems.empty())
 	{
 		UndoItem_t undoItem;
 		undoItem.Type = FILE_ACTION_RENAMED;
