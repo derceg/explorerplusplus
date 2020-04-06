@@ -7,7 +7,6 @@
 
 ShellNavigationController::ShellNavigationController(NavigatorInterface *navigator, TabNavigationInterface *tabNavigation,
 	IconFetcherInterface *iconFetcher) :
-	NavigationController(),
 	m_navigator(navigator),
 	m_tabNavigation(tabNavigation),
 	m_iconFetcher(iconFetcher)
