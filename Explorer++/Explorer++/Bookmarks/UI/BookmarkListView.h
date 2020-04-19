@@ -74,10 +74,12 @@ private:
 	static std::wstring FormatDate(const FILETIME *date);
 
 	BookmarkItem *GetBookmarkItemFromListView(int iItem);
+	const BookmarkItem *GetBookmarkItemFromListView(int iItem) const;
 
 	void SortItems();
 	static int CALLBACK SortBookmarksStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 	int CALLBACK SortBookmarks(LPARAM lParam1, LPARAM lParam2);
+	int GetItemSortedPosition(const BookmarkItem *bookmarkItem) const;
 
 	void OnDblClk(const NMITEMACTIVATE *itemActivate);
 	void OnRClick(const NMITEMACTIVATE *itemActivate);

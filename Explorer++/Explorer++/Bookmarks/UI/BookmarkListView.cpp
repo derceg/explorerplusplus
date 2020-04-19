@@ -20,6 +20,7 @@
 #include "../Helper/iDropSource.h"
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/adaptor/indexed.hpp>
+#include <utility>
 
 BookmarkListView::BookmarkListView(HWND hListView, HMODULE resourceModule,
 	BookmarkTree *bookmarkTree, IExplorerplusplus *expp,
@@ -263,9 +264,20 @@ int BookmarkListView::InsertBookmarkItemIntoListView(BookmarkItem *bookmarkItem,
 		iImage = m_imageListMappings.at(Icon::Bookmarks);
 	}
 
+	int sortedPosition;
+
+	if (m_sortColumn == BookmarkHelper::ColumnType::Default)
+	{
+		sortedPosition = position;
+	}
+	else
+	{
+		sortedPosition = GetItemSortedPosition(bookmarkItem);
+	}
+
 	LVITEM lvi;
 	lvi.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
-	lvi.iItem = position;
+	lvi.iItem = sortedPosition;
 	lvi.iSubItem = 0;
 	lvi.iImage = iImage;
 	lvi.pszText = szName;
@@ -276,6 +288,11 @@ int BookmarkListView::InsertBookmarkItemIntoListView(BookmarkItem *bookmarkItem,
 }
 
 BookmarkItem *BookmarkListView::GetBookmarkItemFromListView(int iItem)
+{
+	return const_cast<BookmarkItem *>(std::as_const(*this).GetBookmarkItemFromListView(iItem));
+}
+
+const BookmarkItem *BookmarkListView::GetBookmarkItemFromListView(int iItem) const
 {
 	LVITEM lvi;
 	lvi.mask = LVIF_PARAM;
@@ -314,6 +331,28 @@ int CALLBACK BookmarkListView::SortBookmarks(LPARAM lParam1, LPARAM lParam2)
 	}
 
 	return iRes;
+}
+
+int BookmarkListView::GetItemSortedPosition(const BookmarkItem *bookmarkItem) const
+{
+	int numItems = ListView_GetItemCount(m_hListView);
+	int res = 1;
+	int i = 0;
+
+	while (res > 0 && i < numItems)
+	{
+		const BookmarkItem *currentItem = GetBookmarkItemFromListView(i);
+		res = BookmarkHelper::Sort(m_sortColumn, bookmarkItem, currentItem);
+
+		i++;
+	}
+
+	if (i < numItems || res < 0)
+	{
+		i--;
+	}
+
+	return i;
 }
 
 BookmarkHelper::ColumnType BookmarkListView::GetSortColumn() const
