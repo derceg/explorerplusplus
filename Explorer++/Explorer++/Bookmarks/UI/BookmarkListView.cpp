@@ -198,6 +198,10 @@ LRESULT CALLBACK BookmarkListView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wP
 		{
 			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
 			{
+			case HDN_ITEMCLICK:
+				OnHeaderItemClick(reinterpret_cast<NMHEADER *>(lParam));
+				break;
+
 			case NM_RCLICK:
 			{
 				POINT pt;
@@ -744,6 +748,43 @@ void BookmarkListView::DeleteSelection()
 		{
 			m_bookmarkTree->RemoveBookmarkItem(bookmarkItem);
 		}
+	}
+}
+
+void BookmarkListView::OnHeaderItemClick(const NMHEADER *header)
+{
+	auto selectedColumn = GetColumnTypeByIndex(header->iItem);
+	assert(selectedColumn);
+
+	BookmarkHelper::ColumnType newSortColumn = m_sortColumn;
+	bool newSortAscending = m_sortAscending;
+
+	if (*selectedColumn == m_sortColumn)
+	{
+		if (m_sortAscending)
+		{
+			newSortAscending = false;
+		}
+		else
+		{
+			newSortColumn = BookmarkHelper::ColumnType::Default;
+			newSortAscending = true;
+		}
+	}
+	else
+	{
+		newSortColumn = *selectedColumn;
+		newSortAscending = true;
+	}
+
+	if (newSortColumn != m_sortColumn)
+	{
+		SetSortColumn(newSortColumn);
+	}
+
+	if (newSortAscending != m_sortAscending)
+	{
+		SetSortAscending(newSortAscending);
 	}
 }
 

@@ -91,6 +91,7 @@ private:
 	void OnBeginDrag();
 	void OnRename();
 
+	void OnHeaderItemClick(const NMHEADER *header);
 	void OnHeaderRClick(const POINT &pt);
 	void OnHeaderContextMenuItemSelected(int menuItemId);
 	void UpdateHeader();
