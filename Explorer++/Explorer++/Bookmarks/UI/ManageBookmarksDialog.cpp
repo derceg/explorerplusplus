@@ -380,17 +380,25 @@ void ManageBookmarksDialog::SetViewMenuItemStates(HMENU menu)
 	CheckMenuRadioItem(
 		menu, IDM_MB_VIEW_SORTBYNAME, IDM_MB_VIEW_SORT_BY_DEFAULT, itemToCheck, MF_BYCOMMAND);
 
-	if (m_bookmarkListView->GetSortAscending())
+	if (m_bookmarkListView->GetSortColumn() == BookmarkHelper::ColumnType::Default)
 	{
-		itemToCheck = IDM_MB_VIEW_SORTASCENDING;
+		MenuHelper::EnableItem(menu, IDM_MB_VIEW_SORTASCENDING, FALSE);
+		MenuHelper::EnableItem(menu, IDM_MB_VIEW_SORTDESCENDING, FALSE);
 	}
 	else
 	{
-		itemToCheck = IDM_MB_VIEW_SORTDESCENDING;
-	}
+		if (m_bookmarkListView->GetSortAscending())
+		{
+			itemToCheck = IDM_MB_VIEW_SORTASCENDING;
+		}
+		else
+		{
+			itemToCheck = IDM_MB_VIEW_SORTDESCENDING;
+		}
 
-	CheckMenuRadioItem(
-		menu, IDM_MB_VIEW_SORTASCENDING, IDM_MB_VIEW_SORTDESCENDING, itemToCheck, MF_BYCOMMAND);
+		CheckMenuRadioItem(
+			menu, IDM_MB_VIEW_SORTASCENDING, IDM_MB_VIEW_SORTDESCENDING, itemToCheck, MF_BYCOMMAND);
+	}
 }
 
 void ManageBookmarksDialog::OnViewMenuItemSelected(int menuItemId)
