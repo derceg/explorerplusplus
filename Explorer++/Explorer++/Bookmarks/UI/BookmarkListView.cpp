@@ -48,6 +48,8 @@ BookmarkListView::BookmarkListView(HWND hListView, HMODULE resourceModule,
 
 	InsertColumns(initialColumns);
 
+	m_windowSubclasses.emplace_back(
+		m_hListView, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 	m_windowSubclasses.emplace_back(GetParent(m_hListView), ParentWndProcStub, PARENT_SUBCLASS_ID,
 		reinterpret_cast<DWORD_PTR>(this));
 
@@ -148,6 +150,32 @@ UINT BookmarkListView::GetColumnTextResourceId(BookmarkHelper::ColumnType column
 	}
 
 	throw std::runtime_error("Bookmark column string resource not found");
+}
+
+LRESULT CALLBACK BookmarkListView::WndProcStub(
+	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+{
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
+	auto *listView = reinterpret_cast<BookmarkListView *>(dwRefData);
+	return listView->WndProc(hwnd, uMsg, wParam, lParam);
+}
+
+LRESULT CALLBACK BookmarkListView::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{
+	case WM_GETDLGCODE:
+		switch (wParam)
+		{
+		// This key press is used to open the selected bookmarks.
+		case VK_RETURN:
+			return DLGC_WANTALLKEYS;
+		}
+		break;
+	}
+
+	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
 LRESULT CALLBACK BookmarkListView::ParentWndProcStub(
@@ -450,9 +478,7 @@ void BookmarkListView::OnDblClk(const NMITEMACTIVATE *itemActivate)
 	}
 	else
 	{
-		Tab &selectedTab = m_expp->GetTabContainer()->GetSelectedTab();
-		selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(
-			bookmarkItem->GetLocation());
+		BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_expp);
 	}
 }
 
@@ -700,8 +726,8 @@ void BookmarkListView::OnKeyDown(const NMLVKEYDOWN *keyDown)
 		}
 		break;
 
-	/* TODO: */
 	case VK_RETURN:
+		OnEnterPressed();
 		break;
 
 	case VK_DELETE:
@@ -775,6 +801,23 @@ bool BookmarkListView::CanDelete()
 	}
 
 	return nonPermanentNodeSelected;
+}
+
+void BookmarkListView::OnEnterPressed()
+{
+	RawBookmarkItems bookmarkItems = GetSelectedBookmarkItems();
+
+	if (bookmarkItems.size() == 1 && bookmarkItems[0]->IsFolder())
+	{
+		NavigateToBookmarkFolder(bookmarkItems[0], true);
+	}
+	else
+	{
+		for (BookmarkItem *bookmarkItem : bookmarkItems)
+		{
+			BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_expp);
+		}
+	}
 }
 
 void BookmarkListView::DeleteSelection()

@@ -54,9 +54,14 @@ public:
 	void SetSortAscending(bool sortAscending);
 
 private:
+	static inline const UINT_PTR SUBCLASS_ID = 0;
 	static inline const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
 	static inline const double FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE = 0.2;
+
+	static LRESULT CALLBACK WndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	static LRESULT CALLBACK ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
@@ -92,6 +97,7 @@ private:
 	void OnKeyDown(const NMLVKEYDOWN *keyDown);
 	void OnBeginDrag();
 	void OnRename();
+	void OnEnterPressed();
 
 	void OnHeaderItemClick(const NMHEADER *header);
 	void OnHeaderRClick(const POINT &pt);
