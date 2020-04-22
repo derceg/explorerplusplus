@@ -14,6 +14,7 @@
 #include "ResourceHelper.h"
 #include "TabContainer.h"
 #include "../Helper/CachedIcons.h"
+#include "../Helper/Controls.h"
 #include "../Helper/DataExchangeHelper.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
@@ -549,6 +550,8 @@ void BookmarksToolbar::InsertBookmarkItem(BookmarkItem *bookmarkItem, int positi
 	tbb.iString = reinterpret_cast<INT_PTR>(szName);
 	SendMessage(m_hToolbar, TB_INSERTBUTTON, position, reinterpret_cast<LPARAM>(&tbb));
 
+	UpdateToolbarBandSizing(GetParent(m_hToolbar), m_hToolbar);
+
 	++m_uIDCounter;
 }
 
@@ -692,8 +695,7 @@ void BookmarksToolbar::RemoveBookmarkItem(const BookmarkItem *bookmarkItem)
 		ImageList_Remove(m_imageList.get(), buttonInfo.iImage);
 	}
 
-	/* TODO: */
-	// UpdateToolbarBandSizing(m_hMainRebar,m_hBookmarksToolbar);
+	UpdateToolbarBandSizing(GetParent(m_hToolbar), m_hToolbar);
 }
 
 void BookmarksToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt)
