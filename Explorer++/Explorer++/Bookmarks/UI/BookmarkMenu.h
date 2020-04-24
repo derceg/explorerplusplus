@@ -25,7 +25,9 @@ public:
 	BookmarkMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule, IExplorerplusplus *expp,
 		HWND parentWindow);
 
-	BOOL ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt, MenuCallback callback = nullptr);
+	BOOL ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt,
+		BookmarkMenuBuilder::IncludePredicate includePredicate = nullptr,
+		MenuCallback callback = nullptr);
 
 private:
 	static const int MIN_ID = 1;

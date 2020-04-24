@@ -7,6 +7,7 @@
 #include "Bookmarks/BookmarkItem.h"
 #include "MenuHelper.h"
 #include <boost/functional/hash.hpp>
+#include <functional>
 #include <unordered_map>
 #include <utility>
 
@@ -23,14 +24,18 @@ public:
 	using ItemPositionMap =
 		std::unordered_map<MenuPositionPair, BookmarkItem *, boost::hash<MenuPositionPair>>;
 
+	using IncludePredicate = std::function<bool(const BookmarkItem *bookmarkItem)>;
+
 	BookmarkMenuBuilder(HMODULE resourceModule);
 
 	BOOL BuildMenu(HMENU menu, BookmarkItem *bookmarkItem, const MenuIdRange &menuIdRange,
-		int startPosition, ItemIdMap &itemIdMap, ItemPositionMap *itemPositionMap = nullptr);
+		int startPosition, ItemIdMap &itemIdMap, ItemPositionMap *itemPositionMap = nullptr,
+		IncludePredicate includePredicate = nullptr);
 
 private:
 	BOOL BuildMenu(HMENU menu, BookmarkItem *bookmarkItem, int startPosition, ItemIdMap &itemIdMap,
-		ItemPositionMap *itemPositionMap);
+		ItemPositionMap *itemPositionMap, bool applyIncludePredicate,
+		IncludePredicate includePredicate);
 	BOOL AddEmptyBookmarkFolderToMenu(
 		HMENU menu, BookmarkItem *bookmarkItem, int position, ItemPositionMap *itemPositionMap);
 	BOOL AddBookmarkFolderToMenu(HMENU menu, BookmarkItem *bookmarkItem, int position,

@@ -28,6 +28,8 @@ public:
 	BookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
 		Navigation *navigation, BookmarkTree *bookmarkTree, UINT uIDStart, UINT uIDEnd);
 
+	void ShowOverflowMenu(const POINT &ptScreen);
+
 private:
 	BookmarksToolbar &operator=(const BookmarksToolbar &bt);
 

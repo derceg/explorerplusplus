@@ -77,7 +77,8 @@ void BookmarkMenu::OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt)
 		m_parentWindow, itr->second->GetParent(), { itr->second }, pt, true);
 }
 
-BOOL BookmarkMenu::ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt, MenuCallback callback)
+BOOL BookmarkMenu::ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt,
+	BookmarkMenuBuilder::IncludePredicate includePredicate, MenuCallback callback)
 {
 	wil::unique_hmenu menu(CreatePopupMenu());
 
@@ -89,7 +90,7 @@ BOOL BookmarkMenu::ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt, MenuCal
 	BookmarkMenuBuilder::ItemIdMap menuItemIdMappings;
 	BookmarkMenuBuilder::ItemPositionMap menuItemPositionMappings;
 	BOOL res = m_menuBuilder.BuildMenu(menu.get(), bookmarkItem, { MIN_ID, MAX_ID }, 0,
-		menuItemIdMappings, &menuItemPositionMappings);
+		menuItemIdMappings, &menuItemPositionMappings, includePredicate);
 
 	if (!res)
 	{

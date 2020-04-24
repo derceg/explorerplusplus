@@ -19,6 +19,7 @@
 #include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/ToolbarHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/iDropSource.h"
 #include <wil/com.h>
@@ -404,10 +405,39 @@ void BookmarksToolbar::ShowBookmarkFolderMenu(BookmarkItem *bookmarkItem, int co
 	POINT pt;
 	pt.x = rc.left;
 	pt.y = rc.bottom;
-	m_bookmarkMenu.ShowMenu(bookmarkItem, pt,
+	m_bookmarkMenu.ShowMenu(bookmarkItem, pt, nullptr,
 		std::bind(&BookmarksToolbar::OnBookmarkMenuItemClicked, this, std::placeholders::_1));
 
 	SendMessage(m_hToolbar, TB_PRESSBUTTON, command, MAKEWORD(FALSE, 0));
+}
+
+void BookmarksToolbar::ShowOverflowMenu(const POINT &ptScreen)
+{
+	m_bookmarkMenu.ShowMenu(
+		m_bookmarkTree->GetBookmarksToolbarFolder(), ptScreen,
+		[this](const BookmarkItem *bookmarkItem) {
+			auto index = GetBookmarkItemIndex(bookmarkItem);
+
+			if (!index)
+			{
+				assert(false);
+				return false;
+			}
+
+			RECT toolbarRect;
+			GetClientRect(m_hToolbar, &toolbarRect);
+
+			RECT buttonRect;
+			SendMessage(m_hToolbar, TB_GETITEMRECT, *index, reinterpret_cast<LPARAM>(&buttonRect));
+
+			if (buttonRect.right > toolbarRect.right)
+			{
+				return true;
+			}
+
+			return false;
+		},
+		std::bind(&BookmarksToolbar::OnBookmarkMenuItemClicked, this, std::placeholders::_1));
 }
 
 void BookmarksToolbar::OnBookmarkMenuItemClicked(const BookmarkItem *bookmarkItem)

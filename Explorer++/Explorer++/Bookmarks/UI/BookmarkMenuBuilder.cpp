@@ -14,18 +14,20 @@ BookmarkMenuBuilder::BookmarkMenuBuilder(HMODULE resourceModule) : m_resourceMod
 
 BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, BookmarkItem *bookmarkItem,
 	const MenuIdRange &menuIdRange, int startPosition, ItemIdMap &itemIdMap,
-	ItemPositionMap *itemPositionMap)
+	ItemPositionMap *itemPositionMap, IncludePredicate includePredicate)
 {
 	assert(bookmarkItem->IsFolder());
 
 	m_menuIdRange = menuIdRange;
 	m_idCounter = menuIdRange.startId;
 
-	return BuildMenu(menu, bookmarkItem, startPosition, itemIdMap, itemPositionMap);
+	return BuildMenu(
+		menu, bookmarkItem, startPosition, itemIdMap, itemPositionMap, true, includePredicate);
 }
 
 BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, BookmarkItem *bookmarkItem, int startPosition,
-	ItemIdMap &itemIdMap, ItemPositionMap *itemPositionMap)
+	ItemIdMap &itemIdMap, ItemPositionMap *itemPositionMap, bool applyIncludePredicate,
+	IncludePredicate includePredicate)
 {
 	if (bookmarkItem->GetChildren().empty())
 	{
@@ -36,6 +38,11 @@ BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, BookmarkItem *bookmarkItem, int 
 
 	for (auto &childItem : bookmarkItem->GetChildren())
 	{
+		if (applyIncludePredicate && includePredicate && !includePredicate(childItem.get()))
+		{
+			continue;
+		}
+
 		BOOL res;
 
 		if (childItem->IsFolder())
@@ -121,7 +128,7 @@ BOOL BookmarkMenuBuilder::AddBookmarkFolderToMenu(HMENU menu, BookmarkItem *book
 		itemPositionMap->insert({ { menu, position }, bookmarkItem });
 	}
 
-	return BuildMenu(subMenu, bookmarkItem, 0, itemIdMap, itemPositionMap);
+	return BuildMenu(subMenu, bookmarkItem, 0, itemIdMap, itemPositionMap, false, nullptr);
 }
 
 BOOL BookmarkMenuBuilder::AddBookmarkToMenu(HMENU menu, BookmarkItem *bookmarkItem, int position,

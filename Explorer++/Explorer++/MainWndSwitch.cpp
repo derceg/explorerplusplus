@@ -8,6 +8,7 @@
 #include "ApplicationToolbar.h"
 #include "Bookmarks/UI/AddBookmarkDialog.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
+#include "Bookmarks/UI/BookmarksToolbar.h"
 #include "Bookmarks/UI/ManageBookmarksDialog.h"
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
@@ -1487,9 +1488,20 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 				int nButtons;
 				int i = 0;
 
-				hMenu = CreatePopupMenu();
-
 				pnmrc = (NMREBARCHEVRON *)lParam;
+
+				POINT ptMenu;
+				ptMenu.x = pnmrc->rc.left;
+				ptMenu.y = pnmrc->rc.bottom;
+				ClientToScreen(m_hMainRebar, &ptMenu);
+
+				if (pnmrc->wID == ID_BOOKMARKSTOOLBAR)
+				{
+					m_pBookmarksToolbar->ShowOverflowMenu(ptMenu);
+					return 0;
+				}
+
+				hMenu = CreatePopupMenu();
 
 				HIMAGELIST himlMenu = nullptr;
 
@@ -1499,10 +1511,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 				{
 				case ID_MAINTOOLBAR:
 					hToolbar = m_mainToolbar->GetHWND();
-					break;
-
-				case ID_BOOKMARKSTOOLBAR:
-					hToolbar = m_hBookmarksToolbar;
 					break;
 
 				case ID_DRIVESTOOLBAR:
@@ -1580,12 +1588,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 										}
 									}
 									break;
-
-								case ID_BOOKMARKSTOOLBAR:
-									{
-										/* TODO: [Bookmarks] Build menu. */
-									}
-									break;
 								}
 
 								mii.cbSize		= sizeof(mii);
@@ -1602,13 +1604,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 						}
 					}
 				}
-
-				POINT ptMenu;
-
-				ptMenu.x = pnmrc->rc.left;
-				ptMenu.y = pnmrc->rc.bottom;
-
-				ClientToScreen(m_hMainRebar,&ptMenu);
 
 				UINT uFlags = TPM_LEFTALIGN|TPM_RETURNCMD;
 				int iCmd;
