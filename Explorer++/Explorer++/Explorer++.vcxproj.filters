@@ -430,6 +430,9 @@
     <ClCompile Include="ApplicationToolbarHelper.cpp">
       <Filter>Application Toolbar</Filter>
     </ClCompile>
+    <ClCompile Include="Bookmarks\UI\BookmarkMenuController.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -863,6 +866,9 @@
     </ClInclude>
     <ClInclude Include="SolWrapper.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Bookmarks\UI\BookmarkMenuController.h">
+      <Filter>Bookmarks\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

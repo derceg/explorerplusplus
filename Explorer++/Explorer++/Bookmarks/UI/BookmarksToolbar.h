@@ -76,7 +76,6 @@ private:
 	bool OnButtonClick(int command);
 	BOOL OnRightClick(const NMMOUSE *nmm);
 	void ShowBookmarkFolderMenu(BookmarkItem *bookmarkItem, int command, int index);
-	void OnBookmarkMenuItemClicked(const BookmarkItem *bookmarkItem);
 	int FindNextButtonIndex(const POINT &ptClient);
 	void OnEditBookmarkItem(BookmarkItem *bookmarkItem);
 	bool OnGetInfoTip(NMTBGETINFOTIP *infoTip);

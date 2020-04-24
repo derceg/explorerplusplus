@@ -37,7 +37,7 @@ BookmarksToolbar::BookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerp
 	m_uIDStart(uIDStart),
 	m_uIDEnd(uIDEnd),
 	m_bookmarkContextMenu(bookmarkTree, instance, pexpp),
-	m_bookmarkMenu(bookmarkTree, instance, pexpp, hToolbar),
+	m_bookmarkMenu(bookmarkTree, instance, pexpp, navigation, hToolbar),
 	m_uIDCounter(0),
 	m_iconFetcher(hToolbar, pexpp->GetCachedIcons()),
 	m_defaultFolderIconSystemImageListIndex(GetDefaultFolderIconIndex())
@@ -405,16 +405,14 @@ void BookmarksToolbar::ShowBookmarkFolderMenu(BookmarkItem *bookmarkItem, int co
 	POINT pt;
 	pt.x = rc.left;
 	pt.y = rc.bottom;
-	m_bookmarkMenu.ShowMenu(bookmarkItem, pt, nullptr,
-		std::bind(&BookmarksToolbar::OnBookmarkMenuItemClicked, this, std::placeholders::_1));
+	m_bookmarkMenu.ShowMenu(bookmarkItem, pt);
 
 	SendMessage(m_hToolbar, TB_PRESSBUTTON, command, MAKEWORD(FALSE, 0));
 }
 
 void BookmarksToolbar::ShowOverflowMenu(const POINT &ptScreen)
 {
-	m_bookmarkMenu.ShowMenu(
-		m_bookmarkTree->GetBookmarksToolbarFolder(), ptScreen,
+	m_bookmarkMenu.ShowMenu(m_bookmarkTree->GetBookmarksToolbarFolder(), ptScreen,
 		[this](const BookmarkItem *bookmarkItem) {
 			auto index = GetBookmarkItemIndex(bookmarkItem);
 
@@ -436,15 +434,7 @@ void BookmarksToolbar::ShowOverflowMenu(const POINT &ptScreen)
 			}
 
 			return false;
-		},
-		std::bind(&BookmarksToolbar::OnBookmarkMenuItemClicked, this, std::placeholders::_1));
-}
-
-void BookmarksToolbar::OnBookmarkMenuItemClicked(const BookmarkItem *bookmarkItem)
-{
-	assert(bookmarkItem->IsBookmark());
-
-	m_navigation->BrowseFolderInCurrentTab(bookmarkItem->GetLocation().c_str());
+		});
 }
 
 void BookmarksToolbar::OnToolbarContextMenuItemClicked(int menuItemId)
