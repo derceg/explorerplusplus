@@ -19,7 +19,6 @@
 #include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/ToolbarHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/iDropSource.h"
 #include <wil/com.h>
