@@ -83,6 +83,7 @@ void Explorerplusplus::OnNavigationCompleted(const Tab &tab)
 HRESULT Explorerplusplus::OnNewTab()
 {
 	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	FolderColumns cols = selectedTab.GetShellBrowser()->ExportAllColumns();
 	int selectionIndex = ListView_GetNextItem(
 		selectedTab.GetShellBrowser()->GetListView(), -1, LVNI_FOCUSED | LVNI_SELECTED);
 
@@ -95,7 +96,7 @@ HRESULT Explorerplusplus::OnNewTab()
 		if (WI_IsFlagSet(fileFindData.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
 		{
 			auto pidl = selectedTab.GetShellBrowser()->GetItemCompleteIdl(selectionIndex);
-			return m_tabContainer->CreateNewTab(pidl.get(), TabSettings(_selected = true));
+			return m_tabContainer->CreateNewTab(pidl.get(), TabSettings(_selected = true), nullptr, cols);
 		}
 	}
 
