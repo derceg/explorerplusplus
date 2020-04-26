@@ -48,7 +48,17 @@ INT_PTR SelectColumnsDialog::OnInitDialog()
 
 	for(const auto &column : currentColumns)
 	{
-		std::wstring text = ResourceHelper::LoadString(GetInstance(),ShellBrowser::LookupColumnNameStringIndex(column.id));
+		std::wstring text;
+
+		try
+		{
+			text = ResourceHelper::LoadString(
+				GetInstance(), ShellBrowser::LookupColumnNameStringIndex(column.id));
+		}
+		catch (const std::runtime_error &ex)
+		{
+			ex.what();
+		}
 
 		LVITEM lvItem;
 		lvItem.mask		= LVIF_TEXT|LVIF_PARAM;
