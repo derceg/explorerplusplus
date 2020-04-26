@@ -285,7 +285,12 @@ void Explorerplusplus::OnResolveLink()
 HRESULT Explorerplusplus::OnGoBack()
 {
 	Tab &selectedTab = m_tabContainer->GetSelectedTab();
-	return selectedTab.GetShellBrowser()->GetNavigationController()->GoBack();
+	auto curEntry = selectedTab.GetShellBrowser()->GetNavigationController()->GetEntry(0);
+	auto res = selectedTab.GetShellBrowser()->GetNavigationController()->GoBack();
+	auto prevName = curEntry->GetDisplayName();
+	if (!prevName.empty())
+		selectedTab.GetShellBrowser()->SelectFiles(prevName.c_str());
+	return res;
 }
 
 HRESULT Explorerplusplus::OnGoForward()
