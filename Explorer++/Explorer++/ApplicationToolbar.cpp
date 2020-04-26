@@ -332,8 +332,11 @@ void ApplicationToolbar::OpenItem(int iItem, std::wstring *parameters)
 				combinedParameters.append(_T(" "));
 				combinedParameters.append(*parameters);
 			}
+			
+			// Run it as Admin if Control key is pressed.
+			bool RunAsAdmin = (GetKeyState(VK_CONTROL) & (1 << 7) ? true : false);
 
-			m_pexpp->OpenFileItem(pidl.get(), combinedParameters.c_str());
+			m_pexpp->OpenFileItem(pidl.get(), combinedParameters.c_str(), RunAsAdmin);
 		}
 	}
 }

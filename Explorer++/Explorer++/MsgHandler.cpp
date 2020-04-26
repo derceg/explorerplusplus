@@ -198,7 +198,7 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, 
 			}
 			else
 			{
-				OpenFileItem(pidlItem,EMPTY_STRING);
+				OpenFileItem(pidlItem,EMPTY_STRING,false);
 			}
 		}
 		else if(((uAttributes & SFGAO_FOLDER) && !bControlPanelParent))
@@ -259,7 +259,7 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, 
 				Also, even if the shortcut points to a dead
 				folder, it should still attempted to be
 				opened. */
-				OpenFileItem(pidlItem,EMPTY_STRING);
+				OpenFileItem(pidlItem,EMPTY_STRING,false);
 			}
 		}
 		else if(bControlPanelParent && (uAttributes & SFGAO_FOLDER))
@@ -284,7 +284,7 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, 
 		else
 		{
 			/* File item. */
-			OpenFileItem(pidlItem,EMPTY_STRING);
+			OpenFileItem(pidlItem,EMPTY_STRING,false);
 		}
 	}
 }
@@ -299,15 +299,17 @@ void Explorerplusplus::OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNe
 		m_navigation->BrowseFolderInCurrentTab(pidlItem);
 }
 
-void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidlItem,const TCHAR *szParameters)
+void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters, bool RunAsAdmin)
 {
 	unique_pidl_absolute pidlParent(ILCloneFull(pidlItem));
 	ILRemoveLastID(pidlParent.get());
 
 	TCHAR szItemDirectory[MAX_PATH];
 	GetDisplayName(pidlParent.get(),szItemDirectory,SIZEOF_ARRAY(szItemDirectory),SHGDN_FORPARSING);
+	
+	const TCHAR *szVerb = (RunAsAdmin ? _T("RunAs") : EMPTY_STRING);
 
-	ExecuteFileAction(m_hContainer,EMPTY_STRING,szParameters,szItemDirectory,pidlItem);
+	ExecuteFileAction(m_hContainer,szVerb,szParameters,szItemDirectory,pidlItem);
 }
 
 BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
