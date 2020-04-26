@@ -55,9 +55,8 @@ INT_PTR SelectColumnsDialog::OnInitDialog()
 			text = ResourceHelper::LoadString(
 				GetInstance(), ShellBrowser::LookupColumnNameStringIndex(column.id));
 		}
-		catch (const std::runtime_error &ex)
+		catch (const std::runtime_error &)
 		{
-			ex.what();
 		}
 
 		LVITEM lvItem;
