@@ -96,7 +96,8 @@ HRESULT Explorerplusplus::OnNewTab()
 		if (WI_IsFlagSet(fileFindData.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
 		{
 			auto pidl = selectedTab.GetShellBrowser()->GetItemCompleteIdl(selectionIndex);
-			return m_tabContainer->CreateNewTab(pidl.get(), TabSettings(_selected = true));
+			FolderColumns cols = selectedTab.GetShellBrowser()->ExportAllColumns();
+			return m_tabContainer->CreateNewTab(pidl.get(), TabSettings(_selected = true), nullptr, cols);
 		}
 	}
 
