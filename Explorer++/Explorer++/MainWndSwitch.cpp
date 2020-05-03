@@ -1266,7 +1266,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		if (g_hwndManageBookmarks == nullptr)
 		{
 			auto *pManageBookmarksDialog = new ManageBookmarksDialog(m_hLanguageModule,
-				hwnd, this, m_navigation.get(), &m_bookmarkTree);
+				hwnd, this, m_navigation.get(), &m_bookmarkIconFetcher, &m_bookmarkTree);
 			g_hwndManageBookmarks = pManageBookmarksDialog->ShowModelessDialog(new ModelessDialogNotification());
 		}
 		else

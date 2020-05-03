@@ -7,13 +7,13 @@
 #include "Bookmarks/BookmarkClipboard.h"
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkHelper.h"
+#include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/AddBookmarkDialog.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "TabContainer.h"
-#include "../Helper/CachedIcons.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DataExchangeHelper.h"
 #include "../Helper/ImageHelper.h"
@@ -26,7 +26,8 @@
 #include <algorithm>
 
 BookmarksToolbar::BookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
-	Navigation *navigation, BookmarkTree *bookmarkTree, UINT uIDStart, UINT uIDEnd) :
+	Navigation *navigation, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, UINT uIDStart,
+	UINT uIDEnd) :
 	BookmarkDropTargetWindow(hToolbar, bookmarkTree),
 	m_hToolbar(hToolbar),
 	m_instance(instance),
@@ -37,18 +38,16 @@ BookmarksToolbar::BookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerp
 	m_uIDEnd(uIDEnd),
 	m_bookmarkContextMenu(bookmarkTree, instance, pexpp),
 	m_bookmarkMenu(bookmarkTree, instance, pexpp, navigation, hToolbar),
-	m_uIDCounter(0),
-	m_iconFetcher(hToolbar, pexpp->GetCachedIcons()),
-	m_defaultFolderIconSystemImageListIndex(GetDefaultFolderIconIndex())
+	m_uIDCounter(0)
 {
-	InitializeToolbar();
+	InitializeToolbar(iconFetcher);
 }
 
-void BookmarksToolbar::InitializeToolbar()
+void BookmarksToolbar::InitializeToolbar(IconFetcher *iconFetcher)
 {
 	SendMessage(m_hToolbar, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
 
-	SetUpToolbarImageList();
+	SetUpToolbarImageList(iconFetcher);
 
 	m_windowSubclasses.emplace_back(
 		m_hToolbar, BookmarksToolbarProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
@@ -76,25 +75,20 @@ void BookmarksToolbar::InitializeToolbar()
 			std::placeholders::_2, std::placeholders::_3)));
 }
 
-void BookmarksToolbar::SetUpToolbarImageList()
+void BookmarksToolbar::SetUpToolbarImageList(IconFetcher *iconFetcher)
 {
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hToolbar);
 	int iconWidth = m_dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = m_dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 	SendMessage(m_hToolbar, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
 
-	m_imageList.reset(ImageList_Create(iconWidth, iconHeight, ILC_COLOR32 | ILC_MASK, 0, 1));
+	m_bookmarkIconManager = std::make_unique<BookmarkIconManager>(m_pexpp, iconFetcher,
+		std::bind(&BookmarksToolbar::OnBookmarkIconAvailable, this, std::placeholders::_1,
+			std::placeholders::_2),
+		iconWidth, iconHeight);
 
-	wil::unique_hbitmap folderIcon = m_pexpp->GetIconResourceLoader()->LoadBitmapFromPNGAndScale(
-		Icon::Folder, iconWidth, iconHeight);
-	m_bookmarkFolderIconIndex = ImageList_Add(m_imageList.get(), folderIcon.get(), nullptr);
-
-	SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList));
-	m_defaultFolderIconIndex = ImageHelper::CopyImageListIcon(m_imageList.get(),
-		reinterpret_cast<HIMAGELIST>(m_systemImageList.get()),
-		m_defaultFolderIconSystemImageListIndex);
-
-	SendMessage(m_hToolbar, TB_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(m_imageList.get()));
+	SendMessage(m_hToolbar, TB_SETIMAGELIST, 0,
+		reinterpret_cast<LPARAM>(m_bookmarkIconManager->GetImageList()));
 }
 
 LRESULT CALLBACK BookmarksToolbar::BookmarksToolbarProcStub(
@@ -549,19 +543,10 @@ void BookmarksToolbar::InsertBookmarkItem(BookmarkItem *bookmarkItem, int positi
 	TCHAR szName[256];
 	StringCchCopy(szName, SIZEOF_ARRAY(szName), bookmarkItem->GetName().c_str());
 
-	int imageIndex;
-
-	if (bookmarkItem->IsFolder())
-	{
-		imageIndex = m_bookmarkFolderIconIndex;
-	}
-	else
-	{
-		imageIndex = GetIconForBookmark(bookmarkItem);
-	}
+	int iconIndex = m_bookmarkIconManager->GetBookmarkItemIconIndex(bookmarkItem);
 
 	TBBUTTON tbb;
-	tbb.iBitmap = imageIndex;
+	tbb.iBitmap = iconIndex;
 	tbb.idCommand = m_uIDStart + m_uIDCounter;
 	tbb.fsState = TBSTATE_ENABLED;
 	tbb.fsStyle = BTNS_BUTTON | BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX;
@@ -574,36 +559,8 @@ void BookmarksToolbar::InsertBookmarkItem(BookmarkItem *bookmarkItem, int positi
 	++m_uIDCounter;
 }
 
-int BookmarksToolbar::GetIconForBookmark(const BookmarkItem *bookmark)
+void BookmarksToolbar::OnBookmarkIconAvailable(std::wstring_view guid, int iconIndex)
 {
-	int imageIndex = m_defaultFolderIconIndex;
-
-	auto cachedItr = m_pexpp->GetCachedIcons()->findByPath(bookmark->GetLocation());
-
-	if (cachedItr != m_pexpp->GetCachedIcons()->end())
-	{
-		imageIndex = AddSystemIconToImageList(cachedItr->iconIndex);
-	}
-	else
-	{
-		m_iconFetcher.QueueIconTask(
-			bookmark->GetLocation(), [this, guid = bookmark->GetGUID()](int iconIndex) {
-				ProcessIconResult(guid, iconIndex);
-			});
-	}
-
-	return imageIndex;
-}
-
-void BookmarksToolbar::ProcessIconResult(std::wstring_view guid, int iconIndex)
-{
-	if (iconIndex == m_defaultFolderIconSystemImageListIndex)
-	{
-		// Bookmarks use the standard folder icon by default, so if that's the
-		// icon they're actually using, nothing else needs to happen.
-		return;
-	}
-
 	auto index = GetBookmarkItemIndexUsingGuid(guid);
 
 	if (!index)
@@ -611,33 +568,11 @@ void BookmarksToolbar::ProcessIconResult(std::wstring_view guid, int iconIndex)
 		return;
 	}
 
-	int imageListIconIndex = AddSystemIconToImageList(iconIndex);
-
 	TBBUTTONINFO buttonInfo;
 	buttonInfo.cbSize = sizeof(buttonInfo);
 	buttonInfo.dwMask = TBIF_BYINDEX | TBIF_IMAGE;
-	buttonInfo.iImage = imageListIconIndex;
+	buttonInfo.iImage = iconIndex;
 	SendMessage(m_hToolbar, TB_SETBUTTONINFO, *index, reinterpret_cast<LPARAM>(&buttonInfo));
-}
-
-int BookmarksToolbar::AddSystemIconToImageList(int iconIndex)
-{
-	// Note that while it would be possible to prevent other icons from being
-	// inserted into the image list more than once, it would be a little more
-	// complicated (the number of uses for an icon would have to be tracked) and
-	// there would be more room for things to go wrong.
-	// It's likely not worth it, since most folders will probably use the
-	// default icon.
-	if (iconIndex == m_defaultFolderIconSystemImageListIndex)
-	{
-		return m_defaultFolderIconIndex;
-	}
-
-	int imageListIconIndex = ImageHelper::CopyImageListIcon(
-		m_imageList.get(), reinterpret_cast<HIMAGELIST>(m_systemImageList.get()), iconIndex);
-	m_imageListMappings.insert({ iconIndex, imageListIconIndex });
-
-	return imageListIconIndex;
 }
 
 void BookmarksToolbar::OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t index)
@@ -709,10 +644,7 @@ void BookmarksToolbar::RemoveBookmarkItem(const BookmarkItem *bookmarkItem)
 
 	SendMessage(m_hToolbar, TB_DELETEBUTTON, *index, 0);
 
-	if (bookmarkItem->IsBookmark() && buttonInfo.iImage != m_defaultFolderIconIndex)
-	{
-		ImageList_Remove(m_imageList.get(), buttonInfo.iImage);
-	}
+	m_bookmarkIconManager->RemoveIcon(buttonInfo.iImage);
 
 	UpdateToolbarBandSizing(GetParent(m_hToolbar), m_hToolbar);
 }

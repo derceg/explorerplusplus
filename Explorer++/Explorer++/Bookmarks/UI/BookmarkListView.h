@@ -17,7 +17,9 @@
 #include <wil/resource.h>
 #include <optional>
 
+class BookmarkIconManager;
 class BookmarkTree;
+class IconFetcher;
 __interface IExplorerplusplus;
 
 class BookmarkListView : public BookmarkNavigatorInterface, private BookmarkDropTargetWindow
@@ -31,7 +33,8 @@ public:
 	};
 
 	BookmarkListView(HWND hListView, HMODULE resourceModule, BookmarkTree *bookmarkTree,
-		IExplorerplusplus *expp, const std::vector<Column> &initialColumns);
+		IExplorerplusplus *expp, IconFetcher *iconFetcher,
+		const std::vector<Column> &initialColumns);
 
 	void NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder, bool addHistoryEntry) override;
 	boost::signals2::connection AddNavigationCompletedObserver(
@@ -67,6 +70,8 @@ private:
 		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+	void SetUpListViewImageList(IconFetcher *iconFetcher);
+
 	void InsertColumns(const std::vector<Column> &columns);
 	void InsertColumn(const Column &column, int index);
 	std::wstring GetColumnText(BookmarkHelper::ColumnType columnType);
@@ -75,7 +80,9 @@ private:
 	std::optional<BookmarkHelper::ColumnType> GetColumnTypeByIndex(int index) const;
 
 	int InsertBookmarkItemIntoListView(BookmarkItem *bookmarkItem, int position);
-	std::wstring GetBookmarkItemColumnInfo(const BookmarkItem *bookmarkItem, BookmarkHelper::ColumnType columnType);
+	void OnBookmarkIconAvailable(std::wstring_view guid, int iconIndex);
+	std::wstring GetBookmarkItemColumnInfo(
+		const BookmarkItem *bookmarkItem, BookmarkHelper::ColumnType columnType);
 	static std::wstring FormatDate(const FILETIME *date);
 
 	BookmarkItem *GetBookmarkItemFromListView(int iItem);
@@ -114,7 +121,9 @@ private:
 
 	void RemoveBookmarkItem(const BookmarkItem *bookmarkItem);
 	std::optional<int> GetBookmarkItemIndex(const BookmarkItem *bookmarkItem) const;
-	BookmarkHelper::ColumnType MapPropertyTypeToColumnType(BookmarkItem::PropertyType propertyType) const;
+	std::optional<int> GetBookmarkItemIndexUsingGuid(std::wstring_view guid) const;
+	BookmarkHelper::ColumnType MapPropertyTypeToColumnType(
+		BookmarkItem::PropertyType propertyType) const;
 	Column &GetColumnByType(BookmarkHelper::ColumnType columnType);
 	std::optional<int> GetColumnHeaderIndexByType(BookmarkHelper::ColumnType columnType) const;
 	int GetColumnIndexByType(BookmarkHelper::ColumnType columnType) const;
@@ -130,8 +139,7 @@ private:
 	HMODULE m_resourceModule;
 	IExplorerplusplus *m_expp;
 	DpiCompatibility m_dpiCompat;
-	wil::unique_himagelist m_imageList;
-	IconImageListMapping m_imageListMappings;
+	std::unique_ptr<BookmarkIconManager> m_bookmarkIconManager;
 	std::vector<Column> m_columns;
 
 	BookmarkTree *m_bookmarkTree;

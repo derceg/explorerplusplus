@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "Bookmarks/UI/BookmarksToolbar.h"
 #include "ColorRuleHelper.h"
@@ -33,7 +34,8 @@ Explorerplusplus::Explorerplusplus(HWND hwnd) :
 	m_cachedIcons(MAX_CACHED_ICONS),
 	m_pluginMenuManager(hwnd, MENU_PLUGIN_STARTID, MENU_PLUGIN_ENDID),
 	m_acceleratorUpdater(&g_hAccl),
-	m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_ENDID)
+	m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_ENDID),
+	m_bookmarkIconFetcher(hwnd, &m_cachedIcons)
 {
 	m_hLanguageModule				= nullptr;
 
