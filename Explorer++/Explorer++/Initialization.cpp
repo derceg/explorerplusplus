@@ -40,7 +40,8 @@ void Explorerplusplus::OnCreate()
 
 	SetLanguageModule();
 
-	m_bookmarksMainMenu = std::make_unique<BookmarksMainMenu>(this, &m_bookmarkTree, MenuIdRange{ MENU_BOOKMARK_STARTID, MENU_BOOKMARK_ENDID });
+	m_bookmarksMainMenu = std::make_unique<BookmarksMainMenu>(this, &m_bookmarkIconFetcher,
+		&m_bookmarkTree, MenuIdRange{ MENU_BOOKMARK_STARTID, MENU_BOOKMARK_ENDID });
 
 	m_navigation = std::make_unique<Navigation>(this);
 

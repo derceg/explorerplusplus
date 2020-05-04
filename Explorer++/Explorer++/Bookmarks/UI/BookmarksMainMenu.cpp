@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
+#include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
@@ -12,12 +13,12 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainer.h"
 
-BookmarksMainMenu::BookmarksMainMenu(
-	IExplorerplusplus *expp, BookmarkTree *bookmarkTree, const MenuIdRange &menuIdRange) :
+BookmarksMainMenu::BookmarksMainMenu(IExplorerplusplus *expp, IconFetcher *iconFetcher,
+	BookmarkTree *bookmarkTree, const MenuIdRange &menuIdRange) :
 	m_expp(expp),
 	m_bookmarkTree(bookmarkTree),
 	m_menuIdRange(menuIdRange),
-	m_menuBuilder(expp->GetLanguageModule())
+	m_menuBuilder(expp, iconFetcher, expp->GetLanguageModule())
 {
 	m_connections.push_back(expp->AddMainMenuPreShowObserver(
 		std::bind(&BookmarksMainMenu::OnMainMenuPreShow, this, std::placeholders::_1)));
@@ -93,14 +94,17 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(
 	ResourceHelper::SetMenuItemImage(menu.get(), IDM_BOOKMARKS_MANAGEBOOKMARKS,
 		m_expp->GetIconResourceLoader(), Icon::Bookmarks, dpi, menuImages);
 
-	AddBookmarkItemsToMenu(menu.get(), GetMenuItemCount(menu.get()), menuItemIdMappings);
-	AddOtherBookmarksToMenu(menu.get(), GetMenuItemCount(menu.get()), menuItemIdMappings);
+	AddBookmarkItemsToMenu(
+		menu.get(), GetMenuItemCount(menu.get()), menuImages, menuItemIdMappings);
+	AddOtherBookmarksToMenu(
+		menu.get(), GetMenuItemCount(menu.get()), menuImages, menuItemIdMappings);
 
 	return menu;
 }
 
-void BookmarksMainMenu::AddBookmarkItemsToMenu(
-	HMENU menu, int position, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings)
+void BookmarksMainMenu::AddBookmarkItemsToMenu(HMENU menu, int position,
+	std::vector<wil::unique_hbitmap> &menuImages,
+	BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings)
 {
 	BookmarkItem *bookmarksMenuFolder = m_bookmarkTree->GetBookmarksMenuFolder();
 
@@ -115,11 +119,13 @@ void BookmarksMainMenu::AddBookmarkItemsToMenu(
 	mii.fType = MFT_SEPARATOR;
 	InsertMenuItem(menu, position++, TRUE, &mii);
 
-	m_menuBuilder.BuildMenu(menu, bookmarksMenuFolder, m_menuIdRange, position, menuItemIdMappings);
+	m_menuBuilder.BuildMenu(m_expp->GetMainWindow(), menu, bookmarksMenuFolder, m_menuIdRange,
+		position, menuItemIdMappings, menuImages);
 }
 
-void BookmarksMainMenu::AddOtherBookmarksToMenu(
-	HMENU menu, int position, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings)
+void BookmarksMainMenu::AddOtherBookmarksToMenu(HMENU menu, int position,
+	std::vector<wil::unique_hbitmap> &menuImages,
+	BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings)
 {
 	BookmarkItem *otherBookmarksFolder = m_bookmarkTree->GetOtherBookmarksFolder();
 
@@ -137,7 +143,8 @@ void BookmarksMainMenu::AddOtherBookmarksToMenu(
 	// Note that as DestroyMenu is recursive, this menu will be destroyed when
 	// its parent menu is.
 	HMENU subMenu = CreatePopupMenu();
-	m_menuBuilder.BuildMenu(subMenu, otherBookmarksFolder, m_menuIdRange, 0, menuItemIdMappings);
+	m_menuBuilder.BuildMenu(m_expp->GetMainWindow(), subMenu, otherBookmarksFolder, m_menuIdRange,
+		0, menuItemIdMappings, menuImages);
 
 	std::wstring otherBookmarksName = otherBookmarksFolder->GetName();
 

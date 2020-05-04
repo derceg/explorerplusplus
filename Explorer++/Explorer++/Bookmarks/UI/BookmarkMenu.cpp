@@ -4,11 +4,12 @@
 
 #include "stdafx.h"
 #include "Bookmarks/UI/BookmarkMenu.h"
+#include "Bookmarks/BookmarkIconManager.h"
 
 BookmarkMenu::BookmarkMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule,
-	IExplorerplusplus *expp, Navigation *navigation, HWND parentWindow) :
+	IExplorerplusplus *expp, Navigation *navigation, IconFetcher *iconFetcher, HWND parentWindow) :
 	m_parentWindow(parentWindow),
-	m_menuBuilder(resourceModule),
+	m_menuBuilder(expp, iconFetcher, resourceModule),
 	m_bookmarkContextMenu(bookmarkTree, resourceModule, expp),
 	m_controller(navigation),
 	m_showingMenu(false),
@@ -88,10 +89,11 @@ BOOL BookmarkMenu::ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt,
 		return FALSE;
 	}
 
+	std::vector<wil::unique_hbitmap> menuImages;
 	BookmarkMenuBuilder::ItemIdMap menuItemIdMappings;
 	BookmarkMenuBuilder::ItemPositionMap menuItemPositionMappings;
-	BOOL res = m_menuBuilder.BuildMenu(menu.get(), bookmarkItem, { MIN_ID, MAX_ID }, 0,
-		menuItemIdMappings, &menuItemPositionMappings, includePredicate);
+	BOOL res = m_menuBuilder.BuildMenu(m_parentWindow, menu.get(), bookmarkItem, { MIN_ID, MAX_ID },
+		0, menuItemIdMappings, menuImages, &menuItemPositionMappings, includePredicate);
 
 	if (!res)
 	{

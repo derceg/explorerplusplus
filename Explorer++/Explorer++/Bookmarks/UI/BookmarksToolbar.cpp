@@ -37,7 +37,7 @@ BookmarksToolbar::BookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerp
 	m_uIDStart(uIDStart),
 	m_uIDEnd(uIDEnd),
 	m_bookmarkContextMenu(bookmarkTree, instance, pexpp),
-	m_bookmarkMenu(bookmarkTree, instance, pexpp, navigation, hToolbar),
+	m_bookmarkMenu(bookmarkTree, instance, pexpp, navigation, iconFetcher, hToolbar),
 	m_uIDCounter(0)
 {
 	InitializeToolbar(iconFetcher);
