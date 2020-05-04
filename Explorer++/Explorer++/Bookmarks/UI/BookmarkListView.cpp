@@ -7,6 +7,7 @@
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/BookmarkTree.h"
+#include "Config.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -686,9 +687,9 @@ std::wstring BookmarkListView::GetBookmarkItemColumnInfo(
 
 std::wstring BookmarkListView::FormatDate(const FILETIME *date)
 {
-	/* TODO: Friendly dates. */
 	TCHAR formattedDate[256];
-	BOOL res = CreateFileTimeString(date, formattedDate, std::size(formattedDate), FALSE);
+	BOOL res = CreateFileTimeString(date, formattedDate, std::size(formattedDate),
+		m_expp->GetConfig()->globalFolderSettings.showFriendlyDates);
 
 	if (res)
 	{

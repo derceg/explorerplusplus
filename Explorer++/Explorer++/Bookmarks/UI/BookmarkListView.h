@@ -83,7 +83,7 @@ private:
 	void OnBookmarkIconAvailable(std::wstring_view guid, int iconIndex);
 	std::wstring GetBookmarkItemColumnInfo(
 		const BookmarkItem *bookmarkItem, BookmarkHelper::ColumnType columnType);
-	static std::wstring FormatDate(const FILETIME *date);
+	std::wstring FormatDate(const FILETIME *date);
 
 	BookmarkItem *GetBookmarkItemFromListView(int iItem);
 	const BookmarkItem *GetBookmarkItemFromListView(int iItem) const;
