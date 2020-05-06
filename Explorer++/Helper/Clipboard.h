@@ -10,7 +10,6 @@
 class Clipboard
 {
 public:
-
 	Clipboard();
 	~Clipboard();
 
@@ -23,7 +22,6 @@ public:
 	bool Clear();
 
 private:
-
 	bool WriteDataToClipboard(UINT format, wil::unique_hglobal global);
 
 	bool m_clipboardOpened;

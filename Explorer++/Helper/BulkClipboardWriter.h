@@ -18,13 +18,11 @@
 class BulkClipboardWriter
 {
 public:
-
 	BulkClipboardWriter();
 
 	bool WriteText(const std::wstring &str);
 	bool WriteCustomData(UINT format, const std::string &data);
 
 private:
-
 	Clipboard m_clipboard;
 };
