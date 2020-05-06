@@ -14,34 +14,37 @@ __interface IFileContextMenuExternal
 {
 	/* Allows the caller to add custom entries to the
 	context menu before it is shown. */
-	void AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, HMENU hMenu);
+	void AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems,
+		DWORD_PTR dwData, HMENU hMenu);
 
 	/* Allows the caller to handle the processing
 	of a shell menu item. For example, the 'Open'
 	item may be processed internally.
 	Returns TRUE if the item was processed;
 	FALSE otherwise. */
-	BOOL HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd);
+	BOOL HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd);
 
 	/* Handles the processing for one of the menu
 	items that was added by the caller. */
-	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, int iCmd);
+	void HandleCustomMenuItem(
+		PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, int iCmd);
 };
 
 class FileContextMenuManager
 {
 public:
-
-	FileContextMenuManager(HWND hwnd, PCIDLIST_ABSOLUTE pidlParent, const std::vector<PCITEMID_CHILD> &pidlItems);
+	FileContextMenuManager(
+		HWND hwnd, PCIDLIST_ABSOLUTE pidlParent, const std::vector<PCITEMID_CHILD> &pidlItems);
 	~FileContextMenuManager();
 
 	/* Shows the context menu. */
-	HRESULT				ShowMenu(IFileContextMenuExternal *pfcme,int iMinID,int iMaxID,const POINT *ppt,StatusBar *pStatusBar,DWORD_PTR dwData,BOOL bRename = FALSE,BOOL bExtended = FALSE);
+	HRESULT ShowMenu(IFileContextMenuExternal *pfcme, int iMinID, int iMaxID, const POINT *ppt,
+		StatusBar *pStatusBar, DWORD_PTR dwData, BOOL bRename = FALSE, BOOL bExtended = FALSE);
 
-	LRESULT CALLBACK	ShellMenuHookProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
+	LRESULT CALLBACK ShellMenuHookProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
-
 	DISALLOW_COPY_AND_ASSIGN(FileContextMenuManager);
 
 	static const int CONTEXT_MENU_SUBCLASS_ID = 1;

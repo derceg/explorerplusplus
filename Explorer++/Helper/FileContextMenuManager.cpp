@@ -9,34 +9,34 @@
 #include "StatusBar.h"
 #include <vector>
 
-LRESULT CALLBACK ShellMenuHookProcStub(HWND hwnd,UINT Msg,WPARAM wParam,
-	LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
+LRESULT CALLBACK ShellMenuHookProcStub(
+	HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
-FileContextMenuManager::FileContextMenuManager(HWND hwnd,
-	PCIDLIST_ABSOLUTE pidlParent, const std::vector<PCITEMID_CHILD> &pidlItems) :
+FileContextMenuManager::FileContextMenuManager(
+	HWND hwnd, PCIDLIST_ABSOLUTE pidlParent, const std::vector<PCITEMID_CHILD> &pidlItems) :
 	m_hwnd(hwnd),
 	m_pidlParent(ILCloneFull(pidlParent))
 {
 	wil::com_ptr<IContextMenu> pContextMenu;
 	HRESULT hr;
 
-	for(auto pidl : pidlItems)
+	for (auto pidl : pidlItems)
 	{
 		m_pidlItems.push_back(ILCloneChild(pidl));
 	}
 
 	m_pActualContext = NULL;
 
-	if(pidlItems.empty())
+	if (pidlItems.empty())
 	{
 		wil::com_ptr<IShellFolder> pShellParentFolder;
 		PCUITEMID_CHILD pidlRelative = NULL;
 		hr = SHBindToParent(pidlParent, IID_PPV_ARGS(&pShellParentFolder), &pidlRelative);
 
-		if(SUCCEEDED(hr))
+		if (SUCCEEDED(hr))
 		{
-			hr = GetUIObjectOf(pShellParentFolder.get(), hwnd, 1,
-				&pidlRelative, IID_PPV_ARGS(&pContextMenu));
+			hr = GetUIObjectOf(
+				pShellParentFolder.get(), hwnd, 1, &pidlRelative, IID_PPV_ARGS(&pContextMenu));
 		}
 	}
 	else
@@ -44,7 +44,7 @@ FileContextMenuManager::FileContextMenuManager(HWND hwnd,
 		wil::com_ptr<IShellFolder> pShellFolder;
 		hr = BindToIdl(pidlParent, IID_PPV_ARGS(&pShellFolder));
 
-		if(SUCCEEDED(hr))
+		if (SUCCEEDED(hr))
 		{
 			std::vector<PCITEMID_CHILD> pidlItemsTemp(pidlItems);
 			hr = GetUIObjectOf(pShellFolder.get(), hwnd, static_cast<UINT>(pidlItems.size()),
@@ -52,19 +52,19 @@ FileContextMenuManager::FileContextMenuManager(HWND hwnd,
 		}
 	}
 
-	if(SUCCEEDED(hr))
+	if (SUCCEEDED(hr))
 	{
 		/* First, try to get IContextMenu3, then IContextMenu2, and if neither of these
 		are available, IContextMenu. */
 		hr = pContextMenu->QueryInterface(IID_PPV_ARGS(&m_pShellContext3));
 		m_pActualContext = m_pShellContext3.get();
 
-		if(FAILED(hr))
+		if (FAILED(hr))
 		{
 			hr = pContextMenu->QueryInterface(IID_PPV_ARGS(&m_pShellContext2));
 			m_pActualContext = m_pShellContext2.get();
 
-			if(FAILED(hr))
+			if (FAILED(hr))
 			{
 				hr = pContextMenu->QueryInterface(IID_PPV_ARGS(&m_pShellContext));
 				m_pActualContext = m_pShellContext.get();
@@ -75,24 +75,21 @@ FileContextMenuManager::FileContextMenuManager(HWND hwnd,
 
 FileContextMenuManager::~FileContextMenuManager()
 {
-	for(auto pidl : m_pidlItems)
+	for (auto pidl : m_pidlItems)
 	{
 		CoTaskMemFree(pidl);
 	}
 }
 
-HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme,
-	int iMinID,int iMaxID,const POINT *ppt,StatusBar *pStatusBar,
-	DWORD_PTR dwData,BOOL bRename,BOOL bExtended)
+HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme, int iMinID, int iMaxID,
+	const POINT *ppt, StatusBar *pStatusBar, DWORD_PTR dwData, BOOL bRename, BOOL bExtended)
 {
-	if(m_pActualContext == NULL)
+	if (m_pActualContext == NULL)
 	{
 		return E_FAIL;
 	}
 
-	if(pfcme == NULL ||
-		iMaxID <= iMinID ||
-		ppt == NULL)
+	if (pfcme == NULL || iMaxID <= iMinID || ppt == NULL)
 	{
 		return E_FAIL;
 	}
@@ -104,81 +101,80 @@ HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme,
 
 	HMENU hMenu = CreatePopupMenu();
 
-	if(hMenu == NULL)
+	if (hMenu == NULL)
 	{
 		return E_FAIL;
 	}
 
 	UINT uFlags = CMF_NORMAL;
 
-	if(bExtended)
+	if (bExtended)
 	{
 		uFlags |= CMF_EXTENDEDVERBS;
 	}
 
-	if(bRename)
+	if (bRename)
 	{
 		uFlags |= CMF_CANRENAME;
 	}
 
-	HRESULT hr = m_pActualContext->QueryContextMenu(hMenu,0,iMinID,
-		iMaxID,uFlags);
+	HRESULT hr = m_pActualContext->QueryContextMenu(hMenu, 0, iMinID, iMaxID, uFlags);
 
-	if(FAILED(hr))
+	if (FAILED(hr))
 	{
 		return hr;
 	}
 
 	/* Allow the caller to add custom entries to the menu. */
-	pfcme->AddMenuEntries(m_pidlParent.get(),m_pidlItems,dwData,hMenu);
+	pfcme->AddMenuEntries(m_pidlParent.get(), m_pidlItems, dwData, hMenu);
 
 	BOOL bWindowSubclassed = FALSE;
 
-	if(m_pShellContext3 != NULL || m_pShellContext2 != NULL)
+	if (m_pShellContext3 != NULL || m_pShellContext2 != NULL)
 	{
 		/* Subclass the owner window, so that the shell can handle menu messages. */
-		bWindowSubclassed = SetWindowSubclass(m_hwnd,ShellMenuHookProcStub,CONTEXT_MENU_SUBCLASS_ID,
-			reinterpret_cast<DWORD_PTR>(this));
+		bWindowSubclassed = SetWindowSubclass(m_hwnd, ShellMenuHookProcStub,
+			CONTEXT_MENU_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 	}
 
-	int iCmd = TrackPopupMenu(hMenu,TPM_LEFTALIGN|TPM_RETURNCMD,ppt->x,ppt->y,
-		0,m_hwnd,NULL);
+	int iCmd =
+		TrackPopupMenu(hMenu, TPM_LEFTALIGN | TPM_RETURNCMD, ppt->x, ppt->y, 0, m_hwnd, NULL);
 
-	if(bWindowSubclassed)
+	if (bWindowSubclassed)
 	{
 		/* Restore previous window procedure. */
-		RemoveWindowSubclass(m_hwnd,ShellMenuHookProcStub,CONTEXT_MENU_SUBCLASS_ID);
+		RemoveWindowSubclass(m_hwnd, ShellMenuHookProcStub, CONTEXT_MENU_SUBCLASS_ID);
 	}
 
 	/* Was a shell menu item selected, or one of the
 	custom entries? */
-	if(iCmd >= iMinID && iCmd <= iMaxID)
+	if (iCmd >= iMinID && iCmd <= iMaxID)
 	{
 		TCHAR szCmd[64];
 
-		hr = m_pActualContext->GetCommandString(iCmd - iMinID,GCS_VERB,
-			NULL,reinterpret_cast<LPSTR>(szCmd),SIZEOF_ARRAY(szCmd));
+		hr = m_pActualContext->GetCommandString(
+			iCmd - iMinID, GCS_VERB, NULL, reinterpret_cast<LPSTR>(szCmd), SIZEOF_ARRAY(szCmd));
 
 		BOOL bHandled = FALSE;
 
 		/* Pass the menu back to the caller to give
 		it the chance to handle it. */
-		if(SUCCEEDED(hr))
+		if (SUCCEEDED(hr))
 		{
-			bHandled = pfcme->HandleShellMenuItem(m_pidlParent.get(),m_pidlItems,dwData,szCmd);
+			bHandled = pfcme->HandleShellMenuItem(m_pidlParent.get(), m_pidlItems, dwData, szCmd);
 		}
 
-		if(!bHandled)
+		if (!bHandled)
 		{
-			CMINVOKECOMMANDINFO	cmici;
+			CMINVOKECOMMANDINFO cmici;
 
-			cmici.cbSize		= sizeof(CMINVOKECOMMANDINFO);
-			cmici.fMask			= 0;
-			cmici.hwnd			= m_hwnd;
-			cmici.lpVerb		= (LPCSTR)MAKEWORD(iCmd - iMinID,0);
-			cmici.lpParameters	= NULL;
-			cmici.lpDirectory	= NULL;
-			cmici.nShow			= SW_SHOW;
+			cmici.cbSize = sizeof(CMINVOKECOMMANDINFO);
+			cmici.fMask = 0;
+			cmici.hwnd = m_hwnd;
+			cmici.lpVerb = (LPCSTR) MAKEWORD(iCmd - iMinID, 0);
+			cmici.lpParameters = NULL;
+			cmici.lpDirectory = NULL;
+			cmici.nShow = SW_SHOW;
 
 			m_pActualContext->InvokeCommand(&cmici);
 		}
@@ -187,7 +183,7 @@ HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme,
 	{
 		/* Custom menu entry, so pass back
 		to caller. */
-		pfcme->HandleCustomMenuItem(m_pidlParent.get(),m_pidlItems,iCmd);
+		pfcme->HandleCustomMenuItem(m_pidlParent.get(), m_pidlItems, iCmd);
 	}
 
 	/* Do NOT destroy the menu until AFTER
@@ -200,91 +196,91 @@ HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme,
 	return S_OK;
 }
 
-LRESULT CALLBACK ShellMenuHookProcStub(HWND hwnd,UINT Msg,WPARAM wParam,
-	LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
+LRESULT CALLBACK ShellMenuHookProcStub(
+	HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
 	auto *pfcmm = reinterpret_cast<FileContextMenuManager *>(dwRefData);
 
-	return pfcmm->ShellMenuHookProc(hwnd,Msg,wParam,lParam);
+	return pfcmm->ShellMenuHookProc(hwnd, Msg, wParam, lParam);
 }
 
-LRESULT CALLBACK FileContextMenuManager::ShellMenuHookProc(HWND hwnd,UINT uMsg,WPARAM wParam,
-	LPARAM lParam)
+LRESULT CALLBACK FileContextMenuManager::ShellMenuHookProc(
+	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	switch(uMsg)
+	switch (uMsg)
 	{
-		case WM_MEASUREITEM:
-			/* wParam is 0 if this item was sent by a menu. */
-			if(wParam == 0)
-			{
-				if(m_pShellContext3 != NULL)
-					m_pShellContext3->HandleMenuMsg2(uMsg,wParam,lParam,NULL);
-				else if(m_pShellContext2 != NULL)
-					m_pShellContext2->HandleMenuMsg(uMsg,wParam,lParam);
+	case WM_MEASUREITEM:
+		/* wParam is 0 if this item was sent by a menu. */
+		if (wParam == 0)
+		{
+			if (m_pShellContext3 != NULL)
+				m_pShellContext3->HandleMenuMsg2(uMsg, wParam, lParam, NULL);
+			else if (m_pShellContext2 != NULL)
+				m_pShellContext2->HandleMenuMsg(uMsg, wParam, lParam);
 
-				return TRUE;
-			}
-			break;
-
-		case WM_DRAWITEM:
-			if(wParam == 0)
-			{
-				if(m_pShellContext3 != NULL)
-					m_pShellContext3->HandleMenuMsg2(uMsg,wParam,lParam,NULL);
-				else if(m_pShellContext2 != NULL)
-					m_pShellContext2->HandleMenuMsg(uMsg,wParam,lParam);
-			}
 			return TRUE;
-			break;
+		}
+		break;
 
-		case WM_INITMENUPOPUP:
+	case WM_DRAWITEM:
+		if (wParam == 0)
+		{
+			if (m_pShellContext3 != NULL)
+				m_pShellContext3->HandleMenuMsg2(uMsg, wParam, lParam, NULL);
+			else if (m_pShellContext2 != NULL)
+				m_pShellContext2->HandleMenuMsg(uMsg, wParam, lParam);
+		}
+		return TRUE;
+		break;
+
+	case WM_INITMENUPOPUP:
+	{
+		if (m_pShellContext3 != NULL)
+			m_pShellContext3->HandleMenuMsg2(uMsg, wParam, lParam, NULL);
+		else if (m_pShellContext2 != NULL)
+			m_pShellContext2->HandleMenuMsg(uMsg, wParam, lParam);
+	}
+	break;
+
+	case WM_MENUSELECT:
+	{
+		if (m_pStatusBar != NULL)
+		{
+			if (HIWORD(wParam) == 0xFFFF && lParam == 0)
 			{
-				if(m_pShellContext3 != NULL)
-					m_pShellContext3->HandleMenuMsg2(uMsg,wParam,lParam,NULL);
-				else if(m_pShellContext2 != NULL)
-					m_pShellContext2->HandleMenuMsg(uMsg,wParam,lParam);
+				m_pStatusBar->HandleStatusBarMenuClose();
 			}
-			break;
-
-		case WM_MENUSELECT:
+			else
 			{
-				if(m_pStatusBar != NULL)
+				m_pStatusBar->HandleStatusBarMenuOpen();
+
+				int iCmd = static_cast<int>(LOWORD(wParam));
+
+				if (!((HIWORD(wParam) & MF_POPUP) == MF_POPUP)
+					&& (iCmd >= m_iMinID && iCmd <= m_iMaxID))
 				{
-					if(HIWORD(wParam) == 0xFFFF && lParam == 0)
+					TCHAR szHelpString[512];
+
+					/* Ask for the help string for the currently selected menu item. */
+					HRESULT hr = m_pActualContext->GetCommandString(iCmd - m_iMinID, GCS_HELPTEXT,
+						NULL, reinterpret_cast<LPSTR>(szHelpString), SIZEOF_ARRAY(szHelpString));
+
+					/* If the help string was found, send it to the status bar. */
+					if (hr == NOERROR)
 					{
-						m_pStatusBar->HandleStatusBarMenuClose();
+						m_pStatusBar->SetPartText(0, szHelpString);
 					}
-					else
-					{
-						m_pStatusBar->HandleStatusBarMenuOpen();
-
-						int iCmd = static_cast<int>(LOWORD(wParam));
-
-						if(!((HIWORD(wParam) & MF_POPUP) == MF_POPUP) &&
-							(iCmd >= m_iMinID && iCmd <= m_iMaxID))
-						{
-							TCHAR szHelpString[512];
-
-							/* Ask for the help string for the currently selected menu item. */
-							HRESULT hr = m_pActualContext->GetCommandString(iCmd - m_iMinID,GCS_HELPTEXT,
-								NULL,reinterpret_cast<LPSTR>(szHelpString),SIZEOF_ARRAY(szHelpString));
-
-							/* If the help string was found, send it to the status bar. */
-							if(hr == NOERROR)
-							{
-								m_pStatusBar->SetPartText(0,szHelpString);
-							}
-						}
-					}
-
-					/* Prevent the message from been passed onto the original window. */
-					return 0;
 				}
 			}
-			break;
+
+			/* Prevent the message from been passed onto the original window. */
+			return 0;
+		}
+	}
+	break;
 	}
 
-	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
+	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
