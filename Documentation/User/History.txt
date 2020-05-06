@@ -24,6 +24,13 @@ New features:
   - When a bookmark is copied, the location of the bookmark is
     also copied as plain text. This makes it possible to paste
     the location into other applications.
+  - Bookmarks can now be dragged and dropped between the bookmark
+    windows.
+  - Bookmarks on the bookmarks toolbar can now be arranged via
+    drag and drop.
+  - Right-clicking an item in the dropdown shown when clicking a
+    folder on the bookmarks toolbar now shows the appropriate
+    context menu.
   - In addition to being able to bookmark the current tab, it's
     also possible to bookmark all open tabs.
   - When a bookmark is displayed, the icon for the associated
