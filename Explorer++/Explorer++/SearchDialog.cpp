@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "SearchDialog.h"
 #include "CoreInterface.h"
-#include "DialogHelper.h"
+#include "DialogConstants.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -1236,8 +1236,8 @@ void SearchDialog::SaveState()
 
 SearchDialogPersistentSettings::SearchDialogPersistentSettings() :
 	DialogSettings(SETTINGS_KEY),
-	m_searchPatterns(NDialogHelper::DEFAULT_HISTORY_SIZE),
-	m_searchDirectories(NDialogHelper::DEFAULT_HISTORY_SIZE)
+	m_searchPatterns(DialogConstants::DEFAULT_HISTORY_SIZE),
+	m_searchDirectories(DialogConstants::DEFAULT_HISTORY_SIZE)
 {
 	m_bSearchSubFolders			= TRUE;
 	m_bUseRegularExpressions	= FALSE;

@@ -3,7 +3,6 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "DialogHelper.h"
 #include "Explorer++.h"
 #include "Bookmarks/UI/AddBookmarkDialog.h"
 #include "Bookmarks/UI/ManageBookmarksDialog.h"

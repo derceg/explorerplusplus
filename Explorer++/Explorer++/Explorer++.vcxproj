@@ -659,7 +659,7 @@
     <ClInclude Include="DefaultColumns.h" />
     <ClInclude Include="DefaultToolbarButtons.h" />
     <ClInclude Include="DestroyFilesDialog.h" />
-    <ClInclude Include="DialogHelper.h" />
+    <ClInclude Include="DialogConstants.h" />
     <ClInclude Include="DisplayColoursDialog.h" />
     <ClInclude Include="DisplayWindow\DisplayWindow.h" />
     <ClInclude Include="DrivesToolbar.h" />

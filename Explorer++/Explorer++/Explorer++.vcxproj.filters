@@ -474,9 +474,6 @@
     <ClInclude Include="DisplayColoursDialog.h">
       <Filter>General Dialogs</Filter>
     </ClInclude>
-    <ClInclude Include="DialogHelper.h">
-      <Filter>Dialog Support</Filter>
-    </ClInclude>
     <ClInclude Include="DrivesToolbar.h">
       <Filter>Drives Toolbar</Filter>
     </ClInclude>
@@ -875,6 +872,9 @@
     </ClInclude>
     <ClInclude Include="Bookmarks\BookmarkIconManager.h">
       <Filter>Bookmarks</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogConstants.h">
+      <Filter>Dialog Support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
