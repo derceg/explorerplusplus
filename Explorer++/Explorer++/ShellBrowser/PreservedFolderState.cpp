@@ -9,5 +9,4 @@
 PreservedFolderState::PreservedFolderState(const ShellBrowser *shellBrowser) :
 	folderSettings(shellBrowser->GetFolderSettings())
 {
-
 }

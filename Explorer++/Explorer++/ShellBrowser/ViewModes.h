@@ -6,6 +6,7 @@
 
 #include "BetterEnumsWrapper.h"
 
+// clang-format off
 BETTER_ENUM(ViewMode, int,
 	Icons = 1,
 	SmallIcons = 2,
@@ -16,6 +17,7 @@ BETTER_ENUM(ViewMode, int,
 	ExtraLargeIcons = 7,
 	LargeIcons = 8
 )
+// clang-format on
 
 int GetViewModeMenuId(ViewMode viewMode);
 int GetViewModeMenuStringId(ViewMode viewMode);

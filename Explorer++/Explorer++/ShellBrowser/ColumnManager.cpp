@@ -29,10 +29,12 @@ void ShellBrowser::QueueColumnTask(int itemInternalIndex, int columnIndex)
 	BasicItemInfo_t basicItemInfo = getBasicItemInfo(itemInternalIndex);
 	GlobalFolderSettings globalFolderSettings = m_config->globalFolderSettings;
 
-	auto result = m_columnThreadPool.push([this, columnResultID, columnID, itemInternalIndex, basicItemInfo, globalFolderSettings](int id) {
+	auto result = m_columnThreadPool.push([this, columnResultID, columnID, itemInternalIndex,
+											  basicItemInfo, globalFolderSettings](int id) {
 		UNREFERENCED_PARAMETER(id);
 
-		return GetColumnTextAsync(m_hListView, columnResultID, *columnID, itemInternalIndex, basicItemInfo, globalFolderSettings);
+		return GetColumnTextAsync(m_hListView, columnResultID, *columnID, itemInternalIndex,
+			basicItemInfo, globalFolderSettings);
 	});
 
 	// The function call above might finish before this line runs,
@@ -42,8 +44,9 @@ void ShellBrowser::QueueColumnTask(int itemInternalIndex, int columnIndex)
 	m_columnResults.insert({ columnResultID, std::move(result) });
 }
 
-ShellBrowser::ColumnResult_t ShellBrowser::GetColumnTextAsync(HWND listView, int columnResultId, unsigned int columnID,
-	int internalIndex, const BasicItemInfo_t &basicItemInfo, const GlobalFolderSettings &globalFolderSettings)
+ShellBrowser::ColumnResult_t ShellBrowser::GetColumnTextAsync(HWND listView, int columnResultId,
+	unsigned int columnID, int internalIndex, const BasicItemInfo_t &basicItemInfo,
+	const GlobalFolderSettings &globalFolderSettings)
 {
 	std::wstring columnText = GetColumnText(columnID, basicItemInfo, globalFolderSettings);
 
@@ -144,100 +147,99 @@ std::optional<unsigned int> ShellBrowser::GetColumnIdByIndex(int index) const
 
 void ShellBrowser::PlaceColumns()
 {
-	int							iColumnIndex = 0;
-	int							i = 0;
+	int iColumnIndex = 0;
+	int i = 0;
 
 	m_nActiveColumns = 0;
 
-	if(m_pActiveColumns != nullptr)
+	if (m_pActiveColumns != nullptr)
 	{
-		for(auto itr = m_pActiveColumns->begin();itr != m_pActiveColumns->end();itr++)
+		for (auto itr = m_pActiveColumns->begin(); itr != m_pActiveColumns->end(); itr++)
 		{
-			if(itr->bChecked)
+			if (itr->bChecked)
 			{
-				InsertColumn(itr->id,iColumnIndex,itr->iWidth);
+				InsertColumn(itr->id, iColumnIndex, itr->iWidth);
 
 				/* Do NOT set column widths here. For some reason, this causes list mode to
 				break. (If this code is active, and the listview starts of in details mode
 				and is then switched to list mode, no items will be shown; they appear to
 				be placed off the left edge of the listview). */
-				//ListView_SetColumnWidth(m_hListView,iColumnIndex,LVSCW_AUTOSIZE_USEHEADER);
+				// ListView_SetColumnWidth(m_hListView,iColumnIndex,LVSCW_AUTOSIZE_USEHEADER);
 
 				iColumnIndex++;
 				m_nActiveColumns++;
 			}
 		}
 
-		for(i = m_nCurrentColumns + m_nActiveColumns;i >= m_nActiveColumns;i--)
+		for (i = m_nCurrentColumns + m_nActiveColumns; i >= m_nActiveColumns; i--)
 		{
-			ListView_DeleteColumn(m_hListView,i);
+			ListView_DeleteColumn(m_hListView, i);
 		}
 
 		m_nCurrentColumns = m_nActiveColumns;
 	}
 }
 
-void ShellBrowser::InsertColumn(unsigned int columnId,int iColumnIndex,int iWidth)
+void ShellBrowser::InsertColumn(unsigned int columnId, int iColumnIndex, int iWidth)
 {
-	HWND		hHeader;
-	HDITEM		hdItem;
-	LV_COLUMN	lvColumn;
-	TCHAR		szText[64];
-	int			iActualColumnIndex;
-	int			iStringIndex;
+	HWND hHeader;
+	HDITEM hdItem;
+	LV_COLUMN lvColumn;
+	TCHAR szText[64];
+	int iActualColumnIndex;
+	int iStringIndex;
 
 	iStringIndex = LookupColumnNameStringIndex(columnId);
 
-	LoadString(m_hResourceModule,iStringIndex,
-		szText,SIZEOF_ARRAY(szText));
+	LoadString(m_hResourceModule, iStringIndex, szText, SIZEOF_ARRAY(szText));
 
-	lvColumn.mask		= LVCF_TEXT|LVCF_WIDTH;
-	lvColumn.pszText	= szText;
-	lvColumn.cx			= iWidth;
+	lvColumn.mask = LVCF_TEXT | LVCF_WIDTH;
+	lvColumn.pszText = szText;
+	lvColumn.cx = iWidth;
 
-	if(columnId == CM_SIZE || columnId == CM_REALSIZE || 
-		columnId == CM_TOTALSIZE || columnId == CM_FREESPACE)
+	if (columnId == CM_SIZE || columnId == CM_REALSIZE || columnId == CM_TOTALSIZE
+		|| columnId == CM_FREESPACE)
 	{
-		lvColumn.mask	|= LVCF_FMT;
-		lvColumn.fmt	= LVCFMT_RIGHT;
+		lvColumn.mask |= LVCF_FMT;
+		lvColumn.fmt = LVCFMT_RIGHT;
 	}
 
-	iActualColumnIndex = ListView_InsertColumn(m_hListView,iColumnIndex,&lvColumn);
+	iActualColumnIndex = ListView_InsertColumn(m_hListView, iColumnIndex, &lvColumn);
 
 	hHeader = ListView_GetHeader(m_hListView);
 
 	/* Store the column's ID with the column itself. */
-	hdItem.mask		= HDI_LPARAM;
-	hdItem.lParam	= columnId;
+	hdItem.mask = HDI_LPARAM;
+	hdItem.lParam = columnId;
 
-	Header_SetItem(hHeader,iActualColumnIndex,&hdItem);
+	Header_SetItem(hHeader, iActualColumnIndex, &hdItem);
 }
 
 void ShellBrowser::SetActiveColumnSet()
 {
 	std::vector<Column_t> *pActiveColumns = nullptr;
 
-	if(CompareVirtualFolders(CSIDL_CONTROLS))
+	if (CompareVirtualFolders(CSIDL_CONTROLS))
 	{
 		pActiveColumns = &m_folderColumns.controlPanelColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_DRIVES))
+	else if (CompareVirtualFolders(CSIDL_DRIVES))
 	{
 		pActiveColumns = &m_folderColumns.myComputerColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_BITBUCKET))
+	else if (CompareVirtualFolders(CSIDL_BITBUCKET))
 	{
 		pActiveColumns = &m_folderColumns.recycleBinColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_PRINTERS))
+	else if (CompareVirtualFolders(CSIDL_PRINTERS))
 	{
 		pActiveColumns = &m_folderColumns.printersColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_CONNECTIONS))
+	else if (CompareVirtualFolders(CSIDL_CONNECTIONS))
 	{
 		pActiveColumns = &m_folderColumns.networkConnectionsColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_NETWORK))
+	else if (CompareVirtualFolders(CSIDL_NETWORK))
 	{
 		pActiveColumns = &m_folderColumns.myNetworkPlacesColumns;
 	}
@@ -251,7 +253,7 @@ void ShellBrowser::SetActiveColumnSet()
 	current folder and previous folder are of a
 	different 'type'), set the new columns, and
 	place them (else do nothing). */
-	if(m_pActiveColumns != pActiveColumns)
+	if (m_pActiveColumns != pActiveColumns)
 	{
 		m_pActiveColumns = pActiveColumns;
 		m_bColumnsPlaced = FALSE;
@@ -260,197 +262,197 @@ void ShellBrowser::SetActiveColumnSet()
 
 SortMode ShellBrowser::DetermineColumnSortMode(int iColumnId)
 {
-	switch(iColumnId)
+	switch (iColumnId)
 	{
-		case CM_NAME:
-			return SortMode::Name;
+	case CM_NAME:
+		return SortMode::Name;
 
-		case CM_TYPE:
-			return SortMode::Type;
+	case CM_TYPE:
+		return SortMode::Type;
 
-		case CM_SIZE:
-			return SortMode::Size;
+	case CM_SIZE:
+		return SortMode::Size;
 
-		case CM_DATEMODIFIED:
-			return SortMode::DateModified;
+	case CM_DATEMODIFIED:
+		return SortMode::DateModified;
 
-		case CM_ATTRIBUTES:
-			return SortMode::Attributes;
+	case CM_ATTRIBUTES:
+		return SortMode::Attributes;
 
-		case CM_REALSIZE:
-			return SortMode::RealSize;
+	case CM_REALSIZE:
+		return SortMode::RealSize;
 
-		case CM_SHORTNAME:
-			return SortMode::ShortName;
+	case CM_SHORTNAME:
+		return SortMode::ShortName;
 
-		case CM_OWNER:
-			return SortMode::Owner;
+	case CM_OWNER:
+		return SortMode::Owner;
 
-		case CM_PRODUCTNAME:
-			return SortMode::ProductName;
+	case CM_PRODUCTNAME:
+		return SortMode::ProductName;
 
-		case CM_COMPANY:
-			return SortMode::Company;
+	case CM_COMPANY:
+		return SortMode::Company;
 
-		case CM_DESCRIPTION:
-			return SortMode::Description;
+	case CM_DESCRIPTION:
+		return SortMode::Description;
 
-		case CM_FILEVERSION:
-			return SortMode::FileVersion;
+	case CM_FILEVERSION:
+		return SortMode::FileVersion;
 
-		case CM_PRODUCTVERSION:
-			return SortMode::ProductVersion;
+	case CM_PRODUCTVERSION:
+		return SortMode::ProductVersion;
 
-		case CM_SHORTCUTTO:
-			return SortMode::ShortcutTo;
+	case CM_SHORTCUTTO:
+		return SortMode::ShortcutTo;
 
-		case CM_HARDLINKS:
-			return SortMode::HardLinks;
+	case CM_HARDLINKS:
+		return SortMode::HardLinks;
 
-		case CM_EXTENSION:
-			return SortMode::Extension;
+	case CM_EXTENSION:
+		return SortMode::Extension;
 
-		case CM_CREATED:
-			return SortMode::Created;
+	case CM_CREATED:
+		return SortMode::Created;
 
-		case CM_ACCESSED:
-			return SortMode::Accessed;
+	case CM_ACCESSED:
+		return SortMode::Accessed;
 
-		case CM_TITLE:
-			return SortMode::Title;
+	case CM_TITLE:
+		return SortMode::Title;
 
-		case CM_SUBJECT:
-			return SortMode::Subject;
+	case CM_SUBJECT:
+		return SortMode::Subject;
 
-		case CM_AUTHORS:
-			return SortMode::Authors;
+	case CM_AUTHORS:
+		return SortMode::Authors;
 
-		case CM_KEYWORDS:
-			return SortMode::Keywords;
+	case CM_KEYWORDS:
+		return SortMode::Keywords;
 
-		case CM_COMMENT:
-			return SortMode::Comments;
+	case CM_COMMENT:
+		return SortMode::Comments;
 
-		case CM_CAMERAMODEL:
-			return SortMode::CameraModel;
+	case CM_CAMERAMODEL:
+		return SortMode::CameraModel;
 
-		case CM_DATETAKEN:
-			return SortMode::DateTaken;
+	case CM_DATETAKEN:
+		return SortMode::DateTaken;
 
-		case CM_WIDTH:
-			return SortMode::Width;
+	case CM_WIDTH:
+		return SortMode::Width;
 
-		case CM_HEIGHT:
-			return SortMode::Height;
+	case CM_HEIGHT:
+		return SortMode::Height;
 
-		case CM_VIRTUALCOMMENTS:
-			return SortMode::VirtualComments;
+	case CM_VIRTUALCOMMENTS:
+		return SortMode::VirtualComments;
 
-		case CM_TOTALSIZE:
-			return SortMode::TotalSize;
+	case CM_TOTALSIZE:
+		return SortMode::TotalSize;
 
-		case CM_FREESPACE:
-			return SortMode::FreeSpace;
+	case CM_FREESPACE:
+		return SortMode::FreeSpace;
 
-		case CM_FILESYSTEM:
-			return SortMode::FileSystem;
+	case CM_FILESYSTEM:
+		return SortMode::FileSystem;
 
-		case CM_ORIGINALLOCATION:
-			return SortMode::OriginalLocation;
+	case CM_ORIGINALLOCATION:
+		return SortMode::OriginalLocation;
 
-		case CM_DATEDELETED:
-			return SortMode::DateDeleted;
+	case CM_DATEDELETED:
+		return SortMode::DateDeleted;
 
-		case CM_NUMPRINTERDOCUMENTS:
-			return SortMode::NumPrinterDocuments;
+	case CM_NUMPRINTERDOCUMENTS:
+		return SortMode::NumPrinterDocuments;
 
-		case CM_PRINTERSTATUS:
-			return SortMode::PrinterStatus;
+	case CM_PRINTERSTATUS:
+		return SortMode::PrinterStatus;
 
-		case CM_PRINTERCOMMENTS:
-			return SortMode::PrinterComments;
+	case CM_PRINTERCOMMENTS:
+		return SortMode::PrinterComments;
 
-		case CM_PRINTERLOCATION:
-			return SortMode::PrinterLocation;
+	case CM_PRINTERLOCATION:
+		return SortMode::PrinterLocation;
 
-		case CM_NETWORKADAPTER_STATUS:
-			return SortMode::NetworkAdapterStatus;
+	case CM_NETWORKADAPTER_STATUS:
+		return SortMode::NetworkAdapterStatus;
 
-		case CM_MEDIA_BITRATE:
-			return SortMode::MediaBitrate;
+	case CM_MEDIA_BITRATE:
+		return SortMode::MediaBitrate;
 
-		case CM_MEDIA_COPYRIGHT:
-			return SortMode::MediaCopyright;
+	case CM_MEDIA_COPYRIGHT:
+		return SortMode::MediaCopyright;
 
-		case CM_MEDIA_DURATION:
-			return SortMode::MediaDuration;
+	case CM_MEDIA_DURATION:
+		return SortMode::MediaDuration;
 
-		case CM_MEDIA_PROTECTED:
-			return SortMode::MediaProtected;
+	case CM_MEDIA_PROTECTED:
+		return SortMode::MediaProtected;
 
-		case CM_MEDIA_RATING:
-			return SortMode::MediaRating;
+	case CM_MEDIA_RATING:
+		return SortMode::MediaRating;
 
-		case CM_MEDIA_ALBUMARTIST:
-			return SortMode::MediaAlbumArtist;
+	case CM_MEDIA_ALBUMARTIST:
+		return SortMode::MediaAlbumArtist;
 
-		case CM_MEDIA_ALBUM:
-			return SortMode::MediaAlbum;
+	case CM_MEDIA_ALBUM:
+		return SortMode::MediaAlbum;
 
-		case CM_MEDIA_BEATSPERMINUTE:
-			return SortMode::MediaBeatsPerMinute;
+	case CM_MEDIA_BEATSPERMINUTE:
+		return SortMode::MediaBeatsPerMinute;
 
-		case CM_MEDIA_COMPOSER:
-			return SortMode::MediaComposer;
+	case CM_MEDIA_COMPOSER:
+		return SortMode::MediaComposer;
 
-		case CM_MEDIA_CONDUCTOR:
-			return SortMode::MediaConductor;
+	case CM_MEDIA_CONDUCTOR:
+		return SortMode::MediaConductor;
 
-		case CM_MEDIA_DIRECTOR:
-			return SortMode::MediaDirector;
+	case CM_MEDIA_DIRECTOR:
+		return SortMode::MediaDirector;
 
-		case CM_MEDIA_GENRE:
-			return SortMode::MediaGenre;
+	case CM_MEDIA_GENRE:
+		return SortMode::MediaGenre;
 
-		case CM_MEDIA_LANGUAGE:
-			return SortMode::MediaLanguage;
+	case CM_MEDIA_LANGUAGE:
+		return SortMode::MediaLanguage;
 
-		case CM_MEDIA_BROADCASTDATE:
-			return SortMode::MediaBroadcastDate;
+	case CM_MEDIA_BROADCASTDATE:
+		return SortMode::MediaBroadcastDate;
 
-		case CM_MEDIA_CHANNEL:
-			return SortMode::MediaChannel;
+	case CM_MEDIA_CHANNEL:
+		return SortMode::MediaChannel;
 
-		case CM_MEDIA_STATIONNAME:
-			return SortMode::MediaStationName;
+	case CM_MEDIA_STATIONNAME:
+		return SortMode::MediaStationName;
 
-		case CM_MEDIA_MOOD:
-			return SortMode::MediaMood;
+	case CM_MEDIA_MOOD:
+		return SortMode::MediaMood;
 
-		case CM_MEDIA_PARENTALRATING:
-			return SortMode::MediaParentalRating;
+	case CM_MEDIA_PARENTALRATING:
+		return SortMode::MediaParentalRating;
 
-		case CM_MEDIA_PARENTALRATINGREASON:
-			return SortMode::MediaParentalRatingReason;
+	case CM_MEDIA_PARENTALRATINGREASON:
+		return SortMode::MediaParentalRatingReason;
 
-		case CM_MEDIA_PERIOD:
-			return SortMode::MediaPeriod;
+	case CM_MEDIA_PERIOD:
+		return SortMode::MediaPeriod;
 
-		case CM_MEDIA_PRODUCER:
-			return SortMode::MediaProducer;
+	case CM_MEDIA_PRODUCER:
+		return SortMode::MediaProducer;
 
-		case CM_MEDIA_PUBLISHER:
-			return SortMode::MediaPublisher;
+	case CM_MEDIA_PUBLISHER:
+		return SortMode::MediaPublisher;
 
-		case CM_MEDIA_WRITER:
-			return SortMode::MediaWriter;
+	case CM_MEDIA_WRITER:
+		return SortMode::MediaWriter;
 
-		case CM_MEDIA_YEAR:
-			return SortMode::MediaYear;
+	case CM_MEDIA_YEAR:
+		return SortMode::MediaYear;
 
-		default:
-			assert(false);
-			break;
+	default:
+		assert(false);
+		break;
 	}
 
 	return SortMode::Name;
@@ -783,12 +785,12 @@ void ShellBrowser::ColumnClicked(int iClickedColumn)
 	SortMode sortMode = SortMode::Name;
 	UINT iColumnId = 0;
 
-	for(auto itr = m_pActiveColumns->begin();itr != m_pActiveColumns->end();itr++)
+	for (auto itr = m_pActiveColumns->begin(); itr != m_pActiveColumns->end(); itr++)
 	{
 		/* Only increment if this column is actually been shown. */
-		if(itr->bChecked)
+		if (itr->bChecked)
 		{
-			if(iCurrentColumn == iClickedColumn)
+			if (iCurrentColumn == iClickedColumn)
 			{
 				sortMode = DetermineColumnSortMode(itr->id);
 				iColumnId = itr->id;
@@ -803,7 +805,7 @@ void ShellBrowser::ColumnClicked(int iClickedColumn)
 	ascending/descending sort state. Use unique
 	column ID, not index, as columns may be
 	inserted/deleted. */
-	if(m_iPreviousSortedColumnId == iColumnId)
+	if (m_iPreviousSortedColumnId == iColumnId)
 	{
 		m_folderSettings.sortAscending = !m_folderSettings.sortAscending;
 	}
@@ -862,11 +864,11 @@ void ShellBrowser::ApplyHeaderSortArrow()
 	}
 
 	/* Find the index of the column representing the current sort mode. */
-	for(auto itr = m_pActiveColumns->begin();itr != m_pActiveColumns->end();itr++)
+	for (auto itr = m_pActiveColumns->begin(); itr != m_pActiveColumns->end(); itr++)
 	{
-		if(itr->bChecked)
+		if (itr->bChecked)
 		{
-			if(DetermineColumnSortMode(itr->id) == m_folderSettings.sortMode)
+			if (DetermineColumnSortMode(itr->id) == m_folderSettings.sortMode)
 			{
 				iColumnId = itr->id;
 				break;
@@ -877,16 +879,16 @@ void ShellBrowser::ApplyHeaderSortArrow()
 	}
 
 	hdItem.mask = HDI_FORMAT;
-	Header_GetItem(hHeader,iColumn,&hdItem);
+	Header_GetItem(hHeader, iColumn, &hdItem);
 
-	if(!m_folderSettings.sortAscending)
+	if (!m_folderSettings.sortAscending)
 		hdItem.fmt |= HDF_SORTDOWN;
 	else
 		hdItem.fmt |= HDF_SORTUP;
 
 	/* Add the up/down arrow to the column by which
 	items are now sorted. */
-	Header_SetItem(hHeader,iColumn,&hdItem);
+	Header_SetItem(hHeader, iColumn, &hdItem);
 
 	m_iPreviousSortedColumnId = iColumnId;
 	m_PreviousSortColumnExists = true;
@@ -914,27 +916,27 @@ void ShellBrowser::SaveColumnWidths()
 	std::vector<Column_t> *pActiveColumns = nullptr;
 	int iColumn = 0;
 
-	if(CompareVirtualFolders(CSIDL_CONTROLS))
+	if (CompareVirtualFolders(CSIDL_CONTROLS))
 	{
 		pActiveColumns = &m_folderColumns.controlPanelColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_DRIVES))
+	else if (CompareVirtualFolders(CSIDL_DRIVES))
 	{
 		pActiveColumns = &m_folderColumns.myComputerColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_BITBUCKET))
+	else if (CompareVirtualFolders(CSIDL_BITBUCKET))
 	{
 		pActiveColumns = &m_folderColumns.recycleBinColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_PRINTERS))
+	else if (CompareVirtualFolders(CSIDL_PRINTERS))
 	{
 		pActiveColumns = &m_folderColumns.printersColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_CONNECTIONS))
+	else if (CompareVirtualFolders(CSIDL_CONNECTIONS))
 	{
 		pActiveColumns = &m_folderColumns.networkConnectionsColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_NETWORK))
+	else if (CompareVirtualFolders(CSIDL_NETWORK))
 	{
 		pActiveColumns = &m_folderColumns.myNetworkPlacesColumns;
 	}
@@ -946,13 +948,13 @@ void ShellBrowser::SaveColumnWidths()
 	/* Only save column widths if the listview is currently in
 	details view. If it's not currently in details view, then
 	column widths have already been saved when the view changed. */
-	if(m_folderSettings.viewMode == +ViewMode::Details)
+	if (m_folderSettings.viewMode == +ViewMode::Details)
 	{
-		for(auto itr = pActiveColumns->begin();itr != pActiveColumns->end();itr++)
+		for (auto itr = pActiveColumns->begin(); itr != pActiveColumns->end(); itr++)
 		{
-			if(itr->bChecked)
+			if (itr->bChecked)
 			{
-				itr->iWidth = ListView_GetColumnWidth(m_hListView,iColumn);
+				itr->iWidth = ListView_GetColumnWidth(m_hListView, iColumn);
 
 				iColumn++;
 			}
@@ -1019,8 +1021,7 @@ void ShellBrowser::ImportColumns(const std::vector<Column_t> &columns)
 			{
 				for (auto itr2 = m_pActiveColumns->begin(); itr2 != m_pActiveColumns->end(); itr2++)
 				{
-					if (itr2->id == itr->id &&
-						!itr2->bChecked)
+					if (itr2->id == itr->id && !itr2->bChecked)
 					{
 						InsertColumn(itr->id, iColumn, itr->iWidth);
 
@@ -1049,8 +1050,7 @@ void ShellBrowser::ImportColumns(const std::vector<Column_t> &columns)
 		{
 			for (auto itr2 = m_pActiveColumns->begin(); itr2 != m_pActiveColumns->end(); itr2++)
 			{
-				if (itr2->id == itr->id &&
-					itr2->bChecked)
+				if (itr2->id == itr->id && itr2->bChecked)
 
 				{
 					ListView_DeleteColumn(m_hListView, iColumn);

@@ -22,9 +22,10 @@
 #include <wil/com.h>
 #include <list>
 
-#pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
+#pragma warning(                                                                                   \
+	disable : 4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
-void CALLBACK TimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime);
+void CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 
 int ShellBrowser::listViewParentSubclassIdCounter = 0;
 
@@ -89,11 +90,11 @@ ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
 	TabNavigationInterface *tabNavigation,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState) :
-	ShellBrowser(id, resourceInstance, hOwner, cachedIcons, iconResourceLoader, config, tabNavigation,
-		preservedFolderState.folderSettings, std::nullopt)
+	ShellBrowser(id, resourceInstance, hOwner, cachedIcons, iconResourceLoader, config,
+		tabNavigation, preservedFolderState.folderSettings, std::nullopt)
 {
-	m_navigationController = std::make_unique<ShellNavigationController>(this, tabNavigation, m_iconFetcher.get(),
-		history, currentEntry);
+	m_navigationController = std::make_unique<ShellNavigationController>(
+		this, tabNavigation, m_iconFetcher.get(), history, currentEntry);
 }
 
 ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
@@ -120,7 +121,8 @@ ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
 
 	m_hListView = SetUpListView(hOwner);
 	m_iconFetcher = std::make_unique<IconFetcher>(m_hListView, cachedIcons);
-	m_navigationController = std::make_unique<ShellNavigationController>(this, tabNavigation, m_iconFetcher.get());
+	m_navigationController =
+		std::make_unique<ShellNavigationController>(this, tabNavigation, m_iconFetcher.get());
 
 	InitializeDragDropHelpers();
 
@@ -149,7 +151,7 @@ ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
 	m_iFolderIcon = GetDefaultFolderIconIndex();
 	m_iFileIcon = GetDefaultFileIconIndex();
 
-	m_thumbnailThreadPool.push([] (int id) {
+	m_thumbnailThreadPool.push([](int id) {
 		UNREFERENCED_PARAMETER(id);
 
 		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
@@ -164,7 +166,7 @@ ShellBrowser::~ShellBrowser()
 	m_thumbnailThreadPool.clear_queue();
 	m_infoTipsThreadPool.clear_queue();
 
-	m_thumbnailThreadPool.push([] (int id) {
+	m_thumbnailThreadPool.push([](int id) {
 		UNREFERENCED_PARAMETER(id);
 
 		CoUninitialize();
@@ -181,9 +183,10 @@ ShellBrowser::~ShellBrowser()
 
 HWND ShellBrowser::SetUpListView(HWND parent)
 {
-	HWND hListView = CreateListView(parent, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS |
-		WS_CLIPCHILDREN | LVS_ICON | LVS_EDITLABELS | LVS_SHOWSELALWAYS |
-		LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | WS_TABSTOP | LVS_ALIGNTOP);
+	HWND hListView = CreateListView(parent,
+		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | LVS_ICON | LVS_EDITLABELS
+			| LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | WS_TABSTOP
+			| LVS_ALIGNTOP);
 
 	if (hListView == nullptr)
 	{
@@ -212,13 +215,14 @@ HWND ShellBrowser::SetUpListView(HWND parent)
 		ListViewHelper::SetBackgroundImage(hListView, IDB_FILTERINGAPPLIED);
 	}
 
-	ListViewHelper::ActivateOneClickSelect(hListView, m_config->globalFolderSettings.oneClickActivate,
+	ListViewHelper::ActivateOneClickSelect(hListView,
+		m_config->globalFolderSettings.oneClickActivate,
 		m_config->globalFolderSettings.oneClickActivateHoverTime);
 
 	SetWindowTheme(hListView, L"Explorer", nullptr);
 
-	m_windowSubclasses.emplace_back(hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID,
-		reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.emplace_back(
+		hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
 	m_windowSubclasses.emplace_back(parent, ListViewParentProcStub,
 		listViewParentSubclassIdCounter++, reinterpret_cast<DWORD_PTR>(this));
@@ -283,7 +287,8 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 	{
 		wil::com_ptr<IImageList> pImageList;
 		SHGetImageList(SHIL_JUMBO, IID_PPV_ARGS(&pImageList));
-		ListView_SetImageList(m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_NORMAL);
+		ListView_SetImageList(
+			m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_NORMAL);
 	}
 	break;
 
@@ -291,7 +296,8 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 	{
 		wil::com_ptr<IImageList> pImageList;
 		SHGetImageList(SHIL_EXTRALARGE, IID_PPV_ARGS(&pImageList));
-		ListView_SetImageList(m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_NORMAL);
+		ListView_SetImageList(
+			m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_NORMAL);
 	}
 	break;
 
@@ -304,7 +310,8 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 	{
 		wil::com_ptr<IImageList> pImageList;
 		SHGetImageList(SHIL_LARGE, IID_PPV_ARGS(&pImageList));
-		ListView_SetImageList(m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_NORMAL);
+		ListView_SetImageList(
+			m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_NORMAL);
 	}
 	break;
 
@@ -314,7 +321,8 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 	{
 		wil::com_ptr<IImageList> pImageList;
 		SHGetImageList(SHIL_SMALL, IID_PPV_ARGS(&pImageList));
-		ListView_SetImageList(m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_SMALL);
+		ListView_SetImageList(
+			m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_SMALL);
 	}
 	break;
 	}
@@ -410,8 +418,8 @@ HRESULT ShellBrowser::InitializeDragDropHelpers()
 	HRESULT hr;
 
 	/* Initialize the drag source helper, and use it to initialize the drop target helper. */
-	hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_INPROC_SERVER,
-		IID_PPV_ARGS(&m_pDragSourceHelper));
+	hr = CoCreateInstance(
+		CLSID_DragDropHelper, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_pDragSourceHelper));
 
 	if (SUCCEEDED(hr))
 	{
@@ -438,33 +446,34 @@ void ShellBrowser::OnGridlinesSettingChanged()
 
 BOOL ShellBrowser::IsFilenameFiltered(const TCHAR *FileName) const
 {
-	if(CheckWildcardMatch(m_folderSettings.filter.c_str(),FileName,m_folderSettings.filterCaseSensitive))
+	if (CheckWildcardMatch(
+			m_folderSettings.filter.c_str(), FileName, m_folderSettings.filterCaseSensitive))
 		return FALSE;
 
 	return TRUE;
 }
 
-int ShellBrowser::GetItemDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const
+int ShellBrowser::GetItemDisplayName(int iItem, UINT BufferSize, TCHAR *Buffer) const
 {
 	int internalIndex = GetItemInternalIndex(iItem);
-	StringCchCopy(Buffer,BufferSize,m_itemInfoMap.at(internalIndex).wfd.cFileName);
+	StringCchCopy(Buffer, BufferSize, m_itemInfoMap.at(internalIndex).wfd.cFileName);
 
 	return lstrlen(Buffer);
 }
 
-HRESULT ShellBrowser::GetItemFullName(int iIndex,TCHAR *FullItemPath,UINT cchMax) const
+HRESULT ShellBrowser::GetItemFullName(int iIndex, TCHAR *FullItemPath, UINT cchMax) const
 {
-	LVITEM			lvItem;
-	BOOL			bRes;
+	LVITEM lvItem;
+	BOOL bRes;
 
-	lvItem.mask		= LVIF_PARAM;
-	lvItem.iItem	= iIndex;
-	lvItem.iSubItem	= 0;
-	bRes = ListView_GetItem(m_hListView,&lvItem);
+	lvItem.mask = LVIF_PARAM;
+	lvItem.iItem = iIndex;
+	lvItem.iSubItem = 0;
+	bRes = ListView_GetItem(m_hListView, &lvItem);
 
-	if(bRes)
+	if (bRes)
 	{
-		QueryFullItemNameInternal((int)lvItem.lParam,FullItemPath,cchMax);
+		QueryFullItemNameInternal((int) lvItem.lParam, FullItemPath, cchMax);
 
 		return S_OK;
 	}
@@ -472,9 +481,11 @@ HRESULT ShellBrowser::GetItemFullName(int iIndex,TCHAR *FullItemPath,UINT cchMax
 	return E_FAIL;
 }
 
-void ShellBrowser::QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName,UINT cchMax) const
+void ShellBrowser::QueryFullItemNameInternal(
+	int iItemInternal, TCHAR *szFullFileName, UINT cchMax) const
 {
-	GetDisplayName(m_itemInfoMap.at(iItemInternal).pidlComplete.get(),szFullFileName,cchMax,SHGDN_FORPARSING);
+	GetDisplayName(m_itemInfoMap.at(iItemInternal).pidlComplete.get(), szFullFileName, cchMax,
+		SHGDN_FORPARSING);
 }
 
 std::wstring ShellBrowser::GetDirectory() const
@@ -493,14 +504,14 @@ file names. */
 int ShellBrowser::SelectFiles(const TCHAR *FileNamePattern)
 {
 	int iItem;
-	
+
 	iItem = LocateFileItemIndex(FileNamePattern);
 
-	if(iItem != -1)
+	if (iItem != -1)
 	{
-		ListViewHelper::FocusItem(m_hListView,iItem,TRUE);
-		ListViewHelper::SelectItem(m_hListView,iItem,TRUE);
-		ListView_EnsureVisible(m_hListView,iItem,FALSE);
+		ListViewHelper::FocusItem(m_hListView, iItem, TRUE);
+		ListViewHelper::SelectItem(m_hListView, iItem, TRUE);
+		ListView_EnsureVisible(m_hListView, iItem, FALSE);
 		return 1;
 	}
 
@@ -509,17 +520,17 @@ int ShellBrowser::SelectFiles(const TCHAR *FileNamePattern)
 
 int ShellBrowser::LocateFileItemIndex(const TCHAR *szFileName) const
 {
-	LV_FINDINFO	lvFind;
-	int			iItem;
-	int			iInternalIndex;
+	LV_FINDINFO lvFind;
+	int iItem;
+	int iInternalIndex;
 
 	iInternalIndex = LocateFileItemInternalIndex(szFileName);
 
-	if(iInternalIndex != -1)
+	if (iInternalIndex != -1)
 	{
-		lvFind.flags	= LVFI_PARAM;
-		lvFind.lParam	= iInternalIndex;
-		iItem			= ListView_FindItem(m_hListView,-1,&lvFind);
+		lvFind.flags = LVFI_PARAM;
+		lvFind.lParam = iInternalIndex;
+		iItem = ListView_FindItem(m_hListView, -1, &lvFind);
 
 		return iItem;
 	}
@@ -529,20 +540,21 @@ int ShellBrowser::LocateFileItemIndex(const TCHAR *szFileName) const
 
 int ShellBrowser::LocateFileItemInternalIndex(const TCHAR *szFileName) const
 {
-	LVITEM	lvItem;
-	int		i = 0;
+	LVITEM lvItem;
+	int i = 0;
 
-	for(i = 0;i < m_nTotalItems;i++)
+	for (i = 0; i < m_nTotalItems; i++)
 	{
-		lvItem.mask		= LVIF_PARAM;
-		lvItem.iItem	= i;
-		lvItem.iSubItem	= 0;
-		ListView_GetItem(m_hListView,&lvItem);
+		lvItem.mask = LVIF_PARAM;
+		lvItem.iItem = i;
+		lvItem.iSubItem = 0;
+		ListView_GetItem(m_hListView, &lvItem);
 
-		if((lstrcmp(m_itemInfoMap.at((int)lvItem.lParam).wfd.cFileName,szFileName) == 0) ||
-			(lstrcmp(m_itemInfoMap.at((int)lvItem.lParam).wfd.cAlternateFileName,szFileName) == 0))
+		if ((lstrcmp(m_itemInfoMap.at((int) lvItem.lParam).wfd.cFileName, szFileName) == 0)
+			|| (lstrcmp(m_itemInfoMap.at((int) lvItem.lParam).wfd.cAlternateFileName, szFileName)
+				== 0))
 		{
-			return (int)lvItem.lParam;
+			return (int) lvItem.lParam;
 		}
 	}
 
@@ -570,25 +582,25 @@ WIN32_FIND_DATA ShellBrowser::GetItemFileFindData(int iItem) const
 	return m_itemInfoMap.at(internalIndex).wfd;
 }
 
-void ShellBrowser::DragStarted(int iFirstItem,POINT *ptCursor)
+void ShellBrowser::DragStarted(int iFirstItem, POINT *ptCursor)
 {
-	DraggedFile_t	df;
-	int				iSelected = -1;
+	DraggedFile_t df;
+	int iSelected = -1;
 
-	if(iFirstItem != -1)
+	if (iFirstItem != -1)
 	{
-		POINT	ptOrigin;
-		POINT	ptItem;
+		POINT ptOrigin;
+		POINT ptItem;
 
-		ListView_GetItemPosition(m_hListView,iFirstItem,&ptItem);
+		ListView_GetItemPosition(m_hListView, iFirstItem, &ptItem);
 
-		ListView_GetOrigin(m_hListView,&ptOrigin);
+		ListView_GetOrigin(m_hListView, &ptOrigin);
 
 		m_ptDraggedOffset.x = ptOrigin.x + ptCursor->x - ptItem.x;
 		m_ptDraggedOffset.y = ptOrigin.y + ptCursor->y - ptItem.y;
 	}
 
-	while((iSelected = ListView_GetNextItem(m_hListView,iSelected,LVNI_SELECTED)) != -1)
+	while ((iSelected = ListView_GetNextItem(m_hListView, iSelected, LVNI_SELECTED)) != -1)
 	{
 		GetItemDisplayName(iSelected, SIZEOF_ARRAY(df.szFileName), df.szFileName);
 
@@ -618,7 +630,8 @@ unique_pidl_absolute ShellBrowser::GetItemCompleteIdl(int iItem) const
 		return nullptr;
 	}
 
-	unique_pidl_absolute pidlComplete(ILCombine(m_directoryState.pidlDirectory.get(), m_itemInfoMap.at((int)lvItem.lParam).pridl.get()));
+	unique_pidl_absolute pidlComplete(ILCombine(
+		m_directoryState.pidlDirectory.get(), m_itemInfoMap.at((int) lvItem.lParam).pridl.get()));
 
 	return pidlComplete;
 }
@@ -628,17 +641,17 @@ unique_pidl_child ShellBrowser::GetItemChildIdl(int iItem) const
 	LVITEM lvItem;
 	BOOL bRet;
 
-	lvItem.mask		= LVIF_PARAM;
-	lvItem.iItem	= iItem;
-	lvItem.iSubItem	= 0;
-	bRet = ListView_GetItem(m_hListView,&lvItem);
+	lvItem.mask = LVIF_PARAM;
+	lvItem.iItem = iItem;
+	lvItem.iSubItem = 0;
+	bRet = ListView_GetItem(m_hListView, &lvItem);
 
 	if (!bRet)
 	{
 		return nullptr;
 	}
 
-	unique_pidl_child pidlRelative(ILCloneChild(m_itemInfoMap.at((int)lvItem.lParam).pridl.get()));
+	unique_pidl_child pidlRelative(ILCloneChild(m_itemInfoMap.at((int) lvItem.lParam).pridl.get()));
 
 	return pidlRelative;
 }
@@ -655,11 +668,12 @@ BOOL ShellBrowser::CanCreate() const
 {
 	BOOL bCanCreate = FALSE;
 	unique_pidl_absolute pidl;
-	HRESULT hr = SHGetFolderLocation(nullptr,CSIDL_DESKTOP, nullptr,0,wil::out_param(pidl));
+	HRESULT hr = SHGetFolderLocation(nullptr, CSIDL_DESKTOP, nullptr, 0, wil::out_param(pidl));
 
-	if(SUCCEEDED(hr))
+	if (SUCCEEDED(hr))
 	{
-		bCanCreate = !InVirtualFolder() || CompareIdls(m_directoryState.pidlDirectory.get(),pidl.get());
+		bCanCreate =
+			!InVirtualFolder() || CompareIdls(m_directoryState.pidlDirectory.get(), pidl.get());
 	}
 
 	return bCanCreate;
@@ -677,11 +691,11 @@ int ShellBrowser::GetDirMonitorId() const
 
 BOOL ShellBrowser::CompareVirtualFolders(UINT uFolderCSIDL) const
 {
-	TCHAR	szParsingPath[MAX_PATH];
+	TCHAR szParsingPath[MAX_PATH];
 
-	GetCsidlDisplayName(uFolderCSIDL,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
+	GetCsidlDisplayName(uFolderCSIDL, szParsingPath, SIZEOF_ARRAY(szParsingPath), SHGDN_FORPARSING);
 
-	if(StrCmp(m_CurDir,szParsingPath) == 0)
+	if (StrCmp(m_CurDir, szParsingPath) == 0)
 		return TRUE;
 
 	return FALSE;
@@ -694,36 +708,36 @@ int ShellBrowser::GenerateUniqueItemId()
 
 void ShellBrowser::PositionDroppedItems()
 {
-	std::list<DroppedFile_t>::iterator	itr;
-	BOOL							bDropItemSet = FALSE;
-	int								iItem;
+	std::list<DroppedFile_t>::iterator itr;
+	BOOL bDropItemSet = FALSE;
+	int iItem;
 
 	/* LVNI_TOLEFT and LVNI_TORIGHT cause exceptions
 	in details view. */
-	if(m_folderSettings.viewMode == +ViewMode::Details)
+	if (m_folderSettings.viewMode == +ViewMode::Details)
 	{
 		m_DroppedFileNameList.clear();
 		return;
 	}
 
-	if(!m_DroppedFileNameList.empty())
+	if (!m_DroppedFileNameList.empty())
 	{
 		/* The auto arrange style must be off for the items
 		to be moved. Therefore, if the style is on, turn it
 		off, move the items, and the turn it back on. */
-		if(m_folderSettings.autoArrange)
-			ListViewHelper::SetAutoArrange(m_hListView,FALSE);
+		if (m_folderSettings.autoArrange)
+			ListViewHelper::SetAutoArrange(m_hListView, FALSE);
 
-		for(itr = m_DroppedFileNameList.begin();itr != m_DroppedFileNameList.end();)
+		for (itr = m_DroppedFileNameList.begin(); itr != m_DroppedFileNameList.end();)
 		{
 			iItem = LocateFileItemIndex(itr->szFileName);
 
-			if(iItem != -1)
+			if (iItem != -1)
 			{
-				if(!bDropItemSet)
+				if (!bDropItemSet)
 					m_iDropped = iItem;
 
-				if(m_folderSettings.autoArrange)
+				if (m_folderSettings.autoArrange)
 				{
 					/* TODO: Merge this code with RepositionLocalFiles(). */
 					LVFINDINFO lvfi;
@@ -740,20 +754,19 @@ void ShellBrowser::PositionDroppedItems()
 
 					pt = itr->DropPoint;
 
-					ListView_GetOrigin(m_hListView,&ptOrigin);
+					ListView_GetOrigin(m_hListView, &ptOrigin);
 					pt.x -= ptOrigin.x;
 					pt.y -= ptOrigin.y;
 
 					lvhti.pt = pt;
-					iHitItem = ListView_HitTest(m_hListView,&lvhti);
+					iHitItem = ListView_HitTest(m_hListView, &lvhti);
 
 					/* Based on ListView_HandleInsertionMark() code. */
-					if(iHitItem != -1 && lvhti.flags & LVHT_ONITEM)
+					if (iHitItem != -1 && lvhti.flags & LVHT_ONITEM)
 					{
-						ListView_GetItemRect(m_hListView,lvhti.iItem,&rcItem,LVIR_BOUNDS);
+						ListView_GetItemRect(m_hListView, lvhti.iItem, &rcItem, LVIR_BOUNDS);
 
-						if((pt.x - rcItem.left) >
-							((rcItem.right - rcItem.left)/2))
+						if ((pt.x - rcItem.left) > ((rcItem.right - rcItem.left) / 2))
 						{
 							iNext = iHitItem;
 						}
@@ -761,41 +774,41 @@ void ShellBrowser::PositionDroppedItems()
 						{
 							/* Can just insert the item _after_ the item to the
 							left, unless this is the start of a row. */
-							iNext = ListView_GetNextItem(m_hListView,iHitItem,LVNI_TOLEFT);
+							iNext = ListView_GetNextItem(m_hListView, iHitItem, LVNI_TOLEFT);
 
-							if(iNext == -1)
+							if (iNext == -1)
 								iNext = iHitItem;
 
-							bRowStart = (ListView_GetNextItem(m_hListView,iNext,LVNI_TOLEFT) == -1);
+							bRowStart =
+								(ListView_GetNextItem(m_hListView, iNext, LVNI_TOLEFT) == -1);
 						}
 					}
 					else
 					{
-						lvfi.flags			= LVFI_NEARESTXY;
-						lvfi.pt				= pt;
-						lvfi.vkDirection	= VK_UP;
-						iNext = ListView_FindItem(m_hListView,-1,&lvfi);
+						lvfi.flags = LVFI_NEARESTXY;
+						lvfi.pt = pt;
+						lvfi.vkDirection = VK_UP;
+						iNext = ListView_FindItem(m_hListView, -1, &lvfi);
 
-						if(iNext == -1)
+						if (iNext == -1)
 						{
-							lvfi.flags			= LVFI_NEARESTXY;
-							lvfi.pt				= pt;
-							lvfi.vkDirection	= VK_LEFT;
-							iNext = ListView_FindItem(m_hListView,-1,&lvfi);
+							lvfi.flags = LVFI_NEARESTXY;
+							lvfi.pt = pt;
+							lvfi.vkDirection = VK_LEFT;
+							iNext = ListView_FindItem(m_hListView, -1, &lvfi);
 						}
 
-						ListView_GetItemRect(m_hListView,iNext,&rcItem,LVIR_BOUNDS);
+						ListView_GetItemRect(m_hListView, iNext, &rcItem, LVIR_BOUNDS);
 
-						if(pt.x > rcItem.left +
-							((rcItem.right - rcItem.left)/2))
+						if (pt.x > rcItem.left + ((rcItem.right - rcItem.left) / 2))
 						{
-							if(pt.y > rcItem.bottom)
+							if (pt.y > rcItem.bottom)
 							{
 								int iBelow;
 
-								iBelow = ListView_GetNextItem(m_hListView,iNext,LVNI_BELOW);
+								iBelow = ListView_GetNextItem(m_hListView, iNext, LVNI_BELOW);
 
-								if(iBelow != -1)
+								if (iBelow != -1)
 									iNext = iBelow;
 							}
 
@@ -804,55 +817,54 @@ void ShellBrowser::PositionDroppedItems()
 
 						nItems = ListView_GetItemCount(m_hListView);
 
-						ListView_GetItemRect(m_hListView,nItems - 1,&rcItem,LVIR_BOUNDS);
+						ListView_GetItemRect(m_hListView, nItems - 1, &rcItem, LVIR_BOUNDS);
 
-						if((pt.x > rcItem.left + ((rcItem.right - rcItem.left)/2)) &&
-							pt.x < rcItem.right + ((rcItem.right - rcItem.left)/2) + 2 &&
-							pt.y > rcItem.top)
+						if ((pt.x > rcItem.left + ((rcItem.right - rcItem.left) / 2))
+							&& pt.x < rcItem.right + ((rcItem.right - rcItem.left) / 2) + 2
+							&& pt.y > rcItem.top)
 						{
 							iNext = nItems - 1;
 
 							bRowEnd = TRUE;
 						}
 
-						if(!bRowEnd)
+						if (!bRowEnd)
 						{
 							int iLeft;
 
-							iLeft = ListView_GetNextItem(m_hListView,iNext,LVNI_TOLEFT);
+							iLeft = ListView_GetNextItem(m_hListView, iNext, LVNI_TOLEFT);
 
-							if(iLeft != -1)
+							if (iLeft != -1)
 								iNext = iLeft;
 							else
 								bRowStart = TRUE;
 						}
 					}
 
-					ListView_GetItemPosition(m_hListView,iNext,&ptNext);
+					ListView_GetItemPosition(m_hListView, iNext, &ptNext);
 
 					/* Offset by 1 pixel in the x-direction. This ensures that
 					the dropped item will always be placed AFTER iNext. */
-					if(bRowStart)
+					if (bRowStart)
 					{
 						/* If at the start of a row, simply place at x = 0
 						so that dropped item will be placed before first
 						item... */
-						ListView_SetItemPosition32(m_hListView,
-							iItem,0,ptNext.y);
+						ListView_SetItemPosition32(m_hListView, iItem, 0, ptNext.y);
 					}
 					else
 					{
-						ListView_SetItemPosition32(m_hListView,
-							iItem,ptNext.x + 1,ptNext.y);
+						ListView_SetItemPosition32(m_hListView, iItem, ptNext.x + 1, ptNext.y);
 					}
 				}
 				else
 				{
-					ListView_SetItemPosition32(m_hListView,iItem,itr->DropPoint.x,itr->DropPoint.y);
+					ListView_SetItemPosition32(
+						m_hListView, iItem, itr->DropPoint.x, itr->DropPoint.y);
 				}
 
-				ListViewHelper::SelectItem(m_hListView,iItem,TRUE);
-				ListViewHelper::FocusItem(m_hListView,iItem,TRUE);
+				ListViewHelper::SelectItem(m_hListView, iItem, TRUE);
+				ListViewHelper::FocusItem(m_hListView, iItem, TRUE);
 
 				itr = m_DroppedFileNameList.erase(itr);
 			}
@@ -862,30 +874,30 @@ void ShellBrowser::PositionDroppedItems()
 			}
 		}
 
-		if(m_folderSettings.autoArrange)
-			ListViewHelper::SetAutoArrange(m_hListView,TRUE);
+		if (m_folderSettings.autoArrange)
+			ListViewHelper::SetAutoArrange(m_hListView, TRUE);
 	}
 }
 
 int ShellBrowser::DetermineItemSortedPosition(LPARAM lParam) const
 {
-	LVITEM	lvItem;
-	BOOL	bItem;
-	int		res = 1;
-	int		nItems = 0;
-	int		i = 0;
+	LVITEM lvItem;
+	BOOL bItem;
+	int res = 1;
+	int nItems = 0;
+	int i = 0;
 
 	nItems = ListView_GetItemCount(m_hListView);
 
-	while(res > 0 && i < nItems)
+	while (res > 0 && i < nItems)
 	{
-		lvItem.mask		= LVIF_PARAM;
-		lvItem.iItem	= i;
-		lvItem.iSubItem	= 0;
-		bItem = ListView_GetItem(m_hListView,&lvItem);
+		lvItem.mask = LVIF_PARAM;
+		lvItem.iItem = i;
+		lvItem.iSubItem = 0;
+		bItem = ListView_GetItem(m_hListView, &lvItem);
 
-		if(bItem)
-			res = Sort(static_cast<int>(lParam),static_cast<int>(lvItem.lParam));
+		if (bItem)
+			res = Sort(static_cast<int>(lParam), static_cast<int>(lvItem.lParam));
 		else
 			res = 0;
 
@@ -899,7 +911,7 @@ int ShellBrowser::DetermineItemSortedPosition(LPARAM lParam) const
 	the item at 1 (and push 1 to 2).
 	Therefore, to place in the last position, need
 	to place AFTER last item. */
-	if((i - 1) == nItems - 1 && res > 0)
+	if ((i - 1) == nItems - 1 && res > 0)
 	{
 		i++;
 	}
@@ -916,28 +928,28 @@ void ShellBrowser::RemoveFilteredItems()
 
 	int nItems = ListView_GetItemCount(m_hListView);
 
-	for(int i = nItems - 1;i >= 0;i--)
+	for (int i = nItems - 1; i >= 0; i--)
 	{
 		int internalIndex = GetItemInternalIndex(i);
 
-		if(!((m_itemInfoMap.at(internalIndex).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY))
+		if (!((m_itemInfoMap.at(internalIndex).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+				== FILE_ATTRIBUTE_DIRECTORY))
 		{
-			if(IsFilenameFiltered(m_itemInfoMap.at(internalIndex).szDisplayName))
+			if (IsFilenameFiltered(m_itemInfoMap.at(internalIndex).szDisplayName))
 			{
 				RemoveFilteredItem(i, internalIndex);
 			}
 		}
 	}
 
-	SendMessage(m_hOwner,WM_USER_UPDATEWINDOWS,0,0);
+	SendMessage(m_hOwner, WM_USER_UPDATEWINDOWS, 0, 0);
 }
 
-void ShellBrowser::RemoveFilteredItem(int iItem,int iItemInternal)
+void ShellBrowser::RemoveFilteredItem(int iItem, int iItemInternal)
 {
-	ULARGE_INTEGER	ulFileSize;
+	ULARGE_INTEGER ulFileSize;
 
-	if(ListView_GetItemState(m_hListView,iItem,LVIS_SELECTED)
-		== LVIS_SELECTED)
+	if (ListView_GetItemState(m_hListView, iItem, LVIS_SELECTED) == LVIS_SELECTED)
 	{
 		ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
 		ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
@@ -953,7 +965,7 @@ void ShellBrowser::RemoveFilteredItem(int iItem,int iItemInternal)
 	m_ulTotalDirSize.QuadPart -= ulFileSize.QuadPart;
 
 	/* Remove the item from the m_hListView. */
-	ListView_DeleteItem(m_hListView,iItem);
+	ListView_DeleteItem(m_hListView, iItem);
 
 	m_nTotalItems--;
 
@@ -982,24 +994,24 @@ int ShellBrowser::GetNumSelected() const
 
 void ShellBrowser::GetFolderInfo(FolderInfo_t *pFolderInfo)
 {
-	pFolderInfo->TotalFolderSize.QuadPart		= m_ulTotalDirSize.QuadPart;
-	pFolderInfo->TotalSelectionSize.QuadPart	= m_ulFileSelectionSize.QuadPart;
+	pFolderInfo->TotalFolderSize.QuadPart = m_ulTotalDirSize.QuadPart;
+	pFolderInfo->TotalSelectionSize.QuadPart = m_ulFileSelectionSize.QuadPart;
 }
 
 void ShellBrowser::DetermineFolderVirtual(PCIDLIST_ABSOLUTE pidlDirectory)
 {
 	TCHAR szParsingPath[MAX_PATH];
 
-	m_bVirtualFolder = !SHGetPathFromIDList(pidlDirectory,szParsingPath);
+	m_bVirtualFolder = !SHGetPathFromIDList(pidlDirectory, szParsingPath);
 
-	if(m_bVirtualFolder)
+	if (m_bVirtualFolder)
 	{
 		/* Mark the recycle bin and desktop as
 		real folders. Shouldn't be able to create
 		folders in Recycle Bin. */
-		if(CompareVirtualFolders(CSIDL_BITBUCKET))
+		if (CompareVirtualFolders(CSIDL_BITBUCKET))
 			m_bVirtualFolder = TRUE;
-		else if(CompareVirtualFolders(CSIDL_DESKTOP))
+		else if (CompareVirtualFolders(CSIDL_DESKTOP))
 			m_bVirtualFolder = FALSE;
 	}
 }
@@ -1013,7 +1025,7 @@ void ShellBrowser::SetFilter(std::wstring_view filter)
 {
 	m_folderSettings.filter = filter;
 
-	if(m_folderSettings.applyFilter)
+	if (m_folderSettings.applyFilter)
 	{
 		UnfilterAllItems();
 		UpdateFiltering();
@@ -1044,7 +1056,7 @@ BOOL ShellBrowser::GetFilterCaseSensitive() const
 
 void ShellBrowser::UpdateFiltering()
 {
-	if(m_folderSettings.applyFilter)
+	if (m_folderSettings.applyFilter)
 	{
 		RemoveFilteredItems();
 
@@ -1054,7 +1066,7 @@ void ShellBrowser::UpdateFiltering()
 	{
 		UnfilterAllItems();
 
-		if(m_nTotalItems == 0)
+		if (m_nTotalItems == 0)
 			ApplyFolderEmptyBackgroundImage(true);
 		else
 			ApplyFilteringBackgroundImage(false);
@@ -1063,17 +1075,17 @@ void ShellBrowser::UpdateFiltering()
 
 void ShellBrowser::UnfilterAllItems()
 {
-	std::list<int>::iterator	itr;
-	AwaitingAdd_t		awaitingAdd;
+	std::list<int>::iterator itr;
+	AwaitingAdd_t awaitingAdd;
 
-	for(itr = m_FilteredItemsList.begin();itr != m_FilteredItemsList.end();itr++)
+	for (itr = m_FilteredItemsList.begin(); itr != m_FilteredItemsList.end(); itr++)
 	{
 		int iSorted = DetermineItemSortedPosition(*itr);
 
-		awaitingAdd.iItem			= iSorted;
-		awaitingAdd.bPosition		= TRUE;
-		awaitingAdd.iAfter			= iSorted - 1;
-		awaitingAdd.iItemInternal	= *itr;
+		awaitingAdd.iItem = iSorted;
+		awaitingAdd.bPosition = TRUE;
+		awaitingAdd.iAfter = iSorted - 1;
+		awaitingAdd.iItemInternal = *itr;
 
 		m_AwaitingAddList.push_back(awaitingAdd);
 	}
@@ -1082,30 +1094,30 @@ void ShellBrowser::UnfilterAllItems()
 
 	InsertAwaitingItems(m_folderSettings.showInGroups);
 
-	SendMessage(m_hOwner,WM_USER_UPDATEWINDOWS,0,0);
+	SendMessage(m_hOwner, WM_USER_UPDATEWINDOWS, 0, 0);
 }
 
 void ShellBrowser::VerifySortMode()
 {
 	const std::vector<Column_t> *columns = nullptr;
 
-	if(CompareVirtualFolders(CSIDL_CONTROLS))
+	if (CompareVirtualFolders(CSIDL_CONTROLS))
 	{
 		columns = &m_folderColumns.controlPanelColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_DRIVES))
+	else if (CompareVirtualFolders(CSIDL_DRIVES))
 	{
 		columns = &m_folderColumns.myComputerColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_BITBUCKET))
+	else if (CompareVirtualFolders(CSIDL_BITBUCKET))
 	{
 		columns = &m_folderColumns.recycleBinColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_PRINTERS))
+	else if (CompareVirtualFolders(CSIDL_PRINTERS))
 	{
 		columns = &m_folderColumns.printersColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_CONNECTIONS))
+	else if (CompareVirtualFolders(CSIDL_CONNECTIONS))
 	{
 		columns = &m_folderColumns.networkConnectionsColumns;
 	}
@@ -1118,16 +1130,17 @@ void ShellBrowser::VerifySortMode()
 		columns = &m_folderColumns.realFolderColumns;
 	}
 
-	auto itr = std::find_if(columns->begin(), columns->end(), [sortMode = m_folderSettings.sortMode] (const Column_t &column) {
-		return column.id == static_cast<unsigned int>(sortMode);
-	});
+	auto itr = std::find_if(columns->begin(), columns->end(),
+		[sortMode = m_folderSettings.sortMode](const Column_t &column) {
+			return column.id == static_cast<unsigned int>(sortMode);
+		});
 
 	if (itr != columns->end())
 	{
 		return;
 	}
 
-	auto firstChecked = std::find_if(columns->begin(), columns->end(), [] (const Column_t &column) {
+	auto firstChecked = std::find_if(columns->begin(), columns->end(), [](const Column_t &column) {
 		return column.bChecked;
 	});
 
@@ -1166,7 +1179,7 @@ std::vector<SortMode> ShellBrowser::GetAvailableSortModes() const
 
 	for (const auto &column : *m_pActiveColumns)
 	{
-		if(column.bChecked)
+		if (column.bChecked)
 		{
 			sortModes.push_back(DetermineColumnSortMode(column.id));
 		}
@@ -1199,27 +1212,27 @@ void ShellBrowser::QueueRename(PCIDLIST_ABSOLUTE pidlItem)
 	int nItems;
 	int i = 0;
 
-	GetDisplayName(pidlItem,szItem,SIZEOF_ARRAY(szItem),SHGDN_INFOLDER);
+	GetDisplayName(pidlItem, szItem, SIZEOF_ARRAY(szItem), SHGDN_INFOLDER);
 
 	nItems = ListView_GetItemCount(m_hListView);
 
-	for(i = 0;i < nItems;i++)
+	for (i = 0; i < nItems; i++)
 	{
-		lvItem.mask		= LVIF_PARAM;
-		lvItem.iItem	= i;
-		lvItem.iSubItem	= 0;
-		ListView_GetItem(m_hListView,&lvItem);
+		lvItem.mask = LVIF_PARAM;
+		lvItem.iItem = i;
+		lvItem.iSubItem = 0;
+		ListView_GetItem(m_hListView, &lvItem);
 
-		if(CompareIdls(pidlItem, m_itemInfoMap.at((int)lvItem.lParam).pidlComplete.get()))
+		if (CompareIdls(pidlItem, m_itemInfoMap.at((int) lvItem.lParam).pidlComplete.get()))
 		{
 			bItemFound = TRUE;
 
-			ListView_EditLabel(m_hListView,i);
+			ListView_EditLabel(m_hListView, i);
 			break;
 		}
 	}
 
-	if(!bItemFound)
+	if (!bItemFound)
 	{
 		m_bNewItemCreated = TRUE;
 		m_pidlNewItem = ILCloneFull(pidlItem);
@@ -1232,19 +1245,19 @@ void ShellBrowser::SelectItems(const std::list<std::wstring> &PastedFileList)
 
 	m_FileSelectionList.clear();
 
-	for(const auto &pastedFile : PastedFileList)
+	for (const auto &pastedFile : PastedFileList)
 	{
 		int iIndex = LocateFileItemIndex(pastedFile.c_str());
 
-		if(iIndex != -1)
+		if (iIndex != -1)
 		{
-			ListViewHelper::SelectItem(m_hListView,iIndex,TRUE);
+			ListViewHelper::SelectItem(m_hListView, iIndex, TRUE);
 
-			if(i == 0)
+			if (i == 0)
 			{
 				/* Focus on the first item, and ensure it is visible. */
-				ListViewHelper::FocusItem(m_hListView,iIndex,TRUE);
-				ListView_EnsureVisible(m_hListView,iIndex,FALSE);
+				ListViewHelper::FocusItem(m_hListView, iIndex, TRUE);
+				ListView_EnsureVisible(m_hListView, iIndex, FALSE);
 
 				i++;
 			}
@@ -1256,7 +1269,7 @@ void ShellBrowser::SelectItems(const std::list<std::wstring> &PastedFileList)
 	}
 }
 
-void ShellBrowser::OnDeviceChange(WPARAM wParam,LPARAM lParam)
+void ShellBrowser::OnDeviceChange(WPARAM wParam, LPARAM lParam)
 {
 	/* Note changes made here may have no effect. Since
 	the icon for the cd/dvd/etc. may not have been
@@ -1266,137 +1279,136 @@ void ShellBrowser::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 	/* If we are currently not in my computer, this
 	message can be safely ignored (drives are only
 	shown in my computer). */
-	if(CompareVirtualFolders(CSIDL_DRIVES))
+	if (CompareVirtualFolders(CSIDL_DRIVES))
 	{
-		switch(wParam)
+		switch (wParam)
 		{
 			/* Device has being added/inserted into the system. Update the
 			drives toolbar as necessary. */
 		case DBT_DEVICEARRIVAL:
+		{
+			DEV_BROADCAST_HDR *dbh = nullptr;
+
+			dbh = (DEV_BROADCAST_HDR *) lParam;
+
+			if (dbh->dbch_devicetype == DBT_DEVTYP_VOLUME)
 			{
-				DEV_BROADCAST_HDR *dbh = nullptr;
+				DEV_BROADCAST_VOLUME *pdbv = nullptr;
+				TCHAR chDrive;
+				TCHAR szDrive[4];
 
-				dbh = (DEV_BROADCAST_HDR *)lParam;
+				pdbv = (DEV_BROADCAST_VOLUME *) dbh;
 
-				if(dbh->dbch_devicetype == DBT_DEVTYP_VOLUME)
+				/* Build a string that will form the drive name. */
+				chDrive = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
+				StringCchPrintf(szDrive, SIZEOF_ARRAY(szDrive), _T("%c:\\"), chDrive);
+
+				if (pdbv->dbcv_flags & DBTF_MEDIA)
 				{
-					DEV_BROADCAST_VOLUME	*pdbv = nullptr;
-					TCHAR					chDrive;
-					TCHAR					szDrive[4];
-
-					pdbv = (DEV_BROADCAST_VOLUME *)dbh;
-
-					/* Build a string that will form the drive name. */
-					chDrive = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
-					StringCchPrintf(szDrive,SIZEOF_ARRAY(szDrive),
-						_T("%c:\\"),chDrive);
-
-					if(pdbv->dbcv_flags & DBTF_MEDIA)
-					{
-						UpdateDriveIcon(szDrive);
-					}
-					else
-					{
-						OnFileActionAdded(szDrive);
-					}
+					UpdateDriveIcon(szDrive);
+				}
+				else
+				{
+					OnFileActionAdded(szDrive);
 				}
 			}
-			break;
+		}
+		break;
 
 		case DBT_DEVICEREMOVECOMPLETE:
+		{
+			DEV_BROADCAST_HDR *dbh = nullptr;
+
+			dbh = (DEV_BROADCAST_HDR *) lParam;
+
+			if (dbh->dbch_devicetype == DBT_DEVTYP_VOLUME)
 			{
-				DEV_BROADCAST_HDR				*dbh = nullptr;
+				DEV_BROADCAST_VOLUME *pdbv = nullptr;
+				TCHAR chDrive;
+				TCHAR szDrive[4];
 
-				dbh = (DEV_BROADCAST_HDR *)lParam;
+				pdbv = (DEV_BROADCAST_VOLUME *) dbh;
 
-				if(dbh->dbch_devicetype == DBT_DEVTYP_VOLUME)
+				/* Build a string that will form the drive name. */
+				chDrive = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
+				StringCchPrintf(szDrive, SIZEOF_ARRAY(szDrive), _T("%c:\\"), chDrive);
+
+				/* The device was removed from the system.
+				Remove it from the listview (only if the drive
+				was actually removed - the drive may not have
+				been removed, for example, if a cd/dvd was
+				changed). */
+				if (pdbv->dbcv_flags & DBTF_MEDIA)
 				{
-					DEV_BROADCAST_VOLUME	*pdbv = nullptr;
-					TCHAR					chDrive;
-					TCHAR					szDrive[4];
-
-					pdbv = (DEV_BROADCAST_VOLUME *)dbh;
-
-					/* Build a string that will form the drive name. */
-					chDrive = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
-					StringCchPrintf(szDrive,SIZEOF_ARRAY(szDrive),_T("%c:\\"),chDrive);
-
-					/* The device was removed from the system.
-					Remove it from the listview (only if the drive
-					was actually removed - the drive may not have
-					been removed, for example, if a cd/dvd was
-					changed). */
-					if(pdbv->dbcv_flags & DBTF_MEDIA)
-					{
-						UpdateDriveIcon(szDrive);
-					}
-					else
-					{
-						/* At this point, the drive has been completely removed
-						from the system. Therefore, its display name cannot be
-						queried. Need to search for the drive using ONLY its
-						drive letter/name. Once its index in the listview has
-						been determined, it can simply be removed. */
-						RemoveDrive(szDrive);
-					}
+					UpdateDriveIcon(szDrive);
+				}
+				else
+				{
+					/* At this point, the drive has been completely removed
+					from the system. Therefore, its display name cannot be
+					queried. Need to search for the drive using ONLY its
+					drive letter/name. Once its index in the listview has
+					been determined, it can simply be removed. */
+					RemoveDrive(szDrive);
 				}
 			}
-			break;
+		}
+		break;
 		}
 	}
 }
 
 void ShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 {
-	LVITEM					lvItem;
-	SHFILEINFO				shfi;
-	TCHAR					szDisplayName[MAX_PATH];
-	HRESULT					hr;
-	int						iItem = -1;
-	int						iItemInternal = -1;
-	int						i = 0;
+	LVITEM lvItem;
+	SHFILEINFO shfi;
+	TCHAR szDisplayName[MAX_PATH];
+	HRESULT hr;
+	int iItem = -1;
+	int iItemInternal = -1;
+	int i = 0;
 
 	/* Look for the item using its display name, NOT
 	its drive letter/name. */
-	GetDisplayName(szDrive,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_INFOLDER);
+	GetDisplayName(szDrive, szDisplayName, SIZEOF_ARRAY(szDisplayName), SHGDN_INFOLDER);
 
 	unique_pidl_absolute pidlDrive;
 	hr = SHParseDisplayName(szDrive, nullptr, wil::out_param(pidlDrive), 0, nullptr);
 
-	if(SUCCEEDED(hr))
+	if (SUCCEEDED(hr))
 	{
-		for(i = 0;i < m_nTotalItems;i++)
+		for (i = 0; i < m_nTotalItems; i++)
 		{
-			lvItem.mask		= LVIF_PARAM;
-			lvItem.iItem	= i;
-			lvItem.iSubItem	= 0;
-			ListView_GetItem(m_hListView,&lvItem);
+			lvItem.mask = LVIF_PARAM;
+			lvItem.iItem = i;
+			lvItem.iSubItem = 0;
+			ListView_GetItem(m_hListView, &lvItem);
 
-			if(CompareIdls(pidlDrive.get(), m_itemInfoMap.at((int)lvItem.lParam).pidlComplete.get()))
+			if (CompareIdls(
+					pidlDrive.get(), m_itemInfoMap.at((int) lvItem.lParam).pidlComplete.get()))
 			{
 				iItem = i;
-				iItemInternal = (int)lvItem.lParam;
+				iItemInternal = (int) lvItem.lParam;
 
 				break;
 			}
 		}
 	}
 
-	if(iItem != -1)
+	if (iItem != -1)
 	{
-		SHGetFileInfo(szDrive,0,&shfi,sizeof(shfi),SHGFI_SYSICONINDEX);
+		SHGetFileInfo(szDrive, 0, &shfi, sizeof(shfi), SHGFI_SYSICONINDEX);
 
 		StringCchCopy(m_itemInfoMap.at(iItemInternal).szDisplayName,
-			SIZEOF_ARRAY(m_itemInfoMap.at(iItemInternal).szDisplayName),
-			szDisplayName);
+			SIZEOF_ARRAY(m_itemInfoMap.at(iItemInternal).szDisplayName), szDisplayName);
 
 		/* Update the drives icon and display name. */
-		lvItem.mask		= LVIF_TEXT|LVIF_IMAGE;
-		lvItem.iImage	= shfi.iIcon;
-		lvItem.iItem	= iItem;
-		lvItem.iSubItem	= 0;
-		lvItem.pszText	= szDisplayName;
-		ListView_SetItem(m_hListView,&lvItem);
+		lvItem.mask = LVIF_TEXT | LVIF_IMAGE;
+		lvItem.iImage = shfi.iIcon;
+		lvItem.iItem = iItem;
+		lvItem.iSubItem = 0;
+		lvItem.pszText = szDisplayName;
+		ListView_SetItem(m_hListView, &lvItem);
 	}
 }
 
@@ -1406,24 +1418,24 @@ void ShellBrowser::RemoveDrive(const TCHAR *szDrive)
 	int iItemInternal = -1;
 	int i = 0;
 
-	for(i = 0;i < m_nTotalItems;i++)
+	for (i = 0; i < m_nTotalItems; i++)
 	{
-		lvItem.mask		= LVIF_PARAM;
-		lvItem.iItem	= i;
-		lvItem.iSubItem	= 0;
-		ListView_GetItem(m_hListView,&lvItem);
+		lvItem.mask = LVIF_PARAM;
+		lvItem.iItem = i;
+		lvItem.iSubItem = 0;
+		ListView_GetItem(m_hListView, &lvItem);
 
-		if(m_itemInfoMap.at((int)lvItem.lParam).bDrive)
+		if (m_itemInfoMap.at((int) lvItem.lParam).bDrive)
 		{
-			if(lstrcmp(szDrive,m_itemInfoMap.at((int)lvItem.lParam).szDrive) == 0)
+			if (lstrcmp(szDrive, m_itemInfoMap.at((int) lvItem.lParam).szDrive) == 0)
 			{
-				iItemInternal = (int)lvItem.lParam;
+				iItemInternal = (int) lvItem.lParam;
 				break;
 			}
 		}
 	}
 
-	if(iItemInternal != -1)
+	if (iItemInternal != -1)
 		RemoveItem(iItemInternal);
 }
 
@@ -1440,7 +1452,8 @@ BasicItemInfo_t ShellBrowser::getBasicItemInfo(int internalIndex) const
 	basicItemInfo.pidlComplete.reset(ILCloneFull(itemInfo.pidlComplete.get()));
 	basicItemInfo.pridl.reset(ILCloneChild(itemInfo.pridl.get()));
 	basicItemInfo.wfd = itemInfo.wfd;
-	StringCchCopy(basicItemInfo.szDisplayName, SIZEOF_ARRAY(basicItemInfo.szDisplayName), itemInfo.szDisplayName);
+	StringCchCopy(basicItemInfo.szDisplayName, SIZEOF_ARRAY(basicItemInfo.szDisplayName),
+		itemInfo.szDisplayName);
 	basicItemInfo.isRoot = itemInfo.bDrive;
 
 	return basicItemInfo;

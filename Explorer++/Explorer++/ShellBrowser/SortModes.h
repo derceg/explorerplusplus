@@ -6,6 +6,7 @@
 
 #include "BetterEnumsWrapper.h"
 
+// clang-format off
 BETTER_ENUM(SortMode, int,
 	Name = 1,
 	DateModified = 2,
@@ -79,38 +80,34 @@ BETTER_ENUM(SortMode, int,
 	MediaWriter = 63,
 	MediaYear = 64
 )
+// clang-format on
 
-static const SortMode RealFolderSortModes[] =
-{ SortMode::Name,SortMode::Size,SortMode::Type,SortMode::DateModified,SortMode::Attributes,
-SortMode::RealSize,SortMode::ShortName,SortMode::Owner,SortMode::ProductName,
-SortMode::Company,SortMode::Description,SortMode::FileVersion,SortMode::ProductVersion,
-SortMode::ShortcutTo,SortMode::HardLinks,SortMode::Extension,SortMode::Created,
-SortMode::Accessed,SortMode::Title,SortMode::Subject,SortMode::Authors,SortMode::Keywords,
-SortMode::Comments,SortMode::CameraModel,SortMode::DateTaken,SortMode::Width,SortMode::Height,
-SortMode::MediaBitrate,SortMode::MediaCopyright,SortMode::MediaDuration,
-SortMode::MediaProtected,SortMode::MediaRating,SortMode::MediaAlbumArtist,
-SortMode::MediaAlbum,SortMode::MediaBeatsPerMinute,SortMode::MediaComposer,
-SortMode::MediaConductor,SortMode::MediaDirector,SortMode::MediaGenre,
-SortMode::MediaLanguage,SortMode::MediaBroadcastDate,SortMode::MediaChannel,
-SortMode::MediaStationName,SortMode::MediaMood,SortMode::MediaParentalRating,
-SortMode::MediaParentalRatingReason,SortMode::MediaPeriod,SortMode::MediaProducer,
-SortMode::MediaPublisher,SortMode::MediaWriter,SortMode::MediaYear };
+static const SortMode RealFolderSortModes[] = { SortMode::Name, SortMode::Size, SortMode::Type,
+	SortMode::DateModified, SortMode::Attributes, SortMode::RealSize, SortMode::ShortName,
+	SortMode::Owner, SortMode::ProductName, SortMode::Company, SortMode::Description,
+	SortMode::FileVersion, SortMode::ProductVersion, SortMode::ShortcutTo, SortMode::HardLinks,
+	SortMode::Extension, SortMode::Created, SortMode::Accessed, SortMode::Title, SortMode::Subject,
+	SortMode::Authors, SortMode::Keywords, SortMode::Comments, SortMode::CameraModel,
+	SortMode::DateTaken, SortMode::Width, SortMode::Height, SortMode::MediaBitrate,
+	SortMode::MediaCopyright, SortMode::MediaDuration, SortMode::MediaProtected,
+	SortMode::MediaRating, SortMode::MediaAlbumArtist, SortMode::MediaAlbum,
+	SortMode::MediaBeatsPerMinute, SortMode::MediaComposer, SortMode::MediaConductor,
+	SortMode::MediaDirector, SortMode::MediaGenre, SortMode::MediaLanguage,
+	SortMode::MediaBroadcastDate, SortMode::MediaChannel, SortMode::MediaStationName,
+	SortMode::MediaMood, SortMode::MediaParentalRating, SortMode::MediaParentalRatingReason,
+	SortMode::MediaPeriod, SortMode::MediaProducer, SortMode::MediaPublisher, SortMode::MediaWriter,
+	SortMode::MediaYear };
 
-static const SortMode ControlPanelSortModes[] =
-{ SortMode::Name,SortMode::VirtualComments };
+static const SortMode ControlPanelSortModes[] = { SortMode::Name, SortMode::VirtualComments };
 
-static const SortMode MyComputerSortModes[] =
-{ SortMode::Name,SortMode::Type,SortMode::TotalSize,SortMode::FreeSpace,
-SortMode::VirtualComments,SortMode::FileSystem };
+static const SortMode MyComputerSortModes[] = { SortMode::Name, SortMode::Type, SortMode::TotalSize,
+	SortMode::FreeSpace, SortMode::VirtualComments, SortMode::FileSystem };
 
-static const SortMode RecycleBinSortModes[] =
-{ SortMode::Name,SortMode::OriginalLocation,SortMode::DateDeleted,
-SortMode::Size,SortMode::Type,SortMode::DateModified };
+static const SortMode RecycleBinSortModes[] = { SortMode::Name, SortMode::OriginalLocation,
+	SortMode::DateDeleted, SortMode::Size, SortMode::Type, SortMode::DateModified };
 
-static const SortMode PrintersSortModes[] =
-{ SortMode::Name,SortMode::NumPrinterDocuments,SortMode::PrinterStatus,
-SortMode::PrinterComments,SortMode::PrinterLocation };
+static const SortMode PrintersSortModes[] = { SortMode::Name, SortMode::NumPrinterDocuments,
+	SortMode::PrinterStatus, SortMode::PrinterComments, SortMode::PrinterLocation };
 
-static const SortMode NetworkConnectionsSortModes[] =
-{ SortMode::Name,SortMode::Type,SortMode::NetworkAdapterStatus,
-SortMode::Owner };
+static const SortMode NetworkConnectionsSortModes[] = { SortMode::Name, SortMode::Type,
+	SortMode::NetworkAdapterStatus, SortMode::Owner };

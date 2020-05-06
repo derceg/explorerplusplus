@@ -12,5 +12,4 @@ PreservedHistoryEntry::PreservedHistoryEntry(const HistoryEntry &entry) :
 	displayName(entry.GetDisplayName()),
 	systemIconIndex(entry.GetSystemIconIndex())
 {
-
 }

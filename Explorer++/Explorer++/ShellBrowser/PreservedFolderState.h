@@ -12,12 +12,10 @@ class ShellBrowser;
 struct PreservedFolderState
 {
 public:
-
 	PreservedFolderState(const ShellBrowser *shellBrowser);
 
 	FolderSettings folderSettings;
 
 private:
-
 	DISALLOW_COPY_AND_ASSIGN(PreservedFolderState);
 };

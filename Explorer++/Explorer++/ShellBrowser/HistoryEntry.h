@@ -14,13 +14,13 @@ struct PreservedHistoryEntry;
 class HistoryEntry
 {
 public:
-
 	enum class PropertyType
 	{
 		SystemIconIndex
 	};
 
-	HistoryEntry(PCIDLIST_ABSOLUTE pidl, std::wstring_view displayName, std::optional<int> systemIconIndex = std::nullopt);
+	HistoryEntry(PCIDLIST_ABSOLUTE pidl, std::wstring_view displayName,
+		std::optional<int> systemIconIndex = std::nullopt);
 	HistoryEntry(const PreservedHistoryEntry &preservedHistoryEntry);
 
 	int GetId() const;
@@ -31,10 +31,10 @@ public:
 	std::optional<int> GetSystemIconIndex() const;
 	void SetSystemIconIndex(int iconIndex);
 
-	SignalWrapper<HistoryEntry, void(const HistoryEntry &entry, PropertyType propertyType)> historyEntryUpdatedSignal;
+	SignalWrapper<HistoryEntry, void(const HistoryEntry &entry, PropertyType propertyType)>
+		historyEntryUpdatedSignal;
 
 private:
-
 	DISALLOW_COPY_AND_ASSIGN(HistoryEntry);
 
 	static int idCounter;

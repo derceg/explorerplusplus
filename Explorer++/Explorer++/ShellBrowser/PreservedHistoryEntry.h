@@ -13,7 +13,6 @@ class HistoryEntry;
 struct PreservedHistoryEntry
 {
 public:
-
 	PreservedHistoryEntry(const HistoryEntry &entry);
 
 	const int id;
@@ -23,6 +22,5 @@ public:
 	std::optional<int> systemIconIndex;
 
 private:
-
 	DISALLOW_COPY_AND_ASSIGN(PreservedHistoryEntry);
 };

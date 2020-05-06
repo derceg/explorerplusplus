@@ -7,7 +7,8 @@
 #include <wil/common.h>
 #include <propvarutil.h>
 
-int SortByName(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, const GlobalFolderSettings &globalFolderSettings)
+int SortByName(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2,
+	const GlobalFolderSettings &globalFolderSettings)
 {
 	if (itemInfo1.isRoot && !itemInfo2.isRoot)
 	{
@@ -102,7 +103,8 @@ int SortByType(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo
 	return StrCmpLogicalW(type1.c_str(), type2.c_str());
 }
 
-int SortByDate(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, DateType dateType)
+int SortByDate(
+	const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, DateType dateType)
 {
 	switch (dateType)
 	{
@@ -123,7 +125,8 @@ int SortByDate(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo
 	return 0;
 }
 
-int SortByTotalSize(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, bool TotalSize)
+int SortByTotalSize(
+	const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, bool TotalSize)
 {
 	ULARGE_INTEGER driveSpace1;
 	BOOL res1 = GetDriveSpaceColumnRawData(itemInfo1, TotalSize, driveSpace1);
@@ -213,7 +216,8 @@ int SortByOwner(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInf
 	return StrCmpLogicalW(owner1.c_str(), owner2.c_str());
 }
 
-int SortByVersionInfo(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, VersionInfoType versionInfoType)
+int SortByVersionInfo(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2,
+	VersionInfoType versionInfoType)
 {
 	std::wstring versionInfo1 = GetVersionColumnText(itemInfo1, versionInfoType);
 	std::wstring versionInfo2 = GetVersionColumnText(itemInfo2, versionInfoType);
@@ -245,7 +249,8 @@ int SortByExtension(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &ite
 	return StrCmpLogicalW(extension1.c_str(), extension2.c_str());
 }
 
-int SortByItemDetails(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, const SHCOLUMNID *pscid)
+int SortByItemDetails(
+	const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, const SHCOLUMNID *pscid)
 {
 	VARIANT vt1;
 	HRESULT hr1 = GetItemDetailsRawData(itemInfo1, pscid, &vt1);
@@ -273,7 +278,8 @@ int SortByItemDetails(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &i
 	return ret;
 }
 
-int SortByImageProperty(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, PROPID PropertyId)
+int SortByImageProperty(
+	const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, PROPID PropertyId)
 {
 	std::wstring imageProperty1 = GetImageColumnText(itemInfo1, PropertyId);
 	std::wstring imageProperty2 = GetImageColumnText(itemInfo2, PropertyId);
@@ -297,7 +303,8 @@ int SortByFileSystem(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &it
 	return StrCmpLogicalW(fileSystemName1.c_str(), fileSystemName2.c_str());
 }
 
-int SortByPrinterProperty(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, PrinterInformationType printerInformationType)
+int SortByPrinterProperty(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2,
+	PrinterInformationType printerInformationType)
 {
 	std::wstring printerInformation1 = GetPrinterColumnText(itemInfo1, printerInformationType);
 	std::wstring printerInformation2 = GetPrinterColumnText(itemInfo2, printerInformationType);
@@ -313,7 +320,8 @@ int SortByNetworkAdapterStatus(const BasicItemInfo_t &itemInfo1, const BasicItem
 	return StrCmpLogicalW(status1.c_str(), status2.c_str());
 }
 
-int SortByMediaMetadata(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, MediaMetadataType mediaMetadataType)
+int SortByMediaMetadata(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2,
+	MediaMetadataType mediaMetadataType)
 {
 	std::wstring mediaMetadata1 = GetMediaMetadataColumnText(itemInfo1, mediaMetadataType);
 	std::wstring mediaMetadata2 = GetMediaMetadataColumnText(itemInfo2, mediaMetadataType);
