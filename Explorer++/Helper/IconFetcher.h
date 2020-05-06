@@ -8,8 +8,8 @@
 #include "WindowSubclassWrapper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
 #include <ShlObj.h>
-#include <future>
 #include <functional>
+#include <future>
 #include <optional>
 #include <unordered_map>
 
@@ -18,7 +18,6 @@ class CachedIcons;
 class IconFetcherInterface
 {
 public:
-
 	using Callback = std::function<void(int iconIndex)>;
 
 	virtual void QueueIconTask(std::wstring_view path, Callback callback) = 0;
@@ -29,7 +28,6 @@ public:
 class IconFetcher : public IconFetcherInterface
 {
 public:
-
 	IconFetcher(HWND hwnd, CachedIcons *cachedIcons);
 	virtual ~IconFetcher();
 
@@ -38,7 +36,6 @@ public:
 	void ClearQueue() override;
 
 private:
-
 	static const UINT_PTR SUBCLASS_ID = 0;
 
 	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 200;
@@ -67,7 +64,8 @@ private:
 		std::future<std::optional<IconResult>> iconResult;
 	};
 
-	static LRESULT CALLBACK WindowSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	static LRESULT CALLBACK WindowSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK WindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	static std::optional<int> FindIconAsync(PCIDLIST_ABSOLUTE pidl);

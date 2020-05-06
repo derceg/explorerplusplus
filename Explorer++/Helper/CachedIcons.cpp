@@ -6,10 +6,8 @@
 #include "CachedIcons.h"
 #include "ShellHelper.h"
 
-CachedIcons::CachedIcons(std::size_t maxItems) :
-	m_maxItems(maxItems)
+CachedIcons::CachedIcons(std::size_t maxItems) : m_maxItems(maxItems)
 {
-
 }
 
 CachedIcons::iterator CachedIcons::end()

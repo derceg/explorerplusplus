@@ -6,15 +6,16 @@
 #include "FileOperations.h"
 #include "DriveInfo.h"
 #include "Helper.h"
-#include "iDataObject.h"
 #include "Macros.h"
 #include "ShellHelper.h"
 #include "StringHelper.h"
+#include "iDataObject.h"
 #include <boost/scope_exit.hpp>
 #include <list>
 #include <sstream>
 
-#pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
+#pragma warning(                                                                                   \
+	disable : 4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
 enum PasteType
 {
@@ -35,9 +36,11 @@ HRESULT NFileOperations::RenameFile(IShellItem *item, const std::wstring &newNam
 		return hr;
 	}
 
-	BOOST_SCOPE_EXIT(fo) {
+	BOOST_SCOPE_EXIT(fo)
+	{
 		fo->Release();
-	} BOOST_SCOPE_EXIT_END
+	}
+	BOOST_SCOPE_EXIT_END
 
 	hr = fo->SetOperationFlags(FOF_ALLOWUNDO | FOF_SILENT);
 
@@ -58,8 +61,8 @@ HRESULT NFileOperations::RenameFile(IShellItem *item, const std::wstring &newNam
 	return hr;
 }
 
-HRESULT NFileOperations::DeleteFiles(HWND hwnd, std::vector<PCIDLIST_ABSOLUTE> &pidls,
-	bool permanent, bool silent)
+HRESULT NFileOperations::DeleteFiles(
+	HWND hwnd, std::vector<PCIDLIST_ABSOLUTE> &pidls, bool permanent, bool silent)
 {
 	IFileOperation *fo;
 	HRESULT hr = CoCreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&fo));
@@ -69,9 +72,11 @@ HRESULT NFileOperations::DeleteFiles(HWND hwnd, std::vector<PCIDLIST_ABSOLUTE> &
 		return hr;
 	}
 
-	BOOST_SCOPE_EXIT(fo) {
+	BOOST_SCOPE_EXIT(fo)
+	{
 		fo->Release();
-	} BOOST_SCOPE_EXIT_END
+	}
+	BOOST_SCOPE_EXIT_END
 
 	hr = fo->SetOwnerWindow(hwnd);
 
@@ -107,16 +112,19 @@ HRESULT NFileOperations::DeleteFiles(HWND hwnd, std::vector<PCIDLIST_ABSOLUTE> &
 	}
 
 	IShellItemArray *shellItemArray;
-	hr = SHCreateShellItemArrayFromIDLists(static_cast<UINT>(pidls.size()), &pidls[0], &shellItemArray);
+	hr = SHCreateShellItemArrayFromIDLists(
+		static_cast<UINT>(pidls.size()), &pidls[0], &shellItemArray);
 
 	if (FAILED(hr))
 	{
 		return hr;
 	}
 
-	BOOST_SCOPE_EXIT(shellItemArray) {
+	BOOST_SCOPE_EXIT(shellItemArray)
+	{
 		shellItemArray->Release();
-	} BOOST_SCOPE_EXIT_END
+	}
+	BOOST_SCOPE_EXIT_END
 
 	IUnknown *unknown;
 	hr = shellItemArray->QueryInterface(IID_IUnknown, reinterpret_cast<void **>(&unknown));
@@ -126,9 +134,11 @@ HRESULT NFileOperations::DeleteFiles(HWND hwnd, std::vector<PCIDLIST_ABSOLUTE> &
 		return hr;
 	}
 
-	BOOST_SCOPE_EXIT(unknown) {
+	BOOST_SCOPE_EXIT(unknown)
+	{
 		unknown->Release();
-	} BOOST_SCOPE_EXIT_END
+	}
+	BOOST_SCOPE_EXIT_END
 
 	hr = fo->DeleteItems(unknown);
 
@@ -142,20 +152,22 @@ HRESULT NFileOperations::DeleteFiles(HWND hwnd, std::vector<PCIDLIST_ABSOLUTE> &
 	return hr;
 }
 
-HRESULT NFileOperations::CopyFilesToFolder(HWND hOwner, const std::wstring &strTitle,
-	std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move)
+HRESULT NFileOperations::CopyFilesToFolder(
+	HWND hOwner, const std::wstring &strTitle, std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move)
 {
 	PIDLIST_ABSOLUTE pidl;
-	BOOL bRes = NFileOperations::CreateBrowseDialog(hOwner,strTitle,&pidl);
+	BOOL bRes = NFileOperations::CreateBrowseDialog(hOwner, strTitle, &pidl);
 
-	if(!bRes)
+	if (!bRes)
 	{
 		return E_FAIL;
 	}
 
-	BOOST_SCOPE_EXIT(pidl) {
+	BOOST_SCOPE_EXIT(pidl)
+	{
 		CoTaskMemFree(pidl);
-	} BOOST_SCOPE_EXIT_END
+	}
+	BOOST_SCOPE_EXIT_END
 
 	IShellItem *destinationFolder = nullptr;
 	HRESULT hr = SHCreateItemFromIDList(pidl, IID_PPV_ARGS(&destinationFolder));
@@ -165,17 +177,19 @@ HRESULT NFileOperations::CopyFilesToFolder(HWND hOwner, const std::wstring &strT
 		return E_FAIL;
 	}
 
-	BOOST_SCOPE_EXIT(destinationFolder) {
+	BOOST_SCOPE_EXIT(destinationFolder)
+	{
 		destinationFolder->Release();
-	} BOOST_SCOPE_EXIT_END
+	}
+	BOOST_SCOPE_EXIT_END
 
 	hr = CopyFiles(hOwner, destinationFolder, pidls, move);
 
 	return hr;
 }
 
-HRESULT NFileOperations::CopyFiles(HWND hwnd, IShellItem *destinationFolder,
-	std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move)
+HRESULT NFileOperations::CopyFiles(
+	HWND hwnd, IShellItem *destinationFolder, std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move)
 {
 	IFileOperation *fo;
 	HRESULT hr = CoCreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&fo));
@@ -185,9 +199,11 @@ HRESULT NFileOperations::CopyFiles(HWND hwnd, IShellItem *destinationFolder,
 		return hr;
 	}
 
-	BOOST_SCOPE_EXIT(fo) {
+	BOOST_SCOPE_EXIT(fo)
+	{
 		fo->Release();
-	} BOOST_SCOPE_EXIT_END
+	}
+	BOOST_SCOPE_EXIT_END
 
 	hr = fo->SetOwnerWindow(hwnd);
 
@@ -204,16 +220,19 @@ HRESULT NFileOperations::CopyFiles(HWND hwnd, IShellItem *destinationFolder,
 	}
 
 	IShellItemArray *shellItemArray;
-	hr = SHCreateShellItemArrayFromIDLists(static_cast<UINT>(pidls.size()), &pidls[0], &shellItemArray);
+	hr = SHCreateShellItemArrayFromIDLists(
+		static_cast<UINT>(pidls.size()), &pidls[0], &shellItemArray);
 
 	if (FAILED(hr))
 	{
 		return hr;
 	}
 
-	BOOST_SCOPE_EXIT(shellItemArray) {
+	BOOST_SCOPE_EXIT(shellItemArray)
+	{
 		shellItemArray->Release();
-	} BOOST_SCOPE_EXIT_END
+	}
+	BOOST_SCOPE_EXIT_END
 
 	IUnknown *unknown;
 	hr = shellItemArray->QueryInterface(IID_IUnknown, reinterpret_cast<void **>(&unknown));
@@ -223,9 +242,11 @@ HRESULT NFileOperations::CopyFiles(HWND hwnd, IShellItem *destinationFolder,
 		return hr;
 	}
 
-	BOOST_SCOPE_EXIT(unknown) {
+	BOOST_SCOPE_EXIT(unknown)
+	{
 		unknown->Release();
-	} BOOST_SCOPE_EXIT_END
+	}
+	BOOST_SCOPE_EXIT_END
 
 	if (move)
 	{
@@ -251,28 +272,28 @@ TCHAR *NFileOperations::BuildFilenameList(const std::list<std::wstring> &Filenam
 	TCHAR *pszFilenames = NULL;
 	int iTotalSize = 0;
 
-	for(const auto &filename : FilenameList)
+	for (const auto &filename : FilenameList)
 	{
-		pszFilenames = reinterpret_cast<TCHAR *>(realloc(pszFilenames,
-			(iTotalSize + filename.size() + 1) * sizeof(TCHAR)));
-		memcpy(pszFilenames + iTotalSize,filename.c_str(),(filename.size() + 1) * sizeof(TCHAR));
+		pszFilenames = reinterpret_cast<TCHAR *>(
+			realloc(pszFilenames, (iTotalSize + filename.size() + 1) * sizeof(TCHAR)));
+		memcpy(pszFilenames + iTotalSize, filename.c_str(), (filename.size() + 1) * sizeof(TCHAR));
 		iTotalSize += static_cast<int>(filename.size() + 1);
 	}
 
 	/* The list of strings must end with a second
 	terminating NULL character, so add it now. */
-	pszFilenames = reinterpret_cast<TCHAR *>(realloc(pszFilenames,(iTotalSize + 1) * sizeof(TCHAR)));
+	pszFilenames =
+		reinterpret_cast<TCHAR *>(realloc(pszFilenames, (iTotalSize + 1) * sizeof(TCHAR)));
 	pszFilenames[iTotalSize] = '\0';
 
 	/* Note that it is up to the caller to free this. */
 	return pszFilenames;
 }
 
-
 // Creates a new folder. Note that IFileOperation will take care of
 // renaming the folder if one with that name already exists.
-HRESULT NFileOperations::CreateNewFolder(IShellItem *destinationFolder, const std::wstring &newFolderName,
-	IFileOperationProgressSink *progressSink)
+HRESULT NFileOperations::CreateNewFolder(IShellItem *destinationFolder,
+	const std::wstring &newFolderName, IFileOperationProgressSink *progressSink)
 {
 	IFileOperation *fo;
 	HRESULT hr = CoCreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&fo));
@@ -282,9 +303,11 @@ HRESULT NFileOperations::CreateNewFolder(IShellItem *destinationFolder, const st
 		return hr;
 	}
 
-	BOOST_SCOPE_EXIT(fo) {
+	BOOST_SCOPE_EXIT(fo)
+	{
 		fo->Release();
-	} BOOST_SCOPE_EXIT_END
+	}
+	BOOST_SCOPE_EXIT_END
 
 	hr = fo->SetOperationFlags(FOF_ALLOWUNDO | FOF_SILENT);
 
@@ -293,7 +316,8 @@ HRESULT NFileOperations::CreateNewFolder(IShellItem *destinationFolder, const st
 		return hr;
 	}
 
-	hr = fo->NewItem(destinationFolder, FILE_ATTRIBUTE_DIRECTORY, newFolderName.c_str(), nullptr, progressSink);
+	hr = fo->NewItem(
+		destinationFolder, FILE_ATTRIBUTE_DIRECTORY, newFolderName.c_str(), nullptr, progressSink);
 
 	if (FAILED(hr))
 	{
@@ -305,7 +329,8 @@ HRESULT NFileOperations::CreateNewFolder(IShellItem *destinationFolder, const st
 	return hr;
 }
 
-BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,const std::wstring &strFilename)
+BOOL NFileOperations::SaveDirectoryListing(
+	const std::wstring &strDirectory, const std::wstring &strFilename)
 {
 	std::wstring strContents = _T("Directory\r\n---------\r\n") + strDirectory + _T("\r\n\r\n");
 
@@ -313,17 +338,17 @@ BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,cons
 	FILETIME ft;
 	FILETIME lft;
 	GetLocalTime(&st);
-	SystemTimeToFileTime(&st,&ft);
-	LocalFileTimeToFileTime(&ft,&lft);
+	SystemTimeToFileTime(&st, &ft);
+	LocalFileTimeToFileTime(&ft, &lft);
 
 	TCHAR szTime[128];
-	CreateFileTimeString(&lft,szTime,SIZEOF_ARRAY(szTime),FALSE);
+	CreateFileTimeString(&lft, szTime, SIZEOF_ARRAY(szTime), FALSE);
 	strContents += _T("Date\r\n----\r\n") + std::wstring(szTime) + _T("\r\n\r\n");
 
 	std::wstring strSearch = strDirectory + _T("\\*");
 
 	WIN32_FIND_DATA wfd;
-	HANDLE hFirstFile = FindFirstFile(strSearch.c_str(),&wfd);
+	HANDLE hFirstFile = FindFirstFile(strSearch.c_str(), &wfd);
 
 	std::list<std::wstring> folderList;
 	std::list<std::wstring> fileList;
@@ -331,15 +356,13 @@ BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,cons
 
 	ulTotalSize.QuadPart = 0;
 
-	if(hFirstFile != INVALID_HANDLE_VALUE)
+	if (hFirstFile != INVALID_HANDLE_VALUE)
 	{
 		ULARGE_INTEGER ulFileSize;
 
-		if(lstrcmpi(wfd.cFileName,_T(".")) != 0 &&
-			lstrcmpi(wfd.cFileName,_T("..")) != 0)
+		if (lstrcmpi(wfd.cFileName, _T(".")) != 0 && lstrcmpi(wfd.cFileName, _T("..")) != 0)
 		{
-			if((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
-			FILE_ATTRIBUTE_DIRECTORY)
+			if ((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 			{
 				folderList.emplace_back(wfd.cFileName);
 			}
@@ -354,13 +377,11 @@ BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,cons
 			}
 		}
 
-		while(FindNextFile(hFirstFile,&wfd) != 0)
+		while (FindNextFile(hFirstFile, &wfd) != 0)
 		{
-			if(lstrcmpi(wfd.cFileName,_T(".")) != 0 &&
-				lstrcmpi(wfd.cFileName,_T("..")) != 0)
+			if (lstrcmpi(wfd.cFileName, _T(".")) != 0 && lstrcmpi(wfd.cFileName, _T("..")) != 0)
 			{
-				if((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
-					FILE_ATTRIBUTE_DIRECTORY)
+				if ((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 				{
 					folderList.emplace_back(wfd.cFileName);
 				}
@@ -393,41 +414,42 @@ BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,cons
 	strContents += _T("Number of files: ") + ss.str() + std::wstring(_T("\r\n"));
 
 	TCHAR szTotalSize[32];
-	FormatSizeString(ulTotalSize,szTotalSize,SIZEOF_ARRAY(szTotalSize));
-	strContents += _T("Total size (not including subfolders): ") + std::wstring(szTotalSize) + std::wstring(_T("\r\n"));
+	FormatSizeString(ulTotalSize, szTotalSize, SIZEOF_ARRAY(szTotalSize));
+	strContents += _T("Total size (not including subfolders): ") + std::wstring(szTotalSize)
+		+ std::wstring(_T("\r\n"));
 
 	strContents += _T("\r\nFolders\r\n-------\r\n");
 
-	for(const auto &folder : folderList)
+	for (const auto &folder : folderList)
 	{
 		strContents += folder + _T("\r\n");
 	}
 
 	strContents += _T("\r\nFiles\r\n-----\r\n");
 
-	for(const auto &file : fileList)
+	for (const auto &file : fileList)
 	{
 		strContents += file + _T("\r\n");
 	}
 
 	/* Remove the trailing newline. */
-	strContents = strContents.substr(0,strContents.size() - 2);
+	strContents = strContents.substr(0, strContents.size() - 2);
 
-	HANDLE hFile = CreateFile(strFilename.c_str(),FILE_WRITE_DATA,0,NULL,
-		CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+	HANDLE hFile = CreateFile(
+		strFilename.c_str(), FILE_WRITE_DATA, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
-	if(hFile != INVALID_HANDLE_VALUE)
+	if (hFile != INVALID_HANDLE_VALUE)
 	{
 		DWORD nBytesWritten;
 
 		/* Write out the BOM for UTF-16 LE data.
 		See http://en.wikipedia.org/wiki/Byte-order_mark */
-		WriteFile(hFile,reinterpret_cast<LPCVOID>("\xFF\xFE"),2,&nBytesWritten,NULL);
+		WriteFile(hFile, reinterpret_cast<LPCVOID>("\xFF\xFE"), 2, &nBytesWritten, NULL);
 
-		WriteFile(hFile,reinterpret_cast<LPCVOID>(strContents.c_str()),static_cast<DWORD>(strContents.size() * sizeof(WCHAR)),
-			&nBytesWritten,NULL);
+		WriteFile(hFile, reinterpret_cast<LPCVOID>(strContents.c_str()),
+			static_cast<DWORD>(strContents.size() * sizeof(WCHAR)), &nBytesWritten, NULL);
 
-		if(nBytesWritten == strContents.size())
+		if (nBytesWritten == strContents.size())
 		{
 			return TRUE;
 		}
@@ -438,39 +460,39 @@ BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,cons
 	return FALSE;
 }
 
-HRESULT CopyFiles(const std::list<std::wstring> &FileNameList,IDataObject **pClipboardDataObject)
+HRESULT CopyFiles(const std::list<std::wstring> &FileNameList, IDataObject **pClipboardDataObject)
 {
-	return CopyFilesToClipboard(FileNameList,FALSE,pClipboardDataObject);
+	return CopyFilesToClipboard(FileNameList, FALSE, pClipboardDataObject);
 }
 
-HRESULT CutFiles(const std::list<std::wstring> &FileNameList,IDataObject **pClipboardDataObject)
+HRESULT CutFiles(const std::list<std::wstring> &FileNameList, IDataObject **pClipboardDataObject)
 {
-	return CopyFilesToClipboard(FileNameList,TRUE,pClipboardDataObject);
+	return CopyFilesToClipboard(FileNameList, TRUE, pClipboardDataObject);
 }
 
-HRESULT CopyFilesToClipboard(const std::list<std::wstring> &FileNameList,
-BOOL bMove,IDataObject **pClipboardDataObject)
+HRESULT CopyFilesToClipboard(
+	const std::list<std::wstring> &FileNameList, BOOL bMove, IDataObject **pClipboardDataObject)
 {
 	FORMATETC ftc[2];
 	STGMEDIUM stg[2];
-	BuildHDropList(&ftc[0],&stg[0],FileNameList);
+	BuildHDropList(&ftc[0], &stg[0], FileNameList);
 
-	ftc[1].cfFormat			= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT);
-	ftc[1].ptd				= NULL;
-	ftc[1].dwAspect			= DVASPECT_CONTENT;
-	ftc[1].lindex			= -1;
-	ftc[1].tymed			= TYMED_HGLOBAL;
+	ftc[1].cfFormat = (CLIPFORMAT) RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT);
+	ftc[1].ptd = NULL;
+	ftc[1].dwAspect = DVASPECT_CONTENT;
+	ftc[1].lindex = -1;
+	ftc[1].tymed = TYMED_HGLOBAL;
 
 	HRESULT hr = E_FAIL;
-	HGLOBAL hglb = GlobalAlloc(GMEM_MOVEABLE,sizeof(DWORD));
+	HGLOBAL hglb = GlobalAlloc(GMEM_MOVEABLE, sizeof(DWORD));
 
-	if(hglb != NULL)
+	if (hglb != NULL)
 	{
 		auto *pdwCopyEffect = static_cast<DWORD *>(GlobalLock(hglb));
 
-		if(pdwCopyEffect != NULL)
+		if (pdwCopyEffect != NULL)
 		{
-			if(bMove)
+			if (bMove)
 			{
 				*pdwCopyEffect = DROPEFFECT_MOVE;
 			}
@@ -490,7 +512,7 @@ BOOL bMove,IDataObject **pClipboardDataObject)
 			IDataObjectAsyncCapability *pAsyncCapability = NULL;
 			hr = (*pClipboardDataObject)->QueryInterface(IID_PPV_ARGS(&pAsyncCapability));
 
-			if(SUCCEEDED(hr))
+			if (SUCCEEDED(hr))
 			{
 				pAsyncCapability->SetAsyncMode(TRUE);
 				pAsyncCapability->Release();
@@ -505,69 +527,69 @@ BOOL bMove,IDataObject **pClipboardDataObject)
 
 int PasteLinksToClipboardFiles(const TCHAR *szDestination)
 {
-	return PasteFilesFromClipboardSpecial(szDestination,PASTE_CLIPBOARD_LINK);
+	return PasteFilesFromClipboardSpecial(szDestination, PASTE_CLIPBOARD_LINK);
 }
 
 int PasteHardLinks(const TCHAR *szDestination)
 {
-	return PasteFilesFromClipboardSpecial(szDestination,PASTE_CLIPBOARD_HARDLINK);
+	return PasteFilesFromClipboardSpecial(szDestination, PASTE_CLIPBOARD_HARDLINK);
 }
 
 /* TODO: Use CDropHandler. */
-int PasteFilesFromClipboardSpecial(const TCHAR *szDestination,PasteType pasteType)
+int PasteFilesFromClipboardSpecial(const TCHAR *szDestination, PasteType pasteType)
 {
-	IDataObject	*clipboardObject = NULL;
-	DROPFILES	*pdf = NULL;
-	FORMATETC	ftc;
-	STGMEDIUM	stg;
-	HRESULT		hr;
-	TCHAR		szFileName[MAX_PATH];
-	TCHAR		szLinkFileName[MAX_PATH];
-	TCHAR		szOldFileName[MAX_PATH];
-	int			nFilesCopied = -1;
-	int			i = 0;
+	IDataObject *clipboardObject = NULL;
+	DROPFILES *pdf = NULL;
+	FORMATETC ftc;
+	STGMEDIUM stg;
+	HRESULT hr;
+	TCHAR szFileName[MAX_PATH];
+	TCHAR szLinkFileName[MAX_PATH];
+	TCHAR szOldFileName[MAX_PATH];
+	int nFilesCopied = -1;
+	int i = 0;
 
 	hr = OleGetClipboard(&clipboardObject);
 
-	if(SUCCEEDED(hr))
+	if (SUCCEEDED(hr))
 	{
-		ftc.cfFormat	= CF_HDROP;
-		ftc.ptd			= NULL;
-		ftc.dwAspect	= DVASPECT_CONTENT;
-		ftc.lindex		= -1;
-		ftc.tymed		= TYMED_HGLOBAL;
+		ftc.cfFormat = CF_HDROP;
+		ftc.ptd = NULL;
+		ftc.dwAspect = DVASPECT_CONTENT;
+		ftc.lindex = -1;
+		ftc.tymed = TYMED_HGLOBAL;
 
-		hr = clipboardObject->GetData(&ftc,&stg);
+		hr = clipboardObject->GetData(&ftc, &stg);
 
-		if(SUCCEEDED(hr))
+		if (SUCCEEDED(hr))
 		{
-			pdf = (DROPFILES *)GlobalLock(stg.hGlobal);
+			pdf = (DROPFILES *) GlobalLock(stg.hGlobal);
 
-			if(pdf != NULL)
+			if (pdf != NULL)
 			{
-				nFilesCopied = DragQueryFile((HDROP)pdf,
-					0xFFFFFFFF,NULL,0);
+				nFilesCopied = DragQueryFile((HDROP) pdf, 0xFFFFFFFF, NULL, 0);
 
-				for(i = 0;i < nFilesCopied;i++)
+				for (i = 0; i < nFilesCopied; i++)
 				{
-					DragQueryFile((HDROP)pdf,i,szOldFileName,SIZEOF_ARRAY(szOldFileName));
+					DragQueryFile((HDROP) pdf, i, szOldFileName, SIZEOF_ARRAY(szOldFileName));
 
-					StringCchCopy(szLinkFileName,SIZEOF_ARRAY(szLinkFileName),szDestination);
+					StringCchCopy(szLinkFileName, SIZEOF_ARRAY(szLinkFileName), szDestination);
 
-					StringCchCopy(szFileName,SIZEOF_ARRAY(szFileName),szOldFileName);
+					StringCchCopy(szFileName, SIZEOF_ARRAY(szFileName), szOldFileName);
 					PathStripPath(szFileName);
 
-					PathAppend(szLinkFileName,szFileName);
+					PathAppend(szLinkFileName, szFileName);
 
-					switch(pasteType)
+					switch (pasteType)
 					{
 					case PASTE_CLIPBOARD_LINK:
-						PathRenameExtension(szLinkFileName,_T(".lnk"));
-						NFileOperations::CreateLinkToFile(szOldFileName,szLinkFileName,EMPTY_STRING);
+						PathRenameExtension(szLinkFileName, _T(".lnk"));
+						NFileOperations::CreateLinkToFile(
+							szOldFileName, szLinkFileName, EMPTY_STRING);
 						break;
 
 					case PASTE_CLIPBOARD_HARDLINK:
-						CreateHardLink(szLinkFileName,szOldFileName,NULL);
+						CreateHardLink(szLinkFileName, szOldFileName, NULL);
 						break;
 					}
 				}
@@ -584,13 +606,13 @@ int PasteFilesFromClipboardSpecial(const TCHAR *szDestination,PasteType pasteTyp
 }
 
 HRESULT NFileOperations::CreateLinkToFile(const std::wstring &strTargetFilename,
-	const std::wstring &strLinkFilename,const std::wstring &strLinkDescription)
+	const std::wstring &strLinkFilename, const std::wstring &strLinkDescription)
 {
 	IShellLink *pShellLink = NULL;
-	HRESULT hr = CoCreateInstance(CLSID_ShellLink,NULL,CLSCTX_INPROC_SERVER,
-		IID_PPV_ARGS(&pShellLink));
+	HRESULT hr =
+		CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pShellLink));
 
-	if(SUCCEEDED(hr))
+	if (SUCCEEDED(hr))
 	{
 		pShellLink->SetPath(strTargetFilename.c_str());
 		pShellLink->SetDescription(strLinkDescription.c_str());
@@ -598,9 +620,9 @@ HRESULT NFileOperations::CreateLinkToFile(const std::wstring &strTargetFilename,
 		IPersistFile *pPersistFile = NULL;
 		hr = pShellLink->QueryInterface(IID_PPV_ARGS(&pPersistFile));
 
-		if(SUCCEEDED(hr))
+		if (SUCCEEDED(hr))
 		{
-			pPersistFile->Save(strLinkFilename.c_str(),TRUE);
+			pPersistFile->Save(strLinkFilename.c_str(), TRUE);
 			pPersistFile->Release();
 		}
 
@@ -610,38 +632,39 @@ HRESULT NFileOperations::CreateLinkToFile(const std::wstring &strTargetFilename,
 	return hr;
 }
 
-HRESULT NFileOperations::ResolveLink(HWND hwnd, DWORD fFlags, const TCHAR *szLinkFilename, TCHAR *szResolvedPath, int nBufferSize)
+HRESULT NFileOperations::ResolveLink(
+	HWND hwnd, DWORD fFlags, const TCHAR *szLinkFilename, TCHAR *szResolvedPath, int nBufferSize)
 {
 	SHFILEINFO shfi;
-	DWORD_PTR dwRet = SHGetFileInfo(szLinkFilename,NULL,&shfi,sizeof(shfi),SHGFI_ATTRIBUTES);
+	DWORD_PTR dwRet = SHGetFileInfo(szLinkFilename, NULL, &shfi, sizeof(shfi), SHGFI_ATTRIBUTES);
 
-	if(dwRet == 0 ||
-		!(shfi.dwAttributes & SFGAO_LINK))
+	if (dwRet == 0 || !(shfi.dwAttributes & SFGAO_LINK))
 	{
 		return E_FAIL;
 	}
 
 	IShellLink *pShellLink = NULL;
-	HRESULT hr = CoCreateInstance(CLSID_ShellLink,NULL,CLSCTX_INPROC_SERVER,
-		IID_PPV_ARGS(&pShellLink));
+	HRESULT hr =
+		CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pShellLink));
 
-	if(hr == S_OK)
+	if (hr == S_OK)
 	{
 		IPersistFile *pPersistFile = NULL;
 		hr = pShellLink->QueryInterface(IID_PPV_ARGS(&pPersistFile));
 
-		if(hr == S_OK)
+		if (hr == S_OK)
 		{
-			hr = pPersistFile->Load(szLinkFilename,STGM_READ);
+			hr = pPersistFile->Load(szLinkFilename, STGM_READ);
 
-			if(hr == S_OK)
+			if (hr == S_OK)
 			{
-				pShellLink->Resolve(hwnd,fFlags);
+				pShellLink->Resolve(hwnd, fFlags);
 
 				TCHAR szResolvedPathInternal[MAX_PATH];
-				pShellLink->GetPath(szResolvedPathInternal,SIZEOF_ARRAY(szResolvedPathInternal),NULL,SLGP_UNCPRIORITY);
+				pShellLink->GetPath(szResolvedPathInternal, SIZEOF_ARRAY(szResolvedPathInternal),
+					NULL, SLGP_UNCPRIORITY);
 
-				StringCchCopy(szResolvedPath,nBufferSize,szResolvedPathInternal);
+				StringCchCopy(szResolvedPath, nBufferSize, szResolvedPathInternal);
 			}
 
 			pPersistFile->Release();
@@ -653,19 +676,20 @@ HRESULT NFileOperations::ResolveLink(HWND hwnd, DWORD fFlags, const TCHAR *szLin
 	return hr;
 }
 
-BOOL NFileOperations::CreateBrowseDialog(HWND hOwner,const std::wstring &strTitle,PIDLIST_ABSOLUTE *ppidl)
+BOOL NFileOperations::CreateBrowseDialog(
+	HWND hOwner, const std::wstring &strTitle, PIDLIST_ABSOLUTE *ppidl)
 {
-	CoInitializeEx(NULL,COINIT_APARTMENTTHREADED);
+	CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 
 	TCHAR szDisplayName[MAX_PATH];
 
 	BROWSEINFO bi;
-	bi.hwndOwner		= hOwner;
-	bi.pidlRoot			= NULL;
-	bi.pszDisplayName	= szDisplayName;
-	bi.lpszTitle		= strTitle.c_str();
-	bi.ulFlags			= BIF_NEWDIALOGSTYLE;
-	bi.lpfn				= NULL;
+	bi.hwndOwner = hOwner;
+	bi.pidlRoot = NULL;
+	bi.pszDisplayName = szDisplayName;
+	bi.lpszTitle = strTitle.c_str();
+	bi.ulFlags = BIF_NEWDIALOGSTYLE;
+	bi.lpfn = NULL;
 	*ppidl = SHBrowseForFolder(&bi);
 
 	BOOL bSuccessful = (*ppidl != NULL);
@@ -682,7 +706,7 @@ BOOL GetFileClusterSize(const std::wstring &strFilename, PLARGE_INTEGER lpRealFi
 	LARGE_INTEGER lFileSize;
 	BOOL bRet = GetFileSizeEx(strFilename.c_str(), &lFileSize);
 
-	if(!bRet)
+	if (!bRet)
 	{
 		return FALSE;
 	}
@@ -690,26 +714,26 @@ BOOL GetFileClusterSize(const std::wstring &strFilename, PLARGE_INTEGER lpRealFi
 	TCHAR szRoot[MAX_PATH];
 	HRESULT hr = StringCchCopy(szRoot, SIZEOF_ARRAY(szRoot), strFilename.c_str());
 
-	if(FAILED(hr))
+	if (FAILED(hr))
 	{
 		return FALSE;
 	}
 
 	bRet = PathStripToRoot(szRoot);
 
-	if(!bRet)
+	if (!bRet)
 	{
 		return FALSE;
 	}
 
 	bRet = GetClusterSize(szRoot, &dwClusterSize);
 
-	if(!bRet)
+	if (!bRet)
 	{
 		return FALSE;
 	}
 
-	if((lFileSize.QuadPart % dwClusterSize) != 0)
+	if ((lFileSize.QuadPart % dwClusterSize) != 0)
 	{
 		/* The real size is the logical file size rounded up to the end of the
 		nearest cluster. */
@@ -721,85 +745,85 @@ BOOL GetFileClusterSize(const std::wstring &strFilename, PLARGE_INTEGER lpRealFi
 	return TRUE;
 }
 
-void NFileOperations::DeleteFileSecurely(const std::wstring &strFilename,OverwriteMethod_t uOverwriteMethod)
+void NFileOperations::DeleteFileSecurely(
+	const std::wstring &strFilename, OverwriteMethod_t uOverwriteMethod)
 {
-	HANDLE			hFile;
-	WIN32_FIND_DATA	wfd;
-	HANDLE			hFindFile;
-	HCRYPTPROV		hProv;
-	LARGE_INTEGER	lRealFileSize;
-	BYTE			pass1Data;
-	BYTE			pass2Data;
-	BYTE			pass3Data;
-	DWORD			nBytesWritten;
-	BOOL			bFolder;
-	int				i = 0;
+	HANDLE hFile;
+	WIN32_FIND_DATA wfd;
+	HANDLE hFindFile;
+	HCRYPTPROV hProv;
+	LARGE_INTEGER lRealFileSize;
+	BYTE pass1Data;
+	BYTE pass2Data;
+	BYTE pass3Data;
+	DWORD nBytesWritten;
+	BOOL bFolder;
+	int i = 0;
 
-	hFindFile = FindFirstFile(strFilename.c_str(),&wfd);
+	hFindFile = FindFirstFile(strFilename.c_str(), &wfd);
 
-	if(hFindFile == INVALID_HANDLE_VALUE)
+	if (hFindFile == INVALID_HANDLE_VALUE)
 		return;
 
 	bFolder = (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
 
 	FindClose(hFindFile);
 
-	if(bFolder)
+	if (bFolder)
 	{
 		return;
 	}
 
 	/* Determine the actual size of the file on disk
 	(i.e. how many clusters it is allocated). */
-	GetFileClusterSize(strFilename,&lRealFileSize);
+	GetFileClusterSize(strFilename, &lRealFileSize);
 
 	/* Open the file, block any sharing mode, to stop the file
 	been opened while it is overwritten. */
-	hFile = CreateFile(strFilename.c_str(),FILE_WRITE_DATA,0,NULL,OPEN_EXISTING,
-	NULL,NULL);
+	hFile = CreateFile(strFilename.c_str(), FILE_WRITE_DATA, 0, NULL, OPEN_EXISTING, NULL, NULL);
 
-	if(hFile == INVALID_HANDLE_VALUE)
+	if (hFile == INVALID_HANDLE_VALUE)
 		return;
 
 	/* Extend the file out to the end of its last sector. */
-	SetFilePointerEx(hFile,lRealFileSize,NULL,FILE_BEGIN);
+	SetFilePointerEx(hFile, lRealFileSize, NULL, FILE_BEGIN);
 	SetEndOfFile(hFile);
 
 	/* Start at the beginning of the file, and
 	write in the first-pass data, 0x00 over
 	the length of the whole file. */
-	SetFilePointer(hFile,0,NULL,FILE_BEGIN);
+	SetFilePointer(hFile, 0, NULL, FILE_BEGIN);
 	pass1Data = 0x00;
 
-	for(i = 0;i < lRealFileSize.QuadPart;i++)
+	for (i = 0; i < lRealFileSize.QuadPart; i++)
 	{
-		WriteFile(hFile,(LPVOID)&pass1Data,1,&nBytesWritten,NULL);
+		WriteFile(hFile, (LPVOID) &pass1Data, 1, &nBytesWritten, NULL);
 	}
 
-	if(uOverwriteMethod == OVERWRITE_THREEPASS)
+	if (uOverwriteMethod == OVERWRITE_THREEPASS)
 	{
 		/* Start at the beginning of the file, and
 		write in the second-pass data, 0xFF over
 		the length of the whole file. */
-		SetFilePointer(hFile,0,NULL,FILE_BEGIN);
+		SetFilePointer(hFile, 0, NULL, FILE_BEGIN);
 		pass2Data = 0xFF;
 
-		for(i = 0;i < lRealFileSize.QuadPart;i++)
+		for (i = 0; i < lRealFileSize.QuadPart; i++)
 		{
-			WriteFile(hFile,(LPVOID)&pass2Data,1,&nBytesWritten,NULL);
+			WriteFile(hFile, (LPVOID) &pass2Data, 1, &nBytesWritten, NULL);
 		}
 
-		SetFilePointer(hFile,0,NULL,FILE_BEGIN);
+		SetFilePointer(hFile, 0, NULL, FILE_BEGIN);
 
-		CryptAcquireContext(&hProv,_T("SecureDelete"),NULL,PROV_RSA_AES,CRYPT_NEWKEYSET);
+		CryptAcquireContext(&hProv, _T("SecureDelete"), NULL, PROV_RSA_AES, CRYPT_NEWKEYSET);
 
-		for(i = 0;i < lRealFileSize.QuadPart;i++)
+		for (i = 0; i < lRealFileSize.QuadPart; i++)
 		{
-			CryptGenRandom(hProv,1,(LPBYTE)&pass3Data);
-			WriteFile(hFile,(LPVOID)&pass3Data,1,&nBytesWritten,NULL);
+			CryptGenRandom(hProv, 1, (LPBYTE) &pass3Data);
+			WriteFile(hFile, (LPVOID) &pass3Data, 1, &nBytesWritten, NULL);
 		}
 
-		CryptAcquireContext(&hProv,_T("SecureDelete"),NULL,PROV_RSA_AES,CRYPT_DELETEKEYSET);
+		CryptAcquireContext(&hProv, _T("SecureDelete"), NULL, PROV_RSA_AES, CRYPT_DELETEKEYSET);
 	}
 
 	FlushFileBuffers(hFile);
