@@ -348,7 +348,9 @@ LONG DisplayWindow::OnMouseMove(LPARAM lParam)
 	if (m_bSizing)
 	{
 		if ((prevCursorPos.x == cursorPos.x) && (prevCursorPos.y == cursorPos.y))
+		{
 			return 0;
+		}
 
 		prevCursorPos.x = cursorPos.x;
 		prevCursorPos.y = cursorPos.y;
@@ -467,7 +469,9 @@ void DisplayWindow::OnSetThumbnailFile(WPARAM wParam, LPARAM lParam)
 		CancelThumbnailExtraction();
 
 		if (m_hbmThumbnail)
+		{
 			DeleteObject(m_hbmThumbnail);
+		}
 
 		m_iImageWidth = 0;
 		m_iImageHeight = 0;

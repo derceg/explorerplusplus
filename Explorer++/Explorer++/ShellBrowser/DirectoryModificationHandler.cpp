@@ -95,7 +95,9 @@ void ShellBrowser::DirectoryAltered()
 	if (m_iDropped != -1)
 	{
 		if (!ListView_IsItemVisible(m_hListView, m_iDropped))
+		{
 			ListView_EnsureVisible(m_hListView, m_iDropped, TRUE);
+		}
 
 		m_iDropped = -1;
 	}
@@ -103,7 +105,9 @@ void ShellBrowser::DirectoryAltered()
 	SendMessage(m_hOwner, WM_USER_DIRECTORYMODIFIED, m_ID, 0);
 
 	if (bNewItemCreated && !m_bNewItemCreated)
+	{
 		SendMessage(m_hOwner, WM_USER_NEWITEMINSERTED, 0, m_iIndexNewItem);
+	}
 
 	m_AlteredList.clear();
 
@@ -199,10 +203,14 @@ void ShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 			so that items in real folders can still be shown with extensions, even
 			if the global, Explorer option is disabled. */
 			if (m_bVirtualFolder)
+			{
 				hr = pShellFolder->GetDisplayNameOf(pidlRelative, SHGDN_INFOLDER, &str);
+			}
 			else
+			{
 				hr = pShellFolder->GetDisplayNameOf(
 					pidlRelative, SHGDN_INFOLDER | SHGDN_FORPARSING, &str);
+			}
 
 			if (SUCCEEDED(hr))
 			{
@@ -288,7 +296,9 @@ void ShellBrowser::RemoveItemInternal(const TCHAR *szFileName)
 		iItemInternal = LocateFileItemInternalIndex(szFileName);
 
 		if (iItemInternal != -1)
+		{
 			RemoveItem(iItemInternal);
+		}
 	}
 }
 
@@ -350,7 +360,9 @@ void ShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 		res = ListView_GetItem(m_hListView, &lvItem);
 
 		if (res != FALSE)
+		{
 			iItemInternal = (int) lvItem.lParam;
+		}
 
 		TCHAR szFullFileName[MAX_PATH];
 		StringCchCopy(szFullFileName, SIZEOF_ARRAY(szFullFileName), m_CurDir);
@@ -523,7 +535,9 @@ void ShellBrowser::RenameItem(int iItemInternal, const TCHAR *szNewFileName)
 	int iItem;
 
 	if (iItemInternal == -1)
+	{
 		return;
+	}
 
 	auto &itemInfo = m_itemInfoMap.at(iItemInternal);
 

@@ -302,9 +302,13 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	if (nPrevItems == 0 && m_AwaitingAddList.empty())
 	{
 		if (m_folderSettings.applyFilter)
+		{
 			ApplyFilteringBackgroundImage(true);
+		}
 		else
+		{
 			ApplyFolderEmptyBackgroundImage(true);
+		}
 
 		m_nTotalItems = 0;
 
@@ -384,7 +388,9 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 		if (m_bNewItemCreated)
 		{
 			if (CompareIdls(itemInfo.pidlComplete.get(), m_pidlNewItem))
+			{
 				m_bNewItemCreated = FALSE;
+			}
 
 			m_iIndexNewItem = iItemIndex;
 		}
@@ -472,7 +478,9 @@ void ShellBrowser::RemoveItem(int iItemInternal)
 	int nItems;
 
 	if (iItemInternal == -1)
+	{
 		return;
+	}
 
 	/* Is this item a folder? */
 	bFolder = (m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)

@@ -495,18 +495,26 @@ void ShellBrowser::UpdateFileSelectionInfo(int internalIndex, BOOL selected)
 	if (selected)
 	{
 		if (isFolder)
+		{
 			m_NumFoldersSelected++;
+		}
 		else
+		{
 			m_NumFilesSelected++;
+		}
 
 		m_ulFileSelectionSize.QuadPart += ulFileSize.QuadPart;
 	}
 	else
 	{
 		if (isFolder)
+		{
 			m_NumFoldersSelected--;
+		}
 		else
+		{
 			m_NumFilesSelected--;
+		}
 
 		m_ulFileSelectionSize.QuadPart -= ulFileSize.QuadPart;
 	}

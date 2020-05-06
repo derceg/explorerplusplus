@@ -444,7 +444,9 @@ std::wstring ShellBrowser::DetermineItemSizeGroup(const BasicItemInfo_t &itemInf
 
 		/* Check which of the size groups this item belongs to. */
 		while (fileSize < sizeGroupLimits[i] && i > 0)
+		{
 			i--;
+		}
 
 		iSize = i;
 	}
@@ -498,7 +500,9 @@ std::wstring ShellBrowser::DetermineItemTotalSizeGroup(const BasicItemInfo_t &it
 		i = nGroups - 1;
 
 		while (nTotalBytes.QuadPart < totalSizeGroupLimits[i].QuadPart && i > 0)
+		{
 			i--;
+		}
 
 		iSize = i;
 	}

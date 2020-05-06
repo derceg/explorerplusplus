@@ -74,9 +74,13 @@ HRESULT _stdcall ShellBrowser::DragEnter(
 	}
 
 	if (grfKeyState & MK_LBUTTON)
+	{
 		m_DragType = DragType::LeftClick;
+	}
 	else if (grfKeyState & MK_RBUTTON)
+	{
 		m_DragType = DragType::RightClick;
+	}
 
 	pt.x = ptl.x;
 	pt.y = ptl.y;
@@ -113,9 +117,13 @@ HRESULT _stdcall ShellBrowser::DragOver(DWORD grfKeyState, POINTL ptl, DWORD *pd
 	if (m_bDataAccept)
 	{
 		if (!m_bOverFolder)
+		{
 			ListViewHelper::PositionInsertMark(m_hListView, &pt);
+		}
 		else
+		{
 			ListViewHelper::PositionInsertMark(m_hListView, nullptr);
+		}
 	}
 
 	return S_OK;
@@ -289,7 +297,9 @@ void ShellBrowser::HandleDragSelection(const POINT *ppt)
 						iItem = LocateFileItemIndex(itr->szFileName);
 
 						if (info.iItem == iItem)
+						{
 							bClash = TRUE;
+						}
 					}
 				}
 
@@ -303,9 +313,13 @@ void ShellBrowser::HandleDragSelection(const POINT *ppt)
 					mask = ListView_GetItemState(m_hListView, info.iItem, LVIS_SELECTED);
 
 					if ((mask & LVIS_SELECTED) == LVIS_SELECTED)
+					{
 						m_bDeselectDropFolder = FALSE;
+					}
 					else
+					{
 						m_bDeselectDropFolder = TRUE;
+					}
 
 					/* Select the item. */
 					ListView_SetItemState(m_hListView, info.iItem, LVIS_SELECTED, LVIS_SELECTED);
@@ -532,7 +546,9 @@ void ShellBrowser::RepositionLocalFiles(const POINT *ppt)
 	to be moved. Therefore, if the style is on, turn it
 	off, move the items, and the turn it back on. */
 	if (m_folderSettings.autoArrange)
+	{
 		ListViewHelper::SetAutoArrange(m_hListView, FALSE);
+	}
 
 	for (itr = m_DraggedFilesList.begin(); itr != m_DraggedFilesList.end(); itr++)
 	{
@@ -590,7 +606,9 @@ void ShellBrowser::RepositionLocalFiles(const POINT *ppt)
 						else
 						{
 							if (iSort == iInsert)
+							{
 								iSort++;
+							}
 
 							m_itemInfoMap.at((int) lvItem.lParam).iRelativeSort = iSort;
 						}
@@ -638,7 +656,9 @@ void ShellBrowser::RepositionLocalFiles(const POINT *ppt)
 							iNext = ListView_GetNextItem(m_hListView, iHitItem, LVNI_TOLEFT);
 
 							if (iNext == -1)
+							{
 								iNext = iHitItem;
+							}
 
 							bRowStart =
 								(ListView_GetNextItem(m_hListView, iNext, LVNI_TOLEFT) == -1);
@@ -670,7 +690,9 @@ void ShellBrowser::RepositionLocalFiles(const POINT *ppt)
 								iBelow = ListView_GetNextItem(m_hListView, iNext, LVNI_BELOW);
 
 								if (iBelow != -1)
+								{
 									iNext = iBelow;
+								}
 							}
 
 							bRowEnd = TRUE;
@@ -696,9 +718,13 @@ void ShellBrowser::RepositionLocalFiles(const POINT *ppt)
 							iLeft = ListView_GetNextItem(m_hListView, iNext, LVNI_TOLEFT);
 
 							if (iLeft != -1)
+							{
 								iNext = iLeft;
+							}
 							else
+							{
 								bRowStart = TRUE;
+							}
 						}
 					}
 
@@ -732,7 +758,9 @@ void ShellBrowser::RepositionLocalFiles(const POINT *ppt)
 	}
 
 	if (m_folderSettings.autoArrange)
+	{
 		ListViewHelper::SetAutoArrange(m_hListView, TRUE);
+	}
 
 	m_bDragging = FALSE;
 
@@ -753,9 +781,13 @@ void ShellBrowser::ScrollListViewFromCursor(HWND hListView, const POINT *CursorP
 	if ((fStyle & WS_HSCROLL) == WS_HSCROLL)
 	{
 		if (CursorPos->x < MIN_X_POS)
+		{
 			ListView_Scroll(hListView, -X_SCROLL_AMOUNT, 0);
+		}
 		else if (CursorPos->x > (rc.right - MIN_X_POS))
+		{
 			ListView_Scroll(hListView, X_SCROLL_AMOUNT, 0);
+		}
 	}
 
 	/* The listview can be scrolled only if there
@@ -763,8 +795,12 @@ void ShellBrowser::ScrollListViewFromCursor(HWND hListView, const POINT *CursorP
 	if ((fStyle & WS_VSCROLL) == WS_VSCROLL)
 	{
 		if (CursorPos->y < MIN_Y_POS)
+		{
 			ListView_Scroll(hListView, 0, -Y_SCROLL_AMOUNT);
+		}
 		else if (CursorPos->y > (rc.bottom - MIN_Y_POS))
+		{
 			ListView_Scroll(hListView, 0, Y_SCROLL_AMOUNT);
+		}
 	}
 }

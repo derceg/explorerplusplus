@@ -253,9 +253,13 @@ int ShellBrowser::GetThumbnailInternal(
 	FillRect(hdcBacking, &rect, hbr);
 
 	if (iType == THUMBNAIL_TYPE_ICON)
+	{
 		DrawIconThumbnailInternal(hdcBacking, iInternalIndex);
+	}
 	else if (iType == THUMBNAIL_TYPE_EXTRACTED)
+	{
 		DrawThumbnailInternal(hdcBacking, hThumbnailBitmap);
+	}
 
 	/* Clean up...
 	Everything EXCEPT the backing bitmap should be

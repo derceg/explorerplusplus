@@ -882,9 +882,13 @@ void ShellBrowser::ApplyHeaderSortArrow()
 	Header_GetItem(hHeader, iColumn, &hdItem);
 
 	if (!m_folderSettings.sortAscending)
+	{
 		hdItem.fmt |= HDF_SORTDOWN;
+	}
 	else
+	{
 		hdItem.fmt |= HDF_SORTUP;
+	}
 
 	/* Add the up/down arrow to the column by which
 	items are now sorted. */

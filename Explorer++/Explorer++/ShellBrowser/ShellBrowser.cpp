@@ -260,7 +260,9 @@ void ShellBrowser::SetViewMode(ViewMode viewMode)
 	}
 
 	if (m_folderSettings.viewMode == +ViewMode::Thumbnails && viewMode != +ViewMode::Thumbnails)
+	{
 		RemoveThumbnailsView();
+	}
 
 	SetViewModeInternal(viewMode);
 
@@ -329,7 +331,9 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 
 	/* Delete all the tile view columns. */
 	if (m_folderSettings.viewMode == +ViewMode::Tiles && viewMode != +ViewMode::Tiles)
+	{
 		DeleteTileViewColumns();
+	}
 
 	switch (viewMode)
 	{
@@ -367,7 +371,9 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 		dwStyle = LV_VIEW_ICON;
 
 		if (!m_bThumbnailsSetup)
+		{
 			SetupThumbnailsView();
+		}
 		break;
 
 	default:
@@ -448,7 +454,9 @@ BOOL ShellBrowser::IsFilenameFiltered(const TCHAR *FileName) const
 {
 	if (CheckWildcardMatch(
 			m_folderSettings.filter.c_str(), FileName, m_folderSettings.filterCaseSensitive))
+	{
 		return FALSE;
+	}
 
 	return TRUE;
 }
@@ -696,7 +704,9 @@ BOOL ShellBrowser::CompareVirtualFolders(UINT uFolderCSIDL) const
 	GetCsidlDisplayName(uFolderCSIDL, szParsingPath, SIZEOF_ARRAY(szParsingPath), SHGDN_FORPARSING);
 
 	if (StrCmp(m_CurDir, szParsingPath) == 0)
+	{
 		return TRUE;
+	}
 
 	return FALSE;
 }
@@ -726,7 +736,9 @@ void ShellBrowser::PositionDroppedItems()
 		to be moved. Therefore, if the style is on, turn it
 		off, move the items, and the turn it back on. */
 		if (m_folderSettings.autoArrange)
+		{
 			ListViewHelper::SetAutoArrange(m_hListView, FALSE);
+		}
 
 		for (itr = m_DroppedFileNameList.begin(); itr != m_DroppedFileNameList.end();)
 		{
@@ -735,7 +747,9 @@ void ShellBrowser::PositionDroppedItems()
 			if (iItem != -1)
 			{
 				if (!bDropItemSet)
+				{
 					m_iDropped = iItem;
+				}
 
 				if (m_folderSettings.autoArrange)
 				{
@@ -777,7 +791,9 @@ void ShellBrowser::PositionDroppedItems()
 							iNext = ListView_GetNextItem(m_hListView, iHitItem, LVNI_TOLEFT);
 
 							if (iNext == -1)
+							{
 								iNext = iHitItem;
+							}
 
 							bRowStart =
 								(ListView_GetNextItem(m_hListView, iNext, LVNI_TOLEFT) == -1);
@@ -809,7 +825,9 @@ void ShellBrowser::PositionDroppedItems()
 								iBelow = ListView_GetNextItem(m_hListView, iNext, LVNI_BELOW);
 
 								if (iBelow != -1)
+								{
 									iNext = iBelow;
+								}
 							}
 
 							bRowEnd = TRUE;
@@ -835,9 +853,13 @@ void ShellBrowser::PositionDroppedItems()
 							iLeft = ListView_GetNextItem(m_hListView, iNext, LVNI_TOLEFT);
 
 							if (iLeft != -1)
+							{
 								iNext = iLeft;
+							}
 							else
+							{
 								bRowStart = TRUE;
+							}
 						}
 					}
 
@@ -875,7 +897,9 @@ void ShellBrowser::PositionDroppedItems()
 		}
 
 		if (m_folderSettings.autoArrange)
+		{
 			ListViewHelper::SetAutoArrange(m_hListView, TRUE);
+		}
 	}
 }
 
@@ -897,9 +921,13 @@ int ShellBrowser::DetermineItemSortedPosition(LPARAM lParam) const
 		bItem = ListView_GetItem(m_hListView, &lvItem);
 
 		if (bItem)
+		{
 			res = Sort(static_cast<int>(lParam), static_cast<int>(lvItem.lParam));
+		}
 		else
+		{
 			res = 0;
+		}
 
 		i++;
 	}
@@ -1010,9 +1038,13 @@ void ShellBrowser::DetermineFolderVirtual(PCIDLIST_ABSOLUTE pidlDirectory)
 		real folders. Shouldn't be able to create
 		folders in Recycle Bin. */
 		if (CompareVirtualFolders(CSIDL_BITBUCKET))
+		{
 			m_bVirtualFolder = TRUE;
+		}
 		else if (CompareVirtualFolders(CSIDL_DESKTOP))
+		{
 			m_bVirtualFolder = FALSE;
+		}
 	}
 }
 
@@ -1067,9 +1099,13 @@ void ShellBrowser::UpdateFiltering()
 		UnfilterAllItems();
 
 		if (m_nTotalItems == 0)
+		{
 			ApplyFolderEmptyBackgroundImage(true);
+		}
 		else
+		{
 			ApplyFilteringBackgroundImage(false);
+		}
 	}
 }
 
@@ -1436,7 +1472,9 @@ void ShellBrowser::RemoveDrive(const TCHAR *szDrive)
 	}
 
 	if (iItemInternal != -1)
+	{
 		RemoveItem(iItemInternal);
+	}
 }
 
 int ShellBrowser::GetUniqueFolderId() const

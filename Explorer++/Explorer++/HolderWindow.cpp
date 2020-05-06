@@ -178,7 +178,9 @@ int HolderWindow::OnHolderWindowMouseMove(LPARAM lParam)
 	{
 		/* Mouse hasn't moved. */
 		if ((ptsPrevCursor.x == ptsCursor.x) && (ptsPrevCursor.y == ptsCursor.y))
+		{
 			return 0;
+		}
 
 		ptsPrevCursor.x = ptsCursor.x;
 		ptsPrevCursor.y = ptsCursor.y;

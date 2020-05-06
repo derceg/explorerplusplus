@@ -98,7 +98,9 @@ void Explorerplusplus::LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom)
 	long lChildNodes;
 
 	if (pXMLDom == nullptr)
+	{
 		goto clean;
+	}
 
 	TCHAR tempNodeSelector[64];
 	StringCchPrintf(
@@ -166,11 +168,17 @@ void Explorerplusplus::LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom)
 
 clean:
 	if (bstr)
+	{
 		SysFreeString(bstr);
+	}
 	if (pNodes)
+	{
 		pNodes->Release();
+	}
 	if (pNode)
+	{
 		pNode->Release();
+	}
 }
 
 void Explorerplusplus::SaveDialogStatesToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
