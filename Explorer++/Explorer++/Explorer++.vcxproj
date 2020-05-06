@@ -566,7 +566,7 @@
     <ClCompile Include="ShellBrowser\DirectoryModificationHandler.cpp" />
     <ClCompile Include="ShellBrowser\GroupManager.cpp" />
     <ClCompile Include="ShellBrowser\HandleThumbnails.cpp" />
-    <ClCompile Include="ShellBrowser\iDropTarget.cpp" />
+    <ClCompile Include="ShellBrowser\DropTarget.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowser.cpp" />
     <ClCompile Include="ShellBrowser\ListView.cpp" />
     <ClCompile Include="ShellBrowser\SortHelper.cpp" />

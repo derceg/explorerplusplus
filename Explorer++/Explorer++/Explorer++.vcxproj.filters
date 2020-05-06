@@ -190,9 +190,6 @@
     <ClCompile Include="ShellBrowser\HandleThumbnails.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
-    <ClCompile Include="ShellBrowser\iDropTarget.cpp">
-      <Filter>ShellBrowser</Filter>
-    </ClCompile>
     <ClCompile Include="ShellBrowser\SortManager.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
@@ -435,6 +432,9 @@
     </ClCompile>
     <ClCompile Include="Bookmarks\BookmarkIconManager.cpp">
       <Filter>Bookmarks</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBrowser\DropTarget.cpp">
+      <Filter>ShellBrowser</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
