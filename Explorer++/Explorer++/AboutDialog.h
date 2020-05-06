@@ -10,18 +10,15 @@
 class AboutDialog : public BaseDialog
 {
 public:
-
 	AboutDialog(HINSTANCE hInstance, HWND hParent);
 
 protected:
-
-	INT_PTR	OnInitDialog() override;
-	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam) override;
-	INT_PTR	OnNotify(NMHDR *pnmhdr) override;
-	INT_PTR	OnClose() override;
+	INT_PTR OnInitDialog() override;
+	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
+	INT_PTR OnNotify(NMHDR *pnmhdr) override;
+	INT_PTR OnClose() override;
 
 private:
-
 	wil::unique_hicon m_icon;
 	wil::unique_hicon m_mainIcon;
 };

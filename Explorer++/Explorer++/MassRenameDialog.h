@@ -15,11 +15,9 @@ class MassRenameDialog;
 class MassRenameDialogPersistentSettings : public DialogSettings
 {
 public:
-
 	static MassRenameDialogPersistentSettings &GetInstance();
 
 private:
-
 	friend MassRenameDialog;
 
 	static const TCHAR SETTINGS_KEY[];
@@ -32,7 +30,7 @@ private:
 	MassRenameDialogPersistentSettings();
 
 	MassRenameDialogPersistentSettings(const MassRenameDialogPersistentSettings &);
-	MassRenameDialogPersistentSettings & operator=(const MassRenameDialogPersistentSettings &);
+	MassRenameDialogPersistentSettings &operator=(const MassRenameDialogPersistentSettings &);
 
 	void SaveExtraRegistrySettings(HKEY hKey) override;
 	void LoadExtraRegistrySettings(HKEY hKey) override;
@@ -40,34 +38,33 @@ private:
 	void SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode) override;
 	void LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue) override;
 
-	int	m_iColumnWidth1;
-	int	m_iColumnWidth2;
+	int m_iColumnWidth1;
+	int m_iColumnWidth2;
 };
 
 class MassRenameDialog : public BaseDialog
 {
 public:
-
 	MassRenameDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
 		const std::list<std::wstring> &FullFilenameList, FileActionHandler *pFileActionHandler);
 
 protected:
-
-	INT_PTR	OnInitDialog() override;
-	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam) override;
-	INT_PTR	OnClose() override;
+	INT_PTR OnInitDialog() override;
+	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
+	INT_PTR OnClose() override;
 
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 
 private:
+	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+		std::list<ResizableDialog::Control_t> &ControlList) override;
+	void SaveState() override;
 
-	void	GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList) override;
-	void	SaveState() override;
+	void OnOk();
+	void OnCancel();
 
-	void	OnOk();
-	void	OnCancel();
-
-	void	ProcessFileName(const std::wstring &strTarget,const std::wstring &strFilename,int iFileIndex,std::wstring &strOutput);
+	void ProcessFileName(const std::wstring &strTarget, const std::wstring &strFilename,
+		int iFileIndex, std::wstring &strOutput);
 
 	IExplorerplusplus *m_expp;
 	std::list<std::wstring> m_FullFilenameList;

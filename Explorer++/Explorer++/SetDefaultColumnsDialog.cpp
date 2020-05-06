@@ -17,8 +17,8 @@ const TCHAR SetDefaultColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SetD
 
 const TCHAR SetDefaultColumnsDialogPersistentSettings::SETTING_FOLDER_TYPE[] = _T("Folder");
 
-SetDefaultColumnsDialog::SetDefaultColumnsDialog(HINSTANCE hInstance, HWND hParent,
-	FolderColumns &folderColumns) :
+SetDefaultColumnsDialog::SetDefaultColumnsDialog(
+	HINSTANCE hInstance, HWND hParent, FolderColumns &folderColumns) :
 	BaseDialog(hInstance, IDD_SETDEFAULTCOLUMNS, hParent, true),
 	m_folderColumns(folderColumns)
 {
@@ -27,71 +27,83 @@ SetDefaultColumnsDialog::SetDefaultColumnsDialog(HINSTANCE hInstance, HWND hPare
 
 INT_PTR SetDefaultColumnsDialog::OnInitDialog()
 {
-	m_icon.reset(LoadIcon(GetModuleHandle(nullptr),MAKEINTRESOURCE(IDI_MAIN)));
-	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
+	m_icon.reset(LoadIcon(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_MAIN)));
+	SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
 
-	HWND hComboBox = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_COMBOBOX);
+	HWND hComboBox = GetDlgItem(m_hDlg, IDC_DEFAULTCOLUMNS_COMBOBOX);
 
 	TCHAR szFolderName[MAX_PATH];
 	int iPos;
 
-	GetCsidlDisplayName(CSIDL_CONTROLS,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
-	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
-	m_FolderMap.insert(std::unordered_map<int,FolderType>::value_type(iPos,FolderType::ControlPanel));
+	GetCsidlDisplayName(CSIDL_CONTROLS, szFolderName, SIZEOF_ARRAY(szFolderName), SHGDN_INFOLDER);
+	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
+		reinterpret_cast<LPARAM>(szFolderName)));
+	m_FolderMap.insert(
+		std::unordered_map<int, FolderType>::value_type(iPos, FolderType::ControlPanel));
 
-	LoadString(GetInstance(),IDS_DEFAULTCOLUMNS_GENERAL,szFolderName,SIZEOF_ARRAY(szFolderName));
-	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
-	m_FolderMap.insert(std::unordered_map<int,FolderType>::value_type(iPos,FolderType::General));
+	LoadString(GetInstance(), IDS_DEFAULTCOLUMNS_GENERAL, szFolderName, SIZEOF_ARRAY(szFolderName));
+	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
+		reinterpret_cast<LPARAM>(szFolderName)));
+	m_FolderMap.insert(std::unordered_map<int, FolderType>::value_type(iPos, FolderType::General));
 
-	GetCsidlDisplayName(CSIDL_DRIVES,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
-	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
-	m_FolderMap.insert(std::unordered_map<int,FolderType>::value_type(iPos,FolderType::Computer));
+	GetCsidlDisplayName(CSIDL_DRIVES, szFolderName, SIZEOF_ARRAY(szFolderName), SHGDN_INFOLDER);
+	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
+		reinterpret_cast<LPARAM>(szFolderName)));
+	m_FolderMap.insert(std::unordered_map<int, FolderType>::value_type(iPos, FolderType::Computer));
 
-	GetCsidlDisplayName(CSIDL_CONNECTIONS,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
-	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
-	m_FolderMap.insert(std::unordered_map<int,FolderType>::value_type(iPos,FolderType::Network));
+	GetCsidlDisplayName(
+		CSIDL_CONNECTIONS, szFolderName, SIZEOF_ARRAY(szFolderName), SHGDN_INFOLDER);
+	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
+		reinterpret_cast<LPARAM>(szFolderName)));
+	m_FolderMap.insert(std::unordered_map<int, FolderType>::value_type(iPos, FolderType::Network));
 
-	GetCsidlDisplayName(CSIDL_NETWORK,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
-	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
-	m_FolderMap.insert(std::unordered_map<int,FolderType>::value_type(iPos,FolderType::NetworkPlaces));
+	GetCsidlDisplayName(CSIDL_NETWORK, szFolderName, SIZEOF_ARRAY(szFolderName), SHGDN_INFOLDER);
+	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
+		reinterpret_cast<LPARAM>(szFolderName)));
+	m_FolderMap.insert(
+		std::unordered_map<int, FolderType>::value_type(iPos, FolderType::NetworkPlaces));
 
-	GetCsidlDisplayName(CSIDL_PRINTERS,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
-	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
-	m_FolderMap.insert(std::unordered_map<int,FolderType>::value_type(iPos,FolderType::Printers));
+	GetCsidlDisplayName(CSIDL_PRINTERS, szFolderName, SIZEOF_ARRAY(szFolderName), SHGDN_INFOLDER);
+	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
+		reinterpret_cast<LPARAM>(szFolderName)));
+	m_FolderMap.insert(std::unordered_map<int, FolderType>::value_type(iPos, FolderType::Printers));
 
-	GetCsidlDisplayName(CSIDL_BITBUCKET,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
-	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
-	m_FolderMap.insert(std::unordered_map<int,FolderType>::value_type(iPos,FolderType::RecycleBin));
+	GetCsidlDisplayName(CSIDL_BITBUCKET, szFolderName, SIZEOF_ARRAY(szFolderName), SHGDN_INFOLDER);
+	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
+		reinterpret_cast<LPARAM>(szFolderName)));
+	m_FolderMap.insert(
+		std::unordered_map<int, FolderType>::value_type(iPos, FolderType::RecycleBin));
 
 	auto folderType = m_psdcdps->m_FolderType;
-	auto itr = std::find_if(m_FolderMap.begin(),m_FolderMap.end(),
-		[folderType](const std::unordered_map<int,FolderType>::value_type &vt){return vt.second == folderType;});
-	SendMessage(hComboBox,CB_SETCURSEL,itr->first,0);
+	auto itr = std::find_if(m_FolderMap.begin(), m_FolderMap.end(),
+		[folderType](const std::unordered_map<int, FolderType>::value_type &vt) {
+			return vt.second == folderType;
+		});
+	SendMessage(hComboBox, CB_SETCURSEL, itr->first, 0);
 
 	m_PreviousFolderType = m_psdcdps->m_FolderType;
 
-	HWND hListView = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_LISTVIEW);
+	HWND hListView = GetDlgItem(m_hDlg, IDC_DEFAULTCOLUMNS_LISTVIEW);
 	SetWindowTheme(hListView, L"Explorer", nullptr);
 
-	ListView_SetExtendedListViewStyleEx(hListView,
-	LVS_EX_CHECKBOXES,LVS_EX_CHECKBOXES);
+	ListView_SetExtendedListViewStyleEx(hListView, LVS_EX_CHECKBOXES, LVS_EX_CHECKBOXES);
 
 	LVCOLUMN lvColumn;
 	lvColumn.mask = LVCF_WIDTH;
 	lvColumn.cx = 180;
-	ListView_InsertColumn(hListView,0,&lvColumn);
+	ListView_InsertColumn(hListView, 0, &lvColumn);
 
 	SetupFolderColumns(m_psdcdps->m_FolderType);
 
 	SetFocus(hListView);
 
-	m_psdcdps->RestoreDialogPosition(m_hDlg,true);
+	m_psdcdps->RestoreDialogPosition(m_hDlg, true);
 
 	return 0;
 }
 
-void SetDefaultColumnsDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-	std::list<ResizableDialog::Control_t> &ControlList)
+void SetDefaultColumnsDialog::GetResizableControlInformation(
+	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList)
 {
 	dsc = BaseDialog::DIALOG_SIZE_CONSTRAINT_NONE;
 
@@ -153,18 +165,18 @@ void SetDefaultColumnsDialog::GetResizableControlInformation(BaseDialog::DialogS
 	ControlList.push_back(control);
 }
 
-INT_PTR SetDefaultColumnsDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR SetDefaultColumnsDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
-	switch(HIWORD(wParam))
+	switch (HIWORD(wParam))
 	{
 	case CBN_SELCHANGE:
 		OnCbnSelChange();
 		break;
 	}
 
-	switch(LOWORD(wParam))
+	switch (LOWORD(wParam))
 	{
 	case IDC_DEFAULTCOLUMNS_MOVEUP:
 		OnMoveColumn(TRUE);
@@ -188,7 +200,7 @@ INT_PTR SetDefaultColumnsDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 
 INT_PTR SetDefaultColumnsDialog::OnNotify(NMHDR *pnmhdr)
 {
-	switch(pnmhdr->code)
+	switch (pnmhdr->code)
 	{
 	case LVN_ITEMCHANGED:
 		OnLvnItemChanged(reinterpret_cast<NMLISTVIEW *>(pnmhdr));
@@ -200,7 +212,7 @@ INT_PTR SetDefaultColumnsDialog::OnNotify(NMHDR *pnmhdr)
 
 INT_PTR SetDefaultColumnsDialog::OnClose()
 {
-	EndDialog(m_hDlg,0);
+	EndDialog(m_hDlg, 0);
 	return 0;
 }
 
@@ -208,7 +220,8 @@ void SetDefaultColumnsDialog::SaveState()
 {
 	m_psdcdps->SaveDialogPosition(m_hDlg);
 
-	int iSelected = static_cast<int>(SendDlgItemMessage(m_hDlg,IDC_DEFAULTCOLUMNS_COMBOBOX,CB_GETCURSEL,0,0));
+	int iSelected = static_cast<int>(
+		SendDlgItemMessage(m_hDlg, IDC_DEFAULTCOLUMNS_COMBOBOX, CB_GETCURSEL, 0, 0));
 	auto itr = m_FolderMap.find(iSelected);
 	m_psdcdps->m_FolderType = itr->second;
 
@@ -217,25 +230,25 @@ void SetDefaultColumnsDialog::SaveState()
 
 void SetDefaultColumnsDialog::OnOk()
 {
-	HWND hComboBox = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_COMBOBOX);
-	int iSelected = static_cast<int>(SendMessage(hComboBox,CB_GETCURSEL,0,0));
+	HWND hComboBox = GetDlgItem(m_hDlg, IDC_DEFAULTCOLUMNS_COMBOBOX);
+	int iSelected = static_cast<int>(SendMessage(hComboBox, CB_GETCURSEL, 0, 0));
 
 	auto itr = m_FolderMap.find(iSelected);
 
 	SaveCurrentColumnState(itr->second);
 
-	EndDialog(m_hDlg,1);
+	EndDialog(m_hDlg, 1);
 }
 
 void SetDefaultColumnsDialog::OnCancel()
 {
-	EndDialog(m_hDlg,0);
+	EndDialog(m_hDlg, 0);
 }
 
 void SetDefaultColumnsDialog::OnCbnSelChange()
 {
-	HWND hComboBox = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_COMBOBOX);
-	int iSelected = static_cast<int>(SendMessage(hComboBox,CB_GETCURSEL,0,0));
+	HWND hComboBox = GetDlgItem(m_hDlg, IDC_DEFAULTCOLUMNS_COMBOBOX);
+	int iSelected = static_cast<int>(SendMessage(hComboBox, CB_GETCURSEL, 0, 0));
 
 	auto itr = m_FolderMap.find(iSelected);
 
@@ -249,29 +262,31 @@ void SetDefaultColumnsDialog::OnCbnSelChange()
 
 void SetDefaultColumnsDialog::SaveCurrentColumnState(FolderType folderType)
 {
-	HWND hListView = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_LISTVIEW);
+	HWND hListView = GetDlgItem(m_hDlg, IDC_DEFAULTCOLUMNS_LISTVIEW);
 
 	auto currentColumns = GetCurrentColumnList(folderType);
 	std::vector<Column_t> tempColumns;
 
-	for(int i = 0;i < ListView_GetItemCount(hListView);i++)
+	for (int i = 0; i < ListView_GetItemCount(hListView); i++)
 	{
 		LVITEM lvItem;
-		lvItem.mask		= LVIF_PARAM;
-		lvItem.iItem	= i;
-		lvItem.iSubItem	= 0;
-		ListView_GetItem(hListView,&lvItem);
+		lvItem.mask = LVIF_PARAM;
+		lvItem.iItem = i;
+		lvItem.iSubItem = 0;
+		ListView_GetItem(hListView, &lvItem);
 
 		/* Since the column list will be rebuilt, find this column
 		in the current list, and reuse its width. */
 		UINT id = static_cast<int>(lvItem.lParam);
-		auto itr = std::find_if(currentColumns.begin(),currentColumns.end(),
-			[id](const Column_t &Column){return Column.id == id;});
+		auto itr = std::find_if(
+			currentColumns.begin(), currentColumns.end(), [id](const Column_t &Column) {
+				return Column.id == id;
+			});
 
 		Column_t column;
-		column.id		= id;
-		column.iWidth	= itr->iWidth;
-		column.bChecked	= ListView_GetCheckState(hListView,i);
+		column.id = id;
+		column.iWidth = itr->iWidth;
+		column.bChecked = ListView_GetCheckState(hListView, i);
 		tempColumns.push_back(column);
 	}
 
@@ -282,36 +297,36 @@ void SetDefaultColumnsDialog::SetupFolderColumns(FolderType folderType)
 {
 	auto columns = GetCurrentColumnList(folderType);
 
-	HWND hListView = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_LISTVIEW);
+	HWND hListView = GetDlgItem(m_hDlg, IDC_DEFAULTCOLUMNS_LISTVIEW);
 	ListView_DeleteAllItems(hListView);
 
 	int iItem = 0;
 
-	for(const auto &column : columns)
+	for (const auto &column : columns)
 	{
 		TCHAR szText[64];
-		LoadString(GetInstance(),ShellBrowser::LookupColumnNameStringIndex(column.id),
-			szText,SIZEOF_ARRAY(szText));
+		LoadString(GetInstance(), ShellBrowser::LookupColumnNameStringIndex(column.id), szText,
+			SIZEOF_ARRAY(szText));
 
 		LVITEM lvItem;
-		lvItem.mask		= LVIF_TEXT | LVIF_PARAM;
-		lvItem.iItem	= iItem;
-		lvItem.iSubItem	= 0;
-		lvItem.pszText	= szText;
-		lvItem.lParam	= column.id;
-		ListView_InsertItem(hListView,&lvItem);
+		lvItem.mask = LVIF_TEXT | LVIF_PARAM;
+		lvItem.iItem = iItem;
+		lvItem.iSubItem = 0;
+		lvItem.pszText = szText;
+		lvItem.lParam = column.id;
+		ListView_InsertItem(hListView, &lvItem);
 
-		ListView_SetCheckState(hListView,iItem,column.bChecked);
+		ListView_SetCheckState(hListView, iItem, column.bChecked);
 
 		iItem++;
 	}
 
-	ListViewHelper::SelectItem(hListView,0,TRUE);
+	ListViewHelper::SelectItem(hListView, 0, TRUE);
 }
 
 std::vector<Column_t> &SetDefaultColumnsDialog::GetCurrentColumnList(FolderType folderType)
 {
-	switch(folderType)
+	switch (folderType)
 	{
 	case FolderType::General:
 		return m_folderColumns.realFolderColumns;
@@ -340,40 +355,41 @@ std::vector<Column_t> &SetDefaultColumnsDialog::GetCurrentColumnList(FolderType 
 
 void SetDefaultColumnsDialog::OnLvnItemChanged(NMLISTVIEW *pnmlv)
 {
-	if(pnmlv->uNewState & LVIS_SELECTED)
+	if (pnmlv->uNewState & LVIS_SELECTED)
 	{
-		HWND hListView = GetDlgItem(m_hDlg,IDC_COLUMNS_LISTVIEW);
+		HWND hListView = GetDlgItem(m_hDlg, IDC_COLUMNS_LISTVIEW);
 
 		LVITEM lvItem;
-		lvItem.mask		= LVIF_PARAM;
-		lvItem.iItem	= pnmlv->iItem;
-		lvItem.iSubItem	= 0;
-		ListView_GetItem(hListView,&lvItem);
+		lvItem.mask = LVIF_PARAM;
+		lvItem.iItem = pnmlv->iItem;
+		lvItem.iSubItem = 0;
+		ListView_GetItem(hListView, &lvItem);
 
-		int iDescriptionStringIndex = ShellBrowser::LookupColumnDescriptionStringIndex(static_cast<int>(lvItem.lParam));
+		int iDescriptionStringIndex =
+			ShellBrowser::LookupColumnDescriptionStringIndex(static_cast<int>(lvItem.lParam));
 
 		TCHAR szColumnDescription[128];
-		LoadString(GetInstance(),iDescriptionStringIndex,szColumnDescription,
+		LoadString(GetInstance(), iDescriptionStringIndex, szColumnDescription,
 			SIZEOF_ARRAY(szColumnDescription));
-		SetDlgItemText(m_hDlg,IDC_COLUMNS_DESCRIPTION,szColumnDescription);
+		SetDlgItemText(m_hDlg, IDC_COLUMNS_DESCRIPTION, szColumnDescription);
 	}
 }
 
 void SetDefaultColumnsDialog::OnMoveColumn(bool bUp)
 {
-	HWND hListView = GetDlgItem(m_hDlg,IDC_COLUMNS_LISTVIEW);
+	HWND hListView = GetDlgItem(m_hDlg, IDC_COLUMNS_LISTVIEW);
 
-	int iSelected = ListView_GetNextItem(hListView,-1,LVNI_SELECTED);
+	int iSelected = ListView_GetNextItem(hListView, -1, LVNI_SELECTED);
 
-	if(iSelected != -1)
+	if (iSelected != -1)
 	{
-		if(bUp)
+		if (bUp)
 		{
-			ListViewHelper::SwapItems(hListView,iSelected,iSelected - 1,TRUE);
+			ListViewHelper::SwapItems(hListView, iSelected, iSelected - 1, TRUE);
 		}
 		else
 		{
-			ListViewHelper::SwapItems(hListView,iSelected,iSelected + 1,TRUE);
+			ListViewHelper::SwapItems(hListView, iSelected, iSelected + 1, TRUE);
 		}
 
 		SetFocus(hListView);
@@ -381,12 +397,12 @@ void SetDefaultColumnsDialog::OnMoveColumn(bool bUp)
 }
 
 SetDefaultColumnsDialogPersistentSettings::SetDefaultColumnsDialogPersistentSettings() :
-DialogSettings(SETTINGS_KEY)
+	DialogSettings(SETTINGS_KEY)
 {
 	m_FolderType = FolderType::General;
 }
 
-SetDefaultColumnsDialogPersistentSettings& SetDefaultColumnsDialogPersistentSettings::GetInstance()
+SetDefaultColumnsDialogPersistentSettings &SetDefaultColumnsDialogPersistentSettings::GetInstance()
 {
 	static SetDefaultColumnsDialogPersistentSettings mfdps;
 	return mfdps;
@@ -394,7 +410,8 @@ SetDefaultColumnsDialogPersistentSettings& SetDefaultColumnsDialogPersistentSett
 
 void SetDefaultColumnsDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_FOLDER_TYPE, static_cast<DWORD>(m_FolderType));
+	NRegistrySettings::SaveDwordToRegistry(
+		hKey, SETTING_FOLDER_TYPE, static_cast<DWORD>(m_FolderType));
 }
 
 void SetDefaultColumnsDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
@@ -404,15 +421,16 @@ void SetDefaultColumnsDialogPersistentSettings::LoadExtraRegistrySettings(HKEY h
 	m_FolderType = static_cast<FolderType>(value);
 }
 
-void SetDefaultColumnsDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
-	IXMLDOMElement *pParentNode)
+void SetDefaultColumnsDialogPersistentSettings::SaveExtraXMLSettings(
+	IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode)
 {
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_FOLDER_TYPE, NXMLSettings::EncodeIntValue(static_cast<int>(m_FolderType)));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_FOLDER_TYPE,
+		NXMLSettings::EncodeIntValue(static_cast<int>(m_FolderType)));
 }
 
-void SetDefaultColumnsDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
+void SetDefaultColumnsDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue)
 {
-	if(lstrcmpi(bstrName, SETTING_FOLDER_TYPE) == 0)
+	if (lstrcmpi(bstrName, SETTING_FOLDER_TYPE) == 0)
 	{
 		m_FolderType = static_cast<FolderType>(NXMLSettings::DecodeIntValue(bstrValue));
 	}

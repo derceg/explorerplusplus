@@ -15,19 +15,19 @@
 AboutDialog::AboutDialog(HINSTANCE hInstance, HWND hParent) :
 	BaseDialog(hInstance, IDD_ABOUT, hParent, false)
 {
-	
 }
 
 INT_PTR AboutDialog::OnInitDialog()
 {
-	m_icon.reset(reinterpret_cast<HICON>(LoadImage(GetModuleHandle(nullptr),
-		MAKEINTRESOURCE(IDI_MAIN),IMAGE_ICON,
-		32,32,LR_VGACOLOR)));
+	m_icon.reset(reinterpret_cast<HICON>(LoadImage(
+		GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_MAIN), IMAGE_ICON, 32, 32, LR_VGACOLOR)));
 
-	SendMessage(m_hDlg,WM_SETICON,ICON_SMALL,reinterpret_cast<LPARAM>(m_icon.get()));
+	SendMessage(m_hDlg, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(m_icon.get()));
 
-	m_mainIcon.reset(static_cast<HICON>(LoadImage(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_MAIN), IMAGE_ICON, 48, 48, LR_DEFAULTCOLOR)));
-	SendDlgItemMessage(m_hDlg, IDC_ABOUT_STATIC_IMAGE, STM_SETICON, reinterpret_cast<WPARAM>(m_mainIcon.get()), 0);
+	m_mainIcon.reset(static_cast<HICON>(LoadImage(
+		GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_MAIN), IMAGE_ICON, 48, 48, LR_DEFAULTCOLOR)));
+	SendDlgItemMessage(
+		m_hDlg, IDC_ABOUT_STATIC_IMAGE, STM_SETICON, reinterpret_cast<WPARAM>(m_mainIcon.get()), 0);
 
 	std::wstring versionTemplate = ResourceHelper::LoadString(GetInstance(), IDS_ABOUT_VERSION);
 	std::wstring platform;
@@ -41,29 +41,30 @@ INT_PTR AboutDialog::OnInitDialog()
 
 	std::wstring version = (boost::wformat(versionTemplate) % VERSION_STRING_W % platform).str();
 
-	std::wstring buildDateTemplate = ResourceHelper::LoadString(GetInstance(), IDS_ABOUT_BUILD_DATE);
+	std::wstring buildDateTemplate =
+		ResourceHelper::LoadString(GetInstance(), IDS_ABOUT_BUILD_DATE);
 	std::wstring buildDate = (boost::wformat(buildDateTemplate) % BUILD_DATE_STRING).str();
 
 	std::wstring versionInfo = version + L"\r\n\r\n" + buildDate;
 	SetDlgItemText(m_hDlg, IDC_VERSION_INFORMATION, versionInfo.c_str());
 
-	CenterWindow(GetParent(m_hDlg),m_hDlg);
+	CenterWindow(GetParent(m_hDlg), m_hDlg);
 
 	return TRUE;
 }
 
-INT_PTR AboutDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR AboutDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
-	switch(LOWORD(wParam))
+	switch (LOWORD(wParam))
 	{
 	case IDOK:
-		EndDialog(m_hDlg,1);
+		EndDialog(m_hDlg, 1);
 		break;
 
 	case IDCANCEL:
-		EndDialog(m_hDlg,0);
+		EndDialog(m_hDlg, 0);
 		break;
 	}
 
@@ -72,20 +73,19 @@ INT_PTR AboutDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 
 INT_PTR AboutDialog::OnNotify(NMHDR *pnmhdr)
 {
-	switch(pnmhdr->code)
+	switch (pnmhdr->code)
 	{
 	case NM_CLICK:
 	case NM_RETURN:
+	{
+		if (pnmhdr->hwndFrom == GetDlgItem(m_hDlg, IDC_SITELINK))
 		{
-			if(pnmhdr->hwndFrom == GetDlgItem(m_hDlg,IDC_SITELINK))
-			{
-				auto pnmlink = reinterpret_cast<PNMLINK>(pnmhdr);
+			auto pnmlink = reinterpret_cast<PNMLINK>(pnmhdr);
 
-				ShellExecute(nullptr,L"open",pnmlink->item.szUrl,
-					nullptr, nullptr,SW_SHOW);
-			}
+			ShellExecute(nullptr, L"open", pnmlink->item.szUrl, nullptr, nullptr, SW_SHOW);
 		}
-		break;
+	}
+	break;
 	}
 
 	return 0;
@@ -93,6 +93,6 @@ INT_PTR AboutDialog::OnNotify(NMHDR *pnmhdr)
 
 INT_PTR AboutDialog::OnClose()
 {
-	EndDialog(m_hDlg,0);
+	EndDialog(m_hDlg, 0);
 	return 0;
 }

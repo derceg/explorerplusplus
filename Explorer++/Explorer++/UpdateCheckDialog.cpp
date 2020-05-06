@@ -16,16 +16,16 @@
 #include <boost\algorithm\string.hpp>
 
 #pragma warning(push)
-#pragma warning(disable:4995)
+#pragma warning(disable : 4995)
 #include <boost\lexical_cast.hpp>
 #pragma warning(pop)
 
 #include <stdexcept>
 #include <vector>
 
-
 const TCHAR UpdateCheckDialogPersistentSettings::SETTINGS_KEY[] = _T("UpdateCheck");
-const TCHAR UpdateCheckDialog::VERSION_FILE_URL[] = _T("https://explorerplusplus.com/software/version.txt");
+const TCHAR UpdateCheckDialog::VERSION_FILE_URL[] =
+	_T("https://explorerplusplus.com/software/version.txt");
 
 UpdateCheckDialog::UpdateCheckDialog(HINSTANCE hInstance, HWND hParent) :
 	BaseDialog(hInstance, IDD_UPDATECHECK, hParent, false),
@@ -36,22 +36,22 @@ UpdateCheckDialog::UpdateCheckDialog(HINSTANCE hInstance, HWND hParent) :
 
 INT_PTR UpdateCheckDialog::OnInitDialog()
 {
-	SetDlgItemText(m_hDlg,IDC_STATIC_CURRENT_VERSION,VERSION_STRING_W);
+	SetDlgItemText(m_hDlg, IDC_STATIC_CURRENT_VERSION, VERSION_STRING_W);
 
 	TCHAR szTemp[64];
-	LoadString(GetInstance(),IDS_UPDATE_CHECK_STATUS,szTemp,SIZEOF_ARRAY(szTemp));
-	SetDlgItemText(m_hDlg,IDC_STATIC_UPDATE_STATUS,szTemp);
+	LoadString(GetInstance(), IDS_UPDATE_CHECK_STATUS, szTemp, SIZEOF_ARRAY(szTemp));
+	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, szTemp);
 
-	SetTimer(m_hDlg,0,STATUS_TIMER_ELAPSED, nullptr);
+	SetTimer(m_hDlg, 0, STATUS_TIMER_ELAPSED, nullptr);
 
 	/* The actual version check will be performed in a background
 	thread (to avoid blocking the main thread while the version
 	file is downloaded). */
-	HANDLE hThread = CreateThread(nullptr,0,UpdateCheckThread,
-		reinterpret_cast<LPVOID>(m_hDlg),0, nullptr);
+	HANDLE hThread =
+		CreateThread(nullptr, 0, UpdateCheckThread, reinterpret_cast<LPVOID>(m_hDlg), 0, nullptr);
 	CloseHandle(hThread);
 
-	m_pucdps->RestoreDialogPosition(m_hDlg,false);
+	m_pucdps->RestoreDialogPosition(m_hDlg, false);
 
 	return 0;
 }
@@ -68,22 +68,22 @@ DWORD WINAPI UpdateCheckDialog::UpdateCheckThread(LPVOID pParam)
 void UpdateCheckDialog::PerformUpdateCheck(HWND hDlg)
 {
 	TCHAR tempPath[MAX_PATH];
-	DWORD pathRes = GetTempPath(SIZEOF_ARRAY(tempPath),tempPath);
+	DWORD pathRes = GetTempPath(SIZEOF_ARRAY(tempPath), tempPath);
 
-	if(pathRes == 0)
+	if (pathRes == 0)
 	{
-		PostMessage(hDlg,UpdateCheckDialog::WM_APP_UPDATE_CHECK_COMPLETE,
-			UpdateCheckDialog::UPDATE_CHECK_ERROR,0);
+		PostMessage(hDlg, UpdateCheckDialog::WM_APP_UPDATE_CHECK_COMPLETE,
+			UpdateCheckDialog::UPDATE_CHECK_ERROR, 0);
 		return;
 	}
 
 	TCHAR tempFileName[MAX_PATH];
-	UINT fileRes = GetTempFileName(tempPath,_T("exp"),0,tempFileName);
+	UINT fileRes = GetTempFileName(tempPath, _T("exp"), 0, tempFileName);
 
-	if(fileRes == 0)
+	if (fileRes == 0)
 	{
-		PostMessage(hDlg,UpdateCheckDialog::WM_APP_UPDATE_CHECK_COMPLETE,
-			UpdateCheckDialog::UPDATE_CHECK_ERROR,0);
+		PostMessage(hDlg, UpdateCheckDialog::WM_APP_UPDATE_CHECK_COMPLETE,
+			UpdateCheckDialog::UPDATE_CHECK_ERROR, 0);
 		return;
 	}
 
@@ -94,25 +94,28 @@ void UpdateCheckDialog::PerformUpdateCheck(HWND hDlg)
 	version check is not performed against an
 	outdated file. */
 	DeleteUrlCacheEntry(UpdateCheckDialog::VERSION_FILE_URL);
-	HRESULT hr = URLDownloadToFile(nullptr,UpdateCheckDialog::VERSION_FILE_URL,tempFileName,0, nullptr);
+	HRESULT hr =
+		URLDownloadToFile(nullptr, UpdateCheckDialog::VERSION_FILE_URL, tempFileName, 0, nullptr);
 
-	if(SUCCEEDED(hr))
+	if (SUCCEEDED(hr))
 	{
-		HANDLE hFile = CreateFile(tempFileName,GENERIC_READ,0, nullptr,OPEN_EXISTING,0, nullptr);
+		HANDLE hFile =
+			CreateFile(tempFileName, GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 
-		if(hFile != INVALID_HANDLE_VALUE)
+		if (hFile != INVALID_HANDLE_VALUE)
 		{
 			char versionNumber[16];
 			DWORD numBytesRead;
-			BOOL readRes = ReadFile(hFile,versionNumber,sizeof(versionNumber) - 1,&numBytesRead, nullptr);
+			BOOL readRes =
+				ReadFile(hFile, versionNumber, sizeof(versionNumber) - 1, &numBytesRead, nullptr);
 
-			if(readRes && numBytesRead > 0)
+			if (readRes && numBytesRead > 0)
 			{
 				versionNumber[numBytesRead] = '\0';
 
 				std::string versionNumberString(versionNumber);
 				std::vector<std::string> versionNumberComponents;
-				boost::split(versionNumberComponents,versionNumberString,boost::is_any_of("."));
+				boost::split(versionNumberComponents, versionNumberString, boost::is_any_of("."));
 
 				try
 				{
@@ -120,14 +123,16 @@ void UpdateCheckDialog::PerformUpdateCheck(HWND hDlg)
 					version.MajorVersion = boost::lexical_cast<int>(versionNumberComponents.at(0));
 					version.MinorVersion = boost::lexical_cast<int>(versionNumberComponents.at(1));
 					version.MicroVersion = boost::lexical_cast<int>(versionNumberComponents.at(2));
-					MultiByteToWideChar(CP_ACP,0,versionNumber,-1,version.VersionString,SIZEOF_ARRAY(version.VersionString));
+					MultiByteToWideChar(CP_ACP, 0, versionNumber, -1, version.VersionString,
+						SIZEOF_ARRAY(version.VersionString));
 
-					SendMessage(hDlg,UpdateCheckDialog::WM_APP_UPDATE_CHECK_COMPLETE,
-						UpdateCheckDialog::UPDATE_CHECK_SUCCESS,reinterpret_cast<LPARAM>(&version));
+					SendMessage(hDlg, UpdateCheckDialog::WM_APP_UPDATE_CHECK_COMPLETE,
+						UpdateCheckDialog::UPDATE_CHECK_SUCCESS,
+						reinterpret_cast<LPARAM>(&version));
 
 					versionRetrieved = true;
 				}
-				catch(std::out_of_range)
+				catch (std::out_of_range)
 				{
 					/* VersionRetrieved won't be set, so an error
 					will be returned below. Nothing needs to be done
@@ -139,28 +144,28 @@ void UpdateCheckDialog::PerformUpdateCheck(HWND hDlg)
 		}
 	}
 
-	if(!versionRetrieved)
+	if (!versionRetrieved)
 	{
-		PostMessage(hDlg,UpdateCheckDialog::WM_APP_UPDATE_CHECK_COMPLETE,
-			UpdateCheckDialog::UPDATE_CHECK_ERROR,0);
+		PostMessage(hDlg, UpdateCheckDialog::WM_APP_UPDATE_CHECK_COMPLETE,
+			UpdateCheckDialog::UPDATE_CHECK_ERROR, 0);
 	}
 
 	DeleteFile(tempFileName);
 }
 
-INT_PTR UpdateCheckDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR UpdateCheckDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	switch(uMsg)
+	switch (uMsg)
 	{
 	case WM_APP_UPDATE_CHECK_COMPLETE:
-		KillTimer(m_hDlg,0);
+		KillTimer(m_hDlg, 0);
 
 		/* A WM_TIMER message may already be in the
 		message queue. Set a flag here to indicate
 		that the update check has already completed. */
 		m_UpdateCheckComplete = true;
 
-		switch(wParam)
+		switch (wParam)
 		{
 		case UPDATE_CHECK_ERROR:
 			OnUpdateCheckError();
@@ -179,8 +184,8 @@ INT_PTR UpdateCheckDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lPara
 void UpdateCheckDialog::OnUpdateCheckError()
 {
 	TCHAR szTemp[64];
-	LoadString(GetInstance(),IDS_UPDATE_CHECK_ERROR,szTemp,SIZEOF_ARRAY(szTemp));
-	SetDlgItemText(m_hDlg,IDC_STATIC_UPDATE_STATUS,szTemp);
+	LoadString(GetInstance(), IDS_UPDATE_CHECK_ERROR, szTemp, SIZEOF_ARRAY(szTemp));
+	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, szTemp);
 }
 
 void UpdateCheckDialog::OnUpdateCheckSuccess(Version_t *Version)
@@ -188,34 +193,36 @@ void UpdateCheckDialog::OnUpdateCheckSuccess(Version_t *Version)
 	TCHAR szStatus[128];
 	TCHAR szTemp[128];
 
-	if((Version->MajorVersion > MAJOR_VERSION) ||
-		(Version->MajorVersion == MAJOR_VERSION && Version->MinorVersion > MINOR_VERSION) ||
-		(Version->MajorVersion == MAJOR_VERSION && Version->MinorVersion == MINOR_VERSION && Version->MicroVersion > MICRO_VERSION))
+	if ((Version->MajorVersion > MAJOR_VERSION)
+		|| (Version->MajorVersion == MAJOR_VERSION && Version->MinorVersion > MINOR_VERSION)
+		|| (Version->MajorVersion == MAJOR_VERSION && Version->MinorVersion == MINOR_VERSION
+			&& Version->MicroVersion > MICRO_VERSION))
 	{
-		LoadString(GetInstance(),IDS_UPDATE_CHECK_NEW_VERSION_AVAILABLE,szTemp,SIZEOF_ARRAY(szTemp));
-		StringCchPrintf(szStatus,SIZEOF_ARRAY(szStatus),szTemp,Version->VersionString);
+		LoadString(
+			GetInstance(), IDS_UPDATE_CHECK_NEW_VERSION_AVAILABLE, szTemp, SIZEOF_ARRAY(szTemp));
+		StringCchPrintf(szStatus, SIZEOF_ARRAY(szStatus), szTemp, Version->VersionString);
 	}
 	else
 	{
-		LoadString(GetInstance(),IDS_UPDATE_CHECK_UP_TO_DATE,szTemp,SIZEOF_ARRAY(szTemp));
-		StringCchPrintf(szStatus,SIZEOF_ARRAY(szStatus),szTemp,Version->VersionString);
+		LoadString(GetInstance(), IDS_UPDATE_CHECK_UP_TO_DATE, szTemp, SIZEOF_ARRAY(szTemp));
+		StringCchPrintf(szStatus, SIZEOF_ARRAY(szStatus), szTemp, Version->VersionString);
 	}
 
-	SetDlgItemText(m_hDlg,IDC_STATIC_UPDATE_STATUS,szStatus);
+	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, szStatus);
 }
 
-INT_PTR UpdateCheckDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR UpdateCheckDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
-	switch(LOWORD(wParam))
+	switch (LOWORD(wParam))
 	{
 	case IDOK:
-		EndDialog(m_hDlg,1);
+		EndDialog(m_hDlg, 1);
 		break;
 
 	case IDCANCEL:
-		EndDialog(m_hDlg,0);
+		EndDialog(m_hDlg, 0);
 		break;
 	}
 
@@ -226,26 +233,26 @@ INT_PTR UpdateCheckDialog::OnTimer(int iTimerID)
 {
 	UNREFERENCED_PARAMETER(iTimerID);
 
-	if(m_UpdateCheckComplete)
+	if (m_UpdateCheckComplete)
 	{
 		return 0;
 	}
 
 	TCHAR updateStatus[64];
-	LoadString(GetInstance(),IDS_UPDATE_CHECK_STATUS,updateStatus,SIZEOF_ARRAY(updateStatus));
+	LoadString(GetInstance(), IDS_UPDATE_CHECK_STATUS, updateStatus, SIZEOF_ARRAY(updateStatus));
 
 	static int step = 0;
 
-	for(int i = 0;i < step;i++)
+	for (int i = 0; i < step; i++)
 	{
-		StringCchCat(updateStatus,SIZEOF_ARRAY(updateStatus),_T("."));
+		StringCchCat(updateStatus, SIZEOF_ARRAY(updateStatus), _T("."));
 	}
 
-	SetDlgItemText(m_hDlg,IDC_STATIC_UPDATE_STATUS,updateStatus);
+	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, updateStatus);
 
 	step++;
 
-	if(step > 3)
+	if (step > 3)
 	{
 		step = 0;
 	}
@@ -255,14 +262,14 @@ INT_PTR UpdateCheckDialog::OnTimer(int iTimerID)
 
 INT_PTR UpdateCheckDialog::OnNotify(NMHDR *pnmhdr)
 {
-	switch(pnmhdr->code)
+	switch (pnmhdr->code)
 	{
 	case NM_CLICK:
 	case NM_RETURN:
-		if(pnmhdr->hwndFrom == GetDlgItem(m_hDlg,IDC_SYSLINK_DOWNLOAD))
+		if (pnmhdr->hwndFrom == GetDlgItem(m_hDlg, IDC_SYSLINK_DOWNLOAD))
 		{
 			auto pnmlink = reinterpret_cast<PNMLINK>(pnmhdr);
-			ShellExecute(nullptr,L"open",pnmlink->item.szUrl, nullptr, nullptr,SW_SHOW);
+			ShellExecute(nullptr, L"open", pnmlink->item.szUrl, nullptr, nullptr, SW_SHOW);
 		}
 		break;
 	}
@@ -272,7 +279,7 @@ INT_PTR UpdateCheckDialog::OnNotify(NMHDR *pnmhdr)
 
 INT_PTR UpdateCheckDialog::OnClose()
 {
-	EndDialog(m_hDlg,0);
+	EndDialog(m_hDlg, 0);
 	return 0;
 }
 
@@ -284,12 +291,11 @@ void UpdateCheckDialog::SaveState()
 }
 
 UpdateCheckDialogPersistentSettings::UpdateCheckDialogPersistentSettings() :
-DialogSettings(SETTINGS_KEY)
+	DialogSettings(SETTINGS_KEY)
 {
-	
 }
 
-UpdateCheckDialogPersistentSettings& UpdateCheckDialogPersistentSettings::GetInstance()
+UpdateCheckDialogPersistentSettings &UpdateCheckDialogPersistentSettings::GetInstance()
 {
 	static UpdateCheckDialogPersistentSettings ucdps;
 	return ucdps;

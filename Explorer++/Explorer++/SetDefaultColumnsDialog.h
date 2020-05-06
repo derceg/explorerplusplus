@@ -27,11 +27,9 @@ class SetDefaultColumnsDialog;
 class SetDefaultColumnsDialogPersistentSettings : public DialogSettings
 {
 public:
-
 	static SetDefaultColumnsDialogPersistentSettings &GetInstance();
 
 private:
-
 	friend SetDefaultColumnsDialog;
 
 	static const TCHAR SETTINGS_KEY[];
@@ -41,52 +39,51 @@ private:
 	SetDefaultColumnsDialogPersistentSettings();
 
 	SetDefaultColumnsDialogPersistentSettings(const SetDefaultColumnsDialogPersistentSettings &);
-	SetDefaultColumnsDialogPersistentSettings & operator=(const SetDefaultColumnsDialogPersistentSettings &);
+	SetDefaultColumnsDialogPersistentSettings &operator=(
+		const SetDefaultColumnsDialogPersistentSettings &);
 
-	void			SaveExtraRegistrySettings(HKEY hKey) override;
-	void			LoadExtraRegistrySettings(HKEY hKey) override;
+	void SaveExtraRegistrySettings(HKEY hKey) override;
+	void LoadExtraRegistrySettings(HKEY hKey) override;
 
-	void			SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode) override;
-	void			LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue) override;
+	void SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode) override;
+	void LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue) override;
 
-	FolderType	m_FolderType;
+	FolderType m_FolderType;
 };
 
 class SetDefaultColumnsDialog : public BaseDialog
 {
 public:
-
 	SetDefaultColumnsDialog(HINSTANCE hInstance, HWND hParent, FolderColumns &folderColumns);
 
 protected:
-
-	INT_PTR	OnInitDialog() override;
-	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam) override;
-	INT_PTR	OnNotify(NMHDR *pnmhdr) override;
-	INT_PTR	OnClose() override;
+	INT_PTR OnInitDialog() override;
+	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
+	INT_PTR OnNotify(NMHDR *pnmhdr) override;
+	INT_PTR OnClose() override;
 
 private:
+	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+		std::list<ResizableDialog::Control_t> &ControlList) override;
+	void SaveState() override;
 
-	void	GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList) override;
-	void	SaveState() override;
+	void OnOk();
+	void OnCancel();
+	void OnCbnSelChange();
+	void OnLvnItemChanged(NMLISTVIEW *pnmlv);
+	void OnMoveColumn(bool bUp);
 
-	void	OnOk();
-	void	OnCancel();
-	void	OnCbnSelChange();
-	void	OnLvnItemChanged(NMLISTVIEW *pnmlv);
-	void	OnMoveColumn(bool bUp);
+	void SaveCurrentColumnState(FolderType folderType);
+	void SetupFolderColumns(FolderType folderType);
 
-	void	SaveCurrentColumnState(FolderType folderType);
-	void	SetupFolderColumns(FolderType folderType);
+	std::vector<Column_t> &GetCurrentColumnList(FolderType folderType);
 
-	std::vector<Column_t>	&GetCurrentColumnList(FolderType folderType);
+	FolderColumns &m_folderColumns;
 
-	FolderColumns		&m_folderColumns;
+	std::unordered_map<int, FolderType> m_FolderMap;
+	FolderType m_PreviousFolderType;
 
-	std::unordered_map<int,FolderType>	m_FolderMap;
-	FolderType		m_PreviousFolderType;
+	wil::unique_hicon m_icon;
 
-	wil::unique_hicon	m_icon;
-
-	SetDefaultColumnsDialogPersistentSettings	*m_psdcdps;
+	SetDefaultColumnsDialogPersistentSettings *m_psdcdps;
 };
