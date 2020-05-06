@@ -10,31 +10,29 @@
 #include "stdafx.h"
 #include "ResizableDialog.h"
 
-
-ResizableDialog::ResizableDialog(HWND hDlg,
-	const std::list<Control_t> &controlList) :
-	m_hDlg(hDlg)
+ResizableDialog::ResizableDialog(HWND hDlg, const std::list<Control_t> &controlList) : m_hDlg(hDlg)
 {
 	ControlInternal_t controlInternal;
 	HWND hwnd;
 	RECT rcDlg;
 	RECT rc;
 
-	GetClientRect(m_hDlg,&rcDlg);
+	GetClientRect(m_hDlg, &rcDlg);
 
 	/* Loop through each of the controls and
 	find the delta's. */
-	for(const auto &control : controlList)
+	for (const auto &control : controlList)
 	{
-		controlInternal.iID			= control.iID;
-		controlInternal.Type		= control.Type;
-		controlInternal.Constraint	= control.Constraint;
+		controlInternal.iID = control.iID;
+		controlInternal.Type = control.Type;
+		controlInternal.Constraint = control.Constraint;
 
-		hwnd = GetDlgItem(m_hDlg,control.iID);
-		GetWindowRect(hwnd,&rc);
-		MapWindowPoints(HWND_DESKTOP,m_hDlg,reinterpret_cast<LPPOINT>(&rc),sizeof(RECT) / sizeof(POINT));
+		hwnd = GetDlgItem(m_hDlg, control.iID);
+		GetWindowRect(hwnd, &rc);
+		MapWindowPoints(
+			HWND_DESKTOP, m_hDlg, reinterpret_cast<LPPOINT>(&rc), sizeof(RECT) / sizeof(POINT));
 
-		switch(control.Type)
+		switch (control.Type)
 		{
 		case TYPE_MOVE:
 			controlInternal.iWidthDelta = rcDlg.right - rc.left;
@@ -51,68 +49,69 @@ ResizableDialog::ResizableDialog(HWND hDlg,
 	}
 }
 
-void ResizableDialog::UpdateControls(int iWidth,int iHeight)
+void ResizableDialog::UpdateControls(int iWidth, int iHeight)
 {
 	HWND hCtrl;
 	RECT rc;
 
-	for(const auto &control : m_ControlList)
+	for (const auto &control : m_ControlList)
 	{
-		hCtrl = GetDlgItem(m_hDlg,control.iID);
-		GetWindowRect(hCtrl,&rc);
-		MapWindowPoints(HWND_DESKTOP,m_hDlg,reinterpret_cast<LPPOINT>(&rc),sizeof(RECT) / sizeof(POINT));
+		hCtrl = GetDlgItem(m_hDlg, control.iID);
+		GetWindowRect(hCtrl, &rc);
+		MapWindowPoints(
+			HWND_DESKTOP, m_hDlg, reinterpret_cast<LPPOINT>(&rc), sizeof(RECT) / sizeof(POINT));
 
 		/* Update the size/position of each of the controls.
 		Both resizes and movements rely on the fact that two
 		of the edges on a control will always be at a fixed
 		distance from the right/bottom edges of the dialog. */
-		switch(control.Type)
+		switch (control.Type)
 		{
 		case TYPE_MOVE:
-			switch(control.Constraint)
+			switch (control.Constraint)
 			{
 			case CONSTRAINT_NONE:
-				SetWindowPos(hCtrl,NULL,iWidth - control.iWidthDelta,iHeight - control.iHeightDelta,
-					0,0,SWP_NOSIZE|SWP_NOZORDER);
+				SetWindowPos(hCtrl, NULL, iWidth - control.iWidthDelta,
+					iHeight - control.iHeightDelta, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 				break;
 
 			case CONSTRAINT_X:
-				SetWindowPos(hCtrl,NULL,iWidth - control.iWidthDelta,rc.top,
-					0,0,SWP_NOSIZE|SWP_NOZORDER);
+				SetWindowPos(hCtrl, NULL, iWidth - control.iWidthDelta, rc.top, 0, 0,
+					SWP_NOSIZE | SWP_NOZORDER);
 				break;
 
 			case CONSTRAINT_Y:
-				SetWindowPos(hCtrl,NULL,rc.left,iHeight - control.iHeightDelta,
-					0,0,SWP_NOSIZE|SWP_NOZORDER);
+				SetWindowPos(hCtrl, NULL, rc.left, iHeight - control.iHeightDelta, 0, 0,
+					SWP_NOSIZE | SWP_NOZORDER);
 				break;
 			}
 			break;
 
 		case TYPE_RESIZE:
-			switch(control.Constraint)
+			switch (control.Constraint)
 			{
 			case CONSTRAINT_NONE:
-				SetWindowPos(hCtrl,NULL,0,0,iWidth - control.iWidthDelta - rc.left,
-					iHeight - control.iHeightDelta - rc.top,SWP_NOMOVE|SWP_NOZORDER);
+				SetWindowPos(hCtrl, NULL, 0, 0, iWidth - control.iWidthDelta - rc.left,
+					iHeight - control.iHeightDelta - rc.top, SWP_NOMOVE | SWP_NOZORDER);
 				break;
 
 			case CONSTRAINT_X:
-				SetWindowPos(hCtrl,NULL,0,0,iWidth - control.iWidthDelta - rc.left,
-					rc.bottom - rc.top,SWP_NOMOVE|SWP_NOZORDER);
+				SetWindowPos(hCtrl, NULL, 0, 0, iWidth - control.iWidthDelta - rc.left,
+					rc.bottom - rc.top, SWP_NOMOVE | SWP_NOZORDER);
 				break;
 
 			case CONSTRAINT_Y:
-				SetWindowPos(hCtrl,NULL,0,0,rc.right - rc.left,
-					iHeight - control.iHeightDelta - rc.top,SWP_NOMOVE|SWP_NOZORDER);
+				SetWindowPos(hCtrl, NULL, 0, 0, rc.right - rc.left,
+					iHeight - control.iHeightDelta - rc.top, SWP_NOMOVE | SWP_NOZORDER);
 				break;
 			}
 			break;
 		}
 
 		/* Force group boxes to redraw. */
-		if(GetWindowStyle(hCtrl) & BS_GROUPBOX)
+		if (GetWindowStyle(hCtrl) & BS_GROUPBOX)
 		{
-			InvalidateRect(hCtrl,NULL,TRUE);
+			InvalidateRect(hCtrl, NULL, TRUE);
 		}
 	}
 }
