@@ -37,7 +37,7 @@ IncludeBlocks: Merge
 IncludeCategories:
     - Regex:           'stdafx.h'
       Priority:        -1
-    - Regex:           'Explorer\+\+.h'
+    - Regex:           '^(Explorer\+\+.h|ShellBrowser.h)$'
       Priority:        0
     - Regex:           '^"../ThirdParty/'
       Priority:        3
