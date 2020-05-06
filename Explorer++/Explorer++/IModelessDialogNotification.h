@@ -10,14 +10,12 @@
 class ModelessDialogNotification : public ReferenceCount, public IModelessDialogNotification
 {
 public:
-
 	ModelessDialogNotification();
 
 	ULONG AddRef() override;
 	ULONG Release() override;
 
 private:
-
 	/* IModelessDialogNotification methods. */
 	void OnModelessDialogDestroy(int iResource) override;
 
