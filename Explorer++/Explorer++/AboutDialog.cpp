@@ -6,6 +6,7 @@
 #include "AboutDialog.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "ThirdPartyCreditsDialog.h"
 #include "Version.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/Macros.h"
@@ -78,11 +79,16 @@ INT_PTR AboutDialog::OnNotify(NMHDR *pnmhdr)
 	case NM_CLICK:
 	case NM_RETURN:
 	{
-		if (pnmhdr->hwndFrom == GetDlgItem(m_hDlg, IDC_SITELINK))
+		if (pnmhdr->idFrom == IDC_SITELINK)
 		{
 			auto pnmlink = reinterpret_cast<PNMLINK>(pnmhdr);
 
 			ShellExecute(nullptr, L"open", pnmlink->item.szUrl, nullptr, nullptr, SW_SHOW);
+		}
+		else if (pnmhdr->idFrom == IDC_THIRD_PARTY_CREDITS_LINK)
+		{
+			ThirdPartyCreditsDialog thirdPartyCreditsDialog(GetInstance(), m_hDlg);
+			thirdPartyCreditsDialog.ShowModalDialog();
 		}
 	}
 	break;

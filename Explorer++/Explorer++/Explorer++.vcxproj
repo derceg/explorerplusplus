@@ -604,6 +604,7 @@
     <ClCompile Include="Plugins\TabsApi\TabsApi.cpp" />
     <ClCompile Include="Plugins\TabsApi\Events\TabUpdated.cpp" />
     <ClCompile Include="TaskbarThumbnails.cpp" />
+    <ClCompile Include="ThirdPartyCreditsDialog.cpp" />
     <ClCompile Include="UiTheming.cpp" />
     <ClCompile Include="TreeViewHandler.cpp" />
     <ClCompile Include="Plugins\UiApi.cpp" />
@@ -752,6 +753,7 @@
     <ClInclude Include="Plugins\TabsApi\TabsApi.h" />
     <ClInclude Include="Plugins\TabsApi\Events\TabUpdated.h" />
     <ClInclude Include="TaskbarThumbnails.h" />
+    <ClInclude Include="ThirdPartyCreditsDialog.h" />
     <ClInclude Include="UiTheming.h" />
     <ClInclude Include="ToolbarButtons.h" />
     <ClInclude Include="Plugins\UiApi.h" />

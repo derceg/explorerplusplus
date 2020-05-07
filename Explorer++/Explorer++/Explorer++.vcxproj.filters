@@ -436,6 +436,9 @@
     <ClCompile Include="ShellBrowser\DropTarget.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="ThirdPartyCreditsDialog.cpp">
+      <Filter>General Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -875,6 +878,9 @@
     </ClInclude>
     <ClInclude Include="DialogConstants.h">
       <Filter>Dialog Support</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdPartyCreditsDialog.h">
+      <Filter>General Dialogs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
