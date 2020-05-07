@@ -1199,18 +1199,26 @@ void TabContainer::SelectAdjacentTab(BOOL bNextTab)
 		/* If this is the last tab in the order,
 		wrap the selection back to the start. */
 		if (newIndex == (nTabs - 1))
+		{
 			newIndex = 0;
+		}
 		else
+		{
 			newIndex++;
+		}
 	}
 	else
 	{
 		/* If this is the first tab in the order,
 		wrap the selection back to the end. */
 		if (newIndex == 0)
+		{
 			newIndex = nTabs - 1;
+		}
 		else
+		{
 			newIndex--;
+		}
 	}
 
 	SelectTabAtIndex(newIndex);

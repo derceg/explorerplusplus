@@ -763,7 +763,9 @@ void NFileOperations::DeleteFileSecurely(
 	hFindFile = FindFirstFile(strFilename.c_str(), &wfd);
 
 	if (hFindFile == INVALID_HANDLE_VALUE)
+	{
 		return;
+	}
 
 	bFolder = (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
 
@@ -783,7 +785,9 @@ void NFileOperations::DeleteFileSecurely(
 	hFile = CreateFile(strFilename.c_str(), FILE_WRITE_DATA, 0, NULL, OPEN_EXISTING, NULL, NULL);
 
 	if (hFile == INVALID_HANDLE_VALUE)
+	{
 		return;
+	}
 
 	/* Extend the file out to the end of its last sector. */
 	SetFilePointerEx(hFile, lRealFileSize, NULL, FILE_BEGIN);

@@ -458,14 +458,18 @@ void MergeFilesDialog::OnMove(bool bUp)
 		if (bUp)
 		{
 			if (iSelected == 0)
+			{
 				return;
+			}
 
 			iSwap = iSelected - 1;
 		}
 		else
 		{
 			if (iSelected == static_cast<int>((m_FullFilenameList.size() - 1)))
+			{
 				return;
+			}
 
 			iSwap = iSelected + 1;
 		}

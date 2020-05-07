@@ -409,8 +409,10 @@ void ListViewHelper::PositionInsertMark(HWND hListView,const POINT *ppt)
 
 				iBelow = ListView_GetNextItem(hListView,iNext,LVNI_BELOW);
 
-				if(iBelow != -1)
+				if (iBelow != -1)
+				{
 					iNext = iBelow;
+				}
 			}
 
 			dwFlags = LVIM_AFTER;

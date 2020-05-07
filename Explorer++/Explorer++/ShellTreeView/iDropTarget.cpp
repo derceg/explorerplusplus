@@ -66,10 +66,14 @@ DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 	SetTimer(m_hTreeView,DRAGSCROLL_TIMER_ID,DRAGSCROLL_TIMER_ELAPSE,
 		DragScrollTimerProc);
 
-	if(grfKeyState & MK_LBUTTON)
+	if (grfKeyState & MK_LBUTTON)
+	{
 		m_DragType = DragType::LeftClick;
-	else if(grfKeyState & MK_RBUTTON)
+	}
+	else if (grfKeyState & MK_RBUTTON)
+	{
 		m_DragType = DragType::RightClick;
+	}
 
 	/* Notify the drop target helper that an object has been dragged into
 	the window. */
@@ -144,15 +148,23 @@ HRESULT _stdcall ShellTreeView::DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwE
 	{
 		GetClientRect(m_hTreeView,&rc);
 
-		if(pt.x < MIN_X_POS)
-			SendMessage(m_hTreeView,WM_HSCROLL,SB_LINELEFT,NULL);
-		else if(pt.x > (rc.right - MIN_X_POS))
-			SendMessage(m_hTreeView,WM_HSCROLL,SB_LINERIGHT,NULL);
+		if (pt.x < MIN_X_POS)
+		{
+			SendMessage(m_hTreeView, WM_HSCROLL, SB_LINELEFT, NULL);
+		}
+		else if (pt.x > (rc.right - MIN_X_POS))
+		{
+			SendMessage(m_hTreeView, WM_HSCROLL, SB_LINERIGHT, NULL);
+		}
 
-		if(pt.y < MIN_Y_POS)
-			SendMessage(m_hTreeView,WM_VSCROLL,SB_LINEUP,NULL);
-		else if(pt.y > (rc.bottom - MIN_Y_POS))
-			SendMessage(m_hTreeView,WM_VSCROLL,SB_LINEDOWN,NULL);
+		if (pt.y < MIN_Y_POS)
+		{
+			SendMessage(m_hTreeView, WM_VSCROLL, SB_LINEUP, NULL);
+		}
+		else if (pt.y > (rc.bottom - MIN_Y_POS))
+		{
+			SendMessage(m_hTreeView, WM_VSCROLL, SB_LINEDOWN, NULL);
+		}
 	}
 
 	tvht.pt.x	= pt.x;

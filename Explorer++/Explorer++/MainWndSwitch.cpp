@@ -72,10 +72,14 @@ LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 	}
 
 	/* Jump across to the member window function (will handle all requests). */
-	if(pContainer != nullptr)
-		return pContainer->WindowProcedure(hwnd,Msg,wParam,lParam);
+	if (pContainer != nullptr)
+	{
+		return pContainer->WindowProcedure(hwnd, Msg, wParam, lParam);
+	}
 	else
-		return DefWindowProc(hwnd,Msg,wParam,lParam);
+	{
+		return DefWindowProc(hwnd, Msg, wParam, lParam);
+	}
 }
 
 LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)

@@ -216,9 +216,13 @@ LRESULT CALLBACK FileContextMenuManager::ShellMenuHookProc(
 		if (wParam == 0)
 		{
 			if (m_pShellContext3 != NULL)
+			{
 				m_pShellContext3->HandleMenuMsg2(uMsg, wParam, lParam, NULL);
+			}
 			else if (m_pShellContext2 != NULL)
+			{
 				m_pShellContext2->HandleMenuMsg(uMsg, wParam, lParam);
+			}
 
 			return TRUE;
 		}
@@ -228,9 +232,13 @@ LRESULT CALLBACK FileContextMenuManager::ShellMenuHookProc(
 		if (wParam == 0)
 		{
 			if (m_pShellContext3 != NULL)
+			{
 				m_pShellContext3->HandleMenuMsg2(uMsg, wParam, lParam, NULL);
+			}
 			else if (m_pShellContext2 != NULL)
+			{
 				m_pShellContext2->HandleMenuMsg(uMsg, wParam, lParam);
+			}
 		}
 		return TRUE;
 		break;
@@ -238,9 +246,13 @@ LRESULT CALLBACK FileContextMenuManager::ShellMenuHookProc(
 	case WM_INITMENUPOPUP:
 	{
 		if (m_pShellContext3 != NULL)
+		{
 			m_pShellContext3->HandleMenuMsg2(uMsg, wParam, lParam, NULL);
+		}
 		else if (m_pShellContext2 != NULL)
+		{
 			m_pShellContext2->HandleMenuMsg(uMsg, wParam, lParam);
+		}
 	}
 	break;
 

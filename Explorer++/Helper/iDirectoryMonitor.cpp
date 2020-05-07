@@ -186,7 +186,9 @@ int DirectoryMonitor::WatchDirectory(const TCHAR *Directory, UINT WatchFlags,
 	DirInfo pDirInfo;
 
 	if (Directory == NULL)
+	{
 		return -1;
+	}
 
 	pDirInfo.m_pDirectoryMonitor = this;
 	pDirInfo.m_hThread = m_hThread;
@@ -237,7 +239,9 @@ int DirectoryMonitor::WatchDirectory(HANDLE hDirectory, const TCHAR *Directory, 
 	DirInfo pDirInfo;
 
 	if (Directory == NULL)
+	{
 		return -1;
+	}
 
 	pDirInfo.m_pDirectoryMonitor = this;
 	pDirInfo.m_hThread = m_hThread;
@@ -322,7 +326,9 @@ void CALLBACK DirectoryMonitor::CompletionRoutine(
 	if ((dwErrorCode == ERROR_SUCCESS) && (NumberOfBytesTransferred != 0))
 	{
 		if (lpOverlapped->hEvent == NULL)
+		{
 			return;
+		}
 
 		pDirInfo = reinterpret_cast<DirInfo *>(lpOverlapped->hEvent);
 
@@ -394,7 +400,9 @@ BOOL DirectoryMonitor::StopDirectoryMonitor(int iStopId)
 	std::list<DirInfo>::iterator itr;
 
 	if (iStopId < 0)
+	{
 		return FALSE;
+	}
 
 	EnterCriticalSection(&m_cs);
 
@@ -405,7 +413,9 @@ BOOL DirectoryMonitor::StopDirectoryMonitor(int iStopId)
 			/* Only stop monitoring the directory if it was
 			actually monitored in the first place! */
 			if (itr->m_bDirMonitored)
+			{
 				QueueUserAPC(StopDirectoryWatch, m_hThread, (ULONG_PTR) itr->m_hDirectory);
+			}
 
 			break;
 		}

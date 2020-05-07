@@ -378,16 +378,24 @@ void SearchDialog::StartSearching()
 	DWORD dwAttributes = 0;
 
 	if (IsDlgButtonChecked(m_hDlg, IDC_CHECK_ARCHIVE) == BST_CHECKED)
+	{
 		dwAttributes |= FILE_ATTRIBUTE_ARCHIVE;
+	}
 
 	if (IsDlgButtonChecked(m_hDlg, IDC_CHECK_HIDDEN) == BST_CHECKED)
+	{
 		dwAttributes |= FILE_ATTRIBUTE_HIDDEN;
+	}
 
 	if (IsDlgButtonChecked(m_hDlg, IDC_CHECK_READONLY) == BST_CHECKED)
+	{
 		dwAttributes |= FILE_ATTRIBUTE_READONLY;
+	}
 
 	if (IsDlgButtonChecked(m_hDlg, IDC_CHECK_SYSTEM) == BST_CHECKED)
+	{
 		dwAttributes |= FILE_ATTRIBUTE_SYSTEM;
+	}
 
 	m_pSearch = new Search(m_hDlg, szBaseDirectory, szSearchPattern, dwAttributes,
 		bUseRegularExpressions, bCaseInsensitive, bSearchSubFolders);
@@ -1144,9 +1152,13 @@ void Search::SearchDirectoryInternal(
 				{
 					if ((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 						== FILE_ATTRIBUTE_DIRECTORY)
+					{
 						m_iFoldersFound++;
+					}
 					else
+					{
 						m_iFilesFound++;
+					}
 
 					TCHAR szFullFileName[MAX_PATH];
 					PathCombine(szFullFileName, szSearchDirectory, wfd.cFileName);

@@ -44,7 +44,9 @@ INT_PTR FilterDialog::OnInitDialog()
 	SendMessage(hComboBox, CB_SETEDITSEL, 0, MAKELPARAM(0, -1));
 
 	if (m_pexpp->GetActiveShellBrowser()->GetFilterCaseSensitive())
+	{
 		CheckDlgButton(m_hDlg, IDC_FILTERS_CASESENSITIVE, BST_CHECKED);
+	}
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 
@@ -147,7 +149,9 @@ void FilterDialog::OnOk()
 	m_pexpp->GetActiveShellBrowser()->SetFilter(filter.get());
 
 	if (!m_pexpp->GetActiveShellBrowser()->GetFilterStatus())
+	{
 		m_pexpp->GetActiveShellBrowser()->SetFilterStatus(TRUE);
+	}
 
 	EndDialog(m_hDlg, 1);
 }

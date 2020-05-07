@@ -520,8 +520,10 @@ HRESULT DropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 
 					if(pBuffer != NULL)
 					{
-						if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
-							nBytesToWrite = (DWORD)GlobalSize(stgFileContents.hGlobal);
+						if (!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
+						{
+							nBytesToWrite = (DWORD) GlobalSize(stgFileContents.hGlobal);
+						}
 
 						auto pTemp = (LPBYTE)GlobalLock(stgFileContents.hGlobal);
 
@@ -552,8 +554,10 @@ HRESULT DropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 						{
 							/* If the file size isn't explicitly given,
 							use the size of the stream. */
-							if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
+							if (!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
+							{
 								nBytesToWrite = sstg.cbSize.LowPart;
+							}
 
 							stgFileContents.pstm->Read(pBuffer,sstg.cbSize.LowPart,&cbRead);
 
@@ -1302,10 +1306,14 @@ BOOL DropHandler::CheckItemLocations(int iDroppedItem)
 				DragQueryFile((HDROP)pdf,iDroppedItem,szFullFileName,
 					SIZEOF_ARRAY(szFullFileName));
 
-				if(PathIsSameRoot(m_szDestDirectory,szFullFileName))
+				if (PathIsSameRoot(m_szDestDirectory, szFullFileName))
+				{
 					bOnSameDrive = TRUE;
+				}
 				else
+				{
 					bOnSameDrive = FALSE;
+				}
 			}
 
 			GlobalUnlock(stg.hGlobal);

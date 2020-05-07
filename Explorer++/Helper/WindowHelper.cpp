@@ -65,10 +65,14 @@ BOOL lShowWindow(HWND hwnd, BOOL bShowWindow)
 {
 	int windowShowState;
 
-	if(bShowWindow)
+	if (bShowWindow)
+	{
 		windowShowState = SW_SHOW;
+	}
 	else
+	{
 		windowShowState = SW_HIDE;
+	}
 
 	return ShowWindow(hwnd, windowShowState);
 }
@@ -85,14 +89,18 @@ BOOL AddWindowStyle(HWND hwnd, UINT fStyle, BOOL bAdd)
 	if(bAdd)
 	{
 		/* Only add the style if it isn't already present. */
-		if((fCurrentStyle & fStyle) != fStyle)
+		if ((fCurrentStyle & fStyle) != fStyle)
+		{
 			fCurrentStyle |= fStyle;
+		}
 	}
 	else
 	{
 		/* Only remove the style if it is present. */
-		if((fCurrentStyle & fStyle) == fStyle)
+		if ((fCurrentStyle & fStyle) == fStyle)
+		{
 			fCurrentStyle &= ~static_cast<LONG_PTR>(fStyle);
+		}
 	}
 
 	/* See the documentation for SetWindowLongPtr

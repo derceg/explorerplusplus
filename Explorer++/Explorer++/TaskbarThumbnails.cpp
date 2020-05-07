@@ -290,10 +290,14 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProcStub(HWND hwnd,UINT Msg,WPARA
 		break;
 	}
 
-	if(ptp != nullptr)
-		return ptp->taskbarThumbnails->TabProxyWndProc(hwnd,Msg,wParam,lParam,ptp->iTabId);
+	if (ptp != nullptr)
+	{
+		return ptp->taskbarThumbnails->TabProxyWndProc(hwnd, Msg, wParam, lParam, ptp->iTabId);
+	}
 	else
-		return DefWindowProc(hwnd,Msg,wParam,lParam);
+	{
+		return DefWindowProc(hwnd, Msg, wParam, lParam);
+	}
 }
 
 LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam,int iTabId)

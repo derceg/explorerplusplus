@@ -256,7 +256,9 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(
 			case IDC_STARTUP_PREVIOUSTABS:
 			case IDC_STARTUP_DEFAULTFOLDER:
 				if (IsDlgButtonChecked(hDlg, LOWORD(wParam)) == BST_CHECKED)
+				{
 					PropSheet_Changed(GetParent(hDlg), hDlg);
+				}
 				break;
 
 			case IDC_OPTION_REPLACEEXPLORER_NONE:
@@ -293,16 +295,26 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(
 			int iSel;
 
 			if (IsDlgButtonChecked(hDlg, IDC_STARTUP_PREVIOUSTABS) == BST_CHECKED)
+			{
 				m_config->startupMode = StartupMode::PreviousTabs;
+			}
 			else if (IsDlgButtonChecked(hDlg, IDC_STARTUP_DEFAULTFOLDER) == BST_CHECKED)
+			{
 				m_config->startupMode = StartupMode::DefaultFolder;
+			}
 
 			if (IsDlgButtonChecked(hDlg, IDC_OPTION_REPLACEEXPLORER_NONE) == BST_CHECKED)
+			{
 				replaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_NONE;
+			}
 			else if (IsDlgButtonChecked(hDlg, IDC_OPTION_REPLACEEXPLORER_FILESYSTEM) == BST_CHECKED)
+			{
 				replaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_FILESYSTEM;
+			}
 			else if (IsDlgButtonChecked(hDlg, IDC_OPTION_REPLACEEXPLORER_ALL) == BST_CHECKED)
+			{
 				replaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_ALL;
+			}
 
 			if (m_config->replaceExplorerMode != replaceExplorerMode)
 			{
@@ -486,15 +498,29 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 		HWND hCBSize;
 
 		if (m_config->globalFolderSettings.hideSystemFiles)
+		{
 			CheckDlgButton(hDlg, IDC_SETTINGS_CHECK_SYSTEMFILES, BST_CHECKED);
+		}
+
 		if (!m_config->globalFolderSettings.showExtensions)
+		{
 			CheckDlgButton(hDlg, IDC_SETTINGS_CHECK_EXTENSIONS, BST_CHECKED);
+		}
+
 		if (m_config->globalFolderSettings.hideLinkExtension)
+		{
 			CheckDlgButton(hDlg, IDC_SETTINGS_CHECK_LINK, BST_CHECKED);
+		}
+
 		if (m_config->globalFolderSettings.insertSorted)
+		{
 			CheckDlgButton(hDlg, IDC_SETTINGS_CHECK_INSERTSORTED, BST_CHECKED);
+		}
+
 		if (m_config->globalFolderSettings.oneClickActivate)
+		{
 			CheckDlgButton(hDlg, IDC_SETTINGS_CHECK_SINGLECLICK, BST_CHECKED);
+		}
 
 		SetDlgItemInt(hDlg, IDC_OPTIONS_HOVER_TIME,
 			m_config->globalFolderSettings.oneClickActivateHoverTime, FALSE);
@@ -504,26 +530,53 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 			m_config->globalFolderSettings.oneClickActivate);
 
 		if (m_config->overwriteExistingFilesConfirmation)
+		{
 			CheckDlgButton(hDlg, IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION, BST_CHECKED);
+		}
+
 		if (m_config->playNavigationSound)
+		{
 			CheckDlgButton(hDlg, IDC_OPTIONS_PLAYNAVIGATIONSOUND, BST_CHECKED);
+		}
+
 		if (m_config->globalFolderSettings.showFolderSizes)
+		{
 			CheckDlgButton(hDlg, IDC_SETTINGS_CHECK_FOLDERSIZES, BST_CHECKED);
+		}
+
 		if (m_config->globalFolderSettings.disableFolderSizesNetworkRemovable)
+		{
 			CheckDlgButton(hDlg, IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE, BST_CHECKED);
+		}
+
 		if (m_config->globalFolderSettings.forceSize)
+		{
 			CheckDlgButton(hDlg, IDC_SETTINGS_CHECK_FORCESIZE, BST_CHECKED);
+		}
+
 		if (m_config->handleZipFiles)
+		{
 			CheckDlgButton(hDlg, IDC_SETTINGS_CHECK_ZIPFILES, BST_CHECKED);
+		}
+
 		if (m_config->globalFolderSettings.showFriendlyDates)
+		{
 			CheckDlgButton(hDlg, IDC_SETTINGS_CHECK_FRIENDLYDATES, BST_CHECKED);
+		}
+
 		if (m_config->showInfoTips)
+		{
 			CheckDlgButton(hDlg, IDC_OPTIONS_CHECK_SHOWINFOTIPS, BST_CHECKED);
+		}
 
 		if (m_config->infoTipType == InfoTipType::System)
+		{
 			CheckDlgButton(hDlg, IDC_OPTIONS_RADIO_SYSTEMINFOTIPS, BST_CHECKED);
+		}
 		else
+		{
 			CheckDlgButton(hDlg, IDC_OPTIONS_RADIO_CUSTOMINFOTIPS, BST_CHECKED);
+		}
 
 		hCBSize = GetDlgItem(hDlg, IDC_COMBO_FILESIZES);
 
@@ -583,7 +636,9 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 			case IDC_OPTIONS_RADIO_SYSTEMINFOTIPS:
 			case IDC_OPTIONS_RADIO_CUSTOMINFOTIPS:
 				if (IsDlgButtonChecked(hDlg, LOWORD(wParam)) == BST_CHECKED)
+				{
 					PropSheet_Changed(GetParent(hDlg), hDlg);
+				}
 				break;
 
 			case IDC_OPTIONS_CHECK_SHOWINFOTIPS:
@@ -664,9 +719,13 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 				(IsDlgButtonChecked(hDlg, IDC_OPTIONS_CHECK_SHOWINFOTIPS) == BST_CHECKED);
 
 			if (IsDlgButtonChecked(hDlg, IDC_OPTIONS_RADIO_SYSTEMINFOTIPS) == BST_CHECKED)
+			{
 				m_config->infoTipType = InfoTipType::System;
+			}
 			else
+			{
 				m_config->infoTipType = InfoTipType::Custom;
+			}
 
 			hCBSize = GetDlgItem(hDlg, IDC_COMBO_FILESIZES);
 
@@ -722,35 +781,79 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 	case WM_INITDIALOG:
 	{
 		if (m_config->allowMultipleInstances)
+		{
 			CheckDlgButton(hDlg, IDC_OPTION_MULTIPLEINSTANCES, BST_CHECKED);
+		}
+
 		if (m_config->useLargeToolbarIcons.get())
+		{
 			CheckDlgButton(hDlg, IDC_OPTION_LARGETOOLBARICONS, BST_CHECKED);
+		}
+
 		if (m_config->alwaysShowTabBar.get())
+		{
 			CheckDlgButton(hDlg, IDC_OPTION_ALWAYSSHOWTABBAR, BST_CHECKED);
+		}
+
 		if (m_config->showTabBarAtBottom)
+		{
 			CheckDlgButton(hDlg, IDC_OPTION_SHOWTABBARATBOTTOM, BST_CHECKED);
+		}
+
 		if (m_config->showFilePreviews)
+		{
 			CheckDlgButton(hDlg, IDC_OPTION_FILEPREVIEWS, BST_CHECKED);
+		}
+
 		if (m_config->showFullTitlePath.get())
+		{
 			CheckDlgButton(hDlg, IDC_SETTINGS_CHECK_TITLEPATH, BST_CHECKED);
+		}
+
 		if (m_config->showUserNameInTitleBar.get())
+		{
 			CheckDlgButton(hDlg, IDC_OPTION_USERNAMEINTITLEBAR, BST_CHECKED);
+		}
+
 		if (m_config->showPrivilegeLevelInTitleBar.get())
+		{
 			CheckDlgButton(hDlg, IDC_OPTION_PRIVILEGELEVELINTITLEBAR, BST_CHECKED);
+		}
+
 		if (m_config->synchronizeTreeview)
+		{
 			CheckDlgButton(hDlg, IDC_OPTION_SYNCTREEVIEW, BST_CHECKED);
+		}
+
 		if (m_config->treeViewAutoExpandSelected)
+		{
 			CheckDlgButton(hDlg, IDC_OPTION_TREEVIEWSELECTIONEXPAND, BST_CHECKED);
+		}
+
 		if (!m_config->treeViewDelayEnabled)
+		{
 			CheckDlgButton(hDlg, IDC_OPTION_TREEVIEWDELAY, BST_CHECKED);
+		}
+
 		if (m_config->extendTabControl)
+		{
 			CheckDlgButton(hDlg, IDC_OPTION_EXTENDTABCONTROL, BST_CHECKED);
+		}
+
 		if (m_config->globalFolderSettings.showGridlines)
+		{
 			CheckDlgButton(hDlg, IDC_OPTION_GRIDLINES, BST_CHECKED);
+		}
+
 		if (m_config->checkBoxSelection)
+		{
 			CheckDlgButton(hDlg, IDC_OPTION_CHECKBOXSELECTION, BST_CHECKED);
+		}
+
 		if (m_config->useFullRowSelect)
+		{
 			CheckDlgButton(hDlg, IDC_OPTION_FULLROWSELECT, BST_CHECKED);
+		}
 	}
 	break;
 
@@ -907,19 +1010,39 @@ INT_PTR CALLBACK OptionsDialog::TabSettingsProc(HWND hDlg, UINT uMsg, WPARAM wPa
 	case WM_INITDIALOG:
 	{
 		if (m_config->showTaskbarThumbnails)
+		{
 			CheckDlgButton(hDlg, IDC_TABS_TASKBARTHUMBNAILS, BST_CHECKED);
+		}
+
 		if (m_config->forceSameTabWidth.get())
+		{
 			CheckDlgButton(hDlg, IDC_TABS_SAMEWIDTH, BST_CHECKED);
+		}
+
 		if (m_config->confirmCloseTabs)
+		{
 			CheckDlgButton(hDlg, IDC_TABS_CLOSECONFIRMATION, BST_CHECKED);
+		}
+
 		if (m_config->openNewTabNextToCurrent)
+		{
 			CheckDlgButton(hDlg, IDC_TABS_OPENNEXTTOCURRENT, BST_CHECKED);
+		}
+
 		if (m_config->alwaysOpenNewTab)
+		{
 			CheckDlgButton(hDlg, IDC_SETTINGS_CHECK_ALWAYSNEWTAB, BST_CHECKED);
+		}
+
 		if (m_config->doubleClickTabClose)
+		{
 			CheckDlgButton(hDlg, IDC_TABS_DOUBLECLICKCLOSE, BST_CHECKED);
+		}
+
 		if (m_config->closeMainWindowOnTabClose)
+		{
 			CheckDlgButton(hDlg, IDC_TABS_CLOSEMAINWINDOW, BST_CHECKED);
+		}
 	}
 	break;
 
@@ -1009,16 +1132,24 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(
 	case WM_INITDIALOG:
 	{
 		if (m_config->defaultFolderSettings.showHidden)
+		{
 			CheckDlgButton(hDlg, IDC_SHOWHIDDENGLOBAL, BST_CHECKED);
+		}
 
 		if (m_config->defaultFolderSettings.showInGroups)
+		{
 			CheckDlgButton(hDlg, IDC_SHOWINGROUPSGLOBAL, BST_CHECKED);
+		}
 
 		if (m_config->defaultFolderSettings.autoArrange)
+		{
 			CheckDlgButton(hDlg, IDC_AUTOARRANGEGLOBAL, BST_CHECKED);
+		}
 
 		if (m_config->defaultFolderSettings.sortAscending)
+		{
 			CheckDlgButton(hDlg, IDC_SORTASCENDINGGLOBAL, BST_CHECKED);
+		}
 
 		HWND hComboBox = GetDlgItem(hDlg, IDC_OPTIONS_DEFAULT_VIEW);
 		int selectedIndex = -1;
@@ -1137,9 +1268,13 @@ void OptionsDialog::OnDefaultSettingsNewTabDir(HWND hDlg)
 	hr = DecodeFriendlyPath(szNewTabDir, szVirtualParsingPath, SIZEOF_ARRAY(szVirtualParsingPath));
 
 	if (SUCCEEDED(hr))
+	{
 		StringCchCopy(g_szNewTabDirectory, SIZEOF_ARRAY(g_szNewTabDirectory), szVirtualParsingPath);
+	}
 	else
+	{
 		StringCchCopy(g_szNewTabDirectory, SIZEOF_ARRAY(g_szNewTabDirectory), szNewTabDir);
+	}
 
 	CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
@@ -1200,9 +1335,13 @@ void OptionsDialog::DefaultSettingsSetNewTabDir(HWND hEdit, PCIDLIST_ABSOLUTE pi
 	GetItemAttributes(pidl, &attributes);
 
 	if (attributes & SFGAO_FILESYSTEM)
+	{
 		uNameFlags = SHGDN_FORPARSING;
+	}
 	else
+	{
 		uNameFlags = SHGDN_INFOLDER;
+	}
 
 	GetDisplayName(pidl, szNewTabDir, SIZEOF_ARRAY(szNewTabDir), uNameFlags);
 

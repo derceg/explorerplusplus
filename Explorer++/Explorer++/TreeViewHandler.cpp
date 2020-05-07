@@ -37,8 +37,10 @@ void Explorerplusplus::CreateFolderControls()
 	TCHAR szTemp[32];
 	UINT uStyle = WS_CHILD|WS_CLIPSIBLINGS|WS_CLIPCHILDREN;
 
-	if(m_config->showFolders)
+	if (m_config->showFolders)
+	{
 		uStyle |= WS_VISIBLE;
+	}
 
 	LoadString(m_hLanguageModule,IDS_FOLDERS_WINDOW_TEXT,szTemp,SIZEOF_ARRAY(szTemp));
 	m_hHolder = CreateHolderWindow(m_hContainer,szTemp,uStyle);
@@ -259,8 +261,10 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 	the folder that was right-clicked was opened in
 	a new tab (i.e. can just keep the selection the
 	same). */
-	if(!m_bTreeViewOpenInNewTab)
-		TreeView_SelectItem(m_hTreeView,hPrevItem);
+	if (!m_bTreeViewOpenInNewTab)
+	{
+		TreeView_SelectItem(m_hTreeView, hPrevItem);
+	}
 
 	m_bTreeViewRightClick = FALSE;
 }
@@ -442,8 +446,10 @@ int Explorerplusplus::OnTreeViewEndLabelEdit(LPARAM lParam)
 
 	/* No text was entered, so simply notify
 	the control to revert to the previous text. */
-	if(pdi->item.pszText == nullptr)
+	if (pdi->item.pszText == nullptr)
+	{
 		return FALSE;
+	}
 
 	/* Build the new filename from the text entered
 	and the parent directory component of the old
@@ -734,8 +740,10 @@ void Explorerplusplus::UpdateTreeViewSelection()
 			sent when the two are different.
 			Therefore, the only case to handle is when the treeview
 			selection is changed by browsing using the listview. */
-			if(TreeView_GetSelection(m_hTreeView) != hItem)
+			if (TreeView_GetSelection(m_hTreeView) != hItem)
+			{
 				m_bSelectingTreeViewDirectory = TRUE;
+			}
 
 			SendMessage(m_hTreeView,TVM_SELECTITEM,(WPARAM)TVGN_CARET,(LPARAM)hItem);
 		}

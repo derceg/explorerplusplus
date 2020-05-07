@@ -38,19 +38,29 @@ INT_PTR SetFileAttributesDialog::OnInitDialog()
 	for (const auto &file : m_FileList)
 	{
 		if (file.wfd.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)
+		{
 			nArchived++;
+		}
 
 		if ((file.wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) == FILE_ATTRIBUTE_HIDDEN)
+		{
 			nHidden++;
+		}
 
 		if (file.wfd.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
+		{
 			nSystem++;
+		}
 
 		if (file.wfd.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
+		{
 			nReadOnly++;
+		}
 
 		if (!(file.wfd.dwFileAttributes & FILE_ATTRIBUTE_NOT_CONTENT_INDEXED))
+		{
 			nIndexed++;
+		}
 	}
 
 	ResetButtonState(GetDlgItem(m_hDlg, IDC_CHECK_ARCHIVE), nArchived == 0 || nArchived == nItems);
@@ -350,11 +360,17 @@ void SetFileAttributesDialog::SetAttributeCheckState(HWND hwnd, int nAttributes,
 	UINT checkState;
 
 	if (nAttributes == 0)
+	{
 		checkState = BST_UNCHECKED;
+	}
 	else if (nAttributes == nSelected)
+	{
 		checkState = BST_CHECKED;
+	}
 	else
+	{
 		checkState = BST_INDETERMINATE;
+	}
 
 	SendMessage(hwnd, BM_SETCHECK, checkState, 0);
 }
@@ -362,7 +378,9 @@ void SetFileAttributesDialog::SetAttributeCheckState(HWND hwnd, int nAttributes,
 void SetFileAttributesDialog::ResetButtonState(HWND hwnd, BOOL bReset)
 {
 	if (!bReset)
+	{
 		return;
+	}
 
 	SendMessage(hwnd, BM_SETSTYLE, BS_AUTOCHECKBOX, MAKELPARAM(FALSE, 0));
 }

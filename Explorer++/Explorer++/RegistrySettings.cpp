@@ -539,10 +539,16 @@ void Explorerplusplus::SaveTabSettingsToRegistry()
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("AddressLocked"),tab.GetLockState() == Tab::LockState::AddressLocked);
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("UseCustomName"),tab.GetUseCustomName());
 
-				if(tab.GetUseCustomName())
-					NRegistrySettings::SaveStringToRegistry(hTabKey,_T("CustomName"),tab.GetName().c_str());
+				if (tab.GetUseCustomName())
+				{
+					NRegistrySettings::SaveStringToRegistry(
+						hTabKey, _T("CustomName"), tab.GetName().c_str());
+				}
 				else
-					NRegistrySettings::SaveStringToRegistry(hTabKey,_T("CustomName"),EMPTY_STRING);
+				{
+					NRegistrySettings::SaveStringToRegistry(
+						hTabKey, _T("CustomName"), EMPTY_STRING);
+				}
 
 				RegCloseKey(hTabKey);
 			}
@@ -683,8 +689,10 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 
 			hr = m_tabContainer->CreateNewTab(pidlDirectory, tabSettings, &folderSettings, initialColumns);
 
-			if(hr == S_OK)
+			if (hr == S_OK)
+			{
 				nTabsCreated++;
+			}
 
 			CoTaskMemFree(pidlDirectory);
 			RegCloseKey(hTabKey);
@@ -954,8 +962,10 @@ void Explorerplusplus::LoadToolbarInformationFromRegistry()
 		{
 			BOOL bUseChevron = FALSE;
 
-			if(m_ToolbarInformation[i].fStyle & RBBS_USECHEVRON)
+			if (m_ToolbarInformation[i].fStyle & RBBS_USECHEVRON)
+			{
 				bUseChevron = TRUE;
+			}
 
 			NRegistrySettings::ReadDwordFromRegistry(hToolbarKey,_T("id"),
 				(LPDWORD)&m_ToolbarInformation[i].wID);
@@ -964,8 +974,10 @@ void Explorerplusplus::LoadToolbarInformationFromRegistry()
 			NRegistrySettings::ReadDwordFromRegistry(hToolbarKey,_T("Length"),
 				(LPDWORD)&m_ToolbarInformation[i].cx);
 
-			if(bUseChevron)
+			if (bUseChevron)
+			{
 				m_ToolbarInformation[i].fStyle |= RBBS_USECHEVRON;
+			}
 
 			RegCloseKey(hToolbarKey);
 

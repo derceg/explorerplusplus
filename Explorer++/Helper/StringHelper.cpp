@@ -143,8 +143,10 @@ TCHAR *PrintCommaLargeNum(LARGE_INTEGER lPrint)
 
 	while(nTemp != 0)
 	{
-		if(i % 3 == 0 && i != 0)
+		if (i % 3 == 0 && i != 0)
+		{
 			*--p = chComma;
+		}
 
 		*--p = '0' + (TCHAR) (nTemp % 10);
 
@@ -233,13 +235,17 @@ BOOL CheckWildcardMatchInternal(const TCHAR *szWildcard, const TCHAR *szString, 
 
 			if(bMatched)
 			{
-				while(*szWildcard != '\0')
+				while (*szWildcard != '\0')
+				{
 					szWildcard++;
+				}
 
 				szWildcard--;
 
-				while(*szString != '\0')
+				while (*szString != '\0')
+				{
 					szString++;
+				}
 			}
 
 			bCurrentMatch = bMatched;
@@ -273,11 +279,15 @@ BOOL CheckWildcardMatchInternal(const TCHAR *szWildcard, const TCHAR *szString, 
 	}
 
 	/* Skip past any trailing wildcards. */
-	while(*szWildcard == '*')
+	while (*szWildcard == '*')
+	{
 		szWildcard++;
+	}
 
-	if(*szWildcard == '\0' && *szString == '\0' && bCurrentMatch)
+	if (*szWildcard == '\0' && *szString == '\0' && bCurrentMatch)
+	{
 		return TRUE;
+	}
 
 	return FALSE;
 }

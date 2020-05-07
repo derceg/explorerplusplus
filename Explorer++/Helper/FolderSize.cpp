@@ -23,7 +23,9 @@ HRESULT CalculateFolderSize(
 	int r_NumFolders = 0;
 
 	if (!szPath || !nFolders || !nFiles || !lTotalFolderSize)
+	{
 		return E_INVALIDARG;
+	}
 
 	l_TotalFolderSize.QuadPart = 0;
 	r_TotalFolderSize.QuadPart = 0;
@@ -34,7 +36,9 @@ HRESULT CalculateFolderSize(
 	hFirstFile = FindFirstFile(initialPath, &wfd);
 
 	if (hFirstFile == INVALID_HANDLE_VALUE)
+	{
 		return S_OK;
+	}
 
 	if (StrCmp(wfd.cFileName, _T(".")) != 0)
 	{
@@ -94,7 +98,9 @@ DWORD WINAPI Thread_CalculateFolderSize(LPVOID lpParameter)
 	HRESULT hr;
 
 	if (lpParameter == NULL)
+	{
 		return 0;
+	}
 
 	pFolderSize = (FolderSize_t *) lpParameter;
 

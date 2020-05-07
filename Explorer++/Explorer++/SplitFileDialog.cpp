@@ -587,7 +587,9 @@ void SplitFile::Split()
 	LONGLONG nSplits = lFileSize.QuadPart / m_uSplitSize;
 
 	if ((lFileSize.QuadPart % m_uSplitSize) != 0)
+	{
 		nSplits++;
+	}
 
 	PostMessage(
 		m_hDlg, NSplitFileDialog::WM_APP_SETTOTALSPLITCOUNT, static_cast<WPARAM>(nSplits), 0);

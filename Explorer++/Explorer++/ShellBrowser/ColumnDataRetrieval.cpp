@@ -204,7 +204,9 @@ std::wstring ProcessItemFileName(
 		if (*pExt != '\0')
 		{
 			if (lstrcmpi(pExt, _T(".lnk")) == 0)
+			{
 				bHideExtension = TRUE;
+			}
 		}
 	}
 

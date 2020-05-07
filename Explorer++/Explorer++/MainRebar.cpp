@@ -103,7 +103,9 @@ void Explorerplusplus::CreateMainControls()
 	/* If the rebar is locked, prevent bands from
 	been rearranged. */
 	if (m_config->lockToolbars)
+	{
 		RebarStyles |= RBS_FIXEDORDER;
+	}
 
 	/* Create and subclass the main rebar control. */
 	m_hMainRebar = CreateWindowEx(0, REBARCLASSNAME, EMPTY_STRING, RebarStyles,
@@ -123,7 +125,9 @@ void Explorerplusplus::CreateMainControls()
 			SendMessage(m_mainToolbar->GetHWND(), TB_GETMAXSIZE, 0, (LPARAM)&sz);
 
 			if (m_ToolbarInformation[i].cx == 0)
+			{
 				m_ToolbarInformation[i].cx = sz.cx;
+			}
 
 			m_ToolbarInformation[i].cxIdeal = sz.cx;
 			m_ToolbarInformation[i].hwndChild = m_mainToolbar->GetHWND();
@@ -147,7 +151,9 @@ void Explorerplusplus::CreateMainControls()
 			SendMessage(m_hBookmarksToolbar, TB_GETMAXSIZE, 0, (LPARAM)&sz);
 
 			if (m_ToolbarInformation[i].cx == 0)
+			{
 				m_ToolbarInformation[i].cx = sz.cx;
+			}
 
 			m_ToolbarInformation[i].cxIdeal = sz.cx;
 			m_ToolbarInformation[i].hwndChild = m_hBookmarksToolbar;
@@ -162,7 +168,9 @@ void Explorerplusplus::CreateMainControls()
 			SendMessage(m_pDrivesToolbar->GetHWND(), TB_GETMAXSIZE, 0, (LPARAM)&sz);
 
 			if (m_ToolbarInformation[i].cx == 0)
+			{
 				m_ToolbarInformation[i].cx = sz.cx;
+			}
 
 			m_ToolbarInformation[i].cxIdeal = sz.cx;
 			m_ToolbarInformation[i].hwndChild = m_pDrivesToolbar->GetHWND();
@@ -177,7 +185,9 @@ void Explorerplusplus::CreateMainControls()
 			SendMessage(m_pApplicationToolbar->GetHWND(), TB_GETMAXSIZE, 0, (LPARAM)&sz);
 
 			if (m_ToolbarInformation[i].cx == 0)
+			{
 				m_ToolbarInformation[i].cx = sz.cx;
+			}
 
 			m_ToolbarInformation[i].cxIdeal = sz.cx;
 			m_ToolbarInformation[i].hwndChild = m_pApplicationToolbar->GetHWND();

@@ -131,13 +131,17 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 			hr = m_tabContainer->CreateNewTab(szDirectory, TabSettings(_selected = true));
 
 			if (hr == S_OK)
+			{
 				nTabsCreated++;
+			}
 		}
 	}
 	else
 	{
 		if (m_config->startupMode == StartupMode::PreviousTabs)
+		{
 			nTabsCreated = pLoadSave->LoadPreviousTabs();
+		}
 	}
 
 	if (nTabsCreated == 0)
@@ -212,9 +216,13 @@ void Explorerplusplus::OnSelectTabByIndex(int iTab)
 	else
 	{
 		if (iTab < nTabs)
+		{
 			newIndex = iTab;
+		}
 		else
+		{
 			newIndex = nTabs - 1;
+		}
 	}
 
 	m_tabContainer->SelectTabAtIndex(newIndex);

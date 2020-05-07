@@ -468,22 +468,34 @@ DWORD DetermineDragEffect(
 			the location of the source and destination
 			directories. */
 			if (bOnSameDrive && (dwCurrentEffect & DROPEFFECT_MOVE))
+			{
 				dwEffect = DROPEFFECT_MOVE;
+			}
 			else if (dwCurrentEffect & DROPEFFECT_COPY)
+			{
 				dwEffect = DROPEFFECT_COPY;
+			}
 
 			if (dwEffect == DROPEFFECT_NONE)
 			{
 				/* No suitable drop type found above. Use whichever
 				method is available. */
 				if (dwCurrentEffect & DROPEFFECT_MOVE)
+				{
 					dwEffect = DROPEFFECT_MOVE;
+				}
 				else if (dwCurrentEffect & DROPEFFECT_COPY)
+				{
 					dwEffect = DROPEFFECT_COPY;
+				}
 				else if (dwCurrentEffect & DROPEFFECT_LINK)
+				{
 					dwEffect = DROPEFFECT_LINK;
+				}
 				else
+				{
 					dwEffect = DROPEFFECT_NONE;
+				}
 			}
 		}
 	}
