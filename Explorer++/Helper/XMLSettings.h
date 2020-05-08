@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <gdiplus.h>
 #include <objbase.h>
 #include <MsXml2.h>
 

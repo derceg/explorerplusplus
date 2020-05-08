@@ -31,6 +31,10 @@
     <ClCompile Include="ApplicationToolbarHelperTest.cpp">
       <Filter>Application Toolbar</Filter>
     </ClCompile>
+    <ClCompile Include="BookmarkXmlStorageTest.cpp">
+      <Filter>Bookmarks</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -61,5 +65,6 @@
     <ClInclude Include="BookmarkTreeHelper.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
+    <ClInclude Include="ResourceHelper.h" />
   </ItemGroup>
 </Project>

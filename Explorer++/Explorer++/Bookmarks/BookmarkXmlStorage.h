@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <MsXml2.h>
+
 class BookmarkTree;
 
 namespace BookmarkXmlStorage

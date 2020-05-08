@@ -89,8 +89,8 @@ public:
 	FILETIME GetDateModified() const;
 	void SetDateModified(const FILETIME &dateModified);
 
-	void AddChild(std::unique_ptr<BookmarkItem> bookmarkItem);
-	void AddChild(std::unique_ptr<BookmarkItem> bookmarkItem, size_t index);
+	BookmarkItem *AddChild(std::unique_ptr<BookmarkItem> bookmarkItem);
+	BookmarkItem *AddChild(std::unique_ptr<BookmarkItem> bookmarkItem, size_t index);
 	std::unique_ptr<BookmarkItem> RemoveChild(size_t index);
 	bool HasChildFolder() const;
 

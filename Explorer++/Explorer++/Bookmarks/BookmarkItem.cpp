@@ -140,21 +140,24 @@ void BookmarkItem::SetDateModified(const FILETIME &dateModified)
 	updatedSignal.m_signal(*this, PropertyType::DateModified);
 }
 
-void BookmarkItem::AddChild(std::unique_ptr<BookmarkItem> bookmarkItem)
+BookmarkItem *BookmarkItem::AddChild(std::unique_ptr<BookmarkItem> bookmarkItem)
 {
-	AddChild(std::move(bookmarkItem), m_children.size());
+	return AddChild(std::move(bookmarkItem), m_children.size());
 }
 
-void BookmarkItem::AddChild(std::unique_ptr<BookmarkItem> bookmarkItem, size_t index)
+BookmarkItem *BookmarkItem::AddChild(std::unique_ptr<BookmarkItem> bookmarkItem, size_t index)
 {
 	assert(m_type == Type::Folder);
 	assert(index <= m_children.size());
 
 	bookmarkItem->m_parent = this;
 
+	BookmarkItem *rawBookmarkItem = bookmarkItem.get();
 	m_children.insert(m_children.begin() + index, std::move(bookmarkItem));
 
 	UpdateModificationTime();
+
+	return rawBookmarkItem;
 }
 
 std::unique_ptr<BookmarkItem> BookmarkItem::RemoveChild(size_t index)
