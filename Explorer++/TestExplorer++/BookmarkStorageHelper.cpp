@@ -59,7 +59,7 @@ void CompareFolders(const BookmarkItem *firstFolder, const BookmarkItem *secondF
 	auto &secondChildren = secondFolder->GetChildren();
 	ASSERT_EQ(firstChildren.size(), secondChildren.size());
 
-	for (int i = 0; i < firstChildren.size(); i++)
+	for (size_t i = 0; i < firstChildren.size(); i++)
 	{
 		auto *firstCurrent = firstChildren[i].get();
 		auto *secondCurrent = secondChildren[i].get();
