@@ -35,6 +35,12 @@
       <Filter>Bookmarks</Filter>
     </ClCompile>
     <ClCompile Include="ResourceHelper.cpp" />
+    <ClCompile Include="BookmarkRegistryStorageTest.cpp">
+      <Filter>Bookmarks</Filter>
+    </ClCompile>
+    <ClCompile Include="BookmarkStorageHelper.cpp">
+      <Filter>Bookmarks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -66,5 +72,8 @@
       <Filter>Bookmarks</Filter>
     </ClInclude>
     <ClInclude Include="ResourceHelper.h" />
+    <ClInclude Include="BookmarkStorageHelper.h">
+      <Filter>Bookmarks</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

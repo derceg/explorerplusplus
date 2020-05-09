@@ -81,6 +81,8 @@
   <ItemGroup>
     <ClCompile Include="ApplicationToolbarHelperTest.cpp" />
     <ClCompile Include="BookmarkDropperTest.cpp" />
+    <ClCompile Include="BookmarkRegistryStorageTest.cpp" />
+    <ClCompile Include="BookmarkStorageHelper.cpp" />
     <ClCompile Include="BookmarkXmlStorageTest.cpp" />
     <ClCompile Include="DataObjectTest.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -106,6 +108,7 @@
     <ResourceCompile Include="TestExplorer++.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BookmarkStorageHelper.h" />
     <ClInclude Include="BookmarkTreeHelper.h" />
     <ClInclude Include="ResourceHelper.h" />
   </ItemGroup>

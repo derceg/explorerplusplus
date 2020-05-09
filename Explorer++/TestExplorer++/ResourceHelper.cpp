@@ -10,13 +10,16 @@
 
 const TCHAR g_resourcesFileName[] = L"Resources";
 
-std::wstring GetResourcePath(const std::wstring &filename)
+std::filesystem::path GetResourcesDirectoryPath()
 {
 	TCHAR processImageName[MAX_PATH];
 	GetProcessImageName(GetCurrentProcessId(), processImageName, SIZEOF_ARRAY(processImageName));
 
-	std::filesystem::path resourcePath(processImageName);
-	resourcePath = resourcePath.parent_path() / g_resourcesFileName / filename;
+	std::filesystem::path path(processImageName);
+	return path.parent_path() / g_resourcesFileName;
+}
 
-	return resourcePath;
+std::filesystem::path GetResourcePath(const std::wstring &filename)
+{
+	return GetResourcesDirectoryPath() / filename;
 }

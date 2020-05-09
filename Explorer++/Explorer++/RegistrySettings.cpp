@@ -437,12 +437,12 @@ void DeleteKey(HKEY hKey)
 
 void Explorerplusplus::SaveBookmarksToRegistry()
 {
-	BookmarkRegistryStorage::Save(&m_bookmarkTree);
+	BookmarkRegistryStorage::Save(NExplorerplusplus::REG_MAIN_KEY, &m_bookmarkTree);
 }
 
 void Explorerplusplus::LoadBookmarksFromRegistry()
 {
-	BookmarkRegistryStorage::Load(&m_bookmarkTree);
+	BookmarkRegistryStorage::Load(NExplorerplusplus::REG_MAIN_KEY, &m_bookmarkTree);
 }
 
 void Explorerplusplus::SaveTabSettingsToRegistry()

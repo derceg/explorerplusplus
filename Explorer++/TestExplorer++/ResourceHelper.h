@@ -5,6 +5,8 @@
 #pragma once
 
 #include <windows.h>
+#include <filesystem>
 #include <string>
 
-std::wstring GetResourcePath(const std::wstring &filename);
+std::filesystem::path GetResourcesDirectoryPath();
+std::filesystem::path GetResourcePath(const std::wstring &filename);

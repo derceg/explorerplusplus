@@ -4,10 +4,12 @@
 
 #pragma once
 
+#include <string>
+
 class BookmarkTree;
 
 namespace BookmarkRegistryStorage
 {
-void Load(BookmarkTree *bookmarkTree);
-void Save(BookmarkTree *bookmarkTree);
+void Load(const std::wstring &applicationKeyPath, BookmarkTree *bookmarkTree);
+void Save(const std::wstring &applicationKeyPath, BookmarkTree *bookmarkTree);
 }
