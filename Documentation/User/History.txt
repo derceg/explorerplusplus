@@ -60,10 +60,15 @@ New features:
   added. It's possible to switch between the two icon sets via
   Tools > Options > General > Icon theme.
 - Added partial support for high DPI displays.
+- It's now possible to reopen a recently closed tab using File >
+  Reopen Recent Tab. The most recently closed tab can be reopened
+  using Ctrl+Shift+T.
 - The display window can now be displayed on the right.
   Previously, it was always displayed at the bottom.
 - Support for the "Date Deleted" and "Original Location" recycle
   bin columns has been implemented.
+- A context menu is now shown when right-clicking the empty space
+  in the tab bar.
 - When renaming a file, it's possible to move to the next item by
   pressing tab. Shift+tab can now be used to move to the previous
   item.
@@ -182,6 +187,9 @@ Misc:
   subject) are retrieved has been updated. This means that the
   fields should now be displayed for more file types (e.g. Word
   documents).
+- When selecting a file path with spaces in the application
+  toolbar button dialog, the path is now quoted (which is
+  necessary for paths with spaces).
 - The columns in the select columns dialog are now sorted by
   name, with the current set of columns appearing at the top of
   the list.
@@ -189,6 +197,12 @@ Misc:
   to retrieve the extension for both files and folders. Now, the
   extension will only be retrieved for files. Folders will be
   grouped together in a "Folder" group.
+- The order in which view modes are cycled (when clicking the
+  "Views" button on the toolbar or scrolling the mouse wheel
+  while holding ctrl) has been reversed to match the order used
+  in Windows Explorer.
+- A third-party credits dialog has been added, which can be
+  opened via the about dialog.
 
 Version 1.3.5 (03/02/2013)
 --------------------------
