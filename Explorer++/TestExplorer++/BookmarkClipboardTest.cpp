@@ -6,7 +6,8 @@
 #include "Bookmarks/BookmarkItem.h"
 #include <gtest/gtest.h>
 
-TEST(BookmarkClipboardTest, BookmarkReadWrite) {
+TEST(BookmarkClipboardTest, BookmarkReadWrite)
+{
 	BookmarkItems bookmarkItems;
 	OwnedRefBookmarkItems ownedBookmarkItems;
 
