@@ -38,7 +38,11 @@ public:
 private:
 	static const UINT_PTR SUBCLASS_ID = 0;
 
-	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 200;
+	// This is the end of the range that starts at WM_APP. This class subclasses the window that's
+	// passed to the constructor, so it's not possible to tell what other WM_APP messages are in
+	// use. To try to avoid clashes with other messages sent throughout the application, the last
+	// value in the range will be used.
+	static const UINT WM_APP_ICON_RESULT_READY = 0xBFFF;
 
 	struct BasicItemInfo
 	{
