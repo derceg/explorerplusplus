@@ -41,6 +41,9 @@
     <ClCompile Include="BookmarkStorageHelper.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
+    <ClCompile Include="StringHelperTest.cpp">
+      <Filter>Helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

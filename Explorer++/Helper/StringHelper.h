@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <windows.h>
+#include <string>
+
 enum SizeDisplayFormat_t
 {
 	SIZE_FORMAT_NONE,

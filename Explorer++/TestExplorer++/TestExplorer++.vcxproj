@@ -94,6 +94,7 @@
     <ClCompile Include="ManifestTest.cpp" />
     <ClCompile Include="ResourceHelper.cpp" />
     <ClCompile Include="ShellNavigationControllerTest.cpp" />
+    <ClCompile Include="StringHelperTest.cpp" />
     <ClCompile Include="ViewModeHelperTest.cpp" />
   </ItemGroup>
   <ItemGroup>

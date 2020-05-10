@@ -151,7 +151,6 @@
     <ClCompile Include="TestHelper.cpp" />
     <ClCompile Include="TestRegistry.cpp" />
     <ClCompile Include="TestShellHelper.cpp" />
-    <ClCompile Include="TestStringHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Helper\Helper.vcxproj">
