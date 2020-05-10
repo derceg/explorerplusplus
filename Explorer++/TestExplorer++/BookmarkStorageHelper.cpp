@@ -5,15 +5,17 @@
 #include "Bookmarks/BookmarkTree.h"
 #include <gtest/gtest.h>
 
-void CompareFolders(const BookmarkItem *firstFolder, const BookmarkItem *secondFolder, bool compareGuids);
-void CompareBookmarks(const BookmarkItem *firstBookmark, const BookmarkItem *secondBookmark, bool compareGuids);
+void CompareFolders(
+	const BookmarkItem *firstFolder, const BookmarkItem *secondFolder, bool compareGuids);
+void CompareBookmarks(
+	const BookmarkItem *firstBookmark, const BookmarkItem *secondBookmark, bool compareGuids);
 
-void BuildV2LoadReferenceTree(BookmarkTree *bookmarkTree)
+void BuildV2LoadSaveReferenceTree(BookmarkTree *bookmarkTree)
 {
 	auto folder = std::make_unique<BookmarkItem>(
 		L"C974D322-89F3-402E-ADE7-6AB447DB54ED", L"Menu Folder 1", std::nullopt);
-	auto *rawFolder = bookmarkTree->AddBookmarkItem(
-		bookmarkTree->GetBookmarksMenuFolder(), std::move(folder), 0);
+	auto *rawFolder =
+		bookmarkTree->AddBookmarkItem(bookmarkTree->GetBookmarksMenuFolder(), std::move(folder), 0);
 	ASSERT_TRUE(rawFolder);
 
 	auto subFolder = std::make_unique<BookmarkItem>(
@@ -27,14 +29,13 @@ void BuildV2LoadReferenceTree(BookmarkTree *bookmarkTree)
 
 	folder = std::make_unique<BookmarkItem>(
 		L"509F37C6-18CA-44BD-890A-53462529B71D", L"Menu Folder 2", std::nullopt);
-	rawFolder = bookmarkTree->AddBookmarkItem(
-		bookmarkTree->GetBookmarksMenuFolder(), std::move(folder), 1);
+	rawFolder =
+		bookmarkTree->AddBookmarkItem(bookmarkTree->GetBookmarksMenuFolder(), std::move(folder), 1);
 	ASSERT_TRUE(rawFolder);
 
 	bookmark = std::make_unique<BookmarkItem>(
 		L"3AD29787-DE86-4149-8A5E-E615E5232787", L"Public", L"C:\\Users\\Public");
-	bookmarkTree->AddBookmarkItem(
-		bookmarkTree->GetBookmarksMenuFolder(), std::move(bookmark), 2);
+	bookmarkTree->AddBookmarkItem(bookmarkTree->GetBookmarksMenuFolder(), std::move(bookmark), 2);
 
 	bookmark =
 		std::make_unique<BookmarkItem>(L"0FEE66C9-12BD-4278-8AAF-10C4E4068220", L"C", L"C:\\");
@@ -92,14 +93,19 @@ void BuildV1NestedShowOnToolbarLoadReferenceTree(BookmarkTree *bookmarkTree)
 	bookmarkTree->AddBookmarkItem(bookmarkTree->GetBookmarksMenuFolder(), std::move(folder), 1);
 }
 
-void CompareBookmarkTrees(const BookmarkTree *firstTree, const BookmarkTree *secondTree, bool compareGuids)
+void CompareBookmarkTrees(
+	const BookmarkTree *firstTree, const BookmarkTree *secondTree, bool compareGuids)
 {
-	CompareFolders(firstTree->GetBookmarksMenuFolder(), secondTree->GetBookmarksMenuFolder(), compareGuids);
-	CompareFolders(firstTree->GetBookmarksToolbarFolder(), secondTree->GetBookmarksToolbarFolder(), compareGuids);
-	CompareFolders(firstTree->GetOtherBookmarksFolder(), secondTree->GetOtherBookmarksFolder(), compareGuids);
+	CompareFolders(
+		firstTree->GetBookmarksMenuFolder(), secondTree->GetBookmarksMenuFolder(), compareGuids);
+	CompareFolders(firstTree->GetBookmarksToolbarFolder(), secondTree->GetBookmarksToolbarFolder(),
+		compareGuids);
+	CompareFolders(
+		firstTree->GetOtherBookmarksFolder(), secondTree->GetOtherBookmarksFolder(), compareGuids);
 }
 
-void CompareFolders(const BookmarkItem *firstFolder, const BookmarkItem *secondFolder, bool compareGuids)
+void CompareFolders(
+	const BookmarkItem *firstFolder, const BookmarkItem *secondFolder, bool compareGuids)
 {
 	if (compareGuids)
 	{
@@ -130,7 +136,8 @@ void CompareFolders(const BookmarkItem *firstFolder, const BookmarkItem *secondF
 	}
 }
 
-void CompareBookmarks(const BookmarkItem *firstBookmark, const BookmarkItem *secondBookmark, bool compareGuids)
+void CompareBookmarks(
+	const BookmarkItem *firstBookmark, const BookmarkItem *secondBookmark, bool compareGuids)
 {
 	if (compareGuids)
 	{

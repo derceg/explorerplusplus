@@ -23,7 +23,8 @@ protected:
 		ASSERT_EQ(result, ERROR_SUCCESS);
 	}
 
-	void PerformLoadTest(const std::wstring &filename, BookmarkTree *referenceBookmarkTree, bool compareGuids)
+	void PerformLoadTest(
+		const std::wstring &filename, BookmarkTree *referenceBookmarkTree, bool compareGuids)
 	{
 		ImportRegistryResource(filename);
 
@@ -59,9 +60,22 @@ protected:
 TEST_F(BookmarkRegistryStorageTest, V2Load)
 {
 	BookmarkTree referenceBookmarkTree;
-	BuildV2LoadReferenceTree(&referenceBookmarkTree);
+	BuildV2LoadSaveReferenceTree(&referenceBookmarkTree);
 
 	PerformLoadTest(L"bookmarks-v2.reg", &referenceBookmarkTree, true);
+}
+
+TEST_F(BookmarkRegistryStorageTest, V2Save)
+{
+	BookmarkTree referenceBookmarkTree;
+	BuildV2LoadSaveReferenceTree(&referenceBookmarkTree);
+
+	BookmarkRegistryStorage::Save(g_applicationTestKey, &referenceBookmarkTree);
+
+	BookmarkTree loadedBookmarkTree;
+	BookmarkRegistryStorage::Load(g_applicationTestKey, &loadedBookmarkTree);
+
+	CompareBookmarkTrees(&loadedBookmarkTree, &referenceBookmarkTree, true);
 }
 
 TEST_F(BookmarkRegistryStorageTest, V1BasicLoad)
