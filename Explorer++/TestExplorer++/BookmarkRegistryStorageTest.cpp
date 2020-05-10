@@ -17,6 +17,22 @@ const TCHAR g_applicationTestKey[] = _T("Software\\Explorer++Test");
 class BookmarkRegistryStorageTest : public Test
 {
 protected:
+	void TearDown() override
+	{
+		LSTATUS result = SHDeleteKey(HKEY_CURRENT_USER, g_applicationTestKey);
+		ASSERT_EQ(result, ERROR_SUCCESS);
+	}
+
+	void PerformLoadTest(const std::wstring &filename, BookmarkTree *referenceBookmarkTree, bool compareGuids)
+	{
+		ImportRegistryResource(filename);
+
+		BookmarkTree loadedBookmarkTree;
+		BookmarkRegistryStorage::Load(g_applicationTestKey, &loadedBookmarkTree);
+
+		CompareBookmarkTrees(&loadedBookmarkTree, referenceBookmarkTree, compareGuids);
+	}
+
 	void ImportRegistryResource(const std::wstring &filename)
 	{
 		std::wstring command = L"/c reg import " + filename;
@@ -38,36 +54,28 @@ protected:
 		WaitForSingleObject(shellExecuteInfo.hProcess, INFINITE);
 		CloseHandle(shellExecuteInfo.hProcess);
 	}
-
-	void TearDown() override
-	{
-		LSTATUS result = SHDeleteKey(HKEY_CURRENT_USER, g_applicationTestKey);
-		ASSERT_EQ(result, ERROR_SUCCESS);
-	}
 };
+
+TEST_F(BookmarkRegistryStorageTest, V2Load)
+{
+	BookmarkTree referenceBookmarkTree;
+	BuildV2LoadReferenceTree(&referenceBookmarkTree);
+
+	PerformLoadTest(L"bookmarks-v2.reg", &referenceBookmarkTree, true);
+}
 
 TEST_F(BookmarkRegistryStorageTest, V1BasicLoad)
 {
-	ImportRegistryResource(L"bookmarks-v1.reg");
-
 	BookmarkTree referenceBookmarkTree;
 	BuildV1BasicLoadReferenceTree(&referenceBookmarkTree);
 
-	BookmarkTree loadedBookmarkTree;
-	BookmarkRegistryStorage::Load(g_applicationTestKey, &loadedBookmarkTree);
-
-	CompareBookmarkTrees(&loadedBookmarkTree, &referenceBookmarkTree);
+	PerformLoadTest(L"bookmarks-v1.reg", &referenceBookmarkTree, false);
 }
 
 TEST_F(BookmarkRegistryStorageTest, V1NestedShowOnToolbarLoad)
 {
-	ImportRegistryResource(L"bookmarks-v1-nested-show-on-toolbar.reg");
-
 	BookmarkTree referenceBookmarkTree;
 	BuildV1NestedShowOnToolbarLoadReferenceTree(&referenceBookmarkTree);
 
-	BookmarkTree loadedBookmarkTree;
-	BookmarkRegistryStorage::Load(g_applicationTestKey, &loadedBookmarkTree);
-
-	CompareBookmarkTrees(&loadedBookmarkTree, &referenceBookmarkTree);
+	PerformLoadTest(L"bookmarks-v1-nested-show-on-toolbar.reg", &referenceBookmarkTree, false);
 }

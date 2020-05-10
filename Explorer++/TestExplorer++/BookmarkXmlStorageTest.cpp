@@ -26,21 +26,34 @@ protected:
 	{
 		CoUninitialize();
 	}
+
+	void PerformLoadTest(const std::wstring &filename, BookmarkTree *referenceBookmarkTree, bool compareGuids)
+	{
+		std::wstring xmlFilePath = GetResourcePath(filename);
+		auto xmlDocument = InitializeXmlDocument(xmlFilePath);
+		ASSERT_TRUE(xmlDocument);
+
+		BookmarkTree loadedBookmarkTree;
+		BookmarkXmlStorage::Load(xmlDocument.get(), &loadedBookmarkTree);
+
+		CompareBookmarkTrees(&loadedBookmarkTree, referenceBookmarkTree, compareGuids);
+	}
 };
+
+TEST_F(BookmarkXmlStorageTest, V2Load)
+{
+	BookmarkTree referenceBookmarkTree;
+	BuildV2LoadReferenceTree(&referenceBookmarkTree);
+
+	PerformLoadTest(L"bookmarks-v2-config.xml", &referenceBookmarkTree, true);
+}
 
 TEST_F(BookmarkXmlStorageTest, V1BasicLoad)
 {
 	BookmarkTree referenceBookmarkTree;
 	BuildV1BasicLoadReferenceTree(&referenceBookmarkTree);
 
-	std::wstring xmlFilePath = GetResourcePath(L"bookmarks-v1-config.xml");
-	auto xmlDocument = InitializeXmlDocument(xmlFilePath);
-	ASSERT_TRUE(xmlDocument);
-
-	BookmarkTree loadedBookmarkTree;
-	BookmarkXmlStorage::Load(xmlDocument.get(), &loadedBookmarkTree);
-
-	CompareBookmarkTrees(&loadedBookmarkTree, &referenceBookmarkTree);
+	PerformLoadTest(L"bookmarks-v1-config.xml", &referenceBookmarkTree, false);
 }
 
 TEST_F(BookmarkXmlStorageTest, V1NestedShowOnToolbarLoad)
@@ -48,14 +61,7 @@ TEST_F(BookmarkXmlStorageTest, V1NestedShowOnToolbarLoad)
 	BookmarkTree referenceBookmarkTree;
 	BuildV1NestedShowOnToolbarLoadReferenceTree(&referenceBookmarkTree);
 
-	std::wstring xmlFilePath = GetResourcePath(L"bookmarks-v1-config-nested-show-on-toolbar.xml");
-	auto xmlDocument = InitializeXmlDocument(xmlFilePath);
-	ASSERT_TRUE(xmlDocument);
-
-	BookmarkTree loadedBookmarkTree;
-	BookmarkXmlStorage::Load(xmlDocument.get(), &loadedBookmarkTree);
-
-	CompareBookmarkTrees(&loadedBookmarkTree, &referenceBookmarkTree);
+	PerformLoadTest(L"bookmarks-v1-config-nested-show-on-toolbar.xml", &referenceBookmarkTree, false);
 }
 
 wil::com_ptr<IXMLDOMDocument> InitializeXmlDocument(const std::wstring &filePath)

@@ -16,12 +16,13 @@ BookmarkItem::BookmarkItem(std::optional<std::wstring> guid, std::wstring_view n
 
 // Bookmark deserialization constructor.
 BookmarkItem::BookmarkItem(
-	std::wstring_view originalGuid, std::wstring_view name, std::wstring location) :
+	std::wstring_view originalGuid, std::wstring_view name, std::wstring location, bool internal) :
 	m_originalGuid(originalGuid),
 	m_type(Type::Bookmark),
 	m_name(name),
 	m_location(location)
 {
+	UNREFERENCED_PARAMETER(internal);
 }
 
 // Bookmark folder deserialization constructor.

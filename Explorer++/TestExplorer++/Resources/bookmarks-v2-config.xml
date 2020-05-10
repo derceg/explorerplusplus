@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!-- Preference file for Explorer++ -->
+<ExplorerPlusPlus>
+	<Bookmarksv2>
+		<PermanentItem name="BookmarksToolbar" DateCreatedLow="2876077051" DateCreatedHigh="30811747" DateModifiedLow="173556977" DateModifiedHigh="30811754">
+			<Bookmark name="0" Type="1" GUID="0FEE66C9-12BD-4278-8AAF-10C4E4068220" ItemName="C" Location="C:\" DateCreatedLow="4052642449" DateCreatedHigh="30811747" DateModifiedLow="4201443992" DateModifiedHigh="30811747">
+			</Bookmark>
+			<Bookmark name="1" Type="1" GUID="08232430-DAF7-45DA-91FC-A350459C08CA" ItemName="Public desktop" Location="C:\Users\Public\Desktop" DateCreatedLow="2273929920" DateCreatedHigh="30811748" DateModifiedLow="2365339793" DateModifiedHigh="30811748">
+			</Bookmark>
+		</PermanentItem>
+		<PermanentItem name="BookmarksMenu" DateCreatedLow="2876077051" DateCreatedHigh="30811747" DateModifiedLow="173576955" DateModifiedHigh="30811754">
+			<Bookmark name="0" Type="0" GUID="C974D322-89F3-402E-ADE7-6AB447DB54ED" ItemName="Menu Folder 1" DateCreatedLow="100145061" DateCreatedHigh="30811748" DateModifiedLow="173566970" DateModifiedHigh="30811754">
+				<Bookmark name="0" Type="0" GUID="F4382A95-DCC2-41D3-8675-98243D9956A1" ItemName="Sub Folder 1" DateCreatedLow="388020132" DateCreatedHigh="30811748" DateModifiedLow="173566970" DateModifiedHigh="30811754">
+					<Bookmark name="0" Type="1" GUID="CC620AF8-6761-4A1C-A7CD-CD23F5054FBD" ItemName="Second drive" Location="D:\" DateCreatedLow="1425805860" DateCreatedHigh="30811748" DateModifiedLow="1513796034" DateModifiedHigh="30811748">
+					</Bookmark>
+				</Bookmark>
+			</Bookmark>
+			<Bookmark name="1" Type="0" GUID="509F37C6-18CA-44BD-890A-53462529B71D" ItemName="Menu Folder 2" DateCreatedLow="172635198" DateCreatedHigh="30811748" DateModifiedLow="200720960" DateModifiedHigh="30811748">
+			</Bookmark>
+			<Bookmark name="2" Type="1" GUID="3AD29787-DE86-4149-8A5E-E615E5232787" ItemName="Public" Location="C:\Users\Public" DateCreatedLow="1017648847" DateCreatedHigh="30811748" DateModifiedLow="1223915255" DateModifiedHigh="30811748">
+			</Bookmark>
+		</PermanentItem>
+		<PermanentItem name="OtherBookmarks" DateCreatedLow="2876087048" DateCreatedHigh="30811747" DateModifiedLow="173586956" DateModifiedHigh="30811754">
+			<Bookmark name="0" Type="0" GUID="DB3C84AB-5DE8-4820-B770-45F6C3C275EE" ItemName="Other Folder 1" DateCreatedLow="526718903" DateCreatedHigh="30811748" DateModifiedLow="173586956" DateModifiedHigh="30811754">
+				<Bookmark name="0" Type="1" GUID="B0AB36D9-E6B0-4D39-B24B-72BEB13F1D78" ItemName="Sys32" Location="C:\Windows\System32" DateCreatedLow="1741191725" DateCreatedHigh="30811748" DateModifiedLow="1850811772" DateModifiedHigh="30811748">
+				</Bookmark>
+			</Bookmark>
+		</PermanentItem>
+	</Bookmarksv2>
+</ExplorerPlusPlus>
