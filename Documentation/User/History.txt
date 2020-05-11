@@ -158,7 +158,6 @@ Bug fixes:
 Misc:
 - Windows XP and Vista are no longer supported. Windows 7 is now
   the minimum supported version.
-- Builds are now digitally signed.
 - All menus are now drawn in the standard system style, rather
   than a custom style.
 - More detailed help information is now available when starting
