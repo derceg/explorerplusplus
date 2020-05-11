@@ -98,3 +98,25 @@ artifacts:
 - path: explorer++_x64_symbols.zip
 - path: Explorer++ Setup.msi
 - path: explorer++_translations.zip
+
+for:
+
+-
+  branches:
+    only:
+      - /.*-beta/
+
+  skip_non_tags: true
+
+  environment:
+    RELEASE_MODE: beta
+
+-
+  branches:
+    only:
+      - /.*-release/
+
+  skip_non_tags: true
+
+  environment:
+    RELEASE_MODE: stable
