@@ -40,7 +40,24 @@ INT_PTR AboutDialog::OnInitDialog()
 	platform = ResourceHelper::LoadString(GetInstance(), IDS_ABOUT_32BIT_BUILD);
 #endif
 
-	std::wstring version = (boost::wformat(versionTemplate) % VERSION_STRING_W % platform).str();
+	std::wstring versionAndReleaseMode = VERSION_STRING_W;
+
+#if defined(ENVIRONMENT_RELEASE_STABLE)
+	// There is no release mode shown when building a stable release.
+	std::wstring releaseMode;
+#elif defined(ENVIRONMENT_RELEASE_BETA)
+	std::wstring releaseMode = ResourceHelper::LoadString(GetInstance(), IDS_RELEASE_MODE_BETA);
+#else
+	std::wstring releaseMode = ResourceHelper::LoadString(GetInstance(), IDS_RELEASE_MODE_DEV);
+#endif
+
+	if (!releaseMode.empty())
+	{
+		versionAndReleaseMode += L" " + releaseMode;
+	}
+
+	std::wstring version =
+		(boost::wformat(versionTemplate) % versionAndReleaseMode % platform).str();
 
 	std::wstring buildDateTemplate =
 		ResourceHelper::LoadString(GetInstance(), IDS_ABOUT_BUILD_DATE);
