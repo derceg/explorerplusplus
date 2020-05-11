@@ -9,6 +9,7 @@
 #include "ResourceHelper.h"
 #include "../Helper/ImageHelper.h"
 #include <boost/format.hpp>
+#include <wil/common.h>
 
 BookmarkMenuBuilder::BookmarkMenuBuilder(
 	IExplorerplusplus *expp, IconFetcher *iconFetcher, HMODULE resourceModule) :
@@ -21,7 +22,7 @@ BookmarkMenuBuilder::BookmarkMenuBuilder(
 BOOL BookmarkMenuBuilder::BuildMenu(HWND parentWindow, HMENU menu, BookmarkItem *bookmarkItem,
 	const MenuIdRange &menuIdRange, int startPosition, ItemIdMap &itemIdMap,
 	std::vector<wil::unique_hbitmap> &menuImages, ItemPositionMap *itemPositionMap,
-	IncludePredicate includePredicate)
+	int *nextMenuItemId, IncludePredicate includePredicate)
 {
 	assert(bookmarkItem->IsFolder());
 
@@ -34,8 +35,11 @@ BOOL BookmarkMenuBuilder::BuildMenu(HWND parentWindow, HMENU menu, BookmarkItem 
 
 	BookmarkIconManager bookmarkIconManager(m_expp, m_iconFetcher, nullptr, iconWidth, iconHeight);
 
-	return BuildMenu(menu, bookmarkItem, startPosition, itemIdMap, bookmarkIconManager, menuImages,
-		itemPositionMap, true, includePredicate);
+	BOOL res = BuildMenu(menu, bookmarkItem, startPosition, itemIdMap, bookmarkIconManager,
+		menuImages, itemPositionMap, true, includePredicate);
+	wil::assign_to_opt_param(nextMenuItemId, m_idCounter);
+
+	return res;
 }
 
 BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, BookmarkItem *bookmarkItem, int startPosition,

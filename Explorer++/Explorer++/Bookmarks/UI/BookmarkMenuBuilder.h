@@ -36,7 +36,7 @@ public:
 	BOOL BuildMenu(HWND parentWindow, HMENU menu, BookmarkItem *bookmarkItem,
 		const MenuIdRange &menuIdRange, int startPosition, ItemIdMap &itemIdMap,
 		std::vector<wil::unique_hbitmap> &menuImages, ItemPositionMap *itemPositionMap = nullptr,
-		IncludePredicate includePredicate = nullptr);
+		int *nextMenuItemId = nullptr, IncludePredicate includePredicate = nullptr);
 
 private:
 	BOOL BuildMenu(HMENU menu, BookmarkItem *bookmarkItem, int startPosition, ItemIdMap &itemIdMap,

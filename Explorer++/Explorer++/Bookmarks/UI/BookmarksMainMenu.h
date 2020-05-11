@@ -27,16 +27,16 @@ private:
 	void OnMainMenuPreShow(HMENU mainMenu);
 	wil::unique_hmenu BuildMainBookmarksMenu(std::vector<wil::unique_hbitmap> &menuImages,
 		BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings);
-	void AddBookmarkItemsToMenu(HMENU menu, int position,
+	void AddBookmarkItemsToMenu(HMENU menu, const MenuIdRange &menuIdRange, int position,
 		std::vector<wil::unique_hbitmap> &menuImages,
-		BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings);
-	void AddOtherBookmarksToMenu(HMENU menu, int position,
+		BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings, int *maxMenuItemId);
+	void AddOtherBookmarksToMenu(HMENU menu, const MenuIdRange &menuIdRange, int position,
 		std::vector<wil::unique_hbitmap> &menuImages,
 		BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings);
 
 	IExplorerplusplus *m_expp;
 	BookmarkTree *m_bookmarkTree;
-	MenuIdRange m_menuIdRange;
+	const MenuIdRange m_menuIdRange;
 	BookmarkMenuBuilder m_menuBuilder;
 
 	wil::unique_hmenu m_bookmarksMenu;

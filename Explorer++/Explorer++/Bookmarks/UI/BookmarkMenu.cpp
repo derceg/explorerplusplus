@@ -93,7 +93,7 @@ BOOL BookmarkMenu::ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt,
 	BookmarkMenuBuilder::ItemIdMap menuItemIdMappings;
 	BookmarkMenuBuilder::ItemPositionMap menuItemPositionMappings;
 	BOOL res = m_menuBuilder.BuildMenu(m_parentWindow, menu.get(), bookmarkItem, { MIN_ID, MAX_ID },
-		0, menuItemIdMappings, menuImages, &menuItemPositionMappings, includePredicate);
+		0, menuItemIdMappings, menuImages, &menuItemPositionMappings, nullptr, includePredicate);
 
 	if (!res)
 	{
