@@ -99,6 +99,20 @@ artifacts:
 - path: Explorer++ Setup.msi
 - path: explorer++_translations.zip
 
+# Although the deployment section appears here, it should only be used for the
+# branches below (i.e. beta/release branches). The only reason the section is
+# declared here is to avoid duplication.
+deploy:
+  provider: GitHub
+  auth_token:
+    secure: iU7ijPhvPEwymBKhGsZBwD9aDO3yPWpAq8iS5vaQcs5YdLRgcICuLOEJZ9UZIh9l
+  release: 'Explorer++ $(APPVEYOR_BUILD_VERSION)'
+  description: ''
+  artifact: /.*\.zip/
+  draft: true
+  on:
+    APPVEYOR_REPO_TAG: true
+
 for:
 
 -
@@ -110,6 +124,11 @@ for:
 
   environment:
     RELEASE_MODE: beta
+
+  deploy:
+    provider: GitHub
+    release: 'Explorer++ $(APPVEYOR_BUILD_VERSION) beta'
+    prerelease: true
 
 -
   branches:
