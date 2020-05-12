@@ -151,11 +151,16 @@ ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
 	m_iFolderIcon = GetDefaultFolderIconIndex();
 	m_iFileIcon = GetDefaultFileIconIndex();
 
-	m_thumbnailThreadPool.push([](int id) {
+	auto initializeComTask =
+		[] (int id) {
 		UNREFERENCED_PARAMETER(id);
 
 		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
-	});
+	};
+
+	m_columnThreadPool.push(initializeComTask);
+	m_thumbnailThreadPool.push(initializeComTask);
+	m_infoTipsThreadPool.push(initializeComTask);
 }
 
 ShellBrowser::~ShellBrowser()
@@ -166,11 +171,15 @@ ShellBrowser::~ShellBrowser()
 	m_thumbnailThreadPool.clear_queue();
 	m_infoTipsThreadPool.clear_queue();
 
-	m_thumbnailThreadPool.push([](int id) {
+	auto uninitializeComTask = [](int id) {
 		UNREFERENCED_PARAMETER(id);
 
 		CoUninitialize();
-	});
+	};
+
+	m_columnThreadPool.push(uninitializeComTask);
+	m_thumbnailThreadPool.push(uninitializeComTask);
+	m_infoTipsThreadPool.push(uninitializeComTask);
 
 	/* Release the drag and drop helpers. */
 	m_pDropTargetHelper->Release();
