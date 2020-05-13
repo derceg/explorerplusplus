@@ -9,28 +9,16 @@
 IconFetcher::IconFetcher(HWND hwnd, CachedIcons *cachedIcons) :
 	m_hwnd(hwnd),
 	m_cachedIcons(cachedIcons),
-	m_iconThreadPool(1),
+	m_iconThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
 	m_iconResultIDCounter(0)
 {
 	m_windowSubclasses.emplace_back(
 		hwnd, WindowSubclassStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
-
-	m_iconThreadPool.push([](int id) {
-		UNREFERENCED_PARAMETER(id);
-
-		CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
-	});
 }
 
 IconFetcher::~IconFetcher()
 {
 	m_iconThreadPool.clear_queue();
-
-	m_iconThreadPool.push([](int id) {
-		UNREFERENCED_PARAMETER(id);
-
-		CoUninitialize();
-	});
 }
 
 LRESULT CALLBACK IconFetcher::WindowSubclassStub(

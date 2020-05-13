@@ -110,11 +110,11 @@ ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
 	m_tabNavigation(tabNavigation),
 	m_folderSettings(folderSettings),
 	m_folderColumns(initialColumns ? *initialColumns : config->globalFolderSettings.folderColumns),
-	m_columnThreadPool(1),
+	m_columnThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
 	m_columnResultIDCounter(0),
-	m_thumbnailThreadPool(1),
+	m_thumbnailThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
 	m_thumbnailResultIDCounter(0),
-	m_infoTipsThreadPool(1),
+	m_infoTipsThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
 	m_infoTipResultIDCounter(0)
 {
 	m_iRefCount = 1;
@@ -150,17 +150,6 @@ ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
 
 	m_iFolderIcon = GetDefaultFolderIconIndex();
 	m_iFileIcon = GetDefaultFileIconIndex();
-
-	auto initializeComTask =
-		[] (int id) {
-		UNREFERENCED_PARAMETER(id);
-
-		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
-	};
-
-	m_columnThreadPool.push(initializeComTask);
-	m_thumbnailThreadPool.push(initializeComTask);
-	m_infoTipsThreadPool.push(initializeComTask);
 }
 
 ShellBrowser::~ShellBrowser()
@@ -170,16 +159,6 @@ ShellBrowser::~ShellBrowser()
 	m_columnThreadPool.clear_queue();
 	m_thumbnailThreadPool.clear_queue();
 	m_infoTipsThreadPool.clear_queue();
-
-	auto uninitializeComTask = [](int id) {
-		UNREFERENCED_PARAMETER(id);
-
-		CoUninitialize();
-	};
-
-	m_columnThreadPool.push(uninitializeComTask);
-	m_thumbnailThreadPool.push(uninitializeComTask);
-	m_infoTipsThreadPool.push(uninitializeComTask);
 
 	/* Release the drag and drop helpers. */
 	m_pDropTargetHelper->Release();
