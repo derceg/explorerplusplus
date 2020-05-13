@@ -1276,8 +1276,6 @@ void OptionsDialog::OnDefaultSettingsNewTabDir(HWND hDlg)
 		StringCchCopy(g_szNewTabDirectory, SIZEOF_ARRAY(g_szNewTabDirectory), szNewTabDir);
 	}
 
-	CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
-
 	bi.hwndOwner = hDlg;
 	bi.pidlRoot = nullptr;
 	bi.pszDisplayName = szDisplayName;
@@ -1286,8 +1284,6 @@ void OptionsDialog::OnDefaultSettingsNewTabDir(HWND hDlg)
 	bi.lpfn = NewTabDirectoryBrowseCallbackProc;
 
 	unique_pidl_absolute pidl(SHBrowseForFolder(&bi));
-
-	CoUninitialize();
 
 	if (pidl != nullptr)
 	{

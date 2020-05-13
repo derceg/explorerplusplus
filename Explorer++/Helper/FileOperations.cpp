@@ -679,8 +679,6 @@ HRESULT NFileOperations::ResolveLink(
 BOOL NFileOperations::CreateBrowseDialog(
 	HWND hOwner, const std::wstring &strTitle, PIDLIST_ABSOLUTE *ppidl)
 {
-	CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
-
 	TCHAR szDisplayName[MAX_PATH];
 
 	BROWSEINFO bi;
@@ -693,8 +691,6 @@ BOOL NFileOperations::CreateBrowseDialog(
 	*ppidl = SHBrowseForFolder(&bi);
 
 	BOOL bSuccessful = (*ppidl != NULL);
-
-	CoUninitialize();
 
 	return bSuccessful;
 }
