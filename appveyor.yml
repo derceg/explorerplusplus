@@ -19,9 +19,9 @@ environment:
 
 init:
 - ps: >-
-    if ($env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH -eq "l10n_master") {
-        Write-Host "Skipping l10n_master branch pull request"
-        Exit-AppveyorBuild
+    if ($env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH -eq 'l10n_master') {
+      Write-Host 'Skipping l10n_master branch pull request'
+      Exit-AppveyorBuild
     }
 
 # Decrypt the code signing certificate.
@@ -99,54 +99,45 @@ artifacts:
 - path: Explorer++ Setup.msi
 - path: explorerpp_translations.zip
 
-before_deploy:
-- ps: >-
-    $versionComponents = $env:APPVEYOR_BUILD_VERSION -split "\.";
-
-    $versionComponents = $versionComponents[0, 1, 2];
-
-    $env:RELEASE_BUILD_VERSION = $versionComponents -join ".";
-
 for:
 
 -
   branches:
     only:
-      - /.*-beta/
+      - /version-.*/
 
   skip_non_tags: true
 
-  environment:
-    RELEASE_MODE: beta
+  before_build:
+  - ps: >-
+      if ($env:APPVEYOR_REPO_TAG_NAME -match '-beta$'') {
+        $env:RELEASE_MODE = 'beta'
+      } else {
+        $env:RELEASE_MODE = 'stable'
+      }
+
+  before_deploy:
+  - ps: >-
+      $versionComponents = $env:APPVEYOR_BUILD_VERSION -split '\.'
+
+      $versionComponents = $versionComponents[0, 1, 2]
+
+      $releaseBuildVersion = $versionComponents -join '.'
+
+      if ($env:APPVEYOR_REPO_TAG_NAME -match '-beta$'') {
+        $env:RELEASE_TITLE = "Explorer++ $releaseBuildVersion beta"
+        $env:PRERELEASE = $true
+      } else {
+        $env:RELEASE_TITLE = "Explorer++ $releaseBuildVersion"
+        $env:PRERELEASE = $false
+      }
 
   deploy:
     provider: GitHub
     auth_token:
       secure: iU7ijPhvPEwymBKhGsZBwD9aDO3yPWpAq8iS5vaQcs5YdLRgcICuLOEJZ9UZIh9l
-    release: 'Explorer++ $(RELEASE_BUILD_VERSION) beta'
-    prerelease: true
-    description: ''
-    artifact: /.*\.zip/
-    force_update: true
-    draft: true
-    on:
-      APPVEYOR_REPO_TAG: true
-
--
-  branches:
-    only:
-      - /.*-release/
-
-  skip_non_tags: true
-
-  environment:
-    RELEASE_MODE: stable
-
-  deploy:
-    provider: GitHub
-    auth_token:
-      secure: iU7ijPhvPEwymBKhGsZBwD9aDO3yPWpAq8iS5vaQcs5YdLRgcICuLOEJZ9UZIh9l
-    release: 'Explorer++ $(APPVEYOR_BUILD_VERSION)'
+    release: $(RELEASE_TITLE)
+    prerelease: $(PRERELEASE)
     description: ''
     artifact: /.*\.zip/
     force_update: true
