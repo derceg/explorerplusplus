@@ -50,7 +50,7 @@ after_build:
     IF "%PLATFORM%" == "Win32" (SET "arch=x86") ELSE (SET "arch=x64")
 
 
-    SET "archiveName=explorer++_%arch%.zip"
+    SET "archiveName=explorerpp_%arch%.zip"
 
 
     CALL %APPVEYOR_BUILD_FOLDER%\Scripts\AppVeyor\compile_help_file.bat
@@ -67,13 +67,13 @@ after_build:
     7z a %archiveName% "%APPVEYOR_BUILD_FOLDER%\Documentation\User\Help Manual\Explorer++ Help.chm"
 
 
-    7z a explorer++_%arch%_symbols.zip %APPVEYOR_BUILD_FOLDER%\Explorer++\Explorer++\%PLATFORM%\%CONFIGURATION%\Explorer++.pdb
+    7z a explorerpp_%arch%_symbols.zip %APPVEYOR_BUILD_FOLDER%\Explorer++\Explorer++\%PLATFORM%\%CONFIGURATION%\Explorer++.pdb
 
 
     copy "%APPVEYOR_BUILD_FOLDER%\Explorer++\Installer\bin\%arch%\%CONFIGURATION%\Explorer++ Setup.msi" "Explorer++ Setup.msi"
 
 
-    7z a explorer++_translations.zip %APPVEYOR_BUILD_FOLDER%\Explorer++\Win32\%CONFIGURATION%\Explorer++*.dll
+    7z a explorerpp_translations.zip %APPVEYOR_BUILD_FOLDER%\Explorer++\Win32\%CONFIGURATION%\Explorer++*.dll
 
 test_script:
 - ps: >-
@@ -92,12 +92,12 @@ test_script:
     $wc.UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\TestExplorer++Output.xml))
 
 artifacts:
-- path: explorer++_x86.zip
-- path: explorer++_x86_symbols.zip
-- path: explorer++_x64.zip
-- path: explorer++_x64_symbols.zip
+- path: explorerpp_x86.zip
+- path: explorerpp_x86_symbols.zip
+- path: explorerpp_x64.zip
+- path: explorerpp_x64_symbols.zip
 - path: Explorer++ Setup.msi
-- path: explorer++_translations.zip
+- path: explorerpp_translations.zip
 
 before_deploy:
 - ps: >-
