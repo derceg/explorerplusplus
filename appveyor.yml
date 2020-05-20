@@ -38,7 +38,7 @@ before_build:
     nuget restore Explorer++\Explorer++.sln
 
     if (Test-Path env:APPVEYOR_REPO_TAG_NAME) {
-      if ($env:APPVEYOR_REPO_TAG_NAME -match '-beta$'') {
+      if ($env:APPVEYOR_REPO_TAG_NAME -match '-beta$') {
         $env:RELEASE_MODE = 'beta'
       } else {
         $env:RELEASE_MODE = 'stable'
@@ -115,7 +115,7 @@ before_deploy:
 
     $releaseBuildVersion = $versionComponents -join '.'
 
-    if ($env:APPVEYOR_REPO_TAG_NAME -match '-beta$'') {
+    if ($env:APPVEYOR_REPO_TAG_NAME -match '-beta$') {
       $env:RELEASE_TITLE = "Explorer++ $releaseBuildVersion beta"
       $env:PRERELEASE = $true
     } else {
