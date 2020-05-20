@@ -127,6 +127,7 @@ for:
     prerelease: true
     description: ''
     artifact: /.*\.zip/
+    force_update: true
     draft: true
     on:
       APPVEYOR_REPO_TAG: true
@@ -148,6 +149,7 @@ for:
     release: 'Explorer++ $(APPVEYOR_BUILD_VERSION)'
     description: ''
     artifact: /.*\.zip/
+    force_update: true
     draft: true
     on:
       APPVEYOR_REPO_TAG: true
