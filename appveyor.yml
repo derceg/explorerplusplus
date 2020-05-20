@@ -99,6 +99,14 @@ artifacts:
 - path: Explorer++ Setup.msi
 - path: explorer++_translations.zip
 
+before_deploy:
+- ps: >-
+    $versionComponents = $env:APPVEYOR_BUILD_VERSION -split "\.";
+
+    $versionComponents = $versionComponents[0, 1, 2];
+
+    $env:RELEASE_BUILD_VERSION = $versionComponents -join ".";
+
 for:
 
 -
@@ -115,7 +123,7 @@ for:
     provider: GitHub
     auth_token:
       secure: iU7ijPhvPEwymBKhGsZBwD9aDO3yPWpAq8iS5vaQcs5YdLRgcICuLOEJZ9UZIh9l
-    release: 'Explorer++ $(APPVEYOR_BUILD_VERSION) beta'
+    release: 'Explorer++ $(RELEASE_BUILD_VERSION) beta'
     prerelease: true
     description: ''
     artifact: /.*\.zip/
