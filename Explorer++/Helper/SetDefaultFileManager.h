@@ -6,11 +6,11 @@
 
 namespace NDefaultFileManager
 {
-enum ReplaceExplorerModes_t
+enum class ReplaceExplorerMode
 {
-	REPLACEEXPLORER_NONE = 1,
-	REPLACEEXPLORER_FILESYSTEM = 2,
-	REPLACEEXPLORER_ALL = 3
+	None = 1,
+	FileSystem = 2,
+	All = 3
 };
 
 BOOL SetAsDefaultFileManagerFileSystem(const TCHAR *szInternalCommand, const TCHAR *szMenuText);

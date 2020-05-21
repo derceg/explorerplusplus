@@ -530,11 +530,8 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("OverwriteExistingFilesConfirmation"),NXMLSettings::EncodeBoolValue(m_config->overwriteExistingFilesConfirmation));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("PlayNavigationSound"),NXMLSettings::EncodeBoolValue(m_config->playNavigationSound));
-
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	_itow_s(m_config->replaceExplorerMode,szValue,SIZEOF_ARRAY(szValue),10);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ReplaceExplorerMode"),szValue);
-
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ReplaceExplorerMode"),NXMLSettings::EncodeIntValue(static_cast<int>(m_config->replaceExplorerMode)));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowAddressBar"),NXMLSettings::EncodeBoolValue(m_config->showAddressBar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -1561,7 +1558,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_REPLACEEXPLORERMODE:
-		m_config->replaceExplorerMode = static_cast<NDefaultFileManager::ReplaceExplorerModes_t>(NXMLSettings::DecodeIntValue(wszValue));
+		m_config->replaceExplorerMode = static_cast<NDefaultFileManager::ReplaceExplorerMode>(NXMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_SHOWADDRESSBAR:

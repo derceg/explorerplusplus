@@ -54,6 +54,9 @@ private:
 		HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	INT_PTR CALLBACK DefaultSettingsProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+	void OnReplaceExplorerSettingChanged(
+		HWND dialog, NDefaultFileManager::ReplaceExplorerMode updatedReplaceMode);
+
 	/* Default settings dialog. */
 	void OnDefaultSettingsNewTabDir(HWND hDlg);
 	void DefaultSettingsSetNewTabDir(HWND hEdit, const TCHAR *szPath);
