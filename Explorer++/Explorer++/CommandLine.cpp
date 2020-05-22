@@ -94,9 +94,10 @@ std::optional<CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
 
 	// The options in this group are only used internally by the
 	// application. They're not directly exposed to users.
-	CLI::App *privateCommands = app.add_subcommand("private");
+	CLI::App *privateCommands = app.add_subcommand();
 	privateCommands->group("");
 
+	commandLineSettings.jumplistNewTab = false;
 	privateCommands->add_flag(
 		wstrToStr(NExplorerplusplus::JUMPLIST_TASK_NEWTAB_ARGUMENT),
 		commandLineSettings.jumplistNewTab
