@@ -26,6 +26,7 @@ The value of the "command" sub-key will be of the form:
 #include "Macros.h"
 #include "ProcessHelper.h"
 #include "RegistrySettings.h"
+#include <wil/resource.h>
 
 using namespace NRegistrySettings;
 
@@ -35,171 +36,152 @@ const TCHAR KEY_DIRECTORY_SHELL[] = _T("Directory\\shell");
 const TCHAR KEY_FOLDER_SHELL[] = _T("Folder\\shell");
 const TCHAR SHELL_DEFAULT_VALUE[] = _T("none");
 
-BOOL SetAsDefaultFileManagerInternal(NDefaultFileManager::ReplaceExplorerMode replacementType,
-	const TCHAR *szInternalCommand, const TCHAR *szMenuText);
-BOOL RemoveAsDefaultFileManagerInternal(
-	NDefaultFileManager::ReplaceExplorerMode replacementType, const TCHAR *szInternalCommand);
+LSTATUS SetAsDefaultFileManagerInternal(NDefaultFileManager::ReplaceExplorerMode replacementType,
+	const std::wstring &applicationKeyName, const std::wstring &menuText);
+LSTATUS RemoveAsDefaultFileManagerInternal(NDefaultFileManager::ReplaceExplorerMode replacementType,
+	const std::wstring &applicationKeyName);
 }
 
-BOOL NDefaultFileManager::SetAsDefaultFileManagerFileSystem(
-	const TCHAR *szInternalCommand, const TCHAR *szMenuText)
+LSTATUS NDefaultFileManager::SetAsDefaultFileManagerFileSystem(
+	const std::wstring &applicationKeyName, const std::wstring &menuText)
 {
 	return NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
-		ReplaceExplorerMode::FileSystem, szInternalCommand, szMenuText);
+		ReplaceExplorerMode::FileSystem, applicationKeyName, menuText);
 }
 
-BOOL NDefaultFileManager::SetAsDefaultFileManagerAll(
-	const TCHAR *szInternalCommand, const TCHAR *szMenuText)
+LSTATUS NDefaultFileManager::SetAsDefaultFileManagerAll(
+	const std::wstring &applicationKeyName, const std::wstring &menuText)
 {
 	return NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
-		ReplaceExplorerMode::All, szInternalCommand, szMenuText);
+		ReplaceExplorerMode::All, applicationKeyName, menuText);
 }
 
-BOOL NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
-	NDefaultFileManager::ReplaceExplorerMode replacementType, const TCHAR *szInternalCommand,
-	const TCHAR *szMenuText)
+LSTATUS NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
+	NDefaultFileManager::ReplaceExplorerMode replacementType,
+	const std::wstring &applicationKeyName, const std::wstring &menuText)
 {
-	const TCHAR *pszSubKey = NULL;
+	const TCHAR *shellKeyPath = nullptr;
 
 	switch (replacementType)
 	{
 	case NDefaultFileManager::ReplaceExplorerMode::All:
-		pszSubKey = KEY_FOLDER_SHELL;
+		shellKeyPath = KEY_FOLDER_SHELL;
 		break;
 
 	case NDefaultFileManager::ReplaceExplorerMode::FileSystem:
 	default:
-		pszSubKey = KEY_DIRECTORY_SHELL;
+		shellKeyPath = KEY_DIRECTORY_SHELL;
 		break;
 	}
 
-	BOOL bSuccess = FALSE;
+	wil::unique_hkey shellKey;
+	LSTATUS res = RegOpenKeyEx(HKEY_CLASSES_ROOT, shellKeyPath, 0, KEY_WRITE, &shellKey);
 
-	HKEY hKeyShell;
-	LONG lRes = RegOpenKeyEx(HKEY_CLASSES_ROOT, pszSubKey, 0, KEY_WRITE, &hKeyShell);
-
-	if (lRes == ERROR_SUCCESS)
+	if (res != ERROR_SUCCESS)
 	{
-		HKEY hKeyApp;
-		lRes = RegCreateKeyEx(hKeyShell, szInternalCommand, 0, NULL, REG_OPTION_NON_VOLATILE,
-			KEY_WRITE, NULL, &hKeyApp, NULL);
-
-		if (lRes == ERROR_SUCCESS)
-		{
-			/* Now, set the defaault value for the key. This
-			default value will be the text that is shown on the
-			context menu for folders. */
-			lRes = SaveStringToRegistry(hKeyApp, NULL, szMenuText);
-
-			if (lRes == ERROR_SUCCESS)
-			{
-				/* Now, create the "command" sub-key. */
-				HKEY hKeyCommand;
-				lRes = RegCreateKeyEx(hKeyApp, _T("command"), 0, NULL, REG_OPTION_NON_VOLATILE,
-					KEY_WRITE, NULL, &hKeyCommand, NULL);
-
-				if (lRes == ERROR_SUCCESS)
-				{
-					TCHAR szCommand[512];
-					TCHAR szExecutable[MAX_PATH];
-
-					/* Get the current location of the program, and use
-					it as part of the command. */
-					GetProcessImageName(
-						GetCurrentProcessId(), szExecutable, SIZEOF_ARRAY(szExecutable));
-
-					StringCchPrintf(
-						szCommand, SIZEOF_ARRAY(szCommand), _T("\"%s\" \"%%1\""), szExecutable);
-
-					/* ...and write the command out. */
-					lRes = SaveStringToRegistry(hKeyCommand, NULL, szCommand);
-
-					if (lRes == ERROR_SUCCESS)
-					{
-						/* Set the current entry as the default. */
-						lRes = SaveStringToRegistry(hKeyShell, NULL, szInternalCommand);
-
-						if (lRes == ERROR_SUCCESS)
-						{
-							bSuccess = TRUE;
-						}
-					}
-
-					RegCloseKey(hKeyCommand);
-				}
-			}
-
-			RegCloseKey(hKeyApp);
-		}
-
-		RegCloseKey(hKeyShell);
+		return res;
 	}
 
-	return bSuccess;
+	wil::unique_hkey appKey;
+	res = RegCreateKeyEx(shellKey.get(), applicationKeyName.c_str(), 0, NULL,
+		REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &appKey, NULL);
+
+	if (res != ERROR_SUCCESS)
+	{
+		return res;
+	}
+
+	// Now, set the default value for the key. This default value will be the text that is shown on
+	// the context menu for folders.
+	res = SaveStringToRegistry(appKey.get(), NULL, menuText.c_str());
+
+	if (res != ERROR_SUCCESS)
+	{
+		return res;
+	}
+
+	// Now, create the "command" sub-key.
+	wil::unique_hkey commandKey;
+	res = RegCreateKeyEx(appKey.get(), _T("command"), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE,
+		NULL, &commandKey, NULL);
+
+	if (res != ERROR_SUCCESS)
+	{
+		return res;
+	}
+
+	TCHAR command[512];
+	TCHAR executable[MAX_PATH];
+
+	GetProcessImageName(GetCurrentProcessId(), executable, SIZEOF_ARRAY(executable));
+	StringCchPrintf(command, SIZEOF_ARRAY(command), _T("\"%s\" \"%%1\""), executable);
+
+	res = SaveStringToRegistry(commandKey.get(), NULL, command);
+
+	if (res != ERROR_SUCCESS)
+	{
+		return res;
+	}
+
+	// Set the current entry as the default.
+	res = SaveStringToRegistry(shellKey.get(), NULL, applicationKeyName.c_str());
+
+	return res;
 }
 
-BOOL NDefaultFileManager::RemoveAsDefaultFileManagerFileSystem(const TCHAR *szInternalCommand)
+LSTATUS NDefaultFileManager::RemoveAsDefaultFileManagerFileSystem(
+	const std::wstring &applicationKeyName)
 {
 	return NDefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(
-		ReplaceExplorerMode::FileSystem, szInternalCommand);
+		ReplaceExplorerMode::FileSystem, applicationKeyName);
 }
 
-BOOL NDefaultFileManager::RemoveAsDefaultFileManagerAll(const TCHAR *szInternalCommand)
+LSTATUS NDefaultFileManager::RemoveAsDefaultFileManagerAll(const std::wstring &applicationKeyName)
 {
 	return NDefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(
-		ReplaceExplorerMode::All, szInternalCommand);
+		ReplaceExplorerMode::All, applicationKeyName);
 }
 
-BOOL NDefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(
-	NDefaultFileManager::ReplaceExplorerMode replacementType, const TCHAR *szInternalCommand)
+LSTATUS NDefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(
+	NDefaultFileManager::ReplaceExplorerMode replacementType,
+	const std::wstring &applicationKeyName)
 {
-	const TCHAR *pszSubKey = NULL;
-	const TCHAR *pszDefaultValue = NULL;
+	const TCHAR *shellKeyPath = nullptr;
+	const TCHAR *defaultValue = nullptr;
 
 	switch (replacementType)
 	{
 	case NDefaultFileManager::ReplaceExplorerMode::All:
-		pszSubKey = KEY_FOLDER_SHELL;
-		pszDefaultValue = EMPTY_STRING;
+		shellKeyPath = KEY_FOLDER_SHELL;
+		defaultValue = EMPTY_STRING;
 		break;
 
 	case NDefaultFileManager::ReplaceExplorerMode::FileSystem:
 	default:
-		pszSubKey = KEY_DIRECTORY_SHELL;
-		pszDefaultValue = SHELL_DEFAULT_VALUE;
+		shellKeyPath = KEY_DIRECTORY_SHELL;
+		defaultValue = SHELL_DEFAULT_VALUE;
 		break;
 	}
 
-	BOOL bSuccess = FALSE;
+	// Remove the shell default value.
+	wil::unique_hkey shellKey;
+	LSTATUS res = RegOpenKeyEx(HKEY_CLASSES_ROOT, shellKeyPath, 0, KEY_WRITE, &shellKey);
 
-	/* Remove the shell default value. */
-	HKEY hKeyShell;
-	LONG lRes = RegOpenKeyEx(HKEY_CLASSES_ROOT, pszSubKey, 0, KEY_WRITE, &hKeyShell);
-
-	if (lRes == ERROR_SUCCESS)
+	if (res != ERROR_SUCCESS)
 	{
-		lRes = SaveStringToRegistry(hKeyShell, NULL, pszDefaultValue);
-
-		if (lRes == ERROR_SUCCESS)
-		{
-			TCHAR szDeleteSubKey[512];
-			HRESULT hr = StringCchPrintf(szDeleteSubKey, SIZEOF_ARRAY(szDeleteSubKey), _T("%s\\%s"),
-				pszSubKey, szInternalCommand);
-
-			if (SUCCEEDED(hr))
-			{
-				/* Remove the main command key. */
-				lRes = SHDeleteKey(HKEY_CLASSES_ROOT, szDeleteSubKey);
-
-				if (lRes == ERROR_SUCCESS)
-				{
-					bSuccess = TRUE;
-				}
-			}
-		}
-
-		RegCloseKey(hKeyShell);
+		return res;
 	}
 
-	return bSuccess;
+	res = SaveStringToRegistry(shellKey.get(), NULL, defaultValue);
+
+	if (res != ERROR_SUCCESS)
+	{
+		return res;
+	}
+
+	// Remove the main application key.
+	std::wstring commandKeyPath = std::wstring(shellKeyPath) + L"\\" + applicationKeyName;
+	res = SHDeleteKey(HKEY_CLASSES_ROOT, commandKeyPath.c_str());
+
+	return res;
 }

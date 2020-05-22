@@ -184,12 +184,12 @@ void OnClearRegistrySettings()
 
 void OnRemoveAsDefault()
 {
-	BOOL bSuccess = NDefaultFileManager::RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
+	LSTATUS res = NDefaultFileManager::RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 
 	/* Language hasn't been fully specified at this point, so
 	can't load success/error message from language dll. Simply show
 	a hardcoded success/error message. */
-	if (bSuccess)
+	if (res == ERROR_SUCCESS)
 	{
 		MessageBox(nullptr, _T("Explorer++ successfully removed as default file manager."),
 			NExplorerplusplus::APP_NAME, MB_OK);
@@ -205,10 +205,10 @@ void OnSetAsDefault()
 {
 	std::wstring menuText = ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_OPEN_IN_EXPLORERPLUSPLUS);
 
-	BOOL bSuccess = NDefaultFileManager::SetAsDefaultFileManagerFileSystem(
+	LSTATUS res = NDefaultFileManager::SetAsDefaultFileManagerFileSystem(
 		SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
 
-	if (bSuccess)
+	if (res == ERROR_SUCCESS)
 	{
 		MessageBox(nullptr, _T("Explorer++ successfully set as default file manager."),
 			NExplorerplusplus::APP_NAME, MB_OK);

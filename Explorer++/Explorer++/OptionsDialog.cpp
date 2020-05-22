@@ -30,6 +30,7 @@
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
+#include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/map.hpp>
 #include <unordered_map>
 
@@ -381,8 +382,7 @@ void OptionsDialog::OnReplaceExplorerSettingChanged(
 		}
 	}
 
-	BOOL success = TRUE;
-
+	LSTATUS res = ERROR_SUCCESS;
 	std::wstring menuText = ResourceHelper::LoadString(m_instance, IDS_OPEN_IN_EXPLORERPLUSPLUS);
 
 	switch (updatedReplaceMode)
@@ -392,15 +392,11 @@ void OptionsDialog::OnReplaceExplorerSettingChanged(
 		switch (m_config->replaceExplorerMode)
 		{
 		case ReplaceExplorerMode::FileSystem:
-			success = RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
+			res = RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 			break;
 
 		case ReplaceExplorerMode::All:
-			success = RemoveAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
-			break;
-
-		default:
-			success = TRUE;
+			res = RemoveAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 			break;
 		}
 	}
@@ -409,25 +405,52 @@ void OptionsDialog::OnReplaceExplorerSettingChanged(
 	case ReplaceExplorerMode::FileSystem:
 		RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 		RemoveAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
-		success = SetAsDefaultFileManagerFileSystem(
+		res = SetAsDefaultFileManagerFileSystem(
 			SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
 		break;
 
 	case ReplaceExplorerMode::All:
 		RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 		RemoveAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
-		success = SetAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
+		res = SetAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
 		break;
 	}
 
-	if (success)
+	if (res == ERROR_SUCCESS)
 	{
 		m_config->replaceExplorerMode = updatedReplaceMode;
 	}
 	else
 	{
+		wil::unique_hlocal_string systemErrorMessage;
+		DWORD size = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS
+				| FORMAT_MESSAGE_ALLOCATE_BUFFER,
+			nullptr, res, 0, reinterpret_cast<LPWSTR>(&systemErrorMessage), 32 * 1024, nullptr);
+
+		std::wstring finalSystemErrorMessage;
+
+		if (size > 0)
+		{
+			finalSystemErrorMessage = systemErrorMessage.get();
+
+			// Any trailing newlines are unnecessary, as they'll be added below when appropriate.
+			boost::trim(finalSystemErrorMessage);
+		}
+		else
+		{
+			finalSystemErrorMessage = ResourceHelper::LoadString(m_instance, IDS_ERROR_UNKNOWN);
+		}
+
 		std::wstring errorMessage =
-			ResourceHelper::LoadString(m_instance, IDS_ERR_FILEMANAGERSETTING);
+			ResourceHelper::LoadString(m_instance, IDS_ERROR_REPLACE_EXPLORER_SETTING) + L"\n\n"
+			+ finalSystemErrorMessage;
+
+		if (res == ERROR_ACCESS_DENIED)
+		{
+			errorMessage += L"\n\n"
+				+ ResourceHelper::LoadString(m_instance, IDS_ERROR_REPLACE_EXPLORER_RUN_AS_ADMIN);
+		}
+
 		MessageBox(dialog, errorMessage.c_str(), NExplorerplusplus::APP_NAME, MB_ICONWARNING);
 
 		// The default file manager setting was not changed, so reset the state of the file manager

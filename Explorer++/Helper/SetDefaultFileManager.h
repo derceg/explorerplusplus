@@ -13,8 +13,10 @@ enum class ReplaceExplorerMode
 	All = 3
 };
 
-BOOL SetAsDefaultFileManagerFileSystem(const TCHAR *szInternalCommand, const TCHAR *szMenuText);
-BOOL SetAsDefaultFileManagerAll(const TCHAR *szInternalCommand, const TCHAR *szMenuText);
-BOOL RemoveAsDefaultFileManagerFileSystem(const TCHAR *szInternalCommand);
-BOOL RemoveAsDefaultFileManagerAll(const TCHAR *szInternalCommand);
+LSTATUS SetAsDefaultFileManagerFileSystem(
+	const std::wstring &applicationKeyName, const std::wstring &menuText);
+LSTATUS SetAsDefaultFileManagerAll(
+	const std::wstring &applicationKeyName, const std::wstring &menuText);
+LSTATUS RemoveAsDefaultFileManagerFileSystem(const std::wstring &applicationKeyName);
+LSTATUS RemoveAsDefaultFileManagerAll(const std::wstring &applicationKeyName);
 }
