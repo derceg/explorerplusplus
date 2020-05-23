@@ -15,6 +15,7 @@
 #include "../ThirdParty/CLI11/CLI11.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/log/core.hpp>
+#include <iostream>
 
 extern std::vector<std::wstring> g_commandLineDirectories;
 
@@ -178,9 +179,13 @@ void OnClearRegistrySettings()
 	lStatus = SHDeleteKey(HKEY_CURRENT_USER, NExplorerplusplus::REG_MAIN_KEY);
 
 	if (lStatus == ERROR_SUCCESS)
-		MessageBox(nullptr, _T("Settings cleared successfully."), NExplorerplusplus::APP_NAME, MB_OK);
+	{
+		std::wcout << L"Settings cleared successfully." << std::endl;
+	}
 	else
-		MessageBox(nullptr, _T("Settings could not be cleared."), NExplorerplusplus::APP_NAME, MB_ICONWARNING);
+	{
+		std::wcerr << L"Settings could not be cleared.\n" << std::endl;
+	}
 }
 
 void OnRemoveAsDefault()
@@ -192,13 +197,12 @@ void OnRemoveAsDefault()
 	a hardcoded success/error message. */
 	if (res == ERROR_SUCCESS)
 	{
-		MessageBox(nullptr, _T("Explorer++ successfully removed as default file manager."),
-			NExplorerplusplus::APP_NAME, MB_OK);
+		std::wcout << L"Explorer++ successfully removed as default file manager.\n" << std::endl;
 	}
 	else
 	{
-		MessageBox(nullptr, _T("Could not remove Explorer++ as default file manager. Please \
-ensure you have administrator privileges."), NExplorerplusplus::APP_NAME, MB_ICONWARNING | MB_OK);
+		std::wcerr << L"Could not remove Explorer++ as default file manager. Please \
+ensure you have administrator privileges.\n" << std::endl;
 	}
 }
 
@@ -211,13 +215,12 @@ void OnSetAsDefault()
 
 	if (res == ERROR_SUCCESS)
 	{
-		MessageBox(nullptr, _T("Explorer++ successfully set as default file manager."),
-			NExplorerplusplus::APP_NAME, MB_OK);
+		std::wcout << L"Explorer++ successfully set as default file manager." << std::endl;
 	}
 	else
 	{
-		MessageBox(nullptr, _T("Could not set Explorer++ as default file manager. Please \
-ensure you have administrator privileges."), NExplorerplusplus::APP_NAME, MB_ICONWARNING | MB_OK);
+		std::wcerr << L"Could not set Explorer++ as default file manager. Please \
+ensure you have administrator privileges." << std::endl;
 	}
 }
 
