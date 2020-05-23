@@ -364,6 +364,20 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(
 void OptionsDialog::OnReplaceExplorerSettingChanged(
 	HWND dialog, ReplaceExplorerMode updatedReplaceMode)
 {
+	bool settingChanged = UpdateReplaceExplorerSetting(dialog, updatedReplaceMode);
+
+	if (!settingChanged)
+	{
+		// The default file manager setting was not changed, so reset the state of the file manager
+		// radio buttons.
+		CheckRadioButton(dialog, IDC_OPTION_REPLACEEXPLORER_NONE, IDC_OPTION_REPLACEEXPLORER_ALL,
+			REPLACE_EXPLORER_ENUM_CONTROL_ID_MAPPINGS.at(m_config->replaceExplorerMode));
+	}
+}
+
+bool OptionsDialog::UpdateReplaceExplorerSetting(
+	HWND dialog, ReplaceExplorerMode updatedReplaceMode)
+{
 	if (updatedReplaceMode != ReplaceExplorerMode::None
 		&& m_config->replaceExplorerMode == ReplaceExplorerMode::None)
 	{
@@ -375,10 +389,7 @@ void OptionsDialog::OnReplaceExplorerSettingChanged(
 
 		if (selectedButton == IDNO)
 		{
-			CheckRadioButton(dialog, IDC_OPTION_REPLACEEXPLORER_NONE,
-				IDC_OPTION_REPLACEEXPLORER_ALL,
-				REPLACE_EXPLORER_ENUM_CONTROL_ID_MAPPINGS.at(m_config->replaceExplorerMode));
-			return;
+			return false;
 		}
 	}
 
@@ -419,6 +430,8 @@ void OptionsDialog::OnReplaceExplorerSettingChanged(
 	if (res == ERROR_SUCCESS)
 	{
 		m_config->replaceExplorerMode = updatedReplaceMode;
+
+		return true;
 	}
 	else
 	{
@@ -453,10 +466,7 @@ void OptionsDialog::OnReplaceExplorerSettingChanged(
 
 		MessageBox(dialog, errorMessage.c_str(), NExplorerplusplus::APP_NAME, MB_ICONWARNING);
 
-		// The default file manager setting was not changed, so reset the state of the file manager
-		// radio buttons.
-		CheckRadioButton(dialog, IDC_OPTION_REPLACEEXPLORER_NONE, IDC_OPTION_REPLACEEXPLORER_ALL,
-			REPLACE_EXPLORER_ENUM_CONTROL_ID_MAPPINGS.at(m_config->replaceExplorerMode));
+		return false;
 	}
 }
 
