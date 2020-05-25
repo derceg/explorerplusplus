@@ -13,6 +13,7 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/StringHelper.h"
 #include "../ThirdParty/CLI11/CLI11.hpp"
+#include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/log/core.hpp>
 
@@ -30,6 +31,7 @@ struct CommandLineSettings
 	std::vector<std::string> directories;
 };
 
+void PreprocessCommandLineSettings(CommandLineSettings &commandLineSettings);
 std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(const CommandLineSettings& commandLineSettings);
 void OnClearRegistrySettings();
 void OnRemoveAsDefault();
@@ -112,10 +114,48 @@ std::optional<CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
 		return ExitInfo{ app.exit(e) };
 	}
 
+	PreprocessCommandLineSettings(commandLineSettings);
+
 	return ProcessCommandLineSettings(commandLineSettings);
 }
 
-std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(const CommandLineSettings& commandLineSettings)
+void PreprocessCommandLineSettings(CommandLineSettings &commandLineSettings)
+{
+	// When Explorer++ is set as the default file manager, it's invoked in the following way when a
+	// directory is opened:
+	//
+	// C:\path\to\Explorer++.exe "[directory_path]"
+	//
+	// If directory_path is something like C:\, this will result in the following invocation:
+	//
+	// C:\path\to\Explorer++.exe "C:\"
+	//
+	// This path argument is then turned into the following string:
+	//
+	// C:"
+	//
+	// This is due to the C++ command line parsing rules, as described at:
+	//
+	// https://docs.microsoft.com/en-us/cpp/cpp/main-function-command-line-args?view=vs-2019#parsing-c-command-line-arguments
+	//
+	// That is, \" is interpreted as a literal backslash character.
+	//
+	// That isn't what's intended when being passed a directory path. To resolve this, if a
+	// directory path ends in a double quote character, that character is replaced with a backslash
+	// character. This should be safe, as a double quote isn't an allowed file name character, so
+	// the presence of the double quote character is either a mistake (in which case, no directory
+	// will be opened anyway, so the transformation won't make much of a difference), or it's
+	// something that's being interpreted as part of the command line parsing.
+	for (std::string &directory : commandLineSettings.directories)
+	{
+		if (directory[directory.size() - 1] == '\"')
+		{
+			directory[directory.size() - 1] = '\\';
+		}
+	}
+}
+
+std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(const CommandLineSettings &commandLineSettings)
 {
 	if (commandLineSettings.jumplistNewTab)
 	{
