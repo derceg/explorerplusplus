@@ -31,6 +31,7 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
 #include <boost/range/adaptor/map.hpp>
 #include <unordered_map>
 
@@ -435,34 +436,25 @@ bool OptionsDialog::UpdateReplaceExplorerSetting(
 	}
 	else
 	{
-		wil::unique_hlocal_string systemErrorMessage;
-		DWORD size = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS
-				| FORMAT_MESSAGE_ALLOCATE_BUFFER,
-			nullptr, res, 0, reinterpret_cast<LPWSTR>(&systemErrorMessage), 32 * 1024, nullptr);
-
+		auto systemErrorMessage = GetLastErrorMessage(res);
 		std::wstring finalSystemErrorMessage;
 
-		if (size > 0)
+		if (systemErrorMessage)
 		{
-			finalSystemErrorMessage = systemErrorMessage.get();
+			finalSystemErrorMessage = *systemErrorMessage;
 
 			// Any trailing newlines are unnecessary, as they'll be added below when appropriate.
 			boost::trim(finalSystemErrorMessage);
 		}
 		else
 		{
-			finalSystemErrorMessage = ResourceHelper::LoadString(m_instance, IDS_ERROR_UNKNOWN);
+			std::wstring errorCodeTemplate = ResourceHelper::LoadString(m_instance, IDS_ERROR_CODE);
+			finalSystemErrorMessage = (boost::wformat(errorCodeTemplate) % res).str();
 		}
 
 		std::wstring errorMessage =
 			ResourceHelper::LoadString(m_instance, IDS_ERROR_REPLACE_EXPLORER_SETTING) + L"\n\n"
 			+ finalSystemErrorMessage;
-
-		if (res == ERROR_ACCESS_DENIED)
-		{
-			errorMessage += L"\n\n"
-				+ ResourceHelper::LoadString(m_instance, IDS_ERROR_REPLACE_EXPLORER_RUN_AS_ADMIN);
-		}
 
 		MessageBox(dialog, errorMessage.c_str(), NExplorerplusplus::APP_NAME, MB_ICONWARNING);
 

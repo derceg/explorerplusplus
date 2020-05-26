@@ -70,14 +70,14 @@ std::optional<CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
 	auto removeAsDefaultOption = app.add_flag(
 		"--remove-as-default",
 		commandLineSettings.removeAsDefault,
-		"Remove Explorer++ as the default file manager (requires administrator privileges)"
+		"Remove Explorer++ as the default file manager"
 	);
 
 	commandLineSettings.setAsDefault = false;
 	auto setAsDefaultOption = app.add_flag(
 		"--set-as-default",
 		commandLineSettings.setAsDefault,
-		"Set Explorer++ as the default file manager (requires administrator privileges)"
+		"Set Explorer++ as the default file manager for the current user"
 	);
 
 	removeAsDefaultOption->excludes(setAsDefaultOption);
@@ -241,8 +241,7 @@ void OnRemoveAsDefault()
 	}
 	else
 	{
-		std::wcerr << L"Could not remove Explorer++ as default file manager. Please \
-ensure you have administrator privileges.\n" << std::endl;
+		std::wcerr << L"Could not remove Explorer++ as default file manager." << std::endl;
 	}
 }
 
@@ -259,8 +258,7 @@ void OnSetAsDefault()
 	}
 	else
 	{
-		std::wcerr << L"Could not set Explorer++ as default file manager. Please \
-ensure you have administrator privileges." << std::endl;
+		std::wcerr << L"Could not set Explorer++ as default file manager." << std::endl;
 	}
 }
 

@@ -1,6 +1,18 @@
 Explorer++ Version History
 --------------------------
 
+Version 1.4.1
+-------------
+Misc:
+- When changing the default file manager setting (via Tools >
+  Options > General > Default File Manager), Explorer++ will only
+  be set/removed as the default file manager for the current
+  user. Previously, Explorer++ was set as the default for all
+  users.
+  If you set Explorer++ as the default in a previous version,
+  remove it as the default before you update, then change it back
+  to the default after you've updated.
+
 Version 1.4.0
 -------------
 New features:

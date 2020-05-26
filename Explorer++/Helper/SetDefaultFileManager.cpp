@@ -2,24 +2,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // See LICENSE in the top level directory
 
-/*
-Notes:
-
-- To replace Explorer for filesystem folders only,
-  add a key at:
-  HKEY_CLASSES_ROOT\Directory
-  (Default value is 'none')
-
-- To replace Explorer for all folders, add a key at:
-  HKEY_CLASSES_ROOT\Folder
-  (Default value is empty)
-
-The value of the "command" sub-key will be of the form:
-  "C:\Application.exe" "%1"
-  where "%1" is the path passed from the shell,
-  encapsulated within quotes.
-*/
-
 #include "stdafx.h"
 #include "SetDefaultFileManager.h"
 #include "Helper.h"
@@ -30,10 +12,32 @@ The value of the "command" sub-key will be of the form:
 
 using namespace NRegistrySettings;
 
+/*
+Notes:
+
+- To replace Explorer for filesystem folders only, add a key at:
+
+  HKEY_CURRENT_USER\Software\Classes\Directory
+
+  (Default value is 'none')
+
+- To replace Explorer for all folders, add a key at:
+
+  HKEY_CURRENT_USER\Software\Classes\Folder
+
+  (Default value is empty)
+
+- The value of the "command" sub-key should be of the form:
+
+  "C:\Application.exe" "%1"
+
+  where "%1" is the path passed from the shell, encapsulated within quotes.
+*/
+
 namespace NDefaultFileManagerInternal
 {
-const TCHAR KEY_DIRECTORY_SHELL[] = _T("Directory\\shell");
-const TCHAR KEY_FOLDER_SHELL[] = _T("Folder\\shell");
+const TCHAR KEY_DIRECTORY_SHELL[] = _T("Software\\Classes\\Directory\\shell");
+const TCHAR KEY_FOLDER_SHELL[] = _T("Software\\Classes\\Folder\\shell");
 const TCHAR SHELL_DEFAULT_VALUE[] = _T("none");
 
 LSTATUS SetAsDefaultFileManagerInternal(NDefaultFileManager::ReplaceExplorerMode replacementType,
@@ -75,7 +79,8 @@ LSTATUS NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
 	}
 
 	wil::unique_hkey shellKey;
-	LSTATUS res = RegOpenKeyEx(HKEY_CLASSES_ROOT, shellKeyPath, 0, KEY_WRITE, &shellKey);
+	LSTATUS res = RegCreateKeyEx(HKEY_CURRENT_USER, shellKeyPath, 0, nullptr,
+		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &shellKey, nullptr);
 
 	if (res != ERROR_SUCCESS)
 	{
@@ -165,7 +170,7 @@ LSTATUS NDefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(
 
 	// Remove the shell default value.
 	wil::unique_hkey shellKey;
-	LSTATUS res = RegOpenKeyEx(HKEY_CLASSES_ROOT, shellKeyPath, 0, KEY_WRITE, &shellKey);
+	LSTATUS res = RegOpenKeyEx(HKEY_CURRENT_USER, shellKeyPath, 0, KEY_WRITE, &shellKey);
 
 	if (res != ERROR_SUCCESS)
 	{
@@ -181,7 +186,7 @@ LSTATUS NDefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(
 
 	// Remove the main application key.
 	std::wstring commandKeyPath = std::wstring(shellKeyPath) + L"\\" + applicationKeyName;
-	res = SHDeleteKey(HKEY_CLASSES_ROOT, commandKeyPath.c_str());
+	res = SHDeleteKey(HKEY_CURRENT_USER, commandKeyPath.c_str());
 
 	return res;
 }

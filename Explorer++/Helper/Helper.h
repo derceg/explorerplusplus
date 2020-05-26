@@ -9,6 +9,7 @@
 #include <windows.h>
 #include <winioctl.h>
 #include <list>
+#include <optional>
 #include <string>
 
 struct LangAndCodePage
@@ -55,6 +56,7 @@ void			GetCPUBrandString(char *pszCPUBrand, UINT cchBuf);
 void			SetFORMATETC(FORMATETC *pftc, CLIPFORMAT cfFormat, DVTARGETDEVICE *ptd, DWORD dwAspect, LONG lindex, DWORD tymed);
 bool			IsKeyDown(int nVirtKey);
 std::wstring	CreateGUID();
+std::optional<std::wstring>	GetLastErrorMessage(DWORD error);
 
 /* See http://msdn.microsoft.com/en-us/library/windows/desktop/dd940435(v=vs.85).aspx. */
 template <class T> void SafeRelease(T **ppT)
