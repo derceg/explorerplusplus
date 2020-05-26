@@ -72,7 +72,7 @@ struct Config
 		displayWindowVertical = FALSE;
 		treeViewWidth = DEFAULT_TREEVIEW_WIDTH;
 
-		replaceExplorerMode = NDefaultFileManager::ReplaceExplorerMode::None;
+		replaceExplorerMode = DefaultFileManager::ReplaceExplorerMode::None;
 
 		showInfoTips = TRUE;
 		infoTipType = InfoTipType::System;
@@ -166,7 +166,7 @@ struct Config
 	BOOL displayWindowVertical;
 	unsigned int treeViewWidth;
 
-	NDefaultFileManager::ReplaceExplorerMode replaceExplorerMode;
+	DefaultFileManager::ReplaceExplorerMode replaceExplorerMode;
 
 	BOOL showInfoTips;
 	InfoTipType infoTipType;

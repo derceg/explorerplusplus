@@ -38,7 +38,7 @@
 int CALLBACK NewTabDirectoryBrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData);
 UINT GetIconThemeStringResourceId(IconTheme iconTheme);
 
-using namespace NDefaultFileManager;
+using namespace DefaultFileManager;
 
 // clang-format off
 const OptionsDialog::OptionsDialogSheetInfo OptionsDialog::OPTIONS_DIALOG_SHEETS[] = {

@@ -34,45 +34,45 @@ Notes:
   where "%1" is the path passed from the shell, encapsulated within quotes.
 */
 
-namespace NDefaultFileManagerInternal
+namespace DefaultFileManagerInternal
 {
 const TCHAR KEY_DIRECTORY_SHELL[] = _T("Software\\Classes\\Directory\\shell");
 const TCHAR KEY_FOLDER_SHELL[] = _T("Software\\Classes\\Folder\\shell");
 const TCHAR SHELL_DEFAULT_VALUE[] = _T("none");
 
-LSTATUS SetAsDefaultFileManagerInternal(NDefaultFileManager::ReplaceExplorerMode replacementType,
+LSTATUS SetAsDefaultFileManagerInternal(DefaultFileManager::ReplaceExplorerMode replacementType,
 	const std::wstring &applicationKeyName, const std::wstring &menuText);
-LSTATUS RemoveAsDefaultFileManagerInternal(NDefaultFileManager::ReplaceExplorerMode replacementType,
+LSTATUS RemoveAsDefaultFileManagerInternal(DefaultFileManager::ReplaceExplorerMode replacementType,
 	const std::wstring &applicationKeyName);
 }
 
-LSTATUS NDefaultFileManager::SetAsDefaultFileManagerFileSystem(
+LSTATUS DefaultFileManager::SetAsDefaultFileManagerFileSystem(
 	const std::wstring &applicationKeyName, const std::wstring &menuText)
 {
-	return NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
+	return DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
 		ReplaceExplorerMode::FileSystem, applicationKeyName, menuText);
 }
 
-LSTATUS NDefaultFileManager::SetAsDefaultFileManagerAll(
+LSTATUS DefaultFileManager::SetAsDefaultFileManagerAll(
 	const std::wstring &applicationKeyName, const std::wstring &menuText)
 {
-	return NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
+	return DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
 		ReplaceExplorerMode::All, applicationKeyName, menuText);
 }
 
-LSTATUS NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
-	NDefaultFileManager::ReplaceExplorerMode replacementType,
+LSTATUS DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
+	DefaultFileManager::ReplaceExplorerMode replacementType,
 	const std::wstring &applicationKeyName, const std::wstring &menuText)
 {
 	const TCHAR *shellKeyPath = nullptr;
 
 	switch (replacementType)
 	{
-	case NDefaultFileManager::ReplaceExplorerMode::All:
+	case DefaultFileManager::ReplaceExplorerMode::All:
 		shellKeyPath = KEY_FOLDER_SHELL;
 		break;
 
-	case NDefaultFileManager::ReplaceExplorerMode::FileSystem:
+	case DefaultFileManager::ReplaceExplorerMode::FileSystem:
 	default:
 		shellKeyPath = KEY_DIRECTORY_SHELL;
 		break;
@@ -134,21 +134,21 @@ LSTATUS NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
 	return res;
 }
 
-LSTATUS NDefaultFileManager::RemoveAsDefaultFileManagerFileSystem(
+LSTATUS DefaultFileManager::RemoveAsDefaultFileManagerFileSystem(
 	const std::wstring &applicationKeyName)
 {
-	return NDefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(
+	return DefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(
 		ReplaceExplorerMode::FileSystem, applicationKeyName);
 }
 
-LSTATUS NDefaultFileManager::RemoveAsDefaultFileManagerAll(const std::wstring &applicationKeyName)
+LSTATUS DefaultFileManager::RemoveAsDefaultFileManagerAll(const std::wstring &applicationKeyName)
 {
-	return NDefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(
+	return DefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(
 		ReplaceExplorerMode::All, applicationKeyName);
 }
 
-LSTATUS NDefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(
-	NDefaultFileManager::ReplaceExplorerMode replacementType,
+LSTATUS DefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(
+	DefaultFileManager::ReplaceExplorerMode replacementType,
 	const std::wstring &applicationKeyName)
 {
 	const TCHAR *shellKeyPath = nullptr;
@@ -156,12 +156,12 @@ LSTATUS NDefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(
 
 	switch (replacementType)
 	{
-	case NDefaultFileManager::ReplaceExplorerMode::All:
+	case DefaultFileManager::ReplaceExplorerMode::All:
 		shellKeyPath = KEY_FOLDER_SHELL;
 		defaultValue = EMPTY_STRING;
 		break;
 
-	case NDefaultFileManager::ReplaceExplorerMode::FileSystem:
+	case DefaultFileManager::ReplaceExplorerMode::FileSystem:
 	default:
 		shellKeyPath = KEY_DIRECTORY_SHELL;
 		defaultValue = SHELL_DEFAULT_VALUE;

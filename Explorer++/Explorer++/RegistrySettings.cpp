@@ -247,7 +247,7 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 
 		DWORD numericValue;
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey, _T("ReplaceExplorerMode"), &numericValue);
-		m_config->replaceExplorerMode = static_cast<NDefaultFileManager::ReplaceExplorerMode>(numericValue);
+		m_config->replaceExplorerMode = static_cast<DefaultFileManager::ReplaceExplorerMode>(numericValue);
 
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey, _T("ShowFullTitlePath"), &numericValue);
 		m_config->showFullTitlePath.set(numericValue);

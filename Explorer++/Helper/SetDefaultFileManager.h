@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace NDefaultFileManager
+namespace DefaultFileManager
 {
 enum class ReplaceExplorerMode
 {

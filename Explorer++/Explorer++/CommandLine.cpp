@@ -230,7 +230,7 @@ void OnClearRegistrySettings()
 
 void OnRemoveAsDefault()
 {
-	LSTATUS res = NDefaultFileManager::RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
+	LSTATUS res = DefaultFileManager::RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 
 	/* Language hasn't been fully specified at this point, so
 	can't load success/error message from language dll. Simply show
@@ -249,7 +249,7 @@ void OnSetAsDefault()
 {
 	std::wstring menuText = ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_OPEN_IN_EXPLORERPLUSPLUS);
 
-	LSTATUS res = NDefaultFileManager::SetAsDefaultFileManagerFileSystem(
+	LSTATUS res = DefaultFileManager::SetAsDefaultFileManagerFileSystem(
 		SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
 
 	if (res == ERROR_SUCCESS)
