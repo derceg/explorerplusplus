@@ -17,6 +17,9 @@
 #include <boost/filesystem.hpp>
 #include <boost/log/core.hpp>
 #include <iostream>
+#include <map>
+
+using namespace DefaultFileManager;
 
 extern std::vector<std::wstring> g_commandLineDirectories;
 
@@ -26,17 +29,25 @@ struct CommandLineSettings
 	bool enableLogging;
 	bool enablePlugins;
 	bool removeAsDefault;
-	bool setAsDefault;
+	ReplaceExplorerMode replaceExplorerMode;
 	std::string language;
 	bool jumplistNewTab;
 	std::vector<std::string> directories;
 };
 
+struct ReplaceExplorerResults
+{
+	std::optional<LSTATUS> removedFileSystem;
+	std::optional<LSTATUS> removedAll;
+	std::optional<LSTATUS> setFileSystem;
+	std::optional<LSTATUS> setAll;
+};
+
 void PreprocessCommandLineSettings(CommandLineSettings &commandLineSettings);
 std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(const CommandLineSettings& commandLineSettings);
 void OnClearRegistrySettings();
-void OnRemoveAsDefault();
-void OnSetAsDefault();
+void OnUpdateReplaceExplorerSetting(ReplaceExplorerMode updatedReplaceMode);
+ReplaceExplorerResults UpdateReplaceExplorerSetting(ReplaceExplorerMode updatedReplaceMode);
 void OnJumplistNewTab();
 
 std::optional<CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
@@ -73,12 +84,15 @@ std::optional<CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
 		"Remove Explorer++ as the default file manager"
 	);
 
-	commandLineSettings.setAsDefault = false;
-	auto setAsDefaultOption = app.add_flag(
+	commandLineSettings.replaceExplorerMode = ReplaceExplorerMode::None;
+	auto setAsDefaultOption = app.add_option(
 		"--set-as-default",
-		commandLineSettings.setAsDefault,
+		commandLineSettings.replaceExplorerMode,
 		"Set Explorer++ as the default file manager for the current user"
-	);
+	)->transform(CLI::CheckedTransformer(CLI::TransformPairs<ReplaceExplorerMode>{
+		{ "filesystem", ReplaceExplorerMode::FileSystem },
+		{ "all", ReplaceExplorerMode::All }
+	}));
 
 	removeAsDefaultOption->excludes(setAsDefaultOption);
 	setAsDefaultOption->excludes(removeAsDefaultOption);
@@ -95,8 +109,8 @@ std::optional<CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
 		"Directories to open"
 	);
 
-	// The options in this group are only used internally by the
-	// application. They're not directly exposed to users.
+	// The options in this group are only used internally by the application. They're not directly
+	// exposed to users.
 	CLI::App *privateCommands = app.add_subcommand();
 	privateCommands->group("");
 
@@ -181,11 +195,11 @@ std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(const CommandLin
 
 	if (commandLineSettings.removeAsDefault)
 	{
-		OnRemoveAsDefault();
+		OnUpdateReplaceExplorerSetting(ReplaceExplorerMode::None);
 	}
-	else if (commandLineSettings.setAsDefault)
+	else if (commandLineSettings.replaceExplorerMode != ReplaceExplorerMode::None)
 	{
-		OnSetAsDefault();
+		OnUpdateReplaceExplorerSetting(commandLineSettings.replaceExplorerMode);
 	}
 
 	if (!commandLineSettings.language.empty())
@@ -228,38 +242,72 @@ void OnClearRegistrySettings()
 	}
 }
 
-void OnRemoveAsDefault()
+void OnUpdateReplaceExplorerSetting(ReplaceExplorerMode updatedReplaceMode)
 {
-	LSTATUS res = DefaultFileManager::RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
+	auto results = UpdateReplaceExplorerSetting(updatedReplaceMode);
 
-	/* Language hasn't been fully specified at this point, so
-	can't load success/error message from language dll. Simply show
-	a hardcoded success/error message. */
-	if (res == ERROR_SUCCESS)
+	switch (updatedReplaceMode)
 	{
-		std::wcout << L"Explorer++ successfully removed as default file manager.\n" << std::endl;
-	}
-	else
-	{
-		std::wcerr << L"Could not remove Explorer++ as default file manager." << std::endl;
+	case DefaultFileManager::ReplaceExplorerMode::None:
+		if ((results.removedFileSystem && *results.removedFileSystem == ERROR_SUCCESS)
+			|| (results.removedAll && *results.removedAll == ERROR_SUCCESS))
+		{
+			std::wcout << L"Explorer++ successfully removed as default file manager.\n"
+					   << std::endl;
+		}
+		else
+		{
+			std::wcerr << L"Could not remove Explorer++ as default file manager." << std::endl;
+		}
+		break;
+
+	case DefaultFileManager::ReplaceExplorerMode::FileSystem:
+	case DefaultFileManager::ReplaceExplorerMode::All:
+		if ((results.setFileSystem && *results.setFileSystem == ERROR_SUCCESS)
+			|| (results.setAll && *results.setAll == ERROR_SUCCESS))
+		{
+			std::wcout << L"Explorer++ successfully set as default file manager." << std::endl;
+		}
+		else
+		{
+			std::wcerr << L"Could not set Explorer++ as default file manager." << std::endl;
+		}
+		break;
 	}
 }
 
-void OnSetAsDefault()
+ReplaceExplorerResults UpdateReplaceExplorerSetting(ReplaceExplorerMode updatedReplaceMode)
 {
-	std::wstring menuText = ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_OPEN_IN_EXPLORERPLUSPLUS);
+	ReplaceExplorerResults results;
 
-	LSTATUS res = DefaultFileManager::SetAsDefaultFileManagerFileSystem(
-		SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
+	// TODO: This text should be retrieved from the appropriate translation DLL (if necessary).
+	std::wstring menuText =
+		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_OPEN_IN_EXPLORERPLUSPLUS);
 
-	if (res == ERROR_SUCCESS)
+	// Whether Explorer++ is being set as the default file manager, or being removed, the first step
+	// is always to remove any existing entries.
+	results.removedFileSystem =
+		RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
+	results.removedAll = RemoveAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
+
+	switch (updatedReplaceMode)
 	{
-		std::wcout << L"Explorer++ successfully set as default file manager." << std::endl;
+	case ReplaceExplorerMode::None:
+		// This case is effectively handled above.
+		break;
+
+	case ReplaceExplorerMode::FileSystem:
+		results.setFileSystem = SetAsDefaultFileManagerFileSystem(
+			SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
+		break;
+
+	case ReplaceExplorerMode::All:
+		results.setAll =
+			SetAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
+		break;
 	}
-	else
-	{
-		std::wcerr << L"Could not set Explorer++ as default file manager." << std::endl;
-	}
+
+	return results;
 }
 
 void OnJumplistNewTab()
