@@ -53,7 +53,7 @@ private:
 		Path = 2
 	};
 
-	struct ColumnInfo_t
+	struct ColumnInfo
 	{
 		SortMode sortMode;
 		UINT uStringID;
@@ -91,7 +91,7 @@ private:
 	BOOL m_bReadOnly;
 	BOOL m_bSystem;
 
-	std::vector<ColumnInfo_t> m_Columns;
+	std::vector<ColumnInfo> m_Columns;
 	SortMode m_SortMode;
 	BOOL m_bSortAscending;
 

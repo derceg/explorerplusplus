@@ -244,7 +244,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 
 				FileContextMenuManager fcmm(m_hContainer, pidlParent.get(), pidlItems);
 
-				FileContextMenuInfo_t fcmi;
+				FileContextMenuInfo fcmi;
 				fcmi.uFrom = FROM_TREEVIEW;
 
 				StatusBar statusBar(m_hStatusBar);
@@ -641,8 +641,8 @@ void Explorerplusplus::OnTreeViewSetFileAttributes() const
 		return;
 	}
 
-	std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t> sfaiList;
-	NSetFileAttributesDialogExternal::SetFileAttributesInfo_t sfai;
+	std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo> sfaiList;
+	NSetFileAttributesDialogExternal::SetFileAttributesInfo sfai;
 
 	auto pidlItem = m_shellTreeView->GetItemPidl(hItem);
 	HRESULT hr = GetDisplayName(pidlItem.get(),sfai.szFullFileName,SIZEOF_ARRAY(sfai.szFullFileName),SHGDN_FORPARSING);

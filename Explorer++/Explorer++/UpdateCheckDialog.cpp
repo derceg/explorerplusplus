@@ -119,7 +119,7 @@ void UpdateCheckDialog::PerformUpdateCheck(HWND hDlg)
 
 				try
 				{
-					UpdateCheckDialog::Version_t version;
+					UpdateCheckDialog::Version version;
 					version.MajorVersion = boost::lexical_cast<int>(versionNumberComponents.at(0));
 					version.MinorVersion = boost::lexical_cast<int>(versionNumberComponents.at(1));
 					version.MicroVersion = boost::lexical_cast<int>(versionNumberComponents.at(2));
@@ -172,7 +172,7 @@ INT_PTR UpdateCheckDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lPa
 			break;
 
 		case UPDATE_CHECK_SUCCESS:
-			OnUpdateCheckSuccess(reinterpret_cast<Version_t *>(lParam));
+			OnUpdateCheckSuccess(reinterpret_cast<Version *>(lParam));
 			break;
 		}
 		break;
@@ -188,24 +188,24 @@ void UpdateCheckDialog::OnUpdateCheckError()
 	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, szTemp);
 }
 
-void UpdateCheckDialog::OnUpdateCheckSuccess(Version_t *Version)
+void UpdateCheckDialog::OnUpdateCheckSuccess(Version *version)
 {
 	TCHAR szStatus[128];
 	TCHAR szTemp[128];
 
-	if ((Version->MajorVersion > MAJOR_VERSION)
-		|| (Version->MajorVersion == MAJOR_VERSION && Version->MinorVersion > MINOR_VERSION)
-		|| (Version->MajorVersion == MAJOR_VERSION && Version->MinorVersion == MINOR_VERSION
-			&& Version->MicroVersion > MICRO_VERSION))
+	if ((version->MajorVersion > MAJOR_VERSION)
+		|| (version->MajorVersion == MAJOR_VERSION && version->MinorVersion > MINOR_VERSION)
+		|| (version->MajorVersion == MAJOR_VERSION && version->MinorVersion == MINOR_VERSION
+			&& version->MicroVersion > MICRO_VERSION))
 	{
 		LoadString(
 			GetInstance(), IDS_UPDATE_CHECK_NEW_VERSION_AVAILABLE, szTemp, SIZEOF_ARRAY(szTemp));
-		StringCchPrintf(szStatus, SIZEOF_ARRAY(szStatus), szTemp, Version->VersionString);
+		StringCchPrintf(szStatus, SIZEOF_ARRAY(szStatus), szTemp, version->VersionString);
 	}
 	else
 	{
 		LoadString(GetInstance(), IDS_UPDATE_CHECK_UP_TO_DATE, szTemp, SIZEOF_ARRAY(szTemp));
-		StringCchPrintf(szStatus, SIZEOF_ARRAY(szStatus), szTemp, Version->VersionString);
+		StringCchPrintf(szStatus, SIZEOF_ARRAY(szStatus), szTemp, version->VersionString);
 	}
 
 	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, szStatus);

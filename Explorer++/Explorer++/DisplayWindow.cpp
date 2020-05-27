@@ -125,8 +125,8 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 				FILE_ATTRIBUTE_DIRECTORY) && m_config->globalFolderSettings.showFolderSizes)
 			{
 				FolderSize_t	*pfs = nullptr;
-				FolderSizeExtraInfo_t	*pfsei = nullptr;
-				DWFolderSize_t	DWFolderSize;
+				FolderSizeExtraInfo	*pfsei = nullptr;
+				DWFolderSize	displayWindowFolderSize;
 				TCHAR			szDisplayText[256];
 				TCHAR			szTotalSize[64];
 				TCHAR			szCalculating[64];
@@ -136,7 +136,7 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 
 				if (pfs != nullptr)
 				{
-					pfsei = (FolderSizeExtraInfo_t *)malloc(sizeof(FolderSizeExtraInfo_t));
+					pfsei = (FolderSizeExtraInfo *)malloc(sizeof(FolderSizeExtraInfo));
 
 					if (pfsei != nullptr)
 					{
@@ -157,10 +157,10 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 						DisplayWindow_BufferText(m_hDisplayWindow, szDisplayText);
 
 						/* Maintain a global list of folder size operations. */
-						DWFolderSize.uId = m_iDWFolderSizeUniqueId;
-						DWFolderSize.iTabId = m_tabContainer->GetSelectedTab().GetId();
-						DWFolderSize.bValid = TRUE;
-						m_DWFolderSizes.push_back(DWFolderSize);
+						displayWindowFolderSize.uId = m_iDWFolderSizeUniqueId;
+						displayWindowFolderSize.iTabId = m_tabContainer->GetSelectedTab().GetId();
+						displayWindowFolderSize.bValid = TRUE;
+						m_DWFolderSizes.push_back(displayWindowFolderSize);
 
 						HANDLE hThread = CreateThread(nullptr, 0, Thread_CalculateFolderSize, (LPVOID)pfs, 0, &threadId);
 						CloseHandle(hThread);

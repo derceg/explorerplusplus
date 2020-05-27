@@ -37,7 +37,7 @@ class AddressBar;
 class ApplicationToolbar;
 class BookmarksMainMenu;
 class BookmarksToolbar;
-struct ColumnWidth_t;
+struct ColumnWidth;
 struct Config;
 class DrivesToolbar;
 class IconResourceLoader;
@@ -58,7 +58,7 @@ class UiTheming;
 
 namespace NColorRuleHelper
 {
-struct ColorRule_t;
+struct ColorRule;
 }
 
 namespace Plugins
@@ -119,33 +119,33 @@ private:
 	// shared between various components in the application.
 	static const int MAX_CACHED_ICONS = 1000;
 
-	struct FileContextMenuInfo_t
+	struct FileContextMenuInfo
 	{
 		UINT uFrom;
 	};
 
-	struct DirectoryAltered_t
+	struct DirectoryAltered
 	{
 		int iIndex;
 		int iFolderIndex;
 		void *pData;
 	};
 
-	struct DWFolderSizeCompletion_t
+	struct DWFolderSizeCompletion
 	{
 		ULARGE_INTEGER liFolderSize;
 		int uId;
 		int iTabId;
 	};
 
-	struct DWFolderSize_t
+	struct DWFolderSize
 	{
 		int uId;
 		int iTabId;
 		BOOL bValid;
 	};
 
-	struct FolderSizeExtraInfo_t
+	struct FolderSizeExtraInfo
 	{
 		void *pContainer;
 		int uId;
@@ -345,7 +345,7 @@ private:
 	std::vector<Column_t> LoadColumnFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName);
 	void SaveColumnToRegistry(
 		HKEY hColumnsKey, const TCHAR *szKeyName, std::vector<Column_t> *pColumns);
-	std::vector<ColumnWidth_t> LoadColumnWidthsFromRegistry(
+	std::vector<ColumnWidth> LoadColumnWidthsFromRegistry(
 		HKEY hColumnsKey, const TCHAR *szKeyName);
 	void SaveColumnWidthsToRegistry(
 		HKEY hColumnsKey, const TCHAR *szKeyName, std::vector<Column_t> *pColumns);
@@ -497,7 +497,7 @@ private:
 	static void FolderSizeCallbackStub(
 		int nFolders, int nFiles, PULARGE_INTEGER lTotalFolderSize, LPVOID pData);
 	void FolderSizeCallback(
-		FolderSizeExtraInfo_t *pfsei, int nFolders, int nFiles, PULARGE_INTEGER lTotalFolderSize);
+		FolderSizeExtraInfo *pfsei, int nFolders, int nFiles, PULARGE_INTEGER lTotalFolderSize);
 
 	HWND m_hContainer;
 	HWND m_hStatusBar;
@@ -598,7 +598,7 @@ private:
 	IconFetcher m_bookmarkIconFetcher;
 
 	/* Customize colors. */
-	std::vector<NColorRuleHelper::ColorRule_t> m_ColorRules;
+	std::vector<NColorRuleHelper::ColorRule> m_ColorRules;
 
 	/* Undo support. */
 	FileActionHandler m_FileActionHandler;
@@ -610,7 +610,7 @@ private:
 	ApplicationToolbar *m_pApplicationToolbar;
 
 	/* Display window folder sizes. */
-	std::list<DWFolderSize_t> m_DWFolderSizes;
+	std::list<DWFolderSize> m_DWFolderSizes;
 	int m_iDWFolderSizeUniqueId;
 
 	/* Copy/cut. */

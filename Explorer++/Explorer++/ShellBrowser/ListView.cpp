@@ -811,12 +811,12 @@ void ShellBrowser::OnColumnMenuItemSelected(
 
 void ShellBrowser::SetFileAttributesForSelection()
 {
-	std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t> sfaiList;
+	std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo> sfaiList;
 	int index = -1;
 
 	while ((index = ListView_GetNextItem(m_hListView, index, LVNI_SELECTED)) != -1)
 	{
-		NSetFileAttributesDialogExternal::SetFileAttributesInfo_t sfai;
+		NSetFileAttributesDialogExternal::SetFileAttributesInfo sfai;
 
 		const ItemInfo_t &item = GetItemByIndex(index);
 		sfai.wfd = item.wfd;

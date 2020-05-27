@@ -178,7 +178,7 @@ LRESULT CALLBACK ApplicationToolbar::ParentWndProc(
 
 				int iIndex =
 					static_cast<int>(SendMessage(m_hwnd, TB_COMMANDTOINDEX, pnmtbgit->iItem, 0));
-				ApplicationButton_t *button = MapToolbarButtonToItem(iIndex);
+				ApplicationButton *button = MapToolbarButtonToItem(iIndex);
 
 				if (button != nullptr)
 				{
@@ -204,7 +204,7 @@ void ApplicationToolbar::AddButtonsToToolbar()
 	}
 }
 
-void ApplicationToolbar::AddButtonToToolbar(const ApplicationButton_t &Button)
+void ApplicationToolbar::AddButtonToToolbar(const ApplicationButton &Button)
 {
 	ApplicationInfo ai = ParseCommandString(Button.Command);
 
@@ -240,7 +240,7 @@ void ApplicationToolbar::AddButtonToToolbar(const ApplicationButton_t &Button)
 
 void ApplicationToolbar::UpdateButton(int iItem)
 {
-	ApplicationButton_t *button = MapToolbarButtonToItem(iItem);
+	ApplicationButton *button = MapToolbarButtonToItem(iItem);
 
 	if (button != nullptr)
 	{
@@ -277,7 +277,7 @@ void ApplicationToolbar::UpdateButton(int iItem)
 
 void ApplicationToolbar::ShowNewItemDialog()
 {
-	ApplicationButton_t button;
+	ApplicationButton button;
 	button.ShowNameOnToolbar = TRUE;
 
 	ApplicationToolbarButtonDialog applicationToolbarButtonDialog(
@@ -296,7 +296,7 @@ void ApplicationToolbar::ShowNewItemDialog()
 void ApplicationToolbar::AddNewItem(
 	const std::wstring &name, const std::wstring &command, BOOL showNameOnToolbar)
 {
-	ApplicationButton_t button;
+	ApplicationButton button;
 	bool success = m_atps->AddButton(name, command, showNameOnToolbar, &button);
 
 	if (success)
@@ -313,7 +313,7 @@ void ApplicationToolbar::OpenItem(int iItem, std::wstring *parameters)
 {
 	assert(iItem >= 0 && static_cast<size_t>(iItem) < m_atps->m_Buttons.size());
 
-	ApplicationButton_t *button = MapToolbarButtonToItem(iItem);
+	ApplicationButton *button = MapToolbarButtonToItem(iItem);
 
 	if (button != nullptr)
 	{
@@ -342,7 +342,7 @@ void ApplicationToolbar::ShowItemProperties(int iItem)
 {
 	assert(iItem >= 0 && static_cast<size_t>(iItem) < m_atps->m_Buttons.size());
 
-	ApplicationButton_t *button = MapToolbarButtonToItem(iItem);
+	ApplicationButton *button = MapToolbarButtonToItem(iItem);
 
 	if (button != nullptr)
 	{
@@ -376,7 +376,7 @@ void ApplicationToolbar::DeleteItem(int iItem)
 		{
 			int id = static_cast<int>(tbButton.dwData);
 			auto itr = std::find_if(m_atps->m_Buttons.begin(), m_atps->m_Buttons.end(),
-				[id](const ApplicationButton_t &Button) {
+				[id](const ApplicationButton &Button) {
 					return Button.ID == id;
 				});
 
@@ -410,7 +410,7 @@ void ApplicationToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWind
 	InsertMenuItem(menu, IDM_TOOLBARS_CUSTOMIZE, FALSE, &mii);
 }
 
-ApplicationButton_t *ApplicationToolbar::MapToolbarButtonToItem(int iIndex)
+ApplicationButton *ApplicationToolbar::MapToolbarButtonToItem(int iIndex)
 {
 	if (iIndex == -1)
 	{
@@ -425,7 +425,7 @@ ApplicationButton_t *ApplicationToolbar::MapToolbarButtonToItem(int iIndex)
 	{
 		int id = static_cast<int>(tbButton.dwData);
 		auto itr = std::find_if(m_atps->m_Buttons.begin(), m_atps->m_Buttons.end(),
-			[id](const ApplicationButton_t &Button) {
+			[id](const ApplicationButton &Button) {
 				return Button.ID == id;
 			});
 
@@ -603,14 +603,14 @@ void ApplicationToolbarPersistentSettings::SaveXMLSettings(
 }
 
 bool ApplicationToolbarPersistentSettings::AddButton(const std::wstring &name,
-	const std::wstring &command, BOOL showNameOnToolbar, ApplicationButton_t *buttonOut)
+	const std::wstring &command, BOOL showNameOnToolbar, ApplicationButton *buttonOut)
 {
 	if (name.length() == 0 || command.length() == 0)
 	{
 		return false;
 	}
 
-	ApplicationButton_t button;
+	ApplicationButton button;
 	button.Name = name;
 	button.Command = command;
 	button.ShowNameOnToolbar = showNameOnToolbar;

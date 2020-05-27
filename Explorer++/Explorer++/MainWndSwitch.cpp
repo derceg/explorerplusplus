@@ -178,15 +178,15 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 
 	case WM_APP_FOLDERSIZECOMPLETED:
 		{
-			DWFolderSizeCompletion_t *pDWFolderSizeCompletion = nullptr;
+			DWFolderSizeCompletion *pDWFolderSizeCompletion = nullptr;
 			TCHAR szFolderSize[32];
 			TCHAR szSizeString[64];
 			TCHAR szTotalSize[64];
 			BOOL bValid = FALSE;
 
-			pDWFolderSizeCompletion = (DWFolderSizeCompletion_t *)wParam;
+			pDWFolderSizeCompletion = (DWFolderSizeCompletion *)wParam;
 
-			std::list<DWFolderSize_t>::iterator itr;
+			std::list<DWFolderSize>::iterator itr;
 
 			/* First, make sure we should still display the
 			results (we won't if the listview selection has

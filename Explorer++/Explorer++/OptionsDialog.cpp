@@ -56,14 +56,14 @@ const std::unordered_map<ReplaceExplorerMode, int> REPLACE_EXPLORER_ENUM_CONTROL
 	{ ReplaceExplorerMode::All, IDC_OPTION_REPLACEEXPLORER_ALL }
 };
 
-struct FileSize_t
+struct FileSize
 {
 	SizeDisplayFormat_t sdf;
 	UINT StringID;
 };
 
 // clang-format off
-static const FileSize_t FILE_SIZES[] = {
+static const FileSize FILE_SIZES[] = {
 	{SIZE_FORMAT_BYTES, IDS_OPTIONS_DIALOG_FILE_SIZE_BYTES},
 	{SIZE_FORMAT_KBYTES, IDS_OPTIONS_DIALOG_FILE_SIZE_KB},
 	{SIZE_FORMAT_MBYTES, IDS_OPTIONS_DIALOG_FILE_SIZE_MB},

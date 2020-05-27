@@ -61,23 +61,23 @@ void DisplayColoursDialog::InitializeColorGroups()
 	InitializeColorGroupControls(m_SurroundingGroup);
 }
 
-void DisplayColoursDialog::InitializeColorGroupControls(ColorGroup_t ColorGroup[NUM_COLORS])
+void DisplayColoursDialog::InitializeColorGroupControls(ColorGroup colorGroup[NUM_COLORS])
 {
 	for (int i = 0; i < NUM_COLORS; i++)
 	{
-		SendDlgItemMessage(m_hDlg, ColorGroup[i].sliderId, TBM_SETTICFREQ, TICK_REQUENCY, 0);
-		SendDlgItemMessage(m_hDlg, ColorGroup[i].sliderId, TBM_SETRANGE, TRUE, MAKELONG(0, 255));
-		SendDlgItemMessage(m_hDlg, ColorGroup[i].editId, EM_SETLIMITTEXT, 3, 0);
+		SendDlgItemMessage(m_hDlg, colorGroup[i].sliderId, TBM_SETTICFREQ, TICK_REQUENCY, 0);
+		SendDlgItemMessage(m_hDlg, colorGroup[i].sliderId, TBM_SETRANGE, TRUE, MAKELONG(0, 255));
+		SendDlgItemMessage(m_hDlg, colorGroup[i].editId, EM_SETLIMITTEXT, 3, 0);
 	}
 }
 
-void DisplayColoursDialog::SetColorGroupValues(ColorGroup_t ColorGroup[NUM_COLORS], COLORREF color)
+void DisplayColoursDialog::SetColorGroupValues(ColorGroup colorGroup[NUM_COLORS], COLORREF color)
 {
 	for (int i = 0; i < NUM_COLORS; i++)
 	{
 		UINT colorComponent = 0;
 
-		switch (ColorGroup[i].color)
+		switch (colorGroup[i].color)
 		{
 		case Color::Red:
 			colorComponent = GetRValue(color);
@@ -96,8 +96,8 @@ void DisplayColoursDialog::SetColorGroupValues(ColorGroup_t ColorGroup[NUM_COLOR
 			break;
 		}
 
-		SetDlgItemInt(m_hDlg, ColorGroup[i].editId, colorComponent, FALSE);
-		SendDlgItemMessage(m_hDlg, ColorGroup[i].sliderId, TBM_SETPOS, TRUE, colorComponent);
+		SetDlgItemInt(m_hDlg, colorGroup[i].editId, colorComponent, FALSE);
+		SendDlgItemMessage(m_hDlg, colorGroup[i].sliderId, TBM_SETPOS, TRUE, colorComponent);
 	}
 }
 
@@ -250,21 +250,21 @@ INT_PTR DisplayColoursDialog::OnHScroll(HWND hwnd)
 	return 0;
 }
 
-void DisplayColoursDialog::UpdateEditControlsFromSlider(ColorGroup_t ColorGroup[NUM_COLORS])
+void DisplayColoursDialog::UpdateEditControlsFromSlider(ColorGroup colorGroup[NUM_COLORS])
 {
 	for (int i = 0; i < NUM_COLORS; i++)
 	{
 		UINT colorComponent =
-			static_cast<UINT>(SendDlgItemMessage(m_hDlg, ColorGroup[i].sliderId, TBM_GETPOS, 0, 0));
+			static_cast<UINT>(SendDlgItemMessage(m_hDlg, colorGroup[i].sliderId, TBM_GETPOS, 0, 0));
 
-		if (GetDlgItemInt(m_hDlg, ColorGroup[i].editId, nullptr, FALSE) != colorComponent)
+		if (GetDlgItemInt(m_hDlg, colorGroup[i].editId, nullptr, FALSE) != colorComponent)
 		{
-			SetDlgItemInt(m_hDlg, ColorGroup[i].editId, colorComponent, FALSE);
+			SetDlgItemInt(m_hDlg, colorGroup[i].editId, colorComponent, FALSE);
 		}
 	}
 }
 
-COLORREF DisplayColoursDialog::GetColorFromSliderGroup(ColorGroup_t ColorGroup[NUM_COLORS])
+COLORREF DisplayColoursDialog::GetColorFromSliderGroup(ColorGroup colorGroup[NUM_COLORS])
 {
 	UINT r = 0;
 	UINT g = 0;
@@ -273,9 +273,9 @@ COLORREF DisplayColoursDialog::GetColorFromSliderGroup(ColorGroup_t ColorGroup[N
 	for (int i = 0; i < NUM_COLORS; i++)
 	{
 		UINT colorComponent =
-			static_cast<UINT>(SendDlgItemMessage(m_hDlg, ColorGroup[i].sliderId, TBM_GETPOS, 0, 0));
+			static_cast<UINT>(SendDlgItemMessage(m_hDlg, colorGroup[i].sliderId, TBM_GETPOS, 0, 0));
 
-		switch (ColorGroup[i].color)
+		switch (colorGroup[i].color)
 		{
 		case Color::Red:
 			r = colorComponent;

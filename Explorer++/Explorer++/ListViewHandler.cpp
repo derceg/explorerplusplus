@@ -675,7 +675,7 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 
 		FileContextMenuManager fcmm(m_hActiveListView, pidlDirectory.get(), pidlItems);
 
-		FileContextMenuInfo_t fcmi;
+		FileContextMenuInfo fcmi;
 		fcmi.uFrom = FROM_LISTVIEW;
 
 		StatusBar statusBar(m_hStatusBar);

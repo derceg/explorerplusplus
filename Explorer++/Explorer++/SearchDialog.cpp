@@ -1251,7 +1251,7 @@ SearchDialogPersistentSettings::SearchDialogPersistentSettings() :
 
 	StringCchCopy(m_szSearchPattern, SIZEOF_ARRAY(m_szSearchPattern), EMPTY_STRING);
 
-	ColumnInfo_t ci;
+	ColumnInfo ci;
 	ci.sortMode = SortMode::Name;
 	ci.uStringID = IDS_SEARCH_COLUMN_NAME;
 	ci.bSortAscending = true;

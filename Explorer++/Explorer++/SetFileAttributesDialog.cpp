@@ -12,7 +12,7 @@
 const TCHAR SetFileAttributesDialogPersistentSettings::SETTINGS_KEY[] = _T("SetFileAttributes");
 
 SetFileAttributesDialog::SetFileAttributesDialog(HINSTANCE hInstance, HWND hParent,
-	const std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t> &sfaiList) :
+	const std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo> &sfaiList) :
 	BaseDialog(hInstance, IDD_SETFILEATTRIBUTES, hParent, false)
 {
 	assert(!sfaiList.empty());

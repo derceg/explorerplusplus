@@ -25,7 +25,7 @@ namespace
 	const TCHAR REG_APPLICATIONS_KEY[] = _T("Software\\Explorer++\\ApplicationToolbar");
 }
 
-void UpdateColumnWidths(std::vector<Column_t> &columns, const std::vector<ColumnWidth_t> &columnWidths);
+void UpdateColumnWidths(std::vector<Column_t> &columns, const std::vector<ColumnWidth> &columnWidths);
 
 BOOL LoadWindowPositionFromRegistry(WINDOWPLACEMENT *pwndpl)
 {
@@ -562,7 +562,7 @@ void Explorerplusplus::SaveTabSettingsToRegistry()
 	}
 }
 
-void UpdateColumnWidths(std::vector<Column_t> &columns, const std::vector<ColumnWidth_t> &columnWidths)
+void UpdateColumnWidths(std::vector<Column_t> &columns, const std::vector<ColumnWidth> &columnWidths)
 {
 	for(auto itr1 = columnWidths.begin();itr1 != columnWidths.end();itr1++)
 	{
@@ -740,21 +740,21 @@ void Explorerplusplus::SaveColumnWidthsToRegistry(HKEY hColumnsKey, const TCHAR 
 	free(pColumnList);
 }
 
-std::vector<ColumnWidth_t> Explorerplusplus::LoadColumnWidthsFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName)
+std::vector<ColumnWidth> Explorerplusplus::LoadColumnWidthsFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName)
 {
-	ColumnWidth_t columnWidthData[64];
+	ColumnWidth columnWidthData[64];
 	DWORD dwType = REG_BINARY;
 	DWORD dwSize = sizeof(columnWidthData);
 
 	LONG ret = RegQueryValueEx(hColumnsKey,szKeyName,nullptr,&dwType,(LPBYTE)columnWidthData, &dwSize);
 
-	std::vector<ColumnWidth_t> columnWidths;
+	std::vector<ColumnWidth> columnWidths;
 
 	if(ret == ERROR_SUCCESS)
 	{
-		for(unsigned int i = 0;i < dwSize / sizeof(ColumnWidth_t);i++)
+		for(unsigned int i = 0;i < dwSize / sizeof(ColumnWidth);i++)
 		{
-			ColumnWidth_t columnWidth;
+			ColumnWidth columnWidth;
 			columnWidth.id = columnWidthData[i].id;
 			columnWidth.iWidth = columnWidthData[i].iWidth;
 
