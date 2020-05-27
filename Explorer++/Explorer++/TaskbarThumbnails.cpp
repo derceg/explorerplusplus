@@ -189,10 +189,7 @@ void TaskbarThumbnails::CreateTabProxy(int iTabId,BOOL bSwitchToNewTab)
 
 	if(aRet != 0)
 	{
-		TabProxy_t *ptp = nullptr;
-
-		ptp = (TabProxy_t *)malloc(sizeof(TabProxy_t));
-
+		TabProxy_t *ptp = new TabProxy_t();
 		ptp->taskbarThumbnails = this;
 		ptp->iTabId = iTabId;
 
@@ -237,7 +234,7 @@ void TaskbarThumbnails::RemoveTabProxy(int iTabId)
 
 				auto *ptp = reinterpret_cast<TabProxy_t *>(GetWindowLongPtr(itr->hProxy,GWLP_USERDATA));
 				DestroyWindow(itr->hProxy);
-				free(ptp);
+				delete ptp;
 
 				UnregisterClass(reinterpret_cast<LPCWSTR>(MAKEWORD(itr->atomClass, 0)), GetModuleHandle(nullptr));
 
