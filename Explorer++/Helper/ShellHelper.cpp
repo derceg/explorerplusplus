@@ -12,15 +12,16 @@
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/scope_exit.hpp>
+#include <wil/com.h>
 #include <propkey.h>
 
 #pragma warning(                                                                                   \
 	disable : 4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
-HRESULT AddJumpListTasksInternal(
-	IObjectCollection *poc, const std::list<JumpListTaskInformation> &taskList);
-HRESULT AddJumpListTaskInternal(IObjectCollection *poc, const TCHAR *pszName, const TCHAR *pszPath,
-	const TCHAR *pszArguments, const TCHAR *pszIconPath, int iIcon);
+bool AddJumpListTasksInternal(
+	IObjectCollection *objectCollection, const std::list<JumpListTaskInformation> &taskList);
+HRESULT AddJumpListTaskInternal(IObjectCollection *objectCollection, const TCHAR *name,
+	const TCHAR *path, const TCHAR *arguments, const TCHAR *iconPath, int iconIndex);
 
 HRESULT GetDisplayName(const TCHAR *szParsingPath, TCHAR *szDisplayName, UINT cchMax, DWORD uFlags)
 {
@@ -981,113 +982,121 @@ BOOL CompareIdls(PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2)
 
 HRESULT AddJumpListTasks(const std::list<JumpListTaskInformation> &taskList)
 {
-	if (taskList.empty())
+	wil::com_ptr<ICustomDestinationList> customDestinationList;
+	HRESULT hr = CoCreateInstance(
+		CLSID_DestinationList, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&customDestinationList));
+
+	if (FAILED(hr))
 	{
-		return E_FAIL;
+		return hr;
 	}
 
-	ICustomDestinationList *pCustomDestinationList = NULL;
-	HRESULT hr;
+	wil::com_ptr<IObjectArray> removedItems;
+	UINT minSlots;
+	hr = customDestinationList->BeginList(&minSlots, IID_PPV_ARGS(&removedItems));
 
-	hr = CoCreateInstance(
-		CLSID_DestinationList, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pCustomDestinationList));
-
-	if (SUCCEEDED(hr))
+	if (FAILED(hr))
 	{
-		IObjectArray *poa = NULL;
-		UINT uMinSlots;
-
-		hr = pCustomDestinationList->BeginList(&uMinSlots, IID_PPV_ARGS(&poa));
-
-		if (SUCCEEDED(hr))
-		{
-			poa->Release();
-
-			IObjectCollection *poc = NULL;
-
-			hr = CoCreateInstance(
-				CLSID_EnumerableObjectCollection, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&poc));
-
-			if (SUCCEEDED(hr))
-			{
-				AddJumpListTasksInternal(poc, taskList);
-
-				hr = poc->QueryInterface(IID_PPV_ARGS(&poa));
-
-				if (SUCCEEDED(hr))
-				{
-					pCustomDestinationList->AddUserTasks(poa);
-					pCustomDestinationList->CommitList();
-
-					poa->Release();
-				}
-
-				poc->Release();
-			}
-		}
-
-		pCustomDestinationList->Release();
+		return hr;
 	}
+
+	wil::com_ptr<IObjectCollection> objectCollection;
+	hr = CoCreateInstance(CLSID_EnumerableObjectCollection, NULL, CLSCTX_INPROC_SERVER,
+		IID_PPV_ARGS(&objectCollection));
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	AddJumpListTasksInternal(objectCollection.get(), taskList);
+
+	wil::com_ptr<IObjectArray> items;
+	hr = objectCollection->QueryInterface(IID_PPV_ARGS(&items));
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	hr = customDestinationList->AddUserTasks(items.get());
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	hr = customDestinationList->CommitList();
 
 	return hr;
 }
 
-HRESULT AddJumpListTasksInternal(
-	IObjectCollection *poc, const std::list<JumpListTaskInformation> &taskList)
+bool AddJumpListTasksInternal(
+	IObjectCollection *objectCollection, const std::list<JumpListTaskInformation> &taskList)
 {
+	bool allSucceeded = true;
+
 	for (const auto &jtli : taskList)
 	{
-		AddJumpListTaskInternal(
-			poc, jtli.pszName, jtli.pszPath, jtli.pszArguments, jtli.pszIconPath, jtli.iIcon);
+		HRESULT hr = AddJumpListTaskInternal(objectCollection, jtli.pszName, jtli.pszPath,
+			jtli.pszArguments, jtli.pszIconPath, jtli.iIcon);
+
+		if (FAILED(hr))
+		{
+			allSucceeded = false;
+		}
 	}
 
-	return S_OK;
+	return allSucceeded;
 }
 
-HRESULT AddJumpListTaskInternal(IObjectCollection *poc, const TCHAR *pszName, const TCHAR *pszPath,
-	const TCHAR *pszArguments, const TCHAR *pszIconPath, int iIcon)
+HRESULT AddJumpListTaskInternal(IObjectCollection *objectCollection, const TCHAR *name,
+	const TCHAR *path, const TCHAR *arguments, const TCHAR *iconPath, int iconIndex)
 {
-	if (poc == NULL || pszName == NULL || pszPath == NULL || pszArguments == NULL
-		|| pszIconPath == NULL)
+	wil::com_ptr<IShellLink> shellLink;
+	HRESULT hr =
+		CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellLink));
+
+	if (FAILED(hr))
 	{
-		return E_FAIL;
+		return hr;
 	}
 
-	IShellLink *pShellLink = NULL;
-	HRESULT hr;
+	shellLink->SetPath(path);
+	shellLink->SetArguments(arguments);
+	shellLink->SetIconLocation(iconPath, iconIndex);
 
-	hr = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pShellLink));
+	wil::com_ptr<IPropertyStore> propertyStore;
+	hr = shellLink->QueryInterface(IID_PPV_ARGS(&propertyStore));
 
-	if (SUCCEEDED(hr))
+	if (FAILED(hr))
 	{
-		pShellLink->SetPath(pszPath);
-		pShellLink->SetArguments(pszArguments);
-		pShellLink->SetIconLocation(pszIconPath, iIcon);
-
-		IPropertyStore *pps = NULL;
-		PROPVARIANT pv;
-
-		hr = pShellLink->QueryInterface(IID_PPV_ARGS(&pps));
-
-		if (SUCCEEDED(hr))
-		{
-			hr = InitPropVariantFromString(pszName, &pv);
-
-			if (SUCCEEDED(hr))
-			{
-				pps->SetValue(PKEY_Title, pv);
-				pps->Commit();
-
-				poc->AddObject(pShellLink);
-
-				PropVariantClear(&pv);
-			}
-
-			pps->Release();
-		}
-
-		pShellLink->Release();
+		return hr;
 	}
+
+	wil::unique_prop_variant titleProperty;
+	hr = InitPropVariantFromString(name, &titleProperty);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	hr = propertyStore->SetValue(PKEY_Title, titleProperty);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	hr = propertyStore->Commit();
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	hr = objectCollection->AddObject(shellLink.get());
 
 	return hr;
 }
