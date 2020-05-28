@@ -9,13 +9,13 @@
 
 enum class SizeDisplayFormat
 {
-	None,
-	Bytes,
-	KB,
-	MB,
-	GB,
-	TB,
-	PB
+	None = 0,
+	Bytes = 1,
+	KB = 2,
+	MB = 3,
+	GB = 4,
+	TB = 5,
+	PB = 6
 };
 
 void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize, size_t cchBuf);
