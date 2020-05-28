@@ -575,7 +575,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowUserNameTitleBar"),NXMLSettings::EncodeBoolValue(m_config->showUserNameInTitleBar.get()));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SizeDisplayFormat"),NXMLSettings::EncodeIntValue(m_config->globalFolderSettings.sizeDisplayFormat));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SizeDisplayFormat"),NXMLSettings::EncodeIntValue(static_cast<int>(m_config->globalFolderSettings.sizeDisplayFormat)));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SortAscendingGlobal"),NXMLSettings::EncodeBoolValue(m_config->defaultFolderSettings.sortAscending));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -1646,7 +1646,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SIZEDISPLAYFOMRAT:
-		m_config->globalFolderSettings.sizeDisplayFormat = static_cast<SizeDisplayFormat_t>(NXMLSettings::DecodeIntValue(wszValue));
+		m_config->globalFolderSettings.sizeDisplayFormat = static_cast<SizeDisplayFormat>(NXMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_SORTASCENDINGGLOBAL:

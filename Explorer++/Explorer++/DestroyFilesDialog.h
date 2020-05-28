@@ -35,7 +35,7 @@ private:
 	void SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode) override;
 	void LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue) override;
 
-	NFileOperations::OverwriteMethod_t m_uOverwriteMethod;
+	NFileOperations::OverwriteMethod m_overwriteMethod;
 };
 
 class DestroyFilesDialog : public BaseDialog

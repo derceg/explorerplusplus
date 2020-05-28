@@ -7,20 +7,20 @@
 #include <windows.h>
 #include <string>
 
-enum SizeDisplayFormat_t
+enum class SizeDisplayFormat
 {
-	SIZE_FORMAT_NONE,
-	SIZE_FORMAT_BYTES,
-	SIZE_FORMAT_KBYTES,
-	SIZE_FORMAT_MBYTES,
-	SIZE_FORMAT_GBYTES,
-	SIZE_FORMAT_TBYTES,
-	SIZE_FORMAT_PBYTES
+	None,
+	Bytes,
+	KB,
+	MB,
+	GB,
+	TB,
+	PB
 };
 
 void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize, size_t cchBuf);
 void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize,
-	size_t cchBuf, BOOL bForceSize, SizeDisplayFormat_t sdf);
+	size_t cchBuf, BOOL bForceSize, SizeDisplayFormat sdf);
 TCHAR *PrintComma(unsigned long nPrint);
 TCHAR *PrintCommaLargeNum(LARGE_INTEGER lPrint);
 BOOL CheckWildcardMatch(const TCHAR *szWildcard, const TCHAR *szString, BOOL bCaseSensitive);

@@ -18,12 +18,12 @@ struct LangAndCodePage
 	WORD wCodePage;
 };
 
-enum GroupType_t
+enum class GroupType
 {
-	GROUP_ADMINISTRATORS,
-	GROUP_POWERUSERS,
-	GROUP_USERS,
-	GROUP_USERSRESTRICTED
+	Administrators,
+	PowerUsers,
+	Users,
+	UsersRestricted
 };
 
 /* File helpers. */
@@ -44,7 +44,7 @@ BOOL			GetFileLanguage(const TCHAR *szFullFileName, WORD *pwLanguage);
 BOOL			GetVersionInfoString(const TCHAR *szFullFileName, const TCHAR *szVersionInfo, TCHAR *szVersionBuffer, UINT cchMax);
 
 /* Ownership and access. */
-BOOL			CheckGroupMembership(GroupType_t groupType);
+BOOL			CheckGroupMembership(GroupType groupType);
 BOOL			FormatUserName(PSID sid, TCHAR *userName, size_t cchMax);
 
 /* User interaction. */

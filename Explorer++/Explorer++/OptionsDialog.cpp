@@ -58,18 +58,18 @@ const std::unordered_map<ReplaceExplorerMode, int> REPLACE_EXPLORER_ENUM_CONTROL
 
 struct FileSize
 {
-	SizeDisplayFormat_t sdf;
+	SizeDisplayFormat sdf;
 	UINT StringID;
 };
 
 // clang-format off
 static const FileSize FILE_SIZES[] = {
-	{SIZE_FORMAT_BYTES, IDS_OPTIONS_DIALOG_FILE_SIZE_BYTES},
-	{SIZE_FORMAT_KBYTES, IDS_OPTIONS_DIALOG_FILE_SIZE_KB},
-	{SIZE_FORMAT_MBYTES, IDS_OPTIONS_DIALOG_FILE_SIZE_MB},
-	{SIZE_FORMAT_GBYTES, IDS_OPTIONS_DIALOG_FILE_SIZE_GB},
-	{SIZE_FORMAT_TBYTES, IDS_OPTIONS_DIALOG_FILE_SIZE_TB},
-	{SIZE_FORMAT_PBYTES, IDS_OPTIONS_DIALOG_FILE_SIZE_PB}
+	{SizeDisplayFormat::Bytes, IDS_OPTIONS_DIALOG_FILE_SIZE_BYTES},
+	{SizeDisplayFormat::KB, IDS_OPTIONS_DIALOG_FILE_SIZE_KB},
+	{SizeDisplayFormat::MB, IDS_OPTIONS_DIALOG_FILE_SIZE_MB},
+	{SizeDisplayFormat::GB, IDS_OPTIONS_DIALOG_FILE_SIZE_GB},
+	{SizeDisplayFormat::TB, IDS_OPTIONS_DIALOG_FILE_SIZE_TB},
+	{SizeDisplayFormat::PB, IDS_OPTIONS_DIALOG_FILE_SIZE_PB}
 };
 // clang-format on
 
@@ -576,7 +576,7 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 			std::wstring fileSizeText =
 				ResourceHelper::LoadString(m_instance, FILE_SIZES[i].StringID);
 			SendMessage(hCBSize, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(fileSizeText.c_str()));
-			SendMessage(hCBSize, CB_SETITEMDATA, i, FILE_SIZES[i].sdf);
+			SendMessage(hCBSize, CB_SETITEMDATA, i, static_cast<LPARAM>(FILE_SIZES[i].sdf));
 
 			if (FILE_SIZES[i].sdf == m_config->globalFolderSettings.sizeDisplayFormat)
 			{
@@ -722,7 +722,7 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 
 			iSel = (int) SendMessage(hCBSize, CB_GETCURSEL, 0, 0);
 			m_config->globalFolderSettings.sizeDisplayFormat =
-				(SizeDisplayFormat_t) SendMessage(hCBSize, CB_GETITEMDATA, iSel, 0);
+				(SizeDisplayFormat) SendMessage(hCBSize, CB_GETITEMDATA, iSel, 0);
 
 			for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
 			{

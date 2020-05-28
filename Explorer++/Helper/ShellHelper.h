@@ -26,10 +26,10 @@
 const SHCOLUMNID SCID_ORIGINAL_LOCATION = { PSGUID_DISPLACED, PID_DISPLACED_FROM };
 const SHCOLUMNID SCID_DATE_DELETED = { PSGUID_DISPLACED, PID_DISPLACED_DATE };
 
-enum DefaultIconType
+enum class DefaultIconType
 {
-	DEFAULT_ICON_FOLDER,
-	DEFAULT_ICON_FILE
+	Folder,
+	File
 };
 
 struct JumpListTaskInformation

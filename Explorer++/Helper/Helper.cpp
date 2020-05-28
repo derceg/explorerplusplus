@@ -300,7 +300,7 @@ BOOL FormatUserName(PSID sid, TCHAR *userName, size_t cchMax)
 	return success;
 }
 
-BOOL CheckGroupMembership(GroupType_t groupType)
+BOOL CheckGroupMembership(GroupType groupType)
 {
 	SID_IDENTIFIER_AUTHORITY sia = SECURITY_NT_AUTHORITY;
 	PSID psid;
@@ -310,19 +310,19 @@ BOOL CheckGroupMembership(GroupType_t groupType)
 
 	switch(groupType)
 	{
-	case GROUP_ADMINISTRATORS:
+	case GroupType::Administrators:
 		dwGroup = DOMAIN_ALIAS_RID_ADMINS;
 		break;
 
-	case GROUP_POWERUSERS:
+	case GroupType::PowerUsers:
 		dwGroup = DOMAIN_ALIAS_RID_POWER_USERS;
 		break;
 
-	case GROUP_USERS:
+	case GroupType::Users:
 		dwGroup = DOMAIN_ALIAS_RID_USERS;
 		break;
 
-	case GROUP_USERSRESTRICTED:
+	case GroupType::UsersRestricted:
 		dwGroup = DOMAIN_ALIAS_RID_GUESTS;
 		break;
 	}

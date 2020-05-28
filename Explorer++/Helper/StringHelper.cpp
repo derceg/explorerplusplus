@@ -12,11 +12,11 @@ BOOL CheckWildcardMatchInternal(const TCHAR *szWildcard, const TCHAR *szString, 
 void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize,
 	size_t cchBuf)
 {
-	FormatSizeString(lFileSize, pszFileSize, cchBuf, FALSE, SIZE_FORMAT_NONE);
+	FormatSizeString(lFileSize, pszFileSize, cchBuf, FALSE, SizeDisplayFormat::None);
 }
 
 void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize,
-	size_t cchBuf, BOOL bForceSize, SizeDisplayFormat_t sdf)
+	size_t cchBuf, BOOL bForceSize, SizeDisplayFormat sdf)
 {
 	static const TCHAR *SIZE_STRINGS[] = {_T("bytes"), _T("KB"), _T("MB"), _T("GB"), _T("TB"), _T("PB")};
 
@@ -27,27 +27,27 @@ void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize,
 	{
 		switch(sdf)
 		{
-		case SIZE_FORMAT_BYTES:
+		case SizeDisplayFormat::Bytes:
 			iSizeIndex = 0;
 			break;
 
-		case SIZE_FORMAT_KBYTES:
+		case SizeDisplayFormat::KB:
 			iSizeIndex = 1;
 			break;
 
-		case SIZE_FORMAT_MBYTES:
+		case SizeDisplayFormat::MB:
 			iSizeIndex = 2;
 			break;
 
-		case SIZE_FORMAT_GBYTES:
+		case SizeDisplayFormat::GB:
 			iSizeIndex = 3;
 			break;
 
-		case SIZE_FORMAT_TBYTES:
+		case SizeDisplayFormat::TB:
 			iSizeIndex = 4;
 			break;
 
-		case SIZE_FORMAT_PBYTES:
+		case SizeDisplayFormat::PB:
 			iSizeIndex = 5;
 			break;
 		}

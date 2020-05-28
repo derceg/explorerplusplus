@@ -119,19 +119,19 @@ void MainWindow::UpdateWindowText()
 		TCHAR szPrivilegeAddition[64];
 		TCHAR szPrivilege[64];
 
-		if (CheckGroupMembership(GROUP_ADMINISTRATORS))
+		if (CheckGroupMembership(GroupType::Administrators))
 		{
 			LoadString(m_instance, IDS_PRIVILEGE_LEVEL_ADMINISTRATORS, szPrivilege, SIZEOF_ARRAY(szPrivilege));
 		}
-		else if (CheckGroupMembership(GROUP_POWERUSERS))
+		else if (CheckGroupMembership(GroupType::PowerUsers))
 		{
 			LoadString(m_instance, IDS_PRIVILEGE_LEVEL_POWER_USERS, szPrivilege, SIZEOF_ARRAY(szPrivilege));
 		}
-		else if (CheckGroupMembership(GROUP_USERS))
+		else if (CheckGroupMembership(GroupType::Users))
 		{
 			LoadString(m_instance, IDS_PRIVILEGE_LEVEL_USERS, szPrivilege, SIZEOF_ARRAY(szPrivilege));
 		}
-		else if (CheckGroupMembership(GROUP_USERSRESTRICTED))
+		else if (CheckGroupMembership(GroupType::UsersRestricted))
 		{
 			LoadString(m_instance, IDS_PRIVILEGE_LEVEL_USERS_RESTRICTED, szPrivilege, SIZEOF_ARRAY(szPrivilege));
 		}

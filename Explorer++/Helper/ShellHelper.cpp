@@ -377,12 +377,12 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath, TCHAR *szParsingPath, UI
 
 int GetDefaultFolderIconIndex()
 {
-	return GetDefaultIcon(DEFAULT_ICON_FOLDER);
+	return GetDefaultIcon(DefaultIconType::Folder);
 }
 
 int GetDefaultFileIconIndex()
 {
-	return GetDefaultIcon(DEFAULT_ICON_FILE);
+	return GetDefaultIcon(DefaultIconType::File);
 }
 
 int GetDefaultIcon(DefaultIconType defaultIconType)
@@ -392,11 +392,11 @@ int GetDefaultIcon(DefaultIconType defaultIconType)
 
 	switch (defaultIconType)
 	{
-	case DEFAULT_ICON_FOLDER:
+	case DefaultIconType::Folder:
 		dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_NORMAL;
 		break;
 
-	case DEFAULT_ICON_FILE:
+	case DefaultIconType::File:
 	default:
 		dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
 		break;

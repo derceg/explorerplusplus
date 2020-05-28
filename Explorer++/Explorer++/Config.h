@@ -101,7 +101,7 @@ struct Config
 		globalFolderSettings.insertSorted = TRUE;
 		globalFolderSettings.showGridlines = TRUE;
 		globalFolderSettings.forceSize = FALSE;
-		globalFolderSettings.sizeDisplayFormat = SIZE_FORMAT_BYTES;
+		globalFolderSettings.sizeDisplayFormat = SizeDisplayFormat::Bytes;
 		globalFolderSettings.oneClickActivate = FALSE;
 		globalFolderSettings.oneClickActivateHoverTime = DEFAULT_LISTVIEW_HOVER_TIME;
 

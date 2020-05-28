@@ -17,10 +17,10 @@
 #pragma warning(                                                                                   \
 	disable : 4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
-enum PasteType
+enum class PasteType
 {
-	PASTE_CLIPBOARD_LINK,
-	PASTE_CLIPBOARD_HARDLINK
+	Link,
+	HardLink
 };
 
 int PasteFilesFromClipboardSpecial(const TCHAR *szDestination, PasteType pasteType);
@@ -527,12 +527,12 @@ HRESULT CopyFilesToClipboard(
 
 int PasteLinksToClipboardFiles(const TCHAR *szDestination)
 {
-	return PasteFilesFromClipboardSpecial(szDestination, PASTE_CLIPBOARD_LINK);
+	return PasteFilesFromClipboardSpecial(szDestination, PasteType::Link);
 }
 
 int PasteHardLinks(const TCHAR *szDestination)
 {
-	return PasteFilesFromClipboardSpecial(szDestination, PASTE_CLIPBOARD_HARDLINK);
+	return PasteFilesFromClipboardSpecial(szDestination, PasteType::HardLink);
 }
 
 /* TODO: Use CDropHandler. */
@@ -582,13 +582,13 @@ int PasteFilesFromClipboardSpecial(const TCHAR *szDestination, PasteType pasteTy
 
 					switch (pasteType)
 					{
-					case PASTE_CLIPBOARD_LINK:
+					case PasteType::Link:
 						PathRenameExtension(szLinkFileName, _T(".lnk"));
 						NFileOperations::CreateLinkToFile(
 							szOldFileName, szLinkFileName, EMPTY_STRING);
 						break;
 
-					case PASTE_CLIPBOARD_HARDLINK:
+					case PasteType::HardLink:
 						CreateHardLink(szLinkFileName, szOldFileName, NULL);
 						break;
 					}
@@ -742,7 +742,7 @@ BOOL GetFileClusterSize(const std::wstring &strFilename, PLARGE_INTEGER lpRealFi
 }
 
 void NFileOperations::DeleteFileSecurely(
-	const std::wstring &strFilename, OverwriteMethod_t uOverwriteMethod)
+	const std::wstring &strFilename, OverwriteMethod overwriteMethod)
 {
 	HANDLE hFile;
 	WIN32_FIND_DATA wfd;
@@ -800,7 +800,7 @@ void NFileOperations::DeleteFileSecurely(
 		WriteFile(hFile, (LPVOID) &pass1Data, 1, &nBytesWritten, NULL);
 	}
 
-	if (uOverwriteMethod == OVERWRITE_THREEPASS)
+	if (overwriteMethod == OverwriteMethod::ThreePass)
 	{
 		/* Start at the beginning of the file, and
 		write in the second-pass data, 0xFF over
