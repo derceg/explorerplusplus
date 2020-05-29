@@ -358,7 +358,7 @@ LONG DisplayWindow::OnMouseMove(LPARAM lParam)
 		/* Notify the main window, so that it can redraw/reposition
 		its other windows. */
 		SendMessage(GetParent(m_hDisplayWindow), WM_USER_DISPLAYWINDOWRESIZED,
-			(WPARAM) MAKEWPARAM(rc.right - cursorPos.x, rc.bottom - cursorPos.y), 0);
+			MAKEWPARAM(max(rc.right - cursorPos.x, 0), max(rc.bottom - cursorPos.y, 0)), 0);
 	}
 
 	if (m_bVertical && cursorPos.x <= (rc.left + 5) || !m_bVertical && cursorPos.y <= (rc.top + 5))
