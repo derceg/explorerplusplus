@@ -15,25 +15,18 @@
 #include <cassert>
 #include <list>
 
-void ShellBrowser::QueueColumnTask(int itemInternalIndex, int columnIndex)
+void ShellBrowser::QueueColumnTask(int itemInternalIndex, unsigned int columnId)
 {
-	auto columnID = GetColumnIdByIndex(columnIndex);
-
-	if (!columnID)
-	{
-		return;
-	}
-
 	int columnResultID = m_columnResultIDCounter++;
 
 	BasicItemInfo_t basicItemInfo = getBasicItemInfo(itemInternalIndex);
 	GlobalFolderSettings globalFolderSettings = m_config->globalFolderSettings;
 
-	auto result = m_columnThreadPool.push([this, columnResultID, columnID, itemInternalIndex,
+	auto result = m_columnThreadPool.push([this, columnResultID, columnId, itemInternalIndex,
 											  basicItemInfo, globalFolderSettings](int id) {
 		UNREFERENCED_PARAMETER(id);
 
-		return GetColumnTextAsync(m_hListView, columnResultID, *columnID, itemInternalIndex,
+		return GetColumnTextAsync(m_hListView, columnResultID, columnId, itemInternalIndex,
 			basicItemInfo, globalFolderSettings);
 	});
 

@@ -359,7 +359,7 @@ private:
 
 	/* Listview column support. */
 	void PlaceColumns();
-	void QueueColumnTask(int itemInternalIndex, int columnIndex);
+	void QueueColumnTask(int itemInternalIndex, unsigned int columnId);
 	static ColumnResult_t GetColumnTextAsync(HWND listView, int columnResultId,
 		unsigned int columnID, int internalIndex, const BasicItemInfo_t &basicItemInfo,
 		const GlobalFolderSettings &globalFolderSettings);
