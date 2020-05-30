@@ -113,29 +113,29 @@ will need to be changed correspondingly. */
 
 struct ColumnXMLSaveData
 {
-	TCHAR			szName[64];
-	unsigned int	id;
+	TCHAR szName[64];
+	ColumnType type;
 };
 
 /* Maps column save names to id's. */
 static ColumnXMLSaveData ColumnData[] =
-{{_T("Name"),CM_NAME},{_T("Type"),CM_TYPE},
-{_T("Size"),CM_SIZE},{_T("DateModified"),CM_DATEMODIFIED},
-{_T("Attributes"),CM_ATTRIBUTES},{_T("SizeOnDisk"),CM_REALSIZE},
-{_T("ShortName"),CM_SHORTNAME},{_T("Owner"),CM_OWNER},
-{_T("ProductName"),CM_PRODUCTNAME},{_T("Company"),CM_COMPANY},
-{_T("Description"),CM_DESCRIPTION},{_T("FileVersion"),CM_FILEVERSION},
-{_T("ProductVersion"),CM_PRODUCTVERSION},{_T("ShortcutTo"),CM_SHORTCUTTO},
-{_T("HardLinks"),CM_HARDLINKS},{_T("Extension"),CM_EXTENSION},
-{_T("Created"),CM_CREATED},{_T("Accessed"),CM_ACCESSED},
-{_T("Title"),CM_TITLE},{_T("Subject"),CM_SUBJECT},
-{_T("Author"),CM_AUTHORS},{_T("Keywords"),CM_KEYWORDS},
-{_T("Comment"),CM_COMMENT},{_T("CameraModel"),CM_CAMERAMODEL},
-{_T("DateTaken"),CM_DATETAKEN},{_T("Width"),CM_WIDTH},
-{_T("Height"),CM_HEIGHT},{_T("TotalSize"),CM_TOTALSIZE},
-{_T("FreeSpace"),CM_FREESPACE},{_T("FileSystem"),CM_FILESYSTEM},
-{_T("OriginalLocation"),CM_ORIGINALLOCATION},{_T("DateDeleted"),CM_DATEDELETED},
-{_T("Documents"),CM_NUMPRINTERDOCUMENTS},{_T("Status"),CM_PRINTERSTATUS}};
+{{_T("Name"),ColumnType::Name},{_T("Type"),ColumnType::Type},
+{_T("Size"),ColumnType::Size},{_T("DateModified"),ColumnType::DateModified},
+{_T("Attributes"),ColumnType::Attributes},{_T("SizeOnDisk"),ColumnType::RealSize},
+{_T("ShortName"),ColumnType::ShortName},{_T("Owner"),ColumnType::Owner},
+{_T("ProductName"),ColumnType::ProductName},{_T("Company"),ColumnType::Company},
+{_T("Description"),ColumnType::Description},{_T("FileVersion"),ColumnType::FileVersion},
+{_T("ProductVersion"),ColumnType::ProductVersion},{_T("ShortcutTo"),ColumnType::ShortcutTo},
+{_T("HardLinks"),ColumnType::HardLinks},{_T("Extension"),ColumnType::Extension},
+{_T("Created"),ColumnType::Created},{_T("Accessed"),ColumnType::Accessed},
+{_T("Title"),ColumnType::Title},{_T("Subject"),ColumnType::Subject},
+{_T("Author"),ColumnType::Authors},{_T("Keywords"),ColumnType::Keywords},
+{_T("Comment"),ColumnType::Comment},{_T("CameraModel"),ColumnType::CameraModel},
+{_T("DateTaken"),ColumnType::DateTaken},{_T("Width"),ColumnType::Width},
+{_T("Height"),ColumnType::Height},{_T("TotalSize"),ColumnType::TotalSize},
+{_T("FreeSpace"),ColumnType::FreeSpace},{_T("FileSystem"),ColumnType::FileSystem},
+{_T("OriginalLocation"),ColumnType::OriginalLocation},{_T("DateDeleted"),ColumnType::DateDeleted},
+{_T("Documents"),ColumnType::PrinterNumDocuments},{_T("Status"),ColumnType::PrinterStatus}};
 
 unsigned long hash_setting(unsigned char *str);
 
@@ -970,7 +970,7 @@ int Explorerplusplus::LoadColumnFromXML(IXMLDOMNode *pNode, std::vector<Column_t
 
 				if(lstrcmp(bstrName,ColumnData[j].szName) == 0)
 				{
-					column.id = ColumnData[j].id;
+					column.type = ColumnData[j].type;
 
 					column.bChecked	= NXMLSettings::DecodeBoolValue(bstrValue);
 
@@ -1142,7 +1142,7 @@ void Explorerplusplus::SaveColumnToXML(IXMLDOMDocument *pXMLDom,
 	{
 		for(i = 0;i < sizeof(ColumnData) / sizeof(ColumnData[0]);i++)
 		{
-			if(ColumnData[i].id == itr->id)
+			if(ColumnData[i].type == itr->type)
 			{
 				pszColumnSaveName = ColumnData[i].szName;
 				break;

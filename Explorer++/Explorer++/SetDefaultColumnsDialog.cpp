@@ -277,14 +277,14 @@ void SetDefaultColumnsDialog::SaveCurrentColumnState(FolderType folderType)
 
 		/* Since the column list will be rebuilt, find this column
 		in the current list, and reuse its width. */
-		UINT id = static_cast<int>(lvItem.lParam);
+		ColumnType columnType = static_cast<ColumnType>(lvItem.lParam);
 		auto itr = std::find_if(
-			currentColumns.begin(), currentColumns.end(), [id](const Column_t &Column) {
-				return Column.id == id;
+			currentColumns.begin(), currentColumns.end(), [columnType](const Column_t &column) {
+				return column.type == columnType;
 			});
 
 		Column_t column;
-		column.id = id;
+		column.type = columnType;
 		column.iWidth = itr->iWidth;
 		column.bChecked = ListView_GetCheckState(hListView, i);
 		tempColumns.push_back(column);
@@ -305,7 +305,7 @@ void SetDefaultColumnsDialog::SetupFolderColumns(FolderType folderType)
 	for (const auto &column : columns)
 	{
 		TCHAR szText[64];
-		LoadString(GetInstance(), ShellBrowser::LookupColumnNameStringIndex(column.id), szText,
+		LoadString(GetInstance(), ShellBrowser::LookupColumnNameStringIndex(column.type), szText,
 			SIZEOF_ARRAY(szText));
 
 		LVITEM lvItem;
@@ -313,7 +313,7 @@ void SetDefaultColumnsDialog::SetupFolderColumns(FolderType folderType)
 		lvItem.iItem = iItem;
 		lvItem.iSubItem = 0;
 		lvItem.pszText = szText;
-		lvItem.lParam = column.id;
+		lvItem.lParam = static_cast<LPARAM>(column.type);
 		ListView_InsertItem(hListView, &lvItem);
 
 		ListView_SetCheckState(hListView, iItem, column.bChecked);
@@ -366,7 +366,7 @@ void SetDefaultColumnsDialog::OnLvnItemChanged(NMLISTVIEW *pnmlv)
 		ListView_GetItem(hListView, &lvItem);
 
 		int iDescriptionStringIndex =
-			ShellBrowser::LookupColumnDescriptionStringIndex(static_cast<int>(lvItem.lParam));
+			ShellBrowser::LookupColumnDescriptionStringIndex(static_cast<ColumnType>(lvItem.lParam));
 
 		TCHAR szColumnDescription[128];
 		LoadString(GetInstance(), iDescriptionStringIndex, szColumnDescription,

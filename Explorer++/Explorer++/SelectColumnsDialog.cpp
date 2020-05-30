@@ -49,14 +49,14 @@ INT_PTR SelectColumnsDialog::OnInitDialog()
 	for (const auto &column : currentColumns)
 	{
 		std::wstring text = ResourceHelper::LoadString(
-			GetInstance(), ShellBrowser::LookupColumnNameStringIndex(column.id));
+			GetInstance(), ShellBrowser::LookupColumnNameStringIndex(column.type));
 
 		LVITEM lvItem;
 		lvItem.mask = LVIF_TEXT | LVIF_PARAM;
 		lvItem.iItem = iItem;
 		lvItem.iSubItem = 0;
 		lvItem.pszText = text.data();
-		lvItem.lParam = column.id;
+		lvItem.lParam = static_cast<LPARAM>(column.type);
 		ListView_InsertItem(hListView, &lvItem);
 
 		ListView_SetCheckState(hListView, iItem, column.bChecked);
@@ -99,11 +99,11 @@ bool SelectColumnsDialog::CompareColumns(const Column_t &column1, const Column_t
 	}
 
 	TCHAR column1Text[64];
-	LoadString(GetInstance(), ShellBrowser::LookupColumnNameStringIndex(column1.id), column1Text,
+	LoadString(GetInstance(), ShellBrowser::LookupColumnNameStringIndex(column1.type), column1Text,
 		SIZEOF_ARRAY(column1Text));
 
 	TCHAR column2Text[64];
-	LoadString(GetInstance(), ShellBrowser::LookupColumnNameStringIndex(column2.id), column2Text,
+	LoadString(GetInstance(), ShellBrowser::LookupColumnNameStringIndex(column2.type), column2Text,
 		SIZEOF_ARRAY(column2Text));
 
 	int ret = StrCmpLogicalW(column1Text, column2Text);
@@ -253,14 +253,14 @@ void SelectColumnsDialog::OnOk()
 		lvItem.iSubItem = 0;
 		ListView_GetItem(hListView, &lvItem);
 
-		UINT id = static_cast<int>(lvItem.lParam);
+		ColumnType columnType = static_cast<ColumnType>(lvItem.lParam);
 		auto itr = std::find_if(
-			currentColumns.begin(), currentColumns.end(), [id](const Column_t &Column) {
-				return Column.id == id;
+			currentColumns.begin(), currentColumns.end(), [columnType](const Column_t &column) {
+				return column.type == columnType;
 			});
 
 		Column_t column;
-		column.id = id;
+		column.type = columnType;
 		column.iWidth = itr->iWidth;
 		column.bChecked = ListView_GetCheckState(hListView, i);
 		updatedColumns.push_back(column);
@@ -335,7 +335,7 @@ void SelectColumnsDialog::OnLvnItemChanged(const NMLISTVIEW *pnmlv)
 		ListView_GetItem(hListView, &lvItem);
 
 		int iDescriptionStringIndex =
-			ShellBrowser::LookupColumnDescriptionStringIndex(static_cast<int>(lvItem.lParam));
+			ShellBrowser::LookupColumnDescriptionStringIndex(static_cast<ColumnType>(lvItem.lParam));
 
 		TCHAR szColumnDescription[128];
 		LoadString(GetInstance(), iDescriptionStringIndex, szColumnDescription,

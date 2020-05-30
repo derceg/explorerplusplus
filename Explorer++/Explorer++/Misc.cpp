@@ -112,7 +112,7 @@ void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet, std::vector<Colum
 
 		for(auto itr = columns.begin();itr != columns.end();itr++)
 		{
-			if(itr->id == pColumns[i].id)
+			if(itr->type == pColumns[i].type)
 			{
 				bFound = TRUE;
 				break;
@@ -122,7 +122,7 @@ void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet, std::vector<Colum
 		/* The column is not currently in the set. Add it in. */
 		if(!bFound)
 		{
-			column.id		= pColumns[i].id;
+			column.type		= pColumns[i].type;
 			column.bChecked	= pColumns[i].bChecked;
 			column.iWidth	= DEFAULT_COLUMN_WIDTH;
 			columns.push_back(column);

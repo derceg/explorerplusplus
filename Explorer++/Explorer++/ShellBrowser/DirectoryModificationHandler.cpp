@@ -444,7 +444,7 @@ void ShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 					{
 						if (itrColumn->bChecked)
 						{
-							QueueColumnTask(iItemInternal, itrColumn->id);
+							QueueColumnTask(iItemInternal, itrColumn->type);
 						}
 					}
 				}

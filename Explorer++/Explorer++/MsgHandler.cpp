@@ -968,7 +968,7 @@ void Explorerplusplus::CopyColumnInfoToClipboard()
 		if(column.bChecked)
 		{
 			TCHAR szText[64];
-			LoadString(m_hLanguageModule,ShellBrowser::LookupColumnNameStringIndex(column.id),szText,SIZEOF_ARRAY(szText));
+			LoadString(m_hLanguageModule,ShellBrowser::LookupColumnNameStringIndex(column.type),szText,SIZEOF_ARRAY(szText));
 
 			strColumnInfo += std::wstring(szText) + _T("\t");
 

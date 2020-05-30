@@ -19,26 +19,26 @@
 #include <boost/format.hpp>
 #include <wil/common.h>
 
-const std::vector<unsigned int> COMMON_REAL_FOLDER_COLUMNS = { CM_NAME, CM_TYPE, CM_SIZE,
-	CM_DATEMODIFIED, CM_AUTHORS, CM_TITLE };
+const std::vector<ColumnType> COMMON_REAL_FOLDER_COLUMNS = { ColumnType::Name, ColumnType::Type, ColumnType::Size,
+	ColumnType::DateModified, ColumnType::Authors, ColumnType::Title };
 
-const std::vector<unsigned int> COMMON_CONTROL_PANEL_COLUMNS = { CM_NAME, CM_VIRTUALCOMMENTS };
+const std::vector<ColumnType> COMMON_CONTROL_PANEL_COLUMNS = { ColumnType::Name, ColumnType::VirtualComments };
 
-const std::vector<unsigned int> COMMON_MY_COMPUTER_COLUMNS = { CM_NAME, CM_TYPE, CM_TOTALSIZE,
-	CM_FREESPACE, CM_VIRTUALCOMMENTS, CM_FILESYSTEM };
+const std::vector<ColumnType> COMMON_MY_COMPUTER_COLUMNS = { ColumnType::Name, ColumnType::Type, ColumnType::TotalSize,
+	ColumnType::FreeSpace, ColumnType::VirtualComments, ColumnType::FileSystem };
 
-const std::vector<unsigned int> COMMON_NETWORK_CONNECTIONS_COLUMNS = { CM_NAME, CM_TYPE,
-	CM_NETWORKADAPTER_STATUS, CM_OWNER };
+const std::vector<ColumnType> COMMON_NETWORK_CONNECTIONS_COLUMNS = { ColumnType::Name, ColumnType::Type,
+	ColumnType::NetworkAdaptorStatus, ColumnType::Owner };
 
-const std::vector<unsigned int> COMMON_NETWORK_COLUMNS = { CM_NAME, CM_VIRTUALCOMMENTS };
+const std::vector<ColumnType> COMMON_NETWORK_COLUMNS = { ColumnType::Name, ColumnType::VirtualComments };
 
-const std::vector<unsigned int> COMMON_PRINTERS_COLUMNS = { CM_NAME, CM_NUMPRINTERDOCUMENTS,
-	CM_PRINTERSTATUS, CM_PRINTERCOMMENTS, CM_PRINTERLOCATION };
+const std::vector<ColumnType> COMMON_PRINTERS_COLUMNS = { ColumnType::Name, ColumnType::PrinterNumDocuments,
+	ColumnType::PrinterStatus, ColumnType::PrinterComments, ColumnType::PrinterLocation };
 
-const std::vector<unsigned int> COMMON_RECYCLE_BIN_COLUMNS = { CM_NAME, CM_ORIGINALLOCATION,
-	CM_DATEDELETED, CM_SIZE, CM_TYPE, CM_DATEMODIFIED };
+const std::vector<ColumnType> COMMON_RECYCLE_BIN_COLUMNS = { ColumnType::Name, ColumnType::OriginalLocation,
+	ColumnType::DateDeleted, ColumnType::Size, ColumnType::Type, ColumnType::DateModified };
 
-std::vector<unsigned int> GetColumnHeaderMenuList(const std::wstring &directory);
+std::vector<ColumnType> GetColumnHeaderMenuList(const std::wstring &directory);
 
 LRESULT CALLBACK ShellBrowser::ListViewProcStub(
 	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
@@ -221,10 +221,10 @@ void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 
 	if (m_folderSettings.viewMode == +ViewMode::Details && (plvItem->mask & LVIF_TEXT) == LVIF_TEXT)
 	{
-		auto columnId = GetColumnIdByIndex(plvItem->iSubItem);
-		assert(columnId);
+		auto columnType = GetColumnTypeByIndex(plvItem->iSubItem);
+		assert(columnType);
 
-		QueueColumnTask(internalIndex, *columnId);
+		QueueColumnTask(internalIndex, *columnType);
 	}
 
 	if ((plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
@@ -666,13 +666,13 @@ void ShellBrowser::OnListViewHeaderRightClick(const POINTS &cursorPos)
 
 	auto commonColumns = GetColumnHeaderMenuList(m_CurDir);
 
-	std::unordered_map<int, UINT> menuItemMappings;
+	std::unordered_map<int, ColumnType> menuItemMappings;
 	int totalInserted = 0;
 	int commonColumnPosition = 0;
 
 	for (const auto &column : *m_pActiveColumns)
 	{
-		auto itr = std::find(commonColumns.begin(), commonColumns.end(), column.id);
+		auto itr = std::find(commonColumns.begin(), commonColumns.end(), column.type);
 		bool inCommonColumns = (itr != commonColumns.end());
 
 		if (!column.bChecked && !inCommonColumns)
@@ -685,7 +685,7 @@ void ShellBrowser::OnListViewHeaderRightClick(const POINTS &cursorPos)
 		mii.fMask = MIIM_STRING | MIIM_STATE | MIIM_ID;
 
 		std::wstring columnText =
-			ResourceHelper::LoadString(m_hResourceModule, LookupColumnNameStringIndex(column.id));
+			ResourceHelper::LoadString(m_hResourceModule, LookupColumnNameStringIndex(column.type));
 
 		if (column.bChecked)
 		{
@@ -716,7 +716,7 @@ void ShellBrowser::OnListViewHeaderRightClick(const POINTS &cursorPos)
 		mii.wID = id;
 		InsertMenuItem(headerMenu, currentPosition, TRUE, &mii);
 
-		menuItemMappings.insert({ id, column.id });
+		menuItemMappings.insert({ id, column.type });
 
 		totalInserted++;
 	}
@@ -733,7 +733,7 @@ void ShellBrowser::OnListViewHeaderRightClick(const POINTS &cursorPos)
 	OnListViewHeaderMenuItemSelected(cmd, menuItemMappings);
 }
 
-std::vector<unsigned int> GetColumnHeaderMenuList(const std::wstring &directory)
+std::vector<ColumnType> GetColumnHeaderMenuList(const std::wstring &directory)
 {
 	if (CompareVirtualFolders(directory.c_str(), CSIDL_DRIVES))
 	{
@@ -766,7 +766,7 @@ std::vector<unsigned int> GetColumnHeaderMenuList(const std::wstring &directory)
 }
 
 void ShellBrowser::OnListViewHeaderMenuItemSelected(
-	int menuItemId, const std::unordered_map<int, UINT> &menuItemMappings)
+	int menuItemId, const std::unordered_map<int, ColumnType> &menuItemMappings)
 {
 	if (menuItemId == IDM_HEADER_MORE)
 	{
@@ -786,14 +786,14 @@ void ShellBrowser::OnShowMoreColumnsSelected()
 }
 
 void ShellBrowser::OnColumnMenuItemSelected(
-	int menuItemId, const std::unordered_map<int, UINT> &menuItemMappings)
+	int menuItemId, const std::unordered_map<int, ColumnType> &menuItemMappings)
 {
 	auto currentColumns = ExportCurrentColumns();
 
-	UINT columnId = menuItemMappings.at(menuItemId);
+	ColumnType columnType = menuItemMappings.at(menuItemId);
 	auto itr = std::find_if(
-		currentColumns.begin(), currentColumns.end(), [columnId](const Column_t &column) {
-			return column.id == columnId;
+		currentColumns.begin(), currentColumns.end(), [columnType](const Column_t &column) {
+			return column.type == columnType;
 		});
 
 	if (itr == currentColumns.end())

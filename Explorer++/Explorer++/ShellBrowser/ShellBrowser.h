@@ -133,9 +133,9 @@ public:
 	/* Column support. */
 	std::vector<Column_t> ExportCurrentColumns();
 	void ImportColumns(const std::vector<Column_t> &columns);
-	static SortMode DetermineColumnSortMode(int iColumnId);
-	static int LookupColumnNameStringIndex(int iColumnId);
-	static int LookupColumnDescriptionStringIndex(int iColumnId);
+	static SortMode DetermineColumnSortMode(ColumnType columnType);
+	static int LookupColumnNameStringIndex(ColumnType columnType);
+	static int LookupColumnDescriptionStringIndex(ColumnType columnType);
 
 	/* Filtering. */
 	std::wstring GetFilter() const;
@@ -243,7 +243,7 @@ private:
 	struct ColumnResult_t
 	{
 		int itemInternalIndex;
-		int columnID;
+		ColumnType columnType;
 		std::wstring columnText;
 	};
 
@@ -344,10 +344,10 @@ private:
 	// Listview header context menu
 	void OnListViewHeaderRightClick(const POINTS &cursorPos);
 	void OnListViewHeaderMenuItemSelected(
-		int menuItemId, const std::unordered_map<int, UINT> &menuItemMappings);
+		int menuItemId, const std::unordered_map<int, ColumnType> &menuItemMappings);
 	void OnShowMoreColumnsSelected();
 	void OnColumnMenuItemSelected(
-		int menuItemId, const std::unordered_map<int, UINT> &menuItemMappings);
+		int menuItemId, const std::unordered_map<int, ColumnType> &menuItemMappings);
 
 	ItemInfo_t &GetItemByIndex(int index);
 	int GetItemInternalIndex(int item) const;
@@ -359,17 +359,17 @@ private:
 
 	/* Listview column support. */
 	void PlaceColumns();
-	void QueueColumnTask(int itemInternalIndex, unsigned int columnId);
+	void QueueColumnTask(int itemInternalIndex, ColumnType columnType);
 	static ColumnResult_t GetColumnTextAsync(HWND listView, int columnResultId,
-		unsigned int columnID, int internalIndex, const BasicItemInfo_t &basicItemInfo,
+		ColumnType columnType, int internalIndex, const BasicItemInfo_t &basicItemInfo,
 		const GlobalFolderSettings &globalFolderSettings);
-	void InsertColumn(unsigned int columnId, int iColumnIndex, int iWidth);
+	void InsertColumn(ColumnType columnType, int iColumnIndex, int iWidth);
 	void SetActiveColumnSet();
-	void GetColumnInternal(unsigned int id, Column_t *pci) const;
+	void GetColumnInternal(ColumnType columnType, Column_t *pci) const;
 	void SaveColumnWidths();
 	void ProcessColumnResult(int columnResultId);
-	std::optional<int> GetColumnIndexById(unsigned int id) const;
-	std::optional<unsigned int> GetColumnIdByIndex(int index) const;
+	std::optional<int> GetColumnIndexByType(ColumnType columnType) const;
+	std::optional<ColumnType> GetColumnTypeByIndex(int index) const;
 
 	/* Device change support. */
 	void UpdateDriveIcon(const TCHAR *szDrive);
@@ -568,7 +568,7 @@ private:
 	int m_nCurrentColumns;
 	int m_nActiveColumns;
 	bool m_PreviousSortColumnExists;
-	unsigned int m_iPreviousSortedColumnId;
+	ColumnType m_previousSortColumn;
 
 	/* Drag and drop related data. */
 	IDragSourceHelper *m_pDragSourceHelper;
