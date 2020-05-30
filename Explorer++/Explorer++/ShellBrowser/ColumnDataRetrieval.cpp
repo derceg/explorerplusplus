@@ -20,157 +20,157 @@
 
 BOOL GetPrinterStatusDescription(DWORD dwStatus, TCHAR *szStatus, size_t cchMax);
 
-std::wstring GetColumnText(UINT ColumnID, const BasicItemInfo_t &basicItemInfo,
+std::wstring GetColumnText(ColumnType columnType, const BasicItemInfo_t &basicItemInfo,
 	const GlobalFolderSettings &globalFolderSettings)
 {
-	switch (ColumnID)
+	switch (columnType)
 	{
-	case CM_NAME:
+	case ColumnType::Name:
 		return GetNameColumnText(basicItemInfo, globalFolderSettings);
 
-	case CM_TYPE:
+	case ColumnType::Type:
 		return GetTypeColumnText(basicItemInfo);
-	case CM_SIZE:
+	case ColumnType::Size:
 		return GetSizeColumnText(basicItemInfo, globalFolderSettings);
 
-	case CM_DATEMODIFIED:
+	case ColumnType::DateModified:
 		return GetTimeColumnText(basicItemInfo, TimeType::Modified, globalFolderSettings);
-	case CM_CREATED:
+	case ColumnType::Created:
 		return GetTimeColumnText(basicItemInfo, TimeType::Created, globalFolderSettings);
-	case CM_ACCESSED:
+	case ColumnType::Accessed:
 		return GetTimeColumnText(basicItemInfo, TimeType::Accessed, globalFolderSettings);
 
-	case CM_ATTRIBUTES:
+	case ColumnType::Attributes:
 		return GetAttributeColumnText(basicItemInfo);
-	case CM_REALSIZE:
+	case ColumnType::RealSize:
 		return GetRealSizeColumnText(basicItemInfo, globalFolderSettings);
-	case CM_SHORTNAME:
+	case ColumnType::ShortName:
 		return GetShortNameColumnText(basicItemInfo);
-	case CM_OWNER:
+	case ColumnType::Owner:
 		return GetOwnerColumnText(basicItemInfo);
 
-	case CM_PRODUCTNAME:
+	case ColumnType::ProductName:
 		return GetVersionColumnText(basicItemInfo, VersionInfoType::ProductName);
-	case CM_COMPANY:
+	case ColumnType::Company:
 		return GetVersionColumnText(basicItemInfo, VersionInfoType::Company);
-	case CM_DESCRIPTION:
+	case ColumnType::Description:
 		return GetVersionColumnText(basicItemInfo, VersionInfoType::Description);
-	case CM_FILEVERSION:
+	case ColumnType::FileVersion:
 		return GetVersionColumnText(basicItemInfo, VersionInfoType::FileVersion);
-	case CM_PRODUCTVERSION:
+	case ColumnType::ProductVersion:
 		return GetVersionColumnText(basicItemInfo, VersionInfoType::ProductVersion);
 
-	case CM_SHORTCUTTO:
+	case ColumnType::ShortcutTo:
 		return GetShortcutToColumnText(basicItemInfo);
-	case CM_HARDLINKS:
+	case ColumnType::HardLinks:
 		return GetHardLinksColumnText(basicItemInfo);
-	case CM_EXTENSION:
+	case ColumnType::Extension:
 		return GetExtensionColumnText(basicItemInfo);
 
-	case CM_TITLE:
+	case ColumnType::Title:
 		return GetItemDetailsColumnText(basicItemInfo, &PKEY_Title, globalFolderSettings);
-	case CM_SUBJECT:
+	case ColumnType::Subject:
 		return GetItemDetailsColumnText(basicItemInfo, &PKEY_Subject, globalFolderSettings);
-	case CM_AUTHORS:
+	case ColumnType::Authors:
 		return GetItemDetailsColumnText(basicItemInfo, &PKEY_Author, globalFolderSettings);
-	case CM_KEYWORDS:
+	case ColumnType::Keywords:
 		return GetItemDetailsColumnText(basicItemInfo, &PKEY_Keywords, globalFolderSettings);
-	case CM_COMMENT:
+	case ColumnType::Comment:
 		return GetItemDetailsColumnText(basicItemInfo, &PKEY_Comment, globalFolderSettings);
 
-	case CM_CAMERAMODEL:
+	case ColumnType::CameraModel:
 		return GetImageColumnText(basicItemInfo, PropertyTagEquipModel);
-	case CM_DATETAKEN:
+	case ColumnType::DateTaken:
 		return GetImageColumnText(basicItemInfo, PropertyTagDateTime);
-	case CM_WIDTH:
+	case ColumnType::Width:
 		return GetImageColumnText(basicItemInfo, PropertyTagImageWidth);
-	case CM_HEIGHT:
+	case ColumnType::Height:
 		return GetImageColumnText(basicItemInfo, PropertyTagImageHeight);
 
-	case CM_VIRTUALCOMMENTS:
+	case ColumnType::VirtualComments:
 		return GetControlPanelCommentsColumnText(basicItemInfo);
 
-	case CM_TOTALSIZE:
+	case ColumnType::TotalSize:
 		return GetDriveSpaceColumnText(basicItemInfo, true, globalFolderSettings);
 
-	case CM_FREESPACE:
+	case ColumnType::FreeSpace:
 		return GetDriveSpaceColumnText(basicItemInfo, false, globalFolderSettings);
 
-	case CM_FILESYSTEM:
+	case ColumnType::FileSystem:
 		return GetFileSystemColumnText(basicItemInfo);
 
-	case CM_ORIGINALLOCATION:
+	case ColumnType::OriginalLocation:
 		return GetItemDetailsColumnText(
 			basicItemInfo, &SCID_ORIGINAL_LOCATION, globalFolderSettings);
 
-	case CM_DATEDELETED:
+	case ColumnType::DateDeleted:
 		return GetItemDetailsColumnText(basicItemInfo, &SCID_DATE_DELETED, globalFolderSettings);
 
-	case CM_NUMPRINTERDOCUMENTS:
+	case ColumnType::PrinterNumDocuments:
 		return GetPrinterColumnText(basicItemInfo, PrinterInformationType::NumJobs);
 
-	case CM_PRINTERSTATUS:
+	case ColumnType::PrinterStatus:
 		return GetPrinterColumnText(basicItemInfo, PrinterInformationType::Status);
 
-	case CM_PRINTERCOMMENTS:
+	case ColumnType::PrinterComments:
 		return GetPrinterColumnText(basicItemInfo, PrinterInformationType::Comments);
 
-	case CM_PRINTERLOCATION:
+	case ColumnType::PrinterLocation:
 		return GetPrinterColumnText(basicItemInfo, PrinterInformationType::Location);
 
-	case CM_PRINTERMODEL:
+	case ColumnType::PrinterModel:
 		return GetPrinterColumnText(basicItemInfo, PrinterInformationType::Model);
 
-	case CM_NETWORKADAPTER_STATUS:
+	case ColumnType::NetworkAdaptorStatus:
 		return GetNetworkAdapterColumnText(basicItemInfo);
 
-	case CM_MEDIA_BITRATE:
+	case ColumnType::MediaBitrate:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::Bitrate);
-	case CM_MEDIA_COPYRIGHT:
+	case ColumnType::MediaCopyright:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::Copyright);
-	case CM_MEDIA_DURATION:
+	case ColumnType::MediaDuration:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::Duration);
-	case CM_MEDIA_PROTECTED:
+	case ColumnType::MediaProtected:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::Protected);
-	case CM_MEDIA_RATING:
+	case ColumnType::MediaRating:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::Rating);
-	case CM_MEDIA_ALBUMARTIST:
+	case ColumnType::MediaAlbumArtist:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::AlbumArtist);
-	case CM_MEDIA_ALBUM:
+	case ColumnType::MediaAlbum:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::AlbumTitle);
-	case CM_MEDIA_BEATSPERMINUTE:
+	case ColumnType::MediaBeatsPerMinute:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::BeatsPerMinute);
-	case CM_MEDIA_COMPOSER:
+	case ColumnType::MediaComposer:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::Composer);
-	case CM_MEDIA_CONDUCTOR:
+	case ColumnType::MediaConductor:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::Conductor);
-	case CM_MEDIA_DIRECTOR:
+	case ColumnType::MediaDirector:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::Director);
-	case CM_MEDIA_GENRE:
+	case ColumnType::MediaGenre:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::Genre);
-	case CM_MEDIA_LANGUAGE:
+	case ColumnType::MediaLanguage:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::Language);
-	case CM_MEDIA_BROADCASTDATE:
+	case ColumnType::MediaBroadcastDate:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::BroadcastDate);
-	case CM_MEDIA_CHANNEL:
+	case ColumnType::MediaChannel:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::Channel);
-	case CM_MEDIA_STATIONNAME:
+	case ColumnType::MediaStationName:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::StationName);
-	case CM_MEDIA_MOOD:
+	case ColumnType::MediaMood:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::Mood);
-	case CM_MEDIA_PARENTALRATING:
+	case ColumnType::MediaParentalRating:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::ParentalRating);
-	case CM_MEDIA_PARENTALRATINGREASON:
+	case ColumnType::MediaParentalRatingReason:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::ParentalRatingReason);
-	case CM_MEDIA_PERIOD:
+	case ColumnType::MediaPeriod:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::Period);
-	case CM_MEDIA_PRODUCER:
+	case ColumnType::MediaProducer:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::Producer);
-	case CM_MEDIA_PUBLISHER:
+	case ColumnType::MediaPublisher:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::Publisher);
-	case CM_MEDIA_WRITER:
+	case ColumnType::MediaWriter:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::Writer);
-	case CM_MEDIA_YEAR:
+	case ColumnType::MediaYear:
 		return GetMediaMetadataColumnText(basicItemInfo, MediaMetadataType::Year);
 
 	default:

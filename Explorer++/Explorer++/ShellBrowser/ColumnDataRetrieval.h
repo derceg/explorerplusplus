@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Columns.h"
 #include <string>
 
 struct BasicItemInfo_t;
@@ -62,7 +63,7 @@ enum class MediaMetadataType
 	Year
 };
 
-std::wstring GetColumnText(UINT ColumnID, const BasicItemInfo_t &basicItemInfo,
+std::wstring GetColumnText(ColumnType columnType, const BasicItemInfo_t &basicItemInfo,
 	const GlobalFolderSettings &globalFolderSettings);
 std::wstring GetNameColumnText(
 	const BasicItemInfo_t &itemInfo, const GlobalFolderSettings &globalFolderSettings);

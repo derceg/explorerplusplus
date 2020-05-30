@@ -570,7 +570,7 @@ void UpdateColumnWidths(std::vector<Column_t> &columns, const std::vector<Column
 	{
 		for(auto itr2 = columns.begin();itr2 != columns.end();itr2++)
 		{
-			if(itr2->id == itr1->id)
+			if(static_cast<unsigned int>(itr2->type) == itr1->id)
 			{
 				itr2->iWidth = itr1->iWidth;
 				break;
@@ -730,8 +730,8 @@ void Explorerplusplus::SaveColumnWidthsToRegistry(HKEY hColumnsKey, const TCHAR 
 
 	for(auto itr = pColumns->begin();itr != pColumns->end();itr++)
 	{
-		pColumnList[iColumn].id			= itr->id;
-		pColumnList[iColumn].iWidth		= itr->iWidth;
+		pColumnList[iColumn].id = static_cast<unsigned int>(itr->type);
+		pColumnList[iColumn].iWidth = itr->iWidth;
 
 		iColumn++;
 	}
@@ -776,8 +776,8 @@ void Explorerplusplus::SaveColumnToRegistry(HKEY hColumnsKey, const TCHAR *szKey
 
 	for(auto itr = pColumns->begin();itr != pColumns->end();itr++)
 	{
-		pColumnList[iColumn].id			= itr->id;
-		pColumnList[iColumn].bChecked	= itr->bChecked;
+		pColumnList[iColumn].id = static_cast<unsigned int>(itr->type);
+		pColumnList[iColumn].bChecked = itr->bChecked;
 
 		iColumn++;
 	}
@@ -806,7 +806,7 @@ std::vector<Column_t> Explorerplusplus::LoadColumnFromRegistry(HKEY hColumnsKey,
 
 	for(i = 0;i < dwSize / sizeof(ColumnOld_t);i++)
 	{
-		column.id = columnList[i].id;
+		column.type = static_cast<ColumnType>(columnList[i].id);
 		column.bChecked = columnList[i].bChecked;
 		column.iWidth = DEFAULT_COLUMN_WIDTH;
 

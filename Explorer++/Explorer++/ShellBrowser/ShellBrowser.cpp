@@ -1156,7 +1156,7 @@ void ShellBrowser::VerifySortMode()
 
 	auto itr = std::find_if(columns->begin(), columns->end(),
 		[sortMode = m_folderSettings.sortMode](const Column_t &column) {
-			return column.id == static_cast<unsigned int>(sortMode);
+			return static_cast<unsigned int>(column.type) == static_cast<unsigned int>(sortMode);
 		});
 
 	if (itr != columns->end())
@@ -1170,7 +1170,7 @@ void ShellBrowser::VerifySortMode()
 
 	// There should always be at least one checked column, so firstChecked
 	// should always be valid here.
-	m_folderSettings.sortMode = DetermineColumnSortMode(firstChecked->id);
+	m_folderSettings.sortMode = DetermineColumnSortMode(firstChecked->type);
 }
 
 BOOL ShellBrowser::GetSortAscending() const
@@ -1205,7 +1205,7 @@ std::vector<SortMode> ShellBrowser::GetAvailableSortModes() const
 	{
 		if (column.bChecked)
 		{
-			sortModes.push_back(DetermineColumnSortMode(column.id));
+			sortModes.push_back(DetermineColumnSortMode(column.type));
 		}
 	}
 
