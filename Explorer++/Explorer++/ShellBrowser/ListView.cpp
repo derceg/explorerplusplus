@@ -221,7 +221,10 @@ void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 
 	if (m_folderSettings.viewMode == +ViewMode::Details && (plvItem->mask & LVIF_TEXT) == LVIF_TEXT)
 	{
-		QueueColumnTask(internalIndex, plvItem->iSubItem);
+		auto columnId = GetColumnIdByIndex(plvItem->iSubItem);
+		assert(columnId);
+
+		QueueColumnTask(internalIndex, *columnId);
 	}
 
 	if ((plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
