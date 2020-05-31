@@ -128,7 +128,7 @@ ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
 
 	m_bFolderVisited = FALSE;
 
-	m_bColumnsPlaced = FALSE;
+	m_listViewColumnsSetUp = false;
 	m_bOverFolder = FALSE;
 	m_bDragging = FALSE;
 	m_bVirtualFolder = FALSE;
@@ -348,10 +348,10 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 	case ViewMode::Details:
 		dwStyle = LV_VIEW_DETAILS;
 
-		if (!m_bColumnsPlaced)
+		if (!m_listViewColumnsSetUp)
 		{
-			PlaceColumns();
-			m_bColumnsPlaced = TRUE;
+			SetUpListViewColumns();
+			m_listViewColumnsSetUp = true;
 		}
 		break;
 

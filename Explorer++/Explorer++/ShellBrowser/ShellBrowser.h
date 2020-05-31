@@ -358,12 +358,12 @@ private:
 	int CALLBACK Sort(int InternalIndex1, int InternalIndex2) const;
 
 	/* Listview column support. */
-	void PlaceColumns();
+	void SetUpListViewColumns();
 	void QueueColumnTask(int itemInternalIndex, ColumnType columnType);
 	static ColumnResult_t GetColumnTextAsync(HWND listView, int columnResultId,
 		ColumnType columnType, int internalIndex, const BasicItemInfo_t &basicItemInfo,
 		const GlobalFolderSettings &globalFolderSettings);
-	void InsertColumn(ColumnType columnType, int iColumnIndex, int iWidth);
+	void InsertColumn(ColumnType columnType, int columnIndex, int width);
 	void SetActiveColumnSet();
 	void GetColumnInternal(ColumnType columnType, Column_t *pci) const;
 	void SaveColumnWidths();
@@ -564,7 +564,7 @@ private:
 	/* Column related data. */
 	std::vector<Column_t> *m_pActiveColumns;
 	FolderColumns m_folderColumns;
-	BOOL m_bColumnsPlaced;
+	bool m_listViewColumnsSetUp;
 	int m_nCurrentColumns;
 	int m_nActiveColumns;
 	bool m_PreviousSortColumnExists;

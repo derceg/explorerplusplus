@@ -9,6 +9,7 @@
 #include "Config.h"
 #include "ItemData.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "SortModes.h"
 #include "ViewModes.h"
 #include "../Helper/Macros.h"
@@ -138,74 +139,65 @@ std::optional<ColumnType> ShellBrowser::GetColumnTypeByIndex(int index) const
 	return static_cast<ColumnType>(hdItem.lParam);
 }
 
-void ShellBrowser::PlaceColumns()
+void ShellBrowser::SetUpListViewColumns()
 {
-	int iColumnIndex = 0;
-	int i = 0;
-
 	m_nActiveColumns = 0;
 
-	if (m_pActiveColumns != nullptr)
+	int currentIndex = 0;
+
+	for (const Column_t &column : *m_pActiveColumns)
 	{
-		for (auto itr = m_pActiveColumns->begin(); itr != m_pActiveColumns->end(); itr++)
+		if (!column.bChecked)
 		{
-			if (itr->bChecked)
-			{
-				InsertColumn(itr->type, iColumnIndex, itr->iWidth);
-
-				/* Do NOT set column widths here. For some reason, this causes list mode to
-				break. (If this code is active, and the listview starts of in details mode
-				and is then switched to list mode, no items will be shown; they appear to
-				be placed off the left edge of the listview). */
-				// ListView_SetColumnWidth(m_hListView,iColumnIndex,LVSCW_AUTOSIZE_USEHEADER);
-
-				iColumnIndex++;
-				m_nActiveColumns++;
-			}
+			continue;
 		}
 
-		for (i = m_nCurrentColumns + m_nActiveColumns; i >= m_nActiveColumns; i--)
-		{
-			ListView_DeleteColumn(m_hListView, i);
-		}
+		InsertColumn(column.type, currentIndex, column.iWidth);
 
-		m_nCurrentColumns = m_nActiveColumns;
+		/* Do NOT set column widths here. For some reason, this causes list mode to
+		break. (If this code is active, and the listview starts of in details mode
+		and is then switched to list mode, no items will be shown; they appear to
+		be placed off the left edge of the listview). */
+		// ListView_SetColumnWidth(m_hListView,iColumnIndex,LVSCW_AUTOSIZE_USEHEADER);
+
+		currentIndex++;
+		m_nActiveColumns++;
 	}
+
+	for (int i = m_nCurrentColumns + m_nActiveColumns; i >= m_nActiveColumns; i--)
+	{
+		ListView_DeleteColumn(m_hListView, i);
+	}
+
+	m_nCurrentColumns = m_nActiveColumns;
 }
 
-void ShellBrowser::InsertColumn(ColumnType columnType, int iColumnIndex, int iWidth)
+void ShellBrowser::InsertColumn(ColumnType columnType, int columnIndex, int width)
 {
-	HWND hHeader;
-	HDITEM hdItem;
+	std::wstring columnText =
+		ResourceHelper::LoadString(m_hResourceModule, LookupColumnNameStringIndex(columnType));
+
 	LV_COLUMN lvColumn;
-	TCHAR szText[64];
-	int iActualColumnIndex;
-	int iStringIndex;
-
-	iStringIndex = LookupColumnNameStringIndex(columnType);
-
-	LoadString(m_hResourceModule, iStringIndex, szText, SIZEOF_ARRAY(szText));
-
 	lvColumn.mask = LVCF_TEXT | LVCF_WIDTH;
-	lvColumn.pszText = szText;
-	lvColumn.cx = iWidth;
+	lvColumn.pszText = columnText.data();
+	lvColumn.cx = width;
 
-	if (columnType == ColumnType::Size || columnType == ColumnType::RealSize || columnType == ColumnType::TotalSize
-		|| columnType == ColumnType::FreeSpace)
+	if (columnType == ColumnType::Size || columnType == ColumnType::RealSize
+		|| columnType == ColumnType::TotalSize || columnType == ColumnType::FreeSpace)
 	{
 		lvColumn.mask |= LVCF_FMT;
 		lvColumn.fmt = LVCFMT_RIGHT;
 	}
 
-	iActualColumnIndex = ListView_InsertColumn(m_hListView, iColumnIndex, &lvColumn);
+	int actualColumnIndex = ListView_InsertColumn(m_hListView, columnIndex, &lvColumn);
 
-	hHeader = ListView_GetHeader(m_hListView);
+	HWND header = ListView_GetHeader(m_hListView);
 
-	/* Store the column's ID with the column itself. */
+	// Store the column's ID with the column itself.
+	HDITEM hdItem;
 	hdItem.mask = HDI_LPARAM;
 	hdItem.lParam = static_cast<LPARAM>(columnType);
-
-	Header_SetItem(hHeader, iActualColumnIndex, &hdItem);
+	Header_SetItem(header, actualColumnIndex, &hdItem);
 }
 
 void ShellBrowser::SetActiveColumnSet()
@@ -249,7 +241,7 @@ void ShellBrowser::SetActiveColumnSet()
 	if (m_pActiveColumns != pActiveColumns)
 	{
 		m_pActiveColumns = pActiveColumns;
-		m_bColumnsPlaced = FALSE;
+		m_listViewColumnsSetUp = false;
 	}
 }
 
@@ -1061,7 +1053,7 @@ void ShellBrowser::ImportColumns(const std::vector<Column_t> &columns)
 		SortFolder(m_folderSettings.sortMode);
 	}
 
-	m_bColumnsPlaced = FALSE;
+	m_listViewColumnsSetUp = false;
 
 	columnsChanged.m_signal();
 }
