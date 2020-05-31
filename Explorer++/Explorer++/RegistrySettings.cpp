@@ -310,7 +310,7 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		if (lStatus == ERROR_SUCCESS)
 		{
 			m_config->language = dwordValue;
-			m_bLanguageLoaded = TRUE;
+			m_bLanguageLoaded = true;
 		}
 
 		/* Global settings. */
@@ -382,7 +382,7 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 			m_config->displayWindowFont = hFont;
 		}
 
-		m_bAttemptToolbarRestore = TRUE;
+		m_bAttemptToolbarRestore = true;
 
 		RegCloseKey(hSettingsKey);
 	}

@@ -209,7 +209,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 	hItem	= (HTREEITEM)wParam;
 	ppt		= (POINT *)lParam;
 
-	m_bTreeViewRightClick = TRUE;
+	m_bTreeViewRightClick = true;
 
 	hPrevItem = TreeView_GetSelection(m_hTreeView);
 	TreeView_SelectItem(m_hTreeView,hItem);
@@ -237,7 +237,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 
 			if(pidlParent)
 			{
-				m_bTreeViewOpenInNewTab = FALSE;
+				m_bTreeViewOpenInNewTab = false;
 
 				std::vector<PCITEMID_CHILD> pidlItems;
 				pidlItems.push_back(pidlRelative);
@@ -266,7 +266,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 		TreeView_SelectItem(m_hTreeView, hPrevItem);
 	}
 
-	m_bTreeViewRightClick = FALSE;
+	m_bTreeViewRightClick = false;
 }
 
 void Explorerplusplus::OnTreeViewCopyItemPath() const
@@ -420,7 +420,7 @@ void Explorerplusplus::OnTreeViewSelChanged(LPARAM lParam)
 	}
 	else
 	{
-		m_bSelectingTreeViewDirectory = FALSE;
+		m_bSelectingTreeViewDirectory = false;
 	}
 }
 
@@ -742,7 +742,7 @@ void Explorerplusplus::UpdateTreeViewSelection()
 			selection is changed by browsing using the listview. */
 			if (TreeView_GetSelection(m_hTreeView) != hItem)
 			{
-				m_bSelectingTreeViewDirectory = TRUE;
+				m_bSelectingTreeViewDirectory = true;
 			}
 
 			SendMessage(m_hTreeView,TVM_SELECTITEM,(WPARAM)TVGN_CARET,(LPARAM)hItem);

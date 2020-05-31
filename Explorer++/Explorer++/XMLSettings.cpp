@@ -1522,7 +1522,7 @@ WCHAR *wszName,WCHAR *wszValue)
 
 	case HASH_LANGUAGE:
 		m_config->language = NXMLSettings::DecodeIntValue(wszValue);
-		m_bLanguageLoaded = TRUE;
+		m_bLanguageLoaded = true;
 		break;
 
 	case HASH_LARGETOOLBARICONS:

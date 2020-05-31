@@ -87,7 +87,7 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 			}
 		}
 
-		m_bTreeViewOpenInNewTab = TRUE;
+		m_bTreeViewOpenInNewTab = true;
 
 		return TRUE;
 	}
@@ -162,7 +162,7 @@ void Explorerplusplus::HandleCustomMenuItem(
 			pidlComplete.get(), szParsingPath, SIZEOF_ARRAY(szParsingPath), SHGDN_FORPARSING);
 		m_tabContainer->CreateNewTab(szParsingPath, TabSettings(_selected = true));
 
-		m_bTreeViewOpenInNewTab = TRUE;
+		m_bTreeViewOpenInNewTab = true;
 	}
 	break;
 	}

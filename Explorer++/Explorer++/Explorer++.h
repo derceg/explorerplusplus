@@ -521,12 +521,12 @@ private:
 	HWND m_hNextClipboardViewer;
 	std::wstring m_CurrentDirectory;
 	TCHAR m_OldTreeViewFileName[MAX_PATH];
-	BOOL m_bTreeViewRightClick;
-	BOOL m_bSelectingTreeViewDirectory;
-	BOOL m_bAttemptToolbarRestore;
-	BOOL m_bLanguageLoaded;
-	BOOL m_bTreeViewOpenInNewTab;
-	BOOL m_bShowTabBar;
+	bool m_bTreeViewRightClick;
+	bool m_bSelectingTreeViewDirectory;
+	bool m_bAttemptToolbarRestore;
+	bool m_bLanguageLoaded;
+	bool m_bTreeViewOpenInNewTab;
+	bool m_bShowTabBar;
 	int m_iLastSelectedTab;
 	ULONG m_SHChangeNotifyID;
 	ValueWrapper<bool> m_InitializationFinished;
@@ -618,12 +618,12 @@ private:
 	HTREEITEM m_hCutTreeViewItem;
 
 	/* Drag and drop. */
-	BOOL m_bDragging;
-	BOOL m_bDragCancelled;
-	BOOL m_bDragAllowed;
+	bool m_bDragging;
+	bool m_bDragCancelled;
+	bool m_bDragAllowed;
 
 	/* Rename support. */
-	BOOL m_bListViewRenaming;
+	bool m_bListViewRenaming;
 
 	/* Cut items data. */
 	std::list<std::wstring> m_CutFileNameList;
@@ -638,5 +638,5 @@ private:
 	/* TreeView middle click. */
 	HTREEITEM m_hTVMButtonItem;
 
-	BOOL m_blockNextListViewSelection;
+	bool m_blockNextListViewSelection;
 };

@@ -164,7 +164,7 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 	{
 		if (nTabsCreated == 1)
 		{
-			m_bShowTabBar = FALSE;
+			m_bShowTabBar = false;
 		}
 	}
 
@@ -236,13 +236,13 @@ bool Explorerplusplus::OnCloseTab()
 
 void Explorerplusplus::ShowTabBar()
 {
-	m_bShowTabBar = TRUE;
+	m_bShowTabBar = true;
 	UpdateLayout();
 }
 
 void Explorerplusplus::HideTabBar()
 {
-	m_bShowTabBar = FALSE;
+	m_bShowTabBar = false;
 	UpdateLayout();
 }
 
