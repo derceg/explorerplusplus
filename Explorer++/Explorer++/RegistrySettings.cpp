@@ -717,16 +717,10 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 
 void Explorerplusplus::SaveColumnWidthsToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::vector<Column_t> *pColumns)
 {
-	typedef struct
-	{
-		unsigned int id;
-		int iWidth;
-	} ColumnWidth_t;
+	ColumnWidth *pColumnList = nullptr;
+	int iColumn = 0;
 
-	ColumnWidth_t				*pColumnList = nullptr;
-	int							iColumn = 0;
-
-	pColumnList = (ColumnWidth_t *)malloc(pColumns->size() * sizeof(ColumnWidth_t));
+	pColumnList = (ColumnWidth *)malloc(pColumns->size() * sizeof(ColumnWidth));
 
 	for(auto itr = pColumns->begin();itr != pColumns->end();itr++)
 	{
@@ -737,7 +731,7 @@ void Explorerplusplus::SaveColumnWidthsToRegistry(HKEY hColumnsKey, const TCHAR 
 	}
 
 	RegSetValueEx(hColumnsKey,szKeyName,0,REG_BINARY,
-		(LPBYTE)pColumnList,(DWORD)(pColumns->size() * sizeof(ColumnWidth_t)));
+		(LPBYTE)pColumnList,(DWORD)(pColumns->size() * sizeof(ColumnWidth)));
 
 	free(pColumnList);
 }
