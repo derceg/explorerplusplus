@@ -1077,3 +1077,16 @@ void ShellBrowser::GetColumnInternal(ColumnType columnType, Column_t *pci) const
 		}
 	}
 }
+
+Column_t ShellBrowser::GetFirstCheckedColumn()
+{
+	auto itr = std::find_if(
+		m_pActiveColumns->begin(), m_pActiveColumns->end(), [](const Column_t &column) {
+			return column.bChecked;
+		});
+
+	// There should always be at least one checked column.
+	assert(itr != m_pActiveColumns->end());
+
+	return *itr;
+}

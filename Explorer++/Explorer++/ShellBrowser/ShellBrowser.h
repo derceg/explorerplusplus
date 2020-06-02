@@ -310,6 +310,8 @@ private:
 	int SetItemInformation(
 		PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild, const TCHAR *szFileName);
 	void SetViewModeInternal(ViewMode viewMode);
+	void SetFirstColumnTextToCallback();
+	void SetFirstColumnTextToFilename();
 	void ApplyFolderEmptyBackgroundImage(bool apply);
 	void ApplyFilteringBackgroundImage(bool apply);
 	void PlayNavigationSound() const;
@@ -366,6 +368,7 @@ private:
 	void InsertColumn(ColumnType columnType, int iColumnIndex, int iWidth);
 	void SetActiveColumnSet();
 	void GetColumnInternal(ColumnType columnType, Column_t *pci) const;
+	Column_t GetFirstCheckedColumn();
 	void SaveColumnWidths();
 	void ProcessColumnResult(int columnResultId);
 	std::optional<int> GetColumnIndexByType(ColumnType columnType) const;
