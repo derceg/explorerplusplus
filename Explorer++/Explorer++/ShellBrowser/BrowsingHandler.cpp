@@ -355,7 +355,19 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 		lv.iItem = awaitingItem.iItem;
 		lv.iSubItem = 0;
-		lv.pszText = filename.data();
+
+		auto firstColumn = GetFirstCheckedColumn();
+
+		if ((m_folderSettings.viewMode == +ViewMode::Details)
+			&& firstColumn.type != ColumnType::Name)
+		{
+			lv.pszText = LPSTR_TEXTCALLBACK;
+		}
+		else
+		{
+			lv.pszText = filename.data();
+		}
+
 		lv.iImage = I_IMAGECALLBACK;
 		lv.lParam = awaitingItem.iItemInternal;
 

@@ -110,11 +110,14 @@ ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
 	m_tabNavigation(tabNavigation),
 	m_folderSettings(folderSettings),
 	m_folderColumns(initialColumns ? *initialColumns : config->globalFolderSettings.folderColumns),
-	m_columnThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
+	m_columnThreadPool(
+		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
 	m_columnResultIDCounter(0),
-	m_thumbnailThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
+	m_thumbnailThreadPool(
+		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
 	m_thumbnailResultIDCounter(0),
-	m_infoTipsThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
+	m_infoTipsThreadPool(
+		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
 	m_infoTipResultIDCounter(0)
 {
 	m_iRefCount = 1;
@@ -370,15 +373,61 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 		break;
 	}
 
-	m_folderSettings.viewMode = viewMode;
-
 	if (viewMode != +ViewMode::Details)
 	{
 		m_columnThreadPool.clear_queue();
 		m_columnResults.clear();
 	}
 
+	ViewMode previousViewMode = m_folderSettings.viewMode;
+	m_folderSettings.viewMode = viewMode;
+
 	SendMessage(m_hListView, LVM_SETVIEW, dwStyle, 0);
+
+	if (previousViewMode != +ViewMode::Details && viewMode == +ViewMode::Details)
+	{
+		auto firstColumn = GetFirstCheckedColumn();
+
+		if (firstColumn.type != ColumnType::Name)
+		{
+			SetFirstColumnTextToCallback();
+		}
+	}
+	else if (previousViewMode == +ViewMode::Details && viewMode != +ViewMode::Details)
+	{
+		auto firstColumn = GetFirstCheckedColumn();
+
+		// The item text in non-details view is always the filename.
+		if (firstColumn.type != ColumnType::Name)
+		{
+			SetFirstColumnTextToFilename();
+		}
+	}
+}
+
+void ShellBrowser::SetFirstColumnTextToCallback()
+{
+	int numItems = ListView_GetItemCount(m_hListView);
+
+	for (int i = 0; i < numItems; i++)
+	{
+		ListView_SetItemText(m_hListView, i, 0, LPSTR_TEXTCALLBACK);
+	}
+}
+
+void ShellBrowser::SetFirstColumnTextToFilename()
+{
+	int numItems = ListView_GetItemCount(m_hListView);
+
+	for (int i = 0; i < numItems; i++)
+	{
+		int internalIndex = GetItemInternalIndex(i);
+
+		BasicItemInfo_t basicItemInfo = getBasicItemInfo(internalIndex);
+		std::wstring filename = ProcessItemFileName(basicItemInfo, m_config->globalFolderSettings);
+
+		ListView_SetItemText(m_hListView, i, 0, filename.data());
+	}
 }
 
 void ShellBrowser::CycleViewMode(bool cycleForward)
@@ -1164,13 +1213,8 @@ void ShellBrowser::VerifySortMode()
 		return;
 	}
 
-	auto firstChecked = std::find_if(columns->begin(), columns->end(), [](const Column_t &column) {
-		return column.bChecked;
-	});
-
-	// There should always be at least one checked column, so firstChecked
-	// should always be valid here.
-	m_folderSettings.sortMode = DetermineColumnSortMode(firstChecked->type);
+	auto firstChecked = GetFirstCheckedColumn();
+	m_folderSettings.sortMode = DetermineColumnSortMode(firstChecked.type);
 }
 
 BOOL ShellBrowser::GetSortAscending() const
