@@ -41,7 +41,7 @@ public:
 		const BookmarkNavigationCompletedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;
 
-	int GetLastSelectedItemIndex() const;
+	std::optional<int> GetLastSelectedItemIndex() const;
 	RawBookmarkItems GetSelectedBookmarkItems();
 	void SelectItem(const BookmarkItem *bookmarkItem);
 	void CreateNewFolder();
@@ -94,7 +94,7 @@ private:
 	int GetItemSortedPosition(const BookmarkItem *bookmarkItem) const;
 
 	void OnDblClk(const NMITEMACTIVATE *itemActivate);
-	void OnRClick(const NMITEMACTIVATE *itemActivate);
+	void OnShowContextMenu(const POINT &ptScreen);
 	void ShowBackgroundContextMenu(const POINT &ptScreen);
 	void OnMenuItemSelected(int menuItemId);
 	void OnNewBookmark();

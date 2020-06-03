@@ -583,7 +583,16 @@ void ManageBookmarksDialog::OnNewBookmark()
 
 	if (focus == listView)
 	{
-		targetIndex = m_bookmarkListView->GetLastSelectedItemIndex() + 1;
+		auto lastSelectedItemIndex = m_bookmarkListView->GetLastSelectedItemIndex();
+
+		if (lastSelectedItemIndex)
+		{
+			targetIndex = *lastSelectedItemIndex + 1;
+		}
+		else
+		{
+			targetIndex = m_currentBookmarkFolder->GetChildren().size();
+		}
 	}
 
 	auto bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
@@ -642,7 +651,16 @@ void ManageBookmarksDialog::OnPaste()
 
 	if (focus == GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW))
 	{
-		targetIndex = m_bookmarkListView->GetLastSelectedItemIndex() + 1;
+		auto lastSelectedItemindex = m_bookmarkListView->GetLastSelectedItemIndex();
+
+		if (lastSelectedItemindex)
+		{
+			targetIndex = *lastSelectedItemindex + 1;
+		}
+		else
+		{
+			targetIndex = m_currentBookmarkFolder->GetChildren().size();
+		}
 	}
 	else
 	{
