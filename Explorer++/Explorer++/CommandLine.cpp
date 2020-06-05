@@ -22,6 +22,7 @@
 using namespace DefaultFileManager;
 
 extern std::vector<std::wstring> g_commandLineDirectories;
+extern bool g_enableDarkMode;
 
 struct CommandLineSettings
 {
@@ -32,6 +33,7 @@ struct CommandLineSettings
 	ReplaceExplorerMode replaceExplorerMode;
 	std::string language;
 	bool jumplistNewTab;
+	bool enableDarkMode;
 	std::vector<std::string> directories;
 };
 
@@ -101,6 +103,14 @@ std::optional<CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
 		"--language",
 		commandLineSettings.language,
 		"Allows you to select your desired language. Should be a two-letter language code (e.g. FR, RU, etc)."
+	);
+
+	commandLineSettings.enableDarkMode = false;
+	app.add_flag(
+		"--enable-dark-mode",
+		commandLineSettings.enableDarkMode,
+		"(Experimental) Enables dark mode. Only tested with Windows 10 version 1909. May fail or \
+crash with other versions of Windows 10. This option has no effect on earlier versions of Windows."
 	);
 
 	app.add_option(
@@ -208,6 +218,8 @@ std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(const CommandLin
 
 		StringCchCopy(g_szLang, SIZEOF_ARRAY(g_szLang), strToWstr(commandLineSettings.language).c_str());
 	}
+
+	g_enableDarkMode = commandLineSettings.enableDarkMode;
 
 	TCHAR processImageName[MAX_PATH];
 	GetProcessImageName(GetCurrentProcessId(), processImageName, SIZEOF_ARRAY(processImageName));

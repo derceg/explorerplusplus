@@ -483,6 +483,9 @@ private:
 	HMENU BuildViewsMenu() override;
 	void AddViewModesToMenu(HMENU menu);
 
+	// Dark mode
+	void SetUpDarkMode();
+
 	/* Miscellaneous. */
 	void CreateStatusBar();
 	void InitializeDisplayWindow();
