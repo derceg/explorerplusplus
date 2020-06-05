@@ -52,7 +52,7 @@ void Explorerplusplus::InitializeMainToolbars()
 	m_ToolbarInformation[0].lpText = nullptr;
 
 	m_ToolbarInformation[1].wID = ID_ADDRESSTOOLBAR;
-	m_ToolbarInformation[1].fMask = RBBIM_ID | RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_STYLE | RBBIM_TEXT;
+	m_ToolbarInformation[1].fMask = RBBIM_ID | RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_STYLE;
 	m_ToolbarInformation[1].fStyle = RBBS_BREAK;
 	m_ToolbarInformation[1].cx = 0;
 	m_ToolbarInformation[1].cxIdeal = 0;
@@ -97,7 +97,6 @@ void Explorerplusplus::CreateMainControls()
 	SIZE	sz;
 	RECT	rc;
 	DWORD	toolbarSize;
-	TCHAR	szBandText[32];
 	int		i = 0;
 
 	/* If the rebar is locked, prevent bands from
@@ -135,10 +134,8 @@ void Explorerplusplus::CreateMainControls()
 
 		case ID_ADDRESSTOOLBAR:
 			CreateAddressBar();
-			LoadString(m_hLanguageModule, IDS_ADDRESSBAR, szBandText, SIZEOF_ARRAY(szBandText));
 			GetWindowRect(m_addressBar->GetHWND(), &rc);
 			m_ToolbarInformation[i].cyMinChild = GetRectHeight(&rc);
-			m_ToolbarInformation[i].lpText = szBandText;
 			m_ToolbarInformation[i].hwndChild = m_addressBar->GetHWND();
 			break;
 

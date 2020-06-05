@@ -546,7 +546,6 @@
 #define IDS_SORTBY_PRINTERLOCATION      8043
 #define IDS_SORTBY_NETWORKADAPTERSTATUS 8044
 #define IDS_VERSION                     8045
-#define IDS_ADDRESSBAR                  8046
 #define IDS_HIDEFOLDERSPANE             8048
 #define IDS_FILERENAMEERROR             8049
 #define IDS_TOOLBAR_BACK                8050
