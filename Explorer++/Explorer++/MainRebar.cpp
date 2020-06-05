@@ -8,6 +8,7 @@
 #include "ApplicationToolbar.h"
 #include "Bookmarks/UI/BookmarksToolbar.h"
 #include "Config.h"
+#include "DarkModeHelper.h"
 #include "DrivesToolbar.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
@@ -229,6 +230,13 @@ LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd, UINT msg, WPARAM wPa
 		return TRUE;
 		}
 		break;
+
+	case WM_ERASEBKGND:
+		if (OnRebarEraseBackground(reinterpret_cast<HDC>(wParam)))
+		{
+			return 1;
+		}
+		break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
@@ -397,4 +405,20 @@ HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 	}
 
 	return hSubMenu;
+}
+
+bool Explorerplusplus::OnRebarEraseBackground(HDC hdc)
+{
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (!darkModeHelper.IsDarkModeEnabled())
+	{
+		return false;
+	}
+
+	RECT rc;
+	GetClientRect(m_hMainRebar, &rc);
+	FillRect(hdc, &rc, darkModeHelper.GetBackgroundBrush());
+
+	return true;
 }

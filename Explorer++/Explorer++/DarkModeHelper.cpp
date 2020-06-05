@@ -63,7 +63,6 @@ DarkModeHelper::DarkModeHelper() : m_darkModeSupported(false), m_darkModeEnabled
 		GetProcAddress(GetModuleHandleW(L"user32.dll"), "SetWindowCompositionAttribute"));
 
 	m_darkModeSupported = true;
-	m_darkModeEnabled = m_ShouldAppsUseDarkMode() && !IsHighContrast();
 }
 
 void DarkModeHelper::EnableForApp()
@@ -71,6 +70,8 @@ void DarkModeHelper::EnableForApp()
 	AllowDarkModeForApp(true);
 	FlushMenuThemes();
 	RefreshImmersiveColorPolicyState();
+
+	m_darkModeEnabled = m_ShouldAppsUseDarkMode() && !IsHighContrast();
 }
 
 void DarkModeHelper::AllowDarkModeForApp(bool allow)
@@ -134,4 +135,14 @@ bool DarkModeHelper::IsHighContrast()
 bool DarkModeHelper::IsDarkModeEnabled() const
 {
 	return m_darkModeEnabled;
+}
+
+HBRUSH DarkModeHelper::GetBackgroundBrush()
+{
+	if (!m_backgroundBrush)
+	{
+		m_backgroundBrush.reset(CreateSolidBrush(BACKGROUND_COLOR));
+	}
+
+	return m_backgroundBrush.get();
 }

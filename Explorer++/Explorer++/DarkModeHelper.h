@@ -75,6 +75,8 @@ public:
 
 	bool IsDarkModeEnabled() const;
 
+	HBRUSH GetBackgroundBrush();
+
 private:
 	static inline const DWORD BUILD_NUMBER_1809 = 17763;
 	static inline const DWORD BUILD_NUMBER_1903 = 18362;
@@ -112,4 +114,5 @@ private:
 	wil::unique_hmodule m_uxThemeLib;
 	bool m_darkModeSupported;
 	bool m_darkModeEnabled;
+	wil::unique_hbrush m_backgroundBrush;
 };

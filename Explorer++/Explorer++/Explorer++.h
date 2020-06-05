@@ -486,13 +486,16 @@ private:
 	// Dark mode
 	void SetUpDarkMode();
 
+	// Rebar
+	HMENU CreateRebarHistoryMenu(BOOL bBack);
+	bool OnRebarEraseBackground(HDC hdc);
+
 	/* Miscellaneous. */
 	void CreateStatusBar();
 	void InitializeDisplayWindow();
 	int CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer);
 	void ShowMainRebarBand(HWND hwnd, BOOL bShow);
 	BOOL OnMouseWheel(MousewheelSource mousewheelSource, WPARAM wParam, LPARAM lParam) override;
-	HMENU CreateRebarHistoryMenu(BOOL bBack);
 	StatusBar *GetStatusBar() override;
 	void HandleDirectoryMonitoring(int iTabId);
 	int DetermineListViewObjectIndex(HWND hListView);
