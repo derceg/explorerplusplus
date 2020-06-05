@@ -488,6 +488,7 @@ private:
 
 	// Rebar
 	HMENU CreateRebarHistoryMenu(BOOL bBack);
+	std::optional<int> OnRebarCustomDraw(NMHDR *nmhdr);
 	bool OnRebarEraseBackground(HDC hdc);
 
 	/* Miscellaneous. */

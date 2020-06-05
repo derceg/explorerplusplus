@@ -228,6 +228,13 @@ LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd, UINT msg, WPARAM wPa
 			OnToolbarRClick(pnmm->hdr.hwndFrom);
 		}
 		return TRUE;
+
+		case NM_CUSTOMDRAW:
+			if (auto result = OnRebarCustomDraw(reinterpret_cast<NMHDR *>(lParam)))
+			{
+				return *result;
+			}
+			break;
 		}
 		break;
 
@@ -405,6 +412,38 @@ HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 	}
 
 	return hSubMenu;
+}
+
+std::optional<int> Explorerplusplus::OnRebarCustomDraw(NMHDR *nmhdr)
+{
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (!darkModeHelper.IsDarkModeEnabled())
+	{
+		return std::nullopt;
+	}
+
+	if (nmhdr->hwndFrom != m_mainToolbar->GetHWND() && nmhdr->hwndFrom != m_hBookmarksToolbar
+		&& nmhdr->hwndFrom != m_pDrivesToolbar->GetHWND()
+		&& nmhdr->hwndFrom != m_pApplicationToolbar->GetHWND())
+	{
+		return std::nullopt;
+	}
+
+	auto *customDraw = reinterpret_cast<NMTBCUSTOMDRAW *>(nmhdr);
+
+	switch (customDraw->nmcd.dwDrawStage)
+	{
+	case CDDS_PREPAINT:
+		return CDRF_NOTIFYITEMDRAW;
+
+	case CDDS_ITEMPREPAINT:
+		customDraw->clrText = DarkModeHelper::FOREGROUND_COLOR;
+		customDraw->clrHighlightHotTrack = DarkModeHelper::BUTTON_HIGHLIGHT_COLOR;
+		return TBCDRF_USECDCOLORS | TBCDRF_HILITEHOTTRACK;
+	}
+
+	return std::nullopt;
 }
 
 bool Explorerplusplus::OnRebarEraseBackground(HDC hdc)
