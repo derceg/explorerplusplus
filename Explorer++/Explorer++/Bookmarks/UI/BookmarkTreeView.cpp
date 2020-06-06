@@ -7,6 +7,7 @@
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "CoreInterface.h"
+#include "DarkModeHelper.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/Macros.h"
@@ -30,6 +31,13 @@ BookmarkTreeView::BookmarkTreeView(HWND hTreeView, HINSTANCE hInstance, IExplore
 		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
 	SetWindowTheme(hTreeView, L"Explorer", nullptr);
+
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (darkModeHelper.IsDarkModeEnabled())
+	{
+		darkModeHelper.SetTreeViewDarkModeColors(hTreeView);
+	}
 
 	UINT dpi = m_dpiCompat.GetDpiForWindow(hTreeView);
 	int iconWidth = m_dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);

@@ -9,6 +9,7 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "Config.h"
 #include "CoreInterface.h"
+#include "DarkModeHelper.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -40,6 +41,13 @@ BookmarkListView::BookmarkListView(HWND hListView, HMODULE resourceModule,
 	SetWindowTheme(hListView, L"Explorer", nullptr);
 	ListView_SetExtendedListViewStyleEx(hListView, LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT,
 		LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT);
+
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (darkModeHelper.IsDarkModeEnabled())
+	{
+		darkModeHelper.SetListViewDarkModeColors(hListView);
+	}
 
 	SetUpListViewImageList(iconFetcher);
 

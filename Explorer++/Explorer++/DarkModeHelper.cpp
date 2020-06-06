@@ -146,3 +146,20 @@ HBRUSH DarkModeHelper::GetBackgroundBrush()
 
 	return m_backgroundBrush.get();
 }
+
+void DarkModeHelper::SetListViewDarkModeColors(HWND listView)
+{
+	ListView_SetBkColor(listView, BACKGROUND_COLOR);
+	ListView_SetTextBkColor(listView, BACKGROUND_COLOR);
+	ListView_SetTextColor(listView, FOREGROUND_COLOR);
+
+	InvalidateRect(listView, nullptr, TRUE);
+}
+
+void DarkModeHelper::SetTreeViewDarkModeColors(HWND treeView)
+{
+	TreeView_SetBkColor(treeView, BACKGROUND_COLOR);
+	TreeView_SetTextColor(treeView, FOREGROUND_COLOR);
+
+	InvalidateRect(treeView, nullptr, TRUE);
+}
