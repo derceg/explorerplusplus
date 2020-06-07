@@ -44,6 +44,11 @@ void Explorerplusplus::OnCreate()
 
 	SetLanguageModule();
 
+	if (g_enableDarkMode)
+	{
+		SetUpDarkMode();
+	}
+
 	m_bookmarksMainMenu = std::make_unique<BookmarksMainMenu>(this, &m_bookmarkIconFetcher,
 		&m_bookmarkTree, MenuIdRange{ MENU_BOOKMARK_STARTID, MENU_BOOKMARK_ENDID });
 
@@ -93,12 +98,15 @@ void Explorerplusplus::OnCreate()
 
 	m_uiTheming = std::make_unique<UiTheming>(this, m_tabContainer);
 
-	InitializePlugins();
-
-	if (g_enableDarkMode)
+	if (DarkModeHelper::GetInstance().IsDarkModeEnabled())
 	{
-		SetUpDarkMode();
+		m_uiTheming->SetListViewColors(
+			DarkModeHelper::BACKGROUND_COLOR, DarkModeHelper::FOREGROUND_COLOR);
+		m_uiTheming->SetTreeViewColors(
+			DarkModeHelper::BACKGROUND_COLOR, DarkModeHelper::FOREGROUND_COLOR);
 	}
+
+	InitializePlugins();
 
 	SetTimer(m_hContainer, AUTOSAVE_TIMER_ID, AUTOSAVE_TIMEOUT, nullptr);
 
@@ -166,9 +174,4 @@ void Explorerplusplus::SetUpDarkMode()
 		DarkModeHelper::WCA_USEDARKMODECOLORS, &dark, sizeof(dark)
 	};
 	darkModeHelper.SetWindowCompositionAttribute(m_hContainer, &compositionData);
-
-	m_uiTheming->SetListViewColors(
-		DarkModeHelper::BACKGROUND_COLOR, DarkModeHelper::FOREGROUND_COLOR);
-	m_uiTheming->SetTreeViewColors(
-		DarkModeHelper::BACKGROUND_COLOR, DarkModeHelper::FOREGROUND_COLOR);
 }
