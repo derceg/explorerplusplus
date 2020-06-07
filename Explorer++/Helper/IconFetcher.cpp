@@ -9,32 +9,20 @@
 IconFetcher::IconFetcher(HWND hwnd, CachedIcons *cachedIcons) :
 	m_hwnd(hwnd),
 	m_cachedIcons(cachedIcons),
-	m_iconThreadPool(1),
+	m_iconThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
 	m_iconResultIDCounter(0)
 {
 	m_windowSubclasses.emplace_back(
 		hwnd, WindowSubclassStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
-
-	m_iconThreadPool.push([] (int id) {
-		UNREFERENCED_PARAMETER(id);
-
-		CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
-	});
 }
 
 IconFetcher::~IconFetcher()
 {
 	m_iconThreadPool.clear_queue();
-
-	m_iconThreadPool.push([] (int id) {
-		UNREFERENCED_PARAMETER(id);
-
-		CoUninitialize();
-	});
 }
 
-LRESULT CALLBACK IconFetcher::WindowSubclassStub(HWND hwnd, UINT uMsg,
-	WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK IconFetcher::WindowSubclassStub(
+	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -60,38 +48,40 @@ void IconFetcher::QueueIconTask(std::wstring_view path, Callback callback)
 {
 	int iconResultID = m_iconResultIDCounter++;
 
-	auto iconResult = m_iconThreadPool.push([this, iconResultID, copiedPath = std::wstring(path)] (int id) -> std::optional<IconResult> {
-		UNREFERENCED_PARAMETER(id);
+	auto iconResult = m_iconThreadPool.push(
+		[this, iconResultID, copiedPath = std::wstring(path)](int id) -> std::optional<IconResult> {
+			UNREFERENCED_PARAMETER(id);
 
-		// SHGetFileInfo will fail for non-filesystem paths that are passed in
-		// as strings. For example, attempting to retrieve the icon for the
-		// recycle bin will fail if you pass the parsing path (i.e.
-		// ::{645FF040-5081-101B-9F08-00AA002F954E}). If, however, you pass the
-		// pidl, the function will succeed. Therefore, paths will always be
-		// converted to pidls first here.
-		unique_pidl_absolute pidl;
-		HRESULT hr = SHParseDisplayName(copiedPath.c_str(), nullptr, wil::out_param(pidl), 0, nullptr);
+			// SHGetFileInfo will fail for non-filesystem paths that are passed in
+			// as strings. For example, attempting to retrieve the icon for the
+			// recycle bin will fail if you pass the parsing path (i.e.
+			// ::{645FF040-5081-101B-9F08-00AA002F954E}). If, however, you pass the
+			// pidl, the function will succeed. Therefore, paths will always be
+			// converted to pidls first here.
+			unique_pidl_absolute pidl;
+			HRESULT hr =
+				SHParseDisplayName(copiedPath.c_str(), nullptr, wil::out_param(pidl), 0, nullptr);
 
-		if (FAILED(hr))
-		{
-			return std::nullopt;
-		}
+			if (FAILED(hr))
+			{
+				return std::nullopt;
+			}
 
-		auto iconIndex = FindIconAsync(pidl.get());
+			auto iconIndex = FindIconAsync(pidl.get());
 
-		if (!iconIndex)
-		{
-			return std::nullopt;
-		}
+			if (!iconIndex)
+			{
+				return std::nullopt;
+			}
 
-		IconResult result;
-		result.iconIndex = *iconIndex;
-		result.path = copiedPath;
+			IconResult result;
+			result.iconIndex = *iconIndex;
+			result.path = copiedPath;
 
-		PostMessage(m_hwnd, WM_APP_ICON_RESULT_READY, iconResultID, 0);
+			PostMessage(m_hwnd, WM_APP_ICON_RESULT_READY, iconResultID, 0);
 
-		return result;
-	});
+			return result;
+		});
 
 	FutureResult futureResult;
 	futureResult.callback = callback;
@@ -106,32 +96,33 @@ void IconFetcher::QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback)
 	BasicItemInfo basicItemInfo;
 	basicItemInfo.pidl.reset(ILCloneFull(pidl));
 
-	auto iconResult = m_iconThreadPool.push([this, iconResultID, basicItemInfo] (int id) -> std::optional<IconResult> {
-		UNREFERENCED_PARAMETER(id);
+	auto iconResult = m_iconThreadPool.push(
+		[this, iconResultID, basicItemInfo](int id) -> std::optional<IconResult> {
+			UNREFERENCED_PARAMETER(id);
 
-		auto iconIndex = FindIconAsync(basicItemInfo.pidl.get());
+			auto iconIndex = FindIconAsync(basicItemInfo.pidl.get());
 
-		if (!iconIndex)
-		{
-			return std::nullopt;
-		}
+			if (!iconIndex)
+			{
+				return std::nullopt;
+			}
 
-		IconResult result;
-		result.iconIndex = *iconIndex;
+			IconResult result;
+			result.iconIndex = *iconIndex;
 
-		TCHAR filePath[MAX_PATH];
-		HRESULT hr = GetDisplayName(basicItemInfo.pidl.get(), filePath, static_cast<UINT>(std::size(filePath)),
-			SHGDN_FORPARSING);
+			TCHAR filePath[MAX_PATH];
+			HRESULT hr = GetDisplayName(basicItemInfo.pidl.get(), filePath,
+				static_cast<UINT>(std::size(filePath)), SHGDN_FORPARSING);
 
-		if (SUCCEEDED(hr))
-		{
-			result.path = filePath;
-		}
+			if (SUCCEEDED(hr))
+			{
+				result.path = filePath;
+			}
 
-		PostMessage(m_hwnd, WM_APP_ICON_RESULT_READY, iconResultID, 0);
+			PostMessage(m_hwnd, WM_APP_ICON_RESULT_READY, iconResultID, 0);
 
-		return result;
-	});
+			return result;
+		});
 
 	FutureResult futureResult;
 	futureResult.callback = callback;
@@ -141,11 +132,11 @@ void IconFetcher::QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback)
 
 std::optional<int> IconFetcher::FindIconAsync(PCIDLIST_ABSOLUTE pidl)
 {
-	// Must use SHGFI_ICON here, rather than SHGFO_SYSICONINDEX, or else 
+	// Must use SHGFI_ICON here, rather than SHGFO_SYSICONINDEX, or else
 	// icon overlays won't be applied.
 	SHFILEINFO shfi;
-	DWORD_PTR res = SHGetFileInfo(reinterpret_cast<LPCTSTR>(pidl), 0, &shfi,
-		sizeof(shfi), SHGFI_PIDL | SHGFI_ICON | SHGFI_OVERLAYINDEX);
+	DWORD_PTR res = SHGetFileInfo(reinterpret_cast<LPCTSTR>(pidl), 0, &shfi, sizeof(shfi),
+		SHGFI_PIDL | SHGFI_ICON | SHGFI_OVERLAYINDEX);
 
 	if (res == 0)
 	{

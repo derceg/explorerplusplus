@@ -6,7 +6,9 @@
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
 
-TEST(ManifestTest, TestParsing) {
+TEST(ManifestTest, TestParsing)
+{
+	// clang-format off
 	nlohmann::json json = {
 		{"name", "Test plugin"},
 		{"description", "Test description"},
@@ -14,6 +16,7 @@ TEST(ManifestTest, TestParsing) {
 		{"version", "1.0"},
 		{"author", "John Smith"}
 	};
+	// clang-format on
 
 	Plugins::Manifest manifest = json.get<Plugins::Manifest>();
 

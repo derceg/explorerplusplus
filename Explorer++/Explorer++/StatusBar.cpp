@@ -193,7 +193,9 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 	res = CreateDriveFreeSpaceString(m_CurrentDirectory.c_str(), szBuffer, SIZEOF_ARRAY(szBuffer));
 
 	if (res == -1)
+	{
 		StringCchCopy(szBuffer, SIZEOF_ARRAY(szBuffer), EMPTY_STRING);
+	}
 
 	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM)2 | 0, (LPARAM)szBuffer);
 
@@ -225,9 +227,13 @@ int Explorerplusplus::CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szB
 		_T("%s %s (%.0f%%)"), szFreeSpace, szFree, totalNumberOfFreeBytes.QuadPart * 100.0 / totalNumberOfBytes.QuadPart);
 
 	if (nBuffer > lstrlen(szFreeSpaceString))
+	{
 		StringCchCopy(szBuffer, nBuffer, szFreeSpaceString);
+	}
 	else
+	{
 		szBuffer = nullptr;
+	}
 
 	return lstrlen(szFreeSpaceString);
 }

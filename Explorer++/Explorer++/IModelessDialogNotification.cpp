@@ -7,11 +7,8 @@
 #include "MainResource.h"
 #include "ModelessDialogs.h"
 
-
-ModelessDialogNotification::ModelessDialogNotification() :
-m_RefCount(1)
+ModelessDialogNotification::ModelessDialogNotification() : m_RefCount(1)
 {
-
 }
 
 ULONG ModelessDialogNotification::AddRef()
@@ -22,8 +19,8 @@ ULONG ModelessDialogNotification::AddRef()
 ULONG ModelessDialogNotification::Release()
 {
 	m_RefCount--;
-	
-	if(m_RefCount == 0)
+
+	if (m_RefCount == 0)
 	{
 		delete this;
 		return 0;
@@ -34,7 +31,7 @@ ULONG ModelessDialogNotification::Release()
 
 void ModelessDialogNotification::OnModelessDialogDestroy(int iResource)
 {
-	switch(iResource)
+	switch (iResource)
 	{
 	case IDD_SEARCH:
 		g_hwndSearch = nullptr;

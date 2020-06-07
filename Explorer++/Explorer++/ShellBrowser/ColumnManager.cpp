@@ -9,30 +9,26 @@
 #include "Config.h"
 #include "ItemData.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "SortModes.h"
 #include "ViewModes.h"
 #include "../Helper/Macros.h"
 #include <cassert>
 #include <list>
 
-void ShellBrowser::QueueColumnTask(int itemInternalIndex, int columnIndex)
+void ShellBrowser::QueueColumnTask(int itemInternalIndex, ColumnType columnType)
 {
-	auto columnID = GetColumnIdByIndex(columnIndex);
-
-	if (!columnID)
-	{
-		return;
-	}
-
 	int columnResultID = m_columnResultIDCounter++;
 
 	BasicItemInfo_t basicItemInfo = getBasicItemInfo(itemInternalIndex);
 	GlobalFolderSettings globalFolderSettings = m_config->globalFolderSettings;
 
-	auto result = m_columnThreadPool.push([this, columnResultID, columnID, itemInternalIndex, basicItemInfo, globalFolderSettings](int id) {
+	auto result = m_columnThreadPool.push([this, columnResultID, columnType, itemInternalIndex,
+											  basicItemInfo, globalFolderSettings](int id) {
 		UNREFERENCED_PARAMETER(id);
 
-		return GetColumnTextAsync(m_hListView, columnResultID, *columnID, itemInternalIndex, basicItemInfo, globalFolderSettings);
+		return GetColumnTextAsync(m_hListView, columnResultID, columnType, itemInternalIndex,
+			basicItemInfo, globalFolderSettings);
 	});
 
 	// The function call above might finish before this line runs,
@@ -42,10 +38,11 @@ void ShellBrowser::QueueColumnTask(int itemInternalIndex, int columnIndex)
 	m_columnResults.insert({ columnResultID, std::move(result) });
 }
 
-ShellBrowser::ColumnResult_t ShellBrowser::GetColumnTextAsync(HWND listView, int columnResultId, unsigned int columnID,
-	int internalIndex, const BasicItemInfo_t &basicItemInfo, const GlobalFolderSettings &globalFolderSettings)
+ShellBrowser::ColumnResult_t ShellBrowser::GetColumnTextAsync(HWND listView, int columnResultId,
+	ColumnType columnType, int internalIndex, const BasicItemInfo_t &basicItemInfo,
+	const GlobalFolderSettings &globalFolderSettings)
 {
-	std::wstring columnText = GetColumnText(columnID, basicItemInfo, globalFolderSettings);
+	std::wstring columnText = GetColumnText(columnType, basicItemInfo, globalFolderSettings);
 
 	// This message may be delivered before this function has returned.
 	// That doesn't actually matter, since the message handler will
@@ -54,7 +51,7 @@ ShellBrowser::ColumnResult_t ShellBrowser::GetColumnTextAsync(HWND listView, int
 
 	ColumnResult_t result;
 	result.itemInternalIndex = internalIndex;
-	result.columnID = columnID;
+	result.columnType = columnType;
 	result.columnText = columnText;
 
 	return result;
@@ -85,7 +82,7 @@ void ShellBrowser::ProcessColumnResult(int columnResultId)
 		return;
 	}
 
-	auto columnIndex = GetColumnIndexById(result.columnID);
+	auto columnIndex = GetColumnIndexByType(result.columnType);
 
 	if (!columnIndex)
 	{
@@ -100,7 +97,7 @@ void ShellBrowser::ProcessColumnResult(int columnResultId)
 	m_columnResults.erase(itr);
 }
 
-std::optional<int> ShellBrowser::GetColumnIndexById(unsigned int id) const
+std::optional<int> ShellBrowser::GetColumnIndexByType(ColumnType columnType) const
 {
 	HWND header = ListView_GetHeader(m_hListView);
 
@@ -117,7 +114,7 @@ std::optional<int> ShellBrowser::GetColumnIndexById(unsigned int id) const
 			continue;
 		}
 
-		if (static_cast<unsigned int>(hdItem.lParam) == id)
+		if (static_cast<ColumnType>(hdItem.lParam) == columnType)
 		{
 			return i;
 		}
@@ -126,7 +123,7 @@ std::optional<int> ShellBrowser::GetColumnIndexById(unsigned int id) const
 	return std::nullopt;
 }
 
-std::optional<unsigned int> ShellBrowser::GetColumnIdByIndex(int index) const
+std::optional<ColumnType> ShellBrowser::GetColumnTypeByIndex(int index) const
 {
 	HWND hHeader = ListView_GetHeader(m_hListView);
 
@@ -139,105 +136,95 @@ std::optional<unsigned int> ShellBrowser::GetColumnIdByIndex(int index) const
 		return std::nullopt;
 	}
 
-	return static_cast<unsigned int>(hdItem.lParam);
+	return static_cast<ColumnType>(hdItem.lParam);
 }
 
-void ShellBrowser::PlaceColumns()
+void ShellBrowser::SetUpListViewColumns()
 {
-	int							iColumnIndex = 0;
-	int							i = 0;
-
 	m_nActiveColumns = 0;
 
-	if(m_pActiveColumns != nullptr)
+	int currentIndex = 0;
+
+	for (const Column_t &column : *m_pActiveColumns)
 	{
-		for(auto itr = m_pActiveColumns->begin();itr != m_pActiveColumns->end();itr++)
+		if (!column.bChecked)
 		{
-			if(itr->bChecked)
-			{
-				InsertColumn(itr->id,iColumnIndex,itr->iWidth);
-
-				/* Do NOT set column widths here. For some reason, this causes list mode to
-				break. (If this code is active, and the listview starts of in details mode
-				and is then switched to list mode, no items will be shown; they appear to
-				be placed off the left edge of the listview). */
-				//ListView_SetColumnWidth(m_hListView,iColumnIndex,LVSCW_AUTOSIZE_USEHEADER);
-
-				iColumnIndex++;
-				m_nActiveColumns++;
-			}
+			continue;
 		}
 
-		for(i = m_nCurrentColumns + m_nActiveColumns;i >= m_nActiveColumns;i--)
-		{
-			ListView_DeleteColumn(m_hListView,i);
-		}
+		InsertColumn(column.type, currentIndex, column.iWidth);
 
-		m_nCurrentColumns = m_nActiveColumns;
+		/* Do NOT set column widths here. For some reason, this causes list mode to
+		break. (If this code is active, and the listview starts of in details mode
+		and is then switched to list mode, no items will be shown; they appear to
+		be placed off the left edge of the listview). */
+		// ListView_SetColumnWidth(m_hListView,iColumnIndex,LVSCW_AUTOSIZE_USEHEADER);
+
+		currentIndex++;
+		m_nActiveColumns++;
 	}
+
+	for (int i = m_nCurrentColumns + m_nActiveColumns; i >= m_nActiveColumns; i--)
+	{
+		ListView_DeleteColumn(m_hListView, i);
+	}
+
+	m_nCurrentColumns = m_nActiveColumns;
 }
 
-void ShellBrowser::InsertColumn(unsigned int columnId,int iColumnIndex,int iWidth)
+void ShellBrowser::InsertColumn(ColumnType columnType, int columnIndex, int width)
 {
-	HWND		hHeader;
-	HDITEM		hdItem;
-	LV_COLUMN	lvColumn;
-	TCHAR		szText[64];
-	int			iActualColumnIndex;
-	int			iStringIndex;
+	std::wstring columnText =
+		ResourceHelper::LoadString(m_hResourceModule, LookupColumnNameStringIndex(columnType));
 
-	iStringIndex = LookupColumnNameStringIndex(columnId);
+	LV_COLUMN lvColumn;
+	lvColumn.mask = LVCF_TEXT | LVCF_WIDTH;
+	lvColumn.pszText = columnText.data();
+	lvColumn.cx = width;
 
-	LoadString(m_hResourceModule,iStringIndex,
-		szText,SIZEOF_ARRAY(szText));
-
-	lvColumn.mask		= LVCF_TEXT|LVCF_WIDTH;
-	lvColumn.pszText	= szText;
-	lvColumn.cx			= iWidth;
-
-	if(columnId == CM_SIZE || columnId == CM_REALSIZE || 
-		columnId == CM_TOTALSIZE || columnId == CM_FREESPACE)
+	if (columnType == ColumnType::Size || columnType == ColumnType::RealSize
+		|| columnType == ColumnType::TotalSize || columnType == ColumnType::FreeSpace)
 	{
-		lvColumn.mask	|= LVCF_FMT;
-		lvColumn.fmt	= LVCFMT_RIGHT;
+		lvColumn.mask |= LVCF_FMT;
+		lvColumn.fmt = LVCFMT_RIGHT;
 	}
 
-	iActualColumnIndex = ListView_InsertColumn(m_hListView,iColumnIndex,&lvColumn);
+	int actualColumnIndex = ListView_InsertColumn(m_hListView, columnIndex, &lvColumn);
 
-	hHeader = ListView_GetHeader(m_hListView);
+	HWND header = ListView_GetHeader(m_hListView);
 
-	/* Store the column's ID with the column itself. */
-	hdItem.mask		= HDI_LPARAM;
-	hdItem.lParam	= columnId;
-
-	Header_SetItem(hHeader,iActualColumnIndex,&hdItem);
+	// Store the column's ID with the column itself.
+	HDITEM hdItem;
+	hdItem.mask = HDI_LPARAM;
+	hdItem.lParam = static_cast<LPARAM>(columnType);
+	Header_SetItem(header, actualColumnIndex, &hdItem);
 }
 
 void ShellBrowser::SetActiveColumnSet()
 {
 	std::vector<Column_t> *pActiveColumns = nullptr;
 
-	if(CompareVirtualFolders(CSIDL_CONTROLS))
+	if (CompareVirtualFolders(CSIDL_CONTROLS))
 	{
 		pActiveColumns = &m_folderColumns.controlPanelColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_DRIVES))
+	else if (CompareVirtualFolders(CSIDL_DRIVES))
 	{
 		pActiveColumns = &m_folderColumns.myComputerColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_BITBUCKET))
+	else if (CompareVirtualFolders(CSIDL_BITBUCKET))
 	{
 		pActiveColumns = &m_folderColumns.recycleBinColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_PRINTERS))
+	else if (CompareVirtualFolders(CSIDL_PRINTERS))
 	{
 		pActiveColumns = &m_folderColumns.printersColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_CONNECTIONS))
+	else if (CompareVirtualFolders(CSIDL_CONNECTIONS))
 	{
 		pActiveColumns = &m_folderColumns.networkConnectionsColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_NETWORK))
+	else if (CompareVirtualFolders(CSIDL_NETWORK))
 	{
 		pActiveColumns = &m_folderColumns.myNetworkPlacesColumns;
 	}
@@ -251,402 +238,402 @@ void ShellBrowser::SetActiveColumnSet()
 	current folder and previous folder are of a
 	different 'type'), set the new columns, and
 	place them (else do nothing). */
-	if(m_pActiveColumns != pActiveColumns)
+	if (m_pActiveColumns != pActiveColumns)
 	{
 		m_pActiveColumns = pActiveColumns;
-		m_bColumnsPlaced = FALSE;
+		m_listViewColumnsSetUp = false;
 	}
 }
 
-SortMode ShellBrowser::DetermineColumnSortMode(int iColumnId)
+SortMode ShellBrowser::DetermineColumnSortMode(ColumnType columnType)
 {
-	switch(iColumnId)
+	switch (columnType)
 	{
-		case CM_NAME:
-			return SortMode::Name;
+	case ColumnType::Name:
+		return SortMode::Name;
 
-		case CM_TYPE:
-			return SortMode::Type;
+	case ColumnType::Type:
+		return SortMode::Type;
 
-		case CM_SIZE:
-			return SortMode::Size;
+	case ColumnType::Size:
+		return SortMode::Size;
 
-		case CM_DATEMODIFIED:
-			return SortMode::DateModified;
+	case ColumnType::DateModified:
+		return SortMode::DateModified;
 
-		case CM_ATTRIBUTES:
-			return SortMode::Attributes;
+	case ColumnType::Attributes:
+		return SortMode::Attributes;
 
-		case CM_REALSIZE:
-			return SortMode::RealSize;
+	case ColumnType::RealSize:
+		return SortMode::RealSize;
 
-		case CM_SHORTNAME:
-			return SortMode::ShortName;
+	case ColumnType::ShortName:
+		return SortMode::ShortName;
 
-		case CM_OWNER:
-			return SortMode::Owner;
+	case ColumnType::Owner:
+		return SortMode::Owner;
 
-		case CM_PRODUCTNAME:
-			return SortMode::ProductName;
+	case ColumnType::ProductName:
+		return SortMode::ProductName;
 
-		case CM_COMPANY:
-			return SortMode::Company;
+	case ColumnType::Company:
+		return SortMode::Company;
 
-		case CM_DESCRIPTION:
-			return SortMode::Description;
+	case ColumnType::Description:
+		return SortMode::Description;
 
-		case CM_FILEVERSION:
-			return SortMode::FileVersion;
+	case ColumnType::FileVersion:
+		return SortMode::FileVersion;
 
-		case CM_PRODUCTVERSION:
-			return SortMode::ProductVersion;
+	case ColumnType::ProductVersion:
+		return SortMode::ProductVersion;
 
-		case CM_SHORTCUTTO:
-			return SortMode::ShortcutTo;
+	case ColumnType::ShortcutTo:
+		return SortMode::ShortcutTo;
 
-		case CM_HARDLINKS:
-			return SortMode::HardLinks;
+	case ColumnType::HardLinks:
+		return SortMode::HardLinks;
 
-		case CM_EXTENSION:
-			return SortMode::Extension;
+	case ColumnType::Extension:
+		return SortMode::Extension;
 
-		case CM_CREATED:
-			return SortMode::Created;
+	case ColumnType::Created:
+		return SortMode::Created;
 
-		case CM_ACCESSED:
-			return SortMode::Accessed;
+	case ColumnType::Accessed:
+		return SortMode::Accessed;
 
-		case CM_TITLE:
-			return SortMode::Title;
+	case ColumnType::Title:
+		return SortMode::Title;
 
-		case CM_SUBJECT:
-			return SortMode::Subject;
+	case ColumnType::Subject:
+		return SortMode::Subject;
 
-		case CM_AUTHORS:
-			return SortMode::Authors;
+	case ColumnType::Authors:
+		return SortMode::Authors;
 
-		case CM_KEYWORDS:
-			return SortMode::Keywords;
+	case ColumnType::Keywords:
+		return SortMode::Keywords;
 
-		case CM_COMMENT:
-			return SortMode::Comments;
+	case ColumnType::Comment:
+		return SortMode::Comments;
 
-		case CM_CAMERAMODEL:
-			return SortMode::CameraModel;
+	case ColumnType::CameraModel:
+		return SortMode::CameraModel;
 
-		case CM_DATETAKEN:
-			return SortMode::DateTaken;
+	case ColumnType::DateTaken:
+		return SortMode::DateTaken;
 
-		case CM_WIDTH:
-			return SortMode::Width;
+	case ColumnType::Width:
+		return SortMode::Width;
 
-		case CM_HEIGHT:
-			return SortMode::Height;
+	case ColumnType::Height:
+		return SortMode::Height;
 
-		case CM_VIRTUALCOMMENTS:
-			return SortMode::VirtualComments;
+	case ColumnType::VirtualComments:
+		return SortMode::VirtualComments;
 
-		case CM_TOTALSIZE:
-			return SortMode::TotalSize;
+	case ColumnType::TotalSize:
+		return SortMode::TotalSize;
 
-		case CM_FREESPACE:
-			return SortMode::FreeSpace;
+	case ColumnType::FreeSpace:
+		return SortMode::FreeSpace;
 
-		case CM_FILESYSTEM:
-			return SortMode::FileSystem;
+	case ColumnType::FileSystem:
+		return SortMode::FileSystem;
 
-		case CM_ORIGINALLOCATION:
-			return SortMode::OriginalLocation;
+	case ColumnType::OriginalLocation:
+		return SortMode::OriginalLocation;
 
-		case CM_DATEDELETED:
-			return SortMode::DateDeleted;
+	case ColumnType::DateDeleted:
+		return SortMode::DateDeleted;
 
-		case CM_NUMPRINTERDOCUMENTS:
-			return SortMode::NumPrinterDocuments;
+	case ColumnType::PrinterNumDocuments:
+		return SortMode::NumPrinterDocuments;
 
-		case CM_PRINTERSTATUS:
-			return SortMode::PrinterStatus;
+	case ColumnType::PrinterStatus:
+		return SortMode::PrinterStatus;
 
-		case CM_PRINTERCOMMENTS:
-			return SortMode::PrinterComments;
+	case ColumnType::PrinterComments:
+		return SortMode::PrinterComments;
 
-		case CM_PRINTERLOCATION:
-			return SortMode::PrinterLocation;
+	case ColumnType::PrinterLocation:
+		return SortMode::PrinterLocation;
 
-		case CM_NETWORKADAPTER_STATUS:
-			return SortMode::NetworkAdapterStatus;
+	case ColumnType::NetworkAdaptorStatus:
+		return SortMode::NetworkAdapterStatus;
 
-		case CM_MEDIA_BITRATE:
-			return SortMode::MediaBitrate;
+	case ColumnType::MediaBitrate:
+		return SortMode::MediaBitrate;
 
-		case CM_MEDIA_COPYRIGHT:
-			return SortMode::MediaCopyright;
+	case ColumnType::MediaCopyright:
+		return SortMode::MediaCopyright;
 
-		case CM_MEDIA_DURATION:
-			return SortMode::MediaDuration;
+	case ColumnType::MediaDuration:
+		return SortMode::MediaDuration;
 
-		case CM_MEDIA_PROTECTED:
-			return SortMode::MediaProtected;
+	case ColumnType::MediaProtected:
+		return SortMode::MediaProtected;
 
-		case CM_MEDIA_RATING:
-			return SortMode::MediaRating;
+	case ColumnType::MediaRating:
+		return SortMode::MediaRating;
 
-		case CM_MEDIA_ALBUMARTIST:
-			return SortMode::MediaAlbumArtist;
+	case ColumnType::MediaAlbumArtist:
+		return SortMode::MediaAlbumArtist;
 
-		case CM_MEDIA_ALBUM:
-			return SortMode::MediaAlbum;
+	case ColumnType::MediaAlbum:
+		return SortMode::MediaAlbum;
 
-		case CM_MEDIA_BEATSPERMINUTE:
-			return SortMode::MediaBeatsPerMinute;
+	case ColumnType::MediaBeatsPerMinute:
+		return SortMode::MediaBeatsPerMinute;
 
-		case CM_MEDIA_COMPOSER:
-			return SortMode::MediaComposer;
+	case ColumnType::MediaComposer:
+		return SortMode::MediaComposer;
 
-		case CM_MEDIA_CONDUCTOR:
-			return SortMode::MediaConductor;
+	case ColumnType::MediaConductor:
+		return SortMode::MediaConductor;
 
-		case CM_MEDIA_DIRECTOR:
-			return SortMode::MediaDirector;
+	case ColumnType::MediaDirector:
+		return SortMode::MediaDirector;
 
-		case CM_MEDIA_GENRE:
-			return SortMode::MediaGenre;
+	case ColumnType::MediaGenre:
+		return SortMode::MediaGenre;
 
-		case CM_MEDIA_LANGUAGE:
-			return SortMode::MediaLanguage;
+	case ColumnType::MediaLanguage:
+		return SortMode::MediaLanguage;
 
-		case CM_MEDIA_BROADCASTDATE:
-			return SortMode::MediaBroadcastDate;
+	case ColumnType::MediaBroadcastDate:
+		return SortMode::MediaBroadcastDate;
 
-		case CM_MEDIA_CHANNEL:
-			return SortMode::MediaChannel;
+	case ColumnType::MediaChannel:
+		return SortMode::MediaChannel;
 
-		case CM_MEDIA_STATIONNAME:
-			return SortMode::MediaStationName;
+	case ColumnType::MediaStationName:
+		return SortMode::MediaStationName;
 
-		case CM_MEDIA_MOOD:
-			return SortMode::MediaMood;
+	case ColumnType::MediaMood:
+		return SortMode::MediaMood;
 
-		case CM_MEDIA_PARENTALRATING:
-			return SortMode::MediaParentalRating;
+	case ColumnType::MediaParentalRating:
+		return SortMode::MediaParentalRating;
 
-		case CM_MEDIA_PARENTALRATINGREASON:
-			return SortMode::MediaParentalRatingReason;
+	case ColumnType::MediaParentalRatingReason:
+		return SortMode::MediaParentalRatingReason;
 
-		case CM_MEDIA_PERIOD:
-			return SortMode::MediaPeriod;
+	case ColumnType::MediaPeriod:
+		return SortMode::MediaPeriod;
 
-		case CM_MEDIA_PRODUCER:
-			return SortMode::MediaProducer;
+	case ColumnType::MediaProducer:
+		return SortMode::MediaProducer;
 
-		case CM_MEDIA_PUBLISHER:
-			return SortMode::MediaPublisher;
+	case ColumnType::MediaPublisher:
+		return SortMode::MediaPublisher;
 
-		case CM_MEDIA_WRITER:
-			return SortMode::MediaWriter;
+	case ColumnType::MediaWriter:
+		return SortMode::MediaWriter;
 
-		case CM_MEDIA_YEAR:
-			return SortMode::MediaYear;
+	case ColumnType::MediaYear:
+		return SortMode::MediaYear;
 
-		default:
-			assert(false);
-			break;
+	default:
+		assert(false);
+		break;
 	}
 
 	return SortMode::Name;
 }
 
-int ShellBrowser::LookupColumnNameStringIndex(int iColumnId)
+int ShellBrowser::LookupColumnNameStringIndex(ColumnType columnType)
 {
-	switch (iColumnId)
+	switch (columnType)
 	{
-	case CM_NAME:
+	case ColumnType::Name:
 		return IDS_COLUMN_NAME_NAME;
 
-	case CM_TYPE:
+	case ColumnType::Type:
 		return IDS_COLUMN_NAME_TYPE;
 
-	case CM_SIZE:
+	case ColumnType::Size:
 		return IDS_COLUMN_NAME_SIZE;
 
-	case CM_DATEMODIFIED:
+	case ColumnType::DateModified:
 		return IDS_COLUMN_NAME_DATEMODIFIED;
 
-	case CM_ATTRIBUTES:
+	case ColumnType::Attributes:
 		return IDS_COLUMN_NAME_ATTRIBUTES;
 
-	case CM_REALSIZE:
+	case ColumnType::RealSize:
 		return IDS_COLUMN_NAME_REALSIZE;
 
-	case CM_SHORTNAME:
+	case ColumnType::ShortName:
 		return IDS_COLUMN_NAME_SHORTNAME;
 
-	case CM_OWNER:
+	case ColumnType::Owner:
 		return IDS_COLUMN_NAME_OWNER;
 
-	case CM_PRODUCTNAME:
+	case ColumnType::ProductName:
 		return IDS_COLUMN_NAME_PRODUCTNAME;
 
-	case CM_COMPANY:
+	case ColumnType::Company:
 		return IDS_COLUMN_NAME_COMPANY;
 
-	case CM_DESCRIPTION:
+	case ColumnType::Description:
 		return IDS_COLUMN_NAME_DESCRIPTION;
 
-	case CM_FILEVERSION:
+	case ColumnType::FileVersion:
 		return IDS_COLUMN_NAME_FILEVERSION;
 
-	case CM_PRODUCTVERSION:
+	case ColumnType::ProductVersion:
 		return IDS_COLUMN_NAME_PRODUCTVERSION;
 
-	case CM_SHORTCUTTO:
+	case ColumnType::ShortcutTo:
 		return IDS_COLUMN_NAME_SHORTCUTTO;
 
-	case CM_HARDLINKS:
+	case ColumnType::HardLinks:
 		return IDS_COLUMN_NAME_HARDLINKS;
 
-	case CM_EXTENSION:
+	case ColumnType::Extension:
 		return IDS_COLUMN_NAME_EXTENSION;
 
-	case CM_CREATED:
+	case ColumnType::Created:
 		return IDS_COLUMN_NAME_CREATED;
 
-	case CM_ACCESSED:
+	case ColumnType::Accessed:
 		return IDS_COLUMN_NAME_ACCESSED;
 
-	case CM_TITLE:
+	case ColumnType::Title:
 		return IDS_COLUMN_NAME_TITLE;
 
-	case CM_SUBJECT:
+	case ColumnType::Subject:
 		return IDS_COLUMN_NAME_SUBJECT;
 
-	case CM_AUTHORS:
+	case ColumnType::Authors:
 		return IDS_COLUMN_NAME_AUTHORS;
 
-	case CM_KEYWORDS:
+	case ColumnType::Keywords:
 		return IDS_COLUMN_NAME_KEYWORDS;
 
-	case CM_COMMENT:
+	case ColumnType::Comment:
 		return IDS_COLUMN_NAME_COMMENT;
 
-	case CM_CAMERAMODEL:
+	case ColumnType::CameraModel:
 		return IDS_COLUMN_NAME_CAMERAMODEL;
 
-	case CM_DATETAKEN:
+	case ColumnType::DateTaken:
 		return IDS_COLUMN_NAME_DATETAKEN;
 
-	case CM_WIDTH:
+	case ColumnType::Width:
 		return IDS_COLUMN_NAME_WIDTH;
 
-	case CM_HEIGHT:
+	case ColumnType::Height:
 		return IDS_COLUMN_NAME_HEIGHT;
 
-	case CM_VIRTUALCOMMENTS:
+	case ColumnType::VirtualComments:
 		return IDS_COLUMN_NAME_VIRTUALCOMMENTS;
 
-	case CM_TOTALSIZE:
+	case ColumnType::TotalSize:
 		return IDS_COLUMN_NAME_TOTALSIZE;
 
-	case CM_FREESPACE:
+	case ColumnType::FreeSpace:
 		return IDS_COLUMN_NAME_FREESPACE;
 
-	case CM_FILESYSTEM:
+	case ColumnType::FileSystem:
 		return IDS_COLUMN_NAME_FILESYSTEM;
 
-	case CM_ORIGINALLOCATION:
+	case ColumnType::OriginalLocation:
 		return IDS_COLUMN_NAME_ORIGINALLOCATION;
 
-	case CM_DATEDELETED:
+	case ColumnType::DateDeleted:
 		return IDS_COLUMN_NAME_DATEDELETED;
 
-	case CM_NUMPRINTERDOCUMENTS:
+	case ColumnType::PrinterNumDocuments:
 		return IDS_COLUMN_NAME_NUMPRINTERDOCUMENTS;
 
-	case CM_PRINTERSTATUS:
+	case ColumnType::PrinterStatus:
 		return IDS_COLUMN_NAME_PRINTERSTATUS;
 
-	case CM_PRINTERCOMMENTS:
+	case ColumnType::PrinterComments:
 		return IDS_COLUMN_NAME_PRINTERCOMMENTS;
 
-	case CM_PRINTERLOCATION:
+	case ColumnType::PrinterLocation:
 		return IDS_COLUMN_NAME_PRINTERLOCATION;
 
-	case CM_PRINTERMODEL:
+	case ColumnType::PrinterModel:
 		return IDS_COLUMN_NAME_PRINTERMODEL;
 
-	case CM_NETWORKADAPTER_STATUS:
+	case ColumnType::NetworkAdaptorStatus:
 		return IDS_COLUMN_NAME_NETWORKADAPTER_STATUS;
 
-	case CM_MEDIA_BITRATE:
+	case ColumnType::MediaBitrate:
 		return IDS_COLUMN_NAME_BITRATE;
 
-	case CM_MEDIA_COPYRIGHT:
+	case ColumnType::MediaCopyright:
 		return IDS_COLUMN_NAME_COPYRIGHT;
 
-	case CM_MEDIA_DURATION:
+	case ColumnType::MediaDuration:
 		return IDS_COLUMN_NAME_DURATION;
 
-	case CM_MEDIA_PROTECTED:
+	case ColumnType::MediaProtected:
 		return IDS_COLUMN_NAME_PROTECTED;
 
-	case CM_MEDIA_RATING:
+	case ColumnType::MediaRating:
 		return IDS_COLUMN_NAME_RATING;
 
-	case CM_MEDIA_ALBUMARTIST:
+	case ColumnType::MediaAlbumArtist:
 		return IDS_COLUMN_NAME_ALBUMARTIST;
 
-	case CM_MEDIA_ALBUM:
+	case ColumnType::MediaAlbum:
 		return IDS_COLUMN_NAME_ALBUM;
 
-	case CM_MEDIA_BEATSPERMINUTE:
+	case ColumnType::MediaBeatsPerMinute:
 		return IDS_COLUMN_NAME_BEATSPERMINUTE;
 
-	case CM_MEDIA_COMPOSER:
+	case ColumnType::MediaComposer:
 		return IDS_COLUMN_NAME_COMPOSER;
 
-	case CM_MEDIA_CONDUCTOR:
+	case ColumnType::MediaConductor:
 		return IDS_COLUMN_NAME_CONDUCTOR;
 
-	case CM_MEDIA_DIRECTOR:
+	case ColumnType::MediaDirector:
 		return IDS_COLUMN_NAME_DIRECTOR;
 
-	case CM_MEDIA_GENRE:
+	case ColumnType::MediaGenre:
 		return IDS_COLUMN_NAME_GENRE;
 
-	case CM_MEDIA_LANGUAGE:
+	case ColumnType::MediaLanguage:
 		return IDS_COLUMN_NAME_LANGUAGE;
 
-	case CM_MEDIA_BROADCASTDATE:
+	case ColumnType::MediaBroadcastDate:
 		return IDS_COLUMN_NAME_BROADCASTDATE;
 
-	case CM_MEDIA_CHANNEL:
+	case ColumnType::MediaChannel:
 		return IDS_COLUMN_NAME_CHANNEL;
 
-	case CM_MEDIA_STATIONNAME:
+	case ColumnType::MediaStationName:
 		return IDS_COLUMN_NAME_STATIONNAME;
 
-	case CM_MEDIA_MOOD:
+	case ColumnType::MediaMood:
 		return IDS_COLUMN_NAME_MOOD;
 
-	case CM_MEDIA_PARENTALRATING:
+	case ColumnType::MediaParentalRating:
 		return IDS_COLUMN_NAME_PARENTALRATING;
 
-	case CM_MEDIA_PARENTALRATINGREASON:
+	case ColumnType::MediaParentalRatingReason:
 		return IDS_COLUMN_NAME_PARENTALRATINGREASON;
 
-	case CM_MEDIA_PERIOD:
+	case ColumnType::MediaPeriod:
 		return IDS_COLUMN_NAME_PERIOD;
 
-	case CM_MEDIA_PRODUCER:
+	case ColumnType::MediaProducer:
 		return IDS_COLUMN_NAME_PRODUCER;
 
-	case CM_MEDIA_PUBLISHER:
+	case ColumnType::MediaPublisher:
 		return IDS_COLUMN_NAME_PUBLISHER;
 
-	case CM_MEDIA_WRITER:
+	case ColumnType::MediaWriter:
 		return IDS_COLUMN_NAME_WRITER;
 
-	case CM_MEDIA_YEAR:
+	case ColumnType::MediaYear:
 		return IDS_COLUMN_NAME_YEAR;
 
 	default:
@@ -657,116 +644,116 @@ int ShellBrowser::LookupColumnNameStringIndex(int iColumnId)
 	return 0;
 }
 
-int ShellBrowser::LookupColumnDescriptionStringIndex(int iColumnId)
+int ShellBrowser::LookupColumnDescriptionStringIndex(ColumnType columnType)
 {
-	switch (iColumnId)
+	switch (columnType)
 	{
-	case CM_NAME:
+	case ColumnType::Name:
 		return IDS_COLUMN_DESCRIPTION_NAME;
 
-	case CM_TYPE:
+	case ColumnType::Type:
 		return IDS_COLUMN_DESCRIPTION_TYPE;
 
-	case CM_SIZE:
+	case ColumnType::Size:
 		return IDS_COLUMN_DESCRIPTION_SIZE;
 
-	case CM_DATEMODIFIED:
+	case ColumnType::DateModified:
 		return IDS_COLUMN_DESCRIPTION_MODIFIED;
 
-	case CM_ATTRIBUTES:
+	case ColumnType::Attributes:
 		return IDS_COLUMN_DESCRIPTION_ATTRIBUTES;
 
-	case CM_REALSIZE:
+	case ColumnType::RealSize:
 		return IDS_COLUMN_DESCRIPTION_REALSIZE;
 
-	case CM_SHORTNAME:
+	case ColumnType::ShortName:
 		return IDS_COLUMN_DESCRIPTION_SHORTNAME;
 
-	case CM_OWNER:
+	case ColumnType::Owner:
 		return IDS_COLUMN_DESCRIPTION_OWNER;
 
-	case CM_PRODUCTNAME:
+	case ColumnType::ProductName:
 		return IDS_COLUMN_DESCRIPTION_PRODUCTNAME;
 
-	case CM_COMPANY:
+	case ColumnType::Company:
 		return IDS_COLUMN_DESCRIPTION_COMPANY;
 
-	case CM_DESCRIPTION:
+	case ColumnType::Description:
 		return IDS_COLUMN_DESCRIPTION_DESCRIPTION;
 
-	case CM_FILEVERSION:
+	case ColumnType::FileVersion:
 		return IDS_COLUMN_DESCRIPTION_FILEVERSION;
 
-	case CM_PRODUCTVERSION:
+	case ColumnType::ProductVersion:
 		return IDS_COLUMN_DESCRIPTION_PRODUCTVERSION;
 
-	case CM_SHORTCUTTO:
+	case ColumnType::ShortcutTo:
 		return IDS_COLUMN_DESCRIPTION_SHORTCUTTO;
 
-	case CM_HARDLINKS:
+	case ColumnType::HardLinks:
 		return IDS_COLUMN_DESCRIPTION_HARDLINKS;
 
-	case CM_EXTENSION:
+	case ColumnType::Extension:
 		return IDS_COLUMN_DESCRIPTION_EXTENSION;
 
-	case CM_CREATED:
+	case ColumnType::Created:
 		return IDS_COLUMN_DESCRIPTION_CREATED;
 
-	case CM_ACCESSED:
+	case ColumnType::Accessed:
 		return IDS_COLUMN_DESCRIPTION_ACCESSED;
 
-	case CM_TITLE:
+	case ColumnType::Title:
 		return IDS_COLUMN_DESCRIPTION_TITLE;
 
-	case CM_SUBJECT:
+	case ColumnType::Subject:
 		return IDS_COLUMN_DESCRIPTION_SUBJECT;
 
-	case CM_AUTHORS:
+	case ColumnType::Authors:
 		return IDS_COLUMN_DESCRIPTION_AUTHORS;
 
-	case CM_KEYWORDS:
+	case ColumnType::Keywords:
 		return IDS_COLUMN_DESCRIPTION_KEYWORDS;
 
-	case CM_COMMENT:
+	case ColumnType::Comment:
 		return IDS_COLUMN_DESCRIPTION_COMMENT;
 
-	case CM_CAMERAMODEL:
+	case ColumnType::CameraModel:
 		return IDS_COLUMN_DESCRIPTION_CAMERAMODEL;
 
-	case CM_DATETAKEN:
+	case ColumnType::DateTaken:
 		return IDS_COLUMN_DESCRIPTION_DATETAKEN;
 
-	case CM_WIDTH:
+	case ColumnType::Width:
 		return IDS_COLUMN_DESCRIPTION_WIDTH;
 
-	case CM_HEIGHT:
+	case ColumnType::Height:
 		return IDS_COLUMN_DESCRIPTION_HEIGHT;
 
-	case CM_VIRTUALCOMMENTS:
+	case ColumnType::VirtualComments:
 		return IDS_COLUMN_DESCRIPTION_COMMENT;
 
-	case CM_TOTALSIZE:
+	case ColumnType::TotalSize:
 		return IDS_COLUMN_DESCRIPTION_TOTALSIZE;
 
-	case CM_FREESPACE:
+	case ColumnType::FreeSpace:
 		return IDS_COLUMN_DESCRIPTION_FREESPACE;
 
-	case CM_FILESYSTEM:
+	case ColumnType::FileSystem:
 		return IDS_COLUMN_DESCRIPTION_FILESYSTEM;
 
-	case CM_NUMPRINTERDOCUMENTS:
+	case ColumnType::PrinterNumDocuments:
 		return IDS_COLUMN_DESCRIPTION_NUMPRINTERDOCUMENTS;
 
-	case CM_PRINTERCOMMENTS:
+	case ColumnType::PrinterComments:
 		return IDS_COLUMN_DESCRIPTION_PRINTERCOMMENTS;
 
-	case CM_PRINTERLOCATION:
+	case ColumnType::PrinterLocation:
 		return IDS_COLUMN_DESCRIPTION_PRINTERLOCATION;
 
-	case CM_NETWORKADAPTER_STATUS:
+	case ColumnType::NetworkAdaptorStatus:
 		return IDS_COLUMN_DESCRIPTION_NETWORKADAPTER_STATUS;
 
-	case CM_MEDIA_BITRATE:
+	case ColumnType::MediaBitrate:
 		return IDS_COLUMN_DESCRIPTION_BITRATE;
 
 	default:
@@ -781,34 +768,31 @@ void ShellBrowser::ColumnClicked(int iClickedColumn)
 {
 	int iCurrentColumn = 0;
 	SortMode sortMode = SortMode::Name;
-	UINT iColumnId = 0;
+	ColumnType columnType;
 
-	for(auto itr = m_pActiveColumns->begin();itr != m_pActiveColumns->end();itr++)
+	for (auto itr = m_pActiveColumns->begin(); itr != m_pActiveColumns->end(); itr++)
 	{
 		/* Only increment if this column is actually been shown. */
-		if(itr->bChecked)
+		if (itr->bChecked)
 		{
-			if(iCurrentColumn == iClickedColumn)
+			if (iCurrentColumn == iClickedColumn)
 			{
-				sortMode = DetermineColumnSortMode(itr->id);
-				iColumnId = itr->id;
+				sortMode = DetermineColumnSortMode(itr->type);
+				columnType = itr->type;
+
+				if (m_previousSortColumn == columnType)
+				{
+					m_folderSettings.sortAscending = !m_folderSettings.sortAscending;
+				}
+
+				SortFolder(sortMode);
+
 				break;
 			}
 
 			iCurrentColumn++;
 		}
 	}
-
-	/* Same column was clicked. Toggle the
-	ascending/descending sort state. Use unique
-	column ID, not index, as columns may be
-	inserted/deleted. */
-	if(m_iPreviousSortedColumnId == iColumnId)
-	{
-		m_folderSettings.sortAscending = !m_folderSettings.sortAscending;
-	}
-
-	SortFolder(sortMode);
 }
 
 void ShellBrowser::ApplyHeaderSortArrow()
@@ -818,7 +802,6 @@ void ShellBrowser::ApplyHeaderSortArrow()
 	BOOL previousColumnFound = FALSE;
 	int iColumn = 0;
 	int iPreviousSortedColumn = 0;
-	int iColumnId = -1;
 
 	hHeader = ListView_GetHeader(m_hListView);
 
@@ -831,7 +814,7 @@ void ShellBrowser::ApplyHeaderSortArrow()
 			/* Only increment if this column is actually been shown. */
 			if (itr->bChecked)
 			{
-				if (m_iPreviousSortedColumnId == itr->id)
+				if (m_previousSortColumn == itr->type)
 				{
 					previousColumnFound = TRUE;
 					break;
@@ -862,13 +845,14 @@ void ShellBrowser::ApplyHeaderSortArrow()
 	}
 
 	/* Find the index of the column representing the current sort mode. */
-	for(auto itr = m_pActiveColumns->begin();itr != m_pActiveColumns->end();itr++)
+	for (auto itr = m_pActiveColumns->begin(); itr != m_pActiveColumns->end(); itr++)
 	{
-		if(itr->bChecked)
+		if (itr->bChecked)
 		{
-			if(DetermineColumnSortMode(itr->id) == m_folderSettings.sortMode)
+			if (DetermineColumnSortMode(itr->type) == m_folderSettings.sortMode)
 			{
-				iColumnId = itr->id;
+				m_previousSortColumn = itr->type;
+				m_PreviousSortColumnExists = true;
 				break;
 			}
 
@@ -877,19 +861,20 @@ void ShellBrowser::ApplyHeaderSortArrow()
 	}
 
 	hdItem.mask = HDI_FORMAT;
-	Header_GetItem(hHeader,iColumn,&hdItem);
+	Header_GetItem(hHeader, iColumn, &hdItem);
 
-	if(!m_folderSettings.sortAscending)
+	if (!m_folderSettings.sortAscending)
+	{
 		hdItem.fmt |= HDF_SORTDOWN;
+	}
 	else
+	{
 		hdItem.fmt |= HDF_SORTUP;
+	}
 
 	/* Add the up/down arrow to the column by which
 	items are now sorted. */
-	Header_SetItem(hHeader,iColumn,&hdItem);
-
-	m_iPreviousSortedColumnId = iColumnId;
-	m_PreviousSortColumnExists = true;
+	Header_SetItem(hHeader, iColumn, &hdItem);
 }
 
 size_t ShellBrowser::GetNumActiveColumns() const
@@ -914,27 +899,27 @@ void ShellBrowser::SaveColumnWidths()
 	std::vector<Column_t> *pActiveColumns = nullptr;
 	int iColumn = 0;
 
-	if(CompareVirtualFolders(CSIDL_CONTROLS))
+	if (CompareVirtualFolders(CSIDL_CONTROLS))
 	{
 		pActiveColumns = &m_folderColumns.controlPanelColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_DRIVES))
+	else if (CompareVirtualFolders(CSIDL_DRIVES))
 	{
 		pActiveColumns = &m_folderColumns.myComputerColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_BITBUCKET))
+	else if (CompareVirtualFolders(CSIDL_BITBUCKET))
 	{
 		pActiveColumns = &m_folderColumns.recycleBinColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_PRINTERS))
+	else if (CompareVirtualFolders(CSIDL_PRINTERS))
 	{
 		pActiveColumns = &m_folderColumns.printersColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_CONNECTIONS))
+	else if (CompareVirtualFolders(CSIDL_CONNECTIONS))
 	{
 		pActiveColumns = &m_folderColumns.networkConnectionsColumns;
 	}
-	else if(CompareVirtualFolders(CSIDL_NETWORK))
+	else if (CompareVirtualFolders(CSIDL_NETWORK))
 	{
 		pActiveColumns = &m_folderColumns.myNetworkPlacesColumns;
 	}
@@ -946,13 +931,13 @@ void ShellBrowser::SaveColumnWidths()
 	/* Only save column widths if the listview is currently in
 	details view. If it's not currently in details view, then
 	column widths have already been saved when the view changed. */
-	if(m_folderSettings.viewMode == +ViewMode::Details)
+	if (m_folderSettings.viewMode == +ViewMode::Details)
 	{
-		for(auto itr = pActiveColumns->begin();itr != pActiveColumns->end();itr++)
+		for (auto itr = pActiveColumns->begin(); itr != pActiveColumns->end(); itr++)
 		{
-			if(itr->bChecked)
+			if (itr->bChecked)
 			{
-				itr->iWidth = ListView_GetColumnWidth(m_hListView,iColumn);
+				itr->iWidth = ListView_GetColumnWidth(m_hListView, iColumn);
 
 				iColumn++;
 			}
@@ -975,7 +960,7 @@ std::vector<Column_t> ShellBrowser::ExportCurrentColumns()
 		}
 
 		Column_t column;
-		column.id = itr->id;
+		column.type = itr->type;
 		column.bChecked = itr->bChecked;
 		column.iWidth = itr->iWidth;
 		columns.push_back(column);
@@ -996,14 +981,14 @@ void ShellBrowser::ImportColumns(const std::vector<Column_t> &columns)
 		/* Check if this column represents the current sorting mode.
 		If it does, and it is been removed, set the sort mode back
 		to the first checked column. */
-		if (!itr->bChecked && DetermineColumnSortMode(itr->id) == m_folderSettings.sortMode)
+		if (!itr->bChecked && DetermineColumnSortMode(itr->type) == m_folderSettings.sortMode)
 		{
 			/* Find the first checked column. */
 			for (auto itr2 = columns.begin(); itr2 != columns.end(); itr2++)
 			{
 				if (itr2->bChecked)
 				{
-					m_folderSettings.sortMode = DetermineColumnSortMode(itr2->id);
+					m_folderSettings.sortMode = DetermineColumnSortMode(itr2->type);
 
 					bResortFolder = TRUE;
 					break;
@@ -1011,7 +996,7 @@ void ShellBrowser::ImportColumns(const std::vector<Column_t> &columns)
 			}
 		}
 
-		GetColumnInternal(itr->id, &ci);
+		GetColumnInternal(itr->type, &ci);
 
 		if (itr->bChecked)
 		{
@@ -1019,10 +1004,9 @@ void ShellBrowser::ImportColumns(const std::vector<Column_t> &columns)
 			{
 				for (auto itr2 = m_pActiveColumns->begin(); itr2 != m_pActiveColumns->end(); itr2++)
 				{
-					if (itr2->id == itr->id &&
-						!itr2->bChecked)
+					if (itr2->type == itr->type && !itr2->bChecked)
 					{
-						InsertColumn(itr->id, iColumn, itr->iWidth);
+						InsertColumn(itr->type, iColumn, itr->iWidth);
 
 						for (i = 0; i < m_nTotalItems; i++)
 						{
@@ -1034,7 +1018,7 @@ void ShellBrowser::ImportColumns(const std::vector<Column_t> &columns)
 
 							if (res)
 							{
-								QueueColumnTask(static_cast<int>(lvItem.lParam), itr->id);
+								QueueColumnTask(static_cast<int>(lvItem.lParam), itr->type);
 							}
 						}
 
@@ -1049,8 +1033,7 @@ void ShellBrowser::ImportColumns(const std::vector<Column_t> &columns)
 		{
 			for (auto itr2 = m_pActiveColumns->begin(); itr2 != m_pActiveColumns->end(); itr2++)
 			{
-				if (itr2->id == itr->id &&
-					itr2->bChecked)
+				if (itr2->type == itr->type && itr2->bChecked)
 
 				{
 					ListView_DeleteColumn(m_hListView, iColumn);
@@ -1070,19 +1053,32 @@ void ShellBrowser::ImportColumns(const std::vector<Column_t> &columns)
 		SortFolder(m_folderSettings.sortMode);
 	}
 
-	m_bColumnsPlaced = FALSE;
+	m_listViewColumnsSetUp = false;
 
 	columnsChanged.m_signal();
 }
 
-void ShellBrowser::GetColumnInternal(unsigned int id, Column_t *pci) const
+void ShellBrowser::GetColumnInternal(ColumnType columnType, Column_t *pci) const
 {
 	for (auto itr = m_pActiveColumns->begin(); itr != m_pActiveColumns->end(); itr++)
 	{
-		if (itr->id == id)
+		if (itr->type == columnType)
 		{
 			*pci = *itr;
 			return;
 		}
 	}
+}
+
+Column_t ShellBrowser::GetFirstCheckedColumn()
+{
+	auto itr = std::find_if(
+		m_pActiveColumns->begin(), m_pActiveColumns->end(), [](const Column_t &column) {
+			return column.bChecked;
+		});
+
+	// There should always be at least one checked column.
+	assert(itr != m_pActiveColumns->end());
+
+	return *itr;
 }

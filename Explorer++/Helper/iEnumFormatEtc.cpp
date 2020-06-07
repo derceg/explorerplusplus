@@ -119,8 +119,10 @@ HRESULT __stdcall EnumFormatEtc::Next(ULONG celt,FORMATETC *rgelt,ULONG *pceltFe
 
 	if(m_iIndex >= m_iNumFormats)
 	{
-		if(pceltFetched != NULL)
+		if (pceltFetched != NULL)
+		{
 			*pceltFetched = 0;
+		}
 
 		return S_FALSE;
 	}
@@ -137,8 +139,10 @@ HRESULT __stdcall EnumFormatEtc::Next(ULONG celt,FORMATETC *rgelt,ULONG *pceltFe
 			{
 				rgelt[0].ptd = reinterpret_cast<DVTARGETDEVICE *>(CoTaskMemAlloc(itr->ptd->tdSize));
 
-				if(rgelt[0].ptd == NULL)
+				if (rgelt[0].ptd == NULL)
+				{
 					return S_FALSE;
+				}
 
 				memcpy(rgelt[0].ptd, itr->ptd, itr->ptd->tdSize);
 			}
@@ -151,8 +155,10 @@ HRESULT __stdcall EnumFormatEtc::Next(ULONG celt,FORMATETC *rgelt,ULONG *pceltFe
 
 	m_iIndex++;
 
-	if(pceltFetched != NULL)
+	if (pceltFetched != NULL)
+	{
 		*pceltFetched = 1;
+	}
 
 	return S_OK;
 }

@@ -4,17 +4,19 @@
 
 #pragma once
 
-namespace NDefaultFileManager
+namespace DefaultFileManager
 {
-	enum ReplaceExplorerModes_t
-	{
-		REPLACEEXPLORER_NONE		= 1,
-		REPLACEEXPLORER_FILESYSTEM	= 2,
-		REPLACEEXPLORER_ALL			= 3
-	};
+enum class ReplaceExplorerMode
+{
+	None = 1,
+	FileSystem = 2,
+	All = 3
+};
 
-	BOOL	SetAsDefaultFileManagerFileSystem(const TCHAR *szInternalCommand, const TCHAR *szMenuText);
-	BOOL	SetAsDefaultFileManagerAll(const TCHAR *szInternalCommand, const TCHAR *szMenuText);
-	BOOL	RemoveAsDefaultFileManagerFileSystem(const TCHAR *szInternalCommand);
-	BOOL	RemoveAsDefaultFileManagerAll(const TCHAR *szInternalCommand);
+LSTATUS SetAsDefaultFileManagerFileSystem(
+	const std::wstring &applicationKeyName, const std::wstring &menuText);
+LSTATUS SetAsDefaultFileManagerAll(
+	const std::wstring &applicationKeyName, const std::wstring &menuText);
+LSTATUS RemoveAsDefaultFileManagerFileSystem(const std::wstring &applicationKeyName);
+LSTATUS RemoveAsDefaultFileManagerAll(const std::wstring &applicationKeyName);
 }

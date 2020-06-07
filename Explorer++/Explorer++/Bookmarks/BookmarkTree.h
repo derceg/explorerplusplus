@@ -24,7 +24,7 @@ public:
 	bool CanAddChildren(const BookmarkItem *bookmarkItem) const;
 	bool IsPermanentNode(const BookmarkItem *bookmarkItem) const;
 
-	void AddBookmarkItem(
+	BookmarkItem *AddBookmarkItem(
 		BookmarkItem *parent, std::unique_ptr<BookmarkItem> bookmarkItem, size_t index);
 	void MoveBookmarkItem(BookmarkItem *bookmarkItem, BookmarkItem *newParent, size_t index);
 	void RemoveBookmarkItem(BookmarkItem *bookmarkItem);

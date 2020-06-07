@@ -324,12 +324,18 @@ COLORREF NXMLSettings::ReadXMLColorData(IXMLDOMNode *pNode)
 		/* Element value. */
 		pChildNode->get_text(&bstrValue);
 
-		if(lstrcmp(bstrName,L"r") == 0)
-			r = (BYTE)NXMLSettings::DecodeIntValue(bstrValue);
-		else if(lstrcmp(bstrName,L"g") == 0)
-			g = (BYTE)NXMLSettings::DecodeIntValue(bstrValue);
-		else if(lstrcmp(bstrName,L"b") == 0)
-			b = (BYTE)NXMLSettings::DecodeIntValue(bstrValue);
+		if (lstrcmp(bstrName, L"r") == 0)
+		{
+			r = (BYTE) NXMLSettings::DecodeIntValue(bstrValue);
+		}
+		else if (lstrcmp(bstrName, L"g") == 0)
+		{
+			g = (BYTE) NXMLSettings::DecodeIntValue(bstrValue);
+		}
+		else if (lstrcmp(bstrName, L"b") == 0)
+		{
+			b = (BYTE) NXMLSettings::DecodeIntValue(bstrValue);
+		}
 	}
 
 	return RGB(r,g,b);
@@ -367,12 +373,18 @@ Gdiplus::Color NXMLSettings::ReadXMLColorData2(IXMLDOMNode *pNode)
 		/* Element value. */
 		pChildNode->get_text(&bstrValue);
 
-		if(lstrcmp(bstrName,L"r") == 0)
-			r = (BYTE)NXMLSettings::DecodeIntValue(bstrValue);
-		else if(lstrcmp(bstrName,L"g") == 0)
-			g = (BYTE)NXMLSettings::DecodeIntValue(bstrValue);
-		else if(lstrcmp(bstrName,L"b") == 0)
-			b = (BYTE)NXMLSettings::DecodeIntValue(bstrValue);
+		if (lstrcmp(bstrName, L"r") == 0)
+		{
+			r = (BYTE) NXMLSettings::DecodeIntValue(bstrValue);
+		}
+		else if (lstrcmp(bstrName, L"g") == 0)
+		{
+			g = (BYTE) NXMLSettings::DecodeIntValue(bstrValue);
+		}
+		else if (lstrcmp(bstrName, L"b") == 0)
+		{
+			b = (BYTE) NXMLSettings::DecodeIntValue(bstrValue);
+		}
 	}
 
 	color = Gdiplus::Color(r,g,b);
@@ -401,20 +413,34 @@ HFONT NXMLSettings::ReadXMLFontData(IXMLDOMNode *pNode)
 		pChildNode->get_nodeName(&bstrName);
 		pChildNode->get_text(&bstrValue);
 
-		if(lstrcmp(bstrName,L"Height") == 0)
+		if (lstrcmp(bstrName, L"Height") == 0)
+		{
 			fontInfo.lfHeight = NXMLSettings::DecodeIntValue(bstrValue);
-		else if(lstrcmp(bstrName,L"Width") == 0)
+		}
+		else if (lstrcmp(bstrName, L"Width") == 0)
+		{
 			fontInfo.lfWidth = NXMLSettings::DecodeIntValue(bstrValue);
-		else if(lstrcmp(bstrName,L"Weight") == 0)
+		}
+		else if (lstrcmp(bstrName, L"Weight") == 0)
+		{
 			fontInfo.lfWeight = NXMLSettings::DecodeIntValue(bstrValue);
-		else if(lstrcmp(bstrName,L"Italic") == 0)
-			fontInfo.lfItalic = (BYTE)NXMLSettings::DecodeBoolValue(bstrValue);
-		else if(lstrcmp(bstrName,L"Underline") == 0)
-			fontInfo.lfUnderline = (BYTE)NXMLSettings::DecodeBoolValue(bstrValue);
-		else if(lstrcmp(bstrName,L"Strikeout") == 0)
-			fontInfo.lfStrikeOut = (BYTE)NXMLSettings::DecodeBoolValue(bstrValue);
-		else if(lstrcmp(bstrName,L"Font") == 0)
-			StringCchCopy(fontInfo.lfFaceName,SIZEOF_ARRAY(fontInfo.lfFaceName),bstrValue);
+		}
+		else if (lstrcmp(bstrName, L"Italic") == 0)
+		{
+			fontInfo.lfItalic = (BYTE) NXMLSettings::DecodeBoolValue(bstrValue);
+		}
+		else if (lstrcmp(bstrName, L"Underline") == 0)
+		{
+			fontInfo.lfUnderline = (BYTE) NXMLSettings::DecodeBoolValue(bstrValue);
+		}
+		else if (lstrcmp(bstrName, L"Strikeout") == 0)
+		{
+			fontInfo.lfStrikeOut = (BYTE) NXMLSettings::DecodeBoolValue(bstrValue);
+		}
+		else if (lstrcmp(bstrName, L"Font") == 0)
+		{
+			StringCchCopy(fontInfo.lfFaceName, SIZEOF_ARRAY(fontInfo.lfFaceName), bstrValue);
+		}
 	}
 
 	fontInfo.lfWeight			= FW_MEDIUM;

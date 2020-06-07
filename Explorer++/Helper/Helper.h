@@ -9,6 +9,7 @@
 #include <windows.h>
 #include <winioctl.h>
 #include <list>
+#include <optional>
 #include <string>
 
 struct LangAndCodePage
@@ -17,12 +18,12 @@ struct LangAndCodePage
 	WORD wCodePage;
 };
 
-enum GroupType_t
+enum class GroupType
 {
-	GROUP_ADMINISTRATORS,
-	GROUP_POWERUSERS,
-	GROUP_USERS,
-	GROUP_USERSRESTRICTED
+	Administrators,
+	PowerUsers,
+	Users,
+	UsersRestricted
 };
 
 /* File helpers. */
@@ -43,7 +44,7 @@ BOOL			GetFileLanguage(const TCHAR *szFullFileName, WORD *pwLanguage);
 BOOL			GetVersionInfoString(const TCHAR *szFullFileName, const TCHAR *szVersionInfo, TCHAR *szVersionBuffer, UINT cchMax);
 
 /* Ownership and access. */
-BOOL			CheckGroupMembership(GroupType_t groupType);
+BOOL			CheckGroupMembership(GroupType groupType);
 BOOL			FormatUserName(PSID sid, TCHAR *userName, size_t cchMax);
 
 /* User interaction. */
@@ -55,6 +56,7 @@ void			GetCPUBrandString(char *pszCPUBrand, UINT cchBuf);
 void			SetFORMATETC(FORMATETC *pftc, CLIPFORMAT cfFormat, DVTARGETDEVICE *ptd, DWORD dwAspect, LONG lindex, DWORD tymed);
 bool			IsKeyDown(int nVirtKey);
 std::wstring	CreateGUID();
+std::optional<std::wstring>	GetLastErrorMessage(DWORD error);
 
 /* See http://msdn.microsoft.com/en-us/library/windows/desktop/dd940435(v=vs.85).aspx. */
 template <class T> void SafeRelease(T **ppT)

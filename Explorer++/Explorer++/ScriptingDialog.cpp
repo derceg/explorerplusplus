@@ -10,7 +10,8 @@
 #include "../Helper/WindowHelper.h"
 #include <boost/algorithm/string.hpp>
 
-ScriptingDialog::ScriptingDialog(HINSTANCE hInstance, HWND hParent, PluginInterface *pluginInterface) :
+ScriptingDialog::ScriptingDialog(
+	HINSTANCE hInstance, HWND hParent, PluginInterface *pluginInterface) :
 	BaseDialog(hInstance, IDD_SCRIPTING, hParent, true),
 	m_luaPlugin(L"", Plugins::Manifest(), pluginInterface)
 {
@@ -25,8 +26,8 @@ INT_PTR ScriptingDialog::OnInitDialog()
 	return FALSE;
 }
 
-void ScriptingDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-	std::list<ResizableDialog::Control_t> &ControlList)
+void ScriptingDialog::GetResizableControlInformation(
+	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList)
 {
 	dsc = BaseDialog::DIALOG_SIZE_CONSTRAINT_NONE;
 
@@ -103,7 +104,7 @@ void ScriptingDialog::OnRun()
 
 	boost::replace_all(result, _T("\n"), _T("\r\n"));
 	AppendToLog(command, result);
-	
+
 	SetWindowText(commandControl, _T(""));
 }
 
@@ -135,7 +136,7 @@ void ScriptingDialog::AppendToLog(const std::wstring &command, const std::wstrin
 	{
 		log += _T("\r\n");
 	}
-	
+
 	log += command;
 
 	if (!result.empty())

@@ -23,7 +23,7 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 		SetCursor(LoadCursor(nullptr, IDC_ARROW));
 	});
 
-	if(m_bFolderVisited)
+	if (m_bFolderVisited)
 	{
 		SaveColumnWidths();
 	}
@@ -36,12 +36,12 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 	LeaveCriticalSection(&m_csDirectoryAltered);
 
 	TCHAR szParsingPath[MAX_PATH];
-	GetDisplayName(pidlDirectory,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
+	GetDisplayName(pidlDirectory, szParsingPath, SIZEOF_ARRAY(szParsingPath), SHGDN_FORPARSING);
 
 	/* TODO: Method callback. */
-	SendMessage(m_hOwner,WM_USER_STARTEDBROWSING,m_ID,reinterpret_cast<WPARAM>(szParsingPath));
+	SendMessage(m_hOwner, WM_USER_STARTEDBROWSING, m_ID, reinterpret_cast<WPARAM>(szParsingPath));
 
-	StringCchCopy(m_CurDir,SIZEOF_ARRAY(m_CurDir),szParsingPath);
+	StringCchCopy(m_CurDir, SIZEOF_ARRAY(m_CurDir), szParsingPath);
 
 	/* Stop the list view from redrawing itself each time is inserted.
 	Redrawing will be allowed once all items have being inserted.
@@ -50,7 +50,7 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 
 	ListView_DeleteAllItems(m_hListView);
 
-	if(m_bFolderVisited)
+	if (m_bFolderVisited)
 	{
 		ResetFolderState();
 	}
@@ -74,10 +74,10 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 	VerifySortMode();
 	SortFolder(m_folderSettings.sortMode);
 
-	ListView_EnsureVisible(m_hListView,0,FALSE);
+	ListView_EnsureVisible(m_hListView, 0, FALSE);
 
 	/* Allow the listview to redraw itself once again. */
-	SendMessage(m_hListView,WM_SETREDRAW,TRUE,NULL);
+	SendMessage(m_hListView, WM_SETREDRAW, TRUE, NULL);
 
 	/* Set the focus back to the first item. */
 	ListView_SetItemState(m_hListView, 0, LVIS_FOCUSED, LVIS_FOCUSED);
@@ -118,8 +118,8 @@ void ShellBrowser::ResetFolderState()
 		int nItems = ListView_GetItemCount(m_hListView);
 
 		/* Create and set the new imagelist. */
-		HIMAGELIST himl = ImageList_Create(THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT,
-			ILC_COLOR32, nItems, nItems + 100);
+		HIMAGELIST himl = ImageList_Create(
+			THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT, ILC_COLOR32, nItems, nItems + 100);
 		ListView_SetImageList(m_hListView, himl, LVSIL_NORMAL);
 
 		ImageList_Destroy(himlOld);
@@ -190,7 +190,8 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 		}
 		else
 		{
-			hr = pShellFolder->GetDisplayNameOf(pidlItem.get(), SHGDN_INFOLDER | SHGDN_FORPARSING, &str);
+			hr = pShellFolder->GetDisplayNameOf(
+				pidlItem.get(), SHGDN_INFOLDER | SHGDN_FORPARSING, &str);
 		}
 
 		if (SUCCEEDED(hr))
@@ -205,8 +206,8 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 	return hr;
 }
 
-HRESULT ShellBrowser::AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory,
-	PCITEMID_CHILD pidlChild, const TCHAR *szFileName, int iItemIndex, BOOL bPosition)
+HRESULT ShellBrowser::AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild,
+	const TCHAR *szFileName, int iItemIndex, BOOL bPosition)
 {
 	int uItemId = SetItemInformation(pidlDirectory, pidlChild, szFileName);
 	return AddItemInternal(iItemIndex, uItemId, bPosition);
@@ -234,12 +235,12 @@ HRESULT ShellBrowser::AddItemInternal(int iItemIndex, int iItemId, BOOL bPositio
 	return S_OK;
 }
 
-int ShellBrowser::SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory,
-	PCITEMID_CHILD pidlChild, const TCHAR *szFileName)
+int ShellBrowser::SetItemInformation(
+	PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild, const TCHAR *szFileName)
 {
-	HANDLE			hFirstFile;
-	TCHAR			szPath[MAX_PATH];
-	int				uItemId;
+	HANDLE hFirstFile;
+	TCHAR szPath[MAX_PATH];
+	int uItemId;
 
 	uItemId = GenerateUniqueItemId();
 
@@ -267,9 +268,8 @@ int ShellBrowser::SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory,
 	else
 	{
 		m_itemInfoMap[uItemId].bDrive = TRUE;
-		StringCchCopy(m_itemInfoMap[uItemId].szDrive,
-			SIZEOF_ARRAY(m_itemInfoMap[uItemId].szDrive),
-			szPath);
+		StringCchCopy(
+			m_itemInfoMap[uItemId].szDrive, SIZEOF_ARRAY(m_itemInfoMap[uItemId].szDrive), szPath);
 
 		hFirstFile = INVALID_HANDLE_VALUE;
 	}
@@ -299,18 +299,22 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 {
 	int nPrevItems = ListView_GetItemCount(m_hListView);
 
-	if(nPrevItems == 0 && m_AwaitingAddList.empty())
+	if (nPrevItems == 0 && m_AwaitingAddList.empty())
 	{
-		if(m_folderSettings.applyFilter)
+		if (m_folderSettings.applyFilter)
+		{
 			ApplyFilteringBackgroundImage(true);
+		}
 		else
+		{
 			ApplyFolderEmptyBackgroundImage(true);
+		}
 
 		m_nTotalItems = 0;
 
 		return;
 	}
-	else if(!m_folderSettings.applyFilter)
+	else if (!m_folderSettings.applyFilter)
 	{
 		ApplyFolderEmptyBackgroundImage(false);
 	}
@@ -318,7 +322,7 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	/* Make the listview allocate space (for internal data structures)
 	for all the items at once, rather than individually.
 	Acts as a speed optimization. */
-	ListView_SetItemCount(m_hListView,m_AwaitingAddList.size() + nPrevItems);
+	ListView_SetItemCount(m_hListView, m_AwaitingAddList.size() + nPrevItems);
 
 	if (m_folderSettings.autoArrange)
 	{
@@ -351,20 +355,32 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 		lv.iItem = awaitingItem.iItem;
 		lv.iSubItem = 0;
-		lv.pszText = filename.data();
+
+		auto firstColumn = GetFirstCheckedColumn();
+
+		if ((m_folderSettings.viewMode == +ViewMode::Details)
+			&& firstColumn.type != ColumnType::Name)
+		{
+			lv.pszText = LPSTR_TEXTCALLBACK;
+		}
+		else
+		{
+			lv.pszText = filename.data();
+		}
+
 		lv.iImage = I_IMAGECALLBACK;
 		lv.lParam = awaitingItem.iItemInternal;
 
 		/* Insert the item into the list view control. */
-		int iItemIndex = ListView_InsertItem(m_hListView,&lv);
+		int iItemIndex = ListView_InsertItem(m_hListView, &lv);
 
-		if(awaitingItem.bPosition && m_folderSettings.viewMode != +ViewMode::Details)
+		if (awaitingItem.bPosition && m_folderSettings.viewMode != +ViewMode::Details)
 		{
 			POINT ptItem;
 
-			if(awaitingItem.iAfter != -1)
+			if (awaitingItem.iAfter != -1)
 			{
-				ListView_GetItemPosition(m_hListView, awaitingItem.iAfter,&ptItem);
+				ListView_GetItemPosition(m_hListView, awaitingItem.iAfter, &ptItem);
 			}
 			else
 			{
@@ -373,28 +389,30 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 			}
 
 			/* The item will end up in the position AFTER iAfter. */
-			ListView_SetItemPosition32(m_hListView,iItemIndex,ptItem.x,ptItem.y);
+			ListView_SetItemPosition32(m_hListView, iItemIndex, ptItem.x, ptItem.y);
 		}
 
-		if(m_folderSettings.viewMode == +ViewMode::Tiles)
+		if (m_folderSettings.viewMode == +ViewMode::Tiles)
 		{
 			SetTileViewItemInfo(iItemIndex, awaitingItem.iItemInternal);
 		}
 
-		if(m_bNewItemCreated)
+		if (m_bNewItemCreated)
 		{
-			if(CompareIdls(itemInfo.pidlComplete.get(),m_pidlNewItem))
+			if (CompareIdls(itemInfo.pidlComplete.get(), m_pidlNewItem))
+			{
 				m_bNewItemCreated = FALSE;
+			}
 
 			m_iIndexNewItem = iItemIndex;
 		}
 
 		/* If the file is marked as hidden, ghost it out. */
-		if(itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
+		if (itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
 		{
-			ListView_SetItemState(m_hListView,iItemIndex,LVIS_CUT,LVIS_CUT);
+			ListView_SetItemState(m_hListView, iItemIndex, LVIS_CUT, LVIS_CUT);
 		}
-			
+
 		/* Add the current file's size to the running size of the current directory. */
 		/* A folder may or may not have 0 in its high file size member.
 		It should either be zeroed, or never counted. */
@@ -445,19 +463,19 @@ void ShellBrowser::ApplyFilteringBackgroundImage(bool apply)
 
 BOOL ShellBrowser::IsFileFiltered(const ItemInfo_t &itemInfo) const
 {
-	BOOL bHideSystemFile	= FALSE;
-	BOOL bFilenameFiltered	= FALSE;
+	BOOL bHideSystemFile = FALSE;
+	BOOL bFilenameFiltered = FALSE;
 
-	if(m_folderSettings.applyFilter &&
-		((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
+	if (m_folderSettings.applyFilter
+		&& ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
 	{
 		bFilenameFiltered = IsFilenameFiltered(itemInfo.szDisplayName);
 	}
 
-	if(m_config->globalFolderSettings.hideSystemFiles)
+	if (m_config->globalFolderSettings.hideSystemFiles)
 	{
-		bHideSystemFile = (itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
-			== FILE_ATTRIBUTE_SYSTEM;
+		bHideSystemFile =
+			(itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM) == FILE_ATTRIBUTE_SYSTEM;
 	}
 
 	return bFilenameFiltered || bHideSystemFile;
@@ -465,18 +483,20 @@ BOOL ShellBrowser::IsFileFiltered(const ItemInfo_t &itemInfo) const
 
 void ShellBrowser::RemoveItem(int iItemInternal)
 {
-	ULARGE_INTEGER	ulFileSize;
-	LVFINDINFO		lvfi;
-	BOOL			bFolder;
-	int				iItem;
-	int				nItems;
+	ULARGE_INTEGER ulFileSize;
+	LVFINDINFO lvfi;
+	BOOL bFolder;
+	int iItem;
+	int nItems;
 
-	if(iItemInternal == -1)
+	if (iItemInternal == -1)
+	{
 		return;
+	}
 
 	/* Is this item a folder? */
-	bFolder = (m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
-	FILE_ATTRIBUTE_DIRECTORY;
+	bFolder = (m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		== FILE_ATTRIBUTE_DIRECTORY;
 
 	/* Take the file size of the removed file away from the total
 	directory size. */
@@ -489,14 +509,14 @@ void ShellBrowser::RemoveItem(int iItemInternal)
 	Could use filename, providing removed
 	items are always deleted before new
 	items are inserted. */
-	lvfi.flags	= LVFI_PARAM;
-	lvfi.lParam	= iItemInternal;
-	iItem = ListView_FindItem(m_hListView,-1,&lvfi);
-	
-	if(iItem != -1)
+	lvfi.flags = LVFI_PARAM;
+	lvfi.lParam = iItemInternal;
+	iItem = ListView_FindItem(m_hListView, -1, &lvfi);
+
+	if (iItem != -1)
 	{
 		/* Remove the item from the listview. */
-		ListView_DeleteItem(m_hListView,iItem);
+		ListView_DeleteItem(m_hListView, iItem);
 	}
 
 	m_itemInfoMap.erase(iItemInternal);
@@ -505,7 +525,7 @@ void ShellBrowser::RemoveItem(int iItemInternal)
 
 	m_nTotalItems--;
 
-	if(nItems == 0 && !m_folderSettings.applyFilter)
+	if (nItems == 0 && !m_folderSettings.applyFilter)
 	{
 		ApplyFolderEmptyBackgroundImage(true);
 	}
@@ -515,8 +535,7 @@ void ShellBrowser::PlayNavigationSound() const
 {
 	if (m_config->playNavigationSound)
 	{
-		PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART), nullptr,
-			SND_RESOURCE | SND_ASYNC);
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART), nullptr, SND_RESOURCE | SND_ASYNC);
 	}
 }
 
@@ -525,7 +544,8 @@ ShellNavigationController *ShellBrowser::GetNavigationController() const
 	return m_navigationController.get();
 }
 
-boost::signals2::connection ShellBrowser::AddNavigationCompletedObserver(const NavigationCompletedSignal::slot_type &observer,
+boost::signals2::connection ShellBrowser::AddNavigationCompletedObserver(
+	const NavigationCompletedSignal::slot_type &observer,
 	boost::signals2::connect_position position)
 {
 	return m_navigationCompletedSignal.connect(observer, position);

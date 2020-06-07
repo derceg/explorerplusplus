@@ -19,9 +19,9 @@ environment:
 
 init:
 - ps: >-
-    if ($env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH -eq "l10n_master") {
-        Write-Host "Skipping l10n_master branch pull request"
-        Exit-AppveyorBuild
+    if ($env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH -eq 'l10n_master') {
+      Write-Host 'Skipping l10n_master branch pull request'
+      Exit-AppveyorBuild
     }
 
 # Decrypt the code signing certificate.
@@ -34,8 +34,16 @@ install:
     IF DEFINED PFX_ENC_PASS (secure-file\tools\secure-file -decrypt %APPVEYOR_BUILD_FOLDER%\authenticode.pfx.enc -secret %PFX_ENC_PASS%)
 
 before_build:
-- cmd: >-
+- ps: >-
     nuget restore Explorer++\Explorer++.sln
+
+    if (Test-Path env:APPVEYOR_REPO_TAG_NAME) {
+      if ($env:APPVEYOR_REPO_TAG_NAME -match '-beta$') {
+        $env:RELEASE_MODE = 'beta'
+      } else {
+        $env:RELEASE_MODE = 'stable'
+      }
+    }
 
 build:
   project: Explorer++\Explorer++.sln
@@ -50,7 +58,7 @@ after_build:
     IF "%PLATFORM%" == "Win32" (SET "arch=x86") ELSE (SET "arch=x64")
 
 
-    SET "archiveName=explorer++_%arch%.zip"
+    SET "archiveName=explorerpp_%arch%.zip"
 
 
     CALL %APPVEYOR_BUILD_FOLDER%\Scripts\AppVeyor\compile_help_file.bat
@@ -67,13 +75,13 @@ after_build:
     7z a %archiveName% "%APPVEYOR_BUILD_FOLDER%\Documentation\User\Help Manual\Explorer++ Help.chm"
 
 
-    7z a explorer++_%arch%_symbols.zip %APPVEYOR_BUILD_FOLDER%\Explorer++\Explorer++\%PLATFORM%\%CONFIGURATION%\Explorer++.pdb
+    7z a explorerpp_%arch%_symbols.zip %APPVEYOR_BUILD_FOLDER%\Explorer++\Explorer++\%PLATFORM%\%CONFIGURATION%\Explorer++.pdb
 
 
     copy "%APPVEYOR_BUILD_FOLDER%\Explorer++\Installer\bin\%arch%\%CONFIGURATION%\Explorer++ Setup.msi" "Explorer++ Setup.msi"
 
 
-    7z a explorer++_translations.zip %APPVEYOR_BUILD_FOLDER%\Explorer++\Win32\%CONFIGURATION%\Explorer++*.dll
+    7z a explorerpp_translations.zip %APPVEYOR_BUILD_FOLDER%\Explorer++\Win32\%CONFIGURATION%\Explorer++*.dll
 
 test_script:
 - ps: >-
@@ -92,9 +100,39 @@ test_script:
     $wc.UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\TestExplorer++Output.xml))
 
 artifacts:
-- path: explorer++_x86.zip
-- path: explorer++_x86_symbols.zip
-- path: explorer++_x64.zip
-- path: explorer++_x64_symbols.zip
+- path: explorerpp_x86.zip
+- path: explorerpp_x86_symbols.zip
+- path: explorerpp_x64.zip
+- path: explorerpp_x64_symbols.zip
 - path: Explorer++ Setup.msi
-- path: explorer++_translations.zip
+- path: explorerpp_translations.zip
+
+before_deploy:
+- ps: >-
+    $versionComponents = $env:APPVEYOR_BUILD_VERSION -split '\.'
+
+    $versionComponents = $versionComponents[0, 1, 2]
+
+    $releaseBuildVersion = $versionComponents -join '.'
+
+    if ($env:APPVEYOR_REPO_TAG_NAME -match '-beta$') {
+      $env:RELEASE_TITLE = "Explorer++ $releaseBuildVersion beta"
+      $env:PRERELEASE = $true
+    } else {
+      $env:RELEASE_TITLE = "Explorer++ $releaseBuildVersion"
+      $env:PRERELEASE = $false
+    }
+
+deploy:
+  provider: GitHub
+  auth_token:
+    secure: iU7ijPhvPEwymBKhGsZBwD9aDO3yPWpAq8iS5vaQcs5YdLRgcICuLOEJZ9UZIh9l
+  tag: $(APPVEYOR_REPO_TAG_NAME)
+  release: $(RELEASE_TITLE)
+  prerelease: $(PRERELEASE)
+  description: ''
+  artifact: /.*\.zip/
+  force_update: true
+  draft: true
+  on:
+    APPVEYOR_REPO_TAG: true

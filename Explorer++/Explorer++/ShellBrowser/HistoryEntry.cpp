@@ -8,14 +8,13 @@
 
 int HistoryEntry::idCounter = 0;
 
-HistoryEntry::HistoryEntry(PCIDLIST_ABSOLUTE pidl, std::wstring_view displayName,
-	std::optional<int> systemIconIndex) :
+HistoryEntry::HistoryEntry(
+	PCIDLIST_ABSOLUTE pidl, std::wstring_view displayName, std::optional<int> systemIconIndex) :
 	m_id(idCounter++),
 	m_pidl(ILCloneFull(pidl)),
 	m_displayName(displayName),
 	m_systemIconIndex(systemIconIndex)
 {
-
 }
 
 HistoryEntry::HistoryEntry(const PreservedHistoryEntry &preservedHistoryEntry) :
@@ -24,7 +23,6 @@ HistoryEntry::HistoryEntry(const PreservedHistoryEntry &preservedHistoryEntry) :
 	m_displayName(preservedHistoryEntry.displayName),
 	m_systemIconIndex(preservedHistoryEntry.systemIconIndex)
 {
-
 }
 
 int HistoryEntry::GetId() const

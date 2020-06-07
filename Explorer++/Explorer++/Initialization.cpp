@@ -6,10 +6,12 @@
 #include "Explorer++.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "Config.h"
+#include "DarkModeHelper.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"
 #include "LoadSaveInterface.h"
 #include "MainResource.h"
+#include "MainToolbar.h"
 #include "MainWindow.h"
 #include "MenuHelper.h"
 #include "MenuRanges.h"
@@ -20,6 +22,8 @@
 #include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
+
+bool g_enableDarkMode = false;
 
 /*
 * Main window creation.
@@ -40,7 +44,8 @@ void Explorerplusplus::OnCreate()
 
 	SetLanguageModule();
 
-	m_bookmarksMainMenu = std::make_unique<BookmarksMainMenu>(this, &m_bookmarkTree, MenuIdRange{ MENU_BOOKMARK_STARTID, MENU_BOOKMARK_ENDID });
+	m_bookmarksMainMenu = std::make_unique<BookmarksMainMenu>(this, &m_bookmarkIconFetcher,
+		&m_bookmarkTree, MenuIdRange{ MENU_BOOKMARK_STARTID, MENU_BOOKMARK_ENDID });
 
 	m_navigation = std::make_unique<Navigation>(this);
 
@@ -90,6 +95,11 @@ void Explorerplusplus::OnCreate()
 
 	InitializePlugins();
 
+	if (g_enableDarkMode)
+	{
+		SetUpDarkMode();
+	}
+
 	SetTimer(m_hContainer, AUTOSAVE_TIMER_ID, AUTOSAVE_TIMEOUT, nullptr);
 
 	m_InitializationFinished.set(true);
@@ -137,4 +147,28 @@ void Explorerplusplus::AddViewModesToMenu(HMENU menu)
 		mii.dwTypeData = szText;
 		InsertMenuItem(menu, IDM_VIEW_PLACEHOLDER, FALSE, &mii);
 	}
+}
+
+void Explorerplusplus::SetUpDarkMode()
+{
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+	darkModeHelper.EnableForApp();
+
+	if (!darkModeHelper.IsDarkModeEnabled())
+	{
+		return;
+	}
+
+	darkModeHelper.AllowDarkModeForWindow(m_hContainer, true);
+
+	BOOL dark = TRUE;
+	DarkModeHelper::WINDOWCOMPOSITIONATTRIBDATA compositionData = {
+		DarkModeHelper::WCA_USEDARKMODECOLORS, &dark, sizeof(dark)
+	};
+	darkModeHelper.SetWindowCompositionAttribute(m_hContainer, &compositionData);
+
+	m_uiTheming->SetListViewColors(
+		DarkModeHelper::BACKGROUND_COLOR, DarkModeHelper::FOREGROUND_COLOR);
+	m_uiTheming->SetTreeViewColors(
+		DarkModeHelper::BACKGROUND_COLOR, DarkModeHelper::FOREGROUND_COLOR);
 }

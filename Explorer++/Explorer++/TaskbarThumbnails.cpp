@@ -24,7 +24,7 @@
 
 namespace
 {
-	struct TabProxy_t
+	struct TabProxy
 	{
 		TaskbarThumbnails *taskbarThumbnails;
 		int iTabId;
@@ -148,7 +148,7 @@ ATOM TaskbarThumbnails::RegisterTabProxyClass(const TCHAR *szClassName)
 	wcex.style			= 0;
 	wcex.lpfnWndProc	= TabProxyWndProcStub;
 	wcex.cbClsExtra		= 0;
-	wcex.cbWndExtra		= sizeof(TabProxy_t *);
+	wcex.cbWndExtra		= sizeof(TabProxy *);
 	wcex.hInstance		= GetModuleHandle(nullptr);
 	wcex.hIcon			= nullptr;
 	wcex.hIconSm		= nullptr;
@@ -171,7 +171,7 @@ http://channel9.msdn.com/learn/courses/Windows7/Taskbar/Win7TaskbarNative/Exerci
 void TaskbarThumbnails::CreateTabProxy(int iTabId,BOOL bSwitchToNewTab)
 {
 	HWND hTabProxy;
-	TabProxyInfo_t tpi;
+	TabProxyInfo tpi;
 	TCHAR szClassName[512];
 	ATOM aRet;
 	BOOL bValue = TRUE;
@@ -189,10 +189,7 @@ void TaskbarThumbnails::CreateTabProxy(int iTabId,BOOL bSwitchToNewTab)
 
 	if(aRet != 0)
 	{
-		TabProxy_t *ptp = nullptr;
-
-		ptp = (TabProxy_t *)malloc(sizeof(TabProxy_t));
-
+		TabProxy *ptp = new TabProxy();
 		ptp->taskbarThumbnails = this;
 		ptp->iTabId = iTabId;
 
@@ -235,9 +232,9 @@ void TaskbarThumbnails::RemoveTabProxy(int iTabId)
 			{
 				m_pTaskbarList->UnregisterTab(itr->hProxy);
 
-				auto *ptp = reinterpret_cast<TabProxy_t *>(GetWindowLongPtr(itr->hProxy,GWLP_USERDATA));
+				auto *ptp = reinterpret_cast<TabProxy *>(GetWindowLongPtr(itr->hProxy,GWLP_USERDATA));
 				DestroyWindow(itr->hProxy);
-				free(ptp);
+				delete ptp;
 
 				UnregisterClass(reinterpret_cast<LPCWSTR>(MAKEWORD(itr->atomClass, 0)), GetModuleHandle(nullptr));
 
@@ -277,23 +274,27 @@ void TaskbarThumbnails::RegisterTab(HWND hTabProxy, const TCHAR *szDisplayName, 
 
 LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
-	auto *ptp = (TabProxy_t *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
+	auto *ptp = (TabProxy *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
 
 	switch(Msg)
 	{
 	case WM_CREATE:
 		{
-			ptp = (TabProxy_t *)((CREATESTRUCT *)lParam)->lpCreateParams;
+			ptp = (TabProxy *)((CREATESTRUCT *)lParam)->lpCreateParams;
 
 			SetWindowLongPtr(hwnd,GWLP_USERDATA,(LONG_PTR)ptp);
 		}
 		break;
 	}
 
-	if(ptp != nullptr)
-		return ptp->taskbarThumbnails->TabProxyWndProc(hwnd,Msg,wParam,lParam,ptp->iTabId);
+	if (ptp != nullptr)
+	{
+		return ptp->taskbarThumbnails->TabProxyWndProc(hwnd, Msg, wParam, lParam, ptp->iTabId);
+	}
 	else
-		return DefWindowProc(hwnd,Msg,wParam,lParam);
+	{
+		return DefWindowProc(hwnd, Msg, wParam, lParam);
+	}
 }
 
 LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam,int iTabId)
@@ -572,7 +573,7 @@ void TaskbarThumbnails::OnTabSelectionChanged(const Tab &tab)
 		return;
 	}
 
-	for (const TabProxyInfo_t &tabProxyInfo : m_TabProxyList)
+	for (const TabProxyInfo &tabProxyInfo : m_TabProxyList)
 	{
 		if (tabProxyInfo.iTabId == tab.GetId())
 		{
@@ -590,7 +591,7 @@ void TaskbarThumbnails::OnTabSelectionChanged(const Tab &tab)
 			{
 				const Tab &nextTab = m_tabContainer->GetTabByIndex(index + 1);
 
-				for (const TabProxyInfo_t &tabProxyInfoNext : m_TabProxyList)
+				for (const TabProxyInfo &tabProxyInfoNext : m_TabProxyList)
 				{
 					if (tabProxyInfoNext.iTabId == nextTab.GetId())
 					{
@@ -620,7 +621,7 @@ void TaskbarThumbnails::UpdateTaskbarThumbnailTitle(const Tab &tab)
 		return;
 	}
 
-	for (const TabProxyInfo_t &tabProxyInfo : m_TabProxyList)
+	for (const TabProxyInfo &tabProxyInfo : m_TabProxyList)
 	{
 		if (tabProxyInfo.iTabId == tab.GetId())
 		{
@@ -633,7 +634,7 @@ void TaskbarThumbnails::UpdateTaskbarThumbnailTitle(const Tab &tab)
 
 void TaskbarThumbnails::SetTabProxyIcon(const Tab &tab)
 {
-	for (TabProxyInfo_t &tabProxyInfo : m_TabProxyList)
+	for (TabProxyInfo &tabProxyInfo : m_TabProxyList)
 	{
 		if (tabProxyInfo.iTabId == tab.GetId())
 		{

@@ -4,36 +4,33 @@
 
 #pragma once
 
-#include <objbase.h>
+#include "Macros.h"
 #include <MsXml2.h>
+#include <objbase.h>
 #include <list>
 #include <string>
-#include "Macros.h"
 
 class DialogSettings
 {
 public:
-
-	DialogSettings(const TCHAR *szSettingsKey,bool bSavePosition = true);
+	DialogSettings(const TCHAR *szSettingsKey, bool bSavePosition = true);
 	virtual ~DialogSettings() = default;
 
-	void			SaveRegistrySettings(HKEY hParentKey);
-	void			LoadRegistrySettings(HKEY hParentKey);
+	void SaveRegistrySettings(HKEY hParentKey);
+	void LoadRegistrySettings(HKEY hParentKey);
 
-	void			SaveXMLSettings(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pe);
-	void			LoadXMLSettings(IXMLDOMNamedNodeMap *pam,long lChildNodes);
+	void SaveXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe);
+	void LoadXMLSettings(IXMLDOMNamedNodeMap *pam, long lChildNodes);
 
-	bool			GetSettingsKey(TCHAR *out, size_t cchMax) const;
+	bool GetSettingsKey(TCHAR *out, size_t cchMax) const;
 
 protected:
+	void SaveDialogPosition(HWND hDlg);
+	void RestoreDialogPosition(HWND hDlg, bool bRestoreSize);
 
-	void			SaveDialogPosition(HWND hDlg);
-	void			RestoreDialogPosition(HWND hDlg,bool bRestoreSize);
-
-	BOOL			m_bStateSaved;
+	BOOL m_bStateSaved;
 
 private:
-
 	DISALLOW_COPY_AND_ASSIGN(DialogSettings);
 
 	static const TCHAR SETTING_POSITION[];
@@ -42,16 +39,16 @@ private:
 	static const TCHAR SETTING_WIDTH[];
 	static const TCHAR SETTING_HEIGHT[];
 
-	virtual void	SaveExtraRegistrySettings(HKEY hKey);
-	virtual void	LoadExtraRegistrySettings(HKEY hKey);
+	virtual void SaveExtraRegistrySettings(HKEY hKey);
+	virtual void LoadExtraRegistrySettings(HKEY hKey);
 
-	virtual void	SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode);
-	virtual void	LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue);
+	virtual void SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode);
+	virtual void LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue);
 
 	const std::wstring m_szSettingsKey;
-	const bool		m_bSavePosition;
+	const bool m_bSavePosition;
 
-	POINT			m_ptDialog;
-	int				m_iWidth;
-	int				m_iHeight;
+	POINT m_ptDialog;
+	int m_iWidth;
+	int m_iHeight;
 };

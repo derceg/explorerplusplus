@@ -67,13 +67,13 @@ const BookmarkItem *BookmarkTree::GetOtherBookmarksFolder() const
 	return m_otherBookmarks;
 }
 
-void BookmarkTree::AddBookmarkItem(
+BookmarkItem *BookmarkTree::AddBookmarkItem(
 	BookmarkItem *parent, std::unique_ptr<BookmarkItem> bookmarkItem, size_t index)
 {
 	if (!CanAddChildren(parent))
 	{
 		assert(false);
-		return;
+		return nullptr;
 	}
 
 	bookmarkItem->VisitRecursively([this](BookmarkItem *currentItem) {
@@ -92,9 +92,10 @@ void BookmarkTree::AddBookmarkItem(
 		index = parent->GetChildren().size();
 	}
 
-	BookmarkItem *rawBookmarkItem = bookmarkItem.get();
-	parent->AddChild(std::move(bookmarkItem), index);
+	BookmarkItem *rawBookmarkItem = parent->AddChild(std::move(bookmarkItem), index);
 	bookmarkItemAddedSignal.m_signal(*rawBookmarkItem, index);
+
+	return rawBookmarkItem;
 }
 
 void BookmarkTree::MoveBookmarkItem(

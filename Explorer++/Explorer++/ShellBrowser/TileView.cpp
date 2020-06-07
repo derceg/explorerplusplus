@@ -58,7 +58,7 @@ void ShellBrowser::SetTileViewInfo()
 
 		if (bRes)
 		{
-			SetTileViewItemInfo(i, (int)lvItem.lParam);
+			SetTileViewItemInfo(i, (int) lvItem.lParam);
 		}
 	}
 }
@@ -68,7 +68,7 @@ void ShellBrowser::SetTileViewItemInfo(int iItem, int iItemInternal)
 {
 	SHFILEINFO shfi;
 	LVTILEINFO lvti;
-	UINT uColumns[2] = { 1,2 };
+	UINT uColumns[2] = { 1, 2 };
 	int columnFormats[2] = { LVCFMT_LEFT, LVCFMT_LEFT };
 	TCHAR fullFileName[MAX_PATH];
 
@@ -81,22 +81,22 @@ void ShellBrowser::SetTileViewItemInfo(int iItem, int iItemInternal)
 
 	GetItemFullName(iItem, fullFileName, SIZEOF_ARRAY(fullFileName));
 
-	SHGetFileInfo(fullFileName, 0,
-		&shfi, sizeof(SHFILEINFO), SHGFI_TYPENAME);
+	SHGetFileInfo(fullFileName, 0, &shfi, sizeof(SHFILEINFO), SHGFI_TYPENAME);
 
 	ListView_SetItemText(m_hListView, iItem, 1, shfi.szTypeName);
 
-	if ((m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) !=
-		FILE_ATTRIBUTE_DIRECTORY)
+	if ((m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		!= FILE_ATTRIBUTE_DIRECTORY)
 	{
-		TCHAR			lpszFileSize[32];
-		ULARGE_INTEGER	lFileSize;
+		TCHAR lpszFileSize[32];
+		ULARGE_INTEGER lFileSize;
 
 		lFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
 		lFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
 
 		FormatSizeString(lFileSize, lpszFileSize, SIZEOF_ARRAY(lpszFileSize),
-			m_config->globalFolderSettings.forceSize, m_config->globalFolderSettings.sizeDisplayFormat);
+			m_config->globalFolderSettings.forceSize,
+			m_config->globalFolderSettings.sizeDisplayFormat);
 
 		ListView_SetItemText(m_hListView, iItem, 2, lpszFileSize);
 	}

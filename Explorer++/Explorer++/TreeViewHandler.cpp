@@ -37,8 +37,10 @@ void Explorerplusplus::CreateFolderControls()
 	TCHAR szTemp[32];
 	UINT uStyle = WS_CHILD|WS_CLIPSIBLINGS|WS_CLIPCHILDREN;
 
-	if(m_config->showFolders)
+	if (m_config->showFolders)
+	{
 		uStyle |= WS_VISIBLE;
+	}
 
 	LoadString(m_hLanguageModule,IDS_FOLDERS_WINDOW_TEXT,szTemp,SIZEOF_ARRAY(szTemp));
 	m_hHolder = CreateHolderWindow(m_hContainer,szTemp,uStyle);
@@ -207,7 +209,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 	hItem	= (HTREEITEM)wParam;
 	ppt		= (POINT *)lParam;
 
-	m_bTreeViewRightClick = TRUE;
+	m_bTreeViewRightClick = true;
 
 	hPrevItem = TreeView_GetSelection(m_hTreeView);
 	TreeView_SelectItem(m_hTreeView,hItem);
@@ -235,14 +237,14 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 
 			if(pidlParent)
 			{
-				m_bTreeViewOpenInNewTab = FALSE;
+				m_bTreeViewOpenInNewTab = false;
 
 				std::vector<PCITEMID_CHILD> pidlItems;
 				pidlItems.push_back(pidlRelative);
 
 				FileContextMenuManager fcmm(m_hContainer, pidlParent.get(), pidlItems);
 
-				FileContextMenuInfo_t fcmi;
+				FileContextMenuInfo fcmi;
 				fcmi.uFrom = FROM_TREEVIEW;
 
 				StatusBar statusBar(m_hStatusBar);
@@ -259,10 +261,12 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 	the folder that was right-clicked was opened in
 	a new tab (i.e. can just keep the selection the
 	same). */
-	if(!m_bTreeViewOpenInNewTab)
-		TreeView_SelectItem(m_hTreeView,hPrevItem);
+	if (!m_bTreeViewOpenInNewTab)
+	{
+		TreeView_SelectItem(m_hTreeView, hPrevItem);
+	}
 
-	m_bTreeViewRightClick = FALSE;
+	m_bTreeViewRightClick = false;
 }
 
 void Explorerplusplus::OnTreeViewCopyItemPath() const
@@ -416,7 +420,7 @@ void Explorerplusplus::OnTreeViewSelChanged(LPARAM lParam)
 	}
 	else
 	{
-		m_bSelectingTreeViewDirectory = FALSE;
+		m_bSelectingTreeViewDirectory = false;
 	}
 }
 
@@ -442,8 +446,10 @@ int Explorerplusplus::OnTreeViewEndLabelEdit(LPARAM lParam)
 
 	/* No text was entered, so simply notify
 	the control to revert to the previous text. */
-	if(pdi->item.pszText == nullptr)
+	if (pdi->item.pszText == nullptr)
+	{
 		return FALSE;
+	}
 
 	/* Build the new filename from the text entered
 	and the parent directory component of the old
@@ -635,8 +641,8 @@ void Explorerplusplus::OnTreeViewSetFileAttributes() const
 		return;
 	}
 
-	std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t> sfaiList;
-	NSetFileAttributesDialogExternal::SetFileAttributesInfo_t sfai;
+	std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo> sfaiList;
+	NSetFileAttributesDialogExternal::SetFileAttributesInfo sfai;
 
 	auto pidlItem = m_shellTreeView->GetItemPidl(hItem);
 	HRESULT hr = GetDisplayName(pidlItem.get(),sfai.szFullFileName,SIZEOF_ARRAY(sfai.szFullFileName),SHGDN_FORPARSING);
@@ -734,8 +740,10 @@ void Explorerplusplus::UpdateTreeViewSelection()
 			sent when the two are different.
 			Therefore, the only case to handle is when the treeview
 			selection is changed by browsing using the listview. */
-			if(TreeView_GetSelection(m_hTreeView) != hItem)
-				m_bSelectingTreeViewDirectory = TRUE;
+			if (TreeView_GetSelection(m_hTreeView) != hItem)
+			{
+				m_bSelectingTreeViewDirectory = true;
+			}
 
 			SendMessage(m_hTreeView,TVM_SELECTITEM,(WPARAM)TVGN_CARET,(LPARAM)hItem);
 		}

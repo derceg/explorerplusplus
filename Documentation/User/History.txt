@@ -1,21 +1,91 @@
 Explorer++ Version History
 --------------------------
 
-Current version: 1.3.5
+Version 1.4.1
+-------------
+Misc:
+- When changing the default file manager setting (via Tools >
+  Options > General > Default File Manager), Explorer++ will only
+  be set/removed as the default file manager for the current
+  user. Previously, Explorer++ was set as the default for all
+  users.
+  If you set Explorer++ as the default in a previous version,
+  remove it as the default before you update, then change it back
+  to the default after you've updated.
 
 Version 1.4.0
 -------------
 New features:
+- The bookmarks system has been rewritten. The updated system has
+  the following changes from the previous system:
+  - Bookmarks are now managed in a very similar way to how
+    they're managed in web browsers such as Chrome and Firefox.
+    Bookmarks can be added to one of three top-level folders:
+    - Bookmarks toolbar
+    - Bookmarks menu
+    - Other bookmarks
+  - The add bookmark and manage bookmark dialogs are more
+    functional than their equivalents in the previous version.
+    For example, the manage bookmarks dialog allows items to be
+    renamed directly (rather than by opening the edit bookmark
+    dialog) and shows an appropriate context menu for bookmark
+    folders in the treeview.
+  - Bookmarks can now be copied/pasted.
+  - When a bookmark is copied, the location of the bookmark is
+    also copied as plain text. This makes it possible to paste
+    the location into other applications.
+  - Bookmarks can now be dragged and dropped between the bookmark
+    windows.
+  - Bookmarks on the bookmarks toolbar can now be arranged via
+    drag and drop.
+  - Right-clicking an item in the dropdown shown when clicking a
+    folder on the bookmarks toolbar now shows the appropriate
+    context menu.
+  - In addition to being able to bookmark the current tab, it's
+    also possible to bookmark all open tabs.
+  - When a bookmark is displayed, the icon for the associated
+    folder will be used (rather than a generic icon).
+  - When right-clicking a bookmark folder, it's possible to open
+    all child bookmarks in new tabs.
+  - A number of issues present in the previous system are no
+    longer relevant. For example:
+    - The bookmark menu wasn't being built correctly (folders
+      could be shown with the wrong name).
+    - Selecting "Bookmark This Tab..." from the dropdown shown
+      when clicking a folder on the bookmarks toolbar had no
+      effect.
+    - "Open" and "Open in New Tab" items would be shown when
+      right-clicking a folder on the bookmarks toolbar, but
+      selecting them would have no effect.
+    - Neither the bookmarks toolbar nor the bookmarks menu would
+      update when a bookmark was moved up/down.
+    - The bookmarks menu wasn't updated when a bookmark was
+      updated.
+  - The bookmark description field has been removed.
 - Settings are now automatically saved every 30 seconds. This
   helps to prevent recent tabs or other settings from being lost
   if the application crashes.
+- The default icons used by the application have been updated.
+  Additionally, a second set of Windows 10 style icons have been
+  added. It's possible to switch between the two icon sets via
+  Tools > Options > General > Icon theme.
+- Added partial support for high DPI displays.
+- It's now possible to reopen a recently closed tab using File >
+  Reopen Recent Tab. The most recently closed tab can be reopened
+  using Ctrl+Shift+T.
 - The display window can now be displayed on the right.
   Previously, it was always displayed at the bottom.
 - Support for the "Date Deleted" and "Original Location" recycle
   bin columns has been implemented.
+- A context menu is now shown when right-clicking the empty space
+  in the tab bar.
 - When renaming a file, it's possible to move to the next item by
   pressing tab. Shift+tab can now be used to move to the previous
   item.
+- Toolbar buttons are now available for the following actions:
+  - Split file
+  - Merge files
+  - Close tab
 
 Bug fixes:
 - The way in which column results and file icons/thumbnails are
@@ -100,7 +170,6 @@ Bug fixes:
 Misc:
 - Windows XP and Vista are no longer supported. Windows 7 is now
   the minimum supported version.
-- Builds are now digitally signed.
 - All menus are now drawn in the standard system style, rather
   than a custom style.
 - More detailed help information is now available when starting
@@ -127,6 +196,9 @@ Misc:
   subject) are retrieved has been updated. This means that the
   fields should now be displayed for more file types (e.g. Word
   documents).
+- When selecting a file path with spaces in the application
+  toolbar button dialog, the path is now quoted (which is
+  necessary for paths with spaces).
 - The columns in the select columns dialog are now sorted by
   name, with the current set of columns appearing at the top of
   the list.
@@ -134,6 +206,12 @@ Misc:
   to retrieve the extension for both files and folders. Now, the
   extension will only be retrieved for files. Folders will be
   grouped together in a "Folder" group.
+- The order in which view modes are cycled (when clicking the
+  "Views" button on the toolbar or scrolling the mouse wheel
+  while holding ctrl) has been reversed to match the order used
+  in Windows Explorer.
+- A third-party credits dialog has been added, which can be
+  opened via the about dialog.
 
 Version 1.3.5 (03/02/2013)
 --------------------------

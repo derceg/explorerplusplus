@@ -18,7 +18,7 @@
 const TCHAR CustomizeColorsDialogPersistentSettings::SETTINGS_KEY[] = _T("CustomizeColors");
 
 CustomizeColorsDialog::CustomizeColorsDialog(HINSTANCE hInstance, HWND hParent,
-	IExplorerplusplus *expp, std::vector<NColorRuleHelper::ColorRule_t> *pColorRuleList) :
+	IExplorerplusplus *expp, std::vector<NColorRuleHelper::ColorRule> *pColorRuleList) :
 	BaseDialog(hInstance, IDD_CUSTOMIZECOLORS, hParent, true),
 	m_expp(expp),
 	m_pColorRuleList(pColorRuleList)
@@ -130,13 +130,13 @@ void CustomizeColorsDialog::GetResizableControlInformation(BaseDialog::DialogSiz
 	ControlList.push_back(control);
 }
 
-void CustomizeColorsDialog::InsertColorRuleIntoListView(HWND hListView,const NColorRuleHelper::ColorRule_t &ColorRule,
+void CustomizeColorsDialog::InsertColorRuleIntoListView(HWND hListView,const NColorRuleHelper::ColorRule &colorRule,
 	int iIndex)
 {
 	TCHAR szTemp[512];
 
 	StringCchCopy(szTemp,SIZEOF_ARRAY(szTemp),
-		ColorRule.strDescription.c_str());
+		colorRule.strDescription.c_str());
 
 	LVITEM lvItem;
 	lvItem.mask		= LVIF_TEXT;
@@ -147,10 +147,10 @@ void CustomizeColorsDialog::InsertColorRuleIntoListView(HWND hListView,const NCo
 
 	if(iActualIndex != -1)
 	{
-		StringCchCopy(szTemp,SIZEOF_ARRAY(szTemp),ColorRule.strFilterPattern.c_str());
+		StringCchCopy(szTemp,SIZEOF_ARRAY(szTemp),colorRule.strFilterPattern.c_str());
 		ListView_SetItemText(hListView,iActualIndex,1,szTemp);
 
-		BuildFileAttributeString(ColorRule.dwFilterAttributes,szTemp,SIZEOF_ARRAY(szTemp));
+		BuildFileAttributeString(colorRule.dwFilterAttributes,szTemp,SIZEOF_ARRAY(szTemp));
 		ListView_SetItemText(hListView,iActualIndex,2,szTemp);
 	}
 }
@@ -229,7 +229,7 @@ void CustomizeColorsDialog::OnNew()
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_COLORRULES);
 
-	NColorRuleHelper::ColorRule_t colorRule;
+	NColorRuleHelper::ColorRule colorRule;
 
 	ColorRuleDialog colorRuleDialog(GetInstance(), m_hDlg, &colorRule, FALSE);
 

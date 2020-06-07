@@ -12,7 +12,7 @@
 
 namespace V2
 {
-const TCHAR bookmarksKeyPath[] = _T("Software\\Explorer++\\Bookmarksv2");
+const TCHAR bookmarksKeyPath[] = _T("Bookmarksv2");
 
 void Load(HKEY parentKey, BookmarkTree *bookmarkTree);
 void LoadPermanentFolder(HKEY parentKey, BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
@@ -32,7 +32,7 @@ void SaveBookmarkItem(HKEY key, const BookmarkItem *bookmarkItem);
 // always be saved in the v2 format.
 namespace V1
 {
-const TCHAR bookmarksKeyPath[] = _T("Software\\Explorer++\\Bookmarks");
+const TCHAR bookmarksKeyPath[] = _T("Bookmarks");
 
 void Load(HKEY parentKey, BookmarkTree *bookmarkTree);
 
@@ -42,12 +42,17 @@ std::unique_ptr<BookmarkItem> LoadBookmarkItem(
 	HKEY key, BookmarkTree *bookmarkTree, bool &showOnToolbarOutput);
 }
 
-void BookmarkRegistryStorage::Load(BookmarkTree *bookmarkTree)
+std::wstring BuildFullKeyPath(
+	const std::wstring &applicationKeyPath, const std::wstring &relativeKeyPath);
+
+void BookmarkRegistryStorage::Load(
+	const std::wstring &applicationKeyPath, BookmarkTree *bookmarkTree)
 {
 	// The V2 key always takes precedence (i.e. it will be used even if the V1
 	// key exists).
 	wil::unique_hkey bookmarksKey;
-	LONG res = RegOpenKeyEx(HKEY_CURRENT_USER, V2::bookmarksKeyPath, 0, KEY_READ, &bookmarksKey);
+	std::wstring v2KeyPath = BuildFullKeyPath(applicationKeyPath, V2::bookmarksKeyPath);
+	LONG res = RegOpenKeyEx(HKEY_CURRENT_USER, v2KeyPath.c_str(), 0, KEY_READ, &bookmarksKey);
 
 	if (res == ERROR_SUCCESS)
 	{
@@ -55,7 +60,8 @@ void BookmarkRegistryStorage::Load(BookmarkTree *bookmarkTree)
 		return;
 	}
 
-	res = RegOpenKeyEx(HKEY_CURRENT_USER, V1::bookmarksKeyPath, 0, KEY_READ, &bookmarksKey);
+	std::wstring v1KeyPath = BuildFullKeyPath(applicationKeyPath, V1::bookmarksKeyPath);
+	res = RegOpenKeyEx(HKEY_CURRENT_USER, v1KeyPath.c_str(), 0, KEY_READ, &bookmarksKey);
 
 	if (res == ERROR_SUCCESS)
 	{
@@ -251,12 +257,14 @@ std::unique_ptr<BookmarkItem> V1::LoadBookmarkItem(
 	return bookmarkItem;
 }
 
-void BookmarkRegistryStorage::Save(BookmarkTree *bookmarkTree)
+void BookmarkRegistryStorage::Save(
+	const std::wstring &applicationKeyPath, BookmarkTree *bookmarkTree)
 {
-	SHDeleteKey(HKEY_CURRENT_USER, V2::bookmarksKeyPath);
+	std::wstring v2KeyPath = BuildFullKeyPath(applicationKeyPath, V2::bookmarksKeyPath);
+	SHDeleteKey(HKEY_CURRENT_USER, v2KeyPath.c_str());
 
 	wil::unique_hkey bookmarksKey;
-	LONG res = RegCreateKeyEx(HKEY_CURRENT_USER, V2::bookmarksKeyPath, 0, nullptr,
+	LONG res = RegCreateKeyEx(HKEY_CURRENT_USER, v2KeyPath.c_str(), 0, nullptr,
 		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &bookmarksKey, nullptr);
 
 	if (res == ERROR_SUCCESS)
@@ -332,4 +340,10 @@ void V2::SaveBookmarkItem(HKEY key, const BookmarkItem *bookmarkItem)
 	{
 		SaveBookmarkChildren(key, bookmarkItem);
 	}
+}
+
+std::wstring BuildFullKeyPath(
+	const std::wstring &applicationKeyPath, const std::wstring &relativeKeyPath)
+{
+	return applicationKeyPath + L"\\" + relativeKeyPath;
 }

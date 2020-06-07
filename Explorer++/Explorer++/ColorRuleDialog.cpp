@@ -27,7 +27,7 @@ const TCHAR ColorRuleDialogPersistentSettings::SETTING_INITIAL_COLOR[] = _T("Ini
 const TCHAR ColorRuleDialogPersistentSettings::SETTING_CUSTOM_COLORS[] = _T("CustomColors");
 
 ColorRuleDialog::ColorRuleDialog(HINSTANCE hInstance, HWND hParent,
-	NColorRuleHelper::ColorRule_t *pColorRule, BOOL bEdit) :
+	NColorRuleHelper::ColorRule *pColorRule, BOOL bEdit) :
 	BaseDialog(hInstance, IDD_NEWCOLORRULE, hParent, false)
 {
 	m_pColorRule = pColorRule;

@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <boost/multi_index_container.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
+#include <boost/multi_index_container.hpp>
 
 struct CachedIcon
 {
@@ -18,14 +18,11 @@ struct CachedIcon
 class CachedIcons
 {
 public:
-
-	typedef boost::multi_index_container<
-		CachedIcon,
-		boost::multi_index::indexed_by<
-			boost::multi_index::sequenced<>,
-			boost::multi_index::hashed_unique<boost::multi_index::member<CachedIcon, std::wstring, &CachedIcon::filePath>>
-		>
-	> CachedIconSet;
+	typedef boost::multi_index_container<CachedIcon,
+		boost::multi_index::indexed_by<boost::multi_index::sequenced<>,
+			boost::multi_index::hashed_unique<
+				boost::multi_index::member<CachedIcon, std::wstring, &CachedIcon::filePath>>>>
+		CachedIconSet;
 
 	using CachedIconSetByPath = CachedIconSet::nth_index<1>::type;
 	using iterator = CachedIconSetByPath::iterator;
@@ -40,7 +37,6 @@ public:
 	iterator findByPath(const std::wstring &filePath);
 
 private:
-
 	CachedIconSet m_cachedIconSet;
 	std::size_t m_maxItems;
 };

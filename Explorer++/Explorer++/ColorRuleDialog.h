@@ -45,7 +45,7 @@ class ColorRuleDialog : public BaseDialog
 {
 public:
 
-	ColorRuleDialog(HINSTANCE hInstance, HWND hParent, NColorRuleHelper::ColorRule_t *pColorRule, BOOL bEdit);
+	ColorRuleDialog(HINSTANCE hInstance, HWND hParent, NColorRuleHelper::ColorRule *pColorRule, BOOL bEdit);
 
 	LRESULT CALLBACK	StaticColorProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
@@ -65,7 +65,7 @@ private:
 	void	OnCancel();
 
 	BOOL		m_bEdit;
-	NColorRuleHelper::ColorRule_t	*m_pColorRule;
+	NColorRuleHelper::ColorRule	*m_pColorRule;
 
 	COLORREF	m_cfCurrentColor;
 

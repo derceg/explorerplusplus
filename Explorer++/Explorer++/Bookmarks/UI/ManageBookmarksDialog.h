@@ -15,6 +15,7 @@
 class BookmarkNavigationController;
 class BookmarkTree;
 class BookmarkTreeView;
+class IconFetcher;
 __interface IExplorerplusplus;
 class ManageBookmarksDialog;
 class Navigation;
@@ -48,7 +49,7 @@ class ManageBookmarksDialog : public BaseDialog
 {
 public:
 	ManageBookmarksDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp,
-		Navigation *navigation, BookmarkTree *bookmarkTree);
+		Navigation *navigation, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
 	~ManageBookmarksDialog();
 
 protected:
@@ -113,6 +114,7 @@ private:
 
 	IExplorerplusplus *m_pexpp;
 	Navigation *m_navigation;
+	IconFetcher *m_iconFetcher;
 
 	BookmarkTree *m_bookmarkTree;
 

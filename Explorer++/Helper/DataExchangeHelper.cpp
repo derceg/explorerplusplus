@@ -108,7 +108,8 @@ std::vector<std::wstring> ExtractDroppedFilesList(IDataObject *dataObject)
 	}
 
 	auto *dropFiles = static_cast<DROPFILES *>(mem.get());
-	UINT numDroppedFiles = DragQueryFile(reinterpret_cast<HDROP>(dropFiles), 0xFFFFFFFF, nullptr, 0);
+	UINT numDroppedFiles =
+		DragQueryFile(reinterpret_cast<HDROP>(dropFiles), 0xFFFFFFFF, nullptr, 0);
 	std::vector<std::wstring> droppedFiles;
 
 	for (UINT i = 0; i < numDroppedFiles; i++)
@@ -123,8 +124,8 @@ std::vector<std::wstring> ExtractDroppedFilesList(IDataObject *dataObject)
 		std::wstring fullFileName;
 		fullFileName.resize(numCharacters + 1);
 
-		UINT charactersCopied = DragQueryFile(reinterpret_cast<HDROP>(dropFiles), i, fullFileName.data(),
-			static_cast<UINT>(fullFileName.capacity()));
+		UINT charactersCopied = DragQueryFile(reinterpret_cast<HDROP>(dropFiles), i,
+			fullFileName.data(), static_cast<UINT>(fullFileName.capacity()));
 
 		if (charactersCopied == 0)
 		{

@@ -72,7 +72,7 @@ struct Config
 		displayWindowVertical = FALSE;
 		treeViewWidth = DEFAULT_TREEVIEW_WIDTH;
 
-		replaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_NONE;
+		replaceExplorerMode = DefaultFileManager::ReplaceExplorerMode::None;
 
 		showInfoTips = TRUE;
 		infoTipType = InfoTipType::System;
@@ -101,7 +101,7 @@ struct Config
 		globalFolderSettings.insertSorted = TRUE;
 		globalFolderSettings.showGridlines = TRUE;
 		globalFolderSettings.forceSize = FALSE;
-		globalFolderSettings.sizeDisplayFormat = SIZE_FORMAT_BYTES;
+		globalFolderSettings.sizeDisplayFormat = SizeDisplayFormat::Bytes;
 		globalFolderSettings.oneClickActivate = FALSE;
 		globalFolderSettings.oneClickActivateHoverTime = DEFAULT_LISTVIEW_HOVER_TIME;
 
@@ -166,7 +166,7 @@ struct Config
 	BOOL displayWindowVertical;
 	unsigned int treeViewWidth;
 
-	NDefaultFileManager::ReplaceExplorerModes_t replaceExplorerMode;
+	DefaultFileManager::ReplaceExplorerMode replaceExplorerMode;
 
 	BOOL showInfoTips;
 	InfoTipType infoTipType;

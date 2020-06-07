@@ -657,7 +657,7 @@ void Explorerplusplus::OnChangeCBChain(WPARAM wParam,LPARAM lParam)
 
 void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 {
-	DirectoryAltered_t	*pDirectoryAltered = nullptr;
+	DirectoryAltered	*pDirectoryAltered = nullptr;
 	int					iDirMonitorId;
 
 	Tab &tab = m_tabContainer->GetTab(iTabId);
@@ -677,7 +677,7 @@ void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 	}
 	else
 	{
-		pDirectoryAltered = (DirectoryAltered_t *)malloc(sizeof(DirectoryAltered_t));
+		pDirectoryAltered = (DirectoryAltered *)malloc(sizeof(DirectoryAltered));
 
 		pDirectoryAltered->iIndex		= iTabId;
 		pDirectoryAltered->iFolderIndex	= tab.GetShellBrowser()->GetUniqueFolderId();
@@ -968,7 +968,7 @@ void Explorerplusplus::CopyColumnInfoToClipboard()
 		if(column.bChecked)
 		{
 			TCHAR szText[64];
-			LoadString(m_hLanguageModule,ShellBrowser::LookupColumnNameStringIndex(column.id),szText,SIZEOF_ARRAY(szText));
+			LoadString(m_hLanguageModule,ShellBrowser::LookupColumnNameStringIndex(column.type),szText,SIZEOF_ARRAY(szText));
 
 			strColumnInfo += std::wstring(szText) + _T("\t");
 

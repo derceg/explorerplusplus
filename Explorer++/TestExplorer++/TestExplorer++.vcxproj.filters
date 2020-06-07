@@ -16,8 +16,6 @@
     <ClCompile Include="CachedIconsTest.cpp">
       <Filter>Helper</Filter>
     </ClCompile>
-    <ClCompile Include="AcceleratorParserTest.cpp" />
-    <ClCompile Include="ManifestTest.cpp" />
     <ClCompile Include="ViewModeHelperTest.cpp" />
     <ClCompile Include="DataObjectTest.cpp">
       <Filter>Helper</Filter>
@@ -30,6 +28,25 @@
     </ClCompile>
     <ClCompile Include="ApplicationToolbarHelperTest.cpp">
       <Filter>Application Toolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="BookmarkXmlStorageTest.cpp">
+      <Filter>Bookmarks</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceHelper.cpp" />
+    <ClCompile Include="BookmarkRegistryStorageTest.cpp">
+      <Filter>Bookmarks</Filter>
+    </ClCompile>
+    <ClCompile Include="BookmarkStorageHelper.cpp">
+      <Filter>Bookmarks</Filter>
+    </ClCompile>
+    <ClCompile Include="StringHelperTest.cpp">
+      <Filter>Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="ManifestTest.cpp">
+      <Filter>Plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="AcceleratorParserTest.cpp">
+      <Filter>Plugins</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -51,6 +68,9 @@
     <Filter Include="Application Toolbar">
       <UniqueIdentifier>{50add424-80be-4374-a9f1-c40b3c8f18ec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Plugins">
+      <UniqueIdentifier>{a4c6e860-5447-45a4-9c38-43404e4883bf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -59,6 +79,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BookmarkTreeHelper.h">
+      <Filter>Bookmarks</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceHelper.h" />
+    <ClInclude Include="BookmarkStorageHelper.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
   </ItemGroup>

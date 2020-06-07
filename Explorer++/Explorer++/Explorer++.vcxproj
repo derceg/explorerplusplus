@@ -157,6 +157,8 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(APPVEYOR_BUILD_NUMBER)'!=''">ENVIRONMENT_BUILD_NUMBER=$(APPVEYOR_BUILD_NUMBER);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -209,6 +211,8 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(APPVEYOR_BUILD_NUMBER)'!=''">ENVIRONMENT_BUILD_NUMBER=$(APPVEYOR_BUILD_NUMBER);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -265,6 +269,8 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(APPVEYOR_BUILD_NUMBER)'!=''">ENVIRONMENT_BUILD_NUMBER=$(APPVEYOR_BUILD_NUMBER);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;WIN32;_DEBUG;_WINDOWS;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -318,6 +324,8 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(APPVEYOR_BUILD_NUMBER)'!=''">ENVIRONMENT_BUILD_NUMBER=$(APPVEYOR_BUILD_NUMBER);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;WIN32;_DEBUG;_WINDOWS;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -370,6 +378,8 @@
       <Optimization>MaxSpeed</Optimization>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <PreprocessorDefinitions Condition="'$(APPVEYOR_BUILD_NUMBER)'!=''">ENVIRONMENT_BUILD_NUMBER=$(APPVEYOR_BUILD_NUMBER);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -418,6 +428,8 @@
       <Optimization>MaxSpeed</Optimization>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <PreprocessorDefinitions Condition="'$(APPVEYOR_BUILD_NUMBER)'!=''">ENVIRONMENT_BUILD_NUMBER=$(APPVEYOR_BUILD_NUMBER);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;WIN64;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -456,7 +468,9 @@
   <ItemGroup>
     <ClCompile Include="AboutDialog.cpp" />
     <ClCompile Include="ApplicationToolbarHelper.cpp" />
+    <ClCompile Include="Bookmarks\BookmarkIconManager.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkMenuController.cpp" />
+    <ClCompile Include="DarkModeHelper.cpp" />
     <ClCompile Include="Plugins\AcceleratorParser.cpp" />
     <ClCompile Include="AcceleratorUpdater.cpp" />
     <ClCompile Include="Bookmarks\UI\AddBookmarkDialog.cpp" />
@@ -565,7 +579,7 @@
     <ClCompile Include="ShellBrowser\DirectoryModificationHandler.cpp" />
     <ClCompile Include="ShellBrowser\GroupManager.cpp" />
     <ClCompile Include="ShellBrowser\HandleThumbnails.cpp" />
-    <ClCompile Include="ShellBrowser\iDropTarget.cpp" />
+    <ClCompile Include="ShellBrowser\DropTarget.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowser.cpp" />
     <ClCompile Include="ShellBrowser\ListView.cpp" />
     <ClCompile Include="ShellBrowser\SortHelper.cpp" />
@@ -603,6 +617,7 @@
     <ClCompile Include="Plugins\TabsApi\TabsApi.cpp" />
     <ClCompile Include="Plugins\TabsApi\Events\TabUpdated.cpp" />
     <ClCompile Include="TaskbarThumbnails.cpp" />
+    <ClCompile Include="ThirdPartyCreditsDialog.cpp" />
     <ClCompile Include="UiTheming.cpp" />
     <ClCompile Include="TreeViewHandler.cpp" />
     <ClCompile Include="Plugins\UiApi.cpp" />
@@ -618,7 +633,9 @@
     <ClInclude Include="Accelerator.h" />
     <ClInclude Include="AcceleratorMappings.h" />
     <ClInclude Include="ApplicationToolbarHelper.h" />
+    <ClInclude Include="Bookmarks\BookmarkIconManager.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkMenuController.h" />
+    <ClInclude Include="DarkModeHelper.h" />
     <ClInclude Include="Plugins\AcceleratorParser.h" />
     <ClInclude Include="AcceleratorUpdater.h" />
     <ClInclude Include="Bookmarks\UI\AddBookmarkDialog.h" />
@@ -657,7 +674,7 @@
     <ClInclude Include="DefaultColumns.h" />
     <ClInclude Include="DefaultToolbarButtons.h" />
     <ClInclude Include="DestroyFilesDialog.h" />
-    <ClInclude Include="DialogHelper.h" />
+    <ClInclude Include="DialogConstants.h" />
     <ClInclude Include="DisplayColoursDialog.h" />
     <ClInclude Include="DisplayWindow\DisplayWindow.h" />
     <ClInclude Include="DrivesToolbar.h" />
@@ -750,6 +767,7 @@
     <ClInclude Include="Plugins\TabsApi\TabsApi.h" />
     <ClInclude Include="Plugins\TabsApi\Events\TabUpdated.h" />
     <ClInclude Include="TaskbarThumbnails.h" />
+    <ClInclude Include="ThirdPartyCreditsDialog.h" />
     <ClInclude Include="UiTheming.h" />
     <ClInclude Include="ToolbarButtons.h" />
     <ClInclude Include="Plugins\UiApi.h" />
@@ -810,27 +828,27 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\boost.1.71.0.0\build\boost.targets" Condition="Exists('..\packages\boost.1.71.0.0\build\boost.targets')" />
-    <Import Project="..\packages\boost_atomic-vc141.1.71.0.0\build\boost_atomic-vc141.targets" Condition="Exists('..\packages\boost_atomic-vc141.1.71.0.0\build\boost_atomic-vc141.targets')" />
-    <Import Project="..\packages\boost_chrono-vc141.1.71.0.0\build\boost_chrono-vc141.targets" Condition="Exists('..\packages\boost_chrono-vc141.1.71.0.0\build\boost_chrono-vc141.targets')" />
-    <Import Project="..\packages\boost_date_time-vc141.1.71.0.0\build\boost_date_time-vc141.targets" Condition="Exists('..\packages\boost_date_time-vc141.1.71.0.0\build\boost_date_time-vc141.targets')" />
-    <Import Project="..\packages\boost_filesystem-vc141.1.71.0.0\build\boost_filesystem-vc141.targets" Condition="Exists('..\packages\boost_filesystem-vc141.1.71.0.0\build\boost_filesystem-vc141.targets')" />
-    <Import Project="..\packages\boost_locale-vc141.1.71.0.0\build\boost_locale-vc141.targets" Condition="Exists('..\packages\boost_locale-vc141.1.71.0.0\build\boost_locale-vc141.targets')" />
-    <Import Project="..\packages\boost_log-vc141.1.71.0.0\build\boost_log-vc141.targets" Condition="Exists('..\packages\boost_log-vc141.1.71.0.0\build\boost_log-vc141.targets')" />
-    <Import Project="..\packages\boost_log_setup-vc141.1.71.0.0\build\boost_log_setup-vc141.targets" Condition="Exists('..\packages\boost_log_setup-vc141.1.71.0.0\build\boost_log_setup-vc141.targets')" />
-    <Import Project="..\packages\boost_system-vc141.1.71.0.0\build\boost_system-vc141.targets" Condition="Exists('..\packages\boost_system-vc141.1.71.0.0\build\boost_system-vc141.targets')" />
-    <Import Project="..\packages\boost_thread-vc141.1.71.0.0\build\boost_thread-vc141.targets" Condition="Exists('..\packages\boost_thread-vc141.1.71.0.0\build\boost_thread-vc141.targets')" />
-    <Import Project="..\packages\boost_atomic-vc142.1.71.0.0\build\boost_atomic-vc142.targets" Condition="Exists('..\packages\boost_atomic-vc142.1.71.0.0\build\boost_atomic-vc142.targets')" />
-    <Import Project="..\packages\boost_chrono-vc142.1.71.0.0\build\boost_chrono-vc142.targets" Condition="Exists('..\packages\boost_chrono-vc142.1.71.0.0\build\boost_chrono-vc142.targets')" />
-    <Import Project="..\packages\boost_date_time-vc142.1.71.0.0\build\boost_date_time-vc142.targets" Condition="Exists('..\packages\boost_date_time-vc142.1.71.0.0\build\boost_date_time-vc142.targets')" />
-    <Import Project="..\packages\boost_filesystem-vc142.1.71.0.0\build\boost_filesystem-vc142.targets" Condition="Exists('..\packages\boost_filesystem-vc142.1.71.0.0\build\boost_filesystem-vc142.targets')" />
-    <Import Project="..\packages\boost_locale-vc142.1.71.0.0\build\boost_locale-vc142.targets" Condition="Exists('..\packages\boost_locale-vc142.1.71.0.0\build\boost_locale-vc142.targets')" />
-    <Import Project="..\packages\boost_log_setup-vc142.1.71.0.0\build\boost_log_setup-vc142.targets" Condition="Exists('..\packages\boost_log_setup-vc142.1.71.0.0\build\boost_log_setup-vc142.targets')" />
-    <Import Project="..\packages\boost_log-vc142.1.71.0.0\build\boost_log-vc142.targets" Condition="Exists('..\packages\boost_log-vc142.1.71.0.0\build\boost_log-vc142.targets')" />
-    <Import Project="..\packages\boost_system-vc142.1.71.0.0\build\boost_system-vc142.targets" Condition="Exists('..\packages\boost_system-vc142.1.71.0.0\build\boost_system-vc142.targets')" />
-    <Import Project="..\packages\boost_thread-vc142.1.71.0.0\build\boost_thread-vc142.targets" Condition="Exists('..\packages\boost_thread-vc142.1.71.0.0\build\boost_thread-vc142.targets')" />
-    <Import Project="..\packages\Microsoft.Windows.ImplementationLibrary.1.0.191107.2\build\native\Microsoft.Windows.ImplementationLibrary.targets" Condition="Exists('..\packages\Microsoft.Windows.ImplementationLibrary.1.0.191107.2\build\native\Microsoft.Windows.ImplementationLibrary.targets')" />
     <Import Project="..\packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets" Condition="Exists('..\packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets')" />
+    <Import Project="..\packages\boost.1.72.0.0\build\boost.targets" Condition="Exists('..\packages\boost.1.72.0.0\build\boost.targets')" />
+    <Import Project="..\packages\boost_atomic-vc141.1.72.0.0\build\boost_atomic-vc141.targets" Condition="Exists('..\packages\boost_atomic-vc141.1.72.0.0\build\boost_atomic-vc141.targets')" />
+    <Import Project="..\packages\boost_atomic-vc142.1.72.0.0\build\boost_atomic-vc142.targets" Condition="Exists('..\packages\boost_atomic-vc142.1.72.0.0\build\boost_atomic-vc142.targets')" />
+    <Import Project="..\packages\boost_chrono-vc141.1.72.0.0\build\boost_chrono-vc141.targets" Condition="Exists('..\packages\boost_chrono-vc141.1.72.0.0\build\boost_chrono-vc141.targets')" />
+    <Import Project="..\packages\boost_chrono-vc142.1.72.0.0\build\boost_chrono-vc142.targets" Condition="Exists('..\packages\boost_chrono-vc142.1.72.0.0\build\boost_chrono-vc142.targets')" />
+    <Import Project="..\packages\boost_date_time-vc141.1.72.0.0\build\boost_date_time-vc141.targets" Condition="Exists('..\packages\boost_date_time-vc141.1.72.0.0\build\boost_date_time-vc141.targets')" />
+    <Import Project="..\packages\boost_date_time-vc142.1.72.0.0\build\boost_date_time-vc142.targets" Condition="Exists('..\packages\boost_date_time-vc142.1.72.0.0\build\boost_date_time-vc142.targets')" />
+    <Import Project="..\packages\boost_filesystem-vc141.1.72.0.0\build\boost_filesystem-vc141.targets" Condition="Exists('..\packages\boost_filesystem-vc141.1.72.0.0\build\boost_filesystem-vc141.targets')" />
+    <Import Project="..\packages\boost_filesystem-vc142.1.72.0.0\build\boost_filesystem-vc142.targets" Condition="Exists('..\packages\boost_filesystem-vc142.1.72.0.0\build\boost_filesystem-vc142.targets')" />
+    <Import Project="..\packages\boost_locale-vc141.1.72.0.0\build\boost_locale-vc141.targets" Condition="Exists('..\packages\boost_locale-vc141.1.72.0.0\build\boost_locale-vc141.targets')" />
+    <Import Project="..\packages\boost_locale-vc142.1.72.0.0\build\boost_locale-vc142.targets" Condition="Exists('..\packages\boost_locale-vc142.1.72.0.0\build\boost_locale-vc142.targets')" />
+    <Import Project="..\packages\boost_log-vc141.1.72.0.0\build\boost_log-vc141.targets" Condition="Exists('..\packages\boost_log-vc141.1.72.0.0\build\boost_log-vc141.targets')" />
+    <Import Project="..\packages\boost_log-vc142.1.72.0.0\build\boost_log-vc142.targets" Condition="Exists('..\packages\boost_log-vc142.1.72.0.0\build\boost_log-vc142.targets')" />
+    <Import Project="..\packages\boost_log_setup-vc141.1.72.0.0\build\boost_log_setup-vc141.targets" Condition="Exists('..\packages\boost_log_setup-vc141.1.72.0.0\build\boost_log_setup-vc141.targets')" />
+    <Import Project="..\packages\boost_log_setup-vc142.1.72.0.0\build\boost_log_setup-vc142.targets" Condition="Exists('..\packages\boost_log_setup-vc142.1.72.0.0\build\boost_log_setup-vc142.targets')" />
+    <Import Project="..\packages\boost_system-vc141.1.72.0.0\build\boost_system-vc141.targets" Condition="Exists('..\packages\boost_system-vc141.1.72.0.0\build\boost_system-vc141.targets')" />
+    <Import Project="..\packages\boost_system-vc142.1.72.0.0\build\boost_system-vc142.targets" Condition="Exists('..\packages\boost_system-vc142.1.72.0.0\build\boost_system-vc142.targets')" />
+    <Import Project="..\packages\boost_thread-vc141.1.72.0.0\build\boost_thread-vc141.targets" Condition="Exists('..\packages\boost_thread-vc141.1.72.0.0\build\boost_thread-vc141.targets')" />
+    <Import Project="..\packages\boost_thread-vc142.1.72.0.0\build\boost_thread-vc142.targets" Condition="Exists('..\packages\boost_thread-vc142.1.72.0.0\build\boost_thread-vc142.targets')" />
+    <Import Project="..\packages\Microsoft.Windows.ImplementationLibrary.1.0.200519.2\build\native\Microsoft.Windows.ImplementationLibrary.targets" Condition="Exists('..\packages\Microsoft.Windows.ImplementationLibrary.1.0.200519.2\build\native\Microsoft.Windows.ImplementationLibrary.targets')" />
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
@@ -841,26 +859,26 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\boost.1.71.0.0\build\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.71.0.0\build\boost.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_atomic-vc141.1.71.0.0\build\boost_atomic-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_atomic-vc141.1.71.0.0\build\boost_atomic-vc141.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_chrono-vc141.1.71.0.0\build\boost_chrono-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_chrono-vc141.1.71.0.0\build\boost_chrono-vc141.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_date_time-vc141.1.71.0.0\build\boost_date_time-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_date_time-vc141.1.71.0.0\build\boost_date_time-vc141.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_filesystem-vc141.1.71.0.0\build\boost_filesystem-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_filesystem-vc141.1.71.0.0\build\boost_filesystem-vc141.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_locale-vc141.1.71.0.0\build\boost_locale-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_locale-vc141.1.71.0.0\build\boost_locale-vc141.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_log-vc141.1.71.0.0\build\boost_log-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_log-vc141.1.71.0.0\build\boost_log-vc141.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_log_setup-vc141.1.71.0.0\build\boost_log_setup-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_log_setup-vc141.1.71.0.0\build\boost_log_setup-vc141.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_system-vc141.1.71.0.0\build\boost_system-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_system-vc141.1.71.0.0\build\boost_system-vc141.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_thread-vc141.1.71.0.0\build\boost_thread-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_thread-vc141.1.71.0.0\build\boost_thread-vc141.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_atomic-vc142.1.71.0.0\build\boost_atomic-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_atomic-vc142.1.71.0.0\build\boost_atomic-vc142.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_chrono-vc142.1.71.0.0\build\boost_chrono-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_chrono-vc142.1.71.0.0\build\boost_chrono-vc142.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_date_time-vc142.1.71.0.0\build\boost_date_time-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_date_time-vc142.1.71.0.0\build\boost_date_time-vc142.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_filesystem-vc142.1.71.0.0\build\boost_filesystem-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_filesystem-vc142.1.71.0.0\build\boost_filesystem-vc142.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_locale-vc142.1.71.0.0\build\boost_locale-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_locale-vc142.1.71.0.0\build\boost_locale-vc142.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_log_setup-vc142.1.71.0.0\build\boost_log_setup-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_log_setup-vc142.1.71.0.0\build\boost_log_setup-vc142.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_log-vc142.1.71.0.0\build\boost_log-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_log-vc142.1.71.0.0\build\boost_log-vc142.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_system-vc142.1.71.0.0\build\boost_system-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_system-vc142.1.71.0.0\build\boost_system-vc142.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_thread-vc142.1.71.0.0\build\boost_thread-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_thread-vc142.1.71.0.0\build\boost_thread-vc142.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.Windows.ImplementationLibrary.1.0.191107.2\build\native\Microsoft.Windows.ImplementationLibrary.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.ImplementationLibrary.1.0.191107.2\build\native\Microsoft.Windows.ImplementationLibrary.targets'))" />
     <Error Condition="!Exists('..\packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets'))" />
+    <Error Condition="!Exists('..\packages\boost.1.72.0.0\build\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.72.0.0\build\boost.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_atomic-vc141.1.72.0.0\build\boost_atomic-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_atomic-vc141.1.72.0.0\build\boost_atomic-vc141.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_atomic-vc142.1.72.0.0\build\boost_atomic-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_atomic-vc142.1.72.0.0\build\boost_atomic-vc142.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_chrono-vc141.1.72.0.0\build\boost_chrono-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_chrono-vc141.1.72.0.0\build\boost_chrono-vc141.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_chrono-vc142.1.72.0.0\build\boost_chrono-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_chrono-vc142.1.72.0.0\build\boost_chrono-vc142.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_date_time-vc141.1.72.0.0\build\boost_date_time-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_date_time-vc141.1.72.0.0\build\boost_date_time-vc141.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_date_time-vc142.1.72.0.0\build\boost_date_time-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_date_time-vc142.1.72.0.0\build\boost_date_time-vc142.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_filesystem-vc141.1.72.0.0\build\boost_filesystem-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_filesystem-vc141.1.72.0.0\build\boost_filesystem-vc141.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_filesystem-vc142.1.72.0.0\build\boost_filesystem-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_filesystem-vc142.1.72.0.0\build\boost_filesystem-vc142.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_locale-vc141.1.72.0.0\build\boost_locale-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_locale-vc141.1.72.0.0\build\boost_locale-vc141.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_locale-vc142.1.72.0.0\build\boost_locale-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_locale-vc142.1.72.0.0\build\boost_locale-vc142.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_log-vc141.1.72.0.0\build\boost_log-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_log-vc141.1.72.0.0\build\boost_log-vc141.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_log-vc142.1.72.0.0\build\boost_log-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_log-vc142.1.72.0.0\build\boost_log-vc142.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_log_setup-vc141.1.72.0.0\build\boost_log_setup-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_log_setup-vc141.1.72.0.0\build\boost_log_setup-vc141.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_log_setup-vc142.1.72.0.0\build\boost_log_setup-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_log_setup-vc142.1.72.0.0\build\boost_log_setup-vc142.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_system-vc141.1.72.0.0\build\boost_system-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_system-vc141.1.72.0.0\build\boost_system-vc141.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_system-vc142.1.72.0.0\build\boost_system-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_system-vc142.1.72.0.0\build\boost_system-vc142.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_thread-vc141.1.72.0.0\build\boost_thread-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_thread-vc141.1.72.0.0\build\boost_thread-vc141.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_thread-vc142.1.72.0.0\build\boost_thread-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_thread-vc142.1.72.0.0\build\boost_thread-vc142.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Windows.ImplementationLibrary.1.0.200519.2\build\native\Microsoft.Windows.ImplementationLibrary.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.ImplementationLibrary.1.0.200519.2\build\native\Microsoft.Windows.ImplementationLibrary.targets'))" />
   </Target>
 </Project>

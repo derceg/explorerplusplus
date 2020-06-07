@@ -10,10 +10,11 @@
 #include <boost/scope_exit.hpp>
 #include <list>
 
-#pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
+#pragma warning(                                                                                   \
+	disable : 4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
-#define THUMBNAIL_TYPE_ICON			0
-#define THUMBNAIL_TYPE_EXTRACTED	1
+#define THUMBNAIL_TYPE_ICON 0
+#define THUMBNAIL_TYPE_EXTRACTED 1
 
 void ShellBrowser::SetupThumbnailsView()
 {
@@ -30,26 +31,27 @@ void ShellBrowser::SetupThumbnailsView()
 	the regular size icon is shown for items with a thumbnail that hasn't
 	been found yet (and not the large or extra large icon). */
 	SHGetImageList(SHIL_LARGE, IID_PPV_ARGS(&pImageList));
-	ListView_SetImageList(m_hListView,(HIMAGELIST)pImageList,LVSIL_NORMAL);
+	ListView_SetImageList(m_hListView, (HIMAGELIST) pImageList, LVSIL_NORMAL);
 	pImageList->Release();
 
-	m_hListViewImageList = ListView_GetImageList(m_hListView,LVSIL_NORMAL);
+	m_hListViewImageList = ListView_GetImageList(m_hListView, LVSIL_NORMAL);
 
-	ListView_SetExtendedListViewStyleEx(m_hListView,LVS_EX_BORDERSELECT,LVS_EX_BORDERSELECT);
+	ListView_SetExtendedListViewStyleEx(m_hListView, LVS_EX_BORDERSELECT, LVS_EX_BORDERSELECT);
 
-	ListView_SetIconSpacing(m_hListView,THUMBNAIL_ITEM_HORIZONTAL_SPACING + THUMBNAIL_ITEM_WIDTH,
+	ListView_SetIconSpacing(m_hListView, THUMBNAIL_ITEM_HORIZONTAL_SPACING + THUMBNAIL_ITEM_WIDTH,
 		THUMBNAIL_ITEM_VERTICAL_SPACING + THUMBNAIL_ITEM_HEIGHT);
 
-	himl = ImageList_Create(THUMBNAIL_ITEM_WIDTH,THUMBNAIL_ITEM_HEIGHT,ILC_COLOR32,nItems,nItems + 100);
-	ListView_SetImageList(m_hListView,himl,LVSIL_NORMAL);
+	himl = ImageList_Create(
+		THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT, ILC_COLOR32, nItems, nItems + 100);
+	ListView_SetImageList(m_hListView, himl, LVSIL_NORMAL);
 
-	for(i = 0;i < nItems;i++)
+	for (i = 0; i < nItems; i++)
 	{
-		lvItem.mask		= LVIF_IMAGE;
-		lvItem.iItem	= i;
-		lvItem.iSubItem	= 0;
-		lvItem.iImage	= I_IMAGECALLBACK;
-		ListView_SetItem(m_hListView,&lvItem);
+		lvItem.mask = LVIF_IMAGE;
+		lvItem.iItem = i;
+		lvItem.iSubItem = 0;
+		lvItem.iImage = I_IMAGECALLBACK;
+		ListView_SetItem(m_hListView, &lvItem);
 	}
 
 	m_bThumbnailsSetup = TRUE;
@@ -57,33 +59,33 @@ void ShellBrowser::SetupThumbnailsView()
 
 void ShellBrowser::RemoveThumbnailsView()
 {
-	LVITEM		lvItem;
-	HIMAGELIST	himl;
-	int			nItems;
-	int			i = 0;
+	LVITEM lvItem;
+	HIMAGELIST himl;
+	int nItems;
+	int i = 0;
 
 	/* Remove item borders. */
-	ListView_SetExtendedListViewStyleEx(m_hListView,LVS_EX_BORDERSELECT,0);
+	ListView_SetExtendedListViewStyleEx(m_hListView, LVS_EX_BORDERSELECT, 0);
 
 	/* Reset to the default icon spacing. */
-	ListView_SetIconSpacing(m_hListView,-1,-1);
+	ListView_SetIconSpacing(m_hListView, -1, -1);
 
 	nItems = ListView_GetItemCount(m_hListView);
 
 	m_thumbnailThreadPool.clear_queue();
 	m_thumbnailResults.clear();
 
-	for(i = 0;i < nItems;i++)
+	for (i = 0; i < nItems; i++)
 	{
-		lvItem.mask		= LVIF_IMAGE;
-		lvItem.iItem	= i;
-		lvItem.iSubItem	= 0;
-		lvItem.iImage	= I_IMAGECALLBACK;
-		ListView_SetItem(m_hListView,&lvItem);
+		lvItem.mask = LVIF_IMAGE;
+		lvItem.iItem = i;
+		lvItem.iSubItem = 0;
+		lvItem.iImage = I_IMAGECALLBACK;
+		ListView_SetItem(m_hListView, &lvItem);
 	}
 
 	/* Destroy the thumbnails imagelist. */
-	himl = ListView_GetImageList(m_hListView,LVSIL_NORMAL);
+	himl = ListView_GetImageList(m_hListView, LVSIL_NORMAL);
 
 	ImageList_Destroy(himl);
 
@@ -96,42 +98,49 @@ void ShellBrowser::QueueThumbnailTask(int internalIndex)
 
 	BasicItemInfo_t basicItemInfo = getBasicItemInfo(internalIndex);
 
-	auto result = m_thumbnailThreadPool.push([this, thumbnailResultID, internalIndex, basicItemInfo](int id) {
-		UNREFERENCED_PARAMETER(id);
+	auto result =
+		m_thumbnailThreadPool.push([this, thumbnailResultID, internalIndex, basicItemInfo](int id) {
+			UNREFERENCED_PARAMETER(id);
 
-		return FindThumbnailAsync(m_hListView, thumbnailResultID, internalIndex, basicItemInfo);
-	});
+			return FindThumbnailAsync(m_hListView, thumbnailResultID, internalIndex, basicItemInfo);
+		});
 
 	m_thumbnailResults.insert({ thumbnailResultID, std::move(result) });
 }
 
-std::optional<ShellBrowser::ThumbnailResult_t> ShellBrowser::FindThumbnailAsync(HWND listView,
-	int thumbnailResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo)
+std::optional<ShellBrowser::ThumbnailResult_t> ShellBrowser::FindThumbnailAsync(
+	HWND listView, int thumbnailResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo)
 {
 	IShellFolder *pShellFolder = nullptr;
-	HRESULT hr = SHBindToParent(basicItemInfo.pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), nullptr);
+	HRESULT hr =
+		SHBindToParent(basicItemInfo.pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), nullptr);
 
 	if (FAILED(hr))
 	{
 		return std::nullopt;
 	}
 
-	BOOST_SCOPE_EXIT(pShellFolder) {
+	BOOST_SCOPE_EXIT(pShellFolder)
+	{
 		pShellFolder->Release();
-	} BOOST_SCOPE_EXIT_END
+	}
+	BOOST_SCOPE_EXIT_END
 
 	IExtractImage *pExtractImage = nullptr;
 	auto pridl = basicItemInfo.pridl.get();
-	hr = GetUIObjectOf(pShellFolder, nullptr, 1, const_cast<PCUITEMID_CHILD *>(&pridl), IID_PPV_ARGS(&pExtractImage));
+	hr = GetUIObjectOf(pShellFolder, nullptr, 1, const_cast<PCUITEMID_CHILD *>(&pridl),
+		IID_PPV_ARGS(&pExtractImage));
 
 	if (FAILED(hr))
 	{
 		return std::nullopt;
 	}
 
-	BOOST_SCOPE_EXIT(pExtractImage) {
+	BOOST_SCOPE_EXIT(pExtractImage)
+	{
 		pExtractImage->Release();
-	} BOOST_SCOPE_EXIT_END
+	}
+	BOOST_SCOPE_EXIT_END
 
 	SIZE size;
 	size.cx = THUMBNAIL_ITEM_WIDTH;
@@ -143,7 +152,8 @@ std::optional<ShellBrowser::ThumbnailResult_t> ShellBrowser::FindThumbnailAsync(
 	// Extract.
 	TCHAR szImage[MAX_PATH];
 	DWORD dwPriority;
-	hr = pExtractImage->GetLocation(szImage, SIZEOF_ARRAY(szImage), &dwPriority, &size, 32, &dwFlags);
+	hr = pExtractImage->GetLocation(
+		szImage, SIZEOF_ARRAY(szImage), &dwPriority, &size, 32, &dwFlags);
 
 	if (FAILED(hr))
 	{
@@ -209,19 +219,17 @@ void ShellBrowser::ProcessThumbnailResult(int thumbnailResultId)
 /* Draws a thumbnail based on an items icon. */
 int ShellBrowser::GetIconThumbnail(int iInternalIndex) const
 {
-	return GetThumbnailInternal(THUMBNAIL_TYPE_ICON,iInternalIndex,
-		nullptr);
+	return GetThumbnailInternal(THUMBNAIL_TYPE_ICON, iInternalIndex, nullptr);
 }
 
 /* Draws an items extracted thumbnail. */
 int ShellBrowser::GetExtractedThumbnail(HBITMAP hThumbnailBitmap) const
 {
-	return GetThumbnailInternal(THUMBNAIL_TYPE_EXTRACTED,0,
-		hThumbnailBitmap);
+	return GetThumbnailInternal(THUMBNAIL_TYPE_EXTRACTED, 0, hThumbnailBitmap);
 }
 
-int ShellBrowser::GetThumbnailInternal(int iType,
-int iInternalIndex,HBITMAP hThumbnailBitmap) const
+int ShellBrowser::GetThumbnailInternal(
+	int iType, int iInternalIndex, HBITMAP hThumbnailBitmap) const
 {
 	HDC hdc;
 	HDC hdcBacking;
@@ -235,31 +243,35 @@ int iInternalIndex,HBITMAP hThumbnailBitmap) const
 	hdcBacking = CreateCompatibleDC(hdc);
 
 	/* Backing bitmap. */
-	hBackingBitmap = CreateCompatibleBitmap(hdc,THUMBNAIL_ITEM_WIDTH,THUMBNAIL_ITEM_HEIGHT);
-	hBackingBitmapOld = (HBITMAP)SelectObject(hdcBacking,hBackingBitmap);
+	hBackingBitmap = CreateCompatibleBitmap(hdc, THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT);
+	hBackingBitmapOld = (HBITMAP) SelectObject(hdcBacking, hBackingBitmap);
 
 	/* Set the background of the new bitmap to be the same color as the
 	background in the listview. */
 	hbr = CreateSolidBrush(ListView_GetBkColor(m_hListView));
-	RECT rect = {0,0,THUMBNAIL_ITEM_WIDTH,THUMBNAIL_ITEM_HEIGHT};
-	FillRect(hdcBacking,&rect,hbr);
+	RECT rect = { 0, 0, THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT };
+	FillRect(hdcBacking, &rect, hbr);
 
-	if(iType == THUMBNAIL_TYPE_ICON)
-		DrawIconThumbnailInternal(hdcBacking,iInternalIndex);
-	else if(iType == THUMBNAIL_TYPE_EXTRACTED)
-		DrawThumbnailInternal(hdcBacking,hThumbnailBitmap);
+	if (iType == THUMBNAIL_TYPE_ICON)
+	{
+		DrawIconThumbnailInternal(hdcBacking, iInternalIndex);
+	}
+	else if (iType == THUMBNAIL_TYPE_EXTRACTED)
+	{
+		DrawThumbnailInternal(hdcBacking, hThumbnailBitmap);
+	}
 
 	/* Clean up...
 	Everything EXCEPT the backing bitmap should be
 	deleted here (at the very least, the backing
 	bitmap needs to be selected out of its DC). */
-	SelectObject(hdcBacking,hBackingBitmapOld);
+	SelectObject(hdcBacking, hBackingBitmapOld);
 	DeleteDC(hdcBacking);
-	ReleaseDC(m_hListView,hdc);
+	ReleaseDC(m_hListView, hdc);
 
 	/* Add the new bitmap to the imagelist. */
-	himl = ListView_GetImageList(m_hListView,LVSIL_NORMAL);
-	iImage = ImageList_Add(himl,hBackingBitmap, nullptr);
+	himl = ListView_GetImageList(m_hListView, LVSIL_NORMAL);
+	iImage = ImageList_Add(himl, hBackingBitmap, nullptr);
 
 	/* Now delete the backing bitmap. */
 	DeleteObject(hBackingBitmap);
@@ -267,27 +279,26 @@ int iInternalIndex,HBITMAP hThumbnailBitmap) const
 	return iImage;
 }
 
-void ShellBrowser::DrawIconThumbnailInternal(HDC hdcBacking,int iInternalIndex) const
+void ShellBrowser::DrawIconThumbnailInternal(HDC hdcBacking, int iInternalIndex) const
 {
 	HICON hIcon;
 	SHFILEINFO shfi;
 	int iIconWidth;
 	int iIconHeight;
 
-	SHGetFileInfo((LPCTSTR)m_itemInfoMap.at(iInternalIndex).pidlComplete.get(),0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_SYSICONINDEX);
+	SHGetFileInfo((LPCTSTR) m_itemInfoMap.at(iInternalIndex).pidlComplete.get(), 0, &shfi,
+		sizeof(shfi), SHGFI_PIDL | SHGFI_SYSICONINDEX);
 
-	hIcon = ImageList_GetIcon(m_hListViewImageList,
-		shfi.iIcon,ILD_NORMAL);
+	hIcon = ImageList_GetIcon(m_hListViewImageList, shfi.iIcon, ILD_NORMAL);
 
-	ImageList_GetIconSize(m_hListViewImageList,&iIconWidth,&iIconHeight);
+	ImageList_GetIconSize(m_hListViewImageList, &iIconWidth, &iIconHeight);
 
-	DrawIconEx(hdcBacking,(THUMBNAIL_ITEM_WIDTH - iIconWidth) / 2,
-		(THUMBNAIL_ITEM_HEIGHT - iIconHeight) / 2,hIcon,0,0,
-		0, nullptr,DI_NORMAL);
+	DrawIconEx(hdcBacking, (THUMBNAIL_ITEM_WIDTH - iIconWidth) / 2,
+		(THUMBNAIL_ITEM_HEIGHT - iIconHeight) / 2, hIcon, 0, 0, 0, nullptr, DI_NORMAL);
 	DestroyIcon(hIcon);
 }
 
-void ShellBrowser::DrawThumbnailInternal(HDC hdcBacking,HBITMAP hThumbnailBitmap) const
+void ShellBrowser::DrawThumbnailInternal(HDC hdcBacking, HBITMAP hThumbnailBitmap) const
 {
 	HDC hdcThumbnail;
 	HBITMAP hThumbnailBitmapOld;
@@ -295,17 +306,16 @@ void ShellBrowser::DrawThumbnailInternal(HDC hdcBacking,HBITMAP hThumbnailBitmap
 
 	/* Thumbnail bitmap. */
 	hdcThumbnail = CreateCompatibleDC(hdcBacking);
-	hThumbnailBitmapOld = (HBITMAP)SelectObject(hdcThumbnail,hThumbnailBitmap);
+	hThumbnailBitmapOld = (HBITMAP) SelectObject(hdcThumbnail, hThumbnailBitmap);
 
-	GetObject(hThumbnailBitmap,sizeof(BITMAP),&bm);
+	GetObject(hThumbnailBitmap, sizeof(BITMAP), &bm);
 
 	/* Now, draw the thumbnail bitmap (in its centered position)
 	directly on top of the new bitmap. */
-	BitBlt(hdcBacking,(THUMBNAIL_ITEM_WIDTH - bm.bmWidth) / 2,
-		(THUMBNAIL_ITEM_HEIGHT - bm.bmHeight) / 2,
-		THUMBNAIL_ITEM_WIDTH,THUMBNAIL_ITEM_HEIGHT,
-		hdcThumbnail,0,0,SRCCOPY);
+	BitBlt(hdcBacking, (THUMBNAIL_ITEM_WIDTH - bm.bmWidth) / 2,
+		(THUMBNAIL_ITEM_HEIGHT - bm.bmHeight) / 2, THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT,
+		hdcThumbnail, 0, 0, SRCCOPY);
 
-	SelectObject(hdcThumbnail,hThumbnailBitmapOld);
+	SelectObject(hdcThumbnail, hThumbnailBitmapOld);
 	DeleteDC(hdcThumbnail);
 }

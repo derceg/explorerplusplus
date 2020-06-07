@@ -66,6 +66,25 @@ namespace ctpl {
 			std::queue<T> q;
 			std::mutex mutex;
 		};
+
+		// Explorer++ custom notification changes.
+		class Notifier {
+		public:
+			Notifier(std::function<void()> onConstruction, std::function<void()> onDestruction) : onDestruction(onDestruction) {
+				if (onConstruction) {
+					onConstruction();
+				}
+			}
+
+			~Notifier() {
+				if (onDestruction) {
+					onDestruction();
+				}
+			}
+
+		private:
+			std::function<void()> onDestruction;
+		};
 	}
 
 	class thread_pool {
@@ -74,6 +93,14 @@ namespace ctpl {
 
 		thread_pool() { this->init(); }
 		thread_pool(int nThreads) { this->init(); this->resize(nThreads); }
+
+		// Explorer++ custom notification changes.
+		thread_pool(int nThreads, std::function<void()> onConstruction, std::function<void()> onDestruction) {
+			this->init();
+			this->resize(nThreads);
+			this->onConstruction = onConstruction;
+			this->onDestruction = onDestruction;
+		}
 
 		// the destructor waits for all the functions in the queue to be finished
 		~thread_pool() {
@@ -209,6 +236,9 @@ namespace ctpl {
 		void set_thread(int i) {
 			std::shared_ptr<std::atomic<bool>> flag(this->flags[i]); // a copy of the shared ptr to the flag
 			auto f = [this, i, flag/* a copy of the shared ptr to the flag */]() {
+				// Explorer++ custom notification changes.
+				detail::Notifier notifier(this->onConstruction, this->onDestruction);
+
 				std::atomic<bool> & _flag = *flag;
 				std::function<void(int id)> * _f;
 				bool isPop = this->q.pop(_f);
@@ -241,6 +271,10 @@ namespace ctpl {
 		std::atomic<bool> isDone;
 		std::atomic<bool> isStop;
 		std::atomic<int> nWaiting;  // how many threads are waiting
+
+		// Explorer++ custom notification changes.
+		std::function<void()> onConstruction;
+		std::function<void()> onDestruction;
 
 		std::mutex mutex;
 		std::condition_variable cv;

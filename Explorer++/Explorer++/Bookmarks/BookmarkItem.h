@@ -55,7 +55,7 @@ public:
 
 		if (type == Type::Bookmark)
 		{
-			construct(originalGuid, name, location);
+			construct(originalGuid, name, location, true);
 		}
 		else
 		{
@@ -89,8 +89,8 @@ public:
 	FILETIME GetDateModified() const;
 	void SetDateModified(const FILETIME &dateModified);
 
-	void AddChild(std::unique_ptr<BookmarkItem> bookmarkItem);
-	void AddChild(std::unique_ptr<BookmarkItem> bookmarkItem, size_t index);
+	BookmarkItem *AddChild(std::unique_ptr<BookmarkItem> bookmarkItem);
+	BookmarkItem *AddChild(std::unique_ptr<BookmarkItem> bookmarkItem, size_t index);
 	std::unique_ptr<BookmarkItem> RemoveChild(size_t index);
 	bool HasChildFolder() const;
 
@@ -113,7 +113,11 @@ private:
 	// directly imported. Without that method, you would have to call AddChild()
 	// for each child item and there's no need to do that when you already have
 	// a list of the children in the correct format.
-	BookmarkItem(std::wstring_view originalGuid, std::wstring_view name, std::wstring location);
+	// Also note that the first method has a dummy parameter added to the end.
+	// This is because the method would be ambiguous otherwise (it would clash with
+	// the public constructor).
+	BookmarkItem(std::wstring_view originalGuid, std::wstring_view name, std::wstring location,
+		bool internal);
 	BookmarkItem(std::wstring_view originalGuid, std::wstring_view name, BookmarkItems &&children);
 
 	static FILETIME GetCurrentDate();

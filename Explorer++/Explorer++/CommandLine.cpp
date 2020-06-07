@@ -13,10 +13,16 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/StringHelper.h"
 #include "../ThirdParty/CLI11/CLI11.hpp"
+#include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/log/core.hpp>
+#include <iostream>
+#include <map>
+
+using namespace DefaultFileManager;
 
 extern std::vector<std::wstring> g_commandLineDirectories;
+extern bool g_enableDarkMode;
 
 struct CommandLineSettings
 {
@@ -24,16 +30,26 @@ struct CommandLineSettings
 	bool enableLogging;
 	bool enablePlugins;
 	bool removeAsDefault;
-	bool setAsDefault;
+	ReplaceExplorerMode replaceExplorerMode;
 	std::string language;
 	bool jumplistNewTab;
+	bool enableDarkMode;
 	std::vector<std::string> directories;
 };
 
+struct ReplaceExplorerResults
+{
+	std::optional<LSTATUS> removedFileSystem;
+	std::optional<LSTATUS> removedAll;
+	std::optional<LSTATUS> setFileSystem;
+	std::optional<LSTATUS> setAll;
+};
+
+void PreprocessCommandLineSettings(CommandLineSettings &commandLineSettings);
 std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(const CommandLineSettings& commandLineSettings);
 void OnClearRegistrySettings();
-void OnRemoveAsDefault();
-void OnSetAsDefault();
+void OnUpdateReplaceExplorerSetting(ReplaceExplorerMode updatedReplaceMode);
+ReplaceExplorerResults UpdateReplaceExplorerSetting(ReplaceExplorerMode updatedReplaceMode);
 void OnJumplistNewTab();
 
 std::optional<CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
@@ -67,15 +83,18 @@ std::optional<CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
 	auto removeAsDefaultOption = app.add_flag(
 		"--remove-as-default",
 		commandLineSettings.removeAsDefault,
-		"Remove Explorer++ as the default file manager (requires administrator privileges)"
+		"Remove Explorer++ as the default file manager"
 	);
 
-	commandLineSettings.setAsDefault = false;
-	auto setAsDefaultOption = app.add_flag(
+	commandLineSettings.replaceExplorerMode = ReplaceExplorerMode::None;
+	auto setAsDefaultOption = app.add_option(
 		"--set-as-default",
-		commandLineSettings.setAsDefault,
-		"Set Explorer++ as the default file manager (requires administrator privileges)"
-	);
+		commandLineSettings.replaceExplorerMode,
+		"Set Explorer++ as the default file manager for the current user"
+	)->transform(CLI::CheckedTransformer(CLI::TransformPairs<ReplaceExplorerMode>{
+		{ "filesystem", ReplaceExplorerMode::FileSystem },
+		{ "all", ReplaceExplorerMode::All }
+	}));
 
 	removeAsDefaultOption->excludes(setAsDefaultOption);
 	setAsDefaultOption->excludes(removeAsDefaultOption);
@@ -86,17 +105,26 @@ std::optional<CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
 		"Allows you to select your desired language. Should be a two-letter language code (e.g. FR, RU, etc)."
 	);
 
+	commandLineSettings.enableDarkMode = false;
+	app.add_flag(
+		"--enable-dark-mode",
+		commandLineSettings.enableDarkMode,
+		"(Experimental) Enables dark mode. Only tested with Windows 10 version 1909. May fail or \
+crash with other versions of Windows 10. This option has no effect on earlier versions of Windows."
+	);
+
 	app.add_option(
 		"directories",
 		commandLineSettings.directories,
 		"Directories to open"
 	);
 
-	// The options in this group are only used internally by the
-	// application. They're not directly exposed to users.
-	CLI::App *privateCommands = app.add_subcommand("private");
+	// The options in this group are only used internally by the application. They're not directly
+	// exposed to users.
+	CLI::App *privateCommands = app.add_subcommand();
 	privateCommands->group("");
 
+	commandLineSettings.jumplistNewTab = false;
 	privateCommands->add_flag(
 		wstrToStr(NExplorerplusplus::JUMPLIST_TASK_NEWTAB_ARGUMENT),
 		commandLineSettings.jumplistNewTab
@@ -111,10 +139,48 @@ std::optional<CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
 		return ExitInfo{ app.exit(e) };
 	}
 
+	PreprocessCommandLineSettings(commandLineSettings);
+
 	return ProcessCommandLineSettings(commandLineSettings);
 }
 
-std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(const CommandLineSettings& commandLineSettings)
+void PreprocessCommandLineSettings(CommandLineSettings &commandLineSettings)
+{
+	// When Explorer++ is set as the default file manager, it's invoked in the following way when a
+	// directory is opened:
+	//
+	// C:\path\to\Explorer++.exe "[directory_path]"
+	//
+	// If directory_path is something like C:\, this will result in the following invocation:
+	//
+	// C:\path\to\Explorer++.exe "C:\"
+	//
+	// This path argument is then turned into the following string:
+	//
+	// C:"
+	//
+	// This is due to the C++ command line parsing rules, as described at:
+	//
+	// https://docs.microsoft.com/en-us/cpp/cpp/main-function-command-line-args?view=vs-2019#parsing-c-command-line-arguments
+	//
+	// That is, \" is interpreted as a literal backslash character.
+	//
+	// That isn't what's intended when being passed a directory path. To resolve this, if a
+	// directory path ends in a double quote character, that character is replaced with a backslash
+	// character. This should be safe, as a double quote isn't an allowed file name character, so
+	// the presence of the double quote character is either a mistake (in which case, no directory
+	// will be opened anyway, so the transformation won't make much of a difference), or it's
+	// something that's being interpreted as part of the command line parsing.
+	for (std::string &directory : commandLineSettings.directories)
+	{
+		if (directory[directory.size() - 1] == '\"')
+		{
+			directory[directory.size() - 1] = '\\';
+		}
+	}
+}
+
+std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(const CommandLineSettings &commandLineSettings)
 {
 	if (commandLineSettings.jumplistNewTab)
 	{
@@ -139,11 +205,11 @@ std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(const CommandLin
 
 	if (commandLineSettings.removeAsDefault)
 	{
-		OnRemoveAsDefault();
+		OnUpdateReplaceExplorerSetting(ReplaceExplorerMode::None);
 	}
-	else if (commandLineSettings.setAsDefault)
+	else if (commandLineSettings.replaceExplorerMode != ReplaceExplorerMode::None)
 	{
-		OnSetAsDefault();
+		OnUpdateReplaceExplorerSetting(commandLineSettings.replaceExplorerMode);
 	}
 
 	if (!commandLineSettings.language.empty())
@@ -152,6 +218,8 @@ std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(const CommandLin
 
 		StringCchCopy(g_szLang, SIZEOF_ARRAY(g_szLang), strToWstr(commandLineSettings.language).c_str());
 	}
+
+	g_enableDarkMode = commandLineSettings.enableDarkMode;
 
 	TCHAR processImageName[MAX_PATH];
 	GetProcessImageName(GetCurrentProcessId(), processImageName, SIZEOF_ARRAY(processImageName));
@@ -177,47 +245,81 @@ void OnClearRegistrySettings()
 	lStatus = SHDeleteKey(HKEY_CURRENT_USER, NExplorerplusplus::REG_MAIN_KEY);
 
 	if (lStatus == ERROR_SUCCESS)
-		MessageBox(nullptr, _T("Settings cleared successfully."), NExplorerplusplus::APP_NAME, MB_OK);
-	else
-		MessageBox(nullptr, _T("Settings could not be cleared."), NExplorerplusplus::APP_NAME, MB_ICONWARNING);
-}
-
-void OnRemoveAsDefault()
-{
-	BOOL bSuccess = NDefaultFileManager::RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
-
-	/* Language hasn't been fully specified at this point, so
-	can't load success/error message from language dll. Simply show
-	a hardcoded success/error message. */
-	if (bSuccess)
 	{
-		MessageBox(nullptr, _T("Explorer++ successfully removed as default file manager."),
-			NExplorerplusplus::APP_NAME, MB_OK);
+		std::wcout << L"Settings cleared successfully." << std::endl;
 	}
 	else
 	{
-		MessageBox(nullptr, _T("Could not remove Explorer++ as default file manager. Please \
-ensure you have administrator privileges."), NExplorerplusplus::APP_NAME, MB_ICONWARNING | MB_OK);
+		std::wcerr << L"Settings could not be cleared.\n" << std::endl;
 	}
 }
 
-void OnSetAsDefault()
+void OnUpdateReplaceExplorerSetting(ReplaceExplorerMode updatedReplaceMode)
 {
-	std::wstring menuText = ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_OPEN_IN_EXPLORERPLUSPLUS);
+	auto results = UpdateReplaceExplorerSetting(updatedReplaceMode);
 
-	BOOL bSuccess = NDefaultFileManager::SetAsDefaultFileManagerFileSystem(
-		SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
+	switch (updatedReplaceMode)
+	{
+	case DefaultFileManager::ReplaceExplorerMode::None:
+		if ((results.removedFileSystem && *results.removedFileSystem == ERROR_SUCCESS)
+			|| (results.removedAll && *results.removedAll == ERROR_SUCCESS))
+		{
+			std::wcout << L"Explorer++ successfully removed as default file manager.\n"
+					   << std::endl;
+		}
+		else
+		{
+			std::wcerr << L"Could not remove Explorer++ as default file manager." << std::endl;
+		}
+		break;
 
-	if (bSuccess)
-	{
-		MessageBox(nullptr, _T("Explorer++ successfully set as default file manager."),
-			NExplorerplusplus::APP_NAME, MB_OK);
+	case DefaultFileManager::ReplaceExplorerMode::FileSystem:
+	case DefaultFileManager::ReplaceExplorerMode::All:
+		if ((results.setFileSystem && *results.setFileSystem == ERROR_SUCCESS)
+			|| (results.setAll && *results.setAll == ERROR_SUCCESS))
+		{
+			std::wcout << L"Explorer++ successfully set as default file manager." << std::endl;
+		}
+		else
+		{
+			std::wcerr << L"Could not set Explorer++ as default file manager." << std::endl;
+		}
+		break;
 	}
-	else
+}
+
+ReplaceExplorerResults UpdateReplaceExplorerSetting(ReplaceExplorerMode updatedReplaceMode)
+{
+	ReplaceExplorerResults results;
+
+	// TODO: This text should be retrieved from the appropriate translation DLL (if necessary).
+	std::wstring menuText =
+		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_OPEN_IN_EXPLORERPLUSPLUS);
+
+	// Whether Explorer++ is being set as the default file manager, or being removed, the first step
+	// is always to remove any existing entries.
+	results.removedFileSystem =
+		RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
+	results.removedAll = RemoveAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
+
+	switch (updatedReplaceMode)
 	{
-		MessageBox(nullptr, _T("Could not set Explorer++ as default file manager. Please \
-ensure you have administrator privileges."), NExplorerplusplus::APP_NAME, MB_ICONWARNING | MB_OK);
+	case ReplaceExplorerMode::None:
+		// This case is effectively handled above.
+		break;
+
+	case ReplaceExplorerMode::FileSystem:
+		results.setFileSystem = SetAsDefaultFileManagerFileSystem(
+			SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
+		break;
+
+	case ReplaceExplorerMode::All:
+		results.setAll =
+			SetAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
+		break;
 	}
+
+	return results;
 }
 
 void OnJumplistNewTab()

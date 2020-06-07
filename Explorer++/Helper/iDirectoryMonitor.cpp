@@ -3,77 +3,73 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include <list>
 #include "iDirectoryMonitor.h"
 #include "Macros.h"
-
+#include <list>
 
 DWORD WINAPI Thread_DirModifiedInternal(LPVOID Container);
 
 class DirectoryMonitor : public IDirectoryMonitor
 {
 public:
-
 	DirectoryMonitor();
 	~DirectoryMonitor();
 
-	HRESULT		__stdcall	QueryInterface(REFIID iid, void **ppvObject);
-	ULONG		__stdcall	AddRef();
-	ULONG		__stdcall	Release();
+	HRESULT __stdcall QueryInterface(REFIID iid, void **ppvObject);
+	ULONG __stdcall AddRef();
+	ULONG __stdcall Release();
 
-	int	WatchDirectory(const TCHAR *Directory, UINT WatchFlags,
-		OnDirectoryAltered onDirectoryAltered, BOOL bWatchSubTree,
-		void *pData);
-	int	WatchDirectory(HANDLE hDirectory, const TCHAR *Directory,
-		UINT WatchFlags, OnDirectoryAltered onDirectoryAltered,
-		BOOL bWatchSubTree, void *pData);
-	BOOL	StopDirectoryMonitor(int iStopId);
+	int WatchDirectory(const TCHAR *Directory, UINT WatchFlags,
+		OnDirectoryAltered onDirectoryAltered, BOOL bWatchSubTree, void *pData);
+	int WatchDirectory(HANDLE hDirectory, const TCHAR *Directory, UINT WatchFlags,
+		OnDirectoryAltered onDirectoryAltered, BOOL bWatchSubTree, void *pData);
+	BOOL StopDirectoryMonitor(int iStopId);
 
 private:
-
-	#define PRIMARY_BUFFER_SIZE 1000 * sizeof(FILE_NOTIFY_INFORMATION)
+#define PRIMARY_BUFFER_SIZE 1000 * sizeof(FILE_NOTIFY_INFORMATION)
 
 	/* These function are only ever queued as APC's. */
-	static void CALLBACK	WatchAndCreateDirectoryInternal(ULONG_PTR dwParam);
-	static void CALLBACK	CompletionRoutine(DWORD dwErrorCode,DWORD NumberOfBytesTransferred,LPOVERLAPPED lpOverlapped);
-	static void CALLBACK	StopDirectoryWatch(ULONG_PTR dwParam);
+	static void CALLBACK WatchAndCreateDirectoryInternal(ULONG_PTR dwParam);
+	static void CALLBACK CompletionRoutine(
+		DWORD dwErrorCode, DWORD NumberOfBytesTransferred, LPOVERLAPPED lpOverlapped);
+	static void CALLBACK StopDirectoryWatch(ULONG_PTR dwParam);
 
 	/* This function is called as an APC, and stops
 	the worker thread on exit. */
-	static void CALLBACK	ExitWorkerThread(ULONG_PTR dwParam);
+	static void CALLBACK ExitWorkerThread(ULONG_PTR dwParam);
 
 	/* These are only called in the context of the
 	worker thread (i.e. they are called from APC's,
 	but are not queued as APC's themselves). */
-	static void CALLBACK	WatchDirectoryInternal(ULONG_PTR dwParam);
-	static void				DeleteRequest(ULONG_PTR dwParam);
+	static void CALLBACK WatchDirectoryInternal(ULONG_PTR dwParam);
+	static void DeleteRequest(ULONG_PTR dwParam);
 
 	class DirInfo
 	{
 	public:
-		OnDirectoryAltered		m_OnDirectoryAltered;
+		OnDirectoryAltered m_OnDirectoryAltered;
 
-		DirectoryMonitor		*m_pDirectoryMonitor;
-		FILE_NOTIFY_INFORMATION	*m_FileNotifyBuffer;
-		HANDLE					m_hThread;
-		HANDLE					m_hDirectory;
-		OVERLAPPED				m_Async;
-		LPVOID					m_pData;
-		TCHAR					m_DirPath[MAX_PATH];
-		UINT					m_WatchFlags;
-		BOOL					m_bWatchSubTree;
-		BOOL					m_bMarkedForDeletion;
-		BOOL					m_bDirMonitored;
-		int						m_UniqueId;
+		DirectoryMonitor *m_pDirectoryMonitor;
+		FILE_NOTIFY_INFORMATION *m_FileNotifyBuffer;
+		HANDLE m_hThread;
+		HANDLE m_hDirectory;
+		OVERLAPPED m_Async;
+		LPVOID m_pData;
+		TCHAR m_DirPath[MAX_PATH];
+		UINT m_WatchFlags;
+		BOOL m_bWatchSubTree;
+		BOOL m_bMarkedForDeletion;
+		BOOL m_bDirMonitored;
+		int m_UniqueId;
 	};
 
-	int					m_iRefCount;
-	DWORD				m_ThreadId;
-	HANDLE				m_hThread;
-	std::list<DirInfo>	m_DirWatchInfoList;
-	CRITICAL_SECTION	m_cs;
-	HANDLE				m_hStopThreadEvent;
-	int					m_UniqueId;
+	int m_iRefCount;
+	DWORD m_ThreadId;
+	HANDLE m_hThread;
+	std::list<DirInfo> m_DirWatchInfoList;
+	CRITICAL_SECTION m_cs;
+	HANDLE m_hStopThreadEvent;
+	int m_UniqueId;
 };
 
 HRESULT CreateDirectoryMonitor(IDirectoryMonitor **pDirectoryMonitor)
@@ -85,26 +81,26 @@ HRESULT CreateDirectoryMonitor(IDirectoryMonitor **pDirectoryMonitor)
 
 DirectoryMonitor::DirectoryMonitor()
 {
-	m_iRefCount	= 1;
-	m_UniqueId	= 0;
-	m_hThread	= CreateThread(NULL,0,Thread_DirModifiedInternal,NULL,0,&m_ThreadId);
+	m_iRefCount = 1;
+	m_UniqueId = 0;
+	m_hThread = CreateThread(NULL, 0, Thread_DirModifiedInternal, NULL, 0, &m_ThreadId);
 
 	InitializeCriticalSection(&m_cs);
 
-	m_hStopThreadEvent = CreateEvent(NULL,TRUE,FALSE,NULL);
+	m_hStopThreadEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 }
 
 DirectoryMonitor::~DirectoryMonitor()
 {
 	/* Queue the APC that will stop the worker
 	thread. */
-	QueueUserAPC(ExitWorkerThread,m_hThread,(ULONG_PTR)this);
+	QueueUserAPC(ExitWorkerThread, m_hThread, (ULONG_PTR) this);
 	CloseHandle(m_hThread);
 
 	/* Wait for the worker thread to stop. Once it
 	has been stopped, delete any dependent data
 	(such as any critical sections). */
-	WaitForSingleObject(m_hStopThreadEvent,INFINITE);
+	WaitForSingleObject(m_hStopThreadEvent, INFINITE);
 
 	DeleteCriticalSection(&m_cs);
 	m_DirWatchInfoList.clear();
@@ -116,12 +112,12 @@ HRESULT __stdcall DirectoryMonitor::QueryInterface(REFIID iid, void **ppvObject)
 {
 	*ppvObject = NULL;
 
-	if(iid == IID_IUnknown)
+	if (iid == IID_IUnknown)
 	{
-		*ppvObject=this;
+		*ppvObject = this;
 	}
 
-	if(*ppvObject)
+	if (*ppvObject)
 	{
 		AddRef();
 		return S_OK;
@@ -139,7 +135,7 @@ ULONG __stdcall DirectoryMonitor::Release()
 {
 	m_iRefCount--;
 
-	if(m_iRefCount == 0)
+	if (m_iRefCount == 0)
 	{
 		delete this;
 		return 0;
@@ -157,24 +153,24 @@ DWORD WINAPI Thread_DirModifiedInternal(LPVOID lpParameter)
 
 	SetErrorMode(SEM_FAILCRITICALERRORS);
 
-	/* Warning C4127 (conditional expression is
-	constant) temporarily disabled for this function. */
-	#pragma warning(push)
-	#pragma warning(disable:4127)
-	while(TRUE)
+/* Warning C4127 (conditional expression is
+constant) temporarily disabled for this function. */
+#pragma warning(push)
+#pragma warning(disable : 4127)
+	while (TRUE)
 	{
-		SleepEx(INFINITE,TRUE);
+		SleepEx(INFINITE, TRUE);
 	}
-	#pragma warning(pop)
+#pragma warning(pop)
 
 	return 0;
 }
 
 void CALLBACK DirectoryMonitor::ExitWorkerThread(ULONG_PTR dwParam)
 {
-	DirectoryMonitor	*pdm = NULL;
+	DirectoryMonitor *pdm = NULL;
 
-	pdm = (DirectoryMonitor *)dwParam;
+	pdm = (DirectoryMonitor *) dwParam;
 
 	/* Set the event indicating that it is now
 	safe to destroy data that is shared between
@@ -187,19 +183,21 @@ void CALLBACK DirectoryMonitor::ExitWorkerThread(ULONG_PTR dwParam)
 int DirectoryMonitor::WatchDirectory(const TCHAR *Directory, UINT WatchFlags,
 	OnDirectoryAltered onDirectoryAltered, BOOL bWatchSubTree, void *pData)
 {
-	DirInfo	pDirInfo;
+	DirInfo pDirInfo;
 
-	if(Directory == NULL)
+	if (Directory == NULL)
+	{
 		return -1;
+	}
 
-	pDirInfo.m_pDirectoryMonitor	= this;
-	pDirInfo.m_hThread				= m_hThread;
-	pDirInfo.m_WatchFlags			= WatchFlags;
-	pDirInfo.m_UniqueId				= m_UniqueId;
-	pDirInfo.m_OnDirectoryAltered	= onDirectoryAltered;
-	pDirInfo.m_pData				= pData;
-	pDirInfo.m_bWatchSubTree		= bWatchSubTree;
-	pDirInfo.m_bMarkedForDeletion	= FALSE;
+	pDirInfo.m_pDirectoryMonitor = this;
+	pDirInfo.m_hThread = m_hThread;
+	pDirInfo.m_WatchFlags = WatchFlags;
+	pDirInfo.m_UniqueId = m_UniqueId;
+	pDirInfo.m_OnDirectoryAltered = onDirectoryAltered;
+	pDirInfo.m_pData = pData;
+	pDirInfo.m_bWatchSubTree = bWatchSubTree;
+	pDirInfo.m_bMarkedForDeletion = FALSE;
 
 	/* This suppresses crtical error message boxes, such as the one
 	that mey arise from CreateFile() when opening attempting to
@@ -209,11 +207,11 @@ int DirectoryMonitor::WatchDirectory(const TCHAR *Directory, UINT WatchFlags,
 
 	StringCchCopy(pDirInfo.m_DirPath, SIZEOF_ARRAY(pDirInfo.m_DirPath), Directory);
 
-	pDirInfo.m_hDirectory = CreateFile(pDirInfo.m_DirPath,
-	FILE_LIST_DIRECTORY,FILE_SHARE_READ|FILE_SHARE_DELETE|FILE_SHARE_WRITE,
-	NULL,OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OVERLAPPED,NULL);
+	pDirInfo.m_hDirectory = CreateFile(pDirInfo.m_DirPath, FILE_LIST_DIRECTORY,
+		FILE_SHARE_READ | FILE_SHARE_DELETE | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
+		FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, NULL);
 
-	if(pDirInfo.m_hDirectory == INVALID_HANDLE_VALUE)
+	if (pDirInfo.m_hDirectory == INVALID_HANDLE_VALUE)
 	{
 		free(pData);
 		return -1;
@@ -228,29 +226,31 @@ int DirectoryMonitor::WatchDirectory(const TCHAR *Directory, UINT WatchFlags,
 	m_DirWatchInfoList.push_back(pDirInfo);
 
 	m_DirWatchInfoList.back().m_Async.hEvent = &m_DirWatchInfoList.back();
-	QueueUserAPC(WatchDirectoryInternal,m_hThread,(ULONG_PTR)&m_DirWatchInfoList.back());
+	QueueUserAPC(WatchDirectoryInternal, m_hThread, (ULONG_PTR) &m_DirWatchInfoList.back());
 
 	LeaveCriticalSection(&m_cs);
 
 	return m_UniqueId++;
 }
 
-int DirectoryMonitor::WatchDirectory(HANDLE hDirectory, const TCHAR *Directory,
-	UINT WatchFlags, OnDirectoryAltered onDirectoryAltered, BOOL bWatchSubTree, void *pData)
+int DirectoryMonitor::WatchDirectory(HANDLE hDirectory, const TCHAR *Directory, UINT WatchFlags,
+	OnDirectoryAltered onDirectoryAltered, BOOL bWatchSubTree, void *pData)
 {
-	DirInfo	pDirInfo;
+	DirInfo pDirInfo;
 
-	if(Directory == NULL)
+	if (Directory == NULL)
+	{
 		return -1;
+	}
 
-	pDirInfo.m_pDirectoryMonitor	= this;
-	pDirInfo.m_hThread				= m_hThread;
-	pDirInfo.m_WatchFlags			= WatchFlags;
-	pDirInfo.m_UniqueId				= m_UniqueId;
-	pDirInfo.m_OnDirectoryAltered	= onDirectoryAltered;
-	pDirInfo.m_pData				= pData;
-	pDirInfo.m_bWatchSubTree		= bWatchSubTree;
-	pDirInfo.m_bMarkedForDeletion	= FALSE;
+	pDirInfo.m_pDirectoryMonitor = this;
+	pDirInfo.m_hThread = m_hThread;
+	pDirInfo.m_WatchFlags = WatchFlags;
+	pDirInfo.m_UniqueId = m_UniqueId;
+	pDirInfo.m_OnDirectoryAltered = onDirectoryAltered;
+	pDirInfo.m_pData = pData;
+	pDirInfo.m_bWatchSubTree = bWatchSubTree;
+	pDirInfo.m_bMarkedForDeletion = FALSE;
 
 	/* This suppresses crtical error message boxes, such as the one
 	that mey arise from CreateFile() when opening attempting to
@@ -266,8 +266,8 @@ int DirectoryMonitor::WatchDirectory(HANDLE hDirectory, const TCHAR *Directory,
 
 	m_DirWatchInfoList.push_back(pDirInfo);
 	m_DirWatchInfoList.back().m_Async.hEvent = &m_DirWatchInfoList.back();
-	//QueueUserAPC(WatchAndCreateDirectoryInternal,m_hThread,(ULONG_PTR)&m_DirWatchInfoList.back());
-	QueueUserAPC(WatchDirectoryInternal,m_hThread,(ULONG_PTR)&m_DirWatchInfoList.back());
+	// QueueUserAPC(WatchAndCreateDirectoryInternal,m_hThread,(ULONG_PTR)&m_DirWatchInfoList.back());
+	QueueUserAPC(WatchDirectoryInternal, m_hThread, (ULONG_PTR) &m_DirWatchInfoList.back());
 
 	LeaveCriticalSection(&m_cs);
 
@@ -278,38 +278,37 @@ int DirectoryMonitor::WatchDirectory(HANDLE hDirectory, const TCHAR *Directory,
 to put the thread in an alertable wait state. */
 void CALLBACK DirectoryMonitor::WatchAndCreateDirectoryInternal(ULONG_PTR dwParam)
 {
-	DirInfo	*pDirInfo = NULL;
+	DirInfo *pDirInfo = NULL;
 
 	pDirInfo = reinterpret_cast<DirInfo *>(dwParam);
 
-	pDirInfo->m_hDirectory = CreateFile(pDirInfo->m_DirPath,
-	FILE_LIST_DIRECTORY,FILE_SHARE_READ|FILE_SHARE_DELETE|FILE_SHARE_WRITE,
-	NULL,OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OVERLAPPED,NULL);
+	pDirInfo->m_hDirectory = CreateFile(pDirInfo->m_DirPath, FILE_LIST_DIRECTORY,
+		FILE_SHARE_READ | FILE_SHARE_DELETE | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
+		FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, NULL);
 
 	WatchDirectoryInternal(dwParam);
 }
 
 void DirectoryMonitor::WatchDirectoryInternal(ULONG_PTR dwParam)
 {
-	DirInfo	*pDirInfo = NULL;
+	DirInfo *pDirInfo = NULL;
 
 	pDirInfo = reinterpret_cast<DirInfo *>(dwParam);
 
-	if(pDirInfo->m_hDirectory == INVALID_HANDLE_VALUE)
+	if (pDirInfo->m_hDirectory == INVALID_HANDLE_VALUE)
 	{
 		free(pDirInfo->m_pData);
 
 		return;
 	}
 
-	pDirInfo->m_FileNotifyBuffer = (FILE_NOTIFY_INFORMATION *)malloc(PRIMARY_BUFFER_SIZE);
+	pDirInfo->m_FileNotifyBuffer = (FILE_NOTIFY_INFORMATION *) malloc(PRIMARY_BUFFER_SIZE);
 
 	pDirInfo->m_bDirMonitored = ReadDirectoryChangesW(pDirInfo->m_hDirectory,
-	pDirInfo->m_FileNotifyBuffer,PRIMARY_BUFFER_SIZE,
-	pDirInfo->m_bWatchSubTree,pDirInfo->m_WatchFlags,NULL,&pDirInfo->m_Async,
-	CompletionRoutine);
+		pDirInfo->m_FileNotifyBuffer, PRIMARY_BUFFER_SIZE, pDirInfo->m_bWatchSubTree,
+		pDirInfo->m_WatchFlags, NULL, &pDirInfo->m_Async, CompletionRoutine);
 
-	if(!pDirInfo->m_bDirMonitored)
+	if (!pDirInfo->m_bDirMonitored)
 	{
 		free(pDirInfo->m_FileNotifyBuffer);
 		CancelIo(pDirInfo->m_hDirectory);
@@ -317,17 +316,19 @@ void DirectoryMonitor::WatchDirectoryInternal(ULONG_PTR dwParam)
 	}
 }
 
-void CALLBACK DirectoryMonitor::CompletionRoutine(DWORD dwErrorCode,
-DWORD NumberOfBytesTransferred,LPOVERLAPPED lpOverlapped)
+void CALLBACK DirectoryMonitor::CompletionRoutine(
+	DWORD dwErrorCode, DWORD NumberOfBytesTransferred, LPOVERLAPPED lpOverlapped)
 {
-	DirInfo				*pDirInfo = NULL;
-	FILE_NOTIFY_INFORMATION	*pfni = NULL;
-	TCHAR					szFileName[MAX_PATH];
+	DirInfo *pDirInfo = NULL;
+	FILE_NOTIFY_INFORMATION *pfni = NULL;
+	TCHAR szFileName[MAX_PATH];
 
-	if((dwErrorCode == ERROR_SUCCESS) && (NumberOfBytesTransferred != 0))
+	if ((dwErrorCode == ERROR_SUCCESS) && (NumberOfBytesTransferred != 0))
 	{
-		if(lpOverlapped->hEvent == NULL)
+		if (lpOverlapped->hEvent == NULL)
+		{
 			return;
+		}
 
 		pDirInfo = reinterpret_cast<DirInfo *>(lpOverlapped->hEvent);
 
@@ -336,41 +337,41 @@ DWORD NumberOfBytesTransferred,LPOVERLAPPED lpOverlapped)
 
 		do
 		{
-			if(i != 0)
+			if (i != 0)
 			{
 				pfni = (FILE_NOTIFY_INFORMATION *) ((LPBYTE) pfni + pfni->NextEntryOffset);
 			}
 
 			/* FileNameLength is size in bytes NOT characters. */
-			StringCchCopyN(szFileName,SIZEOF_ARRAY(szFileName),
-				pfni->FileName,pfni->FileNameLength / sizeof(TCHAR));
-			pDirInfo->m_OnDirectoryAltered(szFileName,pfni->Action,pDirInfo->m_pData);
+			StringCchCopyN(szFileName, SIZEOF_ARRAY(szFileName), pfni->FileName,
+				pfni->FileNameLength / sizeof(TCHAR));
+			pDirInfo->m_OnDirectoryAltered(szFileName, pfni->Action, pDirInfo->m_pData);
 
 			i++;
-		} while(pfni->NextEntryOffset != 0);
+		} while (pfni->NextEntryOffset != 0);
 
 		free(pDirInfo->m_FileNotifyBuffer);
 
 		pDirInfo->m_FileNotifyBuffer = NULL;
 
 		/* Rewatch the directory. */
-		WatchDirectoryInternal((ULONG_PTR)pDirInfo);
+		WatchDirectoryInternal((ULONG_PTR) pDirInfo);
 	}
-	else if(dwErrorCode == ERROR_OPERATION_ABORTED)
+	else if (dwErrorCode == ERROR_OPERATION_ABORTED)
 	{
 		pDirInfo = reinterpret_cast<DirInfo *>(lpOverlapped->hEvent);
 
 		/* The specified directory has stop been watched.
 		Remove its entry from the queue. */
-		DeleteRequest((ULONG_PTR)pDirInfo);
+		DeleteRequest((ULONG_PTR) pDirInfo);
 	}
 }
 
 void DirectoryMonitor::DeleteRequest(ULONG_PTR dwParam)
 {
-	DirInfo					*pDirInfo = NULL;
-	DirectoryMonitor			*pDirectoryMonitor = NULL;
-	std::list<DirInfo>::iterator	itr;
+	DirInfo *pDirInfo = NULL;
+	DirectoryMonitor *pDirectoryMonitor = NULL;
+	std::list<DirInfo>::iterator itr;
 
 	pDirInfo = reinterpret_cast<DirInfo *>(dwParam);
 
@@ -381,9 +382,10 @@ void DirectoryMonitor::DeleteRequest(ULONG_PTR dwParam)
 
 	EnterCriticalSection(&pDirectoryMonitor->m_cs);
 
-	for(itr = pDirectoryMonitor->m_DirWatchInfoList.begin();itr != pDirectoryMonitor->m_DirWatchInfoList.end();itr++)
+	for (itr = pDirectoryMonitor->m_DirWatchInfoList.begin();
+		 itr != pDirectoryMonitor->m_DirWatchInfoList.end(); itr++)
 	{
-		if(itr->m_UniqueId == pDirInfo->m_UniqueId)
+		if (itr->m_UniqueId == pDirInfo->m_UniqueId)
 		{
 			pDirectoryMonitor->m_DirWatchInfoList.erase(itr);
 			break;
@@ -395,21 +397,25 @@ void DirectoryMonitor::DeleteRequest(ULONG_PTR dwParam)
 
 BOOL DirectoryMonitor::StopDirectoryMonitor(int iStopId)
 {
-	std::list<DirInfo>::iterator	itr;
+	std::list<DirInfo>::iterator itr;
 
-	if(iStopId < 0)
+	if (iStopId < 0)
+	{
 		return FALSE;
+	}
 
 	EnterCriticalSection(&m_cs);
 
-	for(itr = m_DirWatchInfoList.begin();itr != m_DirWatchInfoList.end();itr++)
+	for (itr = m_DirWatchInfoList.begin(); itr != m_DirWatchInfoList.end(); itr++)
 	{
-		if(itr->m_UniqueId == iStopId)
+		if (itr->m_UniqueId == iStopId)
 		{
 			/* Only stop monitoring the directory if it was
 			actually monitored in the first place! */
-			if(itr->m_bDirMonitored)
-				QueueUserAPC(StopDirectoryWatch,m_hThread,(ULONG_PTR)itr->m_hDirectory);
+			if (itr->m_bDirMonitored)
+			{
+				QueueUserAPC(StopDirectoryWatch, m_hThread, (ULONG_PTR) itr->m_hDirectory);
+			}
 
 			break;
 		}
@@ -422,7 +428,7 @@ BOOL DirectoryMonitor::StopDirectoryMonitor(int iStopId)
 
 void CALLBACK DirectoryMonitor::StopDirectoryWatch(ULONG_PTR dwParam)
 {
-	HANDLE	hDirectory;
+	HANDLE hDirectory;
 
 	hDirectory = reinterpret_cast<HANDLE>(dwParam);
 

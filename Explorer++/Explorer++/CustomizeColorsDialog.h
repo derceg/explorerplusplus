@@ -36,7 +36,7 @@ class CustomizeColorsDialog : public BaseDialog
 public:
 
 	CustomizeColorsDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
-		std::vector<NColorRuleHelper::ColorRule_t> *pColorRuleList);
+		std::vector<NColorRuleHelper::ColorRule> *pColorRuleList);
 
 protected:
 
@@ -54,7 +54,7 @@ private:
 
 	void	OnNew();
 	void	OnEdit();
-	void	InsertColorRuleIntoListView(HWND hListView,const NColorRuleHelper::ColorRule_t &ColorRule,int iIndex);
+	void	InsertColorRuleIntoListView(HWND hListView,const NColorRuleHelper::ColorRule &colorRule,int iIndex);
 	void	EditColorRule(int iSelected);
 	void	OnMove(BOOL bUp);
 	void	OnDelete();
@@ -64,7 +64,7 @@ private:
 
 	IExplorerplusplus *m_expp;
 
-	std::vector<NColorRuleHelper::ColorRule_t> *m_pColorRuleList;
+	std::vector<NColorRuleHelper::ColorRule> *m_pColorRuleList;
 
 	CustomizeColorsDialogPersistentSettings *m_persistentSettings;
 };

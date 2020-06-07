@@ -14,7 +14,7 @@ class ApplicationToolbar;
 class ApplicationToolbarDropHandler;
 __interface IExplorerplusplus;
 
-struct ApplicationButton_t
+struct ApplicationButton
 {
 	std::wstring Name;
 	std::wstring Command;
@@ -47,9 +47,9 @@ private:
 	ApplicationToolbarPersistentSettings &operator=(const ApplicationToolbarPersistentSettings &);
 
 	bool AddButton(const std::wstring &name, const std::wstring &command, BOOL showNameOnToolbar,
-		ApplicationButton_t *buttonOut);
+		ApplicationButton *buttonOut);
 
-	std::vector<ApplicationButton_t> m_Buttons;
+	std::vector<ApplicationButton> m_Buttons;
 	int m_IDCounter;
 };
 
@@ -81,12 +81,12 @@ private:
 	void Initialize(HWND hParent);
 
 	void AddButtonsToToolbar();
-	void AddButtonToToolbar(const ApplicationButton_t &Button);
+	void AddButtonToToolbar(const ApplicationButton &Button);
 	void UpdateButton(int iItem);
 
 	void OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt);
 
-	ApplicationButton_t *MapToolbarButtonToItem(int index);
+	ApplicationButton *MapToolbarButtonToItem(int index);
 
 	HINSTANCE m_hInstance;
 

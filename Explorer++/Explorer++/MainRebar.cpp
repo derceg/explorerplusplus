@@ -8,6 +8,7 @@
 #include "ApplicationToolbar.h"
 #include "Bookmarks/UI/BookmarksToolbar.h"
 #include "Config.h"
+#include "DarkModeHelper.h"
 #include "DrivesToolbar.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
@@ -52,7 +53,7 @@ void Explorerplusplus::InitializeMainToolbars()
 	m_ToolbarInformation[0].lpText = nullptr;
 
 	m_ToolbarInformation[1].wID = ID_ADDRESSTOOLBAR;
-	m_ToolbarInformation[1].fMask = RBBIM_ID | RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_STYLE | RBBIM_TEXT;
+	m_ToolbarInformation[1].fMask = RBBIM_ID | RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_STYLE;
 	m_ToolbarInformation[1].fStyle = RBBS_BREAK;
 	m_ToolbarInformation[1].cx = 0;
 	m_ToolbarInformation[1].cxIdeal = 0;
@@ -97,13 +98,14 @@ void Explorerplusplus::CreateMainControls()
 	SIZE	sz;
 	RECT	rc;
 	DWORD	toolbarSize;
-	TCHAR	szBandText[32];
 	int		i = 0;
 
 	/* If the rebar is locked, prevent bands from
 	been rearranged. */
 	if (m_config->lockToolbars)
+	{
 		RebarStyles |= RBS_FIXEDORDER;
+	}
 
 	/* Create and subclass the main rebar control. */
 	m_hMainRebar = CreateWindowEx(0, REBARCLASSNAME, EMPTY_STRING, RebarStyles,
@@ -123,7 +125,9 @@ void Explorerplusplus::CreateMainControls()
 			SendMessage(m_mainToolbar->GetHWND(), TB_GETMAXSIZE, 0, (LPARAM)&sz);
 
 			if (m_ToolbarInformation[i].cx == 0)
+			{
 				m_ToolbarInformation[i].cx = sz.cx;
+			}
 
 			m_ToolbarInformation[i].cxIdeal = sz.cx;
 			m_ToolbarInformation[i].hwndChild = m_mainToolbar->GetHWND();
@@ -131,10 +135,8 @@ void Explorerplusplus::CreateMainControls()
 
 		case ID_ADDRESSTOOLBAR:
 			CreateAddressBar();
-			LoadString(m_hLanguageModule, IDS_ADDRESSBAR, szBandText, SIZEOF_ARRAY(szBandText));
 			GetWindowRect(m_addressBar->GetHWND(), &rc);
 			m_ToolbarInformation[i].cyMinChild = GetRectHeight(&rc);
-			m_ToolbarInformation[i].lpText = szBandText;
 			m_ToolbarInformation[i].hwndChild = m_addressBar->GetHWND();
 			break;
 
@@ -147,7 +149,9 @@ void Explorerplusplus::CreateMainControls()
 			SendMessage(m_hBookmarksToolbar, TB_GETMAXSIZE, 0, (LPARAM)&sz);
 
 			if (m_ToolbarInformation[i].cx == 0)
+			{
 				m_ToolbarInformation[i].cx = sz.cx;
+			}
 
 			m_ToolbarInformation[i].cxIdeal = sz.cx;
 			m_ToolbarInformation[i].hwndChild = m_hBookmarksToolbar;
@@ -162,7 +166,9 @@ void Explorerplusplus::CreateMainControls()
 			SendMessage(m_pDrivesToolbar->GetHWND(), TB_GETMAXSIZE, 0, (LPARAM)&sz);
 
 			if (m_ToolbarInformation[i].cx == 0)
+			{
 				m_ToolbarInformation[i].cx = sz.cx;
+			}
 
 			m_ToolbarInformation[i].cxIdeal = sz.cx;
 			m_ToolbarInformation[i].hwndChild = m_pDrivesToolbar->GetHWND();
@@ -177,7 +183,9 @@ void Explorerplusplus::CreateMainControls()
 			SendMessage(m_pApplicationToolbar->GetHWND(), TB_GETMAXSIZE, 0, (LPARAM)&sz);
 
 			if (m_ToolbarInformation[i].cx == 0)
+			{
 				m_ToolbarInformation[i].cx = sz.cx;
+			}
 
 			m_ToolbarInformation[i].cxIdeal = sz.cx;
 			m_ToolbarInformation[i].hwndChild = m_pApplicationToolbar->GetHWND();
@@ -220,6 +228,20 @@ LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd, UINT msg, WPARAM wPa
 			OnToolbarRClick(pnmm->hdr.hwndFrom);
 		}
 		return TRUE;
+
+		case NM_CUSTOMDRAW:
+			if (auto result = OnRebarCustomDraw(reinterpret_cast<NMHDR *>(lParam)))
+			{
+				return *result;
+			}
+			break;
+		}
+		break;
+
+	case WM_ERASEBKGND:
+		if (OnRebarEraseBackground(reinterpret_cast<HDC>(wParam)))
+		{
+			return 1;
 		}
 		break;
 	}
@@ -317,7 +339,8 @@ void Explorerplusplus::CreateBookmarksToolbar()
 		TBSTYLE_EX_DOUBLEBUFFER | TBSTYLE_EX_HIDECLIPPEDBUTTONS);
 
 	m_pBookmarksToolbar = new BookmarksToolbar(m_hBookmarksToolbar, m_hLanguageModule, this,
-		m_navigation.get(), &m_bookmarkTree, TOOLBAR_BOOKMARK_START, TOOLBAR_BOOKMARK_END);
+		m_navigation.get(), &m_bookmarkIconFetcher, &m_bookmarkTree, TOOLBAR_BOOKMARK_START,
+		TOOLBAR_BOOKMARK_END);
 }
 
 void Explorerplusplus::CreateDrivesToolbar()
@@ -389,4 +412,52 @@ HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 	}
 
 	return hSubMenu;
+}
+
+std::optional<int> Explorerplusplus::OnRebarCustomDraw(NMHDR *nmhdr)
+{
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (!darkModeHelper.IsDarkModeEnabled())
+	{
+		return std::nullopt;
+	}
+
+	if (nmhdr->hwndFrom != m_mainToolbar->GetHWND() && nmhdr->hwndFrom != m_hBookmarksToolbar
+		&& nmhdr->hwndFrom != m_pDrivesToolbar->GetHWND()
+		&& nmhdr->hwndFrom != m_pApplicationToolbar->GetHWND())
+	{
+		return std::nullopt;
+	}
+
+	auto *customDraw = reinterpret_cast<NMTBCUSTOMDRAW *>(nmhdr);
+
+	switch (customDraw->nmcd.dwDrawStage)
+	{
+	case CDDS_PREPAINT:
+		return CDRF_NOTIFYITEMDRAW;
+
+	case CDDS_ITEMPREPAINT:
+		customDraw->clrText = DarkModeHelper::FOREGROUND_COLOR;
+		customDraw->clrHighlightHotTrack = DarkModeHelper::BUTTON_HIGHLIGHT_COLOR;
+		return TBCDRF_USECDCOLORS | TBCDRF_HILITEHOTTRACK;
+	}
+
+	return std::nullopt;
+}
+
+bool Explorerplusplus::OnRebarEraseBackground(HDC hdc)
+{
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (!darkModeHelper.IsDarkModeEnabled())
+	{
+		return false;
+	}
+
+	RECT rc;
+	GetClientRect(m_hMainRebar, &rc);
+	FillRect(hdc, &rc, darkModeHelper.GetBackgroundBrush());
+
+	return true;
 }

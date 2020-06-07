@@ -11,27 +11,24 @@
 #include "CoreInterface.h"
 #include "INewMenuClient.h"
 
-ServiceProvider::ServiceProvider(IExplorerplusplus *pexpp) :
-m_pexpp(pexpp),
-m_RefCount(1)
+ServiceProvider::ServiceProvider(IExplorerplusplus *pexpp) : m_pexpp(pexpp), m_RefCount(1)
 {
-
 }
 
-HRESULT __stdcall ServiceProvider::QueryInterface(REFIID iid,void **ppvObject)
+HRESULT __stdcall ServiceProvider::QueryInterface(REFIID iid, void **ppvObject)
 {
 	*ppvObject = nullptr;
 
-	if(iid == IID_IUnknown)
+	if (iid == IID_IUnknown)
 	{
 		*ppvObject = static_cast<IUnknown *>(this);
 	}
-	else if(iid == IID_IServiceProvider)
+	else if (iid == IID_IServiceProvider)
 	{
 		*ppvObject = static_cast<IServiceProvider *>(this);
 	}
 
-	if(*ppvObject)
+	if (*ppvObject)
 	{
 		AddRef();
 		return S_OK;
@@ -48,8 +45,8 @@ ULONG __stdcall ServiceProvider::AddRef()
 ULONG __stdcall ServiceProvider::Release()
 {
 	m_RefCount--;
-	
-	if(m_RefCount == 0)
+
+	if (m_RefCount == 0)
 	{
 		delete this;
 		return 0;
@@ -58,7 +55,7 @@ ULONG __stdcall ServiceProvider::Release()
 	return m_RefCount;
 }
 
-HRESULT ServiceProvider::QueryService(REFGUID guidService,REFIID riid,void **ppv)
+HRESULT ServiceProvider::QueryService(REFGUID guidService, REFIID riid, void **ppv)
 {
 	/* Technically, this parameter should
 	probably be validated, but in this case
@@ -71,12 +68,12 @@ HRESULT ServiceProvider::QueryService(REFGUID guidService,REFIID riid,void **ppv
 
 	*ppv = nullptr;
 
-	if(riid == IID_INewMenuClient)
+	if (riid == IID_INewMenuClient)
 	{
 		*ppv = new NewMenuClient(m_pexpp);
 	}
 
-	if(*ppv)
+	if (*ppv)
 	{
 		return S_OK;
 	}

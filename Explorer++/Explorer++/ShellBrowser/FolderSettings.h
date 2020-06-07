@@ -31,7 +31,7 @@ struct GlobalFolderSettings
 	BOOL insertSorted;
 	BOOL showGridlines;
 	BOOL forceSize;
-	SizeDisplayFormat_t sizeDisplayFormat;
+	SizeDisplayFormat sizeDisplayFormat;
 	BOOL oneClickActivate;
 	UINT oneClickActivateHoverTime;
 

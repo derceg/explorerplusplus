@@ -19,17 +19,17 @@ namespace
 
 	const TCHAR REG_COLORS_KEY[] = _T("Software\\Explorer++\\ColorRules");
 
-	void LoadColorRulesFromRegistryInternal(HKEY hKey,std::vector<NColorRuleHelper::ColorRule_t> &ColorRules);
-	void SaveColorRulesToRegistryInternal(HKEY hKey,const NColorRuleHelper::ColorRule_t &ColorRule,int iCount);
+	void LoadColorRulesFromRegistryInternal(HKEY hKey,std::vector<NColorRuleHelper::ColorRule> &ColorRules);
+	void SaveColorRulesToRegistryInternal(HKEY hKey,const NColorRuleHelper::ColorRule &ColorRule,int iCount);
 
-	void LoadColorRulesFromXMLInternal(IXMLDOMNode *pNode,std::vector<NColorRuleHelper::ColorRule_t> &ColorRules);
-	void SaveColorRulesToXMLInternal(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pe,const NColorRuleHelper::ColorRule_t &ColorRule);
+	void LoadColorRulesFromXMLInternal(IXMLDOMNode *pNode,std::vector<NColorRuleHelper::ColorRule> &ColorRules);
+	void SaveColorRulesToXMLInternal(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pe,const NColorRuleHelper::ColorRule &colorRule);
 }
 
-std::vector<NColorRuleHelper::ColorRule_t> NColorRuleHelper::GetDefaultColorRules()
+std::vector<NColorRuleHelper::ColorRule> NColorRuleHelper::GetDefaultColorRules()
 {
-	std::vector<ColorRule_t> colorRules;
-	ColorRule_t colorRule;
+	std::vector<ColorRule> colorRules;
+	ColorRule colorRule;
 
 	colorRule.strDescription		= ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_GENERAL_COLOR_RULE_COMPRESSED);
 	colorRule.caseInsensitive		= FALSE;
@@ -46,7 +46,7 @@ std::vector<NColorRuleHelper::ColorRule_t> NColorRuleHelper::GetDefaultColorRule
 	return colorRules;
 }
 
-void NColorRuleHelper::LoadColorRulesFromRegistry(std::vector<NColorRuleHelper::ColorRule_t> &ColorRules)
+void NColorRuleHelper::LoadColorRulesFromRegistry(std::vector<NColorRuleHelper::ColorRule> &ColorRules)
 {
 	HKEY hKey;
 	LONG lRes = RegOpenKeyEx(HKEY_CURRENT_USER,REG_COLORS_KEY,0,KEY_READ,&hKey);
@@ -61,7 +61,7 @@ void NColorRuleHelper::LoadColorRulesFromRegistry(std::vector<NColorRuleHelper::
 
 namespace
 {
-	void LoadColorRulesFromRegistryInternal(HKEY hKey,std::vector<NColorRuleHelper::ColorRule_t> &ColorRules)
+	void LoadColorRulesFromRegistryInternal(HKEY hKey,std::vector<NColorRuleHelper::ColorRule> &ColorRules)
 	{
 		TCHAR szKeyName[256];
 		DWORD dwIndex = 0;
@@ -74,7 +74,7 @@ namespace
 
 			if(res == ERROR_SUCCESS)
 			{
-				NColorRuleHelper::ColorRule_t colorRule;
+				NColorRuleHelper::ColorRule colorRule;
 
 				colorRule.caseInsensitive = FALSE;
 
@@ -102,7 +102,7 @@ namespace
 	}
 }
 
-void NColorRuleHelper::SaveColorRulesToRegistry(const std::vector<NColorRuleHelper::ColorRule_t> &ColorRules)
+void NColorRuleHelper::SaveColorRulesToRegistry(const std::vector<NColorRuleHelper::ColorRule> &ColorRules)
 {
 	SHDeleteKey(HKEY_CURRENT_USER,REG_COLORS_KEY);
 
@@ -126,7 +126,7 @@ void NColorRuleHelper::SaveColorRulesToRegistry(const std::vector<NColorRuleHelp
 
 namespace
 {
-	void SaveColorRulesToRegistryInternal(HKEY hKey,const NColorRuleHelper::ColorRule_t &ColorRule,int iCount)
+	void SaveColorRulesToRegistryInternal(HKEY hKey,const NColorRuleHelper::ColorRule &ColorRule,int iCount)
 	{
 		TCHAR szKeyName[32];
 		_itow_s(iCount,szKeyName,SIZEOF_ARRAY(szKeyName),10);
@@ -148,7 +148,7 @@ namespace
 }
 
 void NColorRuleHelper::LoadColorRulesFromXML(IXMLDOMDocument *pXMLDom,
-	std::vector<NColorRuleHelper::ColorRule_t> &ColorRules)
+	std::vector<NColorRuleHelper::ColorRule> &ColorRules)
 {
 	IXMLDOMNode *pNode = nullptr;
 	BSTR bstr = nullptr;
@@ -173,12 +173,12 @@ clean:
 
 namespace
 {
-	void LoadColorRulesFromXMLInternal(IXMLDOMNode *pNode,std::vector<NColorRuleHelper::ColorRule_t> &ColorRules)
+	void LoadColorRulesFromXMLInternal(IXMLDOMNode *pNode,std::vector<NColorRuleHelper::ColorRule> &ColorRules)
 	{
 		IXMLDOMNamedNodeMap *am = nullptr;
 		IXMLDOMNode *pAttributeNode = nullptr;
 		IXMLDOMNode *pNextSibling = nullptr;
-		NColorRuleHelper::ColorRule_t colorRule;
+		NColorRuleHelper::ColorRule colorRule;
 		BOOL bDescriptionFound = FALSE;
 		BOOL bFilenamePatternFound = FALSE;
 		BSTR bstrName;
@@ -261,7 +261,7 @@ namespace
 }
 
 void NColorRuleHelper::SaveColorRulesToXML(IXMLDOMDocument *pXMLDom,
-IXMLDOMElement *pRoot,const std::vector<NColorRuleHelper::ColorRule_t> &ColorRules)
+IXMLDOMElement *pRoot,const std::vector<NColorRuleHelper::ColorRule> &ColorRules)
 {
 	IXMLDOMElement *pe = nullptr;
 	BSTR bstr_wsnt = SysAllocString(L"\n\t");
@@ -290,7 +290,7 @@ IXMLDOMElement *pRoot,const std::vector<NColorRuleHelper::ColorRule_t> &ColorRul
 namespace
 {
 	void SaveColorRulesToXMLInternal(IXMLDOMDocument *pXMLDom,
-		IXMLDOMElement *pe,const NColorRuleHelper::ColorRule_t &ColorRule)
+		IXMLDOMElement *pe,const NColorRuleHelper::ColorRule &colorRule)
 	{
 		IXMLDOMElement *pParentNode = nullptr;
 		BSTR bstr_indent;
@@ -310,13 +310,13 @@ namespace
 
 		SysFreeString(bstr_indent);
 
-		NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("ColorRule"),ColorRule.strDescription.c_str());
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("FilenamePattern"),ColorRule.strFilterPattern.c_str());
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("CaseInsensitive"),NXMLSettings::EncodeBoolValue(ColorRule.caseInsensitive));
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Attributes"),NXMLSettings::EncodeIntValue(ColorRule.dwFilterAttributes));
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("r"),NXMLSettings::EncodeIntValue(GetRValue(ColorRule.rgbColour)));
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("g"),NXMLSettings::EncodeIntValue(GetGValue(ColorRule.rgbColour)));
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("b"),NXMLSettings::EncodeIntValue(GetBValue(ColorRule.rgbColour)));
+		NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("ColorRule"),colorRule.strDescription.c_str());
+		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("FilenamePattern"),colorRule.strFilterPattern.c_str());
+		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("CaseInsensitive"),NXMLSettings::EncodeBoolValue(colorRule.caseInsensitive));
+		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Attributes"),NXMLSettings::EncodeIntValue(colorRule.dwFilterAttributes));
+		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("r"),NXMLSettings::EncodeIntValue(GetRValue(colorRule.rgbColour)));
+		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("g"),NXMLSettings::EncodeIntValue(GetGValue(colorRule.rgbColour)));
+		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("b"),NXMLSettings::EncodeIntValue(GetBValue(colorRule.rgbColour)));
 
 		pParentNode->Release();
 	}

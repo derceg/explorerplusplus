@@ -23,7 +23,7 @@ private:
 
 	DISALLOW_COPY_AND_ASSIGN(TaskbarThumbnails);
 
-	struct TabProxyInfo_t
+	struct TabProxyInfo
 	{
 		ATOM atomClass;
 		HWND hProxy;
@@ -61,7 +61,7 @@ private:
 	HINSTANCE m_instance;
 
 	ITaskbarList4 *m_pTaskbarList;
-	std::list<TabProxyInfo_t> m_TabProxyList;
+	std::list<TabProxyInfo> m_TabProxyList;
 	UINT m_uTaskbarButtonCreatedMessage;
 	BOOL m_bTaskbarInitialised;
 	BOOL m_enabled;

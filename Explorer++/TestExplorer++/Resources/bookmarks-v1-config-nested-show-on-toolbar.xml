@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- Preference file for Explorer++ -->
+<ExplorerPlusPlus>
+	<Bookmarks>
+		<Bookmark name="Root" Description="" Type="1" ShowOnBookmarksToolbar="yes" Location="C:\"/>
+		<Bookmark name="Folder 1" Description="" Type="0" ShowOnBookmarksToolbar="no">
+			<Bookmarks>
+				<Bookmark name="Windows" Description="" Type="1" ShowOnBookmarksToolbar="yes" Location="C:\Windows"/>
+			</Bookmarks>
+		</Bookmark>
+		<Bookmark name="Folder 2" Description="" Type="0" ShowOnBookmarksToolbar="no"/>
+	</Bookmarks>
+</ExplorerPlusPlus>

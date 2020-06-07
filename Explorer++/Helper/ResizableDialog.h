@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <list>
 #include "Macros.h"
+#include <list>
 
 /* Within a resizable dialog, controls
 either: move, resize, or hold the same
@@ -17,7 +17,6 @@ resize/move horizontally, but not vertically. */
 class ResizableDialog
 {
 public:
-
 	enum ControlType
 	{
 		TYPE_MOVE,
@@ -33,27 +32,26 @@ public:
 
 	struct Control_t
 	{
-		int					iID;
-		ControlType			Type;
-		ControlConstraint	Constraint;
+		int iID;
+		ControlType Type;
+		ControlConstraint Constraint;
 	};
 
-	ResizableDialog(HWND hDlg,const std::list<Control_t> &controlList);
+	ResizableDialog(HWND hDlg, const std::list<Control_t> &controlList);
 
-	void	UpdateControls(int iWidth,int iHeight);
+	void UpdateControls(int iWidth, int iHeight);
 
 private:
-
 	DISALLOW_COPY_AND_ASSIGN(ResizableDialog);
 
 	struct ControlInternal_t
 	{
-		int					iID;
-		ControlType			Type;
-		ControlConstraint	Constraint;
+		int iID;
+		ControlType Type;
+		ControlConstraint Constraint;
 
-		int					iWidthDelta;
-		int					iHeightDelta;
+		int iWidthDelta;
+		int iHeightDelta;
 	};
 
 	const HWND m_hDlg;

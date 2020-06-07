@@ -9,7 +9,7 @@
 
 namespace NColorRuleHelper
 {
-	struct ColorRule_t
+	struct ColorRule
 	{
 		std::wstring	strDescription;
 
@@ -21,11 +21,11 @@ namespace NColorRuleHelper
 		COLORREF		rgbColour;
 	};
 
-	std::vector<ColorRule_t> GetDefaultColorRules();
+	std::vector<ColorRule> GetDefaultColorRules();
 
-	void	LoadColorRulesFromRegistry(std::vector<ColorRule_t> &ColorRules);
-	void	SaveColorRulesToRegistry(const std::vector<ColorRule_t> &ColorRules);
+	void	LoadColorRulesFromRegistry(std::vector<ColorRule> &ColorRules);
+	void	SaveColorRulesToRegistry(const std::vector<ColorRule> &ColorRules);
 
-	void	LoadColorRulesFromXML(IXMLDOMDocument *pXMLDom,std::vector<ColorRule_t> &ColorRules);
-	void	SaveColorRulesToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot,const std::vector<ColorRule_t> &ColorRules);
+	void	LoadColorRulesFromXML(IXMLDOMDocument *pXMLDom,std::vector<ColorRule> &ColorRules);
+	void	SaveColorRulesToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot,const std::vector<ColorRule> &ColorRules);
 }

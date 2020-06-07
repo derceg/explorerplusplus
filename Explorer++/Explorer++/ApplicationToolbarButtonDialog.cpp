@@ -8,7 +8,7 @@
 #include "ResourceHelper.h"
 
 ApplicationToolbarButtonDialog::ApplicationToolbarButtonDialog(
-	HINSTANCE hInstance, HWND hParent, ApplicationButton_t *Button, bool IsNew) :
+	HINSTANCE hInstance, HWND hParent, ApplicationButton *Button, bool IsNew) :
 	BaseDialog(hInstance, IDD_EDITAPPLICATIONBUTTON, hParent, false),
 	m_Button(Button),
 	m_IsNew(IsNew)

@@ -19,36 +19,29 @@
 #include <boost/format.hpp>
 #include <wil/common.h>
 
-const std::vector<unsigned int> COMMON_REAL_FOLDER_COLUMNS =
-{ CM_NAME, CM_TYPE, CM_SIZE, CM_DATEMODIFIED,
-CM_AUTHORS, CM_TITLE };
+const std::vector<ColumnType> COMMON_REAL_FOLDER_COLUMNS = { ColumnType::Name, ColumnType::Type, ColumnType::Size,
+	ColumnType::DateModified, ColumnType::Authors, ColumnType::Title };
 
-const std::vector<unsigned int> COMMON_CONTROL_PANEL_COLUMNS =
-{ CM_NAME, CM_VIRTUALCOMMENTS };
+const std::vector<ColumnType> COMMON_CONTROL_PANEL_COLUMNS = { ColumnType::Name, ColumnType::VirtualComments };
 
-const std::vector<unsigned int> COMMON_MY_COMPUTER_COLUMNS =
-{ CM_NAME, CM_TYPE, CM_TOTALSIZE,
-CM_FREESPACE, CM_VIRTUALCOMMENTS,
-CM_FILESYSTEM };
+const std::vector<ColumnType> COMMON_MY_COMPUTER_COLUMNS = { ColumnType::Name, ColumnType::Type, ColumnType::TotalSize,
+	ColumnType::FreeSpace, ColumnType::VirtualComments, ColumnType::FileSystem };
 
-const std::vector<unsigned int> COMMON_NETWORK_CONNECTIONS_COLUMNS =
-{ CM_NAME, CM_TYPE, CM_NETWORKADAPTER_STATUS,
-CM_OWNER };
+const std::vector<ColumnType> COMMON_NETWORK_CONNECTIONS_COLUMNS = { ColumnType::Name, ColumnType::Type,
+	ColumnType::NetworkAdaptorStatus, ColumnType::Owner };
 
-const std::vector<unsigned int> COMMON_NETWORK_COLUMNS =
-{ CM_NAME, CM_VIRTUALCOMMENTS };
+const std::vector<ColumnType> COMMON_NETWORK_COLUMNS = { ColumnType::Name, ColumnType::VirtualComments };
 
-const std::vector<unsigned int> COMMON_PRINTERS_COLUMNS =
-{ CM_NAME, CM_NUMPRINTERDOCUMENTS, CM_PRINTERSTATUS,
-CM_PRINTERCOMMENTS, CM_PRINTERLOCATION };
+const std::vector<ColumnType> COMMON_PRINTERS_COLUMNS = { ColumnType::Name, ColumnType::PrinterNumDocuments,
+	ColumnType::PrinterStatus, ColumnType::PrinterComments, ColumnType::PrinterLocation };
 
-const std::vector<unsigned int> COMMON_RECYCLE_BIN_COLUMNS =
-{ CM_NAME, CM_ORIGINALLOCATION, CM_DATEDELETED,
-CM_SIZE, CM_TYPE, CM_DATEMODIFIED };
+const std::vector<ColumnType> COMMON_RECYCLE_BIN_COLUMNS = { ColumnType::Name, ColumnType::OriginalLocation,
+	ColumnType::DateDeleted, ColumnType::Size, ColumnType::Type, ColumnType::DateModified };
 
-std::vector<unsigned int> GetColumnHeaderMenuList(const std::wstring &directory);
+std::vector<ColumnType> GetColumnHeaderMenuList(const std::wstring &directory);
 
-LRESULT CALLBACK ShellBrowser::ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK ShellBrowser::ListViewProcStub(
+	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -92,7 +85,8 @@ LRESULT CALLBACK ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK ShellBrowser::ListViewParentProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK ShellBrowser::ListViewParentProcStub(
+	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -100,7 +94,8 @@ LRESULT CALLBACK ShellBrowser::ListViewParentProcStub(HWND hwnd, UINT uMsg, WPAR
 	return shellBrowser->ListViewParentProc(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK ShellBrowser::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ShellBrowser::ListViewParentProc(
+	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -167,7 +162,7 @@ void ShellBrowser::OnListViewMButtonDown(const POINT *pt)
 
 void ShellBrowser::OnListViewMButtonUp(const POINT *pt)
 {
-	LV_HITTESTINFO	ht;
+	LV_HITTESTINFO ht;
 	ht.pt = *pt;
 	ListView_HitTest(m_hListView, &ht);
 
@@ -185,7 +180,8 @@ void ShellBrowser::OnListViewMButtonUp(const POINT *pt)
 
 	const ItemInfo_t &itemInfo = GetItemByIndex(m_middleButtonItem);
 
-	if (!WI_IsAnyFlagSet(itemInfo.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_ARCHIVE))
+	if (!WI_IsAnyFlagSet(
+			itemInfo.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_ARCHIVE))
 	{
 		return;
 	}
@@ -195,10 +191,10 @@ void ShellBrowser::OnListViewMButtonUp(const POINT *pt)
 
 void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 {
-	NMLVDISPINFO	*pnmv = nullptr;
-	LVITEM			*plvItem = nullptr;
+	NMLVDISPINFO *pnmv = nullptr;
+	LVITEM *plvItem = nullptr;
 
-	pnmv = (NMLVDISPINFO *)lParam;
+	pnmv = (NMLVDISPINFO *) lParam;
 	plvItem = &pnmv->item;
 
 	int internalIndex = static_cast<int>(plvItem->lParam);
@@ -212,7 +208,8 @@ void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 	first, or else it may be possible for the
 	thumbnail to be drawn before the initial
 	image. */
-	if (m_folderSettings.viewMode == +ViewMode::Thumbnails && (plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
+	if (m_folderSettings.viewMode == +ViewMode::Thumbnails
+		&& (plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
 	{
 		plvItem->iImage = GetIconThumbnail(internalIndex);
 		plvItem->mask |= LVIF_DI_SETITEM;
@@ -224,7 +221,10 @@ void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 
 	if (m_folderSettings.viewMode == +ViewMode::Details && (plvItem->mask & LVIF_TEXT) == LVIF_TEXT)
 	{
-		QueueColumnTask(internalIndex, plvItem->iSubItem);
+		auto columnType = GetColumnTypeByIndex(plvItem->iSubItem);
+		assert(columnType);
+
+		QueueColumnTask(internalIndex, *columnType);
 	}
 
 	if ((plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
@@ -253,7 +253,8 @@ void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 		}
 		else
 		{
-			if ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+			if ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+				== FILE_ATTRIBUTE_DIRECTORY)
 			{
 				plvItem->iImage = m_iFolderIcon;
 			}
@@ -263,9 +264,10 @@ void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 			}
 		}
 
-		m_iconFetcher->QueueIconTask(itemInfo.pidlComplete.get(), [this, internalIndex] (int iconIndex) {
-			ProcessIconResult(internalIndex, iconIndex);
-		});
+		m_iconFetcher->QueueIconTask(
+			itemInfo.pidlComplete.get(), [this, internalIndex](int iconIndex) {
+				ProcessIconResult(internalIndex, iconIndex);
+			});
 	}
 
 	plvItem->mask |= LVIF_DI_SETITEM;
@@ -274,8 +276,8 @@ void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 std::optional<int> ShellBrowser::GetCachedIconIndex(const ItemInfo_t &itemInfo)
 {
 	TCHAR filePath[MAX_PATH];
-	HRESULT hr = GetDisplayName(itemInfo.pidlComplete.get(),
-		filePath, SIZEOF_ARRAY(filePath), SHGDN_FORPARSING);
+	HRESULT hr = GetDisplayName(
+		itemInfo.pidlComplete.get(), filePath, SIZEOF_ARRAY(filePath), SHGDN_FORPARSING);
 
 	if (FAILED(hr))
 	{
@@ -332,30 +334,32 @@ void ShellBrowser::QueueInfoTipTask(int internalIndex, const std::wstring &exist
 	Config configCopy = *m_config;
 	bool virtualFolder = InVirtualFolder();
 
-	auto result = m_infoTipsThreadPool.push([this, infoTipResultId, internalIndex,
-		basicItemInfo, configCopy, virtualFolder, existingInfoTip](int id) {
-		UNREFERENCED_PARAMETER(id);
+	auto result =
+		m_infoTipsThreadPool.push([this, infoTipResultId, internalIndex, basicItemInfo, configCopy,
+									  virtualFolder, existingInfoTip](int id) {
+			UNREFERENCED_PARAMETER(id);
 
-		auto result = GetInfoTipAsync(m_hListView, infoTipResultId, internalIndex, basicItemInfo, configCopy,
-			m_hResourceModule, virtualFolder);
+			auto result = GetInfoTipAsync(m_hListView, infoTipResultId, internalIndex,
+				basicItemInfo, configCopy, m_hResourceModule, virtualFolder);
 
-		// If the item name is truncated in the listview,
-		// existingInfoTip will contain that value. Therefore, it's
-		// important that the rest of the infotip is concatenated onto
-		// that value if it's there.
-		if (result && !existingInfoTip.empty())
-		{
-			result->infoTip = existingInfoTip + L"\n" + result->infoTip;
-		}
+			// If the item name is truncated in the listview,
+			// existingInfoTip will contain that value. Therefore, it's
+			// important that the rest of the infotip is concatenated onto
+			// that value if it's there.
+			if (result && !existingInfoTip.empty())
+			{
+				result->infoTip = existingInfoTip + L"\n" + result->infoTip;
+			}
 
-		return result;
-	});
+			return result;
+		});
 
 	m_infoTipResults.insert({ infoTipResultId, std::move(result) });
 }
 
-std::optional<ShellBrowser::InfoTipResult> ShellBrowser::GetInfoTipAsync(HWND listView, int infoTipResultId,
-	int internalIndex, const BasicItemInfo_t &basicItemInfo, const Config &config, HINSTANCE instance, bool virtualFolder)
+std::optional<ShellBrowser::InfoTipResult> ShellBrowser::GetInfoTipAsync(HWND listView,
+	int infoTipResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo,
+	const Config &config, HINSTANCE instance, bool virtualFolder)
 {
 	std::wstring infoTip;
 
@@ -364,7 +368,8 @@ std::optional<ShellBrowser::InfoTipResult> ShellBrowser::GetInfoTipAsync(HWND li
 	if ((config.infoTipType == InfoTipType::System) || virtualFolder)
 	{
 		TCHAR infoTipText[256];
-		HRESULT hr = GetItemInfoTip(basicItemInfo.pidlComplete.get(), infoTipText, SIZEOF_ARRAY(infoTipText));
+		HRESULT hr = GetItemInfoTip(
+			basicItemInfo.pidlComplete.get(), infoTipText, SIZEOF_ARRAY(infoTipText));
 
 		if (FAILED(hr))
 		{
@@ -379,8 +384,9 @@ std::optional<ShellBrowser::InfoTipResult> ShellBrowser::GetInfoTipAsync(HWND li
 		LoadString(instance, IDS_GENERAL_DATEMODIFIED, dateModified, SIZEOF_ARRAY(dateModified));
 
 		TCHAR fileModificationText[256];
-		BOOL fileTimeResult = CreateFileTimeString(&basicItemInfo.wfd.ftLastWriteTime, fileModificationText,
-			SIZEOF_ARRAY(fileModificationText), config.globalFolderSettings.showFriendlyDates);
+		BOOL fileTimeResult =
+			CreateFileTimeString(&basicItemInfo.wfd.ftLastWriteTime, fileModificationText,
+				SIZEOF_ARRAY(fileModificationText), config.globalFolderSettings.showFriendlyDates);
 
 		if (!fileTimeResult)
 		{
@@ -480,8 +486,8 @@ void ShellBrowser::OnListViewItemChanged(const NMLISTVIEW *changeData)
 
 void ShellBrowser::UpdateFileSelectionInfo(int internalIndex, BOOL selected)
 {
-	ULARGE_INTEGER	ulFileSize;
-	BOOL			isFolder;
+	ULARGE_INTEGER ulFileSize;
+	BOOL isFolder;
 
 	isFolder = (m_itemInfoMap.at(internalIndex).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 		== FILE_ATTRIBUTE_DIRECTORY;
@@ -492,18 +498,26 @@ void ShellBrowser::UpdateFileSelectionInfo(int internalIndex, BOOL selected)
 	if (selected)
 	{
 		if (isFolder)
+		{
 			m_NumFoldersSelected++;
+		}
 		else
+		{
 			m_NumFilesSelected++;
+		}
 
 		m_ulFileSelectionSize.QuadPart += ulFileSize.QuadPart;
 	}
 	else
 	{
 		if (isFolder)
+		{
 			m_NumFoldersSelected--;
+		}
 		else
+		{
 			m_NumFilesSelected--;
+		}
 
 		m_ulFileSelectionSize.QuadPart -= ulFileSize.QuadPart;
 	}
@@ -514,9 +528,7 @@ void ShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 	switch (lvKeyDown->wVKey)
 	{
 	case 'A':
-		if (IsKeyDown(VK_CONTROL) &&
-			!IsKeyDown(VK_SHIFT) &&
-			!IsKeyDown(VK_MENU))
+		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
 			ListViewHelper::SelectAllItems(m_hListView, TRUE);
 			SetFocus(m_hListView);
@@ -524,9 +536,7 @@ void ShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 		break;
 
 	case 'I':
-		if (IsKeyDown(VK_CONTROL) &&
-			!IsKeyDown(VK_SHIFT) &&
-			!IsKeyDown(VK_MENU))
+		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
 			ListViewHelper::InvertSelection(m_hListView);
 			SetFocus(m_hListView);
@@ -534,12 +544,11 @@ void ShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 		break;
 
 	case VK_BACK:
-		if (IsKeyDown(VK_CONTROL) &&
-			!IsKeyDown(VK_SHIFT) &&
-			!IsKeyDown(VK_MENU))
+		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
 			TCHAR szRoot[MAX_PATH];
-			HRESULT hr = GetDisplayName(m_directoryState.pidlDirectory.get(), szRoot, SIZEOF_ARRAY(szRoot), SHGDN_FORPARSING);
+			HRESULT hr = GetDisplayName(m_directoryState.pidlDirectory.get(), szRoot,
+				SIZEOF_ARRAY(szRoot), SHGDN_FORPARSING);
 
 			if (SUCCEEDED(hr))
 			{
@@ -593,8 +602,8 @@ BOOL ShellBrowser::DeghostItem(int iItem)
 
 BOOL ShellBrowser::GhostItemInternal(int iItem, BOOL bGhost)
 {
-	LVITEM	lvItem;
-	BOOL	bRet;
+	LVITEM lvItem;
+	BOOL bRet;
 
 	lvItem.mask = LVIF_PARAM;
 	lvItem.iItem = iItem;
@@ -605,7 +614,8 @@ BOOL ShellBrowser::GhostItemInternal(int iItem, BOOL bGhost)
 	{
 		/* If the file is hidden, prevent changes to its visibility state (i.e.
 		hidden items will ALWAYS be ghosted). */
-		if (WI_IsFlagSet(m_itemInfoMap.at((int)lvItem.lParam).wfd.dwFileAttributes, FILE_ATTRIBUTE_HIDDEN))
+		if (WI_IsFlagSet(
+				m_itemInfoMap.at((int) lvItem.lParam).wfd.dwFileAttributes, FILE_ATTRIBUTE_HIDDEN))
 		{
 			return FALSE;
 		}
@@ -644,23 +654,25 @@ void ShellBrowser::ShowPropertiesForSelectedFiles() const
 	}
 
 	auto pidlDirectory = GetDirectoryIdl();
-	ShowMultipleFileProperties(pidlDirectory.get(), rawPidls.data(), m_hOwner, static_cast<int>(rawPidls.size()));
+	ShowMultipleFileProperties(
+		pidlDirectory.get(), rawPidls.data(), m_hOwner, static_cast<int>(rawPidls.size()));
 }
 
 void ShellBrowser::OnListViewHeaderRightClick(const POINTS &cursorPos)
 {
-	wil::unique_hmenu headerPopupMenu(LoadMenu(m_hResourceModule, MAKEINTRESOURCE(IDR_HEADER_MENU)));
+	wil::unique_hmenu headerPopupMenu(
+		LoadMenu(m_hResourceModule, MAKEINTRESOURCE(IDR_HEADER_MENU)));
 	HMENU headerMenu = GetSubMenu(headerPopupMenu.get(), 0);
 
 	auto commonColumns = GetColumnHeaderMenuList(m_CurDir);
 
-	std::unordered_map<int, UINT> menuItemMappings;
+	std::unordered_map<int, ColumnType> menuItemMappings;
 	int totalInserted = 0;
 	int commonColumnPosition = 0;
 
 	for (const auto &column : *m_pActiveColumns)
 	{
-		auto itr = std::find(commonColumns.begin(), commonColumns.end(), column.id);
+		auto itr = std::find(commonColumns.begin(), commonColumns.end(), column.type);
 		bool inCommonColumns = (itr != commonColumns.end());
 
 		if (!column.bChecked && !inCommonColumns)
@@ -672,8 +684,8 @@ void ShellBrowser::OnListViewHeaderRightClick(const POINTS &cursorPos)
 		mii.cbSize = sizeof(mii);
 		mii.fMask = MIIM_STRING | MIIM_STATE | MIIM_ID;
 
-		std::wstring columnText = ResourceHelper::LoadString(m_hResourceModule,
-			LookupColumnNameStringIndex(column.id));
+		std::wstring columnText =
+			ResourceHelper::LoadString(m_hResourceModule, LookupColumnNameStringIndex(column.type));
 
 		if (column.bChecked)
 		{
@@ -704,13 +716,14 @@ void ShellBrowser::OnListViewHeaderRightClick(const POINTS &cursorPos)
 		mii.wID = id;
 		InsertMenuItem(headerMenu, currentPosition, TRUE, &mii);
 
-		menuItemMappings.insert({ id, column.id });
+		menuItemMappings.insert({ id, column.type });
 
 		totalInserted++;
 	}
 
-	int cmd = TrackPopupMenu(headerMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD,
-		cursorPos.x, cursorPos.y, 0, m_hListView, nullptr);
+	int cmd =
+		TrackPopupMenu(headerMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD,
+			cursorPos.x, cursorPos.y, 0, m_hListView, nullptr);
 
 	if (cmd == 0)
 	{
@@ -720,7 +733,7 @@ void ShellBrowser::OnListViewHeaderRightClick(const POINTS &cursorPos)
 	OnListViewHeaderMenuItemSelected(cmd, menuItemMappings);
 }
 
-std::vector<unsigned int> GetColumnHeaderMenuList(const std::wstring &directory)
+std::vector<ColumnType> GetColumnHeaderMenuList(const std::wstring &directory)
 {
 	if (CompareVirtualFolders(directory.c_str(), CSIDL_DRIVES))
 	{
@@ -752,8 +765,8 @@ std::vector<unsigned int> GetColumnHeaderMenuList(const std::wstring &directory)
 	}
 }
 
-void ShellBrowser::OnListViewHeaderMenuItemSelected(int menuItemId,
-	const std::unordered_map<int, UINT> &menuItemMappings)
+void ShellBrowser::OnListViewHeaderMenuItemSelected(
+	int menuItemId, const std::unordered_map<int, ColumnType> &menuItemMappings)
 {
 	if (menuItemId == IDM_HEADER_MORE)
 	{
@@ -773,14 +786,14 @@ void ShellBrowser::OnShowMoreColumnsSelected()
 }
 
 void ShellBrowser::OnColumnMenuItemSelected(
-	int menuItemId, const std::unordered_map<int, UINT> &menuItemMappings)
+	int menuItemId, const std::unordered_map<int, ColumnType> &menuItemMappings)
 {
 	auto currentColumns = ExportCurrentColumns();
 
-	UINT columnId = menuItemMappings.at(menuItemId);
+	ColumnType columnType = menuItemMappings.at(menuItemId);
 	auto itr = std::find_if(
-		currentColumns.begin(), currentColumns.end(), [columnId](const Column_t &column) {
-			return column.id == columnId;
+		currentColumns.begin(), currentColumns.end(), [columnType](const Column_t &column) {
+			return column.type == columnType;
 		});
 
 	if (itr == currentColumns.end())
@@ -801,12 +814,12 @@ void ShellBrowser::OnColumnMenuItemSelected(
 
 void ShellBrowser::SetFileAttributesForSelection()
 {
-	std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t> sfaiList;
+	std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo> sfaiList;
 	int index = -1;
 
 	while ((index = ListView_GetNextItem(m_hListView, index, LVNI_SELECTED)) != -1)
 	{
-		NSetFileAttributesDialogExternal::SetFileAttributesInfo_t sfai;
+		NSetFileAttributesDialogExternal::SetFileAttributesInfo sfai;
 
 		const ItemInfo_t &item = GetItemByIndex(index);
 		sfai.wfd = item.wfd;

@@ -72,10 +72,14 @@ LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 	}
 
 	/* Jump across to the member window function (will handle all requests). */
-	if(pContainer != nullptr)
-		return pContainer->WindowProcedure(hwnd,Msg,wParam,lParam);
+	if (pContainer != nullptr)
+	{
+		return pContainer->WindowProcedure(hwnd, Msg, wParam, lParam);
+	}
 	else
-		return DefWindowProc(hwnd,Msg,wParam,lParam);
+	{
+		return DefWindowProc(hwnd, Msg, wParam, lParam);
+	}
 }
 
 LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
@@ -174,15 +178,15 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 
 	case WM_APP_FOLDERSIZECOMPLETED:
 		{
-			DWFolderSizeCompletion_t *pDWFolderSizeCompletion = nullptr;
+			DWFolderSizeCompletion *pDWFolderSizeCompletion = nullptr;
 			TCHAR szFolderSize[32];
 			TCHAR szSizeString[64];
 			TCHAR szTotalSize[64];
 			BOOL bValid = FALSE;
 
-			pDWFolderSizeCompletion = (DWFolderSizeCompletion_t *)wParam;
+			pDWFolderSizeCompletion = (DWFolderSizeCompletion *)wParam;
 
-			std::list<DWFolderSize_t>::iterator itr;
+			std::list<DWFolderSize>::iterator itr;
 
 			/* First, make sure we should still display the
 			results (we won't if the listview selection has
@@ -1266,7 +1270,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		if (g_hwndManageBookmarks == nullptr)
 		{
 			auto *pManageBookmarksDialog = new ManageBookmarksDialog(m_hLanguageModule,
-				hwnd, this, m_navigation.get(), &m_bookmarkTree);
+				hwnd, this, m_navigation.get(), &m_bookmarkIconFetcher, &m_bookmarkTree);
 			g_hwndManageBookmarks = pManageBookmarksDialog->ShowModelessDialog(new ModelessDialogNotification());
 		}
 		else

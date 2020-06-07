@@ -12,12 +12,12 @@ using namespace testing;
 class BookmarkTreeObserverTest : public Test
 {
 protected:
-
 	BookmarkTreeObserverTest()
 	{
 		auto folder = std::make_unique<BookmarkItem>(std::nullopt, L"Test folder", std::nullopt);
 		m_rawFolder = folder.get();
-		m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(), std::move(folder), 0);
+		m_bookmarkTree.AddBookmarkItem(
+			m_bookmarkTree.GetBookmarksMenuFolder(), std::move(folder), 0);
 
 		auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark", L"C:\\");
 		m_rawBookmark = bookmark.get();
@@ -31,7 +31,8 @@ protected:
 	BookmarkItem *m_rawBookmark;
 };
 
-TEST(BookmarkTreeTest, BasicTests) {
+TEST(BookmarkTreeTest, BasicTests)
+{
 	BookmarkTree bookmarkTree;
 
 	EXPECT_FALSE(bookmarkTree.CanAddChildren(bookmarkTree.GetRoot()));
@@ -58,7 +59,8 @@ TEST(BookmarkTreeTest, BasicTests) {
 	EXPECT_FALSE(bookmarkTree.IsPermanentNode(rawFolder));
 }
 
-TEST(BookmarkTreeTest, AddChildren) {
+TEST(BookmarkTreeTest, AddChildren)
+{
 	BookmarkTree bookmarkTree;
 
 	auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark", L"C:\\");
@@ -70,8 +72,10 @@ TEST(BookmarkTreeTest, AddChildren) {
 
 	for (int i = 0; i < 10; i++)
 	{
-		auto currentBookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark " + std::to_wstring(i), L"C:\\");
-		bookmarkTree.AddBookmarkItem(bookmarkTree.GetBookmarksToolbarFolder(), std::move(currentBookmark), i);
+		auto currentBookmark = std::make_unique<BookmarkItem>(
+			std::nullopt, L"Test bookmark " + std::to_wstring(i), L"C:\\");
+		bookmarkTree.AddBookmarkItem(
+			bookmarkTree.GetBookmarksToolbarFolder(), std::move(currentBookmark), i);
 	}
 
 	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1);
@@ -96,7 +100,8 @@ TEST(BookmarkTreeTest, AddChildren) {
 	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildIndex(rawBookmark), 0);
 }
 
-TEST(BookmarkTreeTest, MoveChildren) {
+TEST(BookmarkTreeTest, MoveChildren)
+{
 	BookmarkTree bookmarkTree;
 
 	auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark", L"C:\\");
@@ -114,7 +119,8 @@ TEST(BookmarkTreeTest, MoveChildren) {
 	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0);
 }
 
-TEST(BookmarkTreeTest, RemoveChildren) {
+TEST(BookmarkTreeTest, RemoveChildren)
+{
 	BookmarkTree bookmarkTree;
 
 	auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark", L"C:\\");
@@ -132,9 +138,11 @@ TEST(BookmarkTreeTest, RemoveChildren) {
 	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0);
 }
 
-TEST_F(BookmarkTreeObserverTest, Add) {
+TEST_F(BookmarkTreeObserverTest, Add)
+{
 	m_bookmarkTree.bookmarkItemAddedSignal.AddObserver(
-		std::bind(&BookmarkTreeObserver::OnBookmarkItemAdded, &m_observer, std::placeholders::_1, std::placeholders::_2));
+		std::bind(&BookmarkTreeObserver::OnBookmarkItemAdded, &m_observer, std::placeholders::_1,
+			std::placeholders::_2));
 
 	auto folder = std::make_unique<BookmarkItem>(std::nullopt, L"Test folder", std::nullopt);
 	auto rawFolder = folder.get();
@@ -152,45 +160,57 @@ TEST_F(BookmarkTreeObserverTest, Add) {
 	m_bookmarkTree.AddBookmarkItem(rawFolder, std::move(bookmark), 0);
 }
 
-TEST_F(BookmarkTreeObserverTest, Update) {
+TEST_F(BookmarkTreeObserverTest, Update)
+{
 	m_bookmarkTree.bookmarkItemUpdatedSignal.AddObserver(
-		std::bind(&BookmarkTreeObserver::OnBookmarkItemUpdated, &m_observer, std::placeholders::_1, std::placeholders::_2));
+		std::bind(&BookmarkTreeObserver::OnBookmarkItemUpdated, &m_observer, std::placeholders::_1,
+			std::placeholders::_2));
 
-	EXPECT_CALL(m_observer, OnBookmarkItemUpdated(Ref(*m_rawFolder), BookmarkItem::PropertyType::Name));
+	EXPECT_CALL(
+		m_observer, OnBookmarkItemUpdated(Ref(*m_rawFolder), BookmarkItem::PropertyType::Name));
 	m_rawFolder->SetName(L"New name");
 
-	EXPECT_CALL(m_observer, OnBookmarkItemUpdated(Ref(*m_rawFolder), BookmarkItem::PropertyType::DateModified));
+	EXPECT_CALL(m_observer,
+		OnBookmarkItemUpdated(Ref(*m_rawFolder), BookmarkItem::PropertyType::DateModified));
 
 	FILETIME dateModified;
 	GetSystemTimeAsFileTime(&dateModified);
 	m_rawFolder->SetDateModified(dateModified);
 
-	EXPECT_CALL(m_observer, OnBookmarkItemUpdated(Ref(*m_rawBookmark), BookmarkItem::PropertyType::Name));
+	EXPECT_CALL(
+		m_observer, OnBookmarkItemUpdated(Ref(*m_rawBookmark), BookmarkItem::PropertyType::Name));
 	m_rawBookmark->SetName(L"New name");
 
-	EXPECT_CALL(m_observer, OnBookmarkItemUpdated(Ref(*m_rawBookmark), BookmarkItem::PropertyType::Location));
+	EXPECT_CALL(m_observer,
+		OnBookmarkItemUpdated(Ref(*m_rawBookmark), BookmarkItem::PropertyType::Location));
 	m_rawBookmark->SetLocation(L"D:\\");
 }
 
-TEST_F(BookmarkTreeObserverTest, Move) {
+TEST_F(BookmarkTreeObserverTest, Move)
+{
 	m_bookmarkTree.bookmarkItemMovedSignal.AddObserver(
-		std::bind(&BookmarkTreeObserver::OnBookmarkItemMoved, &m_observer, std::placeholders::_1, std::placeholders::_2,
-			std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
+		std::bind(&BookmarkTreeObserver::OnBookmarkItemMoved, &m_observer, std::placeholders::_1,
+			std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
+			std::placeholders::_5));
 
-	EXPECT_CALL(m_observer, OnBookmarkItemMoved(m_rawFolder, m_bookmarkTree.GetBookmarksMenuFolder(), 0,
-		m_bookmarkTree.GetBookmarksToolbarFolder(), 0));
+	EXPECT_CALL(m_observer,
+		OnBookmarkItemMoved(m_rawFolder, m_bookmarkTree.GetBookmarksMenuFolder(), 0,
+			m_bookmarkTree.GetBookmarksToolbarFolder(), 0));
 	m_bookmarkTree.MoveBookmarkItem(m_rawFolder, m_bookmarkTree.GetBookmarksToolbarFolder(), 0);
 
-	EXPECT_CALL(m_observer, OnBookmarkItemMoved(m_rawBookmark, m_rawFolder, 0, m_bookmarkTree.GetBookmarksToolbarFolder(), 1));
+	EXPECT_CALL(m_observer,
+		OnBookmarkItemMoved(
+			m_rawBookmark, m_rawFolder, 0, m_bookmarkTree.GetBookmarksToolbarFolder(), 1));
 	m_bookmarkTree.MoveBookmarkItem(m_rawBookmark, m_bookmarkTree.GetBookmarksToolbarFolder(), 1);
 }
 
-TEST_F(BookmarkTreeObserverTest, Remove) {
-	m_bookmarkTree.bookmarkItemPreRemovalSignal.AddObserver(
-		std::bind(&BookmarkTreeObserver::OnBookmarkItemPreRemoval, &m_observer, std::placeholders::_1));
+TEST_F(BookmarkTreeObserverTest, Remove)
+{
+	m_bookmarkTree.bookmarkItemPreRemovalSignal.AddObserver(std::bind(
+		&BookmarkTreeObserver::OnBookmarkItemPreRemoval, &m_observer, std::placeholders::_1));
 
-	m_bookmarkTree.bookmarkItemRemovedSignal.AddObserver(
-		std::bind(&BookmarkTreeObserver::OnBookmarkItemRemoved, &m_observer, std::placeholders::_1));
+	m_bookmarkTree.bookmarkItemRemovedSignal.AddObserver(std::bind(
+		&BookmarkTreeObserver::OnBookmarkItemRemoved, &m_observer, std::placeholders::_1));
 
 	EXPECT_CALL(m_observer, OnBookmarkItemPreRemoval(Ref(*m_rawBookmark)));
 	EXPECT_CALL(m_observer, OnBookmarkItemRemoved(m_rawBookmark->GetGUID()));

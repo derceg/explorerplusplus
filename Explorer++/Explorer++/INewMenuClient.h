@@ -9,11 +9,9 @@ __interface IExplorerplusplus;
 class NewMenuClient : public INewMenuClient
 {
 public:
-
 	NewMenuClient(IExplorerplusplus *pexpp);
 
 private:
-
 	/* These are used with the IncludeItems()
 	method of INewMenuClient. INewMenuClient
 	is used to support the shell 'new' menu. */
@@ -31,14 +29,14 @@ private:
 	static const int NMCSAEI_EDIT_WINDOWS_10 = 0x0003;
 
 	/* IUnknown methods. */
-	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject) override;
-	ULONG __stdcall		AddRef() override;
-	ULONG __stdcall		Release() override;
+	HRESULT __stdcall QueryInterface(REFIID iid, void **ppvObject) override;
+	ULONG __stdcall AddRef() override;
+	ULONG __stdcall Release() override;
 
 	/* INewMenuClient methods. */
-	HRESULT __stdcall	IncludeItems(NMCII_FLAGS *pFlags) override;
-	HRESULT __stdcall	SelectAndEditItem(PCIDLIST_ABSOLUTE pidlItem,NMCSAEI_FLAGS flags) override;
+	HRESULT __stdcall IncludeItems(NMCII_FLAGS *pFlags) override;
+	HRESULT __stdcall SelectAndEditItem(PCIDLIST_ABSOLUTE pidlItem, NMCSAEI_FLAGS flags) override;
 
-	ULONG				m_RefCount;
-	IExplorerplusplus	*m_pexpp;
+	ULONG m_RefCount;
+	IExplorerplusplus *m_pexpp;
 };

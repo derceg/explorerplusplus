@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "Bookmarks/UI/BookmarksToolbar.h"
 #include "ColorRuleHelper.h"
@@ -33,22 +34,23 @@ Explorerplusplus::Explorerplusplus(HWND hwnd) :
 	m_cachedIcons(MAX_CACHED_ICONS),
 	m_pluginMenuManager(hwnd, MENU_PLUGIN_STARTID, MENU_PLUGIN_ENDID),
 	m_acceleratorUpdater(&g_hAccl),
-	m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_ENDID)
+	m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_ENDID),
+	m_bookmarkIconFetcher(hwnd, &m_cachedIcons)
 {
 	m_hLanguageModule				= nullptr;
 
 	m_config = std::make_shared<Config>();
 
-	m_bSelectingTreeViewDirectory	= FALSE;
-	m_bTreeViewRightClick			= FALSE;
+	m_bSelectingTreeViewDirectory	= false;
+	m_bTreeViewRightClick			= false;
 	m_bSavePreferencesToXMLFile		= FALSE;
-	m_bAttemptToolbarRestore		= FALSE;
-	m_bLanguageLoaded				= FALSE;
-	m_bListViewRenaming				= FALSE;
-	m_bDragging						= FALSE;
-	m_bDragCancelled				= FALSE;
-	m_bDragAllowed					= FALSE;
-	m_bShowTabBar					= TRUE;
+	m_bAttemptToolbarRestore		= false;
+	m_bLanguageLoaded				= false;
+	m_bListViewRenaming				= false;
+	m_bDragging						= false;
+	m_bDragCancelled				= false;
+	m_bDragAllowed					= false;
+	m_bShowTabBar					= true;
 	m_pActiveShellBrowser			= nullptr;
 	m_hMainRebar					= nullptr;
 	m_hStatusBar					= nullptr;
@@ -64,7 +66,7 @@ Explorerplusplus::Explorerplusplus(HWND hwnd) :
 	m_zDeltaTotal					= 0;
 	m_InitializationFinished.set(false);
 
-	m_blockNextListViewSelection = FALSE;
+	m_blockNextListViewSelection = false;
 
 	m_ColorRules = NColorRuleHelper::GetDefaultColorRules();
 

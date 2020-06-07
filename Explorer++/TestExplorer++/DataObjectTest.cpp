@@ -4,8 +4,8 @@
 
 #include "../Helper/DataExchangeHelper.h"
 #include "../Helper/DragDropHelper.h"
-#include "../Helper/iDataObject.h"
 #include "../Helper/Macros.h"
+#include "../Helper/iDataObject.h"
 #include <gtest/gtest.h>
 #include <wil/com.h>
 
@@ -14,7 +14,6 @@ using namespace testing;
 class DataObjectTest : public Test
 {
 protected:
-
 	DataObjectTest()
 	{
 		m_dataObject = CreateDataObject(nullptr, nullptr, 0);

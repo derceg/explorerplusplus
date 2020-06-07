@@ -12,94 +12,93 @@
 #include "HolderWindowInternal.h"
 #include "../Helper/Macros.h"
 
+#define FOLDERS_TEXT_X 5
+#define FOLDERS_TEXT_Y 2
 
-#define FOLDERS_TEXT_X	5
-#define FOLDERS_TEXT_Y	2
+#define HOLDER_CLASS_NAME _T("Holder")
 
-#define HOLDER_CLASS_NAME	_T("Holder")
-
-ATOM				RegisterHolderWindowClass();
-LRESULT CALLBACK	HolderWndProcStub(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
+ATOM RegisterHolderWindowClass();
+LRESULT CALLBACK HolderWndProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 HolderWindow::HolderWindow(HWND hHolder)
 {
 	m_hHolder = hHolder;
-	m_bHolderResizing	= FALSE;
+	m_bHolderResizing = FALSE;
 }
 
 ATOM RegisterHolderWindowClass()
 {
 	WNDCLASS wc;
 
-	wc.style			= 0;
-	wc.lpfnWndProc		= HolderWndProcStub;
-	wc.cbClsExtra		= 0;
-	wc.cbWndExtra		= sizeof(HolderWindow *);
-	wc.hInstance		= GetModuleHandle(nullptr);
-	wc.hIcon			= nullptr;
-	wc.hCursor			= LoadCursor(nullptr,IDC_ARROW);
-	wc.hbrBackground	= (HBRUSH)GetSysColorBrush(COLOR_BTNFACE);
-	wc.lpszMenuName		= nullptr;
-	wc.lpszClassName	= HOLDER_CLASS_NAME;
+	wc.style = 0;
+	wc.lpfnWndProc = HolderWndProcStub;
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = sizeof(HolderWindow *);
+	wc.hInstance = GetModuleHandle(nullptr);
+	wc.hIcon = nullptr;
+	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	wc.hbrBackground = (HBRUSH) GetSysColorBrush(COLOR_BTNFACE);
+	wc.lpszMenuName = nullptr;
+	wc.lpszClassName = HOLDER_CLASS_NAME;
 
 	return RegisterClass(&wc);
 }
 
-HWND CreateHolderWindow(HWND hParent,TCHAR *szWindowName,UINT uStyle)
+HWND CreateHolderWindow(HWND hParent, TCHAR *szWindowName, UINT uStyle)
 {
 	HWND hHolder;
 
 	RegisterHolderWindowClass();
 
-	hHolder = CreateWindowEx(0,HOLDER_CLASS_NAME,szWindowName,
-		uStyle,0,0,0,0,hParent, nullptr,GetModuleHandle(nullptr), nullptr);
+	hHolder = CreateWindowEx(0, HOLDER_CLASS_NAME, szWindowName, uStyle, 0, 0, 0, 0, hParent,
+		nullptr, GetModuleHandle(nullptr), nullptr);
 
 	return hHolder;
 }
 
-LRESULT CALLBACK HolderWndProcStub(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK HolderWndProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	auto *pHolderWindow = (HolderWindow *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
+	auto *pHolderWindow = (HolderWindow *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
-	switch(msg)
+	switch (msg)
 	{
-		case WM_CREATE:
-			{
-				pHolderWindow = new HolderWindow(hwnd);
+	case WM_CREATE:
+	{
+		pHolderWindow = new HolderWindow(hwnd);
 
-				SetWindowLongPtr(hwnd,GWLP_USERDATA,(LONG_PTR)pHolderWindow);
-			}
-			break;
+		SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR) pHolderWindow);
+	}
+	break;
 
-		case WM_NCDESTROY:
-			delete pHolderWindow;
-			return 0;
+	case WM_NCDESTROY:
+		delete pHolderWindow;
+		return 0;
 	}
 
-	return pHolderWindow->HolderWndProc(hwnd,msg,wParam,lParam);
+	return pHolderWindow->HolderWndProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK HolderWindow::HolderWndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK HolderWindow::HolderWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	switch(msg)
+	switch (msg)
 	{
-		case WM_LBUTTONDOWN:
-			OnHolderWindowLButtonDown(lParam);
-			break;
+	case WM_LBUTTONDOWN:
+		OnHolderWindowLButtonDown(lParam);
+		break;
 
-		case WM_LBUTTONUP:
-			OnHolderWindowLButtonUp();
-			break;
+	case WM_LBUTTONUP:
+		OnHolderWindowLButtonUp();
+		break;
 
-		case WM_MOUSEMOVE:
-			return OnHolderWindowMouseMove(lParam);
+	case WM_MOUSEMOVE:
+		return OnHolderWindowMouseMove(lParam);
 
-		case WM_PAINT:
-			OnHolderWindowPaint(hwnd);
-			break;
+	case WM_PAINT:
+		OnHolderWindowPaint(hwnd);
+		break;
 	}
 
-	return DefWindowProc(hwnd,msg,wParam,lParam);
+	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
 /*
@@ -115,27 +114,28 @@ void HolderWindow::OnHolderWindowPaint(HWND hwnd)
 	RECT rc;
 	TCHAR szHeader[64];
 
-	GetClientRect(hwnd,&rc);
+	GetClientRect(hwnd, &rc);
 
-	hdc = BeginPaint(hwnd,&ps);
+	hdc = BeginPaint(hwnd, &ps);
 
 	UINT dpi = m_dpiCompat.GetDpiForWindow(hwnd);
 
 	ncm.cbSize = sizeof(ncm);
-	m_dpiCompat.SystemParametersInfoForDpi(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0, dpi);
+	m_dpiCompat.SystemParametersInfoForDpi(
+		SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0, dpi);
 	ncm.lfSmCaptionFont.lfWeight = FW_NORMAL;
 	hFont = CreateFontIndirect(&ncm.lfSmCaptionFont);
 
-	SelectObject(hdc,hFont);
+	SelectObject(hdc, hFont);
 
-	GetWindowText(hwnd,szHeader,SIZEOF_ARRAY(szHeader));
+	GetWindowText(hwnd, szHeader, SIZEOF_ARRAY(szHeader));
 
-	SetBkMode(hdc,TRANSPARENT);
-	TextOut(hdc,FOLDERS_TEXT_X,FOLDERS_TEXT_Y,szHeader,lstrlen(szHeader));
+	SetBkMode(hdc, TRANSPARENT);
+	TextOut(hdc, FOLDERS_TEXT_X, FOLDERS_TEXT_Y, szHeader, lstrlen(szHeader));
 
 	DeleteObject(hFont);
 
-	EndPaint(hwnd,&ps);
+	EndPaint(hwnd, &ps);
 }
 
 void HolderWindow::OnHolderWindowLButtonDown(LPARAM lParam)
@@ -144,11 +144,11 @@ void HolderWindow::OnHolderWindowLButtonDown(LPARAM lParam)
 	RECT rc;
 
 	cursorPos = MAKEPOINTS(lParam);
-	GetClientRect(m_hHolder,&rc);
+	GetClientRect(m_hHolder, &rc);
 
-	if(cursorPos.x >= (rc.right - 10))
+	if (cursorPos.x >= (rc.right - 10))
 	{
-		SetCursor(LoadCursor(nullptr,IDC_SIZEWE));
+		SetCursor(LoadCursor(nullptr, IDC_SIZEWE));
 
 		m_bHolderResizing = TRUE;
 
@@ -166,32 +166,34 @@ void HolderWindow::OnHolderWindowLButtonUp()
 
 int HolderWindow::OnHolderWindowMouseMove(LPARAM lParam)
 {
-	static POINTS	ptsPrevCursor;
-	POINTS			ptsCursor;
-	RECT			rc;
+	static POINTS ptsPrevCursor;
+	POINTS ptsCursor;
+	RECT rc;
 
 	ptsCursor = MAKEPOINTS(lParam);
-	GetClientRect(m_hHolder,&rc);
+	GetClientRect(m_hHolder, &rc);
 
 	/* Is the window in the process of been resized? */
-	if(m_bHolderResizing)
+	if (m_bHolderResizing)
 	{
 		/* Mouse hasn't moved. */
-		if((ptsPrevCursor.x == ptsCursor.x)
-			&& (ptsPrevCursor.y == ptsCursor.y))
+		if ((ptsPrevCursor.x == ptsCursor.x) && (ptsPrevCursor.y == ptsCursor.y))
+		{
 			return 0;
+		}
 
 		ptsPrevCursor.x = ptsCursor.x;
 		ptsPrevCursor.y = ptsCursor.y;
 
-		SendMessage(GetParent(m_hHolder),WM_USER_HOLDERRESIZED,(WPARAM)m_hHolder,(LPARAM)ptsCursor.x);
+		SendMessage(
+			GetParent(m_hHolder), WM_USER_HOLDERRESIZED, (WPARAM) m_hHolder, (LPARAM) ptsCursor.x);
 
 		return 1;
 	}
 
-	if(ptsCursor.x >= (rc.right - 10))
+	if (ptsCursor.x >= (rc.right - 10))
 	{
-		SetCursor(LoadCursor(nullptr,IDC_SIZEWE));
+		SetCursor(LoadCursor(nullptr, IDC_SIZEWE));
 	}
 
 	return 0;

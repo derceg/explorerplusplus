@@ -296,7 +296,7 @@ void DrivesToolbar::InsertDrive(const std::wstring &DrivePath)
 
 void DrivesToolbar::RemoveDrive(const std::wstring &DrivePath)
 {
-	DriveInformation_t di = GetDrivePosition(DrivePath);
+	DriveInformation di = GetDrivePosition(DrivePath);
 
 	if (di.Position != -1)
 	{
@@ -310,7 +310,7 @@ void DrivesToolbar::RemoveDrive(const std::wstring &DrivePath)
 for example, if a cd/dvd is inserted/removed. */
 void DrivesToolbar::UpdateDriveIcon(const std::wstring &DrivePath)
 {
-	DriveInformation_t di = GetDrivePosition(DrivePath);
+	DriveInformation di = GetDrivePosition(DrivePath);
 
 	if (di.Position != -1)
 	{
@@ -345,9 +345,9 @@ int DrivesToolbar::GetSortedPosition(const std::wstring &DrivePath)
 	return position;
 }
 
-DrivesToolbar::DriveInformation_t DrivesToolbar::GetDrivePosition(const std::wstring &DrivePath)
+DrivesToolbar::DriveInformation DrivesToolbar::GetDrivePosition(const std::wstring &DrivePath)
 {
-	DriveInformation_t di;
+	DriveInformation di;
 	di.Position = -1;
 
 	int nButtons = static_cast<int>(SendMessage(m_hwnd, TB_BUTTONCOUNT, 0, 0));

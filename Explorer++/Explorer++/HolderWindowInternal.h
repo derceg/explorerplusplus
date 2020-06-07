@@ -9,21 +9,18 @@
 class HolderWindow
 {
 public:
-
 	HolderWindow(HWND hHolder);
 
-	LRESULT CALLBACK	HolderWndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
+	LRESULT CALLBACK HolderWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 private:
+	void OnHolderWindowPaint(HWND hwnd);
+	void OnHolderWindowLButtonDown(LPARAM lParam);
+	void OnHolderWindowLButtonUp();
+	int OnHolderWindowMouseMove(LPARAM lParam);
 
-	void	OnHolderWindowPaint(HWND hwnd);
-	void	OnHolderWindowLButtonDown(LPARAM lParam);
-	void	OnHolderWindowLButtonUp();
-	int		OnHolderWindowMouseMove(LPARAM lParam);
-
-
-	HWND	m_hHolder;
-	BOOL	m_bHolderResizing;
+	HWND m_hHolder;
+	BOOL m_bHolderResizing;
 
 	DpiCompatibility m_dpiCompat;
 };

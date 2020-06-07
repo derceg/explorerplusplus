@@ -12,28 +12,26 @@
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/DropHandler.h"
-#include "../Helper/IconFetcher.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/signals2.hpp>
-#include <wil/com.h>
-#include <wil/resource.h>
 #include <optional>
 
+class BookmarkIconManager;
 class BookmarkTree;
+class IconFetcher;
 __interface IExplorerplusplus;
 
 class BookmarksToolbar : private BookmarkDropTargetWindow
 {
 public:
 	BookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
-		Navigation *navigation, BookmarkTree *bookmarkTree, UINT uIDStart, UINT uIDEnd);
+		Navigation *navigation, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, UINT uIDStart,
+		UINT uIDEnd);
 
 	void ShowOverflowMenu(const POINT &ptScreen);
 
 private:
 	BookmarksToolbar &operator=(const BookmarksToolbar &bt);
-
-	using SystemIconImageListMapping = std::unordered_map<int, int>;
 
 	static inline const UINT_PTR SUBCLASS_ID = 0;
 	static inline const UINT_PTR PARENT_SUBCLASS_ID = 0;
@@ -59,8 +57,8 @@ private:
 		LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK BookmarksToolbarParentProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	void InitializeToolbar();
-	void SetUpToolbarImageList();
+	void InitializeToolbar(IconFetcher *iconFetcher);
+	void SetUpToolbarImageList(IconFetcher *iconFetcher);
 
 	void InsertBookmarkItems();
 	void InsertBookmarkItem(BookmarkItem *bookmarkItem, int position);
@@ -106,18 +104,11 @@ private:
 	void RemoveDropHighlight();
 
 	int GetIconForBookmark(const BookmarkItem *bookmark);
-	void ProcessIconResult(std::wstring_view guid, int iconIndex);
-	int AddSystemIconToImageList(int iconIndex);
+	void OnBookmarkIconAvailable(std::wstring_view guid, int iconIndex);
 
 	HWND m_hToolbar;
 	DpiCompatibility m_dpiCompat;
-	wil::unique_himagelist m_imageList;
-	SystemIconImageListMapping m_imageListMappings;
-	wil::com_ptr<IImageList> m_systemImageList;
-	int m_defaultFolderIconSystemImageListIndex;
-	int m_defaultFolderIconIndex;
-	int m_bookmarkFolderIconIndex;
-	IconFetcher m_iconFetcher;
+	std::unique_ptr<BookmarkIconManager> m_bookmarkIconManager;
 
 	HINSTANCE m_instance;
 

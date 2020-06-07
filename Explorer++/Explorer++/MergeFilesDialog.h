@@ -15,11 +15,9 @@ class MergeFilesDialog;
 class MergeFilesDialogPersistentSettings : public DialogSettings
 {
 public:
-
 	static MergeFilesDialogPersistentSettings &GetInstance();
 
 private:
-
 	friend MergeFilesDialog;
 
 	static const TCHAR SETTINGS_KEY[];
@@ -27,59 +25,56 @@ private:
 	MergeFilesDialogPersistentSettings();
 
 	MergeFilesDialogPersistentSettings(const MergeFilesDialogPersistentSettings &);
-	MergeFilesDialogPersistentSettings & operator=(const MergeFilesDialogPersistentSettings &);
+	MergeFilesDialogPersistentSettings &operator=(const MergeFilesDialogPersistentSettings &);
 };
 
 class MergeFiles : public ReferenceCount
 {
 public:
-	
-	MergeFiles(HWND hDlg, const std::wstring &strOutputFilename, const std::list<std::wstring> &FullFilenameList);
+	MergeFiles(HWND hDlg, const std::wstring &strOutputFilename,
+		const std::list<std::wstring> &FullFilenameList);
 	~MergeFiles();
 
-	void					StartMerging();
-	void					StopMerging();
+	void StartMerging();
+	void StopMerging();
 
 private:
+	HWND m_hDlg;
 
-	HWND					m_hDlg;
+	std::wstring m_strOutputFilename;
+	std::list<std::wstring> m_FullFilenameList;
 
-	std::wstring			m_strOutputFilename;
-	std::list<std::wstring>	m_FullFilenameList;
-
-	CRITICAL_SECTION		m_csStop;
-	bool					m_bstopMerging;
+	CRITICAL_SECTION m_csStop;
+	bool m_bstopMerging;
 };
 
 class MergeFilesDialog : public BaseDialog
 {
 public:
-
 	MergeFilesDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
 		const std::wstring &strOutputDirectory, const std::list<std::wstring> &FullFilenameList,
 		BOOL bShowFriendlyDates);
 	~MergeFilesDialog();
 
 protected:
+	INT_PTR OnInitDialog() override;
+	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
+	INT_PTR OnClose() override;
 
-	INT_PTR	OnInitDialog() override;
-	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam) override;
-	INT_PTR	OnClose() override;
-
-	INT_PTR	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam) override;
+	INT_PTR OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 
 private:
+	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+		std::list<ResizableDialog::Control_t> &ControlList) override;
+	void SaveState() override;
 
-	void	GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList) override;
-	void	SaveState() override;
-
-	void	OnOk();
-	void	OnCancel();
-	void	OnChangeOutputDirectory();
-	void	OnMove(bool bUp);
-	void	OnFinished();
+	void OnOk();
+	void OnCancel();
+	void OnChangeOutputDirectory();
+	void OnMove(bool bUp);
+	void OnFinished();
 
 	IExplorerplusplus *m_expp;
 

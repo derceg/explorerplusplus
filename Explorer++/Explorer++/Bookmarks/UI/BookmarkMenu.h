@@ -12,6 +12,7 @@
 #include <functional>
 
 class BookmarkTree;
+class IconFetcher;
 __interface IExplorerplusplus;
 
 // Although it's not necessary, this class is effectively designed to be held
@@ -22,7 +23,7 @@ class BookmarkMenu
 {
 public:
 	BookmarkMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule, IExplorerplusplus *expp,
-		Navigation *navigation, HWND parentWindow);
+		Navigation *navigation, IconFetcher *iconFetcher, HWND parentWindow);
 
 	BOOL ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt,
 		BookmarkMenuBuilder::IncludePredicate includePredicate = nullptr);

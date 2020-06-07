@@ -16,7 +16,6 @@
 class ShellNavigationController : public NavigationController<HistoryEntry, HRESULT>
 {
 public:
-
 	enum class NavigationMode
 	{
 		Normal,
@@ -26,7 +25,8 @@ public:
 	ShellNavigationController(NavigatorInterface *navigator, TabNavigationInterface *tabNavigation,
 		IconFetcherInterface *iconFetcher);
 	ShellNavigationController(NavigatorInterface *navigator, TabNavigationInterface *tabNavigation,
-		IconFetcherInterface *iconFetcher, const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
+		IconFetcherInterface *iconFetcher,
+		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
 		int currentEntry);
 
 	[[nodiscard]] bool CanGoUp() const;
@@ -40,7 +40,6 @@ public:
 	void SetNavigationMode(NavigationMode navigationMode);
 
 private:
-
 	DISALLOW_COPY_AND_ASSIGN(ShellNavigationController);
 
 	void Initialize();

@@ -16,11 +16,9 @@ class ShellBrowser;
 class SelectColumnsDialogPersistentSettings : public DialogSettings
 {
 public:
-
 	static SelectColumnsDialogPersistentSettings &GetInstance();
 
 private:
-
 	friend SelectColumnsDialog;
 
 	static const TCHAR SETTINGS_KEY[];
@@ -28,37 +26,35 @@ private:
 	SelectColumnsDialogPersistentSettings();
 
 	SelectColumnsDialogPersistentSettings(const SelectColumnsDialogPersistentSettings &);
-	SelectColumnsDialogPersistentSettings & operator=(const SelectColumnsDialogPersistentSettings &);
+	SelectColumnsDialogPersistentSettings &operator=(const SelectColumnsDialogPersistentSettings &);
 };
 
 class SelectColumnsDialog : public BaseDialog
 {
 public:
-
 	SelectColumnsDialog(HINSTANCE hInstance, HWND hParent, ShellBrowser *shellBrowser,
 		IconResourceLoader *iconResourceLoader);
 
 protected:
-
-	INT_PTR	OnInitDialog() override;
-	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam) override;
-	INT_PTR	OnNotify(NMHDR *pnmhdr) override;
-	INT_PTR	OnClose() override;
+	INT_PTR OnInitDialog() override;
+	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
+	INT_PTR OnNotify(NMHDR *pnmhdr) override;
+	INT_PTR OnClose() override;
 
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 
 private:
+	bool CompareColumns(const Column_t &column1, const Column_t &column2);
 
-	bool	CompareColumns(const Column_t &column1, const Column_t &column2);
+	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+		std::list<ResizableDialog::Control_t> &ControlList) override;
+	void SaveState() override;
 
-	void	GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList) override;
-	void	SaveState() override;
-
-	void	OnOk();
-	void	OnCancel();
-	BOOL	OnLvnItemChanging(const NMLISTVIEW *nmlv);
-	void	OnLvnItemChanged(const NMLISTVIEW *pnmlv);
-	void	OnMoveColumn(bool bUp);
+	void OnOk();
+	void OnCancel();
+	BOOL OnLvnItemChanging(const NMLISTVIEW *nmlv);
+	void OnLvnItemChanged(const NMLISTVIEW *pnmlv);
+	void OnMoveColumn(bool bUp);
 
 	ShellBrowser *m_shellBrowser;
 	IconResourceLoader *m_iconResourceLoader;

@@ -51,7 +51,7 @@ static const TCHAR SHELL_DEFAULT_INTERNAL_COMMAND_NAME[] = _T("openinexplorer++"
 #define VALIDATE_NETWORKCONNECTIONS_COLUMNS	5
 #define VALIDATE_MYNETWORKPLACES_COLUMNS	6
 
-struct ColumnWidth_t
+struct ColumnWidth
 {
 	unsigned int id;
 	int iWidth;

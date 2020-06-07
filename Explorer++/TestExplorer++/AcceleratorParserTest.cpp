@@ -5,7 +5,8 @@
 #include "Plugins/AcceleratorParser.h"
 #include <gtest/gtest.h>
 
-TEST(AcceleratorParserTest, TestValidCases) {
+TEST(AcceleratorParserTest, TestValidCases)
+{
 	auto res = Plugins::parseAccelerator(L"Ctrl+S");
 
 	EXPECT_TRUE(res);
@@ -35,7 +36,8 @@ TEST(AcceleratorParserTest, TestValidCases) {
 	EXPECT_EQ(res->key, 'P');
 }
 
-TEST(AcceleratorParserTest, TestInvalidCases) {
+TEST(AcceleratorParserTest, TestInvalidCases)
+{
 	auto res = Plugins::parseAccelerator(L"");
 
 	EXPECT_FALSE(res);

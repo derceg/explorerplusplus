@@ -25,7 +25,7 @@ namespace
 	const TCHAR REG_APPLICATIONS_KEY[] = _T("Software\\Explorer++\\ApplicationToolbar");
 }
 
-void UpdateColumnWidths(std::vector<Column_t> &columns, const std::vector<ColumnWidth_t> &columnWidths);
+void UpdateColumnWidths(std::vector<Column_t> &columns, const std::vector<ColumnWidth> &columnWidths);
 
 BOOL LoadWindowPositionFromRegistry(WINDOWPLACEMENT *pwndpl)
 {
@@ -121,7 +121,7 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ExtendTabControl"),m_config->extendTabControl);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("UseFullRowSelect"),m_config->useFullRowSelect);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ShowFilePreviews"),m_config->showFilePreviews);
-		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ReplaceExplorerMode"), m_config->replaceExplorerMode);
+		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ReplaceExplorerMode"), static_cast<DWORD>(m_config->replaceExplorerMode));
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ShowUserNameTitleBar"),m_config->showUserNameInTitleBar.get());
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("AllowMultipleInstances"),m_config->allowMultipleInstances);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("OneClickActivate"),m_config->globalFolderSettings.oneClickActivate);
@@ -134,7 +134,7 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("AlwaysShowTabBar"),m_config->alwaysShowTabBar.get());
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("CheckBoxSelection"),m_config->checkBoxSelection);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ForceSize"),m_config->globalFolderSettings.forceSize);
-		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("SizeDisplayFormat"),m_config->globalFolderSettings.sizeDisplayFormat);
+		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("SizeDisplayFormat"),static_cast<DWORD>(m_config->globalFolderSettings.sizeDisplayFormat));
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("CloseMainWindowOnTabClose"),m_config->closeMainWindowOnTabClose);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ShowTabBarAtBottom"), m_config->showTabBarAtBottom);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("OverwriteExistingFilesConfirmation"),m_config->overwriteExistingFilesConfirmation);
@@ -244,9 +244,11 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("ExtendTabControl"),(LPDWORD)&m_config->extendTabControl);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("UseFullRowSelect"),(LPDWORD)&m_config->useFullRowSelect);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("ShowFilePreviews"),(LPDWORD)&m_config->showFilePreviews);
-		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("ReplaceExplorerMode"),(LPDWORD)&m_config->replaceExplorerMode);
 
 		DWORD numericValue;
+		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey, _T("ReplaceExplorerMode"), &numericValue);
+		m_config->replaceExplorerMode = static_cast<DefaultFileManager::ReplaceExplorerMode>(numericValue);
+
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey, _T("ShowFullTitlePath"), &numericValue);
 		m_config->showFullTitlePath.set(numericValue);
 
@@ -268,6 +270,9 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey, _T("InfoTipType"), &numericValue);
 		m_config->infoTipType = static_cast<InfoTipType>(numericValue);
 
+		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey, _T("SizeDisplayFormat"), &numericValue);
+		m_config->globalFolderSettings.sizeDisplayFormat = static_cast<SizeDisplayFormat>(numericValue);
+
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("AllowMultipleInstances"),(LPDWORD)&m_config->allowMultipleInstances);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("OneClickActivate"),(LPDWORD)&m_config->globalFolderSettings.oneClickActivate);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("OneClickActivateHoverTime"),(LPDWORD)&m_config->globalFolderSettings.oneClickActivateHoverTime);
@@ -276,7 +281,6 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("InsertSorted"),(LPDWORD)&m_config->globalFolderSettings.insertSorted);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("CheckBoxSelection"),(LPDWORD)&m_config->checkBoxSelection);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("ForceSize"),(LPDWORD)&m_config->globalFolderSettings.forceSize);
-		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("SizeDisplayFormat"),(LPDWORD)&m_config->globalFolderSettings.sizeDisplayFormat);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("CloseMainWindowOnTabClose"),(LPDWORD)&m_config->closeMainWindowOnTabClose);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("ShowTabBarAtBottom"),(LPDWORD)&m_config->showTabBarAtBottom);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("ShowTaskbarThumbnails"),(LPDWORD)&m_config->showTaskbarThumbnails);
@@ -306,7 +310,7 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		if (lStatus == ERROR_SUCCESS)
 		{
 			m_config->language = dwordValue;
-			m_bLanguageLoaded = TRUE;
+			m_bLanguageLoaded = true;
 		}
 
 		/* Global settings. */
@@ -378,7 +382,7 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 			m_config->displayWindowFont = hFont;
 		}
 
-		m_bAttemptToolbarRestore = TRUE;
+		m_bAttemptToolbarRestore = true;
 
 		RegCloseKey(hSettingsKey);
 	}
@@ -437,12 +441,12 @@ void DeleteKey(HKEY hKey)
 
 void Explorerplusplus::SaveBookmarksToRegistry()
 {
-	BookmarkRegistryStorage::Save(&m_bookmarkTree);
+	BookmarkRegistryStorage::Save(NExplorerplusplus::REG_MAIN_KEY, &m_bookmarkTree);
 }
 
 void Explorerplusplus::LoadBookmarksFromRegistry()
 {
-	BookmarkRegistryStorage::Load(&m_bookmarkTree);
+	BookmarkRegistryStorage::Load(NExplorerplusplus::REG_MAIN_KEY, &m_bookmarkTree);
 }
 
 void Explorerplusplus::SaveTabSettingsToRegistry()
@@ -539,10 +543,16 @@ void Explorerplusplus::SaveTabSettingsToRegistry()
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("AddressLocked"),tab.GetLockState() == Tab::LockState::AddressLocked);
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("UseCustomName"),tab.GetUseCustomName());
 
-				if(tab.GetUseCustomName())
-					NRegistrySettings::SaveStringToRegistry(hTabKey,_T("CustomName"),tab.GetName().c_str());
+				if (tab.GetUseCustomName())
+				{
+					NRegistrySettings::SaveStringToRegistry(
+						hTabKey, _T("CustomName"), tab.GetName().c_str());
+				}
 				else
-					NRegistrySettings::SaveStringToRegistry(hTabKey,_T("CustomName"),EMPTY_STRING);
+				{
+					NRegistrySettings::SaveStringToRegistry(
+						hTabKey, _T("CustomName"), EMPTY_STRING);
+				}
 
 				RegCloseKey(hTabKey);
 			}
@@ -554,13 +564,13 @@ void Explorerplusplus::SaveTabSettingsToRegistry()
 	}
 }
 
-void UpdateColumnWidths(std::vector<Column_t> &columns, const std::vector<ColumnWidth_t> &columnWidths)
+void UpdateColumnWidths(std::vector<Column_t> &columns, const std::vector<ColumnWidth> &columnWidths)
 {
 	for(auto itr1 = columnWidths.begin();itr1 != columnWidths.end();itr1++)
 	{
 		for(auto itr2 = columns.begin();itr2 != columns.end();itr2++)
 		{
-			if(itr2->id == itr1->id)
+			if(static_cast<unsigned int>(itr2->type) == itr1->id)
 			{
 				itr2->iWidth = itr1->iWidth;
 				break;
@@ -683,8 +693,10 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 
 			hr = m_tabContainer->CreateNewTab(pidlDirectory, tabSettings, &folderSettings, initialColumns);
 
-			if(hr == S_OK)
+			if (hr == S_OK)
+			{
 				nTabsCreated++;
+			}
 
 			CoTaskMemFree(pidlDirectory);
 			RegCloseKey(hTabKey);
@@ -705,46 +717,40 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 
 void Explorerplusplus::SaveColumnWidthsToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::vector<Column_t> *pColumns)
 {
-	typedef struct
-	{
-		unsigned int id;
-		int iWidth;
-	} ColumnWidth_t;
+	ColumnWidth *pColumnList = nullptr;
+	int iColumn = 0;
 
-	ColumnWidth_t				*pColumnList = nullptr;
-	int							iColumn = 0;
-
-	pColumnList = (ColumnWidth_t *)malloc(pColumns->size() * sizeof(ColumnWidth_t));
+	pColumnList = (ColumnWidth *)malloc(pColumns->size() * sizeof(ColumnWidth));
 
 	for(auto itr = pColumns->begin();itr != pColumns->end();itr++)
 	{
-		pColumnList[iColumn].id			= itr->id;
-		pColumnList[iColumn].iWidth		= itr->iWidth;
+		pColumnList[iColumn].id = static_cast<unsigned int>(itr->type);
+		pColumnList[iColumn].iWidth = itr->iWidth;
 
 		iColumn++;
 	}
 
 	RegSetValueEx(hColumnsKey,szKeyName,0,REG_BINARY,
-		(LPBYTE)pColumnList,(DWORD)(pColumns->size() * sizeof(ColumnWidth_t)));
+		(LPBYTE)pColumnList,(DWORD)(pColumns->size() * sizeof(ColumnWidth)));
 
 	free(pColumnList);
 }
 
-std::vector<ColumnWidth_t> Explorerplusplus::LoadColumnWidthsFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName)
+std::vector<ColumnWidth> Explorerplusplus::LoadColumnWidthsFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName)
 {
-	ColumnWidth_t columnWidthData[64];
+	ColumnWidth columnWidthData[64];
 	DWORD dwType = REG_BINARY;
 	DWORD dwSize = sizeof(columnWidthData);
 
 	LONG ret = RegQueryValueEx(hColumnsKey,szKeyName,nullptr,&dwType,(LPBYTE)columnWidthData, &dwSize);
 
-	std::vector<ColumnWidth_t> columnWidths;
+	std::vector<ColumnWidth> columnWidths;
 
 	if(ret == ERROR_SUCCESS)
 	{
-		for(unsigned int i = 0;i < dwSize / sizeof(ColumnWidth_t);i++)
+		for(unsigned int i = 0;i < dwSize / sizeof(ColumnWidth);i++)
 		{
-			ColumnWidth_t columnWidth;
+			ColumnWidth columnWidth;
 			columnWidth.id = columnWidthData[i].id;
 			columnWidth.iWidth = columnWidthData[i].iWidth;
 
@@ -764,8 +770,8 @@ void Explorerplusplus::SaveColumnToRegistry(HKEY hColumnsKey, const TCHAR *szKey
 
 	for(auto itr = pColumns->begin();itr != pColumns->end();itr++)
 	{
-		pColumnList[iColumn].id			= itr->id;
-		pColumnList[iColumn].bChecked	= itr->bChecked;
+		pColumnList[iColumn].id = static_cast<unsigned int>(itr->type);
+		pColumnList[iColumn].bChecked = itr->bChecked;
 
 		iColumn++;
 	}
@@ -794,7 +800,7 @@ std::vector<Column_t> Explorerplusplus::LoadColumnFromRegistry(HKEY hColumnsKey,
 
 	for(i = 0;i < dwSize / sizeof(ColumnOld_t);i++)
 	{
-		column.id = columnList[i].id;
+		column.type = static_cast<ColumnType>(columnList[i].id);
 		column.bChecked = columnList[i].bChecked;
 		column.iWidth = DEFAULT_COLUMN_WIDTH;
 
@@ -954,8 +960,10 @@ void Explorerplusplus::LoadToolbarInformationFromRegistry()
 		{
 			BOOL bUseChevron = FALSE;
 
-			if(m_ToolbarInformation[i].fStyle & RBBS_USECHEVRON)
+			if (m_ToolbarInformation[i].fStyle & RBBS_USECHEVRON)
+			{
 				bUseChevron = TRUE;
+			}
 
 			NRegistrySettings::ReadDwordFromRegistry(hToolbarKey,_T("id"),
 				(LPDWORD)&m_ToolbarInformation[i].wID);
@@ -964,8 +972,10 @@ void Explorerplusplus::LoadToolbarInformationFromRegistry()
 			NRegistrySettings::ReadDwordFromRegistry(hToolbarKey,_T("Length"),
 				(LPDWORD)&m_ToolbarInformation[i].cx);
 
-			if(bUseChevron)
+			if (bUseChevron)
+			{
 				m_ToolbarInformation[i].fStyle |= RBBS_USECHEVRON;
+			}
 
 			RegCloseKey(hToolbarKey);
 

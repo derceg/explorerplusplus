@@ -14,27 +14,24 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/Logging.h"
 
-NewMenuClient::NewMenuClient(IExplorerplusplus *pexpp) :
-m_pexpp(pexpp),
-m_RefCount(1)
+NewMenuClient::NewMenuClient(IExplorerplusplus *pexpp) : m_pexpp(pexpp), m_RefCount(1)
 {
-
 }
 
-HRESULT __stdcall NewMenuClient::QueryInterface(REFIID iid,void **ppvObject)
+HRESULT __stdcall NewMenuClient::QueryInterface(REFIID iid, void **ppvObject)
 {
 	*ppvObject = nullptr;
 
-	if(iid == IID_IUnknown)
+	if (iid == IID_IUnknown)
 	{
 		*ppvObject = static_cast<IUnknown *>(this);
 	}
-	else if(iid == IID_INewMenuClient)
+	else if (iid == IID_INewMenuClient)
 	{
 		*ppvObject = static_cast<INewMenuClient *>(this);
 	}
 
-	if(*ppvObject)
+	if (*ppvObject)
 	{
 		AddRef();
 		return S_OK;
@@ -51,8 +48,8 @@ ULONG __stdcall NewMenuClient::AddRef()
 ULONG __stdcall NewMenuClient::Release()
 {
 	m_RefCount--;
-	
-	if(m_RefCount == 0)
+
+	if (m_RefCount == 0)
 	{
 		delete this;
 		return 0;
@@ -76,31 +73,31 @@ HRESULT NewMenuClient::IncludeItems(NMCII_FLAGS *pFlags)
 	Therefore, to get all the items, OR the two flags
 	together to show files and folders. */
 
-	*pFlags = NMCII_ITEMS|NMCII_FOLDERS;
+	*pFlags = NMCII_ITEMS | NMCII_FOLDERS;
 
 	return S_OK;
 }
 
-HRESULT NewMenuClient::SelectAndEditItem(PCIDLIST_ABSOLUTE pidlItem,NMCSAEI_FLAGS flags)
+HRESULT NewMenuClient::SelectAndEditItem(PCIDLIST_ABSOLUTE pidlItem, NMCSAEI_FLAGS flags)
 {
-	switch(flags)
+	switch (flags)
 	{
-		/* This would usually cause the
-		item to be selected first, then
-		renamed. In this case however,
-		the item is selected and renamed
-		in one operation, so this state
-		can be ignored. */
-		case NMCSAEI_SELECT:
-			break;
+	/* This would usually cause the
+	item to be selected first, then
+	renamed. In this case however,
+	the item is selected and renamed
+	in one operation, so this state
+	can be ignored. */
+	case NMCSAEI_SELECT:
+		break;
 
-		/* Now, start an in-place rename
-		of the item. */
-		case NMCSAEI_EDIT:
-		case NMCSAEI_EDIT_WINDOWS_10:
-			LOG(info) << _T("Starting in-place rename of item created via new menu");
-			m_pexpp->GetActiveShellBrowser()->QueueRename(pidlItem);
-			break;
+	/* Now, start an in-place rename
+	of the item. */
+	case NMCSAEI_EDIT:
+	case NMCSAEI_EDIT_WINDOWS_10:
+		LOG(info) << _T("Starting in-place rename of item created via new menu");
+		m_pexpp->GetActiveShellBrowser()->QueueRename(pidlItem);
+		break;
 	}
 
 	return S_OK;

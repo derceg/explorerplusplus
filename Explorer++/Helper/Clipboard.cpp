@@ -6,8 +6,7 @@
 #include "Clipboard.h"
 #include "DataExchangeHelper.h"
 
-Clipboard::Clipboard() :
-	m_clipboardOpened(false)
+Clipboard::Clipboard() : m_clipboardOpened(false)
 {
 	if (OpenClipboard(nullptr))
 	{

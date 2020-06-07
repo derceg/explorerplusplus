@@ -16,11 +16,9 @@ __interface IExplorerplusplus;
 class FilterDialogPersistentSettings : public DialogSettings
 {
 public:
-
 	static FilterDialogPersistentSettings &GetInstance();
 
 private:
-
 	friend FilterDialog;
 
 	static const TCHAR SETTINGS_KEY[];
@@ -30,7 +28,7 @@ private:
 	FilterDialogPersistentSettings();
 
 	FilterDialogPersistentSettings(const FilterDialogPersistentSettings &);
-	FilterDialogPersistentSettings & operator=(const FilterDialogPersistentSettings &);
+	FilterDialogPersistentSettings &operator=(const FilterDialogPersistentSettings &);
 
 	void SaveExtraRegistrySettings(HKEY hKey) override;
 	void LoadExtraRegistrySettings(HKEY hKey) override;
@@ -38,30 +36,28 @@ private:
 	void SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode) override;
 	void LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue) override;
 
-	std::list<std::wstring>	m_FilterList;
+	std::list<std::wstring> m_FilterList;
 };
 
 class FilterDialog : public BaseDialog
 {
 public:
-
 	FilterDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp);
 
 protected:
-
-	INT_PTR				OnInitDialog() override;
-	INT_PTR				OnCommand(WPARAM wParam,LPARAM lParam) override;
-	INT_PTR				OnClose() override;
+	INT_PTR OnInitDialog() override;
+	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
+	INT_PTR OnClose() override;
 
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 
 private:
+	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+		std::list<ResizableDialog::Control_t> &ControlList) override;
+	void SaveState() override;
 
-	void				GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList) override;
-	void				SaveState() override;
-
-	void				OnOk();
-	void				OnCancel();
+	void OnOk();
+	void OnCancel();
 
 	IExplorerplusplus *m_pexpp;
 

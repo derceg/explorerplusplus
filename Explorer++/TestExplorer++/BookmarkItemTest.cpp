@@ -5,7 +5,8 @@
 #include "Bookmarks/BookmarkItem.h"
 #include <gtest/gtest.h>
 
-TEST(BookmarkItemTest, CreateAndUpdate) {
+TEST(BookmarkItemTest, CreateAndUpdate)
+{
 	BookmarkItem bookmarkFolder(std::nullopt, L"Test folder", std::nullopt);
 
 	EXPECT_TRUE(bookmarkFolder.IsFolder());
@@ -25,7 +26,8 @@ TEST(BookmarkItemTest, CreateAndUpdate) {
 	EXPECT_EQ(bookmark.GetLocation(), L"D:\\");
 }
 
-TEST(BookmarkItemTest, AddRemoveChildren) {
+TEST(BookmarkItemTest, AddRemoveChildren)
+{
 	BookmarkItem parentFolder(std::nullopt, L"Test folder", std::nullopt);
 	auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test child bookmark", L"C:\\");
 	auto rawBookmark = bookmark.get();

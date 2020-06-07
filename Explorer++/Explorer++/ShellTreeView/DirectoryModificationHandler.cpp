@@ -347,8 +347,10 @@ void ShellTreeView::AddItem(const TCHAR *szFullFileName)
 		/* If this items' parent isn't currently shown on the
 		treeview and the item is not on the desktop, exit without
 		doing anything further. */
-		if(hParent == nullptr && hDeskParent == nullptr)
+		if (hParent == nullptr && hDeskParent == nullptr)
+		{
 			return;
+		}
 
 		AddItemInternal(hParent,szFullFileName);
 
@@ -380,8 +382,10 @@ void ShellTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileNam
 
 	hr = SHParseDisplayName(szFullFileName, nullptr, &pidlComplete, 0, nullptr);
 
-	if(!SUCCEEDED(hr))
+	if (!SUCCEEDED(hr))
+	{
 		return;
+	}
 
 	tvItem.mask		= TVIF_CHILDREN | TVIF_STATE;
 	tvItem.hItem	= hParent;
@@ -416,10 +420,14 @@ void ShellTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileNam
 
 				if(SUCCEEDED(hr))
 				{
-					if((attributes & SFGAO_HASSUBFOLDER) != SFGAO_HASSUBFOLDER)
+					if ((attributes & SFGAO_HASSUBFOLDER) != SFGAO_HASSUBFOLDER)
+					{
 						nChildren = 0;
+					}
 					else
+					{
 						nChildren = 1;
+					}
 
 					iItemId = GenerateUniqueItemId();
 
@@ -466,8 +474,10 @@ void ShellTreeView::RenameItem(HTREEITEM hItem, const TCHAR *szFullFileName)
 	HRESULT		hr;
 	BOOL		res;
 
-	if(hItem == nullptr)
+	if (hItem == nullptr)
+	{
 		return;
+	}
 
 	tvItem.mask		= TVIF_PARAM;
 	tvItem.hItem	= hItem;

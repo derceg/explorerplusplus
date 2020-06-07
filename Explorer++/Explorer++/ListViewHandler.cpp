@@ -125,23 +125,23 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 
 						if(!PtInRect(&rc,lvhti.pt))
 						{
-							m_blockNextListViewSelection = TRUE;
+							m_blockNextListViewSelection = true;
 						}
 					}
 				}
 
 				if(!(lvhti.flags & LVHT_NOWHERE))
 				{
-					m_bDragAllowed = TRUE;
+					m_bDragAllowed = true;
 				}
 			}
 			break;
 
 		case WM_RBUTTONUP:
-			m_bDragCancelled = FALSE;
-			m_bDragAllowed = FALSE;
+			m_bDragCancelled = false;
+			m_bDragAllowed = false;
 
-			m_blockNextListViewSelection = FALSE;
+			m_blockNextListViewSelection = false;
 			break;
 
 		/* If no item is currently been dragged, and the last drag
@@ -150,7 +150,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 		mouse button was clicked, it was over an item, start dragging. */
 		case WM_MOUSEMOVE:
 			{
-				m_blockNextListViewSelection = FALSE;
+				m_blockNextListViewSelection = false;
 				if(!m_bDragging && !m_bDragCancelled && m_bDragAllowed)
 				{
 					if((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON)
@@ -183,7 +183,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 
 							if(hr == DRAGDROP_S_CANCEL)
 							{
-								m_bDragCancelled = TRUE;
+								m_bDragCancelled = true;
 							}
 						}
 					}
@@ -357,7 +357,7 @@ BOOL Explorerplusplus::OnListViewItemChanging(const NMLISTVIEW *changeData)
 	{
 		if (m_blockNextListViewSelection)
 		{
-			m_blockNextListViewSelection = FALSE;
+			m_blockNextListViewSelection = false;
 			return TRUE;
 		}
 	}
@@ -400,7 +400,7 @@ BOOL Explorerplusplus::OnListViewBeginLabelEdit(LPARAM lParam)
 
 	ListViewEdit::CreateNew(hEdit,reinterpret_cast<NMLVDISPINFO *>(lParam)->item.iItem,this);
 
-	m_bListViewRenaming = TRUE;
+	m_bListViewRenaming = true;
 
 	return FALSE;
 }
@@ -418,7 +418,7 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 	pdi = (NMLVDISPINFO *) lParam;
 	pItem = &pdi->item;
 
-	m_bListViewRenaming = FALSE;
+	m_bListViewRenaming = false;
 
 	/* Did the user cancel the editing? */
 	if(pItem->pszText == nullptr)
@@ -675,7 +675,7 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 
 		FileContextMenuManager fcmm(m_hActiveListView, pidlDirectory.get(), pidlItems);
 
-		FileContextMenuInfo_t fcmi;
+		FileContextMenuInfo fcmi;
 		fcmi.uFrom = FROM_LISTVIEW;
 
 		StatusBar statusBar(m_hStatusBar);
@@ -759,7 +759,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragType dragType)
 			hr = pDragSourceHelper->InitializeFromWindow(m_hActiveListView,&pt,pDataObject);
 
 			m_pActiveShellBrowser->DragStarted(pnmlv->iItem,&pnmlv->ptAction);
-			m_bDragging = TRUE;
+			m_bDragging = true;
 
 			/* Need to remember which tab started the drag (as
 			it may be different from the tab in which the drag
@@ -771,7 +771,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragType dragType)
 			hr = DoDragDrop(pDataObject,pDropSource,DROPEFFECT_COPY|DROPEFFECT_MOVE|
 				DROPEFFECT_LINK,&dwEffect);
 
-			m_bDragging = FALSE;
+			m_bDragging = false;
 
 			/* The object that starts any drag may NOT be the
 			object that stops it (i.e. when a file is dragged

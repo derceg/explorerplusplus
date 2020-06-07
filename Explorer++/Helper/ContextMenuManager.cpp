@@ -9,16 +9,18 @@
  */
 
 #include "stdafx.h"
-#include <vector>
-#include "Helper.h"
 #include "ContextMenuManager.h"
-#include "ShellHelper.h"
+#include "Helper.h"
 #include "Macros.h"
+#include "ShellHelper.h"
+#include <vector>
 
-
-const TCHAR ContextMenuManager::CMH_FOLDER_DRAG_AND_DROP[] = _T("Folder\\ShellEx\\DragDropHandlers");
-const TCHAR ContextMenuManager::CMH_DIRECTORY_BACKGROUND[] = _T("Directory\\Background\\shellex\\ContextMenuHandlers");
-const TCHAR ContextMenuManager::CMH_DIRECTORY_DRAG_AND_DROP[] = _T("Directory\\shellex\\DragDropHandlers");
+const TCHAR ContextMenuManager::CMH_FOLDER_DRAG_AND_DROP[] =
+	_T("Folder\\ShellEx\\DragDropHandlers");
+const TCHAR ContextMenuManager::CMH_DIRECTORY_BACKGROUND[] =
+	_T("Directory\\Background\\shellex\\ContextMenuHandlers");
+const TCHAR ContextMenuManager::CMH_DIRECTORY_DRAG_AND_DROP[] =
+	_T("Directory\\shellex\\DragDropHandlers");
 
 /* The following steps are taken when showing shell
 extensions on an existing menu:
@@ -27,49 +29,50 @@ extensions on an existing menu:
 3. Pass selection to shell extension (if necessary).
 4. Release shell extensions (also free the DLL's they reside in). */
 ContextMenuManager::ContextMenuManager(ContextMenuType_t contextMenuType,
-	PCIDLIST_ABSOLUTE pidlDirectory,IDataObject *pDataObject,IUnknown *pUnkSite,
+	PCIDLIST_ABSOLUTE pidlDirectory, IDataObject *pDataObject, IUnknown *pUnkSite,
 	const std::vector<std::wstring> &blacklistedCLSIDEntries)
 {
 	ItemType_t itemType = GetItemType(pidlDirectory);
 
 	const TCHAR *pszRegContext = NULL;
 
-	switch(itemType)
+	switch (itemType)
 	{
 	case ITEM_TYPE_FOLDER:
-		if(contextMenuType == CONTEXT_MENU_TYPE_DRAG_AND_DROP)
+		if (contextMenuType == CONTEXT_MENU_TYPE_DRAG_AND_DROP)
 		{
 			pszRegContext = CMH_FOLDER_DRAG_AND_DROP;
 		}
 		break;
 
 	case ITEM_TYPE_DIRECTORY:
-		if(contextMenuType == CONTEXT_MENU_TYPE_BACKGROUND)
+		if (contextMenuType == CONTEXT_MENU_TYPE_BACKGROUND)
 		{
 			pszRegContext = CMH_DIRECTORY_BACKGROUND;
 		}
-		else if(contextMenuType == CONTEXT_MENU_TYPE_DRAG_AND_DROP)
+		else if (contextMenuType == CONTEXT_MENU_TYPE_DRAG_AND_DROP)
 		{
 			pszRegContext = CMH_DIRECTORY_DRAG_AND_DROP;
 		}
 		break;
 	}
 
-	if(pszRegContext == NULL)
+	if (pszRegContext == NULL)
 	{
 		return;
 	}
 
-	BOOL bRet = LoadContextMenuHandlers(pszRegContext, m_ContextMenuHandlers, blacklistedCLSIDEntries);
+	BOOL bRet =
+		LoadContextMenuHandlers(pszRegContext, m_ContextMenuHandlers, blacklistedCLSIDEntries);
 
-	if(!bRet)
+	if (!bRet)
 	{
 		return;
 	}
 
 	/* Initialize the shell extensions, and extract
 	an IContextMenu interface. */
-	for(const auto &contextMenuHandler : m_ContextMenuHandlers)
+	for (const auto &contextMenuHandler : m_ContextMenuHandlers)
 	{
 		IShellExtInit *pShellExtInit = NULL;
 		HRESULT hr;
@@ -78,23 +81,23 @@ ContextMenuManager::ContextMenuManager(ContextMenuType_t contextMenuType,
 
 		hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pShellExtInit));
 
-		if(SUCCEEDED(hr))
+		if (SUCCEEDED(hr))
 		{
 			MenuHandler_t menuHandler;
 			IContextMenu *pContextMenu = NULL;
 			IContextMenu2 *pContextMenu2 = NULL;
 			IContextMenu3 *pContextMenu3 = NULL;
 
-			pShellExtInit->Initialize(pidlDirectory,pDataObject,NULL);
+			pShellExtInit->Initialize(pidlDirectory, pDataObject, NULL);
 			pShellExtInit->Release();
 
-			if(pUnkSite != NULL)
+			if (pUnkSite != NULL)
 			{
 				IObjectWithSite *pObjectSite = NULL;
 
 				hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pObjectSite));
 
-				if(SUCCEEDED(hr))
+				if (SUCCEEDED(hr))
 				{
 					pObjectSite->SetSite(pUnkSite);
 					pObjectSite->Release();
@@ -104,12 +107,12 @@ ContextMenuManager::ContextMenuManager(ContextMenuType_t contextMenuType,
 			hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pContextMenu3));
 			menuHandler.pContextMenuActual = pContextMenu3;
 
-			if(FAILED(hr) || pContextMenu3 == NULL)
+			if (FAILED(hr) || pContextMenu3 == NULL)
 			{
 				hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pContextMenu2));
 				menuHandler.pContextMenuActual = pContextMenu2;
 
-				if(FAILED(hr) || pContextMenu2 == NULL)
+				if (FAILED(hr) || pContextMenu2 == NULL)
 				{
 					hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pContextMenu));
 					menuHandler.pContextMenuActual = pContextMenu;
@@ -131,34 +134,30 @@ ContextMenuManager::ContextMenuManager(ContextMenuType_t contextMenuType,
 ContextMenuManager::~ContextMenuManager()
 {
 	/* Release the IContextMenu interfaces. */
-	for(auto menuHandler : m_MenuHandlers)
+	for (auto menuHandler : m_MenuHandlers)
 	{
-		if(menuHandler.pContextMenuActual != NULL)
+		if (menuHandler.pContextMenuActual != NULL)
 		{
 			menuHandler.pContextMenuActual->Release();
 		}
 	}
 
 	/* ...and free the necessary DLL's. */
-	for(auto contextMenuHandler : m_ContextMenuHandlers)
+	for (auto contextMenuHandler : m_ContextMenuHandlers)
 	{
 		contextMenuHandler.pUnknown->Release();
 
-		if(contextMenuHandler.hDLL != NULL)
+		if (contextMenuHandler.hDLL != NULL)
 		{
 			FreeLibrary(contextMenuHandler.hDLL);
 		}
 	}
 }
 
-bool ContextMenuManager::ShowMenu(HWND hwnd,HMENU hMenu,
-	UINT uIDPrevious,UINT uMinID,UINT uMaxID,const POINT &pt,
-	StatusBar &statusBar)
+bool ContextMenuManager::ShowMenu(HWND hwnd, HMENU hMenu, UINT uIDPrevious, UINT uMinID,
+	UINT uMaxID, const POINT &pt, StatusBar &statusBar)
 {
-	if(hwnd == NULL ||
-		hMenu == NULL ||
-		uIDPrevious == 0 ||
-		uMaxID <= uMinID)
+	if (hwnd == NULL || hMenu == NULL || uIDPrevious == 0 || uMaxID <= uMinID)
 	{
 		return false;
 	}
@@ -167,54 +166,53 @@ bool ContextMenuManager::ShowMenu(HWND hwnd,HMENU hMenu,
 	m_uMaxID = uMaxID;
 	m_pStatusBar = &statusBar;
 
-	AddMenuEntries(hMenu,uIDPrevious,uMinID,uMaxID);
+	AddMenuEntries(hMenu, uIDPrevious, uMinID, uMaxID);
 
-	BOOL bRet = SetWindowSubclass(hwnd,ContextMenuHookProc,CONTEXT_MENU_SUBCLASS_ID,
-		reinterpret_cast<DWORD_PTR>(this));
+	BOOL bRet = SetWindowSubclass(
+		hwnd, ContextMenuHookProc, CONTEXT_MENU_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
-	if(!bRet)
+	if (!bRet)
 	{
 		return false;
 	}
 
-	UINT uCmd = TrackPopupMenu(hMenu,TPM_LEFTALIGN|TPM_RIGHTBUTTON|
-		TPM_VERTICAL|TPM_RETURNCMD,pt.x,pt.y,0,hwnd,NULL);
+	UINT uCmd = TrackPopupMenu(hMenu,
+		TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD, pt.x, pt.y, 0, hwnd, NULL);
 
-	RemoveWindowSubclass(hwnd,ContextMenuHookProc,CONTEXT_MENU_SUBCLASS_ID);
+	RemoveWindowSubclass(hwnd, ContextMenuHookProc, CONTEXT_MENU_SUBCLASS_ID);
 
-	if(uCmd != 0)
+	if (uCmd != 0)
 	{
-		if(uCmd >= uMinID && uCmd <= uMaxID)
+		if (uCmd >= uMinID && uCmd <= uMaxID)
 		{
-			InvokeMenuEntry(hwnd,uCmd);
+			InvokeMenuEntry(hwnd, uCmd);
 		}
 		else
 		{
-			SendMessage(hwnd,WM_COMMAND,MAKEWPARAM(uCmd,0),NULL);
+			SendMessage(hwnd, WM_COMMAND, MAKEWPARAM(uCmd, 0), NULL);
 		}
 	}
 
 	return true;
 }
 
-void ContextMenuManager::AddMenuEntries(HMENU hMenu,
-	UINT uIDPrevious,int iMinID,int iMaxID)
+void ContextMenuManager::AddMenuEntries(HMENU hMenu, UINT uIDPrevious, int iMinID, int iMaxID)
 {
 	/* Shell extension menu items will be inserted
 	directly *after* this item. This is used rather
 	than a direct position, as some shell extensions
 	(such as the "Catalyst Context Menu") insert themselves
 	at positions other than the one specified. */
-	int iStartPos = GetMenuItemPos(hMenu,uIDPrevious) + 1;
+	int iStartPos = GetMenuItemPos(hMenu, uIDPrevious) + 1;
 
 	/* First, add two separators to the menu; these
 	will "bracket" the shell extensions. */
 	MENUITEMINFO mii;
-	mii.cbSize	= sizeof(mii);
-	mii.fMask	= MIIM_FTYPE;
-	mii.fType	= MFT_SEPARATOR;
-	InsertMenuItem(hMenu,iStartPos,TRUE,&mii);
-	InsertMenuItem(hMenu,iStartPos + 1,TRUE,&mii);
+	mii.cbSize = sizeof(mii);
+	mii.fMask = MIIM_FTYPE;
+	mii.fType = MFT_SEPARATOR;
+	InsertMenuItem(hMenu, iStartPos, TRUE, &mii);
+	InsertMenuItem(hMenu, iStartPos + 1, TRUE, &mii);
 
 	iStartPos++;
 
@@ -222,19 +220,18 @@ void ContextMenuManager::AddMenuEntries(HMENU hMenu,
 
 	/* Loop through each of the acquired IContextMenu interfaces and add
 	the required menu items. */
-	for(auto itr = m_MenuHandlers.begin();itr != m_MenuHandlers.end();itr++)
+	for (auto itr = m_MenuHandlers.begin(); itr != m_MenuHandlers.end(); itr++)
 	{
-		if(itr->pContextMenuActual != NULL)
+		if (itr->pContextMenuActual != NULL)
 		{
 			HRESULT hr = itr->pContextMenuActual->QueryContextMenu(
-				hMenu,iStartPos,iMinID + iOffset,iMaxID,
-				CMF_NORMAL|CMF_EXPLORE);
+				hMenu, iStartPos, iMinID + iOffset, iMaxID, CMF_NORMAL | CMF_EXPLORE);
 
-			if(HRESULT_SEVERITY(hr) == SEVERITY_SUCCESS)
+			if (HRESULT_SEVERITY(hr) == SEVERITY_SUCCESS)
 			{
 				int iCurrentOffset = HRESULT_CODE(hr);
 
-				if(iCurrentOffset > 0)
+				if (iCurrentOffset > 0)
 				{
 					/* Need to save ID offsets for this menu handler. */
 					itr->uStartID = iMinID + iOffset;
@@ -242,7 +239,7 @@ void ContextMenuManager::AddMenuEntries(HMENU hMenu,
 
 					iOffset += iCurrentOffset;
 
-					iStartPos = GetMenuItemPos(hMenu,uIDPrevious) + 2;
+					iStartPos = GetMenuItemPos(hMenu, uIDPrevious) + 2;
 				}
 			}
 		}
@@ -257,16 +254,16 @@ void ContextMenuManager::RemoveDuplicateSeperators(HMENU hMenu)
 
 	bool bPreviousItemSeperator = false;
 
-	for(int i = 0;i < GetMenuItemCount(hMenu);i++)
+	for (int i = 0; i < GetMenuItemCount(hMenu); i++)
 	{
 		MENUITEMINFO mii;
-		mii.cbSize	= sizeof(mii);
-		mii.fMask	= MIIM_FTYPE;
-		GetMenuItemInfo(hMenu,i,TRUE,&mii);
+		mii.cbSize = sizeof(mii);
+		mii.fMask = MIIM_FTYPE;
+		GetMenuItemInfo(hMenu, i, TRUE, &mii);
 
 		bool bCurrentItemSeparator = (mii.fType & MFT_SEPARATOR) ? true : false;
 
-		if(bPreviousItemSeperator && bCurrentItemSeparator)
+		if (bPreviousItemSeperator && bCurrentItemSeparator)
 		{
 			deletionVector.push_back(i);
 		}
@@ -274,90 +271,90 @@ void ContextMenuManager::RemoveDuplicateSeperators(HMENU hMenu)
 		bPreviousItemSeperator = bCurrentItemSeparator;
 	}
 
-	for(auto itr = deletionVector.rbegin();itr != deletionVector.rend();itr++)
+	for (auto itr = deletionVector.rbegin(); itr != deletionVector.rend(); itr++)
 	{
-		DeleteMenu(hMenu,*itr,MF_BYPOSITION);
+		DeleteMenu(hMenu, *itr, MF_BYPOSITION);
 	}
 }
 
-LRESULT CALLBACK ContextMenuManager::ContextMenuHookProc(HWND hwnd,UINT uMsg,
-	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
+LRESULT CALLBACK ContextMenuManager::ContextMenuHookProc(
+	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
 	auto *pcmm = reinterpret_cast<ContextMenuManager *>(dwRefData);
 
-	switch(uMsg)
+	switch (uMsg)
 	{
 	case WM_INITMENUPOPUP:
 	case WM_MEASUREITEM:
 	case WM_DRAWITEM:
 	case WM_MENUCHAR:
-		{
-			LRESULT lRes;
-			HRESULT hr = pcmm->HandleMenuMessage(uMsg,wParam,lParam,lRes);
+	{
+		LRESULT lRes;
+		HRESULT hr = pcmm->HandleMenuMessage(uMsg, wParam, lParam, lRes);
 
-			if(SUCCEEDED(hr))
+		if (SUCCEEDED(hr))
+		{
+			if (uMsg == WM_INITMENUPOPUP)
 			{
-				if(uMsg == WM_INITMENUPOPUP)
-				{
-					return 0;
-				}
-				else if(uMsg == WM_MEASUREITEM ||
-					uMsg == WM_DRAWITEM)
-				{
-					return TRUE;
-				}
-				else
-				{
-					return lRes;
-				}
+				return 0;
 			}
-		}
-		break;
-
-	case WM_MENUSELECT:
-		{
-			if(HIWORD(wParam) == 0xFFFF && lParam == 0)
+			else if (uMsg == WM_MEASUREITEM || uMsg == WM_DRAWITEM)
 			{
-				pcmm->m_pStatusBar->HandleStatusBarMenuClose();
+				return TRUE;
 			}
 			else
 			{
-				pcmm->m_pStatusBar->HandleStatusBarMenuOpen();
+				return lRes;
+			}
+		}
+	}
+	break;
 
-				UINT uCmd = LOWORD(wParam);
+	case WM_MENUSELECT:
+	{
+		if (HIWORD(wParam) == 0xFFFF && lParam == 0)
+		{
+			pcmm->m_pStatusBar->HandleStatusBarMenuClose();
+		}
+		else
+		{
+			pcmm->m_pStatusBar->HandleStatusBarMenuOpen();
 
-				if(uCmd >= pcmm->m_uMinID && uCmd <= pcmm->m_uMaxID)
+			UINT uCmd = LOWORD(wParam);
+
+			if (uCmd >= pcmm->m_uMinID && uCmd <= pcmm->m_uMaxID)
+			{
+				TCHAR szHelperText[512];
+
+				HRESULT hr = pcmm->GetMenuHelperText(
+					LOWORD(wParam), szHelperText, SIZEOF_ARRAY(szHelperText));
+
+				if (hr == S_OK)
 				{
-					TCHAR szHelperText[512];
-
-					HRESULT hr = pcmm->GetMenuHelperText(LOWORD(wParam),szHelperText,SIZEOF_ARRAY(szHelperText));
-
-					if(hr == S_OK)
-					{
-						pcmm->m_pStatusBar->SetPartText(0,szHelperText);
-						return 0;
-					}
+					pcmm->m_pStatusBar->SetPartText(0, szHelperText);
+					return 0;
 				}
 			}
 		}
-		break;
+	}
+	break;
 	}
 
-	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
+	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-HRESULT ContextMenuManager::HandleMenuMessage(UINT uMsg,WPARAM wParam,
-	LPARAM lParam,LRESULT &lRes)
+HRESULT ContextMenuManager::HandleMenuMessage(
+	UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lRes)
 {
 	UINT uItemID = static_cast<UINT>(-1);
 	bool bContextMenu3Required = false;
 
-	switch(uMsg)
+	switch (uMsg)
 	{
 	case WM_INITMENUPOPUP:
-		uItemID = GetMenuItemID(reinterpret_cast<HMENU>(wParam),0);
+		uItemID = GetMenuItemID(reinterpret_cast<HMENU>(wParam), 0);
 		break;
 
 	case WM_MEASUREITEM:
@@ -369,27 +366,26 @@ HRESULT ContextMenuManager::HandleMenuMessage(UINT uMsg,WPARAM wParam,
 		break;
 
 	case WM_MENUCHAR:
-		uItemID = GetMenuItemID(reinterpret_cast<HMENU>(lParam),0);
+		uItemID = GetMenuItemID(reinterpret_cast<HMENU>(lParam), 0);
 		bContextMenu3Required = true;
 		break;
 	}
 
 	HRESULT hr = E_FAIL;
 
-	if(uItemID != -1)
+	if (uItemID != -1)
 	{
-		for(auto menuHandler : m_MenuHandlers)
+		for (auto menuHandler : m_MenuHandlers)
 		{
-			if(uItemID >= menuHandler.uStartID &&
-				uItemID < menuHandler.uEndID)
+			if (uItemID >= menuHandler.uStartID && uItemID < menuHandler.uEndID)
 			{
-				if(menuHandler.pContextMenu3 != NULL)
+				if (menuHandler.pContextMenu3 != NULL)
 				{
-					hr = menuHandler.pContextMenu3->HandleMenuMsg2(uMsg,wParam,lParam,&lRes);
+					hr = menuHandler.pContextMenu3->HandleMenuMsg2(uMsg, wParam, lParam, &lRes);
 				}
-				else if(menuHandler.pContextMenu2 != NULL && !bContextMenu3Required)
+				else if (menuHandler.pContextMenu2 != NULL && !bContextMenu3Required)
 				{
-					hr = menuHandler.pContextMenu2->HandleMenuMsg(uMsg,wParam,lParam);
+					hr = menuHandler.pContextMenu2->HandleMenuMsg(uMsg, wParam, lParam);
 				}
 
 				break;
@@ -402,19 +398,18 @@ HRESULT ContextMenuManager::HandleMenuMessage(UINT uMsg,WPARAM wParam,
 
 /* See http://blogs.msdn.com/b/oldnewthing/archive/2004/09/28/235242.aspx for potential
 issues with this. */
-HRESULT ContextMenuManager::GetMenuHelperText(UINT uID,TCHAR *szText,UINT cchMax)
+HRESULT ContextMenuManager::GetMenuHelperText(UINT uID, TCHAR *szText, UINT cchMax)
 {
 	HRESULT hr = E_FAIL;
 
-	for(auto menuHandler : m_MenuHandlers)
+	for (auto menuHandler : m_MenuHandlers)
 	{
-		if(uID >= menuHandler.uStartID &&
-			uID < menuHandler.uEndID)
+		if (uID >= menuHandler.uStartID && uID < menuHandler.uEndID)
 		{
-			if(menuHandler.pContextMenuActual != NULL)
+			if (menuHandler.pContextMenuActual != NULL)
 			{
 				hr = menuHandler.pContextMenuActual->GetCommandString(uID - menuHandler.uStartID,
-					GCS_HELPTEXT,NULL,reinterpret_cast<LPSTR>(szText),cchMax);
+					GCS_HELPTEXT, NULL, reinterpret_cast<LPSTR>(szText), cchMax);
 			}
 
 			break;
@@ -424,13 +419,13 @@ HRESULT ContextMenuManager::GetMenuHelperText(UINT uID,TCHAR *szText,UINT cchMax
 	return hr;
 }
 
-int ContextMenuManager::GetMenuItemPos(HMENU hMenu,UINT uID)
+int ContextMenuManager::GetMenuItemPos(HMENU hMenu, UINT uID)
 {
 	int iPos = -1;
 
-	for(int i = 0;i < GetMenuItemCount(hMenu);i++)
+	for (int i = 0; i < GetMenuItemCount(hMenu); i++)
 	{
-		if(GetMenuItemID(hMenu,i) == uID)
+		if (GetMenuItemID(hMenu, i) == uID)
 		{
 			iPos = i;
 			break;
@@ -440,21 +435,20 @@ int ContextMenuManager::GetMenuItemPos(HMENU hMenu,UINT uID)
 	return iPos;
 }
 
-void ContextMenuManager::InvokeMenuEntry(HWND hwnd,UINT uCmd)
+void ContextMenuManager::InvokeMenuEntry(HWND hwnd, UINT uCmd)
 {
-	for(auto menuHandler : m_MenuHandlers)
+	for (auto menuHandler : m_MenuHandlers)
 	{
-		if(uCmd >= menuHandler.uStartID &&
-			uCmd < menuHandler.uEndID)
+		if (uCmd >= menuHandler.uStartID && uCmd < menuHandler.uEndID)
 		{
-			CMINVOKECOMMANDINFO	cmici;
-			cmici.cbSize		= sizeof(CMINVOKECOMMANDINFO);
-			cmici.fMask			= 0;
-			cmici.hwnd			= hwnd;
-			cmici.lpVerb		= reinterpret_cast<LPCSTR>(MAKEWORD(uCmd - menuHandler.uStartID,0));
-			cmici.lpParameters	= NULL;
-			cmici.lpDirectory	= NULL;
-			cmici.nShow			= SW_SHOW;
+			CMINVOKECOMMANDINFO cmici;
+			cmici.cbSize = sizeof(CMINVOKECOMMANDINFO);
+			cmici.fMask = 0;
+			cmici.hwnd = hwnd;
+			cmici.lpVerb = reinterpret_cast<LPCSTR>(MAKEWORD(uCmd - menuHandler.uStartID, 0));
+			cmici.lpParameters = NULL;
+			cmici.lpDirectory = NULL;
+			cmici.nShow = SW_SHOW;
 
 			menuHandler.pContextMenuActual->InvokeCommand(&cmici);
 			break;
@@ -464,16 +458,14 @@ void ContextMenuManager::InvokeMenuEntry(HWND hwnd,UINT uCmd)
 
 ContextMenuManager::ItemType_t ContextMenuManager::GetItemType(PCIDLIST_ABSOLUTE pidl)
 {
-	SFGAOF attributes = SFGAO_FOLDER|SFGAO_FILESYSTEM;
-	GetItemAttributes(pidl,&attributes);
+	SFGAOF attributes = SFGAO_FOLDER | SFGAO_FILESYSTEM;
+	GetItemAttributes(pidl, &attributes);
 
-	if((attributes & SFGAO_FOLDER) &&
-		(attributes & SFGAO_FILESYSTEM))
+	if ((attributes & SFGAO_FOLDER) && (attributes & SFGAO_FILESYSTEM))
 	{
 		return ITEM_TYPE_DIRECTORY;
 	}
-	else if((attributes & SFGAO_FOLDER) &&
-		!(attributes & SFGAO_FILESYSTEM))
+	else if ((attributes & SFGAO_FOLDER) && !(attributes & SFGAO_FILESYSTEM))
 	{
 		return ITEM_TYPE_FOLDER;
 	}
