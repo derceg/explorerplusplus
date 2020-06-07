@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Config.h"
+#include "DarkModeHelper.h"
 #include "MainResource.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
@@ -34,6 +35,14 @@ void Explorerplusplus::CreateStatusBar()
 	}
 
 	SetStatusBarParts(width);
+
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (darkModeHelper.IsDarkModeEnabled())
+	{
+		darkModeHelper.AllowDarkModeForWindow(m_hStatusBar, true);
+		SetWindowTheme(m_hStatusBar, nullptr, L"ExplorerStatusBar");
+	}
 }
 
 void Explorerplusplus::SetStatusBarParts(int width)
