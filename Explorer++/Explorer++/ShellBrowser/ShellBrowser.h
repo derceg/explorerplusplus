@@ -475,7 +475,7 @@ private:
 
 	TabNavigationInterface *m_tabNavigation;
 
-	std::vector<WindowSubclassWrapper> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 
 	// Each instance of this class will subclass the parent window. As
 	// they'll all use the same static procedure, it's important that

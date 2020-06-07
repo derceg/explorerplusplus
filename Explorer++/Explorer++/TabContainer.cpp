@@ -108,10 +108,10 @@ void TabContainer::Initialize(HWND parent)
 	RegisterDragDrop(m_hwnd, pTabDropHandler);
 	pTabDropHandler->Release();
 
-	m_windowSubclasses.emplace_back(
-		m_hwnd, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
-	m_windowSubclasses.emplace_back(
-		parent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
+		m_hwnd, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
+		parent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	m_connections.push_back(
 		tabCreatedSignal.AddObserver(boost::bind(&TabContainer::OnTabCreated, this, _1, _2)));

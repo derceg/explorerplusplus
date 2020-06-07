@@ -116,6 +116,6 @@ private:
 	std::unordered_map<int, int> m_toolbarImageMapLarge;
 	std::unordered_map<int, int> m_toolbarStringMap;
 
-	std::vector<WindowSubclassWrapper> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

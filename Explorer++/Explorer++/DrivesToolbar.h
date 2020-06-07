@@ -95,5 +95,5 @@ private:
 
 	IDCounter m_IDCounter;
 
-	std::vector<WindowSubclassWrapper> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 };

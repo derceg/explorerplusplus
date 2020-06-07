@@ -101,6 +101,6 @@ private:
 
 	ApplicationToolbarPersistentSettings *m_atps;
 
-	std::vector<WindowSubclassWrapper> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

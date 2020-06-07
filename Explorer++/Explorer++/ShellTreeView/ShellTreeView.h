@@ -189,7 +189,7 @@ private:
 	int					m_iRefCount;
 	IDirectoryMonitor	*m_pDirMon;
 	BOOL				m_bShowHidden;
-	std::vector<WindowSubclassWrapper>	m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclassWrapper>>	m_windowSubclasses;
 
 	ctpl::thread_pool	m_iconThreadPool;
 	std::unordered_map<int, std::future<std::optional<IconResult>>>	m_iconResults;

@@ -212,11 +212,12 @@ HWND ShellBrowser::SetUpListView(HWND parent)
 
 	SetWindowTheme(hListView, L"Explorer", nullptr);
 
-	m_windowSubclasses.emplace_back(
-		hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
+		hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
-	m_windowSubclasses.emplace_back(parent, ListViewParentProcStub,
-		listViewParentSubclassIdCounter++, reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.push_back(
+		std::make_unique<WindowSubclassWrapper>(parent, ListViewParentProcStub,
+			listViewParentSubclassIdCounter++, reinterpret_cast<DWORD_PTR>(this)));
 
 	return hListView;
 }

@@ -12,8 +12,8 @@ IconFetcher::IconFetcher(HWND hwnd, CachedIcons *cachedIcons) :
 	m_iconThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
 	m_iconResultIDCounter(0)
 {
-	m_windowSubclasses.emplace_back(
-		hwnd, WindowSubclassStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
+		hwnd, WindowSubclassStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 }
 
 IconFetcher::~IconFetcher()

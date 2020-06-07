@@ -129,6 +129,6 @@ private:
 	std::optional<POINT> m_leftButtonDownPoint;
 	std::optional<int> m_previousDropButton;
 
-	std::vector<WindowSubclassWrapper> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

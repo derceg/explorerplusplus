@@ -15,8 +15,8 @@ BookmarkMenu::BookmarkMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule,
 	m_showingMenu(false),
 	m_menuItemPositionMappings(nullptr)
 {
-	m_windowSubclasses.emplace_back(
-		parentWindow, ParentWindowSubclassStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
+		parentWindow, ParentWindowSubclassStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 }
 
 LRESULT CALLBACK BookmarkMenu::ParentWindowSubclassStub(

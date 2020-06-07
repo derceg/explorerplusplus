@@ -38,10 +38,10 @@ ShellTreeView::ShellTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pD
 	m_subfoldersThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
 	m_subfoldersResultIDCounter(0)
 {
-	m_windowSubclasses.emplace_back(m_hTreeView, TreeViewProcStub, SUBCLASS_ID,
-		reinterpret_cast<DWORD_PTR>(this));
-	m_windowSubclasses.emplace_back(hParent, ParentWndProcStub, PARENT_SUBCLASS_ID,
-		reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
+		m_hTreeView, TreeViewProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
+		hParent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	InitializeCriticalSection(&m_cs);
 

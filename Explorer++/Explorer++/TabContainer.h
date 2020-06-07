@@ -213,7 +213,7 @@ private:
 	HINSTANCE m_instance;
 	std::shared_ptr<Config> m_config;
 
-	std::vector<WindowSubclassWrapper> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	DpiCompatibility m_dpiCompat;

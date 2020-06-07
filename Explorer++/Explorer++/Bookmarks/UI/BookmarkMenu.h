@@ -49,5 +49,5 @@ private:
 	bool m_showingMenu;
 	BookmarkMenuBuilder::ItemPositionMap *m_menuItemPositionMappings;
 
-	std::vector<WindowSubclassWrapper> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 };

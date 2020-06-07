@@ -76,7 +76,7 @@ private:
 	void ProcessIconResult(int iconResultId);
 
 	const HWND m_hwnd;
-	std::vector<WindowSubclassWrapper> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 
 	ctpl::thread_pool m_iconThreadPool;
 	std::unordered_map<int, FutureResult> m_iconResults;

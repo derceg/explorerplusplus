@@ -63,8 +63,8 @@ void DrivesToolbar::Initialize(HWND hParent)
 
 	SendMessage(m_hwnd, TB_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(himlSmall));
 
-	m_windowSubclasses.emplace_back(hParent, DrivesToolbarParentProcStub, PARENT_SUBCLASS_ID,
-		reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hParent,
+		DrivesToolbarParentProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	InsertDrives();
 }

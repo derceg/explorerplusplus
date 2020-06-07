@@ -53,10 +53,10 @@ BookmarkListView::BookmarkListView(HWND hListView, HMODULE resourceModule,
 
 	InsertColumns(initialColumns);
 
-	m_windowSubclasses.emplace_back(
-		m_hListView, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
-	m_windowSubclasses.emplace_back(GetParent(m_hListView), ParentWndProcStub, PARENT_SUBCLASS_ID,
-		reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
+		m_hListView, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(m_hListView),
+		ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	m_connections.push_back(m_bookmarkTree->bookmarkItemAddedSignal.AddObserver(
 		std::bind(&BookmarkListView::OnBookmarkItemAdded, this, std::placeholders::_1,

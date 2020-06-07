@@ -84,5 +84,5 @@ private:
 	wil::unique_hicon m_optionsDialogIcon;
 	wil::unique_hicon m_newTabDirectoryIcon;
 
-	std::vector<WindowSubclassWrapper> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 };

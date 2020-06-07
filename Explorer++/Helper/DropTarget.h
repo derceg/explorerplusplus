@@ -57,7 +57,7 @@ private:
 	DropTargetInternal *m_dropTargetInternal;
 	long m_refCount;
 
-	std::vector<WindowSubclassWrapper> m_windowSubclasses;
+	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 
 	bool m_withinDrag;
 };
