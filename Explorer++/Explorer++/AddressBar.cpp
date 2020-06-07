@@ -45,10 +45,14 @@ void AddressBar::Initialize(HWND parent)
 	Shell_GetImageLists(nullptr, &smallIcons);
 	SendMessage(m_hwnd, CBEM_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(smallIcons));
 
-	if (DarkModeHelper::GetInstance().IsDarkModeEnabled())
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (darkModeHelper.IsDarkModeEnabled())
 	{
 		HWND comboBox = reinterpret_cast<HWND>(SendMessage(m_hwnd, CBEM_GETCOMBOCONTROL, 0, 0));
-		SetWindowTheme(comboBox, L"DarkMode_CFD", nullptr);
+
+		darkModeHelper.AllowDarkModeForWindow(comboBox, true);
+		SetWindowTheme(comboBox, L"CFD", nullptr);
 	}
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
