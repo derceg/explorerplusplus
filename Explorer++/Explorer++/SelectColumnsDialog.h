@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "DarkModeDialogBase.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
 
@@ -29,7 +29,7 @@ private:
 	SelectColumnsDialogPersistentSettings &operator=(const SelectColumnsDialogPersistentSettings &);
 };
 
-class SelectColumnsDialog : public BaseDialog
+class SelectColumnsDialog : public DarkModeDialogBase
 {
 public:
 	SelectColumnsDialog(HINSTANCE hInstance, HWND hParent, ShellBrowser *shellBrowser,

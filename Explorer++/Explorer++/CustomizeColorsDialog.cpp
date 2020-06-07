@@ -6,6 +6,7 @@
 #include "CustomizeColorsDialog.h"
 #include "ColorRuleDialog.h"
 #include "CoreInterface.h"
+#include "DarkModeHelper.h"
 #include "Explorer++_internal.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
@@ -19,7 +20,7 @@ const TCHAR CustomizeColorsDialogPersistentSettings::SETTINGS_KEY[] = _T("Custom
 
 CustomizeColorsDialog::CustomizeColorsDialog(HINSTANCE hInstance, HWND hParent,
 	IExplorerplusplus *expp, std::vector<NColorRuleHelper::ColorRule> *pColorRuleList) :
-	BaseDialog(hInstance, IDD_CUSTOMIZECOLORS, hParent, true),
+	DarkModeDialogBase(hInstance, IDD_CUSTOMIZECOLORS, hParent, true),
 	m_expp(expp),
 	m_pColorRuleList(pColorRuleList)
 {
@@ -66,6 +67,16 @@ INT_PTR CustomizeColorsDialog::OnInitDialog()
 	}
 
 	SetFocus(hListView);
+
+	AllowDarkModeForControls({ IDC_BUTTON_NEW, IDC_BUTTON_EDIT, IDC_BUTTON_MOVEUP,
+		IDC_BUTTON_MOVEDOWN, IDC_BUTTON_DELETE });
+
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (darkModeHelper.IsDarkModeEnabled())
+	{
+		darkModeHelper.SetListViewDarkModeColors(hListView);
+	}
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg,true);
 

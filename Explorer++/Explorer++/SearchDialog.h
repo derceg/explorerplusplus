@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "DarkModeDialogBase.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/ReferenceCount.h"
@@ -132,7 +132,7 @@ private:
 	int m_iFilesFound;
 };
 
-class SearchDialog : public BaseDialog, public IFileContextMenuExternal
+class SearchDialog : public DarkModeDialogBase, public IFileContextMenuExternal
 {
 public:
 	SearchDialog(HINSTANCE hInstance, HWND hParent, std::wstring_view searchDirectory,

@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "SplitFileDialog.h"
 #include "CoreInterface.h"
+#include "DarkModeHelper.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -42,7 +43,7 @@ const TCHAR SplitFileDialogPersistentSettings::SETTING_SIZE_GROUP[] = _T("SizeGr
 
 SplitFileDialog::SplitFileDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
 	const std::wstring &strFullFilename) :
-	BaseDialog(hInstance, IDD_SPLITFILE, hParent, false),
+	DarkModeDialogBase(hInstance, IDD_SPLITFILE, hParent, false),
 	m_expp(expp),
 	m_strFullFilename(strFullFilename),
 	m_bSplittingFile(false),
@@ -155,6 +156,16 @@ INT_PTR SplitFileDialog::OnInitDialog()
 
 	SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_ELAPSEDTIME, _T("00:00:00"));
 
+	AllowDarkModeForControls({ IDC_SPLIT_BUTTON_OUTPUT });
+
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (darkModeHelper.IsDarkModeEnabled())
+	{
+		darkModeHelper.AllowDarkModeForWindow(hComboBox, true);
+		SetWindowTheme(hComboBox, L"CFD", nullptr);
+	}
+
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, false);
 
 	return 0;
@@ -182,7 +193,7 @@ INT_PTR SplitFileDialog::OnTimer(int iTimerID)
 	return 0;
 }
 
-INT_PTR SplitFileDialog::OnCtlColorStatic(HWND hwnd, HDC hdc)
+INT_PTR SplitFileDialog::OnCtlColorStaticExtra(HWND hwnd, HDC hdc)
 {
 	if (hwnd == GetDlgItem(m_hDlg, IDC_SPLIT_STATIC_FILENAMEHELPER))
 	{
@@ -192,7 +203,7 @@ INT_PTR SplitFileDialog::OnCtlColorStatic(HWND hwnd, HDC hdc)
 		return reinterpret_cast<INT_PTR>(GetStockObject(NULL_BRUSH));
 	}
 
-	return 0;
+	return FALSE;
 }
 
 INT_PTR SplitFileDialog::OnCommand(WPARAM wParam, LPARAM lParam)

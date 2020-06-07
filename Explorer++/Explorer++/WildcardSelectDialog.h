@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "DarkModeDialogBase.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
 #include <wil/resource.h>
@@ -45,7 +45,7 @@ private:
 	std::list<std::wstring> m_PatternList;
 };
 
-class WildcardSelectDialog : public BaseDialog
+class WildcardSelectDialog : public DarkModeDialogBase
 {
 public:
 	WildcardSelectDialog(HINSTANCE hInstance, HWND hParent, BOOL bSelect, IExplorerplusplus *pexpp);

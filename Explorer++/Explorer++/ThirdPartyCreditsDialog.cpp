@@ -4,12 +4,13 @@
 
 #include "stdafx.h"
 #include "ThirdPartyCreditsDialog.h"
+#include "DarkModeHelper.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/WindowHelper.h"
 
 ThirdPartyCreditsDialog::ThirdPartyCreditsDialog(HINSTANCE instance, HWND parent) :
-	BaseDialog(instance, IDD_THIRD_PARTY_CREDITS, parent, false)
+	DarkModeDialogBase(instance, IDD_THIRD_PARTY_CREDITS, parent, false)
 {
 }
 
@@ -20,6 +21,20 @@ INT_PTR ThirdPartyCreditsDialog::OnInitDialog()
 
 	std::wstring credits = ResourceHelper::LoadString(GetInstance(), IDS_THIRD_PARTY_CREDITS);
 	SetDlgItemText(m_hDlg, IDC_CREDITS, credits.c_str());
+
+	if (DarkModeHelper::GetInstance().IsDarkModeEnabled())
+	{
+		SendDlgItemMessage(
+			m_hDlg, IDC_CREDITS, EM_SETBKGNDCOLOR, 0, DarkModeHelper::BACKGROUND_COLOR);
+
+		CHARFORMAT charFormat;
+		charFormat.cbSize = sizeof(charFormat);
+		charFormat.dwMask = CFM_COLOR;
+		charFormat.crTextColor = DarkModeHelper::FOREGROUND_COLOR;
+		charFormat.dwEffects = 0;
+		SendDlgItemMessage(
+			m_hDlg, IDC_CREDITS, EM_SETCHARFORMAT, SCF_ALL, reinterpret_cast<LPARAM>(&charFormat));
+	}
 
 	CenterWindow(GetParent(m_hDlg), m_hDlg);
 

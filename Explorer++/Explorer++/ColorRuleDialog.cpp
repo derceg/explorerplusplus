@@ -28,7 +28,7 @@ const TCHAR ColorRuleDialogPersistentSettings::SETTING_CUSTOM_COLORS[] = _T("Cus
 
 ColorRuleDialog::ColorRuleDialog(HINSTANCE hInstance, HWND hParent,
 	NColorRuleHelper::ColorRule *pColorRule, BOOL bEdit) :
-	BaseDialog(hInstance, IDD_NEWCOLORRULE, hParent, false)
+	DarkModeDialogBase(hInstance, IDD_NEWCOLORRULE, hParent, false)
 {
 	m_pColorRule = pColorRule;
 	m_bEdit = bEdit;
@@ -82,6 +82,8 @@ INT_PTR ColorRuleDialog::OnInitDialog()
 
 	SendMessage(GetDlgItem(m_hDlg,IDC_EDIT_DESCRIPTION),EM_SETSEL,0,-1);
 	SetFocus(GetDlgItem(m_hDlg,IDC_EDIT_DESCRIPTION));
+
+	AllowDarkModeForControls({ IDC_BUTTON_CHANGECOLOR });
 
 	m_pcrdps->RestoreDialogPosition(m_hDlg,false);
 

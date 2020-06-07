@@ -5,8 +5,8 @@
 #pragma once
 
 #include "Bookmarks/UI/BookmarkListView.h"
+#include "DarkModeDialogBase.h"
 #include "ResourceHelper.h"
-#include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
 #include <boost/signals2.hpp>
@@ -45,7 +45,7 @@ private:
 	std::unordered_set<std::wstring> m_setExpansion;
 };
 
-class ManageBookmarksDialog : public BaseDialog
+class ManageBookmarksDialog : public DarkModeDialogBase
 {
 public:
 	ManageBookmarksDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp,

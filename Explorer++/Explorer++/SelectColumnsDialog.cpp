@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "SelectColumnsDialog.h"
+#include "DarkModeHelper.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -19,7 +20,7 @@ const TCHAR SelectColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SelectCo
 
 SelectColumnsDialog::SelectColumnsDialog(HINSTANCE hInstance, HWND hParent,
 	ShellBrowser *shellBrowser, IconResourceLoader *iconResourceLoader) :
-	BaseDialog(hInstance, IDD_SELECTCOLUMNS, hParent, true),
+	DarkModeDialogBase(hInstance, IDD_SELECTCOLUMNS, hParent, true),
 	m_shellBrowser(shellBrowser),
 	m_iconResourceLoader(iconResourceLoader),
 	m_bColumnsSwapped(FALSE)
@@ -68,6 +69,15 @@ INT_PTR SelectColumnsDialog::OnInitDialog()
 
 	ListViewHelper::SelectItem(hListView, 0, TRUE);
 	SetFocus(hListView);
+
+	AllowDarkModeForControls({ IDC_COLUMNS_MOVEUP, IDC_COLUMNS_MOVEDOWN });
+
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (darkModeHelper.IsDarkModeEnabled())
+	{
+		darkModeHelper.SetListViewDarkModeColors(hListView);
+	}
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 

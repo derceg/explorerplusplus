@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include "DarkModeDialogBase.h"
 #include "ShellBrowser/FolderSettings.h"
-#include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
 #include <wil/resource.h>
@@ -51,7 +51,7 @@ private:
 	FolderType m_FolderType;
 };
 
-class SetDefaultColumnsDialog : public BaseDialog
+class SetDefaultColumnsDialog : public DarkModeDialogBase
 {
 public:
 	SetDefaultColumnsDialog(HINSTANCE hInstance, HWND hParent, FolderColumns &folderColumns);

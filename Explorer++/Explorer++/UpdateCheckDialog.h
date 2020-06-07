@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "DarkModeDialogBase.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/Macros.h"
 
@@ -25,7 +25,7 @@ private:
 	DISALLOW_COPY_AND_ASSIGN(UpdateCheckDialogPersistentSettings);
 };
 
-class UpdateCheckDialog : public BaseDialog
+class UpdateCheckDialog : public DarkModeDialogBase
 {
 public:
 	UpdateCheckDialog(HINSTANCE hInstance, HWND hParent);

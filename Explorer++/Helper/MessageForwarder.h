@@ -14,8 +14,10 @@ protected:
 
 	virtual INT_PTR OnInitDialog();
 	virtual INT_PTR OnTimer(int iTimerID);
+	virtual INT_PTR OnCtlColorDlg(HWND hwnd, HDC hdc);
 	virtual INT_PTR OnCtlColorStatic(HWND hwnd, HDC hdc);
 	virtual INT_PTR OnCtlColorEdit(HWND hwnd, HDC hdc);
+	virtual INT_PTR OnCtlColorListBox(HWND hwnd, HDC hdc);
 	virtual INT_PTR OnHScroll(HWND hwnd);
 	virtual INT_PTR OnMButtonUp(const POINTS *pts);
 	virtual INT_PTR OnAppCommand(HWND hwnd, UINT uCmd, UINT uDevice, DWORD dwKeys);

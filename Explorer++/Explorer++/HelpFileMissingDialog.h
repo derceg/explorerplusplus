@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "DarkModeDialogBase.h"
 
-class HelpFileMissingDialog : public BaseDialog
+class HelpFileMissingDialog : public DarkModeDialogBase
 {
 public:
 	HelpFileMissingDialog(HINSTANCE hInstance, HWND hParent);

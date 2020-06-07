@@ -12,7 +12,7 @@
 
 ScriptingDialog::ScriptingDialog(
 	HINSTANCE hInstance, HWND hParent, PluginInterface *pluginInterface) :
-	BaseDialog(hInstance, IDD_SCRIPTING, hParent, true),
+	DarkModeDialogBase(hInstance, IDD_SCRIPTING, hParent, true),
 	m_luaPlugin(L"", Plugins::Manifest(), pluginInterface)
 {
 	m_luaPlugin.GetLuaState().open_libraries(sol::lib::base);
@@ -22,6 +22,8 @@ INT_PTR ScriptingDialog::OnInitDialog()
 {
 	HWND commandControl = GetDlgItem(m_hDlg, IDC_COMMAND);
 	SendMessage(m_hDlg, WM_NEXTDLGCTL, reinterpret_cast<WPARAM>(commandControl), TRUE);
+
+	AllowDarkModeForControls({ ID_RUN });
 
 	return FALSE;
 }

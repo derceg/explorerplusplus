@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "SetFileAttributesDialog.h"
+#include "DarkModeHelper.h"
 #include "MainResource.h"
 #include "../Helper/Helper.h"
 #include "../Helper/TimeHelper.h"
@@ -13,7 +14,7 @@ const TCHAR SetFileAttributesDialogPersistentSettings::SETTINGS_KEY[] = _T("SetF
 
 SetFileAttributesDialog::SetFileAttributesDialog(HINSTANCE hInstance, HWND hParent,
 	const std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo> &sfaiList) :
-	BaseDialog(hInstance, IDD_SETFILEATTRIBUTES, hParent, false)
+	DarkModeDialogBase(hInstance, IDD_SETFILEATTRIBUTES, hParent, false)
 {
 	assert(!sfaiList.empty());
 
@@ -78,6 +79,9 @@ INT_PTR SetFileAttributesDialog::OnInitDialog()
 	m_bModificationDateEnabled = FALSE;
 	m_bCreationDateEnabled = FALSE;
 	m_bAccessDateEnabled = FALSE;
+
+	AllowDarkModeForControls(
+		{ IDC_MODIFICATION_RESET, IDC_CREATION_RESET, IDC_ACCESS_RESET });
 
 	m_psfadps->RestoreDialogPosition(m_hDlg, false);
 

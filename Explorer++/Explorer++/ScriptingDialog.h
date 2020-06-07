@@ -1,10 +1,10 @@
 #pragma once
 
+#include "DarkModeDialogBase.h"
 #include "PluginInterface.h"
 #include "Plugins/LuaPlugin.h"
-#include "../Helper/BaseDialog.h"
 
-class ScriptingDialog : public BaseDialog
+class ScriptingDialog : public DarkModeDialogBase
 {
 public:
 	ScriptingDialog(HINSTANCE hInstance, HWND hParent, PluginInterface *pluginInterface);

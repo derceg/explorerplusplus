@@ -9,7 +9,7 @@
 
 ApplicationToolbarButtonDialog::ApplicationToolbarButtonDialog(
 	HINSTANCE hInstance, HWND hParent, ApplicationButton *Button, bool IsNew) :
-	BaseDialog(hInstance, IDD_EDITAPPLICATIONBUTTON, hParent, false),
+	DarkModeDialogBase(hInstance, IDD_EDITAPPLICATIONBUTTON, hParent, false),
 	m_Button(Button),
 	m_IsNew(IsNew)
 {
@@ -40,6 +40,8 @@ INT_PTR ApplicationToolbarButtonDialog::OnInitDialog()
 	HWND hEditName = GetDlgItem(m_hDlg, IDC_APP_EDIT_NAME);
 	SendMessage(hEditName, EM_SETSEL, 0, -1);
 	SetFocus(hEditName);
+
+	AllowDarkModeForControls({ IDC_APP_BUTTON_CHOOSE_FILE });
 
 	return 0;
 }

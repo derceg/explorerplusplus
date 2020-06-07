@@ -19,7 +19,7 @@ const TCHAR AddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmar
 AddBookmarkDialog::AddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
 	BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem, BookmarkItem *defaultParentSelection,
 	BookmarkItem **selectedParentFolder, std::optional<std::wstring> customDialogTitle) :
-	BaseDialog(hInstance, IDD_ADD_BOOKMARK, hParent, true),
+	DarkModeDialogBase(hInstance, IDD_ADD_BOOKMARK, hParent, true),
 	m_expp(expp),
 	m_bookmarkTree(bookmarkTree),
 	m_bookmarkItem(bookmarkItem),
@@ -84,6 +84,8 @@ INT_PTR AddBookmarkDialog::OnInitDialog()
 	HWND hEditName = GetDlgItem(m_hDlg, IDC_BOOKMARK_NAME);
 	SendMessage(hEditName, EM_SETSEL, 0, -1);
 	SetFocus(hEditName);
+
+	AllowDarkModeForControls({ IDC_BOOKMARK_NEWFOLDER });
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, false);
 
@@ -227,7 +229,7 @@ void AddBookmarkDialog::GetResizableControlInformation(
 	ControlList.push_back(control);
 }
 
-INT_PTR AddBookmarkDialog::OnCtlColorEdit(HWND hwnd, HDC hdc)
+INT_PTR AddBookmarkDialog::OnCtlColorEditExtra(HWND hwnd, HDC hdc)
 {
 	if (hwnd == GetDlgItem(m_hDlg, IDC_BOOKMARK_NAME)
 		|| hwnd == GetDlgItem(m_hDlg, IDC_BOOKMARK_LOCATION))

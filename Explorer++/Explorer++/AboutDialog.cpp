@@ -14,7 +14,7 @@
 #include <boost/format.hpp>
 
 AboutDialog::AboutDialog(HINSTANCE hInstance, HWND hParent) :
-	BaseDialog(hInstance, IDD_ABOUT, hParent, false)
+	DarkModeDialogBase(hInstance, IDD_ABOUT, hParent, false)
 {
 }
 

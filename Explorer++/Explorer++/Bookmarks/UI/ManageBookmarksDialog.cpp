@@ -24,7 +24,7 @@ const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("Manage
 ManageBookmarksDialog::ManageBookmarksDialog(HINSTANCE hInstance, HWND hParent,
 	IExplorerplusplus *pexpp, Navigation *navigation, IconFetcher *iconFetcher,
 	BookmarkTree *bookmarkTree) :
-	BaseDialog(hInstance, IDD_MANAGE_BOOKMARKS, hParent, true),
+	DarkModeDialogBase(hInstance, IDD_MANAGE_BOOKMARKS, hParent, true),
 	m_pexpp(pexpp),
 	m_navigation(navigation),
 	m_iconFetcher(iconFetcher),

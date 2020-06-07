@@ -5,7 +5,7 @@
 #pragma once
 
 #include "ColorRuleHelper.h"
-#include "../Helper/BaseDialog.h"
+#include "DarkModeDialogBase.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
 #include <vector>
@@ -31,7 +31,7 @@ private:
 	CustomizeColorsDialogPersistentSettings & operator=(const CustomizeColorsDialogPersistentSettings &);
 };
 
-class CustomizeColorsDialog : public BaseDialog
+class CustomizeColorsDialog : public DarkModeDialogBase
 {
 public:
 

@@ -21,7 +21,7 @@ const TCHAR WildcardSelectDialogPersistentSettings::SETTING_CURRENT_TEXT[] = _T(
 
 WildcardSelectDialog::WildcardSelectDialog(
 	HINSTANCE hInstance, HWND hParent, BOOL bSelect, IExplorerplusplus *pexpp) :
-	BaseDialog(hInstance, IDD_WILDCARDSELECT, hParent, true)
+	DarkModeDialogBase(hInstance, IDD_WILDCARDSELECT, hParent, true)
 {
 	m_bSelect = bSelect;
 	m_pexpp = pexpp;

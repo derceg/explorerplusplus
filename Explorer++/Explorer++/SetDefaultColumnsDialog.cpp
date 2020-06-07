@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "SetDefaultColumnsDialog.h"
+#include "DarkModeHelper.h"
 #include "MainResource.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/ListViewHelper.h"
@@ -19,7 +20,7 @@ const TCHAR SetDefaultColumnsDialogPersistentSettings::SETTING_FOLDER_TYPE[] = _
 
 SetDefaultColumnsDialog::SetDefaultColumnsDialog(
 	HINSTANCE hInstance, HWND hParent, FolderColumns &folderColumns) :
-	BaseDialog(hInstance, IDD_SETDEFAULTCOLUMNS, hParent, true),
+	DarkModeDialogBase(hInstance, IDD_SETDEFAULTCOLUMNS, hParent, true),
 	m_folderColumns(folderColumns)
 {
 	m_psdcdps = &SetDefaultColumnsDialogPersistentSettings::GetInstance();
@@ -96,6 +97,18 @@ INT_PTR SetDefaultColumnsDialog::OnInitDialog()
 	SetupFolderColumns(m_psdcdps->m_FolderType);
 
 	SetFocus(hListView);
+
+	AllowDarkModeForControls({ IDC_DEFAULTCOLUMNS_MOVEUP, IDC_DEFAULTCOLUMNS_MOVEDOWN });
+
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (darkModeHelper.IsDarkModeEnabled())
+	{
+		darkModeHelper.SetListViewDarkModeColors(hListView);
+
+		darkModeHelper.AllowDarkModeForWindow(hComboBox, true);
+		SetWindowTheme(hComboBox, L"CFD", nullptr);
+	}
 
 	m_psdcdps->RestoreDialogPosition(m_hDlg, true);
 

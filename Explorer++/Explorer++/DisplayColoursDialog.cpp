@@ -12,7 +12,7 @@ const TCHAR DisplayColoursDialogPersistentSettings::SETTINGS_KEY[] = _T("Display
 
 DisplayColoursDialog::DisplayColoursDialog(HINSTANCE hInstance, HWND hParent, HWND hDisplayWindow,
 	COLORREF DefaultCenterColor, COLORREF DefaultSurroundingColor) :
-	BaseDialog(hInstance, IDD_DISPLAYCOLOURS, hParent, false),
+	DarkModeDialogBase(hInstance, IDD_DISPLAYCOLOURS, hParent, false),
 	m_hDisplayWindow(hDisplayWindow),
 	m_DefaultCenterColor(DefaultCenterColor),
 	m_DefaultSurroundingColor(DefaultSurroundingColor)
@@ -24,6 +24,8 @@ INT_PTR DisplayColoursDialog::OnInitDialog()
 {
 	InitializeColorGroups();
 	InitializePreviewWindow();
+
+	AllowDarkModeForControls({ IDC_BUTTON_RESTOREDEFAULTS , IDC_BUTTON_DISPLAY_FONT });
 
 	m_pdcdps->RestoreDialogPosition(m_hDlg, false);
 

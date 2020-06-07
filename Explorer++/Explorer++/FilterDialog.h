@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "DarkModeDialogBase.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
 #include <MsXml2.h>
@@ -39,7 +39,7 @@ private:
 	std::list<std::wstring> m_FilterList;
 };
 
-class FilterDialog : public BaseDialog
+class FilterDialog : public DarkModeDialogBase
 {
 public:
 	FilterDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp);

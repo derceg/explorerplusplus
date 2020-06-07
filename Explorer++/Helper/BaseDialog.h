@@ -35,13 +35,16 @@ public:
 	static const int RETURN_CANCEL = 0;
 	static const int RETURN_OK = 1;
 
-	BaseDialog(HINSTANCE hInstance, int iResource, HWND hParent, bool bResizable);
 	virtual ~BaseDialog() = default;
 
 	INT_PTR ShowModalDialog();
 	HWND ShowModelessDialog(IModelessDialogNotification *pmdn = NULL);
 
 protected:
+	BaseDialog(HINSTANCE hInstance, int iResource, HWND hParent, bool bResizable);
+
+	virtual void OnInitDialogBase();
+
 	HINSTANCE GetInstance() const;
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const;
 

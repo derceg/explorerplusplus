@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "DarkModeDialogBase.h"
 #include <wil/resource.h>
 
-class AboutDialog : public BaseDialog
+class AboutDialog : public DarkModeDialogBase
 {
 public:
 	AboutDialog(HINSTANCE hInstance, HWND hParent);

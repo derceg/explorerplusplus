@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "DarkModeDialogBase.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
 #include <wil/resource.h>
@@ -37,7 +37,7 @@ private:
 	std::unordered_set<std::wstring> m_setExpansion;
 };
 
-class AddBookmarkDialog : public BaseDialog
+class AddBookmarkDialog : public DarkModeDialogBase
 {
 public:
 	AddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
@@ -47,7 +47,7 @@ public:
 
 protected:
 	INT_PTR OnInitDialog() override;
-	INT_PTR OnCtlColorEdit(HWND hwnd, HDC hdc) override;
+	INT_PTR OnCtlColorEditExtra(HWND hwnd, HDC hdc) override;
 	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
 	INT_PTR OnClose() override;
 	INT_PTR OnNcDestroy() override;

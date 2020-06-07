@@ -16,6 +16,7 @@
 #include "stdafx.h"
 #include "MassRenameDialog.h"
 #include "CoreInterface.h"
+#include "DarkModeHelper.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -34,7 +35,7 @@ const TCHAR MassRenameDialogPersistentSettings::SETTING_COLUMN_WIDTH_2[] = _T("C
 
 MassRenameDialog::MassRenameDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
 	const std::list<std::wstring> &FullFilenameList, FileActionHandler *pFileActionHandler) :
-	BaseDialog(hInstance, IDD_MASSRENAME, hParent, true),
+	DarkModeDialogBase(hInstance, IDD_MASSRENAME, hParent, true),
 	m_expp(expp),
 	m_FullFilenameList(FullFilenameList),
 	m_pFileActionHandler(pFileActionHandler)
@@ -110,6 +111,15 @@ INT_PTR MassRenameDialog::OnInitDialog()
 	SetDlgItemText(m_hDlg, IDC_MASSRENAME_EDIT, _T("/F"));
 	SendMessage(GetDlgItem(m_hDlg, IDC_MASSRENAME_EDIT), EM_SETSEL, 0, -1);
 	SetFocus(GetDlgItem(m_hDlg, IDC_MASSRENAME_EDIT));
+
+	AllowDarkModeForControls({ IDC_MASSRENAME_MORE });
+
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (darkModeHelper.IsDarkModeEnabled())
+	{
+		darkModeHelper.SetListViewDarkModeColors(hListView);
+	}
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 

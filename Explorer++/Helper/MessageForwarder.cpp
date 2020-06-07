@@ -24,12 +24,20 @@ INT_PTR MessageForwarder::ForwardMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LP
 		return OnInitDialog();
 		break;
 
+	case WM_CTLCOLORDLG:
+		return OnCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+		break;
+
 	case WM_CTLCOLORSTATIC:
 		return OnCtlColorStatic(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
 		break;
 
 	case WM_CTLCOLOREDIT:
 		return OnCtlColorEdit(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+		break;
+
+	case WM_CTLCOLORLISTBOX:
+		return OnCtlColorListBox(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
 		break;
 
 	case WM_HSCROLL:
@@ -97,6 +105,14 @@ INT_PTR MessageForwarder::OnTimer(int iTimerID)
 	return GetDefaultReturnValue(m_hwnd, m_uMsg, m_wParam, m_lParam);
 }
 
+INT_PTR MessageForwarder::OnCtlColorDlg(HWND hwnd, HDC hdc)
+{
+	UNREFERENCED_PARAMETER(hwnd);
+	UNREFERENCED_PARAMETER(hdc);
+
+	return GetDefaultReturnValue(m_hwnd, m_uMsg, m_wParam, m_lParam);
+}
+
 INT_PTR MessageForwarder::OnCtlColorStatic(HWND hwnd, HDC hdc)
 {
 	UNREFERENCED_PARAMETER(hwnd);
@@ -106,6 +122,14 @@ INT_PTR MessageForwarder::OnCtlColorStatic(HWND hwnd, HDC hdc)
 }
 
 INT_PTR MessageForwarder::OnCtlColorEdit(HWND hwnd, HDC hdc)
+{
+	UNREFERENCED_PARAMETER(hwnd);
+	UNREFERENCED_PARAMETER(hdc);
+
+	return GetDefaultReturnValue(m_hwnd, m_uMsg, m_wParam, m_lParam);
+}
+
+INT_PTR MessageForwarder::OnCtlColorListBox(HWND hwnd, HDC hdc)
 {
 	UNREFERENCED_PARAMETER(hwnd);
 	UNREFERENCED_PARAMETER(hdc);

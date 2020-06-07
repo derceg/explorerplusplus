@@ -9,7 +9,7 @@
 #include "../Helper/WindowHelper.h"
 
 HelpFileMissingDialog::HelpFileMissingDialog(HINSTANCE hInstance, HWND hParent) :
-	BaseDialog(hInstance, IDD_HELPFILEMISSING, hParent, false)
+	DarkModeDialogBase(hInstance, IDD_HELPFILEMISSING, hParent, false)
 {
 }
 

@@ -5,7 +5,7 @@
 #pragma once
 
 #include "CustomizeColorsDialog.h"
-#include "../Helper/BaseDialog.h"
+#include "DarkModeDialogBase.h"
 #include "../Helper/DialogSettings.h"
 
 class ColorRuleDialog;
@@ -41,7 +41,7 @@ private:
 	COLORREF	m_cfCustomColors[16];
 };
 
-class ColorRuleDialog : public BaseDialog
+class ColorRuleDialog : public DarkModeDialogBase
 {
 public:
 

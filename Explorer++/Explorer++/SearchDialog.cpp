@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "SearchDialog.h"
 #include "CoreInterface.h"
+#include "DarkModeHelper.h"
 #include "DialogConstants.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
@@ -57,7 +58,7 @@ const TCHAR SearchDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern
 
 SearchDialog::SearchDialog(HINSTANCE hInstance, HWND hParent, std::wstring_view searchDirectory,
 	IExplorerplusplus *pexpp, TabContainer *tabContainer) :
-	BaseDialog(hInstance, IDD_SEARCH, hParent, true),
+	DarkModeDialogBase(hInstance, IDD_SEARCH, hParent, true),
 	m_searchDirectory(searchDirectory),
 	m_pexpp(pexpp),
 	m_tabContainer(tabContainer),
@@ -161,9 +162,18 @@ INT_PTR SearchDialog::OnInitDialog()
 		}
 	}
 
-	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
-
 	SetFocus(GetDlgItem(m_hDlg, IDC_COMBO_NAME));
+
+	AllowDarkModeForControls({ IDC_BUTTON_DIRECTORY, IDSEARCH, IDEXIT });
+
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (darkModeHelper.IsDarkModeEnabled())
+	{
+		darkModeHelper.SetListViewDarkModeColors(hListView);
+	}
+
+	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 
 	return FALSE;
 }

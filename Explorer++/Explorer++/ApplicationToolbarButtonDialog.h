@@ -5,9 +5,9 @@
 #pragma once
 
 #include "ApplicationToolbar.h"
-#include "../Helper/BaseDialog.h"
+#include "DarkModeDialogBase.h"
 
-class ApplicationToolbarButtonDialog : public BaseDialog
+class ApplicationToolbarButtonDialog : public DarkModeDialogBase
 {
 public:
 	ApplicationToolbarButtonDialog(

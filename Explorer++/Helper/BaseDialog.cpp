@@ -98,6 +98,8 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 		}
 
 		m_tipWnd = CreateTooltipControl(m_hDlg, m_hInstance);
+
+		OnInitDialogBase();
 	}
 	break;
 
@@ -164,6 +166,10 @@ wil::unique_hicon BaseDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 	UNREFERENCED_PARAMETER(iconHeight);
 
 	return nullptr;
+}
+
+void BaseDialog::OnInitDialogBase()
+{
 }
 
 INT_PTR BaseDialog::GetDefaultReturnValue(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

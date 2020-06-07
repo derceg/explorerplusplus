@@ -18,7 +18,7 @@ const TCHAR FilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");
 const TCHAR FilterDialogPersistentSettings::SETTING_FILTER_LIST[] = _T("Filter");
 
 FilterDialog::FilterDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp) :
-	BaseDialog(hInstance, IDD_FILTER, hParent, true)
+	DarkModeDialogBase(hInstance, IDD_FILTER, hParent, true)
 {
 	m_pexpp = pexpp;
 

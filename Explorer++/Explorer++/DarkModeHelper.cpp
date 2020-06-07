@@ -132,6 +132,19 @@ bool DarkModeHelper::IsHighContrast()
 	return WI_IsFlagSet(highContrast.dwFlags, HCF_HIGHCONTRASTON);
 }
 
+// Sets the dark mode theme for a control. Works for controls that use the DarkMode_Explorer theme:
+// 
+// - Buttons
+// - Scrollbars
+// - TreeViews
+// - Tooltips
+// - Edit controls
+void DarkModeHelper::SetDarkModeForControl(HWND control)
+{
+	AllowDarkModeForWindow(control, true);
+	SetWindowTheme(control, L"Explorer", nullptr);
+}
+
 bool DarkModeHelper::IsDarkModeEnabled() const
 {
 	return m_darkModeEnabled;

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "DestroyFilesDialog.h"
+#include "DarkModeHelper.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "../Helper/Helper.h"
@@ -19,7 +20,7 @@ const TCHAR DestroyFilesDialogPersistentSettings::SETTING_OVERWRITE_METHOD[] =
 
 DestroyFilesDialog::DestroyFilesDialog(HINSTANCE hInstance, HWND hParent,
 	const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates) :
-	BaseDialog(hInstance, IDD_DESTROYFILES, hParent, true)
+	DarkModeDialogBase(hInstance, IDD_DESTROYFILES, hParent, true)
 {
 	m_FullFilenameList = FullFilenameList;
 	m_bShowFriendlyDates = bShowFriendlyDates;
@@ -121,6 +122,13 @@ INT_PTR DestroyFilesDialog::OnInitDialog()
 		break;
 	}
 
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (darkModeHelper.IsDarkModeEnabled())
+	{
+		darkModeHelper.SetListViewDarkModeColors(hListView);
+	}
+
 	m_pdfdps->RestoreDialogPosition(m_hDlg, true);
 
 	return 0;
@@ -184,7 +192,7 @@ void DestroyFilesDialog::GetResizableControlInformation(
 	ControlList.push_back(control);
 }
 
-INT_PTR DestroyFilesDialog::OnCtlColorStatic(HWND hwnd, HDC hdc)
+INT_PTR DestroyFilesDialog::OnCtlColorStaticExtra(HWND hwnd, HDC hdc)
 {
 	if (hwnd == GetDlgItem(m_hDlg, IDC_DESTROYFILES_STATIC_WARNING_MESSAGE))
 	{
@@ -193,7 +201,7 @@ INT_PTR DestroyFilesDialog::OnCtlColorStatic(HWND hwnd, HDC hdc)
 		return reinterpret_cast<INT_PTR>(GetStockObject(NULL_BRUSH));
 	}
 
-	return 0;
+	return FALSE;
 }
 
 INT_PTR DestroyFilesDialog::OnCommand(WPARAM wParam, LPARAM lParam)
