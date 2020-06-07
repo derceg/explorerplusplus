@@ -9,6 +9,7 @@
 
 #include "stdafx.h"
 #include "HolderWindow.h"
+#include "DarkModeHelper.h"
 #include "HolderWindowInternal.h"
 #include "../Helper/Macros.h"
 
@@ -37,7 +38,18 @@ ATOM RegisterHolderWindowClass()
 	wc.hInstance = GetModuleHandle(nullptr);
 	wc.hIcon = nullptr;
 	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH) GetSysColorBrush(COLOR_BTNFACE);
+
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (darkModeHelper.IsDarkModeEnabled())
+	{
+		wc.hbrBackground = darkModeHelper.GetBackgroundBrush();
+	}
+	else
+	{
+		wc.hbrBackground = GetSysColorBrush(COLOR_BTNFACE);
+	}
+
 	wc.lpszMenuName = nullptr;
 	wc.lpszClassName = HOLDER_CLASS_NAME;
 
@@ -131,6 +143,14 @@ void HolderWindow::OnHolderWindowPaint(HWND hwnd)
 	GetWindowText(hwnd, szHeader, SIZEOF_ARRAY(szHeader));
 
 	SetBkMode(hdc, TRANSPARENT);
+
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (darkModeHelper.IsDarkModeEnabled())
+	{
+		SetTextColor(hdc, DarkModeHelper::FOREGROUND_COLOR);
+	}
+
 	TextOut(hdc, FOLDERS_TEXT_X, FOLDERS_TEXT_Y, szHeader, lstrlen(szHeader));
 
 	DeleteObject(hFont);
