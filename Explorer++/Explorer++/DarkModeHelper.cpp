@@ -162,6 +162,13 @@ HBRUSH DarkModeHelper::GetBackgroundBrush()
 
 void DarkModeHelper::SetListViewDarkModeColors(HWND listView)
 {
+	AllowDarkModeForWindow(listView, true);
+	SetWindowTheme(listView, L"ItemsView", nullptr);
+
+	HWND header = ListView_GetHeader(listView);
+	AllowDarkModeForWindow(header, true);
+	SetWindowTheme(header, L"ItemsView", nullptr);
+
 	ListView_SetBkColor(listView, BACKGROUND_COLOR);
 	ListView_SetTextBkColor(listView, BACKGROUND_COLOR);
 	ListView_SetTextColor(listView, FOREGROUND_COLOR);
@@ -171,14 +178,16 @@ void DarkModeHelper::SetListViewDarkModeColors(HWND listView)
 
 void DarkModeHelper::SetTreeViewDarkModeColors(HWND treeView)
 {
-	// This sets the following colors correctly:
+	AllowDarkModeForWindow(treeView, true);
+
+	// When in dark mode, this theme sets the following colors correctly:
 	// 
 	// - the item selection color,
 	// - the colors of the arrows that appear to the left of the items,
 	// - the color of the scrollbars.
 	// 
 	// It doesn't, however, change the background color, or the text color.
-	SetWindowTheme(treeView, L"DarkMode_Explorer", nullptr);
+	SetWindowTheme(treeView, L"Explorer", nullptr);
 
 	TreeView_SetBkColor(treeView, BACKGROUND_COLOR);
 	TreeView_SetTextColor(treeView, FOREGROUND_COLOR);
