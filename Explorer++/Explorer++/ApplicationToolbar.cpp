@@ -19,6 +19,7 @@
 #include "ApplicationToolbarDropHandler.h"
 #include "ApplicationToolbarHelper.h"
 #include "CoreInterface.h"
+#include "DarkModeHelper.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -88,6 +89,13 @@ void ApplicationToolbar::Initialize(HWND hParent)
 
 	m_connections.push_back(m_pexpp->AddToolbarContextMenuObserver(
 		boost::bind(&ApplicationToolbar::OnToolbarContextMenuPreShow, this, _1, _2, _3)));
+
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (darkModeHelper.IsDarkModeEnabled())
+	{
+		darkModeHelper.SetDarkModeForToolbarTooltips(m_hwnd);
+	}
 }
 
 ApplicationToolbar::~ApplicationToolbar()

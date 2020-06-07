@@ -73,6 +73,7 @@ public:
 	void RefreshImmersiveColorPolicyState();
 	void AllowDarkModeForWindow(HWND hWnd, bool allow);
 	void SetWindowCompositionAttribute(HWND hWnd, WINDOWCOMPOSITIONATTRIBDATA *data);
+	void SetDarkModeForToolbarTooltips(HWND toolbar);
 	void SetDarkModeForControl(HWND control);
 	void SetListViewDarkModeColors(HWND listView);
 	void SetTreeViewDarkModeColors(HWND treeView);

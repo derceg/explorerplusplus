@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "DrivesToolbar.h"
 #include "CoreInterface.h"
+#include "DarkModeHelper.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "TabContainer.h"
@@ -67,6 +68,13 @@ void DrivesToolbar::Initialize(HWND hParent)
 		DrivesToolbarParentProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	InsertDrives();
+
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (darkModeHelper.IsDarkModeEnabled())
+	{
+		darkModeHelper.SetDarkModeForToolbarTooltips(m_hwnd);
+	}
 }
 
 INT_PTR DrivesToolbar::OnMButtonUp(const POINTS *pts)

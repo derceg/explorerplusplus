@@ -132,6 +132,16 @@ bool DarkModeHelper::IsHighContrast()
 	return WI_IsFlagSet(highContrast.dwFlags, HCF_HIGHCONTRASTON);
 }
 
+void DarkModeHelper::SetDarkModeForToolbarTooltips(HWND toolbar)
+{
+	HWND tooltips = reinterpret_cast<HWND>(SendMessage(toolbar, TB_GETTOOLTIPS, 0, 0));
+
+	if (tooltips)
+	{
+		SetDarkModeForControl(tooltips);
+	}
+}
+
 // Sets the dark mode theme for a control. Works for controls that use the DarkMode_Explorer theme:
 // 
 // - Buttons

@@ -6,6 +6,7 @@
 #include "MainToolbar.h"
 #include "Config.h"
 #include "CoreInterface.h"
+#include "DarkModeHelper.h"
 #include "DefaultToolbarButtons.h"
 #include "Icon.h"
 #include "MainResource.h"
@@ -169,6 +170,13 @@ void MainToolbar::Initialize(HWND parent)
 	});
 
 	m_connections.push_back(m_config->useLargeToolbarIcons.addObserver(boost::bind(&MainToolbar::OnUseLargeToolbarIconsUpdated, this, _1)));
+
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (darkModeHelper.IsDarkModeEnabled())
+	{
+		darkModeHelper.SetDarkModeForToolbarTooltips(m_hwnd);
+	}
 }
 
 void MainToolbar::SetTooolbarImageList()
