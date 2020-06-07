@@ -50,14 +50,14 @@ void Explorerplusplus::CreateFolderControls()
 	m_hTreeView = CreateTreeView(m_hHolder,WS_CHILD|WS_VISIBLE|TVS_SHOWSELALWAYS|
 		TVS_HASBUTTONS|TVS_EDITLABELS|TVS_HASLINES|TVS_TRACKSELECT);
 
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
 	if (DarkModeHelper::GetInstance().IsDarkModeEnabled())
 	{
-		SetWindowTheme(m_hTreeView, L"DarkMode_Explorer", nullptr);
+		darkModeHelper.AllowDarkModeForWindow(m_hTreeView, true);
 	}
-	else
-	{
-		SetWindowTheme(m_hTreeView, L"Explorer", nullptr);
-	}
+
+	SetWindowTheme(m_hTreeView, L"Explorer", nullptr);
 
 	SetWindowLongPtr(m_hTreeView,GWL_EXSTYLE,WS_EX_CLIENTEDGE);
 	m_shellTreeView = new ShellTreeView(m_hTreeView, m_hHolder, m_pDirMon, &m_cachedIcons);
