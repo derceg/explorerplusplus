@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ShellBrowser.h"
 #include "Config.h"
+#include "DarkModeHelper.h"
 #include "ItemData.h"
 #include "MainResource.h"
 #include "PreservedFolderState.h"
@@ -174,8 +175,12 @@ ShellBrowser::~ShellBrowser()
 
 HWND ShellBrowser::SetUpListView(HWND parent)
 {
+	// Note that the only reason LVS_REPORT is specified here is so that the listview header theme
+	// can be set immediately when in dark mode. Without this style, ListView_GetHeader() will
+	// return NULL. The actual view mode set here doesn't matter, since it will be updated when
+	// navigating to a folder.
 	HWND hListView = CreateListView(parent,
-		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | LVS_ICON | LVS_EDITLABELS
+		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | LVS_REPORT | LVS_EDITLABELS
 			| LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | WS_TABSTOP
 			| LVS_ALIGNTOP);
 
@@ -210,7 +215,16 @@ HWND ShellBrowser::SetUpListView(HWND parent)
 		m_config->globalFolderSettings.oneClickActivate,
 		m_config->globalFolderSettings.oneClickActivateHoverTime);
 
-	SetWindowTheme(hListView, L"Explorer", nullptr);
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (darkModeHelper.IsDarkModeEnabled())
+	{
+		darkModeHelper.SetListViewDarkModeColors(hListView);
+	}
+	else
+	{
+		SetWindowTheme(hListView, L"Explorer", nullptr);
+	}
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
 		hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));

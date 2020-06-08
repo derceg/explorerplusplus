@@ -100,8 +100,6 @@ void Explorerplusplus::OnCreate()
 
 	if (DarkModeHelper::GetInstance().IsDarkModeEnabled())
 	{
-		m_uiTheming->SetListViewColors(
-			DarkModeHelper::BACKGROUND_COLOR, DarkModeHelper::FOREGROUND_COLOR);
 		m_uiTheming->SetTreeViewColors(
 			DarkModeHelper::BACKGROUND_COLOR, DarkModeHelper::FOREGROUND_COLOR);
 	}
