@@ -7,6 +7,7 @@
 #include "Bookmarks/BookmarkHelper.h"
 #include "Config.h"
 #include "CoreInterface.h"
+#include "DarkModeHelper.h"
 #include "Icon.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
@@ -107,6 +108,15 @@ void TabContainer::Initialize(HWND parent)
 	auto *pTabDropHandler = new TabDropHandler(m_hwnd, this);
 	RegisterDragDrop(m_hwnd, pTabDropHandler);
 	pTabDropHandler->Release();
+
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (darkModeHelper.IsDarkModeEnabled())
+	{
+		HWND tooltips = TabCtrl_GetToolTips(m_hwnd);
+		darkModeHelper.AllowDarkModeForWindow(tooltips, true);
+		SetWindowTheme(tooltips, L"Explorer", nullptr);
+	}
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
 		m_hwnd, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
