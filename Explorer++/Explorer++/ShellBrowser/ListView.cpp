@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ShellBrowser.h"
 #include "Config.h"
+#include "DarkModeHelper.h"
 #include "ItemData.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -68,6 +69,33 @@ LRESULT CALLBACK ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 		OnListViewMButtonUp(&pt);
 	}
 	break;
+
+	case WM_NOTIFY:
+		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == ListView_GetHeader(m_hListView))
+		{
+			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
+			{
+			case NM_CUSTOMDRAW:
+			{
+				if (DarkModeHelper::GetInstance().IsDarkModeEnabled())
+				{
+					auto *customDraw = reinterpret_cast<NMCUSTOMDRAW *>(lParam);
+
+					switch (customDraw->dwDrawStage)
+					{
+					case CDDS_PREPAINT:
+						return CDRF_NOTIFYITEMDRAW;
+
+					case CDDS_ITEMPREPAINT:
+						SetTextColor(customDraw->hdc, DarkModeHelper::FOREGROUND_COLOR);
+						return CDRF_NEWFONT;
+					}
+				}
+			}
+			break;
+			}
+		}
+		break;
 
 	case WM_APP_COLUMN_RESULT_READY:
 		ProcessColumnResult(static_cast<int>(wParam));

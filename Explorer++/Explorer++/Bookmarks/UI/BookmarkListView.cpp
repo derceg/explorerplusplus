@@ -208,16 +208,19 @@ LRESULT CALLBACK BookmarkListView::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, 
 			{
 			case NM_CUSTOMDRAW:
 			{
-				auto *customDraw = reinterpret_cast<NMCUSTOMDRAW *>(lParam);
-
-				switch (customDraw->dwDrawStage)
+				if (DarkModeHelper::GetInstance().IsDarkModeEnabled())
 				{
-				case CDDS_PREPAINT:
-					return CDRF_NOTIFYITEMDRAW;
+					auto *customDraw = reinterpret_cast<NMCUSTOMDRAW *>(lParam);
 
-				case CDDS_ITEMPREPAINT:
-					SetTextColor(customDraw->hdc, DarkModeHelper::FOREGROUND_COLOR);
-					return CDRF_NEWFONT;
+					switch (customDraw->dwDrawStage)
+					{
+					case CDDS_PREPAINT:
+						return CDRF_NOTIFYITEMDRAW;
+
+					case CDDS_ITEMPREPAINT:
+						SetTextColor(customDraw->hdc, DarkModeHelper::FOREGROUND_COLOR);
+						return CDRF_NEWFONT;
+					}
 				}
 			}
 			break;
