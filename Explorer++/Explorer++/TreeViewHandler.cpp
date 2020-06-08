@@ -55,6 +55,10 @@ void Explorerplusplus::CreateFolderControls()
 	if (DarkModeHelper::GetInstance().IsDarkModeEnabled())
 	{
 		darkModeHelper.AllowDarkModeForWindow(m_hTreeView, true);
+
+		HWND tooltips = TreeView_GetToolTips(m_hTreeView);
+		darkModeHelper.AllowDarkModeForWindow(tooltips, true);
+		SetWindowTheme(tooltips, L"Explorer", nullptr);
 	}
 
 	SetWindowTheme(m_hTreeView, L"Explorer", nullptr);
