@@ -200,6 +200,30 @@ LRESULT CALLBACK BookmarkListView::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, 
 			return 0;
 		}
 		break;
+
+	case WM_NOTIFY:
+		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == ListView_GetHeader(m_hListView))
+		{
+			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
+			{
+			case NM_CUSTOMDRAW:
+			{
+				auto *customDraw = reinterpret_cast<NMCUSTOMDRAW *>(lParam);
+
+				switch (customDraw->dwDrawStage)
+				{
+				case CDDS_PREPAINT:
+					return CDRF_NOTIFYITEMDRAW;
+
+				case CDDS_ITEMPREPAINT:
+					SetTextColor(customDraw->hdc, DarkModeHelper::FOREGROUND_COLOR);
+					return CDRF_NEWFONT;
+				}
+			}
+			break;
+			}
+		}
+		break;
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
