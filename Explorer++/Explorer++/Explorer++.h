@@ -24,6 +24,7 @@
 #include "../Helper/IconFetcher.h"
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
+#include <optional>
 
 /* Sent when a folder size calculation has finished. */
 #define WM_APP_FOLDERSIZECOMPLETED WM_APP + 3
@@ -165,6 +166,7 @@ private:
 	void OnCreate();
 	BOOL OnSize(int MainWindowWidth, int MainWindowHeight);
 	void OnDpiChanged(const RECT *updatedWindowRect);
+	std::optional<LRESULT> OnCtlColorStatic(HWND hwnd, HDC hdc);
 	int OnClose();
 	int OnDestroy();
 	void OnRightClick(NMHDR *nmhdr);

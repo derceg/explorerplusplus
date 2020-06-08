@@ -7,6 +7,7 @@
 #include "AddressBar.h"
 #include "ColorRuleHelper.h"
 #include "Config.h"
+#include "DarkModeHelper.h"
 #include "Explorer++_internal.h"
 #include "LoadSaveRegistry.h"
 #include "LoadSaveXml.h"
@@ -516,6 +517,25 @@ void Explorerplusplus::OnDpiChanged(const RECT *updatedWindowRect)
 	SetWindowPos(m_hContainer, nullptr, updatedWindowRect->left, updatedWindowRect->top,
 		GetRectWidth(updatedWindowRect), GetRectHeight(updatedWindowRect),
 		SWP_NOZORDER | SWP_NOACTIVATE);
+}
+
+std::optional<LRESULT> Explorerplusplus::OnCtlColorStatic(HWND hwnd, HDC hdc)
+{
+	UNREFERENCED_PARAMETER(hdc);
+
+	if (hwnd == m_hTabBacking)
+	{
+		auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+		if (!darkModeHelper.IsDarkModeEnabled())
+		{
+			return std::nullopt;
+		}
+
+		return reinterpret_cast<INT_PTR>(darkModeHelper.GetBackgroundBrush());
+	}
+
+	return std::nullopt;
 }
 
 int Explorerplusplus::OnDestroy()

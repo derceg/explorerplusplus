@@ -284,6 +284,13 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		OnDpiChanged(reinterpret_cast<RECT *>(lParam));
 		return 0;
 
+	case WM_CTLCOLORSTATIC:
+		if (auto res = OnCtlColorStatic(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam)))
+		{
+			return *res;
+		}
+		break;
+
 	case WM_CLOSE:
 		return OnClose();
 
