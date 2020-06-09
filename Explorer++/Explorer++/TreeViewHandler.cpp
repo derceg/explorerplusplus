@@ -68,7 +68,6 @@ void Explorerplusplus::CreateFolderControls()
 
 	SetWindowTheme(m_hTreeView, L"Explorer", nullptr);
 
-	SetWindowLongPtr(m_hTreeView,GWL_EXSTYLE,WS_EX_CLIENTEDGE);
 	m_shellTreeView = new ShellTreeView(m_hTreeView, m_hHolder, m_pDirMon, &m_cachedIcons);
 
 	/* Now, subclass the treeview again. This is needed for messages
