@@ -28,6 +28,7 @@ AddressBar::AddressBar(HWND parent, IExplorerplusplus *expp, MainToolbar *mainTo
 	BaseWindow(CreateAddressBar(parent)),
 	m_expp(expp),
 	m_mainToolbar(mainToolbar),
+	m_backgroundBrush(CreateSolidBrush(DARK_MODE_BACKGROUND_COLOR)),
 	m_defaultFolderIconIndex(GetDefaultFolderIconIndex())
 {
 	Initialize(parent);
@@ -52,7 +53,7 @@ void AddressBar::Initialize(HWND parent)
 		HWND comboBox = reinterpret_cast<HWND>(SendMessage(m_hwnd, CBEM_GETCOMBOCONTROL, 0, 0));
 
 		darkModeHelper.AllowDarkModeForWindow(comboBox, true);
-		SetWindowTheme(comboBox, L"CFD", nullptr);
+		SetWindowTheme(comboBox, L"AddressComposited", nullptr);
 	}
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
@@ -109,7 +110,7 @@ std::optional<LRESULT> AddressBar::OnComboBoxExCtlColorEdit(HWND hwnd, HDC hdc)
 	SetBkMode(hdc, TRANSPARENT);
 	SetTextColor(hdc, DarkModeHelper::FOREGROUND_COLOR);
 
-	return reinterpret_cast<LRESULT>(darkModeHelper.GetBackgroundBrush());
+	return reinterpret_cast<LRESULT>(m_backgroundBrush.get());
 }
 
 LRESULT CALLBACK AddressBar::EditSubclassStub(HWND hwnd, UINT uMsg,

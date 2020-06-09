@@ -7,6 +7,7 @@
 #include "ShellBrowser/HistoryEntry.h"
 #include "../Helper/BaseWindow.h"
 #include "../Helper/WindowSubclassWrapper.h"
+#include <wil/resource.h>
 #include <optional>
 
 __interface IExplorerplusplus;
@@ -23,6 +24,9 @@ private:
 
 	static const UINT_PTR SUBCLASS_ID = 0;
 	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
+
+	// This is the same background color as used in the Explorer address bar.
+	static inline constexpr COLORREF DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
 
 	AddressBar(HWND parent, IExplorerplusplus *expp, MainToolbar *mainToolbar);
 	~AddressBar() = default;
@@ -49,6 +53,7 @@ private:
 
 	IExplorerplusplus *m_expp;
 	MainToolbar *m_mainToolbar;
+	wil::unique_hbrush m_backgroundBrush;
 
 	boost::signals2::scoped_connection m_historyEntryUpdatedConnection;
 	int m_defaultFolderIconIndex;
