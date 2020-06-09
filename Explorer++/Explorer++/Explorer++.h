@@ -120,6 +120,9 @@ private:
 	// shared between various components in the application.
 	static const int MAX_CACHED_ICONS = 1000;
 
+	// This is the same background color as used in the Explorer treeview.
+	static inline constexpr COLORREF TREE_VIEW_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
+
 	struct FileContextMenuInfo
 	{
 		UINT uFrom;

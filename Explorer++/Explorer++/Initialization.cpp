@@ -98,12 +98,6 @@ void Explorerplusplus::OnCreate()
 
 	m_uiTheming = std::make_unique<UiTheming>(this, m_tabContainer);
 
-	if (DarkModeHelper::GetInstance().IsDarkModeEnabled())
-	{
-		m_uiTheming->SetTreeViewColors(
-			DarkModeHelper::BACKGROUND_COLOR, DarkModeHelper::FOREGROUND_COLOR);
-	}
-
 	InitializePlugins();
 
 	SetTimer(m_hContainer, AUTOSAVE_TIMER_ID, AUTOSAVE_TIMEOUT, nullptr);
