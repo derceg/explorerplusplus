@@ -19,6 +19,7 @@ protected:
 
 private:
 	void OnInitDialogBase() override final;
+	int GetGripperControlId() override final;
 
 	INT_PTR OnCtlColorDlg(HWND hwnd, HDC hdc) override final;
 	INT_PTR OnCtlColorStatic(HWND hwnd, HDC hdc) override final;

@@ -82,11 +82,6 @@ void ManageBookmarksDialog::GetResizableControlInformation(
 	control.Type = ResizableDialog::TYPE_MOVE;
 	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	controlList.push_back(control);
-
-	control.iID = IDC_GRIPPER;
-	control.Type = ResizableDialog::TYPE_MOVE;
-	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
-	controlList.push_back(control);
 }
 
 wil::unique_hicon ManageBookmarksDialog::GetDialogIcon(int iconWidth, int iconHeight) const

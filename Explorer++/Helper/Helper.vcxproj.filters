@@ -142,6 +142,9 @@
     <ClCompile Include="HeaderHelper.cpp">
       <Filter>Control Support</Filter>
     </ClCompile>
+    <ClCompile Include="CustomGripper.cpp">
+      <Filter>Control Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
@@ -292,6 +295,9 @@
       <Filter>Data Exchange\Drag and Drop</Filter>
     </ClInclude>
     <ClInclude Include="HeaderHelper.h">
+      <Filter>Control Support</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomGripper.h">
       <Filter>Control Support</Filter>
     </ClInclude>
   </ItemGroup>

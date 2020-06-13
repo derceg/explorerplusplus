@@ -222,11 +222,6 @@ void AddBookmarkDialog::GetResizableControlInformation(
 	control.Type = ResizableDialog::TYPE_MOVE;
 	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(control);
-
-	control.iID = IDC_GRIPPER;
-	control.Type = ResizableDialog::TYPE_MOVE;
-	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
-	ControlList.push_back(control);
 }
 
 INT_PTR AddBookmarkDialog::OnCtlColorEditExtra(HWND hwnd, HDC hdc)

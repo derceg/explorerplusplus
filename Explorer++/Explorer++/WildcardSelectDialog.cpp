@@ -78,11 +78,6 @@ void WildcardSelectDialog::GetResizableControlInformation(
 	control.Type = ResizableDialog::TYPE_MOVE;
 	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	controlList.push_back(control);
-
-	control.iID = IDC_GRIPPER;
-	control.Type = ResizableDialog::TYPE_MOVE;
-	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
-	controlList.push_back(control);
 }
 
 INT_PTR WildcardSelectDialog::OnCommand(WPARAM wParam, LPARAM lParam)

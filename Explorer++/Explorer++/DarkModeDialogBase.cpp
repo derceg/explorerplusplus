@@ -30,7 +30,7 @@ void DarkModeDialogBase::OnInitDialogBase()
 	};
 	darkModeHelper.SetWindowCompositionAttribute(m_hDlg, &compositionData);
 
-	AllowDarkModeForControls({ IDC_GRIPPER, IDOK, IDCANCEL });
+	AllowDarkModeForControls({ IDOK, IDCANCEL });
 }
 
 void DarkModeDialogBase::AllowDarkModeForControls(const std::vector<int> controlIds)
@@ -147,4 +147,9 @@ INT_PTR DarkModeDialogBase::OnCtlColorListBoxExtra(HWND hwnd, HDC hdc)
 	UNREFERENCED_PARAMETER(hdc);
 
 	return FALSE;
+}
+
+int DarkModeDialogBase::GetGripperControlId()
+{
+	return IDC_GRIPPER;
 }

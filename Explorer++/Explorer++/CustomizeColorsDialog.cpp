@@ -134,11 +134,6 @@ void CustomizeColorsDialog::GetResizableControlInformation(BaseDialog::DialogSiz
 	control.Type = ResizableDialog::TYPE_MOVE;
 	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(control);
-
-	control.iID = IDC_GRIPPER;
-	control.Type = ResizableDialog::TYPE_MOVE;
-	control.Constraint = ResizableDialog::CONSTRAINT_NONE;
-	ControlList.push_back(control);
 }
 
 void CustomizeColorsDialog::InsertColorRuleIntoListView(HWND hListView,const NColorRuleHelper::ColorRule &colorRule,

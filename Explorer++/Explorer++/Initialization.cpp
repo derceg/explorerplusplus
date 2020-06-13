@@ -19,6 +19,7 @@
 #include "TaskbarThumbnails.h"
 #include "UiTheming.h"
 #include "ViewModeHelper.h"
+#include "../Helper/CustomGripper.h"
 #include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
@@ -97,6 +98,19 @@ void Explorerplusplus::OnCreate()
 	SetFocus(m_hActiveListView);
 
 	m_uiTheming = std::make_unique<UiTheming>(this, m_tabContainer);
+
+	COLORREF gripperBackgroundColor;
+
+	if (DarkModeHelper::GetInstance().IsDarkModeEnabled())
+	{
+		gripperBackgroundColor = DarkModeHelper::BACKGROUND_COLOR;
+	}
+	else
+	{
+		gripperBackgroundColor = GetSysColor(COLOR_WINDOW);
+	}
+
+	CustomGripper::Initialize(m_hContainer, gripperBackgroundColor);
 
 	InitializePlugins();
 

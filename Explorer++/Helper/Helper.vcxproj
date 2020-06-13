@@ -293,6 +293,7 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
     </ClCompile>
+    <ClCompile Include="CustomGripper.cpp" />
     <ClCompile Include="DataExchangeHelper.cpp" />
     <ClCompile Include="DialogSettings.cpp" />
     <ClCompile Include="DpiCompatibility.cpp" />
@@ -356,6 +357,7 @@
     <ClInclude Include="ComboBoxHelper.h" />
     <ClInclude Include="ContextMenuManager.h" />
     <ClInclude Include="Controls.h" />
+    <ClInclude Include="CustomGripper.h" />
     <ClInclude Include="DataExchangeHelper.h" />
     <ClInclude Include="DialogSettings.h" />
     <ClInclude Include="DpiCompatibility.h" />

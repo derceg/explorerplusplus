@@ -44,6 +44,7 @@ protected:
 	BaseDialog(HINSTANCE hInstance, int iResource, HWND hParent, bool bResizable);
 
 	virtual void OnInitDialogBase();
+	virtual int GetGripperControlId() = 0;
 
 	HINSTANCE GetInstance() const;
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const;
