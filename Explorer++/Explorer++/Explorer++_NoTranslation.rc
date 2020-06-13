@@ -396,6 +396,8 @@ IDB_MOVE_TO_24          PNG                     "res\\icons\\color\\24x24\\move-
 
 IDB_MOVE_TO_32          PNG                     "res\\icons\\color\\32x32\\move-to.png"
 
+IDB_MOVE_TO_48          PNG                     "res\\icons\\color\\48x48\\move-to.png"
+
 IDB_MASS_RENAME_16      PNG                     "res\\icons\\color\\16x16\\mass-rename.png"
 
 IDB_MASS_RENAME_24      PNG                     "res\\icons\\color\\24x24\\mass-rename.png"
@@ -689,6 +691,8 @@ IDB_MOVE_TO_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16
 IDB_MOVE_TO_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\move-to.png"
 
 IDB_MOVE_TO_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\move-to.png"
+
+IDB_MOVE_TO_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\move-to.png"
 
 IDB_MASS_RENAME_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\mass-rename.png"
 

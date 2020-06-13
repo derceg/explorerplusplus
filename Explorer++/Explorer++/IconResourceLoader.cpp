@@ -113,6 +113,7 @@ std::unique_ptr<Gdiplus::Bitmap> IconResourceLoader::LoadGdiplusBitmapFromPNGAnd
 	}
 
 	auto bitmap = ImageHelper::LoadGdiplusBitmapFromPNG(GetModuleHandle(nullptr), match->second);
+	assert(bitmap);
 
 	// If the icon size matches exactly, it doesn't need to be scaled, so can be
 	// returned immediately.
