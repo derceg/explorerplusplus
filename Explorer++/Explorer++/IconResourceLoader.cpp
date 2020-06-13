@@ -124,6 +124,8 @@ std::unique_ptr<Gdiplus::Bitmap> IconResourceLoader::LoadGdiplusBitmapFromPNGAnd
 	}
 
 	auto scaledBitmap = std::make_unique<Gdiplus::Bitmap>(iconWidth, iconHeight);
+	scaledBitmap->SetResolution(bitmap->GetHorizontalResolution(), bitmap->GetVerticalResolution());
+
 	Gdiplus::Graphics graphics(scaledBitmap.get());
 
 	float scalingFactorX = static_cast<float>(iconWidth) / static_cast<float>(match->first);
