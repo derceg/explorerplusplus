@@ -56,7 +56,7 @@ IndentPPDirectives: BeforeHash
 IndentWrappedFunctionNames: true
 KeepEmptyLinesAtTheStartOfBlocks: false
 MaxEmptyLinesToKeep: 1
-NamespaceIndentation: None
+NamespaceIndentation: All
 PointerAlignment: Right
 ReflowComments: true
 SortIncludes: true
