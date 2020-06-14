@@ -165,13 +165,7 @@ INT_PTR SearchDialog::OnInitDialog()
 	SetFocus(GetDlgItem(m_hDlg, IDC_COMBO_NAME));
 
 	AllowDarkModeForControls({ IDC_BUTTON_DIRECTORY, IDSEARCH, IDEXIT });
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		darkModeHelper.SetListViewDarkModeColors(hListView);
-	}
+	AllowDarkModeForListView(IDC_LISTVIEW_SEARCHRESULTS);
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 

@@ -113,13 +113,7 @@ INT_PTR MassRenameDialog::OnInitDialog()
 	SetFocus(GetDlgItem(m_hDlg, IDC_MASSRENAME_EDIT));
 
 	AllowDarkModeForControls({ IDC_MASSRENAME_MORE });
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		darkModeHelper.SetListViewDarkModeColors(hListView);
-	}
+	AllowDarkModeForListView(IDC_MASSRENAME_FILELISTVIEW);
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 

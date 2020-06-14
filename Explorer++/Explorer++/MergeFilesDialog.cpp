@@ -190,13 +190,7 @@ INT_PTR MergeFilesDialog::OnInitDialog()
 
 	AllowDarkModeForControls(
 		{ IDC_MERGE_BUTTON_MOVEUP, IDC_MERGE_BUTTON_MOVEDOWN, IDC_MERGE_BUTTON_OUTPUT });
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		darkModeHelper.SetListViewDarkModeColors(hListView);
-	}
+	AllowDarkModeForListView(IDC_MERGE_LISTVIEW);
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 

@@ -70,13 +70,7 @@ INT_PTR CustomizeColorsDialog::OnInitDialog()
 
 	AllowDarkModeForControls({ IDC_BUTTON_NEW, IDC_BUTTON_EDIT, IDC_BUTTON_MOVEUP,
 		IDC_BUTTON_MOVEDOWN, IDC_BUTTON_DELETE });
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		darkModeHelper.SetListViewDarkModeColors(hListView);
-	}
+	AllowDarkModeForListView(IDC_LISTVIEW_COLORRULES);
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg,true);
 

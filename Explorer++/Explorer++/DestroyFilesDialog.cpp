@@ -122,12 +122,7 @@ INT_PTR DestroyFilesDialog::OnInitDialog()
 		break;
 	}
 
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		darkModeHelper.SetListViewDarkModeColors(hListView);
-	}
+	AllowDarkModeForListView(IDC_DESTROYFILES_LISTVIEW);
 
 	m_pdfdps->RestoreDialogPosition(m_hDlg, true);
 

@@ -51,6 +51,62 @@ void DarkModeDialogBase::AllowDarkModeForControls(const std::vector<int> control
 	}
 }
 
+void DarkModeDialogBase::AllowDarkModeForListView(int controlId)
+{
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (!darkModeHelper.IsDarkModeEnabled())
+	{
+		return;
+	}
+
+	if (HWND control = GetDlgItem(m_hDlg, controlId))
+	{
+		darkModeHelper.SetListViewDarkModeColors(control);
+
+		m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(control,
+			std::bind(&DarkModeDialogBase::ListViewWndProc, this, std::placeholders::_1,
+				std::placeholders::_2, std::placeholders::_3, std::placeholders::_4),
+			0));
+	}
+}
+
+LRESULT CALLBACK DarkModeDialogBase::ListViewWndProc(
+	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_NOTIFY:
+		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == ListView_GetHeader(hwnd))
+		{
+			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
+			{
+			case NM_CUSTOMDRAW:
+			{
+				if (DarkModeHelper::GetInstance().IsDarkModeEnabled())
+				{
+					auto *customDraw = reinterpret_cast<NMCUSTOMDRAW *>(lParam);
+
+					switch (customDraw->dwDrawStage)
+					{
+					case CDDS_PREPAINT:
+						return CDRF_NOTIFYITEMDRAW;
+
+					case CDDS_ITEMPREPAINT:
+						SetTextColor(customDraw->hdc, DarkModeHelper::FOREGROUND_COLOR);
+						return CDRF_NEWFONT;
+					}
+				}
+			}
+			break;
+			}
+		}
+		break;
+	}
+
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
 INT_PTR DarkModeDialogBase::OnCtlColorDlg(HWND hwnd, HDC hdc)
 {
 	UNREFERENCED_PARAMETER(hwnd);
