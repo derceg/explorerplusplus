@@ -46,7 +46,7 @@ BOOL FileActionHandler::RenameFiles(const RenamedItems_t &itemList)
 	if(!renamedItems.empty())
 	{
 		UndoItem_t undoItem;
-		undoItem.Type = FILE_ACTION_RENAMED;
+		undoItem.type = UndoType::Renamed;
 		undoItem.renamedItems = renamedItems;	
 		m_stackFileActions.push(undoItem);
 
@@ -64,7 +64,7 @@ HRESULT FileActionHandler::DeleteFiles(HWND hwnd, DeletedItems_t &deletedItems,
 	if(SUCCEEDED(hr))
 	{
 		UndoItem_t undoItem;
-		undoItem.Type = FILE_ACTION_DELETED;
+		undoItem.type = UndoType::Deleted;
 		undoItem.deletedItems = deletedItems;
 		m_stackFileActions.push(undoItem);
 	}
@@ -78,19 +78,19 @@ void FileActionHandler::Undo()
 	{
 		UndoItem_t &undoItem = m_stackFileActions.top();
 
-		switch(undoItem.Type)
+		switch(undoItem.type)
 		{
-		case FILE_ACTION_RENAMED:
+		case UndoType::Renamed:
 			UndoRenameOperation(undoItem.renamedItems);
 			break;
 
-		case FILE_ACTION_COPIED:
+		case UndoType::Copied:
 			break;
 
-		case FILE_ACTION_MOVED:
+		case UndoType::Moved:
 			break;
 
-		case FILE_ACTION_DELETED:
+		case UndoType::Deleted:
 			UndoDeleteOperation(undoItem.deletedItems);
 			break;
 		}

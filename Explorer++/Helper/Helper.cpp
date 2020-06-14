@@ -9,15 +9,15 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-enum VersionSubBlockType_t
+enum class VersionSubBlockType
 {
-	ROOT,
-	TRANSLATION,
-	STRING_TABLE_VALUE
+	Root,
+	Translation,
+	StringTableValue
 };
 
 void EnterAttributeIntoString(BOOL bEnter, TCHAR *string, int pos, TCHAR chAttribute);
-BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType_t subBlockType,
+BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType subBlockType,
 	WORD *pwLanguage, DWORD *pdwProductVersionLS, DWORD *pdwProductVersionMS,
 	const TCHAR *szVersionInfo, TCHAR *szVersionBuffer, UINT cchMax);
 BOOL GetStringTableValue(void *pBlock, LangAndCodePage *plcp, UINT nItems,
@@ -501,25 +501,25 @@ BOOL IsImage(const TCHAR *szFileName)
 BOOL GetFileProductVersion(const TCHAR *szFullFileName,
 	DWORD *pdwProductVersionLS, DWORD *pdwProductVersionMS)
 {
-	return GetFileVersionValue(szFullFileName, ROOT, NULL,
+	return GetFileVersionValue(szFullFileName, VersionSubBlockType::Root, NULL,
 		pdwProductVersionLS, pdwProductVersionMS,
 		NULL, NULL, 0);
 }
 
 BOOL GetFileLanguage(const TCHAR *szFullFileName, WORD *pwLanguage)
 {
-	return GetFileVersionValue(szFullFileName, TRANSLATION,
+	return GetFileVersionValue(szFullFileName, VersionSubBlockType::Translation,
 		pwLanguage, NULL, NULL, NULL, NULL, 0);
 }
 
 BOOL GetVersionInfoString(const TCHAR *szFullFileName, const TCHAR *szVersionInfo,
 	TCHAR *szVersionBuffer, UINT cchMax)
 {
-	return GetFileVersionValue(szFullFileName, STRING_TABLE_VALUE,
+	return GetFileVersionValue(szFullFileName, VersionSubBlockType::StringTableValue,
 		NULL, NULL, NULL, szVersionInfo, szVersionBuffer, cchMax);
 }
 
-BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType_t subBlockType,
+BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType subBlockType,
 	WORD *pwLanguage, DWORD *pdwProductVersionLS, DWORD *pdwProductVersionMS,
 	const TCHAR *szVersionInfo, TCHAR *szVersionBuffer, UINT cchMax)
 {
@@ -543,14 +543,14 @@ BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType_t subB
 				LangAndCodePage *plcp = NULL;
 				VS_FIXEDFILEINFO *pvsffi = NULL;
 
-				if(subBlockType == ROOT)
+				if(subBlockType == VersionSubBlockType::Root)
 				{
 					StringCchCopy(szSubBlock, SIZEOF_ARRAY(szSubBlock), _T("\\"));
 					pBuffer = reinterpret_cast<LPVOID *>(&pvsffi);
 					uStructureSize = sizeof(VS_FIXEDFILEINFO);
 				}
-				else if(subBlockType == TRANSLATION ||
-					subBlockType == STRING_TABLE_VALUE)
+				else if(subBlockType == VersionSubBlockType::Translation ||
+					subBlockType == VersionSubBlockType::StringTableValue)
 				{
 					StringCchCopy(szSubBlock, SIZEOF_ARRAY(szSubBlock), _T("\\VarFileInfo\\Translation"));
 					pBuffer = reinterpret_cast<LPVOID *>(&plcp);
@@ -564,16 +564,16 @@ BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType_t subB
 				{
 					bSuccess = TRUE;
 
-					if(subBlockType == ROOT)
+					if(subBlockType == VersionSubBlockType::Root)
 					{
 						*pdwProductVersionLS = pvsffi->dwProductVersionLS;
 						*pdwProductVersionMS = pvsffi->dwProductVersionMS;
 					}
-					else if(subBlockType == TRANSLATION)
+					else if(subBlockType == VersionSubBlockType::Translation)
 					{
 						*pwLanguage = plcp[0].wLanguage;
 					}
-					else if(subBlockType == STRING_TABLE_VALUE)
+					else if(subBlockType == VersionSubBlockType::StringTableValue)
 					{
 						bSuccess = GetStringTableValue(pBlock, plcp, uLen / sizeof(LangAndCodePage),
 							szVersionInfo, szVersionBuffer, cchMax);

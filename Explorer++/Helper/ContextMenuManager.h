@@ -12,15 +12,15 @@
 class ContextMenuManager
 {
 public:
-	enum ContextMenuType_t
+	enum class ContextMenuType
 	{
-		CONTEXT_MENU_TYPE_BACKGROUND,
-		CONTEXT_MENU_TYPE_DRAG_AND_DROP
+		Background,
+		DragAndDrop
 	};
 
 	/* Loads the context menu handlers bound to
 	a specific registry key. */
-	ContextMenuManager(ContextMenuType_t contextMenuType, PCIDLIST_ABSOLUTE pidlDirectory,
+	ContextMenuManager(ContextMenuType contextMenuType, PCIDLIST_ABSOLUTE pidlDirectory,
 		IDataObject *pDataObject, IUnknown *pUnkSite,
 		const std::vector<std::wstring> &blacklistedCLSIDEntries);
 
@@ -35,11 +35,11 @@ public:
 		const POINT &pt, StatusBar &statusBar);
 
 private:
-	enum ItemType_t
+	enum class ItemType
 	{
-		ITEM_TYPE_FOLDER,
-		ITEM_TYPE_DIRECTORY,
-		ITEM_TYPE_FILE
+		Folder,
+		Directory,
+		File
 	};
 
 	struct MenuHandler_t
@@ -76,7 +76,7 @@ private:
 	static int GetMenuItemPos(HMENU hMenu, UINT uID);
 	static void RemoveDuplicateSeperators(HMENU hMenu);
 
-	static ItemType_t GetItemType(PCIDLIST_ABSOLUTE pidl);
+	static ItemType GetItemType(PCIDLIST_ABSOLUTE pidl);
 
 	std::list<ContextMenuHandler_t> m_ContextMenuHandlers;
 	std::list<MenuHandler_t> m_MenuHandlers;

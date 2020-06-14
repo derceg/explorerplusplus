@@ -29,17 +29,17 @@ public:
 
 private:
 
-	enum UndoType_t
+	enum class UndoType
 	{
-		FILE_ACTION_RENAMED,
-		FILE_ACTION_COPIED,
-		FILE_ACTION_MOVED,
-		FILE_ACTION_DELETED
+		Renamed,
+		Copied,
+		Moved,
+		Deleted
 	};
 
 	struct UndoItem_t
 	{
-		UndoType_t	Type;
+		UndoType	type;
 
 		RenamedItems_t renamedItems;
 		DeletedItems_t deletedItems;

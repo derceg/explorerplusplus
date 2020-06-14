@@ -92,14 +92,14 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 				reinterpret_cast<HMENU>(static_cast<INT_PTR>(GetGripperControlId())),
 				GetModuleHandle(nullptr), nullptr);
 
-			m_dsc = DIALOG_SIZE_CONSTRAINT_NONE;
+			m_dsc = DialogSizeConstraint::None;
 
 			std::list<ResizableDialog::Control_t> controlList;
 
 			ResizableDialog::Control_t control;
 			control.iID = GetGripperControlId();
-			control.Type = ResizableDialog::TYPE_MOVE;
-			control.Constraint = ResizableDialog::CONSTRAINT_NONE;
+			control.Type = ResizableDialog::ControlType::Move;
+			control.Constraint = ResizableDialog::ControlConstraint::None;
 			controlList.push_back(control);
 
 			GetResizableControlInformation(m_dsc, controlList);
@@ -131,12 +131,12 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 			pmmi->ptMinTrackSize.x = m_iMinWidth;
 			pmmi->ptMinTrackSize.y = m_iMinHeight;
 
-			if (m_dsc == DIALOG_SIZE_CONSTRAINT_X)
+			if (m_dsc == DialogSizeConstraint::X)
 			{
 				pmmi->ptMaxTrackSize.y = m_iMinHeight;
 			}
 
-			if (m_dsc == DIALOG_SIZE_CONSTRAINT_Y)
+			if (m_dsc == DialogSizeConstraint::Y)
 			{
 				pmmi->ptMaxTrackSize.x = m_iMinWidth;
 			}

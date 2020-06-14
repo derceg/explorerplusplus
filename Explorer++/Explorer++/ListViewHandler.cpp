@@ -612,7 +612,7 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 	}
 
 	ServiceProvider serviceProvider(this);
-	ContextMenuManager cmm(ContextMenuManager::CONTEXT_MENU_TYPE_BACKGROUND, pidlDirectory.get(),
+	ContextMenuManager cmm(ContextMenuManager::ContextMenuType::Background, pidlDirectory.get(),
 		pDataObject.get(), &serviceProvider, BLACKLISTED_BACKGROUND_MENU_CLSID_ENTRIES);
 
 	cmm.ShowMenu(m_hContainer, menu, IDM_FILE_COPYFOLDERPATH, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID,

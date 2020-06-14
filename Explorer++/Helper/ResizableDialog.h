@@ -17,17 +17,17 @@ resize/move horizontally, but not vertically. */
 class ResizableDialog
 {
 public:
-	enum ControlType
+	enum class ControlType
 	{
-		TYPE_MOVE,
-		TYPE_RESIZE
+		Move,
+		Resize
 	};
 
-	enum ControlConstraint
+	enum class ControlConstraint
 	{
-		CONSTRAINT_NONE,
-		CONSTRAINT_X,
-		CONSTRAINT_Y
+		None,
+		X,
+		Y
 	};
 
 	struct Control_t

@@ -28,29 +28,29 @@ extensions on an existing menu:
 2. Build and show menu.
 3. Pass selection to shell extension (if necessary).
 4. Release shell extensions (also free the DLL's they reside in). */
-ContextMenuManager::ContextMenuManager(ContextMenuType_t contextMenuType,
+ContextMenuManager::ContextMenuManager(ContextMenuType contextMenuType,
 	PCIDLIST_ABSOLUTE pidlDirectory, IDataObject *pDataObject, IUnknown *pUnkSite,
 	const std::vector<std::wstring> &blacklistedCLSIDEntries)
 {
-	ItemType_t itemType = GetItemType(pidlDirectory);
+	ItemType itemType = GetItemType(pidlDirectory);
 
 	const TCHAR *pszRegContext = NULL;
 
 	switch (itemType)
 	{
-	case ITEM_TYPE_FOLDER:
-		if (contextMenuType == CONTEXT_MENU_TYPE_DRAG_AND_DROP)
+	case ItemType::Folder:
+		if (contextMenuType == ContextMenuType::DragAndDrop)
 		{
 			pszRegContext = CMH_FOLDER_DRAG_AND_DROP;
 		}
 		break;
 
-	case ITEM_TYPE_DIRECTORY:
-		if (contextMenuType == CONTEXT_MENU_TYPE_BACKGROUND)
+	case ItemType::Directory:
+		if (contextMenuType == ContextMenuType::Background)
 		{
 			pszRegContext = CMH_DIRECTORY_BACKGROUND;
 		}
-		else if (contextMenuType == CONTEXT_MENU_TYPE_DRAG_AND_DROP)
+		else if (contextMenuType == ContextMenuType::DragAndDrop)
 		{
 			pszRegContext = CMH_DIRECTORY_DRAG_AND_DROP;
 		}
@@ -456,21 +456,21 @@ void ContextMenuManager::InvokeMenuEntry(HWND hwnd, UINT uCmd)
 	}
 }
 
-ContextMenuManager::ItemType_t ContextMenuManager::GetItemType(PCIDLIST_ABSOLUTE pidl)
+ContextMenuManager::ItemType ContextMenuManager::GetItemType(PCIDLIST_ABSOLUTE pidl)
 {
 	SFGAOF attributes = SFGAO_FOLDER | SFGAO_FILESYSTEM;
 	GetItemAttributes(pidl, &attributes);
 
 	if ((attributes & SFGAO_FOLDER) && (attributes & SFGAO_FILESYSTEM))
 	{
-		return ITEM_TYPE_DIRECTORY;
+		return ItemType::Directory;
 	}
 	else if ((attributes & SFGAO_FOLDER) && !(attributes & SFGAO_FILESYSTEM))
 	{
-		return ITEM_TYPE_FOLDER;
+		return ItemType::Folder;
 	}
 	else
 	{
-		return ITEM_TYPE_FILE;
+		return ItemType::File;
 	}
 }

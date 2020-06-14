@@ -25,11 +25,11 @@ class BaseDialog : public MessageForwarder
 	friend INT_PTR CALLBACK BaseDialogProcStub(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 public:
-	enum DialogSizeConstraint
+	enum class DialogSizeConstraint
 	{
-		DIALOG_SIZE_CONSTRAINT_NONE,
-		DIALOG_SIZE_CONSTRAINT_X,
-		DIALOG_SIZE_CONSTRAINT_Y
+		None,
+		X,
+		Y
 	};
 
 	static const int RETURN_CANCEL = 0;
