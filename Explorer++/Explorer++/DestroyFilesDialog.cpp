@@ -123,6 +123,8 @@ INT_PTR DestroyFilesDialog::OnInitDialog()
 	}
 
 	AllowDarkModeForListView(IDC_DESTROYFILES_LISTVIEW);
+	AllowDarkModeForRadioButtons(
+		{ IDC_DESTROYFILES_RADIO_ONEPASS, IDC_DESTROYFILES_RADIO_THREEPASS });
 
 	m_pdfdps->RestoreDialogPosition(m_hDlg, true);
 

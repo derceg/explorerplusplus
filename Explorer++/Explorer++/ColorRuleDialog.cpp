@@ -84,6 +84,9 @@ INT_PTR ColorRuleDialog::OnInitDialog()
 	SetFocus(GetDlgItem(m_hDlg,IDC_EDIT_DESCRIPTION));
 
 	AllowDarkModeForControls({ IDC_BUTTON_CHANGECOLOR });
+	AllowDarkModeForCheckboxes(
+		{ IDC_CHECK_CASE_INSENSITIVE, IDC_CHECK_COMPRESSED, IDC_CHECK_ENCRYPTED, IDC_CHECK_ARCHIVE,
+			IDC_CHECK_HIDDEN, IDC_CHECK_INDEXED, IDC_CHECK_READONLY, IDC_CHECK_SYSTEM });
 
 	m_pcrdps->RestoreDialogPosition(m_hDlg,false);
 

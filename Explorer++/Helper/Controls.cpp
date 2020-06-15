@@ -4,9 +4,18 @@
 
 #include "stdafx.h"
 #include "Controls.h"
-#include "WindowHelper.h"
+#include "DpiCompatibility.h"
 #include "Macros.h"
+#include "WindowHelper.h"
+#include <VSStyle.h>
+#include <uxtheme.h>
+#include <wil/resource.h>
 
+constexpr int DEFAULT_CHECKBOX_WIDTH = 13;
+constexpr int DEFAULT_CHECKBOX_HEIGHT = 13;
+
+constexpr int DEFAULT_RADIO_BUTTON_WIDTH = 13;
+constexpr int DEFAULT_RADIO_BUTTON_HEIGHT = 13;
 
 HWND CreateListView(HWND hParent, DWORD dwStyle)
 {
@@ -268,4 +277,43 @@ void UpdateToolbarBandSizing(HWND hRebar, HWND hToolbar)
 		rbbi.cxIdeal = sz.cx;
 		SendMessage(hRebar, RB_SETBANDINFO, iBand, reinterpret_cast<LPARAM>(&rbbi));
 	}
+}
+
+SIZE GetCheckboxSize(HWND hwnd)
+{
+	return GetButtonSize(
+		hwnd, BP_CHECKBOX, CBS_UNCHECKEDNORMAL, DEFAULT_CHECKBOX_WIDTH, DEFAULT_CHECKBOX_HEIGHT);
+}
+
+SIZE GetRadioButtonSize(HWND hwnd)
+{
+	return GetButtonSize(hwnd, BP_RADIOBUTTON, RBS_UNCHECKEDNORMAL, DEFAULT_RADIO_BUTTON_WIDTH,
+		DEFAULT_RADIO_BUTTON_HEIGHT);
+}
+
+SIZE GetButtonSize(HWND hwnd, int partId, int stateId, int defaultWidth, int defaultHeight)
+{
+	if (IsAppThemed())
+	{
+		wil::unique_htheme theme(OpenThemeData(hwnd, L"BUTTON"));
+
+		if (theme)
+		{
+			wil::unique_hdc screenDC(GetDC(nullptr));
+
+			SIZE size;
+			HRESULT hr = GetThemePartSize(
+				theme.get(), screenDC.get(), partId, stateId, nullptr, TS_DRAW, &size);
+
+			if (SUCCEEDED(hr))
+			{
+				return size;
+			}
+		}
+	}
+
+	DpiCompatibility dpiCompat;
+	UINT dpi = dpiCompat.GetDpiForWindow(hwnd);
+	return { MulDiv(defaultWidth, dpi, USER_DEFAULT_SCREEN_DPI),
+		MulDiv(defaultHeight, dpi, USER_DEFAULT_SCREEN_DPI) };
 }

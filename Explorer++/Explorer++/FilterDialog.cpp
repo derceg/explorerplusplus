@@ -48,6 +48,8 @@ INT_PTR FilterDialog::OnInitDialog()
 		CheckDlgButton(m_hDlg, IDC_FILTERS_CASESENSITIVE, BST_CHECKED);
 	}
 
+	AllowDarkModeForCheckboxes({ IDC_FILTERS_CASESENSITIVE });
+
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 
 	return 0;

@@ -39,6 +39,8 @@ INT_PTR RenameTabDialog::OnInitDialog()
 	SendMessage(hEditName, EM_SETSEL, 0, -1);
 	SetFocus(hEditName);
 
+	AllowDarkModeForRadioButtons({ IDC_RENAMETAB_USEFOLDERNAME, IDC_RENAMETAB_USECUSTOMNAME });
+
 	m_prtdps->RestoreDialogPosition(m_hDlg, false);
 
 	return 0;

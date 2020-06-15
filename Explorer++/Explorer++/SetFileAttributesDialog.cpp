@@ -82,6 +82,8 @@ INT_PTR SetFileAttributesDialog::OnInitDialog()
 
 	AllowDarkModeForControls(
 		{ IDC_MODIFICATION_RESET, IDC_CREATION_RESET, IDC_ACCESS_RESET });
+	AllowDarkModeForCheckboxes({ IDC_CHECK_ARCHIVE, IDC_CHECK_HIDDEN, IDC_CHECK_INDEXED,
+		IDC_CHECK_READONLY, IDC_CHECK_SYSTEM });
 
 	m_psfadps->RestoreDialogPosition(m_hDlg, false);
 

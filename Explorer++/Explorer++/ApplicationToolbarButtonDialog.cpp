@@ -42,6 +42,7 @@ INT_PTR ApplicationToolbarButtonDialog::OnInitDialog()
 	SetFocus(hEditName);
 
 	AllowDarkModeForControls({ IDC_APP_BUTTON_CHOOSE_FILE });
+	AllowDarkModeForCheckboxes({ IDC_CHECK_SHOWAPPNAME });
 
 	return 0;
 }

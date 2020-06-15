@@ -6,6 +6,7 @@
 #include "DarkModeDialogBase.h"
 #include "DarkModeHelper.h"
 #include "MainResource.h"
+#include "../Helper/Controls.h"
 
 DarkModeDialogBase::DarkModeDialogBase(
 	HINSTANCE hInstance, int iResource, HWND hParent, bool bResizable) :
@@ -31,6 +32,98 @@ void DarkModeDialogBase::OnInitDialogBase()
 	darkModeHelper.SetWindowCompositionAttribute(m_hDlg, &compositionData);
 
 	AllowDarkModeForControls({ IDOK, IDCANCEL });
+
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hDlg,
+		std::bind(&DarkModeDialogBase::DialogWndProc, this, std::placeholders::_1,
+			std::placeholders::_2, std::placeholders::_3, std::placeholders::_4),
+		0));
+}
+
+LRESULT CALLBACK DarkModeDialogBase::DialogWndProc(
+	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_NOTIFY:
+		switch (reinterpret_cast<LPNMHDR>(lParam)->code)
+		{
+		case NM_CUSTOMDRAW:
+			return OnCustomDraw(reinterpret_cast<NMCUSTOMDRAW *>(lParam));
+		}
+		break;
+	}
+
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+LRESULT DarkModeDialogBase::OnCustomDraw(const NMCUSTOMDRAW *customDraw)
+{
+	bool isStoredCheckbox =
+		(m_checkboxControlIds.count(static_cast<int>(customDraw->hdr.idFrom)) == 1);
+	bool isStoredRadioButton =
+		(m_radioButtonControlIds.count(static_cast<int>(customDraw->hdr.idFrom)) == 1);
+
+	if (!isStoredCheckbox && !isStoredRadioButton)
+	{
+		return CDRF_DODEFAULT;
+	}
+
+	switch (customDraw->dwDrawStage)
+	{
+	case CDDS_PREPAINT:
+		OnDrawButtonText(customDraw, isStoredCheckbox ? ButtonType::Checkbox : ButtonType::Radio);
+		return CDRF_SKIPDEFAULT;
+	}
+
+	return CDRF_DODEFAULT;
+}
+
+void DarkModeDialogBase::OnDrawButtonText(const NMCUSTOMDRAW *customDraw, ButtonType buttonType)
+{
+	// The size of the interactive element of the control (i.e. the check box or radio button
+	// part).
+	SIZE elementSize;
+
+	if (buttonType == ButtonType::Checkbox)
+	{
+		elementSize = GetCheckboxSize(m_hDlg);
+	}
+	else
+	{
+		elementSize = GetRadioButtonSize(m_hDlg);
+	}
+
+	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
+
+	RECT textRect = customDraw->rc;
+	textRect.left +=
+		elementSize.cx + MulDiv(CHECKBOX_TEXT_SPACING_96DPI, dpi, USER_DEFAULT_SCREEN_DPI);
+
+	int textLength = GetWindowTextLength(customDraw->hdr.hwndFrom);
+	assert(textLength != 0);
+
+	std::wstring text;
+	text.resize(textLength + 1);
+
+	GetWindowText(customDraw->hdr.hwndFrom, text.data(), static_cast<int>(text.capacity()));
+
+	SetTextColor(customDraw->hdc, DarkModeHelper::FOREGROUND_COLOR);
+
+	UINT textFormat = DT_LEFT | DT_SINGLELINE | DT_VCENTER;
+
+	if (!WI_IsFlagSet(customDraw->uItemState, CDIS_SHOWKEYBOARDCUES))
+	{
+		WI_SetFlag(textFormat, DT_HIDEPREFIX);
+	}
+
+	DrawText(customDraw->hdc, text.c_str(), static_cast<int>(text.size()), &textRect, textFormat);
+
+	if (WI_IsFlagSet(customDraw->uItemState, CDIS_FOCUS))
+	{
+		DrawFocusRect(customDraw->hdc, &textRect);
+	}
+
+	// TODO: May also need to handle CDIS_DISABLED and CDIS_GRAYED.
 }
 
 void DarkModeDialogBase::AllowDarkModeForControls(const std::vector<int> controlIds)
@@ -105,6 +198,30 @@ LRESULT CALLBACK DarkModeDialogBase::ListViewWndProc(
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+void DarkModeDialogBase::AllowDarkModeForCheckboxes(const std::vector<int> controlIds)
+{
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (!darkModeHelper.IsDarkModeEnabled())
+	{
+		return;
+	}
+
+	m_checkboxControlIds = std::unordered_set(controlIds.begin(), controlIds.end());
+}
+
+void DarkModeDialogBase::AllowDarkModeForRadioButtons(const std::vector<int> controlIds)
+{
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (!darkModeHelper.IsDarkModeEnabled())
+	{
+		return;
+	}
+
+	m_radioButtonControlIds = std::unordered_set(controlIds.begin(), controlIds.end());
 }
 
 INT_PTR DarkModeDialogBase::OnCtlColorDlg(HWND hwnd, HDC hdc)
