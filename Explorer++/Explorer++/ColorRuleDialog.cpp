@@ -46,28 +46,44 @@ INT_PTR ColorRuleDialog::OnInitDialog()
 		m_cfCurrentColor = m_pColorRule->rgbColour;
 
 		if (m_pColorRule->caseInsensitive)
+		{
 			CheckDlgButton(m_hDlg, IDC_CHECK_CASE_INSENSITIVE, BST_CHECKED);
+		}
 
 		if (m_pColorRule->dwFilterAttributes & FILE_ATTRIBUTE_COMPRESSED)
+		{
 			CheckDlgButton(m_hDlg, IDC_CHECK_COMPRESSED, BST_CHECKED);
+		}
 
 		if (m_pColorRule->dwFilterAttributes & FILE_ATTRIBUTE_ENCRYPTED)
+		{
 			CheckDlgButton(m_hDlg, IDC_CHECK_ENCRYPTED, BST_CHECKED);
+		}
 
 		if (m_pColorRule->dwFilterAttributes & FILE_ATTRIBUTE_ARCHIVE)
+		{
 			CheckDlgButton(m_hDlg, IDC_CHECK_ARCHIVE, BST_CHECKED);
+		}
 
 		if (m_pColorRule->dwFilterAttributes & FILE_ATTRIBUTE_HIDDEN)
+		{
 			CheckDlgButton(m_hDlg, IDC_CHECK_HIDDEN, BST_CHECKED);
+		}
 
 		if (m_pColorRule->dwFilterAttributes & FILE_ATTRIBUTE_NOT_CONTENT_INDEXED)
+		{
 			CheckDlgButton(m_hDlg, IDC_CHECK_INDEXED, BST_CHECKED);
+		}
 
 		if (m_pColorRule->dwFilterAttributes & FILE_ATTRIBUTE_READONLY)
+		{
 			CheckDlgButton(m_hDlg, IDC_CHECK_READONLY, BST_CHECKED);
+		}
 
 		if (m_pColorRule->dwFilterAttributes & FILE_ATTRIBUTE_SYSTEM)
+		{
 			CheckDlgButton(m_hDlg, IDC_CHECK_SYSTEM, BST_CHECKED);
+		}
 
 		std::wstring editText = ResourceHelper::LoadString(GetInstance(), IDS_EDITCOLORRULE);
 		SetWindowText(m_hDlg, editText.c_str());
@@ -142,22 +158,34 @@ void ColorRuleDialog::OnOk()
 	m_pColorRule->dwFilterAttributes = 0;
 
 	if (IsDlgButtonChecked(m_hDlg, IDC_CHECK_COMPRESSED) == BST_CHECKED)
+	{
 		m_pColorRule->dwFilterAttributes |= FILE_ATTRIBUTE_COMPRESSED;
+	}
 
 	if (IsDlgButtonChecked(m_hDlg, IDC_CHECK_ENCRYPTED) == BST_CHECKED)
+	{
 		m_pColorRule->dwFilterAttributes |= FILE_ATTRIBUTE_ENCRYPTED;
+	}
 
 	if (IsDlgButtonChecked(m_hDlg, IDC_CHECK_ARCHIVE) == BST_CHECKED)
+	{
 		m_pColorRule->dwFilterAttributes |= FILE_ATTRIBUTE_ARCHIVE;
+	}
 
 	if (IsDlgButtonChecked(m_hDlg, IDC_CHECK_HIDDEN) == BST_CHECKED)
+	{
 		m_pColorRule->dwFilterAttributes |= FILE_ATTRIBUTE_HIDDEN;
+	}
 
 	if (IsDlgButtonChecked(m_hDlg, IDC_CHECK_READONLY) == BST_CHECKED)
+	{
 		m_pColorRule->dwFilterAttributes |= FILE_ATTRIBUTE_READONLY;
+	}
 
 	if (IsDlgButtonChecked(m_hDlg, IDC_CHECK_SYSTEM) == BST_CHECKED)
+	{
 		m_pColorRule->dwFilterAttributes |= FILE_ATTRIBUTE_SYSTEM;
+	}
 
 	EndDialog(m_hDlg, 1);
 }
@@ -198,7 +226,9 @@ void ColorRuleDialog::OnChangeColor()
 		regardless of whether the item is actually created or
 		not. */
 		if (!m_bEdit)
+		{
 			m_pcrdps->m_cfInitialColor = cc.rgbResult;
+		}
 
 		InvalidateRect(GetDlgItem(m_hDlg, IDC_STATIC_COLOR), nullptr, TRUE);
 	}
@@ -326,21 +356,33 @@ void ColorRuleDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName, BSTR
 		BYTE c = static_cast<BYTE>(NXMLSettings::DecodeIntValue(bstrValue));
 
 		if (CheckWildcardMatch(_T("r*"), bstrName, TRUE))
+		{
 			m_cfCustomColors[iIndex] = RGB(c, GetGValue(clr), GetBValue(clr));
+		}
 		else if (CheckWildcardMatch(_T("g*"), bstrName, TRUE))
+		{
 			m_cfCustomColors[iIndex] = RGB(GetRValue(clr), c, GetBValue(clr));
+		}
 		else if (CheckWildcardMatch(_T("b*"), bstrName, TRUE))
+		{
 			m_cfCustomColors[iIndex] = RGB(GetRValue(clr), GetGValue(clr), c);
+		}
 	}
 	else
 	{
 		BYTE c = static_cast<BYTE>(NXMLSettings::DecodeIntValue(bstrValue));
 
 		if (lstrcmpi(_T("InitialColor_r"), bstrName) == 0)
+		{
 			m_cfInitialColor = RGB(c, GetGValue(m_cfInitialColor), GetBValue(m_cfInitialColor));
+		}
 		else if (lstrcmpi(_T("InitialColor_g"), bstrName) == 0)
+		{
 			m_cfInitialColor = RGB(GetRValue(m_cfInitialColor), c, GetBValue(m_cfInitialColor));
+		}
 		else if (lstrcmpi(_T("InitialColor_b"), bstrName) == 0)
+		{
 			m_cfInitialColor = RGB(GetRValue(m_cfInitialColor), GetGValue(m_cfInitialColor), c);
+		}
 	}
 }

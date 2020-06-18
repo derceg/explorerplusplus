@@ -176,7 +176,9 @@ void NColorRuleHelper::LoadColorRulesFromXML(
 	HRESULT hr;
 
 	if (!pXMLDom)
+	{
 		goto clean;
+	}
 
 	bstr = SysAllocString(L"//ColorRule");
 	hr = pXMLDom->selectSingleNode(bstr, &pNode);
@@ -189,9 +191,13 @@ void NColorRuleHelper::LoadColorRulesFromXML(
 
 clean:
 	if (bstr)
+	{
 		SysFreeString(bstr);
+	}
 	if (pNode)
+	{
 		pNode->Release();
+	}
 }
 
 namespace
@@ -216,7 +222,9 @@ namespace
 		hr = pNode->get_attributes(&am);
 
 		if (FAILED(hr))
+		{
 			return;
+		}
 
 		am->get_length(&nAttributeNodes);
 

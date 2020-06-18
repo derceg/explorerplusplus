@@ -298,14 +298,18 @@ void CustomizeColorsDialog::OnMove(BOOL bUp)
 		if (bUp)
 		{
 			if (iSelected == 0)
+			{
 				return;
+			}
 
 			iSwap = iSelected - 1;
 		}
 		else
 		{
 			if (iSelected == static_cast<int>((m_pColorRuleList->size() - 1)))
+			{
 				return;
+			}
 
 			iSwap = iSelected + 1;
 		}
@@ -346,7 +350,9 @@ void CustomizeColorsDialog::OnDelete()
 			ListView_DeleteItem(hListView, iSelected);
 
 			if (iSelected == (nItems - 1))
+			{
 				iSelected--;
+			}
 
 			ListViewHelper::SelectItem(hListView, iSelected, TRUE);
 		}
