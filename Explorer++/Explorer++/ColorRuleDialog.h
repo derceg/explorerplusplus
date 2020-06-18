@@ -13,11 +13,9 @@ class ColorRuleDialog;
 class ColorRuleDialogPersistentSettings : public DialogSettings
 {
 public:
-
 	static ColorRuleDialogPersistentSettings &GetInstance();
 
 private:
-
 	friend ColorRuleDialog;
 
 	static const TCHAR SETTINGS_KEY[];
@@ -29,45 +27,43 @@ private:
 	ColorRuleDialogPersistentSettings();
 
 	ColorRuleDialogPersistentSettings(const ColorRuleDialogPersistentSettings &);
-	ColorRuleDialogPersistentSettings & operator=(const ColorRuleDialogPersistentSettings &);
+	ColorRuleDialogPersistentSettings &operator=(const ColorRuleDialogPersistentSettings &);
 
-	void		SaveExtraRegistrySettings(HKEY hKey) override;
-	void		LoadExtraRegistrySettings(HKEY hKey) override;
+	void SaveExtraRegistrySettings(HKEY hKey) override;
+	void LoadExtraRegistrySettings(HKEY hKey) override;
 
-	void		SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode) override;
-	void		LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue) override;
+	void SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode) override;
+	void LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue) override;
 
-	COLORREF	m_cfInitialColor;
-	COLORREF	m_cfCustomColors[16];
+	COLORREF m_cfInitialColor;
+	COLORREF m_cfCustomColors[16];
 };
 
 class ColorRuleDialog : public DarkModeDialogBase
 {
 public:
+	ColorRuleDialog(
+		HINSTANCE hInstance, HWND hParent, NColorRuleHelper::ColorRule *pColorRule, BOOL bEdit);
 
-	ColorRuleDialog(HINSTANCE hInstance, HWND hParent, NColorRuleHelper::ColorRule *pColorRule, BOOL bEdit);
-
-	LRESULT CALLBACK	StaticColorProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
+	LRESULT CALLBACK StaticColorProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
 protected:
+	INT_PTR OnInitDialog() override;
+	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
+	INT_PTR OnClose() override;
 
-	INT_PTR	OnInitDialog() override;
-	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam) override;
-	INT_PTR	OnClose() override;
-
-	void	SaveState() override;
+	void SaveState() override;
 
 private:
+	void OnChangeColor();
 
-	void	OnChangeColor();
+	void OnOk();
+	void OnCancel();
 
-	void	OnOk();
-	void	OnCancel();
+	BOOL m_bEdit;
+	NColorRuleHelper::ColorRule *m_pColorRule;
 
-	BOOL		m_bEdit;
-	NColorRuleHelper::ColorRule	*m_pColorRule;
+	COLORREF m_cfCurrentColor;
 
-	COLORREF	m_cfCurrentColor;
-
-	ColorRuleDialogPersistentSettings	*m_pcrdps;
+	ColorRuleDialogPersistentSettings *m_pcrdps;
 };
