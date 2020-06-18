@@ -12,7 +12,7 @@ BOOL GetClusterSize(const TCHAR *drive, DWORD *pdwClusterSize)
 {
 	DWORD dwSectorsPerCluster;
 	DWORD dwBytesPerSector;
-	BOOL bRet = GetDiskFreeSpace(drive,&dwSectorsPerCluster,&dwBytesPerSector,NULL,NULL);
+	BOOL bRet = GetDiskFreeSpace(drive,&dwSectorsPerCluster,&dwBytesPerSector,nullptr,nullptr);
 
 	if(!bRet)
 	{

@@ -181,16 +181,16 @@ BOOL CheckWildcardMatch(const TCHAR *szWildcard, const TCHAR *szString, BOOL bCa
 	else
 	{
 		TCHAR szWildcardPattern[512];
-		TCHAR *szSinglePattern = NULL;
-		TCHAR *szSearchPattern = NULL;
-		TCHAR *szRemainingPattern = NULL;
+		TCHAR *szSinglePattern = nullptr;
+		TCHAR *szSearchPattern = nullptr;
+		TCHAR *szRemainingPattern = nullptr;
 
 		StringCchCopy(szWildcardPattern, SIZEOF_ARRAY(szWildcardPattern), szWildcard);
 
 		szSinglePattern = wcstok_s(szWildcardPattern, _T(":"), &szRemainingPattern);
 		PathRemoveBlanks(szSinglePattern);
 
-		while(szSinglePattern != NULL)
+		while(szSinglePattern != nullptr)
 		{
 			if(CheckWildcardMatchInternal(szSinglePattern, szString, bCaseSensitive))
 			{

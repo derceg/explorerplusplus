@@ -39,8 +39,8 @@ void DialogSettings::SaveRegistrySettings(HKEY hParentKey)
 	HKEY hKey;
 	DWORD dwDisposition;
 
-	LONG lRes = RegCreateKeyEx(hParentKey, m_szSettingsKey.c_str(), 0, NULL,
-		REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hKey, &dwDisposition);
+	LONG lRes = RegCreateKeyEx(hParentKey, m_szSettingsKey.c_str(), 0, nullptr,
+		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &hKey, &dwDisposition);
 
 	if (lRes == ERROR_SUCCESS)
 	{
@@ -71,7 +71,7 @@ void DialogSettings::LoadRegistrySettings(HKEY hParentKey)
 		if (m_bSavePosition)
 		{
 			DWORD dwSize = sizeof(POINT);
-			RegQueryValueEx(hKey, SETTING_POSITION, NULL, NULL, (LPBYTE) &m_ptDialog, &dwSize);
+			RegQueryValueEx(hKey, SETTING_POSITION, nullptr, nullptr, (LPBYTE) &m_ptDialog, &dwSize);
 
 			NRegistrySettings::ReadDwordFromRegistry(
 				hKey, SETTING_WIDTH, reinterpret_cast<DWORD *>(&m_iWidth));
@@ -98,7 +98,7 @@ void DialogSettings::SaveXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *p
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt, pe);
 	SysFreeString(bstr_wsntt);
 
-	IXMLDOMElement *pParentNode = NULL;
+	IXMLDOMElement *pParentNode = nullptr;
 	NXMLSettings::CreateElementNode(
 		pXMLDom, &pParentNode, pe, _T("DialogState"), m_szSettingsKey.c_str());
 
@@ -119,7 +119,7 @@ void DialogSettings::SaveXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *p
 
 void DialogSettings::LoadXMLSettings(IXMLDOMNamedNodeMap *pam, long lChildNodes)
 {
-	IXMLDOMNode *pNode = NULL;
+	IXMLDOMNode *pNode = nullptr;
 	BSTR bstrName;
 	BSTR bstrValue;
 
@@ -219,11 +219,11 @@ void DialogSettings::RestoreDialogPosition(HWND hDlg, bool bRestoreSize)
 	{
 		if (bRestoreSize)
 		{
-			SetWindowPos(hDlg, NULL, m_ptDialog.x, m_ptDialog.y, m_iWidth, m_iHeight, SWP_NOZORDER);
+			SetWindowPos(hDlg, nullptr, m_ptDialog.x, m_ptDialog.y, m_iWidth, m_iHeight, SWP_NOZORDER);
 		}
 		else
 		{
-			SetWindowPos(hDlg, NULL, m_ptDialog.x, m_ptDialog.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+			SetWindowPos(hDlg, nullptr, m_ptDialog.x, m_ptDialog.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 		}
 	}
 	else

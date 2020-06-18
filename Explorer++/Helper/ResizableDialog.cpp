@@ -71,17 +71,17 @@ void ResizableDialog::UpdateControls(int iWidth, int iHeight)
 			switch (control.Constraint)
 			{
 			case ControlConstraint::None:
-				SetWindowPos(hCtrl, NULL, iWidth - control.iWidthDelta,
+				SetWindowPos(hCtrl, nullptr, iWidth - control.iWidthDelta,
 					iHeight - control.iHeightDelta, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 				break;
 
 			case ControlConstraint::X:
-				SetWindowPos(hCtrl, NULL, iWidth - control.iWidthDelta, rc.top, 0, 0,
+				SetWindowPos(hCtrl, nullptr, iWidth - control.iWidthDelta, rc.top, 0, 0,
 					SWP_NOSIZE | SWP_NOZORDER);
 				break;
 
 			case ControlConstraint::Y:
-				SetWindowPos(hCtrl, NULL, rc.left, iHeight - control.iHeightDelta, 0, 0,
+				SetWindowPos(hCtrl, nullptr, rc.left, iHeight - control.iHeightDelta, 0, 0,
 					SWP_NOSIZE | SWP_NOZORDER);
 				break;
 			}
@@ -91,17 +91,17 @@ void ResizableDialog::UpdateControls(int iWidth, int iHeight)
 			switch (control.Constraint)
 			{
 			case ControlConstraint::None:
-				SetWindowPos(hCtrl, NULL, 0, 0, iWidth - control.iWidthDelta - rc.left,
+				SetWindowPos(hCtrl, nullptr, 0, 0, iWidth - control.iWidthDelta - rc.left,
 					iHeight - control.iHeightDelta - rc.top, SWP_NOMOVE | SWP_NOZORDER);
 				break;
 
 			case ControlConstraint::X:
-				SetWindowPos(hCtrl, NULL, 0, 0, iWidth - control.iWidthDelta - rc.left,
+				SetWindowPos(hCtrl, nullptr, 0, 0, iWidth - control.iWidthDelta - rc.left,
 					rc.bottom - rc.top, SWP_NOMOVE | SWP_NOZORDER);
 				break;
 
 			case ControlConstraint::Y:
-				SetWindowPos(hCtrl, NULL, 0, 0, rc.right - rc.left,
+				SetWindowPos(hCtrl, nullptr, 0, 0, rc.right - rc.left,
 					iHeight - control.iHeightDelta - rc.top, SWP_NOMOVE | SWP_NOZORDER);
 				break;
 			}
@@ -111,7 +111,7 @@ void ResizableDialog::UpdateControls(int iWidth, int iHeight)
 		/* Force group boxes to redraw. */
 		if (GetWindowStyle(hCtrl) & BS_GROUPBOX)
 		{
-			InvalidateRect(hCtrl, NULL, TRUE);
+			InvalidateRect(hCtrl, nullptr, TRUE);
 		}
 	}
 }

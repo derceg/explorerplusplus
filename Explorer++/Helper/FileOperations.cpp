@@ -269,7 +269,7 @@ HRESULT NFileOperations::CopyFiles(
 
 TCHAR *NFileOperations::BuildFilenameList(const std::list<std::wstring> &FilenameList)
 {
-	TCHAR *pszFilenames = NULL;
+	TCHAR *pszFilenames = nullptr;
 	int iTotalSize = 0;
 
 	for (const auto &filename : FilenameList)
@@ -436,7 +436,7 @@ BOOL NFileOperations::SaveDirectoryListing(
 	strContents = strContents.substr(0, strContents.size() - 2);
 
 	HANDLE hFile = CreateFile(
-		strFilename.c_str(), FILE_WRITE_DATA, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		strFilename.c_str(), FILE_WRITE_DATA, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 
 	if (hFile != INVALID_HANDLE_VALUE)
 	{
@@ -444,10 +444,10 @@ BOOL NFileOperations::SaveDirectoryListing(
 
 		/* Write out the BOM for UTF-16 LE data.
 		See http://en.wikipedia.org/wiki/Byte-order_mark */
-		WriteFile(hFile, reinterpret_cast<LPCVOID>("\xFF\xFE"), 2, &nBytesWritten, NULL);
+		WriteFile(hFile, reinterpret_cast<LPCVOID>("\xFF\xFE"), 2, &nBytesWritten, nullptr);
 
 		WriteFile(hFile, reinterpret_cast<LPCVOID>(strContents.c_str()),
-			static_cast<DWORD>(strContents.size() * sizeof(WCHAR)), &nBytesWritten, NULL);
+			static_cast<DWORD>(strContents.size() * sizeof(WCHAR)), &nBytesWritten, nullptr);
 
 		if (nBytesWritten == strContents.size())
 		{
@@ -478,7 +478,7 @@ HRESULT CopyFilesToClipboard(
 	BuildHDropList(&ftc[0], &stg[0], FileNameList);
 
 	ftc[1].cfFormat = (CLIPFORMAT) RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT);
-	ftc[1].ptd = NULL;
+	ftc[1].ptd = nullptr;
 	ftc[1].dwAspect = DVASPECT_CONTENT;
 	ftc[1].lindex = -1;
 	ftc[1].tymed = TYMED_HGLOBAL;
@@ -486,11 +486,11 @@ HRESULT CopyFilesToClipboard(
 	HRESULT hr = E_FAIL;
 	HGLOBAL hglb = GlobalAlloc(GMEM_MOVEABLE, sizeof(DWORD));
 
-	if (hglb != NULL)
+	if (hglb != nullptr)
 	{
 		auto *pdwCopyEffect = static_cast<DWORD *>(GlobalLock(hglb));
 
-		if (pdwCopyEffect != NULL)
+		if (pdwCopyEffect != nullptr)
 		{
 			if (bMove)
 			{
@@ -503,13 +503,13 @@ HRESULT CopyFilesToClipboard(
 
 			GlobalUnlock(hglb);
 
-			stg[1].pUnkForRelease = NULL;
+			stg[1].pUnkForRelease = nullptr;
 			stg[1].hGlobal = hglb;
 			stg[1].tymed = TYMED_HGLOBAL;
 
 			*pClipboardDataObject = CreateDataObject(ftc, stg, 2);
 
-			IDataObjectAsyncCapability *pAsyncCapability = NULL;
+			IDataObjectAsyncCapability *pAsyncCapability = nullptr;
 			hr = (*pClipboardDataObject)->QueryInterface(IID_PPV_ARGS(&pAsyncCapability));
 
 			if (SUCCEEDED(hr))
@@ -538,8 +538,8 @@ int PasteHardLinks(const TCHAR *szDestination)
 /* TODO: Use CDropHandler. */
 int PasteFilesFromClipboardSpecial(const TCHAR *szDestination, PasteType pasteType)
 {
-	IDataObject *clipboardObject = NULL;
-	DROPFILES *pdf = NULL;
+	IDataObject *clipboardObject = nullptr;
+	DROPFILES *pdf = nullptr;
 	FORMATETC ftc;
 	STGMEDIUM stg;
 	HRESULT hr;
@@ -554,7 +554,7 @@ int PasteFilesFromClipboardSpecial(const TCHAR *szDestination, PasteType pasteTy
 	if (SUCCEEDED(hr))
 	{
 		ftc.cfFormat = CF_HDROP;
-		ftc.ptd = NULL;
+		ftc.ptd = nullptr;
 		ftc.dwAspect = DVASPECT_CONTENT;
 		ftc.lindex = -1;
 		ftc.tymed = TYMED_HGLOBAL;
@@ -565,9 +565,9 @@ int PasteFilesFromClipboardSpecial(const TCHAR *szDestination, PasteType pasteTy
 		{
 			pdf = (DROPFILES *) GlobalLock(stg.hGlobal);
 
-			if (pdf != NULL)
+			if (pdf != nullptr)
 			{
-				nFilesCopied = DragQueryFile((HDROP) pdf, 0xFFFFFFFF, NULL, 0);
+				nFilesCopied = DragQueryFile((HDROP) pdf, 0xFFFFFFFF, nullptr, 0);
 
 				for (i = 0; i < nFilesCopied; i++)
 				{
@@ -589,7 +589,7 @@ int PasteFilesFromClipboardSpecial(const TCHAR *szDestination, PasteType pasteTy
 						break;
 
 					case PasteType::HardLink:
-						CreateHardLink(szLinkFileName, szOldFileName, NULL);
+						CreateHardLink(szLinkFileName, szOldFileName, nullptr);
 						break;
 					}
 				}
@@ -608,16 +608,16 @@ int PasteFilesFromClipboardSpecial(const TCHAR *szDestination, PasteType pasteTy
 HRESULT NFileOperations::CreateLinkToFile(const std::wstring &strTargetFilename,
 	const std::wstring &strLinkFilename, const std::wstring &strLinkDescription)
 {
-	IShellLink *pShellLink = NULL;
+	IShellLink *pShellLink = nullptr;
 	HRESULT hr =
-		CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pShellLink));
+		CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pShellLink));
 
 	if (SUCCEEDED(hr))
 	{
 		pShellLink->SetPath(strTargetFilename.c_str());
 		pShellLink->SetDescription(strLinkDescription.c_str());
 
-		IPersistFile *pPersistFile = NULL;
+		IPersistFile *pPersistFile = nullptr;
 		hr = pShellLink->QueryInterface(IID_PPV_ARGS(&pPersistFile));
 
 		if (SUCCEEDED(hr))
@@ -643,13 +643,13 @@ HRESULT NFileOperations::ResolveLink(
 		return E_FAIL;
 	}
 
-	IShellLink *pShellLink = NULL;
+	IShellLink *pShellLink = nullptr;
 	HRESULT hr =
-		CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pShellLink));
+		CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pShellLink));
 
 	if (hr == S_OK)
 	{
-		IPersistFile *pPersistFile = NULL;
+		IPersistFile *pPersistFile = nullptr;
 		hr = pShellLink->QueryInterface(IID_PPV_ARGS(&pPersistFile));
 
 		if (hr == S_OK)
@@ -662,7 +662,7 @@ HRESULT NFileOperations::ResolveLink(
 
 				TCHAR szResolvedPathInternal[MAX_PATH];
 				pShellLink->GetPath(szResolvedPathInternal, SIZEOF_ARRAY(szResolvedPathInternal),
-					NULL, SLGP_UNCPRIORITY);
+					nullptr, SLGP_UNCPRIORITY);
 
 				StringCchCopy(szResolvedPath, nBufferSize, szResolvedPathInternal);
 			}
@@ -683,14 +683,14 @@ BOOL NFileOperations::CreateBrowseDialog(
 
 	BROWSEINFO bi;
 	bi.hwndOwner = hOwner;
-	bi.pidlRoot = NULL;
+	bi.pidlRoot = nullptr;
 	bi.pszDisplayName = szDisplayName;
 	bi.lpszTitle = strTitle.c_str();
 	bi.ulFlags = BIF_NEWDIALOGSTYLE;
-	bi.lpfn = NULL;
+	bi.lpfn = nullptr;
 	*ppidl = SHBrowseForFolder(&bi);
 
-	BOOL bSuccessful = (*ppidl != NULL);
+	BOOL bSuccessful = (*ppidl != nullptr);
 
 	return bSuccessful;
 }
@@ -778,7 +778,7 @@ void NFileOperations::DeleteFileSecurely(
 
 	/* Open the file, block any sharing mode, to stop the file
 	been opened while it is overwritten. */
-	hFile = CreateFile(strFilename.c_str(), FILE_WRITE_DATA, 0, NULL, OPEN_EXISTING, NULL, NULL);
+	hFile = CreateFile(strFilename.c_str(), FILE_WRITE_DATA, 0, nullptr, OPEN_EXISTING, NULL, nullptr);
 
 	if (hFile == INVALID_HANDLE_VALUE)
 	{
@@ -786,18 +786,18 @@ void NFileOperations::DeleteFileSecurely(
 	}
 
 	/* Extend the file out to the end of its last sector. */
-	SetFilePointerEx(hFile, lRealFileSize, NULL, FILE_BEGIN);
+	SetFilePointerEx(hFile, lRealFileSize, nullptr, FILE_BEGIN);
 	SetEndOfFile(hFile);
 
 	/* Start at the beginning of the file, and
 	write in the first-pass data, 0x00 over
 	the length of the whole file. */
-	SetFilePointer(hFile, 0, NULL, FILE_BEGIN);
+	SetFilePointer(hFile, 0, nullptr, FILE_BEGIN);
 	pass1Data = 0x00;
 
 	for (i = 0; i < lRealFileSize.QuadPart; i++)
 	{
-		WriteFile(hFile, (LPVOID) &pass1Data, 1, &nBytesWritten, NULL);
+		WriteFile(hFile, (LPVOID) &pass1Data, 1, &nBytesWritten, nullptr);
 	}
 
 	if (overwriteMethod == OverwriteMethod::ThreePass)
@@ -805,25 +805,25 @@ void NFileOperations::DeleteFileSecurely(
 		/* Start at the beginning of the file, and
 		write in the second-pass data, 0xFF over
 		the length of the whole file. */
-		SetFilePointer(hFile, 0, NULL, FILE_BEGIN);
+		SetFilePointer(hFile, 0, nullptr, FILE_BEGIN);
 		pass2Data = 0xFF;
 
 		for (i = 0; i < lRealFileSize.QuadPart; i++)
 		{
-			WriteFile(hFile, (LPVOID) &pass2Data, 1, &nBytesWritten, NULL);
+			WriteFile(hFile, (LPVOID) &pass2Data, 1, &nBytesWritten, nullptr);
 		}
 
-		SetFilePointer(hFile, 0, NULL, FILE_BEGIN);
+		SetFilePointer(hFile, 0, nullptr, FILE_BEGIN);
 
-		CryptAcquireContext(&hProv, _T("SecureDelete"), NULL, PROV_RSA_AES, CRYPT_NEWKEYSET);
+		CryptAcquireContext(&hProv, _T("SecureDelete"), nullptr, PROV_RSA_AES, CRYPT_NEWKEYSET);
 
 		for (i = 0; i < lRealFileSize.QuadPart; i++)
 		{
 			CryptGenRandom(hProv, 1, (LPBYTE) &pass3Data);
-			WriteFile(hFile, (LPVOID) &pass3Data, 1, &nBytesWritten, NULL);
+			WriteFile(hFile, (LPVOID) &pass3Data, 1, &nBytesWritten, nullptr);
 		}
 
-		CryptAcquireContext(&hProv, _T("SecureDelete"), NULL, PROV_RSA_AES, CRYPT_DELETEKEYSET);
+		CryptAcquireContext(&hProv, _T("SecureDelete"), nullptr, PROV_RSA_AES, CRYPT_DELETEKEYSET);
 	}
 
 	FlushFileBuffers(hFile);

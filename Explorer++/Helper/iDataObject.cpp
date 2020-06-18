@@ -85,12 +85,12 @@ DataObject::~DataObject()
 /* IUnknown interface members. */
 HRESULT __stdcall DataObject::QueryInterface(REFIID iid, void **ppvObject)
 {
-	if(ppvObject == NULL)
+	if(ppvObject == nullptr)
 	{
 		return E_POINTER;
 	}
 
-	*ppvObject = NULL;
+	*ppvObject = nullptr;
 
 	if(IsEqualIID(iid,IID_IDataObject) ||
 		IsEqualIID(iid,IID_IUnknown))
@@ -131,7 +131,7 @@ ULONG __stdcall DataObject::Release()
 
 HRESULT __stdcall DataObject::GetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium)
 {
-	if(pFormatEtc == NULL || pMedium == NULL)
+	if(pFormatEtc == nullptr || pMedium == nullptr)
 	{
 		return E_INVALIDARG;
 	}
@@ -164,9 +164,9 @@ HRESULT __stdcall DataObject::GetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium)
 BOOL DataObject::DuplicateStorageMedium(STGMEDIUM *pstgDest, const STGMEDIUM *pstgSrc, const FORMATETC *pftc)
 {
 	pstgDest->tymed = pstgSrc->tymed;
-	pstgDest->pUnkForRelease = NULL;
+	pstgDest->pUnkForRelease = nullptr;
 
-	if(pstgSrc->pUnkForRelease != NULL)
+	if(pstgSrc->pUnkForRelease != nullptr)
 	{
 		pstgDest->pUnkForRelease = pstgSrc->pUnkForRelease;
 		pstgSrc->pUnkForRelease->AddRef();
@@ -206,7 +206,7 @@ BOOL DataObject::DuplicateData(STGMEDIUM *pstgDest, const STGMEDIUM *pstgSrc, co
 {
 	HANDLE hData = OleDuplicateData(pstgSrc->hGlobal,pftc->cfFormat,0);
 
-	if(hData == NULL)
+	if(hData == nullptr)
 	{
 		return FALSE;
 	}
@@ -247,7 +247,7 @@ HRESULT __stdcall DataObject::GetDataHere(FORMATETC *pFormatEtc,STGMEDIUM *pMedi
 
 HRESULT	__stdcall DataObject::QueryGetData(FORMATETC *pFormatEtc)
 {
-	if(pFormatEtc == NULL)
+	if(pFormatEtc == nullptr)
 	{
 		return E_INVALIDARG;
 	}
@@ -269,19 +269,19 @@ HRESULT __stdcall DataObject::GetCanonicalFormatEtc(FORMATETC *pFormatEtcIn,FORM
 {
 	UNREFERENCED_PARAMETER(pFormatEtcIn);
 
-	if(pFormatEtcOut == NULL)
+	if(pFormatEtcOut == nullptr)
 	{
 		return E_INVALIDARG;
 	}
 
-	pFormatEtcOut->ptd = NULL;
+	pFormatEtcOut->ptd = nullptr;
 
 	return E_NOTIMPL;
 }
 
 HRESULT __stdcall DataObject::SetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,BOOL fRelease)
 {
-	if(pFormatEtc == NULL || pMedium == NULL)
+	if(pFormatEtc == nullptr || pMedium == nullptr)
 	{
 		return E_INVALIDARG;
 	}
@@ -311,7 +311,7 @@ HRESULT __stdcall DataObject::SetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,B
 
 HRESULT __stdcall DataObject::EnumFormatEtc(DWORD dwDirection,IEnumFORMATETC **ppEnumFormatEtc)
 {
-	if(ppEnumFormatEtc == NULL)
+	if(ppEnumFormatEtc == nullptr)
 	{
 		return E_INVALIDARG;
 	}

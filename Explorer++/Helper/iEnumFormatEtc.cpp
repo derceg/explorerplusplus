@@ -48,11 +48,11 @@ EnumFormatEtc::EnumFormatEtc(const std::list<FORMATETC> &feList)
 	{
 		FORMATETC ftc = fe;
 
-		if(fe.ptd != NULL)
+		if(fe.ptd != nullptr)
 		{
 			ftc.ptd = reinterpret_cast<DVTARGETDEVICE *>(CoTaskMemAlloc(fe.ptd->tdSize));
 
-			if(ftc.ptd != NULL)
+			if(ftc.ptd != nullptr)
 			{
 				memcpy(ftc.ptd, fe.ptd, fe.ptd->tdSize);
 			}
@@ -68,7 +68,7 @@ EnumFormatEtc::~EnumFormatEtc()
 {
 	for(auto fe : m_feList)
 	{
-		if(fe.ptd != NULL)
+		if(fe.ptd != nullptr)
 		{
 			CoTaskMemFree(fe.ptd);
 		}
@@ -78,7 +78,7 @@ EnumFormatEtc::~EnumFormatEtc()
 /* IUnknown interface members. */
 HRESULT __stdcall EnumFormatEtc::QueryInterface(REFIID iid, void **ppvObject)
 {
-	*ppvObject = NULL;
+	*ppvObject = nullptr;
 
 	if(iid == IID_IEnumFORMATETC||iid == IID_IUnknown)
 	{
@@ -119,7 +119,7 @@ HRESULT __stdcall EnumFormatEtc::Next(ULONG celt,FORMATETC *rgelt,ULONG *pceltFe
 
 	if(m_iIndex >= m_iNumFormats)
 	{
-		if (pceltFetched != NULL)
+		if (pceltFetched != nullptr)
 		{
 			*pceltFetched = 0;
 		}
@@ -135,11 +135,11 @@ HRESULT __stdcall EnumFormatEtc::Next(ULONG celt,FORMATETC *rgelt,ULONG *pceltFe
 		{
 			memcpy(&rgelt[0],&(*itr),sizeof(FORMATETC));
 
-			if(itr->ptd != NULL)
+			if(itr->ptd != nullptr)
 			{
 				rgelt[0].ptd = reinterpret_cast<DVTARGETDEVICE *>(CoTaskMemAlloc(itr->ptd->tdSize));
 
-				if (rgelt[0].ptd == NULL)
+				if (rgelt[0].ptd == nullptr)
 				{
 					return S_FALSE;
 				}
@@ -155,7 +155,7 @@ HRESULT __stdcall EnumFormatEtc::Next(ULONG celt,FORMATETC *rgelt,ULONG *pceltFe
 
 	m_iIndex++;
 
-	if (pceltFetched != NULL)
+	if (pceltFetched != nullptr)
 	{
 		*pceltFetched = 1;
 	}

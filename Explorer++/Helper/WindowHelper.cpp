@@ -45,7 +45,7 @@ BOOL CenterWindow(HWND hParent, HWND hChild)
 		return FALSE;
 	}
 
-	return SetWindowPos(hChild, NULL, ptOrigin.x, ptOrigin.y,
+	return SetWindowPos(hChild, nullptr, ptOrigin.x, ptOrigin.y,
 		0, 0, SWP_NOSIZE | SWP_SHOWWINDOW | SWP_NOZORDER);
 }
 

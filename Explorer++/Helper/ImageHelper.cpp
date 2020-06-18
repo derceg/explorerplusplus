@@ -42,21 +42,21 @@ void ImageHelper::InitBitmapInfo(__out_bcount(cbInfo) BITMAPINFO *pbmi, ULONG cb
 
 HRESULT ImageHelper::Create32BitHBITMAP(HDC hdc, const SIZE *psize, __deref_opt_out void **ppvBits, __out HBITMAP* phBmp)
 {
-	*phBmp = NULL;
+	*phBmp = nullptr;
 
 	BITMAPINFO bmi;
 	InitBitmapInfo(&bmi, sizeof(bmi), psize->cx, psize->cy, 32);
 
-	HDC hdcUsed = hdc ? hdc : GetDC(NULL);
+	HDC hdcUsed = hdc ? hdc : GetDC(nullptr);
 	if (hdcUsed)
 	{
-		*phBmp = CreateDIBSection(hdcUsed, &bmi, DIB_RGB_COLORS, ppvBits, NULL, 0);
+		*phBmp = CreateDIBSection(hdcUsed, &bmi, DIB_RGB_COLORS, ppvBits, nullptr, 0);
 		if (hdc != hdcUsed)
 		{
-			ReleaseDC(NULL, hdcUsed);
+			ReleaseDC(nullptr, hdcUsed);
 		}
 	}
-	return (NULL == *phBmp) ? E_OUTOFMEMORY : S_OK;
+	return (nullptr == *phBmp) ? E_OUTOFMEMORY : S_OK;
 }
 
 HRESULT ImageHelper::ConvertToPARGB32(HDC hdc, __inout ARGB *pargb, HBITMAP hbmp, SIZE& sizImage, int cxRow)
@@ -152,7 +152,7 @@ HRESULT ImageHelper::ConvertBufferToPARGB32(HPAINTBUFFER hPaintBuffer, HDC hdc, 
 HBITMAP ImageHelper::IconToBitmapPARGB32(HICON hicon, int width, int height)
 {
 	HRESULT hr = E_OUTOFMEMORY;
-	HBITMAP hbmp = NULL;
+	HBITMAP hbmp = nullptr;
 
 	SIZE sizIcon;
 	sizIcon.cx = width;
@@ -161,10 +161,10 @@ HBITMAP ImageHelper::IconToBitmapPARGB32(HICON hicon, int width, int height)
 	RECT rcIcon;
 	SetRect(&rcIcon, 0, 0, sizIcon.cx, sizIcon.cy);
 
-	HDC hdcDest = CreateCompatibleDC(NULL);
+	HDC hdcDest = CreateCompatibleDC(nullptr);
 	if (hdcDest)
 	{
-		hr = Create32BitHBITMAP(hdcDest, &sizIcon, NULL, &hbmp);
+		hr = Create32BitHBITMAP(hdcDest, &sizIcon, nullptr, &hbmp);
 		if (SUCCEEDED(hr))
 		{
 			hr = E_FAIL;
@@ -182,7 +182,7 @@ HBITMAP ImageHelper::IconToBitmapPARGB32(HICON hicon, int width, int height)
 				HPAINTBUFFER hPaintBuffer = BeginBufferedPaint(hdcDest, &rcIcon, BPBF_DIB, &paintParams, &hdcBuffer);
 				if (hPaintBuffer)
 				{
-					if (DrawIconEx(hdcBuffer, 0, 0, hicon, sizIcon.cx, sizIcon.cy, 0, NULL, DI_NORMAL))
+					if (DrawIconEx(hdcBuffer, 0, 0, hicon, sizIcon.cx, sizIcon.cy, 0, nullptr, DI_NORMAL))
 					{
 						// If icon did not have an alpha channel we need to convert buffer to PARGB
 						hr = ConvertBufferToPARGB32(hPaintBuffer, hdcDest, hicon, sizIcon);
@@ -202,7 +202,7 @@ HBITMAP ImageHelper::IconToBitmapPARGB32(HICON hicon, int width, int height)
 	if (FAILED(hr))
 	{
 		DeleteObject(hbmp);
-		hbmp = NULL;
+		hbmp = nullptr;
 	}
 
 	return hbmp;

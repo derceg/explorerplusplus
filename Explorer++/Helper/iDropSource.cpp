@@ -31,7 +31,7 @@ private:
 
 HRESULT CreateDropSource(IDropSource **ppDropSource,DragType dragType)
 {
-	if(ppDropSource == NULL)
+	if(ppDropSource == nullptr)
 	{
 		return E_FAIL;
 	}
@@ -50,7 +50,7 @@ DropSource::DropSource(DragType dragType)
 /* IUnknown interface members. */
 HRESULT __stdcall DropSource::QueryInterface(REFIID iid, void **ppvObject)
 {
-	*ppvObject = NULL;
+	*ppvObject = nullptr;
 
 	if(iid == IID_IDropSource ||
 		iid == IID_IUnknown)

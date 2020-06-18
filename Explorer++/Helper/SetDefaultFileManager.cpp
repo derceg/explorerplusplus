@@ -88,8 +88,8 @@ LSTATUS DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
 	}
 
 	wil::unique_hkey appKey;
-	res = RegCreateKeyEx(shellKey.get(), applicationKeyName.c_str(), 0, NULL,
-		REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &appKey, NULL);
+	res = RegCreateKeyEx(shellKey.get(), applicationKeyName.c_str(), 0, nullptr,
+		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &appKey, nullptr);
 
 	if (res != ERROR_SUCCESS)
 	{
@@ -98,7 +98,7 @@ LSTATUS DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
 
 	// Now, set the default value for the key. This default value will be the text that is shown on
 	// the context menu for folders.
-	res = SaveStringToRegistry(appKey.get(), NULL, menuText.c_str());
+	res = SaveStringToRegistry(appKey.get(), nullptr, menuText.c_str());
 
 	if (res != ERROR_SUCCESS)
 	{
@@ -107,8 +107,8 @@ LSTATUS DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
 
 	// Now, create the "command" sub-key.
 	wil::unique_hkey commandKey;
-	res = RegCreateKeyEx(appKey.get(), _T("command"), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE,
-		NULL, &commandKey, NULL);
+	res = RegCreateKeyEx(appKey.get(), _T("command"), 0, nullptr, REG_OPTION_NON_VOLATILE, KEY_WRITE,
+		nullptr, &commandKey, nullptr);
 
 	if (res != ERROR_SUCCESS)
 	{
@@ -121,7 +121,7 @@ LSTATUS DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
 	GetProcessImageName(GetCurrentProcessId(), executable, SIZEOF_ARRAY(executable));
 	StringCchPrintf(command, SIZEOF_ARRAY(command), _T("\"%s\" \"%%1\""), executable);
 
-	res = SaveStringToRegistry(commandKey.get(), NULL, command);
+	res = SaveStringToRegistry(commandKey.get(), nullptr, command);
 
 	if (res != ERROR_SUCCESS)
 	{
@@ -129,7 +129,7 @@ LSTATUS DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
 	}
 
 	// Set the current entry as the default.
-	res = SaveStringToRegistry(shellKey.get(), NULL, applicationKeyName.c_str());
+	res = SaveStringToRegistry(shellKey.get(), nullptr, applicationKeyName.c_str());
 
 	return res;
 }
@@ -177,7 +177,7 @@ LSTATUS DefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(
 		return res;
 	}
 
-	res = SaveStringToRegistry(shellKey.get(), NULL, defaultValue);
+	res = SaveStringToRegistry(shellKey.get(), nullptr, defaultValue);
 
 	if (res != ERROR_SUCCESS)
 	{

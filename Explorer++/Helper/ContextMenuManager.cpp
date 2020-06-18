@@ -34,7 +34,7 @@ ContextMenuManager::ContextMenuManager(ContextMenuType contextMenuType,
 {
 	ItemType itemType = GetItemType(pidlDirectory);
 
-	const TCHAR *pszRegContext = NULL;
+	const TCHAR *pszRegContext = nullptr;
 
 	switch (itemType)
 	{
@@ -57,7 +57,7 @@ ContextMenuManager::ContextMenuManager(ContextMenuType contextMenuType,
 		break;
 	}
 
-	if (pszRegContext == NULL)
+	if (pszRegContext == nullptr)
 	{
 		return;
 	}
@@ -74,7 +74,7 @@ ContextMenuManager::ContextMenuManager(ContextMenuType contextMenuType,
 	an IContextMenu interface. */
 	for (const auto &contextMenuHandler : m_ContextMenuHandlers)
 	{
-		IShellExtInit *pShellExtInit = NULL;
+		IShellExtInit *pShellExtInit = nullptr;
 		HRESULT hr;
 
 		IUnknown *pUnknown = contextMenuHandler.pUnknown;
@@ -84,16 +84,16 @@ ContextMenuManager::ContextMenuManager(ContextMenuType contextMenuType,
 		if (SUCCEEDED(hr))
 		{
 			MenuHandler_t menuHandler;
-			IContextMenu *pContextMenu = NULL;
-			IContextMenu2 *pContextMenu2 = NULL;
-			IContextMenu3 *pContextMenu3 = NULL;
+			IContextMenu *pContextMenu = nullptr;
+			IContextMenu2 *pContextMenu2 = nullptr;
+			IContextMenu3 *pContextMenu3 = nullptr;
 
-			pShellExtInit->Initialize(pidlDirectory, pDataObject, NULL);
+			pShellExtInit->Initialize(pidlDirectory, pDataObject, nullptr);
 			pShellExtInit->Release();
 
-			if (pUnkSite != NULL)
+			if (pUnkSite != nullptr)
 			{
-				IObjectWithSite *pObjectSite = NULL;
+				IObjectWithSite *pObjectSite = nullptr;
 
 				hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pObjectSite));
 
@@ -107,12 +107,12 @@ ContextMenuManager::ContextMenuManager(ContextMenuType contextMenuType,
 			hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pContextMenu3));
 			menuHandler.pContextMenuActual = pContextMenu3;
 
-			if (FAILED(hr) || pContextMenu3 == NULL)
+			if (FAILED(hr) || pContextMenu3 == nullptr)
 			{
 				hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pContextMenu2));
 				menuHandler.pContextMenuActual = pContextMenu2;
 
-				if (FAILED(hr) || pContextMenu2 == NULL)
+				if (FAILED(hr) || pContextMenu2 == nullptr)
 				{
 					hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pContextMenu));
 					menuHandler.pContextMenuActual = pContextMenu;
@@ -136,7 +136,7 @@ ContextMenuManager::~ContextMenuManager()
 	/* Release the IContextMenu interfaces. */
 	for (auto menuHandler : m_MenuHandlers)
 	{
-		if (menuHandler.pContextMenuActual != NULL)
+		if (menuHandler.pContextMenuActual != nullptr)
 		{
 			menuHandler.pContextMenuActual->Release();
 		}
@@ -147,7 +147,7 @@ ContextMenuManager::~ContextMenuManager()
 	{
 		contextMenuHandler.pUnknown->Release();
 
-		if (contextMenuHandler.hDLL != NULL)
+		if (contextMenuHandler.hDLL != nullptr)
 		{
 			FreeLibrary(contextMenuHandler.hDLL);
 		}
@@ -157,7 +157,7 @@ ContextMenuManager::~ContextMenuManager()
 bool ContextMenuManager::ShowMenu(HWND hwnd, HMENU hMenu, UINT uIDPrevious, UINT uMinID,
 	UINT uMaxID, const POINT &pt, StatusBar &statusBar)
 {
-	if (hwnd == NULL || hMenu == NULL || uIDPrevious == 0 || uMaxID <= uMinID)
+	if (hwnd == nullptr || hMenu == nullptr || uIDPrevious == 0 || uMaxID <= uMinID)
 	{
 		return false;
 	}
@@ -177,7 +177,7 @@ bool ContextMenuManager::ShowMenu(HWND hwnd, HMENU hMenu, UINT uIDPrevious, UINT
 	}
 
 	UINT uCmd = TrackPopupMenu(hMenu,
-		TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD, pt.x, pt.y, 0, hwnd, NULL);
+		TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD, pt.x, pt.y, 0, hwnd, nullptr);
 
 	RemoveWindowSubclass(hwnd, ContextMenuHookProc, CONTEXT_MENU_SUBCLASS_ID);
 
@@ -222,7 +222,7 @@ void ContextMenuManager::AddMenuEntries(HMENU hMenu, UINT uIDPrevious, int iMinI
 	the required menu items. */
 	for (auto itr = m_MenuHandlers.begin(); itr != m_MenuHandlers.end(); itr++)
 	{
-		if (itr->pContextMenuActual != NULL)
+		if (itr->pContextMenuActual != nullptr)
 		{
 			HRESULT hr = itr->pContextMenuActual->QueryContextMenu(
 				hMenu, iStartPos, iMinID + iOffset, iMaxID, CMF_NORMAL | CMF_EXPLORE);
@@ -379,11 +379,11 @@ HRESULT ContextMenuManager::HandleMenuMessage(
 		{
 			if (uItemID >= menuHandler.uStartID && uItemID < menuHandler.uEndID)
 			{
-				if (menuHandler.pContextMenu3 != NULL)
+				if (menuHandler.pContextMenu3 != nullptr)
 				{
 					hr = menuHandler.pContextMenu3->HandleMenuMsg2(uMsg, wParam, lParam, &lRes);
 				}
-				else if (menuHandler.pContextMenu2 != NULL && !bContextMenu3Required)
+				else if (menuHandler.pContextMenu2 != nullptr && !bContextMenu3Required)
 				{
 					hr = menuHandler.pContextMenu2->HandleMenuMsg(uMsg, wParam, lParam);
 				}
@@ -406,10 +406,10 @@ HRESULT ContextMenuManager::GetMenuHelperText(UINT uID, TCHAR *szText, UINT cchM
 	{
 		if (uID >= menuHandler.uStartID && uID < menuHandler.uEndID)
 		{
-			if (menuHandler.pContextMenuActual != NULL)
+			if (menuHandler.pContextMenuActual != nullptr)
 			{
 				hr = menuHandler.pContextMenuActual->GetCommandString(uID - menuHandler.uStartID,
-					GCS_HELPTEXT, NULL, reinterpret_cast<LPSTR>(szText), cchMax);
+					GCS_HELPTEXT, nullptr, reinterpret_cast<LPSTR>(szText), cchMax);
 			}
 
 			break;
@@ -446,8 +446,8 @@ void ContextMenuManager::InvokeMenuEntry(HWND hwnd, UINT uCmd)
 			cmici.fMask = 0;
 			cmici.hwnd = hwnd;
 			cmici.lpVerb = reinterpret_cast<LPCSTR>(MAKEWORD(uCmd - menuHandler.uStartID, 0));
-			cmici.lpParameters = NULL;
-			cmici.lpDirectory = NULL;
+			cmici.lpParameters = nullptr;
+			cmici.lpDirectory = nullptr;
 			cmici.nShow = SW_SHOW;
 
 			menuHandler.pContextMenuActual->InvokeCommand(&cmici);

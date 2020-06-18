@@ -43,7 +43,7 @@ IFACEMETHODIMP DropTarget::QueryInterface(REFIID iid, void **object)
 	static const QITAB qit[] =
 	{
 		QITABENT(DropTarget, IDropTarget),
-		{0}
+		{nullptr}
 	};
 
 	return QISearch(this, qit, iid, object);

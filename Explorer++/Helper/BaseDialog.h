@@ -38,7 +38,7 @@ public:
 	virtual ~BaseDialog() = default;
 
 	INT_PTR ShowModalDialog();
-	HWND ShowModelessDialog(IModelessDialogNotification *pmdn = NULL);
+	HWND ShowModelessDialog(IModelessDialogNotification *pmdn = nullptr);
 
 protected:
 	BaseDialog(HINSTANCE hInstance, int iResource, HWND hParent, bool bResizable);

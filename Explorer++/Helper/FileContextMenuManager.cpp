@@ -25,12 +25,12 @@ FileContextMenuManager::FileContextMenuManager(
 		m_pidlItems.push_back(ILCloneChild(pidl));
 	}
 
-	m_pActualContext = NULL;
+	m_pActualContext = nullptr;
 
 	if (pidlItems.empty())
 	{
 		wil::com_ptr<IShellFolder> pShellParentFolder;
-		PCUITEMID_CHILD pidlRelative = NULL;
+		PCUITEMID_CHILD pidlRelative = nullptr;
 		hr = SHBindToParent(pidlParent, IID_PPV_ARGS(&pShellParentFolder), &pidlRelative);
 
 		if (SUCCEEDED(hr))
@@ -84,12 +84,12 @@ FileContextMenuManager::~FileContextMenuManager()
 HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme, int iMinID, int iMaxID,
 	const POINT *ppt, StatusBar *pStatusBar, DWORD_PTR dwData, BOOL bRename, BOOL bExtended)
 {
-	if (m_pActualContext == NULL)
+	if (m_pActualContext == nullptr)
 	{
 		return E_FAIL;
 	}
 
-	if (pfcme == NULL || iMaxID <= iMinID || ppt == NULL)
+	if (pfcme == nullptr || iMaxID <= iMinID || ppt == nullptr)
 	{
 		return E_FAIL;
 	}
@@ -101,7 +101,7 @@ HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme, int iM
 
 	HMENU hMenu = CreatePopupMenu();
 
-	if (hMenu == NULL)
+	if (hMenu == nullptr)
 	{
 		return E_FAIL;
 	}
@@ -130,7 +130,7 @@ HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme, int iM
 
 	BOOL bWindowSubclassed = FALSE;
 
-	if (m_pShellContext3 != NULL || m_pShellContext2 != NULL)
+	if (m_pShellContext3 != nullptr || m_pShellContext2 != nullptr)
 	{
 		/* Subclass the owner window, so that the shell can handle menu messages. */
 		bWindowSubclassed = SetWindowSubclass(m_hwnd, ShellMenuHookProcStub,
@@ -138,7 +138,7 @@ HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme, int iM
 	}
 
 	int iCmd =
-		TrackPopupMenu(hMenu, TPM_LEFTALIGN | TPM_RETURNCMD, ppt->x, ppt->y, 0, m_hwnd, NULL);
+		TrackPopupMenu(hMenu, TPM_LEFTALIGN | TPM_RETURNCMD, ppt->x, ppt->y, 0, m_hwnd, nullptr);
 
 	if (bWindowSubclassed)
 	{
@@ -153,7 +153,7 @@ HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme, int iM
 		TCHAR szCmd[64];
 
 		hr = m_pActualContext->GetCommandString(
-			iCmd - iMinID, GCS_VERB, NULL, reinterpret_cast<LPSTR>(szCmd), SIZEOF_ARRAY(szCmd));
+			iCmd - iMinID, GCS_VERB, nullptr, reinterpret_cast<LPSTR>(szCmd), SIZEOF_ARRAY(szCmd));
 
 		BOOL bHandled = FALSE;
 
@@ -172,8 +172,8 @@ HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme, int iM
 			cmici.fMask = 0;
 			cmici.hwnd = m_hwnd;
 			cmici.lpVerb = (LPCSTR) MAKEWORD(iCmd - iMinID, 0);
-			cmici.lpParameters = NULL;
-			cmici.lpDirectory = NULL;
+			cmici.lpParameters = nullptr;
+			cmici.lpDirectory = nullptr;
 			cmici.nShow = SW_SHOW;
 
 			m_pActualContext->InvokeCommand(&cmici);
@@ -215,11 +215,11 @@ LRESULT CALLBACK FileContextMenuManager::ShellMenuHookProc(
 		/* wParam is 0 if this item was sent by a menu. */
 		if (wParam == 0)
 		{
-			if (m_pShellContext3 != NULL)
+			if (m_pShellContext3 != nullptr)
 			{
-				m_pShellContext3->HandleMenuMsg2(uMsg, wParam, lParam, NULL);
+				m_pShellContext3->HandleMenuMsg2(uMsg, wParam, lParam, nullptr);
 			}
-			else if (m_pShellContext2 != NULL)
+			else if (m_pShellContext2 != nullptr)
 			{
 				m_pShellContext2->HandleMenuMsg(uMsg, wParam, lParam);
 			}
@@ -231,11 +231,11 @@ LRESULT CALLBACK FileContextMenuManager::ShellMenuHookProc(
 	case WM_DRAWITEM:
 		if (wParam == 0)
 		{
-			if (m_pShellContext3 != NULL)
+			if (m_pShellContext3 != nullptr)
 			{
-				m_pShellContext3->HandleMenuMsg2(uMsg, wParam, lParam, NULL);
+				m_pShellContext3->HandleMenuMsg2(uMsg, wParam, lParam, nullptr);
 			}
-			else if (m_pShellContext2 != NULL)
+			else if (m_pShellContext2 != nullptr)
 			{
 				m_pShellContext2->HandleMenuMsg(uMsg, wParam, lParam);
 			}
@@ -245,11 +245,11 @@ LRESULT CALLBACK FileContextMenuManager::ShellMenuHookProc(
 
 	case WM_INITMENUPOPUP:
 	{
-		if (m_pShellContext3 != NULL)
+		if (m_pShellContext3 != nullptr)
 		{
-			m_pShellContext3->HandleMenuMsg2(uMsg, wParam, lParam, NULL);
+			m_pShellContext3->HandleMenuMsg2(uMsg, wParam, lParam, nullptr);
 		}
-		else if (m_pShellContext2 != NULL)
+		else if (m_pShellContext2 != nullptr)
 		{
 			m_pShellContext2->HandleMenuMsg(uMsg, wParam, lParam);
 		}
@@ -258,7 +258,7 @@ LRESULT CALLBACK FileContextMenuManager::ShellMenuHookProc(
 
 	case WM_MENUSELECT:
 	{
-		if (m_pStatusBar != NULL)
+		if (m_pStatusBar != nullptr)
 		{
 			if (HIWORD(wParam) == 0xFFFF && lParam == 0)
 			{
@@ -277,7 +277,7 @@ LRESULT CALLBACK FileContextMenuManager::ShellMenuHookProc(
 
 					/* Ask for the help string for the currently selected menu item. */
 					HRESULT hr = m_pActualContext->GetCommandString(iCmd - m_iMinID, GCS_HELPTEXT,
-						NULL, reinterpret_cast<LPSTR>(szHelpString), SIZEOF_ARRAY(szHelpString));
+						nullptr, reinterpret_cast<LPSTR>(szHelpString), SIZEOF_ARRAY(szHelpString));
 
 					/* If the help string was found, send it to the status bar. */
 					if (hr == NOERROR)

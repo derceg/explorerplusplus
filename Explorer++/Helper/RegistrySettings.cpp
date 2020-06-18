@@ -17,7 +17,7 @@ LONG NRegistrySettings::ReadDwordFromRegistry(HKEY hKey,const TCHAR *szKey,DWORD
 {
 	DWORD dwSize = sizeof(DWORD);
 
-	return RegQueryValueEx(hKey,szKey,0,0,reinterpret_cast<LPBYTE>(pReturnValue),&dwSize);
+	return RegQueryValueEx(hKey,szKey,nullptr,nullptr,reinterpret_cast<LPBYTE>(pReturnValue),&dwSize);
 }
 
 LONG NRegistrySettings::SaveStringToRegistry(HKEY hKey,const TCHAR *szKey,const TCHAR *szValue)
@@ -34,7 +34,7 @@ LONG NRegistrySettings::ReadStringFromRegistry(HKEY hKey,const TCHAR *szKey,TCHA
 	DWORD	dwBufChSize;
 
 	dwBufByteSize = cchMax * sizeof(TCHAR);
-	lRes = RegQueryValueEx(hKey,szKey,0,&dwType,reinterpret_cast<LPBYTE>(szOutput),&dwBufByteSize);
+	lRes = RegQueryValueEx(hKey,szKey,nullptr,&dwType,reinterpret_cast<LPBYTE>(szOutput),&dwBufByteSize);
 	dwBufChSize = dwBufByteSize / sizeof(TCHAR);
 
 	/* The returned buffer size includes any terminating

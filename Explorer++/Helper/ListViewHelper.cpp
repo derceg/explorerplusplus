@@ -218,7 +218,7 @@ executable. */
 BOOL ListViewHelper::SetBackgroundImage(HWND hListView,UINT uImage)
 {
 	TCHAR szModuleName[MAX_PATH];
-	DWORD dwRet = GetModuleFileName(NULL,szModuleName,SIZEOF_ARRAY(szModuleName));
+	DWORD dwRet = GetModuleFileName(nullptr,szModuleName,SIZEOF_ARRAY(szModuleName));
 
 	if(dwRet == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
 	{
@@ -318,7 +318,7 @@ BOOL ListViewHelper::SwapItems(HWND hListView, int iItem1, int iItem2, BOOL bSwa
 void ListViewHelper::PositionInsertMark(HWND hListView,const POINT *ppt)
 {
 	/* Remove the insertion mark. */
-	if(ppt == NULL)
+	if(ppt == nullptr)
 	{
 		LVINSERTMARK lvim;
 		lvim.cbSize		= sizeof(LVINSERTMARK);
