@@ -16,7 +16,6 @@ namespace
 }
 
 BaseDialog::BaseDialog(HINSTANCE hInstance, int iResource, HWND hParent, bool bResizable) :
-	MessageForwarder(),
 	m_hInstance(hInstance),
 	m_iResource(iResource),
 	m_hParent(hParent),

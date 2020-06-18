@@ -6,9 +6,7 @@
 #include "BaseWindow.h"
 
 
-BaseWindow::BaseWindow(HWND hwnd) :
-MessageForwarder(),
-m_hwnd(hwnd)
+BaseWindow::BaseWindow(HWND hwnd) : m_hwnd(hwnd)
 {
 	SetWindowSubclass(hwnd, BaseWindowProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 }
