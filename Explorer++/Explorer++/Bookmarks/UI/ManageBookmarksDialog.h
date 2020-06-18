@@ -19,6 +19,7 @@ class IconFetcher;
 __interface IExplorerplusplus;
 class ManageBookmarksDialog;
 class Navigation;
+class WindowSubclassWrapper;
 
 class ManageBookmarksDialogPersistentSettings : public DialogSettings
 {
@@ -56,7 +57,6 @@ protected:
 	INT_PTR OnInitDialog() override;
 	INT_PTR OnAppCommand(HWND hwnd, UINT uCmd, UINT uDevice, DWORD dwKeys) override;
 	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
-	INT_PTR OnNotify(NMHDR *pnmhdr) override;
 	INT_PTR OnClose() override;
 	INT_PTR OnDestroy() override;
 	INT_PTR OnNcDestroy() override;
@@ -79,6 +79,9 @@ private:
 	void SetupToolbar();
 	void SetupTreeView();
 	void SetupListView();
+
+	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	std::optional<LRESULT> OnToolbarCustomDraw(NMTBCUSTOMDRAW *customDraw);
 
 	void OnTreeViewSelectionChanged(BookmarkItem *bookmarkFolder);
 	void OnListViewNavigation(BookmarkItem *bookmarkFolder, bool addHistoryEntry);
@@ -108,6 +111,7 @@ private:
 	void OnOk();
 	void OnCancel();
 
+	HWND m_toolbarParent;
 	HWND m_hToolbar;
 	wil::unique_himagelist m_imageListToolbar;
 	IconImageListMapping m_imageListToolbarMappings;
@@ -125,6 +129,7 @@ private:
 
 	std::unique_ptr<BookmarkNavigationController> m_navigationController;
 
+	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	ManageBookmarksDialogPersistentSettings *m_persistentSettings;

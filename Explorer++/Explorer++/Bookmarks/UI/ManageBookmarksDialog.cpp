@@ -10,6 +10,7 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarkTreeView.h"
 #include "CoreInterface.h"
+#include "DarkModeHelper.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "Navigation.h"
@@ -18,6 +19,7 @@
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
+#include "../Helper/WindowSubclassWrapper.h"
 
 const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
@@ -92,7 +94,15 @@ wil::unique_hicon ManageBookmarksDialog::GetDialogIcon(int iconWidth, int iconHe
 
 void ManageBookmarksDialog::SetupToolbar()
 {
-	m_hToolbar = CreateToolbar(m_hDlg,
+	m_toolbarParent = CreateWindow(WC_STATIC, EMPTY_STRING, WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS,
+		0, 0, 0, 0, m_hDlg, nullptr, GetModuleHandle(nullptr), nullptr);
+
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_toolbarParent,
+		std::bind(&ManageBookmarksDialog::ParentWndProc, this, std::placeholders::_1,
+			std::placeholders::_2, std::placeholders::_3, std::placeholders::_4),
+		0));
+
+	m_hToolbar = CreateToolbar(m_toolbarParent,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | TBSTYLE_TOOLTIPS | TBSTYLE_LIST
 			| TBSTYLE_TRANSPARENT | TBSTYLE_FLAT | CCS_NODIVIDER | CCS_NORESIZE,
 		TBSTYLE_EX_MIXEDBUTTONS | TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_DOUBLEBUFFER
@@ -162,8 +172,12 @@ void ManageBookmarksDialog::SetupToolbar()
 	MapWindowPoints(HWND_DESKTOP, m_hDlg, reinterpret_cast<LPPOINT>(&rcListView), 2);
 
 	auto dwButtonSize = static_cast<DWORD>(SendMessage(m_hToolbar, TB_GETBUTTONSIZE, 0, 0));
-	SetWindowPos(m_hToolbar, nullptr, rcTreeView.left, (rcTreeView.top - HIWORD(dwButtonSize)) / 2,
-		rcListView.right - rcTreeView.left, HIWORD(dwButtonSize), 0);
+
+	SetWindowPos(m_toolbarParent, nullptr, rcTreeView.left,
+		(rcTreeView.top - HIWORD(dwButtonSize)) / 2, rcListView.right - rcTreeView.left,
+		HIWORD(dwButtonSize), 0);
+	SetWindowPos(
+		m_hToolbar, nullptr, 0, 0, rcListView.right - rcTreeView.left, HIWORD(dwButtonSize), 0);
 }
 
 void ManageBookmarksDialog::SetupTreeView()
@@ -187,6 +201,81 @@ void ManageBookmarksDialog::SetupListView()
 	m_connections.push_back(m_bookmarkListView->AddNavigationCompletedObserver(
 		std::bind(&ManageBookmarksDialog::OnListViewNavigation, this, std::placeholders::_1,
 			std::placeholders::_2)));
+}
+
+LRESULT CALLBACK ManageBookmarksDialog::ParentWndProc(
+	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_COMMAND:
+		if (HIWORD(wParam) == 0 || HIWORD(wParam) == 1)
+		{
+			switch (LOWORD(wParam))
+			{
+			case TOOLBAR_ID_BACK:
+				m_navigationController->GoBack();
+				break;
+
+			case TOOLBAR_ID_FORWARD:
+				m_navigationController->GoForward();
+				break;
+
+			case TOOLBAR_ID_ORGANIZE:
+				ShowOrganizeMenu();
+				break;
+
+			case TOOLBAR_ID_VIEWS:
+				ShowViewMenu();
+				break;
+			}
+		}
+		break;
+
+	case WM_NOTIFY:
+		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == m_hToolbar)
+		{
+			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
+			{
+			case NM_CUSTOMDRAW:
+				if (auto result = OnToolbarCustomDraw(reinterpret_cast<NMTBCUSTOMDRAW *>(lParam)))
+				{
+					return *result;
+				}
+				break;
+
+			case TBN_DROPDOWN:
+				OnTbnDropDown(reinterpret_cast<NMTOOLBAR *>(lParam));
+				break;
+			}
+		}
+		break;
+	}
+
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+std::optional<LRESULT> ManageBookmarksDialog::OnToolbarCustomDraw(NMTBCUSTOMDRAW *customDraw)
+{
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (!darkModeHelper.IsDarkModeEnabled())
+	{
+		return std::nullopt;
+	}
+
+	switch (customDraw->nmcd.dwDrawStage)
+	{
+	case CDDS_PREPAINT:
+		return CDRF_NOTIFYITEMDRAW;
+
+	case CDDS_ITEMPREPAINT:
+		customDraw->clrText = DarkModeHelper::FOREGROUND_COLOR;
+		customDraw->clrHighlightHotTrack = DarkModeHelper::BUTTON_HIGHLIGHT_COLOR;
+		return TBCDRF_USECDCOLORS | TBCDRF_HILITEHOTTRACK;
+	}
+
+	return std::nullopt;
 }
 
 INT_PTR ManageBookmarksDialog::OnAppCommand(HWND hwnd, UINT uCmd, UINT uDevice, DWORD dwKeys)
@@ -225,40 +314,12 @@ LRESULT ManageBookmarksDialog::HandleMenuOrAccelerator(WPARAM wParam)
 {
 	switch (LOWORD(wParam))
 	{
-	case TOOLBAR_ID_BACK:
-		m_navigationController->GoBack();
-		break;
-
-	case TOOLBAR_ID_FORWARD:
-		m_navigationController->GoForward();
-		break;
-
-	case TOOLBAR_ID_ORGANIZE:
-		ShowOrganizeMenu();
-		break;
-
-	case TOOLBAR_ID_VIEWS:
-		ShowViewMenu();
-		break;
-
 	case IDOK:
 		OnOk();
 		break;
 
 	case IDCANCEL:
 		OnCancel();
-		break;
-	}
-
-	return 0;
-}
-
-INT_PTR ManageBookmarksDialog::OnNotify(NMHDR *pnmhdr)
-{
-	switch (pnmhdr->code)
-	{
-	case TBN_DROPDOWN:
-		OnTbnDropDown(reinterpret_cast<NMTOOLBAR *>(pnmhdr));
 		break;
 	}
 
