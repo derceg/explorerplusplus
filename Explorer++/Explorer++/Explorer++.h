@@ -56,6 +56,7 @@ class TabRestorerUI;
 struct TabSettings;
 class TaskbarThumbnails;
 class UiTheming;
+class WindowSubclassWrapper;
 
 namespace NColorRuleHelper
 {
@@ -122,6 +123,9 @@ private:
 
 	// This is the same background color as used in the Explorer treeview.
 	static inline constexpr COLORREF TREE_VIEW_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
+
+	static inline const int CLOSE_TOOLBAR_WIDTH = 24;
+	static inline const int CLOSE_TOOLBAR_HEIGHT = 24;
 
 	struct FileContextMenuInfo
 	{
@@ -270,10 +274,12 @@ private:
 	void OnTreeViewPaste();
 
 	/* Holder window private message handlers. */
-	LRESULT CALLBACK TreeViewHolderWindowCommandHandler(WPARAM wParam);
+	std::optional<LRESULT> OnHolderCtlColorStatic(HWND hwnd, HDC hdc);
 	LRESULT CALLBACK TreeViewHolderWindowNotifyHandler(
 		HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnTreeViewHolderWindowTimer();
+
+	LRESULT CALLBACK FoldersToolbarParentProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	/* Tab backing. */
 	void CreateTabBacking();
@@ -518,6 +524,7 @@ private:
 	HWND m_hTabWindowToolbar;
 	HWND m_hTreeView;
 	HWND m_hHolder;
+	HWND m_foldersToolbarParent;
 	HWND m_hFoldersToolbar;
 	HWND m_hTabBacking;
 	HWND m_hBookmarksToolbar;
@@ -584,6 +591,7 @@ private:
 
 	TaskbarThumbnails *m_taskbarThumbnails;
 
+	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	/* Bookmarks. */

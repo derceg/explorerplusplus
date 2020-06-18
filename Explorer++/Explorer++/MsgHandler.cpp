@@ -46,8 +46,6 @@ static const int TREEVIEW_X_CLEARANCE = 1;
 the treeview and the holder window. */
 static const int TREEVIEW_HOLDER_CLEARANCE = 4;
 
-const int CLOSE_TOOLBAR_WIDTH = 24;
-const int CLOSE_TOOLBAR_HEIGHT = 24;
 const int CLOSE_TOOLBAR_X_OFFSET = 4;
 const int CLOSE_TOOLBAR_Y_OFFSET = 1;
 
@@ -455,8 +453,9 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 		iHolderWidth - TREEVIEW_HOLDER_CLEARANCE - TREEVIEW_X_CLEARANCE,
 		iHolderHeight - tabWindowHeight,SWP_NOZORDER);
 
-	SetWindowPos(m_hFoldersToolbar, nullptr, iHolderWidth - scaledCloseToolbarWidth - scaledCloseToolbarXOffset,
-		scaledCloseToolbarYOffset, scaledCloseToolbarWidth, scaledCloseToolbarHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
+	SetWindowPos(m_foldersToolbarParent, nullptr,
+		iHolderWidth - scaledCloseToolbarWidth - scaledCloseToolbarXOffset,
+		scaledCloseToolbarYOffset, 0, 0, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOSIZE);
 
 
 	/* <---- Display window ----> */

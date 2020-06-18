@@ -75,8 +75,26 @@ void Explorerplusplus::CreateFolderControls()
 	reach the window procedure provided by ShellTreeView. */
 	SetWindowSubclass(m_hTreeView,TreeViewSubclassStub,1,(DWORD_PTR)this);
 
-	m_hFoldersToolbar = CreateTabToolbar(m_hHolder, FOLDERS_TOOLBAR_CLOSE,
+	m_foldersToolbarParent =
+		CreateWindow(WC_STATIC, EMPTY_STRING, WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS, 0, 0, 0, 0,
+			m_hHolder, nullptr, GetModuleHandle(nullptr), nullptr);
+
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_foldersToolbarParent,
+		std::bind(&Explorerplusplus::FoldersToolbarParentProc, this, std::placeholders::_1,
+			std::placeholders::_2, std::placeholders::_3, std::placeholders::_4),
+		0));
+
+	m_hFoldersToolbar = CreateTabToolbar(m_foldersToolbarParent, FOLDERS_TOOLBAR_CLOSE,
 		ResourceHelper::LoadString(m_hLanguageModule, IDS_HIDEFOLDERSPANE));
+
+	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hHolder);
+
+	int scaledCloseToolbarWidth = MulDiv(CLOSE_TOOLBAR_WIDTH, dpi, USER_DEFAULT_SCREEN_DPI);
+	int scaledCloseToolbarHeight = MulDiv(CLOSE_TOOLBAR_HEIGHT, dpi, USER_DEFAULT_SCREEN_DPI);
+	SetWindowPos(m_foldersToolbarParent, nullptr, 0, 0, scaledCloseToolbarWidth,
+		scaledCloseToolbarHeight, SWP_NOZORDER);
+	SetWindowPos(m_hFoldersToolbar, nullptr, 0, 0, scaledCloseToolbarWidth,
+		scaledCloseToolbarHeight, SWP_NOZORDER);
 
 	m_InitializationFinished.addObserver([this] (bool newValue) {
 		if (newValue)
@@ -113,6 +131,24 @@ void Explorerplusplus::CreateFolderControls()
 
 		UpdateTreeViewSelection();
 	});
+}
+
+LRESULT CALLBACK Explorerplusplus::FoldersToolbarParentProc(
+	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case FOLDERS_TOOLBAR_CLOSE:
+			ToggleFolders();
+			return 0;
+		}
+		break;
+	}
+
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
 LRESULT CALLBACK TreeViewSubclassStub(HWND hwnd,UINT uMsg,
@@ -565,11 +601,16 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(msg)
 	{
+	case WM_CTLCOLORSTATIC:
+		if (auto result = OnHolderCtlColorStatic(
+				reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam)))
+		{
+			return *result;
+		}
+		break;
+
 	case WM_NOTIFY:
 		return TreeViewHolderWindowNotifyHandler(hwnd, msg, wParam, lParam);
-
-	case WM_COMMAND:
-		return TreeViewHolderWindowCommandHandler(wParam);
 
 	case WM_TIMER:
 		OnTreeViewHolderWindowTimer();
@@ -636,16 +677,23 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowNotifyHandler(HWND hwnd,
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowCommandHandler(WPARAM wParam)
+std::optional<LRESULT> Explorerplusplus::OnHolderCtlColorStatic(HWND hwnd, HDC hdc)
 {
-	switch(LOWORD(wParam))
+	UNREFERENCED_PARAMETER(hdc);
+
+	if (hwnd != m_foldersToolbarParent)
 	{
-	case FOLDERS_TOOLBAR_CLOSE:
-		ToggleFolders();
-		break;
+		return std::nullopt;
 	}
 
-	return 1;
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (!darkModeHelper.IsDarkModeEnabled())
+	{
+		return std::nullopt;
+	}
+
+	return reinterpret_cast<LRESULT>(darkModeHelper.GetBackgroundBrush());
 }
 
 void Explorerplusplus::OnTreeViewSetFileAttributes() const

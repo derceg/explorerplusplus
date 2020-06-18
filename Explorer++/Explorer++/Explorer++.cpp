@@ -15,6 +15,7 @@
 #include "TabRestorerUI.h"
 #include "UiTheming.h"
 #include "../Helper/iDirectoryMonitor.h"
+#include "../Helper/WindowSubclassWrapper.h"
 
 /* These entries correspond to shell
 extensions that are known to be
@@ -59,6 +60,7 @@ Explorerplusplus::Explorerplusplus(HWND hwnd) :
 	m_hTabWindowToolbar				= nullptr;
 	m_hDisplayWindow				= nullptr;
 	m_hTreeView						= nullptr;
+	m_foldersToolbarParent			= nullptr;
 	m_hFoldersToolbar				= nullptr;
 	m_hLastActiveWindow				= nullptr;
 	m_hActiveListView				= nullptr;
