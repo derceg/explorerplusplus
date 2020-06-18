@@ -49,6 +49,7 @@ INT_PTR FilterDialog::OnInitDialog()
 	}
 
 	AllowDarkModeForCheckboxes({ IDC_FILTERS_CASESENSITIVE });
+	AllowDarkModeForComboBoxes({ IDC_FILTER_COMBOBOX });
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 

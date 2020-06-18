@@ -21,6 +21,7 @@ protected:
 	void AllowDarkModeForCheckboxes(const std::vector<int> &controlIds);
 	void AllowDarkModeForRadioButtons(const std::vector<int> &controlIds);
 	void AllowDarkModeForGroupBoxes(const std::vector<int> &controlIds);
+	void AllowDarkModeForComboBoxes(const std::vector<int> &controlIds);
 
 	virtual INT_PTR OnCtlColorStaticExtra(HWND hwnd, HDC hdc);
 	virtual INT_PTR OnCtlColorEditExtra(HWND hwnd, HDC hdc);

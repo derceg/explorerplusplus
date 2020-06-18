@@ -52,6 +52,8 @@ INT_PTR WildcardSelectDialog::OnInitDialog()
 
 	SetFocus(hComboBox);
 
+	AllowDarkModeForComboBoxes({ IDC_SELECTGROUP_COMBOBOX });
+
 	m_pwsdps->RestoreDialogPosition(m_hDlg, true);
 
 	return 0;

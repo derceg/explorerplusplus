@@ -99,15 +99,13 @@ INT_PTR SetDefaultColumnsDialog::OnInitDialog()
 	SetFocus(hListView);
 
 	AllowDarkModeForControls({ IDC_DEFAULTCOLUMNS_MOVEUP, IDC_DEFAULTCOLUMNS_MOVEDOWN });
+	AllowDarkModeForComboBoxes({ IDC_DEFAULTCOLUMNS_COMBOBOX });
 
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
 
 	if (darkModeHelper.IsDarkModeEnabled())
 	{
 		darkModeHelper.SetListViewDarkModeColors(hListView);
-
-		darkModeHelper.AllowDarkModeForWindow(hComboBox, true);
-		SetWindowTheme(hComboBox, L"CFD", nullptr);
 	}
 
 	m_psdcdps->RestoreDialogPosition(m_hDlg, true);

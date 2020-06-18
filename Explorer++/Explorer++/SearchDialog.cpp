@@ -170,6 +170,7 @@ INT_PTR SearchDialog::OnInitDialog()
 		IDC_CHECK_SYSTEM, IDC_CHECK_CASEINSENSITIVE, IDC_CHECK_USEREGULAREXPRESSIONS,
 		IDC_CHECK_SEARCHSUBFOLDERS });
 	AllowDarkModeForGroupBoxes({ IDC_GROUP_ATTRIBUTES, IDC_GROUP_SEARCH_TYPE });
+	AllowDarkModeForComboBoxes({ IDC_COMBO_NAME, IDC_COMBO_DIRECTORY });
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 

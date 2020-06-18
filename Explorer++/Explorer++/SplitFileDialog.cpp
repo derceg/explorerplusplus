@@ -158,14 +158,7 @@ INT_PTR SplitFileDialog::OnInitDialog()
 
 	AllowDarkModeForControls({ IDC_SPLIT_BUTTON_OUTPUT });
 	AllowDarkModeForGroupBoxes({ IDC_GROUP_FILE_INFORMATION, IDC_GROUP_SPLIT_INFORMATION });
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		darkModeHelper.AllowDarkModeForWindow(hComboBox, true);
-		SetWindowTheme(hComboBox, L"CFD", nullptr);
-	}
+	AllowDarkModeForComboBoxes({ IDC_SPLIT_COMBOBOX_SIZES });
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, false);
 

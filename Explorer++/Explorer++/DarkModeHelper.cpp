@@ -155,6 +155,12 @@ void DarkModeHelper::SetDarkModeForControl(HWND control)
 	SetWindowTheme(control, L"Explorer", nullptr);
 }
 
+void DarkModeHelper::SetDarkModeForComboBox(HWND comboBox)
+{
+	AllowDarkModeForWindow(comboBox, true);
+	SetWindowTheme(comboBox, L"CFD", nullptr);
+}
+
 bool DarkModeHelper::IsDarkModeEnabled() const
 {
 	return m_darkModeEnabled;

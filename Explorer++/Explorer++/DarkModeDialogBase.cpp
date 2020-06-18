@@ -239,6 +239,24 @@ void DarkModeDialogBase::AllowDarkModeForGroupBoxes(const std::vector<int> &cont
 	}
 }
 
+void DarkModeDialogBase::AllowDarkModeForComboBoxes(const std::vector<int> &controlIds)
+{
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (!darkModeHelper.IsDarkModeEnabled())
+	{
+		return;
+	}
+
+	for (int controlId : controlIds)
+	{
+		if (HWND comboBox = GetDlgItem(m_hDlg, controlId))
+		{
+			darkModeHelper.SetDarkModeForComboBox(comboBox);
+		}
+	}
+}
+
 INT_PTR DarkModeDialogBase::OnCtlColorDlg(HWND hwnd, HDC hdc)
 {
 	UNREFERENCED_PARAMETER(hwnd);
