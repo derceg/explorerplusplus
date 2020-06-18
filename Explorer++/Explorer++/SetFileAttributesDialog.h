@@ -31,9 +31,10 @@ private:
 
 	SetFileAttributesDialogPersistentSettings();
 
-	SetFileAttributesDialogPersistentSettings(const SetFileAttributesDialogPersistentSettings &);
+	SetFileAttributesDialogPersistentSettings(
+		const SetFileAttributesDialogPersistentSettings &) = delete;
 	SetFileAttributesDialogPersistentSettings &operator=(
-		const SetFileAttributesDialogPersistentSettings &);
+		const SetFileAttributesDialogPersistentSettings &) = delete;
 };
 
 class SetFileAttributesDialog : public DarkModeDialogBase

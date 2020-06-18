@@ -37,8 +37,8 @@ private:
 
 	HardwareChangeNotifier() = default;
 
-	HardwareChangeNotifier(const HardwareChangeNotifier &);
-	HardwareChangeNotifier & operator=(const HardwareChangeNotifier &);
+	HardwareChangeNotifier(const HardwareChangeNotifier &) = delete;
+	HardwareChangeNotifier & operator=(const HardwareChangeNotifier &) = delete;
 
 	void	NotifyObservers(NotificationType notificationType,DEV_BROADCAST_HDR *dbh);
 

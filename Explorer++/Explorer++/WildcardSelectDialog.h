@@ -31,9 +31,9 @@ private:
 
 	WildcardSelectDialogPersistentSettings();
 
-	WildcardSelectDialogPersistentSettings(const WildcardSelectDialogPersistentSettings &);
+	WildcardSelectDialogPersistentSettings(const WildcardSelectDialogPersistentSettings &) = delete;
 	WildcardSelectDialogPersistentSettings &operator=(
-		const WildcardSelectDialogPersistentSettings &);
+		const WildcardSelectDialogPersistentSettings &) = delete;
 
 	void SaveExtraRegistrySettings(HKEY hKey) override;
 	void LoadExtraRegistrySettings(HKEY hKey) override;
