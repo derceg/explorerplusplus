@@ -17,8 +17,8 @@ public:
 	ReferenceCount();
 	virtual ~ReferenceCount() = default;
 
-	ULONG	AddRef();
-	ULONG	Release();
+	ULONG	AddRef() override;
+	ULONG	Release() override;
 
 private:
 

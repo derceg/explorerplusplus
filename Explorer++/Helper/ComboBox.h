@@ -14,7 +14,7 @@ public:
 
 protected:
 
-	INT_PTR	OnDestroy();
+	INT_PTR	OnDestroy() override;
 
 private:
 

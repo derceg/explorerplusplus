@@ -49,7 +49,7 @@ protected:
 	HINSTANCE GetInstance() const;
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const;
 
-	INT_PTR GetDefaultReturnValue(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	INT_PTR GetDefaultReturnValue(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 	void AddTooltipForControl(int controlId, int stringResourceId);
 
