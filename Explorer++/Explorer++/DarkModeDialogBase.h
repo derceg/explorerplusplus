@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "DarkModeGroupBox.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <memory>
@@ -15,10 +16,11 @@ class DarkModeDialogBase : public BaseDialog
 protected:
 	DarkModeDialogBase(HINSTANCE hInstance, int iResource, HWND hParent, bool bResizable);
 
-	void AllowDarkModeForControls(const std::vector<int> controlIds);
+	void AllowDarkModeForControls(const std::vector<int> &controlIds);
 	void AllowDarkModeForListView(int controlId);
-	void AllowDarkModeForCheckboxes(const std::vector<int> controlIds);
-	void AllowDarkModeForRadioButtons(const std::vector<int> controlIds);
+	void AllowDarkModeForCheckboxes(const std::vector<int> &controlIds);
+	void AllowDarkModeForRadioButtons(const std::vector<int> &controlIds);
+	void AllowDarkModeForGroupBoxes(const std::vector<int> &controlIds);
 
 	virtual INT_PTR OnCtlColorStaticExtra(HWND hwnd, HDC hdc);
 	virtual INT_PTR OnCtlColorEditExtra(HWND hwnd, HDC hdc);
@@ -53,5 +55,6 @@ private:
 
 	std::unordered_set<int> m_checkboxControlIds;
 	std::unordered_set<int> m_radioButtonControlIds;
+	std::vector<std::unique_ptr<DarkModeGroupBox>> m_darkModeGroupBoxes;
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 };

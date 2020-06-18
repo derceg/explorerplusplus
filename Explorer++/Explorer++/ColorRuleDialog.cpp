@@ -87,6 +87,7 @@ INT_PTR ColorRuleDialog::OnInitDialog()
 	AllowDarkModeForCheckboxes(
 		{ IDC_CHECK_CASE_INSENSITIVE, IDC_CHECK_COMPRESSED, IDC_CHECK_ENCRYPTED, IDC_CHECK_ARCHIVE,
 			IDC_CHECK_HIDDEN, IDC_CHECK_INDEXED, IDC_CHECK_READONLY, IDC_CHECK_SYSTEM });
+	AllowDarkModeForGroupBoxes({ IDC_GROUP_ATTRIBUTES });
 
 	m_pcrdps->RestoreDialogPosition(m_hDlg,false);
 

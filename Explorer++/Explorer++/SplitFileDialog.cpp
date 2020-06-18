@@ -157,6 +157,7 @@ INT_PTR SplitFileDialog::OnInitDialog()
 	SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_ELAPSEDTIME, _T("00:00:00"));
 
 	AllowDarkModeForControls({ IDC_SPLIT_BUTTON_OUTPUT });
+	AllowDarkModeForGroupBoxes({ IDC_GROUP_FILE_INFORMATION, IDC_GROUP_SPLIT_INFORMATION });
 
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
 

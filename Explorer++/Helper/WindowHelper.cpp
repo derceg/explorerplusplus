@@ -61,6 +61,23 @@ void GetWindowString(HWND hwnd, std::wstring &str)
 	delete[] szTemp;
 }
 
+std::wstring GetWindowString(HWND hwnd)
+{
+	int textLength = GetWindowTextLength(hwnd);
+
+	if (textLength == 0)
+	{
+		return {};
+	}
+
+	std::wstring text;
+	text.resize(textLength + 1);
+
+	GetWindowText(hwnd, text.data(), static_cast<int>(text.capacity()));
+
+	return text;
+}
+
 BOOL lShowWindow(HWND hwnd, BOOL bShowWindow)
 {
 	int windowShowState;

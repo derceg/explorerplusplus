@@ -445,6 +445,9 @@
     <ClCompile Include="DarkModeDialogBase.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="DarkModeGroupBox.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -892,6 +895,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="DarkModeDialogBase.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="DarkModeGroupBox.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

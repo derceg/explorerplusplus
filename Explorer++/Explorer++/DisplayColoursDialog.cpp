@@ -26,6 +26,7 @@ INT_PTR DisplayColoursDialog::OnInitDialog()
 	InitializePreviewWindow();
 
 	AllowDarkModeForControls({ IDC_BUTTON_RESTOREDEFAULTS , IDC_BUTTON_DISPLAY_FONT });
+	AllowDarkModeForGroupBoxes({ IDC_GROUP_CENTER_COLOR, IDC_GROUP_SURROUND_COLOR });
 
 	m_pdcdps->RestoreDialogPosition(m_hDlg, false);
 

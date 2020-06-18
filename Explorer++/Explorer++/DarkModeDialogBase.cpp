@@ -7,6 +7,8 @@
 #include "DarkModeHelper.h"
 #include "MainResource.h"
 #include "../Helper/Controls.h"
+#include "../Helper/WindowHelper.h"
+#include <VSStyle.h>
 
 DarkModeDialogBase::DarkModeDialogBase(
 	HINSTANCE hInstance, int iResource, HWND hParent, bool bResizable) :
@@ -99,13 +101,8 @@ void DarkModeDialogBase::OnDrawButtonText(const NMCUSTOMDRAW *customDraw, Button
 	textRect.left +=
 		elementSize.cx + MulDiv(CHECKBOX_TEXT_SPACING_96DPI, dpi, USER_DEFAULT_SCREEN_DPI);
 
-	int textLength = GetWindowTextLength(customDraw->hdr.hwndFrom);
-	assert(textLength != 0);
-
-	std::wstring text;
-	text.resize(textLength + 1);
-
-	GetWindowText(customDraw->hdr.hwndFrom, text.data(), static_cast<int>(text.capacity()));
+	std::wstring text = GetWindowString(customDraw->hdr.hwndFrom);
+	assert(!text.empty());
 
 	SetTextColor(customDraw->hdc, DarkModeHelper::FOREGROUND_COLOR);
 
@@ -126,7 +123,7 @@ void DarkModeDialogBase::OnDrawButtonText(const NMCUSTOMDRAW *customDraw, Button
 	// TODO: May also need to handle CDIS_DISABLED and CDIS_GRAYED.
 }
 
-void DarkModeDialogBase::AllowDarkModeForControls(const std::vector<int> controlIds)
+void DarkModeDialogBase::AllowDarkModeForControls(const std::vector<int> &controlIds)
 {
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
 
@@ -200,7 +197,7 @@ LRESULT CALLBACK DarkModeDialogBase::ListViewWndProc(
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-void DarkModeDialogBase::AllowDarkModeForCheckboxes(const std::vector<int> controlIds)
+void DarkModeDialogBase::AllowDarkModeForCheckboxes(const std::vector<int> &controlIds)
 {
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
 
@@ -212,7 +209,7 @@ void DarkModeDialogBase::AllowDarkModeForCheckboxes(const std::vector<int> contr
 	m_checkboxControlIds = std::unordered_set(controlIds.begin(), controlIds.end());
 }
 
-void DarkModeDialogBase::AllowDarkModeForRadioButtons(const std::vector<int> controlIds)
+void DarkModeDialogBase::AllowDarkModeForRadioButtons(const std::vector<int> &controlIds)
 {
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
 
@@ -222,6 +219,24 @@ void DarkModeDialogBase::AllowDarkModeForRadioButtons(const std::vector<int> con
 	}
 
 	m_radioButtonControlIds = std::unordered_set(controlIds.begin(), controlIds.end());
+}
+
+void DarkModeDialogBase::AllowDarkModeForGroupBoxes(const std::vector<int> &controlIds)
+{
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (!darkModeHelper.IsDarkModeEnabled())
+	{
+		return;
+	}
+
+	for (int controlId : controlIds)
+	{
+		if (HWND groupBox = GetDlgItem(m_hDlg, controlId))
+		{
+			m_darkModeGroupBoxes.push_back(std::make_unique<DarkModeGroupBox>(groupBox));
+		}
+	}
 }
 
 INT_PTR DarkModeDialogBase::OnCtlColorDlg(HWND hwnd, HDC hdc)
