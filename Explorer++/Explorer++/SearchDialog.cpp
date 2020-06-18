@@ -184,11 +184,11 @@ wil::unique_hicon SearchDialog::GetDialogIcon(int iconWidth, int iconHeight) con
 }
 
 void SearchDialog::GetResizableControlInformation(
-	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList)
+	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control> &ControlList)
 {
 	dsc = BaseDialog::DialogSizeConstraint::None;
 
-	ResizableDialog::Control_t control;
+	ResizableDialog::Control control;
 
 	control.iID = IDC_COMBO_NAME;
 	control.Type = ResizableDialog::ControlType::Resize;

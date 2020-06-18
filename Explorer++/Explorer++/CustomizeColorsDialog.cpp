@@ -83,11 +83,11 @@ wil::unique_hicon CustomizeColorsDialog::GetDialogIcon(int iconWidth, int iconHe
 }
 
 void CustomizeColorsDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-	std::list<ResizableDialog::Control_t> &ControlList)
+	std::list<ResizableDialog::Control> &ControlList)
 {
 	dsc = BaseDialog::DialogSizeConstraint::None;
 
-	ResizableDialog::Control_t control;
+	ResizableDialog::Control control;
 
 	control.iID = IDC_LISTVIEW_COLORRULES;
 	control.Type = ResizableDialog::ControlType::Resize;

@@ -30,21 +30,21 @@ public:
 		Y
 	};
 
-	struct Control_t
+	struct Control
 	{
 		int iID;
 		ControlType Type;
 		ControlConstraint Constraint;
 	};
 
-	ResizableDialog(HWND hDlg, const std::list<Control_t> &controlList);
+	ResizableDialog(HWND hDlg, const std::list<Control> &controlList);
 
 	void UpdateControls(int iWidth, int iHeight);
 
 private:
 	DISALLOW_COPY_AND_ASSIGN(ResizableDialog);
 
-	struct ControlInternal_t
+	struct ControlInternal
 	{
 		int iID;
 		ControlType Type;
@@ -55,5 +55,5 @@ private:
 	};
 
 	const HWND m_hDlg;
-	std::list<ControlInternal_t> m_ControlList;
+	std::list<ControlInternal> m_ControlList;
 };

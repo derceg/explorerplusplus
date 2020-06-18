@@ -63,11 +63,11 @@ wil::unique_hicon FilterDialog::GetDialogIcon(int iconWidth, int iconHeight) con
 }
 
 void FilterDialog::GetResizableControlInformation(
-	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList)
+	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control> &ControlList)
 {
 	dsc = BaseDialog::DialogSizeConstraint::X;
 
-	ResizableDialog::Control_t control;
+	ResizableDialog::Control control;
 
 	control.iID = IDC_FILTER_COMBOBOX;
 	control.Type = ResizableDialog::ControlType::Resize;

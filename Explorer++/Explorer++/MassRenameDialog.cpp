@@ -127,11 +127,11 @@ wil::unique_hicon MassRenameDialog::GetDialogIcon(int iconWidth, int iconHeight)
 }
 
 void MassRenameDialog::GetResizableControlInformation(
-	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList)
+	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control> &ControlList)
 {
 	dsc = BaseDialog::DialogSizeConstraint::None;
 
-	ResizableDialog::Control_t control;
+	ResizableDialog::Control control;
 
 	control.iID = IDC_MASSRENAME_EDIT;
 	control.Type = ResizableDialog::ControlType::Resize;

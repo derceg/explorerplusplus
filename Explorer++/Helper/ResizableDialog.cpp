@@ -10,9 +10,9 @@
 #include "stdafx.h"
 #include "ResizableDialog.h"
 
-ResizableDialog::ResizableDialog(HWND hDlg, const std::list<Control_t> &controlList) : m_hDlg(hDlg)
+ResizableDialog::ResizableDialog(HWND hDlg, const std::list<Control> &controlList) : m_hDlg(hDlg)
 {
-	ControlInternal_t controlInternal;
+	ControlInternal controlInternal;
 	HWND hwnd;
 	RECT rcDlg;
 	RECT rc;

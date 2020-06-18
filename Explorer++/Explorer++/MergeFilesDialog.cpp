@@ -204,11 +204,11 @@ wil::unique_hicon MergeFilesDialog::GetDialogIcon(int iconWidth, int iconHeight)
 }
 
 void MergeFilesDialog::GetResizableControlInformation(
-	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList)
+	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control> &ControlList)
 {
 	dsc = BaseDialog::DialogSizeConstraint::None;
 
-	ResizableDialog::Control_t control;
+	ResizableDialog::Control control;
 
 	control.iID = IDC_MERGE_LISTVIEW;
 	control.Type = ResizableDialog::ControlType::Resize;

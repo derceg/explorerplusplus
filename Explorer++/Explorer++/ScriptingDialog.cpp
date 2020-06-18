@@ -29,11 +29,11 @@ INT_PTR ScriptingDialog::OnInitDialog()
 }
 
 void ScriptingDialog::GetResizableControlInformation(
-	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList)
+	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control> &ControlList)
 {
 	dsc = BaseDialog::DialogSizeConstraint::None;
 
-	ResizableDialog::Control_t control;
+	ResizableDialog::Control control;
 
 	control.iID = IDC_LOG;
 	control.Type = ResizableDialog::ControlType::Resize;

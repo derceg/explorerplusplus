@@ -1112,7 +1112,7 @@ provided. Any entries in this set will be ignored (i.e. they
 won't be loaded). Each entry should be a CLSID with the enclosing
 braces included. */
 BOOL LoadContextMenuHandlers(const TCHAR *szRegKey,
-	std::list<ContextMenuHandler_t> &contextMenuHandlers,
+	std::list<ContextMenuHandler> &contextMenuHandlers,
 	const std::vector<std::wstring> &blacklistedCLSIDEntries)
 {
 	HKEY hKey = nullptr;
@@ -1151,7 +1151,7 @@ BOOL LoadContextMenuHandlers(const TCHAR *szRegKey,
 								return boost::iequals(szCLSID, blacklistedEntry);
 							}))
 					{
-						ContextMenuHandler_t contextMenuHandler;
+						ContextMenuHandler contextMenuHandler;
 
 						BOOL bRes = LoadIUnknownFromCLSID(szCLSID, &contextMenuHandler);
 
@@ -1184,7 +1184,7 @@ will attempted to be loaded.
 Regardless of whether or not a DLL was actually
 loaded, the object will be initialized with a call
 to CoCreateInstance. */
-BOOL LoadIUnknownFromCLSID(const TCHAR *szCLSID, ContextMenuHandler_t *pContextMenuHandler)
+BOOL LoadIUnknownFromCLSID(const TCHAR *szCLSID, ContextMenuHandler *pContextMenuHandler)
 {
 	HKEY hCLSIDKey;
 	HKEY hDllKey;

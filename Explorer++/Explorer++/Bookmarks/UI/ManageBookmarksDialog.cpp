@@ -64,11 +64,11 @@ INT_PTR ManageBookmarksDialog::OnInitDialog()
 }
 
 void ManageBookmarksDialog::GetResizableControlInformation(
-	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &controlList)
+	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control> &controlList)
 {
 	dsc = BaseDialog::DialogSizeConstraint::None;
 
-	ResizableDialog::Control_t control;
+	ResizableDialog::Control control;
 
 	control.iID = IDC_MANAGEBOOKMARKS_TREEVIEW;
 	control.Type = ResizableDialog::ControlType::Resize;

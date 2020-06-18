@@ -74,7 +74,7 @@ private:
 	ManageBookmarksDialog &operator=(const ManageBookmarksDialog &mbd);
 
 	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-		std::list<ResizableDialog::Control_t> &controlList) override;
+		std::list<ResizableDialog::Control> &controlList) override;
 
 	void SetupToolbar();
 	void SetupTreeView();

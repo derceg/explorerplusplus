@@ -93,9 +93,9 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 
 			m_dsc = DialogSizeConstraint::None;
 
-			std::list<ResizableDialog::Control_t> controlList;
+			std::list<ResizableDialog::Control> controlList;
 
-			ResizableDialog::Control_t control;
+			ResizableDialog::Control control;
 			control.iID = GetGripperControlId();
 			control.Type = ResizableDialog::ControlType::Move;
 			control.Constraint = ResizableDialog::ControlConstraint::None;
@@ -241,7 +241,7 @@ HWND BaseDialog::ShowModelessDialog(IModelessDialogNotification *pmdn)
 }
 
 void BaseDialog::GetResizableControlInformation(
-	DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &controlList)
+	DialogSizeConstraint &dsc, std::list<ResizableDialog::Control> &controlList)
 {
 	UNREFERENCED_PARAMETER(dsc);
 	UNREFERENCED_PARAMETER(controlList);

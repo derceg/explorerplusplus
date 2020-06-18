@@ -83,7 +83,7 @@ ContextMenuManager::ContextMenuManager(ContextMenuType contextMenuType,
 
 		if (SUCCEEDED(hr))
 		{
-			MenuHandler_t menuHandler;
+			MenuHandler menuHandler;
 			IContextMenu *pContextMenu = nullptr;
 			IContextMenu2 *pContextMenu2 = nullptr;
 			IContextMenu3 *pContextMenu3 = nullptr;

@@ -129,11 +129,11 @@ bool SelectColumnsDialog::CompareColumns(const Column_t &column1, const Column_t
 }
 
 void SelectColumnsDialog::GetResizableControlInformation(
-	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control_t> &ControlList)
+	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control> &ControlList)
 {
 	dsc = BaseDialog::DialogSizeConstraint::None;
 
-	ResizableDialog::Control_t control;
+	ResizableDialog::Control control;
 
 	control.iID = IDC_COLUMNS_LISTVIEW;
 	control.Type = ResizableDialog::ControlType::Resize;

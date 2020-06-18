@@ -47,7 +47,7 @@ private:
 	bool CompareColumns(const Column_t &column1, const Column_t &column2);
 
 	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-		std::list<ResizableDialog::Control_t> &ControlList) override;
+		std::list<ResizableDialog::Control> &ControlList) override;
 	void SaveState() override;
 
 	void OnOk();

@@ -18,7 +18,7 @@ protected:
 
 private:
 	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-		std::list<ResizableDialog::Control_t> &ControlList) override;
+		std::list<ResizableDialog::Control> &ControlList) override;
 
 	std::wstring FormatResult(const sol::protected_function_result &result);
 	void AppendToLog(const std::wstring &command, const std::wstring &result);

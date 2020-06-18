@@ -42,7 +42,7 @@ private:
 		File
 	};
 
-	struct MenuHandler_t
+	struct MenuHandler
 	{
 		/* Note that only ONE of these
 		should be used at any one time. */
@@ -78,8 +78,8 @@ private:
 
 	static ItemType GetItemType(PCIDLIST_ABSOLUTE pidl);
 
-	std::list<ContextMenuHandler_t> m_ContextMenuHandlers;
-	std::list<MenuHandler_t> m_MenuHandlers;
+	std::list<ContextMenuHandler> m_ContextMenuHandlers;
+	std::list<MenuHandler> m_MenuHandlers;
 
 	UINT m_uMinID;
 	UINT m_uMaxID;
