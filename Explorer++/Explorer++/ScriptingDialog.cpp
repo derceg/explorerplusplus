@@ -82,8 +82,7 @@ void ScriptingDialog::OnRun()
 {
 	HWND commandControl = GetDlgItem(m_hDlg, IDC_COMMAND);
 
-	std::wstring command;
-	GetWindowString(commandControl, command);
+	std::wstring command = GetWindowString(commandControl);
 
 	std::wstring result;
 

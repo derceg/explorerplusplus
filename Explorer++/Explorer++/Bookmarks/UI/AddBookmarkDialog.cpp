@@ -290,12 +290,10 @@ INT_PTR AddBookmarkDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 void AddBookmarkDialog::OnOk()
 {
 	HWND hName = GetDlgItem(m_hDlg, IDC_BOOKMARK_NAME);
-	std::wstring name;
-	GetWindowString(hName, name);
+	std::wstring name = GetWindowString(hName);
 
 	HWND hLocation = GetDlgItem(m_hDlg, IDC_BOOKMARK_LOCATION);
-	std::wstring location;
-	GetWindowString(hLocation, location);
+	std::wstring location = GetWindowString(hLocation);
 
 	if (name.empty() || (m_bookmarkItem->IsBookmark() && location.empty()))
 	{

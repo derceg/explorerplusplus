@@ -130,8 +130,7 @@ INT_PTR ComboBox::OnCBNEditChange()
 		return 1;
 	}
 
-	std::wstring currentText;
-	GetWindowString(m_hwnd,currentText);
+	std::wstring currentText = GetWindowString(m_hwnd);
 
 	if(currentText.length() > 0)
 	{

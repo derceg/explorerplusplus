@@ -147,8 +147,8 @@ INT_PTR ColorRuleDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 
 void ColorRuleDialog::OnOk()
 {
-	GetWindowString(GetDlgItem(m_hDlg, IDC_EDIT_DESCRIPTION), m_pColorRule->strDescription);
-	GetWindowString(GetDlgItem(m_hDlg, IDC_EDIT_FILENAMEPATTERN), m_pColorRule->strFilterPattern);
+	m_pColorRule->strDescription = GetWindowString(GetDlgItem(m_hDlg, IDC_EDIT_DESCRIPTION));
+	m_pColorRule->strFilterPattern = GetWindowString(GetDlgItem(m_hDlg, IDC_EDIT_FILENAMEPATTERN));
 
 	m_pColorRule->rgbColour = m_cfCurrentColor;
 
