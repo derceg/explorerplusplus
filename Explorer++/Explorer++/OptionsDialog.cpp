@@ -14,6 +14,7 @@
 #include "OptionsDialog.h"
 #include "Config.h"
 #include "CoreInterface.h"
+#include "DarkModeGroupBox.h"
 #include "DarkModeHelper.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
@@ -275,6 +276,15 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(
 			darkModeHelper.SetDarkModeForControl(GetDlgItem(hDlg, IDC_DEFAULT_NEWTABDIR_BUTTON));
 			darkModeHelper.SetDarkModeForComboBox(GetDlgItem(hDlg, IDC_OPTIONS_ICON_THEME));
 			darkModeHelper.SetDarkModeForComboBox(GetDlgItem(hDlg, IDC_OPTIONS_LANGUAGE));
+
+			m_darkModeGroupBoxes.push_back(
+				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_STARTUP)));
+			m_darkModeGroupBoxes.push_back(std::make_unique<DarkModeGroupBox>(
+				GetDlgItem(hDlg, IDC_GROUP_DEFAULT_FILE_MANAGER)));
+			m_darkModeGroupBoxes.push_back(
+				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_GENERAL_SETTINGS)));
+			m_darkModeGroupBoxes.push_back(
+				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_LANGUAGE)));
 		}
 	}
 	break;
@@ -914,6 +924,20 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 		if (m_config->useFullRowSelect)
 		{
 			CheckDlgButton(hDlg, IDC_OPTION_FULLROWSELECT, BST_CHECKED);
+		}
+
+		auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+		if (darkModeHelper.IsDarkModeEnabled())
+		{
+			m_darkModeGroupBoxes.push_back(
+				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_GENERAL)));
+			m_darkModeGroupBoxes.push_back(
+				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_LISTVIEW)));
+			m_darkModeGroupBoxes.push_back(
+				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_TREEVIEW)));
+			m_darkModeGroupBoxes.push_back(
+				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_DISPLAY_WINDOW)));
 		}
 	}
 	break;

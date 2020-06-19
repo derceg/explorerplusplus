@@ -9,6 +9,7 @@
 #include "../Helper/WindowSubclassWrapper.h"
 #include <wil/resource.h>
 
+class DarkModeGroupBox;
 __interface IExplorerplusplus;
 class TabContainer;
 
@@ -90,5 +91,6 @@ private:
 	wil::unique_hicon m_optionsDialogIcon;
 	wil::unique_hicon m_newTabDirectoryIcon;
 
+	std::vector<std::unique_ptr<DarkModeGroupBox>> m_darkModeGroupBoxes;
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 };
