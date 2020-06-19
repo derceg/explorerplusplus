@@ -300,6 +300,9 @@
     <ClInclude Include="CustomGripper.h">
       <Filter>Control Support</Filter>
     </ClInclude>
+    <ClInclude Include="PropertySheet.h">
+      <Filter>Control Support</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dialog Support">

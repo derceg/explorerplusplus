@@ -14,6 +14,7 @@
 #include "OptionsDialog.h"
 #include "Config.h"
 #include "CoreInterface.h"
+#include "DarkModeHelper.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -27,6 +28,7 @@
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
+#include "../Helper/PropertySheet.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
@@ -118,7 +120,7 @@ HWND OptionsDialog::Show(HWND parentWindow)
 	psh.hIcon = m_optionsDialogIcon.get();
 	psh.ppsp = nullptr;
 	psh.phpage = sheetHandles.data();
-	psh.pfnCallback = nullptr;
+	psh.pfnCallback = PropertySheetCallback;
 	HWND propertySheet = reinterpret_cast<HWND>(PropertySheet(&psh));
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(propertySheet,
@@ -127,6 +129,42 @@ HWND OptionsDialog::Show(HWND parentWindow)
 	CenterWindow(parentWindow, propertySheet);
 
 	return propertySheet;
+}
+
+int CALLBACK OptionsDialog::PropertySheetCallback(HWND dialog, UINT msg, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+
+	switch (msg)
+	{
+	case PSCB_INITIALIZED:
+		OnPropertySheetInitialized(dialog);
+		break;
+	}
+
+	return 0;
+}
+
+void OptionsDialog::OnPropertySheetInitialized(HWND dialog)
+{
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (!darkModeHelper.IsDarkModeEnabled())
+	{
+		return;
+	}
+
+	darkModeHelper.AllowDarkModeForWindow(dialog, true);
+
+	BOOL dark = TRUE;
+	DarkModeHelper::WINDOWCOMPOSITIONATTRIBDATA compositionData = {
+		DarkModeHelper::WCA_USEDARKMODECOLORS, &dark, sizeof(dark)
+	};
+	darkModeHelper.SetWindowCompositionAttribute(dialog, &compositionData);
+
+	darkModeHelper.SetDarkModeForControl(GetDlgItem(dialog, IDOK));
+	darkModeHelper.SetDarkModeForControl(GetDlgItem(dialog, IDCANCEL));
+	darkModeHelper.SetDarkModeForControl(GetDlgItem(dialog, IDAPPLY));
 }
 
 PROPSHEETPAGE OptionsDialog::GeneratePropertySheetDefinition(

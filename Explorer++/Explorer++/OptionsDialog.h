@@ -37,6 +37,9 @@ private:
 
 	PROPSHEETPAGE GeneratePropertySheetDefinition(const OptionsDialogSheetInfo &sheetInfo);
 
+	static int CALLBACK PropertySheetCallback(HWND dialog, UINT msg, LPARAM lParam);
+	static void OnPropertySheetInitialized(HWND dialog);
+
 	static LRESULT CALLBACK PropSheetProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK PropSheetProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
