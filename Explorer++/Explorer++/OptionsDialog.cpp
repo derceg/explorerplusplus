@@ -267,6 +267,15 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(
 
 		AddIconThemes(hDlg);
 		AddLanguages(hDlg);
+
+		auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+		if (darkModeHelper.IsDarkModeEnabled())
+		{
+			darkModeHelper.SetDarkModeForControl(GetDlgItem(hDlg, IDC_DEFAULT_NEWTABDIR_BUTTON));
+			darkModeHelper.SetDarkModeForComboBox(GetDlgItem(hDlg, IDC_OPTIONS_ICON_THEME));
+			darkModeHelper.SetDarkModeForComboBox(GetDlgItem(hDlg, IDC_OPTIONS_LANGUAGE));
+		}
 	}
 	break;
 
@@ -634,6 +643,13 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 
 		SetInfoTipWindowStates(hDlg);
 		SetFolderSizeWindowState(hDlg);
+
+		auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+		if (darkModeHelper.IsDarkModeEnabled())
+		{
+			darkModeHelper.SetDarkModeForComboBox(GetDlgItem(hDlg, IDC_COMBO_FILESIZES));
+		}
 	}
 	break;
 
@@ -1236,6 +1252,14 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(
 		}
 
 		SendMessage(hComboBox, CB_SETCURSEL, selectedIndex, 0);
+
+		auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+		if (darkModeHelper.IsDarkModeEnabled())
+		{
+			darkModeHelper.SetDarkModeForControl(GetDlgItem(hDlg, IDC_BUTTON_DEFAULTCOLUMNS));
+			darkModeHelper.SetDarkModeForComboBox(GetDlgItem(hDlg, IDC_OPTIONS_DEFAULT_VIEW));
+		}
 	}
 	break;
 
