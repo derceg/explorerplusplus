@@ -57,6 +57,9 @@ private:
 		HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	INT_PTR CALLBACK DefaultSettingsProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+	INT_PTR OnCtlColorDlg(HWND hwnd, HDC hdc);
+	INT_PTR OnCtlColor(HWND hwnd, HDC hdc);
+
 	void OnReplaceExplorerSettingChanged(HWND dialog,
 		DefaultFileManager::ReplaceExplorerMode updatedReplaceMode);
 	bool UpdateReplaceExplorerSetting(

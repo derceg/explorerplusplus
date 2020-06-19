@@ -270,6 +270,14 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(
 	}
 	break;
 
+	case WM_CTLCOLORDLG:
+		return OnCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
+	case WM_CTLCOLORSTATIC:
+	case WM_CTLCOLOREDIT:
+	case WM_CTLCOLORLISTBOX:
+		return OnCtlColor(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
 	case WM_COMMAND:
 		if (HIWORD(wParam) != 0)
 		{
@@ -629,6 +637,14 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 	}
 	break;
 
+	case WM_CTLCOLORDLG:
+		return OnCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
+	case WM_CTLCOLORSTATIC:
+	case WM_CTLCOLOREDIT:
+	case WM_CTLCOLORLISTBOX:
+		return OnCtlColor(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
 	case WM_COMMAND:
 		if (HIWORD(wParam) != 0)
 		{
@@ -886,6 +902,14 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 	}
 	break;
 
+	case WM_CTLCOLORDLG:
+		return OnCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
+	case WM_CTLCOLORSTATIC:
+	case WM_CTLCOLOREDIT:
+	case WM_CTLCOLORLISTBOX:
+		return OnCtlColor(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
@@ -1075,6 +1099,14 @@ INT_PTR CALLBACK OptionsDialog::TabSettingsProc(HWND hDlg, UINT uMsg, WPARAM wPa
 	}
 	break;
 
+	case WM_CTLCOLORDLG:
+		return OnCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
+	case WM_CTLCOLORSTATIC:
+	case WM_CTLCOLOREDIT:
+	case WM_CTLCOLORLISTBOX:
+		return OnCtlColor(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
@@ -1207,6 +1239,14 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(
 	}
 	break;
 
+	case WM_CTLCOLORDLG:
+		return OnCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
+	case WM_CTLCOLORSTATIC:
+	case WM_CTLCOLOREDIT:
+	case WM_CTLCOLORLISTBOX:
+		return OnCtlColor(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
 	case WM_COMMAND:
 		if (HIWORD(wParam) != 0)
 		{
@@ -1278,6 +1318,38 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(
 	}
 
 	return 0;
+}
+
+INT_PTR OptionsDialog::OnCtlColorDlg(HWND hwnd, HDC hdc)
+{
+	UNREFERENCED_PARAMETER(hwnd);
+	UNREFERENCED_PARAMETER(hdc);
+
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (!darkModeHelper.IsDarkModeEnabled())
+	{
+		return FALSE;
+	}
+
+	return reinterpret_cast<INT_PTR>(darkModeHelper.GetBackgroundBrush());
+}
+
+INT_PTR OptionsDialog::OnCtlColor(HWND hwnd, HDC hdc)
+{
+	UNREFERENCED_PARAMETER(hwnd);
+
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (!darkModeHelper.IsDarkModeEnabled())
+	{
+		return FALSE;
+	}
+
+	SetBkColor(hdc, DarkModeHelper::BACKGROUND_COLOR);
+	SetTextColor(hdc, DarkModeHelper::FOREGROUND_COLOR);
+
+	return reinterpret_cast<INT_PTR>(darkModeHelper.GetBackgroundBrush());
 }
 
 void OptionsDialog::OnDefaultSettingsNewTabDir(HWND hDlg)
