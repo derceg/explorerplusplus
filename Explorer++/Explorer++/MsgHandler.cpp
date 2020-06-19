@@ -531,7 +531,7 @@ std::optional<LRESULT> Explorerplusplus::OnCtlColorStatic(HWND hwnd, HDC hdc)
 			return std::nullopt;
 		}
 
-		return reinterpret_cast<INT_PTR>(darkModeHelper.GetBackgroundBrush());
+		return reinterpret_cast<INT_PTR>(m_tabBarBackgroundBrush.get());
 	}
 
 	return std::nullopt;

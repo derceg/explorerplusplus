@@ -124,6 +124,8 @@ private:
 	// This is the same background color as used in the Explorer treeview.
 	static inline constexpr COLORREF TREE_VIEW_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
 
+	static inline constexpr COLORREF TAB_BAR_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
+
 	static inline const int CLOSE_TOOLBAR_WIDTH = 24;
 	static inline const int CLOSE_TOOLBAR_HEIGHT = 24;
 
@@ -567,6 +569,7 @@ private:
 
 	/* Tabs. */
 	TabContainer *m_tabContainer;
+	wil::unique_hbrush m_tabBarBackgroundBrush;
 	std::unique_ptr<TabRestorer> m_tabRestorer;
 	std::unique_ptr<TabRestorerUI> m_tabRestorerUI;
 	TabsInitializedSignal m_tabsInitializedSignal;
