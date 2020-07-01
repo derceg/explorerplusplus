@@ -115,7 +115,7 @@ HRESULT ShellNavigationController::Refresh()
 		return E_FAIL;
 	}
 
-	return m_navigator->BrowseFolder(currentEntry->GetPidl().get(), false);
+	return m_navigator->BrowseFolder(currentEntry->GetPidl().get(), false, true);
 }
 
 HRESULT ShellNavigationController::BrowseFolder(const HistoryEntry *entry, bool addHistoryEntry)

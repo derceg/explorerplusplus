@@ -15,7 +15,8 @@
 #include <wil/com.h>
 #include <list>
 
-HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)
+HRESULT ShellBrowser::BrowseFolder(
+	PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry, bool retainSelection)
 {
 	SetCursor(LoadCursor(nullptr, IDC_WAIT));
 
@@ -33,6 +34,17 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 	EnterCriticalSection(&m_csDirectoryAltered);
 	m_FilesAdded.clear();
 	m_FileSelectionList.clear();
+
+	std::list<std::wstring> previousSelection;
+	if (retainSelection)
+	{
+		int iItem = -1;
+		while ((iItem = ListView_GetNextItem(m_hListView, iItem, LVIS_SELECTED)) != -1)
+		{
+			auto fd = GetItemFileFindData(iItem);
+			previousSelection.push_back(fd.cFileName);
+		}
+	}
 	LeaveCriticalSection(&m_csDirectoryAltered);
 
 	TCHAR szParsingPath[MAX_PATH];
@@ -81,6 +93,11 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 
 	/* Set the focus back to the first item. */
 	ListView_SetItemState(m_hListView, 0, LVIS_FOCUSED, LVIS_FOCUSED);
+
+	if (!previousSelection.empty())
+	{
+		SelectItems(previousSelection);
+	}
 
 	m_bFolderVisited = TRUE;
 

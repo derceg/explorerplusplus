@@ -296,7 +296,8 @@ private:
 	void VerifySortMode();
 
 	/* NavigatorInterface methods. */
-	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true) override;
+	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true,
+		bool retainSelection = false) override;
 
 	/* Browsing support. */
 	HRESULT EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory);

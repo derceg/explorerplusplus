@@ -11,7 +11,7 @@ typedef boost::signals2::signal<void(PCIDLIST_ABSOLUTE pidlDirectory, bool addHi
 
 __interface NavigatorInterface
 {
-	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true);
+	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true, bool retainSelection = false);
 	boost::signals2::connection AddNavigationCompletedObserver(
 		const NavigationCompletedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back);
