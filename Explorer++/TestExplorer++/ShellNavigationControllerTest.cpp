@@ -18,7 +18,8 @@ using namespace testing;
 class NavigatorFake : public NavigatorInterface
 {
 public:
-	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true) override
+	HRESULT BrowseFolder(
+		PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true, bool retainSelection = false) override
 	{
 		m_navigationCompletedSignal(pidlDirectory, addHistoryEntry);
 
@@ -42,8 +43,9 @@ public:
 	NavigatorMock()
 	{
 		ON_CALL(*this, BrowseFolderImpl)
-			.WillByDefault([this](PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry) {
-				return m_fake.BrowseFolder(pidlDirectory, addHistoryEntry);
+			.WillByDefault([this](PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry,
+							   bool retainSelection) {
+				return m_fake.BrowseFolder(pidlDirectory, addHistoryEntry, retainSelection);
 			});
 
 		ON_CALL(*this, AddNavigationCompletedObserverImpl)
@@ -53,14 +55,16 @@ public:
 			});
 	}
 
-	MOCK_METHOD(HRESULT, BrowseFolderImpl, (PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry));
+	MOCK_METHOD(HRESULT, BrowseFolderImpl,
+		(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry, bool retainSelection));
 	MOCK_METHOD(boost::signals2::connection, AddNavigationCompletedObserverImpl,
 		(const NavigationCompletedSignal::slot_type &observer,
 			boost::signals2::connect_position position));
 
-	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true) override
+	HRESULT BrowseFolder(
+		PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true, bool retainSelection = false) override
 	{
-		return BrowseFolderImpl(pidlDirectory, addHistoryEntry);
+		return BrowseFolderImpl(pidlDirectory, addHistoryEntry, retainSelection);
 	}
 
 	boost::signals2::connection AddNavigationCompletedObserver(
