@@ -174,8 +174,15 @@ void ShellBrowser::SetUpListViewColumns()
 
 void ShellBrowser::InsertColumn(ColumnType columnType, int columnIndex, int width)
 {
-	std::wstring columnText =
-		ResourceHelper::LoadString(m_hResourceModule, LookupColumnNameStringIndex(columnType));
+	std::wstring columnText;
+	try
+	{
+		columnText =
+			ResourceHelper::LoadString(m_hResourceModule, LookupColumnNameStringIndex(columnType));
+	}
+	catch (const std::runtime_error &)
+	{
+	}
 
 	LV_COLUMN lvColumn;
 	lvColumn.mask = LVCF_TEXT | LVCF_WIDTH;
