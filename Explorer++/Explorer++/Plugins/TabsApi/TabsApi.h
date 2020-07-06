@@ -51,7 +51,7 @@ namespace Plugins
 			std::wstring toString();
 		};
 
-		TabsApi(IExplorerplusplus *expp, TabContainer *tabContainer, Navigation *navigation);
+		TabsApi(IExplorerplusplus *expp, TabContainer *tabContainer);
 
 		std::vector<Tab> getAll();
 		std::optional<Tab> get(int tabId);
@@ -68,6 +68,5 @@ namespace Plugins
 
 		IExplorerplusplus *m_expp;
 		TabContainer *m_tabContainer;
-		Navigation *m_navigation;
 	};
 }

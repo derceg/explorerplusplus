@@ -55,11 +55,9 @@ std::wstring Plugins::TabsApi::Tab::toString()
 		+ _T(", folderSettings = {") + folderSettings.toString() + _T("}");
 }
 
-Plugins::TabsApi::TabsApi(IExplorerplusplus *expp, TabContainer *tabContainer,
-	Navigation *navigation) :
+Plugins::TabsApi::TabsApi(IExplorerplusplus *expp, TabContainer *tabContainer) :
 	m_expp(expp),
-	m_tabContainer(tabContainer),
-	m_navigation(navigation)
+	m_tabContainer(tabContainer)
 {
 
 }
