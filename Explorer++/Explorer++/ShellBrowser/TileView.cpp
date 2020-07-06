@@ -8,24 +8,19 @@
 
 void ShellBrowser::InsertTileViewColumns()
 {
-	LVTILEVIEWINFO lvtvi;
 	LVCOLUMN lvColumn;
+	lvColumn.mask = 0;
 
-	/* Name. */
-	lvColumn.mask = LVCF_TEXT;
-	lvColumn.pszText = EMPTY_STRING;
+	/* Name. */	
 	ListView_InsertColumn(m_hListView, 1, &lvColumn);
 
 	/* Type. */
-	lvColumn.mask = LVCF_TEXT;
-	lvColumn.pszText = EMPTY_STRING;
 	ListView_InsertColumn(m_hListView, 2, &lvColumn);
 
 	/* File size. */
-	lvColumn.mask = LVCF_TEXT;
-	lvColumn.pszText = EMPTY_STRING;
 	ListView_InsertColumn(m_hListView, 3, &lvColumn);
 
+	LVTILEVIEWINFO lvtvi;
 	lvtvi.cbSize = sizeof(lvtvi);
 	lvtvi.dwMask = LVTVIM_COLUMNS;
 	lvtvi.dwFlags = LVTVIF_AUTOSIZE;
