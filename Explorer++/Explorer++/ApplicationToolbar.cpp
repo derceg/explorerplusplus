@@ -266,17 +266,15 @@ void ApplicationToolbar::UpdateButton(int iItem)
 		TBBUTTONINFO tbi;
 		TCHAR name[512];
 		tbi.cbSize = sizeof(tbi);
-		tbi.dwMask = TBIF_BYINDEX | TBIF_IMAGE | TBIF_TEXT;
+		tbi.dwMask = TBIF_BYINDEX | TBIF_IMAGE;
 		tbi.iImage = shfi.iIcon;
 
 		if (button->ShowNameOnToolbar)
 		{
+			WI_SetFlag(tbi.dwMask, TBIF_TEXT);
+
 			StringCchCopy(name, SIZEOF_ARRAY(name), button->Name.c_str());
 			tbi.pszText = name;
-		}
-		else
-		{
-			tbi.pszText = EMPTY_STRING;
 		}
 
 		SendMessage(m_hwnd, TB_SETBUTTONINFO, iItem, reinterpret_cast<LPARAM>(&tbi));
