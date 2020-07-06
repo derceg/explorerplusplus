@@ -12,6 +12,7 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainer.h"
+#include "../Helper/DpiCompatibility.h"
 
 BookmarksMainMenu::BookmarksMainMenu(IExplorerplusplus *expp, IconFetcher *iconFetcher,
 	BookmarkTree *bookmarkTree, const MenuIdRange &menuIdRange) :
@@ -56,7 +57,7 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(
 {
 	wil::unique_hmenu menu(CreatePopupMenu());
 
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_expp->GetMainWindow());
+	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_expp->GetMainWindow());
 
 	std::wstring bookmarkThisTabText =
 		ResourceHelper::LoadString(m_expp->GetLanguageModule(), IDS_MENU_BOOKMARK_THIS_TAB);

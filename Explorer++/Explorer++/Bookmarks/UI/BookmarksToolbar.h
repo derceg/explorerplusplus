@@ -10,7 +10,6 @@
 #include "Bookmarks/UI/BookmarkMenu.h"
 #include "Navigation.h"
 #include "ResourceHelper.h"
-#include "../Helper/DpiCompatibility.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/signals2.hpp>
@@ -107,7 +106,6 @@ private:
 	void OnBookmarkIconAvailable(std::wstring_view guid, int iconIndex);
 
 	HWND m_hToolbar;
-	DpiCompatibility m_dpiCompat;
 	std::unique_ptr<BookmarkIconManager> m_bookmarkIconManager;
 
 	HINSTANCE m_instance;

@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include "../Helper/DpiCompatibility.h"
-
 class HolderWindow
 {
 public:
@@ -21,6 +19,4 @@ private:
 
 	HWND m_hHolder;
 	BOOL m_bHolderResizing;
-
-	DpiCompatibility m_dpiCompat;
 };

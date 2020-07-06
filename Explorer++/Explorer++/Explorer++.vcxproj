@@ -470,6 +470,7 @@
     <ClCompile Include="ApplicationToolbarHelper.cpp" />
     <ClCompile Include="Bookmarks\BookmarkIconManager.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkMenuController.cpp" />
+    <ClCompile Include="DarkModeButton.cpp" />
     <ClCompile Include="DarkModeDialogBase.cpp" />
     <ClCompile Include="DarkModeGroupBox.cpp" />
     <ClCompile Include="DarkModeHelper.cpp" />
@@ -637,6 +638,7 @@
     <ClInclude Include="ApplicationToolbarHelper.h" />
     <ClInclude Include="Bookmarks\BookmarkIconManager.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkMenuController.h" />
+    <ClInclude Include="DarkModeButton.h" />
     <ClInclude Include="DarkModeDialogBase.h" />
     <ClInclude Include="DarkModeGroupBox.h" />
     <ClInclude Include="DarkModeHelper.h" />

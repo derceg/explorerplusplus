@@ -7,6 +7,7 @@
 #include "Bookmarks/BookmarkIconManager.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/ImageHelper.h"
 #include <boost/format.hpp>
 #include <wil/common.h>
@@ -29,9 +30,10 @@ BOOL BookmarkMenuBuilder::BuildMenu(HWND parentWindow, HMENU menu, BookmarkItem 
 	m_menuIdRange = menuIdRange;
 	m_idCounter = menuIdRange.startId;
 
-	UINT dpi = m_dpiCompat.GetDpiForWindow(parentWindow);
-	int iconWidth = m_dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
-	int iconHeight = m_dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
+	auto &dpiCompat = DpiCompatibility::GetInstance();
+	UINT dpi = dpiCompat.GetDpiForWindow(parentWindow);
+	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
+	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 
 	BookmarkIconManager bookmarkIconManager(m_expp, m_iconFetcher, nullptr, iconWidth, iconHeight);
 

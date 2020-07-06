@@ -21,6 +21,7 @@
 #include "TabRestorer.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/Controls.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/IconFetcher.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/MenuHelper.h"
@@ -82,11 +83,12 @@ HWND TabContainer::CreateTabControl(HWND parent, BOOL forceSameTabWidth)
 
 void TabContainer::Initialize(HWND parent)
 {
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hwnd);
+	auto &dpiCompat = DpiCompatibility::GetInstance();
+	UINT dpi = dpiCompat.GetDpiForWindow(m_hwnd);
 
 	NONCLIENTMETRICS ncm;
 	ncm.cbSize = sizeof(ncm);
-	m_dpiCompat.SystemParametersInfoForDpi(
+	dpiCompat.SystemParametersInfoForDpi(
 		SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0, dpi);
 	m_tabFont.reset(CreateFontIndirect(&ncm.lfSmCaptionFont));
 
@@ -140,7 +142,7 @@ void TabContainer::Initialize(HWND parent)
 
 void TabContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
 {
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hwnd);
+	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hwnd);
 	wil::unique_hbitmap bitmap = m_expp->GetIconResourceLoader()->LoadBitmapFromPNGForDpi(
 		Icon::Lock, ICON_SIZE_96DPI, ICON_SIZE_96DPI, dpi);
 	m_tabIconLockIndex = ImageList_Add(himlTab, bitmap.get(), nullptr);
@@ -421,7 +423,7 @@ void TabContainer::CreateTabContextMenu(Tab &tab, const POINT &pt)
 void TabContainer::AddImagesToTabContextMenu(
 	HMENU menu, std::vector<wil::unique_hbitmap> &menuImages)
 {
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hwnd);
+	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hwnd);
 
 	for (const auto &mapping : TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS)
 	{

@@ -13,6 +13,7 @@
 #include "TabContainer.h"
 #include "ToolbarButtons.h"
 #include "../Helper/Controls.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowHelper.h"
 
 HWND Explorerplusplus::CreateTabToolbar(HWND hParent,int idCommand,const std::wstring &tip)
@@ -21,7 +22,7 @@ HWND Explorerplusplus::CreateTabToolbar(HWND hParent,int idCommand,const std::ws
 		TBSTYLE_TOOLTIPS|TBSTYLE_LIST|TBSTYLE_TRANSPARENT|TBSTYLE_FLAT|CCS_NODIVIDER|
 		CCS_NOPARENTALIGN|CCS_NORESIZE,TBSTYLE_EX_MIXEDBUTTONS|TBSTYLE_EX_DOUBLEBUFFER);
 
-	UINT dpi = m_dpiCompat.GetDpiForWindow(tabToolbar);
+	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(tabToolbar);
 	int scaledIconSize = MulDiv(16, dpi, USER_DEFAULT_SCREEN_DPI);
 	
 	SendMessage(tabToolbar,TB_SETBITMAPSIZE,0,MAKELONG(scaledIconSize,scaledIconSize));

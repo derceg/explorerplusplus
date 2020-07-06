@@ -312,8 +312,7 @@ SIZE GetButtonSize(HWND hwnd, int partId, int stateId, int defaultWidth, int def
 		}
 	}
 
-	DpiCompatibility dpiCompat;
-	UINT dpi = dpiCompat.GetDpiForWindow(hwnd);
+	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(hwnd);
 	return { MulDiv(defaultWidth, dpi, USER_DEFAULT_SCREEN_DPI),
 		MulDiv(defaultHeight, dpi, USER_DEFAULT_SCREEN_DPI) };
 }

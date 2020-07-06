@@ -15,6 +15,7 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainer.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/HeaderHelper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
@@ -73,9 +74,10 @@ BookmarkListView::BookmarkListView(HWND hListView, HMODULE resourceModule,
 
 void BookmarkListView::SetUpListViewImageList(IconFetcher *iconFetcher)
 {
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hListView);
-	int iconWidth = m_dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
-	int iconHeight = m_dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
+	auto &dpiCompat = DpiCompatibility::GetInstance();
+	UINT dpi = dpiCompat.GetDpiForWindow(m_hListView);
+	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
+	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 
 	m_bookmarkIconManager = std::make_unique<BookmarkIconManager>(m_expp, iconFetcher,
 		std::bind(&BookmarkListView::OnBookmarkIconAvailable, this, std::placeholders::_1,

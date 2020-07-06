@@ -4,11 +4,14 @@
 
 #include "stdafx.h"
 #include "DarkModeDialogBase.h"
+#include "DarkModeButton.h"
 #include "DarkModeHelper.h"
 #include "MainResource.h"
 #include "../Helper/Controls.h"
 #include "../Helper/WindowHelper.h"
 #include <VSStyle.h>
+
+using namespace DarkModeButton;
 
 DarkModeDialogBase::DarkModeDialogBase(
 	HINSTANCE hInstance, int iResource, HWND hParent, bool bResizable) :
@@ -73,54 +76,11 @@ LRESULT DarkModeDialogBase::OnCustomDraw(const NMCUSTOMDRAW *customDraw)
 	switch (customDraw->dwDrawStage)
 	{
 	case CDDS_PREPAINT:
-		OnDrawButtonText(customDraw, isStoredCheckbox ? ButtonType::Checkbox : ButtonType::Radio);
+		DrawButtonText(customDraw, isStoredCheckbox ? ButtonType::Checkbox : ButtonType::Radio);
 		return CDRF_SKIPDEFAULT;
 	}
 
 	return CDRF_DODEFAULT;
-}
-
-void DarkModeDialogBase::OnDrawButtonText(const NMCUSTOMDRAW *customDraw, ButtonType buttonType)
-{
-	// The size of the interactive element of the control (i.e. the check box or radio button
-	// part).
-	SIZE elementSize;
-
-	if (buttonType == ButtonType::Checkbox)
-	{
-		elementSize = GetCheckboxSize(m_hDlg);
-	}
-	else
-	{
-		elementSize = GetRadioButtonSize(m_hDlg);
-	}
-
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
-
-	RECT textRect = customDraw->rc;
-	textRect.left +=
-		elementSize.cx + MulDiv(CHECKBOX_TEXT_SPACING_96DPI, dpi, USER_DEFAULT_SCREEN_DPI);
-
-	std::wstring text = GetWindowString(customDraw->hdr.hwndFrom);
-	assert(!text.empty());
-
-	SetTextColor(customDraw->hdc, DarkModeHelper::FOREGROUND_COLOR);
-
-	UINT textFormat = DT_LEFT | DT_SINGLELINE | DT_VCENTER;
-
-	if (!WI_IsFlagSet(customDraw->uItemState, CDIS_SHOWKEYBOARDCUES))
-	{
-		WI_SetFlag(textFormat, DT_HIDEPREFIX);
-	}
-
-	DrawText(customDraw->hdc, text.c_str(), static_cast<int>(text.size()), &textRect, textFormat);
-
-	if (WI_IsFlagSet(customDraw->uItemState, CDIS_FOCUS))
-	{
-		DrawFocusRect(customDraw->hdc, &textRect);
-	}
-
-	// TODO: May also need to handle CDIS_DISABLED and CDIS_GRAYED.
 }
 
 void DarkModeDialogBase::AllowDarkModeForControls(const std::vector<int> &controlIds)

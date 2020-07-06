@@ -11,6 +11,7 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
 #include "TabRestorerUI.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/Macros.h"
 #include <list>
 
@@ -36,7 +37,7 @@ void Explorerplusplus::InitializeTabs()
 		boost::bind(&Explorerplusplus::OnTabListViewSelectionChanged, this, _1),
 		boost::signals2::at_front);
 
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_tabContainer->GetHWND());
+	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_tabContainer->GetHWND());
 	int tabWindowHeight = MulDiv(TAB_WINDOW_HEIGHT_96DPI, dpi, USER_DEFAULT_SCREEN_DPI);
 	SetWindowPos(
 		m_tabContainer->GetHWND(), nullptr, 0, 0, 0, tabWindowHeight, SWP_NOMOVE | SWP_NOZORDER);

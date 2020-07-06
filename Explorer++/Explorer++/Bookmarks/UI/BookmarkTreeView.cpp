@@ -10,6 +10,7 @@
 #include "DarkModeHelper.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
@@ -39,9 +40,10 @@ BookmarkTreeView::BookmarkTreeView(HWND hTreeView, HINSTANCE hInstance, IExplore
 		darkModeHelper.SetTreeViewDarkModeColors(hTreeView);
 	}
 
-	UINT dpi = m_dpiCompat.GetDpiForWindow(hTreeView);
-	int iconWidth = m_dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
-	int iconHeight = m_dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
+	auto &dpiCompat = DpiCompatibility::GetInstance();
+	UINT dpi = dpiCompat.GetDpiForWindow(hTreeView);
+	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
+	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 	std::tie(m_imageList, m_imageListMappings) = ResourceHelper::CreateIconImageList(
 		expp->GetIconResourceLoader(), iconWidth, iconHeight, { Icon::Folder });
 	TreeView_SetImageList(hTreeView, m_imageList.get(), TVSIL_NORMAL);

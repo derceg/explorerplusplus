@@ -8,6 +8,7 @@
 #include "Icon.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/resource.h>
 #include <map>
@@ -86,7 +87,7 @@ void Explorerplusplus::InitializeMainMenu()
 void Explorerplusplus::SetMainMenuImages()
 {
 	HMENU mainMenu = GetMenu(m_hContainer);
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hContainer);
+	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hContainer);
 
 	for (const auto &mapping : MAIN_MENU_IMAGE_MAPPINGS)
 	{

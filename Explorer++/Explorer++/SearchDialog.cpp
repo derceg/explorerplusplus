@@ -15,6 +15,7 @@
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ComboBox.h"
 #include "../Helper/Controls.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
@@ -83,7 +84,7 @@ SearchDialog::~SearchDialog()
 
 INT_PTR SearchDialog::OnInitDialog()
 {
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
+	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hDlg);
 	m_directoryIcon =
 		m_pexpp->GetIconResourceLoader()->LoadIconFromPNGForDpi(Icon::Folder, 16, 16, dpi);
 	SendMessage(GetDlgItem(m_hDlg, IDC_BUTTON_DIRECTORY), BM_SETIMAGE, IMAGE_ICON,

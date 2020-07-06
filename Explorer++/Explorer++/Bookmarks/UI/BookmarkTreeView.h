@@ -9,7 +9,6 @@
 #include "Bookmarks/UI/BookmarkDropTargetWindow.h"
 #include "ResourceHelper.h"
 #include "SignalWrapper.h"
-#include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
@@ -91,7 +90,6 @@ private:
 	void RemoveDropHighlight();
 
 	HWND m_hTreeView;
-	DpiCompatibility m_dpiCompat;
 	wil::unique_himagelist m_imageList;
 	IconImageListMapping m_imageListMappings;
 

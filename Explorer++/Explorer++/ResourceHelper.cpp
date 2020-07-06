@@ -23,7 +23,7 @@ std::wstring ResourceHelper::LoadString(HINSTANCE instance, UINT stringId)
 void ResourceHelper::SetMenuItemImage(HMENU menu, UINT menuItemId, IconResourceLoader *iconResourceLoader,
 	Icon icon, int dpi, std::vector<wil::unique_hbitmap> &menuImages)
 {
-	DpiCompatibility dpiCompat;
+	auto &dpiCompat = DpiCompatibility::GetInstance();
 	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 	wil::unique_hbitmap bitmap = iconResourceLoader->LoadBitmapFromPNGAndScale(icon, iconWidth, iconHeight);

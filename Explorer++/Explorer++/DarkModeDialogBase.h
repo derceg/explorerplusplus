@@ -28,23 +28,11 @@ protected:
 	virtual INT_PTR OnCtlColorListBoxExtra(HWND hwnd, HDC hdc);
 
 private:
-	// Also applies to radio buttons.
-	static inline constexpr int CHECKBOX_TEXT_SPACING_96DPI = 3;
-
-	enum class ButtonType
-	{
-		Checkbox,
-		Radio
-	};
-
 	void OnInitDialogBase() override final;
 	int GetGripperControlId() override final;
 
 	LRESULT CALLBACK DialogWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT OnCustomDraw(const NMCUSTOMDRAW *customDraw);
-
-	// Handles checkboxes and radio buttons.
-	void OnDrawButtonText(const NMCUSTOMDRAW *customDraw, ButtonType buttonType);
 
 	LRESULT CALLBACK ListViewWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 

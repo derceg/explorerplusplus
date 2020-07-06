@@ -16,6 +16,7 @@
 #include "Navigation.h"
 #include "ResourceHelper.h"
 #include "../Helper/Controls.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
@@ -110,9 +111,10 @@ void ManageBookmarksDialog::SetupToolbar()
 
 	SendMessage(m_hToolbar, TB_BUTTONSTRUCTSIZE, static_cast<WPARAM>(sizeof(TBBUTTON)), 0);
 
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hToolbar);
-	int iconWidth = m_dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
-	int iconHeight = m_dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
+	auto &dpiCompat = DpiCompatibility::GetInstance();
+	UINT dpi = dpiCompat.GetDpiForWindow(m_hToolbar);
+	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
+	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 	SendMessage(m_hToolbar, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
 
 	std::tie(m_imageListToolbar, m_imageListToolbarMappings) =

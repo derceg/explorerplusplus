@@ -17,7 +17,6 @@
 #include "TabNavigationInterface.h"
 #include "ValueWrapper.h"
 #include "../Helper/CachedIcons.h"
-#include "../Helper/DpiCompatibility.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/FileContextMenuManager.h"
@@ -561,7 +560,6 @@ private:
 	std::unique_ptr<Navigation> m_navigation;
 
 	std::unique_ptr<IconResourceLoader> m_iconResourceLoader;
-	DpiCompatibility m_dpiCompat;
 
 	CachedIcons m_cachedIcons;
 

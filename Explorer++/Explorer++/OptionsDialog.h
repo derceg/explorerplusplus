@@ -5,7 +5,6 @@
 #pragma once
 
 #include "Config.h"
-#include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <wil/resource.h>
 
@@ -60,9 +59,10 @@ private:
 
 	INT_PTR OnCtlColorDlg(HWND hwnd, HDC hdc);
 	INT_PTR OnCtlColor(HWND hwnd, HDC hdc);
+	INT_PTR OnCustomDraw(const NMCUSTOMDRAW *customDraw);
 
-	void OnReplaceExplorerSettingChanged(HWND dialog,
-		DefaultFileManager::ReplaceExplorerMode updatedReplaceMode);
+	void OnReplaceExplorerSettingChanged(
+		HWND dialog, DefaultFileManager::ReplaceExplorerMode updatedReplaceMode);
 	bool UpdateReplaceExplorerSetting(
 		HWND dialog, DefaultFileManager::ReplaceExplorerMode updatedReplaceMode);
 
@@ -84,13 +84,14 @@ private:
 	std::shared_ptr<Config> m_config;
 	HINSTANCE m_instance;
 	IExplorerplusplus *m_expp;
-	DpiCompatibility m_dpiCompat;
 
 	TabContainer *m_tabContainer;
 
 	wil::unique_hicon m_optionsDialogIcon;
 	wil::unique_hicon m_newTabDirectoryIcon;
 
+	std::unordered_set<int> m_checkboxControlIds;
+	std::unordered_set<int> m_radioButtonControlIds;
 	std::vector<std::unique_ptr<DarkModeGroupBox>> m_darkModeGroupBoxes;
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 };

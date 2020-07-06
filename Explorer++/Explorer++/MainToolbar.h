@@ -8,7 +8,6 @@
 #include "IconResourceLoader.h"
 #include "Tab.h"
 #include "../Helper/BaseWindow.h"
-#include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <wil/com.h>
 #include <wil/resource.h>
@@ -107,7 +106,6 @@ private:
 	IExplorerplusplus *m_pexpp;
 	std::shared_ptr<Config> m_config;
 
-	DpiCompatibility m_dpiCompat;
 	wil::com_ptr<IImageList> m_systemImageList;
 	wil::unique_hbitmap m_defaultFolderIconBitmap;
 	wil::unique_himagelist m_imageListSmall;

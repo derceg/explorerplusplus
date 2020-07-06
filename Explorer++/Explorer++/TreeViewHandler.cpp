@@ -17,6 +17,7 @@
 #include "TabContainer.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/Controls.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
@@ -87,7 +88,7 @@ void Explorerplusplus::CreateFolderControls()
 	m_hFoldersToolbar = CreateTabToolbar(m_foldersToolbarParent, FOLDERS_TOOLBAR_CLOSE,
 		ResourceHelper::LoadString(m_hLanguageModule, IDS_HIDEFOLDERSPANE));
 
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hHolder);
+	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hHolder);
 
 	int scaledCloseToolbarWidth = MulDiv(CLOSE_TOOLBAR_WIDTH, dpi, USER_DEFAULT_SCREEN_DPI);
 	int scaledCloseToolbarHeight = MulDiv(CLOSE_TOOLBAR_HEIGHT, dpi, USER_DEFAULT_SCREEN_DPI);

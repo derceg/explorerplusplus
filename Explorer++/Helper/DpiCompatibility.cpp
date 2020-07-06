@@ -6,6 +6,12 @@
 #include "DpiCompatibility.h"
 #include <wil/win32_helpers.h>
 
+DpiCompatibility &DpiCompatibility::GetInstance()
+{
+	static DpiCompatibility dpiCompatibility;
+	return dpiCompatibility;
+}
+
 DpiCompatibility::DpiCompatibility() :
 	m_SystemParametersInfoForDpi(nullptr),
 	m_GetSystemMetricsForDpi(nullptr),

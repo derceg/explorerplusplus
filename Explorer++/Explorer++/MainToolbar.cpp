@@ -15,6 +15,7 @@
 #include "ShellBrowser/ViewModes.h"
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/XMLSettings.h"
@@ -141,7 +142,7 @@ void MainToolbar::Initialize(HWND parent)
 
 	m_defaultFolderIconBitmap = ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), GetDefaultFolderIconIndex());
 
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hwnd);
+	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hwnd);
 
 	int dpiScaledSizeSmall = MulDiv(TOOLBAR_IMAGE_SIZE_SMALL, dpi, USER_DEFAULT_SCREEN_DPI);
 	int dpiScaledSizeLarge = MulDiv(TOOLBAR_IMAGE_SIZE_LARGE, dpi, USER_DEFAULT_SCREEN_DPI);

@@ -20,6 +20,7 @@
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
@@ -45,7 +46,7 @@ MassRenameDialog::MassRenameDialog(HINSTANCE hInstance, HWND hParent, IExplorerp
 
 INT_PTR MassRenameDialog::OnInitDialog()
 {
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
+	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hDlg);
 	m_moreIcon =
 		m_expp->GetIconResourceLoader()->LoadIconFromPNGForDpi(Icon::ArrowRight, 16, 16, dpi);
 	SendDlgItemMessage(m_hDlg, IDC_MASSRENAME_MORE, BM_SETIMAGE, IMAGE_ICON,

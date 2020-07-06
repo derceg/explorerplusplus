@@ -21,7 +21,6 @@ namespace
 	LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnPaint(HWND hwnd);
 
-	DpiCompatibility g_dpiCompat;
 	bool g_isAppThemed;
 	wil::unique_htheme g_theme;
 	SIZE g_size;
@@ -109,7 +108,7 @@ SIZE CustomGripper::GetDpiScaledSize(HWND parentWindow)
 	}
 	else
 	{
-		UINT dpi = g_dpiCompat.GetDpiForWindow(parentWindow);
+		UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(parentWindow);
 		return { MulDiv(g_size.cx, dpi, USER_DEFAULT_SCREEN_DPI),
 			MulDiv(g_size.cy, dpi, USER_DEFAULT_SCREEN_DPI) };
 	}

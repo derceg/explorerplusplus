@@ -14,6 +14,7 @@
 #include "OptionsDialog.h"
 #include "Config.h"
 #include "CoreInterface.h"
+#include "DarkModeButton.h"
 #include "DarkModeGroupBox.h"
 #include "DarkModeHelper.h"
 #include "Explorer++_internal.h"
@@ -25,6 +26,7 @@
 #include "ShellBrowser/ViewModes.h"
 #include "TabContainer.h"
 #include "ViewModeHelper.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
@@ -38,10 +40,11 @@
 #include <boost/range/adaptor/map.hpp>
 #include <unordered_map>
 
+using namespace DarkModeButton;
+using namespace DefaultFileManager;
+
 int CALLBACK NewTabDirectoryBrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData);
 UINT GetIconThemeStringResourceId(IconTheme iconTheme);
-
-using namespace DefaultFileManager;
 
 // clang-format off
 const OptionsDialog::OptionsDialogSheetInfo OptionsDialog::OPTIONS_DIALOG_SHEETS[] = {
@@ -105,9 +108,10 @@ HWND OptionsDialog::Show(HWND parentWindow)
 
 	std::wstring title = ResourceHelper::LoadString(m_instance, IDS_OPTIONSDIALOG_TITLE);
 
-	UINT dpi = m_dpiCompat.GetDpiForWindow(parentWindow);
-	int iconWidth = m_dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
-	int iconHeight = m_dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
+	auto &dpiCompat = DpiCompatibility::GetInstance();
+	UINT dpi = dpiCompat.GetDpiForWindow(parentWindow);
+	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
+	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 	m_optionsDialogIcon = m_expp->GetIconResourceLoader()->LoadIconFromPNGForDpi(
 		Icon::Options, iconWidth, iconHeight, dpi);
 
@@ -256,7 +260,7 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(
 			CheckDlgButton(hDlg, IDC_OPTION_XML, BST_CHECKED);
 		}
 
-		UINT dpi = m_dpiCompat.GetDpiForWindow(hDlg);
+		UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(hDlg);
 		m_newTabDirectoryIcon =
 			m_expp->GetIconResourceLoader()->LoadIconFromPNGForDpi(Icon::Folder, 16, 16, dpi);
 
@@ -276,6 +280,11 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(
 			darkModeHelper.SetDarkModeForControl(GetDlgItem(hDlg, IDC_DEFAULT_NEWTABDIR_BUTTON));
 			darkModeHelper.SetDarkModeForComboBox(GetDlgItem(hDlg, IDC_OPTIONS_ICON_THEME));
 			darkModeHelper.SetDarkModeForComboBox(GetDlgItem(hDlg, IDC_OPTIONS_LANGUAGE));
+
+			m_checkboxControlIds.insert(IDC_OPTION_XML);
+			m_radioButtonControlIds.insert({ IDC_STARTUP_PREVIOUSTABS, IDC_STARTUP_DEFAULTFOLDER,
+				IDC_OPTION_REPLACEEXPLORER_NONE, IDC_OPTION_REPLACEEXPLORER_FILESYSTEM,
+				IDC_OPTION_REPLACEEXPLORER_ALL });
 
 			m_darkModeGroupBoxes.push_back(
 				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_STARTUP)));
@@ -337,11 +346,18 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(
 
 	case WM_NOTIFY:
 	{
-		NMHDR *nmhdr = nullptr;
-		nmhdr = (NMHDR *) lParam;
+		auto *nmhdr = reinterpret_cast<NMHDR *>(lParam);
 
 		switch (nmhdr->code)
 		{
+		case NM_CUSTOMDRAW:
+		{
+			auto result = OnCustomDraw(reinterpret_cast<NMCUSTOMDRAW *>(lParam));
+			SetWindowLongPtr(hDlg, DWLP_MSGRESULT, result);
+			return result;
+		}
+		break;
+
 		case PSN_APPLY:
 		{
 			HWND hEdit;
@@ -659,6 +675,17 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 		if (darkModeHelper.IsDarkModeEnabled())
 		{
 			darkModeHelper.SetDarkModeForComboBox(GetDlgItem(hDlg, IDC_COMBO_FILESIZES));
+
+			m_checkboxControlIds.insert({ IDC_SETTINGS_CHECK_SYSTEMFILES,
+				IDC_SETTINGS_CHECK_EXTENSIONS, IDC_SETTINGS_CHECK_LINK,
+				IDC_SETTINGS_CHECK_INSERTSORTED, IDC_SETTINGS_CHECK_SINGLECLICK,
+				IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION, IDC_OPTIONS_PLAYNAVIGATIONSOUND,
+				IDC_SETTINGS_CHECK_FOLDERSIZES, IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE,
+				IDC_SETTINGS_CHECK_FORCESIZE, IDC_SETTINGS_CHECK_ZIPFILES,
+				IDC_SETTINGS_CHECK_FRIENDLYDATES, IDC_OPTIONS_CHECK_SHOWINFOTIPS });
+
+			m_radioButtonControlIds.insert(
+				{ IDC_OPTIONS_RADIO_SYSTEMINFOTIPS, IDC_OPTIONS_RADIO_CUSTOMINFOTIPS });
 		}
 	}
 	break;
@@ -735,11 +762,18 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 
 	case WM_NOTIFY:
 	{
-		NMHDR *nmhdr = nullptr;
-		nmhdr = (NMHDR *) lParam;
+		auto *nmhdr = reinterpret_cast<NMHDR *>(lParam);
 
 		switch (nmhdr->code)
 		{
+		case NM_CUSTOMDRAW:
+		{
+			auto result = OnCustomDraw(reinterpret_cast<NMCUSTOMDRAW *>(lParam));
+			SetWindowLongPtr(hDlg, DWLP_MSGRESULT, result);
+			return result;
+		}
+		break;
+
 		case PSN_APPLY:
 		{
 			HWND hCBSize;
@@ -930,6 +964,15 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 
 		if (darkModeHelper.IsDarkModeEnabled())
 		{
+			m_checkboxControlIds.insert(
+				{ IDC_OPTION_MULTIPLEINSTANCES, IDC_OPTION_LARGETOOLBARICONS,
+					IDC_OPTION_ALWAYSSHOWTABBAR, IDC_OPTION_SHOWTABBARATBOTTOM,
+					IDC_OPTION_EXTENDTABCONTROL, IDC_SETTINGS_CHECK_TITLEPATH,
+					IDC_OPTION_USERNAMEINTITLEBAR, IDC_OPTION_PRIVILEGELEVELINTITLEBAR,
+					IDC_OPTION_GRIDLINES, IDC_OPTION_CHECKBOXSELECTION, IDC_OPTION_FULLROWSELECT,
+					IDC_OPTION_SYNCTREEVIEW, IDC_OPTION_TREEVIEWSELECTIONEXPAND,
+					IDC_OPTION_TREEVIEWDELAY, IDC_OPTION_FILEPREVIEWS });
+
 			m_darkModeGroupBoxes.push_back(
 				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_GENERAL)));
 			m_darkModeGroupBoxes.push_back(
@@ -975,11 +1018,18 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 
 	case WM_NOTIFY:
 	{
-		NMHDR *nmhdr = nullptr;
-		nmhdr = (NMHDR *) lParam;
+		auto *nmhdr = reinterpret_cast<NMHDR *>(lParam);
 
 		switch (nmhdr->code)
 		{
+		case NM_CUSTOMDRAW:
+		{
+			auto result = OnCustomDraw(reinterpret_cast<NMCUSTOMDRAW *>(lParam));
+			SetWindowLongPtr(hDlg, DWLP_MSGRESULT, result);
+			return result;
+		}
+		break;
+
 		case PSN_APPLY:
 		{
 			BOOL bCheckBoxSelection;
@@ -1136,6 +1186,16 @@ INT_PTR CALLBACK OptionsDialog::TabSettingsProc(HWND hDlg, UINT uMsg, WPARAM wPa
 		{
 			CheckDlgButton(hDlg, IDC_TABS_CLOSEMAINWINDOW, BST_CHECKED);
 		}
+
+		auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+		if (darkModeHelper.IsDarkModeEnabled())
+		{
+			m_checkboxControlIds.insert(
+				{ IDC_TABS_TASKBARTHUMBNAILS, IDC_TABS_SAMEWIDTH, IDC_TABS_CLOSECONFIRMATION,
+					IDC_TABS_OPENNEXTTOCURRENT, IDC_SETTINGS_CHECK_ALWAYSNEWTAB,
+					IDC_TABS_DOUBLECLICKCLOSE, IDC_TABS_CLOSEMAINWINDOW });
+		}
 	}
 	break;
 
@@ -1164,11 +1224,18 @@ INT_PTR CALLBACK OptionsDialog::TabSettingsProc(HWND hDlg, UINT uMsg, WPARAM wPa
 
 	case WM_NOTIFY:
 	{
-		NMHDR *nmhdr = nullptr;
-		nmhdr = (NMHDR *) lParam;
+		auto *nmhdr = reinterpret_cast<NMHDR *>(lParam);
 
 		switch (nmhdr->code)
 		{
+		case NM_CUSTOMDRAW:
+		{
+			auto result = OnCustomDraw(reinterpret_cast<NMCUSTOMDRAW *>(lParam));
+			SetWindowLongPtr(hDlg, DWLP_MSGRESULT, result);
+			return result;
+		}
+		break;
+
 		case PSN_APPLY:
 		{
 			m_config->showTaskbarThumbnails =
@@ -1283,6 +1350,9 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(
 		{
 			darkModeHelper.SetDarkModeForControl(GetDlgItem(hDlg, IDC_BUTTON_DEFAULTCOLUMNS));
 			darkModeHelper.SetDarkModeForComboBox(GetDlgItem(hDlg, IDC_OPTIONS_DEFAULT_VIEW));
+
+			m_checkboxControlIds.insert({ IDC_SHOWHIDDENGLOBAL, IDC_AUTOARRANGEGLOBAL,
+				IDC_SHOWINGROUPSGLOBAL, IDC_SORTASCENDINGGLOBAL });
 		}
 	}
 	break;
@@ -1329,11 +1399,18 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(
 
 	case WM_NOTIFY:
 	{
-		NMHDR *nmhdr = nullptr;
-		nmhdr = (NMHDR *) lParam;
+		auto *nmhdr = reinterpret_cast<NMHDR *>(lParam);
 
 		switch (nmhdr->code)
 		{
+		case NM_CUSTOMDRAW:
+		{
+			auto result = OnCustomDraw(reinterpret_cast<NMCUSTOMDRAW *>(lParam));
+			SetWindowLongPtr(hDlg, DWLP_MSGRESULT, result);
+			return result;
+		}
+		break;
+
 		case PSN_APPLY:
 		{
 			m_config->defaultFolderSettings.showHidden =
@@ -1398,6 +1475,28 @@ INT_PTR OptionsDialog::OnCtlColor(HWND hwnd, HDC hdc)
 	SetTextColor(hdc, DarkModeHelper::FOREGROUND_COLOR);
 
 	return reinterpret_cast<INT_PTR>(darkModeHelper.GetBackgroundBrush());
+}
+
+INT_PTR OptionsDialog::OnCustomDraw(const NMCUSTOMDRAW *customDraw)
+{
+	bool isStoredCheckbox =
+		(m_checkboxControlIds.count(static_cast<int>(customDraw->hdr.idFrom)) == 1);
+	bool isStoredRadioButton =
+		(m_radioButtonControlIds.count(static_cast<int>(customDraw->hdr.idFrom)) == 1);
+
+	if (!isStoredCheckbox && !isStoredRadioButton)
+	{
+		return CDRF_DODEFAULT;
+	}
+
+	switch (customDraw->dwDrawStage)
+	{
+	case CDDS_PREPAINT:
+		DrawButtonText(customDraw, isStoredCheckbox ? ButtonType::Checkbox : ButtonType::Radio);
+		return CDRF_SKIPDEFAULT;
+	}
+
+	return CDRF_DODEFAULT;
 }
 
 void OptionsDialog::OnDefaultSettingsNewTabDir(HWND hDlg)

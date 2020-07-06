@@ -11,6 +11,7 @@
 #include "HolderWindow.h"
 #include "DarkModeHelper.h"
 #include "HolderWindowInternal.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/Macros.h"
 
 #define FOLDERS_TEXT_X 5
@@ -130,10 +131,11 @@ void HolderWindow::OnHolderWindowPaint(HWND hwnd)
 
 	hdc = BeginPaint(hwnd, &ps);
 
-	UINT dpi = m_dpiCompat.GetDpiForWindow(hwnd);
+	auto &dpiCompat = DpiCompatibility::GetInstance();
+	UINT dpi = dpiCompat.GetDpiForWindow(hwnd);
 
 	ncm.cbSize = sizeof(ncm);
-	m_dpiCompat.SystemParametersInfoForDpi(
+	dpiCompat.SystemParametersInfoForDpi(
 		SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0, dpi);
 	ncm.lfSmCaptionFont.lfWeight = FW_NORMAL;
 	hFont = CreateFontIndirect(&ncm.lfSmCaptionFont);

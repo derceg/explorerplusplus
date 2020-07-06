@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "DpiCompatibility.h"
 #include "Macros.h"
 #include "MessageForwarder.h"
 #include "ReferenceCount.h"
@@ -54,7 +53,6 @@ protected:
 	void AddTooltipForControl(int controlId, int stringResourceId);
 
 	HWND m_hDlg;
-	DpiCompatibility m_dpiCompat;
 	int m_iMinWidth;
 	int m_iMinHeight;
 

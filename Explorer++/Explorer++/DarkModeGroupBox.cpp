@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "DarkModeGroupBox.h"
 #include "DarkModeHelper.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowHelper.h"
 #include <VSStyle.h>
 
@@ -42,10 +43,12 @@ void DarkModeGroupBox::OnPaint(HWND hwnd)
 	SetBkMode(hdc, TRANSPARENT);
 	SetTextColor(hdc, DarkModeHelper::FOREGROUND_COLOR);
 
+	auto &dpiCompat = DpiCompatibility::GetInstance();
+
 	NONCLIENTMETRICS metrics;
 	metrics.cbSize = sizeof(metrics);
-	m_dpiCompat.SystemParametersInfoForDpi(
-		SPI_GETNONCLIENTMETRICS, sizeof(metrics), &metrics, 0, m_dpiCompat.GetDpiForWindow(hwnd));
+	dpiCompat.SystemParametersInfoForDpi(
+		SPI_GETNONCLIENTMETRICS, sizeof(metrics), &metrics, 0, dpiCompat.GetDpiForWindow(hwnd));
 
 	wil::unique_hfont captionFont(CreateFontIndirect(&metrics.lfCaptionFont));
 	wil::unique_select_object object(SelectObject(hdc, captionFont.get()));

@@ -6,7 +6,6 @@
 
 #include "Bookmarks/BookmarkItem.h"
 #include "MenuHelper.h"
-#include "../Helper/DpiCompatibility.h"
 #include <boost/functional/hash.hpp>
 #include <functional>
 #include <unordered_map>
@@ -59,5 +58,4 @@ private:
 	HMODULE m_resourceModule;
 	MenuIdRange m_menuIdRange;
 	int m_idCounter;
-	DpiCompatibility m_dpiCompat;
 };

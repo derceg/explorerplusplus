@@ -6,6 +6,7 @@
 #include "BaseDialog.h"
 #include "Controls.h"
 #include "CustomGripper.h"
+#include "DpiCompatibility.h"
 #include "Helper.h"
 #include "WindowHelper.h"
 #include <unordered_map>
@@ -106,9 +107,10 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 			m_prd = std::make_unique<ResizableDialog>(m_hDlg, controlList);
 		}
 
-		UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
-		int iconWidth = m_dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
-		int iconHeight = m_dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
+		auto &dpiCompat = DpiCompatibility::GetInstance();
+		UINT dpi = dpiCompat.GetDpiForWindow(m_hDlg);
+		int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
+		int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 		m_icon = GetDialogIcon(iconWidth, iconHeight);
 
 		if (m_icon)

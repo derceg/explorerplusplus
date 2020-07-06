@@ -6,7 +6,6 @@
 
 #include "Bookmarks/UI/BookmarkMenuBuilder.h"
 #include "MenuHelper.h"
-#include "../Helper/DpiCompatibility.h"
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
 
@@ -41,7 +40,6 @@ private:
 
 	wil::unique_hmenu m_bookmarksMenu;
 
-	DpiCompatibility m_dpiCompat;
 	std::vector<wil::unique_hbitmap> m_menuImages;
 
 	BookmarkMenuBuilder::ItemIdMap m_menuItemIdMappings;

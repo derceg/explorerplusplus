@@ -11,7 +11,6 @@
 #include "Bookmarks/UI/BookmarkDropTargetWindow.h"
 #include "ResourceHelper.h"
 #include "SignalWrapper.h"
-#include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
@@ -138,7 +137,6 @@ private:
 	HWND m_hListView;
 	HMODULE m_resourceModule;
 	IExplorerplusplus *m_expp;
-	DpiCompatibility m_dpiCompat;
 	std::unique_ptr<BookmarkIconManager> m_bookmarkIconManager;
 	std::vector<Column> m_columns;
 

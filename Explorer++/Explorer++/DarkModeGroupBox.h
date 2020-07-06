@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <uxtheme.h>
 #include <memory>
@@ -27,6 +26,5 @@ private:
 	void OnPaint(HWND hwnd);
 
 	wil::unique_htheme m_theme;
-	DpiCompatibility m_dpiCompat;
 	std::unique_ptr<WindowSubclassWrapper> m_windowSubclass;
 };

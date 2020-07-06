@@ -17,6 +17,7 @@
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DataExchangeHelper.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
@@ -85,9 +86,10 @@ void BookmarksToolbar::InitializeToolbar(IconFetcher *iconFetcher)
 
 void BookmarksToolbar::SetUpToolbarImageList(IconFetcher *iconFetcher)
 {
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hToolbar);
-	int iconWidth = m_dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
-	int iconHeight = m_dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
+	auto &dpiCompat = DpiCompatibility::GetInstance();
+	UINT dpi = dpiCompat.GetDpiForWindow(m_hToolbar);
+	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
+	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 	SendMessage(m_hToolbar, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
 
 	m_bookmarkIconManager = std::make_unique<BookmarkIconManager>(m_pexpp, iconFetcher,
@@ -171,11 +173,13 @@ void BookmarksToolbar::OnMouseMove(int keys, const POINT &pt)
 		return;
 	}
 
+	auto &dpiCompat = DpiCompatibility::GetInstance();
+	UINT dpi = dpiCompat.GetDpiForWindow(m_hToolbar);
+
 	RECT rect = { m_leftButtonDownPoint->x, m_leftButtonDownPoint->y, m_leftButtonDownPoint->x,
 		m_leftButtonDownPoint->y };
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hToolbar);
-	InflateRect(&rect, m_dpiCompat.GetSystemMetricsForDpi(SM_CXDRAG, dpi),
-		m_dpiCompat.GetSystemMetricsForDpi(SM_CYDRAG, dpi));
+	InflateRect(&rect, dpiCompat.GetSystemMetricsForDpi(SM_CXDRAG, dpi),
+		dpiCompat.GetSystemMetricsForDpi(SM_CYDRAG, dpi));
 
 	if (!PtInRect(&rect, pt))
 	{

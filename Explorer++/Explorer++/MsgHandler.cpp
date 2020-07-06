@@ -25,6 +25,7 @@
 #include "ViewModeHelper.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/Controls.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/Logging.h"
@@ -408,7 +409,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	SetWindowPos(m_tabContainer->GetHWND(), nullptr,0,0,iTabBackingWidth - 25,
 		tabWindowHeight,SWP_SHOWWINDOW|SWP_NOZORDER);
 
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hContainer);
+	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hContainer);
 
 	/* Tab close button. */
 	int scaledCloseToolbarWidth = MulDiv(CLOSE_TOOLBAR_WIDTH, dpi, USER_DEFAULT_SCREEN_DPI);
