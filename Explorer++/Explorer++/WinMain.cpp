@@ -63,7 +63,7 @@ ATOM RegisterMainWindowClass(HINSTANCE hInstance)
 	WNDCLASSEX wcex;
 	wcex.cbSize			= sizeof(wcex);
 	wcex.style			= 0;
-	wcex.lpfnWndProc	= WndProcStub;
+	wcex.lpfnWndProc	= Explorerplusplus::WndProcStub;
 	wcex.cbClsExtra		= 0;
 	wcex.cbWndExtra		= sizeof(Explorerplusplus *);
 	wcex.hInstance		= hInstance;

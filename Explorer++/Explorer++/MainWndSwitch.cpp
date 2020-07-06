@@ -44,7 +44,7 @@ and the right edge of the treeview during
 a resizing operation. */
 static const int TREEVIEW_DRAG_OFFSET = 8;
 
-LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	auto *pContainer = (Explorerplusplus *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
 

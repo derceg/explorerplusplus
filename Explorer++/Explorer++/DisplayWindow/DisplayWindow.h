@@ -87,12 +87,12 @@ static int g_ObjectCount = 0;
 
 class DisplayWindow
 {
-	friend LRESULT CALLBACK DisplayWindowProcStub(
-		HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 public:
 	DisplayWindow(HWND hDisplayWindow, DWInitialSettings_t *pInitialSettings);
 	~DisplayWindow();
+
+	static LRESULT CALLBACK DisplayWindowProcStub(
+		HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	void ExtractThumbnailImageInternal(ThumbnailEntry_t *pte);
 

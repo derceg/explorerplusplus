@@ -39,7 +39,7 @@ BOOL RegisterDisplayWindowClass()
 
 	WNDCLASS wc;
 	wc.style = 0;
-	wc.lpfnWndProc = DisplayWindowProcStub;
+	wc.lpfnWndProc = DisplayWindow::DisplayWindowProcStub;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = sizeof(DisplayWindow *);
 	wc.hInstance = GetModuleHandle(nullptr);
@@ -112,7 +112,8 @@ DisplayWindow::~DisplayWindow()
 	}
 }
 
-LRESULT CALLBACK DisplayWindowProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK DisplayWindow::DisplayWindowProcStub(
+	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	auto *pdw = reinterpret_cast<DisplayWindow *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 

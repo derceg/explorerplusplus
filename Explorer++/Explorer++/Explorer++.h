@@ -76,11 +76,11 @@ class Explorerplusplus :
 	friend LoadSaveRegistry;
 	friend LoadSaveXML;
 
-	friend LRESULT CALLBACK WndProcStub(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam);
-
 public:
 	Explorerplusplus(HWND);
 	~Explorerplusplus();
+
+	static LRESULT CALLBACK WndProcStub(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
 	LRESULT CALLBACK RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
