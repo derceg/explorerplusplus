@@ -585,7 +585,7 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 	HKEY				hTabKey;
 	HKEY				hColumnsKey;
 	TCHAR				szItemKey[128];
-	LPITEMIDLIST		pidlDirectory = nullptr;
+	PIDLIST_ABSOLUTE	pidlDirectory = nullptr;
 	LONG				returnValue;
 	DWORD				cbData;
 	DWORD				type;
@@ -607,7 +607,7 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 			if(RegQueryValueEx(hTabKey,_T("Directory"),nullptr, nullptr, nullptr,&cbData)
 				== ERROR_SUCCESS)
 			{
-				pidlDirectory = (LPITEMIDLIST)CoTaskMemAlloc(cbData);
+				pidlDirectory = (PIDLIST_ABSOLUTE)CoTaskMemAlloc(cbData);
 
 				RegQueryValueEx(hTabKey,_T("Directory"),nullptr,&type,(LPBYTE)pidlDirectory,&cbData);
 			}

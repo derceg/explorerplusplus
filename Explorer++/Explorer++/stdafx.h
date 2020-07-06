@@ -11,11 +11,13 @@
 
 #include "..\targetver.h"
 
-#define STRICT
-
 #define ISOLATION_AWARE_ENABLED	1
 
 #define OEMRESOURCE
+
+#define STRICT
+
+#define STRICT_TYPED_ITEMIDS
 
 // Windows Header Files:
 #include <Winsock2.h>

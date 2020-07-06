@@ -764,8 +764,16 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 
 					if (hr == S_OK)
 					{
+						// The only reason this pidl is cloned at all is that ILFindLastID returns
+						// an unaligned pointer. Inserting that into the pidlItems vector then
+						// triggers a warning due to the underlying types having different
+						// __unaligned qualifiers. This only affects Itanium (which isn't
+						// supported), but cloning the pidl here is a simple way of producing an
+						// aligned version.
+						unique_pidl_child pidlItem(ILCloneChild(ILFindLastID(pidlFull.get())));
+
 						std::vector<PCITEMID_CHILD> pidlItems;
-						pidlItems.push_back(ILFindLastID(pidlFull.get()));
+						pidlItems.push_back(pidlItem.get());
 
 						unique_pidl_absolute pidlDirectory(ILCloneFull(pidlFull.get()));
 						ILRemoveLastID(pidlDirectory.get());

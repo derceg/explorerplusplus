@@ -61,7 +61,7 @@ HRESULT GetDisplayName(PCIDLIST_ABSOLUTE pidl, TCHAR *szDisplayName, UINT cchMax
 
 		if (SUCCEEDED(hr))
 		{
-			hr = StrRetToBuf(&str, pidl, szDisplayName, cchMax);
+			hr = StrRetToBuf(&str, pidlRelative, szDisplayName, cchMax);
 		}
 
 		pShellFolder->Release();

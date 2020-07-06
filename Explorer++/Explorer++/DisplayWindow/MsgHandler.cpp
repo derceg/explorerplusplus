@@ -167,9 +167,9 @@ void DisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 {
 	IExtractImage *pExtractImage = nullptr;
 	IShellFolder *pShellFolder = nullptr;
-	LPITEMIDLIST pidlParent = nullptr;
-	LPITEMIDLIST pidlFull = nullptr;
-	LPITEMIDLIST pridl = nullptr;
+	PIDLIST_ABSOLUTE pidlParent = nullptr;
+	PIDLIST_ABSOLUTE pidlFull = nullptr;
+	PITEMID_CHILD pridl = nullptr;
 	HBITMAP hBitmap;
 	BITMAP bm;
 	RECT rc;
@@ -186,17 +186,17 @@ void DisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 
 	if (SUCCEEDED(hr))
 	{
-		pidlParent = ILClone(pidlFull);
+		pidlParent = ILCloneFull(pidlFull);
 		ILRemoveLastID(pidlParent);
 
-		pridl = ILClone(ILFindLastID(pidlFull));
+		pridl = ILCloneChild(ILFindLastID(pidlFull));
 
 		hr = BindToIdl(pidlParent, IID_PPV_ARGS(&pShellFolder));
 
 		if (SUCCEEDED(hr))
 		{
 			hr = GetUIObjectOf(
-				pShellFolder, nullptr, 1, (LPCITEMIDLIST *) &pridl, IID_PPV_ARGS(&pExtractImage));
+				pShellFolder, nullptr, 1, &pridl, IID_PPV_ARGS(&pExtractImage));
 
 			if (SUCCEEDED(hr))
 			{

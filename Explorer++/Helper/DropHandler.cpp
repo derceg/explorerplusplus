@@ -301,13 +301,11 @@ HRESULT DropHandler::CopyShellIDListData(IDataObject *pDataObject,
 
 			if(SUCCEEDED(hr))
 			{
-				LPCITEMIDLIST pidlItem = nullptr;
-				IStorage *pStorage = nullptr;
-
 				for(unsigned int i = 0;i < pcida->cidl;i++)
 				{
-					pidlItem = HIDA_GetPIDLItem(pcida,i);
+					auto pidlItem = HIDA_GetPIDLItem(pcida,i);
 
+					IStorage *pStorage = nullptr;
 					hr = pShellFolder->BindToStorage(pidlItem, nullptr, IID_PPV_ARGS(&pStorage));
 
 					if(SUCCEEDED(hr))
