@@ -424,7 +424,7 @@ std::wstring ShellBrowser::DetermineItemNameGroup(const BasicItemInfo_t &itemInf
  */
 std::wstring ShellBrowser::DetermineItemSizeGroup(const BasicItemInfo_t &itemInfo) const
 {
-	TCHAR *sizeGroups[] = { _T("Folders"), _T("Tiny"), _T("Small"), _T("Medium"), _T("Large"),
+	const TCHAR *sizeGroups[] = { _T("Folders"), _T("Tiny"), _T("Small"), _T("Medium"), _T("Large"),
 		_T("Huge") };
 	int sizeGroupLimits[] = { 0, 0, 32 * KBYTE, 100 * KBYTE, MBYTE, 10 * MBYTE };
 	int nGroups = 6;
@@ -465,7 +465,7 @@ std::wstring ShellBrowser::DetermineItemTotalSizeGroup(const BasicItemInfo_t &it
 {
 	IShellFolder *pShellFolder = nullptr;
 	PCITEMID_CHILD pidlRelative = nullptr;
-	TCHAR *sizeGroups[] = { _T("Unspecified"), _T("Small"), _T("Medium"), _T("Huge"),
+	const TCHAR *sizeGroups[] = { _T("Unspecified"), _T("Small"), _T("Medium"), _T("Huge"),
 		_T("Gigantic") };
 	TCHAR szItem[MAX_PATH];
 	STRRET str;
