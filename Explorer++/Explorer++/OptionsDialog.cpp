@@ -131,6 +131,10 @@ HWND OptionsDialog::Show(HWND parentWindow)
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(propertySheet,
 		PropSheetProcStub, PROP_SHEET_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
+	// Needed to ensure that the background color is correctly set in dark mode when opening the
+	// dialog.
+	InvalidateRect(propertySheet, nullptr, true);
+
 	CenterWindow(parentWindow, propertySheet);
 
 	return propertySheet;
@@ -198,6 +202,9 @@ LRESULT CALLBACK OptionsDialog::PropSheetProc(HWND hwnd, UINT uMsg, WPARAM wPara
 {
 	switch (uMsg)
 	{
+	case WM_CTLCOLORDLG:
+		return OnCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
 	case WM_NCDESTROY:
 		delete this;
 		return 0;
