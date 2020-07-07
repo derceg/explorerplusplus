@@ -362,7 +362,7 @@ TEST_F(ShellNavigationControllerTest, NavigationMode)
 	unique_pidl_absolute pidl(SHSimpleIDListFromPath(L"C:\\Fake"));
 	ASSERT_TRUE(pidl);
 
-	EXPECT_CALL(m_navigator, BrowseFolderImpl(pidl.get(), _));
+	EXPECT_CALL(m_navigator, BrowseFolderImpl(pidl.get(), _, false));
 
 	// By default, all navigations should proceed in the current tab.
 	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
@@ -391,7 +391,7 @@ TEST_F(ShellNavigationControllerTest, NavigationModeFirstNavigation)
 
 	// The first navigation in a tab should always take place within that tab, regardless of the
 	// navigation mode in effect.
-	EXPECT_CALL(m_navigator, BrowseFolderImpl(pidl1.get(), _));
+	EXPECT_CALL(m_navigator, BrowseFolderImpl(pidl1.get(), _, false));
 	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
 
 	HRESULT hr = m_navigationController.BrowseFolder(pidl1.get());
