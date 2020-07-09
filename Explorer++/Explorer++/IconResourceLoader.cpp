@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "IconResourceLoader.h"
+#include "DarkModeHelper.h"
 #include "IconMappingsColor.h"
 #include "IconMappingsWindows10.h"
 #include "../Helper/ImageHelper.h"
@@ -23,7 +24,7 @@ wil::unique_hbitmap IconResourceLoader::LoadBitmapFromPNGForDpi(
 wil::unique_hbitmap IconResourceLoader::LoadBitmapFromPNGAndScale(
 	Icon icon, int iconWidth, int iconHeight) const
 {
-	auto gdiplusBitmap = LoadGdiplusBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
+	auto gdiplusBitmap = LoadGdiplusBitmapFromPNGAndScalePlusInvert(icon, iconWidth, iconHeight);
 	return RetrieveBitmapFromGdiplusBitmap(gdiplusBitmap.get());
 }
 
@@ -57,7 +58,7 @@ wil::unique_hicon IconResourceLoader::LoadIconFromPNGForDpi(
 wil::unique_hicon IconResourceLoader::LoadIconFromPNGAndScale(
 	Icon icon, int iconWidth, int iconHeight) const
 {
-	auto gdiplusBitmap = LoadGdiplusBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
+	auto gdiplusBitmap = LoadGdiplusBitmapFromPNGAndScalePlusInvert(icon, iconWidth, iconHeight);
 	return RetrieveIconFromGdiplusBitmap(gdiplusBitmap.get());
 }
 
@@ -85,7 +86,46 @@ std::unique_ptr<Gdiplus::Bitmap> IconResourceLoader::LoadGdiplusBitmapFromPNGFor
 {
 	int scaledIconWidth = MulDiv(iconWidth, dpi, USER_DEFAULT_SCREEN_DPI);
 	int scaledIconHeight = MulDiv(iconHeight, dpi, USER_DEFAULT_SCREEN_DPI);
-	return LoadGdiplusBitmapFromPNGAndScale(icon, scaledIconWidth, scaledIconHeight);
+	return LoadGdiplusBitmapFromPNGAndScalePlusInvert(icon, scaledIconWidth, scaledIconHeight);
+}
+
+// Loads and scales a PNG and then inverts the colors, when required by the current color mode.
+std::unique_ptr<Gdiplus::Bitmap> IconResourceLoader::LoadGdiplusBitmapFromPNGAndScalePlusInvert(
+	Icon icon, int iconWidth, int iconHeight) const
+{
+	auto bitmap = LoadGdiplusBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
+
+	if (m_iconTheme != +IconTheme::Windows10 || !DarkModeHelper::GetInstance().IsDarkModeEnabled())
+	{
+		return bitmap;
+	}
+
+	auto invertedBitmap = std::make_unique<Gdiplus::Bitmap>(iconWidth, iconHeight);
+	invertedBitmap->SetResolution(
+		bitmap->GetHorizontalResolution(), bitmap->GetVerticalResolution());
+
+	Gdiplus::Graphics graphics(invertedBitmap.get());
+
+	// This matrix will result in the RGB components all being inverted, while the alpha component
+	// will stay as-is. See the documentation on ColorMatrix for information on how this structure
+	// is laid out.
+	// clang-format off
+	Gdiplus::ColorMatrix colorMatrix = {
+		-1, 0, 0, 0, 0,
+		0, -1, 0, 0, 0,
+		0, 0, -1, 0, 0,
+		0, 0, 0, 1, 0,
+		1, 1, 1, 0, 1
+	};
+	// clang-format on
+
+	Gdiplus::ImageAttributes attributes;
+	attributes.SetColorMatrix(&colorMatrix);
+
+	graphics.DrawImage(bitmap.get(), Gdiplus::Rect(0, 0, iconWidth, iconHeight), 0, 0, iconWidth,
+		iconHeight, Gdiplus::UnitPixel, &attributes);
+
+	return invertedBitmap;
 }
 
 // This function is based on the steps performed by
