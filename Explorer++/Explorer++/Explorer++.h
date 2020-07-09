@@ -467,9 +467,6 @@ private:
 	HRESULT ExpandAndBrowsePath(const TCHAR *szPath);
 	HRESULT ExpandAndBrowsePath(const TCHAR *szPath, BOOL bOpenInNewTab, BOOL bSwitchToNewTab);
 
-	/* Filtering. */
-	void ToggleFilterStatus();
-
 	/* IExplorerplusplus methods. */
 	Config *GetConfig() const override;
 	HMODULE GetLanguageModule() const override;

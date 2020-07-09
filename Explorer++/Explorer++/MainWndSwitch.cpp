@@ -593,7 +593,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		break;
 
 	case IDM_FILTER_APPLYFILTER:
-		ToggleFilterStatus();
+		m_pActiveShellBrowser->SetFilterStatus(!m_pActiveShellBrowser->GetFilterStatus());
 		break;
 
 	case IDM_SORTBY_NAME:

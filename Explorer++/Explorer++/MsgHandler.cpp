@@ -1033,11 +1033,6 @@ void Explorerplusplus::CopyColumnInfoToClipboard()
 	clipboardWriter.WriteText(strColumnInfo);
 }
 
-void Explorerplusplus::ToggleFilterStatus()
-{
-	m_pActiveShellBrowser->SetFilterStatus(!m_pActiveShellBrowser->GetFilterStatus());
-}
-
 void Explorerplusplus::OnDirectoryModified(int iTabId)
 {
 	/* This message is sent when one of the
