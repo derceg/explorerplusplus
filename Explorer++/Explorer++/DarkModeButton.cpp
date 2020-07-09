@@ -49,11 +49,20 @@ void DarkModeButton::DrawButtonText(const NMCUSTOMDRAW *customDraw, ButtonType b
 
 	SetTextColor(customDraw->hdc, textColor);
 
-	UINT textFormat = DT_LEFT | DT_SINGLELINE | DT_VCENTER;
+	UINT textFormat = DT_LEFT;
 
 	if (!WI_IsFlagSet(customDraw->uItemState, CDIS_SHOWKEYBOARDCUES))
 	{
 		WI_SetFlag(textFormat, DT_HIDEPREFIX);
+	}
+
+	RECT finalTextRect = textRect;
+	DrawText(customDraw->hdc, text.c_str(), static_cast<int>(text.size()), &finalTextRect,
+		textFormat | DT_CALCRECT);
+
+	if (GetRectHeight(&finalTextRect) < GetRectHeight(&textRect))
+	{
+		textRect.top += (GetRectHeight(&textRect) - GetRectHeight(&finalTextRect)) / 2;
 	}
 
 	DrawText(customDraw->hdc, text.c_str(), static_cast<int>(text.size()), &textRect, textFormat);
