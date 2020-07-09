@@ -498,9 +498,6 @@
     <ClInclude Include="Explorer++_internal.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Explorer++VersionInfo.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="FilterDialog.h">
       <Filter>General Dialogs</Filter>
     </ClInclude>
@@ -521,9 +518,6 @@
     </ClInclude>
     <ClInclude Include="IModelessDialogNotification.h">
       <Filter>Dialog Support</Filter>
-    </ClInclude>
-    <ClInclude Include="MainResource.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="MassRenameDialog.h">
       <Filter>General Dialogs</Filter>
@@ -905,6 +899,12 @@
     </ClInclude>
     <ClInclude Include="DarkModeButton.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Explorer++VersionInfo.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MainResource.h">
+      <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
