@@ -14,7 +14,8 @@ UiTheming::UiTheming(IExplorerplusplus *expp, TabContainer *tabContainer) :
 	m_tabContainer(tabContainer),
 	m_customListViewColorsApplied(false)
 {
-	m_connections.emplace_back(m_tabContainer->tabCreatedSignal.AddObserver(boost::bind(&UiTheming::OnTabCreated, this, _1, _2)));
+	m_connections.emplace_back(m_tabContainer->tabCreatedSignal.AddObserver(
+		boost::bind(&UiTheming::OnTabCreated, this, _1, _2)));
 }
 
 void UiTheming::OnTabCreated(int tabId, BOOL switchToNewTab)
@@ -57,7 +58,8 @@ bool UiTheming::ApplyListViewColorsForAllTabs(COLORREF backgroundColor, COLORREF
 	return overallResult;
 }
 
-bool UiTheming::ApplyListViewColorsForTab(const Tab &tab, COLORREF backgroundColor, COLORREF textColor)
+bool UiTheming::ApplyListViewColorsForTab(
+	const Tab &tab, COLORREF backgroundColor, COLORREF textColor)
 {
 	BOOL bkRes = ListView_SetBkColor(tab.GetShellBrowser()->GetListView(), backgroundColor);
 	BOOL textBkRes = ListView_SetTextBkColor(tab.GetShellBrowser()->GetListView(), backgroundColor);

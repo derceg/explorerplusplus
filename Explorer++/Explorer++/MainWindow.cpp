@@ -14,14 +14,14 @@
 #include "../Helper/ProcessHelper.h"
 #include <wil/resource.h>
 
-MainWindow *MainWindow::Create(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
-	IExplorerplusplus *expp)
+MainWindow *MainWindow::Create(
+	HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance, IExplorerplusplus *expp)
 {
 	return new MainWindow(hwnd, config, instance, expp);
 }
 
-MainWindow::MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
-	IExplorerplusplus *expp) :
+MainWindow::MainWindow(
+	HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance, IExplorerplusplus *expp) :
 	BaseWindow(hwnd),
 	m_hwnd(hwnd),
 	m_config(config),
@@ -35,9 +35,12 @@ MainWindow::MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE inst
 			boost::bind(&MainWindow::OnNavigationCompleted, this, _1)));
 	});
 
-	m_connections.push_back(m_config->showFullTitlePath.addObserver(boost::bind(&MainWindow::OnShowFullTitlePathUpdated, this, _1)));
-	m_connections.push_back(m_config->showUserNameInTitleBar.addObserver(boost::bind(&MainWindow::OnShowUserNameInTitleBarUpdated, this, _1)));
-	m_connections.push_back(m_config->showPrivilegeLevelInTitleBar.addObserver(boost::bind(&MainWindow::OnShowPrivilegeLevelInTitleBarUpdated, this, _1)));
+	m_connections.push_back(m_config->showFullTitlePath.addObserver(
+		boost::bind(&MainWindow::OnShowFullTitlePathUpdated, this, _1)));
+	m_connections.push_back(m_config->showUserNameInTitleBar.addObserver(
+		boost::bind(&MainWindow::OnShowUserNameInTitleBarUpdated, this, _1)));
+	m_connections.push_back(m_config->showPrivilegeLevelInTitleBar.addObserver(
+		boost::bind(&MainWindow::OnShowPrivilegeLevelInTitleBarUpdated, this, _1)));
 }
 
 void MainWindow::OnNavigationCompleted(const Tab &tab)
@@ -87,19 +90,21 @@ void MainWindow::UpdateWindowText()
 	GUID will be shown). */
 	if (m_config->showFullTitlePath.get() && !tab.GetShellBrowser()->InVirtualFolder())
 	{
-		GetDisplayName(pidlDirectory.get(), szFolderDisplayName, SIZEOF_ARRAY(szFolderDisplayName), SHGDN_FORPARSING);
+		GetDisplayName(pidlDirectory.get(), szFolderDisplayName, SIZEOF_ARRAY(szFolderDisplayName),
+			SHGDN_FORPARSING);
 	}
 	else
 	{
-		GetDisplayName(pidlDirectory.get(), szFolderDisplayName, SIZEOF_ARRAY(szFolderDisplayName), SHGDN_NORMAL);
+		GetDisplayName(pidlDirectory.get(), szFolderDisplayName, SIZEOF_ARRAY(szFolderDisplayName),
+			SHGDN_NORMAL);
 	}
 
 	TCHAR szTitle[512];
 
 	TCHAR szTemp[64];
 	LoadString(m_instance, IDS_MAIN_WINDOW_TITLE, szTemp, SIZEOF_ARRAY(szTemp));
-	StringCchPrintf(szTitle, SIZEOF_ARRAY(szTitle),
-		szTemp, szFolderDisplayName, NExplorerplusplus::APP_NAME);
+	StringCchPrintf(
+		szTitle, SIZEOF_ARRAY(szTitle), szTemp, szFolderDisplayName, NExplorerplusplus::APP_NAME);
 
 	if (m_config->showUserNameInTitleBar.get() || m_config->showPrivilegeLevelInTitleBar.get())
 	{
@@ -121,30 +126,34 @@ void MainWindow::UpdateWindowText()
 
 		if (CheckGroupMembership(GroupType::Administrators))
 		{
-			LoadString(m_instance, IDS_PRIVILEGE_LEVEL_ADMINISTRATORS, szPrivilege, SIZEOF_ARRAY(szPrivilege));
+			LoadString(m_instance, IDS_PRIVILEGE_LEVEL_ADMINISTRATORS, szPrivilege,
+				SIZEOF_ARRAY(szPrivilege));
 		}
 		else if (CheckGroupMembership(GroupType::PowerUsers))
 		{
-			LoadString(m_instance, IDS_PRIVILEGE_LEVEL_POWER_USERS, szPrivilege, SIZEOF_ARRAY(szPrivilege));
+			LoadString(m_instance, IDS_PRIVILEGE_LEVEL_POWER_USERS, szPrivilege,
+				SIZEOF_ARRAY(szPrivilege));
 		}
 		else if (CheckGroupMembership(GroupType::Users))
 		{
-			LoadString(m_instance, IDS_PRIVILEGE_LEVEL_USERS, szPrivilege, SIZEOF_ARRAY(szPrivilege));
+			LoadString(
+				m_instance, IDS_PRIVILEGE_LEVEL_USERS, szPrivilege, SIZEOF_ARRAY(szPrivilege));
 		}
 		else if (CheckGroupMembership(GroupType::UsersRestricted))
 		{
-			LoadString(m_instance, IDS_PRIVILEGE_LEVEL_USERS_RESTRICTED, szPrivilege, SIZEOF_ARRAY(szPrivilege));
+			LoadString(m_instance, IDS_PRIVILEGE_LEVEL_USERS_RESTRICTED, szPrivilege,
+				SIZEOF_ARRAY(szPrivilege));
 		}
 
 		if (m_config->showUserNameInTitleBar.get())
 		{
-			StringCchPrintf(szPrivilegeAddition, SIZEOF_ARRAY(szPrivilegeAddition),
-				_T(" - %s"), szPrivilege);
+			StringCchPrintf(
+				szPrivilegeAddition, SIZEOF_ARRAY(szPrivilegeAddition), _T(" - %s"), szPrivilege);
 		}
 		else
 		{
-			StringCchPrintf(szPrivilegeAddition, SIZEOF_ARRAY(szPrivilegeAddition),
-				_T("%s"), szPrivilege);
+			StringCchPrintf(
+				szPrivilegeAddition, SIZEOF_ARRAY(szPrivilegeAddition), _T("%s"), szPrivilege);
 		}
 
 		StringCchCat(szTitle, SIZEOF_ARRAY(szTitle), szPrivilegeAddition);

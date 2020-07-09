@@ -10,7 +10,6 @@ class TabContainer;
 class Navigation
 {
 public:
-
 	Navigation(IExplorerplusplus *expp);
 
 	void OnNavigateUp();
@@ -21,7 +20,6 @@ public:
 	void OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory);
 
 private:
-
 	IExplorerplusplus *m_expp;
 	TabContainer *m_tabContainer;
 };

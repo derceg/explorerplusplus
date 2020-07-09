@@ -7,7 +7,6 @@
 #include "Config.h"
 #include "Explorer++_internal.h"
 #include "IDropFilesCallback.h"
-#include "iServiceProvider.h"
 #include "ListViewEdit.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
@@ -22,6 +21,7 @@
 #include "SortMenuBuilder.h"
 #include "TabContainer.h"
 #include "ViewModeHelper.h"
+#include "iServiceProvider.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/ContextMenuManager.h"
 #include "../Helper/DropHandler.h"
@@ -29,305 +29,297 @@
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
-#include "../Helper/iDataObject.h"
-#include "../Helper/iDropSource.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/iDataObject.h"
+#include "../Helper/iDropSource.h"
 #include <wil/com.h>
 
-LRESULT CALLBACK Explorerplusplus::ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
-	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK Explorerplusplus::ListViewProcStub(
+	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
 	auto *pexpp = reinterpret_cast<Explorerplusplus *>(dwRefData);
 
-	return pexpp->ListViewSubclassProc(hwnd,uMsg,wParam,lParam);
+	return pexpp->ListViewSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
-	WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(
+	HWND ListView, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	switch(msg)
+	switch (msg)
 	{
-		case WM_MENUSELECT:
-			SendMessage(m_hContainer,WM_MENUSELECT,wParam,lParam);
-			break;
+	case WM_MENUSELECT:
+		SendMessage(m_hContainer, WM_MENUSELECT, wParam, lParam);
+		break;
 
-		case WM_SETFOCUS:
-			m_hLastActiveWindow = ListView;
-			m_mainToolbar->UpdateToolbarButtonStates();
-			break;
+	case WM_SETFOCUS:
+		m_hLastActiveWindow = ListView;
+		m_mainToolbar->UpdateToolbarButtonStates();
+		break;
 
-		case WM_LBUTTONDBLCLK:
+	case WM_LBUTTONDBLCLK:
+	{
+		LV_HITTESTINFO ht;
+		DWORD dwPos;
+		POINT mousePos;
+
+		dwPos = GetMessagePos();
+		mousePos.x = GET_X_LPARAM(dwPos);
+		mousePos.y = GET_Y_LPARAM(dwPos);
+		ScreenToClient(m_hActiveListView, &mousePos);
+
+		ht.pt = mousePos;
+		ListView_HitTest(ListView, &ht);
+
+		/* NM_DBLCLK for the listview is sent both on double clicks
+		(by default), as well as in the situation when LVS_EX_ONECLICKACTIVATE
+		is active (in which case it is sent on a single mouse click).
+		Therefore, because we only want to navigate up one folder on
+		a DOUBLE click, we'll handle the event here. */
+		if (ht.flags == LVHT_NOWHERE)
+		{
+			/* The user has double clicked in the whitespace
+			area for this tab, so go up one folder... */
+			m_navigation->OnNavigateUp();
+			return 0;
+		}
+	}
+	break;
+
+	case WM_RBUTTONDOWN:
+		if ((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON) && !(wParam & MK_MBUTTON))
+		{
+			LV_HITTESTINFO lvhti;
+
+			lvhti.pt.x = LOWORD(lParam);
+			lvhti.pt.y = HIWORD(lParam);
+
+			/* Test to see if the mouse click was
+			on an item or not. */
+			ListView_HitTest(m_hActiveListView, &lvhti);
+
+			HDC hdc;
+			TCHAR szText[MAX_PATH];
+			RECT rc;
+			SIZE sz;
+
+			UINT uViewMode = m_pActiveShellBrowser->GetViewMode();
+
+			if (uViewMode == ViewMode::List)
 			{
-				LV_HITTESTINFO	ht;
-				DWORD			dwPos;
-				POINT			mousePos;
-
-				dwPos = GetMessagePos();
-				mousePos.x = GET_X_LPARAM(dwPos);
-				mousePos.y = GET_Y_LPARAM(dwPos);
-				ScreenToClient(m_hActiveListView,&mousePos);
-
-				ht.pt = mousePos;
-				ListView_HitTest(ListView,&ht);
-
-				/* NM_DBLCLK for the listview is sent both on double clicks
-				(by default), as well as in the situation when LVS_EX_ONECLICKACTIVATE
-				is active (in which case it is sent on a single mouse click).
-				Therefore, because we only want to navigate up one folder on
-				a DOUBLE click, we'll handle the event here. */
-				if(ht.flags == LVHT_NOWHERE)
+				if (!(lvhti.flags & LVHT_NOWHERE) && lvhti.iItem != -1)
 				{
-					/* The user has double clicked in the whitespace
-					area for this tab, so go up one folder... */
-					m_navigation->OnNavigateUp();
-					return 0;
+					ListView_GetItemRect(m_hActiveListView, lvhti.iItem, &rc, LVIR_LABEL);
+					ListView_GetItemText(
+						m_hActiveListView, lvhti.iItem, 0, szText, SIZEOF_ARRAY(szText));
+
+					hdc = GetDC(m_hActiveListView);
+					GetTextExtentPoint32(hdc, szText, lstrlen(szText), &sz);
+					ReleaseDC(m_hActiveListView, hdc);
+
+					rc.right = rc.left + sz.cx;
+
+					if (!PtInRect(&rc, lvhti.pt))
+					{
+						m_blockNextListViewSelection = true;
+					}
 				}
 			}
-			break;
 
-		case WM_RBUTTONDOWN:
-			if((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON)
-				&& !(wParam & MK_MBUTTON))
+			if (!(lvhti.flags & LVHT_NOWHERE))
 			{
+				m_bDragAllowed = true;
+			}
+		}
+		break;
+
+	case WM_RBUTTONUP:
+		m_bDragCancelled = false;
+		m_bDragAllowed = false;
+
+		m_blockNextListViewSelection = false;
+		break;
+
+	/* If no item is currently been dragged, and the last drag
+	has not just finished (i.e. item was dragged, but was cancelled
+	with escape, but mouse button is still down), and when the right
+	mouse button was clicked, it was over an item, start dragging. */
+	case WM_MOUSEMOVE:
+	{
+		m_blockNextListViewSelection = false;
+		if (!m_bDragging && !m_bDragCancelled && m_bDragAllowed)
+		{
+			if ((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON) && !(wParam & MK_MBUTTON))
+			{
+				NMLISTVIEW nmlv;
+				POINT pt;
+				DWORD dwPos;
+				HRESULT hr;
+
+				dwPos = GetMessagePos();
+				pt.x = GET_X_LPARAM(dwPos);
+				pt.y = GET_Y_LPARAM(dwPos);
+				MapWindowPoints(HWND_DESKTOP, m_hActiveListView, &pt, 1);
+
 				LV_HITTESTINFO lvhti;
 
-				lvhti.pt.x	= LOWORD(lParam);
-				lvhti.pt.y	= HIWORD(lParam);
+				lvhti.pt = pt;
 
 				/* Test to see if the mouse click was
 				on an item or not. */
-				ListView_HitTest(m_hActiveListView,&lvhti);
+				ListView_HitTest(m_hActiveListView, &lvhti);
 
-				HDC hdc;
-				TCHAR szText[MAX_PATH];
-				RECT rc;
-				SIZE sz;
-
-				UINT uViewMode = m_pActiveShellBrowser->GetViewMode();
-
-				if(uViewMode == ViewMode::List)
+				if (!(lvhti.flags & LVHT_NOWHERE)
+					&& ListView_GetSelectedCount(m_hActiveListView) > 0)
 				{
-					if(!(lvhti.flags & LVHT_NOWHERE) && lvhti.iItem != -1)
+					nmlv.iItem = 0;
+					nmlv.ptAction = pt;
+
+					hr = OnListViewBeginDrag((LPARAM) &nmlv, DragType::RightClick);
+
+					if (hr == DRAGDROP_S_CANCEL)
 					{
-						ListView_GetItemRect(m_hActiveListView,lvhti.iItem,&rc,LVIR_LABEL);
-						ListView_GetItemText(m_hActiveListView,lvhti.iItem,0,szText,SIZEOF_ARRAY(szText));
-
-						hdc = GetDC(m_hActiveListView);
-						GetTextExtentPoint32(hdc,szText,lstrlen(szText),&sz);
-						ReleaseDC(m_hActiveListView,hdc);
-
-						rc.right = rc.left + sz.cx;
-
-						if(!PtInRect(&rc,lvhti.pt))
-						{
-							m_blockNextListViewSelection = true;
-						}
+						m_bDragCancelled = true;
 					}
 				}
-
-				if(!(lvhti.flags & LVHT_NOWHERE))
-				{
-					m_bDragAllowed = true;
-				}
 			}
-			break;
+		}
+	}
+	break;
 
-		case WM_RBUTTONUP:
-			m_bDragCancelled = false;
-			m_bDragAllowed = false;
+	case WM_MOUSEWHEEL:
+		if (OnMouseWheel(MousewheelSource::ListView, wParam, lParam))
+		{
+			return 0;
+		}
+		break;
 
-			m_blockNextListViewSelection = false;
-			break;
+	case WM_NOTIFY:
+		switch (((LPNMHDR) lParam)->code)
+		{
+		case HDN_BEGINDRAG:
+			return FALSE;
 
-		/* If no item is currently been dragged, and the last drag
-		has not just finished (i.e. item was dragged, but was cancelled
-		with escape, but mouse button is still down), and when the right
-		mouse button was clicked, it was over an item, start dragging. */
-		case WM_MOUSEMOVE:
+		case HDN_ENDDRAG:
+		{
+			/* When the drag ends, the dragged item
+			is shifted into position, and all later
+			items are shifted down one. Therefore,
+			take the item out of its position in the
+			list, and move it into its new position. */
+			NMHEADER *pnmHeader = nullptr;
+			Column_t column;
+			int i = 0;
+
+			pnmHeader = (NMHEADER *) lParam;
+
+			auto currentColumns = m_pActiveShellBrowser->ExportCurrentColumns();
+
+			i = 0;
+			auto itr = currentColumns.begin();
+			while (i < (pnmHeader->iItem + 1) && itr != currentColumns.end())
 			{
-				m_blockNextListViewSelection = false;
-				if(!m_bDragging && !m_bDragCancelled && m_bDragAllowed)
+				if (itr->bChecked)
 				{
-					if((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON)
-						&& !(wParam & MK_MBUTTON))
-					{
-						NMLISTVIEW nmlv;
-						POINT pt;
-						DWORD dwPos;
-						HRESULT hr;
-
-						dwPos = GetMessagePos();
-						pt.x = GET_X_LPARAM(dwPos);
-						pt.y = GET_Y_LPARAM(dwPos);
-						MapWindowPoints(HWND_DESKTOP,m_hActiveListView,&pt,1);
-
-						LV_HITTESTINFO lvhti;
-
-						lvhti.pt = pt;
-
-						/* Test to see if the mouse click was
-						on an item or not. */
-						ListView_HitTest(m_hActiveListView,&lvhti);
-
-						if(!(lvhti.flags & LVHT_NOWHERE) && ListView_GetSelectedCount(m_hActiveListView) > 0)
-						{
-							nmlv.iItem = 0;
-							nmlv.ptAction = pt;
-
-							hr = OnListViewBeginDrag((LPARAM)&nmlv,DragType::RightClick);
-
-							if(hr == DRAGDROP_S_CANCEL)
-							{
-								m_bDragCancelled = true;
-							}
-						}
-					}
+					i++;
 				}
+
+				itr++;
 			}
-			break;
 
-		case WM_MOUSEWHEEL:
-			if(OnMouseWheel(MousewheelSource::ListView,wParam,lParam))
+			if (itr != currentColumns.begin())
+				itr--;
+
+			column = *itr;
+			currentColumns.erase(itr);
+
+			i = 0;
+			itr = currentColumns.begin();
+			while (i < (pnmHeader->pitem->iOrder + 1) && itr != currentColumns.end())
 			{
-				return 0;
-			}
-			break;
-
-		case WM_NOTIFY:
-			switch(((LPNMHDR)lParam)->code)
-			{
-			case HDN_BEGINDRAG:
-				return FALSE;
-
-			case HDN_ENDDRAG:
+				if (itr->bChecked)
 				{
-					/* When the drag ends, the dragged item
-					is shifted into position, and all later
-					items are shifted down one. Therefore,
-					take the item out of its position in the
-					list, and move it into its new position. */
-					NMHEADER *pnmHeader = nullptr;
-					Column_t column;
-					int i = 0;
-
-					pnmHeader = (NMHEADER *)lParam;
-
-					auto currentColumns = m_pActiveShellBrowser->ExportCurrentColumns();
-
-					i = 0;
-					auto itr = currentColumns.begin();
-					while(i < (pnmHeader->iItem + 1) && itr != currentColumns.end())
-					{
-						if(itr->bChecked)
-						{
-							i++;
-						}
-
-						itr++;
-					}
-
-					if(itr != currentColumns.begin())
-						itr--;
-
-					column = *itr;
-					currentColumns.erase(itr);
-
-					i = 0;
-					itr = currentColumns.begin();
-					while(i < (pnmHeader->pitem->iOrder + 1) && itr != currentColumns.end())
-					{
-						if(itr->bChecked)
-						{
-							i++;
-						}
-
-						itr++;
-					}
-
-					if(itr != currentColumns.begin())
-						itr--;
-
-					currentColumns.insert(itr,column);
-
-					m_pActiveShellBrowser->ImportColumns(currentColumns);
-
-					Tab &tab = m_tabContainer->GetSelectedTab();
-					tab.GetShellBrowser()->GetNavigationController()->Refresh();
-
-					return TRUE;
+					i++;
 				}
+
+				itr++;
 			}
-			break;
+
+			if (itr != currentColumns.begin())
+				itr--;
+
+			currentColumns.insert(itr, column);
+
+			m_pActiveShellBrowser->ImportColumns(currentColumns);
+
+			Tab &tab = m_tabContainer->GetSelectedTab();
+			tab.GetShellBrowser()->GetNavigationController()->Refresh();
+
+			return TRUE;
+		}
+		}
+		break;
 	}
 
-	return DefSubclassProc(ListView,msg,wParam,lParam);
+	return DefSubclassProc(ListView, msg, wParam, lParam);
 }
 
 LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 {
-	LV_KEYDOWN	*keyDown = nullptr;
+	LV_KEYDOWN *keyDown = nullptr;
 
-	keyDown = (LV_KEYDOWN *)lParam;
+	keyDown = (LV_KEYDOWN *) lParam;
 
-	switch(keyDown->wVKey)
+	switch (keyDown->wVKey)
 	{
-		case VK_RETURN:
-			if(IsKeyDown(VK_CONTROL) &&
-				!IsKeyDown(VK_SHIFT) &&
-				!IsKeyDown(VK_MENU))
-			{
-				/* Key press: Ctrl+Enter
-				Action: Open item in background tab. */
-				OpenAllSelectedItems(TRUE);
-			}
-			else
-			{
-				OpenAllSelectedItems(FALSE);
-			}
-			break;
+	case VK_RETURN:
+		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
+		{
+			/* Key press: Ctrl+Enter
+			Action: Open item in background tab. */
+			OpenAllSelectedItems(TRUE);
+		}
+		else
+		{
+			OpenAllSelectedItems(FALSE);
+		}
+		break;
 
-		case VK_DELETE:
-			if(IsKeyDown(VK_SHIFT))
-			{
-				OnListViewFileDelete(true);
-			}
-			else
-			{
-				OnListViewFileDelete(false);
-			}
-			break;
+	case VK_DELETE:
+		if (IsKeyDown(VK_SHIFT))
+		{
+			OnListViewFileDelete(true);
+		}
+		else
+		{
+			OnListViewFileDelete(false);
+		}
+		break;
 
-		case 'C':
-			if(IsKeyDown(VK_CONTROL) &&
-				!IsKeyDown(VK_SHIFT) &&
-				!IsKeyDown(VK_MENU))
-			{
-				OnListViewCopy(TRUE);
-			}
-			break;
+	case 'C':
+		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
+		{
+			OnListViewCopy(TRUE);
+		}
+		break;
 
-		case 'V':
-			if(IsKeyDown(VK_CONTROL) &&
-				!IsKeyDown(VK_SHIFT) &&
-				!IsKeyDown(VK_MENU))
-			{
-				OnListViewPaste();
-			}
-			break;
+	case 'V':
+		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
+		{
+			OnListViewPaste();
+		}
+		break;
 
-		case 'X':
-			if(IsKeyDown(VK_CONTROL) &&
-				!IsKeyDown(VK_SHIFT) &&
-				!IsKeyDown(VK_MENU))
-			{
-				OnListViewCopy(FALSE);
-			}
-			break;
+	case 'X':
+		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
+		{
+			OnListViewCopy(FALSE);
+		}
+		break;
 	}
 
 	return 0;
@@ -380,7 +372,7 @@ int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 
 BOOL Explorerplusplus::OnListViewBeginLabelEdit(LPARAM lParam)
 {
-	if(!CanRename())
+	if (!CanRename())
 	{
 		return TRUE;
 	}
@@ -393,12 +385,12 @@ BOOL Explorerplusplus::OnListViewBeginLabelEdit(LPARAM lParam)
 	it does not work in Windows XP. */
 	HWND hEdit = ListView_GetEditControl(m_hActiveListView);
 
-	if(hEdit == nullptr)
+	if (hEdit == nullptr)
 	{
 		return TRUE;
 	}
 
-	ListViewEdit::CreateNew(hEdit,reinterpret_cast<NMLVDISPINFO *>(lParam)->item.iItem,this);
+	ListViewEdit::CreateNew(hEdit, reinterpret_cast<NMLVDISPINFO *>(lParam)->item.iItem, this);
 
 	m_bListViewRenaming = true;
 
@@ -407,13 +399,13 @@ BOOL Explorerplusplus::OnListViewBeginLabelEdit(LPARAM lParam)
 
 BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 {
-	NMLVDISPINFO	*pdi = nullptr;
-	LVITEM			*pItem = nullptr;
-	TCHAR			newFileName[MAX_PATH + 1];
-	TCHAR			oldFileName[MAX_PATH + 1];
-	TCHAR			oldName[MAX_PATH];
-	DWORD			dwAttributes;
-	int				ret;
+	NMLVDISPINFO *pdi = nullptr;
+	LVITEM *pItem = nullptr;
+	TCHAR newFileName[MAX_PATH + 1];
+	TCHAR oldFileName[MAX_PATH + 1];
+	TCHAR oldName[MAX_PATH];
+	DWORD dwAttributes;
+	int ret;
 
 	pdi = (NMLVDISPINFO *) lParam;
 	pItem = &pdi->item;
@@ -421,11 +413,11 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 	m_bListViewRenaming = false;
 
 	/* Did the user cancel the editing? */
-	if(pItem->pszText == nullptr)
+	if (pItem->pszText == nullptr)
 		return FALSE;
 
 	/* Is the new filename empty? */
-	if(lstrcmp(pItem->pszText,EMPTY_STRING) == 0)
+	if (lstrcmp(pItem->pszText, EMPTY_STRING) == 0)
 		return FALSE;
 
 	/*
@@ -435,14 +427,14 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 	C:\Hello.txt
 	C:\Hello.txt....
 	refer to exactly the same file.
-	
+
 	Taken from the web site referenced below:
 	"Do not end a file or directory name with a trailing
 	space or a period. Although the underlying file system
 	may support such names, the operating system does not.
-	However, it is acceptable to start a name with a period."	
+	However, it is acceptable to start a name with a period."
 	*/
-	if(pItem->pszText[lstrlen(pItem->pszText) - 1] == '.')
+	if (pItem->pszText[lstrlen(pItem->pszText) - 1] == '.')
 		return FALSE;
 
 	/*
@@ -452,20 +444,17 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 
 	See: http://msdn.microsoft.com/en-us/library/aa365247.aspx
 	*/
-	if(StrChr(pItem->pszText,'\\') != nullptr ||
-		StrChr(pItem->pszText,'/') != nullptr ||
-		StrChr(pItem->pszText,':') != nullptr ||
-		StrChr(pItem->pszText,'*') != nullptr ||
-		StrChr(pItem->pszText,'?') != nullptr ||
-		StrChr(pItem->pszText,'"') != nullptr ||
-		StrChr(pItem->pszText,'<') != nullptr ||
-		StrChr(pItem->pszText,'>') != nullptr ||
-		StrChr(pItem->pszText,'|') != nullptr)
+	if (StrChr(pItem->pszText, '\\') != nullptr || StrChr(pItem->pszText, '/') != nullptr
+		|| StrChr(pItem->pszText, ':') != nullptr || StrChr(pItem->pszText, '*') != nullptr
+		|| StrChr(pItem->pszText, '?') != nullptr || StrChr(pItem->pszText, '"') != nullptr
+		|| StrChr(pItem->pszText, '<') != nullptr || StrChr(pItem->pszText, '>') != nullptr
+		|| StrChr(pItem->pszText, '|') != nullptr)
 	{
-		std::wstring error = ResourceHelper::LoadString(m_hLanguageModule,IDS_ERR_FILENAMEINVALID);
-		std::wstring title = ResourceHelper::LoadString(m_hLanguageModule,IDS_ERR_FILENAMEINVALID_MSGTITLE);
+		std::wstring error = ResourceHelper::LoadString(m_hLanguageModule, IDS_ERR_FILENAMEINVALID);
+		std::wstring title =
+			ResourceHelper::LoadString(m_hLanguageModule, IDS_ERR_FILENAMEINVALID_MSGTITLE);
 
-		MessageBox(m_hContainer,error.c_str(),title.c_str(),MB_ICONERROR);
+		MessageBox(m_hContainer, error.c_str(), title.c_str(), MB_ICONERROR);
 
 		return 0;
 	}
@@ -474,37 +463,38 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 	StringCchCopy(newFileName, SIZEOF_ARRAY(newFileName), currentDirectory.c_str());
 	StringCchCopy(oldFileName, SIZEOF_ARRAY(oldFileName), currentDirectory.c_str());
 
-	m_pActiveShellBrowser->GetItemDisplayName(pItem->iItem,SIZEOF_ARRAY(oldName),oldName);
-	PathAppend(oldFileName,oldName);
+	m_pActiveShellBrowser->GetItemDisplayName(pItem->iItem, SIZEOF_ARRAY(oldName), oldName);
+	PathAppend(oldFileName, oldName);
 
-	BOOL bRes = PathAppend(newFileName,pItem->pszText);
+	BOOL bRes = PathAppend(newFileName, pItem->pszText);
 
-	if(!bRes)
+	if (!bRes)
 	{
 		return 0;
 	}
 
 	dwAttributes = m_pActiveShellBrowser->GetItemFileFindData(pItem->iItem).dwFileAttributes;
 
-	if((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
+	if ((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 	{
 		BOOL bExtensionHidden = FALSE;
 
-		bExtensionHidden = (!m_config->globalFolderSettings.showExtensions) ||
-			(m_config->globalFolderSettings.hideLinkExtension && lstrcmpi(PathFindExtension(oldName),_T(".lnk")) == 0);
+		bExtensionHidden = (!m_config->globalFolderSettings.showExtensions)
+			|| (m_config->globalFolderSettings.hideLinkExtension
+				&& lstrcmpi(PathFindExtension(oldName), _T(".lnk")) == 0);
 
 		/* If file extensions are turned off, the new filename
 		will be incorrect (i.e. it will be missing the extension).
 		Therefore, append the extension manually if it is turned
 		off. */
-		if(bExtensionHidden)
+		if (bExtensionHidden)
 		{
-			TCHAR	*szExt = nullptr;
+			TCHAR *szExt = nullptr;
 
 			szExt = PathFindExtension(oldName);
 
-			if(*szExt == '.')
-				StringCchCat(newFileName,SIZEOF_ARRAY(newFileName),szExt);
+			if (*szExt == '.')
+				StringCchCat(newFileName, SIZEOF_ARRAY(newFileName), szExt);
 		}
 	}
 
@@ -515,18 +505,18 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 	renamedItem.strOldFilename = oldFileName;
 	renamedItem.strNewFilename = newFileName;
 
-	TrimStringRight(renamedItem.strNewFilename,_T(" "));
+	TrimStringRight(renamedItem.strNewFilename, _T(" "));
 
 	std::list<FileActionHandler::RenamedItem_t> renamedItemList;
 	renamedItemList.push_back(renamedItem);
 	ret = m_FileActionHandler.RenameFiles(renamedItemList);
 
 	/* If the file was not renamed, show an error message. */
-	if(!ret)
+	if (!ret)
 	{
-		std::wstring error = ResourceHelper::LoadString(m_hLanguageModule,IDS_FILERENAMEERROR);
-		MessageBox(m_hContainer,error.c_str(),NExplorerplusplus::APP_NAME,
-			MB_ICONWARNING|MB_OK);
+		std::wstring error = ResourceHelper::LoadString(m_hLanguageModule, IDS_FILERENAMEERROR);
+		MessageBox(
+			m_hContainer, error.c_str(), NExplorerplusplus::APP_NAME, MB_ICONWARNING | MB_OK);
 	}
 
 	return ret;
@@ -552,28 +542,26 @@ void Explorerplusplus::OnListViewRClick(POINT *pCursorPos)
 
 	SetForegroundWindow(m_hContainer);
 
-	if(IsKeyDown(VK_SHIFT) &&
-		!IsKeyDown(VK_CONTROL) &&
-		!IsKeyDown(VK_MENU))
+	if (IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_MENU))
 	{
 		LVHITTESTINFO lvhti;
 
 		lvhti.pt = *pCursorPos;
-		ScreenToClient(m_hActiveListView,&lvhti.pt);
-		ListView_HitTest(m_hActiveListView,&lvhti);
+		ScreenToClient(m_hActiveListView, &lvhti.pt);
+		ListView_HitTest(m_hActiveListView, &lvhti);
 
-		if(!(lvhti.flags & LVHT_NOWHERE) && lvhti.iItem != -1)
+		if (!(lvhti.flags & LVHT_NOWHERE) && lvhti.iItem != -1)
 		{
-			if(ListView_GetItemState(m_hActiveListView,lvhti.iItem,LVIS_SELECTED) !=
-				LVIS_SELECTED)
+			if (ListView_GetItemState(m_hActiveListView, lvhti.iItem, LVIS_SELECTED)
+				!= LVIS_SELECTED)
 			{
-				ListViewHelper::SelectAllItems(m_hActiveListView,FALSE);
-				ListViewHelper::SelectItem(m_hActiveListView,lvhti.iItem,TRUE);
+				ListViewHelper::SelectAllItems(m_hActiveListView, FALSE);
+				ListViewHelper::SelectItem(m_hActiveListView, lvhti.iItem, TRUE);
 			}
 		}
 	}
 
-	if(ListView_GetSelectedCount(m_hActiveListView) == 0)
+	if (ListView_GetSelectedCount(m_hActiveListView) == 0)
 	{
 		OnListViewBackgroundRClick(pCursorPos);
 	}
@@ -657,13 +645,13 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 {
 	int nSelected = ListView_GetSelectedCount(m_hActiveListView);
 
-	if(nSelected > 0)
+	if (nSelected > 0)
 	{
 		std::vector<unique_pidl_child> pidlPtrs;
 		std::vector<PCITEMID_CHILD> pidlItems;
 		int iItem = -1;
 
-		while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
+		while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
 		{
 			auto pidlPtr = m_pActiveShellBrowser->GetItemChildIdl(iItem);
 
@@ -680,23 +668,23 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 
 		StatusBar statusBar(m_hStatusBar);
 
-		fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,pCursorPos,&statusBar,
-			reinterpret_cast<DWORD_PTR>(&fcmi),TRUE,IsKeyDown(VK_SHIFT));
+		fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, pCursorPos, &statusBar,
+			reinterpret_cast<DWORD_PTR>(&fcmi), TRUE, IsKeyDown(VK_SHIFT));
 	}
 }
 
-HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragType dragType)
+HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam, DragType dragType)
 {
-	IDropSource			*pDropSource = nullptr;
-	IDragSourceHelper	*pDragSourceHelper = nullptr;
-	NMLISTVIEW			*pnmlv = nullptr;
-	POINT				pt = {0,0};
-	HRESULT				hr;
-	int					iDragStartObjectIndex;
+	IDropSource *pDropSource = nullptr;
+	IDragSourceHelper *pDragSourceHelper = nullptr;
+	NMLISTVIEW *pnmlv = nullptr;
+	POINT pt = { 0, 0 };
+	HRESULT hr;
+	int iDragStartObjectIndex;
 
 	pnmlv = reinterpret_cast<NMLISTVIEW *>(lParam);
 
-	if(ListView_GetSelectedCount(m_hActiveListView) == 0)
+	if (ListView_GetSelectedCount(m_hActiveListView) == 0)
 	{
 		return E_FAIL;
 	}
@@ -711,7 +699,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragType dragType)
 	pidl's of the dragged items. */
 	auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
-	while((item = ListView_GetNextItem(m_hActiveListView,item,LVNI_SELECTED)) != -1)
+	while ((item = ListView_GetNextItem(m_hActiveListView, item, LVNI_SELECTED)) != -1)
 	{
 		auto pidl = m_pActiveShellBrowser->GetItemChildIdl(item);
 
@@ -720,21 +708,21 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragType dragType)
 
 		TCHAR szFullFilename[MAX_PATH];
 
-		m_pActiveShellBrowser->GetItemFullName(item,szFullFilename,SIZEOF_ARRAY(szFullFilename));
+		m_pActiveShellBrowser->GetItemFullName(item, szFullFilename, SIZEOF_ARRAY(szFullFilename));
 
 		std::wstring stringFilename(szFullFilename);
 
 		filenameList.push_back(stringFilename);
 	}
 
-	hr = CoCreateInstance(CLSID_DragDropHelper, nullptr,CLSCTX_ALL,
-		IID_PPV_ARGS(&pDragSourceHelper));
+	hr = CoCreateInstance(
+		CLSID_DragDropHelper, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&pDragSourceHelper));
 
-	if(SUCCEEDED(hr))
+	if (SUCCEEDED(hr))
 	{
 		hr = CreateDropSource(&pDropSource, dragType);
 
-		if(SUCCEEDED(hr))
+		if (SUCCEEDED(hr))
 		{
 			FORMATETC ftc[2];
 			STGMEDIUM stg[2];
@@ -742,10 +730,10 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragType dragType)
 			/* We'll export two formats:
 			CF_HDROP
 			CFSTR_SHELLIDLIST */
-			BuildHDropList(&ftc[0],&stg[0],filenameList);
-			BuildShellIDList(&ftc[1],&stg[1],pidlDirectory.get(),rawPidls);
+			BuildHDropList(&ftc[0], &stg[0], filenameList);
+			BuildShellIDList(&ftc[1], &stg[1], pidlDirectory.get(), rawPidls);
 
-			IDataObject *pDataObject = CreateDataObject(ftc,stg,2);
+			IDataObject *pDataObject = CreateDataObject(ftc, stg, 2);
 
 			IDataObjectAsyncCapability *pAsyncCapability = nullptr;
 			pDataObject->QueryInterface(IID_PPV_ARGS(&pAsyncCapability));
@@ -756,9 +744,9 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragType dragType)
 			But the argument is a BOOL, so we'll go with regular TRUE/FALSE. */
 			pAsyncCapability->SetAsyncMode(TRUE);
 
-			hr = pDragSourceHelper->InitializeFromWindow(m_hActiveListView,&pt,pDataObject);
+			hr = pDragSourceHelper->InitializeFromWindow(m_hActiveListView, &pt, pDataObject);
 
-			m_pActiveShellBrowser->DragStarted(pnmlv->iItem,&pnmlv->ptAction);
+			m_pActiveShellBrowser->DragStarted(pnmlv->iItem, &pnmlv->ptAction);
 			m_bDragging = true;
 
 			/* Need to remember which tab started the drag (as
@@ -768,8 +756,8 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragType dragType)
 
 			DWORD dwEffect;
 
-			hr = DoDragDrop(pDataObject,pDropSource,DROPEFFECT_COPY|DROPEFFECT_MOVE|
-				DROPEFFECT_LINK,&dwEffect);
+			hr = DoDragDrop(pDataObject, pDropSource,
+				DROPEFFECT_COPY | DROPEFFECT_MOVE | DROPEFFECT_LINK, &dwEffect);
 
 			m_bDragging = false;
 
@@ -798,7 +786,7 @@ void Explorerplusplus::OnListViewFileDelete(bool permanent)
 {
 	int nSelected = ListView_GetSelectedCount(m_hActiveListView);
 
-	if(nSelected == 0)
+	if (nSelected == 0)
 	{
 		return;
 	}
@@ -811,7 +799,7 @@ void Explorerplusplus::OnListViewFileDelete(bool permanent)
 	std::vector<PCIDLIST_ABSOLUTE> pidls;
 	int iItem = -1;
 
-	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
+	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
 	{
 		auto pidlPtr = m_pActiveShellBrowser->GetItemCompleteIdl(iItem);
 
@@ -829,28 +817,28 @@ void Explorerplusplus::OnListViewFileDelete(bool permanent)
 		return;
 	}
 
-	m_FileActionHandler.DeleteFiles(m_hContainer,pidls,permanent,false);
+	m_FileActionHandler.DeleteFiles(m_hContainer, pidls, permanent, false);
 }
 
 void Explorerplusplus::OnListViewDoubleClick(NMHDR *nmhdr)
 {
-	if(nmhdr->hwndFrom == m_hActiveListView)
+	if (nmhdr->hwndFrom == m_hActiveListView)
 	{
-		LV_HITTESTINFO	ht;
-		DWORD			dwPos;
-		POINT			mousePos;
+		LV_HITTESTINFO ht;
+		DWORD dwPos;
+		POINT mousePos;
 
 		dwPos = GetMessagePos();
 		mousePos.x = GET_X_LPARAM(dwPos);
 		mousePos.y = GET_Y_LPARAM(dwPos);
-		ScreenToClient(m_hActiveListView,&mousePos);
+		ScreenToClient(m_hActiveListView, &mousePos);
 
 		ht.pt = mousePos;
-		ListView_HitTest(m_hActiveListView,&ht);
+		ListView_HitTest(m_hActiveListView, &ht);
 
-		if(ht.flags != LVHT_NOWHERE && ht.iItem != -1)
+		if (ht.flags != LVHT_NOWHERE && ht.iItem != -1)
 		{
-			if(IsKeyDown(VK_MENU))
+			if (IsKeyDown(VK_MENU))
 			{
 				auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 				auto pidl = m_pActiveShellBrowser->GetItemChildIdl(ht.iItem);
@@ -858,19 +846,19 @@ void Explorerplusplus::OnListViewDoubleClick(NMHDR *nmhdr)
 
 				ShowMultipleFileProperties(pidlDirectory.get(), items.data(), m_hContainer, 1);
 			}
-			else if(IsKeyDown(VK_CONTROL))
+			else if (IsKeyDown(VK_CONTROL))
 			{
 				/* Open the item in a new tab. */
-				OpenListViewItem(ht.iItem,TRUE,FALSE);
+				OpenListViewItem(ht.iItem, TRUE, FALSE);
 			}
-			else if(IsKeyDown(VK_SHIFT))
+			else if (IsKeyDown(VK_SHIFT))
 			{
 				/* Open the item in a new window. */
-				OpenListViewItem(ht.iItem,FALSE,TRUE);
+				OpenListViewItem(ht.iItem, FALSE, TRUE);
 			}
 			else
 			{
-				OpenListViewItem(ht.iItem,FALSE,FALSE);
+				OpenListViewItem(ht.iItem, FALSE, FALSE);
 			}
 		}
 	}
@@ -883,11 +871,11 @@ void Explorerplusplus::OnListViewFileRename()
 	/* If there is only item selected, start editing
 	it in-place. If multiple items are selected,
 	show the mass rename dialog. */
-	if(nSelected == 1)
+	if (nSelected == 1)
 	{
 		OnListViewFileRenameSingle();
 	}
-	else if(nSelected > 1)
+	else if (nSelected > 1)
 	{
 		OnListViewFileRenameMultiple();
 	}
@@ -895,8 +883,7 @@ void Explorerplusplus::OnListViewFileRename()
 
 void Explorerplusplus::OnListViewFileRenameSingle()
 {
-	int iSelected = ListView_GetNextItem(m_hActiveListView,
-		-1, LVNI_SELECTED | LVNI_FOCUSED);
+	int iSelected = ListView_GetNextItem(m_hActiveListView, -1, LVNI_SELECTED | LVNI_FOCUSED);
 
 	if (iSelected == -1)
 	{
@@ -915,12 +902,11 @@ void Explorerplusplus::OnListViewFileRenameSingle()
 
 void Explorerplusplus::OnListViewFileRenameMultiple()
 {
-	std::list<std::wstring>	fullFilenameList;
+	std::list<std::wstring> fullFilenameList;
 	TCHAR szFullFilename[MAX_PATH];
 	int iIndex = -1;
 
-	while ((iIndex = ListView_GetNextItem(m_hActiveListView,
-		iIndex, LVNI_SELECTED)) != -1)
+	while ((iIndex = ListView_GetNextItem(m_hActiveListView, iIndex, LVNI_SELECTED)) != -1)
 	{
 		BOOL canRename = TestListViewItemAttributes(iIndex, SFGAO_CANRENAME);
 
@@ -929,7 +915,8 @@ void Explorerplusplus::OnListViewFileRenameMultiple()
 			continue;
 		}
 
-		m_pActiveShellBrowser->GetItemFullName(iIndex, szFullFilename, SIZEOF_ARRAY(szFullFilename));
+		m_pActiveShellBrowser->GetItemFullName(
+			iIndex, szFullFilename, SIZEOF_ARRAY(szFullFilename));
 		fullFilenameList.emplace_back(szFullFilename);
 	}
 
@@ -938,14 +925,14 @@ void Explorerplusplus::OnListViewFileRenameMultiple()
 		return;
 	}
 
-	MassRenameDialog massRenameDialog(m_hLanguageModule, m_hContainer, this,
-		fullFilenameList, &m_FileActionHandler);
+	MassRenameDialog massRenameDialog(
+		m_hLanguageModule, m_hContainer, this, fullFilenameList, &m_FileActionHandler);
 	massRenameDialog.ShowModalDialog();
 }
 
 void Explorerplusplus::OnListViewCopyItemPath() const
 {
-	if(ListView_GetSelectedCount(m_hActiveListView) == 0)
+	if (ListView_GetSelectedCount(m_hActiveListView) == 0)
 	{
 		return;
 	}
@@ -953,15 +940,15 @@ void Explorerplusplus::OnListViewCopyItemPath() const
 	std::wstring strItemPaths;
 	int iItem = -1;
 
-	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
+	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
 	{
 		TCHAR szFullFilename[MAX_PATH];
-		m_pActiveShellBrowser->GetItemFullName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
+		m_pActiveShellBrowser->GetItemFullName(iItem, szFullFilename, SIZEOF_ARRAY(szFullFilename));
 
 		strItemPaths += szFullFilename + std::wstring(_T("\r\n"));
 	}
 
-	strItemPaths = strItemPaths.substr(0,strItemPaths.size() - 2);
+	strItemPaths = strItemPaths.substr(0, strItemPaths.size() - 2);
 
 	BulkClipboardWriter clipboardWriter;
 	clipboardWriter.WriteText(strItemPaths);
@@ -969,7 +956,7 @@ void Explorerplusplus::OnListViewCopyItemPath() const
 
 void Explorerplusplus::OnListViewCopyUniversalPaths() const
 {
-	if(ListView_GetSelectedCount(m_hActiveListView) == 0)
+	if (ListView_GetSelectedCount(m_hActiveListView) == 0)
 	{
 		return;
 	}
@@ -977,19 +964,19 @@ void Explorerplusplus::OnListViewCopyUniversalPaths() const
 	std::wstring strUniversalPaths;
 	int iItem = -1;
 
-	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
+	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
 	{
 		TCHAR szFullFilename[MAX_PATH];
-		m_pActiveShellBrowser->GetItemFullName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
+		m_pActiveShellBrowser->GetItemFullName(iItem, szFullFilename, SIZEOF_ARRAY(szFullFilename));
 
 		TCHAR szBuffer[1024];
 
 		DWORD dwBufferSize = SIZEOF_ARRAY(szBuffer);
 		auto *puni = reinterpret_cast<UNIVERSAL_NAME_INFO *>(&szBuffer);
-		DWORD dwRet = WNetGetUniversalName(szFullFilename,UNIVERSAL_NAME_INFO_LEVEL,
-			reinterpret_cast<LPVOID>(puni),&dwBufferSize);
+		DWORD dwRet = WNetGetUniversalName(szFullFilename, UNIVERSAL_NAME_INFO_LEVEL,
+			reinterpret_cast<LPVOID>(puni), &dwBufferSize);
 
-		if(dwRet == NO_ERROR)
+		if (dwRet == NO_ERROR)
 		{
 			strUniversalPaths += puni->lpUniversalName + std::wstring(_T("\r\n"));
 		}
@@ -999,7 +986,7 @@ void Explorerplusplus::OnListViewCopyUniversalPaths() const
 		}
 	}
 
-	strUniversalPaths = strUniversalPaths.substr(0,strUniversalPaths.size() - 2);
+	strUniversalPaths = strUniversalPaths.substr(0, strUniversalPaths.size() - 2);
 
 	BulkClipboardWriter clipboardWriter;
 	clipboardWriter.WriteText(strUniversalPaths);
@@ -1007,33 +994,33 @@ void Explorerplusplus::OnListViewCopyUniversalPaths() const
 
 HRESULT Explorerplusplus::OnListViewCopy(BOOL bCopy)
 {
-	IDataObject		*pClipboardDataObject = nullptr;
-	int				iItem = -1;
-	HRESULT			hr;
+	IDataObject *pClipboardDataObject = nullptr;
+	int iItem = -1;
+	HRESULT hr;
 
-	if(!CanCopy())
+	if (!CanCopy())
 		return E_FAIL;
 
-	SetCursor(LoadCursor(nullptr,IDC_WAIT));
+	SetCursor(LoadCursor(nullptr, IDC_WAIT));
 
 	std::list<std::wstring> fileNameList;
 
-	BuildListViewFileSelectionList(m_hActiveListView,&fileNameList);
+	BuildListViewFileSelectionList(m_hActiveListView, &fileNameList);
 
-	if(bCopy)
+	if (bCopy)
 	{
-		hr = CopyFiles(fileNameList,&pClipboardDataObject);
+		hr = CopyFiles(fileNameList, &pClipboardDataObject);
 
-		if(SUCCEEDED(hr))
+		if (SUCCEEDED(hr))
 		{
 			m_pClipboardDataObject = pClipboardDataObject;
 		}
 	}
 	else
 	{
-		hr = CutFiles(fileNameList,&pClipboardDataObject);
+		hr = CutFiles(fileNameList, &pClipboardDataObject);
 
-		if(SUCCEEDED(hr))
+		if (SUCCEEDED(hr))
 		{
 			m_pClipboardDataObject = pClipboardDataObject;
 			m_iCutTabInternal = m_tabContainer->GetSelectedTab().GetId();
@@ -1041,11 +1028,10 @@ HRESULT Explorerplusplus::OnListViewCopy(BOOL bCopy)
 			TCHAR szFilename[MAX_PATH];
 
 			/* 'Ghost' each of the cut items. */
-			while((iItem = ListView_GetNextItem(m_hActiveListView,
-				iItem,LVNI_SELECTED)) != -1)
+			while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
 			{
-				m_pActiveShellBrowser->GetItemDisplayName(iItem,SIZEOF_ARRAY(szFilename),
-					szFilename);
+				m_pActiveShellBrowser->GetItemDisplayName(
+					iItem, SIZEOF_ARRAY(szFilename), szFilename);
 				m_CutFileNameList.emplace_back(szFilename);
 
 				m_pActiveShellBrowser->GhostItem(iItem);
@@ -1053,7 +1039,7 @@ HRESULT Explorerplusplus::OnListViewCopy(BOOL bCopy)
 		}
 	}
 
-	SetCursor(LoadCursor(nullptr,IDC_ARROW));
+	SetCursor(LoadCursor(nullptr, IDC_ARROW));
 
 	return hr;
 }
@@ -1071,7 +1057,7 @@ void Explorerplusplus::OnListViewPaste()
 
 	hr = OleGetClipboard(&pClipboardObject);
 
-	if(hr == S_OK)
+	if (hr == S_OK)
 	{
 		TCHAR szDestination[MAX_PATH + 1];
 
@@ -1079,26 +1065,25 @@ void Explorerplusplus::OnListViewPaste()
 		Files are copied asynchronously, so a change of directory
 		will cause the destination directory to change in the
 		middle of the copy operation. */
-		StringCchCopy(szDestination,SIZEOF_ARRAY(szDestination),
-			m_CurrentDirectory.c_str());
+		StringCchCopy(szDestination, SIZEOF_ARRAY(szDestination), m_CurrentDirectory.c_str());
 
 		/* Also, the string must be double NULL terminated. */
 		szDestination[lstrlen(szDestination) + 1] = '\0';
 
 		DropHandler *pDropHandler = DropHandler::CreateNew();
 		auto *dropFilesCallback = new DropFilesCallback(this);
-		pDropHandler->CopyClipboardData(pClipboardObject,m_hContainer,szDestination,
-			dropFilesCallback,!m_config->overwriteExistingFilesConfirmation);
+		pDropHandler->CopyClipboardData(pClipboardObject, m_hContainer, szDestination,
+			dropFilesCallback, !m_config->overwriteExistingFilesConfirmation);
 		pDropHandler->Release();
 
 		pClipboardObject->Release();
 	}
 }
 
-void Explorerplusplus::BuildListViewFileSelectionList(HWND hListView,
-	std::list<std::wstring> *pFileSelectionList)
+void Explorerplusplus::BuildListViewFileSelectionList(
+	HWND hListView, std::list<std::wstring> *pFileSelectionList)
 {
-	if(pFileSelectionList == nullptr)
+	if (pFileSelectionList == nullptr)
 	{
 		return;
 	}
@@ -1106,59 +1091,55 @@ void Explorerplusplus::BuildListViewFileSelectionList(HWND hListView,
 	std::list<std::wstring> fileSelectionList;
 	int iItem = -1;
 
-	while((iItem = ListView_GetNextItem(hListView,
-		iItem,LVNI_SELECTED)) != -1)
+	while ((iItem = ListView_GetNextItem(hListView, iItem, LVNI_SELECTED)) != -1)
 	{
 		TCHAR szFullFileName[MAX_PATH];
 
-		m_pActiveShellBrowser->GetItemFullName(iItem,
-			szFullFileName,SIZEOF_ARRAY(szFullFileName));
+		m_pActiveShellBrowser->GetItemFullName(iItem, szFullFileName, SIZEOF_ARRAY(szFullFileName));
 
 		std::wstring stringFileName(szFullFileName);
 		fileSelectionList.push_back(stringFileName);
 	}
 
-	pFileSelectionList->assign(fileSelectionList.begin(),
-		fileSelectionList.end());
+	pFileSelectionList->assign(fileSelectionList.begin(), fileSelectionList.end());
 }
 
 int Explorerplusplus::HighlightSimilarFiles(HWND ListView) const
 {
-	TCHAR	fullFileName[MAX_PATH];
-	TCHAR	testFile[MAX_PATH];
-	HRESULT	hr;
-	BOOL	bSimilarTypes;
-	int		iSelected;
-	int		nItems;
-	int		nSimilar = 0;
-	int		i = 0;
+	TCHAR fullFileName[MAX_PATH];
+	TCHAR testFile[MAX_PATH];
+	HRESULT hr;
+	BOOL bSimilarTypes;
+	int iSelected;
+	int nItems;
+	int nSimilar = 0;
+	int i = 0;
 
-	iSelected = ListView_GetNextItem(ListView,
-	-1,LVNI_SELECTED);
+	iSelected = ListView_GetNextItem(ListView, -1, LVNI_SELECTED);
 
-	if(iSelected == -1)
+	if (iSelected == -1)
 		return -1;
 
-	hr = m_pActiveShellBrowser->GetItemFullName(iSelected,testFile,SIZEOF_ARRAY(testFile));
+	hr = m_pActiveShellBrowser->GetItemFullName(iSelected, testFile, SIZEOF_ARRAY(testFile));
 
-	if(SUCCEEDED(hr))
+	if (SUCCEEDED(hr))
 	{
 		nItems = ListView_GetItemCount(ListView);
 
-		for(i = 0;i < nItems;i++)
+		for (i = 0; i < nItems; i++)
 		{
-			m_pActiveShellBrowser->GetItemFullName(i,fullFileName,SIZEOF_ARRAY(fullFileName));
+			m_pActiveShellBrowser->GetItemFullName(i, fullFileName, SIZEOF_ARRAY(fullFileName));
 
-			bSimilarTypes = CompareFileTypes(fullFileName,testFile);
+			bSimilarTypes = CompareFileTypes(fullFileName, testFile);
 
-			if(bSimilarTypes)
+			if (bSimilarTypes)
 			{
-				ListViewHelper::SelectItem(ListView,i,TRUE);
+				ListViewHelper::SelectItem(ListView, i, TRUE);
 				nSimilar++;
 			}
 			else
 			{
-				ListViewHelper::SelectItem(ListView,i,FALSE);
+				ListViewHelper::SelectItem(ListView, i, FALSE);
 			}
 		}
 	}
@@ -1168,28 +1149,28 @@ int Explorerplusplus::HighlightSimilarFiles(HWND ListView) const
 
 void Explorerplusplus::OpenAllSelectedItems(BOOL bOpenInNewTab)
 {
-	BOOL	bSeenDirectory = FALSE;
-	DWORD	dwAttributes;
-	int		iItem = -1;
-	int		iFolderItem = -1;
+	BOOL bSeenDirectory = FALSE;
+	DWORD dwAttributes;
+	int iItem = -1;
+	int iFolderItem = -1;
 
-	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVIS_SELECTED)) != -1)
+	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVIS_SELECTED)) != -1)
 	{
 		dwAttributes = m_pActiveShellBrowser->GetItemFileFindData(iItem).dwFileAttributes;
 
-		if((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+		if ((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 		{
 			bSeenDirectory = TRUE;
 			iFolderItem = iItem;
 		}
 		else
 		{
-			OpenListViewItem(iItem,FALSE,FALSE);
+			OpenListViewItem(iItem, FALSE, FALSE);
 		}
 	}
 
-	if(bSeenDirectory)
-		OpenListViewItem(iFolderItem,bOpenInNewTab,FALSE);
+	if (bSeenDirectory)
+		OpenListViewItem(iFolderItem, bOpenInNewTab, FALSE);
 }
 
 void Explorerplusplus::OpenListViewItem(int iItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow)
@@ -1197,7 +1178,7 @@ void Explorerplusplus::OpenListViewItem(int iItem, BOOL bOpenInNewTab, BOOL bOpe
 	auto pidl = m_pActiveShellBrowser->GetDirectoryIdl();
 	auto ridl = m_pActiveShellBrowser->GetItemChildIdl(iItem);
 
-	if(ridl != nullptr)
+	if (ridl != nullptr)
 	{
 		unique_pidl_absolute pidlComplete(ILCombine(pidl.get(), ridl.get()));
 		OpenItem(pidlComplete.get(), bOpenInNewTab, bOpenInNewWindow);

@@ -22,9 +22,9 @@ void Explorerplusplus::UpdateWindowStates(const Tab &tab)
 }
 
 /*
-* Set the state of the items in the main
-* program menu.
-*/
+ * Set the state of the items in the main
+ * program menu.
+ */
 void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 {
 	const Tab &tab = m_tabContainer->GetSelectedTab();
@@ -35,83 +35,97 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	int numSelected = tab.GetShellBrowser()->GetNumSelected();
 	bool anySelected = (numSelected > 0);
 
-	MenuHelper::EnableItem(hProgramMenu,IDM_FILE_COPYITEMPATH,AnyItemsSelected());
-	MenuHelper::EnableItem(hProgramMenu,IDM_FILE_COPYUNIVERSALFILEPATHS,AnyItemsSelected());
-	MenuHelper::EnableItem(hProgramMenu,IDM_FILE_SETFILEATTRIBUTES,AnyItemsSelected());
-	MenuHelper::EnableItem(hProgramMenu,IDM_FILE_OPENCOMMANDPROMPT,!bVirtualFolder);
-	MenuHelper::EnableItem(hProgramMenu,IDM_FILE_SAVEDIRECTORYLISTING,!bVirtualFolder);
-	MenuHelper::EnableItem(hProgramMenu,IDM_FILE_COPYCOLUMNTEXT,anySelected && (viewMode == +ViewMode::Details));
+	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_COPYITEMPATH, AnyItemsSelected());
+	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_COPYUNIVERSALFILEPATHS, AnyItemsSelected());
+	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_SETFILEATTRIBUTES, AnyItemsSelected());
+	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_OPENCOMMANDPROMPT, !bVirtualFolder);
+	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_SAVEDIRECTORYLISTING, !bVirtualFolder);
+	MenuHelper::EnableItem(
+		hProgramMenu, IDM_FILE_COPYCOLUMNTEXT, anySelected && (viewMode == +ViewMode::Details));
 
-	MenuHelper::EnableItem(hProgramMenu,IDM_FILE_RENAME,CanRename());
-	MenuHelper::EnableItem(hProgramMenu,IDM_FILE_DELETE,CanDelete());
-	MenuHelper::EnableItem(hProgramMenu,IDM_FILE_DELETEPERMANENTLY,CanDelete());
-	MenuHelper::EnableItem(hProgramMenu,IDM_FILE_PROPERTIES,CanShowFileProperties());
+	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_RENAME, CanRename());
+	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_DELETE, CanDelete());
+	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_DELETEPERMANENTLY, CanDelete());
+	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_PROPERTIES, CanShowFileProperties());
 
-	MenuHelper::EnableItem(hProgramMenu,IDM_EDIT_UNDO,m_FileActionHandler.CanUndo());
-	MenuHelper::EnableItem(hProgramMenu,IDM_EDIT_PASTE,CanPaste());
-	MenuHelper::EnableItem(hProgramMenu,IDM_EDIT_PASTESHORTCUT,CanPaste());
-	MenuHelper::EnableItem(hProgramMenu,IDM_EDIT_PASTEHARDLINK,CanPaste());
+	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_UNDO, m_FileActionHandler.CanUndo());
+	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_PASTE, CanPaste());
+	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_PASTESHORTCUT, CanPaste());
+	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_PASTEHARDLINK, CanPaste());
 
 	/* The following menu items are only enabled when one
 	or more files are selected (they represent file
 	actions, cut/copy, etc). */
-	MenuHelper::EnableItem(hProgramMenu,IDM_EDIT_COPY,CanCopy());
-	MenuHelper::EnableItem(hProgramMenu,IDM_EDIT_CUT,CanCut());
-	MenuHelper::EnableItem(hProgramMenu,IDM_EDIT_COPYTOFOLDER,CanCopy() && GetFocus() != m_hTreeView);
-	MenuHelper::EnableItem(hProgramMenu,IDM_EDIT_MOVETOFOLDER,CanCut() && GetFocus() != m_hTreeView);
-	MenuHelper::EnableItem(hProgramMenu,IDM_EDIT_WILDCARDDESELECT,anySelected);
-	MenuHelper::EnableItem(hProgramMenu,IDM_EDIT_SELECTNONE,anySelected);
-	MenuHelper::EnableItem(hProgramMenu,IDM_EDIT_RESOLVELINK,anySelected);
+	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_COPY, CanCopy());
+	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_CUT, CanCut());
+	MenuHelper::EnableItem(
+		hProgramMenu, IDM_EDIT_COPYTOFOLDER, CanCopy() && GetFocus() != m_hTreeView);
+	MenuHelper::EnableItem(
+		hProgramMenu, IDM_EDIT_MOVETOFOLDER, CanCut() && GetFocus() != m_hTreeView);
+	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_WILDCARDDESELECT, anySelected);
+	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_SELECTNONE, anySelected);
+	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_RESOLVELINK, anySelected);
 
-	MenuHelper::CheckItem(hProgramMenu,IDM_VIEW_STATUSBAR,m_config->showStatusBar);
-	MenuHelper::CheckItem(hProgramMenu,IDM_VIEW_FOLDERS, m_config->showFolders);
-	MenuHelper::CheckItem(hProgramMenu,IDM_VIEW_DISPLAYWINDOW,m_config->showDisplayWindow);
-	MenuHelper::CheckItem(hProgramMenu,IDM_TOOLBARS_ADDRESSBAR, m_config->showAddressBar);
-	MenuHelper::CheckItem(hProgramMenu,IDM_TOOLBARS_MAINTOOLBAR,m_config->showMainToolbar);
-	MenuHelper::CheckItem(hProgramMenu,IDM_TOOLBARS_BOOKMARKSTOOLBAR,m_config->showBookmarksToolbar);
-	MenuHelper::CheckItem(hProgramMenu,IDM_TOOLBARS_DRIVES,m_config->showDrivesToolbar);
-	MenuHelper::CheckItem(hProgramMenu,IDM_TOOLBARS_APPLICATIONTOOLBAR,m_config->showApplicationToolbar);
-	MenuHelper::CheckItem(hProgramMenu,IDM_TOOLBARS_LOCKTOOLBARS,m_config->lockToolbars);
-	MenuHelper::CheckItem(hProgramMenu,IDM_VIEW_SHOWHIDDENFILES,tab.GetShellBrowser()->GetShowHidden());
-	MenuHelper::CheckItem(hProgramMenu,IDM_FILTER_APPLYFILTER,tab.GetShellBrowser()->GetFilterStatus());
+	MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_STATUSBAR, m_config->showStatusBar);
+	MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_FOLDERS, m_config->showFolders);
+	MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_DISPLAYWINDOW, m_config->showDisplayWindow);
+	MenuHelper::CheckItem(hProgramMenu, IDM_TOOLBARS_ADDRESSBAR, m_config->showAddressBar);
+	MenuHelper::CheckItem(hProgramMenu, IDM_TOOLBARS_MAINTOOLBAR, m_config->showMainToolbar);
+	MenuHelper::CheckItem(
+		hProgramMenu, IDM_TOOLBARS_BOOKMARKSTOOLBAR, m_config->showBookmarksToolbar);
+	MenuHelper::CheckItem(hProgramMenu, IDM_TOOLBARS_DRIVES, m_config->showDrivesToolbar);
+	MenuHelper::CheckItem(
+		hProgramMenu, IDM_TOOLBARS_APPLICATIONTOOLBAR, m_config->showApplicationToolbar);
+	MenuHelper::CheckItem(hProgramMenu, IDM_TOOLBARS_LOCKTOOLBARS, m_config->lockToolbars);
+	MenuHelper::CheckItem(
+		hProgramMenu, IDM_VIEW_SHOWHIDDENFILES, tab.GetShellBrowser()->GetShowHidden());
+	MenuHelper::CheckItem(
+		hProgramMenu, IDM_FILTER_APPLYFILTER, tab.GetShellBrowser()->GetFilterStatus());
 
-	MenuHelper::EnableItem(hProgramMenu,IDM_ACTIONS_NEWFOLDER,CanCreate());
-	MenuHelper::EnableItem(hProgramMenu,IDM_ACTIONS_SPLITFILE,(tab.GetShellBrowser()->GetNumSelectedFiles() == 1) && !bVirtualFolder);
-	MenuHelper::EnableItem(hProgramMenu,IDM_ACTIONS_MERGEFILES,tab.GetShellBrowser()->GetNumSelectedFiles() > 1);
-	MenuHelper::EnableItem(hProgramMenu,IDM_ACTIONS_DESTROYFILES,anySelected);
+	MenuHelper::EnableItem(hProgramMenu, IDM_ACTIONS_NEWFOLDER, CanCreate());
+	MenuHelper::EnableItem(hProgramMenu, IDM_ACTIONS_SPLITFILE,
+		(tab.GetShellBrowser()->GetNumSelectedFiles() == 1) && !bVirtualFolder);
+	MenuHelper::EnableItem(
+		hProgramMenu, IDM_ACTIONS_MERGEFILES, tab.GetShellBrowser()->GetNumSelectedFiles() > 1);
+	MenuHelper::EnableItem(hProgramMenu, IDM_ACTIONS_DESTROYFILES, anySelected);
 
 	UINT itemToCheck = GetViewModeMenuId(viewMode);
-	CheckMenuRadioItem(hProgramMenu,IDM_VIEW_THUMBNAILS,IDM_VIEW_EXTRALARGEICONS,itemToCheck,MF_BYCOMMAND);
+	CheckMenuRadioItem(
+		hProgramMenu, IDM_VIEW_THUMBNAILS, IDM_VIEW_EXTRALARGEICONS, itemToCheck, MF_BYCOMMAND);
 
-	MenuHelper::EnableItem(hProgramMenu,IDM_GO_BACK,tab.GetShellBrowser()->GetNavigationController()->CanGoBack());
-	MenuHelper::EnableItem(hProgramMenu,IDM_GO_FORWARD,tab.GetShellBrowser()->GetNavigationController()->CanGoForward());
-	MenuHelper::EnableItem(hProgramMenu,IDM_GO_UPONELEVEL,tab.GetShellBrowser()->GetNavigationController()->CanGoUp());
+	MenuHelper::EnableItem(
+		hProgramMenu, IDM_GO_BACK, tab.GetShellBrowser()->GetNavigationController()->CanGoBack());
+	MenuHelper::EnableItem(hProgramMenu, IDM_GO_FORWARD,
+		tab.GetShellBrowser()->GetNavigationController()->CanGoForward());
+	MenuHelper::EnableItem(hProgramMenu, IDM_GO_UPONELEVEL,
+		tab.GetShellBrowser()->GetNavigationController()->CanGoUp());
 
-	MenuHelper::EnableItem(hProgramMenu,IDM_VIEW_AUTOSIZECOLUMNS,viewMode == +ViewMode::Details);
+	MenuHelper::EnableItem(hProgramMenu, IDM_VIEW_AUTOSIZECOLUMNS, viewMode == +ViewMode::Details);
 
-	if(viewMode == +ViewMode::Details)
+	if (viewMode == +ViewMode::Details)
 	{
 		/* Disable auto arrange menu item. */
-		MenuHelper::EnableItem(hProgramMenu,IDM_VIEW_AUTOARRANGE,FALSE);
-		MenuHelper::CheckItem(hProgramMenu,IDM_VIEW_AUTOARRANGE,FALSE);
+		MenuHelper::EnableItem(hProgramMenu, IDM_VIEW_AUTOARRANGE, FALSE);
+		MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_AUTOARRANGE, FALSE);
 
-		MenuHelper::EnableItem(hProgramMenu,IDM_VIEW_GROUPBY,TRUE);
+		MenuHelper::EnableItem(hProgramMenu, IDM_VIEW_GROUPBY, TRUE);
 	}
-	else if(viewMode == +ViewMode::List)
+	else if (viewMode == +ViewMode::List)
 	{
 		/* Disable group menu item. */
-		MenuHelper::EnableItem(hProgramMenu,IDM_VIEW_GROUPBY,FALSE);
+		MenuHelper::EnableItem(hProgramMenu, IDM_VIEW_GROUPBY, FALSE);
 
 		/* Disable auto arrange menu item. */
-		MenuHelper::EnableItem(hProgramMenu,IDM_VIEW_AUTOARRANGE,FALSE);
-		MenuHelper::CheckItem(hProgramMenu,IDM_VIEW_AUTOARRANGE,FALSE);
+		MenuHelper::EnableItem(hProgramMenu, IDM_VIEW_AUTOARRANGE, FALSE);
+		MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_AUTOARRANGE, FALSE);
 	}
 	else
 	{
-		MenuHelper::EnableItem(hProgramMenu,IDM_VIEW_GROUPBY,TRUE);
+		MenuHelper::EnableItem(hProgramMenu, IDM_VIEW_GROUPBY, TRUE);
 
-		MenuHelper::EnableItem(hProgramMenu,IDM_VIEW_AUTOARRANGE,TRUE);
-		MenuHelper::CheckItem(hProgramMenu,IDM_VIEW_AUTOARRANGE,tab.GetShellBrowser()->GetAutoArrange());
+		MenuHelper::EnableItem(hProgramMenu, IDM_VIEW_AUTOARRANGE, TRUE);
+		MenuHelper::CheckItem(
+			hProgramMenu, IDM_VIEW_AUTOARRANGE, tab.GetShellBrowser()->GetAutoArrange());
 	}
 
 	SortMenuBuilder sortMenuBuilder(m_hLanguageModule);

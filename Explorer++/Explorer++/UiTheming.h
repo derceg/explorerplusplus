@@ -13,14 +13,12 @@ class TabContainer;
 class UiTheming
 {
 public:
-
 	UiTheming(IExplorerplusplus *expp, TabContainer *tabContainer);
 
 	bool SetListViewColors(COLORREF backgroundColor, COLORREF textColor);
 	void SetTreeViewColors(COLORREF backgroundColor, COLORREF textColor);
 
 private:
-
 	void OnTabCreated(int tabId, BOOL switchToNewTab);
 
 	bool ApplyListViewColorsForAllTabs(COLORREF backgroundColor, COLORREF textColor);

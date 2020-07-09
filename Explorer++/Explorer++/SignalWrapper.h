@@ -8,7 +8,7 @@
 
 // This class wraps a signal object and is designed to be embedded as a public
 // data member within another class. It has the following functionality:
-// 
+//
 // 1. It adds an AddObserver() method, to allow outside code to connect a slot
 // to the signal.
 // 2. It allows the embedding class to access the internal signal variable.
@@ -20,7 +20,6 @@ class SignalWrapper
 	friend EmbeddingClassType;
 
 public:
-
 	using Signal = boost::signals2::signal<SignalSignature>;
 
 	SignalWrapper() = default;
@@ -32,7 +31,6 @@ public:
 	}
 
 private:
-
 	SignalWrapper &operator=(const SignalWrapper &) = delete;
 	SignalWrapper(const SignalWrapper &) = delete;
 

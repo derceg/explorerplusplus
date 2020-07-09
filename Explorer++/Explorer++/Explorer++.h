@@ -59,12 +59,12 @@ class WindowSubclassWrapper;
 
 namespace NColorRuleHelper
 {
-struct ColorRule;
+	struct ColorRule;
 }
 
 namespace Plugins
 {
-class PluginManager;
+	class PluginManager;
 }
 
 class Explorerplusplus :
@@ -357,8 +357,7 @@ private:
 	std::vector<Column_t> LoadColumnFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName);
 	void SaveColumnToRegistry(
 		HKEY hColumnsKey, const TCHAR *szKeyName, std::vector<Column_t> *pColumns);
-	std::vector<ColumnWidth> LoadColumnWidthsFromRegistry(
-		HKEY hColumnsKey, const TCHAR *szKeyName);
+	std::vector<ColumnWidth> LoadColumnWidthsFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName);
 	void SaveColumnWidthsToRegistry(
 		HKEY hColumnsKey, const TCHAR *szKeyName, std::vector<Column_t> *pColumns);
 	void LoadDefaultColumnsFromRegistry();

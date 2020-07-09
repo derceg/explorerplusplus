@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "HardwareChangeNotifier.h"
 
-HardwareChangeNotifier& HardwareChangeNotifier::GetInstance()
+HardwareChangeNotifier &HardwareChangeNotifier::GetInstance()
 {
 	static HardwareChangeNotifier hcn;
 	return hcn;
@@ -18,10 +18,12 @@ void HardwareChangeNotifier::AddObserver(NHardwareChangeNotifier::INotification 
 
 void HardwareChangeNotifier::RemoveObserver(NHardwareChangeNotifier::INotification *hcn)
 {
-	auto itr = std::find_if(m_Observers.begin(),m_Observers.end(),
-		[hcn](const NHardwareChangeNotifier::INotification *hcnCurrent){return hcnCurrent == hcn;});
+	auto itr = std::find_if(m_Observers.begin(), m_Observers.end(),
+		[hcn](const NHardwareChangeNotifier::INotification *hcnCurrent) {
+			return hcnCurrent == hcn;
+		});
 
-	if(itr != m_Observers.end())
+	if (itr != m_Observers.end())
 	{
 		m_Observers.erase(itr);
 	}
@@ -29,19 +31,20 @@ void HardwareChangeNotifier::RemoveObserver(NHardwareChangeNotifier::INotificati
 
 void HardwareChangeNotifier::NotifyDeviceArrival(DEV_BROADCAST_HDR *dbh)
 {
-	NotifyObservers(NotificationType::Arrival,dbh);
+	NotifyObservers(NotificationType::Arrival, dbh);
 }
 
 void HardwareChangeNotifier::NotifyDeviceRemovalComplete(DEV_BROADCAST_HDR *dbh)
 {
-	NotifyObservers(NotificationType::RemovalComplete,dbh);
+	NotifyObservers(NotificationType::RemovalComplete, dbh);
 }
 
-void HardwareChangeNotifier::NotifyObservers(NotificationType notificationType,DEV_BROADCAST_HDR *dbh)
+void HardwareChangeNotifier::NotifyObservers(
+	NotificationType notificationType, DEV_BROADCAST_HDR *dbh)
 {
-	for(const auto &hcn : m_Observers)
+	for (const auto &hcn : m_Observers)
 	{
-		switch(notificationType)
+		switch (notificationType)
 		{
 		case NotificationType::Arrival:
 			hcn->OnDeviceArrival(dbh);

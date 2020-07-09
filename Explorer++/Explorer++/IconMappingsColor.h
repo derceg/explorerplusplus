@@ -6,6 +6,7 @@
 
 #include "IconMapping.h"
 
+// clang-format off
 const IconMapping ICON_RESOURCE_MAPPINGS_COLOR = {
 	{ Icon::AddBookmark, { ICON_SIZE_MAPPINGS(IDB_ADD_BOOKMARK) } },
 	{ Icon::ArrowRight, { ICON_SIZE_MAPPINGS(IDB_ARROW_RIGHT) } },
@@ -45,3 +46,4 @@ const IconMapping ICON_RESOURCE_MAPPINGS_COLOR = {
 	{ Icon::Up, { ICON_SIZE_MAPPINGS(IDB_UP) } },
 	{ Icon::Views, { ICON_SIZE_MAPPINGS(IDB_VIEWS) } }
 };
+// clang-format on

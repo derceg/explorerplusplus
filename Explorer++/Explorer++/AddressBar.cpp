@@ -13,9 +13,9 @@
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ShellHelper.h"
 #include "../Helper/iDataObject.h"
 #include "../Helper/iDropSource.h"
-#include "../Helper/ShellHelper.h"
 #include <wil/common.h>
 #include <wil/resource.h>
 
@@ -36,8 +36,9 @@ AddressBar::AddressBar(HWND parent, IExplorerplusplus *expp, MainToolbar *mainTo
 
 HWND AddressBar::CreateAddressBar(HWND parent)
 {
-	return CreateComboBox(parent, WS_CHILD | WS_VISIBLE | WS_TABSTOP |
-		CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
+	return CreateComboBox(parent,
+		WS_CHILD | WS_VISIBLE | WS_TABSTOP | CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_CLIPSIBLINGS
+			| WS_CLIPCHILDREN);
 }
 
 void AddressBar::Initialize(HWND parent)
@@ -113,8 +114,8 @@ std::optional<LRESULT> AddressBar::OnComboBoxExCtlColorEdit(HWND hwnd, HDC hdc)
 	return reinterpret_cast<LRESULT>(m_backgroundBrush.get());
 }
 
-LRESULT CALLBACK AddressBar::EditSubclassStub(HWND hwnd, UINT uMsg,
-	WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK AddressBar::EditSubclassStub(
+	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -151,7 +152,8 @@ LRESULT CALLBACK AddressBar::EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LP
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK AddressBar::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK AddressBar::ParentWndProcStub(
+	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -199,7 +201,7 @@ void AddressBar::OnGo()
 
 	/* Retrieve the combobox text, and determine if it is a
 	valid path. */
-	SendMessage(m_hwnd, WM_GETTEXT, SIZEOF_ARRAY(szPath), (LPARAM)szPath);
+	SendMessage(m_hwnd, WM_GETTEXT, SIZEOF_ARRAY(szPath), (LPARAM) szPath);
 
 	const Tab &selectedTab = m_expp->GetTabContainer()->GetSelectedTab();
 	std::wstring currentDirectory = selectedTab.GetShellBrowser()->GetDirectory();
@@ -214,8 +216,8 @@ void AddressBar::OnBeginDrag()
 	IDropSource *pDropSource = nullptr;
 	HRESULT hr;
 
-	hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_ALL,
-		IID_PPV_ARGS(&pDragSourceHelper));
+	hr = CoCreateInstance(
+		CLSID_DragDropHelper, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&pDragSourceHelper));
 
 	if (SUCCEEDED(hr))
 	{
@@ -229,7 +231,7 @@ void AddressBar::OnBeginDrag()
 			FORMATETC ftc[2];
 			STGMEDIUM stg[2];
 
-			SetFORMATETC(&ftc[0], (CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),
+			SetFORMATETC(&ftc[0], (CLIPFORMAT) RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),
 				nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL);
 
 			HGLOBAL hglb = GlobalAlloc(GMEM_MOVEABLE, 1000);
@@ -238,7 +240,7 @@ void AddressBar::OnBeginDrag()
 
 			pfgd->cItems = 1;
 
-			auto *pfd = (FILEDESCRIPTOR *)((LPBYTE)pfgd + sizeof(UINT));
+			auto *pfd = (FILEDESCRIPTOR *) ((LPBYTE) pfgd + sizeof(UINT));
 
 			/* File information (name, size, date created, etc). */
 			pfd[0].dwFlags = FD_ATTRIBUTES | FD_FILESIZE;
@@ -248,7 +250,8 @@ void AddressBar::OnBeginDrag()
 
 			/* The name of the file will be the folder name, followed by .lnk. */
 			TCHAR szDisplayName[MAX_PATH];
-			GetDisplayName(pidlDirectory.get(), szDisplayName, SIZEOF_ARRAY(szDisplayName), SHGDN_INFOLDER);
+			GetDisplayName(
+				pidlDirectory.get(), szDisplayName, SIZEOF_ARRAY(szDisplayName), SHGDN_INFOLDER);
 			StringCchCat(szDisplayName, SIZEOF_ARRAY(szDisplayName), _T(".lnk"));
 			StringCchCopy(pfd[0].cFileName, SIZEOF_ARRAY(pfd[0].cFileName), szDisplayName);
 
@@ -259,16 +262,16 @@ void AddressBar::OnBeginDrag()
 			stg[0].tymed = TYMED_HGLOBAL;
 
 			/* File contents. */
-			SetFORMATETC(&ftc[1], (CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILECONTENTS),
-				nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL);
+			SetFORMATETC(&ftc[1], (CLIPFORMAT) RegisterClipboardFormat(CFSTR_FILECONTENTS), nullptr,
+				DVASPECT_CONTENT, -1, TYMED_HGLOBAL);
 
 			hglb = GlobalAlloc(GMEM_MOVEABLE, 16384);
 
 			IShellLink *pShellLink = nullptr;
 			IPersistStream *pPersistStream = nullptr;
 
-			hr = CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER,
-				IID_PPV_ARGS(&pShellLink));
+			hr = CoCreateInstance(
+				CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pShellLink));
 
 			if (SUCCEEDED(hr))
 			{
@@ -301,7 +304,7 @@ void AddressBar::OnBeginDrag()
 
 			IDataObject *pDataObject = CreateDataObject(ftc, stg, 2);
 
-			POINT pt = { 0,0 };
+			POINT pt = { 0, 0 };
 			pDragSourceHelper->InitializeFromWindow(m_hwnd, &pt, pDataObject);
 
 			DWORD dwEffect;
@@ -401,7 +404,8 @@ void AddressBar::UpdateTextAndIconInUI(std::wstring *text, int iconIndex)
 	SendMessage(m_hwnd, CBEM_SETITEM, 0, reinterpret_cast<LPARAM>(&cbItem));
 }
 
-void AddressBar::OnHistoryEntryUpdated(const HistoryEntry &entry, HistoryEntry::PropertyType propertyType)
+void AddressBar::OnHistoryEntryUpdated(
+	const HistoryEntry &entry, HistoryEntry::PropertyType propertyType)
 {
 	switch (propertyType)
 	{

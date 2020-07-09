@@ -20,19 +20,17 @@
 #include "UiTheming.h"
 #include "ViewModeHelper.h"
 #include "../Helper/CustomGripper.h"
-#include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/iDirectoryMonitor.h"
 
 bool g_enableDarkMode = false;
 
 /*
-* Main window creation.
-*
-* Settings are loaded very early on. Any
-* initial settings must be in place before
-* this.
-*/
+ * Main window creation.
+ *
+ * Settings are loaded very early on. Any initial settings must be in place before this.
+ */
 void Explorerplusplus::OnCreate()
 {
 	InitializeMainToolbars();
@@ -77,7 +75,8 @@ void Explorerplusplus::OnCreate()
 	size initially. */
 	ResizeWindows();
 
-	m_taskbarThumbnails = TaskbarThumbnails::Create(this, m_tabContainer, m_hLanguageModule, m_config);
+	m_taskbarThumbnails =
+		TaskbarThumbnails::Create(this, m_tabContainer, m_hLanguageModule, m_config);
 
 	RestoreTabs(pLoadSave);
 	delete pLoadSave;
@@ -87,8 +86,8 @@ void Explorerplusplus::OnCreate()
 	SHChangeNotifyEntry shcne;
 	shcne.fRecursive = TRUE;
 	shcne.pidl = nullptr;
-	m_SHChangeNotifyID = SHChangeNotifyRegister(m_hContainer, SHCNRF_ShellLevel,
-		SHCNE_ASSOCCHANGED, WM_APP_ASSOCCHANGED, 1, &shcne);
+	m_SHChangeNotifyID = SHChangeNotifyRegister(
+		m_hContainer, SHCNRF_ShellLevel, SHCNE_ASSOCCHANGED, WM_APP_ASSOCCHANGED, 1, &shcne);
 
 	/* Place the main window in the clipboard chain. This
 	will allow the 'Paste' button to be enabled/disabled
@@ -122,15 +121,14 @@ void Explorerplusplus::OnCreate()
 void Explorerplusplus::InitializeDisplayWindow()
 {
 	DWInitialSettings_t initialSettings;
-	initialSettings.CentreColor		= m_config->displayWindowCentreColor;
-	initialSettings.SurroundColor	= m_config->displayWindowSurroundColor;
-	initialSettings.TextColor		= m_config->displayWindowTextColor;
-	initialSettings.hFont			= m_config->displayWindowFont;
-	initialSettings.hIcon			= (HICON)LoadImage(GetModuleHandle(nullptr),
-		MAKEINTRESOURCE(IDI_DISPLAYWINDOW),IMAGE_ICON,
-		0,0,LR_CREATEDIBSECTION);
+	initialSettings.CentreColor = m_config->displayWindowCentreColor;
+	initialSettings.SurroundColor = m_config->displayWindowSurroundColor;
+	initialSettings.TextColor = m_config->displayWindowTextColor;
+	initialSettings.hFont = m_config->displayWindowFont;
+	initialSettings.hIcon = (HICON) LoadImage(GetModuleHandle(nullptr),
+		MAKEINTRESOURCE(IDI_DISPLAYWINDOW), IMAGE_ICON, 0, 0, LR_CREATEDIBSECTION);
 
-	m_hDisplayWindow = CreateDisplayWindow(m_hContainer,&initialSettings);
+	m_hDisplayWindow = CreateDisplayWindow(m_hContainer, &initialSettings);
 
 	ApplyDisplayWindowPosition();
 }
@@ -152,8 +150,8 @@ void Explorerplusplus::AddViewModesToMenu(HMENU menu)
 
 	for (auto viewMode : VIEW_MODES)
 	{
-		LoadString(m_hLanguageModule, GetViewModeMenuStringId(viewMode),
-			szText, SIZEOF_ARRAY(szText));
+		LoadString(
+			m_hLanguageModule, GetViewModeMenuStringId(viewMode), szText, SIZEOF_ARRAY(szText));
 
 		mii.cbSize = sizeof(mii);
 		mii.fMask = MIIM_ID | MIIM_STRING;

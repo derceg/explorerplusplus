@@ -6,6 +6,7 @@
 
 #include "IconMapping.h"
 
+// clang-format off
 const IconMapping ICON_RESOURCE_MAPPINGS_WINDOWS_10 = {
 	{ Icon::AddBookmark, { ICON_SIZE_MAPPINGS(IDB_ADD_BOOKMARK_WINDOWS_10) } },
 	{ Icon::ArrowRight, { ICON_SIZE_MAPPINGS(IDB_ARROW_RIGHT_WINDOWS_10) } },
@@ -45,3 +46,4 @@ const IconMapping ICON_RESOURCE_MAPPINGS_WINDOWS_10 = {
 	{ Icon::Up, { ICON_SIZE_MAPPINGS(IDB_UP_WINDOWS_10) } },
 	{ Icon::Views, { ICON_SIZE_MAPPINGS(IDB_VIEWS_WINDOWS_10) } }
 };
+// clang-format on

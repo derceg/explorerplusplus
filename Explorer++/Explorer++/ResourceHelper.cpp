@@ -20,13 +20,15 @@ std::wstring ResourceHelper::LoadString(HINSTANCE instance, UINT stringId)
 	return std::wstring(string, numCharacters);
 }
 
-void ResourceHelper::SetMenuItemImage(HMENU menu, UINT menuItemId, IconResourceLoader *iconResourceLoader,
-	Icon icon, int dpi, std::vector<wil::unique_hbitmap> &menuImages)
+void ResourceHelper::SetMenuItemImage(HMENU menu, UINT menuItemId,
+	IconResourceLoader *iconResourceLoader, Icon icon, int dpi,
+	std::vector<wil::unique_hbitmap> &menuImages)
 {
 	auto &dpiCompat = DpiCompatibility::GetInstance();
 	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
-	wil::unique_hbitmap bitmap = iconResourceLoader->LoadBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
+	wil::unique_hbitmap bitmap =
+		iconResourceLoader->LoadBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
 
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
@@ -41,24 +43,29 @@ void ResourceHelper::SetMenuItemImage(HMENU menu, UINT menuItemId, IconResourceL
 	}
 }
 
-std::tuple<wil::unique_himagelist, IconImageListMapping> ResourceHelper::CreateIconImageList(IconResourceLoader *iconResourceLoader,
-	int iconWidth, int iconHeight, const std::initializer_list<Icon> &icons)
+std::tuple<wil::unique_himagelist, IconImageListMapping> ResourceHelper::CreateIconImageList(
+	IconResourceLoader *iconResourceLoader, int iconWidth, int iconHeight,
+	const std::initializer_list<Icon> &icons)
 {
-	wil::unique_himagelist imageList(ImageList_Create(iconWidth, iconHeight, ILC_COLOR32 | ILC_MASK, 0, static_cast<int>(icons.size())));
+	wil::unique_himagelist imageList(ImageList_Create(
+		iconWidth, iconHeight, ILC_COLOR32 | ILC_MASK, 0, static_cast<int>(icons.size())));
 	IconImageListMapping imageListMappings;
 
 	for (auto icon : icons)
 	{
-		AddIconToImageList(imageList.get(), iconResourceLoader, icon, iconWidth, iconHeight, imageListMappings);
+		AddIconToImageList(
+			imageList.get(), iconResourceLoader, icon, iconWidth, iconHeight, imageListMappings);
 	}
 
 	return { std::move(imageList), imageListMappings };
 }
 
-void ResourceHelper::AddIconToImageList(HIMAGELIST imageList, IconResourceLoader *iconResourceLoader, Icon icon,
-	int iconWidth, int iconHeight, IconImageListMapping &imageListMappings)
+void ResourceHelper::AddIconToImageList(HIMAGELIST imageList,
+	IconResourceLoader *iconResourceLoader, Icon icon, int iconWidth, int iconHeight,
+	IconImageListMapping &imageListMappings)
 {
-	wil::unique_hbitmap bitmap = iconResourceLoader->LoadBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
+	wil::unique_hbitmap bitmap =
+		iconResourceLoader->LoadBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
 	int imagePosition = ImageList_Add(imageList, bitmap.get(), nullptr);
 
 	if (imagePosition == -1)

@@ -8,7 +8,8 @@
 
 typedef boost::signals2::signal<void()> TabsInitializedSignal;
 typedef boost::signals2::signal<void(HMENU mainMenu)> MainMenuPreShowSignal;
-typedef boost::signals2::signal<void(HMENU menu, HWND sourceWindow, const POINT &pt)> ToolbarContextMenuSignal;
+typedef boost::signals2::signal<void(HMENU menu, HWND sourceWindow, const POINT &pt)>
+	ToolbarContextMenuSignal;
 
 enum class MousewheelSource
 {
@@ -31,53 +32,56 @@ and some of the other components (such as the
 dialogs and toolbars). */
 __interface IExplorerplusplus
 {
-	Config			*GetConfig() const;
-	HMODULE			GetLanguageModule() const;
+	Config *GetConfig() const;
+	HMODULE GetLanguageModule() const;
 
-	HWND			GetMainWindow() const;
+	HWND GetMainWindow() const;
 
-	HWND			GetActiveListView() const;
-	ShellBrowser	*GetActiveShellBrowser() const;
+	HWND GetActiveListView() const;
+	ShellBrowser *GetActiveShellBrowser() const;
 
-	TabContainer	*GetTabContainer() const;
-	TabRestorer		*GetTabRestorer() const;
-	IDirectoryMonitor	*GetDirectoryMonitor() const;
+	TabContainer *GetTabContainer() const;
+	TabRestorer *GetTabRestorer() const;
+	IDirectoryMonitor *GetDirectoryMonitor() const;
 
-	IconResourceLoader	*GetIconResourceLoader() const;
-	CachedIcons		*GetCachedIcons();
+	IconResourceLoader *GetIconResourceLoader() const;
+	CachedIcons *GetCachedIcons();
 
-	HWND			GetTreeView() const;
+	HWND GetTreeView() const;
 
-	void			OpenItem(const TCHAR *szItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
-	void			OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
+	void OpenItem(const TCHAR *szItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
+	void OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
 
-	StatusBar		*GetStatusBar();
+	StatusBar *GetStatusBar();
 
-	void			OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters);
+	void OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters);
 
-	HMENU			BuildViewsMenu();
+	HMENU BuildViewsMenu();
 
-	bool			CanCreate() const;
-	BOOL			CanCut() const;
-	BOOL			CanCopy() const;
-	BOOL			CanRename() const;
-	BOOL			CanDelete() const;
-	BOOL			CanShowFileProperties() const;
-	BOOL			CanPaste() const;
+	bool CanCreate() const;
+	BOOL CanCut() const;
+	BOOL CanCopy() const;
+	BOOL CanRename() const;
+	BOOL CanDelete() const;
+	BOOL CanShowFileProperties() const;
+	BOOL CanPaste() const;
 
-	BOOL			OnMouseWheel(MousewheelSource mousewheelSource, WPARAM wParam, LPARAM lParam);
+	BOOL OnMouseWheel(MousewheelSource mousewheelSource, WPARAM wParam, LPARAM lParam);
 
-	void			ShowTabBar();
-	void			HideTabBar();
+	void ShowTabBar();
+	void HideTabBar();
 
-	void			SetListViewInitialPosition(HWND hListView);
+	void SetListViewInitialPosition(HWND hListView);
 
 	// Used to support the options dialog.
-	void			SaveAllSettings();
-	BOOL			GetSavePreferencesToXmlFile() const;
-	void			SetSavePreferencesToXmlFile(BOOL savePreferencesToXmlFile);
+	void SaveAllSettings();
+	BOOL GetSavePreferencesToXmlFile() const;
+	void SetSavePreferencesToXmlFile(BOOL savePreferencesToXmlFile);
 
-	boost::signals2::connection	AddTabsInitializedObserver(const TabsInitializedSignal::slot_type &observer);
-	boost::signals2::connection	AddMainMenuPreShowObserver(const MainMenuPreShowSignal::slot_type &observer);
-	boost::signals2::connection	AddToolbarContextMenuObserver(const ToolbarContextMenuSignal::slot_type &observer);
+	boost::signals2::connection AddTabsInitializedObserver(
+		const TabsInitializedSignal::slot_type &observer);
+	boost::signals2::connection AddMainMenuPreShowObserver(
+		const MainMenuPreShowSignal::slot_type &observer);
+	boost::signals2::connection AddToolbarContextMenuObserver(
+		const ToolbarContextMenuSignal::slot_type &observer);
 };

@@ -11,18 +11,15 @@ template <typename HistoryEntryType, typename BrowseFolderReturnType>
 class NavigationController
 {
 public:
-
-	NavigationController() :
-		m_currentEntry(-1)
+	NavigationController() : m_currentEntry(-1)
 	{
-
 	}
 
-	NavigationController(std::vector<std::unique_ptr<HistoryEntryType>> &&entries, int currentEntry) :
+	NavigationController(
+		std::vector<std::unique_ptr<HistoryEntryType>> &&entries, int currentEntry) :
 		m_entries(std::move(entries)),
 		m_currentEntry(currentEntry)
 	{
-
 	}
 
 	int GetNumHistoryEntries() const
@@ -139,8 +136,8 @@ public:
 	}
 
 protected:
-
-	virtual BrowseFolderReturnType BrowseFolder(const HistoryEntryType *entry, bool addHistoryEntry = true) = 0;
+	virtual BrowseFolderReturnType BrowseFolder(
+		const HistoryEntryType *entry, bool addHistoryEntry = true) = 0;
 	virtual BrowseFolderReturnType GetFailureValue() = 0;
 
 	int AddEntry(std::unique_ptr<HistoryEntryType> entry)
@@ -155,7 +152,6 @@ protected:
 	}
 
 private:
-
 	HistoryEntryType *GetEntryAndUpdateIndex(int offset)
 	{
 		int index = m_currentEntry + offset;

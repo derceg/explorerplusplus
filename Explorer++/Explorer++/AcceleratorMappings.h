@@ -7,6 +7,7 @@
 #include "MainResource.h"
 #include <unordered_map>
 
+// clang-format off
 const std::unordered_map<std::wstring, int> ACCELERATOR_MAPPINGS = {
 	// Accelerators.
 	{L"address_bar", IDA_ADDRESSBAR},
@@ -249,3 +250,4 @@ const std::unordered_map<std::wstring, int> ACCELERATOR_MAPPINGS = {
 	{L"check_for_updates", IDM_HELP_CHECKFORUPDATES},
 	{L"about", IDM_HELP_ABOUT}
 };
+// clang-format on

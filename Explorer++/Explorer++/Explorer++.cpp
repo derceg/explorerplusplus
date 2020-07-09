@@ -14,8 +14,8 @@
 #include "Plugins/PluginManager.h"
 #include "TabRestorerUI.h"
 #include "UiTheming.h"
-#include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/WindowSubclassWrapper.h"
+#include "../Helper/iDirectoryMonitor.h"
 
 /* These entries correspond to shell
 extensions that are known to be
@@ -39,34 +39,34 @@ Explorerplusplus::Explorerplusplus(HWND hwnd) :
 	m_bookmarkIconFetcher(hwnd, &m_cachedIcons),
 	m_tabBarBackgroundBrush(CreateSolidBrush(TAB_BAR_DARK_MODE_BACKGROUND_COLOR))
 {
-	m_hLanguageModule				= nullptr;
+	m_hLanguageModule = nullptr;
 
 	m_config = std::make_shared<Config>();
 
-	m_bSelectingTreeViewDirectory	= false;
-	m_bTreeViewRightClick			= false;
-	m_bSavePreferencesToXMLFile		= FALSE;
-	m_bAttemptToolbarRestore		= false;
-	m_bLanguageLoaded				= false;
-	m_bListViewRenaming				= false;
-	m_bDragging						= false;
-	m_bDragCancelled				= false;
-	m_bDragAllowed					= false;
-	m_bShowTabBar					= true;
-	m_pActiveShellBrowser			= nullptr;
-	m_hMainRebar					= nullptr;
-	m_hStatusBar					= nullptr;
-	m_hHolder						= nullptr;
-	m_hTabBacking					= nullptr;
-	m_hTabWindowToolbar				= nullptr;
-	m_hDisplayWindow				= nullptr;
-	m_hTreeView						= nullptr;
-	m_foldersToolbarParent			= nullptr;
-	m_hFoldersToolbar				= nullptr;
-	m_hLastActiveWindow				= nullptr;
-	m_hActiveListView				= nullptr;
-	m_hNextClipboardViewer			= nullptr;
-	m_zDeltaTotal					= 0;
+	m_bSelectingTreeViewDirectory = false;
+	m_bTreeViewRightClick = false;
+	m_bSavePreferencesToXMLFile = FALSE;
+	m_bAttemptToolbarRestore = false;
+	m_bLanguageLoaded = false;
+	m_bListViewRenaming = false;
+	m_bDragging = false;
+	m_bDragCancelled = false;
+	m_bDragAllowed = false;
+	m_bShowTabBar = true;
+	m_pActiveShellBrowser = nullptr;
+	m_hMainRebar = nullptr;
+	m_hStatusBar = nullptr;
+	m_hHolder = nullptr;
+	m_hTabBacking = nullptr;
+	m_hTabWindowToolbar = nullptr;
+	m_hDisplayWindow = nullptr;
+	m_hTreeView = nullptr;
+	m_foldersToolbarParent = nullptr;
+	m_hFoldersToolbar = nullptr;
+	m_hLastActiveWindow = nullptr;
+	m_hActiveListView = nullptr;
+	m_hNextClipboardViewer = nullptr;
+	m_zDeltaTotal = 0;
 	m_InitializationFinished.set(false);
 
 	m_blockNextListViewSelection = false;
@@ -75,9 +75,9 @@ Explorerplusplus::Explorerplusplus(HWND hwnd) :
 
 	m_iDWFolderSizeUniqueId = 0;
 
-	m_pClipboardDataObject	= nullptr;
-	m_iCutTabInternal		= 0;
-	m_hCutTreeViewItem		= nullptr;
+	m_pClipboardDataObject = nullptr;
+	m_iCutTabInternal = 0;
+	m_hCutTreeViewItem = nullptr;
 }
 
 Explorerplusplus::~Explorerplusplus()

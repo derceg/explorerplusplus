@@ -10,26 +10,25 @@ conforms to this specification. */
 class ILoadSave
 {
 public:
-
 	virtual ~ILoadSave() = default;
 
 	/* Loading functions. */
-	virtual void	LoadGenericSettings() = 0;
-	virtual void	LoadBookmarks() = 0;
-	virtual int		LoadPreviousTabs() = 0;
-	virtual void	LoadDefaultColumns() = 0;
-	virtual void	LoadApplicationToolbar() = 0;
-	virtual void	LoadToolbarInformation() = 0;
-	virtual void	LoadColorRules() = 0;
-	virtual void	LoadDialogStates() = 0;
+	virtual void LoadGenericSettings() = 0;
+	virtual void LoadBookmarks() = 0;
+	virtual int LoadPreviousTabs() = 0;
+	virtual void LoadDefaultColumns() = 0;
+	virtual void LoadApplicationToolbar() = 0;
+	virtual void LoadToolbarInformation() = 0;
+	virtual void LoadColorRules() = 0;
+	virtual void LoadDialogStates() = 0;
 
 	/* Saving functions. */
-	virtual void	SaveGenericSettings() = 0;
-	virtual void	SaveBookmarks() = 0;
-	virtual void	SaveTabs() = 0;
-	virtual void	SaveDefaultColumns() = 0;
-	virtual void	SaveApplicationToolbar() = 0;
-	virtual void	SaveToolbarInformation() = 0;
-	virtual void	SaveColorRules() = 0;
-	virtual void	SaveDialogStates() = 0;
+	virtual void SaveGenericSettings() = 0;
+	virtual void SaveBookmarks() = 0;
+	virtual void SaveTabs() = 0;
+	virtual void SaveDefaultColumns() = 0;
+	virtual void SaveApplicationToolbar() = 0;
+	virtual void SaveToolbarInformation() = 0;
+	virtual void SaveColorRules() = 0;
+	virtual void SaveDialogStates() = 0;
 };

@@ -13,6 +13,7 @@
 #include <wil/resource.h>
 #include <map>
 
+// clang-format off
 const std::map<UINT, Icon> MAIN_MENU_IMAGE_MAPPINGS = {
 	{ IDM_FILE_NEWTAB, Icon::NewTab},
 	{ IDM_FILE_CLOSETAB, Icon::CloseTab },
@@ -51,6 +52,7 @@ const std::map<UINT, Icon> MAIN_MENU_IMAGE_MAPPINGS = {
 
 	{ IDM_HELP_HELP, Icon::Help }
 };
+// clang-format on
 
 void Explorerplusplus::InitializeMainMenu()
 {
@@ -91,7 +93,8 @@ void Explorerplusplus::SetMainMenuImages()
 
 	for (const auto &mapping : MAIN_MENU_IMAGE_MAPPINGS)
 	{
-		ResourceHelper::SetMenuItemImage(mainMenu, mapping.first, m_iconResourceLoader.get(), mapping.second, dpi, m_menuImages);
+		ResourceHelper::SetMenuItemImage(
+			mainMenu, mapping.first, m_iconResourceLoader.get(), mapping.second, dpi, m_menuImages);
 	}
 }
 
@@ -121,7 +124,8 @@ void Explorerplusplus::SetGoMenuName(HMENU hMenu, UINT uMenuID, UINT csidl)
 	DeleteMenu(hMenu, uMenuID, MF_BYCOMMAND);
 }
 
-boost::signals2::connection Explorerplusplus::AddMainMenuPreShowObserver(const MainMenuPreShowSignal::slot_type &observer)
+boost::signals2::connection Explorerplusplus::AddMainMenuPreShowObserver(
+	const MainMenuPreShowSignal::slot_type &observer)
 {
 	return m_mainMenuPreShowSignal.connect(observer);
 }

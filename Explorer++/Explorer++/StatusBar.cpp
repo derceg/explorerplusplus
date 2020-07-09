@@ -49,11 +49,11 @@ void Explorerplusplus::SetStatusBarParts(int width)
 {
 	int parts[3];
 
-	parts[0] = (int)(0.50 * width);
-	parts[1] = (int)(0.75 * width);
+	parts[0] = (int) (0.50 * width);
+	parts[1] = (int) (0.75 * width);
 	parts[2] = width;
 
-	SendMessage(m_hStatusBar, SB_SETPARTS, 3, (LPARAM)parts);
+	SendMessage(m_hStatusBar, SB_SETPARTS, 3, (LPARAM) parts);
 }
 
 LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
@@ -68,8 +68,7 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
 		m_pStatusBar->HandleStatusBarMenuOpen();
 
 		TCHAR szBuffer[512];
-		LoadString(m_hLanguageModule, LOWORD(wParam),
-			szBuffer, SIZEOF_ARRAY(szBuffer));
+		LoadString(m_hLanguageModule, LOWORD(wParam), szBuffer, SIZEOF_ARRAY(szBuffer));
 		SetWindowText(m_hStatusBar, szBuffer);
 	}
 
@@ -87,26 +86,26 @@ void Explorerplusplus::OnStartedBrowsing(int iTabId, const TCHAR *szFolderPath)
 
 		/* Browsing of a folder has started. Set the status bar text to indicate that
 		the folder is been loaded. */
-		SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM)0 | 0, (LPARAM)szLoadingText);
+		SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 0 | 0, (LPARAM) szLoadingText);
 
 		/* Clear the text in all other parts of the status bar. */
-		SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM)1 | 0, (LPARAM)EMPTY_STRING);
-		SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM)2 | 0, (LPARAM)EMPTY_STRING);
+		SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 1 | 0, (LPARAM) EMPTY_STRING);
+		SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 2 | 0, (LPARAM) EMPTY_STRING);
 	}
 }
 
 HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 {
-	FolderInfo_t	folderInfo;
-	int				nTotal;
-	int				nFilesSelected;
-	int				nFoldersSelected;
-	TCHAR			szItemsSelected[64];
-	TCHAR			lpszSizeBuffer[32];
-	TCHAR			szBuffer[64];
-	TCHAR			szTemp[64];
-	TCHAR			*szNumSelected = nullptr;
-	int				res;
+	FolderInfo_t folderInfo;
+	int nTotal;
+	int nFilesSelected;
+	int nFoldersSelected;
+	TCHAR szItemsSelected[64];
+	TCHAR lpszSizeBuffer[32];
+	TCHAR szBuffer[64];
+	TCHAR szTemp[64];
+	TCHAR *szNumSelected = nullptr;
+	int res;
 
 	nTotal = tab.GetShellBrowser()->GetNumItems();
 	nFilesSelected = tab.GetShellBrowser()->GetNumSelectedFiles();
@@ -118,23 +117,23 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 
 		if ((nFilesSelected + nFoldersSelected) == 1)
 		{
-			LoadString(m_hLanguageModule, IDS_GENERAL_SELECTED_ONEITEM, szTemp,
-				SIZEOF_ARRAY(szTemp));
+			LoadString(
+				m_hLanguageModule, IDS_GENERAL_SELECTED_ONEITEM, szTemp, SIZEOF_ARRAY(szTemp));
 
 			/* One item selected. Form:
 			1 item selected */
-			StringCchPrintf(szItemsSelected, SIZEOF_ARRAY(szItemsSelected),
-				_T("%s %s"), szNumSelected, szTemp);
+			StringCchPrintf(
+				szItemsSelected, SIZEOF_ARRAY(szItemsSelected), _T("%s %s"), szNumSelected, szTemp);
 		}
 		else
 		{
-			LoadString(m_hLanguageModule, IDS_GENERAL_SELECTED_MOREITEMS, szTemp,
-				SIZEOF_ARRAY(szTemp));
+			LoadString(
+				m_hLanguageModule, IDS_GENERAL_SELECTED_MOREITEMS, szTemp, SIZEOF_ARRAY(szTemp));
 
 			/* More than one item selected. Form:
 			n items selected */
-			StringCchPrintf(szItemsSelected, SIZEOF_ARRAY(szItemsSelected),
-				_T("%s %s"), szNumSelected, szTemp);
+			StringCchPrintf(
+				szItemsSelected, SIZEOF_ARRAY(szItemsSelected), _T("%s %s"), szNumSelected, szTemp);
 		}
 	}
 	else
@@ -143,25 +142,23 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 
 		if (nTotal == 1)
 		{
-			LoadString(m_hLanguageModule, IDS_GENERAL_ONEITEM, szTemp,
-				SIZEOF_ARRAY(szTemp));
+			LoadString(m_hLanguageModule, IDS_GENERAL_ONEITEM, szTemp, SIZEOF_ARRAY(szTemp));
 
 			/* Text: '1 item' */
-			StringCchPrintf(szItemsSelected, SIZEOF_ARRAY(szItemsSelected),
-				_T("%s %s"), szNumSelected, szTemp);
+			StringCchPrintf(
+				szItemsSelected, SIZEOF_ARRAY(szItemsSelected), _T("%s %s"), szNumSelected, szTemp);
 		}
 		else
 		{
-			LoadString(m_hLanguageModule, IDS_GENERAL_MOREITEMS, szTemp,
-				SIZEOF_ARRAY(szTemp));
+			LoadString(m_hLanguageModule, IDS_GENERAL_MOREITEMS, szTemp, SIZEOF_ARRAY(szTemp));
 
 			/* Text: 'n Items' */
-			StringCchPrintf(szItemsSelected, SIZEOF_ARRAY(szItemsSelected),
-				_T("%s %s"), szNumSelected, szTemp);
+			StringCchPrintf(
+				szItemsSelected, SIZEOF_ARRAY(szItemsSelected), _T("%s %s"), szNumSelected, szTemp);
 		}
 	}
 
-	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM)0 | 0, (LPARAM)szItemsSelected);
+	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 0 | 0, (LPARAM) szItemsSelected);
 
 	if (tab.GetShellBrowser()->InVirtualFolder())
 	{
@@ -197,7 +194,7 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 		}
 	}
 
-	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM)1 | 0, (LPARAM)lpszSizeBuffer);
+	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 1 | 0, (LPARAM) lpszSizeBuffer);
 
 	res = CreateDriveFreeSpaceString(m_CurrentDirectory.c_str(), szBuffer, SIZEOF_ARRAY(szBuffer));
 
@@ -206,34 +203,34 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 		StringCchCopy(szBuffer, SIZEOF_ARRAY(szBuffer), EMPTY_STRING);
 	}
 
-	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM)2 | 0, (LPARAM)szBuffer);
+	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 2 | 0, (LPARAM) szBuffer);
 
 	return S_OK;
 }
 
 int Explorerplusplus::CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer)
 {
-	ULARGE_INTEGER	totalNumberOfBytes;
-	ULARGE_INTEGER	totalNumberOfFreeBytes;
-	ULARGE_INTEGER	bytesAvailableToCaller;
-	TCHAR			szFreeSpace[32];
-	TCHAR			szFree[16];
-	TCHAR			szFreeSpaceString[512];
+	ULARGE_INTEGER totalNumberOfBytes;
+	ULARGE_INTEGER totalNumberOfFreeBytes;
+	ULARGE_INTEGER bytesAvailableToCaller;
+	TCHAR szFreeSpace[32];
+	TCHAR szFree[16];
+	TCHAR szFreeSpaceString[512];
 
-	if (GetDiskFreeSpaceEx(szPath, &bytesAvailableToCaller,
-		&totalNumberOfBytes, &totalNumberOfFreeBytes) == 0)
+	if (GetDiskFreeSpaceEx(
+			szPath, &bytesAvailableToCaller, &totalNumberOfBytes, &totalNumberOfFreeBytes)
+		== 0)
 	{
 		szBuffer = nullptr;
 		return -1;
 	}
 
-	FormatSizeString(totalNumberOfFreeBytes, szFreeSpace,
-		SIZEOF_ARRAY(szFreeSpace));
+	FormatSizeString(totalNumberOfFreeBytes, szFreeSpace, SIZEOF_ARRAY(szFreeSpace));
 
 	LoadString(m_hLanguageModule, IDS_GENERAL_FREE, szFree, SIZEOF_ARRAY(szFree));
 
-	StringCchPrintf(szFreeSpaceString, SIZEOF_ARRAY(szFreeSpace),
-		_T("%s %s (%.0f%%)"), szFreeSpace, szFree, totalNumberOfFreeBytes.QuadPart * 100.0 / totalNumberOfBytes.QuadPart);
+	StringCchPrintf(szFreeSpaceString, SIZEOF_ARRAY(szFreeSpace), _T("%s %s (%.0f%%)"), szFreeSpace,
+		szFree, totalNumberOfFreeBytes.QuadPart * 100.0 / totalNumberOfBytes.QuadPart);
 
 	if (nBuffer > lstrlen(szFreeSpaceString))
 	{

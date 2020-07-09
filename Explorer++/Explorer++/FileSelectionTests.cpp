@@ -98,8 +98,8 @@ BOOL Explorerplusplus::TestItemAttributes(SFGAOF attributes) const
 
 HRESULT Explorerplusplus::GetSelectionAttributes(SFGAOF *pItemAttributes) const
 {
-	HWND	hFocus;
-	HRESULT	hr = E_FAIL;
+	HWND hFocus;
+	HRESULT hr = E_FAIL;
 
 	hFocus = GetFocus();
 
@@ -137,7 +137,8 @@ HRESULT Explorerplusplus::GetListViewSelectionAttributes(SFGAOF *pItemAttributes
 	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
 
 	/* TODO: This should probably check all selected files. */
-	int iSelected = ListView_GetNextItem(selectedTab.GetShellBrowser()->GetListView(), -1, LVNI_SELECTED);
+	int iSelected =
+		ListView_GetNextItem(selectedTab.GetShellBrowser()->GetListView(), -1, LVNI_SELECTED);
 
 	if (iSelected != -1)
 	{
@@ -147,7 +148,8 @@ HRESULT Explorerplusplus::GetListViewSelectionAttributes(SFGAOF *pItemAttributes
 	return hr;
 }
 
-HRESULT Explorerplusplus::GetListViewItemAttributes(const Tab &tab, int item, SFGAOF *pItemAttributes) const
+HRESULT Explorerplusplus::GetListViewItemAttributes(
+	const Tab &tab, int item, SFGAOF *pItemAttributes) const
 {
 	auto pidlComplete = tab.GetShellBrowser()->GetItemCompleteIdl(item);
 

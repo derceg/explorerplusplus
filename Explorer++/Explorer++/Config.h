@@ -32,8 +32,7 @@ enum class InfoTipType
 
 struct Config
 {
-	Config() :
-		defaultTabDirectoryStatic(GetComputerFolderPath())
+	Config() : defaultTabDirectoryStatic(GetComputerFolderPath())
 	{
 		language = LANG_ENGLISH;
 		iconTheme = IconTheme::Color;
@@ -87,10 +86,9 @@ struct Config
 		displayWindowSurroundColor = Gdiplus::Color(0, 94, 138);
 		displayWindowCentreColor = Gdiplus::Color(255, 255, 255);
 		displayWindowTextColor = RGB(0, 0, 0);
-		displayWindowFont = CreateFont(-13, 0, 0, 0, FW_MEDIUM, FALSE,
-			FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-			CLIP_DEFAULT_PRECIS, PROOF_QUALITY, FIXED_PITCH | FF_MODERN,
-			_T("Segoe UI"));
+		displayWindowFont = CreateFont(-13, 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE,
+			DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY,
+			FIXED_PITCH | FF_MODERN, _T("Segoe UI"));
 
 		globalFolderSettings.showExtensions = TRUE;
 		globalFolderSettings.showFriendlyDates = TRUE;
@@ -105,13 +103,22 @@ struct Config
 		globalFolderSettings.oneClickActivate = FALSE;
 		globalFolderSettings.oneClickActivateHoverTime = DEFAULT_LISTVIEW_HOVER_TIME;
 
-		globalFolderSettings.folderColumns.realFolderColumns = std::vector<Column_t>(std::begin(REAL_FOLDER_DEFAULT_COLUMNS), std::end(REAL_FOLDER_DEFAULT_COLUMNS));
-		globalFolderSettings.folderColumns.myComputerColumns = std::vector<Column_t>(std::begin(MY_COMPUTER_DEFAULT_COLUMNS), std::end(MY_COMPUTER_DEFAULT_COLUMNS));
-		globalFolderSettings.folderColumns.controlPanelColumns = std::vector<Column_t>(std::begin(CONTROL_PANEL_DEFAULT_COLUMNS), std::end(CONTROL_PANEL_DEFAULT_COLUMNS));
-		globalFolderSettings.folderColumns.recycleBinColumns = std::vector<Column_t>(std::begin(RECYCLE_BIN_DEFAULT_COLUMNS), std::end(RECYCLE_BIN_DEFAULT_COLUMNS));
-		globalFolderSettings.folderColumns.printersColumns = std::vector<Column_t>(std::begin(PRINTERS_DEFAULT_COLUMNS), std::end(PRINTERS_DEFAULT_COLUMNS));
-		globalFolderSettings.folderColumns.networkConnectionsColumns = std::vector<Column_t>(std::begin(NETWORK_CONNECTIONS_DEFAULT_COLUMNS), std::end(NETWORK_CONNECTIONS_DEFAULT_COLUMNS));
-		globalFolderSettings.folderColumns.myNetworkPlacesColumns = std::vector<Column_t>(std::begin(MY_NETWORK_PLACES_DEFAULT_COLUMNS), std::end(MY_NETWORK_PLACES_DEFAULT_COLUMNS));
+		globalFolderSettings.folderColumns.realFolderColumns = std::vector<Column_t>(
+			std::begin(REAL_FOLDER_DEFAULT_COLUMNS), std::end(REAL_FOLDER_DEFAULT_COLUMNS));
+		globalFolderSettings.folderColumns.myComputerColumns = std::vector<Column_t>(
+			std::begin(MY_COMPUTER_DEFAULT_COLUMNS), std::end(MY_COMPUTER_DEFAULT_COLUMNS));
+		globalFolderSettings.folderColumns.controlPanelColumns = std::vector<Column_t>(
+			std::begin(CONTROL_PANEL_DEFAULT_COLUMNS), std::end(CONTROL_PANEL_DEFAULT_COLUMNS));
+		globalFolderSettings.folderColumns.recycleBinColumns = std::vector<Column_t>(
+			std::begin(RECYCLE_BIN_DEFAULT_COLUMNS), std::end(RECYCLE_BIN_DEFAULT_COLUMNS));
+		globalFolderSettings.folderColumns.printersColumns = std::vector<Column_t>(
+			std::begin(PRINTERS_DEFAULT_COLUMNS), std::end(PRINTERS_DEFAULT_COLUMNS));
+		globalFolderSettings.folderColumns.networkConnectionsColumns =
+			std::vector<Column_t>(std::begin(NETWORK_CONNECTIONS_DEFAULT_COLUMNS),
+				std::end(NETWORK_CONNECTIONS_DEFAULT_COLUMNS));
+		globalFolderSettings.folderColumns.myNetworkPlacesColumns =
+			std::vector<Column_t>(std::begin(MY_NETWORK_PLACES_DEFAULT_COLUMNS),
+				std::end(MY_NETWORK_PLACES_DEFAULT_COLUMNS));
 
 		defaultFolderSettings.sortMode = SortMode::Name;
 		defaultFolderSettings.viewMode = ViewMode::Icons;
@@ -193,12 +200,12 @@ struct Config
 	FolderSettings defaultFolderSettings;
 
 private:
-
 	static std::wstring GetComputerFolderPath()
 	{
 		// It's assumed here that this won't fail.
 		TCHAR computerPath[MAX_PATH];
-		GetCsidlDisplayName(CSIDL_DRIVES, computerPath, SIZEOF_ARRAY(computerPath), SHGDN_FORPARSING);
+		GetCsidlDisplayName(
+			CSIDL_DRIVES, computerPath, SIZEOF_ARRAY(computerPath), SHGDN_FORPARSING);
 		return computerPath;
 	}
 };

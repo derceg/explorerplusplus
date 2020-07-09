@@ -15,12 +15,10 @@ class TabContainer;
 class TaskbarThumbnails
 {
 public:
-
 	static TaskbarThumbnails *Create(IExplorerplusplus *expp, TabContainer *tabContainer,
 		HINSTANCE instance, std::shared_ptr<Config> config);
 
 private:
-
 	DISALLOW_COPY_AND_ASSIGN(TaskbarThumbnails);
 
 	struct TabProxyInfo
@@ -31,11 +29,12 @@ private:
 		wil::unique_hicon icon;
 	};
 
-	TaskbarThumbnails(IExplorerplusplus *expp, TabContainer *tabContainer,
-		HINSTANCE instance, std::shared_ptr<Config> config);
+	TaskbarThumbnails(IExplorerplusplus *expp, TabContainer *tabContainer, HINSTANCE instance,
+		std::shared_ptr<Config> config);
 	~TaskbarThumbnails() = default;
 
-	static LRESULT CALLBACK MainWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	static LRESULT CALLBACK MainWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK MainWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	static LRESULT CALLBACK TabProxyWndProcStub(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam);

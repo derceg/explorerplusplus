@@ -10,9 +10,7 @@
 #include "TabContainer.h"
 #include "../Helper/ShellHelper.h"
 
-Navigation::Navigation(IExplorerplusplus *expp) :
-	m_expp(expp),
-	m_tabContainer(nullptr)
+Navigation::Navigation(IExplorerplusplus *expp) : m_expp(expp), m_tabContainer(nullptr)
 {
 	m_expp->AddTabsInitializedObserver([this] {
 		m_tabContainer = m_expp->GetTabContainer();
@@ -34,11 +32,13 @@ void Navigation::OnNavigateUp()
 	else
 	{
 		unique_pidl_absolute pidlParent;
-		hr = GetVirtualParentPath(tab.GetShellBrowser()->GetDirectoryIdl().get(), wil::out_param(pidlParent));
+		hr = GetVirtualParentPath(
+			tab.GetShellBrowser()->GetDirectoryIdl().get(), wil::out_param(pidlParent));
 
 		if (SUCCEEDED(hr))
 		{
-			hr = m_tabContainer->CreateNewTab(pidlParent.get(), TabSettings(_selected = true), nullptr, std::nullopt, &resultingTabId);
+			hr = m_tabContainer->CreateNewTab(pidlParent.get(), TabSettings(_selected = true),
+				nullptr, std::nullopt, &resultingTabId);
 		}
 	}
 

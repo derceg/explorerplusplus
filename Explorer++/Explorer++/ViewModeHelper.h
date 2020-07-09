@@ -8,6 +8,7 @@
 #include <array>
 #include <cassert>
 
+// clang-format off
 const std::array<ViewMode, 8> VIEW_MODES = {
 	ViewMode::ExtraLargeIcons,
 	ViewMode::LargeIcons,
@@ -18,8 +19,9 @@ const std::array<ViewMode, 8> VIEW_MODES = {
 	ViewMode::Thumbnails,
 	ViewMode::Tiles
 };
+// clang-format on
 
-template<std::size_t N>
+template <std::size_t N>
 ViewMode GetNextViewMode(const std::array<ViewMode, N> &viewModes, ViewMode viewMode)
 {
 	auto itr = std::find(viewModes.begin(), viewModes.end(), viewMode);
@@ -37,7 +39,7 @@ ViewMode GetNextViewMode(const std::array<ViewMode, N> &viewModes, ViewMode view
 	return *itr;
 }
 
-template<std::size_t N>
+template <std::size_t N>
 ViewMode GetPreviousViewMode(const std::array<ViewMode, N> &viewModes, ViewMode viewMode)
 {
 	auto itr = std::find(viewModes.begin(), viewModes.end(), viewMode);

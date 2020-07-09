@@ -13,23 +13,20 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include <list>
 
-DropFilesCallback::DropFilesCallback(IExplorerplusplus *pexpp) :
-m_pexpp(pexpp),
-m_RefCount(1)
+DropFilesCallback::DropFilesCallback(IExplorerplusplus *pexpp) : m_pexpp(pexpp), m_RefCount(1)
 {
-
 }
 
-HRESULT __stdcall DropFilesCallback::QueryInterface(REFIID iid,void **ppvObject)
+HRESULT __stdcall DropFilesCallback::QueryInterface(REFIID iid, void **ppvObject)
 {
 	*ppvObject = nullptr;
 
-	if(iid == IID_IUnknown)
+	if (iid == IID_IUnknown)
 	{
 		*ppvObject = static_cast<IUnknown *>(this);
 	}
 
-	if(*ppvObject)
+	if (*ppvObject)
 	{
 		AddRef();
 		return S_OK;
@@ -46,8 +43,8 @@ ULONG __stdcall DropFilesCallback::AddRef()
 ULONG __stdcall DropFilesCallback::Release()
 {
 	m_RefCount--;
-	
-	if(m_RefCount == 0)
+
+	if (m_RefCount == 0)
 	{
 		delete this;
 		return 0;
@@ -60,7 +57,7 @@ void DropFilesCallback::OnDropFile(const std::list<std::wstring> &PastedFileList
 {
 	UNREFERENCED_PARAMETER(ppt);
 
-	if(m_pexpp->GetActiveShellBrowser()->GetNumSelected() == 0)
+	if (m_pexpp->GetActiveShellBrowser()->GetNumSelected() == 0)
 	{
 		m_pexpp->GetActiveShellBrowser()->SelectItems(PastedFileList);
 	}
