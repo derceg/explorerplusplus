@@ -143,7 +143,7 @@ LRESULT CALLBACK DarkModeDialogBase::ListViewWndProc(
 						return CDRF_NOTIFYITEMDRAW;
 
 					case CDDS_ITEMPREPAINT:
-						SetTextColor(customDraw->hdc, DarkModeHelper::FOREGROUND_COLOR);
+						SetTextColor(customDraw->hdc, DarkModeHelper::TEXT_COLOR);
 						return CDRF_NEWFONT;
 					}
 				}
@@ -286,7 +286,7 @@ INT_PTR DarkModeDialogBase::OnCtlColor(HWND hwnd, HDC hdc)
 	}
 
 	SetBkColor(hdc, DarkModeHelper::BACKGROUND_COLOR);
-	SetTextColor(hdc, DarkModeHelper::FOREGROUND_COLOR);
+	SetTextColor(hdc, DarkModeHelper::TEXT_COLOR);
 
 	return reinterpret_cast<INT_PTR>(darkModeHelper.GetBackgroundBrush());
 }

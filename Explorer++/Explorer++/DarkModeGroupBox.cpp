@@ -41,7 +41,7 @@ void DarkModeGroupBox::OnPaint(HWND hwnd)
 	assert(!text.empty());
 
 	SetBkMode(hdc, TRANSPARENT);
-	SetTextColor(hdc, DarkModeHelper::FOREGROUND_COLOR);
+	SetTextColor(hdc, DarkModeHelper::TEXT_COLOR);
 
 	auto &dpiCompat = DpiCompatibility::GetInstance();
 

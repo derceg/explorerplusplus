@@ -30,7 +30,7 @@ INT_PTR ThirdPartyCreditsDialog::OnInitDialog()
 		CHARFORMAT charFormat;
 		charFormat.cbSize = sizeof(charFormat);
 		charFormat.dwMask = CFM_COLOR;
-		charFormat.crTextColor = DarkModeHelper::FOREGROUND_COLOR;
+		charFormat.crTextColor = DarkModeHelper::TEXT_COLOR;
 		charFormat.dwEffects = 0;
 		SendDlgItemMessage(
 			m_hDlg, IDC_CREDITS, EM_SETCHARFORMAT, SCF_ALL, reinterpret_cast<LPARAM>(&charFormat));

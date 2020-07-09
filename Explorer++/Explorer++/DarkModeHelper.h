@@ -61,7 +61,8 @@ public:
 	};
 
 	static inline constexpr COLORREF BACKGROUND_COLOR = RGB(32, 32, 32);
-	static inline constexpr COLORREF FOREGROUND_COLOR = RGB(255, 255, 255);
+	static inline constexpr COLORREF TEXT_COLOR = RGB(255, 255, 255);
+	static inline constexpr COLORREF TEXT_COLOR_DISABLED = RGB(204, 204, 204);
 	static inline constexpr COLORREF BUTTON_HIGHLIGHT_COLOR = RGB(71, 71, 71);
 
 	static DarkModeHelper &GetInstance();

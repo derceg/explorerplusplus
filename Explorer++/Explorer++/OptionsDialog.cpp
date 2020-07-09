@@ -1479,7 +1479,7 @@ INT_PTR OptionsDialog::OnCtlColor(HWND hwnd, HDC hdc)
 	}
 
 	SetBkColor(hdc, DarkModeHelper::BACKGROUND_COLOR);
-	SetTextColor(hdc, DarkModeHelper::FOREGROUND_COLOR);
+	SetTextColor(hdc, DarkModeHelper::TEXT_COLOR);
 
 	return reinterpret_cast<INT_PTR>(darkModeHelper.GetBackgroundBrush());
 }

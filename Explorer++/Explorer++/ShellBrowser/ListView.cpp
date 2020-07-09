@@ -87,7 +87,7 @@ LRESULT CALLBACK ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 						return CDRF_NOTIFYITEMDRAW;
 
 					case CDDS_ITEMPREPAINT:
-						SetTextColor(customDraw->hdc, DarkModeHelper::FOREGROUND_COLOR);
+						SetTextColor(customDraw->hdc, DarkModeHelper::TEXT_COLOR);
 						return CDRF_NEWFONT;
 					}
 				}

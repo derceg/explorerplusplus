@@ -150,7 +150,7 @@ void HolderWindow::OnHolderWindowPaint(HWND hwnd)
 
 	if (darkModeHelper.IsDarkModeEnabled())
 	{
-		SetTextColor(hdc, DarkModeHelper::FOREGROUND_COLOR);
+		SetTextColor(hdc, DarkModeHelper::TEXT_COLOR);
 	}
 
 	TextOut(hdc, FOLDERS_TEXT_X, FOLDERS_TEXT_Y, szHeader, lstrlen(szHeader));

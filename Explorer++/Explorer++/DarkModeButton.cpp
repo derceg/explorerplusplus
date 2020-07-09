@@ -36,7 +36,18 @@ void DarkModeButton::DrawButtonText(const NMCUSTOMDRAW *customDraw, ButtonType b
 	std::wstring text = GetWindowString(customDraw->hdr.hwndFrom);
 	assert(!text.empty());
 
-	SetTextColor(customDraw->hdc, DarkModeHelper::FOREGROUND_COLOR);
+	COLORREF textColor;
+
+	if (IsWindowEnabled(customDraw->hdr.hwndFrom))
+	{
+		textColor = DarkModeHelper::TEXT_COLOR;
+	}
+	else
+	{
+		textColor = DarkModeHelper::TEXT_COLOR_DISABLED;
+	}
+
+	SetTextColor(customDraw->hdc, textColor);
 
 	UINT textFormat = DT_LEFT | DT_SINGLELINE | DT_VCENTER;
 

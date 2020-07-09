@@ -187,7 +187,7 @@ void DarkModeHelper::SetListViewDarkModeColors(HWND listView)
 
 	ListView_SetBkColor(listView, BACKGROUND_COLOR);
 	ListView_SetTextBkColor(listView, BACKGROUND_COLOR);
-	ListView_SetTextColor(listView, FOREGROUND_COLOR);
+	ListView_SetTextColor(listView, TEXT_COLOR);
 
 	InvalidateRect(listView, nullptr, TRUE);
 }
@@ -206,7 +206,7 @@ void DarkModeHelper::SetTreeViewDarkModeColors(HWND treeView)
 	SetWindowTheme(treeView, L"Explorer", nullptr);
 
 	TreeView_SetBkColor(treeView, BACKGROUND_COLOR);
-	TreeView_SetTextColor(treeView, FOREGROUND_COLOR);
+	TreeView_SetTextColor(treeView, TEXT_COLOR);
 
 	InvalidateRect(treeView, nullptr, TRUE);
 }

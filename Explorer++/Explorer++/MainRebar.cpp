@@ -449,7 +449,7 @@ std::optional<int> Explorerplusplus::OnRebarCustomDraw(NMHDR *nmhdr)
 		return CDRF_NOTIFYITEMDRAW;
 
 	case CDDS_ITEMPREPAINT:
-		customDraw->clrText = DarkModeHelper::FOREGROUND_COLOR;
+		customDraw->clrText = DarkModeHelper::TEXT_COLOR;
 		customDraw->clrHighlightHotTrack = DarkModeHelper::BUTTON_HIGHLIGHT_COLOR;
 		return TBCDRF_USECDCOLORS | TBCDRF_HILITEHOTTRACK;
 	}

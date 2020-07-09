@@ -109,7 +109,7 @@ std::optional<LRESULT> AddressBar::OnComboBoxExCtlColorEdit(HWND hwnd, HDC hdc)
 	}
 
 	SetBkMode(hdc, TRANSPARENT);
-	SetTextColor(hdc, DarkModeHelper::FOREGROUND_COLOR);
+	SetTextColor(hdc, DarkModeHelper::TEXT_COLOR);
 
 	return reinterpret_cast<LRESULT>(m_backgroundBrush.get());
 }
