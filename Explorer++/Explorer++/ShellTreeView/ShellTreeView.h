@@ -22,7 +22,7 @@ public:
 	ULONG __stdcall		AddRef() override;
 	ULONG __stdcall		Release() override;
 
-	ShellTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pDirMon, CachedIcons *cachedIcons);
+	ShellTreeView(HWND hParent, IDirectoryMonitor *pDirMon, CachedIcons *cachedIcons);
 	~ShellTreeView();
 
 	/* Drop source functions. */
@@ -47,6 +47,7 @@ public:
 
 	void				MonitorDrivePublic(const TCHAR *szDrive);
 
+	HWND				GetHWND() const;
 	void				StartRenamingSelectedItem();
 	void				ShowPropertiesOfSelectedItem() const;
 	void				DeleteSelectedItem(bool permanent);
@@ -58,6 +59,9 @@ private:
 
 	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 1;
 	static const UINT WM_APP_SUBFOLDERS_RESULT_READY = WM_APP + 2;
+
+	// This is the same background color as used in the Explorer treeview.
+	static inline constexpr COLORREF TREE_VIEW_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
 
 	typedef struct
 	{
@@ -114,6 +118,8 @@ private:
 		HANDLE	hDrive;
 		int		iMonitorId;
 	} DriveEvent_t;
+
+	static HWND CreateTreeView(HWND parent);
 
 	static LRESULT CALLBACK TreeViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);

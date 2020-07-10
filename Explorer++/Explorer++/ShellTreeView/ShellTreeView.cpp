@@ -16,7 +16,9 @@
 
 #include "stdafx.h"
 #include "ShellTreeView.h"
+#include "DarkModeHelper.h"
 #include "../Helper/CachedIcons.h"
+#include "../Helper/Controls.h"
 #include "../Helper/DriveInfo.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
@@ -27,8 +29,8 @@
 int CALLBACK		CompareItemsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
 DWORD WINAPI		Thread_MonitorAllDrives(LPVOID pParam);
 
-ShellTreeView::ShellTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pDirMon, CachedIcons *cachedIcons) :
-	m_hTreeView(hTreeView),
+ShellTreeView::ShellTreeView(HWND hParent, IDirectoryMonitor *pDirMon, CachedIcons *cachedIcons) :
+	m_hTreeView(CreateTreeView(hParent)),
 	m_pDirMon(pDirMon),
 	m_cachedIcons(cachedIcons),
 	m_iRefCount(1),
@@ -39,6 +41,24 @@ ShellTreeView::ShellTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pD
 	m_subfoldersThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
 	m_subfoldersResultIDCounter(0)
 {
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (DarkModeHelper::GetInstance().IsDarkModeEnabled())
+	{
+		darkModeHelper.AllowDarkModeForWindow(m_hTreeView, true);
+
+		TreeView_SetBkColor(m_hTreeView, TREE_VIEW_DARK_MODE_BACKGROUND_COLOR);
+		TreeView_SetTextColor(m_hTreeView, DarkModeHelper::TEXT_COLOR);
+
+		InvalidateRect(m_hTreeView, nullptr, TRUE);
+
+		HWND tooltips = TreeView_GetToolTips(m_hTreeView);
+		darkModeHelper.AllowDarkModeForWindow(tooltips, true);
+		SetWindowTheme(tooltips, L"Explorer", nullptr);
+	}
+
+	SetWindowTheme(m_hTreeView, L"Explorer", nullptr);
+
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
 		m_hTreeView, TreeViewProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
@@ -60,6 +80,18 @@ ShellTreeView::ShellTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pD
 	m_bQueryRemoveCompleted = FALSE;
 	HANDLE hThread = CreateThread(nullptr,0,Thread_MonitorAllDrives,this,0, nullptr);
 	CloseHandle(hThread);
+}
+
+HWND ShellTreeView::CreateTreeView(HWND parent)
+{
+	return ::CreateTreeView(parent,
+		WS_CHILD | WS_VISIBLE | TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_EDITLABELS | TVS_HASLINES
+			| TVS_TRACKSELECT);
+}
+
+HWND ShellTreeView::GetHWND() const
+{
+	return m_hTreeView;
 }
 
 ShellTreeView::~ShellTreeView()

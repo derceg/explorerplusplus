@@ -24,7 +24,7 @@ void Explorerplusplus::OnCopyItemPath() const
 	{
 		OnListViewCopyItemPath();
 	}
-	else if (hFocus == m_hTreeView)
+	else if (hFocus == m_shellTreeView->GetHWND())
 	{
 		OnTreeViewCopyItemPath();
 	}
@@ -40,7 +40,7 @@ void Explorerplusplus::OnCopyUniversalPaths() const
 	{
 		OnListViewCopyUniversalPaths();
 	}
-	else if (hFocus == m_hTreeView)
+	else if (hFocus == m_shellTreeView->GetHWND())
 	{
 		OnTreeViewCopyUniversalPaths();
 	}
@@ -56,7 +56,7 @@ void Explorerplusplus::OnCopy(BOOL bCopy)
 	{
 		OnListViewCopy(bCopy);
 	}
-	else if (hFocus == m_hTreeView)
+	else if (hFocus == m_shellTreeView->GetHWND())
 	{
 		OnTreeViewCopy(bCopy);
 	}
@@ -78,7 +78,7 @@ void Explorerplusplus::OnFileRename()
 		{
 			OnListViewFileRename();
 		}
-		else if (hFocus == m_hTreeView)
+		else if (hFocus == m_shellTreeView->GetHWND())
 		{
 			m_shellTreeView->StartRenamingSelectedItem();
 		}
@@ -95,7 +95,7 @@ void Explorerplusplus::OnFileDelete(bool permanent)
 	{
 		OnListViewFileDelete(permanent);
 	}
-	else if (hFocus == m_hTreeView)
+	else if (hFocus == m_shellTreeView->GetHWND())
 	{
 		m_shellTreeView->DeleteSelectedItem(permanent);
 	}
@@ -111,7 +111,7 @@ void Explorerplusplus::OnSetFileAttributes() const
 	{
 		OnListViewSetFileAttributes();
 	}
-	else if (hFocus == m_hTreeView)
+	else if (hFocus == m_shellTreeView->GetHWND())
 	{
 		OnTreeViewSetFileAttributes();
 	}
@@ -128,7 +128,7 @@ void Explorerplusplus::OnShowFileProperties() const
 		const Tab &selectedTab = m_tabContainer->GetSelectedTab();
 		selectedTab.GetShellBrowser()->ShowPropertiesForSelectedFiles();
 	}
-	else if (hFocus == m_hTreeView)
+	else if (hFocus == m_shellTreeView->GetHWND())
 	{
 		m_shellTreeView->ShowPropertiesOfSelectedItem();
 	}
@@ -159,7 +159,7 @@ void Explorerplusplus::OnPaste()
 	{
 		OnListViewPaste();
 	}
-	else if (hFocus == m_hTreeView)
+	else if (hFocus == m_shellTreeView->GetHWND())
 	{
 		OnTreeViewPaste();
 	}
@@ -228,12 +228,12 @@ BOOL Explorerplusplus::OnMouseWheel(MousewheelSource mousewheelSource, WPARAM wP
 			}
 		}
 	}
-	else if (hwnd == m_hTreeView)
+	else if (hwnd == m_shellTreeView->GetHWND())
 	{
 		if (mousewheelSource != MousewheelSource::TreeView)
 		{
 			bMessageHandled = TRUE;
-			SendMessage(m_hTreeView, WM_MOUSEWHEEL, wParam, lParam);
+			SendMessage(m_shellTreeView->GetHWND(), WM_MOUSEWHEEL, wParam, lParam);
 		}
 	}
 	else if (hwnd == m_tabContainer->GetHWND())

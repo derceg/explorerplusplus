@@ -456,7 +456,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 
 	/* The treeview is only slightly smaller than the holder
 	window, in both the x and y-directions. */
-	SetWindowPos(m_hTreeView, nullptr, TREEVIEW_X_CLEARANCE, tabWindowHeight,
+	SetWindowPos(m_shellTreeView->GetHWND(), nullptr, TREEVIEW_X_CLEARANCE, tabWindowHeight,
 		iHolderWidth - TREEVIEW_HOLDER_CLEARANCE - TREEVIEW_X_CLEARANCE,
 		iHolderHeight - tabWindowHeight, SWP_NOZORDER);
 
@@ -651,7 +651,7 @@ void Explorerplusplus::OnDrawClipboard()
 				tvItem.hItem = m_hCutTreeViewItem;
 				tvItem.state = 0;
 				tvItem.stateMask = TVIS_CUT;
-				TreeView_SetItem(m_hTreeView, &tvItem);
+				TreeView_SetItem(m_shellTreeView->GetHWND(), &tvItem);
 
 				m_hCutTreeViewItem = nullptr;
 			}
@@ -792,7 +792,7 @@ void Explorerplusplus::OnPreviousWindow()
 		{
 			if (m_config->showFolders)
 			{
-				SetFocus(m_hTreeView);
+				SetFocus(m_shellTreeView->GetHWND());
 			}
 			else
 			{
@@ -802,7 +802,7 @@ void Explorerplusplus::OnPreviousWindow()
 				}
 			}
 		}
-		else if (hFocus == m_hTreeView)
+		else if (hFocus == m_shellTreeView->GetHWND())
 		{
 			if (m_config->showAddressBar)
 			{
@@ -849,11 +849,11 @@ void Explorerplusplus::OnNextWindow()
 			{
 				if (m_config->showFolders)
 				{
-					SetFocus(m_hTreeView);
+					SetFocus(m_shellTreeView->GetHWND());
 				}
 			}
 		}
-		else if (hFocus == m_hTreeView)
+		else if (hFocus == m_shellTreeView->GetHWND())
 		{
 			/* Always shown. */
 			SetFocus(m_hActiveListView);
@@ -862,7 +862,7 @@ void Explorerplusplus::OnNextWindow()
 		{
 			if (m_config->showFolders)
 			{
-				SetFocus(m_hTreeView);
+				SetFocus(m_shellTreeView->GetHWND());
 			}
 			else
 			{
@@ -1142,20 +1142,20 @@ void Explorerplusplus::OnIdaRClick()
 
 		OnListViewRClick(&ptMenuOrigin);
 	}
-	else if (hFocus == m_hTreeView)
+	else if (hFocus == m_shellTreeView->GetHWND())
 	{
 		HTREEITEM hSelection;
 		RECT rcItem;
 		POINT ptOrigin;
 
-		hSelection = TreeView_GetSelection(m_hTreeView);
+		hSelection = TreeView_GetSelection(m_shellTreeView->GetHWND());
 
-		TreeView_GetItemRect(m_hTreeView, hSelection, &rcItem, TRUE);
+		TreeView_GetItemRect(m_shellTreeView->GetHWND(), hSelection, &rcItem, TRUE);
 
 		ptOrigin.x = rcItem.left;
 		ptOrigin.y = rcItem.top;
 
-		ClientToScreen(m_hTreeView, &ptOrigin);
+		ClientToScreen(m_shellTreeView->GetHWND(), &ptOrigin);
 
 		ptOrigin.y += (rcItem.bottom - rcItem.top) / 2;
 
@@ -1500,7 +1500,7 @@ TabRestorer *Explorerplusplus::GetTabRestorer() const
 
 HWND Explorerplusplus::GetTreeView() const
 {
-	return m_hTreeView;
+	return m_shellTreeView->GetHWND();
 }
 
 IDirectoryMonitor *Explorerplusplus::GetDirectoryMonitor() const

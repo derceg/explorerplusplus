@@ -11,6 +11,7 @@
 #include "MainResource.h"
 #include "SelectColumnsDialog.h"
 #include "ShellBrowser/ShellBrowser.h"
+#include "ShellTreeView/ShellTreeView.h"
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileOperations.h"
@@ -273,7 +274,7 @@ LRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam, LPARAM lParam)
 
 	/* Forward the message to the treeview, so that
 	it can handle the message as well. */
-	SendMessage(m_hTreeView, WM_DEVICECHANGE, wParam, lParam);
+	SendMessage(m_shellTreeView->GetHWND(), WM_DEVICECHANGE, wParam, lParam);
 
 	switch (wParam)
 	{

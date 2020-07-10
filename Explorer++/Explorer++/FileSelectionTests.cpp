@@ -21,9 +21,9 @@ BOOL Explorerplusplus::AnyItemsSelected() const
 			return TRUE;
 		}
 	}
-	else if (hFocus == m_hTreeView)
+	else if (hFocus == m_shellTreeView->GetHWND())
 	{
-		if (TreeView_GetSelection(m_hTreeView) != nullptr)
+		if (TreeView_GetSelection(m_shellTreeView->GetHWND()) != nullptr)
 		{
 			return TRUE;
 		}
@@ -107,7 +107,7 @@ HRESULT Explorerplusplus::GetSelectionAttributes(SFGAOF *pItemAttributes) const
 	{
 		hr = GetListViewSelectionAttributes(pItemAttributes);
 	}
-	else if (hFocus == m_hTreeView)
+	else if (hFocus == m_shellTreeView->GetHWND())
 	{
 		hr = GetTreeViewSelectionAttributes(pItemAttributes);
 	}
@@ -166,7 +166,7 @@ HRESULT Explorerplusplus::GetListViewItemAttributes(
 HRESULT Explorerplusplus::GetTreeViewSelectionAttributes(SFGAOF *pItemAttributes) const
 {
 	HRESULT hr = E_FAIL;
-	auto hItem = TreeView_GetSelection(m_hTreeView);
+	auto hItem = TreeView_GetSelection(m_shellTreeView->GetHWND());
 
 	if (hItem != nullptr)
 	{
@@ -201,9 +201,9 @@ BOOL Explorerplusplus::CanPaste() const
 	{
 		return bDataAvailable && CanCreate();
 	}
-	else if (hFocus == m_hTreeView)
+	else if (hFocus == m_shellTreeView->GetHWND())
 	{
-		auto hItem = TreeView_GetSelection(m_hTreeView);
+		auto hItem = TreeView_GetSelection(m_shellTreeView->GetHWND());
 
 		if (hItem != nullptr)
 		{

@@ -9,6 +9,7 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/ViewModes.h"
+#include "ShellTreeView/ShellTreeView.h"
 #include "SortMenuBuilder.h"
 #include "TabContainer.h"
 #include "../Helper/MenuHelper.h"
@@ -59,9 +60,9 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_COPY, CanCopy());
 	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_CUT, CanCut());
 	MenuHelper::EnableItem(
-		hProgramMenu, IDM_EDIT_COPYTOFOLDER, CanCopy() && GetFocus() != m_hTreeView);
+		hProgramMenu, IDM_EDIT_COPYTOFOLDER, CanCopy() && GetFocus() != m_shellTreeView->GetHWND());
 	MenuHelper::EnableItem(
-		hProgramMenu, IDM_EDIT_MOVETOFOLDER, CanCut() && GetFocus() != m_hTreeView);
+		hProgramMenu, IDM_EDIT_MOVETOFOLDER, CanCut() && GetFocus() != m_shellTreeView->GetHWND());
 	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_WILDCARDDESELECT, anySelected);
 	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_SELECTNONE, anySelected);
 	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_RESOLVELINK, anySelected);

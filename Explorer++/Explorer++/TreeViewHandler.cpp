@@ -50,34 +50,12 @@ void Explorerplusplus::CreateFolderControls()
 	m_hHolder = CreateHolderWindow(m_hContainer, szTemp, uStyle);
 	SetWindowSubclass(m_hHolder, TreeViewHolderProcStub, 0, (DWORD_PTR) this);
 
-	m_hTreeView = CreateTreeView(m_hHolder,
-		WS_CHILD | WS_VISIBLE | TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_EDITLABELS | TVS_HASLINES
-			| TVS_TRACKSELECT);
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (DarkModeHelper::GetInstance().IsDarkModeEnabled())
-	{
-		darkModeHelper.AllowDarkModeForWindow(m_hTreeView, true);
-
-		TreeView_SetBkColor(m_hTreeView, TREE_VIEW_DARK_MODE_BACKGROUND_COLOR);
-		TreeView_SetTextColor(m_hTreeView, DarkModeHelper::TEXT_COLOR);
-
-		InvalidateRect(m_hTreeView, nullptr, TRUE);
-
-		HWND tooltips = TreeView_GetToolTips(m_hTreeView);
-		darkModeHelper.AllowDarkModeForWindow(tooltips, true);
-		SetWindowTheme(tooltips, L"Explorer", nullptr);
-	}
-
-	SetWindowTheme(m_hTreeView, L"Explorer", nullptr);
-
-	m_shellTreeView = new ShellTreeView(m_hTreeView, m_hHolder, m_pDirMon, &m_cachedIcons);
+	m_shellTreeView = new ShellTreeView(m_hHolder, m_pDirMon, &m_cachedIcons);
 
 	/* Now, subclass the treeview again. This is needed for messages
 	such as WM_MOUSEWHEEL, which need to be intercepted before they
 	reach the window procedure provided by ShellTreeView. */
-	SetWindowSubclass(m_hTreeView, TreeViewSubclassStub, 1, (DWORD_PTR) this);
+	SetWindowSubclass(m_shellTreeView->GetHWND(), TreeViewSubclassStub, 1, (DWORD_PTR) this);
 
 	m_foldersToolbarParent =
 		CreateWindow(WC_STATIC, EMPTY_STRING, WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS, 0, 0, 0, 0,
@@ -172,7 +150,7 @@ LRESULT CALLBACK Explorerplusplus::TreeViewSubclass(
 	{
 	case WM_SETFOCUS:
 		m_mainToolbar->UpdateToolbarButtonStates();
-		m_hLastActiveWindow = m_hTreeView;
+		m_hLastActiveWindow = m_shellTreeView->GetHWND();
 		break;
 
 	case WM_MBUTTONDOWN:
@@ -182,7 +160,7 @@ LRESULT CALLBACK Explorerplusplus::TreeViewSubclass(
 		tvhi.pt.x = LOWORD(lParam);
 		tvhi.pt.y = HIWORD(lParam);
 
-		TreeView_HitTest(m_hTreeView, &tvhi);
+		TreeView_HitTest(m_shellTreeView->GetHWND(), &tvhi);
 
 		if (tvhi.flags != LVHT_NOWHERE && tvhi.hItem != nullptr)
 		{
@@ -201,7 +179,7 @@ LRESULT CALLBACK Explorerplusplus::TreeViewSubclass(
 		tvhi.pt.x = LOWORD(lParam);
 		tvhi.pt.y = HIWORD(lParam);
 
-		TreeView_HitTest(m_hTreeView, &tvhi);
+		TreeView_HitTest(m_shellTreeView->GetHWND(), &tvhi);
 
 		if (tvhi.flags != LVHT_NOWHERE && tvhi.hItem != nullptr)
 		{
@@ -242,8 +220,8 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam, LPARAM lParam)
 
 	m_bTreeViewRightClick = true;
 
-	hPrevItem = TreeView_GetSelection(m_hTreeView);
-	TreeView_SelectItem(m_hTreeView, hItem);
+	hPrevItem = TreeView_GetSelection(m_shellTreeView->GetHWND());
+	TreeView_SelectItem(m_shellTreeView->GetHWND(), hItem);
 	auto pidl = m_shellTreeView->GetItemPidl(hItem);
 
 	hr = SHBindToParent(pidl.get(), IID_PPV_ARGS(&pShellParentFolder), &pidlRelative);
@@ -252,7 +230,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam, LPARAM lParam)
 	{
 		HTREEITEM hParent;
 
-		hParent = TreeView_GetParent(m_hTreeView, hItem);
+		hParent = TreeView_GetParent(m_shellTreeView->GetHWND(), hItem);
 
 		/* If we right-click on the "Desktop" item in the treeview, there is no parent.
 		   In such case, use "Desktop" as parent item as well, to allow the context menu
@@ -294,7 +272,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam, LPARAM lParam)
 	same). */
 	if (!m_bTreeViewOpenInNewTab)
 	{
-		TreeView_SelectItem(m_hTreeView, hPrevItem);
+		TreeView_SelectItem(m_shellTreeView->GetHWND(), hPrevItem);
 	}
 
 	m_bTreeViewRightClick = false;
@@ -302,7 +280,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam, LPARAM lParam)
 
 void Explorerplusplus::OnTreeViewCopyItemPath() const
 {
-	auto hItem = TreeView_GetSelection(m_hTreeView);
+	auto hItem = TreeView_GetSelection(m_shellTreeView->GetHWND());
 
 	if (hItem != nullptr)
 	{
@@ -324,7 +302,7 @@ void Explorerplusplus::OnTreeViewCopyUniversalPaths() const
 	DWORD dwBufferSize;
 	DWORD dwRet;
 
-	hItem = TreeView_GetSelection(m_hTreeView);
+	hItem = TreeView_GetSelection(m_shellTreeView->GetHWND());
 
 	if (hItem != nullptr)
 	{
@@ -356,7 +334,7 @@ void Explorerplusplus::OnTreeViewCopy(BOOL bCopy)
 	TVITEM tvItem;
 	HRESULT hr;
 
-	hItem = TreeView_GetSelection(m_hTreeView);
+	hItem = TreeView_GetSelection(m_shellTreeView->GetHWND());
 
 	if (hItem != nullptr)
 	{
@@ -387,7 +365,7 @@ void Explorerplusplus::OnTreeViewCopy(BOOL bCopy)
 				tvItem.hItem = hItem;
 				tvItem.state = TVIS_CUT;
 				tvItem.stateMask = TVIS_CUT;
-				TreeView_SetItem(m_hTreeView, &tvItem);
+				TreeView_SetItem(m_shellTreeView->GetHWND(), &tvItem);
 			}
 		}
 
@@ -411,7 +389,7 @@ void Explorerplusplus::OnTreeViewHolderWindowTimer()
 
 		if (m_config->treeViewAutoExpandSelected)
 		{
-			TreeView_Expand(m_hTreeView, g_newSelectionItem, TVE_EXPAND);
+			TreeView_Expand(m_shellTreeView->GetHWND(), g_newSelectionItem, TVE_EXPAND);
 		}
 	}
 
@@ -616,7 +594,7 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowNotifyHandler(
 
 		nmhdr = (NMHDR *) lParam;
 
-		if (nmhdr->hwndFrom == m_hTreeView)
+		if (nmhdr->hwndFrom == m_shellTreeView->GetHWND())
 		{
 			dwPos = GetMessagePos();
 			ptCursor.x = GET_X_LPARAM(dwPos);
@@ -624,9 +602,9 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowNotifyHandler(
 
 			tvht.pt = ptCursor;
 
-			ScreenToClient(m_hTreeView, &tvht.pt);
+			ScreenToClient(m_shellTreeView->GetHWND(), &tvht.pt);
 
-			TreeView_HitTest(m_hTreeView, &tvht);
+			TreeView_HitTest(m_shellTreeView->GetHWND(), &tvht);
 
 			if ((tvht.flags & TVHT_NOWHERE) == 0)
 			{
@@ -661,7 +639,7 @@ std::optional<LRESULT> Explorerplusplus::OnHolderCtlColorStatic(HWND hwnd, HDC h
 
 void Explorerplusplus::OnTreeViewSetFileAttributes() const
 {
-	auto hItem = TreeView_GetSelection(m_hTreeView);
+	auto hItem = TreeView_GetSelection(m_shellTreeView->GetHWND());
 
 	if (hItem == nullptr)
 	{
@@ -697,7 +675,7 @@ void Explorerplusplus::OnTreeViewPaste()
 	HTREEITEM hItem;
 	TCHAR szFullFileName[MAX_PATH + 1];
 
-	hItem = TreeView_GetSelection(m_hTreeView);
+	hItem = TreeView_GetSelection(m_shellTreeView->GetHWND());
 
 	if (hItem != nullptr)
 	{
@@ -717,7 +695,7 @@ void Explorerplusplus::OnTreeViewPaste()
 			/* Name must be double NULL terminated. */
 			szFullFileName[lstrlen(szFullFileName) + 1] = '\0';
 
-			pDropHandler->CopyClipboardData(pClipboardObject, m_hTreeView, szFullFileName, nullptr,
+			pDropHandler->CopyClipboardData(pClipboardObject, m_shellTreeView->GetHWND(), szFullFileName, nullptr,
 				!m_config->overwriteExistingFilesConfirmation);
 
 			pDropHandler->Release();
@@ -769,12 +747,12 @@ void Explorerplusplus::UpdateTreeViewSelection()
 			sent when the two are different.
 			Therefore, the only case to handle is when the treeview
 			selection is changed by browsing using the listview. */
-			if (TreeView_GetSelection(m_hTreeView) != hItem)
+			if (TreeView_GetSelection(m_shellTreeView->GetHWND()) != hItem)
 			{
 				m_bSelectingTreeViewDirectory = true;
 			}
 
-			SendMessage(m_hTreeView, TVM_SELECTITEM, (WPARAM) TVGN_CARET, (LPARAM) hItem);
+			SendMessage(m_shellTreeView->GetHWND(), TVM_SELECTITEM, (WPARAM) TVGN_CARET, (LPARAM) hItem);
 		}
 	}
 }

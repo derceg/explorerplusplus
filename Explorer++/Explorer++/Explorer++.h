@@ -120,9 +120,6 @@ private:
 	// shared between various components in the application.
 	static const int MAX_CACHED_ICONS = 1000;
 
-	// This is the same background color as used in the Explorer treeview.
-	static inline constexpr COLORREF TREE_VIEW_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
-
 	static inline constexpr COLORREF TAB_BAR_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
 
 	static inline const int CLOSE_TOOLBAR_WIDTH = 24;
@@ -518,7 +515,6 @@ private:
 	HWND m_hMainRebar;
 	HWND m_hDisplayWindow;
 	HWND m_hTabWindowToolbar;
-	HWND m_hTreeView;
 	HWND m_hHolder;
 	HWND m_foldersToolbarParent;
 	HWND m_hFoldersToolbar;

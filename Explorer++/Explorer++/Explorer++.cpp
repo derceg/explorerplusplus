@@ -60,7 +60,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd) :
 	m_hTabBacking = nullptr;
 	m_hTabWindowToolbar = nullptr;
 	m_hDisplayWindow = nullptr;
-	m_hTreeView = nullptr;
 	m_foldersToolbarParent = nullptr;
 	m_hFoldersToolbar = nullptr;
 	m_hLastActiveWindow = nullptr;
