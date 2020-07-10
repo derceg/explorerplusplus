@@ -17,6 +17,7 @@
 #include "stdafx.h"
 #include "ShellTreeView.h"
 #include "DarkModeHelper.h"
+#include "TabContainer.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DriveInfo.h"
@@ -29,9 +30,11 @@
 int CALLBACK		CompareItemsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
 DWORD WINAPI		Thread_MonitorAllDrives(LPVOID pParam);
 
-ShellTreeView::ShellTreeView(HWND hParent, IDirectoryMonitor *pDirMon, CachedIcons *cachedIcons) :
+ShellTreeView::ShellTreeView(HWND hParent, IDirectoryMonitor *pDirMon, TabContainer *tabContainer,
+	CachedIcons *cachedIcons) :
 	m_hTreeView(CreateTreeView(hParent)),
 	m_pDirMon(pDirMon),
+	m_tabContainer(tabContainer),
 	m_cachedIcons(cachedIcons),
 	m_iRefCount(1),
 	m_itemIDCounter(0),
@@ -146,6 +149,22 @@ LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam,
 			m_bDragCancelled = FALSE;
 			m_bDragAllowed = FALSE;
 			break;
+
+		case WM_MBUTTONDOWN:
+		{
+			POINT pt;
+			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+			OnMiddleButtonDown(&pt);
+		}
+		break;
+
+		case WM_MBUTTONUP:
+		{
+			POINT pt;
+			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+			OnMiddleButtonUp(&pt);
+		}
+		break;
 
 		case WM_MOUSEMOVE:
 			{
@@ -1475,6 +1494,46 @@ void ShellTreeView::MonitorDrive(const TCHAR *szDrive)
 			}
 		}
 	}
+}
+
+void ShellTreeView::OnMiddleButtonDown(const POINT *pt)
+{
+	TVHITTESTINFO hitTestInfo;
+	hitTestInfo.pt = *pt;
+
+	TreeView_HitTest(m_hTreeView, &hitTestInfo);
+
+	if (hitTestInfo.flags != LVHT_NOWHERE)
+	{
+		m_middleButtonItem = hitTestInfo.hItem;
+	}
+	else
+	{
+		m_middleButtonItem = nullptr;
+	}
+}
+
+void ShellTreeView::OnMiddleButtonUp(const POINT *pt)
+{
+	TVHITTESTINFO hitTestInfo;
+	hitTestInfo.pt = *pt;
+
+	TreeView_HitTest(m_hTreeView, &hitTestInfo);
+
+	if (hitTestInfo.flags == LVHT_NOWHERE)
+	{
+		return;
+	}
+
+	// Only open an item if it was the one on which the middle mouse button was initially clicked
+	// on.
+	if (hitTestInfo.hItem != m_middleButtonItem)
+	{
+		return;
+	}
+
+	auto pidl = GetItemPidl(hitTestInfo.hItem);
+	m_tabContainer->CreateNewTab(pidl.get());
 }
 
 HRESULT ShellTreeView::InitializeDragDropHelpers()

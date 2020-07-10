@@ -12,6 +12,7 @@
 #include <optional>
 
 class CachedIcons;
+class TabContainer;
 
 class ShellTreeView : public IDropTarget, public IDropSource
 {
@@ -22,7 +23,8 @@ public:
 	ULONG __stdcall		AddRef() override;
 	ULONG __stdcall		Release() override;
 
-	ShellTreeView(HWND hParent, IDirectoryMonitor *pDirMon, CachedIcons *cachedIcons);
+	ShellTreeView(HWND hParent, IDirectoryMonitor *pDirMon, TabContainer *tabContainer,
+		CachedIcons *cachedIcons);
 	~ShellTreeView();
 
 	/* Drop source functions. */
@@ -150,6 +152,8 @@ private:
 	HTREEITEM	LocateDeletedItem(const TCHAR *szFullFileName);
 	HTREEITEM	LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand);
 	HTREEITEM	LocateItemOnDesktopTree(const TCHAR *szFullFileName);
+	void		OnMiddleButtonDown(const POINT *pt);
+	void		OnMiddleButtonUp(const POINT *pt);
 
 	static void	DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData);
 
@@ -198,6 +202,7 @@ private:
 	IDirectoryMonitor	*m_pDirMon;
 	BOOL				m_bShowHidden;
 	std::vector<std::unique_ptr<WindowSubclassWrapper>>	m_windowSubclasses;
+	TabContainer		*m_tabContainer;
 
 	ctpl::thread_pool	m_iconThreadPool;
 	std::unordered_map<int, std::future<std::optional<IconResult>>>	m_iconResults;
@@ -213,6 +218,8 @@ private:
 	CachedIcons			*m_cachedIcons;
 
 	int					m_iFolderIcon;
+
+	HTREEITEM			m_middleButtonItem;
 
 	/* Drag and drop. */
 	BOOL				m_bDragDropRegistered;

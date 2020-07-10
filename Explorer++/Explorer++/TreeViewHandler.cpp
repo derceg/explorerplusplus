@@ -50,7 +50,7 @@ void Explorerplusplus::CreateFolderControls()
 	m_hHolder = CreateHolderWindow(m_hContainer, szTemp, uStyle);
 	SetWindowSubclass(m_hHolder, TreeViewHolderProcStub, 0, (DWORD_PTR) this);
 
-	m_shellTreeView = new ShellTreeView(m_hHolder, m_pDirMon, &m_cachedIcons);
+	m_shellTreeView = new ShellTreeView(m_hHolder, m_pDirMon, m_tabContainer, &m_cachedIcons);
 
 	/* Now, subclass the treeview again. This is needed for messages
 	such as WM_MOUSEWHEEL, which need to be intercepted before they
@@ -152,48 +152,6 @@ LRESULT CALLBACK Explorerplusplus::TreeViewSubclass(
 		m_mainToolbar->UpdateToolbarButtonStates();
 		m_hLastActiveWindow = m_shellTreeView->GetHWND();
 		break;
-
-	case WM_MBUTTONDOWN:
-	{
-		TVHITTESTINFO tvhi;
-
-		tvhi.pt.x = LOWORD(lParam);
-		tvhi.pt.y = HIWORD(lParam);
-
-		TreeView_HitTest(m_shellTreeView->GetHWND(), &tvhi);
-
-		if (tvhi.flags != LVHT_NOWHERE && tvhi.hItem != nullptr)
-		{
-			m_hTVMButtonItem = tvhi.hItem;
-		}
-		else
-		{
-			m_hTVMButtonItem = nullptr;
-		}
-	}
-	break;
-
-	case WM_MBUTTONUP:
-	{
-		TVHITTESTINFO tvhi;
-		tvhi.pt.x = LOWORD(lParam);
-		tvhi.pt.y = HIWORD(lParam);
-
-		TreeView_HitTest(m_shellTreeView->GetHWND(), &tvhi);
-
-		if (tvhi.flags != LVHT_NOWHERE && tvhi.hItem != nullptr)
-		{
-			/* Only open an item if it was the one
-			on which the middle mouse button was
-			initially clicked on. */
-			if (tvhi.hItem == m_hTVMButtonItem)
-			{
-				auto pidl = m_shellTreeView->GetItemPidl(tvhi.hItem);
-				m_tabContainer->CreateNewTab(pidl.get());
-			}
-		}
-	}
-	break;
 
 	case WM_MOUSEWHEEL:
 		if (OnMouseWheel(MousewheelSource::TreeView, wParam, lParam))

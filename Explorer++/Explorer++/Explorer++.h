@@ -647,8 +647,5 @@ private:
 	/* Mousewheel. */
 	int m_zDeltaTotal;
 
-	/* TreeView middle click. */
-	HTREEITEM m_hTVMButtonItem;
-
 	bool m_blockNextListViewSelection;
 };
