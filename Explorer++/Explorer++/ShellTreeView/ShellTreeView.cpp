@@ -1826,8 +1826,9 @@ void ShellTreeView::DeleteSelectedItem(bool permanent)
 
 bool ShellTreeView::OnEndLabelEdit(const NMTVDISPINFO *dispInfo)
 {
-	// If label editing was canceled, simply notify the control to revert to the previous text.
-	if (!dispInfo->item.pszText)
+	// If label editing was canceled or no text was entered, simply notify the control to revert to
+	// the previous text.
+	if (!dispInfo->item.pszText || lstrlen(dispInfo->item.pszText) == 0)
 	{
 		return false;
 	}
