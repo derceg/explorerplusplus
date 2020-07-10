@@ -18,6 +18,7 @@
 #include "ShellTreeView.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/DriveInfo.h"
+#include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/com.h>
@@ -210,6 +211,10 @@ LRESULT CALLBACK ShellTreeView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wPara
 
 			case TVN_ITEMEXPANDING:
 				OnItemExpanding(reinterpret_cast<NMTREEVIEW *>(lParam));
+				break;
+
+			case TVN_KEYDOWN:
+				OnKeyDown(reinterpret_cast<NMTVKEYDOWN *>(lParam));
 				break;
 			}
 		}
@@ -522,6 +527,23 @@ void ShellTreeView::OnItemExpanding(const NMTREEVIEW *nmtv)
 
 		SendMessage(m_hTreeView, TVM_EXPAND, TVE_COLLAPSE | TVE_COLLAPSERESET,
 			reinterpret_cast<LPARAM>(parentItem));
+	}
+}
+
+void ShellTreeView::OnKeyDown(const NMTVKEYDOWN *keyDown)
+{
+	switch (keyDown->wVKey)
+	{
+	case VK_DELETE:
+		if (IsKeyDown(VK_SHIFT))
+		{
+			DeleteSelectedItem(true);
+		}
+		else
+		{
+			DeleteSelectedItem(false);
+		}
+		break;
 	}
 }
 
@@ -1662,4 +1684,24 @@ void ShellTreeView::ShowPropertiesOfSelectedItem() const
 {
 	auto pidlDirectory = GetSelectedItemPidl();
 	ShowMultipleFileProperties(pidlDirectory.get(), nullptr, m_hTreeView, 0);
+}
+
+void ShellTreeView::DeleteSelectedItem(bool permanent)
+{
+	HTREEITEM item = TreeView_GetSelection(m_hTreeView);
+	HTREEITEM parentItem = TreeView_GetParent(m_hTreeView, item);
+
+	// Select the parent item to release the lock and allow deletion.
+	TreeView_Select(m_hTreeView, parentItem, TVGN_CARET);
+
+	auto pidl = GetItemPidl(item);
+
+	DWORD mask = 0;
+
+	if (permanent)
+	{
+		mask = CMIC_MASK_SHIFT_DOWN;
+	}
+
+	ExecuteActionFromContextMenu(pidl.get(), nullptr, m_hTreeView, 0, _T("delete"), mask);
 }

@@ -262,7 +262,6 @@ private:
 	void OnListViewPaste();
 
 	/* TreeView private message handlers. */
-	void OnTreeViewFileDelete(BOOL bPermanent);
 	void OnTreeViewRightClick(WPARAM wParam, LPARAM lParam);
 	void OnTreeViewSelChanged(LPARAM lParam);
 	int OnTreeViewBeginLabelEdit(LPARAM lParam);

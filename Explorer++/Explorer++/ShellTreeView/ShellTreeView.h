@@ -49,6 +49,7 @@ public:
 
 	void				StartRenamingSelectedItem();
 	void				ShowPropertiesOfSelectedItem() const;
+	void				DeleteSelectedItem(bool permanent);
 
 private:
 
@@ -137,6 +138,7 @@ private:
 	LRESULT CALLBACK	OnDeviceChange(WPARAM wParam,LPARAM lParam);
 	void		OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi);
 	void		OnItemExpanding(const NMTREEVIEW *nmtv);
+	void		OnKeyDown(const NMTVKEYDOWN *keyDown);
 	void		UpdateChildren(HTREEITEM hParent, PCIDLIST_ABSOLUTE pidlParent);
 	PCIDLIST_ABSOLUTE UpdateItemInfo(PCIDLIST_ABSOLUTE pidlParent, int iItemId);
 	HTREEITEM	LocateDeletedItem(const TCHAR *szFullFileName);

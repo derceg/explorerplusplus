@@ -97,7 +97,7 @@ void Explorerplusplus::OnFileDelete(bool permanent)
 	}
 	else if (hFocus == m_hTreeView)
 	{
-		OnTreeViewFileDelete(permanent);
+		m_shellTreeView->DeleteSelectedItem(permanent);
 	}
 }
 

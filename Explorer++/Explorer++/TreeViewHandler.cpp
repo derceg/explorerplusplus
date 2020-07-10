@@ -228,32 +228,6 @@ LRESULT CALLBACK Explorerplusplus::TreeViewSubclass(
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-void Explorerplusplus::OnTreeViewFileDelete(BOOL bPermanent)
-{
-	HTREEITEM hItem, hParentItem;
-	DWORD fMask = 0;
-	HRESULT hr;
-
-	hItem = TreeView_GetSelection(m_hTreeView);
-	hParentItem = TreeView_GetParent(m_hTreeView, hItem);
-
-	// Select the parent item to release the lock and allow deletion
-	TreeView_Select(m_hTreeView, hParentItem, TVGN_CARET);
-
-	if (hItem != nullptr)
-	{
-		auto pidl = m_shellTreeView->GetItemPidl(hItem);
-
-		if (bPermanent)
-		{
-			fMask = CMIC_MASK_SHIFT_DOWN;
-		}
-
-		hr =
-			ExecuteActionFromContextMenu(pidl.get(), nullptr, m_hContainer, 0, _T("delete"), fMask);
-	}
-}
-
 void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam, LPARAM lParam)
 {
 	POINT *ppt = nullptr;
@@ -542,17 +516,6 @@ LRESULT Explorerplusplus::OnTreeViewKeyDown(LPARAM lParam)
 
 	switch (nmtvkd->wVKey)
 	{
-	case VK_DELETE:
-		if (IsKeyDown(VK_SHIFT))
-		{
-			OnTreeViewFileDelete(TRUE);
-		}
-		else
-		{
-			OnTreeViewFileDelete(FALSE);
-		}
-		break;
-
 	case 'C':
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
