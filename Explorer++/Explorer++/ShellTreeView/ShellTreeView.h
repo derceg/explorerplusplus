@@ -12,6 +12,7 @@
 #include <optional>
 
 class CachedIcons;
+class FileActionHandler;
 class TabContainer;
 
 class ShellTreeView : public IDropTarget, public IDropSource
@@ -24,7 +25,7 @@ public:
 	ULONG __stdcall		Release() override;
 
 	ShellTreeView(HWND hParent, IDirectoryMonitor *pDirMon, TabContainer *tabContainer,
-		CachedIcons *cachedIcons);
+		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons);
 	~ShellTreeView();
 
 	/* Drop source functions. */
@@ -154,6 +155,7 @@ private:
 	HTREEITEM	LocateItemOnDesktopTree(const TCHAR *szFullFileName);
 	void		OnMiddleButtonDown(const POINT *pt);
 	void		OnMiddleButtonUp(const POINT *pt);
+	bool		OnEndLabelEdit(const NMTVDISPINFO *dispInfo);
 
 	static void	DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData);
 
@@ -177,6 +179,10 @@ private:
 
 	/* Item id's. */
 	int			GenerateUniqueItemId();
+
+	const ItemInfo_t	&GetItemByHandle(HTREEITEM item) const;
+	ItemInfo_t	&GetItemByHandle(HTREEITEM item);
+	int			GetItemInternalIndex(HTREEITEM item) const;
 
 	/* Drag and drop. */
 	HRESULT		InitializeDragDropHelpers();
@@ -203,6 +209,7 @@ private:
 	BOOL				m_bShowHidden;
 	std::vector<std::unique_ptr<WindowSubclassWrapper>>	m_windowSubclasses;
 	TabContainer		*m_tabContainer;
+	FileActionHandler	*m_FileActionHandler;
 
 	ctpl::thread_pool	m_iconThreadPool;
 	std::unordered_map<int, std::future<std::optional<IconResult>>>	m_iconResults;

@@ -21,6 +21,7 @@
 #include "../Helper/CachedIcons.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DriveInfo.h"
+#include "../Helper/FileActionHandler.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
@@ -31,10 +32,11 @@ int CALLBACK		CompareItemsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
 DWORD WINAPI		Thread_MonitorAllDrives(LPVOID pParam);
 
 ShellTreeView::ShellTreeView(HWND hParent, IDirectoryMonitor *pDirMon, TabContainer *tabContainer,
-	CachedIcons *cachedIcons) :
+	FileActionHandler *fileActionHandler, CachedIcons *cachedIcons) :
 	m_hTreeView(CreateTreeView(hParent)),
 	m_pDirMon(pDirMon),
 	m_tabContainer(tabContainer),
+	m_FileActionHandler(fileActionHandler),
 	m_cachedIcons(cachedIcons),
 	m_iRefCount(1),
 	m_itemIDCounter(0),
@@ -266,6 +268,14 @@ LRESULT CALLBACK ShellTreeView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wPara
 
 			case TVN_KEYDOWN:
 				OnKeyDown(reinterpret_cast<NMTVKEYDOWN *>(lParam));
+				break;
+
+			case TVN_ENDLABELEDIT:
+				/* TODO: Should return the value from this function. Can't do it
+				at the moment, since the treeview looks items up by their label
+				when a directory modification event is received (meaning that if
+				the label changes, the lookup for the old file name will fail). */
+				OnEndLabelEdit(reinterpret_cast<NMTVDISPINFO *>(lParam));
 				break;
 			}
 		}
@@ -858,15 +868,32 @@ unique_pidl_absolute ShellTreeView::GetSelectedItemPidl() const
 
 unique_pidl_absolute ShellTreeView::GetItemPidl(HTREEITEM hTreeItem) const
 {
+	const ItemInfo_t &itemInfo = GetItemByHandle(hTreeItem);
+	unique_pidl_absolute pidl(ILCloneFull(itemInfo.pidl.get()));
+	return pidl;
+}
+
+const ShellTreeView::ItemInfo_t &ShellTreeView::GetItemByHandle(HTREEITEM item) const
+{
+	int internalIndex = GetItemInternalIndex(item);
+	return m_itemInfoMap.at(internalIndex);
+}
+
+ShellTreeView::ItemInfo_t &ShellTreeView::GetItemByHandle(HTREEITEM item)
+{
+	int internalIndex = GetItemInternalIndex(item);
+	return m_itemInfoMap.at(internalIndex);
+}
+
+int ShellTreeView::GetItemInternalIndex(HTREEITEM item) const
+{
 	TVITEMEX tvItemEx;
 	tvItemEx.mask = TVIF_HANDLE | TVIF_PARAM;
-	tvItemEx.hItem = hTreeItem;
-	TreeView_GetItem(m_hTreeView, &tvItemEx);
+	tvItemEx.hItem = item;
+	bool res = TreeView_GetItem(m_hTreeView, &tvItemEx);
+	assert(res);
 
-	const ItemInfo_t &itemInfo = m_itemInfoMap.at(static_cast<int>(tvItemEx.lParam));
-	unique_pidl_absolute pidl(ILCloneFull(itemInfo.pidl.get()));
-
-	return pidl;
+	return static_cast<int>(tvItemEx.lParam);
 }
 
 HTREEITEM ShellTreeView::LocateItem(PCIDLIST_ABSOLUTE pidlDirectory)
@@ -1795,4 +1822,46 @@ void ShellTreeView::DeleteSelectedItem(bool permanent)
 	}
 
 	ExecuteActionFromContextMenu(pidl.get(), nullptr, m_hTreeView, 0, _T("delete"), mask);
+}
+
+bool ShellTreeView::OnEndLabelEdit(const NMTVDISPINFO *dispInfo)
+{
+	// If label editing was canceled, simply notify the control to revert to the previous text.
+	if (!dispInfo->item.pszText)
+	{
+		return false;
+	}
+
+	const auto &itemInfo = GetItemByHandle(dispInfo->item.hItem);
+
+	TCHAR oldFileName[MAX_PATH];
+	HRESULT hr = GetDisplayName(
+		itemInfo.pidl.get(), oldFileName, SIZEOF_ARRAY(oldFileName), SHGDN_FORPARSING);
+
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	TCHAR newFileName[MAX_PATH];
+	StringCchCopy(newFileName, SIZEOF_ARRAY(newFileName), oldFileName);
+	PathRemoveFileSpec(newFileName);
+	bool res = PathAppend(newFileName, dispInfo->item.pszText);
+
+	if (!res)
+	{
+		return false;
+	}
+
+	FileActionHandler::RenamedItem_t renamedItem;
+	renamedItem.strOldFilename = oldFileName;
+	renamedItem.strNewFilename = newFileName;
+
+	TrimStringRight(renamedItem.strNewFilename, _T(" "));
+
+	std::list<FileActionHandler::RenamedItem_t> renamedItemList;
+	renamedItemList.push_back(renamedItem);
+	m_FileActionHandler->RenameFiles(renamedItemList);
+
+	return true;
 }

@@ -50,7 +50,8 @@ void Explorerplusplus::CreateFolderControls()
 	m_hHolder = CreateHolderWindow(m_hContainer, szTemp, uStyle);
 	SetWindowSubclass(m_hHolder, TreeViewHolderProcStub, 0, (DWORD_PTR) this);
 
-	m_shellTreeView = new ShellTreeView(m_hHolder, m_pDirMon, m_tabContainer, &m_cachedIcons);
+	m_shellTreeView = new ShellTreeView(
+		m_hHolder, m_pDirMon, m_tabContainer, &m_FileActionHandler, &m_cachedIcons);
 
 	/* Now, subclass the treeview again. This is needed for messages
 	such as WM_MOUSEWHEEL, which need to be intercepted before they
@@ -391,59 +392,6 @@ void Explorerplusplus::OnTreeViewSelChanged(LPARAM lParam)
 	}
 }
 
-int Explorerplusplus::OnTreeViewBeginLabelEdit(LPARAM lParam)
-{
-	auto *pdi = reinterpret_cast<NMTVDISPINFO *>(lParam);
-
-	auto pidl = m_shellTreeView->GetItemPidl(pdi->item.hItem);
-
-	/* Save the old filename, in the case that the file
-	needs to be renamed. */
-	GetDisplayName(
-		pidl.get(), m_OldTreeViewFileName, SIZEOF_ARRAY(m_OldTreeViewFileName), SHGDN_FORPARSING);
-
-	return FALSE;
-}
-
-int Explorerplusplus::OnTreeViewEndLabelEdit(LPARAM lParam)
-{
-	NMTVDISPINFO *pdi = nullptr;
-	TCHAR newFileName[MAX_PATH];
-
-	pdi = (NMTVDISPINFO *) lParam;
-
-	/* No text was entered, so simply notify
-	the control to revert to the previous text. */
-	if (pdi->item.pszText == nullptr)
-	{
-		return FALSE;
-	}
-
-	/* Build the new filename from the text entered
-	and the parent directory component of the old
-	filename. */
-	StringCchCopy(newFileName, SIZEOF_ARRAY(newFileName), m_OldTreeViewFileName);
-	PathRemoveFileSpec(newFileName);
-	BOOL bRes = PathAppend(newFileName, pdi->item.pszText);
-
-	if (!bRes)
-	{
-		return FALSE;
-	}
-
-	FileActionHandler::RenamedItem_t renamedItem;
-	renamedItem.strOldFilename = m_OldTreeViewFileName;
-	renamedItem.strNewFilename = newFileName;
-
-	TrimStringRight(renamedItem.strNewFilename, _T(" "));
-
-	std::list<FileActionHandler::RenamedItem_t> renamedItemList;
-	renamedItemList.push_back(renamedItem);
-	m_FileActionHandler.RenameFiles(renamedItemList);
-
-	return TRUE;
-}
-
 LRESULT Explorerplusplus::OnTreeViewKeyDown(LPARAM lParam)
 {
 	NMTVKEYDOWN *nmtvkd = nullptr;
@@ -526,18 +474,6 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowNotifyHandler(
 	{
 	case TVN_SELCHANGED:
 		OnTreeViewSelChanged(lParam);
-		break;
-
-	case TVN_BEGINLABELEDIT:
-		OnTreeViewBeginLabelEdit(lParam);
-		break;
-
-	case TVN_ENDLABELEDIT:
-		/* TODO: Should return the value from this function. Can't do it
-		at the moment, since the treeview looks items up by their label
-		when a directory modification event is received (meaning that if
-		the label changes, the lookup for the old file name will fail). */
-		OnTreeViewEndLabelEdit(lParam);
 		break;
 
 	case TVN_KEYDOWN:
