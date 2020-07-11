@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "ShellTreeView.h"
 
-HRESULT _stdcall ShellTreeView::QueryContinueDrag(BOOL fEscapePressed,DWORD grfKeyState)
+HRESULT _stdcall ShellTreeView::QueryContinueDrag(BOOL fEscapePressed, DWORD grfKeyState)
 {
 	DWORD dwStopButton = 0;
 
