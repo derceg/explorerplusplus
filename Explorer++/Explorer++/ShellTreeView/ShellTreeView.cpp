@@ -16,6 +16,7 @@
 
 #include "stdafx.h"
 #include "ShellTreeView.h"
+#include "Config.h"
 #include "DarkModeHelper.h"
 #include "TabContainer.h"
 #include "../Helper/CachedIcons.h"
@@ -31,9 +32,10 @@
 int CALLBACK		CompareItemsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
 DWORD WINAPI		Thread_MonitorAllDrives(LPVOID pParam);
 
-ShellTreeView::ShellTreeView(HWND hParent, IDirectoryMonitor *pDirMon, TabContainer *tabContainer,
-	FileActionHandler *fileActionHandler, CachedIcons *cachedIcons) :
+ShellTreeView::ShellTreeView(HWND hParent, const Config *config, IDirectoryMonitor *pDirMon,
+	TabContainer *tabContainer, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons) :
 	m_hTreeView(CreateTreeView(hParent)),
+	m_config(config),
 	m_pDirMon(pDirMon),
 	m_tabContainer(tabContainer),
 	m_FileActionHandler(fileActionHandler),
@@ -595,6 +597,13 @@ void ShellTreeView::OnKeyDown(const NMTVKEYDOWN *keyDown)
 {
 	switch (keyDown->wVKey)
 	{
+	case 'V':
+		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
+		{
+			PasteClipboardData();
+		}
+		break;
+
 	case VK_DELETE:
 		if (IsKeyDown(VK_SHIFT))
 		{
@@ -1865,4 +1874,34 @@ bool ShellTreeView::OnEndLabelEdit(const NMTVDISPINFO *dispInfo)
 	m_FileActionHandler->RenameFiles(renamedItemList);
 
 	return true;
+}
+
+void ShellTreeView::PasteClipboardData()
+{
+	wil::com_ptr<IDataObject> clipboardObject;
+	HRESULT hr = OleGetClipboard(&clipboardObject);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	auto &selectedItem = GetItemByHandle(TreeView_GetSelection(m_hTreeView));
+
+	TCHAR destinationPath[MAX_PATH + 1];
+	hr = GetDisplayName(selectedItem.pidl.get(), destinationPath, SIZEOF_ARRAY(destinationPath) - 1,
+		SHGDN_FORPARSING);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	// Name must be double NULL terminated.
+	destinationPath[lstrlen(destinationPath) + 1] = '\0';
+
+	DropHandler *dropHandler = DropHandler::CreateNew();
+	dropHandler->CopyClipboardData(clipboardObject.get(), m_hTreeView, destinationPath, nullptr,
+		!m_config->overwriteExistingFilesConfirmation);
+	dropHandler->Release();
 }

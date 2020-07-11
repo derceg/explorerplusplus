@@ -161,7 +161,7 @@ void Explorerplusplus::OnPaste()
 	}
 	else if (hFocus == m_shellTreeView->GetHWND())
 	{
-		OnTreeViewPaste();
+		m_shellTreeView->PasteClipboardData();
 	}
 }
 

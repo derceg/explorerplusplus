@@ -266,7 +266,6 @@ private:
 	void OnTreeViewCopy(BOOL bCopy);
 	void OnTreeViewSetFileAttributes() const;
 	void OnTreeViewCopyUniversalPaths() const;
-	void OnTreeViewPaste();
 
 	/* Holder window private message handlers. */
 	std::optional<LRESULT> OnHolderCtlColorStatic(HWND hwnd, HDC hdc);

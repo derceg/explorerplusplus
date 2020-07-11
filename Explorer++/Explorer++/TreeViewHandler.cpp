@@ -51,7 +51,7 @@ void Explorerplusplus::CreateFolderControls()
 	SetWindowSubclass(m_hHolder, TreeViewHolderProcStub, 0, (DWORD_PTR) this);
 
 	m_shellTreeView = new ShellTreeView(
-		m_hHolder, m_pDirMon, m_tabContainer, &m_FileActionHandler, &m_cachedIcons);
+		m_hHolder, m_config.get(), m_pDirMon, m_tabContainer, &m_FileActionHandler, &m_cachedIcons);
 
 	/* Now, subclass the treeview again. This is needed for messages
 	such as WM_MOUSEWHEEL, which need to be intercepted before they
@@ -407,13 +407,6 @@ LRESULT Explorerplusplus::OnTreeViewKeyDown(LPARAM lParam)
 		}
 		break;
 
-	case 'V':
-		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
-		{
-			OnTreeViewPaste();
-		}
-		break;
-
 	case 'X':
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
@@ -560,40 +553,6 @@ void Explorerplusplus::OnTreeViewSetFileAttributes() const
 			SetFileAttributesDialog setFileAttributesDialog(
 				m_hLanguageModule, m_hContainer, sfaiList);
 			setFileAttributesDialog.ShowModalDialog();
-		}
-	}
-}
-
-void Explorerplusplus::OnTreeViewPaste()
-{
-	HTREEITEM hItem;
-	TCHAR szFullFileName[MAX_PATH + 1];
-
-	hItem = TreeView_GetSelection(m_shellTreeView->GetHWND());
-
-	if (hItem != nullptr)
-	{
-		IDataObject *pClipboardObject = nullptr;
-
-		HRESULT hr = OleGetClipboard(&pClipboardObject);
-
-		if (hr == S_OK)
-		{
-			DropHandler *pDropHandler = DropHandler::CreateNew();
-
-			auto pidl = m_shellTreeView->GetItemPidl(hItem);
-
-			GetDisplayName(
-				pidl.get(), szFullFileName, SIZEOF_ARRAY(szFullFileName), SHGDN_FORPARSING);
-
-			/* Name must be double NULL terminated. */
-			szFullFileName[lstrlen(szFullFileName) + 1] = '\0';
-
-			pDropHandler->CopyClipboardData(pClipboardObject, m_shellTreeView->GetHWND(), szFullFileName, nullptr,
-				!m_config->overwriteExistingFilesConfirmation);
-
-			pDropHandler->Release();
-			pClipboardObject->Release();
 		}
 	}
 }

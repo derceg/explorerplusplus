@@ -12,6 +12,7 @@
 #include <optional>
 
 class CachedIcons;
+struct Config;
 class FileActionHandler;
 class TabContainer;
 
@@ -24,8 +25,8 @@ public:
 	ULONG __stdcall		AddRef() override;
 	ULONG __stdcall		Release() override;
 
-	ShellTreeView(HWND hParent, IDirectoryMonitor *pDirMon, TabContainer *tabContainer,
-		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons);
+	ShellTreeView(HWND hParent, const Config *config, IDirectoryMonitor *pDirMon,
+		TabContainer *tabContainer, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons);
 	~ShellTreeView();
 
 	/* Drop source functions. */
@@ -54,6 +55,7 @@ public:
 	void				StartRenamingSelectedItem();
 	void				ShowPropertiesOfSelectedItem() const;
 	void				DeleteSelectedItem(bool permanent);
+	void				PasteClipboardData();
 
 private:
 
@@ -208,6 +210,7 @@ private:
 	IDirectoryMonitor	*m_pDirMon;
 	BOOL				m_bShowHidden;
 	std::vector<std::unique_ptr<WindowSubclassWrapper>>	m_windowSubclasses;
+	const Config		*m_config;
 	TabContainer		*m_tabContainer;
 	FileActionHandler	*m_FileActionHandler;
 
