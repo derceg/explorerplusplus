@@ -261,9 +261,7 @@ private:
 	/* TreeView private message handlers. */
 	void OnTreeViewRightClick(WPARAM wParam, LPARAM lParam);
 	void OnTreeViewSelChanged(LPARAM lParam);
-	LRESULT OnTreeViewKeyDown(LPARAM lParam);
 	void OnTreeViewCopyItemPath() const;
-	void OnTreeViewCopy(BOOL bCopy);
 	void OnTreeViewSetFileAttributes() const;
 	void OnTreeViewCopyUniversalPaths() const;
 
@@ -623,7 +621,6 @@ private:
 
 	/* Copy/cut. */
 	IDataObject *m_pClipboardDataObject;
-	HTREEITEM m_hCutTreeViewItem;
 
 	/* Drag and drop. */
 	bool m_bDragging;

@@ -112,7 +112,7 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		}
 		else if (pfcmi->uFrom == FROM_TREEVIEW)
 		{
-			OnTreeViewCopy(TRUE);
+			m_shellTreeView->CopySelectedItemToClipboard(true);
 		}
 
 		return TRUE;
@@ -125,7 +125,7 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		}
 		else if (pfcmi->uFrom == FROM_TREEVIEW)
 		{
-			OnTreeViewCopy(FALSE);
+			m_shellTreeView->CopySelectedItemToClipboard(false);
 		}
 
 		return TRUE;

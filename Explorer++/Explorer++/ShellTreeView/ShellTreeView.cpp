@@ -23,10 +23,10 @@
 #include "../Helper/Controls.h"
 #include "../Helper/DriveInfo.h"
 #include "../Helper/FileActionHandler.h"
+#include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
-#include <wil/com.h>
 #include <wil/common.h>
 
 int CALLBACK CompareItemsStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
@@ -48,7 +48,9 @@ ShellTreeView::ShellTreeView(HWND hParent, const Config *config, IDirectoryMonit
 	m_iconResultIDCounter(0),
 	m_subfoldersThreadPool(
 		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
-	m_subfoldersResultIDCounter(0)
+	m_subfoldersResultIDCounter(0),
+	m_cutItem(nullptr),
+	m_cutItemDataObject(nullptr)
 {
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
 
@@ -89,6 +91,8 @@ ShellTreeView::ShellTreeView(HWND hParent, const Config *config, IDirectoryMonit
 	m_bQueryRemoveCompleted = FALSE;
 	HANDLE hThread = CreateThread(nullptr, 0, Thread_MonitorAllDrives, this, 0, nullptr);
 	CloseHandle(hThread);
+
+	AddClipboardFormatListener(m_hTreeView);
 }
 
 HWND ShellTreeView::CreateTreeView(HWND parent)
@@ -216,6 +220,10 @@ LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam,
 	}
 	break;
 
+	case WM_CLIPBOARDUPDATE:
+		OnClipboardUpdate();
+		return 0;
+
 	case WM_APP_ICON_RESULT_READY:
 		ProcessIconResult(static_cast<int>(wParam));
 		break;
@@ -230,6 +238,8 @@ LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam,
 			RevokeDragDrop(m_hTreeView);
 			m_bDragDropRegistered = FALSE;
 		}
+
+		RemoveClipboardFormatListener(m_hTreeView);
 		break;
 	}
 
@@ -270,8 +280,7 @@ LRESULT CALLBACK ShellTreeView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wPara
 				break;
 
 			case TVN_KEYDOWN:
-				OnKeyDown(reinterpret_cast<NMTVKEYDOWN *>(lParam));
-				break;
+				return OnKeyDown(reinterpret_cast<NMTVKEYDOWN *>(lParam));
 
 			case TVN_ENDLABELEDIT:
 				/* TODO: Should return the value from this function. Can't do it
@@ -601,10 +610,24 @@ void ShellTreeView::OnItemExpanding(const NMTREEVIEW *nmtv)
 	}
 }
 
-void ShellTreeView::OnKeyDown(const NMTVKEYDOWN *keyDown)
+LRESULT ShellTreeView::OnKeyDown(const NMTVKEYDOWN *keyDown)
 {
 	switch (keyDown->wVKey)
 	{
+	case 'C':
+		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
+		{
+			CopySelectedItemToClipboard(true);
+		}
+		break;
+
+	case 'X':
+		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
+		{
+			CopySelectedItemToClipboard(false);
+		}
+		break;
+
 	case 'V':
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
@@ -623,6 +646,15 @@ void ShellTreeView::OnKeyDown(const NMTVKEYDOWN *keyDown)
 		}
 		break;
 	}
+
+	// If the ctrl key is down, this key sequence is likely a modifier. Stop any other pressed key
+	// from been used in an incremental search.
+	if (IsKeyDown(VK_CONTROL))
+	{
+		return 1;
+	}
+
+	return 0;
 }
 
 /* Sorts items in the following order:
@@ -1889,6 +1921,50 @@ bool ShellTreeView::OnEndLabelEdit(const NMTVDISPINFO *dispInfo)
 	return true;
 }
 
+void ShellTreeView::CopySelectedItemToClipboard(bool copy)
+{
+	HTREEITEM item = TreeView_GetSelection(m_hTreeView);
+	auto &itemInfo = GetItemByHandle(item);
+
+	TCHAR fullFileName[MAX_PATH];
+	HRESULT hr = GetDisplayName(
+		itemInfo.pidl.get(), fullFileName, SIZEOF_ARRAY(fullFileName), SHGDN_FORPARSING);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	std::list<std::wstring> fileNameList = { fullFileName };
+	wil::com_ptr<IDataObject> clipboardDataObject;
+
+	if (copy)
+	{
+		CopyFiles(fileNameList, &clipboardDataObject);
+	}
+	else
+	{
+		hr = CutFiles(fileNameList, &clipboardDataObject);
+
+		if (SUCCEEDED(hr))
+		{
+			// Note that the WM_CLIPBOARDUPDATE message will be processed after this function has
+			// finished. Therefore, any previously cut item will need to have its state restored
+			// here. Relying on the WM_CLIPBOARDUPDATE handler wouldn't work, as by the time it
+			// runs, m_cutItem would refer to the newly cut item.
+			if (m_cutItem)
+			{
+				UpdateItemState(m_cutItem, TVIS_CUT, 0);
+			}
+
+			m_cutItem = item;
+			m_cutItemDataObject = clipboardDataObject;
+
+			UpdateItemState(item, TVIS_CUT, TVIS_CUT);
+		}
+	}
+}
+
 void ShellTreeView::PasteClipboardData()
 {
 	wil::com_ptr<IDataObject> clipboardObject;
@@ -1917,4 +1993,27 @@ void ShellTreeView::PasteClipboardData()
 	dropHandler->CopyClipboardData(clipboardObject.get(), m_hTreeView, destinationPath, nullptr,
 		!m_config->overwriteExistingFilesConfirmation);
 	dropHandler->Release();
+}
+
+void ShellTreeView::OnClipboardUpdate()
+{
+	if (m_cutItemDataObject && OleIsCurrentClipboard(m_cutItemDataObject.get()) == S_FALSE)
+	{
+		assert(m_cutItem);
+		UpdateItemState(m_cutItem, TVIS_CUT, 0);
+
+		m_cutItem = nullptr;
+		m_cutItemDataObject.reset();
+	}
+}
+
+void ShellTreeView::UpdateItemState(HTREEITEM item, UINT stateMask, UINT state)
+{
+	TVITEM tvItem;
+	tvItem.mask = TVIF_HANDLE | TVIF_STATE;
+	tvItem.hItem = item;
+	tvItem.stateMask = stateMask;
+	tvItem.state = state;
+	bool res = TreeView_SetItem(m_hTreeView, &tvItem);
+	assert(res);
 }

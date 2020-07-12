@@ -615,7 +615,7 @@ void Explorerplusplus::OnSetFocus()
  */
 void Explorerplusplus::OnDrawClipboard()
 {
-	if (m_pClipboardDataObject != nullptr)
+	if (m_pClipboardDataObject)
 	{
 		if (OleIsCurrentClipboard(m_pClipboardDataObject) == S_FALSE)
 		{
@@ -641,20 +641,6 @@ void Explorerplusplus::OnDrawClipboard()
 			}
 
 			m_CutFileNameList.clear();
-
-			/* Deghost any cut treeview items. */
-			if (m_hCutTreeViewItem != nullptr)
-			{
-				TVITEM tvItem;
-
-				tvItem.mask = TVIF_HANDLE | TVIF_STATE;
-				tvItem.hItem = m_hCutTreeViewItem;
-				tvItem.state = 0;
-				tvItem.stateMask = TVIS_CUT;
-				TreeView_SetItem(m_shellTreeView->GetHWND(), &tvItem);
-
-				m_hCutTreeViewItem = nullptr;
-			}
 
 			m_pClipboardDataObject->Release();
 			m_pClipboardDataObject = nullptr;

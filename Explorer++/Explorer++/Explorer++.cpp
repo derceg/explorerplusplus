@@ -76,7 +76,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd) :
 
 	m_pClipboardDataObject = nullptr;
 	m_iCutTabInternal = 0;
-	m_hCutTreeViewItem = nullptr;
 }
 
 Explorerplusplus::~Explorerplusplus()

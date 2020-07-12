@@ -9,6 +9,7 @@
 #include "../Helper/WindowSubclassWrapper.h"
 #include "../Helper/iDirectoryMonitor.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
+#include <wil/com.h>
 #include <optional>
 
 class CachedIcons;
@@ -56,6 +57,7 @@ public:
 	void StartRenamingSelectedItem();
 	void ShowPropertiesOfSelectedItem() const;
 	void DeleteSelectedItem(bool permanent);
+	void CopySelectedItemToClipboard(bool copy);
 	void PasteClipboardData();
 
 private:
@@ -152,7 +154,7 @@ private:
 	LRESULT CALLBACK OnDeviceChange(WPARAM wParam, LPARAM lParam);
 	void OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi);
 	void OnItemExpanding(const NMTREEVIEW *nmtv);
-	void OnKeyDown(const NMTVKEYDOWN *keyDown);
+	LRESULT OnKeyDown(const NMTVKEYDOWN *keyDown);
 	void UpdateChildren(HTREEITEM hParent, PCIDLIST_ABSOLUTE pidlParent);
 	PCIDLIST_ABSOLUTE UpdateItemInfo(PCIDLIST_ABSOLUTE pidlParent, int iItemId);
 	HTREEITEM LocateDeletedItem(const TCHAR *szFullFileName);
@@ -161,6 +163,7 @@ private:
 	void OnMiddleButtonDown(const POINT *pt);
 	void OnMiddleButtonUp(const POINT *pt);
 	bool OnEndLabelEdit(const NMTVDISPINFO *dispInfo);
+	void OnClipboardUpdate();
 
 	static void DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData);
 
@@ -208,6 +211,7 @@ private:
 	HTREEITEM DetermineItemSortedPosition(HTREEITEM hParent, const TCHAR *szItem);
 	BOOL IsDesktop(const TCHAR *szPath);
 	BOOL IsDesktopSubChild(const TCHAR *szFullFileName);
+	void UpdateItemState(HTREEITEM item, UINT stateMask, UINT state);
 
 	HWND m_hTreeView;
 	int m_iRefCount;
@@ -245,6 +249,9 @@ private:
 	BOOL m_bDragAllowed;
 	BOOL m_bDataAccept;
 	DragType m_DragType;
+
+	HTREEITEM m_cutItem;
+	wil::com_ptr<IDataObject> m_cutItemDataObject;
 
 	/* Directory modification. */
 	std::list<AlteredFile_t> m_AlteredList;

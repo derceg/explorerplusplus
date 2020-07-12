@@ -286,55 +286,6 @@ void Explorerplusplus::OnTreeViewCopyUniversalPaths() const
 	}
 }
 
-void Explorerplusplus::OnTreeViewCopy(BOOL bCopy)
-{
-	IDataObject *pClipboardDataObject = nullptr;
-	HTREEITEM hItem;
-	TVITEM tvItem;
-	HRESULT hr;
-
-	hItem = TreeView_GetSelection(m_shellTreeView->GetHWND());
-
-	if (hItem != nullptr)
-	{
-		auto pidl = m_shellTreeView->GetItemPidl(hItem);
-
-		std::list<std::wstring> fileNameList;
-		TCHAR szFullFileName[MAX_PATH];
-
-		GetDisplayName(pidl.get(), szFullFileName, SIZEOF_ARRAY(szFullFileName), SHGDN_FORPARSING);
-
-		std::wstring stringFileName(szFullFileName);
-		fileNameList.push_back(stringFileName);
-
-		if (bCopy)
-		{
-			hr = CopyFiles(fileNameList, &pClipboardDataObject);
-		}
-		else
-		{
-			hr = CutFiles(fileNameList, &pClipboardDataObject);
-
-			if (SUCCEEDED(hr))
-			{
-				m_hCutTreeViewItem = hItem;
-				m_iCutTabInternal = m_tabContainer->GetSelectedTab().GetId();
-
-				tvItem.mask = TVIF_HANDLE | TVIF_STATE;
-				tvItem.hItem = hItem;
-				tvItem.state = TVIS_CUT;
-				tvItem.stateMask = TVIS_CUT;
-				TreeView_SetItem(m_shellTreeView->GetHWND(), &tvItem);
-			}
-		}
-
-		if (SUCCEEDED(hr))
-		{
-			m_pClipboardDataObject = pClipboardDataObject;
-		}
-	}
-}
-
 void Explorerplusplus::OnTreeViewHolderWindowTimer()
 {
 	auto pidlDirectory = m_shellTreeView->GetItemPidl(g_newSelectionItem);
@@ -392,40 +343,6 @@ void Explorerplusplus::OnTreeViewSelChanged(LPARAM lParam)
 	}
 }
 
-LRESULT Explorerplusplus::OnTreeViewKeyDown(LPARAM lParam)
-{
-	NMTVKEYDOWN *nmtvkd = nullptr;
-
-	nmtvkd = (NMTVKEYDOWN *) lParam;
-
-	switch (nmtvkd->wVKey)
-	{
-	case 'C':
-		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
-		{
-			OnTreeViewCopy(TRUE);
-		}
-		break;
-
-	case 'X':
-		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
-		{
-			OnTreeViewCopy(FALSE);
-		}
-		break;
-	}
-
-	/* If the ctrl key is down, this key sequence
-	is likely a modifier. Stop any other pressed
-	key from been used in an incremental search. */
-	if (IsKeyDown(VK_CONTROL))
-	{
-		return 1;
-	}
-
-	return 0;
-}
-
 LRESULT CALLBACK TreeViewHolderProcStub(
 	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
@@ -468,9 +385,6 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowNotifyHandler(
 	case TVN_SELCHANGED:
 		OnTreeViewSelChanged(lParam);
 		break;
-
-	case TVN_KEYDOWN:
-		return OnTreeViewKeyDown(lParam);
 
 	case NM_RCLICK:
 	{
