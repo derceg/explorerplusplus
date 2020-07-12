@@ -943,7 +943,7 @@ int ShellTreeView::GetItemInternalIndex(HTREEITEM item) const
 	TVITEMEX tvItemEx;
 	tvItemEx.mask = TVIF_HANDLE | TVIF_PARAM;
 	tvItemEx.hItem = item;
-	bool res = TreeView_GetItem(m_hTreeView, &tvItemEx);
+	[[maybe_unused]] bool res = TreeView_GetItem(m_hTreeView, &tvItemEx);
 	assert(res);
 
 	return static_cast<int>(tvItemEx.lParam);
@@ -2014,6 +2014,6 @@ void ShellTreeView::UpdateItemState(HTREEITEM item, UINT stateMask, UINT state)
 	tvItem.hItem = item;
 	tvItem.stateMask = stateMask;
 	tvItem.state = state;
-	bool res = TreeView_SetItem(m_hTreeView, &tvItem);
+	[[maybe_unused]] bool res = TreeView_SetItem(m_hTreeView, &tvItem);
 	assert(res);
 }
