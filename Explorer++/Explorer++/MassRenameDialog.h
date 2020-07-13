@@ -9,7 +9,7 @@
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/ResizableDialog.h"
 
-__interface IExplorerplusplus;
+class IconResourceLoader;
 class MassRenameDialog;
 
 class MassRenameDialogPersistentSettings : public DialogSettings
@@ -45,8 +45,9 @@ private:
 class MassRenameDialog : public DarkModeDialogBase
 {
 public:
-	MassRenameDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
-		const std::list<std::wstring> &FullFilenameList, FileActionHandler *pFileActionHandler);
+	MassRenameDialog(HINSTANCE hInstance, HWND hParent,
+		const std::list<std::wstring> &FullFilenameList, IconResourceLoader *iconResourceLoader,
+		FileActionHandler *pFileActionHandler);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -66,9 +67,9 @@ private:
 	void ProcessFileName(const std::wstring &strTarget, const std::wstring &strFilename,
 		int iFileIndex, std::wstring &strOutput);
 
-	IExplorerplusplus *m_expp;
 	std::list<std::wstring> m_FullFilenameList;
 	wil::unique_hicon m_moreIcon;
+	IconResourceLoader *m_iconResourceLoader;
 	FileActionHandler *m_pFileActionHandler;
 
 	MassRenameDialogPersistentSettings *m_persistentSettings;

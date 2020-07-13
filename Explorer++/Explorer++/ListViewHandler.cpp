@@ -10,7 +10,6 @@
 #include "ListViewEdit.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
-#include "MassRenameDialog.h"
 #include "Navigation.h"
 #include "ResourceHelper.h"
 #include "SetFileAttributesDialog.h"
@@ -826,72 +825,6 @@ void Explorerplusplus::OnListViewDoubleClick(NMHDR *nmhdr)
 			}
 		}
 	}
-}
-
-void Explorerplusplus::OnListViewFileRename()
-{
-	int nSelected = ListView_GetSelectedCount(m_hActiveListView);
-
-	/* If there is only item selected, start editing
-	it in-place. If multiple items are selected,
-	show the mass rename dialog. */
-	if (nSelected == 1)
-	{
-		OnListViewFileRenameSingle();
-	}
-	else if (nSelected > 1)
-	{
-		OnListViewFileRenameMultiple();
-	}
-}
-
-void Explorerplusplus::OnListViewFileRenameSingle()
-{
-	int iSelected = ListView_GetNextItem(m_hActiveListView, -1, LVNI_SELECTED | LVNI_FOCUSED);
-
-	if (iSelected == -1)
-	{
-		return;
-	}
-
-	BOOL canRename = TestListViewItemAttributes(iSelected, SFGAO_CANRENAME);
-
-	if (!canRename)
-	{
-		return;
-	}
-
-	ListView_EditLabel(m_hActiveListView, iSelected);
-}
-
-void Explorerplusplus::OnListViewFileRenameMultiple()
-{
-	std::list<std::wstring> fullFilenameList;
-	TCHAR szFullFilename[MAX_PATH];
-	int iIndex = -1;
-
-	while ((iIndex = ListView_GetNextItem(m_hActiveListView, iIndex, LVNI_SELECTED)) != -1)
-	{
-		BOOL canRename = TestListViewItemAttributes(iIndex, SFGAO_CANRENAME);
-
-		if (!canRename)
-		{
-			continue;
-		}
-
-		m_pActiveShellBrowser->GetItemFullName(
-			iIndex, szFullFilename, SIZEOF_ARRAY(szFullFilename));
-		fullFilenameList.emplace_back(szFullFilename);
-	}
-
-	if (fullFilenameList.empty())
-	{
-		return;
-	}
-
-	MassRenameDialog massRenameDialog(
-		m_hLanguageModule, m_hContainer, this, fullFilenameList, &m_FileActionHandler);
-	massRenameDialog.ShowModalDialog();
 }
 
 void Explorerplusplus::OnListViewCopyItemPath() const

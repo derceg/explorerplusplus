@@ -146,6 +146,9 @@ public:
 	BOOL GetFilterCaseSensitive() const;
 	void SetFilterCaseSensitive(BOOL filterCaseSensitive);
 
+	bool TestListViewItemAttributes(int item, SFGAOF attributes) const;
+	HRESULT GetListViewSelectionAttributes(SFGAOF *attributes) const;
+
 	void SetFileAttributesForSelection();
 
 	int SelectFiles(const TCHAR *FileNamePattern);
@@ -155,6 +158,7 @@ public:
 	BOOL GhostItem(int iItem);
 	BOOL InVirtualFolder() const;
 	BOOL CanCreate() const;
+	void StartRenamingSelectedItems();
 	void DeleteSelectedItems(bool permanent);
 
 	BOOL GetShowInGroups() const;
@@ -345,6 +349,11 @@ private:
 	void UpdateFileSelectionInfo(int internalIndex, BOOL selected);
 	void OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown);
 
+	HRESULT GetListViewItemAttributes(int item, SFGAOF *attributes) const;
+
+	void StartRenamingSingleFile();
+	void StartRenamingMultipleFiles();
+
 	// Listview header context menu
 	void OnListViewHeaderRightClick(const POINTS &cursorPos);
 	void OnListViewHeaderMenuItemSelected(
@@ -353,6 +362,7 @@ private:
 	void OnColumnMenuItemSelected(
 		int menuItemId, const std::unordered_map<int, ColumnType> &menuItemMappings);
 
+	const ItemInfo_t &GetItemByIndex(int index) const;
 	ItemInfo_t &GetItemByIndex(int index);
 	int GetItemInternalIndex(int item) const;
 

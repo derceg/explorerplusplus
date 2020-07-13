@@ -15,7 +15,6 @@
 
 #include "stdafx.h"
 #include "MassRenameDialog.h"
-#include "CoreInterface.h"
 #include "DarkModeHelper.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
@@ -34,11 +33,12 @@ const TCHAR MassRenameDialogPersistentSettings::SETTINGS_KEY[] = _T("MassRename"
 const TCHAR MassRenameDialogPersistentSettings::SETTING_COLUMN_WIDTH_1[] = _T("ColumnWidth1");
 const TCHAR MassRenameDialogPersistentSettings::SETTING_COLUMN_WIDTH_2[] = _T("ColumnWidth2");
 
-MassRenameDialog::MassRenameDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
-	const std::list<std::wstring> &FullFilenameList, FileActionHandler *pFileActionHandler) :
+MassRenameDialog::MassRenameDialog(HINSTANCE hInstance, HWND hParent,
+	const std::list<std::wstring> &FullFilenameList, IconResourceLoader *iconResourceLoader,
+	FileActionHandler *pFileActionHandler) :
 	DarkModeDialogBase(hInstance, IDD_MASSRENAME, hParent, true),
-	m_expp(expp),
 	m_FullFilenameList(FullFilenameList),
+	m_iconResourceLoader(iconResourceLoader),
 	m_pFileActionHandler(pFileActionHandler)
 {
 	m_persistentSettings = &MassRenameDialogPersistentSettings::GetInstance();
@@ -47,8 +47,7 @@ MassRenameDialog::MassRenameDialog(HINSTANCE hInstance, HWND hParent, IExplorerp
 INT_PTR MassRenameDialog::OnInitDialog()
 {
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hDlg);
-	m_moreIcon =
-		m_expp->GetIconResourceLoader()->LoadIconFromPNGForDpi(Icon::ArrowRight, 16, 16, dpi);
+	m_moreIcon = m_iconResourceLoader->LoadIconFromPNGForDpi(Icon::ArrowRight, 16, 16, dpi);
 	SendDlgItemMessage(m_hDlg, IDC_MASSRENAME_MORE, BM_SETIMAGE, IMAGE_ICON,
 		reinterpret_cast<LPARAM>(m_moreIcon.get()));
 
@@ -123,8 +122,7 @@ INT_PTR MassRenameDialog::OnInitDialog()
 
 wil::unique_hicon MassRenameDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_expp->GetIconResourceLoader()->LoadIconFromPNGAndScale(
-		Icon::MassRename, iconWidth, iconHeight);
+	return m_iconResourceLoader->LoadIconFromPNGAndScale(Icon::MassRename, iconWidth, iconHeight);
 }
 
 void MassRenameDialog::GetResizableControlInformation(

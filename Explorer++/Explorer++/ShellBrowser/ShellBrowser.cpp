@@ -8,6 +8,7 @@
 #include "DarkModeHelper.h"
 #include "ItemData.h"
 #include "MainResource.h"
+#include "MassRenameDialog.h"
 #include "PreservedFolderState.h"
 #include "ShellNavigationController.h"
 #include "SortModes.h"
@@ -1573,4 +1574,74 @@ void ShellBrowser::DeleteSelectedItems(bool permanent)
 	}
 
 	m_fileActionHandler->DeleteFiles(m_hListView, pidls, permanent, false);
+}
+
+void ShellBrowser::StartRenamingSelectedItems()
+{
+	int numSelected = ListView_GetSelectedCount(m_hListView);
+
+	// If there is only item selected, start editing it in-place. If multiple items are selected,
+	// show the mass rename dialog.
+	if (numSelected == 1)
+	{
+		StartRenamingSingleFile();
+	}
+	else if (numSelected > 1)
+	{
+		StartRenamingMultipleFiles();
+	}
+}
+
+void ShellBrowser::StartRenamingSingleFile()
+{
+	int selectedItem = ListView_GetNextItem(m_hListView, -1, LVNI_SELECTED | LVNI_FOCUSED);
+
+	if (selectedItem == -1)
+	{
+		return;
+	}
+
+	bool canRename = TestListViewItemAttributes(selectedItem, SFGAO_CANRENAME);
+
+	if (!canRename)
+	{
+		return;
+	}
+
+	ListView_EditLabel(m_hListView, selectedItem);
+}
+
+void ShellBrowser::StartRenamingMultipleFiles()
+{
+	std::list<std::wstring> fullFilenameList;
+	int item = -1;
+
+	while ((item = ListView_GetNextItem(m_hListView, item, LVNI_SELECTED)) != -1)
+	{
+		bool canRename = TestListViewItemAttributes(item, SFGAO_CANRENAME);
+
+		if (!canRename)
+		{
+			continue;
+		}
+
+		TCHAR szFullFilename[MAX_PATH];
+		HRESULT hr = GetItemFullName(item, szFullFilename, SIZEOF_ARRAY(szFullFilename));
+
+		if (FAILED(hr))
+		{
+			continue;
+		}
+
+		fullFilenameList.emplace_back(szFullFilename);
+	}
+
+	if (fullFilenameList.empty())
+	{
+		return;
+	}
+
+	MassRenameDialog massRenameDialog(m_hResourceModule, m_hListView, fullFilenameList,
+		m_iconResourceLoader, m_fileActionHandler);
+	massRenameDialog.ShowModalDialog();
 }

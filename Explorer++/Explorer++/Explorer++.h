@@ -241,9 +241,6 @@ private:
 
 	/* ListView private message handlers. */
 	void OnListViewDoubleClick(NMHDR *nmhdr);
-	void OnListViewFileRename();
-	void OnListViewFileRenameSingle();
-	void OnListViewFileRenameMultiple();
 	LRESULT OnListViewKeyDown(LPARAM lParam);
 	BOOL OnListViewItemChanging(const NMLISTVIEW *changeData);
 	HRESULT OnListViewBeginDrag(LPARAM lParam, DragType dragType);
@@ -435,9 +432,6 @@ private:
 
 	void BuildListViewFileSelectionList(
 		HWND hListView, std::list<std::wstring> *pFileSelectionList);
-	BOOL TestListViewItemAttributes(int item, SFGAOF attributes) const;
-	HRESULT GetListViewSelectionAttributes(SFGAOF *pItemAttributes) const;
-	HRESULT GetListViewItemAttributes(const Tab &tab, int item, SFGAOF *pItemAttributes) const;
 
 	HRESULT GetTreeViewSelectionAttributes(SFGAOF *pItemAttributes) const;
 

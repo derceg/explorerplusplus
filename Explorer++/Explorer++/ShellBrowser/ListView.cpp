@@ -20,24 +20,29 @@
 #include <boost/format.hpp>
 #include <wil/common.h>
 
-const std::vector<ColumnType> COMMON_REAL_FOLDER_COLUMNS = { ColumnType::Name, ColumnType::Type, ColumnType::Size,
-	ColumnType::DateModified, ColumnType::Authors, ColumnType::Title };
+const std::vector<ColumnType> COMMON_REAL_FOLDER_COLUMNS = { ColumnType::Name, ColumnType::Type,
+	ColumnType::Size, ColumnType::DateModified, ColumnType::Authors, ColumnType::Title };
 
-const std::vector<ColumnType> COMMON_CONTROL_PANEL_COLUMNS = { ColumnType::Name, ColumnType::VirtualComments };
+const std::vector<ColumnType> COMMON_CONTROL_PANEL_COLUMNS = { ColumnType::Name,
+	ColumnType::VirtualComments };
 
-const std::vector<ColumnType> COMMON_MY_COMPUTER_COLUMNS = { ColumnType::Name, ColumnType::Type, ColumnType::TotalSize,
-	ColumnType::FreeSpace, ColumnType::VirtualComments, ColumnType::FileSystem };
+const std::vector<ColumnType> COMMON_MY_COMPUTER_COLUMNS = { ColumnType::Name, ColumnType::Type,
+	ColumnType::TotalSize, ColumnType::FreeSpace, ColumnType::VirtualComments,
+	ColumnType::FileSystem };
 
-const std::vector<ColumnType> COMMON_NETWORK_CONNECTIONS_COLUMNS = { ColumnType::Name, ColumnType::Type,
-	ColumnType::NetworkAdaptorStatus, ColumnType::Owner };
+const std::vector<ColumnType> COMMON_NETWORK_CONNECTIONS_COLUMNS = { ColumnType::Name,
+	ColumnType::Type, ColumnType::NetworkAdaptorStatus, ColumnType::Owner };
 
-const std::vector<ColumnType> COMMON_NETWORK_COLUMNS = { ColumnType::Name, ColumnType::VirtualComments };
+const std::vector<ColumnType> COMMON_NETWORK_COLUMNS = { ColumnType::Name,
+	ColumnType::VirtualComments };
 
-const std::vector<ColumnType> COMMON_PRINTERS_COLUMNS = { ColumnType::Name, ColumnType::PrinterNumDocuments,
-	ColumnType::PrinterStatus, ColumnType::PrinterComments, ColumnType::PrinterLocation };
+const std::vector<ColumnType> COMMON_PRINTERS_COLUMNS = { ColumnType::Name,
+	ColumnType::PrinterNumDocuments, ColumnType::PrinterStatus, ColumnType::PrinterComments,
+	ColumnType::PrinterLocation };
 
-const std::vector<ColumnType> COMMON_RECYCLE_BIN_COLUMNS = { ColumnType::Name, ColumnType::OriginalLocation,
-	ColumnType::DateDeleted, ColumnType::Size, ColumnType::Type, ColumnType::DateModified };
+const std::vector<ColumnType> COMMON_RECYCLE_BIN_COLUMNS = { ColumnType::Name,
+	ColumnType::OriginalLocation, ColumnType::DateDeleted, ColumnType::Size, ColumnType::Type,
+	ColumnType::DateModified };
 
 std::vector<ColumnType> GetColumnHeaderMenuList(const std::wstring &directory);
 
@@ -596,6 +601,12 @@ void ShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 	}
 }
 
+const ShellBrowser::ItemInfo_t &ShellBrowser::GetItemByIndex(int index) const
+{
+	int internalIndex = GetItemInternalIndex(index);
+	return m_itemInfoMap.at(internalIndex);
+}
+
 ShellBrowser::ItemInfo_t &ShellBrowser::GetItemByIndex(int index)
 {
 	int internalIndex = GetItemInternalIndex(index);
@@ -860,4 +871,38 @@ void ShellBrowser::SetFileAttributesForSelection()
 
 	SetFileAttributesDialog setFileAttributesDialog(m_hResourceModule, m_hListView, sfaiList);
 	setFileAttributesDialog.ShowModalDialog();
+}
+
+bool ShellBrowser::TestListViewItemAttributes(int item, SFGAOF attributes) const
+{
+	SFGAOF commonAttributes = attributes;
+	HRESULT hr = GetListViewItemAttributes(item, &commonAttributes);
+
+	if (SUCCEEDED(hr))
+	{
+		return (commonAttributes & attributes) == attributes;
+	}
+
+	return false;
+}
+
+HRESULT ShellBrowser::GetListViewSelectionAttributes(SFGAOF *attributes) const
+{
+	HRESULT hr = E_FAIL;
+
+	/* TODO: This should probably check all selected files. */
+	int selectedItem = ListView_GetNextItem(m_hListView, -1, LVNI_SELECTED);
+
+	if (selectedItem != -1)
+	{
+		hr = GetListViewItemAttributes(selectedItem, attributes);
+	}
+
+	return hr;
+}
+
+HRESULT ShellBrowser::GetListViewItemAttributes(int item, SFGAOF *attributes) const
+{
+	const auto &itemInfo = GetItemByIndex(item);
+	return GetItemAttributes(itemInfo.pidlComplete.get(), attributes);
 }

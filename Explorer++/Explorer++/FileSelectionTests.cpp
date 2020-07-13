@@ -105,60 +105,13 @@ HRESULT Explorerplusplus::GetSelectionAttributes(SFGAOF *pItemAttributes) const
 
 	if (hFocus == m_hActiveListView)
 	{
-		hr = GetListViewSelectionAttributes(pItemAttributes);
+		const Tab &selectedTab = m_tabContainer->GetSelectedTab();
+		hr = selectedTab.GetShellBrowser()->GetListViewSelectionAttributes(pItemAttributes);
 	}
 	else if (hFocus == m_shellTreeView->GetHWND())
 	{
 		hr = GetTreeViewSelectionAttributes(pItemAttributes);
 	}
-
-	return hr;
-}
-
-BOOL Explorerplusplus::TestListViewItemAttributes(int item, SFGAOF attributes) const
-{
-	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
-
-	SFGAOF commonAttributes = attributes;
-	HRESULT hr = GetListViewItemAttributes(selectedTab, item, &commonAttributes);
-
-	if (SUCCEEDED(hr))
-	{
-		return (commonAttributes & attributes) == attributes;
-	}
-
-	return FALSE;
-}
-
-HRESULT Explorerplusplus::GetListViewSelectionAttributes(SFGAOF *pItemAttributes) const
-{
-	HRESULT hr = E_FAIL;
-
-	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
-
-	/* TODO: This should probably check all selected files. */
-	int iSelected =
-		ListView_GetNextItem(selectedTab.GetShellBrowser()->GetListView(), -1, LVNI_SELECTED);
-
-	if (iSelected != -1)
-	{
-		hr = GetListViewItemAttributes(selectedTab, iSelected, pItemAttributes);
-	}
-
-	return hr;
-}
-
-HRESULT Explorerplusplus::GetListViewItemAttributes(
-	const Tab &tab, int item, SFGAOF *pItemAttributes) const
-{
-	auto pidlComplete = tab.GetShellBrowser()->GetItemCompleteIdl(item);
-
-	if (!pidlComplete)
-	{
-		return E_FAIL;
-	}
-
-	HRESULT hr = GetItemAttributes(pidlComplete.get(), pItemAttributes);
 
 	return hr;
 }

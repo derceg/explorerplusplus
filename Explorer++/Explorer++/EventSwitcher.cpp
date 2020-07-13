@@ -76,7 +76,8 @@ void Explorerplusplus::OnFileRename()
 
 		if (hFocus == m_hActiveListView)
 		{
-			OnListViewFileRename();
+			Tab &selectedTab = m_tabContainer->GetSelectedTab();
+			selectedTab.GetShellBrowser()->StartRenamingSelectedItems();
 		}
 		else if (hFocus == m_shellTreeView->GetHWND())
 		{
