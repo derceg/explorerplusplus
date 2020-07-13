@@ -93,7 +93,8 @@ void Explorerplusplus::OnFileDelete(bool permanent)
 
 	if (hFocus == m_hActiveListView)
 	{
-		OnListViewFileDelete(permanent);
+		Tab &tab = m_tabContainer->GetSelectedTab();
+		tab.GetShellBrowser()->DeleteSelectedItems(permanent);
 	}
 	else if (hFocus == m_shellTreeView->GetHWND())
 	{

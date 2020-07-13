@@ -15,6 +15,7 @@
 #include "ViewModes.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DriveInfo.h"
+#include "../Helper/FileActionHandler.h"
 #include "../Helper/IconFetcher.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
@@ -69,30 +70,30 @@ ULONG __stdcall ShellBrowser::Release()
 
 ShellBrowser *ShellBrowser::CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner,
 	CachedIcons *cachedIcons, IconResourceLoader *iconResourceLoader, const Config *config,
-	TabNavigationInterface *tabNavigation, const FolderSettings &folderSettings,
-	std::optional<FolderColumns> initialColumns)
+	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
+	const FolderSettings &folderSettings, std::optional<FolderColumns> initialColumns)
 {
 	return new ShellBrowser(id, resourceInstance, hOwner, cachedIcons, iconResourceLoader, config,
-		tabNavigation, folderSettings, initialColumns);
+		tabNavigation, fileActionHandler, folderSettings, initialColumns);
 }
 
 ShellBrowser *ShellBrowser::CreateFromPreserved(int id, HINSTANCE resourceInstance, HWND hOwner,
 	CachedIcons *cachedIcons, IconResourceLoader *iconResourceLoader, const Config *config,
-	TabNavigationInterface *tabNavigation,
+	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState)
 {
 	return new ShellBrowser(id, resourceInstance, hOwner, cachedIcons, iconResourceLoader, config,
-		tabNavigation, history, currentEntry, preservedFolderState);
+		tabNavigation, fileActionHandler, history, currentEntry, preservedFolderState);
 }
 
 ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
 	CachedIcons *cachedIcons, IconResourceLoader *iconResourceLoader, const Config *config,
-	TabNavigationInterface *tabNavigation,
+	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState) :
 	ShellBrowser(id, resourceInstance, hOwner, cachedIcons, iconResourceLoader, config,
-		tabNavigation, preservedFolderState.folderSettings, std::nullopt)
+		tabNavigation, fileActionHandler, preservedFolderState.folderSettings, std::nullopt)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(
 		this, tabNavigation, m_iconFetcher.get(), history, currentEntry);
@@ -100,8 +101,8 @@ ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
 
 ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
 	CachedIcons *cachedIcons, IconResourceLoader *iconResourceLoader, const Config *config,
-	TabNavigationInterface *tabNavigation, const FolderSettings &folderSettings,
-	std::optional<FolderColumns> initialColumns) :
+	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
+	const FolderSettings &folderSettings, std::optional<FolderColumns> initialColumns) :
 	m_ID(id),
 	m_hResourceModule(resourceInstance),
 	m_hOwner(hOwner),
@@ -109,6 +110,7 @@ ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
 	m_iconResourceLoader(iconResourceLoader),
 	m_config(config),
 	m_tabNavigation(tabNavigation),
+	m_fileActionHandler(fileActionHandler),
 	m_folderSettings(folderSettings),
 	m_folderColumns(initialColumns ? *initialColumns : config->globalFolderSettings.folderColumns),
 	m_columnThreadPool(
@@ -1552,4 +1554,23 @@ HWND ShellBrowser::GetListView() const
 FolderSettings ShellBrowser::GetFolderSettings() const
 {
 	return m_folderSettings;
+}
+
+void ShellBrowser::DeleteSelectedItems(bool permanent)
+{
+	std::vector<PCIDLIST_ABSOLUTE> pidls;
+	int item = -1;
+
+	while ((item = ListView_GetNextItem(m_hListView, item, LVNI_SELECTED)) != -1)
+	{
+		auto &itemInfo = GetItemByIndex(item);
+		pidls.push_back(itemInfo.pidlComplete.get());
+	}
+
+	if (pidls.empty())
+	{
+		return;
+	}
+
+	m_fileActionHandler->DeleteFiles(m_hListView, pidls, permanent, false);
 }

@@ -44,19 +44,20 @@ const std::map<UINT, Icon> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
 // clang-format on
 
 TabContainer *TabContainer::Create(HWND parent, TabNavigationInterface *tabNavigation,
-	IExplorerplusplus *expp, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-	HINSTANCE instance, std::shared_ptr<Config> config)
+	IExplorerplusplus *expp, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons,
+	BookmarkTree *bookmarkTree, HINSTANCE instance, std::shared_ptr<Config> config)
 {
-	return new TabContainer(
-		parent, tabNavigation, expp, cachedIcons, bookmarkTree, instance, config);
+	return new TabContainer(parent, tabNavigation, expp, fileActionHandler, cachedIcons,
+		bookmarkTree, instance, config);
 }
 
 TabContainer::TabContainer(HWND parent, TabNavigationInterface *tabNavigation,
-	IExplorerplusplus *expp, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-	HINSTANCE instance, std::shared_ptr<Config> config) :
+	IExplorerplusplus *expp, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons,
+	BookmarkTree *bookmarkTree, HINSTANCE instance, std::shared_ptr<Config> config) :
 	BaseWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
 	m_tabNavigation(tabNavigation),
 	m_expp(expp),
+	m_fileActionHandler(fileActionHandler),
 	m_cachedIcons(cachedIcons),
 	m_bookmarkTree(bookmarkTree),
 	m_instance(instance),
@@ -919,7 +920,8 @@ HRESULT TabContainer::CreateNewTab(const PreservedTab &preservedTab, int *newTab
 		return E_FAIL;
 	}
 
-	auto tabTemp = std::make_unique<Tab>(preservedTab, m_expp, m_tabNavigation);
+	auto tabTemp =
+		std::make_unique<Tab>(preservedTab, m_expp, m_tabNavigation, m_fileActionHandler);
 	auto item = m_tabs.insert({ tabTemp->GetId(), std::move(tabTemp) });
 
 	Tab &tab = *item.first->second;
@@ -938,7 +940,8 @@ HRESULT TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSet
 		return E_FAIL;
 	}
 
-	auto tabTemp = std::make_unique<Tab>(m_expp, m_tabNavigation, folderSettings, initialColumns);
+	auto tabTemp = std::make_unique<Tab>(
+		m_expp, m_tabNavigation, m_fileActionHandler, folderSettings, initialColumns);
 	auto item = m_tabs.insert({ tabTemp->GetId(), std::move(tabTemp) });
 
 	Tab &tab = *item.first->second;

@@ -32,6 +32,7 @@
 struct BasicItemInfo_t;
 class CachedIcons;
 struct Config;
+class FileActionHandler;
 class IconFetcher;
 class IconResourceLoader;
 struct PreservedFolderState;
@@ -59,12 +60,12 @@ class ShellBrowser : public IDropTarget, public IDropFilesCallback, public Navig
 public:
 	static ShellBrowser *CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner,
 		CachedIcons *cachedIcons, IconResourceLoader *iconResourceLoader, const Config *config,
-		TabNavigationInterface *tabNavigation, const FolderSettings &folderSettings,
-		std::optional<FolderColumns> initialColumns);
+		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
+		const FolderSettings &folderSettings, std::optional<FolderColumns> initialColumns);
 
 	static ShellBrowser *CreateFromPreserved(int id, HINSTANCE resourceInstance, HWND hOwner,
 		CachedIcons *cachedIcons, IconResourceLoader *iconResourceLoader, const Config *config,
-		TabNavigationInterface *tabNavigation,
+		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 		const PreservedFolderState &preservedFolderState);
 
@@ -154,6 +155,7 @@ public:
 	BOOL GhostItem(int iItem);
 	BOOL InVirtualFolder() const;
 	BOOL CanCreate() const;
+	void DeleteSelectedItems(bool permanent);
 
 	BOOL GetShowInGroups() const;
 	void SetShowInGroups(BOOL bShowInGroups);
@@ -280,13 +282,13 @@ private:
 
 	ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
 		IconResourceLoader *iconResourceLoader, const Config *config,
-		TabNavigationInterface *tabNavigation,
+		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 		const PreservedFolderState &preservedFolderState);
 	ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
 		IconResourceLoader *iconResourceLoader, const Config *config,
-		TabNavigationInterface *tabNavigation, const FolderSettings &folderSettings,
-		std::optional<FolderColumns> initialColumns);
+		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
+		const FolderSettings &folderSettings, std::optional<FolderColumns> initialColumns);
 	~ShellBrowser();
 
 	HWND SetUpListView(HWND parent);
@@ -474,6 +476,7 @@ private:
 	std::unique_ptr<ShellNavigationController> m_navigationController;
 
 	TabNavigationInterface *m_tabNavigation;
+	FileActionHandler *m_fileActionHandler;
 
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 

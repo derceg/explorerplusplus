@@ -38,7 +38,7 @@ ShellTreeView::ShellTreeView(HWND hParent, const Config *config, IDirectoryMonit
 	m_config(config),
 	m_pDirMon(pDirMon),
 	m_tabContainer(tabContainer),
-	m_FileActionHandler(fileActionHandler),
+	m_fileActionHandler(fileActionHandler),
 	m_cachedIcons(cachedIcons),
 	m_iRefCount(1),
 	m_itemIDCounter(0),
@@ -1916,7 +1916,7 @@ bool ShellTreeView::OnEndLabelEdit(const NMTVDISPINFO *dispInfo)
 
 	std::list<FileActionHandler::RenamedItem_t> renamedItemList;
 	renamedItemList.push_back(renamedItem);
-	m_FileActionHandler->RenameFiles(renamedItemList);
+	m_fileActionHandler->RenameFiles(renamedItemList);
 
 	return true;
 }

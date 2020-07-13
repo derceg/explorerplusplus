@@ -24,8 +24,8 @@ void Explorerplusplus::InitializeTabs()
 	/* The tab backing will hold the tab window. */
 	CreateTabBacking();
 
-	m_tabContainer = TabContainer::Create(
-		m_hTabBacking, this, this, &m_cachedIcons, &m_bookmarkTree, m_hLanguageModule, m_config);
+	m_tabContainer = TabContainer::Create(m_hTabBacking, this, this, &m_FileActionHandler,
+		&m_cachedIcons, &m_bookmarkTree, m_hLanguageModule, m_config);
 	m_tabContainer->tabCreatedSignal.AddObserver(
 		boost::bind(&Explorerplusplus::OnTabCreated, this, _1, _2), boost::signals2::at_front);
 	m_tabContainer->tabNavigationCompletedSignal.AddObserver(

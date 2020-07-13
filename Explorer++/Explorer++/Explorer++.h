@@ -249,7 +249,6 @@ private:
 	HRESULT OnListViewBeginDrag(LPARAM lParam, DragType dragType);
 	BOOL OnListViewBeginLabelEdit(LPARAM lParam);
 	BOOL OnListViewEndLabelEdit(LPARAM lParam);
-	void OnListViewFileDelete(bool permanent);
 	void OnListViewRClick(POINT *pCursorPos);
 	void OnListViewBackgroundRClick(POINT *pCursorPos);
 	void OnListViewItemRClick(POINT *pCursorPos);

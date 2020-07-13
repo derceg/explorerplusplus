@@ -220,7 +220,7 @@ private:
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	const Config *m_config;
 	TabContainer *m_tabContainer;
-	FileActionHandler *m_FileActionHandler;
+	FileActionHandler *m_fileActionHandler;
 
 	ctpl::thread_pool m_iconThreadPool;
 	std::unordered_map<int, std::future<std::optional<IconResult>>> m_iconResults;

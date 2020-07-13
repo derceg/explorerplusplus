@@ -274,6 +274,8 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 
 	keyDown = (LV_KEYDOWN *) lParam;
 
+	Tab &tab = m_tabContainer->GetSelectedTab();
+
 	switch (keyDown->wVKey)
 	{
 	case VK_RETURN:
@@ -292,11 +294,11 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 	case VK_DELETE:
 		if (IsKeyDown(VK_SHIFT))
 		{
-			OnListViewFileDelete(true);
+			tab.GetShellBrowser()->DeleteSelectedItems(true);
 		}
 		else
 		{
-			OnListViewFileDelete(false);
+			tab.GetShellBrowser()->DeleteSelectedItems(false);
 		}
 		break;
 
@@ -780,44 +782,6 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam, DragType dragType)
 	}
 
 	return hr;
-}
-
-void Explorerplusplus::OnListViewFileDelete(bool permanent)
-{
-	int nSelected = ListView_GetSelectedCount(m_hActiveListView);
-
-	if (nSelected == 0)
-	{
-		return;
-	}
-
-	// PIDLPointer is analogous to a unique_ptr. This vector exists only
-	// so that the underlying PIDLs will be freed on scope exit (i.e.
-	// when this function returns).
-	std::vector<unique_pidl_absolute> pidlPtrs;
-
-	std::vector<PCIDLIST_ABSOLUTE> pidls;
-	int iItem = -1;
-
-	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
-	{
-		auto pidlPtr = m_pActiveShellBrowser->GetItemCompleteIdl(iItem);
-
-		if (!pidlPtr)
-		{
-			continue;
-		}
-
-		pidls.push_back(pidlPtr.get());
-		pidlPtrs.push_back(std::move(pidlPtr));
-	}
-
-	if (pidls.empty())
-	{
-		return;
-	}
-
-	m_FileActionHandler.DeleteFiles(m_hContainer, pidls, permanent, false);
 }
 
 void Explorerplusplus::OnListViewDoubleClick(NMHDR *nmhdr)

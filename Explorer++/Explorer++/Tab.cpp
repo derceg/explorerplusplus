@@ -15,7 +15,8 @@
 int Tab::idCounter = 1;
 
 Tab::Tab(IExplorerplusplus *expp, TabNavigationInterface *tabNavigation,
-	const FolderSettings *folderSettings, std::optional<FolderColumns> initialColumns) :
+	FileActionHandler *fileActionHandler, const FolderSettings *folderSettings,
+	std::optional<FolderColumns> initialColumns) :
 	m_id(idCounter++),
 	m_useCustomName(false),
 	m_lockState(LockState::NotLocked)
@@ -33,20 +34,20 @@ Tab::Tab(IExplorerplusplus *expp, TabNavigationInterface *tabNavigation,
 
 	m_shellBrowser = ShellBrowser::CreateNew(m_id, expp->GetLanguageModule(), expp->GetMainWindow(),
 		expp->GetCachedIcons(), expp->GetIconResourceLoader(), expp->GetConfig(), tabNavigation,
-		folderSettingsFinal, initialColumns);
+		fileActionHandler, folderSettingsFinal, initialColumns);
 }
 
 Tab::Tab(const PreservedTab &preservedTab, IExplorerplusplus *expp,
-	TabNavigationInterface *tabNavigation) :
+	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler) :
 	m_id(idCounter++),
 	m_useCustomName(preservedTab.useCustomName),
 	m_customName(preservedTab.customName),
 	m_lockState(preservedTab.lockState)
 {
-	m_shellBrowser =
-		ShellBrowser::CreateFromPreserved(m_id, expp->GetLanguageModule(), expp->GetMainWindow(),
-			expp->GetCachedIcons(), expp->GetIconResourceLoader(), expp->GetConfig(), tabNavigation,
-			preservedTab.history, preservedTab.currentEntry, preservedTab.preservedFolderState);
+	m_shellBrowser = ShellBrowser::CreateFromPreserved(m_id, expp->GetLanguageModule(),
+		expp->GetMainWindow(), expp->GetCachedIcons(), expp->GetIconResourceLoader(),
+		expp->GetConfig(), tabNavigation, fileActionHandler, preservedTab.history,
+		preservedTab.currentEntry, preservedTab.preservedFolderState);
 }
 
 int Tab::GetId() const

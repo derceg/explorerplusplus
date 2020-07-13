@@ -22,6 +22,7 @@
 class BookmarkTree;
 class CachedIcons;
 struct Config;
+class FileActionHandler;
 __interface IExplorerplusplus;
 class Navigation;
 struct PreservedTab;
@@ -37,7 +38,8 @@ BOOST_PARAMETER_NAME(lockState)
 // introduced until C++20.
 struct TabSettingsImpl
 {
-	template <class ArgumentPack> TabSettingsImpl(const ArgumentPack &args)
+	template <class ArgumentPack>
+	TabSettingsImpl(const ArgumentPack &args)
 	{
 		name = args[_name | std::nullopt];
 		lockState = args[_lockState | std::nullopt];
@@ -73,8 +75,8 @@ class TabContainer : public BaseWindow
 {
 public:
 	static TabContainer *Create(HWND parent, TabNavigationInterface *tabNavigation,
-		IExplorerplusplus *expp, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-		HINSTANCE instance, std::shared_ptr<Config> config);
+		IExplorerplusplus *expp, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons,
+		BookmarkTree *bookmarkTree, HINSTANCE instance, std::shared_ptr<Config> config);
 
 	HRESULT CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
 	HRESULT CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {},
@@ -128,8 +130,8 @@ private:
 	static const int ICON_SIZE_96DPI = 16;
 
 	TabContainer(HWND parent, TabNavigationInterface *tabNavigation, IExplorerplusplus *expp,
-		CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, HINSTANCE instance,
-		std::shared_ptr<Config> config);
+		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
+		HINSTANCE instance, std::shared_ptr<Config> config);
 	~TabContainer();
 
 	static HWND CreateTabControl(HWND parent, BOOL forceSameTabWidth);
@@ -208,6 +210,7 @@ private:
 
 	TabNavigationInterface *m_tabNavigation;
 	IExplorerplusplus *m_expp;
+	FileActionHandler *m_fileActionHandler;
 
 	HINSTANCE m_instance;
 	std::shared_ptr<Config> m_config;

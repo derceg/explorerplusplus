@@ -9,6 +9,7 @@
 #include <boost/signals2.hpp>
 #include <optional>
 
+class FileActionHandler;
 struct FolderColumns;
 struct FolderSettings;
 __interface IExplorerplusplus;
@@ -35,9 +36,10 @@ public:
 		TabUpdatedSignal;
 
 	Tab(IExplorerplusplus *expp, TabNavigationInterface *tabNavigation,
-		const FolderSettings *folderSettings, std::optional<FolderColumns> initialColumns);
+		FileActionHandler *fileActionHandler, const FolderSettings *folderSettings,
+		std::optional<FolderColumns> initialColumns);
 	Tab(const PreservedTab &preservedTab, IExplorerplusplus *expp,
-		TabNavigationInterface *tabNavigation);
+		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler);
 
 	int GetId() const;
 
