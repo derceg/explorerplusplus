@@ -10,12 +10,10 @@
 #include "NavigatorInterface.h"
 #include "SignalWrapper.h"
 #include "SortModes.h"
-#include "TabNavigationInterface.h"
 #include "ViewModes.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/WindowSubclassWrapper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
 #include <wil/resource.h>
 #include <future>
@@ -38,6 +36,8 @@ class IconResourceLoader;
 struct PreservedFolderState;
 struct PreservedHistoryEntry;
 class ShellNavigationController;
+__interface TabNavigationInterface;
+class WindowSubclassWrapper;
 
 typedef struct
 {

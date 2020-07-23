@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "IconFetcher.h"
 #include "CachedIcons.h"
+#include "WindowSubclassWrapper.h"
 
 IconFetcher::IconFetcher(HWND hwnd, CachedIcons *cachedIcons) :
 	m_hwnd(hwnd),

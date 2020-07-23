@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "TabNavigationInterface.h"
 #include "../Helper/Macros.h"
 #include <boost/signals2.hpp>
 #include <optional>
@@ -15,6 +14,7 @@ struct FolderSettings;
 __interface IExplorerplusplus;
 struct PreservedTab;
 class ShellBrowser;
+__interface TabNavigationInterface;
 
 class Tab
 {

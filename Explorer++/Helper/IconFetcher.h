@@ -5,7 +5,6 @@
 #pragma once
 
 #include "ShellHelper.h"
-#include "WindowSubclassWrapper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
 #include <ShlObj.h>
 #include <functional>
@@ -14,6 +13,7 @@
 #include <unordered_map>
 
 class CachedIcons;
+class WindowSubclassWrapper;
 
 class IconFetcherInterface
 {
