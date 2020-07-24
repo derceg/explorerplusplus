@@ -14,7 +14,6 @@
 #include "DarkModeHelper.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
-#include "TabContainer.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DataExchangeHelper.h"
 #include "../Helper/DpiCompatibility.h"

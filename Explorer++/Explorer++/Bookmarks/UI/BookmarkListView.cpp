@@ -14,7 +14,6 @@
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "TabContainer.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/HeaderHelper.h"
 #include "../Helper/ListViewHelper.h"
