@@ -67,6 +67,11 @@ DarkModeHelper::DarkModeHelper() : m_darkModeSupported(false), m_darkModeEnabled
 
 void DarkModeHelper::EnableForApp()
 {
+	if (!m_darkModeSupported)
+	{
+		return;
+	}
+
 	AllowDarkModeForApp(true);
 	FlushMenuThemes();
 	RefreshImmersiveColorPolicyState();
