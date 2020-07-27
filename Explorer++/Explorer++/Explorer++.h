@@ -175,8 +175,6 @@ private:
 	int OnClose();
 	int OnDestroy();
 	void OnRightClick(NMHDR *nmhdr);
-	void OnDrawClipboard();
-	void OnChangeCBChain(WPARAM wParam, LPARAM lParam);
 	void OnSetFocus();
 	LRESULT OnDeviceChange(WPARAM wParam, LPARAM lParam);
 	LRESULT StatusBarMenuSelect(WPARAM wParam, LPARAM lParam);
@@ -516,7 +514,6 @@ private:
 
 	/** Internal state. **/
 	HWND m_hLastActiveWindow;
-	HWND m_hNextClipboardViewer;
 	std::wstring m_CurrentDirectory;
 	bool m_bTreeViewRightClick;
 	bool m_bSelectingTreeViewDirectory;

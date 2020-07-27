@@ -89,11 +89,6 @@ void Explorerplusplus::OnCreate()
 	m_SHChangeNotifyID = SHChangeNotifyRegister(
 		m_hContainer, SHCNRF_ShellLevel, SHCNE_ASSOCCHANGED, WM_APP_ASSOCCHANGED, 1, &shcne);
 
-	/* Place the main window in the clipboard chain. This
-	will allow the 'Paste' button to be enabled/disabled
-	dynamically. */
-	m_hNextClipboardViewer = SetClipboardViewer(m_hContainer);
-
 	SetFocus(m_hActiveListView);
 
 	m_uiTheming = std::make_unique<UiTheming>(this, m_tabContainer);

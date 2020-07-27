@@ -160,6 +160,10 @@ void MainToolbar::Initialize(HWND parent)
 	AddButtonsToToolbar(m_persistentSettings->m_toolbarButtons);
 	UpdateConfigDependentButtonStates();
 
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
+		std::bind(&MainToolbar::WndProc, this, std::placeholders::_1, std::placeholders::_2,
+			std::placeholders::_3, std::placeholders::_4),
+		SUBCLASS_ID));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
 		parent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
@@ -172,12 +176,19 @@ void MainToolbar::Initialize(HWND parent)
 
 	m_connections.push_back(m_config->useLargeToolbarIcons.addObserver(boost::bind(&MainToolbar::OnUseLargeToolbarIconsUpdated, this, _1)));
 
+	AddClipboardFormatListener(m_hwnd);
+
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
 
 	if (darkModeHelper.IsDarkModeEnabled())
 	{
 		darkModeHelper.SetDarkModeForToolbarTooltips(m_hwnd);
 	}
+}
+
+MainToolbar::~MainToolbar()
+{
+	RemoveClipboardFormatListener(m_hwnd);
 }
 
 void MainToolbar::SetTooolbarImageList()
@@ -221,6 +232,18 @@ std::unordered_map<int, int> MainToolbar::SetUpToolbarImageList(HIMAGELIST image
 	}
 
 	return imageListMappings;
+}
+
+LRESULT CALLBACK MainToolbar::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_CLIPBOARDUPDATE:
+		OnClipboardUpdate();
+		return 0;
+	}
+
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
 LRESULT CALLBACK MainToolbar::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
@@ -825,6 +848,11 @@ void MainToolbar::UpdateToolbarButtonStates()
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::MergeFiles, tab.GetShellBrowser()->GetNumSelectedFiles() > 1);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::OpenCommandPrompt, !bVirtualFolder);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::NewFolder, m_pexpp->CanCreate());
+}
+
+void MainToolbar::OnClipboardUpdate()
+{
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Paste, m_pexpp->CanPaste());
 }
 
 void MainToolbar::OnTabSelected(const Tab &tab)

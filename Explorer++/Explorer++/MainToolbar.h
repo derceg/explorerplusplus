@@ -51,6 +51,7 @@ public:
 
 private:
 
+	static const UINT_PTR SUBCLASS_ID = 0;
 	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
 	enum class HistoryType
@@ -61,9 +62,11 @@ private:
 
 	MainToolbar(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
 		std::shared_ptr<Config> config);
-	~MainToolbar() = default;
+	~MainToolbar();
 
 	static HWND CreateMainToolbar(HWND parent);
+
+	LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	static LRESULT CALLBACK ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -99,6 +102,8 @@ private:
 	void UpdateToolbarButtonImageIndexes();
 
 	void OnUseLargeToolbarIconsUpdated(BOOL newValue);
+
+	void OnClipboardUpdate();
 
 	MainToolbarPersistentSettings *m_persistentSettings;
 

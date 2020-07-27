@@ -560,7 +560,6 @@ int Explorerplusplus::OnDestroy()
 
 	delete m_pStatusBar;
 
-	ChangeClipboardChain(m_hContainer, m_hNextClipboardViewer);
 	PostQuitMessage(0);
 
 	return 0;
@@ -604,29 +603,6 @@ int Explorerplusplus::OnClose()
 void Explorerplusplus::OnSetFocus()
 {
 	SetFocus(m_hLastActiveWindow);
-}
-
-void Explorerplusplus::OnDrawClipboard()
-{
-	SendMessage(m_mainToolbar->GetHWND(), TB_ENABLEBUTTON, ToolbarButton::Paste, CanPaste());
-
-	if (m_hNextClipboardViewer != nullptr)
-	{
-		/* Forward the message to the next window in the chain. */
-		SendMessage(m_hNextClipboardViewer, WM_DRAWCLIPBOARD, 0, 0);
-	}
-}
-
-/*
- * Called when the clipboard chain is changed (i.e. a window
- * is added/removed).
- */
-void Explorerplusplus::OnChangeCBChain(WPARAM wParam, LPARAM lParam)
-{
-	if ((HWND) wParam == m_hNextClipboardViewer)
-		m_hNextClipboardViewer = (HWND) lParam;
-	else if (m_hNextClipboardViewer != nullptr)
-		SendMessage(m_hNextClipboardViewer, WM_CHANGECBCHAIN, wParam, lParam);
 }
 
 void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)

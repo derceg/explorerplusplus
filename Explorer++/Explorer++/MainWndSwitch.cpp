@@ -259,14 +259,6 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		}
 		break;
 
-	case WM_CHANGECBCHAIN:
-		OnChangeCBChain(wParam,lParam);
-		break;
-
-	case WM_DRAWCLIPBOARD:
-		OnDrawClipboard();
-		break;
-
 	case WM_APPCOMMAND:
 		OnAppCommand(GET_APPCOMMAND_LPARAM(lParam));
 		break;

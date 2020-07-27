@@ -64,7 +64,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd) :
 	m_hFoldersToolbar = nullptr;
 	m_hLastActiveWindow = nullptr;
 	m_hActiveListView = nullptr;
-	m_hNextClipboardViewer = nullptr;
 	m_zDeltaTotal = 0;
 	m_InitializationFinished.set(false);
 
