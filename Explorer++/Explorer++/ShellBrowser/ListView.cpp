@@ -572,11 +572,25 @@ void ShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 		}
 		break;
 
+	case 'C':
+		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
+		{
+			CopySelectedItemToClipboard(true);
+		}
+		break;
+
 	case 'I':
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
 			ListViewHelper::InvertSelection(m_hListView);
 			SetFocus(m_hListView);
+		}
+		break;
+
+	case 'X':
+		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
+		{
+			CopySelectedItemToClipboard(false);
 		}
 		break;
 
@@ -600,6 +614,17 @@ void ShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 		else
 		{
 			m_navigationController->GoUp();
+		}
+		break;
+
+	case VK_DELETE:
+		if (IsKeyDown(VK_SHIFT))
+		{
+			DeleteSelectedItems(true);
+		}
+		else
+		{
+			DeleteSelectedItems(false);
 		}
 		break;
 	}

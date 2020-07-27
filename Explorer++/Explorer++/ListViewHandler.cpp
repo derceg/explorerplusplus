@@ -269,11 +269,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(
 
 LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 {
-	LV_KEYDOWN *keyDown = nullptr;
-
-	keyDown = (LV_KEYDOWN *) lParam;
-
-	Tab &tab = m_tabContainer->GetSelectedTab();
+	LV_KEYDOWN *keyDown = reinterpret_cast<LV_KEYDOWN *>(lParam);
 
 	switch (keyDown->wVKey)
 	{
@@ -290,35 +286,10 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 		}
 		break;
 
-	case VK_DELETE:
-		if (IsKeyDown(VK_SHIFT))
-		{
-			tab.GetShellBrowser()->DeleteSelectedItems(true);
-		}
-		else
-		{
-			tab.GetShellBrowser()->DeleteSelectedItems(false);
-		}
-		break;
-
-	case 'C':
-		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
-		{
-			tab.GetShellBrowser()->CopySelectedItemToClipboard(true);
-		}
-		break;
-
 	case 'V':
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
 			OnListViewPaste();
-		}
-		break;
-
-	case 'X':
-		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
-		{
-			tab.GetShellBrowser()->CopySelectedItemToClipboard(false);
 		}
 		break;
 	}
