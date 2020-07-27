@@ -1381,7 +1381,7 @@ void Explorerplusplus::SaveAllSettings()
 	delete pLoadSave;
 }
 
-Config *Explorerplusplus::GetConfig() const
+const Config *Explorerplusplus::GetConfig() const
 {
 	return m_config.get();
 }

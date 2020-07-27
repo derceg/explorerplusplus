@@ -446,7 +446,7 @@ private:
 	HRESULT ExpandAndBrowsePath(const TCHAR *szPath, BOOL bOpenInNewTab, BOOL bSwitchToNewTab);
 
 	/* IExplorerplusplus methods. */
-	Config *GetConfig() const override;
+	const Config *GetConfig() const override;
 	HMODULE GetLanguageModule() const override;
 	HWND GetMainWindow() const override;
 	HWND GetActiveListView() const override;

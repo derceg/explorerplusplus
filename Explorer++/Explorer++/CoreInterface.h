@@ -33,7 +33,7 @@ and some of the other components (such as the
 dialogs and toolbars). */
 __interface IExplorerplusplus
 {
-	Config *GetConfig() const;
+	const Config *GetConfig() const;
 	HMODULE GetLanguageModule() const;
 
 	HWND GetMainWindow() const;
