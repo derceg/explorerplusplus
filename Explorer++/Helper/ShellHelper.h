@@ -61,7 +61,7 @@ HRESULT GetVirtualParentPath(PCIDLIST_ABSOLUTE pidlDirectory, PIDLIST_ABSOLUTE *
 BOOL IsNamespaceRoot(PCIDLIST_ABSOLUTE pidl);
 BOOL MyExpandEnvironmentStrings(const TCHAR *szSrc, TCHAR *szExpandedPath, DWORD nSize);
 HRESULT BuildHDropList(
-	FORMATETC *pftc, STGMEDIUM *pstg, const std::list<std::wstring> &filenameList);
+	FORMATETC *pftc, STGMEDIUM *pstg, const std::vector<std::wstring> &filenameList);
 HRESULT BuildShellIDList(FORMATETC *pftc, STGMEDIUM *pstg, PCIDLIST_ABSOLUTE pidlDirectory,
 	const std::vector<PCITEMID_CHILD> &pidlList);
 HRESULT BindToIdl(PCIDLIST_ABSOLUTE pidl, REFIID riid, void **ppv);

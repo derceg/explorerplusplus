@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ShellBrowser.h"
 #include "Config.h"
+#include "CoreInterface.h"
 #include "DarkModeHelper.h"
 #include "ItemData.h"
 #include "MainResource.h"
@@ -17,6 +18,7 @@
 #include "../Helper/Controls.h"
 #include "../Helper/DriveInfo.h"
 #include "../Helper/FileActionHandler.h"
+#include "../Helper/FileOperations.h"
 #include "../Helper/IconFetcher.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
@@ -69,51 +71,50 @@ ULONG __stdcall ShellBrowser::Release()
 	return m_iRefCount;
 }
 
-ShellBrowser *ShellBrowser::CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner,
-	CachedIcons *cachedIcons, IconResourceLoader *iconResourceLoader, const Config *config,
+ShellBrowser *ShellBrowser::CreateNew(int id, HWND hOwner, IExplorerplusplus *coreInterface,
 	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 	const FolderSettings &folderSettings, std::optional<FolderColumns> initialColumns)
 {
-	return new ShellBrowser(id, resourceInstance, hOwner, cachedIcons, iconResourceLoader, config,
-		tabNavigation, fileActionHandler, folderSettings, initialColumns);
+	return new ShellBrowser(id, hOwner, coreInterface, tabNavigation, fileActionHandler,
+		folderSettings, initialColumns);
 }
 
-ShellBrowser *ShellBrowser::CreateFromPreserved(int id, HINSTANCE resourceInstance, HWND hOwner,
-	CachedIcons *cachedIcons, IconResourceLoader *iconResourceLoader, const Config *config,
-	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
+ShellBrowser *ShellBrowser::CreateFromPreserved(int id, HWND hOwner,
+	IExplorerplusplus *coreInterface, TabNavigationInterface *tabNavigation,
+	FileActionHandler *fileActionHandler,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState)
 {
-	return new ShellBrowser(id, resourceInstance, hOwner, cachedIcons, iconResourceLoader, config,
-		tabNavigation, fileActionHandler, history, currentEntry, preservedFolderState);
+	return new ShellBrowser(id, hOwner, coreInterface, tabNavigation, fileActionHandler, history,
+		currentEntry, preservedFolderState);
 }
 
-ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
-	CachedIcons *cachedIcons, IconResourceLoader *iconResourceLoader, const Config *config,
+ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface,
 	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState) :
-	ShellBrowser(id, resourceInstance, hOwner, cachedIcons, iconResourceLoader, config,
-		tabNavigation, fileActionHandler, preservedFolderState.folderSettings, std::nullopt)
+	ShellBrowser(id, hOwner, coreInterface, tabNavigation, fileActionHandler,
+		preservedFolderState.folderSettings, std::nullopt)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(
 		this, tabNavigation, m_iconFetcher.get(), history, currentEntry);
 }
 
-ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
-	CachedIcons *cachedIcons, IconResourceLoader *iconResourceLoader, const Config *config,
+ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface,
 	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 	const FolderSettings &folderSettings, std::optional<FolderColumns> initialColumns) :
 	m_ID(id),
-	m_hResourceModule(resourceInstance),
+	m_hResourceModule(coreInterface->GetLanguageModule()),
 	m_hOwner(hOwner),
-	m_cachedIcons(cachedIcons),
-	m_iconResourceLoader(iconResourceLoader),
-	m_config(config),
+	m_cachedIcons(coreInterface->GetCachedIcons()),
+	m_iconResourceLoader(coreInterface->GetIconResourceLoader()),
+	m_config(coreInterface->GetConfig()),
 	m_tabNavigation(tabNavigation),
 	m_fileActionHandler(fileActionHandler),
 	m_folderSettings(folderSettings),
-	m_folderColumns(initialColumns ? *initialColumns : config->globalFolderSettings.folderColumns),
+	m_folderColumns(initialColumns
+			? *initialColumns
+			: coreInterface->GetConfig()->globalFolderSettings.folderColumns),
 	m_columnThreadPool(
 		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
 	m_columnResultIDCounter(0),
@@ -127,7 +128,7 @@ ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
 	m_iRefCount = 1;
 
 	m_hListView = SetUpListView(hOwner);
-	m_iconFetcher = std::make_unique<IconFetcher>(m_hListView, cachedIcons);
+	m_iconFetcher = std::make_unique<IconFetcher>(m_hListView, m_cachedIcons);
 	m_navigationController =
 		std::make_unique<ShellNavigationController>(this, tabNavigation, m_iconFetcher.get());
 
@@ -157,10 +158,17 @@ ShellBrowser::ShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
 
 	m_iFolderIcon = GetDefaultFolderIconIndex();
 	m_iFileIcon = GetDefaultFileIconIndex();
+
+	AddClipboardFormatListener(m_hListView);
+
+	m_connections.push_back(coreInterface->AddApplicationShuttingDownObserver(
+		std::bind(&ShellBrowser::OnApplicationShuttingDown, this)));
 }
 
 ShellBrowser::~ShellBrowser()
 {
+	RemoveClipboardFormatListener(m_hListView);
+
 	DestroyWindow(m_hListView);
 
 	m_columnThreadPool.clear_queue();
@@ -1644,4 +1652,86 @@ void ShellBrowser::StartRenamingMultipleFiles()
 	MassRenameDialog massRenameDialog(m_hResourceModule, m_hListView, fullFilenameList,
 		m_iconResourceLoader, m_fileActionHandler);
 	massRenameDialog.ShowModalDialog();
+}
+
+HRESULT ShellBrowser::CopySelectedItemToClipboard(bool copy)
+{
+	auto selectedFiles = GetSelectedItems();
+	wil::com_ptr<IDataObject> clipboardDataObject;
+	HRESULT hr;
+
+	if (copy)
+	{
+		hr = CopyFiles(selectedFiles, &clipboardDataObject);
+
+		if (SUCCEEDED(hr))
+		{
+			UpdateCurrentClipboardObject(clipboardDataObject);
+		}
+	}
+	else
+	{
+		hr = CutFiles(selectedFiles, &clipboardDataObject);
+
+		if (SUCCEEDED(hr))
+		{
+			UpdateCurrentClipboardObject(clipboardDataObject);
+
+			int item = -1;
+
+			while ((item = ListView_GetNextItem(m_hListView, item, LVNI_SELECTED)) != -1)
+			{
+				TCHAR filename[MAX_PATH];
+				GetItemDisplayName(item, SIZEOF_ARRAY(filename), filename);
+				m_cutFileNames.emplace_back(filename);
+
+				MarkItemAsCut(item, true);
+			}
+		}
+	}
+
+	return hr;
+}
+
+void ShellBrowser::UpdateCurrentClipboardObject(wil::com_ptr<IDataObject> clipboardDataObject)
+{
+	RestoreStateOfCutItems();
+
+	m_clipboardDataObject = clipboardDataObject;
+}
+
+void ShellBrowser::OnClipboardUpdate()
+{
+	if (m_clipboardDataObject && OleIsCurrentClipboard(m_clipboardDataObject.get()) == S_FALSE)
+	{
+		RestoreStateOfCutItems();
+
+		m_cutFileNames.clear();
+		m_clipboardDataObject.reset();
+	}
+}
+
+void ShellBrowser::RestoreStateOfCutItems()
+{
+	// FIXME: Should base this off something other than the filename (which can change).
+	for (const auto &filename : m_cutFileNames)
+	{
+		int item = LocateFileItemIndex(filename.c_str());
+
+		if (item != -1)
+		{
+			MarkItemAsCut(item, false);
+		}
+	}
+}
+
+void ShellBrowser::OnApplicationShuttingDown()
+{
+	if (m_clipboardDataObject && OleIsCurrentClipboard(m_clipboardDataObject.get()) == S_OK)
+	{
+		// Ensure that any data that was copied to the clipboard remains there. It's only necessary
+		// to call this when the application is going to be closed. While the application is
+		// running, any clipboard objects will still be available.
+		OleFlushClipboard();
+	}
 }

@@ -17,6 +17,7 @@
 #include "stdafx.h"
 #include "ShellTreeView.h"
 #include "Config.h"
+#include "CoreInterface.h"
 #include "DarkModeHelper.h"
 #include "TabContainer.h"
 #include "../Helper/CachedIcons.h"
@@ -32,10 +33,11 @@
 int CALLBACK CompareItemsStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 DWORD WINAPI Thread_MonitorAllDrives(LPVOID pParam);
 
-ShellTreeView::ShellTreeView(HWND hParent, const Config *config, IDirectoryMonitor *pDirMon,
-	TabContainer *tabContainer, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons) :
+ShellTreeView::ShellTreeView(HWND hParent, IExplorerplusplus *coreInterface,
+	IDirectoryMonitor *pDirMon, TabContainer *tabContainer, FileActionHandler *fileActionHandler,
+	CachedIcons *cachedIcons) :
 	m_hTreeView(CreateTreeView(hParent)),
-	m_config(config),
+	m_config(coreInterface->GetConfig()),
 	m_pDirMon(pDirMon),
 	m_tabContainer(tabContainer),
 	m_fileActionHandler(fileActionHandler),
@@ -49,8 +51,7 @@ ShellTreeView::ShellTreeView(HWND hParent, const Config *config, IDirectoryMonit
 	m_subfoldersThreadPool(
 		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
 	m_subfoldersResultIDCounter(0),
-	m_cutItem(nullptr),
-	m_cutItemDataObject(nullptr)
+	m_cutItem(nullptr)
 {
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
 
@@ -93,6 +94,9 @@ ShellTreeView::ShellTreeView(HWND hParent, const Config *config, IDirectoryMonit
 	CloseHandle(hThread);
 
 	AddClipboardFormatListener(m_hTreeView);
+
+	m_connections.push_back(coreInterface->AddApplicationShuttingDownObserver(
+		std::bind(&ShellTreeView::OnApplicationShuttingDown, this)));
 }
 
 HWND ShellTreeView::CreateTreeView(HWND parent)
@@ -112,6 +116,14 @@ ShellTreeView::~ShellTreeView()
 	DeleteCriticalSection(&m_cs);
 
 	m_iconThreadPool.clear_queue();
+}
+
+void ShellTreeView::OnApplicationShuttingDown()
+{
+	if (m_clipboardDataObject && OleIsCurrentClipboard(m_clipboardDataObject.get()) == S_OK)
+	{
+		OleFlushClipboard();
+	}
 }
 
 LRESULT CALLBACK ShellTreeView::TreeViewProcStub(
@@ -1935,12 +1947,17 @@ void ShellTreeView::CopySelectedItemToClipboard(bool copy)
 		return;
 	}
 
-	std::list<std::wstring> fileNameList = { fullFileName };
+	std::vector<std::wstring> fileNameList = { fullFileName };
 	wil::com_ptr<IDataObject> clipboardDataObject;
 
 	if (copy)
 	{
-		CopyFiles(fileNameList, &clipboardDataObject);
+		hr = CopyFiles(fileNameList, &clipboardDataObject);
+
+		if (SUCCEEDED(hr))
+		{
+			UpdateCurrentClipboardObject(clipboardDataObject);
+		}
 	}
 	else
 	{
@@ -1948,18 +1965,9 @@ void ShellTreeView::CopySelectedItemToClipboard(bool copy)
 
 		if (SUCCEEDED(hr))
 		{
-			// Note that the WM_CLIPBOARDUPDATE message will be processed after this function has
-			// finished. Therefore, any previously cut item will need to have its state restored
-			// here. Relying on the WM_CLIPBOARDUPDATE handler wouldn't work, as by the time it
-			// runs, m_cutItem would refer to the newly cut item.
-			if (m_cutItem)
-			{
-				UpdateItemState(m_cutItem, TVIS_CUT, 0);
-			}
+			UpdateCurrentClipboardObject(clipboardDataObject);
 
 			m_cutItem = item;
-			m_cutItemDataObject = clipboardDataObject;
-
 			UpdateItemState(item, TVIS_CUT, TVIS_CUT);
 		}
 	}
@@ -1995,15 +2003,32 @@ void ShellTreeView::PasteClipboardData()
 	dropHandler->Release();
 }
 
+void ShellTreeView::UpdateCurrentClipboardObject(wil::com_ptr<IDataObject> clipboardDataObject)
+{
+	// When copying an item, the WM_CLIPBOARDUPDATE message will be processed after the copy
+	// operation has been fully completed. Therefore, any previously cut item will need to have its
+	// state restored first. Relying on the WM_CLIPBOARDUPDATE handler wouldn't work, as by the time
+	// it runs, m_cutItem would refer to the newly cut item.
+	if (m_cutItem)
+	{
+		UpdateItemState(m_cutItem, TVIS_CUT, 0);
+	}
+
+	m_clipboardDataObject = clipboardDataObject;
+}
+
 void ShellTreeView::OnClipboardUpdate()
 {
-	if (m_cutItemDataObject && OleIsCurrentClipboard(m_cutItemDataObject.get()) == S_FALSE)
+	if (m_clipboardDataObject && OleIsCurrentClipboard(m_clipboardDataObject.get()) == S_FALSE)
 	{
-		assert(m_cutItem);
-		UpdateItemState(m_cutItem, TVIS_CUT, 0);
+		if (m_cutItem)
+		{
+			UpdateItemState(m_cutItem, TVIS_CUT, 0);
 
-		m_cutItem = nullptr;
-		m_cutItemDataObject.reset();
+			m_cutItem = nullptr;
+		}
+
+		m_clipboardDataObject.reset();
 	}
 }
 

@@ -408,7 +408,6 @@ private:
 	void OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow) override;
 	void OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
 	void OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters) override;
-	HRESULT OnListViewCopy(BOOL bCopy);
 
 	/* File context menu. */
 	void AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems,
@@ -429,9 +428,6 @@ private:
 	BOOL CanPaste() const override;
 	BOOL TestItemAttributes(SFGAOF attributes) const;
 	HRESULT GetSelectionAttributes(SFGAOF *pItemAttributes) const;
-
-	void BuildListViewFileSelectionList(
-		HWND hListView, std::list<std::wstring> *pFileSelectionList);
 
 	HRESULT GetTreeViewSelectionAttributes(SFGAOF *pItemAttributes) const;
 
@@ -482,6 +478,9 @@ private:
 	HMENU CreateRebarHistoryMenu(BOOL bBack);
 	std::optional<int> OnRebarCustomDraw(NMHDR *nmhdr);
 	bool OnRebarEraseBackground(HDC hdc);
+
+	boost::signals2::connection AddApplicationShuttingDownObserver(
+		const ApplicationShuttingDownSignal::slot_type &observer) override;
 
 	/* Miscellaneous. */
 	void CreateStatusBar();
@@ -542,6 +541,7 @@ private:
 	CachedIcons m_cachedIcons;
 
 	MainMenuPreShowSignal m_mainMenuPreShowSignal;
+	ApplicationShuttingDownSignal m_applicationShuttingDownSignal;
 
 	/* Tabs. */
 	TabContainer *m_tabContainer;
@@ -612,9 +612,6 @@ private:
 	std::list<DWFolderSize> m_DWFolderSizes;
 	int m_iDWFolderSizeUniqueId;
 
-	/* Copy/cut. */
-	IDataObject *m_pClipboardDataObject;
-
 	/* Drag and drop. */
 	bool m_bDragging;
 	bool m_bDragCancelled;
@@ -622,10 +619,6 @@ private:
 
 	/* Rename support. */
 	bool m_bListViewRenaming;
-
-	/* Cut items data. */
-	std::list<std::wstring> m_CutFileNameList;
-	int m_iCutTabInternal;
 
 	/* Menu images. */
 	std::vector<wil::unique_hbitmap> m_menuImages;

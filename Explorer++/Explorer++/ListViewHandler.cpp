@@ -304,7 +304,7 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 	case 'C':
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
-			OnListViewCopy(TRUE);
+			tab.GetShellBrowser()->CopySelectedItemToClipboard(true);
 		}
 		break;
 
@@ -318,7 +318,7 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 	case 'X':
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
-			OnListViewCopy(FALSE);
+			tab.GetShellBrowser()->CopySelectedItemToClipboard(false);
 		}
 		break;
 	}
@@ -692,7 +692,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam, DragType dragType)
 
 	std::vector<unique_pidl_child> pidls;
 	std::vector<PCITEMID_CHILD> rawPidls;
-	std::list<std::wstring> filenameList;
+	std::vector<std::wstring> filenameList;
 
 	int item = -1;
 
@@ -889,58 +889,6 @@ void Explorerplusplus::OnListViewCopyUniversalPaths() const
 	clipboardWriter.WriteText(strUniversalPaths);
 }
 
-HRESULT Explorerplusplus::OnListViewCopy(BOOL bCopy)
-{
-	IDataObject *pClipboardDataObject = nullptr;
-	int iItem = -1;
-	HRESULT hr;
-
-	if (!CanCopy())
-		return E_FAIL;
-
-	SetCursor(LoadCursor(nullptr, IDC_WAIT));
-
-	std::list<std::wstring> fileNameList;
-
-	BuildListViewFileSelectionList(m_hActiveListView, &fileNameList);
-
-	if (bCopy)
-	{
-		hr = CopyFiles(fileNameList, &pClipboardDataObject);
-
-		if (SUCCEEDED(hr))
-		{
-			m_pClipboardDataObject = pClipboardDataObject;
-		}
-	}
-	else
-	{
-		hr = CutFiles(fileNameList, &pClipboardDataObject);
-
-		if (SUCCEEDED(hr))
-		{
-			m_pClipboardDataObject = pClipboardDataObject;
-			m_iCutTabInternal = m_tabContainer->GetSelectedTab().GetId();
-
-			TCHAR szFilename[MAX_PATH];
-
-			/* 'Ghost' each of the cut items. */
-			while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
-			{
-				m_pActiveShellBrowser->GetItemDisplayName(
-					iItem, SIZEOF_ARRAY(szFilename), szFilename);
-				m_CutFileNameList.emplace_back(szFilename);
-
-				m_pActiveShellBrowser->GhostItem(iItem);
-			}
-		}
-	}
-
-	SetCursor(LoadCursor(nullptr, IDC_ARROW));
-
-	return hr;
-}
-
 void Explorerplusplus::OnListViewSetFileAttributes() const
 {
 	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
@@ -975,30 +923,6 @@ void Explorerplusplus::OnListViewPaste()
 
 		pClipboardObject->Release();
 	}
-}
-
-void Explorerplusplus::BuildListViewFileSelectionList(
-	HWND hListView, std::list<std::wstring> *pFileSelectionList)
-{
-	if (pFileSelectionList == nullptr)
-	{
-		return;
-	}
-
-	std::list<std::wstring> fileSelectionList;
-	int iItem = -1;
-
-	while ((iItem = ListView_GetNextItem(hListView, iItem, LVNI_SELECTED)) != -1)
-	{
-		TCHAR szFullFileName[MAX_PATH];
-
-		m_pActiveShellBrowser->GetItemFullName(iItem, szFullFileName, SIZEOF_ARRAY(szFullFileName));
-
-		std::wstring stringFileName(szFullFileName);
-		fileSelectionList.push_back(stringFileName);
-	}
-
-	pFileSelectionList->assign(fileSelectionList.begin(), fileSelectionList.end());
 }
 
 int Explorerplusplus::HighlightSimilarFiles(HWND ListView) const

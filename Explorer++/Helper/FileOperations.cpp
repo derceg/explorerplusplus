@@ -435,8 +435,8 @@ BOOL NFileOperations::SaveDirectoryListing(
 	/* Remove the trailing newline. */
 	strContents = strContents.substr(0, strContents.size() - 2);
 
-	HANDLE hFile = CreateFile(
-		strFilename.c_str(), FILE_WRITE_DATA, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	HANDLE hFile = CreateFile(strFilename.c_str(), FILE_WRITE_DATA, 0, nullptr, CREATE_ALWAYS,
+		FILE_ATTRIBUTE_NORMAL, nullptr);
 
 	if (hFile != INVALID_HANDLE_VALUE)
 	{
@@ -460,18 +460,18 @@ BOOL NFileOperations::SaveDirectoryListing(
 	return FALSE;
 }
 
-HRESULT CopyFiles(const std::list<std::wstring> &FileNameList, IDataObject **pClipboardDataObject)
+HRESULT CopyFiles(const std::vector<std::wstring> &FileNameList, IDataObject **pClipboardDataObject)
 {
 	return CopyFilesToClipboard(FileNameList, FALSE, pClipboardDataObject);
 }
 
-HRESULT CutFiles(const std::list<std::wstring> &FileNameList, IDataObject **pClipboardDataObject)
+HRESULT CutFiles(const std::vector<std::wstring> &FileNameList, IDataObject **pClipboardDataObject)
 {
 	return CopyFilesToClipboard(FileNameList, TRUE, pClipboardDataObject);
 }
 
 HRESULT CopyFilesToClipboard(
-	const std::list<std::wstring> &FileNameList, BOOL bMove, IDataObject **pClipboardDataObject)
+	const std::vector<std::wstring> &FileNameList, BOOL bMove, IDataObject **pClipboardDataObject)
 {
 	FORMATETC ftc[2];
 	STGMEDIUM stg[2];
@@ -778,7 +778,8 @@ void NFileOperations::DeleteFileSecurely(
 
 	/* Open the file, block any sharing mode, to stop the file
 	been opened while it is overwritten. */
-	hFile = CreateFile(strFilename.c_str(), FILE_WRITE_DATA, 0, nullptr, OPEN_EXISTING, NULL, nullptr);
+	hFile =
+		CreateFile(strFilename.c_str(), FILE_WRITE_DATA, 0, nullptr, OPEN_EXISTING, NULL, nullptr);
 
 	if (hFile == INVALID_HANDLE_VALUE)
 	{

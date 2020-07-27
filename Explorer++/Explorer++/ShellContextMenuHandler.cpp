@@ -11,7 +11,9 @@
 #include "Explorer++.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "ShellTreeView/ShellTreeView.h"
+#include "Tab.h"
 #include "TabContainer.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
@@ -108,7 +110,8 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	{
 		if (pfcmi->uFrom == FROM_LISTVIEW)
 		{
-			OnListViewCopy(TRUE);
+			Tab &selectedTab = m_tabContainer->GetSelectedTab();
+			selectedTab.GetShellBrowser()->CopySelectedItemToClipboard(true);
 		}
 		else if (pfcmi->uFrom == FROM_TREEVIEW)
 		{
@@ -121,7 +124,8 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	{
 		if (pfcmi->uFrom == FROM_LISTVIEW)
 		{
-			OnListViewCopy(FALSE);
+			Tab &selectedTab = m_tabContainer->GetSelectedTab();
+			selectedTab.GetShellBrowser()->CopySelectedItemToClipboard(false);
 		}
 		else if (pfcmi->uFrom == FROM_TREEVIEW)
 		{

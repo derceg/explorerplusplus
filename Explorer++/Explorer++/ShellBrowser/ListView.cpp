@@ -75,6 +75,10 @@ LRESULT CALLBACK ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 	}
 	break;
 
+	case WM_CLIPBOARDUPDATE:
+		OnClipboardUpdate();
+		return 0;
+
 	case WM_NOTIFY:
 		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == ListView_GetHeader(m_hListView))
 		{
@@ -629,47 +633,24 @@ int ShellBrowser::GetItemInternalIndex(int item) const
 	return static_cast<int>(lvItem.lParam);
 }
 
-BOOL ShellBrowser::GhostItem(int iItem)
+void ShellBrowser::MarkItemAsCut(int item, bool cut)
 {
-	return GhostItemInternal(iItem, TRUE);
-}
+	const auto &itemInfo = GetItemByIndex(item);
 
-BOOL ShellBrowser::DeghostItem(int iItem)
-{
-	return GhostItemInternal(iItem, FALSE);
-}
-
-BOOL ShellBrowser::GhostItemInternal(int iItem, BOOL bGhost)
-{
-	LVITEM lvItem;
-	BOOL bRet;
-
-	lvItem.mask = LVIF_PARAM;
-	lvItem.iItem = iItem;
-	lvItem.iSubItem = 0;
-	bRet = ListView_GetItem(m_hListView, &lvItem);
-
-	if (bRet)
+	// If the file is hidden, prevent changes to its visibility state.
+	if (WI_IsFlagSet(itemInfo.wfd.dwFileAttributes, FILE_ATTRIBUTE_HIDDEN))
 	{
-		/* If the file is hidden, prevent changes to its visibility state (i.e.
-		hidden items will ALWAYS be ghosted). */
-		if (WI_IsFlagSet(
-				m_itemInfoMap.at((int) lvItem.lParam).wfd.dwFileAttributes, FILE_ATTRIBUTE_HIDDEN))
-		{
-			return FALSE;
-		}
-
-		if (bGhost)
-		{
-			ListView_SetItemState(m_hListView, iItem, LVIS_CUT, LVIS_CUT);
-		}
-		else
-		{
-			ListView_SetItemState(m_hListView, iItem, 0, LVIS_CUT);
-		}
+		return;
 	}
 
-	return TRUE;
+	if (cut)
+	{
+		ListView_SetItemState(m_hListView, item, LVIS_CUT, LVIS_CUT);
+	}
+	else
+	{
+		ListView_SetItemState(m_hListView, item, 0, LVIS_CUT);
+	}
 }
 
 void ShellBrowser::ShowPropertiesForSelectedFiles() const
@@ -905,4 +886,19 @@ HRESULT ShellBrowser::GetListViewItemAttributes(int item, SFGAOF *attributes) co
 {
 	const auto &itemInfo = GetItemByIndex(item);
 	return GetItemAttributes(itemInfo.pidlComplete.get(), attributes);
+}
+
+std::vector<std::wstring> ShellBrowser::GetSelectedItems()
+{
+	std::vector<std::wstring> selectedFiles;
+	int item = -1;
+
+	while ((item = ListView_GetNextItem(m_hListView, item, LVNI_SELECTED)) != -1)
+	{
+		TCHAR fullFileName[MAX_PATH];
+		GetItemFullName(item, fullFileName, SIZEOF_ARRAY(fullFileName));
+		selectedFiles.emplace_back(fullFileName);
+	}
+
+	return selectedFiles;
 }

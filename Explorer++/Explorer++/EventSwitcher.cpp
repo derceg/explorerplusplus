@@ -48,13 +48,12 @@ void Explorerplusplus::OnCopyUniversalPaths() const
 
 void Explorerplusplus::OnCopy(BOOL bCopy)
 {
-	HWND hFocus;
-
-	hFocus = GetFocus();
+	HWND hFocus = GetFocus();
 
 	if (hFocus == m_hActiveListView)
 	{
-		OnListViewCopy(bCopy);
+		Tab &selectedTab = m_tabContainer->GetSelectedTab();
+		selectedTab.GetShellBrowser()->CopySelectedItemToClipboard(bCopy);
 	}
 	else if (hFocus == m_shellTreeView->GetHWND())
 	{

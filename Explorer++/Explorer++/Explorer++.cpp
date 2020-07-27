@@ -73,9 +73,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd) :
 	m_ColorRules = NColorRuleHelper::GetDefaultColorRules();
 
 	m_iDWFolderSizeUniqueId = 0;
-
-	m_pClipboardDataObject = nullptr;
-	m_iCutTabInternal = 0;
 }
 
 Explorerplusplus::~Explorerplusplus()

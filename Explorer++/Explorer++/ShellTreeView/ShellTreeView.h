@@ -9,12 +9,14 @@
 #include "../Helper/WindowSubclassWrapper.h"
 #include "../Helper/iDirectoryMonitor.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
+#include <boost/signals2.hpp>
 #include <wil/com.h>
 #include <optional>
 
 class CachedIcons;
 struct Config;
 class FileActionHandler;
+__interface IExplorerplusplus;
 class TabContainer;
 
 class ShellTreeView : public IDropTarget, public IDropSource
@@ -25,7 +27,7 @@ public:
 	ULONG __stdcall AddRef() override;
 	ULONG __stdcall Release() override;
 
-	ShellTreeView(HWND hParent, const Config *config, IDirectoryMonitor *pDirMon,
+	ShellTreeView(HWND hParent, IExplorerplusplus *coreInterface, IDirectoryMonitor *pDirMon,
 		TabContainer *tabContainer, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons);
 	~ShellTreeView();
 
@@ -163,6 +165,8 @@ private:
 	void OnMiddleButtonDown(const POINT *pt);
 	void OnMiddleButtonUp(const POINT *pt);
 	bool OnEndLabelEdit(const NMTVDISPINFO *dispInfo);
+
+	void UpdateCurrentClipboardObject(wil::com_ptr<IDataObject> clipboardDataObject);
 	void OnClipboardUpdate();
 
 	static void DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData);
@@ -213,11 +217,14 @@ private:
 	BOOL IsDesktopSubChild(const TCHAR *szFullFileName);
 	void UpdateItemState(HTREEITEM item, UINT stateMask, UINT state);
 
+	void OnApplicationShuttingDown();
+
 	HWND m_hTreeView;
 	int m_iRefCount;
 	IDirectoryMonitor *m_pDirMon;
 	BOOL m_bShowHidden;
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<boost::signals2::scoped_connection> m_connections;
 	const Config *m_config;
 	TabContainer *m_tabContainer;
 	FileActionHandler *m_fileActionHandler;
@@ -251,7 +258,7 @@ private:
 	DragType m_DragType;
 
 	HTREEITEM m_cutItem;
-	wil::com_ptr<IDataObject> m_cutItemDataObject;
+	wil::com_ptr<IDataObject> m_clipboardDataObject;
 
 	/* Directory modification. */
 	std::list<AlteredFile_t> m_AlteredList;

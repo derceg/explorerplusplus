@@ -184,7 +184,8 @@ BOOL IsNamespaceRoot(PCIDLIST_ABSOLUTE pidl)
 {
 	BOOL bNamespaceRoot = FALSE;
 	unique_pidl_absolute pidlDesktop;
-	HRESULT hr = SHGetFolderLocation(nullptr, CSIDL_DESKTOP, nullptr, 0, wil::out_param(pidlDesktop));
+	HRESULT hr =
+		SHGetFolderLocation(nullptr, CSIDL_DESKTOP, nullptr, 0, wil::out_param(pidlDesktop));
 
 	if (SUCCEEDED(hr))
 	{
@@ -506,7 +507,7 @@ DWORD DetermineDragEffect(
 }
 
 HRESULT BuildHDropList(
-	FORMATETC *pftc, STGMEDIUM *pstg, const std::list<std::wstring> &filenameList)
+	FORMATETC *pftc, STGMEDIUM *pstg, const std::vector<std::wstring> &filenameList)
 {
 	SetFORMATETC(pftc, CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL);
 
@@ -1127,7 +1128,8 @@ BOOL LoadContextMenuHandlers(const TCHAR *szRegKey,
 
 		DWORD dwLen = SIZEOF_ARRAY(szKeyName);
 
-		while ((lRes = RegEnumKeyEx(hKey, iIndex, szKeyName, &dwLen, nullptr, nullptr, nullptr, nullptr))
+		while ((lRes = RegEnumKeyEx(
+					hKey, iIndex, szKeyName, &dwLen, nullptr, nullptr, nullptr, nullptr))
 			== ERROR_SUCCESS)
 		{
 			HKEY hSubKey;

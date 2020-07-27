@@ -6,10 +6,11 @@
 
 #include <boost/signals2.hpp>
 
-typedef boost::signals2::signal<void()> TabsInitializedSignal;
-typedef boost::signals2::signal<void(HMENU mainMenu)> MainMenuPreShowSignal;
-typedef boost::signals2::signal<void(HMENU menu, HWND sourceWindow, const POINT &pt)>
-	ToolbarContextMenuSignal;
+using TabsInitializedSignal = boost::signals2::signal<void()>;
+using MainMenuPreShowSignal = boost::signals2::signal<void(HMENU mainMenu)>;
+using ToolbarContextMenuSignal =
+	boost::signals2::signal<void(HMENU menu, HWND sourceWindow, const POINT &pt)>;
+using ApplicationShuttingDownSignal = boost::signals2::signal<void()>;
 
 enum class MousewheelSource
 {
@@ -84,4 +85,6 @@ __interface IExplorerplusplus
 		const MainMenuPreShowSignal::slot_type &observer);
 	boost::signals2::connection AddToolbarContextMenuObserver(
 		const ToolbarContextMenuSignal::slot_type &observer);
+	boost::signals2::connection AddApplicationShuttingDownObserver(
+		const ApplicationShuttingDownSignal::slot_type &observer);
 };
