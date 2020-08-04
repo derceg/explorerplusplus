@@ -742,11 +742,17 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 	{
 		if (pnmhdr->hwndFrom == GetDlgItem(m_hDlg, IDC_LISTVIEW_SEARCHRESULTS))
 		{
+			unique_pidl_absolute pidlDirectory;
+			std::vector<unique_pidl_child> pidlItemPtrs;
 			HWND hListView = GetDlgItem(m_hDlg, IDC_LISTVIEW_SEARCHRESULTS);
-			int iSelected = ListView_GetNextItem(hListView, -1, LVNI_ALL | LVNI_SELECTED);
 
-			if (iSelected != -1)
+			int iSelected = -1;
+			for (;;)
 			{
+				iSelected = ListView_GetNextItem(hListView, iSelected, LVNI_ALL | LVNI_SELECTED);
+				if (-1 == iSelected)
+					break;
+
 				LVITEM lvItem;
 				lvItem.mask = LVIF_PARAM;
 				lvItem.iItem = iSelected;
@@ -770,26 +776,34 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 						// __unaligned qualifiers. This only affects Itanium (which isn't
 						// supported), but cloning the pidl here is a simple way of producing an
 						// aligned version.
-						unique_pidl_child pidlItem(ILCloneChild(ILFindLastID(pidlFull.get())));
+						pidlItemPtrs.emplace_back(ILCloneChild(ILFindLastID(pidlFull.get())));
 
-						std::vector<PCITEMID_CHILD> pidlItems;
-						pidlItems.push_back(pidlItem.get());
-
-						unique_pidl_absolute pidlDirectory(ILCloneFull(pidlFull.get()));
-						ILRemoveLastID(pidlDirectory.get());
-
-						FileContextMenuManager fcmm(m_hDlg, pidlDirectory.get(), pidlItems);
-
-						DWORD dwCursorPos = GetMessagePos();
-
-						POINT ptCursor;
-						ptCursor.x = GET_X_LPARAM(dwCursorPos);
-						ptCursor.y = GET_Y_LPARAM(dwCursorPos);
-
-						fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, &ptCursor,
-							m_pexpp->GetStatusBar(), NULL, FALSE, IsKeyDown(VK_SHIFT));
+						if (!pidlDirectory.get())
+						{
+							unique_pidl_absolute tmp(ILCloneFull(pidlFull.get()));
+							ILRemoveLastID(tmp.get());
+							pidlDirectory.swap(tmp);
+						}
 					}
 				}
+			}
+
+			if (!pidlItemPtrs.empty() && pidlDirectory.get())
+			{
+				std::vector<PCITEMID_CHILD> pidlItems;
+				for (const auto &it : pidlItemPtrs)
+					pidlItems.push_back(it.get());
+
+				FileContextMenuManager fcmm(m_hDlg, pidlDirectory.get(), pidlItems);
+
+				DWORD dwCursorPos = GetMessagePos();
+
+				POINT ptCursor;
+				ptCursor.x = GET_X_LPARAM(dwCursorPos);
+				ptCursor.y = GET_Y_LPARAM(dwCursorPos);
+
+				fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, &ptCursor,
+					m_pexpp->GetStatusBar(), NULL, FALSE, IsKeyDown(VK_SHIFT));
 			}
 		}
 	}
