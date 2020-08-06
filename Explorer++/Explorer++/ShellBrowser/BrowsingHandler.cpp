@@ -158,6 +158,38 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 		enumFlags |= SHCONTF_INCLUDEHIDDEN | SHCONTF_INCLUDESUPERHIDDEN;
 	}
 
+	std::map<std::wstring, WIN32_FIND_DATA> networkPathWfds;
+	TCHAR szParsingPath[MAX_PATH];
+	GetDisplayName(pidlDirectory, szParsingPath, SIZEOF_ARRAY(szParsingPath), SHGDN_FORPARSING);
+
+	if (PathIsNetworkPath(szParsingPath))
+	{
+		HANDLE hFindFile;
+		WIN32_FIND_DATA wfd;
+
+		std::wstring fstr(szParsingPath);
+		fstr += L"\\*.*";
+		hFindFile = FindFirstFile(fstr.c_str(), &wfd);
+		if (INVALID_HANDLE_VALUE != hFindFile)
+		{
+			do
+			{
+				if ((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) &&
+					((wfd.cFileName[0] == L'.' && wfd.cFileName[1] == L'\0')
+						|| (wfd.cFileName[0] == L'.' && wfd.cFileName[1] == L'.' && wfd.cFileName[2] == L'\0')))
+				{
+					// exclude directories named "." and ".."
+					continue;
+				}
+
+				networkPathWfds.emplace(std::wstring(wfd.cFileName), wfd);
+			} while (FindNextFile(hFindFile, &wfd));
+		}
+
+		if (hFindFile != INVALID_HANDLE_VALUE)
+			FindClose(hFindFile);
+	}
+
 	wil::com_ptr<IEnumIDList> pEnumIDList;
 	hr = pShellFolder->EnumObjects(m_hOwner, enumFlags, &pEnumIDList);
 
@@ -199,6 +231,17 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 			TCHAR szFileName[MAX_PATH];
 			StrRetToBuf(&str, pidlItem.get(), szFileName, SIZEOF_ARRAY(szFileName));
 
+			if (!networkPathWfds.empty())
+			{
+				// check for pre-cached file info and use it if present
+				const auto &it = networkPathWfds.find(std::wstring(szFileName));
+				if (it != networkPathWfds.end())
+				{
+					AddItemInternal(pidlDirectory, pidlItem.get(), it->second, -1, FALSE);
+					continue;
+				}
+			}
+
 			AddItemInternal(pidlDirectory, pidlItem.get(), szFileName, -1, FALSE);
 		}
 	}
@@ -210,6 +253,13 @@ HRESULT ShellBrowser::AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_
 	const TCHAR *szFileName, int iItemIndex, BOOL bPosition)
 {
 	int uItemId = SetItemInformation(pidlDirectory, pidlChild, szFileName);
+	return AddItemInternal(iItemIndex, uItemId, bPosition);
+}
+
+HRESULT ShellBrowser::AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild,
+	const WIN32_FIND_DATA &fileData, int iItemIndex, BOOL bPosition)
+{
+	int uItemId = SetItemInformation(pidlDirectory, pidlChild, fileData);
 	return AddItemInternal(iItemIndex, uItemId, bPosition);
 }
 
@@ -291,6 +341,29 @@ int ShellBrowser::SetItemInformation(
 
 		m_itemInfoMap[uItemId].wfd = wfd;
 	}
+
+	return uItemId;
+}
+
+int ShellBrowser::SetItemInformation(
+	PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild, const WIN32_FIND_DATA &wfd)
+{
+	int uItemId;
+
+	uItemId = GenerateUniqueItemId();
+
+	if (pidlDirectory && pidlChild)
+	{
+		unique_pidl_absolute pidlItem(ILCombine(pidlDirectory, pidlChild));
+
+		m_itemInfoMap[uItemId].pidlComplete.reset(ILCloneFull(pidlItem.get()));
+		m_itemInfoMap[uItemId].pridl.reset(ILCloneChild(pidlChild));
+	}
+	StringCchCopy(m_itemInfoMap[uItemId].szDisplayName,
+		SIZEOF_ARRAY(m_itemInfoMap[uItemId].szDisplayName), wfd.cFileName);
+
+	m_itemInfoMap[uItemId].bDrive = FALSE;
+	m_itemInfoMap[uItemId].wfd = wfd;
 
 	return uItemId;
 }

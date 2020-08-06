@@ -310,9 +310,13 @@ private:
 	BOOL IsFileFiltered(const ItemInfo_t &itemInfo) const;
 	HRESULT AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild,
 		const TCHAR *szFileName, int iItemIndex, BOOL bPosition);
+	HRESULT AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild,
+		const WIN32_FIND_DATA &fileData, int iItemIndex, BOOL bPosition);
 	HRESULT AddItemInternal(int iItemIndex, int iItemId, BOOL bPosition);
 	int SetItemInformation(
 		PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild, const TCHAR *szFileName);
+	int SetItemInformation(
+		PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild, const WIN32_FIND_DATA &wfd);
 	void SetViewModeInternal(ViewMode viewMode);
 	void SetFirstColumnTextToCallback();
 	void SetFirstColumnTextToFilename();
