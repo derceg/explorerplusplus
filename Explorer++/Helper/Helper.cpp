@@ -214,7 +214,7 @@ HRESULT BuildFileAttributeString(const TCHAR *lpszFileName, TCHAR *szOutput, siz
 
 HRESULT BuildFileAttributeString(DWORD dwFileAttributes, TCHAR *szOutput, size_t cchMax)
 {
-	TCHAR szAttributes[8];
+	TCHAR szAttributes[9];
 	int i = 0;
 
 	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE, szAttributes, i++, 'A');
@@ -223,6 +223,7 @@ HRESULT BuildFileAttributeString(DWORD dwFileAttributes, TCHAR *szOutput, size_t
 	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_SYSTEM, szAttributes, i++, 'S');
 	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY, szAttributes, i++, 'D');
 	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED, szAttributes, i++, 'C');
+	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_SPARSE_FILE, szAttributes, i++, 'P');
 	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_ENCRYPTED, szAttributes, i++, 'E');
 
 	szAttributes[i] = '\0';
