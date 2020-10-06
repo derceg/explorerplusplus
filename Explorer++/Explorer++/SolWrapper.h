@@ -5,7 +5,6 @@
 #pragma once
 
 #pragma warning(push)
-#pragma warning(disable : 4996) // The std::iterator class template (used as a base class to provide
-								// typedefs) is deprecated in C++17.
+#pragma warning(disable : 4100) // unreferenced formal parameter
 #include "../ThirdParty/Sol/sol.hpp"
 #pragma warning(pop)
