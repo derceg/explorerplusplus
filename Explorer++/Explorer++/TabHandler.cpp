@@ -96,7 +96,8 @@ HRESULT Explorerplusplus::OnNewTab()
 		{
 			auto pidl = selectedTab.GetShellBrowser()->GetItemCompleteIdl(selectionIndex);
 			FolderColumns cols = selectedTab.GetShellBrowser()->ExportAllColumns();
-			return m_tabContainer->CreateNewTab(pidl.get(), TabSettings(_selected = true), nullptr, cols);
+			return m_tabContainer->CreateNewTab(
+				pidl.get(), TabSettings(_selected = true), nullptr, cols);
 		}
 	}
 
