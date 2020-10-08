@@ -802,9 +802,10 @@ std::vector<Column_t> Explorerplusplus::LoadColumnFromRegistry(HKEY hColumnsKey,
 	{
 		column.type = static_cast<ColumnType>(columnList[i].id);
 
-		if (32 == static_cast<unsigned int>(column.type))
+		if (DeprecatedColumnType::VirtualType
+			== static_cast<DeprecatedColumnType>(columnList[i].id))
 		{
-			/* Column type CM_VIRTUALTYPE (value 32) was removed in 2011.
+			/* Column type CM_VIRTUALTYPE was removed in 2011.
 			 * Transform to CM_TYPE. */
 			column.type = ColumnType::Type;
 		}
