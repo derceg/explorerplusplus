@@ -55,7 +55,6 @@ void Explorerplusplus::ValidateColumns(FolderColumns &folderColumns)
 void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet, std::vector<Column_t> &columns)
 {
 	Column_t column;
-	int *pColumnMap = nullptr;
 	BOOL bFound = FALSE;
 	const Column_t *pColumns = nullptr;
 	unsigned int iTotalColumnSize = 0;
@@ -99,13 +98,6 @@ void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet, std::vector<Colum
 		break;
 	}
 
-	pColumnMap = (int *) malloc(iTotalColumnSize * sizeof(int));
-
-	for (i = 0; i < iTotalColumnSize; i++)
-	{
-		pColumnMap[i] = 0;
-	}
-
 	/* Check that every column that is supposed to appear
 	is in the column list. */
 	for (i = 0; i < iTotalColumnSize; i++)
@@ -130,8 +122,6 @@ void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet, std::vector<Colum
 			columns.push_back(column);
 		}
 	}
-
-	free(pColumnMap);
 }
 
 void Explorerplusplus::ApplyDisplayWindowPosition()
