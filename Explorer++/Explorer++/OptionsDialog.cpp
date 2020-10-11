@@ -299,8 +299,6 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(
 				GetDlgItem(hDlg, IDC_GROUP_DEFAULT_FILE_MANAGER)));
 			m_darkModeGroupBoxes.push_back(
 				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_GENERAL_SETTINGS)));
-			m_darkModeGroupBoxes.push_back(
-				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_LANGUAGE)));
 		}
 	}
 	break;

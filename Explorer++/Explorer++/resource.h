@@ -360,7 +360,6 @@
 #define IDC_GROUP_STARTUP               1337
 #define IDC_GROUP_DEFAULT_FILE_MANAGER  1338
 #define IDC_GROUP_GENERAL_SETTINGS      1339
-#define IDC_GROUP_LANGUAGE              1340
 #define IDC_GROUP_GENERAL               1341
 #define IDC_GROUP_LISTVIEW              1342
 #define IDC_GROUP_TREEVIEW              1343
