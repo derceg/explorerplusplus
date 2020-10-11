@@ -121,7 +121,7 @@ HWND OptionsDialog::Show(HWND parentWindow)
 	psh.hwndParent = parentWindow;
 	psh.pszCaption = title.c_str();
 	psh.nPages = static_cast<UINT>(sheetHandles.size());
-	psh.nStartPage = 0;
+	psh.nStartPage = m_lastSelectedSheetIndex;
 	psh.hIcon = m_optionsDialogIcon.get();
 	psh.ppsp = nullptr;
 	psh.phpage = sheetHandles.data();
@@ -205,12 +205,27 @@ LRESULT CALLBACK OptionsDialog::PropSheetProc(HWND hwnd, UINT uMsg, WPARAM wPara
 	case WM_CTLCOLORDLG:
 		return OnCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
 
+	case WM_DESTROY:
+		OnDestroyDialog(hwnd);
+		break;
+
 	case WM_NCDESTROY:
 		delete this;
 		return 0;
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
+}
+
+void OptionsDialog::OnDestroyDialog(HWND dlg)
+{
+	HWND tabControl = PropSheet_GetTabControl(dlg);
+	int index = TabCtrl_GetCurSel(tabControl);
+
+	if (index != -1)
+	{
+		m_lastSelectedSheetIndex = index;
+	}
 }
 
 INT_PTR CALLBACK OptionsDialog::GeneralSettingsProcStub(

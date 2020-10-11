@@ -44,6 +44,8 @@ private:
 		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK PropSheetProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+	void OnDestroyDialog(HWND dlg);
+
 	static INT_PTR CALLBACK GeneralSettingsProcStub(
 		HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	INT_PTR CALLBACK GeneralSettingsProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -94,4 +96,6 @@ private:
 	std::unordered_set<int> m_radioButtonControlIds;
 	std::vector<std::unique_ptr<DarkModeGroupBox>> m_darkModeGroupBoxes;
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+
+	static inline int m_lastSelectedSheetIndex = 0;
 };
