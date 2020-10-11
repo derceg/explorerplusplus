@@ -28,7 +28,9 @@
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/XMLSettings.h"
-#include <boost\algorithm\string.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
+#include <comdef.h>
 
 const TCHAR ApplicationToolbarPersistentSettings::SETTING_NAME[] = _T("Name");
 const TCHAR ApplicationToolbarPersistentSettings::SETTING_COMMAND[] = _T("Command");
@@ -321,27 +323,38 @@ void ApplicationToolbar::OpenItem(int iItem, std::wstring *parameters)
 
 	ApplicationButton *button = MapToolbarButtonToItem(iItem);
 
-	if (button != nullptr)
+	if (!button)
 	{
-		ApplicationInfo ai = ParseCommandString(button->Command);
-
-		unique_pidl_absolute pidl;
-		HRESULT hr =
-			SHParseDisplayName(ai.application.c_str(), nullptr, wil::out_param(pidl), 0, nullptr);
-
-		if (SUCCEEDED(hr))
-		{
-			std::wstring combinedParameters = ai.parameters;
-
-			if (parameters != nullptr && parameters->length() > 0)
-			{
-				combinedParameters.append(_T(" "));
-				combinedParameters.append(*parameters);
-			}
-
-			m_pexpp->OpenFileItem(pidl.get(), combinedParameters.c_str());
-		}
+		return;
 	}
+
+	ApplicationInfo ai = ParseCommandString(button->Command);
+
+	unique_pidl_absolute pidl;
+	HRESULT hr =
+		SHParseDisplayName(ai.application.c_str(), nullptr, wil::out_param(pidl), 0, nullptr);
+
+	if (FAILED(hr))
+	{
+		std::wstring messageTemplate =
+			ResourceHelper::LoadString(m_hInstance, IDS_APPLICATION_TOOLBAR_OPEN_ERROR);
+		_com_error error(hr);
+		std::wstring message =
+			(boost::wformat(messageTemplate) % ai.application % error.ErrorMessage()).str();
+
+		MessageBox(m_hwnd, message.c_str(), NExplorerplusplus::APP_NAME, MB_ICONWARNING | MB_OK);
+		return;
+	}
+
+	std::wstring combinedParameters = ai.parameters;
+
+	if (parameters != nullptr && parameters->length() > 0)
+	{
+		combinedParameters.append(_T(" "));
+		combinedParameters.append(*parameters);
+	}
+
+	m_pexpp->OpenFileItem(pidl.get(), combinedParameters.c_str());
 }
 
 void ApplicationToolbar::ShowItemProperties(int iItem)
