@@ -1602,7 +1602,6 @@ void OptionsDialog::DefaultSettingsSetNewTabDir(HWND hEdit, PCIDLIST_ABSOLUTE pi
 void OptionsDialog::AddIconThemes(HWND dlg)
 {
 	HWND iconThemeControl = GetDlgItem(dlg, IDC_OPTIONS_ICON_THEME);
-	int currentThemeIndex = 0;
 
 	for (auto theme : IconTheme::_values())
 	{
@@ -1621,11 +1620,9 @@ void OptionsDialog::AddIconThemes(HWND dlg)
 
 		if (theme == m_config->iconTheme)
 		{
-			currentThemeIndex = index;
+			SendMessage(iconThemeControl, CB_SETCURSEL, index, 0);
 		}
 	}
-
-	SendMessage(iconThemeControl, CB_SETCURSEL, currentThemeIndex, 0);
 }
 
 UINT GetIconThemeStringResourceId(IconTheme iconTheme)
@@ -1634,6 +1631,9 @@ UINT GetIconThemeStringResourceId(IconTheme iconTheme)
 	{
 	case IconTheme::Color:
 		return IDS_ICON_THEME_COLOR;
+
+	case IconTheme::FluentUi:
+		return IDS_ICON_THEME_FLUENT_UI;
 
 	case IconTheme::Windows10:
 		return IDS_ICON_THEME_WINDOWS_10;
