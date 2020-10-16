@@ -155,7 +155,7 @@ std::optional<ShellBrowser::ThumbnailResult_t> ShellBrowser::FindThumbnailAsync(
 	hr = pExtractImage->GetLocation(
 		szImage, SIZEOF_ARRAY(szImage), &dwPriority, &size, 32, &dwFlags);
 
-	if (FAILED(hr))
+	if (FAILED(hr) && hr != E_PENDING)
 	{
 		return std::nullopt;
 	}
