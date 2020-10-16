@@ -459,6 +459,11 @@ private:
 	CachedIcons *GetCachedIcons() override;
 	BOOL GetSavePreferencesToXmlFile() const override;
 	void SetSavePreferencesToXmlFile(BOOL savePreferencesToXmlFile) override;
+	void FocusChanged(WindowFocusSource windowFocusSource) override;
+	boost::signals2::connection AddFocusChangeObserver(
+		const FocusChangedSignal::slot_type &observer) override;
+	boost::signals2::connection AddApplicationShuttingDownObserver(
+		const ApplicationShuttingDownSignal::slot_type &observer) override;
 
 	/* Menus. */
 	void InitializeMainMenu();
@@ -476,9 +481,6 @@ private:
 	HMENU CreateRebarHistoryMenu(BOOL bBack);
 	std::optional<int> OnRebarCustomDraw(NMHDR *nmhdr);
 	bool OnRebarEraseBackground(HDC hdc);
-
-	boost::signals2::connection AddApplicationShuttingDownObserver(
-		const ApplicationShuttingDownSignal::slot_type &observer) override;
 
 	/* Miscellaneous. */
 	void CreateStatusBar();
@@ -538,6 +540,7 @@ private:
 	CachedIcons m_cachedIcons;
 
 	MainMenuPreShowSignal m_mainMenuPreShowSignal;
+	FocusChangedSignal m_focusChangedSignal;
 	ApplicationShuttingDownSignal m_applicationShuttingDownSignal;
 
 	/* Tabs. */

@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "MainToolbar.h"
 #include "Config.h"
-#include "CoreInterface.h"
 #include "DarkModeHelper.h"
 #include "DefaultToolbarButtons.h"
 #include "Icon.h"
@@ -174,6 +173,8 @@ void MainToolbar::Initialize(HWND parent)
 			boost::bind(&MainToolbar::OnNavigationCompleted, this, _1)));
 	});
 
+	m_connections.push_back(
+		m_pexpp->AddFocusChangeObserver(boost::bind(&MainToolbar::OnFocusChanged, this, _1)));
 	m_connections.push_back(m_config->useLargeToolbarIcons.addObserver(boost::bind(&MainToolbar::OnUseLargeToolbarIconsUpdated, this, _1)));
 
 	AddClipboardFormatListener(m_hwnd);
@@ -868,6 +869,13 @@ void MainToolbar::OnNavigationCompleted(const Tab &tab)
 	{
 		UpdateToolbarButtonStates();
 	}
+}
+
+void MainToolbar::OnFocusChanged(WindowFocusSource windowFocusSource)
+{
+	UNREFERENCED_PARAMETER(windowFocusSource);
+
+	UpdateToolbarButtonStates();
 }
 
 MainToolbarPersistentSettings::MainToolbarPersistentSettings() :

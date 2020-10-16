@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "CoreInterface.h"
 #include "DefaultToolbarButtons.h"
 #include "IconResourceLoader.h"
 #include "Tab.h"
@@ -14,7 +15,6 @@
 #include <unordered_map>
 
 struct Config;
-__interface IExplorerplusplus;
 class MainToolbar;
 
 class MainToolbarPersistentSettings
@@ -98,6 +98,7 @@ private:
 
 	void OnTabSelected(const Tab &tab);
 	void OnNavigationCompleted(const Tab &tab);
+	void OnFocusChanged(WindowFocusSource windowFocusSource);
 
 	void UpdateToolbarButtonImageIndexes();
 

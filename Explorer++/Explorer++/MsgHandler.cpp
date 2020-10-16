@@ -1457,3 +1457,29 @@ void Explorerplusplus::OnShowHiddenFiles()
 	tab.GetShellBrowser()->SetShowHidden(!tab.GetShellBrowser()->GetShowHidden());
 	tab.GetShellBrowser()->GetNavigationController()->Refresh();
 }
+
+void Explorerplusplus::FocusChanged(WindowFocusSource windowFocusSource)
+{
+	switch (windowFocusSource)
+	{
+	case WindowFocusSource::AddressBar:
+		m_hLastActiveWindow = m_addressBar->GetHWND();
+		break;
+
+	case WindowFocusSource::TreeView:
+		m_hLastActiveWindow = m_shellTreeView->GetHWND();
+		break;
+
+	case WindowFocusSource::ListView:
+		m_hLastActiveWindow = m_hActiveListView;
+		break;
+	}
+
+	m_focusChangedSignal(windowFocusSource);
+}
+
+boost::signals2::connection Explorerplusplus::AddFocusChangeObserver(
+	const FocusChangedSignal::slot_type &observer)
+{
+	return m_focusChangedSignal.connect(observer);
+}

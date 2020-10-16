@@ -11,13 +11,12 @@
 #include <optional>
 
 __interface IExplorerplusplus;
-class MainToolbar;
 class Tab;
 
 class AddressBar : public BaseWindow
 {
 public:
-	static AddressBar *Create(HWND parent, IExplorerplusplus *expp, MainToolbar *mainToolbar);
+	static AddressBar *Create(HWND parent, IExplorerplusplus *expp);
 
 private:
 	static const UINT_PTR SUBCLASS_ID = 0;
@@ -26,7 +25,7 @@ private:
 	// This is the same background color as used in the Explorer address bar.
 	static inline constexpr COLORREF DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
 
-	AddressBar(HWND parent, IExplorerplusplus *expp, MainToolbar *mainToolbar);
+	AddressBar(HWND parent, IExplorerplusplus *expp);
 	~AddressBar() = default;
 
 	static HWND CreateAddressBar(HWND parent);
@@ -52,7 +51,6 @@ private:
 	void OnHistoryEntryUpdated(const HistoryEntry &entry, HistoryEntry::PropertyType propertyType);
 
 	IExplorerplusplus *m_expp;
-	MainToolbar *m_mainToolbar;
 	wil::unique_hbrush m_backgroundBrush;
 
 	boost::signals2::scoped_connection m_historyEntryUpdatedConnection;
