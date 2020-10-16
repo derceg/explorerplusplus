@@ -9,21 +9,19 @@
 #include "../Helper/WindowSubclassWrapper.h"
 
 __interface IExplorerplusplus;
-class MainToolbar;
 class Tab;
 
 class AddressBar : public BaseWindow
 {
 public:
-
-	static AddressBar *Create(HWND parent, IExplorerplusplus *expp, MainToolbar *mainToolbar);
+	static AddressBar *Create(HWND parent, IExplorerplusplus *expp);
 
 private:
 
 	static const UINT_PTR SUBCLASS_ID = 0;
 	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
-	AddressBar(HWND parent, IExplorerplusplus *expp, MainToolbar *mainToolbar);
+	AddressBar(HWND parent, IExplorerplusplus *expp);
 	~AddressBar() = default;
 
 	static HWND CreateAddressBar(HWND parent);
@@ -44,7 +42,6 @@ private:
 	void OnHistoryEntryUpdated(const HistoryEntry &entry, HistoryEntry::PropertyType propertyType);
 
 	IExplorerplusplus *m_expp;
-	MainToolbar *m_mainToolbar;
 
 	boost::signals2::scoped_connection m_historyEntryUpdatedConnection;
 	int m_defaultFolderIconIndex;

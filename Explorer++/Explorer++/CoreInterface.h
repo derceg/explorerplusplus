@@ -6,16 +6,25 @@
 
 #include <boost/signals2.hpp>
 
-typedef boost::signals2::signal<void()> TabsInitializedSignal;
-typedef boost::signals2::signal<void(HMENU mainMenu)> MainMenuPreShowSignal;
-typedef boost::signals2::signal<void(HMENU menu, HWND sourceWindow, const POINT &pt)> ToolbarContextMenuSignal;
-
 enum class MousewheelSource
 {
 	ListView,
 	TreeView,
 	Other
 };
+
+enum class WindowFocusSource
+{
+	AddressBar,
+	TreeView,
+	ListView
+};
+
+using TabsInitializedSignal = boost::signals2::signal<void()>;
+using MainMenuPreShowSignal = boost::signals2::signal<void(HMENU mainMenu)>;
+using ToolbarContextMenuSignal =
+	boost::signals2::signal<void(HMENU menu, HWND sourceWindow, const POINT &pt)>;
+using FocusChangedSignal = boost::signals2::signal<void(WindowFocusSource windowFocusSource)>;
 
 class CachedIcons;
 struct Config;
@@ -72,6 +81,8 @@ __interface IExplorerplusplus
 
 	void			SetListViewInitialPosition(HWND hListView);
 
+	void			FocusChanged(WindowFocusSource windowFocusSource);
+
 	// Used to support the options dialog.
 	void			SaveAllSettings();
 	BOOL			GetSavePreferencesToXmlFile() const;
@@ -80,4 +91,5 @@ __interface IExplorerplusplus
 	boost::signals2::connection	AddTabsInitializedObserver(const TabsInitializedSignal::slot_type &observer);
 	boost::signals2::connection	AddMainMenuPreShowObserver(const MainMenuPreShowSignal::slot_type &observer);
 	boost::signals2::connection	AddToolbarContextMenuObserver(const ToolbarContextMenuSignal::slot_type &observer);
+	boost::signals2::connection AddFocusChangeObserver(const FocusChangedSignal::slot_type &observer);
 };

@@ -57,8 +57,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 			break;
 
 		case WM_SETFOCUS:
-			m_hLastActiveWindow = ListView;
-			m_mainToolbar->UpdateToolbarButtonStates();
+			FocusChanged(WindowFocusSource::ListView);
 			break;
 
 		case WM_LBUTTONDBLCLK:

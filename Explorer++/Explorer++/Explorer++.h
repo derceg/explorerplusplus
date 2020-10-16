@@ -473,6 +473,9 @@ private:
 	CachedIcons *GetCachedIcons() override;
 	BOOL GetSavePreferencesToXmlFile() const override;
 	void SetSavePreferencesToXmlFile(BOOL savePreferencesToXmlFile) override;
+	void FocusChanged(WindowFocusSource windowFocusSource) override;
+	boost::signals2::connection AddFocusChangeObserver(
+		const FocusChangedSignal::slot_type &observer) override;
 
 	/* Menus. */
 	void InitializeMainMenu();
@@ -545,6 +548,7 @@ private:
 	CachedIcons m_cachedIcons;
 
 	MainMenuPreShowSignal m_mainMenuPreShowSignal;
+	FocusChangedSignal m_focusChangedSignal;
 
 	/* Tabs. */
 	TabContainer *m_tabContainer;

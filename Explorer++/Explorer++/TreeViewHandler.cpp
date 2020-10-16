@@ -115,8 +115,7 @@ WPARAM wParam,LPARAM lParam)
 	switch(uMsg)
 	{
 	case WM_SETFOCUS:
-		m_mainToolbar->UpdateToolbarButtonStates();
-		m_hLastActiveWindow = m_hTreeView;
+		FocusChanged(WindowFocusSource::TreeView);
 		break;
 
 	case WM_MBUTTONDOWN:

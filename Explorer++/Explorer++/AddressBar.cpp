@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "AddressBar.h"
 #include "CoreInterface.h"
-#include "MainToolbar.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "Tab.h"
@@ -18,15 +17,14 @@
 #include <wil/common.h>
 #include <wil/resource.h>
 
-AddressBar *AddressBar::Create(HWND parent, IExplorerplusplus *expp, MainToolbar *mainToolbar)
+AddressBar *AddressBar::Create(HWND parent, IExplorerplusplus *expp)
 {
-	return new AddressBar(parent, expp, mainToolbar);
+	return new AddressBar(parent, expp);
 }
 
-AddressBar::AddressBar(HWND parent, IExplorerplusplus *expp, MainToolbar *mainToolbar) :
+AddressBar::AddressBar(HWND parent, IExplorerplusplus *expp) :
 	BaseWindow(CreateAddressBar(parent)),
 	m_expp(expp),
-	m_mainToolbar(mainToolbar),
 	m_defaultFolderIconIndex(GetDefaultFolderIconIndex())
 {
 	Initialize(parent);
@@ -86,7 +84,7 @@ LRESULT CALLBACK AddressBar::EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LP
 		break;
 
 	case WM_SETFOCUS:
-		m_mainToolbar->UpdateToolbarButtonStates();
+		m_expp->FocusChanged(WindowFocusSource::AddressBar);
 		break;
 
 	case WM_MOUSEWHEEL:
