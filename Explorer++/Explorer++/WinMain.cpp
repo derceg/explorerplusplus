@@ -452,7 +452,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 			}
 		}
 
-		if(PropSheet_GetCurrentPageHwnd(g_hwndOptions) == nullptr)
+		if(g_hwndOptions && PropSheet_GetCurrentPageHwnd(g_hwndOptions) == nullptr)
 		{
 			DestroyWindow(g_hwndOptions);
 			g_hwndOptions = nullptr;
