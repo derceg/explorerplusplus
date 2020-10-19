@@ -30,6 +30,8 @@
 #include "../Helper/XMLSettings.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
+#include <wil/com.h>
+#include <wil/resource.h>
 #include <comdef.h>
 
 const TCHAR ApplicationToolbarPersistentSettings::SETTING_NAME[] = _T("Name");
@@ -533,14 +535,7 @@ void ApplicationToolbarPersistentSettings::SaveRegistrySettings(HKEY hParentKey)
 
 void ApplicationToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
 {
-	TCHAR szName[512];
-	TCHAR szCommand[512];
-	BOOL bShowNameOnToolbar = TRUE;
-
-	BOOL bNameFound = FALSE;
-	BOOL bCommandFound = FALSE;
-
-	IXMLDOMNamedNodeMap *am = nullptr;
+	wil::com_ptr<IXMLDOMNamedNodeMap> am;
 	HRESULT hr = pNode->get_attributes(&am);
 
 	if (FAILED(hr))
@@ -548,34 +543,41 @@ void ApplicationToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
 		return;
 	}
 
+	BOOL bNameFound = FALSE;
+	BOOL bCommandFound = FALSE;
+	TCHAR szName[512];
+	TCHAR szCommand[512];
+	BOOL bShowNameOnToolbar = TRUE;
+
 	long lChildNodes;
 	am->get_length(&lChildNodes);
 
 	for (int i = 0; i < lChildNodes; i++)
 	{
-		IXMLDOMNode *pAttributeNode = nullptr;
+		wil::com_ptr<IXMLDOMNode> pAttributeNode;
 		am->get_item(i, &pAttributeNode);
 
-		BSTR bstrName;
-		BSTR bstrValue;
+		wil::unique_bstr bstrName;
 		pAttributeNode->get_nodeName(&bstrName);
+
+		wil::unique_bstr bstrValue;
 		pAttributeNode->get_text(&bstrValue);
 
-		if (lstrcmpi(bstrName, SETTING_NAME) == 0)
+		if (lstrcmpi(bstrName.get(), SETTING_NAME) == 0)
 		{
-			StringCchCopy(szName, SIZEOF_ARRAY(szName), bstrValue);
+			StringCchCopy(szName, SIZEOF_ARRAY(szName), bstrValue.get());
 
 			bNameFound = TRUE;
 		}
-		else if (lstrcmpi(bstrName, SETTING_COMMAND) == 0)
+		else if (lstrcmpi(bstrName.get(), SETTING_COMMAND) == 0)
 		{
-			StringCchCopy(szCommand, SIZEOF_ARRAY(szCommand), bstrValue);
+			StringCchCopy(szCommand, SIZEOF_ARRAY(szCommand), bstrValue.get());
 
 			bCommandFound = TRUE;
 		}
-		else if (lstrcmpi(bstrName, SETTING_SHOW_NAME_ON_TOOLBAR) == 0)
+		else if (lstrcmpi(bstrName.get(), SETTING_SHOW_NAME_ON_TOOLBAR) == 0)
 		{
-			bShowNameOnToolbar = NXMLSettings::DecodeBoolValue(bstrValue);
+			bShowNameOnToolbar = NXMLSettings::DecodeBoolValue(bstrValue.get());
 		}
 	}
 
@@ -584,16 +586,17 @@ void ApplicationToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
 		AddButton(szName, szCommand, bShowNameOnToolbar, nullptr);
 	}
 
-	IXMLDOMNode *pNextSibling = nullptr;
+	wil::com_ptr<IXMLDOMNode> pNextSibling;
 	hr = pNode->get_nextSibling(&pNextSibling);
 
 	if (hr == S_OK)
 	{
-		hr = pNextSibling->get_nextSibling(&pNextSibling);
+		wil::com_ptr<IXMLDOMNode> secondSibling;
+		hr = pNextSibling->get_nextSibling(&secondSibling);
 
 		if (hr == S_OK)
 		{
-			LoadXMLSettings(pNextSibling);
+			LoadXMLSettings(secondSibling.get());
 		}
 	}
 }
@@ -601,24 +604,20 @@ void ApplicationToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
 void ApplicationToolbarPersistentSettings::SaveXMLSettings(
 	IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe)
 {
-	BSTR bstr_wsntt = SysAllocString(L"\n\t\t");
+	auto bstr_wsntt = wil::make_bstr(L"\n\t\t");
 
 	for (const auto &button : m_Buttons)
 	{
-		NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt, pe);
+		NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe);
 
-		IXMLDOMElement *pParentNode = nullptr;
+		wil::com_ptr<IXMLDOMElement> pParentNode;
 		NXMLSettings::CreateElementNode(
 			pXMLDom, &pParentNode, pe, _T("ApplicationButton"), button.Name.c_str());
 		NXMLSettings::AddAttributeToNode(
-			pXMLDom, pParentNode, SETTING_COMMAND, button.Command.c_str());
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SHOW_NAME_ON_TOOLBAR,
+			pXMLDom, pParentNode.get(), SETTING_COMMAND, button.Command.c_str());
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), SETTING_SHOW_NAME_ON_TOOLBAR,
 			NXMLSettings::EncodeBoolValue(button.ShowNameOnToolbar));
-
-		pParentNode->Release();
 	}
-
-	SysFreeString(bstr_wsntt);
 }
 
 bool ApplicationToolbarPersistentSettings::AddButton(const std::wstring &name,

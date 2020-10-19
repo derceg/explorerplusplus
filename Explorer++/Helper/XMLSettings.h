@@ -35,6 +35,4 @@ namespace NXMLSettings
 		const FILETIME &dateTime);
 	HRESULT	GetIntFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name, int &outputValue);
 	HRESULT	GetStringFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name, std::wstring &outputValue);
-
-	void	SafeBSTRRelease(BSTR bstr);
 }

@@ -892,29 +892,23 @@ MainToolbarPersistentSettings &MainToolbarPersistentSettings::GetInstance()
 
 void MainToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
 {
-	IXMLDOMNode *pChildNode = nullptr;
-	IXMLDOMNamedNodeMap *am = nullptr;
-	BSTR bstrValue;
-
 	std::vector<ToolbarButton> toolbarButtons;
 
+	wil::com_ptr<IXMLDOMNamedNodeMap> am;
 	pNode->get_attributes(&am);
 
 	long lChildNodes;
-	long j = 0;
-
-	/* Retrieve the total number of attributes
-	attached to this node. */
 	am->get_length(&lChildNodes);
 
-	for (j = 1; j < lChildNodes; j++)
+	for (long j = 1; j < lChildNodes; j++)
 	{
+		wil::com_ptr<IXMLDOMNode> pChildNode;
 		am->get_item(j, &pChildNode);
 
-		/* Element value. */
+		wil::unique_bstr bstrValue;
 		pChildNode->get_text(&bstrValue);
 
-		auto itr = TOOLBAR_BUTTON_XML_NAME_MAPPINGS.right.find(bstrValue);
+		auto itr = TOOLBAR_BUTTON_XML_NAME_MAPPINGS.right.find(bstrValue.get());
 
 		if (itr == TOOLBAR_BUTTON_XML_NAME_MAPPINGS.right.end())
 		{
