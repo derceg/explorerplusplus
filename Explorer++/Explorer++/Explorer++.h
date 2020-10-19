@@ -371,7 +371,7 @@ private:
 		const std::vector<Column_t> &columns, const TCHAR *szColumnSet, int iIndent);
 	void LoadBookmarksFromXML(IXMLDOMDocument *pXMLDom);
 	void SaveBookmarksToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
-	int LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom);
+	void LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom);
 	void SaveDefaultColumnsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void SaveDefaultColumnsToXMLInternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pColumnsNode);
 	void SaveWindowPositionToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
