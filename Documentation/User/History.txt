@@ -159,6 +159,10 @@ Bug fixes:
   in a row would inconsistently result in the item being
   selected. Now, an item is only selected if you right-click its
   filename label.
+- Some columns were effectively skipped over when saving data to
+  the XML config file. Additionally, if one of these columns
+  appeared first, the application would crash when exiting.
+  Fixed.
 - When loading from the XML config file, the initial color in the
   color rule dialog wasn't been loaded correctly. Fixed.
 - There was an issue that prevented labels in the treeview from
