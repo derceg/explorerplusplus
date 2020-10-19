@@ -968,15 +968,6 @@ int Explorerplusplus::LoadColumnFromXML(IXMLDOMNode *pNode, std::vector<Column_t
 				if(lstrcmp(bstrName,ColumnData[j].szName) == 0)
 				{
 					column.type = ColumnData[j].type;
-
-					if (DeprecatedColumnType::VirtualType
-						== static_cast<DeprecatedColumnType>(ColumnData[j].type))
-					{
-						/* Column type CM_VIRTUALTYPE was removed in 2011.
-						 * Transform to CM_TYPE. */
-						column.type = ColumnType::Type;
-					}
-
 					column.bChecked	= NXMLSettings::DecodeBoolValue(bstrValue);
 
 					outputColumns.push_back(column);

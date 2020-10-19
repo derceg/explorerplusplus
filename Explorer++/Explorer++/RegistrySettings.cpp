@@ -801,15 +801,6 @@ std::vector<Column_t> Explorerplusplus::LoadColumnFromRegistry(HKEY hColumnsKey,
 	for(i = 0;i < dwSize / sizeof(ColumnOld_t);i++)
 	{
 		column.type = static_cast<ColumnType>(columnList[i].id);
-
-		if (DeprecatedColumnType::VirtualType
-			== static_cast<DeprecatedColumnType>(columnList[i].id))
-		{
-			/* Column type CM_VIRTUALTYPE was removed in 2011.
-			 * Transform to CM_TYPE. */
-			column.type = ColumnType::Type;
-		}
-
 		column.bChecked = columnList[i].bChecked;
 		column.iWidth = DEFAULT_COLUMN_WIDTH;
 

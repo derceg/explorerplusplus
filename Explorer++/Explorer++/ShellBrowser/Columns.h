@@ -92,11 +92,6 @@ enum class ColumnType
 	PrinterModel = 64
 };
 
-enum class DeprecatedColumnType
-{
-	VirtualType = 32
-};
-
 struct Column_t
 {
 	ColumnType type;
