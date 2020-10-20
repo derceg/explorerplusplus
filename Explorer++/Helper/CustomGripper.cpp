@@ -48,7 +48,7 @@ void CustomGripper::Initialize(HWND mainWindow, COLORREF backgroundColor)
 	{
 		g_theme.reset(OpenThemeData(mainWindow, L"SCROLLBAR"));
 
-		wil::unique_hdc screenDC(GetDC(nullptr));
+		wil::unique_hdc_window screenDC(GetDC(nullptr));
 		GetThemePartSize(
 			g_theme.get(), screenDC.get(), PART_ID, STATE_ID, nullptr, TS_DRAW, &g_size);
 	}
