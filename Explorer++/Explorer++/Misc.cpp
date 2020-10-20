@@ -122,6 +122,31 @@ void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet, std::vector<Colum
 			columns.push_back(column);
 		}
 	}
+
+	/* Check that no unknown column types appear in the column list. */
+	for (auto itr = columns.cbegin(); itr != columns.cend();)
+	{
+		bFound = FALSE;
+
+		for (i = 0; i < iTotalColumnSize; i++)
+		{
+			if (itr->type == pColumns[i].type)
+			{
+				bFound = TRUE;
+				break;
+			}
+		}
+
+		if (!bFound)
+		{
+			/* The column is not recognized in the set. Remove it. */
+			itr = columns.erase(itr);
+		}
+		else
+		{
+			++itr;
+		}
+	}
 }
 
 void Explorerplusplus::ApplyDisplayWindowPosition()
