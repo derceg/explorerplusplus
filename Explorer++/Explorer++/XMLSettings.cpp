@@ -968,6 +968,7 @@ int Explorerplusplus::LoadColumnFromXML(IXMLDOMNode *pNode, std::vector<Column_t
 				if(lstrcmp(bstrName,ColumnData[j].szName) == 0)
 				{
 					column.type = ColumnData[j].type;
+
 					column.bChecked	= NXMLSettings::DecodeBoolValue(bstrValue);
 
 					outputColumns.push_back(column);
