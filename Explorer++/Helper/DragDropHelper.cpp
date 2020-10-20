@@ -13,3 +13,12 @@ STGMEDIUM GetStgMediumForGlobal(HGLOBAL global)
 	storage.pUnkForRelease = nullptr;
 	return storage;
 }
+
+STGMEDIUM GetStgMediumForStream(IStream *stream)
+{
+	STGMEDIUM storage;
+	storage.tymed = TYMED_ISTREAM;
+	storage.pstm = stream;
+	storage.pUnkForRelease = nullptr;
+	return storage;
+}

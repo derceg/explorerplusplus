@@ -11,10 +11,13 @@
 #include "Tab.h"
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
+#include "../Helper/DataExchangeHelper.h"
+#include "../Helper/DragDropHelper.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/iDataObject.h"
 #include "../Helper/iDropSource.h"
+#include <wil/com.h>
 #include <wil/common.h>
 #include <wil/resource.h>
 
@@ -210,111 +213,165 @@ void AddressBar::OnGo()
 
 void AddressBar::OnBeginDrag()
 {
-	IDragSourceHelper *pDragSourceHelper = nullptr;
-	IDropSource *pDropSource = nullptr;
-	HRESULT hr;
+	const Tab &selectedTab = m_expp->GetTabContainer()->GetSelectedTab();
+	auto pidlDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
 
-	hr = CoCreateInstance(
-		CLSID_DragDropHelper, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&pDragSourceHelper));
+	auto descriptorStgMedium = GenerateShortcutDescriptorStgMedium(pidlDirectory.get());
 
-	if (SUCCEEDED(hr))
+	if (!descriptorStgMedium)
 	{
-		hr = CreateDropSource(&pDropSource, DragType::LeftClick);
-
-		if (SUCCEEDED(hr))
-		{
-			const Tab &selectedTab = m_expp->GetTabContainer()->GetSelectedTab();
-			auto pidlDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
-
-			FORMATETC ftc[2];
-			STGMEDIUM stg[2];
-
-			SetFORMATETC(&ftc[0], (CLIPFORMAT) RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),
-				nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL);
-
-			HGLOBAL hglb = GlobalAlloc(GMEM_MOVEABLE, 1000);
-
-			auto *pfgd = static_cast<FILEGROUPDESCRIPTOR *>(GlobalLock(hglb));
-
-			pfgd->cItems = 1;
-
-			auto *pfd = (FILEDESCRIPTOR *) ((LPBYTE) pfgd + sizeof(UINT));
-
-			/* File information (name, size, date created, etc). */
-			pfd[0].dwFlags = FD_ATTRIBUTES | FD_FILESIZE;
-			pfd[0].dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
-			pfd[0].nFileSizeLow = 16384;
-			pfd[0].nFileSizeHigh = 0;
-
-			/* The name of the file will be the folder name, followed by .lnk. */
-			TCHAR szDisplayName[MAX_PATH];
-			GetDisplayName(
-				pidlDirectory.get(), szDisplayName, SIZEOF_ARRAY(szDisplayName), SHGDN_INFOLDER);
-			StringCchCat(szDisplayName, SIZEOF_ARRAY(szDisplayName), _T(".lnk"));
-			StringCchCopy(pfd[0].cFileName, SIZEOF_ARRAY(pfd[0].cFileName), szDisplayName);
-
-			GlobalUnlock(hglb);
-
-			stg[0].pUnkForRelease = nullptr;
-			stg[0].hGlobal = hglb;
-			stg[0].tymed = TYMED_HGLOBAL;
-
-			/* File contents. */
-			SetFORMATETC(&ftc[1], (CLIPFORMAT) RegisterClipboardFormat(CFSTR_FILECONTENTS), nullptr,
-				DVASPECT_CONTENT, -1, TYMED_HGLOBAL);
-
-			hglb = GlobalAlloc(GMEM_MOVEABLE, 16384);
-
-			IShellLink *pShellLink = nullptr;
-			IPersistStream *pPersistStream = nullptr;
-
-			hr = CoCreateInstance(
-				CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pShellLink));
-
-			if (SUCCEEDED(hr))
-			{
-				TCHAR szPath[MAX_PATH];
-
-				GetDisplayName(pidlDirectory.get(), szPath, SIZEOF_ARRAY(szPath), SHGDN_FORPARSING);
-
-				pShellLink->SetPath(szPath);
-
-				hr = pShellLink->QueryInterface(IID_PPV_ARGS(&pPersistStream));
-
-				if (SUCCEEDED(hr))
-				{
-					IStream *pStream = nullptr;
-
-					hr = CreateStreamOnHGlobal(hglb, FALSE, &pStream);
-
-					if (SUCCEEDED(hr))
-					{
-						hr = pPersistStream->Save(pStream, TRUE);
-					}
-				}
-			}
-
-			GlobalUnlock(hglb);
-
-			stg[1].pUnkForRelease = nullptr;
-			stg[1].hGlobal = hglb;
-			stg[1].tymed = TYMED_HGLOBAL;
-
-			IDataObject *pDataObject = CreateDataObject(ftc, stg, 2);
-
-			POINT pt = { 0, 0 };
-			pDragSourceHelper->InitializeFromWindow(m_hwnd, &pt, pDataObject);
-
-			DWORD dwEffect;
-
-			DoDragDrop(pDataObject, pDropSource, DROPEFFECT_LINK, &dwEffect);
-
-			pDataObject->Release();
-			pDropSource->Release();
-		}
-
-		pDragSourceHelper->Release();
+		return;
 	}
+
+	auto contentsStgMedium = GenerateShortcutContentsStgMedium(pidlDirectory.get());
+
+	if (!contentsStgMedium)
+	{
+		return;
+	}
+
+	FORMATETC ftc[2];
+	STGMEDIUM stg[2];
+
+	// The IDataObject instance created below will take ownership of the STGMEDIUMs and the data
+	// they contain, which is why they're released here.
+	ftc[0] = { static_cast<CLIPFORMAT>(RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR)), nullptr,
+		DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+	stg[0] = descriptorStgMedium->release();
+
+	ftc[1] = { static_cast<CLIPFORMAT>(RegisterClipboardFormat(CFSTR_FILECONTENTS)), nullptr,
+		DVASPECT_CONTENT, 0, TYMED_ISTREAM };
+	stg[1] = contentsStgMedium->release();
+
+	wil::com_ptr<IDataObject> pDataObject(CreateDataObject(ftc, stg, SIZEOF_ARRAY(ftc)));
+
+	wil::com_ptr<IDragSourceHelper> dragSourceHelper;
+	HRESULT hr = CoCreateInstance(
+		CLSID_DragDropHelper, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&dragSourceHelper));
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	wil::com_ptr<IDropSource> dropSource;
+	hr = CreateDropSource(&dropSource, DragType::LeftClick);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	POINT pt = { 0, 0 };
+	dragSourceHelper->InitializeFromWindow(m_hwnd, &pt, pDataObject.get());
+
+	DWORD dwEffect;
+	DoDragDrop(pDataObject.get(), dropSource.get(), DROPEFFECT_LINK, &dwEffect);
+}
+
+std::optional<wil::unique_stg_medium> AddressBar::GenerateShortcutDescriptorStgMedium(
+	PCIDLIST_ABSOLUTE pidl)
+{
+	auto fileGroupDescriptor = GenerateShortcutDescriptor(pidl);
+
+	if (!fileGroupDescriptor)
+	{
+		return std::nullopt;
+	}
+
+	auto global = WriteDataToGlobal(&*fileGroupDescriptor, sizeof(fileGroupDescriptor));
+
+	if (!global)
+	{
+		return std::nullopt;
+	}
+
+	return wil::unique_stg_medium(GetStgMediumForGlobal(global.release()));
+}
+
+std::optional<FILEGROUPDESCRIPTOR> AddressBar::GenerateShortcutDescriptor(PCIDLIST_ABSOLUTE pidl)
+{
+	FILEGROUPDESCRIPTOR fileGroupDescriptor;
+	fileGroupDescriptor.cItems = 1;
+	fileGroupDescriptor.fgd[0].dwFlags = FD_ATTRIBUTES;
+	fileGroupDescriptor.fgd[0].dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
+
+	// The name of the file will be the item name, followed by .lnk.
+	TCHAR displayName[MAX_PATH];
+	HRESULT hr = GetDisplayName(pidl, displayName, SIZEOF_ARRAY(displayName), SHGDN_INFOLDER);
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	hr = StringCchCat(displayName, SIZEOF_ARRAY(displayName), _T(".lnk"));
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	hr = StringCchCopy(fileGroupDescriptor.fgd[0].cFileName,
+		SIZEOF_ARRAY(fileGroupDescriptor.fgd[0].cFileName), displayName);
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	return fileGroupDescriptor;
+}
+
+std::optional<wil::unique_stg_medium> AddressBar::GenerateShortcutContentsStgMedium(
+	PCIDLIST_ABSOLUTE pidl)
+{
+	wil::com_ptr<IShellLink> shellLink;
+	HRESULT hr =
+		CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellLink));
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	hr = shellLink->SetIDList(pidl);
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	wil::com_ptr<IPersistStream> pPersistStream;
+	hr = shellLink->QueryInterface(IID_PPV_ARGS(&pPersistStream));
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	wil::com_ptr<IStream> stream(SHCreateMemStream(nullptr, 0));
+
+	if (!stream)
+	{
+		return std::nullopt;
+	}
+
+	hr = pPersistStream->Save(stream.get(), TRUE);
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	hr = stream->Seek({ 0, 0 }, STREAM_SEEK_SET, nullptr);
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	return wil::unique_stg_medium(GetStgMediumForStream(stream.detach()));
 }
 
 void AddressBar::OnTabSelected(const Tab &tab)

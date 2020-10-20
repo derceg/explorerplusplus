@@ -5,8 +5,6 @@
 #include "stdafx.h"
 #include "DataExchangeHelper.h"
 
-wil::unique_hglobal WriteDataToGlobal(const void *data, size_t size);
-
 std::optional<std::wstring> ReadStringFromGlobal(HGLOBAL global)
 {
 	wil::unique_hglobal_locked mem(global);

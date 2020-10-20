@@ -13,6 +13,7 @@ std::optional<std::wstring> ReadStringFromGlobal(HGLOBAL global);
 wil::unique_hglobal WriteStringToGlobal(const std::wstring &str);
 std::optional<std::string> ReadBinaryDataFromGlobal(HGLOBAL global);
 wil::unique_hglobal WriteBinaryDataToGlobal(const std::string &data);
+wil::unique_hglobal WriteDataToGlobal(const void *data, size_t size);
 
 bool IsDropFormatAvailable(IDataObject *dataObject, const FORMATETC &formatEtc);
 FORMATETC GetDroppedFilesFormatEtc();

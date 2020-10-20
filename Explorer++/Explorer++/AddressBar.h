@@ -44,6 +44,11 @@ private:
 	std::optional<LRESULT> OnComboBoxExCtlColorEdit(HWND hwnd, HDC hdc);
 	void OnGo();
 	void OnBeginDrag();
+	static std::optional<wil::unique_stg_medium> GenerateShortcutDescriptorStgMedium(
+		PCIDLIST_ABSOLUTE pidl);
+	static std::optional<FILEGROUPDESCRIPTOR> GenerateShortcutDescriptor(PCIDLIST_ABSOLUTE pidl);
+	static std::optional<wil::unique_stg_medium> GenerateShortcutContentsStgMedium(
+		PCIDLIST_ABSOLUTE pidl);
 	void OnTabSelected(const Tab &tab);
 	void OnNavigationCompleted(const Tab &tab);
 	void UpdateTextAndIcon(const Tab &tab);

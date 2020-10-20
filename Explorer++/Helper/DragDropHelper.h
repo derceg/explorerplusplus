@@ -5,3 +5,4 @@
 #pragma once
 
 STGMEDIUM GetStgMediumForGlobal(HGLOBAL global);
+STGMEDIUM GetStgMediumForStream(IStream *stream);
