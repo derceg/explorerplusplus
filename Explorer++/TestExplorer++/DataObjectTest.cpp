@@ -16,7 +16,7 @@ class DataObjectTest : public Test
 protected:
 	DataObjectTest()
 	{
-		m_dataObject = CreateDataObject(nullptr, nullptr, 0);
+		m_dataObject.attach(CreateDataObject(nullptr, nullptr, 0));
 	}
 
 	wil::com_ptr<IDataObject> m_dataObject;

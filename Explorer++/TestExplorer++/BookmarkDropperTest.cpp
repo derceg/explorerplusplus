@@ -60,7 +60,7 @@ protected:
 		auto global = WriteStringToGlobal(L"Test");
 		STGMEDIUM stgMedium = GetStgMediumForGlobal(global.get());
 
-		m_dataObject = CreateDataObject(&formatEtc, &stgMedium, 1);
+		m_dataObject.attach(CreateDataObject(&formatEtc, &stgMedium, 1));
 
 		global.release();
 

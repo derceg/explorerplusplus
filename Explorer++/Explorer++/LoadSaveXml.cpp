@@ -39,7 +39,7 @@ LoadSaveXML::~LoadSaveXML()
 
 void LoadSaveXML::InitializeLoadEnvironment()
 {
-	m_pXMLDom = NXMLSettings::DomFromCOM();
+	m_pXMLDom.attach(NXMLSettings::DomFromCOM());
 
 	if (!m_pXMLDom)
 	{
@@ -63,7 +63,7 @@ void LoadSaveXML::InitializeLoadEnvironment()
 
 void LoadSaveXML::InitializeSaveEnvironment()
 {
-	m_pXMLDom = NXMLSettings::DomFromCOM();
+	m_pXMLDom.attach(NXMLSettings::DomFromCOM());
 
 	if (!m_pXMLDom)
 	{
