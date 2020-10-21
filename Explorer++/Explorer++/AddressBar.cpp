@@ -243,7 +243,8 @@ void AddressBar::OnBeginDrag()
 		DVASPECT_CONTENT, 0, TYMED_ISTREAM };
 	stg[1] = contentsStgMedium->release();
 
-	wil::com_ptr<IDataObject> pDataObject(CreateDataObject(ftc, stg, SIZEOF_ARRAY(ftc)));
+	wil::com_ptr<IDataObject> pDataObject;
+	pDataObject.attach(CreateDataObject(ftc, stg, SIZEOF_ARRAY(ftc)));
 
 	wil::com_ptr<IDragSourceHelper> dragSourceHelper;
 	HRESULT hr = CoCreateInstance(
@@ -350,7 +351,8 @@ std::optional<wil::unique_stg_medium> AddressBar::GenerateShortcutContentsStgMed
 		return std::nullopt;
 	}
 
-	wil::com_ptr<IStream> stream(SHCreateMemStream(nullptr, 0));
+	wil::com_ptr<IStream> stream;
+	stream.attach(SHCreateMemStream(nullptr, 0));
 
 	if (!stream)
 	{

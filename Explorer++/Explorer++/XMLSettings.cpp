@@ -192,7 +192,8 @@ unsigned long hash_setting(unsigned char *str);
 
 BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl)
 {
-	wil::com_ptr<IXMLDOMDocument> pXMLDom(NXMLSettings::DomFromCOM());
+	wil::com_ptr<IXMLDOMDocument> pXMLDom;
+	pXMLDom.attach(NXMLSettings::DomFromCOM());
 
 	if (!pXMLDom)
 	{
@@ -306,7 +307,8 @@ BOOL LoadAllowMultipleInstancesFromXML()
 {
 	BOOL bAllowMultipleInstances = TRUE;
 
-	wil::com_ptr<IXMLDOMDocument> pXMLDom(NXMLSettings::DomFromCOM());
+	wil::com_ptr<IXMLDOMDocument> pXMLDom;
+	pXMLDom.attach(NXMLSettings::DomFromCOM());
 
 	if (!pXMLDom)
 	{

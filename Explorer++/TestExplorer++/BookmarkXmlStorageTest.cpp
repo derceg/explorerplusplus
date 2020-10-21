@@ -94,7 +94,8 @@ TEST_F(BookmarkXmlStorageTest, V1NestedShowOnToolbarLoad)
 
 wil::com_ptr<IXMLDOMDocument> LoadXmlDocument(const std::wstring &filePath)
 {
-	wil::com_ptr<IXMLDOMDocument> xmlDocument(NXMLSettings::DomFromCOM());
+	wil::com_ptr<IXMLDOMDocument> xmlDocument;
+	xmlDocument.attach(NXMLSettings::DomFromCOM());
 
 	if (!xmlDocument)
 	{
@@ -115,7 +116,8 @@ wil::com_ptr<IXMLDOMDocument> LoadXmlDocument(const std::wstring &filePath)
 
 std::optional<XmlDocumentData> CreateXmlDocument()
 {
-	wil::com_ptr<IXMLDOMDocument> xmlDocument(NXMLSettings::DomFromCOM());
+	wil::com_ptr<IXMLDOMDocument> xmlDocument;
+	xmlDocument.attach(NXMLSettings::DomFromCOM());
 
 	if (!xmlDocument)
 	{
