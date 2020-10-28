@@ -15,11 +15,12 @@
 #include "MainResource.h"
 #include "ModelessDialogs.h"
 #include "RegistrySettings.h"
-#include "Version.h"
 #include "XMLSettings.h"
 #include "../Helper/Logging.h"
 #include "../Helper/Macros.h"
+#include "../Helper/ProcessHelper.h"
 #include "../ThirdParty/CLI11/CLI11.hpp"
+#include <boost/format.hpp>
 #include <boost/scope_exit.hpp>
 #include <wil/resource.h>
 
@@ -31,14 +32,8 @@
 #define DEFAULT_WINDOWPOS_WIDTH_PERCENTAGE	0.96
 #define DEFAULT_WINDOWPOS_HEIGHT_PERCENTAGE	0.82
 
-typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(
-	HANDLE hProcee,DWORD ProcessId,HANDLE hFile,MINIDUMP_TYPE DumpType,
-	PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
-	PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
-	PMINIDUMP_CALLBACK_INFORMATION CallbackParam);
-
 ATOM RegisterMainWindowClass(HINSTANCE hInstance);
-LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS *pExceptionInfo);
+LONG WINAPI TopLevelExceptionFilter(EXCEPTION_POINTERS *exception);
 
 DWORD dwControlClasses = ICC_BAR_CLASSES|ICC_COOL_CLASSES|
 	ICC_LISTVIEW_CLASSES|ICC_USEREX_CLASSES|ICC_STANDARD_CLASSES|
@@ -76,57 +71,47 @@ ATOM RegisterMainWindowClass(HINSTANCE hInstance)
 	return RegisterClassEx(&wcex);
 }
 
-LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS *pExceptionInfo)
+LONG WINAPI TopLevelExceptionFilter(EXCEPTION_POINTERS *exception)
 {
-	HMODULE hDbgHelp;
-	MINIDUMPWRITEDUMP pMiniDumpWriteDump;
-	MINIDUMP_EXCEPTION_INFORMATION mei;
-	HANDLE hFile;
-	SYSTEMTIME stLocalTime;
-	TCHAR szFileName[MAX_PATH];
-	TCHAR szPath[MAX_PATH];
-	LONG ret = EXCEPTION_CONTINUE_SEARCH;
+	TCHAR currentProcess[MAX_PATH];
+	GetProcessImageName(GetCurrentProcessId(), currentProcess, SIZEOF_ARRAY(currentProcess));
 
-	hDbgHelp = LoadLibrary(_T("Dbghelp.dll"));
+	// Event names are global in the system. Therefore, the event name used for signaling should be
+	// unique.
+	auto eventName = CreateGUID();
+	wil::unique_event event;
+	bool res = event.try_create(wil::EventOptions::ManualReset, eventName.c_str());
 
-	if(hDbgHelp != nullptr)
+	if (!res)
 	{
-		pMiniDumpWriteDump = (MINIDUMPWRITEDUMP)GetProcAddress(hDbgHelp,"MiniDumpWriteDump");
-
-		if(pMiniDumpWriteDump != nullptr)
-		{
-			GetLocalTime(&stLocalTime);
-
-			MyExpandEnvironmentStrings(_T("%TEMP%"),szPath,SIZEOF_ARRAY(szPath));
-
-			StringCchPrintf(szFileName,SIZEOF_ARRAY(szFileName),
-				_T("%s\\%s%s-%02d%02d%04d-%02d%02d%02d.dmp"),
-				szPath,NExplorerplusplus::APP_NAME,VERSION_STRING_W,stLocalTime.wDay,stLocalTime.wMonth,
-				stLocalTime.wYear,stLocalTime.wHour,stLocalTime.wMinute,stLocalTime.wSecond);
-			hFile = CreateFile(szFileName,GENERIC_WRITE,0, nullptr,CREATE_ALWAYS,
-				FILE_ATTRIBUTE_NORMAL, nullptr);
-
-			if(hFile != INVALID_HANDLE_VALUE)
-			{
-				mei.ThreadId			= GetCurrentThreadId();
-				mei.ExceptionPointers	= pExceptionInfo;
-				mei.ClientPointers		= FALSE;
-
-				pMiniDumpWriteDump(GetCurrentProcess(),GetCurrentProcessId(),hFile,
-					MiniDumpNormal,&mei, nullptr, nullptr);
-
-				/* If this is enabled, it needs to have a proper error message, and block
-				access to the main window. */
-				/*StringCchPrintf(szMsg,SIZEOF_ARRAY(szMsg),_T("Explorer++ has encountered an error and needs to close. \
-A minidump has been saved to:\n%s\nPlease report this to the developer."),szFileName);
-				MessageBox(NULL,szMsg,szAppName,MB_OK);
-
-				ret = EXCEPTION_EXECUTE_HANDLER;*/
-			}
-		}
+		return EXCEPTION_CONTINUE_SEARCH;
 	}
 
-	return ret;
+	// Note that while %#p should print the base (i.e. 0x), that doesn't appear to work. That's why
+	// the 0x prefix is manually set in the string below. It's important that the base is set so
+	// that the value is correctly interpreted as a hex value.
+	std::wstring arguments = (boost::wformat(L"\"%s\" %s %lu %lu 0x%p %s") % currentProcess
+		% NExplorerplusplus::APPLICATION_CRASHED_ARGUMENT % GetCurrentProcessId()
+		% GetCurrentThreadId() % exception % eventName)
+								 .str();
+
+	STARTUPINFO startupInfo = { 0 };
+	startupInfo.cb = sizeof(startupInfo);
+	wil::unique_process_information processInformation;
+	res = CreateProcess(currentProcess, arguments.data(), nullptr, nullptr, false,
+		NORMAL_PRIORITY_CLASS, nullptr, nullptr, &startupInfo, &processInformation);
+
+	if (!res)
+	{
+		return EXCEPTION_CONTINUE_SEARCH;
+	}
+
+	// The process that's created above will attempt to create a minidump for this process. It's
+	// possible that the new process will itself crash for whatever reason, so the wait here
+	// shouldn't be indefinite.
+	event.wait(30000);
+
+	return EXCEPTION_EXECUTE_HANDLER;
 }
 
 int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
@@ -350,7 +335,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 		return 0;
 	}
 
-	SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
+	SetUnhandledExceptionFilter(TopLevelExceptionFilter);
 
 	g_hAccl = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINACCELERATORS));
 
