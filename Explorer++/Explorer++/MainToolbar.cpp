@@ -894,7 +894,7 @@ void MainToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
 {
 	std::vector<ToolbarButton> toolbarButtons;
 
-	wil::com_ptr<IXMLDOMNamedNodeMap> am;
+	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
 	pNode->get_attributes(&am);
 
 	long lChildNodes;
@@ -902,7 +902,7 @@ void MainToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
 
 	for (long j = 1; j < lChildNodes; j++)
 	{
-		wil::com_ptr<IXMLDOMNode> pChildNode;
+		wil::com_ptr_nothrow<IXMLDOMNode> pChildNode;
 		am->get_item(j, &pChildNode);
 
 		wil::unique_bstr bstrValue;

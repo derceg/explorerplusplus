@@ -301,7 +301,7 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 	{
 	case ViewMode::ExtraLargeIcons:
 	{
-		wil::com_ptr<IImageList> pImageList;
+		wil::com_ptr_nothrow<IImageList> pImageList;
 		SHGetImageList(SHIL_JUMBO, IID_PPV_ARGS(&pImageList));
 		ListView_SetImageList(
 			m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_NORMAL);
@@ -310,7 +310,7 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 
 	case ViewMode::LargeIcons:
 	{
-		wil::com_ptr<IImageList> pImageList;
+		wil::com_ptr_nothrow<IImageList> pImageList;
 		SHGetImageList(SHIL_EXTRALARGE, IID_PPV_ARGS(&pImageList));
 		ListView_SetImageList(
 			m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_NORMAL);
@@ -324,7 +324,7 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 	case ViewMode::Tiles:
 	case ViewMode::Icons:
 	{
-		wil::com_ptr<IImageList> pImageList;
+		wil::com_ptr_nothrow<IImageList> pImageList;
 		SHGetImageList(SHIL_LARGE, IID_PPV_ARGS(&pImageList));
 		ListView_SetImageList(
 			m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_NORMAL);
@@ -335,7 +335,7 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 	case ViewMode::List:
 	case ViewMode::Details:
 	{
-		wil::com_ptr<IImageList> pImageList;
+		wil::com_ptr_nothrow<IImageList> pImageList;
 		SHGetImageList(SHIL_SMALL, IID_PPV_ARGS(&pImageList));
 		ListView_SetImageList(
 			m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_SMALL);
@@ -1654,7 +1654,7 @@ void ShellBrowser::StartRenamingMultipleFiles()
 HRESULT ShellBrowser::CopySelectedItemToClipboard(bool copy)
 {
 	auto selectedFiles = GetSelectedItems();
-	wil::com_ptr<IDataObject> clipboardDataObject;
+	wil::com_ptr_nothrow<IDataObject> clipboardDataObject;
 	HRESULT hr;
 
 	if (copy)
@@ -1690,7 +1690,7 @@ HRESULT ShellBrowser::CopySelectedItemToClipboard(bool copy)
 	return hr;
 }
 
-void ShellBrowser::UpdateCurrentClipboardObject(wil::com_ptr<IDataObject> clipboardDataObject)
+void ShellBrowser::UpdateCurrentClipboardObject(wil::com_ptr_nothrow<IDataObject> clipboardDataObject)
 {
 	RestoreStateOfCutItems();
 

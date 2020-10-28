@@ -166,7 +166,7 @@ private:
 	void OnMiddleButtonUp(const POINT *pt);
 	bool OnEndLabelEdit(const NMTVDISPINFO *dispInfo);
 
-	void UpdateCurrentClipboardObject(wil::com_ptr<IDataObject> clipboardDataObject);
+	void UpdateCurrentClipboardObject(wil::com_ptr_nothrow<IDataObject> clipboardDataObject);
 	void OnClipboardUpdate();
 
 	static void DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData);
@@ -258,7 +258,7 @@ private:
 	DragType m_DragType;
 
 	HTREEITEM m_cutItem;
-	wil::com_ptr<IDataObject> m_clipboardDataObject;
+	wil::com_ptr_nothrow<IDataObject> m_clipboardDataObject;
 
 	/* Directory modification. */
 	std::list<AlteredFile_t> m_AlteredList;

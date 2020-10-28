@@ -217,7 +217,7 @@ void Explorerplusplus::OnCreateNewFolder()
 {
 	auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
-	wil::com_ptr<IShellItem> directoryShellItem;
+	wil::com_ptr_nothrow<IShellItem> directoryShellItem;
 	HRESULT hr = SHCreateItemFromIDList(pidlDirectory.get(), IID_PPV_ARGS(&directoryShellItem));
 
 	if (FAILED(hr))

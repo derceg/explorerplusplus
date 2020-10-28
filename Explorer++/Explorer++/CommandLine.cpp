@@ -415,7 +415,7 @@ void OnShowCrashedMessage(const CrashedData &crashedData)
 
 std::optional<std::wstring> CreateMiniDump(const CrashedData &crashedData)
 {
-	wil::unique_event event;
+	wil::unique_event_nothrow event;
 	bool res = event.try_open(strToWstr(crashedData.eventName).c_str());
 
 	if (!res)

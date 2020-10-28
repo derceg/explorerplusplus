@@ -257,7 +257,7 @@ std::unique_ptr<Gdiplus::Bitmap> ImageHelper::LoadGdiplusBitmapFromPNG(HINSTANCE
 
 	std::unique_ptr<Gdiplus::Bitmap> bitmap;
 
-	wil::com_ptr<IStream> stream;
+	wil::com_ptr_nothrow<IStream> stream;
 	HRESULT hr = CreateStreamOnHGlobal(global.get(), false, &stream);
 
 	if (SUCCEEDED(hr))

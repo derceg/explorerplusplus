@@ -44,8 +44,8 @@ std::unique_ptr<BookmarkItem> LoadBookmarkItem(
 
 void BookmarkXmlStorage::Load(IXMLDOMDocument *xmlDocument, BookmarkTree *bookmarkTree)
 {
-	wil::com_ptr<IXMLDOMNode> bookmarksNode;
-	auto queryString = wil::make_bstr(
+	wil::com_ptr_nothrow<IXMLDOMNode> bookmarksNode;
+	auto queryString = wil::make_bstr_nothrow(
 		(std::wstring(L"/ExplorerPlusPlus/") + std::wstring(V2::bookmarksKeyNodeName)).c_str());
 	HRESULT hr = xmlDocument->selectSingleNode(queryString.get(), &bookmarksNode);
 
@@ -55,7 +55,7 @@ void BookmarkXmlStorage::Load(IXMLDOMDocument *xmlDocument, BookmarkTree *bookma
 		return;
 	}
 
-	queryString = wil::make_bstr(
+	queryString = wil::make_bstr_nothrow(
 		(std::wstring(L"/ExplorerPlusPlus/") + std::wstring(V1::bookmarksKeyNodeName)).c_str());
 	hr = xmlDocument->selectSingleNode(queryString.get(), &bookmarksNode);
 
@@ -79,13 +79,13 @@ void V2::Load(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree)
 void V2::LoadPermanentFolder(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
 	BookmarkItem *bookmarkItem, const std::wstring &name)
 {
-	wil::com_ptr<IXMLDOMNode> childNode;
-	auto queryString = wil::make_bstr((L"./PermanentItem[@name='" + name + L"']").c_str());
+	wil::com_ptr_nothrow<IXMLDOMNode> childNode;
+	auto queryString = wil::make_bstr_nothrow((L"./PermanentItem[@name='" + name + L"']").c_str());
 	HRESULT hr = parentNode->selectSingleNode(queryString.get(), &childNode);
 
 	if (hr == S_OK)
 	{
-		wil::com_ptr<IXMLDOMNamedNodeMap> attributeMap;
+		wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> attributeMap;
 		childNode->get_attributes(&attributeMap);
 
 		FILETIME dateCreated;
@@ -104,10 +104,10 @@ void V2::LoadBookmarkChildren(
 	IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree, BookmarkItem *parentBookmarkItem)
 {
 	auto makeQueryString = [](int index) {
-		return wil::make_bstr((L"./Bookmark[@name='" + std::to_wstring(index) + L"']").c_str());
+		return wil::make_bstr_nothrow((L"./Bookmark[@name='" + std::to_wstring(index) + L"']").c_str());
 	};
 
-	wil::com_ptr<IXMLDOMNode> childNode;
+	wil::com_ptr_nothrow<IXMLDOMNode> childNode;
 	int index = 0;
 	auto queryString = makeQueryString(index);
 
@@ -124,7 +124,7 @@ void V2::LoadBookmarkChildren(
 std::unique_ptr<BookmarkItem> V2::LoadBookmarkItem(
 	IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree)
 {
-	wil::com_ptr<IXMLDOMNamedNodeMap> attributeMap;
+	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> attributeMap;
 	parentNode->get_attributes(&attributeMap);
 
 	int type;
@@ -172,8 +172,8 @@ void V1::Load(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree)
 void V1::LoadBookmarkChildren(
 	IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree, BookmarkItem *parentBookmarkItem)
 {
-	wil::com_ptr<IXMLDOMNodeList> children;
-	auto queryString = wil::make_bstr(L"./Bookmark");
+	wil::com_ptr_nothrow<IXMLDOMNodeList> children;
+	auto queryString = wil::make_bstr_nothrow(L"./Bookmark");
 	HRESULT hr = parentNode->selectNodes(queryString.get(), &children);
 
 	if (hr != S_OK)
@@ -181,7 +181,7 @@ void V1::LoadBookmarkChildren(
 		return;
 	}
 
-	wil::com_ptr<IXMLDOMNode> childNode;
+	wil::com_ptr_nothrow<IXMLDOMNode> childNode;
 
 	while (children->nextNode(&childNode) == S_OK)
 	{
@@ -214,7 +214,7 @@ void V1::LoadBookmarkChildren(
 std::unique_ptr<BookmarkItem> V1::LoadBookmarkItem(
 	IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree, bool &showOnToolbarOutput)
 {
-	wil::com_ptr<IXMLDOMNamedNodeMap> attributeMap;
+	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> attributeMap;
 	parentNode->get_attributes(&attributeMap);
 
 	int type;
@@ -242,8 +242,8 @@ std::unique_ptr<BookmarkItem> V1::LoadBookmarkItem(
 
 	if (type == static_cast<int>(BookmarkStorage::BookmarkTypeV1::Folder))
 	{
-		wil::com_ptr<IXMLDOMNode> bookmarksNode;
-		auto queryString = wil::make_bstr(L"./Bookmarks");
+		wil::com_ptr_nothrow<IXMLDOMNode> bookmarksNode;
+		auto queryString = wil::make_bstr_nothrow(L"./Bookmarks");
 		HRESULT hr = parentNode->selectSingleNode(queryString.get(), &bookmarksNode);
 
 		if (hr == S_OK)
@@ -258,11 +258,11 @@ std::unique_ptr<BookmarkItem> V1::LoadBookmarkItem(
 void BookmarkXmlStorage::Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
 	BookmarkTree *bookmarkTree, int indent)
 {
-	auto newline = wil::make_bstr((std::wstring(L"\n") + std::wstring(indent, '\t')).c_str());
+	auto newline = wil::make_bstr_nothrow((std::wstring(L"\n") + std::wstring(indent, '\t')).c_str());
 	NXMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), parentNode);
 
-	wil::com_ptr<IXMLDOMElement> bookmarksNode;
-	auto bookmarksKeyNodeName = wil::make_bstr(V2::bookmarksKeyNodeName);
+	wil::com_ptr_nothrow<IXMLDOMElement> bookmarksNode;
+	auto bookmarksKeyNodeName = wil::make_bstr_nothrow(V2::bookmarksKeyNodeName);
 	HRESULT hr = xmlDocument->createElement(bookmarksKeyNodeName.get(), &bookmarksNode);
 
 	if (hr == S_OK)
@@ -288,10 +288,10 @@ void V2::Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode, Bookmark
 void V2::SavePermanentFolder(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
 	const BookmarkItem *bookmarkItem, const std::wstring &name, int indent)
 {
-	auto newline = wil::make_bstr((std::wstring(L"\n") + std::wstring(indent, '\t')).c_str());
+	auto newline = wil::make_bstr_nothrow((std::wstring(L"\n") + std::wstring(indent, '\t')).c_str());
 	NXMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), parentNode);
 
-	wil::com_ptr<IXMLDOMElement> childNode;
+	wil::com_ptr_nothrow<IXMLDOMElement> childNode;
 	NXMLSettings::CreateElementNode(
 		xmlDocument, &childNode, parentNode, L"PermanentItem", name.c_str());
 
@@ -312,10 +312,10 @@ void V2::SaveBookmarkChildren(IXMLDOMDocument *xmlDocument, IXMLDOMElement *pare
 
 	for (auto &child : parentBookmarkItem->GetChildren())
 	{
-		auto newline = wil::make_bstr((std::wstring(L"\n") + std::wstring(indent, '\t')).c_str());
+		auto newline = wil::make_bstr_nothrow((std::wstring(L"\n") + std::wstring(indent, '\t')).c_str());
 		NXMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), parentNode);
 
-		wil::com_ptr<IXMLDOMElement> childNode;
+		wil::com_ptr_nothrow<IXMLDOMElement> childNode;
 		NXMLSettings::CreateElementNode(
 			xmlDocument, &childNode, parentNode, _T("Bookmark"), std::to_wstring(index).c_str());
 

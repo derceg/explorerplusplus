@@ -198,7 +198,7 @@ void BookmarksToolbar::StartDrag(DragType dragType, const POINT &pt)
 		return;
 	}
 
-	wil::com_ptr<IDragSourceHelper> dragSourceHelper;
+	wil::com_ptr_nothrow<IDragSourceHelper> dragSourceHelper;
 	HRESULT hr = CoCreateInstance(
 		CLSID_DragDropHelper, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&dragSourceHelper));
 
@@ -207,7 +207,7 @@ void BookmarksToolbar::StartDrag(DragType dragType, const POINT &pt)
 		return;
 	}
 
-	wil::com_ptr<IDropSource> dropSource;
+	wil::com_ptr_nothrow<IDropSource> dropSource;
 	hr = CreateDropSource(&dropSource, dragType);
 
 	if (FAILED(hr))

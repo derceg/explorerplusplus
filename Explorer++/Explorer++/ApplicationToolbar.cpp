@@ -535,7 +535,7 @@ void ApplicationToolbarPersistentSettings::SaveRegistrySettings(HKEY hParentKey)
 
 void ApplicationToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
 {
-	wil::com_ptr<IXMLDOMNamedNodeMap> am;
+	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
 	HRESULT hr = pNode->get_attributes(&am);
 
 	if (FAILED(hr))
@@ -554,7 +554,7 @@ void ApplicationToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
 
 	for (int i = 0; i < lChildNodes; i++)
 	{
-		wil::com_ptr<IXMLDOMNode> pAttributeNode;
+		wil::com_ptr_nothrow<IXMLDOMNode> pAttributeNode;
 		am->get_item(i, &pAttributeNode);
 
 		wil::unique_bstr bstrName;
@@ -586,12 +586,12 @@ void ApplicationToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
 		AddButton(szName, szCommand, bShowNameOnToolbar, nullptr);
 	}
 
-	wil::com_ptr<IXMLDOMNode> pNextSibling;
+	wil::com_ptr_nothrow<IXMLDOMNode> pNextSibling;
 	hr = pNode->get_nextSibling(&pNextSibling);
 
 	if (hr == S_OK)
 	{
-		wil::com_ptr<IXMLDOMNode> secondSibling;
+		wil::com_ptr_nothrow<IXMLDOMNode> secondSibling;
 		hr = pNextSibling->get_nextSibling(&secondSibling);
 
 		if (hr == S_OK)
@@ -604,13 +604,13 @@ void ApplicationToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
 void ApplicationToolbarPersistentSettings::SaveXMLSettings(
 	IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe)
 {
-	auto bstr_wsntt = wil::make_bstr(L"\n\t\t");
+	auto bstr_wsntt = wil::make_bstr_nothrow(L"\n\t\t");
 
 	for (const auto &button : m_Buttons)
 	{
 		NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe);
 
-		wil::com_ptr<IXMLDOMElement> pParentNode;
+		wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
 		NXMLSettings::CreateElementNode(
 			pXMLDom, &pParentNode, pe, _T("ApplicationButton"), button.Name.c_str());
 		NXMLSettings::AddAttributeToNode(

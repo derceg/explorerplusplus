@@ -108,7 +108,7 @@ void ShellBrowser::QueueThumbnailTask(int internalIndex)
 std::optional<ShellBrowser::ThumbnailResult_t> ShellBrowser::FindThumbnailAsync(
 	HWND listView, int thumbnailResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo)
 {
-	wil::com_ptr<IShellFolder> pShellFolder;
+	wil::com_ptr_nothrow<IShellFolder> pShellFolder;
 	HRESULT hr =
 		SHBindToParent(basicItemInfo.pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), nullptr);
 
@@ -117,7 +117,7 @@ std::optional<ShellBrowser::ThumbnailResult_t> ShellBrowser::FindThumbnailAsync(
 		return std::nullopt;
 	}
 
-	wil::com_ptr<IExtractImage> pExtractImage;
+	wil::com_ptr_nothrow<IExtractImage> pExtractImage;
 	auto pridl = basicItemInfo.pridl.get();
 	hr = GetUIObjectOf(pShellFolder.get(), nullptr, 1, const_cast<PCUITEMID_CHILD *>(&pridl),
 		IID_PPV_ARGS(&pExtractImage));

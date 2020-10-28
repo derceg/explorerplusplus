@@ -71,32 +71,32 @@ void LoadSaveXML::InitializeSaveEnvironment()
 	}
 
 	/* Insert the XML header. */
-	wil::com_ptr<IXMLDOMProcessingInstruction> pi;
-	auto bstr = wil::make_bstr(L"xml");
-	auto bstr1 = wil::make_bstr(L"version='1.0'");
+	wil::com_ptr_nothrow<IXMLDOMProcessingInstruction> pi;
+	auto bstr = wil::make_bstr_nothrow(L"xml");
+	auto bstr1 = wil::make_bstr_nothrow(L"version='1.0'");
 	m_pXMLDom->createProcessingInstruction(bstr.get(), bstr1.get(), &pi);
 	NXMLSettings::AppendChildToParent(pi.get(), m_pXMLDom.get());
 
 	/* Short header comment, explaining file purpose. */
-	wil::com_ptr<IXMLDOMComment> pc;
-	bstr = wil::make_bstr(L" Preference file for Explorer++ ");
+	wil::com_ptr_nothrow<IXMLDOMComment> pc;
+	bstr = wil::make_bstr_nothrow(L" Preference file for Explorer++ ");
 	m_pXMLDom->createComment(bstr.get(), &pc);
 	NXMLSettings::AppendChildToParent(pc.get(), m_pXMLDom.get());
 
 	/* Create the root element. CANNOT use '+' signs
 	within the element name. */
-	bstr = wil::make_bstr(L"ExplorerPlusPlus");
+	bstr = wil::make_bstr_nothrow(L"ExplorerPlusPlus");
 	m_pXMLDom->createElement(bstr.get(), &m_pRoot);
 
 	NXMLSettings::AppendChildToParent(m_pRoot.get(), m_pXMLDom.get());
 
-	auto bstr_wsnt = wil::make_bstr(L"\n\t");
+	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
 	NXMLSettings::AddWhiteSpaceToNode(m_pXMLDom.get(), bstr_wsnt.get(), m_pRoot.get());
 }
 
 void LoadSaveXML::ReleaseSaveEnvironment()
 {
-	auto bstr_wsn = wil::make_bstr(L"\n");
+	auto bstr_wsn = wil::make_bstr_nothrow(L"\n");
 	NXMLSettings::AddWhiteSpaceToNode(m_pXMLDom.get(), bstr_wsn.get(), m_pRoot.get());
 
 	wil::unique_bstr bstr;

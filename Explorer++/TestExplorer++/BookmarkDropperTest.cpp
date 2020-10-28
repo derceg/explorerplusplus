@@ -44,7 +44,7 @@ protected:
 	BookmarkTree m_bookmarkTree;
 
 	std::unique_ptr<BookmarkDropper> m_dropper;
-	wil::com_ptr<IDataObject> m_dataObject;
+	wil::com_ptr_nothrow<IDataObject> m_dataObject;
 	BookmarkItem *m_rawGrandparentFolder;
 	BookmarkItem *m_rawParentFolder;
 	BookmarkItem *m_rawBookmark;
@@ -70,7 +70,7 @@ protected:
 	BookmarkTree m_bookmarkTree;
 
 	std::unique_ptr<BookmarkDropper> m_dropper;
-	wil::com_ptr<IDataObject> m_dataObject;
+	wil::com_ptr_nothrow<IDataObject> m_dataObject;
 };
 
 TEST_F(BookmarkDropperValidTest, DropEffect)

@@ -460,7 +460,7 @@ private:
 	void SetTileViewInfo();
 	void SetTileViewItemInfo(int iItem, int iItemInternal);
 
-	void UpdateCurrentClipboardObject(wil::com_ptr<IDataObject> clipboardDataObject);
+	void UpdateCurrentClipboardObject(wil::com_ptr_nothrow<IDataObject> clipboardDataObject);
 	void OnClipboardUpdate();
 	void RestoreStateOfCutItems();
 
@@ -592,7 +592,7 @@ private:
 	bool m_PreviousSortColumnExists;
 	ColumnType m_previousSortColumn;
 
-	wil::com_ptr<IDataObject> m_clipboardDataObject;
+	wil::com_ptr_nothrow<IDataObject> m_clipboardDataObject;
 	std::vector<std::wstring> m_cutFileNames;
 
 	/* Drag and drop related data. */

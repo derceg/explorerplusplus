@@ -49,8 +49,8 @@ private:
 	BOOL					m_bLoad;
 
 	/* Used for saving + loading. */
-	wil::com_ptr<IXMLDOMDocument> m_pXMLDom;
+	wil::com_ptr_nothrow<IXMLDOMDocument> m_pXMLDom;
 
 	/* Used exclusively for saving. */
-	wil::com_ptr<IXMLDOMElement> m_pRoot;
+	wil::com_ptr_nothrow<IXMLDOMElement> m_pRoot;
 };

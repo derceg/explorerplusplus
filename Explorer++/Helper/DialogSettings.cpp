@@ -97,10 +97,10 @@ void DialogSettings::SaveXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *p
 		return;
 	}
 
-	auto bstr_wsntt = wil::make_bstr(L"\n\t\t");
+	auto bstr_wsntt = wil::make_bstr_nothrow(L"\n\t\t");
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe);
 
-	wil::com_ptr<IXMLDOMElement> pParentNode;
+	wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
 	NXMLSettings::CreateElementNode(
 		pXMLDom, &pParentNode, pe, _T("DialogState"), m_szSettingsKey.c_str());
 
@@ -123,7 +123,7 @@ void DialogSettings::LoadXMLSettings(IXMLDOMNamedNodeMap *pam, long lChildNodes)
 {
 	for (int i = 1; i < lChildNodes; i++)
 	{
-		wil::com_ptr<IXMLDOMNode> pNode;
+		wil::com_ptr_nothrow<IXMLDOMNode> pNode;
 		pam->get_item(i, &pNode);
 
 		wil::unique_bstr bstrName;

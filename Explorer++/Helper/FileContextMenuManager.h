@@ -49,9 +49,9 @@ private:
 
 	static const int CONTEXT_MENU_SUBCLASS_ID = 1;
 
-	wil::com_ptr<IContextMenu3> m_pShellContext3;
-	wil::com_ptr<IContextMenu2> m_pShellContext2;
-	wil::com_ptr<IContextMenu> m_pShellContext;
+	wil::com_ptr_nothrow<IContextMenu3> m_pShellContext3;
+	wil::com_ptr_nothrow<IContextMenu2> m_pShellContext2;
+	wil::com_ptr_nothrow<IContextMenu> m_pShellContext;
 	IContextMenu *m_pActualContext;
 
 	const HWND m_hwnd;

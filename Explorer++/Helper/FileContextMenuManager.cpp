@@ -17,7 +17,7 @@ FileContextMenuManager::FileContextMenuManager(
 	m_hwnd(hwnd),
 	m_pidlParent(ILCloneFull(pidlParent))
 {
-	wil::com_ptr<IContextMenu> pContextMenu;
+	wil::com_ptr_nothrow<IContextMenu> pContextMenu;
 	HRESULT hr;
 
 	for (auto pidl : pidlItems)
@@ -29,7 +29,7 @@ FileContextMenuManager::FileContextMenuManager(
 
 	if (pidlItems.empty())
 	{
-		wil::com_ptr<IShellFolder> pShellParentFolder;
+		wil::com_ptr_nothrow<IShellFolder> pShellParentFolder;
 		PCUITEMID_CHILD pidlRelative = nullptr;
 		hr = SHBindToParent(pidlParent, IID_PPV_ARGS(&pShellParentFolder), &pidlRelative);
 
@@ -41,7 +41,7 @@ FileContextMenuManager::FileContextMenuManager(
 	}
 	else
 	{
-		wil::com_ptr<IShellFolder> pShellFolder;
+		wil::com_ptr_nothrow<IShellFolder> pShellFolder;
 		hr = BindToIdl(pidlParent, IID_PPV_ARGS(&pShellFolder));
 
 		if (SUCCEEDED(hr))

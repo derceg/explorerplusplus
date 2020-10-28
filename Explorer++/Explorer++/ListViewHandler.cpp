@@ -552,7 +552,7 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 	unique_pidl_absolute pidlParent(ILCloneFull(pidlDirectory.get()));
 	ILRemoveLastID(pidlParent.get());
 
-	wil::com_ptr<IShellFolder> pShellFolder;
+	wil::com_ptr_nothrow<IShellFolder> pShellFolder;
 	HRESULT hr = BindToIdl(pidlParent.get(), IID_PPV_ARGS(&pShellFolder));
 
 	if (FAILED(hr))
@@ -560,7 +560,7 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 		return;
 	}
 
-	wil::com_ptr<IDataObject> pDataObject;
+	wil::com_ptr_nothrow<IDataObject> pDataObject;
 	PCUITEMID_CHILD pidlChildFolder = ILFindLastID(pidlDirectory.get());
 	hr =
 		GetUIObjectOf(pShellFolder.get(), nullptr, 1, &pidlChildFolder, IID_PPV_ARGS(&pDataObject));

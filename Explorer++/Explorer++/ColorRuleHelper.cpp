@@ -177,8 +177,8 @@ void NColorRuleHelper::LoadColorRulesFromXML(
 		return;
 	}
 
-	wil::com_ptr<IXMLDOMNode> pNode;
-	auto bstr = wil::make_bstr(L"//ColorRule");
+	wil::com_ptr_nothrow<IXMLDOMNode> pNode;
+	auto bstr = wil::make_bstr_nothrow(L"//ColorRule");
 	HRESULT hr = pXMLDom->selectSingleNode(bstr.get(), &pNode);
 
 	if (hr == S_OK)
@@ -193,7 +193,7 @@ namespace
 	void LoadColorRulesFromXMLInternal(
 		IXMLDOMNode *pNode, std::vector<NColorRuleHelper::ColorRule> &ColorRules)
 	{
-		wil::com_ptr<IXMLDOMNamedNodeMap> am;
+		wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
 		HRESULT hr = pNode->get_attributes(&am);
 
 		if (FAILED(hr))
@@ -215,7 +215,7 @@ namespace
 
 		for (long i = 0; i < nAttributeNodes; i++)
 		{
-			wil::com_ptr<IXMLDOMNode> pAttributeNode;
+			wil::com_ptr_nothrow<IXMLDOMNode> pAttributeNode;
 			am->get_item(i, &pAttributeNode);
 
 			wil::unique_bstr bstrName;
@@ -265,12 +265,12 @@ namespace
 			ColorRules.push_back(colorRule);
 		}
 
-		wil::com_ptr<IXMLDOMNode> pNextSibling;
+		wil::com_ptr_nothrow<IXMLDOMNode> pNextSibling;
 		hr = pNode->get_nextSibling(&pNextSibling);
 
 		if (hr == S_OK)
 		{
-			wil::com_ptr<IXMLDOMNode> secondSibling;
+			wil::com_ptr_nothrow<IXMLDOMNode> secondSibling;
 			hr = pNextSibling->get_nextSibling(&secondSibling);
 
 			if (hr == S_OK)
@@ -284,11 +284,11 @@ namespace
 void NColorRuleHelper::SaveColorRulesToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot,
 	const std::vector<NColorRuleHelper::ColorRule> &ColorRules)
 {
-	auto bstr_wsnt = wil::make_bstr(L"\n\t");
+	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pRoot);
 
-	wil::com_ptr<IXMLDOMElement> pe;
-	auto bstr = wil::make_bstr(L"ColorRules");
+	wil::com_ptr_nothrow<IXMLDOMElement> pe;
+	auto bstr = wil::make_bstr_nothrow(L"ColorRules");
 	pXMLDom->createElement(bstr.get(), &pe);
 
 	for (const auto &colorRule : ColorRules)
@@ -305,10 +305,10 @@ namespace
 	void SaveColorRulesToXMLInternal(
 		IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe, const NColorRuleHelper::ColorRule &colorRule)
 	{
-		auto bstr_indent = wil::make_bstr(L"\n\t\t");
+		auto bstr_indent = wil::make_bstr_nothrow(L"\n\t\t");
 		NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_indent.get(), pe);
 
-		wil::com_ptr<IXMLDOMElement> pParentNode;
+		wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
 		NXMLSettings::CreateElementNode(
 			pXMLDom, &pParentNode, pe, _T("ColorRule"), colorRule.strDescription.c_str());
 		NXMLSettings::AddAttributeToNode(

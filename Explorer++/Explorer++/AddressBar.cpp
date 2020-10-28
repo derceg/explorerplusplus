@@ -243,10 +243,10 @@ void AddressBar::OnBeginDrag()
 		DVASPECT_CONTENT, 0, TYMED_ISTREAM };
 	stg[1] = contentsStgMedium->release();
 
-	wil::com_ptr<IDataObject> pDataObject;
+	wil::com_ptr_nothrow<IDataObject> pDataObject;
 	pDataObject.attach(CreateDataObject(ftc, stg, SIZEOF_ARRAY(ftc)));
 
-	wil::com_ptr<IDragSourceHelper> dragSourceHelper;
+	wil::com_ptr_nothrow<IDragSourceHelper> dragSourceHelper;
 	HRESULT hr = CoCreateInstance(
 		CLSID_DragDropHelper, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&dragSourceHelper));
 
@@ -255,7 +255,7 @@ void AddressBar::OnBeginDrag()
 		return;
 	}
 
-	wil::com_ptr<IDropSource> dropSource;
+	wil::com_ptr_nothrow<IDropSource> dropSource;
 	hr = CreateDropSource(&dropSource, DragType::LeftClick);
 
 	if (FAILED(hr))
@@ -327,7 +327,7 @@ std::optional<FILEGROUPDESCRIPTOR> AddressBar::GenerateShortcutDescriptor(PCIDLI
 std::optional<wil::unique_stg_medium> AddressBar::GenerateShortcutContentsStgMedium(
 	PCIDLIST_ABSOLUTE pidl)
 {
-	wil::com_ptr<IShellLink> shellLink;
+	wil::com_ptr_nothrow<IShellLink> shellLink;
 	HRESULT hr =
 		CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellLink));
 
@@ -343,7 +343,7 @@ std::optional<wil::unique_stg_medium> AddressBar::GenerateShortcutContentsStgMed
 		return std::nullopt;
 	}
 
-	wil::com_ptr<IPersistStream> pPersistStream;
+	wil::com_ptr_nothrow<IPersistStream> pPersistStream;
 	hr = shellLink->QueryInterface(IID_PPV_ARGS(&pPersistStream));
 
 	if (FAILED(hr))
@@ -351,7 +351,7 @@ std::optional<wil::unique_stg_medium> AddressBar::GenerateShortcutContentsStgMed
 		return std::nullopt;
 	}
 
-	wil::com_ptr<IStream> stream;
+	wil::com_ptr_nothrow<IStream> stream;
 	stream.attach(SHCreateMemStream(nullptr, 0));
 
 	if (!stream)

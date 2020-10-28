@@ -192,7 +192,7 @@ unsigned long hash_setting(unsigned char *str);
 
 BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl)
 {
-	wil::com_ptr<IXMLDOMDocument> pXMLDom;
+	wil::com_ptr_nothrow<IXMLDOMDocument> pXMLDom;
 	pXMLDom.attach(NXMLSettings::DomFromCOM());
 
 	if (!pXMLDom)
@@ -214,8 +214,8 @@ BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl)
 		return FALSE;
 	}
 
-	wil::com_ptr<IXMLDOMNodeList> pNodes;
-	auto bstr = wil::make_bstr(L"//WindowPosition/*");
+	wil::com_ptr_nothrow<IXMLDOMNodeList> pNodes;
+	auto bstr = wil::make_bstr_nothrow(L"//WindowPosition/*");
 	pXMLDom->selectNodes(bstr.get(), &pNodes);
 
 	if (!pNodes)
@@ -235,10 +235,10 @@ BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl)
 		return FALSE;
 	}
 
-	wil::com_ptr<IXMLDOMNode> pNode;
+	wil::com_ptr_nothrow<IXMLDOMNode> pNode;
 	pNodes->get_item(0, &pNode);
 
-	wil::com_ptr<IXMLDOMNamedNodeMap> am;
+	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
 	HRESULT hr = pNode->get_attributes(&am);
 
 	if (SUCCEEDED(hr))
@@ -248,7 +248,7 @@ BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl)
 
 		for (long i = 1; i < nChildNodes; i++)
 		{
-			wil::com_ptr<IXMLDOMNode> pChildNode;
+			wil::com_ptr_nothrow<IXMLDOMNode> pChildNode;
 			am->get_item(i, &pChildNode);
 
 			wil::unique_bstr bstrName;
@@ -307,7 +307,7 @@ BOOL LoadAllowMultipleInstancesFromXML()
 {
 	BOOL bAllowMultipleInstances = TRUE;
 
-	wil::com_ptr<IXMLDOMDocument> pXMLDom;
+	wil::com_ptr_nothrow<IXMLDOMDocument> pXMLDom;
 	pXMLDom.attach(NXMLSettings::DomFromCOM());
 
 	if (!pXMLDom)
@@ -329,8 +329,8 @@ BOOL LoadAllowMultipleInstancesFromXML()
 		return bAllowMultipleInstances;
 	}
 
-	wil::com_ptr<IXMLDOMNodeList> pNodes;
-	auto bstr = wil::make_bstr(L"//Settings/*");
+	wil::com_ptr_nothrow<IXMLDOMNodeList> pNodes;
+	auto bstr = wil::make_bstr_nothrow(L"//Settings/*");
 	pXMLDom->selectNodes(bstr.get(), &pNodes);
 
 	if (!pNodes)
@@ -343,15 +343,15 @@ BOOL LoadAllowMultipleInstancesFromXML()
 
 	for (long i = 0; i < length; i++)
 	{
-		wil::com_ptr<IXMLDOMNode> pNode;
+		wil::com_ptr_nothrow<IXMLDOMNode> pNode;
 		pNodes->get_item(i, &pNode);
 
-		wil::com_ptr<IXMLDOMNamedNodeMap> am;
+		wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
 		HRESULT hr = pNode->get_attributes(&am);
 
 		if (SUCCEEDED(hr))
 		{
-			wil::com_ptr<IXMLDOMNode> pNodeAttribute;
+			wil::com_ptr_nothrow<IXMLDOMNode> pNodeAttribute;
 			hr = am->get_item(0, &pNodeAttribute);
 
 			if (SUCCEEDED(hr))
@@ -381,8 +381,8 @@ void Explorerplusplus::LoadGenericSettingsFromXML(IXMLDOMDocument *pXMLDom)
 		return;
 	}
 
-	wil::com_ptr<IXMLDOMNodeList> pNodes;
-	auto bstr = wil::make_bstr(L"//Settings/*");
+	wil::com_ptr_nothrow<IXMLDOMNodeList> pNodes;
+	auto bstr = wil::make_bstr_nothrow(L"//Settings/*");
 	pXMLDom->selectNodes(bstr.get(), &pNodes);
 
 	if (!pNodes)
@@ -395,15 +395,15 @@ void Explorerplusplus::LoadGenericSettingsFromXML(IXMLDOMDocument *pXMLDom)
 
 	for (long i = 0; i < length; i++)
 	{
-		wil::com_ptr<IXMLDOMNode> pNode;
+		wil::com_ptr_nothrow<IXMLDOMNode> pNode;
 		pNodes->get_item(i, &pNode);
 
-		wil::com_ptr<IXMLDOMNamedNodeMap> am;
+		wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
 		HRESULT hr = pNode->get_attributes(&am);
 
 		if (SUCCEEDED(hr))
 		{
-			wil::com_ptr<IXMLDOMNode> pNodeAttribute;
+			wil::com_ptr_nothrow<IXMLDOMNode> pNodeAttribute;
 			hr = am->get_item(0, &pNodeAttribute);
 
 			if (SUCCEEDED(hr))
@@ -424,11 +424,11 @@ void Explorerplusplus::LoadGenericSettingsFromXML(IXMLDOMDocument *pXMLDom)
 
 void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
 {
-	wil::com_ptr<IXMLDOMElement> pe;
-	auto bstr = wil::make_bstr(L"Settings");
+	wil::com_ptr_nothrow<IXMLDOMElement> pe;
+	auto bstr = wil::make_bstr_nothrow(L"Settings");
 	pXMLDom->createElement(bstr.get(), &pe);
 
-	auto bstr_wsntt = wil::make_bstr(L"\n\t\t");
+	auto bstr_wsntt = wil::make_bstr_nothrow(L"\n\t\t");
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
@@ -462,7 +462,7 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 
 	COLORREF centreColor;
 
-	wil::com_ptr<IXMLDOMElement> pParentNode;
+	wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::CreateElementNode(
 		pXMLDom, &pParentNode, pe.get(), _T("Setting"), _T("DisplayCentreColor"));
@@ -716,7 +716,7 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	NXMLSettings::WriteStandardSetting(
 		pXMLDom, pe.get(), _T("Setting"), _T("ViewModeGlobal"), szValue);
 
-	auto bstr_wsnt = wil::make_bstr(L"\n\t");
+	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pe.get());
 
 	NXMLSettings::AppendChildToParent(pe.get(), pRoot);
@@ -731,8 +731,8 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 		return 0;
 	}
 
-	wil::com_ptr<IXMLDOMNodeList> pNodes;
-	auto bstr = wil::make_bstr(L"//Tabs/*");
+	wil::com_ptr_nothrow<IXMLDOMNodeList> pNodes;
+	auto bstr = wil::make_bstr_nothrow(L"//Tabs/*");
 	pXMLDom->selectNodes(bstr.get(), &pNodes);
 
 	if (!pNodes)
@@ -750,7 +750,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 		/* This should never fail, as the number
 		of nodes has already been counted (so
 		they must exist). */
-		wil::com_ptr<IXMLDOMNode> pNode;
+		wil::com_ptr_nothrow<IXMLDOMNode> pNode;
 		HRESULT hr = pNodes->get_item(i, &pNode);
 
 		TCHAR szDirectory[MAX_PATH];
@@ -760,7 +760,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 
 		if (SUCCEEDED(hr))
 		{
-			wil::com_ptr<IXMLDOMNamedNodeMap> am;
+			wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
 			hr = pNode->get_attributes(&am);
 
 			if (SUCCEEDED(hr))
@@ -776,7 +776,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 				ignored. */
 				for (long j = 1; j < lChildNodes; j++)
 				{
-					wil::com_ptr<IXMLDOMNode> pChildNode;
+					wil::com_ptr_nothrow<IXMLDOMNode> pChildNode;
 					am->get_item(j, &pChildNode);
 
 					wil::unique_bstr bstrName;
@@ -796,22 +796,22 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 					}
 				}
 
-				wil::com_ptr<IXMLDOMNode> firstNode;
+				wil::com_ptr_nothrow<IXMLDOMNode> firstNode;
 				hr = pNode->get_firstChild(&firstNode);
 
 				if (hr == S_OK)
 				{
-					wil::com_ptr<IXMLDOMNode> pColumnsNode;
+					wil::com_ptr_nothrow<IXMLDOMNode> pColumnsNode;
 					hr = firstNode->get_nextSibling(&pColumnsNode);
 
 					if (hr == S_OK)
 					{
-						wil::com_ptr<IXMLDOMNode> firstInnerNode;
+						wil::com_ptr_nothrow<IXMLDOMNode> firstInnerNode;
 						hr = pColumnsNode->get_firstChild(&firstInnerNode);
 
 						if (hr == S_OK)
 						{
-							wil::com_ptr<IXMLDOMNode> pColumnNode;
+							wil::com_ptr_nothrow<IXMLDOMNode> pColumnNode;
 							firstInnerNode->get_nextSibling(&pColumnNode);
 
 							std::vector<Column_t> column;
@@ -852,7 +852,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 									break;
 								}
 
-								wil::com_ptr<IXMLDOMNode> nextSibling;
+								wil::com_ptr_nothrow<IXMLDOMNode> nextSibling;
 								pColumnNode->get_nextSibling(&nextSibling);
 								nextSibling->get_nextSibling(&pColumnNode);
 							}
@@ -888,11 +888,11 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 
 void Explorerplusplus::SaveTabSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
 {
-	auto bstr_wsnt = wil::make_bstr(L"\n\t");
+	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pRoot);
 
-	wil::com_ptr<IXMLDOMElement> pe;
-	auto bstr = wil::make_bstr(L"Tabs");
+	wil::com_ptr_nothrow<IXMLDOMElement> pe;
+	auto bstr = wil::make_bstr_nothrow(L"Tabs");
 	pXMLDom->createElement(bstr.get(), &pe);
 
 	SaveTabSettingsToXMLnternal(pXMLDom, pe.get());
@@ -905,8 +905,8 @@ void Explorerplusplus::SaveTabSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMEle
 void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe)
 {
 	int tabNum = 0;
-	auto bstr_wsntt = wil::make_bstr(L"\n\t\t");
-	auto bstr_wsnttt = wil::make_bstr(L"\n\t\t\t");
+	auto bstr_wsntt = wil::make_bstr_nothrow(L"\n\t\t");
+	auto bstr_wsnttt = wil::make_bstr_nothrow(L"\n\t\t\t");
 
 	for (auto tabRef : m_tabContainer->GetAllTabsInOrder())
 	{
@@ -914,7 +914,7 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom, IXM
 
 		NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe);
 
-		wil::com_ptr<IXMLDOMElement> pParentNode;
+		wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
 		TCHAR szNodeName[32];
 		StringCchPrintf(szNodeName, SIZEOF_ARRAY(szNodeName), _T("%d"), tabNum);
 		NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe, _T("Tab"), szNodeName);
@@ -952,8 +952,8 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom, IXM
 		NXMLSettings::AddAttributeToNode(
 			pXMLDom, pParentNode.get(), _T("ViewMode"), NXMLSettings::EncodeIntValue(viewMode));
 
-		wil::com_ptr<IXMLDOMElement> pColumnsNode;
-		auto bstr = wil::make_bstr(L"Columns");
+		wil::com_ptr_nothrow<IXMLDOMElement> pColumnsNode;
+		auto bstr = wil::make_bstr_nothrow(L"Columns");
 		pXMLDom->createElement(bstr.get(), &pColumnsNode);
 
 		auto folderColumns = tab.GetShellBrowser()->ExportAllColumns();
@@ -1006,7 +1006,7 @@ int Explorerplusplus::LoadColumnFromXML(IXMLDOMNode *pNode, std::vector<Column_t
 {
 	outputColumns.clear();
 
-	wil::com_ptr<IXMLDOMNamedNodeMap> am;
+	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
 	HRESULT hr = pNode->get_attributes(&am);
 
 	if (FAILED(hr))
@@ -1021,7 +1021,7 @@ int Explorerplusplus::LoadColumnFromXML(IXMLDOMNode *pNode, std::vector<Column_t
 
 	for (long i = 0; i < nAttributeNodes; i++)
 	{
-		wil::com_ptr<IXMLDOMNode> pAttributeNode;
+		wil::com_ptr_nothrow<IXMLDOMNode> pAttributeNode;
 		am->get_item(i, &pAttributeNode);
 
 		wil::unique_bstr bstrName;
@@ -1098,8 +1098,8 @@ void Explorerplusplus::LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom)
 		return;
 	}
 
-	wil::com_ptr<IXMLDOMNodeList> pNodes;
-	auto bstr = wil::make_bstr(L"//DefaultColumns/*");
+	wil::com_ptr_nothrow<IXMLDOMNodeList> pNodes;
+	auto bstr = wil::make_bstr_nothrow(L"//DefaultColumns/*");
 	pXMLDom->selectNodes(bstr.get(), &pNodes);
 
 	if (!pNodes)
@@ -1114,7 +1114,7 @@ void Explorerplusplus::LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom)
 
 	for (long i = 0; i < length; i++)
 	{
-		wil::com_ptr<IXMLDOMNode> pNode;
+		wil::com_ptr_nothrow<IXMLDOMNode> pNode;
 		pNodes->get_item(i, &pNode);
 
 		std::vector<Column_t> columnSet;
@@ -1155,13 +1155,13 @@ void Explorerplusplus::LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom)
 
 void Explorerplusplus::SaveDefaultColumnsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
 {
-	wil::com_ptr<IXMLDOMElement> pColumnsNode;
-	auto bstr = wil::make_bstr(L"DefaultColumns");
+	wil::com_ptr_nothrow<IXMLDOMElement> pColumnsNode;
+	auto bstr = wil::make_bstr_nothrow(L"DefaultColumns");
 	pXMLDom->createElement(bstr.get(), &pColumnsNode);
 
 	SaveDefaultColumnsToXMLInternal(pXMLDom, pColumnsNode.get());
 
-	auto bstr_wsnt = wil::make_bstr(L"\n\t");
+	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pColumnsNode.get());
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pRoot);
 
@@ -1202,9 +1202,9 @@ void Explorerplusplus::SaveColumnToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement 
 		StringCchCat(wszIndent, SIZEOF_ARRAY(wszIndent), L"\t");
 	}
 
-	auto bstr_indent = wil::make_bstr(wszIndent);
+	auto bstr_indent = wil::make_bstr_nothrow(wszIndent);
 
-	wil::com_ptr<IXMLDOMElement> pColumnNode;
+	wil::com_ptr_nothrow<IXMLDOMElement> pColumnNode;
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_indent.get(), pColumnsNode);
 	NXMLSettings::CreateElementNode(pXMLDom, &pColumnNode, pColumnsNode, _T("Column"), szColumnSet);
 
@@ -1233,13 +1233,13 @@ void Explorerplusplus::SaveColumnToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement 
 
 void Explorerplusplus::SaveWindowPositionToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
 {
-	wil::com_ptr<IXMLDOMElement> pWndPosNode;
-	auto bstr = wil::make_bstr(L"WindowPosition");
+	wil::com_ptr_nothrow<IXMLDOMElement> pWndPosNode;
+	auto bstr = wil::make_bstr_nothrow(L"WindowPosition");
 	pXMLDom->createElement(bstr.get(), &pWndPosNode);
 
 	SaveWindowPositionToXMLInternal(pXMLDom, pWndPosNode.get());
 
-	auto bstr_wsnt = wil::make_bstr(L"\n\t");
+	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pWndPosNode.get());
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pRoot);
 
@@ -1253,10 +1253,10 @@ void Explorerplusplus::SaveWindowPositionToXMLInternal(
 	wndpl.length = sizeof(WINDOWPLACEMENT);
 	GetWindowPlacement(m_hContainer, &wndpl);
 
-	auto bstr_wsntt = wil::make_bstr(L"\n\t\t");
+	auto bstr_wsntt = wil::make_bstr_nothrow(L"\n\t\t");
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pWndPosNode);
 
-	wil::com_ptr<IXMLDOMElement> pParentNode;
+	wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
 	NXMLSettings::CreateElementNode(
 		pXMLDom, &pParentNode, pWndPosNode, _T("Setting"), _T("Position"));
 	NXMLSettings::AddAttributeToNode(
@@ -1288,8 +1288,8 @@ void Explorerplusplus::LoadToolbarInformationFromXML(IXMLDOMDocument *pXMLDom)
 		return;
 	}
 
-	wil::com_ptr<IXMLDOMNodeList> pNodes;
-	auto bstr = wil::make_bstr(L"//Toolbars/*");
+	wil::com_ptr_nothrow<IXMLDOMNodeList> pNodes;
+	auto bstr = wil::make_bstr_nothrow(L"//Toolbars/*");
 	pXMLDom->selectNodes(bstr.get(), &pNodes);
 
 	if (!pNodes)
@@ -1305,12 +1305,12 @@ void Explorerplusplus::LoadToolbarInformationFromXML(IXMLDOMDocument *pXMLDom)
 		/* This should never fail, as the number
 		of nodes has already been counted (so
 		they must exist). */
-		wil::com_ptr<IXMLDOMNode> pNode;
+		wil::com_ptr_nothrow<IXMLDOMNode> pNode;
 		HRESULT hr = pNodes->get_item(i, &pNode);
 
 		if (SUCCEEDED(hr))
 		{
-			wil::com_ptr<IXMLDOMNamedNodeMap> am;
+			wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
 			hr = pNode->get_attributes(&am);
 
 			if (SUCCEEDED(hr))
@@ -1328,7 +1328,7 @@ void Explorerplusplus::LoadToolbarInformationFromXML(IXMLDOMDocument *pXMLDom)
 				ignored. */
 				for (long j = 1; j < lChildNodes; j++)
 				{
-					wil::com_ptr<IXMLDOMNode> pChildNode;
+					wil::com_ptr_nothrow<IXMLDOMNode> pChildNode;
 					am->get_item(j, &pChildNode);
 
 					wil::unique_bstr bstrName;
@@ -1361,11 +1361,11 @@ void Explorerplusplus::LoadToolbarInformationFromXML(IXMLDOMDocument *pXMLDom)
 
 void Explorerplusplus::SaveToolbarInformationToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
 {
-	auto bstr_wsnt = wil::make_bstr(L"\n\t");
+	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pRoot);
 
-	wil::com_ptr<IXMLDOMElement> pe;
-	auto bstr = wil::make_bstr(L"Toolbars");
+	wil::com_ptr_nothrow<IXMLDOMElement> pe;
+	auto bstr = wil::make_bstr_nothrow(L"Toolbars");
 	pXMLDom->createElement(bstr.get(), &pe);
 
 	SaveToolbarInformationToXMLnternal(pXMLDom, pe.get());
@@ -1379,7 +1379,7 @@ void Explorerplusplus::SaveToolbarInformationToXMLnternal(
 	IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe)
 {
 	int nBands = (int) SendMessage(m_hMainRebar, RB_GETBANDCOUNT, 0, 0);
-	auto bstr_wsntt = wil::make_bstr(L"\n\t\t");
+	auto bstr_wsntt = wil::make_bstr_nothrow(L"\n\t\t");
 
 	for (int i = 0; i < nBands; i++)
 	{
@@ -1390,7 +1390,7 @@ void Explorerplusplus::SaveToolbarInformationToXMLnternal(
 		rbi.fMask = RBBIM_ID | RBBIM_CHILD | RBBIM_SIZE | RBBIM_STYLE;
 		SendMessage(m_hMainRebar, RB_GETBANDINFO, i, (LPARAM) &rbi);
 
-		wil::com_ptr<IXMLDOMElement> pParentNode;
+		wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
 		TCHAR szNodeName[32];
 		StringCchPrintf(szNodeName, SIZEOF_ARRAY(szNodeName), _T("%d"), i);
 		NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe, _T("Toolbar"), szNodeName);
@@ -1411,8 +1411,8 @@ void Explorerplusplus::LoadApplicationToolbarFromXML(IXMLDOMDocument *pXMLDom)
 		return;
 	}
 
-	wil::com_ptr<IXMLDOMNode> pNode;
-	auto bstr = wil::make_bstr(L"//ApplicationButton");
+	wil::com_ptr_nothrow<IXMLDOMNode> pNode;
+	auto bstr = wil::make_bstr_nothrow(L"//ApplicationButton");
 	HRESULT hr = pXMLDom->selectSingleNode(bstr.get(), &pNode);
 
 	if (hr == S_OK)
@@ -1423,11 +1423,11 @@ void Explorerplusplus::LoadApplicationToolbarFromXML(IXMLDOMDocument *pXMLDom)
 
 void Explorerplusplus::SaveApplicationToolbarToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
 {
-	auto bstr_wsnt = wil::make_bstr(L"\n\t");
+	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pRoot);
 
-	wil::com_ptr<IXMLDOMElement> pe;
-	auto bstr = wil::make_bstr(L"ApplicationToolbar");
+	wil::com_ptr_nothrow<IXMLDOMElement> pe;
+	auto bstr = wil::make_bstr_nothrow(L"ApplicationToolbar");
 	pXMLDom->createElement(bstr.get(), &pe);
 
 	ApplicationToolbarPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom, pe.get());
@@ -1727,7 +1727,7 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 
 	case HASH_POSITION:
 	{
-		wil::com_ptr<IXMLDOMNamedNodeMap> am;
+		wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
 		pNode->get_attributes(&am);
 
 		WINDOWPLACEMENT wndpl;
@@ -1738,7 +1738,7 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 
 		for (long j = 1; j < lChildNodes; j++)
 		{
-			wil::com_ptr<IXMLDOMNode> pChildNode;
+			wil::com_ptr_nothrow<IXMLDOMNode> pChildNode;
 			am->get_item(j, &pChildNode);
 
 			wil::unique_bstr bstrName;

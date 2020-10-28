@@ -141,7 +141,7 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 {
 	DetermineFolderVirtual(pidlDirectory);
 
-	wil::com_ptr<IShellFolder> pShellFolder;
+	wil::com_ptr_nothrow<IShellFolder> pShellFolder;
 	HRESULT hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
 
 	if (FAILED(hr))
@@ -158,7 +158,7 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 		enumFlags |= SHCONTF_INCLUDEHIDDEN | SHCONTF_INCLUDESUPERHIDDEN;
 	}
 
-	wil::com_ptr<IEnumIDList> pEnumIDList;
+	wil::com_ptr_nothrow<IEnumIDList> pEnumIDList;
 	hr = pShellFolder->EnumObjects(m_hOwner, enumFlags, &pEnumIDList);
 
 	if (FAILED(hr) || !pEnumIDList)

@@ -199,7 +199,7 @@ void BookmarkMenuBuilder::AddIconToMenuItem(HMENU menu, int position,
 {
 	int iconIndex = bookmarkIconManager.GetBookmarkItemIconIndex(bookmarkItem);
 
-	wil::com_ptr<IImageList> imageList;
+	wil::com_ptr_nothrow<IImageList> imageList;
 	HRESULT hr =
 		HIMAGELIST_QueryInterface(bookmarkIconManager.GetImageList(), IID_PPV_ARGS(&imageList));
 

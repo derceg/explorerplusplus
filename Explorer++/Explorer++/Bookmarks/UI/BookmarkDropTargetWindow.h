@@ -40,7 +40,7 @@ private:
 
 	BookmarkTree *m_bookmarkTree;
 
-	wil::com_ptr<DropTarget> m_dropTarget;
+	wil::com_ptr_nothrow<DropTarget> m_dropTarget;
 	std::unique_ptr<BookmarkDropper> m_bookmarkDropper;
 	std::optional<POINT> m_previousDragOverPoint;
 	std::optional<DropLocation> m_previousDropLocation;

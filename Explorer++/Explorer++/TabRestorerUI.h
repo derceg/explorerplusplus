@@ -42,7 +42,7 @@ private:
 
 	wil::unique_hmenu m_recentTabsMenu;
 	std::vector<wil::unique_hbitmap> m_menuImages;
-	wil::com_ptr<IImageList> m_systemImageList;
+	wil::com_ptr_nothrow<IImageList> m_systemImageList;
 	wil::unique_hbitmap m_defaultFolderIconBitmap;
 
 	std::unordered_map<int, int> m_menuItemMappings;

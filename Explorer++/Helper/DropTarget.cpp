@@ -5,9 +5,9 @@
 #include "stdafx.h"
 #include "DropTarget.h"
 
-wil::com_ptr<DropTarget> DropTarget::Create(HWND hwnd, DropTargetInternal *dropTargetInternal)
+wil::com_ptr_nothrow<DropTarget> DropTarget::Create(HWND hwnd, DropTargetInternal *dropTargetInternal)
 {
-	wil::com_ptr<DropTarget> dropTarget;
+	wil::com_ptr_nothrow<DropTarget> dropTarget;
 	dropTarget.attach(new DropTarget(hwnd, dropTargetInternal));
 	return dropTarget;
 }

@@ -96,9 +96,9 @@ void Explorerplusplus::LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom)
 	TCHAR tempNodeSelector[64];
 	StringCchPrintf(
 		tempNodeSelector, SIZEOF_ARRAY(tempNodeSelector), _T("//%s/*"), DIALOGS_XML_KEY);
-	auto bstr = wil::make_bstr(tempNodeSelector);
+	auto bstr = wil::make_bstr_nothrow(tempNodeSelector);
 
-	wil::com_ptr<IXMLDOMNodeList> pNodes;
+	wil::com_ptr_nothrow<IXMLDOMNodeList> pNodes;
 	pXMLDom->selectNodes(bstr.get(), &pNodes);
 
 	if (!pNodes)
@@ -114,12 +114,12 @@ void Explorerplusplus::LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom)
 		/* This should never fail, as the number
 		of nodes has already been counted (so
 		they must exist). */
-		wil::com_ptr<IXMLDOMNode> pNode;
+		wil::com_ptr_nothrow<IXMLDOMNode> pNode;
 		HRESULT hr = pNodes->get_item(i, &pNode);
 
 		if (SUCCEEDED(hr))
 		{
-			wil::com_ptr<IXMLDOMNamedNodeMap> am;
+			wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
 			hr = pNode->get_attributes(&am);
 
 			if (SUCCEEDED(hr))
@@ -131,7 +131,7 @@ void Explorerplusplus::LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom)
 
 				if (lChildNodes >= 1)
 				{
-					wil::com_ptr<IXMLDOMNode> pChildNode;
+					wil::com_ptr_nothrow<IXMLDOMNode> pChildNode;
 					am->get_item(0, &pChildNode);
 
 					wil::unique_bstr bstrValue;
@@ -161,11 +161,11 @@ void Explorerplusplus::LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom)
 
 void Explorerplusplus::SaveDialogStatesToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
 {
-	auto bstr_wsnt = wil::make_bstr(L"\n\t");
+	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pRoot);
 
-	wil::com_ptr<IXMLDOMElement> pe;
-	auto bstr = wil::make_bstr(DIALOGS_XML_KEY);
+	wil::com_ptr_nothrow<IXMLDOMElement> pe;
+	auto bstr = wil::make_bstr_nothrow(DIALOGS_XML_KEY);
 	pXMLDom->createElement(bstr.get(), &pe);
 
 	for (DialogSettings *ds : DIALOG_SETTINGS)

@@ -79,7 +79,7 @@ LONG WINAPI TopLevelExceptionFilter(EXCEPTION_POINTERS *exception)
 	// Event names are global in the system. Therefore, the event name used for signaling should be
 	// unique.
 	auto eventName = CreateGUID();
-	wil::unique_event event;
+	wil::unique_event_nothrow event;
 	bool res = event.try_create(wil::EventOptions::ManualReset, eventName.c_str());
 
 	if (!res)
@@ -280,7 +280,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	if the first instance is run, and multiple instances are allowed,
 	and then disallowed, still need to be able to load back to the
 	original instance. */
-	wil::unique_mutex applicationMutex(CreateMutex(nullptr,TRUE,_T("Explorer++")));
+	wil::unique_mutex_nothrow applicationMutex(CreateMutex(nullptr,TRUE,_T("Explorer++")));
 
 	if(!bAllowMultipleInstances)
 	{

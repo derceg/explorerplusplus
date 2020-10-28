@@ -983,7 +983,7 @@ BOOL CompareIdls(PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2)
 
 HRESULT AddJumpListTasks(const std::list<JumpListTaskInformation> &taskList)
 {
-	wil::com_ptr<ICustomDestinationList> customDestinationList;
+	wil::com_ptr_nothrow<ICustomDestinationList> customDestinationList;
 	HRESULT hr = CoCreateInstance(
 		CLSID_DestinationList, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&customDestinationList));
 
@@ -992,7 +992,7 @@ HRESULT AddJumpListTasks(const std::list<JumpListTaskInformation> &taskList)
 		return hr;
 	}
 
-	wil::com_ptr<IObjectArray> removedItems;
+	wil::com_ptr_nothrow<IObjectArray> removedItems;
 	UINT minSlots;
 	hr = customDestinationList->BeginList(&minSlots, IID_PPV_ARGS(&removedItems));
 
@@ -1001,7 +1001,7 @@ HRESULT AddJumpListTasks(const std::list<JumpListTaskInformation> &taskList)
 		return hr;
 	}
 
-	wil::com_ptr<IObjectCollection> objectCollection;
+	wil::com_ptr_nothrow<IObjectCollection> objectCollection;
 	hr = CoCreateInstance(CLSID_EnumerableObjectCollection, nullptr, CLSCTX_INPROC_SERVER,
 		IID_PPV_ARGS(&objectCollection));
 
@@ -1012,7 +1012,7 @@ HRESULT AddJumpListTasks(const std::list<JumpListTaskInformation> &taskList)
 
 	AddJumpListTasksInternal(objectCollection.get(), taskList);
 
-	wil::com_ptr<IObjectArray> items;
+	wil::com_ptr_nothrow<IObjectArray> items;
 	hr = objectCollection->QueryInterface(IID_PPV_ARGS(&items));
 
 	if (FAILED(hr))
@@ -1054,7 +1054,7 @@ bool AddJumpListTasksInternal(
 HRESULT AddJumpListTaskInternal(IObjectCollection *objectCollection, const TCHAR *name,
 	const TCHAR *path, const TCHAR *arguments, const TCHAR *iconPath, int iconIndex)
 {
-	wil::com_ptr<IShellLink> shellLink;
+	wil::com_ptr_nothrow<IShellLink> shellLink;
 	HRESULT hr =
 		CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellLink));
 
@@ -1067,7 +1067,7 @@ HRESULT AddJumpListTaskInternal(IObjectCollection *objectCollection, const TCHAR
 	shellLink->SetArguments(arguments);
 	shellLink->SetIconLocation(iconPath, iconIndex);
 
-	wil::com_ptr<IPropertyStore> propertyStore;
+	wil::com_ptr_nothrow<IPropertyStore> propertyStore;
 	hr = shellLink->QueryInterface(IID_PPV_ARGS(&propertyStore));
 
 	if (FAILED(hr))

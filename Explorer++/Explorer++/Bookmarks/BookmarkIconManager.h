@@ -39,7 +39,7 @@ private:
 
 	wil::unique_himagelist m_imageList;
 
-	wil::com_ptr<IImageList> m_systemImageList;
+	wil::com_ptr_nothrow<IImageList> m_systemImageList;
 	int m_defaultFolderIconSystemImageListIndex;
 	int m_defaultFolderIconIndex;
 	int m_bookmarkFolderIconIndex;

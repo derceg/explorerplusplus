@@ -22,6 +22,8 @@
 
 #define STRICT_TYPED_ITEMIDS
 
+#define WIL_SUPPRESS_EXCEPTIONS
+
 // Windows Header Files:
 #include <winsock2.h>
 #include <windows.h>
