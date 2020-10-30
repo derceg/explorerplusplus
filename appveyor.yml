@@ -7,10 +7,6 @@ platform:
 - Win32
 - x64
 
-branches:
-  except:
-  - l10n_master
-
 environment:
   PFX_ENC_PASS:
     secure: vl0ntw9DjQdAno9nYVe0osg2tBmXD7gW75NLfxIvxMDW3GiVlJlFcESf7v6f7qKe
@@ -19,8 +15,8 @@ environment:
 
 init:
 - ps: >-
-    if ($env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH -eq 'l10n_master') {
-      Write-Host 'Skipping l10n_master branch pull request'
+    if ($env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH -match '^l10n_') {
+      Write-Host 'Skipping translation branch pull request'
       Exit-AppveyorBuild
     }
 
