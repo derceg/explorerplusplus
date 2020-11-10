@@ -355,7 +355,7 @@ HRESULT ShellTreeView::ExpandDirectory(HTREEITEM hParent)
 {
 	auto pidlDirectory = GetItemPidl(hParent);
 
-	wil::com_ptr<IShellFolder> pShellFolder;
+	wil::com_ptr_nothrow<IShellFolder> pShellFolder;
 	HRESULT hr = BindToIdl(pidlDirectory.get(), IID_PPV_ARGS(&pShellFolder));
 
 	if (SUCCEEDED(hr))
@@ -526,7 +526,7 @@ void ShellTreeView::QueueSubfoldersTask(HTREEITEM item)
 std::optional<ShellTreeView::SubfoldersResult> ShellTreeView::CheckSubfoldersAsync(
 	HWND treeView, int subfoldersResultId, HTREEITEM item, PCIDLIST_ABSOLUTE pidl)
 {
-	wil::com_ptr<IShellFolder> pShellFolder;
+	wil::com_ptr_nothrow<IShellFolder> pShellFolder;
 	PCITEMID_CHILD pidlRelative;
 	HRESULT hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
@@ -746,7 +746,7 @@ void ShellTreeView::AddDirectoryInternal(
 		enumFlags |= SHCONTF_INCLUDEHIDDEN | SHCONTF_INCLUDESUPERHIDDEN;
 	}
 
-	wil::com_ptr<IEnumIDList> pEnumIDList;
+	wil::com_ptr_nothrow<IEnumIDList> pEnumIDList;
 	HRESULT hr = pShellFolder->EnumObjects(nullptr, enumFlags, &pEnumIDList);
 
 	if (FAILED(hr) || !pEnumIDList)
@@ -1948,7 +1948,7 @@ void ShellTreeView::CopySelectedItemToClipboard(bool copy)
 	}
 
 	std::vector<std::wstring> fileNameList = { fullFileName };
-	wil::com_ptr<IDataObject> clipboardDataObject;
+	wil::com_ptr_nothrow<IDataObject> clipboardDataObject;
 
 	if (copy)
 	{
@@ -1975,7 +1975,7 @@ void ShellTreeView::CopySelectedItemToClipboard(bool copy)
 
 void ShellTreeView::PasteClipboardData()
 {
-	wil::com_ptr<IDataObject> clipboardObject;
+	wil::com_ptr_nothrow<IDataObject> clipboardObject;
 	HRESULT hr = OleGetClipboard(&clipboardObject);
 
 	if (FAILED(hr))
@@ -2003,7 +2003,7 @@ void ShellTreeView::PasteClipboardData()
 	dropHandler->Release();
 }
 
-void ShellTreeView::UpdateCurrentClipboardObject(wil::com_ptr<IDataObject> clipboardDataObject)
+void ShellTreeView::UpdateCurrentClipboardObject(wil::com_ptr_nothrow<IDataObject> clipboardDataObject)
 {
 	// When copying an item, the WM_CLIPBOARDUPDATE message will be processed after the copy
 	// operation has been fully completed. Therefore, any previously cut item will need to have its

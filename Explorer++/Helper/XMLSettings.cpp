@@ -12,6 +12,7 @@
 #include "Helper.h"
 #include "Macros.h"
 #include <wil/com.h>
+#include <wil/resource.h>
 #include <comdef.h>
 
 static const TCHAR BOOL_YES[] = _T("yes");
@@ -20,10 +21,8 @@ static const TCHAR BOOL_NO[] = _T("no");
 /* Helper function to create a DOM instance. */
 IXMLDOMDocument *NXMLSettings::DomFromCOM()
 {
-	HRESULT					hr;
 	IXMLDOMDocument	*pxmldoc = nullptr;
-
-	hr = CoCreateInstance(__uuidof(DOMDocument30),nullptr,CLSCTX_INPROC_SERVER,
+	HRESULT hr = CoCreateInstance(__uuidof(DOMDocument30),nullptr,CLSCTX_INPROC_SERVER,
 		__uuidof(IXMLDOMDocument),reinterpret_cast<LPVOID *>(&pxmldoc));
 
 	if(SUCCEEDED(hr))
@@ -41,54 +40,30 @@ void NXMLSettings::WriteStandardSetting(IXMLDOMDocument *pXMLDom,
 	IXMLDOMElement *pGrandparentNode, const TCHAR *szElementName,
 	const TCHAR *szAttributeName, const TCHAR *szAttributeValue)
 {
-	IXMLDOMElement		*pParentNode = nullptr;
-	IXMLDOMAttribute	*pa = nullptr;
-	IXMLDOMAttribute	*pa1 = nullptr;
-	BSTR						bstr = nullptr;
-	BSTR						bstr_wsntt = SysAllocString(L"\n\t\t");
-	VARIANT						var;
+	wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
+	auto bstr = wil::make_bstr_nothrow(szElementName);
+	pXMLDom->createElement(bstr.get(),&pParentNode);
 
-	bstr = SysAllocString(szElementName);
-	pXMLDom->createElement(bstr,&pParentNode);
-	SysFreeString(bstr);
-	bstr = nullptr;
-
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pParentNode);
+	auto bstr_wsntt = wil::make_bstr_nothrow(L"\n\t\t");
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt.get(),pParentNode.get());
 
 	/* This will form an attribute of the form:
 	name="AttributeName" */
-	bstr = SysAllocString(L"name");
+	bstr = wil::make_bstr_nothrow(L"name");
 
-	var = NXMLSettings::VariantString(szAttributeName);
+	wil::unique_variant var(NXMLSettings::VariantString(szAttributeName));
 
-	pXMLDom->createAttribute(bstr,&pa);
+	wil::com_ptr_nothrow<IXMLDOMAttribute> pa;
+	pXMLDom->createAttribute(bstr.get(),&pa);
 	pa->put_value(var);
-	pParentNode->setAttributeNode(pa,&pa1);
-	SysFreeString(bstr);
-	bstr = nullptr;
 
-	if (pa1)
-	{
-		pa1->Release();
-		pa1 = nullptr;
-	}
+	wil::com_ptr_nothrow<IXMLDOMAttribute> pa1;
+	pParentNode->setAttributeNode(pa.get(),&pa1);
 
-	pa->Release();
-	pa = nullptr;
-	VariantClear(&var);
+	bstr = wil::make_bstr_nothrow(szAttributeValue);
+	pParentNode->put_text(bstr.get());
 
-	bstr = SysAllocString(szAttributeValue);
-	pParentNode->put_text(bstr);
-	SysFreeString(bstr);
-	bstr = nullptr;
-
-	SysFreeString(bstr_wsntt);
-	bstr_wsntt = nullptr;
-
-	NXMLSettings::AppendChildToParent(pParentNode,pGrandparentNode);
-
-	pParentNode->Release();
-	pParentNode = nullptr;
+	NXMLSettings::AppendChildToParent(pParentNode.get(),pGrandparentNode);
 }
 
 VARIANT NXMLSettings::VariantString(const WCHAR *str)
@@ -107,66 +82,38 @@ specified element. */
 void NXMLSettings::AddWhiteSpaceToNode(IXMLDOMDocument* pDom,
 	BSTR bstrWs, IXMLDOMNode *pNode)
 {
-	IXMLDOMText	*pws = nullptr;
-	IXMLDOMNode	*pBuf = nullptr;
-
+	wil::com_ptr_nothrow<IXMLDOMText> pws;
 	HRESULT hr = pDom->createTextNode(bstrWs,&pws);
 
 	if(FAILED(hr))
 	{
-		goto clean;
+		return;
 	}
 
-	hr = pNode->appendChild(pws,&pBuf);
-
-	if(FAILED(hr))
-	{
-		goto clean;
-	}
-
-clean:
-	SafeRelease(&pws);
-	SafeRelease(&pBuf);
+	wil::com_ptr_nothrow<IXMLDOMNode> pBuf;
+	pNode->appendChild(pws.get(),&pBuf);
 }
 
 /* Helper function to append a child to a parent node. */
 void NXMLSettings::AppendChildToParent(IXMLDOMNode *pChild, IXMLDOMNode *pParent)
 {
-	IXMLDOMNode	*pNode = nullptr;
+	wil::com_ptr_nothrow<IXMLDOMNode> pNode;
 	pParent->appendChild(pChild, &pNode);
-	SafeRelease(&pNode);
 }
 
 void NXMLSettings::AddAttributeToNode(IXMLDOMDocument *pXMLDom,
 IXMLDOMElement *pParentNode,const WCHAR *wszAttributeName,
 const WCHAR *wszAttributeValue)
 {
-	IXMLDOMAttribute	*pa = nullptr;
-	IXMLDOMAttribute	*pa1 = nullptr;
-	BSTR						bstr = nullptr;
-	VARIANT						var;
+	wil::com_ptr_nothrow<IXMLDOMAttribute> pa;
+	auto bstr = wil::make_bstr_nothrow(wszAttributeName);
+	pXMLDom->createAttribute(bstr.get(),&pa);
 
-	bstr = SysAllocString(wszAttributeName);
-
-	var = VariantString(wszAttributeValue);
-
-	pXMLDom->createAttribute(bstr,&pa);
+	wil::unique_variant var(VariantString(wszAttributeValue));
 	pa->put_value(var);
-	pParentNode->setAttributeNode(pa,&pa1);
 
-	SysFreeString(bstr);
-	bstr = nullptr;
-
-	if(pa1)
-	{
-		pa1->Release();
-		pa1 = nullptr;
-	}
-
-	pa->Release();
-	pa = nullptr;
-
-	VariantClear(&var);
+	wil::com_ptr_nothrow<IXMLDOMAttribute> pa1;
+	pParentNode->setAttributeNode(pa.get(),&pa1);
 }
 
 void NXMLSettings::AddStringListToNode(IXMLDOMDocument *pXMLDom,
@@ -190,67 +137,41 @@ void NXMLSettings::CreateElementNode(IXMLDOMDocument *pXMLDom,
 	IXMLDOMElement *pGrandparentNode, const WCHAR *szElementName,
 	const WCHAR *szAttributeName)
 {
-	BSTR bstrElement = nullptr;
-	BSTR bstrName = nullptr;
-	VARIANT var;
-	bool varInitialized = false;
-	IXMLDOMAttribute *pa = nullptr;
-	IXMLDOMAttribute *pa1 = nullptr;
-	HRESULT hr;
-
-	bstrElement = SysAllocString(szElementName);
-
-	if(bstrElement == nullptr)
-	{
-		goto clean;
-	}
-
-	hr = pXMLDom->createElement(bstrElement, pParentNode);
+	auto bstrElement = wil::make_bstr_nothrow(szElementName);
+	HRESULT hr = pXMLDom->createElement(bstrElement.get(), pParentNode);
 
 	if(FAILED(hr))
 	{
-		goto clean;
+		return;
 	}
 
-	bstrName = SysAllocString(L"name");
+	wil::unique_variant var(VariantString(szAttributeName));
 
-	if(bstrName == nullptr)
-	{
-		goto clean;
-	}
-
-	var = VariantString(szAttributeName);
-	varInitialized = true;
-
-	hr = pXMLDom->createAttribute(bstrName, &pa);
+	wil::com_ptr_nothrow<IXMLDOMAttribute> pa;
+	auto bstrName = wil::make_bstr_nothrow(L"name");
+	hr = pXMLDom->createAttribute(bstrName.get(), &pa);
 
 	if(FAILED(hr))
 	{
-		goto clean;
+		return;
 	}
 
 	hr = pa->put_value(var);
 
 	if(FAILED(hr))
 	{
-		goto clean;
+		return;
 	}
 
-	hr = (*pParentNode)->setAttributeNode(pa, &pa1);
+	wil::com_ptr_nothrow<IXMLDOMAttribute> pa1;
+	hr = (*pParentNode)->setAttributeNode(pa.get(), &pa1);
 
 	if(FAILED(hr))
 	{
-		goto clean;
+		return;
 	}
 
 	AppendChildToParent(*pParentNode, pGrandparentNode);
-
-clean:
-	SafeBSTRRelease(bstrElement);
-	SafeBSTRRelease(bstrName);
-	if(varInitialized) { VariantClear(&var); }
-	SafeRelease(&pa);
-	SafeRelease(&pa1);
 }
 
 const TCHAR	*NXMLSettings::EncodeBoolValue(BOOL value)
@@ -290,22 +211,18 @@ int NXMLSettings::DecodeIntValue(const WCHAR *wszValue)
 
 COLORREF NXMLSettings::ReadXMLColorData(IXMLDOMNode *pNode)
 {
-	IXMLDOMNode			*pChildNode = nullptr;
-	IXMLDOMNamedNodeMap	*am = nullptr;
-	BSTR						bstrName;
-	BSTR						bstrValue;
-	long						lChildNodes;
-	BYTE						r = 0;
-	BYTE						g = 0;
-	BYTE						b = 0;
-	long						i = 0;
-
+	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
 	pNode->get_attributes(&am);
 
+	long lChildNodes;
 	am->get_length(&lChildNodes);
 
 	/* RGB data requires three attributes (R,G,B). */
 	/*if(lChildNodes != 3)*/
+
+	BYTE r = 0;
+	BYTE g = 0;
+	BYTE b = 0;
 
 	/* Attribute name should be one of: r,g,b
 	Attribute value should be a value between
@@ -314,27 +231,30 @@ COLORREF NXMLSettings::ReadXMLColorData(IXMLDOMNode *pNode)
 	not need to be checked for, as each color
 	value is a byte, and can only hold values
 	between 0x00 and 0xFF. */
-	for(i = 1;i < lChildNodes;i++)
+	for(long i = 1;i < lChildNodes;i++)
 	{
+		wil::com_ptr_nothrow<IXMLDOMNode> pChildNode;
 		am->get_item(i,&pChildNode);
 
 		/* Element name. */
+		wil::unique_bstr bstrName;
 		pChildNode->get_nodeName(&bstrName);
 
 		/* Element value. */
+		wil::unique_bstr bstrValue;
 		pChildNode->get_text(&bstrValue);
 
-		if (lstrcmp(bstrName, L"r") == 0)
+		if (lstrcmp(bstrName.get(), L"r") == 0)
 		{
-			r = (BYTE) NXMLSettings::DecodeIntValue(bstrValue);
+			r = (BYTE) NXMLSettings::DecodeIntValue(bstrValue.get());
 		}
-		else if (lstrcmp(bstrName, L"g") == 0)
+		else if (lstrcmp(bstrName.get(), L"g") == 0)
 		{
-			g = (BYTE) NXMLSettings::DecodeIntValue(bstrValue);
+			g = (BYTE) NXMLSettings::DecodeIntValue(bstrValue.get());
 		}
-		else if (lstrcmp(bstrName, L"b") == 0)
+		else if (lstrcmp(bstrName.get(), L"b") == 0)
 		{
-			b = (BYTE) NXMLSettings::DecodeIntValue(bstrValue);
+			b = (BYTE) NXMLSettings::DecodeIntValue(bstrValue.get());
 		}
 	}
 
@@ -343,103 +263,99 @@ COLORREF NXMLSettings::ReadXMLColorData(IXMLDOMNode *pNode)
 
 Gdiplus::Color NXMLSettings::ReadXMLColorData2(IXMLDOMNode *pNode)
 {
-	IXMLDOMNode			*pChildNode = nullptr;
-	IXMLDOMNamedNodeMap	*am = nullptr;
-	Gdiplus::Color				color;
-	BSTR						bstrName;
-	BSTR						bstrValue;
-	long						lChildNodes;
-	BYTE						r = 0;
-	BYTE						g = 0;
-	BYTE						b = 0;
-	long						i = 0;
-
+	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
 	pNode->get_attributes(&am);
 
+	long lChildNodes;
 	am->get_length(&lChildNodes);
 
 	/* RGB data requires three attributes (R,G,B). */
 	/*if(lChildNodes != 3)*/
 
+	BYTE r = 0;
+	BYTE g = 0;
+	BYTE b = 0;
+
 	/* Attribute name should be one of: r,g,b
 	Attribute value should be a value between 0x00 and 0xFF. */
-	for(i = 1;i < lChildNodes;i++)
+	for(long i = 1;i < lChildNodes;i++)
 	{
+		wil::com_ptr_nothrow<IXMLDOMNode> pChildNode;
 		am->get_item(i,&pChildNode);
 
 		/* Element name. */
+		wil::unique_bstr bstrName;
 		pChildNode->get_nodeName(&bstrName);
 
 		/* Element value. */
+		wil::unique_bstr bstrValue;
 		pChildNode->get_text(&bstrValue);
 
-		if (lstrcmp(bstrName, L"r") == 0)
+		if (lstrcmp(bstrName.get(), L"r") == 0)
 		{
-			r = (BYTE) NXMLSettings::DecodeIntValue(bstrValue);
+			r = (BYTE) NXMLSettings::DecodeIntValue(bstrValue.get());
 		}
-		else if (lstrcmp(bstrName, L"g") == 0)
+		else if (lstrcmp(bstrName.get(), L"g") == 0)
 		{
-			g = (BYTE) NXMLSettings::DecodeIntValue(bstrValue);
+			g = (BYTE) NXMLSettings::DecodeIntValue(bstrValue.get());
 		}
-		else if (lstrcmp(bstrName, L"b") == 0)
+		else if (lstrcmp(bstrName.get(), L"b") == 0)
 		{
-			b = (BYTE) NXMLSettings::DecodeIntValue(bstrValue);
+			b = (BYTE) NXMLSettings::DecodeIntValue(bstrValue.get());
 		}
 	}
 
-	color = Gdiplus::Color(r,g,b);
-
-	return color;
+	return Gdiplus::Color(r, g, b);
 }
 
 HFONT NXMLSettings::ReadXMLFontData(IXMLDOMNode *pNode)
 {
-	IXMLDOMNode			*pChildNode = nullptr;
-	IXMLDOMNamedNodeMap	*am = nullptr;
-	LOGFONT						fontInfo;
-	BSTR						bstrName;
-	BSTR						bstrValue;
-	long						lChildNodes;
-	long						i = 0;
-
+	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
 	pNode->get_attributes(&am);
 
+	long lChildNodes;
 	am->get_length(&lChildNodes);
 
-	for(i = 1;i < lChildNodes;i++)
+	LOGFONT fontInfo;
+
+	for(long i = 1;i < lChildNodes;i++)
 	{
+		wil::com_ptr_nothrow<IXMLDOMNode> pChildNode;
 		am->get_item(i,&pChildNode);
 
+		wil::unique_bstr bstrName;
 		pChildNode->get_nodeName(&bstrName);
+
+		wil::unique_bstr bstrValue;
 		pChildNode->get_text(&bstrValue);
 
-		if (lstrcmp(bstrName, L"Height") == 0)
+		if (lstrcmp(bstrName.get(), L"Height") == 0)
 		{
-			fontInfo.lfHeight = NXMLSettings::DecodeIntValue(bstrValue);
+			fontInfo.lfHeight = NXMLSettings::DecodeIntValue(bstrValue.get());
 		}
-		else if (lstrcmp(bstrName, L"Width") == 0)
+		else if (lstrcmp(bstrName.get(), L"Width") == 0)
 		{
-			fontInfo.lfWidth = NXMLSettings::DecodeIntValue(bstrValue);
+			fontInfo.lfWidth = NXMLSettings::DecodeIntValue(bstrValue.get());
 		}
-		else if (lstrcmp(bstrName, L"Weight") == 0)
+		else if (lstrcmp(bstrName.get(), L"Weight") == 0)
 		{
-			fontInfo.lfWeight = NXMLSettings::DecodeIntValue(bstrValue);
+			fontInfo.lfWeight = NXMLSettings::DecodeIntValue(bstrValue.get());
 		}
-		else if (lstrcmp(bstrName, L"Italic") == 0)
+		else if (lstrcmp(bstrName.get(), L"Italic") == 0)
 		{
-			fontInfo.lfItalic = (BYTE) NXMLSettings::DecodeBoolValue(bstrValue);
+			fontInfo.lfItalic = (BYTE) NXMLSettings::DecodeBoolValue(bstrValue.get());
 		}
-		else if (lstrcmp(bstrName, L"Underline") == 0)
+		else if (lstrcmp(bstrName.get(), L"Underline") == 0)
 		{
-			fontInfo.lfUnderline = (BYTE) NXMLSettings::DecodeBoolValue(bstrValue);
+			fontInfo.lfUnderline = (BYTE) NXMLSettings::DecodeBoolValue(bstrValue.get());
 		}
-		else if (lstrcmp(bstrName, L"Strikeout") == 0)
+		else if (lstrcmp(bstrName.get(), L"Strikeout") == 0)
 		{
-			fontInfo.lfStrikeOut = (BYTE) NXMLSettings::DecodeBoolValue(bstrValue);
+			fontInfo.lfStrikeOut = (BYTE) NXMLSettings::DecodeBoolValue(bstrValue.get());
 		}
-		else if (lstrcmp(bstrName, L"Font") == 0)
+		else if (lstrcmp(bstrName.get(), L"Font") == 0)
 		{
-			StringCchCopy(fontInfo.lfFaceName, SIZEOF_ARRAY(fontInfo.lfFaceName), bstrValue);
+			StringCchCopy(fontInfo.lfFaceName, SIZEOF_ARRAY(fontInfo.lfFaceName), bstrValue.get());
 		}
 	}
 
@@ -498,8 +414,8 @@ HRESULT NXMLSettings::GetIntFromMap(IXMLDOMNamedNodeMap *attributeMap, const std
 
 HRESULT NXMLSettings::GetStringFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name, std::wstring &outputValue)
 {
-	wil::com_ptr<IXMLDOMNode> node;
-	auto nodeName = wil::make_bstr(name.c_str());
+	wil::com_ptr_nothrow<IXMLDOMNode> node;
+	auto nodeName = wil::make_bstr_nothrow(name.c_str());
 	HRESULT hr = attributeMap->getNamedItem(nodeName.get(), &node);
 
 	if (FAILED(hr))
@@ -507,7 +423,7 @@ HRESULT NXMLSettings::GetStringFromMap(IXMLDOMNamedNodeMap *attributeMap, const 
 		return hr;
 	}
 
-	BSTR value;
+	wil::unique_bstr value;
 	hr = node->get_text(&value);
 
 	if (FAILED(hr))
@@ -515,15 +431,7 @@ HRESULT NXMLSettings::GetStringFromMap(IXMLDOMNamedNodeMap *attributeMap, const 
 		return hr;
 	}
 
-	outputValue = _bstr_t(value);
+	outputValue = _bstr_t(value.get());
 
 	return hr;
-}
-
-void NXMLSettings::SafeBSTRRelease(BSTR bstr)
-{
-	if(bstr != nullptr)
-	{
-		SysFreeString(bstr);
-	}
 }

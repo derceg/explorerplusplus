@@ -55,7 +55,6 @@ void Explorerplusplus::ValidateColumns(FolderColumns &folderColumns)
 void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet, std::vector<Column_t> &columns)
 {
 	Column_t column;
-	int *pColumnMap = nullptr;
 	BOOL bFound = FALSE;
 	const Column_t *pColumns = nullptr;
 	unsigned int iTotalColumnSize = 0;
@@ -99,13 +98,6 @@ void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet, std::vector<Colum
 		break;
 	}
 
-	pColumnMap = (int *) malloc(iTotalColumnSize * sizeof(int));
-
-	for (i = 0; i < iTotalColumnSize; i++)
-	{
-		pColumnMap[i] = 0;
-	}
-
 	/* Check that every column that is supposed to appear
 	is in the column list. */
 	for (i = 0; i < iTotalColumnSize; i++)
@@ -131,7 +123,30 @@ void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet, std::vector<Colum
 		}
 	}
 
-	free(pColumnMap);
+	/* Check that no unknown column types appear in the column list. */
+	for (auto itr = columns.cbegin(); itr != columns.cend();)
+	{
+		bFound = FALSE;
+
+		for (i = 0; i < iTotalColumnSize; i++)
+		{
+			if (itr->type == pColumns[i].type)
+			{
+				bFound = TRUE;
+				break;
+			}
+		}
+
+		if (!bFound)
+		{
+			/* The column is not recognized in the set. Remove it. */
+			itr = columns.erase(itr);
+		}
+		else
+		{
+			++itr;
+		}
+	}
 }
 
 void Explorerplusplus::ApplyDisplayWindowPosition()

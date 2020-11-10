@@ -121,7 +121,7 @@ HWND OptionsDialog::Show(HWND parentWindow)
 	psh.hwndParent = parentWindow;
 	psh.pszCaption = title.c_str();
 	psh.nPages = static_cast<UINT>(sheetHandles.size());
-	psh.nStartPage = 0;
+	psh.nStartPage = m_lastSelectedSheetIndex;
 	psh.hIcon = m_optionsDialogIcon.get();
 	psh.ppsp = nullptr;
 	psh.phpage = sheetHandles.data();
@@ -205,12 +205,27 @@ LRESULT CALLBACK OptionsDialog::PropSheetProc(HWND hwnd, UINT uMsg, WPARAM wPara
 	case WM_CTLCOLORDLG:
 		return OnCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
 
+	case WM_DESTROY:
+		OnDestroyDialog(hwnd);
+		break;
+
 	case WM_NCDESTROY:
 		delete this;
 		return 0;
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
+}
+
+void OptionsDialog::OnDestroyDialog(HWND dlg)
+{
+	HWND tabControl = PropSheet_GetTabControl(dlg);
+	int index = TabCtrl_GetCurSel(tabControl);
+
+	if (index != -1)
+	{
+		m_lastSelectedSheetIndex = index;
+	}
 }
 
 INT_PTR CALLBACK OptionsDialog::GeneralSettingsProcStub(
@@ -299,8 +314,6 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(
 				GetDlgItem(hDlg, IDC_GROUP_DEFAULT_FILE_MANAGER)));
 			m_darkModeGroupBoxes.push_back(
 				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_GENERAL_SETTINGS)));
-			m_darkModeGroupBoxes.push_back(
-				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_LANGUAGE)));
 		}
 	}
 	break;
@@ -1602,7 +1615,6 @@ void OptionsDialog::DefaultSettingsSetNewTabDir(HWND hEdit, PCIDLIST_ABSOLUTE pi
 void OptionsDialog::AddIconThemes(HWND dlg)
 {
 	HWND iconThemeControl = GetDlgItem(dlg, IDC_OPTIONS_ICON_THEME);
-	int currentThemeIndex = 0;
 
 	for (auto theme : IconTheme::_values())
 	{
@@ -1621,11 +1633,9 @@ void OptionsDialog::AddIconThemes(HWND dlg)
 
 		if (theme == m_config->iconTheme)
 		{
-			currentThemeIndex = index;
+			SendMessage(iconThemeControl, CB_SETCURSEL, index, 0);
 		}
 	}
-
-	SendMessage(iconThemeControl, CB_SETCURSEL, currentThemeIndex, 0);
 }
 
 UINT GetIconThemeStringResourceId(IconTheme iconTheme)
@@ -1634,6 +1644,9 @@ UINT GetIconThemeStringResourceId(IconTheme iconTheme)
 	{
 	case IconTheme::Color:
 		return IDS_ICON_THEME_COLOR;
+
+	case IconTheme::FluentUi:
+		return IDS_ICON_THEME_FLUENT_UI;
 
 	case IconTheme::Windows10:
 		return IDS_ICON_THEME_WINDOWS_10;

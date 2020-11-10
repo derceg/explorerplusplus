@@ -270,7 +270,7 @@ void SetDefaultColumnsDialog::SaveCurrentColumnState(FolderType folderType)
 {
 	HWND hListView = GetDlgItem(m_hDlg, IDC_DEFAULTCOLUMNS_LISTVIEW);
 
-	auto currentColumns = GetCurrentColumnList(folderType);
+	auto & currentColumns = GetCurrentColumnList(folderType);
 	std::vector<Column_t> tempColumns;
 
 	for (int i = 0; i < ListView_GetItemCount(hListView); i++)
@@ -296,7 +296,7 @@ void SetDefaultColumnsDialog::SaveCurrentColumnState(FolderType folderType)
 		tempColumns.push_back(column);
 	}
 
-	currentColumns = tempColumns;
+	currentColumns.swap(tempColumns);
 }
 
 void SetDefaultColumnsDialog::SetupFolderColumns(FolderType folderType)

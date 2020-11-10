@@ -1150,13 +1150,15 @@ void TabContainer::RemoveTabFromControl(const Tab &tab)
 		}
 		else
 		{
-			newIndex = index;
-
 			// If the last tab in the control is what's being closed,
 			// the tab before it will be selected.
-			if (newIndex == (GetNumTabs() - 1))
+			if (index == (GetNumTabs() - 1))
 			{
-				newIndex--;
+				newIndex = index - 1;
+			}
+			else
+			{
+				newIndex = index + 1;
 			}
 		}
 

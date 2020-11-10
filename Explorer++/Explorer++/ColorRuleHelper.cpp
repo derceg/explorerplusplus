@@ -9,6 +9,7 @@
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
+#include <wil/com.h>
 #include <comdef.h>
 #include <vector>
 
@@ -171,32 +172,19 @@ namespace
 void NColorRuleHelper::LoadColorRulesFromXML(
 	IXMLDOMDocument *pXMLDom, std::vector<NColorRuleHelper::ColorRule> &ColorRules)
 {
-	IXMLDOMNode *pNode = nullptr;
-	BSTR bstr = nullptr;
-	HRESULT hr;
-
 	if (!pXMLDom)
 	{
-		goto clean;
+		return;
 	}
 
-	bstr = SysAllocString(L"//ColorRule");
-	hr = pXMLDom->selectSingleNode(bstr, &pNode);
+	wil::com_ptr_nothrow<IXMLDOMNode> pNode;
+	auto bstr = wil::make_bstr_nothrow(L"//ColorRule");
+	HRESULT hr = pXMLDom->selectSingleNode(bstr.get(), &pNode);
 
 	if (hr == S_OK)
 	{
 		ColorRules.clear();
-		LoadColorRulesFromXMLInternal(pNode, ColorRules);
-	}
-
-clean:
-	if (bstr)
-	{
-		SysFreeString(bstr);
-	}
-	if (pNode)
-	{
-		pNode->Release();
+		LoadColorRulesFromXMLInternal(pNode.get(), ColorRules);
 	}
 }
 
@@ -205,69 +193,68 @@ namespace
 	void LoadColorRulesFromXMLInternal(
 		IXMLDOMNode *pNode, std::vector<NColorRuleHelper::ColorRule> &ColorRules)
 	{
-		IXMLDOMNamedNodeMap *am = nullptr;
-		IXMLDOMNode *pAttributeNode = nullptr;
-		IXMLDOMNode *pNextSibling = nullptr;
-		NColorRuleHelper::ColorRule colorRule;
-		BOOL bDescriptionFound = FALSE;
-		BOOL bFilenamePatternFound = FALSE;
-		BSTR bstrName;
-		BSTR bstrValue;
-		BYTE r = 0;
-		BYTE g = 0;
-		BYTE b = 0;
-		HRESULT hr;
-		long nAttributeNodes;
-
-		hr = pNode->get_attributes(&am);
+		wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
+		HRESULT hr = pNode->get_attributes(&am);
 
 		if (FAILED(hr))
 		{
 			return;
 		}
 
-		am->get_length(&nAttributeNodes);
-
+		NColorRuleHelper::ColorRule colorRule;
 		colorRule.caseInsensitive = FALSE;
+
+		BOOL bDescriptionFound = FALSE;
+		BOOL bFilenamePatternFound = FALSE;
+		BYTE r = 0;
+		BYTE g = 0;
+		BYTE b = 0;
+
+		long nAttributeNodes;
+		am->get_length(&nAttributeNodes);
 
 		for (long i = 0; i < nAttributeNodes; i++)
 		{
+			wil::com_ptr_nothrow<IXMLDOMNode> pAttributeNode;
 			am->get_item(i, &pAttributeNode);
 
+			wil::unique_bstr bstrName;
 			pAttributeNode->get_nodeName(&bstrName);
+
+			wil::unique_bstr bstrValue;
 			pAttributeNode->get_text(&bstrValue);
 
-			if (lstrcmpi(bstrName, L"Name") == 0)
+			if (lstrcmpi(bstrName.get(), L"Name") == 0)
 			{
-				colorRule.strDescription = _bstr_t(bstrValue);
+				colorRule.strDescription = _bstr_t(bstrValue.get());
 
 				bDescriptionFound = TRUE;
 			}
-			else if (lstrcmpi(bstrName, L"FilenamePattern") == 0)
+			else if (lstrcmpi(bstrName.get(), L"FilenamePattern") == 0)
 			{
-				colorRule.strFilterPattern = _bstr_t(bstrValue);
+				colorRule.strFilterPattern = _bstr_t(bstrValue.get());
 
 				bFilenamePatternFound = TRUE;
 			}
-			else if (lstrcmpi(bstrName, L"CaseInsensitive") == 0)
+			else if (lstrcmpi(bstrName.get(), L"CaseInsensitive") == 0)
 			{
-				colorRule.caseInsensitive = NXMLSettings::DecodeBoolValue(bstrValue);
+				colorRule.caseInsensitive = NXMLSettings::DecodeBoolValue(bstrValue.get());
 			}
-			else if (lstrcmpi(bstrName, L"Attributes") == 0)
+			else if (lstrcmpi(bstrName.get(), L"Attributes") == 0)
 			{
-				colorRule.dwFilterAttributes = NXMLSettings::DecodeIntValue(bstrValue);
+				colorRule.dwFilterAttributes = NXMLSettings::DecodeIntValue(bstrValue.get());
 			}
-			else if (lstrcmpi(bstrName, L"r") == 0)
+			else if (lstrcmpi(bstrName.get(), L"r") == 0)
 			{
-				r = static_cast<BYTE>(NXMLSettings::DecodeIntValue(bstrValue));
+				r = static_cast<BYTE>(NXMLSettings::DecodeIntValue(bstrValue.get()));
 			}
-			else if (lstrcmpi(bstrName, L"g") == 0)
+			else if (lstrcmpi(bstrName.get(), L"g") == 0)
 			{
-				g = static_cast<BYTE>(NXMLSettings::DecodeIntValue(bstrValue));
+				g = static_cast<BYTE>(NXMLSettings::DecodeIntValue(bstrValue.get()));
 			}
-			else if (lstrcmpi(bstrName, L"b") == 0)
+			else if (lstrcmpi(bstrName.get(), L"b") == 0)
 			{
-				b = static_cast<BYTE>(NXMLSettings::DecodeIntValue(bstrValue));
+				b = static_cast<BYTE>(NXMLSettings::DecodeIntValue(bstrValue.get()));
 			}
 		}
 
@@ -278,15 +265,17 @@ namespace
 			ColorRules.push_back(colorRule);
 		}
 
+		wil::com_ptr_nothrow<IXMLDOMNode> pNextSibling;
 		hr = pNode->get_nextSibling(&pNextSibling);
 
 		if (hr == S_OK)
 		{
-			hr = pNextSibling->get_nextSibling(&pNextSibling);
+			wil::com_ptr_nothrow<IXMLDOMNode> secondSibling;
+			hr = pNextSibling->get_nextSibling(&secondSibling);
 
 			if (hr == S_OK)
 			{
-				LoadColorRulesFromXMLInternal(pNextSibling, ColorRules);
+				LoadColorRulesFromXMLInternal(secondSibling.get(), ColorRules);
 			}
 		}
 	}
@@ -295,28 +284,20 @@ namespace
 void NColorRuleHelper::SaveColorRulesToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot,
 	const std::vector<NColorRuleHelper::ColorRule> &ColorRules)
 {
-	IXMLDOMElement *pe = nullptr;
-	BSTR bstr_wsnt = SysAllocString(L"\n\t");
-	BSTR bstr;
+	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pRoot);
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt, pRoot);
-
-	bstr = SysAllocString(L"ColorRules");
-	pXMLDom->createElement(bstr, &pe);
-	SysFreeString(bstr);
+	wil::com_ptr_nothrow<IXMLDOMElement> pe;
+	auto bstr = wil::make_bstr_nothrow(L"ColorRules");
+	pXMLDom->createElement(bstr.get(), &pe);
 
 	for (const auto &colorRule : ColorRules)
 	{
-		SaveColorRulesToXMLInternal(pXMLDom, pe, colorRule);
+		SaveColorRulesToXMLInternal(pXMLDom, pe.get(), colorRule);
 	}
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt, pe);
-
-	NXMLSettings::AppendChildToParent(pe, pRoot);
-	pe->Release();
-	pe = nullptr;
-
-	SysFreeString(bstr_wsnt);
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pe.get());
+	NXMLSettings::AppendChildToParent(pe.get(), pRoot);
 }
 
 namespace
@@ -324,39 +305,23 @@ namespace
 	void SaveColorRulesToXMLInternal(
 		IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe, const NColorRuleHelper::ColorRule &colorRule)
 	{
-		IXMLDOMElement *pParentNode = nullptr;
-		BSTR bstr_indent;
-		WCHAR wszIndent[128];
-		static int iIndent = 2;
+		auto bstr_indent = wil::make_bstr_nothrow(L"\n\t\t");
+		NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_indent.get(), pe);
 
-		StringCchPrintf(wszIndent, SIZEOF_ARRAY(wszIndent), L"\n");
-
-		for (int i = 0; i < iIndent; i++)
-		{
-			StringCchCat(wszIndent, SIZEOF_ARRAY(wszIndent), L"\t");
-		}
-
-		bstr_indent = SysAllocString(wszIndent);
-
-		NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_indent, pe);
-
-		SysFreeString(bstr_indent);
-
+		wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
 		NXMLSettings::CreateElementNode(
 			pXMLDom, &pParentNode, pe, _T("ColorRule"), colorRule.strDescription.c_str());
 		NXMLSettings::AddAttributeToNode(
-			pXMLDom, pParentNode, _T("FilenamePattern"), colorRule.strFilterPattern.c_str());
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, _T("CaseInsensitive"),
+			pXMLDom, pParentNode.get(), _T("FilenamePattern"), colorRule.strFilterPattern.c_str());
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("CaseInsensitive"),
 			NXMLSettings::EncodeBoolValue(colorRule.caseInsensitive));
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, _T("Attributes"),
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Attributes"),
 			NXMLSettings::EncodeIntValue(colorRule.dwFilterAttributes));
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, _T("r"),
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("r"),
 			NXMLSettings::EncodeIntValue(GetRValue(colorRule.rgbColour)));
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, _T("g"),
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("g"),
 			NXMLSettings::EncodeIntValue(GetGValue(colorRule.rgbColour)));
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, _T("b"),
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("b"),
 			NXMLSettings::EncodeIntValue(GetBValue(colorRule.rgbColour)));
-
-		pParentNode->Release();
 	}
 }

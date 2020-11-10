@@ -5,6 +5,7 @@
 #pragma once
 
 #include "LoadSaveInterface.h"
+#include <wil/com.h>
 #include <MsXml2.h>
 #include <objbase.h>
 
@@ -47,12 +48,9 @@ private:
 	Explorerplusplus *m_pContainer;
 	BOOL					m_bLoad;
 
-	/* These are used for saving + loading. */
-	IXMLDOMDocument *m_pXMLDom;
-
-	/* Used exclusively for loading. */
-	BOOL					m_bLoadedCorrectly;
+	/* Used for saving + loading. */
+	wil::com_ptr_nothrow<IXMLDOMDocument> m_pXMLDom;
 
 	/* Used exclusively for saving. */
-	IXMLDOMElement *m_pRoot;
+	wil::com_ptr_nothrow<IXMLDOMElement> m_pRoot;
 };

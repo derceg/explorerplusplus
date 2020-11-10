@@ -22,7 +22,7 @@ class DropTarget : public IDropTarget
 {
 public:
 
-	static wil::com_ptr<DropTarget> Create(HWND hwnd, DropTargetInternal *dropTargetInternal);
+	static wil::com_ptr_nothrow<DropTarget> Create(HWND hwnd, DropTargetInternal *dropTargetInternal);
 
 	// IUnknown methods.
 	IFACEMETHODIMP QueryInterface(REFIID iid, void **object);

@@ -7,20 +7,25 @@ platform:
 - Win32
 - x64
 
-branches:
-  except:
-  - l10n_master
-
 environment:
   PFX_ENC_PASS:
     secure: vl0ntw9DjQdAno9nYVe0osg2tBmXD7gW75NLfxIvxMDW3GiVlJlFcESf7v6f7qKe
   PFX_PASS:
     secure: rgMy2ixSiaW0sk2CwaHwO5pK8U98ynzt/jjiGNRSYPfaAcOTRZ5oX+fsgqn6qP54
 
+for:
+
+-
+  branches:
+    only:
+      - /version-.*/
+
+  skip_non_tags: true
+
 init:
 - ps: >-
-    if ($env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH -eq 'l10n_master') {
-      Write-Host 'Skipping l10n_master branch pull request'
+    if ($env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH -match '^l10n_') {
+      Write-Host 'Skipping translation branch pull request'
       Exit-AppveyorBuild
     }
 
@@ -38,7 +43,7 @@ before_build:
     nuget restore Explorer++\Explorer++.sln
 
     if (Test-Path env:APPVEYOR_REPO_TAG_NAME) {
-      if ($env:APPVEYOR_REPO_TAG_NAME -match '-beta$') {
+      if ($env:APPVEYOR_REPO_TAG_NAME -match '-beta(-\d)?$') {
         $env:RELEASE_MODE = 'beta'
       } else {
         $env:RELEASE_MODE = 'stable'
@@ -115,7 +120,7 @@ before_deploy:
 
     $releaseBuildVersion = $versionComponents -join '.'
 
-    if ($env:APPVEYOR_REPO_TAG_NAME -match '-beta$') {
+    if ($env:APPVEYOR_REPO_TAG_NAME -match '-beta(-\d)?$') {
       $env:RELEASE_TITLE = "Explorer++ $releaseBuildVersion beta"
       $env:PRERELEASE = $true
     } else {

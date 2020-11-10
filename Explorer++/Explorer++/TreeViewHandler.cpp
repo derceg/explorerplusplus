@@ -150,8 +150,7 @@ LRESULT CALLBACK Explorerplusplus::TreeViewSubclass(
 	switch (uMsg)
 	{
 	case WM_SETFOCUS:
-		m_mainToolbar->UpdateToolbarButtonStates();
-		m_hLastActiveWindow = m_shellTreeView->GetHWND();
+		FocusChanged(WindowFocusSource::TreeView);
 		break;
 
 	case WM_MOUSEWHEEL:

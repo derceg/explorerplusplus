@@ -18,7 +18,7 @@ FORMATETC BookmarkDataExchange::GetFormatEtc()
 	return formatEtc;
 }
 
-wil::com_ptr<IDataObject> BookmarkDataExchange::CreateDataObject(
+wil::com_ptr_nothrow<IDataObject> BookmarkDataExchange::CreateDataObject(
 	const OwnedRefBookmarkItems &bookmarkItems)
 {
 	FORMATETC formatEtc = GetFormatEtc();
@@ -27,7 +27,8 @@ wil::com_ptr<IDataObject> BookmarkDataExchange::CreateDataObject(
 	auto global = WriteBinaryDataToGlobal(data);
 	STGMEDIUM stgMedium = GetStgMediumForGlobal(global.get());
 
-	wil::com_ptr<IDataObject> dataObject(CreateDataObject(&formatEtc, &stgMedium, 1));
+	wil::com_ptr_nothrow<IDataObject> dataObject;
+	dataObject.attach(CreateDataObject(&formatEtc, &stgMedium, 1));
 
 	// TODO: Probably worth updating the code so that this doesn't need to be
 	// done manually.

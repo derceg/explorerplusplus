@@ -16,19 +16,19 @@ class DataObjectTest : public Test
 protected:
 	DataObjectTest()
 	{
-		m_dataObject = CreateDataObject(nullptr, nullptr, 0);
+		m_dataObject.attach(CreateDataObject(nullptr, nullptr, 0));
 	}
 
-	wil::com_ptr<IDataObject> m_dataObject;
+	wil::com_ptr_nothrow<IDataObject> m_dataObject;
 };
 
 TEST_F(DataObjectTest, QueryInterface)
 {
-	wil::com_ptr<IUnknown> unknown;
+	wil::com_ptr_nothrow<IUnknown> unknown;
 	HRESULT hr = m_dataObject->QueryInterface(IID_PPV_ARGS(&unknown));
 	EXPECT_HRESULT_SUCCEEDED(hr);
 
-	wil::com_ptr<IDataObject> dataObject;
+	wil::com_ptr_nothrow<IDataObject> dataObject;
 	hr = m_dataObject->QueryInterface(IID_PPV_ARGS(&dataObject));
 	EXPECT_HRESULT_SUCCEEDED(hr);
 }

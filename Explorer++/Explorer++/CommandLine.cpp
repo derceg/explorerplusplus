@@ -7,6 +7,7 @@
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "Version.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/SetDefaultFileManager.h"
@@ -15,14 +16,38 @@
 #include "../ThirdParty/CLI11/CLI11.hpp"
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/format.hpp>
 #include <boost/log/core.hpp>
 #include <iostream>
 #include <map>
+
+using CrashedDataTuple = std::tuple<DWORD, DWORD, intptr_t, std::string>;
+
+struct CrashedData
+{
+	DWORD processId;
+	DWORD threadId;
+	intptr_t exceptionPointersAddress;
+	std::string eventName;
+
+	CrashedData(const CrashedDataTuple &crashedData)
+	{
+		processId = std::get<0>(crashedData);
+		threadId = std::get<1>(crashedData);
+		exceptionPointersAddress = std::get<2>(crashedData);
+		eventName = std::get<3>(crashedData);
+	}
+};
 
 using namespace DefaultFileManager;
 
 extern std::vector<std::wstring> g_commandLineDirectories;
 extern bool g_enableDarkMode;
+
+typedef BOOL(WINAPI *MINIDUMPWRITEDUMP)(HANDLE hProcee, DWORD ProcessId, HANDLE hFile,
+	MINIDUMP_TYPE DumpType, PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
+	PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
+	PMINIDUMP_CALLBACK_INFORMATION CallbackParam);
 
 struct CommandLineSettings
 {
@@ -33,6 +58,7 @@ struct CommandLineSettings
 	ReplaceExplorerMode replaceExplorerMode;
 	std::string language;
 	bool jumplistNewTab;
+	CrashedDataTuple crashedData;
 	bool enableDarkMode;
 	std::vector<std::string> directories;
 };
@@ -45,11 +71,19 @@ struct ReplaceExplorerResults
 	std::optional<LSTATUS> setAll;
 };
 
+const int REPORT_ISSUE_BUTTON_ID = 100;
+const TCHAR REPORT_ISSUE_URL[] = L"https://github.com/derceg/explorerplusplus/issues/new?labels=bug,crash&template=bug_report.md";
+
 void PreprocessCommandLineSettings(CommandLineSettings &commandLineSettings);
-std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(const CommandLineSettings& commandLineSettings);
+std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(
+	const CLI::App &app, const CommandLineSettings &commandLineSettings);
 void OnClearRegistrySettings();
 void OnUpdateReplaceExplorerSetting(ReplaceExplorerMode updatedReplaceMode);
 ReplaceExplorerResults UpdateReplaceExplorerSetting(ReplaceExplorerMode updatedReplaceMode);
+void OnShowCrashedMessage(const CrashedData &crashedData);
+std::optional<std::wstring> CreateMiniDump(const CrashedData &crashedData);
+HRESULT CALLBACK CrashedDialogCallback(
+	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, LONG_PTR data);
 void OnJumplistNewTab();
 
 std::optional<CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
@@ -130,6 +164,11 @@ crash with other versions of Windows 10. This option has no effect on earlier ve
 		commandLineSettings.jumplistNewTab
 	);
 
+	privateCommands->add_option(
+		wstrToStr(NExplorerplusplus::APPLICATION_CRASHED_ARGUMENT),
+		commandLineSettings.crashedData
+	);
+
 	try
 	{
 		app.parse(__argc, __argv);
@@ -141,7 +180,7 @@ crash with other versions of Windows 10. This option has no effect on earlier ve
 
 	PreprocessCommandLineSettings(commandLineSettings);
 
-	return ProcessCommandLineSettings(commandLineSettings);
+	return ProcessCommandLineSettings(app, commandLineSettings);
 }
 
 void PreprocessCommandLineSettings(CommandLineSettings &commandLineSettings)
@@ -180,8 +219,15 @@ void PreprocessCommandLineSettings(CommandLineSettings &commandLineSettings)
 	}
 }
 
-std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(const CommandLineSettings &commandLineSettings)
+std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(
+	const CLI::App &app, const CommandLineSettings &commandLineSettings)
 {
+	if (app.count(wstrToStr(NExplorerplusplus::APPLICATION_CRASHED_ARGUMENT)) > 0)
+	{
+		OnShowCrashedMessage(commandLineSettings.crashedData);
+		return CommandLine::ExitInfo{ EXIT_SUCCESS };
+	}
+
 	if (commandLineSettings.jumplistNewTab)
 	{
 		OnJumplistNewTab();
@@ -320,6 +366,175 @@ ReplaceExplorerResults UpdateReplaceExplorerSetting(ReplaceExplorerMode updatedR
 	}
 
 	return results;
+}
+
+void OnShowCrashedMessage(const CrashedData &crashedData)
+{
+	auto crashDumpFileName = CreateMiniDump(crashedData);
+	std::wstring message;
+
+	if (crashDumpFileName)
+	{
+		message = (boost::wformat(L" A crash dump has been saved to:\n\n%s\n\n"
+								  L"If you report this crash, please include this crash dump.")
+			% *crashDumpFileName)
+					  .str();
+	}
+	else
+	{
+		message = L"A crash dump could not be created.";
+	}
+
+	TASKDIALOG_BUTTON customButtons[] = { { REPORT_ISSUE_BUTTON_ID, L"Report issue..." } };
+
+	int button;
+
+	TASKDIALOGCONFIG dialogConfig = { 0 };
+	dialogConfig.cbSize = sizeof(dialogConfig);
+	dialogConfig.hwndParent = nullptr;
+	dialogConfig.hInstance = GetModuleHandle(nullptr);
+	dialogConfig.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION | TDF_SIZE_TO_CONTENT;
+	dialogConfig.dwCommonButtons = TDCBF_CLOSE_BUTTON;
+	dialogConfig.pszWindowTitle = NExplorerplusplus::APP_NAME;
+	dialogConfig.pszMainIcon = TD_ERROR_ICON;
+	dialogConfig.pszMainInstruction = L"Explorer++ has encountered an error.";
+	dialogConfig.pszContent = message.c_str();
+	dialogConfig.cButtons = SIZEOF_ARRAY(customButtons);
+	dialogConfig.pButtons = customButtons;
+	dialogConfig.nDefaultButton = IDCLOSE;
+	dialogConfig.cRadioButtons = 0;
+	dialogConfig.pRadioButtons = nullptr;
+	dialogConfig.pszVerificationText = nullptr;
+	dialogConfig.pszExpandedInformation = nullptr;
+	dialogConfig.pszFooter = nullptr;
+	dialogConfig.pfCallback = CrashedDialogCallback;
+	dialogConfig.lpCallbackData = 0;
+	dialogConfig.cxWidth = 0;
+	TaskDialogIndirect(&dialogConfig, &button, nullptr, nullptr);
+}
+
+std::optional<std::wstring> CreateMiniDump(const CrashedData &crashedData)
+{
+	wil::unique_event_nothrow event;
+	bool res = event.try_open(strToWstr(crashedData.eventName).c_str());
+
+	if (!res)
+	{
+		return std::nullopt;
+	}
+
+	// The original process will wait until this event is signaled to exit. It's important that the
+	// original process exists until the MiniDumpWriteDump call below finishes.
+	// By signaling the event whenever the current function returns, the event will either be
+	// signaled when the MiniDumpWriteDump call has completed, or when one of the intermediate steps
+	// has failed.
+	auto setOnExit = event.SetEvent_scope_exit();
+
+	wil::unique_process_handle process(
+		OpenProcess(PROCESS_ALL_ACCESS, false, crashedData.processId));
+
+	if (!process)
+	{
+		return std::nullopt;
+	}
+
+	wil::unique_handle thread(OpenThread(THREAD_ALL_ACCESS, false, crashedData.threadId));
+
+	if (!thread)
+	{
+		return std::nullopt;
+	}
+
+	EXCEPTION_POINTERS *exceptionAddress =
+		reinterpret_cast<EXCEPTION_POINTERS *>(crashedData.exceptionPointersAddress);
+
+	wil::unique_hmodule dbgHelp(LoadLibrary(_T("Dbghelp.dll")));
+
+	if (!dbgHelp)
+	{
+		return std::nullopt;
+	}
+
+	MINIDUMPWRITEDUMP miniDumpWriteDump =
+		reinterpret_cast<MINIDUMPWRITEDUMP>(GetProcAddress(dbgHelp.get(), "MiniDumpWriteDump"));
+
+	if (!miniDumpWriteDump)
+	{
+		return std::nullopt;
+	}
+
+	TCHAR fullPath[MAX_PATH];
+	DWORD pathRes = GetTempPath(SIZEOF_ARRAY(fullPath), fullPath);
+
+	if (pathRes == 0)
+	{
+		return std::nullopt;
+	}
+
+	SYSTEMTIME localTime;
+	GetLocalTime(&localTime);
+
+	TCHAR fileName[MAX_PATH];
+	HRESULT hr =
+		StringCchPrintf(fileName, SIZEOF_ARRAY(fileName), _T("%s%s-%02d%02d%04d-%02d%02d%02d.dmp"),
+			NExplorerplusplus::APP_NAME, VERSION_STRING_W, localTime.wDay, localTime.wMonth,
+			localTime.wYear, localTime.wHour, localTime.wMinute, localTime.wSecond);
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	res = PathAppend(fullPath, fileName);
+
+	if (!res)
+	{
+		return std::nullopt;
+	}
+
+	wil::unique_hfile file(CreateFile(
+		fullPath, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr));
+
+	if (!file)
+	{
+		return std::nullopt;
+	}
+
+	MINIDUMP_EXCEPTION_INFORMATION mei;
+	mei.ThreadId = crashedData.threadId;
+	mei.ExceptionPointers = exceptionAddress;
+	mei.ClientPointers = true;
+	res = miniDumpWriteDump(
+		process.get(), crashedData.processId, file.get(), MiniDumpNormal, &mei, nullptr, nullptr);
+
+	if (!res)
+	{
+		return std::nullopt;
+	}
+
+	return fullPath;
+}
+
+HRESULT CALLBACK CrashedDialogCallback(
+	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, LONG_PTR data)
+{
+	UNREFERENCED_PARAMETER(hwnd);
+	UNREFERENCED_PARAMETER(lParam);
+	UNREFERENCED_PARAMETER(data);
+
+	switch (msg)
+	{
+	case TDN_BUTTON_CLICKED:
+		switch (wParam)
+		{
+		case REPORT_ISSUE_BUTTON_ID:
+			ShellExecute(nullptr, L"open", REPORT_ISSUE_URL, nullptr, nullptr, SW_SHOW);
+			return S_FALSE;
+		}
+		break;
+	}
+
+	return S_OK;
 }
 
 void OnJumplistNewTab()

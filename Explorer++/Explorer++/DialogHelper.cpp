@@ -22,33 +22,35 @@
 #include "UpdateCheckDialog.h"
 #include "WildcardSelectDialog.h"
 #include "../Helper/XMLSettings.h"
+#include <wil/com.h>
+#include <wil/resource.h>
 
 namespace
 {
-const TCHAR DIALOGS_REGISTRY_KEY[] = _T("Software\\Explorer++\\Dialogs");
-const TCHAR DIALOGS_XML_KEY[] = _T("State");
+	const TCHAR DIALOGS_REGISTRY_KEY[] = _T("Software\\Explorer++\\Dialogs");
+	const TCHAR DIALOGS_XML_KEY[] = _T("State");
 
-/* Safe provided that the object returned through
-GetInstance is stable throughout the lifetime of
-the program (which is true, as these are all
-singletons). */
-DialogSettings *const DIALOG_SETTINGS[] = { &SearchDialogPersistentSettings::GetInstance(),
-	&WildcardSelectDialogPersistentSettings::GetInstance(),
-	&SetFileAttributesDialogPersistentSettings::GetInstance(),
-	&RenameTabDialogPersistentSettings::GetInstance(),
-	&MassRenameDialogPersistentSettings::GetInstance(),
-	&FilterDialogPersistentSettings::GetInstance(),
-	&ColorRuleDialogPersistentSettings::GetInstance(),
-	&CustomizeColorsDialogPersistentSettings::GetInstance(),
-	&SplitFileDialogPersistentSettings::GetInstance(),
-	&DestroyFilesDialogPersistentSettings::GetInstance(),
-	&MergeFilesDialogPersistentSettings::GetInstance(),
-	&SelectColumnsDialogPersistentSettings::GetInstance(),
-	&SetDefaultColumnsDialogPersistentSettings::GetInstance(),
-	&AddBookmarkDialogPersistentSettings::GetInstance(),
-	&ManageBookmarksDialogPersistentSettings::GetInstance(),
-	&DisplayColoursDialogPersistentSettings::GetInstance(),
-	&UpdateCheckDialogPersistentSettings::GetInstance() };
+	/* Safe provided that the object returned through
+	GetInstance is stable throughout the lifetime of
+	the program (which is true, as these are all
+	singletons). */
+	DialogSettings *const DIALOG_SETTINGS[] = { &SearchDialogPersistentSettings::GetInstance(),
+		&WildcardSelectDialogPersistentSettings::GetInstance(),
+		&SetFileAttributesDialogPersistentSettings::GetInstance(),
+		&RenameTabDialogPersistentSettings::GetInstance(),
+		&MassRenameDialogPersistentSettings::GetInstance(),
+		&FilterDialogPersistentSettings::GetInstance(),
+		&ColorRuleDialogPersistentSettings::GetInstance(),
+		&CustomizeColorsDialogPersistentSettings::GetInstance(),
+		&SplitFileDialogPersistentSettings::GetInstance(),
+		&DestroyFilesDialogPersistentSettings::GetInstance(),
+		&MergeFilesDialogPersistentSettings::GetInstance(),
+		&SelectColumnsDialogPersistentSettings::GetInstance(),
+		&SetDefaultColumnsDialogPersistentSettings::GetInstance(),
+		&AddBookmarkDialogPersistentSettings::GetInstance(),
+		&ManageBookmarksDialogPersistentSettings::GetInstance(),
+		&DisplayColoursDialogPersistentSettings::GetInstance(),
+		&UpdateCheckDialogPersistentSettings::GetInstance() };
 }
 
 void Explorerplusplus::LoadDialogStatesFromRegistry()
@@ -86,122 +88,91 @@ void Explorerplusplus::SaveDialogStatesToRegistry()
 
 void Explorerplusplus::LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom)
 {
-	IXMLDOMNodeList *pNodes = nullptr;
-	IXMLDOMNode *pNode = nullptr;
-	IXMLDOMNamedNodeMap *am = nullptr;
-	IXMLDOMNode *pChildNode = nullptr;
-	BSTR bstrName;
-	BSTR bstrValue;
-	BSTR bstr = nullptr;
-	HRESULT hr;
-	long length;
-	long lChildNodes;
-
-	if (pXMLDom == nullptr)
+	if (!pXMLDom)
 	{
-		goto clean;
+		return;
 	}
 
 	TCHAR tempNodeSelector[64];
 	StringCchPrintf(
 		tempNodeSelector, SIZEOF_ARRAY(tempNodeSelector), _T("//%s/*"), DIALOGS_XML_KEY);
-	bstr = SysAllocString(tempNodeSelector);
-	pXMLDom->selectNodes(bstr, &pNodes);
+	auto bstr = wil::make_bstr_nothrow(tempNodeSelector);
+
+	wil::com_ptr_nothrow<IXMLDOMNodeList> pNodes;
+	pXMLDom->selectNodes(bstr.get(), &pNodes);
 
 	if (!pNodes)
 	{
-		goto clean;
+		return;
 	}
-	else
-	{
-		pNodes->get_length(&length);
 
-		for (long i = 0; i < length; i++)
+	long length;
+	pNodes->get_length(&length);
+
+	for (long i = 0; i < length; i++)
+	{
+		/* This should never fail, as the number
+		of nodes has already been counted (so
+		they must exist). */
+		wil::com_ptr_nothrow<IXMLDOMNode> pNode;
+		HRESULT hr = pNodes->get_item(i, &pNode);
+
+		if (SUCCEEDED(hr))
 		{
-			/* This should never fail, as the number
-			of nodes has already been counted (so
-			they must exist). */
-			hr = pNodes->get_item(i, &pNode);
+			wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
+			hr = pNode->get_attributes(&am);
 
 			if (SUCCEEDED(hr))
 			{
-				hr = pNode->get_attributes(&am);
+				/* Retrieve the total number of attributes
+				attached to this node. */
+				long lChildNodes;
+				am->get_length(&lChildNodes);
 
-				if (SUCCEEDED(hr))
+				if (lChildNodes >= 1)
 				{
-					/* Retrieve the total number of attributes
-					attached to this node. */
-					am->get_length(&lChildNodes);
+					wil::com_ptr_nothrow<IXMLDOMNode> pChildNode;
+					am->get_item(0, &pChildNode);
 
-					if (lChildNodes >= 1)
+					wil::unique_bstr bstrValue;
+					pChildNode->get_text(&bstrValue);
+
+					for (DialogSettings *ds : DIALOG_SETTINGS)
 					{
-						am->get_item(0, &pChildNode);
+						TCHAR settingsKey[64];
+						bool success = ds->GetSettingsKey(settingsKey, SIZEOF_ARRAY(settingsKey));
+						assert(success);
 
-						pChildNode->get_nodeName(&bstrName);
-						pChildNode->get_text(&bstrValue);
-
-						for (DialogSettings *ds : DIALOG_SETTINGS)
+						if (!success)
 						{
-							TCHAR settingsKey[64];
-							bool success =
-								ds->GetSettingsKey(settingsKey, SIZEOF_ARRAY(settingsKey));
-							assert(success);
+							continue;
+						}
 
-							if (!success)
-							{
-								continue;
-							}
-
-							if (lstrcmpi(bstrValue, settingsKey) == 0)
-							{
-								ds->LoadXMLSettings(am, lChildNodes);
-							}
+						if (lstrcmpi(bstrValue.get(), settingsKey) == 0)
+						{
+							ds->LoadXMLSettings(am.get(), lChildNodes);
 						}
 					}
 				}
 			}
-
-			pNode->Release();
-			pNode = nullptr;
 		}
-	}
-
-clean:
-	if (bstr)
-	{
-		SysFreeString(bstr);
-	}
-	if (pNodes)
-	{
-		pNodes->Release();
-	}
-	if (pNode)
-	{
-		pNode->Release();
 	}
 }
 
 void Explorerplusplus::SaveDialogStatesToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
 {
-	IXMLDOMElement *pe = nullptr;
-	BSTR bstr = nullptr;
-	BSTR bstr_wsnt = SysAllocString(L"\n\t");
+	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pRoot);
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt, pRoot);
-
-	bstr = SysAllocString(DIALOGS_XML_KEY);
-	pXMLDom->createElement(bstr, &pe);
-	SysFreeString(bstr);
-	bstr = nullptr;
+	wil::com_ptr_nothrow<IXMLDOMElement> pe;
+	auto bstr = wil::make_bstr_nothrow(DIALOGS_XML_KEY);
+	pXMLDom->createElement(bstr.get(), &pe);
 
 	for (DialogSettings *ds : DIALOG_SETTINGS)
 	{
-		ds->SaveXMLSettings(pXMLDom, pe);
+		ds->SaveXMLSettings(pXMLDom, pe.get());
 	}
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt, pe);
-
-	NXMLSettings::AppendChildToParent(pe, pRoot);
-	pe->Release();
-	pe = nullptr;
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pe.get());
+	NXMLSettings::AppendChildToParent(pe.get(), pRoot);
 }

@@ -159,6 +159,10 @@ Bug fixes:
   in a row would inconsistently result in the item being
   selected. Now, an item is only selected if you right-click its
   filename label.
+- Some columns were effectively skipped over when saving data to
+  the XML config file. Additionally, if one of these columns
+  appeared first, the application would crash when exiting.
+  Fixed.
 - When loading from the XML config file, the initial color in the
   color rule dialog wasn't been loaded correctly. Fixed.
 - There was an issue that prevented labels in the treeview from
@@ -183,7 +187,6 @@ Misc:
 - The format used to display dates has been updated. Previously,
   the date and time were separated by a comma. Now, they're
   separated by a space.
-- Dates are now displayed without seconds.
 - Infotips for files/folders are now retrieved on a background
   thread. This stops the application from hanging when
   retrieving the infotip for a large folder.
@@ -192,6 +195,9 @@ Misc:
   back/forward (the apparent flickering occurs as the default
   file/folder icons are replaced with the actual file/folder
   icons).
+- Due to the way in which listview items were deleted when
+  navigating away from a folder, navigations away from large
+  folders could be slow. This process should now be quicker.
 - The way in which the document summary fields (e.g. title,
   subject) are retrieved has been updated. This means that the
   fields should now be displayed for more file types (e.g. Word
@@ -199,6 +205,8 @@ Misc:
 - When selecting a file path with spaces in the application
   toolbar button dialog, the path is now quoted (which is
   necessary for paths with spaces).
+- An error message is now shown when opening an item on the
+  application toolbar fails.
 - The columns in the select columns dialog are now sorted by
   name, with the current set of columns appearing at the top of
   the list.

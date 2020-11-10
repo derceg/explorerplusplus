@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "MainToolbar.h"
 #include "Config.h"
-#include "CoreInterface.h"
 #include "DarkModeHelper.h"
 #include "DefaultToolbarButtons.h"
 #include "Icon.h"
@@ -174,6 +173,8 @@ void MainToolbar::Initialize(HWND parent)
 			boost::bind(&MainToolbar::OnNavigationCompleted, this, _1)));
 	});
 
+	m_connections.push_back(
+		m_pexpp->AddFocusChangeObserver(boost::bind(&MainToolbar::OnFocusChanged, this, _1)));
 	m_connections.push_back(m_config->useLargeToolbarIcons.addObserver(boost::bind(&MainToolbar::OnUseLargeToolbarIconsUpdated, this, _1)));
 
 	AddClipboardFormatListener(m_hwnd);
@@ -870,6 +871,13 @@ void MainToolbar::OnNavigationCompleted(const Tab &tab)
 	}
 }
 
+void MainToolbar::OnFocusChanged(WindowFocusSource windowFocusSource)
+{
+	UNREFERENCED_PARAMETER(windowFocusSource);
+
+	UpdateToolbarButtonStates();
+}
+
 MainToolbarPersistentSettings::MainToolbarPersistentSettings() :
 	m_toolbarButtons(DEFAULT_TOOLBAR_BUTTONS, std::end(DEFAULT_TOOLBAR_BUTTONS))
 {
@@ -884,29 +892,23 @@ MainToolbarPersistentSettings &MainToolbarPersistentSettings::GetInstance()
 
 void MainToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
 {
-	IXMLDOMNode *pChildNode = nullptr;
-	IXMLDOMNamedNodeMap *am = nullptr;
-	BSTR bstrValue;
-
 	std::vector<ToolbarButton> toolbarButtons;
 
+	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
 	pNode->get_attributes(&am);
 
 	long lChildNodes;
-	long j = 0;
-
-	/* Retrieve the total number of attributes
-	attached to this node. */
 	am->get_length(&lChildNodes);
 
-	for (j = 1; j < lChildNodes; j++)
+	for (long j = 1; j < lChildNodes; j++)
 	{
+		wil::com_ptr_nothrow<IXMLDOMNode> pChildNode;
 		am->get_item(j, &pChildNode);
 
-		/* Element value. */
+		wil::unique_bstr bstrValue;
 		pChildNode->get_text(&bstrValue);
 
-		auto itr = TOOLBAR_BUTTON_XML_NAME_MAPPINGS.right.find(bstrValue);
+		auto itr = TOOLBAR_BUTTON_XML_NAME_MAPPINGS.right.find(bstrValue.get());
 
 		if (itr == TOOLBAR_BUTTON_XML_NAME_MAPPINGS.right.end())
 		{

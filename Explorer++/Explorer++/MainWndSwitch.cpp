@@ -1457,6 +1457,11 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 		case LVN_ENDLABELEDIT:
 			return OnListViewEndLabelEdit(lParam);
 
+		case LVN_DELETEALLITEMS:
+			// Respond to the notification in order to speed up calls to ListView_DeleteAllItems
+			// per http://www.verycomputer.com/5_0c959e6a4fd713e2_1.htm
+			return TRUE;
+
 		case TBN_ENDADJUST:
 			UpdateToolbarBandSizing(m_hMainRebar,((NMHDR *)lParam)->hwndFrom);
 			break;

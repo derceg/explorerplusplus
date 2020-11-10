@@ -5,15 +5,17 @@
 #include "stdafx.h"
 #include "DropTarget.h"
 
-wil::com_ptr<DropTarget> DropTarget::Create(HWND hwnd, DropTargetInternal *dropTargetInternal)
+wil::com_ptr_nothrow<DropTarget> DropTarget::Create(HWND hwnd, DropTargetInternal *dropTargetInternal)
 {
-	return wil::com_ptr<DropTarget>(new DropTarget(hwnd, dropTargetInternal));
+	wil::com_ptr_nothrow<DropTarget> dropTarget;
+	dropTarget.attach(new DropTarget(hwnd, dropTargetInternal));
+	return dropTarget;
 }
 
 DropTarget::DropTarget(HWND hwnd, DropTargetInternal *dropTargetInternal) :
 	m_hwnd(hwnd),
 	m_dropTargetInternal(dropTargetInternal),
-	m_refCount(0),
+	m_refCount(1),
 	m_withinDrag(false)
 {
 	RegisterDragDrop(hwnd, this);

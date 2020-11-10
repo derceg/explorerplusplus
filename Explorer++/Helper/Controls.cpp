@@ -299,7 +299,7 @@ SIZE GetButtonSize(HWND hwnd, int partId, int stateId, int defaultWidth, int def
 
 		if (theme)
 		{
-			wil::unique_hdc screenDC(GetDC(nullptr));
+			wil::unique_hdc_window screenDC(GetDC(nullptr));
 
 			SIZE size;
 			HRESULT hr = GetThemePartSize(

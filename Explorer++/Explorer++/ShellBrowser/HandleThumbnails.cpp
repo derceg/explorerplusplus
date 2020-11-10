@@ -7,11 +7,8 @@
 #include "ItemData.h"
 #include "ViewModes.h"
 #include "../Helper/ShellHelper.h"
-#include <boost/scope_exit.hpp>
+#include <wil/com.h>
 #include <list>
-
-#pragma warning(                                                                                   \
-	disable : 4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
 #define THUMBNAIL_TYPE_ICON 0
 #define THUMBNAIL_TYPE_EXTRACTED 1
@@ -111,7 +108,7 @@ void ShellBrowser::QueueThumbnailTask(int internalIndex)
 std::optional<ShellBrowser::ThumbnailResult_t> ShellBrowser::FindThumbnailAsync(
 	HWND listView, int thumbnailResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo)
 {
-	IShellFolder *pShellFolder = nullptr;
+	wil::com_ptr_nothrow<IShellFolder> pShellFolder;
 	HRESULT hr =
 		SHBindToParent(basicItemInfo.pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), nullptr);
 
@@ -120,27 +117,15 @@ std::optional<ShellBrowser::ThumbnailResult_t> ShellBrowser::FindThumbnailAsync(
 		return std::nullopt;
 	}
 
-	BOOST_SCOPE_EXIT(pShellFolder)
-	{
-		pShellFolder->Release();
-	}
-	BOOST_SCOPE_EXIT_END
-
-	IExtractImage *pExtractImage = nullptr;
+	wil::com_ptr_nothrow<IExtractImage> pExtractImage;
 	auto pridl = basicItemInfo.pridl.get();
-	hr = GetUIObjectOf(pShellFolder, nullptr, 1, const_cast<PCUITEMID_CHILD *>(&pridl),
+	hr = GetUIObjectOf(pShellFolder.get(), nullptr, 1, const_cast<PCUITEMID_CHILD *>(&pridl),
 		IID_PPV_ARGS(&pExtractImage));
 
 	if (FAILED(hr))
 	{
 		return std::nullopt;
 	}
-
-	BOOST_SCOPE_EXIT(pExtractImage)
-	{
-		pExtractImage->Release();
-	}
-	BOOST_SCOPE_EXIT_END
 
 	SIZE size;
 	size.cx = THUMBNAIL_ITEM_WIDTH;
@@ -155,7 +140,7 @@ std::optional<ShellBrowser::ThumbnailResult_t> ShellBrowser::FindThumbnailAsync(
 	hr = pExtractImage->GetLocation(
 		szImage, SIZEOF_ARRAY(szImage), &dwPriority, &size, 32, &dwFlags);
 
-	if (FAILED(hr))
+	if (FAILED(hr) && hr != E_PENDING)
 	{
 		return std::nullopt;
 	}

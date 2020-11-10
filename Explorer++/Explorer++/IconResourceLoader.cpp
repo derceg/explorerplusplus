@@ -5,13 +5,11 @@
 #include "stdafx.h"
 #include "IconResourceLoader.h"
 #include "DarkModeHelper.h"
-#include "IconMappingsColor.h"
-#include "IconMappingsWindows10.h"
+#include "IconMappings.h"
 #include "../Helper/ImageHelper.h"
 
 IconResourceLoader::IconResourceLoader(IconTheme iconTheme) : m_iconTheme(iconTheme)
 {
-	assert(ICON_RESOURCE_MAPPINGS_COLOR.size() == ICON_RESOURCE_MAPPINGS_WINDOWS_10.size());
 }
 
 wil::unique_hbitmap IconResourceLoader::LoadBitmapFromPNGForDpi(
@@ -95,7 +93,7 @@ std::unique_ptr<Gdiplus::Bitmap> IconResourceLoader::LoadGdiplusBitmapFromPNGAnd
 {
 	auto bitmap = LoadGdiplusBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
 
-	if (m_iconTheme != +IconTheme::Windows10 || !DarkModeHelper::GetInstance().IsDarkModeEnabled())
+	if (m_iconTheme == +IconTheme::Color || !DarkModeHelper::GetInstance().IsDarkModeEnabled())
 	{
 		return bitmap;
 	}
@@ -140,6 +138,10 @@ std::unique_ptr<Gdiplus::Bitmap> IconResourceLoader::LoadGdiplusBitmapFromPNGAnd
 	{
 	case IconTheme::Color:
 		mapping = &ICON_RESOURCE_MAPPINGS_COLOR;
+		break;
+
+	case IconTheme::FluentUi:
+		mapping = &ICON_RESOURCE_MAPPINGS_FLUENT_UI;
 		break;
 
 	case IconTheme::Windows10:

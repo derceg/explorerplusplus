@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "CoreInterface.h"
 #include "DefaultToolbarButtons.h"
 #include "IconResourceLoader.h"
 #include "Tab.h"
@@ -14,7 +15,6 @@
 #include <unordered_map>
 
 struct Config;
-__interface IExplorerplusplus;
 class MainToolbar;
 
 class MainToolbarPersistentSettings
@@ -98,6 +98,7 @@ private:
 
 	void OnTabSelected(const Tab &tab);
 	void OnNavigationCompleted(const Tab &tab);
+	void OnFocusChanged(WindowFocusSource windowFocusSource);
 
 	void UpdateToolbarButtonImageIndexes();
 
@@ -111,7 +112,7 @@ private:
 	IExplorerplusplus *m_pexpp;
 	std::shared_ptr<Config> m_config;
 
-	wil::com_ptr<IImageList> m_systemImageList;
+	wil::com_ptr_nothrow<IImageList> m_systemImageList;
 	wil::unique_hbitmap m_defaultFolderIconBitmap;
 	wil::unique_himagelist m_imageListSmall;
 	wil::unique_himagelist m_imageListLarge;
