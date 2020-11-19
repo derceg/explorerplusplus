@@ -348,15 +348,9 @@ BOOL Explorerplusplus::OnListViewBeginLabelEdit(const NMLVDISPINFO *dispInfo)
 		return TRUE;
 	}
 
-	/* Subclass the edit window. The only reason this is
-	done is so that when the listview item is put into
-	edit mode, any extension the file has will not be
-	selected along with the rest of the text. Although
-	selection works directly from here in Windows Vista,
-	it does not work in Windows XP. */
-	HWND hEdit = ListView_GetEditControl(m_hActiveListView);
+	HWND editControl = ListView_GetEditControl(m_hActiveListView);
 
-	if (hEdit == nullptr)
+	if (editControl == nullptr)
 	{
 		return TRUE;
 	}
@@ -413,10 +407,10 @@ BOOL Explorerplusplus::OnListViewBeginLabelEdit(const NMLVDISPINFO *dispInfo)
 	// nothing that needs to be changed if editing is canceled.
 	if (useEditingName)
 	{
-		SetWindowText(hEdit, editingName.c_str());
+		SetWindowText(editControl, editingName.c_str());
 	}
 
-	ListViewEdit::CreateNew(hEdit, dispInfo->item.iItem, this);
+	ListViewEdit::CreateNew(editControl, dispInfo->item.iItem, this);
 
 	m_bListViewRenaming = true;
 
@@ -425,126 +419,98 @@ BOOL Explorerplusplus::OnListViewBeginLabelEdit(const NMLVDISPINFO *dispInfo)
 
 BOOL Explorerplusplus::OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo)
 {
-	TCHAR newFileName[MAX_PATH + 1];
-	TCHAR oldFileName[MAX_PATH + 1];
-	DWORD dwAttributes;
-	int ret;
-
 	m_bListViewRenaming = false;
 
-	/* Did the user cancel the editing? */
+	// Did the user cancel editing?
 	if (dispInfo->item.pszText == nullptr)
-		return FALSE;
-
-	/* Is the new filename empty? */
-	if (lstrcmp(dispInfo->item.pszText, EMPTY_STRING) == 0)
-		return FALSE;
-
-	/*
-	Deny file names ending with a dot, as they are just
-	synonyms for the same file without any dot(s).
-	For example:
-	C:\Hello.txt
-	C:\Hello.txt....
-	refer to exactly the same file.
-
-	Taken from the web site referenced below:
-	"Do not end a file or directory name with a trailing
-	space or a period. Although the underlying file system
-	may support such names, the operating system does not.
-	However, it is acceptable to start a name with a period."
-	*/
-	if (dispInfo->item.pszText[lstrlen(dispInfo->item.pszText) - 1] == '.')
-		return FALSE;
-
-	/*
-	The following characters are NOT allowed
-	within a file name:
-	\/:*?"<>|
-
-	See: http://msdn.microsoft.com/en-us/library/aa365247.aspx
-	*/
-	if (StrChr(dispInfo->item.pszText, '\\') != nullptr
-		|| StrChr(dispInfo->item.pszText, '/') != nullptr
-		|| StrChr(dispInfo->item.pszText, ':') != nullptr
-		|| StrChr(dispInfo->item.pszText, '*') != nullptr
-		|| StrChr(dispInfo->item.pszText, '?') != nullptr
-		|| StrChr(dispInfo->item.pszText, '"') != nullptr
-		|| StrChr(dispInfo->item.pszText, '<') != nullptr
-		|| StrChr(dispInfo->item.pszText, '>') != nullptr
-		|| StrChr(dispInfo->item.pszText, '|') != nullptr)
 	{
-		std::wstring error = ResourceHelper::LoadString(m_hLanguageModule, IDS_ERR_FILENAMEINVALID);
-		std::wstring title =
-			ResourceHelper::LoadString(m_hLanguageModule, IDS_ERR_FILENAMEINVALID_MSGTITLE);
-
-		MessageBox(m_hContainer, error.c_str(), title.c_str(), MB_ICONERROR);
-
-		return 0;
+		return FALSE;
 	}
 
-	std::wstring currentDirectory = m_pActiveShellBrowser->GetDirectory();
-	StringCchCopy(newFileName, SIZEOF_ARRAY(newFileName), currentDirectory.c_str());
-	StringCchCopy(oldFileName, SIZEOF_ARRAY(oldFileName), currentDirectory.c_str());
+	std::wstring newFilename = dispInfo->item.pszText;
 
-	std::wstring oldName = m_pActiveShellBrowser->GetItemName(dispInfo->item.iItem);
-	PathAppend(oldFileName, oldName.c_str());
-
-	BOOL bRes = PathAppend(newFileName, dispInfo->item.pszText);
-
-	if (!bRes)
+	if (newFilename.empty())
 	{
-		return 0;
+		return FALSE;
 	}
 
-	dwAttributes =
-		m_pActiveShellBrowser->GetItemFileFindData(dispInfo->item.iItem).dwFileAttributes;
+	std::wstring editingName = m_pActiveShellBrowser->GetItemEditingName(dispInfo->item.iItem);
 
-	if ((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
+	if (newFilename == editingName)
 	{
-		BOOL bExtensionHidden = FALSE;
+		return FALSE;
+	}
 
-		bExtensionHidden = (!m_config->globalFolderSettings.showExtensions)
+	auto fileData = m_pActiveShellBrowser->GetItemFileFindData(dispInfo->item.iItem);
+
+	if (!WI_IsFlagSet(fileData.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
+	{
+		std::wstring filename = m_pActiveShellBrowser->GetItemName(dispInfo->item.iItem);
+		auto *extension = PathFindExtension(filename.c_str());
+
+		bool extensionHidden = !m_config->globalFolderSettings.showExtensions
 			|| (m_config->globalFolderSettings.hideLinkExtension
-				&& lstrcmpi(PathFindExtension(oldName.c_str()), _T(".lnk")) == 0);
+				&& lstrcmpi(extension, _T(".lnk")) == 0);
 
-		/* If file extensions are turned off, the new filename
-		will be incorrect (i.e. it will be missing the extension).
-		Therefore, append the extension manually if it is turned
-		off. */
-		if (bExtensionHidden)
+		// If file extensions are turned off, the new filename will be incorrect (i.e. it will be
+		// missing the extension). Therefore, append the extension manually if it is turned off.
+		if (extensionHidden && *extension != '\0')
 		{
-			TCHAR *szExt = nullptr;
-
-			szExt = PathFindExtension(oldName.c_str());
-
-			if (*szExt == '.')
-				StringCchCat(newFileName, SIZEOF_ARRAY(newFileName), szExt);
+			newFilename += extension;
 		}
 	}
 
-	if (lstrcmp(oldFileName, newFileName) == 0)
-		return FALSE;
+	auto pidl = m_pActiveShellBrowser->GetItemCompleteIdl(dispInfo->item.iItem);
 
-	FileActionHandler::RenamedItem_t renamedItem;
-	renamedItem.strOldFilename = oldFileName;
-	renamedItem.strNewFilename = newFileName;
+	wil::com_ptr_nothrow<IShellFolder> parent;
+	PCITEMID_CHILD child;
+	HRESULT hr = SHBindToParent(pidl.get(), IID_PPV_ARGS(&parent), &child);
 
-	TrimStringRight(renamedItem.strNewFilename, _T(" "));
-
-	std::list<FileActionHandler::RenamedItem_t> renamedItemList;
-	renamedItemList.push_back(renamedItem);
-	ret = m_FileActionHandler.RenameFiles(renamedItemList);
-
-	/* If the file was not renamed, show an error message. */
-	if (!ret)
+	if (FAILED(hr))
 	{
-		std::wstring error = ResourceHelper::LoadString(m_hLanguageModule, IDS_FILERENAMEERROR);
-		MessageBox(
-			m_hContainer, error.c_str(), NExplorerplusplus::APP_NAME, MB_ICONWARNING | MB_OK);
+		return FALSE;
 	}
 
-	return ret;
+	SHGDNF flags = SHGDN_INFOLDER;
+
+	// As with GetDisplayNameOf(), the behavior of SetNameOf() is influenced by whether or not file
+	// extensions are displayed in Explorer. If extensions are displayed and the SHGDN_INFOLDER name
+	// is set, then the name should contain an extension. On the other hand, if extensions aren't
+	// displayed and the SHGDN_INFOLDER name is set, then the name shouldn't contain an extension.
+	// Given that extensions can be independently hidden and shown in Explorer++, this behavior is
+	// undesirable and incompatible.
+	// For example, if extensions are hidden in Explorer, but shown in Explorer++, then it wouldn't
+	// be possible to change a file's extension. When setting the SHGDN_INFOLDER name, the original
+	// extension would always be re-added by the shell.
+	// Therefore, if a file is being edited, the parsing name (which will always contain an
+	// extension) will be updated.
+	if (!m_pActiveShellBrowser->InVirtualFolder()
+		&& !WI_IsFlagSet(fileData.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
+	{
+		flags |= SHGDN_FORPARSING;
+	}
+
+	unique_pidl_child newChild;
+	hr = parent->SetNameOf(m_pActiveShellBrowser->GetListView(), child, newFilename.c_str(), flags,
+		wil::out_param(newChild));
+
+	if (FAILED(hr))
+	{
+		return FALSE;
+	}
+
+	hr = parent->CompareIDs(0, child, newChild.get());
+
+	// It's possible for the rename operation to succeed, but for the item name to remain unchanged.
+	// For example, if one or more '.' characters are appended to the end of the item name, the
+	// rename operation will succeed, but the name won't actually change. In those sorts of cases,
+	// the name the user entered should be removed.
+	if (HRESULT_CODE(hr) == 0)
+	{
+		return FALSE;
+	}
+
+	return TRUE;
 }
 
 void Explorerplusplus::OnListViewRClick(POINT *pCursorPos)
