@@ -341,7 +341,7 @@ int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 	return -1;
 }
 
-BOOL Explorerplusplus::OnListViewBeginLabelEdit(LPARAM lParam)
+BOOL Explorerplusplus::OnListViewBeginLabelEdit(const NMLVDISPINFO *dispInfo)
 {
 	if (!CanRename())
 	{
@@ -361,34 +361,83 @@ BOOL Explorerplusplus::OnListViewBeginLabelEdit(LPARAM lParam)
 		return TRUE;
 	}
 
-	ListViewEdit::CreateNew(hEdit, reinterpret_cast<NMLVDISPINFO *>(lParam)->item.iItem, this);
+	auto fileData = m_pActiveShellBrowser->GetItemFileFindData(dispInfo->item.iItem);
+	std::wstring editingName = m_pActiveShellBrowser->GetItemEditingName(dispInfo->item.iItem);
+
+	bool useEditingName = true;
+
+	// The editing name may differ from the display name. For example, the display name of the C:\
+	// drive item will be something like "Local Disk (C:)", while its editing name will be "Local
+	// Disk". Since the editing name is affected by the file name extensions setting in Explorer, it
+	// won't be used if:
+	//
+	// - Extensions are hidden in Explorer, but shown in Explorer++ (since the editing name would
+	//   contain no extension)
+	// - Extensions are shown in Explorer, but hidden in Explorer++ (since the editing name would
+	//   contain an extension). Note that this case is handled when editing is finished - if
+	//   extensions are hidden, the extension will be manually re-added when renaming an item.
+	if (!WI_IsFlagSet(fileData.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
+	{
+		std::wstring displayName = m_pActiveShellBrowser->GetItemDisplayName(dispInfo->item.iItem);
+
+		if (m_config->globalFolderSettings.showExtensions
+			|| m_config->globalFolderSettings.hideLinkExtension)
+		{
+			auto *extension = PathFindExtension(displayName.c_str());
+
+			if (*extension != '\0'
+				&& lstrcmp((editingName + extension).c_str(), displayName.c_str()) == 0)
+			{
+				useEditingName = false;
+			}
+		}
+		else
+		{
+			auto *extension = PathFindExtension(editingName.c_str());
+
+			if (*extension != '\0'
+				&& lstrcmp((displayName + extension).c_str(), editingName.c_str()) == 0)
+			{
+				useEditingName = false;
+			}
+		}
+	}
+
+	// Note that the necessary text is set in the edit control, rather than the listview. This is
+	// for the following two reasons:
+	//
+	// 1. Setting the listview item text after the edit control has already been created won't
+	// change the text in the control
+	// 2. Even if setting the listview item text did change the edit control text, the text would
+	// need to be reverted if the user canceled editing. Setting the edit control text means there's
+	// nothing that needs to be changed if editing is canceled.
+	if (useEditingName)
+	{
+		SetWindowText(hEdit, editingName.c_str());
+	}
+
+	ListViewEdit::CreateNew(hEdit, dispInfo->item.iItem, this);
 
 	m_bListViewRenaming = true;
 
 	return FALSE;
 }
 
-BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
+BOOL Explorerplusplus::OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo)
 {
-	NMLVDISPINFO *pdi = nullptr;
-	LVITEM *pItem = nullptr;
 	TCHAR newFileName[MAX_PATH + 1];
 	TCHAR oldFileName[MAX_PATH + 1];
-	TCHAR oldName[MAX_PATH];
 	DWORD dwAttributes;
 	int ret;
-
-	pdi = (NMLVDISPINFO *) lParam;
-	pItem = &pdi->item;
 
 	m_bListViewRenaming = false;
 
 	/* Did the user cancel the editing? */
-	if (pItem->pszText == nullptr)
+	if (dispInfo->item.pszText == nullptr)
 		return FALSE;
 
 	/* Is the new filename empty? */
-	if (lstrcmp(pItem->pszText, EMPTY_STRING) == 0)
+	if (lstrcmp(dispInfo->item.pszText, EMPTY_STRING) == 0)
 		return FALSE;
 
 	/*
@@ -405,7 +454,7 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 	may support such names, the operating system does not.
 	However, it is acceptable to start a name with a period."
 	*/
-	if (pItem->pszText[lstrlen(pItem->pszText) - 1] == '.')
+	if (dispInfo->item.pszText[lstrlen(dispInfo->item.pszText) - 1] == '.')
 		return FALSE;
 
 	/*
@@ -415,11 +464,15 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 
 	See: http://msdn.microsoft.com/en-us/library/aa365247.aspx
 	*/
-	if (StrChr(pItem->pszText, '\\') != nullptr || StrChr(pItem->pszText, '/') != nullptr
-		|| StrChr(pItem->pszText, ':') != nullptr || StrChr(pItem->pszText, '*') != nullptr
-		|| StrChr(pItem->pszText, '?') != nullptr || StrChr(pItem->pszText, '"') != nullptr
-		|| StrChr(pItem->pszText, '<') != nullptr || StrChr(pItem->pszText, '>') != nullptr
-		|| StrChr(pItem->pszText, '|') != nullptr)
+	if (StrChr(dispInfo->item.pszText, '\\') != nullptr
+		|| StrChr(dispInfo->item.pszText, '/') != nullptr
+		|| StrChr(dispInfo->item.pszText, ':') != nullptr
+		|| StrChr(dispInfo->item.pszText, '*') != nullptr
+		|| StrChr(dispInfo->item.pszText, '?') != nullptr
+		|| StrChr(dispInfo->item.pszText, '"') != nullptr
+		|| StrChr(dispInfo->item.pszText, '<') != nullptr
+		|| StrChr(dispInfo->item.pszText, '>') != nullptr
+		|| StrChr(dispInfo->item.pszText, '|') != nullptr)
 	{
 		std::wstring error = ResourceHelper::LoadString(m_hLanguageModule, IDS_ERR_FILENAMEINVALID);
 		std::wstring title =
@@ -434,17 +487,18 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 	StringCchCopy(newFileName, SIZEOF_ARRAY(newFileName), currentDirectory.c_str());
 	StringCchCopy(oldFileName, SIZEOF_ARRAY(oldFileName), currentDirectory.c_str());
 
-	m_pActiveShellBrowser->GetItemDisplayName(pItem->iItem, SIZEOF_ARRAY(oldName), oldName);
-	PathAppend(oldFileName, oldName);
+	std::wstring oldName = m_pActiveShellBrowser->GetItemName(dispInfo->item.iItem);
+	PathAppend(oldFileName, oldName.c_str());
 
-	BOOL bRes = PathAppend(newFileName, pItem->pszText);
+	BOOL bRes = PathAppend(newFileName, dispInfo->item.pszText);
 
 	if (!bRes)
 	{
 		return 0;
 	}
 
-	dwAttributes = m_pActiveShellBrowser->GetItemFileFindData(pItem->iItem).dwFileAttributes;
+	dwAttributes =
+		m_pActiveShellBrowser->GetItemFileFindData(dispInfo->item.iItem).dwFileAttributes;
 
 	if ((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 	{
@@ -452,7 +506,7 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 
 		bExtensionHidden = (!m_config->globalFolderSettings.showExtensions)
 			|| (m_config->globalFolderSettings.hideLinkExtension
-				&& lstrcmpi(PathFindExtension(oldName), _T(".lnk")) == 0);
+				&& lstrcmpi(PathFindExtension(oldName.c_str()), _T(".lnk")) == 0);
 
 		/* If file extensions are turned off, the new filename
 		will be incorrect (i.e. it will be missing the extension).
@@ -462,7 +516,7 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 		{
 			TCHAR *szExt = nullptr;
 
-			szExt = PathFindExtension(oldName);
+			szExt = PathFindExtension(oldName.c_str());
 
 			if (*szExt == '.')
 				StringCchCat(newFileName, SIZEOF_ARRAY(newFileName), szExt);

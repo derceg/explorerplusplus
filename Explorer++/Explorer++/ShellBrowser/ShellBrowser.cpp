@@ -521,12 +521,29 @@ BOOL ShellBrowser::IsFilenameFiltered(const TCHAR *FileName) const
 	return TRUE;
 }
 
-int ShellBrowser::GetItemDisplayName(int iItem, UINT BufferSize, TCHAR *Buffer) const
+std::wstring ShellBrowser::GetItemName(int index) const
 {
-	int internalIndex = GetItemInternalIndex(iItem);
-	StringCchCopy(Buffer, BufferSize, m_itemInfoMap.at(internalIndex).wfd.cFileName);
+	return GetItemByIndex(index).wfd.cFileName;
+}
 
-	return lstrlen(Buffer);
+// Returns the name of the item as it's shown to the user. Note that this name may not be unique.
+// For example, if file extensions are hidden, then two or more items might share the same display
+// name (because they only differ in their extensions, which are hidden). Because of this, the
+// display name shouldn't be used to perform item lookups.
+std::wstring ShellBrowser::GetItemDisplayName(int index) const
+{
+	// Although the display name for an item is retrieved and cached, that might not be exactly the
+	// same as the text that's displayed. For example, if extensions are shown within Explorer, but
+	// hidden within Explorer++, then the display name will contain the file extension, but the text
+	// displayed to the user won't. Processing the filename here ensures that the extension is
+	// removed, if necessary.
+	BasicItemInfo_t basicItemInfo = getBasicItemInfo(GetItemInternalIndex(index));
+	return ProcessItemFileName(basicItemInfo, m_config->globalFolderSettings);
+}
+
+std::wstring ShellBrowser::GetItemEditingName(int index) const
+{
+	return GetItemByIndex(index).editingName;
 }
 
 HRESULT ShellBrowser::GetItemFullName(int iIndex, TCHAR *FullItemPath, UINT cchMax) const
@@ -670,7 +687,8 @@ void ShellBrowser::DragStarted(int iFirstItem, POINT *ptCursor)
 
 	while ((iSelected = ListView_GetNextItem(m_hListView, iSelected, LVNI_SELECTED)) != -1)
 	{
-		GetItemDisplayName(iSelected, SIZEOF_ARRAY(df.szFileName), df.szFileName);
+		std::wstring filename = GetItemName(iSelected);
+		StringCchCopy(df.szFileName, SIZEOF_ARRAY(df.szFileName), filename.c_str());
 
 		m_DraggedFilesList.push_back(df);
 	}
@@ -1023,7 +1041,7 @@ void ShellBrowser::RemoveFilteredItems()
 		if (!((m_itemInfoMap.at(internalIndex).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 				== FILE_ATTRIBUTE_DIRECTORY))
 		{
-			if (IsFilenameFiltered(m_itemInfoMap.at(internalIndex).szDisplayName))
+			if (IsFilenameFiltered(m_itemInfoMap.at(internalIndex).displayName.c_str()))
 			{
 				RemoveFilteredItem(i, internalIndex);
 			}
@@ -1490,8 +1508,7 @@ void ShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 	{
 		SHGetFileInfo(szDrive, 0, &shfi, sizeof(shfi), SHGFI_SYSICONINDEX);
 
-		StringCchCopy(m_itemInfoMap.at(iItemInternal).szDisplayName,
-			SIZEOF_ARRAY(m_itemInfoMap.at(iItemInternal).szDisplayName), szDisplayName);
+		m_itemInfoMap.at(iItemInternal).displayName = szDisplayName;
 
 		/* Update the drives icon and display name. */
 		lvItem.mask = LVIF_TEXT | LVIF_IMAGE;
@@ -1546,7 +1563,7 @@ BasicItemInfo_t ShellBrowser::getBasicItemInfo(int internalIndex) const
 	basicItemInfo.pridl.reset(ILCloneChild(itemInfo.pridl.get()));
 	basicItemInfo.wfd = itemInfo.wfd;
 	StringCchCopy(basicItemInfo.szDisplayName, SIZEOF_ARRAY(basicItemInfo.szDisplayName),
-		itemInfo.szDisplayName);
+		itemInfo.displayName.c_str());
 	basicItemInfo.isRoot = itemInfo.bDrive;
 
 	return basicItemInfo;
@@ -1678,8 +1695,7 @@ HRESULT ShellBrowser::CopySelectedItemToClipboard(bool copy)
 
 			while ((item = ListView_GetNextItem(m_hListView, item, LVNI_SELECTED)) != -1)
 			{
-				TCHAR filename[MAX_PATH];
-				GetItemDisplayName(item, SIZEOF_ARRAY(filename), filename);
+				std::wstring filename = GetItemName(item);
 				m_cutFileNames.emplace_back(filename);
 
 				MarkItemAsCut(item, true);
@@ -1690,7 +1706,8 @@ HRESULT ShellBrowser::CopySelectedItemToClipboard(bool copy)
 	return hr;
 }
 
-void ShellBrowser::UpdateCurrentClipboardObject(wil::com_ptr_nothrow<IDataObject> clipboardDataObject)
+void ShellBrowser::UpdateCurrentClipboardObject(
+	wil::com_ptr_nothrow<IDataObject> clipboardDataObject)
 {
 	RestoreStateOfCutItems();
 

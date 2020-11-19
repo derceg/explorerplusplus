@@ -175,7 +175,7 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 		PCITEMID_CHILD items[] = { pidlItem.get() };
 		pShellFolder->GetAttributesOf(1, items, &uAttributes);
 
-		STRRET str;
+		STRRET displayNameStr;
 
 		/* If this is a virtual folder, only use SHGDN_INFOLDER. If this is
 		a real folder, combine SHGDN_INFOLDER with SHGDN_FORPARSING. This is
@@ -186,57 +186,82 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 		correctly. */
 		if (m_bVirtualFolder || (uAttributes & SFGAO_FOLDER))
 		{
-			hr = pShellFolder->GetDisplayNameOf(pidlItem.get(), SHGDN_INFOLDER, &str);
+			hr = pShellFolder->GetDisplayNameOf(pidlItem.get(), SHGDN_INFOLDER, &displayNameStr);
 		}
 		else
 		{
 			hr = pShellFolder->GetDisplayNameOf(
-				pidlItem.get(), SHGDN_INFOLDER | SHGDN_FORPARSING, &str);
+				pidlItem.get(), SHGDN_INFOLDER | SHGDN_FORPARSING, &displayNameStr);
 		}
 
-		if (SUCCEEDED(hr))
+		if (FAILED(hr))
 		{
-			TCHAR szFileName[MAX_PATH];
-			StrRetToBuf(&str, pidlItem.get(), szFileName, SIZEOF_ARRAY(szFileName));
-
-			AddItemInternal(pidlDirectory, pidlItem.get(), szFileName, -1, FALSE);
+			continue;
 		}
+
+		TCHAR displayName[MAX_PATH];
+		hr = StrRetToBuf(&displayNameStr, pidlItem.get(), displayName, SIZEOF_ARRAY(displayName));
+
+		if (FAILED(hr))
+		{
+			continue;
+		}
+
+		STRRET editingNameStr;
+		hr = pShellFolder->GetDisplayNameOf(
+			pidlItem.get(), SHGDN_INFOLDER | SHGDN_FOREDITING, &editingNameStr);
+
+		if (FAILED(hr))
+		{
+			continue;
+		}
+
+		TCHAR editingName[MAX_PATH];
+		hr = StrRetToBuf(&editingNameStr, pidlItem.get(), editingName, SIZEOF_ARRAY(editingName));
+
+		if (FAILED(hr))
+		{
+			continue;
+		}
+
+		AddItemInternal(pidlDirectory, pidlItem.get(), displayName, editingName, -1, FALSE);
 	}
 
 	return hr;
 }
 
 HRESULT ShellBrowser::AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild,
-	const TCHAR *szFileName, int iItemIndex, BOOL bPosition)
+	const std::wstring &displayName, const std::wstring &editingName, int itemIndex,
+	BOOL setPosition)
 {
-	int uItemId = SetItemInformation(pidlDirectory, pidlChild, szFileName);
-	return AddItemInternal(iItemIndex, uItemId, bPosition);
+	int uItemId = SetItemInformation(pidlDirectory, pidlChild, displayName, editingName);
+	return AddItemInternal(itemIndex, uItemId, setPosition);
 }
 
-HRESULT ShellBrowser::AddItemInternal(int iItemIndex, int iItemId, BOOL bPosition)
+HRESULT ShellBrowser::AddItemInternal(int itemIndex, int itemId, BOOL setPosition)
 {
 	AwaitingAdd_t awaitingAdd;
 
-	if (iItemIndex == -1)
+	if (itemIndex == -1)
 	{
 		awaitingAdd.iItem = m_nTotalItems + static_cast<int>(m_AwaitingAddList.size());
 	}
 	else
 	{
-		awaitingAdd.iItem = iItemIndex;
+		awaitingAdd.iItem = itemIndex;
 	}
 
-	awaitingAdd.iItemInternal = iItemId;
-	awaitingAdd.bPosition = bPosition;
-	awaitingAdd.iAfter = iItemIndex - 1;
+	awaitingAdd.iItemInternal = itemId;
+	awaitingAdd.bPosition = setPosition;
+	awaitingAdd.iAfter = itemIndex - 1;
 
 	m_AwaitingAddList.push_back(awaitingAdd);
 
 	return S_OK;
 }
 
-int ShellBrowser::SetItemInformation(
-	PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild, const TCHAR *szFileName)
+int ShellBrowser::SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild,
+	const std::wstring &displayName, const std::wstring &editingName)
 {
 	HANDLE hFirstFile;
 	TCHAR szPath[MAX_PATH];
@@ -248,8 +273,8 @@ int ShellBrowser::SetItemInformation(
 
 	m_itemInfoMap[uItemId].pidlComplete.reset(ILCloneFull(pidlItem.get()));
 	m_itemInfoMap[uItemId].pridl.reset(ILCloneChild(pidlChild));
-	StringCchCopy(m_itemInfoMap[uItemId].szDisplayName,
-		SIZEOF_ARRAY(m_itemInfoMap[uItemId].szDisplayName), szFileName);
+	m_itemInfoMap[uItemId].displayName = displayName;
+	m_itemInfoMap[uItemId].editingName = editingName;
 
 	SHGetPathFromIDList(pidlItem.get(), szPath);
 
@@ -284,7 +309,7 @@ int ShellBrowser::SetItemInformation(
 	{
 		WIN32_FIND_DATA wfd;
 
-		StringCchCopy(wfd.cFileName, SIZEOF_ARRAY(wfd.cFileName), szFileName);
+		StringCchCopy(wfd.cFileName, SIZEOF_ARRAY(wfd.cFileName), displayName.c_str());
 		wfd.nFileSizeLow = 0;
 		wfd.nFileSizeHigh = 0;
 		wfd.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
@@ -469,7 +494,7 @@ BOOL ShellBrowser::IsFileFiltered(const ItemInfo_t &itemInfo) const
 	if (m_folderSettings.applyFilter
 		&& ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
 	{
-		bFilenameFiltered = IsFilenameFiltered(itemInfo.szDisplayName);
+		bFilenameFiltered = IsFilenameFiltered(itemInfo.displayName.c_str());
 	}
 
 	if (m_config->globalFolderSettings.hideSystemFiles)

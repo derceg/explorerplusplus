@@ -242,8 +242,8 @@ private:
 	LRESULT OnListViewKeyDown(LPARAM lParam);
 	BOOL OnListViewItemChanging(const NMLISTVIEW *changeData);
 	HRESULT OnListViewBeginDrag(LPARAM lParam, DragType dragType);
-	BOOL OnListViewBeginLabelEdit(LPARAM lParam);
-	BOOL OnListViewEndLabelEdit(LPARAM lParam);
+	BOOL OnListViewBeginLabelEdit(const NMLVDISPINFO *dispInfo);
+	BOOL OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo);
 	void OnListViewRClick(POINT *pCursorPos);
 	void OnListViewBackgroundRClick(POINT *pCursorPos);
 	void OnListViewItemRClick(POINT *pCursorPos);

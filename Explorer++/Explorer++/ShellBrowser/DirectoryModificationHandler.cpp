@@ -212,9 +212,16 @@ void ShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 					pidlRelative, SHGDN_INFOLDER | SHGDN_FORPARSING, &str);
 			}
 
-			if (SUCCEEDED(hr))
+			STRRET editingNameStr;
+			HRESULT editingNameResult = pShellFolder->GetDisplayNameOf(
+				pidlRelative, SHGDN_INFOLDER | SHGDN_FOREDITING, &editingNameStr);
+
+			if (SUCCEEDED(hr) && SUCCEEDED(editingNameResult))
 			{
 				StrRetToBuf(&str, pidlRelative, szDisplayName, SIZEOF_ARRAY(szDisplayName));
+
+				TCHAR editingName[MAX_PATH];
+				StrRetToBuf(&editingNameStr, pidlRelative, editingName, SIZEOF_ARRAY(editingName));
 
 				std::list<DroppedFile_t>::iterator itr;
 				BOOL bDropped = FALSE;
@@ -239,8 +246,8 @@ void ShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 					int iItemId;
 					int iSorted;
 
-					iItemId = SetItemInformation(
-						m_directoryState.pidlDirectory.get(), pidlRelative, szDisplayName);
+					iItemId = SetItemInformation(m_directoryState.pidlDirectory.get(), pidlRelative,
+						szDisplayName, editingName);
 
 					iSorted = DetermineItemSortedPosition(iItemId);
 
@@ -250,7 +257,7 @@ void ShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 				{
 					/* Just add the item to the end of the list. */
 					AddItemInternal(m_directoryState.pidlDirectory.get(), pidlRelative,
-						szDisplayName, -1, FALSE);
+						szDisplayName, editingName, -1, FALSE);
 				}
 
 				InsertAwaitingItems(m_folderSettings.showInGroups);
@@ -556,12 +563,16 @@ void ShellBrowser::RenameItem(int iItemInternal, const TCHAR *szNewFileName)
 			hr = GetDisplayName(szFullFileName, szDisplayName, SIZEOF_ARRAY(szDisplayName),
 				SHGDN_INFOLDER | SHGDN_FORPARSING);
 
-			if (SUCCEEDED(hr))
+			TCHAR editingName[MAX_PATH];
+			HRESULT editingNameResult = GetDisplayName(szFullFileName, editingName,
+				SIZEOF_ARRAY(editingName), SHGDN_INFOLDER | SHGDN_FOREDITING);
+
+			if (SUCCEEDED(hr) && SUCCEEDED(editingNameResult))
 			{
 				itemInfo.pidlComplete.reset(ILCloneFull(pidlFull.get()));
 				itemInfo.pridl.reset(ILCloneChild(pidlRelative));
-				StringCchCopy(
-					itemInfo.szDisplayName, SIZEOF_ARRAY(itemInfo.szDisplayName), szDisplayName);
+				itemInfo.displayName = szDisplayName;
+				itemInfo.editingName = editingName;
 				StringCchCopy(
 					itemInfo.wfd.cFileName, SIZEOF_ARRAY(itemInfo.wfd.cFileName), szNewFileName);
 
@@ -617,7 +628,7 @@ void ShellBrowser::RenameItem(int iItemInternal, const TCHAR *szNewFileName)
 	}
 	else
 	{
-		StringCchCopy(itemInfo.szDisplayName, SIZEOF_ARRAY(itemInfo.szDisplayName), szNewFileName);
+		itemInfo.displayName = szNewFileName;
 		StringCchCopy(itemInfo.wfd.cFileName, SIZEOF_ARRAY(itemInfo.wfd.cFileName), szNewFileName);
 	}
 }

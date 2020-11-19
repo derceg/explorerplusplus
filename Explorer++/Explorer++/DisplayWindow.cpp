@@ -99,7 +99,6 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 	TCHAR szFullItemName[MAX_PATH];
 	TCHAR szFileDate[256];
 	TCHAR szDisplayDate[512];
-	TCHAR szDisplayName[MAX_PATH];
 	TCHAR szDateModified[256];
 	int iSelected;
 
@@ -107,11 +106,10 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 
 	if (iSelected != -1)
 	{
-		tab.GetShellBrowser()->GetItemDisplayName(
-			iSelected, SIZEOF_ARRAY(szDisplayName), szDisplayName);
+		std::wstring filename = tab.GetShellBrowser()->GetItemName(iSelected);
 
 		/* File name. */
-		DisplayWindow_BufferText(m_hDisplayWindow, szDisplayName);
+		DisplayWindow_BufferText(m_hDisplayWindow, filename.c_str());
 
 		tab.GetShellBrowser()->GetItemFullName(
 			iSelected, szFullItemName, SIZEOF_ARRAY(szFullItemName));

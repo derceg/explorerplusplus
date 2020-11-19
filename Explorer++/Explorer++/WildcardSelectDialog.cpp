@@ -142,11 +142,9 @@ void WildcardSelectDialog::SelectItems(TCHAR *szPattern)
 
 	for (int i = 0; i < nItems; i++)
 	{
-		TCHAR szFilename[MAX_PATH];
-		m_pexpp->GetActiveShellBrowser()->GetItemDisplayName(
-			i, SIZEOF_ARRAY(szFilename), szFilename);
+		std::wstring filename = m_pexpp->GetActiveShellBrowser()->GetItemName(i);
 
-		if (CheckWildcardMatch(szPattern, szFilename, FALSE) == 1)
+		if (CheckWildcardMatch(szPattern, filename.c_str(), FALSE) == 1)
 		{
 			ListViewHelper::SelectItem(hListView, i, m_bSelect);
 		}

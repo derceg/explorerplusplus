@@ -127,7 +127,9 @@ public:
 	WIN32_FIND_DATA GetItemFileFindData(int iItem) const;
 	unique_pidl_absolute GetItemCompleteIdl(int iItem) const;
 	unique_pidl_child GetItemChildIdl(int iItem) const;
-	int GetItemDisplayName(int iItem, UINT BufferSize, TCHAR *Buffer) const;
+	std::wstring GetItemName(int index) const;
+	std::wstring GetItemDisplayName(int index) const;
+	std::wstring GetItemEditingName(int index) const;
 	HRESULT GetItemFullName(int iIndex, TCHAR *FullItemPath, UINT cchMax) const;
 
 	void ShowPropertiesForSelectedFiles() const;
@@ -199,7 +201,8 @@ private:
 		unique_pidl_absolute pidlComplete;
 		unique_pidl_child pridl;
 		WIN32_FIND_DATA wfd;
-		TCHAR szDisplayName[MAX_PATH];
+		std::wstring displayName;
+		std::wstring editingName;
 		int iIcon;
 
 		/* These are only used for drives. They are
@@ -309,10 +312,11 @@ private:
 	void InsertAwaitingItems(BOOL bInsertIntoGroup);
 	BOOL IsFileFiltered(const ItemInfo_t &itemInfo) const;
 	HRESULT AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild,
-		const TCHAR *szFileName, int iItemIndex, BOOL bPosition);
-	HRESULT AddItemInternal(int iItemIndex, int iItemId, BOOL bPosition);
-	int SetItemInformation(
-		PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild, const TCHAR *szFileName);
+		const std::wstring &displayName, const std::wstring &editingName, int itemIndex,
+		BOOL setPosition);
+	HRESULT AddItemInternal(int itemIndex, int itemId, BOOL setPosition);
+	int SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild,
+		const std::wstring &displayName, const std::wstring &editingName);
 	void SetViewModeInternal(ViewMode viewMode);
 	void SetFirstColumnTextToCallback();
 	void SetFirstColumnTextToFilename();
