@@ -23,7 +23,6 @@
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
-#include <boost/scope_exit.hpp>
 #include <wil/com.h>
 #include <list>
 

@@ -5,9 +5,7 @@
 #include "stdafx.h"
 #include "FileProgressSink.h"
 #include "../Helper/ShellHelper.h"
-#include <boost/scope_exit.hpp>
-
-#pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
+#include <wil/com.h>
 
 FileProgressSink *FileProgressSink::CreateNew()
 {
@@ -181,7 +179,7 @@ HRESULT STDMETHODCALLTYPE FileProgressSink::PostNewItem(DWORD dwFlags, IShellIte
 		return S_OK;
 	}
 
-	IUnknown *unknown;
+	wil::com_ptr_nothrow<IUnknown> unknown;
 	HRESULT hr = psiNewItem->QueryInterface(IID_IUnknown, reinterpret_cast<void **>(&unknown));
 
 	if (FAILED(hr))
@@ -189,12 +187,8 @@ HRESULT STDMETHODCALLTYPE FileProgressSink::PostNewItem(DWORD dwFlags, IShellIte
 		return S_OK;
 	}
 
-	BOOST_SCOPE_EXIT(unknown) {
-		unknown->Release();
-	} BOOST_SCOPE_EXIT_END
-
 	unique_pidl_absolute pidl;
-	hr = SHGetIDListFromObject(unknown, wil::out_param(pidl));
+	hr = SHGetIDListFromObject(unknown.get(), wil::out_param(pidl));
 
 	if (FAILED(hr))
 	{

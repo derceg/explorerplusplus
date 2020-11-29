@@ -11,12 +11,8 @@
 #include "RegistrySettings.h"
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/scope_exit.hpp>
 #include <wil/com.h>
 #include <propkey.h>
-
-#pragma warning(                                                                                   \
-	disable : 4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
 bool AddJumpListTasksInternal(
 	IObjectCollection *objectCollection, const std::list<JumpListTaskInformation> &taskList);

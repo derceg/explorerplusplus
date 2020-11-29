@@ -10,12 +10,9 @@
 #include "ShellHelper.h"
 #include "StringHelper.h"
 #include "iDataObject.h"
-#include <boost/scope_exit.hpp>
+#include <wil/com.h>
 #include <list>
 #include <sstream>
-
-#pragma warning(                                                                                   \
-	disable : 4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
 enum class PasteType
 {
@@ -28,19 +25,13 @@ BOOL GetFileClusterSize(const std::wstring &strFilename, PLARGE_INTEGER lpRealFi
 
 HRESULT NFileOperations::RenameFile(IShellItem *item, const std::wstring &newName)
 {
-	IFileOperation *fo;
+	wil::com_ptr_nothrow<IFileOperation> fo;
 	HRESULT hr = CoCreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&fo));
 
 	if (FAILED(hr))
 	{
 		return hr;
 	}
-
-	BOOST_SCOPE_EXIT(fo)
-	{
-		fo->Release();
-	}
-	BOOST_SCOPE_EXIT_END
 
 	hr = fo->SetOperationFlags(FOF_ALLOWUNDO | FOF_SILENT);
 
@@ -64,19 +55,13 @@ HRESULT NFileOperations::RenameFile(IShellItem *item, const std::wstring &newNam
 HRESULT NFileOperations::DeleteFiles(
 	HWND hwnd, std::vector<PCIDLIST_ABSOLUTE> &pidls, bool permanent, bool silent)
 {
-	IFileOperation *fo;
+	wil::com_ptr_nothrow<IFileOperation> fo;
 	HRESULT hr = CoCreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&fo));
 
 	if (FAILED(hr))
 	{
 		return hr;
 	}
-
-	BOOST_SCOPE_EXIT(fo)
-	{
-		fo->Release();
-	}
-	BOOST_SCOPE_EXIT_END
 
 	hr = fo->SetOwnerWindow(hwnd);
 
@@ -111,7 +96,7 @@ HRESULT NFileOperations::DeleteFiles(
 		}
 	}
 
-	IShellItemArray *shellItemArray;
+	wil::com_ptr_nothrow<IShellItemArray> shellItemArray;
 	hr = SHCreateShellItemArrayFromIDLists(
 		static_cast<UINT>(pidls.size()), &pidls[0], &shellItemArray);
 
@@ -120,13 +105,7 @@ HRESULT NFileOperations::DeleteFiles(
 		return hr;
 	}
 
-	BOOST_SCOPE_EXIT(shellItemArray)
-	{
-		shellItemArray->Release();
-	}
-	BOOST_SCOPE_EXIT_END
-
-	IUnknown *unknown;
+	wil::com_ptr_nothrow<IUnknown> unknown;
 	hr = shellItemArray->QueryInterface(IID_IUnknown, reinterpret_cast<void **>(&unknown));
 
 	if (FAILED(hr))
@@ -134,13 +113,7 @@ HRESULT NFileOperations::DeleteFiles(
 		return hr;
 	}
 
-	BOOST_SCOPE_EXIT(unknown)
-	{
-		unknown->Release();
-	}
-	BOOST_SCOPE_EXIT_END
-
-	hr = fo->DeleteItems(unknown);
+	hr = fo->DeleteItems(unknown.get());
 
 	if (FAILED(hr))
 	{
@@ -155,35 +128,23 @@ HRESULT NFileOperations::DeleteFiles(
 HRESULT NFileOperations::CopyFilesToFolder(
 	HWND hOwner, const std::wstring &strTitle, std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move)
 {
-	PIDLIST_ABSOLUTE pidl;
-	BOOL bRes = NFileOperations::CreateBrowseDialog(hOwner, strTitle, &pidl);
+	unique_pidl_absolute pidl;
+	BOOL bRes = NFileOperations::CreateBrowseDialog(hOwner, strTitle, wil::out_param(pidl));
 
 	if (!bRes)
 	{
 		return E_FAIL;
 	}
 
-	BOOST_SCOPE_EXIT(pidl)
-	{
-		CoTaskMemFree(pidl);
-	}
-	BOOST_SCOPE_EXIT_END
-
-	IShellItem *destinationFolder = nullptr;
-	HRESULT hr = SHCreateItemFromIDList(pidl, IID_PPV_ARGS(&destinationFolder));
+	wil::com_ptr_nothrow<IShellItem> destinationFolder;
+	HRESULT hr = SHCreateItemFromIDList(pidl.get(), IID_PPV_ARGS(&destinationFolder));
 
 	if (FAILED(hr))
 	{
 		return E_FAIL;
 	}
 
-	BOOST_SCOPE_EXIT(destinationFolder)
-	{
-		destinationFolder->Release();
-	}
-	BOOST_SCOPE_EXIT_END
-
-	hr = CopyFiles(hOwner, destinationFolder, pidls, move);
+	hr = CopyFiles(hOwner, destinationFolder.get(), pidls, move);
 
 	return hr;
 }
@@ -191,19 +152,13 @@ HRESULT NFileOperations::CopyFilesToFolder(
 HRESULT NFileOperations::CopyFiles(
 	HWND hwnd, IShellItem *destinationFolder, std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move)
 {
-	IFileOperation *fo;
+	wil::com_ptr_nothrow<IFileOperation> fo;
 	HRESULT hr = CoCreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&fo));
 
 	if (FAILED(hr))
 	{
 		return hr;
 	}
-
-	BOOST_SCOPE_EXIT(fo)
-	{
-		fo->Release();
-	}
-	BOOST_SCOPE_EXIT_END
 
 	hr = fo->SetOwnerWindow(hwnd);
 
@@ -219,7 +174,7 @@ HRESULT NFileOperations::CopyFiles(
 		return hr;
 	}
 
-	IShellItemArray *shellItemArray;
+	wil::com_ptr_nothrow<IShellItemArray> shellItemArray;
 	hr = SHCreateShellItemArrayFromIDLists(
 		static_cast<UINT>(pidls.size()), &pidls[0], &shellItemArray);
 
@@ -228,13 +183,7 @@ HRESULT NFileOperations::CopyFiles(
 		return hr;
 	}
 
-	BOOST_SCOPE_EXIT(shellItemArray)
-	{
-		shellItemArray->Release();
-	}
-	BOOST_SCOPE_EXIT_END
-
-	IUnknown *unknown;
+	wil::com_ptr_nothrow<IUnknown> unknown;
 	hr = shellItemArray->QueryInterface(IID_IUnknown, reinterpret_cast<void **>(&unknown));
 
 	if (FAILED(hr))
@@ -242,19 +191,13 @@ HRESULT NFileOperations::CopyFiles(
 		return hr;
 	}
 
-	BOOST_SCOPE_EXIT(unknown)
-	{
-		unknown->Release();
-	}
-	BOOST_SCOPE_EXIT_END
-
 	if (move)
 	{
-		hr = fo->MoveItems(unknown, destinationFolder);
+		hr = fo->MoveItems(unknown.get(), destinationFolder);
 	}
 	else
 	{
-		hr = fo->CopyItems(unknown, destinationFolder);
+		hr = fo->CopyItems(unknown.get(), destinationFolder);
 	}
 
 	if (FAILED(hr))
@@ -295,19 +238,13 @@ TCHAR *NFileOperations::BuildFilenameList(const std::list<std::wstring> &Filenam
 HRESULT NFileOperations::CreateNewFolder(IShellItem *destinationFolder,
 	const std::wstring &newFolderName, IFileOperationProgressSink *progressSink)
 {
-	IFileOperation *fo;
+	wil::com_ptr_nothrow<IFileOperation> fo;
 	HRESULT hr = CoCreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&fo));
 
 	if (FAILED(hr))
 	{
 		return hr;
 	}
-
-	BOOST_SCOPE_EXIT(fo)
-	{
-		fo->Release();
-	}
-	BOOST_SCOPE_EXIT_END
 
 	hr = fo->SetOperationFlags(FOF_ALLOWUNDO | FOF_SILENT);
 
