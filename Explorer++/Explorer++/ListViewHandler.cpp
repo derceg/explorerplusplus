@@ -215,7 +215,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(
 
 			pnmHeader = (NMHEADER *) lParam;
 
-			auto currentColumns = m_pActiveShellBrowser->ExportCurrentColumns();
+			auto currentColumns = m_pActiveShellBrowser->GetCurrentColumns();
 
 			i = 0;
 			auto itr = currentColumns.begin();
@@ -252,7 +252,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(
 
 			currentColumns.insert(itr, column);
 
-			m_pActiveShellBrowser->ImportColumns(currentColumns);
+			m_pActiveShellBrowser->SetCurrentColumns(currentColumns);
 
 			Tab &tab = m_tabContainer->GetSelectedTab();
 			tab.GetShellBrowser()->GetNavigationController()->Refresh();

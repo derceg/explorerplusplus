@@ -833,7 +833,7 @@ void ShellBrowser::OnShowMoreColumnsSelected()
 void ShellBrowser::OnColumnMenuItemSelected(
 	int menuItemId, const std::unordered_map<int, ColumnType> &menuItemMappings)
 {
-	auto currentColumns = ExportCurrentColumns();
+	auto currentColumns = GetCurrentColumns();
 
 	ColumnType columnType = menuItemMappings.at(menuItemId);
 	auto itr = std::find_if(
@@ -848,7 +848,7 @@ void ShellBrowser::OnColumnMenuItemSelected(
 
 	itr->bChecked = !itr->bChecked;
 
-	ImportColumns(currentColumns);
+	SetCurrentColumns(currentColumns);
 
 	// If it was the first column that was changed, need to refresh all columns.
 	if (menuItemId == 1)

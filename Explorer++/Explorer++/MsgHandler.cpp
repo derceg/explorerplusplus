@@ -908,7 +908,7 @@ void Explorerplusplus::OnRefresh()
 
 void Explorerplusplus::CopyColumnInfoToClipboard()
 {
-	auto currentColumns = m_pActiveShellBrowser->ExportCurrentColumns();
+	auto currentColumns = m_pActiveShellBrowser->GetCurrentColumns();
 
 	std::wstring strColumnInfo;
 	int nActiveColumns = 0;

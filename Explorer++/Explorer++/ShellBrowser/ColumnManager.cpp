@@ -945,110 +945,67 @@ void ShellBrowser::SaveColumnWidths()
 	}
 }
 
-std::vector<Column_t> ShellBrowser::ExportCurrentColumns()
+std::vector<Column_t> ShellBrowser::GetCurrentColumns()
 {
-	std::vector<Column_t> columns;
-	int iColumn = 0;
-
-	for (auto itr = m_pActiveColumns->begin(); itr != m_pActiveColumns->end(); itr++)
+	if (m_folderSettings.viewMode == +ViewMode::Details)
 	{
-		if (m_folderSettings.viewMode == +ViewMode::Details && itr->bChecked)
-		{
-			itr->iWidth = ListView_GetColumnWidth(m_hListView, iColumn);
-
-			iColumn++;
-		}
-
-		Column_t column;
-		column.type = itr->type;
-		column.bChecked = itr->bChecked;
-		column.iWidth = itr->iWidth;
-		columns.push_back(column);
+		SaveColumnWidths();
 	}
 
-	return columns;
+	return *m_pActiveColumns;
 }
 
-void ShellBrowser::ImportColumns(const std::vector<Column_t> &columns)
+void ShellBrowser::SetCurrentColumns(const std::vector<Column_t> &columns)
 {
-	Column_t ci;
-	BOOL bResortFolder = FALSE;
-	int iColumn = 0;
-	int i = 0;
+	bool sortFolder = false;
+	int columnIndex = 0;
 
-	for (auto itr = columns.begin(); itr != columns.end(); itr++)
+	for (auto &column : columns)
 	{
-		/* Check if this column represents the current sorting mode.
-		If it does, and it is been removed, set the sort mode back
-		to the first checked column. */
-		if (!itr->bChecked && DetermineColumnSortMode(itr->type) == m_folderSettings.sortMode)
+		// Check if this column represents the current sorting mode. If it does, and it is being
+		// removed, set the sort mode back to the first checked column.
+		if (!column.bChecked && DetermineColumnSortMode(column.type) == m_folderSettings.sortMode)
 		{
-			/* Find the first checked column. */
-			for (auto itr2 = columns.begin(); itr2 != columns.end(); itr2++)
-			{
-				if (itr2->bChecked)
-				{
-					m_folderSettings.sortMode = DetermineColumnSortMode(itr2->type);
+			auto firstChecked =
+				std::find_if(columns.begin(), columns.end(), [](const Column_t &currentColumn) {
+					return currentColumn.bChecked;
+				});
+			assert(firstChecked != columns.end());
 
-					bResortFolder = TRUE;
-					break;
-				}
-			}
+			m_folderSettings.sortMode = DetermineColumnSortMode(firstChecked->type);
+			sortFolder = true;
 		}
 
-		GetColumnInternal(itr->type, &ci);
-
-		if (itr->bChecked)
+		if (m_folderSettings.viewMode != +ViewMode::Details)
 		{
-			if (m_folderSettings.viewMode == +ViewMode::Details)
-			{
-				for (auto itr2 = m_pActiveColumns->begin(); itr2 != m_pActiveColumns->end(); itr2++)
-				{
-					if (itr2->type == itr->type && !itr2->bChecked)
-					{
-						InsertColumn(itr->type, iColumn, itr->iWidth);
-
-						for (i = 0; i < m_nTotalItems; i++)
-						{
-							LVITEM lvItem;
-							lvItem.mask = LVIF_PARAM;
-							lvItem.iItem = i;
-							lvItem.iSubItem = 0;
-							BOOL res = ListView_GetItem(m_hListView, &lvItem);
-
-							if (res)
-							{
-								QueueColumnTask(static_cast<int>(lvItem.lParam), itr->type);
-							}
-						}
-
-						break;
-					}
-				}
-			}
-
-			iColumn++;
+			continue;
 		}
-		else
-		{
-			for (auto itr2 = m_pActiveColumns->begin(); itr2 != m_pActiveColumns->end(); itr2++)
-			{
-				if (itr2->type == itr->type && itr2->bChecked)
 
-				{
-					ListView_DeleteColumn(m_hListView, iColumn);
-					break;
-				}
-			}
+		auto existingColumn = std::find_if(m_pActiveColumns->begin(), m_pActiveColumns->end(),
+			[column](const Column_t &currentColumn) {
+				return currentColumn.type == column.type;
+			});
+		assert(existingColumn != m_pActiveColumns->end());
+
+		if (column.bChecked && !existingColumn->bChecked)
+		{
+			InsertColumn(column.type, columnIndex, column.iWidth);
+		}
+		else if (!column.bChecked && existingColumn->bChecked)
+		{
+			ListView_DeleteColumn(m_hListView, columnIndex);
+		}
+
+		if (column.bChecked)
+		{
+			columnIndex++;
 		}
 	}
 
-	/* Copy the new columns. */
 	*m_pActiveColumns = columns;
 
-	/* The folder will need to be resorted if the
-	sorting column was removed. */
-	if (bResortFolder)
+	// The folder will need to be re-sorted if the sorting column was removed.
+	if (sortFolder)
 	{
 		SortFolder(m_folderSettings.sortMode);
 	}

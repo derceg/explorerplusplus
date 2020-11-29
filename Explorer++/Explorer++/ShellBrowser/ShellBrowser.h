@@ -135,8 +135,8 @@ public:
 	void ShowPropertiesForSelectedFiles() const;
 
 	/* Column support. */
-	std::vector<Column_t> ExportCurrentColumns();
-	void ImportColumns(const std::vector<Column_t> &columns);
+	std::vector<Column_t> GetCurrentColumns();
+	void SetCurrentColumns(const std::vector<Column_t> &columns);
 	static SortMode DetermineColumnSortMode(ColumnType columnType);
 	static int LookupColumnNameStringIndex(ColumnType columnType);
 	static int LookupColumnDescriptionStringIndex(ColumnType columnType);
