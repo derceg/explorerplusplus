@@ -7,7 +7,7 @@
 #include "Plugins/LuaPlugin.h"
 #include "PluginInterface.h"
 
-namespace boost
+namespace std
 {
 	namespace filesystem
 	{
@@ -23,14 +23,14 @@ namespace Plugins
 
 		PluginManager(PluginInterface *pluginInterface);
 
-		void loadAllPlugins(const boost::filesystem::path &pluginDirectory);
+		void loadAllPlugins(const std::filesystem::path &pluginDirectory);
 
 	private:
 
 		static const std::wstring MANIFEST_NAME;
 
-		bool attemptToLoadPlugin(const boost::filesystem::path &directory);
-		bool registerPlugin(const boost::filesystem::path &directory, const Manifest &manifest);
+		bool attemptToLoadPlugin(const std::filesystem::path &directory);
+		bool registerPlugin(const std::filesystem::path &directory, const Manifest &manifest);
 
 		PluginInterface *m_pluginInterface;
 

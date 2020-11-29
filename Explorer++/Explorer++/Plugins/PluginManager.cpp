@@ -8,7 +8,7 @@
 #include "Plugins/Manifest.h"
 #include "Plugins/PluginCommandManager.h"
 #include "../ThirdParty/Sol/forward.hpp"
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 const std::wstring Plugins::PluginManager::MANIFEST_NAME = L"plugin.json";
 
@@ -20,15 +20,18 @@ Plugins::PluginManager::PluginManager(PluginInterface *pluginInterface) :
 
 }
 
-void Plugins::PluginManager::loadAllPlugins(const boost::filesystem::path &pluginDirectory)
+void Plugins::PluginManager::loadAllPlugins(const std::filesystem::path &pluginDirectory)
 {
-	boost::system::error_code error;
+	std::error_code error;
 
 	/* TODO: Ideally, any error would be logged somewhere. For now, it's
 	ignored. */
-	for (const auto &entry : boost::filesystem::directory_iterator(pluginDirectory, error))
+	for (const auto &entry : std::filesystem::directory_iterator(pluginDirectory, error))
 	{
-		if (boost::filesystem::is_directory(entry))
+		std::error_code statusError;
+		auto status = entry.status(statusError);
+
+		if (!statusError && std::filesystem::is_directory(status))
 		{
 			/* TODO: This should return an error code, perhaps using
 			something like std::expected or boost::outcome, once either
@@ -38,7 +41,7 @@ void Plugins::PluginManager::loadAllPlugins(const boost::filesystem::path &plugi
 	}
 }
 
-bool Plugins::PluginManager::attemptToLoadPlugin(const boost::filesystem::path &directory)
+bool Plugins::PluginManager::attemptToLoadPlugin(const std::filesystem::path &directory)
 {
 	auto manifestPath = directory / MANIFEST_NAME;
 	auto manifest = parseManifest(manifestPath);
@@ -51,7 +54,7 @@ bool Plugins::PluginManager::attemptToLoadPlugin(const boost::filesystem::path &
 	return registerPlugin(directory, *manifest);
 }
 
-bool Plugins::PluginManager::registerPlugin(const boost::filesystem::path &directory, const Manifest &manifest)
+bool Plugins::PluginManager::registerPlugin(const std::filesystem::path &directory, const Manifest &manifest)
 {
 	auto plugin = std::make_unique<LuaPlugin>(directory.wstring(), manifest, m_pluginInterface);
 
@@ -73,7 +76,7 @@ bool Plugins::PluginManager::registerPlugin(const boost::filesystem::path &direc
 	// There's a potential race issue here. The file could exist at this
 	// point, but not when used by the safe_script_file call below. That
 	// doesn't really matter though.
-	if (!boost::filesystem::exists(pluginFile))
+	if (!std::filesystem::exists(pluginFile))
 	{
 		return false;
 	}

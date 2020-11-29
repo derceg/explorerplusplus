@@ -7,7 +7,7 @@
 #include "AcceleratorMappings.h"
 #include "Plugins/AcceleratorParser.h"
 #include "../Helper/StringHelper.h"
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <fstream>
 
 void Plugins::from_json(const nlohmann::json &json, Manifest &manifest)
@@ -95,7 +95,7 @@ void Plugins::from_json(const nlohmann::json &json, PluginAccelerator &pluginAcc
 	pluginAccelerator.accelerator = parseAccelerator(pluginAccelerator.acceleratorString);
 }
 
-std::optional<Plugins::Manifest> Plugins::parseManifest(const boost::filesystem::path &manifestPath)
+std::optional<Plugins::Manifest> Plugins::parseManifest(const std::filesystem::path &manifestPath)
 {
 	std::ifstream inputStream(manifestPath.wstring());
 

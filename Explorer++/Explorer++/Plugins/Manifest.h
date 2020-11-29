@@ -9,7 +9,7 @@
 #include <nlohmann/json.hpp>
 #include <optional>
 
-namespace boost
+namespace std
 {
 	namespace filesystem
 	{
@@ -71,7 +71,7 @@ namespace Plugins
 	void from_json(const nlohmann::json &json, PluginShortcutKey &shortcutKey);
 	void from_json(const nlohmann::json &json, PluginAccelerator &pluginAccelerator);
 
-	std::optional<Manifest> parseManifest(const boost::filesystem::path &manifestPath);
+	std::optional<Manifest> parseManifest(const std::filesystem::path &manifestPath);
 }
 
 namespace nlohmann

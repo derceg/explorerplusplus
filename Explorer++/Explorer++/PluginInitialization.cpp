@@ -8,7 +8,7 @@
 #include "MenuHelper.h"
 #include "Plugins/PluginManager.h"
 #include "../Helper/ProcessHelper.h"
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 static const std::wstring PLUGIN_FOLDER_NAME = L"plugins";
 
@@ -22,7 +22,7 @@ void Explorerplusplus::InitializePlugins()
 	TCHAR processImageName[MAX_PATH];
 	GetProcessImageName(GetCurrentProcessId(), processImageName, SIZEOF_ARRAY(processImageName));
 
-	boost::filesystem::path processDirectoryPath(processImageName);
+	std::filesystem::path processDirectoryPath(processImageName);
 	processDirectoryPath.remove_filename();
 	processDirectoryPath.append(PLUGIN_FOLDER_NAME);
 

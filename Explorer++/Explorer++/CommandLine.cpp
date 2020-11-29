@@ -15,9 +15,9 @@
 #include "../Helper/StringHelper.h"
 #include "../ThirdParty/CLI11/CLI11.hpp"
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/log/core.hpp>
+#include <filesystem>
 #include <iostream>
 #include <map>
 
@@ -270,7 +270,7 @@ std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(
 	TCHAR processImageName[MAX_PATH];
 	GetProcessImageName(GetCurrentProcessId(), processImageName, SIZEOF_ARRAY(processImageName));
 
-	boost::filesystem::path processDirectoryPath(processImageName);
+	std::filesystem::path processDirectoryPath(processImageName);
 	processDirectoryPath.remove_filename();
 
 	for (const std::string& directory : commandLineSettings.directories)

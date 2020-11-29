@@ -57,6 +57,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <filesystem>
 #include <iostream>
 #include <memory>
 #include <optional>
@@ -68,7 +69,6 @@
 #include <boost/algorithm/string/join.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/functional/hash.hpp>
 #include <boost/log/common.hpp>
 #include <boost/log/sources/global_logger_storage.hpp>
