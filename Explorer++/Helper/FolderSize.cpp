@@ -4,109 +4,53 @@
 
 #include "stdafx.h"
 #include "FolderSize.h"
-#include "Macros.h"
-#include <list>
+#include <filesystem>
 
-HRESULT CalculateFolderSize(
-	const TCHAR *szPath, int *nFolders, int *nFiles, PULARGE_INTEGER lTotalFolderSize)
+FolderInfo GetFolderInfo(const std::wstring &path)
 {
-	HANDLE hFirstFile;
-	WIN32_FIND_DATA wfd;
-	TCHAR initialPath[MAX_PATH + 2];
-	TCHAR tempPath[MAX_PATH + 2];
-	ULARGE_INTEGER l_TotalFolderSize;
-	ULARGE_INTEGER r_TotalFolderSize;
-	ULARGE_INTEGER lFileSize;
-	int l_NumFiles = 0;
-	int l_NumFolders = 0;
-	int r_NumFiles = 0;
-	int r_NumFolders = 0;
+	FolderInfo folderInfo = {};
+	std::error_code error;
 
-	if (!szPath || !nFolders || !nFiles || !lTotalFolderSize)
+	for (const auto &entry : std::filesystem::directory_iterator(path, error))
 	{
-		return E_INVALIDARG;
-	}
-
-	l_TotalFolderSize.QuadPart = 0;
-	r_TotalFolderSize.QuadPart = 0;
-
-	StringCchCopy(initialPath, SIZEOF_ARRAY(initialPath), szPath);
-	StringCchCat(initialPath, SIZEOF_ARRAY(initialPath), _T("\\*"));
-
-	hFirstFile = FindFirstFile(initialPath, &wfd);
-
-	if (hFirstFile == INVALID_HANDLE_VALUE)
-	{
-		return S_OK;
-	}
-
-	if (StrCmp(wfd.cFileName, _T(".")) != 0)
-	{
-		if ((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+		if (std::filesystem::is_directory(entry.status()))
 		{
-			l_NumFolders++;
+			folderInfo.numFolders++;
+
+			FolderInfo subFolderInfo = GetFolderInfo(entry.path());
+
+			folderInfo.size += subFolderInfo.size;
+			folderInfo.numFolders += subFolderInfo.numFolders;
+			folderInfo.numFiles += subFolderInfo.numFiles;
 		}
 		else
 		{
-			l_NumFiles++;
-		}
-	}
+			std::error_code sizeErrorCode;
+			const auto size = std::filesystem::file_size(entry.path(), sizeErrorCode);
 
-	while (FindNextFile(hFirstFile, &wfd) != 0)
-	{
-		if (StrCmp(wfd.cFileName, _T("..")) != 0)
-		{
-			if ((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+			// If the size can't be retrieved, the error will be ignored and the current file will
+			// effectively be skipped over.
+			if (!sizeErrorCode)
 			{
-				l_NumFolders++;
-
-				StringCchCopy(tempPath, SIZEOF_ARRAY(tempPath), szPath);
-				PathAppend(tempPath, wfd.cFileName);
-
-				CalculateFolderSize(tempPath, &r_NumFolders, &r_NumFiles, &r_TotalFolderSize);
-
-				l_NumFolders += r_NumFolders;
-				l_NumFiles += r_NumFiles;
-				l_TotalFolderSize.QuadPart += r_TotalFolderSize.QuadPart;
-			}
-			else
-			{
-				l_NumFiles++;
-				lFileSize.LowPart = wfd.nFileSizeLow;
-				lFileSize.HighPart = wfd.nFileSizeHigh;
-
-				l_TotalFolderSize.QuadPart += lFileSize.QuadPart;
+				folderInfo.size += size;
+				folderInfo.numFiles++;
 			}
 		}
 	}
 
-	*nFolders = l_NumFolders;
-	*nFiles = l_NumFiles;
-	lTotalFolderSize->QuadPart = l_TotalFolderSize.QuadPart;
-
-	FindClose(hFirstFile);
-
-	return S_OK;
+	return folderInfo;
 }
 
 DWORD WINAPI Thread_CalculateFolderSize(LPVOID lpParameter)
 {
-	FolderSize_t *pFolderSize = nullptr;
-	static int nFiles;
-	static int nFolders;
-	ULARGE_INTEGER lTotalDirSize;
-	HRESULT hr;
+	FolderSize_t *pFolderSize = reinterpret_cast<FolderSize_t *>(lpParameter);
 
-	if (lpParameter == nullptr)
-	{
-		return 0;
-	}
+	auto folderInfo = GetFolderInfo(pFolderSize->szPath);
 
-	pFolderSize = (FolderSize_t *) lpParameter;
+	ULARGE_INTEGER size;
+	size.QuadPart = folderInfo.size;
 
-	hr = CalculateFolderSize(pFolderSize->szPath, &nFolders, &nFiles, &lTotalDirSize);
-
-	pFolderSize->pfnCallback(nFolders, nFiles, &lTotalDirSize, pFolderSize->pData);
+	pFolderSize->pfnCallback(folderInfo.numFolders, folderInfo.numFiles, &size, pFolderSize->pData);
 
 	free(pFolderSize);
 

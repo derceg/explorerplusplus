@@ -284,10 +284,7 @@ std::wstring GetSizeColumnText(
 std::wstring GetFolderSizeColumnText(
 	const BasicItemInfo_t &itemInfo, const GlobalFolderSettings &globalFolderSettings)
 {
-	int numFolders;
-	int numFiles;
-	ULARGE_INTEGER totalFolderSize;
-	CalculateFolderSize(itemInfo.getFullPath().c_str(), &numFolders, &numFiles, &totalFolderSize);
+	auto folderInfo = GetFolderInfo(itemInfo.getFullPath());
 
 	/* TODO: This should
 	be done some other way.
@@ -295,9 +292,12 @@ std::wstring GetFolderSizeColumnText(
 	the internal index. */
 	// m_cachedFolderSizes.insert({internalIndex, totalFolderSize.QuadPart});
 
+	ULARGE_INTEGER size;
+	size.QuadPart = folderInfo.size;
+
 	TCHAR fileSizeText[64];
-	FormatSizeString(totalFolderSize, fileSizeText, SIZEOF_ARRAY(fileSizeText),
-		globalFolderSettings.forceSize, globalFolderSettings.sizeDisplayFormat);
+	FormatSizeString(size, fileSizeText, SIZEOF_ARRAY(fileSizeText), globalFolderSettings.forceSize,
+		globalFolderSettings.sizeDisplayFormat);
 
 	return fileSizeText;
 }

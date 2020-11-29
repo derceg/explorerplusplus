@@ -4,6 +4,15 @@
 
 #pragma once
 
+struct FolderInfo
+{
+	std::uintmax_t size;
+	int numFolders;
+	int numFiles;
+};
+
+FolderInfo GetFolderInfo(const std::wstring &path);
+
 typedef struct
 {
 	TCHAR szPath[MAX_PATH];
@@ -12,5 +21,3 @@ typedef struct
 } FolderSize_t;
 
 DWORD WINAPI Thread_CalculateFolderSize(LPVOID lpParameter);
-HRESULT CalculateFolderSize(
-	const TCHAR *szPath, int *nFolders, int *nFiles, PULARGE_INTEGER lTotalFolderSize);
