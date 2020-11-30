@@ -84,8 +84,6 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 
 	m_bFolderVisited = TRUE;
 
-	PlayNavigationSound();
-
 	m_uniqueFolderId++;
 
 	m_navigationCompletedSignal(pidlDirectory, addHistoryEntry);
@@ -553,14 +551,6 @@ void ShellBrowser::RemoveItem(int iItemInternal)
 	if (nItems == 0 && !m_folderSettings.applyFilter)
 	{
 		ApplyFolderEmptyBackgroundImage(true);
-	}
-}
-
-void ShellBrowser::PlayNavigationSound() const
-{
-	if (m_config->playNavigationSound)
-	{
-		PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART), nullptr, SND_RESOURCE | SND_ASYNC);
 	}
 }
 

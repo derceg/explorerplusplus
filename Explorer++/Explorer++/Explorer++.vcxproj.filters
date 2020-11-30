@@ -928,9 +928,6 @@
     <None Include="res\Folder Empty.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\Navigation Start.wav">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="res\No Preview Available.bmp">
       <Filter>Resource Files</Filter>
     </None>

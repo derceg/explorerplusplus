@@ -183,8 +183,6 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 			_T("OverwriteExistingFilesConfirmation"), m_config->overwriteExistingFilesConfirmation);
 		NRegistrySettings::SaveDwordToRegistry(
 			hSettingsKey, _T("LargeToolbarIcons"), m_config->useLargeToolbarIcons.get());
-		NRegistrySettings::SaveDwordToRegistry(
-			hSettingsKey, _T("PlayNavigationSound"), m_config->playNavigationSound);
 
 		NRegistrySettings::SaveStringToRegistry(
 			hSettingsKey, _T("NewTabDirectory"), m_config->defaultTabDirectory.c_str());
@@ -400,9 +398,6 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		NRegistrySettings::ReadDwordFromRegistry(
 			hSettingsKey, _T("LargeToolbarIcons"), &numericValue);
 		m_config->useLargeToolbarIcons.set(numericValue);
-
-		NRegistrySettings::ReadDwordFromRegistry(
-			hSettingsKey, _T("PlayNavigationSound"), (LPDWORD) &m_config->playNavigationSound);
 
 		TCHAR value[MAX_PATH];
 		NRegistrySettings::ReadStringFromRegistry(

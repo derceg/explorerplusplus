@@ -793,7 +793,6 @@
     <None Include="res\Explorer++.ico" />
     <None Include="res\Filtering Applied.bmp" />
     <None Include="res\Folder Empty.bmp" />
-    <None Include="res\Navigation Start.wav" />
     <None Include="res\No Preview Available.bmp" />
     <None Include="Version.h" />
   </ItemGroup>

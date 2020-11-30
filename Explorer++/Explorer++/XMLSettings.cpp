@@ -110,7 +110,6 @@ will need to be changed correspondingly. */
 #define HASH_TVAUTOEXPAND 1228854897
 #define HASH_OVERWRITEEXISTINGFILESCONFIRMATION 1625342835
 #define HASH_LARGETOOLBARICONS 10895007
-#define HASH_PLAYNAVIGATIONSOUND 1987363412
 #define HASH_ICON_THEME 3998265761
 
 struct ColumnXMLSaveData
@@ -600,9 +599,6 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
 		_T("OverwriteExistingFilesConfirmation"),
 		NXMLSettings::EncodeBoolValue(m_config->overwriteExistingFilesConfirmation));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("PlayNavigationSound"),
-		NXMLSettings::EncodeBoolValue(m_config->playNavigationSound));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ReplaceExplorerMode"),
 		NXMLSettings::EncodeIntValue(static_cast<int>(m_config->replaceExplorerMode)));
@@ -1588,10 +1584,6 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 
 	case HASH_OVERWRITEEXISTINGFILESCONFIRMATION:
 		m_config->overwriteExistingFilesConfirmation = NXMLSettings::DecodeBoolValue(wszValue);
-		break;
-
-	case HASH_PLAYNAVIGATIONSOUND:
-		m_config->playNavigationSound = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_REPLACEEXPLORERMODE:

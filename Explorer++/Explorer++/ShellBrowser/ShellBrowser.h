@@ -322,7 +322,6 @@ private:
 	void SetFirstColumnTextToFilename();
 	void ApplyFolderEmptyBackgroundImage(bool apply);
 	void ApplyFilteringBackgroundImage(bool apply);
-	void PlayNavigationSound() const;
 
 	static LRESULT CALLBACK ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);

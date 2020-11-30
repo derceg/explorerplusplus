@@ -63,7 +63,6 @@ struct Config
 		overwriteExistingFilesConfirmation = TRUE;
 		checkBoxSelection = FALSE;
 		closeMainWindowOnTabClose = TRUE;
-		playNavigationSound = TRUE;
 		confirmCloseTabs = FALSE;
 		synchronizeTreeview = TRUE;
 		displayWindowWidth = DEFAULT_DISPLAYWINDOW_WIDTH;
@@ -165,7 +164,6 @@ struct Config
 	BOOL overwriteExistingFilesConfirmation;
 	BOOL checkBoxSelection;
 	BOOL closeMainWindowOnTabClose;
-	BOOL playNavigationSound;
 	BOOL confirmCloseTabs;
 	BOOL synchronizeTreeview;
 	LONG displayWindowWidth;
