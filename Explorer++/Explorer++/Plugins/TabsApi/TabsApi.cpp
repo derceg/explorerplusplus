@@ -27,8 +27,8 @@ Plugins::TabsApi::FolderSettings::FolderSettings(const ShellBrowser &shellBrowse
 
 std::wstring Plugins::TabsApi::FolderSettings::toString()
 {
-	return _T("sortMode = ") + strToWstr(sortMode._to_string())
-		+ _T(", viewMode = ") + strToWstr(viewMode._to_string())
+	return _T("sortMode = ") + utf8StrToWstr(sortMode._to_string())
+		+ _T(", viewMode = ") + utf8StrToWstr(viewMode._to_string())
 		+ _T(", sortAscending = ") + std::to_wstring(sortAscending)
 		+ _T(", showInGroups = ") + std::to_wstring(showInGroups)
 		+ _T(", showHidden = ") + std::to_wstring(showHidden)

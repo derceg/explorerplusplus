@@ -349,13 +349,15 @@ void TrimString(std::wstring &str, const std::wstring &strWhitespace)
 	TrimStringRight(str, strWhitespace);
 }
 
-std::string wstrToStr(const std::wstring &source)
+// Generally speaking, the string returned by this function should only be used internally. Windows
+// API functions, for example, will expect a different (non utf-8) narrow encoding.
+std::string wstrToUtf8Str(const std::wstring &source)
 {
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 	return converter.to_bytes(source);
 }
 
-std::wstring strToWstr(const std::string &source)
+std::wstring utf8StrToWstr(const std::string &source)
 {
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 	return converter.from_bytes(source);

@@ -16,26 +16,26 @@ void Plugins::from_json(const nlohmann::json &json, Manifest &manifest)
 	auto file = json.at("file").get<std::string>();
 	auto version = json.at("version").get<std::string>();
 
-	manifest.name = strToWstr(name);
-	manifest.file = strToWstr(file);
-	manifest.version = strToWstr(version);
+	manifest.name = utf8StrToWstr(name);
+	manifest.file = utf8StrToWstr(file);
+	manifest.version = utf8StrToWstr(version);
 
 	if (json.count("description") != 0)
 	{
 		auto description = json.at("description").get<std::string>();
-		manifest.description = strToWstr(description);
+		manifest.description = utf8StrToWstr(description);
 	}
 
 	if (json.count("author") != 0)
 	{
 		auto author = json.at("author").get<std::string>();
-		manifest.author = strToWstr(author);
+		manifest.author = utf8StrToWstr(author);
 	}
 
 	if (json.count("homepage") != 0)
 	{
 		auto homepage = json.at("homepage").get<std::string>();
-		manifest.homepage = strToWstr(homepage);
+		manifest.homepage = utf8StrToWstr(homepage);
 	}
 
 	if (json.count("std_libs_required") != 0)
@@ -57,17 +57,17 @@ void Plugins::from_json(const nlohmann::json &json, Manifest &manifest)
 void Plugins::from_json(const nlohmann::json &json, Command &command)
 {
 	auto key = json.at("key").get<std::string>();
-	command.acceleratorString = strToWstr(key);
+	command.acceleratorString = utf8StrToWstr(key);
 
 	auto name = json.at("name").get<std::string>();
-	command.name = strToWstr(name);
+	command.name = utf8StrToWstr(name);
 
 	command.accelerator = parseAccelerator(command.acceleratorString);
 
 	if (json.count("description") != 0)
 	{
 		auto description = json.at("description").get<std::string>();
-		command.description = strToWstr(description);
+		command.description = utf8StrToWstr(description);
 	}
 }
 
@@ -75,7 +75,7 @@ void Plugins::from_json(const nlohmann::json &json, PluginShortcutKey &shortcutK
 {
 	auto command = json.at("command").get<std::string>();
 
-	auto itr = ACCELERATOR_MAPPINGS.find(strToWstr(command));
+	auto itr = ACCELERATOR_MAPPINGS.find(utf8StrToWstr(command));
 
 	if (itr == ACCELERATOR_MAPPINGS.end())
 	{
@@ -90,7 +90,7 @@ void Plugins::from_json(const nlohmann::json &json, PluginShortcutKey &shortcutK
 void Plugins::from_json(const nlohmann::json &json, PluginAccelerator &pluginAccelerator)
 {
 	auto key = json.get<std::string>();
-	pluginAccelerator.acceleratorString = strToWstr(key);
+	pluginAccelerator.acceleratorString = utf8StrToWstr(key);
 
 	pluginAccelerator.accelerator = parseAccelerator(pluginAccelerator.acceleratorString);
 }

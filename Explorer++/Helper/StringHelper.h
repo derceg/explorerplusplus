@@ -30,5 +30,5 @@ void ReplaceCharacterWithString(const TCHAR *szBaseString, TCHAR *szOutput,
 void TrimStringLeft(std::wstring &str, const std::wstring &strWhitespace);
 void TrimStringRight(std::wstring &str, const std::wstring &strWhitespace);
 void TrimString(std::wstring &str, const std::wstring &strWhitespace);
-std::string wstrToStr(const std::wstring &source);
-std::wstring strToWstr(const std::string &source);
+std::string wstrToUtf8Str(const std::wstring &source);
+std::wstring utf8StrToWstr(const std::string &source);

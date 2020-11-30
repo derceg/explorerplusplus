@@ -88,14 +88,14 @@ void ScriptingDialog::OnRun()
 
 	try
 	{
-		std::string convertedCommand = wstrToStr(command);
+		std::string convertedCommand = wstrToUtf8Str(command);
 		auto protectedResult = m_luaPlugin.GetLuaState().safe_script(convertedCommand);
 
 		result = FormatResult(protectedResult);
 	}
 	catch (const sol::error &e)
 	{
-		result = strToWstr(e.what());
+		result = utf8StrToWstr(e.what());
 	}
 
 	boost::replace_all(result, _T("\n"), _T("\r\n"));

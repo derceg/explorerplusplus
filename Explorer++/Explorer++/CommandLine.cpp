@@ -160,18 +160,40 @@ crash with other versions of Windows 10. This option has no effect on earlier ve
 
 	commandLineSettings.jumplistNewTab = false;
 	privateCommands->add_flag(
-		wstrToStr(NExplorerplusplus::JUMPLIST_TASK_NEWTAB_ARGUMENT),
+		wstrToUtf8Str(NExplorerplusplus::JUMPLIST_TASK_NEWTAB_ARGUMENT),
 		commandLineSettings.jumplistNewTab
 	);
 
 	privateCommands->add_option(
-		wstrToStr(NExplorerplusplus::APPLICATION_CRASHED_ARGUMENT),
+		wstrToUtf8Str(NExplorerplusplus::APPLICATION_CRASHED_ARGUMENT),
 		commandLineSettings.crashedData
 	);
 
+	int numArgs;
+	LPWSTR *args = CommandLineToArgvW(GetCommandLine(), &numArgs);
+
+	if (!args)
+	{
+		return std::nullopt;
+	}
+
+	auto freeArgs = wil::scope_exit([args] {
+		LocalFree(args);
+	});
+
+	std::vector<std::string> utf8Args;
+
+	for (int i = numArgs - 1; i > 0; i--)
+	{
+		// The args here are converted from utf-16 to utf-8. While it wouldn't be safe to pass the
+		// resulting utf-8 strings to Windows API functions, it should be ok to use them as
+		// intermediates (to pass to CLI11).
+		utf8Args.emplace_back(wstrToUtf8Str(args[i]));
+	}
+
 	try
 	{
-		app.parse(__argc, __argv);
+		app.parse(utf8Args);
 	}
 	catch (const CLI::ParseError & e)
 	{
@@ -222,7 +244,7 @@ void PreprocessCommandLineSettings(CommandLineSettings &commandLineSettings)
 std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(
 	const CLI::App &app, const CommandLineSettings &commandLineSettings)
 {
-	if (app.count(wstrToStr(NExplorerplusplus::APPLICATION_CRASHED_ARGUMENT)) > 0)
+	if (app.count(wstrToUtf8Str(NExplorerplusplus::APPLICATION_CRASHED_ARGUMENT)) > 0)
 	{
 		OnShowCrashedMessage(commandLineSettings.crashedData);
 		return CommandLine::ExitInfo{ EXIT_SUCCESS };
@@ -262,7 +284,7 @@ std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(
 	{
 		g_bForceLanguageLoad = TRUE;
 
-		StringCchCopy(g_szLang, SIZEOF_ARRAY(g_szLang), strToWstr(commandLineSettings.language).c_str());
+		StringCchCopy(g_szLang, SIZEOF_ARRAY(g_szLang), utf8StrToWstr(commandLineSettings.language).c_str());
 	}
 
 	g_enableDarkMode = commandLineSettings.enableDarkMode;
@@ -276,7 +298,7 @@ std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(
 	for (const std::string& directory : commandLineSettings.directories)
 	{
 		TCHAR szParsingPath[MAX_PATH];
-		DecodePath(strToWstr(directory).c_str(), processDirectoryPath.wstring().c_str(), szParsingPath, SIZEOF_ARRAY(szParsingPath));
+		DecodePath(utf8StrToWstr(directory).c_str(), processDirectoryPath.wstring().c_str(), szParsingPath, SIZEOF_ARRAY(szParsingPath));
 
 		g_commandLineDirectories.emplace_back(szParsingPath);
 	}
@@ -416,7 +438,7 @@ void OnShowCrashedMessage(const CrashedData &crashedData)
 std::optional<std::wstring> CreateMiniDump(const CrashedData &crashedData)
 {
 	wil::unique_event_nothrow event;
-	bool res = event.try_open(strToWstr(crashedData.eventName).c_str());
+	bool res = event.try_open(utf8StrToWstr(crashedData.eventName).c_str());
 
 	if (!res)
 	{
