@@ -299,7 +299,6 @@ private:
 	HWND SetUpListView(HWND parent);
 	int GenerateUniqueItemId();
 	void MarkItemAsCut(int item, bool cut);
-	void DetermineFolderVirtual(PCIDLIST_ABSOLUTE pidlDirectory);
 	void VerifySortMode();
 
 	/* NavigatorInterface methods. */

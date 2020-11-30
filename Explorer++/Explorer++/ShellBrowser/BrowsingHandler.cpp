@@ -137,10 +137,27 @@ void ShellBrowser::ResetFolderState()
 
 HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 {
-	DetermineFolderVirtual(pidlDirectory);
+	wil::com_ptr_nothrow<IShellFolder> parent;
+	PCITEMID_CHILD child;
+	HRESULT hr = SHBindToParent(pidlDirectory, IID_PPV_ARGS(&parent), &child);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	SFGAOF attr = SFGAO_FILESYSTEM;
+	hr = parent->GetAttributesOf(1, &child, &attr);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	m_bVirtualFolder = WI_IsFlagClear(attr, SFGAO_FILESYSTEM);
 
 	wil::com_ptr_nothrow<IShellFolder> pShellFolder;
-	HRESULT hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
+	hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
 
 	if (FAILED(hr))
 	{

@@ -1103,28 +1103,6 @@ void ShellBrowser::GetFolderInfo(FolderInfo_t *pFolderInfo)
 	pFolderInfo->TotalSelectionSize.QuadPart = m_ulFileSelectionSize.QuadPart;
 }
 
-void ShellBrowser::DetermineFolderVirtual(PCIDLIST_ABSOLUTE pidlDirectory)
-{
-	TCHAR szParsingPath[MAX_PATH];
-
-	m_bVirtualFolder = !SHGetPathFromIDList(pidlDirectory, szParsingPath);
-
-	if (m_bVirtualFolder)
-	{
-		/* Mark the recycle bin and desktop as
-		real folders. Shouldn't be able to create
-		folders in Recycle Bin. */
-		if (CompareVirtualFolders(CSIDL_BITBUCKET))
-		{
-			m_bVirtualFolder = TRUE;
-		}
-		else if (CompareVirtualFolders(CSIDL_DESKTOP))
-		{
-			m_bVirtualFolder = FALSE;
-		}
-	}
-}
-
 std::wstring ShellBrowser::GetFilter() const
 {
 	return m_folderSettings.filter;
