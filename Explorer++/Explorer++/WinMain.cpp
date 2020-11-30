@@ -120,11 +120,6 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	LPSTR lpCmdLine,int nCmdShow)
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
-
-	/* This command line string is
-	ANSI, so GetCommandLine is used
-	below to retrieve the Unicode
-	version. */
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
 	bool enableLogging =
