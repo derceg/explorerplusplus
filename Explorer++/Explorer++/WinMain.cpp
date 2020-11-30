@@ -21,6 +21,7 @@
 #include "../Helper/ProcessHelper.h"
 #include "../ThirdParty/CLI11/CLI11.hpp"
 #include <boost/format.hpp>
+#include <boost/locale.hpp>
 #include <boost/scope_exit.hpp>
 #include <wil/resource.h>
 
@@ -34,6 +35,7 @@
 
 ATOM RegisterMainWindowClass(HINSTANCE hInstance);
 LONG WINAPI TopLevelExceptionFilter(EXCEPTION_POINTERS *exception);
+void InitializeLocale();
 
 DWORD dwControlClasses = ICC_BAR_CLASSES|ICC_COOL_CLASSES|
 	ICC_LISTVIEW_CLASSES|ICC_USEREX_CLASSES|ICC_STANDARD_CLASSES|
@@ -337,6 +339,8 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 
 	SetUnhandledExceptionFilter(TopLevelExceptionFilter);
 
+	InitializeLocale();
+
 	g_hAccl = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINACCELERATORS));
 
 	/* Create the main window. This window will act as a
@@ -445,4 +449,15 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	}
 
 	return (int)msg.wParam;
+}
+
+void InitializeLocale()
+{
+	auto backendManager = boost::locale::localization_backend_manager::global();
+	backendManager.select("winapi");
+	boost::locale::localization_backend_manager::global(backendManager);
+
+	// Use the system default locale.
+	boost::locale::generator gen;
+	std::locale::global(gen(""));
 }

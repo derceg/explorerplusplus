@@ -23,7 +23,7 @@
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
-#include <boost/algorithm/string.hpp>
+#include <boost/locale.hpp>
 #include <iomanip>
 #include <list>
 #include <regex>
@@ -383,13 +383,13 @@ void MassRenameDialog::ProcessFileName(const std::wstring &strTarget,
 	while ((iPos = strOutput.find(_T("/L"))) != std::wstring::npos)
 	{
 		strOutput.replace(iPos, 2, strFilename);
-		boost::to_lower(strOutput);
+		strOutput = boost::locale::to_lower(strOutput);
 	}
 
 	while ((iPos = strOutput.find(_T("/U"))) != std::wstring::npos)
 	{
 		strOutput.replace(iPos, 2, strFilename);
-		boost::to_upper(strOutput);
+		strOutput = boost::locale::to_upper(strOutput);
 	}
 }
 
