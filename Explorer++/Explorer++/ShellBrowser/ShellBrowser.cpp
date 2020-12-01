@@ -568,8 +568,10 @@ HRESULT ShellBrowser::GetItemFullName(int iIndex, TCHAR *FullItemPath, UINT cchM
 void ShellBrowser::QueryFullItemNameInternal(
 	int iItemInternal, TCHAR *szFullFileName, UINT cchMax) const
 {
-	GetDisplayName(m_itemInfoMap.at(iItemInternal).pidlComplete.get(), szFullFileName, cchMax,
-		SHGDN_FORPARSING);
+	std::wstring name;
+	GetDisplayName(m_itemInfoMap.at(iItemInternal).pidlComplete.get(), SHGDN_FORPARSING, name);
+
+	StringCchCopy(szFullFileName, cchMax, name.c_str());
 }
 
 std::wstring ShellBrowser::GetDirectory() const
@@ -776,11 +778,10 @@ int ShellBrowser::GetDirMonitorId() const
 
 BOOL ShellBrowser::CompareVirtualFolders(UINT uFolderCSIDL) const
 {
-	TCHAR szParsingPath[MAX_PATH];
+	std::wstring parsingPath;
+	GetCsidlDisplayName(uFolderCSIDL, SHGDN_FORPARSING, parsingPath);
 
-	GetCsidlDisplayName(uFolderCSIDL, szParsingPath, SIZEOF_ARRAY(szParsingPath), SHGDN_FORPARSING);
-
-	if (StrCmp(m_CurDir, szParsingPath) == 0)
+	if (parsingPath == m_CurDir)
 	{
 		return TRUE;
 	}
@@ -1292,13 +1293,10 @@ void ShellBrowser::QueueRename(PCIDLIST_ABSOLUTE pidlItem)
 	Once a match is found, rename the item
 	in-place within the listview. */
 
-	TCHAR szItem[MAX_PATH];
 	LVITEM lvItem;
 	BOOL bItemFound = FALSE;
 	int nItems;
 	int i = 0;
-
-	GetDisplayName(pidlItem, szItem, SIZEOF_ARRAY(szItem), SHGDN_INFOLDER);
 
 	nItems = ListView_GetItemCount(m_hListView);
 
@@ -1448,7 +1446,6 @@ void ShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 {
 	LVITEM lvItem;
 	SHFILEINFO shfi;
-	TCHAR szDisplayName[MAX_PATH];
 	HRESULT hr;
 	int iItem = -1;
 	int iItemInternal = -1;
@@ -1456,7 +1453,8 @@ void ShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 
 	/* Look for the item using its display name, NOT
 	its drive letter/name. */
-	GetDisplayName(szDrive, szDisplayName, SIZEOF_ARRAY(szDisplayName), SHGDN_INFOLDER);
+	std::wstring displayName;
+	GetDisplayName(szDrive, SHGDN_INFOLDER, displayName);
 
 	unique_pidl_absolute pidlDrive;
 	hr = SHParseDisplayName(szDrive, nullptr, wil::out_param(pidlDrive), 0, nullptr);
@@ -1485,14 +1483,14 @@ void ShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 	{
 		SHGetFileInfo(szDrive, 0, &shfi, sizeof(shfi), SHGFI_SYSICONINDEX);
 
-		m_itemInfoMap.at(iItemInternal).displayName = szDisplayName;
+		m_itemInfoMap.at(iItemInternal).displayName = displayName;
 
 		/* Update the drives icon and display name. */
 		lvItem.mask = LVIF_TEXT | LVIF_IMAGE;
 		lvItem.iImage = shfi.iIcon;
 		lvItem.iItem = iItem;
 		lvItem.iSubItem = 0;
-		lvItem.pszText = szDisplayName;
+		lvItem.pszText = displayName.data();
 		ListView_SetItem(m_hListView, &lvItem);
 	}
 }

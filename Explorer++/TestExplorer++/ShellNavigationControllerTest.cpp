@@ -145,9 +145,8 @@ protected:
 			return nullptr;
 		}
 
-		TCHAR displayName[MAX_PATH];
-		HRESULT hr = GetDisplayName(
-			pidl.get(), displayName, static_cast<UINT>(std::size(displayName)), SHGDN_INFOLDER);
+		std::wstring displayName;
+		HRESULT hr = GetDisplayName(pidl.get(), SHGDN_INFOLDER, displayName);
 
 		if (FAILED(hr))
 		{

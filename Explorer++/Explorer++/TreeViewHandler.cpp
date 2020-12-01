@@ -244,18 +244,17 @@ void Explorerplusplus::OnTreeViewCopyItemPath() const
 	{
 		auto pidl = m_shellTreeView->GetItemPidl(hItem);
 
-		TCHAR szFullFileName[MAX_PATH];
-		GetDisplayName(pidl.get(), szFullFileName, SIZEOF_ARRAY(szFullFileName), SHGDN_FORPARSING);
+		std::wstring fullFileName;
+		GetDisplayName(pidl.get(), SHGDN_FORPARSING, fullFileName);
 
 		BulkClipboardWriter clipboardWriter;
-		clipboardWriter.WriteText(szFullFileName);
+		clipboardWriter.WriteText(fullFileName);
 	}
 }
 
 void Explorerplusplus::OnTreeViewCopyUniversalPaths() const
 {
 	HTREEITEM hItem;
-	TCHAR szFullFileName[MAX_PATH];
 	UNIVERSAL_NAME_INFO uni;
 	DWORD dwBufferSize;
 	DWORD dwRet;
@@ -266,11 +265,12 @@ void Explorerplusplus::OnTreeViewCopyUniversalPaths() const
 	{
 		auto pidl = m_shellTreeView->GetItemPidl(hItem);
 
-		GetDisplayName(pidl.get(), szFullFileName, SIZEOF_ARRAY(szFullFileName), SHGDN_FORPARSING);
+		std::wstring fullFileName;
+		GetDisplayName(pidl.get(), SHGDN_FORPARSING, fullFileName);
 
 		dwBufferSize = sizeof(uni);
 		dwRet = WNetGetUniversalName(
-			szFullFileName, UNIVERSAL_NAME_INFO_LEVEL, (void **) &uni, &dwBufferSize);
+			fullFileName.c_str(), UNIVERSAL_NAME_INFO_LEVEL, (void **) &uni, &dwBufferSize);
 
 		BulkClipboardWriter clipboardWriter;
 
@@ -280,7 +280,7 @@ void Explorerplusplus::OnTreeViewCopyUniversalPaths() const
 		}
 		else
 		{
-			clipboardWriter.WriteText(szFullFileName);
+			clipboardWriter.WriteText(fullFileName);
 		}
 	}
 }
@@ -450,11 +450,14 @@ void Explorerplusplus::OnTreeViewSetFileAttributes() const
 	NSetFileAttributesDialogExternal::SetFileAttributesInfo sfai;
 
 	auto pidlItem = m_shellTreeView->GetItemPidl(hItem);
-	HRESULT hr = GetDisplayName(
-		pidlItem.get(), sfai.szFullFileName, SIZEOF_ARRAY(sfai.szFullFileName), SHGDN_FORPARSING);
+
+	std::wstring fullFileName;
+	HRESULT hr = GetDisplayName(pidlItem.get(), SHGDN_FORPARSING, fullFileName);
 
 	if (hr == S_OK)
 	{
+		StringCchCopy(sfai.szFullFileName, SIZEOF_ARRAY(sfai.szFullFileName), fullFileName.c_str());
+
 		HANDLE hFindFile = FindFirstFile(sfai.szFullFileName, &sfai.wfd);
 
 		if (hFindFile != INVALID_HANDLE_VALUE)
@@ -473,7 +476,6 @@ void Explorerplusplus::OnTreeViewSetFileAttributes() const
 void Explorerplusplus::UpdateTreeViewSelection()
 {
 	HTREEITEM hItem;
-	TCHAR szDirectory[MAX_PATH];
 	TCHAR szRoot[MAX_PATH];
 	UINT uDriveType;
 	BOOL bNetworkPath = FALSE;
@@ -485,15 +487,16 @@ void Explorerplusplus::UpdateTreeViewSelection()
 
 	auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
-	GetDisplayName(pidlDirectory.get(), szDirectory, SIZEOF_ARRAY(szDirectory), SHGDN_FORPARSING);
+	std::wstring directory;
+	GetDisplayName(pidlDirectory.get(), SHGDN_FORPARSING, directory);
 
-	if (PathIsUNC(szDirectory))
+	if (PathIsUNC(directory.c_str()))
 	{
 		bNetworkPath = TRUE;
 	}
 	else
 	{
-		StringCchCopy(szRoot, SIZEOF_ARRAY(szRoot), szDirectory);
+		StringCchCopy(szRoot, SIZEOF_ARRAY(szRoot), directory.c_str());
 		PathStripToRoot(szRoot);
 		uDriveType = GetDriveType(szRoot);
 

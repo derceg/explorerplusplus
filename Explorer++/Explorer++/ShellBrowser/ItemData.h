@@ -35,8 +35,8 @@ struct BasicItemInfo_t
 
 	std::wstring getFullPath() const
 	{
-		TCHAR fullPath[MAX_PATH];
-		GetDisplayName(pidlComplete.get(), fullPath, SIZEOF_ARRAY(fullPath), SHGDN_FORPARSING);
+		std::wstring fullPath;
+		GetDisplayName(pidlComplete.get(), SHGDN_FORPARSING, fullPath);
 		return fullPath;
 	}
 };

@@ -534,7 +534,6 @@ void ShellBrowser::RenameItem(int iItemInternal, const TCHAR *szNewFileName)
 	PCITEMID_CHILD pidlRelative = nullptr;
 	SHFILEINFO shfi;
 	LVFINDINFO lvfi;
-	TCHAR szDisplayName[MAX_PATH];
 	LVITEM lvItem;
 	TCHAR szFullFileName[MAX_PATH];
 	DWORD_PTR res;
@@ -560,18 +559,18 @@ void ShellBrowser::RenameItem(int iItemInternal, const TCHAR *szNewFileName)
 
 		if (SUCCEEDED(hr))
 		{
-			hr = GetDisplayName(szFullFileName, szDisplayName, SIZEOF_ARRAY(szDisplayName),
-				SHGDN_INFOLDER | SHGDN_FORPARSING);
+			std::wstring displayName;
+			hr = GetDisplayName(szFullFileName, SHGDN_INFOLDER | SHGDN_FORPARSING, displayName);
 
-			TCHAR editingName[MAX_PATH];
-			HRESULT editingNameResult = GetDisplayName(szFullFileName, editingName,
-				SIZEOF_ARRAY(editingName), SHGDN_INFOLDER | SHGDN_FOREDITING);
+			std::wstring editingName;
+			HRESULT editingNameResult =
+				GetDisplayName(szFullFileName, SHGDN_INFOLDER | SHGDN_FOREDITING, editingName);
 
 			if (SUCCEEDED(hr) && SUCCEEDED(editingNameResult))
 			{
 				itemInfo.pidlComplete.reset(ILCloneFull(pidlFull.get()));
 				itemInfo.pridl.reset(ILCloneChild(pidlRelative));
-				itemInfo.displayName = szDisplayName;
+				itemInfo.displayName = displayName;
 				itemInfo.editingName = editingName;
 				StringCchCopy(
 					itemInfo.wfd.cFileName, SIZEOF_ARRAY(itemInfo.wfd.cFileName), szNewFileName);

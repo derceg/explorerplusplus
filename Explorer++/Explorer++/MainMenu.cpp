@@ -106,15 +106,15 @@ void Explorerplusplus::SetGoMenuName(HMENU hMenu, UINT uMenuID, UINT csidl)
 	/* Don't use SUCCEEDED(hr). */
 	if (hr == S_OK)
 	{
-		TCHAR szFolderName[MAX_PATH];
-		hr = GetDisplayName(pidl.get(), szFolderName, SIZEOF_ARRAY(szFolderName), SHGDN_INFOLDER);
+		std::wstring folderName;
+		hr = GetDisplayName(pidl.get(), SHGDN_INFOLDER, folderName);
 
 		if (SUCCEEDED(hr))
 		{
 			MENUITEMINFO mii;
 			mii.cbSize = sizeof(mii);
 			mii.fMask = MIIM_STRING;
-			mii.dwTypeData = szFolderName;
+			mii.dwTypeData = folderName.data();
 			SetMenuItemInfo(hMenu, uMenuID, FALSE, &mii);
 
 			return;

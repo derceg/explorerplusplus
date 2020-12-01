@@ -52,9 +52,9 @@ using unique_pidl_child = wil::unique_cotaskmem_ptr<std::remove_pointer_t<PITEMI
 
 void DecodePath(const TCHAR *szInitialPath, const TCHAR *szCurrentDirectory, TCHAR *szParsingPath,
 	size_t cchDest);
-HRESULT GetDisplayName(const TCHAR *szParsingPath, TCHAR *szDisplayName, UINT cchMax, DWORD uFlags);
-HRESULT GetDisplayName(PCIDLIST_ABSOLUTE pidl, TCHAR *szDisplayName, UINT cchMax, DWORD uFlags);
-HRESULT GetCsidlDisplayName(int csidl, TCHAR *szFolderName, UINT cchMax, DWORD uParsingFlags);
+HRESULT GetDisplayName(const std::wstring &parsingPath, DWORD flags, std::wstring &output);
+HRESULT GetDisplayName(PCIDLIST_ABSOLUTE pidl, DWORD flags, std::wstring &output);
+HRESULT GetCsidlDisplayName(int csidl, DWORD flags, std::wstring &output);
 BOOL CheckIdl(PCIDLIST_ABSOLUTE pidl);
 BOOL IsIdlDirectory(PCIDLIST_ABSOLUTE pidl);
 HRESULT GetVirtualParentPath(PCIDLIST_ABSOLUTE pidlDirectory, PIDLIST_ABSOLUTE *pidlParent);
@@ -88,7 +88,7 @@ BOOL ExecuteFileAction(HWND hwnd, const TCHAR *szVerb, const TCHAR *szParameters
 	const TCHAR *szStartDirectory, LPCITEMIDLIST pidl);
 BOOL ExecuteAndShowCurrentProcess(HWND hwnd, const TCHAR *szParameters);
 BOOL ExecuteAndShowProcess(HWND hwnd, const TCHAR *szProcess, const TCHAR *szParameters);
-HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath, TCHAR *szParsingPath, UINT cchMax);
+HRESULT DecodeFriendlyPath(const std::wstring &friendlyPath, std::wstring &parsingPath);
 HRESULT ShowMultipleFileProperties(
 	PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD *ppidl, HWND hwndOwner, int nFiles);
 HRESULT ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD *ppidl,

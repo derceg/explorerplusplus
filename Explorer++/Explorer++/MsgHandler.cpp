@@ -212,13 +212,13 @@ void Explorerplusplus::OpenItem(
 		else if (uAttributes & SFGAO_LINK && !bControlPanelParent)
 		{
 			/* This item is a shortcut. */
-			TCHAR szItemPath[MAX_PATH];
 			TCHAR szTargetPath[MAX_PATH];
 
-			GetDisplayName(pidlItem, szItemPath, SIZEOF_ARRAY(szItemPath), SHGDN_FORPARSING);
+			std::wstring itemPath;
+			GetDisplayName(pidlItem, SHGDN_FORPARSING, itemPath);
 
 			hr = NFileOperations::ResolveLink(
-				m_hContainer, 0, szItemPath, szTargetPath, SIZEOF_ARRAY(szTargetPath));
+				m_hContainer, 0, itemPath.c_str(), szTargetPath, SIZEOF_ARRAY(szTargetPath));
 
 			if (hr == S_OK)
 			{
@@ -270,10 +270,10 @@ void Explorerplusplus::OpenItem(
 		}
 		else if (bControlPanelParent && (uAttributes & SFGAO_FOLDER))
 		{
-			TCHAR szParsingPath[MAX_PATH];
 			TCHAR szExplorerPath[MAX_PATH];
 
-			GetDisplayName(pidlItem, szParsingPath, SIZEOF_ARRAY(szParsingPath), SHGDN_FORPARSING);
+			std::wstring parsingPath;
+			GetDisplayName(pidlItem, SHGDN_FORPARSING, parsingPath);
 
 			MyExpandEnvironmentStrings(
 				_T("%windir%\\explorer.exe"), szExplorerPath, SIZEOF_ARRAY(szExplorerPath));
@@ -284,8 +284,8 @@ void Explorerplusplus::OpenItem(
 			1. Explorer can only open folder items.
 			2. Non-folder items can be opened directly (regardless of
 			whether or not they're children of the control panel). */
-			ShellExecute(
-				m_hContainer, _T("open"), szExplorerPath, szParsingPath, nullptr, SW_SHOWNORMAL);
+			ShellExecute(m_hContainer, _T("open"), szExplorerPath, parsingPath.c_str(), nullptr,
+				SW_SHOWNORMAL);
 		}
 		else
 		{
@@ -311,11 +311,10 @@ void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szP
 	unique_pidl_absolute pidlParent(ILCloneFull(pidlItem));
 	ILRemoveLastID(pidlParent.get());
 
-	TCHAR szItemDirectory[MAX_PATH];
-	GetDisplayName(
-		pidlParent.get(), szItemDirectory, SIZEOF_ARRAY(szItemDirectory), SHGDN_FORPARSING);
+	std::wstring itemDirectory;
+	GetDisplayName(pidlParent.get(), SHGDN_FORPARSING, itemDirectory);
 
-	ExecuteFileAction(m_hContainer, EMPTY_STRING, szParameters, szItemDirectory, pidlItem);
+	ExecuteFileAction(m_hContainer, EMPTY_STRING, szParameters, itemDirectory.c_str(), pidlItem);
 }
 
 BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)

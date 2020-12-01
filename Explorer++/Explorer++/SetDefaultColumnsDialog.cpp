@@ -6,6 +6,7 @@
 #include "SetDefaultColumnsDialog.h"
 #include "DarkModeHelper.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
@@ -33,47 +34,46 @@ INT_PTR SetDefaultColumnsDialog::OnInitDialog()
 
 	HWND hComboBox = GetDlgItem(m_hDlg, IDC_DEFAULTCOLUMNS_COMBOBOX);
 
-	TCHAR szFolderName[MAX_PATH];
-	int iPos;
+	std::wstring folderName;
+	int pos;
 
-	GetCsidlDisplayName(CSIDL_CONTROLS, szFolderName, SIZEOF_ARRAY(szFolderName), SHGDN_INFOLDER);
-	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
-		reinterpret_cast<LPARAM>(szFolderName)));
+	GetCsidlDisplayName(CSIDL_CONTROLS, SHGDN_INFOLDER, folderName);
+	pos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
+		reinterpret_cast<LPARAM>(folderName.c_str())));
 	m_FolderMap.insert(
-		std::unordered_map<int, FolderType>::value_type(iPos, FolderType::ControlPanel));
+		std::unordered_map<int, FolderType>::value_type(pos, FolderType::ControlPanel));
 
-	LoadString(GetInstance(), IDS_DEFAULTCOLUMNS_GENERAL, szFolderName, SIZEOF_ARRAY(szFolderName));
-	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
-		reinterpret_cast<LPARAM>(szFolderName)));
-	m_FolderMap.insert(std::unordered_map<int, FolderType>::value_type(iPos, FolderType::General));
+	folderName = ResourceHelper::LoadString(GetInstance(), IDS_DEFAULTCOLUMNS_GENERAL);
+	pos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
+		reinterpret_cast<LPARAM>(folderName.c_str())));
+	m_FolderMap.insert(std::unordered_map<int, FolderType>::value_type(pos, FolderType::General));
 
-	GetCsidlDisplayName(CSIDL_DRIVES, szFolderName, SIZEOF_ARRAY(szFolderName), SHGDN_INFOLDER);
-	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
-		reinterpret_cast<LPARAM>(szFolderName)));
-	m_FolderMap.insert(std::unordered_map<int, FolderType>::value_type(iPos, FolderType::Computer));
+	GetCsidlDisplayName(CSIDL_DRIVES, SHGDN_INFOLDER, folderName);
+	pos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
+		reinterpret_cast<LPARAM>(folderName.c_str())));
+	m_FolderMap.insert(std::unordered_map<int, FolderType>::value_type(pos, FolderType::Computer));
 
-	GetCsidlDisplayName(
-		CSIDL_CONNECTIONS, szFolderName, SIZEOF_ARRAY(szFolderName), SHGDN_INFOLDER);
-	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
-		reinterpret_cast<LPARAM>(szFolderName)));
-	m_FolderMap.insert(std::unordered_map<int, FolderType>::value_type(iPos, FolderType::Network));
+	GetCsidlDisplayName(CSIDL_CONNECTIONS, SHGDN_INFOLDER, folderName);
+	pos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
+		reinterpret_cast<LPARAM>(folderName.c_str())));
+	m_FolderMap.insert(std::unordered_map<int, FolderType>::value_type(pos, FolderType::Network));
 
-	GetCsidlDisplayName(CSIDL_NETWORK, szFolderName, SIZEOF_ARRAY(szFolderName), SHGDN_INFOLDER);
-	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
-		reinterpret_cast<LPARAM>(szFolderName)));
+	GetCsidlDisplayName(CSIDL_NETWORK, SHGDN_INFOLDER, folderName);
+	pos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
+		reinterpret_cast<LPARAM>(folderName.c_str())));
 	m_FolderMap.insert(
-		std::unordered_map<int, FolderType>::value_type(iPos, FolderType::NetworkPlaces));
+		std::unordered_map<int, FolderType>::value_type(pos, FolderType::NetworkPlaces));
 
-	GetCsidlDisplayName(CSIDL_PRINTERS, szFolderName, SIZEOF_ARRAY(szFolderName), SHGDN_INFOLDER);
-	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
-		reinterpret_cast<LPARAM>(szFolderName)));
-	m_FolderMap.insert(std::unordered_map<int, FolderType>::value_type(iPos, FolderType::Printers));
+	GetCsidlDisplayName(CSIDL_PRINTERS, SHGDN_INFOLDER, folderName);
+	pos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
+		reinterpret_cast<LPARAM>(folderName.c_str())));
+	m_FolderMap.insert(std::unordered_map<int, FolderType>::value_type(pos, FolderType::Printers));
 
-	GetCsidlDisplayName(CSIDL_BITBUCKET, szFolderName, SIZEOF_ARRAY(szFolderName), SHGDN_INFOLDER);
-	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
-		reinterpret_cast<LPARAM>(szFolderName)));
+	GetCsidlDisplayName(CSIDL_BITBUCKET, SHGDN_INFOLDER, folderName);
+	pos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
+		reinterpret_cast<LPARAM>(folderName.c_str())));
 	m_FolderMap.insert(
-		std::unordered_map<int, FolderType>::value_type(iPos, FolderType::RecycleBin));
+		std::unordered_map<int, FolderType>::value_type(pos, FolderType::RecycleBin));
 
 	auto folderType = m_psdcdps->m_FolderType;
 	auto itr = std::find_if(m_FolderMap.begin(), m_FolderMap.end(),
@@ -270,7 +270,7 @@ void SetDefaultColumnsDialog::SaveCurrentColumnState(FolderType folderType)
 {
 	HWND hListView = GetDlgItem(m_hDlg, IDC_DEFAULTCOLUMNS_LISTVIEW);
 
-	auto & currentColumns = GetCurrentColumnList(folderType);
+	auto &currentColumns = GetCurrentColumnList(folderType);
 	std::vector<Column_t> tempColumns;
 
 	for (int i = 0; i < ListView_GetItemCount(hListView); i++)
@@ -371,8 +371,8 @@ void SetDefaultColumnsDialog::OnLvnItemChanged(NMLISTVIEW *pnmlv)
 		lvItem.iSubItem = 0;
 		ListView_GetItem(hListView, &lvItem);
 
-		int iDescriptionStringIndex =
-			ShellBrowser::LookupColumnDescriptionStringIndex(static_cast<ColumnType>(lvItem.lParam));
+		int iDescriptionStringIndex = ShellBrowser::LookupColumnDescriptionStringIndex(
+			static_cast<ColumnType>(lvItem.lParam));
 
 		TCHAR szColumnDescription[128];
 		LoadString(GetInstance(), iDescriptionStringIndex, szColumnDescription,

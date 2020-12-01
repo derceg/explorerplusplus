@@ -82,8 +82,8 @@ void Explorerplusplus::OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pid
 		return;
 	}
 
-	TCHAR displayName[MAX_PATH];
-	HRESULT hr = GetDisplayName(pidl, displayName, SIZEOF_ARRAY(displayName), SHGDN_INFOLDER);
+	std::wstring displayName;
+	HRESULT hr = GetDisplayName(pidl, SHGDN_INFOLDER, displayName);
 
 	if (FAILED(hr))
 	{
@@ -93,7 +93,7 @@ void Explorerplusplus::OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pid
 	TCHAR szTemp[64];
 	TCHAR szLoadingText[512];
 	LoadString(m_hLanguageModule, IDS_GENERAL_LOADING, szTemp, SIZEOF_ARRAY(szTemp));
-	StringCchPrintf(szLoadingText, SIZEOF_ARRAY(szLoadingText), szTemp, displayName);
+	StringCchPrintf(szLoadingText, SIZEOF_ARRAY(szLoadingText), szTemp, displayName.c_str());
 
 	/* Browsing of a folder has started. Set the status bar text to indicate that
 	the folder is being loaded. */

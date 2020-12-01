@@ -180,8 +180,8 @@ BookmarkItems BookmarkDropper::ExtractBookmarkItemsFromHDrop()
 			continue;
 		}
 
-		TCHAR displayName[MAX_PATH];
-		GetDisplayName(droppedFile.c_str(), displayName, SIZEOF_ARRAY(displayName), SHGDN_INFOLDER);
+		std::wstring displayName;
+		GetDisplayName(droppedFile.c_str(), SHGDN_INFOLDER, displayName);
 
 		auto bookmarkItem =
 			std::make_unique<BookmarkItem>(std::nullopt, displayName, droppedFile.c_str());

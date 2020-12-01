@@ -68,13 +68,13 @@ HRESULT Navigation::BrowseFolderInCurrentTab(PCIDLIST_ABSOLUTE pidlDirectory)
 
 void Navigation::OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory)
 {
-	TCHAR szPath[MAX_PATH];
-	TCHAR szParameters[512];
-
 	/* Create a new instance of this program, with the
 	specified path as an argument. */
-	GetDisplayName(pidlDirectory, szPath, SIZEOF_ARRAY(szPath), SHGDN_FORPARSING);
-	StringCchPrintf(szParameters, SIZEOF_ARRAY(szParameters), _T("\"%s\""), szPath);
+	std::wstring path;
+	GetDisplayName(pidlDirectory, SHGDN_FORPARSING, path);
+
+	TCHAR szParameters[512];
+	StringCchPrintf(szParameters, SIZEOF_ARRAY(szParameters), _T("\"%s\""), path.c_str());
 
 	ExecuteAndShowCurrentProcess(m_expp->GetMainWindow(), szParameters);
 }

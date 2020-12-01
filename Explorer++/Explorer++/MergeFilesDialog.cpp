@@ -426,16 +426,15 @@ void MergeFilesDialog::OnChangeOutputDirectory()
 		return;
 	}
 
-	TCHAR parsingName[MAX_PATH];
-	HRESULT hr =
-		GetDisplayName(pidl.get(), parsingName, SIZEOF_ARRAY(parsingName), SHGDN_FORPARSING);
+	std::wstring parsingName;
+	HRESULT hr = GetDisplayName(pidl.get(), SHGDN_FORPARSING, parsingName);
 
 	if (FAILED(hr))
 	{
 		return;
 	}
 
-	SetDlgItemText(m_hDlg, IDC_MERGE_EDIT_FILENAME, parsingName);
+	SetDlgItemText(m_hDlg, IDC_MERGE_EDIT_FILENAME, parsingName.c_str());
 }
 
 void MergeFilesDialog::OnMove(bool bUp)

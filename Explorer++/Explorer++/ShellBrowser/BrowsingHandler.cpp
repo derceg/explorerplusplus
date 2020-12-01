@@ -35,12 +35,12 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 	m_FileSelectionList.clear();
 	LeaveCriticalSection(&m_csDirectoryAltered);
 
-	TCHAR szParsingPath[MAX_PATH];
-	GetDisplayName(pidlDirectory, szParsingPath, SIZEOF_ARRAY(szParsingPath), SHGDN_FORPARSING);
+	std::wstring parsingPath;
+	GetDisplayName(pidlDirectory, SHGDN_FORPARSING, parsingPath);
 
 	navigationStarted.m_signal(pidlDirectory);
 
-	StringCchCopy(m_CurDir, SIZEOF_ARRAY(m_CurDir), szParsingPath);
+	StringCchCopy(m_CurDir, SIZEOF_ARRAY(m_CurDir), parsingPath.c_str());
 
 	/* Stop the list view from redrawing itself each time is inserted.
 	Redrawing will be allowed once all items have being inserted.

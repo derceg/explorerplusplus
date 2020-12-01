@@ -572,11 +572,10 @@ std::wstring GetImageColumnText(const BasicItemInfo_t &itemInfo, PROPID Property
 
 std::wstring GetFileSystemColumnText(const BasicItemInfo_t &itemInfo)
 {
-	TCHAR fullFileName[MAX_PATH];
-	GetDisplayName(
-		itemInfo.pidlComplete.get(), fullFileName, SIZEOF_ARRAY(fullFileName), SHGDN_FORPARSING);
+	std::wstring fullFileName;
+	GetDisplayName(itemInfo.pidlComplete.get(), SHGDN_FORPARSING, fullFileName);
 
-	BOOL isRoot = PathIsRoot(fullFileName);
+	BOOL isRoot = PathIsRoot(fullFileName.c_str());
 
 	if (!isRoot)
 	{
@@ -584,7 +583,7 @@ std::wstring GetFileSystemColumnText(const BasicItemInfo_t &itemInfo)
 	}
 
 	TCHAR fileSystemName[MAX_PATH];
-	BOOL res = GetVolumeInformation(fullFileName, nullptr, 0, nullptr, nullptr, nullptr,
+	BOOL res = GetVolumeInformation(fullFileName.c_str(), nullptr, 0, nullptr, nullptr, nullptr,
 		fileSystemName, SIZEOF_ARRAY(fileSystemName));
 
 	if (!res)
@@ -978,11 +977,10 @@ std::wstring GetDriveSpaceColumnText(const BasicItemInfo_t &itemInfo, bool Total
 BOOL GetDriveSpaceColumnRawData(
 	const BasicItemInfo_t &itemInfo, bool TotalSize, ULARGE_INTEGER &DriveSpace)
 {
-	TCHAR fullFileName[MAX_PATH];
-	GetDisplayName(
-		itemInfo.pidlComplete.get(), fullFileName, SIZEOF_ARRAY(fullFileName), SHGDN_FORPARSING);
+	std::wstring fullFileName;
+	GetDisplayName(itemInfo.pidlComplete.get(), SHGDN_FORPARSING, fullFileName);
 
-	BOOL isRoot = PathIsRoot(fullFileName);
+	BOOL isRoot = PathIsRoot(fullFileName.c_str());
 
 	if (!isRoot)
 	{
@@ -991,7 +989,7 @@ BOOL GetDriveSpaceColumnRawData(
 
 	ULARGE_INTEGER totalBytes;
 	ULARGE_INTEGER freeBytes;
-	BOOL res = GetDiskFreeSpaceEx(fullFileName, nullptr, &totalBytes, &freeBytes);
+	BOOL res = GetDiskFreeSpaceEx(fullFileName.c_str(), nullptr, &totalBytes, &freeBytes);
 
 	if (TotalSize)
 	{

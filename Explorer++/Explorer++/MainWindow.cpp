@@ -84,27 +84,25 @@ void MainWindow::UpdateWindowText()
 	const Tab &tab = m_expp->GetTabContainer()->GetSelectedTab();
 	auto pidlDirectory = tab.GetShellBrowser()->GetDirectoryIdl();
 
-	TCHAR szFolderDisplayName[MAX_PATH];
+	std::wstring folderDisplayName;
 
 	/* Don't show full paths for virtual folders (as only the folders
 	GUID will be shown). */
 	if (m_config->showFullTitlePath.get() && !tab.GetShellBrowser()->InVirtualFolder())
 	{
-		GetDisplayName(pidlDirectory.get(), szFolderDisplayName, SIZEOF_ARRAY(szFolderDisplayName),
-			SHGDN_FORPARSING);
+		GetDisplayName(pidlDirectory.get(), SHGDN_FORPARSING, folderDisplayName);
 	}
 	else
 	{
-		GetDisplayName(pidlDirectory.get(), szFolderDisplayName, SIZEOF_ARRAY(szFolderDisplayName),
-			SHGDN_NORMAL);
+		GetDisplayName(pidlDirectory.get(), SHGDN_NORMAL, folderDisplayName);
 	}
 
 	TCHAR szTitle[512];
 
 	TCHAR szTemp[64];
 	LoadString(m_instance, IDS_MAIN_WINDOW_TITLE, szTemp, SIZEOF_ARRAY(szTemp));
-	StringCchPrintf(
-		szTitle, SIZEOF_ARRAY(szTitle), szTemp, szFolderDisplayName, NExplorerplusplus::APP_NAME);
+	StringCchPrintf(szTitle, SIZEOF_ARRAY(szTitle), szTemp, folderDisplayName.c_str(),
+		NExplorerplusplus::APP_NAME);
 
 	if (m_config->showUserNameInTitleBar.get() || m_config->showPrivilegeLevelInTitleBar.get())
 	{

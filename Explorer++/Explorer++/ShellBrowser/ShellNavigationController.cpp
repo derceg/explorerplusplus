@@ -51,9 +51,8 @@ void ShellNavigationController::OnNavigationCompleted(
 {
 	if (addHistoryEntry)
 	{
-		TCHAR displayName[MAX_PATH];
-		GetDisplayName(
-			pidlDirectory, displayName, static_cast<UINT>(std::size(displayName)), SHGDN_INFOLDER);
+		std::wstring displayName;
+		GetDisplayName(pidlDirectory, SHGDN_INFOLDER, displayName);
 
 		auto newEntry = std::make_unique<HistoryEntry>(pidlDirectory, displayName);
 		int entryId = newEntry->GetId();

@@ -10,7 +10,8 @@
 IconFetcher::IconFetcher(HWND hwnd, CachedIcons *cachedIcons) :
 	m_hwnd(hwnd),
 	m_cachedIcons(cachedIcons),
-	m_iconThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
+	m_iconThreadPool(
+		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
 	m_iconResultIDCounter(0)
 {
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
@@ -111,9 +112,8 @@ void IconFetcher::QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback)
 			IconResult result;
 			result.iconIndex = *iconIndex;
 
-			TCHAR filePath[MAX_PATH];
-			HRESULT hr = GetDisplayName(basicItemInfo.pidl.get(), filePath,
-				static_cast<UINT>(std::size(filePath)), SHGDN_FORPARSING);
+			std::wstring filePath;
+			HRESULT hr = GetDisplayName(basicItemInfo.pidl.get(), SHGDN_FORPARSING, filePath);
 
 			if (SUCCEEDED(hr))
 			{

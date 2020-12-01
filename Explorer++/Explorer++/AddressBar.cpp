@@ -298,23 +298,18 @@ std::optional<FILEGROUPDESCRIPTOR> AddressBar::GenerateShortcutDescriptor(PCIDLI
 	fileGroupDescriptor.fgd[0].dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
 
 	// The name of the file will be the item name, followed by .lnk.
-	TCHAR displayName[MAX_PATH];
-	HRESULT hr = GetDisplayName(pidl, displayName, SIZEOF_ARRAY(displayName), SHGDN_INFOLDER);
+	std::wstring displayName;
+	HRESULT hr = GetDisplayName(pidl, SHGDN_INFOLDER, displayName);
 
 	if (FAILED(hr))
 	{
 		return std::nullopt;
 	}
 
-	hr = StringCchCat(displayName, SIZEOF_ARRAY(displayName), _T(".lnk"));
-
-	if (FAILED(hr))
-	{
-		return std::nullopt;
-	}
+	displayName += L".lnk";
 
 	hr = StringCchCopy(fileGroupDescriptor.fgd[0].cFileName,
-		SIZEOF_ARRAY(fileGroupDescriptor.fgd[0].cFileName), displayName);
+		SIZEOF_ARRAY(fileGroupDescriptor.fgd[0].cFileName), displayName.c_str());
 
 	if (FAILED(hr))
 	{

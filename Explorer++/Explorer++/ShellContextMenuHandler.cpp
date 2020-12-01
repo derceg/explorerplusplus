@@ -146,7 +146,6 @@ void Explorerplusplus::HandleCustomMenuItem(
 	case MENU_OPEN_IN_NEW_TAB:
 	{
 		unique_pidl_absolute pidlComplete;
-		TCHAR szParsingPath[MAX_PATH];
 		BOOL bOpenInNewTab;
 
 		if (!pidlItems.empty())
@@ -162,9 +161,9 @@ void Explorerplusplus::HandleCustomMenuItem(
 			bOpenInNewTab = TRUE;
 		}
 
-		GetDisplayName(
-			pidlComplete.get(), szParsingPath, SIZEOF_ARRAY(szParsingPath), SHGDN_FORPARSING);
-		m_tabContainer->CreateNewTab(szParsingPath, TabSettings(_selected = true));
+		std::wstring parsingPath;
+		GetDisplayName(pidlComplete.get(), SHGDN_FORPARSING, parsingPath);
+		m_tabContainer->CreateNewTab(parsingPath.c_str(), TabSettings(_selected = true));
 
 		m_bTreeViewOpenInNewTab = true;
 	}

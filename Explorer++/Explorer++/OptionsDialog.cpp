@@ -382,7 +382,6 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(
 		{
 			HWND hEdit;
 			TCHAR szNewTabDir[MAX_PATH];
-			TCHAR szVirtualParsingPath[MAX_PATH];
 			ReplaceExplorerMode replaceExplorerMode = ReplaceExplorerMode::None;
 			HRESULT hr;
 			int iSel;
@@ -424,12 +423,12 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(
 
 			/* The folder may be virtual, in which case, it needs
 			to be decoded. */
-			hr = DecodeFriendlyPath(
-				szNewTabDir, szVirtualParsingPath, SIZEOF_ARRAY(szVirtualParsingPath));
+			std::wstring virtualParsingPath;
+			hr = DecodeFriendlyPath(szNewTabDir, virtualParsingPath);
 
 			if (SUCCEEDED(hr))
 			{
-				m_config->defaultTabDirectory = szVirtualParsingPath;
+				m_config->defaultTabDirectory = virtualParsingPath;
 			}
 			else
 			{
@@ -1516,7 +1515,6 @@ void OptionsDialog::OnDefaultSettingsNewTabDir(HWND hDlg)
 	HWND hEdit;
 	TCHAR szDisplayName[MAX_PATH];
 	TCHAR szNewTabDir[MAX_PATH];
-	TCHAR szVirtualParsingPath[MAX_PATH];
 	HRESULT hr;
 
 	/* Load the dialog helper message. */
@@ -1524,11 +1522,13 @@ void OptionsDialog::OnDefaultSettingsNewTabDir(HWND hDlg)
 
 	GetDlgItemText(hDlg, IDC_DEFAULT_NEWTABDIR_EDIT, szNewTabDir, SIZEOF_ARRAY(szNewTabDir));
 
-	hr = DecodeFriendlyPath(szNewTabDir, szVirtualParsingPath, SIZEOF_ARRAY(szVirtualParsingPath));
+	std::wstring virtualParsingPath;
+	hr = DecodeFriendlyPath(szNewTabDir, virtualParsingPath);
 
 	if (SUCCEEDED(hr))
 	{
-		StringCchCopy(g_szNewTabDirectory, SIZEOF_ARRAY(g_szNewTabDirectory), szVirtualParsingPath);
+		StringCchCopy(
+			g_szNewTabDirectory, SIZEOF_ARRAY(g_szNewTabDirectory), virtualParsingPath.c_str());
 	}
 	else
 	{
@@ -1580,27 +1580,25 @@ void OptionsDialog::DefaultSettingsSetNewTabDir(HWND hEdit, const TCHAR *szPath)
 
 void OptionsDialog::DefaultSettingsSetNewTabDir(HWND hEdit, PCIDLIST_ABSOLUTE pidl)
 {
-	SFGAOF attributes;
-	DWORD uNameFlags;
-	TCHAR szNewTabDir[MAX_PATH];
-
-	attributes = SFGAO_FILESYSTEM;
-
 	/* Check if the specified folder is real or virtual. */
+	SFGAOF attributes = SFGAO_FILESYSTEM;
 	GetItemAttributes(pidl, &attributes);
+
+	DWORD nameFlags;
 
 	if (attributes & SFGAO_FILESYSTEM)
 	{
-		uNameFlags = SHGDN_FORPARSING;
+		nameFlags = SHGDN_FORPARSING;
 	}
 	else
 	{
-		uNameFlags = SHGDN_INFOLDER;
+		nameFlags = SHGDN_INFOLDER;
 	}
 
-	GetDisplayName(pidl, szNewTabDir, SIZEOF_ARRAY(szNewTabDir), uNameFlags);
+	std::wstring newTabDir;
+	GetDisplayName(pidl, nameFlags, newTabDir);
 
-	SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM) szNewTabDir);
+	SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM) newTabDir.c_str());
 }
 
 void OptionsDialog::AddIconThemes(HWND dlg)

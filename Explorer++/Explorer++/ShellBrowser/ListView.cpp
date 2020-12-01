@@ -312,9 +312,8 @@ void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 
 std::optional<int> ShellBrowser::GetCachedIconIndex(const ItemInfo_t &itemInfo)
 {
-	TCHAR filePath[MAX_PATH];
-	HRESULT hr = GetDisplayName(
-		itemInfo.pidlComplete.get(), filePath, SIZEOF_ARRAY(filePath), SHGDN_FORPARSING);
+	std::wstring filePath;
+	HRESULT hr = GetDisplayName(itemInfo.pidlComplete.get(), SHGDN_FORPARSING, filePath);
 
 	if (FAILED(hr))
 	{
@@ -597,17 +596,23 @@ void ShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 	case VK_BACK:
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
-			TCHAR szRoot[MAX_PATH];
-			HRESULT hr = GetDisplayName(m_directoryState.pidlDirectory.get(), szRoot,
-				SIZEOF_ARRAY(szRoot), SHGDN_FORPARSING);
+			std::wstring parsingPath;
+			HRESULT hr =
+				GetDisplayName(m_directoryState.pidlDirectory.get(), SHGDN_FORPARSING, parsingPath);
 
 			if (SUCCEEDED(hr))
 			{
-				BOOL bRes = PathStripToRoot(szRoot);
+				TCHAR root[MAX_PATH];
+				hr = StringCchCopy(root, SIZEOF_ARRAY(root), parsingPath.c_str());
 
-				if (bRes)
+				if (SUCCEEDED(hr))
 				{
-					m_navigationController->BrowseFolder(szRoot);
+					BOOL bRes = PathStripToRoot(root);
+
+					if (bRes)
+					{
+						m_navigationController->BrowseFolder(root);
+					}
 				}
 			}
 		}
@@ -869,8 +874,10 @@ void ShellBrowser::SetFileAttributesForSelection()
 		const ItemInfo_t &item = GetItemByIndex(index);
 		sfai.wfd = item.wfd;
 
-		GetDisplayName(item.pidlComplete.get(), sfai.szFullFileName,
-			static_cast<UINT>(std::size(sfai.szFullFileName)), SHGDN_FORPARSING);
+		std::wstring parsingPath;
+		GetDisplayName(item.pidlComplete.get(), SHGDN_FORPARSING, parsingPath);
+
+		StringCchCopy(sfai.szFullFileName, SIZEOF_ARRAY(sfai.szFullFileName), parsingPath.c_str());
 
 		sfaiList.push_back(sfai);
 	}

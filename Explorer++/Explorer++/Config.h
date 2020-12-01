@@ -201,9 +201,8 @@ private:
 	static std::wstring GetComputerFolderPath()
 	{
 		// It's assumed here that this won't fail.
-		TCHAR computerPath[MAX_PATH];
-		GetCsidlDisplayName(
-			CSIDL_DRIVES, computerPath, SIZEOF_ARRAY(computerPath), SHGDN_FORPARSING);
+		std::wstring computerPath;
+		GetCsidlDisplayName(CSIDL_DRIVES, SHGDN_FORPARSING, computerPath);
 		return computerPath;
 	}
 };

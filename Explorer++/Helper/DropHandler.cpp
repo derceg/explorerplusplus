@@ -82,7 +82,7 @@ HRESULT DropHandler::GetDropFormats(std::list<FORMATETC> &ftcList)
 
 void DropHandler::Drop(IDataObject *pDataObject,DWORD grfKeyState,
 POINTL ptl,DWORD *pdwEffect,HWND hwndDrop,DragType dragType,
-TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,
+const TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,
 BOOL bRenameOnCollision)
 {
 	m_pDataObject		= pDataObject;
@@ -91,7 +91,7 @@ BOOL bRenameOnCollision)
 	m_dwEffect			= *pdwEffect;
 	m_hwndDrop			= hwndDrop;
 	m_DragType			= dragType;
-	m_szDestDirectory	= szDestDirectory;
+	m_destDirectory	= szDestDirectory;
 	m_pDropFilesCallback	= pDropFilesCallback;
 	m_bRenameOnCollision	= bRenameOnCollision;
 
@@ -108,13 +108,13 @@ BOOL bRenameOnCollision)
 }
 
 void DropHandler::CopyClipboardData(IDataObject *pDataObject,HWND hwndDrop,
-TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,
+const TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,
 BOOL bRenameOnCollision)
 {
 	m_pDataObject		= pDataObject;
 	m_dwEffect			= DROPEFFECT_COPY;
 	m_hwndDrop			= hwndDrop;
-	m_szDestDirectory	= szDestDirectory;
+	m_destDirectory	= szDestDirectory;
 	m_pDropFilesCallback	= pDropFilesCallback;
 	m_bRenameOnCollision	= bRenameOnCollision;
 
@@ -568,7 +568,7 @@ HRESULT DropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 			case TYMED_ISTORAGE:
 				{
 					TCHAR szFullFileName[MAX_PATH];
-					StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_szDestDirectory);
+					StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_destDirectory.c_str());
 					PathAppend(szFullFileName,pfgd->fgd[i].cFileName);
 
 					IStorage *pStorage = nullptr;
@@ -605,7 +605,7 @@ HRESULT DropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 		{
 			TCHAR szFullFileName[MAX_PATH];
 
-			StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_szDestDirectory);
+			StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_destDirectory.c_str());
 			PathAppend(szFullFileName,pfgd->fgd[i].cFileName);
 
 			HANDLE hFile = CreateFile(szFullFileName,GENERIC_WRITE,0,nullptr,
@@ -683,7 +683,7 @@ HRESULT DropHandler::CopyUnicodeTextData(IDataObject *pDataObject,
 		{
 			TCHAR szFullFileName[MAX_PATH];
 
-			hr = CopyTextToFile(m_szDestDirectory, pText, szFullFileName, SIZEOF_ARRAY(szFullFileName));
+			hr = CopyTextToFile(m_destDirectory.c_str(), pText, szFullFileName, SIZEOF_ARRAY(szFullFileName));
 
 			if(hr == S_OK)
 			{
@@ -726,7 +726,7 @@ HRESULT DropHandler::CopyAnsiTextData(IDataObject *pDataObject,
 			{
 				TCHAR szFullFileName[MAX_PATH];
 
-				hr = CopyTextToFile(m_szDestDirectory, pszUnicodeText,
+				hr = CopyTextToFile(m_destDirectory.c_str(), pszUnicodeText,
 					szFullFileName, SIZEOF_ARRAY(szFullFileName));
 
 				if(hr == S_OK)
@@ -793,7 +793,7 @@ HRESULT DropHandler::CopyDIBV5Data(IDataObject *pDataObject,
 			StringCchPrintf(szFileName,SIZEOF_ARRAY(szFileName),
 				_T("Clipboard Image (%s).bmp"),szTime);
 
-			PathCombine(szFullFileName,m_szDestDirectory,
+			PathCombine(szFullFileName,m_destDirectory.c_str(),
 				szFileName);
 
 			HANDLE hFile = CreateFile(szFullFileName,
@@ -850,7 +850,7 @@ HRESULT DropHandler::CopyDIBV5Data(IDataObject *pDataObject,
 void DropHandler::HandleRightClickDrop()
 {
 	unique_pidl_absolute pidlDirectory;
-	HRESULT hr = SHParseDisplayName(m_szDestDirectory, nullptr, wil::out_param(pidlDirectory), 0, nullptr);
+	HRESULT hr = SHParseDisplayName(m_destDirectory.c_str(), nullptr, wil::out_param(pidlDirectory), 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
@@ -912,7 +912,7 @@ void DropHandler::CopyDroppedFiles(const HDROP &hd,BOOL bPreferredEffect,DWORD d
 
 		/* Force files to be renamed when they are copied and pasted
 		in the same directory. */
-		if(lstrcmpi(m_szDestDirectory,szSourceDirectory) == 0)
+		if(lstrcmpi(m_destDirectory.c_str(),szSourceDirectory) == 0)
 		{
 			bRenameOnCollision = TRUE;
 		}
@@ -970,7 +970,7 @@ void DropHandler::CopyDroppedFilesInternal(const std::list<std::wstring> &FullFi
 	ppfi->pReferenceCount		= this;
 	ppfi->hwnd					= m_hwndDrop;
 	ppfi->FullFilenameList		= FullFilenameList;
-	ppfi->strDestDirectory		= m_szDestDirectory;
+	ppfi->strDestDirectory		= m_destDirectory;
 	ppfi->bCopy					= bCopy;
 	ppfi->bRenameOnCollision	= bRenameOnCollision;
 	ppfi->pac					= nullptr;
@@ -1203,7 +1203,7 @@ void DropHandler::CreateShortcutToDroppedFile(TCHAR *szFullFileName)
 	StringCchCopy(szFileName,SIZEOF_ARRAY(szFileName),szFullFileName);
 	PathStripPath(szFileName);
 	PathRenameExtension(szFileName,_T(".lnk"));
-	StringCchCopy(szLink,SIZEOF_ARRAY(szLink),m_szDestDirectory);
+	StringCchCopy(szLink,SIZEOF_ARRAY(szLink),m_destDirectory.c_str());
 	PathAppend(szLink,szFileName);
 
 	NFileOperations::CreateLinkToFile(szFullFileName,szLink,EMPTY_STRING);
@@ -1304,7 +1304,7 @@ BOOL DropHandler::CheckItemLocations(int iDroppedItem)
 				DragQueryFile((HDROP)pdf,iDroppedItem,szFullFileName,
 					SIZEOF_ARRAY(szFullFileName));
 
-				if (PathIsSameRoot(m_szDestDirectory, szFullFileName))
+				if (PathIsSameRoot(m_destDirectory.c_str(), szFullFileName))
 				{
 					bOnSameDrive = TRUE;
 				}

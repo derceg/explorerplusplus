@@ -1078,10 +1078,7 @@ void TabContainer::InsertNewTab(
 	}
 	else
 	{
-		TCHAR folderName[MAX_PATH];
-		GetDisplayName(pidlDirectory, folderName, SIZEOF_ARRAY(folderName), SHGDN_INFOLDER);
-
-		name = folderName;
+		GetDisplayName(pidlDirectory, SHGDN_INFOLDER, name);
 	}
 
 	boost::replace_all(name, L"&", L"&&");

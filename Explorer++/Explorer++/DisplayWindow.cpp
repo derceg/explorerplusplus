@@ -79,10 +79,9 @@ void Explorerplusplus::UpdateDisplayWindowForZeroFiles(const Tab &tab)
 	else
 	{
 		/* Folder name. */
-		TCHAR szFolderName[MAX_PATH];
-		GetDisplayName(
-			currentDirectory.c_str(), szFolderName, SIZEOF_ARRAY(szFolderName), SHGDN_INFOLDER);
-		DisplayWindow_BufferText(m_hDisplayWindow, szFolderName);
+		std::wstring folderName;
+		GetDisplayName(currentDirectory.c_str(), SHGDN_INFOLDER, folderName);
+		DisplayWindow_BufferText(m_hDisplayWindow, folderName.c_str());
 
 		/* Folder type. */
 		SHFILEINFO shfi;

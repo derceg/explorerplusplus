@@ -374,7 +374,6 @@ void ShellTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileNam
 	TVINSERTSTRUCT	tvis;
 	SHFILEINFO		shfi;
 	SFGAOF			attributes;
-	TCHAR			szDisplayName[MAX_PATH];
 	HRESULT			hr;
 	BOOL			res;
 	int				iItemId;
@@ -434,10 +433,11 @@ void ShellTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileNam
 					m_itemInfoMap[iItemId].pidl.reset(ILCloneFull(pidlComplete));
 					m_itemInfoMap[iItemId].pridl.reset(ILCloneChild(pidlRelative));
 
-					GetDisplayName(szFullFileName,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_NORMAL);
+					std::wstring displayName;
+					GetDisplayName(szFullFileName, SHGDN_NORMAL, displayName);
 
 					tvItem.mask				= TVIF_TEXT|TVIF_IMAGE|TVIF_SELECTEDIMAGE|TVIF_PARAM|TVIF_CHILDREN;
-					tvItem.pszText			= szDisplayName;
+					tvItem.pszText			= displayName.data();
 					tvItem.iImage			= shfi.iIcon;
 					tvItem.iSelectedImage	= shfi.iIcon;
 					tvItem.lParam			= (LPARAM)iItemId;

@@ -27,15 +27,15 @@
 
 namespace NSearchDialog
 {
-const int WM_APP_SEARCHITEMFOUND = WM_APP + 1;
-const int WM_APP_SEARCHFINISHED = WM_APP + 2;
-const int WM_APP_SEARCHCHANGEDDIRECTORY = WM_APP + 3;
-const int WM_APP_REGULAREXPRESSIONINVALID = WM_APP + 4;
+	const int WM_APP_SEARCHITEMFOUND = WM_APP + 1;
+	const int WM_APP_SEARCHFINISHED = WM_APP + 2;
+	const int WM_APP_SEARCHCHANGEDDIRECTORY = WM_APP + 3;
+	const int WM_APP_REGULAREXPRESSIONINVALID = WM_APP + 4;
 
-int CALLBACK SortResultsStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
+	int CALLBACK SortResultsStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 
-DWORD WINAPI SearchThread(LPVOID pParam);
-int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData);
+	DWORD WINAPI SearchThread(LPVOID pParam);
+	int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData);
 }
 
 const TCHAR SearchDialogPersistentSettings::SETTINGS_KEY[] = _T("Search");
@@ -272,7 +272,6 @@ INT_PTR SearchDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 		BROWSEINFO bi;
 		TCHAR szDirectory[MAX_PATH];
 		TCHAR szDisplayName[MAX_PATH];
-		TCHAR szParsingPath[MAX_PATH];
 		TCHAR szTitle[256];
 
 		LoadString(GetInstance(), IDS_SEARCHDIALOG_TITLE, szTitle, SIZEOF_ARRAY(szTitle));
@@ -290,9 +289,9 @@ INT_PTR SearchDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 
 		if (pidl != nullptr)
 		{
-			GetDisplayName(
-				pidl.get(), szParsingPath, SIZEOF_ARRAY(szParsingPath), SHGDN_FORPARSING);
-			SetDlgItemText(m_hDlg, IDC_COMBO_DIRECTORY, szParsingPath);
+			std::wstring parsingPath;
+			GetDisplayName(pidl.get(), SHGDN_FORPARSING, parsingPath);
+			SetDlgItemText(m_hDlg, IDC_COMBO_DIRECTORY, parsingPath.c_str());
 		}
 	}
 	break;
@@ -676,12 +675,11 @@ void SearchDialog::HandleCustomMenuItem(
 	{
 		m_tabContainer->CreateNewTab(pidlParent, TabSettings(_selected = true));
 
-		TCHAR szFilename[MAX_PATH];
+		std::wstring filename;
 		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems.front()));
-		GetDisplayName(pidlComplete.get(), szFilename, SIZEOF_ARRAY(szFilename),
-			SHGDN_INFOLDER | SHGDN_FORPARSING);
+		GetDisplayName(pidlComplete.get(), SHGDN_INFOLDER | SHGDN_FORPARSING, filename);
 
-		m_pexpp->GetActiveShellBrowser()->SelectFiles(szFilename);
+		m_pexpp->GetActiveShellBrowser()->SelectFiles(filename.c_str());
 	}
 	break;
 	}
@@ -943,36 +941,36 @@ INT_PTR SearchDialog::OnTimer(int iTimerID)
 
 	while (i < nItems)
 	{
-		TCHAR szFullFileName[MAX_PATH];
-		TCHAR szDirectory[MAX_PATH];
-		TCHAR szFileName[MAX_PATH];
 		LVITEM lvItem;
 		SHFILEINFO shfi;
 		int iIndex;
 
 		PIDLIST_ABSOLUTE pidl = *itr;
 
-		GetDisplayName(pidl, szDirectory, SIZEOF_ARRAY(szDirectory), SHGDN_FORPARSING);
-		PathRemoveFileSpec(szDirectory);
+		std::wstring fullFileName;
+		GetDisplayName(pidl, SHGDN_FORPARSING, fullFileName);
 
-		GetDisplayName(pidl, szFullFileName, SIZEOF_ARRAY(szFullFileName), SHGDN_FORPARSING);
-		GetDisplayName(
-			pidl, szFileName, SIZEOF_ARRAY(szFileName), SHGDN_INFOLDER | SHGDN_FORPARSING);
+		TCHAR directory[MAX_PATH];
+		StringCchCopy(directory, SIZEOF_ARRAY(directory), fullFileName.c_str());
+		PathRemoveFileSpec(directory);
+
+		std::wstring fileName;
+		GetDisplayName(pidl, SHGDN_INFOLDER | SHGDN_FORPARSING, fileName);
 
 		SHGetFileInfo((LPCWSTR) pidl, 0, &shfi, sizeof(shfi), SHGFI_PIDL | SHGFI_SYSICONINDEX);
 
 		m_SearchItemsMapInternal.insert(
-			std::unordered_map<int, std::wstring>::value_type(m_iInternalIndex, szFullFileName));
+			std::unordered_map<int, std::wstring>::value_type(m_iInternalIndex, fullFileName));
 
 		lvItem.mask = LVIF_IMAGE | LVIF_TEXT | LVIF_PARAM;
-		lvItem.pszText = szFileName;
+		lvItem.pszText = fileName.data();
 		lvItem.iItem = nListViewItems + i;
 		lvItem.iSubItem = 0;
 		lvItem.iImage = shfi.iIcon;
 		lvItem.lParam = m_iInternalIndex++;
 		iIndex = ListView_InsertItem(hListView, &lvItem);
 
-		ListView_SetItemText(hListView, iIndex, 1, szDirectory);
+		ListView_SetItemText(hListView, iIndex, 1, directory);
 
 		CoTaskMemFree(pidl);
 

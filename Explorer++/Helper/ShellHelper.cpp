@@ -19,61 +19,59 @@ bool AddJumpListTasksInternal(
 HRESULT AddJumpListTaskInternal(IObjectCollection *objectCollection, const TCHAR *name,
 	const TCHAR *path, const TCHAR *arguments, const TCHAR *iconPath, int iconIndex);
 
-HRESULT GetDisplayName(const TCHAR *szParsingPath, TCHAR *szDisplayName, UINT cchMax, DWORD uFlags)
+HRESULT GetDisplayName(const std::wstring &parsingPath, DWORD flags, std::wstring &output)
 {
-	if (szParsingPath == nullptr || szDisplayName == nullptr)
-	{
-		return E_FAIL;
-	}
-
 	unique_pidl_absolute pidl;
-	HRESULT hr = SHParseDisplayName(szParsingPath, nullptr, wil::out_param(pidl), 0, nullptr);
+	HRESULT hr = SHParseDisplayName(parsingPath.c_str(), nullptr, wil::out_param(pidl), 0, nullptr);
 
 	if (SUCCEEDED(hr))
 	{
-		hr = GetDisplayName(pidl.get(), szDisplayName, cchMax, uFlags);
+		hr = GetDisplayName(pidl.get(), flags, output);
 	}
 
 	return hr;
 }
 
-HRESULT GetDisplayName(PCIDLIST_ABSOLUTE pidl, TCHAR *szDisplayName, UINT cchMax, DWORD uFlags)
+HRESULT GetDisplayName(PCIDLIST_ABSOLUTE pidl, DWORD flags, std::wstring &output)
 {
-	if (pidl == nullptr || szDisplayName == nullptr)
+	wil::com_ptr_nothrow<IShellFolder> shellFolder;
+	PCUITEMID_CHILD pidlChild = nullptr;
+	HRESULT hr = SHBindToParent(pidl, IID_PPV_ARGS(&shellFolder), &pidlChild);
+
+	if (FAILED(hr))
 	{
-		return E_FAIL;
+		return hr;
 	}
 
-	IShellFolder *pShellFolder = nullptr;
-	PCUITEMID_CHILD pidlRelative = nullptr;
 	STRRET str;
-	HRESULT hr;
+	hr = shellFolder->GetDisplayNameOf(pidlChild, flags, &str);
 
-	hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellFolder), &pidlRelative);
-
-	if (SUCCEEDED(hr))
+	if (FAILED(hr))
 	{
-		hr = pShellFolder->GetDisplayNameOf(pidlRelative, uFlags, &str);
-
-		if (SUCCEEDED(hr))
-		{
-			hr = StrRetToBuf(&str, pidlRelative, szDisplayName, cchMax);
-		}
-
-		pShellFolder->Release();
+		return hr;
 	}
+
+	wil::unique_cotaskmem_string name;
+	hr = StrRetToStr(&str, pidlChild, &name);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	output = name.get();
 
 	return hr;
 }
 
-HRESULT GetCsidlDisplayName(int csidl, TCHAR *szFolderName, UINT cchMax, DWORD uParsingFlags)
+HRESULT GetCsidlDisplayName(int csidl, DWORD flags, std::wstring &output)
 {
 	unique_pidl_absolute pidl;
 	HRESULT hr = SHGetFolderLocation(nullptr, csidl, nullptr, 0, wil::out_param(pidl));
 
 	if (SUCCEEDED(hr))
 	{
-		hr = GetDisplayName(pidl.get(), szFolderName, cchMax, uParsingFlags);
+		hr = GetDisplayName(pidl.get(), flags, output);
 	}
 
 	return hr;
@@ -193,16 +191,18 @@ BOOL IsNamespaceRoot(PCIDLIST_ABSOLUTE pidl)
 
 BOOL CheckIdl(PCIDLIST_ABSOLUTE pidl)
 {
-	TCHAR szTabText[MAX_PATH];
+	std::wstring parsingPath;
+	HRESULT hr = GetDisplayName(pidl, SHGDN_FORPARSING, parsingPath);
 
-	if (!SUCCEEDED(GetDisplayName(pidl, szTabText, SIZEOF_ARRAY(szTabText), SHGDN_FORPARSING)))
+	if (FAILED(hr))
 	{
 		return FALSE;
 	}
 
 	unique_pidl_absolute pidlCheck;
+	hr = SHParseDisplayName(parsingPath.c_str(), nullptr, wil::out_param(pidlCheck), 0, nullptr);
 
-	if (!SUCCEEDED(SHParseDisplayName(szTabText, nullptr, wil::out_param(pidlCheck), 0, nullptr)))
+	if (FAILED(hr))
 	{
 		return FALSE;
 	}
@@ -224,148 +224,148 @@ BOOL IsIdlDirectory(PCIDLIST_ABSOLUTE pidl)
 	return FALSE;
 }
 
-HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath, TCHAR *szParsingPath, UINT cchMax)
+HRESULT DecodeFriendlyPath(const std::wstring &friendlyPath, std::wstring &parsingPath)
 {
 	PIDLIST_ABSOLUTE pidl = nullptr;
-	TCHAR szName[MAX_PATH];
+	std::wstring name;
 
 	SHGetFolderLocation(nullptr, CSIDL_CONTROLS, nullptr, 0, &pidl);
-	GetDisplayName(pidl, szName, SIZEOF_ARRAY(szName), SHGDN_INFOLDER);
+	GetDisplayName(pidl, SHGDN_INFOLDER, name);
 	CoTaskMemFree(pidl);
 
-	if (lstrcmpi(szName, szFriendlyPath) == 0)
+	if (name == friendlyPath)
 	{
-		GetCsidlDisplayName(CSIDL_CONTROLS, szParsingPath, cchMax, SHGDN_FORPARSING);
+		GetCsidlDisplayName(CSIDL_CONTROLS, SHGDN_FORPARSING, parsingPath);
 		return S_OK;
 	}
 
 	SHGetFolderLocation(nullptr, CSIDL_BITBUCKET, nullptr, 0, &pidl);
-	GetDisplayName(pidl, szName, SIZEOF_ARRAY(szName), SHGDN_INFOLDER);
+	GetDisplayName(pidl, SHGDN_INFOLDER, name);
 	CoTaskMemFree(pidl);
 
-	if (lstrcmpi(szName, szFriendlyPath) == 0)
+	if (name == friendlyPath)
 	{
-		GetCsidlDisplayName(CSIDL_BITBUCKET, szParsingPath, cchMax, SHGDN_FORPARSING);
+		GetCsidlDisplayName(CSIDL_BITBUCKET, SHGDN_FORPARSING, parsingPath);
 		return S_OK;
 	}
 
 	SHGetFolderLocation(nullptr, CSIDL_DRIVES, nullptr, 0, &pidl);
-	GetDisplayName(pidl, szName, SIZEOF_ARRAY(szName), SHGDN_INFOLDER);
+	GetDisplayName(pidl, SHGDN_INFOLDER, name);
 	CoTaskMemFree(pidl);
 
-	if (lstrcmpi(szName, szFriendlyPath) == 0)
+	if (name == friendlyPath)
 	{
-		GetCsidlDisplayName(CSIDL_DRIVES, szParsingPath, cchMax, SHGDN_FORPARSING);
+		GetCsidlDisplayName(CSIDL_DRIVES, SHGDN_FORPARSING, parsingPath);
 		return S_OK;
 	}
 
 	SHGetFolderLocation(nullptr, CSIDL_NETWORK, nullptr, 0, &pidl);
-	GetDisplayName(pidl, szName, SIZEOF_ARRAY(szName), SHGDN_INFOLDER);
+	GetDisplayName(pidl, SHGDN_INFOLDER, name);
 	CoTaskMemFree(pidl);
 
-	if (lstrcmpi(szName, szFriendlyPath) == 0)
+	if (name == friendlyPath)
 	{
-		GetCsidlDisplayName(CSIDL_NETWORK, szParsingPath, cchMax, SHGDN_FORPARSING);
+		GetCsidlDisplayName(CSIDL_NETWORK, SHGDN_FORPARSING, parsingPath);
 		return S_OK;
 	}
 
 	SHGetFolderLocation(nullptr, CSIDL_CONNECTIONS, nullptr, 0, &pidl);
-	GetDisplayName(pidl, szName, SIZEOF_ARRAY(szName), SHGDN_INFOLDER);
+	GetDisplayName(pidl, SHGDN_INFOLDER, name);
 	CoTaskMemFree(pidl);
 
-	if (lstrcmpi(szName, szFriendlyPath) == 0)
+	if (name == friendlyPath)
 	{
-		GetCsidlDisplayName(CSIDL_CONNECTIONS, szParsingPath, cchMax, SHGDN_FORPARSING);
+		GetCsidlDisplayName(CSIDL_CONNECTIONS, SHGDN_FORPARSING, parsingPath);
 		return S_OK;
 	}
 
 	SHGetFolderLocation(nullptr, CSIDL_PRINTERS, nullptr, 0, &pidl);
-	GetDisplayName(pidl, szName, SIZEOF_ARRAY(szName), SHGDN_INFOLDER);
+	GetDisplayName(pidl, SHGDN_INFOLDER, name);
 	CoTaskMemFree(pidl);
 
-	if (lstrcmpi(szName, szFriendlyPath) == 0)
+	if (name == friendlyPath)
 	{
-		GetCsidlDisplayName(CSIDL_PRINTERS, szParsingPath, cchMax, SHGDN_FORPARSING);
+		GetCsidlDisplayName(CSIDL_PRINTERS, SHGDN_FORPARSING, parsingPath);
 		return S_OK;
 	}
 
 	SHGetFolderLocation(nullptr, CSIDL_FAVORITES, nullptr, 0, &pidl);
-	GetDisplayName(pidl, szName, SIZEOF_ARRAY(szName), SHGDN_INFOLDER);
+	GetDisplayName(pidl, SHGDN_INFOLDER, name);
 	CoTaskMemFree(pidl);
 
-	if (lstrcmpi(szName, szFriendlyPath) == 0)
+	if (name == friendlyPath)
 	{
-		GetCsidlDisplayName(CSIDL_FAVORITES, szParsingPath, cchMax, SHGDN_FORPARSING);
+		GetCsidlDisplayName(CSIDL_FAVORITES, SHGDN_FORPARSING, parsingPath);
 		return S_OK;
 	}
 
 	SHGetFolderLocation(nullptr, CSIDL_MYPICTURES, nullptr, 0, &pidl);
-	GetDisplayName(pidl, szName, SIZEOF_ARRAY(szName), SHGDN_INFOLDER);
+	GetDisplayName(pidl, SHGDN_INFOLDER, name);
 	CoTaskMemFree(pidl);
 
-	if (lstrcmpi(szName, szFriendlyPath) == 0)
+	if (name == friendlyPath)
 	{
-		GetCsidlDisplayName(CSIDL_MYPICTURES, szParsingPath, cchMax, SHGDN_FORPARSING);
+		GetCsidlDisplayName(CSIDL_MYPICTURES, SHGDN_FORPARSING, parsingPath);
 		return S_OK;
 	}
 
 	SHGetFolderLocation(nullptr, CSIDL_MYMUSIC, nullptr, 0, &pidl);
-	GetDisplayName(pidl, szName, SIZEOF_ARRAY(szName), SHGDN_INFOLDER);
+	GetDisplayName(pidl, SHGDN_INFOLDER, name);
 	CoTaskMemFree(pidl);
 
-	if (lstrcmpi(szName, szFriendlyPath) == 0)
+	if (name == friendlyPath)
 	{
-		GetCsidlDisplayName(CSIDL_MYMUSIC, szParsingPath, cchMax, SHGDN_FORPARSING);
+		GetCsidlDisplayName(CSIDL_MYMUSIC, SHGDN_FORPARSING, parsingPath);
 		return S_OK;
 	}
 
 	SHGetFolderLocation(nullptr, CSIDL_MYVIDEO, nullptr, 0, &pidl);
-	GetDisplayName(pidl, szName, SIZEOF_ARRAY(szName), SHGDN_INFOLDER);
+	GetDisplayName(pidl, SHGDN_INFOLDER, name);
 	CoTaskMemFree(pidl);
 
-	if (lstrcmpi(szName, szFriendlyPath) == 0)
+	if (name == friendlyPath)
 	{
-		GetCsidlDisplayName(CSIDL_MYVIDEO, szParsingPath, cchMax, SHGDN_FORPARSING);
+		GetCsidlDisplayName(CSIDL_MYVIDEO, SHGDN_FORPARSING, parsingPath);
 		return S_OK;
 	}
 
 	if (CompareString(
-			LOCALE_INVARIANT, NORM_IGNORECASE, FRIENDLY_NAME_DESKTOP, -1, szFriendlyPath, -1)
+			LOCALE_INVARIANT, NORM_IGNORECASE, FRIENDLY_NAME_DESKTOP, -1, friendlyPath.c_str(), -1)
 		== CSTR_EQUAL)
 	{
-		GetCsidlDisplayName(CSIDL_DESKTOP, szParsingPath, cchMax, SHGDN_FORPARSING);
+		GetCsidlDisplayName(CSIDL_DESKTOP, SHGDN_FORPARSING, parsingPath);
 		return S_OK;
 	}
 
 	if (CompareString(
-			LOCALE_INVARIANT, NORM_IGNORECASE, FRIENDLY_NAME_PICTURES, -1, szFriendlyPath, -1)
+			LOCALE_INVARIANT, NORM_IGNORECASE, FRIENDLY_NAME_PICTURES, -1, friendlyPath.c_str(), -1)
 		== CSTR_EQUAL)
 	{
-		GetCsidlDisplayName(CSIDL_MYPICTURES, szParsingPath, cchMax, SHGDN_FORPARSING);
+		GetCsidlDisplayName(CSIDL_MYPICTURES, SHGDN_FORPARSING, parsingPath);
 		return S_OK;
 	}
 
 	if (CompareString(
-			LOCALE_INVARIANT, NORM_IGNORECASE, FRIENDLY_NAME_MUSIC, -1, szFriendlyPath, -1)
+			LOCALE_INVARIANT, NORM_IGNORECASE, FRIENDLY_NAME_MUSIC, -1, friendlyPath.c_str(), -1)
 		== CSTR_EQUAL)
 	{
-		GetCsidlDisplayName(CSIDL_MYMUSIC, szParsingPath, cchMax, SHGDN_FORPARSING);
+		GetCsidlDisplayName(CSIDL_MYMUSIC, SHGDN_FORPARSING, parsingPath);
 		return S_OK;
 	}
 
 	if (CompareString(
-			LOCALE_INVARIANT, NORM_IGNORECASE, FRIENDLY_NAME_VIDEOS, -1, szFriendlyPath, -1)
+			LOCALE_INVARIANT, NORM_IGNORECASE, FRIENDLY_NAME_VIDEOS, -1, friendlyPath.c_str(), -1)
 		== CSTR_EQUAL)
 	{
-		GetCsidlDisplayName(CSIDL_MYVIDEO, szParsingPath, cchMax, SHGDN_FORPARSING);
+		GetCsidlDisplayName(CSIDL_MYVIDEO, SHGDN_FORPARSING, parsingPath);
 		return S_OK;
 	}
 
-	if (CompareString(
-			LOCALE_INVARIANT, NORM_IGNORECASE, FRIENDLY_NAME_DOCUMENTS, -1, szFriendlyPath, -1)
+	if (CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, FRIENDLY_NAME_DOCUMENTS, -1,
+			friendlyPath.c_str(), -1)
 		== CSTR_EQUAL)
 	{
-		GetCsidlDisplayName(CSIDL_MYDOCUMENTS, szParsingPath, cchMax, SHGDN_FORPARSING);
+		GetCsidlDisplayName(CSIDL_MYDOCUMENTS, SHGDN_FORPARSING, parsingPath);
 		return S_OK;
 	}
 
@@ -819,17 +819,17 @@ HRESULT ConvertGenericVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t
 // path is a GUID (which typically shouldn't be displayed to the user).
 std::optional<std::wstring> GetFolderPathForDisplay(PCIDLIST_ABSOLUTE pidl)
 {
-	TCHAR parsingPath[MAX_PATH];
-	HRESULT hr = GetDisplayName(pidl, parsingPath, SIZEOF_ARRAY(parsingPath), SHGDN_FORPARSING);
+	std::wstring parsingPath;
+	HRESULT hr = GetDisplayName(pidl, SHGDN_FORPARSING, parsingPath);
 
 	if (FAILED(hr))
 	{
 		return std::nullopt;
 	}
 
-	if (IsPathGUID(parsingPath))
+	if (IsPathGUID(parsingPath.c_str()))
 	{
-		hr = GetDisplayName(pidl, parsingPath, SIZEOF_ARRAY(parsingPath), SHGDN_INFOLDER);
+		hr = GetDisplayName(pidl, SHGDN_INFOLDER, parsingPath);
 
 		if (FAILED(hr))
 		{
@@ -894,7 +894,6 @@ void DecodePath(const TCHAR *szInitialPath, const TCHAR *szCurrentDirectory, TCH
 {
 	TCHAR szExpandedPath[MAX_PATH];
 	TCHAR szCanonicalPath[MAX_PATH];
-	TCHAR szVirtualParsingPath[MAX_PATH];
 	HRESULT hr;
 	BOOL bRelative;
 	BOOL bRet;
@@ -907,12 +906,12 @@ void DecodePath(const TCHAR *szInitialPath, const TCHAR *szCurrentDirectory, TCH
 	}
 	else
 	{
-		hr = DecodeFriendlyPath(
-			szInitialPath, szVirtualParsingPath, SIZEOF_ARRAY(szVirtualParsingPath));
+		std::wstring virtualParsingPath;
+		hr = DecodeFriendlyPath(szInitialPath, virtualParsingPath);
 
 		if (SUCCEEDED(hr))
 		{
-			StringCchCopy(szParsingPath, cchDest, szVirtualParsingPath);
+			StringCchCopy(szParsingPath, cchDest, virtualParsingPath.c_str());
 		}
 		else
 		{
@@ -1364,11 +1363,10 @@ HRESULT ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_C
 
 BOOL CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL)
 {
-	TCHAR szParsingPath[MAX_PATH];
+	std::wstring parsingPath;
+	GetCsidlDisplayName(uFolderCSIDL, SHGDN_FORPARSING, parsingPath);
 
-	GetCsidlDisplayName(uFolderCSIDL, szParsingPath, SIZEOF_ARRAY(szParsingPath), SHGDN_FORPARSING);
-
-	if (StrCmp(szDirectory, szParsingPath) == 0)
+	if (parsingPath == szDirectory)
 	{
 		return TRUE;
 	}

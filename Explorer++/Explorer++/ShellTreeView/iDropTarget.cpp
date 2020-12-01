@@ -199,7 +199,6 @@ BOOL ShellTreeView::CheckItemLocations(IDataObject *pDataObject, HTREEITEM hItem
 	FORMATETC ftc;
 	STGMEDIUM stg;
 	DROPFILES *pdf = nullptr;
-	TCHAR szDestDirectory[MAX_PATH];
 	TCHAR szFullFileName[MAX_PATH];
 	HRESULT hr;
 	BOOL bOnSameDrive = FALSE;
@@ -232,10 +231,10 @@ BOOL ShellTreeView::CheckItemLocations(IDataObject *pDataObject, HTREEITEM hItem
 					DragQueryFile(
 						(HDROP) pdf, iDroppedItem, szFullFileName, SIZEOF_ARRAY(szFullFileName));
 
-					GetDisplayName(pidlDest.get(), szDestDirectory, SIZEOF_ARRAY(szDestDirectory),
-						SHGDN_FORPARSING);
+					std::wstring destDirectory;
+					GetDisplayName(pidlDest.get(), SHGDN_FORPARSING, destDirectory);
 
-					bOnSameDrive = PathIsSameRoot(szDestDirectory, szFullFileName);
+					bOnSameDrive = PathIsSameRoot(destDirectory.c_str(), szFullFileName);
 				}
 			}
 
@@ -274,13 +273,12 @@ HRESULT _stdcall ShellTreeView::Drop(
 	{
 		auto pidlDirectory = GetItemPidl(tvht.hItem);
 
-		TCHAR szDestDirectory[MAX_PATH];
-		GetDisplayName(
-			pidlDirectory.get(), szDestDirectory, SIZEOF_ARRAY(szDestDirectory), SHGDN_FORPARSING);
+		std::wstring destDirectory;
+		GetDisplayName(pidlDirectory.get(), SHGDN_FORPARSING, destDirectory);
 
 		DropHandler *pDropHandler = DropHandler::CreateNew();
 		pDropHandler->Drop(pDataObject, grfKeyState, pt, pdwEffect, m_hTreeView, m_DragType,
-			szDestDirectory, nullptr, FALSE);
+			destDirectory.c_str(), nullptr, FALSE);
 		pDropHandler->Release();
 	}
 

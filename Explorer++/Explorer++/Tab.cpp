@@ -69,8 +69,8 @@ std::wstring Tab::GetName() const
 
 	auto pidlDirectory = m_shellBrowser->GetDirectoryIdl();
 
-	TCHAR name[MAX_PATH];
-	HRESULT hr = GetDisplayName(pidlDirectory.get(), name, SIZEOF_ARRAY(name), SHGDN_INFOLDER);
+	std::wstring name;
+	HRESULT hr = GetDisplayName(pidlDirectory.get(), SHGDN_INFOLDER, name);
 
 	if (FAILED(hr))
 	{
