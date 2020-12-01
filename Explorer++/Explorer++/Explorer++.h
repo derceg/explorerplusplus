@@ -178,7 +178,7 @@ private:
 	void OnSetFocus();
 	LRESULT OnDeviceChange(WPARAM wParam, LPARAM lParam);
 	LRESULT StatusBarMenuSelect(WPARAM wParam, LPARAM lParam);
-	void OnStartedBrowsing(int iTabId, const TCHAR *szPath);
+	void OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pidl);
 	void OnPreviousWindow();
 	void OnNextWindow();
 	void OnShellNewItemCreated(LPARAM lParam);

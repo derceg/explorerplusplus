@@ -75,23 +75,33 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void Explorerplusplus::OnStartedBrowsing(int iTabId, const TCHAR *szFolderPath)
+void Explorerplusplus::OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pidl)
 {
-	if (iTabId == m_tabContainer->GetSelectedTab().GetId())
+	if (!m_tabContainer->IsTabSelected(tab))
 	{
-		TCHAR szTemp[64];
-		TCHAR szLoadingText[512];
-		LoadString(m_hLanguageModule, IDS_GENERAL_LOADING, szTemp, SIZEOF_ARRAY(szTemp));
-		StringCchPrintf(szLoadingText, SIZEOF_ARRAY(szLoadingText), szTemp, szFolderPath);
-
-		/* Browsing of a folder has started. Set the status bar text to indicate that
-		the folder is been loaded. */
-		SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 0 | 0, (LPARAM) szLoadingText);
-
-		/* Clear the text in all other parts of the status bar. */
-		SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 1 | 0, (LPARAM) EMPTY_STRING);
-		SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 2 | 0, (LPARAM) EMPTY_STRING);
+		return;
 	}
+
+	TCHAR displayName[MAX_PATH];
+	HRESULT hr = GetDisplayName(pidl, displayName, SIZEOF_ARRAY(displayName), SHGDN_INFOLDER);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	TCHAR szTemp[64];
+	TCHAR szLoadingText[512];
+	LoadString(m_hLanguageModule, IDS_GENERAL_LOADING, szTemp, SIZEOF_ARRAY(szTemp));
+	StringCchPrintf(szLoadingText, SIZEOF_ARRAY(szLoadingText), szTemp, displayName);
+
+	/* Browsing of a folder has started. Set the status bar text to indicate that
+	the folder is being loaded. */
+	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 0 | 0, (LPARAM) szLoadingText);
+
+	/* Clear the text in all other parts of the status bar. */
+	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 1 | 0, (LPARAM) EMPTY_STRING);
+	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 2 | 0, (LPARAM) EMPTY_STRING);
 }
 
 HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)

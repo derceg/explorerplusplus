@@ -25,7 +25,6 @@
 
 #define WM_USER_UPDATEWINDOWS (WM_APP + 17)
 #define WM_USER_FILESADDED (WM_APP + 51)
-#define WM_USER_STARTEDBROWSING (WM_APP + 55)
 #define WM_USER_NEWITEMINSERTED (WM_APP + 200)
 #define WM_USER_DIRECTORYMODIFIED (WM_APP + 204)
 
@@ -180,6 +179,7 @@ public:
 	void OnGridlinesSettingChanged();
 
 	// Signals
+	SignalWrapper<ShellBrowser, void(PCIDLIST_ABSOLUTE pidl)> navigationStarted;
 	SignalWrapper<ShellBrowser, void()> listViewSelectionChanged;
 	SignalWrapper<ShellBrowser, void()> columnsChanged;
 

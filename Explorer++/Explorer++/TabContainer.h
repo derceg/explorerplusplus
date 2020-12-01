@@ -120,6 +120,7 @@ public:
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabPreRemovalSignal;
 	SignalWrapper<TabContainer, void(int tabId)> tabRemovedSignal;
 
+	SignalWrapper<TabContainer, void(const Tab &tab, PCIDLIST_ABSOLUTE pidl)> tabNavigationStarted;
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabListViewSelectionChanged;
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabColumnsChanged;
 

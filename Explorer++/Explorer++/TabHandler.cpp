@@ -28,6 +28,8 @@ void Explorerplusplus::InitializeTabs()
 		&m_cachedIcons, &m_bookmarkTree, m_hLanguageModule, m_config);
 	m_tabContainer->tabCreatedSignal.AddObserver(
 		boost::bind(&Explorerplusplus::OnTabCreated, this, _1, _2), boost::signals2::at_front);
+	m_tabContainer->tabNavigationStarted.AddObserver(
+		boost::bind(&Explorerplusplus::OnNavigationStarted, this, _1, _2), boost::signals2::at_front);
 	m_tabContainer->tabNavigationCompletedSignal.AddObserver(
 		boost::bind(&Explorerplusplus::OnNavigationCompleted, this, _1), boost::signals2::at_front);
 	m_tabContainer->tabSelectedSignal.AddObserver(

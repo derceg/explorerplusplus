@@ -38,8 +38,7 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 	TCHAR szParsingPath[MAX_PATH];
 	GetDisplayName(pidlDirectory, szParsingPath, SIZEOF_ARRAY(szParsingPath), SHGDN_FORPARSING);
 
-	/* TODO: Method callback. */
-	SendMessage(m_hOwner, WM_USER_STARTEDBROWSING, m_ID, reinterpret_cast<WPARAM>(szParsingPath));
+	navigationStarted.m_signal(pidlDirectory);
 
 	StringCchCopy(m_CurDir, SIZEOF_ARRAY(m_CurDir), szParsingPath);
 

@@ -1019,6 +1019,10 @@ HRESULT TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 			tabNavigationCompletedSignal.m_signal(tab);
 		});
 
+	tab.GetShellBrowser()->navigationStarted.AddObserver([this, &tab](PCIDLIST_ABSOLUTE pidl) {
+		tabNavigationStarted.m_signal(tab, pidl);
+	});
+
 	tab.GetShellBrowser()->listViewSelectionChanged.AddObserver([this, &tab]() {
 		tabListViewSelectionChanged.m_signal(tab);
 	});
