@@ -545,33 +545,9 @@ std::wstring ShellBrowser::GetItemEditingName(int index) const
 	return GetItemByIndex(index).editingName;
 }
 
-HRESULT ShellBrowser::GetItemFullName(int iIndex, TCHAR *FullItemPath, UINT cchMax) const
+HRESULT ShellBrowser::GetItemFullName(int index, std::wstring fullName) const
 {
-	LVITEM lvItem;
-	BOOL bRes;
-
-	lvItem.mask = LVIF_PARAM;
-	lvItem.iItem = iIndex;
-	lvItem.iSubItem = 0;
-	bRes = ListView_GetItem(m_hListView, &lvItem);
-
-	if (bRes)
-	{
-		QueryFullItemNameInternal((int) lvItem.lParam, FullItemPath, cchMax);
-
-		return S_OK;
-	}
-
-	return E_FAIL;
-}
-
-void ShellBrowser::QueryFullItemNameInternal(
-	int iItemInternal, TCHAR *szFullFileName, UINT cchMax) const
-{
-	std::wstring name;
-	GetDisplayName(m_itemInfoMap.at(iItemInternal).pidlComplete.get(), SHGDN_FORPARSING, name);
-
-	StringCchCopy(szFullFileName, cchMax, name.c_str());
+	return GetDisplayName(GetItemByIndex(index).pidlComplete.get(), SHGDN_FORPARSING, fullName);
 }
 
 std::wstring ShellBrowser::GetDirectory() const
@@ -1622,15 +1598,15 @@ void ShellBrowser::StartRenamingMultipleFiles()
 			continue;
 		}
 
-		TCHAR szFullFilename[MAX_PATH];
-		HRESULT hr = GetItemFullName(item, szFullFilename, SIZEOF_ARRAY(szFullFilename));
+		std::wstring fullFilename;
+		HRESULT hr = GetItemFullName(item, fullFilename);
 
 		if (FAILED(hr))
 		{
 			continue;
 		}
 
-		fullFilenameList.emplace_back(szFullFilename);
+		fullFilenameList.push_back(fullFilename);
 	}
 
 	if (fullFilenameList.empty())

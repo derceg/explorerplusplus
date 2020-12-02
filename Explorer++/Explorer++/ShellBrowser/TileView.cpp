@@ -11,7 +11,7 @@ void ShellBrowser::InsertTileViewColumns()
 	LVCOLUMN lvColumn;
 	lvColumn.mask = 0;
 
-	/* Name. */	
+	/* Name. */
 	ListView_InsertColumn(m_hListView, 1, &lvColumn);
 
 	/* Type. */
@@ -65,7 +65,6 @@ void ShellBrowser::SetTileViewItemInfo(int iItem, int iItemInternal)
 	LVTILEINFO lvti;
 	UINT uColumns[2] = { 1, 2 };
 	int columnFormats[2] = { LVCFMT_LEFT, LVCFMT_LEFT };
-	TCHAR fullFileName[MAX_PATH];
 
 	lvti.cbSize = sizeof(lvti);
 	lvti.iItem = iItem;
@@ -74,9 +73,10 @@ void ShellBrowser::SetTileViewItemInfo(int iItem, int iItemInternal)
 	lvti.piColFmt = columnFormats;
 	ListView_SetTileInfo(m_hListView, &lvti);
 
-	GetItemFullName(iItem, fullFileName, SIZEOF_ARRAY(fullFileName));
+	std::wstring fullFileName;
+	GetItemFullName(iItem, fullFileName);
 
-	SHGetFileInfo(fullFileName, 0, &shfi, sizeof(SHFILEINFO), SHGFI_TYPENAME);
+	SHGetFileInfo(fullFileName.c_str(), 0, &shfi, sizeof(SHFILEINFO), SHGFI_TYPENAME);
 
 	ListView_SetItemText(m_hListView, iItem, 1, shfi.szTypeName);
 

@@ -1263,10 +1263,13 @@ LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)
 				m_pActiveShellBrowser->GetItemFileFindData(static_cast<int>(pnmcd->dwItemSpec))
 					.dwFileAttributes;
 
-			TCHAR szFileName[MAX_PATH];
+			std::wstring fullFileName;
 			m_pActiveShellBrowser->GetItemFullName(
-				static_cast<int>(pnmcd->dwItemSpec), szFileName, SIZEOF_ARRAY(szFileName));
-			PathStripPath(szFileName);
+				static_cast<int>(pnmcd->dwItemSpec), fullFileName);
+
+			TCHAR fileName[MAX_PATH];
+			StringCchCopy(fileName, SIZEOF_ARRAY(fileName), fullFileName.c_str());
+			PathStripPath(fileName);
 
 			/* Loop through each filter. Decide whether to change the font of the
 			current item based on its filename and/or attributes. */
@@ -1278,7 +1281,7 @@ LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)
 				/* Only match against the filename if it's not empty. */
 				if (!colorRule.strFilterPattern.empty())
 				{
-					if (CheckWildcardMatch(colorRule.strFilterPattern.c_str(), szFileName,
+					if (CheckWildcardMatch(colorRule.strFilterPattern.c_str(), fileName,
 							!colorRule.caseInsensitive)
 						== 1)
 					{

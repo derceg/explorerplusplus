@@ -129,7 +129,7 @@ public:
 	std::wstring GetItemName(int index) const;
 	std::wstring GetItemDisplayName(int index) const;
 	std::wstring GetItemEditingName(int index) const;
-	HRESULT GetItemFullName(int iIndex, TCHAR *FullItemPath, UINT cchMax) const;
+	HRESULT GetItemFullName(int index, std::wstring fullName) const;
 
 	void ShowPropertiesForSelectedFiles() const;
 
@@ -482,7 +482,6 @@ private:
 	int LocateFileItemInternalIndex(const TCHAR *szFileName) const;
 	std::optional<int> LocateItemByInternalIndex(int internalIndex) const;
 	void ApplyHeaderSortArrow();
-	void QueryFullItemNameInternal(int iItemInternal, TCHAR *szFullFileName, UINT cchMax) const;
 
 	int m_iRefCount;
 

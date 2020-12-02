@@ -54,9 +54,9 @@ void Explorerplusplus::OnMergeFiles()
 
 	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
 	{
-		TCHAR szFullFilename[MAX_PATH];
-		m_pActiveShellBrowser->GetItemFullName(iItem, szFullFilename, SIZEOF_ARRAY(szFullFilename));
-		fullFilenameList.emplace_back(szFullFilename);
+		std::wstring fullFilename;
+		m_pActiveShellBrowser->GetItemFullName(iItem, fullFilename);
+		fullFilenameList.push_back(fullFilename);
 	}
 
 	MergeFilesDialog mergeFilesDialog(m_hLanguageModule, m_hContainer, this, currentDirectory,
@@ -70,11 +70,10 @@ void Explorerplusplus::OnSplitFile()
 
 	if (iSelected != -1)
 	{
-		TCHAR szFullFilename[MAX_PATH];
-		m_pActiveShellBrowser->GetItemFullName(
-			iSelected, szFullFilename, SIZEOF_ARRAY(szFullFilename));
+		std::wstring fullFilename;
+		m_pActiveShellBrowser->GetItemFullName(iSelected, fullFilename);
 
-		SplitFileDialog splitFileDialog(m_hLanguageModule, m_hContainer, this, szFullFilename);
+		SplitFileDialog splitFileDialog(m_hLanguageModule, m_hContainer, this, fullFilename);
 		splitFileDialog.ShowModalDialog();
 	}
 }
@@ -86,9 +85,9 @@ void Explorerplusplus::OnDestroyFiles()
 
 	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
 	{
-		TCHAR szFullFilename[MAX_PATH];
-		m_pActiveShellBrowser->GetItemFullName(iItem, szFullFilename, SIZEOF_ARRAY(szFullFilename));
-		fullFilenameList.emplace_back(szFullFilename);
+		std::wstring fullFilename;
+		m_pActiveShellBrowser->GetItemFullName(iItem, fullFilename);
+		fullFilenameList.push_back(fullFilename);
 	}
 
 	DestroyFilesDialog destroyFilesDialog(m_hLanguageModule, m_hContainer, fullFilenameList,
@@ -250,7 +249,6 @@ void Explorerplusplus::OnCreateNewFolder()
 
 void Explorerplusplus::OnResolveLink()
 {
-	TCHAR shortcutFileName[MAX_PATH];
 	TCHAR szFullFileName[MAX_PATH];
 	TCHAR szPath[MAX_PATH];
 	HRESULT hr;
@@ -260,11 +258,11 @@ void Explorerplusplus::OnResolveLink()
 
 	if (iItem != -1)
 	{
-		m_pActiveShellBrowser->GetItemFullName(
-			iItem, shortcutFileName, SIZEOF_ARRAY(shortcutFileName));
+		std::wstring shortcutFileName;
+		m_pActiveShellBrowser->GetItemFullName(iItem, shortcutFileName);
 
-		hr = NFileOperations::ResolveLink(
-			m_hContainer, 0, shortcutFileName, szFullFileName, SIZEOF_ARRAY(szFullFileName));
+		hr = NFileOperations::ResolveLink(m_hContainer, 0, shortcutFileName.c_str(), szFullFileName,
+			SIZEOF_ARRAY(szFullFileName));
 
 		if (hr == S_OK)
 		{

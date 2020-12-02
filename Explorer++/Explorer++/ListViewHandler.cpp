@@ -697,13 +697,9 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam, DragType dragType)
 		rawPidls.push_back(pidl.get());
 		pidls.push_back(std::move(pidl));
 
-		TCHAR szFullFilename[MAX_PATH];
-
-		m_pActiveShellBrowser->GetItemFullName(item, szFullFilename, SIZEOF_ARRAY(szFullFilename));
-
-		std::wstring stringFilename(szFullFilename);
-
-		filenameList.push_back(stringFilename);
+		std::wstring fullFilename;
+		m_pActiveShellBrowser->GetItemFullName(item, fullFilename);
+		filenameList.push_back(fullFilename);
 	}
 
 	hr = CoCreateInstance(
@@ -829,10 +825,10 @@ void Explorerplusplus::OnListViewCopyItemPath() const
 
 	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
 	{
-		TCHAR szFullFilename[MAX_PATH];
-		m_pActiveShellBrowser->GetItemFullName(iItem, szFullFilename, SIZEOF_ARRAY(szFullFilename));
+		std::wstring fullFilename;
+		m_pActiveShellBrowser->GetItemFullName(iItem, fullFilename);
 
-		strItemPaths += szFullFilename + std::wstring(_T("\r\n"));
+		strItemPaths += fullFilename + std::wstring(_T("\r\n"));
 	}
 
 	strItemPaths = strItemPaths.substr(0, strItemPaths.size() - 2);
@@ -853,14 +849,14 @@ void Explorerplusplus::OnListViewCopyUniversalPaths() const
 
 	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
 	{
-		TCHAR szFullFilename[MAX_PATH];
-		m_pActiveShellBrowser->GetItemFullName(iItem, szFullFilename, SIZEOF_ARRAY(szFullFilename));
+		std::wstring fullFilename;
+		m_pActiveShellBrowser->GetItemFullName(iItem, fullFilename);
 
 		TCHAR szBuffer[1024];
 
 		DWORD dwBufferSize = SIZEOF_ARRAY(szBuffer);
 		auto *puni = reinterpret_cast<UNIVERSAL_NAME_INFO *>(&szBuffer);
-		DWORD dwRet = WNetGetUniversalName(szFullFilename, UNIVERSAL_NAME_INFO_LEVEL,
+		DWORD dwRet = WNetGetUniversalName(fullFilename.c_str(), UNIVERSAL_NAME_INFO_LEVEL,
 			reinterpret_cast<LPVOID>(puni), &dwBufferSize);
 
 		if (dwRet == NO_ERROR)
@@ -869,7 +865,7 @@ void Explorerplusplus::OnListViewCopyUniversalPaths() const
 		}
 		else
 		{
-			strUniversalPaths += szFullFilename + std::wstring(_T("\r\n"));
+			strUniversalPaths += fullFilename + std::wstring(_T("\r\n"));
 		}
 	}
 
@@ -917,8 +913,6 @@ void Explorerplusplus::OnListViewPaste()
 
 int Explorerplusplus::HighlightSimilarFiles(HWND ListView) const
 {
-	TCHAR fullFileName[MAX_PATH];
-	TCHAR testFile[MAX_PATH];
 	HRESULT hr;
 	BOOL bSimilarTypes;
 	int iSelected;
@@ -931,7 +925,8 @@ int Explorerplusplus::HighlightSimilarFiles(HWND ListView) const
 	if (iSelected == -1)
 		return -1;
 
-	hr = m_pActiveShellBrowser->GetItemFullName(iSelected, testFile, SIZEOF_ARRAY(testFile));
+	std::wstring testFile;
+	hr = m_pActiveShellBrowser->GetItemFullName(iSelected, testFile);
 
 	if (SUCCEEDED(hr))
 	{
@@ -939,9 +934,10 @@ int Explorerplusplus::HighlightSimilarFiles(HWND ListView) const
 
 		for (i = 0; i < nItems; i++)
 		{
-			m_pActiveShellBrowser->GetItemFullName(i, fullFileName, SIZEOF_ARRAY(fullFileName));
+			std::wstring fullFileName;
+			m_pActiveShellBrowser->GetItemFullName(i, fullFileName);
 
-			bSimilarTypes = CompareFileTypes(fullFileName, testFile);
+			bSimilarTypes = CompareFileTypes(fullFileName.c_str(), testFile.c_str());
 
 			if (bSimilarTypes)
 			{
