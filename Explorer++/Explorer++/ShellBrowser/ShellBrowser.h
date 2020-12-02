@@ -129,7 +129,7 @@ public:
 	std::wstring GetItemName(int index) const;
 	std::wstring GetItemDisplayName(int index) const;
 	std::wstring GetItemEditingName(int index) const;
-	HRESULT GetItemFullName(int index, std::wstring fullName) const;
+	std::wstring GetItemFullName(int index) const;
 
 	void ShowPropertiesForSelectedFiles() const;
 
@@ -201,6 +201,7 @@ private:
 		unique_pidl_absolute pidlComplete;
 		unique_pidl_child pridl;
 		WIN32_FIND_DATA wfd;
+		std::wstring parsingName;
 		std::wstring displayName;
 		std::wstring editingName;
 		int iIcon;

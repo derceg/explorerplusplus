@@ -927,9 +927,7 @@ std::vector<std::wstring> ShellBrowser::GetSelectedItems()
 
 	while ((item = ListView_GetNextItem(m_hListView, item, LVNI_SELECTED)) != -1)
 	{
-		std::wstring fullFileName;
-		GetItemFullName(item, fullFileName);
-		selectedFiles.push_back(fullFileName);
+		selectedFiles.push_back(GetItemFullName(item));
 	}
 
 	return selectedFiles;

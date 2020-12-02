@@ -559,6 +559,10 @@ void ShellBrowser::RenameItem(int iItemInternal, const TCHAR *szNewFileName)
 
 		if (SUCCEEDED(hr))
 		{
+			std::wstring parsingName;
+			HRESULT parsingNameResult =
+				GetDisplayName(szFullFileName, SHGDN_FORPARSING, parsingName);
+
 			std::wstring displayName;
 			hr = GetDisplayName(szFullFileName, SHGDN_INFOLDER | SHGDN_FORPARSING, displayName);
 
@@ -566,10 +570,11 @@ void ShellBrowser::RenameItem(int iItemInternal, const TCHAR *szNewFileName)
 			HRESULT editingNameResult =
 				GetDisplayName(szFullFileName, SHGDN_INFOLDER | SHGDN_FOREDITING, editingName);
 
-			if (SUCCEEDED(hr) && SUCCEEDED(editingNameResult))
+			if (SUCCEEDED(parsingNameResult) && SUCCEEDED(hr) && SUCCEEDED(editingNameResult))
 			{
 				itemInfo.pidlComplete.reset(ILCloneFull(pidlFull.get()));
 				itemInfo.pridl.reset(ILCloneChild(pidlRelative));
+				itemInfo.parsingName = parsingName;
 				itemInfo.displayName = displayName;
 				itemInfo.editingName = editingName;
 				StringCchCopy(

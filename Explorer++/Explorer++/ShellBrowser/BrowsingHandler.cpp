@@ -278,7 +278,6 @@ int ShellBrowser::SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_C
 	const std::wstring &displayName, const std::wstring &editingName)
 {
 	HANDLE hFirstFile;
-	TCHAR szPath[MAX_PATH];
 	int uItemId;
 
 	uItemId = GenerateUniqueItemId();
@@ -290,25 +289,30 @@ int ShellBrowser::SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_C
 	m_itemInfoMap[uItemId].displayName = displayName;
 	m_itemInfoMap[uItemId].editingName = editingName;
 
-	SHGetPathFromIDList(pidlItem.get(), szPath);
+	// Failing fast isn't ideal, but the parsing name is required and this function currently
+	// doesn't return any errors.
+	// TODO: This function should be able to signal an error in some way.
+	std::wstring parsingName;
+	FAIL_FAST_IF_FAILED(GetDisplayName(pidlItem.get(), SHGDN_FORPARSING, parsingName));
+	m_itemInfoMap[uItemId].parsingName = parsingName;
 
 	/* DO NOT call FindFirstFile() on root drives (especially
 	floppy drives). Doing so may cause a delay of up to a
 	few seconds. */
-	if (!PathIsRoot(szPath))
+	if (!PathIsRoot(parsingName.c_str()))
 	{
 		m_itemInfoMap[uItemId].bDrive = FALSE;
 
 		WIN32_FIND_DATA wfd;
-		hFirstFile = FindFirstFile(szPath, &wfd);
+		hFirstFile = FindFirstFile(parsingName.c_str(), &wfd);
 
 		m_itemInfoMap[uItemId].wfd = wfd;
 	}
 	else
 	{
 		m_itemInfoMap[uItemId].bDrive = TRUE;
-		StringCchCopy(
-			m_itemInfoMap[uItemId].szDrive, SIZEOF_ARRAY(m_itemInfoMap[uItemId].szDrive), szPath);
+		StringCchCopy(m_itemInfoMap[uItemId].szDrive, SIZEOF_ARRAY(m_itemInfoMap[uItemId].szDrive),
+			parsingName.c_str());
 
 		hFirstFile = INVALID_HANDLE_VALUE;
 	}

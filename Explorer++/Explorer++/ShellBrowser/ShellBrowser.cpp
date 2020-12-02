@@ -545,9 +545,9 @@ std::wstring ShellBrowser::GetItemEditingName(int index) const
 	return GetItemByIndex(index).editingName;
 }
 
-HRESULT ShellBrowser::GetItemFullName(int index, std::wstring fullName) const
+std::wstring ShellBrowser::GetItemFullName(int index) const
 {
-	return GetDisplayName(GetItemByIndex(index).pidlComplete.get(), SHGDN_FORPARSING, fullName);
+	return GetItemByIndex(index).parsingName;
 }
 
 std::wstring ShellBrowser::GetDirectory() const
@@ -1598,15 +1598,7 @@ void ShellBrowser::StartRenamingMultipleFiles()
 			continue;
 		}
 
-		std::wstring fullFilename;
-		HRESULT hr = GetItemFullName(item, fullFilename);
-
-		if (FAILED(hr))
-		{
-			continue;
-		}
-
-		fullFilenameList.push_back(fullFilename);
+		fullFilenameList.push_back(GetItemFullName(item));
 	}
 
 	if (fullFilenameList.empty())

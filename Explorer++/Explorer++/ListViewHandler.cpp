@@ -697,8 +697,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam, DragType dragType)
 		rawPidls.push_back(pidl.get());
 		pidls.push_back(std::move(pidl));
 
-		std::wstring fullFilename;
-		m_pActiveShellBrowser->GetItemFullName(item, fullFilename);
+		std::wstring fullFilename = m_pActiveShellBrowser->GetItemFullName(item);
 		filenameList.push_back(fullFilename);
 	}
 
@@ -825,8 +824,7 @@ void Explorerplusplus::OnListViewCopyItemPath() const
 
 	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
 	{
-		std::wstring fullFilename;
-		m_pActiveShellBrowser->GetItemFullName(iItem, fullFilename);
+		std::wstring fullFilename = m_pActiveShellBrowser->GetItemFullName(iItem);
 
 		strItemPaths += fullFilename + std::wstring(_T("\r\n"));
 	}
@@ -849,8 +847,7 @@ void Explorerplusplus::OnListViewCopyUniversalPaths() const
 
 	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
 	{
-		std::wstring fullFilename;
-		m_pActiveShellBrowser->GetItemFullName(iItem, fullFilename);
+		std::wstring fullFilename = m_pActiveShellBrowser->GetItemFullName(iItem);
 
 		TCHAR szBuffer[1024];
 
@@ -913,7 +910,6 @@ void Explorerplusplus::OnListViewPaste()
 
 int Explorerplusplus::HighlightSimilarFiles(HWND ListView) const
 {
-	HRESULT hr;
 	BOOL bSimilarTypes;
 	int iSelected;
 	int nItems;
@@ -925,29 +921,24 @@ int Explorerplusplus::HighlightSimilarFiles(HWND ListView) const
 	if (iSelected == -1)
 		return -1;
 
-	std::wstring testFile;
-	hr = m_pActiveShellBrowser->GetItemFullName(iSelected, testFile);
+	std::wstring testFile = m_pActiveShellBrowser->GetItemFullName(iSelected);
 
-	if (SUCCEEDED(hr))
+	nItems = ListView_GetItemCount(ListView);
+
+	for (i = 0; i < nItems; i++)
 	{
-		nItems = ListView_GetItemCount(ListView);
+		std::wstring fullFileName = m_pActiveShellBrowser->GetItemFullName(i);
 
-		for (i = 0; i < nItems; i++)
+		bSimilarTypes = CompareFileTypes(fullFileName.c_str(), testFile.c_str());
+
+		if (bSimilarTypes)
 		{
-			std::wstring fullFileName;
-			m_pActiveShellBrowser->GetItemFullName(i, fullFileName);
-
-			bSimilarTypes = CompareFileTypes(fullFileName.c_str(), testFile.c_str());
-
-			if (bSimilarTypes)
-			{
-				ListViewHelper::SelectItem(ListView, i, TRUE);
-				nSimilar++;
-			}
-			else
-			{
-				ListViewHelper::SelectItem(ListView, i, FALSE);
-			}
+			ListViewHelper::SelectItem(ListView, i, TRUE);
+			nSimilar++;
+		}
+		else
+		{
+			ListViewHelper::SelectItem(ListView, i, FALSE);
 		}
 	}
 

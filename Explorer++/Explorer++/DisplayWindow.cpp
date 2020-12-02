@@ -109,8 +109,7 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 		/* File name. */
 		DisplayWindow_BufferText(m_hDisplayWindow, filename.c_str());
 
-		std::wstring fullItemName;
-		tab.GetShellBrowser()->GetItemFullName(iSelected, fullItemName);
+		std::wstring fullItemName = tab.GetShellBrowser()->GetItemFullName(iSelected);
 
 		if (!tab.GetShellBrowser()->InVirtualFolder())
 		{

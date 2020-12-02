@@ -73,8 +73,7 @@ void ShellBrowser::SetTileViewItemInfo(int iItem, int iItemInternal)
 	lvti.piColFmt = columnFormats;
 	ListView_SetTileInfo(m_hListView, &lvti);
 
-	std::wstring fullFileName;
-	GetItemFullName(iItem, fullFileName);
+	std::wstring fullFileName = GetItemFullName(iItem);
 
 	SHGetFileInfo(fullFileName.c_str(), 0, &shfi, sizeof(SHFILEINFO), SHGFI_TYPENAME);
 

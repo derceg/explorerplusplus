@@ -54,8 +54,7 @@ void Explorerplusplus::OnMergeFiles()
 
 	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
 	{
-		std::wstring fullFilename;
-		m_pActiveShellBrowser->GetItemFullName(iItem, fullFilename);
+		std::wstring fullFilename = m_pActiveShellBrowser->GetItemFullName(iItem);
 		fullFilenameList.push_back(fullFilename);
 	}
 
@@ -70,8 +69,7 @@ void Explorerplusplus::OnSplitFile()
 
 	if (iSelected != -1)
 	{
-		std::wstring fullFilename;
-		m_pActiveShellBrowser->GetItemFullName(iSelected, fullFilename);
+		std::wstring fullFilename = m_pActiveShellBrowser->GetItemFullName(iSelected);
 
 		SplitFileDialog splitFileDialog(m_hLanguageModule, m_hContainer, this, fullFilename);
 		splitFileDialog.ShowModalDialog();
@@ -85,8 +83,7 @@ void Explorerplusplus::OnDestroyFiles()
 
 	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
 	{
-		std::wstring fullFilename;
-		m_pActiveShellBrowser->GetItemFullName(iItem, fullFilename);
+		std::wstring fullFilename = m_pActiveShellBrowser->GetItemFullName(iItem);
 		fullFilenameList.push_back(fullFilename);
 	}
 
@@ -258,8 +255,7 @@ void Explorerplusplus::OnResolveLink()
 
 	if (iItem != -1)
 	{
-		std::wstring shortcutFileName;
-		m_pActiveShellBrowser->GetItemFullName(iItem, shortcutFileName);
+		std::wstring shortcutFileName = m_pActiveShellBrowser->GetItemFullName(iItem);
 
 		hr = NFileOperations::ResolveLink(m_hContainer, 0, shortcutFileName.c_str(), szFullFileName,
 			SIZEOF_ARRAY(szFullFileName));

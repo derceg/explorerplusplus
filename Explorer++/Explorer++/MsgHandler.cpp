@@ -1263,9 +1263,8 @@ LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)
 				m_pActiveShellBrowser->GetItemFileFindData(static_cast<int>(pnmcd->dwItemSpec))
 					.dwFileAttributes;
 
-			std::wstring fullFileName;
-			m_pActiveShellBrowser->GetItemFullName(
-				static_cast<int>(pnmcd->dwItemSpec), fullFileName);
+			std::wstring fullFileName =
+				m_pActiveShellBrowser->GetItemFullName(static_cast<int>(pnmcd->dwItemSpec));
 
 			TCHAR fileName[MAX_PATH];
 			StringCchCopy(fileName, SIZEOF_ARRAY(fileName), fullFileName.c_str());
