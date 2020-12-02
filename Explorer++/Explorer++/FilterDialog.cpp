@@ -10,6 +10,7 @@
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/RegistrySettings.h"
+#include "../Helper/WindowHelper.h"
 #include "../Helper/XMLSettings.h"
 #include <list>
 
@@ -113,11 +114,7 @@ void FilterDialog::OnOk()
 {
 	HWND hComboBox = GetDlgItem(m_hDlg, IDC_FILTER_COMBOBOX);
 
-	int iBufSize = GetWindowTextLength(hComboBox);
-
-	auto filter = std::make_unique<TCHAR[]>(iBufSize + 1);
-
-	SendMessage(hComboBox, WM_GETTEXT, iBufSize + 1, reinterpret_cast<LPARAM>(filter.get()));
+	std::wstring filter = GetWindowString(hComboBox);
 
 	bool bFound = false;
 
@@ -127,7 +124,7 @@ void FilterDialog::OnOk()
 	for (auto itr = m_persistentSettings->m_FilterList.begin();
 		 itr != m_persistentSettings->m_FilterList.end(); itr++)
 	{
-		if (lstrcmp(filter.get(), itr->c_str()) == 0)
+		if (filter == *itr)
 		{
 			std::iter_swap(itr, m_persistentSettings->m_FilterList.begin());
 
@@ -138,13 +135,13 @@ void FilterDialog::OnOk()
 
 	if (!bFound)
 	{
-		m_persistentSettings->m_FilterList.push_front(filter.get());
+		m_persistentSettings->m_FilterList.push_front(filter);
 	}
 
 	m_pexpp->GetActiveShellBrowser()->SetFilterCaseSensitive(
 		IsDlgButtonChecked(m_hDlg, IDC_FILTERS_CASESENSITIVE) == BST_CHECKED);
 
-	m_pexpp->GetActiveShellBrowser()->SetFilter(filter.get());
+	m_pexpp->GetActiveShellBrowser()->SetFilter(filter);
 
 	if (!m_pexpp->GetActiveShellBrowser()->GetFilterStatus())
 	{

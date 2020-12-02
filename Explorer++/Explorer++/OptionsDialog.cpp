@@ -381,7 +381,6 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(
 		case PSN_APPLY:
 		{
 			HWND hEdit;
-			TCHAR szNewTabDir[MAX_PATH];
 			ReplaceExplorerMode replaceExplorerMode = ReplaceExplorerMode::None;
 			HRESULT hr;
 			int iSel;
@@ -419,12 +418,12 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(
 
 			hEdit = GetDlgItem(hDlg, IDC_DEFAULT_NEWTABDIR_EDIT);
 
-			SendMessage(hEdit, WM_GETTEXT, SIZEOF_ARRAY(szNewTabDir), (LPARAM) szNewTabDir);
+			std::wstring newTabDir = GetWindowString(hEdit);
 
 			/* The folder may be virtual, in which case, it needs
 			to be decoded. */
 			std::wstring virtualParsingPath;
-			hr = DecodeFriendlyPath(szNewTabDir, virtualParsingPath);
+			hr = DecodeFriendlyPath(newTabDir, virtualParsingPath);
 
 			if (SUCCEEDED(hr))
 			{
@@ -432,7 +431,7 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(
 			}
 			else
 			{
-				m_config->defaultTabDirectory = szNewTabDir;
+				m_config->defaultTabDirectory = newTabDir;
 			}
 
 			iSel = static_cast<int>(

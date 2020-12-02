@@ -16,6 +16,7 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/StringHelper.h"
+#include "../Helper/WindowHelper.h"
 #include <wil/resource.h>
 #include <regex>
 
@@ -370,10 +371,9 @@ void MergeFilesDialog::OnOk()
 			return;
 		}
 
-		TCHAR szOutputFileName[MAX_PATH];
-		GetWindowText(hOutputFileName, szOutputFileName, SIZEOF_ARRAY(szOutputFileName));
+		std::wstring outputFileName = GetWindowString(hOutputFileName);
 
-		m_pMergeFiles = new MergeFiles(m_hDlg, szOutputFileName, m_FullFilenameList);
+		m_pMergeFiles = new MergeFiles(m_hDlg, outputFileName, m_FullFilenameList);
 
 		SendDlgItemMessage(m_hDlg, IDC_MERGE_PROGRESS, PBM_SETPOS, 0, 0);
 

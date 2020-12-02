@@ -13,6 +13,7 @@
 #include "HolderWindowInternal.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/Macros.h"
+#include "../Helper/WindowHelper.h"
 
 #define FOLDERS_TEXT_X 5
 #define FOLDERS_TEXT_Y 2
@@ -125,7 +126,6 @@ void HolderWindow::OnHolderWindowPaint(HWND hwnd)
 	HDC hdc;
 	HFONT hFont;
 	RECT rc;
-	TCHAR szHeader[64];
 
 	GetClientRect(hwnd, &rc);
 
@@ -142,7 +142,7 @@ void HolderWindow::OnHolderWindowPaint(HWND hwnd)
 
 	SelectObject(hdc, hFont);
 
-	GetWindowText(hwnd, szHeader, SIZEOF_ARRAY(szHeader));
+	std::wstring header = GetWindowString(hwnd);
 
 	SetBkMode(hdc, TRANSPARENT);
 
@@ -153,7 +153,7 @@ void HolderWindow::OnHolderWindowPaint(HWND hwnd)
 		SetTextColor(hdc, DarkModeHelper::TEXT_COLOR);
 	}
 
-	TextOut(hdc, FOLDERS_TEXT_X, FOLDERS_TEXT_Y, szHeader, lstrlen(szHeader));
+	TextOut(hdc, FOLDERS_TEXT_X, FOLDERS_TEXT_Y, header.c_str(), static_cast<int>(header.size()));
 
 	DeleteObject(hFont);
 

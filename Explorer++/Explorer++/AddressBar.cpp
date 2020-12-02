@@ -15,6 +15,7 @@
 #include "../Helper/DragDropHelper.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/WindowHelper.h"
 #include "../Helper/iDataObject.h"
 #include "../Helper/iDropSource.h"
 #include <wil/com.h>
@@ -197,16 +198,16 @@ Basic procedure:
 */
 void AddressBar::OnGo()
 {
-	TCHAR szPath[MAX_PATH];
-	TCHAR szFullFilePath[MAX_PATH];
-
 	/* Retrieve the combobox text, and determine if it is a
 	valid path. */
-	SendMessage(m_hwnd, WM_GETTEXT, SIZEOF_ARRAY(szPath), (LPARAM) szPath);
+	std::wstring path = GetWindowString(m_hwnd);
 
 	const Tab &selectedTab = m_expp->GetTabContainer()->GetSelectedTab();
 	std::wstring currentDirectory = selectedTab.GetShellBrowser()->GetDirectory();
-	DecodePath(szPath, currentDirectory.c_str(), szFullFilePath, SIZEOF_ARRAY(szFullFilePath));
+
+	TCHAR szFullFilePath[MAX_PATH];
+	DecodePath(
+		path.c_str(), currentDirectory.c_str(), szFullFilePath, SIZEOF_ARRAY(szFullFilePath));
 
 	m_expp->OpenItem(szFullFilePath, FALSE, FALSE);
 }

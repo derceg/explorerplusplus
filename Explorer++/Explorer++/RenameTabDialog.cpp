@@ -7,6 +7,7 @@
 #include "MainResource.h"
 #include "TabContainer.h"
 #include "../Helper/Macros.h"
+#include "../Helper/WindowHelper.h"
 
 const TCHAR RenameTabDialogPersistentSettings::SETTINGS_KEY[] = _T("RenameTab");
 
@@ -95,8 +96,6 @@ void RenameTabDialog::OnUseCustomName()
 
 void RenameTabDialog::OnOk()
 {
-	TCHAR szTabText[MAX_PATH];
-
 	UINT uCheckStatus = IsDlgButtonChecked(m_hDlg, IDC_RENAMETAB_USEFOLDERNAME);
 
 	Tab *tab = m_tabContainer->GetTabOptional(m_tabId);
@@ -109,11 +108,11 @@ void RenameTabDialog::OnOk()
 	{
 		HWND hEditName = GetDlgItem(m_hDlg, IDC_RENAMETAB_NEWTABNAME);
 
-		GetWindowText(hEditName, szTabText, SIZEOF_ARRAY(szTabText));
+		std::wstring tabText = GetWindowString(hEditName);
 
-		if (lstrlen(szTabText) > 0)
+		if (!tabText.empty())
 		{
-			tab->SetCustomName(szTabText);
+			tab->SetCustomName(tabText);
 		}
 	}
 

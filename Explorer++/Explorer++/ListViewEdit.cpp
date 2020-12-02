@@ -10,6 +10,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/WindowHelper.h"
 
 ListViewEdit *ListViewEdit::CreateNew(HWND hwnd, int ItemIndex, IExplorerplusplus *pexpp)
 {
@@ -133,8 +134,7 @@ INT_PTR ListViewEdit::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 int ListViewEdit::GetExtensionIndex()
 {
-	TCHAR szFileName[MAX_PATH];
-	GetWindowText(m_hwnd, szFileName, SIZEOF_ARRAY(szFileName));
+	std::wstring fileName = GetWindowString(m_hwnd);
 
 	DWORD dwAttributes =
 		m_pexpp->GetActiveShellBrowser()->GetItemFileFindData(m_ItemIndex).dwFileAttributes;
@@ -143,11 +143,11 @@ int ListViewEdit::GetExtensionIndex()
 
 	if ((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 	{
-		for (int i = lstrlen(szFileName) - 1; i >= 0; i--)
+		for (size_t i = fileName.size() - 1; i >= 0; i--)
 		{
-			if (szFileName[i] == '.')
+			if (fileName[i] == '.')
 			{
-				index = i;
+				index = static_cast<int>(i);
 				break;
 			}
 		}
