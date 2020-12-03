@@ -835,7 +835,7 @@ void MainToolbar::UpdateToolbarButtonStates()
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Forward, tab.GetShellBrowser()->GetNavigationController()->CanGoForward());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Up, tab.GetShellBrowser()->GetNavigationController()->CanGoUp());
 
-	BOOL bVirtualFolder = tab.GetShellBrowser()->InVirtualFolder();
+	bool virtualFolder = tab.GetShellBrowser()->InVirtualFolder();
 
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::CopyTo, m_pexpp->CanCopy() && GetFocus() != m_pexpp->GetTreeView());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::MoveTo, m_pexpp->CanCut() && GetFocus() != m_pexpp->GetTreeView());
@@ -847,7 +847,7 @@ void MainToolbar::UpdateToolbarButtonStates()
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::DeletePermanently, m_pexpp->CanDelete());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::SplitFile, tab.GetShellBrowser()->GetNumSelectedFiles() == 1);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::MergeFiles, tab.GetShellBrowser()->GetNumSelectedFiles() > 1);
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::OpenCommandPrompt, !bVirtualFolder);
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::OpenCommandPrompt, !virtualFolder);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::NewFolder, m_pexpp->CanCreate());
 }
 

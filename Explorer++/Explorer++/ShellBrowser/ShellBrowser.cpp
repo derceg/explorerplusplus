@@ -135,7 +135,6 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 	m_listViewColumnsSetUp = false;
 	m_bOverFolder = FALSE;
 	m_bDragging = FALSE;
-	m_bVirtualFolder = FALSE;
 	m_bThumbnailsSetup = FALSE;
 	m_nCurrentColumns = 0;
 	m_iDirMonitorId = -1;
@@ -719,9 +718,9 @@ unique_pidl_child ShellBrowser::GetItemChildIdl(int iItem) const
 	return pidlRelative;
 }
 
-BOOL ShellBrowser::InVirtualFolder() const
+bool ShellBrowser::InVirtualFolder() const
 {
-	return m_bVirtualFolder;
+	return m_directoryState.virtualFolder;
 }
 
 /* We can create files in this folder if it is

@@ -202,7 +202,7 @@ void ShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 			a real folder, combine SHGDN_INFOLDER with SHGDN_FORPARSING. This is
 			so that items in real folders can still be shown with extensions, even
 			if the global, Explorer option is disabled. */
-			if (m_bVirtualFolder)
+			if (m_directoryState.virtualFolder)
 			{
 				hr = pShellFolder->GetDisplayNameOf(pidlRelative, SHGDN_INFOLDER, &str);
 			}

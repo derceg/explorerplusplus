@@ -140,7 +140,7 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 		return hr;
 	}
 
-	m_bVirtualFolder = WI_IsFlagClear(attr, SFGAO_FILESYSTEM);
+	m_directoryState.virtualFolder = WI_IsFlagClear(attr, SFGAO_FILESYSTEM);
 
 	wil::com_ptr_nothrow<IShellFolder> pShellFolder;
 	hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
@@ -185,7 +185,7 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 		Also use only SHGDN_INFOLDER if this item is a folder. This is to ensure
 		that specific folders in Windows 7 (those under C:\Users\Username) appear
 		correctly. */
-		if (m_bVirtualFolder || (uAttributes & SFGAO_FOLDER))
+		if (m_directoryState.virtualFolder || (uAttributes & SFGAO_FOLDER))
 		{
 			hr = pShellFolder->GetDisplayNameOf(pidlItem.get(), SHGDN_INFOLDER, &displayNameStr);
 		}

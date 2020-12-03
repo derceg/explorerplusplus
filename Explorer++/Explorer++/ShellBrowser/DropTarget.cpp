@@ -31,7 +31,7 @@ HRESULT _stdcall ShellBrowser::DragEnter(
 	m_bDeselectDropFolder = FALSE;
 	m_iDropFolder = -1;
 
-	if (m_bVirtualFolder && !m_bDragging)
+	if (m_directoryState.virtualFolder && !m_bDragging)
 	{
 		m_bDataAccept = FALSE;
 		*pdwEffect = DROPEFFECT_NONE;

@@ -31,7 +31,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	const Tab &tab = m_tabContainer->GetSelectedTab();
 
 	ViewMode viewMode = tab.GetShellBrowser()->GetViewMode();
-	BOOL bVirtualFolder = tab.GetShellBrowser()->InVirtualFolder();
+	bool virtualFolder = tab.GetShellBrowser()->InVirtualFolder();
 
 	int numSelected = tab.GetShellBrowser()->GetNumSelected();
 	bool anySelected = (numSelected > 0);
@@ -39,8 +39,8 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_COPYITEMPATH, AnyItemsSelected());
 	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_COPYUNIVERSALFILEPATHS, AnyItemsSelected());
 	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_SETFILEATTRIBUTES, AnyItemsSelected());
-	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_OPENCOMMANDPROMPT, !bVirtualFolder);
-	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_SAVEDIRECTORYLISTING, !bVirtualFolder);
+	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_OPENCOMMANDPROMPT, !virtualFolder);
+	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_SAVEDIRECTORYLISTING, !virtualFolder);
 	MenuHelper::EnableItem(
 		hProgramMenu, IDM_FILE_COPYCOLUMNTEXT, anySelected && (viewMode == +ViewMode::Details));
 
@@ -85,7 +85,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 
 	MenuHelper::EnableItem(hProgramMenu, IDM_ACTIONS_NEWFOLDER, CanCreate());
 	MenuHelper::EnableItem(hProgramMenu, IDM_ACTIONS_SPLITFILE,
-		(tab.GetShellBrowser()->GetNumSelectedFiles() == 1) && !bVirtualFolder);
+		(tab.GetShellBrowser()->GetNumSelectedFiles() == 1) && !virtualFolder);
 	MenuHelper::EnableItem(
 		hProgramMenu, IDM_ACTIONS_MERGEFILES, tab.GetShellBrowser()->GetNumSelectedFiles() > 1);
 	MenuHelper::EnableItem(hProgramMenu, IDM_ACTIONS_DESTROYFILES, anySelected);

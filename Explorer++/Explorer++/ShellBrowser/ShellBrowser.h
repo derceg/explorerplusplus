@@ -156,7 +156,7 @@ public:
 	int SelectFiles(const TCHAR *FileNamePattern);
 	void GetFolderInfo(FolderInfo_t *pFolderInfo);
 	int LocateFileItemIndex(const TCHAR *szFileName) const;
-	BOOL InVirtualFolder() const;
+	bool InVirtualFolder() const;
 	BOOL CanCreate() const;
 	HRESULT CopySelectedItemToClipboard(bool copy);
 	void StartRenamingSelectedItems();
@@ -270,6 +270,7 @@ private:
 	{
 		unique_pidl_absolute pidlDirectory;
 		std::wstring directory;
+		bool virtualFolder;
 		int itemIDCounter;
 
 		/* Stores information on files that have
@@ -288,7 +289,12 @@ private:
 		/* Cached folder size data. */
 		mutable std::unordered_map<int, ULONGLONG> cachedFolderSizes;
 
-		DirectoryState() : itemIDCounter(0), numItems(0), numFilesSelected(0), numFoldersSelected(0)
+		DirectoryState() :
+			virtualFolder(false),
+			itemIDCounter(0),
+			numItems(0),
+			numFilesSelected(0),
+			numFoldersSelected(0)
 		{
 			totalDirSize = {};
 			fileSelectionSize = {};
@@ -551,7 +557,6 @@ private:
 
 	/* Internal state. */
 	const HINSTANCE m_hResourceModule;
-	BOOL m_bVirtualFolder;
 	BOOL m_bFolderVisited;
 	int m_iDirMonitorId;
 	int m_iFolderIcon;
