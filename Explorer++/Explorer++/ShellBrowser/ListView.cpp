@@ -535,27 +535,27 @@ void ShellBrowser::UpdateFileSelectionInfo(int internalIndex, BOOL selected)
 	{
 		if (isFolder)
 		{
-			m_NumFoldersSelected++;
+			m_directoryState.numFoldersSelected++;
 		}
 		else
 		{
-			m_NumFilesSelected++;
+			m_directoryState.numFilesSelected++;
 		}
 
-		m_ulFileSelectionSize.QuadPart += ulFileSize.QuadPart;
+		m_directoryState.fileSelectionSize.QuadPart += ulFileSize.QuadPart;
 	}
 	else
 	{
 		if (isFolder)
 		{
-			m_NumFoldersSelected--;
+			m_directoryState.numFoldersSelected--;
 		}
 		else
 		{
-			m_NumFilesSelected--;
+			m_directoryState.numFilesSelected--;
 		}
 
-		m_ulFileSelectionSize.QuadPart -= ulFileSize.QuadPart;
+		m_directoryState.fileSelectionSize.QuadPart -= ulFileSize.QuadPart;
 	}
 }
 
@@ -714,7 +714,7 @@ void ShellBrowser::OnListViewHeaderRightClick(const POINTS &cursorPos)
 		LoadMenu(m_hResourceModule, MAKEINTRESOURCE(IDR_HEADER_MENU)));
 	HMENU headerMenu = GetSubMenu(headerPopupMenu.get(), 0);
 
-	auto commonColumns = GetColumnHeaderMenuList(m_CurDir);
+	auto commonColumns = GetColumnHeaderMenuList(m_directoryState.directory.c_str());
 
 	std::unordered_map<int, ColumnType> menuItemMappings;
 	int totalInserted = 0;

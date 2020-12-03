@@ -26,8 +26,8 @@ void ShellBrowser::DirectoryAltered()
 
 	SendMessage(m_hListView, WM_SETREDRAW, (WPARAM) FALSE, (LPARAM) NULL);
 
-	LOG(debug) << _T("ShellBrowser - Starting directory change update for \"") << m_CurDir
-			   << _T("\"");
+	LOG(debug) << _T("ShellBrowser - Starting directory change update for \"")
+			   << m_directoryState.directory << _T("\"");
 
 	/* Potential problem:
 	After a file is created, it may be renamed shortly afterwards.
@@ -86,8 +86,8 @@ void ShellBrowser::DirectoryAltered()
 		}
 	}
 
-	LOG(debug) << _T("ShellBrowser - Finished directory change update for \"") << m_CurDir
-			   << _T("\"");
+	LOG(debug) << _T("ShellBrowser - Finished directory change update for \"")
+			   << m_directoryState.directory << _T("\"");
 
 	SendMessage(m_hListView, WM_SETREDRAW, (WPARAM) TRUE, (LPARAM) NULL);
 
@@ -182,7 +182,7 @@ void ShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 	BOOL bFileAdded = FALSE;
 	HRESULT hr;
 
-	StringCchCopy(fullFileName, SIZEOF_ARRAY(fullFileName), m_CurDir);
+	StringCchCopy(fullFileName, SIZEOF_ARRAY(fullFileName), m_directoryState.directory.c_str());
 	PathAppend(fullFileName, szFileName);
 
 	unique_pidl_absolute pidlFull;
@@ -346,13 +346,11 @@ void ShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 		inserted, so that files the have just been created
 		can be updated without them residing within the
 		listview. */
-		std::list<AwaitingAdd_t>::iterator itr;
-
-		for (itr = m_AwaitingAddList.begin(); itr != m_AwaitingAddList.end(); itr++)
+		for (const auto &awaitingItem : m_directoryState.awaitingAddList)
 		{
-			if (lstrcmp(m_itemInfoMap.at(itr->iItemInternal).wfd.cFileName, FileName) == 0)
+			if (lstrcmp(m_itemInfoMap.at(awaitingItem.iItemInternal).wfd.cFileName, FileName) == 0)
 			{
-				iItemInternal = itr->iItemInternal;
+				iItemInternal = awaitingItem.iItemInternal;
 				break;
 			}
 		}
@@ -372,7 +370,8 @@ void ShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 		}
 
 		TCHAR szFullFileName[MAX_PATH];
-		StringCchCopy(szFullFileName, SIZEOF_ARRAY(szFullFileName), m_CurDir);
+		StringCchCopy(
+			szFullFileName, SIZEOF_ARRAY(szFullFileName), m_directoryState.directory.c_str());
 		PathAppend(szFullFileName, FileName);
 
 		/* When a file is modified, its icon overlay may change.
@@ -404,17 +403,17 @@ void ShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 		ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
 		ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
 
-		m_ulTotalDirSize.QuadPart -= ulFileSize.QuadPart;
+		m_directoryState.totalDirSize.QuadPart -= ulFileSize.QuadPart;
 
 		if (ListView_GetItemState(m_hListView, iItem, LVIS_SELECTED) == LVIS_SELECTED)
 		{
 			ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
 			ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
 
-			m_ulFileSelectionSize.QuadPart -= ulFileSize.QuadPart;
+			m_directoryState.fileSelectionSize.QuadPart -= ulFileSize.QuadPart;
 		}
 
-		StringCchCopy(fullFileName, SIZEOF_ARRAY(fullFileName), m_CurDir);
+		StringCchCopy(fullFileName, SIZEOF_ARRAY(fullFileName), m_directoryState.directory.c_str());
 		PathAppend(fullFileName, FileName);
 
 		hFirstFile = FindFirstFile(fullFileName, &m_itemInfoMap.at(iItemInternal).wfd);
@@ -424,14 +423,14 @@ void ShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 			ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
 			ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
 
-			m_ulTotalDirSize.QuadPart += ulFileSize.QuadPart;
+			m_directoryState.totalDirSize.QuadPart += ulFileSize.QuadPart;
 
 			if (ListView_GetItemState(m_hListView, iItem, LVIS_SELECTED) == LVIS_SELECTED)
 			{
 				ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
 				ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
 
-				m_ulFileSelectionSize.QuadPart += ulFileSize.QuadPart;
+				m_directoryState.fileSelectionSize.QuadPart += ulFileSize.QuadPart;
 			}
 
 			if ((m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
@@ -547,7 +546,7 @@ void ShellBrowser::RenameItem(int iItemInternal, const TCHAR *szNewFileName)
 
 	auto &itemInfo = m_itemInfoMap.at(iItemInternal);
 
-	StringCchCopy(szFullFileName, SIZEOF_ARRAY(szFullFileName), m_CurDir);
+	StringCchCopy(szFullFileName, SIZEOF_ARRAY(szFullFileName), m_directoryState.directory.c_str());
 	PathAppend(szFullFileName, szNewFileName);
 
 	unique_pidl_absolute pidlFull;

@@ -552,7 +552,7 @@ std::wstring ShellBrowser::GetItemFullName(int index) const
 
 std::wstring ShellBrowser::GetDirectory() const
 {
-	return m_CurDir;
+	return m_directoryState.directory;
 }
 
 unique_pidl_absolute ShellBrowser::GetDirectoryIdl() const
@@ -605,7 +605,7 @@ int ShellBrowser::LocateFileItemInternalIndex(const TCHAR *szFileName) const
 	LVITEM lvItem;
 	int i = 0;
 
-	for (i = 0; i < m_nTotalItems; i++)
+	for (i = 0; i < m_directoryState.numItems; i++)
 	{
 		lvItem.mask = LVIF_PARAM;
 		lvItem.iItem = i;
@@ -757,7 +757,7 @@ BOOL ShellBrowser::CompareVirtualFolders(UINT uFolderCSIDL) const
 	std::wstring parsingPath;
 	GetCsidlDisplayName(uFolderCSIDL, SHGDN_FORPARSING, parsingPath);
 
-	if (parsingPath == m_CurDir)
+	if (parsingPath == m_directoryState.directory)
 	{
 		return TRUE;
 	}
@@ -1036,7 +1036,7 @@ void ShellBrowser::RemoveFilteredItem(int iItem, int iItemInternal)
 		ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
 		ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
 
-		m_ulFileSelectionSize.QuadPart -= ulFileSize.QuadPart;
+		m_directoryState.fileSelectionSize.QuadPart -= ulFileSize.QuadPart;
 	}
 
 	/* Take the file size of the removed file away from the total
@@ -1044,40 +1044,40 @@ void ShellBrowser::RemoveFilteredItem(int iItem, int iItemInternal)
 	ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
 	ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
 
-	m_ulTotalDirSize.QuadPart -= ulFileSize.QuadPart;
+	m_directoryState.totalDirSize.QuadPart -= ulFileSize.QuadPart;
 
 	/* Remove the item from the m_hListView. */
 	ListView_DeleteItem(m_hListView, iItem);
 
-	m_nTotalItems--;
+	m_directoryState.numItems--;
 
-	m_FilteredItemsList.push_back(iItemInternal);
+	m_directoryState.filteredItemsList.push_back(iItemInternal);
 }
 
 int ShellBrowser::GetNumItems() const
 {
-	return m_nTotalItems;
+	return m_directoryState.numItems;
 }
 
 int ShellBrowser::GetNumSelectedFiles() const
 {
-	return m_NumFilesSelected;
+	return m_directoryState.numFilesSelected;
 }
 
 int ShellBrowser::GetNumSelectedFolders() const
 {
-	return m_NumFoldersSelected;
+	return m_directoryState.numFoldersSelected;
 }
 
 int ShellBrowser::GetNumSelected() const
 {
-	return m_NumFilesSelected + m_NumFoldersSelected;
+	return m_directoryState.numFilesSelected + m_directoryState.numFoldersSelected;
 }
 
 void ShellBrowser::GetFolderInfo(FolderInfo_t *pFolderInfo)
 {
-	pFolderInfo->TotalFolderSize.QuadPart = m_ulTotalDirSize.QuadPart;
-	pFolderInfo->TotalSelectionSize.QuadPart = m_ulFileSelectionSize.QuadPart;
+	pFolderInfo->TotalFolderSize.QuadPart = m_directoryState.totalDirSize.QuadPart;
+	pFolderInfo->TotalSelectionSize.QuadPart = m_directoryState.fileSelectionSize.QuadPart;
 }
 
 std::wstring ShellBrowser::GetFilter() const
@@ -1130,7 +1130,7 @@ void ShellBrowser::UpdateFiltering()
 	{
 		UnfilterAllItems();
 
-		if (m_nTotalItems == 0)
+		if (m_directoryState.numItems == 0)
 		{
 			ApplyFolderEmptyBackgroundImage(true);
 		}
@@ -1143,22 +1143,21 @@ void ShellBrowser::UpdateFiltering()
 
 void ShellBrowser::UnfilterAllItems()
 {
-	std::list<int>::iterator itr;
 	AwaitingAdd_t awaitingAdd;
 
-	for (itr = m_FilteredItemsList.begin(); itr != m_FilteredItemsList.end(); itr++)
+	for (int itemId : m_directoryState.filteredItemsList)
 	{
-		int iSorted = DetermineItemSortedPosition(*itr);
+		int iSorted = DetermineItemSortedPosition(itemId);
 
 		awaitingAdd.iItem = iSorted;
 		awaitingAdd.bPosition = TRUE;
 		awaitingAdd.iAfter = iSorted - 1;
-		awaitingAdd.iItemInternal = *itr;
+		awaitingAdd.iItemInternal = itemId;
 
-		m_AwaitingAddList.push_back(awaitingAdd);
+		m_directoryState.awaitingAddList.push_back(awaitingAdd);
 	}
 
-	m_FilteredItemsList.clear();
+	m_directoryState.filteredItemsList.clear();
 
 	InsertAwaitingItems(m_folderSettings.showInGroups);
 
@@ -1437,7 +1436,7 @@ void ShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 
 	if (SUCCEEDED(hr))
 	{
-		for (i = 0; i < m_nTotalItems; i++)
+		for (i = 0; i < m_directoryState.numItems; i++)
 		{
 			lvItem.mask = LVIF_PARAM;
 			lvItem.iItem = i;
@@ -1477,7 +1476,7 @@ void ShellBrowser::RemoveDrive(const TCHAR *szDrive)
 	int iItemInternal = -1;
 	int i = 0;
 
-	for (i = 0; i < m_nTotalItems; i++)
+	for (i = 0; i < m_directoryState.numItems; i++)
 	{
 		lvItem.mask = LVIF_PARAM;
 		lvItem.iItem = i;

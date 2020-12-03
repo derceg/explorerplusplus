@@ -186,16 +186,6 @@ public:
 private:
 	DISALLOW_COPY_AND_ASSIGN(ShellBrowser);
 
-	struct DirectoryState
-	{
-		unique_pidl_absolute pidlDirectory;
-		int itemIDCounter;
-
-		DirectoryState() : itemIDCounter(0)
-		{
-		}
-	};
-
 	struct ItemInfo_t
 	{
 		unique_pidl_absolute pidlComplete;
@@ -274,6 +264,35 @@ private:
 		Created,
 		Modified,
 		Accessed
+	};
+
+	struct DirectoryState
+	{
+		unique_pidl_absolute pidlDirectory;
+		std::wstring directory;
+		int itemIDCounter;
+
+		/* Stores information on files that have
+		been created and are awaiting insertion
+		into the listview. */
+		std::vector<AwaitingAdd_t> awaitingAddList;
+
+		std::vector<int> filteredItemsList;
+
+		int numItems;
+		int numFilesSelected;
+		int numFoldersSelected;
+		ULARGE_INTEGER totalDirSize;
+		ULARGE_INTEGER fileSelectionSize;
+
+		/* Cached folder size data. */
+		mutable std::unordered_map<int, ULONGLONG> cachedFolderSizes;
+
+		DirectoryState() : itemIDCounter(0), numItems(0), numFilesSelected(0), numFoldersSelected(0)
+		{
+			totalDirSize = {};
+			fileSelectionSize = {};
+		}
 	};
 
 	static const int THUMBNAIL_ITEM_HORIZONTAL_SPACING = 20;
@@ -530,19 +549,10 @@ private:
 	std::unordered_map<int, std::future<std::optional<InfoTipResult>>> m_infoTipResults;
 	int m_infoTipResultIDCounter;
 
-	/* Cached folder size data. */
-	mutable std::unordered_map<int, ULONGLONG> m_cachedFolderSizes;
-
 	/* Internal state. */
 	const HINSTANCE m_hResourceModule;
-	TCHAR m_CurDir[MAX_PATH];
-	ULARGE_INTEGER m_ulTotalDirSize;
-	ULARGE_INTEGER m_ulFileSelectionSize;
 	BOOL m_bVirtualFolder;
 	BOOL m_bFolderVisited;
-	int m_nTotalItems;
-	int m_NumFilesSelected;
-	int m_NumFoldersSelected;
 	int m_iDirMonitorId;
 	int m_iFolderIcon;
 	int m_iFileIcon;
@@ -566,11 +576,6 @@ private:
 	CRITICAL_SECTION m_csDirectoryAltered;
 	std::list<AlteredFile_t> m_AlteredList;
 	std::list<Added_t> m_FilesAdded;
-
-	/* Stores information on files that have
-	been created and are awaiting insertion
-	into the listview. */
-	std::list<AwaitingAdd_t> m_AwaitingAddList;
 
 	int m_middleButtonItem;
 
@@ -617,7 +622,4 @@ private:
 	size_t and int. */
 	std::list<TypeGroup_t> m_GroupList;
 	int m_iGroupId;
-
-	/* Filtering related data. */
-	std::list<int> m_FilteredItemsList;
 };
