@@ -265,42 +265,41 @@ HRESULT ShellBrowser::AddItemInternal(int itemIndex, int itemId, BOOL setPositio
 int ShellBrowser::SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild,
 	const std::wstring &displayName, const std::wstring &editingName)
 {
-	HANDLE hFirstFile;
-	int uItemId;
-
-	uItemId = GenerateUniqueItemId();
+	int itemId = GenerateUniqueItemId();
+	auto &item = m_itemInfoMap[itemId];
 
 	unique_pidl_absolute pidlItem(ILCombine(pidlDirectory, pidlChild));
 
-	m_itemInfoMap[uItemId].pidlComplete.reset(ILCloneFull(pidlItem.get()));
-	m_itemInfoMap[uItemId].pridl.reset(ILCloneChild(pidlChild));
-	m_itemInfoMap[uItemId].displayName = displayName;
-	m_itemInfoMap[uItemId].editingName = editingName;
+	item.pidlComplete.reset(ILCloneFull(pidlItem.get()));
+	item.pridl.reset(ILCloneChild(pidlChild));
+	item.displayName = displayName;
+	item.editingName = editingName;
 
 	// Failing fast isn't ideal, but the parsing name is required and this function currently
 	// doesn't return any errors.
 	// TODO: This function should be able to signal an error in some way.
 	std::wstring parsingName;
 	FAIL_FAST_IF_FAILED(GetDisplayName(pidlItem.get(), SHGDN_FORPARSING, parsingName));
-	m_itemInfoMap[uItemId].parsingName = parsingName;
+	item.parsingName = parsingName;
+
+	HANDLE hFirstFile;
 
 	/* DO NOT call FindFirstFile() on root drives (especially
 	floppy drives). Doing so may cause a delay of up to a
 	few seconds. */
 	if (!PathIsRoot(parsingName.c_str()))
 	{
-		m_itemInfoMap[uItemId].bDrive = FALSE;
+		item.bDrive = FALSE;
 
 		WIN32_FIND_DATA wfd;
 		hFirstFile = FindFirstFile(parsingName.c_str(), &wfd);
 
-		m_itemInfoMap[uItemId].wfd = wfd;
+		item.wfd = wfd;
 	}
 	else
 	{
-		m_itemInfoMap[uItemId].bDrive = TRUE;
-		StringCchCopy(m_itemInfoMap[uItemId].szDrive, SIZEOF_ARRAY(m_itemInfoMap[uItemId].szDrive),
-			parsingName.c_str());
+		item.bDrive = TRUE;
+		StringCchCopy(item.szDrive, SIZEOF_ARRAY(item.szDrive), parsingName.c_str());
 
 		hFirstFile = INVALID_HANDLE_VALUE;
 	}
@@ -320,10 +319,10 @@ int ShellBrowser::SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_C
 		wfd.nFileSizeHigh = 0;
 		wfd.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
 
-		m_itemInfoMap[uItemId].wfd = wfd;
+		item.wfd = wfd;
 	}
 
-	return uItemId;
+	return itemId;
 }
 
 void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)

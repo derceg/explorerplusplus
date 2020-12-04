@@ -123,9 +123,9 @@ public:
 	int GetUniqueFolderId() const;
 
 	/* Item information. */
-	WIN32_FIND_DATA GetItemFileFindData(int iItem) const;
-	unique_pidl_absolute GetItemCompleteIdl(int iItem) const;
-	unique_pidl_child GetItemChildIdl(int iItem) const;
+	WIN32_FIND_DATA GetItemFileFindData(int index) const;
+	unique_pidl_absolute GetItemCompleteIdl(int index) const;
+	unique_pidl_child GetItemChildIdl(int index) const;
 	std::wstring GetItemName(int index) const;
 	std::wstring GetItemDisplayName(int index) const;
 	std::wstring GetItemEditingName(int index) const;

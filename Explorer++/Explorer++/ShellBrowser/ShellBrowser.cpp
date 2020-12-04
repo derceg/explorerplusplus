@@ -601,21 +601,14 @@ int ShellBrowser::LocateFileItemIndex(const TCHAR *szFileName) const
 
 int ShellBrowser::LocateFileItemInternalIndex(const TCHAR *szFileName) const
 {
-	LVITEM lvItem;
-	int i = 0;
-
-	for (i = 0; i < m_directoryState.numItems; i++)
+	for (int i = 0; i < m_directoryState.numItems; i++)
 	{
-		lvItem.mask = LVIF_PARAM;
-		lvItem.iItem = i;
-		lvItem.iSubItem = 0;
-		ListView_GetItem(m_hListView, &lvItem);
+		const auto &item = GetItemByIndex(i);
 
-		if ((lstrcmp(m_itemInfoMap.at((int) lvItem.lParam).wfd.cFileName, szFileName) == 0)
-			|| (lstrcmp(m_itemInfoMap.at((int) lvItem.lParam).wfd.cAlternateFileName, szFileName)
-				== 0))
+		if ((lstrcmp(item.wfd.cFileName, szFileName) == 0)
+			|| (lstrcmp(item.wfd.cAlternateFileName, szFileName) == 0))
 		{
-			return (int) lvItem.lParam;
+			return GetItemInternalIndex(i);
 		}
 	}
 
@@ -637,10 +630,9 @@ std::optional<int> ShellBrowser::LocateItemByInternalIndex(int internalIndex) co
 	return item;
 }
 
-WIN32_FIND_DATA ShellBrowser::GetItemFileFindData(int iItem) const
+WIN32_FIND_DATA ShellBrowser::GetItemFileFindData(int index) const
 {
-	int internalIndex = GetItemInternalIndex(iItem);
-	return m_itemInfoMap.at(internalIndex).wfd;
+	return GetItemByIndex(index).wfd;
 }
 
 void ShellBrowser::DragStarted(int iFirstItem, POINT *ptCursor)
@@ -679,43 +671,14 @@ void ShellBrowser::DragStopped()
 	m_bDragging = FALSE;
 }
 
-unique_pidl_absolute ShellBrowser::GetItemCompleteIdl(int iItem) const
+unique_pidl_absolute ShellBrowser::GetItemCompleteIdl(int index) const
 {
-	LVITEM lvItem;
-	lvItem.mask = LVIF_PARAM;
-	lvItem.iItem = iItem;
-	lvItem.iSubItem = 0;
-	BOOL bRet = ListView_GetItem(m_hListView, &lvItem);
-
-	if (!bRet)
-	{
-		return nullptr;
-	}
-
-	unique_pidl_absolute pidlComplete(ILCombine(
-		m_directoryState.pidlDirectory.get(), m_itemInfoMap.at((int) lvItem.lParam).pridl.get()));
-
-	return pidlComplete;
+	return unique_pidl_absolute(ILCloneFull(GetItemByIndex(index).pidlComplete.get()));
 }
 
-unique_pidl_child ShellBrowser::GetItemChildIdl(int iItem) const
+unique_pidl_child ShellBrowser::GetItemChildIdl(int index) const
 {
-	LVITEM lvItem;
-	BOOL bRet;
-
-	lvItem.mask = LVIF_PARAM;
-	lvItem.iItem = iItem;
-	lvItem.iSubItem = 0;
-	bRet = ListView_GetItem(m_hListView, &lvItem);
-
-	if (!bRet)
-	{
-		return nullptr;
-	}
-
-	unique_pidl_child pidlRelative(ILCloneChild(m_itemInfoMap.at((int) lvItem.lParam).pridl.get()));
-
-	return pidlRelative;
+	return unique_pidl_child(ILCloneChild(GetItemByIndex(index).pridl.get()));
 }
 
 bool ShellBrowser::InVirtualFolder() const
@@ -1030,18 +993,20 @@ void ShellBrowser::RemoveFilteredItem(int iItem, int iItemInternal)
 {
 	ULARGE_INTEGER ulFileSize;
 
+	const auto &item = m_itemInfoMap.at(iItemInternal);
+
 	if (ListView_GetItemState(m_hListView, iItem, LVIS_SELECTED) == LVIS_SELECTED)
 	{
-		ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
-		ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
+		ulFileSize.LowPart = item.wfd.nFileSizeLow;
+		ulFileSize.HighPart = item.wfd.nFileSizeHigh;
 
 		m_directoryState.fileSelectionSize.QuadPart -= ulFileSize.QuadPart;
 	}
 
 	/* Take the file size of the removed file away from the total
 	directory size. */
-	ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
-	ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
+	ulFileSize.LowPart = item.wfd.nFileSizeLow;
+	ulFileSize.HighPart = item.wfd.nFileSizeHigh;
 
 	m_directoryState.totalDirSize.QuadPart -= ulFileSize.QuadPart;
 
