@@ -206,6 +206,10 @@ private:
 		/* Used for temporary sorting in details mode (i.e.
 		when items need to be rearranged). */
 		int iRelativeSort;
+
+		ItemInfo_t() : wfd({}), iIcon(0), bDrive(FALSE)
+		{
+		}
 	};
 
 	struct AlteredFile_t
@@ -336,12 +340,11 @@ private:
 	void ResetFolderState();
 	void InsertAwaitingItems(BOOL bInsertIntoGroup);
 	BOOL IsFileFiltered(const ItemInfo_t &itemInfo) const;
-	HRESULT AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild,
-		const std::wstring &displayName, const std::wstring &editingName, int itemIndex,
-		BOOL setPosition);
+	HRESULT AddItemInternal(IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory,
+		PCITEMID_CHILD pidlChild, int itemIndex, BOOL setPosition);
 	HRESULT AddItemInternal(int itemIndex, int itemId, BOOL setPosition);
-	int SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild,
-		const std::wstring &displayName, const std::wstring &editingName);
+	std::optional<int> SetItemInformation(
+		IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild);
 	void SetViewModeInternal(ViewMode viewMode);
 	void SetFirstColumnTextToCallback();
 	void SetFirstColumnTextToFilename();
@@ -574,6 +577,9 @@ private:
 
 	/* ID. */
 	const int m_ID;
+
+	wil::com_ptr_nothrow<IShellFolder> m_desktopFolder;
+	unique_pidl_absolute m_recycleBinPidl;
 
 	/* Stores information on files that
 	have been modified (i.e. created, deleted,

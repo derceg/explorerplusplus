@@ -149,6 +149,14 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 
 	m_PreviousSortColumnExists = false;
 
+	// This interface is required. It's not expected that the call would fail.
+	HRESULT hr = SHGetDesktopFolder(&m_desktopFolder);
+	FAIL_FAST_IF_FAILED(hr);
+
+	// This interface is optional, so it doesn't matter whether the call succeeds or not.
+	SHGetKnownFolderIDList(
+		FOLDERID_RecycleBinFolder, KF_FLAG_DEFAULT, nullptr, wil::out_param(m_recycleBinPidl));
+
 	InitializeCriticalSection(&m_csDirectoryAltered);
 
 	m_iFolderIcon = GetDefaultFolderIconIndex();
@@ -605,8 +613,7 @@ int ShellBrowser::LocateFileItemInternalIndex(const TCHAR *szFileName) const
 	{
 		const auto &item = GetItemByIndex(i);
 
-		if ((lstrcmp(item.wfd.cFileName, szFileName) == 0)
-			|| (lstrcmp(item.wfd.cAlternateFileName, szFileName) == 0))
+		if (lstrcmp(item.wfd.cFileName, szFileName) == 0)
 		{
 			return GetItemInternalIndex(i);
 		}

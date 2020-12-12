@@ -177,8 +177,6 @@ void ShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 	PCITEMID_CHILD pidlRelative = nullptr;
 	Added_t added;
 	TCHAR fullFileName[MAX_PATH];
-	TCHAR szDisplayName[MAX_PATH];
-	STRRET str;
 	BOOL bFileAdded = FALSE;
 	HRESULT hr;
 
@@ -198,72 +196,45 @@ void ShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 
 		if (SUCCEEDED(hr))
 		{
-			/* If this is a virtual folder, only use SHGDN_INFOLDER. If this is
-			a real folder, combine SHGDN_INFOLDER with SHGDN_FORPARSING. This is
-			so that items in real folders can still be shown with extensions, even
-			if the global, Explorer option is disabled. */
-			if (m_directoryState.virtualFolder)
+			std::list<DroppedFile_t>::iterator itr;
+			BOOL bDropped = FALSE;
+
+			if (!m_DroppedFileNameList.empty())
 			{
-				hr = pShellFolder->GetDisplayNameOf(pidlRelative, SHGDN_INFOLDER, &str);
+				for (itr = m_DroppedFileNameList.begin(); itr != m_DroppedFileNameList.end(); itr++)
+				{
+					if (lstrcmp(szFileName, itr->szFileName) == 0)
+					{
+						bDropped = TRUE;
+						break;
+					}
+				}
+			}
+
+			/* Only insert the item in its sorted position if it
+			wasn't dropped in. */
+			if (m_config->globalFolderSettings.insertSorted && !bDropped)
+			{
+				auto itemId = SetItemInformation(
+					pShellFolder, m_directoryState.pidlDirectory.get(), pidlRelative);
+
+				if (itemId)
+				{
+					int iSorted = DetermineItemSortedPosition(*itemId);
+
+					AddItemInternal(iSorted, *itemId, TRUE);
+				}
 			}
 			else
 			{
-				hr = pShellFolder->GetDisplayNameOf(
-					pidlRelative, SHGDN_INFOLDER | SHGDN_FORPARSING, &str);
+				/* Just add the item to the end of the list. */
+				AddItemInternal(
+					pShellFolder, m_directoryState.pidlDirectory.get(), pidlRelative, -1, FALSE);
 			}
 
-			STRRET editingNameStr;
-			HRESULT editingNameResult = pShellFolder->GetDisplayNameOf(
-				pidlRelative, SHGDN_INFOLDER | SHGDN_FOREDITING, &editingNameStr);
+			InsertAwaitingItems(m_folderSettings.showInGroups);
 
-			if (SUCCEEDED(hr) && SUCCEEDED(editingNameResult))
-			{
-				StrRetToBuf(&str, pidlRelative, szDisplayName, SIZEOF_ARRAY(szDisplayName));
-
-				TCHAR editingName[MAX_PATH];
-				StrRetToBuf(&editingNameStr, pidlRelative, editingName, SIZEOF_ARRAY(editingName));
-
-				std::list<DroppedFile_t>::iterator itr;
-				BOOL bDropped = FALSE;
-
-				if (!m_DroppedFileNameList.empty())
-				{
-					for (itr = m_DroppedFileNameList.begin(); itr != m_DroppedFileNameList.end();
-						 itr++)
-					{
-						if (lstrcmp(szDisplayName, itr->szFileName) == 0)
-						{
-							bDropped = TRUE;
-							break;
-						}
-					}
-				}
-
-				/* Only insert the item in its sorted position if it
-				wasn't dropped in. */
-				if (m_config->globalFolderSettings.insertSorted && !bDropped)
-				{
-					int iItemId;
-					int iSorted;
-
-					iItemId = SetItemInformation(m_directoryState.pidlDirectory.get(), pidlRelative,
-						szDisplayName, editingName);
-
-					iSorted = DetermineItemSortedPosition(iItemId);
-
-					AddItemInternal(iSorted, iItemId, TRUE);
-				}
-				else
-				{
-					/* Just add the item to the end of the list. */
-					AddItemInternal(m_directoryState.pidlDirectory.get(), pidlRelative,
-						szDisplayName, editingName, -1, FALSE);
-				}
-
-				InsertAwaitingItems(m_folderSettings.showInGroups);
-
-				bFileAdded = TRUE;
-			}
+			bFileAdded = TRUE;
 
 			pShellFolder->Release();
 		}

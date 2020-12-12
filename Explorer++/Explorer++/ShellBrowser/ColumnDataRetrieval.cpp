@@ -17,6 +17,7 @@
 #include <wil/com.h>
 #include <IPHlpApi.h>
 #include <propkey.h>
+#include <filesystem>
 
 BOOL GetPrinterStatusDescription(DWORD dwStatus, TCHAR *szStatus, size_t cchMax);
 
@@ -398,12 +399,26 @@ std::wstring GetAttributeColumnText(const BasicItemInfo_t &itemInfo)
 
 std::wstring GetShortNameColumnText(const BasicItemInfo_t &itemInfo)
 {
-	if (lstrlen(itemInfo.wfd.cAlternateFileName) == 0)
+	DWORD length = GetShortPathName(itemInfo.getFullPath().c_str(), nullptr, 0);
+
+	if (length == 0)
 	{
-		return itemInfo.wfd.cFileName;
+		return {};
 	}
 
-	return itemInfo.wfd.cAlternateFileName;
+	std::wstring shortPath;
+	shortPath.resize(length);
+
+	length = GetShortPathName(
+		itemInfo.getFullPath().c_str(), shortPath.data(), static_cast<DWORD>(shortPath.capacity()));
+
+	if (length == 0)
+	{
+		return {};
+	}
+
+	std::filesystem::path path(shortPath);
+	return path.filename();
 }
 
 std::wstring GetOwnerColumnText(const BasicItemInfo_t &itemInfo)

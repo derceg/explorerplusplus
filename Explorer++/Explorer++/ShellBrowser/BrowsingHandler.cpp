@@ -8,11 +8,14 @@
 #include "ItemData.h"
 #include "MainResource.h"
 #include "ViewModes.h"
+#include "../Helper/Helper.h"
 #include "../Helper/IconFetcher.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/com.h>
+#include <propkey.h>
+#include <propvarutil.h>
 #include <list>
 
 HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)
@@ -142,8 +145,8 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 
 	m_directoryState.virtualFolder = WI_IsFlagClear(attr, SFGAO_FILESYSTEM);
 
-	wil::com_ptr_nothrow<IShellFolder> pShellFolder;
-	hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
+	wil::com_ptr_nothrow<IShellFolder> shellFolder;
+	hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&shellFolder));
 
 	if (FAILED(hr))
 	{
@@ -156,87 +159,39 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 
 	if (m_folderSettings.showHidden)
 	{
-		enumFlags |= SHCONTF_INCLUDEHIDDEN | SHCONTF_INCLUDESUPERHIDDEN;
+		WI_SetAllFlags(enumFlags, SHCONTF_INCLUDEHIDDEN | SHCONTF_INCLUDESUPERHIDDEN);
 	}
 
-	wil::com_ptr_nothrow<IEnumIDList> pEnumIDList;
-	hr = pShellFolder->EnumObjects(m_hOwner, enumFlags, &pEnumIDList);
+	wil::com_ptr_nothrow<IEnumIDList> enumerator;
+	hr = shellFolder->EnumObjects(m_hOwner, enumFlags, &enumerator);
 
-	if (FAILED(hr) || !pEnumIDList)
+	if (FAILED(hr) || !enumerator)
 	{
 		return hr;
 	}
 
-	ULONG uFetched = 1;
+	ULONG numFetched = 1;
 	unique_pidl_child pidlItem;
 
-	while (pEnumIDList->Next(1, wil::out_param(pidlItem), &uFetched) == S_OK && (uFetched == 1))
+	while (enumerator->Next(1, wil::out_param(pidlItem), &numFetched) == S_OK && (numFetched == 1))
 	{
-		ULONG uAttributes = SFGAO_FOLDER;
-		PCITEMID_CHILD items[] = { pidlItem.get() };
-		pShellFolder->GetAttributesOf(1, items, &uAttributes);
-
-		STRRET displayNameStr;
-
-		/* If this is a virtual folder, only use SHGDN_INFOLDER. If this is
-		a real folder, combine SHGDN_INFOLDER with SHGDN_FORPARSING. This is
-		so that items in real folders can still be shown with extensions, even
-		if the global, Explorer option is disabled.
-		Also use only SHGDN_INFOLDER if this item is a folder. This is to ensure
-		that specific folders in Windows 7 (those under C:\Users\Username) appear
-		correctly. */
-		if (m_directoryState.virtualFolder || (uAttributes & SFGAO_FOLDER))
-		{
-			hr = pShellFolder->GetDisplayNameOf(pidlItem.get(), SHGDN_INFOLDER, &displayNameStr);
-		}
-		else
-		{
-			hr = pShellFolder->GetDisplayNameOf(
-				pidlItem.get(), SHGDN_INFOLDER | SHGDN_FORPARSING, &displayNameStr);
-		}
-
-		if (FAILED(hr))
-		{
-			continue;
-		}
-
-		TCHAR displayName[MAX_PATH];
-		hr = StrRetToBuf(&displayNameStr, pidlItem.get(), displayName, SIZEOF_ARRAY(displayName));
-
-		if (FAILED(hr))
-		{
-			continue;
-		}
-
-		STRRET editingNameStr;
-		hr = pShellFolder->GetDisplayNameOf(
-			pidlItem.get(), SHGDN_INFOLDER | SHGDN_FOREDITING, &editingNameStr);
-
-		if (FAILED(hr))
-		{
-			continue;
-		}
-
-		TCHAR editingName[MAX_PATH];
-		hr = StrRetToBuf(&editingNameStr, pidlItem.get(), editingName, SIZEOF_ARRAY(editingName));
-
-		if (FAILED(hr))
-		{
-			continue;
-		}
-
-		AddItemInternal(pidlDirectory, pidlItem.get(), displayName, editingName, -1, FALSE);
+		AddItemInternal(shellFolder.get(), pidlDirectory, pidlItem.get(), -1, FALSE);
 	}
 
 	return hr;
 }
 
-HRESULT ShellBrowser::AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild,
-	const std::wstring &displayName, const std::wstring &editingName, int itemIndex,
-	BOOL setPosition)
+HRESULT ShellBrowser::AddItemInternal(IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory,
+	PCITEMID_CHILD pidlChild, int itemIndex, BOOL setPosition)
 {
-	int uItemId = SetItemInformation(pidlDirectory, pidlChild, displayName, editingName);
-	return AddItemInternal(itemIndex, uItemId, setPosition);
+	auto itemId = SetItemInformation(shellFolder, pidlDirectory, pidlChild);
+
+	if (!itemId)
+	{
+		return E_FAIL;
+	}
+
+	return AddItemInternal(itemIndex, *itemId, setPosition);
 }
 
 HRESULT ShellBrowser::AddItemInternal(int itemIndex, int itemId, BOOL setPosition)
@@ -262,65 +217,175 @@ HRESULT ShellBrowser::AddItemInternal(int itemIndex, int itemId, BOOL setPositio
 	return S_OK;
 }
 
-int ShellBrowser::SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild,
-	const std::wstring &displayName, const std::wstring &editingName)
+std::optional<int> ShellBrowser::SetItemInformation(
+	IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild)
 {
-	int itemId = GenerateUniqueItemId();
-	auto &item = m_itemInfoMap[itemId];
+	ItemInfo_t newItem;
 
 	unique_pidl_absolute pidlItem(ILCombine(pidlDirectory, pidlChild));
 
-	item.pidlComplete.reset(ILCloneFull(pidlItem.get()));
-	item.pridl.reset(ILCloneChild(pidlChild));
-	item.displayName = displayName;
-	item.editingName = editingName;
+	newItem.pidlComplete.reset(ILCloneFull(pidlItem.get()));
+	newItem.pridl.reset(ILCloneChild(pidlChild));
 
-	// Failing fast isn't ideal, but the parsing name is required and this function currently
-	// doesn't return any errors.
-	// TODO: This function should be able to signal an error in some way.
 	std::wstring parsingName;
-	FAIL_FAST_IF_FAILED(GetDisplayName(pidlItem.get(), SHGDN_FORPARSING, parsingName));
-	item.parsingName = parsingName;
+	HRESULT hr = GetDisplayName(shellFolder, pidlChild, SHGDN_FORPARSING, parsingName);
 
-	HANDLE hFirstFile;
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
 
-	/* DO NOT call FindFirstFile() on root drives (especially
-	floppy drives). Doing so may cause a delay of up to a
-	few seconds. */
+	newItem.parsingName = parsingName;
+
+	ULONG attributes = SFGAO_FOLDER | SFGAO_FILESYSTEM;
+	PCITEMID_CHILD items[] = { pidlChild };
+	hr = shellFolder->GetAttributesOf(1, items, &attributes);
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	SHGDNF displayNameFlags = SHGDN_INFOLDER;
+
+	bool isRecycleBin = m_recycleBinPidl
+		&& m_desktopFolder->CompareIDs(SHCIDS_CANONICALONLY, pidlDirectory, m_recycleBinPidl.get())
+			== 0;
+
+	// SHGDN_INFOLDER | SHGDN_FORPARSING is used to ensure that the name retrieved for a filesystem
+	// file contains an extension, even if extensions are hidden in Windows Explorer. When using
+	// SHGDN_INFOLDER by itself, the resulting name won't contain an extension if extensions are
+	// hidden in Windows Explorer.
+	// Note that the recycle bin is excluded here, as the parsing names for the items are completely
+	// different to their regular display names.
+	if (!isRecycleBin && WI_IsFlagSet(attributes, SFGAO_FILESYSTEM)
+		&& WI_IsFlagClear(attributes, SFGAO_FOLDER))
+	{
+		WI_SetFlag(displayNameFlags, SHGDN_FORPARSING);
+	}
+
+	std::wstring displayName;
+	hr = GetDisplayName(shellFolder, pidlChild, displayNameFlags, displayName);
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	newItem.displayName = displayName;
+	StringCchCopy(newItem.wfd.cFileName, SIZEOF_ARRAY(newItem.wfd.cFileName), displayName.c_str());
+
+	std::wstring editingName;
+	hr = GetDisplayName(shellFolder, pidlChild, SHGDN_INFOLDER | SHGDN_FOREDITING, editingName);
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	newItem.editingName = editingName;
+
+	if (PathIsRoot(parsingName.c_str()))
+	{
+		newItem.bDrive = TRUE;
+		StringCchCopy(newItem.szDrive, SIZEOF_ARRAY(newItem.szDrive), parsingName.c_str());
+	}
+	else
+	{
+		newItem.bDrive = FALSE;
+	}
+
+	wil::com_ptr_nothrow<IShellFolder2> shellFolder2;
+	hr = shellFolder->QueryInterface(IID_PPV_ARGS(&shellFolder2));
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	VARIANT sizeVariant;
+	hr = shellFolder2->GetDetailsEx(pidlChild, &PKEY_Size, &sizeVariant);
+
+	// Size retrieval may fail for items in virtual folders. Note that it won't always fail in such
+	// cases. For example, library folders in Windows are backed by the filesystem. Therefore, a
+	// file in a library folder will still have a size, even though the library folder itself is
+	// virtual.
+	if (SUCCEEDED(hr))
+	{
+		ULONGLONG size;
+		hr = VariantToUInt64(sizeVariant, &size);
+
+		if (SUCCEEDED(hr))
+		{
+			ULARGE_INTEGER largeFileSize;
+			largeFileSize.QuadPart = size;
+			newItem.wfd.nFileSizeLow = largeFileSize.LowPart;
+			newItem.wfd.nFileSizeHigh = largeFileSize.HighPart;
+		}
+	}
+
+	FILETIME dateAccessed;
+	hr = GetDateDetailsEx(shellFolder2.get(), pidlChild, &PKEY_DateAccessed, dateAccessed);
+
+	// If the date set on the individual item is invalid, the date retrieval will fail, even though
+	// there are no actual issues with the item. In other words, it's valid for the date retrieval
+	// to fail, even for filesystem files.
+	if (SUCCEEDED(hr))
+	{
+		newItem.wfd.ftLastAccessTime = dateAccessed;
+	}
+
+	FILETIME dateCreated;
+	hr = GetDateDetailsEx(shellFolder2.get(), pidlChild, &PKEY_DateCreated, dateCreated);
+
+	if (SUCCEEDED(hr))
+	{
+		newItem.wfd.ftCreationTime = dateCreated;
+	}
+
+	FILETIME dateModified;
+	hr = GetDateDetailsEx(shellFolder2.get(), pidlChild, &PKEY_DateModified, dateModified);
+
+	if (SUCCEEDED(hr))
+	{
+		newItem.wfd.ftLastWriteTime = dateModified;
+	}
+
+	// The attribute retrieval below may fail, but, at the very least, it's important to know
+	// whether or not an item is a folder. The attributes set here will be used if the attribute
+	// retrieval fails.
+	if (WI_IsFlagSet(attributes, SFGAO_FOLDER))
+	{
+		WI_SetFlag(newItem.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
+	}
+
+	// Although it's possible to retrieve attributes for root folders, the attributes aren't useful.
+	// For example, the attributes returned for the C:\ folder will be something like:
+	//
+	// FILE_ATTRIBUTE_ARCHIVE | FILE_ATTRIBUTE_HIDDEN
+	//
+	// Accepting those attributes would result in the C:\ item (as shown in the "This PC" folder)
+	// being grayed out (because it would be considered hidden).
 	if (!PathIsRoot(parsingName.c_str()))
 	{
-		item.bDrive = FALSE;
+		VARIANT attributesVariant;
+		hr = shellFolder2->GetDetailsEx(pidlChild, &PKEY_FileAttributes, &attributesVariant);
 
-		WIN32_FIND_DATA wfd;
-		hFirstFile = FindFirstFile(parsingName.c_str(), &wfd);
+		// Attribute retrieval may fail for items in virtual folders.
+		if (SUCCEEDED(hr))
+		{
+			UINT fileAttributes;
+			hr = VariantToUInt32(attributesVariant, &fileAttributes);
 
-		item.wfd = wfd;
+			if (SUCCEEDED(hr))
+			{
+				newItem.wfd.dwFileAttributes = fileAttributes;
+			}
+		}
 	}
-	else
-	{
-		item.bDrive = TRUE;
-		StringCchCopy(item.szDrive, SIZEOF_ARRAY(item.szDrive), parsingName.c_str());
 
-		hFirstFile = INVALID_HANDLE_VALUE;
-	}
-
-	/* Need to use this, since may be in a virtual folder
-	(such as the recycle bin), but items still exist. */
-	if (hFirstFile != INVALID_HANDLE_VALUE)
-	{
-		FindClose(hFirstFile);
-	}
-	else
-	{
-		WIN32_FIND_DATA wfd;
-
-		StringCchCopy(wfd.cFileName, SIZEOF_ARRAY(wfd.cFileName), displayName.c_str());
-		wfd.nFileSizeLow = 0;
-		wfd.nFileSizeHigh = 0;
-		wfd.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
-
-		item.wfd = wfd;
-	}
+	int itemId = GenerateUniqueItemId();
+	m_itemInfoMap.insert({ itemId, std::move(newItem) });
 
 	return itemId;
 }

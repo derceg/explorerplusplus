@@ -35,7 +35,7 @@ HRESULT GetDisplayName(const std::wstring &parsingPath, DWORD flags, std::wstrin
 HRESULT GetDisplayName(PCIDLIST_ABSOLUTE pidl, DWORD flags, std::wstring &output)
 {
 	wil::com_ptr_nothrow<IShellFolder> shellFolder;
-	PCUITEMID_CHILD pidlChild = nullptr;
+	PCITEMID_CHILD pidlChild = nullptr;
 	HRESULT hr = SHBindToParent(pidl, IID_PPV_ARGS(&shellFolder), &pidlChild);
 
 	if (FAILED(hr))
@@ -43,8 +43,14 @@ HRESULT GetDisplayName(PCIDLIST_ABSOLUTE pidl, DWORD flags, std::wstring &output
 		return hr;
 	}
 
+	return GetDisplayName(shellFolder.get(), pidlChild, flags, output);
+}
+
+HRESULT GetDisplayName(
+	IShellFolder *shellFolder, PCITEMID_CHILD pidlChild, DWORD flags, std::wstring &output)
+{
 	STRRET str;
-	hr = shellFolder->GetDisplayNameOf(pidlChild, flags, &str);
+	HRESULT hr = shellFolder->GetDisplayNameOf(pidlChild, flags, &str);
 
 	if (FAILED(hr))
 	{
@@ -810,6 +816,30 @@ HRESULT ConvertGenericVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t
 		hr = StringCchCopy(szDetail, cchMax, V_BSTR(&vtDest));
 		VariantClear(&vtDest);
 	}
+
+	return hr;
+}
+
+HRESULT GetDateDetailsEx(IShellFolder2 *shellFolder2, PCITEMID_CHILD pidlChild,
+	const SHCOLUMNID *column, FILETIME &filetime)
+{
+	VARIANT dateVariant;
+	HRESULT hr = shellFolder2->GetDetailsEx(pidlChild, column, &dateVariant);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	FILETIME date;
+	hr = VariantToFileTime(dateVariant, PSTF_UTC, &date);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	filetime = date;
 
 	return hr;
 }
