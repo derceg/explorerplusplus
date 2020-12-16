@@ -196,12 +196,12 @@ void ShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 
 		if (SUCCEEDED(hr))
 		{
-			std::list<DroppedFile_t>::iterator itr;
 			BOOL bDropped = FALSE;
 
 			if (!m_DroppedFileNameList.empty())
 			{
-				for (itr = m_DroppedFileNameList.begin(); itr != m_DroppedFileNameList.end(); itr++)
+				for (auto itr = m_DroppedFileNameList.begin(); itr != m_DroppedFileNameList.end();
+					 itr++)
 				{
 					if (lstrcmp(szFileName, itr->szFileName) == 0)
 					{
@@ -211,25 +211,30 @@ void ShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 				}
 			}
 
+			auto itemId = AddItemInternal(
+				pShellFolder, m_directoryState.pidlDirectory.get(), pidlRelative, -1, FALSE);
+
 			/* Only insert the item in its sorted position if it
 			wasn't dropped in. */
-			if (m_config->globalFolderSettings.insertSorted && !bDropped)
+			if (itemId && m_config->globalFolderSettings.insertSorted && !bDropped)
 			{
-				auto itemId = SetItemInformation(
-					pShellFolder, m_directoryState.pidlDirectory.get(), pidlRelative);
+				// TODO: It would be better to pass the items details to this function directly
+				// instead (before the item is added to the awaiting list).
+				int sortedPosition = DetermineItemSortedPosition(*itemId);
 
-				if (itemId)
-				{
-					int iSorted = DetermineItemSortedPosition(*itemId);
+				auto itr = std::find_if(m_directoryState.awaitingAddList.begin(),
+					m_directoryState.awaitingAddList.end(),
+					[itemId](const AwaitingAdd_t &awaitingItem) {
+						return *itemId == awaitingItem.iItemInternal;
+					});
 
-					AddItemInternal(iSorted, *itemId, TRUE);
-				}
-			}
-			else
-			{
-				/* Just add the item to the end of the list. */
-				AddItemInternal(
-					pShellFolder, m_directoryState.pidlDirectory.get(), pidlRelative, -1, FALSE);
+				// The item was added successfully above, so should be in the list of awaiting
+				// items.
+				assert(itr != m_directoryState.awaitingAddList.end());
+
+				itr->iItem = sortedPosition;
+				itr->bPosition = TRUE;
+				itr->iAfter = sortedPosition - 1;
 			}
 
 			InsertAwaitingItems(m_folderSettings.showInGroups);

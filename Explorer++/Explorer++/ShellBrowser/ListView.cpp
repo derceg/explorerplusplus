@@ -79,6 +79,14 @@ LRESULT CALLBACK ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 		OnClipboardUpdate();
 		return 0;
 
+	case WM_SETCURSOR:
+		if (m_status == Status::Loading && LOWORD(lParam) == HTCLIENT)
+		{
+			SetCursor(LoadCursor(nullptr, IDC_WAIT));
+			return TRUE;
+		}
+		break;
+
 	case WM_NOTIFY:
 		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == ListView_GetHeader(m_hListView))
 		{
@@ -116,6 +124,10 @@ LRESULT CALLBACK ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 
 	case WM_APP_INFO_TIP_READY:
 		ProcessInfoTipResult(static_cast<int>(wParam));
+		break;
+
+	case WM_APP_ENUMERATION_RESULTS_READY:
+		ProcessEnumerationResults(static_cast<int>(wParam));
 		break;
 	}
 

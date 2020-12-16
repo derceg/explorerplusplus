@@ -7,6 +7,7 @@
 #include "Config.h"
 #include "DarkModeHelper.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
@@ -75,13 +76,53 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void Explorerplusplus::OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pidl)
+void Explorerplusplus::OnNavigationStartedStatusBar(
+	const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
 {
-	if (!m_tabContainer->IsTabSelected(tab))
-	{
-		return;
-	}
+	UNREFERENCED_PARAMETER(addHistoryEntry);
 
+	if (m_tabContainer->IsTabSelected(tab))
+	{
+		SetStatusBarLoadingText(pidl);
+	}
+}
+
+void Explorerplusplus::OnNavigationCompletedStatusBar(const Tab &tab)
+{
+	if (m_tabContainer->IsTabSelected(tab))
+	{
+		SetStatusBarStandardText(tab);
+	}
+}
+
+void Explorerplusplus::OnNavigationFailedStatusBar(const Tab &tab)
+{
+	if (m_tabContainer->IsTabSelected(tab))
+	{
+		SetStatusBarFailedText();
+	}
+}
+
+void Explorerplusplus::UpdateStatusBarText(const Tab &tab)
+{
+	switch (tab.GetShellBrowser()->GetStatus())
+	{
+	case ShellBrowser::Status::Loading:
+		SetStatusBarLoadingText(tab.GetShellBrowser()->GetDirectoryIdl().get());
+		break;
+
+	case ShellBrowser::Status::Completed:
+		SetStatusBarStandardText(tab);
+		break;
+
+	case ShellBrowser::Status::Failed:
+		SetStatusBarFailedText();
+		break;
+	}
+}
+
+void Explorerplusplus::SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl)
+{
 	std::wstring displayName;
 	HRESULT hr = GetDisplayName(pidl, SHGDN_INFOLDER, displayName);
 
@@ -104,7 +145,7 @@ void Explorerplusplus::OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pid
 	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 2 | 0, (LPARAM) EMPTY_STRING);
 }
 
-HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
+void Explorerplusplus::SetStatusBarStandardText(const Tab &tab)
 {
 	FolderInfo_t folderInfo;
 	int nTotal;
@@ -214,8 +255,15 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 	}
 
 	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 2 | 0, (LPARAM) szBuffer);
+}
 
-	return S_OK;
+void Explorerplusplus::SetStatusBarFailedText()
+{
+	std::wstring failedText = ResourceHelper::LoadString(m_hLanguageModule, IDS_STATUS_BAR_FAILED);
+	SendMessage(m_hStatusBar, SB_SETTEXT, 0, reinterpret_cast<LPARAM>(failedText.c_str()));
+
+	SendMessage(m_hStatusBar, SB_SETTEXT, 1, reinterpret_cast<LPARAM>(L""));
+	SendMessage(m_hStatusBar, SB_SETTEXT, 2, reinterpret_cast<LPARAM>(L""));
 }
 
 int Explorerplusplus::CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer)

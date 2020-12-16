@@ -111,6 +111,8 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 	m_folderColumns(initialColumns
 			? *initialColumns
 			: coreInterface->GetConfig()->globalFolderSettings.folderColumns),
+	m_enumerationThreadPool(
+		2, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
 	m_columnThreadPool(
 		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
 	m_columnResultIDCounter(0),
@@ -119,7 +121,8 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 	m_thumbnailResultIDCounter(0),
 	m_infoTipsThreadPool(
 		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
-	m_infoTipResultIDCounter(0)
+	m_infoTipResultIDCounter(0),
+	m_closing(false)
 {
 	m_iRefCount = 1;
 
@@ -147,15 +150,11 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 
 	m_uniqueFolderId = 0;
 
+	// Technically, the initial status would be undefined. This is done so that there is at least a
+	// valid value assigned immediately, even though the value shouldn't be used.
+	m_status = Status::Completed;
+
 	m_PreviousSortColumnExists = false;
-
-	// This interface is required. It's not expected that the call would fail.
-	HRESULT hr = SHGetDesktopFolder(&m_desktopFolder);
-	FAIL_FAST_IF_FAILED(hr);
-
-	// This interface is optional, so it doesn't matter whether the call succeeds or not.
-	SHGetKnownFolderIDList(
-		FOLDERID_RecycleBinFolder, KF_FLAG_DEFAULT, nullptr, wil::out_param(m_recycleBinPidl));
 
 	InitializeCriticalSection(&m_csDirectoryAltered);
 
@@ -174,6 +173,7 @@ ShellBrowser::~ShellBrowser()
 
 	DestroyWindow(m_hListView);
 
+	m_enumerationThreadPool.clear_queue();
 	m_columnThreadPool.clear_queue();
 	m_thumbnailThreadPool.clear_queue();
 	m_infoTipsThreadPool.clear_queue();
@@ -183,6 +183,8 @@ ShellBrowser::~ShellBrowser()
 	m_pDragSourceHelper->Release();
 
 	DeleteCriticalSection(&m_csDirectoryAltered);
+
+	m_closing = true;
 
 	/* TODO: Also destroy the thumbnails imagelist. */
 }
@@ -1661,4 +1663,9 @@ void ShellBrowser::OnApplicationShuttingDown()
 		// running, any clipboard objects will still be available.
 		OleFlushClipboard();
 	}
+}
+
+ShellBrowser::Status ShellBrowser::GetStatus() const
+{
+	return m_status;
 }

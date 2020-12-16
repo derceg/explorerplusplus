@@ -178,7 +178,9 @@ private:
 	void OnSetFocus();
 	LRESULT OnDeviceChange(WPARAM wParam, LPARAM lParam);
 	LRESULT StatusBarMenuSelect(WPARAM wParam, LPARAM lParam);
-	void OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pidl);
+	void OnNavigationStartedStatusBar(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
+	void OnNavigationCompletedStatusBar(const Tab &tab);
+	void OnNavigationFailedStatusBar(const Tab &tab);
 	void OnPreviousWindow();
 	void OnNextWindow();
 	void OnShellNewItemCreated(LPARAM lParam);
@@ -287,7 +289,7 @@ private:
 	/* TabNavigationInterface methods. */
 	HRESULT CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected) override;
 
-	void OnNavigationCompleted(const Tab &tab);
+	void OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
 
 	/* PluginInterface. */
 	IExplorerplusplus *GetCoreInterface() override;
@@ -390,7 +392,10 @@ private:
 	void ResizeWindows();
 	void SetListViewInitialPosition(HWND hListView) override;
 	void AdjustFolderPanePosition();
-	HRESULT UpdateStatusBarText(const Tab &tab);
+	void UpdateStatusBarText(const Tab &tab);
+	void SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl);
+	void SetStatusBarStandardText(const Tab &tab);
+	void SetStatusBarFailedText();
 	void ToggleFolders();
 	void UpdateLayout();
 

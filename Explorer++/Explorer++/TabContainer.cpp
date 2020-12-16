@@ -128,8 +128,8 @@ void TabContainer::Initialize(HWND parent)
 
 	m_connections.push_back(
 		tabCreatedSignal.AddObserver(boost::bind(&TabContainer::OnTabCreated, this, _1, _2)));
-	m_connections.push_back(tabNavigationCompletedSignal.AddObserver(
-		boost::bind(&TabContainer::OnNavigationCompleted, this, _1)));
+	m_connections.push_back(tabNavigationStartedSignal.AddObserver(
+		boost::bind(&TabContainer::OnNavigationStarted, this, _1, _2, _3)));
 	m_connections.push_back(
 		tabSelectedSignal.AddObserver(boost::bind(&TabContainer::OnTabSelected, this, _1)));
 	m_connections.push_back(
@@ -751,8 +751,11 @@ void TabContainer::OnForceSameTabWidthUpdated(BOOL newValue)
 	AddWindowStyle(m_hwnd, TCS_FIXEDWIDTH, newValue);
 }
 
-void TabContainer::OnNavigationCompleted(const Tab &tab)
+void TabContainer::OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
 {
+	UNREFERENCED_PARAMETER(pidl);
+	UNREFERENCED_PARAMETER(addHistoryEntry);
+
 	UpdateTabNameInWindow(tab);
 	SetTabIcon(tab);
 }
@@ -1006,29 +1009,30 @@ HRESULT TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 		selected = *tabSettings.selected;
 	}
 
-	// Capturing the tab by reference here is safe, since the tab object is
-	// guaranteed to exist whenever this method is called.
-	tab.GetShellBrowser()->AddNavigationCompletedObserver(
-		[this, &tab](PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry) {
-			UNREFERENCED_PARAMETER(pidlDirectory);
-			UNREFERENCED_PARAMETER(addHistoryEntry);
-
-			// Re-broadcast the event. This allows other classes to be notified of
-			// navigations in any tab, without having to observe navigation events
-			// for each tab individually.
-			tabNavigationCompletedSignal.m_signal(tab);
+	tab.GetShellBrowser()->AddNavigationStartedObserver(
+		[this, &tab](PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry) {
+			tabNavigationStartedSignal.m_signal(tab, pidl, addHistoryEntry);
 		});
 
-	tab.GetShellBrowser()->navigationStarted.AddObserver([this, &tab](PCIDLIST_ABSOLUTE pidl) {
-		tabNavigationStarted.m_signal(tab, pidl);
+	// Capturing the tab by reference here is safe, since the tab object is
+	// guaranteed to exist whenever this method is called.
+	tab.GetShellBrowser()->AddNavigationCompletedObserver([this, &tab]() {
+		// Re-broadcast the event. This allows other classes to be notified of
+		// navigations in any tab, without having to observe navigation events
+		// for each tab individually.
+		tabNavigationCompletedSignal.m_signal(tab);
+	});
+
+	tab.GetShellBrowser()->AddNavigationFailedObserver([this, &tab]() {
+		tabNavigationFailedSignal.m_signal(tab);
 	});
 
 	tab.GetShellBrowser()->listViewSelectionChanged.AddObserver([this, &tab]() {
-		tabListViewSelectionChanged.m_signal(tab);
+		tabListViewSelectionChangedSignal.m_signal(tab);
 	});
 
 	tab.GetShellBrowser()->columnsChanged.AddObserver([this, &tab]() {
-		tabColumnsChanged.m_signal(tab);
+		tabColumnsChangedSignal.m_signal(tab);
 	});
 
 	HRESULT hr = tab.GetShellBrowser()->GetNavigationController()->BrowseFolder(

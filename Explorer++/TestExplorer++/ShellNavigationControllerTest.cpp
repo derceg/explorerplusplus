@@ -22,20 +22,34 @@ class NavigatorFake : public NavigatorInterface
 public:
 	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true) override
 	{
-		m_navigationCompletedSignal(pidlDirectory, addHistoryEntry);
+		m_navigationStartedSignal(pidlDirectory, addHistoryEntry);
 
 		return S_OK;
+	}
+
+	boost::signals2::connection AddNavigationStartedObserver(
+		const NavigationStartedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override
+	{
+		return m_navigationStartedSignal.connect(observer, position);
 	}
 
 	boost::signals2::connection AddNavigationCompletedObserver(
 		const NavigationCompletedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override
 	{
-		return m_navigationCompletedSignal.connect(observer, position);
+		throw std::logic_error("This method is not implemented.");
+	}
+
+	boost::signals2::connection AddNavigationFailedObserver(
+		const NavigationFailedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override
+	{
+		throw std::logic_error("This method is not implemented.");
 	}
 
 private:
-	NavigationCompletedSignal m_navigationCompletedSignal;
+	NavigationStartedSignal m_navigationStartedSignal;
 };
 
 class NavigatorMock : public NavigatorInterface
@@ -48,16 +62,34 @@ public:
 				return m_fake.BrowseFolder(pidlDirectory, addHistoryEntry);
 			});
 
+		ON_CALL(*this, AddNavigationStartedObserverImpl)
+			.WillByDefault([this](const NavigationStartedSignal::slot_type &observer,
+							   boost::signals2::connect_position position) {
+				return m_fake.AddNavigationStartedObserver(observer, position);
+			});
+
 		ON_CALL(*this, AddNavigationCompletedObserverImpl)
 			.WillByDefault([this](const NavigationCompletedSignal::slot_type &observer,
 							   boost::signals2::connect_position position) {
 				return m_fake.AddNavigationCompletedObserver(observer, position);
 			});
+
+		ON_CALL(*this, AddNavigationFailedObserverImpl)
+			.WillByDefault([this](const NavigationFailedSignal::slot_type &observer,
+							   boost::signals2::connect_position position) {
+				return m_fake.AddNavigationFailedObserver(observer, position);
+			});
 	}
 
 	MOCK_METHOD(HRESULT, BrowseFolderImpl, (PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry));
+	MOCK_METHOD(boost::signals2::connection, AddNavigationStartedObserverImpl,
+		(const NavigationStartedSignal::slot_type &observer,
+			boost::signals2::connect_position position));
 	MOCK_METHOD(boost::signals2::connection, AddNavigationCompletedObserverImpl,
 		(const NavigationCompletedSignal::slot_type &observer,
+			boost::signals2::connect_position position));
+	MOCK_METHOD(boost::signals2::connection, AddNavigationFailedObserverImpl,
+		(const NavigationFailedSignal::slot_type &observer,
 			boost::signals2::connect_position position));
 
 	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true) override
@@ -65,11 +97,25 @@ public:
 		return BrowseFolderImpl(pidlDirectory, addHistoryEntry);
 	}
 
+	boost::signals2::connection AddNavigationStartedObserver(
+		const NavigationStartedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override
+	{
+		return AddNavigationStartedObserverImpl(observer, position);
+	}
+
 	boost::signals2::connection AddNavigationCompletedObserver(
 		const NavigationCompletedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override
 	{
 		return AddNavigationCompletedObserverImpl(observer, position);
+	}
+
+	boost::signals2::connection AddNavigationFailedObserver(
+		const NavigationFailedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override
+	{
+		return AddNavigationFailedObserverImpl(observer, position);
 	}
 
 private:

@@ -97,7 +97,7 @@ private:
 	void CreateViewsMenu(POINT *ptOrigin);
 
 	void OnTabSelected(const Tab &tab);
-	void OnNavigationCompleted(const Tab &tab);
+	void OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
 	void OnFocusChanged(WindowFocusSource windowFocusSource);
 
 	void UpdateToolbarButtonImageIndexes();

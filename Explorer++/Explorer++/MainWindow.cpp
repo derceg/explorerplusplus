@@ -31,8 +31,8 @@ MainWindow::MainWindow(
 	m_expp->AddTabsInitializedObserver([this] {
 		m_connections.push_back(m_expp->GetTabContainer()->tabSelectedSignal.AddObserver(
 			boost::bind(&MainWindow::OnTabSelected, this, _1)));
-		m_connections.push_back(m_expp->GetTabContainer()->tabNavigationCompletedSignal.AddObserver(
-			boost::bind(&MainWindow::OnNavigationCompleted, this, _1)));
+		m_connections.push_back(m_expp->GetTabContainer()->tabNavigationStartedSignal.AddObserver(
+			boost::bind(&MainWindow::OnNavigationStarted, this, _1, _2, _3)));
 	});
 
 	m_connections.push_back(m_config->showFullTitlePath.addObserver(
@@ -43,8 +43,11 @@ MainWindow::MainWindow(
 		boost::bind(&MainWindow::OnShowPrivilegeLevelInTitleBarUpdated, this, _1)));
 }
 
-void MainWindow::OnNavigationCompleted(const Tab &tab)
+void MainWindow::OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
 {
+	UNREFERENCED_PARAMETER(pidl);
+	UNREFERENCED_PARAMETER(addHistoryEntry);
+
 	if (m_expp->GetTabContainer()->IsTabSelected(tab))
 	{
 		UpdateWindowText();

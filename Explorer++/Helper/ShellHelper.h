@@ -7,6 +7,7 @@
 #include <wil/resource.h>
 #include <ShObjIdl.h>
 #include <ShlGuid.h>
+#include <ShlObj.h>
 #include <list>
 #include <optional>
 #include <vector>
@@ -49,6 +50,18 @@ struct ContextMenuHandler
 
 using unique_pidl_absolute = wil::unique_cotaskmem_ptr<std::remove_pointer_t<PIDLIST_ABSOLUTE>>;
 using unique_pidl_child = wil::unique_cotaskmem_ptr<std::remove_pointer_t<PITEMID_CHILD>>;
+
+struct unique_pidl_absolute_holder
+{
+	unique_pidl_absolute_holder() = default;
+
+	unique_pidl_absolute_holder(const unique_pidl_absolute_holder &other) :
+		pidl(ILCloneFull(other.pidl.get()))
+	{
+	}
+
+	unique_pidl_absolute pidl;
+};
 
 void DecodePath(const TCHAR *szInitialPath, const TCHAR *szCurrentDirectory, TCHAR *szParsingPath,
 	size_t cchDest);

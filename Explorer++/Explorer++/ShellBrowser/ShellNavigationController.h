@@ -50,7 +50,7 @@ private:
 	HRESULT BrowseFolder(const HistoryEntry *entry, bool addHistoryEntry = true) override;
 	HRESULT GetFailureValue() override;
 
-	void OnNavigationCompleted(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry);
+	void OnNavigationStarted(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry);
 
 	NavigatorInterface *m_navigator;
 

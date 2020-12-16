@@ -27,8 +27,8 @@ ShellNavigationController::ShellNavigationController(NavigatorInterface *navigat
 
 void ShellNavigationController::Initialize()
 {
-	m_connections.emplace_back(m_navigator->AddNavigationCompletedObserver(
-		boost::bind(&ShellNavigationController::OnNavigationCompleted, this, _1, _2),
+	m_connections.emplace_back(m_navigator->AddNavigationStartedObserver(
+		boost::bind(&ShellNavigationController::OnNavigationStarted, this, _1, _2),
 		boost::signals2::at_front));
 }
 
@@ -46,7 +46,7 @@ std::vector<std::unique_ptr<HistoryEntry>> ShellNavigationController::CopyPreser
 	return entries;
 }
 
-void ShellNavigationController::OnNavigationCompleted(
+void ShellNavigationController::OnNavigationStarted(
 	PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)
 {
 	if (addHistoryEntry)

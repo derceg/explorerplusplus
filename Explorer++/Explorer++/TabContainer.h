@@ -112,7 +112,10 @@ public:
 
 	// Signals
 	SignalWrapper<TabContainer, void(int tabId, BOOL switchToNewTab)> tabCreatedSignal;
+	SignalWrapper<TabContainer, void(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)>
+		tabNavigationStartedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabNavigationCompletedSignal;
+	SignalWrapper<TabContainer, void(const Tab &tab)> tabNavigationFailedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, Tab::PropertyType propertyType)>
 		tabUpdatedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, int fromIndex, int toIndex)> tabMovedSignal;
@@ -120,9 +123,8 @@ public:
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabPreRemovalSignal;
 	SignalWrapper<TabContainer, void(int tabId)> tabRemovedSignal;
 
-	SignalWrapper<TabContainer, void(const Tab &tab, PCIDLIST_ABSOLUTE pidl)> tabNavigationStarted;
-	SignalWrapper<TabContainer, void(const Tab &tab)> tabListViewSelectionChanged;
-	SignalWrapper<TabContainer, void(const Tab &tab)> tabColumnsChanged;
+	SignalWrapper<TabContainer, void(const Tab &tab)> tabListViewSelectionChangedSignal;
+	SignalWrapper<TabContainer, void(const Tab &tab)> tabColumnsChangedSignal;
 
 private:
 	static const UINT_PTR SUBCLASS_ID = 0;
@@ -185,7 +187,7 @@ private:
 	void OnAlwaysShowTabBarUpdated(BOOL newValue);
 	void OnForceSameTabWidthUpdated(BOOL newValue);
 
-	void OnNavigationCompleted(const Tab &tab);
+	void OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
 	void OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
 	void UpdateTabNameInWindow(const Tab &tab);
 	void SetTabIcon(const Tab &tab);

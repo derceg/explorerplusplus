@@ -28,14 +28,22 @@ void Explorerplusplus::InitializeTabs()
 		&m_cachedIcons, &m_bookmarkTree, m_hLanguageModule, m_config);
 	m_tabContainer->tabCreatedSignal.AddObserver(
 		boost::bind(&Explorerplusplus::OnTabCreated, this, _1, _2), boost::signals2::at_front);
-	m_tabContainer->tabNavigationStarted.AddObserver(
-		boost::bind(&Explorerplusplus::OnNavigationStarted, this, _1, _2), boost::signals2::at_front);
+	m_tabContainer->tabNavigationStartedSignal.AddObserver(
+		boost::bind(&Explorerplusplus::OnNavigationStarted, this, _1, _2, _3),
+		boost::signals2::at_front);
+	m_tabContainer->tabNavigationStartedSignal.AddObserver(
+		boost::bind(&Explorerplusplus::OnNavigationStartedStatusBar, this, _1, _2, _3),
+		boost::signals2::at_front);
 	m_tabContainer->tabNavigationCompletedSignal.AddObserver(
-		boost::bind(&Explorerplusplus::OnNavigationCompleted, this, _1), boost::signals2::at_front);
+		boost::bind(&Explorerplusplus::OnNavigationCompletedStatusBar, this, _1),
+		boost::signals2::at_front);
+	m_tabContainer->tabNavigationFailedSignal.AddObserver(
+		boost::bind(&Explorerplusplus::OnNavigationFailedStatusBar, this, _1),
+		boost::signals2::at_front);
 	m_tabContainer->tabSelectedSignal.AddObserver(
 		boost::bind(&Explorerplusplus::OnTabSelected, this, _1), boost::signals2::at_front);
 
-	m_tabContainer->tabListViewSelectionChanged.AddObserver(
+	m_tabContainer->tabListViewSelectionChangedSignal.AddObserver(
 		boost::bind(&Explorerplusplus::OnTabListViewSelectionChanged, this, _1),
 		boost::signals2::at_front);
 
@@ -68,8 +76,12 @@ boost::signals2::connection Explorerplusplus::AddTabsInitializedObserver(
 	return m_tabsInitializedSignal.connect(observer);
 }
 
-void Explorerplusplus::OnNavigationCompleted(const Tab &tab)
+void Explorerplusplus::OnNavigationStarted(
+	const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
 {
+	UNREFERENCED_PARAMETER(pidl);
+	UNREFERENCED_PARAMETER(addHistoryEntry);
+
 	if (m_tabContainer->IsTabSelected(tab))
 	{
 		m_CurrentDirectory = tab.GetShellBrowser()->GetDirectory();

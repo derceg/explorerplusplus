@@ -97,11 +97,14 @@ void Explorerplusplus::CreateFolderControls()
 		UpdateTreeViewSelection();
 	});
 
-	m_tabContainer->tabNavigationCompletedSignal.AddObserver([this](const Tab &tab) {
-		UNREFERENCED_PARAMETER(tab);
+	m_tabContainer->tabNavigationStartedSignal.AddObserver(
+		[this](const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry) {
+			UNREFERENCED_PARAMETER(tab);
+			UNREFERENCED_PARAMETER(pidl);
+			UNREFERENCED_PARAMETER(addHistoryEntry);
 
-		UpdateTreeViewSelection();
-	});
+			UpdateTreeViewSelection();
+		});
 
 	m_tabContainer->tabSelectedSignal.AddObserver([this](const Tab &tab) {
 		UNREFERENCED_PARAMETER(tab);

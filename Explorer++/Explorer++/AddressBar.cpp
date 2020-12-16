@@ -78,8 +78,8 @@ void AddressBar::Initialize(HWND parent)
 	m_expp->AddTabsInitializedObserver([this] {
 		m_connections.push_back(m_expp->GetTabContainer()->tabSelectedSignal.AddObserver(
 			boost::bind(&AddressBar::OnTabSelected, this, _1)));
-		m_connections.push_back(m_expp->GetTabContainer()->tabNavigationCompletedSignal.AddObserver(
-			boost::bind(&AddressBar::OnNavigationCompleted, this, _1)));
+		m_connections.push_back(m_expp->GetTabContainer()->tabNavigationStartedSignal.AddObserver(
+			boost::bind(&AddressBar::OnNavigationStarted, this, _1, _2, _3)));
 	});
 }
 
@@ -377,8 +377,11 @@ void AddressBar::OnTabSelected(const Tab &tab)
 	UpdateTextAndIcon(tab);
 }
 
-void AddressBar::OnNavigationCompleted(const Tab &tab)
+void AddressBar::OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
 {
+	UNREFERENCED_PARAMETER(pidl);
+	UNREFERENCED_PARAMETER(addHistoryEntry);
+
 	if (m_expp->GetTabContainer()->IsTabSelected(tab))
 	{
 		UpdateTextAndIcon(tab);

@@ -18,6 +18,7 @@
 #include <boost/signals2.hpp>
 #include <wil/com.h>
 #include <wil/resource.h>
+#include <atomic>
 #include <future>
 #include <list>
 #include <optional>
@@ -60,6 +61,13 @@ typedef struct
 class ShellBrowser : public IDropTarget, public IDropFilesCallback, public NavigatorInterface
 {
 public:
+	enum Status
+	{
+		Loading,
+		Completed,
+		Failed
+	};
+
 	static ShellBrowser *CreateNew(int id, HWND hOwner, IExplorerplusplus *coreInterface,
 		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 		const FolderSettings &folderSettings, std::optional<FolderColumns> initialColumns);
@@ -78,8 +86,14 @@ public:
 	FolderSettings GetFolderSettings() const;
 
 	ShellNavigationController *GetNavigationController() const;
+	boost::signals2::connection AddNavigationStartedObserver(
+		const NavigationStartedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override;
 	boost::signals2::connection AddNavigationCompletedObserver(
 		const NavigationCompletedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override;
+	boost::signals2::connection AddNavigationFailedObserver(
+		const NavigationFailedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;
 
 	/* Drag and Drop. */
@@ -95,6 +109,7 @@ public:
 	/* Get/Set current state. */
 	unique_pidl_absolute GetDirectoryIdl() const;
 	std::wstring GetDirectory() const;
+	Status GetStatus() const;
 	BOOL GetAutoArrange() const;
 	void SetAutoArrange(BOOL autoArrange);
 	ViewMode GetViewMode() const;
@@ -179,7 +194,6 @@ public:
 	void OnGridlinesSettingChanged();
 
 	// Signals
-	SignalWrapper<ShellBrowser, void(PCIDLIST_ABSOLUTE pidl)> navigationStarted;
 	SignalWrapper<ShellBrowser, void()> listViewSelectionChanged;
 	SignalWrapper<ShellBrowser, void()> columnsChanged;
 
@@ -210,6 +224,12 @@ private:
 		ItemInfo_t() : wfd({}), iIcon(0), bDrive(FALSE)
 		{
 		}
+	};
+
+	struct EnumerationResult
+	{
+		HRESULT hr;
+		std::vector<ItemInfo_t> items;
 	};
 
 	struct AlteredFile_t
@@ -313,6 +333,7 @@ private:
 	static const UINT WM_APP_COLUMN_RESULT_READY = WM_APP + 150;
 	static const UINT WM_APP_THUMBNAIL_RESULT_READY = WM_APP + 151;
 	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 152;
+	static const UINT WM_APP_ENUMERATION_RESULTS_READY = WM_APP + 153;
 
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
@@ -335,16 +356,23 @@ private:
 	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true) override;
 
 	/* Browsing support. */
-	HRESULT EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory);
+	HRESULT StartEnumeration(PCIDLIST_ABSOLUTE pidlDirectory);
+	static EnumerationResult EnumerateFolderAsync(HWND listView, int resultId,
+		const std::atomic_bool &closing, const std::atomic_int &currentResultId,
+		PCIDLIST_ABSOLUTE pidlDirectory, HWND owner, bool showHidden);
+	static HRESULT EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owner, bool showHidden,
+		const std::atomic_bool &closing, const std::atomic_int &currentResultId, int resultId,
+		std::vector<ItemInfo_t> &items);
+	static std::optional<ItemInfo_t> GetItemInformation(
+		IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild);
+	void ProcessEnumerationResults(int resultId);
+	std::optional<int> AddItemInternal(IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory,
+		PCITEMID_CHILD pidlChild, int itemIndex, BOOL setPosition);
+	int AddItemInternal(int itemIndex, ItemInfo_t itemInfo, BOOL setPosition);
+	void InsertAwaitingItems(BOOL bInsertIntoGroup);
 	void ClearPendingResults();
 	void ResetFolderState();
-	void InsertAwaitingItems(BOOL bInsertIntoGroup);
 	BOOL IsFileFiltered(const ItemInfo_t &itemInfo) const;
-	HRESULT AddItemInternal(IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory,
-		PCITEMID_CHILD pidlChild, int itemIndex, BOOL setPosition);
-	HRESULT AddItemInternal(int itemIndex, int itemId, BOOL setPosition);
-	std::optional<int> SetItemInformation(
-		IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild);
 	void SetViewModeInternal(ViewMode viewMode);
 	void SetFirstColumnTextToCallback();
 	void SetFirstColumnTextToFilename();
@@ -517,8 +545,12 @@ private:
 	HWND m_hListView;
 	HWND m_hOwner;
 
+	NavigationStartedSignal m_navigationStartedSignal;
 	NavigationCompletedSignal m_navigationCompletedSignal;
+	NavigationFailedSignal m_navigationFailedSignal;
 	std::unique_ptr<ShellNavigationController> m_navigationController;
+
+	Status m_status;
 
 	TabNavigationInterface *m_tabNavigation;
 	FileActionHandler *m_fileActionHandler;
@@ -540,6 +572,9 @@ private:
 	/* Stores various extra information on files, such
 	as display name. */
 	std::unordered_map<int, ItemInfo_t> m_itemInfoMap;
+
+	ctpl::thread_pool m_enumerationThreadPool;
+	std::unordered_map<int, std::future<EnumerationResult>> m_enumerationResults;
 
 	ctpl::thread_pool m_columnThreadPool;
 	std::unordered_map<int, std::future<ColumnResult_t>> m_columnResults;
@@ -570,16 +605,15 @@ private:
 	This may be needed so that folders can be
 	told apart when adding files from directory
 	modification. */
-	int m_uniqueFolderId;
+	std::atomic_int m_uniqueFolderId;
+
+	std::atomic_bool m_closing;
 
 	const Config *m_config;
 	FolderSettings m_folderSettings;
 
 	/* ID. */
 	const int m_ID;
-
-	wil::com_ptr_nothrow<IShellFolder> m_desktopFolder;
-	unique_pidl_absolute m_recycleBinPidl;
 
 	/* Stores information on files that
 	have been modified (i.e. created, deleted,
