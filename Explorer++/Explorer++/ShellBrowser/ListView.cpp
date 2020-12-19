@@ -698,11 +698,6 @@ void ShellBrowser::ShowPropertiesForSelectedFiles() const
 		pidls.push_back(std::move(pidl));
 	}
 
-	if (rawPidls.empty())
-	{
-		return;
-	}
-
 	auto pidlDirectory = GetDirectoryIdl();
 	ShowMultipleFileProperties(
 		pidlDirectory.get(), rawPidls.data(), m_hOwner, static_cast<int>(rawPidls.size()));
