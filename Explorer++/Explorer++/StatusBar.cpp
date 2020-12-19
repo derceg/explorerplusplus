@@ -63,6 +63,10 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
 	if (HIWORD(wParam) == 0xFFFF && lParam == 0)
 	{
 		m_pStatusBar->HandleStatusBarMenuClose();
+
+		// While the menu is open, a folder might have been loaded in the background. That can
+		// change the text shown in the status bar.
+		UpdateStatusBarText(m_tabContainer->GetSelectedTab());
 	}
 	else
 	{
@@ -136,13 +140,7 @@ void Explorerplusplus::SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl)
 	LoadString(m_hLanguageModule, IDS_GENERAL_LOADING, szTemp, SIZEOF_ARRAY(szTemp));
 	StringCchPrintf(szLoadingText, SIZEOF_ARRAY(szLoadingText), szTemp, displayName.c_str());
 
-	/* Browsing of a folder has started. Set the status bar text to indicate that
-	the folder is being loaded. */
-	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 0 | 0, (LPARAM) szLoadingText);
-
-	/* Clear the text in all other parts of the status bar. */
-	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 1 | 0, (LPARAM) EMPTY_STRING);
-	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 2 | 0, (LPARAM) EMPTY_STRING);
+	SetStatusBarText(szLoadingText, L"", L"");
 }
 
 void Explorerplusplus::SetStatusBarStandardText(const Tab &tab)
@@ -209,8 +207,6 @@ void Explorerplusplus::SetStatusBarStandardText(const Tab &tab)
 		}
 	}
 
-	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 0 | 0, (LPARAM) szItemsSelected);
-
 	if (tab.GetShellBrowser()->InVirtualFolder())
 	{
 		LoadString(m_hLanguageModule, IDS_GENERAL_VIRTUALFOLDER, lpszSizeBuffer,
@@ -245,8 +241,6 @@ void Explorerplusplus::SetStatusBarStandardText(const Tab &tab)
 		}
 	}
 
-	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 1 | 0, (LPARAM) lpszSizeBuffer);
-
 	res = CreateDriveFreeSpaceString(m_CurrentDirectory.c_str(), szBuffer, SIZEOF_ARRAY(szBuffer));
 
 	if (res == -1)
@@ -254,16 +248,24 @@ void Explorerplusplus::SetStatusBarStandardText(const Tab &tab)
 		StringCchCopy(szBuffer, SIZEOF_ARRAY(szBuffer), EMPTY_STRING);
 	}
 
-	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 2 | 0, (LPARAM) szBuffer);
+	SetStatusBarText(szItemsSelected, lpszSizeBuffer, szBuffer);
 }
 
 void Explorerplusplus::SetStatusBarFailedText()
 {
 	std::wstring failedText = ResourceHelper::LoadString(m_hLanguageModule, IDS_STATUS_BAR_FAILED);
-	SendMessage(m_hStatusBar, SB_SETTEXT, 0, reinterpret_cast<LPARAM>(failedText.c_str()));
+	SetStatusBarText(failedText, L"", L"");
+}
 
-	SendMessage(m_hStatusBar, SB_SETTEXT, 1, reinterpret_cast<LPARAM>(L""));
-	SendMessage(m_hStatusBar, SB_SETTEXT, 2, reinterpret_cast<LPARAM>(L""));
+void Explorerplusplus::SetStatusBarText(
+	const std::wstring &firstPart, const std::wstring &secondPart, const std::wstring &thirdPart)
+{
+	if (!m_pStatusBar->IsMenuOpen())
+	{
+		SendMessage(m_hStatusBar, SB_SETTEXT, 0, reinterpret_cast<LPARAM>(firstPart.c_str()));
+		SendMessage(m_hStatusBar, SB_SETTEXT, 1, reinterpret_cast<LPARAM>(secondPart.c_str()));
+		SendMessage(m_hStatusBar, SB_SETTEXT, 2, reinterpret_cast<LPARAM>(thirdPart.c_str()));
+	}
 }
 
 int Explorerplusplus::CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer)

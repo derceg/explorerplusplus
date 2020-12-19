@@ -19,6 +19,8 @@ public:
 	void			HandleStatusBarMenuOpen();
 	void			HandleStatusBarMenuClose();
 
+	bool			IsMenuOpen() const;
+
 private:
 
 	DISALLOW_COPY_AND_ASSIGN(StatusBar);
@@ -29,5 +31,6 @@ private:
 	int				*m_pPartWidths;
 	std::list<std::wstring>	m_TextList;
 
+	bool			m_menuOpen;
 	bool			m_bAlteredStatusBarParts;
 };

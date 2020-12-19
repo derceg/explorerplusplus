@@ -8,7 +8,8 @@
 
 
 StatusBar::StatusBar(HWND hwnd) :
-m_hwnd(hwnd)
+m_hwnd(hwnd),
+m_menuOpen(false)
 {
 	m_bAlteredStatusBarParts = false;
 	m_nParts = 0;
@@ -22,6 +23,8 @@ void StatusBar::SetPartText(int iPart, const TCHAR *szText)
 
 void StatusBar::HandleStatusBarMenuOpen()
 {
+	m_menuOpen = true;
+
 	if(!m_bAlteredStatusBarParts)
 	{
 		/* Get the number of parts in the status bar window. */
@@ -82,5 +85,11 @@ void StatusBar::HandleStatusBarMenuClose()
 
 	m_nParts = 0;
 	m_TextList.clear();
+	m_menuOpen = false;
 	m_bAlteredStatusBarParts = false;
+}
+
+bool StatusBar::IsMenuOpen() const
+{
+	return m_menuOpen;
 }

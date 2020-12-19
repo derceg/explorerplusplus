@@ -396,6 +396,8 @@ private:
 	void SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl);
 	void SetStatusBarStandardText(const Tab &tab);
 	void SetStatusBarFailedText();
+	void SetStatusBarText(const std::wstring &firstPart, const std::wstring &secondPart,
+		const std::wstring &thirdPart);
 	void ToggleFolders();
 	void UpdateLayout();
 
