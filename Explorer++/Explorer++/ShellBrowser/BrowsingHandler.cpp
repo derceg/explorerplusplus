@@ -203,6 +203,8 @@ HRESULT ShellBrowser::StartEnumeration(PCIDLIST_ABSOLUTE pidlDirectory)
 
 	m_enumerationResults.insert({ resultId, std::move(result) });
 
+	SetCursor(LoadCursor(nullptr, IDC_WAIT));
+
 	return hr;
 }
 
