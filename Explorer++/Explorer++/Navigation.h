@@ -6,6 +6,7 @@
 
 __interface IExplorerplusplus;
 class TabContainer;
+class Tab;
 
 class Navigation
 {
@@ -20,6 +21,17 @@ public:
 	void OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory);
 
 private:
+	struct SelectionInfo
+	{
+		int folderId;
+		std::wstring filename;
+	};
+
+	void OnNavigationCompleted(const Tab &tab);
+	void OnNavigationFailed(const Tab &tab);
+
 	IExplorerplusplus *m_expp;
 	TabContainer *m_tabContainer;
+	std::vector<boost::signals2::scoped_connection> m_connections;
+	std::unordered_map<int, SelectionInfo> m_selectionInfoMap;
 };
