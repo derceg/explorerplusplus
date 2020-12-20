@@ -13,7 +13,9 @@
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/WindowHelper.h"
 #include <wil/com.h>
+#include <commctrl.h>
 #include <propkey.h>
 #include <propvarutil.h>
 #include <list>
@@ -203,7 +205,13 @@ HRESULT ShellBrowser::StartEnumeration(PCIDLIST_ABSOLUTE pidlDirectory)
 
 	m_enumerationResults.insert({ resultId, std::move(result) });
 
-	SetCursor(LoadCursor(nullptr, IDC_WAIT));
+	// This matches the behavior of the WM_SETCURSOR handler. HTCLIENT will only be set when the
+	// cursor is over the listview, not the listview header.
+	if (CursorInWindowClientArea(m_hListView)
+		&& !CursorInWindowClientArea(ListView_GetHeader(m_hListView)))
+	{
+		SetCursor(LoadCursor(nullptr, IDC_WAIT));
+	}
 
 	return hr;
 }
@@ -468,8 +476,12 @@ void ShellBrowser::ProcessEnumerationResults(int resultId)
 	// when the mouse moves. That means that if the mouse doesn't move when a navigation finishes,
 	// the cursor may not be reset. To ensure that the normal cursor is restored, the cursor will be
 	// set here.
-	auto resetCursor = wil::scope_exit([] {
-		SetCursor(LoadCursor(nullptr, IDC_ARROW));
+	auto resetCursor = wil::scope_exit([this] {
+		if (CursorInWindowClientArea(m_hListView)
+			&& !CursorInWindowClientArea(ListView_GetHeader(m_hListView)))
+		{
+			SetCursor(LoadCursor(nullptr, IDC_ARROW));
+		}
 	});
 
 	auto result = itr->second.get();

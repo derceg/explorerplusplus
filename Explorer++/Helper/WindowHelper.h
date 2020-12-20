@@ -10,3 +10,4 @@ BOOL lShowWindow(HWND hwnd, BOOL bShowWindow);
 BOOL AddWindowStyle(HWND hwnd, UINT fStyle, BOOL bAdd);
 int GetRectHeight(const RECT *rc);
 int GetRectWidth(const RECT *rc);
+bool CursorInWindowClientArea(HWND hwnd);

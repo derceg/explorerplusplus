@@ -124,3 +124,33 @@ int GetRectWidth(const RECT *rc)
 {
 	return rc->right - rc->left;
 }
+
+bool CursorInWindowClientArea(HWND hwnd)
+{
+	CURSORINFO cursorInfo;
+	cursorInfo.cbSize = sizeof(cursorInfo);
+	BOOL cursorResult = GetCursorInfo(&cursorInfo);
+
+	if (!cursorResult || cursorInfo.flags != CURSOR_SHOWING)
+	{
+		return false;
+	}
+
+	RECT windowRect;
+	BOOL windowResult = GetClientRect(hwnd, &windowRect);
+
+	if (!windowResult)
+	{
+		return false;
+	}
+
+	SetLastError(ERROR_SUCCESS);
+	int mapResult = MapWindowPoints(hwnd, HWND_DESKTOP, reinterpret_cast<LPPOINT>(&windowRect), 2);
+
+	if (mapResult == 0 && GetLastError() != ERROR_SUCCESS)
+	{
+		return false;
+	}
+
+	return PtInRect(&windowRect, cursorInfo.ptScreenPos);
+}
