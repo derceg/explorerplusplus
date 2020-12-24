@@ -15,6 +15,7 @@
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/Helper.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/XMLSettings.h"
@@ -60,13 +61,6 @@ const std::unordered_map<ToolbarButton, Icon, ToolbarButtonHash> TOOLBAR_BUTTON_
 	{ToolbarButton::MergeFiles, Icon::MergeFiles},
 	{ToolbarButton::CloseTab, Icon::CloseTab}
 };
-
-template <typename L, typename R>
-boost::bimap<L, R>
-MakeBimap(std::initializer_list<typename boost::bimap<L, R>::value_type> list)
-{
-	return boost::bimap<L, R>(list.begin(), list.end());
-}
 
 #pragma warning(push)
 #pragma warning(disable:4996) //warning STL4010: Various members of std::allocator are deprecated in C++17.

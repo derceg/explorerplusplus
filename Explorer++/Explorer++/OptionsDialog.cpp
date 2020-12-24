@@ -35,7 +35,9 @@
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
+#include "../Helper/WindowSubclassWrapper.h"
 #include <boost/algorithm/string.hpp>
+#include <boost/bimap.hpp>
 #include <boost/format.hpp>
 #include <boost/range/adaptor/map.hpp>
 #include <unordered_map>
@@ -52,7 +54,8 @@ const OptionsDialog::OptionsDialogSheetInfo OptionsDialog::OPTIONS_DIALOG_SHEETS
 	{IDD_OPTIONS_FILESFOLDERS, FilesFoldersProcStub},
 	{IDD_OPTIONS_WINDOW, WindowProcStub},
 	{IDD_OPTIONS_TABS, TabSettingsProcStub},
-	{IDD_OPTIONS_DEFAULT, DefaultSettingsProcStub}
+	{IDD_OPTIONS_DEFAULT, DefaultSettingsProcStub},
+	{IDD_OPTIONS_ADVANCED, AdvancedSettingsProcStub}
 };
 // clang-format on
 
@@ -78,6 +81,15 @@ static const FileSize FILE_SIZES[] = {
 	{SizeDisplayFormat::PB, IDS_OPTIONS_DIALOG_FILE_SIZE_PB}
 };
 // clang-format on
+
+#pragma warning(push)
+#pragma warning(                                                                                   \
+	disable : 4996) // warning STL4010: Various members of std::allocator are deprecated in C++17.
+
+const boost::bimap<bool, std::wstring> BOOL_MAPPINGS =
+	MakeBimap<bool, std::wstring>({ { true, L"true" }, { false, L"false" } });
+
+#pragma warning(pop)
 
 TCHAR g_szNewTabDirectory[MAX_PATH];
 
@@ -1452,6 +1464,322 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(
 	}
 
 	return 0;
+}
+
+INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProcStub(
+	HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	static OptionsDialog *optionsDialog;
+
+	switch (uMsg)
+	{
+	case WM_INITDIALOG:
+	{
+		auto *ppsp = reinterpret_cast<PROPSHEETPAGE *>(lParam);
+		optionsDialog = reinterpret_cast<OptionsDialog *>(ppsp->lParam);
+	}
+	break;
+	}
+
+	return optionsDialog->AdvancedSettingsProc(hDlg, uMsg, wParam, lParam);
+}
+
+INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(
+	HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{
+	case WM_INITDIALOG:
+	{
+		HWND listView = GetDlgItem(hDlg, IDC_ADVANCED_OPTIONS);
+
+		ListView_SetExtendedListViewStyle(
+			listView, LVS_EX_LABELTIP | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
+
+		m_advancedOptionsListViewSubclass = std::make_unique<WindowSubclassWrapper>(listView,
+			std::bind(&OptionsDialog::AdvancedOptionsListViewWndProc, this, std::placeholders::_1,
+				std::placeholders::_2, std::placeholders::_3, std::placeholders::_4),
+			ADVANCED_OPTIONS_LISTVIEW_SUBCLASS_ID);
+
+		auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+		if (darkModeHelper.IsDarkModeEnabled())
+		{
+			darkModeHelper.SetListViewDarkModeColors(listView);
+			darkModeHelper.SetDarkModeForControl(GetDlgItem(hDlg, IDC_ADVANCED_OPTION_DESCRIPTION));
+		}
+		else
+		{
+			SetWindowTheme(listView, L"Explorer", nullptr);
+		}
+
+		std::wstring valueColumnText =
+			ResourceHelper::LoadString(m_instance, IDS_ADVANCED_OPTION_VALUE);
+
+		LV_COLUMN lvColumn;
+		lvColumn.mask = LVCF_TEXT;
+		lvColumn.pszText = valueColumnText.data();
+		ListView_InsertColumn(listView, 0, &lvColumn);
+
+		std::wstring optionColumnText = ResourceHelper::LoadString(m_instance, IDS_ADVANCED_OPTION);
+
+		lvColumn.mask = LVCF_TEXT;
+		lvColumn.pszText = optionColumnText.data();
+		ListView_InsertColumn(listView, 1, &lvColumn);
+
+		ListView_SetColumnWidth(listView, 0, LVSCW_AUTOSIZE_USEHEADER);
+		ListView_SetColumnWidth(listView, 1, LVSCW_AUTOSIZE_USEHEADER);
+
+		int orderArray[] = { 1, 0 };
+		ListView_SetColumnOrderArray(listView, SIZEOF_ARRAY(orderArray), orderArray);
+
+		m_advancedOptions = InitializeAdvancedOptions();
+		InsertAdvancedOptionsIntoListView(hDlg);
+	}
+	break;
+
+	case WM_CTLCOLORDLG:
+		return OnCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
+	case WM_CTLCOLORSTATIC:
+	case WM_CTLCOLOREDIT:
+		return OnCtlColor(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
+	case WM_NOTIFY:
+		switch (reinterpret_cast<NMHDR *>(lParam)->code)
+		{
+		case LVN_ITEMCHANGED:
+		{
+			auto info = reinterpret_cast<NMLISTVIEW *>(lParam);
+
+			if (WI_IsFlagClear(info->uOldState, LVIS_SELECTED)
+				&& WI_IsFlagSet(info->uNewState, LVIS_SELECTED))
+			{
+				auto *option = reinterpret_cast<AdvancedOption *>(info->lParam);
+				SetDlgItemText(hDlg, IDC_ADVANCED_OPTION_DESCRIPTION, option->description.c_str());
+			}
+			else if (WI_IsFlagSet(info->uOldState, LVIS_SELECTED)
+				&& WI_IsFlagClear(info->uNewState, LVIS_SELECTED))
+			{
+				// Since only a single item can be selected, if an item has been deselected, it
+				// means that there's not currently any item selected (otherwise there would have
+				// previously been two items selected).
+				SetDlgItemText(hDlg, IDC_ADVANCED_OPTION_DESCRIPTION, L"");
+			}
+		}
+		break;
+
+		case LVN_ENDLABELEDIT:
+		{
+			auto *info = reinterpret_cast<NMLVDISPINFO *>(lParam);
+
+			if (info->item.pszText == nullptr)
+			{
+				SetWindowLongPtr(hDlg, DWLP_MSGRESULT, FALSE);
+				return FALSE;
+			}
+
+			if (lstrlen(info->item.pszText) == 0)
+			{
+				SetWindowLongPtr(hDlg, DWLP_MSGRESULT, FALSE);
+				return FALSE;
+			}
+
+			auto *option = GetAdvancedOptionByIndex(hDlg, info->item.iItem);
+			bool validValue = false;
+
+			switch (option->type)
+			{
+			case AdvancedOptionType::Boolean:
+			{
+				auto itr = BOOL_MAPPINGS.right.find(info->item.pszText);
+
+				if (itr != BOOL_MAPPINGS.right.end())
+				{
+					validValue = true;
+				}
+			}
+			break;
+			}
+
+			if (!validValue)
+			{
+				SetWindowLongPtr(hDlg, DWLP_MSGRESULT, FALSE);
+				return FALSE;
+			}
+
+			PropSheet_Changed(GetParent(hDlg), hDlg);
+
+			SetWindowLongPtr(hDlg, DWLP_MSGRESULT, TRUE);
+			return TRUE;
+		}
+		break;
+
+		case PSN_APPLY:
+		{
+			HWND listView = GetDlgItem(hDlg, IDC_ADVANCED_OPTIONS);
+			int numItems = ListView_GetItemCount(listView);
+
+			for (int i = 0; i < numItems; i++)
+			{
+				TCHAR text[256];
+				ListView_GetItemText(listView, i, 0, text, SIZEOF_ARRAY(text));
+
+				auto &option = m_advancedOptions[i];
+
+				switch (option.type)
+				{
+				case AdvancedOptionType::Boolean:
+				{
+					// Values are validated when editing, so the current value should always be
+					// valid.
+					bool newValue = BOOL_MAPPINGS.right.at(text);
+					SetBooleanConfigValue(option.id, newValue);
+				}
+				break;
+				}
+			}
+
+			m_expp->SaveAllSettings();
+		}
+		break;
+		}
+		break;
+
+	case WM_DESTROY:
+		m_advancedOptionsListViewSubclass.reset();
+		break;
+	}
+
+	return 0;
+}
+
+LRESULT CALLBACK OptionsDialog::AdvancedOptionsListViewWndProc(
+	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_NOTIFY:
+		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == ListView_GetHeader(hwnd))
+		{
+			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
+			{
+			case NM_CUSTOMDRAW:
+			{
+				if (DarkModeHelper::GetInstance().IsDarkModeEnabled())
+				{
+					auto *customDraw = reinterpret_cast<NMCUSTOMDRAW *>(lParam);
+
+					switch (customDraw->dwDrawStage)
+					{
+					case CDDS_PREPAINT:
+						return CDRF_NOTIFYITEMDRAW;
+
+					case CDDS_ITEMPREPAINT:
+						SetTextColor(customDraw->hdc, DarkModeHelper::TEXT_COLOR);
+						return CDRF_NEWFONT;
+					}
+				}
+			}
+			break;
+			}
+		}
+		break;
+	}
+
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+std::vector<OptionsDialog::AdvancedOption> OptionsDialog::InitializeAdvancedOptions()
+{
+	std::vector<AdvancedOption> advancedOptions;
+
+	AdvancedOption option;
+	option.id = AdvancedOptionId::CheckSystemIsPinnedToNameSpaceTree;
+	option.name = ResourceHelper::LoadString(
+		m_instance, IDS_ADVANCED_OPTION_CHECK_PINNED_TO_NAMESPACE_TREE_NAME);
+	option.type = AdvancedOptionType::Boolean;
+	option.description = ResourceHelper::LoadString(
+		m_instance, IDS_ADVANCED_OPTION_CHECK_PINNED_TO_NAMESPACE_TREE_DESCRIPTION);
+	advancedOptions.push_back(option);
+
+	return advancedOptions;
+}
+
+void OptionsDialog::InsertAdvancedOptionsIntoListView(HWND dlg)
+{
+	HWND listView = GetDlgItem(dlg, IDC_ADVANCED_OPTIONS);
+
+	for (auto &option : m_advancedOptions)
+	{
+		LVITEM item;
+		item.mask = LVIF_PARAM;
+		item.iItem = 0;
+		item.iSubItem = 0;
+		item.lParam = reinterpret_cast<LPARAM>(&option);
+		int index = ListView_InsertItem(listView, &item);
+
+		if (index != -1)
+		{
+			std::wstring value;
+
+			switch (option.type)
+			{
+			case AdvancedOptionType::Boolean:
+				bool booleanValue = GetBooleanConfigValue(option.id);
+				value = BOOL_MAPPINGS.left.at(booleanValue);
+				break;
+			}
+
+			ListView_SetItemText(listView, index, 0, value.data());
+			ListView_SetItemText(listView, index, 1, option.name.data());
+		}
+	}
+}
+
+bool OptionsDialog::GetBooleanConfigValue(OptionsDialog::AdvancedOptionId id)
+{
+	switch (id)
+	{
+	case AdvancedOptionId::CheckSystemIsPinnedToNameSpaceTree:
+		return m_config->checkPinnedToNamespaceTreeProperty;
+
+	default:
+		assert(false);
+		break;
+	}
+
+	return false;
+}
+
+void OptionsDialog::SetBooleanConfigValue(OptionsDialog::AdvancedOptionId id, bool value)
+{
+	switch (id)
+	{
+	case OptionsDialog::AdvancedOptionId::CheckSystemIsPinnedToNameSpaceTree:
+		m_config->checkPinnedToNamespaceTreeProperty = value;
+		break;
+
+	default:
+		assert(false);
+		break;
+	}
+}
+
+OptionsDialog::AdvancedOption *OptionsDialog::GetAdvancedOptionByIndex(HWND dlg, int index)
+{
+	LVITEM lvItem;
+	lvItem.mask = LVIF_PARAM;
+	lvItem.iItem = index;
+	lvItem.iSubItem = 0;
+	BOOL res = ListView_GetItem(GetDlgItem(dlg, IDC_ADVANCED_OPTIONS), &lvItem);
+
+	if (!res)
+	{
+		throw std::runtime_error("Item lookup failed");
+	}
+
+	return reinterpret_cast<AdvancedOption *>(lvItem.lParam);
 }
 
 INT_PTR OptionsDialog::OnCtlColorDlg(HWND hwnd, HDC hdc)

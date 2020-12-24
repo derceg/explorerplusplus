@@ -139,8 +139,6 @@ private:
 	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	HRESULT ExpandDirectory(HTREEITEM hParent);
-	void AddDirectoryInternal(
-		IShellFolder *pShellFolder, PCIDLIST_ABSOLUTE pidlDirectory, HTREEITEM hParent);
 	void DirectoryModified(DWORD dwAction, const TCHAR *szFullFileName);
 	void DirectoryAltered();
 	HTREEITEM AddRoot();

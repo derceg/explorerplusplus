@@ -69,6 +69,7 @@ struct Config
 		displayWindowHeight = DEFAULT_DISPLAYWINDOW_HEIGHT;
 		displayWindowVertical = FALSE;
 		treeViewWidth = DEFAULT_TREEVIEW_WIDTH;
+		checkPinnedToNamespaceTreeProperty = false;
 
 		replaceExplorerMode = DefaultFileManager::ReplaceExplorerMode::None;
 
@@ -170,6 +171,7 @@ struct Config
 	LONG displayWindowHeight;
 	BOOL displayWindowVertical;
 	unsigned int treeViewWidth;
+	bool checkPinnedToNamespaceTreeProperty;
 
 	DefaultFileManager::ReplaceExplorerMode replaceExplorerMode;
 

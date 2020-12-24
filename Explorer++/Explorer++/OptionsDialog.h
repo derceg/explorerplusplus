@@ -27,9 +27,29 @@ private:
 		DLGPROC dlgProc;
 	};
 
+	enum class AdvancedOptionId
+	{
+		CheckSystemIsPinnedToNameSpaceTree
+	};
+
+	enum class AdvancedOptionType
+	{
+		Boolean
+	};
+
+	struct AdvancedOption
+	{
+		AdvancedOptionId id;
+		std::wstring name;
+		AdvancedOptionType type;
+		std::wstring description;
+	};
+
 	static const OptionsDialogSheetInfo OPTIONS_DIALOG_SHEETS[];
 
 	static const UINT_PTR PROP_SHEET_SUBCLASS_ID = 0;
+
+	static const UINT_PTR ADVANCED_OPTIONS_LISTVIEW_SUBCLASS_ID = 0;
 
 	OptionsDialog(std::shared_ptr<Config> config, HINSTANCE instance, IExplorerplusplus *expp,
 		TabContainer *tabContainer);
@@ -58,6 +78,9 @@ private:
 	static INT_PTR CALLBACK DefaultSettingsProcStub(
 		HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	INT_PTR CALLBACK DefaultSettingsProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	static INT_PTR CALLBACK AdvancedSettingsProcStub(
+		HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	INT_PTR CALLBACK AdvancedSettingsProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	INT_PTR OnCtlColorDlg(HWND hwnd, HDC hdc);
 	INT_PTR OnCtlColor(HWND hwnd, HDC hdc);
@@ -83,6 +106,14 @@ private:
 		HWND hComboBox, const TCHAR *szImageDirectory, const TCHAR *szFileName, WORD *pdwLanguage);
 	int GetLanguageIDFromIndex(HWND hDlg, int iIndex);
 
+	LRESULT CALLBACK AdvancedOptionsListViewWndProc(
+		HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	std::vector<AdvancedOption> InitializeAdvancedOptions();
+	void InsertAdvancedOptionsIntoListView(HWND dlg);
+	bool GetBooleanConfigValue(AdvancedOptionId id);
+	void SetBooleanConfigValue(AdvancedOptionId id, bool value);
+	AdvancedOption *GetAdvancedOptionByIndex(HWND dlg, int index);
+
 	std::shared_ptr<Config> m_config;
 	HINSTANCE m_instance;
 	IExplorerplusplus *m_expp;
@@ -96,6 +127,9 @@ private:
 	std::unordered_set<int> m_radioButtonControlIds;
 	std::vector<std::unique_ptr<DarkModeGroupBox>> m_darkModeGroupBoxes;
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+
+	std::vector<AdvancedOption> m_advancedOptions;
+	std::unique_ptr<WindowSubclassWrapper> m_advancedOptionsListViewSubclass;
 
 	static inline int m_lastSelectedSheetIndex = 0;
 };

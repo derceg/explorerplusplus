@@ -844,6 +844,28 @@ HRESULT GetDateDetailsEx(IShellFolder2 *shellFolder2, PCITEMID_CHILD pidlChild,
 	return hr;
 }
 
+BOOL GetBooleanVariant(IShellFolder2 *shellFolder2, PCITEMID_CHILD pidlChild,
+	const SHCOLUMNID *column, BOOL defaultValue)
+{
+	VARIANT boolVariant;
+	HRESULT hr = shellFolder2->GetDetailsEx(pidlChild, column, &boolVariant);
+
+	if (FAILED(hr))
+	{
+		return defaultValue;
+	}
+
+	BOOL convertedValue;
+	hr = VariantToBoolean(boolVariant, &convertedValue);
+
+	if (FAILED(hr))
+	{
+		return defaultValue;
+	}
+
+	return convertedValue;
+}
+
 // Returns either the parsing path for the specified item, or its in
 // folder name. The in folder name will be returned when the parsing
 // path is a GUID (which typically shouldn't be displayed to the user).

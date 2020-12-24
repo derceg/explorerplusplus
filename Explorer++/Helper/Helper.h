@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <boost/bimap.hpp>
 #include <wil/resource.h>
 #include <ShObjIdl.h>
 #include <windows.h>
@@ -57,6 +58,12 @@ void			SetFORMATETC(FORMATETC *pftc, CLIPFORMAT cfFormat, DVTARGETDEVICE *ptd, D
 bool			IsKeyDown(int nVirtKey);
 std::wstring	CreateGUID();
 std::optional<std::wstring>	GetLastErrorMessage(DWORD error);
+
+template <typename L, typename R>
+boost::bimap<L, R> MakeBimap(std::initializer_list<typename boost::bimap<L, R>::value_type> list)
+{
+	return boost::bimap<L, R>(list.begin(), list.end());
+}
 
 /* See http://msdn.microsoft.com/en-us/library/windows/desktop/dd940435(v=vs.85).aspx. */
 template <class T> void SafeRelease(T **ppT)

@@ -111,6 +111,7 @@ will need to be changed correspondingly. */
 #define HASH_OVERWRITEEXISTINGFILESCONFIRMATION 1625342835
 #define HASH_LARGETOOLBARICONS 10895007
 #define HASH_ICON_THEME 3998265761
+#define HASH_CHECK_PINNED_TO_NAMESPACE_TREE_PROPERTY 145831142
 
 struct ColumnXMLSaveData
 {
@@ -711,6 +712,11 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	_itow_s(m_config->defaultFolderSettings.viewMode, szValue, SIZEOF_ARRAY(szValue), 10);
 	NXMLSettings::WriteStandardSetting(
 		pXMLDom, pe.get(), _T("Setting"), _T("ViewModeGlobal"), szValue);
+
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
+		_T("CheckPinnedToNamespaceTreeProperty"),
+		NXMLSettings::EncodeBoolValue(m_config->checkPinnedToNamespaceTreeProperty));
 
 	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pe.get());
@@ -1783,6 +1789,10 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 
 	case HASH_ICON_THEME:
 		m_config->iconTheme = IconTheme::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
+		break;
+
+	case HASH_CHECK_PINNED_TO_NAMESPACE_TREE_PROPERTY:
+		m_config->checkPinnedToNamespaceTreeProperty = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 	}
 }
