@@ -64,13 +64,3 @@ boost::bimap<L, R> MakeBimap(std::initializer_list<typename boost::bimap<L, R>::
 {
 	return boost::bimap<L, R>(list.begin(), list.end());
 }
-
-/* See http://msdn.microsoft.com/en-us/library/windows/desktop/dd940435(v=vs.85).aspx. */
-template <class T> void SafeRelease(T **ppT)
-{
-	if(*ppT)
-	{
-		(*ppT)->Release();
-		*ppT = NULL;
-	}
-}
