@@ -32,6 +32,7 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/PropertySheet.h"
+#include "../Helper/RichEditHelper.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
@@ -1501,12 +1502,26 @@ INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(
 				std::placeholders::_2, std::placeholders::_3, std::placeholders::_4),
 			ADVANCED_OPTIONS_LISTVIEW_SUBCLASS_ID);
 
+		SendDlgItemMessage(
+			hDlg, IDC_ADVANCED_OPTION_DESCRIPTION, EM_AUTOURLDETECT, AURL_ENABLEURL, NULL);
+		SendDlgItemMessage(hDlg, IDC_ADVANCED_OPTION_DESCRIPTION, EM_SETEVENTMASK, 0, ENM_LINK);
+
 		auto &darkModeHelper = DarkModeHelper::GetInstance();
 
 		if (darkModeHelper.IsDarkModeEnabled())
 		{
 			darkModeHelper.SetListViewDarkModeColors(listView);
-			darkModeHelper.SetDarkModeForControl(GetDlgItem(hDlg, IDC_ADVANCED_OPTION_DESCRIPTION));
+
+			SendDlgItemMessage(hDlg, IDC_ADVANCED_OPTION_DESCRIPTION, EM_SETBKGNDCOLOR, 0,
+				DarkModeHelper::BACKGROUND_COLOR);
+
+			CHARFORMAT charFormat;
+			charFormat.cbSize = sizeof(charFormat);
+			charFormat.dwMask = CFM_COLOR;
+			charFormat.crTextColor = DarkModeHelper::TEXT_COLOR;
+			charFormat.dwEffects = 0;
+			SendDlgItemMessage(hDlg, IDC_ADVANCED_OPTION_DESCRIPTION, EM_SETCHARFORMAT, SCF_ALL,
+				reinterpret_cast<LPARAM>(&charFormat));
 		}
 		else
 		{
@@ -1534,6 +1549,12 @@ INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(
 		ListView_SetColumnOrderArray(listView, SIZEOF_ARRAY(orderArray), orderArray);
 
 		m_advancedOptions = InitializeAdvancedOptions();
+
+		std::sort(m_advancedOptions.begin(), m_advancedOptions.end(),
+			[](const AdvancedOption &option1, const AdvancedOption &option2) {
+				return option1.name < option2.name;
+			});
+
 		InsertAdvancedOptionsIntoListView(hDlg);
 	}
 	break;
@@ -1612,6 +1633,21 @@ INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(
 
 			SetWindowLongPtr(hDlg, DWLP_MSGRESULT, TRUE);
 			return TRUE;
+		}
+		break;
+
+		case EN_LINK:
+		{
+			const auto *linkNotificationDetails = reinterpret_cast<ENLINK *>(lParam);
+
+			if (linkNotificationDetails->nmhdr.hwndFrom
+					== GetDlgItem(hDlg, IDC_ADVANCED_OPTION_DESCRIPTION)
+				&& linkNotificationDetails->msg == WM_LBUTTONUP)
+			{
+				std::wstring text = GetRichEditLinkText(linkNotificationDetails);
+				ShellExecute(nullptr, L"open", text.c_str(), nullptr, nullptr, SW_SHOW);
+				return 1;
+			}
 		}
 		break;
 
@@ -1703,23 +1739,31 @@ std::vector<OptionsDialog::AdvancedOption> OptionsDialog::InitializeAdvancedOpti
 		m_instance, IDS_ADVANCED_OPTION_CHECK_PINNED_TO_NAMESPACE_TREE_DESCRIPTION);
 	advancedOptions.push_back(option);
 
+	option.id = AdvancedOptionId::EnableDarkMode;
+	option.name = ResourceHelper::LoadString(m_instance, IDS_ADVANCED_OPTION_ENABLE_DARK_MODE_NAME);
+	option.type = AdvancedOptionType::Boolean;
+	option.description =
+		ResourceHelper::LoadString(m_instance, IDS_ADVANCED_OPTION_ENABLE_DARK_MODE_DESCRIPTION);
+	advancedOptions.push_back(option);
+
 	return advancedOptions;
 }
 
 void OptionsDialog::InsertAdvancedOptionsIntoListView(HWND dlg)
 {
 	HWND listView = GetDlgItem(dlg, IDC_ADVANCED_OPTIONS);
+	int index = 0;
 
 	for (auto &option : m_advancedOptions)
 	{
 		LVITEM item;
 		item.mask = LVIF_PARAM;
-		item.iItem = 0;
+		item.iItem = index++;
 		item.iSubItem = 0;
 		item.lParam = reinterpret_cast<LPARAM>(&option);
-		int index = ListView_InsertItem(listView, &item);
+		int finalIndex = ListView_InsertItem(listView, &item);
 
-		if (index != -1)
+		if (finalIndex != -1)
 		{
 			std::wstring value;
 
@@ -1731,8 +1775,8 @@ void OptionsDialog::InsertAdvancedOptionsIntoListView(HWND dlg)
 				break;
 			}
 
-			ListView_SetItemText(listView, index, 0, value.data());
-			ListView_SetItemText(listView, index, 1, option.name.data());
+			ListView_SetItemText(listView, finalIndex, 0, value.data());
+			ListView_SetItemText(listView, finalIndex, 1, option.name.data());
 		}
 	}
 }
@@ -1743,6 +1787,9 @@ bool OptionsDialog::GetBooleanConfigValue(OptionsDialog::AdvancedOptionId id)
 	{
 	case AdvancedOptionId::CheckSystemIsPinnedToNameSpaceTree:
 		return m_config->checkPinnedToNamespaceTreeProperty;
+
+	case AdvancedOptionId::EnableDarkMode:
+		return m_config->enableDarkMode;
 
 	default:
 		assert(false);
@@ -1758,6 +1805,10 @@ void OptionsDialog::SetBooleanConfigValue(OptionsDialog::AdvancedOptionId id, bo
 	{
 	case OptionsDialog::AdvancedOptionId::CheckSystemIsPinnedToNameSpaceTree:
 		m_config->checkPinnedToNamespaceTreeProperty = value;
+		break;
+
+	case AdvancedOptionId::EnableDarkMode:
+		m_config->enableDarkMode = value;
 		break;
 
 	default:

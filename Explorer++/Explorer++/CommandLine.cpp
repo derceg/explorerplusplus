@@ -59,7 +59,6 @@ struct CommandLineSettings
 	std::string language;
 	bool jumplistNewTab;
 	CrashedDataTuple crashedData;
-	bool enableDarkMode;
 	std::vector<std::string> directories;
 };
 
@@ -89,6 +88,7 @@ void OnJumplistNewTab();
 std::optional<CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
 {
 	CLI::App app("Explorer++");
+	app.allow_extras();
 
 	CommandLineSettings commandLineSettings;
 
@@ -137,14 +137,6 @@ std::optional<CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
 		"--language",
 		commandLineSettings.language,
 		"Allows you to select your desired language. Should be a two-letter language code (e.g. FR, RU, etc)."
-	);
-
-	commandLineSettings.enableDarkMode = false;
-	app.add_flag(
-		"--enable-dark-mode",
-		commandLineSettings.enableDarkMode,
-		"(Experimental) Enables dark mode. Only tested with Windows 10 version 1909. May fail or \
-crash with other versions of Windows 10. This option has no effect on earlier versions of Windows."
 	);
 
 	app.add_option(
@@ -286,8 +278,6 @@ std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(
 
 		StringCchCopy(g_szLang, SIZEOF_ARRAY(g_szLang), utf8StrToWstr(commandLineSettings.language).c_str());
 	}
-
-	g_enableDarkMode = commandLineSettings.enableDarkMode;
 
 	TCHAR processImageName[MAX_PATH];
 	GetProcessImageName(GetCurrentProcessId(), processImageName, SIZEOF_ARRAY(processImageName));

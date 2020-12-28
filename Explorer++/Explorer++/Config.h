@@ -36,6 +36,7 @@ struct Config
 	{
 		language = LANG_ENGLISH;
 		iconTheme = IconTheme::Color;
+		enableDarkMode = false;
 		startupMode = StartupMode::PreviousTabs;
 		defaultTabDirectory = GetComputerFolderPath();
 		showStatusBar = TRUE;
@@ -137,6 +138,7 @@ struct Config
 
 	DWORD language;
 	IconTheme iconTheme;
+	bool enableDarkMode;
 	StartupMode startupMode;
 	std::wstring defaultTabDirectory;
 	const std::wstring defaultTabDirectoryStatic;

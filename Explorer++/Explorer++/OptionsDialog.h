@@ -29,7 +29,8 @@ private:
 
 	enum class AdvancedOptionId
 	{
-		CheckSystemIsPinnedToNameSpaceTree
+		CheckSystemIsPinnedToNameSpaceTree,
+		EnableDarkMode
 	};
 
 	enum class AdvancedOptionType

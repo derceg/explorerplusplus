@@ -24,8 +24,6 @@
 #include "../Helper/Macros.h"
 #include "../Helper/iDirectoryMonitor.h"
 
-bool g_enableDarkMode = false;
-
 /*
  * Main window creation.
  *
@@ -43,7 +41,7 @@ void Explorerplusplus::OnCreate()
 
 	SetLanguageModule();
 
-	if (g_enableDarkMode)
+	if (m_config->enableDarkMode)
 	{
 		SetUpDarkMode();
 	}

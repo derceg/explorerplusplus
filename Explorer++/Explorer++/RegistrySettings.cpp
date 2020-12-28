@@ -185,6 +185,8 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 			hSettingsKey, _T("LargeToolbarIcons"), m_config->useLargeToolbarIcons.get());
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,
 			_T("CheckPinnedToNamespaceTreeProperty"), m_config->checkPinnedToNamespaceTreeProperty);
+		NRegistrySettings::SaveDwordToRegistry(
+			hSettingsKey, _T("EnableDarkMode"), m_config->enableDarkMode);
 
 		NRegistrySettings::SaveStringToRegistry(
 			hSettingsKey, _T("NewTabDirectory"), m_config->defaultTabDirectory.c_str());
@@ -401,9 +403,19 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 			hSettingsKey, _T("LargeToolbarIcons"), &numericValue);
 		m_config->useLargeToolbarIcons.set(numericValue);
 
-		NRegistrySettings::ReadDwordFromRegistry(
-			hSettingsKey, _T("CheckPinnedToNamespaceTreeProperty"), &numericValue);
-		m_config->checkPinnedToNamespaceTreeProperty = numericValue;
+		if (NRegistrySettings::ReadDwordFromRegistry(
+				hSettingsKey, _T("CheckPinnedToNamespaceTreeProperty"), &numericValue)
+			== ERROR_SUCCESS)
+		{
+			m_config->checkPinnedToNamespaceTreeProperty = numericValue;
+		}
+
+		if (NRegistrySettings::ReadDwordFromRegistry(
+				hSettingsKey, _T("EnableDarkMode"), &numericValue)
+			== ERROR_SUCCESS)
+		{
+			m_config->enableDarkMode = numericValue;
+		}
 
 		TCHAR value[MAX_PATH];
 		NRegistrySettings::ReadStringFromRegistry(

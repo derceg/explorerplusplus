@@ -145,6 +145,9 @@
     <ClCompile Include="CustomGripper.cpp">
       <Filter>Control Support</Filter>
     </ClCompile>
+    <ClCompile Include="RichEditHelper.cpp">
+      <Filter>Control Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
@@ -301,6 +304,9 @@
       <Filter>Control Support</Filter>
     </ClInclude>
     <ClInclude Include="PropertySheet.h">
+      <Filter>Control Support</Filter>
+    </ClInclude>
+    <ClInclude Include="RichEditHelper.h">
       <Filter>Control Support</Filter>
     </ClInclude>
   </ItemGroup>

@@ -112,6 +112,7 @@ will need to be changed correspondingly. */
 #define HASH_LARGETOOLBARICONS 10895007
 #define HASH_ICON_THEME 3998265761
 #define HASH_CHECK_PINNED_TO_NAMESPACE_TREE_PROPERTY 145831142
+#define HASH_ENABLE_DARK_MODE 1623404723
 
 struct ColumnXMLSaveData
 {
@@ -717,6 +718,10 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
 		_T("CheckPinnedToNamespaceTreeProperty"),
 		NXMLSettings::EncodeBoolValue(m_config->checkPinnedToNamespaceTreeProperty));
+
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("EnableDarkMode"),
+		NXMLSettings::EncodeBoolValue(m_config->enableDarkMode));
 
 	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pe.get());
@@ -1793,6 +1798,10 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 
 	case HASH_CHECK_PINNED_TO_NAMESPACE_TREE_PROPERTY:
 		m_config->checkPinnedToNamespaceTreeProperty = NXMLSettings::DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_ENABLE_DARK_MODE:
+		m_config->enableDarkMode = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 	}
 }

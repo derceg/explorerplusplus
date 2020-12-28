@@ -328,6 +328,7 @@
     <ClCompile Include="RegistrySettings.cpp" />
     <ClCompile Include="ResizableDialog.cpp" />
     <ClCompile Include="Rgb.cpp" />
+    <ClCompile Include="RichEditHelper.cpp" />
     <ClCompile Include="SetDefaultFileManager.cpp" />
     <ClCompile Include="ShellHelper.cpp" />
     <ClCompile Include="StatusBar.cpp" />
@@ -394,6 +395,7 @@
     <ClInclude Include="RegistrySettings.h" />
     <ClInclude Include="ResizableDialog.h" />
     <ClInclude Include="Rgb.h" />
+    <ClInclude Include="RichEditHelper.h" />
     <ClInclude Include="SetDefaultFileManager.h" />
     <ClInclude Include="ShellHelper.h" />
     <ClInclude Include="StatusBar.h" />
