@@ -8,25 +8,25 @@
 #include "RegistrySettings.h"
 #include "Macros.h"
 
-LONG NRegistrySettings::SaveDwordToRegistry(HKEY hKey,const TCHAR *szKey,DWORD dwValue)
+LONG NRegistrySettings::SaveDwordToRegistry(HKEY hKey,const TCHAR *valueName,DWORD dwValue)
 {
-	return RegSetValueEx(hKey,szKey,0,REG_DWORD,reinterpret_cast<const BYTE *>(&dwValue),sizeof(dwValue));
+	return RegSetValueEx(hKey,valueName,0,REG_DWORD,reinterpret_cast<const BYTE *>(&dwValue),sizeof(dwValue));
 }
 
-LONG NRegistrySettings::ReadDwordFromRegistry(HKEY hKey,const TCHAR *szKey,DWORD *pReturnValue)
+LONG NRegistrySettings::ReadDwordFromRegistry(HKEY hKey,const TCHAR *valueName,DWORD *pReturnValue)
 {
 	DWORD dwSize = sizeof(DWORD);
 
-	return RegQueryValueEx(hKey,szKey,nullptr,nullptr,reinterpret_cast<LPBYTE>(pReturnValue),&dwSize);
+	return RegQueryValueEx(hKey,valueName,nullptr,nullptr,reinterpret_cast<LPBYTE>(pReturnValue),&dwSize);
 }
 
-LONG NRegistrySettings::SaveStringToRegistry(HKEY hKey,const TCHAR *szKey,const TCHAR *szValue)
+LONG NRegistrySettings::SaveStringToRegistry(HKEY hKey,const TCHAR *valueName,const TCHAR *szValue)
 {
-	return RegSetValueEx(hKey,szKey,0,REG_SZ,reinterpret_cast<const BYTE *>(szValue),
+	return RegSetValueEx(hKey,valueName,0,REG_SZ,reinterpret_cast<const BYTE *>(szValue),
 		(lstrlen(szValue) + 1) * sizeof(TCHAR));
 }
 
-LONG NRegistrySettings::ReadStringFromRegistry(HKEY hKey,const TCHAR *szKey,TCHAR *szOutput,DWORD cchMax)
+LONG NRegistrySettings::ReadStringFromRegistry(HKEY hKey,const TCHAR *valueName,TCHAR *szOutput,DWORD cchMax)
 {
 	LONG	lRes;
 	DWORD	dwType;
@@ -34,7 +34,7 @@ LONG NRegistrySettings::ReadStringFromRegistry(HKEY hKey,const TCHAR *szKey,TCHA
 	DWORD	dwBufChSize;
 
 	dwBufByteSize = cchMax * sizeof(TCHAR);
-	lRes = RegQueryValueEx(hKey,szKey,nullptr,&dwType,reinterpret_cast<LPBYTE>(szOutput),&dwBufByteSize);
+	lRes = RegQueryValueEx(hKey,valueName,nullptr,&dwType,reinterpret_cast<LPBYTE>(szOutput),&dwBufByteSize);
 	dwBufChSize = dwBufByteSize / sizeof(TCHAR);
 
 	/* The returned buffer size includes any terminating
@@ -62,10 +62,10 @@ LONG NRegistrySettings::ReadStringFromRegistry(HKEY hKey,const TCHAR *szKey,TCHA
 	return lRes;
 }
 
-LONG NRegistrySettings::ReadStringFromRegistry(HKEY hKey,const std::wstring &strKey,std::wstring &strOutput)
+LONG NRegistrySettings::ReadStringFromRegistry(HKEY hKey,const std::wstring &valueName,std::wstring &strOutput)
 {
 	TCHAR szTemp[512];
-	LONG lRes = NRegistrySettings::ReadStringFromRegistry(hKey,strKey.c_str(),szTemp,SIZEOF_ARRAY(szTemp));
+	LONG lRes = NRegistrySettings::ReadStringFromRegistry(hKey,valueName.c_str(),szTemp,SIZEOF_ARRAY(szTemp));
 
 	if(lRes == ERROR_SUCCESS)
 	{
@@ -79,7 +79,7 @@ LONG NRegistrySettings::ReadStringFromRegistry(HKEY hKey,const std::wstring &str
 than ERROR_SUCCESS on failure. If this function does fail, any values
 that have been written will not be deleted (i.e. this function is
 not transactional). */
-LONG NRegistrySettings::SaveStringListToRegistry(HKEY hKey,const TCHAR *szBaseKeyName,
+LONG NRegistrySettings::SaveStringListToRegistry(HKEY hKey,const TCHAR *baseValueName,
 	const std::list<std::wstring> &strList)
 {
 	TCHAR szItemKey[128];
@@ -89,7 +89,7 @@ LONG NRegistrySettings::SaveStringListToRegistry(HKEY hKey,const TCHAR *szBaseKe
 	for(const auto &str : strList)
 	{
 		StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),_T("%s%d"),
-			szBaseKeyName,i++);
+			baseValueName,i++);
 		lRes = SaveStringToRegistry(hKey,szItemKey,str.c_str());
 
 		if(lRes != ERROR_SUCCESS)
@@ -101,7 +101,7 @@ LONG NRegistrySettings::SaveStringListToRegistry(HKEY hKey,const TCHAR *szBaseKe
 	return ERROR_SUCCESS;
 }
 
-LONG NRegistrySettings::ReadStringListFromRegistry(HKEY hKey,const TCHAR *szBaseKeyName,
+LONG NRegistrySettings::ReadStringListFromRegistry(HKEY hKey,const TCHAR *baseValueName,
 	std::list<std::wstring> &strList)
 {
 	TCHAR szItemKey[128];
@@ -112,7 +112,7 @@ LONG NRegistrySettings::ReadStringListFromRegistry(HKEY hKey,const TCHAR *szBase
 	do
 	{
 		StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
-			_T("%s%d"),szBaseKeyName,i++);
+			_T("%s%d"),baseValueName,i++);
 
 		lRes = ReadStringFromRegistry(hKey,szItemKey,
 			szTemp,SIZEOF_ARRAY(szTemp));
@@ -137,18 +137,18 @@ LONG NRegistrySettings::ReadStringListFromRegistry(HKEY hKey,const TCHAR *szBase
 	return lRes;
 }
 
-bool NRegistrySettings::SaveDateTime(HKEY key, const std::wstring &baseKeyName, const FILETIME &dateTime)
+bool NRegistrySettings::SaveDateTime(HKEY key, const std::wstring &baseValueName, const FILETIME &dateTime)
 {
-	LONG res1 = SaveDwordToRegistry(key, (baseKeyName + L"Low").c_str(), dateTime.dwLowDateTime);
-	LONG res2 = SaveDwordToRegistry(key, (baseKeyName + L"High").c_str(), dateTime.dwHighDateTime);
+	LONG res1 = SaveDwordToRegistry(key, (baseValueName + L"Low").c_str(), dateTime.dwLowDateTime);
+	LONG res2 = SaveDwordToRegistry(key, (baseValueName + L"High").c_str(), dateTime.dwHighDateTime);
 
 	return (res1 == ERROR_SUCCESS && res2 == ERROR_SUCCESS);
 }
 
-bool NRegistrySettings::ReadDateTime(HKEY key, const std::wstring &baseKeyName, FILETIME &dateTime)
+bool NRegistrySettings::ReadDateTime(HKEY key, const std::wstring &baseValueName, FILETIME &dateTime)
 {
-	LONG res1 = ReadDwordFromRegistry(key, (baseKeyName + L"Low").c_str(), &dateTime.dwLowDateTime);
-	LONG res2 = ReadDwordFromRegistry(key, (baseKeyName + L"High").c_str(), &dateTime.dwHighDateTime);
+	LONG res1 = ReadDwordFromRegistry(key, (baseValueName + L"Low").c_str(), &dateTime.dwLowDateTime);
+	LONG res2 = ReadDwordFromRegistry(key, (baseValueName + L"High").c_str(), &dateTime.dwHighDateTime);
 
 	return (res1 == ERROR_SUCCESS && res2 == ERROR_SUCCESS);
 }
