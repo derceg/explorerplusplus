@@ -51,8 +51,8 @@ void DialogSettings::SaveRegistrySettings(HKEY hParentKey)
 			RegSetValueEx(hKey, SETTING_POSITION, 0, REG_BINARY,
 				reinterpret_cast<LPBYTE>(&m_ptDialog), sizeof(m_ptDialog));
 
-			NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_WIDTH, m_iWidth);
-			NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_HEIGHT, m_iHeight);
+			RegistrySettings::SaveDword(hKey, SETTING_WIDTH, m_iWidth);
+			RegistrySettings::SaveDword(hKey, SETTING_HEIGHT, m_iHeight);
 		}
 
 		SaveExtraRegistrySettings(hKey);
@@ -76,9 +76,8 @@ void DialogSettings::LoadRegistrySettings(HKEY hParentKey)
 			RegQueryValueEx(
 				hKey, SETTING_POSITION, nullptr, nullptr, (LPBYTE) &m_ptDialog, &dwSize);
 
-			NRegistrySettings::ReadDwordFromRegistry(
-				hKey, SETTING_WIDTH, reinterpret_cast<DWORD *>(&m_iWidth));
-			NRegistrySettings::ReadDwordFromRegistry(
+			RegistrySettings::ReadDword(hKey, SETTING_WIDTH, reinterpret_cast<DWORD *>(&m_iWidth));
+			RegistrySettings::ReadDword(
 				hKey, SETTING_HEIGHT, reinterpret_cast<DWORD *>(&m_iHeight));
 		}
 

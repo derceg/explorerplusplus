@@ -1125,20 +1125,20 @@ void Explorerplusplus::OnAssocChanged()
 
 	if (res == ERROR_SUCCESS)
 	{
-		NRegistrySettings::ReadStringFromRegistry(
+		RegistrySettings::ReadString(
 			hKey, _T("Shell Icon Size"), szShellIconSize, SIZEOF_ARRAY(szShellIconSize));
 
 		dwShellIconSize = _wtoi(szShellIconSize);
 
 		/* Increment the value by one, and save it back to the registry. */
 		StringCchPrintf(szTemp, SIZEOF_ARRAY(szTemp), _T("%d"), dwShellIconSize + 1);
-		NRegistrySettings::SaveStringToRegistry(hKey, _T("Shell Icon Size"), szTemp);
+		RegistrySettings::SaveString(hKey, _T("Shell Icon Size"), szTemp);
 
 		if (fileIconInit != nullptr)
 			fileIconInit(TRUE);
 
 		/* Now, set it back to the original value. */
-		NRegistrySettings::SaveStringToRegistry(hKey, _T("Shell Icon Size"), szShellIconSize);
+		RegistrySettings::SaveString(hKey, _T("Shell Icon Size"), szShellIconSize);
 
 		if (fileIconInit != nullptr)
 			fileIconInit(FALSE);

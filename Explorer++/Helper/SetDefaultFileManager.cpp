@@ -10,8 +10,6 @@
 #include "RegistrySettings.h"
 #include <wil/resource.h>
 
-using namespace NRegistrySettings;
-
 /*
 Notes:
 
@@ -36,14 +34,15 @@ Notes:
 
 namespace DefaultFileManagerInternal
 {
-const TCHAR KEY_DIRECTORY_SHELL[] = _T("Software\\Classes\\Directory\\shell");
-const TCHAR KEY_FOLDER_SHELL[] = _T("Software\\Classes\\Folder\\shell");
-const TCHAR SHELL_DEFAULT_VALUE[] = _T("none");
+	const TCHAR KEY_DIRECTORY_SHELL[] = _T("Software\\Classes\\Directory\\shell");
+	const TCHAR KEY_FOLDER_SHELL[] = _T("Software\\Classes\\Folder\\shell");
+	const TCHAR SHELL_DEFAULT_VALUE[] = _T("none");
 
-LSTATUS SetAsDefaultFileManagerInternal(DefaultFileManager::ReplaceExplorerMode replacementType,
-	const std::wstring &applicationKeyName, const std::wstring &menuText);
-LSTATUS RemoveAsDefaultFileManagerInternal(DefaultFileManager::ReplaceExplorerMode replacementType,
-	const std::wstring &applicationKeyName);
+	LSTATUS SetAsDefaultFileManagerInternal(DefaultFileManager::ReplaceExplorerMode replacementType,
+		const std::wstring &applicationKeyName, const std::wstring &menuText);
+	LSTATUS RemoveAsDefaultFileManagerInternal(
+		DefaultFileManager::ReplaceExplorerMode replacementType,
+		const std::wstring &applicationKeyName);
 }
 
 LSTATUS DefaultFileManager::SetAsDefaultFileManagerFileSystem(
@@ -61,8 +60,8 @@ LSTATUS DefaultFileManager::SetAsDefaultFileManagerAll(
 }
 
 LSTATUS DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
-	DefaultFileManager::ReplaceExplorerMode replacementType,
-	const std::wstring &applicationKeyName, const std::wstring &menuText)
+	DefaultFileManager::ReplaceExplorerMode replacementType, const std::wstring &applicationKeyName,
+	const std::wstring &menuText)
 {
 	const TCHAR *shellKeyPath = nullptr;
 
@@ -98,7 +97,7 @@ LSTATUS DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
 
 	// Now, set the default value for the key. This default value will be the text that is shown on
 	// the context menu for folders.
-	res = SaveStringToRegistry(appKey.get(), nullptr, menuText.c_str());
+	res = RegistrySettings::SaveString(appKey.get(), nullptr, menuText.c_str());
 
 	if (res != ERROR_SUCCESS)
 	{
@@ -107,8 +106,8 @@ LSTATUS DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
 
 	// Now, create the "command" sub-key.
 	wil::unique_hkey commandKey;
-	res = RegCreateKeyEx(appKey.get(), _T("command"), 0, nullptr, REG_OPTION_NON_VOLATILE, KEY_WRITE,
-		nullptr, &commandKey, nullptr);
+	res = RegCreateKeyEx(appKey.get(), _T("command"), 0, nullptr, REG_OPTION_NON_VOLATILE,
+		KEY_WRITE, nullptr, &commandKey, nullptr);
 
 	if (res != ERROR_SUCCESS)
 	{
@@ -121,7 +120,7 @@ LSTATUS DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
 	GetProcessImageName(GetCurrentProcessId(), executable, SIZEOF_ARRAY(executable));
 	StringCchPrintf(command, SIZEOF_ARRAY(command), _T("\"%s\" \"%%1\""), executable);
 
-	res = SaveStringToRegistry(commandKey.get(), nullptr, command);
+	res = RegistrySettings::SaveString(commandKey.get(), nullptr, command);
 
 	if (res != ERROR_SUCCESS)
 	{
@@ -129,7 +128,7 @@ LSTATUS DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
 	}
 
 	// Set the current entry as the default.
-	res = SaveStringToRegistry(shellKey.get(), nullptr, applicationKeyName.c_str());
+	res = RegistrySettings::SaveString(shellKey.get(), nullptr, applicationKeyName.c_str());
 
 	return res;
 }
@@ -148,8 +147,7 @@ LSTATUS DefaultFileManager::RemoveAsDefaultFileManagerAll(const std::wstring &ap
 }
 
 LSTATUS DefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(
-	DefaultFileManager::ReplaceExplorerMode replacementType,
-	const std::wstring &applicationKeyName)
+	DefaultFileManager::ReplaceExplorerMode replacementType, const std::wstring &applicationKeyName)
 {
 	const TCHAR *shellKeyPath = nullptr;
 	const TCHAR *defaultValue = nullptr;
@@ -177,7 +175,7 @@ LSTATUS DefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(
 		return res;
 	}
 
-	res = SaveStringToRegistry(shellKey.get(), nullptr, defaultValue);
+	res = RegistrySettings::SaveString(shellKey.get(), nullptr, defaultValue);
 
 	if (res != ERROR_SUCCESS)
 	{

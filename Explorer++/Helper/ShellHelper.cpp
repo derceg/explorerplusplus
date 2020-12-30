@@ -1190,8 +1190,8 @@ BOOL LoadContextMenuHandlers(const TCHAR *szRegKey,
 
 			if (lSubKeyRes == ERROR_SUCCESS)
 			{
-				lSubKeyRes = NRegistrySettings::ReadStringFromRegistry(
-					hSubKey, nullptr, szCLSID, SIZEOF_ARRAY(szCLSID));
+				lSubKeyRes =
+					RegistrySettings::ReadString(hSubKey, nullptr, szCLSID, SIZEOF_ARRAY(szCLSID));
 
 				if (lSubKeyRes == ERROR_SUCCESS)
 				{
@@ -1256,8 +1256,7 @@ BOOL LoadIUnknownFromCLSID(const TCHAR *szCLSID, ContextMenuHandler *pContextMen
 		{
 			TCHAR szDLL[MAX_PATH];
 
-			lRes = NRegistrySettings::ReadStringFromRegistry(
-				hDllKey, nullptr, szDLL, SIZEOF_ARRAY(szDLL));
+			lRes = RegistrySettings::ReadString(hDllKey, nullptr, szDLL, SIZEOF_ARRAY(szDLL));
 
 			if (lRes == ERROR_SUCCESS)
 			{

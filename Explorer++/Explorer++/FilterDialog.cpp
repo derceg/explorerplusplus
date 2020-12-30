@@ -175,12 +175,12 @@ FilterDialogPersistentSettings &FilterDialogPersistentSettings::GetInstance()
 
 void FilterDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::SaveStringListToRegistry(hKey, SETTING_FILTER_LIST, m_FilterList);
+	RegistrySettings::SaveStringList(hKey, SETTING_FILTER_LIST, m_FilterList);
 }
 
 void FilterDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::ReadStringListFromRegistry(hKey, SETTING_FILTER_LIST, m_FilterList);
+	RegistrySettings::ReadStringList(hKey, SETTING_FILTER_LIST, m_FilterList);
 }
 
 void FilterDialogPersistentSettings::SaveExtraXMLSettings(

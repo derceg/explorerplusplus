@@ -1285,66 +1285,59 @@ SearchDialogPersistentSettings &SearchDialogPersistentSettings::GetInstance()
 
 void SearchDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_COLUMN_WIDTH_1, m_iColumnWidth1);
-	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_COLUMN_WIDTH_2, m_iColumnWidth2);
-	NRegistrySettings::SaveStringToRegistry(hKey, SETTING_SEARCH_DIRECTORY_TEXT, m_szSearchPattern);
-	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_SEARCH_SUB_FOLDERS, m_bSearchSubFolders);
-	NRegistrySettings::SaveDwordToRegistry(
-		hKey, SETTING_USE_REGULAR_EXPRESSIONS, m_bUseRegularExpressions);
-	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_CASE_INSENSITIVE, m_bCaseInsensitive);
-	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_ARCHIVE, m_bArchive);
-	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_HIDDEN, m_bHidden);
-	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_READ_ONLY, m_bReadOnly);
-	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_SYSTEM, m_bSystem);
-	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_SORT_MODE, static_cast<DWORD>(m_SortMode));
-	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_SORT_ASCENDING, m_bSortAscending);
+	RegistrySettings::SaveDword(hKey, SETTING_COLUMN_WIDTH_1, m_iColumnWidth1);
+	RegistrySettings::SaveDword(hKey, SETTING_COLUMN_WIDTH_2, m_iColumnWidth2);
+	RegistrySettings::SaveString(hKey, SETTING_SEARCH_DIRECTORY_TEXT, m_szSearchPattern);
+	RegistrySettings::SaveDword(hKey, SETTING_SEARCH_SUB_FOLDERS, m_bSearchSubFolders);
+	RegistrySettings::SaveDword(hKey, SETTING_USE_REGULAR_EXPRESSIONS, m_bUseRegularExpressions);
+	RegistrySettings::SaveDword(hKey, SETTING_CASE_INSENSITIVE, m_bCaseInsensitive);
+	RegistrySettings::SaveDword(hKey, SETTING_ARCHIVE, m_bArchive);
+	RegistrySettings::SaveDword(hKey, SETTING_HIDDEN, m_bHidden);
+	RegistrySettings::SaveDword(hKey, SETTING_READ_ONLY, m_bReadOnly);
+	RegistrySettings::SaveDword(hKey, SETTING_SYSTEM, m_bSystem);
+	RegistrySettings::SaveDword(hKey, SETTING_SORT_MODE, static_cast<DWORD>(m_SortMode));
+	RegistrySettings::SaveDword(hKey, SETTING_SORT_ASCENDING, m_bSortAscending);
 
 	std::list<std::wstring> searchDirectoriesList;
 	CircularBufferToList(m_searchDirectories, searchDirectoriesList);
-	NRegistrySettings::SaveStringListToRegistry(
-		hKey, SETTING_DIRECTORY_LIST, searchDirectoriesList);
+	RegistrySettings::SaveStringList(hKey, SETTING_DIRECTORY_LIST, searchDirectoriesList);
 
 	std::list<std::wstring> searchPatternList;
 	CircularBufferToList(m_searchPatterns, searchPatternList);
-	NRegistrySettings::SaveStringListToRegistry(hKey, SETTING_PATTERN_LIST, searchPatternList);
+	RegistrySettings::SaveStringList(hKey, SETTING_PATTERN_LIST, searchPatternList);
 }
 
 void SearchDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::ReadDwordFromRegistry(
+	RegistrySettings::ReadDword(
 		hKey, SETTING_COLUMN_WIDTH_1, reinterpret_cast<LPDWORD>(&m_iColumnWidth1));
-	NRegistrySettings::ReadDwordFromRegistry(
+	RegistrySettings::ReadDword(
 		hKey, SETTING_COLUMN_WIDTH_2, reinterpret_cast<LPDWORD>(&m_iColumnWidth2));
-	NRegistrySettings::ReadStringFromRegistry(
+	RegistrySettings::ReadString(
 		hKey, SETTING_SEARCH_DIRECTORY_TEXT, m_szSearchPattern, SIZEOF_ARRAY(m_szSearchPattern));
-	NRegistrySettings::ReadDwordFromRegistry(
+	RegistrySettings::ReadDword(
 		hKey, SETTING_SEARCH_SUB_FOLDERS, reinterpret_cast<LPDWORD>(&m_bSearchSubFolders));
-	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_USE_REGULAR_EXPRESSIONS,
+	RegistrySettings::ReadDword(hKey, SETTING_USE_REGULAR_EXPRESSIONS,
 		reinterpret_cast<LPDWORD>(&m_bUseRegularExpressions));
-	NRegistrySettings::ReadDwordFromRegistry(
+	RegistrySettings::ReadDword(
 		hKey, SETTING_CASE_INSENSITIVE, reinterpret_cast<LPDWORD>(&m_bCaseInsensitive));
-	NRegistrySettings::ReadDwordFromRegistry(
-		hKey, SETTING_ARCHIVE, reinterpret_cast<LPDWORD>(&m_bArchive));
-	NRegistrySettings::ReadDwordFromRegistry(
-		hKey, SETTING_HIDDEN, reinterpret_cast<LPDWORD>(&m_bHidden));
-	NRegistrySettings::ReadDwordFromRegistry(
-		hKey, SETTING_READ_ONLY, reinterpret_cast<LPDWORD>(&m_bReadOnly));
-	NRegistrySettings::ReadDwordFromRegistry(
-		hKey, SETTING_SYSTEM, reinterpret_cast<LPDWORD>(&m_bSystem));
-	NRegistrySettings::ReadDwordFromRegistry(
+	RegistrySettings::ReadDword(hKey, SETTING_ARCHIVE, reinterpret_cast<LPDWORD>(&m_bArchive));
+	RegistrySettings::ReadDword(hKey, SETTING_HIDDEN, reinterpret_cast<LPDWORD>(&m_bHidden));
+	RegistrySettings::ReadDword(hKey, SETTING_READ_ONLY, reinterpret_cast<LPDWORD>(&m_bReadOnly));
+	RegistrySettings::ReadDword(hKey, SETTING_SYSTEM, reinterpret_cast<LPDWORD>(&m_bSystem));
+	RegistrySettings::ReadDword(
 		hKey, SETTING_SORT_ASCENDING, reinterpret_cast<LPDWORD>(&m_bSortAscending));
 
 	DWORD value;
-	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_SORT_MODE, &value);
+	RegistrySettings::ReadDword(hKey, SETTING_SORT_MODE, &value);
 	m_SortMode = static_cast<SortMode>(value);
 
 	std::list<std::wstring> searchDirectoriesList;
-	NRegistrySettings::ReadStringListFromRegistry(
-		hKey, SETTING_DIRECTORY_LIST, searchDirectoriesList);
+	RegistrySettings::ReadStringList(hKey, SETTING_DIRECTORY_LIST, searchDirectoriesList);
 	ListToCircularBuffer(searchDirectoriesList, m_searchDirectories);
 
 	std::list<std::wstring> searchPatternList;
-	NRegistrySettings::ReadStringListFromRegistry(hKey, SETTING_PATTERN_LIST, searchPatternList);
+	RegistrySettings::ReadStringList(hKey, SETTING_PATTERN_LIST, searchPatternList);
 	ListToCircularBuffer(searchPatternList, m_searchPatterns);
 }
 

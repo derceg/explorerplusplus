@@ -186,14 +186,14 @@ WildcardSelectDialogPersistentSettings &WildcardSelectDialogPersistentSettings::
 
 void WildcardSelectDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::SaveStringListToRegistry(hKey, SETTING_PATTERN_LIST, m_PatternList);
-	NRegistrySettings::SaveStringToRegistry(hKey, SETTING_CURRENT_TEXT, m_szPattern);
+	RegistrySettings::SaveStringList(hKey, SETTING_PATTERN_LIST, m_PatternList);
+	RegistrySettings::SaveString(hKey, SETTING_CURRENT_TEXT, m_szPattern);
 }
 
 void WildcardSelectDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::ReadStringListFromRegistry(hKey, SETTING_PATTERN_LIST, m_PatternList);
-	NRegistrySettings::ReadStringFromRegistry(
+	RegistrySettings::ReadStringList(hKey, SETTING_PATTERN_LIST, m_PatternList);
+	RegistrySettings::ReadString(
 		hKey, SETTING_CURRENT_TEXT, m_szPattern, SIZEOF_ARRAY(m_szPattern));
 }
 
