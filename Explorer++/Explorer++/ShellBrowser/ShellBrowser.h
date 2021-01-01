@@ -345,6 +345,8 @@ private:
 	HRESULT AddItemInternal(int itemIndex, int itemId, BOOL setPosition);
 	std::optional<int> SetItemInformation(
 		IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild);
+	static HRESULT ExtractFindDataUsingPropertyStore(
+		IShellFolder *shellFolder, PCITEMID_CHILD pidlChild, WIN32_FIND_DATA &output);
 	void SetViewModeInternal(ViewMode viewMode);
 	void SetFirstColumnTextToCallback();
 	void SetFirstColumnTextToFilename();

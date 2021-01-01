@@ -273,7 +273,6 @@ std::optional<int> ShellBrowser::SetItemInformation(
 	}
 
 	newItem.displayName = displayName;
-	StringCchCopy(newItem.wfd.cFileName, SIZEOF_ARRAY(newItem.wfd.cFileName), displayName.c_str());
 
 	std::wstring editingName;
 	hr = GetDisplayName(shellFolder, pidlChild, SHGDN_INFOLDER | SHGDN_FOREDITING, editingName);
@@ -295,92 +294,26 @@ std::optional<int> ShellBrowser::SetItemInformation(
 		newItem.bDrive = FALSE;
 	}
 
-	wil::com_ptr_nothrow<IShellFolder2> shellFolder2;
-	hr = shellFolder->QueryInterface(IID_PPV_ARGS(&shellFolder2));
+	WIN32_FIND_DATA wfd;
+	hr = SHGetDataFromIDList(shellFolder, pidlChild, SHGDFIL_FINDDATA, &wfd, sizeof(wfd));
 
 	if (FAILED(hr))
 	{
-		return std::nullopt;
+		hr = ExtractFindDataUsingPropertyStore(shellFolder, pidlChild, wfd);
 	}
 
-	VARIANT sizeVariant;
-	hr = shellFolder2->GetDetailsEx(pidlChild, &PKEY_Size, &sizeVariant);
-
-	// Size retrieval may fail for items in virtual folders. Note that it won't always fail in such
-	// cases. For example, library folders in Windows are backed by the filesystem. Therefore, a
-	// file in a library folder will still have a size, even though the library folder itself is
-	// virtual.
 	if (SUCCEEDED(hr))
 	{
-		ULONGLONG size;
-		hr = VariantToUInt64(sizeVariant, &size);
+		newItem.wfd = wfd;
+	}
+	else
+	{
+		StringCchCopy(
+			newItem.wfd.cFileName, SIZEOF_ARRAY(newItem.wfd.cFileName), displayName.c_str());
 
-		if (SUCCEEDED(hr))
+		if (WI_IsFlagSet(attributes, SFGAO_FOLDER))
 		{
-			ULARGE_INTEGER largeFileSize;
-			largeFileSize.QuadPart = size;
-			newItem.wfd.nFileSizeLow = largeFileSize.LowPart;
-			newItem.wfd.nFileSizeHigh = largeFileSize.HighPart;
-		}
-	}
-
-	FILETIME dateAccessed;
-	hr = GetDateDetailsEx(shellFolder2.get(), pidlChild, &PKEY_DateAccessed, dateAccessed);
-
-	// If the date set on the individual item is invalid, the date retrieval will fail, even though
-	// there are no actual issues with the item. In other words, it's valid for the date retrieval
-	// to fail, even for filesystem files.
-	if (SUCCEEDED(hr))
-	{
-		newItem.wfd.ftLastAccessTime = dateAccessed;
-	}
-
-	FILETIME dateCreated;
-	hr = GetDateDetailsEx(shellFolder2.get(), pidlChild, &PKEY_DateCreated, dateCreated);
-
-	if (SUCCEEDED(hr))
-	{
-		newItem.wfd.ftCreationTime = dateCreated;
-	}
-
-	FILETIME dateModified;
-	hr = GetDateDetailsEx(shellFolder2.get(), pidlChild, &PKEY_DateModified, dateModified);
-
-	if (SUCCEEDED(hr))
-	{
-		newItem.wfd.ftLastWriteTime = dateModified;
-	}
-
-	// The attribute retrieval below may fail, but, at the very least, it's important to know
-	// whether or not an item is a folder. The attributes set here will be used if the attribute
-	// retrieval fails.
-	if (WI_IsFlagSet(attributes, SFGAO_FOLDER))
-	{
-		WI_SetFlag(newItem.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
-	}
-
-	// Although it's possible to retrieve attributes for root folders, the attributes aren't useful.
-	// For example, the attributes returned for the C:\ folder will be something like:
-	//
-	// FILE_ATTRIBUTE_ARCHIVE | FILE_ATTRIBUTE_HIDDEN
-	//
-	// Accepting those attributes would result in the C:\ item (as shown in the "This PC" folder)
-	// being grayed out (because it would be considered hidden).
-	if (!PathIsRoot(parsingName.c_str()))
-	{
-		VARIANT attributesVariant;
-		hr = shellFolder2->GetDetailsEx(pidlChild, &PKEY_FileAttributes, &attributesVariant);
-
-		// Attribute retrieval may fail for items in virtual folders.
-		if (SUCCEEDED(hr))
-		{
-			UINT fileAttributes;
-			hr = VariantToUInt32(attributesVariant, &fileAttributes);
-
-			if (SUCCEEDED(hr))
-			{
-				newItem.wfd.dwFileAttributes = fileAttributes;
-			}
+			WI_SetFlag(newItem.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
 		}
 	}
 
@@ -388,6 +321,53 @@ std::optional<int> ShellBrowser::SetItemInformation(
 	m_itemInfoMap.insert({ itemId, std::move(newItem) });
 
 	return itemId;
+}
+
+HRESULT ShellBrowser::ExtractFindDataUsingPropertyStore(
+	IShellFolder *shellFolder, PCITEMID_CHILD pidlChild, WIN32_FIND_DATA &output)
+{
+	wil::com_ptr_nothrow<IPropertyStoreFactory> factory;
+	HRESULT hr = shellFolder->BindToObject(pidlChild, nullptr, IID_PPV_ARGS(&factory));
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	wil::com_ptr_nothrow<IPropertyStore> store;
+	PROPERTYKEY keys[] = { PKEY_FindData };
+	hr = factory->GetPropertyStoreForKeys(
+		keys, SIZEOF_ARRAY(keys), GPS_FASTPROPERTIESONLY, IID_PPV_ARGS(&store));
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	wil::unique_prop_variant findDataProp;
+	hr = store->GetValue(PKEY_FindData, &findDataProp);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	if (PropVariantGetElementCount(findDataProp) != sizeof(WIN32_FIND_DATA))
+	{
+		return hr;
+	}
+
+	WIN32_FIND_DATA wfd;
+	hr = PropVariantToBuffer(findDataProp, &wfd, sizeof(wfd));
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	output = wfd;
+
+	return hr;
 }
 
 void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
