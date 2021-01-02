@@ -47,16 +47,6 @@ typedef struct
 	ULARGE_INTEGER TotalSelectionSize;
 } FolderInfo_t;
 
-typedef struct
-{
-	std::wstring header;
-	int iGroupId;
-
-	/* Used to record the number of items in this group.
-	Mimics the feature available in Windows Vista and later. */
-	int nItems;
-} TypeGroup_t;
-
 class ShellBrowser : public IDropTarget, public IDropFilesCallback, public NavigatorInterface
 {
 public:
@@ -264,6 +254,38 @@ private:
 		std::wstring infoTip;
 	};
 
+	struct GroupInfo
+	{
+		std::wstring name;
+		int relativeSortPosition;
+
+		explicit GroupInfo(const std::wstring &name) : name(name), relativeSortPosition(0)
+		{
+		}
+
+		GroupInfo(const std::wstring &name, int relativeSortPosition) :
+			name(name),
+			relativeSortPosition(relativeSortPosition)
+		{
+		}
+	};
+
+	struct ListViewGroup
+	{
+		int id;
+		std::wstring name;
+		int relativeSortPosition;
+		int numItems;
+
+		ListViewGroup(int id, const GroupInfo &groupInfo) :
+			id(id),
+			name(groupInfo.name),
+			relativeSortPosition(groupInfo.relativeSortPosition),
+			numItems(1)
+		{
+		}
+	};
+
 	enum class GroupByDateType
 	{
 		Created,
@@ -440,34 +462,34 @@ private:
 	void UpdateFiltering();
 	void UnfilterAllItems();
 
-	/* Listview group support (real files). */
-	static INT CALLBACK GroupNameComparisonStub(INT Group1_ID, INT Group2_ID, void *pvData);
-	INT CALLBACK GroupNameComparison(INT Group1_ID, INT Group2_ID);
-	static INT CALLBACK GroupFreeSpaceComparisonStub(INT Group1_ID, INT Group2_ID, void *pvData);
-	INT CALLBACK GroupFreeSpaceComparison(INT Group1_ID, INT Group2_ID);
-	std::wstring RetrieveGroupHeader(int groupId);
+	/* Listview group support. */
+	static int CALLBACK GroupComparisonStub(int id1, int id2, void *data);
+	int GroupComparison(int id1, int id2);
+	int GroupNameComparison(const ListViewGroup &group1, const ListViewGroup &group2);
+	int GroupRelativePositionComparison(const ListViewGroup &group1, const ListViewGroup &group2);
+	const ListViewGroup GetListViewGroupById(int groupId);
 	int DetermineItemGroup(int iItemInternal);
-	std::wstring DetermineItemNameGroup(const BasicItemInfo_t &itemInfo) const;
-	std::wstring DetermineItemSizeGroup(const BasicItemInfo_t &itemInfo) const;
-	std::wstring DetermineItemTotalSizeGroup(const BasicItemInfo_t &itemInfo) const;
-	std::wstring DetermineItemTypeGroupVirtual(const BasicItemInfo_t &itemInfo) const;
-	std::wstring DetermineItemDateGroup(
+	std::optional<GroupInfo> DetermineItemNameGroup(const BasicItemInfo_t &itemInfo) const;
+	std::optional<GroupInfo> DetermineItemSizeGroup(const BasicItemInfo_t &itemInfo) const;
+	std::optional<GroupInfo> DetermineItemTotalSizeGroup(const BasicItemInfo_t &itemInfo) const;
+	std::optional<GroupInfo> DetermineItemTypeGroupVirtual(const BasicItemInfo_t &itemInfo) const;
+	std::optional<GroupInfo> DetermineItemDateGroup(
 		const BasicItemInfo_t &itemInfo, GroupByDateType dateType) const;
-	std::wstring DetermineItemSummaryGroup(const BasicItemInfo_t &itemInfo, const SHCOLUMNID *pscid,
-		const GlobalFolderSettings &globalFolderSettings) const;
-	std::wstring DetermineItemFreeSpaceGroup(const BasicItemInfo_t &itemInfo) const;
-	std::wstring DetermineItemAttributeGroup(const BasicItemInfo_t &itemInfo) const;
-	std::wstring DetermineItemOwnerGroup(const BasicItemInfo_t &itemInfo) const;
-	std::wstring DetermineItemVersionGroup(
+	std::optional<GroupInfo> DetermineItemSummaryGroup(const BasicItemInfo_t &itemInfo,
+		const SHCOLUMNID *pscid, const GlobalFolderSettings &globalFolderSettings) const;
+	std::optional<GroupInfo> DetermineItemFreeSpaceGroup(const BasicItemInfo_t &itemInfo) const;
+	std::optional<GroupInfo> DetermineItemAttributeGroup(const BasicItemInfo_t &itemInfo) const;
+	std::optional<GroupInfo> DetermineItemOwnerGroup(const BasicItemInfo_t &itemInfo) const;
+	std::optional<GroupInfo> DetermineItemVersionGroup(
 		const BasicItemInfo_t &itemInfo, const TCHAR *szVersionType) const;
-	std::wstring DetermineItemCameraPropertyGroup(
+	std::optional<GroupInfo> DetermineItemCameraPropertyGroup(
 		const BasicItemInfo_t &itemInfo, PROPID PropertyId) const;
-	std::wstring DetermineItemExtensionGroup(const BasicItemInfo_t &itemInfo) const;
-	std::wstring DetermineItemFileSystemGroup(const BasicItemInfo_t &itemInfo) const;
-	std::wstring DetermineItemNetworkStatus(const BasicItemInfo_t &itemInfo) const;
+	std::optional<GroupInfo> DetermineItemExtensionGroup(const BasicItemInfo_t &itemInfo) const;
+	std::optional<GroupInfo> DetermineItemFileSystemGroup(const BasicItemInfo_t &itemInfo) const;
+	std::optional<GroupInfo> DetermineItemNetworkStatus(const BasicItemInfo_t &itemInfo) const;
 
 	/* Other grouping support. */
-	int CheckGroup(std::wstring_view groupHeader, PFNLVGROUPCOMPARE groupComparison);
+	int InsertOrUpdateListViewGroup(const GroupInfo &groupInfo);
 	void InsertItemIntoGroup(int iItem, int iGroupId);
 	void MoveItemsIntoGroups();
 
@@ -634,6 +656,6 @@ private:
 	explicitly, rather than taken from the size
 	of the group list, to avoid warnings concerning
 	size_t and int. */
-	std::list<TypeGroup_t> m_GroupList;
+	std::list<ListViewGroup> m_listViewGroups;
 	int m_iGroupId;
 };
