@@ -363,12 +363,6 @@ int ShellBrowser::InsertOrUpdateListViewGroup(const GroupInfo &groupInfo)
 	return groupId;
 }
 
-/*
- * Determines the id of the group to which the specified
- * item belongs, based on the item's name.
- * Also returns the text header for the group when szGroupHeader
- * is non-NULL.
- */
 /* TODO: These groups have changed as of Windows Visa.*/
 std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemNameGroup(
 	const BasicItemInfo_t &itemInfo) const
@@ -387,12 +381,6 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemNameGroup(
 	}
 }
 
-/*
- * Determines the id of the group to which the specified
- * item belongs, based on the item's size.
- * Also returns the text header for the group when szGroupHeader
- * is non-NULL.
- */
 std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemSizeGroup(
 	const BasicItemInfo_t &itemInfo) const
 {
@@ -419,12 +407,6 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemSizeGroup(
 	return GroupInfo(sizeGroups[i], i + 1);
 }
 
-/*
- * Determines the id of the group to which the specified
- * drive/folder item belongs, based on the item's total size.
- * Also returns the text header for the group when szGroupHeader
- * is non-NULL.
- */
 /* TODO: These groups have changed as of Windows Vista. */
 std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemTotalSizeGroup(
 	const BasicItemInfo_t &itemInfo) const
