@@ -1168,10 +1168,9 @@ void ShellBrowser::VerifySortMode()
 		columns = &m_folderColumns.realFolderColumns;
 	}
 
-	auto itr = std::find_if(columns->begin(), columns->end(),
-		[sortMode = m_folderSettings.sortMode](const Column_t &column) {
-			return static_cast<unsigned int>(column.type) == static_cast<unsigned int>(sortMode);
-		});
+	auto itr = std::find_if(columns->begin(), columns->end(), [this](const Column_t &column) {
+		return DetermineColumnSortMode(column.type) == m_folderSettings.sortMode;
+	});
 
 	if (itr != columns->end())
 	{
