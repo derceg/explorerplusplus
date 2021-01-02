@@ -136,11 +136,8 @@ int ShellBrowser::GroupRelativePositionComparison(
 
 const ShellBrowser::ListViewGroup ShellBrowser::GetListViewGroupById(int groupId)
 {
-	auto itr = std::find_if(
-		m_listViewGroups.begin(), m_listViewGroups.end(), [groupId](const ListViewGroup &group) {
-			return group.id == groupId;
-		});
-	assert(itr != m_listViewGroups.end());
+	auto itr = m_listViewGroups.get<0>().find(groupId);
+	assert(itr != m_listViewGroups.get<0>().end());
 
 	return *itr;
 }
@@ -318,18 +315,18 @@ int ShellBrowser::DetermineItemGroup(int iItemInternal)
 
 int ShellBrowser::InsertOrUpdateListViewGroup(const GroupInfo &groupInfo)
 {
-	auto itr = std::find_if(
-		m_listViewGroups.begin(), m_listViewGroups.end(), [&groupInfo](const ListViewGroup &group) {
-			return group.name == groupInfo.name;
-		});
-
 	auto generateListViewHeader = [](std::wstring_view header, int numItems) {
 		return std::wstring(header) + L" (" + std::to_wstring(numItems) + L")";
 	};
 
-	if (itr != m_listViewGroups.end())
+	auto &groupNameIndex = m_listViewGroups.get<1>();
+	auto itr = groupNameIndex.find(groupInfo.name);
+
+	if (itr != groupNameIndex.end())
 	{
-		itr->numItems++;
+		auto updatedGroup = *itr;
+		updatedGroup.numItems++;
+		groupNameIndex.replace(itr, updatedGroup);
 
 		std::wstring listViewHeader = generateListViewHeader(groupInfo.name, itr->numItems);
 
@@ -342,10 +339,10 @@ int ShellBrowser::InsertOrUpdateListViewGroup(const GroupInfo &groupInfo)
 		return itr->id;
 	}
 
-	int groupId = m_iGroupId++;
+	int groupId = m_groupIdCounter++;
 
 	ListViewGroup listViewGroup(groupId, groupInfo);
-	m_listViewGroups.push_back(listViewGroup);
+	m_listViewGroups.insert(listViewGroup);
 
 	std::wstring listViewHeader = generateListViewHeader(groupInfo.name, listViewGroup.numItems);
 
@@ -878,7 +875,7 @@ void ShellBrowser::MoveItemsIntoGroups()
 	SendMessage(m_hListView, WM_SETREDRAW, (WPARAM) FALSE, (LPARAM) NULL);
 
 	m_listViewGroups.clear();
-	m_iGroupId = 0;
+	m_groupIdCounter = 0;
 
 	for (i = 0; i < nItems; i++)
 	{

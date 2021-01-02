@@ -15,6 +15,9 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
+#include <boost/multi_index/hashed_index.hpp>
+#include <boost/multi_index/member.hpp>
+#include <boost/multi_index_container.hpp>
 #include <boost/signals2.hpp>
 #include <wil/com.h>
 #include <wil/resource.h>
@@ -327,6 +330,19 @@ private:
 			fileSelectionSize = {};
 		}
 	};
+
+	// clang-format off
+	using ListViewGroupSet = boost::multi_index_container<ListViewGroup,
+		boost::multi_index::indexed_by<
+			boost::multi_index::hashed_unique<
+				boost::multi_index::member<ListViewGroup, int, &ListViewGroup::id>
+			>,
+			boost::multi_index::hashed_unique<
+				boost::multi_index::member<ListViewGroup, std::wstring, &ListViewGroup::name>
+			>
+		>
+	>;
+	// clang-format on
 
 	static const int THUMBNAIL_ITEM_HORIZONTAL_SPACING = 20;
 	static const int THUMBNAIL_ITEM_VERTICAL_SPACING = 20;
@@ -652,10 +668,6 @@ private:
 	int m_bOverFolder;
 	int m_iDropFolder;
 
-	/* Listview groups. The group id is declared
-	explicitly, rather than taken from the size
-	of the group list, to avoid warnings concerning
-	size_t and int. */
-	std::list<ListViewGroup> m_listViewGroups;
-	int m_iGroupId;
+	ListViewGroupSet m_listViewGroups;
+	int m_groupIdCounter;
 };
