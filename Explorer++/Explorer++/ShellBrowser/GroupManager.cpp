@@ -361,7 +361,7 @@ int ShellBrowser::InsertOrUpdateListViewGroup(const GroupInfo &groupInfo)
 	return groupId;
 }
 
-/* TODO: These groups have changed as of Windows Visa.*/
+/* TODO: These groups have changed as of Windows Vista.*/
 std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemNameGroup(
 	const BasicItemInfo_t &itemInfo) const
 {
@@ -375,7 +375,8 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemNameGroup(
 	}
 	else
 	{
-		return GroupInfo(L"Other", INT_MAX);
+		return GroupInfo(
+			ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_NAME_OTHER), INT_MAX);
 	}
 }
 
