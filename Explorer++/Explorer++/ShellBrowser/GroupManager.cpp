@@ -465,8 +465,13 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemTypeGroupVirtu
 	const BasicItemInfo_t &itemInfo) const
 {
 	SHFILEINFO shfi;
-	SHGetFileInfo(
+	DWORD_PTR res = SHGetFileInfo(
 		(LPTSTR) itemInfo.pidlComplete.get(), 0, &shfi, sizeof(shfi), SHGFI_PIDL | SHGFI_TYPENAME);
+
+	if (!res)
+	{
+		return std::nullopt;
+	}
 
 	return GroupInfo(shfi.szTypeName);
 }
@@ -686,7 +691,13 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemAttributeGroup
 	std::wstring fullFileName = itemInfo.getFullPath();
 
 	TCHAR szAttributes[32];
-	BuildFileAttributeString(fullFileName.c_str(), szAttributes, std::size(szAttributes));
+	HRESULT hr =
+		BuildFileAttributeString(fullFileName.c_str(), szAttributes, std::size(szAttributes));
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
 
 	return GroupInfo(szAttributes);
 }
@@ -763,39 +774,24 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemExtensionGroup
 std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemFileSystemGroup(
 	const BasicItemInfo_t &itemInfo) const
 {
-	IShellFolder *pShellFolder = nullptr;
-	PCITEMID_CHILD pidlRelative = nullptr;
-	TCHAR szFileSystemName[MAX_PATH];
-	TCHAR szItem[MAX_PATH];
-	STRRET str;
-	BOOL bRoot;
-	BOOL bRes;
+	std::wstring fullPath = itemInfo.getFullPath();
+	BOOL isRoot = PathIsRoot(fullPath.c_str());
 
-	SHBindToParent(itemInfo.pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), &pidlRelative);
-
-	pShellFolder->GetDisplayNameOf(pidlRelative, SHGDN_FORPARSING, &str);
-	StrRetToBuf(&str, pidlRelative, szItem, SIZEOF_ARRAY(szItem));
-
-	bRoot = PathIsRoot(szItem);
-
-	if (bRoot)
-	{
-		bRes = GetVolumeInformation(szItem, nullptr, 0, nullptr, nullptr, nullptr, szFileSystemName,
-			SIZEOF_ARRAY(szFileSystemName));
-
-		if (!bRes || *szFileSystemName == '\0')
-		{
-			return std::nullopt;
-		}
-	}
-	else
+	if (!isRoot)
 	{
 		return std::nullopt;
 	}
 
-	pShellFolder->Release();
+	TCHAR fileSystemName[MAX_PATH];
+	BOOL res = GetVolumeInformation(fullPath.c_str(), nullptr, 0, nullptr, nullptr, nullptr,
+		fileSystemName, SIZEOF_ARRAY(fileSystemName));
 
-	return GroupInfo(szFileSystemName);
+	if (!res)
+	{
+		return std::nullopt;
+	}
+
+	return GroupInfo(fileSystemName);
 }
 
 /* TODO: Fix. Need to check for each adapter. */
