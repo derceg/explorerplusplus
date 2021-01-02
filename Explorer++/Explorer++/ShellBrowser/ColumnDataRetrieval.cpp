@@ -249,6 +249,11 @@ std::wstring GetTypeColumnText(const BasicItemInfo_t &itemInfo)
 std::wstring GetSizeColumnText(
 	const BasicItemInfo_t &itemInfo, const GlobalFolderSettings &globalFolderSettings)
 {
+	if (!itemInfo.isFindDataValid)
+	{
+		return L"";
+	}
+
 	if ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
 		TCHAR drive[MAX_PATH];
@@ -306,6 +311,11 @@ std::wstring GetFolderSizeColumnText(
 std::wstring GetTimeColumnText(const BasicItemInfo_t &itemInfo, TimeType timeType,
 	const GlobalFolderSettings &globalFolderSettings)
 {
+	if (!itemInfo.isFindDataValid)
+	{
+		return L"";
+	}
+
 	TCHAR fileTime[64];
 	BOOL bRet = FALSE;
 

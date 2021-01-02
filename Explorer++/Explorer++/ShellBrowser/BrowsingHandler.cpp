@@ -305,6 +305,7 @@ std::optional<int> ShellBrowser::SetItemInformation(
 	if (SUCCEEDED(hr))
 	{
 		newItem.wfd = wfd;
+		newItem.isFindDataValid = true;
 	}
 	else
 	{

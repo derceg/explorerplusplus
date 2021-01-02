@@ -191,6 +191,7 @@ private:
 		unique_pidl_absolute pidlComplete;
 		unique_pidl_child pridl;
 		WIN32_FIND_DATA wfd;
+		bool isFindDataValid;
 		std::wstring parsingName;
 		std::wstring displayName;
 		std::wstring editingName;
@@ -207,7 +208,7 @@ private:
 		when items need to be rearranged). */
 		int iRelativeSort;
 
-		ItemInfo_t() : wfd({}), iIcon(0), bDrive(FALSE)
+		ItemInfo_t() : wfd({}), isFindDataValid(false), iIcon(0), bDrive(FALSE)
 		{
 		}
 	};

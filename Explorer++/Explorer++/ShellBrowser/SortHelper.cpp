@@ -33,6 +33,19 @@ int SortByName(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo
 
 int SortBySize(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2)
 {
+	if (!itemInfo1.isFindDataValid && itemInfo2.isFindDataValid)
+	{
+		return -1;
+	}
+	else if (itemInfo1.isFindDataValid && !itemInfo2.isFindDataValid)
+	{
+		return 1;
+	}
+	else if (!itemInfo1.isFindDataValid && !itemInfo2.isFindDataValid)
+	{
+		return 0;
+	}
+
 	bool isFolder1 = WI_IsFlagSet(itemInfo1.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
 	bool isFolder2 = WI_IsFlagSet(itemInfo2.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
 
@@ -106,6 +119,19 @@ int SortByType(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo
 int SortByDate(
 	const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, DateType dateType)
 {
+	if (!itemInfo1.isFindDataValid && itemInfo2.isFindDataValid)
+	{
+		return -1;
+	}
+	else if (itemInfo1.isFindDataValid && !itemInfo2.isFindDataValid)
+	{
+		return 1;
+	}
+	else if (!itemInfo1.isFindDataValid && !itemInfo2.isFindDataValid)
+	{
+		return 0;
+	}
+
 	switch (dateType)
 	{
 	case DateType::Created:

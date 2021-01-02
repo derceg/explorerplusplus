@@ -1483,6 +1483,7 @@ BasicItemInfo_t ShellBrowser::getBasicItemInfo(int internalIndex) const
 	basicItemInfo.pidlComplete.reset(ILCloneFull(itemInfo.pidlComplete.get()));
 	basicItemInfo.pridl.reset(ILCloneChild(itemInfo.pridl.get()));
 	basicItemInfo.wfd = itemInfo.wfd;
+	basicItemInfo.isFindDataValid = itemInfo.isFindDataValid;
 	StringCchCopy(basicItemInfo.szDisplayName, SIZEOF_ARRAY(basicItemInfo.szDisplayName),
 		itemInfo.displayName.c_str());
 	basicItemInfo.isRoot = itemInfo.bDrive;

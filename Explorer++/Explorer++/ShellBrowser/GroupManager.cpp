@@ -23,9 +23,9 @@
 
 namespace
 {
-const UINT KBYTE = 1024;
-const UINT MBYTE = 1024 * 1024;
-const UINT GBYTE = 1024 * 1024 * 1024;
+	const UINT KBYTE = 1024;
+	const UINT MBYTE = 1024 * 1024;
+	const UINT GBYTE = 1024 * 1024 * 1024;
 }
 
 BOOL ShellBrowser::GetShowInGroups() const
@@ -424,34 +424,27 @@ std::wstring ShellBrowser::DetermineItemNameGroup(const BasicItemInfo_t &itemInf
  */
 std::wstring ShellBrowser::DetermineItemSizeGroup(const BasicItemInfo_t &itemInfo) const
 {
-	const TCHAR *sizeGroups[] = { _T("Folders"), _T("Tiny"), _T("Small"), _T("Medium"), _T("Large"),
-		_T("Huge") };
-	int sizeGroupLimits[] = { 0, 0, 32 * KBYTE, 100 * KBYTE, MBYTE, 10 * MBYTE };
-	int nGroups = 6;
-	int iSize;
-	int i;
-
 	if ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
-		/* This item is a folder. */
-		iSize = 0;
+		return L"Folders";
 	}
-	else
+	else if (!itemInfo.isFindDataValid)
 	{
-		i = nGroups - 1;
-
-		double fileSize = itemInfo.wfd.nFileSizeLow + (itemInfo.wfd.nFileSizeHigh * pow(2.0, 32.0));
-
-		/* Check which of the size groups this item belongs to. */
-		while (fileSize < sizeGroupLimits[i] && i > 0)
-		{
-			i--;
-		}
-
-		iSize = i;
+		return ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_UNSPECIFIED);
 	}
 
-	return sizeGroups[iSize];
+	const TCHAR *sizeGroups[] = { _T("Tiny"), _T("Small"), _T("Medium"), _T("Large"), _T("Huge") };
+	int sizeGroupLimits[] = { 0, 32 * KBYTE, 100 * KBYTE, MBYTE, 10 * MBYTE };
+	int i = SIZEOF_ARRAY(sizeGroupLimits) - 1;
+
+	double fileSize = itemInfo.wfd.nFileSizeLow + (itemInfo.wfd.nFileSizeHigh * pow(2.0, 32.0));
+
+	while (fileSize < sizeGroupLimits[i] && i >= 0)
+	{
+		i--;
+	}
+
+	return sizeGroups[i];
 }
 
 /*
@@ -527,6 +520,11 @@ std::wstring ShellBrowser::DetermineItemTypeGroupVirtual(const BasicItemInfo_t &
 std::wstring ShellBrowser::DetermineItemDateGroup(
 	const BasicItemInfo_t &itemInfo, GroupByDateType dateType) const
 {
+	if (!itemInfo.isFindDataValid)
+	{
+		return ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_UNSPECIFIED);
+	}
+
 	using namespace boost::gregorian;
 	using namespace boost::posix_time;
 
