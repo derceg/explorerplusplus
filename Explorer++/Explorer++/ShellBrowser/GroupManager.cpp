@@ -15,6 +15,7 @@
 #include "../Helper/TimeHelper.h"
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/integer_traits.hpp>
 #include <wil/common.h>
 #include <iphlpapi.h>
 #include <propkey.h>
@@ -23,9 +24,9 @@
 
 namespace
 {
-	const UINT KBYTE = 1024;
-	const UINT MBYTE = 1024 * 1024;
-	const UINT GBYTE = 1024 * 1024 * 1024;
+	const uint64_t KBYTE = 1024;
+	const uint64_t MBYTE = 1024 * 1024;
+	const uint64_t GBYTE = 1024 * 1024 * 1024;
 }
 
 BOOL ShellBrowser::GetShowInGroups() const
@@ -383,25 +384,39 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemSizeGroup(
 {
 	if ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
-		return GroupInfo(L"Folders", 0);
+		return GroupInfo(
+			ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_SIZE_FOLDERS), 0);
 	}
 	else if (!itemInfo.isFindDataValid)
 	{
 		return std::nullopt;
 	}
 
-	const TCHAR *sizeGroups[] = { _T("Tiny"), _T("Small"), _T("Medium"), _T("Large"), _T("Huge") };
-	int sizeGroupLimits[] = { 0, 32 * KBYTE, 100 * KBYTE, MBYTE, 10 * MBYTE };
-	int i = SIZEOF_ARRAY(sizeGroupLimits) - 1;
-
-	double fileSize = itemInfo.wfd.nFileSizeLow + (itemInfo.wfd.nFileSizeHigh * pow(2.0, 32.0));
-
-	while (fileSize < sizeGroupLimits[i] && i >= 0)
+	struct SizeGroup
 	{
-		i--;
+		int nameResourceId;
+		uint64_t upperLimit;
+	};
+
+	// If the limits here are adjusted, the entries in the string table should be updated as well
+	// (since they reference the limits as well).
+	SizeGroup sizeGroups[] = { { IDS_GROUPBY_SIZE_EMPTY, 0 }, { IDS_GROUPBY_SIZE_TINY, 16 * KBYTE },
+		{ IDS_GROUPBY_SIZE_SMALL, MBYTE }, { IDS_GROUPBY_SIZE_MEDIUM, 128 * MBYTE },
+		{ IDS_GROUPBY_SIZE_LARGE, GBYTE }, { IDS_GROUPBY_SIZE_HUGE, 4 * GBYTE },
+		{ IDS_GROUPBY_SIZE_GIGANTIC, boost::integer_traits<uint64_t>::const_max } };
+
+	ULARGE_INTEGER fileSize = { itemInfo.wfd.nFileSizeLow, itemInfo.wfd.nFileSizeHigh };
+	int currentIndex = 0;
+
+	while (fileSize.QuadPart > sizeGroups[currentIndex].upperLimit
+		&& currentIndex < (SIZEOF_ARRAY(sizeGroups) - 1))
+	{
+		currentIndex++;
 	}
 
-	return GroupInfo(sizeGroups[i], i + 1);
+	return GroupInfo(
+		ResourceHelper::LoadString(m_hResourceModule, sizeGroups[currentIndex].nameResourceId),
+		currentIndex + 1);
 }
 
 /* TODO: These groups have changed as of Windows Vista. */
