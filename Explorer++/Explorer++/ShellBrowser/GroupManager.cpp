@@ -143,10 +143,6 @@ const ShellBrowser::ListViewGroup ShellBrowser::GetListViewGroupById(int groupId
 	return *itr;
 }
 
-/*
- * Determines the id of the group the specified
- * item belongs to.
- */
 int ShellBrowser::DetermineItemGroup(int iItemInternal)
 {
 	BasicItemInfo_t basicItemInfo = getBasicItemInfo(iItemInternal);
