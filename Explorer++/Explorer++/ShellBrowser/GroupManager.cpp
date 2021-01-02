@@ -872,7 +872,7 @@ void ShellBrowser::MoveItemsIntoGroups()
 
 	nItems = ListView_GetItemCount(m_hListView);
 
-	SendMessage(m_hListView, WM_SETREDRAW, (WPARAM) FALSE, (LPARAM) NULL);
+	SendMessage(m_hListView, WM_SETREDRAW, FALSE, NULL);
 
 	m_listViewGroups.clear();
 	m_groupIdCounter = 0;
@@ -889,5 +889,5 @@ void ShellBrowser::MoveItemsIntoGroups()
 		InsertItemIntoGroup(i, iGroupId);
 	}
 
-	SendMessage(m_hListView, WM_SETREDRAW, (WPARAM) TRUE, (LPARAM) NULL);
+	SendMessage(m_hListView, WM_SETREDRAW, TRUE, NULL);
 }
