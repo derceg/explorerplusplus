@@ -1030,9 +1030,9 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 			m_darkModeGroupBoxes.push_back(
 				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_GENERAL)));
 			m_darkModeGroupBoxes.push_back(
-				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_LISTVIEW)));
+				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_MAIN_PANE)));
 			m_darkModeGroupBoxes.push_back(
-				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_TREEVIEW)));
+				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_NAVIGATION_PANE)));
 			m_darkModeGroupBoxes.push_back(
 				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_DISPLAY_WINDOW)));
 		}
