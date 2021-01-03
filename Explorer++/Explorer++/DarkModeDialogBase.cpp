@@ -42,6 +42,8 @@ void DarkModeDialogBase::OnInitDialogBase()
 		std::bind(&DarkModeDialogBase::DialogWndProc, this, std::placeholders::_1,
 			std::placeholders::_2, std::placeholders::_3, std::placeholders::_4),
 		0));
+
+	darkModeHelper.SetDarkModeForControl(m_tipWnd);
 }
 
 LRESULT CALLBACK DarkModeDialogBase::DialogWndProc(
