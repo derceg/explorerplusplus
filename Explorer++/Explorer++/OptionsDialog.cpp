@@ -26,6 +26,7 @@
 #include "ShellBrowser/ViewModes.h"
 #include "TabContainer.h"
 #include "ViewModeHelper.h"
+#include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
@@ -143,6 +144,15 @@ HWND OptionsDialog::Show(HWND parentWindow)
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(propertySheet,
 		PropSheetProcStub, PROP_SHEET_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+
+	m_tipWnd = CreateTooltipControl(propertySheet, m_instance);
+
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (darkModeHelper.IsDarkModeEnabled())
+	{
+		darkModeHelper.SetDarkModeForControl(m_tipWnd);
+	}
 
 	// Needed to ensure that the background color is correctly set in dark mode when opening the
 	// dialog.
@@ -685,6 +695,9 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 		{
 			CheckDlgButton(hDlg, IDC_USE_NATURAL_SORT_ORDER, BST_CHECKED);
 		}
+
+		AddTooltipForControl(m_tipWnd, GetDlgItem(hDlg, IDC_USE_NATURAL_SORT_ORDER), m_instance,
+			IDS_USE_NATURAL_SORT_ORDER_TOOLTIP);
 
 		hCBSize = GetDlgItem(hDlg, IDC_COMBO_FILESIZES);
 

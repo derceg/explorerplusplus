@@ -118,6 +118,7 @@ private:
 	std::shared_ptr<Config> m_config;
 	HINSTANCE m_instance;
 	IExplorerplusplus *m_expp;
+	HWND m_tipWnd;
 
 	TabContainer *m_tabContainer;
 

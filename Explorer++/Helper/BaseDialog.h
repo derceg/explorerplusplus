@@ -50,11 +50,11 @@ protected:
 
 	INT_PTR GetDefaultReturnValue(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
-	void AddTooltipForControl(int controlId, int stringResourceId);
-
 	HWND m_hDlg;
 	int m_iMinWidth;
 	int m_iMinHeight;
+
+	HWND m_tipWnd;
 
 private:
 	DISALLOW_COPY_AND_ASSIGN(BaseDialog);
@@ -78,6 +78,4 @@ private:
 	const bool m_bResizable;
 	DialogSizeConstraint m_dsc;
 	std::unique_ptr<ResizableDialog> m_prd;
-
-	HWND m_tipWnd;
 };

@@ -252,15 +252,3 @@ void BaseDialog::GetResizableControlInformation(
 void BaseDialog::SaveState()
 {
 }
-
-void BaseDialog::AddTooltipForControl(int controlId, int stringResourceId)
-{
-	TOOLINFO toolInfo = {};
-	toolInfo.cbSize = sizeof(toolInfo);
-	toolInfo.uFlags = TTF_IDISHWND | TTF_SUBCLASS;
-	toolInfo.hwnd = m_hDlg;
-	toolInfo.uId = reinterpret_cast<UINT_PTR>(GetDlgItem(m_hDlg, controlId));
-	toolInfo.hinst = m_hInstance;
-	toolInfo.lpszText = MAKEINTRESOURCE(stringResourceId);
-	SendMessage(m_tipWnd, TTM_ADDTOOL, 0, reinterpret_cast<LPARAM>(&toolInfo));
-}

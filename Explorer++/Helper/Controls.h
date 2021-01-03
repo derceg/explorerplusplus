@@ -25,3 +25,5 @@ void UpdateToolbarBandSizing(HWND hRebar, HWND hToolbar);
 SIZE GetCheckboxSize(HWND hwnd);
 SIZE GetRadioButtonSize(HWND hwnd);
 SIZE GetButtonSize(HWND hwnd, int partId, int stateId, int defaultWidth, int defaultHeight);
+
+void AddTooltipForControl(HWND tipWnd, HWND control, HINSTANCE instance, int stringResourceId);
