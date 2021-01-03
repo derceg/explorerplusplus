@@ -34,6 +34,8 @@ struct GlobalFolderSettings
 	SizeDisplayFormat sizeDisplayFormat;
 	BOOL oneClickActivate;
 	UINT oneClickActivateHoverTime;
+	BOOL displayMixedFilesAndFolders;
+	BOOL useNaturalSortOrder;
 
 	FolderColumns folderColumns;
 };

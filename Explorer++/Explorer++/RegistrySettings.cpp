@@ -184,6 +184,11 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 
 		RegistrySettings::SaveDword(hSettingsKey, _T("Language"), m_config->language);
 
+		RegistrySettings::SaveDword(hSettingsKey, _T("DisplayMixedFilesAndFolders"),
+			m_config->globalFolderSettings.displayMixedFilesAndFolders);
+		RegistrySettings::SaveDword(hSettingsKey, _T("UseNaturalSortOrder"),
+			m_config->globalFolderSettings.useNaturalSortOrder);
+
 		/* Global settings. */
 		RegistrySettings::SaveDword(
 			hSettingsKey, _T("ShowHiddenGlobal"), m_config->defaultFolderSettings.showHidden);
@@ -409,6 +414,12 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 			m_config->language = dwordValue;
 			m_bLanguageLoaded = true;
 		}
+
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey,
+			_T("DisplayMixedFilesAndFolders"),
+			m_config->globalFolderSettings.displayMixedFilesAndFolders);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("UseNaturalSortOrder"),
+			m_config->globalFolderSettings.useNaturalSortOrder);
 
 		/* Global settings. */
 		RegistrySettings::Read32BitValueFromRegistry(

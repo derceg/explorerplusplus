@@ -676,6 +676,16 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 			CheckDlgButton(hDlg, IDC_OPTIONS_RADIO_CUSTOMINFOTIPS, BST_CHECKED);
 		}
 
+		if (m_config->globalFolderSettings.displayMixedFilesAndFolders)
+		{
+			CheckDlgButton(hDlg, IDC_DISPLAY_MIXED_FILES_AND_FOLDERS, BST_CHECKED);
+		}
+
+		if (m_config->globalFolderSettings.useNaturalSortOrder)
+		{
+			CheckDlgButton(hDlg, IDC_USE_NATURAL_SORT_ORDER, BST_CHECKED);
+		}
+
 		hCBSize = GetDlgItem(hDlg, IDC_COMBO_FILESIZES);
 
 		for (int i = 0; i < SIZEOF_ARRAY(FILE_SIZES); i++)
@@ -708,7 +718,8 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 					IDC_SETTINGS_CHECK_SINGLECLICK, IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION,
 					IDC_SETTINGS_CHECK_FOLDERSIZES, IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE,
 					IDC_SETTINGS_CHECK_FORCESIZE, IDC_SETTINGS_CHECK_ZIPFILES,
-					IDC_SETTINGS_CHECK_FRIENDLYDATES, IDC_OPTIONS_CHECK_SHOWINFOTIPS });
+					IDC_SETTINGS_CHECK_FRIENDLYDATES, IDC_OPTIONS_CHECK_SHOWINFOTIPS,
+					IDC_DISPLAY_MIXED_FILES_AND_FOLDERS, IDC_USE_NATURAL_SORT_ORDER });
 
 			m_radioButtonControlIds.insert(
 				{ IDC_OPTIONS_RADIO_SYSTEMINFOTIPS, IDC_OPTIONS_RADIO_CUSTOMINFOTIPS });
@@ -747,6 +758,8 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 			case IDC_SETTINGS_CHECK_ZIPFILES:
 			case IDC_SETTINGS_CHECK_FRIENDLYDATES:
 			case IDC_OPTIONS_HOVER_TIME:
+			case IDC_DISPLAY_MIXED_FILES_AND_FOLDERS:
+			case IDC_USE_NATURAL_SORT_ORDER:
 				PropSheet_Changed(GetParent(hDlg), hDlg);
 				break;
 
@@ -853,6 +866,12 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 			{
 				m_config->infoTipType = InfoTipType::Custom;
 			}
+
+			m_config->globalFolderSettings.displayMixedFilesAndFolders =
+				(IsDlgButtonChecked(hDlg, IDC_DISPLAY_MIXED_FILES_AND_FOLDERS) == BST_CHECKED);
+
+			m_config->globalFolderSettings.useNaturalSortOrder =
+				(IsDlgButtonChecked(hDlg, IDC_USE_NATURAL_SORT_ORDER) == BST_CHECKED);
 
 			hCBSize = GetDlgItem(hDlg, IDC_COMBO_FILESIZES);
 

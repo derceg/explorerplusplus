@@ -711,7 +711,14 @@ int CALLBACK ShellTreeView::CompareItems(LPARAM lParam1, LPARAM lParam2)
 			GetDisplayName(itemInfo1.pidl.get(), SHGDN_INFOLDER, displayName1);
 			GetDisplayName(itemInfo2.pidl.get(), SHGDN_INFOLDER, displayName2);
 
-			return StrCmpLogicalW(displayName1.c_str(), displayName2.c_str());
+			if (m_config->globalFolderSettings.useNaturalSortOrder)
+			{
+				return StrCmpLogicalW(displayName1.c_str(), displayName2.c_str());
+			}
+			else
+			{
+				return StrCmpIW(displayName1.c_str(), displayName2.c_str());
+			}
 		}
 	}
 }

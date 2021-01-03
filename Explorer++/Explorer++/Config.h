@@ -103,6 +103,8 @@ struct Config
 		globalFolderSettings.sizeDisplayFormat = SizeDisplayFormat::Bytes;
 		globalFolderSettings.oneClickActivate = FALSE;
 		globalFolderSettings.oneClickActivateHoverTime = DEFAULT_LISTVIEW_HOVER_TIME;
+		globalFolderSettings.displayMixedFilesAndFolders = FALSE;
+		globalFolderSettings.useNaturalSortOrder = TRUE;
 
 		globalFolderSettings.folderColumns.realFolderColumns = std::vector<Column_t>(
 			std::begin(REAL_FOLDER_DEFAULT_COLUMNS), std::end(REAL_FOLDER_DEFAULT_COLUMNS));

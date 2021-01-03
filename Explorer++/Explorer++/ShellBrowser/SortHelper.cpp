@@ -22,13 +22,27 @@ int SortByName(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo
 	{
 		/* If the items been compared are both drives,
 		sort by drive letter, rather than display name. */
-		return StrCmpLogicalW(itemInfo1.getFullPath().c_str(), itemInfo2.getFullPath().c_str());
+		if (globalFolderSettings.useNaturalSortOrder)
+		{
+			return StrCmpLogicalW(itemInfo1.getFullPath().c_str(), itemInfo2.getFullPath().c_str());
+		}
+		else
+		{
+			return StrCmpIW(itemInfo1.getFullPath().c_str(), itemInfo2.getFullPath().c_str());
+		}
 	}
 
 	std::wstring name1 = GetNameColumnText(itemInfo1, globalFolderSettings);
 	std::wstring name2 = GetNameColumnText(itemInfo2, globalFolderSettings);
 
-	return StrCmpLogicalW(name1.c_str(), name2.c_str());
+	if (globalFolderSettings.useNaturalSortOrder)
+	{
+		return StrCmpLogicalW(name1.c_str(), name2.c_str());
+	}
+	else
+	{
+		return StrCmpIW(name1.c_str(), name2.c_str());
+	}
 }
 
 int SortBySize(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2)

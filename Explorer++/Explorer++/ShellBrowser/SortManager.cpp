@@ -59,13 +59,15 @@ int CALLBACK ShellBrowser::Sort(int InternalIndex1, int InternalIndex2) const
 		? true
 		: false;
 
-	/* Folders will always be sorted separately from files,
+	/* Folders will by default be sorted separately from files,
 	except in the recycle bin. */
-	if (isFolder1 && !isFolder2 && !CompareVirtualFolders(CSIDL_BITBUCKET))
+	if (!m_config->globalFolderSettings.displayMixedFilesAndFolders && isFolder1 && !isFolder2
+		&& !CompareVirtualFolders(CSIDL_BITBUCKET))
 	{
 		comparisonResult = -1;
 	}
-	else if (!isFolder1 && isFolder2 && !CompareVirtualFolders(CSIDL_BITBUCKET))
+	else if (!m_config->globalFolderSettings.displayMixedFilesAndFolders && !isFolder1 && isFolder2
+		&& !CompareVirtualFolders(CSIDL_BITBUCKET))
 	{
 		comparisonResult = 1;
 	}
@@ -371,8 +373,15 @@ int CALLBACK ShellBrowser::Sort(int InternalIndex1, int InternalIndex2) const
 	{
 		/* By default, items that are equal will be sub-sorted
 		by their display names. */
-		comparisonResult =
-			StrCmpLogicalW(basicItemInfo1.szDisplayName, basicItemInfo2.szDisplayName);
+		if (m_config->globalFolderSettings.useNaturalSortOrder)
+		{
+			comparisonResult =
+				StrCmpLogicalW(basicItemInfo1.szDisplayName, basicItemInfo2.szDisplayName);
+		}
+		else
+		{
+			comparisonResult = StrCmpIW(basicItemInfo1.szDisplayName, basicItemInfo2.szDisplayName);
+		}
 	}
 
 	if (!m_folderSettings.sortAscending)
