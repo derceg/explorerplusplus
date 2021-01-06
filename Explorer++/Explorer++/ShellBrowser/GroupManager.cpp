@@ -307,32 +307,16 @@ int ShellBrowser::DetermineItemGroup(int iItemInternal)
 			ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_UNSPECIFIED), INT_MIN);
 	}
 
-	return InsertOrUpdateListViewGroup(*groupInfo);
+	return GetOrCreateListViewGroup(*groupInfo);
 }
 
-int ShellBrowser::InsertOrUpdateListViewGroup(const GroupInfo &groupInfo)
+int ShellBrowser::GetOrCreateListViewGroup(const GroupInfo &groupInfo)
 {
-	auto generateListViewHeader = [](std::wstring_view header, int numItems) {
-		return std::wstring(header) + L" (" + std::to_wstring(numItems) + L")";
-	};
-
 	auto &groupNameIndex = m_listViewGroups.get<1>();
 	auto itr = groupNameIndex.find(groupInfo.name);
 
 	if (itr != groupNameIndex.end())
 	{
-		auto updatedGroup = *itr;
-		updatedGroup.numItems++;
-		groupNameIndex.replace(itr, updatedGroup);
-
-		std::wstring listViewHeader = generateListViewHeader(groupInfo.name, itr->numItems);
-
-		LVGROUP lvGroup;
-		lvGroup.cbSize = sizeof(LVGROUP);
-		lvGroup.mask = LVGF_HEADER;
-		lvGroup.pszHeader = listViewHeader.data();
-		ListView_SetGroupInfo(m_hListView, itr->id, &lvGroup);
-
 		return itr->id;
 	}
 
@@ -340,19 +324,6 @@ int ShellBrowser::InsertOrUpdateListViewGroup(const GroupInfo &groupInfo)
 
 	ListViewGroup listViewGroup(groupId, groupInfo);
 	m_listViewGroups.insert(listViewGroup);
-
-	std::wstring listViewHeader = generateListViewHeader(groupInfo.name, listViewGroup.numItems);
-
-	LVINSERTGROUPSORTED lvigs;
-	lvigs.lvGroup.cbSize = sizeof(LVGROUP);
-	lvigs.lvGroup.mask = LVGF_HEADER | LVGF_GROUPID | LVGF_STATE;
-	lvigs.lvGroup.state = LVGS_COLLAPSIBLE;
-	lvigs.lvGroup.pszHeader = listViewHeader.data();
-	lvigs.lvGroup.iGroupId = groupId;
-	lvigs.lvGroup.stateMask = 0;
-	lvigs.pfnGroupCompare = GroupComparisonStub;
-	lvigs.pvData = this;
-	ListView_InsertGroupSorted(m_hListView, &lvigs);
 
 	return groupId;
 }
@@ -860,18 +831,6 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemNetworkStatus(
 	return GroupInfo(szStatus);
 }
 
-void ShellBrowser::InsertItemIntoGroup(int iItem, int iGroupId)
-{
-	LVITEM item;
-
-	/* Move the item into the group. */
-	item.mask = LVIF_GROUPID;
-	item.iItem = iItem;
-	item.iSubItem = 0;
-	item.iGroupId = iGroupId;
-	ListView_SetItem(m_hListView, &item);
-}
-
 void ShellBrowser::MoveItemsIntoGroups()
 {
 	LVITEM item;
@@ -902,4 +861,129 @@ void ShellBrowser::MoveItemsIntoGroups()
 	}
 
 	SendMessage(m_hListView, WM_SETREDRAW, TRUE, NULL);
+}
+
+void ShellBrowser::InsertItemIntoGroup(int index, int groupId)
+{
+	auto previousGroupId = GetItemGroupId(index);
+
+	if (previousGroupId && *previousGroupId == groupId)
+	{
+		return;
+	}
+
+	EnsureGroupExistsInListView(groupId);
+
+	LVITEM item;
+	item.mask = LVIF_GROUPID;
+	item.iItem = index;
+	item.iSubItem = 0;
+	item.iGroupId = groupId;
+	BOOL res = ListView_SetItem(m_hListView, &item);
+
+	if (res)
+	{
+		if (previousGroupId)
+		{
+			OnItemRemovedFromGroup(*previousGroupId);
+		}
+
+		OnItemAddedToGroup(groupId);
+	}
+}
+
+void ShellBrowser::EnsureGroupExistsInListView(int groupId)
+{
+	ListViewGroup group = GetListViewGroupById(groupId);
+
+	if (group.numItems == 0)
+	{
+		InsertGroupIntoListView(group);
+	}
+}
+
+void ShellBrowser::InsertGroupIntoListView(const ListViewGroup &listViewGroup)
+{
+	std::wstring header = GenerateGroupHeader(listViewGroup);
+
+	LVINSERTGROUPSORTED lvigs;
+	lvigs.lvGroup.cbSize = sizeof(LVGROUP);
+	lvigs.lvGroup.mask = LVGF_HEADER | LVGF_GROUPID | LVGF_STATE;
+	lvigs.lvGroup.state = LVGS_COLLAPSIBLE;
+	lvigs.lvGroup.pszHeader = header.data();
+	lvigs.lvGroup.iGroupId = listViewGroup.id;
+	lvigs.lvGroup.stateMask = 0;
+	lvigs.pfnGroupCompare = GroupComparisonStub;
+	lvigs.pvData = this;
+	ListView_InsertGroupSorted(m_hListView, &lvigs);
+}
+
+void ShellBrowser::RemoveGroupFromListView(const ListViewGroup &listViewGroup)
+{
+	ListView_RemoveGroup(m_hListView, listViewGroup.id);
+}
+
+void ShellBrowser::UpdateGroupHeader(const ListViewGroup &listViewGroup)
+{
+	std::wstring header = GenerateGroupHeader(listViewGroup);
+
+	LVGROUP lvGroup;
+	lvGroup.cbSize = sizeof(LVGROUP);
+	lvGroup.mask = LVGF_HEADER;
+	lvGroup.pszHeader = header.data();
+	ListView_SetGroupInfo(m_hListView, listViewGroup.id, &lvGroup);
+}
+
+std::wstring ShellBrowser::GenerateGroupHeader(const ListViewGroup &listViewGroup)
+{
+	return listViewGroup.name + L" (" + std::to_wstring(listViewGroup.numItems) + L")";
+}
+
+void ShellBrowser::OnItemRemovedFromGroup(int groupId)
+{
+	auto &groupIdIndex = m_listViewGroups.get<0>();
+	auto itr = groupIdIndex.find(groupId);
+	assert(itr != groupIdIndex.end());
+
+	auto updatedGroup = *itr;
+	updatedGroup.numItems--;
+	m_listViewGroups.replace(itr, updatedGroup);
+
+	if (updatedGroup.numItems == 0)
+	{
+		RemoveGroupFromListView(updatedGroup);
+	}
+	else
+	{
+		UpdateGroupHeader(updatedGroup);
+	}
+}
+
+void ShellBrowser::OnItemAddedToGroup(int groupId)
+{
+	auto &groupIdIndex = m_listViewGroups.get<0>();
+	auto itr = groupIdIndex.find(groupId);
+	assert(itr != groupIdIndex.end());
+
+	auto updatedGroup = *itr;
+	updatedGroup.numItems++;
+	m_listViewGroups.replace(itr, updatedGroup);
+
+	UpdateGroupHeader(updatedGroup);
+}
+
+std::optional<int> ShellBrowser::GetItemGroupId(int index)
+{
+	LVITEM item;
+	item.mask = LVIF_GROUPID;
+	item.iItem = index;
+	item.iSubItem = 0;
+	BOOL res = ListView_GetItem(m_hListView, &item);
+
+	if (!res || item.iGroupId == I_GROUPIDNONE)
+	{
+		return std::nullopt;
+	}
+
+	return item.iGroupId;
 }

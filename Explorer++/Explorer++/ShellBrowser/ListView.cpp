@@ -148,6 +148,10 @@ LRESULT CALLBACK ShellBrowser::ListViewParentProc(
 			case LVN_GETINFOTIP:
 				return OnListViewGetInfoTip(reinterpret_cast<NMLVGETINFOTIP *>(lParam));
 
+			case LVN_INSERTITEM:
+				OnListViewItemInserted(reinterpret_cast<NMLISTVIEW *>(lParam));
+				break;
+
 			case LVN_ITEMCHANGED:
 				OnListViewItemChanged(reinterpret_cast<NMLISTVIEW *>(lParam));
 				break;
@@ -475,6 +479,19 @@ void ShellBrowser::ProcessInfoTipResult(int infoTipResultId)
 	infoTip.iSubItem = 0;
 	infoTip.pszText = infoTipText;
 	ListView_SetInfoTip(m_hListView, &infoTip);
+}
+
+void ShellBrowser::OnListViewItemInserted(const NMLISTVIEW *itemData)
+{
+	if (m_folderSettings.showInGroups)
+	{
+		auto groupId = GetItemGroupId(itemData->iItem);
+
+		if (groupId)
+		{
+			OnItemAddedToGroup(*groupId);
+		}
+	}
 }
 
 void ShellBrowser::OnListViewItemChanged(const NMLISTVIEW *changeData)

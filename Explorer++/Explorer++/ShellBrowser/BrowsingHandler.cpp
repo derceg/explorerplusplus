@@ -425,8 +425,12 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 		if (bInsertIntoGroup)
 		{
+			int groupId = DetermineItemGroup(awaitingItem.iItemInternal);
+
 			lv.mask |= LVIF_GROUPID;
-			lv.iGroupId = DetermineItemGroup(awaitingItem.iItemInternal);
+			lv.iGroupId = groupId;
+
+			EnsureGroupExistsInListView(groupId);
 		}
 
 		lv.iItem = awaitingItem.iItem;
@@ -591,6 +595,16 @@ void ShellBrowser::RemoveItem(int iItemInternal)
 
 	if (iItem != -1)
 	{
+		if (m_folderSettings.showInGroups)
+		{
+			auto groupId = GetItemGroupId(iItem);
+
+			if (groupId)
+			{
+				OnItemRemovedFromGroup(*groupId);
+			}
+		}
+
 		/* Remove the item from the listview. */
 		ListView_DeleteItem(m_hListView, iItem);
 	}

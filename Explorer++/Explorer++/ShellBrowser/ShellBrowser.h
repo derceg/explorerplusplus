@@ -284,7 +284,7 @@ private:
 			id(id),
 			name(groupInfo.name),
 			relativeSortPosition(groupInfo.relativeSortPosition),
-			numItems(1)
+			numItems(0)
 		{
 		}
 	};
@@ -415,6 +415,7 @@ private:
 		int internalIndex, const BasicItemInfo_t &basicItemInfo, const Config &config,
 		HINSTANCE instance, bool virtualFolder);
 	void ProcessInfoTipResult(int infoTipResultId);
+	void OnListViewItemInserted(const NMLISTVIEW *itemData);
 	void OnListViewItemChanged(const NMLISTVIEW *changeData);
 	void UpdateFileSelectionInfo(int internalIndex, BOOL selected);
 	void OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown);
@@ -505,9 +506,17 @@ private:
 	std::optional<GroupInfo> DetermineItemNetworkStatus(const BasicItemInfo_t &itemInfo) const;
 
 	/* Other grouping support. */
-	int InsertOrUpdateListViewGroup(const GroupInfo &groupInfo);
-	void InsertItemIntoGroup(int iItem, int iGroupId);
+	int GetOrCreateListViewGroup(const GroupInfo &groupInfo);
 	void MoveItemsIntoGroups();
+	void InsertItemIntoGroup(int index, int groupId);
+	void EnsureGroupExistsInListView(int groupId);
+	void InsertGroupIntoListView(const ListViewGroup &listViewGroup);
+	void RemoveGroupFromListView(const ListViewGroup &listViewGroup);
+	void UpdateGroupHeader(const ListViewGroup &listViewGroup);
+	std::wstring GenerateGroupHeader(const ListViewGroup &listViewGroup);
+	void OnItemRemovedFromGroup(int groupId);
+	void OnItemAddedToGroup(int groupId);
+	std::optional<int> GetItemGroupId(int index);
 
 	/* Listview icons. */
 	void ProcessIconResult(int internalIndex, int iconIndex);

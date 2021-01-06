@@ -428,6 +428,12 @@ void ShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 			}
 
 			FindClose(hFirstFile);
+
+			if (m_folderSettings.showInGroups)
+			{
+				int groupId = DetermineItemGroup(iItemInternal);
+				InsertItemIntoGroup(iItem, groupId);
+			}
 		}
 		else
 		{
@@ -585,6 +591,12 @@ void ShellBrowser::RenameItem(int iItemInternal, const TCHAR *szNewFileName)
 
 						/* Update the item in the listview. */
 						ListView_SetItem(m_hListView, &lvItem);
+
+						if (m_folderSettings.showInGroups)
+						{
+							int groupId = DetermineItemGroup(iItemInternal);
+							InsertItemIntoGroup(iItem, groupId);
+						}
 
 						/* TODO: Does the file need to be filtered out? */
 						if (IsFileFiltered(itemInfo))
