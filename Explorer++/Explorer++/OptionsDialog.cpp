@@ -1601,6 +1601,17 @@ INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(
 	case WM_NOTIFY:
 		switch (reinterpret_cast<NMHDR *>(lParam)->code)
 		{
+		case NM_DBLCLK:
+		{
+			const auto *info = reinterpret_cast<NMITEMACTIVATE *>(lParam);
+
+			if (info->iItem != -1)
+			{
+				ListView_EditLabel(info->hdr.hwndFrom, info->iItem);
+			}
+		}
+		break;
+
 		case LVN_ITEMCHANGED:
 		{
 			auto info = reinterpret_cast<NMLISTVIEW *>(lParam);
