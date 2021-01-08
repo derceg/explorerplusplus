@@ -118,19 +118,19 @@ void Explorerplusplus::LoadAllSettings(ILoadSave **pLoadSave)
 	ValidateLoadedSettings();
 }
 
-void Explorerplusplus::OpenItem(const TCHAR *szItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow)
+void Explorerplusplus::OpenItem(const TCHAR *itemPath, OpenFolderDisposition openFolderDisposition)
 {
 	unique_pidl_absolute pidlItem;
-	HRESULT hr = SHParseDisplayName(szItem, nullptr, wil::out_param(pidlItem), 0, nullptr);
+	HRESULT hr = SHParseDisplayName(itemPath, nullptr, wil::out_param(pidlItem), 0, nullptr);
 
 	if (SUCCEEDED(hr))
 	{
-		OpenItem(pidlItem.get(), bOpenInNewTab, bOpenInNewWindow);
+		OpenItem(pidlItem.get(), openFolderDisposition);
 	}
 }
 
 void Explorerplusplus::OpenItem(
-	PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow)
+	PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition)
 {
 	BOOL bControlPanelParent = FALSE;
 
@@ -197,7 +197,7 @@ void Explorerplusplus::OpenItem(
 			/* Zip file. */
 			if (m_config->handleZipFiles)
 			{
-				OpenFolderItem(pidlItem, bOpenInNewTab, bOpenInNewWindow);
+				OpenFolderItem(pidlItem, openFolderDisposition);
 			}
 			else
 			{
@@ -206,8 +206,7 @@ void Explorerplusplus::OpenItem(
 		}
 		else if (((uAttributes & SFGAO_FOLDER) && !bControlPanelParent))
 		{
-			/* Open folders. */
-			OpenFolderItem(pidlItem, bOpenInNewTab, bOpenInNewWindow);
+			OpenFolderItem(pidlItem, openFolderDisposition);
 		}
 		else if (uAttributes & SFGAO_LINK && !bControlPanelParent)
 		{
@@ -247,7 +246,7 @@ void Explorerplusplus::OpenItem(
 
 						if (SUCCEEDED(hr))
 						{
-							OpenFolderItem(pidlTarget.get(), bOpenInNewTab, bOpenInNewWindow);
+							OpenFolderItem(pidlTarget.get(), openFolderDisposition);
 						}
 					}
 					else
@@ -296,14 +295,31 @@ void Explorerplusplus::OpenItem(
 }
 
 void Explorerplusplus::OpenFolderItem(
-	PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow)
+	PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition)
 {
-	if (bOpenInNewWindow)
-		m_navigation->OpenDirectoryInNewWindow(pidlItem);
-	else if (m_config->alwaysOpenNewTab || bOpenInNewTab)
-		m_tabContainer->CreateNewTab(pidlItem, TabSettings(_selected = true));
-	else
+	if (m_config->alwaysOpenNewTab && openFolderDisposition == OpenFolderDisposition::CurrentTab)
+	{
+		openFolderDisposition = OpenFolderDisposition::ForegroundTab;
+	}
+
+	switch (openFolderDisposition)
+	{
+	case OpenFolderDisposition::CurrentTab:
 		m_navigation->BrowseFolderInCurrentTab(pidlItem);
+		break;
+
+	case OpenFolderDisposition::BackgroundTab:
+		m_tabContainer->CreateNewTab(pidlItem);
+		break;
+
+	case OpenFolderDisposition::ForegroundTab:
+		m_tabContainer->CreateNewTab(pidlItem, TabSettings(_selected = true));
+		break;
+
+	case OpenFolderDisposition::NewWindow:
+		m_navigation->OpenDirectoryInNewWindow(pidlItem);
+		break;
+	}
 }
 
 void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters)

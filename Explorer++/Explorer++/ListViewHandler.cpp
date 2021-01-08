@@ -273,15 +273,25 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 	switch (keyDown->wVKey)
 	{
 	case VK_RETURN:
-		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
+		if (IsKeyDown(VK_MENU))
 		{
-			/* Key press: Ctrl+Enter
-			Action: Open item in background tab. */
-			OpenAllSelectedItems(TRUE);
+			m_pActiveShellBrowser->ShowPropertiesForSelectedFiles();
+		}
+		else if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT))
+		{
+			OpenAllSelectedItems(OpenFolderDisposition::BackgroundTab);
+		}
+		else if (!IsKeyDown(VK_CONTROL) && IsKeyDown(VK_SHIFT))
+		{
+			OpenAllSelectedItems(OpenFolderDisposition::NewWindow);
+		}
+		else if (IsKeyDown(VK_CONTROL) && IsKeyDown(VK_SHIFT))
+		{
+			OpenAllSelectedItems(OpenFolderDisposition::ForegroundTab);
 		}
 		else
 		{
-			OpenAllSelectedItems(FALSE);
+			OpenAllSelectedItems();
 		}
 		break;
 
@@ -794,19 +804,21 @@ void Explorerplusplus::OnListViewDoubleClick(NMHDR *nmhdr)
 
 				ShowMultipleFileProperties(pidlDirectory.get(), items.data(), m_hContainer, 1);
 			}
-			else if (IsKeyDown(VK_CONTROL))
+			else if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT))
 			{
-				/* Open the item in a new tab. */
-				OpenListViewItem(ht.iItem, TRUE, FALSE);
+				OpenListViewItem(ht.iItem, OpenFolderDisposition::BackgroundTab);
 			}
-			else if (IsKeyDown(VK_SHIFT))
+			else if (!IsKeyDown(VK_CONTROL) && IsKeyDown(VK_SHIFT))
 			{
-				/* Open the item in a new window. */
-				OpenListViewItem(ht.iItem, FALSE, TRUE);
+				OpenListViewItem(ht.iItem, OpenFolderDisposition::NewWindow);
+			}
+			else if (IsKeyDown(VK_CONTROL) && IsKeyDown(VK_SHIFT))
+			{
+				OpenListViewItem(ht.iItem, OpenFolderDisposition::ForegroundTab);
 			}
 			else
 			{
-				OpenListViewItem(ht.iItem, FALSE, FALSE);
+				OpenListViewItem(ht.iItem);
 			}
 		}
 	}
@@ -945,7 +957,7 @@ int Explorerplusplus::HighlightSimilarFiles(HWND ListView) const
 	return nSimilar;
 }
 
-void Explorerplusplus::OpenAllSelectedItems(BOOL bOpenInNewTab)
+void Explorerplusplus::OpenAllSelectedItems(OpenFolderDisposition openFolderDisposition)
 {
 	BOOL bSeenDirectory = FALSE;
 	DWORD dwAttributes;
@@ -963,22 +975,18 @@ void Explorerplusplus::OpenAllSelectedItems(BOOL bOpenInNewTab)
 		}
 		else
 		{
-			OpenListViewItem(iItem, FALSE, FALSE);
+			OpenListViewItem(iItem);
 		}
 	}
 
 	if (bSeenDirectory)
-		OpenListViewItem(iFolderItem, bOpenInNewTab, FALSE);
+	{
+		OpenListViewItem(iFolderItem, openFolderDisposition);
+	}
 }
 
-void Explorerplusplus::OpenListViewItem(int iItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow)
+void Explorerplusplus::OpenListViewItem(int index, OpenFolderDisposition openFolderDisposition)
 {
-	auto pidl = m_pActiveShellBrowser->GetDirectoryIdl();
-	auto ridl = m_pActiveShellBrowser->GetItemChildIdl(iItem);
-
-	if (ridl != nullptr)
-	{
-		unique_pidl_absolute pidlComplete(ILCombine(pidl.get(), ridl.get()));
-		OpenItem(pidlComplete.get(), bOpenInNewTab, bOpenInNewWindow);
-	}
+	auto pidlComplete = m_pActiveShellBrowser->GetItemCompleteIdl(index);
+	OpenItem(pidlComplete.get(), openFolderDisposition);
 }

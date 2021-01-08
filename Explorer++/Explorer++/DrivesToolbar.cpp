@@ -416,7 +416,7 @@ BOOL DrivesToolbar::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 
 	if (StrCmpI(szCmd, _T("open")) == 0)
 	{
-		m_pexpp->OpenItem(pidlParent, FALSE, FALSE);
+		m_pexpp->OpenItem(pidlParent);
 		return TRUE;
 	}
 

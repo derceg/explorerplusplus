@@ -209,7 +209,7 @@ void AddressBar::OnGo()
 	DecodePath(
 		path.c_str(), currentDirectory.c_str(), szFullFilePath, SIZEOF_ARRAY(szFullFilePath));
 
-	m_expp->OpenItem(szFullFilePath, FALSE, FALSE);
+	m_expp->OpenItem(szFullFilePath);
 }
 
 void AddressBar::OnBeginDrag()

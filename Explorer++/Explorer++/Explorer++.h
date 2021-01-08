@@ -400,11 +400,16 @@ private:
 
 	/* File operations. */
 	void CopyToFolder(bool move);
-	void OpenAllSelectedItems(BOOL bOpenInNewTab);
-	void OpenListViewItem(int iItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
-	void OpenItem(const TCHAR *szItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow) override;
-	void OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow) override;
-	void OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
+	void OpenAllSelectedItems(
+		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
+	void OpenListViewItem(
+		int index, OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
+	void OpenItem(const TCHAR *itemPath,
+		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) override;
+	void OpenItem(PCIDLIST_ABSOLUTE pidlItem,
+		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) override;
+	void OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
+		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
 	void OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters) override;
 
 	/* File context menu. */

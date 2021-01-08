@@ -73,19 +73,16 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 
 	if (StrCmpI(szCmd, _T("open")) == 0)
 	{
-		/* If ppidl is NULL, open the item specified by pidlParent
-		in the current listview. If ppidl is not NULL, open each
-		of the items specified in ppidl. */
 		if (pidlItems.empty())
 		{
-			OpenItem(pidlParent, FALSE, FALSE);
+			OpenItem(pidlParent);
 		}
 		else
 		{
 			for (const auto &pidl : pidlItems)
 			{
 				unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidl));
-				OpenItem(pidlComplete.get(), FALSE, FALSE);
+				OpenItem(pidlComplete.get());
 			}
 		}
 

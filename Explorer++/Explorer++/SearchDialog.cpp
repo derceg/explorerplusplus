@@ -657,7 +657,7 @@ BOOL SearchDialog::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		for (auto pidlItem : pidlItems)
 		{
 			unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItem));
-			m_pexpp->OpenItem(pidlComplete.get(), FALSE, FALSE);
+			m_pexpp->OpenItem(pidlComplete.get());
 		}
 
 		return TRUE;
@@ -718,7 +718,7 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 
 					if (hr == S_OK)
 					{
-						m_pexpp->OpenItem(pidlFull.get(), FALSE, FALSE);
+						m_pexpp->OpenItem(pidlFull.get());
 					}
 				}
 			}
