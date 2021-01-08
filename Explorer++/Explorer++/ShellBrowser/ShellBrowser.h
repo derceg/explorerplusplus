@@ -407,7 +407,7 @@ private:
 
 	/* Listview. */
 	void OnListViewMButtonDown(const POINT *pt);
-	void OnListViewMButtonUp(const POINT *pt);
+	void OnListViewMButtonUp(const POINT *pt, UINT keysDown);
 	void OnListViewGetDisplayInfo(LPARAM lParam);
 	LRESULT OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip);
 	void QueueInfoTipTask(int internalIndex, const std::wstring &existingInfoTip);

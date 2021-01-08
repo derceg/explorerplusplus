@@ -71,7 +71,7 @@ LRESULT CALLBACK ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 	{
 		POINT pt;
 		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-		OnListViewMButtonUp(&pt);
+		OnListViewMButtonUp(&pt, static_cast<UINT>(wParam));
 	}
 	break;
 
@@ -201,7 +201,7 @@ void ShellBrowser::OnListViewMButtonDown(const POINT *pt)
 	}
 }
 
-void ShellBrowser::OnListViewMButtonUp(const POINT *pt)
+void ShellBrowser::OnListViewMButtonUp(const POINT *pt, UINT keysDown)
 {
 	LV_HITTESTINFO ht;
 	ht.pt = *pt;
@@ -227,7 +227,14 @@ void ShellBrowser::OnListViewMButtonUp(const POINT *pt)
 		return;
 	}
 
-	m_tabNavigation->CreateNewTab(itemInfo.pidlComplete.get(), false);
+	bool switchToNewTab = false;
+
+	if (WI_IsFlagSet(keysDown, MK_SHIFT))
+	{
+		switchToNewTab = true;
+	}
+
+	m_tabNavigation->CreateNewTab(itemInfo.pidlComplete.get(), switchToNewTab);
 }
 
 void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
