@@ -12,6 +12,7 @@
 #include "../Helper/WindowSubclassWrapper.h"
 #include <wil/com.h>
 #include <wil/resource.h>
+#include <optional>
 #include <unordered_map>
 
 struct Config;
@@ -105,6 +106,8 @@ private:
 	void OnUseLargeToolbarIconsUpdated(BOOL newValue);
 
 	void OnClipboardUpdate();
+	void OnMButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT keysDown);
+	void OnMButtonUp(HWND hwnd, int x, int y, UINT keysDown);
 
 	MainToolbarPersistentSettings *m_persistentSettings;
 
@@ -122,4 +125,6 @@ private:
 
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
+
+	std::optional<int> m_middleButtonItem;
 };

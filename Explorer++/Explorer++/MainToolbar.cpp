@@ -233,6 +233,9 @@ LRESULT CALLBACK MainToolbar::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
 {
 	switch (msg)
 	{
+		HANDLE_MSG(hwnd, WM_MBUTTONDOWN, OnMButtonDown);
+		HANDLE_MSG(hwnd, WM_MBUTTONUP, OnMButtonUp);
+
 	case WM_CLIPBOARDUPDATE:
 		OnClipboardUpdate();
 		return 0;
@@ -848,6 +851,93 @@ void MainToolbar::UpdateToolbarButtonStates()
 void MainToolbar::OnClipboardUpdate()
 {
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Paste, m_pexpp->CanPaste());
+}
+
+void MainToolbar::OnMButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT keysDown)
+{
+	UNREFERENCED_PARAMETER(hwnd);
+	UNREFERENCED_PARAMETER(doubleClick);
+	UNREFERENCED_PARAMETER(keysDown);
+
+	POINT pt = { x, y };
+	int index = static_cast<int>(SendMessage(m_hwnd, TB_HITTEST, 0, reinterpret_cast<LPARAM>(&pt)));
+
+	if (index >= 0)
+	{
+		m_middleButtonItem = index;
+	}
+	else
+	{
+		m_middleButtonItem.reset();
+	}
+}
+
+void MainToolbar::OnMButtonUp(HWND hwnd, int x, int y, UINT keysDown)
+{
+	UNREFERENCED_PARAMETER(hwnd);
+
+	POINT pt = { x, y };
+	int index = static_cast<int>(SendMessage(m_hwnd, TB_HITTEST, 0, reinterpret_cast<LPARAM>(&pt)));
+
+	if (index < 0 || !m_middleButtonItem || index != *m_middleButtonItem)
+	{
+		return;
+	}
+
+	TBBUTTON tbButton;
+	BOOL res = static_cast<BOOL>(
+		SendMessage(m_hwnd, TB_GETBUTTON, index, reinterpret_cast<LPARAM>(&tbButton)));
+
+	if (!res)
+	{
+		return;
+	}
+
+	if (tbButton.idCommand == 0)
+	{
+		// Separator.
+		return;
+	}
+
+	if (tbButton.idCommand == ToolbarButton::Back || tbButton.idCommand == ToolbarButton::Forward)
+	{
+		const Tab &tab = m_pexpp->GetTabContainer()->GetSelectedTab();
+		HistoryEntry *entry = nullptr;
+
+		if (tbButton.idCommand == ToolbarButton::Back)
+		{
+			entry = tab.GetShellBrowser()->GetNavigationController()->GetEntry(-1);
+		}
+		else
+		{
+			entry = tab.GetShellBrowser()->GetNavigationController()->GetEntry(1);
+		}
+
+		if (!entry)
+		{
+			return;
+		}
+
+		m_pexpp->GetTabContainer()->CreateNewTab(
+			entry->GetPidl().get(), TabSettings(_selected = WI_IsFlagSet(keysDown, MK_SHIFT)));
+	}
+	else if (tbButton.idCommand == ToolbarButton::Up)
+	{
+		const Tab &tab = m_pexpp->GetTabContainer()->GetSelectedTab();
+		auto *currentEntry = tab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
+
+		unique_pidl_absolute pidlParent;
+		HRESULT hr =
+			GetVirtualParentPath(currentEntry->GetPidl().get(), wil::out_param(pidlParent));
+
+		if (FAILED(hr))
+		{
+			return;
+		}
+
+		m_pexpp->GetTabContainer()->CreateNewTab(
+			pidlParent.get(), TabSettings(_selected = WI_IsFlagSet(keysDown, MK_SHIFT)));
+	}
 }
 
 void MainToolbar::OnTabSelected(const Tab &tab)
