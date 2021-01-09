@@ -431,7 +431,7 @@ void DrivesToolbar::HandleCustomMenuItem(
 	switch (iCmd)
 	{
 	case MENU_ID_OPEN_IN_NEW_TAB:
-		m_pexpp->GetTabContainer()->CreateNewTab(pidlParent, TabSettings(_selected = true));
+		m_pexpp->GetTabContainer()->CreateNewTab(pidlParent);
 		break;
 	}
 }

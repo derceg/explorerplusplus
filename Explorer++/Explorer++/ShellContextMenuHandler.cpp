@@ -142,25 +142,11 @@ void Explorerplusplus::HandleCustomMenuItem(
 	{
 	case MENU_OPEN_IN_NEW_TAB:
 	{
-		unique_pidl_absolute pidlComplete;
-		BOOL bOpenInNewTab;
+		// This menu item should only be added when a single folder is selected.
+		assert(pidlItems.size() == 1);
 
-		if (!pidlItems.empty())
-		{
-			pidlComplete.reset(ILCombine(pidlParent, pidlItems[0]));
-
-			bOpenInNewTab = FALSE;
-		}
-		else
-		{
-			pidlComplete.reset(ILCloneFull(pidlParent));
-
-			bOpenInNewTab = TRUE;
-		}
-
-		std::wstring parsingPath;
-		GetDisplayName(pidlComplete.get(), SHGDN_FORPARSING, parsingPath);
-		m_tabContainer->CreateNewTab(parsingPath.c_str(), TabSettings(_selected = true));
+		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
+		m_tabContainer->CreateNewTab(pidlComplete.get());
 
 		m_bTreeViewOpenInNewTab = true;
 	}
