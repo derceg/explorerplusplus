@@ -24,7 +24,7 @@ void ShellBrowser::DirectoryAltered()
 
 	bNewItemCreated = m_bNewItemCreated;
 
-	SendMessage(m_hListView, WM_SETREDRAW, (WPARAM) FALSE, (LPARAM) NULL);
+	SendMessage(m_hListView, WM_SETREDRAW, FALSE, NULL);
 
 	LOG(debug) << _T("ShellBrowser - Starting directory change update for \"")
 			   << m_directoryState.directory << _T("\"");
@@ -89,7 +89,7 @@ void ShellBrowser::DirectoryAltered()
 	LOG(debug) << _T("ShellBrowser - Finished directory change update for \"")
 			   << m_directoryState.directory << _T("\"");
 
-	SendMessage(m_hListView, WM_SETREDRAW, (WPARAM) TRUE, (LPARAM) NULL);
+	SendMessage(m_hListView, WM_SETREDRAW, TRUE, NULL);
 
 	/* Ensure the first dropped item is visible. */
 	if (m_iDropped != -1)
@@ -151,7 +151,7 @@ void CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 
 	KillTimer(hwnd, idEvent);
 
-	SendMessage(hwnd, WM_USER_FILESADDED, (WPARAM) idEvent, 0);
+	SendMessage(hwnd, WM_USER_FILESADDED, idEvent, 0);
 }
 
 void ShellBrowser::FilesModified(DWORD Action, const TCHAR *FileName, int EventId, int iFolderIndex)

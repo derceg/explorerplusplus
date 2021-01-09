@@ -521,8 +521,7 @@ void Explorerplusplus::UpdateTreeViewSelection()
 				m_bSelectingTreeViewDirectory = true;
 			}
 
-			SendMessage(
-				m_shellTreeView->GetHWND(), TVM_SELECTITEM, (WPARAM) TVGN_CARET, (LPARAM) hItem);
+			SendMessage(m_shellTreeView->GetHWND(), TVM_SELECTITEM, TVGN_CARET, (LPARAM) hItem);
 		}
 	}
 }

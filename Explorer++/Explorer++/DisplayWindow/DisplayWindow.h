@@ -31,7 +31,7 @@
 #define DWM_SETLINE (DWM_BASE + 17)
 
 #define DisplayWindow_SetThumbnailFile(hDisplay, FileName, bShowImage)                             \
-	SendMessage(hDisplay, DWM_SETTHUMBNAILFILE, (WPARAM) FileName, (LPARAM) bShowImage)
+	SendMessage(hDisplay, DWM_SETTHUMBNAILFILE, (WPARAM) FileName, bShowImage)
 
 #define DisplayWindow_GetSurroundColor(hDisplay) SendMessage(hDisplay, DWM_GETSURROUNDCOLOR, 0, 0)
 
@@ -49,13 +49,12 @@
 	SendMessage(hDisplay, DWM_SETTEXTCOLOR, hColor, 0)
 
 #define DisplayWindow_BufferText(hDisplay, szText)                                                 \
-	SendMessage(hDisplay, DWM_BUFFERTEXT, (WPARAM) 0, (LPARAM) szText)
+	SendMessage(hDisplay, DWM_BUFFERTEXT, 0, (LPARAM) szText)
 
-#define DisplayWindow_ClearTextBuffer(hDisplay)                                                    \
-	SendMessage(hDisplay, DWM_CLEARTEXTBUFFER, (WPARAM) 0, (LPARAM) 0)
+#define DisplayWindow_ClearTextBuffer(hDisplay) SendMessage(hDisplay, DWM_CLEARTEXTBUFFER, 0, 0)
 
 #define DisplayWindow_SetLine(hDisplay, iLine, szText)                                             \
-	SendMessage(hDisplay, DWM_SETLINE, (WPARAM) iLine, (LPARAM) szText)
+	SendMessage(hDisplay, DWM_SETLINE, iLine, (LPARAM) szText)
 
 #define WM_USER_DISPLAYWINDOWMOVED (WM_APP + 99)
 #define WM_USER_DISPLAYWINDOWRESIZED (WM_APP + 100)

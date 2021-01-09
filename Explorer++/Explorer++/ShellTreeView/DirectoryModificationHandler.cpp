@@ -440,7 +440,7 @@ void ShellTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileNam
 					tvItem.pszText			= displayName.data();
 					tvItem.iImage			= shfi.iIcon;
 					tvItem.iSelectedImage	= shfi.iIcon;
-					tvItem.lParam			= (LPARAM)iItemId;
+					tvItem.lParam			= iItemId;
 					tvItem.cChildren		= nChildren;
 
 					if(hParent != nullptr)

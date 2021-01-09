@@ -1109,7 +1109,7 @@ HTREEITEM ShellTreeView::LocateItemInternal(
 				}
 				else
 				{
-					SendMessage(m_hTreeView, TVM_EXPAND, (WPARAM) TVE_EXPAND, (LPARAM) hItem);
+					SendMessage(m_hTreeView, TVM_EXPAND, TVE_EXPAND, (LPARAM) hItem);
 				}
 			}
 
@@ -1191,7 +1191,7 @@ HTREEITEM ShellTreeView::LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand)
 		if (TreeView_GetChild(m_hTreeView, hItem) == nullptr)
 		{
 			if (bExpand)
-				SendMessage(m_hTreeView, TVM_EXPAND, (WPARAM) TVE_EXPAND, (LPARAM) hItem);
+				SendMessage(m_hTreeView, TVM_EXPAND, TVE_EXPAND, (LPARAM) hItem);
 			else
 				return nullptr;
 		}

@@ -168,7 +168,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 
 			GetClientRect(m_hContainer,&rc);
 
-			SendMessage(m_hContainer,WM_SIZE,SIZE_RESTORED,(LPARAM)MAKELPARAM(rc.right,rc.bottom));
+			SendMessage(m_hContainer,WM_SIZE,SIZE_RESTORED,MAKELPARAM(rc.right,rc.bottom));
 		}
 		break;
 

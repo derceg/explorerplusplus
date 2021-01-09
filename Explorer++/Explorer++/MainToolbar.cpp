@@ -135,7 +135,7 @@ void MainToolbar::Initialize(HWND parent)
 	// the ToolbarButton enum contains one additional item - for the separator.
 	assert(TOOLBAR_BUTTON_ICON_MAPPINGS.size() == (ToolbarButton::_size() - 1));
 
-	SendMessage(m_hwnd, TB_BUTTONSTRUCTSIZE, (WPARAM) sizeof(TBBUTTON), 0);
+	SendMessage(m_hwnd, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
 
 	SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList));
 

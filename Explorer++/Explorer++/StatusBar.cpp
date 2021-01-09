@@ -97,11 +97,11 @@ void Explorerplusplus::OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pid
 
 	/* Browsing of a folder has started. Set the status bar text to indicate that
 	the folder is being loaded. */
-	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 0 | 0, (LPARAM) szLoadingText);
+	SendMessage(m_hStatusBar, SB_SETTEXT, 0 | 0, (LPARAM) szLoadingText);
 
 	/* Clear the text in all other parts of the status bar. */
-	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 1 | 0, (LPARAM) EMPTY_STRING);
-	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 2 | 0, (LPARAM) EMPTY_STRING);
+	SendMessage(m_hStatusBar, SB_SETTEXT, 1 | 0, (LPARAM) EMPTY_STRING);
+	SendMessage(m_hStatusBar, SB_SETTEXT, 2 | 0, (LPARAM) EMPTY_STRING);
 }
 
 HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
@@ -168,7 +168,7 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 		}
 	}
 
-	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 0 | 0, (LPARAM) szItemsSelected);
+	SendMessage(m_hStatusBar, SB_SETTEXT, 0 | 0, (LPARAM) szItemsSelected);
 
 	if (tab.GetShellBrowser()->InVirtualFolder())
 	{
@@ -204,7 +204,7 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 		}
 	}
 
-	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 1 | 0, (LPARAM) lpszSizeBuffer);
+	SendMessage(m_hStatusBar, SB_SETTEXT, 1 | 0, (LPARAM) lpszSizeBuffer);
 
 	res = CreateDriveFreeSpaceString(m_CurrentDirectory.c_str(), szBuffer, SIZEOF_ARRAY(szBuffer));
 
@@ -213,7 +213,7 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 		StringCchCopy(szBuffer, SIZEOF_ARRAY(szBuffer), EMPTY_STRING);
 	}
 
-	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 2 | 0, (LPARAM) szBuffer);
+	SendMessage(m_hStatusBar, SB_SETTEXT, 2 | 0, (LPARAM) szBuffer);
 
 	return S_OK;
 }

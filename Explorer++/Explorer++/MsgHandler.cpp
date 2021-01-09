@@ -674,7 +674,7 @@ void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
 
 	RECT rc;
 	GetClientRect(m_hContainer, &rc);
-	SendMessage(m_hContainer, WM_SIZE, SIZE_RESTORED, (LPARAM) MAKELPARAM(rc.right, rc.bottom));
+	SendMessage(m_hContainer, WM_SIZE, SIZE_RESTORED, MAKELPARAM(rc.right, rc.bottom));
 }
 
 /*
