@@ -234,18 +234,24 @@ void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *
 // If it's a bookmark folder, each of its children will be opened in new
 // tabs.
 void BookmarkHelper::OpenBookmarkItemInNewTab(
-	const BookmarkItem *bookmarkItem, IExplorerplusplus *expp)
+	const BookmarkItem *bookmarkItem, IExplorerplusplus *expp, bool switchToNewTab)
 {
 	if (bookmarkItem->IsFolder())
 	{
 		for (auto &childItem : bookmarkItem->GetChildren() | boost::adaptors::filtered(IsBookmark))
 		{
-			expp->GetTabContainer()->CreateNewTab(childItem->GetLocation().c_str());
+			expp->GetTabContainer()->CreateNewTab(
+				childItem->GetLocation().c_str(), TabSettings(_selected = switchToNewTab));
+
+			// When opening a set of bookmarks within a folder, only the first item should be
+			// switched to.
+			switchToNewTab = false;
 		}
 	}
 	else
 	{
-		expp->GetTabContainer()->CreateNewTab(bookmarkItem->GetLocation().c_str());
+		expp->GetTabContainer()->CreateNewTab(
+			bookmarkItem->GetLocation().c_str(), TabSettings(_selected = switchToNewTab));
 	}
 }
 

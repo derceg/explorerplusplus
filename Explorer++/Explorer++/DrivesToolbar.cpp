@@ -77,24 +77,33 @@ void DrivesToolbar::Initialize(HWND hParent)
 	}
 }
 
-INT_PTR DrivesToolbar::OnMButtonUp(const POINTS *pts)
+INT_PTR DrivesToolbar::OnMButtonUp(const POINTS *pts, UINT keysDown)
 {
 	POINT pt;
 	POINTSTOPOINT(pt, *pts);
 	int iIndex =
 		static_cast<int>(SendMessage(m_hwnd, TB_HITTEST, 0, reinterpret_cast<LPARAM>(&pt)));
 
-	if (iIndex >= 0)
+	if (iIndex < 0)
 	{
-		TBBUTTON tbButton;
-		SendMessage(m_hwnd, TB_GETBUTTON, iIndex, reinterpret_cast<LPARAM>(&tbButton));
-
-		auto itr = m_mapID.find(static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData)));
-		assert(itr != m_mapID.end());
-
-		m_pexpp->GetTabContainer()->CreateNewTab(
-			itr->second.c_str(), TabSettings(_selected = true));
+		return 0;
 	}
+
+	TBBUTTON tbButton;
+	SendMessage(m_hwnd, TB_GETBUTTON, iIndex, reinterpret_cast<LPARAM>(&tbButton));
+
+	auto itr = m_mapID.find(static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData)));
+	assert(itr != m_mapID.end());
+
+	bool switchToNewTab = false;
+
+	if (WI_IsFlagSet(keysDown, MK_SHIFT))
+	{
+		switchToNewTab = true;
+	}
+
+	m_pexpp->GetTabContainer()->CreateNewTab(
+		itr->second.c_str(), TabSettings(_selected = switchToNewTab));
 
 	return 0;
 }
