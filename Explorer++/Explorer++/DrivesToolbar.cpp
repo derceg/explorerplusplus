@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "DrivesToolbar.h"
+#include "Config.h"
 #include "CoreInterface.h"
 #include "DarkModeHelper.h"
 #include "MainResource.h"
@@ -95,11 +96,11 @@ INT_PTR DrivesToolbar::OnMButtonUp(const POINTS *pts, UINT keysDown)
 	auto itr = m_mapID.find(static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData)));
 	assert(itr != m_mapID.end());
 
-	bool switchToNewTab = false;
+	bool switchToNewTab = m_pexpp->GetConfig()->openTabsInForeground;
 
 	if (WI_IsFlagSet(keysDown, MK_SHIFT))
 	{
-		switchToNewTab = true;
+		switchToNewTab = !switchToNewTab;
 	}
 
 	m_pexpp->GetTabContainer()->CreateNewTab(
@@ -440,7 +441,8 @@ void DrivesToolbar::HandleCustomMenuItem(
 	switch (iCmd)
 	{
 	case MENU_ID_OPEN_IN_NEW_TAB:
-		m_pexpp->GetTabContainer()->CreateNewTab(pidlParent);
+		m_pexpp->GetTabContainer()->CreateNewTab(
+			pidlParent, TabSettings(_selected = m_pexpp->GetConfig()->openTabsInForeground));
 		break;
 	}
 }

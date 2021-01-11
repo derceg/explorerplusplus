@@ -411,6 +411,7 @@ private:
 	void OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
 	void OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters) override;
+	OpenFolderDisposition DetermineOpenDisposition(bool isCtrlKeyDown, bool isShiftKeyDown);
 
 	/* File context menu. */
 	void AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems,

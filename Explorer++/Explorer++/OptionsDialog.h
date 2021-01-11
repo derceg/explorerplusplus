@@ -30,7 +30,8 @@ private:
 	enum class AdvancedOptionId
 	{
 		CheckSystemIsPinnedToNameSpaceTree,
-		EnableDarkMode
+		EnableDarkMode,
+		OpenTabsInForeground
 	};
 
 	enum class AdvancedOptionType

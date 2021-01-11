@@ -9,6 +9,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "Config.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -146,7 +147,8 @@ void Explorerplusplus::HandleCustomMenuItem(
 		assert(pidlItems.size() == 1);
 
 		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
-		m_tabContainer->CreateNewTab(pidlComplete.get());
+		m_tabContainer->CreateNewTab(
+			pidlComplete.get(), TabSettings(_selected = m_config->openTabsInForeground));
 
 		m_bTreeViewOpenInNewTab = true;
 	}

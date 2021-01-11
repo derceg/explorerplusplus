@@ -10,6 +10,7 @@
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/AddBookmarkDialog.h"
+#include "Config.h"
 #include "CoreInterface.h"
 #include "DarkModeHelper.h"
 #include "MainResource.h"
@@ -245,11 +246,11 @@ void BookmarksToolbar::OnMButtonUp(const POINT &pt, UINT keysDown)
 		return;
 	}
 
-	bool switchToNewTab = false;
+	bool switchToNewTab = m_pexpp->GetConfig()->openTabsInForeground;
 
 	if (WI_IsFlagSet(keysDown, MK_SHIFT))
 	{
-		switchToNewTab = true;
+		switchToNewTab = !switchToNewTab;
 	}
 
 	BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_pexpp, switchToNewTab);

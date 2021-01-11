@@ -227,11 +227,11 @@ void ShellBrowser::OnListViewMButtonUp(const POINT *pt, UINT keysDown)
 		return;
 	}
 
-	bool switchToNewTab = false;
+	bool switchToNewTab = m_config->openTabsInForeground;
 
 	if (WI_IsFlagSet(keysDown, MK_SHIFT))
 	{
-		switchToNewTab = true;
+		switchToNewTab = !switchToNewTab;
 	}
 
 	m_tabNavigation->CreateNewTab(itemInfo.pidlComplete.get(), switchToNewTab);

@@ -83,6 +83,7 @@ struct Config
 
 		alwaysShowTabBar.set(TRUE);
 		forceSameTabWidth.set(FALSE);
+		openTabsInForeground = false;
 
 		displayWindowSurroundColor = Gdiplus::Color(0, 94, 138);
 		displayWindowCentreColor = Gdiplus::Color(255, 255, 255);
@@ -190,6 +191,7 @@ struct Config
 	// Tabs
 	ValueWrapper<BOOL> alwaysShowTabBar;
 	ValueWrapper<BOOL> forceSameTabWidth;
+	bool openTabsInForeground;
 
 	// Display window
 	Gdiplus::Color displayWindowCentreColor;

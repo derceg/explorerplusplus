@@ -1789,6 +1789,14 @@ std::vector<OptionsDialog::AdvancedOption> OptionsDialog::InitializeAdvancedOpti
 		ResourceHelper::LoadString(m_instance, IDS_ADVANCED_OPTION_ENABLE_DARK_MODE_DESCRIPTION);
 	advancedOptions.push_back(option);
 
+	option.id = AdvancedOptionId::OpenTabsInForeground;
+	option.name =
+		ResourceHelper::LoadString(m_instance, IDS_ADVANCED_OPTION_OPEN_TABS_IN_FOREGROUND_NAME);
+	option.type = AdvancedOptionType::Boolean;
+	option.description = ResourceHelper::LoadString(
+		m_instance, IDS_ADVANCED_OPTION_OPEN_TABS_IN_FOREGROUND_DESCRIPTION);
+	advancedOptions.push_back(option);
+
 	return advancedOptions;
 }
 
@@ -1834,6 +1842,9 @@ bool OptionsDialog::GetBooleanConfigValue(OptionsDialog::AdvancedOptionId id)
 	case AdvancedOptionId::EnableDarkMode:
 		return m_config->enableDarkMode;
 
+	case AdvancedOptionId::OpenTabsInForeground:
+		return m_config->openTabsInForeground;
+
 	default:
 		assert(false);
 		break;
@@ -1852,6 +1863,10 @@ void OptionsDialog::SetBooleanConfigValue(OptionsDialog::AdvancedOptionId id, bo
 
 	case AdvancedOptionId::EnableDarkMode:
 		m_config->enableDarkMode = value;
+		break;
+
+	case AdvancedOptionId::OpenTabsInForeground:
+		m_config->openTabsInForeground = value;
 		break;
 
 	default:

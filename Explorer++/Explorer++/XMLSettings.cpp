@@ -115,6 +115,7 @@ will need to be changed correspondingly. */
 #define HASH_ENABLE_DARK_MODE 1623404723
 #define HASH_DISPLAY_MIXED_FILES_AND_FOLDERS 1168704423
 #define HASH_USE_NATURAL_SORT_ORDER 528323501
+#define HASH_OPEN_TABS_IN_FOREGROUND 2957281235
 
 struct ColumnXMLSaveData
 {
@@ -732,6 +733,10 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("UseNaturalSortOrder"),
 		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.useNaturalSortOrder));
+
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("OpenTabsInForeground"),
+		NXMLSettings::EncodeBoolValue(m_config->openTabsInForeground));
 
 	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pe.get());
@@ -1822,6 +1827,10 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 	case HASH_USE_NATURAL_SORT_ORDER:
 		m_config->globalFolderSettings.useNaturalSortOrder =
 			NXMLSettings::DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_OPEN_TABS_IN_FOREGROUND:
+		m_config->openTabsInForeground = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 	}
 }

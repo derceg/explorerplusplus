@@ -928,9 +928,11 @@ void MainToolbar::OnMButtonUp(HWND hwnd, int x, int y, UINT keysDown)
 		return;
 	}
 
+	const Tab &tab = m_pexpp->GetTabContainer()->GetSelectedTab();
+	unique_pidl_absolute pidl;
+
 	if (tbButton.idCommand == ToolbarButton::Back || tbButton.idCommand == ToolbarButton::Forward)
 	{
-		const Tab &tab = m_pexpp->GetTabContainer()->GetSelectedTab();
 		HistoryEntry *entry = nullptr;
 
 		if (tbButton.idCommand == ToolbarButton::Back)
@@ -947,12 +949,10 @@ void MainToolbar::OnMButtonUp(HWND hwnd, int x, int y, UINT keysDown)
 			return;
 		}
 
-		m_pexpp->GetTabContainer()->CreateNewTab(
-			entry->GetPidl().get(), TabSettings(_selected = WI_IsFlagSet(keysDown, MK_SHIFT)));
+		pidl = entry->GetPidl();
 	}
 	else if (tbButton.idCommand == ToolbarButton::Up)
 	{
-		const Tab &tab = m_pexpp->GetTabContainer()->GetSelectedTab();
 		auto *currentEntry = tab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
 
 		unique_pidl_absolute pidlParent;
@@ -964,9 +964,22 @@ void MainToolbar::OnMButtonUp(HWND hwnd, int x, int y, UINT keysDown)
 			return;
 		}
 
-		m_pexpp->GetTabContainer()->CreateNewTab(
-			pidlParent.get(), TabSettings(_selected = WI_IsFlagSet(keysDown, MK_SHIFT)));
+		pidl = std::move(pidlParent);
 	}
+
+	if (!pidl)
+	{
+		return;
+	}
+
+	bool switchToNewTab = m_config->openTabsInForeground;
+
+	if (WI_IsFlagSet(keysDown, MK_SHIFT))
+	{
+		switchToNewTab = !switchToNewTab;
+	}
+
+	m_pexpp->GetTabContainer()->CreateNewTab(pidl.get(), TabSettings(_selected = switchToNewTab));
 }
 
 void MainToolbar::OnTabSelected(const Tab &tab)

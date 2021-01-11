@@ -538,7 +538,8 @@ void BookmarkListView::OnDblClk(const NMITEMACTIVATE *itemActivate)
 	}
 	else
 	{
-		BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_expp, false);
+		BookmarkHelper::OpenBookmarkItemInNewTab(
+			bookmarkItem, m_expp, m_expp->GetConfig()->openTabsInForeground);
 	}
 }
 
@@ -914,9 +915,13 @@ void BookmarkListView::OnEnterPressed()
 	}
 	else
 	{
+		bool switchToNewTab = m_expp->GetConfig()->openTabsInForeground;
+
 		for (BookmarkItem *bookmarkItem : bookmarkItems)
 		{
-			BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_expp, false);
+			BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_expp, switchToNewTab);
+
+			switchToNewTab = false;
 		}
 	}
 }

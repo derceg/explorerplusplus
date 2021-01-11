@@ -181,8 +181,9 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 			hSettingsKey, _T("NewTabDirectory"), m_config->defaultTabDirectory.c_str());
 
 		RegistrySettings::SaveDword(hSettingsKey, _T("IconTheme"), m_config->iconTheme);
-
 		RegistrySettings::SaveDword(hSettingsKey, _T("Language"), m_config->language);
+		RegistrySettings::SaveDword(
+			hSettingsKey, _T("OpenTabsInForeground"), m_config->openTabsInForeground);
 
 		RegistrySettings::SaveDword(hSettingsKey, _T("DisplayMixedFilesAndFolders"),
 			m_config->globalFolderSettings.displayMixedFilesAndFolders);
@@ -414,6 +415,9 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 			m_config->language = dwordValue;
 			m_bLanguageLoaded = true;
 		}
+
+		RegistrySettings::Read32BitValueFromRegistry(
+			hSettingsKey, _T("OpenTabsInForeground"), m_config->openTabsInForeground);
 
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey,
 			_T("DisplayMixedFilesAndFolders"),

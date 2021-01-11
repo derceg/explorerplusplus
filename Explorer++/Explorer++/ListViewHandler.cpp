@@ -277,21 +277,10 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 		{
 			m_pActiveShellBrowser->ShowPropertiesForSelectedFiles();
 		}
-		else if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT))
-		{
-			OpenAllSelectedItems(OpenFolderDisposition::BackgroundTab);
-		}
-		else if (!IsKeyDown(VK_CONTROL) && IsKeyDown(VK_SHIFT))
-		{
-			OpenAllSelectedItems(OpenFolderDisposition::NewWindow);
-		}
-		else if (IsKeyDown(VK_CONTROL) && IsKeyDown(VK_SHIFT))
-		{
-			OpenAllSelectedItems(OpenFolderDisposition::ForegroundTab);
-		}
 		else
 		{
-			OpenAllSelectedItems();
+			OpenAllSelectedItems(
+				DetermineOpenDisposition(IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT)));
 		}
 		break;
 
@@ -804,21 +793,10 @@ void Explorerplusplus::OnListViewDoubleClick(NMHDR *nmhdr)
 
 				ShowMultipleFileProperties(pidlDirectory.get(), items.data(), m_hContainer, 1);
 			}
-			else if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT))
-			{
-				OpenListViewItem(ht.iItem, OpenFolderDisposition::BackgroundTab);
-			}
-			else if (!IsKeyDown(VK_CONTROL) && IsKeyDown(VK_SHIFT))
-			{
-				OpenListViewItem(ht.iItem, OpenFolderDisposition::NewWindow);
-			}
-			else if (IsKeyDown(VK_CONTROL) && IsKeyDown(VK_SHIFT))
-			{
-				OpenListViewItem(ht.iItem, OpenFolderDisposition::ForegroundTab);
-			}
 			else
 			{
-				OpenListViewItem(ht.iItem);
+				OpenListViewItem(
+					ht.iItem, DetermineOpenDisposition(IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT)));
 			}
 		}
 	}
@@ -989,4 +967,40 @@ void Explorerplusplus::OpenListViewItem(int index, OpenFolderDisposition openFol
 {
 	auto pidlComplete = m_pActiveShellBrowser->GetItemCompleteIdl(index);
 	OpenItem(pidlComplete.get(), openFolderDisposition);
+}
+
+OpenFolderDisposition Explorerplusplus::DetermineOpenDisposition(
+	bool isCtrlKeyDown, bool isShiftKeyDown)
+{
+	if (isCtrlKeyDown && !isShiftKeyDown)
+	{
+		if (m_config->openTabsInForeground)
+		{
+			return OpenFolderDisposition::ForegroundTab;
+		}
+		else
+		{
+			return OpenFolderDisposition::BackgroundTab;
+		}
+	}
+	else if (!isCtrlKeyDown && isShiftKeyDown)
+	{
+		return OpenFolderDisposition::NewWindow;
+	}
+	else if (isCtrlKeyDown && isShiftKeyDown)
+	{
+		// Ctrl + Shift inverts the usual behavior.
+		if (m_config->openTabsInForeground)
+		{
+			return OpenFolderDisposition::BackgroundTab;
+		}
+		else
+		{
+			return OpenFolderDisposition::ForegroundTab;
+		}
+	}
+	else
+	{
+		return OpenFolderDisposition::CurrentTab;
+	}
 }
