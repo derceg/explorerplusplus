@@ -1333,10 +1333,17 @@ HRESULT GetItemInfoTip(PCIDLIST_ABSOLUTE pidlComplete, TCHAR *szInfoTip, size_t 
 		{
 			hr = pQueryInfo->GetInfoTip(QITIPF_USESLOWTIP, &ppwszTip);
 
-			if (SUCCEEDED(hr) && (ppwszTip != nullptr))
+			if (SUCCEEDED(hr))
 			{
-				StringCchCopy(szInfoTip, cchMax, ppwszTip);
-				CoTaskMemFree(ppwszTip);
+				if (ppwszTip)
+				{
+					StringCchCopy(szInfoTip, cchMax, ppwszTip);
+					CoTaskMemFree(ppwszTip);
+				}
+				else
+				{
+					StringCchCopy(szInfoTip, cchMax, _T(""));
+				}
 			}
 
 			pQueryInfo->Release();
