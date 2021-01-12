@@ -8,6 +8,7 @@
 #include "ViewModes.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/com.h>
+#include <thumbcache.h>
 #include <list>
 
 #define THUMBNAIL_TYPE_ICON 0
@@ -108,45 +109,34 @@ void ShellBrowser::QueueThumbnailTask(int internalIndex)
 std::optional<ShellBrowser::ThumbnailResult_t> ShellBrowser::FindThumbnailAsync(
 	HWND listView, int thumbnailResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo)
 {
-	wil::com_ptr_nothrow<IShellFolder> pShellFolder;
-	HRESULT hr =
-		SHBindToParent(basicItemInfo.pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), nullptr);
+	wil::com_ptr_nothrow<IShellItem> shellItem;
+	HRESULT hr = SHCreateItemFromIDList(basicItemInfo.pidlComplete.get(), IID_PPV_ARGS(&shellItem));
 
 	if (FAILED(hr))
 	{
 		return std::nullopt;
 	}
 
-	wil::com_ptr_nothrow<IExtractImage> pExtractImage;
-	auto pridl = basicItemInfo.pridl.get();
-	hr = GetUIObjectOf(pShellFolder.get(), nullptr, 1, const_cast<PCUITEMID_CHILD *>(&pridl),
-		IID_PPV_ARGS(&pExtractImage));
+	wil::com_ptr_nothrow<IThumbnailCache> thumbnailCache;
+	hr = CoCreateInstance(
+		CLSID_LocalThumbnailCache, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&thumbnailCache));
 
 	if (FAILED(hr))
 	{
 		return std::nullopt;
 	}
 
-	SIZE size;
-	size.cx = THUMBNAIL_ITEM_WIDTH;
-	size.cy = THUMBNAIL_ITEM_HEIGHT;
+	wil::com_ptr_nothrow<ISharedBitmap> sharedBitmap;
+	hr = thumbnailCache->GetThumbnail(shellItem.get(), THUMBNAIL_ITEM_WIDTH,
+		WTS_EXTRACT | WTS_SCALETOREQUESTEDSIZE, &sharedBitmap, nullptr, nullptr);
 
-	DWORD dwFlags = IEIFLAG_OFFLINE | IEIFLAG_QUALITY;
-
-	// As per the MSDN documentation, GetLocation must be called before
-	// Extract.
-	TCHAR szImage[MAX_PATH];
-	DWORD dwPriority;
-	hr = pExtractImage->GetLocation(
-		szImage, SIZEOF_ARRAY(szImage), &dwPriority, &size, 32, &dwFlags);
-
-	if (FAILED(hr) && hr != E_PENDING)
+	if (FAILED(hr))
 	{
 		return std::nullopt;
 	}
 
-	wil::unique_hbitmap thumbnailBitmap;
-	hr = pExtractImage->Extract(&thumbnailBitmap);
+	HBITMAP bitmap;
+	hr = sharedBitmap->GetSharedBitmap(&bitmap);
 
 	if (FAILED(hr))
 	{
@@ -155,9 +145,12 @@ std::optional<ShellBrowser::ThumbnailResult_t> ShellBrowser::FindThumbnailAsync(
 
 	PostMessage(listView, WM_APP_THUMBNAIL_RESULT_READY, thumbnailResultId, 0);
 
+	// Note that the bitmap is copied here, since it's owned by the ISharedBitmap instance. As soon
+	// as that instance is destroyed, the bitmap will be destroyed.
 	ThumbnailResult_t result;
 	result.itemInternalIndex = internalIndex;
-	result.bitmap = std::move(thumbnailBitmap);
+	result.bitmap.reset(
+		reinterpret_cast<HBITMAP>(CopyImage(bitmap, IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR)));
 
 	return result;
 }
