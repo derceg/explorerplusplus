@@ -34,11 +34,6 @@ void ShellBrowser::SetupThumbnailsView()
 
 	m_hListViewImageList = ListView_GetImageList(m_hListView, LVSIL_NORMAL);
 
-	ListView_SetExtendedListViewStyleEx(m_hListView, LVS_EX_BORDERSELECT, LVS_EX_BORDERSELECT);
-
-	ListView_SetIconSpacing(m_hListView, THUMBNAIL_ITEM_HORIZONTAL_SPACING + THUMBNAIL_ITEM_WIDTH,
-		THUMBNAIL_ITEM_VERTICAL_SPACING + THUMBNAIL_ITEM_HEIGHT);
-
 	himl = ImageList_Create(
 		THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT, ILC_COLOR32, nItems, nItems + 100);
 	ListView_SetImageList(m_hListView, himl, LVSIL_NORMAL);
@@ -61,12 +56,6 @@ void ShellBrowser::RemoveThumbnailsView()
 	HIMAGELIST himl;
 	int nItems;
 	int i = 0;
-
-	/* Remove item borders. */
-	ListView_SetExtendedListViewStyleEx(m_hListView, LVS_EX_BORDERSELECT, 0);
-
-	/* Reset to the default icon spacing. */
-	ListView_SetIconSpacing(m_hListView, -1, -1);
 
 	nItems = ListView_GetItemCount(m_hListView);
 

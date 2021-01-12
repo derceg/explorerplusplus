@@ -344,9 +344,6 @@ private:
 	>;
 	// clang-format on
 
-	static const int THUMBNAIL_ITEM_HORIZONTAL_SPACING = 20;
-	static const int THUMBNAIL_ITEM_VERTICAL_SPACING = 20;
-
 	static const UINT_PTR LISTVIEW_SUBCLASS_ID = 0;
 
 	static const UINT WM_APP_COLUMN_RESULT_READY = WM_APP + 150;
