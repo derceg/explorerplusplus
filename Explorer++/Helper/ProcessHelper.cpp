@@ -3,9 +3,8 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "Helper.h"
 #include "ProcessHelper.h"
-
+#include "Helper.h"
 
 DWORD GetProcessImageName(DWORD dwProcessId, TCHAR *szImageName, DWORD nSize)
 {
@@ -13,7 +12,7 @@ DWORD GetProcessImageName(DWORD dwProcessId, TCHAR *szImageName, DWORD nSize)
 
 	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, dwProcessId);
 
-	if(hProcess != nullptr)
+	if (hProcess != nullptr)
 	{
 		dwRet = GetModuleFileNameEx(hProcess, nullptr, szImageName, nSize);
 		CloseHandle(hProcess);
@@ -28,25 +27,26 @@ BOOL GetProcessOwner(DWORD dwProcessId, TCHAR *szOwner, size_t cchMax)
 
 	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, dwProcessId);
 
-	if(hProcess != nullptr)
+	if (hProcess != nullptr)
 	{
 		HANDLE hToken;
 		BOOL bRet = OpenProcessToken(hProcess, TOKEN_QUERY, &hToken);
 
-		if(bRet)
+		if (bRet)
 		{
 			DWORD dwSize = 0;
 			bRet = GetTokenInformation(hToken, TokenUser, nullptr, 0, &dwSize);
 
-			if(!bRet && GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+			if (!bRet && GetLastError() == ERROR_INSUFFICIENT_BUFFER)
 			{
 				auto *pTokenUser = reinterpret_cast<TOKEN_USER *>(GlobalAlloc(GMEM_FIXED, dwSize));
 
-				if(pTokenUser != nullptr)
+				if (pTokenUser != nullptr)
 				{
-					bRet = GetTokenInformation(hToken, TokenUser, reinterpret_cast<LPVOID>(pTokenUser), dwSize, &dwSize);
+					bRet = GetTokenInformation(
+						hToken, TokenUser, reinterpret_cast<LPVOID>(pTokenUser), dwSize, &dwSize);
 
-					if(bRet)
+					if (bRet)
 					{
 						success = FormatUserName(pTokenUser->User.Sid, szOwner, cchMax);
 					}
@@ -70,23 +70,23 @@ BOOL SetProcessTokenPrivilege(DWORD dwProcessId, const TCHAR *PrivilegeName, BOO
 
 	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, dwProcessId);
 
-	if(hProcess != nullptr)
+	if (hProcess != nullptr)
 	{
 		HANDLE hToken;
 		BOOL bRet = OpenProcessToken(hProcess, TOKEN_ADJUST_PRIVILEGES, &hToken);
 
-		if(bRet)
+		if (bRet)
 		{
 			LUID luid;
 			bRet = LookupPrivilegeValue(nullptr, PrivilegeName, &luid);
 
-			if(bRet)
+			if (bRet)
 			{
 				TOKEN_PRIVILEGES tp;
 				tp.PrivilegeCount = 1;
 				tp.Privileges[0].Luid = luid;
 
-				if(bEnablePrivilege)
+				if (bEnablePrivilege)
 				{
 					tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
 				}

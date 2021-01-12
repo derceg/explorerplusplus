@@ -5,11 +5,8 @@
 #include "stdafx.h"
 #include "ReferenceCount.h"
 
-
-ReferenceCount::ReferenceCount() :
-m_RefCount(1)
+ReferenceCount::ReferenceCount() : m_RefCount(1)
 {
-	
 }
 
 ULONG ReferenceCount::AddRef()
@@ -21,7 +18,7 @@ ULONG ReferenceCount::Release()
 {
 	LONG lCount = InterlockedDecrement(&m_RefCount);
 
-	if(lCount == 0)
+	if (lCount == 0)
 	{
 		delete this;
 		return 0;

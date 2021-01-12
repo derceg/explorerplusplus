@@ -16,11 +16,12 @@ BOOL FileActionHandler::RenameFiles(const RenamedItems_t &itemList)
 {
 	RenamedItems_t renamedItems;
 
-	for(const auto &item : itemList)
+	for (const auto &item : itemList)
 	{
 		/* TODO: This should actually be done by the caller. */
 		IShellItem *shellItem = nullptr;
-		HRESULT hr = SHCreateItemFromParsingName(item.strOldFilename.c_str(), nullptr, IID_PPV_ARGS(&shellItem));
+		HRESULT hr = SHCreateItemFromParsingName(
+			item.strOldFilename.c_str(), nullptr, IID_PPV_ARGS(&shellItem));
 
 		if (SUCCEEDED(hr))
 		{
@@ -43,11 +44,11 @@ BOOL FileActionHandler::RenameFiles(const RenamedItems_t &itemList)
 
 	/* Only store an undo operation if at least one
 	file was actually renamed. */
-	if(!renamedItems.empty())
+	if (!renamedItems.empty())
 	{
 		UndoItem_t undoItem;
 		undoItem.type = UndoType::Renamed;
-		undoItem.renamedItems = renamedItems;	
+		undoItem.renamedItems = renamedItems;
 		m_stackFileActions.push(undoItem);
 
 		return TRUE;
@@ -56,12 +57,12 @@ BOOL FileActionHandler::RenameFiles(const RenamedItems_t &itemList)
 	return FALSE;
 }
 
-HRESULT FileActionHandler::DeleteFiles(HWND hwnd, DeletedItems_t &deletedItems,
-	bool permanent, bool silent)
+HRESULT FileActionHandler::DeleteFiles(
+	HWND hwnd, DeletedItems_t &deletedItems, bool permanent, bool silent)
 {
 	HRESULT hr = NFileOperations::DeleteFiles(hwnd, deletedItems, permanent, silent);
 
-	if(SUCCEEDED(hr))
+	if (SUCCEEDED(hr))
 	{
 		UndoItem_t undoItem;
 		undoItem.type = UndoType::Deleted;
@@ -74,11 +75,11 @@ HRESULT FileActionHandler::DeleteFiles(HWND hwnd, DeletedItems_t &deletedItems,
 
 void FileActionHandler::Undo()
 {
-	if(!m_stackFileActions.empty())
+	if (!m_stackFileActions.empty())
 	{
 		UndoItem_t &undoItem = m_stackFileActions.top();
 
-		switch(undoItem.type)
+		switch (undoItem.type)
 		{
 		case UndoType::Renamed:
 			UndoRenameOperation(undoItem.renamedItems);
@@ -105,7 +106,7 @@ void FileActionHandler::UndoRenameOperation(const RenamedItems_t &renamedItemLis
 
 	/* When undoing a rename operation, the new name
 	becomes the old name, and vice versa. */
-	for(const auto &renamedItem : renamedItemList)
+	for (const auto &renamedItem : renamedItemList)
 	{
 		RenamedItem_t undoItem;
 		undoItem.strOldFilename = renamedItem.strNewFilename;

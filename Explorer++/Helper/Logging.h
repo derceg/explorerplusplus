@@ -17,18 +17,11 @@ enum SeverityLevel
 	fatal
 };
 
-template<typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT>& operator<< (
-	std::basic_ostream<CharT, TraitsT>& stream, SeverityLevel level)
+template <typename CharT, typename TraitsT>
+inline std::basic_ostream<CharT, TraitsT> &operator<<(
+	std::basic_ostream<CharT, TraitsT> &stream, SeverityLevel level)
 {
-	static const char* const str[] =
-	{
-		"debug",
-		"info",
-		"warning",
-		"error",
-		"fatal"
-	};
+	static const char *const str[] = { "debug", "info", "warning", "error", "fatal" };
 
 	if (static_cast<std::size_t>(level) < (sizeof(str) / sizeof(*str)))
 	{

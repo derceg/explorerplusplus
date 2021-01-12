@@ -5,13 +5,12 @@
 #include "stdafx.h"
 #include "TimeHelper.h"
 
-
 BOOL LocalSystemTimeToFileTime(const SYSTEMTIME *lpLocalTime, FILETIME *lpFileTime)
 {
 	SYSTEMTIME systemTime;
 	BOOL result = TzSpecificLocalTimeToSystemTime(nullptr, lpLocalTime, &systemTime);
 
-	if(result)
+	if (result)
 	{
 		result = SystemTimeToFileTime(&systemTime, lpFileTime);
 	}
@@ -24,7 +23,7 @@ BOOL FileTimeToLocalSystemTime(const FILETIME *lpFileTime, SYSTEMTIME *lpLocalTi
 	SYSTEMTIME systemTime;
 	BOOL result = FileTimeToSystemTime(lpFileTime, &systemTime);
 
-	if(result)
+	if (result)
 	{
 		result = SystemTimeToTzSpecificLocalTime(nullptr, &systemTime, lpLocalTime);
 	}
