@@ -217,7 +217,7 @@ std::wstring ProcessItemFileName(
 	if ((!globalFolderSettings.showExtensions || bHideExtension) && itemInfo.szDisplayName[0] != '.'
 		&& (itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 	{
-		static TCHAR szDisplayName[MAX_PATH];
+		TCHAR szDisplayName[MAX_PATH];
 
 		StringCchCopy(szDisplayName, SIZEOF_ARRAY(szDisplayName), itemInfo.szDisplayName);
 
