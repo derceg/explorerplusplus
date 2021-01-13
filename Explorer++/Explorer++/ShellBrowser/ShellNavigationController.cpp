@@ -102,7 +102,7 @@ HRESULT ShellNavigationController::GoUp()
 		return hr;
 	}
 
-	return m_navigator->BrowseFolder(pidlParent.get());
+	return BrowseFolder(pidlParent.get());
 }
 
 HRESULT ShellNavigationController::Refresh()
