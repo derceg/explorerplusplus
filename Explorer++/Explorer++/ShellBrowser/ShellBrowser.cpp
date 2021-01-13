@@ -1338,7 +1338,7 @@ void ShellBrowser::OnDeviceChange(WPARAM wParam, LPARAM lParam)
 				}
 				else
 				{
-					OnFileActionAdded(szDrive);
+					OnFileAdded(szDrive);
 				}
 			}
 		}

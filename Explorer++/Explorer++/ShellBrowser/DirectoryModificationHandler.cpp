@@ -58,29 +58,29 @@ void ShellBrowser::DirectoryAltered()
 			{
 			case FILE_ACTION_ADDED:
 				LOG(debug) << _T("ShellBrowser - Adding \"") << af.szFileName << _T("\"");
-				OnFileActionAdded(af.szFileName);
+				OnFileAdded(af.szFileName);
 				break;
 
 			case FILE_ACTION_MODIFIED:
 				LOG(debug) << _T("ShellBrowser - Modifying \"") << af.szFileName << _T("\"");
-				ModifyItemInternal(af.szFileName);
+				OnFileModified(af.szFileName);
 				break;
 
 			case FILE_ACTION_REMOVED:
 				LOG(debug) << _T("ShellBrowser - Removing \"") << af.szFileName << _T("\"");
-				RemoveItemInternal(af.szFileName);
+				OnFileRemoved(af.szFileName);
 				break;
 
 			case FILE_ACTION_RENAMED_OLD_NAME:
 				LOG(debug) << _T("ShellBrowser - Old name received \"") << af.szFileName
 						   << _T("\"");
-				OnFileActionRenamedOldName(af.szFileName);
+				OnFileRenamedOldName(af.szFileName);
 				break;
 
 			case FILE_ACTION_RENAMED_NEW_NAME:
 				LOG(debug) << _T("ShellBrowser - New name received \"") << af.szFileName
 						   << _T("\"");
-				OnFileActionRenamedNewName(af.szFileName);
+				OnFileRenamedNewName(af.szFileName);
 				break;
 			}
 		}
@@ -171,7 +171,7 @@ void ShellBrowser::FilesModified(DWORD Action, const TCHAR *FileName, int EventI
 	LeaveCriticalSection(&m_csDirectoryAltered);
 }
 
-void ShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
+void ShellBrowser::OnFileAdded(const TCHAR *szFileName)
 {
 	IShellFolder *pShellFolder = nullptr;
 	PCITEMID_CHILD pidlRelative = nullptr;
@@ -251,7 +251,7 @@ void ShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 	}
 }
 
-void ShellBrowser::RemoveItemInternal(const TCHAR *szFileName)
+void ShellBrowser::OnFileRemoved(const TCHAR *szFileName)
 {
 	std::list<Added_t>::iterator itr;
 	int iItemInternal;
@@ -283,7 +283,7 @@ void ShellBrowser::RemoveItemInternal(const TCHAR *szFileName)
 /*
  * Modifies the attributes of an item currently in the listview.
  */
-void ShellBrowser::ModifyItemInternal(const TCHAR *FileName)
+void ShellBrowser::OnFileModified(const TCHAR *FileName)
 {
 	HANDLE hFirstFile;
 	ULARGE_INTEGER ulFileSize;
@@ -452,7 +452,7 @@ void ShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 	}
 }
 
-void ShellBrowser::OnFileActionRenamedOldName(const TCHAR *szFileName)
+void ShellBrowser::OnFileRenamedOldName(const TCHAR *szFileName)
 {
 	std::list<Added_t>::iterator itrAdded;
 	BOOL bFileHandled = FALSE;
@@ -482,13 +482,13 @@ void ShellBrowser::OnFileActionRenamedOldName(const TCHAR *szFileName)
 	}
 }
 
-void ShellBrowser::OnFileActionRenamedNewName(const TCHAR *szFileName)
+void ShellBrowser::OnFileRenamedNewName(const TCHAR *szFileName)
 {
 	if (g_bNewFileRenamed)
 	{
 		/* The file that was previously added was renamed before
 		it could be added. Add the file now. */
-		OnFileActionAdded(szFileName);
+		OnFileAdded(szFileName);
 
 		g_bNewFileRenamed = FALSE;
 	}

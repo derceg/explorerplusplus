@@ -461,12 +461,12 @@ private:
 	void RemoveDrive(const TCHAR *szDrive);
 
 	/* Directory altered support. */
-	void OnFileActionAdded(const TCHAR *szFileName);
+	void OnFileAdded(const TCHAR *szFileName);
 	void RemoveItem(int iItemInternal);
-	void RemoveItemInternal(const TCHAR *szFileName);
-	void ModifyItemInternal(const TCHAR *FileName);
-	void OnFileActionRenamedOldName(const TCHAR *szFileName);
-	void OnFileActionRenamedNewName(const TCHAR *szFileName);
+	void OnFileRemoved(const TCHAR *szFileName);
+	void OnFileModified(const TCHAR *FileName);
+	void OnFileRenamedOldName(const TCHAR *szFileName);
+	void OnFileRenamedNewName(const TCHAR *szFileName);
 	void RenameItem(int iItemInternal, const TCHAR *szNewFileName);
 	int DetermineItemSortedPosition(LPARAM lParam) const;
 
