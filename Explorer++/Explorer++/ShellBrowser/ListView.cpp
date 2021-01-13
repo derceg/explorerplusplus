@@ -259,7 +259,18 @@ void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 	if (m_folderSettings.viewMode == +ViewMode::Thumbnails
 		&& (plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
 	{
-		plvItem->iImage = GetIconThumbnail(internalIndex);
+		const ItemInfo_t &itemInfo = m_itemInfoMap.at(internalIndex);
+		auto cachedThumbnailIndex = GetCachedThumbnailIndex(itemInfo);
+
+		if (cachedThumbnailIndex)
+		{
+			plvItem->iImage = *cachedThumbnailIndex;
+		}
+		else
+		{
+			plvItem->iImage = GetIconThumbnail(internalIndex);
+		}
+
 		plvItem->mask |= LVIF_DI_SETITEM;
 
 		QueueThumbnailTask(internalIndex);

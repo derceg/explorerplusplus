@@ -21,6 +21,7 @@
 #include <boost/signals2.hpp>
 #include <wil/com.h>
 #include <wil/resource.h>
+#include <thumbcache.h>
 #include <future>
 #include <list>
 #include <optional>
@@ -521,8 +522,8 @@ private:
 
 	/* Thumbnails view. */
 	void QueueThumbnailTask(int internalIndex);
-	static std::optional<ThumbnailResult_t> FindThumbnailAsync(HWND listView, int thumbnailResultId,
-		int internalIndex, const BasicItemInfo_t &basicItemInfo);
+	std::optional<int> GetCachedThumbnailIndex(const ItemInfo_t &itemInfo);
+	static wil::unique_hbitmap GetThumbnail(PIDLIST_ABSOLUTE pidl, WTS_FLAGS flags);
 	void ProcessThumbnailResult(int thumbnailResultId);
 	void SetupThumbnailsView();
 	void RemoveThumbnailsView();
