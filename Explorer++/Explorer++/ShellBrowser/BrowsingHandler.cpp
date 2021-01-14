@@ -181,21 +181,24 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 	return hr;
 }
 
-HRESULT ShellBrowser::AddItemInternal(IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory,
-	PCITEMID_CHILD pidlChild, int itemIndex, BOOL setPosition)
+std::optional<int> ShellBrowser::AddItemInternal(IShellFolder *shellFolder,
+	PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild, int itemIndex, BOOL setPosition)
 {
-	auto itemId = SetItemInformation(shellFolder, pidlDirectory, pidlChild);
+	auto itemInfo = GetItemInformation(shellFolder, pidlDirectory, pidlChild);
 
-	if (!itemId)
+	if (!itemInfo)
 	{
-		return E_FAIL;
+		return std::nullopt;
 	}
 
-	return AddItemInternal(itemIndex, *itemId, setPosition);
+	return AddItemInternal(itemIndex, std::move(*itemInfo), setPosition);
 }
 
-HRESULT ShellBrowser::AddItemInternal(int itemIndex, int itemId, BOOL setPosition)
+int ShellBrowser::AddItemInternal(int itemIndex, ItemInfo_t itemInfo, BOOL setPosition)
 {
+	int itemId = GenerateUniqueItemId();
+	m_itemInfoMap.insert({ itemId, std::move(itemInfo) });
+
 	AwaitingAdd_t awaitingAdd;
 
 	if (itemIndex == -1)
@@ -214,18 +217,18 @@ HRESULT ShellBrowser::AddItemInternal(int itemIndex, int itemId, BOOL setPositio
 
 	m_directoryState.awaitingAddList.push_back(awaitingAdd);
 
-	return S_OK;
+	return itemId;
 }
 
-std::optional<int> ShellBrowser::SetItemInformation(
+std::optional<ShellBrowser::ItemInfo_t> ShellBrowser::GetItemInformation(
 	IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild)
 {
-	ItemInfo_t newItem;
+	ItemInfo_t itemInfo;
 
 	unique_pidl_absolute pidlItem(ILCombine(pidlDirectory, pidlChild));
 
-	newItem.pidlComplete.reset(ILCloneFull(pidlItem.get()));
-	newItem.pridl.reset(ILCloneChild(pidlChild));
+	itemInfo.pidlComplete.reset(ILCloneFull(pidlItem.get()));
+	itemInfo.pridl.reset(ILCloneChild(pidlChild));
 
 	std::wstring parsingName;
 	HRESULT hr = GetDisplayName(shellFolder, pidlChild, SHGDN_FORPARSING, parsingName);
@@ -235,7 +238,7 @@ std::optional<int> ShellBrowser::SetItemInformation(
 		return std::nullopt;
 	}
 
-	newItem.parsingName = parsingName;
+	itemInfo.parsingName = parsingName;
 
 	ULONG attributes = SFGAO_FOLDER | SFGAO_FILESYSTEM;
 	PCITEMID_CHILD items[] = { pidlChild };
@@ -272,7 +275,7 @@ std::optional<int> ShellBrowser::SetItemInformation(
 		return std::nullopt;
 	}
 
-	newItem.displayName = displayName;
+	itemInfo.displayName = displayName;
 
 	std::wstring editingName;
 	hr = GetDisplayName(shellFolder, pidlChild, SHGDN_INFOLDER | SHGDN_FOREDITING, editingName);
@@ -282,16 +285,16 @@ std::optional<int> ShellBrowser::SetItemInformation(
 		return std::nullopt;
 	}
 
-	newItem.editingName = editingName;
+	itemInfo.editingName = editingName;
 
 	if (PathIsRoot(parsingName.c_str()))
 	{
-		newItem.bDrive = TRUE;
-		StringCchCopy(newItem.szDrive, SIZEOF_ARRAY(newItem.szDrive), parsingName.c_str());
+		itemInfo.bDrive = TRUE;
+		StringCchCopy(itemInfo.szDrive, SIZEOF_ARRAY(itemInfo.szDrive), parsingName.c_str());
 	}
 	else
 	{
-		newItem.bDrive = FALSE;
+		itemInfo.bDrive = FALSE;
 	}
 
 	WIN32_FIND_DATA wfd;
@@ -304,24 +307,21 @@ std::optional<int> ShellBrowser::SetItemInformation(
 
 	if (SUCCEEDED(hr))
 	{
-		newItem.wfd = wfd;
-		newItem.isFindDataValid = true;
+		itemInfo.wfd = wfd;
+		itemInfo.isFindDataValid = true;
 	}
 	else
 	{
 		StringCchCopy(
-			newItem.wfd.cFileName, SIZEOF_ARRAY(newItem.wfd.cFileName), displayName.c_str());
+			itemInfo.wfd.cFileName, SIZEOF_ARRAY(itemInfo.wfd.cFileName), displayName.c_str());
 
 		if (WI_IsFlagSet(attributes, SFGAO_FOLDER))
 		{
-			WI_SetFlag(newItem.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
+			WI_SetFlag(itemInfo.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
 		}
 	}
 
-	int itemId = GenerateUniqueItemId();
-	m_itemInfoMap.insert({ itemId, std::move(newItem) });
-
-	return itemId;
+	return std::move(itemInfo);
 }
 
 HRESULT ShellBrowser::ExtractFindDataUsingPropertyStore(

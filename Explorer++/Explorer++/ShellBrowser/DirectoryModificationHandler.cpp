@@ -196,12 +196,12 @@ void ShellBrowser::OnFileAdded(const TCHAR *szFileName)
 
 		if (SUCCEEDED(hr))
 		{
-			std::list<DroppedFile_t>::iterator itr;
 			BOOL bDropped = FALSE;
 
 			if (!m_DroppedFileNameList.empty())
 			{
-				for (itr = m_DroppedFileNameList.begin(); itr != m_DroppedFileNameList.end(); itr++)
+				for (auto itr = m_DroppedFileNameList.begin(); itr != m_DroppedFileNameList.end();
+					 itr++)
 				{
 					if (lstrcmp(szFileName, itr->szFileName) == 0)
 					{
@@ -211,25 +211,30 @@ void ShellBrowser::OnFileAdded(const TCHAR *szFileName)
 				}
 			}
 
+			auto itemId = AddItemInternal(
+				pShellFolder, m_directoryState.pidlDirectory.get(), pidlRelative, -1, FALSE);
+
 			/* Only insert the item in its sorted position if it
 			wasn't dropped in. */
-			if (m_config->globalFolderSettings.insertSorted && !bDropped)
+			if (itemId && m_config->globalFolderSettings.insertSorted && !bDropped)
 			{
-				auto itemId = SetItemInformation(
-					pShellFolder, m_directoryState.pidlDirectory.get(), pidlRelative);
+				// TODO: It would be better to pass the items details to this function directly
+				// instead (before the item is added to the awaiting list).
+				int sortedPosition = DetermineItemSortedPosition(*itemId);
 
-				if (itemId)
-				{
-					int iSorted = DetermineItemSortedPosition(*itemId);
+				auto itr = std::find_if(m_directoryState.awaitingAddList.begin(),
+					m_directoryState.awaitingAddList.end(),
+					[itemId](const AwaitingAdd_t &awaitingItem) {
+						return *itemId == awaitingItem.iItemInternal;
+					});
 
-					AddItemInternal(iSorted, *itemId, TRUE);
-				}
-			}
-			else
-			{
-				/* Just add the item to the end of the list. */
-				AddItemInternal(
-					pShellFolder, m_directoryState.pidlDirectory.get(), pidlRelative, -1, FALSE);
+				// The item was added successfully above, so should be in the list of awaiting
+				// items.
+				assert(itr != m_directoryState.awaitingAddList.end());
+
+				itr->iItem = sortedPosition;
+				itr->bPosition = TRUE;
+				itr->iAfter = sortedPosition - 1;
 			}
 
 			InsertAwaitingItems(m_folderSettings.showInGroups);
@@ -498,123 +503,110 @@ void ShellBrowser::OnFileRenamedNewName(const TCHAR *szFileName)
 	}
 }
 
-/* Renames an item currently in the listview.
- */
-/* TODO: This code should be coalesced with the code that
-adds items as well as the code that finds their icons.
-ALL changes to an items name/internal properties/icon/overlay icon
-should go through a central function. */
-void ShellBrowser::RenameItem(int iItemInternal, const TCHAR *szNewFileName)
+void ShellBrowser::RenameItem(int internalIndex, const TCHAR *szNewFileName)
 {
-	IShellFolder *pShellFolder = nullptr;
-	PCITEMID_CHILD pidlRelative = nullptr;
-	SHFILEINFO shfi;
-	LVFINDINFO lvfi;
-	LVITEM lvItem;
-	TCHAR szFullFileName[MAX_PATH];
-	DWORD_PTR res;
-	HRESULT hr;
-	int iItem;
-
-	if (iItemInternal == -1)
+	if (internalIndex == -1)
 	{
 		return;
 	}
 
-	auto &itemInfo = m_itemInfoMap.at(iItemInternal);
-
+	TCHAR szFullFileName[MAX_PATH];
 	StringCchCopy(szFullFileName, SIZEOF_ARRAY(szFullFileName), m_directoryState.directory.c_str());
 	PathAppend(szFullFileName, szNewFileName);
 
 	unique_pidl_absolute pidlFull;
-	hr = SHParseDisplayName(szFullFileName, nullptr, wil::out_param(pidlFull), 0, nullptr);
+	HRESULT hr = SHParseDisplayName(szFullFileName, nullptr, wil::out_param(pidlFull), 0, nullptr);
 
-	if (SUCCEEDED(hr))
+	if (FAILED(hr))
 	{
-		hr = SHBindToParent(pidlFull.get(), IID_PPV_ARGS(&pShellFolder), &pidlRelative);
+		return;
+	}
 
-		if (SUCCEEDED(hr))
-		{
-			std::wstring parsingName;
-			HRESULT parsingNameResult =
-				GetDisplayName(szFullFileName, SHGDN_FORPARSING, parsingName);
+	wil::com_ptr_nothrow<IShellFolder> shellFolder;
+	PCITEMID_CHILD pidlChild = nullptr;
+	hr = SHBindToParent(pidlFull.get(), IID_PPV_ARGS(&shellFolder), &pidlChild);
 
-			std::wstring displayName;
-			hr = GetDisplayName(szFullFileName, SHGDN_INFOLDER | SHGDN_FORPARSING, displayName);
+	if (FAILED(hr))
+	{
+		return;
+	}
 
-			std::wstring editingName;
-			HRESULT editingNameResult =
-				GetDisplayName(szFullFileName, SHGDN_INFOLDER | SHGDN_FOREDITING, editingName);
+	auto itemInfo =
+		GetItemInformation(shellFolder.get(), m_directoryState.pidlDirectory.get(), pidlChild);
 
-			if (SUCCEEDED(parsingNameResult) && SUCCEEDED(hr) && SUCCEEDED(editingNameResult))
-			{
-				itemInfo.pidlComplete.reset(ILCloneFull(pidlFull.get()));
-				itemInfo.pridl.reset(ILCloneChild(pidlRelative));
-				itemInfo.parsingName = parsingName;
-				itemInfo.displayName = displayName;
-				itemInfo.editingName = editingName;
-				StringCchCopy(
-					itemInfo.wfd.cFileName, SIZEOF_ARRAY(itemInfo.wfd.cFileName), szNewFileName);
+	if (!itemInfo)
+	{
+		return;
+	}
 
-				/* The files' type may have changed, so retrieve the files'
-				icon again. */
-				res = SHGetFileInfo((LPTSTR) pidlFull.get(), 0, &shfi, sizeof(SHFILEINFO),
-					SHGFI_PIDL | SHGFI_ICON | SHGFI_OVERLAYINDEX);
+	m_itemInfoMap[internalIndex] = std::move(*itemInfo);
+	const ItemInfo_t &updatedItemInfo = m_itemInfoMap[internalIndex];
 
-				if (res != 0)
-				{
-					/* Locate the item within the listview. */
-					lvfi.flags = LVFI_PARAM;
-					lvfi.lParam = iItemInternal;
-					iItem = ListView_FindItem(m_hListView, -1, &lvfi);
+	LVFINDINFO lvfi;
+	lvfi.flags = LVFI_PARAM;
+	lvfi.lParam = internalIndex;
+	int itemIndex = ListView_FindItem(m_hListView, -1, &lvfi);
 
-					if (iItem != -1)
-					{
-						BasicItemInfo_t basicItemInfo = getBasicItemInfo(iItemInternal);
-						std::wstring filename =
-							ProcessItemFileName(basicItemInfo, m_config->globalFolderSettings);
+	// Items may be filtered out of the listview, so it's valid for an item not to be found.
+	if (itemIndex == -1)
+	{
+		return;
+	}
 
-						TCHAR filenameCopy[MAX_PATH];
-						StringCchCopy(filenameCopy, SIZEOF_ARRAY(filenameCopy), filename.c_str());
+	if (IsFileFiltered(updatedItemInfo))
+	{
+		RemoveFilteredItem(itemIndex, internalIndex);
+		return;
+	}
 
-						lvItem.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_STATE;
-						lvItem.iItem = iItem;
-						lvItem.iSubItem = 0;
-						lvItem.iImage = shfi.iIcon;
-						lvItem.pszText = filenameCopy;
-						lvItem.stateMask = LVIS_OVERLAYMASK;
+	InvalidateIconForItem(itemIndex);
 
-						/* As well as resetting the items icon, we'll also set
-						it's overlay again (the overlay could change, for example,
-						if the file is changed to a shortcut). */
-						lvItem.state = INDEXTOOVERLAYMASK(shfi.iIcon >> 24);
-
-						/* Update the item in the listview. */
-						ListView_SetItem(m_hListView, &lvItem);
-
-						if (m_folderSettings.showInGroups)
-						{
-							int groupId = DetermineItemGroup(iItemInternal);
-							InsertItemIntoGroup(iItem, groupId);
-						}
-
-						/* TODO: Does the file need to be filtered out? */
-						if (IsFileFiltered(itemInfo))
-						{
-							RemoveFilteredItem(iItem, iItemInternal);
-						}
-					}
-
-					DestroyIcon(shfi.hIcon);
-				}
-			}
-
-			pShellFolder->Release();
-		}
+	if (m_folderSettings.viewMode == +ViewMode::Details)
+	{
+		// Although only the item name has changed, other columns might need to be updated as well
+		// (e.g. type, extension, 8.3 name). Therefore, all columns will be invalidated here.
+		// Note that this is more efficient than simply queuing tasks to set the text for each
+		// column, since that won't be necessary if the item isn't currently visible.
+		InvalidateAllColumnsForItem(itemIndex);
 	}
 	else
 	{
-		itemInfo.displayName = szNewFileName;
-		StringCchCopy(itemInfo.wfd.cFileName, SIZEOF_ARRAY(itemInfo.wfd.cFileName), szNewFileName);
+		BasicItemInfo_t basicItemInfo = getBasicItemInfo(internalIndex);
+		std::wstring filename = ProcessItemFileName(basicItemInfo, m_config->globalFolderSettings);
+		ListView_SetItemText(m_hListView, itemIndex, 0, filename.data());
 	}
+
+	if (m_folderSettings.showInGroups)
+	{
+		int groupId = DetermineItemGroup(internalIndex);
+		InsertItemIntoGroup(itemIndex, groupId);
+	}
+}
+
+void ShellBrowser::InvalidateAllColumnsForItem(int itemIndex)
+{
+	if (m_folderSettings.viewMode != +ViewMode::Details)
+	{
+		return;
+	}
+
+	auto numColumns = std::count_if(
+		m_pActiveColumns->begin(), m_pActiveColumns->end(), [](const Column_t &column) {
+			return column.bChecked;
+		});
+
+	for (int i = 0; i < numColumns; i++)
+	{
+		ListView_SetItemText(m_hListView, itemIndex, i, LPSTR_TEXTCALLBACK);
+	}
+}
+
+void ShellBrowser::InvalidateIconForItem(int itemIndex)
+{
+	LVITEM lvItem;
+	lvItem.mask = LVIF_IMAGE;
+	lvItem.iItem = itemIndex;
+	lvItem.iSubItem = 0;
+	lvItem.iImage = I_IMAGECALLBACK;
+	ListView_SetItem(m_hListView, &lvItem);
 }

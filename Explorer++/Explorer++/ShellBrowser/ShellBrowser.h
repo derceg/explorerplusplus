@@ -377,10 +377,10 @@ private:
 	void ResetFolderState();
 	void InsertAwaitingItems(BOOL bInsertIntoGroup);
 	BOOL IsFileFiltered(const ItemInfo_t &itemInfo) const;
-	HRESULT AddItemInternal(IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory,
+	std::optional<int> AddItemInternal(IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory,
 		PCITEMID_CHILD pidlChild, int itemIndex, BOOL setPosition);
-	HRESULT AddItemInternal(int itemIndex, int itemId, BOOL setPosition);
-	std::optional<int> SetItemInformation(
+	int AddItemInternal(int itemIndex, ItemInfo_t itemInfo, BOOL setPosition);
+	std::optional<ItemInfo_t> GetItemInformation(
 		IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild);
 	static HRESULT ExtractFindDataUsingPropertyStore(
 		IShellFolder *shellFolder, PCITEMID_CHILD pidlChild, WIN32_FIND_DATA &output);
@@ -467,7 +467,9 @@ private:
 	void OnFileModified(const TCHAR *FileName);
 	void OnFileRenamedOldName(const TCHAR *szFileName);
 	void OnFileRenamedNewName(const TCHAR *szFileName);
-	void RenameItem(int iItemInternal, const TCHAR *szNewFileName);
+	void RenameItem(int internalIndex, const TCHAR *szNewFileName);
+	void InvalidateAllColumnsForItem(int itemIndex);
+	void InvalidateIconForItem(int itemIndex);
 	int DetermineItemSortedPosition(LPARAM lParam) const;
 
 	/* Filtering support. */
