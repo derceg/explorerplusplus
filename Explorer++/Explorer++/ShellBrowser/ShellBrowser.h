@@ -464,7 +464,7 @@ private:
 	void OnFileAdded(const TCHAR *szFileName);
 	void RemoveItem(int iItemInternal);
 	void OnFileRemoved(const TCHAR *szFileName);
-	void OnFileModified(const TCHAR *FileName);
+	void OnFileModified(const TCHAR *fileName);
 	void OnFileRenamedOldName(const TCHAR *szFileName);
 	void OnFileRenamedNewName(const TCHAR *szFileName);
 	void RenameItem(int internalIndex, const TCHAR *szNewFileName);

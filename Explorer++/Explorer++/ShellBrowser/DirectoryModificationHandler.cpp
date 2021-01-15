@@ -285,175 +285,96 @@ void ShellBrowser::OnFileRemoved(const TCHAR *szFileName)
 	}
 }
 
-/*
- * Modifies the attributes of an item currently in the listview.
- */
-void ShellBrowser::OnFileModified(const TCHAR *FileName)
+void ShellBrowser::OnFileModified(const TCHAR *fileName)
 {
-	HANDLE hFirstFile;
-	ULARGE_INTEGER ulFileSize;
-	LVITEM lvItem;
 	TCHAR fullFileName[MAX_PATH];
-	BOOL bFolder;
-	BOOL res;
-	int iItem;
-	int iItemInternal = -1;
+	StringCchCopy(fullFileName, SIZEOF_ARRAY(fullFileName), m_directoryState.directory.c_str());
+	PathAppend(fullFileName, fileName);
 
-	iItem = LocateFileItemIndex(FileName);
+	unique_pidl_absolute pidlFull;
+	HRESULT hr = SHParseDisplayName(fullFileName, nullptr, wil::out_param(pidlFull), 0, nullptr);
 
-	/* Although an item may not have been added to the listview
-	yet, it is critical that its' size still be updated if
-	necessary.
-	It is possible (and quite likely) that the file add and
-	modified messages will be sent in the same group, meaning
-	that when the modification message is processed, the item
-	is not in the listview, but it still needs to be updated.
-	Therefore, instead of searching for items solely in the
-	listview, also look through the list of pending file
-	additions. */
-
-	if (iItem == -1)
+	if (FAILED(hr))
 	{
-		/* The item doesn't exist in the listview. This can
-		happen when a file has been created with a non-zero
-		size, but an item has not yet been inserted into
-		the listview.
-		Search through the list of items waiting to be
-		inserted, so that files the have just been created
-		can be updated without them residing within the
-		listview. */
-		for (const auto &awaitingItem : m_directoryState.awaitingAddList)
-		{
-			if (lstrcmp(m_itemInfoMap.at(awaitingItem.iItemInternal).wfd.cFileName, FileName) == 0)
-			{
-				iItemInternal = awaitingItem.iItemInternal;
-				break;
-			}
-		}
+		return;
+	}
+
+	auto internalIndex = GetItemInternalIndexForPidl(pidlFull.get());
+
+	if (!internalIndex)
+	{
+		return;
+	}
+
+	wil::com_ptr_nothrow<IShellFolder> shellFolder;
+	PCITEMID_CHILD pidlChild = nullptr;
+	hr = SHBindToParent(pidlFull.get(), IID_PPV_ARGS(&shellFolder), &pidlChild);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	auto itemInfo =
+		GetItemInformation(shellFolder.get(), m_directoryState.pidlDirectory.get(), pidlChild);
+
+	if (!itemInfo)
+	{
+		return;
+	}
+
+	ULARGE_INTEGER oldFileSize = { m_itemInfoMap[*internalIndex].wfd.nFileSizeLow,
+		m_itemInfoMap[*internalIndex].wfd.nFileSizeHigh };
+	ULARGE_INTEGER newFileSize = { itemInfo->wfd.nFileSizeLow,
+		itemInfo->wfd.nFileSizeHigh };
+
+	m_directoryState.totalDirSize.QuadPart += newFileSize.QuadPart - oldFileSize.QuadPart;
+
+	m_itemInfoMap[*internalIndex] = std::move(*itemInfo);
+	const ItemInfo_t &updatedItemInfo = m_itemInfoMap[*internalIndex];
+
+	auto itemIndex = LocateItemByInternalIndex(*internalIndex);
+
+	if (!itemIndex)
+	{
+		return;
+	}
+
+	UINT state = ListView_GetItemState(m_hListView, *itemIndex, LVIS_SELECTED);
+
+	if (WI_IsFlagSet(state, LVIS_SELECTED))
+	{
+		m_directoryState.fileSelectionSize.QuadPart += newFileSize.QuadPart - oldFileSize.QuadPart;
+	}
+
+	if (IsFileFiltered(updatedItemInfo))
+	{
+		RemoveFilteredItem(*itemIndex, *internalIndex);
+		return;
+	}
+
+	InvalidateIconForItem(*itemIndex);
+
+	if (m_folderSettings.viewMode == +ViewMode::Details)
+	{
+		InvalidateAllColumnsForItem(*itemIndex);
+	}
+
+	if (WI_IsFlagSet(updatedItemInfo.wfd.dwFileAttributes, FILE_ATTRIBUTE_HIDDEN))
+	{
+		ListView_SetItemState(m_hListView, *itemIndex, LVIS_CUT, LVIS_CUT);
 	}
 	else
 	{
-		/* The item exists in the listview. Determine its
-		internal index from its listview information. */
-		lvItem.mask = LVIF_PARAM;
-		lvItem.iItem = iItem;
-		lvItem.iSubItem = 0;
-		res = ListView_GetItem(m_hListView, &lvItem);
-
-		if (res != FALSE)
-		{
-			iItemInternal = (int) lvItem.lParam;
-		}
-
-		TCHAR szFullFileName[MAX_PATH];
-		StringCchCopy(
-			szFullFileName, SIZEOF_ARRAY(szFullFileName), m_directoryState.directory.c_str());
-		PathAppend(szFullFileName, FileName);
-
-		/* When a file is modified, its icon overlay may change.
-		This is the case when modifying a file managed by
-		TortoiseSVN, for example. */
-		SHFILEINFO shfi;
-		DWORD_PTR dwRes = SHGetFileInfo(
-			szFullFileName, 0, &shfi, sizeof(SHFILEINFO), SHGFI_ICON | SHGFI_OVERLAYINDEX);
-
-		if (dwRes != 0)
-		{
-			lvItem.mask = LVIF_STATE;
-			lvItem.iItem = iItem;
-			lvItem.iSubItem = 0;
-			lvItem.stateMask = LVIS_OVERLAYMASK;
-			lvItem.state = INDEXTOOVERLAYMASK(shfi.iIcon >> 24);
-			ListView_SetItem(m_hListView, &lvItem);
-
-			DestroyIcon(shfi.hIcon);
-		}
+		ListView_SetItemState(m_hListView, *itemIndex, 0, LVIS_CUT);
 	}
 
-	if (iItemInternal != -1)
+	ListView_SortItems(m_hListView, SortStub, this);
+
+	if (m_folderSettings.showInGroups)
 	{
-		/* Is this item a folder? */
-		bFolder = (m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-			== FILE_ATTRIBUTE_DIRECTORY;
-
-		ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
-		ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
-
-		m_directoryState.totalDirSize.QuadPart -= ulFileSize.QuadPart;
-
-		if (ListView_GetItemState(m_hListView, iItem, LVIS_SELECTED) == LVIS_SELECTED)
-		{
-			ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
-			ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
-
-			m_directoryState.fileSelectionSize.QuadPart -= ulFileSize.QuadPart;
-		}
-
-		StringCchCopy(fullFileName, SIZEOF_ARRAY(fullFileName), m_directoryState.directory.c_str());
-		PathAppend(fullFileName, FileName);
-
-		hFirstFile = FindFirstFile(fullFileName, &m_itemInfoMap.at(iItemInternal).wfd);
-
-		if (hFirstFile != INVALID_HANDLE_VALUE)
-		{
-			ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
-			ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
-
-			m_directoryState.totalDirSize.QuadPart += ulFileSize.QuadPart;
-
-			if (ListView_GetItemState(m_hListView, iItem, LVIS_SELECTED) == LVIS_SELECTED)
-			{
-				ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
-				ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
-
-				m_directoryState.fileSelectionSize.QuadPart += ulFileSize.QuadPart;
-			}
-
-			if ((m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
-				== FILE_ATTRIBUTE_HIDDEN)
-			{
-				ListView_SetItemState(m_hListView, iItem, LVIS_CUT, LVIS_CUT);
-			}
-			else
-				ListView_SetItemState(m_hListView, iItem, 0, LVIS_CUT);
-
-			if (m_folderSettings.viewMode == +ViewMode::Details)
-			{
-				if (m_pActiveColumns != nullptr)
-				{
-					for (auto itrColumn = m_pActiveColumns->begin();
-						 itrColumn != m_pActiveColumns->end(); itrColumn++)
-					{
-						if (itrColumn->bChecked)
-						{
-							QueueColumnTask(iItemInternal, itrColumn->type);
-						}
-					}
-				}
-			}
-
-			FindClose(hFirstFile);
-
-			if (m_folderSettings.showInGroups)
-			{
-				int groupId = DetermineItemGroup(iItemInternal);
-				InsertItemIntoGroup(iItem, groupId);
-			}
-		}
-		else
-		{
-			/* The file may not exist if, for example, it was
-			renamed just after a file with the same name was
-			deleted. If this does happen, a modification
-			message will likely be sent out after the file
-			has been renamed, indicating the new items properties.
-			However, the files' size will be subtracted on
-			modification. If the internal structures still hold
-			the old size, the total directory size will become
-			corrupted. */
-			m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow = 0;
-			m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh = 0;
-		}
+		int groupId = DetermineItemGroup(*internalIndex);
+		InsertItemIntoGroup(*itemIndex, groupId);
 	}
 }
 
@@ -529,12 +450,12 @@ void ShellBrowser::RenameItem(int internalIndex, const TCHAR *szNewFileName)
 		return;
 	}
 
-	TCHAR szFullFileName[MAX_PATH];
-	StringCchCopy(szFullFileName, SIZEOF_ARRAY(szFullFileName), m_directoryState.directory.c_str());
-	PathAppend(szFullFileName, szNewFileName);
+	TCHAR fullFileName[MAX_PATH];
+	StringCchCopy(fullFileName, SIZEOF_ARRAY(fullFileName), m_directoryState.directory.c_str());
+	PathAppend(fullFileName, szNewFileName);
 
 	unique_pidl_absolute pidlFull;
-	HRESULT hr = SHParseDisplayName(szFullFileName, nullptr, wil::out_param(pidlFull), 0, nullptr);
+	HRESULT hr = SHParseDisplayName(fullFileName, nullptr, wil::out_param(pidlFull), 0, nullptr);
 
 	if (FAILED(hr))
 	{
