@@ -37,6 +37,8 @@ void Explorerplusplus::OnCreate()
 	LoadAllSettings(&pLoadSave);
 	ApplyToolbarSettings();
 
+	m_config->registerForShellNotifications = g_registerForShellNotifications;
+
 	m_iconResourceLoader = std::make_unique<IconResourceLoader>(m_config->iconTheme);
 
 	SetLanguageModule();

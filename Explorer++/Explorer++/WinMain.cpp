@@ -54,6 +54,7 @@ BOOL g_bForceLanguageLoad = FALSE;
 HACCEL g_hAccl;
 
 bool g_enablePlugins = false;
+bool g_registerForShellNotifications = false;
 
 ATOM RegisterMainWindowClass(HINSTANCE hInstance)
 {

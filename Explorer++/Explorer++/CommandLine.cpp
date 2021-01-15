@@ -54,6 +54,7 @@ struct CommandLineSettings
 	bool clearRegistrySettings;
 	bool enableLogging;
 	bool enablePlugins;
+	bool registerForShellNotifications;
 	bool removeAsDefault;
 	ReplaceExplorerMode replaceExplorerMode;
 	std::string language;
@@ -111,6 +112,13 @@ std::optional<CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
 		"--enable-plugins",
 		commandLineSettings.enablePlugins,
 		"Enable the Lua plugin system"
+	);
+
+	commandLineSettings.registerForShellNotifications = false;
+	app.add_flag(
+		"--register-for-shell-notifications",
+		commandLineSettings.registerForShellNotifications,
+		"Watch for directory changes through SHChangeNotifyRegister"
 	);
 
 	commandLineSettings.removeAsDefault = false;
@@ -261,6 +269,11 @@ std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(
 	if (commandLineSettings.enablePlugins)
 	{
 		g_enablePlugins = true;
+	}
+
+	if (commandLineSettings.registerForShellNotifications)
+	{
+		g_registerForShellNotifications = true;
 	}
 
 	if (commandLineSettings.removeAsDefault)

@@ -33,6 +33,11 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 
 	ClearPendingResults();
 
+	if (m_config->registerForShellNotifications)
+	{
+		StopDirectoryMonitoring();
+	}
+
 	EnterCriticalSection(&m_csDirectoryAltered);
 	m_FilesAdded.clear();
 	m_FileSelectionList.clear();
@@ -70,6 +75,11 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 
 	/* Allow the listview to redraw itself once again. */
 	SendMessage(m_hListView, WM_SETREDRAW, TRUE, NULL);
+
+	if (m_config->registerForShellNotifications)
+	{
+		StartDirectoryMonitoring(pidlDirectory);
+	}
 
 	/* Set the focus back to the first item. */
 	ListView_SetItemState(m_hListView, 0, LVIS_FOCUSED, LVIS_FOCUSED);

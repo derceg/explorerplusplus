@@ -351,6 +351,7 @@ private:
 	static const UINT WM_APP_COLUMN_RESULT_READY = WM_APP + 150;
 	static const UINT WM_APP_THUMBNAIL_RESULT_READY = WM_APP + 151;
 	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 152;
+	static const UINT WM_APP_SHELL_NOTIFY = WM_APP + 153;
 
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
@@ -461,6 +462,8 @@ private:
 	void RemoveDrive(const TCHAR *szDrive);
 
 	/* Directory altered support. */
+	void StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl);
+	void StopDirectoryMonitoring();
 	void OnFileAdded(const TCHAR *szFileName);
 	void RemoveItem(int iItemInternal);
 	void OnFileRemoved(const TCHAR *szFileName);
@@ -631,6 +634,9 @@ private:
 
 	/* ID. */
 	const int m_ID;
+
+	/* Directory monitoring. */
+	ULONG m_shChangeNotifyId;
 
 	wil::com_ptr_nothrow<IShellFolder> m_desktopFolder;
 	unique_pidl_absolute m_recycleBinPidl;

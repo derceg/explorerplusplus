@@ -16,6 +16,38 @@
 BOOL g_bNewFileRenamed = FALSE;
 int g_iRenamedItem = -1;
 
+void ShellBrowser::StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl)
+{
+	SHChangeNotifyEntry shcne;
+	shcne.pidl = pidl;
+	shcne.fRecursive = FALSE;
+	m_shChangeNotifyId = SHChangeNotifyRegister(m_hListView,
+		SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
+		SHCNE_ATTRIBUTES | SHCNE_CREATE | SHCNE_DELETE | SHCNE_MKDIR | SHCNE_RENAMEFOLDER
+			| SHCNE_RENAMEITEM | SHCNE_RMDIR | SHCNE_UPDATEDIR | SHCNE_UPDATEITEM,
+		WM_APP_SHELL_NOTIFY, 1, &shcne);
+
+	if (m_shChangeNotifyId == 0)
+	{
+		std::wstring path;
+		HRESULT hr = GetDisplayName(pidl, SHGDN_FORPARSING, path);
+
+		if (SUCCEEDED(hr))
+		{
+			LOG(warning) << L"Couldn't monitor directory \"" << path << L"\" for changes.";
+		}
+	}
+}
+
+void ShellBrowser::StopDirectoryMonitoring()
+{
+	if (m_shChangeNotifyId != 0)
+	{
+		SHChangeNotifyDeregister(m_shChangeNotifyId);
+		m_shChangeNotifyId = 0;
+	}
+}
+
 void ShellBrowser::DirectoryAltered()
 {
 	BOOL bNewItemCreated;
@@ -325,8 +357,7 @@ void ShellBrowser::OnFileModified(const TCHAR *fileName)
 
 	ULARGE_INTEGER oldFileSize = { m_itemInfoMap[*internalIndex].wfd.nFileSizeLow,
 		m_itemInfoMap[*internalIndex].wfd.nFileSizeHigh };
-	ULARGE_INTEGER newFileSize = { itemInfo->wfd.nFileSizeLow,
-		itemInfo->wfd.nFileSizeHigh };
+	ULARGE_INTEGER newFileSize = { itemInfo->wfd.nFileSizeLow, itemInfo->wfd.nFileSizeHigh };
 
 	m_directoryState.totalDirSize.QuadPart += newFileSize.QuadPart - oldFileSize.QuadPart;
 

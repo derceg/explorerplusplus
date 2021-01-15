@@ -1111,7 +1111,11 @@ bool TabContainer::CloseTab(const Tab &tab)
 
 	RemoveTabFromControl(tab);
 
-	m_expp->GetDirectoryMonitor()->StopDirectoryMonitor(tab.GetShellBrowser()->GetDirMonitorId());
+	if (!m_config->registerForShellNotifications)
+	{
+		m_expp->GetDirectoryMonitor()->StopDirectoryMonitor(
+			tab.GetShellBrowser()->GetDirMonitorId());
+	}
 
 	tab.GetShellBrowser()->Release();
 

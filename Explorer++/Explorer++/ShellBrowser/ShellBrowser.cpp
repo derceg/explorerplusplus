@@ -100,6 +100,7 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 	const FolderSettings &folderSettings, std::optional<FolderColumns> initialColumns) :
 	m_ID(id),
+	m_shChangeNotifyId(0),
 	m_hResourceModule(coreInterface->GetLanguageModule()),
 	m_hOwner(hOwner),
 	m_cachedIcons(coreInterface->GetCachedIcons()),
@@ -170,6 +171,11 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 
 ShellBrowser::~ShellBrowser()
 {
+	if (m_config->registerForShellNotifications)
+	{
+		StopDirectoryMonitoring();
+	}
+
 	RemoveClipboardFormatListener(m_hListView);
 
 	DestroyWindow(m_hListView);

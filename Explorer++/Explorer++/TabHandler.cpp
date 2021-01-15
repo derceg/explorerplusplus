@@ -29,7 +29,8 @@ void Explorerplusplus::InitializeTabs()
 	m_tabContainer->tabCreatedSignal.AddObserver(
 		boost::bind(&Explorerplusplus::OnTabCreated, this, _1, _2), boost::signals2::at_front);
 	m_tabContainer->tabNavigationStarted.AddObserver(
-		boost::bind(&Explorerplusplus::OnNavigationStarted, this, _1, _2), boost::signals2::at_front);
+		boost::bind(&Explorerplusplus::OnNavigationStarted, this, _1, _2),
+		boost::signals2::at_front);
 	m_tabContainer->tabNavigationCompletedSignal.AddObserver(
 		boost::bind(&Explorerplusplus::OnNavigationCompleted, this, _1), boost::signals2::at_front);
 	m_tabContainer->tabSelectedSignal.AddObserver(
@@ -78,7 +79,10 @@ void Explorerplusplus::OnNavigationCompleted(const Tab &tab)
 		UpdateWindowStates(tab);
 	}
 
-	HandleDirectoryMonitoring(tab.GetId());
+	if (!m_config->registerForShellNotifications)
+	{
+		HandleDirectoryMonitoring(tab.GetId());
+	}
 }
 
 /* Creates a new tab. If a folder is selected, that folder is opened in a new
