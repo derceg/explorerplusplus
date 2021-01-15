@@ -597,6 +597,8 @@ void ShellBrowser::RenameItem(int internalIndex, const TCHAR *szNewFileName)
 		ListView_SetItemText(m_hListView, *itemIndex, 0, filename.data());
 	}
 
+	ListView_SortItems(m_hListView, SortStub, this);
+
 	if (m_folderSettings.showInGroups)
 	{
 		int groupId = DetermineItemGroup(internalIndex);
