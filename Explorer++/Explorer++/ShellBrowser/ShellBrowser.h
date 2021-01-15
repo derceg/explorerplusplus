@@ -470,9 +470,11 @@ private:
 	void OnItemRemoved(PCIDLIST_ABSOLUTE pidl);
 	void OnFileRemoved(const TCHAR *szFileName);
 	void OnFileModified(const TCHAR *fileName);
+	void OnItemRenamed(PCIDLIST_ABSOLUTE pidlOld, PCIDLIST_ABSOLUTE pidlNew);
 	void OnFileRenamedOldName(const TCHAR *szFileName);
 	void OnFileRenamedNewName(const TCHAR *szFileName);
 	void RenameItem(int internalIndex, const TCHAR *szNewFileName);
+	void RenameItem(int internalIndex, PCIDLIST_ABSOLUTE pidlNew);
 	void InvalidateAllColumnsForItem(int itemIndex);
 	void InvalidateIconForItem(int itemIndex);
 	int DetermineItemSortedPosition(LPARAM lParam) const;

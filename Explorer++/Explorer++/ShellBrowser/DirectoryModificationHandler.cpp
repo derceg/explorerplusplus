@@ -57,6 +57,15 @@ void ShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)
 
 	switch (event)
 	{
+	case SHCNE_RENAMEFOLDER:
+	case SHCNE_RENAMEITEM:
+		if (ILIsParent(m_directoryState.pidlDirectory.get(), pidls[0], TRUE)
+			&& ILIsParent(m_directoryState.pidlDirectory.get(), pidls[1], TRUE))
+		{
+			OnItemRenamed(pidls[0], pidls[1]);
+		}
+		break;
+
 	case SHCNE_RMDIR:
 	case SHCNE_DELETE:
 		// Only the current directory is monitored, so notifications should only arrive for items in
@@ -446,6 +455,16 @@ void ShellBrowser::OnFileModified(const TCHAR *fileName)
 	}
 }
 
+void ShellBrowser::OnItemRenamed(PCIDLIST_ABSOLUTE pidlOld, PCIDLIST_ABSOLUTE pidlNew)
+{
+	auto internalIndex = GetItemInternalIndexForPidl(pidlOld);
+
+	if (internalIndex)
+	{
+		RenameItem(*internalIndex, pidlNew);
+	}
+}
+
 void ShellBrowser::OnFileRenamedOldName(const TCHAR *szFileName)
 {
 	/* Loop through each file that is awaiting add to check for the
@@ -530,9 +549,14 @@ void ShellBrowser::RenameItem(int internalIndex, const TCHAR *szNewFileName)
 		return;
 	}
 
+	RenameItem(internalIndex, pidlFull.get());
+}
+
+void ShellBrowser::RenameItem(int internalIndex, PCIDLIST_ABSOLUTE pidlNew)
+{
 	wil::com_ptr_nothrow<IShellFolder> shellFolder;
 	PCITEMID_CHILD pidlChild = nullptr;
-	hr = SHBindToParent(pidlFull.get(), IID_PPV_ARGS(&shellFolder), &pidlChild);
+	HRESULT hr = SHBindToParent(pidlNew, IID_PPV_ARGS(&shellFolder), &pidlChild);
 
 	if (FAILED(hr))
 	{
