@@ -48,6 +48,33 @@ void ShellBrowser::StopDirectoryMonitoring()
 	}
 }
 
+void ShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)
+{
+	PIDLIST_ABSOLUTE *pidls;
+	LONG event;
+	HANDLE lock = SHChangeNotification_Lock(
+		reinterpret_cast<HANDLE>(wParam), static_cast<DWORD>(lParam), &pidls, &event);
+
+	switch (event)
+	{
+	case SHCNE_RMDIR:
+	case SHCNE_DELETE:
+		// Only the current directory is monitored, so notifications should only arrive for items in
+		// that directory. However, if the user has just changed directories, a notification could
+		// still come in for the previous directory. Therefore, it's important to verify that the
+		// item is actually a child of the current directory.
+		if (ILIsParent(m_directoryState.pidlDirectory.get(), pidls[0], TRUE))
+		{
+			OnItemRemoved(pidls[0]);
+		}
+		break;
+	}
+
+	SHChangeNotification_Unlock(lock);
+
+	SendMessage(m_hOwner, WM_USER_DIRECTORYMODIFIED, m_ID, 0);
+}
+
 void ShellBrowser::DirectoryAltered()
 {
 	BOOL bNewItemCreated;
@@ -285,6 +312,16 @@ void ShellBrowser::OnFileAdded(const TCHAR *szFileName)
 		be added). */
 		StringCchCopy(added.szFileName, SIZEOF_ARRAY(added.szFileName), szFileName);
 		m_FilesAdded.push_back(added);
+	}
+}
+
+void ShellBrowser::OnItemRemoved(PCIDLIST_ABSOLUTE pidl)
+{
+	auto internalIndex = GetItemInternalIndexForPidl(pidl);
+
+	if (internalIndex)
+	{
+		RemoveItem(*internalIndex);
 	}
 }
 

@@ -464,8 +464,10 @@ private:
 	/* Directory altered support. */
 	void StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl);
 	void StopDirectoryMonitoring();
+	void OnShellNotify(WPARAM wParam, LPARAM lParam);
 	void OnFileAdded(const TCHAR *szFileName);
 	void RemoveItem(int iItemInternal);
+	void OnItemRemoved(PCIDLIST_ABSOLUTE pidl);
 	void OnFileRemoved(const TCHAR *szFileName);
 	void OnFileModified(const TCHAR *fileName);
 	void OnFileRenamedOldName(const TCHAR *szFileName);

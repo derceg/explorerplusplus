@@ -117,6 +117,10 @@ LRESULT CALLBACK ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 	case WM_APP_INFO_TIP_READY:
 		ProcessInfoTipResult(static_cast<int>(wParam));
 		break;
+
+	case WM_APP_SHELL_NOTIFY:
+		OnShellNotify(wParam, lParam);
+		break;
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
