@@ -295,7 +295,7 @@ TEST_F(ShellNavigationControllerTest, GoUp)
 
 	unique_pidl_absolute pidlParent(SHSimpleIDListFromPath(L"C:\\"));
 	ASSERT_TRUE(pidlParent);
-	EXPECT_TRUE(CompareIdls(entry->GetPidl().get(), pidlParent.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidlParent.get()));
 
 	// The desktop folder is the root of the shell namespace.
 	unique_pidl_absolute pidlDesktop;
@@ -313,7 +313,7 @@ TEST_F(ShellNavigationControllerTest, GoUp)
 
 	entry = m_navigationController.GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(CompareIdls(entry->GetPidl().get(), pidlDesktop.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidlDesktop.get()));
 }
 
 TEST_F(ShellNavigationControllerTest, GetEntry)
@@ -334,7 +334,7 @@ TEST_F(ShellNavigationControllerTest, GetEntry)
 
 	entry = m_navigationController.GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(CompareIdls(entry->GetPidl().get(), pidl1.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl1.get()));
 
 	unique_pidl_absolute pidl2(SHSimpleIDListFromPath(L"C:\\Fake2"));
 	ASSERT_TRUE(pidl2);
@@ -344,14 +344,14 @@ TEST_F(ShellNavigationControllerTest, GetEntry)
 
 	entry = m_navigationController.GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(CompareIdls(entry->GetPidl().get(), pidl2.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl2.get()));
 
 	EXPECT_EQ(m_navigationController.GetCurrentIndex(), 1);
 	EXPECT_EQ(m_navigationController.GetCurrentEntry(), m_navigationController.GetEntryAtIndex(1));
 
 	entry = m_navigationController.GetEntryAtIndex(0);
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(CompareIdls(entry->GetPidl().get(), pidl1.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl1.get()));
 }
 
 TEST_F(ShellNavigationControllerTest, NavigationMode)
@@ -433,6 +433,6 @@ TEST_F(ShellNavigationControllerPreservedTest, CheckEntries)
 	{
 		auto entry = m_navigationController->GetEntryAtIndex(static_cast<int>(i));
 		ASSERT_NE(entry, nullptr);
-		EXPECT_TRUE(CompareIdls(entry->GetPidl().get(), m_preservedEntries[i]->pidl.get()));
+		EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), m_preservedEntries[i]->pidl.get()));
 	}
 }

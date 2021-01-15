@@ -413,7 +413,7 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 		if (IsFileFiltered(itemInfo))
 		{
-			m_directoryState.filteredItemsList.push_back(awaitingItem.iItemInternal);
+			m_directoryState.filteredItemsList.insert(awaitingItem.iItemInternal);
 			continue;
 		}
 
@@ -479,7 +479,7 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 		if (m_bNewItemCreated)
 		{
-			if (CompareIdls(itemInfo.pidlComplete.get(), m_pidlNewItem))
+			if (ArePidlsEquivalent(itemInfo.pidlComplete.get(), m_pidlNewItem))
 			{
 				m_bNewItemCreated = FALSE;
 			}
@@ -522,18 +522,6 @@ void ShellBrowser::ApplyFolderEmptyBackgroundImage(bool apply)
 	if (apply)
 	{
 		ListViewHelper::SetBackgroundImage(m_hListView, IDB_FOLDEREMPTY);
-	}
-	else
-	{
-		ListViewHelper::SetBackgroundImage(m_hListView, NULL);
-	}
-}
-
-void ShellBrowser::ApplyFilteringBackgroundImage(bool apply)
-{
-	if (apply)
-	{
-		ListViewHelper::SetBackgroundImage(m_hListView, IDB_FILTERINGAPPLIED);
 	}
 	else
 	{

@@ -82,7 +82,7 @@ BOOL GetBooleanVariant(IShellFolder2 *shellFolder2, PCITEMID_CHILD pidlChild,
 	const SHCOLUMNID *column, BOOL defaultValue);
 std::optional<std::wstring> GetFolderPathForDisplay(PCIDLIST_ABSOLUTE pidl);
 BOOL IsPathGUID(const TCHAR *szPath);
-BOOL CompareIdls(PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2);
+BOOL ArePidlsEquivalent(PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2);
 HRESULT AddJumpListTasks(const std::list<JumpListTaskInformation> &taskList);
 BOOL LoadContextMenuHandlers(const TCHAR *szRegKey,
 	std::list<ContextMenuHandler> &contextMenuHandlers,
@@ -101,6 +101,7 @@ HRESULT ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_C
 	HWND hwndOwner, int nFiles, const TCHAR *szAction, DWORD fMask);
 BOOL CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL);
 bool IsChildOfLibrariesFolder(PCIDLIST_ABSOLUTE pidl);
+HRESULT CreateSimplePidl(const std::wstring &path, PIDLIST_ABSOLUTE *pidl);
 
 /* Drag and drop helpers. */
 DWORD DetermineDragEffect(

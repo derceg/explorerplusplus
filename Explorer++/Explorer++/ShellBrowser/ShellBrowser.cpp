@@ -516,17 +516,6 @@ void ShellBrowser::OnGridlinesSettingChanged()
 	ListViewHelper::SetGridlines(m_hListView, m_config->globalFolderSettings.showGridlines);
 }
 
-BOOL ShellBrowser::IsFilenameFiltered(const TCHAR *FileName) const
-{
-	if (CheckWildcardMatch(
-			m_folderSettings.filter.c_str(), FileName, m_folderSettings.filterCaseSensitive))
-	{
-		return FALSE;
-	}
-
-	return TRUE;
-}
-
 std::wstring ShellBrowser::GetItemName(int index) const
 {
 	return GetItemByIndex(index).wfd.cFileName;
@@ -622,6 +611,20 @@ int ShellBrowser::LocateFileItemInternalIndex(const TCHAR *szFileName) const
 	return -1;
 }
 
+std::optional<int> ShellBrowser::GetItemInternalIndexForPidl(PCIDLIST_ABSOLUTE pidl) const
+{
+	auto itr = std::find_if(m_itemInfoMap.begin(), m_itemInfoMap.end(), [pidl](const auto &pair) {
+		return ArePidlsEquivalent(pidl, pair.second.pidlComplete.get());
+	});
+
+	if (itr == m_itemInfoMap.end())
+	{
+		return std::nullopt;
+	}
+
+	return itr->first;
+}
+
 std::optional<int> ShellBrowser::LocateItemByInternalIndex(int internalIndex) const
 {
 	LVFINDINFO lvfi;
@@ -704,8 +707,8 @@ BOOL ShellBrowser::CanCreate() const
 
 	if (SUCCEEDED(hr))
 	{
-		bCanCreate =
-			!InVirtualFolder() || CompareIdls(m_directoryState.pidlDirectory.get(), pidl.get());
+		bCanCreate = !InVirtualFolder()
+			|| ArePidlsEquivalent(m_directoryState.pidlDirectory.get(), pidl.get());
 	}
 
 	return bCanCreate;
@@ -970,61 +973,6 @@ int ShellBrowser::DetermineItemSortedPosition(LPARAM lParam) const
 	return i - 1;
 }
 
-void ShellBrowser::RemoveFilteredItems()
-{
-	if (!m_folderSettings.applyFilter)
-	{
-		return;
-	}
-
-	int nItems = ListView_GetItemCount(m_hListView);
-
-	for (int i = nItems - 1; i >= 0; i--)
-	{
-		int internalIndex = GetItemInternalIndex(i);
-
-		if (!((m_itemInfoMap.at(internalIndex).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-				== FILE_ATTRIBUTE_DIRECTORY))
-		{
-			if (IsFilenameFiltered(m_itemInfoMap.at(internalIndex).displayName.c_str()))
-			{
-				RemoveFilteredItem(i, internalIndex);
-			}
-		}
-	}
-
-	SendMessage(m_hOwner, WM_USER_UPDATEWINDOWS, 0, 0);
-}
-
-void ShellBrowser::RemoveFilteredItem(int iItem, int iItemInternal)
-{
-	ULARGE_INTEGER ulFileSize;
-
-	const auto &item = m_itemInfoMap.at(iItemInternal);
-
-	if (ListView_GetItemState(m_hListView, iItem, LVIS_SELECTED) == LVIS_SELECTED)
-	{
-		ulFileSize.LowPart = item.wfd.nFileSizeLow;
-		ulFileSize.HighPart = item.wfd.nFileSizeHigh;
-
-		m_directoryState.fileSelectionSize.QuadPart -= ulFileSize.QuadPart;
-	}
-
-	/* Take the file size of the removed file away from the total
-	directory size. */
-	ulFileSize.LowPart = item.wfd.nFileSizeLow;
-	ulFileSize.HighPart = item.wfd.nFileSizeHigh;
-
-	m_directoryState.totalDirSize.QuadPart -= ulFileSize.QuadPart;
-
-	/* Remove the item from the m_hListView. */
-	ListView_DeleteItem(m_hListView, iItem);
-
-	m_directoryState.numItems--;
-
-	m_directoryState.filteredItemsList.push_back(iItemInternal);
-}
-
 int ShellBrowser::GetNumItems() const
 {
 	return m_directoryState.numItems;
@@ -1049,90 +997,6 @@ void ShellBrowser::GetFolderInfo(FolderInfo_t *pFolderInfo)
 {
 	pFolderInfo->TotalFolderSize.QuadPart = m_directoryState.totalDirSize.QuadPart;
 	pFolderInfo->TotalSelectionSize.QuadPart = m_directoryState.fileSelectionSize.QuadPart;
-}
-
-std::wstring ShellBrowser::GetFilter() const
-{
-	return m_folderSettings.filter;
-}
-
-void ShellBrowser::SetFilter(std::wstring_view filter)
-{
-	m_folderSettings.filter = filter;
-
-	if (m_folderSettings.applyFilter)
-	{
-		UnfilterAllItems();
-		UpdateFiltering();
-	}
-}
-
-void ShellBrowser::SetFilterStatus(BOOL bFilter)
-{
-	m_folderSettings.applyFilter = bFilter;
-
-	UpdateFiltering();
-}
-
-BOOL ShellBrowser::GetFilterStatus() const
-{
-	return m_folderSettings.applyFilter;
-}
-
-void ShellBrowser::SetFilterCaseSensitive(BOOL filterCaseSensitive)
-{
-	m_folderSettings.filterCaseSensitive = filterCaseSensitive;
-}
-
-BOOL ShellBrowser::GetFilterCaseSensitive() const
-{
-	return m_folderSettings.filterCaseSensitive;
-}
-
-void ShellBrowser::UpdateFiltering()
-{
-	if (m_folderSettings.applyFilter)
-	{
-		RemoveFilteredItems();
-
-		ApplyFilteringBackgroundImage(true);
-	}
-	else
-	{
-		UnfilterAllItems();
-
-		if (m_directoryState.numItems == 0)
-		{
-			ApplyFolderEmptyBackgroundImage(true);
-		}
-		else
-		{
-			ApplyFilteringBackgroundImage(false);
-		}
-	}
-}
-
-void ShellBrowser::UnfilterAllItems()
-{
-	AwaitingAdd_t awaitingAdd;
-
-	for (int itemId : m_directoryState.filteredItemsList)
-	{
-		int iSorted = DetermineItemSortedPosition(itemId);
-
-		awaitingAdd.iItem = iSorted;
-		awaitingAdd.bPosition = TRUE;
-		awaitingAdd.iAfter = iSorted - 1;
-		awaitingAdd.iItemInternal = itemId;
-
-		m_directoryState.awaitingAddList.push_back(awaitingAdd);
-	}
-
-	m_directoryState.filteredItemsList.clear();
-
-	InsertAwaitingItems(m_folderSettings.showInGroups);
-
-	SendMessage(m_hOwner, WM_USER_UPDATEWINDOWS, 0, 0);
 }
 
 void ShellBrowser::VerifySortMode()
@@ -1252,7 +1116,7 @@ void ShellBrowser::QueueRename(PCIDLIST_ABSOLUTE pidlItem)
 		lvItem.iSubItem = 0;
 		ListView_GetItem(m_hListView, &lvItem);
 
-		if (CompareIdls(pidlItem, m_itemInfoMap.at((int) lvItem.lParam).pidlComplete.get()))
+		if (ArePidlsEquivalent(pidlItem, m_itemInfoMap.at((int) lvItem.lParam).pidlComplete.get()))
 		{
 			bItemFound = TRUE;
 
@@ -1413,7 +1277,7 @@ void ShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 			lvItem.iSubItem = 0;
 			ListView_GetItem(m_hListView, &lvItem);
 
-			if (CompareIdls(
+			if (ArePidlsEquivalent(
 					pidlDrive.get(), m_itemInfoMap.at((int) lvItem.lParam).pidlComplete.get()))
 			{
 				iItem = i;

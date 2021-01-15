@@ -202,7 +202,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 				if(SUCCEEDED(hr))
 				{
 					if(ILIsParent(pidlControlPanel.get(),pidl.get(),FALSE) &&
-						!CompareIdls(pidlControlPanel.get(),pidl.get()))
+						!ArePidlsEquivalent(pidlControlPanel.get(),pidl.get()))
 					{
 						bControlPanelChild = TRUE;
 					}
@@ -215,7 +215,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 						if (SUCCEEDED(hr))
 						{
 							if (ILIsParent(pidlControlPanelCategory.get(), pidl.get(), FALSE) &&
-								!CompareIdls(pidlControlPanelCategory.get(), pidl.get()))
+								!ArePidlsEquivalent(pidlControlPanelCategory.get(), pidl.get()))
 							{
 								bControlPanelChild = TRUE;
 							}

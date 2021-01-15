@@ -14,7 +14,7 @@
 #include <list>
 
 BOOL g_bNewFileRenamed = FALSE;
-static int iRenamedItem;
+int g_iRenamedItem = -1;
 
 void ShellBrowser::DirectoryAltered()
 {
@@ -459,31 +459,50 @@ void ShellBrowser::OnFileModified(const TCHAR *FileName)
 
 void ShellBrowser::OnFileRenamedOldName(const TCHAR *szFileName)
 {
-	std::list<Added_t>::iterator itrAdded;
-	BOOL bFileHandled = FALSE;
-
 	/* Loop through each file that is awaiting add to check for the
 	renamed file. */
-	for (itrAdded = m_FilesAdded.begin(); itrAdded != m_FilesAdded.end(); itrAdded++)
+	for (auto itr = m_FilesAdded.begin(); itr != m_FilesAdded.end(); itr++)
 	{
-		if (lstrcmp(szFileName, itrAdded->szFileName) == 0)
+		if (lstrcmp(szFileName, itr->szFileName) == 0)
 		{
-			bFileHandled = TRUE;
-
 			g_bNewFileRenamed = TRUE;
-
-			m_FilesAdded.erase(itrAdded);
-
-			break;
+			m_FilesAdded.erase(itr);
+			return;
 		}
 	}
 
-	if (!bFileHandled)
+	TCHAR fullFileName[MAX_PATH];
+	HRESULT hr =
+		StringCchCopy(fullFileName, SIZEOF_ARRAY(fullFileName), m_directoryState.directory.c_str());
+
+	if (FAILED(hr))
 	{
-		/* Find the index of the item that was renamed...
-		Store the index so that it is known which item needs
-		renaming when the files new name is received. */
-		iRenamedItem = LocateFileItemInternalIndex(szFileName);
+		return;
+	}
+
+	BOOL res = PathAppend(fullFileName, szFileName);
+
+	if (!res)
+	{
+		return;
+	}
+
+	unique_pidl_absolute pidl;
+	hr = CreateSimplePidl(fullFileName, wil::out_param(pidl));
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	/* Find the index of the item that was renamed...
+	Store the index so that it is known which item needs
+	renaming when the files new name is received. */
+	auto internalIndex = GetItemInternalIndexForPidl(pidl.get());
+
+	if (internalIndex)
+	{
+		g_iRenamedItem = *internalIndex;
 	}
 }
 
@@ -499,7 +518,7 @@ void ShellBrowser::OnFileRenamedNewName(const TCHAR *szFileName)
 	}
 	else
 	{
-		RenameItem(iRenamedItem, szFileName);
+		RenameItem(g_iRenamedItem, szFileName);
 	}
 }
 
@@ -542,24 +561,26 @@ void ShellBrowser::RenameItem(int internalIndex, const TCHAR *szNewFileName)
 	m_itemInfoMap[internalIndex] = std::move(*itemInfo);
 	const ItemInfo_t &updatedItemInfo = m_itemInfoMap[internalIndex];
 
-	LVFINDINFO lvfi;
-	lvfi.flags = LVFI_PARAM;
-	lvfi.lParam = internalIndex;
-	int itemIndex = ListView_FindItem(m_hListView, -1, &lvfi);
+	auto itemIndex = LocateItemByInternalIndex(internalIndex);
 
 	// Items may be filtered out of the listview, so it's valid for an item not to be found.
-	if (itemIndex == -1)
+	if (!itemIndex)
 	{
+		if (!IsFileFiltered(updatedItemInfo))
+		{
+			UnfilterItem(internalIndex);
+		}
+
 		return;
 	}
 
 	if (IsFileFiltered(updatedItemInfo))
 	{
-		RemoveFilteredItem(itemIndex, internalIndex);
+		RemoveFilteredItem(*itemIndex, internalIndex);
 		return;
 	}
 
-	InvalidateIconForItem(itemIndex);
+	InvalidateIconForItem(*itemIndex);
 
 	if (m_folderSettings.viewMode == +ViewMode::Details)
 	{
@@ -567,19 +588,19 @@ void ShellBrowser::RenameItem(int internalIndex, const TCHAR *szNewFileName)
 		// (e.g. type, extension, 8.3 name). Therefore, all columns will be invalidated here.
 		// Note that this is more efficient than simply queuing tasks to set the text for each
 		// column, since that won't be necessary if the item isn't currently visible.
-		InvalidateAllColumnsForItem(itemIndex);
+		InvalidateAllColumnsForItem(*itemIndex);
 	}
 	else
 	{
 		BasicItemInfo_t basicItemInfo = getBasicItemInfo(internalIndex);
 		std::wstring filename = ProcessItemFileName(basicItemInfo, m_config->globalFolderSettings);
-		ListView_SetItemText(m_hListView, itemIndex, 0, filename.data());
+		ListView_SetItemText(m_hListView, *itemIndex, 0, filename.data());
 	}
 
 	if (m_folderSettings.showInGroups)
 	{
 		int groupId = DetermineItemGroup(internalIndex);
-		InsertItemIntoGroup(itemIndex, groupId);
+		InsertItemIntoGroup(*itemIndex, groupId);
 	}
 }
 

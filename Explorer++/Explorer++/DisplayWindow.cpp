@@ -44,7 +44,7 @@ void Explorerplusplus::UpdateDisplayWindowForZeroFiles(const Tab &tab)
 	unique_pidl_absolute pidlComputer;
 	SHGetFolderLocation(nullptr, CSIDL_DRIVES, nullptr, 0, wil::out_param(pidlComputer));
 
-	if (CompareIdls(pidlDirectory.get(), pidlComputer.get()))
+	if (ArePidlsEquivalent(pidlDirectory.get(), pidlComputer.get()))
 	{
 		TCHAR szDisplay[512];
 		DWORD dwSize = SIZEOF_ARRAY(szDisplay);

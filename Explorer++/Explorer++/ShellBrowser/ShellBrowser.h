@@ -26,6 +26,7 @@
 #include <list>
 #include <optional>
 #include <unordered_map>
+#include <unordered_set>
 
 #define WM_USER_UPDATEWINDOWS (WM_APP + 17)
 #define WM_USER_FILESADDED (WM_APP + 51)
@@ -309,7 +310,7 @@ private:
 		into the listview. */
 		std::vector<AwaitingAdd_t> awaitingAddList;
 
-		std::vector<int> filteredItemsList;
+		std::unordered_set<int> filteredItemsList;
 
 		int numItems;
 		int numFilesSelected;
@@ -388,7 +389,6 @@ private:
 	void SetFirstColumnTextToCallback();
 	void SetFirstColumnTextToFilename();
 	void ApplyFolderEmptyBackgroundImage(bool apply);
-	void ApplyFilteringBackgroundImage(bool apply);
 
 	static LRESULT CALLBACK ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
@@ -473,11 +473,14 @@ private:
 	int DetermineItemSortedPosition(LPARAM lParam) const;
 
 	/* Filtering support. */
-	BOOL IsFilenameFiltered(const TCHAR *FileName) const;
+	void UpdateFiltering();
 	void RemoveFilteredItems();
 	void RemoveFilteredItem(int iItem, int iItemInternal);
-	void UpdateFiltering();
+	BOOL IsFilenameFiltered(const TCHAR *FileName) const;
 	void UnfilterAllItems();
+	void UnfilterItem(int internalIndex);
+	void RestoreFilteredItem(int internalIndex);
+	void ApplyFilteringBackgroundImage(bool apply);
 
 	/* Listview group support. */
 	static int CALLBACK GroupComparisonStub(int id1, int id2, void *data);
@@ -559,6 +562,7 @@ private:
 	/* Miscellaneous. */
 	BOOL CompareVirtualFolders(UINT uFolderCSIDL) const;
 	int LocateFileItemInternalIndex(const TCHAR *szFileName) const;
+	std::optional<int> GetItemInternalIndexForPidl(PCIDLIST_ABSOLUTE pidl) const;
 	std::optional<int> LocateItemByInternalIndex(int internalIndex) const;
 	void ApplyHeaderSortArrow();
 

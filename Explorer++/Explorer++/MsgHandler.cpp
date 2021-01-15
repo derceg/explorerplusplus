@@ -144,7 +144,7 @@ void Explorerplusplus::OpenItem(
 		If it is, pass it to the shell to open, rather than
 		opening it in-place. */
 		if (ILIsParent(pidlControlPanel.get(), pidlItem, FALSE)
-			&& !CompareIdls(pidlControlPanel.get(), pidlItem))
+			&& !ArePidlsEquivalent(pidlControlPanel.get(), pidlItem))
 		{
 			bControlPanelParent = TRUE;
 		}
@@ -180,7 +180,7 @@ void Explorerplusplus::OpenItem(
 			If it is, pass it to the shell to open, rather than
 			opening it in-place. */
 			if (ILIsParent(pidlControlPanelCategoryView.get(), pidlItem, FALSE)
-				&& !CompareIdls(pidlControlPanelCategoryView.get(), pidlItem))
+				&& !ArePidlsEquivalent(pidlControlPanelCategoryView.get(), pidlItem))
 			{
 				bControlPanelParent = TRUE;
 			}

@@ -291,7 +291,7 @@ void Explorerplusplus::OnTreeViewHolderWindowTimer()
 	auto pidlCurrentDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
 	if (!m_bSelectingTreeViewDirectory && !m_bTreeViewRightClick
-		&& !CompareIdls(pidlDirectory.get(), pidlCurrentDirectory.get()))
+		&& !ArePidlsEquivalent(pidlDirectory.get(), pidlCurrentDirectory.get()))
 	{
 		Tab &selectedTab = m_tabContainer->GetSelectedTab();
 		selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(pidlDirectory.get());

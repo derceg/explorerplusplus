@@ -189,7 +189,7 @@ BOOL IsNamespaceRoot(PCIDLIST_ABSOLUTE pidl)
 
 	if (SUCCEEDED(hr))
 	{
-		bNamespaceRoot = CompareIdls(pidl, pidlDesktop.get());
+		bNamespaceRoot = ArePidlsEquivalent(pidl, pidlDesktop.get());
 	}
 
 	return bNamespaceRoot;
@@ -1005,7 +1005,7 @@ void DecodePath(const TCHAR *szInitialPath, const TCHAR *szCurrentDirectory, TCH
 	}
 }
 
-BOOL CompareIdls(PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2)
+BOOL ArePidlsEquivalent(PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2)
 {
 	IShellFolder *pDesktopFolder = nullptr;
 	HRESULT hr;
@@ -1444,4 +1444,82 @@ bool IsChildOfLibrariesFolder(PCIDLIST_ABSOLUTE pidl)
 	}
 
 	return ILIsParent(pidlLibraries.get(), pidl, FALSE);
+}
+
+class FileSystemBindData : public IFileSystemBindData
+{
+public:
+	static wil::com_ptr_nothrow<FileSystemBindData> Create(const WIN32_FIND_DATA *wfd)
+	{
+		wil::com_ptr_nothrow<FileSystemBindData> fsBindData;
+		fsBindData.attach(new FileSystemBindData(wfd));
+		return fsBindData;
+	}
+
+	IFACEMETHODIMP QueryInterface(REFIID riid, void **ppvObject)
+	{
+		// clang-format off
+		static const QITAB qit[] = {
+			QITABENT(FileSystemBindData, IFileSystemBindData),
+			{ nullptr }
+		};
+		// clang-format on
+
+		return QISearch(this, qit, riid, ppvObject);
+	}
+
+	IFACEMETHODIMP_(ULONG) AddRef(void)
+	{
+		return InterlockedIncrement(&m_refCount);
+	}
+
+	IFACEMETHODIMP_(ULONG) Release(void)
+	{
+		ULONG refCount = InterlockedDecrement(&m_refCount);
+
+		if (refCount == 0)
+		{
+			delete this;
+		}
+
+		return refCount;
+	}
+
+	IFACEMETHODIMP SetFindData(const WIN32_FIND_DATAW *wfd)
+	{
+		m_wfd = *wfd;
+		return S_OK;
+	}
+
+	IFACEMETHODIMP GetFindData(WIN32_FIND_DATAW *wfd)
+	{
+		*wfd = m_wfd;
+		return S_OK;
+	}
+
+private:
+	ULONG m_refCount;
+	WIN32_FIND_DATA m_wfd;
+
+	FileSystemBindData(const WIN32_FIND_DATA *wfd) : m_refCount(1), m_wfd(*wfd)
+	{
+	}
+};
+
+HRESULT CreateSimplePidl(const std::wstring &path, PIDLIST_ABSOLUTE *pidl)
+{
+	wil::com_ptr_nothrow<IBindCtx> bindCtx;
+	RETURN_IF_FAILED(CreateBindCtx(0, &bindCtx));
+
+	BIND_OPTS opts = { sizeof(opts), 0, STGM_CREATE, 0 };
+	RETURN_IF_FAILED(bindCtx->SetBindOptions(&opts));
+
+	WIN32_FIND_DATA wfd = {};
+	wfd.dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
+	auto fsBindData = FileSystemBindData::Create(&wfd);
+
+	RETURN_IF_FAILED(
+		bindCtx->RegisterObjectParam(const_cast<PWSTR>(STR_FILE_SYS_BIND_DATA), fsBindData.get()));
+
+	return SHParseDisplayName(path.c_str(), bindCtx.get(), pidl, 0, nullptr);
 }

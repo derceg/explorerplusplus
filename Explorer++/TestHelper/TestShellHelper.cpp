@@ -104,11 +104,11 @@ TEST(IsPathGUID, NonGUID)
 
 void TestCompareIdls(LPCITEMIDLIST pidl1, LPCITEMIDLIST pidl2, BOOL bExpected)
 {
-	BOOL bRet = CompareIdls(pidl1, pidl2);
+	BOOL bRet = ArePidlsEquivalent(pidl1, pidl2);
 	EXPECT_EQ(bExpected, bRet);
 }
 
-TEST(CompareIdls, Same)
+TEST(ArePidlsEquivalent, Same)
 {
 	LPITEMIDLIST pidl = NULL;
 	GetTestResourceDirectoryIdl(&pidl);
@@ -118,7 +118,7 @@ TEST(CompareIdls, Same)
 	CoTaskMemFree(pidl);
 }
 
-TEST(CompareIdls, Different)
+TEST(ArePidlsEquivalent, Different)
 {
 	LPITEMIDLIST pidl1 = NULL;
 	GetTestResourceFileIdl(L"Metadata.jpg", &pidl1);

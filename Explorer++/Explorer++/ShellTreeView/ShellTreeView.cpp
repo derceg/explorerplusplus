@@ -1091,7 +1091,8 @@ HTREEITEM ShellTreeView::LocateItemInternal(
 	the parent node if necessary. */
 	while (!bFound && hItem != nullptr)
 	{
-		if (CompareIdls(m_itemInfoMap.at(static_cast<int>(item.lParam)).pidl.get(), pidlDirectory))
+		if (ArePidlsEquivalent(
+				m_itemInfoMap.at(static_cast<int>(item.lParam)).pidl.get(), pidlDirectory))
 		{
 			bFound = TRUE;
 
