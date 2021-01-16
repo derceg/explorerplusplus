@@ -20,7 +20,7 @@ Navigation::Navigation(IExplorerplusplus *expp) : m_expp(expp), m_tabContainer(n
 void Navigation::OnNavigateUp()
 {
 	Tab &tab = m_tabContainer->GetSelectedTab();
-	std::wstring directory = tab.GetShellBrowser()->GetDirectory();
+	unique_pidl_absolute directory = tab.GetShellBrowser()->GetDirectoryIdl();
 
 	HRESULT hr = E_FAIL;
 	int resultingTabId = -1;
@@ -47,11 +47,7 @@ void Navigation::OnNavigateUp()
 	if (SUCCEEDED(hr))
 	{
 		const Tab &resultingTab = m_tabContainer->GetTab(resultingTabId);
-
-		TCHAR directoryFileName[MAX_PATH];
-		StringCchCopy(directoryFileName, std::size(directoryFileName), directory.c_str());
-		PathStripPath(directoryFileName);
-		resultingTab.GetShellBrowser()->SelectFiles(directoryFileName);
+		resultingTab.GetShellBrowser()->SelectItem(directory.get());
 	}
 }
 

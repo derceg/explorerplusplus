@@ -148,7 +148,7 @@ public:
 
 	void SetFileAttributesForSelection();
 
-	int SelectFiles(const TCHAR *FileNamePattern);
+	void SelectItem(PCIDLIST_ABSOLUTE pidl);
 	void GetFolderInfo(FolderInfo_t *pFolderInfo);
 	int LocateFileItemIndex(const TCHAR *szFileName) const;
 	bool InVirtualFolder() const;

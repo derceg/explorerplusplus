@@ -675,11 +675,8 @@ void SearchDialog::HandleCustomMenuItem(
 	{
 		m_tabContainer->CreateNewTab(pidlParent, TabSettings(_selected = true));
 
-		std::wstring filename;
 		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems.front()));
-		GetDisplayName(pidlComplete.get(), SHGDN_INFOLDER | SHGDN_FORPARSING, filename);
-
-		m_pexpp->GetActiveShellBrowser()->SelectFiles(filename.c_str());
+		m_pexpp->GetActiveShellBrowser()->SelectItem(pidlComplete.get());
 	}
 	break;
 	}

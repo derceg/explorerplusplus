@@ -270,10 +270,13 @@ void Explorerplusplus::OnResolveLink()
 
 			if (SUCCEEDED(hr))
 			{
-				/* Strip off the path, and select the shortcut target
-				in the listview. */
-				PathStripPath(szFullFileName);
-				m_pActiveShellBrowser->SelectFiles(szFullFileName);
+				unique_pidl_absolute pidl;
+				hr = CreateSimplePidl(szFullFileName, wil::out_param(pidl));
+
+				if (SUCCEEDED(hr))
+				{
+					m_pActiveShellBrowser->SelectItem(pidl.get());
+				}
 
 				SetFocus(m_hActiveListView);
 			}

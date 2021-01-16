@@ -563,23 +563,25 @@ unique_pidl_absolute ShellBrowser::GetDirectoryIdl() const
 	return pidlDirectory;
 }
 
-/* TODO: Convert to using pidl's here, rather than
-file names. */
-int ShellBrowser::SelectFiles(const TCHAR *FileNamePattern)
+void ShellBrowser::SelectItem(PCIDLIST_ABSOLUTE pidl)
 {
-	int iItem;
+	auto internalIndex = GetItemInternalIndexForPidl(pidl);
 
-	iItem = LocateFileItemIndex(FileNamePattern);
-
-	if (iItem != -1)
+	if (!internalIndex)
 	{
-		ListViewHelper::FocusItem(m_hListView, iItem, TRUE);
-		ListViewHelper::SelectItem(m_hListView, iItem, TRUE);
-		ListView_EnsureVisible(m_hListView, iItem, FALSE);
-		return 1;
+		return;
 	}
 
-	return 0;
+	auto index = LocateItemByInternalIndex(*internalIndex);
+
+	if (!index)
+	{
+		return;
+	}
+
+	ListViewHelper::FocusItem(m_hListView, *index, TRUE);
+	ListViewHelper::SelectItem(m_hListView, *index, TRUE);
+	ListView_EnsureVisible(m_hListView, *index, FALSE);
 }
 
 int ShellBrowser::LocateFileItemIndex(const TCHAR *szFileName) const
