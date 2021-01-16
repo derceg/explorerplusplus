@@ -288,52 +288,53 @@ void ShellBrowser::OnFileAdded(const TCHAR *szFileName)
 
 void ShellBrowser::AddItem(PCIDLIST_ABSOLUTE pidl)
 {
-	IShellFolder *pShellFolder = nullptr;
-	PCITEMID_CHILD pidlRelative = nullptr;
-	HRESULT hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellFolder), &pidlRelative);
+	wil::com_ptr_nothrow<IShellFolder> shellFolder;
+	PCITEMID_CHILD pidlChild = nullptr;
+	HRESULT hr = SHBindToParent(pidl, IID_PPV_ARGS(&shellFolder), &pidlChild);
 
-	if (SUCCEEDED(hr))
+	if (FAILED(hr))
 	{
-		auto itemId = AddItemInternal(
-			pShellFolder, m_directoryState.pidlDirectory.get(), pidlRelative, -1, FALSE);
-
-		if (itemId)
-		{
-			auto droppedFilesItr = std::find_if(m_droppedFileNameList.begin(),
-				m_droppedFileNameList.end(), [this, itemId](const DroppedFile_t &droppedFile) {
-					return m_itemInfoMap.at(*itemId).displayName == droppedFile.szFileName;
-				});
-
-			bool wasDropped = (droppedFilesItr != m_droppedFileNameList.end());
-
-			/* Only insert the item in its sorted position if it
-			wasn't dropped in. */
-			if (m_config->globalFolderSettings.insertSorted && !wasDropped)
-			{
-				// TODO: It would be better to pass the items details to this function directly
-				// instead (before the item is added to the awaiting list).
-				int sortedPosition = DetermineItemSortedPosition(*itemId);
-
-				auto itr = std::find_if(m_directoryState.awaitingAddList.begin(),
-					m_directoryState.awaitingAddList.end(),
-					[itemId](const AwaitingAdd_t &awaitingItem) {
-						return *itemId == awaitingItem.iItemInternal;
-					});
-
-				// The item was added successfully above, so should be in the list of awaiting
-				// items.
-				assert(itr != m_directoryState.awaitingAddList.end());
-
-				itr->iItem = sortedPosition;
-				itr->bPosition = TRUE;
-				itr->iAfter = sortedPosition - 1;
-			}
-
-			InsertAwaitingItems(m_folderSettings.showInGroups);
-		}
-
-		pShellFolder->Release();
+		return;
 	}
+
+	auto itemId = AddItemInternal(
+		shellFolder.get(), m_directoryState.pidlDirectory.get(), pidlChild, -1, FALSE);
+
+	if (!itemId)
+	{
+		return;
+	}
+
+	const std::wstring displayName = m_itemInfoMap.at(*itemId).displayName;
+	auto droppedFilesItr = std::find_if(m_droppedFileNameList.begin(), m_droppedFileNameList.end(),
+		[&displayName](const DroppedFile_t &droppedFile) {
+			return displayName == droppedFile.szFileName;
+		});
+
+	bool wasDropped = (droppedFilesItr != m_droppedFileNameList.end());
+
+	// Only insert the item in its sorted position if it wasn't dropped in.
+	if (m_config->globalFolderSettings.insertSorted && !wasDropped)
+	{
+		// TODO: It would be better to pass the items details to this function directly
+		// instead (before the item is added to the awaiting list).
+		int sortedPosition = DetermineItemSortedPosition(*itemId);
+
+		auto itr = std::find_if(m_directoryState.awaitingAddList.begin(),
+			m_directoryState.awaitingAddList.end(), [itemId](const AwaitingAdd_t &awaitingItem) {
+				return *itemId == awaitingItem.iItemInternal;
+			});
+
+		// The item was added successfully above, so should be in the list of awaiting
+		// items.
+		assert(itr != m_directoryState.awaitingAddList.end());
+
+		itr->iItem = sortedPosition;
+		itr->bPosition = TRUE;
+		itr->iAfter = sortedPosition - 1;
+	}
+
+	InsertAwaitingItems(m_folderSettings.showInGroups);
 }
 
 void ShellBrowser::OnItemRemoved(PCIDLIST_ABSOLUTE pidl)
