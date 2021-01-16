@@ -161,7 +161,7 @@ private:
 	HTREEITEM LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand);
 	HTREEITEM LocateItemOnDesktopTree(const TCHAR *szFullFileName);
 	void OnMiddleButtonDown(const POINT *pt);
-	void OnMiddleButtonUp(const POINT *pt);
+	void OnMiddleButtonUp(const POINT *pt, UINT keysDown);
 	bool OnEndLabelEdit(const NMTVDISPINFO *dispInfo);
 
 	void UpdateCurrentClipboardObject(wil::com_ptr_nothrow<IDataObject> clipboardDataObject);

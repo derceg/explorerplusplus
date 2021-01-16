@@ -184,7 +184,7 @@ LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam,
 	{
 		POINT pt;
 		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-		OnMiddleButtonUp(&pt);
+		OnMiddleButtonUp(&pt, static_cast<UINT>(wParam));
 	}
 	break;
 
@@ -1615,7 +1615,7 @@ void ShellTreeView::OnMiddleButtonDown(const POINT *pt)
 	}
 }
 
-void ShellTreeView::OnMiddleButtonUp(const POINT *pt)
+void ShellTreeView::OnMiddleButtonUp(const POINT *pt, UINT keysDown)
 {
 	TVHITTESTINFO hitTestInfo;
 	hitTestInfo.pt = *pt;
@@ -1634,8 +1634,15 @@ void ShellTreeView::OnMiddleButtonUp(const POINT *pt)
 		return;
 	}
 
+	bool switchToNewTab = m_config->openTabsInForeground;
+
+	if (WI_IsFlagSet(keysDown, MK_SHIFT))
+	{
+		switchToNewTab = !switchToNewTab;
+	}
+
 	auto pidl = GetItemPidl(hitTestInfo.hItem);
-	m_tabContainer->CreateNewTab(pidl.get());
+	m_tabContainer->CreateNewTab(pidl.get(), TabSettings(_selected = switchToNewTab));
 }
 
 HRESULT ShellTreeView::InitializeDragDropHelpers()
