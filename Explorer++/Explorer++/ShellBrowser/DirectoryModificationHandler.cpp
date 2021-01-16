@@ -6,6 +6,7 @@
 #include "ShellBrowser.h"
 #include "Config.h"
 #include "ItemData.h"
+#include "ShellNavigationController.h"
 #include "ViewModes.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Logging.h"
@@ -95,6 +96,13 @@ void ShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)
 			{
 				ModifyItem(pidlFull.get());
 			}
+		}
+		break;
+
+	case SHCNE_UPDATEDIR:
+		if (ArePidlsEquivalent(m_directoryState.pidlDirectory.get(), pidls[0]))
+		{
+			m_navigationController->Refresh();
 		}
 		break;
 
