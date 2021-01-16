@@ -470,6 +470,7 @@ private:
 	void OnItemRemoved(PCIDLIST_ABSOLUTE pidl);
 	void OnFileRemoved(const TCHAR *szFileName);
 	void OnFileModified(const TCHAR *fileName);
+	void ModifyItem(PCIDLIST_ABSOLUTE pidl);
 	void OnItemRenamed(PCIDLIST_ABSOLUTE pidlOld, PCIDLIST_ABSOLUTE pidlNew);
 	void OnFileRenamedOldName(const TCHAR *szFileName);
 	void OnFileRenamedNewName(const TCHAR *szFileName);

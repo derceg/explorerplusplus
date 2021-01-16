@@ -1506,6 +1506,7 @@ private:
 	}
 };
 
+// This performs the same function as SHSimpleIDListFromPath(), which is deprecated.
 HRESULT CreateSimplePidl(const std::wstring &path, PIDLIST_ABSOLUTE *pidl)
 {
 	wil::com_ptr_nothrow<IBindCtx> bindCtx;
@@ -1522,4 +1523,24 @@ HRESULT CreateSimplePidl(const std::wstring &path, PIDLIST_ABSOLUTE *pidl)
 		bindCtx->RegisterObjectParam(const_cast<PWSTR>(STR_FILE_SYS_BIND_DATA), fsBindData.get()));
 
 	return SHParseDisplayName(path.c_str(), bindCtx.get(), pidl, 0, nullptr);
+}
+
+// This performs the same function as SHGetRealIDL, which is deprecated.
+HRESULT SimplePidlToFullPidl(PCIDLIST_ABSOLUTE simplePidl, PIDLIST_ABSOLUTE *fullPidl)
+{
+	wil::com_ptr_nothrow<IShellItem2> shellItem2;
+	RETURN_IF_FAILED(SHCreateItemFromIDList(simplePidl, IID_PPV_ARGS(&shellItem2)));
+	RETURN_IF_FAILED(shellItem2->Update(nullptr));
+
+	wil::com_ptr_nothrow<IParentAndItem> parentAndItem;
+	RETURN_IF_FAILED(shellItem2->QueryInterface(IID_PPV_ARGS(&parentAndItem)));
+
+	unique_pidl_absolute parent;
+	unique_pidl_child child;
+	RETURN_IF_FAILED(
+		parentAndItem->GetParentAndItem(wil::out_param(parent), nullptr, wil::out_param(child)));
+
+	*fullPidl = ILCombine(parent.get(), child.get());
+
+	return S_OK;
 }

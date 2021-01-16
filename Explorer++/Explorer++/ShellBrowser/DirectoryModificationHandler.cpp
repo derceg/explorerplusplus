@@ -62,7 +62,32 @@ void ShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)
 		if (ILIsParent(m_directoryState.pidlDirectory.get(), pidls[0], TRUE)
 			&& ILIsParent(m_directoryState.pidlDirectory.get(), pidls[1], TRUE))
 		{
-			OnItemRenamed(pidls[0], pidls[1]);
+			// The pidls provided to these change notifications are always simple pidls. When an
+			// item is updated, the WIN32_FIND_DATA information cached in the pidl will be
+			// retrieved. As the simple pidl won't contain this information, it's important to
+			// convert the pidl to a full pidl here.
+			// Note that there's no need to convert pidls[0], as it refers to the original item,
+			// which no longer exists.
+			unique_pidl_absolute pidlNewFull;
+			HRESULT hr = SimplePidlToFullPidl(pidls[1], wil::out_param(pidlNewFull));
+
+			if (SUCCEEDED(hr))
+			{
+				OnItemRenamed(pidls[0], pidlNewFull.get());
+			}
+		}
+		break;
+
+	case SHCNE_UPDATEITEM:
+		if (ILIsParent(m_directoryState.pidlDirectory.get(), pidls[0], TRUE))
+		{
+			unique_pidl_absolute pidlFull;
+			HRESULT hr = SimplePidlToFullPidl(pidls[0], wil::out_param(pidlFull));
+
+			if (SUCCEEDED(hr))
+			{
+				ModifyItem(pidlFull.get());
+			}
 		}
 		break;
 
@@ -377,7 +402,12 @@ void ShellBrowser::OnFileModified(const TCHAR *fileName)
 		return;
 	}
 
-	auto internalIndex = GetItemInternalIndexForPidl(pidlFull.get());
+	ModifyItem(pidlFull.get());
+}
+
+void ShellBrowser::ModifyItem(PCIDLIST_ABSOLUTE pidl)
+{
+	auto internalIndex = GetItemInternalIndexForPidl(pidl);
 
 	if (!internalIndex)
 	{
@@ -386,7 +416,7 @@ void ShellBrowser::OnFileModified(const TCHAR *fileName)
 
 	wil::com_ptr_nothrow<IShellFolder> shellFolder;
 	PCITEMID_CHILD pidlChild = nullptr;
-	hr = SHBindToParent(pidlFull.get(), IID_PPV_ARGS(&shellFolder), &pidlChild);
+	HRESULT hr = SHBindToParent(pidl, IID_PPV_ARGS(&shellFolder), &pidlChild);
 
 	if (FAILED(hr))
 	{

@@ -102,6 +102,7 @@ HRESULT ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_C
 BOOL CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL);
 bool IsChildOfLibrariesFolder(PCIDLIST_ABSOLUTE pidl);
 HRESULT CreateSimplePidl(const std::wstring &path, PIDLIST_ABSOLUTE *pidl);
+HRESULT SimplePidlToFullPidl(PCIDLIST_ABSOLUTE simplePidl, PIDLIST_ABSOLUTE *fullPidl);
 
 /* Drag and drop helpers. */
 DWORD DetermineDragEffect(
