@@ -758,11 +758,11 @@ void ShellBrowser::PositionDroppedItems()
 	in details view. */
 	if (m_folderSettings.viewMode == +ViewMode::Details)
 	{
-		m_DroppedFileNameList.clear();
+		m_droppedFileNameList.clear();
 		return;
 	}
 
-	if (!m_DroppedFileNameList.empty())
+	if (!m_droppedFileNameList.empty())
 	{
 		/* The auto arrange style must be off for the items
 		to be moved. Therefore, if the style is on, turn it
@@ -772,7 +772,7 @@ void ShellBrowser::PositionDroppedItems()
 			ListViewHelper::SetAutoArrange(m_hListView, FALSE);
 		}
 
-		for (itr = m_DroppedFileNameList.begin(); itr != m_DroppedFileNameList.end();)
+		for (itr = m_droppedFileNameList.begin(); itr != m_droppedFileNameList.end();)
 		{
 			iItem = LocateFileItemIndex(itr->szFileName);
 
@@ -920,7 +920,7 @@ void ShellBrowser::PositionDroppedItems()
 				ListViewHelper::SelectItem(m_hListView, iItem, TRUE);
 				ListViewHelper::FocusItem(m_hListView, iItem, TRUE);
 
-				itr = m_DroppedFileNameList.erase(itr);
+				itr = m_droppedFileNameList.erase(itr);
 			}
 			else
 			{

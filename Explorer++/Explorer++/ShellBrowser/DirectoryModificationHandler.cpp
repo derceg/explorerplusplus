@@ -13,7 +13,6 @@
 #include "../Helper/ShellHelper.h"
 #include <list>
 
-BOOL g_bNewFileRenamed = FALSE;
 int g_iRenamedItem = -1;
 
 void ShellBrowser::StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl)
@@ -57,6 +56,14 @@ void ShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)
 
 	switch (event)
 	{
+	case SHCNE_MKDIR:
+	case SHCNE_CREATE:
+		if (ILIsParent(m_directoryState.pidlDirectory.get(), pidls[0], TRUE))
+		{
+			AddItem(pidls[0]);
+		}
+		break;
+
 	case SHCNE_RENAMEFOLDER:
 	case SHCNE_RENAMEITEM:
 		if (ILIsParent(m_directoryState.pidlDirectory.get(), pidls[0], TRUE)
@@ -266,50 +273,42 @@ void ShellBrowser::FilesModified(DWORD Action, const TCHAR *FileName, int EventI
 
 void ShellBrowser::OnFileAdded(const TCHAR *szFileName)
 {
-	IShellFolder *pShellFolder = nullptr;
-	PCITEMID_CHILD pidlRelative = nullptr;
-	Added_t added;
 	TCHAR fullFileName[MAX_PATH];
-	BOOL bFileAdded = FALSE;
-	HRESULT hr;
-
 	StringCchCopy(fullFileName, SIZEOF_ARRAY(fullFileName), m_directoryState.directory.c_str());
 	PathAppend(fullFileName, szFileName);
 
 	unique_pidl_absolute pidlFull;
-	hr = SHParseDisplayName(fullFileName, nullptr, wil::out_param(pidlFull), 0, nullptr);
+	HRESULT hr = SHParseDisplayName(fullFileName, nullptr, wil::out_param(pidlFull), 0, nullptr);
 
-	/* It is possible that by the time a file is registered here,
-	it will have already been renamed. In this the following
-	check will fail.
-	If the file is not added, store its filename. */
 	if (SUCCEEDED(hr))
 	{
-		hr = SHBindToParent(pidlFull.get(), IID_PPV_ARGS(&pShellFolder), &pidlRelative);
+		AddItem(pidlFull.get());
+	}
+}
 
-		if (SUCCEEDED(hr))
+void ShellBrowser::AddItem(PCIDLIST_ABSOLUTE pidl)
+{
+	IShellFolder *pShellFolder = nullptr;
+	PCITEMID_CHILD pidlRelative = nullptr;
+	HRESULT hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellFolder), &pidlRelative);
+
+	if (SUCCEEDED(hr))
+	{
+		auto itemId = AddItemInternal(
+			pShellFolder, m_directoryState.pidlDirectory.get(), pidlRelative, -1, FALSE);
+
+		if (itemId)
 		{
-			BOOL bDropped = FALSE;
+			auto droppedFilesItr = std::find_if(m_droppedFileNameList.begin(),
+				m_droppedFileNameList.end(), [this, itemId](const DroppedFile_t &droppedFile) {
+					return m_itemInfoMap.at(*itemId).displayName == droppedFile.szFileName;
+				});
 
-			if (!m_DroppedFileNameList.empty())
-			{
-				for (auto itr = m_DroppedFileNameList.begin(); itr != m_DroppedFileNameList.end();
-					 itr++)
-				{
-					if (lstrcmp(szFileName, itr->szFileName) == 0)
-					{
-						bDropped = TRUE;
-						break;
-					}
-				}
-			}
-
-			auto itemId = AddItemInternal(
-				pShellFolder, m_directoryState.pidlDirectory.get(), pidlRelative, -1, FALSE);
+			bool wasDropped = (droppedFilesItr != m_droppedFileNameList.end());
 
 			/* Only insert the item in its sorted position if it
 			wasn't dropped in. */
-			if (itemId && m_config->globalFolderSettings.insertSorted && !bDropped)
+			if (m_config->globalFolderSettings.insertSorted && !wasDropped)
 			{
 				// TODO: It would be better to pass the items details to this function directly
 				// instead (before the item is added to the awaiting list).
@@ -331,21 +330,9 @@ void ShellBrowser::OnFileAdded(const TCHAR *szFileName)
 			}
 
 			InsertAwaitingItems(m_folderSettings.showInGroups);
-
-			bFileAdded = TRUE;
-
-			pShellFolder->Release();
 		}
-	}
 
-	if (!bFileAdded)
-	{
-		/* The file does not exist. However, it is possible
-		that is was simply renamed shortly after been created.
-		Record the filename temporarily (so that it can later
-		be added). */
-		StringCchCopy(added.szFileName, SIZEOF_ARRAY(added.szFileName), szFileName);
-		m_FilesAdded.push_back(added);
+		pShellFolder->Release();
 	}
 }
 
@@ -361,30 +348,11 @@ void ShellBrowser::OnItemRemoved(PCIDLIST_ABSOLUTE pidl)
 
 void ShellBrowser::OnFileRemoved(const TCHAR *szFileName)
 {
-	std::list<Added_t>::iterator itr;
-	int iItemInternal;
-	BOOL bFound = FALSE;
+	int iItemInternal = LocateFileItemInternalIndex(szFileName);
 
-	/* First check if this item is in the queue of awaiting
-	items. If it is, remove it. */
-	for (itr = m_FilesAdded.begin(); itr != m_FilesAdded.end(); itr++)
+	if (iItemInternal != -1)
 	{
-		if (lstrcmp(szFileName, itr->szFileName) == 0)
-		{
-			m_FilesAdded.erase(itr);
-			bFound = TRUE;
-			break;
-		}
-	}
-
-	if (!bFound)
-	{
-		iItemInternal = LocateFileItemInternalIndex(szFileName);
-
-		if (iItemInternal != -1)
-		{
-			RemoveItem(iItemInternal);
-		}
+		RemoveItem(iItemInternal);
 	}
 }
 
@@ -493,21 +461,18 @@ void ShellBrowser::OnItemRenamed(PCIDLIST_ABSOLUTE pidlOld, PCIDLIST_ABSOLUTE pi
 	{
 		RenameItem(*internalIndex, pidlNew);
 	}
+	else
+	{
+		// This can happen if an item was added, then immediately renamed. In that case, attempting
+		// to add the new item would fail (since it no longer exists). Since the new name has now
+		// been received, the item can be added.
+		AddItem(pidlNew);
+	}
 }
 
 void ShellBrowser::OnFileRenamedOldName(const TCHAR *szFileName)
 {
-	/* Loop through each file that is awaiting add to check for the
-	renamed file. */
-	for (auto itr = m_FilesAdded.begin(); itr != m_FilesAdded.end(); itr++)
-	{
-		if (lstrcmp(szFileName, itr->szFileName) == 0)
-		{
-			g_bNewFileRenamed = TRUE;
-			m_FilesAdded.erase(itr);
-			return;
-		}
-	}
+	g_iRenamedItem = -1;
 
 	TCHAR fullFileName[MAX_PATH];
 	HRESULT hr =
@@ -546,17 +511,13 @@ void ShellBrowser::OnFileRenamedOldName(const TCHAR *szFileName)
 
 void ShellBrowser::OnFileRenamedNewName(const TCHAR *szFileName)
 {
-	if (g_bNewFileRenamed)
+	if (g_iRenamedItem != -1)
 	{
-		/* The file that was previously added was renamed before
-		it could be added. Add the file now. */
-		OnFileAdded(szFileName);
-
-		g_bNewFileRenamed = FALSE;
+		RenameItem(g_iRenamedItem, szFileName);
 	}
 	else
 	{
-		RenameItem(g_iRenamedItem, szFileName);
+		OnFileAdded(szFileName);
 	}
 }
 

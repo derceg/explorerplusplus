@@ -466,6 +466,7 @@ private:
 	void StopDirectoryMonitoring();
 	void OnShellNotify(WPARAM wParam, LPARAM lParam);
 	void OnFileAdded(const TCHAR *szFileName);
+	void AddItem(PCIDLIST_ABSOLUTE pidl);
 	void RemoveItem(int iItemInternal);
 	void OnItemRemoved(PCIDLIST_ABSOLUTE pidl);
 	void OnFileRemoved(const TCHAR *szFileName);
@@ -651,7 +652,6 @@ private:
 	renamed, etc). */
 	CRITICAL_SECTION m_csDirectoryAltered;
 	std::list<AlteredFile_t> m_AlteredList;
-	std::list<Added_t> m_FilesAdded;
 
 	int m_middleButtonItem;
 
@@ -681,7 +681,7 @@ private:
 	/* Drag and drop related data. */
 	IDragSourceHelper *m_pDragSourceHelper;
 	IDropTargetHelper *m_pDropTargetHelper;
-	std::list<DroppedFile_t> m_DroppedFileNameList;
+	std::list<DroppedFile_t> m_droppedFileNameList;
 	std::list<DraggedFile_t> m_DraggedFilesList;
 	DragType m_DragType;
 	POINT m_ptDraggedOffset;

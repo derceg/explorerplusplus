@@ -39,7 +39,6 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 	}
 
 	EnterCriticalSection(&m_csDirectoryAltered);
-	m_FilesAdded.clear();
 	m_FileSelectionList.clear();
 	LeaveCriticalSection(&m_csDirectoryAltered);
 
