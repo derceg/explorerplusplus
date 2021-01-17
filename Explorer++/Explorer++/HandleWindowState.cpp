@@ -16,8 +16,6 @@
 
 void Explorerplusplus::UpdateWindowStates(const Tab &tab)
 {
-	m_CurrentDirectory = tab.GetShellBrowser()->GetDirectory();
-
 	UpdateStatusBarText(tab);
 	UpdateDisplayWindow(tab);
 }

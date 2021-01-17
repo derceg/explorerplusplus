@@ -883,7 +883,8 @@ void Explorerplusplus::OnListViewPaste()
 		Files are copied asynchronously, so a change of directory
 		will cause the destination directory to change in the
 		middle of the copy operation. */
-		StringCchCopy(szDestination, SIZEOF_ARRAY(szDestination), m_CurrentDirectory.c_str());
+		StringCchCopy(szDestination, SIZEOF_ARRAY(szDestination),
+			m_pActiveShellBrowser->GetDirectory().c_str());
 
 		/* Also, the string must be double NULL terminated. */
 		szDestination[lstrlen(szDestination) + 1] = '\0';

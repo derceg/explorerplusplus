@@ -75,8 +75,8 @@ void Explorerplusplus::OnNavigationCompleted(const Tab &tab)
 {
 	if (m_tabContainer->IsTabSelected(tab))
 	{
-		m_CurrentDirectory = tab.GetShellBrowser()->GetDirectory();
-		SetCurrentDirectory(m_CurrentDirectory.c_str());
+		std::wstring directory = tab.GetShellBrowser()->GetDirectory();
+		SetCurrentDirectory(directory.c_str());
 
 		UpdateWindowStates(tab);
 	}
@@ -205,8 +205,8 @@ void Explorerplusplus::OnTabSelected(const Tab &tab)
 	directory. Although this is not needed internally, context
 	menu extensions may need the current directory to be
 	set correctly. */
-	m_CurrentDirectory = tab.GetShellBrowser()->GetDirectory();
-	SetCurrentDirectory(m_CurrentDirectory.c_str());
+	std::wstring directory = tab.GetShellBrowser()->GetDirectory();
+	SetCurrentDirectory(directory.c_str());
 
 	UpdateWindowStates(tab);
 

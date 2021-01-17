@@ -206,7 +206,8 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 
 	SendMessage(m_hStatusBar, SB_SETTEXT, 1 | 0, (LPARAM) lpszSizeBuffer);
 
-	res = CreateDriveFreeSpaceString(m_CurrentDirectory.c_str(), szBuffer, SIZEOF_ARRAY(szBuffer));
+	res = CreateDriveFreeSpaceString(
+		tab.GetShellBrowser()->GetDirectory().c_str(), szBuffer, SIZEOF_ARRAY(szBuffer));
 
 	if (res == -1)
 	{

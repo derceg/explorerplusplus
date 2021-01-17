@@ -200,12 +200,15 @@ void Explorerplusplus::OnSaveDirectoryListing() const
 	LoadString(m_hLanguageModule, IDS_GENERAL_DIRECTORY_LISTING_FILENAME, fileName,
 		SIZEOF_ARRAY(fileName));
 	StringCchCat(fileName, SIZEOF_ARRAY(fileName), _T(".txt"));
-	BOOL bSaveNameRetrieved = GetFileNameFromUser(
-		m_hContainer, fileName, SIZEOF_ARRAY(fileName), m_CurrentDirectory.c_str());
+
+	std::wstring directory = m_pActiveShellBrowser->GetDirectory();
+
+	BOOL bSaveNameRetrieved =
+		GetFileNameFromUser(m_hContainer, fileName, SIZEOF_ARRAY(fileName), directory.c_str());
 
 	if (bSaveNameRetrieved)
 	{
-		NFileOperations::SaveDirectoryListing(m_CurrentDirectory, fileName);
+		NFileOperations::SaveDirectoryListing(directory, fileName);
 	}
 }
 

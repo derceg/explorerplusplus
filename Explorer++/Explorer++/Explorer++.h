@@ -521,7 +521,6 @@ private:
 
 	/** Internal state. **/
 	HWND m_hLastActiveWindow;
-	std::wstring m_CurrentDirectory;
 	bool m_bTreeViewRightClick;
 	bool m_bSelectingTreeViewDirectory;
 	bool m_bAttemptToolbarRestore;

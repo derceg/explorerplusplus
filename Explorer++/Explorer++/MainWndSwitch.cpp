@@ -343,17 +343,17 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 
 	case ToolbarButton::OpenCommandPrompt:
 	case IDM_FILE_OPENCOMMANDPROMPT:
-		StartCommandPrompt(m_CurrentDirectory, false);
+		StartCommandPrompt(m_pActiveShellBrowser->GetDirectory(), false);
 		break;
 
 	case IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR:
-		StartCommandPrompt(m_CurrentDirectory, true);
+		StartCommandPrompt(m_pActiveShellBrowser->GetDirectory(), true);
 		break;
 
 	case IDM_FILE_COPYFOLDERPATH:
 	{
 		BulkClipboardWriter clipboardWriter;
-		clipboardWriter.WriteText(m_CurrentDirectory);
+		clipboardWriter.WriteText(m_pActiveShellBrowser->GetDirectory());
 	}
 		break;
 
@@ -417,11 +417,11 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		break;
 
 	case IDM_EDIT_PASTESHORTCUT:
-		PasteLinksToClipboardFiles(m_CurrentDirectory.c_str());
+		PasteLinksToClipboardFiles(m_pActiveShellBrowser->GetDirectory().c_str());
 		break;
 
 	case IDM_EDIT_PASTEHARDLINK:
-		PasteHardLinks(m_CurrentDirectory.c_str());
+		PasteHardLinks(m_pActiveShellBrowser->GetDirectory().c_str());
 		break;
 
 	case IDM_EDIT_COPYTOFOLDER:
@@ -1395,7 +1395,8 @@ LRESULT Explorerplusplus::HandleControlNotification(HWND hwnd, WPARAM wParam)
 	switch (HIWORD(wParam))
 	{
 	case CBN_DROPDOWN:
-		AddPathsToComboBoxEx(m_addressBar->GetHWND(), m_CurrentDirectory.c_str());
+		AddPathsToComboBoxEx(
+			m_addressBar->GetHWND(), m_pActiveShellBrowser->GetDirectory().c_str());
 		break;
 	}
 
