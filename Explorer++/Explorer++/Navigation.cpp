@@ -47,7 +47,7 @@ void Navigation::OnNavigateUp()
 	if (SUCCEEDED(hr))
 	{
 		const Tab &resultingTab = m_tabContainer->GetTab(resultingTabId);
-		resultingTab.GetShellBrowser()->SelectItem(directory.get());
+		resultingTab.GetShellBrowser()->SelectItems({ directory.get() });
 	}
 }
 

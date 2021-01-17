@@ -275,7 +275,7 @@ void Explorerplusplus::OnResolveLink()
 
 				if (SUCCEEDED(hr))
 				{
-					m_pActiveShellBrowser->SelectItem(pidl.get());
+					m_pActiveShellBrowser->SelectItems({ pidl.get() });
 				}
 
 				SetFocus(m_hActiveListView);

@@ -8,6 +8,7 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include <optional>
+#include <vector>
 
 struct PreservedHistoryEntry;
 
@@ -30,6 +31,8 @@ public:
 	void SetFullPathForDisplay(const std::wstring &fullPathForDisplay);
 	std::optional<int> GetSystemIconIndex() const;
 	void SetSystemIconIndex(int iconIndex);
+	std::vector<unique_pidl_absolute> GetSelectedItems() const;
+	void SetSelectedItems(const std::vector<PCIDLIST_ABSOLUTE> &pidls);
 
 	SignalWrapper<HistoryEntry, void(const HistoryEntry &entry, PropertyType propertyType)>
 		historyEntryUpdatedSignal;
@@ -44,4 +47,5 @@ private:
 	std::wstring m_displayName;
 	std::optional<std::wstring> m_fullPathForDisplay;
 	std::optional<int> m_systemIconIndex;
+	std::vector<unique_pidl_absolute> m_selectedItems;
 };

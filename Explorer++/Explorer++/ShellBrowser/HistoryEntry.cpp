@@ -66,3 +66,13 @@ void HistoryEntry::SetSystemIconIndex(int iconIndex)
 
 	historyEntryUpdatedSignal.m_signal(*this, PropertyType::SystemIconIndex);
 }
+
+std::vector<unique_pidl_absolute> HistoryEntry::GetSelectedItems() const
+{
+	return DeepCopyPidls(m_selectedItems);
+}
+
+void HistoryEntry::SetSelectedItems(const std::vector<PCIDLIST_ABSOLUTE> &pidls)
+{
+	m_selectedItems = DeepCopyPidls(pidls);
+}

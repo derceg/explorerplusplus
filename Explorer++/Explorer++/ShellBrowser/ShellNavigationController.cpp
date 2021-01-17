@@ -73,6 +73,33 @@ void ShellNavigationController::OnNavigationCompleted(
 	}
 }
 
+HRESULT ShellNavigationController::GoToOffset(int offset)
+{
+	auto entry = GetEntry(offset);
+
+	if (!entry)
+	{
+		return E_FAIL;
+	}
+
+	auto connection = m_navigator->AddNavigationStartedObserver(
+		[this, offset](PCIDLIST_ABSOLUTE pidl) {
+			UNREFERENCED_PARAMETER(pidl);
+
+			// The entry retrieval above will fail if the provided offset is invalid, so there's no
+			// need to re-check the offset here.
+			int index = GetCurrentIndex() + offset;
+			SetCurrentIndex(index);
+		},
+		boost::signals2::at_front);
+
+	auto disconnect = wil::scope_exit([&connection] {
+		connection.disconnect();
+	});
+
+	return BrowseFolder(entry);
+}
+
 bool ShellNavigationController::CanGoUp() const
 {
 	auto *currentEntry = GetCurrentEntry();
@@ -114,12 +141,17 @@ HRESULT ShellNavigationController::Refresh()
 		return E_FAIL;
 	}
 
-	return m_navigator->BrowseFolder(currentEntry->GetPidl().get(), false);
+	return m_navigator->BrowseFolder(*currentEntry);
 }
 
-HRESULT ShellNavigationController::BrowseFolder(const HistoryEntry *entry, bool addHistoryEntry)
+HRESULT ShellNavigationController::BrowseFolder(const HistoryEntry *entry)
 {
-	return BrowseFolder(entry->GetPidl().get(), addHistoryEntry);
+	if (m_navigationMode == NavigationMode::ForceNewTab && GetCurrentEntry() != nullptr)
+	{
+		return m_tabNavigation->CreateNewTab(entry->GetPidl().get(), true);
+	}
+
+	return m_navigator->BrowseFolder(*entry);
 }
 
 HRESULT ShellNavigationController::BrowseFolder(const std::wstring &path, bool addHistoryEntry)

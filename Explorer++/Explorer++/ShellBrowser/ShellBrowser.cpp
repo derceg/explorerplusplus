@@ -563,25 +563,39 @@ unique_pidl_absolute ShellBrowser::GetDirectoryIdl() const
 	return pidlDirectory;
 }
 
-void ShellBrowser::SelectItem(PCIDLIST_ABSOLUTE pidl)
+void ShellBrowser::SelectItems(const std::vector<PCIDLIST_ABSOLUTE> &pidls)
 {
-	auto internalIndex = GetItemInternalIndexForPidl(pidl);
+	int smallestIndex = INT_MAX;
 
-	if (!internalIndex)
+	for (auto &pidl : pidls)
 	{
-		return;
+		auto internalIndex = GetItemInternalIndexForPidl(pidl);
+
+		if (!internalIndex)
+		{
+			return;
+		}
+
+		auto index = LocateItemByInternalIndex(*internalIndex);
+
+		if (!index)
+		{
+			return;
+		}
+
+		ListViewHelper::SelectItem(m_hListView, *index, TRUE);
+
+		if (*index < smallestIndex)
+		{
+			smallestIndex = *index;
+		}
 	}
 
-	auto index = LocateItemByInternalIndex(*internalIndex);
-
-	if (!index)
+	if (smallestIndex != INT_MAX)
 	{
-		return;
+		ListViewHelper::FocusItem(m_hListView, smallestIndex, TRUE);
+		ListView_EnsureVisible(m_hListView, smallestIndex, FALSE);
 	}
-
-	ListViewHelper::FocusItem(m_hListView, *index, TRUE);
-	ListViewHelper::SelectItem(m_hListView, *index, TRUE);
-	ListView_EnsureVisible(m_hListView, *index, FALSE);
 }
 
 int ShellBrowser::LocateFileItemIndex(const TCHAR *szFileName) const

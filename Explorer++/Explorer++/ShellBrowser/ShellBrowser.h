@@ -73,6 +73,9 @@ public:
 	FolderSettings GetFolderSettings() const;
 
 	ShellNavigationController *GetNavigationController() const;
+	boost::signals2::connection AddNavigationStartedObserver(
+		const NavigationStartedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override;
 	boost::signals2::connection AddNavigationCompletedObserver(
 		const NavigationCompletedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;
@@ -148,7 +151,7 @@ public:
 
 	void SetFileAttributesForSelection();
 
-	void SelectItem(PCIDLIST_ABSOLUTE pidl);
+	void SelectItems(const std::vector<PCIDLIST_ABSOLUTE> &pidls);
 	void GetFolderInfo(FolderInfo_t *pFolderInfo);
 	int LocateFileItemIndex(const TCHAR *szFileName) const;
 	bool InVirtualFolder() const;
@@ -174,7 +177,6 @@ public:
 	void OnGridlinesSettingChanged();
 
 	// Signals
-	SignalWrapper<ShellBrowser, void(PCIDLIST_ABSOLUTE pidl)> navigationStarted;
 	SignalWrapper<ShellBrowser, void()> listViewSelectionChanged;
 	SignalWrapper<ShellBrowser, void()> columnsChanged;
 
@@ -371,12 +373,14 @@ private:
 	void VerifySortMode();
 
 	/* NavigatorInterface methods. */
+	HRESULT BrowseFolder(const HistoryEntry &entry) override;
 	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true) override;
 
 	/* Browsing support. */
 	HRESULT EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory);
 	void ClearPendingResults();
 	void ResetFolderState();
+	void StoreCurrentlySelectedItems();
 	void InsertAwaitingItems(BOOL bInsertIntoGroup);
 	BOOL IsFileFiltered(const ItemInfo_t &itemInfo) const;
 	std::optional<int> AddItemInternal(IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory,
@@ -580,6 +584,7 @@ private:
 	HWND m_hListView;
 	HWND m_hOwner;
 
+	NavigationStartedSignal m_navigationStartedSignal;
 	NavigationCompletedSignal m_navigationCompletedSignal;
 	std::unique_ptr<ShellNavigationController> m_navigationController;
 

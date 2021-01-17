@@ -676,7 +676,7 @@ void SearchDialog::HandleCustomMenuItem(
 		m_tabContainer->CreateNewTab(pidlParent, TabSettings(_selected = true));
 
 		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems.front()));
-		m_pexpp->GetActiveShellBrowser()->SelectItem(pidlComplete.get());
+		m_pexpp->GetActiveShellBrowser()->SelectItems({ pidlComplete.get() });
 	}
 	break;
 	}

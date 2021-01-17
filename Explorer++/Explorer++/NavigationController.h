@@ -123,21 +123,28 @@ public:
 		return GoToOffset(1);
 	}
 
-	BrowseFolderReturnType GoToOffset(int offset)
+	virtual BrowseFolderReturnType GoToOffset(int offset)
 	{
-		auto entry = GetEntryAndUpdateIndex(offset);
+		auto entry = GetEntry(offset);
 
 		if (!entry)
 		{
 			return GetFailureValue();
 		}
 
-		return BrowseFolder(entry, false);
+		auto res = BrowseFolder(entry);
+
+		if (res != GetFailureValue())
+		{
+			int index = m_currentEntry + offset;
+			m_currentEntry = index;
+		}
+
+		return res;
 	}
 
 protected:
-	virtual BrowseFolderReturnType BrowseFolder(
-		const HistoryEntryType *entry, bool addHistoryEntry = true) = 0;
+	virtual BrowseFolderReturnType BrowseFolder(const HistoryEntryType *entry) = 0;
 	virtual BrowseFolderReturnType GetFailureValue() = 0;
 
 	int AddEntry(std::unique_ptr<HistoryEntryType> entry)
@@ -151,21 +158,17 @@ protected:
 		return m_currentEntry;
 	}
 
-private:
-	HistoryEntryType *GetEntryAndUpdateIndex(int offset)
+	void SetCurrentIndex(int index)
 	{
-		int index = m_currentEntry + offset;
-
 		if (index < 0 || index >= GetNumHistoryEntries())
 		{
-			return nullptr;
+			throw std::runtime_error("Incorrect history index specified");
 		}
 
 		m_currentEntry = index;
-
-		return m_entries[index].get();
 	}
 
+private:
 	std::vector<std::unique_ptr<HistoryEntryType>> m_entries;
 	int m_currentEntry;
 };

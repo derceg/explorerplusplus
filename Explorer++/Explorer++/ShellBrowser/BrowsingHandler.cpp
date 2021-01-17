@@ -5,8 +5,10 @@
 #include "stdafx.h"
 #include "ShellBrowser.h"
 #include "Config.h"
+#include "HistoryEntry.h"
 #include "ItemData.h"
 #include "MainResource.h"
+#include "ShellNavigationController.h"
 #include "ViewModes.h"
 #include "../Helper/Helper.h"
 #include "../Helper/IconFetcher.h"
@@ -17,6 +19,19 @@
 #include <propkey.h>
 #include <propvarutil.h>
 #include <list>
+
+HRESULT ShellBrowser::BrowseFolder(const HistoryEntry &entry)
+{
+	HRESULT hr = BrowseFolder(entry.GetPidl().get(), false);
+
+	if (SUCCEEDED(hr))
+	{
+		auto selectedItems = entry.GetSelectedItems();
+		SelectItems(ShallowCopyPidls(selectedItems));
+	}
+
+	return hr;
+}
 
 HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)
 {
@@ -42,7 +57,9 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 	m_FileSelectionList.clear();
 	LeaveCriticalSection(&m_csDirectoryAltered);
 
-	navigationStarted.m_signal(pidlDirectory);
+	StoreCurrentlySelectedItems();
+
+	m_navigationStartedSignal(pidlDirectory);
 
 	/* Stop the list view from redrawing itself each time is inserted.
 	Redrawing will be allowed once all items have being inserted.
@@ -131,6 +148,27 @@ void ShellBrowser::ResetFolderState()
 	LeaveCriticalSection(&m_csDirectoryAltered);
 
 	m_itemInfoMap.clear();
+}
+
+void ShellBrowser::StoreCurrentlySelectedItems()
+{
+	auto *entry = m_navigationController->GetCurrentEntry();
+
+	if (!entry)
+	{
+		return;
+	}
+
+	std::vector<PCIDLIST_ABSOLUTE> selectedItems;
+	int index = -1;
+
+	while ((index = ListView_GetNextItem(m_hListView, index, LVNI_SELECTED)) != -1)
+	{
+		auto &item = GetItemByIndex(index);
+		selectedItems.push_back(item.pidlComplete.get());
+	}
+
+	entry->SetSelectedItems(selectedItems);
 }
 
 HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
@@ -621,6 +659,12 @@ void ShellBrowser::RemoveItem(int iItemInternal)
 ShellNavigationController *ShellBrowser::GetNavigationController() const
 {
 	return m_navigationController.get();
+}
+
+boost::signals2::connection ShellBrowser::AddNavigationStartedObserver(
+	const NavigationStartedSignal::slot_type &observer, boost::signals2::connect_position position)
+{
+	return m_navigationStartedSignal.connect(observer, position);
 }
 
 boost::signals2::connection ShellBrowser::AddNavigationCompletedObserver(
