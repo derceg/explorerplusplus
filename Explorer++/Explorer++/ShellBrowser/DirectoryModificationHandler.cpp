@@ -126,11 +126,7 @@ void ShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)
 
 void ShellBrowser::DirectoryAltered()
 {
-	BOOL bNewItemCreated;
-
 	EnterCriticalSection(&m_csDirectoryAltered);
-
-	bNewItemCreated = m_bNewItemCreated;
 
 	SendMessage(m_hListView, WM_SETREDRAW, FALSE, NULL);
 
@@ -211,11 +207,6 @@ void ShellBrowser::DirectoryAltered()
 	}
 
 	SendMessage(m_hOwner, WM_USER_DIRECTORYMODIFIED, m_ID, 0);
-
-	if (bNewItemCreated && !m_bNewItemCreated)
-	{
-		SendMessage(m_hOwner, WM_USER_NEWITEMINSERTED, 0, m_iIndexNewItem);
-	}
 
 	m_AlteredList.clear();
 

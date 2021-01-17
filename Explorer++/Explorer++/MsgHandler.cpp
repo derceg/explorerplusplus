@@ -839,17 +839,6 @@ void Explorerplusplus::OnLockToolbars()
 	AddWindowStyle(m_hMainRebar, RBS_FIXEDORDER, m_config->lockToolbars);
 }
 
-void Explorerplusplus::OnShellNewItemCreated(LPARAM lParam)
-{
-	int iRenamedItem = (int) lParam;
-
-	if (iRenamedItem != -1)
-	{
-		/* Start editing the label for this item. */
-		ListView_EditLabel(m_hActiveListView, iRenamedItem);
-	}
-}
-
 void Explorerplusplus::OnAppCommand(UINT cmd)
 {
 	switch (cmd)

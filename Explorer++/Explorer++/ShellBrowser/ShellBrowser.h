@@ -30,7 +30,6 @@
 
 #define WM_USER_UPDATEWINDOWS (WM_APP + 17)
 #define WM_USER_FILESADDED (WM_APP + 51)
-#define WM_USER_NEWITEMINSERTED (WM_APP + 200)
 #define WM_USER_DIRECTORYMODIFIED (WM_APP + 204)
 
 struct BasicItemInfo_t;
@@ -661,9 +660,7 @@ private:
 	int m_middleButtonItem;
 
 	/* Shell new. */
-	BOOL m_bNewItemCreated;
-	PCIDLIST_ABSOLUTE m_pidlNewItem;
-	int m_iIndexNewItem;
+	unique_pidl_absolute m_queuedRenameItem;
 
 	/* File selection. */
 	std::list<std::wstring> m_FileSelectionList;

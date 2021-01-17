@@ -453,6 +453,7 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	}
 
 	int nAdded = 0;
+	std::optional<int> itemToRename;
 
 	for (const auto &awaitingItem : m_directoryState.awaitingAddList)
 	{
@@ -524,14 +525,10 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 			SetTileViewItemInfo(iItemIndex, awaitingItem.iItemInternal);
 		}
 
-		if (m_bNewItemCreated)
+		if (m_queuedRenameItem
+			&& ArePidlsEquivalent(itemInfo.pidlComplete.get(), m_queuedRenameItem.get()))
 		{
-			if (ArePidlsEquivalent(itemInfo.pidlComplete.get(), m_pidlNewItem))
-			{
-				m_bNewItemCreated = FALSE;
-			}
-
-			m_iIndexNewItem = iItemIndex;
+			itemToRename = iItemIndex;
 		}
 
 		/* If the file is marked as hidden, ghost it out. */
@@ -562,6 +559,12 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	PositionDroppedItems();
 
 	m_directoryState.awaitingAddList.clear();
+
+	if (itemToRename)
+	{
+		m_queuedRenameItem.reset();
+		ListView_EditLabel(m_hListView, *itemToRename);
+	}
 }
 
 void ShellBrowser::ApplyFolderEmptyBackgroundImage(bool apply)

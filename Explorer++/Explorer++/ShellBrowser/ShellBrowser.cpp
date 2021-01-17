@@ -142,7 +142,6 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 	m_pActiveColumns = nullptr;
 	m_bPerformingDrag = FALSE;
 	m_nActiveColumns = 0;
-	m_bNewItemCreated = FALSE;
 	m_iDropped = -1;
 	m_middleButtonItem = -1;
 
@@ -1113,45 +1112,20 @@ may or may not have been inserted into
 the listview yet. */
 void ShellBrowser::QueueRename(PCIDLIST_ABSOLUTE pidlItem)
 {
-	/* Items are inserted within the context
-	of this thread. Therefore, either pending
-	items have already been inserted, or they
-	have yet to be inserted.
-	First, look for the file using it's display
-	name. If the file is not found, set a flag
-	indicating that when items are inserted,
-	they should be checked against this item.
-	Once a match is found, rename the item
-	in-place within the listview. */
+	int numItems = ListView_GetItemCount(m_hListView);
 
-	LVITEM lvItem;
-	BOOL bItemFound = FALSE;
-	int nItems;
-	int i = 0;
-
-	nItems = ListView_GetItemCount(m_hListView);
-
-	for (i = 0; i < nItems; i++)
+	for (int i = 0; i < numItems; i++)
 	{
-		lvItem.mask = LVIF_PARAM;
-		lvItem.iItem = i;
-		lvItem.iSubItem = 0;
-		ListView_GetItem(m_hListView, &lvItem);
+		const auto &item = GetItemByIndex(i);
 
-		if (ArePidlsEquivalent(pidlItem, m_itemInfoMap.at((int) lvItem.lParam).pidlComplete.get()))
+		if (ArePidlsEquivalent(pidlItem, item.pidlComplete.get()))
 		{
-			bItemFound = TRUE;
-
 			ListView_EditLabel(m_hListView, i);
-			break;
+			return;
 		}
 	}
 
-	if (!bItemFound)
-	{
-		m_bNewItemCreated = TRUE;
-		m_pidlNewItem = ILCloneFull(pidlItem);
-	}
+	m_queuedRenameItem.reset(ILCloneFull(pidlItem));
 }
 
 void ShellBrowser::SelectItems(const std::list<std::wstring> &PastedFileList)

@@ -181,7 +181,6 @@ private:
 	void OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pidl);
 	void OnPreviousWindow();
 	void OnNextWindow();
-	void OnShellNewItemCreated(LPARAM lParam);
 	void OnAppCommand(UINT cmd);
 	void OnDirectoryModified(int iTabId);
 	void OnIdaRClick();
