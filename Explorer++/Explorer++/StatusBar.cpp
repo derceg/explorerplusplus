@@ -170,37 +170,29 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 
 	SendMessage(m_hStatusBar, SB_SETTEXT, 0 | 0, (LPARAM) szItemsSelected);
 
-	if (tab.GetShellBrowser()->InVirtualFolder())
+	tab.GetShellBrowser()->GetFolderInfo(&folderInfo);
+
+	if ((nFilesSelected + nFoldersSelected) == 0)
 	{
-		LoadString(m_hLanguageModule, IDS_GENERAL_VIRTUALFOLDER, lpszSizeBuffer,
-			SIZEOF_ARRAY(lpszSizeBuffer));
+		/* No items(files or folders) selected. */
+		FormatSizeString(folderInfo.TotalFolderSize, lpszSizeBuffer, SIZEOF_ARRAY(lpszSizeBuffer),
+			m_config->globalFolderSettings.forceSize,
+			m_config->globalFolderSettings.sizeDisplayFormat);
 	}
 	else
 	{
-		tab.GetShellBrowser()->GetFolderInfo(&folderInfo);
-
-		if ((nFilesSelected + nFoldersSelected) == 0)
+		if (nFilesSelected == 0)
 		{
-			/* No items(files or folders) selected. */
-			FormatSizeString(folderInfo.TotalFolderSize, lpszSizeBuffer,
-				SIZEOF_ARRAY(lpszSizeBuffer), m_config->globalFolderSettings.forceSize,
-				m_config->globalFolderSettings.sizeDisplayFormat);
+			/* Only folders selected. Don't show any size in the status bar. */
+			StringCchCopy(lpszSizeBuffer, SIZEOF_ARRAY(lpszSizeBuffer), EMPTY_STRING);
 		}
 		else
 		{
-			if (nFilesSelected == 0)
-			{
-				/* Only folders selected. Don't show any size in the status bar. */
-				StringCchCopy(lpszSizeBuffer, SIZEOF_ARRAY(lpszSizeBuffer), EMPTY_STRING);
-			}
-			else
-			{
-				/* Mixture of files and folders selected. Show size of currently
-				selected files. */
-				FormatSizeString(folderInfo.TotalSelectionSize, lpszSizeBuffer,
-					SIZEOF_ARRAY(lpszSizeBuffer), m_config->globalFolderSettings.forceSize,
-					m_config->globalFolderSettings.sizeDisplayFormat);
-			}
+			/* Mixture of files and folders selected. Show size of currently
+			selected files. */
+			FormatSizeString(folderInfo.TotalSelectionSize, lpszSizeBuffer,
+				SIZEOF_ARRAY(lpszSizeBuffer), m_config->globalFolderSettings.forceSize,
+				m_config->globalFolderSettings.sizeDisplayFormat);
 		}
 	}
 
