@@ -1023,6 +1023,10 @@ HRESULT TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 		tabNavigationStarted.m_signal(tab, pidl);
 	});
 
+	tab.GetShellBrowser()->directoryModified.AddObserver([this, &tab]() {
+		tabDirectoryModified.m_signal(tab);
+	});
+
 	tab.GetShellBrowser()->listViewSelectionChanged.AddObserver([this, &tab]() {
 		tabListViewSelectionChanged.m_signal(tab);
 	});

@@ -36,6 +36,8 @@ void Explorerplusplus::InitializeTabs()
 	m_tabContainer->tabSelectedSignal.AddObserver(
 		boost::bind(&Explorerplusplus::OnTabSelected, this, _1), boost::signals2::at_front);
 
+	m_tabContainer->tabDirectoryModified.AddObserver(
+		boost::bind(&Explorerplusplus::OnDirectoryModified, this, _1), boost::signals2::at_front);
 	m_tabContainer->tabListViewSelectionChanged.AddObserver(
 		boost::bind(&Explorerplusplus::OnTabListViewSelectionChanged, this, _1),
 		boost::signals2::at_front);

@@ -182,7 +182,7 @@ private:
 	void OnPreviousWindow();
 	void OnNextWindow();
 	void OnAppCommand(UINT cmd);
-	void OnDirectoryModified(int iTabId);
+	void OnDirectoryModified(const Tab &tab);
 	void OnIdaRClick();
 	void OnAssocChanged();
 	LRESULT OnCustomDraw(LPARAM lParam);

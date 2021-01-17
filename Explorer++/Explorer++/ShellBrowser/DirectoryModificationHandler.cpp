@@ -121,7 +121,7 @@ void ShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)
 
 	SHChangeNotification_Unlock(lock);
 
-	SendMessage(m_hOwner, WM_USER_DIRECTORYMODIFIED, m_ID, 0);
+	directoryModified.m_signal();
 }
 
 void ShellBrowser::DirectoryAltered()
@@ -206,7 +206,7 @@ void ShellBrowser::DirectoryAltered()
 		m_iDropped = -1;
 	}
 
-	SendMessage(m_hOwner, WM_USER_DIRECTORYMODIFIED, m_ID, 0);
+	directoryModified.m_signal();
 
 	m_AlteredList.clear();
 

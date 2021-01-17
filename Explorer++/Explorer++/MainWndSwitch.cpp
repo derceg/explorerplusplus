@@ -147,10 +147,6 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		OnDisplayWindowResized(wParam);
 		break;
 
-	case WM_USER_DIRECTORYMODIFIED:
-		OnDirectoryModified((int)wParam);
-		break;
-
 	// See https://github.com/derceg/explorerplusplus/issues/169.
 	/*case WM_APP_ASSOCCHANGED:
 		OnAssocChanged();

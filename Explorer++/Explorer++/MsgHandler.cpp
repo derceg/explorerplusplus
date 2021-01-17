@@ -960,37 +960,12 @@ void Explorerplusplus::CopyColumnInfoToClipboard()
 	clipboardWriter.WriteText(strColumnInfo);
 }
 
-void Explorerplusplus::OnDirectoryModified(int iTabId)
+void Explorerplusplus::OnDirectoryModified(const Tab &tab)
 {
-	/* This message is sent when one of the
-	tab directories is modified.
-	Two cases to handle:
-	 1. Tab that sent the notification DOES NOT
-		have focus.
-	 2. Tab that sent the notification DOES have
-		focus.
-
-	Case 1 (Tab DOES NOT have focus):
-	No updates will be applied. When the tab
-	selection changes to the updated tab, the
-	view will be synchronized anyhow (since all
-	windows are updated when the tab selection
-	changes).
-
-	Case 2 (Tab DOES have focus):
-	In this case, only the following updates
-	need to be applied:
-	 - Updated status bar text
-	 - Handle file selection display (i.e. update
-	   the display window)
-	*/
-
-	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
-
-	if (iTabId == selectedTab.GetId())
+	if (m_tabContainer->IsTabSelected(tab))
 	{
-		UpdateStatusBarText(selectedTab);
-		UpdateDisplayWindow(selectedTab);
+		UpdateStatusBarText(tab);
+		UpdateDisplayWindow(tab);
 	}
 }
 
