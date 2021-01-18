@@ -21,7 +21,7 @@ private:
 		HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance, IExplorerplusplus *expp);
 	~MainWindow() = default;
 
-	void OnNavigationCompleted(const Tab &tab);
+	void OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
 	void OnTabSelected(const Tab &tab);
 
 	void OnShowFullTitlePathUpdated(BOOL newValue);

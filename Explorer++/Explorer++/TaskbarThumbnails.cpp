@@ -68,6 +68,8 @@ void TaskbarThumbnails::Initialize()
 
 	m_tabContainer->tabCreatedSignal.AddObserver(
 		boost::bind(&TaskbarThumbnails::CreateTabProxy, this, _1, _2));
+	m_tabContainer->tabNavigationCommittedSignal.AddObserver(
+		boost::bind(&TaskbarThumbnails::OnNavigationCommitted, this, _1, _2, _3));
 	m_tabContainer->tabNavigationCompletedSignal.AddObserver(
 		boost::bind(&TaskbarThumbnails::OnNavigationCompleted, this, _1));
 	m_tabContainer->tabSelectedSignal.AddObserver(
@@ -637,11 +639,20 @@ void TaskbarThumbnails::OnTabSelectionChanged(const Tab &tab)
 	}
 }
 
-void TaskbarThumbnails::OnNavigationCompleted(const Tab &tab)
+void TaskbarThumbnails::OnNavigationCommitted(
+	const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
 {
+	UNREFERENCED_PARAMETER(pidl);
+	UNREFERENCED_PARAMETER(addHistoryEntry);
+
 	InvalidateTaskbarThumbnailBitmap(tab);
 	SetTabProxyIcon(tab);
 	UpdateTaskbarThumbnailTitle(tab);
+}
+
+void TaskbarThumbnails::OnNavigationCompleted(const Tab &tab)
+{
+	InvalidateTaskbarThumbnailBitmap(tab);
 }
 
 void TaskbarThumbnails::UpdateTaskbarThumbnailTitle(const Tab &tab)

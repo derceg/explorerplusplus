@@ -27,8 +27,8 @@ ShellNavigationController::ShellNavigationController(NavigatorInterface *navigat
 
 void ShellNavigationController::Initialize()
 {
-	m_connections.emplace_back(m_navigator->AddNavigationCompletedObserver(
-		boost::bind(&ShellNavigationController::OnNavigationCompleted, this, _1, _2),
+	m_connections.emplace_back(m_navigator->AddNavigationCommittedObserver(
+		boost::bind(&ShellNavigationController::OnNavigationCommitted, this, _1, _2),
 		boost::signals2::at_front));
 }
 
@@ -46,7 +46,7 @@ std::vector<std::unique_ptr<HistoryEntry>> ShellNavigationController::CopyPreser
 	return entries;
 }
 
-void ShellNavigationController::OnNavigationCompleted(
+void ShellNavigationController::OnNavigationCommitted(
 	PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)
 {
 	if (addHistoryEntry)
@@ -83,8 +83,9 @@ HRESULT ShellNavigationController::GoToOffset(int offset)
 	}
 
 	auto connection = m_navigator->AddNavigationCommittedObserver(
-		[this, offset](PCIDLIST_ABSOLUTE pidl) {
+		[this, offset](PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry) {
 			UNREFERENCED_PARAMETER(pidl);
+			UNREFERENCED_PARAMETER(addHistoryEntry);
 
 			// The entry retrieval above will fail if the provided offset is invalid, so there's no
 			// need to re-check the offset here.

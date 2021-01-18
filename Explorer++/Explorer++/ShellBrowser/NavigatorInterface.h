@@ -9,9 +9,9 @@
 class HistoryEntry;
 
 using NavigationStartedSignal = boost::signals2::signal<void(PCIDLIST_ABSOLUTE pidl)>;
-using NavigationCommittedSignal = boost::signals2::signal<void(PCIDLIST_ABSOLUTE pidl)>;
-using NavigationCompletedSignal =
-	boost::signals2::signal<void(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)>;
+using NavigationCommittedSignal =
+	boost::signals2::signal<void(PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)>;
+using NavigationCompletedSignal = boost::signals2::signal<void(PCIDLIST_ABSOLUTE pidlDirectory)>;
 using NavigationFailedSignal = boost::signals2::signal<void()>;
 
 __interface NavigatorInterface

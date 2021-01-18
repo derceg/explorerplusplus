@@ -23,8 +23,8 @@ public:
 	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true) override
 	{
 		m_navigationStartedSignal(pidlDirectory);
-		m_navigationCommittedSignal(pidlDirectory);
-		m_navigationCompletedSignal(pidlDirectory, addHistoryEntry);
+		m_navigationCommittedSignal(pidlDirectory, addHistoryEntry);
+		m_navigationCompletedSignal(pidlDirectory);
 
 		return S_OK;
 	}
@@ -32,8 +32,8 @@ public:
 	HRESULT BrowseFolder(const HistoryEntry &entry) override
 	{
 		m_navigationStartedSignal(entry.GetPidl().get());
-		m_navigationCommittedSignal(entry.GetPidl().get());
-		m_navigationCompletedSignal(entry.GetPidl().get(), false);
+		m_navigationCommittedSignal(entry.GetPidl().get(), false);
+		m_navigationCompletedSignal(entry.GetPidl().get());
 
 		return S_OK;
 	}

@@ -43,7 +43,7 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 
 	m_navigationStartedSignal(pidlDirectory);
 
-	HRESULT hr = EnumerateFolder(pidlDirectory);
+	HRESULT hr = EnumerateFolder(pidlDirectory, addHistoryEntry);
 
 	if (FAILED(hr))
 	{
@@ -79,9 +79,7 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 
 	m_bFolderVisited = TRUE;
 
-	m_uniqueFolderId++;
-
-	m_navigationCompletedSignal(pidlDirectory, addHistoryEntry);
+	m_navigationCompletedSignal(pidlDirectory);
 
 	return hr;
 }
@@ -176,7 +174,7 @@ void ShellBrowser::StoreCurrentlySelectedItems()
 	entry->SetSelectedItems(selectedItems);
 }
 
-HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
+HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)
 {
 	wil::com_ptr_nothrow<IShellFolder> parent;
 	PCITEMID_CHILD child;
@@ -231,8 +229,9 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 	m_directoryState.pidlDirectory.reset(ILCloneFull(pidlDirectory));
 	m_directoryState.directory = parsingPath;
 	m_directoryState.virtualFolder = WI_IsFlagClear(attr, SFGAO_FILESYSTEM);
+	m_uniqueFolderId++;
 
-	m_navigationCommittedSignal(pidlDirectory);
+	m_navigationCommittedSignal(pidlDirectory, addHistoryEntry);
 
 	ULONG numFetched = 1;
 	unique_pidl_child pidlItem;

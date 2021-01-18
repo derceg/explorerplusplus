@@ -29,10 +29,14 @@ void Explorerplusplus::InitializeTabs()
 	m_tabContainer->tabCreatedSignal.AddObserver(
 		boost::bind(&Explorerplusplus::OnTabCreated, this, _1, _2), boost::signals2::at_front);
 	m_tabContainer->tabNavigationStartedSignal.AddObserver(
-		boost::bind(&Explorerplusplus::OnNavigationStarted, this, _1, _2),
+		boost::bind(&Explorerplusplus::OnNavigationStartedStatusBar, this, _1, _2),
+		boost::signals2::at_front);
+	m_tabContainer->tabNavigationCommittedSignal.AddObserver(
+		boost::bind(&Explorerplusplus::OnNavigationCommitted, this, _1, _2, _3),
 		boost::signals2::at_front);
 	m_tabContainer->tabNavigationCompletedSignal.AddObserver(
-		boost::bind(&Explorerplusplus::OnNavigationCompleted, this, _1), boost::signals2::at_front);
+		boost::bind(&Explorerplusplus::OnNavigationCompletedStatusBar, this, _1),
+		boost::signals2::at_front);
 	m_tabContainer->tabNavigationFailedSignal.AddObserver(
 		boost::bind(&Explorerplusplus::OnNavigationFailedStatusBar, this, _1),
 		boost::signals2::at_front);
@@ -74,8 +78,12 @@ boost::signals2::connection Explorerplusplus::AddTabsInitializedObserver(
 	return m_tabsInitializedSignal.connect(observer);
 }
 
-void Explorerplusplus::OnNavigationCompleted(const Tab &tab)
+void Explorerplusplus::OnNavigationCommitted(
+	const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
 {
+	UNREFERENCED_PARAMETER(pidl);
+	UNREFERENCED_PARAMETER(addHistoryEntry);
+
 	if (m_tabContainer->IsTabSelected(tab))
 	{
 		std::wstring directory = tab.GetShellBrowser()->GetDirectory();

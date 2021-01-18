@@ -382,7 +382,7 @@ private:
 	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true) override;
 
 	/* Browsing support. */
-	HRESULT EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory);
+	HRESULT EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry);
 	void PrepareToChangeFolders();
 	void ClearPendingResults();
 	void ResetFolderState();

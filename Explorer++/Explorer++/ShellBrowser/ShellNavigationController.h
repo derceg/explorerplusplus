@@ -52,7 +52,7 @@ private:
 	HRESULT BrowseFolder(const HistoryEntry *entry) override;
 	HRESULT GetFailureValue() override;
 
-	void OnNavigationCompleted(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry);
+	void OnNavigationCommitted(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry);
 
 	NavigatorInterface *m_navigator;
 

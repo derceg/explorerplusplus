@@ -75,13 +75,16 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void Explorerplusplus::OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pidl)
+void Explorerplusplus::OnNavigationStartedStatusBar(const Tab &tab, PCIDLIST_ABSOLUTE pidl)
 {
-	if (!m_tabContainer->IsTabSelected(tab))
+	if (m_tabContainer->IsTabSelected(tab))
 	{
-		return;
+		SetStatusBarLoadingText(pidl);
 	}
+}
 
+void Explorerplusplus::SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl)
+{
 	std::wstring displayName;
 	HRESULT hr = GetDisplayName(pidl, SHGDN_INFOLDER, displayName);
 
@@ -102,6 +105,14 @@ void Explorerplusplus::OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pid
 	/* Clear the text in all other parts of the status bar. */
 	SendMessage(m_hStatusBar, SB_SETTEXT, 1 | 0, (LPARAM) EMPTY_STRING);
 	SendMessage(m_hStatusBar, SB_SETTEXT, 2 | 0, (LPARAM) EMPTY_STRING);
+}
+
+void Explorerplusplus::OnNavigationCompletedStatusBar(const Tab &tab)
+{
+	if (m_tabContainer->IsTabSelected(tab))
+	{
+		UpdateStatusBarText(tab);
+	}
 }
 
 void Explorerplusplus::OnNavigationFailedStatusBar(const Tab &tab)

@@ -173,8 +173,8 @@ void MainToolbar::Initialize(HWND parent)
 		m_connections.push_back(m_pexpp->GetTabContainer()->tabSelectedSignal.AddObserver(
 			boost::bind(&MainToolbar::OnTabSelected, this, _1)));
 		m_connections.push_back(
-			m_pexpp->GetTabContainer()->tabNavigationCompletedSignal.AddObserver(
-				boost::bind(&MainToolbar::OnNavigationCompleted, this, _1)));
+			m_pexpp->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
+				boost::bind(&MainToolbar::OnNavigationCommitted, this, _1, _2, _3)));
 	});
 
 	m_connections.push_back(
@@ -989,8 +989,12 @@ void MainToolbar::OnTabSelected(const Tab &tab)
 	UpdateToolbarButtonStates();
 }
 
-void MainToolbar::OnNavigationCompleted(const Tab &tab)
+void MainToolbar::OnNavigationCommitted(
+	const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
 {
+	UNREFERENCED_PARAMETER(pidl);
+	UNREFERENCED_PARAMETER(addHistoryEntry);
+
 	if (m_pexpp->GetTabContainer()->IsTabSelected(tab))
 	{
 		UpdateToolbarButtonStates();

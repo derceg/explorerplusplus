@@ -50,7 +50,7 @@ private:
 	static std::optional<wil::unique_stg_medium> GenerateShortcutContentsStgMedium(
 		PCIDLIST_ABSOLUTE pidl);
 	void OnTabSelected(const Tab &tab);
-	void OnNavigationCompleted(const Tab &tab);
+	void OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
 	void UpdateTextAndIcon(const Tab &tab);
 	void UpdateTextAndIconInUI(std::wstring *text, int iconIndex);
 	void OnHistoryEntryUpdated(const HistoryEntry &entry, HistoryEntry::PropertyType propertyType);

@@ -177,8 +177,6 @@ private:
 	void OnRightClick(NMHDR *nmhdr);
 	void OnSetFocus();
 	LRESULT OnDeviceChange(WPARAM wParam, LPARAM lParam);
-	LRESULT StatusBarMenuSelect(WPARAM wParam, LPARAM lParam);
-	void OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pidl);
 	void OnPreviousWindow();
 	void OnNextWindow();
 	void OnAppCommand(UINT cmd);
@@ -286,7 +284,7 @@ private:
 	/* TabNavigationInterface methods. */
 	void CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected) override;
 
-	void OnNavigationCompleted(const Tab &tab);
+	void OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
 
 	/* PluginInterface. */
 	IExplorerplusplus *GetCoreInterface() override;
@@ -385,14 +383,22 @@ private:
 	/* Window state update. */
 	void UpdateWindowStates(const Tab &tab);
 	void UpdateTreeViewSelection();
-	void SetStatusBarParts(int width);
 	void ResizeWindows();
 	void SetListViewInitialPosition(HWND hListView) override;
 	void AdjustFolderPanePosition();
-	void OnNavigationFailedStatusBar(const Tab &tab);
-	HRESULT UpdateStatusBarText(const Tab &tab);
 	void ToggleFolders();
 	void UpdateLayout();
+
+	// Status bar
+	void CreateStatusBar();
+	void SetStatusBarParts(int width);
+	LRESULT StatusBarMenuSelect(WPARAM wParam, LPARAM lParam);
+	void OnNavigationStartedStatusBar(const Tab &tab, PCIDLIST_ABSOLUTE pidl);
+	void SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl);
+	void OnNavigationCompletedStatusBar(const Tab &tab);
+	void OnNavigationFailedStatusBar(const Tab &tab);
+	HRESULT UpdateStatusBarText(const Tab &tab);
+	int CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer);
 
 	/* Languages. */
 	void SetLanguageModule();
@@ -489,9 +495,7 @@ private:
 	bool OnRebarEraseBackground(HDC hdc);
 
 	/* Miscellaneous. */
-	void CreateStatusBar();
 	void InitializeDisplayWindow();
-	int CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer);
 	void ShowMainRebarBand(HWND hwnd, BOOL bShow);
 	BOOL OnMouseWheel(MousewheelSource mousewheelSource, WPARAM wParam, LPARAM lParam) override;
 	StatusBar *GetStatusBar() override;
