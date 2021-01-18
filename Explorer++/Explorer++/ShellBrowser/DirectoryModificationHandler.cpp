@@ -55,20 +55,47 @@ void ShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)
 	HANDLE lock = SHChangeNotification_Lock(
 		reinterpret_cast<HANDLE>(wParam), static_cast<DWORD>(lParam), &pidls, &event);
 
-	switch (event)
+	m_directoryState.shellChangeNotifications.emplace_back(event, pidls[0], pidls[1]);
+
+	SHChangeNotification_Unlock(lock);
+
+	SetTimer(m_hListView, PROCESS_SHELL_CHANGES_TIMER_ID, PROCESS_SHELL_CHANGES_TIMEOUT, nullptr);
+}
+
+void ShellBrowser::OnProcessShellChangeNotifications()
+{
+	SendMessage(m_hListView, WM_SETREDRAW, FALSE, NULL);
+
+	for (const auto &change : m_directoryState.shellChangeNotifications)
+	{
+		ProcessShellChangeNotification(change);
+	}
+
+	SendMessage(m_hListView, WM_SETREDRAW, TRUE, NULL);
+
+	m_directoryState.shellChangeNotifications.clear();
+
+	KillTimer(m_hListView, PROCESS_SHELL_CHANGES_TIMER_ID);
+
+	directoryModified.m_signal();
+}
+
+void ShellBrowser::ProcessShellChangeNotification(const ShellChangeNotification &change)
+{
+	switch (change.event)
 	{
 	case SHCNE_MKDIR:
 	case SHCNE_CREATE:
-		if (ILIsParent(m_directoryState.pidlDirectory.get(), pidls[0], TRUE))
+		if (ILIsParent(m_directoryState.pidlDirectory.get(), change.pidl1.get(), TRUE))
 		{
-			AddItem(pidls[0]);
+			AddItem(change.pidl1.get());
 		}
 		break;
 
 	case SHCNE_RENAMEFOLDER:
 	case SHCNE_RENAMEITEM:
-		if (ILIsParent(m_directoryState.pidlDirectory.get(), pidls[0], TRUE)
-			&& ILIsParent(m_directoryState.pidlDirectory.get(), pidls[1], TRUE))
+		if (ILIsParent(m_directoryState.pidlDirectory.get(), change.pidl1.get(), TRUE)
+			&& ILIsParent(m_directoryState.pidlDirectory.get(), change.pidl2.get(), TRUE))
 		{
 			// The pidls provided to these change notifications are always simple pidls. When an
 			// item is updated, the WIN32_FIND_DATA information cached in the pidl will be
@@ -77,20 +104,20 @@ void ShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)
 			// Note that there's no need to convert pidls[0], as it refers to the original item,
 			// which no longer exists.
 			unique_pidl_absolute pidlNewFull;
-			HRESULT hr = SimplePidlToFullPidl(pidls[1], wil::out_param(pidlNewFull));
+			HRESULT hr = SimplePidlToFullPidl(change.pidl2.get(), wil::out_param(pidlNewFull));
 
 			if (SUCCEEDED(hr))
 			{
-				OnItemRenamed(pidls[0], pidlNewFull.get());
+				OnItemRenamed(change.pidl1.get(), pidlNewFull.get());
 			}
 		}
 		break;
 
 	case SHCNE_UPDATEITEM:
-		if (ILIsParent(m_directoryState.pidlDirectory.get(), pidls[0], TRUE))
+		if (ILIsParent(m_directoryState.pidlDirectory.get(), change.pidl1.get(), TRUE))
 		{
 			unique_pidl_absolute pidlFull;
-			HRESULT hr = SimplePidlToFullPidl(pidls[0], wil::out_param(pidlFull));
+			HRESULT hr = SimplePidlToFullPidl(change.pidl1.get(), wil::out_param(pidlFull));
 
 			if (SUCCEEDED(hr))
 			{
@@ -100,7 +127,7 @@ void ShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)
 		break;
 
 	case SHCNE_UPDATEDIR:
-		if (ArePidlsEquivalent(m_directoryState.pidlDirectory.get(), pidls[0]))
+		if (ArePidlsEquivalent(m_directoryState.pidlDirectory.get(), change.pidl1.get()))
 		{
 			m_navigationController->Refresh();
 		}
@@ -112,16 +139,12 @@ void ShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)
 		// that directory. However, if the user has just changed directories, a notification could
 		// still come in for the previous directory. Therefore, it's important to verify that the
 		// item is actually a child of the current directory.
-		if (ILIsParent(m_directoryState.pidlDirectory.get(), pidls[0], TRUE))
+		if (ILIsParent(m_directoryState.pidlDirectory.get(), change.pidl1.get(), TRUE))
 		{
-			OnItemRemoved(pidls[0]);
+			OnItemRemoved(change.pidl1.get());
 		}
 		break;
 	}
-
-	SHChangeNotification_Unlock(lock);
-
-	directoryModified.m_signal();
 }
 
 void ShellBrowser::DirectoryAltered()

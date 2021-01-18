@@ -215,6 +215,20 @@ private:
 		}
 	};
 
+	struct ShellChangeNotification
+	{
+		LONG event;
+		unique_pidl_absolute pidl1;
+		unique_pidl_absolute pidl2;
+
+		ShellChangeNotification(LONG event, PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2) :
+			event(event),
+			pidl1(pidl1 ? ILCloneFull(pidl1) : nullptr),
+			pidl2(pidl2 ? ILCloneFull(pidl2) : nullptr)
+		{
+		}
+	};
+
 	struct AlteredFile_t
 	{
 		TCHAR szFileName[MAX_PATH];
@@ -328,15 +342,17 @@ private:
 		/* Cached folder size data. */
 		mutable std::unordered_map<int, ULONGLONG> cachedFolderSizes;
 
+		std::vector<ShellChangeNotification> shellChangeNotifications;
+
 		DirectoryState() :
 			virtualFolder(false),
 			itemIDCounter(0),
 			numItems(0),
 			numFilesSelected(0),
-			numFoldersSelected(0)
+			numFoldersSelected(0),
+			totalDirSize({}),
+			fileSelectionSize({})
 		{
-			totalDirSize = {};
-			fileSelectionSize = {};
 		}
 	};
 
@@ -362,6 +378,9 @@ private:
 
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
+
+	static const UINT PROCESS_SHELL_CHANGES_TIMER_ID = 1;
+	static const UINT PROCESS_SHELL_CHANGES_TIMEOUT = 100;
 
 	ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface,
 		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
@@ -475,6 +494,8 @@ private:
 	void StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl);
 	void StopDirectoryMonitoring();
 	void OnShellNotify(WPARAM wParam, LPARAM lParam);
+	void OnProcessShellChangeNotifications();
+	void ProcessShellChangeNotification(const ShellChangeNotification &change);
 	void OnFileAdded(const TCHAR *szFileName);
 	void AddItem(PCIDLIST_ABSOLUTE pidl);
 	void RemoveItem(int iItemInternal);

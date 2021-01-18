@@ -79,6 +79,13 @@ LRESULT CALLBACK ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 		OnClipboardUpdate();
 		return 0;
 
+	case WM_TIMER:
+		if (wParam == PROCESS_SHELL_CHANGES_TIMER_ID)
+		{
+			OnProcessShellChangeNotifications();
+		}
+		break;
+
 	case WM_NOTIFY:
 		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == ListView_GetHeader(m_hListView))
 		{

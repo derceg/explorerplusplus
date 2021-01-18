@@ -96,6 +96,8 @@ void ShellBrowser::PrepareToChangeFolders()
 	if (m_config->registerForShellNotifications)
 	{
 		StopDirectoryMonitoring();
+
+		KillTimer(m_hListView, PROCESS_SHELL_CHANGES_TIMER_ID);
 	}
 
 	EnterCriticalSection(&m_csDirectoryAltered);
