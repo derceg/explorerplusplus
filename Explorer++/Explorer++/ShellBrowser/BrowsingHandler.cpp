@@ -41,43 +41,20 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 		SetCursor(LoadCursor(nullptr, IDC_ARROW));
 	});
 
-	if (m_bFolderVisited)
-	{
-		SaveColumnWidths();
-	}
-
-	ClearPendingResults();
-
-	if (m_config->registerForShellNotifications)
-	{
-		StopDirectoryMonitoring();
-	}
-
-	EnterCriticalSection(&m_csDirectoryAltered);
-	m_FileSelectionList.clear();
-	LeaveCriticalSection(&m_csDirectoryAltered);
-
-	StoreCurrentlySelectedItems();
-
 	m_navigationStartedSignal(pidlDirectory);
+
+	HRESULT hr = EnumerateFolder(pidlDirectory);
+
+	if (FAILED(hr))
+	{
+		m_navigationFailedSignal();
+		return hr;
+	}
 
 	/* Stop the list view from redrawing itself each time is inserted.
 	Redrawing will be allowed once all items have being inserted.
 	(reduces lag when a large number of items are going to be inserted). */
 	SendMessage(m_hListView, WM_SETREDRAW, FALSE, NULL);
-
-	ListView_DeleteAllItems(m_hListView);
-
-	if (m_bFolderVisited)
-	{
-		ResetFolderState();
-	}
-
-	std::wstring parsingPath;
-	GetDisplayName(pidlDirectory, SHGDN_FORPARSING, parsingPath);
-	m_directoryState.directory = parsingPath;
-
-	EnumerateFolder(pidlDirectory);
 
 	SetActiveColumnSet();
 	SetViewModeInternal(m_folderSettings.viewMode);
@@ -106,7 +83,35 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 
 	m_navigationCompletedSignal(pidlDirectory, addHistoryEntry);
 
-	return S_OK;
+	return hr;
+}
+
+void ShellBrowser::PrepareToChangeFolders()
+{
+	if (m_bFolderVisited)
+	{
+		SaveColumnWidths();
+	}
+
+	ClearPendingResults();
+
+	if (m_config->registerForShellNotifications)
+	{
+		StopDirectoryMonitoring();
+	}
+
+	EnterCriticalSection(&m_csDirectoryAltered);
+	m_FileSelectionList.clear();
+	LeaveCriticalSection(&m_csDirectoryAltered);
+
+	StoreCurrentlySelectedItems();
+
+	ListView_DeleteAllItems(m_hListView);
+
+	if (m_bFolderVisited)
+	{
+		ResetFolderState();
+	}
 }
 
 void ShellBrowser::ClearPendingResults()
@@ -190,7 +195,13 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 		return hr;
 	}
 
-	m_directoryState.virtualFolder = WI_IsFlagClear(attr, SFGAO_FILESYSTEM);
+	std::wstring parsingPath;
+	hr = GetDisplayName(parent.get(), child, SHGDN_FORPARSING, parsingPath);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
 
 	wil::com_ptr_nothrow<IShellFolder> shellFolder;
 	hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&shellFolder));
@@ -199,8 +210,6 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 	{
 		return hr;
 	}
-
-	m_directoryState.pidlDirectory.reset(ILCloneFull(pidlDirectory));
 
 	SHCONTF enumFlags = SHCONTF_FOLDERS | SHCONTF_NONFOLDERS;
 
@@ -216,6 +225,14 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 	{
 		return hr;
 	}
+
+	PrepareToChangeFolders();
+
+	m_directoryState.pidlDirectory.reset(ILCloneFull(pidlDirectory));
+	m_directoryState.directory = parsingPath;
+	m_directoryState.virtualFolder = WI_IsFlagClear(attr, SFGAO_FILESYSTEM);
+
+	m_navigationCommittedSignal(pidlDirectory);
 
 	ULONG numFetched = 1;
 	unique_pidl_child pidlItem;
@@ -670,9 +687,22 @@ boost::signals2::connection ShellBrowser::AddNavigationStartedObserver(
 	return m_navigationStartedSignal.connect(observer, position);
 }
 
+boost::signals2::connection ShellBrowser::AddNavigationCommittedObserver(
+	const NavigationCommittedSignal::slot_type &observer,
+	boost::signals2::connect_position position)
+{
+	return m_navigationCommittedSignal.connect(observer, position);
+}
+
 boost::signals2::connection ShellBrowser::AddNavigationCompletedObserver(
 	const NavigationCompletedSignal::slot_type &observer,
 	boost::signals2::connect_position position)
 {
 	return m_navigationCompletedSignal.connect(observer, position);
+}
+
+boost::signals2::connection ShellBrowser::AddNavigationFailedObserver(
+	const NavigationFailedSignal::slot_type &observer, boost::signals2::connect_position position)
+{
+	return m_navigationFailedSignal.connect(observer, position);
 }

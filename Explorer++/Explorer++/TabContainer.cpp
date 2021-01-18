@@ -872,19 +872,12 @@ void TabContainer::SetTabIconFromImageList(const Tab &tab, int imageIndex)
 	}
 }
 
-HRESULT TabContainer::CreateNewTabInDefaultDirectory(const TabSettings &tabSettings)
+void TabContainer::CreateNewTabInDefaultDirectory(const TabSettings &tabSettings)
 {
-	HRESULT hr = CreateNewTab(m_config->defaultTabDirectory.c_str(), tabSettings);
-
-	if (FAILED(hr))
-	{
-		hr = CreateNewTab(m_config->defaultTabDirectoryStatic.c_str(), tabSettings);
-	}
-
-	return hr;
+	CreateNewTab(m_config->defaultTabDirectory.c_str(), tabSettings);
 }
 
-HRESULT TabContainer::CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings,
+void TabContainer::CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings,
 	const FolderSettings *folderSettings, std::optional<FolderColumns> initialColumns,
 	int *newTabId)
 {
@@ -900,25 +893,26 @@ HRESULT TabContainer::CreateNewTab(const TCHAR *TabDirectory, const TabSettings 
 	}
 
 	unique_pidl_absolute pidl;
+	HRESULT hr = SHParseDisplayName(szExpandedPath, nullptr, wil::out_param(pidl), 0, nullptr);
 
-	if (!SUCCEEDED(SHParseDisplayName(szExpandedPath, nullptr, wil::out_param(pidl), 0, nullptr)))
+	if (FAILED(hr))
 	{
-		return E_FAIL;
+		hr = SHParseDisplayName(
+			m_config->defaultTabDirectory.c_str(), nullptr, wil::out_param(pidl), 0, nullptr);
+
+		if (FAILED(hr))
+		{
+			hr = SHParseDisplayName(m_config->defaultTabDirectoryStatic.c_str(), nullptr,
+				wil::out_param(pidl), 0, nullptr);
+		}
 	}
 
-	HRESULT hr = CreateNewTab(pidl.get(), tabSettings, folderSettings, initialColumns, newTabId);
-
-	return hr;
+	CreateNewTab(pidl.get(), tabSettings, folderSettings, initialColumns, newTabId);
 }
 
-HRESULT TabContainer::CreateNewTab(const PreservedTab &preservedTab, int *newTabId)
+void TabContainer::CreateNewTab(const PreservedTab &preservedTab, int *newTabId)
 {
 	PreservedHistoryEntry *entry = preservedTab.history.at(preservedTab.currentEntry).get();
-
-	if (!CheckIdl(entry->pidl.get()) || !IsIdlDirectory(entry->pidl.get()))
-	{
-		return E_FAIL;
-	}
 
 	auto tabTemp =
 		std::make_unique<Tab>(preservedTab, m_expp, m_tabNavigation, m_fileActionHandler);
@@ -928,18 +922,13 @@ HRESULT TabContainer::CreateNewTab(const PreservedTab &preservedTab, int *newTab
 
 	TabSettings tabSettings(_index = preservedTab.index, _selected = true);
 
-	return SetUpNewTab(tab, entry->pidl.get(), tabSettings, false, newTabId);
+	SetUpNewTab(tab, entry->pidl.get(), tabSettings, false, newTabId);
 }
 
-HRESULT TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings,
+void TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings,
 	const FolderSettings *folderSettings, std::optional<FolderColumns> initialColumns,
 	int *newTabId)
 {
-	if (!CheckIdl(pidlDirectory) || !IsIdlDirectory(pidlDirectory))
-	{
-		return E_FAIL;
-	}
-
 	auto tabTemp = std::make_unique<Tab>(
 		m_expp, m_tabNavigation, m_fileActionHandler, folderSettings, initialColumns);
 	auto item = m_tabs.insert({ tabTemp->GetId(), std::move(tabTemp) });
@@ -956,10 +945,10 @@ HRESULT TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSet
 		tab.SetCustomName(*tabSettings.name);
 	}
 
-	return SetUpNewTab(tab, pidlDirectory, tabSettings, true, newTabId);
+	SetUpNewTab(tab, pidlDirectory, tabSettings, true, newTabId);
 }
 
-HRESULT TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
+void TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 	const TabSettings &tabSettings, bool addHistoryEntry, int *newTabId)
 {
 	int index;
@@ -1006,6 +995,10 @@ HRESULT TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 		selected = *tabSettings.selected;
 	}
 
+	tab.GetShellBrowser()->AddNavigationStartedObserver([this, &tab](PCIDLIST_ABSOLUTE pidl) {
+		tabNavigationStartedSignal.m_signal(tab, pidl);
+	});
+
 	// Capturing the tab by reference here is safe, since the tab object is
 	// guaranteed to exist whenever this method is called.
 	tab.GetShellBrowser()->AddNavigationCompletedObserver(
@@ -1019,30 +1012,36 @@ HRESULT TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 			tabNavigationCompletedSignal.m_signal(tab);
 		});
 
-	tab.GetShellBrowser()->AddNavigationStartedObserver([this, &tab](PCIDLIST_ABSOLUTE pidl) {
-		tabNavigationStarted.m_signal(tab, pidl);
+	tab.GetShellBrowser()->AddNavigationFailedObserver([this, &tab]() {
+		tabNavigationFailedSignal.m_signal(tab);
 	});
 
 	tab.GetShellBrowser()->directoryModified.AddObserver([this, &tab]() {
-		tabDirectoryModified.m_signal(tab);
+		tabDirectoryModifiedSignal.m_signal(tab);
 	});
 
 	tab.GetShellBrowser()->listViewSelectionChanged.AddObserver([this, &tab]() {
-		tabListViewSelectionChanged.m_signal(tab);
+		tabListViewSelectionChangedSignal.m_signal(tab);
 	});
 
 	tab.GetShellBrowser()->columnsChanged.AddObserver([this, &tab]() {
-		tabColumnsChanged.m_signal(tab);
+		tabColumnsChangedSignal.m_signal(tab);
 	});
 
 	HRESULT hr = tab.GetShellBrowser()->GetNavigationController()->BrowseFolder(
 		pidlDirectory, addHistoryEntry);
 
-	if (hr != S_OK)
+	if (FAILED(hr))
 	{
-		/* Folder was not browsed. Likely that the path does not exist
-		(or is locked, cannot be found, etc). */
-		return E_FAIL;
+		hr = tab.GetShellBrowser()->GetNavigationController()->BrowseFolder(
+			m_config->defaultTabDirectory, addHistoryEntry);
+
+		if (FAILED(hr))
+		{
+			// The computer folder should always exist, so this call shouldn't fail.
+			tab.GetShellBrowser()->GetNavigationController()->BrowseFolder(
+				m_config->defaultTabDirectoryStatic, addHistoryEntry);
+		}
 	}
 
 	if (selected)
@@ -1067,8 +1066,6 @@ HRESULT TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 	tab.AddTabUpdatedObserver(boost::bind(&TabContainer::OnTabUpdated, this, _1, _2));
 
 	tabCreatedSignal.m_signal(tab.GetId(), selected);
-
-	return S_OK;
 }
 
 void TabContainer::InsertNewTab(

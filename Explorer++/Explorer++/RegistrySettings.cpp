@@ -734,7 +734,6 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 	LONG returnValue;
 	DWORD cbData;
 	DWORD type;
-	HRESULT hr;
 	int nTabsCreated = 0;
 	int i = 0;
 
@@ -858,13 +857,10 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 				hTabKey, _T("CustomName"), customName, SIZEOF_ARRAY(customName));
 			tabSettings.name = customName;
 
-			hr = m_tabContainer->CreateNewTab(
+			m_tabContainer->CreateNewTab(
 				pidlDirectory, tabSettings, &folderSettings, initialColumns);
 
-			if (hr == S_OK)
-			{
-				nTabsCreated++;
-			}
+			nTabsCreated++;
 
 			CoTaskMemFree(pidlDirectory);
 			RegCloseKey(hTabKey);

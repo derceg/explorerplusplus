@@ -78,12 +78,12 @@ public:
 		IExplorerplusplus *expp, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons,
 		BookmarkTree *bookmarkTree, HINSTANCE instance, std::shared_ptr<Config> config);
 
-	HRESULT CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
-	HRESULT CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {},
+	void CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
+	void CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {},
 		const FolderSettings *folderSettings = nullptr,
 		std::optional<FolderColumns> initialColumns = std::nullopt, int *newTabId = nullptr);
-	HRESULT CreateNewTab(const PreservedTab &preservedTab, int *newTabId = nullptr);
-	HRESULT CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings = {},
+	void CreateNewTab(const PreservedTab &preservedTab, int *newTabId = nullptr);
+	void CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings = {},
 		const FolderSettings *folderSettings = nullptr,
 		std::optional<FolderColumns> initialColumns = std::nullopt, int *newTabId = nullptr);
 
@@ -112,7 +112,10 @@ public:
 
 	// Signals
 	SignalWrapper<TabContainer, void(int tabId, BOOL switchToNewTab)> tabCreatedSignal;
+	SignalWrapper<TabContainer, void(const Tab &tab, PCIDLIST_ABSOLUTE pidl)>
+		tabNavigationStartedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabNavigationCompletedSignal;
+	SignalWrapper<TabContainer, void(const Tab &tab)> tabNavigationFailedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, Tab::PropertyType propertyType)>
 		tabUpdatedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, int fromIndex, int toIndex)> tabMovedSignal;
@@ -120,10 +123,9 @@ public:
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabPreRemovalSignal;
 	SignalWrapper<TabContainer, void(int tabId)> tabRemovedSignal;
 
-	SignalWrapper<TabContainer, void(const Tab &tab, PCIDLIST_ABSOLUTE pidl)> tabNavigationStarted;
-	SignalWrapper<TabContainer, void(const Tab &tab)> tabDirectoryModified;
-	SignalWrapper<TabContainer, void(const Tab &tab)> tabListViewSelectionChanged;
-	SignalWrapper<TabContainer, void(const Tab &tab)> tabColumnsChanged;
+	SignalWrapper<TabContainer, void(const Tab &tab)> tabDirectoryModifiedSignal;
+	SignalWrapper<TabContainer, void(const Tab &tab)> tabListViewSelectionChangedSignal;
+	SignalWrapper<TabContainer, void(const Tab &tab)> tabColumnsChangedSignal;
 
 private:
 	static const UINT_PTR SUBCLASS_ID = 0;
@@ -150,7 +152,7 @@ private:
 	void AddDefaultTabIcons(HIMAGELIST himlTab);
 	bool IsDefaultIcon(int iconIndex);
 
-	HRESULT SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings,
+	void SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings,
 		bool addHistoryEntry, int *newTabId);
 
 	void OnTabCtrlLButtonDown(POINT *pt);

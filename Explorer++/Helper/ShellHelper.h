@@ -57,8 +57,6 @@ HRESULT GetDisplayName(PCIDLIST_ABSOLUTE pidl, DWORD flags, std::wstring &output
 HRESULT GetDisplayName(
 	IShellFolder *shellFolder, PCITEMID_CHILD pidlChild, DWORD flags, std::wstring &output);
 HRESULT GetCsidlDisplayName(int csidl, DWORD flags, std::wstring &output);
-BOOL CheckIdl(PCIDLIST_ABSOLUTE pidl);
-BOOL IsIdlDirectory(PCIDLIST_ABSOLUTE pidl);
 HRESULT GetVirtualParentPath(PCIDLIST_ABSOLUTE pidlDirectory, PIDLIST_ABSOLUTE *pidlParent);
 BOOL IsNamespaceRoot(PCIDLIST_ABSOLUTE pidl);
 BOOL MyExpandEnvironmentStrings(const TCHAR *szSrc, TCHAR *szExpandedPath, DWORD nSize);

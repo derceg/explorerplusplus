@@ -28,17 +28,20 @@ void Explorerplusplus::InitializeTabs()
 		&m_cachedIcons, &m_bookmarkTree, m_hLanguageModule, m_config);
 	m_tabContainer->tabCreatedSignal.AddObserver(
 		boost::bind(&Explorerplusplus::OnTabCreated, this, _1, _2), boost::signals2::at_front);
-	m_tabContainer->tabNavigationStarted.AddObserver(
+	m_tabContainer->tabNavigationStartedSignal.AddObserver(
 		boost::bind(&Explorerplusplus::OnNavigationStarted, this, _1, _2),
 		boost::signals2::at_front);
 	m_tabContainer->tabNavigationCompletedSignal.AddObserver(
 		boost::bind(&Explorerplusplus::OnNavigationCompleted, this, _1), boost::signals2::at_front);
+	m_tabContainer->tabNavigationFailedSignal.AddObserver(
+		boost::bind(&Explorerplusplus::OnNavigationFailedStatusBar, this, _1),
+		boost::signals2::at_front);
 	m_tabContainer->tabSelectedSignal.AddObserver(
 		boost::bind(&Explorerplusplus::OnTabSelected, this, _1), boost::signals2::at_front);
 
-	m_tabContainer->tabDirectoryModified.AddObserver(
+	m_tabContainer->tabDirectoryModifiedSignal.AddObserver(
 		boost::bind(&Explorerplusplus::OnDirectoryModified, this, _1), boost::signals2::at_front);
-	m_tabContainer->tabListViewSelectionChanged.AddObserver(
+	m_tabContainer->tabListViewSelectionChangedSignal.AddObserver(
 		boost::bind(&Explorerplusplus::OnTabListViewSelectionChanged, this, _1),
 		boost::signals2::at_front);
 
@@ -89,7 +92,7 @@ void Explorerplusplus::OnNavigationCompleted(const Tab &tab)
 
 /* Creates a new tab. If a folder is selected, that folder is opened in a new
  * tab, else the default directory is opened. */
-HRESULT Explorerplusplus::OnNewTab()
+void Explorerplusplus::OnNewTab()
 {
 	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
 	int selectionIndex = ListView_GetNextItem(
@@ -105,20 +108,19 @@ HRESULT Explorerplusplus::OnNewTab()
 		{
 			auto pidl = selectedTab.GetShellBrowser()->GetItemCompleteIdl(selectionIndex);
 			FolderColumns cols = selectedTab.GetShellBrowser()->ExportAllColumns();
-			return m_tabContainer->CreateNewTab(
-				pidl.get(), TabSettings(_selected = true), nullptr, cols);
+			m_tabContainer->CreateNewTab(pidl.get(), TabSettings(_selected = true), nullptr, cols);
+			return;
 		}
 	}
 
 	/* Either no items are selected, or the focused + selected item was not a
 	 * folder; open the default tab directory. */
-	return m_tabContainer->CreateNewTabInDefaultDirectory(TabSettings(_selected = true));
+	m_tabContainer->CreateNewTabInDefaultDirectory(TabSettings(_selected = true));
 }
 
 HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 {
 	TCHAR szDirectory[MAX_PATH];
-	HRESULT hr;
 	int nTabsCreated = 0;
 
 	if (!g_commandLineDirectories.empty())
@@ -139,12 +141,8 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 				GetCurrentDirectory(SIZEOF_ARRAY(szDirectory), szDirectory);
 			}
 
-			hr = m_tabContainer->CreateNewTab(szDirectory, TabSettings(_selected = true));
-
-			if (hr == S_OK)
-			{
-				nTabsCreated++;
-			}
+			m_tabContainer->CreateNewTab(szDirectory, TabSettings(_selected = true));
+			nTabsCreated++;
 		}
 	}
 	else
@@ -157,18 +155,7 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 
 	if (nTabsCreated == 0)
 	{
-		hr = m_tabContainer->CreateNewTabInDefaultDirectory(TabSettings(_selected = true));
-
-		if (hr == S_OK)
-		{
-			nTabsCreated++;
-		}
-	}
-
-	if (nTabsCreated == 0)
-	{
-		/* Should never end up here. */
-		return E_FAIL;
+		m_tabContainer->CreateNewTabInDefaultDirectory(TabSettings(_selected = true));
 	}
 
 	if (!m_config->alwaysShowTabBar.get())
@@ -257,9 +244,9 @@ void Explorerplusplus::HideTabBar()
 	UpdateLayout();
 }
 
-HRESULT Explorerplusplus::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected)
+void Explorerplusplus::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected)
 {
-	return m_tabContainer->CreateNewTab(pidlDirectory, TabSettings(_selected = selected));
+	m_tabContainer->CreateNewTab(pidlDirectory, TabSettings(_selected = selected));
 }
 
 void Explorerplusplus::OnTabListViewSelectionChanged(const Tab &tab)

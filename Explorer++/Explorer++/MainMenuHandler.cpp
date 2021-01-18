@@ -269,9 +269,13 @@ void Explorerplusplus::OnResolveLink()
 			StringCchCopy(szPath, SIZEOF_ARRAY(szPath), szFullFileName);
 			PathRemoveFileSpec(szPath);
 
-			hr = m_tabContainer->CreateNewTab(szPath, TabSettings(_selected = true));
+			int newTabId;
+			m_tabContainer->CreateNewTab(
+				szPath, TabSettings(_selected = true), nullptr, std::nullopt, &newTabId);
 
-			if (SUCCEEDED(hr))
+			Tab &tab = m_tabContainer->GetTab(newTabId);
+
+			if (tab.GetShellBrowser()->GetDirectory() == szPath)
 			{
 				unique_pidl_absolute pidl;
 				hr = CreateSimplePidl(szFullFileName, wil::out_param(pidl));
@@ -280,9 +284,9 @@ void Explorerplusplus::OnResolveLink()
 				{
 					m_pActiveShellBrowser->SelectItems({ pidl.get() });
 				}
-
-				SetFocus(m_hActiveListView);
 			}
+
+			SetFocus(m_hActiveListView);
 		}
 	}
 }

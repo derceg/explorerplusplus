@@ -9,8 +9,10 @@
 class HistoryEntry;
 
 using NavigationStartedSignal = boost::signals2::signal<void(PCIDLIST_ABSOLUTE pidl)>;
+using NavigationCommittedSignal = boost::signals2::signal<void(PCIDLIST_ABSOLUTE pidl)>;
 using NavigationCompletedSignal =
 	boost::signals2::signal<void(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)>;
+using NavigationFailedSignal = boost::signals2::signal<void()>;
 
 __interface NavigatorInterface
 {
@@ -19,7 +21,13 @@ __interface NavigatorInterface
 	boost::signals2::connection AddNavigationStartedObserver(
 		const NavigationStartedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back);
+	boost::signals2::connection AddNavigationCommittedObserver(
+		const NavigationCommittedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back);
 	boost::signals2::connection AddNavigationCompletedObserver(
 		const NavigationCompletedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back);
+	boost::signals2::connection AddNavigationFailedObserver(
+		const NavigationFailedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back);
 };

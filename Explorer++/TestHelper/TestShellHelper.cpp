@@ -59,34 +59,6 @@ TEST(GetDisplayName, Simple)
 	EXPECT_STREQ(L"Metadata.jpg", szDisplayName);
 }
 
-void TestIsIdlDirectory(const TCHAR *szFullFileName, BOOL bExpected)
-{
-	LPITEMIDLIST pidl = NULL;
-	HRESULT hr = GetIdlFromParsingName(szFullFileName, &pidl);
-	ASSERT_TRUE(SUCCEEDED(hr));
-
-	BOOL bRet = IsIdlDirectory(pidl);
-	EXPECT_EQ(bExpected, bRet);
-
-	CoTaskMemFree(pidl);
-}
-
-TEST(IsIdlDirectory, Directory)
-{
-	TCHAR szResourceDirectory[MAX_PATH];
-	GetTestResourceDirectory(szResourceDirectory, SIZEOF_ARRAY(szResourceDirectory));
-
-	TestIsIdlDirectory(szResourceDirectory, TRUE);
-}
-
-TEST(IsIdlDirectory, File)
-{
-	TCHAR szFullFileName[MAX_PATH];
-	GetTestResourceFilePath(L"Metadata.jpg", szFullFileName, SIZEOF_ARRAY(szFullFileName));
-
-	TestIsIdlDirectory(szFullFileName, FALSE);
-}
-
 TEST(IsPathGUID, GUID)
 {
 	BOOL bRet = IsPathGUID(L"::{26EE0668-A00A-44D7-9371-BEB064C98683}");

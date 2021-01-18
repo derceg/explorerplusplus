@@ -9,20 +9,24 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 
-HRESULT Explorerplusplus::ExpandAndBrowsePath(const TCHAR *szPath)
+void Explorerplusplus::ExpandAndBrowsePath(const TCHAR *szPath)
 {
-	return ExpandAndBrowsePath(szPath, FALSE, FALSE);
+	ExpandAndBrowsePath(szPath, FALSE, FALSE);
 }
 
 /* Browses to the specified path. The path may
 have any environment variables expanded (if
 necessary). */
-HRESULT Explorerplusplus::ExpandAndBrowsePath(
+void Explorerplusplus::ExpandAndBrowsePath(
 	const TCHAR *szPath, BOOL bOpenInNewTab, BOOL bSwitchToNewTab)
 {
 	TCHAR szExpandedPath[MAX_PATH];
+	BOOL res = MyExpandEnvironmentStrings(szPath, szExpandedPath, SIZEOF_ARRAY(szExpandedPath));
 
-	MyExpandEnvironmentStrings(szPath, szExpandedPath, SIZEOF_ARRAY(szExpandedPath));
+	if (!res)
+	{
+		StringCchCopy(szExpandedPath, std::size(szExpandedPath), szPath);
+	}
 
 	if (bOpenInNewTab)
 	{
@@ -33,8 +37,9 @@ HRESULT Explorerplusplus::ExpandAndBrowsePath(
 			tabSettings.selected = true;
 		}
 
-		return m_tabContainer->CreateNewTab(szExpandedPath, tabSettings);
+		m_tabContainer->CreateNewTab(szExpandedPath, tabSettings);
+		return;
 	}
 
-	return m_navigation->BrowseFolderInCurrentTab(szExpandedPath);
+	m_navigation->BrowseFolderInCurrentTab(szExpandedPath);
 }

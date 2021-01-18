@@ -195,41 +195,6 @@ BOOL IsNamespaceRoot(PCIDLIST_ABSOLUTE pidl)
 	return bNamespaceRoot;
 }
 
-BOOL CheckIdl(PCIDLIST_ABSOLUTE pidl)
-{
-	std::wstring parsingPath;
-	HRESULT hr = GetDisplayName(pidl, SHGDN_FORPARSING, parsingPath);
-
-	if (FAILED(hr))
-	{
-		return FALSE;
-	}
-
-	unique_pidl_absolute pidlCheck;
-	hr = SHParseDisplayName(parsingPath.c_str(), nullptr, wil::out_param(pidlCheck), 0, nullptr);
-
-	if (FAILED(hr))
-	{
-		return FALSE;
-	}
-
-	return TRUE;
-}
-
-BOOL IsIdlDirectory(PCIDLIST_ABSOLUTE pidl)
-{
-	SFGAOF attributes = SFGAO_FOLDER;
-
-	GetItemAttributes(pidl, &attributes);
-
-	if (attributes & SFGAO_FOLDER)
-	{
-		return TRUE;
-	}
-
-	return FALSE;
-}
-
 HRESULT DecodeFriendlyPath(const std::wstring &friendlyPath, std::wstring &parsingPath)
 {
 	PIDLIST_ABSOLUTE pidl = nullptr;

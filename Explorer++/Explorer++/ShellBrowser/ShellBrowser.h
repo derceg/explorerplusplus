@@ -74,8 +74,14 @@ public:
 	boost::signals2::connection AddNavigationStartedObserver(
 		const NavigationStartedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;
+	boost::signals2::connection AddNavigationCommittedObserver(
+		const NavigationCommittedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override;
 	boost::signals2::connection AddNavigationCompletedObserver(
 		const NavigationCompletedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override;
+	boost::signals2::connection AddNavigationFailedObserver(
+		const NavigationFailedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;
 
 	/* Drag and Drop. */
@@ -377,6 +383,7 @@ private:
 
 	/* Browsing support. */
 	HRESULT EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory);
+	void PrepareToChangeFolders();
 	void ClearPendingResults();
 	void ResetFolderState();
 	void StoreCurrentlySelectedItems();
@@ -584,7 +591,9 @@ private:
 	HWND m_hOwner;
 
 	NavigationStartedSignal m_navigationStartedSignal;
+	NavigationCommittedSignal m_navigationCommittedSignal;
 	NavigationCompletedSignal m_navigationCompletedSignal;
+	NavigationFailedSignal m_navigationFailedSignal;
 	std::unique_ptr<ShellNavigationController> m_navigationController;
 
 	TabNavigationInterface *m_tabNavigation;

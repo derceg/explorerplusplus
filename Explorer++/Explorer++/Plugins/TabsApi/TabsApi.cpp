@@ -119,14 +119,7 @@ int Plugins::TabsApi::create(sol::table createProperties)
 	}
 
 	int tabId = -1;
-	hr = m_tabContainer->CreateNewTab(pidlDirectory.get(), tabSettings, &folderSettings, std::nullopt, &tabId);
-
-	if (FAILED(hr))
-	{
-		/* TODO: Ideally, an error message would be available in case of
-		failure. */
-		return -1;
-	}
+	m_tabContainer->CreateNewTab(pidlDirectory.get(), tabSettings, &folderSettings, std::nullopt, &tabId);
 
 	return tabId;
 }

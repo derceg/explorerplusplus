@@ -82,7 +82,7 @@ HRESULT ShellNavigationController::GoToOffset(int offset)
 		return E_FAIL;
 	}
 
-	auto connection = m_navigator->AddNavigationStartedObserver(
+	auto connection = m_navigator->AddNavigationCommittedObserver(
 		[this, offset](PCIDLIST_ABSOLUTE pidl) {
 			UNREFERENCED_PARAMETER(pidl);
 
@@ -148,7 +148,8 @@ HRESULT ShellNavigationController::BrowseFolder(const HistoryEntry *entry)
 {
 	if (m_navigationMode == NavigationMode::ForceNewTab && GetCurrentEntry() != nullptr)
 	{
-		return m_tabNavigation->CreateNewTab(entry->GetPidl().get(), true);
+		m_tabNavigation->CreateNewTab(entry->GetPidl().get(), true);
+		return S_OK;
 	}
 
 	return m_navigator->BrowseFolder(*entry);
@@ -172,7 +173,8 @@ HRESULT ShellNavigationController::BrowseFolder(PCIDLIST_ABSOLUTE pidl, bool add
 {
 	if (m_navigationMode == NavigationMode::ForceNewTab && GetCurrentEntry() != nullptr)
 	{
-		return m_tabNavigation->CreateNewTab(pidl, true);
+		m_tabNavigation->CreateNewTab(pidl, true);
+		return S_OK;
 	}
 
 	return m_navigator->BrowseFolder(pidl, addHistoryEntry);

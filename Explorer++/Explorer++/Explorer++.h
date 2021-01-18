@@ -189,7 +189,7 @@ private:
 	void OnSelectTabByIndex(int iTab);
 
 	/* Main menu handlers. */
-	HRESULT OnNewTab();
+	void OnNewTab();
 	bool OnCloseTab();
 	void OnSaveDirectoryListing() const;
 	void OnCloneWindow();
@@ -284,7 +284,7 @@ private:
 	void OnTabListViewSelectionChanged(const Tab &tab);
 
 	/* TabNavigationInterface methods. */
-	HRESULT CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected) override;
+	void CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected) override;
 
 	void OnNavigationCompleted(const Tab &tab);
 
@@ -389,6 +389,7 @@ private:
 	void ResizeWindows();
 	void SetListViewInitialPosition(HWND hListView) override;
 	void AdjustFolderPanePosition();
+	void OnNavigationFailedStatusBar(const Tab &tab);
 	HRESULT UpdateStatusBarText(const Tab &tab);
 	void ToggleFolders();
 	void UpdateLayout();
@@ -447,8 +448,8 @@ private:
 	void CopyColumnInfoToClipboard();
 
 	/* Bookmark handling. */
-	HRESULT ExpandAndBrowsePath(const TCHAR *szPath);
-	HRESULT ExpandAndBrowsePath(const TCHAR *szPath, BOOL bOpenInNewTab, BOOL bSwitchToNewTab);
+	void ExpandAndBrowsePath(const TCHAR *szPath);
+	void ExpandAndBrowsePath(const TCHAR *szPath, BOOL bOpenInNewTab, BOOL bSwitchToNewTab);
 
 	/* IExplorerplusplus methods. */
 	const Config *GetConfig() const override;

@@ -104,6 +104,14 @@ void Explorerplusplus::OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pid
 	SendMessage(m_hStatusBar, SB_SETTEXT, 2 | 0, (LPARAM) EMPTY_STRING);
 }
 
+void Explorerplusplus::OnNavigationFailedStatusBar(const Tab &tab)
+{
+	if (m_tabContainer->IsTabSelected(tab))
+	{
+		UpdateStatusBarText(tab);
+	}
+}
+
 HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 {
 	FolderInfo_t folderInfo;
