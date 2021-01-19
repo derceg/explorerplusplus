@@ -26,16 +26,20 @@
 #include "ShellBrowser/ViewModes.h"
 #include "TabContainer.h"
 #include "ViewModeHelper.h"
+#include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/PropertySheet.h"
+#include "../Helper/RichEditHelper.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
+#include "../Helper/WindowSubclassWrapper.h"
 #include <boost/algorithm/string.hpp>
+#include <boost/bimap.hpp>
 #include <boost/format.hpp>
 #include <boost/range/adaptor/map.hpp>
 #include <unordered_map>
@@ -52,7 +56,8 @@ const OptionsDialog::OptionsDialogSheetInfo OptionsDialog::OPTIONS_DIALOG_SHEETS
 	{IDD_OPTIONS_FILESFOLDERS, FilesFoldersProcStub},
 	{IDD_OPTIONS_WINDOW, WindowProcStub},
 	{IDD_OPTIONS_TABS, TabSettingsProcStub},
-	{IDD_OPTIONS_DEFAULT, DefaultSettingsProcStub}
+	{IDD_OPTIONS_DEFAULT, DefaultSettingsProcStub},
+	{IDD_OPTIONS_ADVANCED, AdvancedSettingsProcStub}
 };
 // clang-format on
 
@@ -78,6 +83,15 @@ static const FileSize FILE_SIZES[] = {
 	{SizeDisplayFormat::PB, IDS_OPTIONS_DIALOG_FILE_SIZE_PB}
 };
 // clang-format on
+
+#pragma warning(push)
+#pragma warning(                                                                                   \
+	disable : 4996) // warning STL4010: Various members of std::allocator are deprecated in C++17.
+
+const boost::bimap<bool, std::wstring> BOOL_MAPPINGS =
+	MakeBimap<bool, std::wstring>({ { true, L"true" }, { false, L"false" } });
+
+#pragma warning(pop)
 
 TCHAR g_szNewTabDirectory[MAX_PATH];
 
@@ -130,6 +144,15 @@ HWND OptionsDialog::Show(HWND parentWindow)
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(propertySheet,
 		PropSheetProcStub, PROP_SHEET_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+
+	m_tipWnd = CreateTooltipControl(propertySheet, m_instance);
+
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (darkModeHelper.IsDarkModeEnabled())
+	{
+		darkModeHelper.SetDarkModeForControl(m_tipWnd);
+	}
 
 	// Needed to ensure that the background color is correctly set in dark mode when opening the
 	// dialog.
@@ -663,6 +686,19 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 			CheckDlgButton(hDlg, IDC_OPTIONS_RADIO_CUSTOMINFOTIPS, BST_CHECKED);
 		}
 
+		if (m_config->globalFolderSettings.displayMixedFilesAndFolders)
+		{
+			CheckDlgButton(hDlg, IDC_DISPLAY_MIXED_FILES_AND_FOLDERS, BST_CHECKED);
+		}
+
+		if (m_config->globalFolderSettings.useNaturalSortOrder)
+		{
+			CheckDlgButton(hDlg, IDC_USE_NATURAL_SORT_ORDER, BST_CHECKED);
+		}
+
+		AddTooltipForControl(m_tipWnd, GetDlgItem(hDlg, IDC_USE_NATURAL_SORT_ORDER), m_instance,
+			IDS_USE_NATURAL_SORT_ORDER_TOOLTIP);
+
 		hCBSize = GetDlgItem(hDlg, IDC_COMBO_FILESIZES);
 
 		for (int i = 0; i < SIZEOF_ARRAY(FILE_SIZES); i++)
@@ -695,7 +731,8 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 					IDC_SETTINGS_CHECK_SINGLECLICK, IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION,
 					IDC_SETTINGS_CHECK_FOLDERSIZES, IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE,
 					IDC_SETTINGS_CHECK_FORCESIZE, IDC_SETTINGS_CHECK_ZIPFILES,
-					IDC_SETTINGS_CHECK_FRIENDLYDATES, IDC_OPTIONS_CHECK_SHOWINFOTIPS });
+					IDC_SETTINGS_CHECK_FRIENDLYDATES, IDC_OPTIONS_CHECK_SHOWINFOTIPS,
+					IDC_DISPLAY_MIXED_FILES_AND_FOLDERS, IDC_USE_NATURAL_SORT_ORDER });
 
 			m_radioButtonControlIds.insert(
 				{ IDC_OPTIONS_RADIO_SYSTEMINFOTIPS, IDC_OPTIONS_RADIO_CUSTOMINFOTIPS });
@@ -734,6 +771,8 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 			case IDC_SETTINGS_CHECK_ZIPFILES:
 			case IDC_SETTINGS_CHECK_FRIENDLYDATES:
 			case IDC_OPTIONS_HOVER_TIME:
+			case IDC_DISPLAY_MIXED_FILES_AND_FOLDERS:
+			case IDC_USE_NATURAL_SORT_ORDER:
 				PropSheet_Changed(GetParent(hDlg), hDlg);
 				break;
 
@@ -840,6 +879,12 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 			{
 				m_config->infoTipType = InfoTipType::Custom;
 			}
+
+			m_config->globalFolderSettings.displayMixedFilesAndFolders =
+				(IsDlgButtonChecked(hDlg, IDC_DISPLAY_MIXED_FILES_AND_FOLDERS) == BST_CHECKED);
+
+			m_config->globalFolderSettings.useNaturalSortOrder =
+				(IsDlgButtonChecked(hDlg, IDC_USE_NATURAL_SORT_ORDER) == BST_CHECKED);
 
 			hCBSize = GetDlgItem(hDlg, IDC_COMBO_FILESIZES);
 
@@ -985,9 +1030,9 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 			m_darkModeGroupBoxes.push_back(
 				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_GENERAL)));
 			m_darkModeGroupBoxes.push_back(
-				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_LISTVIEW)));
+				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_MAIN_PANE)));
 			m_darkModeGroupBoxes.push_back(
-				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_TREEVIEW)));
+				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_NAVIGATION_PANE)));
 			m_darkModeGroupBoxes.push_back(
 				std::make_unique<DarkModeGroupBox>(GetDlgItem(hDlg, IDC_GROUP_DISPLAY_WINDOW)));
 		}
@@ -1452,6 +1497,398 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(
 	}
 
 	return 0;
+}
+
+INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProcStub(
+	HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	static OptionsDialog *optionsDialog;
+
+	switch (uMsg)
+	{
+	case WM_INITDIALOG:
+	{
+		auto *ppsp = reinterpret_cast<PROPSHEETPAGE *>(lParam);
+		optionsDialog = reinterpret_cast<OptionsDialog *>(ppsp->lParam);
+	}
+	break;
+	}
+
+	return optionsDialog->AdvancedSettingsProc(hDlg, uMsg, wParam, lParam);
+}
+
+INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(
+	HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{
+	case WM_INITDIALOG:
+	{
+		HWND listView = GetDlgItem(hDlg, IDC_ADVANCED_OPTIONS);
+
+		ListView_SetExtendedListViewStyle(
+			listView, LVS_EX_LABELTIP | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
+
+		m_advancedOptionsListViewSubclass = std::make_unique<WindowSubclassWrapper>(listView,
+			std::bind(&OptionsDialog::AdvancedOptionsListViewWndProc, this, std::placeholders::_1,
+				std::placeholders::_2, std::placeholders::_3, std::placeholders::_4),
+			ADVANCED_OPTIONS_LISTVIEW_SUBCLASS_ID);
+
+		SendDlgItemMessage(
+			hDlg, IDC_ADVANCED_OPTION_DESCRIPTION, EM_AUTOURLDETECT, AURL_ENABLEURL, NULL);
+		SendDlgItemMessage(hDlg, IDC_ADVANCED_OPTION_DESCRIPTION, EM_SETEVENTMASK, 0, ENM_LINK);
+
+		auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+		if (darkModeHelper.IsDarkModeEnabled())
+		{
+			darkModeHelper.SetListViewDarkModeColors(listView);
+
+			SendDlgItemMessage(hDlg, IDC_ADVANCED_OPTION_DESCRIPTION, EM_SETBKGNDCOLOR, 0,
+				DarkModeHelper::BACKGROUND_COLOR);
+
+			CHARFORMAT charFormat;
+			charFormat.cbSize = sizeof(charFormat);
+			charFormat.dwMask = CFM_COLOR;
+			charFormat.crTextColor = DarkModeHelper::TEXT_COLOR;
+			charFormat.dwEffects = 0;
+			SendDlgItemMessage(hDlg, IDC_ADVANCED_OPTION_DESCRIPTION, EM_SETCHARFORMAT, SCF_ALL,
+				reinterpret_cast<LPARAM>(&charFormat));
+		}
+		else
+		{
+			SetWindowTheme(listView, L"Explorer", nullptr);
+		}
+
+		std::wstring valueColumnText =
+			ResourceHelper::LoadString(m_instance, IDS_ADVANCED_OPTION_VALUE);
+
+		LV_COLUMN lvColumn;
+		lvColumn.mask = LVCF_TEXT;
+		lvColumn.pszText = valueColumnText.data();
+		ListView_InsertColumn(listView, 0, &lvColumn);
+
+		std::wstring optionColumnText = ResourceHelper::LoadString(m_instance, IDS_ADVANCED_OPTION);
+
+		lvColumn.mask = LVCF_TEXT;
+		lvColumn.pszText = optionColumnText.data();
+		ListView_InsertColumn(listView, 1, &lvColumn);
+
+		ListView_SetColumnWidth(listView, 0, LVSCW_AUTOSIZE_USEHEADER);
+		ListView_SetColumnWidth(listView, 1, LVSCW_AUTOSIZE_USEHEADER);
+
+		int orderArray[] = { 1, 0 };
+		ListView_SetColumnOrderArray(listView, SIZEOF_ARRAY(orderArray), orderArray);
+
+		m_advancedOptions = InitializeAdvancedOptions();
+
+		std::sort(m_advancedOptions.begin(), m_advancedOptions.end(),
+			[](const AdvancedOption &option1, const AdvancedOption &option2) {
+				return option1.name < option2.name;
+			});
+
+		InsertAdvancedOptionsIntoListView(hDlg);
+	}
+	break;
+
+	case WM_CTLCOLORDLG:
+		return OnCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
+	case WM_CTLCOLORSTATIC:
+	case WM_CTLCOLOREDIT:
+		return OnCtlColor(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
+	case WM_NOTIFY:
+		switch (reinterpret_cast<NMHDR *>(lParam)->code)
+		{
+		case NM_DBLCLK:
+		{
+			const auto *info = reinterpret_cast<NMITEMACTIVATE *>(lParam);
+
+			if (info->iItem != -1)
+			{
+				ListView_EditLabel(info->hdr.hwndFrom, info->iItem);
+			}
+		}
+		break;
+
+		case LVN_ITEMCHANGED:
+		{
+			auto info = reinterpret_cast<NMLISTVIEW *>(lParam);
+
+			if (WI_IsFlagClear(info->uOldState, LVIS_SELECTED)
+				&& WI_IsFlagSet(info->uNewState, LVIS_SELECTED))
+			{
+				auto *option = reinterpret_cast<AdvancedOption *>(info->lParam);
+				SetDlgItemText(hDlg, IDC_ADVANCED_OPTION_DESCRIPTION, option->description.c_str());
+			}
+			else if (WI_IsFlagSet(info->uOldState, LVIS_SELECTED)
+				&& WI_IsFlagClear(info->uNewState, LVIS_SELECTED))
+			{
+				// Since only a single item can be selected, if an item has been deselected, it
+				// means that there's not currently any item selected (otherwise there would have
+				// previously been two items selected).
+				SetDlgItemText(hDlg, IDC_ADVANCED_OPTION_DESCRIPTION, L"");
+			}
+		}
+		break;
+
+		case LVN_ENDLABELEDIT:
+		{
+			auto *info = reinterpret_cast<NMLVDISPINFO *>(lParam);
+
+			if (info->item.pszText == nullptr)
+			{
+				SetWindowLongPtr(hDlg, DWLP_MSGRESULT, FALSE);
+				return FALSE;
+			}
+
+			if (lstrlen(info->item.pszText) == 0)
+			{
+				SetWindowLongPtr(hDlg, DWLP_MSGRESULT, FALSE);
+				return FALSE;
+			}
+
+			auto *option = GetAdvancedOptionByIndex(hDlg, info->item.iItem);
+			bool validValue = false;
+
+			switch (option->type)
+			{
+			case AdvancedOptionType::Boolean:
+			{
+				auto itr = BOOL_MAPPINGS.right.find(info->item.pszText);
+
+				if (itr != BOOL_MAPPINGS.right.end())
+				{
+					validValue = true;
+				}
+			}
+			break;
+			}
+
+			if (!validValue)
+			{
+				SetWindowLongPtr(hDlg, DWLP_MSGRESULT, FALSE);
+				return FALSE;
+			}
+
+			PropSheet_Changed(GetParent(hDlg), hDlg);
+
+			SetWindowLongPtr(hDlg, DWLP_MSGRESULT, TRUE);
+			return TRUE;
+		}
+		break;
+
+		case EN_LINK:
+		{
+			const auto *linkNotificationDetails = reinterpret_cast<ENLINK *>(lParam);
+
+			if (linkNotificationDetails->nmhdr.hwndFrom
+					== GetDlgItem(hDlg, IDC_ADVANCED_OPTION_DESCRIPTION)
+				&& linkNotificationDetails->msg == WM_LBUTTONUP)
+			{
+				std::wstring text = GetRichEditLinkText(linkNotificationDetails);
+				ShellExecute(nullptr, L"open", text.c_str(), nullptr, nullptr, SW_SHOW);
+				return 1;
+			}
+		}
+		break;
+
+		case PSN_APPLY:
+		{
+			HWND listView = GetDlgItem(hDlg, IDC_ADVANCED_OPTIONS);
+			int numItems = ListView_GetItemCount(listView);
+
+			for (int i = 0; i < numItems; i++)
+			{
+				TCHAR text[256];
+				ListView_GetItemText(listView, i, 0, text, SIZEOF_ARRAY(text));
+
+				auto &option = m_advancedOptions[i];
+
+				switch (option.type)
+				{
+				case AdvancedOptionType::Boolean:
+				{
+					// Values are validated when editing, so the current value should always be
+					// valid.
+					bool newValue = BOOL_MAPPINGS.right.at(text);
+					SetBooleanConfigValue(option.id, newValue);
+				}
+				break;
+				}
+			}
+
+			m_expp->SaveAllSettings();
+		}
+		break;
+		}
+		break;
+
+	case WM_DESTROY:
+		m_advancedOptionsListViewSubclass.reset();
+		break;
+	}
+
+	return 0;
+}
+
+LRESULT CALLBACK OptionsDialog::AdvancedOptionsListViewWndProc(
+	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_NOTIFY:
+		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == ListView_GetHeader(hwnd))
+		{
+			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
+			{
+			case NM_CUSTOMDRAW:
+			{
+				if (DarkModeHelper::GetInstance().IsDarkModeEnabled())
+				{
+					auto *customDraw = reinterpret_cast<NMCUSTOMDRAW *>(lParam);
+
+					switch (customDraw->dwDrawStage)
+					{
+					case CDDS_PREPAINT:
+						return CDRF_NOTIFYITEMDRAW;
+
+					case CDDS_ITEMPREPAINT:
+						SetTextColor(customDraw->hdc, DarkModeHelper::TEXT_COLOR);
+						return CDRF_NEWFONT;
+					}
+				}
+			}
+			break;
+			}
+		}
+		break;
+	}
+
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+std::vector<OptionsDialog::AdvancedOption> OptionsDialog::InitializeAdvancedOptions()
+{
+	std::vector<AdvancedOption> advancedOptions;
+
+	AdvancedOption option;
+	option.id = AdvancedOptionId::CheckSystemIsPinnedToNameSpaceTree;
+	option.name = ResourceHelper::LoadString(
+		m_instance, IDS_ADVANCED_OPTION_CHECK_PINNED_TO_NAMESPACE_TREE_NAME);
+	option.type = AdvancedOptionType::Boolean;
+	option.description = ResourceHelper::LoadString(
+		m_instance, IDS_ADVANCED_OPTION_CHECK_PINNED_TO_NAMESPACE_TREE_DESCRIPTION);
+	advancedOptions.push_back(option);
+
+	option.id = AdvancedOptionId::EnableDarkMode;
+	option.name = ResourceHelper::LoadString(m_instance, IDS_ADVANCED_OPTION_ENABLE_DARK_MODE_NAME);
+	option.type = AdvancedOptionType::Boolean;
+	option.description =
+		ResourceHelper::LoadString(m_instance, IDS_ADVANCED_OPTION_ENABLE_DARK_MODE_DESCRIPTION);
+	advancedOptions.push_back(option);
+
+	option.id = AdvancedOptionId::OpenTabsInForeground;
+	option.name =
+		ResourceHelper::LoadString(m_instance, IDS_ADVANCED_OPTION_OPEN_TABS_IN_FOREGROUND_NAME);
+	option.type = AdvancedOptionType::Boolean;
+	option.description = ResourceHelper::LoadString(
+		m_instance, IDS_ADVANCED_OPTION_OPEN_TABS_IN_FOREGROUND_DESCRIPTION);
+	advancedOptions.push_back(option);
+
+	return advancedOptions;
+}
+
+void OptionsDialog::InsertAdvancedOptionsIntoListView(HWND dlg)
+{
+	HWND listView = GetDlgItem(dlg, IDC_ADVANCED_OPTIONS);
+	int index = 0;
+
+	for (auto &option : m_advancedOptions)
+	{
+		LVITEM item;
+		item.mask = LVIF_PARAM;
+		item.iItem = index++;
+		item.iSubItem = 0;
+		item.lParam = reinterpret_cast<LPARAM>(&option);
+		int finalIndex = ListView_InsertItem(listView, &item);
+
+		if (finalIndex != -1)
+		{
+			std::wstring value;
+
+			switch (option.type)
+			{
+			case AdvancedOptionType::Boolean:
+				bool booleanValue = GetBooleanConfigValue(option.id);
+				value = BOOL_MAPPINGS.left.at(booleanValue);
+				break;
+			}
+
+			ListView_SetItemText(listView, finalIndex, 0, value.data());
+			ListView_SetItemText(listView, finalIndex, 1, option.name.data());
+		}
+	}
+}
+
+bool OptionsDialog::GetBooleanConfigValue(OptionsDialog::AdvancedOptionId id)
+{
+	switch (id)
+	{
+	case AdvancedOptionId::CheckSystemIsPinnedToNameSpaceTree:
+		return m_config->checkPinnedToNamespaceTreeProperty;
+
+	case AdvancedOptionId::EnableDarkMode:
+		return m_config->enableDarkMode;
+
+	case AdvancedOptionId::OpenTabsInForeground:
+		return m_config->openTabsInForeground;
+
+	default:
+		assert(false);
+		break;
+	}
+
+	return false;
+}
+
+void OptionsDialog::SetBooleanConfigValue(OptionsDialog::AdvancedOptionId id, bool value)
+{
+	switch (id)
+	{
+	case OptionsDialog::AdvancedOptionId::CheckSystemIsPinnedToNameSpaceTree:
+		m_config->checkPinnedToNamespaceTreeProperty = value;
+		break;
+
+	case AdvancedOptionId::EnableDarkMode:
+		m_config->enableDarkMode = value;
+		break;
+
+	case AdvancedOptionId::OpenTabsInForeground:
+		m_config->openTabsInForeground = value;
+		break;
+
+	default:
+		assert(false);
+		break;
+	}
+}
+
+OptionsDialog::AdvancedOption *OptionsDialog::GetAdvancedOptionByIndex(HWND dlg, int index)
+{
+	LVITEM lvItem;
+	lvItem.mask = LVIF_PARAM;
+	lvItem.iItem = index;
+	lvItem.iSubItem = 0;
+	BOOL res = ListView_GetItem(GetDlgItem(dlg, IDC_ADVANCED_OPTIONS), &lvItem);
+
+	if (!res)
+	{
+		throw std::runtime_error("Item lookup failed");
+	}
+
+	return reinterpret_cast<AdvancedOption *>(lvItem.lParam);
 }
 
 INT_PTR OptionsDialog::OnCtlColorDlg(HWND hwnd, HDC hdc)

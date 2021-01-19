@@ -6,6 +6,7 @@
 #include "Bookmarks/UI/BookmarkContextMenuController.h"
 #include "Bookmarks/BookmarkClipboard.h"
 #include "Bookmarks/BookmarkTree.h"
+#include "Config.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -38,7 +39,8 @@ void BookmarkContextMenuController::OnMenuItemSelected(int menuItemId,
 
 	case IDM_BOOKMARKS_OPEN_IN_NEW_TAB:
 		assert(bookmarkItems.size() == 1 && bookmarkItems[0]->IsBookmark());
-		BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItems[0], m_expp);
+		BookmarkHelper::OpenBookmarkItemInNewTab(
+			bookmarkItems[0], m_expp, m_expp->GetConfig()->openTabsInForeground);
 		break;
 
 	case IDM_BOOKMARKS_OPEN_ALL:
@@ -84,9 +86,13 @@ void BookmarkContextMenuController::OnMenuItemSelected(int menuItemId,
 
 void BookmarkContextMenuController::OnOpenAll(const RawBookmarkItems &bookmarkItems)
 {
+	bool switchToNewTab = m_expp->GetConfig()->openTabsInForeground;
+
 	for (auto *bookmarkItem : bookmarkItems)
 	{
-		BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_expp);
+		BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_expp, switchToNewTab);
+
+		switchToNewTab = false;
 	}
 }
 

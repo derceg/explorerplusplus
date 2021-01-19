@@ -32,7 +32,7 @@ public:
 private:
 	DISALLOW_COPY_AND_ASSIGN(BookmarkNavigationController);
 
-	bool BrowseFolder(const BookmarkHistoryEntry *entry, bool addHistoryEntry = true) override;
+	bool BrowseFolder(const BookmarkHistoryEntry *entry) override;
 	bool GetFailureValue() override;
 
 	void OnNavigationCompleted(BookmarkItem *bookmarkFolder, bool addHistoryEntry);

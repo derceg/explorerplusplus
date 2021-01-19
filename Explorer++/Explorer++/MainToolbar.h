@@ -12,6 +12,7 @@
 #include "../Helper/WindowSubclassWrapper.h"
 #include <wil/com.h>
 #include <wil/resource.h>
+#include <optional>
 #include <unordered_map>
 
 struct Config;
@@ -20,14 +21,12 @@ class MainToolbar;
 class MainToolbarPersistentSettings
 {
 public:
-
 	static MainToolbarPersistentSettings &GetInstance();
 
 	void LoadXMLSettings(IXMLDOMNode *pNode);
 	void SaveXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe);
 
 private:
-
 	friend MainToolbar;
 
 	MainToolbarPersistentSettings();
@@ -42,15 +41,13 @@ private:
 class MainToolbar : public BaseWindow
 {
 public:
-
-	static MainToolbar *Create(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
-		std::shared_ptr<Config> config);
+	static MainToolbar *Create(
+		HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp, std::shared_ptr<Config> config);
 
 	void UpdateConfigDependentButtonStates();
 	void UpdateToolbarButtonStates();
 
 private:
-
 	static const UINT_PTR SUBCLASS_ID = 0;
 	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
@@ -60,21 +57,22 @@ private:
 		Forward
 	};
 
-	MainToolbar(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
-		std::shared_ptr<Config> config);
+	MainToolbar(
+		HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp, std::shared_ptr<Config> config);
 	~MainToolbar();
 
 	static HWND CreateMainToolbar(HWND parent);
 
 	LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	static LRESULT CALLBACK ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	static LRESULT CALLBACK ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	void Initialize(HWND parent);
 	void SetTooolbarImageList();
-	static std::unordered_map<int, int> SetUpToolbarImageList(HIMAGELIST imageList,
-		IconResourceLoader *iconResourceLoader, int iconSize, UINT dpi);
+	static std::unordered_map<int, int> SetUpToolbarImageList(
+		HIMAGELIST imageList, IconResourceLoader *iconResourceLoader, int iconSize, UINT dpi);
 	void AddButtonsToToolbar(const std::vector<ToolbarButton> &buttons);
 	void AddButtonToToolbar(ToolbarButton button);
 	TBBUTTON GetToolbarButtonDetails(ToolbarButton button) const;
@@ -97,7 +95,7 @@ private:
 	void CreateViewsMenu(POINT *ptOrigin);
 
 	void OnTabSelected(const Tab &tab);
-	void OnNavigationCompleted(const Tab &tab);
+	void OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
 	void OnFocusChanged(WindowFocusSource windowFocusSource);
 
 	void UpdateToolbarButtonImageIndexes();
@@ -105,6 +103,8 @@ private:
 	void OnUseLargeToolbarIconsUpdated(BOOL newValue);
 
 	void OnClipboardUpdate();
+	void OnMButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT keysDown);
+	void OnMButtonUp(HWND hwnd, int x, int y, UINT keysDown);
 
 	MainToolbarPersistentSettings *m_persistentSettings;
 
@@ -122,4 +122,6 @@ private:
 
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
+
+	std::optional<int> m_middleButtonItem;
 };

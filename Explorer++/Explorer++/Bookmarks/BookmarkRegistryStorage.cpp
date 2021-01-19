@@ -12,34 +12,34 @@
 
 namespace V2
 {
-const TCHAR bookmarksKeyPath[] = _T("Bookmarksv2");
+	const TCHAR bookmarksKeyPath[] = _T("Bookmarksv2");
 
-void Load(HKEY parentKey, BookmarkTree *bookmarkTree);
-void LoadPermanentFolder(HKEY parentKey, BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
-	const std::wstring &name);
-void LoadBookmarkChildren(
-	HKEY parentKey, BookmarkTree *bookmarkTree, BookmarkItem *parentBookmarkItem);
-std::unique_ptr<BookmarkItem> LoadBookmarkItem(HKEY key, BookmarkTree *bookmarkTree);
+	void Load(HKEY parentKey, BookmarkTree *bookmarkTree);
+	void LoadPermanentFolder(HKEY parentKey, BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
+		const std::wstring &name);
+	void LoadBookmarkChildren(
+		HKEY parentKey, BookmarkTree *bookmarkTree, BookmarkItem *parentBookmarkItem);
+	std::unique_ptr<BookmarkItem> LoadBookmarkItem(HKEY key, BookmarkTree *bookmarkTree);
 
-void Save(HKEY parentKey, BookmarkTree *bookmarkTree);
-void SavePermanentFolder(
-	HKEY parentKey, const BookmarkItem *bookmarkItem, const std::wstring &name);
-void SaveBookmarkChildren(HKEY parentKey, const BookmarkItem *parentBookmarkItem);
-void SaveBookmarkItem(HKEY key, const BookmarkItem *bookmarkItem);
+	void Save(HKEY parentKey, BookmarkTree *bookmarkTree);
+	void SavePermanentFolder(
+		HKEY parentKey, const BookmarkItem *bookmarkItem, const std::wstring &name);
+	void SaveBookmarkChildren(HKEY parentKey, const BookmarkItem *parentBookmarkItem);
+	void SaveBookmarkItem(HKEY key, const BookmarkItem *bookmarkItem);
 }
 
 // Note that there's no ability to save bookmarks in the v1 format, as they will
 // always be saved in the v2 format.
 namespace V1
 {
-const TCHAR bookmarksKeyPath[] = _T("Bookmarks");
+	const TCHAR bookmarksKeyPath[] = _T("Bookmarks");
 
-void Load(HKEY parentKey, BookmarkTree *bookmarkTree);
+	void Load(HKEY parentKey, BookmarkTree *bookmarkTree);
 
-void LoadBookmarkChildren(
-	HKEY parentKey, BookmarkTree *bookmarkTree, BookmarkItem *parentBookmarkItem);
-std::unique_ptr<BookmarkItem> LoadBookmarkItem(
-	HKEY key, BookmarkTree *bookmarkTree, bool &showOnToolbarOutput);
+	void LoadBookmarkChildren(
+		HKEY parentKey, BookmarkTree *bookmarkTree, BookmarkItem *parentBookmarkItem);
+	std::unique_ptr<BookmarkItem> LoadBookmarkItem(
+		HKEY key, BookmarkTree *bookmarkTree, bool &showOnToolbarOutput);
 }
 
 std::wstring BuildFullKeyPath(
@@ -90,7 +90,7 @@ void V2::LoadPermanentFolder(HKEY parentKey, BookmarkTree *bookmarkTree, Bookmar
 	{
 		FILETIME dateCreated;
 		bool dateRes =
-			NRegistrySettings::ReadDateTime(childKey.get(), _T("DateCreated"), dateCreated);
+			RegistrySettings::ReadDateTime(childKey.get(), _T("DateCreated"), dateCreated);
 
 		if (dateRes)
 		{
@@ -98,7 +98,7 @@ void V2::LoadPermanentFolder(HKEY parentKey, BookmarkTree *bookmarkTree, Bookmar
 		}
 
 		FILETIME dateModified;
-		dateRes = NRegistrySettings::ReadDateTime(childKey.get(), _T("DateModified"), dateModified);
+		dateRes = RegistrySettings::ReadDateTime(childKey.get(), _T("DateModified"), dateModified);
 
 		if (dateRes)
 		{
@@ -128,20 +128,20 @@ void V2::LoadBookmarkChildren(
 std::unique_ptr<BookmarkItem> V2::LoadBookmarkItem(HKEY key, BookmarkTree *bookmarkTree)
 {
 	DWORD type;
-	NRegistrySettings::ReadDwordFromRegistry(key, _T("Type"), &type);
+	RegistrySettings::ReadDword(key, _T("Type"), &type);
 
 	std::wstring guid;
-	NRegistrySettings::ReadStringFromRegistry(key, _T("GUID"), guid);
+	RegistrySettings::ReadString(key, _T("GUID"), guid);
 
 	std::wstring name;
-	NRegistrySettings::ReadStringFromRegistry(key, _T("Name"), name);
+	RegistrySettings::ReadString(key, _T("Name"), name);
 
 	std::optional<std::wstring> locationOptional;
 
 	if (type == static_cast<int>(BookmarkItem::Type::Bookmark))
 	{
 		std::wstring location;
-		NRegistrySettings::ReadStringFromRegistry(key, _T("Location"), location);
+		RegistrySettings::ReadString(key, _T("Location"), location);
 
 		locationOptional = location;
 	}
@@ -149,11 +149,11 @@ std::unique_ptr<BookmarkItem> V2::LoadBookmarkItem(HKEY key, BookmarkTree *bookm
 	auto bookmarkItem = std::make_unique<BookmarkItem>(guid, name, locationOptional);
 
 	FILETIME dateCreated;
-	NRegistrySettings::ReadDateTime(key, _T("DateCreated"), dateCreated);
+	RegistrySettings::ReadDateTime(key, _T("DateCreated"), dateCreated);
 	bookmarkItem->SetDateCreated(dateCreated);
 
 	FILETIME dateModified;
-	NRegistrySettings::ReadDateTime(key, _T("DateModified"), dateModified);
+	RegistrySettings::ReadDateTime(key, _T("DateModified"), dateModified);
 	bookmarkItem->SetDateModified(dateModified);
 
 	if (type == static_cast<int>(BookmarkItem::Type::Folder))
@@ -227,13 +227,13 @@ std::unique_ptr<BookmarkItem> V1::LoadBookmarkItem(
 	HKEY key, BookmarkTree *bookmarkTree, bool &showOnToolbarOutput)
 {
 	DWORD type;
-	NRegistrySettings::ReadDwordFromRegistry(key, _T("Type"), &type);
+	RegistrySettings::ReadDword(key, _T("Type"), &type);
 
 	std::wstring name;
-	NRegistrySettings::ReadStringFromRegistry(key, _T("Name"), name);
+	RegistrySettings::ReadString(key, _T("Name"), name);
 
 	DWORD showOnToolbar;
-	NRegistrySettings::ReadDwordFromRegistry(key, _T("ShowOnBookmarksToolbar"), &showOnToolbar);
+	RegistrySettings::ReadDword(key, _T("ShowOnBookmarksToolbar"), &showOnToolbar);
 
 	showOnToolbarOutput = showOnToolbar;
 
@@ -242,7 +242,7 @@ std::unique_ptr<BookmarkItem> V1::LoadBookmarkItem(
 	if (type == static_cast<int>(BookmarkStorage::BookmarkTypeV1::Bookmark))
 	{
 		std::wstring location;
-		NRegistrySettings::ReadStringFromRegistry(key, _T("Location"), location);
+		RegistrySettings::ReadString(key, _T("Location"), location);
 
 		locationOptional = location;
 	}
@@ -292,9 +292,9 @@ void V2::SavePermanentFolder(
 
 	if (res == ERROR_SUCCESS)
 	{
-		NRegistrySettings::SaveDateTime(
+		RegistrySettings::SaveDateTime(
 			childKey.get(), _T("DateCreated"), bookmarkItem->GetDateCreated());
-		NRegistrySettings::SaveDateTime(
+		RegistrySettings::SaveDateTime(
 			childKey.get(), _T("DateModified"), bookmarkItem->GetDateModified());
 
 		SaveBookmarkChildren(childKey.get(), bookmarkItem);
@@ -322,19 +322,17 @@ void V2::SaveBookmarkChildren(HKEY parentKey, const BookmarkItem *parentBookmark
 
 void V2::SaveBookmarkItem(HKEY key, const BookmarkItem *bookmarkItem)
 {
-	NRegistrySettings::SaveDwordToRegistry(
-		key, _T("Type"), static_cast<int>(bookmarkItem->GetType()));
-	NRegistrySettings::SaveStringToRegistry(key, _T("GUID"), bookmarkItem->GetGUID().c_str());
-	NRegistrySettings::SaveStringToRegistry(key, _T("Name"), bookmarkItem->GetName().c_str());
+	RegistrySettings::SaveDword(key, _T("Type"), static_cast<int>(bookmarkItem->GetType()));
+	RegistrySettings::SaveString(key, _T("GUID"), bookmarkItem->GetGUID().c_str());
+	RegistrySettings::SaveString(key, _T("Name"), bookmarkItem->GetName().c_str());
 
 	if (bookmarkItem->GetType() == BookmarkItem::Type::Bookmark)
 	{
-		NRegistrySettings::SaveStringToRegistry(
-			key, _T("Location"), bookmarkItem->GetLocation().c_str());
+		RegistrySettings::SaveString(key, _T("Location"), bookmarkItem->GetLocation().c_str());
 	}
 
-	NRegistrySettings::SaveDateTime(key, _T("DateCreated"), bookmarkItem->GetDateCreated());
-	NRegistrySettings::SaveDateTime(key, _T("DateModified"), bookmarkItem->GetDateModified());
+	RegistrySettings::SaveDateTime(key, _T("DateCreated"), bookmarkItem->GetDateCreated());
+	RegistrySettings::SaveDateTime(key, _T("DateModified"), bookmarkItem->GetDateModified());
 
 	if (bookmarkItem->GetType() == BookmarkItem::Type::Folder)
 	{

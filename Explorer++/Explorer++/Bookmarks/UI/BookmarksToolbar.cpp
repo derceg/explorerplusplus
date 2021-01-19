@@ -10,6 +10,7 @@
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/AddBookmarkDialog.h"
+#include "Config.h"
 #include "CoreInterface.h"
 #include "DarkModeHelper.h"
 #include "MainResource.h"
@@ -139,7 +140,7 @@ LRESULT CALLBACK BookmarksToolbar::BookmarksToolbarProc(
 	{
 		POINT pt;
 		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-		OnMButtonUp(pt);
+		OnMButtonUp(pt, static_cast<UINT>(wParam));
 	}
 	break;
 	}
@@ -228,7 +229,7 @@ void BookmarksToolbar::OnLButtonUp()
 	m_leftButtonDownPoint.reset();
 }
 
-void BookmarksToolbar::OnMButtonUp(const POINT &pt)
+void BookmarksToolbar::OnMButtonUp(const POINT &pt, UINT keysDown)
 {
 	int index =
 		static_cast<int>(SendMessage(m_hToolbar, TB_HITTEST, 0, reinterpret_cast<LPARAM>(&pt)));
@@ -240,10 +241,19 @@ void BookmarksToolbar::OnMButtonUp(const POINT &pt)
 
 	auto bookmarkItem = GetBookmarkItemFromToolbarIndex(index);
 
-	if (bookmarkItem)
+	if (!bookmarkItem)
 	{
-		BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_pexpp);
+		return;
 	}
+
+	bool switchToNewTab = m_pexpp->GetConfig()->openTabsInForeground;
+
+	if (WI_IsFlagSet(keysDown, MK_SHIFT))
+	{
+		switchToNewTab = !switchToNewTab;
+	}
+
+	BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_pexpp, switchToNewTab);
 }
 
 LRESULT CALLBACK BookmarksToolbar::BookmarksToolbarParentProcStub(

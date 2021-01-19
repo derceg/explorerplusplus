@@ -3,18 +3,17 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "Helper.h"
 #include "FileOperations.h"
+#include "Helper.h"
 #include "Macros.h"
-
 
 BOOL GetClusterSize(const TCHAR *drive, DWORD *pdwClusterSize)
 {
 	DWORD dwSectorsPerCluster;
 	DWORD dwBytesPerSector;
-	BOOL bRet = GetDiskFreeSpace(drive,&dwSectorsPerCluster,&dwBytesPerSector,nullptr,nullptr);
+	BOOL bRet = GetDiskFreeSpace(drive, &dwSectorsPerCluster, &dwBytesPerSector, nullptr, nullptr);
 
-	if(!bRet)
+	if (!bRet)
 	{
 		return FALSE;
 	}
@@ -26,7 +25,7 @@ BOOL GetClusterSize(const TCHAR *drive, DWORD *pdwClusterSize)
 	DWORD value. */
 	HRESULT hr = DWordMult(dwBytesPerSector, dwSectorsPerCluster, pdwClusterSize);
 
-	if(FAILED(hr))
+	if (FAILED(hr))
 	{
 		return FALSE;
 	}
@@ -38,11 +37,11 @@ TCHAR GetDriveLetterFromMask(ULONG unitmask)
 {
 	int bitNum = 0;
 
-	while(!(unitmask & 0x1))
+	while (!(unitmask & 0x1))
 	{
 		unitmask >>= 1;
 		bitNum++;
 	}
 
-	return (TCHAR)bitNum + 'A';
+	return (TCHAR) bitNum + 'A';
 }

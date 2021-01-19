@@ -9,6 +9,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "Config.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -73,19 +74,16 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 
 	if (StrCmpI(szCmd, _T("open")) == 0)
 	{
-		/* If ppidl is NULL, open the item specified by pidlParent
-		in the current listview. If ppidl is not NULL, open each
-		of the items specified in ppidl. */
 		if (pidlItems.empty())
 		{
-			OpenItem(pidlParent, FALSE, FALSE);
+			OpenItem(pidlParent);
 		}
 		else
 		{
 			for (const auto &pidl : pidlItems)
 			{
 				unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidl));
-				OpenItem(pidlComplete.get(), FALSE, FALSE);
+				OpenItem(pidlComplete.get());
 			}
 		}
 
@@ -145,25 +143,12 @@ void Explorerplusplus::HandleCustomMenuItem(
 	{
 	case MENU_OPEN_IN_NEW_TAB:
 	{
-		unique_pidl_absolute pidlComplete;
-		BOOL bOpenInNewTab;
+		// This menu item should only be added when a single folder is selected.
+		assert(pidlItems.size() == 1);
 
-		if (!pidlItems.empty())
-		{
-			pidlComplete.reset(ILCombine(pidlParent, pidlItems[0]));
-
-			bOpenInNewTab = FALSE;
-		}
-		else
-		{
-			pidlComplete.reset(ILCloneFull(pidlParent));
-
-			bOpenInNewTab = TRUE;
-		}
-
-		std::wstring parsingPath;
-		GetDisplayName(pidlComplete.get(), SHGDN_FORPARSING, parsingPath);
-		m_tabContainer->CreateNewTab(parsingPath.c_str(), TabSettings(_selected = true));
+		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
+		m_tabContainer->CreateNewTab(
+			pidlComplete.get(), TabSettings(_selected = m_config->openTabsInForeground));
 
 		m_bTreeViewOpenInNewTab = true;
 	}

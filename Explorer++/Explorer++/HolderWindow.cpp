@@ -207,8 +207,7 @@ int HolderWindow::OnHolderWindowMouseMove(LPARAM lParam)
 		ptsPrevCursor.x = ptsCursor.x;
 		ptsPrevCursor.y = ptsCursor.y;
 
-		SendMessage(
-			GetParent(m_hHolder), WM_USER_HOLDERRESIZED, (WPARAM) m_hHolder, (LPARAM) ptsCursor.x);
+		SendMessage(GetParent(m_hHolder), WM_USER_HOLDERRESIZED, (WPARAM) m_hHolder, ptsCursor.x);
 
 		return 1;
 	}

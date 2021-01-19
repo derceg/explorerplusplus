@@ -676,14 +676,14 @@ SplitFileDialogPersistentSettings &SplitFileDialogPersistentSettings::GetInstanc
 
 void SplitFileDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::SaveStringToRegistry(hKey, SETTING_SIZE, m_strSplitSize.c_str());
-	NRegistrySettings::SaveStringToRegistry(hKey, SETTING_SIZE_GROUP, m_strSplitGroup.c_str());
+	RegistrySettings::SaveString(hKey, SETTING_SIZE, m_strSplitSize.c_str());
+	RegistrySettings::SaveString(hKey, SETTING_SIZE_GROUP, m_strSplitGroup.c_str());
 }
 
 void SplitFileDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::ReadStringFromRegistry(hKey, SETTING_SIZE, m_strSplitSize);
-	NRegistrySettings::ReadStringFromRegistry(hKey, SETTING_SIZE_GROUP, m_strSplitGroup);
+	RegistrySettings::ReadString(hKey, SETTING_SIZE, m_strSplitSize);
+	RegistrySettings::ReadString(hKey, SETTING_SIZE_GROUP, m_strSplitGroup);
 }
 
 void SplitFileDialogPersistentSettings::SaveExtraXMLSettings(

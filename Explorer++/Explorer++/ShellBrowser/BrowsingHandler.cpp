@@ -5,15 +5,33 @@
 #include "stdafx.h"
 #include "ShellBrowser.h"
 #include "Config.h"
+#include "HistoryEntry.h"
 #include "ItemData.h"
 #include "MainResource.h"
+#include "ShellNavigationController.h"
 #include "ViewModes.h"
+#include "../Helper/Helper.h"
 #include "../Helper/IconFetcher.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/com.h>
+#include <propkey.h>
+#include <propvarutil.h>
 #include <list>
+
+HRESULT ShellBrowser::BrowseFolder(const HistoryEntry &entry)
+{
+	HRESULT hr = BrowseFolder(entry.GetPidl().get(), false);
+
+	if (SUCCEEDED(hr))
+	{
+		auto selectedItems = entry.GetSelectedItems();
+		SelectItems(ShallowCopyPidls(selectedItems));
+	}
+
+	return hr;
+}
 
 HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)
 {
@@ -23,37 +41,20 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 		SetCursor(LoadCursor(nullptr, IDC_ARROW));
 	});
 
-	if (m_bFolderVisited)
+	m_navigationStartedSignal(pidlDirectory);
+
+	HRESULT hr = EnumerateFolder(pidlDirectory, addHistoryEntry);
+
+	if (FAILED(hr))
 	{
-		SaveColumnWidths();
+		m_navigationFailedSignal();
+		return hr;
 	}
-
-	ClearPendingResults();
-
-	EnterCriticalSection(&m_csDirectoryAltered);
-	m_FilesAdded.clear();
-	m_FileSelectionList.clear();
-	LeaveCriticalSection(&m_csDirectoryAltered);
-
-	navigationStarted.m_signal(pidlDirectory);
 
 	/* Stop the list view from redrawing itself each time is inserted.
 	Redrawing will be allowed once all items have being inserted.
 	(reduces lag when a large number of items are going to be inserted). */
 	SendMessage(m_hListView, WM_SETREDRAW, FALSE, NULL);
-
-	ListView_DeleteAllItems(m_hListView);
-
-	if (m_bFolderVisited)
-	{
-		ResetFolderState();
-	}
-
-	std::wstring parsingPath;
-	GetDisplayName(pidlDirectory, SHGDN_FORPARSING, parsingPath);
-	m_directoryState.directory = parsingPath;
-
-	EnumerateFolder(pidlDirectory);
 
 	SetActiveColumnSet();
 	SetViewModeInternal(m_folderSettings.viewMode);
@@ -68,16 +69,49 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 	/* Allow the listview to redraw itself once again. */
 	SendMessage(m_hListView, WM_SETREDRAW, TRUE, NULL);
 
+	if (m_config->registerForShellNotifications)
+	{
+		StartDirectoryMonitoring(pidlDirectory);
+	}
+
 	/* Set the focus back to the first item. */
 	ListView_SetItemState(m_hListView, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
 	m_bFolderVisited = TRUE;
 
-	m_uniqueFolderId++;
+	m_navigationCompletedSignal(pidlDirectory);
 
-	m_navigationCompletedSignal(pidlDirectory, addHistoryEntry);
+	return hr;
+}
 
-	return S_OK;
+void ShellBrowser::PrepareToChangeFolders()
+{
+	if (m_bFolderVisited)
+	{
+		SaveColumnWidths();
+	}
+
+	ClearPendingResults();
+
+	if (m_config->registerForShellNotifications)
+	{
+		StopDirectoryMonitoring();
+
+		KillTimer(m_hListView, PROCESS_SHELL_CHANGES_TIMER_ID);
+	}
+
+	EnterCriticalSection(&m_csDirectoryAltered);
+	m_FileSelectionList.clear();
+	LeaveCriticalSection(&m_csDirectoryAltered);
+
+	StoreCurrentlySelectedItems();
+
+	ListView_DeleteAllItems(m_hListView);
+
+	if (m_bFolderVisited)
+	{
+		ResetFolderState();
+	}
 }
 
 void ShellBrowser::ClearPendingResults()
@@ -121,7 +155,28 @@ void ShellBrowser::ResetFolderState()
 	m_itemInfoMap.clear();
 }
 
-HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
+void ShellBrowser::StoreCurrentlySelectedItems()
+{
+	auto *entry = m_navigationController->GetCurrentEntry();
+
+	if (!entry)
+	{
+		return;
+	}
+
+	std::vector<PCIDLIST_ABSOLUTE> selectedItems;
+	int index = -1;
+
+	while ((index = ListView_GetNextItem(m_hListView, index, LVNI_SELECTED)) != -1)
+	{
+		auto &item = GetItemByIndex(index);
+		selectedItems.push_back(item.pidlComplete.get());
+	}
+
+	entry->SetSelectedItems(selectedItems);
+}
+
+HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)
 {
 	wil::com_ptr_nothrow<IShellFolder> parent;
 	PCITEMID_CHILD child;
@@ -140,107 +195,75 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 		return hr;
 	}
 
-	m_directoryState.virtualFolder = WI_IsFlagClear(attr, SFGAO_FILESYSTEM);
-
-	wil::com_ptr_nothrow<IShellFolder> pShellFolder;
-	hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
+	std::wstring parsingPath;
+	hr = GetDisplayName(parent.get(), child, SHGDN_FORPARSING, parsingPath);
 
 	if (FAILED(hr))
 	{
 		return hr;
 	}
 
-	m_directoryState.pidlDirectory.reset(ILCloneFull(pidlDirectory));
+	wil::com_ptr_nothrow<IShellFolder> shellFolder;
+	hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&shellFolder));
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
 
 	SHCONTF enumFlags = SHCONTF_FOLDERS | SHCONTF_NONFOLDERS;
 
 	if (m_folderSettings.showHidden)
 	{
-		enumFlags |= SHCONTF_INCLUDEHIDDEN | SHCONTF_INCLUDESUPERHIDDEN;
+		WI_SetAllFlags(enumFlags, SHCONTF_INCLUDEHIDDEN | SHCONTF_INCLUDESUPERHIDDEN);
 	}
 
-	wil::com_ptr_nothrow<IEnumIDList> pEnumIDList;
-	hr = pShellFolder->EnumObjects(m_hOwner, enumFlags, &pEnumIDList);
+	wil::com_ptr_nothrow<IEnumIDList> enumerator;
+	hr = shellFolder->EnumObjects(m_hOwner, enumFlags, &enumerator);
 
-	if (FAILED(hr) || !pEnumIDList)
+	if (FAILED(hr) || !enumerator)
 	{
 		return hr;
 	}
 
-	ULONG uFetched = 1;
+	PrepareToChangeFolders();
+
+	m_directoryState.pidlDirectory.reset(ILCloneFull(pidlDirectory));
+	m_directoryState.directory = parsingPath;
+	m_directoryState.virtualFolder = WI_IsFlagClear(attr, SFGAO_FILESYSTEM);
+	m_uniqueFolderId++;
+
+	m_navigationCommittedSignal(pidlDirectory, addHistoryEntry);
+
+	ULONG numFetched = 1;
 	unique_pidl_child pidlItem;
 
-	while (pEnumIDList->Next(1, wil::out_param(pidlItem), &uFetched) == S_OK && (uFetched == 1))
+	while (enumerator->Next(1, wil::out_param(pidlItem), &numFetched) == S_OK && (numFetched == 1))
 	{
-		ULONG uAttributes = SFGAO_FOLDER;
-		PCITEMID_CHILD items[] = { pidlItem.get() };
-		pShellFolder->GetAttributesOf(1, items, &uAttributes);
-
-		STRRET displayNameStr;
-
-		/* If this is a virtual folder, only use SHGDN_INFOLDER. If this is
-		a real folder, combine SHGDN_INFOLDER with SHGDN_FORPARSING. This is
-		so that items in real folders can still be shown with extensions, even
-		if the global, Explorer option is disabled.
-		Also use only SHGDN_INFOLDER if this item is a folder. This is to ensure
-		that specific folders in Windows 7 (those under C:\Users\Username) appear
-		correctly. */
-		if (m_directoryState.virtualFolder || (uAttributes & SFGAO_FOLDER))
-		{
-			hr = pShellFolder->GetDisplayNameOf(pidlItem.get(), SHGDN_INFOLDER, &displayNameStr);
-		}
-		else
-		{
-			hr = pShellFolder->GetDisplayNameOf(
-				pidlItem.get(), SHGDN_INFOLDER | SHGDN_FORPARSING, &displayNameStr);
-		}
-
-		if (FAILED(hr))
-		{
-			continue;
-		}
-
-		TCHAR displayName[MAX_PATH];
-		hr = StrRetToBuf(&displayNameStr, pidlItem.get(), displayName, SIZEOF_ARRAY(displayName));
-
-		if (FAILED(hr))
-		{
-			continue;
-		}
-
-		STRRET editingNameStr;
-		hr = pShellFolder->GetDisplayNameOf(
-			pidlItem.get(), SHGDN_INFOLDER | SHGDN_FOREDITING, &editingNameStr);
-
-		if (FAILED(hr))
-		{
-			continue;
-		}
-
-		TCHAR editingName[MAX_PATH];
-		hr = StrRetToBuf(&editingNameStr, pidlItem.get(), editingName, SIZEOF_ARRAY(editingName));
-
-		if (FAILED(hr))
-		{
-			continue;
-		}
-
-		AddItemInternal(pidlDirectory, pidlItem.get(), displayName, editingName, -1, FALSE);
+		AddItemInternal(shellFolder.get(), pidlDirectory, pidlItem.get(), -1, FALSE);
 	}
 
 	return hr;
 }
 
-HRESULT ShellBrowser::AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild,
-	const std::wstring &displayName, const std::wstring &editingName, int itemIndex,
-	BOOL setPosition)
+std::optional<int> ShellBrowser::AddItemInternal(IShellFolder *shellFolder,
+	PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild, int itemIndex, BOOL setPosition)
 {
-	int uItemId = SetItemInformation(pidlDirectory, pidlChild, displayName, editingName);
-	return AddItemInternal(itemIndex, uItemId, setPosition);
+	auto itemInfo = GetItemInformation(shellFolder, pidlDirectory, pidlChild);
+
+	if (!itemInfo)
+	{
+		return std::nullopt;
+	}
+
+	return AddItemInternal(itemIndex, std::move(*itemInfo), setPosition);
 }
 
-HRESULT ShellBrowser::AddItemInternal(int itemIndex, int itemId, BOOL setPosition)
+int ShellBrowser::AddItemInternal(int itemIndex, ItemInfo_t itemInfo, BOOL setPosition)
 {
+	int itemId = GenerateUniqueItemId();
+	m_itemInfoMap.insert({ itemId, std::move(itemInfo) });
+
 	AwaitingAdd_t awaitingAdd;
 
 	if (itemIndex == -1)
@@ -259,70 +282,158 @@ HRESULT ShellBrowser::AddItemInternal(int itemIndex, int itemId, BOOL setPositio
 
 	m_directoryState.awaitingAddList.push_back(awaitingAdd);
 
-	return S_OK;
+	return itemId;
 }
 
-int ShellBrowser::SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild,
-	const std::wstring &displayName, const std::wstring &editingName)
+std::optional<ShellBrowser::ItemInfo_t> ShellBrowser::GetItemInformation(
+	IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild)
 {
-	int itemId = GenerateUniqueItemId();
-	auto &item = m_itemInfoMap[itemId];
+	ItemInfo_t itemInfo;
 
 	unique_pidl_absolute pidlItem(ILCombine(pidlDirectory, pidlChild));
 
-	item.pidlComplete.reset(ILCloneFull(pidlItem.get()));
-	item.pridl.reset(ILCloneChild(pidlChild));
-	item.displayName = displayName;
-	item.editingName = editingName;
+	itemInfo.pidlComplete.reset(ILCloneFull(pidlItem.get()));
+	itemInfo.pridl.reset(ILCloneChild(pidlChild));
 
-	// Failing fast isn't ideal, but the parsing name is required and this function currently
-	// doesn't return any errors.
-	// TODO: This function should be able to signal an error in some way.
 	std::wstring parsingName;
-	FAIL_FAST_IF_FAILED(GetDisplayName(pidlItem.get(), SHGDN_FORPARSING, parsingName));
-	item.parsingName = parsingName;
+	HRESULT hr = GetDisplayName(shellFolder, pidlChild, SHGDN_FORPARSING, parsingName);
 
-	HANDLE hFirstFile;
-
-	/* DO NOT call FindFirstFile() on root drives (especially
-	floppy drives). Doing so may cause a delay of up to a
-	few seconds. */
-	if (!PathIsRoot(parsingName.c_str()))
+	if (FAILED(hr))
 	{
-		item.bDrive = FALSE;
+		return std::nullopt;
+	}
 
-		WIN32_FIND_DATA wfd;
-		hFirstFile = FindFirstFile(parsingName.c_str(), &wfd);
+	itemInfo.parsingName = parsingName;
 
-		item.wfd = wfd;
+	ULONG attributes = SFGAO_FOLDER | SFGAO_FILESYSTEM;
+	PCITEMID_CHILD items[] = { pidlChild };
+	hr = shellFolder->GetAttributesOf(1, items, &attributes);
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	SHGDNF displayNameFlags = SHGDN_INFOLDER;
+
+	bool isRecycleBin = m_recycleBinPidl
+		&& m_desktopFolder->CompareIDs(SHCIDS_CANONICALONLY, pidlDirectory, m_recycleBinPidl.get())
+			== 0;
+
+	// SHGDN_INFOLDER | SHGDN_FORPARSING is used to ensure that the name retrieved for a filesystem
+	// file contains an extension, even if extensions are hidden in Windows Explorer. When using
+	// SHGDN_INFOLDER by itself, the resulting name won't contain an extension if extensions are
+	// hidden in Windows Explorer.
+	// Note that the recycle bin is excluded here, as the parsing names for the items are completely
+	// different to their regular display names.
+	if (!isRecycleBin && WI_IsFlagSet(attributes, SFGAO_FILESYSTEM)
+		&& WI_IsFlagClear(attributes, SFGAO_FOLDER))
+	{
+		WI_SetFlag(displayNameFlags, SHGDN_FORPARSING);
+	}
+
+	std::wstring displayName;
+	hr = GetDisplayName(shellFolder, pidlChild, displayNameFlags, displayName);
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	itemInfo.displayName = displayName;
+
+	std::wstring editingName;
+	hr = GetDisplayName(shellFolder, pidlChild, SHGDN_INFOLDER | SHGDN_FOREDITING, editingName);
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	itemInfo.editingName = editingName;
+
+	if (PathIsRoot(parsingName.c_str()))
+	{
+		itemInfo.bDrive = TRUE;
+		StringCchCopy(itemInfo.szDrive, SIZEOF_ARRAY(itemInfo.szDrive), parsingName.c_str());
 	}
 	else
 	{
-		item.bDrive = TRUE;
-		StringCchCopy(item.szDrive, SIZEOF_ARRAY(item.szDrive), parsingName.c_str());
-
-		hFirstFile = INVALID_HANDLE_VALUE;
+		itemInfo.bDrive = FALSE;
 	}
 
-	/* Need to use this, since may be in a virtual folder
-	(such as the recycle bin), but items still exist. */
-	if (hFirstFile != INVALID_HANDLE_VALUE)
+	WIN32_FIND_DATA wfd;
+	hr = SHGetDataFromIDList(shellFolder, pidlChild, SHGDFIL_FINDDATA, &wfd, sizeof(wfd));
+
+	if (FAILED(hr))
 	{
-		FindClose(hFirstFile);
+		hr = ExtractFindDataUsingPropertyStore(shellFolder, pidlChild, wfd);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		itemInfo.wfd = wfd;
+		itemInfo.isFindDataValid = true;
 	}
 	else
 	{
-		WIN32_FIND_DATA wfd;
+		StringCchCopy(
+			itemInfo.wfd.cFileName, SIZEOF_ARRAY(itemInfo.wfd.cFileName), displayName.c_str());
 
-		StringCchCopy(wfd.cFileName, SIZEOF_ARRAY(wfd.cFileName), displayName.c_str());
-		wfd.nFileSizeLow = 0;
-		wfd.nFileSizeHigh = 0;
-		wfd.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
-
-		item.wfd = wfd;
+		if (WI_IsFlagSet(attributes, SFGAO_FOLDER))
+		{
+			WI_SetFlag(itemInfo.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
+		}
 	}
 
-	return itemId;
+	return std::move(itemInfo);
+}
+
+HRESULT ShellBrowser::ExtractFindDataUsingPropertyStore(
+	IShellFolder *shellFolder, PCITEMID_CHILD pidlChild, WIN32_FIND_DATA &output)
+{
+	wil::com_ptr_nothrow<IPropertyStoreFactory> factory;
+	HRESULT hr = shellFolder->BindToObject(pidlChild, nullptr, IID_PPV_ARGS(&factory));
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	wil::com_ptr_nothrow<IPropertyStore> store;
+	PROPERTYKEY keys[] = { PKEY_FindData };
+	hr = factory->GetPropertyStoreForKeys(
+		keys, SIZEOF_ARRAY(keys), GPS_FASTPROPERTIESONLY, IID_PPV_ARGS(&store));
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	wil::unique_prop_variant findDataProp;
+	hr = store->GetValue(PKEY_FindData, &findDataProp);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	if (PropVariantGetElementCount(findDataProp) != sizeof(WIN32_FIND_DATA))
+	{
+		return hr;
+	}
+
+	WIN32_FIND_DATA wfd;
+	hr = PropVariantToBuffer(findDataProp, &wfd, sizeof(wfd));
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	output = wfd;
+
+	return hr;
 }
 
 void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
@@ -360,6 +471,7 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	}
 
 	int nAdded = 0;
+	std::optional<int> itemToRename;
 
 	for (const auto &awaitingItem : m_directoryState.awaitingAddList)
 	{
@@ -367,7 +479,7 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 		if (IsFileFiltered(itemInfo))
 		{
-			m_directoryState.filteredItemsList.push_back(awaitingItem.iItemInternal);
+			m_directoryState.filteredItemsList.insert(awaitingItem.iItemInternal);
 			continue;
 		}
 
@@ -379,8 +491,12 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 		if (bInsertIntoGroup)
 		{
+			int groupId = DetermineItemGroup(awaitingItem.iItemInternal);
+
 			lv.mask |= LVIF_GROUPID;
-			lv.iGroupId = DetermineItemGroup(awaitingItem.iItemInternal);
+			lv.iGroupId = groupId;
+
+			EnsureGroupExistsInListView(groupId);
 		}
 
 		lv.iItem = awaitingItem.iItem;
@@ -427,14 +543,10 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 			SetTileViewItemInfo(iItemIndex, awaitingItem.iItemInternal);
 		}
 
-		if (m_bNewItemCreated)
+		if (m_queuedRenameItem
+			&& ArePidlsEquivalent(itemInfo.pidlComplete.get(), m_queuedRenameItem.get()))
 		{
-			if (CompareIdls(itemInfo.pidlComplete.get(), m_pidlNewItem))
-			{
-				m_bNewItemCreated = FALSE;
-			}
-
-			m_iIndexNewItem = iItemIndex;
+			itemToRename = iItemIndex;
 		}
 
 		/* If the file is marked as hidden, ghost it out. */
@@ -465,6 +577,12 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	PositionDroppedItems();
 
 	m_directoryState.awaitingAddList.clear();
+
+	if (itemToRename)
+	{
+		m_queuedRenameItem.reset();
+		ListView_EditLabel(m_hListView, *itemToRename);
+	}
 }
 
 void ShellBrowser::ApplyFolderEmptyBackgroundImage(bool apply)
@@ -472,18 +590,6 @@ void ShellBrowser::ApplyFolderEmptyBackgroundImage(bool apply)
 	if (apply)
 	{
 		ListViewHelper::SetBackgroundImage(m_hListView, IDB_FOLDEREMPTY);
-	}
-	else
-	{
-		ListViewHelper::SetBackgroundImage(m_hListView, NULL);
-	}
-}
-
-void ShellBrowser::ApplyFilteringBackgroundImage(bool apply)
-{
-	if (apply)
-	{
-		ListViewHelper::SetBackgroundImage(m_hListView, IDB_FILTERINGAPPLIED);
 	}
 	else
 	{
@@ -545,6 +651,16 @@ void ShellBrowser::RemoveItem(int iItemInternal)
 
 	if (iItem != -1)
 	{
+		if (m_folderSettings.showInGroups)
+		{
+			auto groupId = GetItemGroupId(iItem);
+
+			if (groupId)
+			{
+				OnItemRemovedFromGroup(*groupId);
+			}
+		}
+
 		/* Remove the item from the listview. */
 		ListView_DeleteItem(m_hListView, iItem);
 	}
@@ -566,9 +682,28 @@ ShellNavigationController *ShellBrowser::GetNavigationController() const
 	return m_navigationController.get();
 }
 
+boost::signals2::connection ShellBrowser::AddNavigationStartedObserver(
+	const NavigationStartedSignal::slot_type &observer, boost::signals2::connect_position position)
+{
+	return m_navigationStartedSignal.connect(observer, position);
+}
+
+boost::signals2::connection ShellBrowser::AddNavigationCommittedObserver(
+	const NavigationCommittedSignal::slot_type &observer,
+	boost::signals2::connect_position position)
+{
+	return m_navigationCommittedSignal.connect(observer, position);
+}
+
 boost::signals2::connection ShellBrowser::AddNavigationCompletedObserver(
 	const NavigationCompletedSignal::slot_type &observer,
 	boost::signals2::connect_position position)
 {
 	return m_navigationCompletedSignal.connect(observer, position);
+}
+
+boost::signals2::connection ShellBrowser::AddNavigationFailedObserver(
+	const NavigationFailedSignal::slot_type &observer, boost::signals2::connect_position position)
+{
+	return m_navigationFailedSignal.connect(observer, position);
 }

@@ -118,19 +118,19 @@ void Explorerplusplus::LoadAllSettings(ILoadSave **pLoadSave)
 	ValidateLoadedSettings();
 }
 
-void Explorerplusplus::OpenItem(const TCHAR *szItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow)
+void Explorerplusplus::OpenItem(const TCHAR *itemPath, OpenFolderDisposition openFolderDisposition)
 {
 	unique_pidl_absolute pidlItem;
-	HRESULT hr = SHParseDisplayName(szItem, nullptr, wil::out_param(pidlItem), 0, nullptr);
+	HRESULT hr = SHParseDisplayName(itemPath, nullptr, wil::out_param(pidlItem), 0, nullptr);
 
 	if (SUCCEEDED(hr))
 	{
-		OpenItem(pidlItem.get(), bOpenInNewTab, bOpenInNewWindow);
+		OpenItem(pidlItem.get(), openFolderDisposition);
 	}
 }
 
 void Explorerplusplus::OpenItem(
-	PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow)
+	PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition)
 {
 	BOOL bControlPanelParent = FALSE;
 
@@ -144,7 +144,7 @@ void Explorerplusplus::OpenItem(
 		If it is, pass it to the shell to open, rather than
 		opening it in-place. */
 		if (ILIsParent(pidlControlPanel.get(), pidlItem, FALSE)
-			&& !CompareIdls(pidlControlPanel.get(), pidlItem))
+			&& !ArePidlsEquivalent(pidlControlPanel.get(), pidlItem))
 		{
 			bControlPanelParent = TRUE;
 		}
@@ -180,7 +180,7 @@ void Explorerplusplus::OpenItem(
 			If it is, pass it to the shell to open, rather than
 			opening it in-place. */
 			if (ILIsParent(pidlControlPanelCategoryView.get(), pidlItem, FALSE)
-				&& !CompareIdls(pidlControlPanelCategoryView.get(), pidlItem))
+				&& !ArePidlsEquivalent(pidlControlPanelCategoryView.get(), pidlItem))
 			{
 				bControlPanelParent = TRUE;
 			}
@@ -197,7 +197,7 @@ void Explorerplusplus::OpenItem(
 			/* Zip file. */
 			if (m_config->handleZipFiles)
 			{
-				OpenFolderItem(pidlItem, bOpenInNewTab, bOpenInNewWindow);
+				OpenFolderItem(pidlItem, openFolderDisposition);
 			}
 			else
 			{
@@ -206,8 +206,7 @@ void Explorerplusplus::OpenItem(
 		}
 		else if (((uAttributes & SFGAO_FOLDER) && !bControlPanelParent))
 		{
-			/* Open folders. */
-			OpenFolderItem(pidlItem, bOpenInNewTab, bOpenInNewWindow);
+			OpenFolderItem(pidlItem, openFolderDisposition);
 		}
 		else if (uAttributes & SFGAO_LINK && !bControlPanelParent)
 		{
@@ -247,7 +246,7 @@ void Explorerplusplus::OpenItem(
 
 						if (SUCCEEDED(hr))
 						{
-							OpenFolderItem(pidlTarget.get(), bOpenInNewTab, bOpenInNewWindow);
+							OpenFolderItem(pidlTarget.get(), openFolderDisposition);
 						}
 					}
 					else
@@ -296,14 +295,31 @@ void Explorerplusplus::OpenItem(
 }
 
 void Explorerplusplus::OpenFolderItem(
-	PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow)
+	PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition)
 {
-	if (bOpenInNewWindow)
-		m_navigation->OpenDirectoryInNewWindow(pidlItem);
-	else if (m_config->alwaysOpenNewTab || bOpenInNewTab)
-		m_tabContainer->CreateNewTab(pidlItem, TabSettings(_selected = true));
-	else
+	if (m_config->alwaysOpenNewTab && openFolderDisposition == OpenFolderDisposition::CurrentTab)
+	{
+		openFolderDisposition = OpenFolderDisposition::ForegroundTab;
+	}
+
+	switch (openFolderDisposition)
+	{
+	case OpenFolderDisposition::CurrentTab:
 		m_navigation->BrowseFolderInCurrentTab(pidlItem);
+		break;
+
+	case OpenFolderDisposition::BackgroundTab:
+		m_tabContainer->CreateNewTab(pidlItem);
+		break;
+
+	case OpenFolderDisposition::ForegroundTab:
+		m_tabContainer->CreateNewTab(pidlItem, TabSettings(_selected = true));
+		break;
+
+	case OpenFolderDisposition::NewWindow:
+		m_navigation->OpenDirectoryInNewWindow(pidlItem);
+		break;
+	}
 }
 
 void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters)
@@ -658,7 +674,7 @@ void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
 
 	RECT rc;
 	GetClientRect(m_hContainer, &rc);
-	SendMessage(m_hContainer, WM_SIZE, SIZE_RESTORED, (LPARAM) MAKELPARAM(rc.right, rc.bottom));
+	SendMessage(m_hContainer, WM_SIZE, SIZE_RESTORED, MAKELPARAM(rc.right, rc.bottom));
 }
 
 /*
@@ -823,17 +839,6 @@ void Explorerplusplus::OnLockToolbars()
 	AddWindowStyle(m_hMainRebar, RBS_FIXEDORDER, m_config->lockToolbars);
 }
 
-void Explorerplusplus::OnShellNewItemCreated(LPARAM lParam)
-{
-	int iRenamedItem = (int) lParam;
-
-	if (iRenamedItem != -1)
-	{
-		/* Start editing the label for this item. */
-		ListView_EditLabel(m_hActiveListView, iRenamedItem);
-	}
-}
-
 void Explorerplusplus::OnAppCommand(UINT cmd)
 {
 	switch (cmd)
@@ -955,37 +960,12 @@ void Explorerplusplus::CopyColumnInfoToClipboard()
 	clipboardWriter.WriteText(strColumnInfo);
 }
 
-void Explorerplusplus::OnDirectoryModified(int iTabId)
+void Explorerplusplus::OnDirectoryModified(const Tab &tab)
 {
-	/* This message is sent when one of the
-	tab directories is modified.
-	Two cases to handle:
-	 1. Tab that sent the notification DOES NOT
-		have focus.
-	 2. Tab that sent the notification DOES have
-		focus.
-
-	Case 1 (Tab DOES NOT have focus):
-	No updates will be applied. When the tab
-	selection changes to the updated tab, the
-	view will be synchronized anyhow (since all
-	windows are updated when the tab selection
-	changes).
-
-	Case 2 (Tab DOES have focus):
-	In this case, only the following updates
-	need to be applied:
-	 - Updated status bar text
-	 - Handle file selection display (i.e. update
-	   the display window)
-	*/
-
-	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
-
-	if (iTabId == selectedTab.GetId())
+	if (m_tabContainer->IsTabSelected(tab))
 	{
-		UpdateStatusBarText(selectedTab);
-		UpdateDisplayWindow(selectedTab);
+		UpdateStatusBarText(tab);
+		UpdateDisplayWindow(tab);
 	}
 }
 
@@ -1125,20 +1105,20 @@ void Explorerplusplus::OnAssocChanged()
 
 	if (res == ERROR_SUCCESS)
 	{
-		NRegistrySettings::ReadStringFromRegistry(
+		RegistrySettings::ReadString(
 			hKey, _T("Shell Icon Size"), szShellIconSize, SIZEOF_ARRAY(szShellIconSize));
 
 		dwShellIconSize = _wtoi(szShellIconSize);
 
 		/* Increment the value by one, and save it back to the registry. */
 		StringCchPrintf(szTemp, SIZEOF_ARRAY(szTemp), _T("%d"), dwShellIconSize + 1);
-		NRegistrySettings::SaveStringToRegistry(hKey, _T("Shell Icon Size"), szTemp);
+		RegistrySettings::SaveString(hKey, _T("Shell Icon Size"), szTemp);
 
 		if (fileIconInit != nullptr)
 			fileIconInit(TRUE);
 
 		/* Now, set it back to the original value. */
-		NRegistrySettings::SaveStringToRegistry(hKey, _T("Shell Icon Size"), szShellIconSize);
+		RegistrySettings::SaveString(hKey, _T("Shell Icon Size"), szShellIconSize);
 
 		if (fileIconInit != nullptr)
 			fileIconInit(FALSE);

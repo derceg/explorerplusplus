@@ -484,11 +484,11 @@ void ApplicationToolbarPersistentSettings::LoadRegistrySettings(HKEY hParentKey)
 		TCHAR szCommand[512];
 		BOOL bShowNameOnToolbar = TRUE;
 
-		LONG lNameStatus = NRegistrySettings::ReadStringFromRegistry(
-			hKeyChild, SETTING_NAME, szName, SIZEOF_ARRAY(szName));
-		LONG lCommandStatus = NRegistrySettings::ReadStringFromRegistry(
+		LONG lNameStatus =
+			RegistrySettings::ReadString(hKeyChild, SETTING_NAME, szName, SIZEOF_ARRAY(szName));
+		LONG lCommandStatus = RegistrySettings::ReadString(
 			hKeyChild, SETTING_COMMAND, szCommand, SIZEOF_ARRAY(szCommand));
-		NRegistrySettings::ReadDwordFromRegistry(hKeyChild, SETTING_SHOW_NAME_ON_TOOLBAR,
+		RegistrySettings::ReadDword(hKeyChild, SETTING_SHOW_NAME_ON_TOOLBAR,
 			reinterpret_cast<DWORD *>(&bShowNameOnToolbar));
 
 		if (lNameStatus == ERROR_SUCCESS && lCommandStatus == ERROR_SUCCESS)
@@ -520,10 +520,9 @@ void ApplicationToolbarPersistentSettings::SaveRegistrySettings(HKEY hParentKey)
 
 		if (returnValue == ERROR_SUCCESS)
 		{
-			NRegistrySettings::SaveStringToRegistry(hKeyChild, SETTING_NAME, button.Name.c_str());
-			NRegistrySettings::SaveStringToRegistry(
-				hKeyChild, SETTING_COMMAND, button.Command.c_str());
-			NRegistrySettings::SaveDwordToRegistry(
+			RegistrySettings::SaveString(hKeyChild, SETTING_NAME, button.Name.c_str());
+			RegistrySettings::SaveString(hKeyChild, SETTING_COMMAND, button.Command.c_str());
+			RegistrySettings::SaveDword(
 				hKeyChild, SETTING_SHOW_NAME_ON_TOOLBAR, button.ShowNameOnToolbar);
 
 			index++;

@@ -6,6 +6,7 @@
 
 #include "ToolbarButtons.h"
 
+// clang-format off
 const ToolbarButton DEFAULT_TOOLBAR_BUTTONS[] =
 {
 	ToolbarButton::Back,
@@ -33,3 +34,4 @@ const ToolbarButton DEFAULT_TOOLBAR_BUTTONS[] =
 	ToolbarButton::AddBookmark,
 	ToolbarButton::Bookmarks
 };
+// clang-format on

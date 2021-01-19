@@ -15,13 +15,14 @@
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/Helper.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/XMLSettings.h"
 #include <boost/bimap.hpp>
 
 // Enable C4062: enumerator 'identifier' in switch of enum 'enumeration' is not handled
-#pragma warning(default:4062)
+#pragma warning(default : 4062)
 
 const int TOOLBAR_IMAGE_SIZE_SMALL = 16;
 const int TOOLBAR_IMAGE_SIZE_LARGE = 24;
@@ -35,6 +36,7 @@ struct ToolbarButtonHash
 	}
 };
 
+// clang-format off
 const std::unordered_map<ToolbarButton, Icon, ToolbarButtonHash> TOOLBAR_BUTTON_ICON_MAPPINGS = {
 	{ToolbarButton::Back, Icon::Back},
 	{ToolbarButton::Forward, Icon::Forward},
@@ -60,19 +62,15 @@ const std::unordered_map<ToolbarButton, Icon, ToolbarButtonHash> TOOLBAR_BUTTON_
 	{ToolbarButton::MergeFiles, Icon::MergeFiles},
 	{ToolbarButton::CloseTab, Icon::CloseTab}
 };
-
-template <typename L, typename R>
-boost::bimap<L, R>
-MakeBimap(std::initializer_list<typename boost::bimap<L, R>::value_type> list)
-{
-	return boost::bimap<L, R>(list.begin(), list.end());
-}
+// clang-format on
 
 #pragma warning(push)
-#pragma warning(disable:4996) //warning STL4010: Various members of std::allocator are deprecated in C++17.
+#pragma warning(                                                                                   \
+	disable : 4996) // warning STL4010: Various members of std::allocator are deprecated in C++17.
 
 // Ideally, toolbar button IDs would be saved in the XML config file, rather
 // than button strings, but that's not especially easy to change now.
+// clang-format off
 const boost::bimap<ToolbarButton, std::wstring> TOOLBAR_BUTTON_XML_NAME_MAPPINGS = MakeBimap<ToolbarButton, std::wstring>({
 	{ToolbarButton::Back, L"Back"},
 	{ToolbarButton::Forward, L"Forward"},
@@ -100,17 +98,18 @@ const boost::bimap<ToolbarButton, std::wstring> TOOLBAR_BUTTON_XML_NAME_MAPPINGS
 
 	{ToolbarButton::Separator, L"Separator"}
 });
+// clang-format on
 
 #pragma warning(pop)
 
-MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
-	std::shared_ptr<Config> config)
+MainToolbar *MainToolbar::Create(
+	HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp, std::shared_ptr<Config> config)
 {
 	return new MainToolbar(parent, instance, pexpp, config);
 }
 
-MainToolbar::MainToolbar(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
-	std::shared_ptr<Config> config) :
+MainToolbar::MainToolbar(
+	HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp, std::shared_ptr<Config> config) :
 	BaseWindow(CreateMainToolbar(parent)),
 	m_persistentSettings(&MainToolbarPersistentSettings::GetInstance()),
 	m_instance(instance),
@@ -122,10 +121,11 @@ MainToolbar::MainToolbar(HWND parent, HINSTANCE instance, IExplorerplusplus *pex
 
 HWND MainToolbar::CreateMainToolbar(HWND parent)
 {
-	return CreateToolbar(parent, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS |
-		TBSTYLE_TOOLTIPS | TBSTYLE_LIST | TBSTYLE_TRANSPARENT | TBSTYLE_FLAT | CCS_NODIVIDER |
-		CCS_NORESIZE | CCS_ADJUSTABLE, TBSTYLE_EX_MIXEDBUTTONS | TBSTYLE_EX_DRAWDDARROWS |
-		TBSTYLE_EX_DOUBLEBUFFER | TBSTYLE_EX_HIDECLIPPEDBUTTONS);
+	return CreateToolbar(parent,
+		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | TBSTYLE_TOOLTIPS | TBSTYLE_LIST
+			| TBSTYLE_TRANSPARENT | TBSTYLE_FLAT | CCS_NODIVIDER | CCS_NORESIZE | CCS_ADJUSTABLE,
+		TBSTYLE_EX_MIXEDBUTTONS | TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_DOUBLEBUFFER
+			| TBSTYLE_EX_HIDECLIPPEDBUTTONS);
 }
 
 void MainToolbar::Initialize(HWND parent)
@@ -135,11 +135,12 @@ void MainToolbar::Initialize(HWND parent)
 	// the ToolbarButton enum contains one additional item - for the separator.
 	assert(TOOLBAR_BUTTON_ICON_MAPPINGS.size() == (ToolbarButton::_size() - 1));
 
-	SendMessage(m_hwnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
+	SendMessage(m_hwnd, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
 
 	SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList));
 
-	m_defaultFolderIconBitmap = ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), GetDefaultFolderIconIndex());
+	m_defaultFolderIconBitmap =
+		ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), GetDefaultFolderIconIndex());
 
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hwnd);
 
@@ -151,8 +152,10 @@ void MainToolbar::Initialize(HWND parent)
 	m_imageListLarge.reset(ImageList_Create(dpiScaledSizeLarge, dpiScaledSizeLarge,
 		ILC_COLOR32 | ILC_MASK, 0, static_cast<int>(ToolbarButton::_size() - 1)));
 
-	m_toolbarImageMapSmall = SetUpToolbarImageList(m_imageListSmall.get(), m_pexpp->GetIconResourceLoader(), TOOLBAR_IMAGE_SIZE_SMALL, dpi);
-	m_toolbarImageMapLarge = SetUpToolbarImageList(m_imageListLarge.get(), m_pexpp->GetIconResourceLoader(), TOOLBAR_IMAGE_SIZE_LARGE, dpi);
+	m_toolbarImageMapSmall = SetUpToolbarImageList(
+		m_imageListSmall.get(), m_pexpp->GetIconResourceLoader(), TOOLBAR_IMAGE_SIZE_SMALL, dpi);
+	m_toolbarImageMapLarge = SetUpToolbarImageList(
+		m_imageListLarge.get(), m_pexpp->GetIconResourceLoader(), TOOLBAR_IMAGE_SIZE_LARGE, dpi);
 
 	SetTooolbarImageList();
 	AddStringsToToolbar();
@@ -169,13 +172,15 @@ void MainToolbar::Initialize(HWND parent)
 	m_pexpp->AddTabsInitializedObserver([this] {
 		m_connections.push_back(m_pexpp->GetTabContainer()->tabSelectedSignal.AddObserver(
 			boost::bind(&MainToolbar::OnTabSelected, this, _1)));
-		m_connections.push_back(m_pexpp->GetTabContainer()->tabNavigationCompletedSignal.AddObserver(
-			boost::bind(&MainToolbar::OnNavigationCompleted, this, _1)));
+		m_connections.push_back(
+			m_pexpp->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
+				boost::bind(&MainToolbar::OnNavigationCommitted, this, _1, _2, _3)));
 	});
 
 	m_connections.push_back(
 		m_pexpp->AddFocusChangeObserver(boost::bind(&MainToolbar::OnFocusChanged, this, _1)));
-	m_connections.push_back(m_config->useLargeToolbarIcons.addObserver(boost::bind(&MainToolbar::OnUseLargeToolbarIconsUpdated, this, _1)));
+	m_connections.push_back(m_config->useLargeToolbarIcons.addObserver(
+		boost::bind(&MainToolbar::OnUseLargeToolbarIconsUpdated, this, _1)));
 
 	AddClipboardFormatListener(m_hwnd);
 
@@ -213,14 +218,15 @@ void MainToolbar::SetTooolbarImageList()
 	SendMessage(m_hwnd, TB_SETBUTTONSIZE, 0, MAKELPARAM(cx, cy));
 }
 
-std::unordered_map<int, int> MainToolbar::SetUpToolbarImageList(HIMAGELIST imageList,
-	IconResourceLoader *iconResourceLoader, int iconSize, UINT dpi)
+std::unordered_map<int, int> MainToolbar::SetUpToolbarImageList(
+	HIMAGELIST imageList, IconResourceLoader *iconResourceLoader, int iconSize, UINT dpi)
 {
 	std::unordered_map<int, int> imageListMappings;
 
 	for (const auto &mapping : TOOLBAR_BUTTON_ICON_MAPPINGS)
 	{
-		wil::unique_hbitmap bitmap = iconResourceLoader->LoadBitmapFromPNGForDpi(mapping.second, iconSize, iconSize, dpi);
+		wil::unique_hbitmap bitmap =
+			iconResourceLoader->LoadBitmapFromPNGForDpi(mapping.second, iconSize, iconSize, dpi);
 
 		int imagePosition = ImageList_Add(imageList, bitmap.get(), nullptr);
 
@@ -239,6 +245,9 @@ LRESULT CALLBACK MainToolbar::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
 {
 	switch (msg)
 	{
+		HANDLE_MSG(hwnd, WM_MBUTTONDOWN, OnMButtonDown);
+		HANDLE_MSG(hwnd, WM_MBUTTONUP, OnMButtonUp);
+
 	case WM_CLIPBOARDUPDATE:
 		OnClipboardUpdate();
 		return 0;
@@ -247,7 +256,8 @@ LRESULT CALLBACK MainToolbar::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK MainToolbar::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK MainToolbar::ParentWndProcStub(
+	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -380,7 +390,8 @@ void MainToolbar::AddStringToToolbar(ToolbarButton button)
 	GetToolbarButtonText(button, szText, SIZEOF_ARRAY(szText));
 	szText[lstrlen(szText) + 1] = '\0';
 
-	int index = static_cast<int>(SendMessage(m_hwnd, TB_ADDSTRING, NULL, reinterpret_cast<LPARAM>(szText)));
+	int index =
+		static_cast<int>(SendMessage(m_hwnd, TB_ADDSTRING, NULL, reinterpret_cast<LPARAM>(szText)));
 
 	m_toolbarStringMap.insert(std::make_pair(button, index));
 }
@@ -512,7 +523,8 @@ void MainToolbar::UpdateToolbarButtonImageIndexes()
 	for (int i = 0; i < numButtons; i++)
 	{
 		TBBUTTON tbButton;
-		BOOL res = static_cast<BOOL>(SendMessage(m_hwnd, TB_GETBUTTON, i, reinterpret_cast<LPARAM>(&tbButton)));
+		BOOL res = static_cast<BOOL>(
+			SendMessage(m_hwnd, TB_GETBUTTON, i, reinterpret_cast<LPARAM>(&tbButton)));
 
 		if (!res)
 		{
@@ -565,7 +577,8 @@ BOOL MainToolbar::OnTBGetButtonInfo(LPARAM lParam)
 {
 	auto *pnmtb = reinterpret_cast<NMTOOLBAR *>(lParam);
 
-	if ((pnmtb->iItem >= 0) && (static_cast<std::size_t>(pnmtb->iItem) < (ToolbarButton::_size() - 1)))
+	if ((pnmtb->iItem >= 0)
+		&& (static_cast<std::size_t>(pnmtb->iItem) < (ToolbarButton::_size() - 1)))
 	{
 		// Note that the separator (which is the first item in the enumeration)
 		// is skipped.
@@ -594,7 +607,8 @@ void MainToolbar::OnTBReset()
 		SendMessage(m_hwnd, TB_DELETEBUTTON, i, 0);
 	}
 
-	m_persistentSettings->m_toolbarButtons = { DEFAULT_TOOLBAR_BUTTONS, std::end(DEFAULT_TOOLBAR_BUTTONS) };
+	m_persistentSettings->m_toolbarButtons = { DEFAULT_TOOLBAR_BUTTONS,
+		std::end(DEFAULT_TOOLBAR_BUTTONS) };
 
 	AddButtonsToToolbar(m_persistentSettings->m_toolbarButtons);
 	UpdateConfigDependentButtonStates();
@@ -609,7 +623,8 @@ void MainToolbar::OnTBChange()
 	for (int i = 0; i < numButtons; i++)
 	{
 		TBBUTTON tbButton;
-		BOOL res = static_cast<BOOL>(SendMessage(m_hwnd, TB_GETBUTTON, i, reinterpret_cast<LPARAM>(&tbButton)));
+		BOOL res = static_cast<BOOL>(
+			SendMessage(m_hwnd, TB_GETBUTTON, i, reinterpret_cast<LPARAM>(&tbButton)));
 
 		if (!res)
 		{
@@ -652,7 +667,8 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 			TCHAR szInfoTip[1024];
 			TCHAR szTemp[64];
 			LoadString(m_instance, IDS_MAIN_TOOLBAR_BACK, szTemp, SIZEOF_ARRAY(szTemp));
-			StringCchPrintf(szInfoTip, SIZEOF_ARRAY(szInfoTip), szTemp, entry->GetDisplayName().c_str());
+			StringCchPrintf(
+				szInfoTip, SIZEOF_ARRAY(szInfoTip), szTemp, entry->GetDisplayName().c_str());
 
 			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, szInfoTip);
 		}
@@ -666,7 +682,8 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 			TCHAR szInfoTip[1024];
 			TCHAR szTemp[64];
 			LoadString(m_instance, IDS_MAIN_TOOLBAR_FORWARD, szTemp, SIZEOF_ARRAY(szTemp));
-			StringCchPrintf(szInfoTip, SIZEOF_ARRAY(szInfoTip), szTemp, entry->GetDisplayName().c_str());
+			StringCchPrintf(
+				szInfoTip, SIZEOF_ARRAY(szInfoTip), szTemp, entry->GetDisplayName().c_str());
 
 			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, szInfoTip);
 		}
@@ -691,7 +708,8 @@ LRESULT MainToolbar::OnTbnDropDown(const NMTOOLBAR *nmtb)
 	else if (nmtb->iItem == ToolbarButton::Forward)
 	{
 		RECT backButtonRect;
-		SendMessage(m_hwnd, TB_GETRECT, ToolbarButton::Back, reinterpret_cast<LPARAM>(&backButtonRect));
+		SendMessage(
+			m_hwnd, TB_GETRECT, ToolbarButton::Back, reinterpret_cast<LPARAM>(&backButtonRect));
 
 		ptOrigin.x += backButtonRect.right;
 
@@ -748,7 +766,8 @@ void MainToolbar::ShowHistoryMenu(HistoryType historyType, const POINT &pt)
 
 		if (iconIndex)
 		{
-			wil::unique_hbitmap iconBitmap = ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), *iconIndex);
+			wil::unique_hbitmap iconBitmap =
+				ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), *iconIndex);
 
 			if (iconBitmap)
 			{
@@ -772,8 +791,8 @@ void MainToolbar::ShowHistoryMenu(HistoryType historyType, const POINT &pt)
 		numInserted++;
 	}
 
-	int cmd = TrackPopupMenu(menu.get(), TPM_LEFTALIGN | TPM_VERTICAL | TPM_RETURNCMD,
-		pt.x, pt.y, 0, m_hwnd, nullptr);
+	int cmd = TrackPopupMenu(
+		menu.get(), TPM_LEFTALIGN | TPM_VERTICAL | TPM_RETURNCMD, pt.x, pt.y, 0, m_hwnd, nullptr);
 
 	if (cmd == 0)
 	{
@@ -791,10 +810,10 @@ void MainToolbar::ShowHistoryMenu(HistoryType historyType, const POINT &pt)
 
 void MainToolbar::ShowToolbarViewsDropdown()
 {
-	POINT	ptOrigin;
-	RECT	rcButton;
+	POINT ptOrigin;
+	RECT rcButton;
 
-	SendMessage(m_hwnd, TB_GETRECT, (WPARAM)ToolbarButton::Views, (LPARAM)&rcButton);
+	SendMessage(m_hwnd, TB_GETRECT, (WPARAM) ToolbarButton::Views, (LPARAM) &rcButton);
 
 	ptOrigin.x = rcButton.left;
 	ptOrigin.y = rcButton.bottom;
@@ -812,11 +831,10 @@ void MainToolbar::CreateViewsMenu(POINT *ptOrigin)
 	HMENU viewsMenu = m_pexpp->BuildViewsMenu();
 
 	int itemToCheck = GetViewModeMenuId(viewMode);
-	CheckMenuRadioItem(viewsMenu, IDM_VIEW_THUMBNAILS, IDM_VIEW_EXTRALARGEICONS,
-		itemToCheck, MF_BYCOMMAND);
+	CheckMenuRadioItem(
+		viewsMenu, IDM_VIEW_THUMBNAILS, IDM_VIEW_EXTRALARGEICONS, itemToCheck, MF_BYCOMMAND);
 
-	TrackPopupMenu(viewsMenu, TPM_LEFTALIGN, ptOrigin->x, ptOrigin->y,
-		0, m_hwnd, nullptr);
+	TrackPopupMenu(viewsMenu, TPM_LEFTALIGN, ptOrigin->x, ptOrigin->y, 0, m_hwnd, nullptr);
 }
 
 // For some of the buttons on the toolbar, their state depends on an item from
@@ -831,22 +849,30 @@ void MainToolbar::UpdateToolbarButtonStates()
 {
 	const Tab &tab = m_pexpp->GetTabContainer()->GetSelectedTab();
 
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Back, tab.GetShellBrowser()->GetNavigationController()->CanGoBack());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Forward, tab.GetShellBrowser()->GetNavigationController()->CanGoForward());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Up, tab.GetShellBrowser()->GetNavigationController()->CanGoUp());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Back,
+		tab.GetShellBrowser()->GetNavigationController()->CanGoBack());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Forward,
+		tab.GetShellBrowser()->GetNavigationController()->CanGoForward());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Up,
+		tab.GetShellBrowser()->GetNavigationController()->CanGoUp());
 
 	bool virtualFolder = tab.GetShellBrowser()->InVirtualFolder();
 
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::CopyTo, m_pexpp->CanCopy() && GetFocus() != m_pexpp->GetTreeView());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::MoveTo, m_pexpp->CanCut() && GetFocus() != m_pexpp->GetTreeView());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::CopyTo,
+		m_pexpp->CanCopy() && GetFocus() != m_pexpp->GetTreeView());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::MoveTo,
+		m_pexpp->CanCut() && GetFocus() != m_pexpp->GetTreeView());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Copy, m_pexpp->CanCopy());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Cut, m_pexpp->CanCut());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Paste, m_pexpp->CanPaste());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Properties, m_pexpp->CanShowFileProperties());
+	SendMessage(
+		m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Properties, m_pexpp->CanShowFileProperties());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Delete, m_pexpp->CanDelete());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::DeletePermanently, m_pexpp->CanDelete());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::SplitFile, tab.GetShellBrowser()->GetNumSelectedFiles() == 1);
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::MergeFiles, tab.GetShellBrowser()->GetNumSelectedFiles() > 1);
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::SplitFile,
+		tab.GetShellBrowser()->GetNumSelectedFiles() == 1);
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::MergeFiles,
+		tab.GetShellBrowser()->GetNumSelectedFiles() > 1);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::OpenCommandPrompt, !virtualFolder);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::NewFolder, m_pexpp->CanCreate());
 }
@@ -856,6 +882,106 @@ void MainToolbar::OnClipboardUpdate()
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Paste, m_pexpp->CanPaste());
 }
 
+void MainToolbar::OnMButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT keysDown)
+{
+	UNREFERENCED_PARAMETER(hwnd);
+	UNREFERENCED_PARAMETER(doubleClick);
+	UNREFERENCED_PARAMETER(keysDown);
+
+	POINT pt = { x, y };
+	int index = static_cast<int>(SendMessage(m_hwnd, TB_HITTEST, 0, reinterpret_cast<LPARAM>(&pt)));
+
+	if (index >= 0)
+	{
+		m_middleButtonItem = index;
+	}
+	else
+	{
+		m_middleButtonItem.reset();
+	}
+}
+
+void MainToolbar::OnMButtonUp(HWND hwnd, int x, int y, UINT keysDown)
+{
+	UNREFERENCED_PARAMETER(hwnd);
+
+	POINT pt = { x, y };
+	int index = static_cast<int>(SendMessage(m_hwnd, TB_HITTEST, 0, reinterpret_cast<LPARAM>(&pt)));
+
+	if (index < 0 || !m_middleButtonItem || index != *m_middleButtonItem)
+	{
+		return;
+	}
+
+	TBBUTTON tbButton;
+	BOOL res = static_cast<BOOL>(
+		SendMessage(m_hwnd, TB_GETBUTTON, index, reinterpret_cast<LPARAM>(&tbButton)));
+
+	if (!res)
+	{
+		return;
+	}
+
+	if (tbButton.idCommand == 0)
+	{
+		// Separator.
+		return;
+	}
+
+	const Tab &tab = m_pexpp->GetTabContainer()->GetSelectedTab();
+	unique_pidl_absolute pidl;
+
+	if (tbButton.idCommand == ToolbarButton::Back || tbButton.idCommand == ToolbarButton::Forward)
+	{
+		HistoryEntry *entry = nullptr;
+
+		if (tbButton.idCommand == ToolbarButton::Back)
+		{
+			entry = tab.GetShellBrowser()->GetNavigationController()->GetEntry(-1);
+		}
+		else
+		{
+			entry = tab.GetShellBrowser()->GetNavigationController()->GetEntry(1);
+		}
+
+		if (!entry)
+		{
+			return;
+		}
+
+		pidl = entry->GetPidl();
+	}
+	else if (tbButton.idCommand == ToolbarButton::Up)
+	{
+		auto *currentEntry = tab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
+
+		unique_pidl_absolute pidlParent;
+		HRESULT hr =
+			GetVirtualParentPath(currentEntry->GetPidl().get(), wil::out_param(pidlParent));
+
+		if (FAILED(hr))
+		{
+			return;
+		}
+
+		pidl = std::move(pidlParent);
+	}
+
+	if (!pidl)
+	{
+		return;
+	}
+
+	bool switchToNewTab = m_config->openTabsInForeground;
+
+	if (WI_IsFlagSet(keysDown, MK_SHIFT))
+	{
+		switchToNewTab = !switchToNewTab;
+	}
+
+	m_pexpp->GetTabContainer()->CreateNewTab(pidl.get(), TabSettings(_selected = switchToNewTab));
+}
+
 void MainToolbar::OnTabSelected(const Tab &tab)
 {
 	UNREFERENCED_PARAMETER(tab);
@@ -863,8 +989,12 @@ void MainToolbar::OnTabSelected(const Tab &tab)
 	UpdateToolbarButtonStates();
 }
 
-void MainToolbar::OnNavigationCompleted(const Tab &tab)
+void MainToolbar::OnNavigationCommitted(
+	const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
 {
+	UNREFERENCED_PARAMETER(pidl);
+	UNREFERENCED_PARAMETER(addHistoryEntry);
+
 	if (m_pexpp->GetTabContainer()->IsTabSelected(tab))
 	{
 		UpdateToolbarButtonStates();
@@ -928,7 +1058,8 @@ void MainToolbarPersistentSettings::SaveXMLSettings(IXMLDOMDocument *pXMLDom, IX
 	for (auto button : m_toolbarButtons)
 	{
 		TCHAR szButtonAttributeName[32];
-		StringCchPrintf(szButtonAttributeName, SIZEOF_ARRAY(szButtonAttributeName), _T("Button%d"), index);
+		StringCchPrintf(
+			szButtonAttributeName, SIZEOF_ARRAY(szButtonAttributeName), _T("Button%d"), index);
 
 		std::wstring buttonName = TOOLBAR_BUTTON_XML_NAME_MAPPINGS.left.at(button);
 

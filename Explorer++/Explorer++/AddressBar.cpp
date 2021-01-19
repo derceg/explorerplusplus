@@ -78,8 +78,8 @@ void AddressBar::Initialize(HWND parent)
 	m_expp->AddTabsInitializedObserver([this] {
 		m_connections.push_back(m_expp->GetTabContainer()->tabSelectedSignal.AddObserver(
 			boost::bind(&AddressBar::OnTabSelected, this, _1)));
-		m_connections.push_back(m_expp->GetTabContainer()->tabNavigationCompletedSignal.AddObserver(
-			boost::bind(&AddressBar::OnNavigationCompleted, this, _1)));
+		m_connections.push_back(m_expp->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
+			boost::bind(&AddressBar::OnNavigationCommitted, this, _1, _2, _3)));
 	});
 }
 
@@ -209,7 +209,7 @@ void AddressBar::OnGo()
 	DecodePath(
 		path.c_str(), currentDirectory.c_str(), szFullFilePath, SIZEOF_ARRAY(szFullFilePath));
 
-	m_expp->OpenItem(szFullFilePath, FALSE, FALSE);
+	m_expp->OpenItem(szFullFilePath);
 }
 
 void AddressBar::OnBeginDrag()
@@ -377,8 +377,11 @@ void AddressBar::OnTabSelected(const Tab &tab)
 	UpdateTextAndIcon(tab);
 }
 
-void AddressBar::OnNavigationCompleted(const Tab &tab)
+void AddressBar::OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
 {
+	UNREFERENCED_PARAMETER(pidl);
+	UNREFERENCED_PARAMETER(addHistoryEntry);
+
 	if (m_expp->GetTabContainer()->IsTabSelected(tab))
 	{
 		UpdateTextAndIcon(tab);

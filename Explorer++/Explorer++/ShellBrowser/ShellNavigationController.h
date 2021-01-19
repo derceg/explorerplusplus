@@ -29,6 +29,8 @@ public:
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
 		int currentEntry);
 
+	HRESULT GoToOffset(int offset) override;
+
 	[[nodiscard]] bool CanGoUp() const;
 	HRESULT GoUp();
 
@@ -47,10 +49,10 @@ private:
 	static std::vector<std::unique_ptr<HistoryEntry>> CopyPreservedHistoryEntries(
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries);
 
-	HRESULT BrowseFolder(const HistoryEntry *entry, bool addHistoryEntry = true) override;
+	HRESULT BrowseFolder(const HistoryEntry *entry) override;
 	HRESULT GetFailureValue() override;
 
-	void OnNavigationCompleted(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry);
+	void OnNavigationCommitted(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry);
 
 	NavigatorInterface *m_navigator;
 

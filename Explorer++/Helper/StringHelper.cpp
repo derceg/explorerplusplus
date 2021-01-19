@@ -7,25 +7,26 @@
 #include "Macros.h"
 #include <codecvt>
 
-BOOL CheckWildcardMatchInternal(const TCHAR *szWildcard, const TCHAR *szString, BOOL bCaseSensitive);
+BOOL CheckWildcardMatchInternal(
+	const TCHAR *szWildcard, const TCHAR *szString, BOOL bCaseSensitive);
 
-void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize,
-	size_t cchBuf)
+void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize, size_t cchBuf)
 {
 	FormatSizeString(lFileSize, pszFileSize, cchBuf, FALSE, SizeDisplayFormat::None);
 }
 
-void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize,
-	size_t cchBuf, BOOL bForceSize, SizeDisplayFormat sdf)
+void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize, size_t cchBuf, BOOL bForceSize,
+	SizeDisplayFormat sdf)
 {
-	static const TCHAR *SIZE_STRINGS[] = {_T("bytes"), _T("KB"), _T("MB"), _T("GB"), _T("TB"), _T("PB")};
+	static const TCHAR *SIZE_STRINGS[] = { _T("bytes"), _T("KB"), _T("MB"), _T("GB"), _T("TB"),
+		_T("PB") };
 
 	auto fFileSize = static_cast<double>(lFileSize.QuadPart);
 	int iSizeIndex = 0;
 
-	if(bForceSize)
+	if (bForceSize)
 	{
-		switch(sdf)
+		switch (sdf)
 		{
 		case SizeDisplayFormat::Bytes:
 			iSizeIndex = 0;
@@ -52,21 +53,21 @@ void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize,
 			break;
 		}
 
-		for(int i = 0; i < iSizeIndex; i++)
+		for (int i = 0; i < iSizeIndex; i++)
 		{
 			fFileSize /= 1024;
 		}
 	}
 	else
 	{
-		while((fFileSize / 1024) >= 1)
+		while ((fFileSize / 1024) >= 1)
 		{
 			fFileSize /= 1024;
 
 			iSizeIndex++;
 		}
 
-		if(iSizeIndex > (SIZEOF_ARRAY(SIZE_STRINGS) - 1))
+		if (iSizeIndex > (SIZEOF_ARRAY(SIZE_STRINGS) - 1))
 		{
 			StringCchCopy(pszFileSize, cchBuf, EMPTY_STRING);
 			return;
@@ -75,17 +76,17 @@ void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize,
 
 	int iPrecision;
 
-	if(iSizeIndex == 0)
+	if (iSizeIndex == 0)
 	{
 		iPrecision = 0;
 	}
 	else
 	{
-		if(fFileSize < 10)
+		if (fFileSize < 10)
 		{
 			iPrecision = 2;
 		}
-		else if(fFileSize < 100)
+		else if (fFileSize < 100)
 		{
 			iPrecision = 1;
 		}
@@ -95,13 +96,13 @@ void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize,
 		}
 	}
 
-	int iLeast = static_cast<int>((fFileSize - static_cast<int>(fFileSize)) *
-		pow(10.0, iPrecision + 1));
+	int iLeast =
+		static_cast<int>((fFileSize - static_cast<int>(fFileSize)) * pow(10.0, iPrecision + 1));
 
 	/* Setting the precision will cause automatic rounding. Therefore,
 	if the least significant digit to be dropped is greater than 0.5,
 	reduce it to below 0.5. */
-	if(iLeast >= 5)
+	if (iLeast >= 5)
 	{
 		fFileSize -= 5.0 * pow(10.0, -(iPrecision + 1));
 	}
@@ -130,25 +131,25 @@ TCHAR *PrintCommaLargeNum(LARGE_INTEGER lPrint)
 	static TCHAR szBuffer[14];
 	TCHAR *p = &szBuffer[SIZEOF_ARRAY(szBuffer) - 1];
 	static TCHAR chComma = ',';
-	auto nTemp = (unsigned long long)(lPrint.LowPart + (lPrint.HighPart * pow(2.0, 32.0)));
+	auto nTemp = (unsigned long long) (lPrint.LowPart + (lPrint.HighPart * pow(2.0, 32.0)));
 	int i = 0;
 
-	if(nTemp == 0)
+	if (nTemp == 0)
 	{
 		StringCchPrintf(szBuffer, SIZEOF_ARRAY(szBuffer), _T("%d"), 0);
 		return szBuffer;
 	}
 
-	*p = (TCHAR)'\0';
+	*p = (TCHAR) '\0';
 
-	while(nTemp != 0)
+	while (nTemp != 0)
 	{
 		if (i % 3 == 0 && i != 0)
 		{
 			*--p = chComma;
 		}
 
-		*--p = '0' + (TCHAR) (nTemp % 10);
+		*--p = '0' + (TCHAR)(nTemp % 10);
 
 		nTemp /= 10;
 
@@ -165,16 +166,16 @@ BOOL CheckWildcardMatch(const TCHAR *szWildcard, const TCHAR *szString, BOOL bCa
 	For example "*.h: *.cpp" would match against "*.h" and "*.cpp" */
 	BOOL bMultiplePattern = FALSE;
 
-	for(int i = 0; i < lstrlen(szWildcard); i++)
+	for (int i = 0; i < lstrlen(szWildcard); i++)
 	{
-		if(szWildcard[i] == ':')
+		if (szWildcard[i] == ':')
 		{
 			bMultiplePattern = TRUE;
 			break;
 		}
 	}
 
-	if(!bMultiplePattern)
+	if (!bMultiplePattern)
 	{
 		return CheckWildcardMatchInternal(szWildcard, szString, bCaseSensitive);
 	}
@@ -190,9 +191,9 @@ BOOL CheckWildcardMatch(const TCHAR *szWildcard, const TCHAR *szString, BOOL bCa
 		szSinglePattern = wcstok_s(szWildcardPattern, _T(":"), &szRemainingPattern);
 		PathRemoveBlanks(szSinglePattern);
 
-		while(szSinglePattern != nullptr)
+		while (szSinglePattern != nullptr)
 		{
-			if(CheckWildcardMatchInternal(szSinglePattern, szString, bCaseSensitive))
+			if (CheckWildcardMatchInternal(szSinglePattern, szString, bCaseSensitive))
 			{
 				return TRUE;
 			}
@@ -211,9 +212,9 @@ BOOL CheckWildcardMatchInternal(const TCHAR *szWildcard, const TCHAR *szString, 
 	BOOL bMatched;
 	BOOL bCurrentMatch = TRUE;
 
-	while(*szWildcard != '\0' && *szString != '\0' && bCurrentMatch)
+	while (*szWildcard != '\0' && *szString != '\0' && bCurrentMatch)
 	{
-		switch(*szWildcard)
+		switch (*szWildcard)
 		{
 			/* Match against the next part of the wildcard string.
 			If there is a match, then return true, else consume
@@ -221,19 +222,19 @@ BOOL CheckWildcardMatchInternal(const TCHAR *szWildcard, const TCHAR *szString, 
 		case '*':
 			bMatched = FALSE;
 
-			if(*(szWildcard + 1) != '\0')
+			if (*(szWildcard + 1) != '\0')
 			{
 				bMatched = CheckWildcardMatch(++szWildcard, szString, bCaseSensitive);
 			}
 
-			while(*szWildcard != '\0' && *szString != '\0' && !bMatched)
+			while (*szWildcard != '\0' && *szString != '\0' && !bMatched)
 			{
 				/* Consume one more character on the input string,
 				and keep (recursively) trying to match. */
 				bMatched = CheckWildcardMatch(szWildcard, ++szString, bCaseSensitive);
 			}
 
-			if(bMatched)
+			if (bMatched)
 			{
 				while (*szWildcard != '\0')
 				{
@@ -256,17 +257,19 @@ BOOL CheckWildcardMatchInternal(const TCHAR *szWildcard, const TCHAR *szString, 
 			break;
 
 		default:
-			if(bCaseSensitive)
+			if (bCaseSensitive)
 			{
 				bCurrentMatch = (*szWildcard == *szString);
 			}
 			else
 			{
 				TCHAR szCharacter1[1];
-				LCMapString(LOCALE_USER_DEFAULT, LCMAP_LOWERCASE, szWildcard, 1, szCharacter1, SIZEOF_ARRAY(szCharacter1));
+				LCMapString(LOCALE_USER_DEFAULT, LCMAP_LOWERCASE, szWildcard, 1, szCharacter1,
+					SIZEOF_ARRAY(szCharacter1));
 
 				TCHAR szCharacter2[1];
-				LCMapString(LOCALE_USER_DEFAULT, LCMAP_LOWERCASE, szString, 1, szCharacter2, SIZEOF_ARRAY(szCharacter2));
+				LCMapString(LOCALE_USER_DEFAULT, LCMAP_LOWERCASE, szString, 1, szCharacter2,
+					SIZEOF_ARRAY(szCharacter2));
 
 				bCurrentMatch = (szCharacter1[0] == szCharacter2[0]);
 			}
@@ -294,39 +297,37 @@ BOOL CheckWildcardMatchInternal(const TCHAR *szWildcard, const TCHAR *szString, 
 
 void ReplaceCharacter(TCHAR *str, TCHAR ch, TCHAR chReplacement)
 {
-	int  i = 0;
+	int i = 0;
 
-	for(i = 0; i < lstrlen(str); i++)
+	for (i = 0; i < lstrlen(str); i++)
 	{
-		if(str[i] == ch)
+		if (str[i] == ch)
 		{
 			str[i] = chReplacement;
 		}
 	}
 }
 
-void ReplaceCharacterWithString(const TCHAR *szBaseString, TCHAR *szOutput,
-	UINT cchMax, TCHAR chToReplace, const TCHAR *szReplacement)
+void ReplaceCharacterWithString(const TCHAR *szBaseString, TCHAR *szOutput, UINT cchMax,
+	TCHAR chToReplace, const TCHAR *szReplacement)
 {
 	TCHAR szNewString[1024];
 	int iBase = 0;
 	int i = 0;
 
 	szNewString[0] = '\0';
-	for(i = 0; i < lstrlen(szBaseString); i++)
+	for (i = 0; i < lstrlen(szBaseString); i++)
 	{
-		if(szBaseString[i] == chToReplace)
+		if (szBaseString[i] == chToReplace)
 		{
-			StringCchCatN(szNewString, SIZEOF_ARRAY(szNewString),
-				&szBaseString[iBase], i - iBase);
+			StringCchCatN(szNewString, SIZEOF_ARRAY(szNewString), &szBaseString[iBase], i - iBase);
 			StringCchCat(szNewString, SIZEOF_ARRAY(szNewString), szReplacement);
 
 			iBase = i + 1;
 		}
 	}
 
-	StringCchCatN(szNewString, SIZEOF_ARRAY(szNewString),
-		&szBaseString[iBase], i - iBase);
+	StringCchCatN(szNewString, SIZEOF_ARRAY(szNewString), &szBaseString[iBase], i - iBase);
 
 	StringCchCopy(szOutput, cchMax, szNewString);
 }

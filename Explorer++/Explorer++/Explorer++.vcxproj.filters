@@ -451,6 +451,9 @@
     <ClCompile Include="DarkModeButton.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="ShellBrowser\Filtering.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">

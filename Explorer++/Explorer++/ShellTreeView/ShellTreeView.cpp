@@ -29,6 +29,7 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/common.h>
+#include <propkey.h>
 
 int CALLBACK CompareItemsStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 DWORD WINAPI Thread_MonitorAllDrives(LPVOID pParam);
@@ -183,7 +184,7 @@ LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam,
 	{
 		POINT pt;
 		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-		OnMiddleButtonUp(&pt);
+		OnMiddleButtonUp(&pt, static_cast<UINT>(wParam));
 	}
 	break;
 
@@ -348,21 +349,6 @@ HTREEITEM ShellTreeView::AddRoot()
 	}
 
 	return hDesktop;
-}
-
-HRESULT ShellTreeView::ExpandDirectory(HTREEITEM hParent)
-{
-	auto pidlDirectory = GetItemPidl(hParent);
-
-	wil::com_ptr_nothrow<IShellFolder> pShellFolder;
-	HRESULT hr = BindToIdl(pidlDirectory.get(), IID_PPV_ARGS(&pShellFolder));
-
-	if (SUCCEEDED(hr))
-	{
-		AddDirectoryInternal(pShellFolder.get(), pidlDirectory.get(), hParent);
-	}
-
-	return hr;
 }
 
 void ShellTreeView::OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi)
@@ -725,14 +711,30 @@ int CALLBACK ShellTreeView::CompareItems(LPARAM lParam1, LPARAM lParam2)
 			GetDisplayName(itemInfo1.pidl.get(), SHGDN_INFOLDER, displayName1);
 			GetDisplayName(itemInfo2.pidl.get(), SHGDN_INFOLDER, displayName2);
 
-			return StrCmpLogicalW(displayName1.c_str(), displayName2.c_str());
+			if (m_config->globalFolderSettings.useNaturalSortOrder)
+			{
+				return StrCmpLogicalW(displayName1.c_str(), displayName2.c_str());
+			}
+			else
+			{
+				return StrCmpIW(displayName1.c_str(), displayName2.c_str());
+			}
 		}
 	}
 }
 
-void ShellTreeView::AddDirectoryInternal(
-	IShellFolder *pShellFolder, PCIDLIST_ABSOLUTE pidlDirectory, HTREEITEM hParent)
+HRESULT ShellTreeView::ExpandDirectory(HTREEITEM hParent)
 {
+	auto pidlDirectory = GetItemPidl(hParent);
+
+	wil::com_ptr_nothrow<IShellFolder2> shellFolder2;
+	HRESULT hr = BindToIdl(pidlDirectory.get(), IID_PPV_ARGS(&shellFolder2));
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
 	SHCONTF enumFlags = SHCONTF_FOLDERS;
 
 	if (m_bShowHidden)
@@ -741,35 +743,46 @@ void ShellTreeView::AddDirectoryInternal(
 	}
 
 	wil::com_ptr_nothrow<IEnumIDList> pEnumIDList;
-	HRESULT hr = pShellFolder->EnumObjects(nullptr, enumFlags, &pEnumIDList);
+	hr = shellFolder2->EnumObjects(nullptr, enumFlags, &pEnumIDList);
 
 	if (FAILED(hr) || !pEnumIDList)
 	{
-		return;
+		return hr;
 	}
 
 	SendMessage(m_hTreeView, WM_SETREDRAW, FALSE, 0);
 
 	std::vector<EnumeratedItem> items;
 
-	unique_pidl_child rgelt;
+	unique_pidl_child pidlItem;
 	ULONG uFetched = 1;
 
-	while (pEnumIDList->Next(1, wil::out_param(rgelt), &uFetched) == S_OK && (uFetched == 1))
+	while (pEnumIDList->Next(1, wil::out_param(pidlItem), &uFetched) == S_OK && (uFetched == 1))
 	{
+		if (m_config->checkPinnedToNamespaceTreeProperty)
+		{
+			BOOL showItem = GetBooleanVariant(
+				shellFolder2.get(), pidlItem.get(), &PKEY_IsPinnedToNameSpaceTree, TRUE);
+
+			if (!showItem)
+			{
+				continue;
+			}
+		}
+
 		STRRET str;
-		hr = pShellFolder->GetDisplayNameOf(rgelt.get(), SHGDN_NORMAL, &str);
+		hr = shellFolder2->GetDisplayNameOf(pidlItem.get(), SHGDN_NORMAL, &str);
 
 		if (SUCCEEDED(hr))
 		{
 			TCHAR itemName[MAX_PATH];
-			hr = StrRetToBuf(&str, rgelt.get(), itemName, SIZEOF_ARRAY(itemName));
+			hr = StrRetToBuf(&str, pidlItem.get(), itemName, SIZEOF_ARRAY(itemName));
 
 			if (SUCCEEDED(hr))
 			{
 				int itemId = GenerateUniqueItemId();
-				m_itemInfoMap[itemId].pidl.reset(ILCombine(pidlDirectory, rgelt.get()));
-				m_itemInfoMap[itemId].pridl.reset(ILCloneChild(rgelt.get()));
+				m_itemInfoMap[itemId].pidl.reset(ILCombine(pidlDirectory.get(), pidlItem.get()));
+				m_itemInfoMap[itemId].pridl.reset(ILCloneChild(pidlItem.get()));
 
 				EnumeratedItem item;
 				item.internalIndex = itemId;
@@ -804,6 +817,8 @@ void ShellTreeView::AddDirectoryInternal(
 	TreeView_SortChildrenCB(m_hTreeView, &tvscb, 0);
 
 	SendMessage(m_hTreeView, WM_SETREDRAW, TRUE, 0);
+
+	return hr;
 }
 
 int ShellTreeView::GenerateUniqueItemId()
@@ -1076,7 +1091,8 @@ HTREEITEM ShellTreeView::LocateItemInternal(
 	the parent node if necessary. */
 	while (!bFound && hItem != nullptr)
 	{
-		if (CompareIdls(m_itemInfoMap.at(static_cast<int>(item.lParam)).pidl.get(), pidlDirectory))
+		if (ArePidlsEquivalent(
+				m_itemInfoMap.at(static_cast<int>(item.lParam)).pidl.get(), pidlDirectory))
 		{
 			bFound = TRUE;
 
@@ -1094,7 +1110,7 @@ HTREEITEM ShellTreeView::LocateItemInternal(
 				}
 				else
 				{
-					SendMessage(m_hTreeView, TVM_EXPAND, (WPARAM) TVE_EXPAND, (LPARAM) hItem);
+					SendMessage(m_hTreeView, TVM_EXPAND, TVE_EXPAND, (LPARAM) hItem);
 				}
 			}
 
@@ -1176,7 +1192,7 @@ HTREEITEM ShellTreeView::LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand)
 		if (TreeView_GetChild(m_hTreeView, hItem) == nullptr)
 		{
 			if (bExpand)
-				SendMessage(m_hTreeView, TVM_EXPAND, (WPARAM) TVE_EXPAND, (LPARAM) hItem);
+				SendMessage(m_hTreeView, TVM_EXPAND, TVE_EXPAND, (LPARAM) hItem);
 			else
 				return nullptr;
 		}
@@ -1599,7 +1615,7 @@ void ShellTreeView::OnMiddleButtonDown(const POINT *pt)
 	}
 }
 
-void ShellTreeView::OnMiddleButtonUp(const POINT *pt)
+void ShellTreeView::OnMiddleButtonUp(const POINT *pt, UINT keysDown)
 {
 	TVHITTESTINFO hitTestInfo;
 	hitTestInfo.pt = *pt;
@@ -1618,8 +1634,15 @@ void ShellTreeView::OnMiddleButtonUp(const POINT *pt)
 		return;
 	}
 
+	bool switchToNewTab = m_config->openTabsInForeground;
+
+	if (WI_IsFlagSet(keysDown, MK_SHIFT))
+	{
+		switchToNewTab = !switchToNewTab;
+	}
+
 	auto pidl = GetItemPidl(hitTestInfo.hItem);
-	m_tabContainer->CreateNewTab(pidl.get());
+	m_tabContainer->CreateNewTab(pidl.get(), TabSettings(_selected = switchToNewTab));
 }
 
 HRESULT ShellTreeView::InitializeDragDropHelpers()

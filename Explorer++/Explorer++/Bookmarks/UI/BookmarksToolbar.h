@@ -68,7 +68,7 @@ private:
 	void OnMouseMove(int keys, const POINT &pt);
 	void StartDrag(DragType dragType, const POINT &pt);
 	void OnLButtonUp();
-	void OnMButtonUp(const POINT &pt);
+	void OnMButtonUp(const POINT &pt, UINT keysDown);
 	bool OnCommand(WPARAM wParam, LPARAM lParam);
 	bool OnButtonClick(int command);
 	BOOL OnRightClick(const NMMOUSE *nmm);

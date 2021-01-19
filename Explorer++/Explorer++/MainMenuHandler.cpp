@@ -200,12 +200,15 @@ void Explorerplusplus::OnSaveDirectoryListing() const
 	LoadString(m_hLanguageModule, IDS_GENERAL_DIRECTORY_LISTING_FILENAME, fileName,
 		SIZEOF_ARRAY(fileName));
 	StringCchCat(fileName, SIZEOF_ARRAY(fileName), _T(".txt"));
-	BOOL bSaveNameRetrieved = GetFileNameFromUser(
-		m_hContainer, fileName, SIZEOF_ARRAY(fileName), m_CurrentDirectory.c_str());
+
+	std::wstring directory = m_pActiveShellBrowser->GetDirectory();
+
+	BOOL bSaveNameRetrieved =
+		GetFileNameFromUser(m_hContainer, fileName, SIZEOF_ARRAY(fileName), directory.c_str());
 
 	if (bSaveNameRetrieved)
 	{
-		NFileOperations::SaveDirectoryListing(m_CurrentDirectory, fileName);
+		NFileOperations::SaveDirectoryListing(directory, fileName);
 	}
 }
 
@@ -266,17 +269,24 @@ void Explorerplusplus::OnResolveLink()
 			StringCchCopy(szPath, SIZEOF_ARRAY(szPath), szFullFileName);
 			PathRemoveFileSpec(szPath);
 
-			hr = m_tabContainer->CreateNewTab(szPath, TabSettings(_selected = true));
+			int newTabId;
+			m_tabContainer->CreateNewTab(
+				szPath, TabSettings(_selected = true), nullptr, std::nullopt, &newTabId);
 
-			if (SUCCEEDED(hr))
+			Tab &tab = m_tabContainer->GetTab(newTabId);
+
+			if (tab.GetShellBrowser()->GetDirectory() == szPath)
 			{
-				/* Strip off the path, and select the shortcut target
-				in the listview. */
-				PathStripPath(szFullFileName);
-				m_pActiveShellBrowser->SelectFiles(szFullFileName);
+				unique_pidl_absolute pidl;
+				hr = CreateSimplePidl(szFullFileName, wil::out_param(pidl));
 
-				SetFocus(m_hActiveListView);
+				if (SUCCEEDED(hr))
+				{
+					m_pActiveShellBrowser->SelectItems({ pidl.get() });
+				}
 			}
+
+			SetFocus(m_hActiveListView);
 		}
 	}
 }

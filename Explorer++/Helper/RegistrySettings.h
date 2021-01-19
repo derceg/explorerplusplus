@@ -5,18 +5,33 @@
 #pragma once
 
 #include <tchar.h>
-#include <string>
 #include <list>
+#include <string>
 
-namespace NRegistrySettings
+namespace RegistrySettings
 {
-	LONG	SaveDwordToRegistry(HKEY hKey,const TCHAR *szKey,DWORD dwValue);
-	LONG	ReadDwordFromRegistry(HKEY hKey,const TCHAR *szKey,DWORD *pReturnValue);
-	LONG	SaveStringToRegistry(HKEY hKey,const TCHAR *szKey,const TCHAR *szValue);
-	LONG	ReadStringFromRegistry(HKEY hKey,const TCHAR *szKey,TCHAR *szOutput,DWORD cchMax);
-	LONG	ReadStringFromRegistry(HKEY hKey,const std::wstring &strKey,std::wstring &strOutput);
-	LONG	SaveStringListToRegistry(HKEY hKey,const TCHAR *szBaseKeyName,const std::list<std::wstring> &strList);
-	LONG	ReadStringListFromRegistry(HKEY hKey,const TCHAR *szBaseKeyName,std::list<std::wstring> &strList);
-	bool	SaveDateTime(HKEY key, const std::wstring &baseKeyName, const FILETIME &dateTime);
-	bool	ReadDateTime(HKEY key, const std::wstring &baseKeyName, FILETIME &dateTime);
+	LONG SaveDword(HKEY hKey, const TCHAR *valueName, DWORD dwValue);
+	LONG ReadDword(HKEY hKey, const TCHAR *valueName, DWORD *pReturnValue);
+	LONG SaveString(HKEY hKey, const TCHAR *valueName, const TCHAR *szValue);
+	LONG ReadString(HKEY hKey, const TCHAR *szKey, TCHAR *valueName, DWORD cchMax);
+	LONG ReadString(HKEY hKey, const std::wstring &valueName, std::wstring &strOutput);
+	LONG SaveStringList(
+		HKEY hKey, const TCHAR *baseValueName, const std::list<std::wstring> &strList);
+	LONG ReadStringList(HKEY hKey, const TCHAR *baseValueName, std::list<std::wstring> &strList);
+	bool SaveDateTime(HKEY key, const std::wstring &baseValueName, const FILETIME &dateTime);
+	bool ReadDateTime(HKEY key, const std::wstring &baseValueName, FILETIME &dateTime);
+
+	template <typename T>
+	LONG Read32BitValueFromRegistry(HKEY key, const std::wstring &valueName, T &output)
+	{
+		DWORD value;
+		LONG result = ReadDword(key, valueName.c_str(), &value);
+
+		if (result == ERROR_SUCCESS)
+		{
+			output = value;
+		}
+
+		return result;
+	}
 }

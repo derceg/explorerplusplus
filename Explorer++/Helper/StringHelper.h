@@ -19,14 +19,14 @@ enum class SizeDisplayFormat
 };
 
 void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize, size_t cchBuf);
-void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize,
-	size_t cchBuf, BOOL bForceSize, SizeDisplayFormat sdf);
+void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize, size_t cchBuf, BOOL bForceSize,
+	SizeDisplayFormat sdf);
 TCHAR *PrintComma(unsigned long nPrint);
 TCHAR *PrintCommaLargeNum(LARGE_INTEGER lPrint);
 BOOL CheckWildcardMatch(const TCHAR *szWildcard, const TCHAR *szString, BOOL bCaseSensitive);
 void ReplaceCharacter(TCHAR *str, TCHAR ch, TCHAR chReplacement);
-void ReplaceCharacterWithString(const TCHAR *szBaseString, TCHAR *szOutput,
-	UINT cchMax, TCHAR chToReplace, const TCHAR *szReplacement);
+void ReplaceCharacterWithString(const TCHAR *szBaseString, TCHAR *szOutput, UINT cchMax,
+	TCHAR chToReplace, const TCHAR *szReplacement);
 void TrimStringLeft(std::wstring &str, const std::wstring &strWhitespace);
 void TrimStringRight(std::wstring &str, const std::wstring &strWhitespace);
 void TrimString(std::wstring &str, const std::wstring &strWhitespace);

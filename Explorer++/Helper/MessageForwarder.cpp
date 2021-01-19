@@ -54,7 +54,7 @@ INT_PTR MessageForwarder::ForwardMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LP
 		break;
 
 	case WM_MBUTTONUP:
-		return OnMButtonUp(&MAKEPOINTS(lParam));
+		return OnMButtonUp(&MAKEPOINTS(lParam), static_cast<UINT>(wParam));
 		break;
 
 	case WM_COMMAND:
@@ -144,9 +144,10 @@ INT_PTR MessageForwarder::OnHScroll(HWND hwnd)
 	return GetDefaultReturnValue(m_hwnd, m_uMsg, m_wParam, m_lParam);
 }
 
-INT_PTR MessageForwarder::OnMButtonUp(const POINTS *pts)
+INT_PTR MessageForwarder::OnMButtonUp(const POINTS *pts, UINT keysDown)
 {
 	UNREFERENCED_PARAMETER(pts);
+	UNREFERENCED_PARAMETER(keysDown);
 
 	return GetDefaultReturnValue(m_hwnd, m_uMsg, m_wParam, m_lParam);
 }

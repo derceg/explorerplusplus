@@ -416,14 +416,13 @@ SetDefaultColumnsDialogPersistentSettings &SetDefaultColumnsDialogPersistentSett
 
 void SetDefaultColumnsDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::SaveDwordToRegistry(
-		hKey, SETTING_FOLDER_TYPE, static_cast<DWORD>(m_FolderType));
+	RegistrySettings::SaveDword(hKey, SETTING_FOLDER_TYPE, static_cast<DWORD>(m_FolderType));
 }
 
 void SetDefaultColumnsDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
 	DWORD value;
-	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_FOLDER_TYPE, &value);
+	RegistrySettings::ReadDword(hKey, SETTING_FOLDER_TYPE, &value);
 	m_FolderType = static_cast<FolderType>(value);
 }
 

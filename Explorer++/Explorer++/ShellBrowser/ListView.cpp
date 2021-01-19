@@ -71,13 +71,20 @@ LRESULT CALLBACK ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 	{
 		POINT pt;
 		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-		OnListViewMButtonUp(&pt);
+		OnListViewMButtonUp(&pt, static_cast<UINT>(wParam));
 	}
 	break;
 
 	case WM_CLIPBOARDUPDATE:
 		OnClipboardUpdate();
 		return 0;
+
+	case WM_TIMER:
+		if (wParam == PROCESS_SHELL_CHANGES_TIMER_ID)
+		{
+			OnProcessShellChangeNotifications();
+		}
+		break;
 
 	case WM_NOTIFY:
 		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == ListView_GetHeader(m_hListView))
@@ -117,6 +124,10 @@ LRESULT CALLBACK ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 	case WM_APP_INFO_TIP_READY:
 		ProcessInfoTipResult(static_cast<int>(wParam));
 		break;
+
+	case WM_APP_SHELL_NOTIFY:
+		OnShellNotify(wParam, lParam);
+		break;
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
@@ -147,6 +158,10 @@ LRESULT CALLBACK ShellBrowser::ListViewParentProc(
 
 			case LVN_GETINFOTIP:
 				return OnListViewGetInfoTip(reinterpret_cast<NMLVGETINFOTIP *>(lParam));
+
+			case LVN_INSERTITEM:
+				OnListViewItemInserted(reinterpret_cast<NMLISTVIEW *>(lParam));
+				break;
 
 			case LVN_ITEMCHANGED:
 				OnListViewItemChanged(reinterpret_cast<NMLISTVIEW *>(lParam));
@@ -197,7 +212,7 @@ void ShellBrowser::OnListViewMButtonDown(const POINT *pt)
 	}
 }
 
-void ShellBrowser::OnListViewMButtonUp(const POINT *pt)
+void ShellBrowser::OnListViewMButtonUp(const POINT *pt, UINT keysDown)
 {
 	LV_HITTESTINFO ht;
 	ht.pt = *pt;
@@ -223,7 +238,14 @@ void ShellBrowser::OnListViewMButtonUp(const POINT *pt)
 		return;
 	}
 
-	m_tabNavigation->CreateNewTab(itemInfo.pidlComplete.get(), false);
+	bool switchToNewTab = m_config->openTabsInForeground;
+
+	if (WI_IsFlagSet(keysDown, MK_SHIFT))
+	{
+		switchToNewTab = !switchToNewTab;
+	}
+
+	m_tabNavigation->CreateNewTab(itemInfo.pidlComplete.get(), switchToNewTab);
 }
 
 void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
@@ -248,7 +270,18 @@ void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 	if (m_folderSettings.viewMode == +ViewMode::Thumbnails
 		&& (plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
 	{
-		plvItem->iImage = GetIconThumbnail(internalIndex);
+		const ItemInfo_t &itemInfo = m_itemInfoMap.at(internalIndex);
+		auto cachedThumbnailIndex = GetCachedThumbnailIndex(itemInfo);
+
+		if (cachedThumbnailIndex)
+		{
+			plvItem->iImage = *cachedThumbnailIndex;
+		}
+		else
+		{
+			plvItem->iImage = GetIconThumbnail(internalIndex);
+		}
+
 		plvItem->mask |= LVIF_DI_SETITEM;
 
 		QueueThumbnailTask(internalIndex);
@@ -312,15 +345,7 @@ void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 
 std::optional<int> ShellBrowser::GetCachedIconIndex(const ItemInfo_t &itemInfo)
 {
-	std::wstring filePath;
-	HRESULT hr = GetDisplayName(itemInfo.pidlComplete.get(), SHGDN_FORPARSING, filePath);
-
-	if (FAILED(hr))
-	{
-		return std::nullopt;
-	}
-
-	auto cachedItr = m_cachedIcons->findByPath(filePath);
+	auto cachedItr = m_cachedIcons->findByPath(itemInfo.parsingName);
 
 	if (cachedItr == m_cachedIcons->end())
 	{
@@ -477,6 +502,19 @@ void ShellBrowser::ProcessInfoTipResult(int infoTipResultId)
 	ListView_SetInfoTip(m_hListView, &infoTip);
 }
 
+void ShellBrowser::OnListViewItemInserted(const NMLISTVIEW *itemData)
+{
+	if (m_folderSettings.showInGroups)
+	{
+		auto groupId = GetItemGroupId(itemData->iItem);
+
+		if (groupId)
+		{
+			OnItemAddedToGroup(*groupId);
+		}
+	}
+}
+
 void ShellBrowser::OnListViewItemChanged(const NMLISTVIEW *changeData)
 {
 	if (changeData->uChanged != LVIF_STATE)
@@ -596,23 +634,17 @@ void ShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 	case VK_BACK:
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
-			std::wstring parsingPath;
+			TCHAR root[MAX_PATH];
 			HRESULT hr =
-				GetDisplayName(m_directoryState.pidlDirectory.get(), SHGDN_FORPARSING, parsingPath);
+				StringCchCopy(root, SIZEOF_ARRAY(root), m_directoryState.directory.c_str());
 
 			if (SUCCEEDED(hr))
 			{
-				TCHAR root[MAX_PATH];
-				hr = StringCchCopy(root, SIZEOF_ARRAY(root), parsingPath.c_str());
+				BOOL bRes = PathStripToRoot(root);
 
-				if (SUCCEEDED(hr))
+				if (bRes)
 				{
-					BOOL bRes = PathStripToRoot(root);
-
-					if (bRes)
-					{
-						m_navigationController->BrowseFolder(root);
-					}
+					m_navigationController->BrowseFolder(root);
 				}
 			}
 		}
@@ -696,11 +728,6 @@ void ShellBrowser::ShowPropertiesForSelectedFiles() const
 
 		rawPidls.push_back(pidl.get());
 		pidls.push_back(std::move(pidl));
-	}
-
-	if (rawPidls.empty())
-	{
-		return;
 	}
 
 	auto pidlDirectory = GetDirectoryIdl();
@@ -873,11 +900,8 @@ void ShellBrowser::SetFileAttributesForSelection()
 
 		const ItemInfo_t &item = GetItemByIndex(index);
 		sfai.wfd = item.wfd;
-
-		std::wstring parsingPath;
-		GetDisplayName(item.pidlComplete.get(), SHGDN_FORPARSING, parsingPath);
-
-		StringCchCopy(sfai.szFullFileName, SIZEOF_ARRAY(sfai.szFullFileName), parsingPath.c_str());
+		StringCchCopy(
+			sfai.szFullFileName, SIZEOF_ARRAY(sfai.szFullFileName), item.parsingName.c_str());
 
 		sfaiList.push_back(sfai);
 	}

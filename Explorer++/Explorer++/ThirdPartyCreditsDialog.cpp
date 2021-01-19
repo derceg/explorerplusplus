@@ -7,6 +7,7 @@
 #include "DarkModeHelper.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "../Helper/RichEditHelper.h"
 #include "../Helper/WindowHelper.h"
 
 ThirdPartyCreditsDialog::ThirdPartyCreditsDialog(HINSTANCE instance, HWND parent) :
@@ -85,25 +86,7 @@ INT_PTR ThirdPartyCreditsDialog::OnLinkNotification(const ENLINK *linkNotificati
 
 void ThirdPartyCreditsDialog::OnLinkClicked(const ENLINK *linkNotificationDetails)
 {
-	std::size_t textLength;
-
-	if (linkNotificationDetails->chrg.cpMax == -1)
-	{
-		textLength = GetWindowTextLength(linkNotificationDetails->nmhdr.hwndFrom);
-	}
-	else
-	{
-		textLength = linkNotificationDetails->chrg.cpMax - linkNotificationDetails->chrg.cpMin;
-	}
-
-	std::wstring text(textLength + 1, ' ');
-
-	TEXTRANGE textRange;
-	textRange.chrg = linkNotificationDetails->chrg;
-	textRange.lpstrText = text.data();
-	SendMessage(linkNotificationDetails->nmhdr.hwndFrom, EM_GETTEXTRANGE, 0,
-		reinterpret_cast<LPARAM>(&textRange));
-
+	std::wstring text = GetRichEditLinkText(linkNotificationDetails);
 	ShellExecute(nullptr, L"open", text.c_str(), nullptr, nullptr, SW_SHOW);
 }
 

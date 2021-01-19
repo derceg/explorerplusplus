@@ -17,6 +17,7 @@
 #include <wil/com.h>
 #include <IPHlpApi.h>
 #include <propkey.h>
+#include <filesystem>
 
 BOOL GetPrinterStatusDescription(DWORD dwStatus, TCHAR *szStatus, size_t cchMax);
 
@@ -216,7 +217,7 @@ std::wstring ProcessItemFileName(
 	if ((!globalFolderSettings.showExtensions || bHideExtension) && itemInfo.szDisplayName[0] != '.'
 		&& (itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 	{
-		static TCHAR szDisplayName[MAX_PATH];
+		TCHAR szDisplayName[MAX_PATH];
 
 		StringCchCopy(szDisplayName, SIZEOF_ARRAY(szDisplayName), itemInfo.szDisplayName);
 
@@ -248,6 +249,11 @@ std::wstring GetTypeColumnText(const BasicItemInfo_t &itemInfo)
 std::wstring GetSizeColumnText(
 	const BasicItemInfo_t &itemInfo, const GlobalFolderSettings &globalFolderSettings)
 {
+	if (!itemInfo.isFindDataValid)
+	{
+		return L"";
+	}
+
 	if ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
 		TCHAR drive[MAX_PATH];
@@ -305,6 +311,11 @@ std::wstring GetFolderSizeColumnText(
 std::wstring GetTimeColumnText(const BasicItemInfo_t &itemInfo, TimeType timeType,
 	const GlobalFolderSettings &globalFolderSettings)
 {
+	if (!itemInfo.isFindDataValid)
+	{
+		return L"";
+	}
+
 	TCHAR fileTime[64];
 	BOOL bRet = FALSE;
 
@@ -390,20 +401,39 @@ bool GetRealSizeColumnRawData(const BasicItemInfo_t &itemInfo, ULARGE_INTEGER &R
 std::wstring GetAttributeColumnText(const BasicItemInfo_t &itemInfo)
 {
 	TCHAR attributeString[32];
-	BuildFileAttributeString(
+	HRESULT hr = BuildFileAttributeString(
 		itemInfo.getFullPath().c_str(), attributeString, SIZEOF_ARRAY(attributeString));
 
-	return attributeString;
+	if (SUCCEEDED(hr))
+	{
+		return attributeString;
+	}
+
+	return L"";
 }
 
 std::wstring GetShortNameColumnText(const BasicItemInfo_t &itemInfo)
 {
-	if (lstrlen(itemInfo.wfd.cAlternateFileName) == 0)
+	DWORD length = GetShortPathName(itemInfo.getFullPath().c_str(), nullptr, 0);
+
+	if (length == 0)
 	{
-		return itemInfo.wfd.cFileName;
+		return {};
 	}
 
-	return itemInfo.wfd.cAlternateFileName;
+	std::wstring shortPath;
+	shortPath.resize(length);
+
+	length = GetShortPathName(
+		itemInfo.getFullPath().c_str(), shortPath.data(), static_cast<DWORD>(shortPath.capacity()));
+
+	if (length == 0)
+	{
+		return {};
+	}
+
+	std::filesystem::path path(shortPath);
+	return path.filename();
 }
 
 std::wstring GetOwnerColumnText(const BasicItemInfo_t &itemInfo)

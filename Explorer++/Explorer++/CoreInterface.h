@@ -13,6 +13,14 @@ enum class MousewheelSource
 	Other
 };
 
+enum class OpenFolderDisposition
+{
+	CurrentTab,
+	BackgroundTab,
+	ForegroundTab,
+	NewWindow
+};
+
 enum class WindowFocusSource
 {
 	AddressBar,
@@ -58,8 +66,10 @@ __interface IExplorerplusplus
 
 	HWND GetTreeView() const;
 
-	void OpenItem(const TCHAR *szItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
-	void OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
+	void OpenItem(const TCHAR *itemPath,
+		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
+	void OpenItem(PCIDLIST_ABSOLUTE pidlItem,
+		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
 
 	StatusBar *GetStatusBar();
 

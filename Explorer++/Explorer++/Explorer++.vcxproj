@@ -504,6 +504,7 @@
     <ClCompile Include="DisplayWindow\DisplayWindow.cpp" />
     <ClCompile Include="DisplayWindow\MsgHandler.cpp" />
     <ClCompile Include="PreservedTab.cpp" />
+    <ClCompile Include="ShellBrowser\Filtering.cpp" />
     <ClCompile Include="ShellBrowser\HistoryEntry.cpp" />
     <ClCompile Include="ShellBrowser\ShellNavigationController.cpp" />
     <ClCompile Include="ShellBrowser\PreservedFolderState.cpp" />

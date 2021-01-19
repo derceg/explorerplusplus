@@ -15,18 +15,21 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
+#include <boost/multi_index/hashed_index.hpp>
+#include <boost/multi_index/member.hpp>
+#include <boost/multi_index_container.hpp>
 #include <boost/signals2.hpp>
 #include <wil/com.h>
 #include <wil/resource.h>
+#include <thumbcache.h>
 #include <future>
 #include <list>
 #include <optional>
 #include <unordered_map>
+#include <unordered_set>
 
 #define WM_USER_UPDATEWINDOWS (WM_APP + 17)
 #define WM_USER_FILESADDED (WM_APP + 51)
-#define WM_USER_NEWITEMINSERTED (WM_APP + 200)
-#define WM_USER_DIRECTORYMODIFIED (WM_APP + 204)
 
 struct BasicItemInfo_t;
 class CachedIcons;
@@ -46,16 +49,6 @@ typedef struct
 	ULARGE_INTEGER TotalFolderSize;
 	ULARGE_INTEGER TotalSelectionSize;
 } FolderInfo_t;
-
-typedef struct
-{
-	std::wstring header;
-	int iGroupId;
-
-	/* Used to record the number of items in this group.
-	Mimics the feature available in Windows Vista and later. */
-	int nItems;
-} TypeGroup_t;
 
 class ShellBrowser : public IDropTarget, public IDropFilesCallback, public NavigatorInterface
 {
@@ -78,8 +71,17 @@ public:
 	FolderSettings GetFolderSettings() const;
 
 	ShellNavigationController *GetNavigationController() const;
+	boost::signals2::connection AddNavigationStartedObserver(
+		const NavigationStartedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override;
+	boost::signals2::connection AddNavigationCommittedObserver(
+		const NavigationCommittedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override;
 	boost::signals2::connection AddNavigationCompletedObserver(
 		const NavigationCompletedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override;
+	boost::signals2::connection AddNavigationFailedObserver(
+		const NavigationFailedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;
 
 	/* Drag and Drop. */
@@ -153,7 +155,7 @@ public:
 
 	void SetFileAttributesForSelection();
 
-	int SelectFiles(const TCHAR *FileNamePattern);
+	void SelectItems(const std::vector<PCIDLIST_ABSOLUTE> &pidls);
 	void GetFolderInfo(FolderInfo_t *pFolderInfo);
 	int LocateFileItemIndex(const TCHAR *szFileName) const;
 	bool InVirtualFolder() const;
@@ -179,7 +181,7 @@ public:
 	void OnGridlinesSettingChanged();
 
 	// Signals
-	SignalWrapper<ShellBrowser, void(PCIDLIST_ABSOLUTE pidl)> navigationStarted;
+	SignalWrapper<ShellBrowser, void()> directoryModified;
 	SignalWrapper<ShellBrowser, void()> listViewSelectionChanged;
 	SignalWrapper<ShellBrowser, void()> columnsChanged;
 
@@ -191,6 +193,7 @@ private:
 		unique_pidl_absolute pidlComplete;
 		unique_pidl_child pridl;
 		WIN32_FIND_DATA wfd;
+		bool isFindDataValid;
 		std::wstring parsingName;
 		std::wstring displayName;
 		std::wstring editingName;
@@ -206,6 +209,24 @@ private:
 		/* Used for temporary sorting in details mode (i.e.
 		when items need to be rearranged). */
 		int iRelativeSort;
+
+		ItemInfo_t() : wfd({}), isFindDataValid(false), iIcon(0), bDrive(FALSE)
+		{
+		}
+	};
+
+	struct ShellChangeNotification
+	{
+		LONG event;
+		unique_pidl_absolute pidl1;
+		unique_pidl_absolute pidl2;
+
+		ShellChangeNotification(LONG event, PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2) :
+			event(event),
+			pidl1(pidl1 ? ILCloneFull(pidl1) : nullptr),
+			pidl2(pidl2 ? ILCloneFull(pidl2) : nullptr)
+		{
+		}
 	};
 
 	struct AlteredFile_t
@@ -259,6 +280,38 @@ private:
 		std::wstring infoTip;
 	};
 
+	struct GroupInfo
+	{
+		std::wstring name;
+		int relativeSortPosition;
+
+		explicit GroupInfo(const std::wstring &name) : name(name), relativeSortPosition(0)
+		{
+		}
+
+		GroupInfo(const std::wstring &name, int relativeSortPosition) :
+			name(name),
+			relativeSortPosition(relativeSortPosition)
+		{
+		}
+	};
+
+	struct ListViewGroup
+	{
+		int id;
+		std::wstring name;
+		int relativeSortPosition;
+		int numItems;
+
+		ListViewGroup(int id, const GroupInfo &groupInfo) :
+			id(id),
+			name(groupInfo.name),
+			relativeSortPosition(groupInfo.relativeSortPosition),
+			numItems(0)
+		{
+		}
+	};
+
 	enum class GroupByDateType
 	{
 		Created,
@@ -278,7 +331,7 @@ private:
 		into the listview. */
 		std::vector<AwaitingAdd_t> awaitingAddList;
 
-		std::vector<int> filteredItemsList;
+		std::unordered_set<int> filteredItemsList;
 
 		int numItems;
 		int numFilesSelected;
@@ -289,29 +342,45 @@ private:
 		/* Cached folder size data. */
 		mutable std::unordered_map<int, ULONGLONG> cachedFolderSizes;
 
+		std::vector<ShellChangeNotification> shellChangeNotifications;
+
 		DirectoryState() :
 			virtualFolder(false),
 			itemIDCounter(0),
 			numItems(0),
 			numFilesSelected(0),
-			numFoldersSelected(0)
+			numFoldersSelected(0),
+			totalDirSize({}),
+			fileSelectionSize({})
 		{
-			totalDirSize = {};
-			fileSelectionSize = {};
 		}
 	};
 
-	static const int THUMBNAIL_ITEM_HORIZONTAL_SPACING = 20;
-	static const int THUMBNAIL_ITEM_VERTICAL_SPACING = 20;
+	// clang-format off
+	using ListViewGroupSet = boost::multi_index_container<ListViewGroup,
+		boost::multi_index::indexed_by<
+			boost::multi_index::hashed_unique<
+				boost::multi_index::member<ListViewGroup, int, &ListViewGroup::id>
+			>,
+			boost::multi_index::hashed_unique<
+				boost::multi_index::member<ListViewGroup, std::wstring, &ListViewGroup::name>
+			>
+		>
+	>;
+	// clang-format on
 
 	static const UINT_PTR LISTVIEW_SUBCLASS_ID = 0;
 
 	static const UINT WM_APP_COLUMN_RESULT_READY = WM_APP + 150;
 	static const UINT WM_APP_THUMBNAIL_RESULT_READY = WM_APP + 151;
 	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 152;
+	static const UINT WM_APP_SHELL_NOTIFY = WM_APP + 153;
 
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
+
+	static const UINT PROCESS_SHELL_CHANGES_TIMER_ID = 1;
+	static const UINT PROCESS_SHELL_CHANGES_TIMEOUT = 100;
 
 	ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface,
 		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
@@ -328,25 +397,28 @@ private:
 	void VerifySortMode();
 
 	/* NavigatorInterface methods. */
+	HRESULT BrowseFolder(const HistoryEntry &entry) override;
 	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true) override;
 
 	/* Browsing support. */
-	HRESULT EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory);
+	HRESULT EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry);
+	void PrepareToChangeFolders();
 	void ClearPendingResults();
 	void ResetFolderState();
+	void StoreCurrentlySelectedItems();
 	void InsertAwaitingItems(BOOL bInsertIntoGroup);
 	BOOL IsFileFiltered(const ItemInfo_t &itemInfo) const;
-	HRESULT AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild,
-		const std::wstring &displayName, const std::wstring &editingName, int itemIndex,
-		BOOL setPosition);
-	HRESULT AddItemInternal(int itemIndex, int itemId, BOOL setPosition);
-	int SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild,
-		const std::wstring &displayName, const std::wstring &editingName);
+	std::optional<int> AddItemInternal(IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory,
+		PCITEMID_CHILD pidlChild, int itemIndex, BOOL setPosition);
+	int AddItemInternal(int itemIndex, ItemInfo_t itemInfo, BOOL setPosition);
+	std::optional<ItemInfo_t> GetItemInformation(
+		IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild);
+	static HRESULT ExtractFindDataUsingPropertyStore(
+		IShellFolder *shellFolder, PCITEMID_CHILD pidlChild, WIN32_FIND_DATA &output);
 	void SetViewModeInternal(ViewMode viewMode);
 	void SetFirstColumnTextToCallback();
 	void SetFirstColumnTextToFilename();
 	void ApplyFolderEmptyBackgroundImage(bool apply);
-	void ApplyFilteringBackgroundImage(bool apply);
 
 	static LRESULT CALLBACK ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
@@ -363,7 +435,7 @@ private:
 
 	/* Listview. */
 	void OnListViewMButtonDown(const POINT *pt);
-	void OnListViewMButtonUp(const POINT *pt);
+	void OnListViewMButtonUp(const POINT *pt, UINT keysDown);
 	void OnListViewGetDisplayInfo(LPARAM lParam);
 	LRESULT OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip);
 	void QueueInfoTipTask(int internalIndex, const std::wstring &existingInfoTip);
@@ -371,6 +443,7 @@ private:
 		int internalIndex, const BasicItemInfo_t &basicItemInfo, const Config &config,
 		HINSTANCE instance, bool virtualFolder);
 	void ProcessInfoTipResult(int infoTipResultId);
+	void OnListViewItemInserted(const NMLISTVIEW *itemData);
 	void OnListViewItemChanged(const NMLISTVIEW *changeData);
 	void UpdateFileSelectionInfo(int internalIndex, BOOL selected);
 	void OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown);
@@ -418,52 +491,75 @@ private:
 	void RemoveDrive(const TCHAR *szDrive);
 
 	/* Directory altered support. */
-	void OnFileActionAdded(const TCHAR *szFileName);
+	void StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl);
+	void StopDirectoryMonitoring();
+	void OnShellNotify(WPARAM wParam, LPARAM lParam);
+	void OnProcessShellChangeNotifications();
+	void ProcessShellChangeNotification(const ShellChangeNotification &change);
+	void OnFileAdded(const TCHAR *szFileName);
+	void AddItem(PCIDLIST_ABSOLUTE pidl);
 	void RemoveItem(int iItemInternal);
-	void RemoveItemInternal(const TCHAR *szFileName);
-	void ModifyItemInternal(const TCHAR *FileName);
-	void OnFileActionRenamedOldName(const TCHAR *szFileName);
-	void OnFileActionRenamedNewName(const TCHAR *szFileName);
-	void RenameItem(int iItemInternal, const TCHAR *szNewFileName);
+	void OnItemRemoved(PCIDLIST_ABSOLUTE pidl);
+	void OnFileRemoved(const TCHAR *szFileName);
+	void OnFileModified(const TCHAR *fileName);
+	void ModifyItem(PCIDLIST_ABSOLUTE pidl);
+	void OnItemRenamed(PCIDLIST_ABSOLUTE pidlOld, PCIDLIST_ABSOLUTE pidlNew);
+	void OnFileRenamedOldName(const TCHAR *szFileName);
+	void OnFileRenamedNewName(const TCHAR *szFileName);
+	void RenameItem(int internalIndex, const TCHAR *szNewFileName);
+	void RenameItem(int internalIndex, PCIDLIST_ABSOLUTE pidlNew);
+	void InvalidateAllColumnsForItem(int itemIndex);
+	void InvalidateIconForItem(int itemIndex);
 	int DetermineItemSortedPosition(LPARAM lParam) const;
 
 	/* Filtering support. */
-	BOOL IsFilenameFiltered(const TCHAR *FileName) const;
+	void UpdateFiltering();
 	void RemoveFilteredItems();
 	void RemoveFilteredItem(int iItem, int iItemInternal);
-	void UpdateFiltering();
+	BOOL IsFilenameFiltered(const TCHAR *FileName) const;
 	void UnfilterAllItems();
+	void UnfilterItem(int internalIndex);
+	void RestoreFilteredItem(int internalIndex);
+	void ApplyFilteringBackgroundImage(bool apply);
 
-	/* Listview group support (real files). */
-	static INT CALLBACK GroupNameComparisonStub(INT Group1_ID, INT Group2_ID, void *pvData);
-	INT CALLBACK GroupNameComparison(INT Group1_ID, INT Group2_ID);
-	static INT CALLBACK GroupFreeSpaceComparisonStub(INT Group1_ID, INT Group2_ID, void *pvData);
-	INT CALLBACK GroupFreeSpaceComparison(INT Group1_ID, INT Group2_ID);
-	std::wstring RetrieveGroupHeader(int groupId);
+	/* Listview group support. */
+	static int CALLBACK GroupComparisonStub(int id1, int id2, void *data);
+	int GroupComparison(int id1, int id2);
+	int GroupNameComparison(const ListViewGroup &group1, const ListViewGroup &group2);
+	int GroupRelativePositionComparison(const ListViewGroup &group1, const ListViewGroup &group2);
+	const ListViewGroup GetListViewGroupById(int groupId);
 	int DetermineItemGroup(int iItemInternal);
-	std::wstring DetermineItemNameGroup(const BasicItemInfo_t &itemInfo) const;
-	std::wstring DetermineItemSizeGroup(const BasicItemInfo_t &itemInfo) const;
-	std::wstring DetermineItemTotalSizeGroup(const BasicItemInfo_t &itemInfo) const;
-	std::wstring DetermineItemTypeGroupVirtual(const BasicItemInfo_t &itemInfo) const;
-	std::wstring DetermineItemDateGroup(
+	std::optional<GroupInfo> DetermineItemNameGroup(const BasicItemInfo_t &itemInfo) const;
+	std::optional<GroupInfo> DetermineItemSizeGroup(const BasicItemInfo_t &itemInfo) const;
+	std::optional<GroupInfo> DetermineItemTotalSizeGroup(const BasicItemInfo_t &itemInfo) const;
+	std::optional<GroupInfo> DetermineItemTypeGroupVirtual(const BasicItemInfo_t &itemInfo) const;
+	std::optional<GroupInfo> DetermineItemDateGroup(
 		const BasicItemInfo_t &itemInfo, GroupByDateType dateType) const;
-	std::wstring DetermineItemSummaryGroup(const BasicItemInfo_t &itemInfo, const SHCOLUMNID *pscid,
-		const GlobalFolderSettings &globalFolderSettings) const;
-	std::wstring DetermineItemFreeSpaceGroup(const BasicItemInfo_t &itemInfo) const;
-	std::wstring DetermineItemAttributeGroup(const BasicItemInfo_t &itemInfo) const;
-	std::wstring DetermineItemOwnerGroup(const BasicItemInfo_t &itemInfo) const;
-	std::wstring DetermineItemVersionGroup(
+	std::optional<GroupInfo> DetermineItemSummaryGroup(const BasicItemInfo_t &itemInfo,
+		const SHCOLUMNID *pscid, const GlobalFolderSettings &globalFolderSettings) const;
+	std::optional<GroupInfo> DetermineItemFreeSpaceGroup(const BasicItemInfo_t &itemInfo) const;
+	std::optional<GroupInfo> DetermineItemAttributeGroup(const BasicItemInfo_t &itemInfo) const;
+	std::optional<GroupInfo> DetermineItemOwnerGroup(const BasicItemInfo_t &itemInfo) const;
+	std::optional<GroupInfo> DetermineItemVersionGroup(
 		const BasicItemInfo_t &itemInfo, const TCHAR *szVersionType) const;
-	std::wstring DetermineItemCameraPropertyGroup(
+	std::optional<GroupInfo> DetermineItemCameraPropertyGroup(
 		const BasicItemInfo_t &itemInfo, PROPID PropertyId) const;
-	std::wstring DetermineItemExtensionGroup(const BasicItemInfo_t &itemInfo) const;
-	std::wstring DetermineItemFileSystemGroup(const BasicItemInfo_t &itemInfo) const;
-	std::wstring DetermineItemNetworkStatus(const BasicItemInfo_t &itemInfo) const;
+	std::optional<GroupInfo> DetermineItemExtensionGroup(const BasicItemInfo_t &itemInfo) const;
+	std::optional<GroupInfo> DetermineItemFileSystemGroup(const BasicItemInfo_t &itemInfo) const;
+	std::optional<GroupInfo> DetermineItemNetworkStatus(const BasicItemInfo_t &itemInfo) const;
 
 	/* Other grouping support. */
-	int CheckGroup(std::wstring_view groupHeader, PFNLVGROUPCOMPARE groupComparison);
-	void InsertItemIntoGroup(int iItem, int iGroupId);
+	int GetOrCreateListViewGroup(const GroupInfo &groupInfo);
 	void MoveItemsIntoGroups();
+	void InsertItemIntoGroup(int index, int groupId);
+	void EnsureGroupExistsInListView(int groupId);
+	void InsertGroupIntoListView(const ListViewGroup &listViewGroup);
+	void RemoveGroupFromListView(const ListViewGroup &listViewGroup);
+	void UpdateGroupHeader(const ListViewGroup &listViewGroup);
+	std::wstring GenerateGroupHeader(const ListViewGroup &listViewGroup);
+	void OnItemRemovedFromGroup(int groupId);
+	void OnItemAddedToGroup(int groupId);
+	std::optional<int> GetItemGroupId(int index);
 
 	/* Listview icons. */
 	void ProcessIconResult(int internalIndex, int iconIndex);
@@ -471,8 +567,8 @@ private:
 
 	/* Thumbnails view. */
 	void QueueThumbnailTask(int internalIndex);
-	static std::optional<ThumbnailResult_t> FindThumbnailAsync(HWND listView, int thumbnailResultId,
-		int internalIndex, const BasicItemInfo_t &basicItemInfo);
+	std::optional<int> GetCachedThumbnailIndex(const ItemInfo_t &itemInfo);
+	static wil::unique_hbitmap GetThumbnail(PIDLIST_ABSOLUTE pidl, WTS_FLAGS flags);
 	void ProcessThumbnailResult(int thumbnailResultId);
 	void SetupThumbnailsView();
 	void RemoveThumbnailsView();
@@ -506,6 +602,7 @@ private:
 	/* Miscellaneous. */
 	BOOL CompareVirtualFolders(UINT uFolderCSIDL) const;
 	int LocateFileItemInternalIndex(const TCHAR *szFileName) const;
+	std::optional<int> GetItemInternalIndexForPidl(PCIDLIST_ABSOLUTE pidl) const;
 	std::optional<int> LocateItemByInternalIndex(int internalIndex) const;
 	void ApplyHeaderSortArrow();
 
@@ -514,7 +611,10 @@ private:
 	HWND m_hListView;
 	HWND m_hOwner;
 
+	NavigationStartedSignal m_navigationStartedSignal;
+	NavigationCommittedSignal m_navigationCommittedSignal;
 	NavigationCompletedSignal m_navigationCompletedSignal;
+	NavigationFailedSignal m_navigationFailedSignal;
 	std::unique_ptr<ShellNavigationController> m_navigationController;
 
 	TabNavigationInterface *m_tabNavigation;
@@ -575,19 +675,22 @@ private:
 	/* ID. */
 	const int m_ID;
 
+	/* Directory monitoring. */
+	ULONG m_shChangeNotifyId;
+
+	wil::com_ptr_nothrow<IShellFolder> m_desktopFolder;
+	unique_pidl_absolute m_recycleBinPidl;
+
 	/* Stores information on files that
 	have been modified (i.e. created, deleted,
 	renamed, etc). */
 	CRITICAL_SECTION m_csDirectoryAltered;
 	std::list<AlteredFile_t> m_AlteredList;
-	std::list<Added_t> m_FilesAdded;
 
 	int m_middleButtonItem;
 
 	/* Shell new. */
-	BOOL m_bNewItemCreated;
-	PCIDLIST_ABSOLUTE m_pidlNewItem;
-	int m_iIndexNewItem;
+	unique_pidl_absolute m_queuedRenameItem;
 
 	/* File selection. */
 	std::list<std::wstring> m_FileSelectionList;
@@ -610,7 +713,7 @@ private:
 	/* Drag and drop related data. */
 	IDragSourceHelper *m_pDragSourceHelper;
 	IDropTargetHelper *m_pDropTargetHelper;
-	std::list<DroppedFile_t> m_DroppedFileNameList;
+	std::list<DroppedFile_t> m_droppedFileNameList;
 	std::list<DraggedFile_t> m_DraggedFilesList;
 	DragType m_DragType;
 	POINT m_ptDraggedOffset;
@@ -621,10 +724,6 @@ private:
 	int m_bOverFolder;
 	int m_iDropFolder;
 
-	/* Listview groups. The group id is declared
-	explicitly, rather than taken from the size
-	of the group list, to avoid warnings concerning
-	size_t and int. */
-	std::list<TypeGroup_t> m_GroupList;
-	int m_iGroupId;
+	ListViewGroupSet m_listViewGroups;
+	int m_groupIdCounter;
 };

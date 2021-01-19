@@ -24,8 +24,6 @@
 #include "../Helper/Macros.h"
 #include "../Helper/iDirectoryMonitor.h"
 
-bool g_enableDarkMode = false;
-
 /*
  * Main window creation.
  *
@@ -39,11 +37,13 @@ void Explorerplusplus::OnCreate()
 	LoadAllSettings(&pLoadSave);
 	ApplyToolbarSettings();
 
+	m_config->registerForShellNotifications = g_registerForShellNotifications;
+
 	m_iconResourceLoader = std::make_unique<IconResourceLoader>(m_config->iconTheme);
 
 	SetLanguageModule();
 
-	if (g_enableDarkMode)
+	if (m_config->enableDarkMode)
 	{
 		SetUpDarkMode();
 	}

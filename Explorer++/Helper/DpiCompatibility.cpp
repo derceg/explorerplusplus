@@ -21,13 +21,16 @@ DpiCompatibility::DpiCompatibility() :
 
 	if (m_user32)
 	{
-		m_SystemParametersInfoForDpi = GetProcAddressByFunctionDeclaration(m_user32.get(), SystemParametersInfoForDpi);
-		m_GetSystemMetricsForDpi = GetProcAddressByFunctionDeclaration(m_user32.get(), GetSystemMetricsForDpi);
+		m_SystemParametersInfoForDpi =
+			GetProcAddressByFunctionDeclaration(m_user32.get(), SystemParametersInfoForDpi);
+		m_GetSystemMetricsForDpi =
+			GetProcAddressByFunctionDeclaration(m_user32.get(), GetSystemMetricsForDpi);
 		m_GetDpiForWindow = GetProcAddressByFunctionDeclaration(m_user32.get(), GetDpiForWindow);
 	}
 }
 
-BOOL DpiCompatibility::SystemParametersInfoForDpi(UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni, UINT dpi)
+BOOL DpiCompatibility::SystemParametersInfoForDpi(
+	UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni, UINT dpi)
 {
 	if (m_SystemParametersInfoForDpi)
 	{

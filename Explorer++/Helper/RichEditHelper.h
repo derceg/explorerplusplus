@@ -4,7 +4,4 @@
 
 #pragma once
 
-#include <Windows.h>
-
-BOOL GetClusterSize(const TCHAR *drive, DWORD *pdwClusterSize);
-TCHAR GetDriveLetterFromMask(ULONG unitmask);
+std::wstring GetRichEditLinkText(const ENLINK *linkNotificationDetails);

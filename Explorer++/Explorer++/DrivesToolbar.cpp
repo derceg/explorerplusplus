@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "DrivesToolbar.h"
+#include "Config.h"
 #include "CoreInterface.h"
 #include "DarkModeHelper.h"
 #include "MainResource.h"
@@ -77,24 +78,33 @@ void DrivesToolbar::Initialize(HWND hParent)
 	}
 }
 
-INT_PTR DrivesToolbar::OnMButtonUp(const POINTS *pts)
+INT_PTR DrivesToolbar::OnMButtonUp(const POINTS *pts, UINT keysDown)
 {
 	POINT pt;
 	POINTSTOPOINT(pt, *pts);
 	int iIndex =
 		static_cast<int>(SendMessage(m_hwnd, TB_HITTEST, 0, reinterpret_cast<LPARAM>(&pt)));
 
-	if (iIndex >= 0)
+	if (iIndex < 0)
 	{
-		TBBUTTON tbButton;
-		SendMessage(m_hwnd, TB_GETBUTTON, iIndex, reinterpret_cast<LPARAM>(&tbButton));
-
-		auto itr = m_mapID.find(static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData)));
-		assert(itr != m_mapID.end());
-
-		m_pexpp->GetTabContainer()->CreateNewTab(
-			itr->second.c_str(), TabSettings(_selected = true));
+		return 0;
 	}
+
+	TBBUTTON tbButton;
+	SendMessage(m_hwnd, TB_GETBUTTON, iIndex, reinterpret_cast<LPARAM>(&tbButton));
+
+	auto itr = m_mapID.find(static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData)));
+	assert(itr != m_mapID.end());
+
+	bool switchToNewTab = m_pexpp->GetConfig()->openTabsInForeground;
+
+	if (WI_IsFlagSet(keysDown, MK_SHIFT))
+	{
+		switchToNewTab = !switchToNewTab;
+	}
+
+	m_pexpp->GetTabContainer()->CreateNewTab(
+		itr->second.c_str(), TabSettings(_selected = switchToNewTab));
 
 	return 0;
 }
@@ -416,7 +426,7 @@ BOOL DrivesToolbar::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 
 	if (StrCmpI(szCmd, _T("open")) == 0)
 	{
-		m_pexpp->OpenItem(pidlParent, FALSE, FALSE);
+		m_pexpp->OpenItem(pidlParent);
 		return TRUE;
 	}
 
@@ -431,7 +441,8 @@ void DrivesToolbar::HandleCustomMenuItem(
 	switch (iCmd)
 	{
 	case MENU_ID_OPEN_IN_NEW_TAB:
-		m_pexpp->GetTabContainer()->CreateNewTab(pidlParent, TabSettings(_selected = true));
+		m_pexpp->GetTabContainer()->CreateNewTab(
+			pidlParent, TabSettings(_selected = m_pexpp->GetConfig()->openTabsInForeground));
 		break;
 	}
 }

@@ -8,14 +8,15 @@
 // don't exist in the minimum version of Windows supported by this application
 // (currently Windows 7), the declarations have been copied below. This makes it
 // easier to call the functions dynamically.
-// 
+//
 // Grouping functions together in a single header (that matches the original
 // header) also makes it easier to see which functions from later versions of
 // Windows are being used.
-// 
+//
 // See the official documentation for information on the minimum version of
 // Windows required to call these functions directly.
 
+// clang-format off
 BOOL
 WINAPI
 SystemParametersInfoForDpi(
@@ -35,3 +36,4 @@ UINT
 WINAPI
 GetDpiForWindow(
 	_In_ HWND hwnd);
+// clang-format on

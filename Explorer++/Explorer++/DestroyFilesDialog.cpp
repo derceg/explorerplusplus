@@ -301,12 +301,13 @@ DestroyFilesDialogPersistentSettings &DestroyFilesDialogPersistentSettings::GetI
 
 void DestroyFilesDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_OVERWRITE_METHOD, static_cast<DWORD>(m_overwriteMethod));
+	RegistrySettings::SaveDword(
+		hKey, SETTING_OVERWRITE_METHOD, static_cast<DWORD>(m_overwriteMethod));
 }
 
 void DestroyFilesDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::ReadDwordFromRegistry(
+	RegistrySettings::ReadDword(
 		hKey, SETTING_OVERWRITE_METHOD, reinterpret_cast<LPDWORD>(&m_overwriteMethod));
 }
 
@@ -321,7 +322,7 @@ void DestroyFilesDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName, B
 {
 	if (lstrcmpi(bstrName, SETTING_OVERWRITE_METHOD) == 0)
 	{
-		m_overwriteMethod = static_cast<NFileOperations::OverwriteMethod>(
-			NXMLSettings::DecodeIntValue(bstrValue));
+		m_overwriteMethod =
+			static_cast<NFileOperations::OverwriteMethod>(NXMLSettings::DecodeIntValue(bstrValue));
 	}
 }

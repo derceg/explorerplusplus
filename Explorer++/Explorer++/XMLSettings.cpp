@@ -111,6 +111,11 @@ will need to be changed correspondingly. */
 #define HASH_OVERWRITEEXISTINGFILESCONFIRMATION 1625342835
 #define HASH_LARGETOOLBARICONS 10895007
 #define HASH_ICON_THEME 3998265761
+#define HASH_CHECK_PINNED_TO_NAMESPACE_TREE_PROPERTY 145831142
+#define HASH_ENABLE_DARK_MODE 1623404723
+#define HASH_DISPLAY_MIXED_FILES_AND_FOLDERS 1168704423
+#define HASH_USE_NATURAL_SORT_ORDER 528323501
+#define HASH_OPEN_TABS_IN_FOREGROUND 2957281235
 
 struct ColumnXMLSaveData
 {
@@ -712,6 +717,27 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	NXMLSettings::WriteStandardSetting(
 		pXMLDom, pe.get(), _T("Setting"), _T("ViewModeGlobal"), szValue);
 
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
+		_T("CheckPinnedToNamespaceTreeProperty"),
+		NXMLSettings::EncodeBoolValue(m_config->checkPinnedToNamespaceTreeProperty));
+
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("EnableDarkMode"),
+		NXMLSettings::EncodeBoolValue(m_config->enableDarkMode));
+
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
+		_T("DisplayMixedFilesAndFolders"),
+		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.displayMixedFilesAndFolders));
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("UseNaturalSortOrder"),
+		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.useNaturalSortOrder));
+
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("OpenTabsInForeground"),
+		NXMLSettings::EncodeBoolValue(m_config->openTabsInForeground));
+
 	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pe.get());
 
@@ -872,11 +898,9 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 			}
 		}
 
-		hr =
-			m_tabContainer->CreateNewTab(szDirectory, tabSettings, &folderSettings, initialColumns);
+		m_tabContainer->CreateNewTab(szDirectory, tabSettings, &folderSettings, initialColumns);
 
-		if (hr == S_OK)
-			nTabsCreated++;
+		nTabsCreated++;
 	}
 
 	return nTabsCreated;
@@ -1783,6 +1807,28 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 
 	case HASH_ICON_THEME:
 		m_config->iconTheme = IconTheme::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
+		break;
+
+	case HASH_CHECK_PINNED_TO_NAMESPACE_TREE_PROPERTY:
+		m_config->checkPinnedToNamespaceTreeProperty = NXMLSettings::DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_ENABLE_DARK_MODE:
+		m_config->enableDarkMode = NXMLSettings::DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_DISPLAY_MIXED_FILES_AND_FOLDERS:
+		m_config->globalFolderSettings.displayMixedFilesAndFolders =
+			NXMLSettings::DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_USE_NATURAL_SORT_ORDER:
+		m_config->globalFolderSettings.useNaturalSortOrder =
+			NXMLSettings::DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_OPEN_TABS_IN_FOREGROUND:
+		m_config->openTabsInForeground = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 	}
 }

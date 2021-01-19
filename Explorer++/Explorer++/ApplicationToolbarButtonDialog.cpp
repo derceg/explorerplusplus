@@ -6,6 +6,7 @@
 #include "ApplicationToolbarButtonDialog.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "../Helper/Controls.h"
 
 ApplicationToolbarButtonDialog::ApplicationToolbarButtonDialog(
 	HINSTANCE hInstance, HWND hParent, ApplicationButton *Button, bool IsNew) :
@@ -24,7 +25,8 @@ INT_PTR ApplicationToolbarButtonDialog::OnInitDialog()
 		SetWindowText(m_hDlg, newText.c_str());
 	}
 
-	AddTooltipForControl(IDC_APP_EDIT_COMMAND, IDC_APP_EDIT_COMMAND_TT);
+	AddTooltipForControl(m_tipWnd, GetDlgItem(m_hDlg, IDC_APP_EDIT_COMMAND), GetInstance(),
+		IDS_APP_EDIT_COMMAND_TOOLTIP);
 
 	SetDlgItemText(m_hDlg, IDC_APP_EDIT_NAME, m_Button->Name.c_str());
 	SetDlgItemText(m_hDlg, IDC_APP_EDIT_COMMAND, m_Button->Command.c_str());

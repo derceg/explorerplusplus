@@ -156,7 +156,7 @@ void Explorerplusplus::ToggleFolders()
 	lShowWindow(m_shellTreeView->GetHWND(), m_config->showFolders);
 
 	SendMessage(m_mainToolbar->GetHWND(), TB_CHECKBUTTON, (WPARAM) ToolbarButton::Folders,
-		(LPARAM) m_config->showFolders);
+		m_config->showFolders);
 	ResizeWindows();
 }
 

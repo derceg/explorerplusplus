@@ -19,7 +19,7 @@ protected:
 	virtual INT_PTR OnCtlColorEdit(HWND hwnd, HDC hdc);
 	virtual INT_PTR OnCtlColorListBox(HWND hwnd, HDC hdc);
 	virtual INT_PTR OnHScroll(HWND hwnd);
-	virtual INT_PTR OnMButtonUp(const POINTS *pts);
+	virtual INT_PTR OnMButtonUp(const POINTS *pts, UINT keysDown);
 	virtual INT_PTR OnAppCommand(HWND hwnd, UINT uCmd, UINT uDevice, DWORD dwKeys);
 	virtual INT_PTR OnCommand(WPARAM wParam, LPARAM lParam);
 	virtual INT_PTR OnNotify(NMHDR *pnmhdr);

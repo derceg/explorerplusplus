@@ -22,9 +22,34 @@ class NavigatorFake : public NavigatorInterface
 public:
 	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true) override
 	{
-		m_navigationCompletedSignal(pidlDirectory, addHistoryEntry);
+		m_navigationStartedSignal(pidlDirectory);
+		m_navigationCommittedSignal(pidlDirectory, addHistoryEntry);
+		m_navigationCompletedSignal(pidlDirectory);
 
 		return S_OK;
+	}
+
+	HRESULT BrowseFolder(const HistoryEntry &entry) override
+	{
+		m_navigationStartedSignal(entry.GetPidl().get());
+		m_navigationCommittedSignal(entry.GetPidl().get(), false);
+		m_navigationCompletedSignal(entry.GetPidl().get());
+
+		return S_OK;
+	}
+
+	boost::signals2::connection AddNavigationStartedObserver(
+		const NavigationStartedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override
+	{
+		return m_navigationStartedSignal.connect(observer, position);
+	}
+
+	boost::signals2::connection AddNavigationCommittedObserver(
+		const NavigationCommittedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override
+	{
+		return m_navigationCommittedSignal.connect(observer, position);
 	}
 
 	boost::signals2::connection AddNavigationCompletedObserver(
@@ -34,8 +59,18 @@ public:
 		return m_navigationCompletedSignal.connect(observer, position);
 	}
 
+	boost::signals2::connection AddNavigationFailedObserver(
+		const NavigationFailedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override
+	{
+		return m_navigationFailedSignal.connect(observer, position);
+	}
+
 private:
+	NavigationStartedSignal m_navigationStartedSignal;
+	NavigationCommittedSignal m_navigationCommittedSignal;
 	NavigationCompletedSignal m_navigationCompletedSignal;
+	NavigationFailedSignal m_navigationFailedSignal;
 };
 
 class NavigatorMock : public NavigatorInterface
@@ -43,9 +78,25 @@ class NavigatorMock : public NavigatorInterface
 public:
 	NavigatorMock()
 	{
-		ON_CALL(*this, BrowseFolderImpl)
+		ON_CALL(*this, BrowseFolderImpl(_, _))
 			.WillByDefault([this](PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry) {
 				return m_fake.BrowseFolder(pidlDirectory, addHistoryEntry);
+			});
+
+		ON_CALL(*this, BrowseFolderImpl(_)).WillByDefault([this](const HistoryEntry &entry) {
+			return m_fake.BrowseFolder(entry);
+		});
+
+		ON_CALL(*this, AddNavigationStartedObserverImpl)
+			.WillByDefault([this](const NavigationStartedSignal::slot_type &observer,
+							   boost::signals2::connect_position position) {
+				return m_fake.AddNavigationStartedObserver(observer, position);
+			});
+
+		ON_CALL(*this, AddNavigationCommittedObserverImpl)
+			.WillByDefault([this](const NavigationCommittedSignal::slot_type &observer,
+							   boost::signals2::connect_position position) {
+				return m_fake.AddNavigationCommittedObserver(observer, position);
 			});
 
 		ON_CALL(*this, AddNavigationCompletedObserverImpl)
@@ -53,16 +104,51 @@ public:
 							   boost::signals2::connect_position position) {
 				return m_fake.AddNavigationCompletedObserver(observer, position);
 			});
+
+		ON_CALL(*this, AddNavigationFailedObserverImpl)
+			.WillByDefault([this](const NavigationFailedSignal::slot_type &observer,
+							   boost::signals2::connect_position position) {
+				return m_fake.AddNavigationFailedObserver(observer, position);
+			});
 	}
 
 	MOCK_METHOD(HRESULT, BrowseFolderImpl, (PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry));
+	MOCK_METHOD(HRESULT, BrowseFolderImpl, (const HistoryEntry &entry));
+	MOCK_METHOD(boost::signals2::connection, AddNavigationStartedObserverImpl,
+		(const NavigationStartedSignal::slot_type &observer,
+			boost::signals2::connect_position position));
+	MOCK_METHOD(boost::signals2::connection, AddNavigationCommittedObserverImpl,
+		(const NavigationCommittedSignal::slot_type &observer,
+			boost::signals2::connect_position position));
 	MOCK_METHOD(boost::signals2::connection, AddNavigationCompletedObserverImpl,
 		(const NavigationCompletedSignal::slot_type &observer,
+			boost::signals2::connect_position position));
+	MOCK_METHOD(boost::signals2::connection, AddNavigationFailedObserverImpl,
+		(const NavigationFailedSignal::slot_type &observer,
 			boost::signals2::connect_position position));
 
 	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true) override
 	{
 		return BrowseFolderImpl(pidlDirectory, addHistoryEntry);
+	}
+
+	HRESULT BrowseFolder(const HistoryEntry &entry) override
+	{
+		return BrowseFolderImpl(entry);
+	}
+
+	boost::signals2::connection AddNavigationStartedObserver(
+		const NavigationStartedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override
+	{
+		return AddNavigationStartedObserver(observer, position);
+	}
+
+	boost::signals2::connection AddNavigationCommittedObserver(
+		const NavigationCommittedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override
+	{
+		return AddNavigationCommittedObserverImpl(observer, position);
 	}
 
 	boost::signals2::connection AddNavigationCompletedObserver(
@@ -72,6 +158,13 @@ public:
 		return AddNavigationCompletedObserverImpl(observer, position);
 	}
 
+	boost::signals2::connection AddNavigationFailedObserver(
+		const NavigationFailedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back) override
+	{
+		return AddNavigationFailedObserverImpl(observer, position);
+	}
+
 private:
 	NavigatorFake m_fake;
 };
@@ -79,8 +172,7 @@ private:
 class TabNavigationMock : public TabNavigationInterface
 {
 public:
-	MOCK_METHOD(
-		HRESULT, CreateNewTab, (PCIDLIST_ABSOLUTE pidlDirectory, bool selected), (override));
+	MOCK_METHOD(void, CreateNewTab, (PCIDLIST_ABSOLUTE pidlDirectory, bool selected), (override));
 };
 
 class IconFetcherMock : public IconFetcherInterface
@@ -295,7 +387,7 @@ TEST_F(ShellNavigationControllerTest, GoUp)
 
 	unique_pidl_absolute pidlParent(SHSimpleIDListFromPath(L"C:\\"));
 	ASSERT_TRUE(pidlParent);
-	EXPECT_TRUE(CompareIdls(entry->GetPidl().get(), pidlParent.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidlParent.get()));
 
 	// The desktop folder is the root of the shell namespace.
 	unique_pidl_absolute pidlDesktop;
@@ -313,7 +405,7 @@ TEST_F(ShellNavigationControllerTest, GoUp)
 
 	entry = m_navigationController.GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(CompareIdls(entry->GetPidl().get(), pidlDesktop.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidlDesktop.get()));
 }
 
 TEST_F(ShellNavigationControllerTest, GetEntry)
@@ -334,7 +426,7 @@ TEST_F(ShellNavigationControllerTest, GetEntry)
 
 	entry = m_navigationController.GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(CompareIdls(entry->GetPidl().get(), pidl1.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl1.get()));
 
 	unique_pidl_absolute pidl2(SHSimpleIDListFromPath(L"C:\\Fake2"));
 	ASSERT_TRUE(pidl2);
@@ -344,14 +436,14 @@ TEST_F(ShellNavigationControllerTest, GetEntry)
 
 	entry = m_navigationController.GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(CompareIdls(entry->GetPidl().get(), pidl2.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl2.get()));
 
 	EXPECT_EQ(m_navigationController.GetCurrentIndex(), 1);
 	EXPECT_EQ(m_navigationController.GetCurrentEntry(), m_navigationController.GetEntryAtIndex(1));
 
 	entry = m_navigationController.GetEntryAtIndex(0);
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(CompareIdls(entry->GetPidl().get(), pidl1.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl1.get()));
 }
 
 TEST_F(ShellNavigationControllerTest, NavigationMode)
@@ -370,7 +462,7 @@ TEST_F(ShellNavigationControllerTest, NavigationMode)
 	m_navigationController.SetNavigationMode(
 		ShellNavigationController::NavigationMode::ForceNewTab);
 
-	EXPECT_CALL(m_navigator, BrowseFolderImpl).Times(0);
+	EXPECT_CALL(m_navigator, BrowseFolderImpl(_, _)).Times(0);
 
 	EXPECT_CALL(m_tabNavigation, CreateNewTab(pidl.get(), _));
 
@@ -398,7 +490,7 @@ TEST_F(ShellNavigationControllerTest, NavigationModeFirstNavigation)
 	ASSERT_TRUE(pidl2);
 
 	// Subsequent navigations should then open in a new tab when necessary.
-	EXPECT_CALL(m_navigator, BrowseFolderImpl).Times(0);
+	EXPECT_CALL(m_navigator, BrowseFolderImpl(pidl2.get(), _)).Times(0);
 	EXPECT_CALL(m_tabNavigation, CreateNewTab(pidl2.get(), _));
 
 	hr = m_navigationController.BrowseFolder(pidl2.get());
@@ -433,6 +525,6 @@ TEST_F(ShellNavigationControllerPreservedTest, CheckEntries)
 	{
 		auto entry = m_navigationController->GetEntryAtIndex(static_cast<int>(i));
 		ASSERT_NE(entry, nullptr);
-		EXPECT_TRUE(CompareIdls(entry->GetPidl().get(), m_preservedEntries[i]->pidl.get()));
+		EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), m_preservedEntries[i]->pidl.get()));
 	}
 }

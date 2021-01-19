@@ -89,13 +89,13 @@ namespace
 
 				colorRule.caseInsensitive = FALSE;
 
-				LONG lDescriptionStatus = NRegistrySettings::ReadStringFromRegistry(
+				LONG lDescriptionStatus = RegistrySettings::ReadString(
 					hKeyChild, _T("Description"), colorRule.strDescription);
-				LONG lFilenamePatternStatus = NRegistrySettings::ReadStringFromRegistry(
+				LONG lFilenamePatternStatus = RegistrySettings::ReadString(
 					hKeyChild, _T("FilenamePattern"), colorRule.strFilterPattern);
-				NRegistrySettings::ReadDwordFromRegistry(
+				RegistrySettings::ReadDword(
 					hKeyChild, _T("CaseInsensitive"), (LPDWORD) &colorRule.caseInsensitive);
-				NRegistrySettings::ReadDwordFromRegistry(
+				RegistrySettings::ReadDword(
 					hKeyChild, _T("Attributes"), &colorRule.dwFilterAttributes);
 
 				DWORD dwType = REG_BINARY;
@@ -153,14 +153,13 @@ namespace
 
 		if (res == ERROR_SUCCESS)
 		{
-			NRegistrySettings::SaveStringToRegistry(
+			RegistrySettings::SaveString(
 				hKeyChild, _T("Description"), ColorRule.strDescription.c_str());
-			NRegistrySettings::SaveStringToRegistry(
+			RegistrySettings::SaveString(
 				hKeyChild, _T("FilenamePattern"), ColorRule.strFilterPattern.c_str());
-			NRegistrySettings::SaveDwordToRegistry(
+			RegistrySettings::SaveDword(
 				hKeyChild, _T("CaseInsensitive"), ColorRule.caseInsensitive);
-			NRegistrySettings::SaveDwordToRegistry(
-				hKeyChild, _T("Attributes"), ColorRule.dwFilterAttributes);
+			RegistrySettings::SaveDword(hKeyChild, _T("Attributes"), ColorRule.dwFilterAttributes);
 			RegSetValueEx(hKeyChild, _T("Color"), 0, REG_BINARY,
 				reinterpret_cast<const BYTE *>(&ColorRule.rgbColour), sizeof(ColorRule.rgbColour));
 

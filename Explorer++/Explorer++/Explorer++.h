@@ -177,20 +177,17 @@ private:
 	void OnRightClick(NMHDR *nmhdr);
 	void OnSetFocus();
 	LRESULT OnDeviceChange(WPARAM wParam, LPARAM lParam);
-	LRESULT StatusBarMenuSelect(WPARAM wParam, LPARAM lParam);
-	void OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pidl);
 	void OnPreviousWindow();
 	void OnNextWindow();
-	void OnShellNewItemCreated(LPARAM lParam);
 	void OnAppCommand(UINT cmd);
-	void OnDirectoryModified(int iTabId);
+	void OnDirectoryModified(const Tab &tab);
 	void OnIdaRClick();
 	void OnAssocChanged();
 	LRESULT OnCustomDraw(LPARAM lParam);
 	void OnSelectTabByIndex(int iTab);
 
 	/* Main menu handlers. */
-	HRESULT OnNewTab();
+	void OnNewTab();
 	bool OnCloseTab();
 	void OnSaveDirectoryListing() const;
 	void OnCloneWindow();
@@ -285,9 +282,9 @@ private:
 	void OnTabListViewSelectionChanged(const Tab &tab);
 
 	/* TabNavigationInterface methods. */
-	HRESULT CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected) override;
+	void CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected) override;
 
-	void OnNavigationCompleted(const Tab &tab);
+	void OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
 
 	/* PluginInterface. */
 	IExplorerplusplus *GetCoreInterface() override;
@@ -386,13 +383,22 @@ private:
 	/* Window state update. */
 	void UpdateWindowStates(const Tab &tab);
 	void UpdateTreeViewSelection();
-	void SetStatusBarParts(int width);
 	void ResizeWindows();
 	void SetListViewInitialPosition(HWND hListView) override;
 	void AdjustFolderPanePosition();
-	HRESULT UpdateStatusBarText(const Tab &tab);
 	void ToggleFolders();
 	void UpdateLayout();
+
+	// Status bar
+	void CreateStatusBar();
+	void SetStatusBarParts(int width);
+	LRESULT StatusBarMenuSelect(WPARAM wParam, LPARAM lParam);
+	void OnNavigationStartedStatusBar(const Tab &tab, PCIDLIST_ABSOLUTE pidl);
+	void SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl);
+	void OnNavigationCompletedStatusBar(const Tab &tab);
+	void OnNavigationFailedStatusBar(const Tab &tab);
+	HRESULT UpdateStatusBarText(const Tab &tab);
+	int CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer);
 
 	/* Languages. */
 	void SetLanguageModule();
@@ -400,12 +406,18 @@ private:
 
 	/* File operations. */
 	void CopyToFolder(bool move);
-	void OpenAllSelectedItems(BOOL bOpenInNewTab);
-	void OpenListViewItem(int iItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
-	void OpenItem(const TCHAR *szItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow) override;
-	void OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow) override;
-	void OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
+	void OpenAllSelectedItems(
+		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
+	void OpenListViewItem(
+		int index, OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
+	void OpenItem(const TCHAR *itemPath,
+		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) override;
+	void OpenItem(PCIDLIST_ABSOLUTE pidlItem,
+		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) override;
+	void OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
+		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
 	void OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters) override;
+	OpenFolderDisposition DetermineOpenDisposition(bool isCtrlKeyDown, bool isShiftKeyDown);
 
 	/* File context menu. */
 	void AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems,
@@ -442,8 +454,8 @@ private:
 	void CopyColumnInfoToClipboard();
 
 	/* Bookmark handling. */
-	HRESULT ExpandAndBrowsePath(const TCHAR *szPath);
-	HRESULT ExpandAndBrowsePath(const TCHAR *szPath, BOOL bOpenInNewTab, BOOL bSwitchToNewTab);
+	void ExpandAndBrowsePath(const TCHAR *szPath);
+	void ExpandAndBrowsePath(const TCHAR *szPath, BOOL bOpenInNewTab, BOOL bSwitchToNewTab);
 
 	/* IExplorerplusplus methods. */
 	const Config *GetConfig() const override;
@@ -483,9 +495,7 @@ private:
 	bool OnRebarEraseBackground(HDC hdc);
 
 	/* Miscellaneous. */
-	void CreateStatusBar();
 	void InitializeDisplayWindow();
-	int CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer);
 	void ShowMainRebarBand(HWND hwnd, BOOL bShow);
 	BOOL OnMouseWheel(MousewheelSource mousewheelSource, WPARAM wParam, LPARAM lParam) override;
 	StatusBar *GetStatusBar() override;
@@ -516,7 +526,6 @@ private:
 
 	/** Internal state. **/
 	HWND m_hLastActiveWindow;
-	std::wstring m_CurrentDirectory;
 	bool m_bTreeViewRightClick;
 	bool m_bSelectingTreeViewDirectory;
 	bool m_bAttemptToolbarRestore;

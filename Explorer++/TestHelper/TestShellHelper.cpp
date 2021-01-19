@@ -59,34 +59,6 @@ TEST(GetDisplayName, Simple)
 	EXPECT_STREQ(L"Metadata.jpg", szDisplayName);
 }
 
-void TestIsIdlDirectory(const TCHAR *szFullFileName, BOOL bExpected)
-{
-	LPITEMIDLIST pidl = NULL;
-	HRESULT hr = GetIdlFromParsingName(szFullFileName, &pidl);
-	ASSERT_TRUE(SUCCEEDED(hr));
-
-	BOOL bRet = IsIdlDirectory(pidl);
-	EXPECT_EQ(bExpected, bRet);
-
-	CoTaskMemFree(pidl);
-}
-
-TEST(IsIdlDirectory, Directory)
-{
-	TCHAR szResourceDirectory[MAX_PATH];
-	GetTestResourceDirectory(szResourceDirectory, SIZEOF_ARRAY(szResourceDirectory));
-
-	TestIsIdlDirectory(szResourceDirectory, TRUE);
-}
-
-TEST(IsIdlDirectory, File)
-{
-	TCHAR szFullFileName[MAX_PATH];
-	GetTestResourceFilePath(L"Metadata.jpg", szFullFileName, SIZEOF_ARRAY(szFullFileName));
-
-	TestIsIdlDirectory(szFullFileName, FALSE);
-}
-
 TEST(IsPathGUID, GUID)
 {
 	BOOL bRet = IsPathGUID(L"::{26EE0668-A00A-44D7-9371-BEB064C98683}");
@@ -104,11 +76,11 @@ TEST(IsPathGUID, NonGUID)
 
 void TestCompareIdls(LPCITEMIDLIST pidl1, LPCITEMIDLIST pidl2, BOOL bExpected)
 {
-	BOOL bRet = CompareIdls(pidl1, pidl2);
+	BOOL bRet = ArePidlsEquivalent(pidl1, pidl2);
 	EXPECT_EQ(bExpected, bRet);
 }
 
-TEST(CompareIdls, Same)
+TEST(ArePidlsEquivalent, Same)
 {
 	LPITEMIDLIST pidl = NULL;
 	GetTestResourceDirectoryIdl(&pidl);
@@ -118,7 +90,7 @@ TEST(CompareIdls, Same)
 	CoTaskMemFree(pidl);
 }
 
-TEST(CompareIdls, Different)
+TEST(ArePidlsEquivalent, Different)
 {
 	LPITEMIDLIST pidl1 = NULL;
 	GetTestResourceFileIdl(L"Metadata.jpg", &pidl1);

@@ -22,17 +22,44 @@ int SortByName(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo
 	{
 		/* If the items been compared are both drives,
 		sort by drive letter, rather than display name. */
-		return StrCmpLogicalW(itemInfo1.getFullPath().c_str(), itemInfo2.getFullPath().c_str());
+		if (globalFolderSettings.useNaturalSortOrder)
+		{
+			return StrCmpLogicalW(itemInfo1.getFullPath().c_str(), itemInfo2.getFullPath().c_str());
+		}
+		else
+		{
+			return StrCmpIW(itemInfo1.getFullPath().c_str(), itemInfo2.getFullPath().c_str());
+		}
 	}
 
 	std::wstring name1 = GetNameColumnText(itemInfo1, globalFolderSettings);
 	std::wstring name2 = GetNameColumnText(itemInfo2, globalFolderSettings);
 
-	return StrCmpLogicalW(name1.c_str(), name2.c_str());
+	if (globalFolderSettings.useNaturalSortOrder)
+	{
+		return StrCmpLogicalW(name1.c_str(), name2.c_str());
+	}
+	else
+	{
+		return StrCmpIW(name1.c_str(), name2.c_str());
+	}
 }
 
 int SortBySize(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2)
 {
+	if (!itemInfo1.isFindDataValid && itemInfo2.isFindDataValid)
+	{
+		return -1;
+	}
+	else if (itemInfo1.isFindDataValid && !itemInfo2.isFindDataValid)
+	{
+		return 1;
+	}
+	else if (!itemInfo1.isFindDataValid && !itemInfo2.isFindDataValid)
+	{
+		return 0;
+	}
+
 	bool isFolder1 = WI_IsFlagSet(itemInfo1.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
 	bool isFolder2 = WI_IsFlagSet(itemInfo2.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
 
@@ -106,6 +133,19 @@ int SortByType(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo
 int SortByDate(
 	const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, DateType dateType)
 {
+	if (!itemInfo1.isFindDataValid && itemInfo2.isFindDataValid)
+	{
+		return -1;
+	}
+	else if (itemInfo1.isFindDataValid && !itemInfo2.isFindDataValid)
+	{
+		return 1;
+	}
+	else if (!itemInfo1.isFindDataValid && !itemInfo2.isFindDataValid)
+	{
+		return 0;
+	}
+
 	switch (dateType)
 	{
 	case DateType::Created:

@@ -32,7 +32,7 @@ public:
 		const std::vector<PITEMID_CHILD> &pidlItems, int iCmd) override;
 
 protected:
-	INT_PTR OnMButtonUp(const POINTS *pts) override;
+	INT_PTR OnMButtonUp(const POINTS *pts, UINT keysDown) override;
 
 private:
 	BOOST_STRONG_TYPEDEF(UINT, IDCounter);

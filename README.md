@@ -28,19 +28,19 @@ Up-to-date builds can be downloaded via AppVeyor. The links below will be for th
 
 ### 32-bit
 
-[explorerpp_x86.zip](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/explorerpp_x86.zip?branch=master&job=Platform%3A%20Win32)
+[explorerpp_x86.zip](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/explorerpp_x86.zip?branch=master&pr=false&job=Platform%3A%20Win32)
 
-[explorerpp_x86_symbols.zip](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/explorerpp_x86_symbols.zip?branch=master&job=Platform%3A%20Win32)
+[explorerpp_x86_symbols.zip](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/explorerpp_x86_symbols.zip?branch=master&pr=false&job=Platform%3A%20Win32)
 
 ### 64-bit
 
-[explorerpp_x64.zip](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/explorerpp_x64.zip?branch=master&job=Platform%3A%20x64)
+[explorerpp_x64.zip](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/explorerpp_x64.zip?branch=master&pr=false&job=Platform%3A%20x64)
 
-[explorerpp_x64_symbols.zip](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/explorerpp_x64_symbols.zip?branch=master&job=Platform%3A%20x64)
+[explorerpp_x64_symbols.zip](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/explorerpp_x64_symbols.zip?branch=master&pr=false&job=Platform%3A%20x64)
 
 ### Translations
 
-[explorerpp_translations.zip](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/explorerpp_translations.zip?branch=master&job=Platform%3A%20Win32)
+[explorerpp_translations.zip](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/explorerpp_translations.zip?branch=master&pr=false&job=Platform%3A%20Win32)
 
 For a full list of builds, see the [AppVeyor page](https://ci.appveyor.com/project/derceg/explorerplusplus) for this project.
 

@@ -139,8 +139,6 @@ private:
 	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	HRESULT ExpandDirectory(HTREEITEM hParent);
-	void AddDirectoryInternal(
-		IShellFolder *pShellFolder, PCIDLIST_ABSOLUTE pidlDirectory, HTREEITEM hParent);
 	void DirectoryModified(DWORD dwAction, const TCHAR *szFullFileName);
 	void DirectoryAltered();
 	HTREEITEM AddRoot();
@@ -163,7 +161,7 @@ private:
 	HTREEITEM LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand);
 	HTREEITEM LocateItemOnDesktopTree(const TCHAR *szFullFileName);
 	void OnMiddleButtonDown(const POINT *pt);
-	void OnMiddleButtonUp(const POINT *pt);
+	void OnMiddleButtonUp(const POINT *pt, UINT keysDown);
 	bool OnEndLabelEdit(const NMTVDISPINFO *dispInfo);
 
 	void UpdateCurrentClipboardObject(wil::com_ptr_nothrow<IDataObject> clipboardDataObject);

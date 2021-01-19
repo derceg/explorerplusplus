@@ -12,5 +12,5 @@
 // tab in any way.
 __interface TabNavigationInterface
 {
-	HRESULT CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected);
+	void CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected);
 };

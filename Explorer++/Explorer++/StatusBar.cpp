@@ -75,13 +75,16 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void Explorerplusplus::OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pidl)
+void Explorerplusplus::OnNavigationStartedStatusBar(const Tab &tab, PCIDLIST_ABSOLUTE pidl)
 {
-	if (!m_tabContainer->IsTabSelected(tab))
+	if (m_tabContainer->IsTabSelected(tab))
 	{
-		return;
+		SetStatusBarLoadingText(pidl);
 	}
+}
 
+void Explorerplusplus::SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl)
+{
 	std::wstring displayName;
 	HRESULT hr = GetDisplayName(pidl, SHGDN_INFOLDER, displayName);
 
@@ -97,11 +100,27 @@ void Explorerplusplus::OnNavigationStarted(const Tab &tab, PCIDLIST_ABSOLUTE pid
 
 	/* Browsing of a folder has started. Set the status bar text to indicate that
 	the folder is being loaded. */
-	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 0 | 0, (LPARAM) szLoadingText);
+	SendMessage(m_hStatusBar, SB_SETTEXT, 0 | 0, (LPARAM) szLoadingText);
 
 	/* Clear the text in all other parts of the status bar. */
-	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 1 | 0, (LPARAM) EMPTY_STRING);
-	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 2 | 0, (LPARAM) EMPTY_STRING);
+	SendMessage(m_hStatusBar, SB_SETTEXT, 1 | 0, (LPARAM) EMPTY_STRING);
+	SendMessage(m_hStatusBar, SB_SETTEXT, 2 | 0, (LPARAM) EMPTY_STRING);
+}
+
+void Explorerplusplus::OnNavigationCompletedStatusBar(const Tab &tab)
+{
+	if (m_tabContainer->IsTabSelected(tab))
+	{
+		UpdateStatusBarText(tab);
+	}
+}
+
+void Explorerplusplus::OnNavigationFailedStatusBar(const Tab &tab)
+{
+	if (m_tabContainer->IsTabSelected(tab))
+	{
+		UpdateStatusBarText(tab);
+	}
 }
 
 HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
@@ -168,52 +187,45 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 		}
 	}
 
-	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 0 | 0, (LPARAM) szItemsSelected);
+	SendMessage(m_hStatusBar, SB_SETTEXT, 0 | 0, (LPARAM) szItemsSelected);
 
-	if (tab.GetShellBrowser()->InVirtualFolder())
+	tab.GetShellBrowser()->GetFolderInfo(&folderInfo);
+
+	if ((nFilesSelected + nFoldersSelected) == 0)
 	{
-		LoadString(m_hLanguageModule, IDS_GENERAL_VIRTUALFOLDER, lpszSizeBuffer,
-			SIZEOF_ARRAY(lpszSizeBuffer));
+		/* No items(files or folders) selected. */
+		FormatSizeString(folderInfo.TotalFolderSize, lpszSizeBuffer, SIZEOF_ARRAY(lpszSizeBuffer),
+			m_config->globalFolderSettings.forceSize,
+			m_config->globalFolderSettings.sizeDisplayFormat);
 	}
 	else
 	{
-		tab.GetShellBrowser()->GetFolderInfo(&folderInfo);
-
-		if ((nFilesSelected + nFoldersSelected) == 0)
+		if (nFilesSelected == 0)
 		{
-			/* No items(files or folders) selected. */
-			FormatSizeString(folderInfo.TotalFolderSize, lpszSizeBuffer,
-				SIZEOF_ARRAY(lpszSizeBuffer), m_config->globalFolderSettings.forceSize,
-				m_config->globalFolderSettings.sizeDisplayFormat);
+			/* Only folders selected. Don't show any size in the status bar. */
+			StringCchCopy(lpszSizeBuffer, SIZEOF_ARRAY(lpszSizeBuffer), EMPTY_STRING);
 		}
 		else
 		{
-			if (nFilesSelected == 0)
-			{
-				/* Only folders selected. Don't show any size in the status bar. */
-				StringCchCopy(lpszSizeBuffer, SIZEOF_ARRAY(lpszSizeBuffer), EMPTY_STRING);
-			}
-			else
-			{
-				/* Mixture of files and folders selected. Show size of currently
-				selected files. */
-				FormatSizeString(folderInfo.TotalSelectionSize, lpszSizeBuffer,
-					SIZEOF_ARRAY(lpszSizeBuffer), m_config->globalFolderSettings.forceSize,
-					m_config->globalFolderSettings.sizeDisplayFormat);
-			}
+			/* Mixture of files and folders selected. Show size of currently
+			selected files. */
+			FormatSizeString(folderInfo.TotalSelectionSize, lpszSizeBuffer,
+				SIZEOF_ARRAY(lpszSizeBuffer), m_config->globalFolderSettings.forceSize,
+				m_config->globalFolderSettings.sizeDisplayFormat);
 		}
 	}
 
-	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 1 | 0, (LPARAM) lpszSizeBuffer);
+	SendMessage(m_hStatusBar, SB_SETTEXT, 1 | 0, (LPARAM) lpszSizeBuffer);
 
-	res = CreateDriveFreeSpaceString(m_CurrentDirectory.c_str(), szBuffer, SIZEOF_ARRAY(szBuffer));
+	res = CreateDriveFreeSpaceString(
+		tab.GetShellBrowser()->GetDirectory().c_str(), szBuffer, SIZEOF_ARRAY(szBuffer));
 
 	if (res == -1)
 	{
 		StringCchCopy(szBuffer, SIZEOF_ARRAY(szBuffer), EMPTY_STRING);
 	}
 
-	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM) 2 | 0, (LPARAM) szBuffer);
+	SendMessage(m_hStatusBar, SB_SETTEXT, 2 | 0, (LPARAM) szBuffer);
 
 	return S_OK;
 }

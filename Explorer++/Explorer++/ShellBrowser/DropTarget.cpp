@@ -375,7 +375,7 @@ void ShellBrowser::OnDropFile(const std::list<std::wstring> &PastedFileList, con
 				droppedFile.szFileName, SIZEOF_ARRAY(droppedFile.szFileName), strFilename.c_str());
 			PathStripPath(droppedFile.szFileName);
 
-			m_DroppedFileNameList.push_back(droppedFile);
+			m_droppedFileNameList.push_back(droppedFile);
 		}
 	}
 }

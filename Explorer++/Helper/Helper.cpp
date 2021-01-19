@@ -23,8 +23,8 @@ BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType subBlo
 BOOL GetStringTableValue(void *pBlock, LangAndCodePage *plcp, UINT nItems,
 	const TCHAR *szVersionInfo, TCHAR *szVersionBuffer, UINT cchMax);
 
-BOOL CreateFileTimeString(const FILETIME *utcFileTime,
-	TCHAR *szBuffer, size_t cchMax, BOOL bFriendlyDate)
+BOOL CreateFileTimeString(
+	const FILETIME *utcFileTime, TCHAR *szBuffer, size_t cchMax, BOOL bFriendlyDate)
 {
 	SYSTEMTIME localSystemTime;
 	BOOL ret = FileTimeToLocalSystemTime(utcFileTime, &localSystemTime);
@@ -37,8 +37,8 @@ BOOL CreateFileTimeString(const FILETIME *utcFileTime,
 	return CreateSystemTimeString(&localSystemTime, szBuffer, cchMax, bFriendlyDate);
 }
 
-BOOL CreateSystemTimeString(const SYSTEMTIME *localSystemTime,
-	TCHAR *szBuffer, size_t cchMax, BOOL bFriendlyDate)
+BOOL CreateSystemTimeString(
+	const SYSTEMTIME *localSystemTime, TCHAR *szBuffer, size_t cchMax, BOOL bFriendlyDate)
 {
 	if (bFriendlyDate)
 	{
@@ -51,12 +51,12 @@ BOOL CreateSystemTimeString(const SYSTEMTIME *localSystemTime,
 	}
 
 	TCHAR dateBuffer[512];
-	int iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, localSystemTime,
-		nullptr, dateBuffer, SIZEOF_ARRAY(dateBuffer));
+	int iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, localSystemTime, nullptr,
+		dateBuffer, SIZEOF_ARRAY(dateBuffer));
 
 	TCHAR timeBuffer[512];
-	int iReturn2 = GetTimeFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, localSystemTime,
-		nullptr, timeBuffer, SIZEOF_ARRAY(timeBuffer));
+	int iReturn2 = GetTimeFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, localSystemTime, nullptr,
+		timeBuffer, SIZEOF_ARRAY(timeBuffer));
 
 	if ((iReturn1 != 0) && (iReturn2 != 0))
 	{
@@ -67,8 +67,8 @@ BOOL CreateSystemTimeString(const SYSTEMTIME *localSystemTime,
 	return FALSE;
 }
 
-BOOL CreateFriendlySystemTimeString(const SYSTEMTIME *localSystemTime,
-	TCHAR *szBuffer, size_t cchMax)
+BOOL CreateFriendlySystemTimeString(
+	const SYSTEMTIME *localSystemTime, TCHAR *szBuffer, size_t cchMax)
 {
 	using namespace boost::gregorian;
 	using namespace boost::posix_time;
@@ -132,17 +132,17 @@ HINSTANCE StartCommandPrompt(const std::wstring &directory, bool elevated)
 	TCHAR systemPath[MAX_PATH];
 	BOOL bRes = SHGetSpecialFolderPath(nullptr, systemPath, CSIDL_SYSTEM, 0);
 
-	if(bRes)
+	if (bRes)
 	{
 		TCHAR commandPath[MAX_PATH];
 		TCHAR *szRet = PathCombine(commandPath, systemPath, _T("cmd.exe"));
 
-		if(szRet != nullptr)
+		if (szRet != nullptr)
 		{
 			TCHAR operation[32];
 			std::wstring parameters;
 
-			if(elevated)
+			if (elevated)
 			{
 				StringCchCopy(operation, SIZEOF_ARRAY(operation), _T("runas"));
 				parameters = _T("/K cd /d ") + directory;
@@ -152,8 +152,8 @@ HINSTANCE StartCommandPrompt(const std::wstring &directory, bool elevated)
 				StringCchCopy(operation, SIZEOF_ARRAY(operation), _T("open"));
 			}
 
-			hNewInstance = ShellExecute(nullptr, operation, commandPath, parameters.c_str(), directory.c_str(),
-				SW_SHOWNORMAL);
+			hNewInstance = ShellExecute(nullptr, operation, commandPath, parameters.c_str(),
+				directory.c_str(), SW_SHOWNORMAL);
 		}
 	}
 
@@ -164,10 +164,10 @@ BOOL GetFileSizeEx(const TCHAR *szFileName, PLARGE_INTEGER lpFileSize)
 {
 	BOOL bSuccess = FALSE;
 
-	wil::unique_hfile file(CreateFile(szFileName, GENERIC_READ,
-		FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, NULL, nullptr));
+	wil::unique_hfile file(CreateFile(szFileName, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+		nullptr, OPEN_EXISTING, NULL, nullptr));
 
-	if(file)
+	if (file)
 	{
 		bSuccess = GetFileSizeEx(file.get(), lpFileSize);
 	}
@@ -175,16 +175,15 @@ BOOL GetFileSizeEx(const TCHAR *szFileName, PLARGE_INTEGER lpFileSize)
 	return bSuccess;
 }
 
-BOOL CompareFileTypes(const TCHAR *pszFile1,const TCHAR *pszFile2)
+BOOL CompareFileTypes(const TCHAR *pszFile1, const TCHAR *pszFile2)
 {
 	SHFILEINFO shfi1;
 	SHFILEINFO shfi2;
 
-	DWORD_PTR result1 = SHGetFileInfo(pszFile1,NULL,&shfi1,sizeof(shfi1),SHGFI_TYPENAME);
-	DWORD_PTR result2 = SHGetFileInfo(pszFile2,NULL,&shfi2,sizeof(shfi2),SHGFI_TYPENAME);
+	DWORD_PTR result1 = SHGetFileInfo(pszFile1, NULL, &shfi1, sizeof(shfi1), SHGFI_TYPENAME);
+	DWORD_PTR result2 = SHGetFileInfo(pszFile2, NULL, &shfi2, sizeof(shfi2), SHGFI_TYPENAME);
 
-	if(result1 != 0 && result2 != 0 &&
-		StrCmp(shfi1.szTypeName,shfi2.szTypeName) == 0)
+	if (result1 != 0 && result2 != 0 && StrCmp(shfi1.szTypeName, shfi2.szTypeName) == 0)
 	{
 		return TRUE;
 	}
@@ -204,7 +203,7 @@ HRESULT BuildFileAttributeString(const TCHAR *lpszFileName, TCHAR *szOutput, siz
 	wil::unique_hfind findFile(FindFirstFile(lpszFileName, &wfd));
 	HRESULT hr = E_FAIL;
 
-	if(findFile)
+	if (findFile)
 	{
 		hr = BuildFileAttributeString(wfd.dwFileAttributes, szOutput, cchMax);
 	}
@@ -233,7 +232,7 @@ HRESULT BuildFileAttributeString(DWORD dwFileAttributes, TCHAR *szOutput, size_t
 
 void EnterAttributeIntoString(BOOL bEnter, TCHAR *string, int pos, TCHAR chAttribute)
 {
-	if(bEnter)
+	if (bEnter)
 	{
 		string[pos] = chAttribute;
 	}
@@ -247,17 +246,17 @@ BOOL GetFileOwner(const TCHAR *szFile, TCHAR *szOwner, size_t cchMax)
 {
 	BOOL success = FALSE;
 
-	wil::unique_hfile file(CreateFile(szFile, READ_CONTROL, FILE_SHARE_READ,
-		nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr));
+	wil::unique_hfile file(CreateFile(szFile, READ_CONTROL, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+		FILE_FLAG_BACKUP_SEMANTICS, nullptr));
 
-	if(file)
+	if (file)
 	{
 		PSID pSidOwner = nullptr;
 		PSECURITY_DESCRIPTOR pSD = nullptr;
 		DWORD dwRet = GetSecurityInfo(file.get(), SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION,
 			&pSidOwner, nullptr, nullptr, nullptr, &pSD);
 
-		if(dwRet == ERROR_SUCCESS)
+		if (dwRet == ERROR_SUCCESS)
 		{
 			success = FormatUserName(pSidOwner, szOwner, cchMax);
 			LocalFree(pSD);
@@ -276,10 +275,10 @@ BOOL FormatUserName(PSID sid, TCHAR *userName, size_t cchMax)
 	TCHAR domainName[512];
 	DWORD domainNameLength = SIZEOF_ARRAY(domainName);
 	SID_NAME_USE eUse;
-	BOOL bRet = LookupAccountSid(nullptr, sid, accountName, &accountNameLength,
-		domainName, &domainNameLength, &eUse);
+	BOOL bRet = LookupAccountSid(
+		nullptr, sid, accountName, &accountNameLength, domainName, &domainNameLength, &eUse);
 
-	if(bRet)
+	if (bRet)
 	{
 		StringCchPrintf(userName, cchMax, _T("%s\\%s"), domainName, accountName);
 		success = TRUE;
@@ -289,7 +288,7 @@ BOOL FormatUserName(PSID sid, TCHAR *userName, size_t cchMax)
 		LPTSTR stringSid;
 		bRet = ConvertSidToStringSid(sid, &stringSid);
 
-		if(bRet)
+		if (bRet)
 		{
 			StringCchCopy(userName, cchMax, stringSid);
 
@@ -309,7 +308,7 @@ BOOL CheckGroupMembership(GroupType groupType)
 	BOOL bMember = FALSE;
 	BOOL bRet;
 
-	switch(groupType)
+	switch (groupType)
 	{
 	case GroupType::Administrators:
 		dwGroup = DOMAIN_ALIAS_RID_ADMINS;
@@ -328,12 +327,12 @@ BOOL CheckGroupMembership(GroupType groupType)
 		break;
 	}
 
-	bRet = AllocateAndInitializeSid(&sia,2,SECURITY_BUILTIN_DOMAIN_RID,
-		dwGroup,0,0,0,0,0,0,&psid);
+	bRet = AllocateAndInitializeSid(
+		&sia, 2, SECURITY_BUILTIN_DOMAIN_RID, dwGroup, 0, 0, 0, 0, 0, 0, &psid);
 
-	if(bRet)
+	if (bRet)
 	{
-		CheckTokenMembership(nullptr,psid,&bMember);
+		CheckTokenMembership(nullptr, psid, &bMember);
 
 		FreeSid(psid);
 	}
@@ -345,15 +344,15 @@ DWORD GetNumFileHardLinks(const TCHAR *lpszFileName)
 {
 	DWORD nLinks = 0;
 
-	wil::unique_hfile file(CreateFile(lpszFileName, FILE_READ_ATTRIBUTES,
-		FILE_SHARE_READ, nullptr, OPEN_EXISTING, NULL, nullptr));
+	wil::unique_hfile file(CreateFile(lpszFileName, FILE_READ_ATTRIBUTES, FILE_SHARE_READ, nullptr,
+		OPEN_EXISTING, NULL, nullptr));
 
-	if(file)
+	if (file)
 	{
 		BY_HANDLE_FILE_INFORMATION fileInfo;
 		BOOL bRet = GetFileInformationByHandle(file.get(), &fileInfo);
 
-		if(bRet)
+		if (bRet)
 		{
 			nLinks = fileInfo.nNumberOfLinks;
 		}
@@ -368,7 +367,7 @@ BOOL ReadImageProperty(const TCHAR *lpszImage, PROPID propId, TCHAR *szProperty,
 	ULONG_PTR token;
 	Gdiplus::Status status = GdiplusStartup(&token, &gdiplusStartupInput, nullptr);
 
-	if(status != Gdiplus::Ok)
+	if (status != Gdiplus::Ok)
 	{
 		return FALSE;
 	}
@@ -385,14 +384,14 @@ BOOL ReadImageProperty(const TCHAR *lpszImage, PROPID propId, TCHAR *szProperty,
 	can be directly controlled. */
 	auto *image = new Gdiplus::Image(lpszImage, FALSE);
 
-	if(image->GetLastStatus() == Gdiplus::Ok)
+	if (image->GetLastStatus() == Gdiplus::Ok)
 	{
-		if(propId == PropertyTagImageWidth)
+		if (propId == PropertyTagImageWidth)
 		{
 			bSuccess = TRUE;
 			StringCchPrintf(szProperty, cchMax, _T("%u pixels"), image->GetWidth());
 		}
-		else if(propId == PropertyTagImageHeight)
+		else if (propId == PropertyTagImageHeight)
 		{
 			bSuccess = TRUE;
 			StringCchPrintf(szProperty, cchMax, _T("%u pixels"), image->GetHeight());
@@ -401,22 +400,23 @@ BOOL ReadImageProperty(const TCHAR *lpszImage, PROPID propId, TCHAR *szProperty,
 		{
 			UINT size = image->GetPropertyItemSize(propId);
 
-			if(size != 0)
+			if (size != 0)
 			{
 				auto *propertyItem = reinterpret_cast<Gdiplus::PropertyItem *>(malloc(size));
 
-				if(propertyItem != nullptr)
+				if (propertyItem != nullptr)
 				{
 					status = image->GetPropertyItem(propId, size, propertyItem);
 
-					if(status == Gdiplus::Ok)
+					if (status == Gdiplus::Ok)
 					{
-						if(propertyItem->type == PropertyTagTypeASCII)
+						if (propertyItem->type == PropertyTagTypeASCII)
 						{
-							int iRes = MultiByteToWideChar(CP_ACP, 0, reinterpret_cast<LPCSTR>(propertyItem->value), -1,
-								szProperty, cchMax);
+							int iRes = MultiByteToWideChar(CP_ACP, 0,
+								reinterpret_cast<LPCSTR>(propertyItem->value), -1, szProperty,
+								cchMax);
 
-							if(iRes != 0)
+							if (iRes != 0)
 							{
 								bSuccess = TRUE;
 							}
@@ -435,7 +435,7 @@ BOOL ReadImageProperty(const TCHAR *lpszImage, PROPID propId, TCHAR *szProperty,
 	return bSuccess;
 }
 
-BOOL GetFileNameFromUser(HWND hwnd,TCHAR *fullFileName,UINT cchMax,const TCHAR *initialDirectory)
+BOOL GetFileNameFromUser(HWND hwnd, TCHAR *fullFileName, UINT cchMax, const TCHAR *initialDirectory)
 {
 	/* As per the documentation for
 	the OPENFILENAME structure, the
@@ -447,25 +447,25 @@ BOOL GetFileNameFromUser(HWND hwnd,TCHAR *fullFileName,UINT cchMax,const TCHAR *
 	OPENFILENAME ofn;
 	BOOL bRet;
 
-	ofn.lStructSize			= sizeof(ofn);
-	ofn.hwndOwner			= hwnd;
-	ofn.lpstrFilter			= filter;
-	ofn.lpstrCustomFilter	= nullptr;
-	ofn.nMaxCustFilter		= 0;
-	ofn.nFilterIndex		= 0;
-	ofn.lpstrFile			= fullFileName;
-	ofn.nMaxFile			= cchMax;
-	ofn.lpstrFileTitle		= nullptr;
-	ofn.nMaxFileTitle		= 0;
-	ofn.lpstrInitialDir		= initialDirectory;
-	ofn.lpstrTitle			= nullptr;
-	ofn.Flags				= OFN_ENABLESIZING|OFN_OVERWRITEPROMPT|OFN_EXPLORER;
-	ofn.lpstrDefExt			= _T("txt");
-	ofn.lCustData			= NULL;
-	ofn.lpfnHook			= nullptr;
-	ofn.pvReserved			= nullptr;
-	ofn.dwReserved			= NULL;
-	ofn.FlagsEx				= NULL;
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = hwnd;
+	ofn.lpstrFilter = filter;
+	ofn.lpstrCustomFilter = nullptr;
+	ofn.nMaxCustFilter = 0;
+	ofn.nFilterIndex = 0;
+	ofn.lpstrFile = fullFileName;
+	ofn.nMaxFile = cchMax;
+	ofn.lpstrFileTitle = nullptr;
+	ofn.nMaxFileTitle = 0;
+	ofn.lpstrInitialDir = initialDirectory;
+	ofn.lpstrTitle = nullptr;
+	ofn.Flags = OFN_ENABLESIZING | OFN_OVERWRITEPROMPT | OFN_EXPLORER;
+	ofn.lpstrDefExt = _T("txt");
+	ofn.lCustData = NULL;
+	ofn.lpfnHook = nullptr;
+	ofn.pvReserved = nullptr;
+	ofn.dwReserved = NULL;
+	ofn.FlagsEx = NULL;
 
 	bRet = GetSaveFileName(&ofn);
 
@@ -474,23 +474,23 @@ BOOL GetFileNameFromUser(HWND hwnd,TCHAR *fullFileName,UINT cchMax,const TCHAR *
 
 BOOL IsImage(const TCHAR *szFileName)
 {
-	static const TCHAR *IMAGE_EXTS[] = {_T("bmp"),_T("ico"),
-	_T("gif"),_T("jpg"),_T("exf"),_T("png"),_T("tif"),_T("wmf"),_T("emf"),_T("tiff")};
+	static const TCHAR *IMAGE_EXTS[] = { _T("bmp"), _T("ico"), _T("gif"), _T("jpg"), _T("exf"),
+		_T("png"), _T("tif"), _T("wmf"), _T("emf"), _T("tiff") };
 	TCHAR *ext;
 	int i = 0;
 
 	ext = PathFindExtension(szFileName);
 
-	if(ext == nullptr || (ext + 1) == nullptr)
+	if (ext == nullptr || (ext + 1) == nullptr)
 	{
 		return FALSE;
 	}
 
 	ext++;
 
-	for(i = 0;i < SIZEOF_ARRAY(IMAGE_EXTS);i++)
+	for (i = 0; i < SIZEOF_ARRAY(IMAGE_EXTS); i++)
 	{
-		if(lstrcmpi(ext, IMAGE_EXTS[i]) == 0)
+		if (lstrcmpi(ext, IMAGE_EXTS[i]) == 0)
 		{
 			return TRUE;
 		}
@@ -499,25 +499,24 @@ BOOL IsImage(const TCHAR *szFileName)
 	return FALSE;
 }
 
-BOOL GetFileProductVersion(const TCHAR *szFullFileName,
-	DWORD *pdwProductVersionLS, DWORD *pdwProductVersionMS)
+BOOL GetFileProductVersion(
+	const TCHAR *szFullFileName, DWORD *pdwProductVersionLS, DWORD *pdwProductVersionMS)
 {
 	return GetFileVersionValue(szFullFileName, VersionSubBlockType::Root, nullptr,
-		pdwProductVersionLS, pdwProductVersionMS,
-		nullptr, nullptr, 0);
+		pdwProductVersionLS, pdwProductVersionMS, nullptr, nullptr, 0);
 }
 
 BOOL GetFileLanguage(const TCHAR *szFullFileName, WORD *pwLanguage)
 {
-	return GetFileVersionValue(szFullFileName, VersionSubBlockType::Translation,
-		pwLanguage, nullptr, nullptr, nullptr, nullptr, 0);
+	return GetFileVersionValue(szFullFileName, VersionSubBlockType::Translation, pwLanguage,
+		nullptr, nullptr, nullptr, nullptr, 0);
 }
 
-BOOL GetVersionInfoString(const TCHAR *szFullFileName, const TCHAR *szVersionInfo,
-	TCHAR *szVersionBuffer, UINT cchMax)
+BOOL GetVersionInfoString(
+	const TCHAR *szFullFileName, const TCHAR *szVersionInfo, TCHAR *szVersionBuffer, UINT cchMax)
 {
-	return GetFileVersionValue(szFullFileName, VersionSubBlockType::StringTableValue,
-		nullptr, nullptr, nullptr, szVersionInfo, szVersionBuffer, cchMax);
+	return GetFileVersionValue(szFullFileName, VersionSubBlockType::StringTableValue, nullptr,
+		nullptr, nullptr, szVersionInfo, szVersionBuffer, cchMax);
 }
 
 BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType subBlockType,
@@ -527,15 +526,15 @@ BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType subBlo
 	BOOL bSuccess = FALSE;
 	DWORD dwLen = GetFileVersionInfoSize(szFullFileName, nullptr);
 
-	if(dwLen > 0)
+	if (dwLen > 0)
 	{
 		void *pBlock = malloc(dwLen);
 
-		if(pBlock != nullptr)
+		if (pBlock != nullptr)
 		{
 			BOOL bRet = GetFileVersionInfo(szFullFileName, NULL, dwLen, pBlock);
 
-			if(bRet)
+			if (bRet)
 			{
 				TCHAR szSubBlock[64];
 				LPVOID *pBuffer = nullptr;
@@ -544,16 +543,17 @@ BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType subBlo
 				LangAndCodePage *plcp = nullptr;
 				VS_FIXEDFILEINFO *pvsffi = nullptr;
 
-				if(subBlockType == VersionSubBlockType::Root)
+				if (subBlockType == VersionSubBlockType::Root)
 				{
 					StringCchCopy(szSubBlock, SIZEOF_ARRAY(szSubBlock), _T("\\"));
 					pBuffer = reinterpret_cast<LPVOID *>(&pvsffi);
 					uStructureSize = sizeof(VS_FIXEDFILEINFO);
 				}
-				else if(subBlockType == VersionSubBlockType::Translation ||
-					subBlockType == VersionSubBlockType::StringTableValue)
+				else if (subBlockType == VersionSubBlockType::Translation
+					|| subBlockType == VersionSubBlockType::StringTableValue)
 				{
-					StringCchCopy(szSubBlock, SIZEOF_ARRAY(szSubBlock), _T("\\VarFileInfo\\Translation"));
+					StringCchCopy(
+						szSubBlock, SIZEOF_ARRAY(szSubBlock), _T("\\VarFileInfo\\Translation"));
 					pBuffer = reinterpret_cast<LPVOID *>(&plcp);
 					uStructureSize = sizeof(LangAndCodePage);
 				}
@@ -561,20 +561,20 @@ BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType subBlo
 				UINT uLen;
 				bRet = VerQueryValue(pBlock, szSubBlock, pBuffer, &uLen);
 
-				if(bRet && (uLen >= uStructureSize))
+				if (bRet && (uLen >= uStructureSize))
 				{
 					bSuccess = TRUE;
 
-					if(subBlockType == VersionSubBlockType::Root)
+					if (subBlockType == VersionSubBlockType::Root)
 					{
 						*pdwProductVersionLS = pvsffi->dwProductVersionLS;
 						*pdwProductVersionMS = pvsffi->dwProductVersionMS;
 					}
-					else if(subBlockType == VersionSubBlockType::Translation)
+					else if (subBlockType == VersionSubBlockType::Translation)
 					{
 						*pwLanguage = plcp[0].wLanguage;
 					}
-					else if(subBlockType == VersionSubBlockType::StringTableValue)
+					else if (subBlockType == VersionSubBlockType::StringTableValue)
 					{
 						bSuccess = GetStringTableValue(pBlock, plcp, uLen / sizeof(LangAndCodePage),
 							szVersionInfo, szVersionBuffer, cchMax);
@@ -595,25 +595,25 @@ BOOL GetStringTableValue(void *pBlock, LangAndCodePage *plcp, UINT nItems,
 	BOOL bSuccess = FALSE;
 	LANGID userLangId = GetUserDefaultLangID();
 
-	for(UINT i = 0; i < nItems; i++)
+	for (UINT i = 0; i < nItems; i++)
 	{
 		/* If the bottom eight bits of the language id's match, use this
 		version information (since this means that the version information
 		and the users default language are the same). Also use this version
 		information if the language is not specified (i.e. wLanguage is 0). */
-		if((plcp[i].wLanguage & 0xFF) == (userLangId & 0xFF) ||
-			plcp[i].wLanguage == 0)
+		if ((plcp[i].wLanguage & 0xFF) == (userLangId & 0xFF) || plcp[i].wLanguage == 0)
 		{
 			TCHAR szSubBlock[64];
 			StringCchPrintf(szSubBlock, SIZEOF_ARRAY(szSubBlock),
-				_T("\\StringFileInfo\\%04X%04X\\%s"), plcp[i].wLanguage,
-				plcp[i].wCodePage, szVersionInfo);
+				_T("\\StringFileInfo\\%04X%04X\\%s"), plcp[i].wLanguage, plcp[i].wCodePage,
+				szVersionInfo);
 
 			TCHAR *szBuffer;
 			UINT uLen;
-			BOOL bRet = VerQueryValue(pBlock, szSubBlock, reinterpret_cast<LPVOID *>(&szBuffer), &uLen);
+			BOOL bRet =
+				VerQueryValue(pBlock, szSubBlock, reinterpret_cast<LPVOID *>(&szBuffer), &uLen);
 
-			if(bRet && (uLen > 0))
+			if (bRet && (uLen > 0))
 			{
 				StringCchCopy(szVersionBuffer, cchMax, szBuffer);
 				bSuccess = TRUE;
@@ -625,26 +625,26 @@ BOOL GetStringTableValue(void *pBlock, LangAndCodePage *plcp, UINT nItems,
 	return bSuccess;
 }
 
-void GetCPUBrandString(char *pszCPUBrand,UINT cchBuf)
+void GetCPUBrandString(char *pszCPUBrand, UINT cchBuf)
 {
-	int cpuInfo[4] = {-1};
+	int cpuInfo[4] = { -1 };
 	char szCPUBrand[64];
 
 	/* Refer to cpuid documentation at:
 	http://msdn.microsoft.com/en-us/library/hskdteyh(v=vs.100).aspx */
-	__cpuid(cpuInfo,0x80000002);
-	memcpy(szCPUBrand,cpuInfo,sizeof(cpuInfo));
-	__cpuid(cpuInfo,0x80000003);
-	memcpy(szCPUBrand + 16,cpuInfo,sizeof(cpuInfo));
-	__cpuid(cpuInfo,0x80000004);
-	memcpy(szCPUBrand + 32,cpuInfo,sizeof(cpuInfo));
+	__cpuid(cpuInfo, 0x80000002);
+	memcpy(szCPUBrand, cpuInfo, sizeof(cpuInfo));
+	__cpuid(cpuInfo, 0x80000003);
+	memcpy(szCPUBrand + 16, cpuInfo, sizeof(cpuInfo));
+	__cpuid(cpuInfo, 0x80000004);
+	memcpy(szCPUBrand + 32, cpuInfo, sizeof(cpuInfo));
 
-	StringCchCopyA(pszCPUBrand,cchBuf,szCPUBrand);
+	StringCchCopyA(pszCPUBrand, cchBuf, szCPUBrand);
 }
 
-HRESULT GetMediaMetadata(const TCHAR *szFileName,const TCHAR *szAttribute,BYTE **pszOutput)
+HRESULT GetMediaMetadata(const TCHAR *szFileName, const TCHAR *szAttribute, BYTE **pszOutput)
 {
-	typedef HRESULT (WINAPI *WMCREATEEDITOR_PROC)(IWMMetadataEditor **);
+	typedef HRESULT(WINAPI * WMCREATEEDITOR_PROC)(IWMMetadataEditor **);
 	WMCREATEEDITOR_PROC pWMCreateEditor = nullptr;
 	HMODULE hWMVCore;
 	IWMMetadataEditor *pEditor = nullptr;
@@ -653,23 +653,23 @@ HRESULT GetMediaMetadata(const TCHAR *szFileName,const TCHAR *szAttribute,BYTE *
 
 	hWMVCore = LoadLibrary(_T("wmvcore.dll"));
 
-	if(hWMVCore != nullptr)
+	if (hWMVCore != nullptr)
 	{
-		pWMCreateEditor = (WMCREATEEDITOR_PROC)GetProcAddress(hWMVCore,"WMCreateEditor");
+		pWMCreateEditor = (WMCREATEEDITOR_PROC) GetProcAddress(hWMVCore, "WMCreateEditor");
 
-		if(pWMCreateEditor != nullptr)
+		if (pWMCreateEditor != nullptr)
 		{
 			hr = pWMCreateEditor(&pEditor);
 
-			if(SUCCEEDED(hr))
+			if (SUCCEEDED(hr))
 			{
 				hr = pEditor->Open(szFileName);
 
-				if(SUCCEEDED(hr))
+				if (SUCCEEDED(hr))
 				{
 					hr = pEditor->QueryInterface(IID_PPV_ARGS(&pWMHeaderInfo));
 
-					if(SUCCEEDED(hr))
+					if (SUCCEEDED(hr))
 					{
 						WORD wStreamNum;
 						WMT_ATTR_DATATYPE type;
@@ -678,16 +678,17 @@ HRESULT GetMediaMetadata(const TCHAR *szFileName,const TCHAR *szAttribute,BYTE *
 						/* Any stream. Should be zero for MP3 files. */
 						wStreamNum = 0;
 
-						hr = pWMHeaderInfo->GetAttributeByName(&wStreamNum,szAttribute,&type,nullptr,&cbLength);
+						hr = pWMHeaderInfo->GetAttributeByName(
+							&wStreamNum, szAttribute, &type, nullptr, &cbLength);
 
-						if(SUCCEEDED(hr))
+						if (SUCCEEDED(hr))
 						{
-							*pszOutput = (BYTE *)malloc(cbLength);
+							*pszOutput = (BYTE *) malloc(cbLength);
 
-							if(*pszOutput != nullptr)
+							if (*pszOutput != nullptr)
 							{
-								hr = pWMHeaderInfo->GetAttributeByName(&wStreamNum,szAttribute,&type,
-									*pszOutput,&cbLength);
+								hr = pWMHeaderInfo->GetAttributeByName(
+									&wStreamNum, szAttribute, &type, *pszOutput, &cbLength);
 							}
 						}
 
@@ -705,9 +706,8 @@ HRESULT GetMediaMetadata(const TCHAR *szFileName,const TCHAR *szAttribute,BYTE *
 	return hr;
 }
 
-void SetFORMATETC(FORMATETC *pftc, CLIPFORMAT cfFormat,
-	DVTARGETDEVICE *ptd, DWORD dwAspect, LONG lindex,
-	DWORD tymed)
+void SetFORMATETC(FORMATETC *pftc, CLIPFORMAT cfFormat, DVTARGETDEVICE *ptd, DWORD dwAspect,
+	LONG lindex, DWORD tymed)
 {
 	pftc->cfFormat = cfFormat;
 	pftc->tymed = tymed;
