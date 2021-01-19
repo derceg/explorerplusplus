@@ -1954,20 +1954,13 @@ void ShellTreeView::CopySelectedItemToClipboard(bool copy)
 	HTREEITEM item = TreeView_GetSelection(m_hTreeView);
 	auto &itemInfo = GetItemByHandle(item);
 
-	std::wstring fullFileName;
-	HRESULT hr = GetDisplayName(itemInfo.pidl.get(), SHGDN_FORPARSING, fullFileName);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	std::vector<std::wstring> fileNameList = { fullFileName };
+	std::vector<PCIDLIST_ABSOLUTE> items = { itemInfo.pidl.get() };
 	wil::com_ptr_nothrow<IDataObject> clipboardDataObject;
+	HRESULT hr;
 
 	if (copy)
 	{
-		hr = CopyFiles(fileNameList, &clipboardDataObject);
+		hr = CopyFiles(items, &clipboardDataObject);
 
 		if (SUCCEEDED(hr))
 		{
@@ -1976,7 +1969,7 @@ void ShellTreeView::CopySelectedItemToClipboard(bool copy)
 	}
 	else
 	{
-		hr = CutFiles(fileNameList, &clipboardDataObject);
+		hr = CutFiles(items, &clipboardDataObject);
 
 		if (SUCCEEDED(hr))
 		{

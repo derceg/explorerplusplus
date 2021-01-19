@@ -53,7 +53,7 @@ void Explorerplusplus::OnCopy(BOOL bCopy)
 	if (hFocus == m_hActiveListView)
 	{
 		Tab &selectedTab = m_tabContainer->GetSelectedTab();
-		selectedTab.GetShellBrowser()->CopySelectedItemToClipboard(bCopy);
+		selectedTab.GetShellBrowser()->CopySelectedItemsToClipboard(bCopy);
 	}
 	else if (hFocus == m_shellTreeView->GetHWND())
 	{

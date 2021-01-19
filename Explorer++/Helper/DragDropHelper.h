@@ -6,3 +6,4 @@
 
 STGMEDIUM GetStgMediumForGlobal(HGLOBAL global);
 STGMEDIUM GetStgMediumForStream(IStream *stream);
+HRESULT SetPreferredDropEffect(IDataObject *dataObject, DWORD effect);

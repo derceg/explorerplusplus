@@ -164,15 +164,7 @@ void ShellBrowser::StoreCurrentlySelectedItems()
 		return;
 	}
 
-	std::vector<PCIDLIST_ABSOLUTE> selectedItems;
-	int index = -1;
-
-	while ((index = ListView_GetNextItem(m_hListView, index, LVNI_SELECTED)) != -1)
-	{
-		auto &item = GetItemByIndex(index);
-		selectedItems.push_back(item.pidlComplete.get());
-	}
-
+	std::vector<PCIDLIST_ABSOLUTE> selectedItems = GetSelectedItemPidls();
 	entry->SetSelectedItems(selectedItems);
 }
 

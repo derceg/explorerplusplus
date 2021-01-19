@@ -109,7 +109,7 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		if (pfcmi->uFrom == FROM_LISTVIEW)
 		{
 			Tab &selectedTab = m_tabContainer->GetSelectedTab();
-			selectedTab.GetShellBrowser()->CopySelectedItemToClipboard(true);
+			selectedTab.GetShellBrowser()->CopySelectedItemsToClipboard(true);
 		}
 		else if (pfcmi->uFrom == FROM_TREEVIEW)
 		{
@@ -123,7 +123,7 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		if (pfcmi->uFrom == FROM_LISTVIEW)
 		{
 			Tab &selectedTab = m_tabContainer->GetSelectedTab();
-			selectedTab.GetShellBrowser()->CopySelectedItemToClipboard(false);
+			selectedTab.GetShellBrowser()->CopySelectedItemsToClipboard(false);
 		}
 		else if (pfcmi->uFrom == FROM_TREEVIEW)
 		{

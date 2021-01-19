@@ -612,7 +612,7 @@ void ShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 	case 'C':
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
-			CopySelectedItemToClipboard(true);
+			CopySelectedItemsToClipboard(true);
 		}
 		break;
 
@@ -627,7 +627,7 @@ void ShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 	case 'X':
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
-			CopySelectedItemToClipboard(false);
+			CopySelectedItemsToClipboard(false);
 		}
 		break;
 
@@ -944,15 +944,16 @@ HRESULT ShellBrowser::GetListViewItemAttributes(int item, SFGAOF *attributes) co
 	return GetItemAttributes(itemInfo.pidlComplete.get(), attributes);
 }
 
-std::vector<std::wstring> ShellBrowser::GetSelectedItems()
+std::vector<PCIDLIST_ABSOLUTE> ShellBrowser::GetSelectedItemPidls()
 {
-	std::vector<std::wstring> selectedFiles;
-	int item = -1;
+	std::vector<PCIDLIST_ABSOLUTE> selectedItemPidls;
+	int index = -1;
 
-	while ((item = ListView_GetNextItem(m_hListView, item, LVNI_SELECTED)) != -1)
+	while ((index = ListView_GetNextItem(m_hListView, index, LVNI_SELECTED)) != -1)
 	{
-		selectedFiles.push_back(GetItemFullName(item));
+		const auto &item = GetItemByIndex(index);
+		selectedItemPidls.push_back(item.pidlComplete.get());
 	}
 
-	return selectedFiles;
+	return selectedItemPidls;
 }

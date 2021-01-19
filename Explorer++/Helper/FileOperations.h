@@ -39,11 +39,10 @@ namespace NFileOperations
 	BOOL CreateBrowseDialog(HWND hOwner, const std::wstring &strTitle, PIDLIST_ABSOLUTE *ppidl);
 };
 
-HRESULT CopyFiles(
-	const std::vector<std::wstring> &FileNameList, IDataObject **pClipboardDataObject);
-HRESULT CutFiles(const std::vector<std::wstring> &FileNameList, IDataObject **pClipboardDataObject);
+HRESULT CopyFiles(const std::vector<PCIDLIST_ABSOLUTE> &items, IDataObject **dataObjectOut);
+HRESULT CutFiles(const std::vector<PCIDLIST_ABSOLUTE> &items, IDataObject **dataObjectOut);
 HRESULT CopyFilesToClipboard(
-	const std::vector<std::wstring> &FileNameList, BOOL bMove, IDataObject **pClipboardDataObject);
+	const std::vector<PCIDLIST_ABSOLUTE> &items, bool move, IDataObject **dataObjectOut);
 
 int PasteLinksToClipboardFiles(const TCHAR *szDestination);
 int PasteHardLinks(const TCHAR *szDestination);

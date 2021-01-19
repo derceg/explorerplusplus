@@ -148,6 +148,9 @@
     <ClCompile Include="RichEditHelper.cpp">
       <Filter>Control Support</Filter>
     </ClCompile>
+    <ClCompile Include="DataObjectWrapper.cpp">
+      <Filter>Data Exchange\Drag and Drop</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
@@ -308,6 +311,9 @@
     </ClInclude>
     <ClInclude Include="RichEditHelper.h">
       <Filter>Control Support</Filter>
+    </ClInclude>
+    <ClInclude Include="DataObjectWrapper.h">
+      <Filter>Data Exchange\Drag and Drop</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

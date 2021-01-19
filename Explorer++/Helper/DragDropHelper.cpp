@@ -4,6 +4,8 @@
 
 #include "stdafx.h"
 #include "DragDropHelper.h"
+#include "DataExchangeHelper.h"
+#include <wil/com.h>
 
 STGMEDIUM GetStgMediumForGlobal(HGLOBAL global)
 {
@@ -21,4 +23,26 @@ STGMEDIUM GetStgMediumForStream(IStream *stream)
 	storage.pstm = stream;
 	storage.pUnkForRelease = nullptr;
 	return storage;
+}
+
+HRESULT SetPreferredDropEffect(IDataObject *dataObject, DWORD effect)
+{
+	FORMATETC ftc = { static_cast<CLIPFORMAT>(RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT)),
+		nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+
+	auto global = WriteDataToGlobal(&effect, sizeof(effect));
+
+	if (!global)
+	{
+		return E_FAIL;
+	}
+
+	STGMEDIUM stg = GetStgMediumForGlobal(global.get());
+	RETURN_IF_FAILED(dataObject->SetData(&ftc, &stg, TRUE));
+
+	// The IDataObject instance has taken ownership of stg at this point, so it's responsible for
+	// freeing the data.
+	global.release();
+
+	return S_OK;
 }

@@ -160,7 +160,7 @@ public:
 	int LocateFileItemIndex(const TCHAR *szFileName) const;
 	bool InVirtualFolder() const;
 	BOOL CanCreate() const;
-	HRESULT CopySelectedItemToClipboard(bool copy);
+	HRESULT CopySelectedItemsToClipboard(bool copy);
 	void StartRenamingSelectedItems();
 	void DeleteSelectedItems(bool permanent);
 
@@ -447,7 +447,7 @@ private:
 	void OnListViewItemChanged(const NMLISTVIEW *changeData);
 	void UpdateFileSelectionInfo(int internalIndex, BOOL selected);
 	void OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown);
-	std::vector<std::wstring> GetSelectedItems();
+	std::vector<PCIDLIST_ABSOLUTE> GetSelectedItemPidls();
 
 	HRESULT GetListViewItemAttributes(int item, SFGAOF *attributes) const;
 

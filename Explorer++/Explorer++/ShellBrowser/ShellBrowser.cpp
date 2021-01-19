@@ -1441,15 +1441,21 @@ void ShellBrowser::StartRenamingMultipleFiles()
 	massRenameDialog.ShowModalDialog();
 }
 
-HRESULT ShellBrowser::CopySelectedItemToClipboard(bool copy)
+HRESULT ShellBrowser::CopySelectedItemsToClipboard(bool copy)
 {
-	auto selectedFiles = GetSelectedItems();
+	std::vector<PCIDLIST_ABSOLUTE> pidls = GetSelectedItemPidls();
+
+	if (pidls.empty())
+	{
+		return E_UNEXPECTED;
+	}
+
 	wil::com_ptr_nothrow<IDataObject> clipboardDataObject;
 	HRESULT hr;
 
 	if (copy)
 	{
-		hr = CopyFiles(selectedFiles, &clipboardDataObject);
+		hr = CopyFiles(pidls, &clipboardDataObject);
 
 		if (SUCCEEDED(hr))
 		{
@@ -1458,7 +1464,7 @@ HRESULT ShellBrowser::CopySelectedItemToClipboard(bool copy)
 	}
 	else
 	{
-		hr = CutFiles(selectedFiles, &clipboardDataObject);
+		hr = CutFiles(pidls, &clipboardDataObject);
 
 		if (SUCCEEDED(hr))
 		{

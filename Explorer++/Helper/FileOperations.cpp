@@ -4,6 +4,8 @@
 
 #include "stdafx.h"
 #include "FileOperations.h"
+#include "DataObjectWrapper.h"
+#include "DragDropHelper.h"
 #include "DriveInfo.h"
 #include "Helper.h"
 #include "Macros.h"
@@ -397,69 +399,44 @@ BOOL NFileOperations::SaveDirectoryListing(
 	return FALSE;
 }
 
-HRESULT CopyFiles(const std::vector<std::wstring> &FileNameList, IDataObject **pClipboardDataObject)
+HRESULT CopyFiles(const std::vector<PCIDLIST_ABSOLUTE> &items, IDataObject **dataObjectOut)
 {
-	return CopyFilesToClipboard(FileNameList, FALSE, pClipboardDataObject);
+	return CopyFilesToClipboard(items, false, dataObjectOut);
 }
 
-HRESULT CutFiles(const std::vector<std::wstring> &FileNameList, IDataObject **pClipboardDataObject)
+HRESULT CutFiles(const std::vector<PCIDLIST_ABSOLUTE> &items, IDataObject **dataObjectOut)
 {
-	return CopyFilesToClipboard(FileNameList, TRUE, pClipboardDataObject);
+	return CopyFilesToClipboard(items, true, dataObjectOut);
 }
 
 HRESULT CopyFilesToClipboard(
-	const std::vector<std::wstring> &FileNameList, BOOL bMove, IDataObject **pClipboardDataObject)
+	const std::vector<PCIDLIST_ABSOLUTE> &items, bool move, IDataObject **dataObjectOut)
 {
-	FORMATETC ftc[2];
-	STGMEDIUM stg[2];
-	BuildHDropList(&ftc[0], &stg[0], FileNameList);
+	wil::com_ptr_nothrow<IShellItemArray> shellItemArray;
+	RETURN_IF_FAILED(SHCreateShellItemArrayFromIDLists(
+		static_cast<UINT>(items.size()), items.data(), &shellItemArray));
 
-	ftc[1].cfFormat = (CLIPFORMAT) RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT);
-	ftc[1].ptd = nullptr;
-	ftc[1].dwAspect = DVASPECT_CONTENT;
-	ftc[1].lindex = -1;
-	ftc[1].tymed = TYMED_HGLOBAL;
+	wil::com_ptr_nothrow<IDataObject> shellDataObject;
+	RETURN_IF_FAILED(
+		shellItemArray->BindToHandler(nullptr, BHID_DataObject, IID_PPV_ARGS(&shellDataObject)));
 
-	HRESULT hr = E_FAIL;
-	HGLOBAL hglb = GlobalAlloc(GMEM_MOVEABLE, sizeof(DWORD));
+	DWORD effect = move ? DROPEFFECT_MOVE : DROPEFFECT_COPY;
+	RETURN_IF_FAILED(SetPreferredDropEffect(shellDataObject.get(), effect));
 
-	if (hglb != nullptr)
-	{
-		auto *pdwCopyEffect = static_cast<DWORD *>(GlobalLock(hglb));
+	// Although it's possible to retrieve the IDataObjectAsyncCapability interface from the shell
+	// IDataObject instance and call SetAsyncMode(), it appears that doesn't actually enable
+	// asynchronous transfer. That's the reason the shell IDataObject instance is wrapped here.
+	wil::com_ptr_nothrow<IDataObject> dataObject = DataObjectWrapper::Create(shellDataObject.get());
 
-		if (pdwCopyEffect != nullptr)
-		{
-			if (bMove)
-			{
-				*pdwCopyEffect = DROPEFFECT_MOVE;
-			}
-			else
-			{
-				*pdwCopyEffect = DROPEFFECT_COPY;
-			}
+	wil::com_ptr_nothrow<IDataObjectAsyncCapability> asyncCapability;
+	RETURN_IF_FAILED(dataObject->QueryInterface(IID_PPV_ARGS(&asyncCapability)));
+	RETURN_IF_FAILED(asyncCapability->SetAsyncMode(TRUE));
 
-			GlobalUnlock(hglb);
+	RETURN_IF_FAILED(OleSetClipboard(dataObject.get()));
 
-			stg[1].pUnkForRelease = nullptr;
-			stg[1].hGlobal = hglb;
-			stg[1].tymed = TYMED_HGLOBAL;
+	*dataObjectOut = dataObject.detach();
 
-			*pClipboardDataObject = CreateDataObject(ftc, stg, 2);
-
-			IDataObjectAsyncCapability *pAsyncCapability = nullptr;
-			hr = (*pClipboardDataObject)->QueryInterface(IID_PPV_ARGS(&pAsyncCapability));
-
-			if (SUCCEEDED(hr))
-			{
-				pAsyncCapability->SetAsyncMode(TRUE);
-				pAsyncCapability->Release();
-
-				hr = OleSetClipboard(*pClipboardDataObject);
-			}
-		}
-	}
-
-	return hr;
+	return S_OK;
 }
 
 int PasteLinksToClipboardFiles(const TCHAR *szDestination)
