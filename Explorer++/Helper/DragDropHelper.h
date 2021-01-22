@@ -4,6 +4,10 @@
 
 #pragma once
 
+#include <shtypes.h>
+
 STGMEDIUM GetStgMediumForGlobal(HGLOBAL global);
 STGMEDIUM GetStgMediumForStream(IStream *stream);
 HRESULT SetPreferredDropEffect(IDataObject *dataObject, DWORD effect);
+HRESULT CreateDataObjectForShellTransfer(
+	const std::vector<PCIDLIST_ABSOLUTE> &items, IDataObject **dataObjectOut);

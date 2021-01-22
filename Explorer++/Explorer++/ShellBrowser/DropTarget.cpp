@@ -27,11 +27,12 @@ HRESULT _stdcall ShellBrowser::DragEnter(
 	HRESULT hReturn;
 	POINT pt;
 
-	m_bPerformingDrag = TRUE;
+	m_performingDrop = TRUE;
 	m_bDeselectDropFolder = FALSE;
+	m_bOverFolder = FALSE;
 	m_iDropFolder = -1;
 
-	if (m_directoryState.virtualFolder && !m_bDragging)
+	if (m_directoryState.virtualFolder && !m_performingDrag)
 	{
 		m_bDataAccept = FALSE;
 		*pdwEffect = DROPEFFECT_NONE;
@@ -234,7 +235,6 @@ void ShellBrowser::HandleDragSelection(const POINT *ppt)
 	BOOL bClash = FALSE;
 	BOOL bOverFolder = FALSE;
 	BOOL bOverItem = FALSE;
-	int iItem;
 	int iInternalIndex = -1;
 
 	info.pt = *ppt;
@@ -288,15 +288,13 @@ void ShellBrowser::HandleDragSelection(const POINT *ppt)
 			if ((m_itemInfoMap.at(iInternalIndex).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 				== FILE_ATTRIBUTE_DIRECTORY)
 			{
-				if (m_bDragging)
+				if (m_performingDrag)
 				{
-					std::list<DraggedFile_t>::iterator itr;
-
-					for (itr = m_DraggedFilesList.begin(); itr != m_DraggedFilesList.end(); itr++)
+					for (auto &pidl : m_draggedItems)
 					{
-						iItem = LocateFileItemIndex(itr->szFileName);
+						auto index = GetItemIndexForPidl(pidl.get());
 
-						if (info.iItem == iItem)
+						if (index && info.iItem == *index)
 						{
 							bClash = TRUE;
 						}
@@ -344,7 +342,7 @@ HRESULT _stdcall ShellBrowser::DragLeave()
 		ListView_SetItemState(m_hListView, m_iDropFolder, 0, LVIS_SELECTED);
 	}
 
-	m_bPerformingDrag = FALSE;
+	m_performingDrop = FALSE;
 
 	return S_OK;
 }
@@ -419,7 +417,7 @@ HRESULT _stdcall ShellBrowser::Drop(
 		ListView_SetItemState(m_hListView, m_iDropFolder, 0, LVIS_SELECTED);
 	}
 
-	m_bPerformingDrag = FALSE;
+	m_performingDrop = FALSE;
 
 	pt.x = ptl.x;
 	pt.y = ptl.y;
@@ -447,7 +445,7 @@ HRESULT _stdcall ShellBrowser::Drop(
 	{
 		BOOL bHandled = FALSE;
 
-		if (m_DragType == DragType::LeftClick && m_bDragging && !m_bOverFolder)
+		if (m_DragType == DragType::LeftClick && m_performingDrag && !m_bOverFolder)
 		{
 			hr = pDataObject->GetData(&ftcHDrop, &stg);
 
@@ -534,10 +532,8 @@ int CALLBACK ShellBrowser::SortTemporary(LPARAM lParam1, LPARAM lParam2)
 
 void ShellBrowser::RepositionLocalFiles(const POINT *ppt)
 {
-	std::list<DraggedFile_t>::iterator itr;
 	POINT pt;
 	POINT ptOrigin;
-	int iItem;
 
 	pt = *ppt;
 	ScreenToClient(m_hListView, &pt);
@@ -550,209 +546,210 @@ void ShellBrowser::RepositionLocalFiles(const POINT *ppt)
 		ListViewHelper::SetAutoArrange(m_hListView, FALSE);
 	}
 
-	for (itr = m_DraggedFilesList.begin(); itr != m_DraggedFilesList.end(); itr++)
+	for (auto &pidl : m_draggedItems)
 	{
-		iItem = LocateFileItemIndex(itr->szFileName);
+		auto index = GetItemIndexForPidl(pidl.get());
 
-		if (iItem != -1)
+		if (!index)
 		{
-			if (m_folderSettings.viewMode == +ViewMode::Details)
+			continue;
+		}
+
+		if (m_folderSettings.viewMode == +ViewMode::Details)
+		{
+			LVITEM lvItem;
+			POINT ptItem;
+			BOOL bBelowPreviousItem = TRUE;
+			BOOL bRes;
+			int iInsert = 0;
+			int iSort = 0;
+			int nItems;
+			int i = 0;
+
+			nItems = ListView_GetItemCount(m_hListView);
+
+			/* Find the closest item to the dropped item. */
+			for (i = 0; i < nItems; i++)
 			{
-				LVITEM lvItem;
-				POINT ptItem;
-				BOOL bBelowPreviousItem = TRUE;
-				BOOL bRes;
-				int iInsert = 0;
-				int iSort = 0;
-				int nItems;
-				int i = 0;
+				ListView_GetItemPosition(m_hListView, i, &ptItem);
 
-				nItems = ListView_GetItemCount(m_hListView);
-
-				/* Find the closest item to the dropped item. */
-				for (i = 0; i < nItems; i++)
+				if (bBelowPreviousItem && (pt.y - ptItem.y) < 0)
 				{
-					ListView_GetItemPosition(m_hListView, i, &ptItem);
-
-					if (bBelowPreviousItem && (pt.y - ptItem.y) < 0)
-					{
-						iInsert = i - 1;
-						break;
-					}
-
-					/* If the dropped item is below the last item,
-					it will be moved to the last position. */
-					if (i == (nItems - 1))
-					{
-						iInsert = nItems;
-					}
-
-					bBelowPreviousItem = (pt.y - ptItem.y) > 0;
+					iInsert = i - 1;
+					break;
 				}
 
-				for (i = 0; i < nItems; i++)
+				/* If the dropped item is below the last item,
+				it will be moved to the last position. */
+				if (i == (nItems - 1))
 				{
-					lvItem.mask = LVIF_PARAM;
-					lvItem.iItem = i;
-					lvItem.iSubItem = 0;
-					bRes = ListView_GetItem(m_hListView, &lvItem);
-
-					if (bRes)
-					{
-						if (i == iItem)
-						{
-							m_itemInfoMap.at((int) lvItem.lParam).iRelativeSort = iInsert;
-						}
-						else
-						{
-							if (iSort == iInsert)
-							{
-								iSort++;
-							}
-
-							m_itemInfoMap.at((int) lvItem.lParam).iRelativeSort = iSort;
-						}
-					}
-
-					iSort++;
+					iInsert = nItems;
 				}
 
-				ListView_SortItems(m_hListView, SortTemporaryStub, (LPARAM) this);
+				bBelowPreviousItem = (pt.y - ptItem.y) > 0;
 			}
-			else
+
+			for (i = 0; i < nItems; i++)
 			{
-				/* If auto arrange is on, the dropped item(s) will
-				have to be 'snapped' to the nearest item position.
-				Otherwise, they may simply be placed where they are
-				dropped. */
-				if (m_folderSettings.autoArrange)
+				lvItem.mask = LVIF_PARAM;
+				lvItem.iItem = i;
+				lvItem.iSubItem = 0;
+				bRes = ListView_GetItem(m_hListView, &lvItem);
+
+				if (bRes)
 				{
-					LVFINDINFO lvfi;
-					LVHITTESTINFO lvhti;
-					RECT rcItem;
-					POINT ptNext;
-					BOOL bRowEnd = FALSE;
-					BOOL bRowStart = FALSE;
-					int iNext;
-					int iHitItem;
-					int nItems;
-
-					lvhti.pt = pt;
-					iHitItem = ListView_HitTest(m_hListView, &lvhti);
-
-					/* Based on ListView_PositionInsertMark() code. */
-					if (iHitItem != -1 && lvhti.flags & LVHT_ONITEM)
+					if (i == *index)
 					{
-						ListView_GetItemRect(m_hListView, lvhti.iItem, &rcItem, LVIR_BOUNDS);
-
-						if ((pt.x - rcItem.left) > ((rcItem.right - rcItem.left) / 2))
-						{
-							iNext = iHitItem;
-						}
-						else
-						{
-							/* Can just insert the item _after_ the item to the
-							left, unless this is the start of a row. */
-							iNext = ListView_GetNextItem(m_hListView, iHitItem, LVNI_TOLEFT);
-
-							if (iNext == -1)
-							{
-								iNext = iHitItem;
-							}
-
-							bRowStart =
-								(ListView_GetNextItem(m_hListView, iNext, LVNI_TOLEFT) == -1);
-						}
+						m_itemInfoMap.at((int) lvItem.lParam).iRelativeSort = iInsert;
 					}
 					else
 					{
-						lvfi.flags = LVFI_NEARESTXY;
-						lvfi.pt = pt;
-						lvfi.vkDirection = VK_UP;
-						iNext = ListView_FindItem(m_hListView, -1, &lvfi);
+						if (iSort == iInsert)
+						{
+							iSort++;
+						}
+
+						m_itemInfoMap.at((int) lvItem.lParam).iRelativeSort = iSort;
+					}
+				}
+
+				iSort++;
+			}
+
+			ListView_SortItems(m_hListView, SortTemporaryStub, (LPARAM) this);
+		}
+		else
+		{
+			/* If auto arrange is on, the dropped item(s) will
+			have to be 'snapped' to the nearest item position.
+			Otherwise, they may simply be placed where they are
+			dropped. */
+			if (m_folderSettings.autoArrange)
+			{
+				LVFINDINFO lvfi;
+				LVHITTESTINFO lvhti;
+				RECT rcItem;
+				POINT ptNext;
+				BOOL bRowEnd = FALSE;
+				BOOL bRowStart = FALSE;
+				int iNext;
+				int iHitItem;
+				int nItems;
+
+				lvhti.pt = pt;
+				iHitItem = ListView_HitTest(m_hListView, &lvhti);
+
+				/* Based on ListView_PositionInsertMark() code. */
+				if (iHitItem != -1 && lvhti.flags & LVHT_ONITEM)
+				{
+					ListView_GetItemRect(m_hListView, lvhti.iItem, &rcItem, LVIR_BOUNDS);
+
+					if ((pt.x - rcItem.left) > ((rcItem.right - rcItem.left) / 2))
+					{
+						iNext = iHitItem;
+					}
+					else
+					{
+						/* Can just insert the item _after_ the item to the
+						left, unless this is the start of a row. */
+						iNext = ListView_GetNextItem(m_hListView, iHitItem, LVNI_TOLEFT);
 
 						if (iNext == -1)
 						{
-							lvfi.flags = LVFI_NEARESTXY;
-							lvfi.pt = pt;
-							lvfi.vkDirection = VK_LEFT;
-							iNext = ListView_FindItem(m_hListView, -1, &lvfi);
+							iNext = iHitItem;
 						}
 
-						ListView_GetItemRect(m_hListView, iNext, &rcItem, LVIR_BOUNDS);
-
-						if (pt.x > rcItem.left + ((rcItem.right - rcItem.left) / 2))
-						{
-							if (pt.y > rcItem.bottom)
-							{
-								int iBelow;
-
-								iBelow = ListView_GetNextItem(m_hListView, iNext, LVNI_BELOW);
-
-								if (iBelow != -1)
-								{
-									iNext = iBelow;
-								}
-							}
-
-							bRowEnd = TRUE;
-						}
-
-						nItems = ListView_GetItemCount(m_hListView);
-
-						ListView_GetItemRect(m_hListView, nItems - 1, &rcItem, LVIR_BOUNDS);
-
-						if ((pt.x > rcItem.left + ((rcItem.right - rcItem.left) / 2))
-							&& pt.x < rcItem.right + ((rcItem.right - rcItem.left) / 2) + 2
-							&& pt.y > rcItem.top)
-						{
-							iNext = nItems - 1;
-
-							bRowEnd = TRUE;
-						}
-
-						if (!bRowEnd)
-						{
-							int iLeft;
-
-							iLeft = ListView_GetNextItem(m_hListView, iNext, LVNI_TOLEFT);
-
-							if (iLeft != -1)
-							{
-								iNext = iLeft;
-							}
-							else
-							{
-								bRowStart = TRUE;
-							}
-						}
-					}
-
-					ListView_GetItemPosition(m_hListView, iNext, &ptNext);
-
-					/* Offset by 1 pixel in the x-direction. This ensures that
-					the dropped item will always be placed AFTER iNext. */
-					if (bRowStart)
-					{
-						/* If at the start of a row, simply place at x = 0
-						so that dropped item will be placed before first
-						item... */
-						ListView_SetItemPosition32(m_hListView, iItem, 0, ptNext.y);
-					}
-					else
-					{
-						ListView_SetItemPosition32(m_hListView, iItem, ptNext.x + 1, ptNext.y);
+						bRowStart = (ListView_GetNextItem(m_hListView, iNext, LVNI_TOLEFT) == -1);
 					}
 				}
 				else
 				{
-					ListView_GetOrigin(m_hListView, &ptOrigin);
+					lvfi.flags = LVFI_NEARESTXY;
+					lvfi.pt = pt;
+					lvfi.vkDirection = VK_UP;
+					iNext = ListView_FindItem(m_hListView, -1, &lvfi);
 
-					/* ListView may be scrolled horizontally or vertically. */
-					ListView_SetItemPosition32(m_hListView, iItem,
-						ptOrigin.x + pt.x - m_ptDraggedOffset.x,
-						ptOrigin.y + pt.y - m_ptDraggedOffset.y);
+					if (iNext == -1)
+					{
+						lvfi.flags = LVFI_NEARESTXY;
+						lvfi.pt = pt;
+						lvfi.vkDirection = VK_LEFT;
+						iNext = ListView_FindItem(m_hListView, -1, &lvfi);
+					}
+
+					ListView_GetItemRect(m_hListView, iNext, &rcItem, LVIR_BOUNDS);
+
+					if (pt.x > rcItem.left + ((rcItem.right - rcItem.left) / 2))
+					{
+						if (pt.y > rcItem.bottom)
+						{
+							int iBelow;
+
+							iBelow = ListView_GetNextItem(m_hListView, iNext, LVNI_BELOW);
+
+							if (iBelow != -1)
+							{
+								iNext = iBelow;
+							}
+						}
+
+						bRowEnd = TRUE;
+					}
+
+					nItems = ListView_GetItemCount(m_hListView);
+
+					ListView_GetItemRect(m_hListView, nItems - 1, &rcItem, LVIR_BOUNDS);
+
+					if ((pt.x > rcItem.left + ((rcItem.right - rcItem.left) / 2))
+						&& pt.x < rcItem.right + ((rcItem.right - rcItem.left) / 2) + 2
+						&& pt.y > rcItem.top)
+					{
+						iNext = nItems - 1;
+
+						bRowEnd = TRUE;
+					}
+
+					if (!bRowEnd)
+					{
+						int iLeft;
+
+						iLeft = ListView_GetNextItem(m_hListView, iNext, LVNI_TOLEFT);
+
+						if (iLeft != -1)
+						{
+							iNext = iLeft;
+						}
+						else
+						{
+							bRowStart = TRUE;
+						}
+					}
 				}
+
+				ListView_GetItemPosition(m_hListView, iNext, &ptNext);
+
+				/* Offset by 1 pixel in the x-direction. This ensures that
+				the dropped item will always be placed AFTER iNext. */
+				if (bRowStart)
+				{
+					/* If at the start of a row, simply place at x = 0
+					so that dropped item will be placed before first
+					item... */
+					ListView_SetItemPosition32(m_hListView, *index, 0, ptNext.y);
+				}
+				else
+				{
+					ListView_SetItemPosition32(m_hListView, *index, ptNext.x + 1, ptNext.y);
+				}
+			}
+			else
+			{
+				ListView_GetOrigin(m_hListView, &ptOrigin);
+
+				/* ListView may be scrolled horizontally or vertically. */
+				ListView_SetItemPosition32(m_hListView, *index,
+					ptOrigin.x + pt.x - m_ptDraggedOffset.x,
+					ptOrigin.y + pt.y - m_ptDraggedOffset.y);
 			}
 		}
 	}
@@ -762,9 +759,9 @@ void ShellBrowser::RepositionLocalFiles(const POINT *ppt)
 		ListViewHelper::SetAutoArrange(m_hListView, TRUE);
 	}
 
-	m_bDragging = FALSE;
+	m_performingDrag = false;
 
-	m_bPerformingDrag = FALSE;
+	m_performingDrop = FALSE;
 }
 
 void ShellBrowser::ScrollListViewFromCursor(HWND hListView, const POINT *CursorPos)

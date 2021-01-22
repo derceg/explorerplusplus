@@ -1436,10 +1436,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 		case LVN_ITEMCHANGING:
 			return OnListViewItemChanging(reinterpret_cast<NMLISTVIEW *>(lParam));
 
-		case LVN_BEGINDRAG:
-			OnListViewBeginDrag(lParam,DragType::LeftClick);
-			break;
-
 		case LVN_BEGINLABELEDIT:
 			return OnListViewBeginLabelEdit(reinterpret_cast<NMLVDISPINFO *>(lParam));
 

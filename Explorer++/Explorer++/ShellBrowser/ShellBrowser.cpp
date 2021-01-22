@@ -120,7 +120,8 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 	m_thumbnailResultIDCounter(0),
 	m_infoTipsThreadPool(
 		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
-	m_infoTipResultIDCounter(0)
+	m_infoTipResultIDCounter(0),
+	m_rightClickDragAllowed(false)
 {
 	m_iRefCount = 1;
 
@@ -135,12 +136,12 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 
 	m_listViewColumnsSetUp = false;
 	m_bOverFolder = FALSE;
-	m_bDragging = FALSE;
+	m_performingDrag = false;
+	m_performingDrop = FALSE;
 	m_bThumbnailsSetup = FALSE;
 	m_nCurrentColumns = 0;
 	m_iDirMonitorId = -1;
 	m_pActiveColumns = nullptr;
-	m_bPerformingDrag = FALSE;
 	m_nActiveColumns = 0;
 	m_iDropped = -1;
 	m_middleButtonItem = -1;
@@ -632,6 +633,18 @@ int ShellBrowser::LocateFileItemInternalIndex(const TCHAR *szFileName) const
 	return -1;
 }
 
+std::optional<int> ShellBrowser::GetItemIndexForPidl(PCIDLIST_ABSOLUTE pidl) const
+{
+	auto internalIndex = GetItemInternalIndexForPidl(pidl);
+
+	if (!internalIndex)
+	{
+		return std::nullopt;
+	}
+
+	return LocateItemByInternalIndex(*internalIndex);
+}
+
 std::optional<int> ShellBrowser::GetItemInternalIndexForPidl(PCIDLIST_ABSOLUTE pidl) const
 {
 	auto itr = std::find_if(m_itemInfoMap.begin(), m_itemInfoMap.end(), [pidl](const auto &pair) {
@@ -664,42 +677,6 @@ std::optional<int> ShellBrowser::LocateItemByInternalIndex(int internalIndex) co
 WIN32_FIND_DATA ShellBrowser::GetItemFileFindData(int index) const
 {
 	return GetItemByIndex(index).wfd;
-}
-
-void ShellBrowser::DragStarted(int iFirstItem, POINT *ptCursor)
-{
-	DraggedFile_t df;
-	int iSelected = -1;
-
-	if (iFirstItem != -1)
-	{
-		POINT ptOrigin;
-		POINT ptItem;
-
-		ListView_GetItemPosition(m_hListView, iFirstItem, &ptItem);
-
-		ListView_GetOrigin(m_hListView, &ptOrigin);
-
-		m_ptDraggedOffset.x = ptOrigin.x + ptCursor->x - ptItem.x;
-		m_ptDraggedOffset.y = ptOrigin.y + ptCursor->y - ptItem.y;
-	}
-
-	while ((iSelected = ListView_GetNextItem(m_hListView, iSelected, LVNI_SELECTED)) != -1)
-	{
-		std::wstring filename = GetItemName(iSelected);
-		StringCchCopy(df.szFileName, SIZEOF_ARRAY(df.szFileName), filename.c_str());
-
-		m_DraggedFilesList.push_back(df);
-	}
-
-	m_bDragging = TRUE;
-}
-
-void ShellBrowser::DragStopped()
-{
-	m_DraggedFilesList.clear();
-
-	m_bDragging = FALSE;
 }
 
 unique_pidl_absolute ShellBrowser::GetItemCompleteIdl(int index) const

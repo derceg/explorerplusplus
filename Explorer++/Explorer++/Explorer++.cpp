@@ -49,9 +49,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd) :
 	m_bAttemptToolbarRestore = false;
 	m_bLanguageLoaded = false;
 	m_bListViewRenaming = false;
-	m_bDragging = false;
-	m_bDragCancelled = false;
-	m_bDragAllowed = false;
 	m_bShowTabBar = true;
 	m_pActiveShellBrowser = nullptr;
 	m_hMainRebar = nullptr;

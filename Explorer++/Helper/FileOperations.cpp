@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "FileOperations.h"
-#include "DataObjectWrapper.h"
 #include "DragDropHelper.h"
 #include "DriveInfo.h"
 #include "Helper.h"
@@ -412,25 +411,11 @@ HRESULT CutFiles(const std::vector<PCIDLIST_ABSOLUTE> &items, IDataObject **data
 HRESULT CopyFilesToClipboard(
 	const std::vector<PCIDLIST_ABSOLUTE> &items, bool move, IDataObject **dataObjectOut)
 {
-	wil::com_ptr_nothrow<IShellItemArray> shellItemArray;
-	RETURN_IF_FAILED(SHCreateShellItemArrayFromIDLists(
-		static_cast<UINT>(items.size()), items.data(), &shellItemArray));
-
-	wil::com_ptr_nothrow<IDataObject> shellDataObject;
-	RETURN_IF_FAILED(
-		shellItemArray->BindToHandler(nullptr, BHID_DataObject, IID_PPV_ARGS(&shellDataObject)));
+	wil::com_ptr_nothrow<IDataObject> dataObject;
+	RETURN_IF_FAILED(CreateDataObjectForShellTransfer(items, &dataObject));
 
 	DWORD effect = move ? DROPEFFECT_MOVE : DROPEFFECT_COPY;
-	RETURN_IF_FAILED(SetPreferredDropEffect(shellDataObject.get(), effect));
-
-	// Although it's possible to retrieve the IDataObjectAsyncCapability interface from the shell
-	// IDataObject instance and call SetAsyncMode(), it appears that doesn't actually enable
-	// asynchronous transfer. That's the reason the shell IDataObject instance is wrapped here.
-	wil::com_ptr_nothrow<IDataObject> dataObject = DataObjectWrapper::Create(shellDataObject.get());
-
-	wil::com_ptr_nothrow<IDataObjectAsyncCapability> asyncCapability;
-	RETURN_IF_FAILED(dataObject->QueryInterface(IID_PPV_ARGS(&asyncCapability)));
-	RETURN_IF_FAILED(asyncCapability->SetAsyncMode(TRUE));
+	RETURN_IF_FAILED(SetPreferredDropEffect(dataObject.get(), effect));
 
 	RETURN_IF_FAILED(OleSetClipboard(dataObject.get()));
 

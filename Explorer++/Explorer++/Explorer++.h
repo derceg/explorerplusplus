@@ -238,7 +238,6 @@ private:
 	void OnListViewDoubleClick(NMHDR *nmhdr);
 	LRESULT OnListViewKeyDown(LPARAM lParam);
 	BOOL OnListViewItemChanging(const NMLISTVIEW *changeData);
-	HRESULT OnListViewBeginDrag(LPARAM lParam, DragType dragType);
 	BOOL OnListViewBeginLabelEdit(const NMLVDISPINFO *dispInfo);
 	BOOL OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo);
 	void OnListViewRClick(POINT *pCursorPos);
@@ -620,11 +619,6 @@ private:
 	/* Display window folder sizes. */
 	std::list<DWFolderSize> m_DWFolderSizes;
 	int m_iDWFolderSizeUniqueId;
-
-	/* Drag and drop. */
-	bool m_bDragging;
-	bool m_bDragCancelled;
-	bool m_bDragAllowed;
 
 	/* Rename support. */
 	bool m_bListViewRenaming;

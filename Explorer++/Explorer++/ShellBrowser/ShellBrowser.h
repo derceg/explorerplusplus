@@ -85,8 +85,6 @@ public:
 		boost::signals2::connect_position position = boost::signals2::at_back) override;
 
 	/* Drag and Drop. */
-	void DragStarted(int iFirstItem, POINT *ptCursor);
-	void DragStopped();
 	HRESULT _stdcall DragEnter(
 		IDataObject *pDataObject, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect) override;
 	HRESULT _stdcall DragOver(DWORD grfKeyState, POINTL pt, DWORD *pdwEffect) override;
@@ -254,11 +252,6 @@ private:
 	{
 		TCHAR szFileName[MAX_PATH];
 		POINT DropPoint;
-	};
-
-	struct DraggedFile_t
-	{
-		TCHAR szFileName[MAX_PATH];
 	};
 
 	struct ColumnResult_t
@@ -436,6 +429,9 @@ private:
 	/* Listview. */
 	void OnListViewMButtonDown(const POINT *pt);
 	void OnListViewMButtonUp(const POINT *pt, UINT keysDown);
+	void OnRButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT keyFlags);
+	void OnRButtonUp(HWND hwnd, int x, int y, UINT keyFlags);
+	void OnMouseMove(HWND hwnd, int x, int y, UINT keyFlags);
 	void OnListViewGetDisplayInfo(LPARAM lParam);
 	LRESULT OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip);
 	void QueueInfoTipTask(int internalIndex, const std::wstring &existingInfoTip);
@@ -448,6 +444,8 @@ private:
 	void UpdateFileSelectionInfo(int internalIndex, BOOL selected);
 	void OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown);
 	std::vector<PCIDLIST_ABSOLUTE> GetSelectedItemPidls();
+	void OnListViewBeginDrag(const NMLISTVIEW *info);
+	HRESULT StartDrag(DragType dragType, int draggedItem, const POINT &startPoint);
 
 	HRESULT GetListViewItemAttributes(int item, SFGAOF *attributes) const;
 
@@ -602,6 +600,7 @@ private:
 	/* Miscellaneous. */
 	BOOL CompareVirtualFolders(UINT uFolderCSIDL) const;
 	int LocateFileItemInternalIndex(const TCHAR *szFileName) const;
+	std::optional<int> GetItemIndexForPidl(PCIDLIST_ABSOLUTE pidl) const;
 	std::optional<int> GetItemInternalIndexForPidl(PCIDLIST_ABSOLUTE pidl) const;
 	std::optional<int> LocateItemByInternalIndex(int internalIndex) const;
 	void ApplyHeaderSortArrow();
@@ -629,7 +628,6 @@ private:
 	// identify a subclass).
 	static int listViewParentSubclassIdCounter;
 
-	BOOL m_bPerformingDrag;
 	HIMAGELIST m_hListViewImageList;
 
 	DirectoryState m_directoryState;
@@ -714,15 +712,20 @@ private:
 	IDragSourceHelper *m_pDragSourceHelper;
 	IDropTargetHelper *m_pDropTargetHelper;
 	std::list<DroppedFile_t> m_droppedFileNameList;
-	std::list<DraggedFile_t> m_DraggedFilesList;
+	std::vector<unique_pidl_absolute> m_draggedItems;
 	DragType m_DragType;
 	POINT m_ptDraggedOffset;
 	BOOL m_bDataAccept;
-	BOOL m_bDragging;
+	bool m_performingDrag;
+	BOOL m_performingDrop;
 	BOOL m_bDeselectDropFolder;
 	BOOL m_bOnSameDrive;
 	int m_bOverFolder;
 	int m_iDropFolder;
+
+	bool m_rightClickDragAllowed;
+	POINT m_rightClickDragStartPoint;
+	int m_rightClickDragItem;
 
 	ListViewGroupSet m_listViewGroups;
 	int m_groupIdCounter;
