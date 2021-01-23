@@ -212,49 +212,30 @@ LRESULT CALLBACK FileContextMenuManager::ShellMenuHookProc(
 	switch (uMsg)
 	{
 	case WM_MEASUREITEM:
-		/* wParam is 0 if this item was sent by a menu. */
-		if (wParam == 0)
-		{
-			if (m_pShellContext3 != nullptr)
-			{
-				m_pShellContext3->HandleMenuMsg2(uMsg, wParam, lParam, nullptr);
-			}
-			else if (m_pShellContext2 != nullptr)
-			{
-				m_pShellContext2->HandleMenuMsg(uMsg, wParam, lParam);
-			}
-
-			return TRUE;
-		}
-		break;
-
 	case WM_DRAWITEM:
-		if (wParam == 0)
-		{
-			if (m_pShellContext3 != nullptr)
-			{
-				m_pShellContext3->HandleMenuMsg2(uMsg, wParam, lParam, nullptr);
-			}
-			else if (m_pShellContext2 != nullptr)
-			{
-				m_pShellContext2->HandleMenuMsg(uMsg, wParam, lParam);
-			}
-		}
-		return TRUE;
-		break;
-
 	case WM_INITMENUPOPUP:
-	{
+	case WM_MENUCHAR:
+		// wParam is 0 if this item was sent by a menu.
+		if ((uMsg == WM_MEASUREITEM || uMsg == WM_DRAWITEM) && wParam != 0)
+		{
+			break;
+		}
+
 		if (m_pShellContext3 != nullptr)
 		{
-			m_pShellContext3->HandleMenuMsg2(uMsg, wParam, lParam, nullptr);
+			LRESULT result;
+			HRESULT hr = m_pShellContext3->HandleMenuMsg2(uMsg, wParam, lParam, &result);
+
+			if (SUCCEEDED(hr))
+			{
+				return result;
+			}
 		}
 		else if (m_pShellContext2 != nullptr)
 		{
 			m_pShellContext2->HandleMenuMsg(uMsg, wParam, lParam);
 		}
-	}
-	break;
+		break;
 
 	case WM_MENUSELECT:
 	{
