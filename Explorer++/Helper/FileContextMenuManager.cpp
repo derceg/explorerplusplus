@@ -251,20 +251,23 @@ LRESULT CALLBACK FileContextMenuManager::ShellMenuHookProc(
 
 				int iCmd = static_cast<int>(LOWORD(wParam));
 
-				if (!((HIWORD(wParam) & MF_POPUP) == MF_POPUP)
-					&& (iCmd >= m_iMinID && iCmd <= m_iMaxID))
+				if (WI_IsFlagSet(HIWORD(wParam), MF_POPUP))
 				{
-					TCHAR szHelpString[512];
-
+					m_pStatusBar->SetPartText(0, L"");
+				}
+				else if (iCmd >= m_iMinID && iCmd <= m_iMaxID)
+				{
 					/* Ask for the help string for the currently selected menu item. */
+					TCHAR szHelpString[512];
 					HRESULT hr = m_pActualContext->GetCommandString(iCmd - m_iMinID, GCS_HELPTEXT,
 						nullptr, reinterpret_cast<LPSTR>(szHelpString), SIZEOF_ARRAY(szHelpString));
 
-					/* If the help string was found, send it to the status bar. */
-					if (hr == NOERROR)
+					if (FAILED(hr))
 					{
-						m_pStatusBar->SetPartText(0, szHelpString);
+						StringCchCopy(szHelpString, SIZEOF_ARRAY(szHelpString), L"");
 					}
+
+					m_pStatusBar->SetPartText(0, szHelpString);
 				}
 			}
 
