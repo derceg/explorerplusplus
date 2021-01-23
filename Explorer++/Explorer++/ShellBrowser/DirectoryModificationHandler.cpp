@@ -101,7 +101,7 @@ void ShellBrowser::ProcessShellChangeNotification(const ShellChangeNotification 
 			// item is updated, the WIN32_FIND_DATA information cached in the pidl will be
 			// retrieved. As the simple pidl won't contain this information, it's important to
 			// convert the pidl to a full pidl here.
-			// Note that there's no need to convert pidls[0], as it refers to the original item,
+			// Note that there's no need to convert change.pidl1, as it refers to the original item,
 			// which no longer exists.
 			unique_pidl_absolute pidlNewFull;
 			HRESULT hr = SimplePidlToFullPidl(change.pidl2.get(), wil::out_param(pidlNewFull));
