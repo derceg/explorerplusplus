@@ -1558,44 +1558,49 @@ void ShellTreeView::MonitorDrive(const TCHAR *szDrive)
 	DriveEvent_t de;
 	int iMonitorId;
 
-	/* Remote (i.e. network) drives will NOT be monitored. */
-	if (GetDriveType(szDrive) != DRIVE_REMOTE)
-	{
-		hDrive = CreateFile(szDrive, FILE_LIST_DIRECTORY,
-			FILE_SHARE_READ | FILE_SHARE_DELETE | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING,
-			FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, nullptr);
+	const int type = GetDriveType(szDrive);
 
-		if (hDrive != INVALID_HANDLE_VALUE)
-		{
-			pDirectoryAltered = (DirectoryAltered_t *) malloc(sizeof(DirectoryAltered_t));
+	// Don't monitor removable drives
+	if (type == DRIVE_REMOVABLE)
+		return;
 
-			StringCchCopy(
-				pDirectoryAltered->szPath, SIZEOF_ARRAY(pDirectoryAltered->szPath), szDrive);
-			pDirectoryAltered->shellTreeView = this;
+	// Don't monitor remote drives
+	if (type == DRIVE_REMOTE)
+		return;
 
-			iMonitorId = m_pDirMon->WatchDirectory(hDrive, szDrive, FILE_NOTIFY_CHANGE_DIR_NAME,
-				ShellTreeView::DirectoryAlteredCallback, TRUE, (void *) pDirectoryAltered);
+	hDrive = CreateFile(szDrive, FILE_LIST_DIRECTORY,
+		FILE_SHARE_READ | FILE_SHARE_DELETE | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING,
+		FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, nullptr);
 
-			dbv.dbch_size = sizeof(dbv);
-			dbv.dbch_devicetype = DBT_DEVTYP_HANDLE;
-			dbv.dbch_handle = hDrive;
+	if (hDrive == INVALID_HANDLE_VALUE)
+		return;
 
-			/* Register to receive hardware events (i.e. insertion,
-			removal, etc) for the specified drive. */
-			hDevNotify = RegisterDeviceNotification(m_hTreeView, &dbv, DEVICE_NOTIFY_WINDOW_HANDLE);
+	pDirectoryAltered = (DirectoryAltered_t *) malloc(sizeof(DirectoryAltered_t));
 
-			/* If the handle was successfully registered, log the
-			drive path, handle and monitoring id. */
-			if (hDevNotify != nullptr)
-			{
-				StringCchCopy(de.szDrive, SIZEOF_ARRAY(de.szDrive), szDrive);
-				de.hDrive = hDrive;
-				de.iMonitorId = iMonitorId;
+	StringCchCopy(pDirectoryAltered->szPath, SIZEOF_ARRAY(pDirectoryAltered->szPath), szDrive);
+	pDirectoryAltered->shellTreeView = this;
 
-				m_pDriveList.push_back(de);
-			}
-		}
-	}
+	iMonitorId = m_pDirMon->WatchDirectory(hDrive, szDrive, FILE_NOTIFY_CHANGE_DIR_NAME,
+		ShellTreeView::DirectoryAlteredCallback, TRUE, (void *) pDirectoryAltered);
+
+	dbv.dbch_size = sizeof(dbv);
+	dbv.dbch_devicetype = DBT_DEVTYP_HANDLE;
+	dbv.dbch_handle = hDrive;
+
+	/* Register to receive hardware events (i.e. insertion,
+	removal, etc) for the specified drive. */
+	hDevNotify = RegisterDeviceNotification(m_hTreeView, &dbv, DEVICE_NOTIFY_WINDOW_HANDLE);
+
+	if (hDevNotify == nullptr)
+		return;
+
+	/* If the handle was successfully registered, log the
+	drive path, handle and monitoring id. */
+	StringCchCopy(de.szDrive, SIZEOF_ARRAY(de.szDrive), szDrive);
+	de.hDrive = hDrive;
+	de.iMonitorId = iMonitorId;
+
+	m_pDriveList.push_back(de);
 }
 
 void ShellTreeView::OnMiddleButtonDown(const POINT *pt)
