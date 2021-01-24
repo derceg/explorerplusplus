@@ -143,13 +143,11 @@ int ListViewEdit::GetExtensionIndex()
 
 	if ((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 	{
-		for (size_t i = fileName.size() - 1; i >= 0; i--)
+		auto position = fileName.find_last_of('.');
+
+		if (position != std::wstring::npos)
 		{
-			if (fileName[i] == '.')
-			{
-				index = static_cast<int>(i);
-				break;
-			}
+			index = static_cast<int>(position);
 		}
 	}
 
