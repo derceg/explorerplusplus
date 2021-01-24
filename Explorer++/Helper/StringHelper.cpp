@@ -350,6 +350,52 @@ void TrimString(std::wstring &str, const std::wstring &strWhitespace)
 	TrimStringRight(str, strWhitespace);
 }
 
+std::optional<std::string> wstrToStr(const std::wstring &source)
+{
+	int res = WideCharToMultiByte(CP_ACP, 0, source.c_str(), -1, nullptr, 0, nullptr, nullptr);
+
+	if (res == 0)
+	{
+		return std::nullopt;
+	}
+
+	std::string narrowString;
+	narrowString.resize(res);
+
+	res = WideCharToMultiByte(CP_ACP, 0, source.c_str(), -1, narrowString.data(),
+		static_cast<int>(narrowString.size()), nullptr, nullptr);
+
+	if (res == 0)
+	{
+		return std::nullopt;
+	}
+
+	return narrowString;
+}
+
+std::optional<std::wstring> strToWstr(const std::string &source)
+{
+	int res = MultiByteToWideChar(CP_ACP, 0, source.c_str(), -1, nullptr, 0);
+
+	if (res == 0)
+	{
+		return std::nullopt;
+	}
+
+	std::wstring wideString;
+	wideString.resize(res);
+
+	res = MultiByteToWideChar(
+		CP_ACP, 0, source.c_str(), -1, wideString.data(), static_cast<int>(wideString.size()));
+
+	if (res == 0)
+	{
+		return std::nullopt;
+	}
+
+	return wideString;
+}
+
 // Generally speaking, the string returned by this function should only be used internally. Windows
 // API functions, for example, will expect a different (non utf-8) narrow encoding.
 std::string wstrToUtf8Str(const std::wstring &source)

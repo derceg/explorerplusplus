@@ -2,11 +2,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // See LICENSE in the top level directory
 
-/*
- * Handles shell context menus (such as file
- * context menus, and the new menu).
- */
-
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Config.h"
@@ -14,19 +9,128 @@
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellTreeView/ShellTreeView.h"
+#include "SortMenuBuilder.h"
 #include "Tab.h"
 #include "TabContainer.h"
+#include "ViewModeHelper.h"
+#include "../Helper/FileOperations.h"
 #include "../Helper/Macros.h"
+#include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
 
 #define MENU_OPEN_IN_NEW_TAB (MAX_SHELL_MENU_ID + 1)
 
-void Explorerplusplus::AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, HMENU hMenu)
+void Explorerplusplus::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, IContextMenu *contextMenu,
+	HMENU hMenu)
 {
 	assert(dwData != NULL);
 
-	auto *pfcmi = reinterpret_cast<FileContextMenuInfo *>(dwData);
+	if (pidlItems.empty())
+	{
+		UpdateBackgroundContextMenu(contextMenu, hMenu);
+	}
+	else
+	{
+		UpdateItemContextMenu(pidlParent, pidlItems, dwData, hMenu);
+	}
+}
+
+void Explorerplusplus::UpdateBackgroundContextMenu(IContextMenu *contextMenu, HMENU menu)
+{
+	int numItems = GetMenuItemCount(menu);
+
+	if (numItems == -1)
+	{
+		return;
+	}
+
+	for (int i = numItems; i >= 0; i--)
+	{
+		MENUITEMINFO mii;
+		mii.cbSize = sizeof(mii);
+		mii.fMask = MIIM_ID | MIIM_FTYPE;
+		BOOL res = GetMenuItemInfo(menu, i, TRUE, &mii);
+
+		if (!res || WI_IsFlagSet(mii.fType, MFT_SEPARATOR))
+		{
+			continue;
+		}
+
+		// Note that verbs are only present for the majority of system items in the background
+		// context menu starting in Windows 8. In Windows 7, verbs are only set for a couple of
+		// items. Therefore, the code below isn't going to work on anything earlier then Windows 8.
+		TCHAR verb[64] = _T("");
+		HRESULT hr = contextMenu->GetCommandString(mii.wID - MIN_SHELL_MENU_ID, GCS_VERB, nullptr,
+			reinterpret_cast<LPSTR>(verb), SIZEOF_ARRAY(verb));
+
+		if (FAILED(hr))
+		{
+			continue;
+		}
+
+		// TODO: Library folders have an "Arrange by" menu that appears at the top of the background
+		// context menu. That menu should be removed, if there's a reliable way of doing it (the
+		// menu item doesn't have a verb at present).
+
+		if (StrCmpI(verb, L"view") == 0)
+		{
+			DeleteMenu(menu, i, MF_BYPOSITION);
+
+			auto viewsMenu = BuildViewsMenu();
+			std::wstring text =
+				ResourceHelper::LoadString(m_hLanguageModule, IDS_BACKGROUND_CONTEXT_MENU_VIEW);
+			MenuHelper::AddSubMenuItem(menu, text, std::move(viewsMenu), i, TRUE);
+		}
+		else if (StrCmpI(verb, L"arrange") == 0)
+		{
+			DeleteMenu(menu, i, MF_BYPOSITION);
+
+			SortMenuBuilder sortMenuBuilder(m_hLanguageModule);
+			auto sortMenus = sortMenuBuilder.BuildMenus(m_tabContainer->GetSelectedTab());
+
+			std::wstring text =
+				ResourceHelper::LoadString(m_hLanguageModule, IDS_BACKGROUND_CONTEXT_MENU_SORT_BY);
+			MenuHelper::AddSubMenuItem(menu, text, std::move(sortMenus.sortByMenu), i, TRUE);
+		}
+		else if (StrCmpI(verb, L"groupby") == 0)
+		{
+			DeleteMenu(menu, i, MF_BYPOSITION);
+
+			SortMenuBuilder sortMenuBuilder(m_hLanguageModule);
+			auto sortMenus = sortMenuBuilder.BuildMenus(m_tabContainer->GetSelectedTab());
+
+			std::wstring text =
+				ResourceHelper::LoadString(m_hLanguageModule, IDS_BACKGROUND_CONTEXT_MENU_GROUP_BY);
+			MenuHelper::AddSubMenuItem(menu, text, std::move(sortMenus.groupByMenu), i, TRUE);
+		}
+		else if (StrCmpI(verb, L"paste") == 0 || StrCmpI(verb, L"pastelink") == 0)
+		{
+			UINT flags = MF_BYPOSITION;
+
+			if (CanPaste())
+			{
+				flags |= MF_ENABLED;
+			}
+			else
+			{
+				flags |= MF_DISABLED;
+			}
+
+			EnableMenuItem(menu, i, flags);
+		}
+		else if (StrCmpI(verb, L"undo") == 0 || StrCmpI(verb, L"redo") == 0)
+		{
+			// The undo and redo items are non-functional.
+			DeleteMenu(menu, i, MF_BYPOSITION);
+		}
+	}
+}
+
+void Explorerplusplus::UpdateItemContextMenu(PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR data, HMENU menu)
+{
+	auto *pfcmi = reinterpret_cast<FileContextMenuInfo *>(data);
 
 	bool addNewTabMenuItem = false;
 
@@ -63,7 +167,7 @@ void Explorerplusplus::AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
 		mii.fMask = MIIM_STRING | MIIM_ID;
 		mii.wID = MENU_OPEN_IN_NEW_TAB;
 		mii.dwTypeData = openInNewTabText.data();
-		InsertMenuItem(hMenu, 1, TRUE, &mii);
+		InsertMenuItem(menu, 1, TRUE, &mii);
 	}
 }
 
@@ -88,6 +192,25 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		}
 
 		m_bTreeViewOpenInNewTab = true;
+
+		return TRUE;
+	}
+	else if (StrCmpI(szCmd, _T("viewcustomwizard")) == 0)
+	{
+		// This item is only shown on the background context menu and that menu can only be shown
+		// within the listview.
+		assert(pfcmi->uFrom == FROM_LISTVIEW);
+		assert(pidlItems.empty());
+
+		// This verb (which corresponds to the "Customize this folder..." menu item shown in the
+		// background context menu) doesn't appear to be a standard verb that's handled by the
+		// system. Therefore, it will be handled here.
+		return ExecuteFileAction(
+			m_hActiveListView, L"properties", L"customize", nullptr, pidlParent);
+	}
+	else if (StrCmpI(szCmd, _T("refresh")) == 0)
+	{
+		OnRefresh();
 
 		return TRUE;
 	}
@@ -132,6 +255,26 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 
 		return TRUE;
 	}
+	else if (StrCmpI(szCmd, _T("paste")) == 0)
+	{
+		// This item should only be shown in the background context menu.
+		assert(pfcmi->uFrom == FROM_LISTVIEW);
+		assert(pidlItems.empty());
+
+		OnListViewPaste();
+
+		return TRUE;
+	}
+	else if (StrCmpI(szCmd, _T("pastelink")) == 0)
+	{
+		// This item should only be shown in the background context menu.
+		assert(pfcmi->uFrom == FROM_LISTVIEW);
+		assert(pidlItems.empty());
+
+		PasteLinksToClipboardFiles(m_pActiveShellBrowser->GetDirectory().c_str());
+
+		return TRUE;
+	}
 
 	return FALSE;
 }
@@ -153,5 +296,10 @@ void Explorerplusplus::HandleCustomMenuItem(
 		m_bTreeViewOpenInNewTab = true;
 	}
 	break;
+
+	// Custom items in the background context menu will be handled by the WM_COMMAND handler.
+	default:
+		SendMessage(m_hContainer, WM_COMMAND, MAKEWPARAM(iCmd, 0), 0);
+		break;
 	}
 }

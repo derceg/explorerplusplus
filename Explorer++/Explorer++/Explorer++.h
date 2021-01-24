@@ -242,6 +242,8 @@ private:
 	BOOL OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo);
 	void OnListViewRClick(POINT *pCursorPos);
 	void OnListViewBackgroundRClick(POINT *pCursorPos);
+	void OnListViewBackgroundRClickWindows8OrGreater(POINT *pCursorPos);
+	void OnListViewBackgroundRClickWindows7(POINT *pCursorPos);
 	void OnListViewItemRClick(POINT *pCursorPos);
 	void OnListViewCopyItemPath() const;
 	void OnListViewCopyUniversalPaths() const;
@@ -419,8 +421,12 @@ private:
 	OpenFolderDisposition DetermineOpenDisposition(bool isCtrlKeyDown, bool isShiftKeyDown);
 
 	/* File context menu. */
-	void AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems,
-		DWORD_PTR dwData, HMENU hMenu) override;
+	void UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
+		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, IContextMenu *contextMenu,
+		HMENU hMenu);
+	void UpdateBackgroundContextMenu(IContextMenu *contextMenu, HMENU menu);
+	void UpdateItemContextMenu(PCIDLIST_ABSOLUTE pidlParent,
+		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR data, HMENU menu);
 	BOOL HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd) override;
 	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
@@ -482,8 +488,8 @@ private:
 	void SetMainMenuImages();
 	boost::signals2::connection AddMainMenuPreShowObserver(
 		const MainMenuPreShowSignal::slot_type &observer) override;
-	HMENU BuildViewsMenu() override;
-	void AddViewModesToMenu(HMENU menu);
+	wil::unique_hmenu BuildViewsMenu() override;
+	void AddViewModesToMenu(HMENU menu, UINT startPosition, BOOL byPosition);
 
 	// Dark mode
 	void SetUpDarkMode();

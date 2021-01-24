@@ -74,7 +74,6 @@ private:
 	void InvokeMenuEntry(HWND hwnd, UINT uCmd);
 
 	static int GetMenuItemPos(HMENU hMenu, UINT uID);
-	static void RemoveDuplicateSeperators(HMENU hMenu);
 
 	static ItemType GetItemType(PCIDLIST_ABSOLUTE pidl);
 

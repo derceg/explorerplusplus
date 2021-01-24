@@ -140,8 +140,9 @@ public:
 	~SearchDialog();
 
 	/* IFileContextMenuExternal methods. */
-	void AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems,
-		DWORD_PTR dwData, HMENU hMenu) override;
+	void UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
+		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, IContextMenu *contextMenu,
+		HMENU hMenu) override;
 	BOOL HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd) override;
 	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,

@@ -67,8 +67,7 @@ void Explorerplusplus::InitializeMainMenu()
 
 	SetMenu(m_hContainer, mainMenu);
 
-	AddViewModesToMenu(mainMenu);
-
+	AddViewModesToMenu(mainMenu, IDM_VIEW_PLACEHOLDER, FALSE);
 	DeleteMenu(mainMenu, IDM_VIEW_PLACEHOLDER, MF_BYCOMMAND);
 
 	SetMainMenuImages();

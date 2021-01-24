@@ -37,12 +37,6 @@
     <ClCompile Include="TabHandler.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
-    <ClCompile Include="INewMenuClient.cpp">
-      <Filter>Context Menu Support\New Menu</Filter>
-    </ClCompile>
-    <ClCompile Include="iServiceProvider.cpp">
-      <Filter>Context Menu Support\New Menu</Filter>
-    </ClCompile>
     <ClCompile Include="DialogHelper.cpp">
       <Filter>Dialog Support</Filter>
     </ClCompile>
@@ -454,6 +448,15 @@
     <ClCompile Include="ShellBrowser\Filtering.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="ServiceProvider.cpp">
+      <Filter>Context Menu Support</Filter>
+    </ClCompile>
+    <ClCompile Include="FolderView.cpp">
+      <Filter>Context Menu Support</Filter>
+    </ClCompile>
+    <ClCompile Include="NewMenuClient.cpp">
+      <Filter>Context Menu Support\New Menu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -512,12 +515,6 @@
     </ClInclude>
     <ClInclude Include="IDropFilesCallback.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="INewMenuClient.h">
-      <Filter>Context Menu Support\New Menu</Filter>
-    </ClInclude>
-    <ClInclude Include="iServiceProvider.h">
-      <Filter>Context Menu Support\New Menu</Filter>
     </ClInclude>
     <ClInclude Include="IModelessDialogNotification.h">
       <Filter>Dialog Support</Filter>
@@ -902,6 +899,15 @@
     </ClInclude>
     <ClInclude Include="IconMappings.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceProvider.h">
+      <Filter>Context Menu Support</Filter>
+    </ClInclude>
+    <ClInclude Include="FolderView.h">
+      <Filter>Context Menu Support</Filter>
+    </ClInclude>
+    <ClInclude Include="NewMenuClient.h">
+      <Filter>Context Menu Support\New Menu</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

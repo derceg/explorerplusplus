@@ -619,10 +619,12 @@ int CALLBACK SearchDialog::SortResultsByPath(LPARAM lParam1, LPARAM lParam2)
 	return StrCmpLogicalW(szPath1, szPath2);
 }
 
-void SearchDialog::AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, HMENU hMenu)
+void SearchDialog::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, IContextMenu *contextMenu,
+	HMENU hMenu)
 {
 	UNREFERENCED_PARAMETER(dwData);
+	UNREFERENCED_PARAMETER(contextMenu);
 
 	unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems.front()));
 	SFGAOF itemAttributes = SFGAO_FOLDER;

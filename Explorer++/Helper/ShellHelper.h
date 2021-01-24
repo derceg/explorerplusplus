@@ -113,3 +113,5 @@ int GetDefaultIcon(DefaultIconType defaultIconType);
 /* Infotips. */
 HRESULT GetItemInfoTip(const TCHAR *szItemPath, TCHAR *szInfoTip, size_t cchMax);
 HRESULT GetItemInfoTip(PCIDLIST_ABSOLUTE pidlComplete, TCHAR *szInfoTip, size_t cchMax);
+
+std::size_t hash_value(const IID &iid);

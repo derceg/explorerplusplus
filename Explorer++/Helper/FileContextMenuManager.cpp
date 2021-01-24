@@ -5,8 +5,10 @@
 #include "stdafx.h"
 #include "FileContextMenuManager.h"
 #include "Macros.h"
+#include "MenuHelper.h"
 #include "ShellHelper.h"
 #include "StatusBar.h"
+#include "StringHelper.h"
 #include <vector>
 
 LRESULT CALLBACK ShellMenuHookProcStub(
@@ -27,29 +29,29 @@ FileContextMenuManager::FileContextMenuManager(
 
 	m_pActualContext = nullptr;
 
+	wil::com_ptr_nothrow<IShellFolder> shellFolder;
+	hr = BindToIdl(m_pidlParent.get(), IID_PPV_ARGS(&shellFolder));
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
 	if (pidlItems.empty())
 	{
-		wil::com_ptr_nothrow<IShellFolder> pShellParentFolder;
-		PCUITEMID_CHILD pidlRelative = nullptr;
-		hr = SHBindToParent(pidlParent, IID_PPV_ARGS(&pShellParentFolder), &pidlRelative);
+		wil::com_ptr_nothrow<IShellView> shellView;
+		hr = shellFolder->CreateViewObject(m_hwnd, IID_PPV_ARGS(&shellView));
 
 		if (SUCCEEDED(hr))
 		{
-			hr = GetUIObjectOf(
-				pShellParentFolder.get(), hwnd, 1, &pidlRelative, IID_PPV_ARGS(&pContextMenu));
+			hr = shellView->GetItemObject(SVGIO_BACKGROUND, IID_PPV_ARGS(&pContextMenu));
 		}
 	}
 	else
 	{
-		wil::com_ptr_nothrow<IShellFolder> pShellFolder;
-		hr = BindToIdl(pidlParent, IID_PPV_ARGS(&pShellFolder));
-
-		if (SUCCEEDED(hr))
-		{
-			std::vector<PCITEMID_CHILD> pidlItemsTemp(pidlItems);
-			hr = GetUIObjectOf(pShellFolder.get(), hwnd, static_cast<UINT>(pidlItems.size()),
-				pidlItemsTemp.data(), IID_PPV_ARGS(&pContextMenu));
-		}
+		std::vector<PCITEMID_CHILD> pidlItemsTemp(pidlItems);
+		hr = GetUIObjectOf(shellFolder.get(), hwnd, static_cast<UINT>(pidlItems.size()),
+			pidlItemsTemp.data(), IID_PPV_ARGS(&pContextMenu));
 	}
 
 	if (SUCCEEDED(hr))
@@ -82,7 +84,8 @@ FileContextMenuManager::~FileContextMenuManager()
 }
 
 HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme, int iMinID, int iMaxID,
-	const POINT *ppt, StatusBar *pStatusBar, DWORD_PTR dwData, BOOL bRename, BOOL bExtended)
+	const POINT *ppt, StatusBar *pStatusBar, IUnknown *site, DWORD_PTR dwData, BOOL bRename,
+	BOOL bExtended)
 {
 	if (m_pActualContext == nullptr)
 	{
@@ -118,15 +121,36 @@ HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme, int iM
 		uFlags |= CMF_CANRENAME;
 	}
 
-	HRESULT hr = m_pActualContext->QueryContextMenu(hMenu, 0, iMinID, iMaxID, uFlags);
+	if (m_pidlItems.empty())
+	{
+		// The background context menu shouldn't have any default item set.
+		uFlags |= CMF_NODEFAULT;
+	}
+
+	HRESULT hr;
+
+	if (site)
+	{
+		wil::com_ptr_nothrow<IObjectWithSite> objectWithSite;
+		hr = m_pActualContext->QueryInterface(IID_PPV_ARGS(&objectWithSite));
+
+		if (SUCCEEDED(hr))
+		{
+			objectWithSite->SetSite(site);
+		}
+	}
+
+	hr = m_pActualContext->QueryContextMenu(hMenu, 0, iMinID, iMaxID, uFlags);
 
 	if (FAILED(hr))
 	{
 		return hr;
 	}
 
-	/* Allow the caller to add custom entries to the menu. */
-	pfcme->AddMenuEntries(m_pidlParent.get(), m_pidlItems, dwData, hMenu);
+	pfcme->UpdateMenuEntries(m_pidlParent.get(), m_pidlItems, dwData, m_pActualContext, hMenu);
+
+	MenuHelper::RemoveTrailingSeparators(hMenu);
+	MenuHelper::RemoveDuplicateSeperators(hMenu);
 
 	BOOL bWindowSubclassed = FALSE;
 
@@ -150,33 +174,32 @@ HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme, int iM
 	custom entries? */
 	if (iCmd >= iMinID && iCmd <= iMaxID)
 	{
-		TCHAR szCmd[64];
-
+		TCHAR verb[64] = _T("");
 		hr = m_pActualContext->GetCommandString(
-			iCmd - iMinID, GCS_VERB, nullptr, reinterpret_cast<LPSTR>(szCmd), SIZEOF_ARRAY(szCmd));
+			iCmd - iMinID, GCS_VERB, nullptr, reinterpret_cast<LPSTR>(verb), SIZEOF_ARRAY(verb));
 
 		BOOL bHandled = FALSE;
 
-		/* Pass the menu back to the caller to give
-		it the chance to handle it. */
+		// Pass the menu back to the caller to give it the chance to handle it.
 		if (SUCCEEDED(hr))
 		{
-			bHandled = pfcme->HandleShellMenuItem(m_pidlParent.get(), m_pidlItems, dwData, szCmd);
+			bHandled = pfcme->HandleShellMenuItem(m_pidlParent.get(), m_pidlItems, dwData, verb);
 		}
 
 		if (!bHandled)
 		{
-			CMINVOKECOMMANDINFO cmici;
+			std::optional<std::string> parsingPathOpt = GetFilesystemDirectory();
 
-			cmici.cbSize = sizeof(CMINVOKECOMMANDINFO);
-			cmici.fMask = 0;
-			cmici.hwnd = m_hwnd;
-			cmici.lpVerb = (LPCSTR) MAKEWORD(iCmd - iMinID, 0);
-			cmici.lpParameters = nullptr;
-			cmici.lpDirectory = nullptr;
-			cmici.nShow = SW_SHOW;
-
-			m_pActualContext->InvokeCommand(&cmici);
+			// Note that some menu items require the directory field to be set. For example, the
+			// "Git Bash Here" item (which is added by Git for Windows) requires that.
+			CMINVOKECOMMANDINFO commandInfo = {};
+			commandInfo.cbSize = sizeof(commandInfo);
+			commandInfo.fMask = 0;
+			commandInfo.hwnd = m_hwnd;
+			commandInfo.lpVerb = reinterpret_cast<LPCSTR>(MAKEINTRESOURCE(iCmd - iMinID));
+			commandInfo.lpDirectory = parsingPathOpt ? parsingPathOpt->c_str() : nullptr;
+			commandInfo.nShow = SW_SHOW;
+			m_pActualContext->InvokeCommand(&commandInfo);
 		}
 	}
 	else
@@ -194,6 +217,57 @@ HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme, int iM
 	DestroyMenu(hMenu);
 
 	return S_OK;
+}
+
+// Returns the parsing path for the current directory, but only if it's a filesystem path.
+std::optional<std::string> FileContextMenuManager::GetFilesystemDirectory()
+{
+	wil::com_ptr_nothrow<IShellItem> shellItem;
+	HRESULT hr = SHCreateItemFromIDList(m_pidlParent.get(), IID_PPV_ARGS(&shellItem));
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	wil::unique_cotaskmem_string parsingPath;
+	hr = shellItem->GetDisplayName(SIGDN_FILESYSPATH, &parsingPath);
+
+	if (SUCCEEDED(hr))
+	{
+		return wstrToStr(parsingPath.get());
+	}
+
+	// In Windows Explorer, it appears that when a menu item is invoked from the background context
+	// menu in a library folder, the directory that's used is the default directory for that
+	// library. The functionality here tries to mimic that behavior.
+	// Without this, menu items like "Git Bash Here" wouldn't work when invoked from a library
+	// directory (since a library doesn't have a filesystem path, even though it may be filesystem
+	// backed).
+	wil::com_ptr_nothrow<IShellLibrary> shellLibrary;
+	hr = SHLoadLibraryFromItem(shellItem.get(), STGM_READ, IID_PPV_ARGS(&shellLibrary));
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	wil::com_ptr_nothrow<IShellItem> defaultLocation;
+	hr = shellLibrary->GetDefaultSaveFolder(DSFT_DETECT, IID_PPV_ARGS(&defaultLocation));
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	hr = defaultLocation->GetDisplayName(SIGDN_FILESYSPATH, &parsingPath);
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	return wstrToStr(parsingPath.get());
 }
 
 LRESULT CALLBACK ShellMenuHookProcStub(

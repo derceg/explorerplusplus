@@ -6,12 +6,15 @@
 #include "Explorer++.h"
 #include "Config.h"
 #include "Explorer++_internal.h"
+#include "FolderView.h"
 #include "IDropFilesCallback.h"
 #include "ListViewEdit.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
 #include "Navigation.h"
+#include "NewMenuClient.h"
 #include "ResourceHelper.h"
+#include "ServiceProvider.h"
 #include "SetFileAttributesDialog.h"
 #include "ShellBrowser/Columns.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -20,7 +23,6 @@
 #include "SortMenuBuilder.h"
 #include "TabContainer.h"
 #include "ViewModeHelper.h"
-#include "iServiceProvider.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/ContextMenuManager.h"
 #include "../Helper/DropHandler.h"
@@ -512,6 +514,41 @@ void Explorerplusplus::OnListViewRClick(POINT *pCursorPos)
 
 void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 {
+	if (IsWindows8OrGreater())
+	{
+		OnListViewBackgroundRClickWindows8OrGreater(pCursorPos);
+	}
+	else
+	{
+		OnListViewBackgroundRClickWindows7(pCursorPos);
+	}
+}
+
+void Explorerplusplus::OnListViewBackgroundRClickWindows8OrGreater(POINT *pCursorPos)
+{
+	auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
+
+	FileContextMenuManager fcmm(m_hActiveListView, pidlDirectory.get(), {});
+
+	FileContextMenuInfo fcmi;
+	fcmi.uFrom = FROM_LISTVIEW;
+
+	StatusBar statusBar(m_hStatusBar);
+
+	auto serviceProvider = ServiceProvider::Create();
+
+	auto newMenuClient = NewMenuClient::Create(this);
+	serviceProvider->RegisterService(IID_INewMenuClient, newMenuClient.get());
+
+	auto folderView = FolderView::Create(pidlDirectory.get());
+	serviceProvider->RegisterService(IID_IFolderView, folderView.get());
+
+	fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, pCursorPos, &statusBar,
+		serviceProvider.get(), reinterpret_cast<DWORD_PTR>(&fcmi), TRUE, IsKeyDown(VK_SHIFT));
+}
+
+void Explorerplusplus::OnListViewBackgroundRClickWindows7(POINT *pCursorPos)
+{
 	auto parentMenu = InitializeRightClickMenu();
 	HMENU menu = GetSubMenu(parentMenu.get(), 0);
 
@@ -538,9 +575,13 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 		return;
 	}
 
-	ServiceProvider serviceProvider(this);
+	auto serviceProvider = ServiceProvider::Create();
+
+	auto newMenuClient = NewMenuClient::Create(this);
+	serviceProvider->RegisterService(IID_INewMenuClient, newMenuClient.get());
+
 	ContextMenuManager cmm(ContextMenuManager::ContextMenuType::Background, pidlDirectory.get(),
-		pDataObject.get(), &serviceProvider, BLACKLISTED_BACKGROUND_MENU_CLSID_ENTRIES);
+		pDataObject.get(), serviceProvider.get(), BLACKLISTED_BACKGROUND_MENU_CLSID_ENTRIES);
 
 	cmm.ShowMenu(m_hContainer, menu, IDM_FILE_COPYFOLDERPATH, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID,
 		*pCursorPos, *m_pStatusBar);
@@ -607,7 +648,7 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 
 		StatusBar statusBar(m_hStatusBar);
 
-		fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, pCursorPos, &statusBar,
+		fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, pCursorPos, &statusBar, nullptr,
 			reinterpret_cast<DWORD_PTR>(&fcmi), TRUE, IsKeyDown(VK_SHIFT));
 	}
 }

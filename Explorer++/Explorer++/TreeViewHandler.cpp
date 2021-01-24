@@ -219,7 +219,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam, LPARAM lParam)
 
 				StatusBar statusBar(m_hStatusBar);
 
-				fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, ppt, &statusBar,
+				fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, ppt, &statusBar, nullptr,
 					reinterpret_cast<DWORD_PTR>(&fcmi), TRUE, IsKeyDown(VK_SHIFT));
 			}
 		}

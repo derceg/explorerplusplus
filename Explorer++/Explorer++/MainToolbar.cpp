@@ -825,16 +825,8 @@ void MainToolbar::ShowToolbarViewsDropdown()
 
 void MainToolbar::CreateViewsMenu(POINT *ptOrigin)
 {
-	const Tab &tab = m_pexpp->GetTabContainer()->GetSelectedTab();
-	ViewMode viewMode = tab.GetShellBrowser()->GetViewMode();
-
-	HMENU viewsMenu = m_pexpp->BuildViewsMenu();
-
-	int itemToCheck = GetViewModeMenuId(viewMode);
-	CheckMenuRadioItem(
-		viewsMenu, IDM_VIEW_THUMBNAILS, IDM_VIEW_EXTRALARGEICONS, itemToCheck, MF_BYCOMMAND);
-
-	TrackPopupMenu(viewsMenu, TPM_LEFTALIGN, ptOrigin->x, ptOrigin->y, 0, m_hwnd, nullptr);
+	auto viewsMenu = m_pexpp->BuildViewsMenu();
+	TrackPopupMenu(viewsMenu.get(), TPM_LEFTALIGN, ptOrigin->x, ptOrigin->y, 0, m_hwnd, nullptr);
 }
 
 // For some of the buttons on the toolbar, their state depends on an item from

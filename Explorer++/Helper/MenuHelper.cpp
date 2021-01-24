@@ -34,6 +34,22 @@ void MenuHelper::AddSeparator(HMENU menu, UINT item, BOOL byPosition)
 	InsertMenuItem(menu, item, byPosition, &mii);
 }
 
+void MenuHelper::AddSubMenuItem(HMENU menu, std::wstring &text, wil::unique_hmenu subMenu)
+{
+	AddSubMenuItem(menu, text, std::move(subMenu), GetMenuItemCount(menu), TRUE);
+}
+
+void MenuHelper::AddSubMenuItem(
+	HMENU menu, std::wstring &text, wil::unique_hmenu subMenu, UINT item, BOOL byPosition)
+{
+	MENUITEMINFO mii = {};
+	mii.cbSize = sizeof(mii);
+	mii.fMask = MIIM_STRING | MIIM_SUBMENU;
+	mii.dwTypeData = text.data();
+	mii.hSubMenu = subMenu.release();
+	InsertMenuItem(menu, item, byPosition, &mii);
+}
+
 void MenuHelper::AttachSubMenu(
 	HMENU parentMenu, wil::unique_hmenu subMenu, UINT item, BOOL byPosition)
 {
@@ -58,4 +74,61 @@ void MenuHelper::EnableItem(HMENU hMenu, UINT itemID, BOOL bEnable)
 {
 	UINT state = bEnable ? MF_ENABLED : MF_DISABLED;
 	EnableMenuItem(hMenu, itemID, state);
+}
+
+void MenuHelper::RemoveDuplicateSeperators(HMENU menu)
+{
+	int count = GetMenuItemCount(menu);
+
+	if (count == -1)
+	{
+		return;
+	}
+
+	bool previousItemSeperator = false;
+
+	for (int i = count - 1; i >= 0; i--)
+	{
+		MENUITEMINFO mii;
+		mii.cbSize = sizeof(mii);
+		mii.fMask = MIIM_FTYPE;
+		GetMenuItemInfo(menu, i, TRUE, &mii);
+
+		bool currentItemSeparator = WI_IsFlagSet(mii.fType, MFT_SEPARATOR);
+
+		if (previousItemSeperator && currentItemSeparator)
+		{
+			DeleteMenu(menu, i, MF_BYPOSITION);
+		}
+		else
+		{
+			previousItemSeperator = currentItemSeparator;
+		}
+	}
+}
+
+// Removes any separators from the end of a menu.
+void MenuHelper::RemoveTrailingSeparators(HMENU menu)
+{
+	int count = GetMenuItemCount(menu);
+
+	if (count == -1)
+	{
+		return;
+	}
+
+	for (int i = count - 1; i >= 0; i--)
+	{
+		MENUITEMINFO mii;
+		mii.cbSize = sizeof(mii);
+		mii.fMask = MIIM_FTYPE;
+		BOOL res = GetMenuItemInfo(menu, i, TRUE, &mii);
+
+		if (!res || mii.fType != MFT_SEPARATOR)
+		{
+			break;
+		}
+
+		DeleteMenu(menu, i, MF_BYPOSITION);
+	}
 }

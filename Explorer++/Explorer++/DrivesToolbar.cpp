@@ -217,16 +217,20 @@ LRESULT CALLBACK DrivesToolbar::DrivesToolbarParentProc(
 					{
 						std::wstring path = GetDrivePath(iIndex);
 
-						unique_pidl_absolute pidlItem;
+						unique_pidl_absolute pidl;
 						HRESULT hr = SHParseDisplayName(
-							path.c_str(), nullptr, wil::out_param(pidlItem), 0, nullptr);
+							path.c_str(), nullptr, wil::out_param(pidl), 0, nullptr);
 
 						if (SUCCEEDED(hr))
 						{
 							ClientToScreen(m_hwnd, &pnmm->pt);
 
-							std::vector<PCITEMID_CHILD> pidlItems;
-							FileContextMenuManager fcmm(m_hwnd, pidlItem.get(), pidlItems);
+							unique_pidl_child child(ILCloneChild(ILFindLastID(pidl.get())));
+
+							[[maybe_unused]] BOOL res = ILRemoveLastID(pidl.get());
+							assert(res);
+
+							FileContextMenuManager fcmm(m_hwnd, pidl.get(), { child.get() });
 
 							fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, &pnmm->pt,
 								m_pexpp->GetStatusBar(), NULL, FALSE, IsKeyDown(VK_SHIFT));
@@ -400,12 +404,14 @@ std::wstring DrivesToolbar::GetDrivePath(int iIndex)
 	return itr->second;
 }
 
-void DrivesToolbar::AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, HMENU hMenu)
+void DrivesToolbar::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, IContextMenu *contextMenu,
+	HMENU hMenu)
 {
 	UNREFERENCED_PARAMETER(pidlParent);
 	UNREFERENCED_PARAMETER(pidlItems);
 	UNREFERENCED_PARAMETER(dwData);
+	UNREFERENCED_PARAMETER(contextMenu);
 
 	std::wstring openInNewTabText =
 		ResourceHelper::LoadString(m_hInstance, IDS_GENERAL_OPEN_IN_NEW_TAB);
@@ -421,12 +427,14 @@ void DrivesToolbar::AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
 BOOL DrivesToolbar::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd)
 {
-	UNREFERENCED_PARAMETER(pidlItems);
 	UNREFERENCED_PARAMETER(dwData);
 
 	if (StrCmpI(szCmd, _T("open")) == 0)
 	{
-		m_pexpp->OpenItem(pidlParent);
+		assert(pidlItems.size() == 1);
+
+		unique_pidl_absolute pidl(ILCombine(pidlParent, pidlItems[0]));
+		m_pexpp->OpenItem(pidl.get());
 		return TRUE;
 	}
 
@@ -441,8 +449,13 @@ void DrivesToolbar::HandleCustomMenuItem(
 	switch (iCmd)
 	{
 	case MENU_ID_OPEN_IN_NEW_TAB:
+	{
+		assert(pidlItems.size() == 1);
+
+		unique_pidl_absolute pidl(ILCombine(pidlParent, pidlItems[0]));
 		m_pexpp->GetTabContainer()->CreateNewTab(
-			pidlParent, TabSettings(_selected = m_pexpp->GetConfig()->openTabsInForeground));
-		break;
+			pidl.get(), TabSettings(_selected = m_pexpp->GetConfig()->openTabsInForeground));
+	}
+	break;
 	}
 }

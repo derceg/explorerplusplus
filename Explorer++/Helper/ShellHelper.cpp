@@ -11,6 +11,7 @@
 #include "RegistrySettings.h"
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/container_hash/hash.hpp>
 #include <wil/com.h>
 #include <propkey.h>
 
@@ -1394,4 +1395,14 @@ std::vector<PCIDLIST_ABSOLUTE> ShallowCopyPidls(const std::vector<unique_pidl_ab
 			return pidl.get();
 		});
 	return rawPidls;
+}
+
+std::size_t hash_value(const IID &iid)
+{
+	std::size_t seed = 0;
+	boost::hash_combine(seed, iid.Data1);
+	boost::hash_combine(seed, iid.Data2);
+	boost::hash_combine(seed, iid.Data3);
+	boost::hash_combine(seed, iid.Data4);
+	return seed;
 }

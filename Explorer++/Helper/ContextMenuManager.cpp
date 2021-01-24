@@ -12,6 +12,7 @@
 #include "ContextMenuManager.h"
 #include "Helper.h"
 #include "Macros.h"
+#include "MenuHelper.h"
 #include "ShellHelper.h"
 #include <vector>
 
@@ -176,8 +177,9 @@ bool ContextMenuManager::ShowMenu(HWND hwnd, HMENU hMenu, UINT uIDPrevious, UINT
 		return false;
 	}
 
-	UINT uCmd = TrackPopupMenu(hMenu,
-		TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD, pt.x, pt.y, 0, hwnd, nullptr);
+	UINT uCmd =
+		TrackPopupMenu(hMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD, pt.x,
+			pt.y, 0, hwnd, nullptr);
 
 	RemoveWindowSubclass(hwnd, ContextMenuHookProc, CONTEXT_MENU_SUBCLASS_ID);
 
@@ -245,36 +247,7 @@ void ContextMenuManager::AddMenuEntries(HMENU hMenu, UINT uIDPrevious, int iMinI
 		}
 	}
 
-	RemoveDuplicateSeperators(hMenu);
-}
-
-void ContextMenuManager::RemoveDuplicateSeperators(HMENU hMenu)
-{
-	std::vector<int> deletionVector;
-
-	bool bPreviousItemSeperator = false;
-
-	for (int i = 0; i < GetMenuItemCount(hMenu); i++)
-	{
-		MENUITEMINFO mii;
-		mii.cbSize = sizeof(mii);
-		mii.fMask = MIIM_FTYPE;
-		GetMenuItemInfo(hMenu, i, TRUE, &mii);
-
-		bool bCurrentItemSeparator = (mii.fType & MFT_SEPARATOR) ? true : false;
-
-		if (bPreviousItemSeperator && bCurrentItemSeparator)
-		{
-			deletionVector.push_back(i);
-		}
-
-		bPreviousItemSeperator = bCurrentItemSeparator;
-	}
-
-	for (auto itr = deletionVector.rbegin(); itr != deletionVector.rend(); itr++)
-	{
-		DeleteMenu(hMenu, *itr, MF_BYPOSITION);
-	}
+	MenuHelper::RemoveDuplicateSeperators(hMenu);
 }
 
 LRESULT CALLBACK ContextMenuManager::ContextMenuHookProc(

@@ -15,7 +15,11 @@
 #include "MainWindow.h"
 #include "MenuHelper.h"
 #include "MenuRanges.h"
+#include "ResourceHelper.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ViewModes.h"
+#include "Tab.h"
+#include "TabContainer.h"
 #include "TaskbarThumbnails.h"
 #include "UiTheming.h"
 #include "ViewModeHelper.h"
@@ -128,31 +132,40 @@ void Explorerplusplus::InitializeDisplayWindow()
 	ApplyDisplayWindowPosition();
 }
 
-HMENU Explorerplusplus::BuildViewsMenu()
+wil::unique_hmenu Explorerplusplus::BuildViewsMenu()
 {
-	HMENU viewsMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_VIEWS_MENU)), 0);
-	AddViewModesToMenu(viewsMenu);
-	DeleteMenu(viewsMenu, IDM_VIEW_PLACEHOLDER, MF_BYCOMMAND);
+	wil::unique_hmenu viewsMenu(CreatePopupMenu());
+	AddViewModesToMenu(viewsMenu.get(), 0, TRUE);
+
+	const Tab &tab = m_tabContainer->GetSelectedTab();
+	ViewMode currentViewMode = tab.GetShellBrowser()->GetViewMode();
+
+	CheckMenuRadioItem(viewsMenu.get(), IDM_VIEW_THUMBNAILS, IDM_VIEW_EXTRALARGEICONS,
+		GetViewModeMenuId(currentViewMode), MF_BYCOMMAND);
 
 	return viewsMenu;
 }
 
-void Explorerplusplus::AddViewModesToMenu(HMENU menu)
+void Explorerplusplus::AddViewModesToMenu(HMENU menu, UINT startPosition, BOOL byPosition)
 {
-	/* Insert the view mode (icons, small icons, details, etc) menus in. */
-	MENUITEMINFO mii;
-	TCHAR szText[64];
+	UINT position = startPosition;
 
 	for (auto viewMode : VIEW_MODES)
 	{
-		LoadString(
-			m_hLanguageModule, GetViewModeMenuStringId(viewMode), szText, SIZEOF_ARRAY(szText));
+		std::wstring text =
+			ResourceHelper::LoadString(m_hLanguageModule, GetViewModeMenuStringId(viewMode));
 
-		mii.cbSize = sizeof(mii);
-		mii.fMask = MIIM_ID | MIIM_STRING;
-		mii.wID = GetViewModeMenuId(viewMode);
-		mii.dwTypeData = szText;
-		InsertMenuItem(menu, IDM_VIEW_PLACEHOLDER, FALSE, &mii);
+		MENUITEMINFO itemInfo;
+		itemInfo.cbSize = sizeof(itemInfo);
+		itemInfo.fMask = MIIM_ID | MIIM_STRING;
+		itemInfo.wID = GetViewModeMenuId(viewMode);
+		itemInfo.dwTypeData = text.data();
+		InsertMenuItem(menu, position, byPosition, &itemInfo);
+
+		if (byPosition)
+		{
+			position++;
+		}
 	}
 }
 
