@@ -834,7 +834,7 @@ BOOL ArePidlsEquivalent(PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2)
 
 	if (SUCCEEDED(hr))
 	{
-		hr = pDesktopFolder->CompareIDs(0, pidl1, pidl2);
+		hr = pDesktopFolder->CompareIDs(SHCIDS_CANONICALONLY, pidl1, pidl2);
 
 		if (HRESULT_CODE(hr) == 0)
 		{
