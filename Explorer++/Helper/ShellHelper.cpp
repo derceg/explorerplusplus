@@ -1326,7 +1326,9 @@ private:
 };
 
 // This performs the same function as SHSimpleIDListFromPath(), which is deprecated.
-HRESULT CreateSimplePidl(const std::wstring &path, PIDLIST_ABSOLUTE *pidl)
+// The path provided should be relative to the parent. If parent is null, the path should be
+// absolute.
+HRESULT CreateSimplePidl(const std::wstring &path, PIDLIST_ABSOLUTE *pidl, IShellFolder *parent)
 {
 	wil::com_ptr_nothrow<IBindCtx> bindCtx;
 	RETURN_IF_FAILED(CreateBindCtx(0, &bindCtx));
@@ -1341,7 +1343,21 @@ HRESULT CreateSimplePidl(const std::wstring &path, PIDLIST_ABSOLUTE *pidl)
 	RETURN_IF_FAILED(
 		bindCtx->RegisterObjectParam(const_cast<PWSTR>(STR_FILE_SYS_BIND_DATA), fsBindData.get()));
 
-	return SHParseDisplayName(path.c_str(), bindCtx.get(), pidl, 0, nullptr);
+	if (!parent)
+	{
+		return SHParseDisplayName(path.c_str(), bindCtx.get(), pidl, 0, nullptr);
+	}
+
+	unique_pidl_relative pidlRelative;
+	RETURN_IF_FAILED(parent->ParseDisplayName(nullptr, bindCtx.get(),
+		const_cast<LPWSTR>(path.c_str()), nullptr, wil::out_param(pidlRelative), nullptr));
+
+	unique_pidl_absolute pidlParent;
+	RETURN_IF_FAILED(SHGetIDListFromObject(parent, wil::out_param(pidlParent)));
+
+	*pidl = ILCombine(pidlParent.get(), pidlRelative.get());
+
+	return S_OK;
 }
 
 // This performs the same function as SHGetRealIDL, which is deprecated.

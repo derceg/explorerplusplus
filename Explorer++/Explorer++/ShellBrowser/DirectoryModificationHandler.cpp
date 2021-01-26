@@ -497,24 +497,17 @@ void ShellBrowser::OnFileRenamedOldName(const TCHAR *szFileName)
 {
 	g_iRenamedItem = -1;
 
-	TCHAR fullFileName[MAX_PATH];
-	HRESULT hr =
-		StringCchCopy(fullFileName, SIZEOF_ARRAY(fullFileName), m_directoryState.directory.c_str());
+	wil::com_ptr_nothrow<IShellFolder> parent;
+	HRESULT hr = SHBindToObject(
+		nullptr, m_directoryState.pidlDirectory.get(), nullptr, IID_PPV_ARGS(&parent));
 
 	if (FAILED(hr))
 	{
 		return;
 	}
 
-	BOOL res = PathAppend(fullFileName, szFileName);
-
-	if (!res)
-	{
-		return;
-	}
-
 	unique_pidl_absolute pidl;
-	hr = CreateSimplePidl(fullFileName, wil::out_param(pidl));
+	hr = CreateSimplePidl(szFileName, wil::out_param(pidl), parent.get());
 
 	if (FAILED(hr))
 	{

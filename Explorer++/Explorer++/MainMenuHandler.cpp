@@ -277,12 +277,22 @@ void Explorerplusplus::OnResolveLink()
 
 			if (tab.GetShellBrowser()->GetDirectory() == szPath)
 			{
-				unique_pidl_absolute pidl;
-				hr = CreateSimplePidl(szFullFileName, wil::out_param(pidl));
+				wil::com_ptr_nothrow<IShellFolder> parent;
+				hr = SHBindToObject(nullptr, tab.GetShellBrowser()->GetDirectoryIdl().get(),
+					nullptr, IID_PPV_ARGS(&parent));
 
-				if (SUCCEEDED(hr))
+				if (hr == S_OK)
 				{
-					m_pActiveShellBrowser->SelectItems({ pidl.get() });
+					auto *filename = PathFindFileName(szFullFileName);
+					assert(filename != szFullFileName);
+
+					unique_pidl_absolute pidl;
+					hr = CreateSimplePidl(filename, wil::out_param(pidl), parent.get());
+
+					if (SUCCEEDED(hr))
+					{
+						m_pActiveShellBrowser->SelectItems({ pidl.get() });
+					}
 				}
 			}
 
