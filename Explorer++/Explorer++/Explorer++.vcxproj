@@ -514,6 +514,7 @@
     <ClCompile Include="ShellTreeView\iDropSource.cpp" />
     <ClCompile Include="ShellTreeView\iDropTarget.cpp" />
     <ClCompile Include="ShellTreeView\ShellTreeView.cpp" />
+    <ClCompile Include="ShellView.cpp" />
     <ClCompile Include="SortMenuBuilder.cpp" />
     <ClCompile Include="Bookmarks\BookmarkHandler.cpp" />
     <ClCompile Include="Bookmarks\BookmarkHelper.cpp" />
@@ -761,6 +762,7 @@
     <ClInclude Include="ShellBrowser\SortModes.h" />
     <ClInclude Include="ShellBrowser\ViewModes.h" />
     <ClInclude Include="ShellTreeView\ShellTreeView.h" />
+    <ClInclude Include="ShellView.h" />
     <ClInclude Include="SignalWrapper.h" />
     <ClInclude Include="SolWrapper.h" />
     <ClInclude Include="SortMenuBuilder.h" />

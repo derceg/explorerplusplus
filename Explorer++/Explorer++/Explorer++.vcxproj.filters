@@ -457,6 +457,9 @@
     <ClCompile Include="NewMenuClient.cpp">
       <Filter>Context Menu Support\New Menu</Filter>
     </ClCompile>
+    <ClCompile Include="ShellView.cpp">
+      <Filter>Context Menu Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -908,6 +911,9 @@
     </ClInclude>
     <ClInclude Include="NewMenuClient.h">
       <Filter>Context Menu Support\New Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellView.h">
+      <Filter>Context Menu Support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

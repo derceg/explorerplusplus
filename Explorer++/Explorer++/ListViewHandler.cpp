@@ -20,6 +20,7 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/ViewModes.h"
+#include "ShellView.h"
 #include "SortMenuBuilder.h"
 #include "TabContainer.h"
 #include "ViewModeHelper.h"
@@ -542,6 +543,9 @@ void Explorerplusplus::OnListViewBackgroundRClickWindows8OrGreater(POINT *pCurso
 
 	auto folderView = FolderView::Create(pidlDirectory.get());
 	serviceProvider->RegisterService(IID_IFolderView, folderView.get());
+
+	auto shellView = ShellView::Create(pidlDirectory.get(), m_pActiveShellBrowser);
+	serviceProvider->RegisterService(SID_DefView, shellView.get());
 
 	fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, pCursorPos, &statusBar,
 		serviceProvider.get(), reinterpret_cast<DWORD_PTR>(&fcmi), TRUE, IsKeyDown(VK_SHIFT));
