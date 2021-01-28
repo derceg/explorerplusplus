@@ -550,7 +550,7 @@ void Explorerplusplus::OnListViewBackgroundRClickWindows8OrGreater(POINT *pCurso
 	serviceProvider->RegisterService(SID_DefView, shellView.get());
 
 	fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, pCursorPos, &statusBar,
-		serviceProvider.get(), reinterpret_cast<DWORD_PTR>(&fcmi), TRUE, IsKeyDown(VK_SHIFT));
+		serviceProvider.get(), reinterpret_cast<DWORD_PTR>(&fcmi), FALSE, IsKeyDown(VK_SHIFT));
 }
 
 void Explorerplusplus::OnListViewBackgroundRClickWindows7(POINT *pCursorPos)
