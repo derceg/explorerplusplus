@@ -95,7 +95,6 @@ HRESULT _stdcall ShellBrowser::DragEnter(
 
 HRESULT _stdcall ShellBrowser::DragOver(DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect)
 {
-	RECT rc;
 	POINT pt;
 
 	*pdwEffect = DetermineDragEffect(grfKeyState, *pdwEffect, m_bDataAccept, m_bOnSameDrive);
@@ -107,7 +106,6 @@ HRESULT _stdcall ShellBrowser::DragOver(DWORD grfKeyState, POINTL ptl, DWORD *pd
 	m_pDropTargetHelper->DragOver((LPPOINT) &pt, *pdwEffect);
 
 	ScreenToClient(m_hListView, (LPPOINT) &pt);
-	GetClientRect(m_hListView, &rc);
 
 	/* If the cursor is too close to either the top or bottom
 	of the listview, scroll the listview in the required direction. */
