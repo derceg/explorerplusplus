@@ -257,13 +257,13 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	}
 	else if (StrCmpI(szCmd, _T("paste")) == 0)
 	{
-		// This item should only be shown in the background context menu.
-		assert(pfcmi->uFrom == FROM_LISTVIEW);
-		assert(pidlItems.empty());
-
-		OnListViewPaste();
-
-		return TRUE;
+		if (pfcmi->uFrom == FROM_LISTVIEW && pidlItems.empty())
+		{
+			// The paste item on the background context menu is non-functional, so needs to be
+			// handled here.
+			OnListViewPaste();
+			return TRUE;
+		}
 	}
 	else if (StrCmpI(szCmd, _T("pastelink")) == 0)
 	{
