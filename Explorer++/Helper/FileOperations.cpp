@@ -17,7 +17,6 @@
 
 enum class PasteType
 {
-	Link,
 	HardLink
 };
 
@@ -424,11 +423,6 @@ HRESULT CopyFilesToClipboard(
 	return S_OK;
 }
 
-int PasteLinksToClipboardFiles(const TCHAR *szDestination)
-{
-	return PasteFilesFromClipboardSpecial(szDestination, PasteType::Link);
-}
-
 int PasteHardLinks(const TCHAR *szDestination)
 {
 	return PasteFilesFromClipboardSpecial(szDestination, PasteType::HardLink);
@@ -481,12 +475,6 @@ int PasteFilesFromClipboardSpecial(const TCHAR *szDestination, PasteType pasteTy
 
 					switch (pasteType)
 					{
-					case PasteType::Link:
-						PathRenameExtension(szLinkFileName, _T(".lnk"));
-						NFileOperations::CreateLinkToFile(
-							szOldFileName, szLinkFileName, EMPTY_STRING);
-						break;
-
 					case PasteType::HardLink:
 						CreateHardLink(szLinkFileName, szOldFileName, nullptr);
 						break;

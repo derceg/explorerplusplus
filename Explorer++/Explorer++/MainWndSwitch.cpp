@@ -417,7 +417,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		break;
 
 	case IDM_EDIT_PASTESHORTCUT:
-		PasteLinksToClipboardFiles(m_pActiveShellBrowser->GetDirectory().c_str());
+		OnPasteShortcut();
 		break;
 
 	case IDM_EDIT_PASTEHARDLINK:

@@ -104,11 +104,26 @@ void Explorerplusplus::UpdateBackgroundContextMenu(IContextMenu *contextMenu, HM
 				ResourceHelper::LoadString(m_hLanguageModule, IDS_BACKGROUND_CONTEXT_MENU_GROUP_BY);
 			MenuHelper::AddSubMenuItem(menu, text, std::move(sortMenus.groupByMenu), i, TRUE);
 		}
-		else if (StrCmpI(verb, L"paste") == 0 || StrCmpI(verb, L"pastelink") == 0)
+		else if (StrCmpI(verb, L"paste") == 0)
 		{
 			UINT flags = MF_BYPOSITION;
 
 			if (CanPaste())
+			{
+				flags |= MF_ENABLED;
+			}
+			else
+			{
+				flags |= MF_DISABLED;
+			}
+
+			EnableMenuItem(menu, i, flags);
+		}
+		else if (StrCmpI(verb, L"pastelink") == 0)
+		{
+			UINT flags = MF_BYPOSITION;
+
+			if (CanPasteShortcut())
 			{
 				flags |= MF_ENABLED;
 			}
@@ -271,7 +286,7 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		assert(pfcmi->uFrom == FROM_LISTVIEW);
 		assert(pidlItems.empty());
 
-		PasteLinksToClipboardFiles(m_pActiveShellBrowser->GetDirectory().c_str());
+		OnListViewPasteShortcut();
 
 		return TRUE;
 	}

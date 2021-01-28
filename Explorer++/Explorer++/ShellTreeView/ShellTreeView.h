@@ -60,7 +60,8 @@ public:
 	void ShowPropertiesOfSelectedItem() const;
 	void DeleteSelectedItem(bool permanent);
 	void CopySelectedItemToClipboard(bool copy);
-	void PasteClipboardData();
+	void Paste();
+	void PasteShortcut();
 
 private:
 	static const UINT_PTR SUBCLASS_ID = 0;

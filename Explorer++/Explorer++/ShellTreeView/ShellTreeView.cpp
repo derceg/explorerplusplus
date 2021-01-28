@@ -627,7 +627,7 @@ LRESULT ShellTreeView::OnKeyDown(const NMTVKEYDOWN *keyDown)
 	case 'V':
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
-			PasteClipboardData();
+			Paste();
 		}
 		break;
 
@@ -1982,7 +1982,7 @@ void ShellTreeView::CopySelectedItemToClipboard(bool copy)
 	}
 }
 
-void ShellTreeView::PasteClipboardData()
+void ShellTreeView::Paste()
 {
 	wil::com_ptr_nothrow<IDataObject> clipboardObject;
 	HRESULT hr = OleGetClipboard(&clipboardObject);
@@ -2015,6 +2015,13 @@ void ShellTreeView::PasteClipboardData()
 			nullptr, !m_config->overwriteExistingFilesConfirmation);
 		dropHandler->Release();
 	}
+}
+
+void ShellTreeView::PasteShortcut()
+{
+	auto &selectedItem = GetItemByHandle(TreeView_GetSelection(m_hTreeView));
+	ExecuteActionFromContextMenu(
+		selectedItem.pidl.get(), {}, m_hTreeView, L"pastelink", 0, nullptr);
 }
 
 void ShellTreeView::UpdateCurrentClipboardObject(

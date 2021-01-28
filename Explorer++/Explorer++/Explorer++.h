@@ -157,6 +157,12 @@ private:
 		int uId;
 	};
 
+	enum class PasteType
+	{
+		Normal,
+		Shortcut
+	};
+
 	LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
 	static LRESULT CALLBACK ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
@@ -199,6 +205,7 @@ private:
 	void OnShowFileProperties() const;
 	void OnCopy(BOOL bCopy);
 	void OnPaste();
+	void OnPasteShortcut();
 	void OnWildcardSelect(BOOL bSelect);
 	void OnResolveLink();
 	void OnLockToolbars();
@@ -249,6 +256,7 @@ private:
 	void OnListViewCopyUniversalPaths() const;
 	void OnListViewSetFileAttributes() const;
 	void OnListViewPaste();
+	void OnListViewPasteShortcut();
 
 	/* TreeView private message handlers. */
 	void OnTreeViewRightClick(WPARAM wParam, LPARAM lParam);
@@ -441,6 +449,8 @@ private:
 	BOOL CanDelete() const override;
 	BOOL CanShowFileProperties() const override;
 	BOOL CanPaste() const override;
+	BOOL CanPasteShortcut() const;
+	BOOL CanPasteShellData(PasteType pastType) const;
 	BOOL CanPasteCustomData() const;
 	BOOL TestItemAttributes(SFGAOF attributes) const;
 	HRESULT GetSelectionAttributes(SFGAOF *pItemAttributes) const;

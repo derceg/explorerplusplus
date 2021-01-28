@@ -44,5 +44,4 @@ HRESULT CutFiles(const std::vector<PCIDLIST_ABSOLUTE> &items, IDataObject **data
 HRESULT CopyFilesToClipboard(
 	const std::vector<PCIDLIST_ABSOLUTE> &items, bool move, IDataObject **dataObjectOut);
 
-int PasteLinksToClipboardFiles(const TCHAR *szDestination);
 int PasteHardLinks(const TCHAR *szDestination);

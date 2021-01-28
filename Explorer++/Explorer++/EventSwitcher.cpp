@@ -152,17 +152,29 @@ void Explorerplusplus::OnRightClick(NMHDR *nmhdr)
 
 void Explorerplusplus::OnPaste()
 {
-	HWND hFocus;
+	HWND focus = GetFocus();
 
-	hFocus = GetFocus();
-
-	if (hFocus == m_hActiveListView)
+	if (focus == m_hActiveListView)
 	{
 		OnListViewPaste();
 	}
-	else if (hFocus == m_shellTreeView->GetHWND())
+	else if (focus == m_shellTreeView->GetHWND())
 	{
-		m_shellTreeView->PasteClipboardData();
+		m_shellTreeView->Paste();
+	}
+}
+
+void Explorerplusplus::OnPasteShortcut()
+{
+	HWND focus = GetFocus();
+
+	if (focus == m_hActiveListView)
+	{
+		OnListViewPasteShortcut();
+	}
+	else if (focus == m_shellTreeView->GetHWND())
+	{
+		m_shellTreeView->PasteShortcut();
 	}
 }
 

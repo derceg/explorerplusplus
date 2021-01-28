@@ -133,6 +133,21 @@ HRESULT Explorerplusplus::GetTreeViewSelectionAttributes(SFGAOF *pItemAttributes
 
 BOOL Explorerplusplus::CanPaste() const
 {
+	if (CanPasteShellData(PasteType::Normal))
+	{
+		return TRUE;
+	}
+
+	return CanPasteCustomData();
+}
+
+BOOL Explorerplusplus::CanPasteShortcut() const
+{
+	return CanPasteShellData(PasteType::Shortcut);
+}
+
+BOOL Explorerplusplus::CanPasteShellData(PasteType pastType) const
+{
 	wil::com_ptr_nothrow<IDataObject> clipboardObject;
 	HRESULT hr = OleGetClipboard(&clipboardObject);
 
@@ -159,14 +174,25 @@ BOOL Explorerplusplus::CanPaste() const
 		}
 	}
 
-	if (directory
-		&& CanShellPasteDataObject(
-			directory.get(), clipboardObject.get(), DROPEFFECT_COPY | DROPEFFECT_MOVE))
+	DWORD effects = DROPEFFECT_NONE;
+
+	switch (pastType)
+	{
+	case Explorerplusplus::PasteType::Normal:
+		effects = DROPEFFECT_COPY | DROPEFFECT_MOVE;
+		break;
+
+	case Explorerplusplus::PasteType::Shortcut:
+		effects = DROPEFFECT_LINK;
+		break;
+	}
+
+	if (directory && CanShellPasteDataObject(directory.get(), clipboardObject.get(), effects))
 	{
 		return TRUE;
 	}
 
-	return CanPasteCustomData();
+	return FALSE;
 }
 
 BOOL Explorerplusplus::CanPasteCustomData() const
