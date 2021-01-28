@@ -21,6 +21,7 @@
 #include "DarkModeHelper.h"
 #include "TabContainer.h"
 #include "../Helper/CachedIcons.h"
+#include "../Helper/ClipboardHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DriveInfo.h"
 #include "../Helper/FileActionHandler.h"
@@ -1884,7 +1885,7 @@ void ShellTreeView::StartRenamingSelectedItem()
 void ShellTreeView::ShowPropertiesOfSelectedItem() const
 {
 	auto pidlDirectory = GetSelectedItemPidl();
-	ShowMultipleFileProperties(pidlDirectory.get(), nullptr, m_hTreeView, 0);
+	ShowMultipleFileProperties(pidlDirectory.get(), {}, m_hTreeView);
 }
 
 void ShellTreeView::DeleteSelectedItem(bool permanent)
@@ -1904,7 +1905,7 @@ void ShellTreeView::DeleteSelectedItem(bool permanent)
 		mask = CMIC_MASK_SHIFT_DOWN;
 	}
 
-	ExecuteActionFromContextMenu(pidl.get(), nullptr, m_hTreeView, 0, _T("delete"), mask);
+	ExecuteActionFromContextMenu(pidl.get(), {}, m_hTreeView, _T("delete"), mask, nullptr);
 }
 
 bool ShellTreeView::OnEndLabelEdit(const NMTVDISPINFO *dispInfo)
@@ -1993,18 +1994,27 @@ void ShellTreeView::PasteClipboardData()
 
 	auto &selectedItem = GetItemByHandle(TreeView_GetSelection(m_hTreeView));
 
-	std::wstring destinationPath;
-	hr = GetDisplayName(selectedItem.pidl.get(), SHGDN_FORPARSING, destinationPath);
-
-	if (FAILED(hr))
+	if (CanShellPasteDataObject(
+			selectedItem.pidl.get(), clipboardObject.get(), DROPEFFECT_COPY | DROPEFFECT_MOVE))
 	{
-		return;
+		ExecuteActionFromContextMenu(
+			selectedItem.pidl.get(), {}, m_hTreeView, L"paste", 0, nullptr);
 	}
+	else
+	{
+		std::wstring destinationPath;
+		hr = GetDisplayName(selectedItem.pidl.get(), SHGDN_FORPARSING, destinationPath);
 
-	DropHandler *dropHandler = DropHandler::CreateNew();
-	dropHandler->CopyClipboardData(clipboardObject.get(), m_hTreeView, destinationPath.c_str(),
-		nullptr, !m_config->overwriteExistingFilesConfirmation);
-	dropHandler->Release();
+		if (FAILED(hr))
+		{
+			return;
+		}
+
+		DropHandler *dropHandler = DropHandler::CreateNew();
+		dropHandler->CopyClipboardData(clipboardObject.get(), m_hTreeView, destinationPath.c_str(),
+			nullptr, !m_config->overwriteExistingFilesConfirmation);
+		dropHandler->Release();
+	}
 }
 
 void ShellTreeView::UpdateCurrentClipboardObject(

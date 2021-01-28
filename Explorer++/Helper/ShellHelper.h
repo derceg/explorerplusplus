@@ -91,9 +91,10 @@ BOOL ExecuteAndShowCurrentProcess(HWND hwnd, const TCHAR *szParameters);
 BOOL ExecuteAndShowProcess(HWND hwnd, const TCHAR *szProcess, const TCHAR *szParameters);
 HRESULT DecodeFriendlyPath(const std::wstring &friendlyPath, std::wstring &parsingPath);
 HRESULT ShowMultipleFileProperties(
-	PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD *ppidl, HWND hwndOwner, int nFiles);
-HRESULT ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD *ppidl,
-	HWND hwndOwner, int nFiles, const TCHAR *szAction, DWORD fMask);
+	PCIDLIST_ABSOLUTE pidlDirectory, const std::vector<PCITEMID_CHILD> &items, HWND hwnd);
+HRESULT ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory,
+	const std::vector<PCITEMID_CHILD> &items, HWND hwnd, const std::wstring &action, DWORD mask,
+	IUnknown *site);
 BOOL CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL);
 bool IsChildOfLibrariesFolder(PCIDLIST_ABSOLUTE pidl);
 HRESULT CreateSimplePidl(

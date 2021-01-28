@@ -6,13 +6,45 @@
 
 #include "../Helper/ShellHelper.h"
 #include <wil/com.h>
+#include <ShlObj.h>
 
-// This isn't a complete implementation. There's only enough functionality to support the background
-// context menu - in particular, the "Give access to" menu.
-class FolderView : public IFolderView
+class ShellBrowser;
+
+// This isn't a complete implementation. There's only enough functionality to support some context
+// menu items.
+class FolderView : public IFolderView2, public IShellFolderView
 {
 public:
-	static wil::com_ptr_nothrow<FolderView> Create(PCIDLIST_ABSOLUTE directory);
+	static wil::com_ptr_nothrow<FolderView> Create(ShellBrowser *shellBrowser);
+
+	// IFolderView2
+	IFACEMETHODIMP SetGroupBy(REFPROPERTYKEY key, BOOL ascending);
+	IFACEMETHODIMP GetGroupBy(PROPERTYKEY *key, BOOL *ascending);
+	IFACEMETHODIMP SetViewProperty(
+		PCUITEMID_CHILD pidl, REFPROPERTYKEY propertyKey, REFPROPVARIANT propVariant);
+	IFACEMETHODIMP GetViewProperty(
+		PCUITEMID_CHILD pidl, REFPROPERTYKEY propertyKey, PROPVARIANT *propVariant);
+	IFACEMETHODIMP SetTileViewProperties(PCUITEMID_CHILD pidl, LPCWSTR propList);
+	IFACEMETHODIMP SetExtendedTileViewProperties(PCUITEMID_CHILD pidl, LPCWSTR propList);
+	IFACEMETHODIMP SetText(FVTEXTTYPE type, LPCWSTR text);
+	IFACEMETHODIMP SetCurrentFolderFlags(DWORD mask, DWORD flags);
+	IFACEMETHODIMP GetCurrentFolderFlags(DWORD *flags);
+	IFACEMETHODIMP GetSortColumnCount(int *columns);
+	IFACEMETHODIMP SetSortColumns(const SORTCOLUMN *sortColumns, int numColumns);
+	IFACEMETHODIMP GetSortColumns(SORTCOLUMN *sortColumns, int numColumns);
+	IFACEMETHODIMP GetItem(int item, REFIID riid, void **ppv);
+	IFACEMETHODIMP GetVisibleItem(int start, BOOL previous, int *item);
+	IFACEMETHODIMP GetSelectedItem(int start, int *item);
+	IFACEMETHODIMP GetSelection(BOOL noneImpliesFolder, IShellItemArray **itemArray);
+	IFACEMETHODIMP GetSelectionState(PCUITEMID_CHILD pidl, DWORD *flags);
+	IFACEMETHODIMP InvokeVerbOnSelection(LPCSTR verb);
+	IFACEMETHODIMP SetViewModeAndIconSize(FOLDERVIEWMODE viewMode, int imageSize);
+	IFACEMETHODIMP GetViewModeAndIconSize(FOLDERVIEWMODE *viewMode, int *imageSize);
+	IFACEMETHODIMP SetGroupSubsetCount(UINT numVisibleRows);
+	IFACEMETHODIMP GetGroupSubsetCount(UINT *numVisibleRows);
+	IFACEMETHODIMP SetRedraw(BOOL redrawOn);
+	IFACEMETHODIMP IsMoveInSameFolder();
+	IFACEMETHODIMP DoRename();
 
 	// IFolderView
 	IFACEMETHODIMP GetCurrentViewMode(UINT *viewMode);
@@ -29,7 +61,38 @@ public:
 	IFACEMETHODIMP GetAutoArrange();
 	IFACEMETHODIMP SelectItem(int item, DWORD flags);
 	IFACEMETHODIMP SelectAndPositionItems(
-		UINT numItems, PCUITEMID_CHILD_ARRAY items, POINT *pt, DWORD flags);
+		UINT numItems, PCUITEMID_CHILD_ARRAY items, POINT *pts, DWORD flags);
+
+	// IShellFolderView
+	// Required for paste support (specifically, selecting items after they've been pasted).
+	// Note that this interface has two methods that have identical signatures to methods in the
+	// IFolderView/IFolderView2 interfaces: GetAutoArrange() and SetRedraw.
+	IFACEMETHODIMP Rearrange(LPARAM sort);
+	IFACEMETHODIMP GetArrangeParam(LPARAM *sort);
+	IFACEMETHODIMP ArrangeGrid();
+	IFACEMETHODIMP AutoArrange();
+	IFACEMETHODIMP AddObject(PUITEMID_CHILD pidl, UINT *item);
+	IFACEMETHODIMP GetObject(PITEMID_CHILD *pidl, UINT item);
+	IFACEMETHODIMP RemoveObject(PUITEMID_CHILD pidl, UINT *item);
+	IFACEMETHODIMP GetObjectCount(UINT *count);
+	IFACEMETHODIMP SetObjectCount(UINT count, UINT flags);
+	IFACEMETHODIMP UpdateObject(PUITEMID_CHILD pidlOld, PUITEMID_CHILD pidlNew, UINT *item);
+	IFACEMETHODIMP RefreshObject(PUITEMID_CHILD pidl, UINT *item);
+	IFACEMETHODIMP GetSelectedCount(UINT *numSelected);
+	IFACEMETHODIMP GetSelectedObjects(PCUITEMID_CHILD **pidlArray, UINT *numItems);
+	IFACEMETHODIMP IsDropOnSource(IDropTarget *dropTarget);
+	IFACEMETHODIMP GetDragPoint(POINT *pt);
+	IFACEMETHODIMP GetDropPoint(POINT *pt);
+	IFACEMETHODIMP MoveIcons(IDataObject *dataObject);
+	IFACEMETHODIMP SetItemPos(PCUITEMID_CHILD pidl, POINT *pt);
+	IFACEMETHODIMP IsBkDropTarget(IDropTarget *dropTarget);
+	IFACEMETHODIMP SetClipboard(BOOL move);
+	IFACEMETHODIMP SetPoints(IDataObject *dataObject);
+	IFACEMETHODIMP GetItemSpacing(ITEMSPACING *spacing);
+	IFACEMETHODIMP SetCallback(IShellFolderViewCB *callback, IShellFolderViewCB **oldCallback);
+	IFACEMETHODIMP Select(UINT flags);
+	IFACEMETHODIMP QuerySupport(UINT *support);
+	IFACEMETHODIMP SetAutomationObject(IDispatch *dispatch);
 
 	// IUnknown
 	IFACEMETHODIMP QueryInterface(REFIID riid, void **ppvObject);
@@ -37,8 +100,8 @@ public:
 	IFACEMETHODIMP_(ULONG) Release();
 
 private:
-	FolderView(PCIDLIST_ABSOLUTE directory);
+	FolderView(ShellBrowser *shellBrowser);
 
 	ULONG m_refCount;
-	unique_pidl_absolute m_directory;
+	ShellBrowser *m_shellBrowser;
 };

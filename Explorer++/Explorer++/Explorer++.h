@@ -441,6 +441,7 @@ private:
 	BOOL CanDelete() const override;
 	BOOL CanShowFileProperties() const override;
 	BOOL CanPaste() const override;
+	BOOL CanPasteCustomData() const;
 	BOOL TestItemAttributes(SFGAOF attributes) const;
 	HRESULT GetSelectionAttributes(SFGAOF *pItemAttributes) const;
 

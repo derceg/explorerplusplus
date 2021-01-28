@@ -7,6 +7,7 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "TabContainer.h"
+#include "../Helper/ClipboardHelper.h"
 
 BOOL Explorerplusplus::AnyItemsSelected() const
 {
@@ -131,6 +132,44 @@ HRESULT Explorerplusplus::GetTreeViewSelectionAttributes(SFGAOF *pItemAttributes
 }
 
 BOOL Explorerplusplus::CanPaste() const
+{
+	wil::com_ptr_nothrow<IDataObject> clipboardObject;
+	HRESULT hr = OleGetClipboard(&clipboardObject);
+
+	if (FAILED(hr))
+	{
+		return FALSE;
+	}
+
+	HWND focus = GetFocus();
+	unique_pidl_absolute directory;
+
+	if (focus == m_hActiveListView)
+	{
+		const Tab &selectedTab = m_tabContainer->GetSelectedTab();
+		directory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
+	}
+	else if (focus == m_shellTreeView->GetHWND())
+	{
+		auto item = TreeView_GetSelection(m_shellTreeView->GetHWND());
+
+		if (item)
+		{
+			directory = m_shellTreeView->GetItemPidl(item);
+		}
+	}
+
+	if (directory
+		&& CanShellPasteDataObject(
+			directory.get(), clipboardObject.get(), DROPEFFECT_COPY | DROPEFFECT_MOVE))
+	{
+		return TRUE;
+	}
+
+	return CanPasteCustomData();
+}
+
+BOOL Explorerplusplus::CanPasteCustomData() const
 {
 	HWND hFocus = GetFocus();
 

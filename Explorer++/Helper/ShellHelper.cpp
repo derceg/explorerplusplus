@@ -9,6 +9,7 @@
 #include "Macros.h"
 #include "ProcessHelper.h"
 #include "RegistrySettings.h"
+#include "StringHelper.h"
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/container_hash/hash.hpp>
@@ -1174,68 +1175,55 @@ HRESULT GetItemInfoTip(PCIDLIST_ABSOLUTE pidlComplete, TCHAR *szInfoTip, size_t 
 }
 
 HRESULT ShowMultipleFileProperties(
-	PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD *ppidl, HWND hwndOwner, int nFiles)
+	PCIDLIST_ABSOLUTE pidlDirectory, const std::vector<PCITEMID_CHILD> &items, HWND hwnd)
 {
-	return ExecuteActionFromContextMenu(
-		pidlDirectory, ppidl, hwndOwner, nFiles, _T("properties"), 0);
+	return ExecuteActionFromContextMenu(pidlDirectory, items, hwnd, _T("properties"), 0, nullptr);
 }
 
-HRESULT ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD *ppidl,
-	HWND hwndOwner, int nFiles, const TCHAR *szAction, DWORD fMask)
+HRESULT ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory,
+	const std::vector<PCITEMID_CHILD> &items, HWND hwnd, const std::wstring &action, DWORD mask,
+	IUnknown *site)
 {
-	IShellFolder *pShellParentFolder = nullptr;
-	IShellFolder *pShellFolder = nullptr;
-	IContextMenu *pContext = nullptr;
-	PCITEMID_CHILD pidlRelative = nullptr;
-	CMINVOKECOMMANDINFO cmici;
-	HRESULT hr = S_FALSE;
-	char szActionA[32];
+	wil::com_ptr_nothrow<IShellFolder> shellFolder;
+	RETURN_IF_FAILED(BindToIdl(pidlDirectory, IID_PPV_ARGS(&shellFolder)));
 
-	if (nFiles == 0)
+	wil::com_ptr_nothrow<IContextMenu> contextMenu;
+
+	if (items.empty())
 	{
-		hr = SHBindToParent(pidlDirectory, IID_PPV_ARGS(&pShellParentFolder), &pidlRelative);
-
-		if (SUCCEEDED(hr))
-		{
-			hr = GetUIObjectOf(
-				pShellParentFolder, hwndOwner, 1, &pidlRelative, IID_PPV_ARGS(&pContext));
-
-			pShellParentFolder->Release();
-			pShellParentFolder = nullptr;
-		}
+		RETURN_IF_FAILED(shellFolder->CreateViewObject(hwnd, IID_PPV_ARGS(&contextMenu)));
 	}
 	else
 	{
-		hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
-
-		if (SUCCEEDED(hr))
-		{
-			hr = GetUIObjectOf(pShellFolder, hwndOwner, nFiles, ppidl, IID_PPV_ARGS(&pContext));
-			pShellFolder->Release();
-		}
+		RETURN_IF_FAILED(GetUIObjectOf(shellFolder.get(), hwnd, static_cast<UINT>(items.size()),
+			items.data(), IID_PPV_ARGS(&contextMenu)));
 	}
 
-	if (SUCCEEDED(hr))
+	if (site)
 	{
-		/* Action string MUST be ANSI. */
-		WideCharToMultiByte(
-			CP_ACP, 0, szAction, -1, szActionA, SIZEOF_ARRAY(szActionA), nullptr, nullptr);
-
-		cmici.cbSize = sizeof(CMINVOKECOMMANDINFO);
-		cmici.fMask = fMask;
-		cmici.hwnd = hwndOwner;
-		cmici.lpVerb = szActionA;
-		cmici.lpParameters = nullptr;
-		cmici.lpDirectory = nullptr;
-		cmici.nShow = SW_SHOW;
-
-		hr = pContext->InvokeCommand(&cmici);
-
-		pContext->Release();
-		pContext = nullptr;
+		wil::com_ptr_nothrow<IObjectWithSite> objectWithSite;
+		RETURN_IF_FAILED(contextMenu->QueryInterface(IID_PPV_ARGS(&objectWithSite)));
+		RETURN_IF_FAILED(objectWithSite->SetSite(site));
 	}
 
-	return hr;
+	auto actionNarrow = wstrToStr(action);
+
+	if (!actionNarrow)
+	{
+		return E_FAIL;
+	}
+
+	CMINVOKECOMMANDINFO commandInfo;
+	commandInfo.cbSize = sizeof(CMINVOKECOMMANDINFO);
+	commandInfo.fMask = mask;
+	commandInfo.hwnd = hwnd;
+	commandInfo.lpVerb = actionNarrow->c_str();
+	commandInfo.lpParameters = nullptr;
+	commandInfo.lpDirectory = nullptr;
+	commandInfo.nShow = SW_SHOW;
+	RETURN_IF_FAILED(contextMenu->InvokeCommand(&commandInfo));
+
+	return S_OK;
 }
 
 BOOL CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL)

@@ -818,8 +818,7 @@ void ShellBrowser::ShowPropertiesForSelectedFiles() const
 	}
 
 	auto pidlDirectory = GetDirectoryIdl();
-	ShowMultipleFileProperties(
-		pidlDirectory.get(), rawPidls.data(), m_hOwner, static_cast<int>(rawPidls.size()));
+	ShowMultipleFileProperties(pidlDirectory.get(), rawPidls, m_hOwner);
 }
 
 void ShellBrowser::OnListViewHeaderRightClick(const POINTS &cursorPos)

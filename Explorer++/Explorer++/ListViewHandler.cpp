@@ -25,6 +25,7 @@
 #include "TabContainer.h"
 #include "ViewModeHelper.h"
 #include "../Helper/BulkClipboardWriter.h"
+#include "../Helper/ClipboardHelper.h"
 #include "../Helper/ContextMenuManager.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/FileActionHandler.h"
@@ -541,8 +542,9 @@ void Explorerplusplus::OnListViewBackgroundRClickWindows8OrGreater(POINT *pCurso
 	auto newMenuClient = NewMenuClient::Create(this);
 	serviceProvider->RegisterService(IID_INewMenuClient, newMenuClient.get());
 
-	auto folderView = FolderView::Create(pidlDirectory.get());
-	serviceProvider->RegisterService(IID_IFolderView, folderView.get());
+	auto folderView = FolderView::Create(m_pActiveShellBrowser);
+	serviceProvider->RegisterService(
+		IID_IFolderView, static_cast<IFolderView2 *>(folderView.get()));
 
 	auto shellView = ShellView::Create(pidlDirectory.get(), m_pActiveShellBrowser);
 	serviceProvider->RegisterService(SID_DefView, shellView.get());
@@ -679,9 +681,7 @@ void Explorerplusplus::OnListViewDoubleClick(NMHDR *nmhdr)
 			{
 				auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 				auto pidl = m_pActiveShellBrowser->GetItemChildIdl(ht.iItem);
-				std::vector<PCITEMID_CHILD> items = { pidl.get() };
-
-				ShowMultipleFileProperties(pidlDirectory.get(), items.data(), m_hContainer, 1);
+				ShowMultipleFileProperties(pidlDirectory.get(), { pidl.get() }, m_hContainer);
 			}
 			else
 			{
@@ -760,19 +760,36 @@ void Explorerplusplus::OnListViewSetFileAttributes() const
 
 void Explorerplusplus::OnListViewPaste()
 {
-	IDataObject *pClipboardObject = nullptr;
-	HRESULT hr;
+	wil::com_ptr_nothrow<IDataObject> clipboardObject;
+	HRESULT hr = OleGetClipboard(&clipboardObject);
 
-	hr = OleGetClipboard(&pClipboardObject);
+	if (FAILED(hr))
+	{
+		return;
+	}
 
-	if (hr == S_OK)
+	auto directory = m_pActiveShellBrowser->GetDirectoryIdl();
+
+	if (CanShellPasteDataObject(
+			directory.get(), clipboardObject.get(), DROPEFFECT_COPY | DROPEFFECT_MOVE))
+	{
+		auto serviceProvider = ServiceProvider::Create();
+
+		auto folderView = FolderView::Create(m_pActiveShellBrowser);
+		serviceProvider->RegisterService(
+			IID_IFolderView, static_cast<IShellFolderView *>(folderView.get()));
+
+		ExecuteActionFromContextMenu(directory.get(), {}, m_pActiveShellBrowser->GetListView(),
+			L"paste", 0, serviceProvider.get());
+	}
+	else
 	{
 		TCHAR szDestination[MAX_PATH + 1];
 
 		/* DO NOT use the internal current directory string.
-		Files are copied asynchronously, so a change of directory
-		will cause the destination directory to change in the
-		middle of the copy operation. */
+		 Files are copied asynchronously, so a change of directory
+		 will cause the destination directory to change in the
+		 middle of the copy operation. */
 		StringCchCopy(szDestination, SIZEOF_ARRAY(szDestination),
 			m_pActiveShellBrowser->GetDirectory().c_str());
 
@@ -781,11 +798,9 @@ void Explorerplusplus::OnListViewPaste()
 
 		DropHandler *pDropHandler = DropHandler::CreateNew();
 		auto *dropFilesCallback = new DropFilesCallback(this);
-		pDropHandler->CopyClipboardData(pClipboardObject, m_hContainer, szDestination,
+		pDropHandler->CopyClipboardData(clipboardObject.get(), m_hContainer, szDestination,
 			dropFilesCallback, !m_config->overwriteExistingFilesConfirmation);
 		pDropHandler->Release();
-
-		pClipboardObject->Release();
 	}
 }
 

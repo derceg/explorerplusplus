@@ -151,6 +151,9 @@
     <ClCompile Include="DataObjectWrapper.cpp">
       <Filter>Data Exchange\Drag and Drop</Filter>
     </ClCompile>
+    <ClCompile Include="ClipboardHelper.cpp">
+      <Filter>Data Exchange\Clipboard</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
@@ -314,6 +317,9 @@
     </ClInclude>
     <ClInclude Include="DataObjectWrapper.h">
       <Filter>Data Exchange\Drag and Drop</Filter>
+    </ClInclude>
+    <ClInclude Include="ClipboardHelper.h">
+      <Filter>Data Exchange\Clipboard</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
