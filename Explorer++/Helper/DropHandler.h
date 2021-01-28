@@ -31,7 +31,7 @@ public:
 
 	static HRESULT		GetDropFormats(std::list<FORMATETC> &ftcList);
 
-	void	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect,HWND hwndDrop,DragType dragType,const TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,BOOL bRenameOnCollision);
+	void	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINT pt,DWORD effect,HWND hwndDrop,DragType dragType,const TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,BOOL bRenameOnCollision);
 	void	CopyClipboardData(IDataObject *pDataObject,HWND hwndDrop,const TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,BOOL bRenameOnCollision);
 
 private:
@@ -39,7 +39,7 @@ private:
 	DropHandler() = default;
 	~DropHandler() = default;
 
-	void	HandleLeftClickDrop(IDataObject *pDataObject,POINTL *pptl);
+	void	HandleLeftClickDrop(IDataObject *pDataObject,POINT *pt);
 	void	HandleRightClickDrop();
 
 	BOOL	CheckDropFormatSupported(IDataObject *pDataObject,FORMATETC *pftc);
@@ -71,7 +71,7 @@ private:
 	IDataObject			*m_pDataObject;
 	IDropFilesCallback	*m_pDropFilesCallback;
 	DWORD				m_grfKeyState;
-	POINTL				m_ptl;
+	POINT				m_pt;
 	DWORD				m_dwEffect;
 	HWND				m_hwndDrop;
 	DragType			m_DragType;

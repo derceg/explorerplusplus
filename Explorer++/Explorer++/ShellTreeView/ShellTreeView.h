@@ -5,6 +5,7 @@
 #pragma once
 
 #include "../Helper/DropHandler.h"
+#include "../Helper/DropTarget.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include "../Helper/iDirectoryMonitor.h"
@@ -19,7 +20,7 @@ class FileActionHandler;
 __interface IExplorerplusplus;
 class TabContainer;
 
-class ShellTreeView : public IDropTarget, public IDropSource
+class ShellTreeView : public IDropSource, private DropTargetInternal
 {
 public:
 	/* IUnknown methods. */
@@ -38,20 +39,12 @@ public:
 	/* User functions. */
 	unique_pidl_absolute GetItemPidl(HTREEITEM hTreeItem) const;
 	HTREEITEM LocateItem(PCIDLIST_ABSOLUTE pidlDirectory);
-	BOOL QueryDragging();
+	bool IsWithinDrag() const;
 	void SetShowHidden(BOOL bShowHidden);
 	void RefreshAllIcons();
 
 	/* Sorting. */
 	int CALLBACK CompareItems(LPARAM lParam1, LPARAM lParam2);
-
-	/* Drag and Drop. */
-	HRESULT _stdcall DragEnter(
-		IDataObject *pDataObject, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect) override;
-	HRESULT _stdcall DragOver(DWORD grfKeyState, POINTL pt, DWORD *pdwEffect) override;
-	HRESULT _stdcall DragLeave() override;
-	HRESULT _stdcall Drop(
-		IDataObject *pDataObject, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect) override;
 
 	void MonitorDrivePublic(const TCHAR *szDrive);
 
@@ -196,10 +189,15 @@ private:
 	ItemInfo_t &GetItemByHandle(HTREEITEM item);
 	int GetItemInternalIndex(HTREEITEM item) const;
 
+	// DropTargetInternal
+	DWORD DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
+	DWORD DragOver(DWORD keyState, POINT pt, DWORD effect) override;
+	void DragLeave() override;
+	DWORD Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
+
 	/* Drag and drop. */
-	HRESULT InitializeDragDropHelpers();
 	void RestoreState();
-	DWORD GetCurrentDragEffect(DWORD grfKeyState, DWORD dwCurrentEffect, POINTL *ptl);
+	DWORD GetCurrentDragEffect(DWORD grfKeyState, DWORD dwCurrentEffect, POINT *pt);
 	BOOL CheckItemLocations(IDataObject *pDataObject, HTREEITEM hItem, int iDroppedItem);
 	HRESULT OnBeginDrag(int iItemId, DragType dragType);
 
@@ -246,11 +244,8 @@ private:
 	HTREEITEM m_middleButtonItem;
 
 	/* Drag and drop. */
-	BOOL m_bDragDropRegistered;
-	IDragSourceHelper *m_pDragSourceHelper;
-	IDropTargetHelper *m_pDropTargetHelper;
+	wil::com_ptr_nothrow<DropTarget> m_dropTarget;
 	IDataObject *m_pDataObject;
-	BOOL m_bDragging;
 	BOOL m_bDragCancelled;
 	BOOL m_bDragAllowed;
 	BOOL m_bDataAccept;

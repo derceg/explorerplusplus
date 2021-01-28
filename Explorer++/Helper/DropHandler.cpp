@@ -81,14 +81,14 @@ HRESULT DropHandler::GetDropFormats(std::list<FORMATETC> &ftcList)
 }
 
 void DropHandler::Drop(IDataObject *pDataObject,DWORD grfKeyState,
-POINTL ptl,DWORD *pdwEffect,HWND hwndDrop,DragType dragType,
+POINT pt,DWORD effect,HWND hwndDrop,DragType dragType,
 const TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,
 BOOL bRenameOnCollision)
 {
 	m_pDataObject		= pDataObject;
 	m_grfKeyState		= grfKeyState;
-	m_ptl				= ptl;
-	m_dwEffect			= *pdwEffect;
+	m_pt				= pt;
+	m_dwEffect			= effect;
 	m_hwndDrop			= hwndDrop;
 	m_DragType			= dragType;
 	m_destDirectory	= szDestDirectory;
@@ -98,7 +98,7 @@ BOOL bRenameOnCollision)
 	switch(m_DragType)
 	{
 	case DragType::LeftClick:
-		HandleLeftClickDrop(m_pDataObject,&m_ptl);
+		HandleLeftClickDrop(m_pDataObject,&m_pt);
 		break;
 
 	case DragType::RightClick:
@@ -118,22 +118,18 @@ BOOL bRenameOnCollision)
 	m_pDropFilesCallback	= pDropFilesCallback;
 	m_bRenameOnCollision	= bRenameOnCollision;
 
-	POINTL ptl = {0,0};
+	POINT pt = {0,0};
 
-	HandleLeftClickDrop(m_pDataObject,&ptl);
+	HandleLeftClickDrop(m_pDataObject,&pt);
 }
 
-void DropHandler::HandleLeftClickDrop(IDataObject *pDataObject,POINTL *pptl)
+void DropHandler::HandleLeftClickDrop(IDataObject *pDataObject,POINT *pt)
 {
 	FORMATETC ftc;
 	STGMEDIUM stg;
 	DWORD *pdwEffect = nullptr;
 	DWORD dwEffect = DROPEFFECT_NONE;
 	BOOL bPrefferedEffect = FALSE;
-	POINT pt;
-
-	pt.x = pptl->x;
-	pt.y = pptl->y;
 
 	SetFORMATETC(&ftc,(CLIPFORMAT)RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT),
 		nullptr,DVASPECT_CONTENT,-1,TYMED_HGLOBAL);
@@ -210,7 +206,7 @@ void DropHandler::HandleLeftClickDrop(IDataObject *pDataObject,POINTL *pptl)
 		the caller via the specified callback interface. */
 		if(m_pDropFilesCallback != nullptr)
 		{
-			m_pDropFilesCallback->OnDropFile(pastedFileList,&pt);
+			m_pDropFilesCallback->OnDropFile(pastedFileList,pt);
 		}
 	}
 }
@@ -866,10 +862,10 @@ void DropHandler::HandleRightClickDrop()
 
 			if(SUCCEEDED(hr))
 			{
-				pDrop->DragEnter(m_pDataObject,MK_RBUTTON,m_ptl,&dwe);
+				pDrop->DragEnter(m_pDataObject, MK_RBUTTON, { m_pt.x, m_pt.y }, &dwe);
 
 				dwe = m_dwEffect;
-				pDrop->Drop(m_pDataObject,m_grfKeyState,m_ptl,&dwe);
+				pDrop->Drop(m_pDataObject, m_grfKeyState, { m_pt.x, m_pt.y }, &dwe);
 
 				pDrop->DragLeave();
 
@@ -975,8 +971,8 @@ void DropHandler::CopyDroppedFilesInternal(const std::list<std::wstring> &FullFi
 	ppfi->bRenameOnCollision	= bRenameOnCollision;
 	ppfi->pac					= nullptr;
 	ppfi->pDropFilesCallback	= m_pDropFilesCallback;
-	ppfi->pt.x					= m_ptl.x;
-	ppfi->pt.y					= m_ptl.y;
+	ppfi->pt.x					= m_pt.x;
+	ppfi->pt.y					= m_pt.y;
 
 	IDataObjectAsyncCapability *pac = nullptr;
 	BOOL bAsyncSupported = FALSE;

@@ -483,8 +483,8 @@ HRESULT _stdcall ShellBrowser::Drop(
 			be switched to an independent class. */
 			AddRef();
 
-			pDropHandler->Drop(pDataObject, grfKeyState, ptl, pdwEffect, m_hListView, m_DragType,
-				finalDestDirectory, this, FALSE);
+			pDropHandler->Drop(pDataObject, grfKeyState, { ptl.x, ptl.y }, *pdwEffect, m_hListView,
+				m_DragType, finalDestDirectory, this, FALSE);
 
 			/* When dragging and dropping, any dropped items
 			will be selected, while any previously selected

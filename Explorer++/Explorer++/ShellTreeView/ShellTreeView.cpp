@@ -46,7 +46,6 @@ ShellTreeView::ShellTreeView(HWND hParent, IExplorerplusplus *coreInterface,
 	m_cachedIcons(cachedIcons),
 	m_iRefCount(1),
 	m_itemIDCounter(0),
-	m_bDragDropRegistered(FALSE),
 	m_iconThreadPool(
 		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
 	m_iconResultIDCounter(0),
@@ -82,14 +81,13 @@ ShellTreeView::ShellTreeView(HWND hParent, IExplorerplusplus *coreInterface,
 
 	m_iFolderIcon = GetDefaultFolderIconIndex();
 
-	m_bDragging = FALSE;
 	m_bDragCancelled = FALSE;
 	m_bDragAllowed = FALSE;
 	m_bShowHidden = TRUE;
 
 	AddRoot();
 
-	InitializeDragDropHelpers();
+	m_dropTarget = DropTarget::Create(m_hTreeView, this);
 
 	m_bQueryRemoveCompleted = FALSE;
 	HANDLE hThread = CreateThread(nullptr, 0, Thread_MonitorAllDrives, this, 0, nullptr);
@@ -191,7 +189,7 @@ LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam,
 
 	case WM_MOUSEMOVE:
 	{
-		if (!m_bDragging && !m_bDragCancelled && m_bDragAllowed)
+		if (!m_dropTarget->IsWithinDrag() && !m_bDragCancelled && m_bDragAllowed)
 		{
 			if ((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON) && !(wParam & MK_MBUTTON))
 			{
@@ -247,12 +245,6 @@ LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam,
 		break;
 
 	case WM_DESTROY:
-		if (m_bDragDropRegistered)
-		{
-			RevokeDragDrop(m_hTreeView);
-			m_bDragDropRegistered = FALSE;
-		}
-
 		RemoveClipboardFormatListener(m_hTreeView);
 		break;
 	}
@@ -1646,32 +1638,6 @@ void ShellTreeView::OnMiddleButtonUp(const POINT *pt, UINT keysDown)
 	m_tabContainer->CreateNewTab(pidl.get(), TabSettings(_selected = switchToNewTab));
 }
 
-HRESULT ShellTreeView::InitializeDragDropHelpers()
-{
-	HRESULT hr;
-
-	/* Initialize the drag source helper, and use it to initialize the drop target helper. */
-	hr = CoCreateInstance(
-		CLSID_DragDropHelper, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_pDragSourceHelper));
-
-	if (SUCCEEDED(hr))
-	{
-		hr = m_pDragSourceHelper->QueryInterface(IID_PPV_ARGS(&m_pDropTargetHelper));
-
-		if (SUCCEEDED(hr))
-		{
-			hr = RegisterDragDrop(m_hTreeView, this);
-
-			if (SUCCEEDED(hr))
-			{
-				m_bDragDropRegistered = TRUE;
-			}
-		}
-	}
-
-	return hr;
-}
-
 /* IUnknown interface members. */
 HRESULT __stdcall ShellTreeView::QueryInterface(REFIID iid, void **ppvObject)
 {
@@ -1684,16 +1650,7 @@ HRESULT __stdcall ShellTreeView::QueryInterface(REFIID iid, void **ppvObject)
 
 	if (iid == IID_IUnknown)
 	{
-		/* IDropTarget and IDropSource
-		both derive from IUnknown, so
-		need to explicitly indicate
-		which is required (in this
-		case, both are equally good). */
-		*ppvObject = static_cast<IUnknown *>(static_cast<IDropTarget *>(this));
-	}
-	else if (iid == IID_IDropTarget)
-	{
-		*ppvObject = static_cast<IDropTarget *>(this);
+		*ppvObject = static_cast<IUnknown *>(this);
 	}
 	else if (iid == IID_IDropSource)
 	{
@@ -1727,9 +1684,9 @@ ULONG __stdcall ShellTreeView::Release()
 	return m_iRefCount;
 }
 
-BOOL ShellTreeView::QueryDragging()
+bool ShellTreeView::IsWithinDrag() const
 {
-	return m_bDragging;
+	return m_dropTarget->IsWithinDrag();
 }
 
 void ShellTreeView::SetShowHidden(BOOL bShowHidden)
@@ -1845,8 +1802,6 @@ HRESULT ShellTreeView::OnBeginDrag(int iItemId, DragType dragType)
 
 			hr = DoDragDrop(
 				pDataObject, this, DROPEFFECT_COPY | DROPEFFECT_MOVE | DROPEFFECT_LINK, &effect);
-
-			m_bDragging = FALSE;
 
 			pDataObject->Release();
 			pShellFolder->Release();

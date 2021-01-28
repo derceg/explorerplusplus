@@ -317,7 +317,7 @@ void Explorerplusplus::OnTreeViewSelChanged(LPARAM lParam)
 	was browsed to, or if the treeview control is involved in a
 	drag and drop operation. */
 	if (!m_bSelectingTreeViewDirectory && !m_bTreeViewRightClick
-		&& !m_shellTreeView->QueryDragging())
+		&& !m_shellTreeView->IsWithinDrag())
 	{
 		pnmtv = (LPNMTREEVIEW) lParam;
 

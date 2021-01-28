@@ -23,12 +23,9 @@ void CALLBACK DragScrollTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD 
 HTREEITEM g_hExpand = nullptr;
 BOOL g_bAllowScroll = FALSE;
 
-HRESULT _stdcall ShellTreeView::DragEnter(
-	IDataObject *pDataObject, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
+DWORD ShellTreeView::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
 {
-	m_pDataObject = pDataObject;
-
-	m_bDragging = TRUE;
+	m_pDataObject = dataObject;
 
 	std::list<FORMATETC> ftcList;
 	DropHandler::GetDropFormats(ftcList);
@@ -39,44 +36,42 @@ HRESULT _stdcall ShellTreeView::DragEnter(
 	that is needed for this drag operation. */
 	for (auto ftc : ftcList)
 	{
-		if (pDataObject->QueryGetData(&ftc) == S_OK)
+		if (dataObject->QueryGetData(&ftc) == S_OK)
 		{
 			bDataAccept = TRUE;
 			break;
 		}
 	}
 
+	DWORD targetEffect;
+
 	if (bDataAccept)
 	{
 		m_bDataAccept = TRUE;
 
-		GetCurrentDragEffect(grfKeyState, *pdwEffect, &pt);
+		targetEffect = GetCurrentDragEffect(keyState, effect, &pt);
 	}
 	else
 	{
 		/* The clipboard contains data that we cannot copy/move. */
 		m_bDataAccept = FALSE;
-		*pdwEffect = DROPEFFECT_NONE;
+		targetEffect = DROPEFFECT_NONE;
 	}
 
 	g_hExpand = nullptr;
 
 	SetTimer(m_hTreeView, DRAGSCROLL_TIMER_ID, DRAGSCROLL_TIMER_ELAPSE, DragScrollTimerProc);
 
-	if (grfKeyState & MK_LBUTTON)
+	if (keyState & MK_LBUTTON)
 	{
 		m_DragType = DragType::LeftClick;
 	}
-	else if (grfKeyState & MK_RBUTTON)
+	else if (keyState & MK_RBUTTON)
 	{
 		m_DragType = DragType::RightClick;
 	}
 
-	/* Notify the drop target helper that an object has been dragged into
-	the window. */
-	m_pDropTargetHelper->DragEnter(m_hTreeView, pDataObject, (POINT *) &pt, *pdwEffect);
-
-	return S_OK;
+	return targetEffect;
 }
 
 void CALLBACK DragScrollTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
@@ -90,15 +85,15 @@ void CALLBACK DragScrollTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD 
 	KillTimer(hwnd, DRAGSCROLL_TIMER_ID);
 }
 
-DWORD ShellTreeView::GetCurrentDragEffect(DWORD grfKeyState, DWORD dwCurrentEffect, POINTL *ptl)
+DWORD ShellTreeView::GetCurrentDragEffect(DWORD grfKeyState, DWORD dwCurrentEffect, POINT *pt)
 {
 	TVHITTESTINFO tvhi;
 	HTREEITEM hItem;
 	DWORD dwEffect;
 	BOOL bOnSameDrive;
 
-	tvhi.pt.x = ptl->x;
-	tvhi.pt.y = ptl->y;
+	tvhi.pt.x = pt->x;
+	tvhi.pt.y = pt->y;
 	ScreenToClient(m_hTreeView, &tvhi.pt);
 
 	hItem = (HTREEITEM) SendMessage(m_hTreeView, TVM_HITTEST, 0, (LPARAM) &tvhi);
@@ -128,15 +123,12 @@ void CALLBACK DragExpandTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD 
 	KillTimer(hwnd, DRAGEXPAND_TIMER_ID);
 }
 
-HRESULT _stdcall ShellTreeView::DragOver(DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
+DWORD ShellTreeView::DragOver(DWORD keyState, POINT pt, DWORD effect)
 {
 	TVHITTESTINFO tvht;
 	RECT rc;
 
-	*pdwEffect = GetCurrentDragEffect(grfKeyState, *pdwEffect, &pt);
-
-	/* Notify the drop helper of the current operation. */
-	m_pDropTargetHelper->DragOver((LPPOINT) &pt, *pdwEffect);
+	DWORD targetEffect = GetCurrentDragEffect(keyState, effect, &pt);
 
 	ScreenToClient(m_hTreeView, (LPPOINT) &pt);
 
@@ -182,7 +174,7 @@ HRESULT _stdcall ShellTreeView::DragOver(DWORD grfKeyState, POINTL pt, DWORD *pd
 		}
 	}
 
-	return S_OK;
+	return targetEffect;
 }
 
 /* Determines the drop effect based on the
@@ -245,19 +237,14 @@ BOOL ShellTreeView::CheckItemLocations(IDataObject *pDataObject, HTREEITEM hItem
 	return bOnSameDrive;
 }
 
-HRESULT _stdcall ShellTreeView::DragLeave()
+void ShellTreeView::DragLeave()
 {
 	RestoreState();
 
 	KillTimer(m_hTreeView, DRAGEXPAND_TIMER_ID);
-
-	m_pDropTargetHelper->DragLeave();
-
-	return S_OK;
 }
 
-HRESULT _stdcall ShellTreeView::Drop(
-	IDataObject *pDataObject, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
+DWORD ShellTreeView::Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
 {
 	KillTimer(m_hTreeView, DRAGEXPAND_TIMER_ID);
 
@@ -277,16 +264,14 @@ HRESULT _stdcall ShellTreeView::Drop(
 		GetDisplayName(pidlDirectory.get(), SHGDN_FORPARSING, destDirectory);
 
 		DropHandler *pDropHandler = DropHandler::CreateNew();
-		pDropHandler->Drop(pDataObject, grfKeyState, pt, pdwEffect, m_hTreeView, m_DragType,
+		pDropHandler->Drop(dataObject, keyState, pt, effect, m_hTreeView, m_DragType,
 			destDirectory.c_str(), nullptr, FALSE);
 		pDropHandler->Release();
 	}
 
 	RestoreState();
 
-	m_pDropTargetHelper->Drop(pDataObject, (POINT *) &pt, *pdwEffect);
-
-	return S_OK;
+	return effect;
 }
 
 void ShellTreeView::RestoreState()
@@ -294,5 +279,4 @@ void ShellTreeView::RestoreState()
 	TreeView_Select(m_hTreeView, nullptr, TVGN_DROPHILITE);
 
 	g_bAllowScroll = FALSE;
-	m_bDragging = FALSE;
 }

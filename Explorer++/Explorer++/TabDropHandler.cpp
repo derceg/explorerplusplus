@@ -267,8 +267,8 @@ HRESULT __stdcall TabDropHandler::Drop(
 		std::wstring destDirectory = tab.GetShellBrowser()->GetDirectory();
 
 		DropHandler *pDropHandler = DropHandler::CreateNew();
-		pDropHandler->Drop(pDataObject, grfKeyState, pt, pdwEffect, m_hTabCtrl, m_DragType,
-			destDirectory.data(), nullptr, FALSE);
+		pDropHandler->Drop(pDataObject, grfKeyState, { pt.x, pt.y }, *pdwEffect, m_hTabCtrl,
+			m_DragType, destDirectory.data(), nullptr, FALSE);
 		pDropHandler->Release();
 	}
 
