@@ -286,7 +286,7 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		assert(pfcmi->uFrom == FROM_LISTVIEW);
 		assert(pidlItems.empty());
 
-		OnListViewPasteShortcut();
+		GetActiveShellBrowser()->PasteShortcut();
 
 		return TRUE;
 	}

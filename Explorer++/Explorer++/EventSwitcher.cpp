@@ -170,7 +170,7 @@ void Explorerplusplus::OnPasteShortcut()
 
 	if (focus == m_hActiveListView)
 	{
-		OnListViewPasteShortcut();
+		GetActiveShellBrowser()->PasteShortcut();
 	}
 	else if (focus == m_shellTreeView->GetHWND())
 	{

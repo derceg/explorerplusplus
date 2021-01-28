@@ -7,10 +7,12 @@
 #include "Config.h"
 #include "CoreInterface.h"
 #include "DarkModeHelper.h"
+#include "FolderView.h"
 #include "ItemData.h"
 #include "MainResource.h"
 #include "MassRenameDialog.h"
 #include "PreservedFolderState.h"
+#include "ServiceProvider.h"
 #include "ShellNavigationController.h"
 #include "SortModes.h"
 #include "ViewModeHelper.h"
@@ -1493,6 +1495,18 @@ void ShellBrowser::RestoreStateOfCutItems()
 			MarkItemAsCut(item, false);
 		}
 	}
+}
+
+void ShellBrowser::PasteShortcut()
+{
+	auto serviceProvider = ServiceProvider::Create();
+
+	auto folderView = FolderView::Create(this);
+	serviceProvider->RegisterService(
+		IID_IFolderView, static_cast<IShellFolderView *>(folderView.get()));
+
+	ExecuteActionFromContextMenu(m_directoryState.pidlDirectory.get(), {}, m_hListView,
+		L"pastelink", 0, serviceProvider.get());
 }
 
 void ShellBrowser::OnApplicationShuttingDown()

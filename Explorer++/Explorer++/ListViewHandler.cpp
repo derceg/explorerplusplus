@@ -804,20 +804,6 @@ void Explorerplusplus::OnListViewPaste()
 	}
 }
 
-void Explorerplusplus::OnListViewPasteShortcut()
-{
-	auto directory = m_pActiveShellBrowser->GetDirectoryIdl();
-
-	auto serviceProvider = ServiceProvider::Create();
-
-	auto folderView = FolderView::Create(m_pActiveShellBrowser);
-	serviceProvider->RegisterService(
-		IID_IFolderView, static_cast<IShellFolderView *>(folderView.get()));
-
-	ExecuteActionFromContextMenu(directory.get(), {}, m_pActiveShellBrowser->GetListView(),
-		L"pastelink", 0, serviceProvider.get());
-}
-
 int Explorerplusplus::HighlightSimilarFiles(HWND ListView) const
 {
 	BOOL bSimilarTypes;

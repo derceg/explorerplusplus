@@ -256,7 +256,6 @@ private:
 	void OnListViewCopyUniversalPaths() const;
 	void OnListViewSetFileAttributes() const;
 	void OnListViewPaste();
-	void OnListViewPasteShortcut();
 
 	/* TreeView private message handlers. */
 	void OnTreeViewRightClick(WPARAM wParam, LPARAM lParam);

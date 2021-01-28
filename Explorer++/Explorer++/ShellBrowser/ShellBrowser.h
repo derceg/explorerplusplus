@@ -159,6 +159,7 @@ public:
 	bool InVirtualFolder() const;
 	BOOL CanCreate() const;
 	HRESULT CopySelectedItemsToClipboard(bool copy);
+	void PasteShortcut();
 	void StartRenamingSelectedItems();
 	void DeleteSelectedItems(bool permanent);
 
