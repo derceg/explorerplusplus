@@ -9,7 +9,7 @@ BookmarkDropTargetWindow::BookmarkDropTargetWindow(HWND hwnd, BookmarkTree *book
 	m_bookmarkTree(bookmarkTree),
 	m_blockDrop(false)
 {
-	m_dropTarget = DropTarget::Create(hwnd, this);
+	m_dropTargetWindow = DropTargetWindow::Create(hwnd, this);
 }
 
 DWORD BookmarkDropTargetWindow::DragEnter(
@@ -108,5 +108,5 @@ void BookmarkDropTargetWindow::SetBlockDrop(bool blockDrop)
 
 bool BookmarkDropTargetWindow::IsWithinDrag() const
 {
-	return m_dropTarget->IsWithinDrag();
+	return m_dropTargetWindow->IsWithinDrag();
 }

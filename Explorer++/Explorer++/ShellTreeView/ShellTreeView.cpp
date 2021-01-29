@@ -52,7 +52,10 @@ ShellTreeView::ShellTreeView(HWND hParent, IExplorerplusplus *coreInterface,
 	m_subfoldersThreadPool(
 		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
 	m_subfoldersResultIDCounter(0),
-	m_cutItem(nullptr)
+	m_cutItem(nullptr),
+	m_currentDropObject(nullptr),
+	m_previousKeyState(0),
+	m_dropExpandItem(nullptr)
 {
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
 
@@ -87,7 +90,7 @@ ShellTreeView::ShellTreeView(HWND hParent, IExplorerplusplus *coreInterface,
 
 	AddRoot();
 
-	m_dropTarget = DropTarget::Create(m_hTreeView, this);
+	m_dropTargetWindow = DropTargetWindow::Create(m_hTreeView, this);
 
 	m_bQueryRemoveCompleted = FALSE;
 	HANDLE hThread = CreateThread(nullptr, 0, Thread_MonitorAllDrives, this, 0, nullptr);
@@ -141,7 +144,14 @@ LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam,
 	switch (msg)
 	{
 	case WM_TIMER:
-		DirectoryAltered();
+		if (wParam == DIRECTORY_MODIFIED_TIMER_ID)
+		{
+			DirectoryAltered();
+		}
+		else if (wParam == DROP_EXPAND_TIMER_ID)
+		{
+			OnDropExpandTimer();
+		}
 		break;
 
 	case WM_DEVICECHANGE:
@@ -189,7 +199,7 @@ LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam,
 
 	case WM_MOUSEMOVE:
 	{
-		if (!m_dropTarget->IsWithinDrag() && !m_bDragCancelled && m_bDragAllowed)
+		if (!m_dropTargetWindow->IsWithinDrag() && !m_bDragCancelled && m_bDragAllowed)
 		{
 			if ((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON) && !(wParam & MK_MBUTTON))
 			{
@@ -219,7 +229,7 @@ LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam,
 
 					if (bRet)
 					{
-						hr = OnBeginDrag((int) tvItem.lParam, DragType::RightClick);
+						hr = OnBeginDrag((int) tvItem.lParam);
 
 						if (hr == DRAGDROP_S_CANCEL)
 						{
@@ -273,7 +283,7 @@ LRESULT CALLBACK ShellTreeView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wPara
 			case TVN_BEGINDRAG:
 			{
 				auto *pnmTreeView = reinterpret_cast<NMTREEVIEW *>(lParam);
-				OnBeginDrag(static_cast<int>(pnmTreeView->itemNew.lParam), DragType::LeftClick);
+				OnBeginDrag(static_cast<int>(pnmTreeView->itemNew.lParam));
 			}
 			break;
 
@@ -1686,7 +1696,7 @@ ULONG __stdcall ShellTreeView::Release()
 
 bool ShellTreeView::IsWithinDrag() const
 {
-	return m_dropTarget->IsWithinDrag();
+	return m_dropTargetWindow->IsWithinDrag();
 }
 
 void ShellTreeView::SetShowHidden(BOOL bShowHidden)
@@ -1771,7 +1781,7 @@ void ShellTreeView::RefreshAllIconsInternal(HTREEITEM hFirstSibling)
 	}
 }
 
-HRESULT ShellTreeView::OnBeginDrag(int iItemId, DragType dragType)
+HRESULT ShellTreeView::OnBeginDrag(int iItemId)
 {
 	IDataObject *pDataObject = nullptr;
 	IDragSourceHelper *pDragSourceHelper = nullptr;
@@ -1797,8 +1807,6 @@ HRESULT ShellTreeView::OnBeginDrag(int iItemId, DragType dragType)
 			GetUIObjectOf(pShellFolder, m_hTreeView, 1, &ridl, IID_PPV_ARGS(&pDataObject));
 
 			pDragSourceHelper->InitializeFromWindow(m_hTreeView, &pt, pDataObject);
-
-			m_DragType = dragType;
 
 			hr = DoDragDrop(
 				pDataObject, this, DROPEFFECT_COPY | DROPEFFECT_MOVE | DROPEFFECT_LINK, &effect);

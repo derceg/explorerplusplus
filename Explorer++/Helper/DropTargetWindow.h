@@ -11,18 +11,17 @@
 class DropTargetInternal
 {
 public:
-
 	virtual DWORD DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) = 0;
 	virtual DWORD DragOver(DWORD keyState, POINT pt, DWORD effect) = 0;
 	virtual void DragLeave() = 0;
 	virtual DWORD Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) = 0;
 };
 
-class DropTarget : public IDropTarget
+class DropTargetWindow : public IDropTarget
 {
 public:
-
-	static wil::com_ptr_nothrow<DropTarget> Create(HWND hwnd, DropTargetInternal *dropTargetInternal);
+	static wil::com_ptr_nothrow<DropTargetWindow> Create(
+		HWND hwnd, DropTargetInternal *dropTargetInternal);
 
 	// IUnknown methods.
 	IFACEMETHODIMP QueryInterface(REFIID iid, void **object);
@@ -38,16 +37,15 @@ public:
 	bool IsWithinDrag() const;
 
 private:
-
-	DISALLOW_COPY_AND_ASSIGN(DropTarget);
+	DISALLOW_COPY_AND_ASSIGN(DropTargetWindow);
 
 	static inline const UINT_PTR SUBCLASS_ID = 0;
 
-	DropTarget(HWND hwnd, DropTargetInternal *dropTargetInternal);
-	~DropTarget() = default;
+	DropTargetWindow(HWND hwnd, DropTargetInternal *dropTargetInternal);
+	~DropTargetWindow() = default;
 
-	static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
-		UINT_PTR subclassId, DWORD_PTR data);
+	static LRESULT CALLBACK WndProc(
+		HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data);
 
 	static IDropTargetHelper *GetDropTargetHelper();
 

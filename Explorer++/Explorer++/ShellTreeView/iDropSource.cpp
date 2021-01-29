@@ -7,28 +7,8 @@
 
 HRESULT _stdcall ShellTreeView::QueryContinueDrag(BOOL fEscapePressed, DWORD grfKeyState)
 {
-	DWORD dwStopButton = 0;
-
-	if (m_DragType == DragType::LeftClick)
-	{
-		if ((grfKeyState & MK_LBUTTON) == 0)
-		{
-			return DRAGDROP_S_DROP;
-		}
-
-		dwStopButton = MK_RBUTTON;
-	}
-	else if (m_DragType == DragType::RightClick)
-	{
-		if ((grfKeyState & MK_RBUTTON) == 0)
-		{
-			return DRAGDROP_S_DROP;
-		}
-
-		dwStopButton = MK_LBUTTON;
-	}
-
-	if (fEscapePressed == TRUE || grfKeyState & dwStopButton)
+	if (fEscapePressed == TRUE
+		|| (WI_IsFlagSet(grfKeyState, MK_LBUTTON) && WI_IsFlagSet(grfKeyState, MK_RBUTTON)))
 	{
 		return DRAGDROP_S_CANCEL;
 	}

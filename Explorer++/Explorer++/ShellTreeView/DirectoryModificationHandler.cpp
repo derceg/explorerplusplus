@@ -7,9 +7,6 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 
-const UINT DIRECTORYMODIFIED_TIMER_ID = 0;
-const UINT DIRECTORYMODIFIED_TIMER_ELAPSE = 500;
-
 void ShellTreeView::DirectoryAltered()
 {
 	EnterCriticalSection(&m_cs);
@@ -289,8 +286,8 @@ void ShellTreeView::DirectoryModified(DWORD dwAction, const TCHAR *szFullFileNam
 {
 	EnterCriticalSection(&m_cs);
 
-	SetTimer(m_hTreeView,DIRECTORYMODIFIED_TIMER_ID,
-		DIRECTORYMODIFIED_TIMER_ELAPSE, nullptr);
+	SetTimer(m_hTreeView,DIRECTORY_MODIFIED_TIMER_ID,
+		DIRECTORY_MODIFIED_TIMER_ELAPSE, nullptr);
 
 	AlteredFile_t af;
 

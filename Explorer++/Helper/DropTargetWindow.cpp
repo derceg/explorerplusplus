@@ -3,16 +3,17 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "DropTarget.h"
+#include "DropTargetWindow.h"
 
-wil::com_ptr_nothrow<DropTarget> DropTarget::Create(HWND hwnd, DropTargetInternal *dropTargetInternal)
+wil::com_ptr_nothrow<DropTargetWindow> DropTargetWindow::Create(
+	HWND hwnd, DropTargetInternal *dropTargetInternal)
 {
-	wil::com_ptr_nothrow<DropTarget> dropTarget;
-	dropTarget.attach(new DropTarget(hwnd, dropTargetInternal));
+	wil::com_ptr_nothrow<DropTargetWindow> dropTarget;
+	dropTarget.attach(new DropTargetWindow(hwnd, dropTargetInternal));
 	return dropTarget;
 }
 
-DropTarget::DropTarget(HWND hwnd, DropTargetInternal *dropTargetInternal) :
+DropTargetWindow::DropTargetWindow(HWND hwnd, DropTargetInternal *dropTargetInternal) :
 	m_hwnd(hwnd),
 	m_dropTargetInternal(dropTargetInternal),
 	m_refCount(1),
@@ -24,8 +25,8 @@ DropTarget::DropTarget(HWND hwnd, DropTargetInternal *dropTargetInternal) :
 		std::make_unique<WindowSubclassWrapper>(hwnd, WndProc, SUBCLASS_ID, 0));
 }
 
-LRESULT CALLBACK DropTarget::WndProc(HWND hwnd, UINT msg, WPARAM wParam,
-	LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data)
+LRESULT CALLBACK DropTargetWindow::WndProc(
+	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data)
 {
 	UNREFERENCED_PARAMETER(subclassId);
 	UNREFERENCED_PARAMETER(data);
@@ -40,23 +41,19 @@ LRESULT CALLBACK DropTarget::WndProc(HWND hwnd, UINT msg, WPARAM wParam,
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-IFACEMETHODIMP DropTarget::QueryInterface(REFIID iid, void **object)
+IFACEMETHODIMP DropTargetWindow::QueryInterface(REFIID iid, void **object)
 {
-	static const QITAB qit[] =
-	{
-		QITABENT(DropTarget, IDropTarget),
-		{nullptr}
-	};
+	static const QITAB qit[] = { QITABENT(DropTargetWindow, IDropTarget), { nullptr } };
 
 	return QISearch(this, qit, iid, object);
 }
 
-IFACEMETHODIMP_(ULONG) DropTarget::AddRef()
+IFACEMETHODIMP_(ULONG) DropTargetWindow::AddRef()
 {
 	return InterlockedIncrement(&m_refCount);
 }
 
-IFACEMETHODIMP_(ULONG) DropTarget::Release()
+IFACEMETHODIMP_(ULONG) DropTargetWindow::Release()
 {
 	long refCount = InterlockedDecrement(&m_refCount);
 
@@ -68,7 +65,8 @@ IFACEMETHODIMP_(ULONG) DropTarget::Release()
 	return refCount;
 }
 
-IFACEMETHODIMP DropTarget::DragEnter(IDataObject *dataObject, DWORD keyState, POINTL ptl, DWORD *effect)
+IFACEMETHODIMP DropTargetWindow::DragEnter(
+	IDataObject *dataObject, DWORD keyState, POINTL ptl, DWORD *effect)
 {
 	POINT pt = { ptl.x, ptl.y };
 
@@ -86,7 +84,7 @@ IFACEMETHODIMP DropTarget::DragEnter(IDataObject *dataObject, DWORD keyState, PO
 	return S_OK;
 }
 
-IFACEMETHODIMP DropTarget::DragOver(DWORD keyState, POINTL ptl, DWORD *effect)
+IFACEMETHODIMP DropTargetWindow::DragOver(DWORD keyState, POINTL ptl, DWORD *effect)
 {
 	POINT pt = { ptl.x, ptl.y };
 
@@ -102,7 +100,7 @@ IFACEMETHODIMP DropTarget::DragOver(DWORD keyState, POINTL ptl, DWORD *effect)
 	return S_OK;
 }
 
-IFACEMETHODIMP DropTarget::DragLeave()
+IFACEMETHODIMP DropTargetWindow::DragLeave()
 {
 	IDropTargetHelper *dropTargetHelper = GetDropTargetHelper();
 
@@ -118,7 +116,8 @@ IFACEMETHODIMP DropTarget::DragLeave()
 	return S_OK;
 }
 
-IFACEMETHODIMP DropTarget::Drop(IDataObject *dataObject, DWORD keyState, POINTL ptl, DWORD *effect)
+IFACEMETHODIMP DropTargetWindow::Drop(
+	IDataObject *dataObject, DWORD keyState, POINTL ptl, DWORD *effect)
 {
 	POINT pt = { ptl.x, ptl.y };
 
@@ -136,18 +135,18 @@ IFACEMETHODIMP DropTarget::Drop(IDataObject *dataObject, DWORD keyState, POINTL 
 	return S_OK;
 }
 
-IDropTargetHelper *DropTarget::GetDropTargetHelper()
+IDropTargetHelper *DropTargetWindow::GetDropTargetHelper()
 {
 	if (!m_dropTargetHelper)
 	{
-		CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_INPROC_SERVER,
-			IID_PPV_ARGS(&m_dropTargetHelper));
+		CoCreateInstance(
+			CLSID_DragDropHelper, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_dropTargetHelper));
 	}
 
 	return m_dropTargetHelper;
 }
 
-bool DropTarget::IsWithinDrag() const
+bool DropTargetWindow::IsWithinDrag() const
 {
 	return m_withinDrag;
 }

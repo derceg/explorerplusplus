@@ -318,7 +318,7 @@
     <ClCompile Include="iDataObject.cpp" />
     <ClCompile Include="iDirectoryMonitor.cpp" />
     <ClCompile Include="iDropSource.cpp" />
-    <ClCompile Include="DropTarget.cpp" />
+    <ClCompile Include="DropTargetWindow.cpp" />
     <ClCompile Include="iEnumFormatEtc.cpp" />
     <ClCompile Include="ImageHelper.cpp" />
     <ClCompile Include="ListViewHelper.cpp" />
@@ -385,7 +385,7 @@
     <ClInclude Include="iDataObject.h" />
     <ClInclude Include="iDirectoryMonitor.h" />
     <ClInclude Include="iDropSource.h" />
-    <ClInclude Include="DropTarget.h" />
+    <ClInclude Include="DropTargetWindow.h" />
     <ClInclude Include="iEnumFormatEtc.h" />
     <ClInclude Include="ImageHelper.h" />
     <ClInclude Include="ListViewHelper.h" />

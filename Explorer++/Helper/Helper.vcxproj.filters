@@ -136,9 +136,6 @@
     <ClCompile Include="DataExchangeHelper.cpp">
       <Filter>Data Exchange</Filter>
     </ClCompile>
-    <ClCompile Include="DropTarget.cpp">
-      <Filter>Data Exchange\Drag and Drop</Filter>
-    </ClCompile>
     <ClCompile Include="HeaderHelper.cpp">
       <Filter>Control Support</Filter>
     </ClCompile>
@@ -153,6 +150,9 @@
     </ClCompile>
     <ClCompile Include="ClipboardHelper.cpp">
       <Filter>Data Exchange\Clipboard</Filter>
+    </ClCompile>
+    <ClCompile Include="DropTargetWindow.cpp">
+      <Filter>Data Exchange\Drag and Drop</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -300,9 +300,6 @@
     <ClInclude Include="DataExchangeHelper.h">
       <Filter>Data Exchange</Filter>
     </ClInclude>
-    <ClInclude Include="DropTarget.h">
-      <Filter>Data Exchange\Drag and Drop</Filter>
-    </ClInclude>
     <ClInclude Include="HeaderHelper.h">
       <Filter>Control Support</Filter>
     </ClInclude>
@@ -320,6 +317,9 @@
     </ClInclude>
     <ClInclude Include="ClipboardHelper.h">
       <Filter>Data Exchange\Clipboard</Filter>
+    </ClInclude>
+    <ClInclude Include="DropTargetWindow.h">
+      <Filter>Data Exchange\Drag and Drop</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

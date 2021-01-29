@@ -5,7 +5,7 @@
 #pragma once
 
 #include "../Helper/DropHandler.h"
-#include "../Helper/DropTarget.h"
+#include "../Helper/DropTargetWindow.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include "../Helper/iDirectoryMonitor.h"
@@ -66,6 +66,15 @@ private:
 	// This is the same background color as used in the Explorer treeview.
 	static inline constexpr COLORREF TREE_VIEW_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
 
+	static const UINT DIRECTORY_MODIFIED_TIMER_ID = 1;
+	static const UINT DIRECTORY_MODIFIED_TIMER_ELAPSE = 500;
+
+	static const UINT DROP_EXPAND_TIMER_ID = 2;
+	static const UINT DROP_EXPAND_TIMER_ELAPSE = 800;
+
+	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 10;
+	static const LONG DROP_SCROLL_MARGIN_Y_96DPI = 10;
+
 	typedef struct
 	{
 		unique_pidl_absolute pidl;
@@ -121,6 +130,12 @@ private:
 		HANDLE hDrive;
 		int iMonitorId;
 	} DriveEvent_t;
+
+	struct DropTargetInfo
+	{
+		wil::com_ptr_nothrow<IDropTarget> dropTarget;
+		bool dropTargetInitialised;
+	};
 
 	static HWND CreateTreeView(HWND parent);
 
@@ -196,10 +211,20 @@ private:
 	DWORD Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
 
 	/* Drag and drop. */
-	void RestoreState();
-	DWORD GetCurrentDragEffect(DWORD grfKeyState, DWORD dwCurrentEffect, POINT *pt);
-	BOOL CheckItemLocations(IDataObject *pDataObject, HTREEITEM hItem, int iDroppedItem);
-	HRESULT OnBeginDrag(int iItemId, DragType dragType);
+	DWORD OnDragInWindow(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect);
+	HTREEITEM GetDropLocation(const POINT &pt);
+	DWORD GetDropEffect(HTREEITEM dropLocation, IDataObject *dataObject, DWORD keyState, POINT pt,
+		DWORD allowedEffects);
+	DWORD PerformDrop(HTREEITEM dropLocation, IDataObject *dataObject, DWORD previousKeyState,
+		DWORD keyState, POINT pt, DWORD allowedEffects);
+	DropTargetInfo GetDropTargetInfoForItem(HTREEITEM treeItem);
+	wil::com_ptr_nothrow<IDropTarget> GetDropTargetForItem(HTREEITEM item);
+	void UpdateUiForDrop(HTREEITEM dropLocation, const POINT &pt);
+	void UpdateUiForDropLocation(HTREEITEM dropLocation);
+	void OnDropExpandTimer();
+	void ResetDropState();
+	void ResetDropUiState();
+	HRESULT OnBeginDrag(int iItemId);
 
 	/* Icon refresh. */
 	void RefreshAllIconsInternal(HTREEITEM hFirstSibling);
@@ -244,12 +269,15 @@ private:
 	HTREEITEM m_middleButtonItem;
 
 	/* Drag and drop. */
-	wil::com_ptr_nothrow<DropTarget> m_dropTarget;
-	IDataObject *m_pDataObject;
+	UINT m_getDragImageMessage;
+	wil::com_ptr_nothrow<DropTargetWindow> m_dropTargetWindow;
+	IDataObject *m_currentDropObject;
+	HTREEITEM m_previousDropLocation;
+	std::optional<DropTargetInfo> m_previousDropTargetInfo;
+	DWORD m_previousKeyState;
+	HTREEITEM m_dropExpandItem;
 	BOOL m_bDragCancelled;
 	BOOL m_bDragAllowed;
-	BOOL m_bDataAccept;
-	DragType m_DragType;
 
 	HTREEITEM m_cutItem;
 	wil::com_ptr_nothrow<IDataObject> m_clipboardDataObject;
