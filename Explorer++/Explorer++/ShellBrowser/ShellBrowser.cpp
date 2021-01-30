@@ -134,6 +134,8 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 
 	InitializeDragDropHelpers();
 
+	m_getDragImageMessage = RegisterWindowMessage(DI_GETDRAGIMAGE);
+
 	m_bFolderVisited = FALSE;
 
 	m_listViewColumnsSetUp = false;

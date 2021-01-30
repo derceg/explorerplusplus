@@ -446,7 +446,7 @@ private:
 	void OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown);
 	std::vector<PCIDLIST_ABSOLUTE> GetSelectedItemPidls();
 	void OnListViewBeginDrag(const NMLISTVIEW *info);
-	HRESULT StartDrag(DragType dragType, int draggedItem, const POINT &startPoint);
+	HRESULT StartDrag(int draggedItem, const POINT &startPoint);
 
 	HRESULT GetListViewItemAttributes(int item, SFGAOF *attributes) const;
 
@@ -710,6 +710,7 @@ private:
 	std::vector<std::wstring> m_cutFileNames;
 
 	/* Drag and drop related data. */
+	UINT m_getDragImageMessage;
 	IDragSourceHelper *m_pDragSourceHelper;
 	IDropTargetHelper *m_pDropTargetHelper;
 	std::list<DroppedFile_t> m_droppedFileNameList;

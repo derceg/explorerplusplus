@@ -59,6 +59,11 @@ LRESULT CALLBACK ShellBrowser::ListViewProcStub(
 
 LRESULT CALLBACK ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	if (m_getDragImageMessage != 0 && uMsg == m_getDragImageMessage)
+	{
+		return FALSE;
+	}
+
 	switch (uMsg)
 	{
 	case WM_MBUTTONDOWN:
@@ -331,7 +336,7 @@ void ShellBrowser::OnMouseMove(HWND hwnd, int x, int y, UINT keyFlags)
 		// button goes down again.
 		m_rightClickDragAllowed = false;
 
-		StartDrag(DragType::RightClick, m_rightClickDragItem, m_rightClickDragStartPoint);
+		StartDrag(m_rightClickDragItem, m_rightClickDragStartPoint);
 	}
 }
 
@@ -1046,10 +1051,10 @@ std::vector<PCIDLIST_ABSOLUTE> ShellBrowser::GetSelectedItemPidls()
 
 void ShellBrowser::OnListViewBeginDrag(const NMLISTVIEW *info)
 {
-	StartDrag(DragType::LeftClick, info->iItem, info->ptAction);
+	StartDrag(info->iItem, info->ptAction);
 }
 
-HRESULT ShellBrowser::StartDrag(DragType dragType, int draggedItem, const POINT &startPoint)
+HRESULT ShellBrowser::StartDrag(int draggedItem, const POINT &startPoint)
 {
 	std::vector<PCIDLIST_ABSOLUTE> pidls = GetSelectedItemPidls();
 
@@ -1060,15 +1065,6 @@ HRESULT ShellBrowser::StartDrag(DragType dragType, int draggedItem, const POINT 
 
 	wil::com_ptr_nothrow<IDataObject> dataObject;
 	RETURN_IF_FAILED(CreateDataObjectForShellTransfer(pidls, &dataObject));
-
-	wil::com_ptr_nothrow<IDragSourceHelper> dragSourceHelper;
-	RETURN_IF_FAILED(CoCreateInstance(
-		CLSID_DragDropHelper, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&dragSourceHelper)));
-
-	wil::com_ptr_nothrow<IDropSource> dropSource;
-	RETURN_IF_FAILED(CreateDropSource(&dropSource, dragType));
-	RETURN_IF_FAILED(
-		dragSourceHelper->InitializeFromWindow(m_hListView, nullptr, dataObject.get()));
 
 	m_performingDrag = true;
 	m_draggedItems = DeepCopyPidls(pidls);
@@ -1083,7 +1079,7 @@ HRESULT ShellBrowser::StartDrag(DragType dragType, int draggedItem, const POINT 
 	m_ptDraggedOffset.y = ptOrigin.y + startPoint.y - ptItem.y;
 
 	DWORD finalEffect;
-	HRESULT hr = DoDragDrop(dataObject.get(), dropSource.get(),
+	HRESULT hr = SHDoDragDrop(m_hListView, dataObject.get(), nullptr,
 		DROPEFFECT_COPY | DROPEFFECT_MOVE | DROPEFFECT_LINK, &finalEffect);
 
 	m_draggedItems.clear();
