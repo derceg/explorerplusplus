@@ -27,7 +27,7 @@ bool CanShellPasteDataObject(PCIDLIST_ABSOLUTE destination, IDataObject *dataObj
 	// Internally, a paste is a simulated drop, so this should give a reliable indication of whether
 	// such a drop would succeed.
 	DWORD finalEffect = effects;
-	hr = dropTarget->DragEnter(dataObject, 0, { 0, 0 }, &finalEffect);
+	hr = dropTarget->DragEnter(dataObject, MK_LBUTTON, { 0, 0 }, &finalEffect);
 
 	if (FAILED(hr) || finalEffect == DROPEFFECT_NONE)
 	{
