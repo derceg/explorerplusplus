@@ -21,23 +21,21 @@
 #define X_SCROLL_AMOUNT 10
 #define Y_SCROLL_AMOUNT 10
 
-HRESULT _stdcall ShellBrowser::DragEnter(
-	IDataObject *pDataObject, DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect)
+DWORD ShellBrowser::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
 {
-	HRESULT hReturn;
-	POINT pt;
+	UNREFERENCED_PARAMETER(pt);
 
 	m_performingDrop = TRUE;
 	m_bDeselectDropFolder = FALSE;
 	m_bOverFolder = FALSE;
 	m_iDropFolder = -1;
 
+	DWORD targetEffect;
+
 	if (m_directoryState.virtualFolder && !m_performingDrag)
 	{
 		m_bDataAccept = FALSE;
-		*pdwEffect = DROPEFFECT_NONE;
-
-		hReturn = S_OK;
+		targetEffect = DROPEFFECT_NONE;
 	}
 	else
 	{
@@ -50,7 +48,7 @@ HRESULT _stdcall ShellBrowser::DragEnter(
 		that is needed for this drag operation. */
 		for (auto ftc : ftcList)
 		{
-			if (pDataObject->QueryGetData(&ftc) == S_OK)
+			if (dataObject->QueryGetData(&ftc) == S_OK)
 			{
 				bDataAccept = TRUE;
 				break;
@@ -61,57 +59,39 @@ HRESULT _stdcall ShellBrowser::DragEnter(
 		{
 			m_bDataAccept = TRUE;
 
-			m_bOnSameDrive = CheckItemLocations(pDataObject, 0);
-			*pdwEffect =
-				DetermineDragEffect(grfKeyState, *pdwEffect, m_bDataAccept, m_bOnSameDrive);
+			m_bOnSameDrive = CheckItemLocations(dataObject, 0);
+			targetEffect = DetermineDragEffect(keyState, effect, m_bDataAccept, m_bOnSameDrive);
 		}
 		else
 		{
 			m_bDataAccept = FALSE;
-			*pdwEffect = DROPEFFECT_NONE;
+			targetEffect = DROPEFFECT_NONE;
 		}
-
-		hReturn = S_OK;
 	}
 
-	if (grfKeyState & MK_LBUTTON)
+	if (keyState & MK_LBUTTON)
 	{
 		m_DragType = DragType::LeftClick;
 	}
-	else if (grfKeyState & MK_RBUTTON)
+	else if (keyState & MK_RBUTTON)
 	{
 		m_DragType = DragType::RightClick;
 	}
 
-	pt.x = ptl.x;
-	pt.y = ptl.y;
-
-	/* Notify the drop target helper that an object has been dragged into
-	the window. */
-	m_pDropTargetHelper->DragEnter(m_hListView, pDataObject, &pt, *pdwEffect);
-
-	return hReturn;
+	return targetEffect;
 }
 
-HRESULT _stdcall ShellBrowser::DragOver(DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect)
+DWORD ShellBrowser::DragOver(DWORD keyState, POINT pt, DWORD effect)
 {
-	POINT pt;
+	DWORD targetEffect = DetermineDragEffect(keyState, effect, m_bDataAccept, m_bOnSameDrive);
 
-	*pdwEffect = DetermineDragEffect(grfKeyState, *pdwEffect, m_bDataAccept, m_bOnSameDrive);
-
-	pt.x = ptl.x;
-	pt.y = ptl.y;
-
-	/* Notify the drop helper of the current operation. */
-	m_pDropTargetHelper->DragOver((LPPOINT) &pt, *pdwEffect);
-
-	ScreenToClient(m_hListView, (LPPOINT) &pt);
+	ScreenToClient(m_hListView, &pt);
 
 	/* If the cursor is too close to either the top or bottom
 	of the listview, scroll the listview in the required direction. */
 	ScrollListViewFromCursor(m_hListView, &pt);
 
-	HandleDragSelection((LPPOINT) &pt);
+	HandleDragSelection(&pt);
 
 	if (m_bDataAccept)
 	{
@@ -125,7 +105,7 @@ HRESULT _stdcall ShellBrowser::DragOver(DWORD grfKeyState, POINTL ptl, DWORD *pd
 		}
 	}
 
-	return S_OK;
+	return targetEffect;
 }
 
 /* Determines the drop effect based on the
@@ -328,10 +308,8 @@ void ShellBrowser::HandleDragSelection(const POINT *ppt)
 	}
 }
 
-HRESULT _stdcall ShellBrowser::DragLeave()
+void ShellBrowser::DragLeave()
 {
-	m_pDropTargetHelper->DragLeave();
-
 	ListViewHelper::PositionInsertMark(m_hListView, nullptr);
 
 	if (m_bDeselectDropFolder)
@@ -341,8 +319,6 @@ HRESULT _stdcall ShellBrowser::DragLeave()
 	}
 
 	m_performingDrop = FALSE;
-
-	return S_OK;
 }
 
 void ShellBrowser::OnDropFile(const std::list<std::wstring> &PastedFileList, const POINT *ppt)
@@ -393,22 +369,14 @@ If no modifiers are held down and the source and destination are on the same dri
 operation is a move. If no modifiers are held down and the source and destination are on different
 drives, then the operation is a copy.
 */
-HRESULT _stdcall ShellBrowser::Drop(
-	IDataObject *pDataObject, DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect)
+DWORD ShellBrowser::Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
 {
 	FORMATETC ftcHDrop = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 	STGMEDIUM stg;
 	DROPFILES *pdf = nullptr;
-	POINT pt;
 	HRESULT hr;
 	DWORD dwEffect;
 	int nDroppedFiles;
-
-	/* Need to remove the drag image before any files are copied/moved.
-	This is because a copy/replace dialog may need to shown (if there
-	is a collision), and the drag image no longer needs to be there.
-	The insertion mark may stay until the end. */
-	m_pDropTargetHelper->Drop(pDataObject, (POINT *) &pt, *pdwEffect);
 
 	if (m_bDeselectDropFolder)
 	{
@@ -416,9 +384,6 @@ HRESULT _stdcall ShellBrowser::Drop(
 	}
 
 	m_performingDrop = FALSE;
-
-	pt.x = ptl.x;
-	pt.y = ptl.y;
 
 	std::wstring destDirectory = GetDirectory();
 
@@ -445,7 +410,7 @@ HRESULT _stdcall ShellBrowser::Drop(
 
 		if (m_DragType == DragType::LeftClick && m_performingDrag && !m_bOverFolder)
 		{
-			hr = pDataObject->GetData(&ftcHDrop, &stg);
+			hr = dataObject->GetData(&ftcHDrop, &stg);
 
 			if (hr == S_OK)
 			{
@@ -457,16 +422,11 @@ HRESULT _stdcall ShellBrowser::Drop(
 
 					/* The drop effect will be the same for all files
 					that are been dragged locally. */
-					dwEffect =
-						DetermineDragEffect(grfKeyState, *pdwEffect, m_bDataAccept, m_bOnSameDrive);
+					dwEffect = DetermineDragEffect(keyState, effect, m_bDataAccept, m_bOnSameDrive);
 
 					if (dwEffect == DROPEFFECT_MOVE)
 					{
-						POINT point;
-
-						point.x = pt.x;
-						point.y = pt.y;
-						RepositionLocalFiles(&point);
+						RepositionLocalFiles(&pt);
 
 						bHandled = TRUE;
 					}
@@ -483,8 +443,8 @@ HRESULT _stdcall ShellBrowser::Drop(
 			be switched to an independent class. */
 			AddRef();
 
-			pDropHandler->Drop(pDataObject, grfKeyState, { ptl.x, ptl.y }, *pdwEffect, m_hListView,
-				m_DragType, finalDestDirectory, this, FALSE);
+			pDropHandler->Drop(dataObject, keyState, pt, effect, m_hListView, m_DragType,
+				finalDestDirectory, this, FALSE);
 
 			/* When dragging and dropping, any dropped items
 			will be selected, while any previously selected
@@ -512,7 +472,7 @@ HRESULT _stdcall ShellBrowser::Drop(
 
 	// m_bPerformingDrag = FALSE;
 
-	return S_OK;
+	return effect;
 }
 
 /* TODO: This isn't declared. */

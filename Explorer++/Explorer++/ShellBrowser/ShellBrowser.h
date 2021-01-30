@@ -12,6 +12,7 @@
 #include "SortModes.h"
 #include "ViewModes.h"
 #include "../Helper/DropHandler.h"
+#include "../Helper/DropTargetWindow.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
@@ -50,7 +51,10 @@ typedef struct
 	ULARGE_INTEGER TotalSelectionSize;
 } FolderInfo_t;
 
-class ShellBrowser : public IDropTarget, public IDropFilesCallback, public NavigatorInterface
+class ShellBrowser :
+	public IDropFilesCallback,
+	public NavigatorInterface,
+	private DropTargetInternal
 {
 public:
 	static ShellBrowser *CreateNew(int id, HWND hOwner, IExplorerplusplus *coreInterface,
@@ -83,14 +87,6 @@ public:
 	boost::signals2::connection AddNavigationFailedObserver(
 		const NavigationFailedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;
-
-	/* Drag and Drop. */
-	HRESULT _stdcall DragEnter(
-		IDataObject *pDataObject, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect) override;
-	HRESULT _stdcall DragOver(DWORD grfKeyState, POINTL pt, DWORD *pdwEffect) override;
-	HRESULT _stdcall DragLeave() override;
-	HRESULT _stdcall Drop(
-		IDataObject *pDataObject, DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect) override;
 
 	/* Get/Set current state. */
 	unique_pidl_absolute GetDirectoryIdl() const;
@@ -587,8 +583,13 @@ private:
 	void OnClipboardUpdate();
 	void RestoreStateOfCutItems();
 
+	// DropTargetInternal
+	DWORD DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
+	DWORD DragOver(DWORD keyState, POINT pt, DWORD effect) override;
+	void DragLeave() override;
+	DWORD Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
+
 	/* Drag and Drop support. */
-	HRESULT InitializeDragDropHelpers();
 	DWORD CheckItemLocations(IDataObject *pDataObject, int iDroppedItem);
 	void HandleDragSelection(const POINT *ppt);
 	void RepositionLocalFiles(const POINT *ppt);
@@ -711,8 +712,7 @@ private:
 
 	/* Drag and drop related data. */
 	UINT m_getDragImageMessage;
-	IDragSourceHelper *m_pDragSourceHelper;
-	IDropTargetHelper *m_pDropTargetHelper;
+	wil::com_ptr_nothrow<DropTargetWindow> m_dropTargetWindow;
 	std::list<DroppedFile_t> m_droppedFileNameList;
 	std::vector<unique_pidl_absolute> m_draggedItems;
 	DragType m_DragType;

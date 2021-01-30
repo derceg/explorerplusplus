@@ -132,7 +132,7 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 	m_navigationController =
 		std::make_unique<ShellNavigationController>(this, tabNavigation, m_iconFetcher.get());
 
-	InitializeDragDropHelpers();
+	m_dropTargetWindow = DropTargetWindow::Create(m_hListView, this);
 
 	m_getDragImageMessage = RegisterWindowMessage(DI_GETDRAGIMAGE);
 
@@ -187,10 +187,6 @@ ShellBrowser::~ShellBrowser()
 	m_columnThreadPool.clear_queue();
 	m_thumbnailThreadPool.clear_queue();
 	m_infoTipsThreadPool.clear_queue();
-
-	/* Release the drag and drop helpers. */
-	m_pDropTargetHelper->Release();
-	m_pDragSourceHelper->Release();
 
 	DeleteCriticalSection(&m_csDirectoryAltered);
 
@@ -493,27 +489,6 @@ SortMode ShellBrowser::GetSortMode() const
 void ShellBrowser::SetSortMode(SortMode sortMode)
 {
 	m_folderSettings.sortMode = sortMode;
-}
-
-HRESULT ShellBrowser::InitializeDragDropHelpers()
-{
-	HRESULT hr;
-
-	/* Initialize the drag source helper, and use it to initialize the drop target helper. */
-	hr = CoCreateInstance(
-		CLSID_DragDropHelper, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_pDragSourceHelper));
-
-	if (SUCCEEDED(hr))
-	{
-		hr = m_pDragSourceHelper->QueryInterface(IID_PPV_ARGS(&m_pDropTargetHelper));
-
-		RegisterDragDrop(m_hListView, this);
-
-		/* RegisterDragDrop calls AddRef on initialization. */
-		Release();
-	}
-
-	return hr;
 }
 
 int ShellBrowser::GetId() const
