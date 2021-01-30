@@ -44,7 +44,6 @@ ShellTreeView::ShellTreeView(HWND hParent, IExplorerplusplus *coreInterface,
 	m_tabContainer(tabContainer),
 	m_fileActionHandler(fileActionHandler),
 	m_cachedIcons(cachedIcons),
-	m_iRefCount(1),
 	m_itemIDCounter(0),
 	m_iconThreadPool(
 		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
@@ -91,6 +90,8 @@ ShellTreeView::ShellTreeView(HWND hParent, IExplorerplusplus *coreInterface,
 	AddRoot();
 
 	m_dropTargetWindow = DropTargetWindow::Create(m_hTreeView, this);
+
+	m_getDragImageMessage = RegisterWindowMessage(DI_GETDRAGIMAGE);
 
 	m_bQueryRemoveCompleted = FALSE;
 	HANDLE hThread = CreateThread(nullptr, 0, Thread_MonitorAllDrives, this, 0, nullptr);
@@ -141,6 +142,11 @@ LRESULT CALLBACK ShellTreeView::TreeViewProcStub(
 
 LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	if (m_getDragImageMessage != 0 && msg == m_getDragImageMessage)
+	{
+		return FALSE;
+	}
+
 	switch (msg)
 	{
 	case WM_TIMER:
@@ -1648,52 +1654,6 @@ void ShellTreeView::OnMiddleButtonUp(const POINT *pt, UINT keysDown)
 	m_tabContainer->CreateNewTab(pidl.get(), TabSettings(_selected = switchToNewTab));
 }
 
-/* IUnknown interface members. */
-HRESULT __stdcall ShellTreeView::QueryInterface(REFIID iid, void **ppvObject)
-{
-	if (ppvObject == nullptr)
-	{
-		return E_POINTER;
-	}
-
-	*ppvObject = nullptr;
-
-	if (iid == IID_IUnknown)
-	{
-		*ppvObject = static_cast<IUnknown *>(this);
-	}
-	else if (iid == IID_IDropSource)
-	{
-		*ppvObject = static_cast<IDropSource *>(this);
-	}
-
-	if (*ppvObject)
-	{
-		AddRef();
-		return S_OK;
-	}
-
-	return E_NOINTERFACE;
-}
-
-ULONG __stdcall ShellTreeView::AddRef()
-{
-	return ++m_iRefCount;
-}
-
-ULONG __stdcall ShellTreeView::Release()
-{
-	m_iRefCount--;
-
-	if (m_iRefCount == 0)
-	{
-		delete this;
-		return 0;
-	}
-
-	return m_iRefCount;
-}
-
 bool ShellTreeView::IsWithinDrag() const
 {
 	return m_dropTargetWindow->IsWithinDrag();
@@ -1783,42 +1743,21 @@ void ShellTreeView::RefreshAllIconsInternal(HTREEITEM hFirstSibling)
 
 HRESULT ShellTreeView::OnBeginDrag(int iItemId)
 {
-	IDataObject *pDataObject = nullptr;
-	IDragSourceHelper *pDragSourceHelper = nullptr;
-	IShellFolder *pShellFolder = nullptr;
-	PCITEMID_CHILD ridl = nullptr;
+	wil::com_ptr_nothrow<IShellFolder> shellFolder;
+	PCITEMID_CHILD child = nullptr;
+	RETURN_IF_FAILED(
+		SHBindToParent(m_itemInfoMap.at(iItemId).pidl.get(), IID_PPV_ARGS(&shellFolder), &child));
+
+	/* Needs to be done from the parent folder for the drag/drop to work correctly.
+	If done from the desktop folder, only links to files are created. They are
+	not copied/moved. */
+	wil::com_ptr_nothrow<IDataObject> dataObject;
+	RETURN_IF_FAILED(
+		GetUIObjectOf(shellFolder.get(), m_hTreeView, 1, &child, IID_PPV_ARGS(&dataObject)));
+
 	DWORD effect;
-	POINT pt = { 0, 0 };
-	HRESULT hr;
-
-	hr = CoCreateInstance(
-		CLSID_DragDropHelper, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&pDragSourceHelper));
-
-	if (SUCCEEDED(hr))
-	{
-		hr = SHBindToParent(
-			m_itemInfoMap.at(iItemId).pidl.get(), IID_PPV_ARGS(&pShellFolder), &ridl);
-
-		if (SUCCEEDED(hr))
-		{
-			/* Needs to be done from the parent folder for the drag/dop to work correctly.
-			If done from the desktop folder, only links to files are created. They are
-			not copied/moved. */
-			GetUIObjectOf(pShellFolder, m_hTreeView, 1, &ridl, IID_PPV_ARGS(&pDataObject));
-
-			pDragSourceHelper->InitializeFromWindow(m_hTreeView, &pt, pDataObject);
-
-			hr = DoDragDrop(
-				pDataObject, this, DROPEFFECT_COPY | DROPEFFECT_MOVE | DROPEFFECT_LINK, &effect);
-
-			pDataObject->Release();
-			pShellFolder->Release();
-		}
-
-		pDragSourceHelper->Release();
-	}
-
-	return hr;
+	return SHDoDragDrop(m_hTreeView, dataObject.get(), nullptr,
+		DROPEFFECT_COPY | DROPEFFECT_MOVE | DROPEFFECT_LINK, &effect);
 }
 
 BOOL ShellTreeView::IsDesktop(const TCHAR *szPath)

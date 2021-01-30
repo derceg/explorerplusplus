@@ -382,9 +382,6 @@
     <ClCompile Include="ShellTreeView\DirectoryModificationHandler.cpp">
       <Filter>ShellTreeView</Filter>
     </ClCompile>
-    <ClCompile Include="ShellTreeView\iDropSource.cpp">
-      <Filter>ShellTreeView</Filter>
-    </ClCompile>
     <ClCompile Include="ShellTreeView\iDropTarget.cpp">
       <Filter>ShellTreeView</Filter>
     </ClCompile>

@@ -20,21 +20,12 @@ class FileActionHandler;
 __interface IExplorerplusplus;
 class TabContainer;
 
-class ShellTreeView : public IDropSource, private DropTargetInternal
+class ShellTreeView : private DropTargetInternal
 {
 public:
-	/* IUnknown methods. */
-	HRESULT __stdcall QueryInterface(REFIID iid, void **ppvObject) override;
-	ULONG __stdcall AddRef() override;
-	ULONG __stdcall Release() override;
-
 	ShellTreeView(HWND hParent, IExplorerplusplus *coreInterface, IDirectoryMonitor *pDirMon,
 		TabContainer *tabContainer, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons);
 	~ShellTreeView();
-
-	/* Drop source functions. */
-	HRESULT _stdcall QueryContinueDrag(BOOL fEscapePressed, DWORD gfrKeyState) override;
-	HRESULT _stdcall GiveFeedback(DWORD dwEffect) override;
 
 	/* User functions. */
 	unique_pidl_absolute GetItemPidl(HTREEITEM hTreeItem) const;
@@ -242,7 +233,6 @@ private:
 	void OnApplicationShuttingDown();
 
 	HWND m_hTreeView;
-	int m_iRefCount;
 	IDirectoryMonitor *m_pDirMon;
 	BOOL m_bShowHidden;
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
