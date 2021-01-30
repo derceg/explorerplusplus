@@ -45,7 +45,7 @@ void Explorerplusplus::UpdateBackgroundContextMenu(IContextMenu *contextMenu, HM
 		return;
 	}
 
-	for (int i = numItems; i >= 0; i--)
+	for (int i = numItems - 1; i >= 0; i--)
 	{
 		MENUITEMINFO mii;
 		mii.cbSize = sizeof(mii);
