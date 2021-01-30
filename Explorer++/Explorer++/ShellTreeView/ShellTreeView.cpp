@@ -23,6 +23,7 @@
 #include "../Helper/CachedIcons.h"
 #include "../Helper/ClipboardHelper.h"
 #include "../Helper/Controls.h"
+#include "../Helper/DragDropHelper.h"
 #include "../Helper/DriveInfo.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/FileOperations.h"
@@ -1743,17 +1744,9 @@ void ShellTreeView::RefreshAllIconsInternal(HTREEITEM hFirstSibling)
 
 HRESULT ShellTreeView::OnBeginDrag(int iItemId)
 {
-	wil::com_ptr_nothrow<IShellFolder> shellFolder;
-	PCITEMID_CHILD child = nullptr;
-	RETURN_IF_FAILED(
-		SHBindToParent(m_itemInfoMap.at(iItemId).pidl.get(), IID_PPV_ARGS(&shellFolder), &child));
-
-	/* Needs to be done from the parent folder for the drag/drop to work correctly.
-	If done from the desktop folder, only links to files are created. They are
-	not copied/moved. */
 	wil::com_ptr_nothrow<IDataObject> dataObject;
-	RETURN_IF_FAILED(
-		GetUIObjectOf(shellFolder.get(), m_hTreeView, 1, &child, IID_PPV_ARGS(&dataObject)));
+	std::vector<PCIDLIST_ABSOLUTE> items = { m_itemInfoMap.at(iItemId).pidl.get() };
+	RETURN_IF_FAILED(CreateDataObjectForShellTransfer(items, &dataObject));
 
 	DWORD effect;
 	return SHDoDragDrop(m_hTreeView, dataObject.get(), nullptr,
