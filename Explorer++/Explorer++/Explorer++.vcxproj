@@ -511,7 +511,7 @@
     <ClCompile Include="ShellBrowser\PreservedFolderState.cpp" />
     <ClCompile Include="ShellBrowser\PreservedHistoryEntry.cpp" />
     <ClCompile Include="ShellTreeView\DirectoryModificationHandler.cpp" />
-    <ClCompile Include="ShellTreeView\iDropTarget.cpp" />
+    <ClCompile Include="ShellTreeView\DropTarget.cpp" />
     <ClCompile Include="ShellTreeView\ShellTreeView.cpp" />
     <ClCompile Include="ShellView.cpp" />
     <ClCompile Include="SortMenuBuilder.cpp" />

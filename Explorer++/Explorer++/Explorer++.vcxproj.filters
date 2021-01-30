@@ -382,9 +382,6 @@
     <ClCompile Include="ShellTreeView\DirectoryModificationHandler.cpp">
       <Filter>ShellTreeView</Filter>
     </ClCompile>
-    <ClCompile Include="ShellTreeView\iDropTarget.cpp">
-      <Filter>ShellTreeView</Filter>
-    </ClCompile>
     <ClCompile Include="ShellTreeView\ShellTreeView.cpp">
       <Filter>ShellTreeView</Filter>
     </ClCompile>
@@ -456,6 +453,9 @@
     </ClCompile>
     <ClCompile Include="ShellView.cpp">
       <Filter>Context Menu Support</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellTreeView\DropTarget.cpp">
+      <Filter>ShellTreeView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
