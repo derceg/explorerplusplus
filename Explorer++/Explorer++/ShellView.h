@@ -6,6 +6,7 @@
 
 #include "../Helper/ShellHelper.h"
 #include <wil/com.h>
+#include <memory>
 
 class ShellBrowser;
 
@@ -16,7 +17,7 @@ class ShellView : public IShellView
 {
 public:
 	static wil::com_ptr_nothrow<ShellView> Create(
-		PCIDLIST_ABSOLUTE directory, ShellBrowser *shellBrowser);
+		PCIDLIST_ABSOLUTE directory, std::weak_ptr<ShellBrowser> shellBrowserWeak);
 
 	// IShellView
 	IFACEMETHODIMP TranslateAccelerator(MSG *msg);
@@ -43,9 +44,9 @@ public:
 	IFACEMETHODIMP_(ULONG) Release();
 
 private:
-	ShellView(PCIDLIST_ABSOLUTE directory, ShellBrowser *shellBrowser);
+	ShellView(PCIDLIST_ABSOLUTE directory, std::weak_ptr<ShellBrowser> shellBrowserWeak);
 
 	ULONG m_refCount;
 	unique_pidl_absolute m_directory;
-	ShellBrowser *m_shellBrowser;
+	std::weak_ptr<ShellBrowser> m_shellBrowserWeak;
 };

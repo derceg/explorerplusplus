@@ -5,52 +5,8 @@
 #include "stdafx.h"
 #include "ShellTreeView.h"
 #include "../Helper/DpiCompatibility.h"
-#include "../Helper/DropHandler.h"
-#include "../Helper/Macros.h"
-#include "../Helper/ShellHelper.h"
 
-DWORD ShellTreeView::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
-{
-	m_currentDropObject = dataObject;
-	return OnDragInWindow(dataObject, keyState, pt, effect);
-}
-
-DWORD ShellTreeView::DragOver(DWORD keyState, POINT pt, DWORD effect)
-{
-	assert(m_currentDropObject);
-	return OnDragInWindow(m_currentDropObject, keyState, pt, effect);
-}
-
-void ShellTreeView::DragLeave()
-{
-	ResetDropState();
-}
-
-DWORD ShellTreeView::Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
-{
-	HTREEITEM dropLocation = GetDropLocation(pt);
-	DWORD targetEffect =
-		PerformDrop(dropLocation, dataObject, m_previousKeyState, keyState, pt, effect);
-
-	ResetDropState();
-
-	return targetEffect;
-}
-
-DWORD ShellTreeView::OnDragInWindow(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
-{
-	HTREEITEM dropLocation = GetDropLocation(pt);
-	DWORD targetEffect = GetDropEffect(dropLocation, dataObject, keyState, pt, effect);
-
-	UpdateUiForDrop(dropLocation, pt);
-
-	m_previousKeyState = keyState;
-	m_previousDropLocation = dropLocation;
-
-	return targetEffect;
-}
-
-HTREEITEM ShellTreeView::GetDropLocation(const POINT &pt)
+HTREEITEM ShellTreeView::GetDropTargetItem(const POINT &pt)
 {
 	POINT ptClient = pt;
 	BOOL res = ScreenToClient(m_hTreeView, &ptClient);
@@ -65,131 +21,27 @@ HTREEITEM ShellTreeView::GetDropLocation(const POINT &pt)
 	return TreeView_HitTest(m_hTreeView, &hitTestInfo);
 }
 
-DWORD ShellTreeView::GetDropEffect(
-	HTREEITEM dropLocation, IDataObject *dataObject, DWORD keyState, POINT pt, DWORD allowedEffects)
+unique_pidl_absolute ShellTreeView::GetPidlForTargetItem(HTREEITEM targetItem)
 {
-	if (m_previousDropLocation && m_previousDropLocation != dropLocation && m_previousDropTargetInfo
-		&& m_previousDropTargetInfo->dropTarget)
-	{
-		m_previousDropTargetInfo->dropTarget->DragLeave();
-		m_previousDropTargetInfo.reset();
-	}
-
-	auto dropTargetInfo = GetDropTargetInfoForItem(dropLocation);
-	m_previousDropTargetInfo = dropTargetInfo;
-
-	if (!dropTargetInfo.dropTarget)
-	{
-		return DROPEFFECT_NONE;
-	}
-
-	DWORD targetEffect = allowedEffects;
-	HRESULT hr;
-
-	if (dropTargetInfo.dropTargetInitialised)
-	{
-		hr = dropTargetInfo.dropTarget->DragOver(keyState, { pt.x, pt.y }, &targetEffect);
-	}
-	else
-	{
-		hr = dropTargetInfo.dropTarget->DragEnter(
-			dataObject, keyState, { pt.x, pt.y }, &targetEffect);
-	}
-
-	if (FAILED(hr))
-	{
-		return DROPEFFECT_NONE;
-	}
-
-	m_previousDropTargetInfo->dropTargetInitialised = true;
-
-	return targetEffect;
-}
-
-DWORD ShellTreeView::PerformDrop(HTREEITEM dropLocation, IDataObject *dataObject,
-	DWORD previousKeyState, DWORD keyState, POINT pt, DWORD allowedEffects)
-{
-	auto dropTargetInfo = GetDropTargetInfoForItem(dropLocation);
-
-	if (!dropTargetInfo.dropTarget)
-	{
-		return DROPEFFECT_NONE;
-	}
-
-	DWORD targetEffect;
-	HRESULT hr;
-
-	if (!dropTargetInfo.dropTargetInitialised)
-	{
-		// Note that the key state provided to this method is used to determine whether this is a
-		// left-click or right-click drag. When the Drop() method is called, the mouse button that
-		// originally started the drag wouldn't be down, so passing the final key state to this
-		// method would mean it wouldn't be able to properly detect a left-click/right-click drag.
-		// Therefore, the key state here is the state that was in effect right before the drop. At
-		// that point, the mouse button that started the drag will have still been down.
-		targetEffect = allowedEffects;
-		hr = dropTargetInfo.dropTarget->DragEnter(
-			dataObject, previousKeyState, { pt.x, pt.y }, &targetEffect);
-
-		if (FAILED(hr) || targetEffect == DROPEFFECT_NONE)
-		{
-			return DROPEFFECT_NONE;
-		}
-	}
-
-	targetEffect = allowedEffects;
-	hr = dropTargetInfo.dropTarget->Drop(dataObject, keyState, { pt.x, pt.y }, &targetEffect);
-
-	if (FAILED(hr))
-	{
-		return DROPEFFECT_NONE;
-	}
-
-	return targetEffect;
-}
-
-ShellTreeView::DropTargetInfo ShellTreeView::GetDropTargetInfoForItem(HTREEITEM treeItem)
-{
-	if (!treeItem)
-	{
-		return { nullptr, false };
-	}
-
-	if (treeItem == m_previousDropLocation)
-	{
-		return *m_previousDropTargetInfo;
-	}
-
-	auto dropTarget = GetDropTargetForItem(treeItem);
-	return { dropTarget, false };
-}
-
-wil::com_ptr_nothrow<IDropTarget> ShellTreeView::GetDropTargetForItem(HTREEITEM treeItem)
-{
-	auto &item = GetItemByHandle(treeItem);
-
-	wil::com_ptr_nothrow<IShellFolder> shellFolder;
-	HRESULT hr = SHBindToObject(nullptr, item.pidl.get(), nullptr, IID_PPV_ARGS(&shellFolder));
-
-	if (FAILED(hr))
+	if (!targetItem)
 	{
 		return nullptr;
 	}
 
-	wil::com_ptr_nothrow<IDropTarget> dropTarget;
-	hr = shellFolder->CreateViewObject(m_hTreeView, IID_PPV_ARGS(&dropTarget));
-
-	if (FAILED(hr))
-	{
-		return nullptr;
-	}
-
-	return dropTarget;
+	auto &item = GetItemByHandle(targetItem);
+	return unique_pidl_absolute(ILCloneFull(item.pidl.get()));
 }
 
-void ShellTreeView::UpdateUiForDrop(HTREEITEM dropLocation, const POINT &pt)
+IUnknown *ShellTreeView::GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl)
 {
-	UpdateUiForDropLocation(dropLocation);
+	UNREFERENCED_PARAMETER(targetItemPidl);
+
+	return nullptr;
+}
+
+void ShellTreeView::UpdateUiForDrop(HTREEITEM targetItem, const POINT &pt)
+{
+	UpdateUiForTargetItem(targetItem);
 
 	POINT ptClient = pt;
 	BOOL res = ScreenToClient(m_hTreeView, &ptClient);
@@ -230,15 +82,15 @@ void ShellTreeView::UpdateUiForDrop(HTREEITEM dropLocation, const POINT &pt)
 	}
 }
 
-void ShellTreeView::UpdateUiForDropLocation(HTREEITEM dropLocation)
+void ShellTreeView::UpdateUiForTargetItem(HTREEITEM targetItem)
 {
-	if (dropLocation)
+	if (targetItem)
 	{
-		TreeView_Select(m_hTreeView, dropLocation, TVGN_DROPHILITE);
+		TreeView_Select(m_hTreeView, targetItem, TVGN_DROPHILITE);
 
-		if (m_dropExpandItem != dropLocation)
+		if (m_dropExpandItem != targetItem)
 		{
-			m_dropExpandItem = dropLocation;
+			m_dropExpandItem = targetItem;
 			SetTimer(m_hTreeView, DROP_EXPAND_TIMER_ID, DROP_EXPAND_TIMER_ELAPSE, nullptr);
 		}
 	}
@@ -257,20 +109,10 @@ void ShellTreeView::OnDropExpandTimer()
 	KillTimer(m_hTreeView, DROP_EXPAND_TIMER_ID);
 }
 
-void ShellTreeView::ResetDropState()
-{
-	ResetDropUiState();
-
-	m_currentDropObject = nullptr;
-	m_previousDropLocation = nullptr;
-	m_previousDropTargetInfo.reset();
-	m_previousKeyState = 0;
-	m_dropExpandItem = nullptr;
-}
-
 void ShellTreeView::ResetDropUiState()
 {
 	TreeView_Select(m_hTreeView, nullptr, TVGN_DROPHILITE);
 
+	m_dropExpandItem = nullptr;
 	KillTimer(m_hTreeView, DROP_EXPAND_TIMER_ID);
 }

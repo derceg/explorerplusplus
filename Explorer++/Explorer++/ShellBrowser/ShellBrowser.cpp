@@ -32,59 +32,23 @@ void CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 
 int ShellBrowser::listViewParentSubclassIdCounter = 0;
 
-/* IUnknown interface members. */
-HRESULT __stdcall ShellBrowser::QueryInterface(REFIID iid, void **ppvObject)
+std::shared_ptr<ShellBrowser> ShellBrowser::CreateNew(int id, HWND hOwner,
+	IExplorerplusplus *coreInterface, TabNavigationInterface *tabNavigation,
+	FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
+	std::optional<FolderColumns> initialColumns)
 {
-	*ppvObject = nullptr;
-
-	if (iid == IID_IUnknown)
-	{
-		*ppvObject = this;
-	}
-
-	if (*ppvObject)
-	{
-		AddRef();
-		return S_OK;
-	}
-
-	return E_NOINTERFACE;
+	return std::shared_ptr<ShellBrowser>(new ShellBrowser(id, hOwner, coreInterface, tabNavigation,
+		fileActionHandler, folderSettings, initialColumns));
 }
 
-ULONG __stdcall ShellBrowser::AddRef()
-{
-	return ++m_iRefCount;
-}
-
-ULONG __stdcall ShellBrowser::Release()
-{
-	m_iRefCount--;
-
-	if (m_iRefCount == 0)
-	{
-		delete this;
-		return 0;
-	}
-
-	return m_iRefCount;
-}
-
-ShellBrowser *ShellBrowser::CreateNew(int id, HWND hOwner, IExplorerplusplus *coreInterface,
-	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
-	const FolderSettings &folderSettings, std::optional<FolderColumns> initialColumns)
-{
-	return new ShellBrowser(id, hOwner, coreInterface, tabNavigation, fileActionHandler,
-		folderSettings, initialColumns);
-}
-
-ShellBrowser *ShellBrowser::CreateFromPreserved(int id, HWND hOwner,
+std::shared_ptr<ShellBrowser> ShellBrowser::CreateFromPreserved(int id, HWND hOwner,
 	IExplorerplusplus *coreInterface, TabNavigationInterface *tabNavigation,
 	FileActionHandler *fileActionHandler,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState)
 {
-	return new ShellBrowser(id, hOwner, coreInterface, tabNavigation, fileActionHandler, history,
-		currentEntry, preservedFolderState);
+	return std::shared_ptr<ShellBrowser>(new ShellBrowser(id, hOwner, coreInterface, tabNavigation,
+		fileActionHandler, history, currentEntry, preservedFolderState));
 }
 
 ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface,
@@ -101,6 +65,8 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface,
 	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 	const FolderSettings &folderSettings, std::optional<FolderColumns> initialColumns) :
+	ShellDropTargetWindow(CreateListView(hOwner)),
+	m_hListView(GetHWND()),
 	m_ID(id),
 	m_shChangeNotifyId(0),
 	m_hResourceModule(coreInterface->GetLanguageModule()),
@@ -125,23 +91,17 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 	m_infoTipResultIDCounter(0),
 	m_rightClickDragAllowed(false)
 {
-	m_iRefCount = 1;
-
-	m_hListView = SetUpListView(hOwner);
+	InitializeListView();
 	m_iconFetcher = std::make_unique<IconFetcher>(m_hListView, m_cachedIcons);
 	m_navigationController =
 		std::make_unique<ShellNavigationController>(this, tabNavigation, m_iconFetcher.get());
-
-	m_dropTargetWindow = DropTargetWindow::Create(m_hListView, this);
 
 	m_getDragImageMessage = RegisterWindowMessage(DI_GETDRAGIMAGE);
 
 	m_bFolderVisited = FALSE;
 
 	m_listViewColumnsSetUp = false;
-	m_bOverFolder = FALSE;
 	m_performingDrag = false;
-	m_performingDrop = FALSE;
 	m_bThumbnailsSetup = FALSE;
 	m_nCurrentColumns = 0;
 	m_iDirMonitorId = -1;
@@ -193,23 +153,21 @@ ShellBrowser::~ShellBrowser()
 	/* TODO: Also destroy the thumbnails imagelist. */
 }
 
-HWND ShellBrowser::SetUpListView(HWND parent)
+HWND ShellBrowser::CreateListView(HWND parent)
 {
 	// Note that the only reason LVS_REPORT is specified here is so that the listview header theme
 	// can be set immediately when in dark mode. Without this style, ListView_GetHeader() will
 	// return NULL. The actual view mode set here doesn't matter, since it will be updated when
 	// navigating to a folder.
-	HWND hListView = CreateListView(parent,
+	return ::CreateListView(parent,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | LVS_REPORT | LVS_EDITLABELS
 			| LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | WS_TABSTOP
 			| LVS_ALIGNTOP);
+}
 
-	if (hListView == nullptr)
-	{
-		return nullptr;
-	}
-
-	auto dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
+void ShellBrowser::InitializeListView()
+{
+	auto dwExtendedStyle = ListView_GetExtendedListViewStyle(m_hListView);
 
 	if (m_config->useFullRowSelect)
 	{
@@ -221,17 +179,17 @@ HWND ShellBrowser::SetUpListView(HWND parent)
 		dwExtendedStyle |= LVS_EX_CHECKBOXES;
 	}
 
-	ListView_SetExtendedListViewStyle(hListView, dwExtendedStyle);
+	ListView_SetExtendedListViewStyle(m_hListView, dwExtendedStyle);
 
-	ListViewHelper::SetAutoArrange(hListView, m_folderSettings.autoArrange);
-	ListViewHelper::SetGridlines(hListView, m_config->globalFolderSettings.showGridlines);
+	ListViewHelper::SetAutoArrange(m_hListView, m_folderSettings.autoArrange);
+	ListViewHelper::SetGridlines(m_hListView, m_config->globalFolderSettings.showGridlines);
 
 	if (m_folderSettings.applyFilter)
 	{
-		ListViewHelper::SetBackgroundImage(hListView, IDB_FILTERINGAPPLIED);
+		ListViewHelper::SetBackgroundImage(m_hListView, IDB_FILTERINGAPPLIED);
 	}
 
-	ListViewHelper::ActivateOneClickSelect(hListView,
+	ListViewHelper::ActivateOneClickSelect(m_hListView,
 		m_config->globalFolderSettings.oneClickActivate,
 		m_config->globalFolderSettings.oneClickActivateHoverTime);
 
@@ -239,21 +197,19 @@ HWND ShellBrowser::SetUpListView(HWND parent)
 
 	if (darkModeHelper.IsDarkModeEnabled())
 	{
-		darkModeHelper.SetListViewDarkModeColors(hListView);
+		darkModeHelper.SetListViewDarkModeColors(m_hListView);
 	}
 	else
 	{
-		SetWindowTheme(hListView, L"Explorer", nullptr);
+		SetWindowTheme(m_hListView, L"Explorer", nullptr);
 	}
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
-		hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+		m_hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	m_windowSubclasses.push_back(
-		std::make_unique<WindowSubclassWrapper>(parent, ListViewParentProcStub,
+		std::make_unique<WindowSubclassWrapper>(GetParent(m_hListView), ListViewParentProcStub,
 			listViewParentSubclassIdCounter++, reinterpret_cast<DWORD_PTR>(this)));
-
-	return hListView;
 }
 
 BOOL ShellBrowser::GetAutoArrange() const
@@ -1478,7 +1434,7 @@ void ShellBrowser::PasteShortcut()
 {
 	auto serviceProvider = ServiceProvider::Create();
 
-	auto folderView = FolderView::Create(this);
+	auto folderView = FolderView::Create(weak_from_this());
 	serviceProvider->RegisterService(
 		IID_IFolderView, static_cast<IShellFolderView *>(folderView.get()));
 

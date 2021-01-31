@@ -7,6 +7,7 @@
 #include "../Helper/ShellHelper.h"
 #include <wil/com.h>
 #include <ShlObj.h>
+#include <memory>
 
 class ShellBrowser;
 
@@ -15,7 +16,7 @@ class ShellBrowser;
 class FolderView : public IFolderView2, public IShellFolderView
 {
 public:
-	static wil::com_ptr_nothrow<FolderView> Create(ShellBrowser *shellBrowser);
+	static wil::com_ptr_nothrow<FolderView> Create(std::weak_ptr<ShellBrowser> shellBrowserWeak);
 
 	// IFolderView2
 	IFACEMETHODIMP SetGroupBy(REFPROPERTYKEY key, BOOL ascending);
@@ -100,8 +101,8 @@ public:
 	IFACEMETHODIMP_(ULONG) Release();
 
 private:
-	FolderView(ShellBrowser *shellBrowser);
+	FolderView(std::weak_ptr<ShellBrowser> shellBrowserWeak);
 
 	ULONG m_refCount;
-	ShellBrowser *m_shellBrowser;
+	std::weak_ptr<ShellBrowser> m_shellBrowserWeak;
 };

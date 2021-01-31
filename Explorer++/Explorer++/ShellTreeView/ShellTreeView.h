@@ -5,7 +5,7 @@
 #pragma once
 
 #include "../Helper/DropHandler.h"
-#include "../Helper/DropTargetWindow.h"
+#include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include "../Helper/iDirectoryMonitor.h"
@@ -20,7 +20,7 @@ class FileActionHandler;
 __interface IExplorerplusplus;
 class TabContainer;
 
-class ShellTreeView : private DropTargetInternal
+class ShellTreeView : public ShellDropTargetWindow<HTREEITEM>
 {
 public:
 	ShellTreeView(HWND hParent, IExplorerplusplus *coreInterface, IDirectoryMonitor *pDirMon,
@@ -30,7 +30,6 @@ public:
 	/* User functions. */
 	unique_pidl_absolute GetItemPidl(HTREEITEM hTreeItem) const;
 	HTREEITEM LocateItem(PCIDLIST_ABSOLUTE pidlDirectory);
-	bool IsWithinDrag() const;
 	void SetShowHidden(BOOL bShowHidden);
 	void RefreshAllIcons();
 
@@ -39,7 +38,6 @@ public:
 
 	void MonitorDrivePublic(const TCHAR *szDrive);
 
-	HWND GetHWND() const;
 	void StartRenamingSelectedItem();
 	void ShowPropertiesOfSelectedItem() const;
 	void DeleteSelectedItem(bool permanent);
@@ -122,12 +120,6 @@ private:
 		int iMonitorId;
 	} DriveEvent_t;
 
-	struct DropTargetInfo
-	{
-		wil::com_ptr_nothrow<IDropTarget> dropTarget;
-		bool dropTargetInitialised;
-	};
-
 	static HWND CreateTreeView(HWND parent);
 
 	static LRESULT CALLBACK TreeViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
@@ -195,26 +187,16 @@ private:
 	ItemInfo_t &GetItemByHandle(HTREEITEM item);
 	int GetItemInternalIndex(HTREEITEM item) const;
 
-	// DropTargetInternal
-	DWORD DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
-	DWORD DragOver(DWORD keyState, POINT pt, DWORD effect) override;
-	void DragLeave() override;
-	DWORD Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
+	// ShellDropTargetWindow
+	HTREEITEM GetDropTargetItem(const POINT &pt) override;
+	unique_pidl_absolute GetPidlForTargetItem(HTREEITEM targetItem) override;
+	IUnknown *GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl) override;
+	void UpdateUiForDrop(HTREEITEM targetItem, const POINT &pt) override;
+	void ResetDropUiState() override;
 
 	/* Drag and drop. */
-	DWORD OnDragInWindow(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect);
-	HTREEITEM GetDropLocation(const POINT &pt);
-	DWORD GetDropEffect(HTREEITEM dropLocation, IDataObject *dataObject, DWORD keyState, POINT pt,
-		DWORD allowedEffects);
-	DWORD PerformDrop(HTREEITEM dropLocation, IDataObject *dataObject, DWORD previousKeyState,
-		DWORD keyState, POINT pt, DWORD allowedEffects);
-	DropTargetInfo GetDropTargetInfoForItem(HTREEITEM treeItem);
-	wil::com_ptr_nothrow<IDropTarget> GetDropTargetForItem(HTREEITEM item);
-	void UpdateUiForDrop(HTREEITEM dropLocation, const POINT &pt);
-	void UpdateUiForDropLocation(HTREEITEM dropLocation);
+	void UpdateUiForTargetItem(HTREEITEM targetItem);
 	void OnDropExpandTimer();
-	void ResetDropState();
-	void ResetDropUiState();
 	HRESULT OnBeginDrag(int iItemId);
 
 	/* Icon refresh. */
@@ -260,11 +242,6 @@ private:
 
 	/* Drag and drop. */
 	UINT m_getDragImageMessage;
-	wil::com_ptr_nothrow<DropTargetWindow> m_dropTargetWindow;
-	IDataObject *m_currentDropObject;
-	HTREEITEM m_previousDropLocation;
-	std::optional<DropTargetInfo> m_previousDropTargetInfo;
-	DWORD m_previousKeyState;
 	HTREEITEM m_dropExpandItem;
 	BOOL m_bDragCancelled;
 	BOOL m_bDragAllowed;

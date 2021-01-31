@@ -55,7 +55,12 @@ int Tab::GetId() const
 
 ShellBrowser *Tab::GetShellBrowser() const
 {
-	return m_shellBrowser;
+	return m_shellBrowser.get();
+}
+
+std::weak_ptr<ShellBrowser> Tab::GetShellBrowserWeak() const
+{
+	return std::weak_ptr<ShellBrowser>(m_shellBrowser);
 }
 
 // If a custom name has been set, that will be returned. Otherwise, the

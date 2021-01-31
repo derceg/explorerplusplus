@@ -39,7 +39,8 @@ DWORD WINAPI Thread_MonitorAllDrives(LPVOID pParam);
 ShellTreeView::ShellTreeView(HWND hParent, IExplorerplusplus *coreInterface,
 	IDirectoryMonitor *pDirMon, TabContainer *tabContainer, FileActionHandler *fileActionHandler,
 	CachedIcons *cachedIcons) :
-	m_hTreeView(CreateTreeView(hParent)),
+	ShellDropTargetWindow(CreateTreeView(hParent)),
+	m_hTreeView(GetHWND()),
 	m_config(coreInterface->GetConfig()),
 	m_pDirMon(pDirMon),
 	m_tabContainer(tabContainer),
@@ -53,8 +54,6 @@ ShellTreeView::ShellTreeView(HWND hParent, IExplorerplusplus *coreInterface,
 		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
 	m_subfoldersResultIDCounter(0),
 	m_cutItem(nullptr),
-	m_currentDropObject(nullptr),
-	m_previousKeyState(0),
 	m_dropExpandItem(nullptr)
 {
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
@@ -90,8 +89,6 @@ ShellTreeView::ShellTreeView(HWND hParent, IExplorerplusplus *coreInterface,
 
 	AddRoot();
 
-	m_dropTargetWindow = DropTargetWindow::Create(m_hTreeView, this);
-
 	m_getDragImageMessage = RegisterWindowMessage(DI_GETDRAGIMAGE);
 
 	m_bQueryRemoveCompleted = FALSE;
@@ -109,11 +106,6 @@ HWND ShellTreeView::CreateTreeView(HWND parent)
 	return ::CreateTreeView(parent,
 		WS_CHILD | WS_VISIBLE | TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_EDITLABELS | TVS_HASLINES
 			| TVS_TRACKSELECT);
-}
-
-HWND ShellTreeView::GetHWND() const
-{
-	return m_hTreeView;
 }
 
 ShellTreeView::~ShellTreeView()
@@ -206,7 +198,7 @@ LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam,
 
 	case WM_MOUSEMOVE:
 	{
-		if (!m_dropTargetWindow->IsWithinDrag() && !m_bDragCancelled && m_bDragAllowed)
+		if (!IsWithinDrag() && !m_bDragCancelled && m_bDragAllowed)
 		{
 			if ((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON) && !(wParam & MK_MBUTTON))
 			{
@@ -1653,11 +1645,6 @@ void ShellTreeView::OnMiddleButtonUp(const POINT *pt, UINT keysDown)
 
 	auto pidl = GetItemPidl(hitTestInfo.hItem);
 	m_tabContainer->CreateNewTab(pidl.get(), TabSettings(_selected = switchToNewTab));
-}
-
-bool ShellTreeView::IsWithinDrag() const
-{
-	return m_dropTargetWindow->IsWithinDrag();
 }
 
 void ShellTreeView::SetShowHidden(BOOL bShowHidden)

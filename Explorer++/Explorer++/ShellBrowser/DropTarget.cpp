@@ -2,17 +2,12 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // See LICENSE in the top level directory
 
-/*
- * Handles the dropping of items onto
- * the main listview.
- */
-
 #include "stdafx.h"
 #include "ShellBrowser.h"
+#include "FolderView.h"
+#include "ServiceProvider.h"
 #include "ViewModes.h"
-#include "../Helper/DropHandler.h"
 #include "../Helper/ListViewHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 
 /* Scroll definitions. */
@@ -21,458 +16,87 @@
 #define X_SCROLL_AMOUNT 10
 #define Y_SCROLL_AMOUNT 10
 
-DWORD ShellBrowser::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
+int ShellBrowser::GetDropTargetItem(const POINT &pt)
 {
-	UNREFERENCED_PARAMETER(pt);
+	POINT ptClient = pt;
+	BOOL res = ScreenToClient(m_hListView, &ptClient);
 
-	m_performingDrop = TRUE;
-	m_bDeselectDropFolder = FALSE;
-	m_bOverFolder = FALSE;
-	m_iDropFolder = -1;
-
-	DWORD targetEffect;
-
-	if (m_directoryState.virtualFolder && !m_performingDrag)
+	if (!res)
 	{
-		m_bDataAccept = FALSE;
-		targetEffect = DROPEFFECT_NONE;
-	}
-	else
-	{
-		std::list<FORMATETC> ftcList;
-		DropHandler::GetDropFormats(ftcList);
-
-		BOOL bDataAccept = FALSE;
-
-		/* Check whether the drop source has the type of data
-		that is needed for this drag operation. */
-		for (auto ftc : ftcList)
-		{
-			if (dataObject->QueryGetData(&ftc) == S_OK)
-			{
-				bDataAccept = TRUE;
-				break;
-			}
-		}
-
-		if (bDataAccept)
-		{
-			m_bDataAccept = TRUE;
-
-			m_bOnSameDrive = CheckItemLocations(dataObject, 0);
-			targetEffect = DetermineDragEffect(keyState, effect, m_bDataAccept, m_bOnSameDrive);
-		}
-		else
-		{
-			m_bDataAccept = FALSE;
-			targetEffect = DROPEFFECT_NONE;
-		}
+		return -1;
 	}
 
-	if (keyState & MK_LBUTTON)
+	LVHITTESTINFO hitTestInfo;
+	hitTestInfo.pt = ptClient;
+	int index = ListView_HitTest(m_hListView, &hitTestInfo);
+
+	if (index == -1)
 	{
-		m_DragType = DragType::LeftClick;
-	}
-	else if (keyState & MK_RBUTTON)
-	{
-		m_DragType = DragType::RightClick;
+		return -1;
 	}
 
-	return targetEffect;
+	auto &item = GetItemByIndex(index);
+
+	// Folders always act as drop targets. If a folder can't actually accept a drop, the drop should
+	// be marked as blocked. On the other hand, a file may accept a drop (e.g. it may be possible to
+	// drop an item on an executable). But if the file can't accept the drop, then the drop target
+	// should revert to the parent.
+	if (WI_IsFlagClear(item.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY)
+		&& !GetDropTargetForPidl(item.pidlComplete.get()))
+	{
+		return -1;
+	}
+
+	// The target item is either a folder (which may or may not accept the drop), or a file that can
+	// accept a drop.
+	return index;
 }
 
-DWORD ShellBrowser::DragOver(DWORD keyState, POINT pt, DWORD effect)
+unique_pidl_absolute ShellBrowser::GetPidlForTargetItem(int targetItem)
 {
-	DWORD targetEffect = DetermineDragEffect(keyState, effect, m_bDataAccept, m_bOnSameDrive);
-
-	ScreenToClient(m_hListView, &pt);
-
-	/* If the cursor is too close to either the top or bottom
-	of the listview, scroll the listview in the required direction. */
-	ScrollListViewFromCursor(m_hListView, &pt);
-
-	HandleDragSelection(&pt);
-
-	if (m_bDataAccept)
+	if (targetItem != -1)
 	{
-		if (!m_bOverFolder)
-		{
-			ListViewHelper::PositionInsertMark(m_hListView, &pt);
-		}
-		else
-		{
-			ListViewHelper::PositionInsertMark(m_hListView, nullptr);
-		}
+		auto &item = GetItemByIndex(targetItem);
+		return unique_pidl_absolute(ILCloneFull(item.pidlComplete.get()));
 	}
 
-	return targetEffect;
+	return unique_pidl_absolute(ILCloneFull(m_directoryState.pidlDirectory.get()));
 }
 
-/* Determines the drop effect based on the
-location of the source and destination
-directories.
-Note that the first dropped file is taken
-as representative of the rest (meaning that
-if the files come from different drives,
-whether this operation is classed as a copy
-or move is only based on the location of the
-first file). */
-DWORD ShellBrowser::CheckItemLocations(IDataObject *pDataObject, int iDroppedItem)
+IUnknown *ShellBrowser::GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl)
 {
-	FORMATETC ftc;
-	STGMEDIUM stg;
-	DROPFILES *pdf = nullptr;
-	TCHAR szFullFileName[MAX_PATH];
-	HRESULT hr;
-	BOOL bOnSameDrive = FALSE;
-	int nDroppedFiles;
-
-	ftc.cfFormat = CF_HDROP;
-	ftc.ptd = nullptr;
-	ftc.dwAspect = DVASPECT_CONTENT;
-	ftc.lindex = -1;
-	ftc.tymed = TYMED_HGLOBAL;
-
-	hr = pDataObject->GetData(&ftc, &stg);
-
-	if (hr == S_OK)
+	// It's important to restrict this to the current folder. Otherwise, there can be situations
+	// where an item is dropped in a subfolder, and an item with the same name is selected in the
+	// parent folder (which is a bug that affects Windows Explorer).
+	if (!ArePidlsEquivalent(targetItemPidl, m_directoryState.pidlDirectory.get()))
 	{
-		pdf = (DROPFILES *) GlobalLock(stg.hGlobal);
-
-		if (pdf != nullptr)
-		{
-			/* Request a count of the number of files that have been dropped. */
-			nDroppedFiles = DragQueryFile((HDROP) pdf, 0xFFFFFFFF, nullptr, 0);
-
-			if (iDroppedItem < nDroppedFiles)
-			{
-				/* Determine the name of the first dropped file. */
-				DragQueryFile(
-					(HDROP) pdf, iDroppedItem, szFullFileName, SIZEOF_ARRAY(szFullFileName));
-
-				/* TODO: Compare against sub-folders? (i.e. path may
-				need to be adjusted if the dragged item is currently
-				over a folder). */
-				std::wstring destDirectory = GetDirectory();
-
-				if (PathIsSameRoot(destDirectory.c_str(), szFullFileName))
-				{
-					bOnSameDrive = TRUE;
-				}
-				else
-				{
-					bOnSameDrive = FALSE;
-				}
-			}
-
-			GlobalUnlock(stg.hGlobal);
-		}
+		return nullptr;
 	}
 
-	return bOnSameDrive;
+	if (!m_dropServiceProvider)
+	{
+		m_dropServiceProvider = ServiceProvider::Create();
+
+		auto folderView = FolderView::Create(weak_from_this());
+		m_dropServiceProvider->RegisterService(
+			IID_IFolderView, static_cast<IShellFolderView *>(folderView.get()));
+	}
+
+	return m_dropServiceProvider.get();
 }
 
-/*
-Cases:
-- The dragged item is NOT over an item in the listview.
-Any previously selected item should revert to its
-previous state (i.e. selected if it was previously
-selected; not selected if it wasn't).
-- The dragged item IS over an item in the listview.
-Three sub-cases:
-(a) The item its over is a file (or somewhere where
-the dragged file can't be dropped). Do not alter
-the selection of the file in the listview.
-(b) The item is over a folder. In this case, save
-the items previous selection state, and select
-it.
-(c) The item is over itself. Do not alter selection
-in any way.
-
-Deselction occurs when:
-1. The dragged file is dropped.
-2. The dragged file moves over the background of the
-listview, or over a file it cannot be dragged into.
-3. The dragged file moves over an item it can be
-dragged into (and this item is different from the
-previous item that was selected).
-4. The drag and drop operation is canceled.
-
-Therefore, the ONLY time selection is maintained is when
-the dragged item remains over the same selected item.
-
-These are handled by:
-1. Drop()
-2. DragOver()
-3. DragOver()
-4. DragLeave()
-*/
-void ShellBrowser::HandleDragSelection(const POINT *ppt)
+void ShellBrowser::UpdateUiForDrop(int targetItem, const POINT &pt)
 {
-	LVHITTESTINFO info;
-	BOOL bClash = FALSE;
-	BOOL bOverFolder = FALSE;
-	BOOL bOverItem = FALSE;
-	int iInternalIndex = -1;
+	ListView_SetItemState(m_hListView, -1, 0, LVIS_DROPHILITED);
 
-	info.pt = *ppt;
-	ListView_HitTest(m_hListView, &info);
-
-	if (!(info.flags & LVHT_NOWHERE) && info.iItem != -1)
+	if (targetItem != -1)
 	{
-		LVITEM lvItem;
-
-		lvItem.mask = LVIF_PARAM;
-		lvItem.iItem = info.iItem;
-		lvItem.iSubItem = 0;
-		ListView_GetItem(m_hListView, &lvItem);
-
-		iInternalIndex = (int) lvItem.lParam;
-
-		if (iInternalIndex != -1)
-		{
-			bOverItem = TRUE;
-
-			if (m_bOverFolder && info.iItem == m_iDropFolder)
-			{
-				bOverFolder = TRUE;
-			}
-		}
+		ListView_SetItemState(m_hListView, targetItem, LVIS_DROPHILITED, LVIS_DROPHILITED);
 	}
 
-	if (!bOverFolder)
-	{
-		/* The dragged item is not over the previously
-		selected item. Revert the selection state on
-		the old item. */
-		if (m_bOverFolder)
-		{
-			/* Only deselect the previous item if it
-			was originally deselcted. */
-			if (m_bDeselectDropFolder)
-			{
-				ListView_SetItemState(m_hListView, m_iDropFolder, 0, LVIS_SELECTED);
-			}
-		}
-
-		m_bOverFolder = FALSE;
-
-		/* Now, if the dragged item is over an item in
-		the listview, test it to see whether or not it
-		is a folder. */
-		if (bOverItem)
-		{
-			/* Check for a clash (only if over a folder). */
-			if ((m_itemInfoMap.at(iInternalIndex).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-				== FILE_ATTRIBUTE_DIRECTORY)
-			{
-				if (m_performingDrag)
-				{
-					for (auto &pidl : m_draggedItems)
-					{
-						auto index = GetItemIndexForPidl(pidl.get());
-
-						if (index && info.iItem == *index)
-						{
-							bClash = TRUE;
-						}
-					}
-				}
-
-				/* The dragged item is over a valid folder
-				(that isn't itself). */
-				if (!bClash)
-				{
-					UINT mask;
-
-					/* Get the original selection state of the item. */
-					mask = ListView_GetItemState(m_hListView, info.iItem, LVIS_SELECTED);
-
-					if ((mask & LVIS_SELECTED) == LVIS_SELECTED)
-					{
-						m_bDeselectDropFolder = FALSE;
-					}
-					else
-					{
-						m_bDeselectDropFolder = TRUE;
-					}
-
-					/* Select the item. */
-					ListView_SetItemState(m_hListView, info.iItem, LVIS_SELECTED, LVIS_SELECTED);
-
-					m_iDropFolder = info.iItem;
-					m_bOverFolder = TRUE;
-				}
-			}
-		}
-	}
-}
-
-void ShellBrowser::DragLeave()
-{
-	ListViewHelper::PositionInsertMark(m_hListView, nullptr);
-
-	if (m_bDeselectDropFolder)
-	{
-		/* Deselect any folder that may have been selected during dragging. */
-		ListView_SetItemState(m_hListView, m_iDropFolder, 0, LVIS_SELECTED);
-	}
-
-	m_performingDrop = FALSE;
-}
-
-void ShellBrowser::OnDropFile(const std::list<std::wstring> &PastedFileList, const POINT *ppt)
-{
-	DroppedFile_t droppedFile;
-	POINT ptOrigin;
-	POINT localDropPoint;
-
-	/* Don't reposition the file if it was dropped
-	in a subfolder. */
-	if (!m_bOverFolder)
-	{
-		ListView_GetOrigin(m_hListView, &ptOrigin);
-
-		localDropPoint = *ppt;
-
-		ScreenToClient(m_hListView, (LPPOINT) &localDropPoint);
-
-		/* The location of each of the dropped items will be the same. */
-		droppedFile.DropPoint.x = ptOrigin.x + localDropPoint.x;
-		droppedFile.DropPoint.y = ptOrigin.y + localDropPoint.y;
-
-		for (const auto &strFilename : PastedFileList)
-		{
-			StringCchCopy(
-				droppedFile.szFileName, SIZEOF_ARRAY(droppedFile.szFileName), strFilename.c_str());
-			PathStripPath(droppedFile.szFileName);
-
-			m_droppedFileNameList.push_back(droppedFile);
-		}
-	}
-}
-
-/*
-Causes any dragged files to be dropped in the current
-directory.
-
-- If the files are been dragged locally, they will simply
-be moved.
-- If the files are been dragged from another directory,
-they will be copied/moved to the current directory.
-
-Modifier keys (from http://blogs.msdn.com/oldnewthing/archive/2004/11/12/256472.aspx):
-If Ctrl+Shift (or Alt) are held down, then the operation creates a shortcut.
-If Shift is held down, then the operation is a move.
-If Ctrl is held down, then the operation is a copy.
-If no modifiers are held down and the source and destination are on the same drive, then the
-operation is a move. If no modifiers are held down and the source and destination are on different
-drives, then the operation is a copy.
-*/
-DWORD ShellBrowser::Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
-{
-	FORMATETC ftcHDrop = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-	STGMEDIUM stg;
-	DROPFILES *pdf = nullptr;
-	HRESULT hr;
-	DWORD dwEffect;
-	int nDroppedFiles;
-
-	if (m_bDeselectDropFolder)
-	{
-		ListView_SetItemState(m_hListView, m_iDropFolder, 0, LVIS_SELECTED);
-	}
-
-	m_performingDrop = FALSE;
-
-	std::wstring destDirectory = GetDirectory();
-
-	TCHAR finalDestDirectory[MAX_PATH];
-	StringCchCopy(finalDestDirectory, std::size(finalDestDirectory), destDirectory.c_str());
-
-	/* If the item(s) have been dropped over a folder in the
-	listview, append the folders name onto the destination path. */
-	if (m_bOverFolder)
-	{
-		LVITEM lvItem;
-
-		lvItem.mask = LVIF_PARAM;
-		lvItem.iItem = m_iDropFolder;
-		lvItem.iSubItem = 0;
-		ListView_GetItem(m_hListView, &lvItem);
-
-		PathAppend(finalDestDirectory, m_itemInfoMap.at((int) lvItem.lParam).wfd.cFileName);
-	}
-
-	if (m_bDataAccept)
-	{
-		BOOL bHandled = FALSE;
-
-		if (m_DragType == DragType::LeftClick && m_performingDrag && !m_bOverFolder)
-		{
-			hr = dataObject->GetData(&ftcHDrop, &stg);
-
-			if (hr == S_OK)
-			{
-				pdf = (DROPFILES *) GlobalLock(stg.hGlobal);
-
-				if (pdf != nullptr)
-				{
-					nDroppedFiles = DragQueryFile((HDROP) pdf, 0xFFFFFFFF, nullptr, 0);
-
-					/* The drop effect will be the same for all files
-					that are been dragged locally. */
-					dwEffect = DetermineDragEffect(keyState, effect, m_bDataAccept, m_bOnSameDrive);
-
-					if (dwEffect == DROPEFFECT_MOVE)
-					{
-						RepositionLocalFiles(&pt);
-
-						bHandled = TRUE;
-					}
-				}
-			}
-		}
-
-		if (!bHandled)
-		{
-			DropHandler *pDropHandler = DropHandler::CreateNew();
-
-			/* The drop handler will call Release(), so we
-			need to AddRef() here. In the future, this should
-			be switched to an independent class. */
-			AddRef();
-
-			pDropHandler->Drop(dataObject, keyState, pt, effect, m_hListView, m_DragType,
-				finalDestDirectory, this, FALSE);
-
-			/* When dragging and dropping, any dropped items
-			will be selected, while any previously selected
-			items will be deselected. */
-			/* TODO: May need to modify this in case there
-			was an error with the drop (i.e. don't deselect current
-			files if nothing was actually copied/moved). */
-			if (!m_bOverFolder)
-			{
-				ListViewHelper::SelectAllItems(m_hListView, FALSE);
-			}
-
-			pDropHandler->Release();
-		}
-	}
-
-	/*if(m_bDeselectDropFolder)
-	{
-		ListView_SetItemState(m_hListView,
-			m_iDropFolder,0,LVIS_SELECTED);
-	}*/
-
-	/* Remove the insertion mark from the listview. */
-	ListViewHelper::PositionInsertMark(m_hListView, nullptr);
-
-	// m_bPerformingDrag = FALSE;
-
-	return effect;
+	POINT ptClient = pt;
+	ScreenToClient(m_hListView, &ptClient);
+	ScrollListViewFromCursor(m_hListView, &ptClient);
 }
 
 /* TODO: This isn't declared. */
@@ -718,8 +342,6 @@ void ShellBrowser::RepositionLocalFiles(const POINT *ppt)
 	}
 
 	m_performingDrag = false;
-
-	m_performingDrop = FALSE;
 }
 
 void ShellBrowser::ScrollListViewFromCursor(HWND hListView, const POINT *CursorPos)
@@ -758,4 +380,11 @@ void ShellBrowser::ScrollListViewFromCursor(HWND hListView, const POINT *CursorP
 			ListView_Scroll(hListView, 0, Y_SCROLL_AMOUNT);
 		}
 	}
+}
+
+void ShellBrowser::ResetDropUiState()
+{
+	ListViewHelper::PositionInsertMark(m_hListView, nullptr);
+
+	ListView_SetItemState(m_hListView, -1, 0, LVIS_DROPHILITED);
 }

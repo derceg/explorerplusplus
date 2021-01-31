@@ -332,6 +332,7 @@
     <ClCompile Include="Rgb.cpp" />
     <ClCompile Include="RichEditHelper.cpp" />
     <ClCompile Include="SetDefaultFileManager.cpp" />
+    <ClCompile Include="ShellDropTargetWindow.cpp" />
     <ClCompile Include="ShellHelper.cpp" />
     <ClCompile Include="StatusBar.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -401,6 +402,7 @@
     <ClInclude Include="Rgb.h" />
     <ClInclude Include="RichEditHelper.h" />
     <ClInclude Include="SetDefaultFileManager.h" />
+    <ClInclude Include="ShellDropTargetWindow.h" />
     <ClInclude Include="ShellHelper.h" />
     <ClInclude Include="StatusBar.h" />
     <ClInclude Include="stdafx.h" />

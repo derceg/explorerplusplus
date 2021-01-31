@@ -6,6 +6,7 @@
 
 #include "../Helper/Macros.h"
 #include <boost/signals2.hpp>
+#include <memory>
 #include <optional>
 
 class FileActionHandler;
@@ -44,6 +45,7 @@ public:
 	int GetId() const;
 
 	ShellBrowser *GetShellBrowser() const;
+	std::weak_ptr<ShellBrowser> GetShellBrowserWeak() const;
 
 	std::wstring GetName() const;
 	bool GetUseCustomName() const;
@@ -68,7 +70,7 @@ private:
 	static int idCounter;
 	const int m_id;
 
-	ShellBrowser *m_shellBrowser;
+	std::shared_ptr<ShellBrowser> m_shellBrowser;
 
 	bool m_useCustomName;
 	std::wstring m_customName;

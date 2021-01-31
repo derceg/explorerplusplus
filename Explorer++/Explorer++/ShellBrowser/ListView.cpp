@@ -628,11 +628,6 @@ void ShellBrowser::OnListViewItemChanged(const NMLISTVIEW *changeData)
 		return;
 	}
 
-	if (m_performingDrop)
-	{
-		return;
-	}
-
 	if (m_config->checkBoxSelection)
 	{
 		if (!previouslySelected && currentlySelected)

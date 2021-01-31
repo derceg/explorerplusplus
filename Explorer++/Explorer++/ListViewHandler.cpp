@@ -528,9 +528,11 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 
 void Explorerplusplus::OnListViewBackgroundRClickWindows8OrGreater(POINT *pCursorPos)
 {
-	auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
+	const auto &selectedTab = m_tabContainer->GetSelectedTab();
+	auto pidlDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
 
-	FileContextMenuManager fcmm(m_hActiveListView, pidlDirectory.get(), {});
+	FileContextMenuManager fcmm(
+		selectedTab.GetShellBrowser()->GetListView(), pidlDirectory.get(), {});
 
 	FileContextMenuInfo fcmi;
 	fcmi.uFrom = FROM_LISTVIEW;
@@ -542,11 +544,11 @@ void Explorerplusplus::OnListViewBackgroundRClickWindows8OrGreater(POINT *pCurso
 	auto newMenuClient = NewMenuClient::Create(this);
 	serviceProvider->RegisterService(IID_INewMenuClient, newMenuClient.get());
 
-	auto folderView = FolderView::Create(m_pActiveShellBrowser);
+	auto folderView = FolderView::Create(selectedTab.GetShellBrowserWeak());
 	serviceProvider->RegisterService(
 		IID_IFolderView, static_cast<IFolderView2 *>(folderView.get()));
 
-	auto shellView = ShellView::Create(pidlDirectory.get(), m_pActiveShellBrowser);
+	auto shellView = ShellView::Create(pidlDirectory.get(), selectedTab.GetShellBrowserWeak());
 	serviceProvider->RegisterService(SID_DefView, shellView.get());
 
 	fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, pCursorPos, &statusBar,
@@ -768,19 +770,20 @@ void Explorerplusplus::OnListViewPaste()
 		return;
 	}
 
-	auto directory = m_pActiveShellBrowser->GetDirectoryIdl();
+	const auto &selectedTab = m_tabContainer->GetSelectedTab();
+	auto directory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
 
 	if (CanShellPasteDataObject(
 			directory.get(), clipboardObject.get(), DROPEFFECT_COPY | DROPEFFECT_MOVE))
 	{
 		auto serviceProvider = ServiceProvider::Create();
 
-		auto folderView = FolderView::Create(m_pActiveShellBrowser);
+		auto folderView = FolderView::Create(selectedTab.GetShellBrowserWeak());
 		serviceProvider->RegisterService(
 			IID_IFolderView, static_cast<IShellFolderView *>(folderView.get()));
 
-		ExecuteActionFromContextMenu(directory.get(), {}, m_pActiveShellBrowser->GetListView(),
-			L"paste", 0, serviceProvider.get());
+		ExecuteActionFromContextMenu(directory.get(), {},
+			selectedTab.GetShellBrowser()->GetListView(), L"paste", 0, serviceProvider.get());
 	}
 	else
 	{
@@ -791,7 +794,7 @@ void Explorerplusplus::OnListViewPaste()
 		 will cause the destination directory to change in the
 		 middle of the copy operation. */
 		StringCchCopy(szDestination, SIZEOF_ARRAY(szDestination),
-			m_pActiveShellBrowser->GetDirectory().c_str());
+			selectedTab.GetShellBrowser()->GetDirectory().c_str());
 
 		/* Also, the string must be double NULL terminated. */
 		szDestination[lstrlen(szDestination) + 1] = '\0';

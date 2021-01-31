@@ -7,17 +7,17 @@
 #include "ShellBrowser/ShellBrowser.h"
 
 wil::com_ptr_nothrow<ShellView> ShellView::Create(
-	PCIDLIST_ABSOLUTE directory, ShellBrowser *shellBrowser)
+	PCIDLIST_ABSOLUTE directory, std::weak_ptr<ShellBrowser> shellBrowserWeak)
 {
 	wil::com_ptr_nothrow<ShellView> shellView;
-	shellView.attach(new ShellView(directory, shellBrowser));
+	shellView.attach(new ShellView(directory, shellBrowserWeak));
 	return shellView;
 }
 
-ShellView::ShellView(PCIDLIST_ABSOLUTE directory, ShellBrowser *shellBrowser) :
+ShellView::ShellView(PCIDLIST_ABSOLUTE directory, std::weak_ptr<ShellBrowser> shellBrowserWeak) :
 	m_refCount(1),
 	m_directory(ILCloneFull(directory)),
-	m_shellBrowser(shellBrowser)
+	m_shellBrowserWeak(shellBrowserWeak)
 {
 }
 
@@ -89,10 +89,17 @@ IFACEMETHODIMP ShellView::SaveViewState()
 
 IFACEMETHODIMP ShellView::SelectItem(PCUITEMID_CHILD pidlItem, SVSIF flags)
 {
+	auto shellBrowser = m_shellBrowserWeak.lock();
+
+	if (!shellBrowser)
+	{
+		return E_FAIL;
+	}
+
 	if (flags == SVSI_EDIT)
 	{
 		auto pidlComplete = unique_pidl_absolute(ILCombine(m_directory.get(), pidlItem));
-		m_shellBrowser->QueueRename(pidlComplete.get());
+		shellBrowser->QueueRename(pidlComplete.get());
 		return S_OK;
 	}
 

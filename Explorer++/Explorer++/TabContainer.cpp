@@ -1126,8 +1126,6 @@ bool TabContainer::CloseTab(const Tab &tab)
 			tab.GetShellBrowser()->GetDirMonitorId());
 	}
 
-	tab.GetShellBrowser()->Release();
-
 	// This is needed, as the erase() call below will remove the element
 	// from the tabs container (which will invalidate the reference
 	// passed to the function).

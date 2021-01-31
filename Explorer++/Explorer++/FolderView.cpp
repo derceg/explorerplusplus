@@ -6,14 +6,16 @@
 #include "FolderView.h"
 #include "ShellBrowser/ShellBrowser.h"
 
-wil::com_ptr_nothrow<FolderView> FolderView::Create(ShellBrowser *shellBrowser)
+wil::com_ptr_nothrow<FolderView> FolderView::Create(std::weak_ptr<ShellBrowser> shellBrowserWeak)
 {
 	wil::com_ptr_nothrow<FolderView> folderView;
-	folderView.attach(new FolderView(shellBrowser));
+	folderView.attach(new FolderView(shellBrowserWeak));
 	return folderView;
 }
 
-FolderView::FolderView(ShellBrowser *shellBrowser) : m_refCount(1), m_shellBrowser(shellBrowser)
+FolderView::FolderView(std::weak_ptr<ShellBrowser> shellBrowserWeak) :
+	m_refCount(1),
+	m_shellBrowserWeak(shellBrowserWeak)
 {
 }
 
@@ -197,7 +199,11 @@ IFACEMETHODIMP FolderView::GetGroupSubsetCount(UINT *numVisibleRows)
 
 IFACEMETHODIMP FolderView::SetRedraw(BOOL redrawOn)
 {
-	SendMessage(m_shellBrowser->GetListView(), WM_SETREDRAW, redrawOn, 0);
+	if (auto shellBrowser = m_shellBrowserWeak.lock())
+	{
+		SendMessage(shellBrowser->GetListView(), WM_SETREDRAW, redrawOn, 0);
+	}
+
 	return S_OK;
 }
 
@@ -230,7 +236,14 @@ IFACEMETHODIMP FolderView::SetCurrentViewMode(UINT viewMode)
 // background context menu for a directory) to be set up correctly.
 IFACEMETHODIMP FolderView::GetFolder(REFIID riid, void **ppv)
 {
-	auto directory = m_shellBrowser->GetDirectoryIdl();
+	auto shellBrowser = m_shellBrowserWeak.lock();
+
+	if (!shellBrowser)
+	{
+		return E_FAIL;
+	}
+
+	auto directory = shellBrowser->GetDirectoryIdl();
 
 	if (riid == IID_IShellItemArray)
 	{
@@ -331,18 +344,25 @@ IFACEMETHODIMP FolderView::SelectAndPositionItems(
 	UNREFERENCED_PARAMETER(pts);
 	UNREFERENCED_PARAMETER(flags);
 
+	auto shellBrowser = m_shellBrowserWeak.lock();
+
+	if (!shellBrowser)
+	{
+		return E_FAIL;
+	}
+
 	if (WI_IsFlagSet(flags, SVSI_SELECT))
 	{
 		std::vector<unique_pidl_absolute> pidls;
 
 		for (UINT i = 0; i < numItems; i++)
 		{
-			unique_pidl_absolute pidl(ILCombine(m_shellBrowser->GetDirectoryIdl().get(), items[i]));
+			unique_pidl_absolute pidl(ILCombine(shellBrowser->GetDirectoryIdl().get(), items[i]));
 			pidls.push_back(std::move(pidl));
 		}
 
 		auto rawPidls = ShallowCopyPidls(pidls);
-		m_shellBrowser->SelectItems(rawPidls);
+		shellBrowser->SelectItems(rawPidls);
 
 		return S_OK;
 	}

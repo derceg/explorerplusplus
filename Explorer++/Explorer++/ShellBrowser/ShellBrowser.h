@@ -8,12 +8,12 @@
 #include "Columns.h"
 #include "FolderSettings.h"
 #include "NavigatorInterface.h"
+#include "ServiceProvider.h"
 #include "SignalWrapper.h"
 #include "SortModes.h"
 #include "ViewModes.h"
-#include "../Helper/DropHandler.h"
-#include "../Helper/DropTargetWindow.h"
 #include "../Helper/Macros.h"
+#include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/ShellHelper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
 #include <boost/multi_index/hashed_index.hpp>
@@ -52,24 +52,23 @@ typedef struct
 } FolderInfo_t;
 
 class ShellBrowser :
-	public IDropFilesCallback,
+	public ShellDropTargetWindow<int>,
 	public NavigatorInterface,
-	private DropTargetInternal
+	public std::enable_shared_from_this<ShellBrowser>
 {
 public:
-	static ShellBrowser *CreateNew(int id, HWND hOwner, IExplorerplusplus *coreInterface,
-		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
-		const FolderSettings &folderSettings, std::optional<FolderColumns> initialColumns);
+	static std::shared_ptr<ShellBrowser> CreateNew(int id, HWND hOwner,
+		IExplorerplusplus *coreInterface, TabNavigationInterface *tabNavigation,
+		FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
+		std::optional<FolderColumns> initialColumns);
 
-	static ShellBrowser *CreateFromPreserved(int id, HWND hOwner, IExplorerplusplus *coreInterface,
-		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
+	static std::shared_ptr<ShellBrowser> CreateFromPreserved(int id, HWND hOwner,
+		IExplorerplusplus *coreInterface, TabNavigationInterface *tabNavigation,
+		FileActionHandler *fileActionHandler,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 		const PreservedFolderState &preservedFolderState);
 
-	/* IUnknown methods. */
-	HRESULT __stdcall QueryInterface(REFIID iid, void **ppvObject) override;
-	ULONG __stdcall AddRef() override;
-	ULONG __stdcall Release() override;
+	~ShellBrowser();
 
 	HWND GetListView() const;
 	FolderSettings GetFolderSettings() const;
@@ -379,9 +378,9 @@ private:
 	ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface,
 		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 		const FolderSettings &folderSettings, std::optional<FolderColumns> initialColumns);
-	~ShellBrowser();
 
-	HWND SetUpListView(HWND parent);
+	static HWND CreateListView(HWND parent);
+	void InitializeListView();
 	int GenerateUniqueItemId();
 	void MarkItemAsCut(int item, bool cut);
 	void VerifySortMode();
@@ -583,19 +582,17 @@ private:
 	void OnClipboardUpdate();
 	void RestoreStateOfCutItems();
 
-	// DropTargetInternal
-	DWORD DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
-	DWORD DragOver(DWORD keyState, POINT pt, DWORD effect) override;
-	void DragLeave() override;
-	DWORD Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
+	// ShellDropTargetWindow
+	int GetDropTargetItem(const POINT &pt) override;
+	unique_pidl_absolute GetPidlForTargetItem(int targetItem) override;
+	IUnknown *GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl) override;
+	void UpdateUiForDrop(int targetItem, const POINT &pt) override;
+	void ResetDropUiState() override;
 
 	/* Drag and Drop support. */
-	DWORD CheckItemLocations(IDataObject *pDataObject, int iDroppedItem);
-	void HandleDragSelection(const POINT *ppt);
 	void RepositionLocalFiles(const POINT *ppt);
 	void ScrollListViewFromCursor(HWND hListView, const POINT *CursorPos);
 	void PositionDroppedItems();
-	void OnDropFile(const std::list<std::wstring> &PastedFileList, const POINT *ppt) override;
 
 	void OnApplicationShuttingDown();
 
@@ -606,8 +603,6 @@ private:
 	std::optional<int> GetItemInternalIndexForPidl(PCIDLIST_ABSOLUTE pidl) const;
 	std::optional<int> LocateItemByInternalIndex(int internalIndex) const;
 	void ApplyHeaderSortArrow();
-
-	int m_iRefCount;
 
 	HWND m_hListView;
 	HWND m_hOwner;
@@ -712,18 +707,11 @@ private:
 
 	/* Drag and drop related data. */
 	UINT m_getDragImageMessage;
-	wil::com_ptr_nothrow<DropTargetWindow> m_dropTargetWindow;
-	std::list<DroppedFile_t> m_droppedFileNameList;
+	wil::com_ptr_nothrow<ServiceProvider> m_dropServiceProvider;
 	std::vector<unique_pidl_absolute> m_draggedItems;
-	DragType m_DragType;
 	POINT m_ptDraggedOffset;
-	BOOL m_bDataAccept;
 	bool m_performingDrag;
-	BOOL m_performingDrop;
-	BOOL m_bDeselectDropFolder;
-	BOOL m_bOnSameDrive;
-	int m_bOverFolder;
-	int m_iDropFolder;
+	std::list<DroppedFile_t> m_droppedFileNameList;
 
 	bool m_rightClickDragAllowed;
 	POINT m_rightClickDragStartPoint;
