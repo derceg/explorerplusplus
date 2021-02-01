@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ShellDropTargetWindow.h"
+#include "DragDropHelper.h"
 
 template <typename DropTargetItemIdentifierType>
 ShellDropTargetWindow<DropTargetItemIdentifierType>::ShellDropTargetWindow(HWND hwnd) :
@@ -112,6 +113,11 @@ DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::GetDropEffect(
 	if (FAILED(hr))
 	{
 		return DROPEFFECT_NONE;
+	}
+
+	if (IsTargetSourceOfDrop(targetItem, dataObject))
+	{
+		SetDropDescription(dataObject, DROPIMAGE_NOIMAGE, L"", L"");
 	}
 
 	m_previousTargetInfo->dropTargetInitialised = true;

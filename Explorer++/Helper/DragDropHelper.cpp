@@ -4,8 +4,8 @@
 
 #include "stdafx.h"
 #include "DragDropHelper.h"
-#include "DataExchangeHelper.h"
 #include "DataObjectWrapper.h"
+#include "Macros.h"
 #include <wil/com.h>
 
 STGMEDIUM GetStgMediumForGlobal(HGLOBAL global)
@@ -28,24 +28,21 @@ STGMEDIUM GetStgMediumForStream(IStream *stream)
 
 HRESULT SetPreferredDropEffect(IDataObject *dataObject, DWORD effect)
 {
-	FORMATETC ftc = { static_cast<CLIPFORMAT>(RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT)),
-		nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+	return SetBlobData(dataObject,
+		static_cast<CLIPFORMAT>(RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT)), effect);
+}
 
-	auto global = WriteDataToGlobal(&effect, sizeof(effect));
+HRESULT SetDropDescription(IDataObject *dataObject, DROPIMAGETYPE type, const std::wstring &message,
+	const std::wstring &insert)
+{
+	DROPDESCRIPTION dropDescription;
+	dropDescription.type = type;
+	StringCchCopy(
+		dropDescription.szMessage, SIZEOF_ARRAY(dropDescription.szMessage), message.c_str());
+	StringCchCopy(dropDescription.szInsert, SIZEOF_ARRAY(dropDescription.szInsert), insert.c_str());
 
-	if (!global)
-	{
-		return E_FAIL;
-	}
-
-	STGMEDIUM stg = GetStgMediumForGlobal(global.get());
-	RETURN_IF_FAILED(dataObject->SetData(&ftc, &stg, TRUE));
-
-	// The IDataObject instance has taken ownership of stg at this point, so it's responsible for
-	// freeing the data.
-	global.release();
-
-	return S_OK;
+	return SetBlobData(dataObject,
+		static_cast<CLIPFORMAT>(RegisterClipboardFormat(CFSTR_DROPDESCRIPTION)), dropDescription);
 }
 
 // Returns an IDataObject instance that can be used for clipboard operations and drag and drop.
