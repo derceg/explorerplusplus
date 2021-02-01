@@ -105,4 +105,5 @@ private:
 
 	ULONG m_refCount;
 	std::weak_ptr<ShellBrowser> m_shellBrowserWeak;
+	int m_initialFolderId;
 };

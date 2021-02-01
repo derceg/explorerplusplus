@@ -17,6 +17,10 @@ FolderView::FolderView(std::weak_ptr<ShellBrowser> shellBrowserWeak) :
 	m_refCount(1),
 	m_shellBrowserWeak(shellBrowserWeak)
 {
+	auto shellBrowser = m_shellBrowserWeak.lock();
+	assert(shellBrowser);
+
+	m_initialFolderId = shellBrowser->GetUniqueFolderId();
 }
 
 // IFolderView2
@@ -346,7 +350,9 @@ IFACEMETHODIMP FolderView::SelectAndPositionItems(
 
 	auto shellBrowser = m_shellBrowserWeak.lock();
 
-	if (!shellBrowser)
+	// If the hosting tab was closed or navigated to a different folder, the request to select items
+	// should be ignored.
+	if (!shellBrowser || shellBrowser->GetUniqueFolderId() != m_initialFolderId)
 	{
 		return E_FAIL;
 	}
