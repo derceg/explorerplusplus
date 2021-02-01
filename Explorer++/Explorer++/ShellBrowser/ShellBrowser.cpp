@@ -501,6 +501,8 @@ unique_pidl_absolute ShellBrowser::GetDirectoryIdl() const
 
 void ShellBrowser::SelectItems(const std::vector<PCIDLIST_ABSOLUTE> &pidls)
 {
+	ListViewHelper::SelectAllItems(m_hListView, FALSE);
+
 	int smallestIndex = INT_MAX;
 
 	for (auto &pidl : pidls)
