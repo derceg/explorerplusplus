@@ -85,6 +85,16 @@ IUnknown *ShellBrowser::GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl)
 	return m_dropServiceProvider.get();
 }
 
+bool ShellBrowser::IsTargetSourceOfDrop(int targetItem, IDataObject *dataObject)
+{
+	if (m_performingDrag && dataObject == m_draggedDataObject && targetItem == -1)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 void ShellBrowser::UpdateUiForDrop(int targetItem, const POINT &pt)
 {
 	ListView_SetItemState(m_hListView, -1, 0, LVIS_DROPHILITED);

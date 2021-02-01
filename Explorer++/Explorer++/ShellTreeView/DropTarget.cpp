@@ -39,6 +39,14 @@ IUnknown *ShellTreeView::GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl)
 	return nullptr;
 }
 
+bool ShellTreeView::IsTargetSourceOfDrop(HTREEITEM targetItem, IDataObject *dataObject)
+{
+	UNREFERENCED_PARAMETER(targetItem);
+	UNREFERENCED_PARAMETER(dataObject);
+
+	return false;
+}
+
 void ShellTreeView::UpdateUiForDrop(HTREEITEM targetItem, const POINT &pt)
 {
 	UpdateUiForTargetItem(targetItem);

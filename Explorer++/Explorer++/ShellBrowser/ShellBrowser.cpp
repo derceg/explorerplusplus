@@ -89,7 +89,8 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 	m_infoTipsThreadPool(
 		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
 	m_infoTipResultIDCounter(0),
-	m_rightClickDragAllowed(false)
+	m_rightClickDragAllowed(false),
+	m_draggedDataObject(nullptr)
 {
 	InitializeListView();
 	m_iconFetcher = std::make_unique<IconFetcher>(m_hListView, m_cachedIcons);

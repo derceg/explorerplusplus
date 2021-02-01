@@ -586,6 +586,7 @@ private:
 	int GetDropTargetItem(const POINT &pt) override;
 	unique_pidl_absolute GetPidlForTargetItem(int targetItem) override;
 	IUnknown *GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl) override;
+	bool IsTargetSourceOfDrop(int targetItem, IDataObject *dataObject) override;
 	void UpdateUiForDrop(int targetItem, const POINT &pt) override;
 	void ResetDropUiState() override;
 
@@ -711,6 +712,7 @@ private:
 	std::vector<unique_pidl_absolute> m_draggedItems;
 	POINT m_ptDraggedOffset;
 	bool m_performingDrag;
+	IDataObject *m_draggedDataObject;
 	std::list<DroppedFile_t> m_droppedFileNameList;
 
 	bool m_rightClickDragAllowed;

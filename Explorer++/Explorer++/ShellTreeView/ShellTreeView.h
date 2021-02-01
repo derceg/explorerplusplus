@@ -191,6 +191,7 @@ private:
 	HTREEITEM GetDropTargetItem(const POINT &pt) override;
 	unique_pidl_absolute GetPidlForTargetItem(HTREEITEM targetItem) override;
 	IUnknown *GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl) override;
+	bool IsTargetSourceOfDrop(HTREEITEM targetItem, IDataObject *dataObject) override;
 	void UpdateUiForDrop(HTREEITEM targetItem, const POINT &pt) override;
 	void ResetDropUiState() override;
 

@@ -191,6 +191,13 @@ DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::PerformDrop(
 		return DROPEFFECT_NONE;
 	}
 
+	if (IsTargetSourceOfDrop(targetItem, dataObject))
+	{
+		// The drag was started in the current window and the target is the folder represented by
+		// that window.
+		return DROPEFFECT_NONE;
+	}
+
 	DWORD targetEffect;
 	HRESULT hr;
 

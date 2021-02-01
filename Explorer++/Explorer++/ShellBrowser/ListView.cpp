@@ -1062,6 +1062,7 @@ HRESULT ShellBrowser::StartDrag(int draggedItem, const POINT &startPoint)
 	RETURN_IF_FAILED(CreateDataObjectForShellTransfer(pidls, &dataObject));
 
 	m_performingDrag = true;
+	m_draggedDataObject = dataObject.get();
 	m_draggedItems = DeepCopyPidls(pidls);
 
 	POINT ptItem;
@@ -1078,6 +1079,7 @@ HRESULT ShellBrowser::StartDrag(int draggedItem, const POINT &startPoint)
 		DROPEFFECT_COPY | DROPEFFECT_MOVE | DROPEFFECT_LINK, &finalEffect);
 
 	m_draggedItems.clear();
+	m_draggedDataObject = nullptr;
 	m_performingDrag = false;
 
 	return hr;
