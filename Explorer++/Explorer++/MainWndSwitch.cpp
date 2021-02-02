@@ -272,7 +272,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		break;
 
 	case WM_CLOSE:
-		return OnClose();
+		return CloseApplication();
 
 	case WM_DESTROY:
 		return OnDestroy();

@@ -197,6 +197,7 @@ private:
 
 	/* Drag and drop. */
 	void UpdateUiForTargetItem(HTREEITEM targetItem);
+	void ScrollTreeViewForDrop(const POINT &pt);
 	void OnDropExpandTimer();
 	HRESULT OnBeginDrag(int iItemId);
 

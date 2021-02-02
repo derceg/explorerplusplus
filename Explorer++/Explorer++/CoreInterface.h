@@ -99,6 +99,8 @@ __interface IExplorerplusplus
 	BOOL GetSavePreferencesToXmlFile() const;
 	void SetSavePreferencesToXmlFile(BOOL savePreferencesToXmlFile);
 
+	int CloseApplication();
+
 	boost::signals2::connection AddTabsInitializedObserver(
 		const TabsInitializedSignal::slot_type &observer);
 	boost::signals2::connection AddMainMenuPreShowObserver(

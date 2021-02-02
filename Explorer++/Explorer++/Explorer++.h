@@ -178,7 +178,7 @@ private:
 	BOOL OnSize(int MainWindowWidth, int MainWindowHeight);
 	void OnDpiChanged(const RECT *updatedWindowRect);
 	std::optional<LRESULT> OnCtlColorStatic(HWND hwnd, HDC hdc);
-	int OnClose();
+	int CloseApplication();
 	int OnDestroy();
 	void OnRightClick(NMHDR *nmhdr);
 	void OnSetFocus();

@@ -8,8 +8,8 @@
 #include "SignalWrapper.h"
 #include "Tab.h"
 #include "TabNavigationInterface.h"
-#include "../Helper/BaseWindow.h"
 #include "../Helper/IconFetcher.h"
+#include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/parameter.hpp>
 #include <boost/signals2.hpp>
@@ -71,7 +71,7 @@ struct TabSettings : TabSettingsImpl
 	// clang-format on
 };
 
-class TabContainer : public BaseWindow
+class TabContainer : public ShellDropTargetWindow<int>
 {
 public:
 	static TabContainer *Create(HWND parent, TabNavigationInterface *tabNavigation,
@@ -130,10 +130,24 @@ public:
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabColumnsChangedSignal;
 
 private:
+	enum class ScrollDirection
+	{
+		Left,
+		Right
+	};
+
 	static const UINT_PTR SUBCLASS_ID = 0;
 	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
 	static const int ICON_SIZE_96DPI = 16;
+
+	static const UINT DROP_SWITCH_TAB_TIMER_ID = 1;
+	static const UINT DROP_SWITCH_TAB_TIMER_ELAPSE = 500;
+
+	static const UINT DROP_SCROLL_TIMER_ID = 2;
+	static const UINT DROP_SCROLL_TIMER_ELAPSE = 1000;
+
+	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 40;
 
 	TabContainer(HWND parent, TabNavigationInterface *tabNavigation, IExplorerplusplus *expp,
 		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
@@ -202,6 +216,20 @@ private:
 
 	void RemoveTabFromControl(const Tab &tab);
 
+	// ShellDropTargetWindow
+	int GetDropTargetItem(const POINT &pt) override;
+	unique_pidl_absolute GetPidlForTargetItem(int targetItem) override;
+	IUnknown *GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl) override;
+	bool IsTargetSourceOfDrop(int targetItem, IDataObject *dataObject) override;
+	void UpdateUiForDrop(int targetItem, const POINT &pt) override;
+	void ResetDropUiState() override;
+
+	void UpdateUiForTargetItem(int targetItem);
+	void ScrollTabControlForDrop(const POINT &pt);
+	void OnDropSwitchTabTimer();
+	void OnDropScrollTimer();
+	void ScrollTabControl(ScrollDirection direction);
+
 	wil::unique_hfont m_tabFont;
 	wil::unique_himagelist m_tabCtrlImageList;
 
@@ -232,6 +260,10 @@ private:
 	int m_draggedTabStartIndex;
 	int m_draggedTabEndIndex;
 	RECT m_rcDraggedTab;
+
+	// Drop handling
+	int m_dropTargetIndex;
+	std::optional<ScrollDirection> m_dropScrollDirection;
 
 	BookmarkTree *m_bookmarkTree;
 };

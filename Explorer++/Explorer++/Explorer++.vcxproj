@@ -618,7 +618,6 @@
     <ClCompile Include="TabBackingHandler.cpp" />
     <ClCompile Include="TabContainer.cpp" />
     <ClCompile Include="Plugins\TabsApi\Events\TabCreated.cpp" />
-    <ClCompile Include="TabDropHandler.cpp" />
     <ClCompile Include="TabHandler.cpp" />
     <ClCompile Include="Plugins\TabsApi\Events\TabMoved.cpp" />
     <ClCompile Include="Plugins\TabsApi\TabProperties.cpp" />
@@ -771,7 +770,6 @@
     <ClInclude Include="TabBacking.h" />
     <ClInclude Include="TabContainer.h" />
     <ClInclude Include="Plugins\TabsApi\Events\TabCreated.h" />
-    <ClInclude Include="TabDropHandler.h" />
     <ClInclude Include="Plugins\TabsApi\Events\TabMoved.h" />
     <ClInclude Include="TabNavigationInterface.h" />
     <ClInclude Include="Plugins\TabsApi\TabProperties.h" />

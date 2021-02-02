@@ -50,7 +50,32 @@ bool ShellTreeView::IsTargetSourceOfDrop(HTREEITEM targetItem, IDataObject *data
 void ShellTreeView::UpdateUiForDrop(HTREEITEM targetItem, const POINT &pt)
 {
 	UpdateUiForTargetItem(targetItem);
+	ScrollTreeViewForDrop(pt);
+}
 
+void ShellTreeView::UpdateUiForTargetItem(HTREEITEM targetItem)
+{
+	if (targetItem)
+	{
+		TreeView_Select(m_hTreeView, targetItem, TVGN_DROPHILITE);
+
+		if (m_dropExpandItem != targetItem)
+		{
+			SetTimer(m_hTreeView, DROP_EXPAND_TIMER_ID, DROP_EXPAND_TIMER_ELAPSE, nullptr);
+		}
+	}
+	else
+	{
+		TreeView_Select(m_hTreeView, nullptr, TVGN_DROPHILITE);
+
+		KillTimer(m_hTreeView, DROP_EXPAND_TIMER_ID);
+	}
+
+	m_dropExpandItem = targetItem;
+}
+
+void ShellTreeView::ScrollTreeViewForDrop(const POINT &pt)
+{
 	POINT ptClient = pt;
 	BOOL res = ScreenToClient(m_hTreeView, &ptClient);
 
@@ -90,28 +115,9 @@ void ShellTreeView::UpdateUiForDrop(HTREEITEM targetItem, const POINT &pt)
 	}
 }
 
-void ShellTreeView::UpdateUiForTargetItem(HTREEITEM targetItem)
-{
-	if (targetItem)
-	{
-		TreeView_Select(m_hTreeView, targetItem, TVGN_DROPHILITE);
-
-		if (m_dropExpandItem != targetItem)
-		{
-			m_dropExpandItem = targetItem;
-			SetTimer(m_hTreeView, DROP_EXPAND_TIMER_ID, DROP_EXPAND_TIMER_ELAPSE, nullptr);
-		}
-	}
-	else
-	{
-		TreeView_Select(m_hTreeView, nullptr, TVGN_DROPHILITE);
-
-		KillTimer(m_hTreeView, DROP_EXPAND_TIMER_ID);
-	}
-}
-
 void ShellTreeView::OnDropExpandTimer()
 {
+	assert(m_dropExpandItem);
 	TreeView_Expand(m_hTreeView, m_dropExpandItem, TVE_EXPAND);
 
 	KillTimer(m_hTreeView, DROP_EXPAND_TIMER_ID);

@@ -17,7 +17,6 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabBacking.h"
-#include "TabDropHandler.h"
 #include "TabRestorer.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/Controls.h"
@@ -54,7 +53,7 @@ TabContainer *TabContainer::Create(HWND parent, TabNavigationInterface *tabNavig
 TabContainer::TabContainer(HWND parent, TabNavigationInterface *tabNavigation,
 	IExplorerplusplus *expp, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons,
 	BookmarkTree *bookmarkTree, HINSTANCE instance, std::shared_ptr<Config> config) :
-	BaseWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
+	ShellDropTargetWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
 	m_tabNavigation(tabNavigation),
 	m_expp(expp),
 	m_fileActionHandler(fileActionHandler),
@@ -65,7 +64,8 @@ TabContainer::TabContainer(HWND parent, TabNavigationInterface *tabNavigation,
 	m_bTabBeenDragged(FALSE),
 	m_iPreviousTabSelectionId(-1),
 	m_iconFetcher(m_hwnd, cachedIcons),
-	m_defaultFolderIconSystemImageListIndex(GetDefaultFolderIconIndex())
+	m_defaultFolderIconSystemImageListIndex(GetDefaultFolderIconIndex()),
+	m_dropTargetIndex(-1)
 {
 	Initialize(parent);
 }
@@ -107,10 +107,6 @@ void TabContainer::Initialize(HWND parent)
 	TabCtrl_SetImageList(m_hwnd, m_tabCtrlImageList.get());
 
 	AddDefaultTabIcons(m_tabCtrlImageList.get());
-
-	auto *pTabDropHandler = new TabDropHandler(m_hwnd, this);
-	RegisterDragDrop(m_hwnd, pTabDropHandler);
-	pTabDropHandler->Release();
 
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
 
@@ -225,6 +221,17 @@ LRESULT CALLBACK TabContainer::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
 	}
 	break;
 
+	case WM_TIMER:
+		if (wParam == DROP_SWITCH_TAB_TIMER_ID)
+		{
+			OnDropSwitchTabTimer();
+		}
+		else if (wParam == DROP_SCROLL_TIMER_ID)
+		{
+			OnDropScrollTimer();
+		}
+		break;
+
 	case WM_MENUSELECT:
 		/* Forward the message to the main window so it can
 		handle menu help. */
@@ -241,6 +248,10 @@ LRESULT CALLBACK TabContainer::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
 		m_bTabBeenDragged = FALSE;
 	}
 	break;
+
+	case WM_NCDESTROY:
+		delete this;
+		return 0;
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
@@ -1105,7 +1116,7 @@ bool TabContainer::CloseTab(const Tab &tab)
 
 	if (nTabs == 1 && m_config->closeMainWindowOnTabClose)
 	{
-		OnClose();
+		m_expp->CloseApplication();
 		return true;
 	}
 
@@ -1378,4 +1389,185 @@ void TabContainer::DuplicateTab(const Tab &tab)
 {
 	std::wstring currentDirectory = tab.GetShellBrowser()->GetDirectory();
 	CreateNewTab(currentDirectory.c_str());
+}
+
+int TabContainer::GetDropTargetItem(const POINT &pt)
+{
+	POINT ptClient = pt;
+	BOOL res = ScreenToClient(m_hwnd, &ptClient);
+
+	if (!res)
+	{
+		return -1;
+	}
+
+	TCHITTESTINFO hitTestInfo;
+	hitTestInfo.pt = ptClient;
+	return TabCtrl_HitTest(m_hwnd, &hitTestInfo);
+}
+
+unique_pidl_absolute TabContainer::GetPidlForTargetItem(int targetItem)
+{
+	if (targetItem == -1)
+	{
+		return nullptr;
+	}
+
+	const auto &tab = GetTabByIndex(targetItem);
+	return tab.GetShellBrowser()->GetDirectoryIdl();
+}
+
+IUnknown *TabContainer::GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl)
+{
+	UNREFERENCED_PARAMETER(targetItemPidl);
+
+	return nullptr;
+}
+
+bool TabContainer::IsTargetSourceOfDrop(int targetItem, IDataObject *dataObject)
+{
+	UNREFERENCED_PARAMETER(targetItem);
+	UNREFERENCED_PARAMETER(dataObject);
+
+	return false;
+}
+
+void TabContainer::UpdateUiForDrop(int targetItem, const POINT &pt)
+{
+	UpdateUiForTargetItem(targetItem);
+	ScrollTabControlForDrop(pt);
+}
+
+void TabContainer::UpdateUiForTargetItem(int targetItem)
+{
+	if (targetItem != -1)
+	{
+		if (m_dropTargetIndex != targetItem)
+		{
+			SetTimer(m_hwnd, DROP_SWITCH_TAB_TIMER_ID, DROP_SWITCH_TAB_TIMER_ELAPSE, nullptr);
+		}
+	}
+	else
+	{
+		KillTimer(m_hwnd, DROP_SWITCH_TAB_TIMER_ID);
+	}
+
+	m_dropTargetIndex = targetItem;
+}
+
+void TabContainer::ScrollTabControlForDrop(const POINT &pt)
+{
+	POINT ptClient = pt;
+	BOOL res = ScreenToClient(m_hwnd, &ptClient);
+
+	if (!res)
+	{
+		return;
+	}
+
+	RECT rc;
+	res = GetClientRect(m_hwnd, &rc);
+
+	if (!res)
+	{
+		return;
+	}
+
+	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hwnd);
+	std::optional<ScrollDirection> scrollDirection;
+
+	if (ptClient.x < MulDiv(DROP_SCROLL_MARGIN_X_96DPI, dpi, USER_DEFAULT_SCREEN_DPI))
+	{
+		scrollDirection = ScrollDirection::Left;
+	}
+	else if (ptClient.x
+		> (rc.right - MulDiv(DROP_SCROLL_MARGIN_X_96DPI, dpi, USER_DEFAULT_SCREEN_DPI)))
+	{
+		scrollDirection = ScrollDirection::Right;
+	}
+
+	if (!scrollDirection)
+	{
+		KillTimer(m_hwnd, DROP_SCROLL_TIMER_ID);
+		return;
+	}
+
+	if (!m_dropScrollDirection || scrollDirection != *m_dropScrollDirection)
+	{
+		m_dropScrollDirection = scrollDirection;
+		SetTimer(m_hwnd, DROP_SCROLL_TIMER_ID, DROP_SCROLL_TIMER_ELAPSE, nullptr);
+	}
+}
+
+void TabContainer::ResetDropUiState()
+{
+	m_dropTargetIndex = -1;
+	KillTimer(m_hwnd, DROP_SWITCH_TAB_TIMER_ID);
+
+	m_dropScrollDirection.reset();
+	KillTimer(m_hwnd, DROP_SCROLL_TIMER_ID);
+}
+
+void TabContainer::OnDropSwitchTabTimer()
+{
+	assert(m_dropTargetIndex != -1);
+
+	if (m_dropTargetIndex != GetSelectedTabIndex())
+	{
+		SelectTabAtIndex(m_dropTargetIndex);
+	}
+
+	KillTimer(m_hwnd, DROP_SWITCH_TAB_TIMER_ID);
+}
+
+void TabContainer::OnDropScrollTimer()
+{
+	assert(m_dropScrollDirection);
+	ScrollTabControl(*m_dropScrollDirection);
+
+	m_dropScrollDirection.reset();
+	KillTimer(m_hwnd, DROP_SCROLL_TIMER_ID);
+}
+
+void TabContainer::ScrollTabControl(ScrollDirection direction)
+{
+	HWND upDownControl = FindWindowEx(m_hwnd, nullptr, UPDOWN_CLASS, nullptr);
+
+	// It's valid for the control not to exist if all the tabs fit within the window.
+	if (!upDownControl)
+	{
+		return;
+	}
+
+	int lowerLimit;
+	int upperLimit;
+	SendMessage(upDownControl, UDM_GETRANGE32, reinterpret_cast<WPARAM>(&lowerLimit),
+		reinterpret_cast<WPARAM>(&upperLimit));
+
+	BOOL positionRetrieved;
+	auto position =
+		SendMessage(upDownControl, UDM_GETPOS32, 0, reinterpret_cast<LPARAM>(&positionRetrieved));
+
+	if (!positionRetrieved)
+	{
+		return;
+	}
+
+	switch (direction)
+	{
+	case ScrollDirection::Left:
+		position--;
+		break;
+
+	case ScrollDirection::Right:
+		position++;
+		break;
+	}
+
+	if (position < lowerLimit || position > upperLimit)
+	{
+		return;
+	}
+
+	SendMessage(m_hwnd, WM_HSCROLL, MAKEWPARAM(SB_THUMBPOSITION, position), NULL);
 }

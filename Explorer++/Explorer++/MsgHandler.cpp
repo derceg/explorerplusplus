@@ -580,7 +580,7 @@ int Explorerplusplus::OnDestroy()
 	return 0;
 }
 
-int Explorerplusplus::OnClose()
+int Explorerplusplus::CloseApplication()
 {
 	if (m_config->confirmCloseTabs && (m_tabContainer->GetNumTabs() > 1))
 	{

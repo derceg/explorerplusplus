@@ -28,9 +28,6 @@
     <ClCompile Include="TabBackingHandler.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
-    <ClCompile Include="TabDropHandler.cpp">
-      <Filter>Tabs</Filter>
-    </ClCompile>
     <ClCompile Include="TabContainer.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
@@ -481,9 +478,6 @@
       <Filter>Color Rules</Filter>
     </ClInclude>
     <ClInclude Include="TabContainer.h">
-      <Filter>Tabs</Filter>
-    </ClInclude>
-    <ClInclude Include="TabDropHandler.h">
       <Filter>Tabs</Filter>
     </ClInclude>
     <ClInclude Include="AboutDialog.h">

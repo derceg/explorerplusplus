@@ -104,9 +104,7 @@ void ShellBrowser::UpdateUiForDrop(int targetItem, const POINT &pt)
 		ListView_SetItemState(m_hListView, targetItem, LVIS_DROPHILITED, LVIS_DROPHILITED);
 	}
 
-	POINT ptClient = pt;
-	ScreenToClient(m_hListView, &ptClient);
-	ScrollListViewFromCursor(m_hListView, &ptClient);
+	ScrollListViewForDrop(pt);
 }
 
 /* TODO: This isn't declared. */
@@ -354,40 +352,51 @@ void ShellBrowser::RepositionLocalFiles(const POINT *ppt)
 	m_performingDrag = false;
 }
 
-void ShellBrowser::ScrollListViewFromCursor(HWND hListView, const POINT *CursorPos)
+void ShellBrowser::ScrollListViewForDrop(const POINT &pt)
 {
+	POINT ptClient = pt;
+	BOOL res = ScreenToClient(m_hListView, &ptClient);
+
+	if (!res)
+	{
+		return;
+	}
+
 	RECT rc;
+	res = GetClientRect(m_hListView, &rc);
+
+	if (!res)
+	{
+		return;
+	}
+
 	LONG_PTR fStyle;
 
-	fStyle = GetWindowLongPtr(hListView, GWL_STYLE);
-
-	GetClientRect(hListView, &rc);
+	fStyle = GetWindowLongPtr(m_hListView, GWL_STYLE);
 
 	/* The listview can be scrolled only if there
 	is a scrollbar present. */
 	if ((fStyle & WS_HSCROLL) == WS_HSCROLL)
 	{
-		if (CursorPos->x < MIN_X_POS)
+		if (ptClient.x < MIN_X_POS)
 		{
-			ListView_Scroll(hListView, -X_SCROLL_AMOUNT, 0);
+			ListView_Scroll(m_hListView, -X_SCROLL_AMOUNT, 0);
 		}
-		else if (CursorPos->x > (rc.right - MIN_X_POS))
+		else if (ptClient.x > (rc.right - MIN_X_POS))
 		{
-			ListView_Scroll(hListView, X_SCROLL_AMOUNT, 0);
+			ListView_Scroll(m_hListView, X_SCROLL_AMOUNT, 0);
 		}
 	}
 
-	/* The listview can be scrolled only if there
-	is a scrollbar present. */
 	if ((fStyle & WS_VSCROLL) == WS_VSCROLL)
 	{
-		if (CursorPos->y < MIN_Y_POS)
+		if (ptClient.y < MIN_Y_POS)
 		{
-			ListView_Scroll(hListView, 0, -Y_SCROLL_AMOUNT);
+			ListView_Scroll(m_hListView, 0, -Y_SCROLL_AMOUNT);
 		}
-		else if (CursorPos->y > (rc.bottom - MIN_Y_POS))
+		else if (ptClient.y > (rc.bottom - MIN_Y_POS))
 		{
-			ListView_Scroll(hListView, 0, Y_SCROLL_AMOUNT);
+			ListView_Scroll(m_hListView, 0, Y_SCROLL_AMOUNT);
 		}
 	}
 }

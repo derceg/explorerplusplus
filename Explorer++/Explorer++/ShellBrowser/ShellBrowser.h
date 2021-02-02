@@ -592,7 +592,7 @@ private:
 
 	/* Drag and Drop support. */
 	void RepositionLocalFiles(const POINT *ppt);
-	void ScrollListViewFromCursor(HWND hListView, const POINT *CursorPos);
+	void ScrollListViewForDrop(const POINT &pt);
 	void PositionDroppedItems();
 
 	void OnApplicationShuttingDown();
