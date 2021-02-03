@@ -1114,10 +1114,17 @@ bool TabContainer::CloseTab(const Tab &tab)
 {
 	const int nTabs = GetNumTabs();
 
-	if (nTabs == 1 && m_config->closeMainWindowOnTabClose)
+	if (nTabs == 1)
 	{
-		m_expp->CloseApplication();
-		return true;
+		if (m_config->closeMainWindowOnTabClose)
+		{
+			m_expp->CloseApplication();
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	/* The tab is locked. Don't close it. */
