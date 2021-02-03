@@ -257,7 +257,7 @@ void AddressBar::OnBeginDrag()
 	}
 
 	wil::com_ptr_nothrow<IDropSource> dropSource;
-	hr = CreateDropSource(&dropSource, DragType::LeftClick);
+	hr = CreateDropSource(&dropSource);
 
 	if (FAILED(hr))
 	{

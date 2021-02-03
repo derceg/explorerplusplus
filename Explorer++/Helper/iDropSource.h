@@ -6,4 +6,4 @@
 
 #include "DropHandler.h"
 
-HRESULT CreateDropSource(IDropSource **ppDropSource,DragType dragType);
+HRESULT CreateDropSource(IDropSource **ppDropSource);

@@ -841,7 +841,7 @@ void BookmarkListView::OnKeyDown(const NMLVKEYDOWN *keyDown)
 void BookmarkListView::OnBeginDrag()
 {
 	wil::com_ptr_nothrow<IDropSource> dropSource;
-	HRESULT hr = CreateDropSource(&dropSource, DragType::LeftClick);
+	HRESULT hr = CreateDropSource(&dropSource);
 
 	if (FAILED(hr))
 	{

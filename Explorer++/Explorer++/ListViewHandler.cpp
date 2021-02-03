@@ -801,8 +801,8 @@ void Explorerplusplus::OnListViewPaste()
 
 		DropHandler *pDropHandler = DropHandler::CreateNew();
 		auto *dropFilesCallback = new DropFilesCallback(this);
-		pDropHandler->CopyClipboardData(clipboardObject.get(), m_hContainer, szDestination,
-			dropFilesCallback, !m_config->overwriteExistingFilesConfirmation);
+		pDropHandler->CopyClipboardData(
+			clipboardObject.get(), m_hContainer, szDestination, dropFilesCallback);
 		pDropHandler->Release();
 	}
 }

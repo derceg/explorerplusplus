@@ -1893,8 +1893,8 @@ void ShellTreeView::Paste()
 		}
 
 		DropHandler *dropHandler = DropHandler::CreateNew();
-		dropHandler->CopyClipboardData(clipboardObject.get(), m_hTreeView, destinationPath.c_str(),
-			nullptr, !m_config->overwriteExistingFilesConfirmation);
+		dropHandler->CopyClipboardData(
+			clipboardObject.get(), m_hTreeView, destinationPath.c_str(), nullptr);
 		dropHandler->Release();
 	}
 }

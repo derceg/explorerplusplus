@@ -183,13 +183,13 @@ void BookmarksToolbar::OnMouseMove(int keys, const POINT &pt)
 
 	if (!PtInRect(&rect, pt))
 	{
-		StartDrag(DragType::LeftClick, *m_leftButtonDownPoint);
+		StartDrag(*m_leftButtonDownPoint);
 
 		m_leftButtonDownPoint.reset();
 	}
 }
 
-void BookmarksToolbar::StartDrag(DragType dragType, const POINT &pt)
+void BookmarksToolbar::StartDrag(const POINT &pt)
 {
 	int index =
 		static_cast<int>(SendMessage(m_hToolbar, TB_HITTEST, 0, reinterpret_cast<LPARAM>(&pt)));
@@ -209,7 +209,7 @@ void BookmarksToolbar::StartDrag(DragType dragType, const POINT &pt)
 	}
 
 	wil::com_ptr_nothrow<IDropSource> dropSource;
-	hr = CreateDropSource(&dropSource, dragType);
+	hr = CreateDropSource(&dropSource);
 
 	if (FAILED(hr))
 	{

@@ -7,12 +7,6 @@
 #include "ReferenceCount.h"
 #include <list>
 
-enum class DragType
-{
-	LeftClick,
-	RightClick
-};
-
 /* TODO: Switch to IReferenceCount in the future.
 IUnknown needed to support CShellBrowser. */
 __interface IDropFilesCallback : public IUnknown
@@ -31,8 +25,7 @@ public:
 
 	static HRESULT		GetDropFormats(std::list<FORMATETC> &ftcList);
 
-	void	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINT pt,DWORD effect,HWND hwndDrop,DragType dragType,const TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,BOOL bRenameOnCollision);
-	void	CopyClipboardData(IDataObject *pDataObject,HWND hwndDrop,const TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,BOOL bRenameOnCollision);
+	void	CopyClipboardData(IDataObject *pDataObject,HWND hwndDrop,const TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback);
 
 private:
 
@@ -40,41 +33,24 @@ private:
 	~DropHandler() = default;
 
 	void	HandleLeftClickDrop(IDataObject *pDataObject,POINT *pt);
-	void	HandleRightClickDrop();
 
 	BOOL	CheckDropFormatSupported(IDataObject *pDataObject,FORMATETC *pftc);
 
-	HRESULT	CopyHDropData(IDataObject *pDataObject,BOOL bPrefferedEffect,DWORD dwEffect);
-	HRESULT	CopyShellIDListData(IDataObject *pDataObject,std::list<std::wstring> &PastedFileList);
-	HRESULT CopyAnsiFileDescriptorData(IDataObject *pDataObject,std::list<std::wstring> &PastedFileList);
-	HRESULT CopyUnicodeFileDescriptorData(IDataObject *pDataObject,std::list<std::wstring> &PastedFileList);
-	HRESULT CopyFileDescriptorData(IDataObject *pDataObject,FILEGROUPDESCRIPTORW *pfgd,std::list<std::wstring> &PastedFileList);
 	HRESULT	CopyUnicodeTextData(IDataObject *pDataObject,std::list<std::wstring> &PastedFileList);
 	HRESULT	CopyAnsiTextData(IDataObject *pDataObject,std::list<std::wstring> &PastedFileList);
 	HRESULT	CopyDIBV5Data(IDataObject *pDataObject,std::list<std::wstring> &PastedFileList);
 
-	void	CopyDroppedFiles(const HDROP &hd,BOOL bPreferredEffect,DWORD dwPreferredEffect);
-	void	CopyDroppedFilesInternal(const std::list<std::wstring> &FullFilenameList,BOOL bCopy,BOOL bRenameOnCollision);
-	void	CreateShortcutToDroppedFile(TCHAR *szFullFileName);
 	HRESULT	CopyTextToFile(const TCHAR *pszDestDirectory, const WCHAR *pszText, TCHAR *pszFullFileNameOut, size_t outLen);
-	BOOL	CheckItemLocations(int iDroppedItem);
 
 	/* Holds the drop formats supported. */
-	static FORMATETC	m_ftcHDrop;
-	static FORMATETC	m_ftcFileDescriptorA;
-	static FORMATETC	m_ftcFileDescriptorW;
-	static FORMATETC	m_ftcShellIDList;
 	static FORMATETC	m_ftcText;
 	static FORMATETC	m_ftcUnicodeText;
 	static FORMATETC	m_ftcDIBV5;
 
 	IDataObject			*m_pDataObject;
 	IDropFilesCallback	*m_pDropFilesCallback;
-	DWORD				m_grfKeyState;
 	POINT				m_pt;
 	DWORD				m_dwEffect;
 	HWND				m_hwndDrop;
-	DragType			m_DragType;
 	std::wstring		m_destDirectory;
-	BOOL				m_bRenameOnCollision;
 };
