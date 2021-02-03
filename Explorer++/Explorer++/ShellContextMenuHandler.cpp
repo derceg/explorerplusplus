@@ -47,12 +47,13 @@ void Explorerplusplus::UpdateBackgroundContextMenu(IContextMenu *contextMenu, HM
 
 	for (int i = numItems - 1; i >= 0; i--)
 	{
-		MENUITEMINFO mii;
+		MENUITEMINFO mii = {};
 		mii.cbSize = sizeof(mii);
 		mii.fMask = MIIM_ID | MIIM_FTYPE;
 		BOOL res = GetMenuItemInfo(menu, i, TRUE, &mii);
 
-		if (!res || WI_IsFlagSet(mii.fType, MFT_SEPARATOR))
+		if (!res || WI_IsFlagSet(mii.fType, MFT_SEPARATOR) || mii.wID < MIN_SHELL_MENU_ID
+			|| mii.wID > MAX_SHELL_MENU_ID)
 		{
 			continue;
 		}
