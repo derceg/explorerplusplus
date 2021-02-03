@@ -25,6 +25,15 @@ template <typename DropTargetItemIdentifierType>
 DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::DragEnter(
 	IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
 {
+	if (WI_IsFlagSet(keyState, MK_RBUTTON))
+	{
+		m_dropType = DropType::RightClick;
+	}
+	else
+	{
+		m_dropType = DropType::LeftClick;
+	}
+
 	m_currentDropObject = dataObject;
 	return OnDragInWindow(dataObject, keyState, pt, effect);
 }
@@ -197,7 +206,7 @@ DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::PerformDrop(
 		return DROPEFFECT_NONE;
 	}
 
-	if (IsTargetSourceOfDrop(targetItem, dataObject))
+	if (m_dropType == DropType::LeftClick && IsTargetSourceOfDrop(targetItem, dataObject))
 	{
 		// The drag was started in the current window and the target is the folder represented by
 		// that window.

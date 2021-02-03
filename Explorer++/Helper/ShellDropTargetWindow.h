@@ -25,6 +25,12 @@ protected:
 	const HWND m_hwnd;
 
 private:
+	enum class DropType
+	{
+		LeftClick,
+		RightClick
+	};
+
 	struct DropTargetInfo
 	{
 		DropTargetItemIdentifierType item;
@@ -56,6 +62,7 @@ private:
 
 	wil::com_ptr_nothrow<DropTargetWindow> m_dropTargetWindow;
 	IDataObject *m_currentDropObject;
+	DropType m_dropType;
 	DWORD m_previousKeyState;
 	std::optional<DropTargetInfo> m_previousTargetInfo;
 };
