@@ -5,19 +5,13 @@
 #include "stdafx.h"
 #include "ShellView.h"
 #include "ShellBrowser/ShellBrowser.h"
+#include "TabNavigationInterface.h"
 
-wil::com_ptr_nothrow<ShellView> ShellView::Create(
-	PCIDLIST_ABSOLUTE directory, std::weak_ptr<ShellBrowser> shellBrowserWeak)
-{
-	wil::com_ptr_nothrow<ShellView> shellView;
-	shellView.attach(new ShellView(directory, shellBrowserWeak));
-	return shellView;
-}
-
-ShellView::ShellView(PCIDLIST_ABSOLUTE directory, std::weak_ptr<ShellBrowser> shellBrowserWeak) :
-	m_refCount(1),
-	m_directory(ILCloneFull(directory)),
-	m_shellBrowserWeak(shellBrowserWeak)
+ShellView::ShellView(std::weak_ptr<ShellBrowser> shellBrowserWeak,
+	TabNavigationInterface *tabNavigation, bool switchToTabOnSelect) :
+	m_shellBrowserWeak(shellBrowserWeak),
+	m_tabNavigation(tabNavigation),
+	m_switchToTabOnSelect(switchToTabOnSelect)
 {
 }
 
@@ -98,8 +92,22 @@ IFACEMETHODIMP ShellView::SelectItem(PCUITEMID_CHILD pidlItem, SVSIF flags)
 
 	if (flags == SVSI_EDIT)
 	{
-		auto pidlComplete = unique_pidl_absolute(ILCombine(m_directory.get(), pidlItem));
+		auto pidlComplete =
+			unique_pidl_absolute(ILCombine(shellBrowser->GetDirectoryIdl().get(), pidlItem));
 		shellBrowser->QueueRename(pidlComplete.get());
+		return S_OK;
+	}
+	else if (WI_IsFlagSet(flags, SVSI_SELECT))
+	{
+		if (m_switchToTabOnSelect)
+		{
+			m_tabNavigation->SelectTabById(shellBrowser->GetId());
+		}
+
+		auto pidlComplete =
+			unique_pidl_absolute(ILCombine(shellBrowser->GetDirectoryIdl().get(), pidlItem));
+		shellBrowser->SelectItems({ pidlComplete.get() });
+
 		return S_OK;
 	}
 
@@ -130,34 +138,11 @@ IFACEMETHODIMP ShellView::ContextSensitiveHelp(BOOL enterMode)
 	return E_NOTIMPL;
 }
 
-// IUnknown
-IFACEMETHODIMP ShellView::QueryInterface(REFIID riid, void **ppvObject)
+namespace winrt
 {
-	// clang-format off
-	static const QITAB qit[] = {
-		QITABENT(ShellView, IShellView),
-		QITABENT(ShellView, IOleWindow),
-		{ nullptr }
-	};
-	// clang-format on
-
-	return QISearch(this, qit, riid, ppvObject);
-}
-
-IFACEMETHODIMP_(ULONG) ShellView::AddRef()
-{
-	return InterlockedIncrement(&m_refCount);
-}
-
-IFACEMETHODIMP_(ULONG) ShellView::Release()
-{
-	ULONG refCount = InterlockedDecrement(&m_refCount);
-
-	if (refCount == 0)
+	template <>
+	bool is_guid_of<IShellView>(guid const &id) noexcept
 	{
-		delete this;
-		return 0;
+		return is_guid_of<IShellView, IOleWindow>(id);
 	}
-
-	return refCount;
 }

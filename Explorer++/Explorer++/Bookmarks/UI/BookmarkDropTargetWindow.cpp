@@ -9,7 +9,8 @@ BookmarkDropTargetWindow::BookmarkDropTargetWindow(HWND hwnd, BookmarkTree *book
 	m_bookmarkTree(bookmarkTree),
 	m_blockDrop(false)
 {
-	m_dropTargetWindow = DropTargetWindow::Create(hwnd, this);
+	m_dropTargetWindow =
+		winrt::make_self<DropTargetWindow>(hwnd, static_cast<DropTargetInternal *>(this));
 }
 
 DWORD BookmarkDropTargetWindow::DragEnter(

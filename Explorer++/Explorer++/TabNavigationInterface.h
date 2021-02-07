@@ -13,4 +13,5 @@
 __interface TabNavigationInterface
 {
 	void CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected);
+	void SelectTabById(int tabId);
 };

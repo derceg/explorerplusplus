@@ -7,6 +7,7 @@
 #include "DropTargetWindow.h"
 #include "ShellHelper.h"
 #include <wil/com.h>
+#include <winrt/base.h>
 #include <optional>
 
 template <typename DropTargetItemIdentifierType>
@@ -60,7 +61,7 @@ private:
 		DWORD previousKeyState, DWORD keyState, POINT pt, DWORD allowedEffects);
 	void ResetDropState();
 
-	wil::com_ptr_nothrow<DropTargetWindow> m_dropTargetWindow;
+	winrt::com_ptr<DropTargetWindow> m_dropTargetWindow;
 	IDataObject *m_currentDropObject;
 	DropType m_dropType;
 	DWORD m_previousKeyState;

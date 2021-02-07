@@ -4,20 +4,20 @@
 
 #pragma once
 
-#include "../Helper/ShellHelper.h"
-#include <wil/com.h>
+#include <winrt/base.h>
 #include <memory>
 
 class ShellBrowser;
+__interface TabNavigationInterface;
 
 // This isn't a complete implementation. There's only enough functionality to support the "New
 // Folder" item shown on the background context menu in a phone's virtual folder (when that phone is
 // connected via USB).
-class ShellView : public IShellView
+class ShellView : public winrt::implements<ShellView, IShellView>
 {
 public:
-	static wil::com_ptr_nothrow<ShellView> Create(
-		PCIDLIST_ABSOLUTE directory, std::weak_ptr<ShellBrowser> shellBrowserWeak);
+	ShellView(std::weak_ptr<ShellBrowser> shellBrowserWeak, TabNavigationInterface *tabNavigation,
+		bool switchToTabOnSelect);
 
 	// IShellView
 	IFACEMETHODIMP TranslateAccelerator(MSG *msg);
@@ -38,15 +38,14 @@ public:
 	IFACEMETHODIMP GetWindow(HWND *hwnd);
 	IFACEMETHODIMP ContextSensitiveHelp(BOOL enterMode);
 
-	// IUnknown
-	IFACEMETHODIMP QueryInterface(REFIID riid, void **ppvObject);
-	IFACEMETHODIMP_(ULONG) AddRef();
-	IFACEMETHODIMP_(ULONG) Release();
-
 private:
-	ShellView(PCIDLIST_ABSOLUTE directory, std::weak_ptr<ShellBrowser> shellBrowserWeak);
-
-	ULONG m_refCount;
-	unique_pidl_absolute m_directory;
 	std::weak_ptr<ShellBrowser> m_shellBrowserWeak;
+	TabNavigationInterface *m_tabNavigation;
+	bool m_switchToTabOnSelect;
 };
+
+namespace winrt
+{
+	template <>
+	bool is_guid_of<IShellView>(guid const &id) noexcept;
+}

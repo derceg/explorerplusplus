@@ -39,6 +39,7 @@
 #include "../Helper/iDataObject.h"
 #include "../Helper/iDropSource.h"
 #include <wil/com.h>
+#include <winrt/base.h>
 
 LRESULT CALLBACK Explorerplusplus::ListViewProcStub(
 	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
@@ -539,16 +540,16 @@ void Explorerplusplus::OnListViewBackgroundRClickWindows8OrGreater(POINT *pCurso
 
 	StatusBar statusBar(m_hStatusBar);
 
-	auto serviceProvider = ServiceProvider::Create();
+	auto serviceProvider = winrt::make_self<ServiceProvider>();
 
-	auto newMenuClient = NewMenuClient::Create(this);
+	auto newMenuClient = winrt::make<NewMenuClient>(this);
 	serviceProvider->RegisterService(IID_INewMenuClient, newMenuClient.get());
 
-	auto folderView = FolderView::Create(selectedTab.GetShellBrowserWeak());
-	serviceProvider->RegisterService(
-		IID_IFolderView, static_cast<IFolderView2 *>(folderView.get()));
+	winrt::com_ptr<IFolderView2> folderView =
+		winrt::make<FolderView>(selectedTab.GetShellBrowserWeak());
+	serviceProvider->RegisterService(IID_IFolderView, folderView.get());
 
-	auto shellView = ShellView::Create(pidlDirectory.get(), selectedTab.GetShellBrowserWeak());
+	auto shellView = winrt::make<ShellView>(selectedTab.GetShellBrowserWeak(), this, false);
 	serviceProvider->RegisterService(SID_DefView, shellView.get());
 
 	fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, pCursorPos, &statusBar,
@@ -583,9 +584,9 @@ void Explorerplusplus::OnListViewBackgroundRClickWindows7(POINT *pCursorPos)
 		return;
 	}
 
-	auto serviceProvider = ServiceProvider::Create();
+	auto serviceProvider = winrt::make_self<ServiceProvider>();
 
-	auto newMenuClient = NewMenuClient::Create(this);
+	auto newMenuClient = winrt::make<NewMenuClient>(this);
 	serviceProvider->RegisterService(IID_INewMenuClient, newMenuClient.get());
 
 	ContextMenuManager cmm(ContextMenuManager::ContextMenuType::Background, pidlDirectory.get(),
@@ -776,11 +777,10 @@ void Explorerplusplus::OnListViewPaste()
 	if (CanShellPasteDataObject(
 			directory.get(), clipboardObject.get(), DROPEFFECT_COPY | DROPEFFECT_MOVE))
 	{
-		auto serviceProvider = ServiceProvider::Create();
+		auto serviceProvider = winrt::make_self<ServiceProvider>();
 
-		auto folderView = FolderView::Create(selectedTab.GetShellBrowserWeak());
-		serviceProvider->RegisterService(
-			IID_IFolderView, static_cast<IShellFolderView *>(folderView.get()));
+		auto folderView = winrt::make<FolderView>(selectedTab.GetShellBrowserWeak());
+		serviceProvider->RegisterService(IID_IFolderView, folderView.get());
 
 		ExecuteActionFromContextMenu(directory.get(), {},
 			selectedTab.GetShellBrowser()->GetListView(), L"paste", 0, serviceProvider.get());

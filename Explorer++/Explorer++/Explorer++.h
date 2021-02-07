@@ -291,6 +291,7 @@ private:
 
 	/* TabNavigationInterface methods. */
 	void CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected) override;
+	void SelectTabById(int tabId) override;
 
 	void OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
 

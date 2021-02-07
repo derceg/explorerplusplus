@@ -12,7 +12,8 @@ ShellDropTargetWindow<DropTargetItemIdentifierType>::ShellDropTargetWindow(HWND 
 	m_currentDropObject(nullptr),
 	m_previousKeyState(0)
 {
-	m_dropTargetWindow = DropTargetWindow::Create(hwnd, this);
+	m_dropTargetWindow =
+		winrt::make_self<DropTargetWindow>(hwnd, static_cast<DropTargetInternal *>(this));
 }
 
 template <typename DropTargetItemIdentifierType>

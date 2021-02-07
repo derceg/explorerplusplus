@@ -89,3 +89,8 @@
 #include "../ThirdParty/CTPL/cpl_stl.h"
 
 #include "SolWrapper.h"
+
+// It's important that Unknwn.h is included before any WinRT headers to ensure there is support for
+// classic COM interfaces (i.e. IUnknown).
+#include <Unknwn.h>
+#include <winrt/base.h>

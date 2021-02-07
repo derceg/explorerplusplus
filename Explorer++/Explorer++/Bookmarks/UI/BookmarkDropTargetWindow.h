@@ -6,7 +6,7 @@
 
 #include "Bookmarks/BookmarkDropper.h"
 #include "../Helper/DropTargetWindow.h"
-#include <wil/com.h>
+#include <winrt/base.h>
 #include <optional>
 
 class BookmarkDropTargetWindow : private DropTargetInternal
@@ -40,7 +40,7 @@ private:
 
 	BookmarkTree *m_bookmarkTree;
 
-	wil::com_ptr_nothrow<DropTargetWindow> m_dropTargetWindow;
+	winrt::com_ptr<DropTargetWindow> m_dropTargetWindow;
 	std::unique_ptr<BookmarkDropper> m_bookmarkDropper;
 	std::optional<POINT> m_previousDragOverPoint;
 	std::optional<DropLocation> m_previousDropLocation;

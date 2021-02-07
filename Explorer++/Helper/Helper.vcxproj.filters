@@ -157,6 +157,9 @@
     <ClCompile Include="ShellDropTargetWindow.cpp">
       <Filter>Data Exchange\Drag and Drop</Filter>
     </ClCompile>
+    <ClCompile Include="ServiceProviderBase.cpp">
+      <Filter>COM</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
@@ -327,6 +330,9 @@
     <ClInclude Include="ShellDropTargetWindow.h">
       <Filter>Data Exchange\Drag and Drop</Filter>
     </ClInclude>
+    <ClInclude Include="ServiceProviderBase.h">
+      <Filter>COM</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dialog Support">
@@ -355,6 +361,9 @@
     </Filter>
     <Filter Include="Data Exchange\Clipboard">
       <UniqueIdentifier>{defee36d-97c6-4793-8684-0b6b287f85ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="COM">
+      <UniqueIdentifier>{a80deb2e-55fa-460e-b05b-036fb27a4988}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -22,6 +22,7 @@
 #include <boost/signals2.hpp>
 #include <wil/com.h>
 #include <wil/resource.h>
+#include <winrt/base.h>
 #include <thumbcache.h>
 #include <future>
 #include <list>
@@ -409,6 +410,11 @@ private:
 	void SetFirstColumnTextToFilename();
 	void ApplyFolderEmptyBackgroundImage(bool apply);
 
+	// Shell window integration
+	void NotifyShellOfNavigation(PCIDLIST_ABSOLUTE pidl);
+	HRESULT RegisterShellWindowIfNecessary(PCIDLIST_ABSOLUTE pidl);
+	HRESULT RegisterShellWindow(PCIDLIST_ABSOLUTE pidl);
+
 	static LRESULT CALLBACK ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -685,6 +691,11 @@ private:
 
 	int m_middleButtonItem;
 
+	// Shell window integration
+	static inline winrt::com_ptr<IShellWindows> m_shellWindows;
+	bool m_shellWindowRegistered;
+	unique_shell_window_cookie m_shellWindowCookie;
+
 	/* Shell new. */
 	unique_pidl_absolute m_queuedRenameItem;
 
@@ -708,7 +719,7 @@ private:
 
 	/* Drag and drop related data. */
 	UINT m_getDragImageMessage;
-	wil::com_ptr_nothrow<ServiceProvider> m_dropServiceProvider;
+	winrt::com_ptr<ServiceProvider> m_dropServiceProvider;
 	std::vector<unique_pidl_absolute> m_draggedItems;
 	POINT m_ptDraggedOffset;
 	bool m_performingDrag;

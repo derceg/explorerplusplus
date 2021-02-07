@@ -252,11 +252,6 @@ void Explorerplusplus::HideTabBar()
 	UpdateLayout();
 }
 
-void Explorerplusplus::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected)
-{
-	m_tabContainer->CreateNewTab(pidlDirectory, TabSettings(_selected = selected));
-}
-
 void Explorerplusplus::OnTabListViewSelectionChanged(const Tab &tab)
 {
 	/* The selection for this tab has changed, so invalidate any
@@ -276,4 +271,16 @@ void Explorerplusplus::OnTabListViewSelectionChanged(const Tab &tab)
 		SetTimer(
 			m_hContainer, LISTVIEW_ITEM_CHANGED_TIMER_ID, LISTVIEW_ITEM_CHANGED_TIMEOUT, nullptr);
 	}
+}
+
+// TabNavigationInterface
+void Explorerplusplus::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected)
+{
+	m_tabContainer->CreateNewTab(pidlDirectory, TabSettings(_selected = selected));
+}
+
+void Explorerplusplus::SelectTabById(int tabId)
+{
+	const Tab &tab = m_tabContainer->GetTab(tabId);
+	m_tabContainer->SelectTab(tab);
 }

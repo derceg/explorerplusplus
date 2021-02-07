@@ -9,6 +9,7 @@
 #include "ViewModes.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ShellHelper.h"
+#include <winrt/base.h>
 
 /* Scroll definitions. */
 #define MIN_X_POS 20
@@ -75,11 +76,10 @@ IUnknown *ShellBrowser::GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl)
 
 	if (!m_dropServiceProvider)
 	{
-		m_dropServiceProvider = ServiceProvider::Create();
+		m_dropServiceProvider = winrt::make_self<ServiceProvider>();
 
-		auto folderView = FolderView::Create(weak_from_this());
-		m_dropServiceProvider->RegisterService(
-			IID_IFolderView, static_cast<IShellFolderView *>(folderView.get()));
+		auto folderView = winrt::make<FolderView>(weak_from_this());
+		m_dropServiceProvider->RegisterService(IID_IFolderView, folderView.get());
 	}
 
 	return m_dropServiceProvider.get();

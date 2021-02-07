@@ -6,7 +6,7 @@
 
 #include "Macros.h"
 #include "WindowSubclassWrapper.h"
-#include <wil/com.h>
+#include <winrt/base.h>
 
 class DropTargetInternal
 {
@@ -17,16 +17,10 @@ public:
 	virtual DWORD Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) = 0;
 };
 
-class DropTargetWindow : public IDropTarget
+class DropTargetWindow : public winrt::implements<DropTargetWindow, IDropTarget>
 {
 public:
-	static wil::com_ptr_nothrow<DropTargetWindow> Create(
-		HWND hwnd, DropTargetInternal *dropTargetInternal);
-
-	// IUnknown methods.
-	IFACEMETHODIMP QueryInterface(REFIID iid, void **object);
-	IFACEMETHODIMP_(ULONG) AddRef();
-	IFACEMETHODIMP_(ULONG) Release();
+	DropTargetWindow(HWND hwnd, DropTargetInternal *dropTargetInternal);
 
 	// IDropTarget methods.
 	IFACEMETHODIMP DragEnter(IDataObject *dataObject, DWORD keyState, POINTL ptl, DWORD *effect);
@@ -37,12 +31,7 @@ public:
 	bool IsWithinDrag() const;
 
 private:
-	DISALLOW_COPY_AND_ASSIGN(DropTargetWindow);
-
 	static inline const UINT_PTR SUBCLASS_ID = 0;
-
-	DropTargetWindow(HWND hwnd, DropTargetInternal *dropTargetInternal);
-	~DropTargetWindow() = default;
 
 	static LRESULT CALLBACK WndProc(
 		HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data);

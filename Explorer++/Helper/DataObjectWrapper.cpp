@@ -5,49 +5,10 @@
 #include "stdafx.h"
 #include "DataObjectWrapper.h"
 
-wil::com_ptr_nothrow<DataObjectWrapper> DataObjectWrapper::Create(IDataObject *dataObject)
-{
-	wil::com_ptr_nothrow<DataObjectWrapper> dataObjectWrapper;
-	dataObjectWrapper.attach(new DataObjectWrapper(dataObject));
-	return dataObjectWrapper;
-}
-
 DataObjectWrapper::DataObjectWrapper(IDataObject *dataObject) :
 	m_dataObject(dataObject),
-	m_refCount(1)
+	m_isOpAsync(FALSE)
 {
-}
-
-// IUnknown
-IFACEMETHODIMP DataObjectWrapper::QueryInterface(REFIID riid, void **ppvObject)
-{
-	// clang-format off
-	static const QITAB qit[] = {
-		QITABENT(DataObjectWrapper, IDataObject),
-		QITABENT(DataObjectWrapper, IDataObjectAsyncCapability),
-		{ nullptr }
-	};
-	// clang-format on
-
-	return QISearch(this, qit, riid, ppvObject);
-}
-
-IFACEMETHODIMP_(ULONG) DataObjectWrapper::AddRef()
-{
-	return InterlockedIncrement(&m_refCount);
-}
-
-IFACEMETHODIMP_(ULONG) DataObjectWrapper::Release()
-{
-	ULONG refCount = InterlockedDecrement(&m_refCount);
-
-	if (refCount == 0)
-	{
-		delete this;
-		return 0;
-	}
-
-	return refCount;
 }
 
 // IDataObject

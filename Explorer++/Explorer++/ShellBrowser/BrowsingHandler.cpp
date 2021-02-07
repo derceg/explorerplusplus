@@ -5,17 +5,21 @@
 #include "stdafx.h"
 #include "ShellBrowser.h"
 #include "Config.h"
+#include "DocumentServiceProvider.h"
 #include "HistoryEntry.h"
 #include "ItemData.h"
 #include "MainResource.h"
 #include "ShellNavigationController.h"
+#include "ShellView.h"
 #include "ViewModes.h"
+#include "WebBrowserApp.h"
 #include "../Helper/Helper.h"
 #include "../Helper/IconFetcher.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/com.h>
+#include <winrt/base.h>
 #include <propkey.h>
 #include <propvarutil.h>
 #include <list>
@@ -225,6 +229,10 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addH
 	m_directoryState.virtualFolder = WI_IsFlagClear(attr, SFGAO_FILESYSTEM);
 	m_uniqueFolderId++;
 
+	// It makes sense to trigger this here, rather than on navigation completion, since
+	// otherwise requests could still come in for the previous directory.
+	NotifyShellOfNavigation(pidlDirectory);
+
 	m_navigationCommittedSignal(pidlDirectory, addHistoryEntry);
 
 	ULONG numFetched = 1;
@@ -236,6 +244,132 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addH
 	}
 
 	return hr;
+}
+
+void ShellBrowser::NotifyShellOfNavigation(PCIDLIST_ABSOLUTE pidl)
+{
+	if (m_config->replaceExplorerMode == DefaultFileManager::ReplaceExplorerMode::None)
+	{
+		return;
+	}
+
+	HRESULT hr = RegisterShellWindowIfNecessary(pidl);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	wil::unique_variant pidlVariant;
+	hr = InitVariantFromBuffer(pidl, ILGetSize(pidl), &pidlVariant);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	m_shellWindows->OnNavigate(m_shellWindowCookie.get(), &pidlVariant);
+}
+
+HRESULT ShellBrowser::RegisterShellWindowIfNecessary(PCIDLIST_ABSOLUTE pidl)
+{
+	if (m_shellWindowRegistered)
+	{
+		return S_OK;
+	}
+
+	HRESULT hr = RegisterShellWindow(pidl);
+
+	if (SUCCEEDED(hr))
+	{
+		m_shellWindowRegistered = true;
+	}
+
+	return hr;
+}
+
+// When the shell needs to find an existing window (to select a specific item), it will go through
+// the following process:
+//
+// 1. Use IShellWindows::FindWindowSW() to query for a window of type SWC_BROWSER with the necessary
+//    pidl.
+// 2. Query for the IWebBrowserApp interface for that window (using the IDispatch interface that's
+//    registered).
+// 3. Call IWebBrowserApp::get_Document() to retrieve the IDispatch interface for the document.
+// 4. Call QueryInterface() on the IDispatch interface to request IServiceProvider.
+// 5. Call IServiceProvider::QueryService() to request an IID_IFolderView service and IID_IShellView
+//    interface.
+// 6. Call IShellView::SelectItem() to select the appropriate item.
+//
+// Note that the shell will also bring the window it finds to the foreground as part of this
+// process.
+//
+// A similar process also occurs when simply searching for an existing shell window. For example, if
+// the user double clicks the recycle bin icon on the desktop, any existing recycle bin window will
+// be brought to the foreground if present.
+HRESULT ShellBrowser::RegisterShellWindow(PCIDLIST_ABSOLUTE pidl)
+{
+	wil::unique_variant pidlVariant;
+	RETURN_IF_FAILED(InitVariantFromBuffer(pidl, ILGetSize(pidl), &pidlVariant));
+
+	wil::unique_variant empty;
+
+	m_shellWindowCookie.associate(m_shellWindows.get());
+
+	// Note that while the documentation states that the pidl variant (the second argument) must be
+	// "of type VT_VARIANT | VT_BYREF", it appears that's not actually necessary (and would be more
+	// complicated, since there would need to be two variants).
+	// Also, an empty variant must be supplied for the third argument (in contrast to the
+	// documentation, which states that null is allowed).
+	// Additionally, the shell window type that's set is SWC_BROWSER, which the documentation states
+	// is for "An Internet Explorer (Iexplore.exe) browser window.". While a value like SWC_3RDPARTY
+	// or SWC_EXPLORER might make more sense, the shell looks for Explorer windows using the
+	// SWC_BROWSER type. So for a window to be found, it needs to use that specific type.
+	// Finally, there are two possible ways of supplying a pidl: using
+	// IShellWindows::RegisterPending() or IShellWindows::OnNavigate(). The second
+	// method is called during each navigation anyway, so it would be simpler to just use that,
+	// however calling IShellWindows::RegisterPending() is necessary.
+	// If a new instance is launched as part of a SHOpenFolderAndSelectItems() call, then no
+	// selection request will be made unless IShellWindows::RegisterPending() is called. In this
+	// case, it's redundant, since IShellWindows::OnNavigate() will be called anyway, which will
+	// supply a pidl, but it appears that that's not enough.
+	// Therefore, that's the only reason this method is called.
+	RETURN_IF_FAILED(m_shellWindows->RegisterPending(
+		GetCurrentThreadId(), &pidlVariant, &empty, SWC_BROWSER, &m_shellWindowCookie));
+
+	auto document = winrt::make_self<DocumentServiceProvider>();
+	auto shellView = winrt::make_self<ShellView>(weak_from_this(), m_tabNavigation, true);
+	document->RegisterService(IID_IFolderView, shellView.get());
+
+	auto browserApp = winrt::make_self<WebBrowserApp>(m_hOwner, document.get());
+
+	// Registering the same window multiple times (ultimately with different pidls) is odd, but
+	// appears to work fine (since a shell window is uniquely identified through a cookie, rather
+	// than a window handle).
+	// Registering each listview wouldn't work, as it wouldn't make sense for the shell to bring the
+	// listview windows to the foreground or activate them (doing so would break the way tabs are
+	// managed).
+	// This has implications for the way the appropriate tab is selected. Since the shell will only
+	// bring the top-level window to the foreground, the appropriate tab will be selected when the
+	// item selection is set (via a call to the IShellView instance set up above).
+	// Note that the cast from HWND to long causes warnings, but the warnings can be safely ignored.
+	// Only the lower 32 bits of a handle are important (see the discussion at
+	// https://stackoverflow.com/q/1822667).
+	long registeredCookie;
+#pragma warning(push)
+#pragma warning(                                                                                   \
+	disable : 4311 4302) // 'reinterpret_cast': pointer truncation from 'HWND' to 'long',
+						 // 'reinterpret_cast': truncation from 'HWND' to 'long'
+	RETURN_IF_FAILED(m_shellWindows->Register(
+		browserApp.get(), reinterpret_cast<long>(m_hOwner), SWC_BROWSER, &registeredCookie));
+#pragma warning(pop)
+
+	// The call to RegisterPending() above is passed the thread ID. The call to Register() will use
+	// that thread ID to link a pending window to the specified window handle. That means the cookie
+	// values for the two calls should be the same - since they refer to the same window instance.
+	assert(registeredCookie == m_shellWindowCookie.get());
+
+	return S_OK;
 }
 
 std::optional<int> ShellBrowser::AddItemInternal(IShellFolder *shellFolder,

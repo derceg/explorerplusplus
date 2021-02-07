@@ -90,3 +90,6 @@ required for VS 2010. */
 #include <memory>
 #include <sstream>
 #include <vector>
+
+#include <Unknwn.h>
+#include <winrt/base.h>

@@ -26,6 +26,7 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/com.h>
+#include <winrt/base.h>
 #include <list>
 
 void CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
@@ -90,7 +91,8 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
 	m_infoTipResultIDCounter(0),
 	m_rightClickDragAllowed(false),
-	m_draggedDataObject(nullptr)
+	m_draggedDataObject(nullptr),
+	m_shellWindowRegistered(false)
 {
 	InitializeListView();
 	m_iconFetcher = std::make_unique<IconFetcher>(m_hListView, m_cachedIcons);
@@ -132,6 +134,11 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 
 	m_connections.push_back(coreInterface->AddApplicationShuttingDownObserver(
 		std::bind(&ShellBrowser::OnApplicationShuttingDown, this)));
+
+	if (!m_shellWindows)
+	{
+		m_shellWindows = winrt::create_instance<IShellWindows>(CLSID_ShellWindows, CLSCTX_ALL);
+	}
 }
 
 ShellBrowser::~ShellBrowser()
@@ -511,14 +518,14 @@ void ShellBrowser::SelectItems(const std::vector<PCIDLIST_ABSOLUTE> &pidls)
 
 		if (!internalIndex)
 		{
-			return;
+			continue;
 		}
 
 		auto index = LocateItemByInternalIndex(*internalIndex);
 
 		if (!index)
 		{
-			return;
+			continue;
 		}
 
 		ListViewHelper::SelectItem(m_hListView, *index, TRUE);
@@ -1435,11 +1442,10 @@ void ShellBrowser::RestoreStateOfCutItems()
 
 void ShellBrowser::PasteShortcut()
 {
-	auto serviceProvider = ServiceProvider::Create();
+	auto serviceProvider = winrt::make_self<ServiceProvider>();
 
-	auto folderView = FolderView::Create(weak_from_this());
-	serviceProvider->RegisterService(
-		IID_IFolderView, static_cast<IShellFolderView *>(folderView.get()));
+	auto folderView = winrt::make<FolderView>(weak_from_this());
+	serviceProvider->RegisterService(IID_IFolderView, folderView.get());
 
 	ExecuteActionFromContextMenu(m_directoryState.pidlDirectory.get(), {}, m_hListView,
 		L"pastelink", 0, serviceProvider.get());

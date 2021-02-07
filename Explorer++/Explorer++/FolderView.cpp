@@ -6,15 +6,7 @@
 #include "FolderView.h"
 #include "ShellBrowser/ShellBrowser.h"
 
-wil::com_ptr_nothrow<FolderView> FolderView::Create(std::weak_ptr<ShellBrowser> shellBrowserWeak)
-{
-	wil::com_ptr_nothrow<FolderView> folderView;
-	folderView.attach(new FolderView(shellBrowserWeak));
-	return folderView;
-}
-
 FolderView::FolderView(std::weak_ptr<ShellBrowser> shellBrowserWeak) :
-	m_refCount(1),
 	m_shellBrowserWeak(shellBrowserWeak)
 {
 	auto shellBrowser = m_shellBrowserWeak.lock();
@@ -568,35 +560,11 @@ IFACEMETHODIMP FolderView::SetAutomationObject(IDispatch *dispatch)
 	return E_NOTIMPL;
 }
 
-// IUnknown
-IFACEMETHODIMP FolderView::QueryInterface(REFIID riid, void **ppvObject)
+namespace winrt
 {
-	// clang-format off
-	static const QITAB qit[] = {
-		QITABENT(FolderView, IFolderView2),
-		QITABENT(FolderView, IFolderView),
-		QITABENT(FolderView, IShellFolderView),
-		{ nullptr }
-	};
-	// clang-format on
-
-	return QISearch(this, qit, riid, ppvObject);
-}
-
-IFACEMETHODIMP_(ULONG) FolderView::AddRef()
-{
-	return InterlockedIncrement(&m_refCount);
-}
-
-IFACEMETHODIMP_(ULONG) FolderView::Release()
-{
-	ULONG refCount = InterlockedDecrement(&m_refCount);
-
-	if (refCount == 0)
+	template <>
+	bool is_guid_of<IFolderView2>(guid const &id) noexcept
 	{
-		delete this;
-		return 0;
+		return is_guid_of<IFolderView2, IFolderView>(id);
 	}
-
-	return refCount;
 }

@@ -6,6 +6,7 @@
 
 #include "../Helper/ShellHelper.h"
 #include <wil/com.h>
+#include <winrt/base.h>
 #include <ShlObj.h>
 #include <memory>
 
@@ -13,10 +14,10 @@ class ShellBrowser;
 
 // This isn't a complete implementation. There's only enough functionality to support some context
 // menu items.
-class FolderView : public IFolderView2, public IShellFolderView
+class FolderView : public winrt::implements<FolderView, IFolderView2, IShellFolderView>
 {
 public:
-	static wil::com_ptr_nothrow<FolderView> Create(std::weak_ptr<ShellBrowser> shellBrowserWeak);
+	FolderView(std::weak_ptr<ShellBrowser> shellBrowserWeak);
 
 	// IFolderView2
 	IFACEMETHODIMP SetGroupBy(REFPROPERTYKEY key, BOOL ascending);
@@ -95,15 +96,13 @@ public:
 	IFACEMETHODIMP QuerySupport(UINT *support);
 	IFACEMETHODIMP SetAutomationObject(IDispatch *dispatch);
 
-	// IUnknown
-	IFACEMETHODIMP QueryInterface(REFIID riid, void **ppvObject);
-	IFACEMETHODIMP_(ULONG) AddRef();
-	IFACEMETHODIMP_(ULONG) Release();
-
 private:
-	FolderView(std::weak_ptr<ShellBrowser> shellBrowserWeak);
-
-	ULONG m_refCount;
 	std::weak_ptr<ShellBrowser> m_shellBrowserWeak;
 	int m_initialFolderId;
 };
+
+namespace winrt
+{
+	template <>
+	bool is_guid_of<IFolderView2>(guid const &id) noexcept;
+}

@@ -8,14 +8,7 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/Logging.h"
 
-wil::com_ptr_nothrow<NewMenuClient> NewMenuClient::Create(IExplorerplusplus *expp)
-{
-	wil::com_ptr_nothrow<NewMenuClient> newMenuClient;
-	newMenuClient.attach(new NewMenuClient(expp));
-	return newMenuClient;
-}
-
-NewMenuClient::NewMenuClient(IExplorerplusplus *pexpp) : m_refCount(1), m_pexpp(pexpp)
+NewMenuClient::NewMenuClient(IExplorerplusplus *pexpp) : m_pexpp(pexpp)
 {
 }
 
@@ -54,45 +47,4 @@ IFACEMETHODIMP NewMenuClient::SelectAndEditItem(PCIDLIST_ABSOLUTE pidlItem, NMCS
 	}
 
 	return S_OK;
-}
-
-// IUnknown
-IFACEMETHODIMP NewMenuClient::QueryInterface(REFIID iid, void **ppvObject)
-{
-	*ppvObject = nullptr;
-
-	if (iid == IID_IUnknown)
-	{
-		*ppvObject = static_cast<IUnknown *>(this);
-	}
-	else if (iid == IID_INewMenuClient)
-	{
-		*ppvObject = static_cast<INewMenuClient *>(this);
-	}
-
-	if (*ppvObject)
-	{
-		AddRef();
-		return S_OK;
-	}
-
-	return E_NOINTERFACE;
-}
-
-IFACEMETHODIMP_(ULONG) NewMenuClient::AddRef()
-{
-	return ++m_refCount;
-}
-
-IFACEMETHODIMP_(ULONG) NewMenuClient::Release()
-{
-	m_refCount--;
-
-	if (m_refCount == 0)
-	{
-		delete this;
-		return 0;
-	}
-
-	return m_refCount;
 }

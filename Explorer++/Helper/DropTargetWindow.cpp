@@ -5,18 +5,9 @@
 #include "stdafx.h"
 #include "DropTargetWindow.h"
 
-wil::com_ptr_nothrow<DropTargetWindow> DropTargetWindow::Create(
-	HWND hwnd, DropTargetInternal *dropTargetInternal)
-{
-	wil::com_ptr_nothrow<DropTargetWindow> dropTarget;
-	dropTarget.attach(new DropTargetWindow(hwnd, dropTargetInternal));
-	return dropTarget;
-}
-
 DropTargetWindow::DropTargetWindow(HWND hwnd, DropTargetInternal *dropTargetInternal) :
 	m_hwnd(hwnd),
 	m_dropTargetInternal(dropTargetInternal),
-	m_refCount(1),
 	m_withinDrag(false)
 {
 	RegisterDragDrop(hwnd, this);
@@ -39,30 +30,6 @@ LRESULT CALLBACK DropTargetWindow::WndProc(
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
-}
-
-IFACEMETHODIMP DropTargetWindow::QueryInterface(REFIID iid, void **object)
-{
-	static const QITAB qit[] = { QITABENT(DropTargetWindow, IDropTarget), { nullptr } };
-
-	return QISearch(this, qit, iid, object);
-}
-
-IFACEMETHODIMP_(ULONG) DropTargetWindow::AddRef()
-{
-	return InterlockedIncrement(&m_refCount);
-}
-
-IFACEMETHODIMP_(ULONG) DropTargetWindow::Release()
-{
-	long refCount = InterlockedDecrement(&m_refCount);
-
-	if (refCount == 0)
-	{
-		delete this;
-	}
-
-	return refCount;
 }
 
 IFACEMETHODIMP DropTargetWindow::DragEnter(

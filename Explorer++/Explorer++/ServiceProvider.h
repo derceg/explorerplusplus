@@ -4,29 +4,14 @@
 
 #pragma once
 
-#include "../Helper/ShellHelper.h"
-#include <boost/container_hash/hash.hpp>
-#include <wil/com.h>
-#include <unordered_map>
+#include "../Helper/ServiceProviderBase.h"
+#include <servprov.h>
 
-class ServiceProvider : public IServiceProvider
+class ServiceProvider :
+	public winrt::implements<ServiceProvider, IServiceProvider>,
+	public ServiceProviderBase
 {
 public:
-	static wil::com_ptr_nothrow<ServiceProvider> Create();
-
-	void RegisterService(REFGUID guidService, IUnknown *service);
-
 	// IServiceProvider
 	IFACEMETHODIMP QueryService(REFGUID guidService, REFIID riid, void **ppv);
-
-	// IUnknown
-	IFACEMETHODIMP QueryInterface(REFIID riid, void **ppvObject);
-	IFACEMETHODIMP_(ULONG) AddRef();
-	IFACEMETHODIMP_(ULONG) Release();
-
-private:
-	ServiceProvider();
-
-	ULONG m_refCount;
-	std::unordered_map<IID, wil::com_ptr_nothrow<IUnknown>, boost::hash<IID>> m_services;
 };

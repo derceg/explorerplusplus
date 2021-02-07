@@ -173,6 +173,7 @@ class TabNavigationMock : public TabNavigationInterface
 {
 public:
 	MOCK_METHOD(void, CreateNewTab, (PCIDLIST_ABSOLUTE pidlDirectory, bool selected), (override));
+	MOCK_METHOD(void, SelectTabById, (int tabId), (override));
 };
 
 class IconFetcherMock : public IconFetcherInterface

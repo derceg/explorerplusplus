@@ -7,6 +7,7 @@
 #include "DataObjectWrapper.h"
 #include "Macros.h"
 #include <wil/com.h>
+#include <winrt/base.h>
 
 STGMEDIUM GetStgMediumForGlobal(HGLOBAL global)
 {
@@ -60,7 +61,7 @@ HRESULT CreateDataObjectForShellTransfer(
 	// Although it's possible to retrieve the IDataObjectAsyncCapability interface from the shell
 	// IDataObject instance and call SetAsyncMode(), it appears that doesn't actually enable
 	// asynchronous transfer. That's the reason the shell IDataObject instance is wrapped here.
-	wil::com_ptr_nothrow<IDataObject> dataObject = DataObjectWrapper::Create(shellDataObject.get());
+	auto dataObject = winrt::make<DataObjectWrapper>(shellDataObject.get());
 
 	wil::com_ptr_nothrow<IDataObjectAsyncCapability> asyncCapability;
 	RETURN_IF_FAILED(dataObject->QueryInterface(IID_PPV_ARGS(&asyncCapability)));
