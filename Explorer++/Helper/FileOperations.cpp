@@ -414,6 +414,12 @@ HRESULT CopyFilesToClipboard(
 	RETURN_IF_FAILED(CreateDataObjectForShellTransfer(items, &dataObject));
 
 	DWORD effect = move ? DROPEFFECT_MOVE : DROPEFFECT_COPY;
+
+	if (!move)
+	{
+		WI_SetFlag(effect, DROPEFFECT_LINK);
+	}
+
 	RETURN_IF_FAILED(SetPreferredDropEffect(dataObject.get(), effect));
 
 	RETURN_IF_FAILED(OleSetClipboard(dataObject.get()));
