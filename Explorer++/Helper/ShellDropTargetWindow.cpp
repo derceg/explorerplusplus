@@ -125,7 +125,9 @@ DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::GetDropEffect(
 		return DROPEFFECT_NONE;
 	}
 
-	if (IsTargetSourceOfDrop(targetItem, dataObject))
+	// Note that MK_XBUTTON1 corresponds to the ALT key.
+	if (IsTargetSourceOfDrop(targetItem, dataObject) && WI_IsFlagClear(keyState, MK_SHIFT)
+		&& WI_IsFlagClear(keyState, MK_CONTROL) && WI_IsFlagClear(keyState, MK_XBUTTON1))
 	{
 		SetDropDescription(dataObject, DROPIMAGE_NOIMAGE, L"", L"");
 	}
@@ -207,7 +209,9 @@ DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::PerformDrop(
 		return DROPEFFECT_NONE;
 	}
 
-	if (m_dropType == DropType::LeftClick && IsTargetSourceOfDrop(targetItem, dataObject))
+	if (m_dropType == DropType::LeftClick && IsTargetSourceOfDrop(targetItem, dataObject)
+		&& WI_IsFlagClear(keyState, MK_SHIFT) && WI_IsFlagClear(keyState, MK_CONTROL)
+		&& WI_IsFlagClear(keyState, MK_XBUTTON1))
 	{
 		// The drag was started in the current window and the target is the folder represented by
 		// that window.
