@@ -177,6 +177,8 @@ LRESULT CALLBACK TabContainer::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
 {
 	switch (uMsg)
 	{
+		HANDLE_MSG(hwnd, WM_MOUSEWHEEL, OnMouseWheel);
+
 	case WM_LBUTTONDOWN:
 	{
 		POINT pt;
@@ -351,6 +353,21 @@ void TabContainer::OnTabCtrlMouseMove(POINT *pt)
 		TabCtrl_SetCurFocus(m_hwnd, iSwap);
 
 		m_draggedTabEndIndex = iSwap;
+	}
+}
+
+void TabContainer::OnMouseWheel(HWND hwnd, int xPos, int yPos, int delta, UINT keys)
+{
+	UNREFERENCED_PARAMETER(hwnd);
+	UNREFERENCED_PARAMETER(xPos);
+	UNREFERENCED_PARAMETER(yPos);
+	UNREFERENCED_PARAMETER(keys);
+
+	auto scrollDirection = delta < 0 ? ScrollDirection::Left : ScrollDirection::Right;
+
+	for (int i = 0; i < abs(delta / WHEEL_DELTA); i++)
+	{
+		ScrollTabControl(scrollDirection);
 	}
 }
 

@@ -174,6 +174,7 @@ private:
 	void OnTabCtrlLButtonDown(POINT *pt);
 	void OnTabCtrlLButtonUp();
 	void OnTabCtrlMouseMove(POINT *pt);
+	void OnMouseWheel(HWND hwnd, int xPos, int yPos, int delta, UINT keys);
 
 	void OnLButtonDoubleClick(const POINT &pt);
 
