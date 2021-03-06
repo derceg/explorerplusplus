@@ -66,7 +66,9 @@ const std::unordered_map<ToolbarButton, Icon, ToolbarButtonHash> TOOLBAR_BUTTON_
 
 #pragma warning(push)
 #pragma warning(                                                                                   \
-	disable : 4996) // warning STL4010: Various members of std::allocator are deprecated in C++17.
+	disable : 4996 4834) // warning STL4010: Various members of std::allocator are
+						 // deprecated in C++17,
+						 // discarding return value of function with 'nodiscard' attribute
 
 // Ideally, toolbar button IDs would be saved in the XML config file, rather
 // than button strings, but that's not especially easy to change now.

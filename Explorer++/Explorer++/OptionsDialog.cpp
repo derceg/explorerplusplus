@@ -86,7 +86,9 @@ static const FileSize FILE_SIZES[] = {
 
 #pragma warning(push)
 #pragma warning(                                                                                   \
-	disable : 4996) // warning STL4010: Various members of std::allocator are deprecated in C++17.
+	disable : 4996 4834) // warning STL4010: Various members of std::allocator are
+						 // deprecated in C++17,
+						 // discarding return value of function with 'nodiscard' attribute
 
 const boost::bimap<bool, std::wstring> BOOL_MAPPINGS =
 	MakeBimap<bool, std::wstring>({ { true, L"true" }, { false, L"false" } });
