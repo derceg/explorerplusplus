@@ -66,25 +66,11 @@ required for VS 2015. */
 #include <gdiplus.h>
 #pragma warning(pop)
 
-/* Temporarily disable the
-"#pragma deprecated" warning. */
-#pragma warning(push)
-#pragma warning(disable:4995)
 #include <intrin.h>
-#pragma warning(pop)
-
 #include <wmsdk.h>
 #include <propvarutil.h>
-
-/* See http://connect.microsoft.com/VisualStudio/feedback/details/621653/including-stdint-after-intsafe-generates-warnings.
-This workaround is only
-required for VS 2010. */
-#pragma warning(push)
-#pragma warning(disable:4005)
 #include <stdint.h>
 #include <intsafe.h>
-#pragma warning(pop)
-
 #include <assert.h>
 #include <list>
 #include <memory>

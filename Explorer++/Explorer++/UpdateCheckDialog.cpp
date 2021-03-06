@@ -14,12 +14,7 @@
 #include "MainResource.h"
 #include "Version.h"
 #include <boost\algorithm\string.hpp>
-
-#pragma warning(push)
-#pragma warning(disable : 4995)
 #include <boost\lexical_cast.hpp>
-#pragma warning(pop)
-
 #include <stdexcept>
 #include <vector>
 
