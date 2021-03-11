@@ -29,10 +29,10 @@ public:
 		BookmarkMenuBuilder::IncludePredicate includePredicate = nullptr);
 
 private:
-	static const int MIN_ID = 1;
-	static const int MAX_ID = 1000;
+	static constexpr int MIN_ID = 1;
+	static constexpr int MAX_ID = 1000;
 
-	static const UINT_PTR SUBCLASS_ID = 0;
+	static constexpr UINT_PTR SUBCLASS_ID = 0;
 
 	static LRESULT CALLBACK ParentWindowSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam,
 		LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);

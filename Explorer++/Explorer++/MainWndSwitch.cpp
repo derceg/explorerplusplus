@@ -37,12 +37,12 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
 
-static const int FOLDER_SIZE_LINE_INDEX = 1;
+constexpr int FOLDER_SIZE_LINE_INDEX = 1;
 
 /* Defines the distance between the cursor
 and the right edge of the treeview during
 a resizing operation. */
-static const int TREEVIEW_DRAG_OFFSET = 8;
+constexpr int TREEVIEW_DRAG_OFFSET = 8;
 
 LRESULT CALLBACK Explorerplusplus::WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {

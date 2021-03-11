@@ -166,14 +166,14 @@ protected:
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 
 private:
-	static const int SEARCH_PROCESSITEMS_TIMER_ID = 0;
-	static const int SEARCH_PROCESSITEMS_TIMER_ELAPSED = 50;
-	static const int SEARCH_MAX_ITEMS_BATCH_PROCESS = 100;
+	static constexpr int SEARCH_PROCESSITEMS_TIMER_ID = 0;
+	static constexpr int SEARCH_PROCESSITEMS_TIMER_ELAPSED = 50;
+	static constexpr int SEARCH_MAX_ITEMS_BATCH_PROCESS = 100;
 
-	static const int MIN_SHELL_MENU_ID = 1;
-	static const int MAX_SHELL_MENU_ID = 1000;
+	static constexpr int MIN_SHELL_MENU_ID = 1;
+	static constexpr int MAX_SHELL_MENU_ID = 1000;
 
-	static const int MENU_ID_OPEN_FILE_LOCATION = (MAX_SHELL_MENU_ID + 1);
+	static constexpr int MENU_ID_OPEN_FILE_LOCATION = (MAX_SHELL_MENU_ID + 1);
 
 	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
 		std::list<ResizableDialog::Control> &ControlList) override;

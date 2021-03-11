@@ -105,14 +105,14 @@ private:
 		SplitSize
 	};
 
-	static const COLORREF HELPER_TEXT_COLOR = RGB(120, 120, 120);
+	static constexpr COLORREF HELPER_TEXT_COLOR = RGB(120, 120, 120);
 
-	static const int KB = (1024);
-	static const int MB = (1024 * 1024);
-	static const int GB = (1024 * 1024 * 1024);
+	static constexpr int KB = (1024);
+	static constexpr int MB = (1024 * 1024);
+	static constexpr int GB = (1024 * 1024 * 1024);
 
-	static const UINT_PTR ELPASED_TIMER_ID = 1;
-	static const UINT_PTR ELPASED_TIMER_TIMEOUT = 1000;
+	static constexpr UINT_PTR ELPASED_TIMER_ID = 1;
+	static constexpr UINT_PTR ELPASED_TIMER_TIMEOUT = 1000;
 
 	void OnOk();
 	void OnCancel();
