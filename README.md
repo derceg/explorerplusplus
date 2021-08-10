@@ -54,4 +54,4 @@ Documentation is available online at [Read the Docs](https://explorerplusplus.re
 
 ## Translations
 
-Translations are managed with [Crowdin](https://crowdin.com/project/explorerplusplus). To contribute to a translation, sign up with Crowdin, then edit the file corresponding to your language. If your language isn't listed, use the contact link shown on the project page to request it.
+Translations are managed with [Crowdin](https://crowdin.com/project/explorerplusplus). To contribute to a translation, sign up with Crowdin, then edit the file corresponding to your language. If your language isn't listed, use the contact link shown on the project page to request it. 
