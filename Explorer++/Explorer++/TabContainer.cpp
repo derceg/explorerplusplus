@@ -991,16 +991,12 @@ void TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 	}
 	else
 	{
-		if (m_config->openNewTabNextToCurrent)
+		// When the application is first started, the number of tabs will be 0 initially, so there
+		// won't be any selected tab. In that case, the openNewTabNextToCurrent setting should
+		// effectively be ignored.
+		if (m_config->openNewTabNextToCurrent && GetSelectedTabIndexOptional())
 		{
-			int currentSelection = GetSelectedTabIndex();
-
-			if (currentSelection == -1)
-			{
-				throw std::runtime_error("No selected tab");
-			}
-
-			index = currentSelection + 1;
+			index = GetSelectedTabIndex() + 1;
 		}
 		else
 		{
@@ -1315,6 +1311,18 @@ int TabContainer::GetSelectedTabIndex() const
 	if (index == -1)
 	{
 		throw std::runtime_error("No selected tab");
+	}
+
+	return index;
+}
+
+std::optional<int> TabContainer::GetSelectedTabIndexOptional() const
+{
+	int index = TabCtrl_GetCurSel(m_hwnd);
+
+	if (index == -1)
+	{
+		return std::nullopt;
 	}
 
 	return index;

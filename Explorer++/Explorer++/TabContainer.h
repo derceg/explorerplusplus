@@ -94,6 +94,7 @@ public:
 	void SelectTabAtIndex(int index);
 	Tab &GetSelectedTab();
 	int GetSelectedTabIndex() const;
+	std::optional<int> GetSelectedTabIndexOptional() const;
 	bool IsTabSelected(const Tab &tab);
 	Tab &GetTabByIndex(int index);
 	int GetTabIndex(const Tab &tab) const;
