@@ -13,24 +13,22 @@
 class DropSource : public IDropSource
 {
 public:
-
 	DropSource();
 
-	HRESULT		__stdcall	QueryInterface(REFIID iid, void **ppvObject);
-	ULONG		__stdcall	AddRef();
-	ULONG		__stdcall	Release();
+	HRESULT __stdcall QueryInterface(REFIID iid, void **ppvObject);
+	ULONG __stdcall AddRef();
+	ULONG __stdcall Release();
 
-	HRESULT _stdcall	QueryContinueDrag(BOOL fEscapePressed, DWORD grfKeyState);
-	HRESULT _stdcall	GiveFeedback(DWORD dwEffect);
+	HRESULT _stdcall QueryContinueDrag(BOOL fEscapePressed, DWORD grfKeyState);
+	HRESULT _stdcall GiveFeedback(DWORD dwEffect);
 
 private:
-
-	LONG		m_lRefCount;
+	LONG m_lRefCount;
 };
 
 HRESULT CreateDropSource(IDropSource **ppDropSource)
 {
-	if(ppDropSource == nullptr)
+	if (ppDropSource == nullptr)
 	{
 		return E_FAIL;
 	}
@@ -50,13 +48,12 @@ HRESULT __stdcall DropSource::QueryInterface(REFIID iid, void **ppvObject)
 {
 	*ppvObject = nullptr;
 
-	if(iid == IID_IDropSource ||
-		iid == IID_IUnknown)
+	if (iid == IID_IDropSource || iid == IID_IUnknown)
 	{
 		*ppvObject = this;
 	}
 
-	if(*ppvObject)
+	if (*ppvObject)
 	{
 		AddRef();
 		return S_OK;
@@ -74,7 +71,7 @@ ULONG __stdcall DropSource::Release()
 {
 	LONG lCount = InterlockedDecrement(&m_lRefCount);
 
-	if(lCount == 0)
+	if (lCount == 0)
 	{
 		delete this;
 		return 0;
@@ -83,13 +80,17 @@ ULONG __stdcall DropSource::Release()
 	return lCount;
 }
 
-
-HRESULT _stdcall DropSource::QueryContinueDrag(BOOL fEscapePressed,DWORD grfKeyState)
+HRESULT _stdcall DropSource::QueryContinueDrag(BOOL fEscapePressed, DWORD grfKeyState)
 {
 	if (fEscapePressed == TRUE
 		|| (WI_IsFlagSet(grfKeyState, MK_LBUTTON) && WI_IsFlagSet(grfKeyState, MK_RBUTTON)))
 	{
 		return DRAGDROP_S_CANCEL;
+	}
+
+	if (WI_IsFlagClear(grfKeyState, MK_LBUTTON) && WI_IsFlagClear(grfKeyState, MK_RBUTTON))
+	{
+		return DRAGDROP_S_DROP;
 	}
 
 	return S_OK;
