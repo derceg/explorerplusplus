@@ -42,7 +42,6 @@ private:
 
 	HWND m_hwnd;
 	DropTargetInternal *m_dropTargetInternal;
-	long m_refCount;
 
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 

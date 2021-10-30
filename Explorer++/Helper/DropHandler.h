@@ -49,7 +49,6 @@ private:
 
 	IDataObject			*m_pDataObject;
 	IDropFilesCallback	*m_pDropFilesCallback;
-	POINT				m_pt;
 	DWORD				m_dwEffect;
 	HWND				m_hwndDrop;
 	std::wstring		m_destDirectory;
