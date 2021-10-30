@@ -9,7 +9,8 @@
 Plugins::MenuApi::MenuApi(PluginMenuManager *pluginMenuManager) :
 	m_pluginMenuManager(pluginMenuManager)
 {
-	m_connections.emplace_back(m_pluginMenuManager->AddMenuClickedObserver(boost::bind(&Plugins::MenuApi::onMenuItemClicked, this, _1)));
+	m_connections.emplace_back(m_pluginMenuManager->AddMenuClickedObserver(
+		boost::bind(&Plugins::MenuApi::onMenuItemClicked, this, boost::placeholders::_1)));
 }
 
 Plugins::MenuApi::~MenuApi()

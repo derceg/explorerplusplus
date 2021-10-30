@@ -25,7 +25,7 @@ TabRestorerUI::TabRestorerUI(HINSTANCE instance, IExplorerplusplus *expp, TabRes
 		ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), GetDefaultFolderIconIndex());
 
 	m_connections.push_back(m_expp->AddMainMenuPreShowObserver(
-		boost::bind(&TabRestorerUI::OnMainMenuPreShow, this, _1)));
+		boost::bind(&TabRestorerUI::OnMainMenuPreShow, this, boost::placeholders::_1)));
 }
 
 TabRestorerUI::~TabRestorerUI()

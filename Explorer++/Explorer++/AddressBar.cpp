@@ -75,12 +75,16 @@ void AddressBar::Initialize(HWND parent)
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
 		parent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
-	m_expp->AddTabsInitializedObserver([this] {
-		m_connections.push_back(m_expp->GetTabContainer()->tabSelectedSignal.AddObserver(
-			boost::bind(&AddressBar::OnTabSelected, this, _1)));
-		m_connections.push_back(m_expp->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
-			boost::bind(&AddressBar::OnNavigationCommitted, this, _1, _2, _3)));
-	});
+	m_expp->AddTabsInitializedObserver(
+		[this]
+		{
+			m_connections.push_back(m_expp->GetTabContainer()->tabSelectedSignal.AddObserver(
+				boost::bind(&AddressBar::OnTabSelected, this, boost::placeholders::_1)));
+			m_connections.push_back(
+				m_expp->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
+					boost::bind(&AddressBar::OnNavigationCommitted, this, boost::placeholders::_1,
+						boost::placeholders::_2, boost::placeholders::_3)));
+		});
 }
 
 LRESULT AddressBar::ComboBoxExSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -434,7 +438,8 @@ void AddressBar::UpdateTextAndIcon(const Tab &tab)
 		iconIndex = m_defaultFolderIconIndex;
 
 		m_historyEntryUpdatedConnection = entry->historyEntryUpdatedSignal.AddObserver(
-			boost::bind(&AddressBar::OnHistoryEntryUpdated, this, _1, _2));
+			boost::bind(&AddressBar::OnHistoryEntryUpdated, this, boost::placeholders::_1,
+				boost::placeholders::_2));
 	}
 
 	SendMessage(m_hwnd, CB_RESETCONTENT, 0, 0);

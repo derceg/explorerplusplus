@@ -122,19 +122,20 @@ void TabContainer::Initialize(HWND parent)
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
 		parent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
+	m_connections.push_back(tabCreatedSignal.AddObserver(boost::bind(&TabContainer::OnTabCreated,
+		this, boost::placeholders::_1, boost::placeholders::_2)));
 	m_connections.push_back(
-		tabCreatedSignal.AddObserver(boost::bind(&TabContainer::OnTabCreated, this, _1, _2)));
-	m_connections.push_back(tabNavigationCommittedSignal.AddObserver(
-		boost::bind(&TabContainer::OnNavigationCommitted, this, _1, _2, _3)));
-	m_connections.push_back(
-		tabSelectedSignal.AddObserver(boost::bind(&TabContainer::OnTabSelected, this, _1)));
-	m_connections.push_back(
-		tabRemovedSignal.AddObserver(boost::bind(&TabContainer::OnTabRemoved, this, _1)));
+		tabNavigationCommittedSignal.AddObserver(boost::bind(&TabContainer::OnNavigationCommitted,
+			this, boost::placeholders::_1, boost::placeholders::_2, boost::placeholders::_3)));
+	m_connections.push_back(tabSelectedSignal.AddObserver(
+		boost::bind(&TabContainer::OnTabSelected, this, boost::placeholders::_1)));
+	m_connections.push_back(tabRemovedSignal.AddObserver(
+		boost::bind(&TabContainer::OnTabRemoved, this, boost::placeholders::_1)));
 
 	m_connections.push_back(m_config->alwaysShowTabBar.addObserver(
-		boost::bind(&TabContainer::OnAlwaysShowTabBarUpdated, this, _1)));
+		boost::bind(&TabContainer::OnAlwaysShowTabBarUpdated, this, boost::placeholders::_1)));
 	m_connections.push_back(m_config->forceSameTabWidth.addObserver(
-		boost::bind(&TabContainer::OnForceSameTabWidthUpdated, this, _1)));
+		boost::bind(&TabContainer::OnForceSameTabWidthUpdated, this, boost::placeholders::_1)));
 }
 
 void TabContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
@@ -1095,7 +1096,8 @@ void TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 	// disconnected when the tab is closed and the tab object (and
 	// associated signal) is destroyed or when the tab is destroyed
 	// during application shutdown.
-	tab.AddTabUpdatedObserver(boost::bind(&TabContainer::OnTabUpdated, this, _1, _2));
+	tab.AddTabUpdatedObserver(boost::bind(&TabContainer::OnTabUpdated, this,
+		boost::placeholders::_1, boost::placeholders::_2));
 
 	tabCreatedSignal.m_signal(tab.GetId(), selected);
 }

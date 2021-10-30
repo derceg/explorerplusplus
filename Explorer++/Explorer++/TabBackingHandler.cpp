@@ -38,8 +38,8 @@ void Explorerplusplus::OnTabsInitialized()
 		UpdateTabToolbar();
 	});
 
-	m_tabContainer->tabUpdatedSignal.AddObserver(
-		boost::bind(&Explorerplusplus::OnTabUpdated, this, _1, _2));
+	m_tabContainer->tabUpdatedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabUpdated, this,
+		boost::placeholders::_1, boost::placeholders::_2));
 
 	m_tabContainer->tabSelectedSignal.AddObserver([this](const Tab &tab) {
 		UNREFERENCED_PARAMETER(tab);

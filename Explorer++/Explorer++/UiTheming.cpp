@@ -14,8 +14,8 @@ UiTheming::UiTheming(IExplorerplusplus *expp, TabContainer *tabContainer) :
 	m_tabContainer(tabContainer),
 	m_customListViewColorsApplied(false)
 {
-	m_connections.emplace_back(m_tabContainer->tabCreatedSignal.AddObserver(
-		boost::bind(&UiTheming::OnTabCreated, this, _1, _2)));
+	m_connections.emplace_back(m_tabContainer->tabCreatedSignal.AddObserver(boost::bind(
+		&UiTheming::OnTabCreated, this, boost::placeholders::_1, boost::placeholders::_2)));
 }
 
 void UiTheming::OnTabCreated(int tabId, BOOL switchToNewTab)
