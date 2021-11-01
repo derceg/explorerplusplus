@@ -32,19 +32,18 @@ MainWindow::MainWindow(
 		[this]
 		{
 			m_connections.push_back(m_expp->GetTabContainer()->tabSelectedSignal.AddObserver(
-				boost::bind(&MainWindow::OnTabSelected, this, boost::placeholders::_1)));
+				std::bind_front(&MainWindow::OnTabSelected, this)));
 			m_connections.push_back(
 				m_expp->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
-					boost::bind(&MainWindow::OnNavigationCommitted, this, boost::placeholders::_1,
-						boost::placeholders::_2, boost::placeholders::_3)));
+					std::bind_front(&MainWindow::OnNavigationCommitted, this)));
 		});
 
 	m_connections.push_back(m_config->showFullTitlePath.addObserver(
-		boost::bind(&MainWindow::OnShowFullTitlePathUpdated, this, boost::placeholders::_1)));
+		std::bind_front(&MainWindow::OnShowFullTitlePathUpdated, this)));
 	m_connections.push_back(m_config->showUserNameInTitleBar.addObserver(
-		boost::bind(&MainWindow::OnShowUserNameInTitleBarUpdated, this, boost::placeholders::_1)));
-	m_connections.push_back(m_config->showPrivilegeLevelInTitleBar.addObserver(boost::bind(
-		&MainWindow::OnShowPrivilegeLevelInTitleBarUpdated, this, boost::placeholders::_1)));
+		std::bind_front(&MainWindow::OnShowUserNameInTitleBarUpdated, this)));
+	m_connections.push_back(m_config->showPrivilegeLevelInTitleBar.addObserver(
+		std::bind_front(&MainWindow::OnShowPrivilegeLevelInTitleBarUpdated, this)));
 }
 
 void MainWindow::OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)

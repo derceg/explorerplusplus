@@ -92,8 +92,7 @@ void ApplicationToolbar::Initialize(HWND hParent)
 	AddButtonsToToolbar();
 
 	m_connections.push_back(m_pexpp->AddToolbarContextMenuObserver(
-		boost::bind(&ApplicationToolbar::OnToolbarContextMenuPreShow, this, boost::placeholders::_1,
-			boost::placeholders::_2, boost::placeholders::_3)));
+		std::bind_front(&ApplicationToolbar::OnToolbarContextMenuPreShow, this)));
 
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
 

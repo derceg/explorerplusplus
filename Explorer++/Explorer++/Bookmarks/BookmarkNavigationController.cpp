@@ -13,8 +13,7 @@ BookmarkNavigationController::BookmarkNavigationController(
 	m_navigator(navigator)
 {
 	m_connections.push_back(m_navigator->AddNavigationCompletedObserver(
-		std::bind(&BookmarkNavigationController::OnNavigationCompleted, this, std::placeholders::_1,
-			std::placeholders::_2),
+		std::bind_front(&BookmarkNavigationController::OnNavigationCompleted, this),
 		boost::signals2::at_front));
 }
 

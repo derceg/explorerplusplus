@@ -63,9 +63,7 @@ void Explorerplusplus::CreateFolderControls()
 			m_hHolder, nullptr, GetModuleHandle(nullptr), nullptr);
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_foldersToolbarParent,
-		std::bind(&Explorerplusplus::FoldersToolbarParentProc, this, std::placeholders::_1,
-			std::placeholders::_2, std::placeholders::_3, std::placeholders::_4),
-		0));
+		std::bind_front(&Explorerplusplus::FoldersToolbarParentProc, this), 0));
 
 	m_hFoldersToolbar = CreateTabToolbar(m_foldersToolbarParent, FOLDERS_TOOLBAR_CLOSE,
 		ResourceHelper::LoadString(m_hLanguageModule, IDS_HIDEFOLDERSPANE));

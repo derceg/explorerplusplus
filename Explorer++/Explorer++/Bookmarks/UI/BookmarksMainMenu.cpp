@@ -22,7 +22,7 @@ BookmarksMainMenu::BookmarksMainMenu(IExplorerplusplus *expp, IconFetcher *iconF
 	m_menuBuilder(expp, iconFetcher, expp->GetLanguageModule())
 {
 	m_connections.push_back(expp->AddMainMenuPreShowObserver(
-		std::bind(&BookmarksMainMenu::OnMainMenuPreShow, this, std::placeholders::_1)));
+		std::bind_front(&BookmarksMainMenu::OnMainMenuPreShow, this)));
 }
 
 BookmarksMainMenu::~BookmarksMainMenu()

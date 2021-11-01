@@ -60,16 +60,13 @@ BookmarkListView::BookmarkListView(HWND hListView, HMODULE resourceModule,
 		ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	m_connections.push_back(m_bookmarkTree->bookmarkItemAddedSignal.AddObserver(
-		std::bind(&BookmarkListView::OnBookmarkItemAdded, this, std::placeholders::_1,
-			std::placeholders::_2)));
+		std::bind_front(&BookmarkListView::OnBookmarkItemAdded, this)));
 	m_connections.push_back(m_bookmarkTree->bookmarkItemUpdatedSignal.AddObserver(
-		std::bind(&BookmarkListView::OnBookmarkItemUpdated, this, std::placeholders::_1,
-			std::placeholders::_2)));
-	m_connections.push_back(m_bookmarkTree->bookmarkItemMovedSignal.AddObserver(std::bind(
-		&BookmarkListView::OnBookmarkItemMoved, this, std::placeholders::_1, std::placeholders::_2,
-		std::placeholders::_3, std::placeholders::_4, std::placeholders::_5)));
+		std::bind_front(&BookmarkListView::OnBookmarkItemUpdated, this)));
+	m_connections.push_back(m_bookmarkTree->bookmarkItemMovedSignal.AddObserver(
+		std::bind_front(&BookmarkListView::OnBookmarkItemMoved, this)));
 	m_connections.push_back(m_bookmarkTree->bookmarkItemPreRemovalSignal.AddObserver(
-		std::bind(&BookmarkListView::OnBookmarkItemPreRemoval, this, std::placeholders::_1)));
+		std::bind_front(&BookmarkListView::OnBookmarkItemPreRemoval, this)));
 }
 
 void BookmarkListView::SetUpListViewImageList(IconFetcher *iconFetcher)
@@ -80,9 +77,7 @@ void BookmarkListView::SetUpListViewImageList(IconFetcher *iconFetcher)
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 
 	m_bookmarkIconManager = std::make_unique<BookmarkIconManager>(m_expp, iconFetcher,
-		std::bind(&BookmarkListView::OnBookmarkIconAvailable, this, std::placeholders::_1,
-			std::placeholders::_2),
-		iconWidth, iconHeight);
+		std::bind_front(&BookmarkListView::OnBookmarkIconAvailable, this), iconWidth, iconHeight);
 
 	ListView_SetImageList(m_hListView, m_bookmarkIconManager->GetImageList(), LVSIL_SMALL);
 }

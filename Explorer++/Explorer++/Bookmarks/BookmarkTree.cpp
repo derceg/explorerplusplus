@@ -82,9 +82,9 @@ BookmarkItem *BookmarkTree::AddBookmarkItem(
 		// Adds an observer to each bookmark item that's being added. This is
 		// needed so that this class can broadcast an event whenever an
 		// individual bookmark item is updated.
-		currentItem->updatedSignal.AddObserver(std::bind(&BookmarkTree::OnBookmarkItemUpdated, this,
-												   std::placeholders::_1, std::placeholders::_2),
-			boost::signals2::at_front);
+			currentItem->updatedSignal.AddObserver(
+				std::bind_front(&BookmarkTree::OnBookmarkItemUpdated, this),
+				boost::signals2::at_front);
 	});
 
 	if (index > parent->GetChildren().size())

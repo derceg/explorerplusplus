@@ -99,9 +99,7 @@ void ManageBookmarksDialog::SetupToolbar()
 		0, 0, 0, 0, m_hDlg, nullptr, GetModuleHandle(nullptr), nullptr);
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_toolbarParent,
-		std::bind(&ManageBookmarksDialog::ParentWndProc, this, std::placeholders::_1,
-			std::placeholders::_2, std::placeholders::_3, std::placeholders::_4),
-		0));
+		std::bind_front(&ManageBookmarksDialog::ParentWndProc, this), 0));
 
 	m_hToolbar = CreateToolbar(m_toolbarParent,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | TBSTYLE_TOOLTIPS | TBSTYLE_LIST
@@ -189,8 +187,8 @@ void ManageBookmarksDialog::SetupTreeView()
 	m_bookmarkTreeView = new BookmarkTreeView(
 		hTreeView, GetInstance(), m_pexpp, m_bookmarkTree, m_persistentSettings->m_setExpansion);
 
-	m_connections.push_back(m_bookmarkTreeView->selectionChangedSignal.AddObserver(std::bind(
-		&ManageBookmarksDialog::OnTreeViewSelectionChanged, this, std::placeholders::_1)));
+	m_connections.push_back(m_bookmarkTreeView->selectionChangedSignal.AddObserver(
+		std::bind_front(&ManageBookmarksDialog::OnTreeViewSelectionChanged, this)));
 }
 
 void ManageBookmarksDialog::SetupListView()
@@ -201,8 +199,7 @@ void ManageBookmarksDialog::SetupListView()
 		m_iconFetcher, m_persistentSettings->m_listViewColumns);
 
 	m_connections.push_back(m_bookmarkListView->AddNavigationCompletedObserver(
-		std::bind(&ManageBookmarksDialog::OnListViewNavigation, this, std::placeholders::_1,
-			std::placeholders::_2)));
+		std::bind_front(&ManageBookmarksDialog::OnListViewNavigation, this)));
 }
 
 LRESULT CALLBACK ManageBookmarksDialog::ParentWndProc(

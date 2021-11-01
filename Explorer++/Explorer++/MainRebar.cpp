@@ -339,8 +339,7 @@ void Explorerplusplus::CreateMainToolbar()
 	// size, rather than relying on the observer here running after the one set
 	// up by the main toolbar.
 	m_connections.push_back(m_config->useLargeToolbarIcons.addObserver(
-		boost::bind(&Explorerplusplus::OnUseLargeToolbarIconsUpdated, this,
-			boost::placeholders::_1),
+		std::bind_front(&Explorerplusplus::OnUseLargeToolbarIconsUpdated, this),
 		boost::signals2::at_back));
 }
 

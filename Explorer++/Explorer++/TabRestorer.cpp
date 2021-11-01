@@ -9,7 +9,7 @@
 TabRestorer::TabRestorer(TabContainer *tabContainer) : m_tabContainer(tabContainer)
 {
 	m_connections.push_back(m_tabContainer->tabPreRemovalSignal.AddObserver(
-		boost::bind(&TabRestorer::OnTabPreRemoval, this, boost::placeholders::_1)));
+		std::bind_front(&TabRestorer::OnTabPreRemoval, this)));
 }
 
 void TabRestorer::OnTabPreRemoval(const Tab &tab)

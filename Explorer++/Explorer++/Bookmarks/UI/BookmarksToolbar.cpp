@@ -62,19 +62,15 @@ void BookmarksToolbar::InitializeToolbar(IconFetcher *iconFetcher)
 	InsertBookmarkItems();
 
 	m_connections.push_back(m_bookmarkTree->bookmarkItemAddedSignal.AddObserver(
-		std::bind(&BookmarksToolbar::OnBookmarkItemAdded, this, std::placeholders::_1,
-			std::placeholders::_2)));
+		std::bind_front(&BookmarksToolbar::OnBookmarkItemAdded, this)));
 	m_connections.push_back(m_bookmarkTree->bookmarkItemUpdatedSignal.AddObserver(
-		std::bind(&BookmarksToolbar::OnBookmarkItemUpdated, this, std::placeholders::_1,
-			std::placeholders::_2)));
-	m_connections.push_back(m_bookmarkTree->bookmarkItemMovedSignal.AddObserver(std::bind(
-		&BookmarksToolbar::OnBookmarkItemMoved, this, std::placeholders::_1, std::placeholders::_2,
-		std::placeholders::_3, std::placeholders::_4, std::placeholders::_5)));
+		std::bind_front(&BookmarksToolbar::OnBookmarkItemUpdated, this)));
+	m_connections.push_back(m_bookmarkTree->bookmarkItemMovedSignal.AddObserver(
+		std::bind_front(&BookmarksToolbar::OnBookmarkItemMoved, this)));
 	m_connections.push_back(m_bookmarkTree->bookmarkItemPreRemovalSignal.AddObserver(
-		std::bind(&BookmarksToolbar::OnBookmarkItemPreRemoval, this, std::placeholders::_1)));
+		std::bind_front(&BookmarksToolbar::OnBookmarkItemPreRemoval, this)));
 	m_connections.push_back(m_pexpp->AddToolbarContextMenuObserver(
-		std::bind(&BookmarksToolbar::OnToolbarContextMenuPreShow, this, std::placeholders::_1,
-			std::placeholders::_2, std::placeholders::_3)));
+		std::bind_front(&BookmarksToolbar::OnToolbarContextMenuPreShow, this)));
 
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
 
@@ -93,9 +89,7 @@ void BookmarksToolbar::SetUpToolbarImageList(IconFetcher *iconFetcher)
 	SendMessage(m_hToolbar, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
 
 	m_bookmarkIconManager = std::make_unique<BookmarkIconManager>(m_pexpp, iconFetcher,
-		std::bind(&BookmarksToolbar::OnBookmarkIconAvailable, this, std::placeholders::_1,
-			std::placeholders::_2),
-		iconWidth, iconHeight);
+		std::bind_front(&BookmarksToolbar::OnBookmarkIconAvailable, this), iconWidth, iconHeight);
 
 	SendMessage(m_hToolbar, TB_SETIMAGELIST, 0,
 		reinterpret_cast<LPARAM>(m_bookmarkIconManager->GetImageList()));

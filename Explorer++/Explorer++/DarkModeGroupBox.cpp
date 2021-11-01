@@ -12,9 +12,7 @@
 DarkModeGroupBox::DarkModeGroupBox(HWND groupBox) : m_theme(OpenThemeData(nullptr, L"BUTTON"))
 {
 	m_windowSubclass = std::make_unique<WindowSubclassWrapper>(groupBox,
-		std::bind(&DarkModeGroupBox::WndProc, this, std::placeholders::_1, std::placeholders::_2,
-			std::placeholders::_3, std::placeholders::_4),
-		0);
+		std::bind_front(&DarkModeGroupBox::WndProc, this), 0);
 }
 
 LRESULT CALLBACK DarkModeGroupBox::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

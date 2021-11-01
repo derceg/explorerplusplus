@@ -109,9 +109,7 @@ TEST_F(BookmarkDropperValidTest, DropOnFolder)
 	BookmarkTreeObserver observer;
 
 	m_bookmarkTree.bookmarkItemMovedSignal.AddObserver(
-		std::bind(&BookmarkTreeObserver::OnBookmarkItemMoved, &observer, std::placeholders::_1,
-			std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
-			std::placeholders::_5));
+		std::bind_front(&BookmarkTreeObserver::OnBookmarkItemMoved, &observer));
 
 	EXPECT_CALL(observer,
 		OnBookmarkItemMoved(m_rawGrandparentFolder, m_bookmarkTree.GetBookmarksMenuFolder(), 0,

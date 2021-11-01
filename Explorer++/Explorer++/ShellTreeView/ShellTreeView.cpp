@@ -98,7 +98,7 @@ ShellTreeView::ShellTreeView(HWND hParent, IExplorerplusplus *coreInterface,
 	AddClipboardFormatListener(m_hTreeView);
 
 	m_connections.push_back(coreInterface->AddApplicationShuttingDownObserver(
-		std::bind(&ShellTreeView::OnApplicationShuttingDown, this)));
+		std::bind_front(&ShellTreeView::OnApplicationShuttingDown, this)));
 }
 
 HWND ShellTreeView::CreateTreeView(HWND parent)

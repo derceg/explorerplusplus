@@ -133,7 +133,7 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 	AddClipboardFormatListener(m_hListView);
 
 	m_connections.push_back(coreInterface->AddApplicationShuttingDownObserver(
-		std::bind(&ShellBrowser::OnApplicationShuttingDown, this)));
+		std::bind_front(&ShellBrowser::OnApplicationShuttingDown, this)));
 
 	if (!m_shellWindows)
 	{

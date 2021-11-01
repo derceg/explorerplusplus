@@ -28,8 +28,7 @@ ShellNavigationController::ShellNavigationController(NavigatorInterface *navigat
 void ShellNavigationController::Initialize()
 {
 	m_connections.emplace_back(m_navigator->AddNavigationCommittedObserver(
-		boost::bind(&ShellNavigationController::OnNavigationCommitted, this,
-			boost::placeholders::_1, boost::placeholders::_2),
+		std::bind_front(&ShellNavigationController::OnNavigationCommitted, this),
 		boost::signals2::at_front));
 }
 

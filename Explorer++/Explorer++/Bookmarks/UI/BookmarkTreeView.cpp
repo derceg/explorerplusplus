@@ -51,16 +51,13 @@ BookmarkTreeView::BookmarkTreeView(HWND hTreeView, HINSTANCE hInstance, IExplore
 	SetupTreeView(setExpansion, guidSelected);
 
 	m_connections.push_back(m_bookmarkTree->bookmarkItemAddedSignal.AddObserver(
-		std::bind(&BookmarkTreeView::OnBookmarkItemAdded, this, std::placeholders::_1,
-			std::placeholders::_2)));
+		std::bind_front(&BookmarkTreeView::OnBookmarkItemAdded, this)));
 	m_connections.push_back(m_bookmarkTree->bookmarkItemUpdatedSignal.AddObserver(
-		std::bind(&BookmarkTreeView::OnBookmarkItemUpdated, this, std::placeholders::_1,
-			std::placeholders::_2)));
-	m_connections.push_back(m_bookmarkTree->bookmarkItemMovedSignal.AddObserver(std::bind(
-		&BookmarkTreeView::OnBookmarkItemMoved, this, std::placeholders::_1, std::placeholders::_2,
-		std::placeholders::_3, std::placeholders::_4, std::placeholders::_5)));
+		std::bind_front(&BookmarkTreeView::OnBookmarkItemUpdated, this)));
+	m_connections.push_back(m_bookmarkTree->bookmarkItemMovedSignal.AddObserver(
+		std::bind_front(&BookmarkTreeView::OnBookmarkItemMoved, this)));
 	m_connections.push_back(m_bookmarkTree->bookmarkItemPreRemovalSignal.AddObserver(
-		std::bind(&BookmarkTreeView::OnBookmarkItemPreRemoval, this, std::placeholders::_1)));
+		std::bind_front(&BookmarkTreeView::OnBookmarkItemPreRemoval, this)));
 }
 
 LRESULT CALLBACK BookmarkTreeView::BookmarkTreeViewProcStub(

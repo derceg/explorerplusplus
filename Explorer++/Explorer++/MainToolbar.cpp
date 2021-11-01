@@ -165,27 +165,24 @@ void MainToolbar::Initialize(HWND parent)
 	UpdateConfigDependentButtonStates();
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
-		std::bind(&MainToolbar::WndProc, this, std::placeholders::_1, std::placeholders::_2,
-			std::placeholders::_3, std::placeholders::_4),
-		SUBCLASS_ID));
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
-		parent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+		std::bind_front(&MainToolbar::WndProc, this), SUBCLASS_ID));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parent, ParentWndProcStub,
+		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	m_pexpp->AddTabsInitializedObserver(
 		[this]
 		{
 			m_connections.push_back(m_pexpp->GetTabContainer()->tabSelectedSignal.AddObserver(
-				boost::bind(&MainToolbar::OnTabSelected, this, boost::placeholders::_1)));
+				std::bind_front(&MainToolbar::OnTabSelected, this)));
 			m_connections.push_back(
 				m_pexpp->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
-					boost::bind(&MainToolbar::OnNavigationCommitted, this, boost::placeholders::_1,
-						boost::placeholders::_2, boost::placeholders::_3)));
+					std::bind_front(&MainToolbar::OnNavigationCommitted, this)));
 		});
 
-	m_connections.push_back(m_pexpp->AddFocusChangeObserver(
-		boost::bind(&MainToolbar::OnFocusChanged, this, boost::placeholders::_1)));
+	m_connections.push_back(
+		m_pexpp->AddFocusChangeObserver(std::bind_front(&MainToolbar::OnFocusChanged, this)));
 	m_connections.push_back(m_config->useLargeToolbarIcons.addObserver(
-		boost::bind(&MainToolbar::OnUseLargeToolbarIconsUpdated, this, boost::placeholders::_1)));
+		std::bind_front(&MainToolbar::OnUseLargeToolbarIconsUpdated, this)));
 
 	AddClipboardFormatListener(m_hwnd);
 

@@ -1532,8 +1532,7 @@ INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(
 			listView, LVS_EX_LABELTIP | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
 
 		m_advancedOptionsListViewSubclass = std::make_unique<WindowSubclassWrapper>(listView,
-			std::bind(&OptionsDialog::AdvancedOptionsListViewWndProc, this, std::placeholders::_1,
-				std::placeholders::_2, std::placeholders::_3, std::placeholders::_4),
+			std::bind_front(&OptionsDialog::AdvancedOptionsListViewWndProc, this),
 			ADVANCED_OPTIONS_LISTVIEW_SUBCLASS_ID);
 
 		SendDlgItemMessage(

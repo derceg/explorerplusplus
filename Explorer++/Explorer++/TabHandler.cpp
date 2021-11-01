@@ -26,35 +26,26 @@ void Explorerplusplus::InitializeTabs()
 
 	m_tabContainer = TabContainer::Create(m_hTabBacking, this, this, &m_FileActionHandler,
 		&m_cachedIcons, &m_bookmarkTree, m_hLanguageModule, m_config);
-	m_tabContainer->tabCreatedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabCreated, this,
-													 boost::placeholders::_1,
-													 boost::placeholders::_2),
-		boost::signals2::at_front);
+	m_tabContainer->tabCreatedSignal.AddObserver(
+		std::bind_front(&Explorerplusplus::OnTabCreated, this), boost::signals2::at_front);
 	m_tabContainer->tabNavigationStartedSignal.AddObserver(
-		boost::bind(&Explorerplusplus::OnNavigationStartedStatusBar, this, boost::placeholders::_1,
-			boost::placeholders::_2),
+		std::bind_front(&Explorerplusplus::OnNavigationStartedStatusBar, this),
 		boost::signals2::at_front);
 	m_tabContainer->tabNavigationCommittedSignal.AddObserver(
-		boost::bind(&Explorerplusplus::OnNavigationCommitted, this, boost::placeholders::_1,
-			boost::placeholders::_2, boost::placeholders::_3),
-		boost::signals2::at_front);
+		std::bind_front(&Explorerplusplus::OnNavigationCommitted, this), boost::signals2::at_front);
 	m_tabContainer->tabNavigationCompletedSignal.AddObserver(
-		boost::bind(&Explorerplusplus::OnNavigationCompletedStatusBar, this,
-			boost::placeholders::_1),
+		std::bind_front(&Explorerplusplus::OnNavigationCompletedStatusBar, this),
 		boost::signals2::at_front);
 	m_tabContainer->tabNavigationFailedSignal.AddObserver(
-		boost::bind(&Explorerplusplus::OnNavigationFailedStatusBar, this, boost::placeholders::_1),
+		std::bind_front(&Explorerplusplus::OnNavigationFailedStatusBar, this),
 		boost::signals2::at_front);
 	m_tabContainer->tabSelectedSignal.AddObserver(
-		boost::bind(&Explorerplusplus::OnTabSelected, this, boost::placeholders::_1),
-		boost::signals2::at_front);
+		std::bind_front(&Explorerplusplus::OnTabSelected, this), boost::signals2::at_front);
 
 	m_tabContainer->tabDirectoryModifiedSignal.AddObserver(
-		boost::bind(&Explorerplusplus::OnDirectoryModified, this, boost::placeholders::_1),
-		boost::signals2::at_front);
+		std::bind_front(&Explorerplusplus::OnDirectoryModified, this), boost::signals2::at_front);
 	m_tabContainer->tabListViewSelectionChangedSignal.AddObserver(
-		boost::bind(&Explorerplusplus::OnTabListViewSelectionChanged, this,
-			boost::placeholders::_1),
+		std::bind_front(&Explorerplusplus::OnTabListViewSelectionChanged, this),
 		boost::signals2::at_front);
 
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_tabContainer->GetHWND());

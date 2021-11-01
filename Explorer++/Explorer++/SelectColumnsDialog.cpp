@@ -42,8 +42,7 @@ INT_PTR SelectColumnsDialog::OnInitDialog()
 	auto currentColumns = m_shellBrowser->GetCurrentColumns();
 
 	std::sort(currentColumns.begin(), currentColumns.end(),
-		std::bind(&SelectColumnsDialog::CompareColumns, this, std::placeholders::_1,
-			std::placeholders::_2));
+		std::bind_front(&SelectColumnsDialog::CompareColumns, this));
 
 	int iItem = 0;
 

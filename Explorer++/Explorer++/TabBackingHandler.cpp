@@ -26,7 +26,7 @@ void Explorerplusplus::CreateTabBacking()
 	m_hTabWindowToolbar = CreateTabToolbar(m_hTabBacking, TABTOOLBAR_CLOSE,
 		ResourceHelper::LoadString(m_hLanguageModule, IDS_TAB_CLOSE_TIP));
 
-	AddTabsInitializedObserver(boost::bind(&Explorerplusplus::OnTabsInitialized, this));
+	AddTabsInitializedObserver(std::bind_front(&Explorerplusplus::OnTabsInitialized, this));
 }
 
 void Explorerplusplus::OnTabsInitialized()
@@ -38,8 +38,8 @@ void Explorerplusplus::OnTabsInitialized()
 		UpdateTabToolbar();
 	});
 
-	m_tabContainer->tabUpdatedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabUpdated, this,
-		boost::placeholders::_1, boost::placeholders::_2));
+	m_tabContainer->tabUpdatedSignal.AddObserver(
+		std::bind_front(&Explorerplusplus::OnTabUpdated, this));
 
 	m_tabContainer->tabSelectedSignal.AddObserver([this](const Tab &tab) {
 		UNREFERENCED_PARAMETER(tab);

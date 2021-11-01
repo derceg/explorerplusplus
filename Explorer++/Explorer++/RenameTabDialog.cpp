@@ -20,7 +20,7 @@ RenameTabDialog::RenameTabDialog(
 	m_prtdps = &RenameTabDialogPersistentSettings::GetInstance();
 
 	m_connections.push_back(m_tabContainer->tabRemovedSignal.AddObserver(
-		boost::bind(&RenameTabDialog::OnTabClosed, this, boost::placeholders::_1)));
+		std::bind_front(&RenameTabDialog::OnTabClosed, this)));
 }
 
 INT_PTR RenameTabDialog::OnInitDialog()

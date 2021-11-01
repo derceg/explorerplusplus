@@ -66,20 +66,19 @@ void TaskbarThumbnails::Initialize()
 	SetWindowSubclass(
 		m_expp->GetMainWindow(), MainWndProcStub, 0, reinterpret_cast<DWORD_PTR>(this));
 
-	m_tabContainer->tabCreatedSignal.AddObserver(boost::bind(&TaskbarThumbnails::CreateTabProxy,
-		this, boost::placeholders::_1, boost::placeholders::_2));
+	m_tabContainer->tabCreatedSignal.AddObserver(
+		std::bind_front(&TaskbarThumbnails::CreateTabProxy, this));
 	m_tabContainer->tabNavigationCommittedSignal.AddObserver(
-		boost::bind(&TaskbarThumbnails::OnNavigationCommitted, this, boost::placeholders::_1,
-			boost::placeholders::_2, boost::placeholders::_3));
+		std::bind_front(&TaskbarThumbnails::OnNavigationCommitted, this));
 	m_tabContainer->tabNavigationCompletedSignal.AddObserver(
-		boost::bind(&TaskbarThumbnails::OnNavigationCompleted, this, boost::placeholders::_1));
+		std::bind_front(&TaskbarThumbnails::OnNavigationCompleted, this));
 	m_tabContainer->tabSelectedSignal.AddObserver(
-		boost::bind(&TaskbarThumbnails::OnTabSelectionChanged, this, boost::placeholders::_1));
+		std::bind_front(&TaskbarThumbnails::OnTabSelectionChanged, this));
 	m_tabContainer->tabRemovedSignal.AddObserver(
-		boost::bind(&TaskbarThumbnails::RemoveTabProxy, this, boost::placeholders::_1));
+		std::bind_front(&TaskbarThumbnails::RemoveTabProxy, this));
 
 	m_connections.push_back(m_expp->AddApplicationShuttingDownObserver(
-		std::bind(&TaskbarThumbnails::OnApplicationShuttingDown, this)));
+		std::bind_front(&TaskbarThumbnails::OnApplicationShuttingDown, this)));
 }
 
 LRESULT CALLBACK TaskbarThumbnails::MainWndProcStub(
