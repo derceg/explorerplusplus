@@ -271,7 +271,7 @@ void ShellTreeView::DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAc
 
 	pDirectoryAltered = (DirectoryAltered_t *)pData;
 
-	shellTreeView = (ShellTreeView *)pDirectoryAltered->shellTreeView;
+	shellTreeView = pDirectoryAltered->shellTreeView;
 
 	StringCchCopy(szFullFileName, SIZEOF_ARRAY(szFullFileName), pDirectoryAltered->szPath);
 	if(!PathAppend(szFullFileName, szFileName))
