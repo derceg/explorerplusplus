@@ -747,7 +747,6 @@ void ShellBrowser::RemoveItem(int iItemInternal)
 {
 	ULARGE_INTEGER ulFileSize;
 	LVFINDINFO lvfi;
-	BOOL bFolder;
 	int iItem;
 	int nItems;
 
@@ -755,10 +754,6 @@ void ShellBrowser::RemoveItem(int iItemInternal)
 	{
 		return;
 	}
-
-	/* Is this item a folder? */
-	bFolder = (m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-		== FILE_ATTRIBUTE_DIRECTORY;
 
 	/* Take the file size of the removed file away from the total
 	directory size. */

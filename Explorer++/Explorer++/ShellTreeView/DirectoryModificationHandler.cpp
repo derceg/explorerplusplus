@@ -366,7 +366,6 @@ void ShellTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileNam
 	IShellFolder	*pShellFolder = nullptr;
 	PIDLIST_ABSOLUTE	pidlComplete = nullptr;
 	PCITEMID_CHILD	pidlRelative = nullptr;
-	HTREEITEM		hItem;
 	TVITEMEX		tvItem;
 	TVINSERTSTRUCT	tvis;
 	SHFILEINFO		shfi;
@@ -446,7 +445,7 @@ void ShellTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileNam
 						tvis.hInsertAfter		= DetermineItemSortedPosition(hParent,szFullFileName);
 						tvis.itemex				= tvItem;
 
-						hItem = TreeView_InsertItem(m_hTreeView,&tvis);
+						TreeView_InsertItem(m_hTreeView,&tvis);
 					}
 				}
 
