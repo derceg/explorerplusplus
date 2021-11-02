@@ -60,12 +60,8 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 	(reduces lag when a large number of items are going to be inserted). */
 	SendMessage(m_hListView, WM_SETREDRAW, FALSE, NULL);
 
-	SetActiveColumnSet();
-	SetViewModeInternal(m_folderSettings.viewMode);
-
 	InsertAwaitingItems(FALSE);
 
-	VerifySortMode();
 	SortFolder(m_folderSettings.sortMode);
 
 	ListView_EnsureVisible(m_hListView, 0, FALSE);
@@ -228,6 +224,10 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addH
 	m_directoryState.directory = parsingPath;
 	m_directoryState.virtualFolder = WI_IsFlagClear(attr, SFGAO_FILESYSTEM);
 	m_uniqueFolderId++;
+
+	SetActiveColumnSet();
+	VerifySortMode();
+	SetViewModeInternal(m_folderSettings.viewMode);
 
 	// It makes sense to trigger this here, rather than on navigation completion, since
 	// otherwise requests could still come in for the previous directory.
