@@ -391,20 +391,22 @@ private:
 	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true) override;
 
 	/* Browsing support. */
-	HRESULT EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry);
+	HRESULT EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry,
+		std::vector<ItemInfo_t> &items);
 	void PrepareToChangeFolders();
 	void ClearPendingResults();
 	void ResetFolderState();
 	void StoreCurrentlySelectedItems();
+	void OnEnumerationCompleted(std::vector<ItemInfo_t> &&items);
 	void InsertAwaitingItems(BOOL bInsertIntoGroup);
 	BOOL IsFileFiltered(const ItemInfo_t &itemInfo) const;
 	std::optional<int> AddItemInternal(IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory,
 		PCITEMID_CHILD pidlChild, int itemIndex, BOOL setPosition);
 	int AddItemInternal(int itemIndex, ItemInfo_t itemInfo, BOOL setPosition);
-	std::optional<ItemInfo_t> GetItemInformation(
-		IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild);
-	static HRESULT ExtractFindDataUsingPropertyStore(
-		IShellFolder *shellFolder, PCITEMID_CHILD pidlChild, WIN32_FIND_DATA &output);
+	std::optional<ItemInfo_t> GetItemInformation(IShellFolder *shellFolder,
+		PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild);
+	static HRESULT ExtractFindDataUsingPropertyStore(IShellFolder *shellFolder,
+		PCITEMID_CHILD pidlChild, WIN32_FIND_DATA &output);
 	void SetViewModeInternal(ViewMode viewMode);
 	void SetFirstColumnTextToCallback();
 	void SetFirstColumnTextToFilename();
@@ -456,11 +458,11 @@ private:
 
 	// Listview header context menu
 	void OnListViewHeaderRightClick(const POINTS &cursorPos);
-	void OnListViewHeaderMenuItemSelected(
-		int menuItemId, const std::unordered_map<int, ColumnType> &menuItemMappings);
+	void OnListViewHeaderMenuItemSelected(int menuItemId,
+		const std::unordered_map<int, ColumnType> &menuItemMappings);
 	void OnShowMoreColumnsSelected();
-	void OnColumnMenuItemSelected(
-		int menuItemId, const std::unordered_map<int, ColumnType> &menuItemMappings);
+	void OnColumnMenuItemSelected(int menuItemId,
+		const std::unordered_map<int, ColumnType> &menuItemMappings);
 
 	const ItemInfo_t &GetItemByIndex(int index) const;
 	ItemInfo_t &GetItemByIndex(int index);
@@ -533,17 +535,17 @@ private:
 	std::optional<GroupInfo> DetermineItemSizeGroup(const BasicItemInfo_t &itemInfo) const;
 	std::optional<GroupInfo> DetermineItemTotalSizeGroup(const BasicItemInfo_t &itemInfo) const;
 	std::optional<GroupInfo> DetermineItemTypeGroupVirtual(const BasicItemInfo_t &itemInfo) const;
-	std::optional<GroupInfo> DetermineItemDateGroup(
-		const BasicItemInfo_t &itemInfo, GroupByDateType dateType) const;
+	std::optional<GroupInfo> DetermineItemDateGroup(const BasicItemInfo_t &itemInfo,
+		GroupByDateType dateType) const;
 	std::optional<GroupInfo> DetermineItemSummaryGroup(const BasicItemInfo_t &itemInfo,
 		const SHCOLUMNID *pscid, const GlobalFolderSettings &globalFolderSettings) const;
 	std::optional<GroupInfo> DetermineItemFreeSpaceGroup(const BasicItemInfo_t &itemInfo) const;
 	std::optional<GroupInfo> DetermineItemAttributeGroup(const BasicItemInfo_t &itemInfo) const;
 	std::optional<GroupInfo> DetermineItemOwnerGroup(const BasicItemInfo_t &itemInfo) const;
-	std::optional<GroupInfo> DetermineItemVersionGroup(
-		const BasicItemInfo_t &itemInfo, const TCHAR *szVersionType) const;
-	std::optional<GroupInfo> DetermineItemCameraPropertyGroup(
-		const BasicItemInfo_t &itemInfo, PROPID PropertyId) const;
+	std::optional<GroupInfo> DetermineItemVersionGroup(const BasicItemInfo_t &itemInfo,
+		const TCHAR *szVersionType) const;
+	std::optional<GroupInfo> DetermineItemCameraPropertyGroup(const BasicItemInfo_t &itemInfo,
+		PROPID PropertyId) const;
 	std::optional<GroupInfo> DetermineItemExtensionGroup(const BasicItemInfo_t &itemInfo) const;
 	std::optional<GroupInfo> DetermineItemFileSystemGroup(const BasicItemInfo_t &itemInfo) const;
 	std::optional<GroupInfo> DetermineItemNetworkStatus(const BasicItemInfo_t &itemInfo) const;

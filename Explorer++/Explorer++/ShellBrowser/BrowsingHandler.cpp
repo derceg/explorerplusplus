@@ -41,13 +41,16 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 {
 	SetCursor(LoadCursor(nullptr, IDC_WAIT));
 
-	auto resetCursor = wil::scope_exit([] {
-		SetCursor(LoadCursor(nullptr, IDC_ARROW));
-	});
+	auto resetCursor = wil::scope_exit(
+		[]
+		{
+			SetCursor(LoadCursor(nullptr, IDC_ARROW));
+		});
 
 	m_navigationStartedSignal(pidlDirectory);
 
-	HRESULT hr = EnumerateFolder(pidlDirectory, addHistoryEntry);
+	std::vector<ItemInfo_t> items;
+	HRESULT hr = EnumerateFolder(pidlDirectory, addHistoryEntry, items);
 
 	if (FAILED(hr))
 	{
@@ -55,31 +58,7 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 		return hr;
 	}
 
-	/* Stop the list view from redrawing itself each time is inserted.
-	Redrawing will be allowed once all items have being inserted.
-	(reduces lag when a large number of items are going to be inserted). */
-	SendMessage(m_hListView, WM_SETREDRAW, FALSE, NULL);
-
-	InsertAwaitingItems(FALSE);
-
-	SortFolder(m_folderSettings.sortMode);
-
-	ListView_EnsureVisible(m_hListView, 0, FALSE);
-
-	/* Allow the listview to redraw itself once again. */
-	SendMessage(m_hListView, WM_SETREDRAW, TRUE, NULL);
-
-	if (m_config->registerForShellNotifications)
-	{
-		StartDirectoryMonitoring(pidlDirectory);
-	}
-
-	/* Set the focus back to the first item. */
-	ListView_SetItemState(m_hListView, 0, LVIS_FOCUSED, LVIS_FOCUSED);
-
-	m_bFolderVisited = TRUE;
-
-	m_navigationCompletedSignal(pidlDirectory);
+	OnEnumerationCompleted(std::move(items));
 
 	return hr;
 }
@@ -139,8 +118,8 @@ void ShellBrowser::ResetFolderState()
 		int nItems = ListView_GetItemCount(m_hListView);
 
 		/* Create and set the new imagelist. */
-		HIMAGELIST himl = ImageList_Create(
-			THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT, ILC_COLOR32, nItems, nItems + 100);
+		HIMAGELIST himl = ImageList_Create(THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT, ILC_COLOR32,
+			nItems, nItems + 100);
 		ListView_SetImageList(m_hListView, himl, LVSIL_NORMAL);
 
 		ImageList_Destroy(himlOld);
@@ -168,7 +147,8 @@ void ShellBrowser::StoreCurrentlySelectedItems()
 	entry->SetSelectedItems(selectedItems);
 }
 
-HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)
+HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry,
+	std::vector<ShellBrowser::ItemInfo_t> &items)
 {
 	wil::com_ptr_nothrow<IShellFolder> parent;
 	PCITEMID_CHILD child;
@@ -240,7 +220,12 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addH
 
 	while (enumerator->Next(1, wil::out_param(pidlItem), &numFetched) == S_OK && (numFetched == 1))
 	{
-		AddItemInternal(shellFolder.get(), pidlDirectory, pidlItem.get(), -1, FALSE);
+		auto item = GetItemInformation(shellFolder.get(), pidlDirectory, pidlItem.get());
+
+		if (item)
+		{
+			items.push_back(std::move(*item));
+		}
 	}
 
 	return hr;
@@ -334,8 +319,8 @@ HRESULT ShellBrowser::RegisterShellWindow(PCIDLIST_ABSOLUTE pidl)
 	// case, it's redundant, since IShellWindows::OnNavigate() will be called anyway, which will
 	// supply a pidl, but it appears that that's not enough.
 	// Therefore, that's the only reason this method is called.
-	RETURN_IF_FAILED(m_shellWindows->RegisterPending(
-		GetCurrentThreadId(), &pidlVariant, &empty, SWC_BROWSER, &m_shellWindowCookie));
+	RETURN_IF_FAILED(m_shellWindows->RegisterPending(GetCurrentThreadId(), &pidlVariant, &empty,
+		SWC_BROWSER, &m_shellWindowCookie));
 
 	auto document = winrt::make_self<DocumentServiceProvider>();
 	auto shellView = winrt::make_self<ShellView>(weak_from_this(), m_tabNavigation, true);
@@ -360,8 +345,8 @@ HRESULT ShellBrowser::RegisterShellWindow(PCIDLIST_ABSOLUTE pidl)
 #pragma warning(                                                                                   \
 	disable : 4311 4302) // 'reinterpret_cast': pointer truncation from 'HWND' to 'long',
 						 // 'reinterpret_cast': truncation from 'HWND' to 'long'
-	RETURN_IF_FAILED(m_shellWindows->Register(
-		browserApp.get(), reinterpret_cast<long>(m_hOwner), SWC_BROWSER, &registeredCookie));
+	RETURN_IF_FAILED(m_shellWindows->Register(browserApp.get(), reinterpret_cast<long>(m_hOwner),
+		SWC_BROWSER, &registeredCookie));
 #pragma warning(pop)
 
 	// The call to RegisterPending() above is passed the thread ID. The call to Register() will use
@@ -411,8 +396,8 @@ int ShellBrowser::AddItemInternal(int itemIndex, ItemInfo_t itemInfo, BOOL setPo
 	return itemId;
 }
 
-std::optional<ShellBrowser::ItemInfo_t> ShellBrowser::GetItemInformation(
-	IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild)
+std::optional<ShellBrowser::ItemInfo_t> ShellBrowser::GetItemInformation(IShellFolder *shellFolder,
+	PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild)
 {
 	ItemInfo_t itemInfo;
 
@@ -503,8 +488,8 @@ std::optional<ShellBrowser::ItemInfo_t> ShellBrowser::GetItemInformation(
 	}
 	else
 	{
-		StringCchCopy(
-			itemInfo.wfd.cFileName, SIZEOF_ARRAY(itemInfo.wfd.cFileName), displayName.c_str());
+		StringCchCopy(itemInfo.wfd.cFileName, SIZEOF_ARRAY(itemInfo.wfd.cFileName),
+			displayName.c_str());
 
 		if (WI_IsFlagSet(attributes, SFGAO_FOLDER))
 		{
@@ -515,8 +500,8 @@ std::optional<ShellBrowser::ItemInfo_t> ShellBrowser::GetItemInformation(
 	return std::move(itemInfo);
 }
 
-HRESULT ShellBrowser::ExtractFindDataUsingPropertyStore(
-	IShellFolder *shellFolder, PCITEMID_CHILD pidlChild, WIN32_FIND_DATA &output)
+HRESULT ShellBrowser::ExtractFindDataUsingPropertyStore(IShellFolder *shellFolder,
+	PCITEMID_CHILD pidlChild, WIN32_FIND_DATA &output)
 {
 	wil::com_ptr_nothrow<IPropertyStoreFactory> factory;
 	HRESULT hr = shellFolder->BindToObject(pidlChild, nullptr, IID_PPV_ARGS(&factory));
@@ -528,8 +513,8 @@ HRESULT ShellBrowser::ExtractFindDataUsingPropertyStore(
 
 	wil::com_ptr_nothrow<IPropertyStore> store;
 	PROPERTYKEY keys[] = { PKEY_FindData };
-	hr = factory->GetPropertyStoreForKeys(
-		keys, SIZEOF_ARRAY(keys), GPS_FASTPROPERTIESONLY, IID_PPV_ARGS(&store));
+	hr = factory->GetPropertyStoreForKeys(keys, SIZEOF_ARRAY(keys), GPS_FASTPROPERTIESONLY,
+		IID_PPV_ARGS(&store));
 
 	if (FAILED(hr))
 	{
@@ -560,6 +545,40 @@ HRESULT ShellBrowser::ExtractFindDataUsingPropertyStore(
 	output = wfd;
 
 	return hr;
+}
+
+void ShellBrowser::OnEnumerationCompleted(std::vector<ShellBrowser::ItemInfo_t> &&items)
+{
+	for (auto &item : items)
+	{
+		AddItemInternal(-1, std::move(item), FALSE);
+	}
+
+	/* Stop the list view from redrawing itself each time is inserted.
+	Redrawing will be allowed once all items have being inserted.
+	(reduces lag when a large number of items are going to be inserted). */
+	SendMessage(m_hListView, WM_SETREDRAW, FALSE, NULL);
+
+	InsertAwaitingItems(FALSE);
+
+	SortFolder(m_folderSettings.sortMode);
+
+	ListView_EnsureVisible(m_hListView, 0, FALSE);
+
+	/* Allow the listview to redraw itself once again. */
+	SendMessage(m_hListView, WM_SETREDRAW, TRUE, NULL);
+
+	/* Set the focus back to the first item. */
+	ListView_SetItemState(m_hListView, 0, LVIS_FOCUSED, LVIS_FOCUSED);
+
+	if (m_config->registerForShellNotifications)
+	{
+		StartDirectoryMonitoring(m_directoryState.pidlDirectory.get());
+	}
+
+	m_bFolderVisited = TRUE;
+
+	m_navigationCompletedSignal(m_directoryState.pidlDirectory.get());
 }
 
 void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
