@@ -39,7 +39,7 @@ void CustomGripper::Initialize(HWND mainWindow, COLORREF backgroundColor)
 	wc.hbrBackground = CreateSolidBrush(backgroundColor);
 	wc.lpszMenuName = nullptr;
 	wc.lpszClassName = CLASS_NAME;
-	const ATOM res = RegisterClass(&wc);
+	[[maybe_unused]] const ATOM res = RegisterClass(&wc);
 	assert(res);
 
 	g_isAppThemed = IsAppThemed();
