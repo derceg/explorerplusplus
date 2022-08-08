@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29418.71
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++", "Explorer++\Explorer++.vcxproj", "{7544A240-2EBF-4DC1-B55B-C8AE32672ED0}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -76,6 +76,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++VI", "..\Translations\Explorer++VI\Explorer++VI.vcxproj", "{D480B32C-BDF2-4364-92C9-2A0E446AE9CD}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++ZH_TW", "..\Translations\Explorer++ZH_TW\Explorer++ZH_TW.vcxproj", "{C76E8EF4-B0BD-4B8A-87BF-09F4CD129D7B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++PT_BR", "..\Translations\Explorer++PT_BR\Explorer++PT_BR.vcxproj", "{EA5B918A-CE1E-4E03-81A7-C9E7A590627C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -425,6 +427,16 @@ Global
 		{C76E8EF4-B0BD-4B8A-87BF-09F4CD129D7B}.Release|x64.Build.0 = Release|Win32
 		{C76E8EF4-B0BD-4B8A-87BF-09F4CD129D7B}.Test|Win32.ActiveCfg = Release|Win32
 		{C76E8EF4-B0BD-4B8A-87BF-09F4CD129D7B}.Test|x64.ActiveCfg = Release|Win32
+		{EA5B918A-CE1E-4E03-81A7-C9E7A590627C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EA5B918A-CE1E-4E03-81A7-C9E7A590627C}.Debug|x64.ActiveCfg = Debug|Win32
+		{EA5B918A-CE1E-4E03-81A7-C9E7A590627C}.Debug-LLVM|Win32.ActiveCfg = Debug|Win32
+		{EA5B918A-CE1E-4E03-81A7-C9E7A590627C}.Debug-LLVM|x64.ActiveCfg = Debug|Win32
+		{EA5B918A-CE1E-4E03-81A7-C9E7A590627C}.Release|Win32.ActiveCfg = Release|Win32
+		{EA5B918A-CE1E-4E03-81A7-C9E7A590627C}.Release|Win32.Build.0 = Release|Win32
+		{EA5B918A-CE1E-4E03-81A7-C9E7A590627C}.Release|x64.ActiveCfg = Release|Win32
+		{EA5B918A-CE1E-4E03-81A7-C9E7A590627C}.Release|x64.Build.0 = Release|Win32
+		{EA5B918A-CE1E-4E03-81A7-C9E7A590627C}.Test|Win32.ActiveCfg = Debug|Win32
+		{EA5B918A-CE1E-4E03-81A7-C9E7A590627C}.Test|x64.ActiveCfg = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -456,6 +468,7 @@ Global
 		{41047779-715C-4018-B21C-2AEAD581E54D} = {F29F24CD-0668-462F-80AE-649CB12F1860}
 		{D480B32C-BDF2-4364-92C9-2A0E446AE9CD} = {F29F24CD-0668-462F-80AE-649CB12F1860}
 		{C76E8EF4-B0BD-4B8A-87BF-09F4CD129D7B} = {F29F24CD-0668-462F-80AE-649CB12F1860}
+		{EA5B918A-CE1E-4E03-81A7-C9E7A590627C} = {F29F24CD-0668-462F-80AE-649CB12F1860}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {504CEF86-1D85-4DF5-84B2-ECA032747EC4}
