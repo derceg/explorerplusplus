@@ -374,6 +374,21 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 		bWindowPosLoaded = LoadWindowPositionFromRegistry(&wndpl);
 	}
 
+	if (bWindowPosLoaded)
+	{
+		// When shown in its normal size, the window for the application should at least be on
+		// screen somewhere, even if it's not completely visible. Therefore, the position should be
+		// reset if the window won't be visible on any monitor.
+		// Checking this on startup makes sense, since the monitor setup can change in between
+		// executions.
+		HMONITOR monitor = MonitorFromRect(&wndpl.rcNormalPosition, MONITOR_DEFAULTTONULL);
+
+		if (!monitor)
+		{
+			bWindowPosLoaded = FALSE;
+		}
+	}
+
 	/* If no window position was loaded, use
 	the default position. */
 	if(!bWindowPosLoaded)
