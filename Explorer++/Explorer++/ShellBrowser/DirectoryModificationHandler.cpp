@@ -371,12 +371,31 @@ void ShellBrowser::OnItemRemoved(PCIDLIST_ABSOLUTE pidl)
 
 void ShellBrowser::OnFileRemoved(const TCHAR *szFileName)
 {
-	int iItemInternal = LocateFileItemInternalIndex(szFileName);
+	wil::com_ptr_nothrow<IShellFolder> parent;
+	HRESULT hr = SHBindToObject(nullptr, m_directoryState.pidlDirectory.get(), nullptr,
+		IID_PPV_ARGS(&parent));
 
-	if (iItemInternal != -1)
+	if (FAILED(hr))
 	{
-		RemoveItem(iItemInternal);
+		return;
 	}
+
+	unique_pidl_absolute pidl;
+	hr = CreateSimplePidl(szFileName, wil::out_param(pidl), parent.get());
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	auto internalIndex = GetItemInternalIndexForPidl(pidl.get());
+
+	if (!internalIndex)
+	{
+		return;
+	}
+
+	RemoveItem(*internalIndex);
 }
 
 void ShellBrowser::OnFileModified(const TCHAR *fileName)
