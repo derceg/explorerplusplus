@@ -681,6 +681,7 @@ private:
 
 	/* Directory monitoring. */
 	ULONG m_shChangeNotifyId;
+	std::optional<std::wstring> m_renamedFileOldName;
 
 	wil::com_ptr_nothrow<IShellFolder> m_desktopFolder;
 	unique_pidl_absolute m_recycleBinPidl;

@@ -132,6 +132,8 @@ void ShellBrowser::ResetFolderState()
 	LeaveCriticalSection(&m_csDirectoryAltered);
 
 	m_itemInfoMap.clear();
+
+	m_renamedFileOldName.reset();
 }
 
 void ShellBrowser::StoreCurrentlySelectedItems()

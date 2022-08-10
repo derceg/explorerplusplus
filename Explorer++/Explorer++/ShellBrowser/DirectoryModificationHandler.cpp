@@ -14,8 +14,6 @@
 #include "../Helper/ShellHelper.h"
 #include <list>
 
-int g_iRenamedItem = -1;
-
 void ShellBrowser::StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl)
 {
 	SHChangeNotifyEntry shcne;
@@ -514,11 +512,21 @@ void ShellBrowser::OnItemRenamed(PCIDLIST_ABSOLUTE pidlOld, PCIDLIST_ABSOLUTE pi
 
 void ShellBrowser::OnFileRenamedOldName(const TCHAR *szFileName)
 {
-	g_iRenamedItem = -1;
+	assert(!m_renamedFileOldName);
+	m_renamedFileOldName = szFileName;
+}
+
+void ShellBrowser::OnFileRenamedNewName(const TCHAR *szFileName)
+{
+	auto resetOldName = wil::scope_exit(
+		[this]
+		{
+			m_renamedFileOldName.reset();
+		});
 
 	wil::com_ptr_nothrow<IShellFolder> parent;
-	HRESULT hr = SHBindToObject(
-		nullptr, m_directoryState.pidlDirectory.get(), nullptr, IID_PPV_ARGS(&parent));
+	HRESULT hr = SHBindToObject(nullptr, m_directoryState.pidlDirectory.get(), nullptr,
+		IID_PPV_ARGS(&parent));
 
 	if (FAILED(hr))
 	{
@@ -526,29 +534,18 @@ void ShellBrowser::OnFileRenamedOldName(const TCHAR *szFileName)
 	}
 
 	unique_pidl_absolute pidl;
-	hr = CreateSimplePidl(szFileName, wil::out_param(pidl), parent.get());
+	hr = CreateSimplePidl(*m_renamedFileOldName, wil::out_param(pidl), parent.get());
 
 	if (FAILED(hr))
 	{
 		return;
 	}
 
-	/* Find the index of the item that was renamed...
-	Store the index so that it is known which item needs
-	renaming when the files new name is received. */
 	auto internalIndex = GetItemInternalIndexForPidl(pidl.get());
 
 	if (internalIndex)
 	{
-		g_iRenamedItem = *internalIndex;
-	}
-}
-
-void ShellBrowser::OnFileRenamedNewName(const TCHAR *szFileName)
-{
-	if (g_iRenamedItem != -1)
-	{
-		RenameItem(g_iRenamedItem, szFileName);
+		RenameItem(*internalIndex, szFileName);
 	}
 	else
 	{
@@ -558,11 +555,6 @@ void ShellBrowser::OnFileRenamedNewName(const TCHAR *szFileName)
 
 void ShellBrowser::RenameItem(int internalIndex, const TCHAR *szNewFileName)
 {
-	if (internalIndex == -1)
-	{
-		return;
-	}
-
 	TCHAR fullFileName[MAX_PATH];
 	StringCchCopy(fullFileName, SIZEOF_ARRAY(fullFileName), m_directoryState.directory.c_str());
 	PathAppend(fullFileName, szNewFileName);
