@@ -270,6 +270,19 @@ void ShellBrowser::FilesModified(DWORD Action, const TCHAR *FileName, int EventI
 
 void ShellBrowser::OnItemAdded(PCIDLIST_ABSOLUTE simplePidl)
 {
+	auto existingItemInternalIndex = GetItemInternalIndexForPidl(simplePidl);
+
+	// When adding an item, it makes no sense to add it if it already exists. If the item does
+	// exist, it's an indication of a programming error. That is, it's not expected that this would
+	// happen at all during normal use.
+	// Silently returning here is about the only thing that can be reasonably done and at least
+	// prevents duplicate items from being added.
+	if (existingItemInternalIndex)
+	{
+		assert(false);
+		return;
+	}
+
 	unique_pidl_absolute pidlFull;
 	HRESULT hr = SimplePidlToFullPidl(simplePidl, wil::out_param(pidlFull));
 
