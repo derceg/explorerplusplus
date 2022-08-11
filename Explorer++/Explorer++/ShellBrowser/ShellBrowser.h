@@ -503,9 +503,8 @@ private:
 	void RemoveItem(int iItemInternal);
 	void OnItemRemoved(PCIDLIST_ABSOLUTE simplePidl);
 	void OnItemModified(PCIDLIST_ABSOLUTE simplePidl);
-	void ModifyItem(PCIDLIST_ABSOLUTE pidl);
+	void UpdateItem(PCIDLIST_ABSOLUTE pidl, PCIDLIST_ABSOLUTE updatedPidl = nullptr);
 	void OnItemRenamed(PCIDLIST_ABSOLUTE simplePidlOld, PCIDLIST_ABSOLUTE simplePidlNew);
-	void RenameItem(int internalIndex, PCIDLIST_ABSOLUTE pidlNew);
 	void InvalidateAllColumnsForItem(int itemIndex);
 	void InvalidateIconForItem(int itemIndex);
 	int DetermineItemSortedPosition(LPARAM lParam) const;

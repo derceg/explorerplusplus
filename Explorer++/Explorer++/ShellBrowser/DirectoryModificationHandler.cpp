@@ -369,11 +369,21 @@ void ShellBrowser::OnItemModified(PCIDLIST_ABSOLUTE simplePidl)
 	// rename/deletion notification is likely to be processed soon).
 	if (SUCCEEDED(hr))
 	{
-		ModifyItem(pidlFull.get());
+		UpdateItem(pidlFull.get());
 	}
 }
 
-void ShellBrowser::ModifyItem(PCIDLIST_ABSOLUTE pidl)
+// Handles both renames and modifications, since they're effectively the same thing. When a rename
+// notification is processed and the updated item details are retrieved, other changes to the item
+// could have been made as well. For example, the item's size could have changed since the rename
+// notification was dispatched. So it makes sense to treat the item as if it has been updated.
+// Additionally, if an item has been updated, then immediately renamed, the update notification
+// might get ignored (since the item no longer exists with its original name). In that case, the
+// item's details would have to be updated when the rename notification was processed.
+// When an item is modified, the name shouldn't change, so that does mean that there is at least one
+// difference between the two update types. However, handling both updates in a single method is
+// better than having two very similar methods.
+void ShellBrowser::UpdateItem(PCIDLIST_ABSOLUTE pidl, PCIDLIST_ABSOLUTE updatedPidl)
 {
 	auto internalIndex = GetItemInternalIndexForPidl(pidl);
 
@@ -382,9 +392,16 @@ void ShellBrowser::ModifyItem(PCIDLIST_ABSOLUTE pidl)
 		return;
 	}
 
+	PCIDLIST_ABSOLUTE currentPidl = pidl;
+
+	if (updatedPidl)
+	{
+		currentPidl = updatedPidl;
+	}
+
 	wil::com_ptr_nothrow<IShellFolder> shellFolder;
 	PCITEMID_CHILD pidlChild = nullptr;
-	HRESULT hr = SHBindToParent(pidl, IID_PPV_ARGS(&shellFolder), &pidlChild);
+	HRESULT hr = SHBindToParent(currentPidl, IID_PPV_ARGS(&shellFolder), &pidlChild);
 
 	if (FAILED(hr))
 	{
@@ -410,8 +427,14 @@ void ShellBrowser::ModifyItem(PCIDLIST_ABSOLUTE pidl)
 
 	auto itemIndex = LocateItemByInternalIndex(*internalIndex);
 
+	// Items may be filtered out of the listview, so it's valid for an item not to be found.
 	if (!itemIndex)
 	{
+		if (!IsFileFiltered(updatedItemInfo))
+		{
+			UnfilterItem(*internalIndex);
+		}
+
 		return;
 	}
 
@@ -433,6 +456,12 @@ void ShellBrowser::ModifyItem(PCIDLIST_ABSOLUTE pidl)
 	if (m_folderSettings.viewMode == +ViewMode::Details)
 	{
 		InvalidateAllColumnsForItem(*itemIndex);
+	}
+	else if (updatedPidl)
+	{
+		BasicItemInfo_t basicItemInfo = getBasicItemInfo(*internalIndex);
+		std::wstring filename = ProcessItemFileName(basicItemInfo, m_config->globalFolderSettings);
+		ListView_SetItemText(m_hListView, *itemIndex, 0, filename.data());
 	}
 
 	if (WI_IsFlagSet(updatedItemInfo.wfd.dwFileAttributes, FILE_ATTRIBUTE_HIDDEN))
@@ -482,79 +511,7 @@ void ShellBrowser::OnItemRenamed(PCIDLIST_ABSOLUTE simplePidlOld, PCIDLIST_ABSOL
 		pidlNew = simplePidlNew;
 	}
 
-	auto internalIndex = GetItemInternalIndexForPidl(simplePidlOld);
-
-	if (internalIndex)
-	{
-		RenameItem(*internalIndex, pidlNew);
-	}
-}
-
-void ShellBrowser::RenameItem(int internalIndex, PCIDLIST_ABSOLUTE pidlNew)
-{
-	wil::com_ptr_nothrow<IShellFolder> shellFolder;
-	PCITEMID_CHILD pidlChild = nullptr;
-	HRESULT hr = SHBindToParent(pidlNew, IID_PPV_ARGS(&shellFolder), &pidlChild);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	auto itemInfo =
-		GetItemInformation(shellFolder.get(), m_directoryState.pidlDirectory.get(), pidlChild);
-
-	if (!itemInfo)
-	{
-		return;
-	}
-
-	m_itemInfoMap[internalIndex] = std::move(*itemInfo);
-	const ItemInfo_t &updatedItemInfo = m_itemInfoMap[internalIndex];
-
-	auto itemIndex = LocateItemByInternalIndex(internalIndex);
-
-	// Items may be filtered out of the listview, so it's valid for an item not to be found.
-	if (!itemIndex)
-	{
-		if (!IsFileFiltered(updatedItemInfo))
-		{
-			UnfilterItem(internalIndex);
-		}
-
-		return;
-	}
-
-	if (IsFileFiltered(updatedItemInfo))
-	{
-		RemoveFilteredItem(*itemIndex, internalIndex);
-		return;
-	}
-
-	InvalidateIconForItem(*itemIndex);
-
-	if (m_folderSettings.viewMode == +ViewMode::Details)
-	{
-		// Although only the item name has changed, other columns might need to be updated as well
-		// (e.g. type, extension, 8.3 name). Therefore, all columns will be invalidated here.
-		// Note that this is more efficient than simply queuing tasks to set the text for each
-		// column, since that won't be necessary if the item isn't currently visible.
-		InvalidateAllColumnsForItem(*itemIndex);
-	}
-	else
-	{
-		BasicItemInfo_t basicItemInfo = getBasicItemInfo(internalIndex);
-		std::wstring filename = ProcessItemFileName(basicItemInfo, m_config->globalFolderSettings);
-		ListView_SetItemText(m_hListView, *itemIndex, 0, filename.data());
-	}
-
-	ListView_SortItems(m_hListView, SortStub, this);
-
-	if (m_folderSettings.showInGroups)
-	{
-		int groupId = DetermineItemGroup(internalIndex);
-		InsertItemIntoGroup(*itemIndex, groupId);
-	}
+	UpdateItem(simplePidlOld, pidlNew);
 }
 
 void ShellBrowser::InvalidateAllColumnsForItem(int itemIndex)
