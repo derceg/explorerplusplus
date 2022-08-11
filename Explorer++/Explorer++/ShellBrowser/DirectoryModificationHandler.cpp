@@ -133,29 +133,15 @@ void ShellBrowser::DirectoryAltered()
 
 	SendMessage(m_hListView, WM_SETREDRAW, FALSE, NULL);
 
-	/* Potential problem:
-	After a file is created, it may be renamed shortly afterwards.
-	If the rename occurs before the file is added here, the
-	addition won't be registered (since technically, the file
-	does not exist), and the rename operation will not take place.
-	Adding an item that does not exist will corrupt the programs
-	state.
-
-	Solution:
-	If a file does not exist when adding it, temporarily remember
-	its filename. On the next rename operation, if the renamed
-	file matches the name of the added file, add the file in-place
-	with its new name.
-	The operation should NOT be queued, as it is possible that
-	other actions for the file will take place before the addition,
-	which will again result in an incorrect state.
-	*/
+	// Note that directory change notifications are received asynchronously. That means that, in
+	// each of the cases below, it's not reasonable to assume that the file being referenced
+	// actually exists (since it may have been renamed or deleted since the original notification
+	// was sent).
 	for (const auto &af : m_AlteredList)
 	{
-		/* Only undertake the modification if the unique folder
-		index on the modified item and current folder match up
-		(i.e. ensure the directory has not changed since these
-		files were modified). */
+		// Only undertake the modification if the unique folder index on the modified item and
+		// current folder match up (i.e. ensure the directory has not changed since these files were
+		// modified).
 		if (af.iFolderIndex != m_uniqueFolderId)
 		{
 			continue;
@@ -287,10 +273,25 @@ void ShellBrowser::OnItemAdded(PCIDLIST_ABSOLUTE simplePidl)
 	unique_pidl_absolute pidlFull;
 	HRESULT hr = SimplePidlToFullPidl(simplePidl, wil::out_param(pidlFull));
 
+	PCIDLIST_ABSOLUTE pidl;
+
+	// The item being referenced may not exist at this point, so it's valid for SimplePidlToFullPidl
+	// to fail. In that case, the simple PIDL will be used instead. The issue with that is that the
+	// WIN32_FIND_DATA information cached in the simple PIDL won't be valid. However, that's likely
+	// ok.
+	// The reason for that is that if this item has been renamed or deleted, the notification for
+	// the rename/deletion is likely to be processed soon, so that there would be no practical
+	// chance for the user to notice that the item details are wrong.
 	if (SUCCEEDED(hr))
 	{
-		AddItem(pidlFull.get());
+		pidl = pidlFull.get();
 	}
+	else
+	{
+		pidl = simplePidl;
+	}
+
+	AddItem(pidl);
 }
 
 void ShellBrowser::AddItem(PCIDLIST_ABSOLUTE pidl)
@@ -362,6 +363,10 @@ void ShellBrowser::OnItemModified(PCIDLIST_ABSOLUTE simplePidl)
 	unique_pidl_absolute pidlFull;
 	HRESULT hr = SimplePidlToFullPidl(simplePidl, wil::out_param(pidlFull));
 
+	// SimplePidlToFullPidl may fail if this item no longer exists. However, there's nothing that
+	// can be done in that case. Leaving the previous details in place until the rename/deletion
+	// notification is received is ok and unlikely to actually be noticed by the user (since the
+	// rename/deletion notification is likely to be processed soon).
 	if (SUCCEEDED(hr))
 	{
 		ModifyItem(pidlFull.get());
@@ -456,23 +461,32 @@ void ShellBrowser::OnItemRenamed(PCIDLIST_ABSOLUTE simplePidlOld, PCIDLIST_ABSOL
 	unique_pidl_absolute pidlNewFull;
 	HRESULT hr = SimplePidlToFullPidl(simplePidlNew, wil::out_param(pidlNewFull));
 
-	if (FAILED(hr))
+	PCIDLIST_ABSOLUTE pidlNew;
+
+	// As with the above cases, it's valid for SimplePidlToFullPidl to fail, since the item may no
+	// longer exist with the new name. Updating the item details anyway should be ok, for two
+	// reasons.
+	// The first is that, as when adding an item, the rename/deletion notification is likely to be
+	// received soon, so there's not much practical chance for the user to notice that the item has
+	// invalid details.
+	// The second is that even if there was enough time for the user to notice the details were
+	// invalid, they would also be invalid if the original details were left in place. That is,
+	// attempting to show information on the item, based on its previous name, is going to fail as
+	// well.
+	if (SUCCEEDED(hr))
 	{
-		return;
+		pidlNew = pidlNewFull.get();
+	}
+	else
+	{
+		pidlNew = simplePidlNew;
 	}
 
 	auto internalIndex = GetItemInternalIndexForPidl(simplePidlOld);
 
 	if (internalIndex)
 	{
-		RenameItem(*internalIndex, pidlNewFull.get());
-	}
-	else
-	{
-		// This can happen if an item was added, then immediately renamed. In that case, attempting
-		// to add the new item would fail (since it no longer exists). Since the new name has now
-		// been received, the item can be added.
-		AddItem(simplePidlNew);
+		RenameItem(*internalIndex, pidlNew);
 	}
 }
 
