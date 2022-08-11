@@ -463,7 +463,23 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo)
 		return FALSE;
 	}
 
-	return TRUE;
+	// TODO: This entire method should be moved into the ShellBrowser class and it should handle
+	// rename updates itself.
+	// When an item is changed in any way, a notification will be sent. However, that notification
+	// isn't going to be received immediately. In the case where the user has renamed an item, that
+	// creates a period of time where the updated name is shown, but the item still internally
+	// refers to the original name. That then means that attempting to opening the item (or interact
+	// with it more generally) will fail, since the item no longer exists with the original name.
+	// Performing an immediate update here means that the user can continue to interact with the
+	// item, without having to wait for the rename notification to be processed.
+	unique_pidl_absolute directoryPidl = m_pActiveShellBrowser->GetDirectoryIdl();
+	unique_pidl_absolute pidlNew(ILCombine(directoryPidl.get(), newChild.get()));
+	m_pActiveShellBrowser->UserRenamedItem(pidl.get(), pidlNew.get());
+
+	// The text will be set by ShellBrowser::UserRenamedItem. It's not safe to return true here,
+	// since items can sorted by ShellBrowser::UserRenamedItem, which can result in the index of
+	// this item being changed.
+	return FALSE;
 }
 
 void Explorerplusplus::OnListViewRClick(POINT *pCursorPos)

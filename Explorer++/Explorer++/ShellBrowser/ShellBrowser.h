@@ -175,6 +175,8 @@ public:
 
 	void OnGridlinesSettingChanged();
 
+	void UserRenamedItem(PCIDLIST_ABSOLUTE pidlOld, PCIDLIST_ABSOLUTE pidlNew);
+
 	// Signals
 	SignalWrapper<ShellBrowser, void()> directoryModified;
 	SignalWrapper<ShellBrowser, void()> listViewSelectionChanged;

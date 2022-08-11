@@ -1467,3 +1467,8 @@ void ShellBrowser::OnApplicationShuttingDown()
 		OleFlushClipboard();
 	}
 }
+
+void ShellBrowser::UserRenamedItem(PCIDLIST_ABSOLUTE pidlOld, PCIDLIST_ABSOLUTE pidlNew)
+{
+	UpdateItem(pidlOld, pidlNew);
+}

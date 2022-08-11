@@ -402,6 +402,10 @@ void ShellBrowser::UpdateItem(PCIDLIST_ABSOLUTE pidl, PCIDLIST_ABSOLUTE updatedP
 
 	if (!internalIndex)
 	{
+		// When the user renames an item in the listview, the item details will be updated
+		// immediately. That means that when the rename notification is received, the old item will
+		// no longer exist and won't be found. In that case, though, the new item should exist.
+		assert(!updatedPidl || GetItemInternalIndexForPidl(updatedPidl));
 		return;
 	}
 
