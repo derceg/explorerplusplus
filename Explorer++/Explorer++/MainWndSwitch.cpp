@@ -1099,7 +1099,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		break;
 
 	case IDM_VIEW_AUTOSIZECOLUMNS:
-		OnAutoSizeColumns();
+		m_pActiveShellBrowser->AutoSizeColumns();
 		break;
 
 	case IDM_VIEW_SAVECOLUMNLAYOUTASDEFAULT:

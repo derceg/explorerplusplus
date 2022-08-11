@@ -677,23 +677,6 @@ void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
 	SendMessage(m_hContainer, WM_SIZE, SIZE_RESTORED, MAKELPARAM(rc.right, rc.bottom));
 }
 
-/*
- * Sizes all columns in the active listview
- * based on their text.
- */
-void Explorerplusplus::OnAutoSizeColumns()
-{
-	size_t nColumns;
-	UINT iCol = 0;
-
-	nColumns = m_pActiveShellBrowser->GetNumActiveColumns();
-
-	for (iCol = 0; iCol < nColumns; iCol++)
-	{
-		ListView_SetColumnWidth(m_hActiveListView, iCol, LVSCW_AUTOSIZE);
-	}
-}
-
 /* Cycle through the current views. */
 void Explorerplusplus::OnToolbarViews()
 {

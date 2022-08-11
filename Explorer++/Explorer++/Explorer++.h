@@ -217,7 +217,6 @@ private:
 	void OnShowHiddenFiles();
 	void OnRefresh();
 	void OnSelectColumns();
-	void OnAutoSizeColumns();
 	void OnCreateNewFolder();
 	void OnMergeFiles();
 	void OnSplitFile();

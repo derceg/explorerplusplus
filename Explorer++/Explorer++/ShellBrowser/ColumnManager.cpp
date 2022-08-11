@@ -877,11 +877,6 @@ void ShellBrowser::ApplyHeaderSortArrow()
 	Header_SetItem(hHeader, iColumn, &hdItem);
 }
 
-size_t ShellBrowser::GetNumActiveColumns() const
-{
-	return m_pActiveColumns->size();
-}
-
 void ShellBrowser::ImportAllColumns(const FolderColumns &folderColumns)
 {
 	m_folderColumns = folderColumns;

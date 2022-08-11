@@ -1084,3 +1084,24 @@ HRESULT ShellBrowser::StartDrag(int draggedItem, const POINT &startPoint)
 
 	return hr;
 }
+
+void ShellBrowser::AutoSizeColumns()
+{
+	if (m_folderSettings.viewMode != +ViewMode::Details)
+	{
+		return;
+	}
+
+	HWND header = ListView_GetHeader(m_hListView);
+	int numColumns = Header_GetItemCount(header);
+
+	if (numColumns == -1)
+	{
+		return;
+	}
+
+	for (int i = 0; i < numColumns; i++)
+	{
+		ListView_SetColumnWidth(m_hListView, i, LVSCW_AUTOSIZE);
+	}
+}

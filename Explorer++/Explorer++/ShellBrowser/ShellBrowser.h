@@ -166,16 +166,14 @@ public:
 	int CALLBACK SortTemporary(LPARAM lParam1, LPARAM lParam2);
 
 	std::vector<SortMode> GetAvailableSortModes() const;
-	size_t GetNumActiveColumns() const;
 	void ImportAllColumns(const FolderColumns &folderColumns);
 	FolderColumns ExportAllColumns();
 	void QueueRename(PCIDLIST_ABSOLUTE pidlItem);
 	void SelectItems(const std::list<std::wstring> &PastedFileList);
 	void OnDeviceChange(WPARAM wParam, LPARAM lParam);
-
 	void OnGridlinesSettingChanged();
-
 	void UserRenamedItem(PCIDLIST_ABSOLUTE pidlOld, PCIDLIST_ABSOLUTE pidlNew);
+	void AutoSizeColumns();
 
 	// Signals
 	SignalWrapper<ShellBrowser, void()> directoryModified;
