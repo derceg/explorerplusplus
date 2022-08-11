@@ -1120,7 +1120,13 @@ void ShellBrowser::OnDeviceChange(WPARAM wParam, LPARAM lParam)
 				}
 				else
 				{
-					OnFileAdded(szDrive);
+					unique_pidl_absolute simplePidl;
+					HRESULT hr = CreateSimplePidl(szDrive, wil::out_param(simplePidl));
+
+					if (SUCCEEDED(hr))
+					{
+						OnItemAdded(simplePidl.get());
+					}
 				}
 			}
 		}

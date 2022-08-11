@@ -50,8 +50,8 @@ void ShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)
 {
 	PIDLIST_ABSOLUTE *pidls;
 	LONG event;
-	HANDLE lock = SHChangeNotification_Lock(
-		reinterpret_cast<HANDLE>(wParam), static_cast<DWORD>(lParam), &pidls, &event);
+	HANDLE lock = SHChangeNotification_Lock(reinterpret_cast<HANDLE>(wParam),
+		static_cast<DWORD>(lParam), &pidls, &event);
 
 	m_directoryState.shellChangeNotifications.emplace_back(event, pidls[0], pidls[1]);
 
@@ -86,7 +86,7 @@ void ShellBrowser::ProcessShellChangeNotification(const ShellChangeNotification 
 	case SHCNE_CREATE:
 		if (ILIsParent(m_directoryState.pidlDirectory.get(), change.pidl1.get(), TRUE))
 		{
-			AddItem(change.pidl1.get());
+			OnItemAdded(change.pidl1.get());
 		}
 		break;
 
@@ -95,32 +95,14 @@ void ShellBrowser::ProcessShellChangeNotification(const ShellChangeNotification 
 		if (ILIsParent(m_directoryState.pidlDirectory.get(), change.pidl1.get(), TRUE)
 			&& ILIsParent(m_directoryState.pidlDirectory.get(), change.pidl2.get(), TRUE))
 		{
-			// The pidls provided to these change notifications are always simple pidls. When an
-			// item is updated, the WIN32_FIND_DATA information cached in the pidl will be
-			// retrieved. As the simple pidl won't contain this information, it's important to
-			// convert the pidl to a full pidl here.
-			// Note that there's no need to convert change.pidl1, as it refers to the original item,
-			// which no longer exists.
-			unique_pidl_absolute pidlNewFull;
-			HRESULT hr = SimplePidlToFullPidl(change.pidl2.get(), wil::out_param(pidlNewFull));
-
-			if (SUCCEEDED(hr))
-			{
-				OnItemRenamed(change.pidl1.get(), pidlNewFull.get());
-			}
+			OnItemRenamed(change.pidl1.get(), change.pidl2.get());
 		}
 		break;
 
 	case SHCNE_UPDATEITEM:
 		if (ILIsParent(m_directoryState.pidlDirectory.get(), change.pidl1.get(), TRUE))
 		{
-			unique_pidl_absolute pidlFull;
-			HRESULT hr = SimplePidlToFullPidl(change.pidl1.get(), wil::out_param(pidlFull));
-
-			if (SUCCEEDED(hr))
-			{
-				ModifyItem(pidlFull.get());
-			}
+			OnItemModified(change.pidl1.get());
 		}
 		break;
 
@@ -151,9 +133,6 @@ void ShellBrowser::DirectoryAltered()
 
 	SendMessage(m_hListView, WM_SETREDRAW, FALSE, NULL);
 
-	LOG(debug) << _T("ShellBrowser - Starting directory change update for \"")
-			   << m_directoryState.directory << _T("\"");
-
 	/* Potential problem:
 	After a file is created, it may be renamed shortly afterwards.
 	If the rename occurs before the file is added here, the
@@ -177,42 +156,54 @@ void ShellBrowser::DirectoryAltered()
 		index on the modified item and current folder match up
 		(i.e. ensure the directory has not changed since these
 		files were modified). */
-		if (af.iFolderIndex == m_uniqueFolderId)
+		if (af.iFolderIndex != m_uniqueFolderId)
 		{
-			switch (af.dwAction)
-			{
-			case FILE_ACTION_ADDED:
-				LOG(debug) << _T("ShellBrowser - Adding \"") << af.szFileName << _T("\"");
-				OnFileAdded(af.szFileName);
-				break;
+			continue;
+		}
 
-			case FILE_ACTION_MODIFIED:
-				LOG(debug) << _T("ShellBrowser - Modifying \"") << af.szFileName << _T("\"");
-				OnFileModified(af.szFileName);
-				break;
+		wil::com_ptr_nothrow<IShellFolder> parent;
+		HRESULT hr = SHBindToObject(nullptr, m_directoryState.pidlDirectory.get(), nullptr,
+			IID_PPV_ARGS(&parent));
 
-			case FILE_ACTION_REMOVED:
-				LOG(debug) << _T("ShellBrowser - Removing \"") << af.szFileName << _T("\"");
-				OnFileRemoved(af.szFileName);
-				break;
+		if (FAILED(hr))
+		{
+			continue;
+		}
 
-			case FILE_ACTION_RENAMED_OLD_NAME:
-				LOG(debug) << _T("ShellBrowser - Old name received \"") << af.szFileName
-						   << _T("\"");
-				OnFileRenamedOldName(af.szFileName);
-				break;
+		unique_pidl_absolute simplePidl;
+		hr = CreateSimplePidl(af.szFileName, wil::out_param(simplePidl), parent.get());
 
-			case FILE_ACTION_RENAMED_NEW_NAME:
-				LOG(debug) << _T("ShellBrowser - New name received \"") << af.szFileName
-						   << _T("\"");
-				OnFileRenamedNewName(af.szFileName);
-				break;
-			}
+		if (FAILED(hr))
+		{
+			continue;
+		}
+
+		switch (af.dwAction)
+		{
+		case FILE_ACTION_ADDED:
+			OnItemAdded(simplePidl.get());
+			break;
+
+		case FILE_ACTION_RENAMED_OLD_NAME:
+			assert(!m_renamedItemOldPidl);
+			m_renamedItemOldPidl.reset(ILCloneFull(simplePidl.get()));
+			break;
+
+		case FILE_ACTION_RENAMED_NEW_NAME:
+			OnItemRenamed(m_renamedItemOldPidl.get(), simplePidl.get());
+
+			m_renamedItemOldPidl.reset();
+			break;
+
+		case FILE_ACTION_MODIFIED:
+			OnItemModified(simplePidl.get());
+			break;
+
+		case FILE_ACTION_REMOVED:
+			OnItemRemoved(simplePidl.get());
+			break;
 		}
 	}
-
-	LOG(debug) << _T("ShellBrowser - Finished directory change update for \"")
-			   << m_directoryState.directory << _T("\"");
 
 	SendMessage(m_hListView, WM_SETREDRAW, TRUE, NULL);
 
@@ -291,14 +282,10 @@ void ShellBrowser::FilesModified(DWORD Action, const TCHAR *FileName, int EventI
 	LeaveCriticalSection(&m_csDirectoryAltered);
 }
 
-void ShellBrowser::OnFileAdded(const TCHAR *szFileName)
+void ShellBrowser::OnItemAdded(PCIDLIST_ABSOLUTE simplePidl)
 {
-	TCHAR fullFileName[MAX_PATH];
-	StringCchCopy(fullFileName, SIZEOF_ARRAY(fullFileName), m_directoryState.directory.c_str());
-	PathAppend(fullFileName, szFileName);
-
 	unique_pidl_absolute pidlFull;
-	HRESULT hr = SHParseDisplayName(fullFileName, nullptr, wil::out_param(pidlFull), 0, nullptr);
+	HRESULT hr = SimplePidlToFullPidl(simplePidl, wil::out_param(pidlFull));
 
 	if (SUCCEEDED(hr))
 	{
@@ -317,8 +304,8 @@ void ShellBrowser::AddItem(PCIDLIST_ABSOLUTE pidl)
 		return;
 	}
 
-	auto itemId = AddItemInternal(
-		shellFolder.get(), m_directoryState.pidlDirectory.get(), pidlChild, -1, FALSE);
+	auto itemId = AddItemInternal(shellFolder.get(), m_directoryState.pidlDirectory.get(),
+		pidlChild, -1, FALSE);
 
 	if (!itemId)
 	{
@@ -327,7 +314,8 @@ void ShellBrowser::AddItem(PCIDLIST_ABSOLUTE pidl)
 
 	const std::wstring displayName = m_itemInfoMap.at(*itemId).displayName;
 	auto droppedFilesItr = std::find_if(m_droppedFileNameList.begin(), m_droppedFileNameList.end(),
-		[&displayName](const DroppedFile_t &droppedFile) {
+		[&displayName](const DroppedFile_t &droppedFile)
+		{
 			return displayName == droppedFile.szFileName;
 		});
 
@@ -341,7 +329,9 @@ void ShellBrowser::AddItem(PCIDLIST_ABSOLUTE pidl)
 		int sortedPosition = DetermineItemSortedPosition(*itemId);
 
 		auto itr = std::find_if(m_directoryState.awaitingAddList.begin(),
-			m_directoryState.awaitingAddList.end(), [itemId](const AwaitingAdd_t &awaitingItem) {
+			m_directoryState.awaitingAddList.end(),
+			[itemId](const AwaitingAdd_t &awaitingItem)
+			{
 				return *itemId == awaitingItem.iItemInternal;
 			});
 
@@ -357,9 +347,9 @@ void ShellBrowser::AddItem(PCIDLIST_ABSOLUTE pidl)
 	InsertAwaitingItems(m_folderSettings.showInGroups);
 }
 
-void ShellBrowser::OnItemRemoved(PCIDLIST_ABSOLUTE pidl)
+void ShellBrowser::OnItemRemoved(PCIDLIST_ABSOLUTE simplePidl)
 {
-	auto internalIndex = GetItemInternalIndexForPidl(pidl);
+	auto internalIndex = GetItemInternalIndexForPidl(simplePidl);
 
 	if (internalIndex)
 	{
@@ -367,50 +357,15 @@ void ShellBrowser::OnItemRemoved(PCIDLIST_ABSOLUTE pidl)
 	}
 }
 
-void ShellBrowser::OnFileRemoved(const TCHAR *szFileName)
+void ShellBrowser::OnItemModified(PCIDLIST_ABSOLUTE simplePidl)
 {
-	wil::com_ptr_nothrow<IShellFolder> parent;
-	HRESULT hr = SHBindToObject(nullptr, m_directoryState.pidlDirectory.get(), nullptr,
-		IID_PPV_ARGS(&parent));
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	unique_pidl_absolute pidl;
-	hr = CreateSimplePidl(szFileName, wil::out_param(pidl), parent.get());
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	auto internalIndex = GetItemInternalIndexForPidl(pidl.get());
-
-	if (!internalIndex)
-	{
-		return;
-	}
-
-	RemoveItem(*internalIndex);
-}
-
-void ShellBrowser::OnFileModified(const TCHAR *fileName)
-{
-	TCHAR fullFileName[MAX_PATH];
-	StringCchCopy(fullFileName, SIZEOF_ARRAY(fullFileName), m_directoryState.directory.c_str());
-	PathAppend(fullFileName, fileName);
-
 	unique_pidl_absolute pidlFull;
-	HRESULT hr = SHParseDisplayName(fullFileName, nullptr, wil::out_param(pidlFull), 0, nullptr);
+	HRESULT hr = SimplePidlToFullPidl(simplePidl, wil::out_param(pidlFull));
 
-	if (FAILED(hr))
+	if (SUCCEEDED(hr))
 	{
-		return;
+		ModifyItem(pidlFull.get());
 	}
-
-	ModifyItem(pidlFull.get());
 }
 
 void ShellBrowser::ModifyItem(PCIDLIST_ABSOLUTE pidl)
@@ -493,81 +448,32 @@ void ShellBrowser::ModifyItem(PCIDLIST_ABSOLUTE pidl)
 	}
 }
 
-void ShellBrowser::OnItemRenamed(PCIDLIST_ABSOLUTE pidlOld, PCIDLIST_ABSOLUTE pidlNew)
+void ShellBrowser::OnItemRenamed(PCIDLIST_ABSOLUTE simplePidlOld, PCIDLIST_ABSOLUTE simplePidlNew)
 {
-	auto internalIndex = GetItemInternalIndexForPidl(pidlOld);
+	// When an item is updated, the WIN32_FIND_DATA information cached in the pidl will be
+	// retrieved. As the simple pidl won't contain this information, it's important to convert the
+	// pidl to a full pidl here.
+	unique_pidl_absolute pidlNewFull;
+	HRESULT hr = SimplePidlToFullPidl(simplePidlNew, wil::out_param(pidlNewFull));
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	auto internalIndex = GetItemInternalIndexForPidl(simplePidlOld);
 
 	if (internalIndex)
 	{
-		RenameItem(*internalIndex, pidlNew);
+		RenameItem(*internalIndex, pidlNewFull.get());
 	}
 	else
 	{
 		// This can happen if an item was added, then immediately renamed. In that case, attempting
 		// to add the new item would fail (since it no longer exists). Since the new name has now
 		// been received, the item can be added.
-		AddItem(pidlNew);
+		AddItem(simplePidlNew);
 	}
-}
-
-void ShellBrowser::OnFileRenamedOldName(const TCHAR *szFileName)
-{
-	assert(!m_renamedFileOldName);
-	m_renamedFileOldName = szFileName;
-}
-
-void ShellBrowser::OnFileRenamedNewName(const TCHAR *szFileName)
-{
-	auto resetOldName = wil::scope_exit(
-		[this]
-		{
-			m_renamedFileOldName.reset();
-		});
-
-	wil::com_ptr_nothrow<IShellFolder> parent;
-	HRESULT hr = SHBindToObject(nullptr, m_directoryState.pidlDirectory.get(), nullptr,
-		IID_PPV_ARGS(&parent));
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	unique_pidl_absolute pidl;
-	hr = CreateSimplePidl(*m_renamedFileOldName, wil::out_param(pidl), parent.get());
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	auto internalIndex = GetItemInternalIndexForPidl(pidl.get());
-
-	if (internalIndex)
-	{
-		RenameItem(*internalIndex, szFileName);
-	}
-	else
-	{
-		OnFileAdded(szFileName);
-	}
-}
-
-void ShellBrowser::RenameItem(int internalIndex, const TCHAR *szNewFileName)
-{
-	TCHAR fullFileName[MAX_PATH];
-	StringCchCopy(fullFileName, SIZEOF_ARRAY(fullFileName), m_directoryState.directory.c_str());
-	PathAppend(fullFileName, szNewFileName);
-
-	unique_pidl_absolute pidlFull;
-	HRESULT hr = SHParseDisplayName(fullFileName, nullptr, wil::out_param(pidlFull), 0, nullptr);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	RenameItem(internalIndex, pidlFull.get());
 }
 
 void ShellBrowser::RenameItem(int internalIndex, PCIDLIST_ABSOLUTE pidlNew)
@@ -644,8 +550,9 @@ void ShellBrowser::InvalidateAllColumnsForItem(int itemIndex)
 		return;
 	}
 
-	auto numColumns = std::count_if(
-		m_pActiveColumns->begin(), m_pActiveColumns->end(), [](const Column_t &column) {
+	auto numColumns = std::count_if(m_pActiveColumns->begin(), m_pActiveColumns->end(),
+		[](const Column_t &column)
+		{
 			return column.bChecked;
 		});
 

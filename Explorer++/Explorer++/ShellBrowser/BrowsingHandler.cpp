@@ -133,7 +133,7 @@ void ShellBrowser::ResetFolderState()
 
 	m_itemInfoMap.clear();
 
-	m_renamedFileOldName.reset();
+	m_renamedItemOldPidl.reset();
 }
 
 void ShellBrowser::StoreCurrentlySelectedItems()

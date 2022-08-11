@@ -498,17 +498,13 @@ private:
 	void OnShellNotify(WPARAM wParam, LPARAM lParam);
 	void OnProcessShellChangeNotifications();
 	void ProcessShellChangeNotification(const ShellChangeNotification &change);
-	void OnFileAdded(const TCHAR *szFileName);
+	void OnItemAdded(PCIDLIST_ABSOLUTE simplePidl);
 	void AddItem(PCIDLIST_ABSOLUTE pidl);
 	void RemoveItem(int iItemInternal);
-	void OnItemRemoved(PCIDLIST_ABSOLUTE pidl);
-	void OnFileRemoved(const TCHAR *szFileName);
-	void OnFileModified(const TCHAR *fileName);
+	void OnItemRemoved(PCIDLIST_ABSOLUTE simplePidl);
+	void OnItemModified(PCIDLIST_ABSOLUTE simplePidl);
 	void ModifyItem(PCIDLIST_ABSOLUTE pidl);
-	void OnItemRenamed(PCIDLIST_ABSOLUTE pidlOld, PCIDLIST_ABSOLUTE pidlNew);
-	void OnFileRenamedOldName(const TCHAR *szFileName);
-	void OnFileRenamedNewName(const TCHAR *szFileName);
-	void RenameItem(int internalIndex, const TCHAR *szNewFileName);
+	void OnItemRenamed(PCIDLIST_ABSOLUTE simplePidlOld, PCIDLIST_ABSOLUTE simplePidlNew);
 	void RenameItem(int internalIndex, PCIDLIST_ABSOLUTE pidlNew);
 	void InvalidateAllColumnsForItem(int itemIndex);
 	void InvalidateIconForItem(int itemIndex);
@@ -681,7 +677,7 @@ private:
 
 	/* Directory monitoring. */
 	ULONG m_shChangeNotifyId;
-	std::optional<std::wstring> m_renamedFileOldName;
+	unique_pidl_absolute m_renamedItemOldPidl;
 
 	wil::com_ptr_nothrow<IShellFolder> m_desktopFolder;
 	unique_pidl_absolute m_recycleBinPidl;
