@@ -486,13 +486,15 @@ void ShellBrowser::UpdateItem(PCIDLIST_ABSOLUTE pidl, PCIDLIST_ABSOLUTE updatedP
 		ListView_SetItemState(m_hListView, *itemIndex, 0, LVIS_CUT);
 	}
 
-	ListView_SortItems(m_hListView, SortStub, this);
-
 	if (m_folderSettings.showInGroups)
 	{
 		int groupId = DetermineItemGroup(*internalIndex);
 		InsertItemIntoGroup(*itemIndex, groupId);
 	}
+
+	// It's not safe to use itemIndex past this point.
+	ListView_SortItems(m_hListView, SortStub, this);
+	itemIndex.reset();
 }
 
 void ShellBrowser::OnItemRenamed(PCIDLIST_ABSOLUTE simplePidlOld, PCIDLIST_ABSOLUTE simplePidlNew)
