@@ -636,9 +636,6 @@ private:
 	std::list<DWFolderSize> m_DWFolderSizes;
 	int m_iDWFolderSizeUniqueId;
 
-	/* Rename support. */
-	bool m_bListViewRenaming;
-
 	/* Menu images. */
 	std::vector<wil::unique_hbitmap> m_menuImages;
 

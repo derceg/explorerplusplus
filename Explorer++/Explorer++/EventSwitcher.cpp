@@ -63,25 +63,16 @@ void Explorerplusplus::OnCopy(BOOL bCopy)
 
 void Explorerplusplus::OnFileRename()
 {
-	HWND hFocus;
+	HWND hFocus = GetFocus();
 
-	if (m_bListViewRenaming)
+	if (hFocus == m_hActiveListView)
 	{
-		SendMessage(ListView_GetEditControl(m_hActiveListView), WM_APP_KEYDOWN, VK_F2, 0);
+		Tab &selectedTab = m_tabContainer->GetSelectedTab();
+		selectedTab.GetShellBrowser()->StartRenamingSelectedItems();
 	}
-	else
+	else if (hFocus == m_shellTreeView->GetHWND())
 	{
-		hFocus = GetFocus();
-
-		if (hFocus == m_hActiveListView)
-		{
-			Tab &selectedTab = m_tabContainer->GetSelectedTab();
-			selectedTab.GetShellBrowser()->StartRenamingSelectedItems();
-		}
-		else if (hFocus == m_shellTreeView->GetHWND())
-		{
-			m_shellTreeView->StartRenamingSelectedItem();
-		}
+		m_shellTreeView->StartRenamingSelectedItem();
 	}
 }
 

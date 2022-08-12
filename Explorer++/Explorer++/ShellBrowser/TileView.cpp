@@ -28,13 +28,6 @@ void ShellBrowser::InsertTileViewColumns()
 	ListView_SetTileViewInfo(m_hListView, &lvtvi);
 }
 
-void ShellBrowser::DeleteTileViewColumns()
-{
-	ListView_DeleteColumn(m_hListView, 3);
-	ListView_DeleteColumn(m_hListView, 2);
-	ListView_DeleteColumn(m_hListView, 1);
-}
-
 void ShellBrowser::SetTileViewInfo()
 {
 	LVITEM lvItem;

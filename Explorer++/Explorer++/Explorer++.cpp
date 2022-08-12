@@ -48,7 +48,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd) :
 	m_bSavePreferencesToXMLFile = FALSE;
 	m_bAttemptToolbarRestore = false;
 	m_bLanguageLoaded = false;
-	m_bListViewRenaming = false;
 	m_bShowTabBar = true;
 	m_pActiveShellBrowser = nullptr;
 	m_hMainRebar = nullptr;

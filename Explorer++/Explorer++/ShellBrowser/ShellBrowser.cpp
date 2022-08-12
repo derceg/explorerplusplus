@@ -103,7 +103,6 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 
 	m_bFolderVisited = FALSE;
 
-	m_listViewColumnsSetUp = false;
 	m_performingDrag = false;
 	m_bThumbnailsSetup = FALSE;
 	m_nCurrentColumns = 0;
@@ -319,11 +318,7 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 	break;
 	}
 
-	/* Delete all the tile view columns. */
-	if (m_folderSettings.viewMode == +ViewMode::Tiles && viewMode != +ViewMode::Tiles)
-	{
-		DeleteTileViewColumns();
-	}
+	DeleteAllColumns();
 
 	switch (viewMode)
 	{
@@ -350,11 +345,7 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 	case ViewMode::Details:
 		dwStyle = LV_VIEW_DETAILS;
 
-		if (!m_listViewColumnsSetUp)
-		{
-			SetUpListViewColumns();
-			m_listViewColumnsSetUp = true;
-		}
+		SetUpListViewColumns();
 		break;
 
 	case ViewMode::Thumbnails:
@@ -376,6 +367,11 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 	{
 		m_columnThreadPool.clear_queue();
 		m_columnResults.clear();
+	}
+
+	if (viewMode != +ViewMode::Details && viewMode != +ViewMode::Tiles)
+	{
+		AddFirstColumn();
 	}
 
 	ViewMode previousViewMode = m_folderSettings.viewMode;

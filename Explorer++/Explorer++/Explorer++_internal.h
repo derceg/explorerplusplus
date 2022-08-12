@@ -35,7 +35,6 @@ file manager. */
 static const TCHAR SHELL_DEFAULT_INTERNAL_COMMAND_NAME[] = _T("openinexplorer++");
 
 #define WM_APP_ASSOCCHANGED (WM_APP + 54)
-#define WM_APP_KEYDOWN (WM_APP + 55)
 
 /* Rebar menu id's. */
 #define ID_REBAR_MENU_BACK_START 2000

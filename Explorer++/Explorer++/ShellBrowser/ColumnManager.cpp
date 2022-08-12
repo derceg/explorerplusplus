@@ -139,6 +139,12 @@ std::optional<ColumnType> ShellBrowser::GetColumnTypeByIndex(int index) const
 	return static_cast<ColumnType>(hdItem.lParam);
 }
 
+void ShellBrowser::AddFirstColumn()
+{
+	Column_t firstCheckedColumn = GetFirstCheckedColumn();
+	InsertColumn(firstCheckedColumn.type, 0, firstCheckedColumn.iWidth);
+}
+
 void ShellBrowser::SetUpListViewColumns()
 {
 	m_nActiveColumns = 0;
@@ -200,6 +206,22 @@ void ShellBrowser::InsertColumn(ColumnType columnType, int columnIndex, int widt
 	Header_SetItem(header, actualColumnIndex, &hdItem);
 }
 
+void ShellBrowser::DeleteAllColumns()
+{
+	HWND header = ListView_GetHeader(m_hListView);
+	int numColumns = Header_GetItemCount(header);
+
+	if (numColumns == -1)
+	{
+		return;
+	}
+
+	for (int i = numColumns - 1; i >= 0; i--)
+	{
+		ListView_DeleteColumn(m_hListView, i);
+	}
+}
+
 void ShellBrowser::SetActiveColumnSet()
 {
 	std::vector<Column_t> *pActiveColumns = nullptr;
@@ -241,7 +263,6 @@ void ShellBrowser::SetActiveColumnSet()
 	if (m_pActiveColumns != pActiveColumns)
 	{
 		m_pActiveColumns = pActiveColumns;
-		m_listViewColumnsSetUp = false;
 	}
 }
 
@@ -1004,8 +1025,6 @@ void ShellBrowser::SetCurrentColumns(const std::vector<Column_t> &columns)
 	{
 		SortFolder(m_folderSettings.sortMode);
 	}
-
-	m_listViewColumnsSetUp = false;
 
 	columnsChanged.m_signal();
 }

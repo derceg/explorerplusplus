@@ -363,17 +363,13 @@ BOOL Explorerplusplus::OnListViewBeginLabelEdit(const NMLVDISPINFO *dispInfo)
 		SetWindowText(editControl, editingName.c_str());
 	}
 
-	ListViewEdit::CreateNew(editControl, dispInfo->item.iItem, this);
-
-	m_bListViewRenaming = true;
+	ListViewEdit::CreateNew(editControl, &g_hAccl, dispInfo->item.iItem, this);
 
 	return FALSE;
 }
 
 BOOL Explorerplusplus::OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo)
 {
-	m_bListViewRenaming = false;
-
 	// Did the user cancel editing?
 	if (dispInfo->item.pszText == nullptr)
 	{

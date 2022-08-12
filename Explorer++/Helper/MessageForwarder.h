@@ -25,6 +25,7 @@ protected:
 	virtual INT_PTR OnNotify(NMHDR *pnmhdr);
 	virtual INT_PTR OnGetMinMaxInfo(LPMINMAXINFO pmmi);
 	virtual INT_PTR OnSize(int iType, int iWidth, int iHeight);
+	virtual void OnKeyDown(HWND hwnd, UINT key, BOOL down, int repeat, UINT flags);
 	virtual INT_PTR OnClose();
 	virtual INT_PTR OnDestroy();
 	virtual INT_PTR OnNcDestroy();

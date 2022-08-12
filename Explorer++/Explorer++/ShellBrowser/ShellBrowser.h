@@ -474,7 +474,9 @@ private:
 	int CALLBACK Sort(int InternalIndex1, int InternalIndex2) const;
 
 	/* Listview column support. */
+	void AddFirstColumn();
 	void SetUpListViewColumns();
+	void DeleteAllColumns();
 	void QueueColumnTask(int itemInternalIndex, ColumnType columnType);
 	static ColumnResult_t GetColumnTextAsync(HWND listView, int columnResultId,
 		ColumnType columnType, int internalIndex, const BasicItemInfo_t &basicItemInfo,
@@ -577,7 +579,6 @@ private:
 
 	/* Tiles view. */
 	void InsertTileViewColumns();
-	void DeleteTileViewColumns();
 	void SetTileViewInfo();
 	void SetTileViewItemInfo(int iItem, int iItemInternal);
 
@@ -706,7 +707,6 @@ private:
 	/* Column related data. */
 	std::vector<Column_t> *m_pActiveColumns;
 	FolderColumns m_folderColumns;
-	bool m_listViewColumnsSetUp;
 	int m_nCurrentColumns;
 	int m_nActiveColumns;
 	bool m_PreviousSortColumnExists;

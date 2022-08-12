@@ -4,39 +4,93 @@
 
 #include "stdafx.h"
 #include "ListViewEdit.h"
+#include "Accelerator.h"
 #include "CoreInterface.h"
-#include "Explorer++_internal.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
 
-ListViewEdit *ListViewEdit::CreateNew(HWND hwnd, int ItemIndex, IExplorerplusplus *pexpp)
+ListViewEdit *ListViewEdit::CreateNew(HWND hwnd, HACCEL *acceleratorTable, int ItemIndex,
+	IExplorerplusplus *pexpp)
 {
-	return new ListViewEdit(hwnd, ItemIndex, pexpp);
+	return new ListViewEdit(hwnd, acceleratorTable, ItemIndex, pexpp);
 }
 
-ListViewEdit::ListViewEdit(HWND hwnd, int ItemIndex, IExplorerplusplus *pexpp) :
+ListViewEdit::ListViewEdit(HWND hwnd, HACCEL *acceleratorTable, int ItemIndex,
+	IExplorerplusplus *pexpp) :
 	BaseWindow(hwnd),
-	m_ItemIndex(ItemIndex),
+	m_acceleratorTable(acceleratorTable),
+	m_itemIndex(ItemIndex),
 	m_pexpp(pexpp),
-	m_RenameStage(RenameStage::Filename),
-	m_BeginRename(true)
+	m_renameStage(RenameStage::Filename),
+	m_beginRename(true)
 {
+	UpdateAcceleratorTable();
+}
+
+void ListViewEdit::UpdateAcceleratorTable()
+{
+	m_originalAcceleratorTable = *m_acceleratorTable;
+
+	int numAccelerators = CopyAcceleratorTable(*m_acceleratorTable, nullptr, 0);
+
+	std::vector<ACCEL> accelerators(numAccelerators);
+	CopyAcceleratorTable(*m_acceleratorTable, &accelerators[0],
+		static_cast<int>(accelerators.size()));
+
+	// F2 will be handled below and used to cycle the selection between the filename and extension.
+	// Tab/Shift + Tab will be used by the listview edit control. It has handling to move to the
+	// next/previous item. However, for that functionality to be invoked, the control has to be able
+	// to receive Tab/Shift + Tab key presses. Therefore, those items need to be removed from the
+	// accelerator table as well.
+	// Once the keys have been removed from the accelerator table, they can be received as normal.
+	RemoveAcceleratorFromTable(accelerators,
+		{ { FVIRTKEY, VK_F2 }, { FVIRTKEY, VK_TAB }, { FVIRTKEY | FSHIFT, VK_TAB } });
+
+	m_updatedAcceleratorTable.reset(
+		CreateAcceleratorTable(&accelerators[0], static_cast<int>(accelerators.size())));
+
+	if (!m_updatedAcceleratorTable)
+	{
+		return;
+	}
+
+	*m_acceleratorTable = m_updatedAcceleratorTable.get();
+}
+
+void ListViewEdit::RemoveAcceleratorFromTable(std::vector<ACCEL> &accelerators,
+	const std::vector<Accelerator> &itemsToRemove)
+{
+	for (auto &item : itemsToRemove)
+	{
+		auto itr = std::find_if(accelerators.begin(), accelerators.end(),
+			[&item](const ACCEL &accel)
+			{
+				return (accel.fVirt & ~FNOINVERT) == item.modifiers && accel.key == item.key;
+			});
+
+		if (itr != accelerators.end())
+		{
+			accelerators.erase(itr);
+		}
+	}
+}
+
+ListViewEdit::~ListViewEdit()
+{
+	*m_acceleratorTable = m_originalAcceleratorTable;
 }
 
 void ListViewEdit::OnEMSetSel(WPARAM &wParam, LPARAM &lParam)
 {
-	/* When editing an item, the listview control
-	will first deselect, then select all text. If
-	an item has been put into edit mode, and the
-	listview attempts to select all text, modify the
-	message so that only text up to the extension
-	(if any) is selected. */
-	if (m_BeginRename && wParam == 0 && lParam == -1)
+	// When editing an item, the listview control will first deselect, then select all text. If an
+	// item has been put into edit mode, and the listview attempts to select all text, modify the
+	// message so that only text up to the extension (if any) is selected.
+	if (m_beginRename && wParam == 0 && lParam == -1)
 	{
-		int index = GetExtensionIndex();
+		int index = GetExtensionIndex(m_hwnd);
 
 		if (index != -1)
 		{
@@ -44,100 +98,59 @@ void ListViewEdit::OnEMSetSel(WPARAM &wParam, LPARAM &lParam)
 			lParam = index;
 		}
 
-		m_BeginRename = false;
+		m_beginRename = false;
 	}
 }
 
-INT_PTR ListViewEdit::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
+void ListViewEdit::OnKeyDown(HWND hwnd, UINT key, BOOL down, int repeat, UINT flags)
 {
-	UNREFERENCED_PARAMETER(lParam);
+	UNREFERENCED_PARAMETER(down);
+	UNREFERENCED_PARAMETER(repeat);
+	UNREFERENCED_PARAMETER(flags);
 
-	switch (uMsg)
+	switch (key)
 	{
-	case WM_APP_KEYDOWN:
-		switch (wParam)
+	case VK_F2:
+	{
+		int index = GetExtensionIndex(hwnd);
+
+		if (index == -1)
 		{
-		case VK_F2:
+			break;
+		}
+
+		switch (m_renameStage)
 		{
-			int index = GetExtensionIndex();
+		case RenameStage::Filename:
+			SendMessage(hwnd, EM_SETSEL, index + 1, -1);
+			m_renameStage = RenameStage::Extension;
+			break;
 
-			if (index != -1)
-			{
-				switch (m_RenameStage)
-				{
-				case RenameStage::Filename:
-					SendMessage(m_hwnd, EM_SETSEL, index + 1, -1);
-					m_RenameStage = RenameStage::Extension;
-					break;
+		case RenameStage::Extension:
+			SendMessage(hwnd, EM_SETSEL, 0, -1);
+			m_renameStage = RenameStage::Entire;
+			break;
 
-				case RenameStage::Extension:
-					SendMessage(m_hwnd, EM_SETSEL, 0, -1);
-					m_RenameStage = RenameStage::Entire;
-					break;
+		case RenameStage::Entire:
+			SendMessage(hwnd, EM_SETSEL, 0, index);
+			m_renameStage = RenameStage::Filename;
+			break;
 
-				case RenameStage::Entire:
-					SendMessage(m_hwnd, EM_SETSEL, 0, index);
-					m_RenameStage = RenameStage::Filename;
-					break;
-
-				default:
-					assert(false);
-					break;
-				}
-			}
+		default:
+			assert(false);
+			break;
 		}
-		break;
-
-		case VK_TAB:
-		{
-			HWND hListView = GetParent(m_hwnd);
-
-			int iSel = ListView_GetNextItem(hListView, -1, LVNI_ALL | LVNI_SELECTED);
-			ListViewHelper::SelectItem(hListView, iSel, FALSE);
-
-			int nItems = ListView_GetItemCount(hListView);
-
-			int iNewSel;
-
-			if (IsKeyDown(VK_SHIFT))
-			{
-				if (iSel == 0)
-				{
-					iNewSel = nItems - 1;
-				}
-				else
-				{
-					iNewSel = iSel - 1;
-				}
-			}
-			else
-			{
-				if (iSel == (nItems - 1))
-				{
-					iNewSel = 0;
-				}
-				else
-				{
-					iNewSel = iSel + 1;
-				}
-			}
-
-			ListView_EditLabel(hListView, iNewSel);
-		}
-		break;
-		}
-		break;
 	}
-
-	return 0;
+	break;
+	}
 }
 
-int ListViewEdit::GetExtensionIndex()
+int ListViewEdit::GetExtensionIndex(HWND hwnd)
 {
-	std::wstring fileName = GetWindowString(m_hwnd);
+	std::wstring fileName = GetWindowString(hwnd);
 
 	DWORD dwAttributes =
-		m_pexpp->GetActiveShellBrowser()->GetItemFileFindData(m_ItemIndex).dwFileAttributes;
+		m_pexpp->GetActiveShellBrowser()->GetItemFileFindData(m_itemIndex).dwFileAttributes;
 
 	int index = -1;
 
