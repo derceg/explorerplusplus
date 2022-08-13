@@ -163,14 +163,12 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 	if (nTabsCreated == 0)
 	{
 		m_tabContainer->CreateNewTabInDefaultDirectory(TabSettings(_selected = true));
+		nTabsCreated++;
 	}
 
-	if (!m_config->alwaysShowTabBar.get())
+	if (!m_config->alwaysShowTabBar.get() && nTabsCreated == 1)
 	{
-		if (nTabsCreated == 1)
-		{
-			m_bShowTabBar = false;
-		}
+		m_bShowTabBar = false;
 	}
 
 	/* m_iLastSelectedTab is the tab that was selected when the
