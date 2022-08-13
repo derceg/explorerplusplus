@@ -208,6 +208,11 @@ LRESULT CALLBACK ShellBrowser::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM w
 
 			case LVN_ENDLABELEDIT:
 				return OnListViewEndLabelEdit(reinterpret_cast<NMLVDISPINFO *>(lParam));
+
+			case LVN_DELETEALLITEMS:
+				// Respond to the notification in order to speed up calls to ListView_DeleteAllItems
+				// per http://www.verycomputer.com/5_0c959e6a4fd713e2_1.htm
+				return TRUE;
 			}
 		}
 		else if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == ListView_GetHeader(m_hListView))
