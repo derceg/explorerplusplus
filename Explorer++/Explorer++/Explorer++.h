@@ -244,8 +244,6 @@ private:
 	void OnListViewDoubleClick(NMHDR *nmhdr);
 	LRESULT OnListViewKeyDown(LPARAM lParam);
 	BOOL OnListViewItemChanging(const NMLISTVIEW *changeData);
-	BOOL OnListViewBeginLabelEdit(const NMLVDISPINFO *dispInfo);
-	BOOL OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo);
 	void OnListViewRClick(POINT *pCursorPos);
 	void OnListViewBackgroundRClick(POINT *pCursorPos);
 	void OnListViewBackgroundRClickWindows8OrGreater(POINT *pCursorPos);
@@ -475,6 +473,7 @@ private:
 	/* IExplorerplusplus methods. */
 	const Config *GetConfig() const override;
 	HMODULE GetLanguageModule() const override;
+	HACCEL *GetAcceleratorTable() const;
 	HWND GetMainWindow() const override;
 	HWND GetActiveListView() const override;
 	ShellBrowser *GetActiveShellBrowser() const override;

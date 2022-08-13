@@ -148,9 +148,6 @@
     <ClCompile Include="Language.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="ListViewEdit.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Navigation.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -460,6 +457,9 @@
     <ClCompile Include="ShellBrowser\DocumentServiceProvider.cpp">
       <Filter>ShellBrowser\Shell Integration</Filter>
     </ClCompile>
+    <ClCompile Include="ShellBrowser\ListViewEdit.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -560,9 +560,6 @@
     </ClInclude>
     <ClInclude Include="RegistrySettings.h">
       <Filter>Settings</Filter>
-    </ClInclude>
-    <ClInclude Include="ListViewEdit.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ModelessDialogs.h">
       <Filter>Dialog Support</Filter>
@@ -917,6 +914,9 @@
     </ClInclude>
     <ClInclude Include="ShellBrowser\DocumentServiceProvider.h">
       <Filter>ShellBrowser\Shell Integration</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowser\ListViewEdit.h">
+      <Filter>ShellBrowser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

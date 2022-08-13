@@ -51,6 +51,7 @@ __interface IExplorerplusplus
 {
 	const Config *GetConfig() const;
 	HMODULE GetLanguageModule() const;
+	HACCEL *GetAcceleratorTable() const;
 
 	HWND GetMainWindow() const;
 

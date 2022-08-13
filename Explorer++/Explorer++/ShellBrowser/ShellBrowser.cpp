@@ -71,6 +71,7 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 	m_ID(id),
 	m_shChangeNotifyId(0),
 	m_hResourceModule(coreInterface->GetLanguageModule()),
+	m_acceleratorTable(coreInterface->GetAcceleratorTable()),
 	m_hOwner(hOwner),
 	m_cachedIcons(coreInterface->GetCachedIcons()),
 	m_iconResourceLoader(coreInterface->GetIconResourceLoader()),
@@ -479,11 +480,6 @@ std::wstring ShellBrowser::GetItemDisplayName(int index) const
 	// removed, if necessary.
 	BasicItemInfo_t basicItemInfo = getBasicItemInfo(GetItemInternalIndex(index));
 	return ProcessItemFileName(basicItemInfo, m_config->globalFolderSettings);
-}
-
-std::wstring ShellBrowser::GetItemEditingName(int index) const
-{
-	return GetItemByIndex(index).editingName;
 }
 
 std::wstring ShellBrowser::GetItemFullName(int index) const
@@ -1462,9 +1458,4 @@ void ShellBrowser::OnApplicationShuttingDown()
 		// running, any clipboard objects will still be available.
 		OleFlushClipboard();
 	}
-}
-
-void ShellBrowser::UserRenamedItem(PCIDLIST_ABSOLUTE pidlOld, PCIDLIST_ABSOLUTE pidlNew)
-{
-	UpdateItem(pidlOld, pidlNew);
 }

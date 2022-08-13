@@ -1341,6 +1341,11 @@ HMODULE Explorerplusplus::GetLanguageModule() const
 	return m_hLanguageModule;
 }
 
+HACCEL *Explorerplusplus::GetAcceleratorTable() const
+{
+	return &g_hAccl;
+}
+
 HWND Explorerplusplus::GetMainWindow() const
 {
 	return m_hContainer;

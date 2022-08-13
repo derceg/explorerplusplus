@@ -7,6 +7,7 @@
 #include "Config.h"
 #include "DarkModeHelper.h"
 #include "ItemData.h"
+#include "ListViewEdit.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "SelectColumnsDialog.h"
@@ -48,8 +49,8 @@ const std::vector<ColumnType> COMMON_RECYCLE_BIN_COLUMNS = { ColumnType::Name,
 
 std::vector<ColumnType> GetColumnHeaderMenuList(const std::wstring &directory);
 
-LRESULT CALLBACK ShellBrowser::ListViewProcStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK ShellBrowser::ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -156,8 +157,8 @@ LRESULT CALLBACK ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK ShellBrowser::ListViewParentProcStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK ShellBrowser::ListViewParentProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
+	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -165,8 +166,8 @@ LRESULT CALLBACK ShellBrowser::ListViewParentProcStub(
 	return shellBrowser->ListViewParentProc(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK ShellBrowser::ListViewParentProc(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ShellBrowser::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM wParam,
+	LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -201,6 +202,12 @@ LRESULT CALLBACK ShellBrowser::ListViewParentProc(
 			case LVN_COLUMNCLICK:
 				ColumnClicked(reinterpret_cast<NMLISTVIEW *>(lParam)->iSubItem);
 				break;
+
+			case LVN_BEGINLABELEDIT:
+				return OnListViewBeginLabelEdit(reinterpret_cast<NMLVDISPINFO *>(lParam));
+
+			case LVN_ENDLABELEDIT:
+				return OnListViewEndLabelEdit(reinterpret_cast<NMLVDISPINFO *>(lParam));
 			}
 		}
 		else if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == ListView_GetHeader(m_hListView))
@@ -259,8 +266,8 @@ void ShellBrowser::OnListViewMButtonUp(const POINT *pt, UINT keysDown)
 
 	const ItemInfo_t &itemInfo = GetItemByIndex(m_middleButtonItem);
 
-	if (!WI_IsAnyFlagSet(
-			itemInfo.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_ARCHIVE))
+	if (!WI_IsAnyFlagSet(itemInfo.wfd.dwFileAttributes,
+			FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_ARCHIVE))
 	{
 		return;
 	}
@@ -426,8 +433,9 @@ void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 			}
 		}
 
-		m_iconFetcher->QueueIconTask(
-			itemInfo.pidlComplete.get(), [this, internalIndex](int iconIndex) {
+		m_iconFetcher->QueueIconTask(itemInfo.pidlComplete.get(),
+			[this, internalIndex](int iconIndex)
+			{
 				ProcessIconResult(internalIndex, iconIndex);
 			});
 	}
@@ -487,9 +495,10 @@ void ShellBrowser::QueueInfoTipTask(int internalIndex, const std::wstring &exist
 	Config configCopy = *m_config;
 	bool virtualFolder = InVirtualFolder();
 
-	auto result =
-		m_infoTipsThreadPool.push([this, infoTipResultId, internalIndex, basicItemInfo, configCopy,
-									  virtualFolder, existingInfoTip](int id) {
+	auto result = m_infoTipsThreadPool.push(
+		[this, infoTipResultId, internalIndex, basicItemInfo, configCopy, virtualFolder,
+			existingInfoTip](int id)
+		{
 			UNREFERENCED_PARAMETER(id);
 
 			auto result = GetInfoTipAsync(m_hListView, infoTipResultId, internalIndex,
@@ -521,8 +530,8 @@ std::optional<ShellBrowser::InfoTipResult> ShellBrowser::GetInfoTipAsync(HWND li
 	if ((config.infoTipType == InfoTipType::System) || virtualFolder)
 	{
 		TCHAR infoTipText[256];
-		HRESULT hr = GetItemInfoTip(
-			basicItemInfo.pidlComplete.get(), infoTipText, SIZEOF_ARRAY(infoTipText));
+		HRESULT hr = GetItemInfoTip(basicItemInfo.pidlComplete.get(), infoTipText,
+			SIZEOF_ARRAY(infoTipText));
 
 		if (FAILED(hr))
 		{
@@ -928,8 +937,8 @@ std::vector<ColumnType> GetColumnHeaderMenuList(const std::wstring &directory)
 	}
 }
 
-void ShellBrowser::OnListViewHeaderMenuItemSelected(
-	int menuItemId, const std::unordered_map<int, ColumnType> &menuItemMappings)
+void ShellBrowser::OnListViewHeaderMenuItemSelected(int menuItemId,
+	const std::unordered_map<int, ColumnType> &menuItemMappings)
 {
 	if (menuItemId == IDM_HEADER_MORE)
 	{
@@ -943,19 +952,20 @@ void ShellBrowser::OnListViewHeaderMenuItemSelected(
 
 void ShellBrowser::OnShowMoreColumnsSelected()
 {
-	SelectColumnsDialog selectColumnsDialog(
-		m_hResourceModule, m_hListView, this, m_iconResourceLoader);
+	SelectColumnsDialog selectColumnsDialog(m_hResourceModule, m_hListView, this,
+		m_iconResourceLoader);
 	selectColumnsDialog.ShowModalDialog();
 }
 
-void ShellBrowser::OnColumnMenuItemSelected(
-	int menuItemId, const std::unordered_map<int, ColumnType> &menuItemMappings)
+void ShellBrowser::OnColumnMenuItemSelected(int menuItemId,
+	const std::unordered_map<int, ColumnType> &menuItemMappings)
 {
 	auto currentColumns = GetCurrentColumns();
 
 	ColumnType columnType = menuItemMappings.at(menuItemId);
-	auto itr = std::find_if(
-		currentColumns.begin(), currentColumns.end(), [columnType](const Column_t &column) {
+	auto itr = std::find_if(currentColumns.begin(), currentColumns.end(),
+		[columnType](const Column_t &column)
+		{
 			return column.type == columnType;
 		});
 
@@ -986,8 +996,8 @@ void ShellBrowser::SetFileAttributesForSelection()
 
 		const ItemInfo_t &item = GetItemByIndex(index);
 		sfai.wfd = item.wfd;
-		StringCchCopy(
-			sfai.szFullFileName, SIZEOF_ARRAY(sfai.szFullFileName), item.parsingName.c_str());
+		StringCchCopy(sfai.szFullFileName, SIZEOF_ARRAY(sfai.szFullFileName),
+			item.parsingName.c_str());
 
 		sfaiList.push_back(sfai);
 	}
@@ -1104,4 +1114,182 @@ void ShellBrowser::AutoSizeColumns()
 	{
 		ListView_SetColumnWidth(m_hListView, i, LVSCW_AUTOSIZE);
 	}
+}
+
+BOOL ShellBrowser::OnListViewBeginLabelEdit(const NMLVDISPINFO *dispInfo)
+{
+	const auto &item = GetItemByIndex(dispInfo->item.iItem);
+
+	SFGAOF attributes = SFGAO_CANRENAME;
+	HRESULT hr = GetItemAttributes(item.pidlComplete.get(), &attributes);
+
+	if (FAILED(hr) || WI_IsFlagClear(attributes, SFGAO_CANRENAME))
+	{
+		return TRUE;
+	}
+
+	bool useEditingName = true;
+
+	// The editing name may differ from the display name. For example, the display name of the C:\
+	// drive item will be something like "Local Disk (C:)", while its editing name will be "Local
+	// Disk". Since the editing name is affected by the file name extensions setting in Explorer, it
+	// won't be used if:
+	//
+	// - Extensions are hidden in Explorer, but shown in Explorer++ (since the editing name would
+	//   contain no extension)
+	// - Extensions are shown in Explorer, but hidden in Explorer++ (since the editing name would
+	//   contain an extension). Note that this case is handled when editing is finished - if
+	//   extensions are hidden, the extension will be manually re-added when renaming an item.
+	if (!WI_IsFlagSet(item.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
+	{
+		std::wstring displayName = GetItemDisplayName(dispInfo->item.iItem);
+
+		if (m_config->globalFolderSettings.showExtensions
+			|| m_config->globalFolderSettings.hideLinkExtension)
+		{
+			auto *extension = PathFindExtension(displayName.c_str());
+
+			if (*extension != '\0'
+				&& lstrcmp((item.editingName + extension).c_str(), displayName.c_str()) == 0)
+			{
+				useEditingName = false;
+			}
+		}
+		else
+		{
+			auto *extension = PathFindExtension(item.editingName.c_str());
+
+			if (*extension != '\0'
+				&& lstrcmp((displayName + extension).c_str(), item.editingName.c_str()) == 0)
+			{
+				useEditingName = false;
+			}
+		}
+	}
+
+	HWND editControl = ListView_GetEditControl(m_hListView);
+
+	if (editControl == nullptr)
+	{
+		return TRUE;
+	}
+
+	// Note that the necessary text is set in the edit control, rather than the listview. This is
+	// for the following two reasons:
+	//
+	// 1. Setting the listview item text after the edit control has already been created won't
+	// change the text in the control
+	// 2. Even if setting the listview item text did change the edit control text, the text would
+	// need to be reverted if the user canceled editing. Setting the edit control text means there's
+	// nothing that needs to be changed if editing is canceled.
+	if (useEditingName)
+	{
+		SetWindowText(editControl, item.editingName.c_str());
+	}
+
+	ListViewEdit::CreateNew(editControl, m_acceleratorTable,
+		WI_IsFlagClear(item.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY));
+
+	return FALSE;
+}
+
+BOOL ShellBrowser::OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo)
+{
+	// Did the user cancel editing?
+	if (dispInfo->item.pszText == nullptr)
+	{
+		return FALSE;
+	}
+
+	std::wstring newFilename = dispInfo->item.pszText;
+
+	if (newFilename.empty())
+	{
+		return FALSE;
+	}
+
+	const auto &item = GetItemByIndex(dispInfo->item.iItem);
+
+	if (newFilename == item.editingName)
+	{
+		return FALSE;
+	}
+
+	if (!WI_IsFlagSet(item.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
+	{
+		auto *extension = PathFindExtension(item.wfd.cFileName);
+
+		bool extensionHidden = !m_config->globalFolderSettings.showExtensions
+			|| (m_config->globalFolderSettings.hideLinkExtension
+				&& lstrcmpi(extension, _T(".lnk")) == 0);
+
+		// If file extensions are turned off, the new filename will be incorrect (i.e. it will be
+		// missing the extension). Therefore, append the extension manually if it is turned off.
+		if (extensionHidden && *extension != '\0')
+		{
+			newFilename += extension;
+		}
+	}
+
+	wil::com_ptr_nothrow<IShellFolder> parent;
+	PCITEMID_CHILD child;
+	HRESULT hr = SHBindToParent(item.pidlComplete.get(), IID_PPV_ARGS(&parent), &child);
+
+	if (FAILED(hr))
+	{
+		return FALSE;
+	}
+
+	SHGDNF flags = SHGDN_INFOLDER;
+
+	// As with GetDisplayNameOf(), the behavior of SetNameOf() is influenced by whether or not file
+	// extensions are displayed in Explorer. If extensions are displayed and the SHGDN_INFOLDER name
+	// is set, then the name should contain an extension. On the other hand, if extensions aren't
+	// displayed and the SHGDN_INFOLDER name is set, then the name shouldn't contain an extension.
+	// Given that extensions can be independently hidden and shown in Explorer++, this behavior is
+	// undesirable and incompatible.
+	// For example, if extensions are hidden in Explorer, but shown in Explorer++, then it wouldn't
+	// be possible to change a file's extension. When setting the SHGDN_INFOLDER name, the original
+	// extension would always be re-added by the shell.
+	// Therefore, if a file is being edited, the parsing name (which will always contain an
+	// extension) will be updated.
+	if (!m_directoryState.virtualFolder
+		&& !WI_IsFlagSet(item.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
+	{
+		flags |= SHGDN_FORPARSING;
+	}
+
+	unique_pidl_child newChild;
+	hr =
+		parent->SetNameOf(m_hListView, child, newFilename.c_str(), flags, wil::out_param(newChild));
+
+	if (FAILED(hr))
+	{
+		return FALSE;
+	}
+
+	hr = parent->CompareIDs(0, child, newChild.get());
+
+	// It's possible for the rename operation to succeed, but for the item name to remain unchanged.
+	// For example, if one or more '.' characters are appended to the end of the item name, the
+	// rename operation will succeed, but the name won't actually change. In those sorts of cases,
+	// the name the user entered should be removed.
+	if (HRESULT_CODE(hr) == 0)
+	{
+		return FALSE;
+	}
+
+	// When an item is changed in any way, a notification will be sent. However, that notification
+	// isn't going to be received immediately. In the case where the user has renamed an item, that
+	// creates a period of time where the updated name is shown, but the item still internally
+	// refers to the original name. That then means that attempting to opening the item (or interact
+	// with it more generally) will fail, since the item no longer exists with the original name.
+	// Performing an immediate update here means that the user can continue to interact with the
+	// item, without having to wait for the rename notification to be processed.
+	unique_pidl_absolute pidlNew(ILCombine(m_directoryState.pidlDirectory.get(), newChild.get()));
+	UpdateItem(item.pidlComplete.get(), pidlNew.get());
+
+	// The text will be set by UpdateItem. It's not safe to return true here, since items can sorted
+	// by UpdateItem, which can result in the index of this item being changed.
+	return FALSE;
 }

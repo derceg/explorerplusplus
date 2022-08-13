@@ -124,7 +124,6 @@ public:
 	unique_pidl_child GetItemChildIdl(int index) const;
 	std::wstring GetItemName(int index) const;
 	std::wstring GetItemDisplayName(int index) const;
-	std::wstring GetItemEditingName(int index) const;
 	std::wstring GetItemFullName(int index) const;
 
 	void ShowPropertiesForSelectedFiles() const;
@@ -172,7 +171,6 @@ public:
 	void SelectItems(const std::list<std::wstring> &PastedFileList);
 	void OnDeviceChange(WPARAM wParam, LPARAM lParam);
 	void OnGridlinesSettingChanged();
-	void UserRenamedItem(PCIDLIST_ABSOLUTE pidlOld, PCIDLIST_ABSOLUTE pidlNew);
 	void AutoSizeColumns();
 
 	// Signals
@@ -450,6 +448,8 @@ private:
 	std::vector<PCIDLIST_ABSOLUTE> GetSelectedItemPidls();
 	void OnListViewBeginDrag(const NMLISTVIEW *info);
 	HRESULT StartDrag(int draggedItem, const POINT &startPoint);
+	BOOL OnListViewBeginLabelEdit(const NMLVDISPINFO *dispInfo);
+	BOOL OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo);
 
 	HRESULT GetListViewItemAttributes(int item, SFGAOF *attributes) const;
 
@@ -657,6 +657,7 @@ private:
 
 	/* Internal state. */
 	const HINSTANCE m_hResourceModule;
+	HACCEL *m_acceleratorTable;
 	BOOL m_bFolderVisited;
 	int m_iDirMonitorId;
 	int m_iFolderIcon;

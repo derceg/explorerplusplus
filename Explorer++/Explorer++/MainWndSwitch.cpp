@@ -1436,12 +1436,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 		case LVN_ITEMCHANGING:
 			return OnListViewItemChanging(reinterpret_cast<NMLISTVIEW *>(lParam));
 
-		case LVN_BEGINLABELEDIT:
-			return OnListViewBeginLabelEdit(reinterpret_cast<NMLVDISPINFO *>(lParam));
-
-		case LVN_ENDLABELEDIT:
-			return OnListViewEndLabelEdit(reinterpret_cast<NMLVDISPINFO *>(lParam));
-
 		case LVN_DELETEALLITEMS:
 			// Respond to the notification in order to speed up calls to ListView_DeleteAllItems
 			// per http://www.verycomputer.com/5_0c959e6a4fd713e2_1.htm
