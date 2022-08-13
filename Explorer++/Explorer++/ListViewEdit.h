@@ -8,7 +8,6 @@
 #include <wil/resource.h>
 
 struct Accelerator;
-__interface IExplorerplusplus;
 
 // Some notes about the handling of Tab/Shift + Tab:
 //
@@ -20,8 +19,7 @@ __interface IExplorerplusplus;
 class ListViewEdit : BaseWindow
 {
 public:
-	static ListViewEdit *CreateNew(HWND hwnd, HACCEL *acceleratorTable, int ItemIndex,
-		IExplorerplusplus *pexpp);
+	static ListViewEdit *CreateNew(HWND hwnd, HACCEL *acceleratorTable, bool itemIsFile);
 
 protected:
 	void OnEMSetSel(WPARAM &wParam, LPARAM &lParam) override;
@@ -36,7 +34,7 @@ private:
 		Entire
 	};
 
-	ListViewEdit(HWND hwnd, HACCEL *acceleratorTable, int ItemIndex, IExplorerplusplus *pexpp);
+	ListViewEdit(HWND hwnd, HACCEL *acceleratorTable, bool itemIsFile);
 	~ListViewEdit();
 
 	void UpdateAcceleratorTable();
@@ -49,9 +47,7 @@ private:
 	wil::unique_haccel m_updatedAcceleratorTable;
 	HACCEL m_originalAcceleratorTable;
 
-	IExplorerplusplus *m_pexpp;
-
-	int m_itemIndex;
+	bool m_itemIsFile;
 	RenameStage m_renameStage;
 	bool m_beginRename;
 };

@@ -363,7 +363,8 @@ BOOL Explorerplusplus::OnListViewBeginLabelEdit(const NMLVDISPINFO *dispInfo)
 		SetWindowText(editControl, editingName.c_str());
 	}
 
-	ListViewEdit::CreateNew(editControl, &g_hAccl, dispInfo->item.iItem, this);
+	ListViewEdit::CreateNew(editControl, &g_hAccl,
+		WI_IsFlagClear(fileData.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY));
 
 	return FALSE;
 }

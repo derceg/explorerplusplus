@@ -5,25 +5,20 @@
 #include "stdafx.h"
 #include "ListViewEdit.h"
 #include "Accelerator.h"
-#include "CoreInterface.h"
-#include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
 
-ListViewEdit *ListViewEdit::CreateNew(HWND hwnd, HACCEL *acceleratorTable, int ItemIndex,
-	IExplorerplusplus *pexpp)
+ListViewEdit *ListViewEdit::CreateNew(HWND hwnd, HACCEL *acceleratorTable, bool itemIsFile)
 {
-	return new ListViewEdit(hwnd, acceleratorTable, ItemIndex, pexpp);
+	return new ListViewEdit(hwnd, acceleratorTable, itemIsFile);
 }
 
-ListViewEdit::ListViewEdit(HWND hwnd, HACCEL *acceleratorTable, int ItemIndex,
-	IExplorerplusplus *pexpp) :
+ListViewEdit::ListViewEdit(HWND hwnd, HACCEL *acceleratorTable, bool itemIsFile) :
 	BaseWindow(hwnd),
 	m_acceleratorTable(acceleratorTable),
-	m_itemIndex(ItemIndex),
-	m_pexpp(pexpp),
+	m_itemIsFile(itemIsFile),
 	m_renameStage(RenameStage::Filename),
 	m_beginRename(true)
 {
@@ -149,12 +144,9 @@ int ListViewEdit::GetExtensionIndex(HWND hwnd)
 {
 	std::wstring fileName = GetWindowString(hwnd);
 
-	DWORD dwAttributes =
-		m_pexpp->GetActiveShellBrowser()->GetItemFileFindData(m_itemIndex).dwFileAttributes;
-
 	int index = -1;
 
-	if ((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
+	if (m_itemIsFile)
 	{
 		auto position = fileName.find_last_of('.');
 
