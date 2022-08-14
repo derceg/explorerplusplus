@@ -956,7 +956,7 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 			CheckDlgButton(hDlg, IDC_OPTION_ALWAYSSHOWTABBAR, BST_CHECKED);
 		}
 
-		if (m_config->showTabBarAtBottom)
+		if (m_config->showTabBarAtBottom.get())
 		{
 			CheckDlgButton(hDlg, IDC_OPTION_SHOWTABBARATBOTTOM, BST_CHECKED);
 		}
@@ -1096,8 +1096,8 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 			m_config->alwaysShowTabBar.set(
 				IsDlgButtonChecked(hDlg, IDC_OPTION_ALWAYSSHOWTABBAR) == BST_CHECKED);
 
-			m_config->showTabBarAtBottom =
-				(IsDlgButtonChecked(hDlg, IDC_OPTION_SHOWTABBARATBOTTOM) == BST_CHECKED);
+			m_config->showTabBarAtBottom.set(
+				(IsDlgButtonChecked(hDlg, IDC_OPTION_SHOWTABBARATBOTTOM) == BST_CHECKED));
 
 			m_config->showFilePreviews =
 				(IsDlgButtonChecked(hDlg, IDC_OPTION_FILEPREVIEWS) == BST_CHECKED);

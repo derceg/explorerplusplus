@@ -47,7 +47,6 @@ struct Config
 		showBookmarksToolbar = FALSE;
 		showDrivesToolbar = TRUE;
 		showApplicationToolbar = FALSE;
-		showTabBarAtBottom = FALSE;
 		alwaysOpenNewTab = FALSE;
 		openNewTabNextToCurrent = FALSE;
 		lockToolbars = TRUE;
@@ -83,6 +82,7 @@ struct Config
 		showPrivilegeLevelInTitleBar.set(FALSE);
 
 		alwaysShowTabBar.set(TRUE);
+		showTabBarAtBottom.set(FALSE);
 		forceSameTabWidth.set(FALSE);
 		openTabsInForeground = false;
 
@@ -154,7 +154,6 @@ struct Config
 	BOOL showBookmarksToolbar;
 	BOOL showDrivesToolbar;
 	BOOL showApplicationToolbar;
-	BOOL showTabBarAtBottom;
 	BOOL alwaysOpenNewTab;
 	BOOL openNewTabNextToCurrent;
 	BOOL lockToolbars;
@@ -192,6 +191,7 @@ struct Config
 
 	// Tabs
 	ValueWrapper<BOOL> alwaysShowTabBar;
+	ValueWrapper<BOOL> showTabBarAtBottom;
 	ValueWrapper<BOOL> forceSameTabWidth;
 	bool openTabsInForeground;
 

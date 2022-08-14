@@ -125,7 +125,7 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 
 	if (m_bShowTabBar)
 	{
-		if (!m_config->showTabBarAtBottom)
+		if (!m_config->showTabBarAtBottom.get())
 		{
 			indentTop += tabWindowHeight;
 		}
@@ -134,7 +134,7 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 	int width = mainWindowWidth - indentLeft - indentRight;
 	int height = mainWindowHeight - indentTop - indentBottom;
 
-	if (m_config->showTabBarAtBottom)
+	if (m_config->showTabBarAtBottom.get())
 	{
 		height -= tabWindowHeight;
 	}

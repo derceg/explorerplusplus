@@ -48,6 +48,14 @@ void Explorerplusplus::InitializeTabs()
 		std::bind_front(&Explorerplusplus::OnTabListViewSelectionChanged, this),
 		boost::signals2::at_front);
 
+	m_connections.push_back(m_config->showTabBarAtBottom.addObserver(
+		[this](BOOL newValue)
+		{
+			UNREFERENCED_PARAMETER(newValue);
+
+			UpdateLayout();
+		}));
+
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_tabContainer->GetHWND());
 	int tabWindowHeight = MulDiv(TAB_WINDOW_HEIGHT_96DPI, dpi, USER_DEFAULT_SCREEN_DPI);
 	SetWindowPos(

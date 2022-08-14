@@ -392,7 +392,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 
 	if (m_bShowTabBar)
 	{
-		if (!m_config->showTabBarAtBottom)
+		if (!m_config->showTabBarAtBottom.get())
 		{
 			indentTop += tabWindowHeight;
 		}
@@ -415,7 +415,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 
 	int iTabTop;
 
-	if (!m_config->showTabBarAtBottom)
+	if (!m_config->showTabBarAtBottom.get())
 	{
 		iTabTop = iIndentRebar;
 	}
@@ -445,7 +445,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 		scaledCloseToolbarYOffset, scaledCloseToolbarWidth, scaledCloseToolbarHeight,
 		SWP_SHOWWINDOW | SWP_NOZORDER);
 
-	if (m_config->extendTabControl && !m_config->showTabBarAtBottom)
+	if (m_config->extendTabControl && !m_config->showTabBarAtBottom.get())
 	{
 		iHolderTop = indentTop;
 	}
@@ -456,7 +456,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 
 	/* <---- Holder window + child windows ----> */
 
-	if (m_config->extendTabControl && m_config->showTabBarAtBottom && m_bShowTabBar)
+	if (m_config->extendTabControl && m_config->showTabBarAtBottom.get() && m_bShowTabBar)
 	{
 		iHolderHeight = MainWindowHeight - indentBottom - iHolderTop - tabWindowHeight;
 	}
@@ -507,7 +507,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 		int width = MainWindowWidth - indentLeft - indentRight;
 		int height = MainWindowHeight - indentBottom - indentTop;
 
-		if (m_config->showTabBarAtBottom && m_bShowTabBar)
+		if (m_config->showTabBarAtBottom.get() && m_bShowTabBar)
 		{
 			height -= tabWindowHeight;
 		}

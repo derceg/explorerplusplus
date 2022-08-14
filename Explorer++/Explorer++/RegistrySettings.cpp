@@ -168,7 +168,7 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 		RegistrySettings::SaveDword(
 			hSettingsKey, _T("CloseMainWindowOnTabClose"), m_config->closeMainWindowOnTabClose);
 		RegistrySettings::SaveDword(
-			hSettingsKey, _T("ShowTabBarAtBottom"), m_config->showTabBarAtBottom);
+			hSettingsKey, _T("ShowTabBarAtBottom"), m_config->showTabBarAtBottom.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("OverwriteExistingFilesConfirmation"),
 			m_config->overwriteExistingFilesConfirmation);
 		RegistrySettings::SaveDword(
@@ -345,6 +345,9 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		RegistrySettings::ReadDword(hSettingsKey, _T("AlwaysShowTabBar"), &numericValue);
 		m_config->alwaysShowTabBar.set(numericValue);
 
+		RegistrySettings::ReadDword(hSettingsKey, _T("ShowTabBarAtBottom"), &numericValue);
+		m_config->showTabBarAtBottom.set(numericValue);
+
 		RegistrySettings::ReadDword(hSettingsKey, _T("ForceSameTabWidth"), &numericValue);
 		m_config->forceSameTabWidth.set(numericValue);
 
@@ -376,8 +379,6 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 			hSettingsKey, _T("ForceSize"), m_config->globalFolderSettings.forceSize);
 		RegistrySettings::Read32BitValueFromRegistry(
 			hSettingsKey, _T("CloseMainWindowOnTabClose"), m_config->closeMainWindowOnTabClose);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("ShowTabBarAtBottom"), m_config->showTabBarAtBottom);
 		RegistrySettings::Read32BitValueFromRegistry(
 			hSettingsKey, _T("ShowTaskbarThumbnails"), m_config->showTaskbarThumbnails);
 		RegistrySettings::Read32BitValueFromRegistry(

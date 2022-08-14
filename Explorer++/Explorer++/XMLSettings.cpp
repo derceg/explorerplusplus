@@ -662,7 +662,7 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 		NXMLSettings::EncodeBoolValue(m_config->showStatusBar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowTabBarAtBottom"),
-		NXMLSettings::EncodeBoolValue(m_config->showTabBarAtBottom));
+		NXMLSettings::EncodeBoolValue(m_config->showTabBarAtBottom.get()));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
 		_T("ShowTaskbarThumbnails"),
@@ -1684,7 +1684,7 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 		break;
 
 	case HASH_SHOWTABBARATBOTTOM:
-		m_config->showTabBarAtBottom = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showTabBarAtBottom.set(NXMLSettings::DecodeBoolValue(wszValue));
 		break;
 
 	case HASH_SHOWTASKBARTHUMBNAILS:
