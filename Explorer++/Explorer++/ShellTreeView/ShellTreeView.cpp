@@ -772,6 +772,18 @@ HRESULT ShellTreeView::ExpandDirectory(HTREEITEM hParent)
 			}
 		}
 
+		if (m_config->globalFolderSettings.hideSystemFiles)
+		{
+			PCITEMID_CHILD child = pidlItem.get();
+			SFGAOF attributes = SFGAO_SYSTEM;
+			hr = shellFolder2->GetAttributesOf(1, &child, &attributes);
+
+			if (FAILED(hr) || (WI_IsFlagSet(attributes, SFGAO_SYSTEM)))
+			{
+				continue;
+			}
+		}
+
 		STRRET str;
 		hr = shellFolder2->GetDisplayNameOf(pidlItem.get(), SHGDN_NORMAL, &str);
 
