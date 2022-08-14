@@ -288,6 +288,12 @@ void Explorerplusplus::OnTreeViewCopyUniversalPaths() const
 
 void Explorerplusplus::OnTreeViewHolderWindowTimer()
 {
+	// It's important that the timer be killed here, before the navigation has started. Otherwise,
+	// what can happen is that if access to the folder is denied, a dialog will be shown and the
+	// message loop will run. That will then cause the timer to fire again, which will start another
+	// navigation, ad infinitum.
+	KillTimer(m_hHolder, 0);
+
 	auto pidlDirectory = m_shellTreeView->GetItemPidl(g_newSelectionItem);
 	auto pidlCurrentDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
@@ -302,8 +308,6 @@ void Explorerplusplus::OnTreeViewHolderWindowTimer()
 			TreeView_Expand(m_shellTreeView->GetHWND(), g_newSelectionItem, TVE_EXPAND);
 		}
 	}
-
-	KillTimer(m_hHolder, 0);
 }
 
 void Explorerplusplus::OnTreeViewSelChanged(LPARAM lParam)
