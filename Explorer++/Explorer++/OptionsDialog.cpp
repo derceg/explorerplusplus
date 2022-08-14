@@ -961,6 +961,11 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 			CheckDlgButton(hDlg, IDC_OPTION_SHOWTABBARATBOTTOM, BST_CHECKED);
 		}
 
+		if (m_config->extendTabControl.get())
+		{
+			CheckDlgButton(hDlg, IDC_OPTION_EXTENDTABCONTROL, BST_CHECKED);
+		}
+
 		if (m_config->showFilePreviews)
 		{
 			CheckDlgButton(hDlg, IDC_OPTION_FILEPREVIEWS, BST_CHECKED);
@@ -994,11 +999,6 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 		if (!m_config->treeViewDelayEnabled)
 		{
 			CheckDlgButton(hDlg, IDC_OPTION_TREEVIEWDELAY, BST_CHECKED);
-		}
-
-		if (m_config->extendTabControl)
-		{
-			CheckDlgButton(hDlg, IDC_OPTION_EXTENDTABCONTROL, BST_CHECKED);
 		}
 
 		if (m_config->globalFolderSettings.showGridlines)
@@ -1099,6 +1099,9 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 			m_config->showTabBarAtBottom.set(
 				(IsDlgButtonChecked(hDlg, IDC_OPTION_SHOWTABBARATBOTTOM) == BST_CHECKED));
 
+			m_config->extendTabControl.set(
+				(IsDlgButtonChecked(hDlg, IDC_OPTION_EXTENDTABCONTROL) == BST_CHECKED));
+
 			m_config->showFilePreviews =
 				(IsDlgButtonChecked(hDlg, IDC_OPTION_FILEPREVIEWS) == BST_CHECKED);
 
@@ -1119,9 +1122,6 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 
 			m_config->treeViewDelayEnabled =
 				!(IsDlgButtonChecked(hDlg, IDC_OPTION_TREEVIEWDELAY) == BST_CHECKED);
-
-			m_config->extendTabControl =
-				(IsDlgButtonChecked(hDlg, IDC_OPTION_EXTENDTABCONTROL) == BST_CHECKED);
 
 			m_config->globalFolderSettings.showGridlines =
 				(IsDlgButtonChecked(hDlg, IDC_OPTION_GRIDLINES) == BST_CHECKED);

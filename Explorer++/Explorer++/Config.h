@@ -55,7 +55,6 @@ struct Config
 		showTaskbarThumbnails = TRUE;
 		useFullRowSelect = FALSE;
 		showFilePreviews = TRUE;
-		extendTabControl = FALSE;
 		allowMultipleInstances = TRUE;
 		doubleClickTabClose = TRUE;
 		useLargeToolbarIcons.set(FALSE);
@@ -83,6 +82,7 @@ struct Config
 
 		alwaysShowTabBar.set(TRUE);
 		showTabBarAtBottom.set(FALSE);
+		extendTabControl.set(FALSE);
 		forceSameTabWidth.set(FALSE);
 		openTabsInForeground = false;
 
@@ -162,7 +162,6 @@ struct Config
 	BOOL showTaskbarThumbnails;
 	BOOL useFullRowSelect;
 	BOOL showFilePreviews;
-	BOOL extendTabControl;
 	BOOL allowMultipleInstances;
 	BOOL doubleClickTabClose;
 	ValueWrapper<BOOL> useLargeToolbarIcons;
@@ -192,6 +191,7 @@ struct Config
 	// Tabs
 	ValueWrapper<BOOL> alwaysShowTabBar;
 	ValueWrapper<BOOL> showTabBarAtBottom;
+	ValueWrapper<BOOL> extendTabControl;
 	ValueWrapper<BOOL> forceSameTabWidth;
 	bool openTabsInForeground;
 

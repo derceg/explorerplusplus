@@ -546,7 +546,7 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 		NXMLSettings::EncodeBoolValue(m_config->doubleClickTabClose));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ExtendTabControl"),
-		NXMLSettings::EncodeBoolValue(m_config->extendTabControl));
+		NXMLSettings::EncodeBoolValue(m_config->extendTabControl.get()));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ForceSameTabWidth"),
 		NXMLSettings::EncodeBoolValue(m_config->forceSameTabWidth.get()));
@@ -1549,7 +1549,7 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 		break;
 
 	case HASH_EXTENDTABCONTROL:
-		m_config->extendTabControl = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->extendTabControl.set(NXMLSettings::DecodeBoolValue(wszValue));
 		break;
 
 	case HASH_FORCESAMETABWIDTH:

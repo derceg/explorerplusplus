@@ -133,7 +133,7 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 			hSettingsKey, _T("TreeViewDelayEnabled"), m_config->treeViewDelayEnabled);
 		RegistrySettings::SaveDword(hSettingsKey, _T("LockToolbars"), m_config->lockToolbars);
 		RegistrySettings::SaveDword(
-			hSettingsKey, _T("ExtendTabControl"), m_config->extendTabControl);
+			hSettingsKey, _T("ExtendTabControl"), m_config->extendTabControl.get());
 		RegistrySettings::SaveDword(
 			hSettingsKey, _T("UseFullRowSelect"), m_config->useFullRowSelect);
 		RegistrySettings::SaveDword(
@@ -321,8 +321,6 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		RegistrySettings::Read32BitValueFromRegistry(
 			hSettingsKey, _T("LockToolbars"), m_config->lockToolbars);
 		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("ExtendTabControl"), m_config->extendTabControl);
-		RegistrySettings::Read32BitValueFromRegistry(
 			hSettingsKey, _T("UseFullRowSelect"), m_config->useFullRowSelect);
 		RegistrySettings::Read32BitValueFromRegistry(
 			hSettingsKey, _T("ShowFilePreviews"), m_config->showFilePreviews);
@@ -347,6 +345,9 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("ShowTabBarAtBottom"), &numericValue);
 		m_config->showTabBarAtBottom.set(numericValue);
+
+		RegistrySettings::ReadDword(hSettingsKey, _T("ExtendTabControl"), &numericValue);
+		m_config->extendTabControl.set(numericValue);
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("ForceSameTabWidth"), &numericValue);
 		m_config->forceSameTabWidth.set(numericValue);
