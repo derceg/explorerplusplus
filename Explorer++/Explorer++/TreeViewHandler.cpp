@@ -301,11 +301,21 @@ void Explorerplusplus::OnTreeViewHolderWindowTimer()
 		&& !ArePidlsEquivalent(pidlDirectory.get(), pidlCurrentDirectory.get()))
 	{
 		Tab &selectedTab = m_tabContainer->GetSelectedTab();
-		selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(pidlDirectory.get());
+		HRESULT hr = selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(
+			pidlDirectory.get());
 
-		if (m_config->treeViewAutoExpandSelected)
+		if (SUCCEEDED(hr))
 		{
-			TreeView_Expand(m_shellTreeView->GetHWND(), g_newSelectionItem, TVE_EXPAND);
+			if (m_config->treeViewAutoExpandSelected)
+			{
+				TreeView_Expand(m_shellTreeView->GetHWND(), g_newSelectionItem, TVE_EXPAND);
+			}
+		}
+		else
+		{
+			// The navigation failed, so the current folder hasn't changed. All that's needed is to
+			// update the treeview selection back to the current folder.
+			UpdateTreeViewSelection();
 		}
 	}
 }
