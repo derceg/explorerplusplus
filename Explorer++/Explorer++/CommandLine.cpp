@@ -42,7 +42,6 @@ struct CrashedData
 using namespace DefaultFileManager;
 
 extern std::vector<std::wstring> g_commandLineDirectories;
-extern bool g_enableDarkMode;
 
 typedef BOOL(WINAPI *MINIDUMPWRITEDUMP)(HANDLE hProcee, DWORD ProcessId, HANDLE hFile,
 	MINIDUMP_TYPE DumpType, PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
