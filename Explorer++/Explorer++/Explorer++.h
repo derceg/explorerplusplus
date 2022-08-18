@@ -6,6 +6,7 @@
 
 #include "AcceleratorUpdater.h"
 #include "Bookmarks/BookmarkTree.h"
+#include "CommandLine.h"
 #include "CoreInterface.h"
 #include "Navigation.h"
 #include "PluginInterface.h"
@@ -77,10 +78,10 @@ class Explorerplusplus :
 	friend LoadSaveXML;
 
 public:
-	Explorerplusplus(HWND);
+	Explorerplusplus(HWND hwnd, CommandLine::Settings *commandLineSettings);
 	~Explorerplusplus();
 
-	static LRESULT CALLBACK WndProcStub(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK WndProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	LRESULT CALLBACK RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -263,8 +264,8 @@ private:
 
 	/* Holder window private message handlers. */
 	std::optional<LRESULT> OnHolderCtlColorStatic(HWND hwnd, HDC hdc);
-	LRESULT CALLBACK TreeViewHolderWindowNotifyHandler(
-		HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK TreeViewHolderWindowNotifyHandler(HWND hwnd, UINT msg, WPARAM wParam,
+		LPARAM lParam);
 	void OnTreeViewHolderWindowTimer();
 
 	LRESULT CALLBACK FoldersToolbarParentProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -343,11 +344,11 @@ private:
 	void SaveTabSettingsToRegistry();
 	int LoadTabSettingsFromRegistry();
 	std::vector<Column_t> LoadColumnFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName);
-	void SaveColumnToRegistry(
-		HKEY hColumnsKey, const TCHAR *szKeyName, std::vector<Column_t> *pColumns);
+	void SaveColumnToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName,
+		std::vector<Column_t> *pColumns);
 	std::vector<ColumnWidth> LoadColumnWidthsFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName);
-	void SaveColumnWidthsToRegistry(
-		HKEY hColumnsKey, const TCHAR *szKeyName, std::vector<Column_t> *pColumns);
+	void SaveColumnWidthsToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName,
+		std::vector<Column_t> *pColumns);
 	void LoadDefaultColumnsFromRegistry();
 	void SaveDefaultColumnsToRegistry();
 	void SaveBookmarksToRegistry();
@@ -383,8 +384,8 @@ private:
 	void LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom);
 	void SaveDialogStatesToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, WCHAR *wszValue);
-	void MapTabAttributeValue(
-		WCHAR *wszName, WCHAR *wszValue, TabSettings &tabSettings, FolderSettings &folderSettings);
+	void MapTabAttributeValue(WCHAR *wszName, WCHAR *wszValue, TabSettings &tabSettings,
+		FolderSettings &folderSettings);
 
 	/* Window state update. */
 	void UpdateWindowStates(const Tab &tab);
@@ -414,8 +415,8 @@ private:
 	void CopyToFolder(bool move);
 	void OpenAllSelectedItems(
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
-	void OpenListViewItem(
-		int index, OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
+	void OpenListViewItem(int index,
+		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
 	void OpenItem(const TCHAR *itemPath,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) override;
 	void OpenItem(PCIDLIST_ABSOLUTE pidlItem,
@@ -516,10 +517,12 @@ private:
 	void HandleDirectoryMonitoring(int iTabId);
 	int DetermineListViewObjectIndex(HWND hListView);
 
-	static void FolderSizeCallbackStub(
-		int nFolders, int nFiles, PULARGE_INTEGER lTotalFolderSize, LPVOID pData);
-	void FolderSizeCallback(
-		FolderSizeExtraInfo *pfsei, int nFolders, int nFiles, PULARGE_INTEGER lTotalFolderSize);
+	static void FolderSizeCallbackStub(int nFolders, int nFiles, PULARGE_INTEGER lTotalFolderSize,
+		LPVOID pData);
+	void FolderSizeCallback(FolderSizeExtraInfo *pfsei, int nFolders, int nFiles,
+		PULARGE_INTEGER lTotalFolderSize);
+
+	CommandLine::Settings m_commandLineSettings;
 
 	HWND m_hContainer;
 	HWND m_hStatusBar;

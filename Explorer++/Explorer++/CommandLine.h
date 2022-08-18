@@ -4,14 +4,22 @@
 
 #pragma once
 
-#include <optional>
+#include <variant>
 
 namespace CommandLine
 {
+	struct Settings
+	{
+		bool enablePlugins;
+		bool registerForShellNotifications;
+		std::wstring language;
+		std::vector<std::wstring> directories;
+	};
+
 	struct ExitInfo
 	{
 		int exitCode;
 	};
 
-	std::optional<ExitInfo> ProcessCommandLine();
+	std::variant<Settings, ExitInfo> ProcessCommandLine();
 }

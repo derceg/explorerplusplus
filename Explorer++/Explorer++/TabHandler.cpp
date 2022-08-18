@@ -17,8 +17,6 @@
 
 static const UINT TAB_WINDOW_HEIGHT_96DPI = 24;
 
-extern std::vector<std::wstring> g_commandLineDirectories;
-
 void Explorerplusplus::InitializeTabs()
 {
 	/* The tab backing will hold the tab window. */
@@ -140,9 +138,9 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 	TCHAR szDirectory[MAX_PATH];
 	int nTabsCreated = 0;
 
-	if (!g_commandLineDirectories.empty())
+	if (!m_commandLineSettings.directories.empty())
 	{
-		for (const auto &strDirectory : g_commandLineDirectories)
+		for (const auto &strDirectory : m_commandLineSettings.directories)
 		{
 			StringCchCopy(szDirectory, SIZEOF_ARRAY(szDirectory), strDirectory.c_str());
 

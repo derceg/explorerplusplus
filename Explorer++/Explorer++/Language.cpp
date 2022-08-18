@@ -26,15 +26,16 @@ void Explorerplusplus::SetLanguageModule()
 	WORD wLanguage;
 	BOOL bRet;
 
-	if (g_bForceLanguageLoad)
+	if (!m_commandLineSettings.language.empty())
 	{
 		/* Language has been forced on the command
 		line by the user. Attempt to find the
 		corresponding DLL. */
-		GetProcessImageName(
-			GetCurrentProcessId(), szLanguageModule, SIZEOF_ARRAY(szLanguageModule));
+		GetProcessImageName(GetCurrentProcessId(), szLanguageModule,
+			SIZEOF_ARRAY(szLanguageModule));
 		PathRemoveFileSpec(szLanguageModule);
-		StringCchPrintf(szName, SIZEOF_ARRAY(szName), _T("Explorer++%s.dll"), g_szLang);
+		StringCchPrintf(szName, SIZEOF_ARRAY(szName), _T("Explorer++%s.dll"),
+			m_commandLineSettings.language.c_str());
 		PathAppend(szLanguageModule, szName);
 
 		bRet = GetFileLanguage(szLanguageModule, &wLanguage);
@@ -62,8 +63,8 @@ void Explorerplusplus::SetLanguageModule()
 	}
 	else
 	{
-		GetProcessImageName(
-			GetCurrentProcessId(), szLanguageModule, SIZEOF_ARRAY(szLanguageModule));
+		GetProcessImageName(GetCurrentProcessId(), szLanguageModule,
+			SIZEOF_ARRAY(szLanguageModule));
 		PathRemoveFileSpec(szLanguageModule);
 
 		StringCchCopy(szNamePattern, SIZEOF_ARRAY(szNamePattern), szLanguageModule);

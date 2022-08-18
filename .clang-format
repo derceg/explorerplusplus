@@ -29,6 +29,7 @@ BreakBeforeBinaryOperators: NonAssignment
 BreakBeforeBraces: Allman
 BreakConstructorInitializers: AfterColon
 BreakInheritanceList: AfterColon
+BreakStringLiterals: false
 CompactNamespaces: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ContinuationIndentWidth: 4

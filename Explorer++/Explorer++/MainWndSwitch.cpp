@@ -44,41 +44,42 @@ and the right edge of the treeview during
 a resizing operation. */
 static const int TREEVIEW_DRAG_OFFSET = 8;
 
-LRESULT CALLBACK Explorerplusplus::WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::WndProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	auto *pContainer = (Explorerplusplus *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
+	auto *pContainer = (Explorerplusplus *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
-	switch(Msg)
+	switch (msg)
 	{
-		case WM_NCCREATE:
-			/* Create a new Explorerplusplus object to assign to this window. */
-			pContainer = new Explorerplusplus(hwnd);
+	case WM_NCCREATE:
+	{
+		auto *createInfo = reinterpret_cast<CREATESTRUCT *>(lParam);
 
-			if(!pContainer)
-			{
-				PostQuitMessage(0);
-				return 0;
-			}
+		pContainer = new Explorerplusplus(hwnd,
+			reinterpret_cast<CommandLine::Settings *>(createInfo->lpCreateParams));
 
-			/* Store the Explorerplusplus object pointer into the extra window bytes
-			for this window. */
-			SetWindowLongPtr(hwnd,GWLP_USERDATA,(LONG_PTR)pContainer);
-			break;
-
-		case WM_NCDESTROY:
-			SetWindowLongPtr(hwnd,GWLP_USERDATA,0);
-			delete pContainer;
+		if (!pContainer)
+		{
+			PostQuitMessage(0);
 			return 0;
+		}
+
+		SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR) pContainer);
+	}
+	break;
+
+	case WM_NCDESTROY:
+		SetWindowLongPtr(hwnd, GWLP_USERDATA, 0);
+		delete pContainer;
+		return 0;
 	}
 
-	/* Jump across to the member window function (will handle all requests). */
 	if (pContainer != nullptr)
 	{
-		return pContainer->WindowProcedure(hwnd, Msg, wParam, lParam);
+		return pContainer->WindowProcedure(hwnd, msg, wParam, lParam);
 	}
 	else
 	{
-		return DefWindowProc(hwnd, Msg, wParam, lParam);
+		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}
 }
 

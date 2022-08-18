@@ -20,6 +20,30 @@
 #include <filesystem>
 #include <iostream>
 #include <map>
+#include <optional>
+
+// Allows std::wstring to be used as a custom type for add_option.
+// See https://github.com/CLIUtils/CLI11/issues/704#issuecomment-1047954575.
+namespace CLI::detail
+{
+	template <>
+	struct classify_object<std::wstring, void>
+	{
+		static constexpr object_category value{ object_category::other };
+	};
+
+	template <>
+	struct is_mutable_container<std::wstring, void> : public std::false_type
+	{
+	};
+
+	template <>
+	bool lexical_cast(const std::string &input, std::wstring &output)
+	{
+		output = utf8StrToWstr(input);
+		return true;
+	}
+}
 
 using CrashedDataTuple = std::tuple<DWORD, DWORD, intptr_t, std::string>;
 
@@ -41,25 +65,20 @@ struct CrashedData
 
 using namespace DefaultFileManager;
 
-extern std::vector<std::wstring> g_commandLineDirectories;
-
 typedef BOOL(WINAPI *MINIDUMPWRITEDUMP)(HANDLE hProcee, DWORD ProcessId, HANDLE hFile,
 	MINIDUMP_TYPE DumpType, PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
 	PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
 	PMINIDUMP_CALLBACK_INFORMATION CallbackParam);
 
-struct CommandLineSettings
+// The items here are handled immediately and don't need to be passed to the Explorerplusplus class.
+struct ImmediatelyHandledOptions
 {
 	bool clearRegistrySettings;
 	bool enableLogging;
-	bool enablePlugins;
-	bool registerForShellNotifications;
 	bool removeAsDefault;
 	ReplaceExplorerMode replaceExplorerMode;
-	std::string language;
 	bool jumplistNewTab;
 	CrashedDataTuple crashedData;
-	std::vector<std::string> directories;
 };
 
 struct ReplaceExplorerResults
@@ -71,114 +90,90 @@ struct ReplaceExplorerResults
 };
 
 const int REPORT_ISSUE_BUTTON_ID = 100;
-const TCHAR REPORT_ISSUE_URL[] = L"https://github.com/derceg/explorerplusplus/issues/new?labels=bug,crash&template=bug_report.md";
+const TCHAR REPORT_ISSUE_URL[] =
+	L"https://github.com/derceg/explorerplusplus/issues/new?labels=bug,crash&template=bug_report.md";
 
-void PreprocessCommandLineSettings(CommandLineSettings &commandLineSettings);
-std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(
-	const CLI::App &app, const CommandLineSettings &commandLineSettings);
+void PreprocessDirectories(std::vector<std::wstring> &directories);
+std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(const CLI::App &app,
+	const ImmediatelyHandledOptions &immediatelyHandledOptions);
 void OnClearRegistrySettings();
 void OnUpdateReplaceExplorerSetting(ReplaceExplorerMode updatedReplaceMode);
 ReplaceExplorerResults UpdateReplaceExplorerSetting(ReplaceExplorerMode updatedReplaceMode);
 void OnShowCrashedMessage(const CrashedData &crashedData);
 std::optional<std::wstring> CreateMiniDump(const CrashedData &crashedData);
-HRESULT CALLBACK CrashedDialogCallback(
-	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, LONG_PTR data);
+HRESULT CALLBACK CrashedDialogCallback(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
+	LONG_PTR data);
 void OnJumplistNewTab();
 
-std::optional<CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
+std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
 {
 	CLI::App app("Explorer++");
 	app.allow_extras();
 
-	CommandLineSettings commandLineSettings;
+	ImmediatelyHandledOptions immediatelyHandledOptions;
 
-	commandLineSettings.clearRegistrySettings = false;
-	app.add_flag(
-		"--clear-registry-settings",
-		commandLineSettings.clearRegistrySettings,
-		"Clear existing registry settings"
-	);
+	immediatelyHandledOptions.clearRegistrySettings = false;
+	app.add_flag("--clear-registry-settings", immediatelyHandledOptions.clearRegistrySettings,
+		"Clear existing registry settings");
 
-	commandLineSettings.enableLogging = false;
-	app.add_flag(
-		"--enable-logging",
-		commandLineSettings.enableLogging,
-		"Enable logging"
-	);
+	immediatelyHandledOptions.enableLogging = false;
+	app.add_flag("--enable-logging", immediatelyHandledOptions.enableLogging, "Enable logging");
 
-	commandLineSettings.enablePlugins = false;
-	app.add_flag(
-		"--enable-plugins",
-		commandLineSettings.enablePlugins,
-		"Enable the Lua plugin system"
-	);
+	immediatelyHandledOptions.removeAsDefault = false;
+	auto removeAsDefaultOption = app.add_flag("--remove-as-default",
+		immediatelyHandledOptions.removeAsDefault, "Remove Explorer++ as the default file manager");
 
-	commandLineSettings.registerForShellNotifications = false;
-	app.add_flag(
-		"--register-for-shell-notifications",
-		commandLineSettings.registerForShellNotifications,
-		"Watch for directory changes through SHChangeNotifyRegister"
-	);
-
-	commandLineSettings.removeAsDefault = false;
-	auto removeAsDefaultOption = app.add_flag(
-		"--remove-as-default",
-		commandLineSettings.removeAsDefault,
-		"Remove Explorer++ as the default file manager"
-	);
-
-	commandLineSettings.replaceExplorerMode = ReplaceExplorerMode::None;
-	auto setAsDefaultOption = app.add_option(
-		"--set-as-default",
-		commandLineSettings.replaceExplorerMode,
-		"Set Explorer++ as the default file manager for the current user"
-	)->transform(CLI::CheckedTransformer(CLI::TransformPairs<ReplaceExplorerMode>{
-		{ "filesystem", ReplaceExplorerMode::FileSystem },
-		{ "all", ReplaceExplorerMode::All }
-	}));
+	immediatelyHandledOptions.replaceExplorerMode = ReplaceExplorerMode::None;
+	auto setAsDefaultOption =
+		app.add_option("--set-as-default", immediatelyHandledOptions.replaceExplorerMode,
+			   "Set Explorer++ as the default file manager for the current user")
+			->transform(CLI::CheckedTransformer(CLI::TransformPairs<ReplaceExplorerMode>{
+				{ "filesystem", ReplaceExplorerMode::FileSystem },
+				{ "all", ReplaceExplorerMode::All } }));
 
 	removeAsDefaultOption->excludes(setAsDefaultOption);
 	setAsDefaultOption->excludes(removeAsDefaultOption);
-
-	app.add_option(
-		"--language",
-		commandLineSettings.language,
-		"Allows you to select your desired language. Should be a two-letter language code (e.g. FR, RU, etc)."
-	);
-
-	app.add_option(
-		"directories",
-		commandLineSettings.directories,
-		"Directories to open"
-	);
 
 	// The options in this group are only used internally by the application. They're not directly
 	// exposed to users.
 	CLI::App *privateCommands = app.add_subcommand();
 	privateCommands->group("");
 
-	commandLineSettings.jumplistNewTab = false;
-	privateCommands->add_flag(
-		wstrToUtf8Str(NExplorerplusplus::JUMPLIST_TASK_NEWTAB_ARGUMENT),
-		commandLineSettings.jumplistNewTab
-	);
+	immediatelyHandledOptions.jumplistNewTab = false;
+	privateCommands->add_flag(wstrToUtf8Str(NExplorerplusplus::JUMPLIST_TASK_NEWTAB_ARGUMENT),
+		immediatelyHandledOptions.jumplistNewTab);
 
-	privateCommands->add_option(
-		wstrToUtf8Str(NExplorerplusplus::APPLICATION_CRASHED_ARGUMENT),
-		commandLineSettings.crashedData
-	);
+	privateCommands->add_option(wstrToUtf8Str(NExplorerplusplus::APPLICATION_CRASHED_ARGUMENT),
+		immediatelyHandledOptions.crashedData);
+
+	CommandLine::Settings settings;
+
+	settings.enablePlugins = false;
+	app.add_flag("--enable-plugins", settings.enablePlugins, "Enable the Lua plugin system");
+
+	settings.registerForShellNotifications = false;
+	app.add_flag("--register-for-shell-notifications", settings.registerForShellNotifications,
+		"Watch for directory changes through SHChangeNotifyRegister");
+
+	app.add_option("--language", settings.language,
+		"Allows you to select your desired language. Should be a two-letter language code (e.g. "
+		"FR, RU, etc).");
+
+	app.add_option("directories", settings.directories, "Directories to open");
 
 	int numArgs;
 	LPWSTR *args = CommandLineToArgvW(GetCommandLine(), &numArgs);
 
 	if (!args)
 	{
-		return std::nullopt;
+		return settings;
 	}
 
-	auto freeArgs = wil::scope_exit([args] {
-		LocalFree(args);
-	});
+	auto freeArgs = wil::scope_exit(
+		[args]
+		{
+			LocalFree(args);
+		});
 
 	std::vector<std::string> utf8Args;
 
@@ -194,17 +189,24 @@ std::optional<CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
 	{
 		app.parse(utf8Args);
 	}
-	catch (const CLI::ParseError & e)
+	catch (const CLI::ParseError &e)
 	{
 		return ExitInfo{ app.exit(e) };
 	}
 
-	PreprocessCommandLineSettings(commandLineSettings);
+	auto exitInfo = ProcessCommandLineFlags(app, immediatelyHandledOptions);
 
-	return ProcessCommandLineSettings(app, commandLineSettings);
+	if (exitInfo)
+	{
+		return *exitInfo;
+	}
+
+	PreprocessDirectories(settings.directories);
+
+	return settings;
 }
 
-void PreprocessCommandLineSettings(CommandLineSettings &commandLineSettings)
+void PreprocessDirectories(std::vector<std::wstring> &directories)
 {
 	// When Explorer++ is set as the default file manager, it's invoked in the following way when a
 	// directory is opened:
@@ -231,64 +233,12 @@ void PreprocessCommandLineSettings(CommandLineSettings &commandLineSettings)
 	// the presence of the double quote character is either a mistake (in which case, no directory
 	// will be opened anyway, so the transformation won't make much of a difference), or it's
 	// something that's being interpreted as part of the command line parsing.
-	for (std::string &directory : commandLineSettings.directories)
+	for (std::wstring &directory : directories)
 	{
 		if (directory[directory.size() - 1] == '\"')
 		{
 			directory[directory.size() - 1] = '\\';
 		}
-	}
-}
-
-std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(
-	const CLI::App &app, const CommandLineSettings &commandLineSettings)
-{
-	if (app.count(wstrToUtf8Str(NExplorerplusplus::APPLICATION_CRASHED_ARGUMENT)) > 0)
-	{
-		OnShowCrashedMessage(commandLineSettings.crashedData);
-		return CommandLine::ExitInfo{ EXIT_SUCCESS };
-	}
-
-	if (commandLineSettings.jumplistNewTab)
-	{
-		OnJumplistNewTab();
-		return CommandLine::ExitInfo{ EXIT_SUCCESS };
-	}
-
-	if (commandLineSettings.clearRegistrySettings)
-	{
-		OnClearRegistrySettings();
-	}
-
-	if (commandLineSettings.enableLogging)
-	{
-		boost::log::core::get()->set_logging_enabled(true);
-	}
-
-	if (commandLineSettings.enablePlugins)
-	{
-		g_enablePlugins = true;
-	}
-
-	if (commandLineSettings.registerForShellNotifications)
-	{
-		g_registerForShellNotifications = true;
-	}
-
-	if (commandLineSettings.removeAsDefault)
-	{
-		OnUpdateReplaceExplorerSetting(ReplaceExplorerMode::None);
-	}
-	else if (commandLineSettings.replaceExplorerMode != ReplaceExplorerMode::None)
-	{
-		OnUpdateReplaceExplorerSetting(commandLineSettings.replaceExplorerMode);
-	}
-
-	if (!commandLineSettings.language.empty())
-	{
-		g_bForceLanguageLoad = TRUE;
-
-		StringCchCopy(g_szLang, SIZEOF_ARRAY(g_szLang), utf8StrToWstr(commandLineSettings.language).c_str());
 	}
 
 	TCHAR processImageName[MAX_PATH];
@@ -297,12 +247,48 @@ std::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(
 	std::filesystem::path processDirectoryPath(processImageName);
 	processDirectoryPath.remove_filename();
 
-	for (const std::string& directory : commandLineSettings.directories)
+	for (std::wstring &directory : directories)
 	{
 		TCHAR szParsingPath[MAX_PATH];
-		DecodePath(utf8StrToWstr(directory).c_str(), processDirectoryPath.wstring().c_str(), szParsingPath, SIZEOF_ARRAY(szParsingPath));
+		DecodePath(directory.c_str(), processDirectoryPath.wstring().c_str(), szParsingPath,
+			SIZEOF_ARRAY(szParsingPath));
 
-		g_commandLineDirectories.emplace_back(szParsingPath);
+		directory = szParsingPath;
+	}
+}
+
+std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(const CLI::App &app,
+	const ImmediatelyHandledOptions &immediatelyHandledOptions)
+{
+	if (app.count(wstrToUtf8Str(NExplorerplusplus::APPLICATION_CRASHED_ARGUMENT)) > 0)
+	{
+		OnShowCrashedMessage(immediatelyHandledOptions.crashedData);
+		return CommandLine::ExitInfo{ EXIT_SUCCESS };
+	}
+
+	if (immediatelyHandledOptions.jumplistNewTab)
+	{
+		OnJumplistNewTab();
+		return CommandLine::ExitInfo{ EXIT_SUCCESS };
+	}
+
+	if (immediatelyHandledOptions.clearRegistrySettings)
+	{
+		OnClearRegistrySettings();
+	}
+
+	if (immediatelyHandledOptions.enableLogging)
+	{
+		boost::log::core::get()->set_logging_enabled(true);
+	}
+
+	if (immediatelyHandledOptions.removeAsDefault)
+	{
+		OnUpdateReplaceExplorerSetting(ReplaceExplorerMode::None);
+	}
+	else if (immediatelyHandledOptions.replaceExplorerMode != ReplaceExplorerMode::None)
+	{
+		OnUpdateReplaceExplorerSetting(immediatelyHandledOptions.replaceExplorerMode);
 	}
 
 	return std::nullopt;
@@ -516,8 +502,8 @@ std::optional<std::wstring> CreateMiniDump(const CrashedData &crashedData)
 		return std::nullopt;
 	}
 
-	wil::unique_hfile file(CreateFile(
-		fullPath, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr));
+	wil::unique_hfile file(CreateFile(fullPath, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS,
+		FILE_ATTRIBUTE_NORMAL, nullptr));
 
 	if (!file)
 	{
@@ -528,8 +514,8 @@ std::optional<std::wstring> CreateMiniDump(const CrashedData &crashedData)
 	mei.ThreadId = crashedData.threadId;
 	mei.ExceptionPointers = exceptionAddress;
 	mei.ClientPointers = true;
-	res = miniDumpWriteDump(
-		process.get(), crashedData.processId, file.get(), MiniDumpNormal, &mei, nullptr, nullptr);
+	res = miniDumpWriteDump(process.get(), crashedData.processId, file.get(), MiniDumpNormal, &mei,
+		nullptr, nullptr);
 
 	if (!res)
 	{
@@ -539,8 +525,8 @@ std::optional<std::wstring> CreateMiniDump(const CrashedData &crashedData)
 	return fullPath;
 }
 
-HRESULT CALLBACK CrashedDialogCallback(
-	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, LONG_PTR data)
+HRESULT CALLBACK CrashedDialogCallback(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
+	LONG_PTR data)
 {
 	UNREFERENCED_PARAMETER(hwnd);
 	UNREFERENCED_PARAMETER(lParam);
@@ -583,7 +569,7 @@ void OnJumplistNewTab()
 
 			cds.cbData = 0;
 			cds.lpData = nullptr;
-			SendMessage(hPrev, WM_COPYDATA, NULL, (LPARAM)& cds);
+			SendMessage(hPrev, WM_COPYDATA, NULL, (LPARAM) &cds);
 
 			SetForegroundWindow(hPrev);
 			ShowWindow(hPrev, SW_SHOW);

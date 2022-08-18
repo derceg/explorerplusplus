@@ -56,12 +56,6 @@ struct ColumnWidth
 	int iWidth;
 };
 
-extern BOOL g_bForceLanguageLoad;
-extern TCHAR g_szLang[32];
-
 extern HACCEL g_hAccl;
-
-extern bool g_enablePlugins;
-extern bool g_registerForShellNotifications;
 
 BOOL TestConfigFileInternal(void);

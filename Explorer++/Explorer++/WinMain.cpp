@@ -40,7 +40,6 @@ void InitializeLocale();
 DWORD dwControlClasses = ICC_BAR_CLASSES|ICC_COOL_CLASSES|
 	ICC_LISTVIEW_CLASSES|ICC_USEREX_CLASSES|ICC_STANDARD_CLASSES|
 	ICC_LINK_CLASS;
-std::vector<std::wstring> g_commandLineDirectories;
 
 /* Modeless dialog handles. */
 HWND g_hwndSearch;
@@ -48,13 +47,7 @@ HWND g_hwndRunScript;
 HWND g_hwndOptions;
 HWND g_hwndManageBookmarks;
 
-TCHAR g_szLang[32];
-BOOL g_bForceLanguageLoad = FALSE;
-
 HACCEL g_hAccl;
-
-bool g_enablePlugins = false;
-bool g_registerForShellNotifications = false;
 
 ATOM RegisterMainWindowClass(HINSTANCE hInstance)
 {
@@ -163,14 +156,16 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 		}
 	} BOOST_SCOPE_EXIT_END
 
-	auto exitInfo = CommandLine::ProcessCommandLine();
+	auto commandLineInfo = CommandLine::ProcessCommandLine();
 
-	if (exitInfo)
+	if (std::holds_alternative<CommandLine::ExitInfo>(commandLineInfo))
 	{
-		return exitInfo->exitCode;
+		return std::get<CommandLine::ExitInfo>(commandLineInfo).exitCode;
 	}
 
 	InitializeLogging(NExplorerplusplus::LOG_FILENAME);
+
+	auto &commandLineSettings = std::get<CommandLine::Settings>(commandLineInfo);
 
 	bool shouldExit = false;
 
@@ -178,7 +173,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	control panel. If the command line only refers
 	to folders that are children of the control panel,
 	pass those folders to Windows Explorer, then exit. */
-	if(!g_commandLineDirectories.empty())
+	if(!commandLineSettings.directories.empty())
 	{
 		unique_pidl_absolute pidlControlPanel;
 		HRESULT hr = SHGetFolderLocation(nullptr,
@@ -186,11 +181,11 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 
 		if(SUCCEEDED(hr))
 		{
-			auto itr = g_commandLineDirectories.begin();
+			auto itr = commandLineSettings.directories.begin();
 
 			BOOL bControlPanelChild = FALSE;
 
-			while(itr != g_commandLineDirectories.end())
+			while(itr != commandLineSettings.directories.end())
 			{
 				/* This could fail on a 64-bit version of Windows if the
 				executable is 32-bit, and the folder is 64-bit specific (as is
@@ -236,7 +231,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 						ShellExecute(nullptr,_T("open"),szExplorerPath,
 							itr->c_str(), nullptr,SW_SHOWNORMAL);
 
-						itr = g_commandLineDirectories.erase(itr);
+						itr = commandLineSettings.directories.erase(itr);
 					}
 				}
 
@@ -247,7 +242,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 				}
 			}
 
-			if(g_commandLineDirectories.empty())
+			if(commandLineSettings.directories.empty())
 			{
 				shouldExit = true;
 			}
@@ -290,9 +285,9 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 
 			if(hPrev != nullptr)
 			{
-				if(!g_commandLineDirectories.empty())
+				if(!commandLineSettings.directories.empty())
 				{
-					for(const auto &strDirectory : g_commandLineDirectories)
+					for(const auto &strDirectory : commandLineSettings.directories)
 					{
 						COPYDATASTRUCT cds;
 						TCHAR szDirectory[MAX_PATH];
@@ -352,7 +347,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	nullptr,
 	nullptr,
 	hInstance,
-	nullptr);
+	&commandLineSettings);
 
 	if(hwnd == nullptr)
 	{

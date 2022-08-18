@@ -14,7 +14,7 @@ static const std::wstring PLUGIN_FOLDER_NAME = L"plugins";
 
 void Explorerplusplus::InitializePlugins()
 {
-	if (!g_enablePlugins)
+	if (!m_commandLineSettings.enablePlugins)
 	{
 		return;
 	}

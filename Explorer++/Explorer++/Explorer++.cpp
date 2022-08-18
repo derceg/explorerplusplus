@@ -30,8 +30,9 @@ const std::vector<std::wstring> Explorerplusplus::BLACKLISTED_BACKGROUND_MENU_CL
 	_T("{CB3D0F55-BC2C-4C1A-85ED-23ED75B5106B}")
 };
 
-Explorerplusplus::Explorerplusplus(HWND hwnd) :
+Explorerplusplus::Explorerplusplus(HWND hwnd, CommandLine::Settings *commandLineSettings) :
 	m_hContainer(hwnd),
+	m_commandLineSettings(*commandLineSettings),
 	m_cachedIcons(MAX_CACHED_ICONS),
 	m_pluginMenuManager(hwnd, MENU_PLUGIN_STARTID, MENU_PLUGIN_ENDID),
 	m_acceleratorUpdater(&g_hAccl),

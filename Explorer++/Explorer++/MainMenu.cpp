@@ -60,7 +60,7 @@ void Explorerplusplus::InitializeMainMenu()
 	// before the tabs are restored.
 	HMENU mainMenu = LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_MAINMENU));
 
-	if (!g_enablePlugins)
+	if (!m_commandLineSettings.enablePlugins)
 	{
 		DeleteMenu(mainMenu, IDM_TOOLS_RUNSCRIPT, MF_BYCOMMAND);
 	}
