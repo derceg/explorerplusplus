@@ -23,13 +23,15 @@ void ShellBrowser::QueueColumnTask(int itemInternalIndex, ColumnType columnType)
 	BasicItemInfo_t basicItemInfo = getBasicItemInfo(itemInternalIndex);
 	GlobalFolderSettings globalFolderSettings = m_config->globalFolderSettings;
 
-	auto result = m_columnThreadPool.push([this, columnResultID, columnType, itemInternalIndex,
-											  basicItemInfo, globalFolderSettings](int id) {
-		UNREFERENCED_PARAMETER(id);
+	auto result = m_columnThreadPool.push(
+		[listView = m_hListView, columnResultID, columnType, itemInternalIndex, basicItemInfo,
+			globalFolderSettings](int id)
+		{
+			UNREFERENCED_PARAMETER(id);
 
-		return GetColumnTextAsync(m_hListView, columnResultID, columnType, itemInternalIndex,
-			basicItemInfo, globalFolderSettings);
-	});
+			return GetColumnTextAsync(listView, columnResultID, columnType, itemInternalIndex,
+				basicItemInfo, globalFolderSettings);
+		});
 
 	// The function call above might finish before this line runs,
 	// but that doesn't matter, as the results won't be processed
@@ -982,8 +984,9 @@ void ShellBrowser::SetCurrentColumns(const std::vector<Column_t> &columns)
 		// removed, set the sort mode back to the first checked column.
 		if (!column.bChecked && DetermineColumnSortMode(column.type) == m_folderSettings.sortMode)
 		{
-			auto firstChecked =
-				std::find_if(columns.begin(), columns.end(), [](const Column_t &currentColumn) {
+			auto firstChecked = std::find_if(columns.begin(), columns.end(),
+				[](const Column_t &currentColumn)
+				{
 					return currentColumn.bChecked;
 				});
 			assert(firstChecked != columns.end());
@@ -998,7 +1001,8 @@ void ShellBrowser::SetCurrentColumns(const std::vector<Column_t> &columns)
 		}
 
 		auto existingColumn = std::find_if(m_pActiveColumns->begin(), m_pActiveColumns->end(),
-			[column](const Column_t &currentColumn) {
+			[column](const Column_t &currentColumn)
+			{
 				return currentColumn.type == column.type;
 			});
 		assert(existingColumn != m_pActiveColumns->end());
@@ -1043,8 +1047,9 @@ void ShellBrowser::GetColumnInternal(ColumnType columnType, Column_t *pci) const
 
 Column_t ShellBrowser::GetFirstCheckedColumn()
 {
-	auto itr = std::find_if(
-		m_pActiveColumns->begin(), m_pActiveColumns->end(), [](const Column_t &column) {
+	auto itr = std::find_if(m_pActiveColumns->begin(), m_pActiveColumns->end(),
+		[](const Column_t &column)
+		{
 			return column.bChecked;
 		});
 
