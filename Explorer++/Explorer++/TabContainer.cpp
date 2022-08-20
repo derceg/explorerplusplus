@@ -1420,7 +1420,9 @@ std::vector<std::reference_wrapper<const Tab>> TabContainer::GetAllTabsInOrder()
 
 void TabContainer::DuplicateTab(const Tab &tab)
 {
-	CreateNewTab(tab.GetShellBrowser()->GetDirectoryIdl().get());
+	auto folderSettings = tab.GetShellBrowser()->GetFolderSettings();
+	CreateNewTab(tab.GetShellBrowser()->GetDirectoryIdl().get(), {}, &folderSettings,
+		tab.GetShellBrowser()->ExportAllColumns());
 }
 
 int TabContainer::GetDropTargetItem(const POINT &pt)
