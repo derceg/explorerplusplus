@@ -22,8 +22,8 @@ protected:
 		auto grandparentFolder =
 			std::make_unique<BookmarkItem>(std::nullopt, L"Test grandparent folder", std::nullopt);
 		m_rawGrandparentFolder = grandparentFolder.get();
-		m_bookmarkTree.AddBookmarkItem(
-			m_bookmarkTree.GetBookmarksMenuFolder(), std::move(grandparentFolder), 0);
+		m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(),
+			std::move(grandparentFolder), 0);
 
 		auto parentFolder =
 			std::make_unique<BookmarkItem>(std::nullopt, L"Test parent folder", std::nullopt);

@@ -36,8 +36,8 @@ protected:
 		CoUninitialize();
 	}
 
-	void PerformLoadTest(
-		const std::wstring &filename, BookmarkTree *referenceBookmarkTree, bool compareGuids)
+	void PerformLoadTest(const std::wstring &filename, BookmarkTree *referenceBookmarkTree,
+		bool compareGuids)
 	{
 		std::wstring xmlFilePath = GetResourcePath(filename);
 		auto xmlDocument = LoadXmlDocument(xmlFilePath);
@@ -66,8 +66,8 @@ TEST_F(BookmarkXmlStorageTest, V2Save)
 	auto xmlDocumentData = CreateXmlDocument();
 	ASSERT_TRUE(xmlDocumentData);
 
-	BookmarkXmlStorage::Save(
-		xmlDocumentData->xmlDocument.get(), xmlDocumentData->root.get(), &referenceBookmarkTree, 1);
+	BookmarkXmlStorage::Save(xmlDocumentData->xmlDocument.get(), xmlDocumentData->root.get(),
+		&referenceBookmarkTree, 1);
 
 	BookmarkTree loadedBookmarkTree;
 	BookmarkXmlStorage::Load(xmlDocumentData->xmlDocument.get(), &loadedBookmarkTree);
@@ -88,8 +88,8 @@ TEST_F(BookmarkXmlStorageTest, V1NestedShowOnToolbarLoad)
 	BookmarkTree referenceBookmarkTree;
 	BuildV1NestedShowOnToolbarLoadReferenceTree(&referenceBookmarkTree);
 
-	PerformLoadTest(
-		L"bookmarks-v1-config-nested-show-on-toolbar.xml", &referenceBookmarkTree, false);
+	PerformLoadTest(L"bookmarks-v1-config-nested-show-on-toolbar.xml", &referenceBookmarkTree,
+		false);
 }
 
 wil::com_ptr_nothrow<IXMLDOMDocument> LoadXmlDocument(const std::wstring &filePath)

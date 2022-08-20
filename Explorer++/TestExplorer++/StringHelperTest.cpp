@@ -88,16 +88,16 @@ TEST(ReplaceCharacter, Simple)
 TEST(ReplaceCharacterWithString, NoMatches)
 {
 	TCHAR outputText[64];
-	ReplaceCharacterWithString(
-		L"Hello world", outputText, SIZEOF_ARRAY(outputText), 'z', L"replacement");
+	ReplaceCharacterWithString(L"Hello world", outputText, SIZEOF_ARRAY(outputText), 'z',
+		L"replacement");
 	EXPECT_STREQ(outputText, L"Hello world");
 }
 
 TEST(ReplaceCharacterWithString, Simple)
 {
 	TCHAR outputText[64];
-	ReplaceCharacterWithString(
-		L"Hello world", outputText, SIZEOF_ARRAY(outputText), 'o', L"replacement");
+	ReplaceCharacterWithString(L"Hello world", outputText, SIZEOF_ARRAY(outputText), 'o',
+		L"replacement");
 	EXPECT_STREQ(outputText, L"Hellreplacement wreplacementrld");
 }
 

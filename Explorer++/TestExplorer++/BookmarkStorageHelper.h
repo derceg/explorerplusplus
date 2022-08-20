@@ -9,5 +9,5 @@ class BookmarkTree;
 void BuildV2LoadSaveReferenceTree(BookmarkTree *bookmarkTree);
 void BuildV1BasicLoadReferenceTree(BookmarkTree *bookmarkTree);
 void BuildV1NestedShowOnToolbarLoadReferenceTree(BookmarkTree *bookmarkTree);
-void CompareBookmarkTrees(
-	const BookmarkTree *firstTree, const BookmarkTree *secondTree, bool compareGuids);
+void CompareBookmarkTrees(const BookmarkTree *firstTree, const BookmarkTree *secondTree,
+	bool compareGuids);

@@ -16,8 +16,8 @@ protected:
 	{
 		auto folder = std::make_unique<BookmarkItem>(std::nullopt, L"Test folder", std::nullopt);
 		m_rawFolder = folder.get();
-		m_bookmarkTree.AddBookmarkItem(
-			m_bookmarkTree.GetBookmarksMenuFolder(), std::move(folder), 0);
+		m_bookmarkTree.AddBookmarkItem(m_bookmarkTree.GetBookmarksMenuFolder(), std::move(folder),
+			0);
 
 		auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark", L"C:\\");
 		m_rawBookmark = bookmark.get();
@@ -72,10 +72,10 @@ TEST(BookmarkTreeTest, AddChildren)
 
 	for (int i = 0; i < 10; i++)
 	{
-		auto currentBookmark = std::make_unique<BookmarkItem>(
-			std::nullopt, L"Test bookmark " + std::to_wstring(i), L"C:\\");
-		bookmarkTree.AddBookmarkItem(
-			bookmarkTree.GetBookmarksToolbarFolder(), std::move(currentBookmark), i);
+		auto currentBookmark = std::make_unique<BookmarkItem>(std::nullopt,
+			L"Test bookmark " + std::to_wstring(i), L"C:\\");
+		bookmarkTree.AddBookmarkItem(bookmarkTree.GetBookmarksToolbarFolder(),
+			std::move(currentBookmark), i);
 	}
 
 	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1);
@@ -164,8 +164,8 @@ TEST_F(BookmarkTreeObserverTest, Update)
 	m_bookmarkTree.bookmarkItemUpdatedSignal.AddObserver(
 		std::bind_front(&BookmarkTreeObserver::OnBookmarkItemUpdated, &m_observer));
 
-	EXPECT_CALL(
-		m_observer, OnBookmarkItemUpdated(Ref(*m_rawFolder), BookmarkItem::PropertyType::Name));
+	EXPECT_CALL(m_observer,
+		OnBookmarkItemUpdated(Ref(*m_rawFolder), BookmarkItem::PropertyType::Name));
 	m_rawFolder->SetName(L"New name");
 
 	EXPECT_CALL(m_observer,
@@ -175,8 +175,8 @@ TEST_F(BookmarkTreeObserverTest, Update)
 	GetSystemTimeAsFileTime(&dateModified);
 	m_rawFolder->SetDateModified(dateModified);
 
-	EXPECT_CALL(
-		m_observer, OnBookmarkItemUpdated(Ref(*m_rawBookmark), BookmarkItem::PropertyType::Name));
+	EXPECT_CALL(m_observer,
+		OnBookmarkItemUpdated(Ref(*m_rawBookmark), BookmarkItem::PropertyType::Name));
 	m_rawBookmark->SetName(L"New name");
 
 	EXPECT_CALL(m_observer,
@@ -195,8 +195,8 @@ TEST_F(BookmarkTreeObserverTest, Move)
 	m_bookmarkTree.MoveBookmarkItem(m_rawFolder, m_bookmarkTree.GetBookmarksToolbarFolder(), 0);
 
 	EXPECT_CALL(m_observer,
-		OnBookmarkItemMoved(
-			m_rawBookmark, m_rawFolder, 0, m_bookmarkTree.GetBookmarksToolbarFolder(), 1));
+		OnBookmarkItemMoved(m_rawBookmark, m_rawFolder, 0,
+			m_bookmarkTree.GetBookmarksToolbarFolder(), 1));
 	m_bookmarkTree.MoveBookmarkItem(m_rawBookmark, m_bookmarkTree.GetBookmarksToolbarFolder(), 1);
 }
 

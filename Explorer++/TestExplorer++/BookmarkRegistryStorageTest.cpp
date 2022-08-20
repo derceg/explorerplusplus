@@ -23,8 +23,8 @@ protected:
 		ASSERT_EQ(result, ERROR_SUCCESS);
 	}
 
-	void PerformLoadTest(
-		const std::wstring &filename, BookmarkTree *referenceBookmarkTree, bool compareGuids)
+	void PerformLoadTest(const std::wstring &filename, BookmarkTree *referenceBookmarkTree,
+		bool compareGuids)
 	{
 		ImportRegistryResource(filename);
 

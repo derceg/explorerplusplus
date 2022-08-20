@@ -79,37 +79,50 @@ public:
 	NavigatorMock()
 	{
 		ON_CALL(*this, BrowseFolderImpl(_, _))
-			.WillByDefault([this](PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry) {
-				return m_fake.BrowseFolder(pidlDirectory, addHistoryEntry);
-			});
+			.WillByDefault(
+				[this](PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)
+				{
+					return m_fake.BrowseFolder(pidlDirectory, addHistoryEntry);
+				});
 
-		ON_CALL(*this, BrowseFolderImpl(_)).WillByDefault([this](const HistoryEntry &entry) {
-			return m_fake.BrowseFolder(entry);
-		});
+		ON_CALL(*this, BrowseFolderImpl(_))
+			.WillByDefault(
+				[this](const HistoryEntry &entry)
+				{
+					return m_fake.BrowseFolder(entry);
+				});
 
 		ON_CALL(*this, AddNavigationStartedObserverImpl)
-			.WillByDefault([this](const NavigationStartedSignal::slot_type &observer,
-							   boost::signals2::connect_position position) {
-				return m_fake.AddNavigationStartedObserver(observer, position);
-			});
+			.WillByDefault(
+				[this](const NavigationStartedSignal::slot_type &observer,
+					boost::signals2::connect_position position)
+				{
+					return m_fake.AddNavigationStartedObserver(observer, position);
+				});
 
 		ON_CALL(*this, AddNavigationCommittedObserverImpl)
-			.WillByDefault([this](const NavigationCommittedSignal::slot_type &observer,
-							   boost::signals2::connect_position position) {
-				return m_fake.AddNavigationCommittedObserver(observer, position);
-			});
+			.WillByDefault(
+				[this](const NavigationCommittedSignal::slot_type &observer,
+					boost::signals2::connect_position position)
+				{
+					return m_fake.AddNavigationCommittedObserver(observer, position);
+				});
 
 		ON_CALL(*this, AddNavigationCompletedObserverImpl)
-			.WillByDefault([this](const NavigationCompletedSignal::slot_type &observer,
-							   boost::signals2::connect_position position) {
-				return m_fake.AddNavigationCompletedObserver(observer, position);
-			});
+			.WillByDefault(
+				[this](const NavigationCompletedSignal::slot_type &observer,
+					boost::signals2::connect_position position)
+				{
+					return m_fake.AddNavigationCompletedObserver(observer, position);
+				});
 
 		ON_CALL(*this, AddNavigationFailedObserverImpl)
-			.WillByDefault([this](const NavigationFailedSignal::slot_type &observer,
-							   boost::signals2::connect_position position) {
-				return m_fake.AddNavigationFailedObserver(observer, position);
-			});
+			.WillByDefault(
+				[this](const NavigationFailedSignal::slot_type &observer,
+					boost::signals2::connect_position position)
+				{
+					return m_fake.AddNavigationFailedObserver(observer, position);
+				});
 	}
 
 	MOCK_METHOD(HRESULT, BrowseFolderImpl, (PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry));
@@ -225,8 +238,8 @@ protected:
 		preservedEntry = CreatePreservedHistoryEntry(L"C:\\Fake2");
 		m_preservedEntries.push_back(std::move(preservedEntry));
 
-		m_navigationController = std::make_unique<ShellNavigationController>(
-			&m_navigator, &m_tabNavigation, &m_iconFetcher, m_preservedEntries, currentEntry);
+		m_navigationController = std::make_unique<ShellNavigationController>(&m_navigator,
+			&m_tabNavigation, &m_iconFetcher, m_preservedEntries, currentEntry);
 	}
 
 	std::unique_ptr<PreservedHistoryEntry> CreatePreservedHistoryEntry(const std::wstring &path)
@@ -392,8 +405,8 @@ TEST_F(ShellNavigationControllerTest, GoUp)
 
 	// The desktop folder is the root of the shell namespace.
 	unique_pidl_absolute pidlDesktop;
-	hr = SHGetKnownFolderIDList(
-		FOLDERID_Desktop, KF_FLAG_DEFAULT, nullptr, wil::out_param(pidlDesktop));
+	hr = SHGetKnownFolderIDList(FOLDERID_Desktop, KF_FLAG_DEFAULT, nullptr,
+		wil::out_param(pidlDesktop));
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	hr = m_navigationController.BrowseFolder(pidlDesktop.get());
