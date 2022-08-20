@@ -16,6 +16,10 @@
 
 void ShellBrowser::StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl)
 {
+	// Shouldn't be monitoring the same directory with both directory modification notifications and
+	// shell change notifications.
+	assert(!m_dirMonitorId);
+
 	SHChangeNotifyEntry shcne;
 	shcne.pidl = pidl;
 	shcne.fRecursive = FALSE;
@@ -44,6 +48,11 @@ void ShellBrowser::StopDirectoryMonitoring()
 		SHChangeNotifyDeregister(m_shChangeNotifyId);
 		m_shChangeNotifyId = 0;
 	}
+}
+
+bool ShellBrowser::IsMonitoringShellChanges()
+{
+	return m_shChangeNotifyId != 0;
 }
 
 void ShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)

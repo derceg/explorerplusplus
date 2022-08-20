@@ -114,8 +114,9 @@ public:
 	/* Directory modification support. */
 	void FilesModified(DWORD Action, const TCHAR *FileName, int EventId, int iFolderIndex);
 	void DirectoryAltered();
-	void SetDirMonitorId(int iDirMonitorId);
-	int GetDirMonitorId() const;
+	void SetDirMonitorId(int dirMonitorId);
+	void ClearDirMonitorId();
+	std::optional<int> GetDirMonitorId() const;
 	int GetUniqueFolderId() const;
 
 	/* Item information. */
@@ -497,6 +498,7 @@ private:
 	/* Directory altered support. */
 	void StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl);
 	void StopDirectoryMonitoring();
+	bool IsMonitoringShellChanges();
 	void OnShellNotify(WPARAM wParam, LPARAM lParam);
 	void OnProcessShellChangeNotifications();
 	void ProcessShellChangeNotification(const ShellChangeNotification &change);
@@ -659,7 +661,7 @@ private:
 	const HINSTANCE m_hResourceModule;
 	HACCEL *m_acceleratorTable;
 	BOOL m_bFolderVisited;
-	int m_iDirMonitorId;
+	std::optional<int> m_dirMonitorId;
 	int m_iFolderIcon;
 	int m_iFileIcon;
 	int m_iDropped;

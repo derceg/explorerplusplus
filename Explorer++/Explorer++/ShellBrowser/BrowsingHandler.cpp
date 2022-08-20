@@ -72,7 +72,7 @@ void ShellBrowser::PrepareToChangeFolders()
 
 	ClearPendingResults();
 
-	if (m_config->registerForShellNotifications)
+	if (IsMonitoringShellChanges())
 	{
 		StopDirectoryMonitoring();
 
@@ -573,7 +573,9 @@ void ShellBrowser::OnEnumerationCompleted(std::vector<ShellBrowser::ItemInfo_t> 
 	/* Set the focus back to the first item. */
 	ListView_SetItemState(m_hListView, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
-	if (m_config->registerForShellNotifications)
+	if (m_config->shellChangeNotificationType == ShellChangeNotificationType::All
+		|| (m_config->shellChangeNotificationType == ShellChangeNotificationType::NonFilesystem
+			&& m_directoryState.virtualFolder))
 	{
 		StartDirectoryMonitoring(m_directoryState.pidlDirectory.get());
 	}

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Config.h"
 #include <variant>
 
 namespace CommandLine
@@ -11,7 +12,7 @@ namespace CommandLine
 	struct Settings
 	{
 		bool enablePlugins;
-		bool registerForShellNotifications;
+		ShellChangeNotificationType shellChangeNotificationType;
 		std::wstring language;
 		std::vector<std::wstring> directories;
 	};

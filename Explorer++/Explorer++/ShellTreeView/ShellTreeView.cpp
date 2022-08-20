@@ -1414,7 +1414,10 @@ LRESULT CALLBACK ShellTreeView::OnDeviceChange(WPARAM wParam, LPARAM lParam)
 			{
 				if (itr->hDrive == pdbHandle->dbch_handle)
 				{
-					m_pDirMon->StopDirectoryMonitor(itr->iMonitorId);
+					if (itr->monitorId)
+					{
+						m_pDirMon->StopDirectoryMonitor(*itr->monitorId);
+					}
 
 					/* Log the removal. If a device removal failure message
 					is later received, the last entry logged here will be
@@ -1570,7 +1573,6 @@ void ShellTreeView::MonitorDrive(const TCHAR *szDrive)
 	HANDLE hDrive;
 	HDEVNOTIFY hDevNotify;
 	DriveEvent_t de;
-	int iMonitorId;
 
 	/* Remote (i.e. network) drives will NOT be monitored. */
 	if (GetDriveType(szDrive) != DRIVE_REMOTE)
@@ -1587,7 +1589,7 @@ void ShellTreeView::MonitorDrive(const TCHAR *szDrive)
 				pDirectoryAltered->szPath, SIZEOF_ARRAY(pDirectoryAltered->szPath), szDrive);
 			pDirectoryAltered->shellTreeView = this;
 
-			iMonitorId = m_pDirMon->WatchDirectory(hDrive, szDrive, FILE_NOTIFY_CHANGE_DIR_NAME,
+			auto monitorId = m_pDirMon->WatchDirectory(hDrive, szDrive, FILE_NOTIFY_CHANGE_DIR_NAME,
 				ShellTreeView::DirectoryAlteredCallback, TRUE, (void *) pDirectoryAltered);
 
 			dbv.dbch_size = sizeof(dbv);
@@ -1604,7 +1606,7 @@ void ShellTreeView::MonitorDrive(const TCHAR *szDrive)
 			{
 				StringCchCopy(de.szDrive, SIZEOF_ARRAY(de.szDrive), szDrive);
 				de.hDrive = hDrive;
-				de.iMonitorId = iMonitorId;
+				de.monitorId = monitorId;
 
 				m_pDriveList.push_back(de);
 			}

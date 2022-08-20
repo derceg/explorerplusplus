@@ -99,9 +99,13 @@ void Explorerplusplus::OnNavigationCommitted(
 		UpdateWindowStates(tab);
 	}
 
-	if (!m_config->registerForShellNotifications)
+	StopDirectoryMonitoringForTab(tab);
+
+	if (m_config->shellChangeNotificationType == ShellChangeNotificationType::Disabled
+		|| (m_config->shellChangeNotificationType == ShellChangeNotificationType::NonFilesystem
+			&& !tab.GetShellBrowser()->InVirtualFolder()))
 	{
-		HandleDirectoryMonitoring(tab.GetId());
+		StartDirectoryMonitoringForTab(tab);
 	}
 }
 

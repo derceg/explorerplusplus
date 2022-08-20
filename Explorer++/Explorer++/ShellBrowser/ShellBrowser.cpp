@@ -107,7 +107,6 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 	m_performingDrag = false;
 	m_bThumbnailsSetup = FALSE;
 	m_nCurrentColumns = 0;
-	m_iDirMonitorId = -1;
 	m_pActiveColumns = nullptr;
 	m_nActiveColumns = 0;
 	m_iDropped = -1;
@@ -143,7 +142,7 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 
 ShellBrowser::~ShellBrowser()
 {
-	if (m_config->registerForShellNotifications)
+	if (IsMonitoringShellChanges())
 	{
 		StopDirectoryMonitoring();
 	}
@@ -649,14 +648,19 @@ BOOL ShellBrowser::CanCreate() const
 	return bCanCreate;
 }
 
-void ShellBrowser::SetDirMonitorId(int iDirMonitorId)
+void ShellBrowser::SetDirMonitorId(int dirMonitorId)
 {
-	m_iDirMonitorId = iDirMonitorId;
+	m_dirMonitorId = dirMonitorId;
 }
 
-int ShellBrowser::GetDirMonitorId() const
+void ShellBrowser::ClearDirMonitorId()
 {
-	return m_iDirMonitorId;
+	m_dirMonitorId.reset();
+}
+
+std::optional<int> ShellBrowser::GetDirMonitorId() const
+{
+	return m_dirMonitorId;
 }
 
 BOOL ShellBrowser::CompareVirtualFolders(UINT uFolderCSIDL) const
@@ -1074,6 +1078,13 @@ void ShellBrowser::SelectItems(const std::list<std::wstring> &PastedFileList)
 
 void ShellBrowser::OnDeviceChange(WPARAM wParam, LPARAM lParam)
 {
+	// If shell change notifications are enabled, drive additions/removals will be handled through
+	// that.
+	if (IsMonitoringShellChanges())
+	{
+		return;
+	}
+
 	/* Note changes made here may have no effect. Since
 	the icon for the cd/dvd/etc. may not have been
 	updated by the time this function is called, it's

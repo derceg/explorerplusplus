@@ -1151,10 +1151,11 @@ bool TabContainer::CloseTab(const Tab &tab)
 
 	RemoveTabFromControl(tab);
 
-	if (!m_config->registerForShellNotifications)
+	auto dirMonitorId = tab.GetShellBrowser()->GetDirMonitorId();
+
+	if (dirMonitorId)
 	{
-		m_expp->GetDirectoryMonitor()->StopDirectoryMonitor(
-			tab.GetShellBrowser()->GetDirMonitorId());
+		m_expp->GetDirectoryMonitor()->StopDirectoryMonitor(*dirMonitorId);
 	}
 
 	// This is needed, as the erase() call below will remove the element

@@ -151,9 +151,13 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 	settings.enablePlugins = false;
 	app.add_flag("--enable-plugins", settings.enablePlugins, "Enable the Lua plugin system");
 
-	settings.registerForShellNotifications = false;
-	app.add_flag("--register-for-shell-notifications", settings.registerForShellNotifications,
-		"Watch for directory changes through SHChangeNotifyRegister");
+	app.add_option("--shell-change-notification-type", settings.shellChangeNotificationType,
+		   "Watch for directory changes through SHChangeNotifyRegister")
+		->transform(CLI::CheckedTransformer(CLI::TransformPairs<ShellChangeNotificationType>{
+			{ "disabled", ShellChangeNotificationType::Disabled },
+			{ "non-filesystem", ShellChangeNotificationType::NonFilesystem },
+			{ "all", ShellChangeNotificationType::All } }))
+		->default_val("disabled");
 
 	app.add_option("--language", settings.language,
 		"Allows you to select your desired language. Should be a two-letter language code (e.g. "

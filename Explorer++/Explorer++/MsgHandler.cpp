@@ -620,45 +620,49 @@ void Explorerplusplus::OnSetFocus()
 	SetFocus(m_hLastActiveWindow);
 }
 
-void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
+void Explorerplusplus::StartDirectoryMonitoringForTab(const Tab &tab)
 {
-	DirectoryAltered *pDirectoryAltered = nullptr;
-	int iDirMonitorId;
+	if (tab.GetShellBrowser()->InVirtualFolder())
+	{
+		return;
+	}
 
-	Tab &tab = m_tabContainer->GetTab(iTabId);
+	DirectoryAltered *directoryAltered = (DirectoryAltered *) malloc(sizeof(DirectoryAltered));
 
-	iDirMonitorId = tab.GetShellBrowser()->GetDirMonitorId();
-
-	/* Stop monitoring the directory that was browsed from. */
-	m_pDirMon->StopDirectoryMonitor(iDirMonitorId);
+	directoryAltered->iIndex = tab.GetId();
+	directoryAltered->iFolderIndex = tab.GetShellBrowser()->GetUniqueFolderId();
+	directoryAltered->pData = this;
 
 	std::wstring directoryToWatch = tab.GetShellBrowser()->GetDirectory();
 
-	/* Don't watch virtual folders (the 'recycle bin' may be an
-	exception to this). */
-	if (tab.GetShellBrowser()->InVirtualFolder())
-	{
-		iDirMonitorId = -1;
-	}
-	else
-	{
-		pDirectoryAltered = (DirectoryAltered *) malloc(sizeof(DirectoryAltered));
+	/* Start monitoring the directory that was opened. */
+	LOG(debug) << _T("Starting directory monitoring for \"") << directoryToWatch << _T("\"");
+	auto dirMonitorId = m_pDirMon->WatchDirectory(directoryToWatch.c_str(),
+		FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_DIR_NAME
+			| FILE_NOTIFY_CHANGE_ATTRIBUTES | FILE_NOTIFY_CHANGE_LAST_WRITE
+			| FILE_NOTIFY_CHANGE_LAST_ACCESS | FILE_NOTIFY_CHANGE_CREATION
+			| FILE_NOTIFY_CHANGE_SECURITY,
+		DirectoryAlteredCallback, FALSE, (void *) directoryAltered);
 
-		pDirectoryAltered->iIndex = iTabId;
-		pDirectoryAltered->iFolderIndex = tab.GetShellBrowser()->GetUniqueFolderId();
-		pDirectoryAltered->pData = this;
-
-		/* Start monitoring the directory that was opened. */
-		LOG(debug) << _T("Starting directory monitoring for \"") << directoryToWatch << _T("\"");
-		iDirMonitorId = m_pDirMon->WatchDirectory(directoryToWatch.c_str(),
-			FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_DIR_NAME
-				| FILE_NOTIFY_CHANGE_ATTRIBUTES | FILE_NOTIFY_CHANGE_LAST_WRITE
-				| FILE_NOTIFY_CHANGE_LAST_ACCESS | FILE_NOTIFY_CHANGE_CREATION
-				| FILE_NOTIFY_CHANGE_SECURITY,
-			DirectoryAlteredCallback, FALSE, (void *) pDirectoryAltered);
+	if (!dirMonitorId)
+	{
+		return;
 	}
 
-	tab.GetShellBrowser()->SetDirMonitorId(iDirMonitorId);
+	tab.GetShellBrowser()->SetDirMonitorId(*dirMonitorId);
+}
+
+void Explorerplusplus::StopDirectoryMonitoringForTab(const Tab &tab)
+{
+	auto dirMonitorId = tab.GetShellBrowser()->GetDirMonitorId();
+
+	if (!dirMonitorId)
+	{
+		return;
+	}
+
+	m_pDirMon->StopDirectoryMonitor(*dirMonitorId);
+	tab.GetShellBrowser()->ClearDirMonitorId();
 }
 
 void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)

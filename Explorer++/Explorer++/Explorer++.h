@@ -514,7 +514,8 @@ private:
 	void ShowMainRebarBand(HWND hwnd, BOOL bShow);
 	BOOL OnMouseWheel(MousewheelSource mousewheelSource, WPARAM wParam, LPARAM lParam) override;
 	StatusBar *GetStatusBar() override;
-	void HandleDirectoryMonitoring(int iTabId);
+	void StartDirectoryMonitoringForTab(const Tab &tab);
+	void StopDirectoryMonitoringForTab(const Tab &tab);
 	int DetermineListViewObjectIndex(HWND hListView);
 
 	static void FolderSizeCallbackStub(int nFolders, int nFiles, PULARGE_INTEGER lTotalFolderSize,

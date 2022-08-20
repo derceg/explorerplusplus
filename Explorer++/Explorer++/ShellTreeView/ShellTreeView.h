@@ -117,7 +117,7 @@ private:
 	{
 		TCHAR szDrive[MAX_PATH];
 		HANDLE hDrive;
-		int iMonitorId;
+		std::optional<int> monitorId;
 	} DriveEvent_t;
 
 	static HWND CreateTreeView(HWND parent);

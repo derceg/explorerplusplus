@@ -16,6 +16,13 @@
 
 static const int DEFAULT_LISTVIEW_HOVER_TIME = 500;
 
+enum class ShellChangeNotificationType
+{
+	Disabled,
+	NonFilesystem,
+	All
+};
+
 // These values are used to save/load configuration data and should not be
 // changed.
 enum class StartupMode
@@ -69,7 +76,7 @@ struct Config
 		displayWindowVertical = FALSE;
 		treeViewWidth = DEFAULT_TREEVIEW_WIDTH;
 		checkPinnedToNamespaceTreeProperty = false;
-		registerForShellNotifications = false;
+		shellChangeNotificationType = ShellChangeNotificationType::Disabled;
 
 		replaceExplorerMode = DefaultFileManager::ReplaceExplorerMode::None;
 
@@ -176,7 +183,7 @@ struct Config
 	BOOL displayWindowVertical;
 	unsigned int treeViewWidth;
 	bool checkPinnedToNamespaceTreeProperty;
-	bool registerForShellNotifications;
+	ShellChangeNotificationType shellChangeNotificationType;
 
 	DefaultFileManager::ReplaceExplorerMode replaceExplorerMode;
 

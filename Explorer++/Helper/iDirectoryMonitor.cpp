@@ -19,19 +19,19 @@ public:
 	ULONG __stdcall AddRef();
 	ULONG __stdcall Release();
 
-	int WatchDirectory(const TCHAR *Directory, UINT WatchFlags,
-		OnDirectoryAltered onDirectoryAltered, BOOL bWatchSubTree, void *pData);
-	int WatchDirectory(HANDLE hDirectory, const TCHAR *Directory, UINT WatchFlags,
-		OnDirectoryAltered onDirectoryAltered, BOOL bWatchSubTree, void *pData);
-	BOOL StopDirectoryMonitor(int iStopId);
+	std::optional<int> WatchDirectory(const TCHAR *Directory, UINT WatchFlags,
+		OnDirectoryAltered onDirectoryAltered, BOOL bWatchSubTree, void *pData) override;
+	std::optional<int> WatchDirectory(HANDLE hDirectory, const TCHAR *Directory, UINT WatchFlags,
+		OnDirectoryAltered onDirectoryAltered, BOOL bWatchSubTree, void *pData) override;
+	BOOL StopDirectoryMonitor(int iStopId) override;
 
 private:
 #define PRIMARY_BUFFER_SIZE 1000 * sizeof(FILE_NOTIFY_INFORMATION)
 
 	/* These function are only ever queued as APC's. */
 	static void CALLBACK WatchAndCreateDirectoryInternal(ULONG_PTR dwParam);
-	static void CALLBACK CompletionRoutine(
-		DWORD dwErrorCode, DWORD NumberOfBytesTransferred, LPOVERLAPPED lpOverlapped);
+	static void CALLBACK CompletionRoutine(DWORD dwErrorCode, DWORD NumberOfBytesTransferred,
+		LPOVERLAPPED lpOverlapped);
 	static void CALLBACK StopDirectoryWatch(ULONG_PTR dwParam);
 
 	/* This function is called as an APC, and stops
@@ -180,14 +180,14 @@ void CALLBACK DirectoryMonitor::ExitWorkerThread(ULONG_PTR dwParam)
 	ExitThread(0);
 }
 
-int DirectoryMonitor::WatchDirectory(const TCHAR *Directory, UINT WatchFlags,
+std::optional<int> DirectoryMonitor::WatchDirectory(const TCHAR *Directory, UINT WatchFlags,
 	OnDirectoryAltered onDirectoryAltered, BOOL bWatchSubTree, void *pData)
 {
 	DirInfo pDirInfo;
 
 	if (Directory == nullptr)
 	{
-		return -1;
+		return std::nullopt;
 	}
 
 	pDirInfo.m_pDirectoryMonitor = this;
@@ -214,7 +214,7 @@ int DirectoryMonitor::WatchDirectory(const TCHAR *Directory, UINT WatchFlags,
 	if (pDirInfo.m_hDirectory == INVALID_HANDLE_VALUE)
 	{
 		free(pData);
-		return -1;
+		return std::nullopt;
 	}
 
 	EnterCriticalSection(&m_cs);
@@ -233,14 +233,14 @@ int DirectoryMonitor::WatchDirectory(const TCHAR *Directory, UINT WatchFlags,
 	return m_UniqueId++;
 }
 
-int DirectoryMonitor::WatchDirectory(HANDLE hDirectory, const TCHAR *Directory, UINT WatchFlags,
-	OnDirectoryAltered onDirectoryAltered, BOOL bWatchSubTree, void *pData)
+std::optional<int> DirectoryMonitor::WatchDirectory(HANDLE hDirectory, const TCHAR *Directory,
+	UINT WatchFlags, OnDirectoryAltered onDirectoryAltered, BOOL bWatchSubTree, void *pData)
 {
 	DirInfo pDirInfo;
 
 	if (Directory == nullptr)
 	{
-		return -1;
+		return std::nullopt;
 	}
 
 	pDirInfo.m_pDirectoryMonitor = this;
@@ -316,8 +316,8 @@ void DirectoryMonitor::WatchDirectoryInternal(ULONG_PTR dwParam)
 	}
 }
 
-void CALLBACK DirectoryMonitor::CompletionRoutine(
-	DWORD dwErrorCode, DWORD NumberOfBytesTransferred, LPOVERLAPPED lpOverlapped)
+void CALLBACK DirectoryMonitor::CompletionRoutine(DWORD dwErrorCode, DWORD NumberOfBytesTransferred,
+	LPOVERLAPPED lpOverlapped)
 {
 	DirInfo *pDirInfo = nullptr;
 	FILE_NOTIFY_INFORMATION *pfni = nullptr;
@@ -398,11 +398,6 @@ void DirectoryMonitor::DeleteRequest(ULONG_PTR dwParam)
 BOOL DirectoryMonitor::StopDirectoryMonitor(int iStopId)
 {
 	std::list<DirInfo>::iterator itr;
-
-	if (iStopId < 0)
-	{
-		return FALSE;
-	}
 
 	EnterCriticalSection(&m_cs);
 

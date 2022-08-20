@@ -41,7 +41,7 @@ void Explorerplusplus::OnCreate()
 	LoadAllSettings(&pLoadSave);
 	ApplyToolbarSettings();
 
-	m_config->registerForShellNotifications = m_commandLineSettings.registerForShellNotifications;
+	m_config->shellChangeNotificationType = m_commandLineSettings.shellChangeNotificationType;
 
 	m_iconResourceLoader = std::make_unique<IconResourceLoader>(m_config->iconTheme);
 
@@ -90,8 +90,8 @@ void Explorerplusplus::OnCreate()
 	SHChangeNotifyEntry shcne;
 	shcne.fRecursive = TRUE;
 	shcne.pidl = nullptr;
-	m_SHChangeNotifyID = SHChangeNotifyRegister(
-		m_hContainer, SHCNRF_ShellLevel, SHCNE_ASSOCCHANGED, WM_APP_ASSOCCHANGED, 1, &shcne);
+	m_SHChangeNotifyID = SHChangeNotifyRegister(m_hContainer, SHCNRF_ShellLevel, SHCNE_ASSOCCHANGED,
+		WM_APP_ASSOCCHANGED, 1, &shcne);
 
 	SetFocus(m_hActiveListView);
 
