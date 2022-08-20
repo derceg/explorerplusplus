@@ -157,7 +157,7 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 			{ "disabled", ShellChangeNotificationType::Disabled },
 			{ "non-filesystem", ShellChangeNotificationType::NonFilesystem },
 			{ "all", ShellChangeNotificationType::All } }))
-		->default_val("disabled");
+		->default_val("non-filesystem");
 
 	app.add_option("--language", settings.language,
 		"Allows you to select your desired language. Should be a two-letter language code (e.g. "
