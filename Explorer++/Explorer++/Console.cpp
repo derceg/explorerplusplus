@@ -34,7 +34,7 @@ bool Console::AttachParentConsole()
 bool Console::ReleaseConsole()
 {
 	bool result = true;
-	FILE* fp;
+	FILE *fp;
 
 	// Just to be safe, redirect standard IO to NUL before releasing.
 
@@ -66,7 +66,7 @@ bool Console::ReleaseConsole()
 bool RedirectConsoleIO()
 {
 	bool result = true;
-	FILE* fp;
+	FILE *fp;
 
 	// Redirect STDIN if the console has an input handle
 	if (GetStdHandle(STD_INPUT_HANDLE) != INVALID_HANDLE_VALUE)

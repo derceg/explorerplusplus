@@ -7,13 +7,13 @@
 #include "Plugins/Manifest.h"
 #include <boost/algorithm/string.hpp>
 
-Plugins::PluginCommandManager::PluginCommandManager(HACCEL *acceleratorTable, int startId, int endId) :
+Plugins::PluginCommandManager::PluginCommandManager(HACCEL *acceleratorTable, int startId,
+	int endId) :
 	m_acceleratorTable(acceleratorTable),
 	m_startId(startId),
 	m_endId(endId),
 	m_idCounter(startId)
 {
-
 }
 
 void Plugins::PluginCommandManager::addCommands(int pluginId, const std::vector<Command> &commands)
@@ -21,7 +21,8 @@ void Plugins::PluginCommandManager::addCommands(int pluginId, const std::vector<
 	int numAccelerators = CopyAcceleratorTable(*m_acceleratorTable, nullptr, 0);
 
 	std::vector<ACCEL> accelerators(numAccelerators);
-	CopyAcceleratorTable(*m_acceleratorTable, &accelerators[0], static_cast<int>(accelerators.size()));
+	CopyAcceleratorTable(*m_acceleratorTable, &accelerators[0],
+		static_cast<int>(accelerators.size()));
 
 	std::unordered_map<int, PluginCommand> registeredCommands;
 
@@ -33,9 +34,12 @@ void Plugins::PluginCommandManager::addCommands(int pluginId, const std::vector<
 			continue;
 		}
 
-		auto itr = std::find_if(accelerators.begin(), accelerators.end(), [command] (const ACCEL &accel) {
-			return (accel.fVirt & ~FNOINVERT) == command.accelerator->modifiers && accel.key == command.accelerator->key;
-		});
+		auto itr = std::find_if(accelerators.begin(), accelerators.end(),
+			[command](const ACCEL &accel)
+			{
+				return (accel.fVirt & ~FNOINVERT) == command.accelerator->modifiers
+					&& accel.key == command.accelerator->key;
+			});
 
 		if (itr != accelerators.end())
 		{
@@ -67,7 +71,8 @@ void Plugins::PluginCommandManager::addCommands(int pluginId, const std::vector<
 		registeredCommands.insert(std::make_pair(*id, pluginCommand));
 	}
 
-	HACCEL newAcceleratorTable = CreateAcceleratorTable(&accelerators[0], static_cast<int>(accelerators.size()));
+	HACCEL newAcceleratorTable =
+		CreateAcceleratorTable(&accelerators[0], static_cast<int>(accelerators.size()));
 
 	if (newAcceleratorTable == nullptr)
 	{
@@ -90,7 +95,8 @@ std::optional<int> Plugins::PluginCommandManager::generateId()
 	return m_idCounter++;
 }
 
-boost::signals2::connection Plugins::PluginCommandManager::AddCommandInvokedObserver(const CommandInvokedSignal::slot_type &observer)
+boost::signals2::connection Plugins::PluginCommandManager::AddCommandInvokedObserver(
+	const CommandInvokedSignal::slot_type &observer)
 {
 	return m_commandInvokedSignal.connect(observer);
 }

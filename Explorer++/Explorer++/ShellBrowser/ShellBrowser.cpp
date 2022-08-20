@@ -59,8 +59,8 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 	ShellBrowser(id, hOwner, coreInterface, tabNavigation, fileActionHandler,
 		preservedFolderState.folderSettings, nullptr)
 {
-	m_navigationController = std::make_unique<ShellNavigationController>(
-		this, tabNavigation, m_iconFetcher.get(), history, currentEntry);
+	m_navigationController = std::make_unique<ShellNavigationController>(this, tabNavigation,
+		m_iconFetcher.get(), history, currentEntry);
 }
 
 ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface,
@@ -82,14 +82,14 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 	m_folderColumns(initialColumns
 			? *initialColumns
 			: coreInterface->GetConfig()->globalFolderSettings.folderColumns),
-	m_columnThreadPool(
-		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
+	m_columnThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
+		CoUninitialize),
 	m_columnResultIDCounter(0),
-	m_thumbnailThreadPool(
-		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
+	m_thumbnailThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
+		CoUninitialize),
 	m_thumbnailResultIDCounter(0),
-	m_infoTipsThreadPool(
-		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
+	m_infoTipsThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
+		CoUninitialize),
 	m_infoTipResultIDCounter(0),
 	m_rightClickDragAllowed(false),
 	m_draggedDataObject(nullptr),
@@ -121,8 +121,8 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 	FAIL_FAST_IF_FAILED(hr);
 
 	// This interface is optional, so it doesn't matter whether the call succeeds or not.
-	SHGetKnownFolderIDList(
-		FOLDERID_RecycleBinFolder, KF_FLAG_DEFAULT, nullptr, wil::out_param(m_recycleBinPidl));
+	SHGetKnownFolderIDList(FOLDERID_RecycleBinFolder, KF_FLAG_DEFAULT, nullptr,
+		wil::out_param(m_recycleBinPidl));
 
 	InitializeCriticalSection(&m_csDirectoryAltered);
 
@@ -211,8 +211,8 @@ void ShellBrowser::InitializeListView()
 		SetWindowTheme(m_hListView, L"Explorer", nullptr);
 	}
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
-		m_hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hListView,
+		ListViewProcStub, LISTVIEW_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	m_windowSubclasses.push_back(
 		std::make_unique<WindowSubclassWrapper>(GetParent(m_hListView), ListViewParentProcStub,
@@ -278,8 +278,8 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 	{
 		wil::com_ptr_nothrow<IImageList> pImageList;
 		SHGetImageList(SHIL_JUMBO, IID_PPV_ARGS(&pImageList));
-		ListView_SetImageList(
-			m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_NORMAL);
+		ListView_SetImageList(m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()),
+			LVSIL_NORMAL);
 	}
 	break;
 
@@ -287,8 +287,8 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 	{
 		wil::com_ptr_nothrow<IImageList> pImageList;
 		SHGetImageList(SHIL_EXTRALARGE, IID_PPV_ARGS(&pImageList));
-		ListView_SetImageList(
-			m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_NORMAL);
+		ListView_SetImageList(m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()),
+			LVSIL_NORMAL);
 	}
 	break;
 
@@ -301,8 +301,8 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 	{
 		wil::com_ptr_nothrow<IImageList> pImageList;
 		SHGetImageList(SHIL_LARGE, IID_PPV_ARGS(&pImageList));
-		ListView_SetImageList(
-			m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_NORMAL);
+		ListView_SetImageList(m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()),
+			LVSIL_NORMAL);
 	}
 	break;
 
@@ -312,8 +312,8 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 	{
 		wil::com_ptr_nothrow<IImageList> pImageList;
 		SHGetImageList(SHIL_SMALL, IID_PPV_ARGS(&pImageList));
-		ListView_SetImageList(
-			m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_SMALL);
+		ListView_SetImageList(m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()),
+			LVSIL_SMALL);
 	}
 	break;
 	}
@@ -583,9 +583,11 @@ std::optional<int> ShellBrowser::GetItemIndexForPidl(PCIDLIST_ABSOLUTE pidl) con
 
 std::optional<int> ShellBrowser::GetItemInternalIndexForPidl(PCIDLIST_ABSOLUTE pidl) const
 {
-	auto itr = std::find_if(m_itemInfoMap.begin(), m_itemInfoMap.end(), [pidl](const auto &pair) {
-		return ArePidlsEquivalent(pidl, pair.second.pidlComplete.get());
-	});
+	auto itr = std::find_if(m_itemInfoMap.begin(), m_itemInfoMap.end(),
+		[pidl](const auto &pair)
+		{
+			return ArePidlsEquivalent(pidl, pair.second.pidlComplete.get());
+		});
 
 	if (itr == m_itemInfoMap.end())
 	{
@@ -846,8 +848,8 @@ void ShellBrowser::PositionDroppedItems()
 				}
 				else
 				{
-					ListView_SetItemPosition32(
-						m_hListView, iItem, itr->DropPoint.x, itr->DropPoint.y);
+					ListView_SetItemPosition32(m_hListView, iItem, itr->DropPoint.x,
+						itr->DropPoint.y);
 				}
 
 				ListViewHelper::SelectItem(m_hListView, iItem, TRUE);
@@ -971,9 +973,11 @@ void ShellBrowser::VerifySortMode()
 		columns = &m_folderColumns.realFolderColumns;
 	}
 
-	auto itr = std::find_if(columns->begin(), columns->end(), [this](const Column_t &column) {
-		return DetermineColumnSortMode(column.type) == m_folderSettings.sortMode;
-	});
+	auto itr = std::find_if(columns->begin(), columns->end(),
+		[this](const Column_t &column)
+		{
+			return DetermineColumnSortMode(column.type) == m_folderSettings.sortMode;
+		});
 
 	if (itr != columns->end())
 	{
@@ -1204,8 +1208,8 @@ void ShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 			lvItem.iSubItem = 0;
 			ListView_GetItem(m_hListView, &lvItem);
 
-			if (ArePidlsEquivalent(
-					pidlDrive.get(), m_itemInfoMap.at((int) lvItem.lParam).pidlComplete.get()))
+			if (ArePidlsEquivalent(pidlDrive.get(),
+					m_itemInfoMap.at((int) lvItem.lParam).pidlComplete.get()))
 			{
 				iItem = i;
 				iItemInternal = (int) lvItem.lParam;

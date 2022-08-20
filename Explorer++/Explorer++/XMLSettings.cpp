@@ -468,32 +468,32 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 
 	wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::CreateElementNode(
-		pXMLDom, &pParentNode, pe.get(), _T("Setting"), _T("DisplayCentreColor"));
+	NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
+		_T("DisplayCentreColor"));
 	centreColor = (COLORREF) SendMessage(m_hDisplayWindow, DWM_GETCENTRECOLOR, 0, 0);
-	NXMLSettings::AddAttributeToNode(
-		pXMLDom, pParentNode.get(), _T("r"), NXMLSettings::EncodeIntValue(GetRValue(centreColor)));
-	NXMLSettings::AddAttributeToNode(
-		pXMLDom, pParentNode.get(), _T("g"), NXMLSettings::EncodeIntValue(GetGValue(centreColor)));
-	NXMLSettings::AddAttributeToNode(
-		pXMLDom, pParentNode.get(), _T("b"), NXMLSettings::EncodeIntValue(GetBValue(centreColor)));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("r"),
+		NXMLSettings::EncodeIntValue(GetRValue(centreColor)));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("g"),
+		NXMLSettings::EncodeIntValue(GetGValue(centreColor)));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("b"),
+		NXMLSettings::EncodeIntValue(GetBValue(centreColor)));
 
 	HFONT hFont;
 	LOGFONT fontInfo;
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::CreateElementNode(
-		pXMLDom, &pParentNode, pe.get(), _T("Setting"), _T("DisplayFont"));
+	NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
+		_T("DisplayFont"));
 	SendMessage(m_hDisplayWindow, DWM_GETFONT, (WPARAM) &hFont, 0);
 	GetObject(hFont, sizeof(LOGFONT), &fontInfo);
-	NXMLSettings::AddAttributeToNode(
-		pXMLDom, pParentNode.get(), _T("Height"), NXMLSettings::EncodeIntValue(fontInfo.lfHeight));
-	NXMLSettings::AddAttributeToNode(
-		pXMLDom, pParentNode.get(), _T("Width"), NXMLSettings::EncodeIntValue(fontInfo.lfWidth));
-	NXMLSettings::AddAttributeToNode(
-		pXMLDom, pParentNode.get(), _T("Weight"), NXMLSettings::EncodeIntValue(fontInfo.lfWeight));
-	NXMLSettings::AddAttributeToNode(
-		pXMLDom, pParentNode.get(), _T("Italic"), NXMLSettings::EncodeBoolValue(fontInfo.lfItalic));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Height"),
+		NXMLSettings::EncodeIntValue(fontInfo.lfHeight));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Width"),
+		NXMLSettings::EncodeIntValue(fontInfo.lfWidth));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Weight"),
+		NXMLSettings::EncodeIntValue(fontInfo.lfWeight));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Italic"),
+		NXMLSettings::EncodeBoolValue(fontInfo.lfItalic));
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Underline"),
 		NXMLSettings::EncodeBoolValue(fontInfo.lfUnderline));
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Strikeout"),
@@ -503,8 +503,8 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	COLORREF surroundColor;
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::CreateElementNode(
-		pXMLDom, &pParentNode, pe.get(), _T("Setting"), _T("DisplaySurroundColor"));
+	NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
+		_T("DisplaySurroundColor"));
 	surroundColor = (COLORREF) SendMessage(m_hDisplayWindow, DWM_GETSURROUNDCOLOR, 0, 0);
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("r"),
 		NXMLSettings::EncodeIntValue(GetRValue(surroundColor)));
@@ -516,25 +516,25 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	COLORREF textColor;
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::CreateElementNode(
-		pXMLDom, &pParentNode, pe.get(), _T("Setting"), _T("DisplayTextColor"));
+	NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
+		_T("DisplayTextColor"));
 	textColor = (COLORREF) SendMessage(m_hDisplayWindow, DWM_GETTEXTCOLOR, 0, 0);
-	NXMLSettings::AddAttributeToNode(
-		pXMLDom, pParentNode.get(), _T("r"), NXMLSettings::EncodeIntValue(GetRValue(textColor)));
-	NXMLSettings::AddAttributeToNode(
-		pXMLDom, pParentNode.get(), _T("g"), NXMLSettings::EncodeIntValue(GetGValue(textColor)));
-	NXMLSettings::AddAttributeToNode(
-		pXMLDom, pParentNode.get(), _T("b"), NXMLSettings::EncodeIntValue(GetBValue(textColor)));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("r"),
+		NXMLSettings::EncodeIntValue(GetRValue(textColor)));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("g"),
+		NXMLSettings::EncodeIntValue(GetGValue(textColor)));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("b"),
+		NXMLSettings::EncodeIntValue(GetBValue(textColor)));
 
 	WCHAR szValue[32];
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	_itow_s(m_config->displayWindowWidth, szValue, SIZEOF_ARRAY(szValue), 10);
-	NXMLSettings::WriteStandardSetting(
-		pXMLDom, pe.get(), _T("Setting"), _T("DisplayWindowWidth"), szValue);
+	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("DisplayWindowWidth"),
+		szValue);
 
 	_itow_s(m_config->displayWindowHeight, szValue, SIZEOF_ARRAY(szValue), 10);
-	NXMLSettings::WriteStandardSetting(
-		pXMLDom, pe.get(), _T("Setting"), _T("DisplayWindowHeight"), szValue);
+	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("DisplayWindowHeight"),
+		szValue);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
@@ -581,8 +581,8 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	_itow_s(m_iLastSelectedTab, szValue, SIZEOF_ARRAY(szValue), 10);
-	NXMLSettings::WriteStandardSetting(
-		pXMLDom, pe.get(), _T("Setting"), _T("LastSelectedTab"), szValue);
+	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("LastSelectedTab"),
+		szValue);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("LockToolbars"),
@@ -698,8 +698,8 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 		NXMLSettings::EncodeIntValue(m_config->iconTheme));
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::CreateElementNode(
-		pXMLDom, &pParentNode, pe.get(), _T("Setting"), _T("ToolbarState"));
+	NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
+		_T("ToolbarState"));
 
 	MainToolbarPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom, pParentNode.get());
 
@@ -709,13 +709,13 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	_itow_s(m_config->treeViewWidth, szValue, SIZEOF_ARRAY(szValue), 10);
-	NXMLSettings::WriteStandardSetting(
-		pXMLDom, pe.get(), _T("Setting"), _T("TreeViewWidth"), szValue);
+	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("TreeViewWidth"),
+		szValue);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	_itow_s(m_config->defaultFolderSettings.viewMode, szValue, SIZEOF_ARRAY(szValue), 10);
-	NXMLSettings::WriteStandardSetting(
-		pXMLDom, pe.get(), _T("Setting"), _T("ViewModeGlobal"), szValue);
+	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ViewModeGlobal"),
+		szValue);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
@@ -813,8 +813,8 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 					}
 					else
 					{
-						MapTabAttributeValue(
-							bstrName.get(), bstrValue.get(), tabSettings, folderSettings);
+						MapTabAttributeValue(bstrName.get(), bstrValue.get(), tabSettings,
+							folderSettings);
 					}
 				}
 
@@ -882,19 +882,19 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 					}
 				}
 
-				ValidateSingleColumnSet(
-					VALIDATE_REALFOLDER_COLUMNS, initialColumns.realFolderColumns);
-				ValidateSingleColumnSet(
-					VALIDATE_CONTROLPANEL_COLUMNS, initialColumns.controlPanelColumns);
-				ValidateSingleColumnSet(
-					VALIDATE_MYCOMPUTER_COLUMNS, initialColumns.myComputerColumns);
-				ValidateSingleColumnSet(
-					VALIDATE_RECYCLEBIN_COLUMNS, initialColumns.recycleBinColumns);
+				ValidateSingleColumnSet(VALIDATE_REALFOLDER_COLUMNS,
+					initialColumns.realFolderColumns);
+				ValidateSingleColumnSet(VALIDATE_CONTROLPANEL_COLUMNS,
+					initialColumns.controlPanelColumns);
+				ValidateSingleColumnSet(VALIDATE_MYCOMPUTER_COLUMNS,
+					initialColumns.myComputerColumns);
+				ValidateSingleColumnSet(VALIDATE_RECYCLEBIN_COLUMNS,
+					initialColumns.recycleBinColumns);
 				ValidateSingleColumnSet(VALIDATE_PRINTERS_COLUMNS, initialColumns.printersColumns);
-				ValidateSingleColumnSet(
-					VALIDATE_NETWORKCONNECTIONS_COLUMNS, initialColumns.networkConnectionsColumns);
-				ValidateSingleColumnSet(
-					VALIDATE_MYNETWORKPLACES_COLUMNS, initialColumns.myNetworkPlacesColumns);
+				ValidateSingleColumnSet(VALIDATE_NETWORKCONNECTIONS_COLUMNS,
+					initialColumns.networkConnectionsColumns);
+				ValidateSingleColumnSet(VALIDATE_MYNETWORKPLACES_COLUMNS,
+					initialColumns.myNetworkPlacesColumns);
 			}
 		}
 
@@ -940,8 +940,8 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom, IXM
 		NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe, _T("Tab"), szNodeName);
 
 		std::wstring tabDirectory = tab.GetShellBrowser()->GetDirectory();
-		NXMLSettings::AddAttributeToNode(
-			pXMLDom, pParentNode.get(), _T("Directory"), tabDirectory.c_str());
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Directory"),
+			tabDirectory.c_str());
 
 		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("ApplyFilter"),
 			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetFilterStatus()));
@@ -965,12 +965,12 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom, IXM
 			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetSortAscending()));
 
 		UINT sortMode = tab.GetShellBrowser()->GetSortMode();
-		NXMLSettings::AddAttributeToNode(
-			pXMLDom, pParentNode.get(), _T("SortMode"), NXMLSettings::EncodeIntValue(sortMode));
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("SortMode"),
+			NXMLSettings::EncodeIntValue(sortMode));
 
 		UINT viewMode = tab.GetShellBrowser()->GetViewMode();
-		NXMLSettings::AddAttributeToNode(
-			pXMLDom, pParentNode.get(), _T("ViewMode"), NXMLSettings::EncodeIntValue(viewMode));
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("ViewMode"),
+			NXMLSettings::EncodeIntValue(viewMode));
 
 		wil::com_ptr_nothrow<IXMLDOMElement> pColumnsNode;
 		auto bstr = wil::make_bstr_nothrow(L"Columns");
@@ -988,8 +988,8 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom, IXM
 			_T("ControlPanel"), TAB_INDENT);
 		SaveColumnToXML(pXMLDom, pColumnsNode.get(), folderColumns.recycleBinColumns,
 			_T("RecycleBin"), TAB_INDENT);
-		SaveColumnToXML(
-			pXMLDom, pColumnsNode.get(), folderColumns.printersColumns, _T("Printers"), TAB_INDENT);
+		SaveColumnToXML(pXMLDom, pColumnsNode.get(), folderColumns.printersColumns, _T("Printers"),
+			TAB_INDENT);
 		SaveColumnToXML(pXMLDom, pColumnsNode.get(), folderColumns.networkConnectionsColumns,
 			_T("Network"), TAB_INDENT);
 		SaveColumnToXML(pXMLDom, pColumnsNode.get(), folderColumns.myNetworkPlacesColumns,
@@ -1006,11 +1006,11 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom, IXM
 			NXMLSettings::EncodeBoolValue(tab.GetUseCustomName()));
 
 		if (tab.GetUseCustomName())
-			NXMLSettings::AddAttributeToNode(
-				pXMLDom, pParentNode.get(), _T("CustomName"), tab.GetName().c_str());
+			NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("CustomName"),
+				tab.GetName().c_str());
 		else
-			NXMLSettings::AddAttributeToNode(
-				pXMLDom, pParentNode.get(), _T("CustomName"), EMPTY_STRING);
+			NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("CustomName"),
+				EMPTY_STRING);
 
 		NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnttt.get(), pParentNode.get());
 
@@ -1074,8 +1074,8 @@ int Explorerplusplus::LoadColumnFromXML(IXMLDOMNode *pNode, std::vector<Column_t
 			for (j = 0; j < sizeof(ColumnData) / sizeof(ColumnData[0]); j++)
 			{
 				TCHAR szWidth[32];
-				StringCchPrintf(
-					szWidth, SIZEOF_ARRAY(szWidth), _T("%s_Width"), ColumnData[j].szName);
+				StringCchPrintf(szWidth, SIZEOF_ARRAY(szWidth), _T("%s_Width"),
+					ColumnData[j].szName);
 
 				if (lstrcmp(bstrName.get(), ColumnData[j].szName) == 0)
 				{
@@ -1188,23 +1188,23 @@ void Explorerplusplus::SaveDefaultColumnsToXML(IXMLDOMDocument *pXMLDom, IXMLDOM
 	NXMLSettings::AppendChildToParent(pColumnsNode.get(), pRoot);
 }
 
-void Explorerplusplus::SaveDefaultColumnsToXMLInternal(
-	IXMLDOMDocument *pXMLDom, IXMLDOMElement *pColumnsNode)
+void Explorerplusplus::SaveDefaultColumnsToXMLInternal(IXMLDOMDocument *pXMLDom,
+	IXMLDOMElement *pColumnsNode)
 {
 	int DEFAULT_INDENT = 2;
 
 	const auto &folderColumns = m_config->globalFolderSettings.folderColumns;
 
-	SaveColumnToXML(
-		pXMLDom, pColumnsNode, folderColumns.realFolderColumns, _T("Generic"), DEFAULT_INDENT);
-	SaveColumnToXML(
-		pXMLDom, pColumnsNode, folderColumns.myComputerColumns, _T("MyComputer"), DEFAULT_INDENT);
+	SaveColumnToXML(pXMLDom, pColumnsNode, folderColumns.realFolderColumns, _T("Generic"),
+		DEFAULT_INDENT);
+	SaveColumnToXML(pXMLDom, pColumnsNode, folderColumns.myComputerColumns, _T("MyComputer"),
+		DEFAULT_INDENT);
 	SaveColumnToXML(pXMLDom, pColumnsNode, folderColumns.controlPanelColumns, _T("ControlPanel"),
 		DEFAULT_INDENT);
-	SaveColumnToXML(
-		pXMLDom, pColumnsNode, folderColumns.recycleBinColumns, _T("RecycleBin"), DEFAULT_INDENT);
-	SaveColumnToXML(
-		pXMLDom, pColumnsNode, folderColumns.printersColumns, _T("Printers"), DEFAULT_INDENT);
+	SaveColumnToXML(pXMLDom, pColumnsNode, folderColumns.recycleBinColumns, _T("RecycleBin"),
+		DEFAULT_INDENT);
+	SaveColumnToXML(pXMLDom, pColumnsNode, folderColumns.printersColumns, _T("Printers"),
+		DEFAULT_INDENT);
 	SaveColumnToXML(pXMLDom, pColumnsNode, folderColumns.networkConnectionsColumns, _T("Network"),
 		DEFAULT_INDENT);
 	SaveColumnToXML(pXMLDom, pColumnsNode, folderColumns.myNetworkPlacesColumns,
@@ -1246,8 +1246,8 @@ void Explorerplusplus::SaveColumnToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement 
 
 		TCHAR szWidth[32];
 		StringCchPrintf(szWidth, SIZEOF_ARRAY(szWidth), _T("%s_Width"), pszColumnSaveName);
-		NXMLSettings::AddAttributeToNode(
-			pXMLDom, pColumnNode.get(), szWidth, NXMLSettings::EncodeIntValue(itr->iWidth));
+		NXMLSettings::AddAttributeToNode(pXMLDom, pColumnNode.get(), szWidth,
+			NXMLSettings::EncodeIntValue(itr->iWidth));
 	}
 }
 
@@ -1266,8 +1266,8 @@ void Explorerplusplus::SaveWindowPositionToXML(IXMLDOMDocument *pXMLDom, IXMLDOM
 	NXMLSettings::AppendChildToParent(pWndPosNode.get(), pRoot);
 }
 
-void Explorerplusplus::SaveWindowPositionToXMLInternal(
-	IXMLDOMDocument *pXMLDom, IXMLDOMElement *pWndPosNode)
+void Explorerplusplus::SaveWindowPositionToXMLInternal(IXMLDOMDocument *pXMLDom,
+	IXMLDOMElement *pWndPosNode)
 {
 	WINDOWPLACEMENT wndpl;
 	wndpl.length = sizeof(WINDOWPLACEMENT);
@@ -1277,12 +1277,12 @@ void Explorerplusplus::SaveWindowPositionToXMLInternal(
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pWndPosNode);
 
 	wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
-	NXMLSettings::CreateElementNode(
-		pXMLDom, &pParentNode, pWndPosNode, _T("Setting"), _T("Position"));
-	NXMLSettings::AddAttributeToNode(
-		pXMLDom, pParentNode.get(), _T("Flags"), NXMLSettings::EncodeIntValue(wndpl.flags));
-	NXMLSettings::AddAttributeToNode(
-		pXMLDom, pParentNode.get(), _T("ShowCmd"), NXMLSettings::EncodeIntValue(wndpl.showCmd));
+	NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pWndPosNode, _T("Setting"),
+		_T("Position"));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Flags"),
+		NXMLSettings::EncodeIntValue(wndpl.flags));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("ShowCmd"),
+		NXMLSettings::EncodeIntValue(wndpl.showCmd));
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("MinPositionX"),
 		NXMLSettings::EncodeIntValue(wndpl.ptMinPosition.x));
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("MinPositionY"),
@@ -1395,8 +1395,8 @@ void Explorerplusplus::SaveToolbarInformationToXML(IXMLDOMDocument *pXMLDom, IXM
 	NXMLSettings::AppendChildToParent(pe.get(), pRoot);
 }
 
-void Explorerplusplus::SaveToolbarInformationToXMLnternal(
-	IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe)
+void Explorerplusplus::SaveToolbarInformationToXMLnternal(IXMLDOMDocument *pXMLDom,
+	IXMLDOMElement *pe)
 {
 	int nBands = (int) SendMessage(m_hMainRebar, RB_GETBANDCOUNT, 0, 0);
 	auto bstr_wsntt = wil::make_bstr_nothrow(L"\n\t\t");
@@ -1415,12 +1415,12 @@ void Explorerplusplus::SaveToolbarInformationToXMLnternal(
 		StringCchPrintf(szNodeName, SIZEOF_ARRAY(szNodeName), _T("%d"), i);
 		NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe, _T("Toolbar"), szNodeName);
 
-		NXMLSettings::AddAttributeToNode(
-			pXMLDom, pParentNode.get(), _T("id"), NXMLSettings::EncodeIntValue(rbi.wID));
-		NXMLSettings::AddAttributeToNode(
-			pXMLDom, pParentNode.get(), _T("Style"), NXMLSettings::EncodeIntValue(rbi.fStyle));
-		NXMLSettings::AddAttributeToNode(
-			pXMLDom, pParentNode.get(), _T("Length"), NXMLSettings::EncodeIntValue(rbi.cx));
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("id"),
+			NXMLSettings::EncodeIntValue(rbi.wID));
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Style"),
+			NXMLSettings::EncodeIntValue(rbi.fStyle));
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Length"),
+			NXMLSettings::EncodeIntValue(rbi.cx));
 	}
 }
 
@@ -1476,8 +1476,8 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 	unsigned char szName[512];
 	unsigned long uNameHash;
 
-	WideCharToMultiByte(
-		CP_ACP, 0, wszName, -1, (LPSTR) szName, SIZEOF_ARRAY(szName), nullptr, nullptr);
+	WideCharToMultiByte(CP_ACP, 0, wszName, -1, (LPSTR) szName, SIZEOF_ARRAY(szName), nullptr,
+		nullptr);
 
 	uNameHash = hash_setting(szName);
 
@@ -1833,8 +1833,8 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 	}
 }
 
-void Explorerplusplus::MapTabAttributeValue(
-	WCHAR *wszName, WCHAR *wszValue, TabSettings &tabSettings, FolderSettings &folderSettings)
+void Explorerplusplus::MapTabAttributeValue(WCHAR *wszName, WCHAR *wszValue,
+	TabSettings &tabSettings, FolderSettings &folderSettings)
 {
 	if (lstrcmp(wszName, L"ApplyFilter") == 0)
 	{

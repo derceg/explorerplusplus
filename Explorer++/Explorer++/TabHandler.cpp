@@ -58,8 +58,8 @@ void Explorerplusplus::InitializeTabs()
 
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_tabContainer->GetHWND());
 	int tabWindowHeight = MulDiv(TAB_WINDOW_HEIGHT_96DPI, dpi, USER_DEFAULT_SCREEN_DPI);
-	SetWindowPos(
-		m_tabContainer->GetHWND(), nullptr, 0, 0, 0, tabWindowHeight, SWP_NOMOVE | SWP_NOZORDER);
+	SetWindowPos(m_tabContainer->GetHWND(), nullptr, 0, 0, 0, tabWindowHeight,
+		SWP_NOMOVE | SWP_NOZORDER);
 
 	m_tabRestorer = std::make_unique<TabRestorer>(m_tabContainer);
 	m_tabRestorerUI = std::make_unique<TabRestorerUI>(m_hLanguageModule, this, m_tabRestorer.get(),
@@ -85,8 +85,8 @@ boost::signals2::connection Explorerplusplus::AddTabsInitializedObserver(
 	return m_tabsInitializedSignal.connect(observer);
 }
 
-void Explorerplusplus::OnNavigationCommitted(
-	const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
+void Explorerplusplus::OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl,
+	bool addHistoryEntry)
 {
 	UNREFERENCED_PARAMETER(pidl);
 	UNREFERENCED_PARAMETER(addHistoryEntry);
@@ -114,8 +114,8 @@ void Explorerplusplus::OnNavigationCommitted(
 void Explorerplusplus::OnNewTab()
 {
 	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
-	int selectionIndex = ListView_GetNextItem(
-		selectedTab.GetShellBrowser()->GetListView(), -1, LVNI_FOCUSED | LVNI_SELECTED);
+	int selectionIndex = ListView_GetNextItem(selectedTab.GetShellBrowser()->GetListView(), -1,
+		LVNI_FOCUSED | LVNI_SELECTED);
 
 	if (selectionIndex != -1)
 	{
@@ -277,8 +277,8 @@ void Explorerplusplus::OnTabListViewSelectionChanged(const Tab &tab)
 
 	if (m_tabContainer->IsTabSelected(tab))
 	{
-		SetTimer(
-			m_hContainer, LISTVIEW_ITEM_CHANGED_TIMER_ID, LISTVIEW_ITEM_CHANGED_TIMEOUT, nullptr);
+		SetTimer(m_hContainer, LISTVIEW_ITEM_CHANGED_TIMER_ID, LISTVIEW_ITEM_CHANGED_TIMEOUT,
+			nullptr);
 	}
 }
 

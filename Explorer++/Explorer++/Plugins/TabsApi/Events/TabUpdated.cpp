@@ -8,17 +8,18 @@
 #include "SolWrapper.h"
 #include "TabContainer.h"
 
-Plugins::TabUpdated::TabUpdated(TabContainer *tabContainer) :
-	m_tabContainer(tabContainer)
+Plugins::TabUpdated::TabUpdated(TabContainer *tabContainer) : m_tabContainer(tabContainer)
 {
-
 }
 
-boost::signals2::connection Plugins::TabUpdated::connectObserver(sol::protected_function observer, sol::this_state state)
+boost::signals2::connection Plugins::TabUpdated::connectObserver(sol::protected_function observer,
+	sol::this_state state)
 {
-	return m_tabContainer->tabUpdatedSignal.AddObserver([this, observer, state] (const Tab &tab, Tab::PropertyType propertyType) {
-		onTabUpdated(observer, state, tab, propertyType);
-	});
+	return m_tabContainer->tabUpdatedSignal.AddObserver(
+		[this, observer, state](const Tab &tab, Tab::PropertyType propertyType)
+		{
+			onTabUpdated(observer, state, tab, propertyType);
+		});
 }
 
 void Plugins::TabUpdated::onTabUpdated(sol::protected_function observer, sol::this_state state,

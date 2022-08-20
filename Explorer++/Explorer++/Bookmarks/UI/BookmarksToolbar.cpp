@@ -51,8 +51,8 @@ void BookmarksToolbar::InitializeToolbar(IconFetcher *iconFetcher)
 
 	SetUpToolbarImageList(iconFetcher);
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
-		m_hToolbar, BookmarksToolbarProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hToolbar,
+		BookmarksToolbarProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	/* Also subclass the parent window, so that WM_COMMAND/WM_NOTIFY messages
 	can be caught. */
@@ -95,8 +95,8 @@ void BookmarksToolbar::SetUpToolbarImageList(IconFetcher *iconFetcher)
 		reinterpret_cast<LPARAM>(m_bookmarkIconManager->GetImageList()));
 }
 
-LRESULT CALLBACK BookmarksToolbar::BookmarksToolbarProcStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK BookmarksToolbar::BookmarksToolbarProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
+	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -105,8 +105,8 @@ LRESULT CALLBACK BookmarksToolbar::BookmarksToolbarProcStub(
 	return pbt->BookmarksToolbarProc(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK BookmarksToolbar::BookmarksToolbarProc(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK BookmarksToolbar::BookmarksToolbarProc(HWND hwnd, UINT uMsg, WPARAM wParam,
+	LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -194,8 +194,8 @@ void BookmarksToolbar::StartDrag(const POINT &pt)
 	}
 
 	wil::com_ptr_nothrow<IDragSourceHelper> dragSourceHelper;
-	HRESULT hr = CoCreateInstance(
-		CLSID_DragDropHelper, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&dragSourceHelper));
+	HRESULT hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_ALL,
+		IID_PPV_ARGS(&dragSourceHelper));
 
 	if (FAILED(hr))
 	{
@@ -250,8 +250,8 @@ void BookmarksToolbar::OnMButtonUp(const POINT &pt, UINT keysDown)
 	BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_pexpp, switchToNewTab);
 }
 
-LRESULT CALLBACK BookmarksToolbar::BookmarksToolbarParentProcStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK BookmarksToolbar::BookmarksToolbarParentProcStub(HWND hwnd, UINT uMsg,
+	WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -260,8 +260,8 @@ LRESULT CALLBACK BookmarksToolbar::BookmarksToolbarParentProcStub(
 	return pbt->BookmarksToolbarParentProc(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK BookmarksToolbar::BookmarksToolbarParentProc(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK BookmarksToolbar::BookmarksToolbarParentProc(HWND hwnd, UINT uMsg, WPARAM wParam,
+	LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -327,8 +327,8 @@ BOOL BookmarksToolbar::OnRightClick(const NMMOUSE *nmm)
 		return FALSE;
 	}
 
-	m_bookmarkContextMenu.ShowMenu(
-		m_hToolbar, m_bookmarkTree->GetBookmarksToolbarFolder(), { bookmarkItem }, pt);
+	m_bookmarkContextMenu.ShowMenu(m_hToolbar, m_bookmarkTree->GetBookmarksToolbarFolder(),
+		{ bookmarkItem }, pt);
 
 	return TRUE;
 }
@@ -421,7 +421,8 @@ void BookmarksToolbar::ShowBookmarkFolderMenu(BookmarkItem *bookmarkItem, int co
 void BookmarksToolbar::ShowOverflowMenu(const POINT &ptScreen)
 {
 	m_bookmarkMenu.ShowMenu(m_bookmarkTree->GetBookmarksToolbarFolder(), ptScreen,
-		[this](const BookmarkItem *bookmarkItem) {
+		[this](const BookmarkItem *bookmarkItem)
+		{
 			auto index = GetBookmarkItemIndex(bookmarkItem);
 
 			if (!index)
@@ -479,8 +480,8 @@ void BookmarksToolbar::OnNewBookmarkItem(BookmarkItem::Type type, size_t targetI
 
 void BookmarksToolbar::OnPaste(size_t targetIndex)
 {
-	BookmarkHelper::PasteBookmarkItems(
-		m_bookmarkTree, m_bookmarkTree->GetBookmarksToolbarFolder(), targetIndex);
+	BookmarkHelper::PasteBookmarkItems(m_bookmarkTree, m_bookmarkTree->GetBookmarksToolbarFolder(),
+		targetIndex);
 }
 
 // Returns the index of the button that comes after the specified point. If the
@@ -598,8 +599,8 @@ void BookmarksToolbar::OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t in
 	}
 }
 
-void BookmarksToolbar::OnBookmarkItemUpdated(
-	BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType)
+void BookmarksToolbar::OnBookmarkItemUpdated(BookmarkItem &bookmarkItem,
+	BookmarkItem::PropertyType propertyType)
 {
 	if (propertyType != BookmarkItem::PropertyType::Name)
 	{

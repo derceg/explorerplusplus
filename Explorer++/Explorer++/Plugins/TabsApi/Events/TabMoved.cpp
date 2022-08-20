@@ -7,17 +7,18 @@
 #include "SolWrapper.h"
 #include "TabContainer.h"
 
-Plugins::TabMoved::TabMoved(TabContainer *tabContainer) :
-	m_tabContainer(tabContainer)
+Plugins::TabMoved::TabMoved(TabContainer *tabContainer) : m_tabContainer(tabContainer)
 {
-
 }
 
-boost::signals2::connection Plugins::TabMoved::connectObserver(sol::protected_function observer, sol::this_state state)
+boost::signals2::connection Plugins::TabMoved::connectObserver(sol::protected_function observer,
+	sol::this_state state)
 {
 	UNREFERENCED_PARAMETER(state);
 
-	return m_tabContainer->tabMovedSignal.AddObserver([observer] (const Tab &tab, int fromIndex, int toIndex) {
-		observer(tab.GetId(), fromIndex, toIndex);
-	});
+	return m_tabContainer->tabMovedSignal.AddObserver(
+		[observer](const Tab &tab, int fromIndex, int toIndex)
+		{
+			observer(tab.GetId(), fromIndex, toIndex);
+		});
 }

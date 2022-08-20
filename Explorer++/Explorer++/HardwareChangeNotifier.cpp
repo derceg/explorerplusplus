@@ -19,7 +19,8 @@ void HardwareChangeNotifier::AddObserver(NHardwareChangeNotifier::INotification 
 void HardwareChangeNotifier::RemoveObserver(NHardwareChangeNotifier::INotification *hcn)
 {
 	auto itr = std::find_if(m_Observers.begin(), m_Observers.end(),
-		[hcn](const NHardwareChangeNotifier::INotification *hcnCurrent) {
+		[hcn](const NHardwareChangeNotifier::INotification *hcnCurrent)
+		{
 			return hcnCurrent == hcn;
 		});
 
@@ -39,8 +40,8 @@ void HardwareChangeNotifier::NotifyDeviceRemovalComplete(DEV_BROADCAST_HDR *dbh)
 	NotifyObservers(NotificationType::RemovalComplete, dbh);
 }
 
-void HardwareChangeNotifier::NotifyObservers(
-	NotificationType notificationType, DEV_BROADCAST_HDR *dbh)
+void HardwareChangeNotifier::NotifyObservers(NotificationType notificationType,
+	DEV_BROADCAST_HDR *dbh)
 {
 	for (const auto &hcn : m_Observers)
 	{

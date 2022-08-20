@@ -31,27 +31,33 @@ void Explorerplusplus::CreateTabBacking()
 
 void Explorerplusplus::OnTabsInitialized()
 {
-	m_tabContainer->tabCreatedSignal.AddObserver([this](int tabId, BOOL switchToNewTab) {
-		UNREFERENCED_PARAMETER(tabId);
-		UNREFERENCED_PARAMETER(switchToNewTab);
+	m_tabContainer->tabCreatedSignal.AddObserver(
+		[this](int tabId, BOOL switchToNewTab)
+		{
+			UNREFERENCED_PARAMETER(tabId);
+			UNREFERENCED_PARAMETER(switchToNewTab);
 
-		UpdateTabToolbar();
-	});
+			UpdateTabToolbar();
+		});
 
 	m_tabContainer->tabUpdatedSignal.AddObserver(
 		std::bind_front(&Explorerplusplus::OnTabUpdated, this));
 
-	m_tabContainer->tabSelectedSignal.AddObserver([this](const Tab &tab) {
-		UNREFERENCED_PARAMETER(tab);
+	m_tabContainer->tabSelectedSignal.AddObserver(
+		[this](const Tab &tab)
+		{
+			UNREFERENCED_PARAMETER(tab);
 
-		UpdateTabToolbar();
-	});
+			UpdateTabToolbar();
+		});
 
-	m_tabContainer->tabRemovedSignal.AddObserver([this](int tabId) {
-		UNREFERENCED_PARAMETER(tabId);
+	m_tabContainer->tabRemovedSignal.AddObserver(
+		[this](int tabId)
+		{
+			UNREFERENCED_PARAMETER(tabId);
 
-		UpdateTabToolbar();
-	});
+			UpdateTabToolbar();
+		});
 }
 
 void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)

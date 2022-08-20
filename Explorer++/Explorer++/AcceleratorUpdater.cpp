@@ -8,7 +8,6 @@
 AcceleratorUpdater::AcceleratorUpdater(HACCEL *acceleratorTable) :
 	m_acceleratorTable(acceleratorTable)
 {
-
 }
 
 void AcceleratorUpdater::update(const std::vector<ShortcutKey> &shortcutKeys)
@@ -16,19 +15,25 @@ void AcceleratorUpdater::update(const std::vector<ShortcutKey> &shortcutKeys)
 	int numAccelerators = CopyAcceleratorTable(*m_acceleratorTable, nullptr, 0);
 
 	std::vector<ACCEL> accelerators(numAccelerators);
-	CopyAcceleratorTable(*m_acceleratorTable, &accelerators[0], static_cast<int>(accelerators.size()));
+	CopyAcceleratorTable(*m_acceleratorTable, &accelerators[0],
+		static_cast<int>(accelerators.size()));
 
 	for (const auto &shortcutKey : shortcutKeys)
 	{
-		accelerators.erase(std::remove_if(accelerators.begin(), accelerators.end(), [shortcutKey] (const ACCEL &accel) {
-			return accel.cmd == shortcutKey.command;
-		}), accelerators.end());
+		accelerators.erase(std::remove_if(accelerators.begin(), accelerators.end(),
+							   [shortcutKey](const ACCEL &accel)
+							   {
+								   return accel.cmd == shortcutKey.command;
+							   }),
+			accelerators.end());
 
 		for (const auto &key : shortcutKey.accelerators)
 		{
-			auto itr = std::find_if(accelerators.begin(), accelerators.end(), [key] (const ACCEL &accel) {
-				return (accel.fVirt & ~FNOINVERT) == key.modifiers && accel.key == key.key;
-			});
+			auto itr = std::find_if(accelerators.begin(), accelerators.end(),
+				[key](const ACCEL &accel)
+				{
+					return (accel.fVirt & ~FNOINVERT) == key.modifiers && accel.key == key.key;
+				});
 
 			if (itr != accelerators.end())
 			{
@@ -43,7 +48,8 @@ void AcceleratorUpdater::update(const std::vector<ShortcutKey> &shortcutKeys)
 		}
 	}
 
-	HACCEL newAcceleratorTable = CreateAcceleratorTable(&accelerators[0], static_cast<int>(accelerators.size()));
+	HACCEL newAcceleratorTable =
+		CreateAcceleratorTable(&accelerators[0], static_cast<int>(accelerators.size()));
 
 	if (newAcceleratorTable == nullptr)
 	{

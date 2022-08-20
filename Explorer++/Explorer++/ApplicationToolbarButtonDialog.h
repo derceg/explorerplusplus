@@ -10,8 +10,8 @@
 class ApplicationToolbarButtonDialog : public DarkModeDialogBase
 {
 public:
-	ApplicationToolbarButtonDialog(
-		HINSTANCE hInstance, HWND hParent, ApplicationButton *Button, bool IsNew);
+	ApplicationToolbarButtonDialog(HINSTANCE hInstance, HWND hParent, ApplicationButton *Button,
+		bool IsNew);
 
 protected:
 	INT_PTR OnInitDialog() override;

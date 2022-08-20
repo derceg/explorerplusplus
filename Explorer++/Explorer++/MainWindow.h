@@ -13,12 +13,12 @@ __interface IExplorerplusplus;
 class MainWindow : BaseWindow
 {
 public:
-	static MainWindow *Create(
-		HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance, IExplorerplusplus *expp);
+	static MainWindow *Create(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
+		IExplorerplusplus *expp);
 
 private:
-	MainWindow(
-		HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance, IExplorerplusplus *expp);
+	MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
+		IExplorerplusplus *expp);
 	~MainWindow() = default;
 
 	void OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);

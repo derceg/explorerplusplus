@@ -15,8 +15,8 @@ public:
 	{
 	}
 
-	NavigationController(
-		std::vector<std::unique_ptr<HistoryEntryType>> &&entries, int currentEntry) :
+	NavigationController(std::vector<std::unique_ptr<HistoryEntryType>> &&entries,
+		int currentEntry) :
 		m_entries(std::move(entries)),
 		m_currentEntry(currentEntry)
 	{

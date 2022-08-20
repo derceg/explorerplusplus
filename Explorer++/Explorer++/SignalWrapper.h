@@ -25,7 +25,7 @@ public:
 	SignalWrapper() = default;
 
 	template <typename... Args>
-	boost::signals2::connection AddObserver(Args &&... args)
+	boost::signals2::connection AddObserver(Args &&...args)
 	{
 		return m_signal.connect(std::forward<Args>(args)...);
 	}

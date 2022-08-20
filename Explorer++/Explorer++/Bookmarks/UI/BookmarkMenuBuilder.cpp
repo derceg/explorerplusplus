@@ -12,8 +12,8 @@
 #include <boost/format.hpp>
 #include <wil/common.h>
 
-BookmarkMenuBuilder::BookmarkMenuBuilder(
-	IExplorerplusplus *expp, IconFetcher *iconFetcher, HMODULE resourceModule) :
+BookmarkMenuBuilder::BookmarkMenuBuilder(IExplorerplusplus *expp, IconFetcher *iconFetcher,
+	HMODULE resourceModule) :
 	m_expp(expp),
 	m_iconFetcher(iconFetcher),
 	m_resourceModule(resourceModule)
@@ -87,8 +87,8 @@ BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, BookmarkItem *bookmarkItem, int 
 	return TRUE;
 }
 
-BOOL BookmarkMenuBuilder::AddEmptyBookmarkFolderToMenu(
-	HMENU menu, BookmarkItem *bookmarkItem, int position, ItemPositionMap *itemPositionMap)
+BOOL BookmarkMenuBuilder::AddEmptyBookmarkFolderToMenu(HMENU menu, BookmarkItem *bookmarkItem,
+	int position, ItemPositionMap *itemPositionMap)
 {
 	std::wstring bookmarkFolderEmpty =
 		ResourceHelper::LoadString(m_resourceModule, IDS_BOOKMARK_FOLDER_EMPTY);

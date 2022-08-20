@@ -129,8 +129,8 @@ void Explorerplusplus::OpenItem(const TCHAR *itemPath, OpenFolderDisposition ope
 	}
 }
 
-void Explorerplusplus::OpenItem(
-	PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition)
+void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem,
+	OpenFolderDisposition openFolderDisposition)
 {
 	BOOL bControlPanelParent = FALSE;
 
@@ -216,8 +216,8 @@ void Explorerplusplus::OpenItem(
 			std::wstring itemPath;
 			GetDisplayName(pidlItem, SHGDN_FORPARSING, itemPath);
 
-			hr = NFileOperations::ResolveLink(
-				m_hContainer, 0, itemPath.c_str(), szTargetPath, SIZEOF_ARRAY(szTargetPath));
+			hr = NFileOperations::ResolveLink(m_hContainer, 0, itemPath.c_str(), szTargetPath,
+				SIZEOF_ARRAY(szTargetPath));
 
 			if (hr == S_OK)
 			{
@@ -241,8 +241,8 @@ void Explorerplusplus::OpenItem(
 							&& m_config->handleZipFiles))
 					{
 						unique_pidl_absolute pidlTarget;
-						hr = SHParseDisplayName(
-							szTargetPath, nullptr, wil::out_param(pidlTarget), 0, nullptr);
+						hr = SHParseDisplayName(szTargetPath, nullptr, wil::out_param(pidlTarget),
+							0, nullptr);
 
 						if (SUCCEEDED(hr))
 						{
@@ -274,8 +274,8 @@ void Explorerplusplus::OpenItem(
 			std::wstring parsingPath;
 			GetDisplayName(pidlItem, SHGDN_FORPARSING, parsingPath);
 
-			MyExpandEnvironmentStrings(
-				_T("%windir%\\explorer.exe"), szExplorerPath, SIZEOF_ARRAY(szExplorerPath));
+			MyExpandEnvironmentStrings(_T("%windir%\\explorer.exe"), szExplorerPath,
+				SIZEOF_ARRAY(szExplorerPath));
 
 			/* Invoke Windows Explorer directly. Note that only folder
 			items need to be passed directly to Explorer. Two central
@@ -294,8 +294,8 @@ void Explorerplusplus::OpenItem(
 	}
 }
 
-void Explorerplusplus::OpenFolderItem(
-	PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition)
+void Explorerplusplus::OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
+	OpenFolderDisposition openFolderDisposition)
 {
 	if (m_config->alwaysOpenNewTab && openFolderDisposition == OpenFolderDisposition::CurrentTab)
 	{
@@ -1078,8 +1078,8 @@ void Explorerplusplus::OnAssocChanged()
 
 	if (res == ERROR_SUCCESS)
 	{
-		RegistrySettings::ReadString(
-			hKey, _T("Shell Icon Size"), szShellIconSize, SIZEOF_ARRAY(szShellIconSize));
+		RegistrySettings::ReadString(hKey, _T("Shell Icon Size"), szShellIconSize,
+			SIZEOF_ARRAY(szShellIconSize));
 
 		dwShellIconSize = _wtoi(szShellIconSize);
 

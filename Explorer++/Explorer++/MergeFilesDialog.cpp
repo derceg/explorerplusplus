@@ -149,8 +149,8 @@ INT_PTR MergeFilesDialog::OnInitDialog()
 
 		/* TODO: Perform in background thread. */
 		SHFILEINFO shfi;
-		SHGetFileInfo(
-			szFullFilename, 0, &shfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX | SHGFI_TYPENAME);
+		SHGetFileInfo(szFullFilename, 0, &shfi, sizeof(SHFILEINFO),
+			SHGFI_SYSICONINDEX | SHGFI_TYPENAME);
 
 		LVITEM lvItem;
 		lvItem.mask = LVIF_TEXT | LVIF_IMAGE;
@@ -197,12 +197,12 @@ INT_PTR MergeFilesDialog::OnInitDialog()
 
 wil::unique_hicon MergeFilesDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_expp->GetIconResourceLoader()->LoadIconFromPNGAndScale(
-		Icon::MergeFiles, iconWidth, iconHeight);
+	return m_expp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::MergeFiles, iconWidth,
+		iconHeight);
 }
 
-void MergeFilesDialog::GetResizableControlInformation(
-	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control> &ControlList)
+void MergeFilesDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+	std::list<ResizableDialog::Control> &ControlList)
 {
 	dsc = BaseDialog::DialogSizeConstraint::None;
 

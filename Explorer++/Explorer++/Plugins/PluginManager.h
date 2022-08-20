@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "Plugins/LuaPlugin.h"
 #include "PluginInterface.h"
+#include "Plugins/LuaPlugin.h"
 
 namespace std
 {
@@ -20,13 +20,11 @@ namespace Plugins
 	class PluginManager
 	{
 	public:
-
 		PluginManager(PluginInterface *pluginInterface);
 
 		void loadAllPlugins(const std::filesystem::path &pluginDirectory);
 
 	private:
-
 		static const std::wstring MANIFEST_NAME;
 
 		bool attemptToLoadPlugin(const std::filesystem::path &directory);

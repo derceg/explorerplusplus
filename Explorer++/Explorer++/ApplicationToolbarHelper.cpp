@@ -52,8 +52,8 @@ ApplicationToolbarHelper::ApplicationInfo ApplicationToolbarHelper::ParseCommand
 	boost::trim(trimmedApplication);
 
 	TCHAR expandedApplicationPath[MAX_PATH];
-	MyExpandEnvironmentStrings(
-		trimmedApplication.c_str(), expandedApplicationPath, SIZEOF_ARRAY(expandedApplicationPath));
+	MyExpandEnvironmentStrings(trimmedApplication.c_str(), expandedApplicationPath,
+		SIZEOF_ARRAY(expandedApplicationPath));
 
 	ApplicationInfo applicationInfo;
 	applicationInfo.application = expandedApplicationPath;

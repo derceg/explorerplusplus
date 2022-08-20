@@ -105,8 +105,8 @@ void Explorerplusplus::OnSearch()
 		Tab &selectedTab = m_tabContainer->GetSelectedTab();
 		std::wstring currentDirectory = selectedTab.GetShellBrowser()->GetDirectory();
 
-		auto *searchDialog = new SearchDialog(
-			m_hLanguageModule, m_hContainer, currentDirectory, this, m_tabContainer);
+		auto *searchDialog = new SearchDialog(m_hLanguageModule, m_hContainer, currentDirectory,
+			this, m_tabContainer);
 		g_hwndSearch = searchDialog->ShowModelessDialog(new ModelessDialogNotification());
 	}
 	else
@@ -117,8 +117,8 @@ void Explorerplusplus::OnSearch()
 
 void Explorerplusplus::OnCustomizeColors()
 {
-	CustomizeColorsDialog customizeColorsDialog(
-		m_hLanguageModule, m_hContainer, this, &m_ColorRules);
+	CustomizeColorsDialog customizeColorsDialog(m_hLanguageModule, m_hContainer, this,
+		&m_ColorRules);
 	customizeColorsDialog.ShowModalDialog();
 
 	/* Causes the active listview to redraw (therefore
@@ -225,12 +225,14 @@ void Explorerplusplus::OnCreateNewFolder()
 	}
 
 	FileProgressSink *sink = FileProgressSink::CreateNew();
-	sink->SetPostNewItemObserver([this](PIDLIST_ABSOLUTE pidl) {
-		ListViewHelper::SelectAllItems(m_hActiveListView, FALSE);
-		SetFocus(m_hActiveListView);
+	sink->SetPostNewItemObserver(
+		[this](PIDLIST_ABSOLUTE pidl)
+		{
+			ListViewHelper::SelectAllItems(m_hActiveListView, FALSE);
+			SetFocus(m_hActiveListView);
 
-		m_pActiveShellBrowser->QueueRename(pidl);
-	});
+			m_pActiveShellBrowser->QueueRename(pidl);
+		});
 
 	TCHAR newFolderName[128];
 	LoadString(m_hLanguageModule, IDS_NEW_FOLDER_NAME, newFolderName, SIZEOF_ARRAY(newFolderName));
@@ -270,8 +272,8 @@ void Explorerplusplus::OnResolveLink()
 			PathRemoveFileSpec(szPath);
 
 			int newTabId;
-			m_tabContainer->CreateNewTab(
-				szPath, TabSettings(_selected = true), nullptr, nullptr, &newTabId);
+			m_tabContainer->CreateNewTab(szPath, TabSettings(_selected = true), nullptr, nullptr,
+				&newTabId);
 
 			Tab &tab = m_tabContainer->GetTab(newTabId);
 

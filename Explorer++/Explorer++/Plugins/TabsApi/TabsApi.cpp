@@ -27,12 +27,14 @@ Plugins::TabsApi::FolderSettings::FolderSettings(const ShellBrowser &shellBrowse
 
 std::wstring Plugins::TabsApi::FolderSettings::toString()
 {
+	// clang-format off
 	return _T("sortMode = ") + utf8StrToWstr(sortMode._to_string())
 		+ _T(", viewMode = ") + utf8StrToWstr(viewMode._to_string())
 		+ _T(", sortAscending = ") + std::to_wstring(sortAscending)
 		+ _T(", showInGroups = ") + std::to_wstring(showInGroups)
 		+ _T(", showHidden = ") + std::to_wstring(showHidden)
 		+ _T(", autoArrange = ") + std::to_wstring(autoArrange);
+	// clang-format on
 }
 
 Plugins::TabsApi::Tab::Tab(const ::Tab &tabInternal) :
@@ -47,19 +49,20 @@ Plugins::TabsApi::Tab::Tab(const ::Tab &tabInternal) :
 
 std::wstring Plugins::TabsApi::Tab::toString()
 {
+	// clang-format off
 	return _T("id = ") + std::to_wstring(id)
 		+ _T(", location = ") + location
 		+ _T(", name = ") + name
 		+ _T(", locked = ") + std::to_wstring(locked)
 		+ _T(", addressLocked = ") + std::to_wstring(addressLocked)
 		+ _T(", folderSettings = {") + folderSettings.toString() + _T("}");
+	// clang-format on
 }
 
 Plugins::TabsApi::TabsApi(IExplorerplusplus *expp, TabContainer *tabContainer) :
 	m_expp(expp),
 	m_tabContainer(tabContainer)
 {
-
 }
 
 std::vector<Plugins::TabsApi::Tab> Plugins::TabsApi::getAll()
@@ -102,7 +105,8 @@ int Plugins::TabsApi::create(sol::table createProperties)
 	extractTabPropertiesForCreation(createProperties, tabSettings);
 
 	unique_pidl_absolute pidlDirectory;
-	HRESULT hr = SHParseDisplayName(location->c_str(), nullptr, wil::out_param(pidlDirectory), 0, nullptr);
+	HRESULT hr =
+		SHParseDisplayName(location->c_str(), nullptr, wil::out_param(pidlDirectory), 0, nullptr);
 
 	if (FAILED(hr))
 	{
@@ -119,12 +123,14 @@ int Plugins::TabsApi::create(sol::table createProperties)
 	}
 
 	int tabId = -1;
-	m_tabContainer->CreateNewTab(pidlDirectory.get(), tabSettings, &folderSettings, nullptr , &tabId);
+	m_tabContainer->CreateNewTab(pidlDirectory.get(), tabSettings, &folderSettings, nullptr,
+		&tabId);
 
 	return tabId;
 }
 
-void Plugins::TabsApi::extractTabPropertiesForCreation(sol::table createProperties, TabSettings &tabSettings)
+void Plugins::TabsApi::extractTabPropertiesForCreation(sol::table createProperties,
+	TabSettings &tabSettings)
 {
 	sol::optional<std::wstring> name = createProperties[TabConstants::NAME];
 
@@ -168,7 +174,8 @@ void Plugins::TabsApi::extractTabPropertiesForCreation(sol::table createProperti
 	}
 }
 
-void Plugins::TabsApi::extractFolderSettingsForCreation(sol::table folderSettingsTable, ::FolderSettings &folderSettings)
+void Plugins::TabsApi::extractFolderSettingsForCreation(sol::table folderSettingsTable,
+	::FolderSettings &folderSettings)
 {
 	sol::optional<int> sortMode = folderSettingsTable[FolderSettingsConstants::SORT_MODE];
 
@@ -176,7 +183,7 @@ void Plugins::TabsApi::extractFolderSettingsForCreation(sol::table folderSetting
 	{
 		folderSettings.sortMode = SortMode::_from_integral(*sortMode);
 	}
-	
+
 	sol::optional<int> viewMode = folderSettingsTable[FolderSettingsConstants::VIEW_MODE];
 
 	if (viewMode && ViewMode::_is_valid(*viewMode))
@@ -191,7 +198,8 @@ void Plugins::TabsApi::extractFolderSettingsForCreation(sol::table folderSetting
 		folderSettings.autoArrange = *autoArrange;
 	}
 
-	sol::optional<bool> sortAscending = folderSettingsTable[FolderSettingsConstants::SORT_ASCENDING];
+	sol::optional<bool> sortAscending =
+		folderSettingsTable[FolderSettingsConstants::SORT_ASCENDING];
 
 	if (sortAscending)
 	{
@@ -248,7 +256,7 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 	// TODO: Verify that lockState has a valid value.
 	if (lockState)
 	{
-		tabInternal->SetLockState(static_cast<::Tab::LockState> (*lockState));
+		tabInternal->SetLockState(static_cast<::Tab::LockState>(*lockState));
 	}
 
 	sol::optional<bool> active = properties[TabConstants::ACTIVE];

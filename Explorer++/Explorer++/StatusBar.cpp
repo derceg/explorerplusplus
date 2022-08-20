@@ -146,23 +146,23 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 
 		if ((nFilesSelected + nFoldersSelected) == 1)
 		{
-			LoadString(
-				m_hLanguageModule, IDS_GENERAL_SELECTED_ONEITEM, szTemp, SIZEOF_ARRAY(szTemp));
+			LoadString(m_hLanguageModule, IDS_GENERAL_SELECTED_ONEITEM, szTemp,
+				SIZEOF_ARRAY(szTemp));
 
 			/* One item selected. Form:
 			1 item selected */
-			StringCchPrintf(
-				szItemsSelected, SIZEOF_ARRAY(szItemsSelected), _T("%s %s"), szNumSelected, szTemp);
+			StringCchPrintf(szItemsSelected, SIZEOF_ARRAY(szItemsSelected), _T("%s %s"),
+				szNumSelected, szTemp);
 		}
 		else
 		{
-			LoadString(
-				m_hLanguageModule, IDS_GENERAL_SELECTED_MOREITEMS, szTemp, SIZEOF_ARRAY(szTemp));
+			LoadString(m_hLanguageModule, IDS_GENERAL_SELECTED_MOREITEMS, szTemp,
+				SIZEOF_ARRAY(szTemp));
 
 			/* More than one item selected. Form:
 			n items selected */
-			StringCchPrintf(
-				szItemsSelected, SIZEOF_ARRAY(szItemsSelected), _T("%s %s"), szNumSelected, szTemp);
+			StringCchPrintf(szItemsSelected, SIZEOF_ARRAY(szItemsSelected), _T("%s %s"),
+				szNumSelected, szTemp);
 		}
 	}
 	else
@@ -174,16 +174,16 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 			LoadString(m_hLanguageModule, IDS_GENERAL_ONEITEM, szTemp, SIZEOF_ARRAY(szTemp));
 
 			/* Text: '1 item' */
-			StringCchPrintf(
-				szItemsSelected, SIZEOF_ARRAY(szItemsSelected), _T("%s %s"), szNumSelected, szTemp);
+			StringCchPrintf(szItemsSelected, SIZEOF_ARRAY(szItemsSelected), _T("%s %s"),
+				szNumSelected, szTemp);
 		}
 		else
 		{
 			LoadString(m_hLanguageModule, IDS_GENERAL_MOREITEMS, szTemp, SIZEOF_ARRAY(szTemp));
 
 			/* Text: 'n Items' */
-			StringCchPrintf(
-				szItemsSelected, SIZEOF_ARRAY(szItemsSelected), _T("%s %s"), szNumSelected, szTemp);
+			StringCchPrintf(szItemsSelected, SIZEOF_ARRAY(szItemsSelected), _T("%s %s"),
+				szNumSelected, szTemp);
 		}
 	}
 
@@ -217,8 +217,8 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 
 	SendMessage(m_hStatusBar, SB_SETTEXT, 1 | 0, (LPARAM) lpszSizeBuffer);
 
-	res = CreateDriveFreeSpaceString(
-		tab.GetShellBrowser()->GetDirectory().c_str(), szBuffer, SIZEOF_ARRAY(szBuffer));
+	res = CreateDriveFreeSpaceString(tab.GetShellBrowser()->GetDirectory().c_str(), szBuffer,
+		SIZEOF_ARRAY(szBuffer));
 
 	if (res == -1)
 	{
@@ -239,8 +239,8 @@ int Explorerplusplus::CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szB
 	TCHAR szFree[16];
 	TCHAR szFreeSpaceString[512];
 
-	if (GetDiskFreeSpaceEx(
-			szPath, &bytesAvailableToCaller, &totalNumberOfBytes, &totalNumberOfFreeBytes)
+	if (GetDiskFreeSpaceEx(szPath, &bytesAvailableToCaller, &totalNumberOfBytes,
+			&totalNumberOfFreeBytes)
 		== 0)
 	{
 		szBuffer = nullptr;

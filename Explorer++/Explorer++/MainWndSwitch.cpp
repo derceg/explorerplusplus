@@ -83,9 +83,10 @@ LRESULT CALLBACK Explorerplusplus::WndProcStub(HWND hwnd, UINT msg, WPARAM wPara
 	}
 }
 
-LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM wParam,
+	LPARAM lParam)
 {
-	switch(Msg)
+	switch (Msg)
 	{
 	case WM_CREATE:
 		OnCreate();
@@ -105,11 +106,11 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		break;
 
 	case WM_MENUSELECT:
-		StatusBarMenuSelect(wParam,lParam);
+		StatusBarMenuSelect(wParam, lParam);
 		break;
 
 	case WM_DEVICECHANGE:
-		OnDeviceChange(wParam,lParam);
+		OnDeviceChange(wParam, lParam);
 		break;
 
 	case WM_TIMER:
@@ -142,131 +143,132 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 			tab->GetShellBrowser()->DirectoryAltered();
 		}
 	}
-		break;
+	break;
 
 	case WM_USER_DISPLAYWINDOWRESIZED:
 		OnDisplayWindowResized(wParam);
 		break;
 
-	// See https://github.com/derceg/explorerplusplus/issues/169.
-	/*case WM_APP_ASSOCCHANGED:
-		OnAssocChanged();
-		break;*/
+		// See https://github.com/derceg/explorerplusplus/issues/169.
+		/*case WM_APP_ASSOCCHANGED:
+			OnAssocChanged();
+			break;*/
 
 	case WM_USER_HOLDERRESIZED:
-		{
-			RECT	rc;
+	{
+		RECT rc;
 
-			m_config->treeViewWidth = (int)lParam + TREEVIEW_DRAG_OFFSET;
+		m_config->treeViewWidth = (int) lParam + TREEVIEW_DRAG_OFFSET;
 
-			GetClientRect(m_hContainer,&rc);
+		GetClientRect(m_hContainer, &rc);
 
-			SendMessage(m_hContainer,WM_SIZE,SIZE_RESTORED,MAKELPARAM(rc.right,rc.bottom));
-		}
-		break;
+		SendMessage(m_hContainer, WM_SIZE, SIZE_RESTORED, MAKELPARAM(rc.right, rc.bottom));
+	}
+	break;
 
 	case WM_APP_FOLDERSIZECOMPLETED:
+	{
+		DWFolderSizeCompletion *pDWFolderSizeCompletion = nullptr;
+		TCHAR szFolderSize[32];
+		TCHAR szSizeString[64];
+		TCHAR szTotalSize[64];
+		BOOL bValid = FALSE;
+
+		pDWFolderSizeCompletion = (DWFolderSizeCompletion *) wParam;
+
+		std::list<DWFolderSize>::iterator itr;
+
+		/* First, make sure we should still display the
+		results (we won't if the listview selection has
+		changed, or this folder size was calculated for
+		a tab other than the current one). */
+		for (itr = m_DWFolderSizes.begin(); itr != m_DWFolderSizes.end(); itr++)
 		{
-			DWFolderSizeCompletion *pDWFolderSizeCompletion = nullptr;
-			TCHAR szFolderSize[32];
-			TCHAR szSizeString[64];
-			TCHAR szTotalSize[64];
-			BOOL bValid = FALSE;
-
-			pDWFolderSizeCompletion = (DWFolderSizeCompletion *)wParam;
-
-			std::list<DWFolderSize>::iterator itr;
-
-			/* First, make sure we should still display the
-			results (we won't if the listview selection has
-			changed, or this folder size was calculated for
-			a tab other than the current one). */
-			for(itr = m_DWFolderSizes.begin();itr != m_DWFolderSizes.end();itr++)
+			if (itr->uId == pDWFolderSizeCompletion->uId)
 			{
-				if(itr->uId == pDWFolderSizeCompletion->uId)
+				if (itr->iTabId == m_tabContainer->GetSelectedTab().GetId())
 				{
-					if(itr->iTabId == m_tabContainer->GetSelectedTab().GetId())
-					{
-						bValid = itr->bValid;
-					}
-
-					m_DWFolderSizes.erase(itr);
-
-					break;
+					bValid = itr->bValid;
 				}
+
+				m_DWFolderSizes.erase(itr);
+
+				break;
 			}
-
-			if(bValid)
-			{
-				FormatSizeString(pDWFolderSizeCompletion->liFolderSize,szFolderSize,
-					SIZEOF_ARRAY(szFolderSize),m_config->globalFolderSettings.forceSize,
-					m_config->globalFolderSettings.sizeDisplayFormat);
-
-				LoadString(m_hLanguageModule,IDS_GENERAL_TOTALSIZE,
-					szTotalSize,SIZEOF_ARRAY(szTotalSize));
-
-				StringCchPrintf(szSizeString,SIZEOF_ARRAY(szSizeString),
-					_T("%s: %s"),szTotalSize,szFolderSize);
-
-				/* TODO: The line index should be stored in some other (variable) way. */
-				DisplayWindow_SetLine(m_hDisplayWindow,FOLDER_SIZE_LINE_INDEX,szSizeString);
-			}
-
-			free(pDWFolderSizeCompletion);
 		}
-		break;
+
+		if (bValid)
+		{
+			FormatSizeString(pDWFolderSizeCompletion->liFolderSize, szFolderSize,
+				SIZEOF_ARRAY(szFolderSize), m_config->globalFolderSettings.forceSize,
+				m_config->globalFolderSettings.sizeDisplayFormat);
+
+			LoadString(m_hLanguageModule, IDS_GENERAL_TOTALSIZE, szTotalSize,
+				SIZEOF_ARRAY(szTotalSize));
+
+			StringCchPrintf(szSizeString, SIZEOF_ARRAY(szSizeString), _T("%s: %s"), szTotalSize,
+				szFolderSize);
+
+			/* TODO: The line index should be stored in some other (variable) way. */
+			DisplayWindow_SetLine(m_hDisplayWindow, FOLDER_SIZE_LINE_INDEX, szSizeString);
+		}
+
+		free(pDWFolderSizeCompletion);
+	}
+	break;
 
 	case WM_COPYDATA:
+	{
+		auto *pcds = reinterpret_cast<COPYDATASTRUCT *>(lParam);
+
+		if (pcds->lpData != nullptr)
 		{
-			auto *pcds = reinterpret_cast<COPYDATASTRUCT *>(lParam);
-
-			if (pcds->lpData != nullptr)
-			{
-				m_tabContainer->CreateNewTab((TCHAR *)pcds->lpData, TabSettings(_selected = true));
-			}
-			else
-			{
-				m_tabContainer->CreateNewTabInDefaultDirectory(TabSettings(_selected = true));
-			}
-
-			return TRUE;
+			m_tabContainer->CreateNewTab((TCHAR *) pcds->lpData, TabSettings(_selected = true));
 		}
+		else
+		{
+			m_tabContainer->CreateNewTabInDefaultDirectory(TabSettings(_selected = true));
+		}
+
+		return TRUE;
+	}
 
 	case WM_NDW_RCLICK:
-		{
-			POINT pt;
-			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-			OnDisplayWindowRClick(&pt);
-		}
-		break;
+	{
+		POINT pt;
+		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+		OnDisplayWindowRClick(&pt);
+	}
+	break;
 
 	case WM_NDW_ICONRCLICK:
-		{
-			POINT pt;
-			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-			OnDisplayWindowIconRClick(&pt);
-		}
-		break;
+	{
+		POINT pt;
+		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+		OnDisplayWindowIconRClick(&pt);
+	}
+	break;
 
 	case WM_APPCOMMAND:
 		OnAppCommand(GET_APPCOMMAND_LPARAM(lParam));
 		break;
 
 	case WM_COMMAND:
-		return CommandHandler(hwnd,wParam);
+		return CommandHandler(hwnd, wParam);
 
 	case WM_NOTIFY:
 		return NotifyHandler(hwnd, Msg, wParam, lParam);
 
 	case WM_SIZE:
-		return OnSize(LOWORD(lParam),HIWORD(lParam));
+		return OnSize(LOWORD(lParam), HIWORD(lParam));
 
 	case WM_DPICHANGED:
 		OnDpiChanged(reinterpret_cast<RECT *>(lParam));
 		return 0;
 
 	case WM_CTLCOLORSTATIC:
-		if (auto res = OnCtlColorStatic(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam)))
+		if (auto res =
+				OnCtlColorStatic(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam)))
 		{
 			return *res;
 		}
@@ -279,10 +281,10 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		return OnDestroy();
 	}
 
-	return DefWindowProc(hwnd,Msg,wParam,lParam);
+	return DefWindowProc(hwnd, Msg, wParam, lParam);
 }
 
-LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
+LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd, WPARAM wParam)
 {
 	if (HIWORD(wParam) == 0 || HIWORD(wParam) == 1)
 	{
@@ -296,26 +298,26 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 
 LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 {
-	if (HIWORD(wParam) == 0 && LOWORD(wParam) >= MENU_BOOKMARK_STARTID &&
-		LOWORD(wParam) <= MENU_BOOKMARK_ENDID)
+	if (HIWORD(wParam) == 0 && LOWORD(wParam) >= MENU_BOOKMARK_STARTID
+		&& LOWORD(wParam) <= MENU_BOOKMARK_ENDID)
 	{
 		m_bookmarksMainMenu->OnMenuItemClicked(LOWORD(wParam));
 		return 0;
 	}
-	else if (HIWORD(wParam) == 0 && LOWORD(wParam) >= MENU_RECENT_TABS_STARTID &&
-		LOWORD(wParam) < MENU_RECENT_TABS_ENDID)
+	else if (HIWORD(wParam) == 0 && LOWORD(wParam) >= MENU_RECENT_TABS_STARTID
+		&& LOWORD(wParam) < MENU_RECENT_TABS_ENDID)
 	{
 		m_tabRestorerUI->OnMenuItemClicked(LOWORD(wParam));
 		return 0;
 	}
-	else if (HIWORD(wParam) == 0 && LOWORD(wParam) >= MENU_PLUGIN_STARTID &&
-		LOWORD(wParam) < MENU_PLUGIN_ENDID)
+	else if (HIWORD(wParam) == 0 && LOWORD(wParam) >= MENU_PLUGIN_STARTID
+		&& LOWORD(wParam) < MENU_PLUGIN_ENDID)
 	{
 		m_pluginMenuManager.OnMenuItemClicked(LOWORD(wParam));
 		return 0;
 	}
-	else if (HIWORD(wParam) == 1 && LOWORD(wParam) >= ACCELERATOR_PLUGIN_STARTID &&
-		LOWORD(wParam) < ACCELERATOR_PLUGIN_ENDID)
+	else if (HIWORD(wParam) == 1 && LOWORD(wParam) >= ACCELERATOR_PLUGIN_STARTID
+		&& LOWORD(wParam) < ACCELERATOR_PLUGIN_ENDID)
 	{
 		m_pluginCommandManager.onAcceleratorPressed(LOWORD(wParam));
 		return 0;
@@ -356,7 +358,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		BulkClipboardWriter clipboardWriter;
 		clipboardWriter.WriteText(m_pActiveShellBrowser->GetDirectory());
 	}
-		break;
+	break;
 
 	case IDM_FILE_COPYITEMPATH:
 		OnCopyItemPath();
@@ -1082,7 +1084,8 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		break;
 
 	case IDM_VIEW_AUTOARRANGE:
-		m_tabContainer->GetSelectedTab().GetShellBrowser()->SetAutoArrange(!m_tabContainer->GetSelectedTab().GetShellBrowser()->GetAutoArrange());
+		m_tabContainer->GetSelectedTab().GetShellBrowser()->SetAutoArrange(
+			!m_tabContainer->GetSelectedTab().GetShellBrowser()->GetAutoArrange());
 		break;
 
 	case IDM_VIEW_SHOWHIDDENFILES:
@@ -1124,7 +1127,8 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		SHGetFolderLocation(nullptr, CSIDL_PRINTERS, nullptr, 0, wil::out_param(pidlPrinters));
 
 		unique_pidl_absolute pidlConnections;
-		SHGetFolderLocation(nullptr, CSIDL_CONNECTIONS, nullptr, 0, wil::out_param(pidlConnections));
+		SHGetFolderLocation(nullptr, CSIDL_CONNECTIONS, nullptr, 0,
+			wil::out_param(pidlConnections));
 
 		unique_pidl_absolute pidlNetwork;
 		SHGetFolderLocation(nullptr, CSIDL_NETWORK, nullptr, 0, wil::out_param(pidlNetwork));
@@ -1136,19 +1140,23 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		{
 			m_config->globalFolderSettings.folderColumns.myComputerColumns = currentColumns;
 		}
-		else if (pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidl.get(), pidlControls.get()) == 0)
+		else if (pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidl.get(), pidlControls.get())
+			== 0)
 		{
 			m_config->globalFolderSettings.folderColumns.controlPanelColumns = currentColumns;
 		}
-		else if (pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidl.get(), pidlBitBucket.get()) == 0)
+		else if (pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidl.get(), pidlBitBucket.get())
+			== 0)
 		{
 			m_config->globalFolderSettings.folderColumns.recycleBinColumns = currentColumns;
 		}
-		else if (pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidl.get(), pidlPrinters.get()) == 0)
+		else if (pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidl.get(), pidlPrinters.get())
+			== 0)
 		{
 			m_config->globalFolderSettings.folderColumns.printersColumns = currentColumns;
 		}
-		else if (pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidl.get(), pidlConnections.get()) == 0)
+		else if (pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidl.get(), pidlConnections.get())
+			== 0)
 		{
 			m_config->globalFolderSettings.folderColumns.networkConnectionsColumns = currentColumns;
 		}
@@ -1245,8 +1253,8 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 
 	case ToolbarButton::AddBookmark:
 	case IDM_BOOKMARKS_BOOKMARKTHISTAB:
-		BookmarkHelper::AddBookmarkItem(&m_bookmarkTree, BookmarkItem::Type::Bookmark,
-			nullptr, std::nullopt, hwnd, this);
+		BookmarkHelper::AddBookmarkItem(&m_bookmarkTree, BookmarkItem::Type::Bookmark, nullptr,
+			std::nullopt, hwnd, this);
 		break;
 
 	case IDM_BOOKMARKS_BOOKMARK_ALL_TABS:
@@ -1257,9 +1265,10 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 	case IDM_BOOKMARKS_MANAGEBOOKMARKS:
 		if (g_hwndManageBookmarks == nullptr)
 		{
-			auto *pManageBookmarksDialog = new ManageBookmarksDialog(m_hLanguageModule,
-				hwnd, this, m_navigation.get(), &m_bookmarkIconFetcher, &m_bookmarkTree);
-			g_hwndManageBookmarks = pManageBookmarksDialog->ShowModelessDialog(new ModelessDialogNotification());
+			auto *pManageBookmarksDialog = new ManageBookmarksDialog(m_hLanguageModule, hwnd, this,
+				m_navigation.get(), &m_bookmarkIconFetcher, &m_bookmarkTree);
+			g_hwndManageBookmarks =
+				pManageBookmarksDialog->ShowModelessDialog(new ModelessDialogNotification());
 		}
 		else
 		{
@@ -1295,7 +1304,6 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 	case IDM_HELP_ABOUT:
 		OnAbout();
 		break;
-
 
 	case IDA_NEXTTAB:
 		m_tabContainer->SelectAdjacentTab(TRUE);
@@ -1396,8 +1404,8 @@ LRESULT Explorerplusplus::HandleControlNotification(HWND hwnd, WPARAM wParam)
 	switch (HIWORD(wParam))
 	{
 	case CBN_DROPDOWN:
-		AddPathsToComboBoxEx(
-			m_addressBar->GetHWND(), m_pActiveShellBrowser->GetDirectory().c_str());
+		AddPathsToComboBoxEx(m_addressBar->GetHWND(),
+			m_pActiveShellBrowser->GetDirectory().c_str());
 		break;
 	}
 
@@ -1411,227 +1419,224 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 {
 	auto *nmhdr = reinterpret_cast<NMHDR *>(lParam);
 
-	switch(nmhdr->code)
+	switch (nmhdr->code)
 	{
-		case NM_CLICK:
-			if(m_config->globalFolderSettings.oneClickActivate)
-			{
-				OnListViewDoubleClick(&((NMITEMACTIVATE *)lParam)->hdr);
-			}
-			break;
+	case NM_CLICK:
+		if (m_config->globalFolderSettings.oneClickActivate)
+		{
+			OnListViewDoubleClick(&((NMITEMACTIVATE *) lParam)->hdr);
+		}
+		break;
 
-		case NM_DBLCLK:
-			OnListViewDoubleClick(nmhdr);
-			break;
+	case NM_DBLCLK:
+		OnListViewDoubleClick(nmhdr);
+		break;
 
-		case NM_RCLICK:
-			OnRightClick(nmhdr);
-			break;
+	case NM_RCLICK:
+		OnRightClick(nmhdr);
+		break;
 
-		case NM_CUSTOMDRAW:
-			return OnCustomDraw(lParam);
+	case NM_CUSTOMDRAW:
+		return OnCustomDraw(lParam);
 
-		case LVN_KEYDOWN:
-			return OnListViewKeyDown(lParam);
+	case LVN_KEYDOWN:
+		return OnListViewKeyDown(lParam);
 
-		case LVN_ITEMCHANGING:
-			return OnListViewItemChanging(reinterpret_cast<NMLISTVIEW *>(lParam));
+	case LVN_ITEMCHANGING:
+		return OnListViewItemChanging(reinterpret_cast<NMLISTVIEW *>(lParam));
 
-		case TBN_ENDADJUST:
-			UpdateToolbarBandSizing(m_hMainRebar,((NMHDR *)lParam)->hwndFrom);
-			break;
+	case TBN_ENDADJUST:
+		UpdateToolbarBandSizing(m_hMainRebar, ((NMHDR *) lParam)->hwndFrom);
+		break;
 
-		case RBN_BEGINDRAG:
-			SendMessage(m_hMainRebar,RB_DRAGMOVE,0,-1);
+	case RBN_BEGINDRAG:
+		SendMessage(m_hMainRebar, RB_DRAGMOVE, 0, -1);
+		return 0;
+
+	case RBN_HEIGHTCHANGE:
+		/* The listview and treeview may
+		need to be moved to accommodate the new
+		rebar size. */
+		AdjustFolderPanePosition();
+		ResizeWindows();
+		break;
+
+	case RBN_CHEVRONPUSHED:
+	{
+		NMREBARCHEVRON *pnmrc = nullptr;
+		HWND hToolbar = nullptr;
+		HMENU hMenu;
+		HIMAGELIST himlSmall;
+		MENUITEMINFO mii;
+		TCHAR szText[512];
+		TBBUTTON tbButton;
+		RECT rcToolbar;
+		RECT rcButton;
+		RECT rcIntersect;
+		LRESULT lResult;
+		BOOL bIntersect;
+		int iMenu = 0;
+		int nButtons;
+		int i = 0;
+
+		pnmrc = (NMREBARCHEVRON *) lParam;
+
+		POINT ptMenu;
+		ptMenu.x = pnmrc->rc.left;
+		ptMenu.y = pnmrc->rc.bottom;
+		ClientToScreen(m_hMainRebar, &ptMenu);
+
+		if (pnmrc->wID == ID_BOOKMARKSTOOLBAR)
+		{
+			m_pBookmarksToolbar->ShowOverflowMenu(ptMenu);
 			return 0;
+		}
 
-		case RBN_HEIGHTCHANGE:
-			/* The listview and treeview may
-			need to be moved to accommodate the new
-			rebar size. */
-			AdjustFolderPanePosition();
-			ResizeWindows();
+		hMenu = CreatePopupMenu();
+
+		HIMAGELIST himlMenu = nullptr;
+
+		Shell_GetImageLists(nullptr, &himlSmall);
+
+		switch (pnmrc->wID)
+		{
+		case ID_MAINTOOLBAR:
+			hToolbar = m_mainToolbar->GetHWND();
 			break;
 
-		case RBN_CHEVRONPUSHED:
+		case ID_DRIVESTOOLBAR:
+			hToolbar = m_pDrivesToolbar->GetHWND();
+			himlMenu = himlSmall;
+			break;
+
+		case ID_APPLICATIONSTOOLBAR:
+			hToolbar = m_pApplicationToolbar->GetHWND();
+			himlMenu = himlSmall;
+			break;
+		}
+
+		nButtons = (int) SendMessage(hToolbar, TB_BUTTONCOUNT, 0, 0);
+
+		GetClientRect(hToolbar, &rcToolbar);
+
+		for (i = 0; i < nButtons; i++)
+		{
+			lResult = SendMessage(hToolbar, TB_GETITEMRECT, i, (LPARAM) &rcButton);
+
+			if (lResult)
 			{
-				NMREBARCHEVRON *pnmrc = nullptr;
-				HWND hToolbar = nullptr;
-				HMENU hMenu;
-				HIMAGELIST himlSmall;
-				MENUITEMINFO mii;
-				TCHAR szText[512];
-				TBBUTTON tbButton;
-				RECT rcToolbar;
-				RECT rcButton;
-				RECT rcIntersect;
-				LRESULT lResult;
-				BOOL bIntersect;
-				int iMenu = 0;
-				int nButtons;
-				int i = 0;
+				bIntersect = IntersectRect(&rcIntersect, &rcToolbar, &rcButton);
 
-				pnmrc = (NMREBARCHEVRON *)lParam;
-
-				POINT ptMenu;
-				ptMenu.x = pnmrc->rc.left;
-				ptMenu.y = pnmrc->rc.bottom;
-				ClientToScreen(m_hMainRebar, &ptMenu);
-
-				if (pnmrc->wID == ID_BOOKMARKSTOOLBAR)
+				if (!bIntersect || rcButton.right > rcToolbar.right)
 				{
-					m_pBookmarksToolbar->ShowOverflowMenu(ptMenu);
-					return 0;
-				}
+					SendMessage(hToolbar, TB_GETBUTTON, i, (LPARAM) &tbButton);
 
-				hMenu = CreatePopupMenu();
-
-				HIMAGELIST himlMenu = nullptr;
-
-				Shell_GetImageLists(nullptr,&himlSmall);
-
-				switch(pnmrc->wID)
-				{
-				case ID_MAINTOOLBAR:
-					hToolbar = m_mainToolbar->GetHWND();
-					break;
-
-				case ID_DRIVESTOOLBAR:
-					hToolbar = m_pDrivesToolbar->GetHWND();
-					himlMenu = himlSmall;
-					break;
-
-				case ID_APPLICATIONSTOOLBAR:
-					hToolbar = m_pApplicationToolbar->GetHWND();
-					himlMenu = himlSmall;
-					break;
-				}
-
-				nButtons = (int)SendMessage(hToolbar,TB_BUTTONCOUNT,0,0);
-
-				GetClientRect(hToolbar,&rcToolbar);
-
-				for(i = 0;i < nButtons;i++)
-				{
-					lResult = SendMessage(hToolbar,TB_GETITEMRECT,i,(LPARAM)&rcButton);
-
-					if(lResult)
+					if (tbButton.fsStyle & BTNS_SEP)
 					{
-						bIntersect = IntersectRect(&rcIntersect,&rcToolbar,&rcButton);
-
-						if(!bIntersect || rcButton.right > rcToolbar.right)
-						{
-							SendMessage(hToolbar,TB_GETBUTTON,i,(LPARAM)&tbButton);
-
-							if(tbButton.fsStyle & BTNS_SEP)
-							{
-								mii.cbSize		= sizeof(mii);
-								mii.fMask		= MIIM_FTYPE;
-								mii.fType		= MFT_SEPARATOR;
-								InsertMenuItem(hMenu,i,TRUE,&mii);
-							}
-							else
-							{
-								if(IS_INTRESOURCE(tbButton.iString))
-								{
-									SendMessage(hToolbar,TB_GETSTRING,MAKEWPARAM(SIZEOF_ARRAY(szText),
-										tbButton.iString),(LPARAM)szText);
-								}
-								else
-								{
-									StringCchCopy(szText,SIZEOF_ARRAY(szText),(LPCWSTR)tbButton.iString);
-								}
-
-								HMENU hSubMenu = nullptr;
-								UINT fMask;
-
-								fMask = MIIM_ID|MIIM_STRING;
-								hSubMenu = nullptr;
-
-								switch(pnmrc->wID)
-								{
-								case ID_MAINTOOLBAR:
-									{
-										switch(tbButton.idCommand)
-										{
-										case ToolbarButton::Back:
-											hSubMenu = CreateRebarHistoryMenu(TRUE);
-											fMask |= MIIM_SUBMENU;
-											break;
-
-										case ToolbarButton::Forward:
-											hSubMenu = CreateRebarHistoryMenu(FALSE);
-											fMask |= MIIM_SUBMENU;
-											break;
-
-										case ToolbarButton::Views:
-										{
-											auto viewsMenu = BuildViewsMenu();
-
-											// The submenu will be destroyed when the parent menu is
-											// destroyed.
-											hSubMenu = viewsMenu.release();
-
-											fMask |= MIIM_SUBMENU;
-										}
-											break;
-										}
-									}
-									break;
-								}
-
-								mii.cbSize		= sizeof(mii);
-								mii.fMask		= fMask;
-								mii.wID			= tbButton.idCommand;
-								mii.hSubMenu	= hSubMenu;
-								mii.dwTypeData	= szText;
-								InsertMenuItem(hMenu,iMenu,TRUE,&mii);
-
-								/* TODO: Update the image
-								for this menu item. */
-							}
-							iMenu++;
-						}
-					}
-				}
-
-				UINT uFlags = TPM_LEFTALIGN|TPM_RETURNCMD;
-				int iCmd;
-
-				iCmd = TrackPopupMenu(hMenu,uFlags,
-					ptMenu.x,ptMenu.y,0,m_hMainRebar, nullptr);
-
-				if(iCmd != 0)
-				{
-					/* We'll handle the back and forward buttons
-					in place, and send the rest of the messages
-					back to the main window. */
-					if((iCmd >= ID_REBAR_MENU_BACK_START &&
-						iCmd <= ID_REBAR_MENU_BACK_END) ||
-						(iCmd >= ID_REBAR_MENU_FORWARD_START &&
-						iCmd <= ID_REBAR_MENU_FORWARD_END))
-					{
-						if(iCmd >= ID_REBAR_MENU_BACK_START &&
-							iCmd <= ID_REBAR_MENU_BACK_END)
-						{
-							iCmd = -(iCmd - ID_REBAR_MENU_BACK_START);
-						}
-						else
-						{
-							iCmd = iCmd - ID_REBAR_MENU_FORWARD_START;
-						}
-
-						OnGoToOffset(iCmd);
+						mii.cbSize = sizeof(mii);
+						mii.fMask = MIIM_FTYPE;
+						mii.fType = MFT_SEPARATOR;
+						InsertMenuItem(hMenu, i, TRUE, &mii);
 					}
 					else
 					{
-						SendMessage(m_hContainer,WM_COMMAND,MAKEWPARAM(iCmd,0),0);
+						if (IS_INTRESOURCE(tbButton.iString))
+						{
+							SendMessage(hToolbar, TB_GETSTRING,
+								MAKEWPARAM(SIZEOF_ARRAY(szText), tbButton.iString),
+								(LPARAM) szText);
+						}
+						else
+						{
+							StringCchCopy(szText, SIZEOF_ARRAY(szText), (LPCWSTR) tbButton.iString);
+						}
+
+						HMENU hSubMenu = nullptr;
+						UINT fMask;
+
+						fMask = MIIM_ID | MIIM_STRING;
+						hSubMenu = nullptr;
+
+						switch (pnmrc->wID)
+						{
+						case ID_MAINTOOLBAR:
+						{
+							switch (tbButton.idCommand)
+							{
+							case ToolbarButton::Back:
+								hSubMenu = CreateRebarHistoryMenu(TRUE);
+								fMask |= MIIM_SUBMENU;
+								break;
+
+							case ToolbarButton::Forward:
+								hSubMenu = CreateRebarHistoryMenu(FALSE);
+								fMask |= MIIM_SUBMENU;
+								break;
+
+							case ToolbarButton::Views:
+							{
+								auto viewsMenu = BuildViewsMenu();
+
+								// The submenu will be destroyed when the parent menu is
+								// destroyed.
+								hSubMenu = viewsMenu.release();
+
+								fMask |= MIIM_SUBMENU;
+							}
+							break;
+							}
+						}
+						break;
+						}
+
+						mii.cbSize = sizeof(mii);
+						mii.fMask = fMask;
+						mii.wID = tbButton.idCommand;
+						mii.hSubMenu = hSubMenu;
+						mii.dwTypeData = szText;
+						InsertMenuItem(hMenu, iMenu, TRUE, &mii);
+
+						/* TODO: Update the image
+						for this menu item. */
 					}
+					iMenu++;
+				}
+			}
+		}
+
+		UINT uFlags = TPM_LEFTALIGN | TPM_RETURNCMD;
+		int iCmd;
+
+		iCmd = TrackPopupMenu(hMenu, uFlags, ptMenu.x, ptMenu.y, 0, m_hMainRebar, nullptr);
+
+		if (iCmd != 0)
+		{
+			/* We'll handle the back and forward buttons
+			in place, and send the rest of the messages
+			back to the main window. */
+			if ((iCmd >= ID_REBAR_MENU_BACK_START && iCmd <= ID_REBAR_MENU_BACK_END)
+				|| (iCmd >= ID_REBAR_MENU_FORWARD_START && iCmd <= ID_REBAR_MENU_FORWARD_END))
+			{
+				if (iCmd >= ID_REBAR_MENU_BACK_START && iCmd <= ID_REBAR_MENU_BACK_END)
+				{
+					iCmd = -(iCmd - ID_REBAR_MENU_BACK_START);
+				}
+				else
+				{
+					iCmd = iCmd - ID_REBAR_MENU_FORWARD_START;
 				}
 
-				DestroyMenu(hMenu);
+				OnGoToOffset(iCmd);
 			}
-			break;
+			else
+			{
+				SendMessage(m_hContainer, WM_COMMAND, MAKEWPARAM(iCmd, 0), 0);
+			}
+		}
+
+		DestroyMenu(hMenu);
+	}
+	break;
 	}
 
 	return DefWindowProc(hwnd, msg, wParam, lParam);

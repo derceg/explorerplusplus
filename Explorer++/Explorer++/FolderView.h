@@ -22,10 +22,10 @@ public:
 	// IFolderView2
 	IFACEMETHODIMP SetGroupBy(REFPROPERTYKEY key, BOOL ascending);
 	IFACEMETHODIMP GetGroupBy(PROPERTYKEY *key, BOOL *ascending);
-	IFACEMETHODIMP SetViewProperty(
-		PCUITEMID_CHILD pidl, REFPROPERTYKEY propertyKey, REFPROPVARIANT propVariant);
-	IFACEMETHODIMP GetViewProperty(
-		PCUITEMID_CHILD pidl, REFPROPERTYKEY propertyKey, PROPVARIANT *propVariant);
+	IFACEMETHODIMP SetViewProperty(PCUITEMID_CHILD pidl, REFPROPERTYKEY propertyKey,
+		REFPROPVARIANT propVariant);
+	IFACEMETHODIMP GetViewProperty(PCUITEMID_CHILD pidl, REFPROPERTYKEY propertyKey,
+		PROPVARIANT *propVariant);
 	IFACEMETHODIMP SetTileViewProperties(PCUITEMID_CHILD pidl, LPCWSTR propList);
 	IFACEMETHODIMP SetExtendedTileViewProperties(PCUITEMID_CHILD pidl, LPCWSTR propList);
 	IFACEMETHODIMP SetText(FVTEXTTYPE type, LPCWSTR text);
@@ -62,8 +62,8 @@ public:
 	IFACEMETHODIMP GetDefaultSpacing(POINT *pt);
 	IFACEMETHODIMP GetAutoArrange();
 	IFACEMETHODIMP SelectItem(int item, DWORD flags);
-	IFACEMETHODIMP SelectAndPositionItems(
-		UINT numItems, PCUITEMID_CHILD_ARRAY items, POINT *pts, DWORD flags);
+	IFACEMETHODIMP SelectAndPositionItems(UINT numItems, PCUITEMID_CHILD_ARRAY items, POINT *pts,
+		DWORD flags);
 
 	// IShellFolderView
 	// Required for paste support (specifically, selecting items after they've been pasted).

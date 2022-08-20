@@ -132,8 +132,8 @@ INT_PTR DestroyFilesDialog::OnInitDialog()
 	return 0;
 }
 
-void DestroyFilesDialog::GetResizableControlInformation(
-	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control> &ControlList)
+void DestroyFilesDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+	std::list<ResizableDialog::Control> &ControlList)
 {
 	dsc = BaseDialog::DialogSizeConstraint::None;
 
@@ -301,18 +301,18 @@ DestroyFilesDialogPersistentSettings &DestroyFilesDialogPersistentSettings::GetI
 
 void DestroyFilesDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	RegistrySettings::SaveDword(
-		hKey, SETTING_OVERWRITE_METHOD, static_cast<DWORD>(m_overwriteMethod));
+	RegistrySettings::SaveDword(hKey, SETTING_OVERWRITE_METHOD,
+		static_cast<DWORD>(m_overwriteMethod));
 }
 
 void DestroyFilesDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	RegistrySettings::ReadDword(
-		hKey, SETTING_OVERWRITE_METHOD, reinterpret_cast<LPDWORD>(&m_overwriteMethod));
+	RegistrySettings::ReadDword(hKey, SETTING_OVERWRITE_METHOD,
+		reinterpret_cast<LPDWORD>(&m_overwriteMethod));
 }
 
-void DestroyFilesDialogPersistentSettings::SaveExtraXMLSettings(
-	IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode)
+void DestroyFilesDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
+	IXMLDOMElement *pParentNode)
 {
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_OVERWRITE_METHOD,
 		NXMLSettings::EncodeIntValue(static_cast<int>(m_overwriteMethod)));

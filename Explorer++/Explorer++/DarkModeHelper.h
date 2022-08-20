@@ -90,8 +90,8 @@ private:
 	static inline const DWORD BUILD_NUMBER_1909 = 18363;
 
 	using RtlGetVersionType = NTSTATUS(WINAPI *)(LPOSVERSIONINFOEXW);
-	using SetWindowCompositionAttributeType = BOOL(WINAPI *)(
-		HWND hWnd, WINDOWCOMPOSITIONATTRIBDATA *data);
+	using SetWindowCompositionAttributeType = BOOL(
+		WINAPI *)(HWND hWnd, WINDOWCOMPOSITIONATTRIBDATA *data);
 
 	// Windows 10 1809
 	using AllowDarkModeForAppType = BOOL(WINAPI *)(BOOL allow);

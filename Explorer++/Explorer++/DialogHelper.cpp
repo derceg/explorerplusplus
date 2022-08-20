@@ -94,8 +94,8 @@ void Explorerplusplus::LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom)
 	}
 
 	TCHAR tempNodeSelector[64];
-	StringCchPrintf(
-		tempNodeSelector, SIZEOF_ARRAY(tempNodeSelector), _T("//%s/*"), DIALOGS_XML_KEY);
+	StringCchPrintf(tempNodeSelector, SIZEOF_ARRAY(tempNodeSelector), _T("//%s/*"),
+		DIALOGS_XML_KEY);
 	auto bstr = wil::make_bstr_nothrow(tempNodeSelector);
 
 	wil::com_ptr_nothrow<IXMLDOMNodeList> pNodes;

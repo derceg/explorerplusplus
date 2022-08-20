@@ -12,12 +12,12 @@
 
 const std::wstring Plugins::PluginManager::MANIFEST_NAME = L"plugin.json";
 
-std::vector<ShortcutKey> convertPluginShortcutKeys(const std::vector<Plugins::PluginShortcutKey> &pluginShortcutKeys);
+std::vector<ShortcutKey> convertPluginShortcutKeys(
+	const std::vector<Plugins::PluginShortcutKey> &pluginShortcutKeys);
 
 Plugins::PluginManager::PluginManager(PluginInterface *pluginInterface) :
 	m_pluginInterface(pluginInterface)
 {
-
 }
 
 void Plugins::PluginManager::loadAllPlugins(const std::filesystem::path &pluginDirectory)
@@ -54,7 +54,8 @@ bool Plugins::PluginManager::attemptToLoadPlugin(const std::filesystem::path &di
 	return registerPlugin(directory, *manifest);
 }
 
-bool Plugins::PluginManager::registerPlugin(const std::filesystem::path &directory, const Manifest &manifest)
+bool Plugins::PluginManager::registerPlugin(const std::filesystem::path &directory,
+	const Manifest &manifest)
 {
 	auto plugin = std::make_unique<LuaPlugin>(directory.wstring(), manifest, m_pluginInterface);
 
@@ -108,7 +109,8 @@ bool Plugins::PluginManager::registerPlugin(const std::filesystem::path &directo
 		return false;
 	}
 
-	m_pluginInterface->GetAccleratorUpdater()->update(convertPluginShortcutKeys(manifest.shortcutKeys));
+	m_pluginInterface->GetAccleratorUpdater()->update(
+		convertPluginShortcutKeys(manifest.shortcutKeys));
 	m_pluginInterface->GetPluginCommandManager()->addCommands(plugin->GetId(), manifest.commands);
 
 	m_plugins.push_back(std::move(plugin));
@@ -116,7 +118,8 @@ bool Plugins::PluginManager::registerPlugin(const std::filesystem::path &directo
 	return true;
 }
 
-std::vector<ShortcutKey> convertPluginShortcutKeys(const std::vector<Plugins::PluginShortcutKey> &pluginShortcutKeys)
+std::vector<ShortcutKey> convertPluginShortcutKeys(
+	const std::vector<Plugins::PluginShortcutKey> &pluginShortcutKeys)
 {
 	std::vector<ShortcutKey> shortcutKeys;
 

@@ -25,16 +25,16 @@ INT_PTR ThirdPartyCreditsDialog::OnInitDialog()
 
 	if (DarkModeHelper::GetInstance().IsDarkModeEnabled())
 	{
-		SendDlgItemMessage(
-			m_hDlg, IDC_CREDITS, EM_SETBKGNDCOLOR, 0, DarkModeHelper::BACKGROUND_COLOR);
+		SendDlgItemMessage(m_hDlg, IDC_CREDITS, EM_SETBKGNDCOLOR, 0,
+			DarkModeHelper::BACKGROUND_COLOR);
 
 		CHARFORMAT charFormat;
 		charFormat.cbSize = sizeof(charFormat);
 		charFormat.dwMask = CFM_COLOR;
 		charFormat.crTextColor = DarkModeHelper::TEXT_COLOR;
 		charFormat.dwEffects = 0;
-		SendDlgItemMessage(
-			m_hDlg, IDC_CREDITS, EM_SETCHARFORMAT, SCF_ALL, reinterpret_cast<LPARAM>(&charFormat));
+		SendDlgItemMessage(m_hDlg, IDC_CREDITS, EM_SETCHARFORMAT, SCF_ALL,
+			reinterpret_cast<LPARAM>(&charFormat));
 	}
 
 	CenterWindow(GetParent(m_hDlg), m_hDlg);

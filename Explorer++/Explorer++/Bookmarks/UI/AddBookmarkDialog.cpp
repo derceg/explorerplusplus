@@ -182,12 +182,12 @@ std::wstring AddBookmarkDialog::LoadDialogTitle()
 
 wil::unique_hicon AddBookmarkDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_expp->GetIconResourceLoader()->LoadIconFromPNGAndScale(
-		Icon::AddBookmark, iconWidth, iconHeight);
+	return m_expp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::AddBookmark, iconWidth,
+		iconHeight);
 }
 
-void AddBookmarkDialog::GetResizableControlInformation(
-	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control> &ControlList)
+void AddBookmarkDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+	std::list<ResizableDialog::Control> &ControlList)
 {
 	dsc = BaseDialog::DialogSizeConstraint::None;
 

@@ -59,12 +59,12 @@ INT_PTR FilterDialog::OnInitDialog()
 
 wil::unique_hicon FilterDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_pexpp->GetIconResourceLoader()->LoadIconFromPNGAndScale(
-		Icon::Filter, iconWidth, iconHeight);
+	return m_pexpp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::Filter, iconWidth,
+		iconHeight);
 }
 
-void FilterDialog::GetResizableControlInformation(
-	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control> &ControlList)
+void FilterDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+	std::list<ResizableDialog::Control> &ControlList)
 {
 	dsc = BaseDialog::DialogSizeConstraint::X;
 
@@ -183,8 +183,8 @@ void FilterDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 	RegistrySettings::ReadStringList(hKey, SETTING_FILTER_LIST, m_FilterList);
 }
 
-void FilterDialogPersistentSettings::SaveExtraXMLSettings(
-	IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode)
+void FilterDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
+	IXMLDOMElement *pParentNode)
 {
 	NXMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_FILTER_LIST, m_FilterList);
 }

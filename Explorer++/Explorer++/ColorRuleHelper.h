@@ -27,6 +27,6 @@ namespace NColorRuleHelper
 	void SaveColorRulesToRegistry(const std::vector<ColorRule> &ColorRules);
 
 	void LoadColorRulesFromXML(IXMLDOMDocument *pXMLDom, std::vector<ColorRule> &ColorRules);
-	void SaveColorRulesToXML(
-		IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot, const std::vector<ColorRule> &ColorRules);
+	void SaveColorRulesToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot,
+		const std::vector<ColorRule> &ColorRules);
 }

@@ -19,8 +19,8 @@ const TCHAR SetDefaultColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SetD
 
 const TCHAR SetDefaultColumnsDialogPersistentSettings::SETTING_FOLDER_TYPE[] = _T("Folder");
 
-SetDefaultColumnsDialog::SetDefaultColumnsDialog(
-	HINSTANCE hInstance, HWND hParent, FolderColumns &folderColumns) :
+SetDefaultColumnsDialog::SetDefaultColumnsDialog(HINSTANCE hInstance, HWND hParent,
+	FolderColumns &folderColumns) :
 	DarkModeDialogBase(hInstance, IDD_SETDEFAULTCOLUMNS, hParent, true),
 	m_folderColumns(folderColumns)
 {
@@ -77,7 +77,8 @@ INT_PTR SetDefaultColumnsDialog::OnInitDialog()
 
 	auto folderType = m_psdcdps->m_FolderType;
 	auto itr = std::find_if(m_FolderMap.begin(), m_FolderMap.end(),
-		[folderType](const std::unordered_map<int, FolderType>::value_type &vt) {
+		[folderType](const std::unordered_map<int, FolderType>::value_type &vt)
+		{
 			return vt.second == folderType;
 		});
 	SendMessage(hComboBox, CB_SETCURSEL, itr->first, 0);
@@ -113,8 +114,8 @@ INT_PTR SetDefaultColumnsDialog::OnInitDialog()
 	return 0;
 }
 
-void SetDefaultColumnsDialog::GetResizableControlInformation(
-	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control> &ControlList)
+void SetDefaultColumnsDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+	std::list<ResizableDialog::Control> &ControlList)
 {
 	dsc = BaseDialog::DialogSizeConstraint::None;
 
@@ -284,8 +285,9 @@ void SetDefaultColumnsDialog::SaveCurrentColumnState(FolderType folderType)
 		/* Since the column list will be rebuilt, find this column
 		in the current list, and reuse its width. */
 		ColumnType columnType = static_cast<ColumnType>(lvItem.lParam);
-		auto itr = std::find_if(
-			currentColumns.begin(), currentColumns.end(), [columnType](const Column_t &column) {
+		auto itr = std::find_if(currentColumns.begin(), currentColumns.end(),
+			[columnType](const Column_t &column)
+			{
 				return column.type == columnType;
 			});
 
@@ -426,8 +428,8 @@ void SetDefaultColumnsDialogPersistentSettings::LoadExtraRegistrySettings(HKEY h
 	m_FolderType = static_cast<FolderType>(value);
 }
 
-void SetDefaultColumnsDialogPersistentSettings::SaveExtraXMLSettings(
-	IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode)
+void SetDefaultColumnsDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
+	IXMLDOMElement *pParentNode)
 {
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_FOLDER_TYPE,
 		NXMLSettings::EncodeIntValue(static_cast<int>(m_FolderType)));

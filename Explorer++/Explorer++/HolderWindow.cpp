@@ -135,8 +135,8 @@ void HolderWindow::OnHolderWindowPaint(HWND hwnd)
 	UINT dpi = dpiCompat.GetDpiForWindow(hwnd);
 
 	ncm.cbSize = sizeof(ncm);
-	dpiCompat.SystemParametersInfoForDpi(
-		SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0, dpi);
+	dpiCompat.SystemParametersInfoForDpi(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0,
+		dpi);
 	ncm.lfSmCaptionFont.lfWeight = FW_NORMAL;
 	hFont = CreateFontIndirect(&ncm.lfSmCaptionFont);
 

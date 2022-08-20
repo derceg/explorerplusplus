@@ -25,6 +25,7 @@ void InitializeLogging(const TCHAR *filename)
 
 	boost::log::add_common_attributes();
 
+	// clang-format off
 	boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend>> sink = boost::log::add_file_log(
 		boost::log::keywords::file_name = szLogFile,
 		boost::log::keywords::open_mode = std::ios_base::app,
@@ -36,6 +37,7 @@ void InitializeLogging(const TCHAR *filename)
 			<< "]: " << boost::log::expressions::message
 			)
 	);
+	// clang-format on
 
 	std::locale locale = boost::locale::generator()("en_US.UTF-8");
 	sink->imbue(locale);

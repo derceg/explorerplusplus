@@ -7,8 +7,8 @@
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkNavigatorInterface.h"
 
-BookmarkNavigationController::BookmarkNavigationController(
-	BookmarkTree *bookmarkTree, BookmarkNavigatorInterface *navigator) :
+BookmarkNavigationController::BookmarkNavigationController(BookmarkTree *bookmarkTree,
+	BookmarkNavigatorInterface *navigator) :
 	m_bookmarkTree(bookmarkTree),
 	m_navigator(navigator)
 {
@@ -43,8 +43,8 @@ bool BookmarkNavigationController::GetFailureValue()
 	return false;
 }
 
-void BookmarkNavigationController::OnNavigationCompleted(
-	BookmarkItem *bookmarkFolder, bool addHistoryEntry)
+void BookmarkNavigationController::OnNavigationCompleted(BookmarkItem *bookmarkFolder,
+	bool addHistoryEntry)
 {
 	if (addHistoryEntry)
 	{

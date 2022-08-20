@@ -42,8 +42,8 @@ private:
 		BookmarkIconManager &bookmarkIconManager, std::vector<wil::unique_hbitmap> &menuImages,
 		ItemPositionMap *itemPositionMap, bool applyIncludePredicate,
 		IncludePredicate includePredicate);
-	BOOL AddEmptyBookmarkFolderToMenu(
-		HMENU menu, BookmarkItem *bookmarkItem, int position, ItemPositionMap *itemPositionMap);
+	BOOL AddEmptyBookmarkFolderToMenu(HMENU menu, BookmarkItem *bookmarkItem, int position,
+		ItemPositionMap *itemPositionMap);
 	BOOL AddBookmarkFolderToMenu(HMENU menu, BookmarkItem *bookmarkItem, int position,
 		ItemIdMap &itemIdMap, BookmarkIconManager &bookmarkIconManager,
 		std::vector<wil::unique_hbitmap> &menuImages, ItemPositionMap *itemPositionMap);

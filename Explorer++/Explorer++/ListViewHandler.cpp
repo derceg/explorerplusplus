@@ -40,8 +40,8 @@
 #include <wil/com.h>
 #include <winrt/base.h>
 
-LRESULT CALLBACK Explorerplusplus::ListViewProcStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK Explorerplusplus::ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
+	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -50,8 +50,8 @@ LRESULT CALLBACK Explorerplusplus::ListViewProcStub(
 	return pexpp->ListViewSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(
-	HWND ListView, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg, WPARAM wParam,
+	LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -116,8 +116,8 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(
 				if (!(lvhti.flags & LVHT_NOWHERE) && lvhti.iItem != -1)
 				{
 					ListView_GetItemRect(m_hActiveListView, lvhti.iItem, &rc, LVIR_LABEL);
-					ListView_GetItemText(
-						m_hActiveListView, lvhti.iItem, 0, szText, SIZEOF_ARRAY(szText));
+					ListView_GetItemText(m_hActiveListView, lvhti.iItem, 0, szText,
+						SIZEOF_ARRAY(szText));
 
 					hdc = GetDC(m_hActiveListView);
 					GetTextExtentPoint32(hdc, szText, lstrlen(szText), &sz);
@@ -359,8 +359,8 @@ void Explorerplusplus::OnListViewBackgroundRClickWindows8OrGreater(POINT *pCurso
 	const auto &selectedTab = m_tabContainer->GetSelectedTab();
 	auto pidlDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
 
-	FileContextMenuManager fcmm(
-		selectedTab.GetShellBrowser()->GetListView(), pidlDirectory.get(), {});
+	FileContextMenuManager fcmm(selectedTab.GetShellBrowser()->GetListView(), pidlDirectory.get(),
+		{});
 
 	FileContextMenuInfo fcmi;
 	fcmi.uFrom = FROM_LISTVIEW;
@@ -515,8 +515,8 @@ void Explorerplusplus::OnListViewDoubleClick(NMHDR *nmhdr)
 			}
 			else
 			{
-				OpenListViewItem(
-					ht.iItem, DetermineOpenDisposition(IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT)));
+				OpenListViewItem(ht.iItem,
+					DetermineOpenDisposition(IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT)));
 			}
 		}
 	}
@@ -601,8 +601,8 @@ void Explorerplusplus::OnListViewPaste()
 	const auto &selectedTab = m_tabContainer->GetSelectedTab();
 	auto directory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
 
-	if (CanShellPasteDataObject(
-			directory.get(), clipboardObject.get(), DROPEFFECT_COPY | DROPEFFECT_MOVE))
+	if (CanShellPasteDataObject(directory.get(), clipboardObject.get(),
+			DROPEFFECT_COPY | DROPEFFECT_MOVE))
 	{
 		auto serviceProvider = winrt::make_self<ServiceProvider>();
 
@@ -628,8 +628,8 @@ void Explorerplusplus::OnListViewPaste()
 
 		DropHandler *pDropHandler = DropHandler::CreateNew();
 		auto *dropFilesCallback = new DropFilesCallback(this);
-		pDropHandler->CopyClipboardData(
-			clipboardObject.get(), m_hContainer, szDestination, dropFilesCallback);
+		pDropHandler->CopyClipboardData(clipboardObject.get(), m_hContainer, szDestination,
+			dropFilesCallback);
 		pDropHandler->Release();
 	}
 }
@@ -705,8 +705,8 @@ void Explorerplusplus::OpenListViewItem(int index, OpenFolderDisposition openFol
 	OpenItem(pidlComplete.get(), openFolderDisposition);
 }
 
-OpenFolderDisposition Explorerplusplus::DetermineOpenDisposition(
-	bool isCtrlKeyDown, bool isShiftKeyDown)
+OpenFolderDisposition Explorerplusplus::DetermineOpenDisposition(bool isCtrlKeyDown,
+	bool isShiftKeyDown)
 {
 	if (isCtrlKeyDown && !isShiftKeyDown)
 	{

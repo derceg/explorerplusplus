@@ -47,8 +47,8 @@ void Explorerplusplus::ValidateColumns(FolderColumns &folderColumns)
 	ValidateSingleColumnSet(VALIDATE_MYCOMPUTER_COLUMNS, folderColumns.myComputerColumns);
 	ValidateSingleColumnSet(VALIDATE_RECYCLEBIN_COLUMNS, folderColumns.recycleBinColumns);
 	ValidateSingleColumnSet(VALIDATE_PRINTERS_COLUMNS, folderColumns.printersColumns);
-	ValidateSingleColumnSet(
-		VALIDATE_NETWORKCONNECTIONS_COLUMNS, folderColumns.networkConnectionsColumns);
+	ValidateSingleColumnSet(VALIDATE_NETWORKCONNECTIONS_COLUMNS,
+		folderColumns.networkConnectionsColumns);
 	ValidateSingleColumnSet(VALIDATE_MYNETWORKPLACES_COLUMNS, folderColumns.myNetworkPlacesColumns);
 }
 
@@ -151,8 +151,8 @@ void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet, std::vector<Colum
 
 void Explorerplusplus::ApplyDisplayWindowPosition()
 {
-	SendMessage(
-		m_hDisplayWindow, WM_USER_DISPLAYWINDOWMOVED, m_config->displayWindowVertical, NULL);
+	SendMessage(m_hDisplayWindow, WM_USER_DISPLAYWINDOWMOVED, m_config->displayWindowVertical,
+		NULL);
 }
 
 void Explorerplusplus::ApplyToolbarSettings()
@@ -322,8 +322,8 @@ Possible bugs:
    If this runs after the tab is freed, the tab existence
    check will fail, and the shell browser function won't be called.
 */
-void Explorerplusplus::DirectoryAlteredCallback(
-	const TCHAR *szFileName, DWORD dwAction, void *pData)
+void Explorerplusplus::DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction,
+	void *pData)
 {
 	DirectoryAltered *pDirectoryAltered = nullptr;
 	Explorerplusplus *pContainer = nullptr;
@@ -340,13 +340,13 @@ void Explorerplusplus::DirectoryAlteredCallback(
 				   << _T("\", Action = ") << dwAction << _T(", Filename = \"") << szFileName
 				   << _T("\"");
 
-		tab->GetShellBrowser()->FilesModified(
-			dwAction, szFileName, pDirectoryAltered->iIndex, pDirectoryAltered->iFolderIndex);
+		tab->GetShellBrowser()->FilesModified(dwAction, szFileName, pDirectoryAltered->iIndex,
+			pDirectoryAltered->iFolderIndex);
 	}
 }
 
-void Explorerplusplus::FolderSizeCallbackStub(
-	int nFolders, int nFiles, PULARGE_INTEGER lTotalFolderSize, LPVOID pData)
+void Explorerplusplus::FolderSizeCallbackStub(int nFolders, int nFiles,
+	PULARGE_INTEGER lTotalFolderSize, LPVOID pData)
 {
 	auto *pfsei = reinterpret_cast<Explorerplusplus::FolderSizeExtraInfo *>(pData);
 	reinterpret_cast<Explorerplusplus *>(pfsei->pContainer)
@@ -354,8 +354,8 @@ void Explorerplusplus::FolderSizeCallbackStub(
 	free(pfsei);
 }
 
-void Explorerplusplus::FolderSizeCallback(
-	FolderSizeExtraInfo *pfsei, int nFolders, int nFiles, PULARGE_INTEGER lTotalFolderSize)
+void Explorerplusplus::FolderSizeCallback(FolderSizeExtraInfo *pfsei, int nFolders, int nFiles,
+	PULARGE_INTEGER lTotalFolderSize)
 {
 	UNREFERENCED_PARAMETER(nFolders);
 	UNREFERENCED_PARAMETER(nFiles);

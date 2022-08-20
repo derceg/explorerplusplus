@@ -172,8 +172,8 @@ IFACEMETHODIMP WebBrowserApp::GoSearch()
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP WebBrowserApp::Navigate(
-	BSTR url, VARIANT *flags, VARIANT *targetFrameName, VARIANT *postData, VARIANT *headers)
+IFACEMETHODIMP WebBrowserApp::Navigate(BSTR url, VARIANT *flags, VARIANT *targetFrameName,
+	VARIANT *postData, VARIANT *headers)
 {
 	UNREFERENCED_PARAMETER(url);
 	UNREFERENCED_PARAMETER(flags);
@@ -336,8 +336,8 @@ IFACEMETHODIMP WebBrowserApp::GetTypeInfo(UINT type, LCID localeId, ITypeInfo **
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP WebBrowserApp::GetIDsOfNames(
-	REFIID riid, LPOLESTR *names, UINT numNames, LCID localeId, DISPID *dispId)
+IFACEMETHODIMP WebBrowserApp::GetIDsOfNames(REFIID riid, LPOLESTR *names, UINT numNames,
+	LCID localeId, DISPID *dispId)
 {
 	UNREFERENCED_PARAMETER(riid);
 	UNREFERENCED_PARAMETER(names);

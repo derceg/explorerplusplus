@@ -41,14 +41,14 @@ const TCHAR ApplicationToolbarPersistentSettings::SETTING_SHOW_NAME_ON_TOOLBAR[]
 
 using namespace ApplicationToolbarHelper;
 
-ApplicationToolbar *ApplicationToolbar::Create(
-	HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp)
+ApplicationToolbar *ApplicationToolbar::Create(HWND hParent, UINT uIDStart, UINT uIDEnd,
+	HINSTANCE hInstance, IExplorerplusplus *pexpp)
 {
 	return new ApplicationToolbar(hParent, uIDStart, uIDEnd, hInstance, pexpp);
 }
 
-ApplicationToolbar::ApplicationToolbar(
-	HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp) :
+ApplicationToolbar::ApplicationToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd,
+	HINSTANCE hInstance, IExplorerplusplus *pexpp) :
 	BaseWindow(CreateApplicationToolbar(hParent)),
 	m_hInstance(hInstance),
 	m_uIDStart(uIDStart),
@@ -86,8 +86,8 @@ void ApplicationToolbar::Initialize(HWND hParent)
 	m_patd = new ApplicationToolbarDropHandler(m_hwnd, this);
 	RegisterDragDrop(m_hwnd, m_patd);
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
-		hParent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hParent, ParentWndProcStub,
+		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	AddButtonsToToolbar();
 
@@ -108,8 +108,8 @@ ApplicationToolbar::~ApplicationToolbar()
 	m_patd->Release();
 }
 
-LRESULT CALLBACK ApplicationToolbar::ParentWndProcStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK ApplicationToolbar::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
+	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -117,8 +117,8 @@ LRESULT CALLBACK ApplicationToolbar::ParentWndProcStub(
 	return pat->ParentWndProc(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK ApplicationToolbar::ParentWndProc(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ApplicationToolbar::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam,
+	LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -290,8 +290,8 @@ void ApplicationToolbar::ShowNewItemDialog()
 	ApplicationButton button;
 	button.ShowNameOnToolbar = TRUE;
 
-	ApplicationToolbarButtonDialog applicationToolbarButtonDialog(
-		m_hInstance, m_hwnd, &button, true);
+	ApplicationToolbarButtonDialog applicationToolbarButtonDialog(m_hInstance, m_hwnd, &button,
+		true);
 	INT_PTR ret = applicationToolbarButtonDialog.ShowModalDialog();
 
 	if (ret == 1)
@@ -303,8 +303,8 @@ void ApplicationToolbar::ShowNewItemDialog()
 	}
 }
 
-void ApplicationToolbar::AddNewItem(
-	const std::wstring &name, const std::wstring &command, BOOL showNameOnToolbar)
+void ApplicationToolbar::AddNewItem(const std::wstring &name, const std::wstring &command,
+	BOOL showNameOnToolbar)
 {
 	ApplicationButton button;
 	bool success = m_atps->AddButton(name, command, showNameOnToolbar, &button);
@@ -367,8 +367,8 @@ void ApplicationToolbar::ShowItemProperties(int iItem)
 
 	if (button != nullptr)
 	{
-		ApplicationToolbarButtonDialog applicationToolbarButtonDialog(
-			m_hInstance, m_hwnd, button, false);
+		ApplicationToolbarButtonDialog applicationToolbarButtonDialog(m_hInstance, m_hwnd, button,
+			false);
 		INT_PTR ret = applicationToolbarButtonDialog.ShowModalDialog();
 
 		if (ret == 1)
@@ -397,7 +397,8 @@ void ApplicationToolbar::DeleteItem(int iItem)
 		{
 			int id = static_cast<int>(tbButton.dwData);
 			auto itr = std::find_if(m_atps->m_Buttons.begin(), m_atps->m_Buttons.end(),
-				[id](const ApplicationButton &Button) {
+				[id](const ApplicationButton &Button)
+				{
 					return Button.ID == id;
 				});
 
@@ -446,7 +447,8 @@ ApplicationButton *ApplicationToolbar::MapToolbarButtonToItem(int iIndex)
 	{
 		int id = static_cast<int>(tbButton.dwData);
 		auto itr = std::find_if(m_atps->m_Buttons.begin(), m_atps->m_Buttons.end(),
-			[id](const ApplicationButton &Button) {
+			[id](const ApplicationButton &Button)
+			{
 				return Button.ID == id;
 			});
 
@@ -486,8 +488,8 @@ void ApplicationToolbarPersistentSettings::LoadRegistrySettings(HKEY hParentKey)
 
 		LONG lNameStatus =
 			RegistrySettings::ReadString(hKeyChild, SETTING_NAME, szName, SIZEOF_ARRAY(szName));
-		LONG lCommandStatus = RegistrySettings::ReadString(
-			hKeyChild, SETTING_COMMAND, szCommand, SIZEOF_ARRAY(szCommand));
+		LONG lCommandStatus = RegistrySettings::ReadString(hKeyChild, SETTING_COMMAND, szCommand,
+			SIZEOF_ARRAY(szCommand));
 		RegistrySettings::ReadDword(hKeyChild, SETTING_SHOW_NAME_ON_TOOLBAR,
 			reinterpret_cast<DWORD *>(&bShowNameOnToolbar));
 
@@ -522,8 +524,8 @@ void ApplicationToolbarPersistentSettings::SaveRegistrySettings(HKEY hParentKey)
 		{
 			RegistrySettings::SaveString(hKeyChild, SETTING_NAME, button.Name.c_str());
 			RegistrySettings::SaveString(hKeyChild, SETTING_COMMAND, button.Command.c_str());
-			RegistrySettings::SaveDword(
-				hKeyChild, SETTING_SHOW_NAME_ON_TOOLBAR, button.ShowNameOnToolbar);
+			RegistrySettings::SaveDword(hKeyChild, SETTING_SHOW_NAME_ON_TOOLBAR,
+				button.ShowNameOnToolbar);
 
 			index++;
 
@@ -600,8 +602,8 @@ void ApplicationToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
 	}
 }
 
-void ApplicationToolbarPersistentSettings::SaveXMLSettings(
-	IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe)
+void ApplicationToolbarPersistentSettings::SaveXMLSettings(IXMLDOMDocument *pXMLDom,
+	IXMLDOMElement *pe)
 {
 	auto bstr_wsntt = wil::make_bstr_nothrow(L"\n\t\t");
 
@@ -610,10 +612,10 @@ void ApplicationToolbarPersistentSettings::SaveXMLSettings(
 		NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe);
 
 		wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
-		NXMLSettings::CreateElementNode(
-			pXMLDom, &pParentNode, pe, _T("ApplicationButton"), button.Name.c_str());
-		NXMLSettings::AddAttributeToNode(
-			pXMLDom, pParentNode.get(), SETTING_COMMAND, button.Command.c_str());
+		NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe, _T("ApplicationButton"),
+			button.Name.c_str());
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), SETTING_COMMAND,
+			button.Command.c_str());
 		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), SETTING_SHOW_NAME_ON_TOOLBAR,
 			NXMLSettings::EncodeBoolValue(button.ShowNameOnToolbar));
 	}

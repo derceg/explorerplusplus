@@ -125,8 +125,8 @@ wil::unique_hicon MassRenameDialog::GetDialogIcon(int iconWidth, int iconHeight)
 	return m_iconResourceLoader->LoadIconFromPNGAndScale(Icon::MassRename, iconWidth, iconHeight);
 }
 
-void MassRenameDialog::GetResizableControlInformation(
-	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control> &ControlList)
+void MassRenameDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+	std::list<ResizableDialog::Control> &ControlList)
 {
 	dsc = BaseDialog::DialogSizeConstraint::None;
 
@@ -414,14 +414,14 @@ void MassRenameDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 
 void MassRenameDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	RegistrySettings::ReadDword(
-		hKey, SETTING_COLUMN_WIDTH_1, reinterpret_cast<DWORD *>(&m_iColumnWidth1));
-	RegistrySettings::ReadDword(
-		hKey, SETTING_COLUMN_WIDTH_2, reinterpret_cast<DWORD *>(&m_iColumnWidth2));
+	RegistrySettings::ReadDword(hKey, SETTING_COLUMN_WIDTH_1,
+		reinterpret_cast<DWORD *>(&m_iColumnWidth1));
+	RegistrySettings::ReadDword(hKey, SETTING_COLUMN_WIDTH_2,
+		reinterpret_cast<DWORD *>(&m_iColumnWidth2));
 }
 
-void MassRenameDialogPersistentSettings::SaveExtraXMLSettings(
-	IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode)
+void MassRenameDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
+	IXMLDOMElement *pParentNode)
 {
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_COLUMN_WIDTH_1,
 		NXMLSettings::EncodeIntValue(m_iColumnWidth1));

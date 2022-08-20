@@ -13,7 +13,6 @@ namespace Plugins
 	class PluginMenuManager
 	{
 	public:
-
 		typedef boost::signals2::signal<void(int)> PluginMenuClickedSignal;
 
 		PluginMenuManager(HWND mainWindow, int startId, int endId);
@@ -21,12 +20,12 @@ namespace Plugins
 		std::optional<int> AddItemToMainMenu(const std::wstring &text);
 		void RemoveItemFromMainMenu(int menuItemId);
 
-		boost::signals2::connection AddMenuClickedObserver(const PluginMenuClickedSignal::slot_type &observer);
+		boost::signals2::connection AddMenuClickedObserver(
+			const PluginMenuClickedSignal::slot_type &observer);
 
 		void OnMenuItemClicked(int menuItemId);
 
 	private:
-
 		std::optional<int> GeneratePluginMenuItemId();
 		void ReleasePluginMenuItemId(int id);
 
@@ -36,6 +35,6 @@ namespace Plugins
 
 		std::set<int> m_freeMenuItemIds;
 
-		PluginMenuClickedSignal	m_menuClickedSignal;
+		PluginMenuClickedSignal m_menuClickedSignal;
 	};
 }

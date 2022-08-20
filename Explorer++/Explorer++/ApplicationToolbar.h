@@ -56,8 +56,8 @@ private:
 class ApplicationToolbar : public BaseWindow
 {
 public:
-	static ApplicationToolbar *Create(
-		HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp);
+	static ApplicationToolbar *Create(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance,
+		IExplorerplusplus *pexpp);
 
 	void ShowNewItemDialog();
 	void AddNewItem(const std::wstring &name, const std::wstring &command, BOOL showNameOnToolbar);
@@ -72,8 +72,8 @@ private:
 		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	ApplicationToolbar(
-		HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp);
+	ApplicationToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance,
+		IExplorerplusplus *pexpp);
 	~ApplicationToolbar();
 
 	static HWND CreateApplicationToolbar(HWND hParent);

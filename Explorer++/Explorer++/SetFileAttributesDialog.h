@@ -10,11 +10,11 @@
 
 namespace NSetFileAttributesDialogExternal
 {
-struct SetFileAttributesInfo
-{
-	TCHAR szFullFileName[MAX_PATH];
-	WIN32_FIND_DATA wfd;
-};
+	struct SetFileAttributesInfo
+	{
+		TCHAR szFullFileName[MAX_PATH];
+		WIN32_FIND_DATA wfd;
+	};
 }
 
 class SetFileAttributesDialog;

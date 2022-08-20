@@ -15,19 +15,18 @@ namespace Plugins
 	class PluginCommandManager
 	{
 	public:
-
 		typedef boost::signals2::signal<void(int, const std::wstring &)> CommandInvokedSignal;
 
 		PluginCommandManager(HACCEL *acceleratorTable, int startId, int endId);
 
 		void addCommands(int pluginId, const std::vector<Command> &commands);
 
-		boost::signals2::connection AddCommandInvokedObserver(const CommandInvokedSignal::slot_type &observer);
+		boost::signals2::connection AddCommandInvokedObserver(
+			const CommandInvokedSignal::slot_type &observer);
 
 		void onAcceleratorPressed(int acceleratorId);
 
 	private:
-
 		struct PluginCommand
 		{
 			int pluginId;

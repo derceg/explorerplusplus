@@ -37,8 +37,8 @@ using OwnedRefBookmarkItems =
 
 namespace BookmarkDataExchange
 {
-FORMATETC GetFormatEtc();
-wil::com_ptr_nothrow<IDataObject> CreateDataObject(const OwnedRefBookmarkItems &bookmarkItems);
-std::string SerializeBookmarkItems(const OwnedRefBookmarkItems &bookmarkItems);
-BookmarkItems DeserializeBookmarkItems(const std::string &data);
+	FORMATETC GetFormatEtc();
+	wil::com_ptr_nothrow<IDataObject> CreateDataObject(const OwnedRefBookmarkItems &bookmarkItems);
+	std::string SerializeBookmarkItems(const OwnedRefBookmarkItems &bookmarkItems);
+	BookmarkItems DeserializeBookmarkItems(const std::string &data);
 }

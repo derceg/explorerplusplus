@@ -26,8 +26,8 @@ const COLORREF ColorRuleDialogPersistentSettings::DEFAULT_INITIAL_COLOR = RGB(0,
 const TCHAR ColorRuleDialogPersistentSettings::SETTING_INITIAL_COLOR[] = _T("InitialColor");
 const TCHAR ColorRuleDialogPersistentSettings::SETTING_CUSTOM_COLORS[] = _T("CustomColors");
 
-ColorRuleDialog::ColorRuleDialog(
-	HINSTANCE hInstance, HWND hParent, NColorRuleHelper::ColorRule *pColorRule, BOOL bEdit) :
+ColorRuleDialog::ColorRuleDialog(HINSTANCE hInstance, HWND hParent,
+	NColorRuleHelper::ColorRule *pColorRule, BOOL bEdit) :
 	DarkModeDialogBase(hInstance, IDD_NEWCOLORRULE, hParent, false)
 {
 	m_pColorRule = pColorRule;
@@ -94,8 +94,8 @@ INT_PTR ColorRuleDialog::OnInitDialog()
 	}
 
 	HWND hStaticColor = GetDlgItem(m_hDlg, IDC_STATIC_COLOR);
-	SetWindowSubclass(
-		hStaticColor, NColorRuleDialog::StaticColorProcStub, 0, reinterpret_cast<DWORD_PTR>(this));
+	SetWindowSubclass(hStaticColor, NColorRuleDialog::StaticColorProcStub, 0,
+		reinterpret_cast<DWORD_PTR>(this));
 
 	SendMessage(GetDlgItem(m_hDlg, IDC_EDIT_DESCRIPTION), EM_SETSEL, 0, -1);
 	SetFocus(GetDlgItem(m_hDlg, IDC_EDIT_DESCRIPTION));
@@ -234,8 +234,8 @@ void ColorRuleDialog::OnChangeColor()
 	}
 }
 
-LRESULT CALLBACK NColorRuleDialog::StaticColorProcStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK NColorRuleDialog::StaticColorProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
+	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -302,8 +302,8 @@ void ColorRuleDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 		reinterpret_cast<LPBYTE>(&m_cfCustomColors), &dwSize);
 }
 
-void ColorRuleDialogPersistentSettings::SaveExtraXMLSettings(
-	IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode)
+void ColorRuleDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
+	IXMLDOMElement *pParentNode)
 {
 	TCHAR szNode[32];
 

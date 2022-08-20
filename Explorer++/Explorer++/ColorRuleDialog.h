@@ -42,8 +42,8 @@ private:
 class ColorRuleDialog : public DarkModeDialogBase
 {
 public:
-	ColorRuleDialog(
-		HINSTANCE hInstance, HWND hParent, NColorRuleHelper::ColorRule *pColorRule, BOOL bEdit);
+	ColorRuleDialog(HINSTANCE hInstance, HWND hParent, NColorRuleHelper::ColorRule *pColorRule,
+		BOOL bEdit);
 
 	LRESULT CALLBACK StaticColorProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 

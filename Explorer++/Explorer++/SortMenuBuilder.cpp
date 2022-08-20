@@ -114,8 +114,8 @@ void SortMenuBuilder::SetMenuItemStates(HMENU sortByMenu, HMENU groupByMenu, con
 		itemToCheck = IDM_SORT_DESCENDING;
 	}
 
-	CheckMenuRadioItem(
-		activeMenu, IDM_SORT_ASCENDING, IDM_SORT_DESCENDING, itemToCheck, MF_BYCOMMAND);
+	CheckMenuRadioItem(activeMenu, IDM_SORT_ASCENDING, IDM_SORT_DESCENDING, itemToCheck,
+		MF_BYCOMMAND);
 }
 
 UINT SortMenuBuilder::GetSortMenuItemStringIndex(UINT uItemId)

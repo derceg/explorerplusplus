@@ -92,8 +92,8 @@ INT_PTR SearchDialog::OnInitDialog()
 
 	HWND hListView = GetDlgItem(m_hDlg, IDC_LISTVIEW_SEARCHRESULTS);
 
-	ListView_SetExtendedListViewStyleEx(
-		hListView, LVS_EX_GRIDLINES | LVS_EX_DOUBLEBUFFER, LVS_EX_GRIDLINES | LVS_EX_DOUBLEBUFFER);
+	ListView_SetExtendedListViewStyleEx(hListView, LVS_EX_GRIDLINES | LVS_EX_DOUBLEBUFFER,
+		LVS_EX_GRIDLINES | LVS_EX_DOUBLEBUFFER);
 
 	HIMAGELIST himlSmall;
 	Shell_GetImageLists(nullptr, &himlSmall);
@@ -130,8 +130,8 @@ INT_PTR SearchDialog::OnInitDialog()
 	lCheckDlgButton(m_hDlg, IDC_CHECK_SYSTEM, m_persistentSettings->m_bSystem);
 	lCheckDlgButton(m_hDlg, IDC_CHECK_SEARCHSUBFOLDERS, m_persistentSettings->m_bSearchSubFolders);
 	lCheckDlgButton(m_hDlg, IDC_CHECK_CASEINSENSITIVE, m_persistentSettings->m_bCaseInsensitive);
-	lCheckDlgButton(
-		m_hDlg, IDC_CHECK_USEREGULAREXPRESSIONS, m_persistentSettings->m_bUseRegularExpressions);
+	lCheckDlgButton(m_hDlg, IDC_CHECK_USEREGULAREXPRESSIONS,
+		m_persistentSettings->m_bUseRegularExpressions);
 
 	for (const auto &strDirectory : m_persistentSettings->m_searchDirectories)
 	{
@@ -180,12 +180,12 @@ INT_PTR SearchDialog::OnInitDialog()
 
 wil::unique_hicon SearchDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_pexpp->GetIconResourceLoader()->LoadIconFromPNGAndScale(
-		Icon::Search, iconWidth, iconHeight);
+	return m_pexpp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::Search, iconWidth,
+		iconHeight);
 }
 
-void SearchDialog::GetResizableControlInformation(
-	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control> &ControlList)
+void SearchDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+	std::list<ResizableDialog::Control> &ControlList)
 {
 	dsc = BaseDialog::DialogSizeConstraint::None;
 
@@ -444,8 +444,8 @@ void SearchDialog::StartSearching()
 	m_bSearching = TRUE;
 
 	/* Create a background thread, and search using it... */
-	HANDLE hThread = CreateThread(
-		nullptr, 0, NSearchDialog::SearchThread, reinterpret_cast<LPVOID>(m_pSearch), 0, nullptr);
+	HANDLE hThread = CreateThread(nullptr, 0, NSearchDialog::SearchThread,
+		reinterpret_cast<LPVOID>(m_pSearch), 0, nullptr);
 	CloseHandle(hThread);
 }
 
@@ -455,9 +455,11 @@ void SearchDialog::SaveEntry(int comboBoxId, boost::circular_buffer<std::wstring
 	GetDlgItemText(m_hDlg, comboBoxId, entry, SIZEOF_ARRAY(entry));
 
 	std::wstring strEntry(entry);
-	auto itr = std::find_if(buffer.begin(), buffer.end(), [strEntry](const std::wstring &Pattern) {
-		return Pattern == strEntry;
-	});
+	auto itr = std::find_if(buffer.begin(), buffer.end(),
+		[strEntry](const std::wstring &Pattern)
+		{
+			return Pattern == strEntry;
+		});
 
 	HWND hComboBox = GetDlgItem(m_hDlg, comboBoxId);
 	ComboBox_SetCurSel(hComboBox, -1);
@@ -668,8 +670,8 @@ BOOL SearchDialog::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	return FALSE;
 }
 
-void SearchDialog::HandleCustomMenuItem(
-	PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, int iCmd)
+void SearchDialog::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PITEMID_CHILD> &pidlItems, int iCmd)
 {
 	switch (iCmd)
 	{
@@ -712,8 +714,8 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 					assert(itr != m_SearchItemsMapInternal.end());
 
 					unique_pidl_absolute pidlFull;
-					HRESULT hr = SHParseDisplayName(
-						itr->second.c_str(), nullptr, wil::out_param(pidlFull), 0, nullptr);
+					HRESULT hr = SHParseDisplayName(itr->second.c_str(), nullptr,
+						wil::out_param(pidlFull), 0, nullptr);
 
 					if (hr == S_OK)
 					{
@@ -756,8 +758,8 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 					assert(itr != m_SearchItemsMapInternal.end());
 
 					unique_pidl_absolute pidlFull;
-					HRESULT hr = SHParseDisplayName(
-						itr->second.c_str(), nullptr, wil::out_param(pidlFull), 0, nullptr);
+					HRESULT hr = SHParseDisplayName(itr->second.c_str(), nullptr,
+						wil::out_param(pidlFull), 0, nullptr);
 
 					if (hr == S_OK)
 					{
@@ -838,8 +840,8 @@ INT_PTR SearchDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		if (m_bSetSearchTimer)
 		{
-			SetTimer(
-				m_hDlg, SEARCH_PROCESSITEMS_TIMER_ID, SEARCH_PROCESSITEMS_TIMER_ELAPSED, nullptr);
+			SetTimer(m_hDlg, SEARCH_PROCESSITEMS_TIMER_ID, SEARCH_PROCESSITEMS_TIMER_ELAPSED,
+				nullptr);
 
 			m_bSetSearchTimer = FALSE;
 		}
@@ -903,8 +905,8 @@ INT_PTR SearchDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		/* The regular expression passed to the search
 		thread was invalid. Show the user an error message. */
 		TCHAR szTemp[128];
-		LoadString(
-			GetInstance(), IDS_SEARCH_REGULAR_EXPRESSION_INVALID, szTemp, SIZEOF_ARRAY(szTemp));
+		LoadString(GetInstance(), IDS_SEARCH_REGULAR_EXPRESSION_INVALID, szTemp,
+			SIZEOF_ARRAY(szTemp));
 		SetDlgItemText(m_hDlg, IDC_LINK_STATUS, szTemp);
 
 		assert(m_pSearch != nullptr);
@@ -1095,8 +1097,8 @@ void Search::SearchDirectory(const TCHAR *szDirectory)
 }
 
 /* Can't recurse, as it would overflow the stack. */
-void Search::SearchDirectoryInternal(
-	const TCHAR *szSearchDirectory, std::list<std::wstring> *pSubFolderList)
+void Search::SearchDirectoryInternal(const TCHAR *szSearchDirectory,
+	std::list<std::wstring> *pSubFolderList)
 {
 	assert(szSearchDirectory != nullptr);
 	assert(pSubFolderList != nullptr);
@@ -1131,8 +1133,8 @@ void Search::SearchDirectoryInternal(
 					}
 					else
 					{
-						if (CheckWildcardMatch(
-								m_szSearchPattern, wfd.cFileName, !m_bCaseInsensitive))
+						if (CheckWildcardMatch(m_szSearchPattern, wfd.cFileName,
+								!m_bCaseInsensitive))
 						{
 							bMatchFileName = TRUE;
 						}
@@ -1308,24 +1310,24 @@ void SearchDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 
 void SearchDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	RegistrySettings::ReadDword(
-		hKey, SETTING_COLUMN_WIDTH_1, reinterpret_cast<LPDWORD>(&m_iColumnWidth1));
-	RegistrySettings::ReadDword(
-		hKey, SETTING_COLUMN_WIDTH_2, reinterpret_cast<LPDWORD>(&m_iColumnWidth2));
-	RegistrySettings::ReadString(
-		hKey, SETTING_SEARCH_DIRECTORY_TEXT, m_szSearchPattern, SIZEOF_ARRAY(m_szSearchPattern));
-	RegistrySettings::ReadDword(
-		hKey, SETTING_SEARCH_SUB_FOLDERS, reinterpret_cast<LPDWORD>(&m_bSearchSubFolders));
+	RegistrySettings::ReadDword(hKey, SETTING_COLUMN_WIDTH_1,
+		reinterpret_cast<LPDWORD>(&m_iColumnWidth1));
+	RegistrySettings::ReadDword(hKey, SETTING_COLUMN_WIDTH_2,
+		reinterpret_cast<LPDWORD>(&m_iColumnWidth2));
+	RegistrySettings::ReadString(hKey, SETTING_SEARCH_DIRECTORY_TEXT, m_szSearchPattern,
+		SIZEOF_ARRAY(m_szSearchPattern));
+	RegistrySettings::ReadDword(hKey, SETTING_SEARCH_SUB_FOLDERS,
+		reinterpret_cast<LPDWORD>(&m_bSearchSubFolders));
 	RegistrySettings::ReadDword(hKey, SETTING_USE_REGULAR_EXPRESSIONS,
 		reinterpret_cast<LPDWORD>(&m_bUseRegularExpressions));
-	RegistrySettings::ReadDword(
-		hKey, SETTING_CASE_INSENSITIVE, reinterpret_cast<LPDWORD>(&m_bCaseInsensitive));
+	RegistrySettings::ReadDword(hKey, SETTING_CASE_INSENSITIVE,
+		reinterpret_cast<LPDWORD>(&m_bCaseInsensitive));
 	RegistrySettings::ReadDword(hKey, SETTING_ARCHIVE, reinterpret_cast<LPDWORD>(&m_bArchive));
 	RegistrySettings::ReadDword(hKey, SETTING_HIDDEN, reinterpret_cast<LPDWORD>(&m_bHidden));
 	RegistrySettings::ReadDword(hKey, SETTING_READ_ONLY, reinterpret_cast<LPDWORD>(&m_bReadOnly));
 	RegistrySettings::ReadDword(hKey, SETTING_SYSTEM, reinterpret_cast<LPDWORD>(&m_bSystem));
-	RegistrySettings::ReadDword(
-		hKey, SETTING_SORT_ASCENDING, reinterpret_cast<LPDWORD>(&m_bSortAscending));
+	RegistrySettings::ReadDword(hKey, SETTING_SORT_ASCENDING,
+		reinterpret_cast<LPDWORD>(&m_bSortAscending));
 
 	DWORD value;
 	RegistrySettings::ReadDword(hKey, SETTING_SORT_MODE, &value);
@@ -1340,29 +1342,29 @@ void SearchDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 	ListToCircularBuffer(searchPatternList, m_searchPatterns);
 }
 
-void SearchDialogPersistentSettings::SaveExtraXMLSettings(
-	IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode)
+void SearchDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
+	IXMLDOMElement *pParentNode)
 {
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_COLUMN_WIDTH_1,
 		NXMLSettings::EncodeIntValue(m_iColumnWidth1));
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_COLUMN_WIDTH_2,
 		NXMLSettings::EncodeIntValue(m_iColumnWidth2));
-	NXMLSettings::AddAttributeToNode(
-		pXMLDom, pParentNode, SETTING_SEARCH_DIRECTORY_TEXT, m_szSearchPattern);
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SEARCH_DIRECTORY_TEXT,
+		m_szSearchPattern);
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SEARCH_SUB_FOLDERS,
 		NXMLSettings::EncodeBoolValue(m_bSearchSubFolders));
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_USE_REGULAR_EXPRESSIONS,
 		NXMLSettings::EncodeBoolValue(m_bUseRegularExpressions));
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_CASE_INSENSITIVE,
 		NXMLSettings::EncodeBoolValue(m_bCaseInsensitive));
-	NXMLSettings::AddAttributeToNode(
-		pXMLDom, pParentNode, SETTING_ARCHIVE, NXMLSettings::EncodeBoolValue(m_bArchive));
-	NXMLSettings::AddAttributeToNode(
-		pXMLDom, pParentNode, SETTING_HIDDEN, NXMLSettings::EncodeBoolValue(m_bHidden));
-	NXMLSettings::AddAttributeToNode(
-		pXMLDom, pParentNode, SETTING_READ_ONLY, NXMLSettings::EncodeBoolValue(m_bReadOnly));
-	NXMLSettings::AddAttributeToNode(
-		pXMLDom, pParentNode, SETTING_SYSTEM, NXMLSettings::EncodeBoolValue(m_bSystem));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_ARCHIVE,
+		NXMLSettings::EncodeBoolValue(m_bArchive));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_HIDDEN,
+		NXMLSettings::EncodeBoolValue(m_bHidden));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_READ_ONLY,
+		NXMLSettings::EncodeBoolValue(m_bReadOnly));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SYSTEM,
+		NXMLSettings::EncodeBoolValue(m_bSystem));
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SORT_MODE,
 		NXMLSettings::EncodeIntValue(static_cast<int>(m_SortMode)));
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SORT_ASCENDING,
@@ -1370,13 +1372,13 @@ void SearchDialogPersistentSettings::SaveExtraXMLSettings(
 
 	std::list<std::wstring> searchDirectoriesList;
 	CircularBufferToList(m_searchDirectories, searchDirectoriesList);
-	NXMLSettings::AddStringListToNode(
-		pXMLDom, pParentNode, SETTING_DIRECTORY_LIST, searchDirectoriesList);
+	NXMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_DIRECTORY_LIST,
+		searchDirectoriesList);
 
 	std::list<std::wstring> searchPatternList;
 	CircularBufferToList(m_searchPatterns, searchPatternList);
-	NXMLSettings::AddStringListToNode(
-		pXMLDom, pParentNode, SETTING_PATTERN_LIST, searchPatternList);
+	NXMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_PATTERN_LIST,
+		searchPatternList);
 }
 
 void SearchDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue)
@@ -1445,8 +1447,8 @@ void SearchDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName, BSTR bs
 }
 
 template <typename T>
-void SearchDialogPersistentSettings::CircularBufferToList(
-	const boost::circular_buffer<T> &cb, std::list<T> &list)
+void SearchDialogPersistentSettings::CircularBufferToList(const boost::circular_buffer<T> &cb,
+	std::list<T> &list)
 {
 	for (const auto &item : cb)
 	{
@@ -1455,8 +1457,8 @@ void SearchDialogPersistentSettings::CircularBufferToList(
 }
 
 template <typename T>
-void SearchDialogPersistentSettings::ListToCircularBuffer(
-	const std::list<T> &list, boost::circular_buffer<T> &cb)
+void SearchDialogPersistentSettings::ListToCircularBuffer(const std::list<T> &list,
+	boost::circular_buffer<T> &cb)
 {
 	for (const auto &item : list)
 	{

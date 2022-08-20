@@ -80,8 +80,8 @@ private:
 
 	int InsertBookmarkItemIntoListView(BookmarkItem *bookmarkItem, int position);
 	void OnBookmarkIconAvailable(std::wstring_view guid, int iconIndex);
-	std::wstring GetBookmarkItemColumnInfo(
-		const BookmarkItem *bookmarkItem, BookmarkHelper::ColumnType columnType);
+	std::wstring GetBookmarkItemColumnInfo(const BookmarkItem *bookmarkItem,
+		BookmarkHelper::ColumnType columnType);
 	std::wstring FormatDate(const FILETIME *date);
 
 	BookmarkItem *GetBookmarkItemFromListView(int iItem);

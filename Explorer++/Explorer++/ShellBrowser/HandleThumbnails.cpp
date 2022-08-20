@@ -34,8 +34,8 @@ void ShellBrowser::SetupThumbnailsView()
 
 	m_hListViewImageList = ListView_GetImageList(m_hListView, LVSIL_NORMAL);
 
-	himl = ImageList_Create(
-		THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT, ILC_COLOR32, nItems, nItems + 100);
+	himl = ImageList_Create(THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT, ILC_COLOR32, nItems,
+		nItems + 100);
 	ListView_SetImageList(m_hListView, himl, LVSIL_NORMAL);
 
 	for (i = 0; i < nItems; i++)
@@ -85,13 +85,14 @@ void ShellBrowser::QueueThumbnailTask(int internalIndex)
 
 	BasicItemInfo_t basicItemInfo = getBasicItemInfo(internalIndex);
 
-	auto result =
-		m_thumbnailThreadPool.push([this, thumbnailResultID, internalIndex, basicItemInfo](
-									   int id) -> std::optional<ThumbnailResult_t> {
+	auto result = m_thumbnailThreadPool.push(
+		[this, thumbnailResultID, internalIndex, basicItemInfo](
+			int id) -> std::optional<ThumbnailResult_t>
+		{
 			UNREFERENCED_PARAMETER(id);
 
-			auto bitmap = GetThumbnail(
-				basicItemInfo.pidlComplete.get(), WTS_EXTRACT | WTS_SCALETOREQUESTEDSIZE);
+			auto bitmap = GetThumbnail(basicItemInfo.pidlComplete.get(),
+				WTS_EXTRACT | WTS_SCALETOREQUESTEDSIZE);
 
 			if (!bitmap)
 			{
@@ -134,8 +135,8 @@ wil::unique_hbitmap ShellBrowser::GetThumbnail(PIDLIST_ABSOLUTE pidl, WTS_FLAGS 
 	}
 
 	wil::com_ptr_nothrow<IThumbnailCache> thumbnailCache;
-	hr = CoCreateInstance(
-		CLSID_LocalThumbnailCache, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&thumbnailCache));
+	hr = CoCreateInstance(CLSID_LocalThumbnailCache, nullptr, CLSCTX_INPROC_SERVER,
+		IID_PPV_ARGS(&thumbnailCache));
 
 	if (FAILED(hr))
 	{
@@ -143,8 +144,8 @@ wil::unique_hbitmap ShellBrowser::GetThumbnail(PIDLIST_ABSOLUTE pidl, WTS_FLAGS 
 	}
 
 	wil::com_ptr_nothrow<ISharedBitmap> sharedBitmap;
-	hr = thumbnailCache->GetThumbnail(
-		shellItem.get(), THUMBNAIL_ITEM_WIDTH, flags, &sharedBitmap, nullptr, nullptr);
+	hr = thumbnailCache->GetThumbnail(shellItem.get(), THUMBNAIL_ITEM_WIDTH, flags, &sharedBitmap,
+		nullptr, nullptr);
 
 	if (FAILED(hr))
 	{
@@ -216,8 +217,8 @@ int ShellBrowser::GetExtractedThumbnail(HBITMAP hThumbnailBitmap) const
 	return GetThumbnailInternal(THUMBNAIL_TYPE_EXTRACTED, 0, hThumbnailBitmap);
 }
 
-int ShellBrowser::GetThumbnailInternal(
-	int iType, int iInternalIndex, HBITMAP hThumbnailBitmap) const
+int ShellBrowser::GetThumbnailInternal(int iType, int iInternalIndex,
+	HBITMAP hThumbnailBitmap) const
 {
 	HDC hdc;
 	HDC hdcBacking;

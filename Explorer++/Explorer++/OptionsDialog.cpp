@@ -128,8 +128,8 @@ HWND OptionsDialog::Show(HWND parentWindow)
 	UINT dpi = dpiCompat.GetDpiForWindow(parentWindow);
 	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
-	m_optionsDialogIcon = m_expp->GetIconResourceLoader()->LoadIconFromPNGForDpi(
-		Icon::Options, iconWidth, iconHeight, dpi);
+	m_optionsDialogIcon = m_expp->GetIconResourceLoader()->LoadIconFromPNGForDpi(Icon::Options,
+		iconWidth, iconHeight, dpi);
 
 	PROPSHEETHEADER psh;
 	psh.dwSize = sizeof(PROPSHEETHEADER);
@@ -214,8 +214,8 @@ PROPSHEETPAGE OptionsDialog::GeneratePropertySheetDefinition(
 	return sheet;
 }
 
-LRESULT CALLBACK OptionsDialog::PropSheetProcStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK OptionsDialog::PropSheetProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
+	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -253,8 +253,8 @@ void OptionsDialog::OnDestroyDialog(HWND dlg)
 	}
 }
 
-INT_PTR CALLBACK OptionsDialog::GeneralSettingsProcStub(
-	HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK OptionsDialog::GeneralSettingsProcStub(HWND hDlg, UINT uMsg, WPARAM wParam,
+	LPARAM lParam)
 {
 	static OptionsDialog *optionsDialog;
 
@@ -271,8 +271,8 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProcStub(
 	return optionsDialog->GeneralSettingsProc(hDlg, uMsg, wParam, lParam);
 }
 
-INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(
-	HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg, UINT uMsg, WPARAM wParam,
+	LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -486,8 +486,8 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(
 	return 0;
 }
 
-void OptionsDialog::OnReplaceExplorerSettingChanged(
-	HWND dialog, ReplaceExplorerMode updatedReplaceMode)
+void OptionsDialog::OnReplaceExplorerSettingChanged(HWND dialog,
+	ReplaceExplorerMode updatedReplaceMode)
 {
 	bool settingChanged = UpdateReplaceExplorerSetting(dialog, updatedReplaceMode);
 
@@ -500,8 +500,8 @@ void OptionsDialog::OnReplaceExplorerSettingChanged(
 	}
 }
 
-bool OptionsDialog::UpdateReplaceExplorerSetting(
-	HWND dialog, ReplaceExplorerMode updatedReplaceMode)
+bool OptionsDialog::UpdateReplaceExplorerSetting(HWND dialog,
+	ReplaceExplorerMode updatedReplaceMode)
 {
 	if (updatedReplaceMode != ReplaceExplorerMode::None
 		&& m_config->replaceExplorerMode == ReplaceExplorerMode::None)
@@ -541,8 +541,8 @@ bool OptionsDialog::UpdateReplaceExplorerSetting(
 	case ReplaceExplorerMode::FileSystem:
 		RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 		RemoveAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
-		res = SetAsDefaultFileManagerFileSystem(
-			SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
+		res = SetAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME,
+			menuText.c_str());
 		break;
 
 	case ReplaceExplorerMode::All:
@@ -586,8 +586,8 @@ bool OptionsDialog::UpdateReplaceExplorerSetting(
 	}
 }
 
-INT_PTR CALLBACK OptionsDialog::FilesFoldersProcStub(
-	HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK OptionsDialog::FilesFoldersProcStub(HWND hDlg, UINT uMsg, WPARAM wParam,
+	LPARAM lParam)
 {
 	static OptionsDialog *optionsDialog;
 
@@ -1145,8 +1145,8 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 						dwExtendedStyle &= ~LVS_EX_CHECKBOXES;
 					}
 
-					ListView_SetExtendedListViewStyle(
-						tab->GetShellBrowser()->GetListView(), dwExtendedStyle);
+					ListView_SetExtendedListViewStyle(tab->GetShellBrowser()->GetListView(),
+						dwExtendedStyle);
 				}
 
 				m_config->checkBoxSelection =
@@ -1184,8 +1184,8 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 	return 0;
 }
 
-INT_PTR CALLBACK OptionsDialog::TabSettingsProcStub(
-	HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK OptionsDialog::TabSettingsProcStub(HWND hDlg, UINT uMsg, WPARAM wParam,
+	LPARAM lParam)
 {
 	static OptionsDialog *optionsDialog;
 
@@ -1330,8 +1330,8 @@ INT_PTR CALLBACK OptionsDialog::TabSettingsProc(HWND hDlg, UINT uMsg, WPARAM wPa
 	return 0;
 }
 
-INT_PTR CALLBACK OptionsDialog::DefaultSettingsProcStub(
-	HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK OptionsDialog::DefaultSettingsProcStub(HWND hDlg, UINT uMsg, WPARAM wParam,
+	LPARAM lParam)
 {
 	static OptionsDialog *optionsDialog;
 
@@ -1348,8 +1348,8 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProcStub(
 	return optionsDialog->DefaultSettingsProc(hDlg, uMsg, wParam, lParam);
 }
 
-INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(
-	HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg, UINT uMsg, WPARAM wParam,
+	LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -1384,8 +1384,8 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(
 
 			std::wstring viewModeText = ResourceHelper::LoadString(m_instance, stringId);
 
-			int index = static_cast<int>(SendMessage(
-				hComboBox, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(viewModeText.c_str())));
+			int index = static_cast<int>(SendMessage(hComboBox, CB_ADDSTRING, 0,
+				reinterpret_cast<LPARAM>(viewModeText.c_str())));
 
 			if (index != CB_ERR)
 			{
@@ -1444,8 +1444,8 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(
 
 			case IDC_BUTTON_DEFAULTCOLUMNS:
 			{
-				SetDefaultColumnsDialog setDefaultColumnsDialog(
-					m_instance, hDlg, m_config->globalFolderSettings.folderColumns);
+				SetDefaultColumnsDialog setDefaultColumnsDialog(m_instance, hDlg,
+					m_config->globalFolderSettings.folderColumns);
 				setDefaultColumnsDialog.ShowModalDialog();
 			}
 			break;
@@ -1501,8 +1501,8 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(
 	return 0;
 }
 
-INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProcStub(
-	HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProcStub(HWND hDlg, UINT uMsg, WPARAM wParam,
+	LPARAM lParam)
 {
 	static OptionsDialog *optionsDialog;
 
@@ -1519,8 +1519,8 @@ INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProcStub(
 	return optionsDialog->AdvancedSettingsProc(hDlg, uMsg, wParam, lParam);
 }
 
-INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(
-	HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(HWND hDlg, UINT uMsg, WPARAM wParam,
+	LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -1528,15 +1528,15 @@ INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(
 	{
 		HWND listView = GetDlgItem(hDlg, IDC_ADVANCED_OPTIONS);
 
-		ListView_SetExtendedListViewStyle(
-			listView, LVS_EX_LABELTIP | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
+		ListView_SetExtendedListViewStyle(listView,
+			LVS_EX_LABELTIP | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
 
 		m_advancedOptionsListViewSubclass = std::make_unique<WindowSubclassWrapper>(listView,
 			std::bind_front(&OptionsDialog::AdvancedOptionsListViewWndProc, this),
 			ADVANCED_OPTIONS_LISTVIEW_SUBCLASS_ID);
 
-		SendDlgItemMessage(
-			hDlg, IDC_ADVANCED_OPTION_DESCRIPTION, EM_AUTOURLDETECT, AURL_ENABLEURL, NULL);
+		SendDlgItemMessage(hDlg, IDC_ADVANCED_OPTION_DESCRIPTION, EM_AUTOURLDETECT, AURL_ENABLEURL,
+			NULL);
 		SendDlgItemMessage(hDlg, IDC_ADVANCED_OPTION_DESCRIPTION, EM_SETEVENTMASK, 0, ENM_LINK);
 
 		auto &darkModeHelper = DarkModeHelper::GetInstance();
@@ -1584,7 +1584,8 @@ INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(
 		m_advancedOptions = InitializeAdvancedOptions();
 
 		std::sort(m_advancedOptions.begin(), m_advancedOptions.end(),
-			[](const AdvancedOption &option1, const AdvancedOption &option2) {
+			[](const AdvancedOption &option1, const AdvancedOption &option2)
+			{
 				return option1.name < option2.name;
 			});
 
@@ -1734,8 +1735,8 @@ INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(
 	return 0;
 }
 
-LRESULT CALLBACK OptionsDialog::AdvancedOptionsListViewWndProc(
-	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK OptionsDialog::AdvancedOptionsListViewWndProc(HWND hwnd, UINT msg, WPARAM wParam,
+	LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -1776,11 +1777,11 @@ std::vector<OptionsDialog::AdvancedOption> OptionsDialog::InitializeAdvancedOpti
 
 	AdvancedOption option;
 	option.id = AdvancedOptionId::CheckSystemIsPinnedToNameSpaceTree;
-	option.name = ResourceHelper::LoadString(
-		m_instance, IDS_ADVANCED_OPTION_CHECK_PINNED_TO_NAMESPACE_TREE_NAME);
+	option.name = ResourceHelper::LoadString(m_instance,
+		IDS_ADVANCED_OPTION_CHECK_PINNED_TO_NAMESPACE_TREE_NAME);
 	option.type = AdvancedOptionType::Boolean;
-	option.description = ResourceHelper::LoadString(
-		m_instance, IDS_ADVANCED_OPTION_CHECK_PINNED_TO_NAMESPACE_TREE_DESCRIPTION);
+	option.description = ResourceHelper::LoadString(m_instance,
+		IDS_ADVANCED_OPTION_CHECK_PINNED_TO_NAMESPACE_TREE_DESCRIPTION);
 	advancedOptions.push_back(option);
 
 	option.id = AdvancedOptionId::EnableDarkMode;
@@ -1794,8 +1795,8 @@ std::vector<OptionsDialog::AdvancedOption> OptionsDialog::InitializeAdvancedOpti
 	option.name =
 		ResourceHelper::LoadString(m_instance, IDS_ADVANCED_OPTION_OPEN_TABS_IN_FOREGROUND_NAME);
 	option.type = AdvancedOptionType::Boolean;
-	option.description = ResourceHelper::LoadString(
-		m_instance, IDS_ADVANCED_OPTION_OPEN_TABS_IN_FOREGROUND_DESCRIPTION);
+	option.description = ResourceHelper::LoadString(m_instance,
+		IDS_ADVANCED_OPTION_OPEN_TABS_IN_FOREGROUND_DESCRIPTION);
 	advancedOptions.push_back(option);
 
 	return advancedOptions;
@@ -1964,8 +1965,8 @@ void OptionsDialog::OnDefaultSettingsNewTabDir(HWND hDlg)
 
 	if (SUCCEEDED(hr))
 	{
-		StringCchCopy(
-			g_szNewTabDirectory, SIZEOF_ARRAY(g_szNewTabDirectory), virtualParsingPath.c_str());
+		StringCchCopy(g_szNewTabDirectory, SIZEOF_ARRAY(g_szNewTabDirectory),
+			virtualParsingPath.c_str());
 	}
 	else
 	{
@@ -2047,8 +2048,8 @@ void OptionsDialog::AddIconThemes(HWND dlg)
 		UINT stringResourceId = GetIconThemeStringResourceId(theme);
 		std::wstring iconThemeName = ResourceHelper::LoadString(m_instance, stringResourceId);
 
-		int index = static_cast<int>(SendMessage(
-			iconThemeControl, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(iconThemeName.c_str())));
+		int index = static_cast<int>(SendMessage(iconThemeControl, CB_ADDSTRING, 0,
+			reinterpret_cast<LPARAM>(iconThemeName.c_str())));
 
 		if (index == CB_ERR)
 		{
@@ -2112,8 +2113,8 @@ void OptionsDialog::AddLanguages(HWND hDlg)
 	{
 		do
 		{
-			BOOL bRet = AddLanguageToComboBox(
-				hLanguageComboBox, szImageDirectory, wfd.cFileName, &wLanguage);
+			BOOL bRet = AddLanguageToComboBox(hLanguageComboBox, szImageDirectory, wfd.cFileName,
+				&wLanguage);
 
 			if (bRet)
 			{
@@ -2133,8 +2134,8 @@ void OptionsDialog::AddLanguages(HWND hDlg)
 	SendMessage(hLanguageComboBox, CB_SETCURSEL, iSel, 0);
 }
 
-BOOL OptionsDialog::AddLanguageToComboBox(
-	HWND hComboBox, const TCHAR *szImageDirectory, const TCHAR *szFileName, WORD *pdwLanguage)
+BOOL OptionsDialog::AddLanguageToComboBox(HWND hComboBox, const TCHAR *szImageDirectory,
+	const TCHAR *szFileName, WORD *pdwLanguage)
 {
 	TCHAR szFullFileName[MAX_PATH];
 	StringCchCopy(szFullFileName, SIZEOF_ARRAY(szFullFileName), szImageDirectory);
@@ -2148,8 +2149,8 @@ BOOL OptionsDialog::AddLanguageToComboBox(
 	{
 		TCHAR szLanguageName[32];
 
-		int iRet = GetLocaleInfo(
-			wLanguage, LOCALE_SNATIVELANGNAME, szLanguageName, SIZEOF_ARRAY(szLanguageName));
+		int iRet = GetLocaleInfo(wLanguage, LOCALE_SNATIVELANGNAME, szLanguageName,
+			SIZEOF_ARRAY(szLanguageName));
 
 		if (iRet != 0)
 		{

@@ -47,11 +47,11 @@ ShellTreeView::ShellTreeView(HWND hParent, IExplorerplusplus *coreInterface,
 	m_fileActionHandler(fileActionHandler),
 	m_cachedIcons(cachedIcons),
 	m_itemIDCounter(0),
-	m_iconThreadPool(
-		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
+	m_iconThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
+		CoUninitialize),
 	m_iconResultIDCounter(0),
-	m_subfoldersThreadPool(
-		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
+	m_subfoldersThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
+		CoUninitialize),
 	m_subfoldersResultIDCounter(0),
 	m_cutItem(nullptr),
 	m_dropExpandItem(nullptr)
@@ -74,10 +74,10 @@ ShellTreeView::ShellTreeView(HWND hParent, IExplorerplusplus *coreInterface,
 
 	SetWindowTheme(m_hTreeView, L"Explorer", nullptr);
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
-		m_hTreeView, TreeViewProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
-		hParent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hTreeView,
+		TreeViewProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hParent, ParentWndProcStub,
+		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	InitializeCriticalSection(&m_cs);
 
@@ -123,8 +123,8 @@ void ShellTreeView::OnApplicationShuttingDown()
 	}
 }
 
-LRESULT CALLBACK ShellTreeView::TreeViewProcStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK ShellTreeView::TreeViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -261,8 +261,8 @@ LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam,
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK ShellTreeView::ParentWndProcStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK ShellTreeView::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
+	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -415,19 +415,20 @@ void ShellTreeView::QueueIconTask(HTREEITEM item, int internalIndex)
 
 	int iconResultID = m_iconResultIDCounter++;
 
-	auto result =
-		m_iconThreadPool.push([this, iconResultID, item, internalIndex, basicItemInfo](int id) {
+	auto result = m_iconThreadPool.push(
+		[this, iconResultID, item, internalIndex, basicItemInfo](int id)
+		{
 			UNREFERENCED_PARAMETER(id);
 
-			return FindIconAsync(
-				m_hTreeView, iconResultID, item, internalIndex, basicItemInfo.pidl.get());
+			return FindIconAsync(m_hTreeView, iconResultID, item, internalIndex,
+				basicItemInfo.pidl.get());
 		});
 
 	m_iconResults.insert({ iconResultID, std::move(result) });
 }
 
-std::optional<ShellTreeView::IconResult> ShellTreeView::FindIconAsync(
-	HWND treeView, int iconResultId, HTREEITEM item, int internalIndex, PCIDLIST_ABSOLUTE pidl)
+std::optional<ShellTreeView::IconResult> ShellTreeView::FindIconAsync(HWND treeView,
+	int iconResultId, HTREEITEM item, int internalIndex, PCIDLIST_ABSOLUTE pidl)
 {
 	SHFILEINFO shfi;
 	DWORD_PTR res = SHGetFileInfo(reinterpret_cast<LPCTSTR>(pidl), 0, &shfi, sizeof(SHFILEINFO),
@@ -459,9 +460,11 @@ void ShellTreeView::ProcessIconResult(int iconResultId)
 		return;
 	}
 
-	auto cleanup = wil::scope_exit([this, itr]() {
-		m_iconResults.erase(itr);
-	});
+	auto cleanup = wil::scope_exit(
+		[this, itr]()
+		{
+			m_iconResults.erase(itr);
+		});
 
 	auto result = itr->second.get();
 
@@ -497,19 +500,20 @@ void ShellTreeView::QueueSubfoldersTask(HTREEITEM item)
 
 	int subfoldersResultID = m_subfoldersResultIDCounter++;
 
-	auto result =
-		m_subfoldersThreadPool.push([this, subfoldersResultID, item, basicItemInfo](int id) {
+	auto result = m_subfoldersThreadPool.push(
+		[this, subfoldersResultID, item, basicItemInfo](int id)
+		{
 			UNREFERENCED_PARAMETER(id);
 
-			return CheckSubfoldersAsync(
-				m_hTreeView, subfoldersResultID, item, basicItemInfo.pidl.get());
+			return CheckSubfoldersAsync(m_hTreeView, subfoldersResultID, item,
+				basicItemInfo.pidl.get());
 		});
 
 	m_subfoldersResults.insert({ subfoldersResultID, std::move(result) });
 }
 
-std::optional<ShellTreeView::SubfoldersResult> ShellTreeView::CheckSubfoldersAsync(
-	HWND treeView, int subfoldersResultId, HTREEITEM item, PCIDLIST_ABSOLUTE pidl)
+std::optional<ShellTreeView::SubfoldersResult> ShellTreeView::CheckSubfoldersAsync(HWND treeView,
+	int subfoldersResultId, HTREEITEM item, PCIDLIST_ABSOLUTE pidl)
 {
 	wil::com_ptr_nothrow<IShellFolder> pShellFolder;
 	PCITEMID_CHILD pidlRelative;
@@ -546,9 +550,11 @@ void ShellTreeView::ProcessSubfoldersResult(int subfoldersResultId)
 		return;
 	}
 
-	auto cleanup = wil::scope_exit([this, itr]() {
-		m_subfoldersResults.erase(itr);
-	});
+	auto cleanup = wil::scope_exit(
+		[this, itr]()
+		{
+			m_subfoldersResults.erase(itr);
+		});
 
 	auto result = itr->second.get();
 
@@ -763,8 +769,8 @@ HRESULT ShellTreeView::ExpandDirectory(HTREEITEM hParent)
 	{
 		if (m_config->checkPinnedToNamespaceTreeProperty)
 		{
-			BOOL showItem = GetBooleanVariant(
-				shellFolder2.get(), pidlItem.get(), &PKEY_IsPinnedToNameSpaceTree, TRUE);
+			BOOL showItem = GetBooleanVariant(shellFolder2.get(), pidlItem.get(),
+				&PKEY_IsPinnedToNameSpaceTree, TRUE);
 
 			if (!showItem)
 			{
@@ -1081,8 +1087,8 @@ HTREEITEM ShellTreeView::LocateExistingItem(PCIDLIST_ABSOLUTE pidlDirectory)
 	return LocateItemInternal(pidlDirectory, TRUE);
 }
 
-HTREEITEM ShellTreeView::LocateItemInternal(
-	PCIDLIST_ABSOLUTE pidlDirectory, BOOL bOnlyLocateExistingItem)
+HTREEITEM ShellTreeView::LocateItemInternal(PCIDLIST_ABSOLUTE pidlDirectory,
+	BOOL bOnlyLocateExistingItem)
 {
 	HTREEITEM hRoot;
 	HTREEITEM hItem;
@@ -1105,16 +1111,16 @@ HTREEITEM ShellTreeView::LocateItemInternal(
 	the parent node if necessary. */
 	while (!bFound && hItem != nullptr)
 	{
-		if (ArePidlsEquivalent(
-				m_itemInfoMap.at(static_cast<int>(item.lParam)).pidl.get(), pidlDirectory))
+		if (ArePidlsEquivalent(m_itemInfoMap.at(static_cast<int>(item.lParam)).pidl.get(),
+				pidlDirectory))
 		{
 			bFound = TRUE;
 
 			break;
 		}
 
-		if (ILIsParent(
-				m_itemInfoMap.at(static_cast<int>(item.lParam)).pidl.get(), pidlDirectory, FALSE))
+		if (ILIsParent(m_itemInfoMap.at(static_cast<int>(item.lParam)).pidl.get(), pidlDirectory,
+				FALSE))
 		{
 			if ((TreeView_GetChild(m_hTreeView, hItem)) == nullptr)
 			{
@@ -1181,8 +1187,8 @@ HTREEITEM ShellTreeView::LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand)
 	TreeView_GetItem(m_hTreeView, &item);
 
 	std::wstring itemName;
-	GetDisplayName(
-		m_itemInfoMap.at(static_cast<int>(item.lParam)).pidl.get(), SHGDN_FORPARSING, itemName);
+	GetDisplayName(m_itemInfoMap.at(static_cast<int>(item.lParam)).pidl.get(), SHGDN_FORPARSING,
+		itemName);
 
 	while (StrCmpI(ptr, itemName.c_str()) != 0)
 	{
@@ -1195,8 +1201,8 @@ HTREEITEM ShellTreeView::LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand)
 		item.hItem = hItem;
 		TreeView_GetItem(m_hTreeView, &item);
 
-		GetDisplayName(
-			m_itemInfoMap.at(static_cast<int>(item.lParam)).pidl.get(), SHGDN_FORPARSING, itemName);
+		GetDisplayName(m_itemInfoMap.at(static_cast<int>(item.lParam)).pidl.get(), SHGDN_FORPARSING,
+			itemName);
 	}
 
 	item.mask = TVIF_TEXT;
@@ -1585,8 +1591,8 @@ void ShellTreeView::MonitorDrive(const TCHAR *szDrive)
 		{
 			pDirectoryAltered = (DirectoryAltered_t *) malloc(sizeof(DirectoryAltered_t));
 
-			StringCchCopy(
-				pDirectoryAltered->szPath, SIZEOF_ARRAY(pDirectoryAltered->szPath), szDrive);
+			StringCchCopy(pDirectoryAltered->szPath, SIZEOF_ARRAY(pDirectoryAltered->szPath),
+				szDrive);
 			pDirectoryAltered->shellTreeView = this;
 
 			auto monitorId = m_pDirMon->WatchDirectory(hDrive, szDrive, FILE_NOTIFY_CHANGE_DIR_NAME,
@@ -1890,11 +1896,11 @@ void ShellTreeView::Paste()
 
 	auto &selectedItem = GetItemByHandle(TreeView_GetSelection(m_hTreeView));
 
-	if (CanShellPasteDataObject(
-			selectedItem.pidl.get(), clipboardObject.get(), DROPEFFECT_COPY | DROPEFFECT_MOVE))
+	if (CanShellPasteDataObject(selectedItem.pidl.get(), clipboardObject.get(),
+			DROPEFFECT_COPY | DROPEFFECT_MOVE))
 	{
-		ExecuteActionFromContextMenu(
-			selectedItem.pidl.get(), {}, m_hTreeView, L"paste", 0, nullptr);
+		ExecuteActionFromContextMenu(selectedItem.pidl.get(), {}, m_hTreeView, L"paste", 0,
+			nullptr);
 	}
 	else
 	{
@@ -1907,8 +1913,8 @@ void ShellTreeView::Paste()
 		}
 
 		DropHandler *dropHandler = DropHandler::CreateNew();
-		dropHandler->CopyClipboardData(
-			clipboardObject.get(), m_hTreeView, destinationPath.c_str(), nullptr);
+		dropHandler->CopyClipboardData(clipboardObject.get(), m_hTreeView, destinationPath.c_str(),
+			nullptr);
 		dropHandler->Release();
 	}
 }
@@ -1916,8 +1922,8 @@ void ShellTreeView::Paste()
 void ShellTreeView::PasteShortcut()
 {
 	auto &selectedItem = GetItemByHandle(TreeView_GetSelection(m_hTreeView));
-	ExecuteActionFromContextMenu(
-		selectedItem.pidl.get(), {}, m_hTreeView, L"pastelink", 0, nullptr);
+	ExecuteActionFromContextMenu(selectedItem.pidl.get(), {}, m_hTreeView, L"pastelink", 0,
+		nullptr);
 }
 
 void ShellTreeView::UpdateCurrentClipboardObject(

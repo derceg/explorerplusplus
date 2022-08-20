@@ -27,10 +27,10 @@
 #define TREEVIEW_FOLDER_OPEN_DELAY 500
 #define FOLDERS_TOOLBAR_CLOSE 6000
 
-LRESULT CALLBACK TreeViewHolderProcStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-LRESULT CALLBACK TreeViewSubclassStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+LRESULT CALLBACK TreeViewHolderProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+LRESULT CALLBACK TreeViewSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
 /* Used to keep track of which item was selected in
 the treeview control. */
@@ -50,8 +50,8 @@ void Explorerplusplus::CreateFolderControls()
 	m_hHolder = CreateHolderWindow(m_hContainer, szTemp, uStyle);
 	SetWindowSubclass(m_hHolder, TreeViewHolderProcStub, 0, (DWORD_PTR) this);
 
-	m_shellTreeView = new ShellTreeView(
-		m_hHolder, this, m_pDirMon, m_tabContainer, &m_FileActionHandler, &m_cachedIcons);
+	m_shellTreeView = new ShellTreeView(m_hHolder, this, m_pDirMon, m_tabContainer,
+		&m_FileActionHandler, &m_cachedIcons);
 
 	/* Now, subclass the treeview again. This is needed for messages
 	such as WM_MOUSEWHEEL, which need to be intercepted before they
@@ -77,26 +77,31 @@ void Explorerplusplus::CreateFolderControls()
 	SetWindowPos(m_hFoldersToolbar, nullptr, 0, 0, scaledCloseToolbarWidth,
 		scaledCloseToolbarHeight, SWP_NOZORDER);
 
-	m_InitializationFinished.addObserver([this](bool newValue) {
-		if (newValue)
+	m_InitializationFinished.addObserver(
+		[this](bool newValue)
 		{
-			// Updating the treeview selection is relatively expensive, so it's
-			// not done at all during startup. Therefore, the selection will be
-			// set a single time, once the application initialization is
-			// complete and all tabs have been restored.
+			if (newValue)
+			{
+				// Updating the treeview selection is relatively expensive, so it's
+				// not done at all during startup. Therefore, the selection will be
+				// set a single time, once the application initialization is
+				// complete and all tabs have been restored.
+				UpdateTreeViewSelection();
+			}
+		});
+
+	m_tabContainer->tabCreatedSignal.AddObserver(
+		[this](int tabId, BOOL switchToNewTab)
+		{
+			UNREFERENCED_PARAMETER(tabId);
+			UNREFERENCED_PARAMETER(switchToNewTab);
+
 			UpdateTreeViewSelection();
-		}
-	});
-
-	m_tabContainer->tabCreatedSignal.AddObserver([this](int tabId, BOOL switchToNewTab) {
-		UNREFERENCED_PARAMETER(tabId);
-		UNREFERENCED_PARAMETER(switchToNewTab);
-
-		UpdateTreeViewSelection();
-	});
+		});
 
 	m_tabContainer->tabNavigationCommittedSignal.AddObserver(
-		[this](const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry) {
+		[this](const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
+		{
 			UNREFERENCED_PARAMETER(tab);
 			UNREFERENCED_PARAMETER(pidl);
 			UNREFERENCED_PARAMETER(addHistoryEntry);
@@ -104,21 +109,25 @@ void Explorerplusplus::CreateFolderControls()
 			UpdateTreeViewSelection();
 		});
 
-	m_tabContainer->tabSelectedSignal.AddObserver([this](const Tab &tab) {
-		UNREFERENCED_PARAMETER(tab);
+	m_tabContainer->tabSelectedSignal.AddObserver(
+		[this](const Tab &tab)
+		{
+			UNREFERENCED_PARAMETER(tab);
 
-		UpdateTreeViewSelection();
-	});
+			UpdateTreeViewSelection();
+		});
 
-	m_tabContainer->tabRemovedSignal.AddObserver([this](int tabId) {
-		UNREFERENCED_PARAMETER(tabId);
+	m_tabContainer->tabRemovedSignal.AddObserver(
+		[this](int tabId)
+		{
+			UNREFERENCED_PARAMETER(tabId);
 
-		UpdateTreeViewSelection();
-	});
+			UpdateTreeViewSelection();
+		});
 }
 
-LRESULT CALLBACK Explorerplusplus::FoldersToolbarParentProc(
-	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::FoldersToolbarParentProc(HWND hwnd, UINT msg, WPARAM wParam,
+	LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -135,8 +144,8 @@ LRESULT CALLBACK Explorerplusplus::FoldersToolbarParentProc(
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK TreeViewSubclassStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK TreeViewSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -145,8 +154,8 @@ LRESULT CALLBACK TreeViewSubclassStub(
 	return pContainer->TreeViewSubclass(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK Explorerplusplus::TreeViewSubclass(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::TreeViewSubclass(HWND hwnd, UINT uMsg, WPARAM wParam,
+	LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -270,8 +279,8 @@ void Explorerplusplus::OnTreeViewCopyUniversalPaths() const
 		GetDisplayName(pidl.get(), SHGDN_FORPARSING, fullFileName);
 
 		dwBufferSize = sizeof(uni);
-		dwRet = WNetGetUniversalName(
-			fullFileName.c_str(), UNIVERSAL_NAME_INFO_LEVEL, (void **) &uni, &dwBufferSize);
+		dwRet = WNetGetUniversalName(fullFileName.c_str(), UNIVERSAL_NAME_INFO_LEVEL,
+			(void **) &uni, &dwBufferSize);
 
 		BulkClipboardWriter clipboardWriter;
 
@@ -357,8 +366,8 @@ void Explorerplusplus::OnTreeViewSelChanged(LPARAM lParam)
 	}
 }
 
-LRESULT CALLBACK TreeViewHolderProcStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK TreeViewHolderProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -367,14 +376,14 @@ LRESULT CALLBACK TreeViewHolderProcStub(
 	return pContainer->TreeViewHolderProc(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK Explorerplusplus::TreeViewHolderProc(
-	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::TreeViewHolderProc(HWND hwnd, UINT msg, WPARAM wParam,
+	LPARAM lParam)
 {
 	switch (msg)
 	{
 	case WM_CTLCOLORSTATIC:
-		if (auto result = OnHolderCtlColorStatic(
-				reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam)))
+		if (auto result = OnHolderCtlColorStatic(reinterpret_cast<HWND>(lParam),
+				reinterpret_cast<HDC>(wParam)))
 		{
 			return *result;
 		}
@@ -391,8 +400,8 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderProc(
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowNotifyHandler(
-	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowNotifyHandler(HWND hwnd, UINT msg,
+	WPARAM wParam, LPARAM lParam)
 {
 	switch (((LPNMHDR) lParam)->code)
 	{
@@ -481,8 +490,8 @@ void Explorerplusplus::OnTreeViewSetFileAttributes() const
 
 			sfaiList.push_back(sfai);
 
-			SetFileAttributesDialog setFileAttributesDialog(
-				m_hLanguageModule, m_hContainer, sfaiList);
+			SetFileAttributesDialog setFileAttributesDialog(m_hLanguageModule, m_hContainer,
+				sfaiList);
 			setFileAttributesDialog.ShowModalDialog();
 		}
 	}

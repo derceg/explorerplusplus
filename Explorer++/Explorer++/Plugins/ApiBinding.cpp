@@ -22,10 +22,12 @@
 void BindTabsAPI(sol::state &state, IExplorerplusplus *expp, TabContainer *tabContainer);
 void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager);
 void BindUiApi(sol::state &state, UiTheming *uiTheming);
-void BindCommandApi(int pluginId, sol::state &state, Plugins::PluginCommandManager *pluginCommandManager);
-template<typename T>
-void BindObserverMethods(sol::state &state, sol::table &parentTable, const std::string &observerTableName, const std::shared_ptr<T> &object);
-template<typename T>
+void BindCommandApi(int pluginId, sol::state &state,
+	Plugins::PluginCommandManager *pluginCommandManager);
+template <typename T>
+void BindObserverMethods(sol::state &state, sol::table &parentTable,
+	const std::string &observerTableName, const std::shared_ptr<T> &object);
+template <typename T>
 void AddEnum(sol::state &state, sol::table &parentTable, const std::string &name);
 sol::table MarkTableReadOnly(sol::state &state, sol::table &table);
 int deny(lua_State *state);
@@ -40,7 +42,8 @@ void Plugins::BindAllApiMethods(int pluginId, sol::state &state, PluginInterface
 
 void BindTabsAPI(sol::state &state, IExplorerplusplus *expp, TabContainer *tabContainer)
 {
-	std::shared_ptr<Plugins::TabsApi> tabsApi = std::make_shared<Plugins::TabsApi>(expp, tabContainer);
+	std::shared_ptr<Plugins::TabsApi> tabsApi =
+		std::make_shared<Plugins::TabsApi>(expp, tabContainer);
 
 	sol::table tabsTable = state.create_named_table("tabs");
 	sol::table tabsMetaTable = MarkTableReadOnly(state, tabsTable);
@@ -53,18 +56,22 @@ void BindTabsAPI(sol::state &state, IExplorerplusplus *expp, TabContainer *tabCo
 	tabsMetaTable.set_function("move", &Plugins::TabsApi::move, tabsApi);
 	tabsMetaTable.set_function("close", &Plugins::TabsApi::close, tabsApi);
 
-	std::shared_ptr<Plugins::TabCreated> tabCreated = std::make_shared<Plugins::TabCreated>(tabContainer);
+	std::shared_ptr<Plugins::TabCreated> tabCreated =
+		std::make_shared<Plugins::TabCreated>(tabContainer);
 	BindObserverMethods(state, tabsMetaTable, "onCreated", tabCreated);
 
 	std::shared_ptr<Plugins::TabMoved> tabMoved = std::make_shared<Plugins::TabMoved>(tabContainer);
 	BindObserverMethods(state, tabsMetaTable, "onMoved", tabMoved);
 
-	std::shared_ptr<Plugins::TabUpdated> tabUpdated = std::make_shared<Plugins::TabUpdated>(tabContainer);
+	std::shared_ptr<Plugins::TabUpdated> tabUpdated =
+		std::make_shared<Plugins::TabUpdated>(tabContainer);
 	BindObserverMethods(state, tabsMetaTable, "onUpdated", tabUpdated);
 
-	std::shared_ptr<Plugins::TabRemoved> tabRemoved = std::make_shared<Plugins::TabRemoved>(tabContainer);
+	std::shared_ptr<Plugins::TabRemoved> tabRemoved =
+		std::make_shared<Plugins::TabRemoved>(tabContainer);
 	BindObserverMethods(state, tabsMetaTable, "onRemoved", tabRemoved);
 
+	// clang-format off
 	tabsMetaTable.new_usertype<Plugins::TabsApi::FolderSettings>("FolderSettings",
 		"viewMode", &Plugins::TabsApi::FolderSettings::viewMode,
 		"__tostring", &Plugins::TabsApi::FolderSettings::toString);
@@ -77,6 +84,7 @@ void BindTabsAPI(sol::state &state, IExplorerplusplus *expp, TabContainer *tabCo
 		"addressLocked", &Plugins::TabsApi::Tab::addressLocked,
 		"folderSettings", &Plugins::TabsApi::Tab::folderSettings,
 		"__tostring", &Plugins::TabsApi::Tab::toString);
+	// clang-format on
 
 	AddEnum<ViewMode>(state, tabsMetaTable, "ViewMode");
 	AddEnum<SortMode>(state, tabsMetaTable, "SortMode");
@@ -84,7 +92,8 @@ void BindTabsAPI(sol::state &state, IExplorerplusplus *expp, TabContainer *tabCo
 
 void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager)
 {
-	std::shared_ptr<Plugins::MenuApi> menuApi = std::make_shared<Plugins::MenuApi>(pluginMenuManager);
+	std::shared_ptr<Plugins::MenuApi> menuApi =
+		std::make_shared<Plugins::MenuApi>(pluginMenuManager);
 
 	sol::table menuTable = state.create_named_table("menu");
 	sol::table metaTable = MarkTableReadOnly(state, menuTable);
@@ -104,17 +113,20 @@ void BindUiApi(sol::state &state, UiTheming *uiTheming)
 	metaTable.set_function("setTreeViewColors", &Plugins::UiApi::setTreeViewColors, uiApi);
 }
 
-void BindCommandApi(int pluginId, sol::state &state, Plugins::PluginCommandManager *pluginCommandManager)
+void BindCommandApi(int pluginId, sol::state &state,
+	Plugins::PluginCommandManager *pluginCommandManager)
 {
 	sol::table commandsTable = state.create_named_table("commands");
 	sol::table commandsMetaTable = MarkTableReadOnly(state, commandsTable);
 
-	std::shared_ptr<Plugins::CommandInvoked> commandInvoked = std::make_shared<Plugins::CommandInvoked>(pluginCommandManager, pluginId);
+	std::shared_ptr<Plugins::CommandInvoked> commandInvoked =
+		std::make_shared<Plugins::CommandInvoked>(pluginCommandManager, pluginId);
 	BindObserverMethods(state, commandsMetaTable, "onCommand", commandInvoked);
 }
 
-template<typename T>
-void BindObserverMethods(sol::state &state, sol::table &parentTable, const std::string &observerTableName, const std::shared_ptr<T> &object)
+template <typename T>
+void BindObserverMethods(sol::state &state, sol::table &parentTable,
+	const std::string &observerTableName, const std::shared_ptr<T> &object)
 {
 	static_assert(std::is_base_of<Plugins::Event, T>::value, "T must inherit from Plugins::Event");
 
@@ -134,7 +146,7 @@ void BindObserverMethods(sol::state &state, sol::table &parentTable, const std::
 // does is create a (possibly read-only) table with the specified enum
 // values. Note that this function is only designed to work with Better
 // Enums (though there's currently no static type check).
-template<typename T>
+template <typename T>
 void AddEnum(sol::state &state, sol::table &parentTable, const std::string &name)
 {
 	sol::table enumTable = parentTable.create_named(name);

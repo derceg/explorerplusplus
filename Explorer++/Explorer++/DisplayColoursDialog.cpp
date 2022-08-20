@@ -25,7 +25,7 @@ INT_PTR DisplayColoursDialog::OnInitDialog()
 	InitializeColorGroups();
 	InitializePreviewWindow();
 
-	AllowDarkModeForControls({ IDC_BUTTON_RESTOREDEFAULTS , IDC_BUTTON_DISPLAY_FONT });
+	AllowDarkModeForControls({ IDC_BUTTON_RESTOREDEFAULTS, IDC_BUTTON_DISPLAY_FONT });
 	AllowDarkModeForGroupBoxes({ IDC_GROUP_CENTER_COLOR, IDC_GROUP_SURROUND_COLOR });
 
 	m_pdcdps->RestoreDialogPosition(m_hDlg, false);
@@ -146,8 +146,8 @@ void DisplayColoursDialog::InitializePreviewWindow()
 
 	RECT rc;
 	GetWindowRect(hStatic, &rc);
-	SetWindowPos(
-		m_hPreviewDisplayWindow, nullptr, 0, 0, rc.right, rc.bottom, SWP_SHOWWINDOW | SWP_NOZORDER);
+	SetWindowPos(m_hPreviewDisplayWindow, nullptr, 0, 0, rc.right, rc.bottom,
+		SWP_SHOWWINDOW | SWP_NOZORDER);
 
 	SetColorGroupValues(m_CenterGroup, centreColor);
 	SetColorGroupValues(m_SurroundingGroup, surroundColor);

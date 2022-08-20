@@ -6,10 +6,8 @@
 #include "Plugins/Event.h"
 #include "SolWrapper.h"
 
-Plugins::Event::Event() :
-	m_connectionIdCounter(1)
+Plugins::Event::Event() : m_connectionIdCounter(1)
 {
-
 }
 
 Plugins::Event::~Event()

@@ -71,7 +71,8 @@ int BookmarkIconManager::GetIconForBookmark(const BookmarkItem *bookmark)
 	else if (m_callback)
 	{
 		m_iconFetcher->QueueIconTask(bookmark->GetLocation(),
-			[this, guid = bookmark->GetGUID(), destroyed = m_destroyed](int systemIconIndex) {
+			[this, guid = bookmark->GetGUID(), destroyed = m_destroyed](int systemIconIndex)
+			{
 				if (*destroyed)
 				{
 					return;
@@ -103,8 +104,8 @@ int BookmarkIconManager::AddSystemIconToImageList(int systemIconIndex)
 		return m_defaultFolderIconIndex;
 	}
 
-	int iconIndex = ImageHelper::CopyImageListIcon(
-		m_imageList.get(), reinterpret_cast<HIMAGELIST>(m_systemImageList.get()), systemIconIndex);
+	int iconIndex = ImageHelper::CopyImageListIcon(m_imageList.get(),
+		reinterpret_cast<HIMAGELIST>(m_systemImageList.get()), systemIconIndex);
 
 	return iconIndex;
 }

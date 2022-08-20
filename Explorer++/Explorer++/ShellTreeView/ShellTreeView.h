@@ -170,14 +170,14 @@ private:
 
 	/* Icons. */
 	void QueueIconTask(HTREEITEM item, int internalIndex);
-	static std::optional<IconResult> FindIconAsync(
-		HWND treeView, int iconResultId, HTREEITEM item, int internalIndex, PCIDLIST_ABSOLUTE pidl);
+	static std::optional<IconResult> FindIconAsync(HWND treeView, int iconResultId, HTREEITEM item,
+		int internalIndex, PCIDLIST_ABSOLUTE pidl);
 	void ProcessIconResult(int iconResultId);
 	std::optional<int> GetCachedIconIndex(const ItemInfo_t &itemInfo);
 
 	void QueueSubfoldersTask(HTREEITEM item);
-	static std::optional<SubfoldersResult> CheckSubfoldersAsync(
-		HWND treeView, int subfoldersResultId, HTREEITEM item, PCIDLIST_ABSOLUTE pidl);
+	static std::optional<SubfoldersResult> CheckSubfoldersAsync(HWND treeView,
+		int subfoldersResultId, HTREEITEM item, PCIDLIST_ABSOLUTE pidl);
 	void ProcessSubfoldersResult(int subfoldersResultId);
 
 	/* Item id's. */

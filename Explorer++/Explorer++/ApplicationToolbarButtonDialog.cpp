@@ -8,8 +8,8 @@
 #include "ResourceHelper.h"
 #include "../Helper/Controls.h"
 
-ApplicationToolbarButtonDialog::ApplicationToolbarButtonDialog(
-	HINSTANCE hInstance, HWND hParent, ApplicationButton *Button, bool IsNew) :
+ApplicationToolbarButtonDialog::ApplicationToolbarButtonDialog(HINSTANCE hInstance, HWND hParent,
+	ApplicationButton *Button, bool IsNew) :
 	DarkModeDialogBase(hInstance, IDD_EDITAPPLICATIONBUTTON, hParent, false),
 	m_Button(Button),
 	m_IsNew(IsNew)

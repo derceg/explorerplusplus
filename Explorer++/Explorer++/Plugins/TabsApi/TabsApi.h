@@ -62,9 +62,9 @@ namespace Plugins
 		bool close(int tabId);
 
 	private:
-
 		void extractTabPropertiesForCreation(sol::table createProperties, TabSettings &tabSettings);
-		void extractFolderSettingsForCreation(sol::table folderSettingsTable, ::FolderSettings &folderSettings);
+		void extractFolderSettingsForCreation(sol::table folderSettingsTable,
+			::FolderSettings &folderSettings);
 
 		IExplorerplusplus *m_expp;
 		TabContainer *m_tabContainer;

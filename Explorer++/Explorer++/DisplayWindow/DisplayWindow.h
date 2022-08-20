@@ -87,8 +87,8 @@ public:
 	DisplayWindow(HWND hDisplayWindow, DWInitialSettings_t *pInitialSettings);
 	~DisplayWindow();
 
-	static LRESULT CALLBACK DisplayWindowProcStub(
-		HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK DisplayWindowProcStub(HWND hwnd, UINT msg, WPARAM wParam,
+		LPARAM lParam);
 
 	void ExtractThumbnailImageInternal(ThumbnailEntry_t *pte);
 

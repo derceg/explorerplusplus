@@ -17,8 +17,8 @@ void Explorerplusplus::ExpandAndBrowsePath(const TCHAR *szPath)
 /* Browses to the specified path. The path may
 have any environment variables expanded (if
 necessary). */
-void Explorerplusplus::ExpandAndBrowsePath(
-	const TCHAR *szPath, BOOL bOpenInNewTab, BOOL bSwitchToNewTab)
+void Explorerplusplus::ExpandAndBrowsePath(const TCHAR *szPath, BOOL bOpenInNewTab,
+	BOOL bSwitchToNewTab)
 {
 	TCHAR szExpandedPath[MAX_PATH];
 	BOOL res = MyExpandEnvironmentStrings(szPath, szExpandedPath, SIZEOF_ARRAY(szExpandedPath));

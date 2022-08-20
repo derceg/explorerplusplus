@@ -35,8 +35,8 @@ bool BookmarkHelper::IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkIte
 	return bookmarkItem->IsBookmark();
 }
 
-int CALLBACK BookmarkHelper::Sort(
-	ColumnType columnType, const BookmarkItem *firstItem, const BookmarkItem *secondItem)
+int CALLBACK BookmarkHelper::Sort(ColumnType columnType, const BookmarkItem *firstItem,
+	const BookmarkItem *secondItem)
 {
 	if (firstItem->IsFolder() && secondItem->IsBookmark())
 	{
@@ -138,8 +138,8 @@ void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree, HMODULE resoure
 	{
 		auto &tab = tabRef.get();
 		auto entry = tab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
-		auto bookmark = std::make_unique<BookmarkItem>(
-			std::nullopt, entry->GetDisplayName(), tab.GetShellBrowser()->GetDirectory());
+		auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, entry->GetDisplayName(),
+			tab.GetShellBrowser()->GetDirectory());
 
 		bookmarkTree->AddBookmarkItem(bookmarkFolder, std::move(bookmark), index);
 
@@ -158,14 +158,14 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 		const Tab &selectedTab = coreInterface->GetTabContainer()->GetSelectedTab();
 		auto entry = selectedTab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
 
-		bookmarkItem = std::make_unique<BookmarkItem>(
-			std::nullopt, entry->GetDisplayName(), selectedTab.GetShellBrowser()->GetDirectory());
+		bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt, entry->GetDisplayName(),
+			selectedTab.GetShellBrowser()->GetDirectory());
 	}
 	else
 	{
 		bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt,
-			ResourceHelper::LoadString(
-				coreInterface->GetLanguageModule(), IDS_BOOKMARKS_NEWBOOKMARKFOLDER),
+			ResourceHelper::LoadString(coreInterface->GetLanguageModule(),
+				IDS_BOOKMARKS_NEWBOOKMARKFOLDER),
 			std::nullopt);
 	}
 
@@ -233,15 +233,15 @@ void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *
 // If the specified item is a bookmark, it will be opened in a new tab.
 // If it's a bookmark folder, each of its children will be opened in new
 // tabs.
-void BookmarkHelper::OpenBookmarkItemInNewTab(
-	const BookmarkItem *bookmarkItem, IExplorerplusplus *expp, bool switchToNewTab)
+void BookmarkHelper::OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem,
+	IExplorerplusplus *expp, bool switchToNewTab)
 {
 	if (bookmarkItem->IsFolder())
 	{
 		for (auto &childItem : bookmarkItem->GetChildren() | boost::adaptors::filtered(IsBookmark))
 		{
-			expp->GetTabContainer()->CreateNewTab(
-				childItem->GetLocation().c_str(), TabSettings(_selected = switchToNewTab));
+			expp->GetTabContainer()->CreateNewTab(childItem->GetLocation().c_str(),
+				TabSettings(_selected = switchToNewTab));
 
 			// When opening a set of bookmarks within a folder, only the first item should be
 			// switched to.
@@ -250,15 +250,15 @@ void BookmarkHelper::OpenBookmarkItemInNewTab(
 	}
 	else
 	{
-		expp->GetTabContainer()->CreateNewTab(
-			bookmarkItem->GetLocation().c_str(), TabSettings(_selected = switchToNewTab));
+		expp->GetTabContainer()->CreateNewTab(bookmarkItem->GetLocation().c_str(),
+			TabSettings(_selected = switchToNewTab));
 	}
 }
 
 // Cuts/copies the selected bookmark items. Each bookmark item needs to be part
 // of the specified bookmark tree.
-bool BookmarkHelper::CopyBookmarkItems(
-	BookmarkTree *bookmarkTree, const RawBookmarkItems &bookmarkItems, bool cut)
+bool BookmarkHelper::CopyBookmarkItems(BookmarkTree *bookmarkTree,
+	const RawBookmarkItems &bookmarkItems, bool cut)
 {
 	OwnedRefBookmarkItems ownedBookmarkItems;
 
@@ -286,8 +286,8 @@ bool BookmarkHelper::CopyBookmarkItems(
 }
 
 // Note that the parent folder must be a part of the specified bookmark tree.
-void BookmarkHelper::PasteBookmarkItems(
-	BookmarkTree *bookmarkTree, BookmarkItem *parentFolder, size_t index)
+void BookmarkHelper::PasteBookmarkItems(BookmarkTree *bookmarkTree, BookmarkItem *parentFolder,
+	size_t index)
 {
 	assert(parentFolder->IsFolder());
 
@@ -303,8 +303,8 @@ void BookmarkHelper::PasteBookmarkItems(
 	}
 }
 
-BookmarkItem *BookmarkHelper::GetBookmarkItemById(
-	BookmarkTree *bookmarkTree, std::wstring_view guid)
+BookmarkItem *BookmarkHelper::GetBookmarkItemById(BookmarkTree *bookmarkTree,
+	std::wstring_view guid)
 {
 	return GetBookmarkItemByIdResursive(bookmarkTree->GetRoot(), guid);
 }

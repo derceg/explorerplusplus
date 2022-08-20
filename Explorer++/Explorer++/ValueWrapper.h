@@ -46,7 +46,7 @@ public:
 	}
 
 	template <typename... Args>
-	boost::signals2::connection addObserver(Args &&... args)
+	boost::signals2::connection addObserver(Args &&...args)
 	{
 		return m_valueUpdatedSignal.connect(std::forward<Args>(args)...);
 	}

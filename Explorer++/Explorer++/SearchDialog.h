@@ -111,8 +111,8 @@ public:
 
 private:
 	void SearchDirectory(const TCHAR *szDirectory);
-	void SearchDirectoryInternal(
-		const TCHAR *szSearchDirectory, std::list<std::wstring> *pSubFolderList);
+	void SearchDirectoryInternal(const TCHAR *szSearchDirectory,
+		std::list<std::wstring> *pSubFolderList);
 
 	HWND m_hDlg;
 

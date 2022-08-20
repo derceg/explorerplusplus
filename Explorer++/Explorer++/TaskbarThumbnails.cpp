@@ -63,8 +63,8 @@ void TaskbarThumbnails::Initialize()
 	ChangeWindowMessageFilter(WM_DWMSENDICONICLIVEPREVIEWBITMAP, MSGFLT_ADD);
 
 	/* Subclass the main window until the above message (TaskbarButtonCreated) is caught. */
-	SetWindowSubclass(
-		m_expp->GetMainWindow(), MainWndProcStub, 0, reinterpret_cast<DWORD_PTR>(this));
+	SetWindowSubclass(m_expp->GetMainWindow(), MainWndProcStub, 0,
+		reinterpret_cast<DWORD_PTR>(this));
 
 	m_tabContainer->tabCreatedSignal.AddObserver(
 		std::bind_front(&TaskbarThumbnails::CreateTabProxy, this));
@@ -81,8 +81,8 @@ void TaskbarThumbnails::Initialize()
 		std::bind_front(&TaskbarThumbnails::OnApplicationShuttingDown, this)));
 }
 
-LRESULT CALLBACK TaskbarThumbnails::MainWndProcStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK TaskbarThumbnails::MainWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
+	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -100,8 +100,8 @@ LRESULT CALLBACK TaskbarThumbnails::MainWndProc(HWND hwnd, UINT uMsg, WPARAM wPa
 			m_pTaskbarList->Release();
 		}
 
-		CoCreateInstance(
-			CLSID_TaskbarList, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_pTaskbarList));
+		CoCreateInstance(CLSID_TaskbarList, nullptr, CLSCTX_INPROC_SERVER,
+			IID_PPV_ARGS(&m_pTaskbarList));
 		m_pTaskbarList->HrInit();
 
 		m_bTaskbarInitialised = TRUE;
@@ -208,8 +208,8 @@ void TaskbarThumbnails::CreateTabProxy(int iTabId, BOOL bSwitchToNewTab)
 
 		if (hTabProxy != nullptr)
 		{
-			DwmSetWindowAttribute(
-				hTabProxy, DWMWA_FORCE_ICONIC_REPRESENTATION, &bValue, sizeof(BOOL));
+			DwmSetWindowAttribute(hTabProxy, DWMWA_FORCE_ICONIC_REPRESENTATION, &bValue,
+				sizeof(BOOL));
 
 			DwmSetWindowAttribute(hTabProxy, DWMWA_HAS_ICONIC_BITMAP, &bValue, sizeof(BOOL));
 
@@ -239,7 +239,8 @@ void TaskbarThumbnails::RemoveTabProxy(int iTabId)
 	}
 
 	auto tabProxy = std::find_if(m_TabProxyList.begin(), m_TabProxyList.end(),
-		[iTabId](const TabProxyInfo &currentTabProxy) {
+		[iTabId](const TabProxyInfo &currentTabProxy)
+		{
 			return currentTabProxy.iTabId == iTabId;
 		});
 
@@ -262,8 +263,8 @@ void TaskbarThumbnails::DestroyTabProxy(TabProxyInfo &tabProxy)
 	DestroyWindow(tabProxy.hProxy);
 	delete ptp;
 
-	UnregisterClass(
-		reinterpret_cast<LPCWSTR>(MAKEWORD(tabProxy.atomClass, 0)), GetModuleHandle(nullptr));
+	UnregisterClass(reinterpret_cast<LPCWSTR>(MAKEWORD(tabProxy.atomClass, 0)),
+		GetModuleHandle(nullptr));
 }
 
 void TaskbarThumbnails::InvalidateTaskbarThumbnailBitmap(const Tab &tab)
@@ -293,8 +294,8 @@ void TaskbarThumbnails::RegisterTab(HWND hTabProxy, const TCHAR *szDisplayName, 
 	}
 }
 
-LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProcStub(
-	HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProcStub(HWND hwnd, UINT Msg, WPARAM wParam,
+	LPARAM lParam)
 {
 	auto *ptp = (TabProxy *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
@@ -319,8 +320,8 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProcStub(
 	}
 }
 
-LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(
-	HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam, int iTabId)
+LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd, UINT Msg, WPARAM wParam,
+	LPARAM lParam, int iTabId)
 {
 	const Tab *tab = m_tabContainer->GetTabOptional(iTabId);
 
@@ -422,8 +423,8 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(
 	return DefWindowProc(hwnd, Msg, wParam, lParam);
 }
 
-void TaskbarThumbnails::OnDwmSendIconicThumbnail(
-	HWND tabProxy, const Tab &tab, int maxWidth, int maxHeight)
+void TaskbarThumbnails::OnDwmSendIconicThumbnail(HWND tabProxy, const Tab &tab, int maxWidth,
+	int maxHeight)
 {
 	wil::unique_hbitmap hbmTab;
 
@@ -542,8 +543,8 @@ wil::unique_hbitmap TaskbarThumbnails::CaptureTabScreenshot(const Tab &tab)
 	wil::unique_hdc hdcThumbnailSrc(CreateCompatibleDC(hdc.get()));
 
 	wil::unique_hbitmap hbmThumbnail;
-	Gdiplus::Bitmap bmpThumbnail(
-		GetRectWidth(&rcMain), GetRectHeight(&rcMain), PixelFormat32bppARGB);
+	Gdiplus::Bitmap bmpThumbnail(GetRectWidth(&rcMain), GetRectHeight(&rcMain),
+		PixelFormat32bppARGB);
 	bmpThumbnail.GetHBITMAP(color, &hbmThumbnail);
 
 	auto thumbnailPreviousBitmap = wil::SelectObject(hdcThumbnailSrc.get(), hbmThumbnail.get());
@@ -555,8 +556,8 @@ wil::unique_hbitmap TaskbarThumbnails::CaptureTabScreenshot(const Tab &tab)
 	BitBlt(hdcThumbnailSrc.get(), 0, 0, GetRectWidth(&rcMain), GetRectHeight(&rcMain), hdcSrc.get(),
 		0, 0, SRCCOPY);
 
-	SetBitmapDimensionEx(
-		hbmThumbnail.get(), GetRectWidth(&rcMain), GetRectHeight(&rcMain), nullptr);
+	SetBitmapDimensionEx(hbmThumbnail.get(), GetRectWidth(&rcMain), GetRectHeight(&rcMain),
+		nullptr);
 
 	return hbmThumbnail;
 }
@@ -639,8 +640,8 @@ void TaskbarThumbnails::OnTabSelectionChanged(const Tab &tab)
 	}
 }
 
-void TaskbarThumbnails::OnNavigationCommitted(
-	const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
+void TaskbarThumbnails::OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl,
+	bool addHistoryEntry)
 {
 	UNREFERENCED_PARAMETER(pidl);
 	UNREFERENCED_PARAMETER(addHistoryEntry);

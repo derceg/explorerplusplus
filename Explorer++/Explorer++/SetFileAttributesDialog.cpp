@@ -80,8 +80,7 @@ INT_PTR SetFileAttributesDialog::OnInitDialog()
 	m_bCreationDateEnabled = FALSE;
 	m_bAccessDateEnabled = FALSE;
 
-	AllowDarkModeForControls(
-		{ IDC_MODIFICATION_RESET, IDC_CREATION_RESET, IDC_ACCESS_RESET });
+	AllowDarkModeForControls({ IDC_MODIFICATION_RESET, IDC_CREATION_RESET, IDC_ACCESS_RESET });
 	AllowDarkModeForCheckboxes({ IDC_CHECK_ARCHIVE, IDC_CHECK_HIDDEN, IDC_CHECK_INDEXED,
 		IDC_CHECK_READONLY, IDC_CHECK_SYSTEM });
 	AllowDarkModeForGroupBoxes({ IDC_GROUP_ATTRIBUTES });

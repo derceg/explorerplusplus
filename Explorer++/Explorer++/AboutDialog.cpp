@@ -20,15 +20,15 @@ AboutDialog::AboutDialog(HINSTANCE hInstance, HWND hParent) :
 
 INT_PTR AboutDialog::OnInitDialog()
 {
-	m_icon.reset(reinterpret_cast<HICON>(LoadImage(
-		GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_MAIN), IMAGE_ICON, 32, 32, LR_VGACOLOR)));
+	m_icon.reset(reinterpret_cast<HICON>(LoadImage(GetModuleHandle(nullptr),
+		MAKEINTRESOURCE(IDI_MAIN), IMAGE_ICON, 32, 32, LR_VGACOLOR)));
 
 	SendMessage(m_hDlg, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(m_icon.get()));
 
-	m_mainIcon.reset(static_cast<HICON>(LoadImage(
-		GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_MAIN), IMAGE_ICON, 48, 48, LR_DEFAULTCOLOR)));
-	SendDlgItemMessage(
-		m_hDlg, IDC_ABOUT_STATIC_IMAGE, STM_SETICON, reinterpret_cast<WPARAM>(m_mainIcon.get()), 0);
+	m_mainIcon.reset(static_cast<HICON>(LoadImage(GetModuleHandle(nullptr),
+		MAKEINTRESOURCE(IDI_MAIN), IMAGE_ICON, 48, 48, LR_DEFAULTCOLOR)));
+	SendDlgItemMessage(m_hDlg, IDC_ABOUT_STATIC_IMAGE, STM_SETICON,
+		reinterpret_cast<WPARAM>(m_mainIcon.get()), 0);
 
 	std::wstring versionTemplate = ResourceHelper::LoadString(GetInstance(), IDS_ABOUT_VERSION);
 	std::wstring platform;

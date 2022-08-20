@@ -46,8 +46,8 @@ std::vector<std::unique_ptr<HistoryEntry>> ShellNavigationController::CopyPreser
 	return entries;
 }
 
-void ShellNavigationController::OnNavigationCommitted(
-	PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)
+void ShellNavigationController::OnNavigationCommitted(PCIDLIST_ABSOLUTE pidlDirectory,
+	bool addHistoryEntry)
 {
 	if (addHistoryEntry)
 	{
@@ -60,16 +60,18 @@ void ShellNavigationController::OnNavigationCommitted(
 
 		// TODO: It would probably be better to do this somewhere else, since
 		// this class is focused on navigation.
-		m_iconFetcher->QueueIconTask(pidlDirectory, [this, index, entryId](int iconIndex) {
-			auto *entry = GetEntryAtIndex(index);
-
-			if (!entry || entry->GetId() != entryId)
+		m_iconFetcher->QueueIconTask(pidlDirectory,
+			[this, index, entryId](int iconIndex)
 			{
-				return;
-			}
+				auto *entry = GetEntryAtIndex(index);
 
-			entry->SetSystemIconIndex(iconIndex);
-		});
+				if (!entry || entry->GetId() != entryId)
+				{
+					return;
+				}
+
+				entry->SetSystemIconIndex(iconIndex);
+			});
 	}
 }
 
@@ -83,7 +85,8 @@ HRESULT ShellNavigationController::GoToOffset(int offset)
 	}
 
 	auto connection = m_navigator->AddNavigationCommittedObserver(
-		[this, offset](PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry) {
+		[this, offset](PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
+		{
 			UNREFERENCED_PARAMETER(pidl);
 			UNREFERENCED_PARAMETER(addHistoryEntry);
 
@@ -94,9 +97,11 @@ HRESULT ShellNavigationController::GoToOffset(int offset)
 		},
 		boost::signals2::at_front);
 
-	auto disconnect = wil::scope_exit([&connection] {
-		connection.disconnect();
-	});
+	auto disconnect = wil::scope_exit(
+		[&connection]
+		{
+			connection.disconnect();
+		});
 
 	return BrowseFolder(entry);
 }

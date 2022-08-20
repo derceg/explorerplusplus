@@ -40,7 +40,8 @@ void TabRestorer::RestoreLastTab()
 void TabRestorer::RestoreTabById(int id)
 {
 	auto itr = std::find_if(m_closedTabs.begin(), m_closedTabs.end(),
-		[id](const std::unique_ptr<PreservedTab> &preservedTab) {
+		[id](const std::unique_ptr<PreservedTab> &preservedTab)
+		{
 			return preservedTab->id == id;
 		});
 

@@ -64,8 +64,8 @@ INT_PTR ManageBookmarksDialog::OnInitDialog()
 	return 0;
 }
 
-void ManageBookmarksDialog::GetResizableControlInformation(
-	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control> &controlList)
+void ManageBookmarksDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+	std::list<ResizableDialog::Control> &controlList)
 {
 	dsc = BaseDialog::DialogSizeConstraint::None;
 
@@ -89,8 +89,8 @@ void ManageBookmarksDialog::GetResizableControlInformation(
 
 wil::unique_hicon ManageBookmarksDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_pexpp->GetIconResourceLoader()->LoadIconFromPNGAndScale(
-		Icon::Bookmarks, iconWidth, iconHeight);
+	return m_pexpp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::Bookmarks, iconWidth,
+		iconHeight);
 }
 
 void ManageBookmarksDialog::SetupToolbar()
@@ -176,16 +176,16 @@ void ManageBookmarksDialog::SetupToolbar()
 	SetWindowPos(m_toolbarParent, nullptr, rcTreeView.left,
 		(rcTreeView.top - HIWORD(dwButtonSize)) / 2, rcListView.right - rcTreeView.left,
 		HIWORD(dwButtonSize), 0);
-	SetWindowPos(
-		m_hToolbar, nullptr, 0, 0, rcListView.right - rcTreeView.left, HIWORD(dwButtonSize), 0);
+	SetWindowPos(m_hToolbar, nullptr, 0, 0, rcListView.right - rcTreeView.left,
+		HIWORD(dwButtonSize), 0);
 }
 
 void ManageBookmarksDialog::SetupTreeView()
 {
 	HWND hTreeView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW);
 
-	m_bookmarkTreeView = new BookmarkTreeView(
-		hTreeView, GetInstance(), m_pexpp, m_bookmarkTree, m_persistentSettings->m_setExpansion);
+	m_bookmarkTreeView = new BookmarkTreeView(hTreeView, GetInstance(), m_pexpp, m_bookmarkTree,
+		m_persistentSettings->m_setExpansion);
 
 	m_connections.push_back(m_bookmarkTreeView->selectionChangedSignal.AddObserver(
 		std::bind_front(&ManageBookmarksDialog::OnTreeViewSelectionChanged, this)));
@@ -202,8 +202,8 @@ void ManageBookmarksDialog::SetupListView()
 		std::bind_front(&ManageBookmarksDialog::OnListViewNavigation, this)));
 }
 
-LRESULT CALLBACK ManageBookmarksDialog::ParentWndProc(
-	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ManageBookmarksDialog::ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam,
+	LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -358,8 +358,8 @@ void ManageBookmarksDialog::ShowViewMenu()
 		return;
 	}
 
-	MenuHelper::EnableItem(
-		columnsMenu.get(), static_cast<UINT>(BookmarkHelper::ColumnType::Name), FALSE);
+	MenuHelper::EnableItem(columnsMenu.get(), static_cast<UINT>(BookmarkHelper::ColumnType::Name),
+		FALSE);
 
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
@@ -436,8 +436,8 @@ void ManageBookmarksDialog::SetViewMenuItemStates(HMENU menu)
 		break;
 	}
 
-	CheckMenuRadioItem(
-		menu, IDM_MB_VIEW_SORTBYNAME, IDM_MB_VIEW_SORT_BY_DEFAULT, itemToCheck, MF_BYCOMMAND);
+	CheckMenuRadioItem(menu, IDM_MB_VIEW_SORTBYNAME, IDM_MB_VIEW_SORT_BY_DEFAULT, itemToCheck,
+		MF_BYCOMMAND);
 
 	if (m_bookmarkListView->GetSortColumn() == BookmarkHelper::ColumnType::Default)
 	{
@@ -455,8 +455,8 @@ void ManageBookmarksDialog::SetViewMenuItemStates(HMENU menu)
 			itemToCheck = IDM_MB_VIEW_SORTDESCENDING;
 		}
 
-		CheckMenuRadioItem(
-			menu, IDM_MB_VIEW_SORTASCENDING, IDM_MB_VIEW_SORTDESCENDING, itemToCheck, MF_BYCOMMAND);
+		CheckMenuRadioItem(menu, IDM_MB_VIEW_SORTASCENDING, IDM_MB_VIEW_SORTDESCENDING, itemToCheck,
+			MF_BYCOMMAND);
 	}
 }
 
@@ -566,8 +566,8 @@ void ManageBookmarksDialog::SetOrganizeMenuItemStates(HMENU menu)
 	HWND listView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW);
 	HWND treeView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW);
 
-	MenuHelper::EnableItem(
-		menu, IDM_MB_ORGANIZE_NEWBOOKMARK, focus == listView || focus == treeView);
+	MenuHelper::EnableItem(menu, IDM_MB_ORGANIZE_NEWBOOKMARK,
+		focus == listView || focus == treeView);
 	MenuHelper::EnableItem(menu, IDM_MB_ORGANIZE_NEWFOLDER, focus == listView || focus == treeView);
 	MenuHelper::EnableItem(menu, IDM_MB_ORGANIZE_SELECTALL, focus == listView);
 
@@ -773,8 +773,8 @@ void ManageBookmarksDialog::OnListViewNavigation(BookmarkItem *bookmarkFolder, b
 void ManageBookmarksDialog::UpdateToolbarState()
 {
 	SendMessage(m_hToolbar, TB_ENABLEBUTTON, TOOLBAR_ID_BACK, m_navigationController->CanGoBack());
-	SendMessage(
-		m_hToolbar, TB_ENABLEBUTTON, TOOLBAR_ID_FORWARD, m_navigationController->CanGoForward());
+	SendMessage(m_hToolbar, TB_ENABLEBUTTON, TOOLBAR_ID_FORWARD,
+		m_navigationController->CanGoForward());
 }
 
 void ManageBookmarksDialog::OnOk()

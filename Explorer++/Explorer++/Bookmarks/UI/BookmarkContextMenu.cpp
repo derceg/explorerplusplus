@@ -10,8 +10,8 @@
 #include "../Helper/MenuHelper.h"
 #include <wil/resource.h>
 
-BookmarkContextMenu::BookmarkContextMenu(
-	BookmarkTree *bookmarkTree, HMODULE resourceModule, IExplorerplusplus *expp) :
+BookmarkContextMenu::BookmarkContextMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule,
+	IExplorerplusplus *expp) :
 	m_resourceModule(resourceModule),
 	m_controller(bookmarkTree, resourceModule, expp),
 	m_showingMenu(false)
@@ -79,7 +79,8 @@ BOOL BookmarkContextMenu::ShowMenu(HWND parentWindow, BookmarkItem *parentFolder
 			targetParentFolder = parentFolder;
 
 			auto lastItem = std::max_element(bookmarkItems.begin(), bookmarkItems.end(),
-				[targetParentFolder](BookmarkItem *first, BookmarkItem *second) {
+				[targetParentFolder](BookmarkItem *first, BookmarkItem *second)
+				{
 					return targetParentFolder->GetChildIndex(first)
 						< targetParentFolder->GetChildIndex(second);
 				});
@@ -87,8 +88,8 @@ BOOL BookmarkContextMenu::ShowMenu(HWND parentWindow, BookmarkItem *parentFolder
 			targetIndex = targetParentFolder->GetChildIndex(*lastItem) + 1;
 		}
 
-		m_controller.OnMenuItemSelected(
-			menuItemId, targetParentFolder, targetIndex, bookmarkItems, parentWindow);
+		m_controller.OnMenuItemSelected(menuItemId, targetParentFolder, targetIndex, bookmarkItems,
+			parentWindow);
 	}
 
 	return TRUE;
@@ -128,7 +129,10 @@ void BookmarkContextMenu::SetUpMenu(HMENU menu, const RawBookmarkItems &bookmark
 				const auto &children = bookmarkItem->GetChildren();
 
 				auto numChildBookmarks = std::count_if(children.begin(), children.end(),
-					[](auto &child) { return child->IsBookmark(); });
+					[](auto &child)
+					{
+						return child->IsBookmark();
+					});
 
 				totalBookmarks += static_cast<int>(numChildBookmarks);
 			}

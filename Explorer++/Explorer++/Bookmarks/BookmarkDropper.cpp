@@ -51,8 +51,8 @@ DWORD BookmarkDropper::GetDropEffect(BookmarkItem *parentFolder)
 	{
 		if (extractedInfo.bookmarkItems.size() == 1)
 		{
-			auto existingBookmarkItem = BookmarkHelper::GetBookmarkItemById(
-				m_bookmarkTree, *extractedInfo.bookmarkItems[0]->GetOriginalGUID());
+			auto existingBookmarkItem = BookmarkHelper::GetBookmarkItemById(m_bookmarkTree,
+				*extractedInfo.bookmarkItems[0]->GetOriginalGUID());
 
 			if (!existingBookmarkItem
 				|| (existingBookmarkItem
@@ -85,8 +85,8 @@ DWORD BookmarkDropper::PerformDrop(BookmarkItem *parentFolder, size_t position)
 		}
 		else if (targetEffect == DROPEFFECT_MOVE)
 		{
-			auto existingBookmarkItem = BookmarkHelper::GetBookmarkItemById(
-				m_bookmarkTree, *bookmarkItem->GetOriginalGUID());
+			auto existingBookmarkItem = BookmarkHelper::GetBookmarkItemById(m_bookmarkTree,
+				*bookmarkItem->GetOriginalGUID());
 
 			if (existingBookmarkItem
 				&& CanMoveBookmarkItemIntoFolder(existingBookmarkItem, parentFolder))
@@ -106,8 +106,8 @@ DWORD BookmarkDropper::PerformDrop(BookmarkItem *parentFolder, size_t position)
 	return finalEffect;
 }
 
-bool BookmarkDropper::CanMoveBookmarkItemIntoFolder(
-	BookmarkItem *bookmarkItem, BookmarkItem *parentFolder)
+bool BookmarkDropper::CanMoveBookmarkItemIntoFolder(BookmarkItem *bookmarkItem,
+	BookmarkItem *parentFolder)
 {
 	if (bookmarkItem->IsBookmark()
 		|| (bookmarkItem->IsFolder() && !BookmarkHelper::IsAncestor(parentFolder, bookmarkItem)))

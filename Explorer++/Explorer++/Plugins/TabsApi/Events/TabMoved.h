@@ -13,15 +13,13 @@ namespace Plugins
 	class TabMoved : public Event
 	{
 	public:
-
 		TabMoved(TabContainer *tabContainer);
 
 	protected:
-
-		boost::signals2::connection connectObserver(sol::protected_function observer, sol::this_state state) override;
+		boost::signals2::connection connectObserver(sol::protected_function observer,
+			sol::this_state state) override;
 
 	private:
-
 		TabContainer *m_tabContainer;
 	};
 }

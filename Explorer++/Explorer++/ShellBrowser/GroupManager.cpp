@@ -129,8 +129,8 @@ int ShellBrowser::GroupNameComparison(const ListViewGroup &group1, const ListVie
 	return group1.name.compare(group2.name);
 }
 
-int ShellBrowser::GroupRelativePositionComparison(
-	const ListViewGroup &group1, const ListViewGroup &group2)
+int ShellBrowser::GroupRelativePositionComparison(const ListViewGroup &group1,
+	const ListViewGroup &group2)
 {
 	return group1.relativeSortPosition - group2.relativeSortPosition;
 }
@@ -178,8 +178,8 @@ int ShellBrowser::DetermineItemGroup(int iItemInternal)
 		break;
 
 	case SortMode::OriginalLocation:
-		groupInfo = DetermineItemSummaryGroup(
-			basicItemInfo, &SCID_ORIGINAL_LOCATION, m_config->globalFolderSettings);
+		groupInfo = DetermineItemSummaryGroup(basicItemInfo, &SCID_ORIGINAL_LOCATION,
+			m_config->globalFolderSettings);
 		break;
 
 	case SortMode::Attributes:
@@ -248,8 +248,8 @@ int ShellBrowser::DetermineItemGroup(int iItemInternal)
 		break;
 
 	case SortMode::Keywords:
-		groupInfo = DetermineItemSummaryGroup(
-			basicItemInfo, &PKEY_Keywords, m_config->globalFolderSettings);
+		groupInfo = DetermineItemSummaryGroup(basicItemInfo, &PKEY_Keywords,
+			m_config->globalFolderSettings);
 		break;
 
 	case SortMode::Comments:
@@ -342,8 +342,8 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemNameGroup(
 	}
 	else
 	{
-		return GroupInfo(
-			ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_NAME_OTHER), INT_MAX);
+		return GroupInfo(ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_NAME_OTHER),
+			INT_MAX);
 	}
 }
 
@@ -352,8 +352,8 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemSizeGroup(
 {
 	if ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
-		return GroupInfo(
-			ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_SIZE_FOLDERS), 0);
+		return GroupInfo(ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_SIZE_FOLDERS),
+			0);
 	}
 	else if (!itemInfo.isFindDataValid)
 	{
@@ -445,8 +445,8 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemTypeGroupVirtu
 	const BasicItemInfo_t &itemInfo) const
 {
 	SHFILEINFO shfi;
-	DWORD_PTR res = SHGetFileInfo(
-		(LPTSTR) itemInfo.pidlComplete.get(), 0, &shfi, sizeof(shfi), SHGFI_PIDL | SHGFI_TYPENAME);
+	DWORD_PTR res = SHGetFileInfo((LPTSTR) itemInfo.pidlComplete.get(), 0, &shfi, sizeof(shfi),
+		SHGFI_PIDL | SHGFI_TYPENAME);
 
 	if (!res)
 	{
@@ -704,8 +704,8 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemVersionGroup(
 	std::wstring fullFileName = itemInfo.getFullPath();
 
 	TCHAR szVersion[512];
-	BOOL bVersionInfoObtained = GetVersionInfoString(
-		fullFileName.c_str(), szVersionType, szVersion, static_cast<UINT>(std::size(szVersion)));
+	BOOL bVersionInfoObtained = GetVersionInfoString(fullFileName.c_str(), szVersionType, szVersion,
+		static_cast<UINT>(std::size(szVersion)));
 
 	if (!bVersionInfoObtained)
 	{
@@ -721,8 +721,8 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemCameraProperty
 	std::wstring fullFileName = itemInfo.getFullPath();
 
 	TCHAR szProperty[512];
-	BOOL bRes = ReadImageProperty(
-		fullFileName.c_str(), PropertyId, szProperty, static_cast<int>(std::size(szProperty)));
+	BOOL bRes = ReadImageProperty(fullFileName.c_str(), PropertyId, szProperty,
+		static_cast<int>(std::size(szProperty)));
 
 	if (!bRes)
 	{

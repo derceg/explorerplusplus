@@ -7,13 +7,12 @@
 #include "UiTheming.h"
 #include "../Helper/Rgb.h"
 
-Plugins::UiApi::UiApi(UiTheming *uiTheming) :
-	m_uiTheming(uiTheming)
+Plugins::UiApi::UiApi(UiTheming *uiTheming) : m_uiTheming(uiTheming)
 {
-
 }
 
-bool Plugins::UiApi::setListViewColors(const std::wstring &backgroundColorString, const std::wstring &textColorString)
+bool Plugins::UiApi::setListViewColors(const std::wstring &backgroundColorString,
+	const std::wstring &textColorString)
 {
 	auto backgroundColor = parseRGBString(backgroundColorString);
 	auto textColor = parseRGBString(textColorString);
@@ -28,7 +27,8 @@ bool Plugins::UiApi::setListViewColors(const std::wstring &backgroundColorString
 	return res;
 }
 
-bool Plugins::UiApi::setTreeViewColors(const std::wstring &backgroundColorString, const std::wstring &textColorString)
+bool Plugins::UiApi::setTreeViewColors(const std::wstring &backgroundColorString,
+	const std::wstring &textColorString)
 {
 	auto backgroundColor = parseRGBString(backgroundColorString);
 	auto textColor = parseRGBString(textColorString);

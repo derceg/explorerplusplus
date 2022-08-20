@@ -5,12 +5,12 @@
 #include "stdafx.h"
 #include "LoadSaveRegistry.h"
 #include "ColorRuleHelper.h"
+// clang-format off
 #include "Explorer++.h"
+// clang-format on
 
-LoadSaveRegistry::LoadSaveRegistry(Explorerplusplus *pContainer) :
-	m_pContainer(pContainer)
+LoadSaveRegistry::LoadSaveRegistry(Explorerplusplus *pContainer) : m_pContainer(pContainer)
 {
-
 }
 
 void LoadSaveRegistry::LoadGenericSettings()

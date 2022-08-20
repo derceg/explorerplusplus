@@ -25,16 +25,16 @@ namespace
 	const TCHAR REG_APPLICATIONS_KEY[] = _T("Software\\Explorer++\\ApplicationToolbar");
 }
 
-void UpdateColumnWidths(
-	std::vector<Column_t> &columns, const std::vector<ColumnWidth> &columnWidths);
+void UpdateColumnWidths(std::vector<Column_t> &columns,
+	const std::vector<ColumnWidth> &columnWidths);
 
 BOOL LoadWindowPositionFromRegistry(WINDOWPLACEMENT *pwndpl)
 {
 	HKEY hSettingsKey;
 	BOOL bRes = FALSE;
 
-	LONG lRes = RegOpenKeyEx(
-		HKEY_CURRENT_USER, NExplorerplusplus::REG_SETTINGS_KEY, 0, KEY_READ, &hSettingsKey);
+	LONG lRes = RegOpenKeyEx(HKEY_CURRENT_USER, NExplorerplusplus::REG_SETTINGS_KEY, 0, KEY_READ,
+		&hSettingsKey);
 
 	if (lRes == ERROR_SUCCESS)
 	{
@@ -58,13 +58,13 @@ BOOL LoadAllowMultipleInstancesFromRegistry()
 	BOOL bAllowMultipleInstances = TRUE;
 
 	HKEY hSettingsKey;
-	LONG lRes = RegOpenKeyEx(
-		HKEY_CURRENT_USER, NExplorerplusplus::REG_SETTINGS_KEY, 0, KEY_READ, &hSettingsKey);
+	LONG lRes = RegOpenKeyEx(HKEY_CURRENT_USER, NExplorerplusplus::REG_SETTINGS_KEY, 0, KEY_READ,
+		&hSettingsKey);
 
 	if (lRes == ERROR_SUCCESS)
 	{
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("AllowMultipleInstances"), bAllowMultipleInstances);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("AllowMultipleInstances"),
+			bAllowMultipleInstances);
 
 		RegCloseKey(hSettingsKey);
 	}
@@ -95,95 +95,95 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 
 		/* User settings. */
 		RegistrySettings::SaveDword(hSettingsKey, _T("LastSelectedTab"), m_iLastSelectedTab);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("ShowExtensions"), m_config->globalFolderSettings.showExtensions);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ShowExtensions"),
+			m_config->globalFolderSettings.showExtensions);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowStatusBar"), m_config->showStatusBar);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowFolders"), m_config->showFolders);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowAddressBar"), m_config->showAddressBar);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowToolbar"), m_config->showMainToolbar);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("ShowBookmarksToolbar"), m_config->showBookmarksToolbar);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("ShowDrivesToolbar"), m_config->showDrivesToolbar);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("ShowApplicationToolbar"), m_config->showApplicationToolbar);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("ShowFullTitlePath"), m_config->showFullTitlePath.get());
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("AlwaysOpenNewTab"), m_config->alwaysOpenNewTab);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ShowBookmarksToolbar"),
+			m_config->showBookmarksToolbar);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ShowDrivesToolbar"),
+			m_config->showDrivesToolbar);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ShowApplicationToolbar"),
+			m_config->showApplicationToolbar);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ShowFullTitlePath"),
+			m_config->showFullTitlePath.get());
+		RegistrySettings::SaveDword(hSettingsKey, _T("AlwaysOpenNewTab"),
+			m_config->alwaysOpenNewTab);
 		RegistrySettings::SaveDword(hSettingsKey, _T("TreeViewWidth"), m_config->treeViewWidth);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowFriendlyDates"),
 			m_config->globalFolderSettings.showFriendlyDates);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("ShowDisplayWindow"), m_config->showDisplayWindow);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("ShowFolderSizes"), m_config->globalFolderSettings.showFolderSizes);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ShowDisplayWindow"),
+			m_config->showDisplayWindow);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ShowFolderSizes"),
+			m_config->globalFolderSettings.showFolderSizes);
 		RegistrySettings::SaveDword(hSettingsKey, _T("DisableFolderSizesNetworkRemovable"),
 			m_config->globalFolderSettings.disableFolderSizesNetworkRemovable);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("StartupMode"), static_cast<DWORD>(m_config->startupMode));
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("NextToCurrent"), m_config->openNewTabNextToCurrent);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("ConfirmCloseTabs"), m_config->confirmCloseTabs);
+		RegistrySettings::SaveDword(hSettingsKey, _T("StartupMode"),
+			static_cast<DWORD>(m_config->startupMode));
+		RegistrySettings::SaveDword(hSettingsKey, _T("NextToCurrent"),
+			m_config->openNewTabNextToCurrent);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ConfirmCloseTabs"),
+			m_config->confirmCloseTabs);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowInfoTips"), m_config->showInfoTips);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("InfoTipType"), static_cast<DWORD>(m_config->infoTipType));
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("TreeViewDelayEnabled"), m_config->treeViewDelayEnabled);
+		RegistrySettings::SaveDword(hSettingsKey, _T("InfoTipType"),
+			static_cast<DWORD>(m_config->infoTipType));
+		RegistrySettings::SaveDword(hSettingsKey, _T("TreeViewDelayEnabled"),
+			m_config->treeViewDelayEnabled);
 		RegistrySettings::SaveDword(hSettingsKey, _T("LockToolbars"), m_config->lockToolbars);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("ExtendTabControl"), m_config->extendTabControl.get());
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("UseFullRowSelect"), m_config->useFullRowSelect);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("ShowFilePreviews"), m_config->showFilePreviews);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ExtendTabControl"),
+			m_config->extendTabControl.get());
+		RegistrySettings::SaveDword(hSettingsKey, _T("UseFullRowSelect"),
+			m_config->useFullRowSelect);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ShowFilePreviews"),
+			m_config->showFilePreviews);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ReplaceExplorerMode"),
 			static_cast<DWORD>(m_config->replaceExplorerMode));
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("ShowUserNameTitleBar"), m_config->showUserNameInTitleBar.get());
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("AllowMultipleInstances"), m_config->allowMultipleInstances);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("OneClickActivate"), m_config->globalFolderSettings.oneClickActivate);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ShowUserNameTitleBar"),
+			m_config->showUserNameInTitleBar.get());
+		RegistrySettings::SaveDword(hSettingsKey, _T("AllowMultipleInstances"),
+			m_config->allowMultipleInstances);
+		RegistrySettings::SaveDword(hSettingsKey, _T("OneClickActivate"),
+			m_config->globalFolderSettings.oneClickActivate);
 		RegistrySettings::SaveDword(hSettingsKey, _T("OneClickActivateHoverTime"),
 			m_config->globalFolderSettings.oneClickActivateHoverTime);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("ForceSameTabWidth"), m_config->forceSameTabWidth.get());
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("DoubleClickTabClose"), m_config->doubleClickTabClose);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ForceSameTabWidth"),
+			m_config->forceSameTabWidth.get());
+		RegistrySettings::SaveDword(hSettingsKey, _T("DoubleClickTabClose"),
+			m_config->doubleClickTabClose);
 		RegistrySettings::SaveDword(hSettingsKey, _T("HandleZipFiles"), m_config->handleZipFiles);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("InsertSorted"), m_config->globalFolderSettings.insertSorted);
+		RegistrySettings::SaveDword(hSettingsKey, _T("InsertSorted"),
+			m_config->globalFolderSettings.insertSorted);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowPrivilegeLevelInTitleBar"),
 			m_config->showPrivilegeLevelInTitleBar.get());
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("AlwaysShowTabBar"), m_config->alwaysShowTabBar.get());
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("CheckBoxSelection"), m_config->checkBoxSelection);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("ForceSize"), m_config->globalFolderSettings.forceSize);
+		RegistrySettings::SaveDword(hSettingsKey, _T("AlwaysShowTabBar"),
+			m_config->alwaysShowTabBar.get());
+		RegistrySettings::SaveDword(hSettingsKey, _T("CheckBoxSelection"),
+			m_config->checkBoxSelection);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ForceSize"),
+			m_config->globalFolderSettings.forceSize);
 		RegistrySettings::SaveDword(hSettingsKey, _T("SizeDisplayFormat"),
 			static_cast<DWORD>(m_config->globalFolderSettings.sizeDisplayFormat));
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("CloseMainWindowOnTabClose"), m_config->closeMainWindowOnTabClose);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("ShowTabBarAtBottom"), m_config->showTabBarAtBottom.get());
+		RegistrySettings::SaveDword(hSettingsKey, _T("CloseMainWindowOnTabClose"),
+			m_config->closeMainWindowOnTabClose);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ShowTabBarAtBottom"),
+			m_config->showTabBarAtBottom.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("OverwriteExistingFilesConfirmation"),
 			m_config->overwriteExistingFilesConfirmation);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("LargeToolbarIcons"), m_config->useLargeToolbarIcons.get());
+		RegistrySettings::SaveDword(hSettingsKey, _T("LargeToolbarIcons"),
+			m_config->useLargeToolbarIcons.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("CheckPinnedToNamespaceTreeProperty"),
 			m_config->checkPinnedToNamespaceTreeProperty);
 		RegistrySettings::SaveDword(hSettingsKey, _T("EnableDarkMode"), m_config->enableDarkMode);
 
-		RegistrySettings::SaveString(
-			hSettingsKey, _T("NewTabDirectory"), m_config->defaultTabDirectory.c_str());
+		RegistrySettings::SaveString(hSettingsKey, _T("NewTabDirectory"),
+			m_config->defaultTabDirectory.c_str());
 
 		RegistrySettings::SaveDword(hSettingsKey, _T("IconTheme"), m_config->iconTheme);
 		RegistrySettings::SaveDword(hSettingsKey, _T("Language"), m_config->language);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("OpenTabsInForeground"), m_config->openTabsInForeground);
+		RegistrySettings::SaveDword(hSettingsKey, _T("OpenTabsInForeground"),
+			m_config->openTabsInForeground);
 
 		RegistrySettings::SaveDword(hSettingsKey, _T("DisplayMixedFilesAndFolders"),
 			m_config->globalFolderSettings.displayMixedFilesAndFolders);
@@ -191,36 +191,36 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 			m_config->globalFolderSettings.useNaturalSortOrder);
 
 		/* Global settings. */
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("ShowHiddenGlobal"), m_config->defaultFolderSettings.showHidden);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("ViewModeGlobal"), m_config->defaultFolderSettings.viewMode);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("ShowGridlinesGlobal"), m_config->globalFolderSettings.showGridlines);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("ShowInGroupsGlobal"), m_config->defaultFolderSettings.showInGroups);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("AutoArrangeGlobal"), m_config->defaultFolderSettings.autoArrange);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("SortAscendingGlobal"), m_config->defaultFolderSettings.sortAscending);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ShowHiddenGlobal"),
+			m_config->defaultFolderSettings.showHidden);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ViewModeGlobal"),
+			m_config->defaultFolderSettings.viewMode);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ShowGridlinesGlobal"),
+			m_config->globalFolderSettings.showGridlines);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ShowInGroupsGlobal"),
+			m_config->defaultFolderSettings.showInGroups);
+		RegistrySettings::SaveDword(hSettingsKey, _T("AutoArrangeGlobal"),
+			m_config->defaultFolderSettings.autoArrange);
+		RegistrySettings::SaveDword(hSettingsKey, _T("SortAscendingGlobal"),
+			m_config->defaultFolderSettings.sortAscending);
 		RegistrySettings::SaveDword(hSettingsKey, _T("HideSystemFilesGlobal"),
 			m_config->globalFolderSettings.hideSystemFiles);
 		RegistrySettings::SaveDword(hSettingsKey, _T("HideLinkExtensionGlobal"),
 			m_config->globalFolderSettings.hideLinkExtension);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("ShowTaskbarThumbnails"), m_config->showTaskbarThumbnails);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("SynchronizeTreeview"), m_config->synchronizeTreeview);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("TVAutoExpandSelected"), m_config->treeViewAutoExpandSelected);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ShowTaskbarThumbnails"),
+			m_config->showTaskbarThumbnails);
+		RegistrySettings::SaveDword(hSettingsKey, _T("SynchronizeTreeview"),
+			m_config->synchronizeTreeview);
+		RegistrySettings::SaveDword(hSettingsKey, _T("TVAutoExpandSelected"),
+			m_config->treeViewAutoExpandSelected);
 
 		/* Display window settings. */
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("DisplayWindowWidth"), m_config->displayWindowWidth);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("DisplayWindowHeight"), m_config->displayWindowHeight);
-		RegistrySettings::SaveDword(
-			hSettingsKey, _T("DisplayWindowVertical"), m_config->displayWindowVertical);
+		RegistrySettings::SaveDword(hSettingsKey, _T("DisplayWindowWidth"),
+			m_config->displayWindowWidth);
+		RegistrySettings::SaveDword(hSettingsKey, _T("DisplayWindowHeight"),
+			m_config->displayWindowHeight);
+		RegistrySettings::SaveDword(hSettingsKey, _T("DisplayWindowVertical"),
+			m_config->displayWindowVertical);
 
 		COLORREF centreColor;
 		COLORREF surroundColor;
@@ -244,8 +244,8 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 
 		GetObject(hFont, sizeof(LOGFONT), (LPVOID) &logFont);
 
-		RegSetValueEx(
-			hSettingsKey, _T("DisplayFont"), 0, REG_BINARY, (LPBYTE) &logFont, sizeof(LOGFONT));
+		RegSetValueEx(hSettingsKey, _T("DisplayFont"), 0, REG_BINARY, (LPBYTE) &logFont,
+			sizeof(LOGFONT));
 
 		/* TODO: This should
 		be done within the
@@ -273,57 +273,57 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 	LONG lStatus;
 
 	/* Open/Create the main key that is used to store data. */
-	returnValue = RegOpenKeyEx(
-		HKEY_CURRENT_USER, NExplorerplusplus::REG_SETTINGS_KEY, 0, KEY_READ, &hSettingsKey);
+	returnValue = RegOpenKeyEx(HKEY_CURRENT_USER, NExplorerplusplus::REG_SETTINGS_KEY, 0, KEY_READ,
+		&hSettingsKey);
 
 	if (returnValue == ERROR_SUCCESS)
 	{
 		/* User settings. */
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("LastSelectedTab"), m_iLastSelectedTab);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("ShowExtensions"), m_config->globalFolderSettings.showExtensions);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("ShowStatusBar"), m_config->showStatusBar);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("ShowFolders"), m_config->showFolders);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("ShowAddressBar"), m_config->showAddressBar);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("ShowToolbar"), m_config->showMainToolbar);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("ShowBookmarksToolbar"), m_config->showBookmarksToolbar);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("ShowDrivesToolbar"), m_config->showDrivesToolbar);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("ShowApplicationToolbar"), m_config->showApplicationToolbar);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("AlwaysOpenNewTab"), m_config->alwaysOpenNewTab);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("TreeViewWidth"), m_config->treeViewWidth);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("LastSelectedTab"),
+			m_iLastSelectedTab);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowExtensions"),
+			m_config->globalFolderSettings.showExtensions);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowStatusBar"),
+			m_config->showStatusBar);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowFolders"),
+			m_config->showFolders);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowAddressBar"),
+			m_config->showAddressBar);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowToolbar"),
+			m_config->showMainToolbar);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowBookmarksToolbar"),
+			m_config->showBookmarksToolbar);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowDrivesToolbar"),
+			m_config->showDrivesToolbar);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowApplicationToolbar"),
+			m_config->showApplicationToolbar);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("AlwaysOpenNewTab"),
+			m_config->alwaysOpenNewTab);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("TreeViewWidth"),
+			m_config->treeViewWidth);
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowFriendlyDates"),
 			m_config->globalFolderSettings.showFriendlyDates);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("ShowDisplayWindow"), m_config->showDisplayWindow);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("ShowFolderSizes"), m_config->globalFolderSettings.showFolderSizes);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowDisplayWindow"),
+			m_config->showDisplayWindow);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowFolderSizes"),
+			m_config->globalFolderSettings.showFolderSizes);
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey,
 			_T("DisableFolderSizesNetworkRemovable"),
 			m_config->globalFolderSettings.disableFolderSizesNetworkRemovable);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("NextToCurrent"), m_config->openNewTabNextToCurrent);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("ConfirmCloseTabs"), m_config->confirmCloseTabs);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("ShowInfoTips"), m_config->showInfoTips);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("TreeViewDelayEnabled"), m_config->treeViewDelayEnabled);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("LockToolbars"), m_config->lockToolbars);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("UseFullRowSelect"), m_config->useFullRowSelect);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("ShowFilePreviews"), m_config->showFilePreviews);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("NextToCurrent"),
+			m_config->openNewTabNextToCurrent);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ConfirmCloseTabs"),
+			m_config->confirmCloseTabs);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowInfoTips"),
+			m_config->showInfoTips);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("TreeViewDelayEnabled"),
+			m_config->treeViewDelayEnabled);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("LockToolbars"),
+			m_config->lockToolbars);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("UseFullRowSelect"),
+			m_config->useFullRowSelect);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowFilePreviews"),
+			m_config->showFilePreviews);
 
 		DWORD numericValue;
 		RegistrySettings::ReadDword(hSettingsKey, _T("ReplaceExplorerMode"), &numericValue);
@@ -336,8 +336,8 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		RegistrySettings::ReadDword(hSettingsKey, _T("ShowUserNameTitleBar"), &numericValue);
 		m_config->showUserNameInTitleBar.set(numericValue);
 
-		RegistrySettings::ReadDword(
-			hSettingsKey, _T("ShowPrivilegeLevelInTitleBar"), &numericValue);
+		RegistrySettings::ReadDword(hSettingsKey, _T("ShowPrivilegeLevelInTitleBar"),
+			&numericValue);
 		m_config->showPrivilegeLevelInTitleBar.set(numericValue);
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("AlwaysShowTabBar"), &numericValue);
@@ -362,30 +362,30 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		m_config->globalFolderSettings.sizeDisplayFormat =
 			static_cast<SizeDisplayFormat>(numericValue);
 
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("AllowMultipleInstances"), m_config->allowMultipleInstances);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("OneClickActivate"), m_config->globalFolderSettings.oneClickActivate);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("AllowMultipleInstances"),
+			m_config->allowMultipleInstances);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("OneClickActivate"),
+			m_config->globalFolderSettings.oneClickActivate);
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("OneClickActivateHoverTime"),
 			m_config->globalFolderSettings.oneClickActivateHoverTime);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("DoubleClickTabClose"), m_config->doubleClickTabClose);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("HandleZipFiles"), m_config->handleZipFiles);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("InsertSorted"), m_config->globalFolderSettings.insertSorted);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("CheckBoxSelection"), m_config->checkBoxSelection);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("ForceSize"), m_config->globalFolderSettings.forceSize);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("CloseMainWindowOnTabClose"), m_config->closeMainWindowOnTabClose);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("ShowTaskbarThumbnails"), m_config->showTaskbarThumbnails);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("SynchronizeTreeview"), m_config->synchronizeTreeview);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("TVAutoExpandSelected"), m_config->treeViewAutoExpandSelected);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("DoubleClickTabClose"),
+			m_config->doubleClickTabClose);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("HandleZipFiles"),
+			m_config->handleZipFiles);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("InsertSorted"),
+			m_config->globalFolderSettings.insertSorted);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("CheckBoxSelection"),
+			m_config->checkBoxSelection);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ForceSize"),
+			m_config->globalFolderSettings.forceSize);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("CloseMainWindowOnTabClose"),
+			m_config->closeMainWindowOnTabClose);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowTaskbarThumbnails"),
+			m_config->showTaskbarThumbnails);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("SynchronizeTreeview"),
+			m_config->synchronizeTreeview);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("TVAutoExpandSelected"),
+			m_config->treeViewAutoExpandSelected);
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey,
 			_T("OverwriteExistingFilesConfirmation"), m_config->overwriteExistingFilesConfirmation);
 
@@ -394,12 +394,12 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey,
 			_T("CheckPinnedToNamespaceTreeProperty"), m_config->checkPinnedToNamespaceTreeProperty);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("EnableDarkMode"), m_config->enableDarkMode);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("EnableDarkMode"),
+			m_config->enableDarkMode);
 
 		TCHAR value[MAX_PATH];
-		RegistrySettings::ReadString(
-			hSettingsKey, _T("NewTabDirectory"), value, SIZEOF_ARRAY(value));
+		RegistrySettings::ReadString(hSettingsKey, _T("NewTabDirectory"), value,
+			SIZEOF_ARRAY(value));
 		m_config->defaultTabDirectory = value;
 
 		DWORD dwordValue;
@@ -418,8 +418,8 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 			m_bLanguageLoaded = true;
 		}
 
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("OpenTabsInForeground"), m_config->openTabsInForeground);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("OpenTabsInForeground"),
+			m_config->openTabsInForeground);
 
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey,
 			_T("DisplayMixedFilesAndFolders"),
@@ -428,16 +428,16 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 			m_config->globalFolderSettings.useNaturalSortOrder);
 
 		/* Global settings. */
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("ShowHiddenGlobal"), m_config->defaultFolderSettings.showHidden);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("ShowGridlinesGlobal"), m_config->globalFolderSettings.showGridlines);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("ShowInGroupsGlobal"), m_config->defaultFolderSettings.showInGroups);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("AutoArrangeGlobal"), m_config->defaultFolderSettings.autoArrange);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("SortAscendingGlobal"), m_config->defaultFolderSettings.sortAscending);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowHiddenGlobal"),
+			m_config->defaultFolderSettings.showHidden);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowGridlinesGlobal"),
+			m_config->globalFolderSettings.showGridlines);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowInGroupsGlobal"),
+			m_config->defaultFolderSettings.showInGroups);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("AutoArrangeGlobal"),
+			m_config->defaultFolderSettings.autoArrange);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("SortAscendingGlobal"),
+			m_config->defaultFolderSettings.sortAscending);
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("HideSystemFilesGlobal"),
 			m_config->globalFolderSettings.hideSystemFiles);
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("HideLinkExtensionGlobal"),
@@ -450,12 +450,12 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		}
 
 		/* Display window settings. */
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("DisplayWindowWidth"), m_config->displayWindowWidth);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("DisplayWindowHeight"), m_config->displayWindowHeight);
-		RegistrySettings::Read32BitValueFromRegistry(
-			hSettingsKey, _T("DisplayWindowVertical"), m_config->displayWindowVertical);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("DisplayWindowWidth"),
+			m_config->displayWindowWidth);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("DisplayWindowHeight"),
+			m_config->displayWindowHeight);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("DisplayWindowVertical"),
+			m_config->displayWindowVertical);
 
 		COLORREF centreColor;
 		COLORREF surroundColor;
@@ -490,8 +490,8 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		dwType = REG_BINARY;
 		dwSize = sizeof(textColor);
 
-		textColorStatus = RegQueryValueEx(
-			hSettingsKey, _T("DisplayTextColor"), nullptr, &dwType, (LPBYTE) &textColor, &dwSize);
+		textColorStatus = RegQueryValueEx(hSettingsKey, _T("DisplayTextColor"), nullptr, &dwType,
+			(LPBYTE) &textColor, &dwSize);
 
 		if (textColorStatus == ERROR_SUCCESS)
 		{
@@ -501,8 +501,8 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		dwType = REG_BINARY;
 		dwSize = sizeof(LOGFONT);
 
-		fontStatus = RegQueryValueEx(
-			hSettingsKey, _T("DisplayFont"), nullptr, &dwType, (LPBYTE) &logFont, &dwSize);
+		fontStatus = RegQueryValueEx(hSettingsKey, _T("DisplayFont"), nullptr, &dwType,
+			(LPBYTE) &logFont, &dwSize);
 
 		if (fontStatus == ERROR_SUCCESS)
 		{
@@ -625,18 +625,18 @@ void Explorerplusplus::SaveTabSettingsToRegistry()
 				sortMode = tab.GetShellBrowser()->GetSortMode();
 				RegistrySettings::SaveDword(hTabKey, _T("SortMode"), sortMode);
 
-				RegistrySettings::SaveDword(
-					hTabKey, _T("SortAscending"), tab.GetShellBrowser()->GetSortAscending());
-				RegistrySettings::SaveDword(
-					hTabKey, _T("ShowInGroups"), tab.GetShellBrowser()->GetShowInGroups());
-				RegistrySettings::SaveDword(
-					hTabKey, _T("ApplyFilter"), tab.GetShellBrowser()->GetFilterStatus());
+				RegistrySettings::SaveDword(hTabKey, _T("SortAscending"),
+					tab.GetShellBrowser()->GetSortAscending());
+				RegistrySettings::SaveDword(hTabKey, _T("ShowInGroups"),
+					tab.GetShellBrowser()->GetShowInGroups());
+				RegistrySettings::SaveDword(hTabKey, _T("ApplyFilter"),
+					tab.GetShellBrowser()->GetFilterStatus());
 				RegistrySettings::SaveDword(hTabKey, _T("FilterCaseSensitive"),
 					tab.GetShellBrowser()->GetFilterCaseSensitive());
-				RegistrySettings::SaveDword(
-					hTabKey, _T("ShowHidden"), tab.GetShellBrowser()->GetShowHidden());
-				RegistrySettings::SaveDword(
-					hTabKey, _T("AutoArrange"), tab.GetShellBrowser()->GetAutoArrange());
+				RegistrySettings::SaveDword(hTabKey, _T("ShowHidden"),
+					tab.GetShellBrowser()->GetShowHidden());
+				RegistrySettings::SaveDword(hTabKey, _T("AutoArrange"),
+					tab.GetShellBrowser()->GetAutoArrange());
 
 				std::wstring filter = tab.GetShellBrowser()->GetFilter();
 				RegistrySettings::SaveString(hTabKey, _T("Filter"), filter.c_str());
@@ -649,16 +649,16 @@ void Explorerplusplus::SaveTabSettingsToRegistry()
 				{
 					FolderColumns folderColumns = tab.GetShellBrowser()->ExportAllColumns();
 
-					SaveColumnToRegistry(
-						hColumnsKey, _T("ControlPanelColumns"), &folderColumns.controlPanelColumns);
-					SaveColumnToRegistry(
-						hColumnsKey, _T("MyComputerColumns"), &folderColumns.myComputerColumns);
-					SaveColumnToRegistry(
-						hColumnsKey, _T("RealFolderColumns"), &folderColumns.realFolderColumns);
-					SaveColumnToRegistry(
-						hColumnsKey, _T("RecycleBinColumns"), &folderColumns.recycleBinColumns);
-					SaveColumnToRegistry(
-						hColumnsKey, _T("PrinterColumns"), &folderColumns.printersColumns);
+					SaveColumnToRegistry(hColumnsKey, _T("ControlPanelColumns"),
+						&folderColumns.controlPanelColumns);
+					SaveColumnToRegistry(hColumnsKey, _T("MyComputerColumns"),
+						&folderColumns.myComputerColumns);
+					SaveColumnToRegistry(hColumnsKey, _T("RealFolderColumns"),
+						&folderColumns.realFolderColumns);
+					SaveColumnToRegistry(hColumnsKey, _T("RecycleBinColumns"),
+						&folderColumns.recycleBinColumns);
+					SaveColumnToRegistry(hColumnsKey, _T("PrinterColumns"),
+						&folderColumns.printersColumns);
 					SaveColumnToRegistry(hColumnsKey, _T("NetworkColumns"),
 						&folderColumns.networkConnectionsColumns);
 					SaveColumnToRegistry(hColumnsKey, _T("NetworkPlacesColumns"),
@@ -674,8 +674,8 @@ void Explorerplusplus::SaveTabSettingsToRegistry()
 						&folderColumns.realFolderColumns);
 					SaveColumnWidthsToRegistry(hColumnsKey, _T("RecycleBinColumnWidths"),
 						&folderColumns.recycleBinColumns);
-					SaveColumnWidthsToRegistry(
-						hColumnsKey, _T("PrinterColumnWidths"), &folderColumns.printersColumns);
+					SaveColumnWidthsToRegistry(hColumnsKey, _T("PrinterColumnWidths"),
+						&folderColumns.printersColumns);
 					SaveColumnWidthsToRegistry(hColumnsKey, _T("NetworkColumnWidths"),
 						&folderColumns.networkConnectionsColumns);
 					SaveColumnWidthsToRegistry(hColumnsKey, _T("NetworkPlacesColumnWidths"),
@@ -685,8 +685,8 @@ void Explorerplusplus::SaveTabSettingsToRegistry()
 				}
 
 				/* High-level settings. */
-				RegistrySettings::SaveDword(
-					hTabKey, _T("Locked"), tab.GetLockState() == Tab::LockState::Locked);
+				RegistrySettings::SaveDword(hTabKey, _T("Locked"),
+					tab.GetLockState() == Tab::LockState::Locked);
 				RegistrySettings::SaveDword(hTabKey, _T("AddressLocked"),
 					tab.GetLockState() == Tab::LockState::AddressLocked);
 				RegistrySettings::SaveDword(hTabKey, _T("UseCustomName"), tab.GetUseCustomName());
@@ -710,8 +710,8 @@ void Explorerplusplus::SaveTabSettingsToRegistry()
 	}
 }
 
-void UpdateColumnWidths(
-	std::vector<Column_t> &columns, const std::vector<ColumnWidth> &columnWidths)
+void UpdateColumnWidths(std::vector<Column_t> &columns,
+	const std::vector<ColumnWidth> &columnWidths)
 {
 	for (auto itr1 = columnWidths.begin(); itr1 != columnWidths.end(); itr1++)
 	{
@@ -754,8 +754,8 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 			{
 				pidlDirectory = (PIDLIST_ABSOLUTE) CoTaskMemAlloc(cbData);
 
-				RegQueryValueEx(
-					hTabKey, _T("Directory"), nullptr, &type, (LPBYTE) pidlDirectory, &cbData);
+				RegQueryValueEx(hTabKey, _T("Directory"), nullptr, &type, (LPBYTE) pidlDirectory,
+					&cbData);
 			}
 
 			FolderSettings folderSettings;
@@ -767,18 +767,18 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 			RegistrySettings::ReadDword(hTabKey, _T("SortMode"), &value);
 			folderSettings.sortMode = SortMode::_from_integral(value);
 
-			RegistrySettings::Read32BitValueFromRegistry(
-				hTabKey, _T("SortAscending"), folderSettings.sortAscending);
-			RegistrySettings::Read32BitValueFromRegistry(
-				hTabKey, _T("ShowInGroups"), folderSettings.showInGroups);
-			RegistrySettings::Read32BitValueFromRegistry(
-				hTabKey, _T("ApplyFilter"), folderSettings.applyFilter);
-			RegistrySettings::Read32BitValueFromRegistry(
-				hTabKey, _T("FilterCaseSensitive"), folderSettings.filterCaseSensitive);
-			RegistrySettings::Read32BitValueFromRegistry(
-				hTabKey, _T("ShowHidden"), folderSettings.showHidden);
-			RegistrySettings::Read32BitValueFromRegistry(
-				hTabKey, _T("AutoArrange"), folderSettings.autoArrange);
+			RegistrySettings::Read32BitValueFromRegistry(hTabKey, _T("SortAscending"),
+				folderSettings.sortAscending);
+			RegistrySettings::Read32BitValueFromRegistry(hTabKey, _T("ShowInGroups"),
+				folderSettings.showInGroups);
+			RegistrySettings::Read32BitValueFromRegistry(hTabKey, _T("ApplyFilter"),
+				folderSettings.applyFilter);
+			RegistrySettings::Read32BitValueFromRegistry(hTabKey, _T("FilterCaseSensitive"),
+				folderSettings.filterCaseSensitive);
+			RegistrySettings::Read32BitValueFromRegistry(hTabKey, _T("ShowHidden"),
+				folderSettings.showHidden);
+			RegistrySettings::Read32BitValueFromRegistry(hTabKey, _T("AutoArrange"),
+				folderSettings.autoArrange);
 
 			TCHAR filter[512];
 			RegistrySettings::ReadString(hTabKey, _T("Filter"), filter, SIZEOF_ARRAY(filter));
@@ -826,8 +826,8 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 				UpdateColumnWidths(initialColumns.realFolderColumns, realFolderWidths);
 				UpdateColumnWidths(initialColumns.recycleBinColumns, recycleBinWidths);
 				UpdateColumnWidths(initialColumns.printersColumns, printersWidths);
-				UpdateColumnWidths(
-					initialColumns.networkConnectionsColumns, networkConnectionsWidths);
+				UpdateColumnWidths(initialColumns.networkConnectionsColumns,
+					networkConnectionsWidths);
 				UpdateColumnWidths(initialColumns.myNetworkPlacesColumns, myNetworkPlacesWidths);
 
 				RegCloseKey(hColumnsKey);
@@ -855,12 +855,12 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 			}
 
 			TCHAR customName[64];
-			RegistrySettings::ReadString(
-				hTabKey, _T("CustomName"), customName, SIZEOF_ARRAY(customName));
+			RegistrySettings::ReadString(hTabKey, _T("CustomName"), customName,
+				SIZEOF_ARRAY(customName));
 			tabSettings.name = customName;
 
-			m_tabContainer->CreateNewTab(
-				pidlDirectory, tabSettings, &folderSettings, &initialColumns);
+			m_tabContainer->CreateNewTab(pidlDirectory, tabSettings, &folderSettings,
+				&initialColumns);
 
 			nTabsCreated++;
 
@@ -880,8 +880,8 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 	return nTabsCreated;
 }
 
-void Explorerplusplus::SaveColumnWidthsToRegistry(
-	HKEY hColumnsKey, const TCHAR *szKeyName, std::vector<Column_t> *pColumns)
+void Explorerplusplus::SaveColumnWidthsToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName,
+	std::vector<Column_t> *pColumns)
 {
 	ColumnWidth *pColumnList = nullptr;
 	int iColumn = 0;
@@ -897,20 +897,20 @@ void Explorerplusplus::SaveColumnWidthsToRegistry(
 	}
 
 	RegSetValueEx(hColumnsKey, szKeyName, 0, REG_BINARY, (LPBYTE) pColumnList,
-		(DWORD)(pColumns->size() * sizeof(ColumnWidth)));
+		(DWORD) (pColumns->size() * sizeof(ColumnWidth)));
 
 	free(pColumnList);
 }
 
-std::vector<ColumnWidth> Explorerplusplus::LoadColumnWidthsFromRegistry(
-	HKEY hColumnsKey, const TCHAR *szKeyName)
+std::vector<ColumnWidth> Explorerplusplus::LoadColumnWidthsFromRegistry(HKEY hColumnsKey,
+	const TCHAR *szKeyName)
 {
 	ColumnWidth columnWidthData[64];
 	DWORD dwType = REG_BINARY;
 	DWORD dwSize = sizeof(columnWidthData);
 
-	LONG ret = RegQueryValueEx(
-		hColumnsKey, szKeyName, nullptr, &dwType, (LPBYTE) columnWidthData, &dwSize);
+	LONG ret = RegQueryValueEx(hColumnsKey, szKeyName, nullptr, &dwType, (LPBYTE) columnWidthData,
+		&dwSize);
 
 	std::vector<ColumnWidth> columnWidths;
 
@@ -929,8 +929,8 @@ std::vector<ColumnWidth> Explorerplusplus::LoadColumnWidthsFromRegistry(
 	return columnWidths;
 }
 
-void Explorerplusplus::SaveColumnToRegistry(
-	HKEY hColumnsKey, const TCHAR *szKeyName, std::vector<Column_t> *pColumns)
+void Explorerplusplus::SaveColumnToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName,
+	std::vector<Column_t> *pColumns)
 {
 	ColumnOld_t *pColumnList = nullptr;
 	int iColumn = 0;
@@ -946,13 +946,13 @@ void Explorerplusplus::SaveColumnToRegistry(
 	}
 
 	RegSetValueEx(hColumnsKey, szKeyName, 0, REG_BINARY, (LPBYTE) pColumnList,
-		(DWORD)(pColumns->size() * sizeof(ColumnOld_t)));
+		(DWORD) (pColumns->size() * sizeof(ColumnOld_t)));
 
 	free(pColumnList);
 }
 
-std::vector<Column_t> Explorerplusplus::LoadColumnFromRegistry(
-	HKEY hColumnsKey, const TCHAR *szKeyName)
+std::vector<Column_t> Explorerplusplus::LoadColumnFromRegistry(HKEY hColumnsKey,
+	const TCHAR *szKeyName)
 {
 	ColumnOld_t columnList[64];
 	Column_t column;
@@ -1076,8 +1076,8 @@ void Explorerplusplus::LoadDefaultColumnsFromRegistry()
 		UpdateColumnWidths(defaultFolderColumns.realFolderColumns, realFolderWidths);
 		UpdateColumnWidths(defaultFolderColumns.recycleBinColumns, recycleBinWidths);
 		UpdateColumnWidths(defaultFolderColumns.printersColumns, printersWidths);
-		UpdateColumnWidths(
-			defaultFolderColumns.networkConnectionsColumns, networkConnectionsWidths);
+		UpdateColumnWidths(defaultFolderColumns.networkConnectionsColumns,
+			networkConnectionsWidths);
 		UpdateColumnWidths(defaultFolderColumns.myNetworkPlacesColumns, myNetworkPlacesWidths);
 
 		ValidateColumns(defaultFolderColumns);
@@ -1158,12 +1158,12 @@ void Explorerplusplus::LoadToolbarInformationFromRegistry()
 				bUseChevron = TRUE;
 			}
 
-			RegistrySettings::Read32BitValueFromRegistry(
-				hToolbarKey, _T("id"), m_ToolbarInformation[i].wID);
-			RegistrySettings::Read32BitValueFromRegistry(
-				hToolbarKey, _T("Style"), m_ToolbarInformation[i].fStyle);
-			RegistrySettings::Read32BitValueFromRegistry(
-				hToolbarKey, _T("Length"), m_ToolbarInformation[i].cx);
+			RegistrySettings::Read32BitValueFromRegistry(hToolbarKey, _T("id"),
+				m_ToolbarInformation[i].wID);
+			RegistrySettings::Read32BitValueFromRegistry(hToolbarKey, _T("Style"),
+				m_ToolbarInformation[i].fStyle);
+			RegistrySettings::Read32BitValueFromRegistry(hToolbarKey, _T("Length"),
+				m_ToolbarInformation[i].cx);
 
 			if (bUseChevron)
 			{

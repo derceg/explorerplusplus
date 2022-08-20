@@ -45,8 +45,8 @@ void DarkModeGroupBox::OnPaint(HWND hwnd)
 
 	NONCLIENTMETRICS metrics;
 	metrics.cbSize = sizeof(metrics);
-	dpiCompat.SystemParametersInfoForDpi(
-		SPI_GETNONCLIENTMETRICS, sizeof(metrics), &metrics, 0, dpiCompat.GetDpiForWindow(hwnd));
+	dpiCompat.SystemParametersInfoForDpi(SPI_GETNONCLIENTMETRICS, sizeof(metrics), &metrics, 0,
+		dpiCompat.GetDpiForWindow(hwnd));
 
 	wil::unique_hfont captionFont(CreateFontIndirect(&metrics.lfCaptionFont));
 	wil::unique_select_object object(SelectObject(hdc, captionFont.get()));

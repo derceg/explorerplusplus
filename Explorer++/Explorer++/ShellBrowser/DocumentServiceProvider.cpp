@@ -24,8 +24,8 @@ IFACEMETHODIMP DocumentServiceProvider::GetTypeInfo(UINT type, LCID localeId, IT
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP DocumentServiceProvider::GetIDsOfNames(
-	REFIID riid, LPOLESTR *names, UINT numNames, LCID localeId, DISPID *dispId)
+IFACEMETHODIMP DocumentServiceProvider::GetIDsOfNames(REFIID riid, LPOLESTR *names, UINT numNames,
+	LCID localeId, DISPID *dispId)
 {
 	UNREFERENCED_PARAMETER(riid);
 	UNREFERENCED_PARAMETER(names);

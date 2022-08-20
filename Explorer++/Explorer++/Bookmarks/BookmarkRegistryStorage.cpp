@@ -17,13 +17,13 @@ namespace V2
 	void Load(HKEY parentKey, BookmarkTree *bookmarkTree);
 	void LoadPermanentFolder(HKEY parentKey, BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
 		const std::wstring &name);
-	void LoadBookmarkChildren(
-		HKEY parentKey, BookmarkTree *bookmarkTree, BookmarkItem *parentBookmarkItem);
+	void LoadBookmarkChildren(HKEY parentKey, BookmarkTree *bookmarkTree,
+		BookmarkItem *parentBookmarkItem);
 	std::unique_ptr<BookmarkItem> LoadBookmarkItem(HKEY key, BookmarkTree *bookmarkTree);
 
 	void Save(HKEY parentKey, BookmarkTree *bookmarkTree);
-	void SavePermanentFolder(
-		HKEY parentKey, const BookmarkItem *bookmarkItem, const std::wstring &name);
+	void SavePermanentFolder(HKEY parentKey, const BookmarkItem *bookmarkItem,
+		const std::wstring &name);
 	void SaveBookmarkChildren(HKEY parentKey, const BookmarkItem *parentBookmarkItem);
 	void SaveBookmarkItem(HKEY key, const BookmarkItem *bookmarkItem);
 }
@@ -36,17 +36,17 @@ namespace V1
 
 	void Load(HKEY parentKey, BookmarkTree *bookmarkTree);
 
-	void LoadBookmarkChildren(
-		HKEY parentKey, BookmarkTree *bookmarkTree, BookmarkItem *parentBookmarkItem);
-	std::unique_ptr<BookmarkItem> LoadBookmarkItem(
-		HKEY key, BookmarkTree *bookmarkTree, bool &showOnToolbarOutput);
+	void LoadBookmarkChildren(HKEY parentKey, BookmarkTree *bookmarkTree,
+		BookmarkItem *parentBookmarkItem);
+	std::unique_ptr<BookmarkItem> LoadBookmarkItem(HKEY key, BookmarkTree *bookmarkTree,
+		bool &showOnToolbarOutput);
 }
 
-std::wstring BuildFullKeyPath(
-	const std::wstring &applicationKeyPath, const std::wstring &relativeKeyPath);
+std::wstring BuildFullKeyPath(const std::wstring &applicationKeyPath,
+	const std::wstring &relativeKeyPath);
 
-void BookmarkRegistryStorage::Load(
-	const std::wstring &applicationKeyPath, BookmarkTree *bookmarkTree)
+void BookmarkRegistryStorage::Load(const std::wstring &applicationKeyPath,
+	BookmarkTree *bookmarkTree)
 {
 	// The V2 key always takes precedence (i.e. it will be used even if the V1
 	// key exists).
@@ -109,8 +109,8 @@ void V2::LoadPermanentFolder(HKEY parentKey, BookmarkTree *bookmarkTree, Bookmar
 	}
 }
 
-void V2::LoadBookmarkChildren(
-	HKEY parentKey, BookmarkTree *bookmarkTree, BookmarkItem *parentBookmarkItem)
+void V2::LoadBookmarkChildren(HKEY parentKey, BookmarkTree *bookmarkTree,
+	BookmarkItem *parentBookmarkItem)
 {
 	wil::unique_hkey childKey;
 	int index = 0;
@@ -169,8 +169,8 @@ void V1::Load(HKEY parentKey, BookmarkTree *bookmarkTree)
 	LoadBookmarkChildren(parentKey, bookmarkTree, nullptr);
 }
 
-void V1::LoadBookmarkChildren(
-	HKEY parentKey, BookmarkTree *bookmarkTree, BookmarkItem *parentBookmarkItem)
+void V1::LoadBookmarkChildren(HKEY parentKey, BookmarkTree *bookmarkTree,
+	BookmarkItem *parentBookmarkItem)
 {
 	wil::unique_hkey childKey;
 	int index = 0;
@@ -223,8 +223,8 @@ void V1::LoadBookmarkChildren(
 	}
 }
 
-std::unique_ptr<BookmarkItem> V1::LoadBookmarkItem(
-	HKEY key, BookmarkTree *bookmarkTree, bool &showOnToolbarOutput)
+std::unique_ptr<BookmarkItem> V1::LoadBookmarkItem(HKEY key, BookmarkTree *bookmarkTree,
+	bool &showOnToolbarOutput)
 {
 	DWORD type;
 	RegistrySettings::ReadDword(key, _T("Type"), &type);
@@ -257,8 +257,8 @@ std::unique_ptr<BookmarkItem> V1::LoadBookmarkItem(
 	return bookmarkItem;
 }
 
-void BookmarkRegistryStorage::Save(
-	const std::wstring &applicationKeyPath, BookmarkTree *bookmarkTree)
+void BookmarkRegistryStorage::Save(const std::wstring &applicationKeyPath,
+	BookmarkTree *bookmarkTree)
 {
 	std::wstring v2KeyPath = BuildFullKeyPath(applicationKeyPath, V2::bookmarksKeyPath);
 	SHDeleteKey(HKEY_CURRENT_USER, v2KeyPath.c_str());
@@ -283,8 +283,8 @@ void V2::Save(HKEY parentKey, BookmarkTree *bookmarkTree)
 		BookmarkStorage::OTHER_BOOKMARKS_NODE_NAME);
 }
 
-void V2::SavePermanentFolder(
-	HKEY parentKey, const BookmarkItem *bookmarkItem, const std::wstring &name)
+void V2::SavePermanentFolder(HKEY parentKey, const BookmarkItem *bookmarkItem,
+	const std::wstring &name)
 {
 	wil::unique_hkey childKey;
 	LONG res = RegCreateKeyEx(parentKey, name.c_str(), 0, nullptr, REG_OPTION_NON_VOLATILE,
@@ -292,10 +292,10 @@ void V2::SavePermanentFolder(
 
 	if (res == ERROR_SUCCESS)
 	{
-		RegistrySettings::SaveDateTime(
-			childKey.get(), _T("DateCreated"), bookmarkItem->GetDateCreated());
-		RegistrySettings::SaveDateTime(
-			childKey.get(), _T("DateModified"), bookmarkItem->GetDateModified());
+		RegistrySettings::SaveDateTime(childKey.get(), _T("DateCreated"),
+			bookmarkItem->GetDateCreated());
+		RegistrySettings::SaveDateTime(childKey.get(), _T("DateModified"),
+			bookmarkItem->GetDateModified());
 
 		SaveBookmarkChildren(childKey.get(), bookmarkItem);
 	}
@@ -340,8 +340,8 @@ void V2::SaveBookmarkItem(HKEY key, const BookmarkItem *bookmarkItem)
 	}
 }
 
-std::wstring BuildFullKeyPath(
-	const std::wstring &applicationKeyPath, const std::wstring &relativeKeyPath)
+std::wstring BuildFullKeyPath(const std::wstring &applicationKeyPath,
+	const std::wstring &relativeKeyPath)
 {
 	return applicationKeyPath + L"\\" + relativeKeyPath;
 }

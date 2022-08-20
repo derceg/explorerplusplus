@@ -108,20 +108,20 @@ INT_PTR SplitFileDialog::OnInitDialog()
 	TCHAR szTemp[64];
 
 	LoadString(GetInstance(), IDS_SPLIT_FILE_SIZE_BYTES, szTemp, SIZEOF_ARRAY(szTemp));
-	iPos = static_cast<int>(SendMessage(
-		hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1), reinterpret_cast<LPARAM>(szTemp)));
+	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
+		reinterpret_cast<LPARAM>(szTemp)));
 	m_SizeMap.insert(std::unordered_map<int, SizeType>::value_type(iPos, SizeType::Bytes));
 	LoadString(GetInstance(), IDS_SPLIT_FILE_SIZE_KB, szTemp, SIZEOF_ARRAY(szTemp));
-	iPos = static_cast<int>(SendMessage(
-		hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1), reinterpret_cast<LPARAM>(szTemp)));
+	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
+		reinterpret_cast<LPARAM>(szTemp)));
 	m_SizeMap.insert(std::unordered_map<int, SizeType>::value_type(iPos, SizeType::KB));
 	LoadString(GetInstance(), IDS_SPLIT_FILE_SIZE_MB, szTemp, SIZEOF_ARRAY(szTemp));
-	iPos = static_cast<int>(SendMessage(
-		hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1), reinterpret_cast<LPARAM>(szTemp)));
+	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
+		reinterpret_cast<LPARAM>(szTemp)));
 	m_SizeMap.insert(std::unordered_map<int, SizeType>::value_type(iPos, SizeType::MB));
 	LoadString(GetInstance(), IDS_SPLIT_FILE_SIZE_GB, szTemp, SIZEOF_ARRAY(szTemp));
-	iPos = static_cast<int>(SendMessage(
-		hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1), reinterpret_cast<LPARAM>(szTemp)));
+	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
+		reinterpret_cast<LPARAM>(szTemp)));
 	m_SizeMap.insert(std::unordered_map<int, SizeType>::value_type(iPos, SizeType::GB));
 
 	SendMessage(hComboBox, CB_SELECTSTRING, static_cast<WPARAM>(-1),
@@ -164,8 +164,8 @@ INT_PTR SplitFileDialog::OnInitDialog()
 
 wil::unique_hicon SplitFileDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_expp->GetIconResourceLoader()->LoadIconFromPNGAndScale(
-		Icon::SplitFiles, iconWidth, iconHeight);
+	return m_expp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::SplitFiles, iconWidth,
+		iconHeight);
 }
 
 INT_PTR SplitFileDialog::OnTimer(int iTimerID)
@@ -307,8 +307,8 @@ INT_PTR SplitFileDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lPara
 	case NSplitFileDialog::WM_APP_INPUTFILEINVALID:
 	{
 		TCHAR szTemp[128];
-		LoadString(
-			GetInstance(), IDS_SPLITFILEDIALOG_INPUTFILEINVALID, szTemp, SIZEOF_ARRAY(szTemp));
+		LoadString(GetInstance(), IDS_SPLITFILEDIALOG_INPUTFILEINVALID, szTemp,
+			SIZEOF_ARRAY(szTemp));
 		SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, szTemp);
 
 		assert(m_pSplitFile != nullptr);
@@ -434,8 +434,8 @@ void SplitFileDialog::OnOk()
 			}
 		}
 
-		m_pSplitFile = new SplitFile(
-			m_hDlg, m_strFullFilename, strOutputFilename, strOutputDirectory, uSplitSize);
+		m_pSplitFile = new SplitFile(m_hDlg, m_strFullFilename, strOutputFilename,
+			strOutputDirectory, uSplitSize);
 
 		GetDlgItemText(m_hDlg, IDOK, m_szOk, SIZEOF_ARRAY(m_szOk));
 
@@ -585,8 +585,8 @@ void SplitFile::Split()
 		nSplits++;
 	}
 
-	PostMessage(
-		m_hDlg, NSplitFileDialog::WM_APP_SETTOTALSPLITCOUNT, static_cast<WPARAM>(nSplits), 0);
+	PostMessage(m_hDlg, NSplitFileDialog::WM_APP_SETTOTALSPLITCOUNT, static_cast<WPARAM>(nSplits),
+		0);
 
 	SplitInternal(hInputFile, lFileSize);
 
@@ -648,8 +648,8 @@ void SplitFile::ProcessFilename(int nSplitsMade, std::wstring &strOutputFullFile
 
 	std::wstringstream ss;
 	ss << nSplitsMade;
-	strOutputFilename.replace(
-		strOutputFilename.find(NSplitFileDialog::COUNTER_PATTERN), 2, ss.str());
+	strOutputFilename.replace(strOutputFilename.find(NSplitFileDialog::COUNTER_PATTERN), 2,
+		ss.str());
 
 	strOutputFullFilename = m_strOutputDirectory + _T("\\") + strOutputFilename;
 }
@@ -686,12 +686,12 @@ void SplitFileDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 	RegistrySettings::ReadString(hKey, SETTING_SIZE_GROUP, m_strSplitGroup);
 }
 
-void SplitFileDialogPersistentSettings::SaveExtraXMLSettings(
-	IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode)
+void SplitFileDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
+	IXMLDOMElement *pParentNode)
 {
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SIZE, m_strSplitSize.c_str());
-	NXMLSettings::AddAttributeToNode(
-		pXMLDom, pParentNode, SETTING_SIZE_GROUP, m_strSplitGroup.c_str());
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SIZE_GROUP,
+		m_strSplitGroup.c_str());
 }
 
 void SplitFileDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue)

@@ -37,7 +37,8 @@ public:
 
 	friend class cereal::access;
 
-	template <class Archive> void serialize(Archive &archive)
+	template <class Archive>
+	void serialize(Archive &archive)
 	{
 		archive(m_guid, m_type, m_name, m_location, m_children);
 	}

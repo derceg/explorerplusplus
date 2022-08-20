@@ -10,6 +10,6 @@ class BookmarkTree;
 
 namespace BookmarkRegistryStorage
 {
-void Load(const std::wstring &applicationKeyPath, BookmarkTree *bookmarkTree);
-void Save(const std::wstring &applicationKeyPath, BookmarkTree *bookmarkTree);
+	void Load(const std::wstring &applicationKeyPath, BookmarkTree *bookmarkTree);
+	void Save(const std::wstring &applicationKeyPath, BookmarkTree *bookmarkTree);
 }

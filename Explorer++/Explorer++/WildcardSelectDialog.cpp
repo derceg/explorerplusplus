@@ -19,8 +19,8 @@ const TCHAR WildcardSelectDialogPersistentSettings::SETTINGS_KEY[] = _T("Wildcar
 const TCHAR WildcardSelectDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
 const TCHAR WildcardSelectDialogPersistentSettings::SETTING_CURRENT_TEXT[] = _T("CurrentText");
 
-WildcardSelectDialog::WildcardSelectDialog(
-	HINSTANCE hInstance, HWND hParent, BOOL bSelect, IExplorerplusplus *pexpp) :
+WildcardSelectDialog::WildcardSelectDialog(HINSTANCE hInstance, HWND hParent, BOOL bSelect,
+	IExplorerplusplus *pexpp) :
 	DarkModeDialogBase(hInstance, IDD_WILDCARDSELECT, hParent, true)
 {
 	m_bSelect = bSelect;
@@ -59,8 +59,8 @@ INT_PTR WildcardSelectDialog::OnInitDialog()
 	return 0;
 }
 
-void WildcardSelectDialog::GetResizableControlInformation(
-	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control> &controlList)
+void WildcardSelectDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+	std::list<ResizableDialog::Control> &controlList)
 {
 	dsc = BaseDialog::DialogSizeConstraint::X;
 
@@ -193,12 +193,12 @@ void WildcardSelectDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey
 void WildcardSelectDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
 	RegistrySettings::ReadStringList(hKey, SETTING_PATTERN_LIST, m_PatternList);
-	RegistrySettings::ReadString(
-		hKey, SETTING_CURRENT_TEXT, m_szPattern, SIZEOF_ARRAY(m_szPattern));
+	RegistrySettings::ReadString(hKey, SETTING_CURRENT_TEXT, m_szPattern,
+		SIZEOF_ARRAY(m_szPattern));
 }
 
-void WildcardSelectDialogPersistentSettings::SaveExtraXMLSettings(
-	IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode)
+void WildcardSelectDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
+	IXMLDOMElement *pParentNode)
 {
 	NXMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_PATTERN_LIST, m_PatternList);
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_CURRENT_TEXT, m_szPattern);

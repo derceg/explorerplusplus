@@ -221,8 +221,8 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		// This verb (which corresponds to the "Customize this folder..." menu item shown in the
 		// background context menu) doesn't appear to be a standard verb that's handled by the
 		// system. Therefore, it will be handled here.
-		return ExecuteFileAction(
-			m_hActiveListView, L"properties", L"customize", nullptr, pidlParent);
+		return ExecuteFileAction(m_hActiveListView, L"properties", L"customize", nullptr,
+			pidlParent);
 	}
 	else if (StrCmpI(szCmd, _T("refresh")) == 0)
 	{
@@ -295,8 +295,8 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	return FALSE;
 }
 
-void Explorerplusplus::HandleCustomMenuItem(
-	PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, int iCmd)
+void Explorerplusplus::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PITEMID_CHILD> &pidlItems, int iCmd)
 {
 	switch (iCmd)
 	{
@@ -306,8 +306,8 @@ void Explorerplusplus::HandleCustomMenuItem(
 		assert(pidlItems.size() == 1);
 
 		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
-		m_tabContainer->CreateNewTab(
-			pidlComplete.get(), TabSettings(_selected = m_config->openTabsInForeground));
+		m_tabContainer->CreateNewTab(pidlComplete.get(),
+			TabSettings(_selected = m_config->openTabsInForeground));
 
 		m_bTreeViewOpenInNewTab = true;
 	}

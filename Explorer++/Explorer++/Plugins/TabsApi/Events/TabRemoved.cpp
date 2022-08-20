@@ -7,13 +7,12 @@
 #include "SolWrapper.h"
 #include "TabContainer.h"
 
-Plugins::TabRemoved::TabRemoved(TabContainer *tabContainer) :
-	m_tabContainer(tabContainer)
+Plugins::TabRemoved::TabRemoved(TabContainer *tabContainer) : m_tabContainer(tabContainer)
 {
-
 }
 
-boost::signals2::connection Plugins::TabRemoved::connectObserver(sol::protected_function observer, sol::this_state state)
+boost::signals2::connection Plugins::TabRemoved::connectObserver(sol::protected_function observer,
+	sol::this_state state)
 {
 	UNREFERENCED_PARAMETER(state);
 

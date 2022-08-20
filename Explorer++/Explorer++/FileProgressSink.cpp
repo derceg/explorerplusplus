@@ -12,22 +12,22 @@ FileProgressSink *FileProgressSink::CreateNew()
 	return new FileProgressSink();
 }
 
-FileProgressSink::FileProgressSink() :
-	m_refCount(1)
+FileProgressSink::FileProgressSink() : m_refCount(1)
 {
-
 }
 
 HRESULT STDMETHODCALLTYPE FileProgressSink::QueryInterface(REFIID riid, void **ppvObject)
 {
-	#pragma warning(push)
-	#pragma warning(disable:4838) //conversion from 'DWORD' to 'int' requires a narrowing conversion
+#pragma warning(push)
+#pragma warning(disable : 4838) // conversion from 'DWORD' to 'int' requires a narrowing conversion
+	// clang-format off
 	static const QITAB qit[] =
 	{
 		QITABENT(FileProgressSink, IFileOperationProgressSink),
 		{nullptr}
 	};
-	#pragma warning(pop)
+// clang-format on
+#pragma warning(pop)
 
 	return QISearch(this, qit, riid, ppvObject);
 }
@@ -66,7 +66,8 @@ HRESULT STDMETHODCALLTYPE FileProgressSink::FinishOperations(HRESULT hrResult)
 	return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE FileProgressSink::PreRenameItem(DWORD dwFlags, IShellItem *psiItem, LPCWSTR pszNewName)
+HRESULT STDMETHODCALLTYPE FileProgressSink::PreRenameItem(DWORD dwFlags, IShellItem *psiItem,
+	LPCWSTR pszNewName)
 {
 	UNREFERENCED_PARAMETER(dwFlags);
 	UNREFERENCED_PARAMETER(psiItem);
@@ -75,8 +76,8 @@ HRESULT STDMETHODCALLTYPE FileProgressSink::PreRenameItem(DWORD dwFlags, IShellI
 	return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE FileProgressSink::PostRenameItem(DWORD dwFlags, IShellItem *psiItem, LPCWSTR pszNewName,
-	HRESULT hrRename, IShellItem *psiNewlyCreated)
+HRESULT STDMETHODCALLTYPE FileProgressSink::PostRenameItem(DWORD dwFlags, IShellItem *psiItem,
+	LPCWSTR pszNewName, HRESULT hrRename, IShellItem *psiNewlyCreated)
 {
 	UNREFERENCED_PARAMETER(dwFlags);
 	UNREFERENCED_PARAMETER(psiItem);
@@ -87,7 +88,8 @@ HRESULT STDMETHODCALLTYPE FileProgressSink::PostRenameItem(DWORD dwFlags, IShell
 	return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE FileProgressSink::PreMoveItem(DWORD dwFlags, IShellItem *psiItem, IShellItem *psiDestinationFolder, LPCWSTR pszNewName)
+HRESULT STDMETHODCALLTYPE FileProgressSink::PreMoveItem(DWORD dwFlags, IShellItem *psiItem,
+	IShellItem *psiDestinationFolder, LPCWSTR pszNewName)
 {
 	UNREFERENCED_PARAMETER(dwFlags);
 	UNREFERENCED_PARAMETER(psiItem);
@@ -97,8 +99,9 @@ HRESULT STDMETHODCALLTYPE FileProgressSink::PreMoveItem(DWORD dwFlags, IShellIte
 	return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE FileProgressSink::PostMoveItem(DWORD dwFlags, IShellItem *psiItem, IShellItem *psiDestinationFolder,
-	LPCWSTR pszNewName, HRESULT hrMove, IShellItem *psiNewlyCreated)
+HRESULT STDMETHODCALLTYPE FileProgressSink::PostMoveItem(DWORD dwFlags, IShellItem *psiItem,
+	IShellItem *psiDestinationFolder, LPCWSTR pszNewName, HRESULT hrMove,
+	IShellItem *psiNewlyCreated)
 {
 	UNREFERENCED_PARAMETER(dwFlags);
 	UNREFERENCED_PARAMETER(psiItem);
@@ -110,7 +113,8 @@ HRESULT STDMETHODCALLTYPE FileProgressSink::PostMoveItem(DWORD dwFlags, IShellIt
 	return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE FileProgressSink::PreCopyItem(DWORD dwFlags, IShellItem *psiItem, IShellItem *psiDestinationFolder, LPCWSTR pszNewName)
+HRESULT STDMETHODCALLTYPE FileProgressSink::PreCopyItem(DWORD dwFlags, IShellItem *psiItem,
+	IShellItem *psiDestinationFolder, LPCWSTR pszNewName)
 {
 	UNREFERENCED_PARAMETER(dwFlags);
 	UNREFERENCED_PARAMETER(psiItem);
@@ -120,8 +124,9 @@ HRESULT STDMETHODCALLTYPE FileProgressSink::PreCopyItem(DWORD dwFlags, IShellIte
 	return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE FileProgressSink::PostCopyItem(DWORD dwFlags, IShellItem *psiItem, IShellItem *psiDestinationFolder,
-	LPCWSTR pszNewName, HRESULT hrCopy, IShellItem *psiNewlyCreated)
+HRESULT STDMETHODCALLTYPE FileProgressSink::PostCopyItem(DWORD dwFlags, IShellItem *psiItem,
+	IShellItem *psiDestinationFolder, LPCWSTR pszNewName, HRESULT hrCopy,
+	IShellItem *psiNewlyCreated)
 {
 	UNREFERENCED_PARAMETER(dwFlags);
 	UNREFERENCED_PARAMETER(psiItem);
@@ -141,7 +146,8 @@ HRESULT STDMETHODCALLTYPE FileProgressSink::PreDeleteItem(DWORD dwFlags, IShellI
 	return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE FileProgressSink::PostDeleteItem(DWORD dwFlags, IShellItem *psiItem, HRESULT hrDelete, IShellItem *psiNewlyCreated)
+HRESULT STDMETHODCALLTYPE FileProgressSink::PostDeleteItem(DWORD dwFlags, IShellItem *psiItem,
+	HRESULT hrDelete, IShellItem *psiNewlyCreated)
 {
 	UNREFERENCED_PARAMETER(dwFlags);
 	UNREFERENCED_PARAMETER(psiItem);
@@ -151,7 +157,8 @@ HRESULT STDMETHODCALLTYPE FileProgressSink::PostDeleteItem(DWORD dwFlags, IShell
 	return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE FileProgressSink::PreNewItem(DWORD dwFlags, IShellItem *psiDestinationFolder, LPCWSTR pszNewName)
+HRESULT STDMETHODCALLTYPE FileProgressSink::PreNewItem(DWORD dwFlags,
+	IShellItem *psiDestinationFolder, LPCWSTR pszNewName)
 {
 	UNREFERENCED_PARAMETER(dwFlags);
 	UNREFERENCED_PARAMETER(psiDestinationFolder);
@@ -160,8 +167,9 @@ HRESULT STDMETHODCALLTYPE FileProgressSink::PreNewItem(DWORD dwFlags, IShellItem
 	return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE FileProgressSink::PostNewItem(DWORD dwFlags, IShellItem *psiDestinationFolder, LPCWSTR pszNewName,
-	LPCWSTR pszTemplateName, DWORD dwFileAttributes, HRESULT hrNew, IShellItem *psiNewItem)
+HRESULT STDMETHODCALLTYPE FileProgressSink::PostNewItem(DWORD dwFlags,
+	IShellItem *psiDestinationFolder, LPCWSTR pszNewName, LPCWSTR pszTemplateName,
+	DWORD dwFileAttributes, HRESULT hrNew, IShellItem *psiNewItem)
 {
 	UNREFERENCED_PARAMETER(dwFlags);
 	UNREFERENCED_PARAMETER(psiDestinationFolder);

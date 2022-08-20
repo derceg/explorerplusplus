@@ -13,8 +13,8 @@
 
 using namespace DarkModeButton;
 
-DarkModeDialogBase::DarkModeDialogBase(
-	HINSTANCE hInstance, int iResource, HWND hParent, bool bResizable) :
+DarkModeDialogBase::DarkModeDialogBase(HINSTANCE hInstance, int iResource, HWND hParent,
+	bool bResizable) :
 	BaseDialog(hInstance, iResource, hParent, bResizable)
 {
 }
@@ -44,8 +44,8 @@ void DarkModeDialogBase::OnInitDialogBase()
 	darkModeHelper.SetDarkModeForControl(m_tipWnd);
 }
 
-LRESULT CALLBACK DarkModeDialogBase::DialogWndProc(
-	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK DarkModeDialogBase::DialogWndProc(HWND hwnd, UINT msg, WPARAM wParam,
+	LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -119,8 +119,8 @@ void DarkModeDialogBase::AllowDarkModeForListView(int controlId)
 	}
 }
 
-LRESULT CALLBACK DarkModeDialogBase::ListViewWndProc(
-	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK DarkModeDialogBase::ListViewWndProc(HWND hwnd, UINT msg, WPARAM wParam,
+	LPARAM lParam)
 {
 	switch (msg)
 	{

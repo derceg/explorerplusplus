@@ -47,14 +47,14 @@ std::tuple<wil::unique_himagelist, IconImageListMapping> ResourceHelper::CreateI
 	IconResourceLoader *iconResourceLoader, int iconWidth, int iconHeight,
 	const std::initializer_list<Icon> &icons)
 {
-	wil::unique_himagelist imageList(ImageList_Create(
-		iconWidth, iconHeight, ILC_COLOR32 | ILC_MASK, 0, static_cast<int>(icons.size())));
+	wil::unique_himagelist imageList(ImageList_Create(iconWidth, iconHeight, ILC_COLOR32 | ILC_MASK,
+		0, static_cast<int>(icons.size())));
 	IconImageListMapping imageListMappings;
 
 	for (auto icon : icons)
 	{
-		AddIconToImageList(
-			imageList.get(), iconResourceLoader, icon, iconWidth, iconHeight, imageListMappings);
+		AddIconToImageList(imageList.get(), iconResourceLoader, icon, iconWidth, iconHeight,
+			imageListMappings);
 	}
 
 	return { std::move(imageList), imageListMappings };

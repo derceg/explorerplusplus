@@ -20,8 +20,8 @@
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
 
-LRESULT CALLBACK RebarSubclassStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+LRESULT CALLBACK RebarSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
 static const int TOOLBAR_BOOKMARK_START = 46000;
 static const int TOOLBAR_BOOKMARK_END = TOOLBAR_BOOKMARK_START + 1000;
@@ -204,8 +204,8 @@ void Explorerplusplus::CreateMainControls()
 	}
 }
 
-LRESULT CALLBACK RebarSubclassStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK RebarSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -323,8 +323,8 @@ void Explorerplusplus::CreateMainToolbar()
 			tbSave.hkr = HKEY_CURRENT_USER;
 			tbSave.pszSubKey = NExplorerplusplus::REG_SETTINGS_KEY;
 			tbSave.pszValueName = _T("ToolbarState");
-			SendMessage(
-				m_mainToolbar->GetHWND(), TB_SAVERESTORE, FALSE, reinterpret_cast<LPARAM>(&tbSave));
+			SendMessage(m_mainToolbar->GetHWND(), TB_SAVERESTORE, FALSE,
+				reinterpret_cast<LPARAM>(&tbSave));
 
 			// As part of restoring the toolbar, the state of some items may be
 			// lost, so set their state again here.

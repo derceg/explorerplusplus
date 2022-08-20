@@ -14,14 +14,14 @@
 #include "../Helper/ProcessHelper.h"
 #include <wil/resource.h>
 
-MainWindow *MainWindow::Create(
-	HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance, IExplorerplusplus *expp)
+MainWindow *MainWindow::Create(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
+	IExplorerplusplus *expp)
 {
 	return new MainWindow(hwnd, config, instance, expp);
 }
 
-MainWindow::MainWindow(
-	HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance, IExplorerplusplus *expp) :
+MainWindow::MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
+	IExplorerplusplus *expp) :
 	BaseWindow(hwnd),
 	m_hwnd(hwnd),
 	m_config(config),
@@ -140,8 +140,8 @@ void MainWindow::UpdateWindowText()
 		}
 		else if (CheckGroupMembership(GroupType::Users))
 		{
-			LoadString(
-				m_instance, IDS_PRIVILEGE_LEVEL_USERS, szPrivilege, SIZEOF_ARRAY(szPrivilege));
+			LoadString(m_instance, IDS_PRIVILEGE_LEVEL_USERS, szPrivilege,
+				SIZEOF_ARRAY(szPrivilege));
 		}
 		else if (CheckGroupMembership(GroupType::UsersRestricted))
 		{
@@ -151,13 +151,13 @@ void MainWindow::UpdateWindowText()
 
 		if (m_config->showUserNameInTitleBar.get())
 		{
-			StringCchPrintf(
-				szPrivilegeAddition, SIZEOF_ARRAY(szPrivilegeAddition), _T(" - %s"), szPrivilege);
+			StringCchPrintf(szPrivilegeAddition, SIZEOF_ARRAY(szPrivilegeAddition), _T(" - %s"),
+				szPrivilege);
 		}
 		else
 		{
-			StringCchPrintf(
-				szPrivilegeAddition, SIZEOF_ARRAY(szPrivilegeAddition), _T("%s"), szPrivilege);
+			StringCchPrintf(szPrivilegeAddition, SIZEOF_ARRAY(szPrivilegeAddition), _T("%s"),
+				szPrivilege);
 		}
 
 		StringCchCat(szTitle, SIZEOF_ARRAY(szTitle), szPrivilegeAddition);

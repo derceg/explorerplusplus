@@ -41,8 +41,8 @@ private:
 class MainToolbar : public BaseWindow
 {
 public:
-	static MainToolbar *Create(
-		HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp, std::shared_ptr<Config> config);
+	static MainToolbar *Create(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
+		std::shared_ptr<Config> config);
 
 	void UpdateConfigDependentButtonStates();
 	void UpdateToolbarButtonStates();
@@ -57,8 +57,8 @@ private:
 		Forward
 	};
 
-	MainToolbar(
-		HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp, std::shared_ptr<Config> config);
+	MainToolbar(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
+		std::shared_ptr<Config> config);
 	~MainToolbar();
 
 	static HWND CreateMainToolbar(HWND parent);
@@ -71,8 +71,8 @@ private:
 
 	void Initialize(HWND parent);
 	void SetTooolbarImageList();
-	static std::unordered_map<int, int> SetUpToolbarImageList(
-		HIMAGELIST imageList, IconResourceLoader *iconResourceLoader, int iconSize, UINT dpi);
+	static std::unordered_map<int, int> SetUpToolbarImageList(HIMAGELIST imageList,
+		IconResourceLoader *iconResourceLoader, int iconSize, UINT dpi);
 	void AddButtonsToToolbar(const std::vector<ToolbarButton> &buttons);
 	void AddButtonToToolbar(ToolbarButton button);
 	TBBUTTON GetToolbarButtonDetails(ToolbarButton button) const;

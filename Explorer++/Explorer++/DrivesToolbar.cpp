@@ -103,8 +103,8 @@ INT_PTR DrivesToolbar::OnMButtonUp(const POINTS *pts, UINT keysDown)
 		switchToNewTab = !switchToNewTab;
 	}
 
-	m_pexpp->GetTabContainer()->CreateNewTab(
-		itr->second.c_str(), TabSettings(_selected = switchToNewTab));
+	m_pexpp->GetTabContainer()->CreateNewTab(itr->second.c_str(),
+		TabSettings(_selected = switchToNewTab));
 
 	return 0;
 }
@@ -168,8 +168,8 @@ void DrivesToolbar::OnDeviceRemoveComplete(DEV_BROADCAST_HDR *dbh)
 	}
 }
 
-LRESULT CALLBACK DrivesToolbar::DrivesToolbarParentProcStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK DrivesToolbar::DrivesToolbarParentProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
+	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -178,8 +178,8 @@ LRESULT CALLBACK DrivesToolbar::DrivesToolbarParentProcStub(
 	return pdt->DrivesToolbarParentProc(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK DrivesToolbar::DrivesToolbarParentProc(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK DrivesToolbar::DrivesToolbarParentProc(HWND hwnd, UINT uMsg, WPARAM wParam,
+	LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -218,8 +218,8 @@ LRESULT CALLBACK DrivesToolbar::DrivesToolbarParentProc(
 						std::wstring path = GetDrivePath(iIndex);
 
 						unique_pidl_absolute pidl;
-						HRESULT hr = SHParseDisplayName(
-							path.c_str(), nullptr, wil::out_param(pidl), 0, nullptr);
+						HRESULT hr = SHParseDisplayName(path.c_str(), nullptr, wil::out_param(pidl),
+							0, nullptr);
 
 						if (SUCCEEDED(hr))
 						{
@@ -297,8 +297,8 @@ void DrivesToolbar::InsertDrive(const std::wstring &DrivePath)
 	}
 
 	SHFILEINFO shfi;
-	SHGetFileInfo(
-		DrivePath.c_str(), 0, &shfi, sizeof(shfi), SHGFI_SYSICONINDEX | SHGFI_USEFILEATTRIBUTES);
+	SHGetFileInfo(DrivePath.c_str(), 0, &shfi, sizeof(shfi),
+		SHGFI_SYSICONINDEX | SHGFI_USEFILEATTRIBUTES);
 
 	int position = GetSortedPosition(DrivePath);
 
@@ -441,8 +441,8 @@ BOOL DrivesToolbar::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	return FALSE;
 }
 
-void DrivesToolbar::HandleCustomMenuItem(
-	PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, int iCmd)
+void DrivesToolbar::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PITEMID_CHILD> &pidlItems, int iCmd)
 {
 	UNREFERENCED_PARAMETER(pidlItems);
 
@@ -453,8 +453,8 @@ void DrivesToolbar::HandleCustomMenuItem(
 		assert(pidlItems.size() == 1);
 
 		unique_pidl_absolute pidl(ILCombine(pidlParent, pidlItems[0]));
-		m_pexpp->GetTabContainer()->CreateNewTab(
-			pidl.get(), TabSettings(_selected = m_pexpp->GetConfig()->openTabsInForeground));
+		m_pexpp->GetTabContainer()->CreateNewTab(pidl.get(),
+			TabSettings(_selected = m_pexpp->GetConfig()->openTabsInForeground));
 	}
 	break;
 	}

@@ -8,11 +8,11 @@
 
 namespace ApplicationToolbarHelper
 {
-struct ApplicationInfo
-{
-	std::wstring application;
-	std::wstring parameters;
-};
+	struct ApplicationInfo
+	{
+		std::wstring application;
+		std::wstring parameters;
+	};
 
-ApplicationInfo ParseCommandString(const std::wstring &command);
+	ApplicationInfo ParseCommandString(const std::wstring &command);
 }

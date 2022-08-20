@@ -11,8 +11,8 @@
 
 const TCHAR RenameTabDialogPersistentSettings::SETTINGS_KEY[] = _T("RenameTab");
 
-RenameTabDialog::RenameTabDialog(
-	HINSTANCE hInstance, HWND hParent, int tabId, TabContainer *tabContainer) :
+RenameTabDialog::RenameTabDialog(HINSTANCE hInstance, HWND hParent, int tabId,
+	TabContainer *tabContainer) :
 	DarkModeDialogBase(hInstance, IDD_RENAMETAB, hParent, false),
 	m_tabId(tabId),
 	m_tabContainer(tabContainer)

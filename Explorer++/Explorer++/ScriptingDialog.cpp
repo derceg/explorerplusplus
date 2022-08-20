@@ -10,8 +10,8 @@
 #include "../Helper/WindowHelper.h"
 #include <boost/algorithm/string.hpp>
 
-ScriptingDialog::ScriptingDialog(
-	HINSTANCE hInstance, HWND hParent, PluginInterface *pluginInterface) :
+ScriptingDialog::ScriptingDialog(HINSTANCE hInstance, HWND hParent,
+	PluginInterface *pluginInterface) :
 	DarkModeDialogBase(hInstance, IDD_SCRIPTING, hParent, true),
 	m_luaPlugin(L"", Plugins::Manifest(), pluginInterface)
 {
@@ -28,8 +28,8 @@ INT_PTR ScriptingDialog::OnInitDialog()
 	return FALSE;
 }
 
-void ScriptingDialog::GetResizableControlInformation(
-	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control> &ControlList)
+void ScriptingDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+	std::list<ResizableDialog::Control> &ControlList)
 {
 	dsc = BaseDialog::DialogSizeConstraint::None;
 

@@ -54,8 +54,8 @@ BookmarkListView::BookmarkListView(HWND hListView, HMODULE resourceModule,
 
 	InsertColumns(initialColumns);
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
-		m_hListView, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hListView, WndProcStub,
+		SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(m_hListView),
 		ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
@@ -168,8 +168,8 @@ UINT BookmarkListView::GetColumnTextResourceId(BookmarkHelper::ColumnType column
 	throw std::runtime_error("Bookmark column string resource not found");
 }
 
-LRESULT CALLBACK BookmarkListView::WndProcStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK BookmarkListView::WndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -229,8 +229,8 @@ LRESULT CALLBACK BookmarkListView::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK BookmarkListView::ParentWndProcStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK BookmarkListView::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
+	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -533,8 +533,8 @@ void BookmarkListView::OnDblClk(const NMITEMACTIVATE *itemActivate)
 	}
 	else
 	{
-		BookmarkHelper::OpenBookmarkItemInNewTab(
-			bookmarkItem, m_expp, m_expp->GetConfig()->openTabsInForeground);
+		BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_expp,
+			m_expp->GetConfig()->openTabsInForeground);
 	}
 }
 
@@ -575,8 +575,8 @@ void BookmarkListView::OnShowContextMenu(const POINT &ptScreen)
 			ClientToScreen(m_hListView, &finalPoint);
 		}
 
-		m_bookmarkContextMenu.ShowMenu(
-			m_hListView, m_currentBookmarkFolder, rawBookmarkItems, finalPoint);
+		m_bookmarkContextMenu.ShowMenu(m_hListView, m_currentBookmarkFolder, rawBookmarkItems,
+			finalPoint);
 	}
 }
 
@@ -592,8 +592,8 @@ void BookmarkListView::ShowBackgroundContextMenu(const POINT &ptScreen)
 
 	HMENU menu = GetSubMenu(parentMenu.get(), 0);
 
-	int menuItemId = TrackPopupMenu(
-		menu, TPM_LEFTALIGN | TPM_RETURNCMD, ptScreen.x, ptScreen.y, 0, m_hListView, nullptr);
+	int menuItemId = TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RETURNCMD, ptScreen.x, ptScreen.y, 0,
+		m_hListView, nullptr);
 
 	if (menuItemId != 0)
 	{
@@ -729,8 +729,8 @@ void BookmarkListView::OnGetDispInfo(NMLVDISPINFO *dispInfo)
 	}
 }
 
-std::wstring BookmarkListView::GetBookmarkItemColumnInfo(
-	const BookmarkItem *bookmarkItem, BookmarkHelper::ColumnType columnType)
+std::wstring BookmarkListView::GetBookmarkItemColumnInfo(const BookmarkItem *bookmarkItem,
+	BookmarkHelper::ColumnType columnType)
 {
 	switch (columnType)
 	{
@@ -861,8 +861,8 @@ void BookmarkListView::OnBeginDrag()
 	auto dataObject = BookmarkDataExchange::CreateDataObject(bookmarkItems);
 
 	wil::com_ptr_nothrow<IDragSourceHelper> dragSourceHelper;
-	hr = CoCreateInstance(
-		CLSID_DragDropHelper, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&dragSourceHelper));
+	hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_ALL,
+		IID_PPV_ARGS(&dragSourceHelper));
 
 	if (SUCCEEDED(hr))
 	{
@@ -983,8 +983,8 @@ void BookmarkListView::OnHeaderRClick(const POINT &pt)
 	/* The name column cannot be removed. */
 	MenuHelper::EnableItem(menu.get(), static_cast<UINT>(BookmarkHelper::ColumnType::Name), FALSE);
 
-	int cmd = TrackPopupMenu(
-		menu.get(), TPM_LEFTALIGN | TPM_RETURNCMD, pt.x, pt.y, 0, m_hListView, nullptr);
+	int cmd = TrackPopupMenu(menu.get(), TPM_LEFTALIGN | TPM_RETURNCMD, pt.x, pt.y, 0, m_hListView,
+		nullptr);
 
 	if (cmd != 0)
 	{
@@ -1059,8 +1059,8 @@ void BookmarkListView::OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t in
 	}
 }
 
-void BookmarkListView::OnBookmarkItemUpdated(
-	BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType)
+void BookmarkListView::OnBookmarkItemUpdated(BookmarkItem &bookmarkItem,
+	BookmarkItem::PropertyType propertyType)
 {
 	if (bookmarkItem.GetParent() != m_currentBookmarkFolder)
 	{
@@ -1171,9 +1171,11 @@ BookmarkHelper::ColumnType BookmarkListView::MapPropertyTypeToColumnType(
 
 BookmarkListView::Column &BookmarkListView::GetColumnByType(BookmarkHelper::ColumnType columnType)
 {
-	auto itr = std::find_if(m_columns.begin(), m_columns.end(), [columnType](const Column &column) {
-		return column.columnType == columnType;
-	});
+	auto itr = std::find_if(m_columns.begin(), m_columns.end(),
+		[columnType](const Column &column)
+		{
+			return column.columnType == columnType;
+		});
 
 	assert(itr != m_columns.end());
 
@@ -1185,9 +1187,11 @@ BookmarkListView::Column &BookmarkListView::GetColumnByType(BookmarkHelper::Colu
 std::optional<int> BookmarkListView::GetColumnHeaderIndexByType(
 	BookmarkHelper::ColumnType columnType) const
 {
-	auto itr = std::find_if(m_columns.begin(), m_columns.end(), [columnType](const Column &column) {
-		return column.columnType == columnType;
-	});
+	auto itr = std::find_if(m_columns.begin(), m_columns.end(),
+		[columnType](const Column &column)
+		{
+			return column.columnType == columnType;
+		});
 
 	if (itr == m_columns.end())
 	{
@@ -1199,9 +1203,11 @@ std::optional<int> BookmarkListView::GetColumnHeaderIndexByType(
 		return std::nullopt;
 	}
 
-	auto columnIndex = std::count_if(m_columns.begin(), itr, [](const Column &column) {
-		return column.active;
-	});
+	auto columnIndex = std::count_if(m_columns.begin(), itr,
+		[](const Column &column)
+		{
+			return column.active;
+		});
 
 	return static_cast<int>(columnIndex);
 }
@@ -1211,15 +1217,19 @@ std::optional<int> BookmarkListView::GetColumnHeaderIndexByType(
 // return the index the column would be shown at, if it were active.
 int BookmarkListView::GetColumnIndexByType(BookmarkHelper::ColumnType columnType) const
 {
-	auto itr = std::find_if(m_columns.begin(), m_columns.end(), [columnType](const Column &column) {
-		return column.columnType == columnType;
-	});
+	auto itr = std::find_if(m_columns.begin(), m_columns.end(),
+		[columnType](const Column &column)
+		{
+			return column.columnType == columnType;
+		});
 
 	assert(itr != m_columns.end());
 
-	auto columnIndex = std::count_if(m_columns.begin(), itr, [](const Column &column) {
-		return column.active;
-	});
+	auto columnIndex = std::count_if(m_columns.begin(), itr,
+		[](const Column &column)
+		{
+			return column.active;
+		});
 
 	return static_cast<int>(columnIndex);
 }

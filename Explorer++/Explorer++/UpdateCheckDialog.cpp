@@ -193,8 +193,8 @@ void UpdateCheckDialog::OnUpdateCheckSuccess(Version *version)
 		|| (version->MajorVersion == MAJOR_VERSION && version->MinorVersion == MINOR_VERSION
 			&& version->MicroVersion > MICRO_VERSION))
 	{
-		LoadString(
-			GetInstance(), IDS_UPDATE_CHECK_NEW_VERSION_AVAILABLE, szTemp, SIZEOF_ARRAY(szTemp));
+		LoadString(GetInstance(), IDS_UPDATE_CHECK_NEW_VERSION_AVAILABLE, szTemp,
+			SIZEOF_ARRAY(szTemp));
 		StringCchPrintf(szStatus, SIZEOF_ARRAY(szStatus), szTemp, version->VersionString);
 	}
 	else

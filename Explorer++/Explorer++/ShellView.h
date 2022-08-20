@@ -28,8 +28,8 @@ public:
 		IShellBrowser *shellBrowser, RECT *view, HWND *hwnd);
 	IFACEMETHODIMP DestroyViewWindow();
 	IFACEMETHODIMP GetCurrentInfo(LPFOLDERSETTINGS folderSettings);
-	IFACEMETHODIMP AddPropertySheetPages(
-		DWORD reserved, LPFNSVADDPROPSHEETPAGE callback, LPARAM lParam);
+	IFACEMETHODIMP AddPropertySheetPages(DWORD reserved, LPFNSVADDPROPSHEETPAGE callback,
+		LPARAM lParam);
 	IFACEMETHODIMP SaveViewState();
 	IFACEMETHODIMP SelectItem(PCUITEMID_CHILD pidlItem, SVSIF flags);
 	IFACEMETHODIMP GetItemObject(UINT item, REFIID riid, void **ppv);

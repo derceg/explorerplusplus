@@ -6,14 +6,14 @@
 #include "ApplicationToolbarDropHandler.h"
 #include "../Helper/Macros.h"
 
-ApplicationToolbarDropHandler::ApplicationToolbarDropHandler(
-	HWND hToolbar, ApplicationToolbar *toolbar) :
+ApplicationToolbarDropHandler::ApplicationToolbarDropHandler(HWND hToolbar,
+	ApplicationToolbar *toolbar) :
 	m_RefCount(1),
 	m_toolbar(toolbar),
 	m_hToolbar(hToolbar)
 {
-	HRESULT hr = CoCreateInstance(
-		CLSID_DragDropHelper, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_pDragSourceHelper));
+	HRESULT hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_INPROC_SERVER,
+		IID_PPV_ARGS(&m_pDragSourceHelper));
 
 	if (SUCCEEDED(hr))
 	{
@@ -66,8 +66,8 @@ ULONG __stdcall ApplicationToolbarDropHandler::Release()
 	return m_RefCount;
 }
 
-HRESULT _stdcall ApplicationToolbarDropHandler::DragEnter(
-	IDataObject *pDataObject, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
+HRESULT _stdcall ApplicationToolbarDropHandler::DragEnter(IDataObject *pDataObject,
+	DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
 {
 	UNREFERENCED_PARAMETER(grfKeyState);
 
@@ -90,8 +90,8 @@ HRESULT _stdcall ApplicationToolbarDropHandler::DragEnter(
 	return hr;
 }
 
-HRESULT _stdcall ApplicationToolbarDropHandler::DragOver(
-	DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
+HRESULT _stdcall ApplicationToolbarDropHandler::DragOver(DWORD grfKeyState, POINTL pt,
+	DWORD *pdwEffect)
 {
 	UNREFERENCED_PARAMETER(grfKeyState);
 
@@ -115,8 +115,8 @@ FORMATETC ApplicationToolbarDropHandler::GetSupportedDropFormat()
 	return ftc;
 }
 
-HRESULT _stdcall ApplicationToolbarDropHandler::Drop(
-	IDataObject *pDataObject, DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect)
+HRESULT _stdcall ApplicationToolbarDropHandler::Drop(IDataObject *pDataObject, DWORD grfKeyState,
+	POINTL ptl, DWORD *pdwEffect)
 {
 	UNREFERENCED_PARAMETER(grfKeyState);
 

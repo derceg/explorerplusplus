@@ -220,23 +220,23 @@ int CALLBACK ShellBrowser::Sort(int InternalIndex1, int InternalIndex2) const
 			break;
 
 		case SortMode::NumPrinterDocuments:
-			comparisonResult = SortByPrinterProperty(
-				basicItemInfo1, basicItemInfo2, PrinterInformationType::NumJobs);
+			comparisonResult = SortByPrinterProperty(basicItemInfo1, basicItemInfo2,
+				PrinterInformationType::NumJobs);
 			break;
 
 		case SortMode::PrinterStatus:
-			comparisonResult = SortByPrinterProperty(
-				basicItemInfo1, basicItemInfo2, PrinterInformationType::Status);
+			comparisonResult = SortByPrinterProperty(basicItemInfo1, basicItemInfo2,
+				PrinterInformationType::Status);
 			break;
 
 		case SortMode::PrinterComments:
-			comparisonResult = SortByPrinterProperty(
-				basicItemInfo1, basicItemInfo2, PrinterInformationType::Comments);
+			comparisonResult = SortByPrinterProperty(basicItemInfo1, basicItemInfo2,
+				PrinterInformationType::Comments);
 			break;
 
 		case SortMode::PrinterLocation:
-			comparisonResult = SortByPrinterProperty(
-				basicItemInfo1, basicItemInfo2, PrinterInformationType::Location);
+			comparisonResult = SortByPrinterProperty(basicItemInfo1, basicItemInfo2,
+				PrinterInformationType::Location);
 			break;
 
 		case SortMode::NetworkAdapterStatus:
@@ -279,8 +279,8 @@ int CALLBACK ShellBrowser::Sort(int InternalIndex1, int InternalIndex2) const
 			break;
 
 		case SortMode::MediaBeatsPerMinute:
-			comparisonResult = SortByMediaMetadata(
-				basicItemInfo1, basicItemInfo2, MediaMetadataType::BeatsPerMinute);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,
+				MediaMetadataType::BeatsPerMinute);
 			break;
 
 		case SortMode::MediaComposer:
@@ -309,8 +309,8 @@ int CALLBACK ShellBrowser::Sort(int InternalIndex1, int InternalIndex2) const
 			break;
 
 		case SortMode::MediaBroadcastDate:
-			comparisonResult = SortByMediaMetadata(
-				basicItemInfo1, basicItemInfo2, MediaMetadataType::BroadcastDate);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,
+				MediaMetadataType::BroadcastDate);
 			break;
 
 		case SortMode::MediaChannel:
@@ -329,13 +329,13 @@ int CALLBACK ShellBrowser::Sort(int InternalIndex1, int InternalIndex2) const
 			break;
 
 		case SortMode::MediaParentalRating:
-			comparisonResult = SortByMediaMetadata(
-				basicItemInfo1, basicItemInfo2, MediaMetadataType::ParentalRating);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,
+				MediaMetadataType::ParentalRating);
 			break;
 
 		case SortMode::MediaParentalRatingReason:
-			comparisonResult = SortByMediaMetadata(
-				basicItemInfo1, basicItemInfo2, MediaMetadataType::ParentalRatingReason);
+			comparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,
+				MediaMetadataType::ParentalRatingReason);
 			break;
 
 		case SortMode::MediaPeriod:

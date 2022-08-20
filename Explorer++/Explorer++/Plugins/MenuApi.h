@@ -15,7 +15,6 @@ namespace Plugins
 	class MenuApi
 	{
 	public:
-
 		MenuApi(PluginMenuManager *pluginMenuManager);
 		~MenuApi();
 
@@ -23,7 +22,6 @@ namespace Plugins
 		void remove(int menuItemId);
 
 	private:
-
 		void onMenuItemClicked(int menuItemId);
 
 		PluginMenuManager *m_pluginMenuManager;

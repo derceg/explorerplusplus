@@ -27,8 +27,8 @@ namespace BookmarkHelper
 	bool IsFolder(const std::unique_ptr<BookmarkItem> &bookmarkItem);
 	bool IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem);
 
-	int CALLBACK Sort(
-		ColumnType columnType, const BookmarkItem *firstItem, const BookmarkItem *secondItem);
+	int CALLBACK Sort(ColumnType columnType, const BookmarkItem *firstItem,
+		const BookmarkItem *secondItem);
 
 	void BookmarkAllTabs(BookmarkTree *bookmarkTree, HMODULE resoureceModule, HWND parentWindow,
 		IExplorerplusplus *coreInterface);
@@ -38,11 +38,11 @@ namespace BookmarkHelper
 		std::optional<std::wstring> customDialogTitle = std::nullopt);
 	void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
 		HMODULE resoureceModule, HWND parentWindow, IExplorerplusplus *coreInterface);
-	void OpenBookmarkItemInNewTab(
-		const BookmarkItem *bookmarkItem, IExplorerplusplus *expp, bool switchToNewTab);
+	void OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem, IExplorerplusplus *expp,
+		bool switchToNewTab);
 
-	bool CopyBookmarkItems(
-		BookmarkTree *bookmarkTree, const RawBookmarkItems &bookmarkItems, bool cut);
+	bool CopyBookmarkItems(BookmarkTree *bookmarkTree, const RawBookmarkItems &bookmarkItems,
+		bool cut);
 	void PasteBookmarkItems(BookmarkTree *bookmarkTree, BookmarkItem *parentFolder, size_t index);
 
 	BookmarkItem *GetBookmarkItemById(BookmarkTree *bookmarkTree, std::wstring_view guid);

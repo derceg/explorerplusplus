@@ -126,8 +126,8 @@ void ShellBrowser::RemoveFilteredItem(int iItem, int iItemInternal)
 
 BOOL ShellBrowser::IsFilenameFiltered(const TCHAR *FileName) const
 {
-	if (CheckWildcardMatch(
-			m_folderSettings.filter.c_str(), FileName, m_folderSettings.filterCaseSensitive))
+	if (CheckWildcardMatch(m_folderSettings.filter.c_str(), FileName,
+			m_folderSettings.filterCaseSensitive))
 	{
 		return FALSE;
 	}

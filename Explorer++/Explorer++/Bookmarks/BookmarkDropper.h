@@ -31,8 +31,8 @@ private:
 		std::optional<ExtractionSource> extractionSource;
 	};
 
-	static bool CanMoveBookmarkItemIntoFolder(
-		BookmarkItem *bookmarkItem, BookmarkItem *parentFolder);
+	static bool CanMoveBookmarkItemIntoFolder(BookmarkItem *bookmarkItem,
+		BookmarkItem *parentFolder);
 	ExtractedInfo &GetExtractedInfo();
 	ExtractedInfo ExtractBookmarkItems();
 	BookmarkItems ExtractBookmarkItemsFromCustomFormat();

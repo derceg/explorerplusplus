@@ -67,8 +67,8 @@ const BookmarkItem *BookmarkTree::GetOtherBookmarksFolder() const
 	return m_otherBookmarks;
 }
 
-BookmarkItem *BookmarkTree::AddBookmarkItem(
-	BookmarkItem *parent, std::unique_ptr<BookmarkItem> bookmarkItem, size_t index)
+BookmarkItem *BookmarkTree::AddBookmarkItem(BookmarkItem *parent,
+	std::unique_ptr<BookmarkItem> bookmarkItem, size_t index)
 {
 	if (!CanAddChildren(parent))
 	{
@@ -76,16 +76,18 @@ BookmarkItem *BookmarkTree::AddBookmarkItem(
 		return nullptr;
 	}
 
-	bookmarkItem->VisitRecursively([this](BookmarkItem *currentItem) {
-		currentItem->ClearOriginalGUID();
+	bookmarkItem->VisitRecursively(
+		[this](BookmarkItem *currentItem)
+		{
+			currentItem->ClearOriginalGUID();
 
-		// Adds an observer to each bookmark item that's being added. This is
-		// needed so that this class can broadcast an event whenever an
-		// individual bookmark item is updated.
+			// Adds an observer to each bookmark item that's being added. This is
+			// needed so that this class can broadcast an event whenever an
+			// individual bookmark item is updated.
 			currentItem->updatedSignal.AddObserver(
 				std::bind_front(&BookmarkTree::OnBookmarkItemUpdated, this),
 				boost::signals2::at_front);
-	});
+		});
 
 	if (index > parent->GetChildren().size())
 	{
@@ -98,8 +100,8 @@ BookmarkItem *BookmarkTree::AddBookmarkItem(
 	return rawBookmarkItem;
 }
 
-void BookmarkTree::MoveBookmarkItem(
-	BookmarkItem *bookmarkItem, BookmarkItem *newParent, size_t index)
+void BookmarkTree::MoveBookmarkItem(BookmarkItem *bookmarkItem, BookmarkItem *newParent,
+	size_t index)
 {
 	if (!CanAddChildren(newParent) || IsPermanentNode(bookmarkItem))
 	{
@@ -151,8 +153,8 @@ void BookmarkTree::RemoveBookmarkItem(BookmarkItem *bookmarkItem)
 	bookmarkItemRemovedSignal.m_signal(guid);
 }
 
-void BookmarkTree::OnBookmarkItemUpdated(
-	BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType)
+void BookmarkTree::OnBookmarkItemUpdated(BookmarkItem &bookmarkItem,
+	BookmarkItem::PropertyType propertyType)
 {
 	bookmarkItemUpdatedSignal.m_signal(bookmarkItem, propertyType);
 }

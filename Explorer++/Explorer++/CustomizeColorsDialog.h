@@ -51,8 +51,8 @@ private:
 
 	void OnNew();
 	void OnEdit();
-	void InsertColorRuleIntoListView(
-		HWND hListView, const NColorRuleHelper::ColorRule &colorRule, int iIndex);
+	void InsertColorRuleIntoListView(HWND hListView, const NColorRuleHelper::ColorRule &colorRule,
+		int iIndex);
 	void EditColorRule(int iSelected);
 	void OnMove(BOOL bUp);
 	void OnDelete();

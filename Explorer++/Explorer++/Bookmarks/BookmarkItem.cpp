@@ -15,8 +15,8 @@ BookmarkItem::BookmarkItem(std::optional<std::wstring> guid, std::wstring_view n
 }
 
 // Bookmark deserialization constructor.
-BookmarkItem::BookmarkItem(
-	std::wstring_view originalGuid, std::wstring_view name, std::wstring location, bool internal) :
+BookmarkItem::BookmarkItem(std::wstring_view originalGuid, std::wstring_view name,
+	std::wstring location, bool internal) :
 	m_originalGuid(originalGuid),
 	m_type(Type::Bookmark),
 	m_name(name),
@@ -26,8 +26,8 @@ BookmarkItem::BookmarkItem(
 }
 
 // Bookmark folder deserialization constructor.
-BookmarkItem::BookmarkItem(
-	std::wstring_view originalGuid, std::wstring_view name, BookmarkItems &&children) :
+BookmarkItem::BookmarkItem(std::wstring_view originalGuid, std::wstring_view name,
+	BookmarkItems &&children) :
 	m_originalGuid(originalGuid),
 	m_type(Type::Folder),
 	m_name(name),
@@ -186,7 +186,10 @@ size_t BookmarkItem::GetChildIndex(const BookmarkItem *bookmarkItem) const
 	assert(m_type == Type::Folder);
 
 	auto itr = std::find_if(m_children.begin(), m_children.end(),
-		[bookmarkItem](const auto &item) { return item.get() == bookmarkItem; });
+		[bookmarkItem](const auto &item)
+		{
+			return item.get() == bookmarkItem;
+		});
 
 	if (itr == m_children.end())
 	{
@@ -202,7 +205,10 @@ const std::unique_ptr<BookmarkItem> &BookmarkItem::GetChildOwnedPtr(
 	assert(m_type == Type::Folder);
 
 	auto itr = std::find_if(m_children.begin(), m_children.end(),
-		[bookmarkItem](const auto &item) { return item.get() == bookmarkItem; });
+		[bookmarkItem](const auto &item)
+		{
+			return item.get() == bookmarkItem;
+		});
 
 	if (itr == m_children.end())
 	{
@@ -216,8 +222,11 @@ bool BookmarkItem::HasChildFolder() const
 {
 	assert(m_type == Type::Folder);
 
-	bool anyChildFolders = std::any_of(
-		m_children.begin(), m_children.end(), [](const auto &item) { return item->IsFolder(); });
+	bool anyChildFolders = std::any_of(m_children.begin(), m_children.end(),
+		[](const auto &item)
+		{
+			return item->IsFolder();
+		});
 
 	return anyChildFolders;
 }

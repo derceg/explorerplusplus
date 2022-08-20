@@ -25,39 +25,39 @@
 
 namespace
 {
-const TCHAR CLASS_NAME[] = _T("DisplayWindow");
-const TCHAR WINDOW_NAME[] = _T("DisplayWindow");
+	const TCHAR CLASS_NAME[] = _T("DisplayWindow");
+	const TCHAR WINDOW_NAME[] = _T("DisplayWindow");
 }
 
 ULONG_PTR token;
 
 namespace
 {
-BOOL RegisterDisplayWindowClass()
-{
-	Gdiplus::GdiplusStartupInput startupInput;
-
-	WNDCLASS wc;
-	wc.style = 0;
-	wc.lpfnWndProc = DisplayWindow::DisplayWindowProcStub;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = sizeof(DisplayWindow *);
-	wc.hInstance = GetModuleHandle(nullptr);
-	wc.hIcon = nullptr;
-	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	wc.hbrBackground = nullptr;
-	wc.lpszMenuName = nullptr;
-	wc.lpszClassName = CLASS_NAME;
-
-	if (!RegisterClass(&wc))
+	BOOL RegisterDisplayWindowClass()
 	{
-		return FALSE;
+		Gdiplus::GdiplusStartupInput startupInput;
+
+		WNDCLASS wc;
+		wc.style = 0;
+		wc.lpfnWndProc = DisplayWindow::DisplayWindowProcStub;
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = sizeof(DisplayWindow *);
+		wc.hInstance = GetModuleHandle(nullptr);
+		wc.hIcon = nullptr;
+		wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+		wc.hbrBackground = nullptr;
+		wc.lpszMenuName = nullptr;
+		wc.lpszClassName = CLASS_NAME;
+
+		if (!RegisterClass(&wc))
+		{
+			return FALSE;
+		}
+
+		Gdiplus::GdiplusStartup(&token, &startupInput, nullptr);
+
+		return TRUE;
 	}
-
-	Gdiplus::GdiplusStartup(&token, &startupInput, nullptr);
-
-	return TRUE;
-}
 }
 
 HWND CreateDisplayWindow(HWND parent, DWInitialSettings_t *pSettings)
@@ -112,8 +112,8 @@ DisplayWindow::~DisplayWindow()
 	}
 }
 
-LRESULT CALLBACK DisplayWindow::DisplayWindowProcStub(
-	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK DisplayWindow::DisplayWindowProcStub(HWND hwnd, UINT msg, WPARAM wParam,
+	LPARAM lParam)
 {
 	auto *pdw = reinterpret_cast<DisplayWindow *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
@@ -137,8 +137,8 @@ LRESULT CALLBACK DisplayWindow::DisplayWindowProcStub(
 	return pdw->DisplayWindowProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK DisplayWindow::DisplayWindowProc(
-	HWND displayWindow, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK DisplayWindow::DisplayWindowProc(HWND displayWindow, UINT msg, WPARAM wParam,
+	LPARAM lParam)
 {
 	switch (msg)
 	{

@@ -158,8 +158,8 @@ void DisplayWindow::ExtractThumbnailImage()
 	te.bCancelled = FALSE;
 	g_ThumbnailEntries.push_back(te);
 
-	HANDLE hThread = CreateThread(
-		nullptr, 0, Thread_ExtractThumbnailImage, (LPVOID) &g_ThumbnailEntries.back(), 0, nullptr);
+	HANDLE hThread = CreateThread(nullptr, 0, Thread_ExtractThumbnailImage,
+		(LPVOID) &g_ThumbnailEntries.back(), 0, nullptr);
 	CloseHandle(hThread);
 }
 
@@ -195,8 +195,7 @@ void DisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 
 		if (SUCCEEDED(hr))
 		{
-			hr = GetUIObjectOf(
-				pShellFolder, nullptr, 1, &pridl, IID_PPV_ARGS(&pExtractImage));
+			hr = GetUIObjectOf(pShellFolder, nullptr, 1, &pridl, IID_PPV_ARGS(&pExtractImage));
 
 			if (SUCCEEDED(hr))
 			{
@@ -208,8 +207,8 @@ void DisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 				size.cx = GetRectHeight(&rc) - THUMB_HEIGHT_DELTA;
 				size.cy = GetRectHeight(&rc) - THUMB_HEIGHT_DELTA;
 
-				hr = pExtractImage->GetLocation(
-					szImage, SIZEOF_ARRAY(szImage), &dwPriority, &size, 32, &dwFlags);
+				hr = pExtractImage->GetLocation(szImage, SIZEOF_ARRAY(szImage), &dwPriority, &size,
+					32, &dwFlags);
 
 				if (SUCCEEDED(hr))
 				{
@@ -229,12 +228,12 @@ void DisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 						dwFlags =
 							IEIFLAG_OFFLINE | IEIFLAG_QUALITY | IEIFLAG_ASPECT | IEIFLAG_ORIGSIZE;
 						size.cy = GetRectHeight(&rc) - THUMB_HEIGHT_DELTA;
-						size.cx =
-							(LONG)((double) size.cy * ((double) bm.bmWidth / (double) bm.bmHeight));
+						size.cx = (LONG) ((double) size.cy
+							* ((double) bm.bmWidth / (double) bm.bmHeight));
 						m_iImageWidth = size.cx;
 						m_iImageHeight = size.cy;
-						pExtractImage->GetLocation(
-							szImage, SIZEOF_ARRAY(szImage), &dwPriority, &size, 32, &dwFlags);
+						pExtractImage->GetLocation(szImage, SIZEOF_ARRAY(szImage), &dwPriority,
+							&size, 32, &dwFlags);
 						hr = pExtractImage->Extract(&m_hbmThumbnail);
 
 						if (SUCCEEDED(hr))
@@ -296,8 +295,8 @@ void DisplayWindow::PaintText(HDC hdc, unsigned int x)
 	{
 		SIZE stringSize;
 
-		GetTextExtentPoint32(
-			hdc, m_LineList.at(i).szText, lstrlen(m_LineList.at(i).szText), &stringSize);
+		GetTextExtentPoint32(hdc, m_LineList.at(i).szText, lstrlen(m_LineList.at(i).szText),
+			&stringSize);
 
 		iTextBottom = (iLine * stringSize.cy) + m_LineSpacing + stringSize.cy;
 

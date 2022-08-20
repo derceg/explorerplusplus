@@ -66,8 +66,8 @@ IFACEMETHODIMP ShellView::GetCurrentInfo(LPFOLDERSETTINGS folderSettings)
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP ShellView::AddPropertySheetPages(
-	DWORD reserved, LPFNSVADDPROPSHEETPAGE callback, LPARAM lParam)
+IFACEMETHODIMP ShellView::AddPropertySheetPages(DWORD reserved, LPFNSVADDPROPSHEETPAGE callback,
+	LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(reserved);
 	UNREFERENCED_PARAMETER(callback);

@@ -60,8 +60,8 @@ private:
 		std::optional<std::wstring> guidSelected);
 
 	void InsertFoldersIntoTreeViewRecursive(HTREEITEM hParent, BookmarkItem *bookmarkItem);
-	HTREEITEM InsertFolderIntoTreeView(
-		HTREEITEM hParent, BookmarkItem *bookmarkFolder, int position);
+	HTREEITEM InsertFolderIntoTreeView(HTREEITEM hParent, BookmarkItem *bookmarkFolder,
+		int position);
 
 	void OnKeyDown(const NMTVKEYDOWN *pnmtvkd);
 	void OnTreeViewRename();

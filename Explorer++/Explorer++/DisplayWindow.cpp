@@ -57,8 +57,8 @@ void Explorerplusplus::UpdateDisplayWindowForZeroFiles(const Tab &tab)
 		TCHAR szTemp[512];
 		WCHAR wszCPUBrand[64];
 		MultiByteToWideChar(CP_ACP, 0, szCPUBrand, -1, wszCPUBrand, SIZEOF_ARRAY(wszCPUBrand));
-		LoadString(
-			m_hLanguageModule, IDS_GENERAL_DISPLAY_WINDOW_PROCESSOR, szTemp, SIZEOF_ARRAY(szTemp));
+		LoadString(m_hLanguageModule, IDS_GENERAL_DISPLAY_WINDOW_PROCESSOR, szTemp,
+			SIZEOF_ARRAY(szTemp));
 		StringCchPrintf(szDisplay, SIZEOF_ARRAY(szDisplay), szTemp, wszCPUBrand);
 		DisplayWindow_BufferText(m_hDisplayWindow, szDisplay);
 
@@ -71,8 +71,8 @@ void Explorerplusplus::UpdateDisplayWindowForZeroFiles(const Tab &tab)
 
 		TCHAR szMemorySize[32];
 		FormatSizeString(lTotalPhysicalMem, szMemorySize, SIZEOF_ARRAY(szMemorySize));
-		LoadString(
-			m_hLanguageModule, IDS_GENERAL_DISPLAY_WINDOW_MEMORY, szTemp, SIZEOF_ARRAY(szTemp));
+		LoadString(m_hLanguageModule, IDS_GENERAL_DISPLAY_WINDOW_MEMORY, szTemp,
+			SIZEOF_ARRAY(szTemp));
 		StringCchPrintf(szDisplay, SIZEOF_ARRAY(szDisplay), szTemp, szMemorySize);
 		DisplayWindow_BufferText(m_hDisplayWindow, szDisplay);
 	}
@@ -160,8 +160,8 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 						displayWindowFolderSize.bValid = TRUE;
 						m_DWFolderSizes.push_back(displayWindowFolderSize);
 
-						HANDLE hThread = CreateThread(
-							nullptr, 0, Thread_CalculateFolderSize, (LPVOID) pfs, 0, &threadId);
+						HANDLE hThread = CreateThread(nullptr, 0, Thread_CalculateFolderSize,
+							(LPVOID) pfs, 0, &threadId);
 						CloseHandle(hThread);
 
 						m_iDWFolderSizeUniqueId++;

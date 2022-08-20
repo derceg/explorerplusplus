@@ -80,12 +80,12 @@ INT_PTR CustomizeColorsDialog::OnInitDialog()
 
 wil::unique_hicon CustomizeColorsDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_expp->GetIconResourceLoader()->LoadIconFromPNGAndScale(
-		Icon::CustomizeColors, iconWidth, iconHeight);
+	return m_expp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::CustomizeColors,
+		iconWidth, iconHeight);
 }
 
-void CustomizeColorsDialog::GetResizableControlInformation(
-	BaseDialog::DialogSizeConstraint &dsc, std::list<ResizableDialog::Control> &ControlList)
+void CustomizeColorsDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
+	std::list<ResizableDialog::Control> &ControlList)
 {
 	dsc = BaseDialog::DialogSizeConstraint::None;
 
@@ -132,8 +132,8 @@ void CustomizeColorsDialog::GetResizableControlInformation(
 	ControlList.push_back(control);
 }
 
-void CustomizeColorsDialog::InsertColorRuleIntoListView(
-	HWND hListView, const NColorRuleHelper::ColorRule &colorRule, int iIndex)
+void CustomizeColorsDialog::InsertColorRuleIntoListView(HWND hListView,
+	const NColorRuleHelper::ColorRule &colorRule, int iIndex)
 {
 	TCHAR szTemp[512];
 
@@ -272,16 +272,16 @@ void CustomizeColorsDialog::EditColorRule(int iSelected)
 
 		TCHAR szTemp[512];
 
-		StringCchCopy(
-			szTemp, SIZEOF_ARRAY(szTemp), (*m_pColorRuleList)[iSelected].strDescription.c_str());
+		StringCchCopy(szTemp, SIZEOF_ARRAY(szTemp),
+			(*m_pColorRuleList)[iSelected].strDescription.c_str());
 		ListView_SetItemText(hListView, iSelected, 0, szTemp);
 
-		StringCchCopy(
-			szTemp, SIZEOF_ARRAY(szTemp), (*m_pColorRuleList)[iSelected].strFilterPattern.c_str());
+		StringCchCopy(szTemp, SIZEOF_ARRAY(szTemp),
+			(*m_pColorRuleList)[iSelected].strFilterPattern.c_str());
 		ListView_SetItemText(hListView, iSelected, 1, szTemp);
 
-		BuildFileAttributeString(
-			(*m_pColorRuleList)[iSelected].dwFilterAttributes, szTemp, SIZEOF_ARRAY(szTemp));
+		BuildFileAttributeString((*m_pColorRuleList)[iSelected].dwFilterAttributes, szTemp,
+			SIZEOF_ARRAY(szTemp));
 		ListView_SetItemText(hListView, iSelected, 2, szTemp);
 	}
 }

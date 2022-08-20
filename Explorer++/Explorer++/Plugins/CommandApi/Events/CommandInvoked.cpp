@@ -10,16 +10,18 @@ Plugins::CommandInvoked::CommandInvoked(PluginCommandManager *pluginCommandManag
 	m_pluginCommandManager(pluginCommandManager),
 	m_pluginId(pluginId)
 {
-
 }
 
-boost::signals2::connection Plugins::CommandInvoked::connectObserver(sol::protected_function observer, sol::this_state state)
+boost::signals2::connection Plugins::CommandInvoked::connectObserver(
+	sol::protected_function observer, sol::this_state state)
 {
 	UNREFERENCED_PARAMETER(state);
 
-	return m_pluginCommandManager->AddCommandInvokedObserver([this, observer](int pluginId, const std::wstring &name) {
-		onCommandInvoked(pluginId, name, observer);
-	});
+	return m_pluginCommandManager->AddCommandInvokedObserver(
+		[this, observer](int pluginId, const std::wstring &name)
+		{
+			onCommandInvoked(pluginId, name, observer);
+		});
 }
 
 void Plugins::CommandInvoked::onCommandInvoked(int pluginId, const std::wstring &name,

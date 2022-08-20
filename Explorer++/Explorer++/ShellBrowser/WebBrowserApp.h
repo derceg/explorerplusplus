@@ -41,8 +41,8 @@ public:
 	IFACEMETHODIMP GoForward();
 	IFACEMETHODIMP GoHome();
 	IFACEMETHODIMP GoSearch();
-	IFACEMETHODIMP Navigate(
-		BSTR url, VARIANT *flags, VARIANT *targetFrameName, VARIANT *postData, VARIANT *headers);
+	IFACEMETHODIMP Navigate(BSTR url, VARIANT *flags, VARIANT *targetFrameName, VARIANT *postData,
+		VARIANT *headers);
 	IFACEMETHODIMP Refresh();
 	IFACEMETHODIMP Refresh2(VARIANT *level);
 	IFACEMETHODIMP Stop();
@@ -67,8 +67,8 @@ public:
 	// IDispatch
 	IFACEMETHODIMP GetTypeInfoCount(UINT *typeInfoCount);
 	IFACEMETHODIMP GetTypeInfo(UINT type, LCID localeId, ITypeInfo **typeInfo);
-	IFACEMETHODIMP GetIDsOfNames(
-		REFIID riid, LPOLESTR *names, UINT numNames, LCID localeId, DISPID *dispId);
+	IFACEMETHODIMP GetIDsOfNames(REFIID riid, LPOLESTR *names, UINT numNames, LCID localeId,
+		DISPID *dispId);
 	IFACEMETHODIMP Invoke(DISPID dispIdMember, REFIID riid, LCID localeId, WORD flags,
 		DISPPARAMS *dispParams, VARIANT *varResult, EXCEPINFO *exceptionInfo, UINT *argErr);
 

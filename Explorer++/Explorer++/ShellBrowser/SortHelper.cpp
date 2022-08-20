@@ -130,8 +130,8 @@ int SortByType(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo
 	return StrCmpLogicalW(type1.c_str(), type2.c_str());
 }
 
-int SortByDate(
-	const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, DateType dateType)
+int SortByDate(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2,
+	DateType dateType)
 {
 	if (!itemInfo1.isFindDataValid && itemInfo2.isFindDataValid)
 	{
@@ -165,8 +165,8 @@ int SortByDate(
 	return 0;
 }
 
-int SortByTotalSize(
-	const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, bool TotalSize)
+int SortByTotalSize(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2,
+	bool TotalSize)
 {
 	ULARGE_INTEGER driveSpace1;
 	BOOL res1 = GetDriveSpaceColumnRawData(itemInfo1, TotalSize, driveSpace1);
@@ -289,8 +289,8 @@ int SortByExtension(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &ite
 	return StrCmpLogicalW(extension1.c_str(), extension2.c_str());
 }
 
-int SortByItemDetails(
-	const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, const SHCOLUMNID *pscid)
+int SortByItemDetails(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2,
+	const SHCOLUMNID *pscid)
 {
 	VARIANT vt1;
 	HRESULT hr1 = GetItemDetailsRawData(itemInfo1, pscid, &vt1);
@@ -318,8 +318,8 @@ int SortByItemDetails(
 	return ret;
 }
 
-int SortByImageProperty(
-	const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, PROPID PropertyId)
+int SortByImageProperty(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2,
+	PROPID PropertyId)
 {
 	std::wstring imageProperty1 = GetImageColumnText(itemInfo1, PropertyId);
 	std::wstring imageProperty2 = GetImageColumnText(itemInfo2, PropertyId);

@@ -13,8 +13,8 @@ __interface IExplorerplusplus;
 class BookmarkContextMenuController
 {
 public:
-	BookmarkContextMenuController(
-		BookmarkTree *bookmarkTree, HMODULE resourceModule, IExplorerplusplus *expp);
+	BookmarkContextMenuController(BookmarkTree *bookmarkTree, HMODULE resourceModule,
+		IExplorerplusplus *expp);
 
 	void OnMenuItemSelected(int menuItemId, BookmarkItem *targetParentFolder, size_t targetIndex,
 		const RawBookmarkItems &bookmarkItems, HWND parentWindow);

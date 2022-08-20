@@ -19,12 +19,12 @@ public:
 	ULONG __stdcall Release() override;
 
 	/* Drag and drop. */
-	HRESULT _stdcall DragEnter(
-		IDataObject *pDataObject, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect) override;
+	HRESULT _stdcall DragEnter(IDataObject *pDataObject, DWORD grfKeyState, POINTL pt,
+		DWORD *pdwEffect) override;
 	HRESULT _stdcall DragOver(DWORD grfKeyState, POINTL pt, DWORD *pdwEffect) override;
 	HRESULT _stdcall DragLeave() override;
-	HRESULT _stdcall Drop(
-		IDataObject *pDataObject, DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect) override;
+	HRESULT _stdcall Drop(IDataObject *pDataObject, DWORD grfKeyState, POINTL ptl,
+		DWORD *pdwEffect) override;
 
 private:
 	static FORMATETC GetSupportedDropFormat();

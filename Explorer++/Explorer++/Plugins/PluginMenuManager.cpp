@@ -13,7 +13,8 @@ Plugins::PluginMenuManager::PluginMenuManager(HWND mainWindow, int startId, int 
 	m_endId(endId)
 {
 	// Note that the start ID is inclusive and the end ID is exclusive.
-	m_freeMenuItemIds.insert(boost::counting_iterator<int>(startId), boost::counting_iterator<int>(endId));
+	m_freeMenuItemIds.insert(boost::counting_iterator<int>(startId),
+		boost::counting_iterator<int>(endId));
 }
 
 std::optional<int> Plugins::PluginMenuManager::AddItemToMainMenu(const std::wstring &text)
@@ -93,7 +94,8 @@ void Plugins::PluginMenuManager::ReleasePluginMenuItemId(int id)
 	m_freeMenuItemIds.insert(id);
 }
 
-boost::signals2::connection Plugins::PluginMenuManager::AddMenuClickedObserver(const PluginMenuClickedSignal::slot_type &observer)
+boost::signals2::connection Plugins::PluginMenuManager::AddMenuClickedObserver(
+	const PluginMenuClickedSignal::slot_type &observer)
 {
 	return m_menuClickedSignal.connect(observer);
 }

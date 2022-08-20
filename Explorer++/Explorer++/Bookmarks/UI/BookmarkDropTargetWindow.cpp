@@ -13,8 +13,8 @@ BookmarkDropTargetWindow::BookmarkDropTargetWindow(HWND hwnd, BookmarkTree *book
 		winrt::make_self<DropTargetWindow>(hwnd, static_cast<DropTargetInternal *>(this));
 }
 
-DWORD BookmarkDropTargetWindow::DragEnter(
-	IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
+DWORD BookmarkDropTargetWindow::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt,
+	DWORD effect)
 {
 	UNREFERENCED_PARAMETER(keyState);
 	UNREFERENCED_PARAMETER(effect);
@@ -72,8 +72,8 @@ void BookmarkDropTargetWindow::DragLeave()
 	ResetDropState();
 }
 
-DWORD BookmarkDropTargetWindow::Drop(
-	IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
+DWORD BookmarkDropTargetWindow::Drop(IDataObject *dataObject, DWORD keyState, POINT pt,
+	DWORD effect)
 {
 	UNREFERENCED_PARAMETER(dataObject);
 	UNREFERENCED_PARAMETER(keyState);

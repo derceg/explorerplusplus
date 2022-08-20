@@ -68,8 +68,8 @@ private:
 
 	void OnDestroyDialog(HWND dlg);
 
-	static INT_PTR CALLBACK GeneralSettingsProcStub(
-		HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	static INT_PTR CALLBACK GeneralSettingsProcStub(HWND hDlg, UINT uMsg, WPARAM wParam,
+		LPARAM lParam);
 	INT_PTR CALLBACK GeneralSettingsProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static INT_PTR CALLBACK FilesFoldersProcStub(HWND, UINT, WPARAM, LPARAM);
 	INT_PTR CALLBACK FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -77,21 +77,21 @@ private:
 	INT_PTR CALLBACK WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static INT_PTR CALLBACK TabSettingsProcStub(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	INT_PTR CALLBACK TabSettingsProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	static INT_PTR CALLBACK DefaultSettingsProcStub(
-		HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	static INT_PTR CALLBACK DefaultSettingsProcStub(HWND hDlg, UINT uMsg, WPARAM wParam,
+		LPARAM lParam);
 	INT_PTR CALLBACK DefaultSettingsProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	static INT_PTR CALLBACK AdvancedSettingsProcStub(
-		HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	static INT_PTR CALLBACK AdvancedSettingsProcStub(HWND hDlg, UINT uMsg, WPARAM wParam,
+		LPARAM lParam);
 	INT_PTR CALLBACK AdvancedSettingsProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	INT_PTR OnCtlColorDlg(HWND hwnd, HDC hdc);
 	INT_PTR OnCtlColor(HWND hwnd, HDC hdc);
 	INT_PTR OnCustomDraw(const NMCUSTOMDRAW *customDraw);
 
-	void OnReplaceExplorerSettingChanged(
-		HWND dialog, DefaultFileManager::ReplaceExplorerMode updatedReplaceMode);
-	bool UpdateReplaceExplorerSetting(
-		HWND dialog, DefaultFileManager::ReplaceExplorerMode updatedReplaceMode);
+	void OnReplaceExplorerSettingChanged(HWND dialog,
+		DefaultFileManager::ReplaceExplorerMode updatedReplaceMode);
+	bool UpdateReplaceExplorerSetting(HWND dialog,
+		DefaultFileManager::ReplaceExplorerMode updatedReplaceMode);
 
 	/* Default settings dialog. */
 	void OnDefaultSettingsNewTabDir(HWND hDlg);
@@ -104,12 +104,12 @@ private:
 
 	void AddIconThemes(HWND dlg);
 	void AddLanguages(HWND hDlg);
-	BOOL AddLanguageToComboBox(
-		HWND hComboBox, const TCHAR *szImageDirectory, const TCHAR *szFileName, WORD *pdwLanguage);
+	BOOL AddLanguageToComboBox(HWND hComboBox, const TCHAR *szImageDirectory,
+		const TCHAR *szFileName, WORD *pdwLanguage);
 	int GetLanguageIDFromIndex(HWND hDlg, int iIndex);
 
-	LRESULT CALLBACK AdvancedOptionsListViewWndProc(
-		HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK AdvancedOptionsListViewWndProc(HWND hwnd, UINT msg, WPARAM wParam,
+		LPARAM lParam);
 	std::vector<AdvancedOption> InitializeAdvancedOptions();
 	void InsertAdvancedOptionsIntoListView(HWND dlg);
 	bool GetBooleanConfigValue(AdvancedOptionId id);

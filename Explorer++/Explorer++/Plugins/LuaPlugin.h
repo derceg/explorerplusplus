@@ -15,8 +15,8 @@ namespace Plugins
 	class LuaPlugin
 	{
 	public:
-
-		LuaPlugin(const std::wstring &directory, const Manifest &manifest, PluginInterface *pluginInterface);
+		LuaPlugin(const std::wstring &directory, const Manifest &manifest,
+			PluginInterface *pluginInterface);
 
 		int GetId() const;
 		std::wstring GetDirectory() const;
@@ -24,7 +24,6 @@ namespace Plugins
 		sol::state &GetLuaState();
 
 	private:
-
 		static int idCounter;
 
 		std::wstring m_directory;
@@ -37,11 +36,8 @@ namespace Plugins
 	class LuaPanicException : public std::runtime_error
 	{
 	public:
-
-		LuaPanicException(const std::string &str) :
-			std::runtime_error(str)
+		LuaPanicException(const std::string &str) : std::runtime_error(str)
 		{
-
 		}
 	};
 }

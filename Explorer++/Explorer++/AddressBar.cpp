@@ -63,15 +63,15 @@ void AddressBar::Initialize(HWND parent)
 		std::bind_front(&AddressBar::ComboBoxExSubclass, this), 0));
 
 	HWND hEdit = reinterpret_cast<HWND>(SendMessage(m_hwnd, CBEM_GETEDITCONTROL, 0, 0));
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
-		hEdit, EditSubclassStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hEdit, EditSubclassStub,
+		SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	/* Turn on auto complete for the edit control within the combobox.
 	This will let the os complete paths as they are typed. */
 	SHAutoComplete(hEdit, SHACF_FILESYSTEM | SHACF_AUTOSUGGEST_FORCE_ON);
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
-		parent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parent, ParentWndProcStub,
+		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	m_expp->AddTabsInitializedObserver(
 		[this]
@@ -89,8 +89,8 @@ LRESULT AddressBar::ComboBoxExSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 	switch (msg)
 	{
 	case WM_CTLCOLOREDIT:
-		if (auto result = OnComboBoxExCtlColorEdit(
-				reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam)))
+		if (auto result = OnComboBoxExCtlColorEdit(reinterpret_cast<HWND>(lParam),
+				reinterpret_cast<HDC>(wParam)))
 		{
 			return *result;
 		}
@@ -117,8 +117,8 @@ std::optional<LRESULT> AddressBar::OnComboBoxExCtlColorEdit(HWND hwnd, HDC hdc)
 	return reinterpret_cast<LRESULT>(m_backgroundBrush.get());
 }
 
-LRESULT CALLBACK AddressBar::EditSubclassStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK AddressBar::EditSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -155,8 +155,8 @@ LRESULT CALLBACK AddressBar::EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LP
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK AddressBar::ParentWndProcStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK AddressBar::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -207,8 +207,8 @@ void AddressBar::OnGo()
 	std::wstring currentDirectory = selectedTab.GetShellBrowser()->GetDirectory();
 
 	TCHAR szFullFilePath[MAX_PATH];
-	DecodePath(
-		path.c_str(), currentDirectory.c_str(), szFullFilePath, SIZEOF_ARRAY(szFullFilePath));
+	DecodePath(path.c_str(), currentDirectory.c_str(), szFullFilePath,
+		SIZEOF_ARRAY(szFullFilePath));
 
 	m_expp->OpenItem(szFullFilePath);
 }
@@ -249,8 +249,8 @@ void AddressBar::OnBeginDrag()
 	pDataObject.attach(CreateDataObject(ftc, stg, SIZEOF_ARRAY(ftc)));
 
 	wil::com_ptr_nothrow<IDragSourceHelper> dragSourceHelper;
-	HRESULT hr = CoCreateInstance(
-		CLSID_DragDropHelper, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&dragSourceHelper));
+	HRESULT hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_INPROC_SERVER,
+		IID_PPV_ARGS(&dragSourceHelper));
 
 	if (FAILED(hr))
 	{
@@ -461,8 +461,8 @@ void AddressBar::UpdateTextAndIconInUI(std::wstring *text, int iconIndex)
 	SendMessage(m_hwnd, CBEM_SETITEM, 0, reinterpret_cast<LPARAM>(&cbItem));
 }
 
-void AddressBar::OnHistoryEntryUpdated(
-	const HistoryEntry &entry, HistoryEntry::PropertyType propertyType)
+void AddressBar::OnHistoryEntryUpdated(const HistoryEntry &entry,
+	HistoryEntry::PropertyType propertyType)
 {
 	switch (propertyType)
 	{

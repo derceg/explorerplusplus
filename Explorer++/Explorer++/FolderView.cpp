@@ -32,8 +32,8 @@ IFACEMETHODIMP FolderView::GetGroupBy(PROPERTYKEY *key, BOOL *ascending)
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::SetViewProperty(
-	PCUITEMID_CHILD pidl, REFPROPERTYKEY propertyKey, REFPROPVARIANT propVariant)
+IFACEMETHODIMP FolderView::SetViewProperty(PCUITEMID_CHILD pidl, REFPROPERTYKEY propertyKey,
+	REFPROPVARIANT propVariant)
 {
 	UNREFERENCED_PARAMETER(pidl);
 	UNREFERENCED_PARAMETER(propertyKey);
@@ -42,8 +42,8 @@ IFACEMETHODIMP FolderView::SetViewProperty(
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::GetViewProperty(
-	PCUITEMID_CHILD pidl, REFPROPERTYKEY propertyKey, PROPVARIANT *propVariant)
+IFACEMETHODIMP FolderView::GetViewProperty(PCUITEMID_CHILD pidl, REFPROPERTYKEY propertyKey,
+	PROPVARIANT *propVariant)
 {
 	UNREFERENCED_PARAMETER(pidl);
 	UNREFERENCED_PARAMETER(propertyKey);
@@ -334,8 +334,8 @@ IFACEMETHODIMP FolderView::SelectItem(int item, DWORD flags)
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::SelectAndPositionItems(
-	UINT numItems, PCUITEMID_CHILD_ARRAY items, POINT *pts, DWORD flags)
+IFACEMETHODIMP FolderView::SelectAndPositionItems(UINT numItems, PCUITEMID_CHILD_ARRAY items,
+	POINT *pts, DWORD flags)
 {
 	UNREFERENCED_PARAMETER(pts);
 	UNREFERENCED_PARAMETER(flags);
@@ -530,8 +530,8 @@ IFACEMETHODIMP FolderView::GetItemSpacing(ITEMSPACING *spacing)
 	return E_NOTIMPL;
 }
 
-IFACEMETHODIMP FolderView::SetCallback(
-	IShellFolderViewCB *callback, IShellFolderViewCB **oldCallback)
+IFACEMETHODIMP FolderView::SetCallback(IShellFolderViewCB *callback,
+	IShellFolderViewCB **oldCallback)
 {
 	UNREFERENCED_PARAMETER(callback);
 	UNREFERENCED_PARAMETER(oldCallback);

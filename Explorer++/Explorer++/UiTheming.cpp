@@ -58,8 +58,8 @@ bool UiTheming::ApplyListViewColorsForAllTabs(COLORREF backgroundColor, COLORREF
 	return overallResult;
 }
 
-bool UiTheming::ApplyListViewColorsForTab(
-	const Tab &tab, COLORREF backgroundColor, COLORREF textColor)
+bool UiTheming::ApplyListViewColorsForTab(const Tab &tab, COLORREF backgroundColor,
+	COLORREF textColor)
 {
 	BOOL bkRes = ListView_SetBkColor(tab.GetShellBrowser()->GetListView(), backgroundColor);
 	BOOL textBkRes = ListView_SetTextBkColor(tab.GetShellBrowser()->GetListView(), backgroundColor);
