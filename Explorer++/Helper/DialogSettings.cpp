@@ -73,12 +73,12 @@ void DialogSettings::LoadRegistrySettings(HKEY hParentKey)
 		if (m_bSavePosition)
 		{
 			DWORD dwSize = sizeof(POINT);
-			RegQueryValueEx(
-				hKey, SETTING_POSITION, nullptr, nullptr, (LPBYTE) &m_ptDialog, &dwSize);
+			RegQueryValueEx(hKey, SETTING_POSITION, nullptr, nullptr, (LPBYTE) &m_ptDialog,
+				&dwSize);
 
 			RegistrySettings::ReadDword(hKey, SETTING_WIDTH, reinterpret_cast<DWORD *>(&m_iWidth));
-			RegistrySettings::ReadDword(
-				hKey, SETTING_HEIGHT, reinterpret_cast<DWORD *>(&m_iHeight));
+			RegistrySettings::ReadDword(hKey, SETTING_HEIGHT,
+				reinterpret_cast<DWORD *>(&m_iHeight));
 		}
 
 		LoadExtraRegistrySettings(hKey);
@@ -100,8 +100,8 @@ void DialogSettings::SaveXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *p
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe);
 
 	wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
-	NXMLSettings::CreateElementNode(
-		pXMLDom, &pParentNode, pe, _T("DialogState"), m_szSettingsKey.c_str());
+	NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe, _T("DialogState"),
+		m_szSettingsKey.c_str());
 
 	if (m_bSavePosition)
 	{
@@ -109,10 +109,10 @@ void DialogSettings::SaveXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *p
 			NXMLSettings::EncodeIntValue(m_ptDialog.x));
 		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), SETTING_POSITION_Y,
 			NXMLSettings::EncodeIntValue(m_ptDialog.y));
-		NXMLSettings::AddAttributeToNode(
-			pXMLDom, pParentNode.get(), SETTING_WIDTH, NXMLSettings::EncodeIntValue(m_iWidth));
-		NXMLSettings::AddAttributeToNode(
-			pXMLDom, pParentNode.get(), SETTING_HEIGHT, NXMLSettings::EncodeIntValue(m_iHeight));
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), SETTING_WIDTH,
+			NXMLSettings::EncodeIntValue(m_iWidth));
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), SETTING_HEIGHT,
+			NXMLSettings::EncodeIntValue(m_iHeight));
 	}
 
 	SaveExtraXMLSettings(pXMLDom, pParentNode.get());
@@ -220,13 +220,13 @@ void DialogSettings::RestoreDialogPosition(HWND hDlg, bool bRestoreSize)
 	{
 		if (bRestoreSize)
 		{
-			SetWindowPos(
-				hDlg, nullptr, m_ptDialog.x, m_ptDialog.y, m_iWidth, m_iHeight, SWP_NOZORDER);
+			SetWindowPos(hDlg, nullptr, m_ptDialog.x, m_ptDialog.y, m_iWidth, m_iHeight,
+				SWP_NOZORDER);
 		}
 		else
 		{
-			SetWindowPos(
-				hDlg, nullptr, m_ptDialog.x, m_ptDialog.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+			SetWindowPos(hDlg, nullptr, m_ptDialog.x, m_ptDialog.y, 0, 0,
+				SWP_NOSIZE | SWP_NOZORDER);
 		}
 	}
 	else

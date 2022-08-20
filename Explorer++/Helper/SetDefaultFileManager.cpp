@@ -52,11 +52,11 @@ LSTATUS DefaultFileManager::SetAsDefaultFileManagerFileSystem(
 		ReplaceExplorerMode::FileSystem, applicationKeyName, menuText);
 }
 
-LSTATUS DefaultFileManager::SetAsDefaultFileManagerAll(
-	const std::wstring &applicationKeyName, const std::wstring &menuText)
+LSTATUS DefaultFileManager::SetAsDefaultFileManagerAll(const std::wstring &applicationKeyName,
+	const std::wstring &menuText)
 {
-	return DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
-		ReplaceExplorerMode::All, applicationKeyName, menuText);
+	return DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(ReplaceExplorerMode::All,
+		applicationKeyName, menuText);
 }
 
 LSTATUS DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
@@ -142,8 +142,8 @@ LSTATUS DefaultFileManager::RemoveAsDefaultFileManagerFileSystem(
 
 LSTATUS DefaultFileManager::RemoveAsDefaultFileManagerAll(const std::wstring &applicationKeyName)
 {
-	return DefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(
-		ReplaceExplorerMode::All, applicationKeyName);
+	return DefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(ReplaceExplorerMode::All,
+		applicationKeyName);
 }
 
 LSTATUS DefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(

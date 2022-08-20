@@ -20,8 +20,8 @@ BOOL FileActionHandler::RenameFiles(const RenamedItems_t &itemList)
 	{
 		/* TODO: This should actually be done by the caller. */
 		IShellItem *shellItem = nullptr;
-		HRESULT hr = SHCreateItemFromParsingName(
-			item.strOldFilename.c_str(), nullptr, IID_PPV_ARGS(&shellItem));
+		HRESULT hr = SHCreateItemFromParsingName(item.strOldFilename.c_str(), nullptr,
+			IID_PPV_ARGS(&shellItem));
 
 		if (SUCCEEDED(hr))
 		{
@@ -57,8 +57,8 @@ BOOL FileActionHandler::RenameFiles(const RenamedItems_t &itemList)
 	return FALSE;
 }
 
-HRESULT FileActionHandler::DeleteFiles(
-	HWND hwnd, DeletedItems_t &deletedItems, bool permanent, bool silent)
+HRESULT FileActionHandler::DeleteFiles(HWND hwnd, DeletedItems_t &deletedItems, bool permanent,
+	bool silent)
 {
 	HRESULT hr = NFileOperations::DeleteFiles(hwnd, deletedItems, permanent, silent);
 

@@ -10,16 +10,16 @@
 
 LONG RegistrySettings::SaveDword(HKEY hKey, const TCHAR *valueName, DWORD dwValue)
 {
-	return RegSetValueEx(
-		hKey, valueName, 0, REG_DWORD, reinterpret_cast<const BYTE *>(&dwValue), sizeof(dwValue));
+	return RegSetValueEx(hKey, valueName, 0, REG_DWORD, reinterpret_cast<const BYTE *>(&dwValue),
+		sizeof(dwValue));
 }
 
 LONG RegistrySettings::ReadDword(HKEY hKey, const TCHAR *valueName, DWORD *pReturnValue)
 {
 	DWORD dwSize = sizeof(DWORD);
 
-	return RegQueryValueEx(
-		hKey, valueName, nullptr, nullptr, reinterpret_cast<LPBYTE>(pReturnValue), &dwSize);
+	return RegQueryValueEx(hKey, valueName, nullptr, nullptr,
+		reinterpret_cast<LPBYTE>(pReturnValue), &dwSize);
 }
 
 LONG RegistrySettings::SaveString(HKEY hKey, const TCHAR *valueName, const TCHAR *szValue)
@@ -36,8 +36,8 @@ LONG RegistrySettings::ReadString(HKEY hKey, const TCHAR *valueName, TCHAR *szOu
 	DWORD dwBufChSize;
 
 	dwBufByteSize = cchMax * sizeof(TCHAR);
-	lRes = RegQueryValueEx(
-		hKey, valueName, nullptr, &dwType, reinterpret_cast<LPBYTE>(szOutput), &dwBufByteSize);
+	lRes = RegQueryValueEx(hKey, valueName, nullptr, &dwType, reinterpret_cast<LPBYTE>(szOutput),
+		&dwBufByteSize);
 	dwBufChSize = dwBufByteSize / sizeof(TCHAR);
 
 	/* The returned buffer size includes any terminating
@@ -82,8 +82,8 @@ LONG RegistrySettings::ReadString(HKEY hKey, const std::wstring &valueName, std:
 than ERROR_SUCCESS on failure. If this function does fail, any values
 that have been written will not be deleted (i.e. this function is
 not transactional). */
-LONG RegistrySettings::SaveStringList(
-	HKEY hKey, const TCHAR *baseValueName, const std::list<std::wstring> &strList)
+LONG RegistrySettings::SaveStringList(HKEY hKey, const TCHAR *baseValueName,
+	const std::list<std::wstring> &strList)
 {
 	TCHAR szItemKey[128];
 	LONG lRes;
@@ -103,8 +103,8 @@ LONG RegistrySettings::SaveStringList(
 	return ERROR_SUCCESS;
 }
 
-LONG RegistrySettings::ReadStringList(
-	HKEY hKey, const TCHAR *baseValueName, std::list<std::wstring> &strList)
+LONG RegistrySettings::ReadStringList(HKEY hKey, const TCHAR *baseValueName,
+	std::list<std::wstring> &strList)
 {
 	TCHAR szItemKey[128];
 	TCHAR szTemp[512];
@@ -137,8 +137,8 @@ LONG RegistrySettings::ReadStringList(
 	return lRes;
 }
 
-bool RegistrySettings::SaveDateTime(
-	HKEY key, const std::wstring &baseValueName, const FILETIME &dateTime)
+bool RegistrySettings::SaveDateTime(HKEY key, const std::wstring &baseValueName,
+	const FILETIME &dateTime)
 {
 	LONG res1 = SaveDword(key, (baseValueName + L"Low").c_str(), dateTime.dwLowDateTime);
 	LONG res2 = SaveDword(key, (baseValueName + L"High").c_str(), dateTime.dwHighDateTime);

@@ -7,8 +7,8 @@
 #include "Macros.h"
 #include <codecvt>
 
-BOOL CheckWildcardMatchInternal(
-	const TCHAR *szWildcard, const TCHAR *szString, BOOL bCaseSensitive);
+BOOL CheckWildcardMatchInternal(const TCHAR *szWildcard, const TCHAR *szString,
+	BOOL bCaseSensitive);
 
 void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize, size_t cchBuf)
 {
@@ -149,7 +149,7 @@ TCHAR *PrintCommaLargeNum(LARGE_INTEGER lPrint)
 			*--p = chComma;
 		}
 
-		*--p = '0' + (TCHAR)(nTemp % 10);
+		*--p = '0' + (TCHAR) (nTemp % 10);
 
 		nTemp /= 10;
 
@@ -385,8 +385,8 @@ std::optional<std::wstring> strToWstr(const std::string &source)
 	std::wstring wideString;
 	wideString.resize(res);
 
-	res = MultiByteToWideChar(
-		CP_ACP, 0, source.c_str(), -1, wideString.data(), static_cast<int>(wideString.size()));
+	res = MultiByteToWideChar(CP_ACP, 0, source.c_str(), -1, wideString.data(),
+		static_cast<int>(wideString.size()));
 
 	if (res == 0)
 	{

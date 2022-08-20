@@ -48,8 +48,8 @@ private:
 	virtual DropTargetItemIdentifierType GetDropTargetItem(const POINT &pt) = 0;
 	virtual unique_pidl_absolute GetPidlForTargetItem(DropTargetItemIdentifierType targetItem) = 0;
 	virtual IUnknown *GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl) = 0;
-	virtual bool IsTargetSourceOfDrop(
-		DropTargetItemIdentifierType targetItem, IDataObject *dataObject) = 0;
+	virtual bool IsTargetSourceOfDrop(DropTargetItemIdentifierType targetItem,
+		IDataObject *dataObject) = 0;
 	virtual void UpdateUiForDrop(DropTargetItemIdentifierType targetItem, const POINT &pt) = 0;
 	virtual void ResetDropUiState() = 0;
 

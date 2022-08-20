@@ -29,8 +29,8 @@ ResizableDialog::ResizableDialog(HWND hDlg, const std::list<Control> &controlLis
 
 		hwnd = GetDlgItem(m_hDlg, control.iID);
 		GetWindowRect(hwnd, &rc);
-		MapWindowPoints(
-			HWND_DESKTOP, m_hDlg, reinterpret_cast<LPPOINT>(&rc), sizeof(RECT) / sizeof(POINT));
+		MapWindowPoints(HWND_DESKTOP, m_hDlg, reinterpret_cast<LPPOINT>(&rc),
+			sizeof(RECT) / sizeof(POINT));
 
 		switch (control.Type)
 		{
@@ -58,8 +58,8 @@ void ResizableDialog::UpdateControls(int iWidth, int iHeight)
 	{
 		hCtrl = GetDlgItem(m_hDlg, control.iID);
 		GetWindowRect(hCtrl, &rc);
-		MapWindowPoints(
-			HWND_DESKTOP, m_hDlg, reinterpret_cast<LPPOINT>(&rc), sizeof(RECT) / sizeof(POINT));
+		MapWindowPoints(HWND_DESKTOP, m_hDlg, reinterpret_cast<LPPOINT>(&rc),
+			sizeof(RECT) / sizeof(POINT));
 
 		/* Update the size/position of each of the controls.
 		Both resizes and movements rely on the fact that two

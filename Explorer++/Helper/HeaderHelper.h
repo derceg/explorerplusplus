@@ -6,5 +6,5 @@
 
 namespace HeaderHelper
 {
-void AddOrRemoveFormatOptions(HWND header, int index, int formatOptions, bool add);
+	void AddOrRemoveFormatOptions(HWND header, int index, int formatOptions, bool add);
 }

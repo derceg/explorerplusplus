@@ -8,8 +8,11 @@
 #include "Macros.h"
 #include "WindowHelper.h"
 #include <VSStyle.h>
+// wil/resource.h needs to be included after uxtheme.h to ensure that wil::unique_htheme is defined.
+// clang-format off
 #include <uxtheme.h>
 #include <wil/resource.h>
+// clang-format on
 
 constexpr int DEFAULT_CHECKBOX_WIDTH = 13;
 constexpr int DEFAULT_CHECKBOX_HEIGHT = 13;
@@ -19,14 +22,15 @@ constexpr int DEFAULT_RADIO_BUTTON_HEIGHT = 13;
 
 HWND CreateListView(HWND hParent, DWORD dwStyle)
 {
-	HWND hListView = CreateWindow(WC_LISTVIEW, EMPTY_STRING, dwStyle,
-		0, 0, 0, 0, hParent, nullptr, GetModuleHandle(nullptr), nullptr);
+	HWND hListView = CreateWindow(WC_LISTVIEW, EMPTY_STRING, dwStyle, 0, 0, 0, 0, hParent, nullptr,
+		GetModuleHandle(nullptr), nullptr);
 
-	if(hListView != nullptr)
+	if (hListView != nullptr)
 	{
 		/* Set the extended hListView styles. These styles can't be set
 		properly with CreateWindowEx(). */
-		SendMessage(hListView, LVM_SETEXTENDEDLISTVIEWSTYLE, 0, LVS_EX_INFOTIP | LVS_EX_DOUBLEBUFFER);
+		SendMessage(hListView, LVM_SETEXTENDEDLISTVIEWSTYLE, 0,
+			LVS_EX_INFOTIP | LVS_EX_DOUBLEBUFFER);
 	}
 
 	return hListView;
@@ -34,16 +38,16 @@ HWND CreateListView(HWND hParent, DWORD dwStyle)
 
 HWND CreateTreeView(HWND hParent, DWORD dwStyle)
 {
-	HWND hTreeView = CreateWindow(WC_TREEVIEW, EMPTY_STRING, dwStyle,
-		0, 0, 0, 0, hParent, nullptr, GetModuleHandle(nullptr), nullptr);
+	HWND hTreeView = CreateWindow(WC_TREEVIEW, EMPTY_STRING, dwStyle, 0, 0, 0, 0, hParent, nullptr,
+		GetModuleHandle(nullptr), nullptr);
 
-	if(hTreeView != nullptr)
+	if (hTreeView != nullptr)
 	{
 		/* Retrieve the small version of the system image list. */
 		HIMAGELIST smallIcons;
 		BOOL bRet = Shell_GetImageLists(nullptr, &smallIcons);
 
-		if(bRet)
+		if (bRet)
 		{
 			TreeView_SetImageList(hTreeView, smallIcons, TVSIL_NORMAL);
 		}
@@ -54,18 +58,18 @@ HWND CreateTreeView(HWND hParent, DWORD dwStyle)
 
 HWND CreateStatusBar(HWND hParent, DWORD dwStyle)
 {
-	HWND hStatusBar = CreateWindow(STATUSCLASSNAME, EMPTY_STRING, dwStyle,
-		0, 0, 0, 0, hParent, nullptr, GetModuleHandle(nullptr), nullptr);
+	HWND hStatusBar = CreateWindow(STATUSCLASSNAME, EMPTY_STRING, dwStyle, 0, 0, 0, 0, hParent,
+		nullptr, GetModuleHandle(nullptr), nullptr);
 
 	return hStatusBar;
 }
 
 HWND CreateToolbar(HWND hParent, DWORD dwStyle, DWORD dwExStyle)
 {
-	HWND hToolbar = CreateWindow(TOOLBARCLASSNAME, EMPTY_STRING, dwStyle,
-		0, 0, 0, 0, hParent, nullptr, GetModuleHandle(nullptr), nullptr);
+	HWND hToolbar = CreateWindow(TOOLBARCLASSNAME, EMPTY_STRING, dwStyle, 0, 0, 0, 0, hParent,
+		nullptr, GetModuleHandle(nullptr), nullptr);
 
-	if(hToolbar != nullptr)
+	if (hToolbar != nullptr)
 	{
 		/* Set the extended styles for the toolbar. */
 		SendMessage(hToolbar, TB_SETEXTENDEDSTYLE, 0, dwExStyle);
@@ -76,17 +80,16 @@ HWND CreateToolbar(HWND hParent, DWORD dwStyle, DWORD dwExStyle)
 
 HWND CreateComboBox(HWND parent, DWORD dwStyle)
 {
-	HWND hComboBox = CreateWindowEx(WS_EX_TOOLWINDOW, WC_COMBOBOXEX,
-		EMPTY_STRING, dwStyle, 0, 0, 0, 200, parent, nullptr,
-		GetModuleHandle(nullptr), nullptr);
+	HWND hComboBox = CreateWindowEx(WS_EX_TOOLWINDOW, WC_COMBOBOXEX, EMPTY_STRING, dwStyle, 0, 0, 0,
+		200, parent, nullptr, GetModuleHandle(nullptr), nullptr);
 
 	return hComboBox;
 }
 
 HWND CreateTabControl(HWND hParent, DWORD dwStyle)
 {
-	HWND hTabControl = CreateWindowEx(0, WC_TABCONTROL, EMPTY_STRING,
-		dwStyle, 0, 0, 0, 0, hParent, nullptr, GetModuleHandle(nullptr), nullptr);
+	HWND hTabControl = CreateWindowEx(0, WC_TABCONTROL, EMPTY_STRING, dwStyle, 0, 0, 0, 0, hParent,
+		nullptr, GetModuleHandle(nullptr), nullptr);
 
 	return hTabControl;
 }
@@ -106,11 +109,11 @@ BOOL PinStatusBar(HWND hStatusBar, int width, int height)
 	RECT rc;
 	BOOL bRet = GetWindowRect(hStatusBar, &rc);
 
-	if(bRet)
+	if (bRet)
 	{
 		/* Pin the status bar to the bottom of the window. */
-		bRet = SetWindowPos(hStatusBar, nullptr, 0, height - GetRectHeight(&rc),
-			width, GetRectHeight(&rc), SWP_NOZORDER);
+		bRet = SetWindowPos(hStatusBar, nullptr, 0, height - GetRectHeight(&rc), width,
+			GetRectHeight(&rc), SWP_NOZORDER);
 	}
 
 	return bRet;
@@ -121,7 +124,7 @@ BOOL AddPathsToComboBoxEx(HWND hComboBoxEx, const TCHAR *path)
 	HIMAGELIST smallIcons;
 	BOOL bRet = Shell_GetImageLists(nullptr, &smallIcons);
 
-	if(!bRet)
+	if (!bRet)
 	{
 		return FALSE;
 	}
@@ -135,7 +138,7 @@ BOOL AddPathsToComboBoxEx(HWND hComboBoxEx, const TCHAR *path)
 	StringCchCopy(findPath, SIZEOF_ARRAY(findPath), path);
 	bRet = PathAppend(findPath, _T("*"));
 
-	if(!bRet)
+	if (!bRet)
 	{
 		return FALSE;
 	}
@@ -143,22 +146,22 @@ BOOL AddPathsToComboBoxEx(HWND hComboBoxEx, const TCHAR *path)
 	WIN32_FIND_DATA wfd;
 	HANDLE hFirstFile = FindFirstFile(findPath, &wfd);
 
-	if(hFirstFile == INVALID_HANDLE_VALUE)
+	if (hFirstFile == INVALID_HANDLE_VALUE)
 	{
 		return FALSE;
 	}
 
 	BOOL success = TRUE;
 
-	while(FindNextFile(hFirstFile, &wfd))
+	while (FindNextFile(hFirstFile, &wfd))
 	{
-		if((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY &&
-			StrCmp(wfd.cFileName, _T("..")) != 0)
+		if ((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY
+			&& StrCmp(wfd.cFileName, _T("..")) != 0)
 		{
 			TCHAR fullFileName[MAX_PATH];
 			LPTSTR szRet = PathCombine(fullFileName, path, wfd.cFileName);
 
-			if(szRet == nullptr)
+			if (szRet == nullptr)
 			{
 				success = FALSE;
 				break;
@@ -176,9 +179,10 @@ BOOL AddPathsToComboBoxEx(HWND hComboBoxEx, const TCHAR *path)
 			cbItem.iOverlay = 1;
 			cbItem.pszText = wfd.cFileName;
 
-			LRESULT lRet = SendMessage(hComboBoxEx, CBEM_INSERTITEM, 0, reinterpret_cast<LPARAM>(&cbItem));
+			LRESULT lRet =
+				SendMessage(hComboBoxEx, CBEM_INSERTITEM, 0, reinterpret_cast<LPARAM>(&cbItem));
 
-			if(lRet == -1)
+			if (lRet == -1)
 			{
 				success = FALSE;
 				break;
@@ -195,7 +199,7 @@ BOOL lCheckDlgButton(HWND hDlg, int buttonId, BOOL bCheck)
 {
 	UINT uCheck;
 
-	if(bCheck)
+	if (bCheck)
 	{
 		uCheck = BST_CHECKED;
 	}
@@ -209,7 +213,7 @@ BOOL lCheckDlgButton(HWND hDlg, int buttonId, BOOL bCheck)
 
 void AddStyleToToolbar(UINT *fStyle, UINT fStyleToAdd)
 {
-	if((*fStyle & fStyleToAdd) != fStyleToAdd)
+	if ((*fStyle & fStyleToAdd) != fStyleToAdd)
 	{
 		*fStyle |= fStyleToAdd;
 	}
@@ -217,28 +221,28 @@ void AddStyleToToolbar(UINT *fStyle, UINT fStyleToAdd)
 
 void AddGripperStyle(UINT *fStyle, BOOL bAddGripper)
 {
-	if(bAddGripper)
+	if (bAddGripper)
 	{
 		/* Remove the no-gripper style (if present). */
-		if((*fStyle & RBBS_NOGRIPPER) == RBBS_NOGRIPPER)
+		if ((*fStyle & RBBS_NOGRIPPER) == RBBS_NOGRIPPER)
 		{
 			*fStyle &= ~RBBS_NOGRIPPER;
 		}
 
 		/* Only add the gripper style if it isn't already present. */
-		if((*fStyle & RBBS_GRIPPERALWAYS) != RBBS_GRIPPERALWAYS)
+		if ((*fStyle & RBBS_GRIPPERALWAYS) != RBBS_GRIPPERALWAYS)
 		{
 			*fStyle |= RBBS_GRIPPERALWAYS;
 		}
 	}
 	else
 	{
-		if((*fStyle & RBBS_GRIPPERALWAYS) == RBBS_GRIPPERALWAYS)
+		if ((*fStyle & RBBS_GRIPPERALWAYS) == RBBS_GRIPPERALWAYS)
 		{
 			*fStyle &= ~RBBS_GRIPPERALWAYS;
 		}
 
-		if((*fStyle & RBBS_NOGRIPPER) != RBBS_NOGRIPPER)
+		if ((*fStyle & RBBS_NOGRIPPER) != RBBS_NOGRIPPER)
 		{
 			*fStyle |= RBBS_NOGRIPPER;
 		}
@@ -255,20 +259,20 @@ void UpdateToolbarBandSizing(HWND hRebar, HWND hToolbar)
 
 	nBands = (int) SendMessage(hRebar, RB_GETBANDCOUNT, 0, 0);
 
-	for(i = 0; i < nBands; i++)
+	for (i = 0; i < nBands; i++)
 	{
 		rbbi.cbSize = sizeof(rbbi);
 		rbbi.fMask = RBBIM_CHILD;
 		SendMessage(hRebar, RB_GETBANDINFO, i, reinterpret_cast<LPARAM>(&rbbi));
 
-		if(rbbi.hwndChild == hToolbar)
+		if (rbbi.hwndChild == hToolbar)
 		{
 			iBand = i;
 			break;
 		}
 	}
 
-	if(iBand != -1)
+	if (iBand != -1)
 	{
 		SendMessage(hToolbar, TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&sz));
 
@@ -281,8 +285,8 @@ void UpdateToolbarBandSizing(HWND hRebar, HWND hToolbar)
 
 SIZE GetCheckboxSize(HWND hwnd)
 {
-	return GetButtonSize(
-		hwnd, BP_CHECKBOX, CBS_UNCHECKEDNORMAL, DEFAULT_CHECKBOX_WIDTH, DEFAULT_CHECKBOX_HEIGHT);
+	return GetButtonSize(hwnd, BP_CHECKBOX, CBS_UNCHECKEDNORMAL, DEFAULT_CHECKBOX_WIDTH,
+		DEFAULT_CHECKBOX_HEIGHT);
 }
 
 SIZE GetRadioButtonSize(HWND hwnd)
@@ -302,8 +306,8 @@ SIZE GetButtonSize(HWND hwnd, int partId, int stateId, int defaultWidth, int def
 			wil::unique_hdc_window screenDC(GetDC(nullptr));
 
 			SIZE size;
-			HRESULT hr = GetThemePartSize(
-				theme.get(), screenDC.get(), partId, stateId, nullptr, TS_DRAW, &size);
+			HRESULT hr = GetThemePartSize(theme.get(), screenDC.get(), partId, stateId, nullptr,
+				TS_DRAW, &size);
 
 			if (SUCCEEDED(hr))
 			{

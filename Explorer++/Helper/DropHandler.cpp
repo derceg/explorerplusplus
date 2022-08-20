@@ -9,9 +9,10 @@
 #include "Macros.h"
 
 /* Drop formats supported. */
-FORMATETC	DropHandler::m_ftcText = {CF_TEXT,nullptr,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
-FORMATETC	DropHandler::m_ftcUnicodeText = {CF_UNICODETEXT,nullptr,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
-FORMATETC	DropHandler::m_ftcDIBV5 = {CF_DIBV5,nullptr,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+FORMATETC DropHandler::m_ftcText = { CF_TEXT, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+FORMATETC DropHandler::m_ftcUnicodeText = { CF_UNICODETEXT, nullptr, DVASPECT_CONTENT, -1,
+	TYMED_HGLOBAL };
+FORMATETC DropHandler::m_ftcDIBV5 = { CF_DIBV5, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 
 DropHandler *DropHandler::CreateNew()
 {
@@ -27,21 +28,21 @@ HRESULT DropHandler::GetDropFormats(std::list<FORMATETC> &ftcList)
 	return S_OK;
 }
 
-void DropHandler::CopyClipboardData(IDataObject *pDataObject,HWND hwndDrop,
-const TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback)
+void DropHandler::CopyClipboardData(IDataObject *pDataObject, HWND hwndDrop,
+	const TCHAR *szDestDirectory, IDropFilesCallback *pDropFilesCallback)
 {
-	m_pDataObject		= pDataObject;
-	m_dwEffect			= DROPEFFECT_COPY;
-	m_hwndDrop			= hwndDrop;
-	m_destDirectory	= szDestDirectory;
-	m_pDropFilesCallback	= pDropFilesCallback;
+	m_pDataObject = pDataObject;
+	m_dwEffect = DROPEFFECT_COPY;
+	m_hwndDrop = hwndDrop;
+	m_destDirectory = szDestDirectory;
+	m_pDropFilesCallback = pDropFilesCallback;
 
-	POINT pt = {0,0};
+	POINT pt = { 0, 0 };
 
-	HandleLeftClickDrop(m_pDataObject,&pt);
+	HandleLeftClickDrop(m_pDataObject, &pt);
 }
 
-void DropHandler::HandleLeftClickDrop(IDataObject *pDataObject,POINT *pt)
+void DropHandler::HandleLeftClickDrop(IDataObject *pDataObject, POINT *pt)
 {
 	FORMATETC ftc;
 	STGMEDIUM stg;
@@ -49,20 +50,20 @@ void DropHandler::HandleLeftClickDrop(IDataObject *pDataObject,POINT *pt)
 	DWORD dwEffect = DROPEFFECT_NONE;
 	BOOL bPrefferedEffect = FALSE;
 
-	SetFORMATETC(&ftc,(CLIPFORMAT)RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT),
-		nullptr,DVASPECT_CONTENT,-1,TYMED_HGLOBAL);
+	SetFORMATETC(&ftc, (CLIPFORMAT) RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT), nullptr,
+		DVASPECT_CONTENT, -1, TYMED_HGLOBAL);
 
 	/* Check if the data has a preferred drop effect
 	(i.e. copy or move). */
-	HRESULT hr = pDataObject->GetData(&ftc,&stg);
+	HRESULT hr = pDataObject->GetData(&ftc, &stg);
 
-	if(hr == S_OK)
+	if (hr == S_OK)
 	{
-		pdwEffect = (DWORD *)GlobalLock(stg.hGlobal);
+		pdwEffect = (DWORD *) GlobalLock(stg.hGlobal);
 
-		if(pdwEffect != nullptr)
+		if (pdwEffect != nullptr)
 		{
-			if(*pdwEffect != DROPEFFECT_NONE)
+			if (*pdwEffect != DROPEFFECT_NONE)
 			{
 				dwEffect = *pdwEffect;
 				bPrefferedEffect = TRUE;
@@ -77,29 +78,29 @@ void DropHandler::HandleLeftClickDrop(IDataObject *pDataObject,POINT *pt)
 	HRESULT hrCopy = E_FAIL;
 	std::list<std::wstring> pastedFileList;
 
-	if(CheckDropFormatSupported(pDataObject,&m_ftcUnicodeText))
+	if (CheckDropFormatSupported(pDataObject, &m_ftcUnicodeText))
 	{
 		LOG(debug) << _T("Helper - Copying CF_UNICODETEXT data");
-		hrCopy = CopyUnicodeTextData(pDataObject,pastedFileList);
+		hrCopy = CopyUnicodeTextData(pDataObject, pastedFileList);
 	}
-	else if(CheckDropFormatSupported(pDataObject,&m_ftcText))
+	else if (CheckDropFormatSupported(pDataObject, &m_ftcText))
 	{
 		LOG(debug) << _T("Helper - Copying CF_TEXT data");
-		hrCopy = CopyAnsiTextData(pDataObject,pastedFileList);
+		hrCopy = CopyAnsiTextData(pDataObject, pastedFileList);
 	}
-	else if(CheckDropFormatSupported(pDataObject,&m_ftcDIBV5))
+	else if (CheckDropFormatSupported(pDataObject, &m_ftcDIBV5))
 	{
 		LOG(debug) << _T("Helper - Copying CF_DIBV5 data");
-		hrCopy = CopyDIBV5Data(pDataObject,pastedFileList);
+		hrCopy = CopyDIBV5Data(pDataObject, pastedFileList);
 	}
 
-	if(hrCopy == S_OK && !pastedFileList.empty())
+	if (hrCopy == S_OK && !pastedFileList.empty())
 	{
 		/* The data was copied successfully, so notify
 		the caller via the specified callback interface. */
-		if(m_pDropFilesCallback != nullptr)
+		if (m_pDropFilesCallback != nullptr)
 		{
-			m_pDropFilesCallback->OnDropFile(pastedFileList,pt);
+			m_pDropFilesCallback->OnDropFile(pastedFileList, pt);
 		}
 	}
 }
@@ -109,7 +110,7 @@ QueryGetData() that they support a particular drop format,
 even though a corresponding call to GetData() fails.
 Therefore, we'll actually attempt to query the data using
 GetData(). */
-BOOL DropHandler::CheckDropFormatSupported(IDataObject *pDataObject,FORMATETC *pftc)
+BOOL DropHandler::CheckDropFormatSupported(IDataObject *pDataObject, FORMATETC *pftc)
 {
 	HRESULT hr;
 
@@ -118,20 +119,20 @@ BOOL DropHandler::CheckDropFormatSupported(IDataObject *pDataObject,FORMATETC *p
 	GetData(). */
 	LONG lindex = pftc->lindex;
 	pftc->lindex = -1;
-	
+
 	hr = pDataObject->QueryGetData(pftc);
 
 	pftc->lindex = lindex;
 
-	if(hr != S_OK)
+	if (hr != S_OK)
 	{
 		return FALSE;
 	}
 
 	STGMEDIUM stg;
-	hr = pDataObject->GetData(pftc,&stg);
+	hr = pDataObject->GetData(pftc, &stg);
 
-	if(hr != S_OK)
+	if (hr != S_OK)
 	{
 		return FALSE;
 	}
@@ -147,22 +148,23 @@ HRESULT DropHandler::CopyUnicodeTextData(IDataObject *pDataObject,
 	STGMEDIUM stg;
 	HRESULT hr;
 
-	hr = pDataObject->GetData(&m_ftcUnicodeText,&stg);
+	hr = pDataObject->GetData(&m_ftcUnicodeText, &stg);
 
-	if(hr == S_OK)
+	if (hr == S_OK)
 	{
 		auto *pText = static_cast<WCHAR *>(GlobalLock(stg.hGlobal));
 
-		if(pText != nullptr)
+		if (pText != nullptr)
 		{
 			TCHAR szFullFileName[MAX_PATH];
 
-			hr = CopyTextToFile(m_destDirectory.c_str(), pText, szFullFileName, SIZEOF_ARRAY(szFullFileName));
+			hr = CopyTextToFile(m_destDirectory.c_str(), pText, szFullFileName,
+				SIZEOF_ARRAY(szFullFileName));
 
-			if(hr == S_OK)
+			if (hr == S_OK)
 			{
 				TCHAR szFileName[MAX_PATH];
-				StringCchCopy(szFileName,SIZEOF_ARRAY(szFileName),szFullFileName);
+				StringCchCopy(szFileName, SIZEOF_ARRAY(szFileName), szFullFileName);
 				PathStripPath(szFileName);
 
 				PastedFileList.emplace_back(szFileName);
@@ -183,27 +185,27 @@ HRESULT DropHandler::CopyAnsiTextData(IDataObject *pDataObject,
 	STGMEDIUM stg;
 	HRESULT hr;
 
-	hr = pDataObject->GetData(&m_ftcText,&stg);
+	hr = pDataObject->GetData(&m_ftcText, &stg);
 
-	if(hr == S_OK)
+	if (hr == S_OK)
 	{
 		char *pText = static_cast<char *>(GlobalLock(stg.hGlobal));
 
-		if(pText != nullptr)
+		if (pText != nullptr)
 		{
 			auto *pszUnicodeText = new WCHAR[strlen(pText) + 1];
 
-			int iRet = MultiByteToWideChar(CP_ACP,0,pText,-1,pszUnicodeText,
+			int iRet = MultiByteToWideChar(CP_ACP, 0, pText, -1, pszUnicodeText,
 				static_cast<int>(strlen(pText) + 1));
 
-			if(iRet != 0)
+			if (iRet != 0)
 			{
 				TCHAR szFullFileName[MAX_PATH];
 
-				hr = CopyTextToFile(m_destDirectory.c_str(), pszUnicodeText,
-					szFullFileName, SIZEOF_ARRAY(szFullFileName));
+				hr = CopyTextToFile(m_destDirectory.c_str(), pszUnicodeText, szFullFileName,
+					SIZEOF_ARRAY(szFullFileName));
 
-				if(hr == S_OK)
+				if (hr == S_OK)
 				{
 					TCHAR szFileName[MAX_PATH];
 					StringCchCopy(szFileName, SIZEOF_ARRAY(szFileName), szFullFileName);
@@ -230,13 +232,13 @@ HRESULT DropHandler::CopyDIBV5Data(IDataObject *pDataObject,
 	STGMEDIUM stg;
 	HRESULT hr;
 
-	hr = pDataObject->GetData(&m_ftcDIBV5,&stg);
+	hr = pDataObject->GetData(&m_ftcDIBV5, &stg);
 
-	if(hr == S_OK)
+	if (hr == S_OK)
 	{
 		auto *pbmp = static_cast<BITMAPINFO *>(GlobalLock(stg.hGlobal));
 
-		if(pbmp != nullptr)
+		if (pbmp != nullptr)
 		{
 			SYSTEMTIME st;
 			FILETIME ft;
@@ -244,17 +246,17 @@ HRESULT DropHandler::CopyDIBV5Data(IDataObject *pDataObject,
 			TCHAR szTime[512];
 
 			GetLocalTime(&st);
-			SystemTimeToFileTime(&st,&ft);
-			LocalFileTimeToFileTime(&ft,&lft);
-			CreateFileTimeString(&lft,szTime,SIZEOF_ARRAY(szTime),FALSE);
+			SystemTimeToFileTime(&st, &ft);
+			LocalFileTimeToFileTime(&ft, &lft);
+			CreateFileTimeString(&lft, szTime, SIZEOF_ARRAY(szTime), FALSE);
 
-			for(int i = 0;i < lstrlen(szTime);i++)
+			for (int i = 0; i < lstrlen(szTime); i++)
 			{
-				if(szTime[i] == '/')
+				if (szTime[i] == '/')
 				{
 					szTime[i] = '-';
 				}
-				else if(szTime[i] == ':')
+				else if (szTime[i] == ':')
 				{
 					szTime[i] = '.';
 				}
@@ -264,45 +266,43 @@ HRESULT DropHandler::CopyDIBV5Data(IDataObject *pDataObject,
 			TCHAR szFileName[MAX_PATH];
 
 			/* TODO: Move text into string table. */
-			StringCchPrintf(szFileName,SIZEOF_ARRAY(szFileName),
-				_T("Clipboard Image (%s).bmp"),szTime);
+			StringCchPrintf(szFileName, SIZEOF_ARRAY(szFileName), _T("Clipboard Image (%s).bmp"),
+				szTime);
 
-			PathCombine(szFullFileName,m_destDirectory.c_str(),
-				szFileName);
+			PathCombine(szFullFileName, m_destDirectory.c_str(), szFileName);
 
-			HANDLE hFile = CreateFile(szFullFileName,
-				GENERIC_WRITE,0,nullptr,CREATE_NEW,
-				FILE_ATTRIBUTE_NORMAL,nullptr);
+			HANDLE hFile = CreateFile(szFullFileName, GENERIC_WRITE, 0, nullptr, CREATE_NEW,
+				FILE_ATTRIBUTE_NORMAL, nullptr);
 
-			if(hFile != INVALID_HANDLE_VALUE)
+			if (hFile != INVALID_HANDLE_VALUE)
 			{
-				auto dwSize = static_cast<DWORD>(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + (GlobalSize(stg.hGlobal) - sizeof(BITMAPINFOHEADER)));
+				auto dwSize = static_cast<DWORD>(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER)
+					+ (GlobalSize(stg.hGlobal) - sizeof(BITMAPINFOHEADER)));
 
 				auto pData = new BYTE[dwSize];
 
-				auto *pbfh = (BITMAPFILEHEADER *)pData;
+				auto *pbfh = (BITMAPFILEHEADER *) pData;
 
 				/* 'BM'. */
-				pbfh->bfType		= 0x4D42;
+				pbfh->bfType = 0x4D42;
 
-				pbfh->bfSize		= pbmp->bmiHeader.biSize;
-				pbfh->bfReserved1	= 0;
-				pbfh->bfReserved2	= 0;
-				pbfh->bfOffBits		= sizeof(BITMAPFILEHEADER);
+				pbfh->bfSize = pbmp->bmiHeader.biSize;
+				pbfh->bfReserved1 = 0;
+				pbfh->bfReserved2 = 0;
+				pbfh->bfOffBits = sizeof(BITMAPFILEHEADER);
 
-				auto *pb5h = (BITMAPINFOHEADER *)(pData + sizeof(BITMAPFILEHEADER));
+				auto *pb5h = (BITMAPINFOHEADER *) (pData + sizeof(BITMAPFILEHEADER));
 
-				memcpy(pb5h,&pbmp->bmiHeader,sizeof(BITMAPINFOHEADER));
+				memcpy(pb5h, &pbmp->bmiHeader, sizeof(BITMAPINFOHEADER));
 
-				auto *prgb = (RGBQUAD *)(pData + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER));
+				auto *prgb =
+					(RGBQUAD *) (pData + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER));
 
-				memcpy(prgb,pbmp->bmiColors,GlobalSize(stg.hGlobal) - sizeof(BITMAPINFOHEADER));
+				memcpy(prgb, pbmp->bmiColors, GlobalSize(stg.hGlobal) - sizeof(BITMAPINFOHEADER));
 
 				DWORD nBytesWritten;
 
-				WriteFile(hFile,(LPCVOID)pData,
-					dwSize,
-					&nBytesWritten,nullptr);
+				WriteFile(hFile, (LPCVOID) pData, dwSize, &nBytesWritten, nullptr);
 
 				CloseHandle(hFile);
 
@@ -321,8 +321,8 @@ HRESULT DropHandler::CopyDIBV5Data(IDataObject *pDataObject,
 	return hr;
 }
 
-HRESULT DropHandler::CopyTextToFile(const TCHAR *pszDestDirectory,
-	const WCHAR *pszText,TCHAR *pszFullFileNameOut, size_t outLen)
+HRESULT DropHandler::CopyTextToFile(const TCHAR *pszDestDirectory, const WCHAR *pszText,
+	TCHAR *pszFullFileNameOut, size_t outLen)
 {
 	SYSTEMTIME st;
 	FILETIME ft;
@@ -331,17 +331,17 @@ HRESULT DropHandler::CopyTextToFile(const TCHAR *pszDestDirectory,
 	TCHAR szTime[512];
 
 	GetLocalTime(&st);
-	SystemTimeToFileTime(&st,&ft);
-	LocalFileTimeToFileTime(&ft,&lft);
-	CreateFileTimeString(&lft,szTime,SIZEOF_ARRAY(szTime),FALSE);
+	SystemTimeToFileTime(&st, &ft);
+	LocalFileTimeToFileTime(&ft, &lft);
+	CreateFileTimeString(&lft, szTime, SIZEOF_ARRAY(szTime), FALSE);
 
-	for(int i = 0;i < lstrlen(szTime);i++)
+	for (int i = 0; i < lstrlen(szTime); i++)
 	{
-		if(szTime[i] == '/')
+		if (szTime[i] == '/')
 		{
 			szTime[i] = '-';
 		}
-		else if(szTime[i] == ':')
+		else if (szTime[i] == ':')
 		{
 			szTime[i] = '.';
 		}
@@ -351,31 +351,26 @@ HRESULT DropHandler::CopyTextToFile(const TCHAR *pszDestDirectory,
 	TCHAR szFileName[MAX_PATH];
 
 	/* TODO: Move text into string table. */
-	StringCchPrintf(szFileName,SIZEOF_ARRAY(szFileName),
-		_T("Clipboard Text (%s).txt"),szTime);
+	StringCchPrintf(szFileName, SIZEOF_ARRAY(szFileName), _T("Clipboard Text (%s).txt"), szTime);
 
-	PathCombine(szFullFileName,pszDestDirectory,
-		szFileName);
+	PathCombine(szFullFileName, pszDestDirectory, szFileName);
 
-	HANDLE hFile = CreateFile(szFullFileName,
-		GENERIC_WRITE,0,nullptr,CREATE_NEW,
-		FILE_ATTRIBUTE_NORMAL,nullptr);
+	HANDLE hFile = CreateFile(szFullFileName, GENERIC_WRITE, 0, nullptr, CREATE_NEW,
+		FILE_ATTRIBUTE_NORMAL, nullptr);
 
-	if(hFile != INVALID_HANDLE_VALUE)
+	if (hFile != INVALID_HANDLE_VALUE)
 	{
 		DWORD nBytesWritten;
 
 		/* UTF-16 LE BOM. */
-		WriteFile(hFile,reinterpret_cast<LPCVOID>("\xFF\xFE"),2,
-			&nBytesWritten,nullptr);
+		WriteFile(hFile, reinterpret_cast<LPCVOID>("\xFF\xFE"), 2, &nBytesWritten, nullptr);
 
-		WriteFile(hFile,(LPCVOID)pszText,
-			lstrlen(pszText) * sizeof(WCHAR),
-			&nBytesWritten,nullptr);
+		WriteFile(hFile, (LPCVOID) pszText, lstrlen(pszText) * sizeof(WCHAR), &nBytesWritten,
+			nullptr);
 
 		CloseHandle(hFile);
 
-		StringCchCopy(pszFullFileNameOut,outLen,szFullFileName);
+		StringCchCopy(pszFullFileNameOut, outLen, szFullFileName);
 
 		hr = S_OK;
 	}

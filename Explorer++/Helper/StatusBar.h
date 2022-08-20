@@ -4,30 +4,28 @@
 
 #pragma once
 
+#include "Macros.h"
 #include <list>
 #include <string>
-#include "Macros.h"
 
 class StatusBar
 {
 public:
-
 	StatusBar(HWND hwnd);
 
-	void			SetPartText(int iPart, const TCHAR *szText);
+	void SetPartText(int iPart, const TCHAR *szText);
 
-	void			HandleStatusBarMenuOpen();
-	void			HandleStatusBarMenuClose();
+	void HandleStatusBarMenuOpen();
+	void HandleStatusBarMenuClose();
 
 private:
-
 	DISALLOW_COPY_AND_ASSIGN(StatusBar);
 
-	const HWND		m_hwnd;
+	const HWND m_hwnd;
 
-	int				m_nParts;
-	int				*m_pPartWidths;
-	std::list<std::wstring>	m_TextList;
+	int m_nParts;
+	int *m_pPartWidths;
+	std::list<std::wstring> m_TextList;
 
-	bool			m_bAlteredStatusBarParts;
+	bool m_bAlteredStatusBarParts;
 };

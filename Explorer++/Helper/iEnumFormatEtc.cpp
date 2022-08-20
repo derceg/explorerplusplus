@@ -3,36 +3,33 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include <list>
 #include "iEnumFormatEtc.h"
-
+#include <list>
 
 class EnumFormatEtc : public IEnumFORMATETC
 {
 public:
-
 	EnumFormatEtc(const std::list<FORMATETC> &feList);
 	~EnumFormatEtc();
 
-	HRESULT		__stdcall	QueryInterface(REFIID iid, void **ppvObject);
-	ULONG		__stdcall	AddRef();
-	ULONG		__stdcall	Release();
+	HRESULT __stdcall QueryInterface(REFIID iid, void **ppvObject);
+	ULONG __stdcall AddRef();
+	ULONG __stdcall Release();
 
 private:
-
-	HRESULT __stdcall Next(ULONG celt,FORMATETC *rgelt,ULONG *pceltFetched);
+	HRESULT __stdcall Next(ULONG celt, FORMATETC *rgelt, ULONG *pceltFetched);
 	HRESULT __stdcall Skip(ULONG celt);
 	HRESULT __stdcall Reset();
 	HRESULT __stdcall Clone(IEnumFORMATETC **ppEnum);
 
-	LONG			m_lRefCount;
+	LONG m_lRefCount;
 
-	std::list<FORMATETC>	m_feList;
-	int				m_iIndex;
-	int				m_iNumFormats;
+	std::list<FORMATETC> m_feList;
+	int m_iIndex;
+	int m_iNumFormats;
 };
 
-HRESULT CreateEnumFormatEtc(const std::list<FORMATETC> &feList,IEnumFORMATETC **ppEnumFormatEtc)
+HRESULT CreateEnumFormatEtc(const std::list<FORMATETC> &feList, IEnumFORMATETC **ppEnumFormatEtc)
 {
 	*ppEnumFormatEtc = new EnumFormatEtc(feList);
 
@@ -44,15 +41,15 @@ EnumFormatEtc::EnumFormatEtc(const std::list<FORMATETC> &feList)
 	m_lRefCount = 1;
 	m_iIndex = 0;
 
-	for(const auto &fe : feList)
+	for (const auto &fe : feList)
 	{
 		FORMATETC ftc = fe;
 
-		if(fe.ptd != nullptr)
+		if (fe.ptd != nullptr)
 		{
 			ftc.ptd = reinterpret_cast<DVTARGETDEVICE *>(CoTaskMemAlloc(fe.ptd->tdSize));
 
-			if(ftc.ptd != nullptr)
+			if (ftc.ptd != nullptr)
 			{
 				memcpy(ftc.ptd, fe.ptd, fe.ptd->tdSize);
 			}
@@ -66,9 +63,9 @@ EnumFormatEtc::EnumFormatEtc(const std::list<FORMATETC> &feList)
 
 EnumFormatEtc::~EnumFormatEtc()
 {
-	for(auto fe : m_feList)
+	for (auto fe : m_feList)
 	{
-		if(fe.ptd != nullptr)
+		if (fe.ptd != nullptr)
 		{
 			CoTaskMemFree(fe.ptd);
 		}
@@ -80,12 +77,12 @@ HRESULT __stdcall EnumFormatEtc::QueryInterface(REFIID iid, void **ppvObject)
 {
 	*ppvObject = nullptr;
 
-	if(iid == IID_IEnumFORMATETC||iid == IID_IUnknown)
+	if (iid == IID_IEnumFORMATETC || iid == IID_IUnknown)
 	{
-		*ppvObject=this;
+		*ppvObject = this;
 	}
 
-	if(*ppvObject)
+	if (*ppvObject)
 	{
 		AddRef();
 		return S_OK;
@@ -103,7 +100,7 @@ ULONG __stdcall EnumFormatEtc::Release()
 {
 	LONG lCount = InterlockedDecrement(&m_lRefCount);
 
-	if(lCount == 0)
+	if (lCount == 0)
 	{
 		delete this;
 		return 0;
@@ -112,12 +109,11 @@ ULONG __stdcall EnumFormatEtc::Release()
 	return lCount;
 }
 
-
-HRESULT __stdcall EnumFormatEtc::Next(ULONG celt,FORMATETC *rgelt,ULONG *pceltFetched)
+HRESULT __stdcall EnumFormatEtc::Next(ULONG celt, FORMATETC *rgelt, ULONG *pceltFetched)
 {
 	UNREFERENCED_PARAMETER(celt);
 
-	if(m_iIndex >= m_iNumFormats)
+	if (m_iIndex >= m_iNumFormats)
 	{
 		if (pceltFetched != nullptr)
 		{
@@ -129,13 +125,13 @@ HRESULT __stdcall EnumFormatEtc::Next(ULONG celt,FORMATETC *rgelt,ULONG *pceltFe
 
 	int i = 0;
 
-	for(auto itr = m_feList.begin();itr != m_feList.end();itr++)
+	for (auto itr = m_feList.begin(); itr != m_feList.end(); itr++)
 	{
-		if(i == m_iIndex)
+		if (i == m_iIndex)
 		{
-			memcpy(&rgelt[0],&(*itr),sizeof(FORMATETC));
+			memcpy(&rgelt[0], &(*itr), sizeof(FORMATETC));
 
-			if(itr->ptd != nullptr)
+			if (itr->ptd != nullptr)
 			{
 				rgelt[0].ptd = reinterpret_cast<DVTARGETDEVICE *>(CoTaskMemAlloc(itr->ptd->tdSize));
 

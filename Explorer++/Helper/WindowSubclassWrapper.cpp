@@ -14,14 +14,14 @@ WindowSubclassWrapper::WindowSubclassWrapper(HWND hwnd, SUBCLASSPROC subclassPro
 	m_subclassInstalled = SetWindowSubclass(hwnd, subclassProc, subclassId, data);
 }
 
-WindowSubclassWrapper::WindowSubclassWrapper(
-	HWND hwnd, Subclass subclass, UINT_PTR subclassId) :
+WindowSubclassWrapper::WindowSubclassWrapper(HWND hwnd, Subclass subclass, UINT_PTR subclassId) :
 	m_hwnd(hwnd),
 	m_subclassProc(SubclassProcStub),
 	m_subclass(subclass),
 	m_subclassId(subclassId)
 {
-	m_subclassInstalled = SetWindowSubclass(hwnd, SubclassProcStub, subclassId, reinterpret_cast<DWORD_PTR>(this));
+	m_subclassInstalled =
+		SetWindowSubclass(hwnd, SubclassProcStub, subclassId, reinterpret_cast<DWORD_PTR>(this));
 }
 
 WindowSubclassWrapper::~WindowSubclassWrapper()
@@ -32,8 +32,8 @@ WindowSubclassWrapper::~WindowSubclassWrapper()
 	}
 }
 
-LRESULT CALLBACK WindowSubclassWrapper::SubclassProcStub(
-	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data)
+LRESULT CALLBACK WindowSubclassWrapper::SubclassProcStub(HWND hwnd, UINT msg, WPARAM wParam,
+	LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data)
 {
 	UNREFERENCED_PARAMETER(subclassId);
 

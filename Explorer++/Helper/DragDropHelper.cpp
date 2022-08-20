@@ -38,8 +38,8 @@ HRESULT SetDropDescription(IDataObject *dataObject, DROPIMAGETYPE type, const st
 {
 	DROPDESCRIPTION dropDescription;
 	dropDescription.type = type;
-	StringCchCopy(
-		dropDescription.szMessage, SIZEOF_ARRAY(dropDescription.szMessage), message.c_str());
+	StringCchCopy(dropDescription.szMessage, SIZEOF_ARRAY(dropDescription.szMessage),
+		message.c_str());
 	StringCchCopy(dropDescription.szInsert, SIZEOF_ARRAY(dropDescription.szInsert), insert.c_str());
 
 	return SetBlobData(dataObject,
@@ -47,12 +47,12 @@ HRESULT SetDropDescription(IDataObject *dataObject, DROPIMAGETYPE type, const st
 }
 
 // Returns an IDataObject instance that can be used for clipboard operations and drag and drop.
-HRESULT CreateDataObjectForShellTransfer(
-	const std::vector<PCIDLIST_ABSOLUTE> &items, IDataObject **dataObjectOut)
+HRESULT CreateDataObjectForShellTransfer(const std::vector<PCIDLIST_ABSOLUTE> &items,
+	IDataObject **dataObjectOut)
 {
 	wil::com_ptr_nothrow<IShellItemArray> shellItemArray;
-	RETURN_IF_FAILED(SHCreateShellItemArrayFromIDLists(
-		static_cast<UINT>(items.size()), items.data(), &shellItemArray));
+	RETURN_IF_FAILED(SHCreateShellItemArrayFromIDLists(static_cast<UINT>(items.size()),
+		items.data(), &shellItemArray));
 
 	wil::com_ptr_nothrow<IDataObject> shellDataObject;
 	RETURN_IF_FAILED(

@@ -61,8 +61,8 @@ private:
 
 	INT_PTR CALLBACK BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	virtual void GetResizableControlInformation(
-		DialogSizeConstraint &dsc, std::list<ResizableDialog::Control> &controlList);
+	virtual void GetResizableControlInformation(DialogSizeConstraint &dsc,
+		std::list<ResizableDialog::Control> &controlList);
 	virtual void SaveState();
 
 	const HINSTANCE m_hInstance;

@@ -23,8 +23,8 @@ BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType subBlo
 BOOL GetStringTableValue(void *pBlock, LangAndCodePage *plcp, UINT nItems,
 	const TCHAR *szVersionInfo, TCHAR *szVersionBuffer, UINT cchMax);
 
-BOOL CreateFileTimeString(
-	const FILETIME *utcFileTime, TCHAR *szBuffer, size_t cchMax, BOOL bFriendlyDate)
+BOOL CreateFileTimeString(const FILETIME *utcFileTime, TCHAR *szBuffer, size_t cchMax,
+	BOOL bFriendlyDate)
 {
 	SYSTEMTIME localSystemTime;
 	BOOL ret = FileTimeToLocalSystemTime(utcFileTime, &localSystemTime);
@@ -37,8 +37,8 @@ BOOL CreateFileTimeString(
 	return CreateSystemTimeString(&localSystemTime, szBuffer, cchMax, bFriendlyDate);
 }
 
-BOOL CreateSystemTimeString(
-	const SYSTEMTIME *localSystemTime, TCHAR *szBuffer, size_t cchMax, BOOL bFriendlyDate)
+BOOL CreateSystemTimeString(const SYSTEMTIME *localSystemTime, TCHAR *szBuffer, size_t cchMax,
+	BOOL bFriendlyDate)
 {
 	if (bFriendlyDate)
 	{
@@ -67,8 +67,8 @@ BOOL CreateSystemTimeString(
 	return FALSE;
 }
 
-BOOL CreateFriendlySystemTimeString(
-	const SYSTEMTIME *localSystemTime, TCHAR *szBuffer, size_t cchMax)
+BOOL CreateFriendlySystemTimeString(const SYSTEMTIME *localSystemTime, TCHAR *szBuffer,
+	size_t cchMax)
 {
 	using namespace boost::gregorian;
 	using namespace boost::posix_time;
@@ -275,8 +275,8 @@ BOOL FormatUserName(PSID sid, TCHAR *userName, size_t cchMax)
 	TCHAR domainName[512];
 	DWORD domainNameLength = SIZEOF_ARRAY(domainName);
 	SID_NAME_USE eUse;
-	BOOL bRet = LookupAccountSid(
-		nullptr, sid, accountName, &accountNameLength, domainName, &domainNameLength, &eUse);
+	BOOL bRet = LookupAccountSid(nullptr, sid, accountName, &accountNameLength, domainName,
+		&domainNameLength, &eUse);
 
 	if (bRet)
 	{
@@ -327,8 +327,8 @@ BOOL CheckGroupMembership(GroupType groupType)
 		break;
 	}
 
-	bRet = AllocateAndInitializeSid(
-		&sia, 2, SECURITY_BUILTIN_DOMAIN_RID, dwGroup, 0, 0, 0, 0, 0, 0, &psid);
+	bRet = AllocateAndInitializeSid(&sia, 2, SECURITY_BUILTIN_DOMAIN_RID, dwGroup, 0, 0, 0, 0, 0, 0,
+		&psid);
 
 	if (bRet)
 	{
@@ -499,8 +499,8 @@ BOOL IsImage(const TCHAR *szFileName)
 	return FALSE;
 }
 
-BOOL GetFileProductVersion(
-	const TCHAR *szFullFileName, DWORD *pdwProductVersionLS, DWORD *pdwProductVersionMS)
+BOOL GetFileProductVersion(const TCHAR *szFullFileName, DWORD *pdwProductVersionLS,
+	DWORD *pdwProductVersionMS)
 {
 	return GetFileVersionValue(szFullFileName, VersionSubBlockType::Root, nullptr,
 		pdwProductVersionLS, pdwProductVersionMS, nullptr, nullptr, 0);
@@ -512,8 +512,8 @@ BOOL GetFileLanguage(const TCHAR *szFullFileName, WORD *pwLanguage)
 		nullptr, nullptr, nullptr, nullptr, 0);
 }
 
-BOOL GetVersionInfoString(
-	const TCHAR *szFullFileName, const TCHAR *szVersionInfo, TCHAR *szVersionBuffer, UINT cchMax)
+BOOL GetVersionInfoString(const TCHAR *szFullFileName, const TCHAR *szVersionInfo,
+	TCHAR *szVersionBuffer, UINT cchMax)
 {
 	return GetFileVersionValue(szFullFileName, VersionSubBlockType::StringTableValue, nullptr,
 		nullptr, nullptr, szVersionInfo, szVersionBuffer, cchMax);
@@ -552,8 +552,8 @@ BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType subBlo
 				else if (subBlockType == VersionSubBlockType::Translation
 					|| subBlockType == VersionSubBlockType::StringTableValue)
 				{
-					StringCchCopy(
-						szSubBlock, SIZEOF_ARRAY(szSubBlock), _T("\\VarFileInfo\\Translation"));
+					StringCchCopy(szSubBlock, SIZEOF_ARRAY(szSubBlock),
+						_T("\\VarFileInfo\\Translation"));
 					pBuffer = reinterpret_cast<LPVOID *>(&plcp);
 					uStructureSize = sizeof(LangAndCodePage);
 				}
@@ -678,8 +678,8 @@ HRESULT GetMediaMetadata(const TCHAR *szFileName, const TCHAR *szAttribute, BYTE
 						/* Any stream. Should be zero for MP3 files. */
 						wStreamNum = 0;
 
-						hr = pWMHeaderInfo->GetAttributeByName(
-							&wStreamNum, szAttribute, &type, nullptr, &cbLength);
+						hr = pWMHeaderInfo->GetAttributeByName(&wStreamNum, szAttribute, &type,
+							nullptr, &cbLength);
 
 						if (SUCCEEDED(hr))
 						{
@@ -687,8 +687,8 @@ HRESULT GetMediaMetadata(const TCHAR *szFileName, const TCHAR *szAttribute, BYTE
 
 							if (*pszOutput != nullptr)
 							{
-								hr = pWMHeaderInfo->GetAttributeByName(
-									&wStreamNum, szAttribute, &type, *pszOutput, &cbLength);
+								hr = pWMHeaderInfo->GetAttributeByName(&wStreamNum, szAttribute,
+									&type, *pszOutput, &cbLength);
 							}
 						}
 
@@ -740,8 +740,8 @@ std::wstring CreateGUID()
 std::optional<std::wstring> GetLastErrorMessage(DWORD error)
 {
 	wil::unique_hlocal_string systemErrorMessage;
-	DWORD size = FormatMessage(
-		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ALLOCATE_BUFFER,
+	DWORD size = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS
+			| FORMAT_MESSAGE_ALLOCATE_BUFFER,
 		nullptr, error, 0, reinterpret_cast<LPWSTR>(&systemErrorMessage), 32 * 1024, nullptr);
 
 	if (size > 0)

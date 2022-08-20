@@ -44,8 +44,8 @@ INT_PTR CALLBACK BaseDialogProcStub(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM 
 		correct object.
 		May also use thunks - see
 		http://www.hackcraft.net/cpp/windowsThunk/ */
-		g_windowMap.insert(std::unordered_map<HWND, BaseDialog *>::value_type(
-			hDlg, reinterpret_cast<BaseDialog *>(lParam)));
+		g_windowMap.insert(std::unordered_map<HWND, BaseDialog *>::value_type(hDlg,
+			reinterpret_cast<BaseDialog *>(lParam)));
 	}
 	break;
 	}
@@ -242,8 +242,8 @@ HWND BaseDialog::ShowModelessDialog(IModelessDialogNotification *pmdn)
 	return hDlg;
 }
 
-void BaseDialog::GetResizableControlInformation(
-	DialogSizeConstraint &dsc, std::list<ResizableDialog::Control> &controlList)
+void BaseDialog::GetResizableControlInformation(DialogSizeConstraint &dsc,
+	std::list<ResizableDialog::Control> &controlList)
 {
 	UNREFERENCED_PARAMETER(dsc);
 	UNREFERENCED_PARAMETER(controlList);

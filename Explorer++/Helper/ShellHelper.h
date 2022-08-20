@@ -59,8 +59,8 @@ void DecodePath(const TCHAR *szInitialPath, const TCHAR *szCurrentDirectory, TCH
 	size_t cchDest);
 HRESULT GetDisplayName(const std::wstring &parsingPath, DWORD flags, std::wstring &output);
 HRESULT GetDisplayName(PCIDLIST_ABSOLUTE pidl, DWORD flags, std::wstring &output);
-HRESULT GetDisplayName(
-	IShellFolder *shellFolder, PCITEMID_CHILD pidlChild, DWORD flags, std::wstring &output);
+HRESULT GetDisplayName(IShellFolder *shellFolder, PCITEMID_CHILD pidlChild, DWORD flags,
+	std::wstring &output);
 HRESULT GetCsidlDisplayName(int csidl, DWORD flags, std::wstring &output);
 HRESULT GetVirtualParentPath(PCIDLIST_ABSOLUTE pidlDirectory, PIDLIST_ABSOLUTE *pidlParent);
 BOOL IsNamespaceRoot(PCIDLIST_ABSOLUTE pidl);
@@ -70,8 +70,8 @@ HRESULT GetUIObjectOf(IShellFolder *pShellFolder, HWND hwndOwner, UINT cidl,
 	PCUITEMID_CHILD_ARRAY apidl, REFIID riid, void **ppv);
 HRESULT GetShellItemDetailsEx(IShellFolder2 *pShellFolder, const SHCOLUMNID *pscid,
 	PCUITEMID_CHILD pidl, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate);
-HRESULT ConvertVariantToString(
-	const VARIANT *vt, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate);
+HRESULT ConvertVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchMax,
+	BOOL friendlyDate);
 HRESULT ConvertVariantStringArrayToString(SAFEARRAY *array, TCHAR *szDetail, size_t cchMax);
 HRESULT ConvertGenericVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchMax);
 HRESULT ConvertDateVariantToString(DATE date, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate);
@@ -94,23 +94,23 @@ BOOL ExecuteFileAction(HWND hwnd, const TCHAR *szVerb, const TCHAR *szParameters
 BOOL ExecuteAndShowCurrentProcess(HWND hwnd, const TCHAR *szParameters);
 BOOL ExecuteAndShowProcess(HWND hwnd, const TCHAR *szProcess, const TCHAR *szParameters);
 HRESULT DecodeFriendlyPath(const std::wstring &friendlyPath, std::wstring &parsingPath);
-HRESULT ShowMultipleFileProperties(
-	PCIDLIST_ABSOLUTE pidlDirectory, const std::vector<PCITEMID_CHILD> &items, HWND hwnd);
+HRESULT ShowMultipleFileProperties(PCIDLIST_ABSOLUTE pidlDirectory,
+	const std::vector<PCITEMID_CHILD> &items, HWND hwnd);
 HRESULT ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory,
 	const std::vector<PCITEMID_CHILD> &items, HWND hwnd, const std::wstring &action, DWORD mask,
 	IUnknown *site);
 BOOL CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL);
 bool IsChildOfLibrariesFolder(PCIDLIST_ABSOLUTE pidl);
-HRESULT CreateSimplePidl(
-	const std::wstring &path, PIDLIST_ABSOLUTE *pidl, IShellFolder *parent = nullptr);
+HRESULT CreateSimplePidl(const std::wstring &path, PIDLIST_ABSOLUTE *pidl,
+	IShellFolder *parent = nullptr);
 HRESULT SimplePidlToFullPidl(PCIDLIST_ABSOLUTE simplePidl, PIDLIST_ABSOLUTE *fullPidl);
 std::vector<unique_pidl_absolute> DeepCopyPidls(const std::vector<PCIDLIST_ABSOLUTE> &pidls);
 std::vector<unique_pidl_absolute> DeepCopyPidls(const std::vector<unique_pidl_absolute> &pidls);
 std::vector<PCIDLIST_ABSOLUTE> ShallowCopyPidls(const std::vector<unique_pidl_absolute> &pidls);
 
 /* Drag and drop helpers. */
-DWORD DetermineDragEffect(
-	DWORD grfKeyState, DWORD dwCurrentEffect, BOOL bDataAccept, BOOL bOnSameDrive);
+DWORD DetermineDragEffect(DWORD grfKeyState, DWORD dwCurrentEffect, BOOL bDataAccept,
+	BOOL bOnSameDrive);
 
 /* Default icon indices. */
 int GetDefaultFolderIconIndex();

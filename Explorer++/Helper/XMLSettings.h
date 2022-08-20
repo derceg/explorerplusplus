@@ -30,12 +30,12 @@ namespace NXMLSettings
 	Gdiplus::Color ReadXMLColorData2(IXMLDOMNode *pNode);
 	HFONT ReadXMLFontData(IXMLDOMNode *pNode);
 
-	bool ReadDateTime(
-		IXMLDOMNamedNodeMap *attributeMap, const std::wstring &baseKeyName, FILETIME &dateTime);
+	bool ReadDateTime(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &baseKeyName,
+		FILETIME &dateTime);
 	void SaveDateTime(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
 		const std::wstring &baseKeyName, const FILETIME &dateTime);
-	HRESULT GetIntFromMap(
-		IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name, int &outputValue);
-	HRESULT GetStringFromMap(
-		IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name, std::wstring &outputValue);
+	HRESULT GetIntFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name,
+		int &outputValue);
+	HRESULT GetStringFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name,
+		std::wstring &outputValue);
 }

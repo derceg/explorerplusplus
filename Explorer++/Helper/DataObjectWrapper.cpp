@@ -27,14 +27,14 @@ IFACEMETHODIMP DataObjectWrapper::QueryGetData(FORMATETC *formatEtc)
 	return m_dataObject->QueryGetData(formatEtc);
 }
 
-IFACEMETHODIMP DataObjectWrapper::GetCanonicalFormatEtc(
-	FORMATETC *formatEtc, FORMATETC *formatEtcResult)
+IFACEMETHODIMP DataObjectWrapper::GetCanonicalFormatEtc(FORMATETC *formatEtc,
+	FORMATETC *formatEtcResult)
 {
 	return m_dataObject->GetCanonicalFormatEtc(formatEtc, formatEtcResult);
 }
 
-IFACEMETHODIMP DataObjectWrapper::SetData(
-	FORMATETC *formatEtc, STGMEDIUM *medium, BOOL shouldRelease)
+IFACEMETHODIMP DataObjectWrapper::SetData(FORMATETC *formatEtc, STGMEDIUM *medium,
+	BOOL shouldRelease)
 {
 	return m_dataObject->SetData(formatEtc, medium, shouldRelease);
 }
@@ -44,8 +44,8 @@ IFACEMETHODIMP DataObjectWrapper::EnumFormatEtc(DWORD direction, IEnumFORMATETC 
 	return m_dataObject->EnumFormatEtc(direction, enumerator);
 }
 
-IFACEMETHODIMP DataObjectWrapper::DAdvise(
-	FORMATETC *formatEtc, DWORD advf, IAdviseSink *sink, DWORD *connection)
+IFACEMETHODIMP DataObjectWrapper::DAdvise(FORMATETC *formatEtc, DWORD advf, IAdviseSink *sink,
+	DWORD *connection)
 {
 	return m_dataObject->DAdvise(formatEtc, advf, sink, connection);
 }

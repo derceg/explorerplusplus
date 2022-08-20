@@ -6,7 +6,6 @@
 #include "TabHelper.h"
 #include "Macros.h"
 
-
 BOOL TabCtrl_SwapItems(HWND hTabCtrl, int iItem1, int iItem2)
 {
 	TCITEM tcItem;
@@ -16,7 +15,7 @@ BOOL TabCtrl_SwapItems(HWND hTabCtrl, int iItem1, int iItem2)
 	tcItem.cchTextMax = SIZEOF_ARRAY(szText1);
 	BOOL bRet = TabCtrl_GetItem(hTabCtrl, iItem1, &tcItem);
 
-	if(!bRet)
+	if (!bRet)
 	{
 		return FALSE;
 	}
@@ -33,7 +32,7 @@ BOOL TabCtrl_SwapItems(HWND hTabCtrl, int iItem1, int iItem2)
 
 	bRet = TabCtrl_GetItem(hTabCtrl, iItem2, &tcItem);
 
-	if(!bRet)
+	if (!bRet)
 	{
 		return FALSE;
 	}
@@ -49,7 +48,7 @@ BOOL TabCtrl_SwapItems(HWND hTabCtrl, int iItem1, int iItem2)
 	tcItem.iImage = iImage1;
 	bRet = TabCtrl_SetItem(hTabCtrl, iItem2, &tcItem);
 
-	if(!bRet)
+	if (!bRet)
 	{
 		return FALSE;
 	}
@@ -60,7 +59,7 @@ BOOL TabCtrl_SwapItems(HWND hTabCtrl, int iItem1, int iItem2)
 	tcItem.iImage = iImage2;
 	bRet = TabCtrl_SetItem(hTabCtrl, iItem1, &tcItem);
 
-	if(!bRet)
+	if (!bRet)
 	{
 		return FALSE;
 	}

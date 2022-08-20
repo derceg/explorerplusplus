@@ -169,8 +169,8 @@ bool ContextMenuManager::ShowMenu(HWND hwnd, HMENU hMenu, UINT uIDPrevious, UINT
 
 	AddMenuEntries(hMenu, uIDPrevious, uMinID, uMaxID);
 
-	BOOL bRet = SetWindowSubclass(
-		hwnd, ContextMenuHookProc, CONTEXT_MENU_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
+	BOOL bRet = SetWindowSubclass(hwnd, ContextMenuHookProc, CONTEXT_MENU_SUBCLASS_ID,
+		reinterpret_cast<DWORD_PTR>(this));
 
 	if (!bRet)
 	{
@@ -226,8 +226,8 @@ void ContextMenuManager::AddMenuEntries(HMENU hMenu, UINT uIDPrevious, int iMinI
 	{
 		if (itr->pContextMenuActual != nullptr)
 		{
-			HRESULT hr = itr->pContextMenuActual->QueryContextMenu(
-				hMenu, iStartPos, iMinID + iOffset, iMaxID, CMF_NORMAL | CMF_EXPLORE);
+			HRESULT hr = itr->pContextMenuActual->QueryContextMenu(hMenu, iStartPos,
+				iMinID + iOffset, iMaxID, CMF_NORMAL | CMF_EXPLORE);
 
 			if (HRESULT_SEVERITY(hr) == SEVERITY_SUCCESS)
 			{
@@ -250,8 +250,8 @@ void ContextMenuManager::AddMenuEntries(HMENU hMenu, UINT uIDPrevious, int iMinI
 	MenuHelper::RemoveDuplicateSeperators(hMenu);
 }
 
-LRESULT CALLBACK ContextMenuManager::ContextMenuHookProc(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK ContextMenuManager::ContextMenuHookProc(HWND hwnd, UINT uMsg, WPARAM wParam,
+	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -301,8 +301,8 @@ LRESULT CALLBACK ContextMenuManager::ContextMenuHookProc(
 			{
 				TCHAR szHelperText[512];
 
-				HRESULT hr = pcmm->GetMenuHelperText(
-					LOWORD(wParam), szHelperText, SIZEOF_ARRAY(szHelperText));
+				HRESULT hr = pcmm->GetMenuHelperText(LOWORD(wParam), szHelperText,
+					SIZEOF_ARRAY(szHelperText));
 
 				if (hr == S_OK)
 				{
@@ -318,8 +318,8 @@ LRESULT CALLBACK ContextMenuManager::ContextMenuHookProc(
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-HRESULT ContextMenuManager::HandleMenuMessage(
-	UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lRes)
+HRESULT ContextMenuManager::HandleMenuMessage(UINT uMsg, WPARAM wParam, LPARAM lParam,
+	LRESULT &lRes)
 {
 	UINT uItemID = static_cast<UINT>(-1);
 	bool bContextMenu3Required = false;

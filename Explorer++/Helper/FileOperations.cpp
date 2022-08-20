@@ -52,8 +52,8 @@ HRESULT NFileOperations::RenameFile(IShellItem *item, const std::wstring &newNam
 	return hr;
 }
 
-HRESULT NFileOperations::DeleteFiles(
-	HWND hwnd, std::vector<PCIDLIST_ABSOLUTE> &pidls, bool permanent, bool silent)
+HRESULT NFileOperations::DeleteFiles(HWND hwnd, std::vector<PCIDLIST_ABSOLUTE> &pidls,
+	bool permanent, bool silent)
 {
 	wil::com_ptr_nothrow<IFileOperation> fo;
 	HRESULT hr = CoCreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&fo));
@@ -97,8 +97,8 @@ HRESULT NFileOperations::DeleteFiles(
 	}
 
 	wil::com_ptr_nothrow<IShellItemArray> shellItemArray;
-	hr = SHCreateShellItemArrayFromIDLists(
-		static_cast<UINT>(pidls.size()), &pidls[0], &shellItemArray);
+	hr = SHCreateShellItemArrayFromIDLists(static_cast<UINT>(pidls.size()), &pidls[0],
+		&shellItemArray);
 
 	if (FAILED(hr))
 	{
@@ -125,8 +125,8 @@ HRESULT NFileOperations::DeleteFiles(
 	return hr;
 }
 
-HRESULT NFileOperations::CopyFilesToFolder(
-	HWND hOwner, const std::wstring &strTitle, std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move)
+HRESULT NFileOperations::CopyFilesToFolder(HWND hOwner, const std::wstring &strTitle,
+	std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move)
 {
 	unique_pidl_absolute pidl;
 	BOOL bRes = NFileOperations::CreateBrowseDialog(hOwner, strTitle, wil::out_param(pidl));
@@ -149,8 +149,8 @@ HRESULT NFileOperations::CopyFilesToFolder(
 	return hr;
 }
 
-HRESULT NFileOperations::CopyFiles(
-	HWND hwnd, IShellItem *destinationFolder, std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move)
+HRESULT NFileOperations::CopyFiles(HWND hwnd, IShellItem *destinationFolder,
+	std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move)
 {
 	wil::com_ptr_nothrow<IFileOperation> fo;
 	HRESULT hr = CoCreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&fo));
@@ -175,8 +175,8 @@ HRESULT NFileOperations::CopyFiles(
 	}
 
 	wil::com_ptr_nothrow<IShellItemArray> shellItemArray;
-	hr = SHCreateShellItemArrayFromIDLists(
-		static_cast<UINT>(pidls.size()), &pidls[0], &shellItemArray);
+	hr = SHCreateShellItemArrayFromIDLists(static_cast<UINT>(pidls.size()), &pidls[0],
+		&shellItemArray);
 
 	if (FAILED(hr))
 	{
@@ -253,8 +253,8 @@ HRESULT NFileOperations::CreateNewFolder(IShellItem *destinationFolder,
 		return hr;
 	}
 
-	hr = fo->NewItem(
-		destinationFolder, FILE_ATTRIBUTE_DIRECTORY, newFolderName.c_str(), nullptr, progressSink);
+	hr = fo->NewItem(destinationFolder, FILE_ATTRIBUTE_DIRECTORY, newFolderName.c_str(), nullptr,
+		progressSink);
 
 	if (FAILED(hr))
 	{
@@ -266,8 +266,8 @@ HRESULT NFileOperations::CreateNewFolder(IShellItem *destinationFolder,
 	return hr;
 }
 
-BOOL NFileOperations::SaveDirectoryListing(
-	const std::wstring &strDirectory, const std::wstring &strFilename)
+BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,
+	const std::wstring &strFilename)
 {
 	std::wstring strContents = _T("Directory\r\n---------\r\n") + strDirectory + _T("\r\n\r\n");
 
@@ -407,8 +407,8 @@ HRESULT CutFiles(const std::vector<PCIDLIST_ABSOLUTE> &items, IDataObject **data
 	return CopyFilesToClipboard(items, true, dataObjectOut);
 }
 
-HRESULT CopyFilesToClipboard(
-	const std::vector<PCIDLIST_ABSOLUTE> &items, bool move, IDataObject **dataObjectOut)
+HRESULT CopyFilesToClipboard(const std::vector<PCIDLIST_ABSOLUTE> &items, bool move,
+	IDataObject **dataObjectOut)
 {
 	wil::com_ptr_nothrow<IDataObject> dataObject;
 	RETURN_IF_FAILED(CreateDataObjectForShellTransfer(items, &dataObject));
@@ -525,8 +525,8 @@ HRESULT NFileOperations::CreateLinkToFile(const std::wstring &strTargetFilename,
 	return hr;
 }
 
-HRESULT NFileOperations::ResolveLink(
-	HWND hwnd, DWORD fFlags, const TCHAR *szLinkFilename, TCHAR *szResolvedPath, int nBufferSize)
+HRESULT NFileOperations::ResolveLink(HWND hwnd, DWORD fFlags, const TCHAR *szLinkFilename,
+	TCHAR *szResolvedPath, int nBufferSize)
 {
 	SHFILEINFO shfi;
 	DWORD_PTR dwRet = SHGetFileInfo(szLinkFilename, NULL, &shfi, sizeof(shfi), SHGFI_ATTRIBUTES);
@@ -569,8 +569,8 @@ HRESULT NFileOperations::ResolveLink(
 	return hr;
 }
 
-BOOL NFileOperations::CreateBrowseDialog(
-	HWND hOwner, const std::wstring &strTitle, PIDLIST_ABSOLUTE *ppidl)
+BOOL NFileOperations::CreateBrowseDialog(HWND hOwner, const std::wstring &strTitle,
+	PIDLIST_ABSOLUTE *ppidl)
 {
 	TCHAR szDisplayName[MAX_PATH];
 
@@ -634,8 +634,8 @@ BOOL GetFileClusterSize(const std::wstring &strFilename, PLARGE_INTEGER lpRealFi
 	return TRUE;
 }
 
-void NFileOperations::DeleteFileSecurely(
-	const std::wstring &strFilename, OverwriteMethod overwriteMethod)
+void NFileOperations::DeleteFileSecurely(const std::wstring &strFilename,
+	OverwriteMethod overwriteMethod)
 {
 	HANDLE hFile;
 	WIN32_FIND_DATA wfd;

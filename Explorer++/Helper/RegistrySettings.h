@@ -15,8 +15,8 @@ namespace RegistrySettings
 	LONG SaveString(HKEY hKey, const TCHAR *valueName, const TCHAR *szValue);
 	LONG ReadString(HKEY hKey, const TCHAR *szKey, TCHAR *valueName, DWORD cchMax);
 	LONG ReadString(HKEY hKey, const std::wstring &valueName, std::wstring &strOutput);
-	LONG SaveStringList(
-		HKEY hKey, const TCHAR *baseValueName, const std::list<std::wstring> &strList);
+	LONG SaveStringList(HKEY hKey, const TCHAR *baseValueName,
+		const std::list<std::wstring> &strList);
 	LONG ReadStringList(HKEY hKey, const TCHAR *baseValueName, std::list<std::wstring> &strList);
 	bool SaveDateTime(HKEY key, const std::wstring &baseValueName, const FILETIME &dateTime);
 	bool ReadDateTime(HKEY key, const std::wstring &baseValueName, FILETIME &dateTime);

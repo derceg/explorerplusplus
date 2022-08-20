@@ -39,8 +39,8 @@ void MenuHelper::AddSubMenuItem(HMENU menu, std::wstring &text, wil::unique_hmen
 	AddSubMenuItem(menu, text, std::move(subMenu), GetMenuItemCount(menu), TRUE);
 }
 
-void MenuHelper::AddSubMenuItem(
-	HMENU menu, std::wstring &text, wil::unique_hmenu subMenu, UINT item, BOOL byPosition)
+void MenuHelper::AddSubMenuItem(HMENU menu, std::wstring &text, wil::unique_hmenu subMenu,
+	UINT item, BOOL byPosition)
 {
 	MENUITEMINFO mii = {};
 	mii.cbSize = sizeof(mii);
@@ -50,8 +50,8 @@ void MenuHelper::AddSubMenuItem(
 	InsertMenuItem(menu, item, byPosition, &mii);
 }
 
-void MenuHelper::AttachSubMenu(
-	HMENU parentMenu, wil::unique_hmenu subMenu, UINT item, BOOL byPosition)
+void MenuHelper::AttachSubMenu(HMENU parentMenu, wil::unique_hmenu subMenu, UINT item,
+	BOOL byPosition)
 {
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);

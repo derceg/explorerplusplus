@@ -28,8 +28,8 @@ wil::unique_hbitmap ImageHelper::ImageListIconToBitmap(IImageList *imageList, in
 	return wil::unique_hbitmap(IconToBitmapPARGB32(icon.get(), iconWidth, iconHeight));
 }
 
-void ImageHelper::InitBitmapInfo(
-	__out_bcount(cbInfo) BITMAPINFO *pbmi, ULONG cbInfo, LONG cx, LONG cy, WORD bpp)
+void ImageHelper::InitBitmapInfo(__out_bcount(cbInfo) BITMAPINFO *pbmi, ULONG cbInfo, LONG cx,
+	LONG cy, WORD bpp)
 {
 	ZeroMemory(pbmi, cbInfo);
 	pbmi->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
@@ -41,8 +41,8 @@ void ImageHelper::InitBitmapInfo(
 	pbmi->bmiHeader.biBitCount = bpp;
 }
 
-HRESULT ImageHelper::Create32BitHBITMAP(
-	HDC hdc, const SIZE *psize, __deref_opt_out void **ppvBits, __out HBITMAP *phBmp)
+HRESULT ImageHelper::Create32BitHBITMAP(HDC hdc, const SIZE *psize, __deref_opt_out void **ppvBits,
+	__out HBITMAP *phBmp)
 {
 	*phBmp = nullptr;
 
@@ -61,8 +61,8 @@ HRESULT ImageHelper::Create32BitHBITMAP(
 	return (nullptr == *phBmp) ? E_OUTOFMEMORY : S_OK;
 }
 
-HRESULT ImageHelper::ConvertToPARGB32(
-	HDC hdc, __inout ARGB *pargb, HBITMAP hbmp, SIZE &sizImage, int cxRow)
+HRESULT ImageHelper::ConvertToPARGB32(HDC hdc, __inout ARGB *pargb, HBITMAP hbmp, SIZE &sizImage,
+	int cxRow)
 {
 	BITMAPINFO bmi;
 	InitBitmapInfo(&bmi, sizeof(bmi), sizImage.cx, sizImage.cy, 32);
@@ -126,8 +126,8 @@ bool ImageHelper::HasAlpha(__in ARGB *pargb, SIZE &sizImage, int cxRow)
 	return false;
 }
 
-HRESULT ImageHelper::ConvertBufferToPARGB32(
-	HPAINTBUFFER hPaintBuffer, HDC hdc, HICON hicon, SIZE &sizIcon)
+HRESULT ImageHelper::ConvertBufferToPARGB32(HPAINTBUFFER hPaintBuffer, HDC hdc, HICON hicon,
+	SIZE &sizIcon)
 {
 	RGBQUAD *prgbQuad;
 	int cxRow;
@@ -188,8 +188,8 @@ HBITMAP ImageHelper::IconToBitmapPARGB32(HICON hicon, int width, int height)
 					BeginBufferedPaint(hdcDest, &rcIcon, BPBF_DIB, &paintParams, &hdcBuffer);
 				if (hPaintBuffer)
 				{
-					if (DrawIconEx(
-							hdcBuffer, 0, 0, hicon, sizIcon.cx, sizIcon.cy, 0, nullptr, DI_NORMAL))
+					if (DrawIconEx(hdcBuffer, 0, 0, hicon, sizIcon.cx, sizIcon.cy, 0, nullptr,
+							DI_NORMAL))
 					{
 						// If icon did not have an alpha channel we need to convert buffer to PARGB
 						hr = ConvertBufferToPARGB32(hPaintBuffer, hdcDest, hicon, sizIcon);
@@ -216,8 +216,8 @@ HBITMAP ImageHelper::IconToBitmapPARGB32(HICON hicon, int width, int height)
 }
 
 // See https://stackoverflow.com/a/24571173.
-std::unique_ptr<Gdiplus::Bitmap> ImageHelper::LoadGdiplusBitmapFromPNG(
-	HINSTANCE instance, UINT resourceId)
+std::unique_ptr<Gdiplus::Bitmap> ImageHelper::LoadGdiplusBitmapFromPNG(HINSTANCE instance,
+	UINT resourceId)
 {
 	HRSRC resourceHandle = FindResource(instance, MAKEINTRESOURCE(resourceId), L"PNG");
 

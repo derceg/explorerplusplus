@@ -33,8 +33,8 @@ public:
 private:
 	static inline const UINT_PTR SUBCLASS_ID = 0;
 
-	static LRESULT CALLBACK WndProc(
-		HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data);
+	static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
+		UINT_PTR subclassId, DWORD_PTR data);
 
 	static IDropTargetHelper *GetDropTargetHelper();
 

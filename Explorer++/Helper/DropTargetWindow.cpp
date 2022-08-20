@@ -16,8 +16,8 @@ DropTargetWindow::DropTargetWindow(HWND hwnd, DropTargetInternal *dropTargetInte
 		std::make_unique<WindowSubclassWrapper>(hwnd, WndProc, SUBCLASS_ID, 0));
 }
 
-LRESULT CALLBACK DropTargetWindow::WndProc(
-	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data)
+LRESULT CALLBACK DropTargetWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR subclassId, DWORD_PTR data)
 {
 	UNREFERENCED_PARAMETER(subclassId);
 	UNREFERENCED_PARAMETER(data);
@@ -32,8 +32,8 @@ LRESULT CALLBACK DropTargetWindow::WndProc(
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-IFACEMETHODIMP DropTargetWindow::DragEnter(
-	IDataObject *dataObject, DWORD keyState, POINTL ptl, DWORD *effect)
+IFACEMETHODIMP DropTargetWindow::DragEnter(IDataObject *dataObject, DWORD keyState, POINTL ptl,
+	DWORD *effect)
 {
 	POINT pt = { ptl.x, ptl.y };
 
@@ -83,8 +83,8 @@ IFACEMETHODIMP DropTargetWindow::DragLeave()
 	return S_OK;
 }
 
-IFACEMETHODIMP DropTargetWindow::Drop(
-	IDataObject *dataObject, DWORD keyState, POINTL ptl, DWORD *effect)
+IFACEMETHODIMP DropTargetWindow::Drop(IDataObject *dataObject, DWORD keyState, POINTL ptl,
+	DWORD *effect)
 {
 	POINT pt = { ptl.x, ptl.y };
 
@@ -106,8 +106,8 @@ IDropTargetHelper *DropTargetWindow::GetDropTargetHelper()
 {
 	if (!m_dropTargetHelper)
 	{
-		CoCreateInstance(
-			CLSID_DragDropHelper, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_dropTargetHelper));
+		CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_INPROC_SERVER,
+			IID_PPV_ARGS(&m_dropTargetHelper));
 	}
 
 	return m_dropTargetHelper;

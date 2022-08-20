@@ -43,8 +43,8 @@ BOOL GetProcessOwner(DWORD dwProcessId, TCHAR *szOwner, size_t cchMax)
 
 				if (pTokenUser != nullptr)
 				{
-					bRet = GetTokenInformation(
-						hToken, TokenUser, reinterpret_cast<LPVOID>(pTokenUser), dwSize, &dwSize);
+					bRet = GetTokenInformation(hToken, TokenUser,
+						reinterpret_cast<LPVOID>(pTokenUser), dwSize, &dwSize);
 
 					if (bRet)
 					{

@@ -28,12 +28,12 @@ enum class GroupType
 };
 
 /* File helpers. */
-BOOL CreateFileTimeString(
-	const FILETIME *utcFileTime, TCHAR *szBuffer, size_t cchMax, BOOL bFriendlyDate);
-BOOL CreateSystemTimeString(
-	const SYSTEMTIME *localSystemTime, TCHAR *szBuffer, size_t cchMax, BOOL bFriendlyDate);
-BOOL CreateFriendlySystemTimeString(
-	const SYSTEMTIME *localSystemTime, TCHAR *szBuffer, size_t cchMax);
+BOOL CreateFileTimeString(const FILETIME *utcFileTime, TCHAR *szBuffer, size_t cchMax,
+	BOOL bFriendlyDate);
+BOOL CreateSystemTimeString(const SYSTEMTIME *localSystemTime, TCHAR *szBuffer, size_t cchMax,
+	BOOL bFriendlyDate);
+BOOL CreateFriendlySystemTimeString(const SYSTEMTIME *localSystemTime, TCHAR *szBuffer,
+	size_t cchMax);
 BOOL GetFileSizeEx(const TCHAR *szFileName, PLARGE_INTEGER lpFileSize);
 BOOL CompareFileTypes(const TCHAR *pszFile1, const TCHAR *pszFile2);
 HRESULT BuildFileAttributeString(const TCHAR *lpszFileName, TCHAR *szOutput, size_t cchMax);
@@ -43,19 +43,19 @@ DWORD GetNumFileHardLinks(const TCHAR *lpszFileName);
 BOOL ReadImageProperty(const TCHAR *lpszImage, PROPID propId, TCHAR *szProperty, int cchMax);
 HRESULT GetMediaMetadata(const TCHAR *szFileName, const TCHAR *szAttribute, BYTE **pszOutput);
 BOOL IsImage(const TCHAR *fileName);
-BOOL GetFileProductVersion(
-	const TCHAR *szFullFileName, DWORD *pdwProductVersionLS, DWORD *pdwProductVersionMS);
+BOOL GetFileProductVersion(const TCHAR *szFullFileName, DWORD *pdwProductVersionLS,
+	DWORD *pdwProductVersionMS);
 BOOL GetFileLanguage(const TCHAR *szFullFileName, WORD *pwLanguage);
-BOOL GetVersionInfoString(
-	const TCHAR *szFullFileName, const TCHAR *szVersionInfo, TCHAR *szVersionBuffer, UINT cchMax);
+BOOL GetVersionInfoString(const TCHAR *szFullFileName, const TCHAR *szVersionInfo,
+	TCHAR *szVersionBuffer, UINT cchMax);
 
 /* Ownership and access. */
 BOOL CheckGroupMembership(GroupType groupType);
 BOOL FormatUserName(PSID sid, TCHAR *userName, size_t cchMax);
 
 /* User interaction. */
-BOOL GetFileNameFromUser(
-	HWND hwnd, TCHAR *fullFileName, UINT cchMax, const TCHAR *initialDirectory);
+BOOL GetFileNameFromUser(HWND hwnd, TCHAR *fullFileName, UINT cchMax,
+	const TCHAR *initialDirectory);
 
 /* General helper functions. */
 HINSTANCE StartCommandPrompt(const std::wstring &directory, bool elevated);

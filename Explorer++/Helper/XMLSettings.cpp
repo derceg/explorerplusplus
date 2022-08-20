@@ -362,8 +362,8 @@ HFONT NXMLSettings::ReadXMLFontData(IXMLDOMNode *pNode)
 	return CreateFontIndirect(&fontInfo);
 }
 
-bool NXMLSettings::ReadDateTime(
-	IXMLDOMNamedNodeMap *attributeMap, const std::wstring &baseKeyName, FILETIME &dateTime)
+bool NXMLSettings::ReadDateTime(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &baseKeyName,
+	FILETIME &dateTime)
 {
 	std::wstring lowDateTime;
 	std::wstring highDateTime;
@@ -390,8 +390,8 @@ void NXMLSettings::SaveDateTime(IXMLDOMDocument *xmlDocument, IXMLDOMElement *pa
 		std::to_wstring(dateTime.dwHighDateTime).c_str());
 }
 
-HRESULT NXMLSettings::GetIntFromMap(
-	IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name, int &outputValue)
+HRESULT NXMLSettings::GetIntFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name,
+	int &outputValue)
 {
 	std::wstring outputString;
 	HRESULT hr = GetStringFromMap(attributeMap, name, outputString);
@@ -406,8 +406,8 @@ HRESULT NXMLSettings::GetIntFromMap(
 	return hr;
 }
 
-HRESULT NXMLSettings::GetStringFromMap(
-	IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name, std::wstring &outputValue)
+HRESULT NXMLSettings::GetStringFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name,
+	std::wstring &outputValue)
 {
 	wil::com_ptr_nothrow<IXMLDOMNode> node;
 	auto nodeName = wil::make_bstr_nothrow(name.c_str());

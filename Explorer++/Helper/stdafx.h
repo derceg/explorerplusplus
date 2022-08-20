@@ -11,7 +11,7 @@
 
 #include "..\targetver.h"
 
-#define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES	1
+#define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
 
 // While wstring_convert is deprecated in C++17, it won't be removed from the
 // language until a replacement is added. Therefore, it should be safe to keep
@@ -25,57 +25,54 @@
 #define WIL_SUPPRESS_EXCEPTIONS
 
 // Windows Header Files:
+// clang-format off
 #include <winsock2.h>
 #include <windows.h>
-#include <windowsx.h>
+// clang-format on
+#include <Iphlpapi.h>
+#include <Lm.h>
 #include <WinUser.h>
-#include <iostream>
-#include <string>
-#include <commctrl.h>
-#include <commoncontrols.h>
-#include <objidl.h>
-#include <shellapi.h>
-#include <shlwapi.h>
-#include <shobjidl.h>
-#include <math.h>
-#include <tchar.h>
-#include <shlobj.h>
-#include <shlguid.h>
-#include <wincrypt.h>
-#include <malloc.h>
-#include <time.h>
-#include <math.h>
-#include <winioctl.h>
-#include <richedit.h>
 #include <accctrl.h>
 #include <aclapi.h>
-#include <sddl.h>
-#include <Lm.h>
-#include <intshcut.h>
-#include <strsafe.h>
-#include <dbt.h>
-#include <Iphlpapi.h>
-#include <psapi.h>
-#include <userenv.h>
-
-/* See https://stackoverflow.com/questions/39797242/where-do-i-get-the-correct-gdi-c-wrappers-from-for-vs21015.
-This workaround is
-required for VS 2015. */
-#pragma warning(push)
-#pragma warning(disable:4458)
-#include <gdiplus.h>
-#pragma warning(pop)
-
-#include <intrin.h>
-#include <wmsdk.h>
-#include <propvarutil.h>
-#include <stdint.h>
-#include <intsafe.h>
 #include <assert.h>
+#include <commctrl.h>
+#include <commoncontrols.h>
+#include <dbt.h>
+#include <gdiplus.h>
+#include <intrin.h>
+#include <intsafe.h>
+#include <intshcut.h>
+#include <malloc.h>
+#include <math.h>
+#include <objidl.h>
+#include <propvarutil.h>
+#include <psapi.h>
+#include <richedit.h>
+#include <sddl.h>
+#include <shellapi.h>
+#include <shlguid.h>
+#include <shlobj.h>
+#include <shlwapi.h>
+#include <shobjidl.h>
+#include <stdint.h>
+#include <strsafe.h>
+#include <tchar.h>
+#include <time.h>
+#include <userenv.h>
+#include <wincrypt.h>
+#include <windowsx.h>
+#include <winioctl.h>
+#include <wmsdk.h>
+
+// clang-format off
+#include <Unknwn.h>
+#include <winrt/base.h>
+// clang-format on
+
+// C++ Header Files:
+#include <iostream>
 #include <list>
 #include <memory>
 #include <sstream>
+#include <string>
 #include <vector>
-
-#include <Unknwn.h>
-#include <winrt/base.h>

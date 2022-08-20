@@ -11,11 +11,11 @@
 #include "StringHelper.h"
 #include <vector>
 
-LRESULT CALLBACK ShellMenuHookProcStub(
-	HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+LRESULT CALLBACK ShellMenuHookProcStub(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
-FileContextMenuManager::FileContextMenuManager(
-	HWND hwnd, PCIDLIST_ABSOLUTE pidlParent, const std::vector<PCITEMID_CHILD> &pidlItems) :
+FileContextMenuManager::FileContextMenuManager(HWND hwnd, PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PCITEMID_CHILD> &pidlItems) :
 	m_hwnd(hwnd),
 	m_pidlParent(ILCloneFull(pidlParent))
 {
@@ -175,8 +175,8 @@ HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme, int iM
 	if (iCmd >= iMinID && iCmd <= iMaxID)
 	{
 		TCHAR verb[64] = _T("");
-		hr = m_pActualContext->GetCommandString(
-			iCmd - iMinID, GCS_VERB, nullptr, reinterpret_cast<LPSTR>(verb), SIZEOF_ARRAY(verb));
+		hr = m_pActualContext->GetCommandString(iCmd - iMinID, GCS_VERB, nullptr,
+			reinterpret_cast<LPSTR>(verb), SIZEOF_ARRAY(verb));
 
 		BOOL bHandled = FALSE;
 
@@ -270,8 +270,8 @@ std::optional<std::string> FileContextMenuManager::GetFilesystemDirectory()
 	return wstrToStr(parsingPath.get());
 }
 
-LRESULT CALLBACK ShellMenuHookProcStub(
-	HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK ShellMenuHookProcStub(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -280,8 +280,8 @@ LRESULT CALLBACK ShellMenuHookProcStub(
 	return pfcmm->ShellMenuHookProc(hwnd, Msg, wParam, lParam);
 }
 
-LRESULT CALLBACK FileContextMenuManager::ShellMenuHookProc(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK FileContextMenuManager::ShellMenuHookProc(HWND hwnd, UINT uMsg, WPARAM wParam,
+	LPARAM lParam)
 {
 	switch (uMsg)
 	{

@@ -18,8 +18,8 @@ enum SeverityLevel
 };
 
 template <typename CharT, typename TraitsT>
-inline std::basic_ostream<CharT, TraitsT> &operator<<(
-	std::basic_ostream<CharT, TraitsT> &stream, SeverityLevel level)
+inline std::basic_ostream<CharT, TraitsT> &operator<<(std::basic_ostream<CharT, TraitsT> &stream,
+	SeverityLevel level)
 {
 	static const char *const str[] = { "debug", "info", "warning", "error", "fatal" };
 

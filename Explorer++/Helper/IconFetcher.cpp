@@ -10,12 +10,12 @@
 IconFetcher::IconFetcher(HWND hwnd, CachedIcons *cachedIcons) :
 	m_hwnd(hwnd),
 	m_cachedIcons(cachedIcons),
-	m_iconThreadPool(
-		1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED), CoUninitialize),
+	m_iconThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
+		CoUninitialize),
 	m_iconResultIDCounter(0)
 {
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(
-		hwnd, WindowSubclassStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hwnd, WindowSubclassStub,
+		SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 }
 
 IconFetcher::~IconFetcher()
@@ -23,8 +23,8 @@ IconFetcher::~IconFetcher()
 	m_iconThreadPool.clear_queue();
 }
 
-LRESULT CALLBACK IconFetcher::WindowSubclassStub(
-	HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK IconFetcher::WindowSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -51,7 +51,8 @@ void IconFetcher::QueueIconTask(std::wstring_view path, Callback callback)
 	int iconResultID = m_iconResultIDCounter++;
 
 	auto iconResult = m_iconThreadPool.push(
-		[this, iconResultID, copiedPath = std::wstring(path)](int id) -> std::optional<IconResult> {
+		[this, iconResultID, copiedPath = std::wstring(path)](int id) -> std::optional<IconResult>
+		{
 			UNREFERENCED_PARAMETER(id);
 
 			// SHGetFileInfo will fail for non-filesystem paths that are passed in
@@ -99,7 +100,8 @@ void IconFetcher::QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback)
 	basicItemInfo.pidl.reset(ILCloneFull(pidl));
 
 	auto iconResult = m_iconThreadPool.push(
-		[this, iconResultID, basicItemInfo](int id) -> std::optional<IconResult> {
+		[this, iconResultID, basicItemInfo](int id) -> std::optional<IconResult>
+		{
 			UNREFERENCED_PARAMETER(id);
 
 			auto iconIndex = FindIconAsync(basicItemInfo.pidl.get());

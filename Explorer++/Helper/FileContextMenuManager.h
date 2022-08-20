@@ -25,15 +25,15 @@ __interface IFileContextMenuExternal
 		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd);
 
 	// Handles the processing for one of the menu items that was added by the caller.
-	void HandleCustomMenuItem(
-		PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, int iCmd);
+	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+		const std::vector<PITEMID_CHILD> &pidlItems, int iCmd);
 };
 
 class FileContextMenuManager
 {
 public:
-	FileContextMenuManager(
-		HWND hwnd, PCIDLIST_ABSOLUTE pidlParent, const std::vector<PCITEMID_CHILD> &pidlItems);
+	FileContextMenuManager(HWND hwnd, PCIDLIST_ABSOLUTE pidlParent,
+		const std::vector<PCITEMID_CHILD> &pidlItems);
 	~FileContextMenuManager();
 
 	HRESULT ShowMenu(IFileContextMenuExternal *pfcme, int iMinID, int iMaxID, const POINT *ppt,

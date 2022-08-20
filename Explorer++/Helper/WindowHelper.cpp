@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "WindowHelper.h"
 
-
 /* Centers one window (hChild) with respect to
 another (hParent), as per the Windows UX
 Guidelines (2009).
@@ -18,7 +17,7 @@ BOOL CenterWindow(HWND hParent, HWND hChild)
 	RECT rcParent;
 	BOOL bRet = GetClientRect(hParent, &rcParent);
 
-	if(!bRet)
+	if (!bRet)
 	{
 		return FALSE;
 	}
@@ -26,7 +25,7 @@ BOOL CenterWindow(HWND hParent, HWND hChild)
 	RECT rcChild;
 	bRet = GetClientRect(hChild, &rcChild);
 
-	if(!bRet)
+	if (!bRet)
 	{
 		return FALSE;
 	}
@@ -40,13 +39,13 @@ BOOL CenterWindow(HWND hParent, HWND hChild)
 	SetLastError(0);
 	int iRet = MapWindowPoints(hParent, HWND_DESKTOP, &ptOrigin, 1);
 
-	if(iRet == 0 && GetLastError() != 0)
+	if (iRet == 0 && GetLastError() != 0)
 	{
 		return FALSE;
 	}
 
-	return SetWindowPos(hChild, nullptr, ptOrigin.x, ptOrigin.y,
-		0, 0, SWP_NOSIZE | SWP_SHOWWINDOW | SWP_NOZORDER);
+	return SetWindowPos(hChild, nullptr, ptOrigin.x, ptOrigin.y, 0, 0,
+		SWP_NOSIZE | SWP_SHOWWINDOW | SWP_NOZORDER);
 }
 
 std::wstring GetWindowString(HWND hwnd)
@@ -86,12 +85,12 @@ BOOL AddWindowStyle(HWND hwnd, UINT fStyle, BOOL bAdd)
 {
 	LONG_PTR fCurrentStyle = GetWindowLongPtr(hwnd, GWL_STYLE);
 
-	if(fCurrentStyle == 0)
+	if (fCurrentStyle == 0)
 	{
 		return FALSE;
 	}
 
-	if(bAdd)
+	if (bAdd)
 	{
 		/* Only add the style if it isn't already present. */
 		if ((fCurrentStyle & fStyle) != fStyle)

@@ -29,8 +29,8 @@ DpiCompatibility::DpiCompatibility() :
 	}
 }
 
-BOOL DpiCompatibility::SystemParametersInfoForDpi(
-	UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni, UINT dpi)
+BOOL DpiCompatibility::SystemParametersInfoForDpi(UINT uiAction, UINT uiParam, PVOID pvParam,
+	UINT fWinIni, UINT dpi)
 {
 	if (m_SystemParametersInfoForDpi)
 	{

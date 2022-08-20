@@ -16,8 +16,8 @@
 #include <wil/com.h>
 #include <propkey.h>
 
-bool AddJumpListTasksInternal(
-	IObjectCollection *objectCollection, const std::list<JumpListTaskInformation> &taskList);
+bool AddJumpListTasksInternal(IObjectCollection *objectCollection,
+	const std::list<JumpListTaskInformation> &taskList);
 HRESULT AddJumpListTaskInternal(IObjectCollection *objectCollection, const TCHAR *name,
 	const TCHAR *path, const TCHAR *arguments, const TCHAR *iconPath, int iconIndex);
 
@@ -48,8 +48,8 @@ HRESULT GetDisplayName(PCIDLIST_ABSOLUTE pidl, DWORD flags, std::wstring &output
 	return GetDisplayName(shellFolder.get(), pidlChild, flags, output);
 }
 
-HRESULT GetDisplayName(
-	IShellFolder *shellFolder, PCITEMID_CHILD pidlChild, DWORD flags, std::wstring &output)
+HRESULT GetDisplayName(IShellFolder *shellFolder, PCITEMID_CHILD pidlChild, DWORD flags,
+	std::wstring &output)
 {
 	STRRET str;
 	HRESULT hr = shellFolder->GetDisplayNameOf(pidlChild, flags, &str);
@@ -302,32 +302,32 @@ HRESULT DecodeFriendlyPath(const std::wstring &friendlyPath, std::wstring &parsi
 		return S_OK;
 	}
 
-	if (CompareString(
-			LOCALE_INVARIANT, NORM_IGNORECASE, FRIENDLY_NAME_DESKTOP, -1, friendlyPath.c_str(), -1)
+	if (CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, FRIENDLY_NAME_DESKTOP, -1,
+			friendlyPath.c_str(), -1)
 		== CSTR_EQUAL)
 	{
 		GetCsidlDisplayName(CSIDL_DESKTOP, SHGDN_FORPARSING, parsingPath);
 		return S_OK;
 	}
 
-	if (CompareString(
-			LOCALE_INVARIANT, NORM_IGNORECASE, FRIENDLY_NAME_PICTURES, -1, friendlyPath.c_str(), -1)
+	if (CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, FRIENDLY_NAME_PICTURES, -1,
+			friendlyPath.c_str(), -1)
 		== CSTR_EQUAL)
 	{
 		GetCsidlDisplayName(CSIDL_MYPICTURES, SHGDN_FORPARSING, parsingPath);
 		return S_OK;
 	}
 
-	if (CompareString(
-			LOCALE_INVARIANT, NORM_IGNORECASE, FRIENDLY_NAME_MUSIC, -1, friendlyPath.c_str(), -1)
+	if (CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, FRIENDLY_NAME_MUSIC, -1,
+			friendlyPath.c_str(), -1)
 		== CSTR_EQUAL)
 	{
 		GetCsidlDisplayName(CSIDL_MYMUSIC, SHGDN_FORPARSING, parsingPath);
 		return S_OK;
 	}
 
-	if (CompareString(
-			LOCALE_INVARIANT, NORM_IGNORECASE, FRIENDLY_NAME_VIDEOS, -1, friendlyPath.c_str(), -1)
+	if (CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, FRIENDLY_NAME_VIDEOS, -1,
+			friendlyPath.c_str(), -1)
 		== CSTR_EQUAL)
 	{
 		GetCsidlDisplayName(CSIDL_MYVIDEO, SHGDN_FORPARSING, parsingPath);
@@ -405,8 +405,8 @@ BOOL MyExpandEnvironmentStrings(const TCHAR *szSrc, TCHAR *szExpandedPath, DWORD
 	return bRet;
 }
 
-DWORD DetermineDragEffect(
-	DWORD grfKeyState, DWORD dwCurrentEffect, BOOL bDataAccept, BOOL bOnSameDrive)
+DWORD DetermineDragEffect(DWORD grfKeyState, DWORD dwCurrentEffect, BOOL bDataAccept,
+	BOOL bOnSameDrive)
 {
 	DWORD dwEffect = DROPEFFECT_NONE;
 
@@ -789,8 +789,8 @@ void DecodePath(const TCHAR *szInitialPath, const TCHAR *szCurrentDirectory, TCH
 		{
 			/* Attempt to expand the path (in the event that
 			it contains embedded environment variables). */
-			bRet = MyExpandEnvironmentStrings(
-				szInitialPath, szExpandedPath, SIZEOF_ARRAY(szExpandedPath));
+			bRet = MyExpandEnvironmentStrings(szInitialPath, szExpandedPath,
+				SIZEOF_ARRAY(szExpandedPath));
 
 			if (!bRet)
 			{
@@ -851,8 +851,8 @@ BOOL ArePidlsEquivalent(PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2)
 HRESULT AddJumpListTasks(const std::list<JumpListTaskInformation> &taskList)
 {
 	wil::com_ptr_nothrow<ICustomDestinationList> customDestinationList;
-	HRESULT hr = CoCreateInstance(
-		CLSID_DestinationList, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&customDestinationList));
+	HRESULT hr = CoCreateInstance(CLSID_DestinationList, nullptr, CLSCTX_INPROC_SERVER,
+		IID_PPV_ARGS(&customDestinationList));
 
 	if (FAILED(hr))
 	{
@@ -899,8 +899,8 @@ HRESULT AddJumpListTasks(const std::list<JumpListTaskInformation> &taskList)
 	return hr;
 }
 
-bool AddJumpListTasksInternal(
-	IObjectCollection *objectCollection, const std::list<JumpListTaskInformation> &taskList)
+bool AddJumpListTasksInternal(IObjectCollection *objectCollection,
+	const std::list<JumpListTaskInformation> &taskList)
 {
 	bool allSucceeded = true;
 
@@ -995,8 +995,8 @@ BOOL LoadContextMenuHandlers(const TCHAR *szRegKey,
 
 		DWORD dwLen = SIZEOF_ARRAY(szKeyName);
 
-		while ((lRes = RegEnumKeyEx(
-					hKey, iIndex, szKeyName, &dwLen, nullptr, nullptr, nullptr, nullptr))
+		while ((lRes = RegEnumKeyEx(hKey, iIndex, szKeyName, &dwLen, nullptr, nullptr, nullptr,
+					nullptr))
 			== ERROR_SUCCESS)
 		{
 			HKEY hSubKey;
@@ -1016,7 +1016,8 @@ BOOL LoadContextMenuHandlers(const TCHAR *szRegKey,
 				if (lSubKeyRes == ERROR_SUCCESS)
 				{
 					if (std::none_of(blacklistedCLSIDEntries.begin(), blacklistedCLSIDEntries.end(),
-							[&szCLSID](const std::wstring &blacklistedEntry) {
+							[&szCLSID](const std::wstring &blacklistedEntry)
+							{
 								return boost::iequals(szCLSID, blacklistedEntry);
 							}))
 					{
@@ -1174,8 +1175,8 @@ HRESULT GetItemInfoTip(PCIDLIST_ABSOLUTE pidlComplete, TCHAR *szInfoTip, size_t 
 	return hr;
 }
 
-HRESULT ShowMultipleFileProperties(
-	PCIDLIST_ABSOLUTE pidlDirectory, const std::vector<PCITEMID_CHILD> &items, HWND hwnd)
+HRESULT ShowMultipleFileProperties(PCIDLIST_ABSOLUTE pidlDirectory,
+	const std::vector<PCITEMID_CHILD> &items, HWND hwnd)
 {
 	return ExecuteActionFromContextMenu(pidlDirectory, items, hwnd, _T("properties"), 0, nullptr);
 }
@@ -1373,7 +1374,8 @@ std::vector<unique_pidl_absolute> DeepCopyPidls(const std::vector<PCIDLIST_ABSOL
 	std::vector<unique_pidl_absolute> copiedPidls;
 	copiedPidls.reserve(pidls.size());
 	std::transform(pidls.begin(), pidls.end(), std::back_inserter(copiedPidls),
-		[](const PCIDLIST_ABSOLUTE &pidl) {
+		[](const PCIDLIST_ABSOLUTE &pidl)
+		{
 			return unique_pidl_absolute(ILCloneFull(pidl));
 		});
 	return copiedPidls;
@@ -1384,7 +1386,8 @@ std::vector<unique_pidl_absolute> DeepCopyPidls(const std::vector<unique_pidl_ab
 	std::vector<unique_pidl_absolute> copiedPidls;
 	copiedPidls.reserve(pidls.size());
 	std::transform(pidls.begin(), pidls.end(), std::back_inserter(copiedPidls),
-		[](const unique_pidl_absolute &pidl) {
+		[](const unique_pidl_absolute &pidl)
+		{
 			return unique_pidl_absolute(ILCloneFull(pidl.get()));
 		});
 	return copiedPidls;
@@ -1395,7 +1398,8 @@ std::vector<PCIDLIST_ABSOLUTE> ShallowCopyPidls(const std::vector<unique_pidl_ab
 	std::vector<PCIDLIST_ABSOLUTE> rawPidls;
 	rawPidls.reserve(pidls.size());
 	std::transform(pidls.begin(), pidls.end(), std::back_inserter(rawPidls),
-		[](const unique_pidl_absolute &pidl) {
+		[](const unique_pidl_absolute &pidl)
+		{
 			return pidl.get();
 		});
 	return rawPidls;

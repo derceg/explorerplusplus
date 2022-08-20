@@ -23,8 +23,8 @@ HWND ShellDropTargetWindow<DropTargetItemIdentifierType>::GetHWND() const
 }
 
 template <typename DropTargetItemIdentifierType>
-DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::DragEnter(
-	IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
+DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::DragEnter(IDataObject *dataObject,
+	DWORD keyState, POINT pt, DWORD effect)
 {
 	if (WI_IsFlagSet(keyState, MK_RBUTTON))
 	{
@@ -40,8 +40,8 @@ DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::DragEnter(
 }
 
 template <typename DropTargetItemIdentifierType>
-DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::DragOver(
-	DWORD keyState, POINT pt, DWORD effect)
+DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::DragOver(DWORD keyState, POINT pt,
+	DWORD effect)
 {
 	assert(m_currentDropObject);
 	return OnDragInWindow(m_currentDropObject, keyState, pt, effect);
@@ -61,8 +61,8 @@ void ShellDropTargetWindow<DropTargetItemIdentifierType>::DragLeave()
 }
 
 template <typename DropTargetItemIdentifierType>
-DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::Drop(
-	IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
+DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::Drop(IDataObject *dataObject,
+	DWORD keyState, POINT pt, DWORD effect)
 {
 	auto targetItem = GetDropTargetItem(pt);
 	DWORD targetEffect =
@@ -74,8 +74,8 @@ DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::Drop(
 }
 
 template <typename DropTargetItemIdentifierType>
-DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::OnDragInWindow(
-	IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
+DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::OnDragInWindow(IDataObject *dataObject,
+	DWORD keyState, POINT pt, DWORD effect)
 {
 	auto targetItem = GetDropTargetItem(pt);
 	DWORD targetEffect = GetDropEffect(targetItem, dataObject, keyState, pt, effect);
@@ -116,8 +116,8 @@ DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::GetDropEffect(
 	}
 	else
 	{
-		hr = dropTargetInfo.dropTarget->DragEnter(
-			dataObject, keyState, { pt.x, pt.y }, &targetEffect);
+		hr = dropTargetInfo.dropTarget->DragEnter(dataObject, keyState, { pt.x, pt.y },
+			&targetEffect);
 	}
 
 	if (FAILED(hr))
@@ -230,8 +230,8 @@ DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::PerformDrop(
 		// Therefore, the key state here is the state that was in effect right before the drop. At
 		// that point, the mouse button that started the drag will have still been down.
 		targetEffect = allowedEffects;
-		hr = dropTargetInfo.dropTarget->DragEnter(
-			dataObject, previousKeyState, { pt.x, pt.y }, &targetEffect);
+		hr = dropTargetInfo.dropTarget->DragEnter(dataObject, previousKeyState, { pt.x, pt.y },
+			&targetEffect);
 
 		if (FAILED(hr) || targetEffect == DROPEFFECT_NONE)
 		{

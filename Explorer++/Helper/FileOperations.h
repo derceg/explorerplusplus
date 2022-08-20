@@ -16,13 +16,13 @@ namespace NFileOperations
 	};
 
 	HRESULT RenameFile(IShellItem *item, const std::wstring &newName);
-	HRESULT DeleteFiles(
-		HWND hwnd, std::vector<PCIDLIST_ABSOLUTE> &pidls, bool permanent, bool silent);
+	HRESULT DeleteFiles(HWND hwnd, std::vector<PCIDLIST_ABSOLUTE> &pidls, bool permanent,
+		bool silent);
 	void DeleteFileSecurely(const std::wstring &strFilename, OverwriteMethod overwriteMethod);
 	HRESULT CopyFilesToFolder(HWND hOwner, const std::wstring &strTitle,
 		std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move);
-	HRESULT CopyFiles(
-		HWND hwnd, IShellItem *destinationFolder, std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move);
+	HRESULT CopyFiles(HWND hwnd, IShellItem *destinationFolder,
+		std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move);
 
 	HRESULT CreateNewFolder(IShellItem *destinationFolder, const std::wstring &newFolderName,
 		IFileOperationProgressSink *progressSink);
@@ -41,7 +41,7 @@ namespace NFileOperations
 
 HRESULT CopyFiles(const std::vector<PCIDLIST_ABSOLUTE> &items, IDataObject **dataObjectOut);
 HRESULT CutFiles(const std::vector<PCIDLIST_ABSOLUTE> &items, IDataObject **dataObjectOut);
-HRESULT CopyFilesToClipboard(
-	const std::vector<PCIDLIST_ABSOLUTE> &items, bool move, IDataObject **dataObjectOut);
+HRESULT CopyFilesToClipboard(const std::vector<PCIDLIST_ABSOLUTE> &items, bool move,
+	IDataObject **dataObjectOut);
 
 int PasteHardLinks(const TCHAR *szDestination);
