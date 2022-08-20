@@ -1420,8 +1420,7 @@ std::vector<std::reference_wrapper<const Tab>> TabContainer::GetAllTabsInOrder()
 
 void TabContainer::DuplicateTab(const Tab &tab)
 {
-	std::wstring currentDirectory = tab.GetShellBrowser()->GetDirectory();
-	CreateNewTab(currentDirectory.c_str());
+	CreateNewTab(tab.GetShellBrowser()->GetDirectoryIdl().get());
 }
 
 int TabContainer::GetDropTargetItem(const POINT &pt)
