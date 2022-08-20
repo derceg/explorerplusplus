@@ -860,7 +860,7 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 			tabSettings.name = customName;
 
 			m_tabContainer->CreateNewTab(
-				pidlDirectory, tabSettings, &folderSettings, initialColumns);
+				pidlDirectory, tabSettings, &folderSettings, &initialColumns);
 
 			nTabsCreated++;
 

@@ -910,7 +910,7 @@ void TabContainer::CreateNewTabInDefaultDirectory(const TabSettings &tabSettings
 }
 
 void TabContainer::CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings,
-	const FolderSettings *folderSettings, std::optional<FolderColumns> initialColumns,
+	const FolderSettings *folderSettings, const FolderColumns *initialColumns,
 	int *newTabId)
 {
 	/* Attempt to expand the path (in the event that
@@ -958,7 +958,7 @@ void TabContainer::CreateNewTab(const PreservedTab &preservedTab, int *newTabId)
 }
 
 void TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings,
-	const FolderSettings *folderSettings, std::optional<FolderColumns> initialColumns,
+	const FolderSettings *folderSettings, const FolderColumns *initialColumns,
 	int *newTabId)
 {
 	auto tabTemp = std::make_unique<Tab>(
@@ -1421,8 +1421,9 @@ std::vector<std::reference_wrapper<const Tab>> TabContainer::GetAllTabsInOrder()
 void TabContainer::DuplicateTab(const Tab &tab)
 {
 	auto folderSettings = tab.GetShellBrowser()->GetFolderSettings();
+	auto folderColumns = tab.GetShellBrowser()->ExportAllColumns();
 	CreateNewTab(tab.GetShellBrowser()->GetDirectoryIdl().get(), {}, &folderSettings,
-		tab.GetShellBrowser()->ExportAllColumns());
+		&folderColumns);
 }
 
 int TabContainer::GetDropTargetItem(const POINT &pt)

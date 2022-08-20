@@ -36,7 +36,7 @@ int ShellBrowser::listViewParentSubclassIdCounter = 0;
 std::shared_ptr<ShellBrowser> ShellBrowser::CreateNew(int id, HWND hOwner,
 	IExplorerplusplus *coreInterface, TabNavigationInterface *tabNavigation,
 	FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
-	std::optional<FolderColumns> initialColumns)
+	const FolderColumns *initialColumns)
 {
 	return std::shared_ptr<ShellBrowser>(new ShellBrowser(id, hOwner, coreInterface, tabNavigation,
 		fileActionHandler, folderSettings, initialColumns));
@@ -57,7 +57,7 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState) :
 	ShellBrowser(id, hOwner, coreInterface, tabNavigation, fileActionHandler,
-		preservedFolderState.folderSettings, std::nullopt)
+		preservedFolderState.folderSettings, nullptr)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(
 		this, tabNavigation, m_iconFetcher.get(), history, currentEntry);
@@ -65,7 +65,7 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 
 ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface,
 	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
-	const FolderSettings &folderSettings, std::optional<FolderColumns> initialColumns) :
+	const FolderSettings &folderSettings, const FolderColumns *initialColumns) :
 	ShellDropTargetWindow(CreateListView(hOwner)),
 	m_hListView(GetHWND()),
 	m_ID(id),

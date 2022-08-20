@@ -40,7 +40,7 @@ void Navigation::OnNavigateUp()
 		if (SUCCEEDED(hr))
 		{
 			m_tabContainer->CreateNewTab(pidlParent.get(), TabSettings(_selected = true), nullptr,
-				std::nullopt, &resultingTabId);
+				nullptr, &resultingTabId);
 		}
 	}
 

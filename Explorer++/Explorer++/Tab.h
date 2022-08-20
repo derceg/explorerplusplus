@@ -38,7 +38,7 @@ public:
 
 	Tab(IExplorerplusplus *expp, TabNavigationInterface *tabNavigation,
 		FileActionHandler *fileActionHandler, const FolderSettings *folderSettings,
-		std::optional<FolderColumns> initialColumns);
+		const FolderColumns *initialColumns);
 	Tab(const PreservedTab &preservedTab, IExplorerplusplus *expp,
 		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler);
 

@@ -81,11 +81,11 @@ public:
 	void CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
 	void CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {},
 		const FolderSettings *folderSettings = nullptr,
-		std::optional<FolderColumns> initialColumns = std::nullopt, int *newTabId = nullptr);
+		const FolderColumns *initialColumns = nullptr, int *newTabId = nullptr);
 	void CreateNewTab(const PreservedTab &preservedTab, int *newTabId = nullptr);
 	void CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings = {},
 		const FolderSettings *folderSettings = nullptr,
-		std::optional<FolderColumns> initialColumns = std::nullopt, int *newTabId = nullptr);
+		const FolderColumns *initialColumns = nullptr, int *newTabId = nullptr);
 
 	Tab &GetTab(int tabId);
 	Tab *GetTabOptional(int tabId);

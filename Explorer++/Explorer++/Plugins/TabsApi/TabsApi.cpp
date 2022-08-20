@@ -119,7 +119,7 @@ int Plugins::TabsApi::create(sol::table createProperties)
 	}
 
 	int tabId = -1;
-	m_tabContainer->CreateNewTab(pidlDirectory.get(), tabSettings, &folderSettings, std::nullopt, &tabId);
+	m_tabContainer->CreateNewTab(pidlDirectory.get(), tabSettings, &folderSettings, nullptr , &tabId);
 
 	return tabId;
 }

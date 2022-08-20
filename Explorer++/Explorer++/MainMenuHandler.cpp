@@ -271,7 +271,7 @@ void Explorerplusplus::OnResolveLink()
 
 			int newTabId;
 			m_tabContainer->CreateNewTab(
-				szPath, TabSettings(_selected = true), nullptr, std::nullopt, &newTabId);
+				szPath, TabSettings(_selected = true), nullptr, nullptr, &newTabId);
 
 			Tab &tab = m_tabContainer->GetTab(newTabId);
 

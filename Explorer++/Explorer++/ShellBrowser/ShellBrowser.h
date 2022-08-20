@@ -61,7 +61,7 @@ public:
 	static std::shared_ptr<ShellBrowser> CreateNew(int id, HWND hOwner,
 		IExplorerplusplus *coreInterface, TabNavigationInterface *tabNavigation,
 		FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
-		std::optional<FolderColumns> initialColumns);
+		const FolderColumns *initialColumns);
 
 	static std::shared_ptr<ShellBrowser> CreateFromPreserved(int id, HWND hOwner,
 		IExplorerplusplus *coreInterface, TabNavigationInterface *tabNavigation,
@@ -377,7 +377,7 @@ private:
 		const PreservedFolderState &preservedFolderState);
 	ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface,
 		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
-		const FolderSettings &folderSettings, std::optional<FolderColumns> initialColumns);
+		const FolderSettings &folderSettings, const FolderColumns *initialColumns);
 
 	static HWND CreateListView(HWND parent);
 	void InitializeListView();

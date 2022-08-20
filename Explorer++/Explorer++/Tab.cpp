@@ -16,7 +16,7 @@ int Tab::idCounter = 1;
 
 Tab::Tab(IExplorerplusplus *expp, TabNavigationInterface *tabNavigation,
 	FileActionHandler *fileActionHandler, const FolderSettings *folderSettings,
-	std::optional<FolderColumns> initialColumns) :
+	const FolderColumns *initialColumns) :
 	m_id(idCounter++),
 	m_useCustomName(false),
 	m_lockState(LockState::NotLocked)
