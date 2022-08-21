@@ -6,6 +6,7 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include <tchar.h>
+#include <windows.h>
 #include <filesystem>
 
 const TCHAR g_resourcesFileName[] = L"Resources";

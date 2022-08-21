@@ -24,7 +24,6 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
-#include "ShellTreeView/ShellTreeView.h"
 #include "TabBacking.h"
 #include "TabContainer.h"
 #include "TabRestorerUI.h"

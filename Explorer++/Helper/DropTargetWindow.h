@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "Macros.h"
 #include "WindowSubclassWrapper.h"
 #include <winrt/base.h>
 

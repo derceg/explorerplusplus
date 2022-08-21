@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "MergeFilesDialog.h"
 #include "CoreInterface.h"
-#include "DarkModeHelper.h"
 #include "Explorer++_internal.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"

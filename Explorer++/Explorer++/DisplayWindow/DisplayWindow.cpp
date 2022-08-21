@@ -20,7 +20,6 @@
 
 #include "stdafx.h"
 #include "DisplayWindow.h"
-#include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 
 namespace

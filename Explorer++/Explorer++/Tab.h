@@ -7,7 +7,6 @@
 #include "../Helper/Macros.h"
 #include <boost/signals2.hpp>
 #include <memory>
-#include <optional>
 
 class FileActionHandler;
 struct FolderColumns;

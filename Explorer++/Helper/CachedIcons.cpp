@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "CachedIcons.h"
-#include "ShellHelper.h"
 
 CachedIcons::CachedIcons(std::size_t maxItems) : m_maxItems(maxItems)
 {

@@ -6,7 +6,6 @@
 #include "SetFileAttributesDialog.h"
 #include "DarkModeHelper.h"
 #include "MainResource.h"
-#include "../Helper/Helper.h"
 #include "../Helper/TimeHelper.h"
 #include <list>
 

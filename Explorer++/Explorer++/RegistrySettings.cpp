@@ -15,7 +15,6 @@
 #include "TabContainer.h"
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
-#include <boost/range/adaptor/map.hpp>
 
 namespace
 {

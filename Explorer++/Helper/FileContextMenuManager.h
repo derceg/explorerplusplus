@@ -8,7 +8,6 @@
 #include "ShellHelper.h"
 #include "StatusBar.h"
 #include <wil/com.h>
-#include <list>
 #include <optional>
 
 __interface IFileContextMenuExternal

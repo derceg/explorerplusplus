@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "UiTheming.h"
 
 TabContainer *Explorerplusplus::GetTabContainer()
 {

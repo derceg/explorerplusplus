@@ -7,7 +7,6 @@
 #include "Macros.h"
 #include <MsXml2.h>
 #include <objbase.h>
-#include <list>
 #include <string>
 
 class DialogSettings

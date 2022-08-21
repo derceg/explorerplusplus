@@ -7,8 +7,6 @@
 #include "DarkModeButton.h"
 #include "DarkModeHelper.h"
 #include "MainResource.h"
-#include "../Helper/Controls.h"
-#include "../Helper/WindowHelper.h"
 #include <VSStyle.h>
 
 using namespace DarkModeButton;

@@ -7,7 +7,6 @@
 #include "Config.h"
 #include "LoadSaveInterface.h"
 #include "MenuRanges.h"
-#include "RenameTabDialog.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
 #include "TabRestorerUI.h"

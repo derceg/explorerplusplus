@@ -4,7 +4,6 @@
 
 #include "../Helper/DataExchangeHelper.h"
 #include "../Helper/DragDropHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/iDataObject.h"
 #include <gtest/gtest.h>
 #include <wil/com.h>

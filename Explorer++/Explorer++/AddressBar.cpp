@@ -13,7 +13,6 @@
 #include "../Helper/Controls.h"
 #include "../Helper/DataExchangeHelper.h"
 #include "../Helper/DragDropHelper.h"
-#include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/iDataObject.h"

@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "Plugins/PluginCommandManager.h"
 #include "Plugins/Manifest.h"
-#include <boost/algorithm/string.hpp>
 
 Plugins::PluginCommandManager::PluginCommandManager(HACCEL *acceleratorTable, int startId,
 	int endId) :

@@ -27,7 +27,6 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/XMLSettings.h"
-#include <boost/range/adaptor/map.hpp>
 #include <wil/com.h>
 #include <wil/resource.h>
 

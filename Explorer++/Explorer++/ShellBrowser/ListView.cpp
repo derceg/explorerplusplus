@@ -19,7 +19,6 @@
 #include "../Helper/IconFetcher.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/iDropSource.h"
 #include <boost/format.hpp>
 #include <wil/common.h>
 

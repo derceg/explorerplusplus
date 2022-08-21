@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "ShellHelper.h"
-#include "FileOperations.h"
 #include "Helper.h"
 #include "Macros.h"
 #include "ProcessHelper.h"

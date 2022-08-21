@@ -3,9 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "FileOperations.h"
 #include "Helper.h"
-#include "Macros.h"
 
 BOOL GetClusterSize(const TCHAR *drive, DWORD *pdwClusterSize)
 {

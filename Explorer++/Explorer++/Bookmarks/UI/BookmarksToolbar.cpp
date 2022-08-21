@@ -9,23 +9,20 @@
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/BookmarkTree.h"
-#include "Bookmarks/UI/AddBookmarkDialog.h"
 #include "Config.h"
 #include "CoreInterface.h"
 #include "DarkModeHelper.h"
 #include "MainResource.h"
+#include "Navigation.h"
 #include "ResourceHelper.h"
 #include "../Helper/Controls.h"
-#include "../Helper/DataExchangeHelper.h"
 #include "../Helper/DpiCompatibility.h"
-#include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/iDropSource.h"
 #include <wil/com.h>
 #include <wil/common.h>
-#include <algorithm>
 
 BookmarksToolbar::BookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
 	Navigation *navigation, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, UINT uIDStart,

@@ -5,9 +5,6 @@
 #include "stdafx.h"
 #include "ListViewEdit.h"
 #include "Accelerator.h"
-#include "../Helper/Helper.h"
-#include "../Helper/ListViewHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
 
 ListViewEdit *ListViewEdit::CreateNew(HWND hwnd, HACCEL *acceleratorTable, bool itemIsFile)

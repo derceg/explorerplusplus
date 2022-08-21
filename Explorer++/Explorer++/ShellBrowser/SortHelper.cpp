@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "SortHelper.h"
+#include "ItemData.h"
 #include <wil/common.h>
 #include <propvarutil.h>
 

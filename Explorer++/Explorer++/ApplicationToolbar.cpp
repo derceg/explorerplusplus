@@ -28,7 +28,6 @@
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/XMLSettings.h"
-#include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 #include <wil/com.h>
 #include <wil/resource.h>

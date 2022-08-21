@@ -7,7 +7,6 @@
 #include "ShellBrowser/FolderSettings.h"
 #include "SignalWrapper.h"
 #include "Tab.h"
-#include "TabNavigationInterface.h"
 #include "../Helper/IconFetcher.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/WindowSubclassWrapper.h"

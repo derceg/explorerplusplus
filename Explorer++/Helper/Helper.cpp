@@ -8,6 +8,7 @@
 #include "TimeHelper.h"
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <wil/resource.h>
 
 enum class VersionSubBlockType
 {

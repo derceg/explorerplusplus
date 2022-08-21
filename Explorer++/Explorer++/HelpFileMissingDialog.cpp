@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "HelpFileMissingDialog.h"
 #include "MainResource.h"
-#include "../Helper/Helper.h"
 #include "../Helper/WindowHelper.h"
 
 HelpFileMissingDialog::HelpFileMissingDialog(HINSTANCE hInstance, HWND hParent) :

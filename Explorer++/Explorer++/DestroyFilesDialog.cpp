@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "DestroyFilesDialog.h"
-#include "DarkModeHelper.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "../Helper/Helper.h"

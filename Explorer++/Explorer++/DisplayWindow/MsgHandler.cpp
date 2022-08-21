@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "DisplayWindow.h"
-#include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"

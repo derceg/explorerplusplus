@@ -11,7 +11,6 @@
 #include "MainResource.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "ShellBrowser/ViewModes.h"
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"

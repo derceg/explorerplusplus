@@ -6,7 +6,6 @@
 #include "ShellBrowser.h"
 #include "ItemData.h"
 #include "ViewModes.h"
-#include "../Helper/ShellHelper.h"
 #include <wil/com.h>
 #include <thumbcache.h>
 #include <list>

@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "Bookmarks/UI/BookmarkContextMenuController.h"
-#include "Bookmarks/BookmarkClipboard.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "Config.h"
 #include "CoreInterface.h"

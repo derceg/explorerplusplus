@@ -7,7 +7,6 @@
 #include "../Helper/WindowSubclassWrapper.h"
 #include <uxtheme.h>
 #include <memory>
-#include <vector>
 
 // clang-format off
 #include <wil/resource.h>

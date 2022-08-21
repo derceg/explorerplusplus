@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
-#include "../Helper/ImageHelper.h"
 
 std::wstring ResourceHelper::LoadString(HINSTANCE instance, UINT stringId)
 {

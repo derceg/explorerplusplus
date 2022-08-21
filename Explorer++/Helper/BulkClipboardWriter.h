@@ -5,7 +5,6 @@
 #pragma once
 
 #include "Clipboard.h"
-#include <utility>
 
 // The Clipboard class won't clear the clipboard, unless explicitly told to.
 // That makes sense, as it's possible to set multiple pieces of data on the

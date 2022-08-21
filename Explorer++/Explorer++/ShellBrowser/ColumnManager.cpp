@@ -12,7 +12,6 @@
 #include "ResourceHelper.h"
 #include "SortModes.h"
 #include "ViewModes.h"
-#include "../Helper/Macros.h"
 #include <cassert>
 #include <list>
 

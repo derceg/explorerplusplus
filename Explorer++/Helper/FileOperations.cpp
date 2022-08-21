@@ -10,7 +10,6 @@
 #include "Macros.h"
 #include "ShellHelper.h"
 #include "StringHelper.h"
-#include "iDataObject.h"
 #include <wil/com.h>
 #include <list>
 #include <sstream>

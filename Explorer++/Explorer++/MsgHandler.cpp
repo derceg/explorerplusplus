@@ -21,8 +21,6 @@
 #include "ShellBrowser/ViewModes.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "TabContainer.h"
-#include "ToolbarButtons.h"
-#include "ViewModeHelper.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"

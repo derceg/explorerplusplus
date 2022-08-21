@@ -14,12 +14,10 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/StringHelper.h"
 #include "../ThirdParty/CLI11/CLI11.hpp"
-#include <boost/algorithm/string/predicate.hpp>
 #include <boost/format.hpp>
 #include <boost/log/core.hpp>
 #include <filesystem>
 #include <iostream>
-#include <map>
 #include <optional>
 
 // Allows std::wstring to be used as a custom type for add_option.

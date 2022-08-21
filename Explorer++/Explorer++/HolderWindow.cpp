@@ -12,7 +12,6 @@
 #include "DarkModeHelper.h"
 #include "HolderWindowInternal.h"
 #include "../Helper/DpiCompatibility.h"
-#include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
 
 #define FOLDERS_TEXT_X 5

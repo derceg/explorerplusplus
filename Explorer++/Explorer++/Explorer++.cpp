@@ -14,7 +14,6 @@
 #include "Plugins/PluginManager.h"
 #include "TabRestorerUI.h"
 #include "UiTheming.h"
-#include "../Helper/WindowSubclassWrapper.h"
 #include "../Helper/iDirectoryMonitor.h"
 
 /* These entries correspond to shell

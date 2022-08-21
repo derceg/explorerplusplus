@@ -24,8 +24,6 @@
 #include "UiTheming.h"
 #include "ViewModeHelper.h"
 #include "../Helper/CustomGripper.h"
-#include "../Helper/ImageHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/iDirectoryMonitor.h"
 
 /*

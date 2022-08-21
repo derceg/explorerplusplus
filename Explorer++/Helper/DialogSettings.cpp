@@ -11,7 +11,6 @@
 #include "stdafx.h"
 #include "DialogSettings.h"
 #include "Helper.h"
-#include "Macros.h"
 #include "RegistrySettings.h"
 #include "WindowHelper.h"
 #include "XMLSettings.h"

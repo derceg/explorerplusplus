@@ -9,7 +9,6 @@
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ViewModes.h"
 #include "ValueWrapper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/StringHelper.h"

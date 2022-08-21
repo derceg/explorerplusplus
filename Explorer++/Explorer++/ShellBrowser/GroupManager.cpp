@@ -20,7 +20,6 @@
 #include <iphlpapi.h>
 #include <propkey.h>
 #include <cassert>
-#include <list>
 
 namespace
 {

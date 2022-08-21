@@ -5,11 +5,7 @@
 #pragma once
 
 #include <boost/bimap.hpp>
-#include <wil/resource.h>
-#include <ShObjIdl.h>
 #include <windows.h>
-#include <winioctl.h>
-#include <list>
 #include <optional>
 #include <string>
 

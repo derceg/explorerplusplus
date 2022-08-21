@@ -13,7 +13,6 @@
 #include "ShellView.h"
 #include "ViewModes.h"
 #include "WebBrowserApp.h"
-#include "../Helper/Helper.h"
 #include "../Helper/IconFetcher.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"

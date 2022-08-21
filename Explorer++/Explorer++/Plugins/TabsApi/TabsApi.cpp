@@ -6,7 +6,6 @@
 #include "Plugins/TabsApi/TabsApi.h"
 #include "Config.h"
 #include "CoreInterface.h"
-#include "Navigation.h"
 #include "Plugins/TabsApi/TabProperties.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ShellBrowser.h"

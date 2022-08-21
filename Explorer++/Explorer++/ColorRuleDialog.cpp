@@ -7,7 +7,6 @@
 #include "ColorRuleHelper.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
-#include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/StringHelper.h"
 #include "../Helper/WindowHelper.h"

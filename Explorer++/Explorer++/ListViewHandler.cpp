@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Config.h"
-#include "Explorer++_internal.h"
 #include "FolderView.h"
 #include "IDropFilesCallback.h"
 #include "MainResource.h"
@@ -27,16 +26,12 @@
 #include "../Helper/ClipboardHelper.h"
 #include "../Helper/ContextMenuManager.h"
 #include "../Helper/DropHandler.h"
-#include "../Helper/FileActionHandler.h"
 #include "../Helper/FileContextMenuManager.h"
-#include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/iDataObject.h"
-#include "../Helper/iDropSource.h"
 #include <wil/com.h>
 #include <winrt/base.h>
 

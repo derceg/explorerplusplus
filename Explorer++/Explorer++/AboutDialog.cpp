@@ -9,7 +9,6 @@
 #include "ThirdPartyCreditsDialog.h"
 #include "Version.h"
 #include "../Helper/BaseDialog.h"
-#include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/format.hpp>
 

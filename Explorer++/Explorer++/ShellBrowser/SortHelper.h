@@ -6,7 +6,8 @@
 
 #include "ColumnDataRetrieval.h"
 #include "FolderSettings.h"
-#include "ItemData.h"
+
+struct BasicItemInfo_t;
 
 enum class DateType
 {

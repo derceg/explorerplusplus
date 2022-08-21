@@ -8,9 +8,7 @@
 #include "Bookmarks/UI/BookmarkContextMenu.h"
 #include "Bookmarks/UI/BookmarkDropTargetWindow.h"
 #include "Bookmarks/UI/BookmarkMenu.h"
-#include "Navigation.h"
 #include "ResourceHelper.h"
-#include "../Helper/DropHandler.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/signals2.hpp>
 #include <optional>
