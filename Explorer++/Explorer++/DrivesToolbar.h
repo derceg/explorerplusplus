@@ -10,6 +10,7 @@
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/serialization/strong_typedef.hpp>
+#include <optional>
 #include <unordered_map>
 
 __interface IExplorerplusplus;
@@ -40,8 +41,8 @@ private:
 
 	struct DriveInformation
 	{
-		int Position;
-		IDCounter ID;
+		int position;
+		IDCounter id;
 	};
 
 	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
@@ -64,14 +65,14 @@ private:
 	void Initialize(HWND hParent);
 
 	void InsertDrives();
-	void InsertDrive(const std::wstring &DrivePath);
-	void RemoveDrive(const std::wstring &DrivePath);
+	void InsertDrive(const std::wstring &drivePath);
+	void RemoveDrive(const std::wstring &drivePath);
 
 	int GetSortedPosition(const std::wstring &DrivePath);
-	DriveInformation GetDrivePosition(const std::wstring &DrivePath);
+	std::optional<DriveInformation> MaybeGetDrive(const std::wstring &drivePath);
 	std::wstring GetDrivePath(int iIndex);
 
-	void UpdateDriveIcon(const std::wstring &DrivePath);
+	void UpdateDriveIcon(const std::wstring &drivePath);
 
 	void OnDeviceArrival(DEV_BROADCAST_HDR *dbh) override;
 	void OnDeviceRemoveComplete(DEV_BROADCAST_HDR *dbh) override;

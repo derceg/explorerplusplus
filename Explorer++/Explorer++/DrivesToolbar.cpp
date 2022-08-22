@@ -285,10 +285,19 @@ void DrivesToolbar::InsertDrives()
 	}
 }
 
-void DrivesToolbar::InsertDrive(const std::wstring &DrivePath)
+void DrivesToolbar::InsertDrive(const std::wstring &drivePath)
 {
+	auto driveInformation = MaybeGetDrive(drivePath);
+
+	// Drives shouldn't be added multiple times, so if this drive already exists in the toolbar,
+	// simply bail out.
+	if (driveInformation)
+	{
+		return;
+	}
+
 	TCHAR szDisplayName[32];
-	StringCchCopy(szDisplayName, SIZEOF_ARRAY(szDisplayName), DrivePath.c_str());
+	StringCchCopy(szDisplayName, SIZEOF_ARRAY(szDisplayName), drivePath.c_str());
 
 	/* Drives will be shown without a closing backslash. */
 	if (szDisplayName[lstrlen(szDisplayName) - 1] == '\\')
@@ -297,10 +306,10 @@ void DrivesToolbar::InsertDrive(const std::wstring &DrivePath)
 	}
 
 	SHFILEINFO shfi;
-	SHGetFileInfo(DrivePath.c_str(), 0, &shfi, sizeof(shfi),
+	SHGetFileInfo(drivePath.c_str(), 0, &shfi, sizeof(shfi),
 		SHGFI_SYSICONINDEX | SHGFI_USEFILEATTRIBUTES);
 
-	int position = GetSortedPosition(DrivePath);
+	int position = GetSortedPosition(drivePath);
 
 	TBBUTTON tbButton;
 	tbButton.iBitmap = shfi.iIcon;
@@ -312,34 +321,38 @@ void DrivesToolbar::InsertDrive(const std::wstring &DrivePath)
 	SendMessage(m_hwnd, TB_INSERTBUTTON, position, reinterpret_cast<LPARAM>(&tbButton));
 	UpdateToolbarBandSizing(GetParent(m_hwnd), m_hwnd);
 
-	m_mapID.insert(std::make_pair(m_IDCounter, DrivePath));
+	m_mapID.insert(std::make_pair(m_IDCounter, drivePath));
 	++m_IDCounter;
 }
 
-void DrivesToolbar::RemoveDrive(const std::wstring &DrivePath)
+void DrivesToolbar::RemoveDrive(const std::wstring &drivePath)
 {
-	DriveInformation di = GetDrivePosition(DrivePath);
+	auto driveInformation = MaybeGetDrive(drivePath);
 
-	if (di.Position != -1)
+	if (!driveInformation)
 	{
-		SendMessage(m_hwnd, TB_DELETEBUTTON, di.Position, 0);
-		UpdateToolbarBandSizing(GetParent(m_hwnd), m_hwnd);
-		m_mapID.erase(di.ID);
+		return;
 	}
+
+	SendMessage(m_hwnd, TB_DELETEBUTTON, driveInformation->position, 0);
+	UpdateToolbarBandSizing(GetParent(m_hwnd), m_hwnd);
+	m_mapID.erase(driveInformation->id);
 }
 
 /* Updates an items icon. This may be necessary,
 for example, if a cd/dvd is inserted/removed. */
-void DrivesToolbar::UpdateDriveIcon(const std::wstring &DrivePath)
+void DrivesToolbar::UpdateDriveIcon(const std::wstring &drivePath)
 {
-	DriveInformation di = GetDrivePosition(DrivePath);
+	auto driveInformation = MaybeGetDrive(drivePath);
 
-	if (di.Position != -1)
+	if (!driveInformation)
 	{
-		SHFILEINFO shfi;
-		SHGetFileInfo(DrivePath.c_str(), 0, &shfi, sizeof(shfi), SHGFI_SYSICONINDEX);
-		SendMessage(m_hwnd, TB_CHANGEBITMAP, di.ID, shfi.iIcon);
+		return;
 	}
+
+	SHFILEINFO shfi;
+	SHGetFileInfo(drivePath.c_str(), 0, &shfi, sizeof(shfi), SHGFI_SYSICONINDEX);
+	SendMessage(m_hwnd, TB_CHANGEBITMAP, driveInformation->id, shfi.iIcon);
 }
 
 int DrivesToolbar::GetSortedPosition(const std::wstring &DrivePath)
@@ -367,11 +380,9 @@ int DrivesToolbar::GetSortedPosition(const std::wstring &DrivePath)
 	return position;
 }
 
-DrivesToolbar::DriveInformation DrivesToolbar::GetDrivePosition(const std::wstring &DrivePath)
+std::optional<DrivesToolbar::DriveInformation> DrivesToolbar::MaybeGetDrive(
+	const std::wstring &drivePath)
 {
-	DriveInformation di;
-	di.Position = -1;
-
 	int nButtons = static_cast<int>(SendMessage(m_hwnd, TB_BUTTONCOUNT, 0, 0));
 
 	for (int i = 0; i < nButtons; i++)
@@ -382,15 +393,16 @@ DrivesToolbar::DriveInformation DrivesToolbar::GetDrivePosition(const std::wstri
 		auto itr = m_mapID.find(static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData)));
 		assert(itr != m_mapID.end());
 
-		if (DrivePath.compare(itr->second) == 0)
+		if (drivePath.compare(itr->second) == 0)
 		{
-			di.Position = i;
-			di.ID = static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData));
-			break;
+			DriveInformation driveInformation;
+			driveInformation.position = i;
+			driveInformation.id = static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData));
+			return driveInformation;
 		}
 	}
 
-	return di;
+	return std::nullopt;
 }
 
 std::wstring DrivesToolbar::GetDrivePath(int iIndex)
