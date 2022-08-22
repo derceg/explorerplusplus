@@ -30,8 +30,7 @@ DrivesToolbar::DrivesToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE
 	m_uIDStart(uIDStart),
 	m_uIDEnd(uIDEnd),
 	m_pexpp(pexpp),
-	m_navigation(navigation),
-	m_IDCounter(0)
+	m_navigation(navigation)
 {
 	Initialize(hParent);
 
@@ -82,19 +81,19 @@ INT_PTR DrivesToolbar::OnMButtonUp(const POINTS *pts, UINT keysDown)
 {
 	POINT pt;
 	POINTSTOPOINT(pt, *pts);
-	int iIndex =
-		static_cast<int>(SendMessage(m_hwnd, TB_HITTEST, 0, reinterpret_cast<LPARAM>(&pt)));
+	int index = static_cast<int>(SendMessage(m_hwnd, TB_HITTEST, 0, reinterpret_cast<LPARAM>(&pt)));
 
-	if (iIndex < 0)
+	if (index < 0)
 	{
 		return 0;
 	}
 
-	TBBUTTON tbButton;
-	SendMessage(m_hwnd, TB_GETBUTTON, iIndex, reinterpret_cast<LPARAM>(&tbButton));
+	auto drive = MaybeGetDriveFromIndex(index);
 
-	auto itr = m_mapID.find(static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData)));
-	assert(itr != m_mapID.end());
+	if (!drive)
+	{
+		return 0;
+	}
 
 	bool switchToNewTab = m_pexpp->GetConfig()->openTabsInForeground;
 
@@ -103,7 +102,7 @@ INT_PTR DrivesToolbar::OnMButtonUp(const POINTS *pts, UINT keysDown)
 		switchToNewTab = !switchToNewTab;
 	}
 
-	m_pexpp->GetTabContainer()->CreateNewTab(itr->second.c_str(),
+	m_pexpp->GetTabContainer()->CreateNewTab(drive->path.c_str(),
 		TabSettings(_selected = switchToNewTab));
 
 	return 0;
@@ -186,14 +185,21 @@ LRESULT CALLBACK DrivesToolbar::DrivesToolbarParentProc(HWND hwnd, UINT uMsg, WP
 	case WM_COMMAND:
 		if (LOWORD(wParam) >= m_uIDStart && LOWORD(wParam) <= m_uIDEnd)
 		{
-			int iIndex =
-				static_cast<int>(SendMessage(m_hwnd, TB_COMMANDTOINDEX, LOWORD(wParam), 0));
+			int index = static_cast<int>(SendMessage(m_hwnd, TB_COMMANDTOINDEX, LOWORD(wParam), 0));
 
-			if (iIndex != -1)
+			if (index == -1)
 			{
-				std::wstring path = GetDrivePath(iIndex);
-				m_navigation->BrowseFolderInCurrentTab(path.c_str());
+				break;
 			}
+
+			auto drive = MaybeGetDriveFromIndex(index);
+
+			if (!drive)
+			{
+				break;
+			}
+
+			m_navigation->BrowseFolderInCurrentTab(drive->path.c_str());
 
 			return 0;
 		}
@@ -208,37 +214,48 @@ LRESULT CALLBACK DrivesToolbar::DrivesToolbarParentProc(HWND hwnd, UINT uMsg, WP
 			{
 				auto *pnmm = reinterpret_cast<NMMOUSE *>(lParam);
 
-				if (pnmm->dwItemSpec != -1)
+				if (pnmm->dwItemSpec == -1)
 				{
-					int iIndex = static_cast<int>(
-						SendMessage(m_hwnd, TB_COMMANDTOINDEX, pnmm->dwItemSpec, 0));
-
-					if (iIndex != -1)
-					{
-						std::wstring path = GetDrivePath(iIndex);
-
-						unique_pidl_absolute pidl;
-						HRESULT hr = SHParseDisplayName(path.c_str(), nullptr, wil::out_param(pidl),
-							0, nullptr);
-
-						if (SUCCEEDED(hr))
-						{
-							ClientToScreen(m_hwnd, &pnmm->pt);
-
-							unique_pidl_child child(ILCloneChild(ILFindLastID(pidl.get())));
-
-							[[maybe_unused]] BOOL res = ILRemoveLastID(pidl.get());
-							assert(res);
-
-							FileContextMenuManager fcmm(m_hwnd, pidl.get(), { child.get() });
-
-							fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, &pnmm->pt,
-								m_pexpp->GetStatusBar(), NULL, FALSE, IsKeyDown(VK_SHIFT));
-						}
-
-						return TRUE;
-					}
+					break;
 				}
+
+				int index =
+					static_cast<int>(SendMessage(m_hwnd, TB_COMMANDTOINDEX, pnmm->dwItemSpec, 0));
+
+				if (index == -1)
+				{
+					break;
+				}
+
+				auto drive = MaybeGetDriveFromIndex(index);
+
+				if (!drive)
+				{
+					break;
+				}
+
+				unique_pidl_absolute pidl;
+				HRESULT hr = SHParseDisplayName(drive->path.c_str(), nullptr, wil::out_param(pidl),
+					0, nullptr);
+
+				if (FAILED(hr))
+				{
+					break;
+				}
+
+				ClientToScreen(m_hwnd, &pnmm->pt);
+
+				unique_pidl_child child(ILCloneChild(ILFindLastID(pidl.get())));
+
+				[[maybe_unused]] BOOL res = ILRemoveLastID(pidl.get());
+				assert(res);
+
+				FileContextMenuManager fcmm(m_hwnd, pidl.get(), { child.get() });
+
+				fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, &pnmm->pt,
+					m_pexpp->GetStatusBar(), NULL, FALSE, IsKeyDown(VK_SHIFT));
+
+				return TRUE;
 			}
 			break;
 
@@ -246,14 +263,22 @@ LRESULT CALLBACK DrivesToolbar::DrivesToolbarParentProc(HWND hwnd, UINT uMsg, WP
 			{
 				auto *pnmtbgit = reinterpret_cast<NMTBGETINFOTIP *>(lParam);
 
-				int iIndex =
+				int index =
 					static_cast<int>(SendMessage(m_hwnd, TB_COMMANDTOINDEX, pnmtbgit->iItem, 0));
 
-				if (iIndex != -1)
+				if (index == -1)
 				{
-					std::wstring path = GetDrivePath(iIndex);
-					GetItemInfoTip(path.c_str(), pnmtbgit->pszText, pnmtbgit->cchTextMax);
+					break;
 				}
+
+				auto drive = MaybeGetDriveFromIndex(index);
+
+				if (!drive)
+				{
+					break;
+				}
+
+				GetItemInfoTip(drive->path.c_str(), pnmtbgit->pszText, pnmtbgit->cchTextMax);
 
 				return 0;
 			}
@@ -287,11 +312,9 @@ void DrivesToolbar::InsertDrives()
 
 void DrivesToolbar::InsertDrive(const std::wstring &drivePath)
 {
-	auto driveInformation = MaybeGetDrive(drivePath);
-
 	// Drives shouldn't be added multiple times, so if this drive already exists in the toolbar,
 	// simply bail out.
-	if (driveInformation)
+	if (MaybeGetDriveIndex(drivePath))
 	{
 		return;
 	}
@@ -305,115 +328,99 @@ void DrivesToolbar::InsertDrive(const std::wstring &drivePath)
 		szDisplayName[lstrlen(szDisplayName) - 1] = '\0';
 	}
 
+	auto [itr, inserted] = m_drives.emplace(drivePath);
+	assert(inserted);
+
 	SHFILEINFO shfi;
 	SHGetFileInfo(drivePath.c_str(), 0, &shfi, sizeof(shfi),
 		SHGFI_SYSICONINDEX | SHGFI_USEFILEATTRIBUTES);
 
-	int position = GetSortedPosition(drivePath);
+	int index = static_cast<int>(std::distance(m_drives.begin(), itr));
 
-	TBBUTTON tbButton;
+	TBBUTTON tbButton = {};
 	tbButton.iBitmap = shfi.iIcon;
-	tbButton.idCommand = m_uIDStart + m_IDCounter;
+	tbButton.idCommand = m_uIDStart + m_idCounter;
 	tbButton.fsState = TBSTATE_ENABLED;
 	tbButton.fsStyle = BTNS_BUTTON | BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX;
-	tbButton.dwData = m_IDCounter;
 	tbButton.iString = reinterpret_cast<INT_PTR>(szDisplayName);
-	SendMessage(m_hwnd, TB_INSERTBUTTON, position, reinterpret_cast<LPARAM>(&tbButton));
+	SendMessage(m_hwnd, TB_INSERTBUTTON, index, reinterpret_cast<LPARAM>(&tbButton));
 	UpdateToolbarBandSizing(GetParent(m_hwnd), m_hwnd);
 
-	m_mapID.insert(std::make_pair(m_IDCounter, drivePath));
-	++m_IDCounter;
+	++m_idCounter;
 }
 
 void DrivesToolbar::RemoveDrive(const std::wstring &drivePath)
 {
-	auto driveInformation = MaybeGetDrive(drivePath);
+	auto itr = std::find_if(m_drives.begin(), m_drives.end(),
+		[&drivePath](const Drive &drive)
+		{
+			return drive.path.compare(drivePath) == 0;
+		});
 
-	if (!driveInformation)
+	if (itr == m_drives.end())
 	{
 		return;
 	}
 
-	SendMessage(m_hwnd, TB_DELETEBUTTON, driveInformation->position, 0);
+	int index = static_cast<int>(std::distance(m_drives.begin(), itr));
+
+	SendMessage(m_hwnd, TB_DELETEBUTTON, index, 0);
 	UpdateToolbarBandSizing(GetParent(m_hwnd), m_hwnd);
-	m_mapID.erase(driveInformation->id);
+	m_drives.erase(itr);
 }
 
 /* Updates an items icon. This may be necessary,
 for example, if a cd/dvd is inserted/removed. */
 void DrivesToolbar::UpdateDriveIcon(const std::wstring &drivePath)
 {
-	auto driveInformation = MaybeGetDrive(drivePath);
+	auto index = MaybeGetDriveIndex(drivePath);
 
-	if (!driveInformation)
+	if (!index)
 	{
 		return;
 	}
 
 	SHFILEINFO shfi;
-	SHGetFileInfo(drivePath.c_str(), 0, &shfi, sizeof(shfi), SHGFI_SYSICONINDEX);
-	SendMessage(m_hwnd, TB_CHANGEBITMAP, driveInformation->id, shfi.iIcon);
-}
+	auto res = SHGetFileInfo(drivePath.c_str(), 0, &shfi, sizeof(shfi), SHGFI_SYSICONINDEX);
 
-int DrivesToolbar::GetSortedPosition(const std::wstring &DrivePath)
-{
-	int position = 0;
-
-	int nButtons = static_cast<int>(SendMessage(m_hwnd, TB_BUTTONCOUNT, 0, 0));
-
-	for (int i = 0; i < nButtons; i++)
+	if (res == 0)
 	{
-		TBBUTTON tbButton;
-		SendMessage(m_hwnd, TB_GETBUTTON, i, reinterpret_cast<LPARAM>(&tbButton));
-
-		auto itr = m_mapID.find(static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData)));
-		assert(itr != m_mapID.end());
-
-		if (DrivePath.compare(itr->second) < 0)
-		{
-			break;
-		}
-
-		position++;
+		return;
 	}
 
-	return position;
+	TBBUTTONINFO tbbi;
+	tbbi.cbSize = sizeof(tbbi);
+	tbbi.dwMask = TBIF_BYINDEX | TBIF_IMAGE;
+	tbbi.iImage = shfi.iIcon;
+	SendMessage(m_hwnd, TB_SETBUTTONINFO, *index, reinterpret_cast<LPARAM>(&tbbi));
 }
 
-std::optional<DrivesToolbar::DriveInformation> DrivesToolbar::MaybeGetDrive(
-	const std::wstring &drivePath)
+const DrivesToolbar::Drive *DrivesToolbar::MaybeGetDriveFromIndex(int index) const
 {
-	int nButtons = static_cast<int>(SendMessage(m_hwnd, TB_BUTTONCOUNT, 0, 0));
-
-	for (int i = 0; i < nButtons; i++)
+	if (index < 0 || index >= m_drives.size())
 	{
-		TBBUTTON tbButton;
-		SendMessage(m_hwnd, TB_GETBUTTON, i, reinterpret_cast<LPARAM>(&tbButton));
-
-		auto itr = m_mapID.find(static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData)));
-		assert(itr != m_mapID.end());
-
-		if (drivePath.compare(itr->second) == 0)
-		{
-			DriveInformation driveInformation;
-			driveInformation.position = i;
-			driveInformation.id = static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData));
-			return driveInformation;
-		}
+		return nullptr;
 	}
 
-	return std::nullopt;
+	auto itr = m_drives.begin();
+	std::advance(itr, index);
+	return &*itr;
 }
 
-std::wstring DrivesToolbar::GetDrivePath(int iIndex)
+std::optional<int> DrivesToolbar::MaybeGetDriveIndex(const std::wstring &drivePath)
 {
-	TBBUTTON tbButton;
-	SendMessage(m_hwnd, TB_GETBUTTON, iIndex, reinterpret_cast<LPARAM>(&tbButton));
+	auto itr = std::find_if(m_drives.begin(), m_drives.end(),
+		[&drivePath](const Drive &drive)
+		{
+			return drive.path.compare(drivePath) == 0;
+		});
 
-	auto itr = m_mapID.find(static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData)));
-	assert(itr != m_mapID.end());
+	if (itr == m_drives.end())
+	{
+		return std::nullopt;
+	}
 
-	return itr->second;
+	return static_cast<int>(std::distance(m_drives.begin(), itr));
 }
 
 void DrivesToolbar::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,

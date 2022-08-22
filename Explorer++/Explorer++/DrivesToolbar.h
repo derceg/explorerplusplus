@@ -9,9 +9,8 @@
 #include "../Helper/BaseWindow.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/WindowSubclassWrapper.h"
-#include <boost/serialization/strong_typedef.hpp>
 #include <optional>
-#include <unordered_map>
+#include <set>
 
 __interface IExplorerplusplus;
 
@@ -37,12 +36,18 @@ protected:
 	INT_PTR OnMButtonUp(const POINTS *pts, UINT keysDown) override;
 
 private:
-	BOOST_STRONG_TYPEDEF(UINT, IDCounter);
-
-	struct DriveInformation
+	struct Drive
 	{
-		int position;
-		IDCounter id;
+		Drive(const std::wstring &path) : path(path)
+		{
+		}
+
+		bool operator<(const Drive &other) const
+		{
+			return path.compare(other.path) < 0;
+		}
+
+		std::wstring path;
 	};
 
 	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
@@ -68,9 +73,8 @@ private:
 	void InsertDrive(const std::wstring &drivePath);
 	void RemoveDrive(const std::wstring &drivePath);
 
-	int GetSortedPosition(const std::wstring &DrivePath);
-	std::optional<DriveInformation> MaybeGetDrive(const std::wstring &drivePath);
-	std::wstring GetDrivePath(int iIndex);
+	const Drive *MaybeGetDriveFromIndex(int index) const;
+	std::optional<int> MaybeGetDriveIndex(const std::wstring &drivePath);
 
 	void UpdateDriveIcon(const std::wstring &drivePath);
 
@@ -81,21 +85,12 @@ private:
 
 	UINT m_uIDStart;
 	UINT m_uIDEnd;
+	int m_idCounter = 0;
 
 	IExplorerplusplus *m_pexpp;
 	Navigation *m_navigation;
 
-	struct IDCounterHasher
-	{
-		size_t operator()(const IDCounter &t) const
-		{
-			return (size_t) t;
-		}
-	};
-
-	std::unordered_map<IDCounter, std::wstring, IDCounterHasher> m_mapID;
-
-	IDCounter m_IDCounter;
+	std::set<Drive> m_drives;
 
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 };
