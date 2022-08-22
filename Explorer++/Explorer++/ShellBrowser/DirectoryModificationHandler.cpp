@@ -71,6 +71,8 @@ void ShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)
 
 void ShellBrowser::OnProcessShellChangeNotifications()
 {
+	KillTimer(m_hListView, PROCESS_SHELL_CHANGES_TIMER_ID);
+
 	SendMessage(m_hListView, WM_SETREDRAW, FALSE, NULL);
 
 	for (const auto &change : m_directoryState.shellChangeNotifications)
@@ -81,8 +83,6 @@ void ShellBrowser::OnProcessShellChangeNotifications()
 	SendMessage(m_hListView, WM_SETREDRAW, TRUE, NULL);
 
 	m_directoryState.shellChangeNotifications.clear();
-
-	KillTimer(m_hListView, PROCESS_SHELL_CHANGES_TIMER_ID);
 
 	directoryModified.m_signal();
 }
