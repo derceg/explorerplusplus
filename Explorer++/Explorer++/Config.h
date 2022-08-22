@@ -13,7 +13,7 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/StringHelper.h"
 
-static const int DEFAULT_LISTVIEW_HOVER_TIME = 500;
+constexpr int DEFAULT_LISTVIEW_HOVER_TIME = 500;
 
 enum class ShellChangeNotificationType
 {

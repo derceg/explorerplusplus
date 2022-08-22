@@ -39,11 +39,11 @@
 
 /* The treeview is offset by a small
 amount on the left. */
-static const int TREEVIEW_X_CLEARANCE = 1;
+constexpr int TREEVIEW_X_CLEARANCE = 1;
 
 /* The spacing between the right edge of
 the treeview and the holder window. */
-static const int TREEVIEW_HOLDER_CLEARANCE = 4;
+constexpr int TREEVIEW_HOLDER_CLEARANCE = 4;
 
 const int CLOSE_TOOLBAR_X_OFFSET = 4;
 const int CLOSE_TOOLBAR_Y_OFFSET = 1;

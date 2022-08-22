@@ -53,10 +53,10 @@ private:
 
 	static const int WM_APP_UPDATE_CHECK_COMPLETE = WM_APP + 1;
 
-	static const int UPDATE_CHECK_ERROR = 0;
-	static const int UPDATE_CHECK_SUCCESS = 1;
+	static constexpr int UPDATE_CHECK_ERROR = 0;
+	static constexpr int UPDATE_CHECK_SUCCESS = 1;
 
-	static const int STATUS_TIMER_ELAPSED = 800;
+	static constexpr int STATUS_TIMER_ELAPSED = 800;
 
 	static const TCHAR VERSION_FILE_URL[];
 

@@ -92,22 +92,22 @@ public:
 	static void DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData);
 
 private:
-	static const int MIN_SHELL_MENU_ID = 1;
-	static const int MAX_SHELL_MENU_ID = 1000;
+	static constexpr int MIN_SHELL_MENU_ID = 1;
+	static constexpr int MAX_SHELL_MENU_ID = 1000;
 
-	static const UINT MINIMUM_DISPLAYWINDOW_WIDTH = 70;
-	static const UINT MINIMUM_DISPLAYWINDOW_HEIGHT = 70;
+	static constexpr UINT MINIMUM_DISPLAYWINDOW_WIDTH = 70;
+	static constexpr UINT MINIMUM_DISPLAYWINDOW_HEIGHT = 70;
 
 	/* The number of toolbars that appear in the
 	main rebar. */
-	static const int NUM_MAIN_TOOLBARS = 5;
+	static constexpr int NUM_MAIN_TOOLBARS = 5;
 
 	/* Main toolbar id's. */
-	static const int ID_MAINTOOLBAR = 0;
-	static const int ID_ADDRESSTOOLBAR = 1;
-	static const int ID_BOOKMARKSTOOLBAR = 2;
-	static const int ID_DRIVESTOOLBAR = 3;
-	static const int ID_APPLICATIONSTOOLBAR = 4;
+	static constexpr int ID_MAINTOOLBAR = 0;
+	static constexpr int ID_ADDRESSTOOLBAR = 1;
+	static constexpr int ID_BOOKMARKSTOOLBAR = 2;
+	static constexpr int ID_DRIVESTOOLBAR = 3;
+	static constexpr int ID_APPLICATIONSTOOLBAR = 4;
 
 	static const std::vector<std::wstring> BLACKLISTED_BACKGROUND_MENU_CLSID_ENTRIES;
 
@@ -119,12 +119,12 @@ private:
 
 	// Represents the maximum number of icons that can be cached. This cache is
 	// shared between various components in the application.
-	static const int MAX_CACHED_ICONS = 1000;
+	static constexpr int MAX_CACHED_ICONS = 1000;
 
 	static inline constexpr COLORREF TAB_BAR_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
 
-	static inline const int CLOSE_TOOLBAR_WIDTH = 24;
-	static inline const int CLOSE_TOOLBAR_HEIGHT = 24;
+	static inline constexpr int CLOSE_TOOLBAR_WIDTH = 24;
+	static inline constexpr int CLOSE_TOOLBAR_HEIGHT = 24;
 
 	struct FileContextMenuInfo
 	{

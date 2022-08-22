@@ -139,15 +139,15 @@ private:
 	static const UINT_PTR SUBCLASS_ID = 0;
 	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
-	static const int ICON_SIZE_96DPI = 16;
+	static constexpr int ICON_SIZE_96DPI = 16;
 
-	static const UINT DROP_SWITCH_TAB_TIMER_ID = 1;
-	static const UINT DROP_SWITCH_TAB_TIMER_ELAPSE = 500;
+	static constexpr UINT DROP_SWITCH_TAB_TIMER_ID = 1;
+	static constexpr UINT DROP_SWITCH_TAB_TIMER_ELAPSE = 500;
 
-	static const UINT DROP_SCROLL_TIMER_ID = 2;
-	static const UINT DROP_SCROLL_TIMER_ELAPSE = 1000;
+	static constexpr UINT DROP_SCROLL_TIMER_ID = 2;
+	static constexpr UINT DROP_SCROLL_TIMER_ELAPSE = 1000;
 
-	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 40;
+	static constexpr LONG DROP_SCROLL_MARGIN_X_96DPI = 40;
 
 	TabContainer(HWND parent, TabNavigationInterface *tabNavigation, IExplorerplusplus *expp,
 		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
