@@ -10,6 +10,7 @@
 #include "Config.h"
 #include "DarkModeHelper.h"
 #include "DrivesToolbar.h"
+#include "DrivesToolbarView.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
@@ -25,9 +26,7 @@ LRESULT CALLBACK RebarSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 static const int TOOLBAR_BOOKMARK_START = 46000;
 static const int TOOLBAR_BOOKMARK_END = TOOLBAR_BOOKMARK_START + 1000;
-static const int TOOLBAR_DRIVES_ID_START = TOOLBAR_BOOKMARK_END + 1;
-static const int TOOLBAR_DRIVES_ID_END = TOOLBAR_DRIVES_ID_START + 1000;
-static const int TOOLBAR_APPLICATIONS_ID_START = TOOLBAR_DRIVES_ID_END + 1;
+static const int TOOLBAR_APPLICATIONS_ID_START = TOOLBAR_BOOKMARK_END + 1;
 static const int TOOLBAR_APPLICATIONS_ID_END = TOOLBAR_APPLICATIONS_ID_START + 1000;
 
 DWORD BookmarkToolbarStyles = WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN
@@ -164,11 +163,12 @@ void Explorerplusplus::CreateMainControls()
 
 		case ID_DRIVESTOOLBAR:
 			CreateDrivesToolbar();
-			toolbarSize = (DWORD) SendMessage(m_pDrivesToolbar->GetHWND(), TB_GETBUTTONSIZE, 0, 0);
+			toolbarSize =
+				(DWORD) SendMessage(m_drivesToolbar->GetView()->GetHWND(), TB_GETBUTTONSIZE, 0, 0);
 			m_ToolbarInformation[i].cyMinChild = HIWORD(toolbarSize);
 			m_ToolbarInformation[i].cyMaxChild = HIWORD(toolbarSize);
 			m_ToolbarInformation[i].cyChild = HIWORD(toolbarSize);
-			SendMessage(m_pDrivesToolbar->GetHWND(), TB_GETMAXSIZE, 0, (LPARAM) &sz);
+			SendMessage(m_drivesToolbar->GetView()->GetHWND(), TB_GETMAXSIZE, 0, (LPARAM) &sz);
 
 			if (m_ToolbarInformation[i].cx == 0)
 			{
@@ -176,7 +176,7 @@ void Explorerplusplus::CreateMainControls()
 			}
 
 			m_ToolbarInformation[i].cxIdeal = sz.cx;
-			m_ToolbarInformation[i].hwndChild = m_pDrivesToolbar->GetHWND();
+			m_ToolbarInformation[i].hwndChild = m_drivesToolbar->GetView()->GetHWND();
 			break;
 
 		case ID_APPLICATIONSTOOLBAR:
@@ -356,14 +356,21 @@ void Explorerplusplus::CreateBookmarksToolbar()
 
 void Explorerplusplus::CreateDrivesToolbar()
 {
-	m_pDrivesToolbar = DrivesToolbar::Create(m_hMainRebar, TOOLBAR_DRIVES_ID_START,
-		TOOLBAR_DRIVES_ID_END, m_hLanguageModule, this, m_navigation.get());
+	m_drivesToolbar =
+		DrivesToolbar::Create(m_hMainRebar, this, m_hLanguageModule, m_navigation.get());
+	m_drivesToolbar->GetView()->AddToolbarUpdatedObserver(std::bind_front(
+		&Explorerplusplus::OnRebarToolbarUpdated, this, m_drivesToolbar->GetView()->GetHWND()));
 }
 
 void Explorerplusplus::CreateApplicationToolbar()
 {
 	m_pApplicationToolbar = ApplicationToolbar::Create(m_hMainRebar, TOOLBAR_APPLICATIONS_ID_START,
 		TOOLBAR_APPLICATIONS_ID_END, m_hLanguageModule, this);
+}
+
+void Explorerplusplus::OnRebarToolbarUpdated(HWND toolbar)
+{
+	UpdateToolbarBandSizing(m_hMainRebar, toolbar);
 }
 
 void Explorerplusplus::OnUseLargeToolbarIconsUpdated(BOOL newValue)
@@ -436,7 +443,7 @@ std::optional<int> Explorerplusplus::OnRebarCustomDraw(NMHDR *nmhdr)
 	}
 
 	if (nmhdr->hwndFrom != m_mainToolbar->GetHWND() && nmhdr->hwndFrom != m_hBookmarksToolbar
-		&& nmhdr->hwndFrom != m_pDrivesToolbar->GetHWND()
+		&& nmhdr->hwndFrom != m_drivesToolbar->GetView()->GetHWND()
 		&& nmhdr->hwndFrom != m_pApplicationToolbar->GetHWND())
 	{
 		return std::nullopt;

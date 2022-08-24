@@ -4,93 +4,48 @@
 
 #pragma once
 
-#include "HardwareChangeNotifier.h"
-#include "Navigation.h"
-#include "../Helper/BaseWindow.h"
-#include "../Helper/FileContextMenuManager.h"
-#include "../Helper/WindowSubclassWrapper.h"
-#include <optional>
-#include <set>
+#include "DriveModel.h"
 
+class DrivesToolbarView;
 __interface IExplorerplusplus;
+struct MouseEvent;
+class Navigation;
 
-class DrivesToolbar :
-	public BaseWindow,
-	public IFileContextMenuExternal,
-	public NHardwareChangeNotifier::INotification
+class DrivesToolbar
 {
 public:
-	static DrivesToolbar *Create(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance,
-		IExplorerplusplus *pexpp, Navigation *navigation);
+	static DrivesToolbar *Create(HWND parent, IExplorerplusplus *coreInterface, HINSTANCE instance,
+		Navigation *navigation);
 
-	/* IFileContextMenuExternal methods. */
-	void UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, IContextMenu *contextMenu,
-		HMENU hMenu) override;
-	BOOL HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd) override;
-	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, int iCmd) override;
+	DrivesToolbar(const DrivesToolbar &) = delete;
+	DrivesToolbar(DrivesToolbar &&) = delete;
+	DrivesToolbar &operator=(const DrivesToolbar &) = delete;
+	DrivesToolbar &operator=(DrivesToolbar &&) = delete;
 
-protected:
-	INT_PTR OnMButtonUp(const POINTS *pts, UINT keysDown) override;
+	DrivesToolbarView *GetView() const;
 
 private:
-	struct Drive
-	{
-		Drive(const std::wstring &path) : path(path)
-		{
-		}
+	DrivesToolbar(HWND parent, IExplorerplusplus *coreInterface, HINSTANCE instance,
+		Navigation *navigation);
+	~DrivesToolbar() = default;
 
-		bool operator<(const Drive &other) const
-		{
-			return path.compare(other.path) < 0;
-		}
+	void Initialize();
 
-		std::wstring path;
-	};
+	void AddDrives();
+	void AddDriveAtIndex(const std::wstring &drivePath, size_t index);
 
-	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
+	void OnDriveAdded(const std::wstring &path, size_t index);
+	void OnDriveUpdated(const std::wstring &path);
+	void OnDriveRemoved(const std::wstring &path, size_t oldIndex);
 
-	static const int MIN_SHELL_MENU_ID = 1;
-	static const int MAX_SHELL_MENU_ID = 1000;
+	void OnButtonClicked(const std::wstring &drivePath, const MouseEvent &event);
+	void OnButtonMiddleClicked(const std::wstring &drivePath, const MouseEvent &event);
+	void OnButtonRightClicked(const std::wstring &drivePath, const MouseEvent &event);
 
-	static const int MENU_ID_OPEN_IN_NEW_TAB = (MAX_SHELL_MENU_ID + 1);
+	void OnWindowDestroyed();
 
-	static LRESULT CALLBACK DrivesToolbarParentProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
-		LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-	LRESULT CALLBACK DrivesToolbarParentProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-	DrivesToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance,
-		IExplorerplusplus *pexpp, Navigation *navigation);
-	~DrivesToolbar();
-
-	static HWND CreateDrivesToolbar(HWND hParent);
-
-	void Initialize(HWND hParent);
-
-	void InsertDrives();
-	void InsertDrive(const std::wstring &drivePath);
-	void RemoveDrive(const std::wstring &drivePath);
-
-	const Drive *MaybeGetDriveFromIndex(int index) const;
-	std::optional<int> MaybeGetDriveIndex(const std::wstring &drivePath);
-
-	void UpdateDriveIcon(const std::wstring &drivePath);
-
-	void OnDeviceArrival(DEV_BROADCAST_HDR *dbh) override;
-	void OnDeviceRemoveComplete(DEV_BROADCAST_HDR *dbh) override;
-
-	HINSTANCE m_hInstance;
-
-	UINT m_uIDStart;
-	UINT m_uIDEnd;
-	int m_idCounter = 0;
-
-	IExplorerplusplus *m_pexpp;
+	DrivesToolbarView *m_view;
+	IExplorerplusplus *m_coreInterface;
 	Navigation *m_navigation;
-
-	std::set<Drive> m_drives;
-
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	DriveModel m_driveModel;
 };

@@ -13,11 +13,13 @@
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "DrivesToolbar.h"
+#include "DrivesToolbarView.h"
 #include "Explorer++_internal.h"
 #include "HolderWindow.h"
 #include "IModelessDialogNotification.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
+#include "MainToolbarButtons.h"
 #include "MenuRanges.h"
 #include "ModelessDialogs.h"
 #include "Navigation.h"
@@ -27,7 +29,6 @@
 #include "TabBacking.h"
 #include "TabContainer.h"
 #include "TabRestorerUI.h"
-#include "ToolbarButtons.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileOperations.h"
@@ -253,7 +254,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM w
 		break;
 
 	case WM_COMMAND:
-		return CommandHandler(hwnd, wParam);
+		return CommandHandler(hwnd, reinterpret_cast<HWND>(lParam), LOWORD(wParam), HIWORD(wParam));
 
 	case WM_NOTIFY:
 		return NotifyHandler(hwnd, Msg, wParam, lParam);
@@ -283,53 +284,57 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM w
 	return DefWindowProc(hwnd, Msg, wParam, lParam);
 }
 
-LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd, WPARAM wParam)
+LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd, HWND control, int id,
+	UINT notificationCode)
 {
-	if (HIWORD(wParam) == 0 || HIWORD(wParam) == 1)
+	// The drives toolbar will handle its own items.
+	if (control && m_drivesToolbar && control == m_drivesToolbar->GetView()->GetHWND())
 	{
-		return HandleMenuOrAccelerator(hwnd, wParam);
+		return 1;
+	}
+
+	if (notificationCode == 0 || notificationCode == 1)
+	{
+		return HandleMenuOrAccelerator(hwnd, id, notificationCode);
 	}
 	else
 	{
-		return HandleControlNotification(hwnd, wParam);
+		return HandleControlNotification(hwnd, notificationCode);
 	}
 }
 
-LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
+LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, int id, UINT notificationCode)
 {
-	if (HIWORD(wParam) == 0 && LOWORD(wParam) >= MENU_BOOKMARK_STARTID
-		&& LOWORD(wParam) <= MENU_BOOKMARK_ENDID)
+	if (notificationCode == 0 && id >= MENU_BOOKMARK_STARTID && id <= MENU_BOOKMARK_ENDID)
 	{
-		m_bookmarksMainMenu->OnMenuItemClicked(LOWORD(wParam));
+		m_bookmarksMainMenu->OnMenuItemClicked(id);
 		return 0;
 	}
-	else if (HIWORD(wParam) == 0 && LOWORD(wParam) >= MENU_RECENT_TABS_STARTID
-		&& LOWORD(wParam) < MENU_RECENT_TABS_ENDID)
+	else if (notificationCode == 0 && id >= MENU_RECENT_TABS_STARTID && id < MENU_RECENT_TABS_ENDID)
 	{
-		m_tabRestorerUI->OnMenuItemClicked(LOWORD(wParam));
+		m_tabRestorerUI->OnMenuItemClicked(id);
 		return 0;
 	}
-	else if (HIWORD(wParam) == 0 && LOWORD(wParam) >= MENU_PLUGIN_STARTID
-		&& LOWORD(wParam) < MENU_PLUGIN_ENDID)
+	else if (notificationCode == 0 && id >= MENU_PLUGIN_STARTID && id < MENU_PLUGIN_ENDID)
 	{
-		m_pluginMenuManager.OnMenuItemClicked(LOWORD(wParam));
+		m_pluginMenuManager.OnMenuItemClicked(id);
 		return 0;
 	}
-	else if (HIWORD(wParam) == 1 && LOWORD(wParam) >= ACCELERATOR_PLUGIN_STARTID
-		&& LOWORD(wParam) < ACCELERATOR_PLUGIN_ENDID)
+	else if (notificationCode == 1 && id >= ACCELERATOR_PLUGIN_STARTID
+		&& id < ACCELERATOR_PLUGIN_ENDID)
 	{
-		m_pluginCommandManager.onAcceleratorPressed(LOWORD(wParam));
+		m_pluginCommandManager.onAcceleratorPressed(id);
 		return 0;
 	}
 
-	switch (LOWORD(wParam))
+	switch (id)
 	{
-	case ToolbarButton::NewTab:
+	case MainToolbarButton::NewTab:
 	case IDM_FILE_NEWTAB:
 		OnNewTab();
 		break;
 
-	case ToolbarButton::CloseTab:
+	case MainToolbarButton::CloseTab:
 	case TABTOOLBAR_CLOSE:
 	case IDM_FILE_CLOSETAB:
 		OnCloseTab();
@@ -343,7 +348,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		OnSaveDirectoryListing();
 		break;
 
-	case ToolbarButton::OpenCommandPrompt:
+	case MainToolbarButton::OpenCommandPrompt:
 	case IDM_FILE_OPENCOMMANDPROMPT:
 		StartCommandPrompt(m_pActiveShellBrowser->GetDirectory(), false);
 		break;
@@ -375,12 +380,12 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		OnSetFileAttributes();
 		break;
 
-	case ToolbarButton::Delete:
+	case MainToolbarButton::Delete:
 	case IDM_FILE_DELETE:
 		OnFileDelete(false);
 		break;
 
-	case ToolbarButton::DeletePermanently:
+	case MainToolbarButton::DeletePermanently:
 	case IDM_FILE_DELETEPERMANENTLY:
 		OnFileDelete(true);
 		break;
@@ -389,7 +394,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		OnFileRename();
 		break;
 
-	case ToolbarButton::Properties:
+	case MainToolbarButton::Properties:
 	case IDM_FILE_PROPERTIES:
 	case IDM_RCLICK_PROPERTIES:
 		OnShowFileProperties();
@@ -403,17 +408,17 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		m_FileActionHandler.Undo();
 		break;
 
-	case ToolbarButton::Copy:
+	case MainToolbarButton::Copy:
 	case IDM_EDIT_COPY:
 		OnCopy(TRUE);
 		break;
 
-	case ToolbarButton::Cut:
+	case MainToolbarButton::Cut:
 	case IDM_EDIT_CUT:
 		OnCopy(FALSE);
 		break;
 
-	case ToolbarButton::Paste:
+	case MainToolbarButton::Paste:
 	case IDM_EDIT_PASTE:
 		OnPaste();
 		break;
@@ -427,11 +432,11 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		break;
 
 	case IDM_EDIT_COPYTOFOLDER:
-	case ToolbarButton::CopyTo:
+	case MainToolbarButton::CopyTo:
 		CopyToFolder(false);
 		break;
 
-	case ToolbarButton::MoveTo:
+	case MainToolbarButton::MoveTo:
 	case IDM_EDIT_MOVETOFOLDER:
 		CopyToFolder(true);
 		break;
@@ -474,7 +479,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		ResizeWindows();
 		break;
 
-	case ToolbarButton::Folders:
+	case MainToolbarButton::Folders:
 	case IDM_VIEW_FOLDERS:
 		ToggleFolders();
 		break;
@@ -514,7 +519,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 
 	case IDM_TOOLBARS_DRIVES:
 		m_config->showDrivesToolbar = !m_config->showDrivesToolbar;
-		ShowMainRebarBand(m_pDrivesToolbar->GetHWND(), m_config->showDrivesToolbar);
+		ShowMainRebarBand(m_drivesToolbar->GetView()->GetHWND(), m_config->showDrivesToolbar);
 		AdjustFolderPanePosition();
 		ResizeWindows();
 		break;
@@ -1091,7 +1096,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		OnShowHiddenFiles();
 		break;
 
-	case ToolbarButton::Refresh:
+	case MainToolbarButton::Refresh:
 	case IDM_VIEW_REFRESH:
 		OnRefresh();
 		break;
@@ -1172,17 +1177,17 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 	}
 	break;
 
-	case ToolbarButton::NewFolder:
+	case MainToolbarButton::NewFolder:
 	case IDM_ACTIONS_NEWFOLDER:
 		OnCreateNewFolder();
 		break;
 
-	case ToolbarButton::MergeFiles:
+	case MainToolbarButton::MergeFiles:
 	case IDM_ACTIONS_MERGEFILES:
 		OnMergeFiles();
 		break;
 
-	case ToolbarButton::SplitFile:
+	case MainToolbarButton::SplitFile:
 	case IDM_ACTIONS_SPLITFILE:
 		OnSplitFile();
 		break;
@@ -1191,17 +1196,17 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		OnDestroyFiles();
 		break;
 
-	case ToolbarButton::Back:
+	case MainToolbarButton::Back:
 	case IDM_GO_BACK:
 		OnGoBack();
 		break;
 
-	case ToolbarButton::Forward:
+	case MainToolbarButton::Forward:
 	case IDM_GO_FORWARD:
 		OnGoForward();
 		break;
 
-	case ToolbarButton::Up:
+	case MainToolbarButton::Up:
 	case IDM_GO_UPONELEVEL:
 		m_navigation->OnNavigateUp();
 		break;
@@ -1250,7 +1255,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		OnGoToKnownFolder(FOLDERID_ConnectionsFolder);
 		break;
 
-	case ToolbarButton::AddBookmark:
+	case MainToolbarButton::AddBookmark:
 	case IDM_BOOKMARKS_BOOKMARKTHISTAB:
 		BookmarkHelper::AddBookmarkItem(&m_bookmarkTree, BookmarkItem::Type::Bookmark, nullptr,
 			std::nullopt, hwnd, this);
@@ -1260,7 +1265,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		BookmarkHelper::BookmarkAllTabs(&m_bookmarkTree, m_hLanguageModule, hwnd, this);
 		break;
 
-	case ToolbarButton::Bookmarks:
+	case MainToolbarButton::Bookmarks:
 	case IDM_BOOKMARKS_MANAGEBOOKMARKS:
 		if (g_hwndManageBookmarks == nullptr)
 		{
@@ -1275,7 +1280,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		}
 		break;
 
-	case ToolbarButton::Search:
+	case MainToolbarButton::Search:
 	case IDM_TOOLS_SEARCH:
 		OnSearch();
 		break;
@@ -1381,7 +1386,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		m_tabRestorer->RestoreLastTab();
 		break;
 
-	case ToolbarButton::Views:
+	case MainToolbarButton::Views:
 		OnToolbarViews();
 		break;
 
@@ -1396,11 +1401,11 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 	return 1;
 }
 
-LRESULT Explorerplusplus::HandleControlNotification(HWND hwnd, WPARAM wParam)
+LRESULT Explorerplusplus::HandleControlNotification(HWND hwnd, UINT notificationCode)
 {
 	UNREFERENCED_PARAMETER(hwnd);
 
-	switch (HIWORD(wParam))
+	switch (notificationCode)
 	{
 	case CBN_DROPDOWN:
 		AddPathsToComboBoxEx(m_addressBar->GetHWND(),
@@ -1504,7 +1509,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 			break;
 
 		case ID_DRIVESTOOLBAR:
-			hToolbar = m_pDrivesToolbar->GetHWND();
+			hToolbar = m_drivesToolbar->GetView()->GetHWND();
 			himlMenu = himlSmall;
 			break;
 
@@ -1562,17 +1567,17 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 						{
 							switch (tbButton.idCommand)
 							{
-							case ToolbarButton::Back:
+							case MainToolbarButton::Back:
 								hSubMenu = CreateRebarHistoryMenu(TRUE);
 								fMask |= MIIM_SUBMENU;
 								break;
 
-							case ToolbarButton::Forward:
+							case MainToolbarButton::Forward:
 								hSubMenu = CreateRebarHistoryMenu(FALSE);
 								fMask |= MIIM_SUBMENU;
 								break;
 
-							case ToolbarButton::Views:
+							case MainToolbarButton::Views:
 							{
 								auto viewsMenu = BuildViewsMenu();
 

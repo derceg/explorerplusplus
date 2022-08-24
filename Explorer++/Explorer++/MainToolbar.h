@@ -35,7 +35,7 @@ private:
 	MainToolbarPersistentSettings &operator=(const MainToolbarPersistentSettings &);
 
 	// The current set of toolbar buttons.
-	std::vector<ToolbarButton> m_toolbarButtons;
+	std::vector<MainToolbarButton> m_toolbarButtons;
 };
 
 class MainToolbar : public BaseWindow
@@ -73,14 +73,14 @@ private:
 	void SetTooolbarImageList();
 	static std::unordered_map<int, int> SetUpToolbarImageList(HIMAGELIST imageList,
 		IconResourceLoader *iconResourceLoader, int iconSize, UINT dpi);
-	void AddButtonsToToolbar(const std::vector<ToolbarButton> &buttons);
-	void AddButtonToToolbar(ToolbarButton button);
-	TBBUTTON GetToolbarButtonDetails(ToolbarButton button) const;
+	void AddButtonsToToolbar(const std::vector<MainToolbarButton> &buttons);
+	void AddButtonToToolbar(MainToolbarButton button);
+	TBBUTTON GetToolbarButtonDetails(MainToolbarButton button) const;
 	void AddStringsToToolbar();
-	void AddStringToToolbar(ToolbarButton button);
-	void GetToolbarButtonText(ToolbarButton button, TCHAR *szText, int bufSize) const;
-	BYTE LookupToolbarButtonExtraStyles(ToolbarButton button) const;
-	int LookupToolbarButtonTextID(ToolbarButton button) const;
+	void AddStringToToolbar(MainToolbarButton button);
+	void GetToolbarButtonText(MainToolbarButton button, TCHAR *szText, int bufSize) const;
+	BYTE LookupToolbarButtonExtraStyles(MainToolbarButton button) const;
+	int LookupToolbarButtonTextID(MainToolbarButton button) const;
 
 	BOOL OnTBQueryInsert();
 	BOOL OnTBQueryDelete();

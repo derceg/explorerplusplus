@@ -83,7 +83,7 @@ FileContextMenuManager::~FileContextMenuManager()
 	}
 }
 
-HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme, int iMinID, int iMaxID,
+HRESULT FileContextMenuManager::ShowMenu(FileContextMenuHandler *handler, int iMinID, int iMaxID,
 	const POINT *ppt, StatusBar *pStatusBar, IUnknown *site, DWORD_PTR dwData, BOOL bRename,
 	BOOL bExtended)
 {
@@ -92,7 +92,7 @@ HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme, int iM
 		return E_FAIL;
 	}
 
-	if (pfcme == nullptr || iMaxID <= iMinID || ppt == nullptr)
+	if (handler == nullptr || iMaxID <= iMinID || ppt == nullptr)
 	{
 		return E_FAIL;
 	}
@@ -147,7 +147,7 @@ HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme, int iM
 		return hr;
 	}
 
-	pfcme->UpdateMenuEntries(m_pidlParent.get(), m_pidlItems, dwData, m_pActualContext, hMenu);
+	handler->UpdateMenuEntries(m_pidlParent.get(), m_pidlItems, dwData, m_pActualContext, hMenu);
 
 	MenuHelper::RemoveTrailingSeparators(hMenu);
 	MenuHelper::RemoveDuplicateSeperators(hMenu);
@@ -183,7 +183,7 @@ HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme, int iM
 		// Pass the menu back to the caller to give it the chance to handle it.
 		if (SUCCEEDED(hr))
 		{
-			bHandled = pfcme->HandleShellMenuItem(m_pidlParent.get(), m_pidlItems, dwData, verb);
+			bHandled = handler->HandleShellMenuItem(m_pidlParent.get(), m_pidlItems, dwData, verb);
 		}
 
 		if (!bHandled)
@@ -206,7 +206,7 @@ HRESULT FileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme, int iM
 	{
 		/* Custom menu entry, so pass back
 		to caller. */
-		pfcme->HandleCustomMenuItem(m_pidlParent.get(), m_pidlItems, iCmd);
+		handler->HandleCustomMenuItem(m_pidlParent.get(), m_pidlItems, iCmd);
 	}
 
 	/* Do NOT destroy the menu until AFTER

@@ -6,22 +6,22 @@
 
 #include <list>
 
-namespace NHardwareChangeNotifier
+class HardwareChangeObserver
 {
-	__interface INotification
-	{
-		void OnDeviceArrival(DEV_BROADCAST_HDR * dbh);
-		void OnDeviceRemoveComplete(DEV_BROADCAST_HDR * dbh);
-	};
-}
+public:
+	virtual ~HardwareChangeObserver() = default;
+
+	virtual void OnDeviceArrival(DEV_BROADCAST_HDR *dbh) = 0;
+	virtual void OnDeviceRemoveComplete(DEV_BROADCAST_HDR *dbh) = 0;
+};
 
 class HardwareChangeNotifier
 {
 public:
 	static HardwareChangeNotifier &GetInstance();
 
-	void AddObserver(NHardwareChangeNotifier::INotification *hcn);
-	void RemoveObserver(NHardwareChangeNotifier::INotification *hcn);
+	void AddObserver(HardwareChangeObserver *observer);
+	void RemoveObserver(HardwareChangeObserver *observer);
 
 	void NotifyDeviceArrival(DEV_BROADCAST_HDR *dbh);
 	void NotifyDeviceRemovalComplete(DEV_BROADCAST_HDR *dbh);
@@ -40,5 +40,5 @@ private:
 
 	void NotifyObservers(NotificationType notificationType, DEV_BROADCAST_HDR *dbh);
 
-	std::list<NHardwareChangeNotifier::INotification *> m_Observers;
+	std::list<HardwareChangeObserver *> m_Observers;
 };

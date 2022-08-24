@@ -71,7 +71,7 @@ namespace Plugins
 class Explorerplusplus :
 	public IExplorerplusplus,
 	public TabNavigationInterface,
-	public IFileContextMenuExternal,
+	private FileContextMenuHandler,
 	public PluginInterface
 {
 	friend LoadSaveRegistry;
@@ -171,9 +171,9 @@ private:
 	LRESULT CALLBACK ListViewSubclassProc(HWND ListView, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	/* Main window message handlers. */
-	LRESULT CALLBACK CommandHandler(HWND hwnd, WPARAM wParam);
-	LRESULT HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam);
-	LRESULT HandleControlNotification(HWND hwnd, WPARAM wParam);
+	LRESULT CALLBACK CommandHandler(HWND hwnd, HWND control, int id, UINT notificationCode);
+	LRESULT HandleMenuOrAccelerator(HWND hwnd, int id, UINT notificationCode);
+	LRESULT HandleControlNotification(HWND hwnd, UINT notificationCode);
 	LRESULT CALLBACK NotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnCreate();
 	BOOL OnSize(int MainWindowWidth, int MainWindowHeight);
@@ -321,6 +321,7 @@ private:
 
 	/* Main toolbars. */
 	void InitializeMainToolbars();
+	void OnRebarToolbarUpdated(HWND toolbar);
 	void OnUseLargeToolbarIconsUpdated(BOOL newValue);
 	boost::signals2::connection AddToolbarContextMenuObserver(
 		const ToolbarContextMenuSignal::slot_type &observer) override;
@@ -426,17 +427,18 @@ private:
 	void OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters) override;
 	OpenFolderDisposition DetermineOpenDisposition(bool isCtrlKeyDown, bool isShiftKeyDown);
 
-	/* File context menu. */
+	// FileContextMenuHandler
 	void UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
 		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, IContextMenu *contextMenu,
-		HMENU hMenu);
-	void UpdateBackgroundContextMenu(IContextMenu *contextMenu, HMENU menu);
-	void UpdateItemContextMenu(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR data, HMENU menu);
+		HMENU hMenu) override;
 	BOOL HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd) override;
 	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		const std::vector<PITEMID_CHILD> &pidlItems, int iCmd) override;
+
+	void UpdateBackgroundContextMenu(IContextMenu *contextMenu, HMENU menu);
+	void UpdateItemContextMenu(PCIDLIST_ABSOLUTE pidlParent,
+		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR data, HMENU menu);
 
 	/* File selection tests. */
 	BOOL AnyItemsSelected() const;
@@ -632,7 +634,7 @@ private:
 	/* Toolbars. */
 	REBARBANDINFO m_ToolbarInformation[NUM_MAIN_TOOLBARS];
 	MainToolbar *m_mainToolbar;
-	DrivesToolbar *m_pDrivesToolbar;
+	DrivesToolbar *m_drivesToolbar = nullptr;
 	ApplicationToolbar *m_pApplicationToolbar;
 
 	/* Display window folder sizes. */

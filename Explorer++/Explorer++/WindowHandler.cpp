@@ -9,9 +9,9 @@
 #include "DarkModeHelper.h"
 #include "IconResourceLoader.h"
 #include "MainToolbar.h"
+#include "MainToolbarButtons.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "TabContainer.h"
-#include "ToolbarButtons.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowHelper.h"
@@ -154,7 +154,7 @@ void Explorerplusplus::ToggleFolders()
 	lShowWindow(m_hHolder, m_config->showFolders);
 	lShowWindow(m_shellTreeView->GetHWND(), m_config->showFolders);
 
-	SendMessage(m_mainToolbar->GetHWND(), TB_CHECKBUTTON, (WPARAM) ToolbarButton::Folders,
+	SendMessage(m_mainToolbar->GetHWND(), TB_CHECKBUTTON, (WPARAM) MainToolbarButton::Folders,
 		m_config->showFolders);
 	ResizeWindows();
 }

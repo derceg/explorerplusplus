@@ -8,7 +8,7 @@
 
 // Note that these values are used to save the toolbar state and should not be changed.
 // clang-format off
-BETTER_ENUM(ToolbarButton, int,
+BETTER_ENUM(MainToolbarButton, int,
 	Separator = 45001,
 	Back = 45002,
 	Forward = 45003,

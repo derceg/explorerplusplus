@@ -132,21 +132,12 @@ private:
 	int m_iFilesFound;
 };
 
-class SearchDialog : public DarkModeDialogBase, public IFileContextMenuExternal
+class SearchDialog : public DarkModeDialogBase, private FileContextMenuHandler
 {
 public:
 	SearchDialog(HINSTANCE hInstance, HWND hParent, std::wstring_view searchDirectory,
 		IExplorerplusplus *pexpp, TabContainer *tabContainer);
 	~SearchDialog();
-
-	/* IFileContextMenuExternal methods. */
-	void UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, IContextMenu *contextMenu,
-		HMENU hMenu) override;
-	BOOL HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd) override;
-	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, int iCmd) override;
 
 	/* Sorting methods. */
 	int CALLBACK SortResults(LPARAM lParam1, LPARAM lParam2);
@@ -184,6 +175,15 @@ private:
 	void StopSearching();
 	void SaveEntry(int comboBoxId, boost::circular_buffer<std::wstring> &buffer);
 	void UpdateListViewHeader();
+
+	// FileContextMenuHandler
+	void UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
+		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, IContextMenu *contextMenu,
+		HMENU hMenu) override;
+	BOOL HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd) override;
+	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+		const std::vector<PITEMID_CHILD> &pidlItems, int iCmd) override;
 
 	std::wstring m_searchDirectory;
 	wil::unique_hicon m_directoryIcon;

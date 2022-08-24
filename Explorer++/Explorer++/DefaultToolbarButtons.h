@@ -4,34 +4,34 @@
 
 #pragma once
 
-#include "ToolbarButtons.h"
+#include "MainToolbarButtons.h"
 
 // clang-format off
-const ToolbarButton DEFAULT_TOOLBAR_BUTTONS[] =
+const MainToolbarButton DEFAULT_TOOLBAR_BUTTONS[] =
 {
-	ToolbarButton::Back,
-	ToolbarButton::Forward,
-	ToolbarButton::Up,
-	ToolbarButton::Separator,
-	ToolbarButton::Folders,
-	ToolbarButton::Separator,
-	ToolbarButton::Cut,
-	ToolbarButton::Copy,
-	ToolbarButton::Paste,
-	ToolbarButton::Delete,
-	ToolbarButton::DeletePermanently,
-	ToolbarButton::Properties,
-	ToolbarButton::Search,
-	ToolbarButton::Separator,
-	ToolbarButton::NewFolder,
-	ToolbarButton::CopyTo,
-	ToolbarButton::MoveTo,
-	ToolbarButton::Separator,
-	ToolbarButton::Views,
-	ToolbarButton::OpenCommandPrompt,
-	ToolbarButton::Refresh,
-	ToolbarButton::Separator,
-	ToolbarButton::AddBookmark,
-	ToolbarButton::Bookmarks
+	MainToolbarButton::Back,
+	MainToolbarButton::Forward,
+	MainToolbarButton::Up,
+	MainToolbarButton::Separator,
+	MainToolbarButton::Folders,
+	MainToolbarButton::Separator,
+	MainToolbarButton::Cut,
+	MainToolbarButton::Copy,
+	MainToolbarButton::Paste,
+	MainToolbarButton::Delete,
+	MainToolbarButton::DeletePermanently,
+	MainToolbarButton::Properties,
+	MainToolbarButton::Search,
+	MainToolbarButton::Separator,
+	MainToolbarButton::NewFolder,
+	MainToolbarButton::CopyTo,
+	MainToolbarButton::MoveTo,
+	MainToolbarButton::Separator,
+	MainToolbarButton::Views,
+	MainToolbarButton::OpenCommandPrompt,
+	MainToolbarButton::Refresh,
+	MainToolbarButton::Separator,
+	MainToolbarButton::AddBookmark,
+	MainToolbarButton::Bookmarks
 };
 // clang-format on

@@ -1122,56 +1122,38 @@ BOOL LoadIUnknownFromCLSID(const TCHAR *szCLSID, ContextMenuHandler *pContextMen
 	return bSuccess;
 }
 
-HRESULT GetItemInfoTip(const TCHAR *szItemPath, TCHAR *szInfoTip, size_t cchMax)
+HRESULT GetItemInfoTip(const std::wstring &itemPath, std::wstring &outputInfoTip)
 {
 	unique_pidl_absolute pidlItem;
-	HRESULT hr = SHParseDisplayName(szItemPath, nullptr, wil::out_param(pidlItem), 0, nullptr);
+	RETURN_IF_FAILED(
+		SHParseDisplayName(itemPath.c_str(), nullptr, wil::out_param(pidlItem), 0, nullptr));
 
-	if (SUCCEEDED(hr))
-	{
-		hr = GetItemInfoTip(pidlItem.get(), szInfoTip, cchMax);
-	}
-
-	return hr;
+	return GetItemInfoTip(pidlItem.get(), outputInfoTip);
 }
 
-HRESULT GetItemInfoTip(PCIDLIST_ABSOLUTE pidlComplete, TCHAR *szInfoTip, size_t cchMax)
+HRESULT GetItemInfoTip(PCIDLIST_ABSOLUTE pidlComplete, std::wstring &outputInfoTip)
 {
-	IShellFolder *pShellFolder = nullptr;
-	IQueryInfo *pQueryInfo = nullptr;
-	PCITEMID_CHILD pidlRelative = nullptr;
-	LPWSTR ppwszTip = nullptr;
-	HRESULT hr;
+	wil::com_ptr_nothrow<IShellFolder> shellFolder;
+	PCITEMID_CHILD pidlRelative;
+	RETURN_IF_FAILED(SHBindToParent(pidlComplete, IID_PPV_ARGS(&shellFolder), &pidlRelative));
 
-	hr = SHBindToParent(pidlComplete, IID_PPV_ARGS(&pShellFolder), &pidlRelative);
+	wil::com_ptr_nothrow<IQueryInfo> queryInfo;
+	RETURN_IF_FAILED(
+		GetUIObjectOf(shellFolder.get(), nullptr, 1, &pidlRelative, IID_PPV_ARGS(&queryInfo)));
 
-	if (SUCCEEDED(hr))
+	wil::unique_cotaskmem_string infoTip;
+	RETURN_IF_FAILED(queryInfo->GetInfoTip(QITIPF_USESLOWTIP, &infoTip));
+
+	if (infoTip)
 	{
-		hr = GetUIObjectOf(pShellFolder, nullptr, 1, &pidlRelative, IID_PPV_ARGS(&pQueryInfo));
-
-		if (SUCCEEDED(hr))
-		{
-			hr = pQueryInfo->GetInfoTip(QITIPF_USESLOWTIP, &ppwszTip);
-
-			if (SUCCEEDED(hr))
-			{
-				if (ppwszTip)
-				{
-					StringCchCopy(szInfoTip, cchMax, ppwszTip);
-					CoTaskMemFree(ppwszTip);
-				}
-				else
-				{
-					StringCchCopy(szInfoTip, cchMax, _T(""));
-				}
-			}
-
-			pQueryInfo->Release();
-		}
-		pShellFolder->Release();
+		outputInfoTip = infoTip.get();
+	}
+	else
+	{
+		outputInfoTip.clear();
 	}
 
-	return hr;
+	return S_OK;
 }
 
 HRESULT ShowMultipleFileProperties(PCIDLIST_ABSOLUTE pidlDirectory,

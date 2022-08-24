@@ -460,6 +460,15 @@
     <ClCompile Include="ShellBrowser\ListViewEdit.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="DrivesToolbarView.cpp">
+      <Filter>Drives Toolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolbarView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
+    <ClCompile Include="DriveModel.cpp">
+      <Filter>Drives Toolbar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -600,7 +609,7 @@
     <ClInclude Include="DefaultToolbarButtons.h">
       <Filter>Main Toolbar</Filter>
     </ClInclude>
-    <ClInclude Include="ToolbarButtons.h">
+    <ClInclude Include="MainToolbarButtons.h">
       <Filter>Main Toolbar</Filter>
     </ClInclude>
     <ClInclude Include="ScriptingDialog.h">
@@ -918,6 +927,15 @@
     <ClInclude Include="ShellBrowser\ListViewEdit.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
+    <ClInclude Include="DrivesToolbarView.h">
+      <Filter>Drives Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolbarView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="DriveModel.h">
+      <Filter>Drives Toolbar</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1029,6 +1047,9 @@
     </Filter>
     <Filter Include="ShellBrowser\Shell Integration">
       <UniqueIdentifier>{5b4c01f6-2a4f-4423-9e67-b861a64bf5e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Views">
+      <UniqueIdentifier>{a5bb582e-2ab4-463c-b4e4-216257c0c29f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

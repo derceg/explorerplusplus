@@ -11,17 +11,17 @@ HardwareChangeNotifier &HardwareChangeNotifier::GetInstance()
 	return hcn;
 }
 
-void HardwareChangeNotifier::AddObserver(NHardwareChangeNotifier::INotification *hcn)
+void HardwareChangeNotifier::AddObserver(HardwareChangeObserver *observer)
 {
-	m_Observers.push_back(hcn);
+	m_Observers.push_back(observer);
 }
 
-void HardwareChangeNotifier::RemoveObserver(NHardwareChangeNotifier::INotification *hcn)
+void HardwareChangeNotifier::RemoveObserver(HardwareChangeObserver *observer)
 {
 	auto itr = std::find_if(m_Observers.begin(), m_Observers.end(),
-		[hcn](const NHardwareChangeNotifier::INotification *hcnCurrent)
+		[observer](const HardwareChangeObserver *currentObserver)
 		{
-			return hcnCurrent == hcn;
+			return currentObserver == observer;
 		});
 
 	if (itr != m_Observers.end())

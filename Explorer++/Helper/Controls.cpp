@@ -249,6 +249,10 @@ void AddGripperStyle(UINT *fStyle, BOOL bAddGripper)
 	}
 }
 
+// When a toolbar is unlocked, clicking the gripper will resize the toolbar band to its ideal size.
+// Therefore, this function should be called when buttons are added or removed from a toolbar (since
+// the ideal size in this context is considered to be the size needed to show all the toolbar
+// buttons).
 void UpdateToolbarBandSizing(HWND hRebar, HWND hToolbar)
 {
 	REBARBANDINFO rbbi;

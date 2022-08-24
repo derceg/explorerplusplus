@@ -626,15 +626,13 @@ std::wstring GetFileSystemColumnText(const BasicItemInfo_t &itemInfo)
 
 std::wstring GetControlPanelCommentsColumnText(const BasicItemInfo_t &itemInfo)
 {
-	TCHAR infoTip[512];
-	HRESULT hr = GetItemInfoTip(itemInfo.getFullPath().c_str(), infoTip, SIZEOF_ARRAY(infoTip));
+	std::wstring infoTip;
+	HRESULT hr = GetItemInfoTip(itemInfo.getFullPath(), infoTip);
 
 	if (FAILED(hr))
 	{
-		return EMPTY_STRING;
+		return {};
 	}
-
-	ReplaceCharacter(infoTip, '\n', ' ');
 
 	return infoTip;
 }

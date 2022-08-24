@@ -10,22 +10,25 @@
 #include <wil/com.h>
 #include <optional>
 
-__interface IFileContextMenuExternal
+class FileContextMenuHandler
 {
+public:
+	virtual ~FileContextMenuHandler() = default;
+
 	// Allows the caller to add/update items on the context menu before it's shown.
-	void UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
+	virtual void UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
 		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, IContextMenu *contextMenu,
-		HMENU hMenu);
+		HMENU hMenu) = 0;
 
 	// Allows the caller to handle the processing of a shell menu item. For example, the 'Open' item
 	// may be processed internally.
 	// Returns TRUE if the item was processed; FALSE otherwise.
-	BOOL HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd);
+	virtual BOOL HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd) = 0;
 
 	// Handles the processing for one of the menu items that was added by the caller.
-	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, int iCmd);
+	virtual void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+		const std::vector<PITEMID_CHILD> &pidlItems, int iCmd) = 0;
 };
 
 class FileContextMenuManager
@@ -35,7 +38,7 @@ public:
 		const std::vector<PCITEMID_CHILD> &pidlItems);
 	~FileContextMenuManager();
 
-	HRESULT ShowMenu(IFileContextMenuExternal *pfcme, int iMinID, int iMaxID, const POINT *ppt,
+	HRESULT ShowMenu(FileContextMenuHandler *handler, int iMinID, int iMaxID, const POINT *ppt,
 		StatusBar *pStatusBar, IUnknown *site, DWORD_PTR dwData, BOOL bRename = FALSE,
 		BOOL bExtended = FALSE);
 

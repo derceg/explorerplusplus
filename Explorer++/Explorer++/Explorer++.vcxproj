@@ -481,6 +481,9 @@
   <ItemGroup>
     <ClCompile Include="AboutDialog.cpp" />
     <ClCompile Include="ApplicationToolbarHelper.cpp" />
+    <ClCompile Include="DriveModel.cpp" />
+    <ClCompile Include="DrivesToolbarView.cpp" />
+    <ClCompile Include="ToolbarView.cpp" />
     <ClCompile Include="Bookmarks\BookmarkIconManager.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkMenuController.cpp" />
     <ClCompile Include="DarkModeButton.cpp" />
@@ -652,6 +655,9 @@
     <ClInclude Include="Accelerator.h" />
     <ClInclude Include="AcceleratorMappings.h" />
     <ClInclude Include="ApplicationToolbarHelper.h" />
+    <ClInclude Include="DriveModel.h" />
+    <ClInclude Include="DrivesToolbarView.h" />
+    <ClInclude Include="ToolbarView.h" />
     <ClInclude Include="Bookmarks\BookmarkIconManager.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkMenuController.h" />
     <ClInclude Include="DarkModeButton.h" />
@@ -792,7 +798,7 @@
     <ClInclude Include="TaskbarThumbnails.h" />
     <ClInclude Include="ThirdPartyCreditsDialog.h" />
     <ClInclude Include="UiTheming.h" />
-    <ClInclude Include="ToolbarButtons.h" />
+    <ClInclude Include="MainToolbarButtons.h" />
     <ClInclude Include="Plugins\UiApi.h" />
     <ClInclude Include="UpdateCheckDialog.h" />
     <ClInclude Include="ValueWrapper.h" />
