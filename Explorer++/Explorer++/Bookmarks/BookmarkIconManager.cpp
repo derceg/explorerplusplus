@@ -12,9 +12,9 @@
 #include "../Helper/IconFetcher.h"
 #include "../Helper/ImageHelper.h"
 
-BookmarkIconManager::BookmarkIconManager(IExplorerplusplus *expp, IconFetcher *iconFetcher,
+BookmarkIconManager::BookmarkIconManager(CoreInterface *coreInterface, IconFetcher *iconFetcher,
 	IconAvailableCallback callback, int iconWidth, int iconHeight) :
-	m_expp(expp),
+	m_coreInterface(coreInterface),
 	m_iconFetcher(iconFetcher),
 	m_callback(callback),
 	m_defaultFolderIconSystemImageListIndex(GetDefaultFolderIconIndex()),
@@ -22,8 +22,9 @@ BookmarkIconManager::BookmarkIconManager(IExplorerplusplus *expp, IconFetcher *i
 {
 	m_imageList.reset(ImageList_Create(iconWidth, iconHeight, ILC_COLOR32 | ILC_MASK, 0, 1));
 
-	wil::unique_hbitmap folderIcon = m_expp->GetIconResourceLoader()->LoadBitmapFromPNGAndScale(
-		Icon::Folder, iconWidth, iconHeight);
+	wil::unique_hbitmap folderIcon =
+		m_coreInterface->GetIconResourceLoader()->LoadBitmapFromPNGAndScale(Icon::Folder, iconWidth,
+			iconHeight);
 	m_bookmarkFolderIconIndex = ImageList_Add(m_imageList.get(), folderIcon.get(), nullptr);
 
 	SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList));
@@ -62,9 +63,9 @@ int BookmarkIconManager::GetIconForBookmark(const BookmarkItem *bookmark)
 {
 	int iconIndex = m_defaultFolderIconIndex;
 
-	auto cachedItr = m_expp->GetCachedIcons()->findByPath(bookmark->GetLocation());
+	auto cachedItr = m_coreInterface->GetCachedIcons()->findByPath(bookmark->GetLocation());
 
-	if (cachedItr != m_expp->GetCachedIcons()->end())
+	if (cachedItr != m_coreInterface->GetCachedIcons()->end())
 	{
 		iconIndex = AddSystemIconToImageList(cachedItr->iconIndex);
 	}

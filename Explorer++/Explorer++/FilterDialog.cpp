@@ -18,10 +18,10 @@ const TCHAR FilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");
 
 const TCHAR FilterDialogPersistentSettings::SETTING_FILTER_LIST[] = _T("Filter");
 
-FilterDialog::FilterDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp) :
+FilterDialog::FilterDialog(HINSTANCE hInstance, HWND hParent, CoreInterface *coreInterface) :
 	DarkModeDialogBase(hInstance, IDD_FILTER, hParent, true)
 {
-	m_pexpp = pexpp;
+	m_coreInterface = coreInterface;
 
 	m_persistentSettings = &FilterDialogPersistentSettings::GetInstance();
 }
@@ -38,13 +38,13 @@ INT_PTR FilterDialog::OnInitDialog()
 			reinterpret_cast<LPARAM>(strFilter.c_str()));
 	}
 
-	std::wstring filter = m_pexpp->GetActiveShellBrowser()->GetFilter();
+	std::wstring filter = m_coreInterface->GetActiveShellBrowser()->GetFilter();
 
 	ComboBox_SelectString(hComboBox, -1, filter.c_str());
 
 	SendMessage(hComboBox, CB_SETEDITSEL, 0, MAKELPARAM(0, -1));
 
-	if (m_pexpp->GetActiveShellBrowser()->GetFilterCaseSensitive())
+	if (m_coreInterface->GetActiveShellBrowser()->GetFilterCaseSensitive())
 	{
 		CheckDlgButton(m_hDlg, IDC_FILTERS_CASESENSITIVE, BST_CHECKED);
 	}
@@ -59,8 +59,8 @@ INT_PTR FilterDialog::OnInitDialog()
 
 wil::unique_hicon FilterDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_pexpp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::Filter, iconWidth,
-		iconHeight);
+	return m_coreInterface->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::Filter,
+		iconWidth, iconHeight);
 }
 
 void FilterDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
@@ -138,14 +138,14 @@ void FilterDialog::OnOk()
 		m_persistentSettings->m_FilterList.push_front(filter);
 	}
 
-	m_pexpp->GetActiveShellBrowser()->SetFilterCaseSensitive(
+	m_coreInterface->GetActiveShellBrowser()->SetFilterCaseSensitive(
 		IsDlgButtonChecked(m_hDlg, IDC_FILTERS_CASESENSITIVE) == BST_CHECKED);
 
-	m_pexpp->GetActiveShellBrowser()->SetFilter(filter);
+	m_coreInterface->GetActiveShellBrowser()->SetFilter(filter);
 
-	if (!m_pexpp->GetActiveShellBrowser()->GetFilterStatus())
+	if (!m_coreInterface->GetActiveShellBrowser()->GetFilterStatus())
 	{
-		m_pexpp->GetActiveShellBrowser()->SetFilterStatus(TRUE);
+		m_coreInterface->GetActiveShellBrowser()->SetFilterStatus(TRUE);
 	}
 
 	EndDialog(m_hDlg, 1);

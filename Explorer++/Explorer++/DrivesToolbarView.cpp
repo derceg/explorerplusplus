@@ -14,13 +14,13 @@
 #include <ShlObj.h>
 #include <Shlwapi.h>
 
-DrivesToolbarView *DrivesToolbarView::Create(HWND parent, IExplorerplusplus *coreInterface,
+DrivesToolbarView *DrivesToolbarView::Create(HWND parent, CoreInterface *coreInterface,
 	HINSTANCE instance)
 {
 	return new DrivesToolbarView(parent, coreInterface, instance);
 }
 
-DrivesToolbarView::DrivesToolbarView(HWND parent, IExplorerplusplus *coreInterface,
+DrivesToolbarView::DrivesToolbarView(HWND parent, CoreInterface *coreInterface,
 	HINSTANCE instance) :
 	ToolbarView(parent,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | TBSTYLE_TOOLTIPS | TBSTYLE_LIST

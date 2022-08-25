@@ -24,19 +24,19 @@
 #include <wil/com.h>
 #include <wil/common.h>
 
-BookmarksToolbar::BookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
+BookmarksToolbar::BookmarksToolbar(HWND hToolbar, HINSTANCE instance, CoreInterface *coreInterface,
 	Navigation *navigation, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, UINT uIDStart,
 	UINT uIDEnd) :
 	BookmarkDropTargetWindow(hToolbar, bookmarkTree),
 	m_hToolbar(hToolbar),
 	m_instance(instance),
-	m_pexpp(pexpp),
+	m_coreInterface(coreInterface),
 	m_navigation(navigation),
 	m_bookmarkTree(bookmarkTree),
 	m_uIDStart(uIDStart),
 	m_uIDEnd(uIDEnd),
-	m_bookmarkContextMenu(bookmarkTree, instance, pexpp),
-	m_bookmarkMenu(bookmarkTree, instance, pexpp, navigation, iconFetcher, hToolbar),
+	m_bookmarkContextMenu(bookmarkTree, instance, coreInterface),
+	m_bookmarkMenu(bookmarkTree, instance, coreInterface, navigation, iconFetcher, hToolbar),
 	m_uIDCounter(0)
 {
 	InitializeToolbar(iconFetcher);
@@ -66,7 +66,7 @@ void BookmarksToolbar::InitializeToolbar(IconFetcher *iconFetcher)
 		std::bind_front(&BookmarksToolbar::OnBookmarkItemMoved, this)));
 	m_connections.push_back(m_bookmarkTree->bookmarkItemPreRemovalSignal.AddObserver(
 		std::bind_front(&BookmarksToolbar::OnBookmarkItemPreRemoval, this)));
-	m_connections.push_back(m_pexpp->AddToolbarContextMenuObserver(
+	m_connections.push_back(m_coreInterface->AddToolbarContextMenuObserver(
 		std::bind_front(&BookmarksToolbar::OnToolbarContextMenuPreShow, this)));
 
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
@@ -85,7 +85,7 @@ void BookmarksToolbar::SetUpToolbarImageList(IconFetcher *iconFetcher)
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 	SendMessage(m_hToolbar, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
 
-	m_bookmarkIconManager = std::make_unique<BookmarkIconManager>(m_pexpp, iconFetcher,
+	m_bookmarkIconManager = std::make_unique<BookmarkIconManager>(m_coreInterface, iconFetcher,
 		std::bind_front(&BookmarksToolbar::OnBookmarkIconAvailable, this), iconWidth, iconHeight);
 
 	SendMessage(m_hToolbar, TB_SETIMAGELIST, 0,
@@ -237,14 +237,14 @@ void BookmarksToolbar::OnMButtonUp(const POINT &pt, UINT keysDown)
 		return;
 	}
 
-	bool switchToNewTab = m_pexpp->GetConfig()->openTabsInForeground;
+	bool switchToNewTab = m_coreInterface->GetConfig()->openTabsInForeground;
 
 	if (WI_IsFlagSet(keysDown, MK_SHIFT))
 	{
 		switchToNewTab = !switchToNewTab;
 	}
 
-	BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_pexpp, switchToNewTab);
+	BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_coreInterface, switchToNewTab);
 }
 
 LRESULT CALLBACK BookmarksToolbar::BookmarksToolbarParentProcStub(HWND hwnd, UINT uMsg,
@@ -472,7 +472,7 @@ void BookmarksToolbar::OnToolbarContextMenuItemClicked(int menuItemId)
 void BookmarksToolbar::OnNewBookmarkItem(BookmarkItem::Type type, size_t targetIndex)
 {
 	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type,
-		m_bookmarkTree->GetBookmarksToolbarFolder(), targetIndex, m_hToolbar, m_pexpp);
+		m_bookmarkTree->GetBookmarksToolbarFolder(), targetIndex, m_hToolbar, m_coreInterface);
 }
 
 void BookmarksToolbar::OnPaste(size_t targetIndex)
@@ -507,7 +507,8 @@ int BookmarksToolbar::FindNextButtonIndex(const POINT &ptClient)
 
 void BookmarksToolbar::OnEditBookmarkItem(BookmarkItem *bookmarkItem)
 {
-	BookmarkHelper::EditBookmarkItem(bookmarkItem, m_bookmarkTree, m_instance, m_hToolbar, m_pexpp);
+	BookmarkHelper::EditBookmarkItem(bookmarkItem, m_bookmarkTree, m_instance, m_hToolbar,
+		m_coreInterface);
 }
 
 bool BookmarksToolbar::OnGetInfoTip(NMTBGETINFOTIP *infoTip)

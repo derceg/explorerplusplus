@@ -36,9 +36,8 @@
 int CALLBACK CompareItemsStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 DWORD WINAPI Thread_MonitorAllDrives(LPVOID pParam);
 
-ShellTreeView::ShellTreeView(HWND hParent, IExplorerplusplus *coreInterface,
-	IDirectoryMonitor *pDirMon, TabContainer *tabContainer, FileActionHandler *fileActionHandler,
-	CachedIcons *cachedIcons) :
+ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, IDirectoryMonitor *pDirMon,
+	TabContainer *tabContainer, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons) :
 	ShellDropTargetWindow(CreateTreeView(hParent)),
 	m_hTreeView(GetHWND()),
 	m_config(coreInterface->GetConfig()),

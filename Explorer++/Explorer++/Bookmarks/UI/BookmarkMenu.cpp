@@ -7,10 +7,11 @@
 #include "Bookmarks/BookmarkIconManager.h"
 
 BookmarkMenu::BookmarkMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule,
-	IExplorerplusplus *expp, Navigation *navigation, IconFetcher *iconFetcher, HWND parentWindow) :
+	CoreInterface *coreInterface, Navigation *navigation, IconFetcher *iconFetcher,
+	HWND parentWindow) :
 	m_parentWindow(parentWindow),
-	m_menuBuilder(expp, iconFetcher, resourceModule),
-	m_bookmarkContextMenu(bookmarkTree, resourceModule, expp),
+	m_menuBuilder(coreInterface, iconFetcher, resourceModule),
+	m_bookmarkContextMenu(bookmarkTree, resourceModule, coreInterface),
 	m_controller(navigation),
 	m_showingMenu(false),
 	m_menuItemPositionMappings(nullptr)

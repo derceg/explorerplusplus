@@ -6,12 +6,12 @@
 
 #include "../Helper/DropHandler.h"
 
-__interface IExplorerplusplus;
+__interface CoreInterface;
 
 class DropFilesCallback : public IDropFilesCallback
 {
 public:
-	DropFilesCallback(IExplorerplusplus *pexpp);
+	DropFilesCallback(CoreInterface *coreInterface);
 
 	/* IUnknown methods. */
 	HRESULT __stdcall QueryInterface(REFIID iid, void **ppvObject) override;
@@ -23,5 +23,5 @@ private:
 	void OnDropFile(const std::list<std::wstring> &PastedFileList, const POINT *ppt) override;
 
 	ULONG m_RefCount;
-	IExplorerplusplus *m_pexpp;
+	CoreInterface *m_coreInterface;
 };

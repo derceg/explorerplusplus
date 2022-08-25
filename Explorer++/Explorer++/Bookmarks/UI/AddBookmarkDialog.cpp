@@ -16,11 +16,12 @@
 
 const TCHAR AddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmark");
 
-AddBookmarkDialog::AddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
-	BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem, BookmarkItem *defaultParentSelection,
-	BookmarkItem **selectedParentFolder, std::optional<std::wstring> customDialogTitle) :
+AddBookmarkDialog::AddBookmarkDialog(HINSTANCE hInstance, HWND hParent,
+	CoreInterface *coreInterface, BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
+	BookmarkItem *defaultParentSelection, BookmarkItem **selectedParentFolder,
+	std::optional<std::wstring> customDialogTitle) :
 	DarkModeDialogBase(hInstance, IDD_ADD_BOOKMARK, hParent, true),
-	m_expp(expp),
+	m_coreInterface(coreInterface),
 	m_bookmarkTree(bookmarkTree),
 	m_bookmarkItem(bookmarkItem),
 	m_selectedParentFolder(selectedParentFolder),
@@ -78,8 +79,8 @@ INT_PTR AddBookmarkDialog::OnInitDialog()
 
 	HWND hTreeView = GetDlgItem(m_hDlg, IDC_BOOKMARK_TREEVIEW);
 
-	m_pBookmarkTreeView = new BookmarkTreeView(hTreeView, GetInstance(), m_expp, m_bookmarkTree,
-		m_persistentSettings->m_setExpansion, m_persistentSettings->m_guidSelected);
+	m_pBookmarkTreeView = new BookmarkTreeView(hTreeView, GetInstance(), m_coreInterface,
+		m_bookmarkTree, m_persistentSettings->m_setExpansion, m_persistentSettings->m_guidSelected);
 
 	HWND hEditName = GetDlgItem(m_hDlg, IDC_BOOKMARK_NAME);
 	SendMessage(hEditName, EM_SETSEL, 0, -1);
@@ -182,8 +183,8 @@ std::wstring AddBookmarkDialog::LoadDialogTitle()
 
 wil::unique_hicon AddBookmarkDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_expp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::AddBookmark, iconWidth,
-		iconHeight);
+	return m_coreInterface->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::AddBookmark,
+		iconWidth, iconHeight);
 }
 
 void AddBookmarkDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,

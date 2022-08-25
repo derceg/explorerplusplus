@@ -19,9 +19,9 @@
 const TCHAR CustomizeColorsDialogPersistentSettings::SETTINGS_KEY[] = _T("CustomizeColors");
 
 CustomizeColorsDialog::CustomizeColorsDialog(HINSTANCE hInstance, HWND hParent,
-	IExplorerplusplus *expp, std::vector<NColorRuleHelper::ColorRule> *pColorRuleList) :
+	CoreInterface *coreInterface, std::vector<NColorRuleHelper::ColorRule> *pColorRuleList) :
 	DarkModeDialogBase(hInstance, IDD_CUSTOMIZECOLORS, hParent, true),
-	m_expp(expp),
+	m_coreInterface(coreInterface),
 	m_pColorRuleList(pColorRuleList)
 {
 	m_persistentSettings = &CustomizeColorsDialogPersistentSettings::GetInstance();
@@ -80,7 +80,7 @@ INT_PTR CustomizeColorsDialog::OnInitDialog()
 
 wil::unique_hicon CustomizeColorsDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_expp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::CustomizeColors,
+	return m_coreInterface->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::CustomizeColors,
 		iconWidth, iconHeight);
 }
 

@@ -120,7 +120,7 @@ int CALLBACK SortByDateModified(const BookmarkItem *firstItem, const BookmarkIte
 }
 
 void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree, HMODULE resoureceModule,
-	HWND parentWindow, IExplorerplusplus *coreInterface)
+	HWND parentWindow, CoreInterface *coreInterface)
 {
 	std::wstring bookmarkAllTabsText =
 		ResourceHelper::LoadString(resoureceModule, IDS_ADD_BOOKMARK_TITLE_BOOKMARK_ALL_TABS);
@@ -149,7 +149,7 @@ void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree, HMODULE resoure
 
 BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
 	BookmarkItem *defaultParentSelection, std::optional<size_t> suggestedIndex, HWND parentWindow,
-	IExplorerplusplus *coreInterface, std::optional<std::wstring> customDialogTitle)
+	CoreInterface *coreInterface, std::optional<std::wstring> customDialogTitle)
 {
 	std::unique_ptr<BookmarkItem> bookmarkItem;
 
@@ -201,7 +201,7 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 }
 
 void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
-	HMODULE resoureceModule, HWND parentWindow, IExplorerplusplus *coreInterface)
+	HMODULE resoureceModule, HWND parentWindow, CoreInterface *coreInterface)
 {
 	BookmarkItem *selectedParentFolder = nullptr;
 	AddBookmarkDialog addBookmarkDialog(resoureceModule, parentWindow, coreInterface, bookmarkTree,
@@ -234,13 +234,13 @@ void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *
 // If it's a bookmark folder, each of its children will be opened in new
 // tabs.
 void BookmarkHelper::OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem,
-	IExplorerplusplus *expp, bool switchToNewTab)
+	CoreInterface *coreInterface, bool switchToNewTab)
 {
 	if (bookmarkItem->IsFolder())
 	{
 		for (auto &childItem : bookmarkItem->GetChildren() | boost::adaptors::filtered(IsBookmark))
 		{
-			expp->GetTabContainer()->CreateNewTab(childItem->GetLocation().c_str(),
+			coreInterface->GetTabContainer()->CreateNewTab(childItem->GetLocation().c_str(),
 				TabSettings(_selected = switchToNewTab));
 
 			// When opening a set of bookmarks within a folder, only the first item should be
@@ -250,7 +250,7 @@ void BookmarkHelper::OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem,
 	}
 	else
 	{
-		expp->GetTabContainer()->CreateNewTab(bookmarkItem->GetLocation().c_str(),
+		coreInterface->GetTabContainer()->CreateNewTab(bookmarkItem->GetLocation().c_str(),
 			TabSettings(_selected = switchToNewTab));
 	}
 }

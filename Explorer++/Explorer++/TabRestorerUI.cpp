@@ -12,10 +12,10 @@
 #include "../Helper/ShellHelper.h"
 #include <boost/range/adaptor/sliced.hpp>
 
-TabRestorerUI::TabRestorerUI(HINSTANCE instance, IExplorerplusplus *expp, TabRestorer *tabRestorer,
-	int menuStartId, int menuEndId) :
+TabRestorerUI::TabRestorerUI(HINSTANCE instance, CoreInterface *coreInterface,
+	TabRestorer *tabRestorer, int menuStartId, int menuEndId) :
 	m_instance(instance),
-	m_expp(expp),
+	m_coreInterface(coreInterface),
 	m_tabRestorer(tabRestorer),
 	m_menuStartId(menuStartId),
 	m_menuEndId(menuEndId)
@@ -24,7 +24,7 @@ TabRestorerUI::TabRestorerUI(HINSTANCE instance, IExplorerplusplus *expp, TabRes
 	m_defaultFolderIconBitmap =
 		ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), GetDefaultFolderIconIndex());
 
-	m_connections.push_back(m_expp->AddMainMenuPreShowObserver(
+	m_connections.push_back(m_coreInterface->AddMainMenuPreShowObserver(
 		std::bind_front(&TabRestorerUI::OnMainMenuPreShow, this)));
 }
 
@@ -34,7 +34,8 @@ TabRestorerUI::~TabRestorerUI()
 	mii.cbSize = sizeof(mii);
 	mii.fMask = MIIM_SUBMENU;
 	mii.hSubMenu = nullptr;
-	SetMenuItemInfo(GetMenu(m_expp->GetMainWindow()), IDM_FILE_REOPEN_RECENT_TAB, FALSE, &mii);
+	SetMenuItemInfo(GetMenu(m_coreInterface->GetMainWindow()), IDM_FILE_REOPEN_RECENT_TAB, FALSE,
+		&mii);
 }
 
 void TabRestorerUI::OnMainMenuPreShow(HMENU mainMenu)

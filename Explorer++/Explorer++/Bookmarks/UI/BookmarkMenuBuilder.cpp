@@ -12,9 +12,9 @@
 #include <boost/format.hpp>
 #include <wil/common.h>
 
-BookmarkMenuBuilder::BookmarkMenuBuilder(IExplorerplusplus *expp, IconFetcher *iconFetcher,
+BookmarkMenuBuilder::BookmarkMenuBuilder(CoreInterface *coreInterface, IconFetcher *iconFetcher,
 	HMODULE resourceModule) :
-	m_expp(expp),
+	m_coreInterface(coreInterface),
 	m_iconFetcher(iconFetcher),
 	m_resourceModule(resourceModule)
 {
@@ -35,7 +35,8 @@ BOOL BookmarkMenuBuilder::BuildMenu(HWND parentWindow, HMENU menu, BookmarkItem 
 	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 
-	BookmarkIconManager bookmarkIconManager(m_expp, m_iconFetcher, nullptr, iconWidth, iconHeight);
+	BookmarkIconManager bookmarkIconManager(m_coreInterface, m_iconFetcher, nullptr, iconWidth,
+		iconHeight);
 
 	BOOL res = BuildMenu(menu, bookmarkItem, startPosition, itemIdMap, bookmarkIconManager,
 		menuImages, itemPositionMap, true, includePredicate);

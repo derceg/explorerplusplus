@@ -17,13 +17,13 @@
 class CachedIcons;
 struct Config;
 class FileActionHandler;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 class TabContainer;
 
 class ShellTreeView : public ShellDropTargetWindow<HTREEITEM>
 {
 public:
-	ShellTreeView(HWND hParent, IExplorerplusplus *coreInterface, IDirectoryMonitor *pDirMon,
+	ShellTreeView(HWND hParent, CoreInterface *coreInterface, IDirectoryMonitor *pDirMon,
 		TabContainer *tabContainer, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons);
 	~ShellTreeView();
 

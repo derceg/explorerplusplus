@@ -16,12 +16,12 @@
 class BookmarkIconManager;
 class BookmarkTree;
 class IconFetcher;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 
 class BookmarksToolbar : private BookmarkDropTargetWindow
 {
 public:
-	BookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
+	BookmarksToolbar(HWND hToolbar, HINSTANCE instance, CoreInterface *coreInterface,
 		Navigation *navigation, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, UINT uIDStart,
 		UINT uIDEnd);
 
@@ -108,7 +108,7 @@ private:
 
 	HINSTANCE m_instance;
 
-	IExplorerplusplus *m_pexpp;
+	CoreInterface *m_coreInterface;
 	Navigation *m_navigation;
 
 	BookmarkTree *m_bookmarkTree;

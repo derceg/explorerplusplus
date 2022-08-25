@@ -62,13 +62,13 @@ private:
 	std::wstring m_path;
 };
 
-DrivesToolbar *DrivesToolbar::Create(HWND parent, IExplorerplusplus *coreInterface,
-	HINSTANCE instance, Navigation *navigation)
+DrivesToolbar *DrivesToolbar::Create(HWND parent, CoreInterface *coreInterface, HINSTANCE instance,
+	Navigation *navigation)
 {
 	return new DrivesToolbar(parent, coreInterface, instance, navigation);
 }
 
-DrivesToolbar::DrivesToolbar(HWND parent, IExplorerplusplus *coreInterface, HINSTANCE instance,
+DrivesToolbar::DrivesToolbar(HWND parent, CoreInterface *coreInterface, HINSTANCE instance,
 	Navigation *navigation) :
 	m_view(DrivesToolbarView::Create(parent, coreInterface, instance)),
 	m_coreInterface(coreInterface),

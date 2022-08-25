@@ -16,7 +16,7 @@ class BookmarkNavigationController;
 class BookmarkTree;
 class BookmarkTreeView;
 class IconFetcher;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 class ManageBookmarksDialog;
 class Navigation;
 class WindowSubclassWrapper;
@@ -49,7 +49,7 @@ private:
 class ManageBookmarksDialog : public DarkModeDialogBase
 {
 public:
-	ManageBookmarksDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp,
+	ManageBookmarksDialog(HINSTANCE hInstance, HWND hParent, CoreInterface *coreInterface,
 		Navigation *navigation, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
 	~ManageBookmarksDialog();
 
@@ -116,7 +116,7 @@ private:
 	wil::unique_himagelist m_imageListToolbar;
 	IconImageListMapping m_imageListToolbarMappings;
 
-	IExplorerplusplus *m_pexpp;
+	CoreInterface *m_coreInterface;
 	Navigation *m_navigation;
 	IconFetcher *m_iconFetcher;
 

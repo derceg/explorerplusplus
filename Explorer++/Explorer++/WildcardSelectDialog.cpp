@@ -20,11 +20,11 @@ const TCHAR WildcardSelectDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T(
 const TCHAR WildcardSelectDialogPersistentSettings::SETTING_CURRENT_TEXT[] = _T("CurrentText");
 
 WildcardSelectDialog::WildcardSelectDialog(HINSTANCE hInstance, HWND hParent, BOOL bSelect,
-	IExplorerplusplus *pexpp) :
+	CoreInterface *coreInterface) :
 	DarkModeDialogBase(hInstance, IDD_WILDCARDSELECT, hParent, true)
 {
 	m_bSelect = bSelect;
-	m_pexpp = pexpp;
+	m_coreInterface = coreInterface;
 
 	m_pwsdps = &WildcardSelectDialogPersistentSettings::GetInstance();
 }
@@ -136,13 +136,13 @@ void WildcardSelectDialog::OnOk()
 
 void WildcardSelectDialog::SelectItems(TCHAR *szPattern)
 {
-	HWND hListView = m_pexpp->GetActiveListView();
+	HWND hListView = m_coreInterface->GetActiveListView();
 
 	int nItems = ListView_GetItemCount(hListView);
 
 	for (int i = 0; i < nItems; i++)
 	{
-		std::wstring filename = m_pexpp->GetActiveShellBrowser()->GetItemName(i);
+		std::wstring filename = m_coreInterface->GetActiveShellBrowser()->GetItemName(i);
 
 		if (CheckWildcardMatch(szPattern, filename.c_str(), FALSE) == 1)
 		{

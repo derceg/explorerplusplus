@@ -9,7 +9,7 @@
 #include "../Helper/ReferenceCount.h"
 #include "../Helper/ResizableDialog.h"
 
-__interface IExplorerplusplus;
+__interface CoreInterface;
 class MergeFilesDialog;
 
 class MergeFilesDialogPersistentSettings : public DialogSettings
@@ -51,7 +51,7 @@ private:
 class MergeFilesDialog : public DarkModeDialogBase
 {
 public:
-	MergeFilesDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
+	MergeFilesDialog(HINSTANCE hInstance, HWND hParent, CoreInterface *coreInterface,
 		const std::wstring &strOutputDirectory, const std::list<std::wstring> &FullFilenameList,
 		BOOL bShowFriendlyDates);
 	~MergeFilesDialog();
@@ -76,7 +76,7 @@ private:
 	void OnMove(bool bUp);
 	void OnFinished();
 
-	IExplorerplusplus *m_expp;
+	CoreInterface *m_coreInterface;
 
 	std::wstring m_strOutputDirectory;
 	std::list<std::wstring> m_FullFilenameList;

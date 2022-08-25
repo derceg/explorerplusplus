@@ -11,7 +11,7 @@
 class FileActionHandler;
 struct FolderColumns;
 struct FolderSettings;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 struct PreservedTab;
 class ShellBrowser;
 __interface TabNavigationInterface;
@@ -35,10 +35,10 @@ public:
 	typedef boost::signals2::signal<void(const Tab &tab, PropertyType propertyType)>
 		TabUpdatedSignal;
 
-	Tab(IExplorerplusplus *expp, TabNavigationInterface *tabNavigation,
+	Tab(CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
 		FileActionHandler *fileActionHandler, const FolderSettings *folderSettings,
 		const FolderColumns *initialColumns);
-	Tab(const PreservedTab &preservedTab, IExplorerplusplus *expp,
+	Tab(const PreservedTab &preservedTab, CoreInterface *coreInterface,
 		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler);
 
 	int GetId() const;

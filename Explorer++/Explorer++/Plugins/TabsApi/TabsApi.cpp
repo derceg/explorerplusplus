@@ -58,8 +58,8 @@ std::wstring Plugins::TabsApi::Tab::toString()
 	// clang-format on
 }
 
-Plugins::TabsApi::TabsApi(IExplorerplusplus *expp, TabContainer *tabContainer) :
-	m_expp(expp),
+Plugins::TabsApi::TabsApi(CoreInterface *coreInterface, TabContainer *tabContainer) :
+	m_coreInterface(coreInterface),
 	m_tabContainer(tabContainer)
 {
 }
@@ -112,7 +112,7 @@ int Plugins::TabsApi::create(sol::table createProperties)
 		return -1;
 	}
 
-	::FolderSettings folderSettings = m_expp->GetConfig()->defaultFolderSettings;
+	::FolderSettings folderSettings = m_coreInterface->GetConfig()->defaultFolderSettings;
 
 	sol::optional<sol::table> folderSettingsTable = createProperties[TabConstants::FOLDER_SETTINGS];
 

@@ -11,7 +11,7 @@
 #include <objbase.h>
 
 class FilterDialog;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 
 class FilterDialogPersistentSettings : public DialogSettings
 {
@@ -42,7 +42,7 @@ private:
 class FilterDialog : public DarkModeDialogBase
 {
 public:
-	FilterDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *pexpp);
+	FilterDialog(HINSTANCE hInstance, HWND hParent, CoreInterface *coreInterface);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -59,7 +59,7 @@ private:
 	void OnOk();
 	void OnCancel();
 
-	IExplorerplusplus *m_pexpp;
+	CoreInterface *m_coreInterface;
 
 	FilterDialogPersistentSettings *m_persistentSettings;
 };

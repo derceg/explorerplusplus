@@ -1363,7 +1363,7 @@ ShellBrowser *Explorerplusplus::GetActiveShellBrowser() const
 	return m_pActiveShellBrowser;
 }
 
-IExplorerplusplus *Explorerplusplus::GetCoreInterface()
+CoreInterface *Explorerplusplus::GetCoreInterface()
 {
 	return this;
 }

@@ -10,13 +10,13 @@
 #include <wil/resource.h>
 #include <optional>
 
-__interface IExplorerplusplus;
+__interface CoreInterface;
 class Tab;
 
 class AddressBar : public BaseWindow
 {
 public:
-	static AddressBar *Create(HWND parent, IExplorerplusplus *expp);
+	static AddressBar *Create(HWND parent, CoreInterface *coreInterface);
 
 private:
 	static const UINT_PTR SUBCLASS_ID = 0;
@@ -25,7 +25,7 @@ private:
 	// This is the same background color as used in the Explorer address bar.
 	static inline constexpr COLORREF DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
 
-	AddressBar(HWND parent, IExplorerplusplus *expp);
+	AddressBar(HWND parent, CoreInterface *coreInterface);
 	~AddressBar() = default;
 
 	static HWND CreateAddressBar(HWND parent);
@@ -55,7 +55,7 @@ private:
 	void UpdateTextAndIconInUI(std::wstring *text, int iconIndex);
 	void OnHistoryEntryUpdated(const HistoryEntry &entry, HistoryEntry::PropertyType propertyType);
 
-	IExplorerplusplus *m_expp;
+	CoreInterface *m_coreInterface;
 	wil::unique_hbrush m_backgroundBrush;
 
 	boost::signals2::scoped_connection m_historyEntryUpdatedConnection;

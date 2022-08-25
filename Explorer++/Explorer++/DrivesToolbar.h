@@ -7,14 +7,14 @@
 #include "DriveModel.h"
 
 class DrivesToolbarView;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 struct MouseEvent;
 class Navigation;
 
 class DrivesToolbar
 {
 public:
-	static DrivesToolbar *Create(HWND parent, IExplorerplusplus *coreInterface, HINSTANCE instance,
+	static DrivesToolbar *Create(HWND parent, CoreInterface *coreInterface, HINSTANCE instance,
 		Navigation *navigation);
 
 	DrivesToolbar(const DrivesToolbar &) = delete;
@@ -25,7 +25,7 @@ public:
 	DrivesToolbarView *GetView() const;
 
 private:
-	DrivesToolbar(HWND parent, IExplorerplusplus *coreInterface, HINSTANCE instance,
+	DrivesToolbar(HWND parent, CoreInterface *coreInterface, HINSTANCE instance,
 		Navigation *navigation);
 	~DrivesToolbar() = default;
 
@@ -45,7 +45,7 @@ private:
 	void OnWindowDestroyed();
 
 	DrivesToolbarView *m_view;
-	IExplorerplusplus *m_coreInterface;
+	CoreInterface *m_coreInterface;
 	Navigation *m_navigation;
 	DriveModel m_driveModel;
 };

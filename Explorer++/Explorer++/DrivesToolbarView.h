@@ -7,13 +7,12 @@
 #include "ToolbarView.h"
 #include "../Helper/FileContextMenuManager.h"
 
-__interface IExplorerplusplus;
+__interface CoreInterface;
 
 class DrivesToolbarView : public ToolbarView, private FileContextMenuHandler
 {
 public:
-	static DrivesToolbarView *Create(HWND parent, IExplorerplusplus *coreInterface,
-		HINSTANCE instance);
+	static DrivesToolbarView *Create(HWND parent, CoreInterface *coreInterface, HINSTANCE instance);
 
 	void ShowContextMenu(const std::wstring &drivePath, const POINT &ptClient, bool showExtended);
 
@@ -23,7 +22,7 @@ private:
 
 	static const int MENU_ID_OPEN_IN_NEW_TAB = (MAX_SHELL_MENU_ID + 1);
 
-	DrivesToolbarView(HWND parent, IExplorerplusplus *coreInterface, HINSTANCE instance);
+	DrivesToolbarView(HWND parent, CoreInterface *coreInterface, HINSTANCE instance);
 	~DrivesToolbarView() = default;
 
 	// FileContextMenuHandler
@@ -35,6 +34,6 @@ private:
 	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		const std::vector<PITEMID_CHILD> &pidlItems, int iCmd) override;
 
-	IExplorerplusplus *m_coreInterface;
+	CoreInterface *m_coreInterface;
 	HINSTANCE m_instance;
 };

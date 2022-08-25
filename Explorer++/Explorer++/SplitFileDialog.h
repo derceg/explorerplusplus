@@ -10,7 +10,7 @@
 #include <string>
 #include <unordered_map>
 
-__interface IExplorerplusplus;
+__interface CoreInterface;
 class SplitFileDialog;
 
 class SplitFileDialogPersistentSettings : public DialogSettings
@@ -69,7 +69,7 @@ private:
 class SplitFileDialog : public DarkModeDialogBase
 {
 public:
-	SplitFileDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
+	SplitFileDialog(HINSTANCE hInstance, HWND hParent, CoreInterface *coreInterface,
 		const std::wstring &strFullFilename);
 	~SplitFileDialog();
 
@@ -119,7 +119,7 @@ private:
 	void OnChangeOutputDirectory();
 	void OnSplitFinished();
 
-	IExplorerplusplus *m_expp;
+	CoreInterface *m_coreInterface;
 
 	std::wstring m_strFullFilename;
 	bool m_bSplittingFile;

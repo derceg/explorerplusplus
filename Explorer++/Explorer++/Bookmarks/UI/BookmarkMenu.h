@@ -13,7 +13,7 @@
 
 class BookmarkTree;
 class IconFetcher;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 
 // Although it's not necessary, this class is effectively designed to be held
 // for the lifetime of its parent class. Doing so is more efficient, as the
@@ -22,7 +22,7 @@ __interface IExplorerplusplus;
 class BookmarkMenu
 {
 public:
-	BookmarkMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule, IExplorerplusplus *expp,
+	BookmarkMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule, CoreInterface *coreInterface,
 		Navigation *navigation, IconFetcher *iconFetcher, HWND parentWindow);
 
 	BOOL ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt,

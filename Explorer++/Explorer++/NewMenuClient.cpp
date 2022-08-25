@@ -8,7 +8,7 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/Logging.h"
 
-NewMenuClient::NewMenuClient(IExplorerplusplus *pexpp) : m_pexpp(pexpp)
+NewMenuClient::NewMenuClient(CoreInterface *coreInterface) : m_coreInterface(coreInterface)
 {
 }
 
@@ -42,7 +42,7 @@ IFACEMETHODIMP NewMenuClient::SelectAndEditItem(PCIDLIST_ABSOLUTE pidlItem, NMCS
 	case NMCSAEI_EDIT:
 	case NMCSAEI_EDIT_WINDOWS_10:
 		LOG(info) << _T("Starting in-place rename of item created via new menu");
-		m_pexpp->GetActiveShellBrowser()->QueueRename(pidlItem);
+		m_coreInterface->GetActiveShellBrowser()->QueueRename(pidlItem);
 		break;
 	}
 

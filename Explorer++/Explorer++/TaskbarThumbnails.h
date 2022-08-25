@@ -10,13 +10,13 @@
 #include <wil/resource.h>
 
 struct Config;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 class TabContainer;
 
 class TaskbarThumbnails
 {
 public:
-	static TaskbarThumbnails *Create(IExplorerplusplus *expp, TabContainer *tabContainer,
+	static TaskbarThumbnails *Create(CoreInterface *coreInterface, TabContainer *tabContainer,
 		HINSTANCE instance, std::shared_ptr<Config> config);
 
 private:
@@ -30,7 +30,7 @@ private:
 		wil::unique_hicon icon;
 	};
 
-	TaskbarThumbnails(IExplorerplusplus *expp, TabContainer *tabContainer, HINSTANCE instance,
+	TaskbarThumbnails(CoreInterface *coreInterface, TabContainer *tabContainer, HINSTANCE instance,
 		std::shared_ptr<Config> config);
 	~TaskbarThumbnails() = default;
 
@@ -59,7 +59,7 @@ private:
 	void UpdateTaskbarThumbnailTitle(const Tab &tab);
 	void OnApplicationShuttingDown();
 
-	IExplorerplusplus *m_expp;
+	CoreInterface *m_coreInterface;
 	TabContainer *m_tabContainer;
 	HINSTANCE m_instance;
 	std::vector<boost::signals2::scoped_connection> m_connections;

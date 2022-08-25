@@ -33,11 +33,11 @@ const TCHAR MergeFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("MergeFiles"
 
 bool CompareFilenames(const std::wstring &strFirst, const std::wstring &strSecond);
 
-MergeFilesDialog::MergeFilesDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
+MergeFilesDialog::MergeFilesDialog(HINSTANCE hInstance, HWND hParent, CoreInterface *coreInterface,
 	const std::wstring &strOutputDirectory, const std::list<std::wstring> &FullFilenameList,
 	BOOL bShowFriendlyDates) :
 	DarkModeDialogBase(hInstance, IDD_MERGEFILES, hParent, true),
-	m_expp(expp),
+	m_coreInterface(coreInterface),
 	m_strOutputDirectory(strOutputDirectory),
 	m_FullFilenameList(FullFilenameList),
 	m_bShowFriendlyDates(bShowFriendlyDates),
@@ -196,8 +196,8 @@ INT_PTR MergeFilesDialog::OnInitDialog()
 
 wil::unique_hicon MergeFilesDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_expp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::MergeFiles, iconWidth,
-		iconHeight);
+	return m_coreInterface->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::MergeFiles,
+		iconWidth, iconHeight);
 }
 
 void MergeFilesDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,

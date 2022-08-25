@@ -39,7 +39,7 @@ struct Config;
 class FileActionHandler;
 class IconFetcher;
 class IconResourceLoader;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 struct PreservedFolderState;
 struct PreservedHistoryEntry;
 class ShellNavigationController;
@@ -59,12 +59,12 @@ class ShellBrowser :
 {
 public:
 	static std::shared_ptr<ShellBrowser> CreateNew(int id, HWND hOwner,
-		IExplorerplusplus *coreInterface, TabNavigationInterface *tabNavigation,
+		CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
 		FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
 		const FolderColumns *initialColumns);
 
 	static std::shared_ptr<ShellBrowser> CreateFromPreserved(int id, HWND hOwner,
-		IExplorerplusplus *coreInterface, TabNavigationInterface *tabNavigation,
+		CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
 		FileActionHandler *fileActionHandler,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 		const PreservedFolderState &preservedFolderState);
@@ -371,11 +371,11 @@ private:
 	static const UINT PROCESS_SHELL_CHANGES_TIMER_ID = 1;
 	static const UINT PROCESS_SHELL_CHANGES_TIMEOUT = 100;
 
-	ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface,
+	ShellBrowser(int id, HWND hOwner, CoreInterface *coreInterface,
 		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 		const PreservedFolderState &preservedFolderState);
-	ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface,
+	ShellBrowser(int id, HWND hOwner, CoreInterface *coreInterface,
 		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 		const FolderSettings &folderSettings, const FolderColumns *initialColumns);
 

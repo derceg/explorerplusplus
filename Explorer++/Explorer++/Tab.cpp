@@ -14,7 +14,7 @@
 
 int Tab::idCounter = 1;
 
-Tab::Tab(IExplorerplusplus *expp, TabNavigationInterface *tabNavigation,
+Tab::Tab(CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
 	FileActionHandler *fileActionHandler, const FolderSettings *folderSettings,
 	const FolderColumns *initialColumns) :
 	m_id(idCounter++),
@@ -29,23 +29,23 @@ Tab::Tab(IExplorerplusplus *expp, TabNavigationInterface *tabNavigation,
 	}
 	else
 	{
-		folderSettingsFinal = expp->GetConfig()->defaultFolderSettings;
+		folderSettingsFinal = coreInterface->GetConfig()->defaultFolderSettings;
 	}
 
-	m_shellBrowser = ShellBrowser::CreateNew(m_id, expp->GetMainWindow(), expp, tabNavigation,
-		fileActionHandler, folderSettingsFinal, initialColumns);
+	m_shellBrowser = ShellBrowser::CreateNew(m_id, coreInterface->GetMainWindow(), coreInterface,
+		tabNavigation, fileActionHandler, folderSettingsFinal, initialColumns);
 }
 
-Tab::Tab(const PreservedTab &preservedTab, IExplorerplusplus *expp,
+Tab::Tab(const PreservedTab &preservedTab, CoreInterface *coreInterface,
 	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler) :
 	m_id(idCounter++),
 	m_useCustomName(preservedTab.useCustomName),
 	m_customName(preservedTab.customName),
 	m_lockState(preservedTab.lockState)
 {
-	m_shellBrowser = ShellBrowser::CreateFromPreserved(m_id, expp->GetMainWindow(), expp,
-		tabNavigation, fileActionHandler, preservedTab.history, preservedTab.currentEntry,
-		preservedTab.preservedFolderState);
+	m_shellBrowser = ShellBrowser::CreateFromPreserved(m_id, coreInterface->GetMainWindow(),
+		coreInterface, tabNavigation, fileActionHandler, preservedTab.history,
+		preservedTab.currentEntry, preservedTab.preservedFolderState);
 }
 
 int Tab::GetId() const

@@ -6,14 +6,14 @@
 
 #include <boost/signals2.hpp>
 
-__interface IExplorerplusplus;
+__interface CoreInterface;
 class Tab;
 class TabContainer;
 
 class UiTheming
 {
 public:
-	UiTheming(IExplorerplusplus *expp, TabContainer *tabContainer);
+	UiTheming(CoreInterface *coreInterface, TabContainer *tabContainer);
 
 	bool SetListViewColors(COLORREF backgroundColor, COLORREF textColor);
 	void SetTreeViewColors(COLORREF backgroundColor, COLORREF textColor);
@@ -24,7 +24,7 @@ private:
 	bool ApplyListViewColorsForAllTabs(COLORREF backgroundColor, COLORREF textColor);
 	bool ApplyListViewColorsForTab(const Tab &tab, COLORREF backgroundColor, COLORREF textColor);
 
-	IExplorerplusplus *m_expp;
+	CoreInterface *m_coreInterface;
 	TabContainer *m_tabContainer;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;

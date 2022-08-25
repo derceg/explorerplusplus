@@ -13,14 +13,14 @@
 #include "TabContainer.h"
 #include "../Helper/DpiCompatibility.h"
 
-BookmarksMainMenu::BookmarksMainMenu(IExplorerplusplus *expp, IconFetcher *iconFetcher,
+BookmarksMainMenu::BookmarksMainMenu(CoreInterface *coreInterface, IconFetcher *iconFetcher,
 	BookmarkTree *bookmarkTree, const MenuIdRange &menuIdRange) :
-	m_expp(expp),
+	m_coreInterface(coreInterface),
 	m_bookmarkTree(bookmarkTree),
 	m_menuIdRange(menuIdRange),
-	m_menuBuilder(expp, iconFetcher, expp->GetLanguageModule())
+	m_menuBuilder(coreInterface, iconFetcher, coreInterface->GetLanguageModule())
 {
-	m_connections.push_back(expp->AddMainMenuPreShowObserver(
+	m_connections.push_back(coreInterface->AddMainMenuPreShowObserver(
 		std::bind_front(&BookmarksMainMenu::OnMainMenuPreShow, this)));
 }
 
@@ -30,7 +30,7 @@ BookmarksMainMenu::~BookmarksMainMenu()
 	mii.cbSize = sizeof(mii);
 	mii.fMask = MIIM_SUBMENU;
 	mii.hSubMenu = nullptr;
-	SetMenuItemInfo(GetMenu(m_expp->GetMainWindow()), IDM_BOOKMARKS, FALSE, &mii);
+	SetMenuItemInfo(GetMenu(m_coreInterface->GetMainWindow()), IDM_BOOKMARKS, FALSE, &mii);
 }
 
 void BookmarksMainMenu::OnMainMenuPreShow(HMENU mainMenu)
@@ -56,10 +56,10 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(
 {
 	wil::unique_hmenu menu(CreatePopupMenu());
 
-	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_expp->GetMainWindow());
+	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_coreInterface->GetMainWindow());
 
-	std::wstring bookmarkThisTabText =
-		ResourceHelper::LoadString(m_expp->GetLanguageModule(), IDS_MENU_BOOKMARK_THIS_TAB);
+	std::wstring bookmarkThisTabText = ResourceHelper::LoadString(
+		m_coreInterface->GetLanguageModule(), IDS_MENU_BOOKMARK_THIS_TAB);
 
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
@@ -69,10 +69,10 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(
 	InsertMenuItem(menu.get(), 0, TRUE, &mii);
 
 	ResourceHelper::SetMenuItemImage(menu.get(), IDM_BOOKMARKS_BOOKMARKTHISTAB,
-		m_expp->GetIconResourceLoader(), Icon::AddBookmark, dpi, menuImages);
+		m_coreInterface->GetIconResourceLoader(), Icon::AddBookmark, dpi, menuImages);
 
-	std::wstring bookmarkAllTabsText =
-		ResourceHelper::LoadString(m_expp->GetLanguageModule(), IDS_MENU_BOOKMARK_ALL_TABS);
+	std::wstring bookmarkAllTabsText = ResourceHelper::LoadString(
+		m_coreInterface->GetLanguageModule(), IDS_MENU_BOOKMARK_ALL_TABS);
 
 	ZeroMemory(&mii, sizeof(mii));
 	mii.cbSize = sizeof(mii);
@@ -82,7 +82,7 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(
 	InsertMenuItem(menu.get(), 1, TRUE, &mii);
 
 	std::wstring manageBookmarksText =
-		ResourceHelper::LoadString(m_expp->GetLanguageModule(), IDS_MENU_MANAGE_BOOKMARKS);
+		ResourceHelper::LoadString(m_coreInterface->GetLanguageModule(), IDS_MENU_MANAGE_BOOKMARKS);
 
 	ZeroMemory(&mii, sizeof(mii));
 	mii.cbSize = sizeof(mii);
@@ -92,7 +92,7 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(
 	InsertMenuItem(menu.get(), 2, TRUE, &mii);
 
 	ResourceHelper::SetMenuItemImage(menu.get(), IDM_BOOKMARKS_MANAGEBOOKMARKS,
-		m_expp->GetIconResourceLoader(), Icon::Bookmarks, dpi, menuImages);
+		m_coreInterface->GetIconResourceLoader(), Icon::Bookmarks, dpi, menuImages);
 
 	int nextMenuItemId;
 	AddBookmarkItemsToMenu(menu.get(), m_menuIdRange, GetMenuItemCount(menu.get()), menuImages,
@@ -121,8 +121,8 @@ void BookmarksMainMenu::AddBookmarkItemsToMenu(HMENU menu, const MenuIdRange &me
 	mii.fType = MFT_SEPARATOR;
 	InsertMenuItem(menu, position++, TRUE, &mii);
 
-	m_menuBuilder.BuildMenu(m_expp->GetMainWindow(), menu, bookmarksMenuFolder, menuIdRange,
-		position, menuItemIdMappings, menuImages, nullptr, maxMenuItemId);
+	m_menuBuilder.BuildMenu(m_coreInterface->GetMainWindow(), menu, bookmarksMenuFolder,
+		menuIdRange, position, menuItemIdMappings, menuImages, nullptr, maxMenuItemId);
 }
 
 void BookmarksMainMenu::AddOtherBookmarksToMenu(HMENU menu, const MenuIdRange &menuIdRange,
@@ -145,8 +145,8 @@ void BookmarksMainMenu::AddOtherBookmarksToMenu(HMENU menu, const MenuIdRange &m
 	// Note that as DestroyMenu is recursive, this menu will be destroyed when
 	// its parent menu is.
 	HMENU subMenu = CreatePopupMenu();
-	m_menuBuilder.BuildMenu(m_expp->GetMainWindow(), subMenu, otherBookmarksFolder, menuIdRange, 0,
-		menuItemIdMappings, menuImages);
+	m_menuBuilder.BuildMenu(m_coreInterface->GetMainWindow(), subMenu, otherBookmarksFolder,
+		menuIdRange, 0, menuItemIdMappings, menuImages);
 
 	std::wstring otherBookmarksName = otherBookmarksFolder->GetName();
 
@@ -171,6 +171,6 @@ void BookmarksMainMenu::OnMenuItemClicked(int menuItemId)
 
 	assert(bookmark->IsBookmark());
 
-	Tab &selectedTab = m_expp->GetTabContainer()->GetSelectedTab();
+	Tab &selectedTab = m_coreInterface->GetTabContainer()->GetSelectedTab();
 	selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(bookmark->GetLocation());
 }

@@ -103,18 +103,18 @@ const boost::bimap<MainToolbarButton, std::wstring> TOOLBAR_BUTTON_XML_NAME_MAPP
 
 #pragma warning(pop)
 
-MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
+MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE instance, CoreInterface *coreInterface,
 	std::shared_ptr<Config> config)
 {
-	return new MainToolbar(parent, instance, pexpp, config);
+	return new MainToolbar(parent, instance, coreInterface, config);
 }
 
-MainToolbar::MainToolbar(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
+MainToolbar::MainToolbar(HWND parent, HINSTANCE instance, CoreInterface *coreInterface,
 	std::shared_ptr<Config> config) :
 	BaseWindow(CreateMainToolbar(parent)),
 	m_persistentSettings(&MainToolbarPersistentSettings::GetInstance()),
 	m_instance(instance),
-	m_pexpp(pexpp),
+	m_coreInterface(coreInterface),
 	m_config(config)
 {
 	Initialize(parent);
@@ -154,9 +154,9 @@ void MainToolbar::Initialize(HWND parent)
 		ILC_COLOR32 | ILC_MASK, 0, static_cast<int>(MainToolbarButton::_size() - 1)));
 
 	m_toolbarImageMapSmall = SetUpToolbarImageList(m_imageListSmall.get(),
-		m_pexpp->GetIconResourceLoader(), TOOLBAR_IMAGE_SIZE_SMALL, dpi);
+		m_coreInterface->GetIconResourceLoader(), TOOLBAR_IMAGE_SIZE_SMALL, dpi);
 	m_toolbarImageMapLarge = SetUpToolbarImageList(m_imageListLarge.get(),
-		m_pexpp->GetIconResourceLoader(), TOOLBAR_IMAGE_SIZE_LARGE, dpi);
+		m_coreInterface->GetIconResourceLoader(), TOOLBAR_IMAGE_SIZE_LARGE, dpi);
 
 	SetTooolbarImageList();
 	AddStringsToToolbar();
@@ -168,18 +168,19 @@ void MainToolbar::Initialize(HWND parent)
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parent, ParentWndProcStub,
 		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
-	m_pexpp->AddTabsInitializedObserver(
+	m_coreInterface->AddTabsInitializedObserver(
 		[this]
 		{
-			m_connections.push_back(m_pexpp->GetTabContainer()->tabSelectedSignal.AddObserver(
-				std::bind_front(&MainToolbar::OnTabSelected, this)));
 			m_connections.push_back(
-				m_pexpp->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
+				m_coreInterface->GetTabContainer()->tabSelectedSignal.AddObserver(
+					std::bind_front(&MainToolbar::OnTabSelected, this)));
+			m_connections.push_back(
+				m_coreInterface->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
 					std::bind_front(&MainToolbar::OnNavigationCommitted, this)));
 		});
 
-	m_connections.push_back(
-		m_pexpp->AddFocusChangeObserver(std::bind_front(&MainToolbar::OnFocusChanged, this)));
+	m_connections.push_back(m_coreInterface->AddFocusChangeObserver(
+		std::bind_front(&MainToolbar::OnFocusChanged, this)));
 	m_connections.push_back(m_config->useLargeToolbarIcons.addObserver(
 		std::bind_front(&MainToolbar::OnUseLargeToolbarIconsUpdated, this)));
 
@@ -657,7 +658,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 
 	StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, EMPTY_STRING);
 
-	const Tab &tab = m_pexpp->GetTabContainer()->GetSelectedTab();
+	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
 
 	if (ptbgit->iItem == MainToolbarButton::Back)
 	{
@@ -732,7 +733,7 @@ void MainToolbar::ShowHistoryMenu(HistoryType historyType, const POINT &pt)
 {
 	std::vector<HistoryEntry *> history;
 
-	const Tab &tab = m_pexpp->GetTabContainer()->GetSelectedTab();
+	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
 
 	if (historyType == HistoryType::Back)
 	{
@@ -805,7 +806,7 @@ void MainToolbar::ShowHistoryMenu(HistoryType historyType, const POINT &pt)
 		cmd = -cmd;
 	}
 
-	Tab &selectedTab = m_pexpp->GetTabContainer()->GetSelectedTab();
+	Tab &selectedTab = m_coreInterface->GetTabContainer()->GetSelectedTab();
 	selectedTab.GetShellBrowser()->GetNavigationController()->GoToOffset(cmd);
 }
 
@@ -826,7 +827,7 @@ void MainToolbar::ShowToolbarViewsDropdown()
 
 void MainToolbar::CreateViewsMenu(POINT *ptOrigin)
 {
-	auto viewsMenu = m_pexpp->BuildViewsMenu();
+	auto viewsMenu = m_coreInterface->BuildViewsMenu();
 	TrackPopupMenu(viewsMenu.get(), TPM_LEFTALIGN, ptOrigin->x, ptOrigin->y, 0, m_hwnd, nullptr);
 }
 
@@ -840,7 +841,7 @@ void MainToolbar::UpdateConfigDependentButtonStates()
 
 void MainToolbar::UpdateToolbarButtonStates()
 {
-	const Tab &tab = m_pexpp->GetTabContainer()->GetSelectedTab();
+	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
 
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Back,
 		tab.GetShellBrowser()->GetNavigationController()->CanGoBack());
@@ -852,28 +853,29 @@ void MainToolbar::UpdateToolbarButtonStates()
 	bool virtualFolder = tab.GetShellBrowser()->InVirtualFolder();
 
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::CopyTo,
-		m_pexpp->CanCopy() && GetFocus() != m_pexpp->GetTreeView());
+		m_coreInterface->CanCopy() && GetFocus() != m_coreInterface->GetTreeView());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::MoveTo,
-		m_pexpp->CanCut() && GetFocus() != m_pexpp->GetTreeView());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Copy, m_pexpp->CanCopy());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Cut, m_pexpp->CanCut());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Paste, m_pexpp->CanPaste());
+		m_coreInterface->CanCut() && GetFocus() != m_coreInterface->GetTreeView());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Copy, m_coreInterface->CanCopy());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Cut, m_coreInterface->CanCut());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Paste, m_coreInterface->CanPaste());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Properties,
-		m_pexpp->CanShowFileProperties());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Delete, m_pexpp->CanDelete());
+		m_coreInterface->CanShowFileProperties());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Delete, m_coreInterface->CanDelete());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::DeletePermanently,
-		m_pexpp->CanDelete());
+		m_coreInterface->CanDelete());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::SplitFile,
 		tab.GetShellBrowser()->GetNumSelectedFiles() == 1);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::MergeFiles,
 		tab.GetShellBrowser()->GetNumSelectedFiles() > 1);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::OpenCommandPrompt, !virtualFolder);
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::NewFolder, m_pexpp->CanCreate());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::NewFolder,
+		m_coreInterface->CanCreate());
 }
 
 void MainToolbar::OnClipboardUpdate()
 {
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Paste, m_pexpp->CanPaste());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Paste, m_coreInterface->CanPaste());
 }
 
 void MainToolbar::OnMButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT keysDown)
@@ -922,7 +924,7 @@ void MainToolbar::OnMButtonUp(HWND hwnd, int x, int y, UINT keysDown)
 		return;
 	}
 
-	const Tab &tab = m_pexpp->GetTabContainer()->GetSelectedTab();
+	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
 	unique_pidl_absolute pidl;
 
 	if (tbButton.idCommand == MainToolbarButton::Back
@@ -974,7 +976,8 @@ void MainToolbar::OnMButtonUp(HWND hwnd, int x, int y, UINT keysDown)
 		switchToNewTab = !switchToNewTab;
 	}
 
-	m_pexpp->GetTabContainer()->CreateNewTab(pidl.get(), TabSettings(_selected = switchToNewTab));
+	m_coreInterface->GetTabContainer()->CreateNewTab(pidl.get(),
+		TabSettings(_selected = switchToNewTab));
 }
 
 void MainToolbar::OnTabSelected(const Tab &tab)
@@ -990,7 +993,7 @@ void MainToolbar::OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl,
 	UNREFERENCED_PARAMETER(pidl);
 	UNREFERENCED_PARAMETER(addHistoryEntry);
 
-	if (m_pexpp->GetTabContainer()->IsTabSelected(tab))
+	if (m_coreInterface->GetTabContainer()->IsTabSelected(tab))
 	{
 		UpdateToolbarButtonStates();
 	}

@@ -11,13 +11,13 @@
 
 class BookmarkTree;
 class IconFetcher;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 
 class BookmarksMainMenu
 {
 public:
-	BookmarksMainMenu(IExplorerplusplus *expp, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree,
-		const MenuIdRange &menuIdRange);
+	BookmarksMainMenu(CoreInterface *coreInterface, IconFetcher *iconFetcher,
+		BookmarkTree *bookmarkTree, const MenuIdRange &menuIdRange);
 	~BookmarksMainMenu();
 
 	void OnMenuItemClicked(int menuItemId);
@@ -33,7 +33,7 @@ private:
 		std::vector<wil::unique_hbitmap> &menuImages,
 		BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings);
 
-	IExplorerplusplus *m_expp;
+	CoreInterface *m_coreInterface;
 	BookmarkTree *m_bookmarkTree;
 	const MenuIdRange m_menuIdRange;
 	BookmarkMenuBuilder m_menuBuilder;

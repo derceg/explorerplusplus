@@ -58,10 +58,10 @@ const TCHAR SearchDialogPersistentSettings::SETTING_DIRECTORY_LIST[] = _T("Direc
 const TCHAR SearchDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
 
 SearchDialog::SearchDialog(HINSTANCE hInstance, HWND hParent, std::wstring_view searchDirectory,
-	IExplorerplusplus *pexpp, TabContainer *tabContainer) :
+	CoreInterface *coreInterface, TabContainer *tabContainer) :
 	DarkModeDialogBase(hInstance, IDD_SEARCH, hParent, true),
 	m_searchDirectory(searchDirectory),
-	m_pexpp(pexpp),
+	m_coreInterface(coreInterface),
 	m_tabContainer(tabContainer),
 	m_bSearching(FALSE),
 	m_bStopSearching(FALSE),
@@ -86,7 +86,7 @@ INT_PTR SearchDialog::OnInitDialog()
 {
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hDlg);
 	m_directoryIcon =
-		m_pexpp->GetIconResourceLoader()->LoadIconFromPNGForDpi(Icon::Folder, 16, 16, dpi);
+		m_coreInterface->GetIconResourceLoader()->LoadIconFromPNGForDpi(Icon::Folder, 16, 16, dpi);
 	SendMessage(GetDlgItem(m_hDlg, IDC_BUTTON_DIRECTORY), BM_SETIMAGE, IMAGE_ICON,
 		reinterpret_cast<LPARAM>(m_directoryIcon.get()));
 
@@ -180,8 +180,8 @@ INT_PTR SearchDialog::OnInitDialog()
 
 wil::unique_hicon SearchDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_pexpp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::Search, iconWidth,
-		iconHeight);
+	return m_coreInterface->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::Search,
+		iconWidth, iconHeight);
 }
 
 void SearchDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
@@ -661,7 +661,7 @@ BOOL SearchDialog::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		for (auto pidlItem : pidlItems)
 		{
 			unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItem));
-			m_pexpp->OpenItem(pidlComplete.get());
+			m_coreInterface->OpenItem(pidlComplete.get());
 		}
 
 		return TRUE;
@@ -680,7 +680,7 @@ void SearchDialog::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		m_tabContainer->CreateNewTab(pidlParent, TabSettings(_selected = true));
 
 		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems.front()));
-		m_pexpp->GetActiveShellBrowser()->SelectItems({ pidlComplete.get() });
+		m_coreInterface->GetActiveShellBrowser()->SelectItems({ pidlComplete.get() });
 	}
 	break;
 	}
@@ -719,7 +719,7 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 
 					if (hr == S_OK)
 					{
-						m_pexpp->OpenItem(pidlFull.get());
+						m_coreInterface->OpenItem(pidlFull.get());
 					}
 				}
 			}
@@ -786,7 +786,7 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 						ptCursor.y = GET_Y_LPARAM(dwCursorPos);
 
 						fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, &ptCursor,
-							m_pexpp->GetStatusBar(), NULL, FALSE, IsKeyDown(VK_SHIFT));
+							m_coreInterface->GetStatusBar(), NULL, FALSE, IsKeyDown(VK_SHIFT));
 					}
 				}
 			}

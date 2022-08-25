@@ -8,13 +8,13 @@
 #include "Bookmarks/BookmarkItem.h"
 
 class BookmarkTree;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 
 class BookmarkContextMenuController
 {
 public:
 	BookmarkContextMenuController(BookmarkTree *bookmarkTree, HMODULE resourceModule,
-		IExplorerplusplus *expp);
+		CoreInterface *coreInterface);
 
 	void OnMenuItemSelected(int menuItemId, BookmarkItem *targetParentFolder, size_t targetIndex,
 		const RawBookmarkItems &bookmarkItems, HWND parentWindow);
@@ -30,5 +30,5 @@ private:
 
 	BookmarkTree *m_bookmarkTree;
 	HMODULE m_resourceModule;
-	IExplorerplusplus *m_expp;
+	CoreInterface *m_coreInterface;
 };

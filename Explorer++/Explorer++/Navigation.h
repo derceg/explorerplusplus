@@ -4,13 +4,13 @@
 
 #pragma once
 
-__interface IExplorerplusplus;
+__interface CoreInterface;
 class TabContainer;
 
 class Navigation
 {
 public:
-	Navigation(IExplorerplusplus *expp);
+	Navigation(CoreInterface *coreInterface);
 
 	void OnNavigateUp();
 
@@ -20,6 +20,6 @@ public:
 	void OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory);
 
 private:
-	IExplorerplusplus *m_expp;
+	CoreInterface *m_coreInterface;
 	TabContainer *m_tabContainer;
 };

@@ -98,16 +98,16 @@ const boost::bimap<bool, std::wstring> BOOL_MAPPINGS =
 TCHAR g_szNewTabDirectory[MAX_PATH];
 
 OptionsDialog *OptionsDialog::Create(std::shared_ptr<Config> config, HINSTANCE instance,
-	IExplorerplusplus *expp, TabContainer *tabContainer)
+	CoreInterface *coreInterface, TabContainer *tabContainer)
 {
-	return new OptionsDialog(config, instance, expp, tabContainer);
+	return new OptionsDialog(config, instance, coreInterface, tabContainer);
 }
 
 OptionsDialog::OptionsDialog(std::shared_ptr<Config> config, HINSTANCE instance,
-	IExplorerplusplus *expp, TabContainer *tabContainer) :
+	CoreInterface *coreInterface, TabContainer *tabContainer) :
 	m_config(config),
 	m_instance(instance),
-	m_expp(expp),
+	m_coreInterface(coreInterface),
 	m_tabContainer(tabContainer)
 {
 }
@@ -128,8 +128,8 @@ HWND OptionsDialog::Show(HWND parentWindow)
 	UINT dpi = dpiCompat.GetDpiForWindow(parentWindow);
 	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
-	m_optionsDialogIcon = m_expp->GetIconResourceLoader()->LoadIconFromPNGForDpi(Icon::Options,
-		iconWidth, iconHeight, dpi);
+	m_optionsDialogIcon = m_coreInterface->GetIconResourceLoader()->LoadIconFromPNGForDpi(
+		Icon::Options, iconWidth, iconHeight, dpi);
 
 	PROPSHEETHEADER psh;
 	psh.dwSize = sizeof(PROPSHEETHEADER);
@@ -302,14 +302,14 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 		CheckRadioButton(hDlg, IDC_OPTION_REPLACEEXPLORER_NONE, IDC_OPTION_REPLACEEXPLORER_ALL,
 			REPLACE_EXPLORER_ENUM_CONTROL_ID_MAPPINGS.at(m_config->replaceExplorerMode));
 
-		if (m_expp->GetSavePreferencesToXmlFile())
+		if (m_coreInterface->GetSavePreferencesToXmlFile())
 		{
 			CheckDlgButton(hDlg, IDC_OPTION_XML, BST_CHECKED);
 		}
 
 		UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(hDlg);
-		m_newTabDirectoryIcon =
-			m_expp->GetIconResourceLoader()->LoadIconFromPNGForDpi(Icon::Folder, 16, 16, dpi);
+		m_newTabDirectoryIcon = m_coreInterface->GetIconResourceLoader()->LoadIconFromPNGForDpi(
+			Icon::Folder, 16, 16, dpi);
 
 		hButton = GetDlgItem(hDlg, IDC_DEFAULT_NEWTABDIR_BUTTON);
 		SendMessage(hButton, BM_SETIMAGE, IMAGE_ICON, (LPARAM) m_newTabDirectoryIcon.get());
@@ -439,7 +439,7 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 
 			BOOL savePreferencesToXmlFile =
 				(IsDlgButtonChecked(hDlg, IDC_OPTION_XML) == BST_CHECKED);
-			m_expp->SetSavePreferencesToXmlFile(savePreferencesToXmlFile);
+			m_coreInterface->SetSavePreferencesToXmlFile(savePreferencesToXmlFile);
 
 			hEdit = GetDlgItem(hDlg, IDC_DEFAULT_NEWTABDIR_EDIT);
 
@@ -471,7 +471,7 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 			int language = GetLanguageIDFromIndex(hDlg, iSel);
 			m_config->language = language;
 
-			m_expp->SaveAllSettings();
+			m_coreInterface->SaveAllSettings();
 		}
 		break;
 		}
@@ -903,7 +903,7 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 					m_config->globalFolderSettings.oneClickActivateHoverTime);
 			}
 
-			m_expp->SaveAllSettings();
+			m_coreInterface->SaveAllSettings();
 		}
 		break;
 		}
@@ -1169,7 +1169,7 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 					LVS_EX_FULLROWSELECT, m_config->useFullRowSelect);
 			}
 
-			m_expp->SaveAllSettings();
+			m_coreInterface->SaveAllSettings();
 		}
 		break;
 		}
@@ -1315,7 +1315,7 @@ INT_PTR CALLBACK OptionsDialog::TabSettingsProc(HWND hDlg, UINT uMsg, WPARAM wPa
 			m_config->closeMainWindowOnTabClose =
 				(IsDlgButtonChecked(hDlg, IDC_TABS_CLOSEMAINWINDOW) == BST_CHECKED);
 
-			m_expp->SaveAllSettings();
+			m_coreInterface->SaveAllSettings();
 		}
 		break;
 		}
@@ -1486,7 +1486,7 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 			m_config->defaultFolderSettings.viewMode = ViewMode::_from_integral(
 				static_cast<int>(SendMessage(hComboBox, CB_GETITEMDATA, selectedIndex, 0)));
 
-			m_expp->SaveAllSettings();
+			m_coreInterface->SaveAllSettings();
 		}
 		break;
 		}
@@ -1721,7 +1721,7 @@ INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(HWND hDlg, UINT uMsg, WPARA
 				}
 			}
 
-			m_expp->SaveAllSettings();
+			m_coreInterface->SaveAllSettings();
 		}
 		break;
 		}

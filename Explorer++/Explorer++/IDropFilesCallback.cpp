@@ -13,7 +13,9 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include <list>
 
-DropFilesCallback::DropFilesCallback(IExplorerplusplus *pexpp) : m_pexpp(pexpp), m_RefCount(1)
+DropFilesCallback::DropFilesCallback(CoreInterface *coreInterface) :
+	m_coreInterface(coreInterface),
+	m_RefCount(1)
 {
 }
 
@@ -57,8 +59,8 @@ void DropFilesCallback::OnDropFile(const std::list<std::wstring> &PastedFileList
 {
 	UNREFERENCED_PARAMETER(ppt);
 
-	if (m_pexpp->GetActiveShellBrowser()->GetNumSelected() == 0)
+	if (m_coreInterface->GetActiveShellBrowser()->GetNumSelected() == 0)
 	{
-		m_pexpp->GetActiveShellBrowser()->SelectItems(PastedFileList);
+		m_coreInterface->GetActiveShellBrowser()->SelectItems(PastedFileList);
 	}
 }

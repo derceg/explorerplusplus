@@ -13,10 +13,10 @@
 #include "TabContainer.h"
 
 BookmarkContextMenuController::BookmarkContextMenuController(BookmarkTree *bookmarkTree,
-	HMODULE resourceModule, IExplorerplusplus *expp) :
+	HMODULE resourceModule, CoreInterface *coreInterface) :
 	m_bookmarkTree(bookmarkTree),
 	m_resourceModule(resourceModule),
-	m_expp(expp)
+	m_coreInterface(coreInterface)
 {
 }
 
@@ -30,7 +30,7 @@ void BookmarkContextMenuController::OnMenuItemSelected(int menuItemId,
 	{
 		assert(bookmarkItems.size() == 1 && bookmarkItems[0]->IsBookmark());
 
-		Tab &selectedTab = m_expp->GetTabContainer()->GetSelectedTab();
+		Tab &selectedTab = m_coreInterface->GetTabContainer()->GetSelectedTab();
 		selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(
 			bookmarkItems[0]->GetLocation());
 	}
@@ -38,8 +38,8 @@ void BookmarkContextMenuController::OnMenuItemSelected(int menuItemId,
 
 	case IDM_BOOKMARKS_OPEN_IN_NEW_TAB:
 		assert(bookmarkItems.size() == 1 && bookmarkItems[0]->IsBookmark());
-		BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItems[0], m_expp,
-			m_expp->GetConfig()->openTabsInForeground);
+		BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItems[0], m_coreInterface,
+			m_coreInterface->GetConfig()->openTabsInForeground);
 		break;
 
 	case IDM_BOOKMARKS_OPEN_ALL:
@@ -85,11 +85,11 @@ void BookmarkContextMenuController::OnMenuItemSelected(int menuItemId,
 
 void BookmarkContextMenuController::OnOpenAll(const RawBookmarkItems &bookmarkItems)
 {
-	bool switchToNewTab = m_expp->GetConfig()->openTabsInForeground;
+	bool switchToNewTab = m_coreInterface->GetConfig()->openTabsInForeground;
 
 	for (auto *bookmarkItem : bookmarkItems)
 	{
-		BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_expp, switchToNewTab);
+		BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_coreInterface, switchToNewTab);
 
 		switchToNewTab = false;
 	}
@@ -99,7 +99,7 @@ void BookmarkContextMenuController::OnNewBookmarkItem(BookmarkItem::Type type,
 	BookmarkItem *targetParentFolder, size_t targetIndex, HWND parentWindow)
 {
 	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type, targetParentFolder, targetIndex,
-		parentWindow, m_expp);
+		parentWindow, m_coreInterface);
 }
 
 void BookmarkContextMenuController::OnCopy(const RawBookmarkItems &bookmarkItems, bool cut)
@@ -124,5 +124,5 @@ void BookmarkContextMenuController::OnEditBookmarkItem(BookmarkItem *bookmarkIte
 	HWND parentWindow)
 {
 	BookmarkHelper::EditBookmarkItem(bookmarkItem, m_bookmarkTree, m_resourceModule, parentWindow,
-		m_expp);
+		m_coreInterface);
 }

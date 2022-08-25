@@ -9,13 +9,13 @@
 #include "Bookmarks/UI/BookmarkContextMenuController.h"
 
 class BookmarkTree;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 
 class BookmarkContextMenu
 {
 public:
 	BookmarkContextMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule,
-		IExplorerplusplus *expp);
+		CoreInterface *coreInterface);
 
 	BOOL ShowMenu(HWND parentWindow, BookmarkItem *parentFolder,
 		const RawBookmarkItems &bookmarkItems, const POINT &ptScreen, bool recursive = false);

@@ -17,12 +17,12 @@
 #include <unordered_set>
 
 class BookmarkTree;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 
 class BookmarkTreeView : private BookmarkDropTargetWindow
 {
 public:
-	BookmarkTreeView(HWND hTreeView, HINSTANCE hInstance, IExplorerplusplus *expp,
+	BookmarkTreeView(HWND hTreeView, HINSTANCE hInstance, CoreInterface *coreInterface,
 		BookmarkTree *bookmarkTree, const std::unordered_set<std::wstring> &setExpansion,
 		std::optional<std::wstring> guidSelected = std::nullopt);
 

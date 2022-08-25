@@ -41,7 +41,7 @@ private:
 class MainToolbar : public BaseWindow
 {
 public:
-	static MainToolbar *Create(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
+	static MainToolbar *Create(HWND parent, HINSTANCE instance, CoreInterface *coreInterface,
 		std::shared_ptr<Config> config);
 
 	void UpdateConfigDependentButtonStates();
@@ -57,7 +57,7 @@ private:
 		Forward
 	};
 
-	MainToolbar(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
+	MainToolbar(HWND parent, HINSTANCE instance, CoreInterface *coreInterface,
 		std::shared_ptr<Config> config);
 	~MainToolbar();
 
@@ -109,7 +109,7 @@ private:
 	MainToolbarPersistentSettings *m_persistentSettings;
 
 	HINSTANCE m_instance;
-	IExplorerplusplus *m_pexpp;
+	CoreInterface *m_coreInterface;
 	std::shared_ptr<Config> m_config;
 
 	wil::com_ptr_nothrow<IImageList> m_systemImageList;

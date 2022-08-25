@@ -11,12 +11,12 @@
 #include <wil/resource.h>
 #include <unordered_map>
 
-__interface IExplorerplusplus;
+__interface CoreInterface;
 
 class TabRestorerUI
 {
 public:
-	TabRestorerUI(HINSTANCE instance, IExplorerplusplus *expp, TabRestorer *tabRestorer,
+	TabRestorerUI(HINSTANCE instance, CoreInterface *coreInterface, TabRestorer *tabRestorer,
 		int menuStartId, int menuEndId);
 	~TabRestorerUI();
 
@@ -32,7 +32,7 @@ private:
 		std::unordered_map<int, int> &menuItemMappings);
 
 	HINSTANCE m_instance;
-	IExplorerplusplus *m_expp;
+	CoreInterface *m_coreInterface;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 

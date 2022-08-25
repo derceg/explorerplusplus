@@ -10,12 +10,14 @@
 #include "TabContainer.h"
 #include "../Helper/ShellHelper.h"
 
-Navigation::Navigation(IExplorerplusplus *expp) : m_expp(expp), m_tabContainer(nullptr)
+Navigation::Navigation(CoreInterface *coreInterface) :
+	m_coreInterface(coreInterface),
+	m_tabContainer(nullptr)
 {
-	m_expp->AddTabsInitializedObserver(
+	m_coreInterface->AddTabsInitializedObserver(
 		[this]
 		{
-			m_tabContainer = m_expp->GetTabContainer();
+			m_tabContainer = m_coreInterface->GetTabContainer();
 		});
 }
 
@@ -75,5 +77,5 @@ void Navigation::OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory)
 	TCHAR szParameters[512];
 	StringCchPrintf(szParameters, SIZEOF_ARRAY(szParameters), _T("\"%s\""), path.c_str());
 
-	ExecuteAndShowCurrentProcess(m_expp->GetMainWindow(), szParameters);
+	ExecuteAndShowCurrentProcess(m_coreInterface->GetMainWindow(), szParameters);
 }

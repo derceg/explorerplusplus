@@ -43,19 +43,19 @@ const std::map<UINT, Icon> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
 // clang-format on
 
 TabContainer *TabContainer::Create(HWND parent, TabNavigationInterface *tabNavigation,
-	IExplorerplusplus *expp, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons,
+	CoreInterface *coreInterface, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons,
 	BookmarkTree *bookmarkTree, HINSTANCE instance, std::shared_ptr<Config> config)
 {
-	return new TabContainer(parent, tabNavigation, expp, fileActionHandler, cachedIcons,
+	return new TabContainer(parent, tabNavigation, coreInterface, fileActionHandler, cachedIcons,
 		bookmarkTree, instance, config);
 }
 
 TabContainer::TabContainer(HWND parent, TabNavigationInterface *tabNavigation,
-	IExplorerplusplus *expp, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons,
+	CoreInterface *coreInterface, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons,
 	BookmarkTree *bookmarkTree, HINSTANCE instance, std::shared_ptr<Config> config) :
 	ShellDropTargetWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
 	m_tabNavigation(tabNavigation),
-	m_expp(expp),
+	m_coreInterface(coreInterface),
 	m_fileActionHandler(fileActionHandler),
 	m_cachedIcons(cachedIcons),
 	m_bookmarkTree(bookmarkTree),
@@ -140,7 +140,7 @@ void TabContainer::Initialize(HWND parent)
 void TabContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
 {
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hwnd);
-	wil::unique_hbitmap bitmap = m_expp->GetIconResourceLoader()->LoadBitmapFromPNGForDpi(
+	wil::unique_hbitmap bitmap = m_coreInterface->GetIconResourceLoader()->LoadBitmapFromPNGForDpi(
 		Icon::Lock, ICON_SIZE_96DPI, ICON_SIZE_96DPI, dpi);
 	m_tabIconLockIndex = ImageList_Add(himlTab, bitmap.get(), nullptr);
 
@@ -237,7 +237,7 @@ LRESULT CALLBACK TabContainer::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
 	case WM_MENUSELECT:
 		/* Forward the message to the main window so it can
 		handle menu help. */
-		SendMessage(m_expp->GetMainWindow(), WM_MENUSELECT, wParam, lParam);
+		SendMessage(m_coreInterface->GetMainWindow(), WM_MENUSELECT, wParam, lParam);
 		break;
 
 	case WM_CAPTURECHANGED:
@@ -456,8 +456,8 @@ void TabContainer::AddImagesToTabContextMenu(HMENU menu,
 
 	for (const auto &mapping : TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS)
 	{
-		ResourceHelper::SetMenuItemImage(menu, mapping.first, m_expp->GetIconResourceLoader(),
-			mapping.second, dpi, menuImages);
+		ResourceHelper::SetMenuItemImage(menu, mapping.first,
+			m_coreInterface->GetIconResourceLoader(), mapping.second, dpi, menuImages);
 	}
 }
 
@@ -467,7 +467,7 @@ void TabContainer::ProcessTabCommand(UINT uMenuID, Tab &tab)
 	{
 	case IDM_FILE_NEWTAB:
 		/* Send the resulting command back to the main window for processing. */
-		SendMessage(m_expp->GetMainWindow(), WM_COMMAND, MAKEWPARAM(uMenuID, 0), 0);
+		SendMessage(m_coreInterface->GetMainWindow(), WM_COMMAND, MAKEWPARAM(uMenuID, 0), 0);
 		break;
 
 	case IDM_TAB_DUPLICATETAB:
@@ -541,7 +541,8 @@ void TabContainer::OnRefreshAllTabs()
 
 void TabContainer::OnRenameTab(const Tab &tab)
 {
-	RenameTabDialog renameTabDialog(m_instance, m_expp->GetMainWindow(), tab.GetId(), this);
+	RenameTabDialog renameTabDialog(m_instance, m_coreInterface->GetMainWindow(), tab.GetId(),
+		this);
 	renameTabDialog.ShowModalDialog();
 }
 
@@ -659,7 +660,7 @@ void TabContainer::ShowBackgroundContextMenu(const POINT &ptClient)
 
 	HMENU menu = GetSubMenu(parentMenu.get(), 0);
 
-	if (m_expp->GetTabRestorer()->GetClosedTabs().empty())
+	if (m_coreInterface->GetTabRestorer()->GetClosedTabs().empty())
 	{
 		MenuHelper::EnableItem(menu, IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB, FALSE);
 	}
@@ -685,11 +686,11 @@ void TabContainer::OnBackgroundMenuItemSelected(int menuItemId)
 		break;
 
 	case IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB:
-		m_expp->GetTabRestorer()->RestoreLastTab();
+		m_coreInterface->GetTabRestorer()->RestoreLastTab();
 		break;
 
 	case IDM_TAB_CONTAINER_BOOKMARK_ALL_TABS:
-		BookmarkHelper::BookmarkAllTabs(m_bookmarkTree, m_instance, m_hwnd, m_expp);
+		BookmarkHelper::BookmarkAllTabs(m_bookmarkTree, m_instance, m_hwnd, m_coreInterface);
 		break;
 
 	default:
@@ -731,7 +732,7 @@ void TabContainer::OnTabCreated(int tabId, BOOL switchToNewTab)
 
 	if (!m_config->alwaysShowTabBar.get() && (GetNumTabs() > 1))
 	{
-		m_expp->ShowTabBar();
+		m_coreInterface->ShowTabBar();
 	}
 }
 
@@ -741,7 +742,7 @@ void TabContainer::OnTabRemoved(int tabId)
 
 	if (!m_config->alwaysShowTabBar.get() && (GetNumTabs() == 1))
 	{
-		m_expp->HideTabBar();
+		m_coreInterface->HideTabBar();
 	}
 }
 
@@ -759,17 +760,17 @@ void TabContainer::OnAlwaysShowTabBarUpdated(BOOL newValue)
 {
 	if (newValue)
 	{
-		m_expp->ShowTabBar();
+		m_coreInterface->ShowTabBar();
 	}
 	else
 	{
 		if (GetNumTabs() > 1)
 		{
-			m_expp->ShowTabBar();
+			m_coreInterface->ShowTabBar();
 		}
 		else
 		{
-			m_expp->HideTabBar();
+			m_coreInterface->HideTabBar();
 		}
 	}
 }
@@ -947,7 +948,7 @@ void TabContainer::CreateNewTab(const PreservedTab &preservedTab, int *newTabId)
 	PreservedHistoryEntry *entry = preservedTab.history.at(preservedTab.currentEntry).get();
 
 	auto tabTemp =
-		std::make_unique<Tab>(preservedTab, m_expp, m_tabNavigation, m_fileActionHandler);
+		std::make_unique<Tab>(preservedTab, m_coreInterface, m_tabNavigation, m_fileActionHandler);
 	auto item = m_tabs.insert({ tabTemp->GetId(), std::move(tabTemp) });
 
 	Tab &tab = *item.first->second;
@@ -960,7 +961,7 @@ void TabContainer::CreateNewTab(const PreservedTab &preservedTab, int *newTabId)
 void TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings,
 	const FolderSettings *folderSettings, const FolderColumns *initialColumns, int *newTabId)
 {
-	auto tabTemp = std::make_unique<Tab>(m_expp, m_tabNavigation, m_fileActionHandler,
+	auto tabTemp = std::make_unique<Tab>(m_coreInterface, m_tabNavigation, m_fileActionHandler,
 		folderSettings, initialColumns);
 	auto item = m_tabs.insert({ tabTemp->GetId(), std::move(tabTemp) });
 
@@ -1013,7 +1014,7 @@ void TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 	// hidden, even if it's later resized. Currently, if the tab is selected,
 	// the listview is shown during the OnTabSelected() call below. Therefore,
 	// the listview needs to have a non-zero size before that point.
-	m_expp->SetListViewInitialPosition(tab.GetShellBrowser()->GetListView());
+	m_coreInterface->SetListViewInitialPosition(tab.GetShellBrowser()->GetListView());
 
 	bool selected = false;
 
@@ -1142,7 +1143,7 @@ bool TabContainer::CloseTab(const Tab &tab)
 	{
 		if (m_config->closeMainWindowOnTabClose)
 		{
-			m_expp->CloseApplication();
+			m_coreInterface->CloseApplication();
 			return true;
 		}
 		else
@@ -1166,7 +1167,7 @@ bool TabContainer::CloseTab(const Tab &tab)
 
 	if (dirMonitorId)
 	{
-		m_expp->GetDirectoryMonitor()->StopDirectoryMonitor(*dirMonitorId);
+		m_coreInterface->GetDirectoryMonitor()->StopDirectoryMonitor(*dirMonitorId);
 	}
 
 	// This is needed, as the erase() call below will remove the element

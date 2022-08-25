@@ -9,14 +9,14 @@
 #include <wil/resource.h>
 
 class DarkModeGroupBox;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 class TabContainer;
 
 class OptionsDialog
 {
 public:
 	static OptionsDialog *Create(std::shared_ptr<Config> config, HINSTANCE instance,
-		IExplorerplusplus *expp, TabContainer *tabContainer);
+		CoreInterface *coreInterface, TabContainer *tabContainer);
 
 	HWND Show(HWND parentWindow);
 
@@ -53,7 +53,7 @@ private:
 
 	static const UINT_PTR ADVANCED_OPTIONS_LISTVIEW_SUBCLASS_ID = 0;
 
-	OptionsDialog(std::shared_ptr<Config> config, HINSTANCE instance, IExplorerplusplus *expp,
+	OptionsDialog(std::shared_ptr<Config> config, HINSTANCE instance, CoreInterface *coreInterface,
 		TabContainer *tabContainer);
 	~OptionsDialog() = default;
 
@@ -118,7 +118,7 @@ private:
 
 	std::shared_ptr<Config> m_config;
 	HINSTANCE m_instance;
-	IExplorerplusplus *m_expp;
+	CoreInterface *m_coreInterface;
 	HWND m_tipWnd;
 
 	TabContainer *m_tabContainer;

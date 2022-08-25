@@ -22,7 +22,7 @@ class BookmarkTree;
 class CachedIcons;
 struct Config;
 class FileActionHandler;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 class Navigation;
 struct PreservedTab;
 
@@ -74,8 +74,9 @@ class TabContainer : public ShellDropTargetWindow<int>
 {
 public:
 	static TabContainer *Create(HWND parent, TabNavigationInterface *tabNavigation,
-		IExplorerplusplus *expp, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons,
-		BookmarkTree *bookmarkTree, HINSTANCE instance, std::shared_ptr<Config> config);
+		CoreInterface *coreInterface, FileActionHandler *fileActionHandler,
+		CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, HINSTANCE instance,
+		std::shared_ptr<Config> config);
 
 	void CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
 	void CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {},
@@ -149,7 +150,7 @@ private:
 
 	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 40;
 
-	TabContainer(HWND parent, TabNavigationInterface *tabNavigation, IExplorerplusplus *expp,
+	TabContainer(HWND parent, TabNavigationInterface *tabNavigation, CoreInterface *coreInterface,
 		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
 		HINSTANCE instance, std::shared_ptr<Config> config);
 	~TabContainer();
@@ -244,7 +245,7 @@ private:
 	int m_tabIconLockIndex;
 
 	TabNavigationInterface *m_tabNavigation;
-	IExplorerplusplus *m_expp;
+	CoreInterface *m_coreInterface;
 	FileActionHandler *m_fileActionHandler;
 
 	HINSTANCE m_instance;

@@ -19,7 +19,7 @@
 #include "TabContainer.h"
 #include "UiTheming.h"
 
-void BindTabsAPI(sol::state &state, IExplorerplusplus *expp, TabContainer *tabContainer);
+void BindTabsAPI(sol::state &state, CoreInterface *coreInterface, TabContainer *tabContainer);
 void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager);
 void BindUiApi(sol::state &state, UiTheming *uiTheming);
 void BindCommandApi(int pluginId, sol::state &state,
@@ -40,10 +40,10 @@ void Plugins::BindAllApiMethods(int pluginId, sol::state &state, PluginInterface
 	BindCommandApi(pluginId, state, pluginInterface->GetPluginCommandManager());
 }
 
-void BindTabsAPI(sol::state &state, IExplorerplusplus *expp, TabContainer *tabContainer)
+void BindTabsAPI(sol::state &state, CoreInterface *coreInterface, TabContainer *tabContainer)
 {
 	std::shared_ptr<Plugins::TabsApi> tabsApi =
-		std::make_shared<Plugins::TabsApi>(expp, tabContainer);
+		std::make_shared<Plugins::TabsApi>(coreInterface, tabContainer);
 
 	sol::table tabsTable = state.create_named_table("tabs");
 	sol::table tabsMetaTable = MarkTableReadOnly(state, tabsTable);

@@ -10,7 +10,7 @@
 #include "../ThirdParty/Sol/forward.hpp"
 #include <optional>
 
-__interface IExplorerplusplus;
+__interface CoreInterface;
 class Navigation;
 class ShellBrowser;
 class TabContainer;
@@ -50,7 +50,7 @@ namespace Plugins
 			std::wstring toString();
 		};
 
-		TabsApi(IExplorerplusplus *expp, TabContainer *tabContainer);
+		TabsApi(CoreInterface *coreInterface, TabContainer *tabContainer);
 
 		std::vector<Tab> getAll();
 		std::optional<Tab> get(int tabId);
@@ -65,7 +65,7 @@ namespace Plugins
 		void extractFolderSettingsForCreation(sol::table folderSettingsTable,
 			::FolderSettings &folderSettings);
 
-		IExplorerplusplus *m_expp;
+		CoreInterface *m_coreInterface;
 		TabContainer *m_tabContainer;
 	};
 }

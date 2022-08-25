@@ -13,7 +13,7 @@
 
 class BookmarkIconManager;
 class IconFetcher;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 
 class BookmarkMenuBuilder
 {
@@ -30,7 +30,8 @@ public:
 
 	using IncludePredicate = std::function<bool(const BookmarkItem *bookmarkItem)>;
 
-	BookmarkMenuBuilder(IExplorerplusplus *expp, IconFetcher *iconFetcher, HMODULE resourceModule);
+	BookmarkMenuBuilder(CoreInterface *coreInterface, IconFetcher *iconFetcher,
+		HMODULE resourceModule);
 
 	BOOL BuildMenu(HWND parentWindow, HMENU menu, BookmarkItem *bookmarkItem,
 		const MenuIdRange &menuIdRange, int startPosition, ItemIdMap &itemIdMap,
@@ -53,7 +54,7 @@ private:
 	void AddIconToMenuItem(HMENU menu, int position, const BookmarkItem *bookmarkItem,
 		BookmarkIconManager &bookmarkIconManager, std::vector<wil::unique_hbitmap> &menuImages);
 
-	IExplorerplusplus *m_expp;
+	CoreInterface *m_coreInterface;
 	IconFetcher *m_iconFetcher;
 	HMODULE m_resourceModule;
 	MenuIdRange m_menuIdRange;

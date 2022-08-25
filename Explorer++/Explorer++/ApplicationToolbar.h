@@ -12,7 +12,7 @@
 
 class ApplicationToolbar;
 class ApplicationToolbarDropHandler;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 
 struct ApplicationButton
 {
@@ -57,7 +57,7 @@ class ApplicationToolbar : public BaseWindow
 {
 public:
 	static ApplicationToolbar *Create(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance,
-		IExplorerplusplus *pexpp);
+		CoreInterface *coreInterface);
 
 	void ShowNewItemDialog();
 	void AddNewItem(const std::wstring &name, const std::wstring &command, BOOL showNameOnToolbar);
@@ -73,7 +73,7 @@ private:
 	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	ApplicationToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance,
-		IExplorerplusplus *pexpp);
+		CoreInterface *coreInterface);
 	~ApplicationToolbar();
 
 	static HWND CreateApplicationToolbar(HWND hParent);
@@ -95,7 +95,7 @@ private:
 
 	int m_RightClickItem;
 
-	IExplorerplusplus *m_pexpp;
+	CoreInterface *m_coreInterface;
 
 	ApplicationToolbarDropHandler *m_patd;
 

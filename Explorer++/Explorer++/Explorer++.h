@@ -69,7 +69,7 @@ namespace Plugins
 }
 
 class Explorerplusplus :
-	public IExplorerplusplus,
+	public CoreInterface,
 	public TabNavigationInterface,
 	private FileContextMenuHandler,
 	public PluginInterface
@@ -294,7 +294,7 @@ private:
 	void OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
 
 	/* PluginInterface. */
-	IExplorerplusplus *GetCoreInterface() override;
+	CoreInterface *GetCoreInterface() override;
 	TabContainer *GetTabContainer() override;
 	Navigation *GetNavigation() override;
 	Plugins::PluginMenuManager *GetPluginMenuManager() override;

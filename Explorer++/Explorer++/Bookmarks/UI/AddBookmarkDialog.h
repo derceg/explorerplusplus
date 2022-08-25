@@ -15,7 +15,7 @@ class AddBookmarkDialog;
 class BookmarkItem;
 class BookmarkTree;
 class BookmarkTreeView;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 
 class AddBookmarkDialogPersistentSettings : public DialogSettings
 {
@@ -40,7 +40,7 @@ private:
 class AddBookmarkDialog : public DarkModeDialogBase
 {
 public:
-	AddBookmarkDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
+	AddBookmarkDialog(HINSTANCE hInstance, HWND hParent, CoreInterface *coreInterface,
 		BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
 		BookmarkItem *defaultParentSelection, BookmarkItem **selectedParentFolder,
 		std::optional<std::wstring> customDialogTitle = std::nullopt);
@@ -73,7 +73,7 @@ private:
 	void SaveTreeViewState();
 	void SaveTreeViewExpansionState(HWND hTreeView, HTREEITEM hItem);
 
-	IExplorerplusplus *m_expp;
+	CoreInterface *m_coreInterface;
 
 	BookmarkTree *m_bookmarkTree;
 	BookmarkItem *m_bookmarkItem;

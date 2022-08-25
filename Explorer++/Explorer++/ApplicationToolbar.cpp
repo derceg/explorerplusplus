@@ -41,18 +41,18 @@ const TCHAR ApplicationToolbarPersistentSettings::SETTING_SHOW_NAME_ON_TOOLBAR[]
 using namespace ApplicationToolbarHelper;
 
 ApplicationToolbar *ApplicationToolbar::Create(HWND hParent, UINT uIDStart, UINT uIDEnd,
-	HINSTANCE hInstance, IExplorerplusplus *pexpp)
+	HINSTANCE hInstance, CoreInterface *coreInterface)
 {
-	return new ApplicationToolbar(hParent, uIDStart, uIDEnd, hInstance, pexpp);
+	return new ApplicationToolbar(hParent, uIDStart, uIDEnd, hInstance, coreInterface);
 }
 
 ApplicationToolbar::ApplicationToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd,
-	HINSTANCE hInstance, IExplorerplusplus *pexpp) :
+	HINSTANCE hInstance, CoreInterface *coreInterface) :
 	BaseWindow(CreateApplicationToolbar(hParent)),
 	m_hInstance(hInstance),
 	m_uIDStart(uIDStart),
 	m_uIDEnd(uIDEnd),
-	m_pexpp(pexpp)
+	m_coreInterface(coreInterface)
 {
 	Initialize(hParent);
 }
@@ -90,7 +90,7 @@ void ApplicationToolbar::Initialize(HWND hParent)
 
 	AddButtonsToToolbar();
 
-	m_connections.push_back(m_pexpp->AddToolbarContextMenuObserver(
+	m_connections.push_back(m_coreInterface->AddToolbarContextMenuObserver(
 		std::bind_front(&ApplicationToolbar::OnToolbarContextMenuPreShow, this)));
 
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
@@ -355,7 +355,7 @@ void ApplicationToolbar::OpenItem(int iItem, std::wstring *parameters)
 		combinedParameters.append(*parameters);
 	}
 
-	m_pexpp->OpenFileItem(pidl.get(), combinedParameters.c_str());
+	m_coreInterface->OpenFileItem(pidl.get(), combinedParameters.c_str());
 }
 
 void ApplicationToolbar::ShowItemProperties(int iItem)

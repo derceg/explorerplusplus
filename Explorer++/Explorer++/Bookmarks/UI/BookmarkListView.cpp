@@ -26,17 +26,17 @@
 #include <utility>
 
 BookmarkListView::BookmarkListView(HWND hListView, HMODULE resourceModule,
-	BookmarkTree *bookmarkTree, IExplorerplusplus *expp, IconFetcher *iconFetcher,
+	BookmarkTree *bookmarkTree, CoreInterface *coreInterface, IconFetcher *iconFetcher,
 	const std::vector<Column> &initialColumns) :
 	BookmarkDropTargetWindow(hListView, bookmarkTree),
 	m_hListView(hListView),
 	m_resourceModule(resourceModule),
 	m_bookmarkTree(bookmarkTree),
-	m_expp(expp),
+	m_coreInterface(coreInterface),
 	m_columns(initialColumns),
 	m_sortColumn(BookmarkHelper::ColumnType::Default),
 	m_sortAscending(true),
-	m_bookmarkContextMenu(bookmarkTree, resourceModule, expp)
+	m_bookmarkContextMenu(bookmarkTree, resourceModule, coreInterface)
 {
 	SetWindowTheme(hListView, L"Explorer", nullptr);
 	ListView_SetExtendedListViewStyleEx(hListView,
@@ -76,7 +76,7 @@ void BookmarkListView::SetUpListViewImageList(IconFetcher *iconFetcher)
 	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 
-	m_bookmarkIconManager = std::make_unique<BookmarkIconManager>(m_expp, iconFetcher,
+	m_bookmarkIconManager = std::make_unique<BookmarkIconManager>(m_coreInterface, iconFetcher,
 		std::bind_front(&BookmarkListView::OnBookmarkIconAvailable, this), iconWidth, iconHeight);
 
 	ListView_SetImageList(m_hListView, m_bookmarkIconManager->GetImageList(), LVSIL_SMALL);
@@ -533,8 +533,8 @@ void BookmarkListView::OnDblClk(const NMITEMACTIVATE *itemActivate)
 	}
 	else
 	{
-		BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_expp,
-			m_expp->GetConfig()->openTabsInForeground);
+		BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_coreInterface,
+			m_coreInterface->GetConfig()->openTabsInForeground);
 	}
 }
 
@@ -634,7 +634,7 @@ void BookmarkListView::OnNewBookmark()
 	}
 
 	auto bookmark = BookmarkHelper::AddBookmarkItem(m_bookmarkTree, BookmarkItem::Type::Bookmark,
-		m_currentBookmarkFolder, targetIndex, m_hListView, m_expp);
+		m_currentBookmarkFolder, targetIndex, m_hListView, m_coreInterface);
 
 	if (!bookmark)
 	{
@@ -767,7 +767,7 @@ std::wstring BookmarkListView::FormatDate(const FILETIME *date)
 {
 	TCHAR formattedDate[256];
 	BOOL res = CreateFileTimeString(date, formattedDate, std::size(formattedDate),
-		m_expp->GetConfig()->globalFolderSettings.showFriendlyDates);
+		m_coreInterface->GetConfig()->globalFolderSettings.showFriendlyDates);
 
 	if (res)
 	{
@@ -910,11 +910,11 @@ void BookmarkListView::OnEnterPressed()
 	}
 	else
 	{
-		bool switchToNewTab = m_expp->GetConfig()->openTabsInForeground;
+		bool switchToNewTab = m_coreInterface->GetConfig()->openTabsInForeground;
 
 		for (BookmarkItem *bookmarkItem : bookmarkItems)
 		{
-			BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_expp, switchToNewTab);
+			BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_coreInterface, switchToNewTab);
 
 			switchToNewTab = false;
 		}

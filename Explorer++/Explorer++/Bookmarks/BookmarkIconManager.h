@@ -10,14 +10,14 @@
 
 class BookmarkItem;
 class IconFetcher;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 
 class BookmarkIconManager
 {
 public:
 	using IconAvailableCallback = std::function<void(std::wstring_view guid, int iconIndex)>;
 
-	BookmarkIconManager(IExplorerplusplus *expp, IconFetcher *iconFetcher,
+	BookmarkIconManager(CoreInterface *coreInterface, IconFetcher *iconFetcher,
 		IconAvailableCallback callback, int iconWidth, int iconHeight);
 	~BookmarkIconManager();
 
@@ -34,7 +34,7 @@ private:
 	int GetIconForBookmark(const BookmarkItem *bookmark);
 	int AddSystemIconToImageList(int systemIconIndex);
 
-	IExplorerplusplus *m_expp;
+	CoreInterface *m_coreInterface;
 	IconAvailableCallback m_callback;
 
 	wil::unique_himagelist m_imageList;

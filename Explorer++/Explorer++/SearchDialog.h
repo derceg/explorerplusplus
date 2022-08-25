@@ -17,7 +17,7 @@
 #include <unordered_map>
 #include <vector>
 
-__interface IExplorerplusplus;
+__interface CoreInterface;
 class SearchDialog;
 class TabContainer;
 
@@ -136,7 +136,7 @@ class SearchDialog : public DarkModeDialogBase, private FileContextMenuHandler
 {
 public:
 	SearchDialog(HINSTANCE hInstance, HWND hParent, std::wstring_view searchDirectory,
-		IExplorerplusplus *pexpp, TabContainer *tabContainer);
+		CoreInterface *coreInterface, TabContainer *tabContainer);
 	~SearchDialog();
 
 	/* Sorting methods. */
@@ -201,7 +201,7 @@ private:
 
 	BOOL m_bSetSearchTimer;
 
-	IExplorerplusplus *m_pexpp;
+	CoreInterface *m_coreInterface;
 	TabContainer *m_tabContainer;
 
 	SearchDialogPersistentSettings *m_persistentSettings;

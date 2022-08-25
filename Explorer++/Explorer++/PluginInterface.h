@@ -5,7 +5,7 @@
 #pragma once
 
 class AcceleratorUpdater;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 class Navigation;
 class TabContainer;
 class UiTheming;
@@ -18,7 +18,7 @@ namespace Plugins
 
 __interface PluginInterface
 {
-	IExplorerplusplus *GetCoreInterface();
+	CoreInterface *GetCoreInterface();
 	TabContainer *GetTabContainer();
 	Navigation *GetNavigation();
 	Plugins::PluginMenuManager *GetPluginMenuManager();

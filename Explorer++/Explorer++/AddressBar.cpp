@@ -21,14 +21,14 @@
 #include <wil/common.h>
 #include <wil/resource.h>
 
-AddressBar *AddressBar::Create(HWND parent, IExplorerplusplus *expp)
+AddressBar *AddressBar::Create(HWND parent, CoreInterface *coreInterface)
 {
-	return new AddressBar(parent, expp);
+	return new AddressBar(parent, coreInterface);
 }
 
-AddressBar::AddressBar(HWND parent, IExplorerplusplus *expp) :
+AddressBar::AddressBar(HWND parent, CoreInterface *coreInterface) :
 	BaseWindow(CreateAddressBar(parent)),
-	m_expp(expp),
+	m_coreInterface(coreInterface),
 	m_backgroundBrush(CreateSolidBrush(DARK_MODE_BACKGROUND_COLOR)),
 	m_defaultFolderIconIndex(GetDefaultFolderIconIndex())
 {
@@ -72,13 +72,14 @@ void AddressBar::Initialize(HWND parent)
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parent, ParentWndProcStub,
 		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
-	m_expp->AddTabsInitializedObserver(
+	m_coreInterface->AddTabsInitializedObserver(
 		[this]
 		{
-			m_connections.push_back(m_expp->GetTabContainer()->tabSelectedSignal.AddObserver(
-				std::bind_front(&AddressBar::OnTabSelected, this)));
 			m_connections.push_back(
-				m_expp->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
+				m_coreInterface->GetTabContainer()->tabSelectedSignal.AddObserver(
+					std::bind_front(&AddressBar::OnTabSelected, this)));
+			m_connections.push_back(
+				m_coreInterface->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
 					std::bind_front(&AddressBar::OnNavigationCommitted, this)));
 		});
 }
@@ -140,11 +141,11 @@ LRESULT CALLBACK AddressBar::EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LP
 		break;
 
 	case WM_SETFOCUS:
-		m_expp->FocusChanged(WindowFocusSource::AddressBar);
+		m_coreInterface->FocusChanged(WindowFocusSource::AddressBar);
 		break;
 
 	case WM_MOUSEWHEEL:
-		if (m_expp->OnMouseWheel(MousewheelSource::Other, wParam, lParam))
+		if (m_coreInterface->OnMouseWheel(MousewheelSource::Other, wParam, lParam))
 		{
 			return 0;
 		}
@@ -202,19 +203,19 @@ void AddressBar::OnGo()
 	valid path. */
 	std::wstring path = GetWindowString(m_hwnd);
 
-	const Tab &selectedTab = m_expp->GetTabContainer()->GetSelectedTab();
+	const Tab &selectedTab = m_coreInterface->GetTabContainer()->GetSelectedTab();
 	std::wstring currentDirectory = selectedTab.GetShellBrowser()->GetDirectory();
 
 	TCHAR szFullFilePath[MAX_PATH];
 	DecodePath(path.c_str(), currentDirectory.c_str(), szFullFilePath,
 		SIZEOF_ARRAY(szFullFilePath));
 
-	m_expp->OpenItem(szFullFilePath);
+	m_coreInterface->OpenItem(szFullFilePath);
 }
 
 void AddressBar::OnBeginDrag()
 {
-	const Tab &selectedTab = m_expp->GetTabContainer()->GetSelectedTab();
+	const Tab &selectedTab = m_coreInterface->GetTabContainer()->GetSelectedTab();
 	auto pidlDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
 
 	auto descriptorStgMedium = GenerateShortcutDescriptorStgMedium(pidlDirectory.get());
@@ -382,7 +383,7 @@ void AddressBar::OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, b
 	UNREFERENCED_PARAMETER(pidl);
 	UNREFERENCED_PARAMETER(addHistoryEntry);
 
-	if (m_expp->GetTabContainer()->IsTabSelected(tab))
+	if (m_coreInterface->GetTabContainer()->IsTabSelected(tab))
 	{
 		UpdateTextAndIcon(tab);
 	}

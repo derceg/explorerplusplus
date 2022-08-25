@@ -34,7 +34,7 @@ void CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 int ShellBrowser::listViewParentSubclassIdCounter = 0;
 
 std::shared_ptr<ShellBrowser> ShellBrowser::CreateNew(int id, HWND hOwner,
-	IExplorerplusplus *coreInterface, TabNavigationInterface *tabNavigation,
+	CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
 	FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
 	const FolderColumns *initialColumns)
 {
@@ -43,7 +43,7 @@ std::shared_ptr<ShellBrowser> ShellBrowser::CreateNew(int id, HWND hOwner,
 }
 
 std::shared_ptr<ShellBrowser> ShellBrowser::CreateFromPreserved(int id, HWND hOwner,
-	IExplorerplusplus *coreInterface, TabNavigationInterface *tabNavigation,
+	CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
 	FileActionHandler *fileActionHandler,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState)
@@ -52,7 +52,7 @@ std::shared_ptr<ShellBrowser> ShellBrowser::CreateFromPreserved(int id, HWND hOw
 		fileActionHandler, history, currentEntry, preservedFolderState));
 }
 
-ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface,
+ShellBrowser::ShellBrowser(int id, HWND hOwner, CoreInterface *coreInterface,
 	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState) :
@@ -63,7 +63,7 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface
 		m_iconFetcher.get(), history, currentEntry);
 }
 
-ShellBrowser::ShellBrowser(int id, HWND hOwner, IExplorerplusplus *coreInterface,
+ShellBrowser::ShellBrowser(int id, HWND hOwner, CoreInterface *coreInterface,
 	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 	const FolderSettings &folderSettings, const FolderColumns *initialColumns) :
 	ShellDropTargetWindow(CreateListView(hOwner)),

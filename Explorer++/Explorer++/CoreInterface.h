@@ -47,7 +47,7 @@ class TabRestorer;
 /* Basic interface between Explorerplusplus
 and some of the other components (such as the
 dialogs and toolbars). */
-__interface IExplorerplusplus
+__interface CoreInterface
 {
 	const Config *GetConfig() const;
 	HMODULE GetLanguageModule() const;

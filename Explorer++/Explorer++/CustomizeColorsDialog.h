@@ -11,7 +11,7 @@
 #include <vector>
 
 class CustomizeColorsDialog;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 
 class CustomizeColorsDialogPersistentSettings : public DialogSettings
 {
@@ -33,7 +33,7 @@ private:
 class CustomizeColorsDialog : public DarkModeDialogBase
 {
 public:
-	CustomizeColorsDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
+	CustomizeColorsDialog(HINSTANCE hInstance, HWND hParent, CoreInterface *coreInterface,
 		std::vector<NColorRuleHelper::ColorRule> *pColorRuleList);
 
 protected:
@@ -60,7 +60,7 @@ private:
 	void OnOk();
 	void OnCancel();
 
-	IExplorerplusplus *m_expp;
+	CoreInterface *m_coreInterface;
 
 	std::vector<NColorRuleHelper::ColorRule> *m_pColorRuleList;
 

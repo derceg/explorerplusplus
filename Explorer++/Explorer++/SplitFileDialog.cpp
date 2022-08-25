@@ -36,10 +36,10 @@ const TCHAR SplitFileDialogPersistentSettings::SETTINGS_KEY[] = _T("SplitFile");
 const TCHAR SplitFileDialogPersistentSettings::SETTING_SIZE[] = _T("Size");
 const TCHAR SplitFileDialogPersistentSettings::SETTING_SIZE_GROUP[] = _T("SizeGroup");
 
-SplitFileDialog::SplitFileDialog(HINSTANCE hInstance, HWND hParent, IExplorerplusplus *expp,
+SplitFileDialog::SplitFileDialog(HINSTANCE hInstance, HWND hParent, CoreInterface *coreInterface,
 	const std::wstring &strFullFilename) :
 	DarkModeDialogBase(hInstance, IDD_SPLITFILE, hParent, false),
-	m_expp(expp),
+	m_coreInterface(coreInterface),
 	m_strFullFilename(strFullFilename),
 	m_bSplittingFile(false),
 	m_bStopSplitting(false),
@@ -162,8 +162,8 @@ INT_PTR SplitFileDialog::OnInitDialog()
 
 wil::unique_hicon SplitFileDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return m_expp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::SplitFiles, iconWidth,
-		iconHeight);
+	return m_coreInterface->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::SplitFiles,
+		iconWidth, iconHeight);
 }
 
 INT_PTR SplitFileDialog::OnTimer(int iTimerID)

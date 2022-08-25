@@ -13,7 +13,7 @@
 #include <list>
 #include <string>
 
-__interface IExplorerplusplus;
+__interface CoreInterface;
 class WildcardSelectDialog;
 
 class WildcardSelectDialogPersistentSettings : public DialogSettings
@@ -48,7 +48,8 @@ private:
 class WildcardSelectDialog : public DarkModeDialogBase
 {
 public:
-	WildcardSelectDialog(HINSTANCE hInstance, HWND hParent, BOOL bSelect, IExplorerplusplus *pexpp);
+	WildcardSelectDialog(HINSTANCE hInstance, HWND hParent, BOOL bSelect,
+		CoreInterface *coreInterface);
 
 protected:
 	INT_PTR OnInitDialog() override;
@@ -64,7 +65,7 @@ private:
 	void OnCancel();
 	void SelectItems(TCHAR *szPattern);
 
-	IExplorerplusplus *m_pexpp;
+	CoreInterface *m_coreInterface;
 	BOOL m_bSelect;
 
 	wil::unique_hicon m_icon;

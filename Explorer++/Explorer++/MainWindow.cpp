@@ -15,26 +15,27 @@
 #include <wil/resource.h>
 
 MainWindow *MainWindow::Create(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
-	IExplorerplusplus *expp)
+	CoreInterface *coreInterface)
 {
-	return new MainWindow(hwnd, config, instance, expp);
+	return new MainWindow(hwnd, config, instance, coreInterface);
 }
 
 MainWindow::MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
-	IExplorerplusplus *expp) :
+	CoreInterface *coreInterface) :
 	BaseWindow(hwnd),
 	m_hwnd(hwnd),
 	m_config(config),
 	m_instance(instance),
-	m_expp(expp)
+	m_coreInterface(coreInterface)
 {
-	m_expp->AddTabsInitializedObserver(
+	m_coreInterface->AddTabsInitializedObserver(
 		[this]
 		{
-			m_connections.push_back(m_expp->GetTabContainer()->tabSelectedSignal.AddObserver(
-				std::bind_front(&MainWindow::OnTabSelected, this)));
 			m_connections.push_back(
-				m_expp->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
+				m_coreInterface->GetTabContainer()->tabSelectedSignal.AddObserver(
+					std::bind_front(&MainWindow::OnTabSelected, this)));
+			m_connections.push_back(
+				m_coreInterface->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
 					std::bind_front(&MainWindow::OnNavigationCommitted, this)));
 		});
 
@@ -51,7 +52,7 @@ void MainWindow::OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, b
 	UNREFERENCED_PARAMETER(pidl);
 	UNREFERENCED_PARAMETER(addHistoryEntry);
 
-	if (m_expp->GetTabContainer()->IsTabSelected(tab))
+	if (m_coreInterface->GetTabContainer()->IsTabSelected(tab))
 	{
 		UpdateWindowText();
 	}
@@ -87,7 +88,7 @@ void MainWindow::OnShowPrivilegeLevelInTitleBarUpdated(BOOL newValue)
 
 void MainWindow::UpdateWindowText()
 {
-	const Tab &tab = m_expp->GetTabContainer()->GetSelectedTab();
+	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
 	auto pidlDirectory = tab.GetShellBrowser()->GetDirectoryIdl();
 
 	std::wstring folderDisplayName;

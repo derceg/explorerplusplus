@@ -17,8 +17,9 @@
 #include "../Helper/iDropSource.h"
 #include <boost/range/adaptor/filtered.hpp>
 
-BookmarkTreeView::BookmarkTreeView(HWND hTreeView, HINSTANCE hInstance, IExplorerplusplus *expp,
-	BookmarkTree *bookmarkTree, const std::unordered_set<std::wstring> &setExpansion,
+BookmarkTreeView::BookmarkTreeView(HWND hTreeView, HINSTANCE hInstance,
+	CoreInterface *coreInterface, BookmarkTree *bookmarkTree,
+	const std::unordered_set<std::wstring> &setExpansion,
 	std::optional<std::wstring> guidSelected) :
 	BookmarkDropTargetWindow(hTreeView, bookmarkTree),
 	m_hTreeView(hTreeView),
@@ -45,7 +46,7 @@ BookmarkTreeView::BookmarkTreeView(HWND hTreeView, HINSTANCE hInstance, IExplore
 	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 	std::tie(m_imageList, m_imageListMappings) = ResourceHelper::CreateIconImageList(
-		expp->GetIconResourceLoader(), iconWidth, iconHeight, { Icon::Folder });
+		coreInterface->GetIconResourceLoader(), iconWidth, iconHeight, { Icon::Folder });
 	TreeView_SetImageList(hTreeView, m_imageList.get(), TVSIL_NORMAL);
 
 	SetupTreeView(setExpansion, guidSelected);

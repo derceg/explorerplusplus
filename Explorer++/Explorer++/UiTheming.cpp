@@ -9,8 +9,8 @@
 #include "Tab.h"
 #include "TabContainer.h"
 
-UiTheming::UiTheming(IExplorerplusplus *expp, TabContainer *tabContainer) :
-	m_expp(expp),
+UiTheming::UiTheming(CoreInterface *coreInterface, TabContainer *tabContainer) :
+	m_coreInterface(coreInterface),
 	m_tabContainer(tabContainer),
 	m_customListViewColorsApplied(false)
 {
@@ -77,8 +77,8 @@ bool UiTheming::ApplyListViewColorsForTab(const Tab &tab, COLORREF backgroundCol
 
 void UiTheming::SetTreeViewColors(COLORREF backgroundColor, COLORREF textColor)
 {
-	TreeView_SetBkColor(m_expp->GetTreeView(), backgroundColor);
-	TreeView_SetTextColor(m_expp->GetTreeView(), textColor);
+	TreeView_SetBkColor(m_coreInterface->GetTreeView(), backgroundColor);
+	TreeView_SetTextColor(m_coreInterface->GetTreeView(), textColor);
 
-	InvalidateRect(m_expp->GetTreeView(), nullptr, TRUE);
+	InvalidateRect(m_coreInterface->GetTreeView(), nullptr, TRUE);
 }

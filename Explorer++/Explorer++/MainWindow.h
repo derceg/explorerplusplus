@@ -8,17 +8,17 @@
 #include "../Helper/BaseWindow.h"
 
 struct Config;
-__interface IExplorerplusplus;
+__interface CoreInterface;
 
 class MainWindow : BaseWindow
 {
 public:
 	static MainWindow *Create(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
-		IExplorerplusplus *expp);
+		CoreInterface *coreInterface);
 
 private:
 	MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
-		IExplorerplusplus *expp);
+		CoreInterface *coreInterface);
 	~MainWindow() = default;
 
 	void OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
@@ -33,7 +33,7 @@ private:
 	HWND m_hwnd;
 	std::shared_ptr<Config> m_config;
 	HINSTANCE m_instance;
-	IExplorerplusplus *m_expp;
+	CoreInterface *m_coreInterface;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };
