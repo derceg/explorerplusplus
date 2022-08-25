@@ -17,7 +17,7 @@
 #include <unordered_set>
 
 class BookmarkTree;
-__interface CoreInterface;
+class CoreInterface;
 
 class BookmarkTreeView : private BookmarkDropTargetWindow
 {

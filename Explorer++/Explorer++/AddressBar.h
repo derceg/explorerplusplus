@@ -10,7 +10,7 @@
 #include <wil/resource.h>
 #include <optional>
 
-__interface CoreInterface;
+class CoreInterface;
 class Tab;
 
 class AddressBar : public BaseWindow

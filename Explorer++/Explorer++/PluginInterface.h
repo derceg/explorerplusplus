@@ -5,7 +5,7 @@
 #pragma once
 
 class AcceleratorUpdater;
-__interface CoreInterface;
+class CoreInterface;
 class Navigation;
 class TabContainer;
 class UiTheming;

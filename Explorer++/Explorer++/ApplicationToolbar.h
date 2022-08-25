@@ -12,7 +12,7 @@
 
 class ApplicationToolbar;
 class ApplicationToolbarDropHandler;
-__interface CoreInterface;
+class CoreInterface;
 
 struct ApplicationButton
 {

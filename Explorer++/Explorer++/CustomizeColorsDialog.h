@@ -10,8 +10,8 @@
 #include "../Helper/ResizableDialog.h"
 #include <vector>
 
+class CoreInterface;
 class CustomizeColorsDialog;
-__interface CoreInterface;
 
 class CustomizeColorsDialogPersistentSettings : public DialogSettings
 {

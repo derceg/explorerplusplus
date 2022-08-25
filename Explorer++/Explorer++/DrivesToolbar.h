@@ -6,8 +6,8 @@
 
 #include "DriveModel.h"
 
+class CoreInterface;
 class DrivesToolbarView;
-__interface CoreInterface;
 struct MouseEvent;
 class Navigation;
 

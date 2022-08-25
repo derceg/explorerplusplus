@@ -4,7 +4,7 @@
 
 #pragma once
 
-__interface CoreInterface;
+class CoreInterface;
 class TabContainer;
 
 class Navigation

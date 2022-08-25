@@ -9,7 +9,7 @@
 #include "Bookmarks/UI/BookmarkContextMenuController.h"
 
 class BookmarkTree;
-__interface CoreInterface;
+class CoreInterface;
 
 class BookmarkContextMenu
 {

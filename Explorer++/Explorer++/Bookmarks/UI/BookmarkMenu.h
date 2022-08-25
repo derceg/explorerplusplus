@@ -12,8 +12,8 @@
 #include <functional>
 
 class BookmarkTree;
+class CoreInterface;
 class IconFetcher;
-__interface CoreInterface;
 
 // Although it's not necessary, this class is effectively designed to be held
 // for the lifetime of its parent class. Doing so is more efficient, as the

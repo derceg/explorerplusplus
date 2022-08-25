@@ -6,7 +6,7 @@
 
 #include "../Helper/DropHandler.h"
 
-__interface CoreInterface;
+class CoreInterface;
 
 class DropFilesCallback : public IDropFilesCallback
 {

@@ -10,7 +10,7 @@
 #include "../ThirdParty/Sol/forward.hpp"
 #include <optional>
 
-__interface CoreInterface;
+class CoreInterface;
 class Navigation;
 class ShellBrowser;
 class TabContainer;

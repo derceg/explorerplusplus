@@ -36,10 +36,10 @@
 struct BasicItemInfo_t;
 class CachedIcons;
 struct Config;
+class CoreInterface;
 class FileActionHandler;
 class IconFetcher;
 class IconResourceLoader;
-__interface CoreInterface;
 struct PreservedFolderState;
 struct PreservedHistoryEntry;
 class ShellNavigationController;

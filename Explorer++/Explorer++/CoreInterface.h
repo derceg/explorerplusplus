@@ -47,69 +47,72 @@ class TabRestorer;
 /* Basic interface between Explorerplusplus
 and some of the other components (such as the
 dialogs and toolbars). */
-__interface CoreInterface
+class CoreInterface
 {
-	const Config *GetConfig() const;
-	HMODULE GetLanguageModule() const;
-	HACCEL *GetAcceleratorTable() const;
+public:
+	virtual ~CoreInterface() = default;
 
-	HWND GetMainWindow() const;
+	virtual const Config *GetConfig() const = 0;
+	virtual HMODULE GetLanguageModule() const = 0;
+	virtual HACCEL *GetAcceleratorTable() const = 0;
 
-	HWND GetActiveListView() const;
-	ShellBrowser *GetActiveShellBrowser() const;
+	virtual HWND GetMainWindow() const = 0;
 
-	TabContainer *GetTabContainer() const;
-	TabRestorer *GetTabRestorer() const;
-	IDirectoryMonitor *GetDirectoryMonitor() const;
+	virtual HWND GetActiveListView() const = 0;
+	virtual ShellBrowser *GetActiveShellBrowser() const = 0;
 
-	IconResourceLoader *GetIconResourceLoader() const;
-	CachedIcons *GetCachedIcons();
+	virtual TabContainer *GetTabContainer() const = 0;
+	virtual TabRestorer *GetTabRestorer() const = 0;
+	virtual IDirectoryMonitor *GetDirectoryMonitor() const = 0;
 
-	HWND GetTreeView() const;
+	virtual IconResourceLoader *GetIconResourceLoader() const = 0;
+	virtual CachedIcons *GetCachedIcons() = 0;
 
-	void OpenItem(const TCHAR *itemPath,
-		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
-	void OpenItem(PCIDLIST_ABSOLUTE pidlItem,
-		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
+	virtual HWND GetTreeView() const = 0;
 
-	StatusBar *GetStatusBar();
+	virtual void OpenItem(const TCHAR *itemPath,
+		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) = 0;
+	virtual void OpenItem(PCIDLIST_ABSOLUTE pidlItem,
+		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) = 0;
 
-	void OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters);
+	virtual StatusBar *GetStatusBar() = 0;
 
-	wil::unique_hmenu BuildViewsMenu();
+	virtual void OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters) = 0;
 
-	bool CanCreate() const;
-	BOOL CanCut() const;
-	BOOL CanCopy() const;
-	BOOL CanRename() const;
-	BOOL CanDelete() const;
-	BOOL CanShowFileProperties() const;
-	BOOL CanPaste() const;
+	virtual wil::unique_hmenu BuildViewsMenu() = 0;
 
-	BOOL OnMouseWheel(MousewheelSource mousewheelSource, WPARAM wParam, LPARAM lParam);
+	virtual bool CanCreate() const = 0;
+	virtual BOOL CanCut() const = 0;
+	virtual BOOL CanCopy() const = 0;
+	virtual BOOL CanRename() const = 0;
+	virtual BOOL CanDelete() const = 0;
+	virtual BOOL CanShowFileProperties() const = 0;
+	virtual BOOL CanPaste() const = 0;
 
-	void ShowTabBar();
-	void HideTabBar();
+	virtual BOOL OnMouseWheel(MousewheelSource mousewheelSource, WPARAM wParam, LPARAM lParam) = 0;
 
-	void SetListViewInitialPosition(HWND hListView);
+	virtual void ShowTabBar() = 0;
+	virtual void HideTabBar() = 0;
 
-	void FocusChanged(WindowFocusSource windowFocusSource);
+	virtual void SetListViewInitialPosition(HWND hListView) = 0;
+
+	virtual void FocusChanged(WindowFocusSource windowFocusSource) = 0;
 
 	// Used to support the options dialog.
-	void SaveAllSettings();
-	BOOL GetSavePreferencesToXmlFile() const;
-	void SetSavePreferencesToXmlFile(BOOL savePreferencesToXmlFile);
+	virtual void SaveAllSettings() = 0;
+	virtual BOOL GetSavePreferencesToXmlFile() const = 0;
+	virtual void SetSavePreferencesToXmlFile(BOOL savePreferencesToXmlFile) = 0;
 
-	int CloseApplication();
+	virtual int CloseApplication() = 0;
 
-	boost::signals2::connection AddTabsInitializedObserver(
-		const TabsInitializedSignal::slot_type &observer);
-	boost::signals2::connection AddMainMenuPreShowObserver(
-		const MainMenuPreShowSignal::slot_type &observer);
-	boost::signals2::connection AddToolbarContextMenuObserver(
-		const ToolbarContextMenuSignal::slot_type &observer);
-	boost::signals2::connection AddFocusChangeObserver(
-		const FocusChangedSignal::slot_type &observer);
-	boost::signals2::connection AddApplicationShuttingDownObserver(
-		const ApplicationShuttingDownSignal::slot_type &observer);
+	virtual boost::signals2::connection AddTabsInitializedObserver(
+		const TabsInitializedSignal::slot_type &observer) = 0;
+	virtual boost::signals2::connection AddMainMenuPreShowObserver(
+		const MainMenuPreShowSignal::slot_type &observer) = 0;
+	virtual boost::signals2::connection AddToolbarContextMenuObserver(
+		const ToolbarContextMenuSignal::slot_type &observer) = 0;
+	virtual boost::signals2::connection AddFocusChangeObserver(
+		const FocusChangedSignal::slot_type &observer) = 0;
+	virtual boost::signals2::connection AddApplicationShuttingDownObserver(
+		const ApplicationShuttingDownSignal::slot_type &observer) = 0;
 };

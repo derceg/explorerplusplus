@@ -8,7 +8,7 @@
 #include <optional>
 
 class BookmarkTree;
-__interface CoreInterface;
+class CoreInterface;
 class TabContainer;
 
 using RawBookmarkItems = std::vector<BookmarkItem *>;

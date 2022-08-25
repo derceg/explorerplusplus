@@ -8,7 +8,7 @@
 #include "../Helper/BaseWindow.h"
 
 struct Config;
-__interface CoreInterface;
+class CoreInterface;
 
 class MainWindow : BaseWindow
 {

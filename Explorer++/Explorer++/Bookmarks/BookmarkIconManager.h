@@ -10,7 +10,7 @@
 
 class BookmarkItem;
 class IconFetcher;
-__interface CoreInterface;
+class CoreInterface;
 
 class BookmarkIconManager
 {

@@ -17,8 +17,8 @@
 
 class BookmarkIconManager;
 class BookmarkTree;
+class CoreInterface;
 class IconFetcher;
-__interface CoreInterface;
 
 class BookmarkListView : public BookmarkNavigatorInterface, private BookmarkDropTargetWindow
 {

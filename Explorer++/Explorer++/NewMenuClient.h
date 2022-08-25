@@ -7,7 +7,7 @@
 #include <winrt/base.h>
 #include <ShObjIdl.h>
 
-__interface CoreInterface;
+class CoreInterface;
 
 class NewMenuClient : public winrt::implements<NewMenuClient, INewMenuClient>
 {

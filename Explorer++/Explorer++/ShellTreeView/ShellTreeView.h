@@ -16,8 +16,8 @@
 
 class CachedIcons;
 struct Config;
+class CoreInterface;
 class FileActionHandler;
-__interface CoreInterface;
 class TabContainer;
 
 class ShellTreeView : public ShellDropTargetWindow<HTREEITEM>

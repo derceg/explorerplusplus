@@ -12,8 +12,8 @@
 #include <utility>
 
 class BookmarkIconManager;
+class CoreInterface;
 class IconFetcher;
-__interface CoreInterface;
 
 class BookmarkMenuBuilder
 {

@@ -7,7 +7,7 @@
 #include "ToolbarView.h"
 #include "../Helper/FileContextMenuManager.h"
 
-__interface CoreInterface;
+class CoreInterface;
 
 class DrivesToolbarView : public ToolbarView, private FileContextMenuHandler
 {

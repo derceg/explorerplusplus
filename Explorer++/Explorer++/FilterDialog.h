@@ -10,8 +10,8 @@
 #include <MsXml2.h>
 #include <objbase.h>
 
+class CoreInterface;
 class FilterDialog;
-__interface CoreInterface;
 
 class FilterDialogPersistentSettings : public DialogSettings
 {

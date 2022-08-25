@@ -21,8 +21,8 @@
 class BookmarkTree;
 class CachedIcons;
 struct Config;
+class CoreInterface;
 class FileActionHandler;
-__interface CoreInterface;
 class Navigation;
 struct PreservedTab;
 

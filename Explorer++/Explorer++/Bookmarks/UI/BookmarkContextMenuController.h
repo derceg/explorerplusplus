@@ -8,7 +8,7 @@
 #include "Bookmarks/BookmarkItem.h"
 
 class BookmarkTree;
-__interface CoreInterface;
+class CoreInterface;
 
 class BookmarkContextMenuController
 {

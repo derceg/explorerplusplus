@@ -6,7 +6,7 @@
 
 #include <boost/signals2.hpp>
 
-__interface CoreInterface;
+class CoreInterface;
 class Tab;
 class TabContainer;
 

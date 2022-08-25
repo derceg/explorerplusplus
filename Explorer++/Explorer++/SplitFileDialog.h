@@ -10,7 +10,7 @@
 #include <string>
 #include <unordered_map>
 
-__interface CoreInterface;
+class CoreInterface;
 class SplitFileDialog;
 
 class SplitFileDialogPersistentSettings : public DialogSettings

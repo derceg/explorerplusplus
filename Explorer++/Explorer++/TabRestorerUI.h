@@ -11,7 +11,7 @@
 #include <wil/resource.h>
 #include <unordered_map>
 
-__interface CoreInterface;
+class CoreInterface;
 
 class TabRestorerUI
 {

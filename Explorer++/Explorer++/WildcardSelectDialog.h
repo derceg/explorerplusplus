@@ -13,7 +13,7 @@
 #include <list>
 #include <string>
 
-__interface CoreInterface;
+class CoreInterface;
 class WildcardSelectDialog;
 
 class WildcardSelectDialogPersistentSettings : public DialogSettings

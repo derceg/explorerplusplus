@@ -15,8 +15,8 @@
 
 class BookmarkIconManager;
 class BookmarkTree;
+class CoreInterface;
 class IconFetcher;
-__interface CoreInterface;
 
 class BookmarksToolbar : private BookmarkDropTargetWindow
 {

@@ -10,8 +10,8 @@
 #include <wil/resource.h>
 
 class BookmarkTree;
+class CoreInterface;
 class IconFetcher;
-__interface CoreInterface;
 
 class BookmarksMainMenu
 {

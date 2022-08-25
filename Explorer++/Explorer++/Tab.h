@@ -8,10 +8,10 @@
 #include <boost/signals2.hpp>
 #include <memory>
 
+class CoreInterface;
 class FileActionHandler;
 struct FolderColumns;
 struct FolderSettings;
-__interface CoreInterface;
 struct PreservedTab;
 class ShellBrowser;
 __interface TabNavigationInterface;

@@ -8,8 +8,8 @@
 #include "../Helper/WindowSubclassWrapper.h"
 #include <wil/resource.h>
 
+class CoreInterface;
 class DarkModeGroupBox;
-__interface CoreInterface;
 class TabContainer;
 
 class OptionsDialog

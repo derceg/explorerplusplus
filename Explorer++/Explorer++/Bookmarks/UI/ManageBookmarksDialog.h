@@ -15,8 +15,8 @@
 class BookmarkNavigationController;
 class BookmarkTree;
 class BookmarkTreeView;
+class CoreInterface;
 class IconFetcher;
-__interface CoreInterface;
 class ManageBookmarksDialog;
 class Navigation;
 class WindowSubclassWrapper;

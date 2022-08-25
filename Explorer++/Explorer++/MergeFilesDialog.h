@@ -9,7 +9,7 @@
 #include "../Helper/ReferenceCount.h"
 #include "../Helper/ResizableDialog.h"
 
-__interface CoreInterface;
+class CoreInterface;
 class MergeFilesDialog;
 
 class MergeFilesDialogPersistentSettings : public DialogSettings

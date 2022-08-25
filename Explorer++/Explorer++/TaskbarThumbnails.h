@@ -10,7 +10,7 @@
 #include <wil/resource.h>
 
 struct Config;
-__interface CoreInterface;
+class CoreInterface;
 class TabContainer;
 
 class TaskbarThumbnails

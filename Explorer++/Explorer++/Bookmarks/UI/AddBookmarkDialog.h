@@ -15,7 +15,7 @@ class AddBookmarkDialog;
 class BookmarkItem;
 class BookmarkTree;
 class BookmarkTreeView;
-__interface CoreInterface;
+class CoreInterface;
 
 class AddBookmarkDialogPersistentSettings : public DialogSettings
 {

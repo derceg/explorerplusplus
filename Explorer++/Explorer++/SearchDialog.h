@@ -17,7 +17,7 @@
 #include <unordered_map>
 #include <vector>
 
-__interface CoreInterface;
+class CoreInterface;
 class SearchDialog;
 class TabContainer;
 
