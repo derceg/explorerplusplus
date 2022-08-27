@@ -48,6 +48,9 @@
     <ClCompile Include="AcceleratorParserTest.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
+    <ClCompile Include="DriveModelTest.cpp">
+      <Filter>Drives Toolbar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -70,6 +73,9 @@
     </Filter>
     <Filter Include="Plugins">
       <UniqueIdentifier>{a4c6e860-5447-45a4-9c38-43404e4883bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Drives Toolbar">
+      <UniqueIdentifier>{eebf535f-03fa-4f78-9ef6-eeabf13f1530}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

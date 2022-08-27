@@ -9,6 +9,9 @@
 #include "Bookmarks/UI/BookmarksToolbar.h"
 #include "Config.h"
 #include "DarkModeHelper.h"
+#include "DriveEnumeratorImpl.h"
+#include "DriveModel.h"
+#include "DriveWatcherImpl.h"
 #include "DrivesToolbar.h"
 #include "DrivesToolbarView.h"
 #include "Explorer++_internal.h"
@@ -356,8 +359,15 @@ void Explorerplusplus::CreateBookmarksToolbar()
 
 void Explorerplusplus::CreateDrivesToolbar()
 {
+	auto drivesToolbarView = DrivesToolbarView::Create(m_hMainRebar, this, m_hLanguageModule);
+
+	auto driveEnumerator = std::make_unique<DriveEnumeratorImpl>();
+	auto driveWatcher = std::make_unique<DriveWatcherImpl>(m_hContainer);
+	auto driveModel =
+		std::make_unique<DriveModel>(std::move(driveEnumerator), std::move(driveWatcher));
+
 	m_drivesToolbar =
-		DrivesToolbar::Create(m_hMainRebar, this, m_hLanguageModule, m_navigation.get());
+		DrivesToolbar::Create(drivesToolbarView, std::move(driveModel), this, m_navigation.get());
 	m_drivesToolbar->GetView()->AddToolbarUpdatedObserver(std::bind_front(
 		&Explorerplusplus::OnRebarToolbarUpdated, this, m_drivesToolbar->GetView()->GetHWND()));
 }

@@ -7,7 +7,6 @@
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"
-#include "HardwareChangeNotifier.h"
 #include "MainResource.h"
 #include "SelectColumnsDialog.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -290,19 +289,6 @@ LRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam, LPARAM lParam)
 	/* Forward the message to the treeview, so that
 	it can handle the message as well. */
 	SendMessage(m_shellTreeView->GetHWND(), WM_DEVICECHANGE, wParam, lParam);
-
-	switch (wParam)
-	{
-	case DBT_DEVICEARRIVAL:
-		HardwareChangeNotifier::GetInstance().NotifyDeviceArrival(
-			reinterpret_cast<DEV_BROADCAST_HDR *>(lParam));
-		break;
-
-	case DBT_DEVICEREMOVECOMPLETE:
-		HardwareChangeNotifier::GetInstance().NotifyDeviceRemovalComplete(
-			reinterpret_cast<DEV_BROADCAST_HDR *>(lParam));
-		break;
-	}
 
 	return TRUE;
 }

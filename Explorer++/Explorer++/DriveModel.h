@@ -4,14 +4,16 @@
 
 #pragma once
 
-#include "HardwareChangeNotifier.h"
 #include <boost/signals2.hpp>
-#include <Dbt.h>
+#include <memory>
 #include <optional>
 #include <set>
 
+class DriveEnumerator;
+class DriveWatcher;
+
 // Maintains a sorted list of drives and provides notifications on drive additions/removals.
-class DriveModel : private HardwareChangeObserver
+class DriveModel
 {
 public:
 	using DriveAddedSignal = boost::signals2::signal<void(const std::wstring &path, size_t index)>;
@@ -19,7 +21,8 @@ public:
 	using DriveRemovedSignal =
 		boost::signals2::signal<void(const std::wstring &path, size_t oldIndex)>;
 
-	DriveModel();
+	DriveModel(std::unique_ptr<DriveEnumerator> driveEnumerator,
+		std::unique_ptr<DriveWatcher> driveWatcher);
 	~DriveModel();
 
 	DriveModel(const DriveModel &) = delete;
@@ -37,16 +40,15 @@ public:
 		const DriveRemovedSignal::slot_type &observer);
 
 private:
-	void InitializeDriveList();
-
-	// HardwareChangeObserver
-	void OnDeviceArrival(DEV_BROADCAST_HDR *deviceBroadcast) override;
-	void OnDeviceRemoveComplete(DEV_BROADCAST_HDR *deviceBroadcast) override;
+	void OnDriveAdded(const std::wstring &path);
+	void OnDriveUpdated(const std::wstring &path);
+	void OnDriveRemoved(const std::wstring &path);
 
 	void AddDrive(const std::wstring &path);
 	void RemoveDrive(const std::wstring &path);
 
 	std::set<std::wstring> m_drives;
+	std::unique_ptr<DriveWatcher> m_driveWatcher;
 
 	DriveAddedSignal m_driveAddedSignal;
 	DriveUpdatedSignal m_driveUpdatedSignal;

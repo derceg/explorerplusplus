@@ -100,9 +100,6 @@
     <ClCompile Include="HandleWindowState.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="HardwareChangeNotifier.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Initialization.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -469,6 +466,12 @@
     <ClCompile Include="DriveModel.cpp">
       <Filter>Drives Toolbar</Filter>
     </ClCompile>
+    <ClCompile Include="DriveEnumeratorImpl.cpp">
+      <Filter>Drives Toolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="DriveWatcherImpl.cpp">
+      <Filter>Drives Toolbar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -518,9 +521,6 @@
     </ClInclude>
     <ClInclude Include="HelpFileMissingDialog.h">
       <Filter>General Dialogs</Filter>
-    </ClInclude>
-    <ClInclude Include="HardwareChangeNotifier.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="IDropFilesCallback.h">
       <Filter>Core</Filter>
@@ -934,6 +934,18 @@
       <Filter>Views</Filter>
     </ClInclude>
     <ClInclude Include="DriveModel.h">
+      <Filter>Drives Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="DriveEnumerator.h">
+      <Filter>Drives Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="DriveEnumeratorImpl.h">
+      <Filter>Drives Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="DriveWatcherImpl.h">
+      <Filter>Drives Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="DriveWatcher.h">
       <Filter>Drives Toolbar</Filter>
     </ClInclude>
   </ItemGroup>

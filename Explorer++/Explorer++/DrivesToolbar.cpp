@@ -6,6 +6,7 @@
 #include "DrivesToolbar.h"
 #include "Config.h"
 #include "CoreInterface.h"
+#include "DriveModel.h"
 #include "DrivesToolbarView.h"
 #include "Navigation.h"
 #include "TabContainer.h"
@@ -34,7 +35,7 @@ public:
 	std::wstring GetTooltipText() const override
 	{
 		std::wstring infoTip;
-		HRESULT hr = GetItemInfoTip(m_path.c_str(), infoTip);
+		HRESULT hr = GetItemInfoTip(m_path, infoTip);
 
 		if (FAILED(hr))
 		{
@@ -62,28 +63,31 @@ private:
 	std::wstring m_path;
 };
 
-DrivesToolbar *DrivesToolbar::Create(HWND parent, CoreInterface *coreInterface, HINSTANCE instance,
-	Navigation *navigation)
+DrivesToolbar *DrivesToolbar::Create(DrivesToolbarView *view,
+	std::unique_ptr<DriveModel> driveModel, CoreInterface *coreInterface, Navigation *navigation)
 {
-	return new DrivesToolbar(parent, coreInterface, instance, navigation);
+	return new DrivesToolbar(view, std::move(driveModel), coreInterface, navigation);
 }
 
-DrivesToolbar::DrivesToolbar(HWND parent, CoreInterface *coreInterface, HINSTANCE instance,
-	Navigation *navigation) :
-	m_view(DrivesToolbarView::Create(parent, coreInterface, instance)),
+DrivesToolbar::DrivesToolbar(DrivesToolbarView *view, std::unique_ptr<DriveModel> driveModel,
+	CoreInterface *coreInterface, Navigation *navigation) :
+	m_view(view),
+	m_driveModel(std::move(driveModel)),
 	m_coreInterface(coreInterface),
 	m_navigation(navigation)
 {
 	Initialize();
 }
 
+DrivesToolbar::~DrivesToolbar() = default;
+
 void DrivesToolbar::Initialize()
 {
 	AddDrives();
 
-	m_driveModel.AddDriveAddedObserver(std::bind_front(&DrivesToolbar::OnDriveAdded, this));
-	m_driveModel.AddDriveUpdatedObserver(std::bind_front(&DrivesToolbar::OnDriveUpdated, this));
-	m_driveModel.AddDriveRemovedObserver(std::bind_front(&DrivesToolbar::OnDriveRemoved, this));
+	m_driveModel->AddDriveAddedObserver(std::bind_front(&DrivesToolbar::OnDriveAdded, this));
+	m_driveModel->AddDriveUpdatedObserver(std::bind_front(&DrivesToolbar::OnDriveUpdated, this));
+	m_driveModel->AddDriveRemovedObserver(std::bind_front(&DrivesToolbar::OnDriveRemoved, this));
 
 	m_view->AddWindowDestroyedObserver(std::bind_front(&DrivesToolbar::OnWindowDestroyed, this));
 }
@@ -95,7 +99,7 @@ DrivesToolbarView *DrivesToolbar::GetView() const
 
 void DrivesToolbar::AddDrives()
 {
-	const auto &drives = m_driveModel.GetDrives();
+	const auto &drives = m_driveModel->GetDrives();
 
 	size_t index = 0;
 
@@ -125,7 +129,7 @@ void DrivesToolbar::OnDriveAdded(const std::wstring &path, size_t index)
 
 void DrivesToolbar::OnDriveUpdated(const std::wstring &path)
 {
-	auto index = m_driveModel.GetDriveIndex(path);
+	auto index = m_driveModel->GetDriveIndex(path);
 
 	if (!index)
 	{

@@ -4,48 +4,30 @@
 
 #include "stdafx.h"
 #include "DriveModel.h"
-#include "../Helper/DriveInfo.h"
-#include <format>
-#include <memory>
+#include "DriveEnumerator.h"
+#include "DriveWatcher.h"
 
-DriveModel::DriveModel()
+DriveModel::DriveModel(std::unique_ptr<DriveEnumerator> driveEnumerator,
+	std::unique_ptr<DriveWatcher> driveWatcher) :
+	m_driveWatcher(std::move(driveWatcher))
 {
-	InitializeDriveList();
+	auto drivesResult = driveEnumerator->GetDrives();
 
-	HardwareChangeNotifier::GetInstance().AddObserver(this);
-}
-
-DriveModel::~DriveModel()
-{
-	HardwareChangeNotifier::GetInstance().RemoveObserver(this);
-}
-
-void DriveModel::InitializeDriveList()
-{
-	DWORD size = GetLogicalDriveStrings(0, nullptr);
-
-	if (size == 0)
+	// Retrieving the list of drives shouldn't fail, so any failure here would be unexpected. But
+	// there's not much that can be done in that situation, so any error is ignored.
+	if (drivesResult)
 	{
-		return;
+		m_drives = drivesResult.value();
 	}
 
-	auto driveStrings = std::make_unique<TCHAR[]>(size);
-	size = GetLogicalDriveStrings(size, driveStrings.get());
-
-	if (size == 0)
-	{
-		return;
-	}
-
-	TCHAR *currentDrive = driveStrings.get();
-
-	while (*currentDrive != '\0')
-	{
-		m_drives.emplace(currentDrive);
-
-		currentDrive += (lstrlen(currentDrive) + 1);
-	}
+	// There's no need to disconnect these observers, as the DriveWatcher instance has the same
+	// lifetime as this class.
+	m_driveWatcher->AddDriveAddedObserver(std::bind_front(&DriveModel::OnDriveAdded, this));
+	m_driveWatcher->AddDriveUpdatedObserver(std::bind_front(&DriveModel::OnDriveUpdated, this));
+	m_driveWatcher->AddDriveRemovedObserver(std::bind_front(&DriveModel::OnDriveRemoved, this));
 }
+
+DriveModel::~DriveModel() = default;
 
 const std::set<std::wstring> &DriveModel::GetDrives() const
 {
@@ -82,48 +64,24 @@ boost::signals2::connection DriveModel::AddDriveRemovedObserver(
 	return m_driveRemovedSignal.connect(observer);
 }
 
-void DriveModel::OnDeviceArrival(DEV_BROADCAST_HDR *deviceBroadcast)
+void DriveModel::OnDriveAdded(const std::wstring &path)
 {
-	if (deviceBroadcast->dbch_devicetype != DBT_DEVTYP_VOLUME)
-	{
-		return;
-	}
-
-	auto *volume = reinterpret_cast<DEV_BROADCAST_VOLUME *>(deviceBroadcast);
-
-	TCHAR driveLetter = GetDriveLetterFromMask(volume->dbcv_unitmask);
-	std::wstring path = std::format(L"{}:\\", driveLetter);
-
-	if (WI_IsFlagSet(volume->dbcv_flags, DBTF_MEDIA))
-	{
-		m_driveUpdatedSignal(path.c_str());
-	}
-	else
-	{
-		AddDrive(path.c_str());
-	}
+	AddDrive(path);
 }
 
-void DriveModel::OnDeviceRemoveComplete(DEV_BROADCAST_HDR *deviceBroadcast)
+void DriveModel::OnDriveUpdated(const std::wstring &path)
 {
-	if (deviceBroadcast->dbch_devicetype != DBT_DEVTYP_VOLUME)
+	if (!m_drives.contains(path))
 	{
 		return;
 	}
 
-	auto *volume = reinterpret_cast<DEV_BROADCAST_VOLUME *>(deviceBroadcast);
+	m_driveUpdatedSignal(path);
+}
 
-	TCHAR driveLetter = GetDriveLetterFromMask(volume->dbcv_unitmask);
-	std::wstring path = std::format(L"{}:\\", driveLetter);
-
-	if (WI_IsFlagSet(volume->dbcv_flags, DBTF_MEDIA))
-	{
-		m_driveUpdatedSignal(path.c_str());
-	}
-	else
-	{
-		RemoveDrive(path.c_str());
-	}
+void DriveModel::OnDriveRemoved(const std::wstring &path)
+{
+	RemoveDrive(path);
 }
 
 void DriveModel::AddDrive(const std::wstring &path)

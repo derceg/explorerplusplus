@@ -4,9 +4,11 @@
 
 #pragma once
 
-#include "DriveModel.h"
+#include <memory>
+#include <string>
 
 class CoreInterface;
+class DriveModel;
 class DrivesToolbarView;
 struct MouseEvent;
 class Navigation;
@@ -14,8 +16,8 @@ class Navigation;
 class DrivesToolbar
 {
 public:
-	static DrivesToolbar *Create(HWND parent, CoreInterface *coreInterface, HINSTANCE instance,
-		Navigation *navigation);
+	static DrivesToolbar *Create(DrivesToolbarView *view, std::unique_ptr<DriveModel> driveModel,
+		CoreInterface *coreInterface, Navigation *navigation);
 
 	DrivesToolbar(const DrivesToolbar &) = delete;
 	DrivesToolbar(DrivesToolbar &&) = delete;
@@ -25,9 +27,9 @@ public:
 	DrivesToolbarView *GetView() const;
 
 private:
-	DrivesToolbar(HWND parent, CoreInterface *coreInterface, HINSTANCE instance,
-		Navigation *navigation);
-	~DrivesToolbar() = default;
+	DrivesToolbar(DrivesToolbarView *view, std::unique_ptr<DriveModel> driveModel,
+		CoreInterface *coreInterface, Navigation *navigation);
+	~DrivesToolbar();
 
 	void Initialize();
 
@@ -45,7 +47,7 @@ private:
 	void OnWindowDestroyed();
 
 	DrivesToolbarView *m_view;
+	std::unique_ptr<DriveModel> m_driveModel;
 	CoreInterface *m_coreInterface;
 	Navigation *m_navigation;
-	DriveModel m_driveModel;
 };

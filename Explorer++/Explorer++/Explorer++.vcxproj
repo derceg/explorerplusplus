@@ -481,6 +481,7 @@
   <ItemGroup>
     <ClCompile Include="AboutDialog.cpp" />
     <ClCompile Include="ApplicationToolbarHelper.cpp" />
+    <ClCompile Include="DriveEnumeratorImpl.cpp" />
     <ClCompile Include="DriveModel.cpp" />
     <ClCompile Include="DrivesToolbarView.cpp" />
     <ClCompile Include="ToolbarView.cpp" />
@@ -551,7 +552,7 @@
     <ClCompile Include="FileSelectionTests.cpp" />
     <ClCompile Include="FilterDialog.cpp" />
     <ClCompile Include="HandleWindowState.cpp" />
-    <ClCompile Include="HardwareChangeNotifier.cpp" />
+    <ClCompile Include="DriveWatcherImpl.cpp" />
     <ClCompile Include="HelpFileMissingDialog.cpp" />
     <ClCompile Include="HolderWindow.cpp" />
     <ClCompile Include="IDropFilesCallback.cpp" />
@@ -655,8 +656,11 @@
     <ClInclude Include="Accelerator.h" />
     <ClInclude Include="AcceleratorMappings.h" />
     <ClInclude Include="ApplicationToolbarHelper.h" />
+    <ClInclude Include="DriveEnumerator.h" />
+    <ClInclude Include="DriveEnumeratorImpl.h" />
     <ClInclude Include="DriveModel.h" />
     <ClInclude Include="DrivesToolbarView.h" />
+    <ClInclude Include="DriveWatcher.h" />
     <ClInclude Include="ToolbarView.h" />
     <ClInclude Include="Bookmarks\BookmarkIconManager.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkMenuController.h" />
@@ -713,7 +717,7 @@
     <ClInclude Include="Explorer++VersionInfo.h" />
     <ClInclude Include="Explorer++_internal.h" />
     <ClInclude Include="FilterDialog.h" />
-    <ClInclude Include="HardwareChangeNotifier.h" />
+    <ClInclude Include="DriveWatcherImpl.h" />
     <ClInclude Include="HelpFileMissingDialog.h" />
     <ClInclude Include="HolderWindow.h" />
     <ClInclude Include="HolderWindowInternal.h" />
