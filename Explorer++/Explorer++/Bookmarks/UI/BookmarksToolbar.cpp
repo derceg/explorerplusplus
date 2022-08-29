@@ -74,6 +74,8 @@ void BookmarksToolbar::InitializeToolbar(IconFetcher *iconFetcher)
 	if (darkModeHelper.IsDarkModeEnabled())
 	{
 		darkModeHelper.SetDarkModeForToolbarTooltips(m_hToolbar);
+
+		SendMessage(m_hToolbar, TB_SETINSERTMARKCOLOR, 0, darkModeHelper.FOREGROUND_COLOR);
 	}
 }
 
