@@ -57,10 +57,18 @@ std::wstring GetWindowString(HWND hwnd)
 		return {};
 	}
 
-	std::wstring text;
-	text.resize(textLength + 1);
+	// Add space for the terminating NULL.
+	textLength += 1;
 
-	GetWindowText(hwnd, text.data(), static_cast<int>(text.capacity()));
+	std::wstring text;
+	text.resize(textLength);
+
+	GetWindowText(hwnd, text.data(), textLength);
+
+	// GetWindowText will copy the entire string, along with the terminating NULL. If the buffer
+	// weren't reduced in size here, the terminating NULL would then end up as part of the actual
+	// string, which is undesirable.
+	text.resize(textLength - 1);
 
 	return text;
 }
