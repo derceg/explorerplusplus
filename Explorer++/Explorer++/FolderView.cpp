@@ -562,9 +562,9 @@ IFACEMETHODIMP FolderView::SetAutomationObject(IDispatch *dispatch)
 
 namespace winrt
 {
-	template <>
-	bool is_guid_of<IFolderView2>(guid const &id) noexcept
-	{
-		return is_guid_of<IFolderView2, IFolderView>(id);
-	}
+template <>
+bool is_guid_of<IFolderView2>(guid const &id) noexcept
+{
+	return is_guid_of<IFolderView2, IFolderView>(id);
+}
 }

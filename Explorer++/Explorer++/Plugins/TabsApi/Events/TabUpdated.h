@@ -11,19 +11,19 @@ class TabContainer;
 
 namespace Plugins
 {
-	class TabUpdated : public Event
-	{
-	public:
-		TabUpdated(TabContainer *tabContainer);
+class TabUpdated : public Event
+{
+public:
+	TabUpdated(TabContainer *tabContainer);
 
-	protected:
-		boost::signals2::connection connectObserver(sol::protected_function observer,
-			sol::this_state state) override;
+protected:
+	boost::signals2::connection connectObserver(sol::protected_function observer,
+		sol::this_state state) override;
 
-	private:
-		void onTabUpdated(sol::protected_function observer, sol::this_state state, const Tab &tab,
-			Tab::PropertyType propertyType);
+private:
+	void onTabUpdated(sol::protected_function observer, sol::this_state state, const Tab &tab,
+		Tab::PropertyType propertyType);
 
-		TabContainer *m_tabContainer;
-	};
+	TabContainer *m_tabContainer;
+};
 }

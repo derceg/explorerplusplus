@@ -24,39 +24,39 @@
 
 namespace
 {
-	const TCHAR CLASS_NAME[] = _T("DisplayWindow");
-	const TCHAR WINDOW_NAME[] = _T("DisplayWindow");
+const TCHAR CLASS_NAME[] = _T("DisplayWindow");
+const TCHAR WINDOW_NAME[] = _T("DisplayWindow");
 }
 
 ULONG_PTR token;
 
 namespace
 {
-	BOOL RegisterDisplayWindowClass()
+BOOL RegisterDisplayWindowClass()
+{
+	Gdiplus::GdiplusStartupInput startupInput;
+
+	WNDCLASS wc;
+	wc.style = 0;
+	wc.lpfnWndProc = DisplayWindow::DisplayWindowProcStub;
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = sizeof(DisplayWindow *);
+	wc.hInstance = GetModuleHandle(nullptr);
+	wc.hIcon = nullptr;
+	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	wc.hbrBackground = nullptr;
+	wc.lpszMenuName = nullptr;
+	wc.lpszClassName = CLASS_NAME;
+
+	if (!RegisterClass(&wc))
 	{
-		Gdiplus::GdiplusStartupInput startupInput;
-
-		WNDCLASS wc;
-		wc.style = 0;
-		wc.lpfnWndProc = DisplayWindow::DisplayWindowProcStub;
-		wc.cbClsExtra = 0;
-		wc.cbWndExtra = sizeof(DisplayWindow *);
-		wc.hInstance = GetModuleHandle(nullptr);
-		wc.hIcon = nullptr;
-		wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-		wc.hbrBackground = nullptr;
-		wc.lpszMenuName = nullptr;
-		wc.lpszClassName = CLASS_NAME;
-
-		if (!RegisterClass(&wc))
-		{
-			return FALSE;
-		}
-
-		Gdiplus::GdiplusStartup(&token, &startupInput, nullptr);
-
-		return TRUE;
+		return FALSE;
 	}
+
+	Gdiplus::GdiplusStartup(&token, &startupInput, nullptr);
+
+	return TRUE;
+}
 }
 
 HWND CreateDisplayWindow(HWND parent, DWInitialSettings_t *pSettings)

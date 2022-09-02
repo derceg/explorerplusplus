@@ -21,12 +21,12 @@
 
 namespace NMergeFilesDialog
 {
-	const int WM_APP_SETTOTALMERGECOUNT = WM_APP + 1;
-	const int WM_APP_SETCURRENTMERGECOUNT = WM_APP + 2;
-	const int WM_APP_MERGINGFINISHED = WM_APP + 3;
-	const int WM_APP_OUTPUTFILEINVALID = WM_APP + 4;
+const int WM_APP_SETTOTALMERGECOUNT = WM_APP + 1;
+const int WM_APP_SETCURRENTMERGECOUNT = WM_APP + 2;
+const int WM_APP_MERGINGFINISHED = WM_APP + 3;
+const int WM_APP_OUTPUTFILEINVALID = WM_APP + 4;
 
-	DWORD WINAPI MergeFilesThread(LPVOID pParam);
+DWORD WINAPI MergeFilesThread(LPVOID pParam);
 }
 
 const TCHAR MergeFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("MergeFiles");

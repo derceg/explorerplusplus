@@ -9,18 +9,18 @@
 
 namespace CommandLine
 {
-	struct Settings
-	{
-		bool enablePlugins;
-		ShellChangeNotificationType shellChangeNotificationType;
-		std::wstring language;
-		std::vector<std::wstring> directories;
-	};
+struct Settings
+{
+	bool enablePlugins;
+	ShellChangeNotificationType shellChangeNotificationType;
+	std::wstring language;
+	std::vector<std::wstring> directories;
+};
 
-	struct ExitInfo
-	{
-		int exitCode;
-	};
+struct ExitInfo
+{
+	int exitCode;
+};
 
-	std::variant<Settings, ExitInfo> ProcessCommandLine();
+std::variant<Settings, ExitInfo> ProcessCommandLine();
 }

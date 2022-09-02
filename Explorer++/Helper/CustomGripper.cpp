@@ -15,15 +15,15 @@
 
 namespace
 {
-	constexpr int PART_ID = SBP_SIZEBOX;
-	constexpr int STATE_ID = SZB_RIGHTALIGN;
+constexpr int PART_ID = SBP_SIZEBOX;
+constexpr int STATE_ID = SZB_RIGHTALIGN;
 
-	LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	void OnPaint(HWND hwnd);
+LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+void OnPaint(HWND hwnd);
 
-	bool g_isAppThemed;
-	wil::unique_htheme g_theme;
-	SIZE g_size;
+bool g_isAppThemed;
+wil::unique_htheme g_theme;
+SIZE g_size;
 }
 
 void CustomGripper::Initialize(HWND mainWindow, COLORREF backgroundColor)
@@ -60,44 +60,44 @@ void CustomGripper::Initialize(HWND mainWindow, COLORREF backgroundColor)
 
 namespace
 {
-	LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
 	{
-		switch (msg)
-		{
-		case WM_PAINT:
-			OnPaint(hwnd);
-			return 0;
-		}
-
-		return DefWindowProc(hwnd, msg, wParam, lParam);
+	case WM_PAINT:
+		OnPaint(hwnd);
+		return 0;
 	}
 
-	void OnPaint(HWND hwnd)
+	return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+void OnPaint(HWND hwnd)
+{
+	PAINTSTRUCT ps;
+	HDC hdc = BeginPaint(hwnd, &ps);
+
+	RECT rect;
+	GetClientRect(hwnd, &rect);
+
+	// Visual styles can only be turned off prior to Windows 8. So drawing without visual styles
+	// is something that's only required to support Windows 7.
+	if (g_isAppThemed)
 	{
-		PAINTSTRUCT ps;
-		HDC hdc = BeginPaint(hwnd, &ps);
-
-		RECT rect;
-		GetClientRect(hwnd, &rect);
-
-		// Visual styles can only be turned off prior to Windows 8. So drawing without visual styles
-		// is something that's only required to support Windows 7.
-		if (g_isAppThemed)
+		if (IsThemeBackgroundPartiallyTransparent(g_theme.get(), PART_ID, STATE_ID))
 		{
-			if (IsThemeBackgroundPartiallyTransparent(g_theme.get(), PART_ID, STATE_ID))
-			{
-				DrawThemeParentBackground(hwnd, hdc, &ps.rcPaint);
-			}
-
-			DrawThemeBackground(g_theme.get(), hdc, PART_ID, STATE_ID, &rect, &ps.rcPaint);
-		}
-		else
-		{
-			DrawFrameControl(hdc, &rect, DFC_SCROLL, DFCS_SCROLLSIZEGRIP);
+			DrawThemeParentBackground(hwnd, hdc, &ps.rcPaint);
 		}
 
-		EndPaint(hwnd, &ps);
+		DrawThemeBackground(g_theme.get(), hdc, PART_ID, STATE_ID, &rect, &ps.rcPaint);
 	}
+	else
+	{
+		DrawFrameControl(hdc, &rect, DFC_SCROLL, DFCS_SCROLLSIZEGRIP);
+	}
+
+	EndPaint(hwnd, &ps);
+}
 }
 
 SIZE CustomGripper::GetDpiScaledSize(HWND parentWindow)

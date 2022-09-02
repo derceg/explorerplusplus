@@ -365,9 +365,9 @@ IFACEMETHODIMP WebBrowserApp::Invoke(DISPID dispIdMember, REFIID riid, LCID loca
 
 namespace winrt
 {
-	template <>
-	bool is_guid_of<IWebBrowserApp>(guid const &id) noexcept
-	{
-		return is_guid_of<IWebBrowserApp, IWebBrowser, IDispatch>(id);
-	}
+template <>
+bool is_guid_of<IWebBrowserApp>(guid const &id) noexcept
+{
+	return is_guid_of<IWebBrowserApp, IWebBrowser, IDispatch>(id);
+}
 }

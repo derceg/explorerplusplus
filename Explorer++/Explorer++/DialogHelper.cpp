@@ -27,30 +27,30 @@
 
 namespace
 {
-	const TCHAR DIALOGS_REGISTRY_KEY[] = _T("Software\\Explorer++\\Dialogs");
-	const TCHAR DIALOGS_XML_KEY[] = _T("State");
+const TCHAR DIALOGS_REGISTRY_KEY[] = _T("Software\\Explorer++\\Dialogs");
+const TCHAR DIALOGS_XML_KEY[] = _T("State");
 
-	/* Safe provided that the object returned through
-	GetInstance is stable throughout the lifetime of
-	the program (which is true, as these are all
-	singletons). */
-	DialogSettings *const DIALOG_SETTINGS[] = { &SearchDialogPersistentSettings::GetInstance(),
-		&WildcardSelectDialogPersistentSettings::GetInstance(),
-		&SetFileAttributesDialogPersistentSettings::GetInstance(),
-		&RenameTabDialogPersistentSettings::GetInstance(),
-		&MassRenameDialogPersistentSettings::GetInstance(),
-		&FilterDialogPersistentSettings::GetInstance(),
-		&ColorRuleDialogPersistentSettings::GetInstance(),
-		&CustomizeColorsDialogPersistentSettings::GetInstance(),
-		&SplitFileDialogPersistentSettings::GetInstance(),
-		&DestroyFilesDialogPersistentSettings::GetInstance(),
-		&MergeFilesDialogPersistentSettings::GetInstance(),
-		&SelectColumnsDialogPersistentSettings::GetInstance(),
-		&SetDefaultColumnsDialogPersistentSettings::GetInstance(),
-		&AddBookmarkDialogPersistentSettings::GetInstance(),
-		&ManageBookmarksDialogPersistentSettings::GetInstance(),
-		&DisplayColoursDialogPersistentSettings::GetInstance(),
-		&UpdateCheckDialogPersistentSettings::GetInstance() };
+/* Safe provided that the object returned through
+GetInstance is stable throughout the lifetime of
+the program (which is true, as these are all
+singletons). */
+DialogSettings *const DIALOG_SETTINGS[] = { &SearchDialogPersistentSettings::GetInstance(),
+	&WildcardSelectDialogPersistentSettings::GetInstance(),
+	&SetFileAttributesDialogPersistentSettings::GetInstance(),
+	&RenameTabDialogPersistentSettings::GetInstance(),
+	&MassRenameDialogPersistentSettings::GetInstance(),
+	&FilterDialogPersistentSettings::GetInstance(),
+	&ColorRuleDialogPersistentSettings::GetInstance(),
+	&CustomizeColorsDialogPersistentSettings::GetInstance(),
+	&SplitFileDialogPersistentSettings::GetInstance(),
+	&DestroyFilesDialogPersistentSettings::GetInstance(),
+	&MergeFilesDialogPersistentSettings::GetInstance(),
+	&SelectColumnsDialogPersistentSettings::GetInstance(),
+	&SetDefaultColumnsDialogPersistentSettings::GetInstance(),
+	&AddBookmarkDialogPersistentSettings::GetInstance(),
+	&ManageBookmarksDialogPersistentSettings::GetInstance(),
+	&DisplayColoursDialogPersistentSettings::GetInstance(),
+	&UpdateCheckDialogPersistentSettings::GetInstance() };
 }
 
 void Explorerplusplus::LoadDialogStatesFromRegistry()

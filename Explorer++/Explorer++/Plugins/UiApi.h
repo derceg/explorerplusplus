@@ -8,17 +8,17 @@ class UiTheming;
 
 namespace Plugins
 {
-	class UiApi
-	{
-	public:
-		UiApi(UiTheming *uiTheming);
+class UiApi
+{
+public:
+	UiApi(UiTheming *uiTheming);
 
-		bool setListViewColors(const std::wstring &backgroundColorString,
-			const std::wstring &textColorString);
-		bool setTreeViewColors(const std::wstring &backgroundColorString,
-			const std::wstring &textColorString);
+	bool setListViewColors(const std::wstring &backgroundColorString,
+		const std::wstring &textColorString);
+	bool setTreeViewColors(const std::wstring &backgroundColorString,
+		const std::wstring &textColorString);
 
-	private:
-		UiTheming *m_uiTheming;
-	};
+private:
+	UiTheming *m_uiTheming;
+};
 }

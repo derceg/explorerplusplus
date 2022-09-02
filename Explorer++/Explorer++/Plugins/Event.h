@@ -10,21 +10,21 @@
 
 namespace Plugins
 {
-	class Event
-	{
-	public:
-		Event();
-		virtual ~Event();
+class Event
+{
+public:
+	Event();
+	virtual ~Event();
 
-		int addObserver(sol::protected_function observer, sol::this_state state);
-		void removeObserver(int id);
+	int addObserver(sol::protected_function observer, sol::this_state state);
+	void removeObserver(int id);
 
-	protected:
-		virtual boost::signals2::connection connectObserver(sol::protected_function observer,
-			sol::this_state state) = 0;
+protected:
+	virtual boost::signals2::connection connectObserver(sol::protected_function observer,
+		sol::this_state state) = 0;
 
-	private:
-		int m_connectionIdCounter;
-		std::unordered_map<int, boost::signals2::connection> m_connections;
-	};
+private:
+	int m_connectionIdCounter;
+	std::unordered_map<int, boost::signals2::connection> m_connections;
+};
 }

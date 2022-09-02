@@ -6,6 +6,6 @@
 
 namespace Console
 {
-	bool AttachParentConsole();
-	bool ReleaseConsole();
+bool AttachParentConsole();
+bool ReleaseConsole();
 }

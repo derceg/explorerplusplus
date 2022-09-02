@@ -12,8 +12,8 @@ class UiTheming;
 
 namespace Plugins
 {
-	class PluginCommandManager;
-	class PluginMenuManager;
+class PluginCommandManager;
+class PluginMenuManager;
 }
 
 __interface PluginInterface

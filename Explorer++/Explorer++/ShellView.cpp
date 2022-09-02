@@ -140,9 +140,9 @@ IFACEMETHODIMP ShellView::ContextSensitiveHelp(BOOL enterMode)
 
 namespace winrt
 {
-	template <>
-	bool is_guid_of<IShellView>(guid const &id) noexcept
-	{
-		return is_guid_of<IShellView, IOleWindow>(id);
-	}
+template <>
+bool is_guid_of<IShellView>(guid const &id) noexcept
+{
+	return is_guid_of<IShellView, IOleWindow>(id);
+}
 }

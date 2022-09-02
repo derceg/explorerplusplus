@@ -15,8 +15,8 @@
 
 namespace NColorRuleDialog
 {
-	LRESULT CALLBACK StaticColorProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+LRESULT CALLBACK StaticColorProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 }
 
 const TCHAR ColorRuleDialogPersistentSettings::SETTINGS_KEY[] = _T("ColorRules");

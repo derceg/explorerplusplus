@@ -10,5 +10,5 @@
 
 namespace Plugins
 {
-	std::optional<Accelerator> parseAccelerator(const std::wstring &acceleratorString);
+std::optional<Accelerator> parseAccelerator(const std::wstring &acceleratorString);
 }

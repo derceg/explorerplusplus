@@ -12,22 +12,22 @@
 
 namespace Plugins
 {
-	class MenuApi
-	{
-	public:
-		MenuApi(PluginMenuManager *pluginMenuManager);
-		~MenuApi();
+class MenuApi
+{
+public:
+	MenuApi(PluginMenuManager *pluginMenuManager);
+	~MenuApi();
 
-		std::optional<int> create(const std::wstring &text, sol::protected_function callback);
-		void remove(int menuItemId);
+	std::optional<int> create(const std::wstring &text, sol::protected_function callback);
+	void remove(int menuItemId);
 
-	private:
-		void onMenuItemClicked(int menuItemId);
+private:
+	void onMenuItemClicked(int menuItemId);
 
-		PluginMenuManager *m_pluginMenuManager;
+	PluginMenuManager *m_pluginMenuManager;
 
-		std::vector<boost::signals2::scoped_connection> m_connections;
+	std::vector<boost::signals2::scoped_connection> m_connections;
 
-		std::unordered_map<int, sol::protected_function> m_pluginMenuItems;
-	};
+	std::unordered_map<int, sol::protected_function> m_pluginMenuItems;
+};
 }

@@ -6,12 +6,12 @@
 
 namespace DarkModeButton
 {
-	enum class ButtonType
-	{
-		Checkbox,
-		Radio
-	};
+enum class ButtonType
+{
+	Checkbox,
+	Radio
+};
 
-	// Handles checkboxes and radio buttons.
-	void DrawButtonText(const NMCUSTOMDRAW *customDraw, ButtonType buttonType);
+// Handles checkboxes and radio buttons.
+void DrawButtonText(const NMCUSTOMDRAW *customDraw, ButtonType buttonType);
 }

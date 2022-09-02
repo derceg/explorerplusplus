@@ -10,16 +10,16 @@ class TabContainer;
 
 namespace Plugins
 {
-	class TabRemoved : public Event
-	{
-	public:
-		TabRemoved(TabContainer *tabContainer);
+class TabRemoved : public Event
+{
+public:
+	TabRemoved(TabContainer *tabContainer);
 
-	protected:
-		boost::signals2::connection connectObserver(sol::protected_function observer,
-			sol::this_state state) override;
+protected:
+	boost::signals2::connection connectObserver(sol::protected_function observer,
+		sol::this_state state) override;
 
-	private:
-		TabContainer *m_tabContainer;
-	};
+private:
+	TabContainer *m_tabContainer;
+};
 }

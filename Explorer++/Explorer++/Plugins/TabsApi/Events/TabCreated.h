@@ -10,18 +10,18 @@ class TabContainer;
 
 namespace Plugins
 {
-	class TabCreated : public Event
-	{
-	public:
-		TabCreated(TabContainer *tabContainer);
+class TabCreated : public Event
+{
+public:
+	TabCreated(TabContainer *tabContainer);
 
-	protected:
-		boost::signals2::connection connectObserver(sol::protected_function observer,
-			sol::this_state state) override;
+protected:
+	boost::signals2::connection connectObserver(sol::protected_function observer,
+		sol::this_state state) override;
 
-	private:
-		void onTabCreated(int tabId, sol::protected_function observer);
+private:
+	void onTabCreated(int tabId, sol::protected_function observer);
 
-		TabContainer *m_tabContainer;
-	};
+	TabContainer *m_tabContainer;
+};
 }

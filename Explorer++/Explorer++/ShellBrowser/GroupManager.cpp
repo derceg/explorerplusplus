@@ -23,9 +23,9 @@
 
 namespace
 {
-	const uint64_t KBYTE = 1024;
-	const uint64_t MBYTE = 1024 * 1024;
-	const uint64_t GBYTE = 1024 * 1024 * 1024;
+const uint64_t KBYTE = 1024;
+const uint64_t MBYTE = 1024 * 1024;
+const uint64_t GBYTE = 1024 * 1024 * 1024;
 }
 
 BOOL ShellBrowser::GetShowInGroups() const

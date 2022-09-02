@@ -12,34 +12,34 @@
 
 namespace V2
 {
-	const TCHAR bookmarksKeyPath[] = _T("Bookmarksv2");
+const TCHAR bookmarksKeyPath[] = _T("Bookmarksv2");
 
-	void Load(HKEY parentKey, BookmarkTree *bookmarkTree);
-	void LoadPermanentFolder(HKEY parentKey, BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
-		const std::wstring &name);
-	void LoadBookmarkChildren(HKEY parentKey, BookmarkTree *bookmarkTree,
-		BookmarkItem *parentBookmarkItem);
-	std::unique_ptr<BookmarkItem> LoadBookmarkItem(HKEY key, BookmarkTree *bookmarkTree);
+void Load(HKEY parentKey, BookmarkTree *bookmarkTree);
+void LoadPermanentFolder(HKEY parentKey, BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
+	const std::wstring &name);
+void LoadBookmarkChildren(HKEY parentKey, BookmarkTree *bookmarkTree,
+	BookmarkItem *parentBookmarkItem);
+std::unique_ptr<BookmarkItem> LoadBookmarkItem(HKEY key, BookmarkTree *bookmarkTree);
 
-	void Save(HKEY parentKey, BookmarkTree *bookmarkTree);
-	void SavePermanentFolder(HKEY parentKey, const BookmarkItem *bookmarkItem,
-		const std::wstring &name);
-	void SaveBookmarkChildren(HKEY parentKey, const BookmarkItem *parentBookmarkItem);
-	void SaveBookmarkItem(HKEY key, const BookmarkItem *bookmarkItem);
+void Save(HKEY parentKey, BookmarkTree *bookmarkTree);
+void SavePermanentFolder(HKEY parentKey, const BookmarkItem *bookmarkItem,
+	const std::wstring &name);
+void SaveBookmarkChildren(HKEY parentKey, const BookmarkItem *parentBookmarkItem);
+void SaveBookmarkItem(HKEY key, const BookmarkItem *bookmarkItem);
 }
 
 // Note that there's no ability to save bookmarks in the v1 format, as they will
 // always be saved in the v2 format.
 namespace V1
 {
-	const TCHAR bookmarksKeyPath[] = _T("Bookmarks");
+const TCHAR bookmarksKeyPath[] = _T("Bookmarks");
 
-	void Load(HKEY parentKey, BookmarkTree *bookmarkTree);
+void Load(HKEY parentKey, BookmarkTree *bookmarkTree);
 
-	void LoadBookmarkChildren(HKEY parentKey, BookmarkTree *bookmarkTree,
-		BookmarkItem *parentBookmarkItem);
-	std::unique_ptr<BookmarkItem> LoadBookmarkItem(HKEY key, BookmarkTree *bookmarkTree,
-		bool &showOnToolbarOutput);
+void LoadBookmarkChildren(HKEY parentKey, BookmarkTree *bookmarkTree,
+	BookmarkItem *parentBookmarkItem);
+std::unique_ptr<BookmarkItem> LoadBookmarkItem(HKEY key, BookmarkTree *bookmarkTree,
+	bool &showOnToolbarOutput);
 }
 
 std::wstring BuildFullKeyPath(const std::wstring &applicationKeyPath,

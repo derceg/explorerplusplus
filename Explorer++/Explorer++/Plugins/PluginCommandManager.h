@@ -10,39 +10,39 @@
 
 namespace Plugins
 {
-	struct Command;
+struct Command;
 
-	class PluginCommandManager
+class PluginCommandManager
+{
+public:
+	typedef boost::signals2::signal<void(int, const std::wstring &)> CommandInvokedSignal;
+
+	PluginCommandManager(HACCEL *acceleratorTable, int startId, int endId);
+
+	void addCommands(int pluginId, const std::vector<Command> &commands);
+
+	boost::signals2::connection AddCommandInvokedObserver(
+		const CommandInvokedSignal::slot_type &observer);
+
+	void onAcceleratorPressed(int acceleratorId);
+
+private:
+	struct PluginCommand
 	{
-	public:
-		typedef boost::signals2::signal<void(int, const std::wstring &)> CommandInvokedSignal;
-
-		PluginCommandManager(HACCEL *acceleratorTable, int startId, int endId);
-
-		void addCommands(int pluginId, const std::vector<Command> &commands);
-
-		boost::signals2::connection AddCommandInvokedObserver(
-			const CommandInvokedSignal::slot_type &observer);
-
-		void onAcceleratorPressed(int acceleratorId);
-
-	private:
-		struct PluginCommand
-		{
-			int pluginId;
-			std::wstring name;
-		};
-
-		HACCEL *m_acceleratorTable;
-		const int m_startId;
-		const int m_endId;
-
-		int m_idCounter;
-
-		std::unordered_map<int, PluginCommand> m_registeredCommands;
-
-		std::optional<int> generateId();
-
-		CommandInvokedSignal m_commandInvokedSignal;
+		int pluginId;
+		std::wstring name;
 	};
+
+	HACCEL *m_acceleratorTable;
+	const int m_startId;
+	const int m_endId;
+
+	int m_idCounter;
+
+	std::unordered_map<int, PluginCommand> m_registeredCommands;
+
+	std::optional<int> generateId();
+
+	CommandInvokedSignal m_commandInvokedSignal;
+};
 }

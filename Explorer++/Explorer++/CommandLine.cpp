@@ -24,23 +24,23 @@
 // See https://github.com/CLIUtils/CLI11/issues/704#issuecomment-1047954575.
 namespace CLI::detail
 {
-	template <>
-	struct classify_object<std::wstring, void>
-	{
-		static constexpr object_category value{ object_category::other };
-	};
+template <>
+struct classify_object<std::wstring, void>
+{
+	static constexpr object_category value{ object_category::other };
+};
 
-	template <>
-	struct is_mutable_container<std::wstring, void> : public std::false_type
-	{
-	};
+template <>
+struct is_mutable_container<std::wstring, void> : public std::false_type
+{
+};
 
-	template <>
-	bool lexical_cast(const std::string &input, std::wstring &output)
-	{
-		output = utf8StrToWstr(input);
-		return true;
-	}
+template <>
+bool lexical_cast(const std::string &input, std::wstring &output)
+{
+	output = utf8StrToWstr(input);
+	return true;
+}
 }
 
 using CrashedDataTuple = std::tuple<DWORD, DWORD, intptr_t, std::string>;

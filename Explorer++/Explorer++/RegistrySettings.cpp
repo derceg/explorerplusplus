@@ -18,10 +18,10 @@
 
 namespace
 {
-	const TCHAR REG_TABS_KEY[] = _T("Software\\Explorer++\\Tabs");
-	const TCHAR REG_TOOLBARS_KEY[] = _T("Software\\Explorer++\\Toolbars");
-	const TCHAR REG_COLUMNS_KEY[] = _T("Software\\Explorer++\\DefaultColumns");
-	const TCHAR REG_APPLICATIONS_KEY[] = _T("Software\\Explorer++\\ApplicationToolbar");
+const TCHAR REG_TABS_KEY[] = _T("Software\\Explorer++\\Tabs");
+const TCHAR REG_TOOLBARS_KEY[] = _T("Software\\Explorer++\\Toolbars");
+const TCHAR REG_COLUMNS_KEY[] = _T("Software\\Explorer++\\DefaultColumns");
+const TCHAR REG_APPLICATIONS_KEY[] = _T("Software\\Explorer++\\ApplicationToolbar");
 }
 
 void UpdateColumnWidths(std::vector<Column_t> &columns,

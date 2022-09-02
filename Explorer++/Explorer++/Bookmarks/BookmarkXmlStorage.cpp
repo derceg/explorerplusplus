@@ -12,35 +12,34 @@
 
 namespace V2
 {
-	const TCHAR bookmarksKeyNodeName[] = _T("Bookmarksv2");
+const TCHAR bookmarksKeyNodeName[] = _T("Bookmarksv2");
 
-	void Load(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree);
-	void LoadPermanentFolder(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
-		BookmarkItem *bookmarkItem, const std::wstring &name);
-	void LoadBookmarkChildren(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
-		BookmarkItem *parentBookmarkItem);
-	std::unique_ptr<BookmarkItem> LoadBookmarkItem(IXMLDOMNode *parentNode,
-		BookmarkTree *bookmarkTree);
+void Load(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree);
+void LoadPermanentFolder(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
+	BookmarkItem *bookmarkItem, const std::wstring &name);
+void LoadBookmarkChildren(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
+	BookmarkItem *parentBookmarkItem);
+std::unique_ptr<BookmarkItem> LoadBookmarkItem(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree);
 
-	void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode, BookmarkTree *bookmarkTree,
-		int indent);
-	void SavePermanentFolder(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
-		const BookmarkItem *bookmarkItem, const std::wstring &name, int indent);
-	void SaveBookmarkChildren(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
-		const BookmarkItem *parentBookmarkItem, int indent);
-	void SaveBookmarkItem(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
-		const BookmarkItem *bookmarkItem, int indent);
+void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode, BookmarkTree *bookmarkTree,
+	int indent);
+void SavePermanentFolder(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
+	const BookmarkItem *bookmarkItem, const std::wstring &name, int indent);
+void SaveBookmarkChildren(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
+	const BookmarkItem *parentBookmarkItem, int indent);
+void SaveBookmarkItem(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
+	const BookmarkItem *bookmarkItem, int indent);
 }
 
 namespace V1
 {
-	const TCHAR bookmarksKeyNodeName[] = _T("Bookmarks");
+const TCHAR bookmarksKeyNodeName[] = _T("Bookmarks");
 
-	void Load(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree);
-	void LoadBookmarkChildren(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
-		BookmarkItem *parentBookmarkItem);
-	std::unique_ptr<BookmarkItem> LoadBookmarkItem(IXMLDOMNode *parentNode,
-		BookmarkTree *bookmarkTree, bool &showOnToolbarOutput);
+void Load(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree);
+void LoadBookmarkChildren(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
+	BookmarkItem *parentBookmarkItem);
+std::unique_ptr<BookmarkItem> LoadBookmarkItem(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
+	bool &showOnToolbarOutput);
 }
 
 void BookmarkXmlStorage::Load(IXMLDOMDocument *xmlDocument, BookmarkTree *bookmarkTree)

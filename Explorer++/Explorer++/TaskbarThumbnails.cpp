@@ -24,11 +24,11 @@
 
 namespace
 {
-	struct TabProxy
-	{
-		TaskbarThumbnails *taskbarThumbnails;
-		int iTabId;
-	};
+struct TabProxy
+{
+	TaskbarThumbnails *taskbarThumbnails;
+	int iTabId;
+};
 }
 
 TaskbarThumbnails *TaskbarThumbnails::Create(CoreInterface *coreInterface,

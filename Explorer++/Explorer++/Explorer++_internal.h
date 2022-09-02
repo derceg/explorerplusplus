@@ -8,26 +8,26 @@
 classes within the Explorer++ project. */
 namespace NExplorerplusplus
 {
-	const TCHAR APP_NAME[] = _T("Explorer++");
-	const TCHAR CLASS_NAME[] = _T("Explorer++");
+const TCHAR APP_NAME[] = _T("Explorer++");
+const TCHAR CLASS_NAME[] = _T("Explorer++");
 
-	const TCHAR HELP_FILE_NAME[] = _T("Explorer++ Help.chm");
+const TCHAR HELP_FILE_NAME[] = _T("Explorer++ Help.chm");
 
-	/* Registry keys used to store program settings. */
-	const TCHAR REG_MAIN_KEY[] = _T("Software\\Explorer++");
-	const TCHAR REG_SETTINGS_KEY[] = _T("Software\\Explorer++\\Settings");
+/* Registry keys used to store program settings. */
+const TCHAR REG_MAIN_KEY[] = _T("Software\\Explorer++");
+const TCHAR REG_SETTINGS_KEY[] = _T("Software\\Explorer++\\Settings");
 
-	/* The name of the XML file that preferences are
-	saved to/loaded from. */
-	const TCHAR XML_FILENAME[] = _T("config.xml");
+/* The name of the XML file that preferences are
+saved to/loaded from. */
+const TCHAR XML_FILENAME[] = _T("config.xml");
 
-	const TCHAR LOG_FILENAME[] = _T("Explorer++.log");
+const TCHAR LOG_FILENAME[] = _T("Explorer++.log");
 
-	// Internal command line arguments.
-	const TCHAR JUMPLIST_TASK_NEWTAB_ARGUMENT[] = _T("--open-new-tab");
-	const TCHAR APPLICATION_CRASHED_ARGUMENT[] = _T("--application-crashed");
+// Internal command line arguments.
+const TCHAR JUMPLIST_TASK_NEWTAB_ARGUMENT[] = _T("--open-new-tab");
+const TCHAR APPLICATION_CRASHED_ARGUMENT[] = _T("--application-crashed");
 
-	const TCHAR LANGUAGE_DLL_FILENAME_PATTERN[] = _T("Explorer++*.dll");
+const TCHAR LANGUAGE_DLL_FILENAME_PATTERN[] = _T("Explorer++*.dll");
 }
 
 /* Used when setting Explorer++ as the default

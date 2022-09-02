@@ -34,15 +34,14 @@ Notes:
 
 namespace DefaultFileManagerInternal
 {
-	const TCHAR KEY_DIRECTORY_SHELL[] = _T("Software\\Classes\\Directory\\shell");
-	const TCHAR KEY_FOLDER_SHELL[] = _T("Software\\Classes\\Folder\\shell");
-	const TCHAR SHELL_DEFAULT_VALUE[] = _T("none");
+const TCHAR KEY_DIRECTORY_SHELL[] = _T("Software\\Classes\\Directory\\shell");
+const TCHAR KEY_FOLDER_SHELL[] = _T("Software\\Classes\\Folder\\shell");
+const TCHAR SHELL_DEFAULT_VALUE[] = _T("none");
 
-	LSTATUS SetAsDefaultFileManagerInternal(DefaultFileManager::ReplaceExplorerMode replacementType,
-		const std::wstring &applicationKeyName, const std::wstring &menuText);
-	LSTATUS RemoveAsDefaultFileManagerInternal(
-		DefaultFileManager::ReplaceExplorerMode replacementType,
-		const std::wstring &applicationKeyName);
+LSTATUS SetAsDefaultFileManagerInternal(DefaultFileManager::ReplaceExplorerMode replacementType,
+	const std::wstring &applicationKeyName, const std::wstring &menuText);
+LSTATUS RemoveAsDefaultFileManagerInternal(DefaultFileManager::ReplaceExplorerMode replacementType,
+	const std::wstring &applicationKeyName);
 }
 
 LSTATUS DefaultFileManager::SetAsDefaultFileManagerFileSystem(

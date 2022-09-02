@@ -81,6 +81,6 @@ private:
 
 namespace winrt
 {
-	template <>
-	bool is_guid_of<IWebBrowserApp>(guid const &id) noexcept;
+template <>
+bool is_guid_of<IWebBrowserApp>(guid const &id) noexcept;
 }

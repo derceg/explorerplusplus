@@ -27,15 +27,15 @@
 
 namespace NSearchDialog
 {
-	const int WM_APP_SEARCHITEMFOUND = WM_APP + 1;
-	const int WM_APP_SEARCHFINISHED = WM_APP + 2;
-	const int WM_APP_SEARCHCHANGEDDIRECTORY = WM_APP + 3;
-	const int WM_APP_REGULAREXPRESSIONINVALID = WM_APP + 4;
+const int WM_APP_SEARCHITEMFOUND = WM_APP + 1;
+const int WM_APP_SEARCHFINISHED = WM_APP + 2;
+const int WM_APP_SEARCHCHANGEDDIRECTORY = WM_APP + 3;
+const int WM_APP_REGULAREXPRESSIONINVALID = WM_APP + 4;
 
-	int CALLBACK SortResultsStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
+int CALLBACK SortResultsStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 
-	DWORD WINAPI SearchThread(LPVOID pParam);
-	int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData);
+DWORD WINAPI SearchThread(LPVOID pParam);
+int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData);
 }
 
 const TCHAR SearchDialogPersistentSettings::SETTINGS_KEY[] = _T("Search");

@@ -8,8 +8,8 @@
 // grip shown in the bottom right corner of a window.
 namespace CustomGripper
 {
-	inline const TCHAR CLASS_NAME[] = L"CustomGripper";
+inline const TCHAR CLASS_NAME[] = L"CustomGripper";
 
-	void Initialize(HWND mainWindow, COLORREF backgroundColor);
-	SIZE GetDpiScaledSize(HWND parentWindow);
+void Initialize(HWND mainWindow, COLORREF backgroundColor);
+SIZE GetDpiScaledSize(HWND parentWindow);
 }

@@ -60,12 +60,12 @@ class WindowSubclassWrapper;
 
 namespace NColorRuleHelper
 {
-	struct ColorRule;
+struct ColorRule;
 }
 
 namespace Plugins
 {
-	class PluginManager;
+class PluginManager;
 }
 
 class Explorerplusplus :

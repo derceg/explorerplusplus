@@ -13,7 +13,7 @@
 
 namespace
 {
-	std::unordered_map<HWND, BaseDialog *> g_windowMap;
+std::unordered_map<HWND, BaseDialog *> g_windowMap;
 }
 
 BaseDialog::BaseDialog(HINSTANCE hInstance, int iResource, HWND hParent, bool bResizable) :

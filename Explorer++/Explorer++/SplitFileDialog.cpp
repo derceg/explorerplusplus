@@ -21,14 +21,14 @@
 
 namespace NSplitFileDialog
 {
-	const int WM_APP_SETTOTALSPLITCOUNT = WM_APP + 1;
-	const int WM_APP_SETCURRENTSPLITCOUNT = WM_APP + 2;
-	const int WM_APP_SPLITFINISHED = WM_APP + 3;
-	const int WM_APP_INPUTFILEINVALID = WM_APP + 4;
+const int WM_APP_SETTOTALSPLITCOUNT = WM_APP + 1;
+const int WM_APP_SETCURRENTSPLITCOUNT = WM_APP + 2;
+const int WM_APP_SPLITFINISHED = WM_APP + 3;
+const int WM_APP_INPUTFILEINVALID = WM_APP + 4;
 
-	const TCHAR COUNTER_PATTERN[] = _T("/N");
+const TCHAR COUNTER_PATTERN[] = _T("/N");
 
-	DWORD WINAPI SplitFileThreadProcStub(LPVOID pParam);
+DWORD WINAPI SplitFileThreadProcStub(LPVOID pParam);
 }
 
 const TCHAR SplitFileDialogPersistentSettings::SETTINGS_KEY[] = _T("SplitFile");

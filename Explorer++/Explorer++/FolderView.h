@@ -103,6 +103,6 @@ private:
 
 namespace winrt
 {
-	template <>
-	bool is_guid_of<IFolderView2>(guid const &id) noexcept;
+template <>
+bool is_guid_of<IFolderView2>(guid const &id) noexcept;
 }
