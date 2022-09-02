@@ -172,7 +172,7 @@ private:
 
 	/* Main window message handlers. */
 	LRESULT CALLBACK CommandHandler(HWND hwnd, HWND control, int id, UINT notificationCode);
-	LRESULT HandleMenuOrAccelerator(HWND hwnd, int id, UINT notificationCode);
+	LRESULT HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int id, UINT notificationCode);
 	LRESULT HandleControlNotification(HWND hwnd, UINT notificationCode);
 	LRESULT CALLBACK NotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnCreate();

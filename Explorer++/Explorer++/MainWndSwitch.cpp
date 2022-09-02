@@ -293,17 +293,20 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd, HWND control, int i
 		return 1;
 	}
 
-	if (notificationCode == 0 || notificationCode == 1)
-	{
-		return HandleMenuOrAccelerator(hwnd, id, notificationCode);
-	}
-	else
+	if (control && notificationCode != 0)
 	{
 		return HandleControlNotification(hwnd, notificationCode);
 	}
+	else
+	{
+		return HandleMenuOrToolbarButtonOrAccelerator(hwnd, id, notificationCode);
+	}
 }
 
-LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, int id, UINT notificationCode)
+// It makes sense to handle menu items/toolbar buttons/accelerators together, since an individual
+// command might be represented by all three of those.
+LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int id,
+	UINT notificationCode)
 {
 	if (notificationCode == 0 && id >= MENU_BOOKMARK_STARTID && id <= MENU_BOOKMARK_ENDID)
 	{
