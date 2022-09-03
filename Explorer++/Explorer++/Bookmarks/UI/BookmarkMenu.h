@@ -32,8 +32,6 @@ private:
 	static const int MIN_ID = 1;
 	static const int MAX_ID = 1000;
 
-	static const UINT_PTR SUBCLASS_ID = 0;
-
 	static LRESULT CALLBACK ParentWindowSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam,
 		LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);

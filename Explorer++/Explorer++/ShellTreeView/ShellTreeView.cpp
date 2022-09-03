@@ -74,9 +74,9 @@ ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, IDirect
 	SetWindowTheme(m_hTreeView, L"Explorer", nullptr);
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hTreeView,
-		TreeViewProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+		TreeViewProcStub, reinterpret_cast<DWORD_PTR>(this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hParent, ParentWndProcStub,
-		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+		reinterpret_cast<DWORD_PTR>(this)));
 
 	InitializeCriticalSection(&m_cs);
 

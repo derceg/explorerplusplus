@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "ApplicationToolbar.h"
+#include "ApplicationToolbarRegistryStorage.h"
 #include "Bookmarks/BookmarkRegistryStorage.h"
 #include "Config.h"
 #include "DefaultColumns.h"
@@ -21,7 +22,6 @@ namespace
 const TCHAR REG_TABS_KEY[] = _T("Software\\Explorer++\\Tabs");
 const TCHAR REG_TOOLBARS_KEY[] = _T("Software\\Explorer++\\Toolbars");
 const TCHAR REG_COLUMNS_KEY[] = _T("Software\\Explorer++\\DefaultColumns");
-const TCHAR REG_APPLICATIONS_KEY[] = _T("Software\\Explorer++\\ApplicationToolbar");
 }
 
 void UpdateColumnWidths(std::vector<Column_t> &columns,
@@ -1184,29 +1184,12 @@ void Explorerplusplus::LoadToolbarInformationFromRegistry()
 
 void Explorerplusplus::LoadApplicationToolbarFromRegistry()
 {
-	HKEY hKey;
-	LONG returnValue = RegOpenKeyEx(HKEY_CURRENT_USER, REG_APPLICATIONS_KEY, 0, KEY_READ, &hKey);
-
-	if (returnValue == ERROR_SUCCESS)
-	{
-		ApplicationToolbarPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-
-		RegCloseKey(hKey);
-	}
+	Applications::ApplicationToolbarRegistryStorage::Load(NExplorerplusplus::REG_MAIN_KEY,
+		&m_applicationModel);
 }
 
 void Explorerplusplus::SaveApplicationToolbarToRegistry()
 {
-	SHDeleteKey(HKEY_CURRENT_USER, REG_APPLICATIONS_KEY);
-
-	HKEY hKey;
-	LONG returnValue = RegCreateKeyEx(HKEY_CURRENT_USER, REG_APPLICATIONS_KEY, 0, nullptr,
-		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &hKey, nullptr);
-
-	if (returnValue == ERROR_SUCCESS)
-	{
-		ApplicationToolbarPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-
-		RegCloseKey(hKey);
-	}
+	Applications::ApplicationToolbarRegistryStorage::Save(NExplorerplusplus::REG_MAIN_KEY,
+		&m_applicationModel);
 }

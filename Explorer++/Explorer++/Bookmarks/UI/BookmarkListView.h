@@ -55,9 +55,6 @@ public:
 	void SetSortAscending(bool sortAscending);
 
 private:
-	static inline const UINT_PTR SUBCLASS_ID = 0;
-	static inline const UINT_PTR PARENT_SUBCLASS_ID = 0;
-
 	static inline const double FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE = 0.2;
 
 	static LRESULT CALLBACK WndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,

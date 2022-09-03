@@ -358,8 +358,6 @@ private:
 	>;
 	// clang-format on
 
-	static const UINT_PTR LISTVIEW_SUBCLASS_ID = 0;
-
 	static const UINT WM_APP_COLUMN_RESULT_READY = WM_APP + 150;
 	static const UINT WM_APP_THUMBNAIL_RESULT_READY = WM_APP + 151;
 	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 152;
@@ -625,12 +623,6 @@ private:
 
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
-
-	// Each instance of this class will subclass the parent window. As
-	// they'll all use the same static procedure, it's important that
-	// they use different subclass IDs (as the procedure and ID uniquely
-	// identify a subclass).
-	static int listViewParentSubclassIdCounter;
 
 	HIMAGELIST m_hListViewImageList;
 

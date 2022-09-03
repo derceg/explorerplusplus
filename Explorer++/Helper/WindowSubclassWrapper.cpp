@@ -5,23 +5,22 @@
 #include "stdafx.h"
 #include "WindowSubclassWrapper.h"
 
-WindowSubclassWrapper::WindowSubclassWrapper(HWND hwnd, SUBCLASSPROC subclassProc,
-	UINT_PTR subclassId, DWORD_PTR data) :
+WindowSubclassWrapper::WindowSubclassWrapper(HWND hwnd, SUBCLASSPROC subclassProc, DWORD_PTR data) :
 	m_hwnd(hwnd),
 	m_subclassProc(subclassProc),
-	m_subclassId(subclassId)
+	m_subclassId(m_subclassIdCounter++)
 {
-	m_subclassInstalled = SetWindowSubclass(hwnd, subclassProc, subclassId, data);
+	m_subclassInstalled = SetWindowSubclass(hwnd, subclassProc, m_subclassId, data);
 }
 
-WindowSubclassWrapper::WindowSubclassWrapper(HWND hwnd, Subclass subclass, UINT_PTR subclassId) :
+WindowSubclassWrapper::WindowSubclassWrapper(HWND hwnd, Subclass subclass) :
 	m_hwnd(hwnd),
 	m_subclassProc(SubclassProcStub),
 	m_subclass(subclass),
-	m_subclassId(subclassId)
+	m_subclassId(m_subclassIdCounter++)
 {
 	m_subclassInstalled =
-		SetWindowSubclass(hwnd, SubclassProcStub, subclassId, reinterpret_cast<DWORD_PTR>(this));
+		SetWindowSubclass(hwnd, SubclassProcStub, m_subclassId, reinterpret_cast<DWORD_PTR>(this));
 }
 
 WindowSubclassWrapper::~WindowSubclassWrapper()

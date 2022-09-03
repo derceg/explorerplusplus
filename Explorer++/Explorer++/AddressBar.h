@@ -19,9 +19,6 @@ public:
 	static AddressBar *Create(HWND parent, CoreInterface *coreInterface);
 
 private:
-	static const UINT_PTR SUBCLASS_ID = 0;
-	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
-
 	// This is the same background color as used in the Explorer address bar.
 	static inline constexpr COLORREF DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
 

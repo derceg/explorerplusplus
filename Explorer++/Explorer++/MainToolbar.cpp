@@ -164,9 +164,9 @@ void MainToolbar::Initialize(HWND parent)
 	UpdateConfigDependentButtonStates();
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
-		std::bind_front(&MainToolbar::WndProc, this), SUBCLASS_ID));
+		std::bind_front(&MainToolbar::WndProc, this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parent, ParentWndProcStub,
-		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+		reinterpret_cast<DWORD_PTR>(this)));
 
 	m_coreInterface->AddTabsInitializedObserver(
 		[this]
@@ -345,7 +345,7 @@ TBBUTTON MainToolbar::GetToolbarButtonDetails(MainToolbarButton button) const
 	else
 	{
 		/* Standard style that all toolbar buttons will have. */
-		BYTE standardStyle = BTNS_BUTTON | BTNS_AUTOSIZE;
+		BYTE standardStyle = BTNS_AUTOSIZE;
 
 		auto stringIndex = m_toolbarStringMap.at(button);
 

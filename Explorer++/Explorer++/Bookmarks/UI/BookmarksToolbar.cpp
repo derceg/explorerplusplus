@@ -15,6 +15,7 @@
 #include "MainResource.h"
 #include "Navigation.h"
 #include "ResourceHelper.h"
+#include "ToolbarViewHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/Macros.h"
@@ -49,12 +50,12 @@ void BookmarksToolbar::InitializeToolbar(IconFetcher *iconFetcher)
 	SetUpToolbarImageList(iconFetcher);
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hToolbar,
-		BookmarksToolbarProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+		BookmarksToolbarProcStub, reinterpret_cast<DWORD_PTR>(this)));
 
 	/* Also subclass the parent window, so that WM_COMMAND/WM_NOTIFY messages
 	can be caught. */
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(m_hToolbar),
-		BookmarksToolbarParentProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+		BookmarksToolbarParentProcStub, reinterpret_cast<DWORD_PTR>(this)));
 
 	InsertBookmarkItems();
 
@@ -451,7 +452,7 @@ void BookmarksToolbar::OnToolbarContextMenuItemClicked(int menuItemId)
 
 	POINT ptClient = *m_contextMenuLocation;
 	ScreenToClient(m_hToolbar, &ptClient);
-	int targetIndex = FindNextButtonIndex(ptClient);
+	int targetIndex = FindNextButtonIndex(m_hToolbar, ptClient);
 
 	switch (menuItemId)
 	{
@@ -481,30 +482,6 @@ void BookmarksToolbar::OnPaste(size_t targetIndex)
 {
 	BookmarkHelper::PasteBookmarkItems(m_bookmarkTree, m_bookmarkTree->GetBookmarksToolbarFolder(),
 		targetIndex);
-}
-
-// Returns the index of the button that comes after the specified point. If the
-// point is past the last button on the toolbar, this index will be one past the
-// last button (or 0 if there are no buttons).
-int BookmarksToolbar::FindNextButtonIndex(const POINT &ptClient)
-{
-	int numButtons = static_cast<int>(SendMessage(m_hToolbar, TB_BUTTONCOUNT, 0, 0));
-	int nextIndex = 0;
-
-	for (int i = 0; i < numButtons; i++)
-	{
-		RECT rc;
-		SendMessage(m_hToolbar, TB_GETITEMRECT, i, reinterpret_cast<LPARAM>(&rc));
-
-		if (ptClient.x < rc.right)
-		{
-			break;
-		}
-
-		nextIndex = i + 1;
-	}
-
-	return nextIndex;
 }
 
 void BookmarksToolbar::OnEditBookmarkItem(BookmarkItem *bookmarkItem)
@@ -565,7 +542,7 @@ void BookmarksToolbar::InsertBookmarkItem(BookmarkItem *bookmarkItem, int positi
 	tbb.iBitmap = iconIndex;
 	tbb.idCommand = m_uIDStart + m_uIDCounter;
 	tbb.fsState = TBSTATE_ENABLED;
-	tbb.fsStyle = BTNS_BUTTON | BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX;
+	tbb.fsStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX;
 	tbb.dwData = reinterpret_cast<DWORD_PTR>(bookmarkItem);
 	tbb.iString = reinterpret_cast<INT_PTR>(szName);
 	SendMessage(m_hToolbar, TB_INSERTBUTTON, position, reinterpret_cast<LPARAM>(&tbb));
@@ -807,7 +784,7 @@ BookmarksToolbar::DropLocation BookmarksToolbar::GetDropLocation(const POINT &pt
 	else
 	{
 		parentFolder = m_bookmarkTree->GetBookmarksToolbarFolder();
-		position = FindNextButtonIndex(ptClient);
+		position = FindNextButtonIndex(m_hToolbar, ptClient);
 	}
 
 	return { parentFolder, position, parentFolderSelected };

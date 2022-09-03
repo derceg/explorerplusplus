@@ -49,10 +49,6 @@ private:
 
 	static const OptionsDialogSheetInfo OPTIONS_DIALOG_SHEETS[];
 
-	static const UINT_PTR PROP_SHEET_SUBCLASS_ID = 0;
-
-	static const UINT_PTR ADVANCED_OPTIONS_LISTVIEW_SUBCLASS_ID = 0;
-
 	OptionsDialog(std::shared_ptr<Config> config, HINSTANCE instance, CoreInterface *coreInterface,
 		TabContainer *tabContainer);
 	~OptionsDialog() = default;

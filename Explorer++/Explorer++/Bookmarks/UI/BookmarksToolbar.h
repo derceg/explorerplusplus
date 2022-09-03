@@ -30,9 +30,6 @@ public:
 private:
 	BookmarksToolbar &operator=(const BookmarksToolbar &bt);
 
-	static inline const UINT_PTR SUBCLASS_ID = 0;
-	static inline const UINT_PTR PARENT_SUBCLASS_ID = 0;
-
 	// When an item is dragged over a folder on the bookmarks toolbar, the drop
 	// target should be set to the folder only if the dragged item is over the
 	// main part of the button for the folder. This is to allow the dragged item
@@ -71,7 +68,6 @@ private:
 	bool OnButtonClick(int command);
 	BOOL OnRightClick(const NMMOUSE *nmm);
 	void ShowBookmarkFolderMenu(BookmarkItem *bookmarkItem, int command, int index);
-	int FindNextButtonIndex(const POINT &ptClient);
 	void OnEditBookmarkItem(BookmarkItem *bookmarkItem);
 	bool OnGetInfoTip(NMTBGETINFOTIP *infoTip);
 

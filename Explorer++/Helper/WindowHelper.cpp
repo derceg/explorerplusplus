@@ -48,6 +48,18 @@ BOOL CenterWindow(HWND hParent, HWND hChild)
 		SWP_NOSIZE | SWP_SHOWWINDOW | SWP_NOZORDER);
 }
 
+std::wstring GetDlgItemString(HWND dlg, int controlId)
+{
+	HWND control = GetDlgItem(dlg, controlId);
+
+	if (!control)
+	{
+		return {};
+	}
+
+	return GetWindowString(control);
+}
+
 std::wstring GetWindowString(HWND hwnd)
 {
 	int textLength = GetWindowTextLength(hwnd);

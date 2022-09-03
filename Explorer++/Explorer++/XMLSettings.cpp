@@ -16,6 +16,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "ApplicationToolbar.h"
+#include "ApplicationToolbarXmlStorage.h"
 #include "Bookmarks/BookmarkXmlStorage.h"
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
@@ -1425,35 +1426,12 @@ void Explorerplusplus::SaveToolbarInformationToXMLnternal(IXMLDOMDocument *pXMLD
 
 void Explorerplusplus::LoadApplicationToolbarFromXML(IXMLDOMDocument *pXMLDom)
 {
-	if (!pXMLDom)
-	{
-		return;
-	}
-
-	wil::com_ptr_nothrow<IXMLDOMNode> pNode;
-	auto bstr = wil::make_bstr_nothrow(L"//ApplicationButton");
-	HRESULT hr = pXMLDom->selectSingleNode(bstr.get(), &pNode);
-
-	if (hr == S_OK)
-	{
-		ApplicationToolbarPersistentSettings::GetInstance().LoadXMLSettings(pNode.get());
-	}
+	Applications::ApplicationToolbarXmlStorage::Load(pXMLDom, &m_applicationModel);
 }
 
 void Explorerplusplus::SaveApplicationToolbarToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
 {
-	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pRoot);
-
-	wil::com_ptr_nothrow<IXMLDOMElement> pe;
-	auto bstr = wil::make_bstr_nothrow(L"ApplicationToolbar");
-	pXMLDom->createElement(bstr.get(), &pe);
-
-	ApplicationToolbarPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom, pe.get());
-
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pe.get());
-
-	NXMLSettings::AppendChildToParent(pe.get(), pRoot);
+	Applications::ApplicationToolbarXmlStorage::Save(pXMLDom, pRoot, &m_applicationModel);
 }
 
 unsigned long hash_setting(unsigned char *str)

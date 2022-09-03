@@ -51,6 +51,24 @@
     <ClCompile Include="DriveModelTest.cpp">
       <Filter>Drives Toolbar</Filter>
     </ClCompile>
+    <ClCompile Include="ApplicationModelTest.cpp">
+      <Filter>Application Toolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplicationToolbarXmlStorageTest.cpp">
+      <Filter>Application Toolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplicationToolbarRegistryStorageTest.cpp">
+      <Filter>Application Toolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplicationToolbarStorageHelper.cpp">
+      <Filter>Application Toolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="XmlStorageHelper.cpp">
+      <Filter>Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="RegistryStorageHelper.cpp">
+      <Filter>Storage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -77,6 +95,9 @@
     <Filter Include="Drives Toolbar">
       <UniqueIdentifier>{eebf535f-03fa-4f78-9ef6-eeabf13f1530}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Storage">
+      <UniqueIdentifier>{7042eb7a-fa80-40c3-9b18-ffdc1a65e513}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -90,6 +111,15 @@
     <ClInclude Include="ResourceHelper.h" />
     <ClInclude Include="BookmarkStorageHelper.h">
       <Filter>Bookmarks</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationToolbarStorageHelper.h">
+      <Filter>Application Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="RegistryStorageHelper.h">
+      <Filter>Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="XmlStorageHelper.h">
+      <Filter>Storage</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

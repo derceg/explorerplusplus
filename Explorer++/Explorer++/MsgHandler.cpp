@@ -583,7 +583,7 @@ int Explorerplusplus::CloseApplication()
 	if (m_config->confirmCloseTabs && (m_tabContainer->GetNumTabs() > 1))
 	{
 		std::wstring message =
-			ResourceHelper::LoadString(m_hLanguageModule, IDS_GENERAL_CLOSE_ALL_TABS);
+			ResourceHelper::LoadString(m_resourceModule, IDS_GENERAL_CLOSE_ALL_TABS);
 		int response = MessageBox(m_hContainer, message.c_str(), NExplorerplusplus::APP_NAME,
 			MB_ICONINFORMATION | MB_YESNO);
 
@@ -893,7 +893,7 @@ void Explorerplusplus::CopyColumnInfoToClipboard()
 		if (column.bChecked)
 		{
 			TCHAR szText[64];
-			LoadString(m_hLanguageModule, ShellBrowser::LookupColumnNameStringIndex(column.type),
+			LoadString(m_resourceModule, ShellBrowser::LookupColumnNameStringIndex(column.type),
 				szText, SIZEOF_ARRAY(szText));
 
 			strColumnInfo += std::wstring(szText) + _T("\t");
@@ -1169,7 +1169,7 @@ void Explorerplusplus::OnDisplayWindowIconRClick(POINT *ptClient)
 void Explorerplusplus::OnDisplayWindowRClick(POINT *ptClient)
 {
 	wil::unique_hmenu parentMenu(
-		LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_DISPLAYWINDOW_RCLICK)));
+		LoadMenu(m_resourceModule, MAKEINTRESOURCE(IDR_DISPLAYWINDOW_RCLICK)));
 
 	if (!parentMenu)
 	{
@@ -1338,9 +1338,9 @@ const Config *Explorerplusplus::GetConfig() const
 	return m_config.get();
 }
 
-HMODULE Explorerplusplus::GetLanguageModule() const
+HMODULE Explorerplusplus::GetResourceModule() const
 {
-	return m_hLanguageModule;
+	return m_resourceModule;
 }
 
 HACCEL *Explorerplusplus::GetAcceleratorTable() const

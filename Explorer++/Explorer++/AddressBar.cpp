@@ -59,18 +59,18 @@ void AddressBar::Initialize(HWND parent)
 	}
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
-		std::bind_front(&AddressBar::ComboBoxExSubclass, this), 0));
+		std::bind_front(&AddressBar::ComboBoxExSubclass, this)));
 
 	HWND hEdit = reinterpret_cast<HWND>(SendMessage(m_hwnd, CBEM_GETEDITCONTROL, 0, 0));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hEdit, EditSubclassStub,
-		SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+		reinterpret_cast<DWORD_PTR>(this)));
 
 	/* Turn on auto complete for the edit control within the combobox.
 	This will let the os complete paths as they are typed. */
 	SHAutoComplete(hEdit, SHACF_FILESYSTEM | SHACF_AUTOSUGGEST_FORCE_ON);
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parent, ParentWndProcStub,
-		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+		reinterpret_cast<DWORD_PTR>(this)));
 
 	m_coreInterface->AddTabsInitializedObserver(
 		[this]

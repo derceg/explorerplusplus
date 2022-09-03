@@ -44,7 +44,7 @@ void Explorerplusplus::CreateFolderControls()
 		uStyle |= WS_VISIBLE;
 	}
 
-	LoadString(m_hLanguageModule, IDS_FOLDERS_WINDOW_TEXT, szTemp, SIZEOF_ARRAY(szTemp));
+	LoadString(m_resourceModule, IDS_FOLDERS_WINDOW_TEXT, szTemp, SIZEOF_ARRAY(szTemp));
 	m_hHolder = CreateHolderWindow(m_hContainer, szTemp, uStyle);
 	SetWindowSubclass(m_hHolder, TreeViewHolderProcStub, 0, (DWORD_PTR) this);
 
@@ -61,10 +61,10 @@ void Explorerplusplus::CreateFolderControls()
 			m_hHolder, nullptr, GetModuleHandle(nullptr), nullptr);
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_foldersToolbarParent,
-		std::bind_front(&Explorerplusplus::FoldersToolbarParentProc, this), 0));
+		std::bind_front(&Explorerplusplus::FoldersToolbarParentProc, this)));
 
 	m_hFoldersToolbar = CreateTabToolbar(m_foldersToolbarParent, FOLDERS_TOOLBAR_CLOSE,
-		ResourceHelper::LoadString(m_hLanguageModule, IDS_HIDEFOLDERSPANE));
+		ResourceHelper::LoadString(m_resourceModule, IDS_HIDEFOLDERSPANE));
 
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hHolder);
 
@@ -488,7 +488,7 @@ void Explorerplusplus::OnTreeViewSetFileAttributes() const
 
 			sfaiList.push_back(sfai);
 
-			SetFileAttributesDialog setFileAttributesDialog(m_hLanguageModule, m_hContainer,
+			SetFileAttributesDialog setFileAttributesDialog(m_resourceModule, m_hContainer,
 				sfaiList);
 			setFileAttributesDialog.ShowModalDialog();
 		}

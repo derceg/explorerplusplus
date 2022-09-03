@@ -35,8 +35,6 @@ private:
 		Removal
 	};
 
-	static const UINT_PTR SUBCLASS_ID = 0;
-
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnDeviceChange(WPARAM wParam, LPARAM lParam);
 	void OnDeviceArrivedOrRemoved(DeviceChangeType deviceChangeType,

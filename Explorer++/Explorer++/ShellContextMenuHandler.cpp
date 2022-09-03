@@ -79,29 +79,29 @@ void Explorerplusplus::UpdateBackgroundContextMenu(IContextMenu *contextMenu, HM
 
 			auto viewsMenu = BuildViewsMenu();
 			std::wstring text =
-				ResourceHelper::LoadString(m_hLanguageModule, IDS_BACKGROUND_CONTEXT_MENU_VIEW);
+				ResourceHelper::LoadString(m_resourceModule, IDS_BACKGROUND_CONTEXT_MENU_VIEW);
 			MenuHelper::AddSubMenuItem(menu, text, std::move(viewsMenu), i, TRUE);
 		}
 		else if (StrCmpI(verb, L"arrange") == 0)
 		{
 			DeleteMenu(menu, i, MF_BYPOSITION);
 
-			SortMenuBuilder sortMenuBuilder(m_hLanguageModule);
+			SortMenuBuilder sortMenuBuilder(m_resourceModule);
 			auto sortMenus = sortMenuBuilder.BuildMenus(m_tabContainer->GetSelectedTab());
 
 			std::wstring text =
-				ResourceHelper::LoadString(m_hLanguageModule, IDS_BACKGROUND_CONTEXT_MENU_SORT_BY);
+				ResourceHelper::LoadString(m_resourceModule, IDS_BACKGROUND_CONTEXT_MENU_SORT_BY);
 			MenuHelper::AddSubMenuItem(menu, text, std::move(sortMenus.sortByMenu), i, TRUE);
 		}
 		else if (StrCmpI(verb, L"groupby") == 0)
 		{
 			DeleteMenu(menu, i, MF_BYPOSITION);
 
-			SortMenuBuilder sortMenuBuilder(m_hLanguageModule);
+			SortMenuBuilder sortMenuBuilder(m_resourceModule);
 			auto sortMenus = sortMenuBuilder.BuildMenus(m_tabContainer->GetSelectedTab());
 
 			std::wstring text =
-				ResourceHelper::LoadString(m_hLanguageModule, IDS_BACKGROUND_CONTEXT_MENU_GROUP_BY);
+				ResourceHelper::LoadString(m_resourceModule, IDS_BACKGROUND_CONTEXT_MENU_GROUP_BY);
 			MenuHelper::AddSubMenuItem(menu, text, std::move(sortMenus.groupByMenu), i, TRUE);
 		}
 		else if (StrCmpI(verb, L"paste") == 0)
@@ -175,7 +175,7 @@ void Explorerplusplus::UpdateItemContextMenu(PCIDLIST_ABSOLUTE pidlParent,
 	if (addNewTabMenuItem)
 	{
 		std::wstring openInNewTabText =
-			ResourceHelper::LoadString(m_hLanguageModule, IDS_GENERAL_OPEN_IN_NEW_TAB);
+			ResourceHelper::LoadString(m_resourceModule, IDS_GENERAL_OPEN_IN_NEW_TAB);
 
 		MENUITEMINFO mii;
 		mii.cbSize = sizeof(mii);

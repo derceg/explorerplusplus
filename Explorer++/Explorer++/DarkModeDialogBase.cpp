@@ -37,7 +37,7 @@ void DarkModeDialogBase::OnInitDialogBase()
 	AllowDarkModeForControls({ IDOK, IDCANCEL });
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hDlg,
-		std::bind_front(&DarkModeDialogBase::DialogWndProc, this), 0));
+		std::bind_front(&DarkModeDialogBase::DialogWndProc, this)));
 
 	darkModeHelper.SetDarkModeForControl(m_tipWnd);
 }
@@ -113,7 +113,7 @@ void DarkModeDialogBase::AllowDarkModeForListView(int controlId)
 		darkModeHelper.SetListViewDarkModeColors(control);
 
 		m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(control,
-			std::bind_front(&DarkModeDialogBase::ListViewWndProc, this), 0));
+			std::bind_front(&DarkModeDialogBase::ListViewWndProc, this)));
 	}
 }
 

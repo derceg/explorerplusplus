@@ -4,8 +4,21 @@
 
 #include "stdafx.h"
 #include "ApplicationToolbarHelper.h"
+#include "Application.h"
+#include "CoreInterface.h"
+#include "Explorer++_internal.h"
+#include "MainResource.h"
+#include "ResourceHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
+#include <boost/format.hpp>
+#include <comdef.h>
+
+namespace Applications
+{
+
+namespace ApplicationToolbarHelper
+{
 
 // Takes a command string entered by the user, and splits it up into two components: an application
 // path (with any environment strings expanded) and a parameter list.
@@ -13,8 +26,7 @@
 // Two supported styles:
 // 1. "[command]" [parameters] (needed if the command contains spaces)
 // 2. [command] [parameters]
-ApplicationToolbarHelper::ApplicationInfo ApplicationToolbarHelper::ParseCommandString(
-	const std::wstring &command)
+ApplicationInfo ParseCommandString(const std::wstring &command)
 {
 	std::wstring trimmedCommand = command;
 	boost::trim(trimmedCommand);
@@ -65,4 +77,40 @@ ApplicationToolbarHelper::ApplicationInfo ApplicationToolbarHelper::ParseCommand
 	}
 
 	return applicationInfo;
+}
+
+void OpenApplication(CoreInterface *coreInterface, HWND errorDialogParent,
+	const Application *application, std::wstring extraParameters)
+{
+	ApplicationInfo applicationInfo = ParseCommandString(application->GetCommand());
+
+	unique_pidl_absolute pidl;
+	HRESULT hr = SHParseDisplayName(applicationInfo.application.c_str(), nullptr,
+		wil::out_param(pidl), 0, nullptr);
+
+	if (FAILED(hr))
+	{
+		std::wstring messageTemplate = ResourceHelper::LoadString(
+			coreInterface->GetResourceModule(), IDS_APPLICATION_TOOLBAR_OPEN_ERROR);
+		_com_error error(hr);
+		std::wstring message =
+			(boost::wformat(messageTemplate) % applicationInfo.application % error.ErrorMessage())
+				.str();
+		MessageBox(errorDialogParent, message.c_str(), NExplorerplusplus::APP_NAME,
+			MB_ICONWARNING | MB_OK);
+		return;
+	}
+
+	std::wstring combinedParameters = applicationInfo.parameters;
+
+	if (!extraParameters.empty())
+	{
+		combinedParameters += L" " + extraParameters;
+	}
+
+	coreInterface->OpenFileItem(pidl.get(), combinedParameters.c_str());
+}
+
+}
+
 }

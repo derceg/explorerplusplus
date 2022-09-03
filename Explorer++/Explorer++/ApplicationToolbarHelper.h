@@ -4,10 +4,19 @@
 
 #pragma once
 
+#include <windows.h>
 #include <string>
+
+class CoreInterface;
+
+namespace Applications
+{
+
+class Application;
 
 namespace ApplicationToolbarHelper
 {
+
 struct ApplicationInfo
 {
 	std::wstring application;
@@ -15,4 +24,9 @@ struct ApplicationInfo
 };
 
 ApplicationInfo ParseCommandString(const std::wstring &command);
+void OpenApplication(CoreInterface *coreInterface, HWND errorDialogParent,
+	const Application *application, std::wstring extraParameters = {});
+
+}
+
 }

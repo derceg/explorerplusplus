@@ -68,7 +68,7 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
 		m_pStatusBar->HandleStatusBarMenuOpen();
 
 		TCHAR szBuffer[512];
-		LoadString(m_hLanguageModule, LOWORD(wParam), szBuffer, SIZEOF_ARRAY(szBuffer));
+		LoadString(m_resourceModule, LOWORD(wParam), szBuffer, SIZEOF_ARRAY(szBuffer));
 		SetWindowText(m_hStatusBar, szBuffer);
 	}
 
@@ -95,7 +95,7 @@ void Explorerplusplus::SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl)
 
 	TCHAR szTemp[64];
 	TCHAR szLoadingText[512];
-	LoadString(m_hLanguageModule, IDS_GENERAL_LOADING, szTemp, SIZEOF_ARRAY(szTemp));
+	LoadString(m_resourceModule, IDS_GENERAL_LOADING, szTemp, SIZEOF_ARRAY(szTemp));
 	StringCchPrintf(szLoadingText, SIZEOF_ARRAY(szLoadingText), szTemp, displayName.c_str());
 
 	/* Browsing of a folder has started. Set the status bar text to indicate that
@@ -146,7 +146,7 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 
 		if ((nFilesSelected + nFoldersSelected) == 1)
 		{
-			LoadString(m_hLanguageModule, IDS_GENERAL_SELECTED_ONEITEM, szTemp,
+			LoadString(m_resourceModule, IDS_GENERAL_SELECTED_ONEITEM, szTemp,
 				SIZEOF_ARRAY(szTemp));
 
 			/* One item selected. Form:
@@ -156,7 +156,7 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 		}
 		else
 		{
-			LoadString(m_hLanguageModule, IDS_GENERAL_SELECTED_MOREITEMS, szTemp,
+			LoadString(m_resourceModule, IDS_GENERAL_SELECTED_MOREITEMS, szTemp,
 				SIZEOF_ARRAY(szTemp));
 
 			/* More than one item selected. Form:
@@ -171,7 +171,7 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 
 		if (nTotal == 1)
 		{
-			LoadString(m_hLanguageModule, IDS_GENERAL_ONEITEM, szTemp, SIZEOF_ARRAY(szTemp));
+			LoadString(m_resourceModule, IDS_GENERAL_ONEITEM, szTemp, SIZEOF_ARRAY(szTemp));
 
 			/* Text: '1 item' */
 			StringCchPrintf(szItemsSelected, SIZEOF_ARRAY(szItemsSelected), _T("%s %s"),
@@ -179,7 +179,7 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 		}
 		else
 		{
-			LoadString(m_hLanguageModule, IDS_GENERAL_MOREITEMS, szTemp, SIZEOF_ARRAY(szTemp));
+			LoadString(m_resourceModule, IDS_GENERAL_MOREITEMS, szTemp, SIZEOF_ARRAY(szTemp));
 
 			/* Text: 'n Items' */
 			StringCchPrintf(szItemsSelected, SIZEOF_ARRAY(szItemsSelected), _T("%s %s"),
@@ -249,7 +249,7 @@ int Explorerplusplus::CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szB
 
 	FormatSizeString(totalNumberOfFreeBytes, szFreeSpace, SIZEOF_ARRAY(szFreeSpace));
 
-	LoadString(m_hLanguageModule, IDS_GENERAL_FREE, szFree, SIZEOF_ARRAY(szFree));
+	LoadString(m_resourceModule, IDS_GENERAL_FREE, szFree, SIZEOF_ARRAY(szFree));
 
 	StringCchPrintf(szFreeSpaceString, SIZEOF_ARRAY(szFreeSpace), _T("%s %s (%.0f%%)"), szFreeSpace,
 		szFree, totalNumberOfFreeBytes.QuadPart * 100.0 / totalNumberOfBytes.QuadPart);

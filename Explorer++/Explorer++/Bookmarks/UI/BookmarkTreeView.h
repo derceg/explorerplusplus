@@ -39,9 +39,6 @@ public:
 private:
 	using ItemMap_t = std::unordered_map<std::wstring, HTREEITEM>;
 
-	static inline const UINT_PTR SUBCLASS_ID = 0;
-	static inline const UINT_PTR PARENT_SUBCLASS_ID = 0;
-
 	static inline const double FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE = 0.2;
 
 	static LRESULT CALLBACK BookmarkTreeViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,

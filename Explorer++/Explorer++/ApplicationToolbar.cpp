@@ -2,643 +2,405 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // See LICENSE in the top level directory
 
-/*
- * Handles the application toolbar.
- *
- * Notes:
- * Settings structure:
- * <ApplicationToolbar>
- *	<name="App1" command="C:\...">
- *	<name="App2" command="D:\...">
- * </ApplicationToolbar>
- */
-
 #include "stdafx.h"
 #include "ApplicationToolbar.h"
-#include "ApplicationToolbarButtonDialog.h"
-#include "ApplicationToolbarDropHandler.h"
+#include "Application.h"
+#include "ApplicationModel.h"
 #include "ApplicationToolbarHelper.h"
-#include "CoreInterface.h"
-#include "DarkModeHelper.h"
-#include "Explorer++_internal.h"
-#include "MainResource.h"
-#include "ResourceHelper.h"
-#include "../Helper/Controls.h"
-#include "../Helper/Macros.h"
-#include "../Helper/RegistrySettings.h"
-#include "../Helper/ShellHelper.h"
-#include "../Helper/XMLSettings.h"
-#include <boost/format.hpp>
-#include <wil/com.h>
-#include <wil/resource.h>
-#include <comdef.h>
+#include "ApplicationToolbarView.h"
+#include <boost/algorithm/string/join.hpp>
+#include <propkey.h>
 
-const TCHAR ApplicationToolbarPersistentSettings::SETTING_NAME[] = _T("Name");
-const TCHAR ApplicationToolbarPersistentSettings::SETTING_COMMAND[] = _T("Command");
-const TCHAR ApplicationToolbarPersistentSettings::SETTING_SHOW_NAME_ON_TOOLBAR[] =
-	_T("ShowNameOnToolbar");
+namespace Applications
+{
 
 using namespace ApplicationToolbarHelper;
 
-ApplicationToolbar *ApplicationToolbar::Create(HWND hParent, UINT uIDStart, UINT uIDEnd,
-	HINSTANCE hInstance, CoreInterface *coreInterface)
+class ApplicationToolbarButton : public ToolbarButton
 {
-	return new ApplicationToolbar(hParent, uIDStart, uIDEnd, hInstance, coreInterface);
+public:
+	ApplicationToolbarButton(const Application *application, ClickedCallback clickedCallback) :
+		ToolbarButton(clickedCallback),
+		m_application(application)
+	{
+	}
+
+	std::wstring GetText() const override
+	{
+		if (m_application->GetShowNameOnToolbar())
+		{
+			return m_application->GetName();
+		}
+
+		return {};
+	}
+
+	std::wstring GetTooltipText() const override
+	{
+		return std::format(L"{}\n{}", m_application->GetName(), m_application->GetCommand());
+	}
+
+	std::optional<int> GetImageIndex() const override
+	{
+		ApplicationInfo applicationInfo = ParseCommandString(m_application->GetCommand());
+
+		SHFILEINFO shfi;
+		DWORD_PTR ret = SHGetFileInfo(applicationInfo.application.c_str(), 0, &shfi, sizeof(shfi),
+			SHGFI_SYSICONINDEX);
+
+		// Assign a generic icon if the file wasn't found.
+		if (ret == 0)
+		{
+			return 0;
+		}
+
+		return shfi.iIcon;
+	}
+
+private:
+	const Application *m_application;
+};
+
+ApplicationToolbar *ApplicationToolbar::Create(ApplicationToolbarView *view,
+	ApplicationModel *model, CoreInterface *coreInterface)
+{
+	return new ApplicationToolbar(view, model, coreInterface);
 }
 
-ApplicationToolbar::ApplicationToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd,
-	HINSTANCE hInstance, CoreInterface *coreInterface) :
-	BaseWindow(CreateApplicationToolbar(hParent)),
-	m_hInstance(hInstance),
-	m_uIDStart(uIDStart),
-	m_uIDEnd(uIDEnd),
+ApplicationToolbar::ApplicationToolbar(ApplicationToolbarView *view, ApplicationModel *model,
+	CoreInterface *coreInterface) :
+	m_view(view),
+	m_model(model),
 	m_coreInterface(coreInterface)
 {
-	Initialize(hParent);
+	Initialize();
 }
 
-HWND ApplicationToolbar::CreateApplicationToolbar(HWND hParent)
+void ApplicationToolbar::Initialize()
 {
-	return CreateToolbar(hParent,
-		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | TBSTYLE_TOOLTIPS | TBSTYLE_LIST
-			| TBSTYLE_TRANSPARENT | TBSTYLE_FLAT | CCS_NODIVIDER | CCS_NORESIZE,
-		TBSTYLE_EX_MIXEDBUTTONS | TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_DOUBLEBUFFER
-			| TBSTYLE_EX_HIDECLIPPEDBUTTONS);
+	AddButtons();
+
+	m_connections.push_back(m_model->AddApplicationAddedObserver(
+		std::bind_front(&ApplicationToolbar::OnApplicationAdded, this)));
+	m_connections.push_back(m_model->AddApplicationUpdatedObserver(
+		std::bind_front(&ApplicationToolbar::OnApplicationUpdated, this)));
+	m_connections.push_back(m_model->AddApplicationRemovedObserver(
+		std::bind_front(&ApplicationToolbar::OnApplicationRemoved, this)));
+
+	m_dropTargetWindow = winrt::make_self<DropTargetWindow>(m_view->GetHWND(),
+		static_cast<DropTargetInternal *>(this));
+
+	m_view->AddWindowDestroyedObserver(
+		std::bind_front(&ApplicationToolbar::OnWindowDestroyed, this));
 }
 
-void ApplicationToolbar::Initialize(HWND hParent)
+ApplicationToolbarView *ApplicationToolbar::GetView() const
 {
-	m_atps = &ApplicationToolbarPersistentSettings::GetInstance();
+	return m_view;
+}
 
-	SendMessage(m_hwnd, TB_BUTTONSTRUCTSIZE, static_cast<WPARAM>(sizeof(TBBUTTON)), 0);
+void ApplicationToolbar::AddButtons()
+{
+	size_t index = 0;
 
-	HIMAGELIST himlSmall;
-	Shell_GetImageLists(nullptr, &himlSmall);
-
-	int iconWidth;
-	int iconHeight;
-	ImageList_GetIconSize(himlSmall, &iconWidth, &iconHeight);
-	SendMessage(m_hwnd, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
-
-	SendMessage(m_hwnd, TB_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(himlSmall));
-
-	m_patd = new ApplicationToolbarDropHandler(m_hwnd, this);
-	RegisterDragDrop(m_hwnd, m_patd);
-
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hParent, ParentWndProcStub,
-		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
-
-	AddButtonsToToolbar();
-
-	m_connections.push_back(m_coreInterface->AddToolbarContextMenuObserver(
-		std::bind_front(&ApplicationToolbar::OnToolbarContextMenuPreShow, this)));
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
+	for (auto &application : m_model->GetApplications())
 	{
-		darkModeHelper.SetDarkModeForToolbarTooltips(m_hwnd);
+		AddButton(application.get(), index);
+		++index;
 	}
 }
 
-ApplicationToolbar::~ApplicationToolbar()
+void ApplicationToolbar::AddButton(Application *application, size_t index)
 {
-	RevokeDragDrop(m_hwnd);
-	m_patd->Release();
+	auto button = std::make_unique<ApplicationToolbarButton>(application,
+		std::bind_front(&ApplicationToolbar::OnButtonClicked, this, application));
+	button->SetRightClickedCallback(
+		std::bind_front(&ApplicationToolbar::OnButtonRightClicked, this, application));
+
+	m_view->AddButton(std::move(button), index);
 }
 
-LRESULT CALLBACK ApplicationToolbar::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
-	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+void ApplicationToolbar::OnApplicationAdded(Application *application, size_t index)
 {
-	UNREFERENCED_PARAMETER(uIdSubclass);
-
-	auto *pat = reinterpret_cast<ApplicationToolbar *>(dwRefData);
-	return pat->ParentWndProc(hwnd, uMsg, wParam, lParam);
+	AddButton(application, index);
 }
 
-LRESULT CALLBACK ApplicationToolbar::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam,
-	LPARAM lParam)
+void ApplicationToolbar::OnApplicationUpdated(Application *application)
 {
-	switch (uMsg)
+	// The ApplicationToolbarButton class holds a pointer to the associated Application (so there's
+	// no need to update it). Only the view needs to be updated.
+	auto index = m_model->GetApplicationIndex(application);
+	m_view->UpdateButton(*index);
+}
+
+void ApplicationToolbar::OnApplicationRemoved(const Application *application, size_t oldIndex)
+{
+	UNREFERENCED_PARAMETER(application);
+
+	m_view->RemoveButton(oldIndex);
+}
+
+void ApplicationToolbar::OnButtonClicked(const Application *application, const MouseEvent &event)
+{
+	UNREFERENCED_PARAMETER(event);
+
+	OpenApplication(m_coreInterface, m_view->GetHWND(), application);
+}
+
+void ApplicationToolbar::OnButtonRightClicked(Application *application, const MouseEvent &event)
+{
+	m_view->ShowContextMenu(application, event.ptClient);
+}
+
+void ApplicationToolbar::OnWindowDestroyed()
+{
+	delete this;
+}
+
+// DropTargetInternal
+DWORD ApplicationToolbar::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
+{
+	UNREFERENCED_PARAMETER(keyState);
+	UNREFERENCED_PARAMETER(effect);
+
+	StoreDropShellItemArray(dataObject);
+	auto target = m_view->GetDropLocation(pt);
+	return GetDropEffect(target);
+}
+
+DWORD ApplicationToolbar::DragOver(DWORD keyState, POINT pt, DWORD effect)
+{
+	UNREFERENCED_PARAMETER(keyState);
+	UNREFERENCED_PARAMETER(effect);
+
+	auto target = m_view->GetDropLocation(pt);
+	return GetDropEffect(target);
+}
+
+void ApplicationToolbar::DragLeave()
+{
+	ResetDropState();
+}
+
+DWORD ApplicationToolbar::Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
+{
+	UNREFERENCED_PARAMETER(dataObject);
+	UNREFERENCED_PARAMETER(keyState);
+	UNREFERENCED_PARAMETER(effect);
+
+	if (!m_dropShellItems)
 	{
-	case WM_COMMAND:
-		if (LOWORD(wParam) >= m_uIDStart && LOWORD(wParam) <= m_uIDEnd)
+		return DROPEFFECT_NONE;
+	}
+
+	auto target = m_view->GetDropLocation(pt);
+	DWORD targetEffect = PerformDrop(target);
+
+	ResetDropState();
+
+	return targetEffect;
+}
+
+void ApplicationToolbar::StoreDropShellItemArray(IDataObject *dataObject)
+{
+	assert(!m_dropShellItems);
+
+	wil::com_ptr_nothrow<IShellItemArray> dropShellItems;
+	HRESULT hr = SHCreateShellItemArrayFromDataObject(dataObject, IID_PPV_ARGS(&dropShellItems));
+
+	if (SUCCEEDED(hr))
+	{
+		m_dropShellItems = dropShellItems;
+	}
+}
+
+DWORD ApplicationToolbar::GetDropEffect(const ToolbarView::DropLocation &target)
+{
+	if (!m_dropShellItems)
+	{
+		return DROPEFFECT_NONE;
+	}
+
+	// Items of any type (file/folder) may be dropped on a button.
+	if (target.onItem)
+	{
+		return DROPEFFECT_COPY;
+	}
+
+	if (!m_areAllDropItemsFolders)
+	{
+		SFGAOF attributes;
+		HRESULT hr = m_dropShellItems->GetAttributes(SIATTRIBFLAGS_AND, SFGAO_FOLDER, &attributes);
+
+		// If the return value is S_OK, that means the attributes returned exactly match the ones
+		// requested (i.e. every item is a folder).
+		if (hr == S_OK)
 		{
-			int iIndex =
-				static_cast<int>(SendMessage(m_hwnd, TB_COMMANDTOINDEX, LOWORD(wParam), 0));
-			OpenItem(iIndex, nullptr);
-			return 0;
+			m_areAllDropItemsFolders = true;
 		}
 		else
 		{
-			switch (LOWORD(wParam))
-			{
-			case IDM_APP_OPEN:
-				OpenItem(m_RightClickItem, nullptr);
-				return 0;
-
-			case IDM_APP_NEW:
-				ShowNewItemDialog();
-				return 0;
-
-			case IDM_APP_DELETE:
-				DeleteItem(m_RightClickItem);
-				return 0;
-
-			case IDM_APP_PROPERTIES:
-				ShowItemProperties(m_RightClickItem);
-				return 0;
-			}
+			// This branch will be taken if the items aren't all folders, or the call fails. Setting
+			// a value of false here at least means the drop will be attempted if the call fails and
+			// the items are then dropped on the toolbar background (rather than on an existing
+			// button).
+			m_areAllDropItemsFolders = false;
 		}
-		break;
-
-	case WM_NOTIFY:
-		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == m_hwnd)
-		{
-			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
-			{
-			case NM_RCLICK:
-			{
-				auto *pnmm = reinterpret_cast<NMMOUSE *>(lParam);
-
-				if (pnmm->dwItemSpec != -1)
-				{
-					int iIndex = static_cast<int>(
-						SendMessage(m_hwnd, TB_COMMANDTOINDEX, pnmm->dwItemSpec, 0));
-
-					if (iIndex != -1)
-					{
-						m_RightClickItem = iIndex;
-
-						HMENU rightClickMenu = GetSubMenu(
-							LoadMenu(m_hInstance, MAKEINTRESOURCE(IDR_APPLICATIONTOOLBAR_MENU)), 0);
-
-						ClientToScreen(m_hwnd, &pnmm->pt);
-						TrackPopupMenu(rightClickMenu, TPM_LEFTALIGN, pnmm->pt.x, pnmm->pt.y, 0,
-							m_hwnd, nullptr);
-					}
-
-					return TRUE;
-				}
-			}
-			break;
-
-			case TBN_GETINFOTIP:
-			{
-				auto *pnmtbgit = reinterpret_cast<NMTBGETINFOTIP *>(lParam);
-
-				int iIndex =
-					static_cast<int>(SendMessage(m_hwnd, TB_COMMANDTOINDEX, pnmtbgit->iItem, 0));
-				ApplicationButton *button = MapToolbarButtonToItem(iIndex);
-
-				if (button != nullptr)
-				{
-					StringCchPrintf(pnmtbgit->pszText, pnmtbgit->cchTextMax, _T("%s\n%s"),
-						button->Name.c_str(), button->Command.c_str());
-				}
-
-				return 0;
-			}
-			}
-		}
-		break;
 	}
 
-	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
+	if (*m_areAllDropItemsFolders)
+	{
+		return DROPEFFECT_NONE;
+	}
+
+	return DROPEFFECT_COPY;
 }
 
-void ApplicationToolbar::AddButtonsToToolbar()
+DWORD ApplicationToolbar::PerformDrop(const ToolbarView::DropLocation &target)
 {
-	for (const auto &button : m_atps->m_Buttons)
+	if (target.onItem)
 	{
-		AddButtonToToolbar(button);
-	}
-}
-
-void ApplicationToolbar::AddButtonToToolbar(const ApplicationButton &Button)
-{
-	ApplicationInfo ai = ParseCommandString(Button.Command);
-
-	SHFILEINFO shfi;
-	DWORD_PTR ret =
-		SHGetFileInfo(ai.application.c_str(), 0, &shfi, sizeof(shfi), SHGFI_SYSICONINDEX);
-
-	/* Assign a generic icon if the file was not found. */
-	if (ret == 0)
-	{
-		shfi.iIcon = 0;
-	}
-
-	TBBUTTON tbButton;
-	tbButton.iBitmap = shfi.iIcon;
-	tbButton.idCommand = m_uIDStart + Button.ID;
-	tbButton.fsState = TBSTATE_ENABLED;
-	tbButton.fsStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT;
-	tbButton.dwData = Button.ID;
-
-	if (Button.ShowNameOnToolbar)
-	{
-		tbButton.iString = reinterpret_cast<INT_PTR>(Button.Name.c_str());
+		return DropItemsOnButton(target.index);
 	}
 	else
 	{
-		tbButton.iString = reinterpret_cast<INT_PTR>(EMPTY_STRING);
-	}
-
-	SendMessage(m_hwnd, TB_ADDBUTTONS, static_cast<WPARAM>(1), reinterpret_cast<LPARAM>(&tbButton));
-	UpdateToolbarBandSizing(GetParent(m_hwnd), m_hwnd);
-}
-
-void ApplicationToolbar::UpdateButton(int iItem)
-{
-	ApplicationButton *button = MapToolbarButtonToItem(iItem);
-
-	if (button != nullptr)
-	{
-		ApplicationInfo ai = ParseCommandString(button->Command);
-
-		SHFILEINFO shfi;
-		DWORD_PTR ret =
-			SHGetFileInfo(ai.application.c_str(), 0, &shfi, sizeof(shfi), SHGFI_SYSICONINDEX);
-
-		if (ret == 0)
-		{
-			shfi.iIcon = 0;
-		}
-
-		TBBUTTONINFO tbi;
-		TCHAR name[512];
-		tbi.cbSize = sizeof(tbi);
-		tbi.dwMask = TBIF_BYINDEX | TBIF_IMAGE;
-		tbi.iImage = shfi.iIcon;
-
-		if (button->ShowNameOnToolbar)
-		{
-			WI_SetFlag(tbi.dwMask, TBIF_TEXT);
-
-			StringCchCopy(name, SIZEOF_ARRAY(name), button->Name.c_str());
-			tbi.pszText = name;
-		}
-
-		SendMessage(m_hwnd, TB_SETBUTTONINFO, iItem, reinterpret_cast<LPARAM>(&tbi));
+		return AddDropItems(target.index);
 	}
 }
 
-void ApplicationToolbar::ShowNewItemDialog()
+DWORD ApplicationToolbar::DropItemsOnButton(size_t target)
 {
-	ApplicationButton button;
-	button.ShowNameOnToolbar = TRUE;
-
-	ApplicationToolbarButtonDialog applicationToolbarButtonDialog(m_hInstance, m_hwnd, &button,
-		true);
-	INT_PTR ret = applicationToolbarButtonDialog.ShowModalDialog();
-
-	if (ret == 1)
-	{
-		button.ID = m_atps->m_IDCounter++;
-		m_atps->m_Buttons.push_back(button);
-
-		AddButtonToToolbar(button);
-	}
-}
-
-void ApplicationToolbar::AddNewItem(const std::wstring &name, const std::wstring &command,
-	BOOL showNameOnToolbar)
-{
-	ApplicationButton button;
-	bool success = m_atps->AddButton(name, command, showNameOnToolbar, &button);
-
-	if (success)
-	{
-		AddButtonToToolbar(button);
-	}
-}
-
-/* If any parameters are provided to this method,
-they will be passed to the application along
-with the default parameters (i.e. those attached
-to the button). */
-void ApplicationToolbar::OpenItem(int iItem, std::wstring *parameters)
-{
-	assert(iItem >= 0 && static_cast<size_t>(iItem) < m_atps->m_Buttons.size());
-
-	ApplicationButton *button = MapToolbarButtonToItem(iItem);
-
-	if (!button)
-	{
-		return;
-	}
-
-	ApplicationInfo ai = ParseCommandString(button->Command);
-
-	unique_pidl_absolute pidl;
-	HRESULT hr =
-		SHParseDisplayName(ai.application.c_str(), nullptr, wil::out_param(pidl), 0, nullptr);
+	DWORD numItems;
+	HRESULT hr = m_dropShellItems->GetCount(&numItems);
 
 	if (FAILED(hr))
 	{
-		std::wstring messageTemplate =
-			ResourceHelper::LoadString(m_hInstance, IDS_APPLICATION_TOOLBAR_OPEN_ERROR);
-		_com_error error(hr);
-		std::wstring message =
-			(boost::wformat(messageTemplate) % ai.application % error.ErrorMessage()).str();
-
-		MessageBox(m_hwnd, message.c_str(), NExplorerplusplus::APP_NAME, MB_ICONWARNING | MB_OK);
-		return;
+		return DROPEFFECT_NONE;
 	}
 
-	std::wstring combinedParameters = ai.parameters;
+	std::vector<std::wstring> extraParametersVector;
 
-	if (parameters != nullptr && parameters->length() > 0)
+	for (DWORD i = 0; i < numItems; i++)
 	{
-		combinedParameters.append(_T(" "));
-		combinedParameters.append(*parameters);
-	}
+		wil::com_ptr_nothrow<IShellItem> shellItem;
+		hr = m_dropShellItems->GetItemAt(i, &shellItem);
 
-	m_coreInterface->OpenFileItem(pidl.get(), combinedParameters.c_str());
-}
-
-void ApplicationToolbar::ShowItemProperties(int iItem)
-{
-	assert(iItem >= 0 && static_cast<size_t>(iItem) < m_atps->m_Buttons.size());
-
-	ApplicationButton *button = MapToolbarButtonToItem(iItem);
-
-	if (button != nullptr)
-	{
-		ApplicationToolbarButtonDialog applicationToolbarButtonDialog(m_hInstance, m_hwnd, button,
-			false);
-		INT_PTR ret = applicationToolbarButtonDialog.ShowModalDialog();
-
-		if (ret == 1)
+		if (FAILED(hr))
 		{
-			UpdateButton(iItem);
-		}
-	}
-}
-
-void ApplicationToolbar::DeleteItem(int iItem)
-{
-	assert(iItem >= 0 && static_cast<size_t>(iItem) < m_atps->m_Buttons.size());
-
-	std::wstring message = ResourceHelper::LoadString(m_hInstance, IDS_APPLICATIONBUTTON_DELETE);
-
-	int iMessageBoxReturn = MessageBox(m_hwnd, message.c_str(), NExplorerplusplus::APP_NAME,
-		MB_YESNO | MB_ICONINFORMATION | MB_DEFBUTTON2);
-
-	if (iMessageBoxReturn == IDYES)
-	{
-		TBBUTTON tbButton;
-		LRESULT lResult =
-			SendMessage(m_hwnd, TB_GETBUTTON, iItem, reinterpret_cast<LPARAM>(&tbButton));
-
-		if (lResult)
-		{
-			int id = static_cast<int>(tbButton.dwData);
-			auto itr = std::find_if(m_atps->m_Buttons.begin(), m_atps->m_Buttons.end(),
-				[id](const ApplicationButton &Button)
-				{
-					return Button.ID == id;
-				});
-
-			if (itr != m_atps->m_Buttons.end())
-			{
-				m_atps->m_Buttons.erase(itr);
-				SendMessage(m_hwnd, TB_DELETEBUTTON, iItem, 0);
-				UpdateToolbarBandSizing(GetParent(m_hwnd), m_hwnd);
-			}
-		}
-	}
-}
-
-void ApplicationToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt)
-{
-	UNREFERENCED_PARAMETER(pt);
-
-	if (sourceWindow != m_hwnd)
-	{
-		return;
-	}
-
-	std::wstring newText = ResourceHelper::LoadString(m_hInstance, IDS_APPLICATIONBUTTON_NEW);
-
-	MENUITEMINFO mii;
-	mii.cbSize = sizeof(mii);
-	mii.fMask = MIIM_ID | MIIM_STRING;
-	mii.dwTypeData = newText.data();
-	mii.wID = IDM_APP_NEW;
-
-	InsertMenuItem(menu, IDM_TOOLBARS_CUSTOMIZE, FALSE, &mii);
-}
-
-ApplicationButton *ApplicationToolbar::MapToolbarButtonToItem(int iIndex)
-{
-	if (iIndex == -1)
-	{
-		return nullptr;
-	}
-
-	TBBUTTON tbButton;
-	LRESULT lResult =
-		SendMessage(m_hwnd, TB_GETBUTTON, iIndex, reinterpret_cast<LPARAM>(&tbButton));
-
-	if (lResult)
-	{
-		int id = static_cast<int>(tbButton.dwData);
-		auto itr = std::find_if(m_atps->m_Buttons.begin(), m_atps->m_Buttons.end(),
-			[id](const ApplicationButton &Button)
-			{
-				return Button.ID == id;
-			});
-
-		if (itr != m_atps->m_Buttons.end())
-		{
-			return &(*itr);
-		}
-	}
-
-	return nullptr;
-}
-
-ApplicationToolbarPersistentSettings::ApplicationToolbarPersistentSettings() : m_IDCounter(0)
-{
-}
-
-ApplicationToolbarPersistentSettings &ApplicationToolbarPersistentSettings::GetInstance()
-{
-	static ApplicationToolbarPersistentSettings atps;
-	return atps;
-}
-
-void ApplicationToolbarPersistentSettings::LoadRegistrySettings(HKEY hParentKey)
-{
-	TCHAR szItemKey[256];
-	int i = 0;
-	StringCchPrintf(szItemKey, SIZEOF_ARRAY(szItemKey), _T("%d"), i);
-
-	HKEY hKeyChild;
-	LONG returnValue = RegOpenKeyEx(hParentKey, szItemKey, 0, KEY_READ, &hKeyChild);
-
-	while (returnValue == ERROR_SUCCESS)
-	{
-		TCHAR szName[512];
-		TCHAR szCommand[512];
-		BOOL bShowNameOnToolbar = TRUE;
-
-		LONG lNameStatus =
-			RegistrySettings::ReadString(hKeyChild, SETTING_NAME, szName, SIZEOF_ARRAY(szName));
-		LONG lCommandStatus = RegistrySettings::ReadString(hKeyChild, SETTING_COMMAND, szCommand,
-			SIZEOF_ARRAY(szCommand));
-		RegistrySettings::ReadDword(hKeyChild, SETTING_SHOW_NAME_ON_TOOLBAR,
-			reinterpret_cast<DWORD *>(&bShowNameOnToolbar));
-
-		if (lNameStatus == ERROR_SUCCESS && lCommandStatus == ERROR_SUCCESS)
-		{
-			AddButton(szName, szCommand, bShowNameOnToolbar, nullptr);
+			continue;
 		}
 
-		RegCloseKey(hKeyChild);
+		wil::unique_cotaskmem_string parsingPath;
+		hr = shellItem->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &parsingPath);
 
-		i++;
-
-		StringCchPrintf(szItemKey, SIZEOF_ARRAY(szItemKey), _T("%d"), i);
-		returnValue = RegOpenKeyEx(hParentKey, szItemKey, 0, KEY_READ, &hKeyChild);
-	}
-}
-
-void ApplicationToolbarPersistentSettings::SaveRegistrySettings(HKEY hParentKey)
-{
-	int index = 0;
-
-	for (const auto &button : m_Buttons)
-	{
-		TCHAR szKeyName[32];
-		_itow_s(index, szKeyName, SIZEOF_ARRAY(szKeyName), 10);
-
-		HKEY hKeyChild;
-		LONG returnValue = RegCreateKeyEx(hParentKey, szKeyName, 0, nullptr,
-			REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &hKeyChild, nullptr);
-
-		if (returnValue == ERROR_SUCCESS)
+		if (FAILED(hr))
 		{
-			RegistrySettings::SaveString(hKeyChild, SETTING_NAME, button.Name.c_str());
-			RegistrySettings::SaveString(hKeyChild, SETTING_COMMAND, button.Command.c_str());
-			RegistrySettings::SaveDword(hKeyChild, SETTING_SHOW_NAME_ON_TOOLBAR,
-				button.ShowNameOnToolbar);
-
-			index++;
-
-			RegCloseKey(hKeyChild);
+			continue;
 		}
+
+		extraParametersVector.push_back(parsingPath.get());
 	}
+
+	std::transform(extraParametersVector.begin(), extraParametersVector.end(),
+		extraParametersVector.begin(),
+		[](const std::wstring &parameter)
+		{
+			return L"\"" + parameter + L"\"";
+		});
+
+	std::wstring extraParameters = boost::algorithm::join(extraParametersVector, L" ");
+
+	auto application = m_model->GetApplicationAtIndex(target);
+	assert(application);
+	OpenApplication(m_coreInterface, m_view->GetHWND(), application, extraParameters);
+
+	return DROPEFFECT_COPY;
 }
 
-void ApplicationToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
+DWORD ApplicationToolbar::AddDropItems(size_t startingIndex)
 {
-	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
-	HRESULT hr = pNode->get_attributes(&am);
+	if (m_areAllDropItemsFolders && *m_areAllDropItemsFolders)
+	{
+		return DROPEFFECT_NONE;
+	}
+
+	DWORD numItems;
+	HRESULT hr = m_dropShellItems->GetCount(&numItems);
 
 	if (FAILED(hr))
 	{
-		return;
+		return DROPEFFECT_NONE;
 	}
 
-	BOOL bNameFound = FALSE;
-	BOOL bCommandFound = FALSE;
-	TCHAR szName[512];
-	TCHAR szCommand[512];
-	BOOL bShowNameOnToolbar = TRUE;
+	size_t index = startingIndex;
 
-	long lChildNodes;
-	am->get_length(&lChildNodes);
-
-	for (int i = 0; i < lChildNodes; i++)
+	for (DWORD i = 0; i < numItems; i++)
 	{
-		wil::com_ptr_nothrow<IXMLDOMNode> pAttributeNode;
-		am->get_item(i, &pAttributeNode);
+		wil::com_ptr_nothrow<IShellItem> shellItem;
+		hr = m_dropShellItems->GetItemAt(i, &shellItem);
 
-		wil::unique_bstr bstrName;
-		pAttributeNode->get_nodeName(&bstrName);
-
-		wil::unique_bstr bstrValue;
-		pAttributeNode->get_text(&bstrValue);
-
-		if (lstrcmpi(bstrName.get(), SETTING_NAME) == 0)
+		if (FAILED(hr))
 		{
-			StringCchCopy(szName, SIZEOF_ARRAY(szName), bstrValue.get());
+			continue;
+		}
 
-			bNameFound = TRUE;
-		}
-		else if (lstrcmpi(bstrName.get(), SETTING_COMMAND) == 0)
-		{
-			StringCchCopy(szCommand, SIZEOF_ARRAY(szCommand), bstrValue.get());
+		hr = AddDropItem(shellItem.get(), index);
 
-			bCommandFound = TRUE;
-		}
-		else if (lstrcmpi(bstrName.get(), SETTING_SHOW_NAME_ON_TOOLBAR) == 0)
+		if (FAILED(hr))
 		{
-			bShowNameOnToolbar = NXMLSettings::DecodeBoolValue(bstrValue.get());
+			continue;
 		}
+
+		index++;
 	}
 
-	if (bNameFound && bCommandFound)
+	if (index == startingIndex)
 	{
-		AddButton(szName, szCommand, bShowNameOnToolbar, nullptr);
+		// In this case, no items were actually copied.
+		return DROPEFFECT_NONE;
 	}
 
-	wil::com_ptr_nothrow<IXMLDOMNode> pNextSibling;
-	hr = pNode->get_nextSibling(&pNextSibling);
-
-	if (hr == S_OK)
-	{
-		wil::com_ptr_nothrow<IXMLDOMNode> secondSibling;
-		hr = pNextSibling->get_nextSibling(&secondSibling);
-
-		if (hr == S_OK)
-		{
-			LoadXMLSettings(secondSibling.get());
-		}
-	}
+	return DROPEFFECT_COPY;
 }
 
-void ApplicationToolbarPersistentSettings::SaveXMLSettings(IXMLDOMDocument *pXMLDom,
-	IXMLDOMElement *pe)
+HRESULT ApplicationToolbar::AddDropItem(IShellItem *shellItem, size_t index)
 {
-	auto bstr_wsntt = wil::make_bstr_nothrow(L"\n\t\t");
+	SFGAOF attributes;
+	HRESULT hr = shellItem->GetAttributes(SFGAO_FOLDER, &attributes);
 
-	for (const auto &button : m_Buttons)
+	// As with testing shell item array attributes, if the return value is S_OK, the returned
+	// attributes exactly match those passed in (i.e. the item is a folder).
+	if (hr == S_OK || FAILED(hr))
 	{
-		NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe);
-
-		wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
-		NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe, _T("ApplicationButton"),
-			button.Name.c_str());
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), SETTING_COMMAND,
-			button.Command.c_str());
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), SETTING_SHOW_NAME_ON_TOOLBAR,
-			NXMLSettings::EncodeBoolValue(button.ShowNameOnToolbar));
+		return hr;
 	}
+
+	wil::com_ptr_nothrow<IShellItem2> shellItem2;
+	RETURN_IF_FAILED(shellItem->QueryInterface(IID_PPV_ARGS(&shellItem2)));
+
+	wil::unique_cotaskmem_string displayName;
+	RETURN_IF_FAILED(shellItem2->GetString(PKEY_ItemNameDisplayWithoutExtension, &displayName));
+
+	wil::unique_cotaskmem_string parsingPath;
+	RETURN_IF_FAILED(shellItem->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &parsingPath));
+
+	std::wstring quotedParsingPath = parsingPath.get();
+
+	if (quotedParsingPath.find(' ') != std::wstring::npos)
+	{
+		quotedParsingPath = L"\"" + quotedParsingPath + L"\"";
+	}
+
+	auto application = std::make_unique<Application>(displayName.get(), quotedParsingPath, true);
+	m_model->AddApplication(std::move(application), index);
+
+	return S_OK;
 }
 
-bool ApplicationToolbarPersistentSettings::AddButton(const std::wstring &name,
-	const std::wstring &command, BOOL showNameOnToolbar, ApplicationButton *buttonOut)
+void ApplicationToolbar::ResetDropState()
 {
-	if (name.length() == 0 || command.length() == 0)
-	{
-		return false;
-	}
+	m_dropShellItems.reset();
+	m_areAllDropItemsFolders.reset();
+}
 
-	ApplicationButton button;
-	button.Name = name;
-	button.Command = command;
-	button.ShowNameOnToolbar = showNameOnToolbar;
-	button.ID = m_IDCounter++;
-	m_Buttons.push_back(button);
-
-	if (buttonOut != nullptr)
-	{
-		*buttonOut = button;
-	}
-
-	return true;
 }

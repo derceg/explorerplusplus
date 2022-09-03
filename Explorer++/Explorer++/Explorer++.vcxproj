@@ -480,7 +480,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AboutDialog.cpp" />
+    <ClCompile Include="Application.cpp" />
+    <ClCompile Include="ApplicationContextMenu.cpp" />
+    <ClCompile Include="ApplicationContextMenuController.cpp" />
+    <ClCompile Include="ApplicationModel.cpp" />
     <ClCompile Include="ApplicationToolbarHelper.cpp" />
+    <ClCompile Include="ApplicationToolbarRegistryStorage.cpp" />
+    <ClCompile Include="ApplicationToolbarView.cpp" />
+    <ClCompile Include="ApplicationToolbarXmlStorage.cpp" />
     <ClCompile Include="DriveEnumeratorImpl.cpp" />
     <ClCompile Include="DriveModel.cpp" />
     <ClCompile Include="DrivesToolbarView.cpp" />
@@ -497,9 +504,7 @@
     <ClCompile Include="Bookmarks\UI\AddBookmarkDialog.cpp" />
     <ClCompile Include="AddressBar.cpp" />
     <ClCompile Include="Plugins\ApiBinding.cpp" />
-    <ClCompile Include="ApplicationToolbar.cpp" />
-    <ClCompile Include="ApplicationToolbarButtonDialog.cpp" />
-    <ClCompile Include="ApplicationToolbarDropHandler.cpp" />
+    <ClCompile Include="ApplicationEditorDialog.cpp" />
     <ClCompile Include="Bookmarks\BookmarkClipboard.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkContextMenu.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkContextMenuController.cpp" />
@@ -641,10 +646,12 @@
     <ClCompile Include="Plugins\TabsApi\Events\TabUpdated.cpp" />
     <ClCompile Include="TaskbarThumbnails.cpp" />
     <ClCompile Include="ThirdPartyCreditsDialog.cpp" />
+    <ClCompile Include="ToolbarViewHelper.cpp" />
     <ClCompile Include="UiTheming.cpp" />
     <ClCompile Include="TreeViewHandler.cpp" />
     <ClCompile Include="Plugins\UiApi.cpp" />
     <ClCompile Include="UpdateCheckDialog.cpp" />
+    <ClCompile Include="ApplicationToolbar.cpp" />
     <ClCompile Include="WildcardSelectDialog.cpp" />
     <ClCompile Include="WindowHandler.cpp" />
     <ClCompile Include="WinMain.cpp" />
@@ -655,7 +662,14 @@
     <ClInclude Include="AboutDialog.h" />
     <ClInclude Include="Accelerator.h" />
     <ClInclude Include="AcceleratorMappings.h" />
+    <ClInclude Include="Application.h" />
+    <ClInclude Include="ApplicationContextMenu.h" />
+    <ClInclude Include="ApplicationContextMenuController.h" />
+    <ClInclude Include="ApplicationModel.h" />
     <ClInclude Include="ApplicationToolbarHelper.h" />
+    <ClInclude Include="ApplicationToolbarRegistryStorage.h" />
+    <ClInclude Include="ApplicationToolbarView.h" />
+    <ClInclude Include="ApplicationToolbarXmlStorage.h" />
     <ClInclude Include="DriveEnumerator.h" />
     <ClInclude Include="DriveEnumeratorImpl.h" />
     <ClInclude Include="DriveModel.h" />
@@ -674,9 +688,7 @@
     <ClInclude Include="Bookmarks\UI\AddBookmarkDialog.h" />
     <ClInclude Include="AddressBar.h" />
     <ClInclude Include="Plugins\ApiBinding.h" />
-    <ClInclude Include="ApplicationToolbar.h" />
-    <ClInclude Include="ApplicationToolbarButtonDialog.h" />
-    <ClInclude Include="ApplicationToolbarDropHandler.h" />
+    <ClInclude Include="ApplicationEditorDialog.h" />
     <ClInclude Include="Bookmarks\BookmarkClipboard.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkContextMenu.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkContextMenuController.h" />
@@ -801,10 +813,12 @@
     <ClInclude Include="Plugins\TabsApi\Events\TabUpdated.h" />
     <ClInclude Include="TaskbarThumbnails.h" />
     <ClInclude Include="ThirdPartyCreditsDialog.h" />
+    <ClInclude Include="ToolbarViewHelper.h" />
     <ClInclude Include="UiTheming.h" />
     <ClInclude Include="MainToolbarButtons.h" />
     <ClInclude Include="Plugins\UiApi.h" />
     <ClInclude Include="UpdateCheckDialog.h" />
+    <ClInclude Include="ApplicationToolbar.h" />
     <ClInclude Include="ValueWrapper.h" />
     <ClInclude Include="ViewModeHelper.h" />
     <ClInclude Include="WildcardSelectDialog.h" />

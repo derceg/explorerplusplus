@@ -28,9 +28,9 @@ BookmarkTreeView::BookmarkTreeView(HWND hTreeView, HINSTANCE hInstance,
 	m_bNewFolderCreated(false)
 {
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hTreeView,
-		BookmarkTreeViewProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+		BookmarkTreeViewProcStub, reinterpret_cast<DWORD_PTR>(this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(hTreeView),
-		BookmarkTreeViewParentProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+		BookmarkTreeViewParentProcStub, reinterpret_cast<DWORD_PTR>(this)));
 
 	SetWindowTheme(hTreeView, L"Explorer", nullptr);
 

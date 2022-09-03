@@ -66,6 +66,20 @@ public:
 	using ToolbarUpdatedSignal = boost::signals2::signal<void()>;
 	using WindowDestroyedSignal = boost::signals2::signal<void()>;
 
+	struct DropLocation
+	{
+		DropLocation(bool onItem, size_t index) : onItem(onItem), index(index)
+		{
+		}
+
+		bool onItem;
+
+		// If onItem is set, the drop location is over an item and this will be the index of the
+		// item; otherwise it will be the index of the next item (which may be one past the last
+		// item that's actually shown).
+		size_t index;
+	};
+
 	ToolbarView(const ToolbarView &) = delete;
 	ToolbarView(ToolbarView &&) = delete;
 	ToolbarView &operator=(const ToolbarView &) = delete;
@@ -77,6 +91,8 @@ public:
 	void UpdateButton(size_t index);
 	void RemoveButton(size_t index);
 
+	DropLocation GetDropLocation(const POINT &ptScreen);
+
 	boost::signals2::connection AddToolbarUpdatedObserver(
 		const ToolbarUpdatedSignal::slot_type &observer);
 	boost::signals2::connection AddWindowDestroyedObserver(
@@ -86,12 +102,11 @@ protected:
 	ToolbarView(HWND parent, DWORD style, DWORD extendedStyle);
 	virtual ~ToolbarView() = default;
 
+	void SetupSmallShellImageList();
+
 	const HWND m_hwnd;
 
 private:
-	static const UINT_PTR SUBCLASS_ID = 0;
-	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
-
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 

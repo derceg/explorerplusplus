@@ -5,7 +5,10 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "AddressBar.h"
+#include "Application.h"
+#include "ApplicationEditorDialog.h"
 #include "ApplicationToolbar.h"
+#include "ApplicationToolbarView.h"
 #include "Bookmarks/UI/AddBookmarkDialog.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "Bookmarks/UI/BookmarksToolbar.h"
@@ -203,7 +206,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM w
 				SIZEOF_ARRAY(szFolderSize), m_config->globalFolderSettings.forceSize,
 				m_config->globalFolderSettings.sizeDisplayFormat);
 
-			LoadString(m_hLanguageModule, IDS_GENERAL_TOTALSIZE, szTotalSize,
+			LoadString(m_resourceModule, IDS_GENERAL_TOTALSIZE, szTotalSize,
 				SIZEOF_ARRAY(szTotalSize));
 
 			StringCchPrintf(szSizeString, SIZEOF_ARRAY(szSizeString), _T("%s: %s"), szTotalSize,
@@ -287,8 +290,10 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM w
 LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd, HWND control, int id,
 	UINT notificationCode)
 {
-	// The drives toolbar will handle its own items.
-	if (control && m_drivesToolbar && control == m_drivesToolbar->GetView()->GetHWND())
+	// The drives toolbar/application toolbar will handle their own items.
+	if (control
+		&& ((m_drivesToolbar && control == m_drivesToolbar->GetView()->GetHWND())
+			|| m_applicationToolbar && control == m_applicationToolbar->GetView()->GetHWND()))
 	{
 		return 1;
 	}
@@ -529,7 +534,8 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 
 	case IDM_TOOLBARS_APPLICATIONTOOLBAR:
 		m_config->showApplicationToolbar = !m_config->showApplicationToolbar;
-		ShowMainRebarBand(m_pApplicationToolbar->GetHWND(), m_config->showApplicationToolbar);
+		ShowMainRebarBand(m_applicationToolbar->GetView()->GetHWND(),
+			m_config->showApplicationToolbar);
 		AdjustFolderPanePosition();
 		ResizeWindows();
 		break;
@@ -537,6 +543,16 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 	case IDM_TOOLBARS_LOCKTOOLBARS:
 		OnLockToolbars();
 		break;
+
+	case IDM_APP_NEW:
+	{
+		Applications::ApplicationEditorDialog editorDialog(
+			m_applicationToolbar->GetView()->GetHWND(), m_resourceModule, &m_applicationModel,
+			Applications::ApplicationEditorDialog::EditDetails::AddNewApplication(
+				std::make_unique<Applications::Application>(L"", L"")));
+		editorDialog.ShowModalDialog();
+	}
+	break;
 
 	case IDM_TOOLBARS_CUSTOMIZE:
 		SendMessage(m_mainToolbar->GetHWND(), TB_CUSTOMIZE, 0, 0);
@@ -1265,14 +1281,14 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_BOOKMARKS_BOOKMARK_ALL_TABS:
-		BookmarkHelper::BookmarkAllTabs(&m_bookmarkTree, m_hLanguageModule, hwnd, this);
+		BookmarkHelper::BookmarkAllTabs(&m_bookmarkTree, m_resourceModule, hwnd, this);
 		break;
 
 	case MainToolbarButton::Bookmarks:
 	case IDM_BOOKMARKS_MANAGEBOOKMARKS:
 		if (g_hwndManageBookmarks == nullptr)
 		{
-			auto *pManageBookmarksDialog = new ManageBookmarksDialog(m_hLanguageModule, hwnd, this,
+			auto *pManageBookmarksDialog = new ManageBookmarksDialog(m_resourceModule, hwnd, this,
 				m_navigation.get(), &m_bookmarkIconFetcher, &m_bookmarkTree);
 			g_hwndManageBookmarks =
 				pManageBookmarksDialog->ShowModelessDialog(new ModelessDialogNotification());
@@ -1517,7 +1533,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 			break;
 
 		case ID_APPLICATIONSTOOLBAR:
-			hToolbar = m_pApplicationToolbar->GetHWND();
+			hToolbar = m_applicationToolbar->GetView()->GetHWND();
 			himlMenu = himlSmall;
 			break;
 		}

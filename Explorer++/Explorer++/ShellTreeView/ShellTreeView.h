@@ -46,9 +46,6 @@ public:
 	void PasteShortcut();
 
 private:
-	static const UINT_PTR SUBCLASS_ID = 0;
-	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
-
 	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 1;
 	static const UINT WM_APP_SUBFOLDERS_RESULT_READY = WM_APP + 2;
 

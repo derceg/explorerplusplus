@@ -5,6 +5,7 @@
 #pragma once
 
 #include "AcceleratorUpdater.h"
+#include "ApplicationModel.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "CommandLine.h"
 #include "CoreInterface.h"
@@ -35,7 +36,6 @@
 
 // Forward declarations.
 class AddressBar;
-class ApplicationToolbar;
 class BookmarksMainMenu;
 class BookmarksToolbar;
 struct ColumnWidth;
@@ -57,6 +57,11 @@ struct TabSettings;
 class TaskbarThumbnails;
 class UiTheming;
 class WindowSubclassWrapper;
+
+namespace Applications
+{
+class ApplicationToolbar;
+}
 
 namespace NColorRuleHelper
 {
@@ -475,7 +480,7 @@ private:
 
 	/* IExplorerplusplus methods. */
 	const Config *GetConfig() const override;
-	HMODULE GetLanguageModule() const override;
+	HMODULE GetResourceModule() const override;
 	HACCEL *GetAcceleratorTable() const;
 	HWND GetMainWindow() const override;
 	HWND GetActiveListView() const override;
@@ -542,7 +547,7 @@ private:
 	ShellTreeView *m_shellTreeView;
 	StatusBar *m_pStatusBar;
 
-	HMODULE m_hLanguageModule;
+	HMODULE m_resourceModule;
 
 	/** Internal state. **/
 	HWND m_hLastActiveWindow;
@@ -635,7 +640,9 @@ private:
 	REBARBANDINFO m_ToolbarInformation[NUM_MAIN_TOOLBARS];
 	MainToolbar *m_mainToolbar;
 	DrivesToolbar *m_drivesToolbar = nullptr;
-	ApplicationToolbar *m_pApplicationToolbar;
+	Applications::ApplicationToolbar *m_applicationToolbar = nullptr;
+
+	Applications::ApplicationModel m_applicationModel;
 
 	/* Display window folder sizes. */
 	std::list<DWFolderSize> m_DWFolderSizes;

@@ -145,7 +145,7 @@ HWND OptionsDialog::Show(HWND parentWindow)
 	HWND propertySheet = reinterpret_cast<HWND>(PropertySheet(&psh));
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(propertySheet,
-		PropSheetProcStub, PROP_SHEET_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+		PropSheetProcStub, reinterpret_cast<DWORD_PTR>(this)));
 
 	m_tipWnd = CreateTooltipControl(propertySheet, m_instance);
 
@@ -1532,8 +1532,7 @@ INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(HWND hDlg, UINT uMsg, WPARA
 			LVS_EX_LABELTIP | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
 
 		m_advancedOptionsListViewSubclass = std::make_unique<WindowSubclassWrapper>(listView,
-			std::bind_front(&OptionsDialog::AdvancedOptionsListViewWndProc, this),
-			ADVANCED_OPTIONS_LISTVIEW_SUBCLASS_ID);
+			std::bind_front(&OptionsDialog::AdvancedOptionsListViewWndProc, this));
 
 		SendDlgItemMessage(hDlg, IDC_ADVANCED_OPTION_DESCRIPTION, EM_AUTOURLDETECT, AURL_ENABLEURL,
 			NULL);

@@ -5,55 +5,23 @@
 #include "Bookmarks/BookmarkRegistryStorage.h"
 #include "BookmarkStorageHelper.h"
 #include "Bookmarks/BookmarkTree.h"
-#include "ResourceHelper.h"
+#include "RegistryStorageHelper.h"
 #include <gtest/gtest.h>
-#include <Shlwapi.h>
-#include <shellapi.h>
 
 using namespace testing;
 
-const TCHAR g_applicationTestKey[] = _T("Software\\Explorer++Test");
-
-class BookmarkRegistryStorageTest : public Test
+class BookmarkRegistryStorageTest : public RegistryStorageTest
 {
 protected:
-	void TearDown() override
-	{
-		LSTATUS result = SHDeleteKey(HKEY_CURRENT_USER, g_applicationTestKey);
-		ASSERT_EQ(result, ERROR_SUCCESS);
-	}
-
 	void PerformLoadTest(const std::wstring &filename, BookmarkTree *referenceBookmarkTree,
 		bool compareGuids)
 	{
 		ImportRegistryResource(filename);
 
 		BookmarkTree loadedBookmarkTree;
-		BookmarkRegistryStorage::Load(g_applicationTestKey, &loadedBookmarkTree);
+		BookmarkRegistryStorage::Load(APPLICATION_TEST_KEY, &loadedBookmarkTree);
 
 		CompareBookmarkTrees(&loadedBookmarkTree, referenceBookmarkTree, compareGuids);
-	}
-
-	void ImportRegistryResource(const std::wstring &filename)
-	{
-		std::wstring command = L"/c reg import " + filename;
-		auto resourcesPath = GetResourcesDirectoryPath();
-
-		SHELLEXECUTEINFO shellExecuteInfo;
-		shellExecuteInfo.cbSize = sizeof(shellExecuteInfo);
-		shellExecuteInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
-		shellExecuteInfo.hwnd = nullptr;
-		shellExecuteInfo.lpVerb = L"open";
-		shellExecuteInfo.lpFile = L"cmd.exe";
-		shellExecuteInfo.lpParameters = command.c_str();
-		shellExecuteInfo.lpDirectory = resourcesPath.c_str();
-		shellExecuteInfo.nShow = SW_HIDE;
-		shellExecuteInfo.hInstApp = nullptr;
-		BOOL result = ShellExecuteEx(&shellExecuteInfo);
-		ASSERT_TRUE(result);
-
-		WaitForSingleObject(shellExecuteInfo.hProcess, INFINITE);
-		CloseHandle(shellExecuteInfo.hProcess);
 	}
 };
 
@@ -70,10 +38,10 @@ TEST_F(BookmarkRegistryStorageTest, V2Save)
 	BookmarkTree referenceBookmarkTree;
 	BuildV2LoadSaveReferenceTree(&referenceBookmarkTree);
 
-	BookmarkRegistryStorage::Save(g_applicationTestKey, &referenceBookmarkTree);
+	BookmarkRegistryStorage::Save(APPLICATION_TEST_KEY, &referenceBookmarkTree);
 
 	BookmarkTree loadedBookmarkTree;
-	BookmarkRegistryStorage::Load(g_applicationTestKey, &loadedBookmarkTree);
+	BookmarkRegistryStorage::Load(APPLICATION_TEST_KEY, &loadedBookmarkTree);
 
 	CompareBookmarkTrees(&loadedBookmarkTree, &referenceBookmarkTree, true);
 }

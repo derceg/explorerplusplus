@@ -7,6 +7,7 @@
 #include <MsXml2.h>
 #include <gdiplus.h>
 #include <objbase.h>
+#include <list>
 
 namespace NXMLSettings
 {
@@ -36,6 +37,8 @@ void SaveDateTime(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
 	const std::wstring &baseKeyName, const FILETIME &dateTime);
 HRESULT GetIntFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name,
 	int &outputValue);
+HRESULT GetBoolFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name,
+	bool &outputValue);
 HRESULT GetStringFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name,
 	std::wstring &outputValue);
 }

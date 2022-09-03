@@ -33,7 +33,7 @@
 
 void Explorerplusplus::OnChangeDisplayColors()
 {
-	DisplayColoursDialog displayColoursDialog(m_hLanguageModule, m_hContainer, m_hDisplayWindow,
+	DisplayColoursDialog displayColoursDialog(m_resourceModule, m_hContainer, m_hDisplayWindow,
 		m_config->displayWindowCentreColor.ToCOLORREF(),
 		m_config->displayWindowSurroundColor.ToCOLORREF());
 	displayColoursDialog.ShowModalDialog();
@@ -41,7 +41,7 @@ void Explorerplusplus::OnChangeDisplayColors()
 
 void Explorerplusplus::OnFilterResults()
 {
-	FilterDialog filterDialog(m_hLanguageModule, m_hContainer, this);
+	FilterDialog filterDialog(m_resourceModule, m_hContainer, this);
 	filterDialog.ShowModalDialog();
 }
 
@@ -58,7 +58,7 @@ void Explorerplusplus::OnMergeFiles()
 		fullFilenameList.push_back(fullFilename);
 	}
 
-	MergeFilesDialog mergeFilesDialog(m_hLanguageModule, m_hContainer, this, currentDirectory,
+	MergeFilesDialog mergeFilesDialog(m_resourceModule, m_hContainer, this, currentDirectory,
 		fullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
 	mergeFilesDialog.ShowModalDialog();
 }
@@ -71,7 +71,7 @@ void Explorerplusplus::OnSplitFile()
 	{
 		std::wstring fullFilename = m_pActiveShellBrowser->GetItemFullName(iSelected);
 
-		SplitFileDialog splitFileDialog(m_hLanguageModule, m_hContainer, this, fullFilename);
+		SplitFileDialog splitFileDialog(m_resourceModule, m_hContainer, this, fullFilename);
 		splitFileDialog.ShowModalDialog();
 	}
 }
@@ -87,14 +87,14 @@ void Explorerplusplus::OnDestroyFiles()
 		fullFilenameList.push_back(fullFilename);
 	}
 
-	DestroyFilesDialog destroyFilesDialog(m_hLanguageModule, m_hContainer, fullFilenameList,
+	DestroyFilesDialog destroyFilesDialog(m_resourceModule, m_hContainer, fullFilenameList,
 		m_config->globalFolderSettings.showFriendlyDates);
 	destroyFilesDialog.ShowModalDialog();
 }
 
 void Explorerplusplus::OnWildcardSelect(BOOL bSelect)
 {
-	WildcardSelectDialog wilcardSelectDialog(m_hLanguageModule, m_hContainer, bSelect, this);
+	WildcardSelectDialog wilcardSelectDialog(m_resourceModule, m_hContainer, bSelect, this);
 	wilcardSelectDialog.ShowModalDialog();
 }
 
@@ -105,7 +105,7 @@ void Explorerplusplus::OnSearch()
 		Tab &selectedTab = m_tabContainer->GetSelectedTab();
 		std::wstring currentDirectory = selectedTab.GetShellBrowser()->GetDirectory();
 
-		auto *searchDialog = new SearchDialog(m_hLanguageModule, m_hContainer, currentDirectory,
+		auto *searchDialog = new SearchDialog(m_resourceModule, m_hContainer, currentDirectory,
 			this, m_tabContainer);
 		g_hwndSearch = searchDialog->ShowModelessDialog(new ModelessDialogNotification());
 	}
@@ -117,7 +117,7 @@ void Explorerplusplus::OnSearch()
 
 void Explorerplusplus::OnCustomizeColors()
 {
-	CustomizeColorsDialog customizeColorsDialog(m_hLanguageModule, m_hContainer, this,
+	CustomizeColorsDialog customizeColorsDialog(m_resourceModule, m_hContainer, this,
 		&m_ColorRules);
 	customizeColorsDialog.ShowModalDialog();
 
@@ -130,7 +130,7 @@ void Explorerplusplus::OnRunScript()
 {
 	if (g_hwndRunScript == nullptr)
 	{
-		auto *scriptingDialog = new ScriptingDialog(m_hLanguageModule, m_hContainer, this);
+		auto *scriptingDialog = new ScriptingDialog(m_resourceModule, m_hContainer, this);
 		g_hwndRunScript = scriptingDialog->ShowModelessDialog(new ModelessDialogNotification());
 	}
 	else
@@ -144,7 +144,7 @@ void Explorerplusplus::OnShowOptions()
 	if (g_hwndOptions == nullptr)
 	{
 		OptionsDialog *optionsDialog =
-			OptionsDialog::Create(m_config, m_hLanguageModule, this, m_tabContainer);
+			OptionsDialog::Create(m_config, m_resourceModule, this, m_tabContainer);
 		g_hwndOptions = optionsDialog->Show(m_hContainer);
 	}
 	else
@@ -177,27 +177,27 @@ void Explorerplusplus::OnShowHelp()
 
 	if (!bOpenedHelpFile)
 	{
-		HelpFileMissingDialog helpFileMissingDialog(m_hLanguageModule, m_hContainer);
+		HelpFileMissingDialog helpFileMissingDialog(m_resourceModule, m_hContainer);
 		helpFileMissingDialog.ShowModalDialog();
 	}
 }
 
 void Explorerplusplus::OnCheckForUpdates()
 {
-	UpdateCheckDialog updateCheckDialog(m_hLanguageModule, m_hContainer);
+	UpdateCheckDialog updateCheckDialog(m_resourceModule, m_hContainer);
 	updateCheckDialog.ShowModalDialog();
 }
 
 void Explorerplusplus::OnAbout()
 {
-	AboutDialog aboutDialog(m_hLanguageModule, m_hContainer);
+	AboutDialog aboutDialog(m_resourceModule, m_hContainer);
 	aboutDialog.ShowModalDialog();
 }
 
 void Explorerplusplus::OnSaveDirectoryListing() const
 {
 	TCHAR fileName[MAX_PATH];
-	LoadString(m_hLanguageModule, IDS_GENERAL_DIRECTORY_LISTING_FILENAME, fileName,
+	LoadString(m_resourceModule, IDS_GENERAL_DIRECTORY_LISTING_FILENAME, fileName,
 		SIZEOF_ARRAY(fileName));
 	StringCchCat(fileName, SIZEOF_ARRAY(fileName), _T(".txt"));
 
@@ -235,7 +235,7 @@ void Explorerplusplus::OnCreateNewFolder()
 		});
 
 	TCHAR newFolderName[128];
-	LoadString(m_hLanguageModule, IDS_NEW_FOLDER_NAME, newFolderName, SIZEOF_ARRAY(newFolderName));
+	LoadString(m_resourceModule, IDS_NEW_FOLDER_NAME, newFolderName, SIZEOF_ARRAY(newFolderName));
 	hr = NFileOperations::CreateNewFolder(directoryShellItem.get(), newFolderName, sink);
 	sink->Release();
 
@@ -243,7 +243,7 @@ void Explorerplusplus::OnCreateNewFolder()
 	{
 		TCHAR szTemp[512];
 
-		LoadString(m_hLanguageModule, IDS_NEWFOLDERERROR, szTemp, SIZEOF_ARRAY(szTemp));
+		LoadString(m_resourceModule, IDS_NEWFOLDERERROR, szTemp, SIZEOF_ARRAY(szTemp));
 
 		MessageBox(m_hContainer, szTemp, NExplorerplusplus::APP_NAME, MB_ICONERROR | MB_OK);
 	}

@@ -57,7 +57,7 @@ void Explorerplusplus::UpdateDisplayWindowForZeroFiles(const Tab &tab)
 		TCHAR szTemp[512];
 		WCHAR wszCPUBrand[64];
 		MultiByteToWideChar(CP_ACP, 0, szCPUBrand, -1, wszCPUBrand, SIZEOF_ARRAY(wszCPUBrand));
-		LoadString(m_hLanguageModule, IDS_GENERAL_DISPLAY_WINDOW_PROCESSOR, szTemp,
+		LoadString(m_resourceModule, IDS_GENERAL_DISPLAY_WINDOW_PROCESSOR, szTemp,
 			SIZEOF_ARRAY(szTemp));
 		StringCchPrintf(szDisplay, SIZEOF_ARRAY(szDisplay), szTemp, wszCPUBrand);
 		DisplayWindow_BufferText(m_hDisplayWindow, szDisplay);
@@ -71,7 +71,7 @@ void Explorerplusplus::UpdateDisplayWindowForZeroFiles(const Tab &tab)
 
 		TCHAR szMemorySize[32];
 		FormatSizeString(lTotalPhysicalMem, szMemorySize, SIZEOF_ARRAY(szMemorySize));
-		LoadString(m_hLanguageModule, IDS_GENERAL_DISPLAY_WINDOW_MEMORY, szTemp,
+		LoadString(m_resourceModule, IDS_GENERAL_DISPLAY_WINDOW_MEMORY, szTemp,
 			SIZEOF_ARRAY(szTemp));
 		StringCchPrintf(szDisplay, SIZEOF_ARRAY(szDisplay), szTemp, szMemorySize);
 		DisplayWindow_BufferText(m_hDisplayWindow, szDisplay);
@@ -146,9 +146,9 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 
 						StringCchCopy(pfs->szPath, SIZEOF_ARRAY(pfs->szPath), fullItemName.c_str());
 
-						LoadString(m_hLanguageModule, IDS_GENERAL_TOTALSIZE, szTotalSize,
+						LoadString(m_resourceModule, IDS_GENERAL_TOTALSIZE, szTotalSize,
 							SIZEOF_ARRAY(szTotalSize));
-						LoadString(m_hLanguageModule, IDS_GENERAL_CALCULATING, szCalculating,
+						LoadString(m_resourceModule, IDS_GENERAL_CALCULATING, szCalculating,
 							SIZEOF_ARRAY(szCalculating));
 						StringCchPrintf(szDisplayText, SIZEOF_ARRAY(szDisplayText), _T("%s: %s"),
 							szTotalSize, szCalculating);
@@ -183,7 +183,7 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 			CreateFileTimeString(&wfd.ftLastWriteTime, szFileDate, SIZEOF_ARRAY(szFileDate),
 				m_config->globalFolderSettings.showFriendlyDates);
 
-			LoadString(m_hLanguageModule, IDS_GENERAL_DATEMODIFIED, szDateModified,
+			LoadString(m_resourceModule, IDS_GENERAL_DATEMODIFIED, szDateModified,
 				SIZEOF_ARRAY(szDateModified));
 
 			StringCchPrintf(szDisplayDate, SIZEOF_ARRAY(szDisplayDate), _T("%s: %s"),
@@ -205,13 +205,13 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 				if (pimg->GetLastStatus() == Gdiplus::Ok)
 				{
 					uWidth = pimg->GetWidth();
-					LoadString(m_hLanguageModule, IDS_GENERAL_DISPLAYWINDOW_IMAGEWIDTH, szTemp,
+					LoadString(m_resourceModule, IDS_GENERAL_DISPLAYWINDOW_IMAGEWIDTH, szTemp,
 						SIZEOF_ARRAY(szTemp));
 					StringCchPrintf(szOutput, SIZEOF_ARRAY(szOutput), szTemp, uWidth);
 					DisplayWindow_BufferText(m_hDisplayWindow, szOutput);
 
 					uHeight = pimg->GetHeight();
-					LoadString(m_hLanguageModule, IDS_GENERAL_DISPLAYWINDOW_IMAGEHEIGHT, szTemp,
+					LoadString(m_resourceModule, IDS_GENERAL_DISPLAYWINDOW_IMAGEHEIGHT, szTemp,
 						SIZEOF_ARRAY(szTemp));
 					StringCchPrintf(szOutput, SIZEOF_ARRAY(szOutput), szTemp, uHeight);
 					DisplayWindow_BufferText(m_hDisplayWindow, szOutput);
@@ -268,13 +268,13 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 
 					if (uBitDepth == 0)
 					{
-						LoadString(m_hLanguageModule, IDS_GENERAL_DISPLAYWINDOW_BITDEPTHUNKNOWN,
+						LoadString(m_resourceModule, IDS_GENERAL_DISPLAYWINDOW_BITDEPTHUNKNOWN,
 							szTemp, SIZEOF_ARRAY(szTemp));
 						StringCchCopy(szOutput, SIZEOF_ARRAY(szOutput), szTemp);
 					}
 					else
 					{
-						LoadString(m_hLanguageModule, IDS_GENERAL_DISPLAYWINDOW_BITDEPTH, szTemp,
+						LoadString(m_resourceModule, IDS_GENERAL_DISPLAYWINDOW_BITDEPTH, szTemp,
 							SIZEOF_ARRAY(szTemp));
 						StringCchPrintf(szOutput, SIZEOF_ARRAY(szOutput), szTemp, uBitDepth);
 					}
@@ -284,13 +284,13 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 					Gdiplus::REAL res;
 
 					res = pimg->GetHorizontalResolution();
-					LoadString(m_hLanguageModule, IDS_GENERAL_DISPLAYWINDOW_HORIZONTALRESOLUTION,
+					LoadString(m_resourceModule, IDS_GENERAL_DISPLAYWINDOW_HORIZONTALRESOLUTION,
 						szTemp, SIZEOF_ARRAY(szTemp));
 					StringCchPrintf(szOutput, SIZEOF_ARRAY(szOutput), szTemp, res);
 					DisplayWindow_BufferText(m_hDisplayWindow, szOutput);
 
 					res = pimg->GetVerticalResolution();
-					LoadString(m_hLanguageModule, IDS_GENERAL_DISPLAYWINDOW_VERTICALRESOLUTION,
+					LoadString(m_resourceModule, IDS_GENERAL_DISPLAYWINDOW_VERTICALRESOLUTION,
 						szTemp, SIZEOF_ARRAY(szTemp));
 					StringCchPrintf(szOutput, SIZEOF_ARRAY(szOutput), szTemp, res);
 					DisplayWindow_BufferText(m_hDisplayWindow, szOutput);
@@ -326,13 +326,13 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 				{
 					TCHAR szSize[32];
 					FormatSizeString(ulTotalNumberOfFreeBytes, szSize, SIZEOF_ARRAY(szSize));
-					LoadString(m_hLanguageModule, IDS_GENERAL_DISPLAY_WINDOW_FREE_SPACE, szTemp,
+					LoadString(m_resourceModule, IDS_GENERAL_DISPLAY_WINDOW_FREE_SPACE, szTemp,
 						SIZEOF_ARRAY(szTemp));
 					StringCchPrintf(szMsg, SIZEOF_ARRAY(szMsg), szTemp, szSize);
 					DisplayWindow_BufferText(m_hDisplayWindow, szMsg);
 
 					FormatSizeString(ulTotalNumberOfBytes, szSize, SIZEOF_ARRAY(szSize));
-					LoadString(m_hLanguageModule, IDS_GENERAL_DISPLAY_WINDOW_TOTAL_SIZE, szTemp,
+					LoadString(m_resourceModule, IDS_GENERAL_DISPLAY_WINDOW_TOTAL_SIZE, szTemp,
 						SIZEOF_ARRAY(szTemp));
 					StringCchPrintf(szMsg, SIZEOF_ARRAY(szMsg), szTemp, szSize);
 					DisplayWindow_BufferText(m_hDisplayWindow, szMsg);
@@ -344,7 +344,7 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 
 				if (bRet)
 				{
-					LoadString(m_hLanguageModule, IDS_GENERAL_DISPLAY_WINDOW_FILE_SYSTEM, szTemp,
+					LoadString(m_resourceModule, IDS_GENERAL_DISPLAY_WINDOW_FILE_SYSTEM, szTemp,
 						SIZEOF_ARRAY(szTemp));
 					StringCchPrintf(szMsg, SIZEOF_ARRAY(szMsg), szTemp, szFileSystem);
 					DisplayWindow_BufferText(m_hDisplayWindow, szMsg);
@@ -368,7 +368,7 @@ void Explorerplusplus::UpdateDisplayWindowForMultipleFiles(const Tab &tab)
 
 	nSelected = tab.GetShellBrowser()->GetNumSelected();
 
-	LoadString(m_hLanguageModule, IDS_GENERAL_SELECTED_MOREITEMS, szMore, SIZEOF_ARRAY(szMore));
+	LoadString(m_resourceModule, IDS_GENERAL_SELECTED_MOREITEMS, szMore, SIZEOF_ARRAY(szMore));
 
 	StringCchPrintf(szNumSelected, SIZEOF_ARRAY(szNumSelected), _T("%d %s"), nSelected, szMore);
 
@@ -382,7 +382,7 @@ void Explorerplusplus::UpdateDisplayWindowForMultipleFiles(const Tab &tab)
 			SIZEOF_ARRAY(szTotalSizeFragment), m_config->globalFolderSettings.forceSize,
 			m_config->globalFolderSettings.sizeDisplayFormat);
 
-		LoadString(m_hLanguageModule, IDS_GENERAL_TOTALFILESIZE, szTotalSizeString,
+		LoadString(m_resourceModule, IDS_GENERAL_TOTALFILESIZE, szTotalSizeString,
 			SIZEOF_ARRAY(szTotalSizeString));
 
 		StringCchPrintf(szTotalSize, SIZEOF_ARRAY(szTotalSize), _T("%s: %s"), szTotalSizeString,

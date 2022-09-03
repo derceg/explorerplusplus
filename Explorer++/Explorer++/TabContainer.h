@@ -137,9 +137,6 @@ private:
 		Right
 	};
 
-	static const UINT_PTR SUBCLASS_ID = 0;
-	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
-
 	static const int ICON_SIZE_96DPI = 16;
 
 	static const UINT DROP_SWITCH_TAB_TIMER_ID = 1;

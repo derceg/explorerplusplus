@@ -6,36 +6,15 @@
 #include "BookmarkStorageHelper.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "ResourceHelper.h"
+#include "XmlStorageHelper.h"
 #include "../Helper/XMLSettings.h"
 #include <gtest/gtest.h>
-#include <wil/com.h>
-#include <wil/resource.h>
-#include <optional>
 
 using namespace testing;
 
-struct XmlDocumentData
-{
-	wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument;
-	wil::com_ptr_nothrow<IXMLDOMElement> root;
-};
-
-wil::com_ptr_nothrow<IXMLDOMDocument> LoadXmlDocument(const std::wstring &filePath);
-std::optional<XmlDocumentData> CreateXmlDocument();
-
-class BookmarkXmlStorageTest : public Test
+class BookmarkXmlStorageTest : public XmlStorageTest
 {
 protected:
-	BookmarkXmlStorageTest()
-	{
-		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
-	}
-
-	~BookmarkXmlStorageTest()
-	{
-		CoUninitialize();
-	}
-
 	void PerformLoadTest(const std::wstring &filename, BookmarkTree *referenceBookmarkTree,
 		bool compareGuids)
 	{
@@ -90,50 +69,4 @@ TEST_F(BookmarkXmlStorageTest, V1NestedShowOnToolbarLoad)
 
 	PerformLoadTest(L"bookmarks-v1-config-nested-show-on-toolbar.xml", &referenceBookmarkTree,
 		false);
-}
-
-wil::com_ptr_nothrow<IXMLDOMDocument> LoadXmlDocument(const std::wstring &filePath)
-{
-	wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument;
-	xmlDocument.attach(NXMLSettings::DomFromCOM());
-
-	if (!xmlDocument)
-	{
-		return nullptr;
-	}
-
-	VARIANT_BOOL status;
-	VARIANT variantFilePath = NXMLSettings::VariantString(filePath.c_str());
-	xmlDocument->load(variantFilePath, &status);
-
-	if (status != VARIANT_TRUE)
-	{
-		return nullptr;
-	}
-
-	return xmlDocument;
-}
-
-std::optional<XmlDocumentData> CreateXmlDocument()
-{
-	wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument;
-	xmlDocument.attach(NXMLSettings::DomFromCOM());
-
-	if (!xmlDocument)
-	{
-		return {};
-	}
-
-	auto tag = wil::make_bstr_nothrow(L"xml");
-	auto attribute = wil::make_bstr_nothrow(L"version='1.0'");
-	wil::com_ptr_nothrow<IXMLDOMProcessingInstruction> processingInstruction;
-	xmlDocument->createProcessingInstruction(tag.get(), attribute.get(), &processingInstruction);
-	NXMLSettings::AppendChildToParent(processingInstruction.get(), xmlDocument.get());
-
-	auto rootTag = wil::make_bstr_nothrow(L"ExplorerPlusPlus");
-	wil::com_ptr_nothrow<IXMLDOMElement> root;
-	xmlDocument->createElement(rootTag.get(), &root);
-	NXMLSettings::AppendChildToParent(root.get(), xmlDocument.get());
-
-	return XmlDocumentData{ std::move(xmlDocument), std::move(root) };
 }

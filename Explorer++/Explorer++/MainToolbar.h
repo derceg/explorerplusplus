@@ -48,9 +48,6 @@ public:
 	void UpdateToolbarButtonStates();
 
 private:
-	static const UINT_PTR SUBCLASS_ID = 0;
-	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
-
 	enum class HistoryType
 	{
 		Back,

@@ -10,6 +10,8 @@
 class DropTargetInternal
 {
 public:
+	virtual ~DropTargetInternal() = default;
+
 	virtual DWORD DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) = 0;
 	virtual DWORD DragOver(DWORD keyState, POINT pt, DWORD effect) = 0;
 	virtual void DragLeave() = 0;
@@ -30,8 +32,6 @@ public:
 	bool IsWithinDrag() const;
 
 private:
-	static inline const UINT_PTR SUBCLASS_ID = 0;
-
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR subclassId, DWORD_PTR data);
 

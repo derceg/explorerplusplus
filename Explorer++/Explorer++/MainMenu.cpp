@@ -57,7 +57,7 @@ void Explorerplusplus::InitializeMainMenu()
 {
 	// These need to occur after the language module has been initialized, but
 	// before the tabs are restored.
-	HMENU mainMenu = LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_MAINMENU));
+	HMENU mainMenu = LoadMenu(m_resourceModule, MAKEINTRESOURCE(IDR_MAINMENU));
 
 	if (!m_commandLineSettings.enablePlugins)
 	{

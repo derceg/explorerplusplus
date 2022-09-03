@@ -55,7 +55,7 @@ void Explorerplusplus::OnCreate()
 
 	m_navigation = std::make_unique<Navigation>(this);
 
-	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_hLanguageModule, this);
+	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_resourceModule, this);
 
 	InitializeMainMenu();
 
@@ -78,7 +78,7 @@ void Explorerplusplus::OnCreate()
 	ResizeWindows();
 
 	m_taskbarThumbnails =
-		TaskbarThumbnails::Create(this, m_tabContainer, m_hLanguageModule, m_config);
+		TaskbarThumbnails::Create(this, m_tabContainer, m_resourceModule, m_config);
 
 	RestoreTabs(pLoadSave);
 	delete pLoadSave;
@@ -151,7 +151,7 @@ void Explorerplusplus::AddViewModesToMenu(HMENU menu, UINT startPosition, BOOL b
 	for (auto viewMode : VIEW_MODES)
 	{
 		std::wstring text =
-			ResourceHelper::LoadString(m_hLanguageModule, GetViewModeMenuStringId(viewMode));
+			ResourceHelper::LoadString(m_resourceModule, GetViewModeMenuStringId(viewMode));
 
 		MENUITEMINFO itemInfo;
 		itemInfo.cbSize = sizeof(itemInfo);

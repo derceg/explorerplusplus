@@ -15,7 +15,7 @@ IconFetcher::IconFetcher(HWND hwnd, CachedIcons *cachedIcons) :
 	m_iconResultIDCounter(0)
 {
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hwnd, WindowSubclassStub,
-		SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+		reinterpret_cast<DWORD_PTR>(this)));
 }
 
 IconFetcher::~IconFetcher()

@@ -36,8 +36,6 @@ public:
 	void ClearQueue() override;
 
 private:
-	static const UINT_PTR SUBCLASS_ID = 0;
-
 	// This is the end of the range that starts at WM_APP. This class subclasses the window that's
 	// passed to the constructor, so it's not possible to tell what other WM_APP messages are in
 	// use. To try to avoid clashes with other messages sent throughout the application, the last

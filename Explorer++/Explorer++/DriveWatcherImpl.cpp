@@ -14,7 +14,7 @@ DriveWatcherImpl::DriveWatcherImpl(HWND topLevelWindow)
 	assert(style && WI_IsFlagClear(style, WS_CHILD));
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(topLevelWindow,
-		std::bind_front(&DriveWatcherImpl::WndProc, this), SUBCLASS_ID));
+		std::bind_front(&DriveWatcherImpl::WndProc, this)));
 }
 
 LRESULT DriveWatcherImpl::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

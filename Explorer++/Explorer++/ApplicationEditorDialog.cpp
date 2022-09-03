@@ -3,22 +3,27 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "ApplicationToolbarButtonDialog.h"
+#include "ApplicationEditorDialog.h"
+#include "ApplicationModel.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/Controls.h"
+#include "../Helper/WindowHelper.h"
 
-ApplicationToolbarButtonDialog::ApplicationToolbarButtonDialog(HINSTANCE hInstance, HWND hParent,
-	ApplicationButton *Button, bool IsNew) :
-	DarkModeDialogBase(hInstance, IDD_EDITAPPLICATIONBUTTON, hParent, false),
-	m_Button(Button),
-	m_IsNew(IsNew)
+namespace Applications
+{
+
+ApplicationEditorDialog::ApplicationEditorDialog(HWND parent, HMODULE resourceModule,
+	ApplicationModel *model, std::unique_ptr<EditDetails> editDetails) :
+	DarkModeDialogBase(resourceModule, IDD_EDITAPPLICATIONBUTTON, parent, false),
+	m_model(model),
+	m_editDetails(std::move(editDetails))
 {
 }
 
-INT_PTR ApplicationToolbarButtonDialog::OnInitDialog()
+INT_PTR ApplicationEditorDialog::OnInitDialog()
 {
-	if (m_IsNew)
+	if (m_editDetails->type == EditDetails::Type::NewItem)
 	{
 		std::wstring newText =
 			ResourceHelper::LoadString(GetInstance(), IDS_GENERAL_NEWAPPLICATIONBUTTON);
@@ -28,15 +33,23 @@ INT_PTR ApplicationToolbarButtonDialog::OnInitDialog()
 	AddTooltipForControl(m_tipWnd, GetDlgItem(m_hDlg, IDC_APP_EDIT_COMMAND), GetInstance(),
 		IDS_APP_EDIT_COMMAND_TOOLTIP);
 
-	SetDlgItemText(m_hDlg, IDC_APP_EDIT_NAME, m_Button->Name.c_str());
-	SetDlgItemText(m_hDlg, IDC_APP_EDIT_COMMAND, m_Button->Command.c_str());
+	const Application *targetApplication = m_editDetails->type == EditDetails::Type::NewItem
+		? m_editDetails->newApplication.get()
+		: m_editDetails->existingApplication;
 
-	if (m_Button->Name.length() == 0 || m_Button->Command.length() == 0)
+	std::wstring name = targetApplication->GetName();
+	std::wstring command = targetApplication->GetCommand();
+	bool showNameOnToolbar = targetApplication->GetShowNameOnToolbar();
+
+	SetDlgItemText(m_hDlg, IDC_APP_EDIT_NAME, name.c_str());
+	SetDlgItemText(m_hDlg, IDC_APP_EDIT_COMMAND, command.c_str());
+
+	if (name.length() == 0 || command.length() == 0)
 	{
 		EnableWindow(GetDlgItem(m_hDlg, IDOK), FALSE);
 	}
 
-	UINT uCheck = m_Button->ShowNameOnToolbar ? BST_CHECKED : BST_UNCHECKED;
+	UINT uCheck = showNameOnToolbar ? BST_CHECKED : BST_UNCHECKED;
 	CheckDlgButton(m_hDlg, IDC_CHECK_SHOWAPPNAME, uCheck);
 
 	HWND hEditName = GetDlgItem(m_hDlg, IDC_APP_EDIT_NAME);
@@ -49,7 +62,7 @@ INT_PTR ApplicationToolbarButtonDialog::OnInitDialog()
 	return 0;
 }
 
-INT_PTR ApplicationToolbarButtonDialog::OnCommand(WPARAM wParam, LPARAM lParam)
+INT_PTR ApplicationEditorDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -90,7 +103,7 @@ INT_PTR ApplicationToolbarButtonDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void ApplicationToolbarButtonDialog::OnChooseFile()
+void ApplicationEditorDialog::OnChooseFile()
 {
 	/* TODO: Text needs to be localized. */
 	const TCHAR *filter = _T("Programs (*.exe)\0*.exe\0All Files\0*.*\0\0");
@@ -132,41 +145,62 @@ void ApplicationToolbarButtonDialog::OnChooseFile()
 	}
 }
 
-void ApplicationToolbarButtonDialog::OnOk()
+void ApplicationEditorDialog::OnOk()
 {
-	TCHAR name[512];
-	GetDlgItemText(m_hDlg, IDC_APP_EDIT_NAME, name, SIZEOF_ARRAY(name));
+	std::wstring name = GetDlgItemString(m_hDlg, IDC_APP_EDIT_NAME);
+	std::wstring command = GetDlgItemString(m_hDlg, IDC_APP_EDIT_COMMAND);
 
-	TCHAR command[512];
-	GetDlgItemText(m_hDlg, IDC_APP_EDIT_COMMAND, command, SIZEOF_ARRAY(command));
-
-	bool validated = true;
-
-	if (lstrlen(name) == 0 || lstrlen(command) == 0)
-	{
-		validated = false;
-	}
-
-	if (!validated)
+	if (name.empty() || command.empty())
 	{
 		EndDialog(m_hDlg, 0);
 		return;
 	}
 
-	m_Button->Name = name;
-	m_Button->Command = command;
-	m_Button->ShowNameOnToolbar = IsDlgButtonChecked(m_hDlg, IDC_CHECK_SHOWAPPNAME) == BST_CHECKED;
+	bool showNameOnToolbar = IsDlgButtonChecked(m_hDlg, IDC_CHECK_SHOWAPPNAME) == BST_CHECKED;
+
+	ApplyEdits(name, command, showNameOnToolbar);
 
 	EndDialog(m_hDlg, 1);
 }
 
-void ApplicationToolbarButtonDialog::OnCancel()
+void ApplicationEditorDialog::ApplyEdits(const std::wstring &newName,
+	const std::wstring &newCommand, bool newShowNameOnToolbar)
+{
+	Application *targetApplication = m_editDetails->type == EditDetails::Type::NewItem
+		? m_editDetails->newApplication.get()
+		: m_editDetails->existingApplication;
+
+	targetApplication->SetName(newName);
+	targetApplication->SetCommand(newCommand);
+	targetApplication->SetShowNameOnToolbar(newShowNameOnToolbar);
+
+	if (m_editDetails->type == EditDetails::Type::NewItem)
+	{
+		size_t index;
+		size_t numItems = m_model->GetApplications().size();
+
+		if (m_editDetails->index.has_value() && m_editDetails->index.value() <= numItems)
+		{
+			index = m_editDetails->index.value();
+		}
+		else
+		{
+			index = numItems;
+		}
+
+		m_model->AddApplication(std::move(m_editDetails->newApplication), index);
+	}
+}
+
+void ApplicationEditorDialog::OnCancel()
 {
 	EndDialog(m_hDlg, 0);
 }
 
-INT_PTR ApplicationToolbarButtonDialog::OnClose()
+INT_PTR ApplicationEditorDialog::OnClose()
 {
 	EndDialog(m_hDlg, 0);
 	return 0;
+}
+
 }

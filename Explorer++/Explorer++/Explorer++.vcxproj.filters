@@ -1,15 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="ApplicationToolbar.cpp">
-      <Filter>Application Toolbar</Filter>
-    </ClCompile>
-    <ClCompile Include="ApplicationToolbarButtonDialog.cpp">
-      <Filter>Application Toolbar</Filter>
-    </ClCompile>
-    <ClCompile Include="ApplicationToolbarDropHandler.cpp">
-      <Filter>Application Toolbar</Filter>
-    </ClCompile>
     <ClCompile Include="Bookmarks\BookmarkHandler.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
@@ -81,9 +72,6 @@
     </ClCompile>
     <ClCompile Include="WildcardSelectDialog.cpp">
       <Filter>General Dialogs</Filter>
-    </ClCompile>
-    <ClCompile Include="DrivesToolbar.cpp">
-      <Filter>Drives Toolbar</Filter>
     </ClCompile>
     <ClCompile Include="HelpFileMissingDialog.cpp">
       <Filter>General Dialogs</Filter>
@@ -457,9 +445,6 @@
     <ClCompile Include="ShellBrowser\ListViewEdit.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
-    <ClCompile Include="DrivesToolbarView.cpp">
-      <Filter>Drives Toolbar</Filter>
-    </ClCompile>
     <ClCompile Include="ToolbarView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
@@ -472,17 +457,44 @@
     <ClCompile Include="DriveWatcherImpl.cpp">
       <Filter>Drives Toolbar</Filter>
     </ClCompile>
+    <ClCompile Include="ApplicationModel.cpp">
+      <Filter>Application Toolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplicationToolbarRegistryStorage.cpp">
+      <Filter>Application Toolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplicationToolbarXmlStorage.cpp">
+      <Filter>Application Toolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="Application.cpp">
+      <Filter>Application Toolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplicationContextMenuController.cpp">
+      <Filter>Application Toolbar\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplicationToolbar.cpp">
+      <Filter>Application Toolbar\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplicationContextMenu.cpp">
+      <Filter>Application Toolbar\UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplicationToolbarView.cpp">
+      <Filter>Application Toolbar\UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplicationEditorDialog.cpp">
+      <Filter>Application Toolbar\UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivesToolbar.cpp">
+      <Filter>Drives Toolbar\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivesToolbarView.cpp">
+      <Filter>Drives Toolbar\UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolbarViewHelper.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ApplicationToolbar.h">
-      <Filter>Application Toolbar</Filter>
-    </ClInclude>
-    <ClInclude Include="ApplicationToolbarButtonDialog.h">
-      <Filter>Application Toolbar</Filter>
-    </ClInclude>
-    <ClInclude Include="ApplicationToolbarDropHandler.h">
-      <Filter>Application Toolbar</Filter>
-    </ClInclude>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
@@ -506,9 +518,6 @@
     </ClInclude>
     <ClInclude Include="DisplayColoursDialog.h">
       <Filter>General Dialogs</Filter>
-    </ClInclude>
-    <ClInclude Include="DrivesToolbar.h">
-      <Filter>Drives Toolbar</Filter>
     </ClInclude>
     <ClInclude Include="Explorer++.h">
       <Filter>Core</Filter>
@@ -927,9 +936,6 @@
     <ClInclude Include="ShellBrowser\ListViewEdit.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="DrivesToolbarView.h">
-      <Filter>Drives Toolbar</Filter>
-    </ClInclude>
     <ClInclude Include="ToolbarView.h">
       <Filter>Views</Filter>
     </ClInclude>
@@ -947,6 +953,42 @@
     </ClInclude>
     <ClInclude Include="DriveWatcher.h">
       <Filter>Drives Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationModel.h">
+      <Filter>Application Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationToolbarRegistryStorage.h">
+      <Filter>Application Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationToolbarXmlStorage.h">
+      <Filter>Application Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="Application.h">
+      <Filter>Application Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationContextMenuController.h">
+      <Filter>Application Toolbar\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationToolbar.h">
+      <Filter>Application Toolbar\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationContextMenu.h">
+      <Filter>Application Toolbar\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationToolbarView.h">
+      <Filter>Application Toolbar\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationEditorDialog.h">
+      <Filter>Application Toolbar\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivesToolbar.h">
+      <Filter>Drives Toolbar\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivesToolbarView.h">
+      <Filter>Drives Toolbar\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolbarViewHelper.h">
+      <Filter>Views</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1062,6 +1104,18 @@
     </Filter>
     <Filter Include="Views">
       <UniqueIdentifier>{a5bb582e-2ab4-463c-b4e4-216257c0c29f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Application Toolbar\UI">
+      <UniqueIdentifier>{d77733b3-5157-437b-bc26-cd28b368b052}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Application Toolbar\UI\Views">
+      <UniqueIdentifier>{ffca9f15-b69b-468f-9859-162c29af9c4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Drives Toolbar\UI">
+      <UniqueIdentifier>{3c07facd-96fb-4697-a57f-927ac759ed36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Drives Toolbar\UI\Views">
+      <UniqueIdentifier>{ae00fb9f-bc03-4910-856f-5a16c6ca24b0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -118,9 +118,9 @@ void TabContainer::Initialize(HWND parent)
 	}
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd, WndProcStub,
-		SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+		reinterpret_cast<DWORD_PTR>(this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parent, ParentWndProcStub,
-		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+		reinterpret_cast<DWORD_PTR>(this)));
 
 	m_connections.push_back(
 		tabCreatedSignal.AddObserver(std::bind_front(&TabContainer::OnTabCreated, this)));

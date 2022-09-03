@@ -79,7 +79,11 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
+    <ClCompile Include="ApplicationModelTest.cpp" />
     <ClCompile Include="ApplicationToolbarHelperTest.cpp" />
+    <ClCompile Include="ApplicationToolbarRegistryStorageTest.cpp" />
+    <ClCompile Include="ApplicationToolbarStorageHelper.cpp" />
+    <ClCompile Include="ApplicationToolbarXmlStorageTest.cpp" />
     <ClCompile Include="BookmarkDropperTest.cpp" />
     <ClCompile Include="BookmarkRegistryStorageTest.cpp" />
     <ClCompile Include="BookmarkStorageHelper.cpp" />
@@ -93,10 +97,12 @@
     <ClCompile Include="BookmarkTreeTest.cpp" />
     <ClCompile Include="CachedIconsTest.cpp" />
     <ClCompile Include="ManifestTest.cpp" />
+    <ClCompile Include="RegistryStorageHelper.cpp" />
     <ClCompile Include="ResourceHelper.cpp" />
     <ClCompile Include="ShellNavigationControllerTest.cpp" />
     <ClCompile Include="StringHelperTest.cpp" />
     <ClCompile Include="ViewModeHelperTest.cpp" />
+    <ClCompile Include="XmlStorageHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Explorer++\Explorer++.vcxproj">
@@ -110,9 +116,12 @@
     <ResourceCompile Include="TestExplorer++.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ApplicationToolbarStorageHelper.h" />
     <ClInclude Include="BookmarkStorageHelper.h" />
     <ClInclude Include="BookmarkTreeHelper.h" />
+    <ClInclude Include="RegistryStorageHelper.h" />
     <ClInclude Include="ResourceHelper.h" />
+    <ClInclude Include="XmlStorageHelper.h" />
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

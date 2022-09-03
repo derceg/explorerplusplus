@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ToolbarView.h"
 #include "DarkModeHelper.h"
+#include "ToolbarViewHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/Helper.h"
 
@@ -49,15 +50,37 @@ ToolbarView::ToolbarView(HWND parent, DWORD style, DWORD extendedStyle) :
 	SendMessage(m_hwnd, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
-		std::bind_front(&ToolbarView::WndProc, this), SUBCLASS_ID));
+		std::bind_front(&ToolbarView::WndProc, this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(m_hwnd),
-		std::bind_front(&ToolbarView::ParentWndProc, this), PARENT_SUBCLASS_ID));
+		std::bind_front(&ToolbarView::ParentWndProc, this)));
 
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
 
 	if (darkModeHelper.IsDarkModeEnabled())
 	{
 		darkModeHelper.SetDarkModeForToolbarTooltips(m_hwnd);
+	}
+}
+
+void ToolbarView::SetupSmallShellImageList()
+{
+	HIMAGELIST smallShellImageList;
+	BOOL imageListResult = Shell_GetImageLists(nullptr, &smallShellImageList);
+
+	if (imageListResult)
+	{
+		int iconWidth;
+		int iconHeight;
+		ImageList_GetIconSize(smallShellImageList, &iconWidth, &iconHeight);
+		[[maybe_unused]] auto res =
+			SendMessage(m_hwnd, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
+		assert(res);
+
+		res =
+			SendMessage(m_hwnd, TB_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(smallShellImageList));
+
+		// The image list should only be set a single time.
+		assert(!res);
 	}
 }
 
@@ -76,7 +99,7 @@ void ToolbarView::AddButton(std::unique_ptr<ToolbarButton> button, size_t index)
 	tbButton.idCommand = m_idCounter;
 	tbButton.iBitmap = button->GetImageIndex() ? *button->GetImageIndex() : I_IMAGENONE;
 	tbButton.fsState = TBSTATE_ENABLED;
-	tbButton.fsStyle = BTNS_BUTTON | BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX;
+	tbButton.fsStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX;
 	tbButton.iString = reinterpret_cast<INT_PTR>(text.c_str());
 	SendMessage(m_hwnd, TB_INSERTBUTTON, index, reinterpret_cast<LPARAM>(&tbButton));
 
@@ -281,6 +304,28 @@ ToolbarButton *ToolbarView::MaybeGetButtonFromIndex(size_t index)
 
 	auto itr = m_buttons.begin() + index;
 	return itr->get();
+}
+
+ToolbarView::DropLocation ToolbarView::GetDropLocation(const POINT &ptScreen)
+{
+	POINT ptClient = ptScreen;
+	[[maybe_unused]] BOOL res = ScreenToClient(m_hwnd, &ptClient);
+
+	// ScreenToClient can likely only fail if the window parameter is invalid, which should never be
+	// the case here.
+	assert(res);
+
+	int index =
+		static_cast<int>(SendMessage(m_hwnd, TB_HITTEST, 0, reinterpret_cast<LPARAM>(&ptClient)));
+
+	if (index >= 0)
+	{
+		return { true, static_cast<size_t>(index) };
+	}
+	else
+	{
+		return { false, static_cast<size_t>(FindNextButtonIndex(m_hwnd, ptClient)) };
+	}
 }
 
 boost::signals2::connection ToolbarView::AddToolbarUpdatedObserver(

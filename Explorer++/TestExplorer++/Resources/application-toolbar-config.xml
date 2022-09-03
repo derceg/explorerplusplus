@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!-- Preference file for Explorer++ -->
+<ExplorerPlusPlus>
+	<ApplicationToolbar>
+		<ApplicationButton name="notepad" Command="C:\Windows\System32\notepad.exe" ShowNameOnToolbar="yes"/>
+		<ApplicationButton name="cmd" Command="C:\Windows\System32\cmd.exe" ShowNameOnToolbar="no"/>
+		<ApplicationButton name="regedit" Command="C:\Windows\regedit.exe" ShowNameOnToolbar="yes"/>
+		<ApplicationButton name="word" Command="&quot;C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE&quot;" ShowNameOnToolbar="yes"/>
+	</ApplicationToolbar>
+</ExplorerPlusPlus>

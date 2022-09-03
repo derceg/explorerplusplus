@@ -406,6 +406,22 @@ HRESULT NXMLSettings::GetIntFromMap(IXMLDOMNamedNodeMap *attributeMap, const std
 	return hr;
 }
 
+HRESULT NXMLSettings::GetBoolFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name,
+	bool &outputValue)
+{
+	std::wstring outputString;
+	HRESULT hr = GetStringFromMap(attributeMap, name, outputString);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	outputValue = DecodeBoolValue(outputString.c_str());
+
+	return hr;
+}
+
 HRESULT NXMLSettings::GetStringFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name,
 	std::wstring &outputValue)
 {

@@ -59,7 +59,7 @@ void Explorerplusplus::SetLanguageModule()
 
 	if (m_config->language == LANG_ENGLISH)
 	{
-		m_hLanguageModule = GetModuleHandle(nullptr);
+		m_resourceModule = GetModuleHandle(nullptr);
 	}
 	else
 	{
@@ -92,7 +92,7 @@ void Explorerplusplus::SetLanguageModule()
 				if it matches the current internal version. */
 				if (VerifyLanguageVersion(szFullFileName))
 				{
-					m_hLanguageModule = LoadLibrary(szFullFileName);
+					m_resourceModule = LoadLibrary(szFullFileName);
 				}
 				else
 				{
@@ -111,7 +111,7 @@ void Explorerplusplus::SetLanguageModule()
 					{
 						if (VerifyLanguageVersion(szFullFileName))
 						{
-							m_hLanguageModule = LoadLibrary(szFullFileName);
+							m_resourceModule = LoadLibrary(szFullFileName);
 						}
 						else
 						{
@@ -207,9 +207,9 @@ void Explorerplusplus::SetLanguageModule()
 
 	/* The language DLL was not found/could not be loaded.
 	Use the default internal resource set. */
-	if (m_hLanguageModule == nullptr)
+	if (m_resourceModule == nullptr)
 	{
-		m_hLanguageModule = GetModuleHandle(nullptr);
+		m_resourceModule = GetModuleHandle(nullptr);
 
 		m_config->language = LANG_ENGLISH;
 	}

@@ -31,8 +31,6 @@
 
 void CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 
-int ShellBrowser::listViewParentSubclassIdCounter = 0;
-
 std::shared_ptr<ShellBrowser> ShellBrowser::CreateNew(int id, HWND hOwner,
 	CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
 	FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
@@ -70,7 +68,7 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, CoreInterface *coreInterface,
 	m_hListView(GetHWND()),
 	m_ID(id),
 	m_shChangeNotifyId(0),
-	m_hResourceModule(coreInterface->GetLanguageModule()),
+	m_hResourceModule(coreInterface->GetResourceModule()),
 	m_acceleratorTable(coreInterface->GetAcceleratorTable()),
 	m_hOwner(hOwner),
 	m_cachedIcons(coreInterface->GetCachedIcons()),
@@ -212,11 +210,10 @@ void ShellBrowser::InitializeListView()
 	}
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hListView,
-		ListViewProcStub, LISTVIEW_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+		ListViewProcStub, reinterpret_cast<DWORD_PTR>(this)));
 
-	m_windowSubclasses.push_back(
-		std::make_unique<WindowSubclassWrapper>(GetParent(m_hListView), ListViewParentProcStub,
-			listViewParentSubclassIdCounter++, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(m_hListView),
+		ListViewParentProcStub, reinterpret_cast<DWORD_PTR>(this)));
 }
 
 BOOL ShellBrowser::GetAutoArrange() const

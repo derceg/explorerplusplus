@@ -164,7 +164,7 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 	else
 	{
 		bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt,
-			ResourceHelper::LoadString(coreInterface->GetLanguageModule(),
+			ResourceHelper::LoadString(coreInterface->GetResourceModule(),
 				IDS_BOOKMARKS_NEWBOOKMARKFOLDER),
 			std::nullopt);
 	}
@@ -172,7 +172,7 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 	BookmarkItem *rawBookmarkItem = bookmarkItem.get();
 	BookmarkItem *selectedParentFolder = nullptr;
 
-	AddBookmarkDialog addBookmarkDialog(coreInterface->GetLanguageModule(), parentWindow,
+	AddBookmarkDialog addBookmarkDialog(coreInterface->GetResourceModule(), parentWindow,
 		coreInterface, bookmarkTree, bookmarkItem.get(), defaultParentSelection,
 		&selectedParentFolder, customDialogTitle);
 	auto res = addBookmarkDialog.ShowModalDialog();

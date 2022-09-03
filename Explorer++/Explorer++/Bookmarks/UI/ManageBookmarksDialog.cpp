@@ -99,7 +99,7 @@ void ManageBookmarksDialog::SetupToolbar()
 		0, 0, 0, 0, m_hDlg, nullptr, GetModuleHandle(nullptr), nullptr);
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_toolbarParent,
-		std::bind_front(&ManageBookmarksDialog::ParentWndProc, this), 0));
+		std::bind_front(&ManageBookmarksDialog::ParentWndProc, this)));
 
 	m_hToolbar = CreateToolbar(m_toolbarParent,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | TBSTYLE_TOOLTIPS | TBSTYLE_LIST
@@ -128,7 +128,7 @@ void ManageBookmarksDialog::SetupToolbar()
 	tbb.iBitmap = m_imageListToolbarMappings.at(Icon::Back);
 	tbb.idCommand = TOOLBAR_ID_BACK;
 	tbb.fsState = TBSTATE_ENABLED;
-	tbb.fsStyle = BTNS_BUTTON | BTNS_AUTOSIZE;
+	tbb.fsStyle = BTNS_AUTOSIZE;
 	tbb.dwData = 0;
 	tbb.iString = reinterpret_cast<INT_PTR>(text.c_str());
 	SendMessage(m_hToolbar, TB_INSERTBUTTON, 0, reinterpret_cast<LPARAM>(&tbb));
@@ -138,7 +138,7 @@ void ManageBookmarksDialog::SetupToolbar()
 	tbb.iBitmap = m_imageListToolbarMappings.at(Icon::Forward);
 	tbb.idCommand = TOOLBAR_ID_FORWARD;
 	tbb.fsState = TBSTATE_ENABLED;
-	tbb.fsStyle = BTNS_BUTTON | BTNS_AUTOSIZE;
+	tbb.fsStyle = BTNS_AUTOSIZE;
 	tbb.dwData = 0;
 	tbb.iString = reinterpret_cast<INT_PTR>(text.c_str());
 	SendMessage(m_hToolbar, TB_INSERTBUTTON, 1, reinterpret_cast<LPARAM>(&tbb));
@@ -148,7 +148,7 @@ void ManageBookmarksDialog::SetupToolbar()
 	tbb.iBitmap = m_imageListToolbarMappings.at(Icon::Copy);
 	tbb.idCommand = TOOLBAR_ID_ORGANIZE;
 	tbb.fsState = TBSTATE_ENABLED;
-	tbb.fsStyle = BTNS_BUTTON | BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_DROPDOWN;
+	tbb.fsStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_DROPDOWN;
 	tbb.dwData = 0;
 	tbb.iString = reinterpret_cast<INT_PTR>(text.c_str());
 	SendMessage(m_hToolbar, TB_INSERTBUTTON, 2, reinterpret_cast<LPARAM>(&tbb));
@@ -158,7 +158,7 @@ void ManageBookmarksDialog::SetupToolbar()
 	tbb.iBitmap = m_imageListToolbarMappings.at(Icon::Views);
 	tbb.idCommand = TOOLBAR_ID_VIEWS;
 	tbb.fsState = TBSTATE_ENABLED;
-	tbb.fsStyle = BTNS_BUTTON | BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_DROPDOWN;
+	tbb.fsStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_DROPDOWN;
 	tbb.dwData = 0;
 	tbb.iString = reinterpret_cast<INT_PTR>(text.c_str());
 	SendMessage(m_hToolbar, TB_INSERTBUTTON, 3, reinterpret_cast<LPARAM>(&tbb));

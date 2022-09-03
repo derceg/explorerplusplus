@@ -29,20 +29,7 @@ DrivesToolbarView::DrivesToolbarView(HWND parent, CoreInterface *coreInterface,
 	m_coreInterface(coreInterface),
 	m_instance(instance)
 {
-	HIMAGELIST smallShellImageList;
-	BOOL imageListResult = Shell_GetImageLists(nullptr, &smallShellImageList);
-
-	if (imageListResult)
-	{
-		int iconWidth;
-		int iconHeight;
-		ImageList_GetIconSize(smallShellImageList, &iconWidth, &iconHeight);
-		[[maybe_unused]] auto res =
-			SendMessage(m_hwnd, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
-		assert(res);
-
-		SendMessage(m_hwnd, TB_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(smallShellImageList));
-	}
+	SetupSmallShellImageList();
 }
 
 void DrivesToolbarView::ShowContextMenu(const std::wstring &drivePath, const POINT &ptClient,

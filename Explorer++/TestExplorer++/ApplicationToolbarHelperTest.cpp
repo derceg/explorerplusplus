@@ -5,7 +5,7 @@
 #include "ApplicationToolbarHelper.h"
 #include <gtest/gtest.h>
 
-using namespace ApplicationToolbarHelper;
+using namespace Applications::ApplicationToolbarHelper;
 
 TEST(ApplicationToolbarHelperTest, WithoutQuotes)
 {

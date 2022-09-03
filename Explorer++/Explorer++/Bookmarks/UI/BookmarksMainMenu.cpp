@@ -18,7 +18,7 @@ BookmarksMainMenu::BookmarksMainMenu(CoreInterface *coreInterface, IconFetcher *
 	m_coreInterface(coreInterface),
 	m_bookmarkTree(bookmarkTree),
 	m_menuIdRange(menuIdRange),
-	m_menuBuilder(coreInterface, iconFetcher, coreInterface->GetLanguageModule())
+	m_menuBuilder(coreInterface, iconFetcher, coreInterface->GetResourceModule())
 {
 	m_connections.push_back(coreInterface->AddMainMenuPreShowObserver(
 		std::bind_front(&BookmarksMainMenu::OnMainMenuPreShow, this)));
@@ -59,7 +59,7 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_coreInterface->GetMainWindow());
 
 	std::wstring bookmarkThisTabText = ResourceHelper::LoadString(
-		m_coreInterface->GetLanguageModule(), IDS_MENU_BOOKMARK_THIS_TAB);
+		m_coreInterface->GetResourceModule(), IDS_MENU_BOOKMARK_THIS_TAB);
 
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
@@ -72,7 +72,7 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(
 		m_coreInterface->GetIconResourceLoader(), Icon::AddBookmark, dpi, menuImages);
 
 	std::wstring bookmarkAllTabsText = ResourceHelper::LoadString(
-		m_coreInterface->GetLanguageModule(), IDS_MENU_BOOKMARK_ALL_TABS);
+		m_coreInterface->GetResourceModule(), IDS_MENU_BOOKMARK_ALL_TABS);
 
 	ZeroMemory(&mii, sizeof(mii));
 	mii.cbSize = sizeof(mii);
@@ -82,7 +82,7 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(
 	InsertMenuItem(menu.get(), 1, TRUE, &mii);
 
 	std::wstring manageBookmarksText =
-		ResourceHelper::LoadString(m_coreInterface->GetLanguageModule(), IDS_MENU_MANAGE_BOOKMARKS);
+		ResourceHelper::LoadString(m_coreInterface->GetResourceModule(), IDS_MENU_MANAGE_BOOKMARKS);
 
 	ZeroMemory(&mii, sizeof(mii));
 	mii.cbSize = sizeof(mii);

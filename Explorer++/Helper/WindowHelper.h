@@ -5,6 +5,7 @@
 #pragma once
 
 BOOL CenterWindow(HWND hParent, HWND hChild);
+std::wstring GetDlgItemString(HWND dlg, int controlId);
 std::wstring GetWindowString(HWND hwnd);
 BOOL lShowWindow(HWND hwnd, BOOL bShowWindow);
 BOOL AddWindowStyle(HWND hwnd, UINT fStyle, BOOL bAdd);
