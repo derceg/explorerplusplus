@@ -24,7 +24,7 @@ DWORD BookmarkDropTargetWindow::DragEnter(IDataObject *dataObject, DWORD keyStat
 
 	auto dropLocation = GetDropLocation(pt);
 
-	return m_bookmarkDropper->GetDropEffect(dropLocation.parentFolder);
+	return m_bookmarkDropper->GetDropEffect(dropLocation.parentFolder, dropLocation.position);
 }
 
 DWORD BookmarkDropTargetWindow::DragOver(DWORD keyState, POINT pt, DWORD effect)
@@ -51,7 +51,8 @@ DWORD BookmarkDropTargetWindow::DragOver(DWORD keyState, POINT pt, DWORD effect)
 
 	m_previousDropLocation = dropLocation;
 
-	DWORD targetEffect = m_bookmarkDropper->GetDropEffect(dropLocation.parentFolder);
+	DWORD targetEffect =
+		m_bookmarkDropper->GetDropEffect(dropLocation.parentFolder, dropLocation.position);
 
 	if (targetEffect != DROPEFFECT_NONE)
 	{

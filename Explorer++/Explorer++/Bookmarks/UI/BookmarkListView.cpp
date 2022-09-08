@@ -76,8 +76,8 @@ void BookmarkListView::SetUpListViewImageList(IconFetcher *iconFetcher)
 	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 
-	m_bookmarkIconManager = std::make_unique<BookmarkIconManager>(m_coreInterface, iconFetcher,
-		std::bind_front(&BookmarkListView::OnBookmarkIconAvailable, this), iconWidth, iconHeight);
+	m_bookmarkIconManager =
+		std::make_unique<BookmarkIconManager>(m_coreInterface, iconFetcher, iconWidth, iconHeight);
 
 	ListView_SetImageList(m_hListView, m_bookmarkIconManager->GetImageList(), LVSIL_SMALL);
 }
@@ -328,7 +328,8 @@ int BookmarkListView::InsertBookmarkItemIntoListView(BookmarkItem *bookmarkItem,
 	TCHAR szName[256];
 	StringCchCopy(szName, SIZEOF_ARRAY(szName), bookmarkItem->GetName().c_str());
 
-	int iconIndex = m_bookmarkIconManager->GetBookmarkItemIconIndex(bookmarkItem);
+	int iconIndex = m_bookmarkIconManager->GetBookmarkItemIconIndex(bookmarkItem,
+		std::bind_front(&BookmarkListView::OnBookmarkIconAvailable, this, bookmarkItem->GetGUID()));
 
 	int sortedPosition;
 

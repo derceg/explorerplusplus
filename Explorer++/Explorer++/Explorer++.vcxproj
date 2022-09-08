@@ -488,6 +488,8 @@
     <ClCompile Include="ApplicationToolbarRegistryStorage.cpp" />
     <ClCompile Include="ApplicationToolbarView.cpp" />
     <ClCompile Include="ApplicationToolbarXmlStorage.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarksToolbar.cpp" />
+    <ClCompile Include="Bookmarks\UI\Views\BookmarksToolbarView.cpp" />
     <ClCompile Include="DriveEnumeratorImpl.cpp" />
     <ClCompile Include="DriveModel.cpp" />
     <ClCompile Include="DrivesToolbarView.cpp" />
@@ -538,7 +540,6 @@
     <ClCompile Include="Bookmarks\BookmarkHelper.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkListView.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkMenu.cpp" />
-    <ClCompile Include="Bookmarks\UI\BookmarksToolbar.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkTreeView.cpp" />
     <ClCompile Include="ColorRuleDialog.cpp" />
     <ClCompile Include="ColorRuleHelper.cpp" />
@@ -646,7 +647,6 @@
     <ClCompile Include="Plugins\TabsApi\Events\TabUpdated.cpp" />
     <ClCompile Include="TaskbarThumbnails.cpp" />
     <ClCompile Include="ThirdPartyCreditsDialog.cpp" />
-    <ClCompile Include="ToolbarViewHelper.cpp" />
     <ClCompile Include="UiTheming.cpp" />
     <ClCompile Include="TreeViewHandler.cpp" />
     <ClCompile Include="Plugins\UiApi.cpp" />
@@ -670,6 +670,8 @@
     <ClInclude Include="ApplicationToolbarRegistryStorage.h" />
     <ClInclude Include="ApplicationToolbarView.h" />
     <ClInclude Include="ApplicationToolbarXmlStorage.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarksToolbar.h" />
+    <ClInclude Include="Bookmarks\UI\Views\BookmarksToolbarView.h" />
     <ClInclude Include="DriveEnumerator.h" />
     <ClInclude Include="DriveEnumeratorImpl.h" />
     <ClInclude Include="DriveModel.h" />
@@ -704,7 +706,6 @@
     <ClInclude Include="Bookmarks\UI\BookmarksMainMenu.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkMenu.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkMenuBuilder.h" />
-    <ClInclude Include="Bookmarks\UI\BookmarksToolbar.h" />
     <ClInclude Include="Bookmarks\BookmarkStorage.h" />
     <ClInclude Include="Bookmarks\BookmarkTree.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkTreeView.h" />
@@ -813,7 +814,6 @@
     <ClInclude Include="Plugins\TabsApi\Events\TabUpdated.h" />
     <ClInclude Include="TaskbarThumbnails.h" />
     <ClInclude Include="ThirdPartyCreditsDialog.h" />
-    <ClInclude Include="ToolbarViewHelper.h" />
     <ClInclude Include="UiTheming.h" />
     <ClInclude Include="MainToolbarButtons.h" />
     <ClInclude Include="Plugins\UiApi.h" />

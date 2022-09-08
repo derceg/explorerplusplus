@@ -330,9 +330,19 @@ private:
 	void OnUseLargeToolbarIconsUpdated(BOOL newValue);
 	boost::signals2::connection AddToolbarContextMenuObserver(
 		const ToolbarContextMenuSignal::slot_type &observer) override;
+	boost::signals2::connection AddToolbarContextMenuSelectedObserver(
+		const ToolbarContextMenuSelectedSignal::slot_type &observer) override;
 
 	/* Main toolbar private message handlers. */
 	void OnToolbarRClick(HWND sourceWindow);
+	void OnToolbarMenuItemSelected(HWND sourceWindow, int menuItemId);
+	void OnToggleAddressBar();
+	void OnToggleMainToolbar();
+	void OnToggleBookmarksToolbar();
+	void OnToggleDrivesToolbar();
+	void OnToggleApplicationToolbar();
+	void OnToggleToolbar(HWND toolbar, bool show);
+	void OnCustomizeMainToolbar();
 
 	/* Settings. */
 	void SaveAllSettings() override;
@@ -541,7 +551,6 @@ private:
 	HWND m_foldersToolbarParent;
 	HWND m_hFoldersToolbar;
 	HWND m_hTabBacking;
-	HWND m_hBookmarksToolbar;
 
 	IDirectoryMonitor *m_pDirMon;
 	ShellTreeView *m_shellTreeView;
@@ -585,6 +594,7 @@ private:
 	TabsInitializedSignal m_tabsInitializedSignal;
 
 	ToolbarContextMenuSignal m_toolbarContextMenuSignal;
+	ToolbarContextMenuSelectedSignal m_toolbarContextMenuSelectedSignal;
 
 	/* Theming. */
 	std::unique_ptr<UiTheming> m_uiTheming;
@@ -610,7 +620,7 @@ private:
 	/* Bookmarks. */
 	BookmarkTree m_bookmarkTree;
 	std::unique_ptr<BookmarksMainMenu> m_bookmarksMainMenu;
-	BookmarksToolbar *m_pBookmarksToolbar;
+	BookmarksToolbar *m_bookmarksToolbar;
 
 	// IconFetcher retrieves file icons in a background thread. A queue of requests is maintained
 	// and that queue is cleared when the instance is destroyed. However, any current request that's

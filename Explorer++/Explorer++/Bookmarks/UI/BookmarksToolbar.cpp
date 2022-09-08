@@ -3,61 +3,162 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "Bookmarks/UI/BookmarksToolbar.h"
+#include "BookmarksToolbar.h"
 #include "Bookmarks/BookmarkClipboard.h"
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/BookmarkTree.h"
+#include "Bookmarks/UI/Views/BookmarksToolbarView.h"
 #include "Config.h"
 #include "CoreInterface.h"
-#include "DarkModeHelper.h"
 #include "MainResource.h"
 #include "Navigation.h"
 #include "ResourceHelper.h"
-#include "ToolbarViewHelper.h"
-#include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
-#include "../Helper/Macros.h"
-#include "../Helper/ShellHelper.h"
+#include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/iDropSource.h"
 #include <wil/com.h>
-#include <wil/common.h>
+#include <format>
 
-BookmarksToolbar::BookmarksToolbar(HWND hToolbar, HINSTANCE instance, CoreInterface *coreInterface,
-	Navigation *navigation, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, UINT uIDStart,
-	UINT uIDEnd) :
-	BookmarkDropTargetWindow(hToolbar, bookmarkTree),
-	m_hToolbar(hToolbar),
-	m_instance(instance),
+class BookmarksToolbarBookmarkButton : public ToolbarButton
+{
+public:
+	BookmarksToolbarBookmarkButton(const BookmarkItem *bookmarkItem,
+		BookmarkIconManager *bookmarkIconManager, ClickedCallback clickedCallback) :
+		ToolbarButton(clickedCallback),
+		m_bookmarkItem(bookmarkItem),
+		m_bookmarkIconManager(bookmarkIconManager),
+		m_destroyed(std::make_shared<bool>(false))
+	{
+		assert(bookmarkItem->IsBookmark());
+	}
+
+	~BookmarksToolbarBookmarkButton()
+	{
+		*m_destroyed = true;
+	}
+
+	std::wstring GetText() const override
+	{
+		return m_bookmarkItem->GetName();
+	}
+
+	std::wstring GetTooltipText() const override
+	{
+		return std::format(L"{}\n{}", m_bookmarkItem->GetName(), m_bookmarkItem->GetLocation());
+	}
+
+	std::optional<int> GetImageIndex() const override
+	{
+		if (m_iconIndex)
+		{
+			return *m_iconIndex;
+		}
+
+		m_iconIndex = m_bookmarkIconManager->GetBookmarkItemIconIndex(m_bookmarkItem,
+			[this, destroyed = m_destroyed](int iconIndex)
+			{
+				// This method is called on the main thread, so it's safe to access the shared
+				// destroyed variable here.
+				if (*destroyed)
+				{
+					return;
+				}
+
+				OnIconLoaded(iconIndex);
+			});
+
+		return *m_iconIndex;
+	}
+
+	void OnIconLoaded(int iconIndex) const
+	{
+		m_iconIndex = iconIndex;
+
+		NotifyParentOfUpdate();
+	}
+
+	void InvalidateCachedIcon()
+	{
+		m_iconIndex.reset();
+	}
+
+private:
+	const BookmarkItem *m_bookmarkItem;
+	BookmarkIconManager *m_bookmarkIconManager;
+
+	// Stores the cached icon index.
+	mutable std::optional<int> m_iconIndex;
+
+	std::shared_ptr<bool> m_destroyed;
+};
+
+class BookmarksToolbarFolderButton : public ToolbarMenuButton
+{
+public:
+	BookmarksToolbarFolderButton(const BookmarkItem *bookmarkItem,
+		BookmarkIconManager *bookmarkIconManager, ClickedCallback clickedCallback) :
+		ToolbarMenuButton(clickedCallback),
+		m_bookmarkItem(bookmarkItem),
+		m_bookmarkIconManager(bookmarkIconManager)
+	{
+		assert(bookmarkItem->IsFolder());
+	}
+
+	std::wstring GetText() const override
+	{
+		return m_bookmarkItem->GetName();
+	}
+
+	std::wstring GetTooltipText() const override
+	{
+		return {};
+	}
+
+	std::optional<int> GetImageIndex() const override
+	{
+		return m_bookmarkIconManager->GetBookmarkItemIconIndex(m_bookmarkItem);
+	}
+
+private:
+	const BookmarkItem *m_bookmarkItem;
+	BookmarkIconManager *m_bookmarkIconManager;
+};
+
+BookmarksToolbar *BookmarksToolbar::Create(BookmarksToolbarView *view, CoreInterface *coreInterface,
+	Navigation *navigation, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree)
+{
+	return new BookmarksToolbar(view, coreInterface, navigation, iconFetcher, bookmarkTree);
+}
+
+BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, CoreInterface *coreInterface,
+	Navigation *navigation, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree) :
+	BookmarkDropTargetWindow(view->GetHWND(), bookmarkTree),
+	m_view(view),
 	m_coreInterface(coreInterface),
 	m_navigation(navigation),
 	m_bookmarkTree(bookmarkTree),
-	m_uIDStart(uIDStart),
-	m_uIDEnd(uIDEnd),
-	m_bookmarkContextMenu(bookmarkTree, instance, coreInterface),
-	m_bookmarkMenu(bookmarkTree, instance, coreInterface, navigation, iconFetcher, hToolbar),
-	m_uIDCounter(0)
+	m_contextMenu(bookmarkTree, coreInterface->GetResourceModule(), coreInterface),
+	m_bookmarkMenu(bookmarkTree, coreInterface->GetResourceModule(), coreInterface, navigation,
+		iconFetcher, view->GetHWND())
 {
-	InitializeToolbar(iconFetcher);
+	Initialize(iconFetcher);
 }
 
-void BookmarksToolbar::InitializeToolbar(IconFetcher *iconFetcher)
+void BookmarksToolbar::Initialize(IconFetcher *iconFetcher)
 {
-	SendMessage(m_hToolbar, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
+	auto &dpiCompat = DpiCompatibility::GetInstance();
+	UINT dpi = dpiCompat.GetDpiForWindow(m_view->GetHWND());
+	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
+	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
+	m_bookmarkIconManager =
+		std::make_unique<BookmarkIconManager>(m_coreInterface, iconFetcher, iconWidth, iconHeight);
 
-	SetUpToolbarImageList(iconFetcher);
+	m_view->SetImageList(m_bookmarkIconManager->GetImageList());
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hToolbar,
-		BookmarksToolbarProcStub, reinterpret_cast<DWORD_PTR>(this)));
-
-	/* Also subclass the parent window, so that WM_COMMAND/WM_NOTIFY messages
-	can be caught. */
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(m_hToolbar),
-		BookmarksToolbarParentProcStub, reinterpret_cast<DWORD_PTR>(this)));
-
-	InsertBookmarkItems();
+	AddBookmarkItems();
 
 	m_connections.push_back(m_bookmarkTree->bookmarkItemAddedSignal.AddObserver(
 		std::bind_front(&BookmarksToolbar::OnBookmarkItemAdded, this)));
@@ -67,182 +168,134 @@ void BookmarksToolbar::InitializeToolbar(IconFetcher *iconFetcher)
 		std::bind_front(&BookmarksToolbar::OnBookmarkItemMoved, this)));
 	m_connections.push_back(m_bookmarkTree->bookmarkItemPreRemovalSignal.AddObserver(
 		std::bind_front(&BookmarksToolbar::OnBookmarkItemPreRemoval, this)));
+
 	m_connections.push_back(m_coreInterface->AddToolbarContextMenuObserver(
 		std::bind_front(&BookmarksToolbar::OnToolbarContextMenuPreShow, this)));
+	m_connections.push_back(m_coreInterface->AddToolbarContextMenuSelectedObserver(
+		std::bind_front(&BookmarksToolbar::OnToolbarContextMenuItemSelected, this)));
 
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
+	m_view->AddWindowDestroyedObserver(std::bind_front(&BookmarksToolbar::OnWindowDestroyed, this));
+}
 
-	if (darkModeHelper.IsDarkModeEnabled())
+void BookmarksToolbar::AddBookmarkItems()
+{
+	size_t index = 0;
+
+	for (const auto &bookmarkItem : m_bookmarkTree->GetBookmarksToolbarFolder()->GetChildren())
 	{
-		darkModeHelper.SetDarkModeForToolbarTooltips(m_hToolbar);
+		AddBookmarkItem(bookmarkItem.get(), index);
 
-		SendMessage(m_hToolbar, TB_SETINSERTMARKCOLOR, 0, darkModeHelper.FOREGROUND_COLOR);
+		index++;
 	}
 }
 
-void BookmarksToolbar::SetUpToolbarImageList(IconFetcher *iconFetcher)
+void BookmarksToolbar::AddBookmarkItem(BookmarkItem *bookmarkItem, size_t index)
 {
-	auto &dpiCompat = DpiCompatibility::GetInstance();
-	UINT dpi = dpiCompat.GetDpiForWindow(m_hToolbar);
-	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
-	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
-	SendMessage(m_hToolbar, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
+	std::unique_ptr<ToolbarButton> button;
 
-	m_bookmarkIconManager = std::make_unique<BookmarkIconManager>(m_coreInterface, iconFetcher,
-		std::bind_front(&BookmarksToolbar::OnBookmarkIconAvailable, this), iconWidth, iconHeight);
+	if (bookmarkItem->IsBookmark())
+	{
+		button = std::make_unique<BookmarksToolbarBookmarkButton>(bookmarkItem,
+			m_bookmarkIconManager.get(),
+			std::bind_front(&BookmarksToolbar::OnBookmarkClicked, this, bookmarkItem));
+	}
+	else
+	{
+		button = std::make_unique<BookmarksToolbarFolderButton>(bookmarkItem,
+			m_bookmarkIconManager.get(),
+			std::bind_front(&BookmarksToolbar::OnBookmarkFolderClicked, this, bookmarkItem));
+	}
 
-	SendMessage(m_hToolbar, TB_SETIMAGELIST, 0,
-		reinterpret_cast<LPARAM>(m_bookmarkIconManager->GetImageList()));
+	button->SetMiddleClickedCallback(
+		std::bind_front(&BookmarksToolbar::OnButtonMiddleClicked, this, bookmarkItem));
+	button->SetRightClickedCallback(
+		std::bind_front(&BookmarksToolbar::OnButtonRightClicked, this, bookmarkItem));
+	button->SetDragStartedCallback(
+		std::bind_front(&BookmarksToolbar::OnButtonDragStarted, this, bookmarkItem));
+
+	m_view->AddButton(std::move(button), index);
 }
 
-LRESULT CALLBACK BookmarksToolbar::BookmarksToolbarProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
-	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+void BookmarksToolbar::OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t index)
 {
-	UNREFERENCED_PARAMETER(uIdSubclass);
-
-	auto *pbt = reinterpret_cast<BookmarksToolbar *>(dwRefData);
-
-	return pbt->BookmarksToolbarProc(hwnd, uMsg, wParam, lParam);
-}
-
-LRESULT CALLBACK BookmarksToolbar::BookmarksToolbarProc(HWND hwnd, UINT uMsg, WPARAM wParam,
-	LPARAM lParam)
-{
-	switch (uMsg)
-	{
-	case WM_LBUTTONDOWN:
-	{
-		POINT pt;
-		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-		OnLButtonDown(pt);
-	}
-	break;
-
-	case WM_MOUSEMOVE:
-	{
-		POINT pt;
-		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-		OnMouseMove(static_cast<int>(wParam), pt);
-	}
-	break;
-
-	case WM_LBUTTONUP:
-		OnLButtonUp();
-		break;
-
-	case WM_MBUTTONUP:
-	{
-		POINT pt;
-		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-		OnMButtonUp(pt, static_cast<UINT>(wParam));
-	}
-	break;
-	}
-
-	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
-}
-
-void BookmarksToolbar::OnLButtonDown(const POINT &pt)
-{
-	// The cursor point saved below will be used to determine whether or not to
-	// enter a drag loop when the mouse moves. Note that although there's a
-	// TBN_BEGINDRAG message, it appears that it's sent as soon as a mouse
-	// button goes down (even if the mouse hasn't moved while the button is
-	// down). Therefore, there's not much point using it.
-	// Additionally, that event is also sent when the right button goes down,
-	// though a drag should only begin when the left button goes down.
-	m_leftButtonDownPoint = pt;
-}
-
-void BookmarksToolbar::OnMouseMove(int keys, const POINT &pt)
-{
-	if (!m_leftButtonDownPoint || !WI_IsFlagSet(keys, MK_LBUTTON))
-	{
-		m_leftButtonDownPoint.reset();
-		return;
-	}
-
-	if (IsWithinDrag())
+	if (bookmarkItem.GetParent() != m_bookmarkTree->GetBookmarksToolbarFolder())
 	{
 		return;
 	}
 
-	auto &dpiCompat = DpiCompatibility::GetInstance();
-	UINT dpi = dpiCompat.GetDpiForWindow(m_hToolbar);
+	AddBookmarkItem(&bookmarkItem, index);
+}
 
-	RECT rect = { m_leftButtonDownPoint->x, m_leftButtonDownPoint->y, m_leftButtonDownPoint->x,
-		m_leftButtonDownPoint->y };
-	InflateRect(&rect, dpiCompat.GetSystemMetricsForDpi(SM_CXDRAG, dpi),
-		dpiCompat.GetSystemMetricsForDpi(SM_CYDRAG, dpi));
-
-	if (!PtInRect(&rect, pt))
+void BookmarksToolbar::OnBookmarkItemUpdated(BookmarkItem &bookmarkItem,
+	BookmarkItem::PropertyType propertyType)
+{
+	if (bookmarkItem.GetParent() != m_bookmarkTree->GetBookmarksToolbarFolder())
 	{
-		StartDrag(*m_leftButtonDownPoint);
+		return;
+	}
 
-		m_leftButtonDownPoint.reset();
+	auto index = bookmarkItem.GetParent()->GetChildIndex(&bookmarkItem);
+
+	if (bookmarkItem.IsBookmark() && propertyType == BookmarkItem::PropertyType::Location)
+	{
+		auto button = static_cast<BookmarksToolbarBookmarkButton *>(m_view->GetButton(index));
+		button->InvalidateCachedIcon();
+	}
+
+	m_view->UpdateButton(index);
+}
+
+void BookmarksToolbar::OnBookmarkItemMoved(BookmarkItem *bookmarkItem,
+	const BookmarkItem *oldParent, size_t oldIndex, const BookmarkItem *newParent, size_t newIndex)
+{
+	if (oldParent == m_bookmarkTree->GetBookmarksToolbarFolder())
+	{
+		m_view->RemoveButton(oldIndex);
+	}
+
+	if (newParent == m_bookmarkTree->GetBookmarksToolbarFolder())
+	{
+		AddBookmarkItem(bookmarkItem, newIndex);
 	}
 }
 
-void BookmarksToolbar::StartDrag(const POINT &pt)
+void BookmarksToolbar::OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem)
 {
-	int index =
-		static_cast<int>(SendMessage(m_hToolbar, TB_HITTEST, 0, reinterpret_cast<LPARAM>(&pt)));
-
-	if (index < 0)
+	if (bookmarkItem.GetParent() != m_bookmarkTree->GetBookmarksToolbarFolder())
 	{
 		return;
 	}
 
-	wil::com_ptr_nothrow<IDragSourceHelper> dragSourceHelper;
-	HRESULT hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_ALL,
-		IID_PPV_ARGS(&dragSourceHelper));
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	wil::com_ptr_nothrow<IDropSource> dropSource;
-	hr = CreateDropSource(&dropSource);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	BookmarkItem *bookmarkItem = GetBookmarkItemFromToolbarIndex(index);
-	auto &ownedPtr = bookmarkItem->GetParent()->GetChildOwnedPtr(bookmarkItem);
-	auto dataObject = BookmarkDataExchange::CreateDataObject({ ownedPtr });
-
-	DWORD effect;
-	DoDragDrop(dataObject.get(), dropSource.get(), DROPEFFECT_MOVE, &effect);
+	auto index = bookmarkItem.GetParent()->GetChildIndex(&bookmarkItem);
+	m_view->RemoveButton(index);
 }
 
-void BookmarksToolbar::OnLButtonUp()
+void BookmarksToolbar::OnBookmarkClicked(BookmarkItem *bookmarkItem, const MouseEvent &event)
 {
-	m_leftButtonDownPoint.reset();
+	UNREFERENCED_PARAMETER(event);
+
+	m_navigation->BrowseFolderInCurrentTab(bookmarkItem->GetLocation().c_str());
 }
 
-void BookmarksToolbar::OnMButtonUp(const POINT &pt, UINT keysDown)
+void BookmarksToolbar::OnBookmarkFolderClicked(BookmarkItem *bookmarkItem, const MouseEvent &event)
 {
-	int index =
-		static_cast<int>(SendMessage(m_hToolbar, TB_HITTEST, 0, reinterpret_cast<LPARAM>(&pt)));
+	UNREFERENCED_PARAMETER(event);
 
-	if (index < 0)
-	{
-		return;
-	}
+	auto index = bookmarkItem->GetParent()->GetChildIndex(bookmarkItem);
+	RECT buttonRect = m_view->GetButtonRect(index);
 
-	auto bookmarkItem = GetBookmarkItemFromToolbarIndex(index);
+	POINT pt = { buttonRect.left, buttonRect.bottom };
+	ClientToScreen(m_view->GetHWND(), &pt);
 
-	if (!bookmarkItem)
-	{
-		return;
-	}
+	m_bookmarkMenu.ShowMenu(bookmarkItem, pt);
+}
 
+void BookmarksToolbar::OnButtonMiddleClicked(const BookmarkItem *bookmarkItem,
+	const MouseEvent &event)
+{
 	bool switchToNewTab = m_coreInterface->GetConfig()->openTabsInForeground;
 
-	if (WI_IsFlagSet(keysDown, MK_SHIFT))
+	if (event.shiftKey)
 	{
 		switchToNewTab = !switchToNewTab;
 	}
@@ -250,209 +303,55 @@ void BookmarksToolbar::OnMButtonUp(const POINT &pt, UINT keysDown)
 	BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_coreInterface, switchToNewTab);
 }
 
-LRESULT CALLBACK BookmarksToolbar::BookmarksToolbarParentProcStub(HWND hwnd, UINT uMsg,
-	WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+void BookmarksToolbar::OnButtonRightClicked(BookmarkItem *bookmarkItem, const MouseEvent &event)
 {
-	UNREFERENCED_PARAMETER(uIdSubclass);
+	POINT ptScreen = event.ptClient;
+	ClientToScreen(m_view->GetHWND(), &ptScreen);
 
-	auto *pbt = reinterpret_cast<BookmarksToolbar *>(dwRefData);
-
-	return pbt->BookmarksToolbarParentProc(hwnd, uMsg, wParam, lParam);
+	m_contextMenu.ShowMenu(m_view->GetHWND(), bookmarkItem->GetParent(), { bookmarkItem },
+		ptScreen);
 }
 
-LRESULT CALLBACK BookmarksToolbar::BookmarksToolbarParentProc(HWND hwnd, UINT uMsg, WPARAM wParam,
-	LPARAM lParam)
+void BookmarksToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt)
 {
-	switch (uMsg)
-	{
-	case WM_COMMAND:
-		if (OnCommand(wParam, lParam))
-		{
-			return 0;
-		}
-		break;
-
-	case WM_NOTIFY:
-		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == m_hToolbar)
-		{
-			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
-			{
-			case NM_RCLICK:
-				if (OnRightClick(reinterpret_cast<NMMOUSE *>(lParam)))
-				{
-					return TRUE;
-				}
-				break;
-
-			case TBN_GETINFOTIP:
-				if (OnGetInfoTip(reinterpret_cast<NMTBGETINFOTIP *>(lParam)))
-				{
-					return 0;
-				}
-				break;
-			}
-		}
-		break;
-	}
-
-	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
-}
-
-BOOL BookmarksToolbar::OnRightClick(const NMMOUSE *nmm)
-{
-	if (nmm->dwItemSpec == -1)
-	{
-		return FALSE;
-	}
-
-	int index = static_cast<int>(SendMessage(m_hToolbar, TB_COMMANDTOINDEX, nmm->dwItemSpec, 0));
-
-	if (index == -1)
-	{
-		return FALSE;
-	}
-
-	auto bookmarkItem = GetBookmarkItemFromToolbarIndex(index);
-
-	if (!bookmarkItem)
-	{
-		return FALSE;
-	}
-
-	POINT pt = nmm->pt;
-	BOOL res = ClientToScreen(m_hToolbar, &pt);
-
-	if (!res)
-	{
-		return FALSE;
-	}
-
-	m_bookmarkContextMenu.ShowMenu(m_hToolbar, m_bookmarkTree->GetBookmarksToolbarFolder(),
-		{ bookmarkItem }, pt);
-
-	return TRUE;
-}
-
-bool BookmarksToolbar::OnCommand(WPARAM wParam, LPARAM lParam)
-{
-	UNREFERENCED_PARAMETER(lParam);
-
-	if (HIWORD(wParam) != 0)
-	{
-		return false;
-	}
-
-	if ((LOWORD(wParam) >= m_uIDStart && LOWORD(wParam) <= m_uIDEnd))
-	{
-		return OnButtonClick(LOWORD(wParam));
-	}
-	else
-	{
-		switch (LOWORD(wParam))
-		{
-		case IDM_BT_NEWBOOKMARK:
-		case IDM_BT_NEWFOLDER:
-		case IDM_BT_PASTE:
-			OnToolbarContextMenuItemClicked(LOWORD(wParam));
-			return true;
-		}
-	}
-
-	return false;
-}
-
-bool BookmarksToolbar::OnButtonClick(int command)
-{
-	int index = static_cast<int>(SendMessage(m_hToolbar, TB_COMMANDTOINDEX, command, 0));
-
-	if (index == -1)
-	{
-		return false;
-	}
-
-	auto bookmarkItem = GetBookmarkItemFromToolbarIndex(index);
-
-	if (!bookmarkItem)
-	{
-		return false;
-	}
-
-	if (bookmarkItem->IsFolder())
-	{
-		ShowBookmarkFolderMenu(bookmarkItem, command, index);
-	}
-	else
-	{
-		m_navigation->BrowseFolderInCurrentTab(bookmarkItem->GetLocation().c_str());
-	}
-
-	return true;
-}
-
-void BookmarksToolbar::ShowBookmarkFolderMenu(BookmarkItem *bookmarkItem, int command, int index)
-{
-	RECT rc;
-	BOOL res = static_cast<BOOL>(
-		SendMessage(m_hToolbar, TB_GETITEMRECT, index, reinterpret_cast<LPARAM>(&rc)));
-
-	if (!res)
+	if (sourceWindow != m_view->GetHWND())
 	{
 		return;
 	}
 
-	SetLastError(ERROR_SUCCESS);
-	auto mapRes = MapWindowPoints(m_hToolbar, nullptr, reinterpret_cast<LPPOINT>(&rc), 2);
+	std::wstring newBookmark = ResourceHelper::LoadString(m_coreInterface->GetResourceModule(),
+		IDS_BOOKMARKS_TOOLBAR_NEW_BOOKMARK);
+	MenuHelper::AddStringItem(menu, IDM_BT_NEWBOOKMARK, newBookmark, IDM_TOOLBARS_CUSTOMIZE, FALSE);
 
-	if (mapRes == 0 && GetLastError() != ERROR_SUCCESS)
+	std::wstring newBookmarkFolder = ResourceHelper::LoadString(
+		m_coreInterface->GetResourceModule(), IDS_BOOKMARKS_TOOLBAR_NEW_FOLDER);
+	MenuHelper::AddStringItem(menu, IDM_BT_NEWFOLDER, newBookmarkFolder, IDM_TOOLBARS_CUSTOMIZE,
+		FALSE);
+
+	std::wstring paste = ResourceHelper::LoadString(m_coreInterface->GetResourceModule(),
+		IDS_BOOKMARKS_TOOLBAR_PASTE);
+	MenuHelper::AddStringItem(menu, IDM_BT_PASTE, paste, IDM_TOOLBARS_CUSTOMIZE, FALSE);
+
+	if (!IsClipboardFormatAvailable(BookmarkClipboard::GetClipboardFormat()))
+	{
+		MenuHelper::EnableItem(menu, IDM_BT_PASTE, FALSE);
+	}
+
+	m_contextMenuLocation = pt;
+}
+
+void BookmarksToolbar::OnToolbarContextMenuItemSelected(HWND sourceWindow, int menuItemId)
+{
+	if (sourceWindow != m_view->GetHWND())
 	{
 		return;
 	}
 
-	SendMessage(m_hToolbar, TB_PRESSBUTTON, command, MAKEWORD(TRUE, 0));
-
-	POINT pt;
-	pt.x = rc.left;
-	pt.y = rc.bottom;
-	m_bookmarkMenu.ShowMenu(bookmarkItem, pt);
-
-	SendMessage(m_hToolbar, TB_PRESSBUTTON, command, MAKEWORD(FALSE, 0));
-}
-
-void BookmarksToolbar::ShowOverflowMenu(const POINT &ptScreen)
-{
-	m_bookmarkMenu.ShowMenu(m_bookmarkTree->GetBookmarksToolbarFolder(), ptScreen,
-		[this](const BookmarkItem *bookmarkItem)
-		{
-			auto index = GetBookmarkItemIndex(bookmarkItem);
-
-			if (!index)
-			{
-				assert(false);
-				return false;
-			}
-
-			RECT toolbarRect;
-			GetClientRect(m_hToolbar, &toolbarRect);
-
-			RECT buttonRect;
-			SendMessage(m_hToolbar, TB_GETITEMRECT, *index, reinterpret_cast<LPARAM>(&buttonRect));
-
-			if (buttonRect.right > toolbarRect.right)
-			{
-				return true;
-			}
-
-			return false;
-		});
-}
-
-void BookmarksToolbar::OnToolbarContextMenuItemClicked(int menuItemId)
-{
 	assert(m_contextMenuLocation);
 
 	POINT ptClient = *m_contextMenuLocation;
-	ScreenToClient(m_hToolbar, &ptClient);
-	int targetIndex = FindNextButtonIndex(m_hToolbar, ptClient);
+	ScreenToClient(m_view->GetHWND(), &ptClient);
+	size_t targetIndex = m_view->FindNextButtonIndex(ptClient);
 
 	switch (menuItemId)
 	{
@@ -475,7 +374,8 @@ void BookmarksToolbar::OnToolbarContextMenuItemClicked(int menuItemId)
 void BookmarksToolbar::OnNewBookmarkItem(BookmarkItem::Type type, size_t targetIndex)
 {
 	BookmarkHelper::AddBookmarkItem(m_bookmarkTree, type,
-		m_bookmarkTree->GetBookmarksToolbarFolder(), targetIndex, m_hToolbar, m_coreInterface);
+		m_bookmarkTree->GetBookmarksToolbarFolder(), targetIndex, m_view->GetHWND(),
+		m_coreInterface);
 }
 
 void BookmarksToolbar::OnPaste(size_t targetIndex)
@@ -484,267 +384,65 @@ void BookmarksToolbar::OnPaste(size_t targetIndex)
 		targetIndex);
 }
 
-void BookmarksToolbar::OnEditBookmarkItem(BookmarkItem *bookmarkItem)
+BookmarksToolbarView *BookmarksToolbar::GetView() const
 {
-	BookmarkHelper::EditBookmarkItem(bookmarkItem, m_bookmarkTree, m_instance, m_hToolbar,
-		m_coreInterface);
+	return m_view;
 }
 
-bool BookmarksToolbar::OnGetInfoTip(NMTBGETINFOTIP *infoTip)
+void BookmarksToolbar::ShowOverflowMenu(const POINT &ptScreen)
 {
-	int index = static_cast<int>(SendMessage(m_hToolbar, TB_COMMANDTOINDEX, infoTip->iItem, 0));
-
-	if (index == -1)
-	{
-		return false;
-	}
-
-	auto bookmarkItem = GetBookmarkItemFromToolbarIndex(index);
-
-	if (!bookmarkItem)
-	{
-		return false;
-	}
-
-	if (bookmarkItem->IsBookmark())
-	{
-		StringCchPrintf(infoTip->pszText, infoTip->cchTextMax, _T("%s\n%s"),
-			bookmarkItem->GetName().c_str(), bookmarkItem->GetLocation().c_str());
-
-		return true;
-	}
-
-	return false;
-}
-
-void BookmarksToolbar::InsertBookmarkItems()
-{
-	int position = 0;
-
-	for (const auto &bookmarkItem : m_bookmarkTree->GetBookmarksToolbarFolder()->GetChildren())
-	{
-		InsertBookmarkItem(bookmarkItem.get(), position);
-
-		position++;
-	}
-}
-
-void BookmarksToolbar::InsertBookmarkItem(BookmarkItem *bookmarkItem, int position)
-{
-	assert(position <= SendMessage(m_hToolbar, TB_BUTTONCOUNT, 0, 0));
-
-	TCHAR szName[256];
-	StringCchCopy(szName, SIZEOF_ARRAY(szName), bookmarkItem->GetName().c_str());
-
-	int iconIndex = m_bookmarkIconManager->GetBookmarkItemIconIndex(bookmarkItem);
-
-	TBBUTTON tbb;
-	tbb.iBitmap = iconIndex;
-	tbb.idCommand = m_uIDStart + m_uIDCounter;
-	tbb.fsState = TBSTATE_ENABLED;
-	tbb.fsStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX;
-	tbb.dwData = reinterpret_cast<DWORD_PTR>(bookmarkItem);
-	tbb.iString = reinterpret_cast<INT_PTR>(szName);
-	SendMessage(m_hToolbar, TB_INSERTBUTTON, position, reinterpret_cast<LPARAM>(&tbb));
-
-	UpdateToolbarBandSizing(GetParent(m_hToolbar), m_hToolbar);
-
-	++m_uIDCounter;
-}
-
-void BookmarksToolbar::OnBookmarkIconAvailable(std::wstring_view guid, int iconIndex)
-{
-	auto index = GetBookmarkItemIndexUsingGuid(guid);
-
-	if (!index)
-	{
-		return;
-	}
-
-	TBBUTTONINFO buttonInfo;
-	buttonInfo.cbSize = sizeof(buttonInfo);
-	buttonInfo.dwMask = TBIF_BYINDEX | TBIF_IMAGE;
-	buttonInfo.iImage = iconIndex;
-	SendMessage(m_hToolbar, TB_SETBUTTONINFO, *index, reinterpret_cast<LPARAM>(&buttonInfo));
-}
-
-void BookmarksToolbar::OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t index)
-{
-	if (bookmarkItem.GetParent() == m_bookmarkTree->GetBookmarksToolbarFolder())
-	{
-		InsertBookmarkItem(&bookmarkItem, static_cast<int>(index));
-	}
-}
-
-void BookmarksToolbar::OnBookmarkItemUpdated(BookmarkItem &bookmarkItem,
-	BookmarkItem::PropertyType propertyType)
-{
-	if (propertyType != BookmarkItem::PropertyType::Name)
-	{
-		return;
-	}
-
-	auto index = GetBookmarkItemIndex(&bookmarkItem);
-
-	if (!index)
-	{
-		return;
-	}
-
-	TCHAR name[128];
-	StringCchCopy(name, std::size(name), bookmarkItem.GetName().c_str());
-
-	TBBUTTONINFO tbbi;
-	tbbi.cbSize = sizeof(tbbi);
-	tbbi.dwMask = TBIF_BYINDEX | TBIF_TEXT;
-	tbbi.pszText = name;
-	SendMessage(m_hToolbar, TB_SETBUTTONINFO, *index, reinterpret_cast<LPARAM>(&tbbi));
-}
-
-void BookmarksToolbar::OnBookmarkItemMoved(BookmarkItem *bookmarkItem,
-	const BookmarkItem *oldParent, size_t oldIndex, const BookmarkItem *newParent, size_t newIndex)
-{
-	UNREFERENCED_PARAMETER(oldIndex);
-
-	if (oldParent == m_bookmarkTree->GetBookmarksToolbarFolder())
-	{
-		RemoveBookmarkItem(bookmarkItem);
-	}
-
-	if (newParent == m_bookmarkTree->GetBookmarksToolbarFolder())
-	{
-		InsertBookmarkItem(bookmarkItem, static_cast<int>(newIndex));
-	}
-}
-
-void BookmarksToolbar::OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem)
-{
-	if (bookmarkItem.GetParent() == m_bookmarkTree->GetBookmarksToolbarFolder())
-	{
-		RemoveBookmarkItem(&bookmarkItem);
-	}
-}
-
-void BookmarksToolbar::RemoveBookmarkItem(const BookmarkItem *bookmarkItem)
-{
-	auto index = GetBookmarkItemIndex(bookmarkItem);
-	assert(index);
-
-	TBBUTTONINFO buttonInfo;
-	buttonInfo.cbSize = sizeof(buttonInfo);
-	buttonInfo.dwMask = TBIF_BYINDEX | TBIF_IMAGE;
-	SendMessage(m_hToolbar, TB_GETBUTTONINFO, *index, reinterpret_cast<LPARAM>(&buttonInfo));
-
-	SendMessage(m_hToolbar, TB_DELETEBUTTON, *index, 0);
-
-	m_bookmarkIconManager->RemoveIcon(buttonInfo.iImage);
-
-	UpdateToolbarBandSizing(GetParent(m_hToolbar), m_hToolbar);
-}
-
-void BookmarksToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt)
-{
-	if (sourceWindow != m_hToolbar)
-	{
-		return;
-	}
-
-	std::wstring newBookmark =
-		ResourceHelper::LoadString(m_instance, IDS_BOOKMARKS_TOOLBAR_NEW_BOOKMARK);
-
-	MENUITEMINFO mii;
-	mii.cbSize = sizeof(mii);
-	mii.fMask = MIIM_ID | MIIM_STRING;
-	mii.dwTypeData = newBookmark.data();
-	mii.wID = IDM_BT_NEWBOOKMARK;
-	InsertMenuItem(menu, IDM_TOOLBARS_CUSTOMIZE, FALSE, &mii);
-
-	std::wstring newBookmarkFolder =
-		ResourceHelper::LoadString(m_instance, IDS_BOOKMARKS_TOOLBAR_NEW_FOLDER);
-
-	mii.fMask = MIIM_ID | MIIM_STRING;
-	mii.dwTypeData = newBookmarkFolder.data();
-	mii.wID = IDM_BT_NEWFOLDER;
-	InsertMenuItem(menu, IDM_TOOLBARS_CUSTOMIZE, FALSE, &mii);
-
-	std::wstring paste = ResourceHelper::LoadString(m_instance, IDS_BOOKMARKS_TOOLBAR_PASTE);
-
-	UINT state = MFS_DISABLED;
-
-	if (IsClipboardFormatAvailable(BookmarkClipboard::GetClipboardFormat()))
-	{
-		state = MFS_ENABLED;
-	}
-
-	mii.fMask = MIIM_ID | MIIM_STRING | MIIM_STATE;
-	mii.dwTypeData = paste.data();
-	mii.wID = IDM_BT_PASTE;
-	mii.fState = state;
-	InsertMenuItem(menu, IDM_TOOLBARS_CUSTOMIZE, FALSE, &mii);
-
-	// TODO: It would be better to have a callback function invoked when a menu
-	// item is selected, rather than handling the selection in WM_COMMAND. That
-	// way, the point here wouldn't need to be saved (it could be passed
-	// directly to the callback instead).
-	m_contextMenuLocation = pt;
-}
-
-BookmarkItem *BookmarksToolbar::GetBookmarkItemFromToolbarIndex(int index)
-{
-	TBBUTTON tbButton;
-	BOOL ret = static_cast<BOOL>(
-		SendMessage(m_hToolbar, TB_GETBUTTON, index, reinterpret_cast<LPARAM>(&tbButton)));
-
-	if (!ret)
-	{
-		return nullptr;
-	}
-
-	return reinterpret_cast<BookmarkItem *>(tbButton.dwData);
-}
-
-std::optional<int> BookmarksToolbar::GetBookmarkItemIndex(const BookmarkItem *bookmarkItem) const
-{
-	return GetBookmarkItemIndexUsingGuid(bookmarkItem->GetGUID());
-}
-
-std::optional<int> BookmarksToolbar::GetBookmarkItemIndexUsingGuid(std::wstring_view guid) const
-{
-	int nButtons = static_cast<int>(SendMessage(m_hToolbar, TB_BUTTONCOUNT, 0, 0));
-
-	for (int i = 0; i < nButtons; i++)
-	{
-		TBBUTTON tb;
-		SendMessage(m_hToolbar, TB_GETBUTTON, i, reinterpret_cast<LPARAM>(&tb));
-
-		auto *currentBookmarkItem = reinterpret_cast<BookmarkItem *>(tb.dwData);
-
-		if (currentBookmarkItem->GetGUID() == guid)
+	m_bookmarkMenu.ShowMenu(m_bookmarkTree->GetBookmarksToolbarFolder(), ptScreen,
+		[this](const BookmarkItem *bookmarkItem)
 		{
-			return i;
-		}
-	}
-
-	return std::nullopt;
+			auto index = bookmarkItem->GetParent()->GetChildIndex(bookmarkItem);
+			return !m_view->IsButtonVisible(index);
+		});
 }
 
-BookmarksToolbar::DropLocation BookmarksToolbar::GetDropLocation(const POINT &pt)
+void BookmarksToolbar::OnWindowDestroyed()
+{
+	delete this;
+}
+
+void BookmarksToolbar::OnButtonDragStarted(const BookmarkItem *bookmarkItem)
+{
+	wil::com_ptr_nothrow<IDragSourceHelper> dragSourceHelper;
+	HRESULT hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_ALL,
+		IID_PPV_ARGS(&dragSourceHelper));
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	wil::com_ptr_nothrow<IDropSource> dropSource;
+	hr = CreateDropSource(&dropSource);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	auto &ownedPtr = bookmarkItem->GetParent()->GetChildOwnedPtr(bookmarkItem);
+	auto dataObject = BookmarkDataExchange::CreateDataObject({ ownedPtr });
+
+	DWORD effect;
+	DoDragDrop(dataObject.get(), dropSource.get(), DROPEFFECT_MOVE, &effect);
+}
+
+BookmarkDropTargetWindow::DropLocation BookmarksToolbar::GetDropLocation(const POINT &pt)
 {
 	POINT ptClient = pt;
-	ScreenToClient(m_hToolbar, &ptClient);
-	int index = static_cast<int>(
-		SendMessage(m_hToolbar, TB_HITTEST, 0, reinterpret_cast<LPARAM>(&ptClient)));
+	ScreenToClient(m_view->GetHWND(), &ptClient);
 
-	BookmarkItem *parentFolder = nullptr;
-	size_t position;
-	bool parentFolderSelected = false;
+	auto index = m_view->MaybeGetIndexOfButtonAtPoint(ptClient);
 
-	if (index >= 0)
+	if (index)
 	{
-		auto bookmarkItem = GetBookmarkItemFromToolbarIndex(index);
+		RECT buttonRect = m_view->GetButtonRect(*index);
 
-		RECT buttonRect;
-		SendMessage(m_hToolbar, TB_GETITEMRECT, index, reinterpret_cast<LPARAM>(&buttonRect));
+		auto bookmarkItem =
+			m_bookmarkTree->GetBookmarksToolbarFolder()->GetChildren().at(*index).get();
 
 		if (bookmarkItem->IsFolder())
 		{
@@ -755,39 +453,34 @@ BookmarksToolbar::DropLocation BookmarksToolbar::GetDropLocation(const POINT &pt
 
 			if (ptClient.x < folderCentralRect.left)
 			{
-				parentFolder = m_bookmarkTree->GetBookmarksToolbarFolder();
-				position = index;
+				return { m_bookmarkTree->GetBookmarksToolbarFolder(), *index, false };
 			}
 			else if (ptClient.x > folderCentralRect.right)
 			{
-				parentFolder = m_bookmarkTree->GetBookmarksToolbarFolder();
-				position = index + 1;
+				return { m_bookmarkTree->GetBookmarksToolbarFolder(), *index + 1, false };
 			}
 			else
 			{
-				parentFolder = bookmarkItem;
-				position = bookmarkItem->GetChildren().size();
-				parentFolderSelected = true;
+				return { bookmarkItem, bookmarkItem->GetChildren().size(), true };
 			}
 		}
 		else
 		{
-			parentFolder = m_bookmarkTree->GetBookmarksToolbarFolder();
-			position = index;
-
 			if (ptClient.x > (buttonRect.left + GetRectWidth(&buttonRect) / 2))
 			{
-				position++;
+				return { m_bookmarkTree->GetBookmarksToolbarFolder(), *index + 1, false };
+			}
+			else
+			{
+				return { m_bookmarkTree->GetBookmarksToolbarFolder(), *index, false };
 			}
 		}
 	}
 	else
 	{
-		parentFolder = m_bookmarkTree->GetBookmarksToolbarFolder();
-		position = FindNextButtonIndex(m_hToolbar, ptClient);
+		auto nextIndex = m_view->FindNextButtonIndex(ptClient);
+		return { m_bookmarkTree->GetBookmarksToolbarFolder(), nextIndex, false };
 	}
-
-	return { parentFolder, position, parentFolderSelected };
 }
 
 void BookmarksToolbar::UpdateUiForDropLocation(const DropLocation &dropLocation)
@@ -796,71 +489,37 @@ void BookmarksToolbar::UpdateUiForDropLocation(const DropLocation &dropLocation)
 
 	if (dropLocation.parentFolder == m_bookmarkTree->GetBookmarksToolbarFolder())
 	{
-		DWORD flags;
-		int numButtons = static_cast<int>(SendMessage(m_hToolbar, TB_BUTTONCOUNT, 0, 0));
-		size_t finalPosition = dropLocation.position;
-
-		if (finalPosition == static_cast<size_t>(numButtons))
-		{
-			finalPosition--;
-			flags = TBIMHT_AFTER;
-		}
-		else
-		{
-			flags = 0;
-		}
-
-		TBINSERTMARK tbim;
-		tbim.iButton = static_cast<int>(finalPosition);
-		tbim.dwFlags = flags;
-		SendMessage(m_hToolbar, TB_SETINSERTMARK, 0, reinterpret_cast<LPARAM>(&tbim));
-
-		m_previousDropButton.reset();
+		m_view->ShowInsertMark(dropLocation.position);
 	}
 	else
 	{
-		RemoveInsertionMark();
+		m_view->RemoveInsertMark();
 
-		auto selectedButtonIndex = GetBookmarkItemIndex(dropLocation.parentFolder);
-		assert(selectedButtonIndex);
+		auto selectedButtonIndex =
+			dropLocation.parentFolder->GetParent()->GetChildIndex(dropLocation.parentFolder);
 
-		SetButtonPressedState(*selectedButtonIndex, true);
-		m_previousDropButton = *selectedButtonIndex;
+		auto button = m_view->GetButton(selectedButtonIndex);
+		button->SetChecked(true);
+
+		m_dropTargetFolder = dropLocation.parentFolder;
 	}
-}
-
-void BookmarksToolbar::SetButtonPressedState(int index, bool pressed)
-{
-	TBBUTTON tbButton;
-	BOOL res = static_cast<BOOL>(
-		SendMessage(m_hToolbar, TB_GETBUTTON, index, reinterpret_cast<LPARAM>(&tbButton)));
-
-	if (!res)
-	{
-		return;
-	}
-
-	SendMessage(m_hToolbar, TB_PRESSBUTTON, tbButton.idCommand, MAKEWORD(pressed, 0));
 }
 
 void BookmarksToolbar::ResetDropUiState()
 {
-	RemoveInsertionMark();
+	m_view->RemoveInsertMark();
 	RemoveDropHighlight();
-}
-
-void BookmarksToolbar::RemoveInsertionMark()
-{
-	TBINSERTMARK tbim;
-	tbim.iButton = -1;
-	SendMessage(m_hToolbar, TB_SETINSERTMARK, 0, reinterpret_cast<LPARAM>(&tbim));
 }
 
 void BookmarksToolbar::RemoveDropHighlight()
 {
-	if (m_previousDropButton)
+	if (m_dropTargetFolder)
 	{
-		SetButtonPressedState(*m_previousDropButton, false);
-		m_previousDropButton.reset();
+		auto index = m_dropTargetFolder->GetParent()->GetChildIndex(m_dropTargetFolder);
+
+		auto button = m_view->GetButton(index);
+		button->SetChecked(false);
+
+		m_dropTargetFolder = nullptr;
 	}
 }

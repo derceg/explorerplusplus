@@ -337,9 +337,6 @@
     <ClCompile Include="Bookmarks\UI\BookmarksMainMenu.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Bookmarks\UI\BookmarksToolbar.cpp">
-      <Filter>Bookmarks\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Bookmarks\UI\BookmarkTreeView.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
@@ -490,8 +487,11 @@
     <ClCompile Include="DrivesToolbarView.cpp">
       <Filter>Drives Toolbar\UI\Views</Filter>
     </ClCompile>
-    <ClCompile Include="ToolbarViewHelper.cpp">
-      <Filter>Views</Filter>
+    <ClCompile Include="Bookmarks\UI\BookmarksToolbar.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Bookmarks\UI\Views\BookmarksToolbarView.cpp">
+      <Filter>Bookmarks\UI\Views</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -828,9 +828,6 @@
     <ClInclude Include="Bookmarks\UI\BookmarksMainMenu.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Bookmarks\UI\BookmarksToolbar.h">
-      <Filter>Bookmarks\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Bookmarks\UI\BookmarkTreeView.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
@@ -987,8 +984,11 @@
     <ClInclude Include="DrivesToolbarView.h">
       <Filter>Drives Toolbar\UI\Views</Filter>
     </ClInclude>
-    <ClInclude Include="ToolbarViewHelper.h">
-      <Filter>Views</Filter>
+    <ClInclude Include="Bookmarks\UI\BookmarksToolbar.h">
+      <Filter>Bookmarks\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Bookmarks\UI\Views\BookmarksToolbarView.h">
+      <Filter>Bookmarks\UI\Views</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1116,6 +1116,9 @@
     </Filter>
     <Filter Include="Drives Toolbar\UI\Views">
       <UniqueIdentifier>{ae00fb9f-bc03-4910-856f-5a16c6ca24b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bookmarks\UI\Views">
+      <UniqueIdentifier>{87d572e6-f08d-48b8-b55e-7bd4107c3d53}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

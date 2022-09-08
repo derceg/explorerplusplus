@@ -7,7 +7,6 @@
 #include "Application.h"
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
-#include "Bookmarks/UI/BookmarksToolbar.h"
 #include "ColorRuleHelper.h"
 #include "Config.h"
 #include "Explorer++_internal.h"
@@ -15,6 +14,7 @@
 #include "Plugins/PluginManager.h"
 #include "TabRestorerUI.h"
 #include "UiTheming.h"
+#include "../Helper/WindowSubclassWrapper.h"
 #include "../Helper/iDirectoryMonitor.h"
 
 /* These entries correspond to shell
@@ -73,8 +73,5 @@ Explorerplusplus::Explorerplusplus(HWND hwnd, CommandLine::Settings *commandLine
 
 Explorerplusplus::~Explorerplusplus()
 {
-	/* Bookmarks teardown. */
-	delete m_pBookmarksToolbar;
-
 	m_pDirMon->Release();
 }

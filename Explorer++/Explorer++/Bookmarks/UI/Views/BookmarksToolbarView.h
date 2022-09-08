@@ -6,11 +6,10 @@
 
 #include "ToolbarView.h"
 
-class DrivesToolbarView : public ToolbarView
+class BookmarksToolbarView : public ToolbarView
 {
 public:
-	static DrivesToolbarView *Create(HWND parent);
+	BookmarksToolbarView(HWND parent);
 
-private:
-	DrivesToolbarView(HWND parent);
+	void SetImageList(HIMAGELIST imageList);
 };

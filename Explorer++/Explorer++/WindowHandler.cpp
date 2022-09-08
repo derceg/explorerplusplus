@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "Bookmarks/UI/BookmarksToolbar.h"
 #include "Config.h"
 #include "DarkModeHelper.h"
 #include "IconResourceLoader.h"

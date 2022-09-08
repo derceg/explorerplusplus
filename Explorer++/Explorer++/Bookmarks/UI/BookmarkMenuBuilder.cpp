@@ -35,8 +35,7 @@ BOOL BookmarkMenuBuilder::BuildMenu(HWND parentWindow, HMENU menu, BookmarkItem 
 	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 
-	BookmarkIconManager bookmarkIconManager(m_coreInterface, m_iconFetcher, nullptr, iconWidth,
-		iconHeight);
+	BookmarkIconManager bookmarkIconManager(m_coreInterface, m_iconFetcher, iconWidth, iconHeight);
 
 	BOOL res = BuildMenu(menu, bookmarkItem, startPosition, itemIdMap, bookmarkIconManager,
 		menuImages, itemPositionMap, true, includePredicate);

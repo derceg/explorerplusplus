@@ -15,10 +15,10 @@ class CoreInterface;
 class BookmarkIconManager
 {
 public:
-	using IconAvailableCallback = std::function<void(std::wstring_view guid, int iconIndex)>;
+	using IconAvailableCallback = std::function<void(int iconIndex)>;
 
-	BookmarkIconManager(CoreInterface *coreInterface, IconFetcher *iconFetcher,
-		IconAvailableCallback callback, int iconWidth, int iconHeight);
+	BookmarkIconManager(CoreInterface *coreInterface, IconFetcher *iconFetcher, int iconWidth,
+		int iconHeight);
 	~BookmarkIconManager();
 
 	BookmarkIconManager(const BookmarkIconManager &other) = delete;
@@ -27,15 +27,14 @@ public:
 	BookmarkIconManager &operator=(const BookmarkIconManager &&other) = delete;
 
 	HIMAGELIST GetImageList();
-	int GetBookmarkItemIconIndex(const BookmarkItem *bookmarkItem);
-	void RemoveIcon(int iconIndex);
+	int GetBookmarkItemIconIndex(const BookmarkItem *bookmarkItem,
+		IconAvailableCallback callback = nullptr);
 
 private:
-	int GetIconForBookmark(const BookmarkItem *bookmark);
+	int GetIconForBookmark(const BookmarkItem *bookmark, IconAvailableCallback callback);
 	int AddSystemIconToImageList(int systemIconIndex);
 
 	CoreInterface *m_coreInterface;
-	IconAvailableCallback m_callback;
 
 	wil::unique_himagelist m_imageList;
 

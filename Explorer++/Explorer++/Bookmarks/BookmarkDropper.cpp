@@ -22,16 +22,16 @@ void BookmarkDropper::SetBlockDrop(bool blockDrop)
 	m_blockDrop = blockDrop;
 }
 
-DWORD BookmarkDropper::GetDropEffect(BookmarkItem *parentFolder)
+DWORD BookmarkDropper::GetDropEffect(BookmarkItem *targetFolder, size_t index)
 {
-	assert(parentFolder->IsFolder());
+	assert(targetFolder->IsFolder());
 
 	if (m_blockDrop)
 	{
 		return DROPEFFECT_NONE;
 	}
 
-	if (!m_bookmarkTree->CanAddChildren(parentFolder))
+	if (!m_bookmarkTree->CanAddChildren(targetFolder))
 	{
 		return DROPEFFECT_NONE;
 	}
@@ -56,7 +56,7 @@ DWORD BookmarkDropper::GetDropEffect(BookmarkItem *parentFolder)
 
 			if (!existingBookmarkItem
 				|| (existingBookmarkItem
-					&& !CanMoveBookmarkItemIntoFolder(existingBookmarkItem, parentFolder)))
+					&& !CanDropBookmarkItemAtLocation(existingBookmarkItem, targetFolder, index)))
 			{
 				return DROPEFFECT_NONE;
 			}
@@ -68,12 +68,12 @@ DWORD BookmarkDropper::GetDropEffect(BookmarkItem *parentFolder)
 	return DROPEFFECT_NONE;
 }
 
-DWORD BookmarkDropper::PerformDrop(BookmarkItem *parentFolder, size_t position)
+DWORD BookmarkDropper::PerformDrop(BookmarkItem *targetFolder, size_t index)
 {
-	assert(parentFolder->IsFolder());
+	assert(targetFolder->IsFolder());
 
 	auto &extractedInfo = GetExtractedInfo();
-	DWORD targetEffect = GetDropEffect(parentFolder);
+	DWORD targetEffect = GetDropEffect(targetFolder, index);
 	DWORD finalEffect = DROPEFFECT_NONE;
 	size_t i = 0;
 
@@ -81,7 +81,7 @@ DWORD BookmarkDropper::PerformDrop(BookmarkItem *parentFolder, size_t position)
 	{
 		if (targetEffect == DROPEFFECT_COPY)
 		{
-			m_bookmarkTree->AddBookmarkItem(parentFolder, std::move(bookmarkItem), position + i);
+			m_bookmarkTree->AddBookmarkItem(targetFolder, std::move(bookmarkItem), index + i);
 		}
 		else if (targetEffect == DROPEFFECT_MOVE)
 		{
@@ -89,9 +89,9 @@ DWORD BookmarkDropper::PerformDrop(BookmarkItem *parentFolder, size_t position)
 				*bookmarkItem->GetOriginalGUID());
 
 			if (existingBookmarkItem
-				&& CanMoveBookmarkItemIntoFolder(existingBookmarkItem, parentFolder))
+				&& CanDropBookmarkItemAtLocation(existingBookmarkItem, targetFolder, index + i))
 			{
-				m_bookmarkTree->MoveBookmarkItem(existingBookmarkItem, parentFolder, position + i);
+				m_bookmarkTree->MoveBookmarkItem(existingBookmarkItem, targetFolder, index + i);
 			}
 		}
 
@@ -106,16 +106,25 @@ DWORD BookmarkDropper::PerformDrop(BookmarkItem *parentFolder, size_t position)
 	return finalEffect;
 }
 
-bool BookmarkDropper::CanMoveBookmarkItemIntoFolder(BookmarkItem *bookmarkItem,
-	BookmarkItem *parentFolder)
+bool BookmarkDropper::CanDropBookmarkItemAtLocation(BookmarkItem *bookmarkItem,
+	BookmarkItem *targetFolder, size_t index)
 {
-	if (bookmarkItem->IsBookmark()
-		|| (bookmarkItem->IsFolder() && !BookmarkHelper::IsAncestor(parentFolder, bookmarkItem)))
+	if (bookmarkItem->IsFolder() && BookmarkHelper::IsAncestor(targetFolder, bookmarkItem))
 	{
-		return true;
+		return false;
 	}
 
-	return false;
+	if (bookmarkItem->GetParent() == targetFolder)
+	{
+		auto currentIndex = bookmarkItem->GetParent()->GetChildIndex(bookmarkItem);
+
+		if ((index == currentIndex) || (index == currentIndex + 1))
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 BookmarkDropper::ExtractedInfo &BookmarkDropper::GetExtractedInfo()

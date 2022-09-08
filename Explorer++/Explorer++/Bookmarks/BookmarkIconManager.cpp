@@ -13,10 +13,9 @@
 #include "../Helper/ImageHelper.h"
 
 BookmarkIconManager::BookmarkIconManager(CoreInterface *coreInterface, IconFetcher *iconFetcher,
-	IconAvailableCallback callback, int iconWidth, int iconHeight) :
+	int iconWidth, int iconHeight) :
 	m_coreInterface(coreInterface),
 	m_iconFetcher(iconFetcher),
-	m_callback(callback),
 	m_defaultFolderIconSystemImageListIndex(GetDefaultFolderIconIndex()),
 	m_destroyed(std::make_shared<bool>(false))
 {
@@ -43,7 +42,8 @@ HIMAGELIST BookmarkIconManager::GetImageList()
 	return m_imageList.get();
 }
 
-int BookmarkIconManager::GetBookmarkItemIconIndex(const BookmarkItem *bookmarkItem)
+int BookmarkIconManager::GetBookmarkItemIconIndex(const BookmarkItem *bookmarkItem,
+	IconAvailableCallback callback)
 {
 	int iconIndex;
 
@@ -53,13 +53,14 @@ int BookmarkIconManager::GetBookmarkItemIconIndex(const BookmarkItem *bookmarkIt
 	}
 	else
 	{
-		iconIndex = GetIconForBookmark(bookmarkItem);
+		iconIndex = GetIconForBookmark(bookmarkItem, callback);
 	}
 
 	return iconIndex;
 }
 
-int BookmarkIconManager::GetIconForBookmark(const BookmarkItem *bookmark)
+int BookmarkIconManager::GetIconForBookmark(const BookmarkItem *bookmark,
+	IconAvailableCallback callback)
 {
 	int iconIndex = m_defaultFolderIconIndex;
 
@@ -69,10 +70,10 @@ int BookmarkIconManager::GetIconForBookmark(const BookmarkItem *bookmark)
 	{
 		iconIndex = AddSystemIconToImageList(cachedItr->iconIndex);
 	}
-	else if (m_callback)
+	else if (callback)
 	{
 		m_iconFetcher->QueueIconTask(bookmark->GetLocation(),
-			[this, guid = bookmark->GetGUID(), destroyed = m_destroyed](int systemIconIndex)
+			[this, callback, destroyed = m_destroyed](int systemIconIndex)
 			{
 				if (*destroyed)
 				{
@@ -87,7 +88,7 @@ int BookmarkIconManager::GetIconForBookmark(const BookmarkItem *bookmark)
 				}
 
 				int iconIndex = AddSystemIconToImageList(systemIconIndex);
-				m_callback(guid, iconIndex);
+				callback(iconIndex);
 			});
 	}
 
@@ -109,12 +110,4 @@ int BookmarkIconManager::AddSystemIconToImageList(int systemIconIndex)
 		reinterpret_cast<HIMAGELIST>(m_systemImageList.get()), systemIconIndex);
 
 	return iconIndex;
-}
-
-void BookmarkIconManager::RemoveIcon(int iconIndex)
-{
-	if (iconIndex != m_bookmarkFolderIconIndex && iconIndex != m_defaultFolderIconIndex)
-	{
-		ImageList_Remove(m_imageList.get(), iconIndex);
-	}
 }

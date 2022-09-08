@@ -15,8 +15,8 @@ public:
 	BookmarkDropper(IDataObject *dataObject, BookmarkTree *bookmarkTree);
 
 	void SetBlockDrop(bool blockDrop);
-	DWORD GetDropEffect(BookmarkItem *parentFolder);
-	DWORD PerformDrop(BookmarkItem *parentFolder, size_t position);
+	DWORD GetDropEffect(BookmarkItem *targetFolder, size_t index);
+	DWORD PerformDrop(BookmarkItem *targetFolder, size_t index);
 
 private:
 	enum class ExtractionSource
@@ -31,8 +31,8 @@ private:
 		std::optional<ExtractionSource> extractionSource;
 	};
 
-	static bool CanMoveBookmarkItemIntoFolder(BookmarkItem *bookmarkItem,
-		BookmarkItem *parentFolder);
+	static bool CanDropBookmarkItemAtLocation(BookmarkItem *bookmarkItem,
+		BookmarkItem *targetFolder, size_t index);
 	ExtractedInfo &GetExtractedInfo();
 	ExtractedInfo ExtractBookmarkItems();
 	BookmarkItems ExtractBookmarkItemsFromCustomFormat();

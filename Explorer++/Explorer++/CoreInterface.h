@@ -32,6 +32,8 @@ using TabsInitializedSignal = boost::signals2::signal<void()>;
 using MainMenuPreShowSignal = boost::signals2::signal<void(HMENU mainMenu)>;
 using ToolbarContextMenuSignal =
 	boost::signals2::signal<void(HMENU menu, HWND sourceWindow, const POINT &pt)>;
+using ToolbarContextMenuSelectedSignal =
+	boost::signals2::signal<void(HWND sourceWindow, int menuItemId)>;
 using FocusChangedSignal = boost::signals2::signal<void(WindowFocusSource windowFocusSource)>;
 using ApplicationShuttingDownSignal = boost::signals2::signal<void()>;
 
@@ -111,6 +113,8 @@ public:
 		const MainMenuPreShowSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddToolbarContextMenuObserver(
 		const ToolbarContextMenuSignal::slot_type &observer) = 0;
+	virtual boost::signals2::connection AddToolbarContextMenuSelectedObserver(
+		const ToolbarContextMenuSelectedSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddFocusChangeObserver(
 		const FocusChangedSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddApplicationShuttingDownObserver(

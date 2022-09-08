@@ -13,6 +13,7 @@
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "Bookmarks/UI/BookmarksToolbar.h"
 #include "Bookmarks/UI/ManageBookmarksDialog.h"
+#include "Bookmarks/UI/Views/BookmarksToolbarView.h"
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "DrivesToolbar.h"
@@ -290,10 +291,11 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM w
 LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd, HWND control, int id,
 	UINT notificationCode)
 {
-	// The drives toolbar/application toolbar will handle their own items.
+	// Several toolbars will handle their own items.
 	if (control
 		&& ((m_drivesToolbar && control == m_drivesToolbar->GetView()->GetHWND())
-			|| m_applicationToolbar && control == m_applicationToolbar->GetView()->GetHWND()))
+			|| m_applicationToolbar && control == m_applicationToolbar->GetView()->GetHWND()
+			|| m_bookmarksToolbar && control == m_bookmarksToolbar->GetView()->GetHWND()))
 	{
 		return 1;
 	}
@@ -505,57 +507,31 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_TOOLBARS_ADDRESSBAR:
-		m_config->showAddressBar = !m_config->showAddressBar;
-		ShowMainRebarBand(m_addressBar->GetHWND(), m_config->showAddressBar);
-		AdjustFolderPanePosition();
-		ResizeWindows();
+		OnToggleAddressBar();
 		break;
 
 	case IDM_TOOLBARS_MAINTOOLBAR:
-		m_config->showMainToolbar = !m_config->showMainToolbar;
-		ShowMainRebarBand(m_mainToolbar->GetHWND(), m_config->showMainToolbar);
-		AdjustFolderPanePosition();
-		ResizeWindows();
+		OnToggleMainToolbar();
 		break;
 
 	case IDM_TOOLBARS_BOOKMARKSTOOLBAR:
-		m_config->showBookmarksToolbar = !m_config->showBookmarksToolbar;
-		ShowMainRebarBand(m_hBookmarksToolbar, m_config->showBookmarksToolbar);
-		AdjustFolderPanePosition();
-		ResizeWindows();
+		OnToggleBookmarksToolbar();
 		break;
 
 	case IDM_TOOLBARS_DRIVES:
-		m_config->showDrivesToolbar = !m_config->showDrivesToolbar;
-		ShowMainRebarBand(m_drivesToolbar->GetView()->GetHWND(), m_config->showDrivesToolbar);
-		AdjustFolderPanePosition();
-		ResizeWindows();
+		OnToggleDrivesToolbar();
 		break;
 
 	case IDM_TOOLBARS_APPLICATIONTOOLBAR:
-		m_config->showApplicationToolbar = !m_config->showApplicationToolbar;
-		ShowMainRebarBand(m_applicationToolbar->GetView()->GetHWND(),
-			m_config->showApplicationToolbar);
-		AdjustFolderPanePosition();
-		ResizeWindows();
+		OnToggleApplicationToolbar();
 		break;
 
 	case IDM_TOOLBARS_LOCKTOOLBARS:
 		OnLockToolbars();
 		break;
 
-	case IDM_APP_NEW:
-	{
-		Applications::ApplicationEditorDialog editorDialog(
-			m_applicationToolbar->GetView()->GetHWND(), m_resourceModule, &m_applicationModel,
-			Applications::ApplicationEditorDialog::EditDetails::AddNewApplication(
-				std::make_unique<Applications::Application>(L"", L"")));
-		editorDialog.ShowModalDialog();
-	}
-	break;
-
 	case IDM_TOOLBARS_CUSTOMIZE:
-		SendMessage(m_mainToolbar->GetHWND(), TB_CUSTOMIZE, 0, 0);
+		OnCustomizeMainToolbar();
 		break;
 
 	case IDM_VIEW_EXTRALARGEICONS:
@@ -1511,7 +1487,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 
 		if (pnmrc->wID == ID_BOOKMARKSTOOLBAR)
 		{
-			m_pBookmarksToolbar->ShowOverflowMenu(ptMenu);
+			m_bookmarksToolbar->ShowOverflowMenu(ptMenu);
 			return 0;
 		}
 

@@ -5,9 +5,14 @@
 #include "stdafx.h"
 #include "ApplicationToolbar.h"
 #include "Application.h"
+#include "ApplicationEditorDialog.h"
 #include "ApplicationModel.h"
 #include "ApplicationToolbarHelper.h"
 #include "ApplicationToolbarView.h"
+#include "CoreInterface.h"
+#include "MainResource.h"
+#include "ResourceHelper.h"
+#include "../Helper/MenuHelper.h"
 #include <boost/algorithm/string/join.hpp>
 #include <propkey.h>
 
@@ -71,7 +76,8 @@ ApplicationToolbar::ApplicationToolbar(ApplicationToolbarView *view, Application
 	CoreInterface *coreInterface) :
 	m_view(view),
 	m_model(model),
-	m_coreInterface(coreInterface)
+	m_coreInterface(coreInterface),
+	m_contextMenu(model, coreInterface)
 {
 	Initialize();
 }
@@ -86,6 +92,11 @@ void ApplicationToolbar::Initialize()
 		std::bind_front(&ApplicationToolbar::OnApplicationUpdated, this)));
 	m_connections.push_back(m_model->AddApplicationRemovedObserver(
 		std::bind_front(&ApplicationToolbar::OnApplicationRemoved, this)));
+
+	m_connections.push_back(m_coreInterface->AddToolbarContextMenuObserver(
+		std::bind_front(&ApplicationToolbar::OnToolbarContextMenuPreShow, this)));
+	m_connections.push_back(m_coreInterface->AddToolbarContextMenuSelectedObserver(
+		std::bind_front(&ApplicationToolbar::OnToolbarContextMenuItemSelected, this)));
 
 	m_dropTargetWindow = winrt::make_self<DropTargetWindow>(m_view->GetHWND(),
 		static_cast<DropTargetInternal *>(this));
@@ -149,7 +160,45 @@ void ApplicationToolbar::OnButtonClicked(const Application *application, const M
 
 void ApplicationToolbar::OnButtonRightClicked(Application *application, const MouseEvent &event)
 {
-	m_view->ShowContextMenu(application, event.ptClient);
+	POINT ptScreen = event.ptClient;
+	ClientToScreen(m_view->GetHWND(), &ptScreen);
+
+	m_contextMenu.ShowMenu(m_view->GetHWND(), application, ptScreen);
+}
+
+void ApplicationToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt)
+{
+	UNREFERENCED_PARAMETER(pt);
+
+	if (sourceWindow != m_view->GetHWND())
+	{
+		return;
+	}
+
+	std::wstring newText =
+		ResourceHelper::LoadString(m_coreInterface->GetResourceModule(), IDS_APPLICATIONBUTTON_NEW);
+	MenuHelper::AddStringItem(menu, IDM_APP_NEW, newText, IDM_TOOLBARS_CUSTOMIZE, FALSE);
+}
+
+void ApplicationToolbar::OnToolbarContextMenuItemSelected(HWND sourceWindow, int menuItemId)
+{
+	if (sourceWindow != m_view->GetHWND())
+	{
+		return;
+	}
+
+	switch (menuItemId)
+	{
+	case IDM_APP_NEW:
+	{
+		ApplicationEditorDialog editorDialog(m_view->GetHWND(),
+			m_coreInterface->GetResourceModule(), m_model,
+			ApplicationEditorDialog::EditDetails::AddNewApplication(
+				std::make_unique<Application>(L"", L"")));
+		editorDialog.ShowModalDialog();
+	}
+	break;
+	}
 }
 
 void ApplicationToolbar::OnWindowDestroyed()

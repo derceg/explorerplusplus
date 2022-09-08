@@ -8,8 +8,14 @@
 #include "CoreInterface.h"
 #include "DriveModel.h"
 #include "DrivesToolbarView.h"
+#include "MainResource.h"
 #include "Navigation.h"
+#include "ResourceHelper.h"
 #include "TabContainer.h"
+#include "../Helper/MenuHelper.h"
+#include "../Helper/ShellHelper.h"
+#include <ShlObj.h>
+#include <Shlwapi.h>
 
 class DrivesToolbarButton : public ToolbarButton
 {
@@ -169,7 +175,82 @@ void DrivesToolbar::OnButtonMiddleClicked(const std::wstring &drivePath, const M
 
 void DrivesToolbar::OnButtonRightClicked(const std::wstring &drivePath, const MouseEvent &event)
 {
-	m_view->ShowContextMenu(drivePath, event.ptClient, event.shiftKey);
+	ShowContextMenu(drivePath, event.ptClient, event.shiftKey);
+}
+
+void DrivesToolbar::ShowContextMenu(const std::wstring &drivePath, const POINT &ptClient,
+	bool showExtended)
+{
+	unique_pidl_absolute pidl;
+	HRESULT hr = SHParseDisplayName(drivePath.c_str(), nullptr, wil::out_param(pidl), 0, nullptr);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	POINT ptScreen = ptClient;
+	ClientToScreen(m_view->GetHWND(), &ptScreen);
+
+	unique_pidl_child child(ILCloneChild(ILFindLastID(pidl.get())));
+
+	[[maybe_unused]] BOOL res = ILRemoveLastID(pidl.get());
+	assert(res);
+
+	FileContextMenuManager contextMenuManager(m_view->GetHWND(), pidl.get(), { child.get() });
+
+	contextMenuManager.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, &ptScreen,
+		m_coreInterface->GetStatusBar(), NULL, FALSE, showExtended);
+}
+
+void DrivesToolbar::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, IContextMenu *contextMenu,
+	HMENU hMenu)
+{
+	UNREFERENCED_PARAMETER(pidlParent);
+	UNREFERENCED_PARAMETER(pidlItems);
+	UNREFERENCED_PARAMETER(dwData);
+	UNREFERENCED_PARAMETER(contextMenu);
+
+	std::wstring openInNewTabText = ResourceHelper::LoadString(m_coreInterface->GetResourceModule(),
+		IDS_GENERAL_OPEN_IN_NEW_TAB);
+	MenuHelper::AddStringItem(hMenu, MENU_ID_OPEN_IN_NEW_TAB, openInNewTabText, 1, TRUE);
+}
+
+BOOL DrivesToolbar::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd)
+{
+	UNREFERENCED_PARAMETER(dwData);
+
+	if (StrCmpI(szCmd, _T("open")) == 0)
+	{
+		assert(pidlItems.size() == 1);
+
+		unique_pidl_absolute pidl(ILCombine(pidlParent, pidlItems[0]));
+		m_coreInterface->OpenItem(pidl.get());
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+void DrivesToolbar::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PITEMID_CHILD> &pidlItems, int iCmd)
+{
+	UNREFERENCED_PARAMETER(pidlItems);
+
+	switch (iCmd)
+	{
+	case MENU_ID_OPEN_IN_NEW_TAB:
+	{
+		assert(pidlItems.size() == 1);
+
+		unique_pidl_absolute pidl(ILCombine(pidlParent, pidlItems[0]));
+		m_coreInterface->GetTabContainer()->CreateNewTab(pidl.get(),
+			TabSettings(_selected = m_coreInterface->GetConfig()->openTabsInForeground));
+	}
+	break;
+	}
 }
 
 void DrivesToolbar::OnWindowDestroyed()

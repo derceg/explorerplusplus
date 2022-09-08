@@ -4,36 +4,18 @@
 
 #pragma once
 
-#include "ApplicationContextMenu.h"
 #include "ToolbarView.h"
-#include <boost/signals2.hpp>
-#include <vector>
-
-class CoreInterface;
 
 namespace Applications
 {
 
-class Application;
-class ApplicationModel;
-
 class ApplicationToolbarView : public ToolbarView
 {
 public:
-	static ApplicationToolbarView *Create(HWND parent, CoreInterface *coreInterface,
-		ApplicationModel *model);
-
-	void ShowContextMenu(Application *application, const POINT &ptClient);
+	static ApplicationToolbarView *Create(HWND parent);
 
 private:
-	ApplicationToolbarView(HWND parent, CoreInterface *coreInterface, ApplicationModel *model);
-
-	void OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt);
-
-	HMODULE m_resourceModule;
-	std::vector<boost::signals2::scoped_connection> m_connections;
-
-	ApplicationContextMenu m_contextMenu;
+	ApplicationToolbarView(HWND parent);
 };
 
 }

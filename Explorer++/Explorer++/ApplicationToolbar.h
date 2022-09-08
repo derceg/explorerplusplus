@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "ApplicationContextMenu.h"
 #include "ToolbarView.h"
 #include "../Helper/DropTargetWindow.h"
 #include <boost/signals2.hpp>
@@ -26,6 +27,11 @@ public:
 	static ApplicationToolbar *Create(ApplicationToolbarView *view, ApplicationModel *model,
 		CoreInterface *coreInterface);
 
+	ApplicationToolbar(const ApplicationToolbar &) = delete;
+	ApplicationToolbar(ApplicationToolbar &&) = delete;
+	ApplicationToolbar &operator=(const ApplicationToolbar &) = delete;
+	ApplicationToolbar &operator=(ApplicationToolbar &&) = delete;
+
 	ApplicationToolbarView *GetView() const;
 
 private:
@@ -43,6 +49,9 @@ private:
 
 	void OnButtonClicked(const Application *application, const MouseEvent &event);
 	void OnButtonRightClicked(Application *application, const MouseEvent &event);
+
+	void OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt);
+	void OnToolbarContextMenuItemSelected(HWND sourceWindow, int menuItemId);
 
 	void OnWindowDestroyed();
 
@@ -62,6 +71,7 @@ private:
 	ApplicationToolbarView *m_view;
 	ApplicationModel *m_model;
 	CoreInterface *m_coreInterface;
+	ApplicationContextMenu m_contextMenu;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 

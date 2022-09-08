@@ -4,84 +4,56 @@
 
 #pragma once
 
+#include "BookmarkContextMenu.h"
 #include "Bookmarks/BookmarkItem.h"
-#include "Bookmarks/UI/BookmarkContextMenu.h"
 #include "Bookmarks/UI/BookmarkDropTargetWindow.h"
 #include "Bookmarks/UI/BookmarkMenu.h"
-#include "ResourceHelper.h"
-#include "../Helper/WindowSubclassWrapper.h"
 #include <boost/signals2.hpp>
-#include <optional>
+#include <memory>
+#include <vector>
 
 class BookmarkIconManager;
+class BookmarksToolbarView;
 class BookmarkTree;
 class CoreInterface;
 class IconFetcher;
+class Navigation;
+struct MouseEvent;
 
 class BookmarksToolbar : private BookmarkDropTargetWindow
 {
 public:
-	BookmarksToolbar(HWND hToolbar, HINSTANCE instance, CoreInterface *coreInterface,
-		Navigation *navigation, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, UINT uIDStart,
-		UINT uIDEnd);
+	static BookmarksToolbar *Create(BookmarksToolbarView *view, CoreInterface *coreInterface,
+		Navigation *navigation, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
+
+	BookmarksToolbar(const BookmarksToolbar &) = delete;
+	BookmarksToolbar(BookmarksToolbar &&) = delete;
+	BookmarksToolbar &operator=(const BookmarksToolbar &) = delete;
+	BookmarksToolbar &operator=(BookmarksToolbar &&) = delete;
+
+	BookmarksToolbarView *GetView() const;
 
 	void ShowOverflowMenu(const POINT &ptScreen);
 
 private:
-	BookmarksToolbar &operator=(const BookmarksToolbar &bt);
+	// When an item is dragged over a folder on the bookmarks toolbar, the drop target should be set
+	// to the folder only if the dragged item is over the main part of the button for the folder.
+	// This is to allow the dragged item to be positioned before or after the folder if the item is
+	// currently over the left or right edge of the button.
+	// This is especially important when there's no horizontal padding between buttons, as there
+	// would be no space before or after the button that would allow you to correctly set the
+	// position.
+	// The constant here represents how far the left/right edges of the button are indented, as a
+	// percentage of the total size of the button, in order to determine whether an item is over the
+	// main portion of the button.
+	static constexpr double FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE = 0.2;
 
-	// When an item is dragged over a folder on the bookmarks toolbar, the drop
-	// target should be set to the folder only if the dragged item is over the
-	// main part of the button for the folder. This is to allow the dragged item
-	// to be positioned before or after the folder if the item is currently over
-	// the left or right edge of the button.
-	// This is especially important when there's no horizontal padding between
-	// buttons, as there would be no space before or after the button that would
-	// allow you to correctly set the position.
-	// The constant here represents how far the left/right edges of the button
-	// are indented, as a percentage of the total size of the button, in order
-	// to determine whether an item is over the main portion of the button.
-	static inline const double FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE = 0.2;
+	BookmarksToolbar(BookmarksToolbarView *view, CoreInterface *coreInterface,
+		Navigation *navigation, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
 
-	static LRESULT CALLBACK BookmarksToolbarProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
-		LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-	LRESULT CALLBACK BookmarksToolbarProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-	static LRESULT CALLBACK BookmarksToolbarParentProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
-		LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-	LRESULT CALLBACK BookmarksToolbarParentProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-	void InitializeToolbar(IconFetcher *iconFetcher);
-	void SetUpToolbarImageList(IconFetcher *iconFetcher);
-
-	void InsertBookmarkItems();
-	void InsertBookmarkItem(BookmarkItem *bookmarkItem, int position);
-
-	void RemoveBookmarkItem(const BookmarkItem *bookmarkItem);
-
-	void OnLButtonDown(const POINT &pt);
-	void OnMouseMove(int keys, const POINT &pt);
-	void StartDrag(const POINT &pt);
-	void OnLButtonUp();
-	void OnMButtonUp(const POINT &pt, UINT keysDown);
-	bool OnCommand(WPARAM wParam, LPARAM lParam);
-	bool OnButtonClick(int command);
-	BOOL OnRightClick(const NMMOUSE *nmm);
-	void ShowBookmarkFolderMenu(BookmarkItem *bookmarkItem, int command, int index);
-	void OnEditBookmarkItem(BookmarkItem *bookmarkItem);
-	bool OnGetInfoTip(NMTBGETINFOTIP *infoTip);
-
-	// Toolbar context menu
-	void OnToolbarContextMenuItemClicked(int menuItemId);
-	void OnNewBookmarkItem(BookmarkItem::Type type, size_t targetIndex);
-	void OnPaste(size_t targetIndex);
-
-	void OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt);
-
-	std::optional<int> GetBookmarkItemIndex(const BookmarkItem *bookmarkItem) const;
-	std::optional<int> GetBookmarkItemIndexUsingGuid(std::wstring_view guid) const;
-
-	BookmarkItem *GetBookmarkItemFromToolbarIndex(int index);
+	void Initialize(IconFetcher *iconFetcher);
+	void AddBookmarkItems();
+	void AddBookmarkItem(BookmarkItem *bookmarkItem, size_t index);
 
 	void OnBookmarkItemAdded(BookmarkItem &bookmarkItem, size_t index);
 	void OnBookmarkItemUpdated(BookmarkItem &bookmarkItem, BookmarkItem::PropertyType propertyType);
@@ -89,38 +61,42 @@ private:
 		size_t oldIndex, const BookmarkItem *newParent, size_t newIndex);
 	void OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem);
 
+	void OnBookmarkClicked(BookmarkItem *bookmarkItem, const MouseEvent &event);
+	void OnBookmarkFolderClicked(BookmarkItem *bookmarkItem, const MouseEvent &event);
+	void OnButtonMiddleClicked(const BookmarkItem *bookmarkItem, const MouseEvent &event);
+	void OnButtonRightClicked(BookmarkItem *bookmarkItem, const MouseEvent &event);
+
+	void OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt);
+	void OnToolbarContextMenuItemSelected(HWND sourceWindow, int menuItemId);
+
+	void OnNewBookmarkItem(BookmarkItem::Type type, size_t targetIndex);
+	void OnPaste(size_t targetIndex);
+
+	void OnWindowDestroyed();
+
+	void OnButtonDragStarted(const BookmarkItem *bookmarkItem);
+
+	// BookmarkDropTargetWindow
 	DropLocation GetDropLocation(const POINT &pt) override;
 	void UpdateUiForDropLocation(const DropLocation &dropLocation) override;
 	void ResetDropUiState() override;
-	void SetButtonPressedState(int index, bool pressed);
-	void RemoveInsertionMark();
+
 	void RemoveDropHighlight();
 
-	int GetIconForBookmark(const BookmarkItem *bookmark);
-	void OnBookmarkIconAvailable(std::wstring_view guid, int iconIndex);
+	BookmarkTree *m_bookmarkTree = nullptr;
+	BookmarksToolbarView *m_view = nullptr;
 
-	HWND m_hToolbar;
+	CoreInterface *m_coreInterface = nullptr;
+	Navigation *m_navigation = nullptr;
+
 	std::unique_ptr<BookmarkIconManager> m_bookmarkIconManager;
-
-	HINSTANCE m_instance;
-
-	CoreInterface *m_coreInterface;
-	Navigation *m_navigation;
-
-	BookmarkTree *m_bookmarkTree;
-	BookmarkContextMenu m_bookmarkContextMenu;
+	BookmarkContextMenu m_contextMenu;
 	BookmarkMenu m_bookmarkMenu;
-
-	UINT m_uIDStart;
-	UINT m_uIDEnd;
-	UINT m_uIDCounter;
 
 	std::optional<POINT> m_contextMenuLocation;
 
-	// Drag and drop.
-	std::optional<POINT> m_leftButtonDownPoint;
-	std::optional<int> m_previousDropButton;
+	// Drag and drop
+	BookmarkItem *m_dropTargetFolder = nullptr;
 
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };
