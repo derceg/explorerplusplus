@@ -177,13 +177,22 @@ HRESULT ShellNavigationController::BrowseFolder(const std::wstring &path, bool a
 
 HRESULT ShellNavigationController::BrowseFolder(PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
 {
-	if (m_navigationMode == NavigationMode::ForceNewTab && GetCurrentEntry() != nullptr)
+	auto currentEntry = GetCurrentEntry();
+
+	if (m_navigationMode == NavigationMode::ForceNewTab && currentEntry)
 	{
 		m_tabNavigation->CreateNewTab(pidl, true);
 		return S_OK;
 	}
 
-	return m_navigator->BrowseFolder(pidl, addHistoryEntry);
+	bool finalAddHistoryEntry = addHistoryEntry;
+
+	if (currentEntry && ArePidlsEquivalent(currentEntry->GetPidl().get(), pidl))
+	{
+		finalAddHistoryEntry = false;
+	}
+
+	return m_navigator->BrowseFolder(pidl, finalAddHistoryEntry);
 }
 
 HRESULT ShellNavigationController::GetFailureValue()

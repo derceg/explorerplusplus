@@ -289,6 +289,21 @@ TEST_F(ShellNavigationControllerTest, Refresh)
 	EXPECT_EQ(m_navigationController.GetNumHistoryEntries(), 1);
 }
 
+TEST_F(ShellNavigationControllerTest, NavigateToSameFolder)
+{
+	HRESULT hr = NavigateToFolder(L"C:\\Fake");
+	ASSERT_HRESULT_SUCCEEDED(hr);
+
+	hr = NavigateToFolder(L"C:\\Fake");
+	ASSERT_HRESULT_SUCCEEDED(hr);
+
+	// Navigating to the same location should be treated as an implicit refresh. No history entry
+	// should be added.
+	EXPECT_FALSE(m_navigationController.CanGoBack());
+	EXPECT_FALSE(m_navigationController.CanGoForward());
+	EXPECT_EQ(m_navigationController.GetNumHistoryEntries(), 1);
+}
+
 TEST_F(ShellNavigationControllerTest, BackForward)
 {
 	HRESULT hr = NavigateToFolder(L"C:\\Fake1");
