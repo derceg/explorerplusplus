@@ -70,12 +70,12 @@ int BookmarkIconManager::GetIconForBookmark(const BookmarkItem *bookmark,
 	{
 		iconIndex = AddSystemIconToImageList(cachedItr->iconIndex);
 	}
-	else if (callback)
+	else
 	{
 		m_iconFetcher->QueueIconTask(bookmark->GetLocation(),
 			[this, callback, destroyed = m_destroyed](int systemIconIndex)
 			{
-				if (*destroyed)
+				if (*destroyed || !callback)
 				{
 					return;
 				}
