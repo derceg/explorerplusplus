@@ -403,18 +403,6 @@
     <ClCompile Include="ThirdPartyCreditsDialog.cpp">
       <Filter>General Dialogs</Filter>
     </ClCompile>
-    <ClCompile Include="DarkModeHelper.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="DarkModeDialogBase.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="DarkModeGroupBox.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="DarkModeButton.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="ShellBrowser\Filtering.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
@@ -492,6 +480,18 @@
     </ClCompile>
     <ClCompile Include="Bookmarks\UI\Views\BookmarksToolbarView.cpp">
       <Filter>Bookmarks\UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="DarkModeButton.cpp">
+      <Filter>Dark Mode Support</Filter>
+    </ClCompile>
+    <ClCompile Include="DarkModeDialogBase.cpp">
+      <Filter>Dark Mode Support</Filter>
+    </ClCompile>
+    <ClCompile Include="DarkModeGroupBox.cpp">
+      <Filter>Dark Mode Support</Filter>
+    </ClCompile>
+    <ClCompile Include="DarkModeHelper.cpp">
+      <Filter>Dark Mode Support</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -891,18 +891,6 @@
     <ClInclude Include="ThirdPartyCreditsDialog.h">
       <Filter>General Dialogs</Filter>
     </ClInclude>
-    <ClInclude Include="DarkModeHelper.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="DarkModeDialogBase.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="DarkModeGroupBox.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="DarkModeButton.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="Explorer++VersionInfo.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
@@ -989,6 +977,18 @@
     </ClInclude>
     <ClInclude Include="Bookmarks\UI\Views\BookmarksToolbarView.h">
       <Filter>Bookmarks\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="DarkModeButton.h">
+      <Filter>Dark Mode Support</Filter>
+    </ClInclude>
+    <ClInclude Include="DarkModeDialogBase.h">
+      <Filter>Dark Mode Support</Filter>
+    </ClInclude>
+    <ClInclude Include="DarkModeGroupBox.h">
+      <Filter>Dark Mode Support</Filter>
+    </ClInclude>
+    <ClInclude Include="DarkModeHelper.h">
+      <Filter>Dark Mode Support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1119,6 +1119,9 @@
     </Filter>
     <Filter Include="Bookmarks\UI\Views">
       <UniqueIdentifier>{87d572e6-f08d-48b8-b55e-7bd4107c3d53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dark Mode Support">
+      <UniqueIdentifier>{9ba5d339-25dc-420e-97ef-a84e1cc12f84}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
