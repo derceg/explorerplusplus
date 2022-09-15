@@ -279,7 +279,11 @@ void BookmarksToolbar::OnBookmarkClicked(BookmarkItem *bookmarkItem, const Mouse
 
 void BookmarksToolbar::OnBookmarkFolderClicked(BookmarkItem *bookmarkItem, const MouseEvent &event)
 {
-	UNREFERENCED_PARAMETER(event);
+	if (event.ctrlKey)
+	{
+		OnOpenBookmarkItemInNewTab(bookmarkItem, event.shiftKey);
+		return;
+	}
 
 	auto index = bookmarkItem->GetParent()->GetChildIndex(bookmarkItem);
 	RECT buttonRect = m_view->GetButtonRect(index);
@@ -293,9 +297,14 @@ void BookmarksToolbar::OnBookmarkFolderClicked(BookmarkItem *bookmarkItem, const
 void BookmarksToolbar::OnButtonMiddleClicked(const BookmarkItem *bookmarkItem,
 	const MouseEvent &event)
 {
+	OnOpenBookmarkItemInNewTab(bookmarkItem, event.shiftKey);
+}
+
+void BookmarksToolbar::OnOpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem, bool shiftKey)
+{
 	bool switchToNewTab = m_coreInterface->GetConfig()->openTabsInForeground;
 
-	if (event.shiftKey)
+	if (shiftKey)
 	{
 		switchToNewTab = !switchToNewTab;
 	}

@@ -64,6 +64,7 @@ private:
 	void OnBookmarkClicked(BookmarkItem *bookmarkItem, const MouseEvent &event);
 	void OnBookmarkFolderClicked(BookmarkItem *bookmarkItem, const MouseEvent &event);
 	void OnButtonMiddleClicked(const BookmarkItem *bookmarkItem, const MouseEvent &event);
+	void OnOpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem, bool shiftKey);
 	void OnButtonRightClicked(BookmarkItem *bookmarkItem, const MouseEvent &event);
 
 	void OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt);
