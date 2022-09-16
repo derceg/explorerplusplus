@@ -85,17 +85,8 @@ LRESULT CALLBACK ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 	// Note that the specific HANDLE_WM_RBUTTONDOWN message cracker is used here, rather than the
 	// more generic message cracker HANDLE_MSG because it's important that the listview control
 	// itself receive this message. Returning 0 would prevent that from happening.
-	// The same reasoning applies to some of the other messages below.
 	case WM_RBUTTONDOWN:
 		HANDLE_WM_RBUTTONDOWN(hwnd, wParam, lParam, OnRButtonDown);
-		break;
-
-	case WM_RBUTTONUP:
-		HANDLE_WM_RBUTTONUP(hwnd, wParam, lParam, OnRButtonUp);
-		break;
-
-	case WM_MOUSEMOVE:
-		HANDLE_WM_MOUSEMOVE(hwnd, wParam, lParam, OnMouseMove);
 		break;
 
 	case WM_CLIPBOARDUPDATE:
@@ -177,6 +168,10 @@ LRESULT CALLBACK ShellBrowser::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM w
 			{
 			case LVN_BEGINDRAG:
 				OnListViewBeginDrag(reinterpret_cast<NMLISTVIEW *>(lParam));
+				break;
+
+			case LVN_BEGINRDRAG:
+				OnListViewBeginRightClickDrag(reinterpret_cast<NMLISTVIEW *>(lParam));
 				break;
 
 			case LVN_GETDISPINFO:
@@ -306,65 +301,6 @@ void ShellBrowser::OnRButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT
 			ListViewHelper::FocusItem(m_hListView, itemAtPoint, TRUE);
 			ListViewHelper::SelectItem(m_hListView, itemAtPoint, TRUE);
 		}
-	}
-
-	m_rightClickDragAllowed = false;
-
-	if (WI_IsFlagSet(keyFlags, MK_LBUTTON) || WI_IsFlagSet(keyFlags, MK_MBUTTON))
-	{
-		return;
-	}
-
-	LV_HITTESTINFO lvhti;
-	lvhti.pt.x = x;
-	lvhti.pt.y = y;
-	int index = ListView_HitTest(m_hListView, &lvhti);
-
-	if (index == -1)
-	{
-		return;
-	}
-
-	m_rightClickDragAllowed = true;
-	m_rightClickDragStartPoint = { x, y };
-	m_rightClickDragItem = index;
-}
-
-void ShellBrowser::OnRButtonUp(HWND hwnd, int x, int y, UINT keyFlags)
-{
-	UNREFERENCED_PARAMETER(hwnd);
-	UNREFERENCED_PARAMETER(x);
-	UNREFERENCED_PARAMETER(y);
-	UNREFERENCED_PARAMETER(keyFlags);
-
-	m_rightClickDragAllowed = false;
-}
-
-void ShellBrowser::OnMouseMove(HWND hwnd, int x, int y, UINT keyFlags)
-{
-	UNREFERENCED_PARAMETER(hwnd);
-	UNREFERENCED_PARAMETER(x);
-	UNREFERENCED_PARAMETER(y);
-
-	if (m_performingDrag || !m_rightClickDragAllowed)
-	{
-		return;
-	}
-
-	if (WI_IsFlagClear(keyFlags, MK_RBUTTON) || WI_IsFlagSet(keyFlags, MK_LBUTTON)
-		|| WI_IsFlagSet(keyFlags, MK_MBUTTON))
-	{
-		return;
-	}
-
-	if (ListView_GetSelectedCount(m_hListView) > 0)
-	{
-		// This is reset so that if the right mouse button goes down and a drag is initiated, then
-		// canceled (while the button is still down), a new drag won't start until the right mouse
-		// button goes down again.
-		m_rightClickDragAllowed = false;
-
-		StartDrag(m_rightClickDragItem, m_rightClickDragStartPoint);
 	}
 }
 
@@ -1075,6 +1011,11 @@ std::vector<PCIDLIST_ABSOLUTE> ShellBrowser::GetSelectedItemPidls()
 }
 
 void ShellBrowser::OnListViewBeginDrag(const NMLISTVIEW *info)
+{
+	StartDrag(info->iItem, info->ptAction);
+}
+
+void ShellBrowser::OnListViewBeginRightClickDrag(const NMLISTVIEW *info)
 {
 	StartDrag(info->iItem, info->ptAction);
 }

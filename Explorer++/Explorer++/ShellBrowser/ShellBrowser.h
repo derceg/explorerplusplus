@@ -431,8 +431,6 @@ private:
 	void OnListViewMButtonDown(const POINT *pt);
 	void OnListViewMButtonUp(const POINT *pt, UINT keysDown);
 	void OnRButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT keyFlags);
-	void OnRButtonUp(HWND hwnd, int x, int y, UINT keyFlags);
-	void OnMouseMove(HWND hwnd, int x, int y, UINT keyFlags);
 	void OnListViewGetDisplayInfo(LPARAM lParam);
 	LRESULT OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip);
 	void QueueInfoTipTask(int internalIndex, const std::wstring &existingInfoTip);
@@ -446,6 +444,7 @@ private:
 	void OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown);
 	std::vector<PCIDLIST_ABSOLUTE> GetSelectedItemPidls();
 	void OnListViewBeginDrag(const NMLISTVIEW *info);
+	void OnListViewBeginRightClickDrag(const NMLISTVIEW *info);
 	HRESULT StartDrag(int draggedItem, const POINT &startPoint);
 	BOOL OnListViewBeginLabelEdit(const NMLVDISPINFO *dispInfo);
 	BOOL OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo);
@@ -718,10 +717,6 @@ private:
 	bool m_performingDrag;
 	IDataObject *m_draggedDataObject;
 	std::list<DroppedFile_t> m_droppedFileNameList;
-
-	bool m_rightClickDragAllowed;
-	POINT m_rightClickDragStartPoint;
-	int m_rightClickDragItem;
 
 	ListViewGroupSet m_listViewGroups;
 	int m_groupIdCounter;
