@@ -172,76 +172,68 @@ LRESULT CALLBACK Explorerplusplus::TreeViewSubclass(HWND hwnd, UINT uMsg, WPARAM
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam, LPARAM lParam)
+void Explorerplusplus::OnShowTreeViewContextMenu(const POINT &ptScreen)
 {
-	POINT *ppt = nullptr;
-	HTREEITEM hItem;
-	HTREEITEM hPrevItem;
-	IShellFolder *pShellParentFolder = nullptr;
-	PCITEMID_CHILD pidlRelative = nullptr;
-	HRESULT hr;
+	HTREEITEM targetItem;
+	POINT finalPoint;
+	bool highlightTargetItem = false;
 
-	hItem = (HTREEITEM) wParam;
-	ppt = (POINT *) lParam;
-
-	m_bTreeViewRightClick = true;
-
-	hPrevItem = TreeView_GetSelection(m_shellTreeView->GetHWND());
-	TreeView_SelectItem(m_shellTreeView->GetHWND(), hItem);
-	auto pidl = m_shellTreeView->GetItemPidl(hItem);
-
-	hr = SHBindToParent(pidl.get(), IID_PPV_ARGS(&pShellParentFolder), &pidlRelative);
-
-	if (SUCCEEDED(hr))
+	if (ptScreen.x == -1 && ptScreen.y == -1)
 	{
-		HTREEITEM hParent;
+		HTREEITEM selection = TreeView_GetSelection(m_shellTreeView->GetHWND());
 
-		hParent = TreeView_GetParent(m_shellTreeView->GetHWND(), hItem);
+		RECT itemRect;
+		TreeView_GetItemRect(m_shellTreeView->GetHWND(), selection, &itemRect, TRUE);
 
-		/* If we right-click on the "Desktop" item in the treeview, there is no parent.
-		   In such case, use "Desktop" as parent item as well, to allow the context menu
-		   to be shown. */
-		if (hParent == nullptr)
+		finalPoint = { itemRect.left, itemRect.top + (itemRect.bottom - itemRect.top) / 2 };
+		ClientToScreen(m_shellTreeView->GetHWND(), &finalPoint);
+
+		targetItem = selection;
+	}
+	else
+	{
+		POINT ptClient = ptScreen;
+		ScreenToClient(m_shellTreeView->GetHWND(), &ptClient);
+
+		TVHITTESTINFO hitTestInfo = {};
+		hitTestInfo.pt = ptClient;
+		auto item = TreeView_HitTest(m_shellTreeView->GetHWND(), &hitTestInfo);
+
+		if (!item)
 		{
-			hParent = hItem;
+			return;
 		}
 
-		if (hParent != nullptr)
-		{
-			auto pidlParent = m_shellTreeView->GetItemPidl(hParent);
-
-			if (pidlParent)
-			{
-				m_bTreeViewOpenInNewTab = false;
-
-				std::vector<PCITEMID_CHILD> pidlItems;
-				pidlItems.push_back(pidlRelative);
-
-				FileContextMenuManager fcmm(m_hContainer, pidlParent.get(), pidlItems);
-
-				FileContextMenuInfo fcmi;
-				fcmi.uFrom = FROM_TREEVIEW;
-
-				StatusBar statusBar(m_hStatusBar);
-
-				fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, ppt, &statusBar, nullptr,
-					reinterpret_cast<DWORD_PTR>(&fcmi), TRUE, IsKeyDown(VK_SHIFT));
-			}
-		}
-
-		pShellParentFolder->Release();
+		finalPoint = ptScreen;
+		targetItem = item;
+		highlightTargetItem = true;
 	}
 
-	/* Don't switch back to the previous folder if
-	the folder that was right-clicked was opened in
-	a new tab (i.e. can just keep the selection the
-	same). */
-	if (!m_bTreeViewOpenInNewTab)
+	if (highlightTargetItem)
 	{
-		TreeView_SelectItem(m_shellTreeView->GetHWND(), hPrevItem);
+		TreeView_SetItemState(m_shellTreeView->GetHWND(), targetItem, TVIS_DROPHILITED,
+			TVIS_DROPHILITED);
 	}
 
-	m_bTreeViewRightClick = false;
+	auto pidl = m_shellTreeView->GetItemPidl(targetItem);
+
+	unique_pidl_child child(ILCloneChild(ILFindLastID(pidl.get())));
+
+	ILRemoveLastID(pidl.get());
+
+	FileContextMenuManager contextMenuManager(m_shellTreeView->GetHWND(), pidl.get(),
+		{ child.get() });
+
+	FileContextMenuInfo fcmi;
+	fcmi.uFrom = FROM_TREEVIEW;
+
+	contextMenuManager.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, &finalPoint,
+		m_pStatusBar, nullptr, reinterpret_cast<DWORD_PTR>(&fcmi), TRUE, IsKeyDown(VK_SHIFT));
+
+	if (highlightTargetItem)
+	{
+		TreeView_SetItemState(m_shellTreeView->GetHWND(), targetItem, 0, TVIS_DROPHILITED);
+	}
 }
 
 void Explorerplusplus::OnTreeViewCopyItemPath() const
@@ -304,7 +296,7 @@ void Explorerplusplus::OnTreeViewHolderWindowTimer()
 	auto pidlDirectory = m_shellTreeView->GetItemPidl(g_newSelectionItem);
 	auto pidlCurrentDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
-	if (!m_bSelectingTreeViewDirectory && !m_bTreeViewRightClick
+	if (!m_bSelectingTreeViewDirectory
 		&& !ArePidlsEquivalent(pidlDirectory.get(), pidlCurrentDirectory.get()))
 	{
 		Tab &selectedTab = m_tabContainer->GetSelectedTab();
@@ -335,8 +327,7 @@ void Explorerplusplus::OnTreeViewSelChanged(LPARAM lParam)
 	/* Check whether the selection was changed because a new directory
 	was browsed to, or if the treeview control is involved in a
 	drag and drop operation. */
-	if (!m_bSelectingTreeViewDirectory && !m_bTreeViewRightClick
-		&& !m_shellTreeView->IsWithinDrag())
+	if (!m_bSelectingTreeViewDirectory && !m_shellTreeView->IsWithinDrag())
 	{
 		pnmtv = (LPNMTREEVIEW) lParam;
 
@@ -379,6 +370,19 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderProc(HWND hwnd, UINT msg, WPARA
 {
 	switch (msg)
 	{
+	// WM_CONTEXTMENU will be sent to the treeview window procedure when pressing Shift + F10 or
+	// VK_APPS. However, when right-clicking, the WM_CONTEXTMENU message will be sent to the parent.
+	// Since WM_CONTEXTMENU messages are sent to the parent if they're not handled, it's easiest to
+	// simply handle WM_CONTEXTMENU here, which will cover all three ways in which it can be
+	// triggered.
+	case WM_CONTEXTMENU:
+		if (reinterpret_cast<HWND>(wParam) == m_shellTreeView->GetHWND())
+		{
+			OnShowTreeViewContextMenu({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
+			return 0;
+		}
+		break;
+
 	case WM_CTLCOLORSTATIC:
 		if (auto result = OnHolderCtlColorStatic(reinterpret_cast<HWND>(lParam),
 				reinterpret_cast<HDC>(wParam)))
@@ -406,35 +410,6 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowNotifyHandler(HWND hwnd, 
 	case TVN_SELCHANGED:
 		OnTreeViewSelChanged(lParam);
 		break;
-
-	case NM_RCLICK:
-	{
-		NMHDR *nmhdr = nullptr;
-		POINT ptCursor;
-		DWORD dwPos;
-		TVHITTESTINFO tvht;
-
-		nmhdr = (NMHDR *) lParam;
-
-		if (nmhdr->hwndFrom == m_shellTreeView->GetHWND())
-		{
-			dwPos = GetMessagePos();
-			ptCursor.x = GET_X_LPARAM(dwPos);
-			ptCursor.y = GET_Y_LPARAM(dwPos);
-
-			tvht.pt = ptCursor;
-
-			ScreenToClient(m_shellTreeView->GetHWND(), &tvht.pt);
-
-			TreeView_HitTest(m_shellTreeView->GetHWND(), &tvht);
-
-			if ((tvht.flags & TVHT_NOWHERE) == 0)
-			{
-				OnTreeViewRightClick((WPARAM) tvht.hItem, (LPARAM) &ptCursor);
-			}
-		}
-	}
-	break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);

@@ -206,8 +206,6 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 			}
 		}
 
-		m_bTreeViewOpenInNewTab = true;
-
 		return TRUE;
 	}
 	else if (StrCmpI(szCmd, _T("viewcustomwizard")) == 0)
@@ -307,8 +305,6 @@ void Explorerplusplus::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
 		m_tabContainer->CreateNewTab(pidlComplete.get(),
 			TabSettings(_selected = m_config->openTabsInForeground));
-
-		m_bTreeViewOpenInNewTab = true;
 	}
 	break;
 

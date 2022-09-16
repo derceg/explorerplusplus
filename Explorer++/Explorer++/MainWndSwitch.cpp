@@ -245,14 +245,6 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM w
 	}
 	break;
 
-	case WM_NDW_ICONRCLICK:
-	{
-		POINT pt;
-		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-		OnDisplayWindowIconRClick(&pt);
-	}
-	break;
-
 	case WM_APPCOMMAND:
 		OnAppCommand(GET_APPCOMMAND_LPARAM(lParam));
 		break;
@@ -1329,10 +1321,6 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		OnNextWindow();
 		break;
 
-	case IDA_RCLICK:
-		OnIdaRClick();
-		break;
-
 	case IDA_TAB_DUPLICATETAB:
 		m_tabContainer->DuplicateTab(m_tabContainer->GetSelectedTab());
 		break;
@@ -1431,18 +1419,11 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 		OnListViewDoubleClick(nmhdr);
 		break;
 
-	case NM_RCLICK:
-		OnRightClick(nmhdr);
-		break;
-
 	case NM_CUSTOMDRAW:
 		return OnCustomDraw(lParam);
 
 	case LVN_KEYDOWN:
 		return OnListViewKeyDown(lParam);
-
-	case LVN_ITEMCHANGING:
-		return OnListViewItemChanging(reinterpret_cast<NMLISTVIEW *>(lParam));
 
 	case TBN_ENDADJUST:
 		UpdateToolbarBandSizing(m_hMainRebar, ((NMHDR *) lParam)->hwndFrom);

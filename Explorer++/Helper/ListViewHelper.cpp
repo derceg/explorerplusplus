@@ -6,10 +6,32 @@
 #include "ListViewHelper.h"
 #include "Macros.h"
 
-BOOL GetListViewItem(HWND hListView, LVITEM *pLVItem, UINT mask, UINT stateMask, int iItem,
-	int iSubItem, TCHAR *pszText, int cchMax);
+namespace
+{
 
-void ListViewHelper::SelectItem(HWND hListView, int iItem, BOOL bSelect)
+BOOL GetListViewItem(HWND hListView, LVITEM *pLVItem, UINT mask, UINT stateMask, int iItem,
+	int iSubItem, TCHAR *pszText, int cchMax)
+{
+	pLVItem->mask = mask;
+	pLVItem->stateMask = stateMask;
+	pLVItem->iItem = iItem;
+	pLVItem->iSubItem = iSubItem;
+
+	if (mask & LVIF_TEXT)
+	{
+		pLVItem->pszText = pszText;
+		pLVItem->cchTextMax = cchMax;
+	}
+
+	return ListView_GetItem(hListView, pLVItem);
+}
+
+}
+
+namespace ListViewHelper
+{
+
+void SelectItem(HWND hListView, int iItem, BOOL bSelect)
 {
 	UINT uNewState;
 
@@ -25,7 +47,7 @@ void ListViewHelper::SelectItem(HWND hListView, int iItem, BOOL bSelect)
 	ListView_SetItemState(hListView, iItem, uNewState, LVIS_SELECTED);
 }
 
-void ListViewHelper::SelectAllItems(HWND hListView, BOOL bSelect)
+void SelectAllItems(HWND hListView, BOOL bSelect)
 {
 	UINT uNewState;
 
@@ -43,7 +65,7 @@ void ListViewHelper::SelectAllItems(HWND hListView, BOOL bSelect)
 	SendMessage(hListView, WM_SETREDRAW, TRUE, 0);
 }
 
-int ListViewHelper::InvertSelection(HWND hListView)
+int InvertSelection(HWND hListView)
 {
 	int nTotalItems = ListView_GetItemCount(hListView);
 
@@ -69,7 +91,7 @@ int ListViewHelper::InvertSelection(HWND hListView)
 	return nSelected;
 }
 
-void ListViewHelper::FocusItem(HWND hListView, int iItem, BOOL bFocus)
+void FocusItem(HWND hListView, int iItem, BOOL bFocus)
 {
 	UINT uNewState;
 
@@ -85,7 +107,7 @@ void ListViewHelper::FocusItem(HWND hListView, int iItem, BOOL bFocus)
 	ListView_SetItemState(hListView, iItem, uNewState, LVIS_FOCUSED);
 }
 
-void ListViewHelper::SetGridlines(HWND hListView, BOOL bEnableGridlines)
+void SetGridlines(HWND hListView, BOOL bEnableGridlines)
 {
 	auto dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
 
@@ -107,7 +129,7 @@ void ListViewHelper::SetGridlines(HWND hListView, BOOL bEnableGridlines)
 	ListView_SetExtendedListViewStyle(hListView, dwExtendedStyle);
 }
 
-BOOL ListViewHelper::SetAutoArrange(HWND hListView, BOOL bAutoArrange)
+BOOL SetAutoArrange(HWND hListView, BOOL bAutoArrange)
 {
 	LONG_PTR lStyle = GetWindowLongPtr(hListView, GWL_STYLE);
 
@@ -142,7 +164,7 @@ BOOL ListViewHelper::SetAutoArrange(HWND hListView, BOOL bAutoArrange)
 	return TRUE;
 }
 
-void ListViewHelper::ActivateOneClickSelect(HWND hListView, BOOL bActivate, UINT uHoverTime)
+void ActivateOneClickSelect(HWND hListView, BOOL bActivate, UINT uHoverTime)
 {
 	auto dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
 
@@ -189,7 +211,7 @@ void ListViewHelper::ActivateOneClickSelect(HWND hListView, BOOL bActivate, UINT
 	}
 }
 
-void ListViewHelper::AddRemoveExtendedStyle(HWND hListView, DWORD dwStyle, BOOL bAdd)
+void AddRemoveExtendedStyle(HWND hListView, DWORD dwStyle, BOOL bAdd)
 {
 	auto dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
 
@@ -215,7 +237,7 @@ void ListViewHelper::AddRemoveExtendedStyle(HWND hListView, DWORD dwStyle, BOOL 
 listview. uImage should be the index
 of a bitmap resource in the current
 executable. */
-BOOL ListViewHelper::SetBackgroundImage(HWND hListView, UINT uImage)
+BOOL SetBackgroundImage(HWND hListView, UINT uImage)
 {
 	TCHAR szModuleName[MAX_PATH];
 	DWORD dwRet = GetModuleFileName(nullptr, szModuleName, SIZEOF_ARRAY(szModuleName));
@@ -251,24 +273,7 @@ BOOL ListViewHelper::SetBackgroundImage(HWND hListView, UINT uImage)
 	return ListView_SetBkImage(hListView, &lvbki);
 }
 
-BOOL GetListViewItem(HWND hListView, LVITEM *pLVItem, UINT mask, UINT stateMask, int iItem,
-	int iSubItem, TCHAR *pszText, int cchMax)
-{
-	pLVItem->mask = mask;
-	pLVItem->stateMask = stateMask;
-	pLVItem->iItem = iItem;
-	pLVItem->iSubItem = iSubItem;
-
-	if (mask & LVIF_TEXT)
-	{
-		pLVItem->pszText = pszText;
-		pLVItem->cchTextMax = cchMax;
-	}
-
-	return ListView_GetItem(hListView, pLVItem);
-}
-
-BOOL ListViewHelper::SwapItems(HWND hListView, int iItem1, int iItem2, BOOL bSwapLPARAM)
+BOOL SwapItems(HWND hListView, int iItem1, int iItem2, BOOL bSwapLPARAM)
 {
 	UINT mask = LVIF_IMAGE | LVIF_INDENT | LVIF_STATE | LVIF_TEXT;
 	UINT stateMask = static_cast<UINT>(-1);
@@ -317,7 +322,7 @@ BOOL ListViewHelper::SwapItems(HWND hListView, int iItem1, int iItem2, BOOL bSwa
 	return TRUE;
 }
 
-void ListViewHelper::PositionInsertMark(HWND hListView, const POINT *ppt)
+void PositionInsertMark(HWND hListView, const POINT *ppt)
 {
 	/* Remove the insertion mark. */
 	if (ppt == nullptr)
@@ -440,4 +445,29 @@ void ListViewHelper::PositionInsertMark(HWND hListView, const POINT *ppt)
 	lvim.dwFlags = dwFlags;
 	lvim.iItem = iNext;
 	ListView_SetInsertMark(hListView, &lvim);
+}
+
+std::optional<int> GetLastSelectedItemIndex(HWND listView)
+{
+	int index = -1;
+	int lastItemIndex = -1;
+
+	// While the documentation for LVM_GETNEXTITEM seems to indicate that LVNI_PREVIOUS could be
+	// used to find the last selected item (by reversing the direction of the search), that doesn't
+	// appear to actually work (i.e. using LVNI_PREVIOUS | LVNI_SELECTED doesn't return any
+	// results).
+	// Which is why the last selected item is found by searching forwards instead.
+	while ((index = ListView_GetNextItem(listView, index, LVNI_SELECTED)) != -1)
+	{
+		lastItemIndex = index;
+	}
+
+	if (lastItemIndex == -1)
+	{
+		return std::nullopt;
+	}
+
+	return lastItemIndex;
+}
+
 }

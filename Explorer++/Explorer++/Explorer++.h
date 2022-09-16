@@ -186,14 +186,12 @@ private:
 	std::optional<LRESULT> OnCtlColorStatic(HWND hwnd, HDC hdc);
 	int CloseApplication();
 	int OnDestroy();
-	void OnRightClick(NMHDR *nmhdr);
 	void OnSetFocus();
 	LRESULT OnDeviceChange(WPARAM wParam, LPARAM lParam);
 	void OnPreviousWindow();
 	void OnNextWindow();
 	void OnAppCommand(UINT cmd);
 	void OnDirectoryModified(const Tab &tab);
-	void OnIdaRClick();
 	void OnAssocChanged();
 	LRESULT OnCustomDraw(LPARAM lParam);
 	void OnSelectTabByIndex(int iTab);
@@ -249,8 +247,7 @@ private:
 	/* ListView private message handlers. */
 	void OnListViewDoubleClick(NMHDR *nmhdr);
 	LRESULT OnListViewKeyDown(LPARAM lParam);
-	BOOL OnListViewItemChanging(const NMLISTVIEW *changeData);
-	void OnListViewRClick(POINT *pCursorPos);
+	void OnShowListViewContextMenu(const POINT &ptScreen);
 	void OnListViewBackgroundRClick(POINT *pCursorPos);
 	void OnListViewBackgroundRClickWindows8OrGreater(POINT *pCursorPos);
 	void OnListViewBackgroundRClickWindows7(POINT *pCursorPos);
@@ -261,7 +258,7 @@ private:
 	void OnListViewPaste();
 
 	/* TreeView private message handlers. */
-	void OnTreeViewRightClick(WPARAM wParam, LPARAM lParam);
+	void OnShowTreeViewContextMenu(const POINT &ptScreen);
 	void OnTreeViewSelChanged(LPARAM lParam);
 	void OnTreeViewCopyItemPath() const;
 	void OnTreeViewSetFileAttributes() const;
@@ -474,7 +471,6 @@ private:
 
 	/* Display window. */
 	void OnDisplayWindowResized(WPARAM wParam);
-	void OnDisplayWindowIconRClick(POINT *ptClient);
 	void OnDisplayWindowRClick(POINT *ptClient);
 	void UpdateDisplayWindow(const Tab &tab);
 	void UpdateDisplayWindowForZeroFiles(const Tab &tab);
@@ -560,11 +556,9 @@ private:
 
 	/** Internal state. **/
 	HWND m_hLastActiveWindow;
-	bool m_bTreeViewRightClick;
 	bool m_bSelectingTreeViewDirectory;
 	bool m_bAttemptToolbarRestore;
 	bool m_bLanguageLoaded;
-	bool m_bTreeViewOpenInNewTab;
 	bool m_bShowTabBar;
 	int m_iLastSelectedTab;
 	ULONG m_SHChangeNotifyID;
@@ -663,6 +657,4 @@ private:
 
 	/* Mousewheel. */
 	int m_zDeltaTotal;
-
-	bool m_blockNextListViewSelection;
 };

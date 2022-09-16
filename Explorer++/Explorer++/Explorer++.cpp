@@ -45,7 +45,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd, CommandLine::Settings *commandLine
 	m_config = std::make_shared<Config>();
 
 	m_bSelectingTreeViewDirectory = false;
-	m_bTreeViewRightClick = false;
 	m_bSavePreferencesToXMLFile = FALSE;
 	m_bAttemptToolbarRestore = false;
 	m_bLanguageLoaded = false;
@@ -63,8 +62,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd, CommandLine::Settings *commandLine
 	m_hActiveListView = nullptr;
 	m_zDeltaTotal = 0;
 	m_InitializationFinished.set(false);
-
-	m_blockNextListViewSelection = false;
 
 	m_ColorRules = NColorRuleHelper::GetDefaultColorRules();
 

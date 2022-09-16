@@ -940,105 +940,6 @@ void Explorerplusplus::OnDirectoryModified(const Tab &tab)
 	}
 }
 
-void Explorerplusplus::OnIdaRClick()
-{
-	/* Show the context menu (if any)
-	for the window that currently has
-	the focus.
-	Note: The edit box within the address
-	bar already handles the r-click menu
-	key. */
-
-	HWND hFocus;
-
-	hFocus = GetFocus();
-
-	if (hFocus == m_hActiveListView)
-	{
-		/* The behaviour of the listview is
-		slightly different when compared to
-		normal right-clicking.
-		If any item(s) in the listview are
-		selected when they key is pressed,
-		the context menu for those items will
-		be shown, rather than the background
-		context menu.
-		The context menu will be anchored to
-		the item that currently has selection.
-		If no item is selected, the background
-		context menu will be shown (and anchored
-		at the current mouse position). */
-		POINT ptMenuOrigin = { 0, 0 };
-
-		/* If no items are selected, pass the current mouse
-		position. If items are selected, take the one with
-		focus, and pass its center point. */
-		if (ListView_GetSelectedCount(m_hActiveListView) == 0)
-		{
-			GetCursorPos(&ptMenuOrigin);
-		}
-		else
-		{
-			HIMAGELIST himl;
-			POINT ptItem;
-			UINT uViewMode;
-			int iItem;
-			int cx;
-			int cy;
-
-			iItem = ListView_GetNextItem(m_hActiveListView, -1, LVNI_FOCUSED);
-
-			if (iItem != -1)
-			{
-				ListView_GetItemPosition(m_hActiveListView, iItem, &ptItem);
-
-				ClientToScreen(m_hActiveListView, &ptItem);
-
-				uViewMode = m_pActiveShellBrowser->GetViewMode();
-
-				if (uViewMode == ViewMode::SmallIcons || uViewMode == ViewMode::List
-					|| uViewMode == ViewMode::Details)
-					himl = ListView_GetImageList(m_hActiveListView, LVSIL_SMALL);
-				else
-					himl = ListView_GetImageList(m_hActiveListView, LVSIL_NORMAL);
-
-				ImageList_GetIconSize(himl, &cx, &cy);
-
-				/* DON'T free the image list. */
-
-				/* The origin of the menu will be fixed at the centre point
-				of the items icon. */
-				ptMenuOrigin.x = ptItem.x + cx / 2;
-				ptMenuOrigin.y = ptItem.y + cy / 2;
-			}
-		}
-
-		OnListViewRClick(&ptMenuOrigin);
-	}
-	else if (hFocus == m_shellTreeView->GetHWND())
-	{
-		HTREEITEM hSelection;
-		RECT rcItem;
-		POINT ptOrigin;
-
-		hSelection = TreeView_GetSelection(m_shellTreeView->GetHWND());
-
-		TreeView_GetItemRect(m_shellTreeView->GetHWND(), hSelection, &rcItem, TRUE);
-
-		ptOrigin.x = rcItem.left;
-		ptOrigin.y = rcItem.top;
-
-		ClientToScreen(m_shellTreeView->GetHWND(), &ptOrigin);
-
-		ptOrigin.y += (rcItem.bottom - rcItem.top) / 2;
-
-		if (hSelection != nullptr)
-		{
-			OnTreeViewRightClick((WPARAM) hSelection, (LPARAM) &ptOrigin);
-		}
-	}
-}
-
 /* A file association has changed. Rather
 than refreshing all tabs, just find all
 icons again.
@@ -1151,19 +1052,6 @@ void Explorerplusplus::ShowMainRebarBand(HWND hwnd, BOOL bShow)
 			}
 		}
 	}
-}
-
-void Explorerplusplus::OnDisplayWindowIconRClick(POINT *ptClient)
-{
-	POINT ptScreen = *ptClient;
-	BOOL res = ClientToScreen(m_hDisplayWindow, &ptScreen);
-
-	if (!res)
-	{
-		return;
-	}
-
-	OnListViewRClick(&ptScreen);
 }
 
 void Explorerplusplus::OnDisplayWindowRClick(POINT *ptClient)

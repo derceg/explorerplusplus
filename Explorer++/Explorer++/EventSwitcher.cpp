@@ -125,21 +125,6 @@ void Explorerplusplus::OnShowFileProperties() const
 	}
 }
 
-void Explorerplusplus::OnRightClick(NMHDR *nmhdr)
-{
-	if (nmhdr->hwndFrom == m_hActiveListView)
-	{
-		POINT cursorPos;
-		DWORD dwPos;
-
-		dwPos = GetMessagePos();
-		cursorPos.x = GET_X_LPARAM(dwPos);
-		cursorPos.y = GET_Y_LPARAM(dwPos);
-
-		OnListViewRClick(&cursorPos);
-	}
-}
-
 void Explorerplusplus::OnPaste()
 {
 	HWND focus = GetFocus();

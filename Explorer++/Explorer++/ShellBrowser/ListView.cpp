@@ -291,6 +291,23 @@ void ShellBrowser::OnRButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT
 	UNREFERENCED_PARAMETER(hwnd);
 	UNREFERENCED_PARAMETER(doubleClick);
 
+	// If shift is held down while right-clicking an item, it appears the listview control won't
+	// select the item. Which is why the functionality is implemented here.
+	if (WI_IsFlagSet(keyFlags, MK_SHIFT))
+	{
+		LVHITTESTINFO hitTestInfo = {};
+		hitTestInfo.pt = { x, y };
+		int itemAtPoint = ListView_HitTest(m_hListView, &hitTestInfo);
+
+		if (itemAtPoint != -1
+			&& ListView_GetItemState(m_hListView, itemAtPoint, LVIS_SELECTED) != LVIS_SELECTED)
+		{
+			ListViewHelper::SelectAllItems(m_hListView, FALSE);
+			ListViewHelper::FocusItem(m_hListView, itemAtPoint, TRUE);
+			ListViewHelper::SelectItem(m_hListView, itemAtPoint, TRUE);
+		}
+	}
+
 	m_rightClickDragAllowed = false;
 
 	if (WI_IsFlagSet(keyFlags, MK_LBUTTON) || WI_IsFlagSet(keyFlags, MK_MBUTTON))

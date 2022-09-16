@@ -652,20 +652,7 @@ void BookmarkListView::OnNewBookmark()
 
 std::optional<int> BookmarkListView::GetLastSelectedItemIndex() const
 {
-	int index = -1;
-	int lastItemIndex = -1;
-
-	while ((index = ListView_GetNextItem(m_hListView, index, LVNI_SELECTED)) != -1)
-	{
-		lastItemIndex = index;
-	}
-
-	if (lastItemIndex == -1)
-	{
-		return std::nullopt;
-	}
-
-	return lastItemIndex;
+	return ListViewHelper::GetLastSelectedItemIndex(m_hListView);
 }
 
 RawBookmarkItems BookmarkListView::GetSelectedBookmarkItems()

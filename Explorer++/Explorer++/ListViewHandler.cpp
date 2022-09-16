@@ -87,54 +87,13 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 	}
 	break;
 
-	case WM_RBUTTONDOWN:
-		if ((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON) && !(wParam & MK_MBUTTON))
+	case WM_CONTEXTMENU:
+		if (reinterpret_cast<HWND>(wParam)
+			== m_tabContainer->GetSelectedTab().GetShellBrowser()->GetListView())
 		{
-			LV_HITTESTINFO lvhti;
-
-			lvhti.pt.x = LOWORD(lParam);
-			lvhti.pt.y = HIWORD(lParam);
-
-			/* Test to see if the mouse click was
-			on an item or not. */
-			ListView_HitTest(m_hActiveListView, &lvhti);
-
-			HDC hdc;
-			TCHAR szText[MAX_PATH];
-			RECT rc;
-			SIZE sz;
-
-			UINT uViewMode = m_pActiveShellBrowser->GetViewMode();
-
-			if (uViewMode == ViewMode::List)
-			{
-				if (!(lvhti.flags & LVHT_NOWHERE) && lvhti.iItem != -1)
-				{
-					ListView_GetItemRect(m_hActiveListView, lvhti.iItem, &rc, LVIR_LABEL);
-					ListView_GetItemText(m_hActiveListView, lvhti.iItem, 0, szText,
-						SIZEOF_ARRAY(szText));
-
-					hdc = GetDC(m_hActiveListView);
-					GetTextExtentPoint32(hdc, szText, lstrlen(szText), &sz);
-					ReleaseDC(m_hActiveListView, hdc);
-
-					rc.right = rc.left + sz.cx;
-
-					if (!PtInRect(&rc, lvhti.pt))
-					{
-						m_blockNextListViewSelection = true;
-					}
-				}
-			}
+			OnShowListViewContextMenu({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
+			return 0;
 		}
-		break;
-
-	case WM_RBUTTONUP:
-		m_blockNextListViewSelection = false;
-		break;
-
-	case WM_MOUSEMOVE:
-		m_blockNextListViewSelection = false;
 		break;
 
 	case WM_MOUSEWHEEL:
@@ -243,38 +202,6 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 	return 0;
 }
 
-BOOL Explorerplusplus::OnListViewItemChanging(const NMLISTVIEW *changeData)
-{
-	if (changeData->uChanged != LVIF_STATE)
-	{
-		return FALSE;
-	}
-
-	int tabId = DetermineListViewObjectIndex(changeData->hdr.hwndFrom);
-
-	if (tabId == -1)
-	{
-		return FALSE;
-	}
-
-	Tab &tab = m_tabContainer->GetTab(tabId);
-	ViewMode viewMode = tab.GetShellBrowser()->GetViewMode();
-
-	bool previouslySelected = WI_IsFlagSet(changeData->uOldState, LVIS_SELECTED);
-	bool currentlySelected = WI_IsFlagSet(changeData->uNewState, LVIS_SELECTED);
-
-	if (viewMode == +ViewMode::List && !previouslySelected && currentlySelected)
-	{
-		if (m_blockNextListViewSelection)
-		{
-			m_blockNextListViewSelection = false;
-			return TRUE;
-		}
-	}
-
-	return FALSE;
-}
-
 int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 {
 	for (auto &item : m_tabContainer->GetAllTabs())
@@ -288,52 +215,53 @@ int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 	return -1;
 }
 
-void Explorerplusplus::OnListViewRClick(POINT *pCursorPos)
+void Explorerplusplus::OnShowListViewContextMenu(const POINT &ptScreen)
 {
-	/* It may be possible for the active tab/folder
-	to change while the menu is been shown (e.g. if
-	not handled correctly, the back/forward buttons
-	on a mouse will change the directory without
-	destroying the popup menu).
-	If this happens, the shell browser used will not
-	stay constant throughout this function, and will
-	cause various problems (e.g. changing from a
-	computer where new items can be created to one
-	where they cannot while the popup menu is still
-	active will cause the 'new' entry to stay on the
-	menu incorrectly).
-	Due to the possibility of unforseen problems,
-	this function should NOT access the current
-	shell browser once the menu has been destroyed. */
+	POINT finalPoint = ptScreen;
 
-	SetForegroundWindow(m_hContainer);
+	bool keyboardGenerated = false;
 
-	if (IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_MENU))
+	if (ptScreen.x == -1 && ptScreen.y == -1)
 	{
-		LVHITTESTINFO lvhti;
-
-		lvhti.pt = *pCursorPos;
-		ScreenToClient(m_hActiveListView, &lvhti.pt);
-		ListView_HitTest(m_hActiveListView, &lvhti);
-
-		if (!(lvhti.flags & LVHT_NOWHERE) && lvhti.iItem != -1)
-		{
-			if (ListView_GetItemState(m_hActiveListView, lvhti.iItem, LVIS_SELECTED)
-				!= LVIS_SELECTED)
-			{
-				ListViewHelper::SelectAllItems(m_hActiveListView, FALSE);
-				ListViewHelper::SelectItem(m_hActiveListView, lvhti.iItem, TRUE);
-			}
-		}
+		keyboardGenerated = true;
 	}
 
-	if (ListView_GetSelectedCount(m_hActiveListView) == 0)
+	Tab &tab = m_tabContainer->GetSelectedTab();
+
+	if (ListView_GetSelectedCount(tab.GetShellBrowser()->GetListView()) == 0)
 	{
-		OnListViewBackgroundRClick(pCursorPos);
+		if (keyboardGenerated)
+		{
+			finalPoint = { 0, 0 };
+			ClientToScreen(tab.GetShellBrowser()->GetListView(), &finalPoint);
+		}
+
+		OnListViewBackgroundRClick(&finalPoint);
 	}
 	else
 	{
-		OnListViewItemRClick(pCursorPos);
+		if (keyboardGenerated)
+		{
+			int targetItem = ListView_GetNextItem(tab.GetShellBrowser()->GetListView(), -1,
+				LVNI_FOCUSED | LVNI_SELECTED);
+
+			if (targetItem == -1)
+			{
+				auto lastSelectedItem =
+					ListViewHelper::GetLastSelectedItemIndex(tab.GetShellBrowser()->GetListView());
+				targetItem = lastSelectedItem.value();
+			}
+
+			RECT itemRect;
+			ListView_GetItemRect(tab.GetShellBrowser()->GetListView(), targetItem, &itemRect,
+				LVIR_ICON);
+
+			finalPoint = { itemRect.left + (itemRect.right - itemRect.left) / 2,
+				itemRect.top + (itemRect.bottom - itemRect.top) / 2 };
+			ClientToScreen(tab.GetShellBrowser()->GetListView(), &finalPoint);
+		}
+
+		OnListViewItemRClick(&finalPoint);
 	}
 }
 
@@ -360,8 +288,6 @@ void Explorerplusplus::OnListViewBackgroundRClickWindows8OrGreater(POINT *pCurso
 	FileContextMenuInfo fcmi;
 	fcmi.uFrom = FROM_LISTVIEW;
 
-	StatusBar statusBar(m_hStatusBar);
-
 	auto serviceProvider = winrt::make_self<ServiceProvider>();
 
 	auto newMenuClient = winrt::make<NewMenuClient>(this);
@@ -374,7 +300,7 @@ void Explorerplusplus::OnListViewBackgroundRClickWindows8OrGreater(POINT *pCurso
 	auto shellView = winrt::make<ShellView>(selectedTab.GetShellBrowserWeak(), this, false);
 	serviceProvider->RegisterService(SID_DefView, shellView.get());
 
-	fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, pCursorPos, &statusBar,
+	fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, pCursorPos, m_pStatusBar,
 		serviceProvider.get(), reinterpret_cast<DWORD_PTR>(&fcmi), FALSE, IsKeyDown(VK_SHIFT));
 }
 
@@ -477,9 +403,7 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 		FileContextMenuInfo fcmi;
 		fcmi.uFrom = FROM_LISTVIEW;
 
-		StatusBar statusBar(m_hStatusBar);
-
-		fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, pCursorPos, &statusBar, nullptr,
+		fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, pCursorPos, m_pStatusBar, nullptr,
 			reinterpret_cast<DWORD_PTR>(&fcmi), TRUE, IsKeyDown(VK_SHIFT));
 	}
 }

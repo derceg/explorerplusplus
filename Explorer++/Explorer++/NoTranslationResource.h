@@ -460,7 +460,6 @@
 #define IDA_COMBODROPDOWN               40287
 #define IDA_NEXTWINDOW                  40289
 #define IDA_PREVIOUSWINDOW              40350
-#define IDA_RCLICK                      40352
 #define IDA_HOME                        40420
 #define IDA_TAB1                        40423
 #define IDA_TAB2                        40424
