@@ -490,6 +490,7 @@
     <ClCompile Include="ApplicationToolbarXmlStorage.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarksToolbar.cpp" />
     <ClCompile Include="Bookmarks\UI\Views\BookmarksToolbarView.cpp" />
+    <ClCompile Include="Bookmarks\UI\BookmarkMenuDropTarget.cpp" />
     <ClCompile Include="DriveEnumeratorImpl.cpp" />
     <ClCompile Include="DriveModel.cpp" />
     <ClCompile Include="DrivesToolbarView.cpp" />
@@ -672,6 +673,7 @@
     <ClInclude Include="ApplicationToolbarXmlStorage.h" />
     <ClInclude Include="Bookmarks\UI\BookmarksToolbar.h" />
     <ClInclude Include="Bookmarks\UI\Views\BookmarksToolbarView.h" />
+    <ClInclude Include="Bookmarks\UI\BookmarkMenuDropTarget.h" />
     <ClInclude Include="DriveEnumerator.h" />
     <ClInclude Include="DriveEnumeratorImpl.h" />
     <ClInclude Include="DriveModel.h" />

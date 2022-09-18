@@ -8,6 +8,7 @@
 
 namespace MenuHelper
 {
+
 void AddStringItem(HMENU menu, UINT id, std::wstring &text);
 void AddStringItem(HMENU menu, UINT id, std::wstring &text, UINT item, BOOL byPosition);
 void AddSeparator(HMENU menu);
@@ -20,6 +21,9 @@ void AttachSubMenu(HMENU parentMenu, wil::unique_hmenu subMenu, UINT item, BOOL 
 void CheckItem(HMENU hMenu, UINT itemID, BOOL bCheck);
 void EnableItem(HMENU hMenu, UINT itemID, BOOL bEnable);
 
+void SetMenuStyle(HMENU menu, DWORD style);
+
 void RemoveDuplicateSeperators(HMENU menu);
 void RemoveTrailingSeparators(HMENU menu);
+
 }

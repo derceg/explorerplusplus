@@ -5,12 +5,15 @@
 #include "stdafx.h"
 #include "MenuHelper.h"
 
-void MenuHelper::AddStringItem(HMENU menu, UINT id, std::wstring &text)
+namespace MenuHelper
+{
+
+void AddStringItem(HMENU menu, UINT id, std::wstring &text)
 {
 	AddStringItem(menu, id, text, GetMenuItemCount(menu), TRUE);
 }
 
-void MenuHelper::AddStringItem(HMENU menu, UINT id, std::wstring &text, UINT item, BOOL byPosition)
+void AddStringItem(HMENU menu, UINT id, std::wstring &text, UINT item, BOOL byPosition)
 {
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
@@ -20,12 +23,12 @@ void MenuHelper::AddStringItem(HMENU menu, UINT id, std::wstring &text, UINT ite
 	InsertMenuItem(menu, item, byPosition, &mii);
 }
 
-void MenuHelper::AddSeparator(HMENU menu)
+void AddSeparator(HMENU menu)
 {
 	AddSeparator(menu, GetMenuItemCount(menu), TRUE);
 }
 
-void MenuHelper::AddSeparator(HMENU menu, UINT item, BOOL byPosition)
+void AddSeparator(HMENU menu, UINT item, BOOL byPosition)
 {
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
@@ -34,13 +37,13 @@ void MenuHelper::AddSeparator(HMENU menu, UINT item, BOOL byPosition)
 	InsertMenuItem(menu, item, byPosition, &mii);
 }
 
-void MenuHelper::AddSubMenuItem(HMENU menu, std::wstring &text, wil::unique_hmenu subMenu)
+void AddSubMenuItem(HMENU menu, std::wstring &text, wil::unique_hmenu subMenu)
 {
 	AddSubMenuItem(menu, text, std::move(subMenu), GetMenuItemCount(menu), TRUE);
 }
 
-void MenuHelper::AddSubMenuItem(HMENU menu, std::wstring &text, wil::unique_hmenu subMenu,
-	UINT item, BOOL byPosition)
+void AddSubMenuItem(HMENU menu, std::wstring &text, wil::unique_hmenu subMenu, UINT item,
+	BOOL byPosition)
 {
 	MENUITEMINFO mii = {};
 	mii.cbSize = sizeof(mii);
@@ -50,8 +53,7 @@ void MenuHelper::AddSubMenuItem(HMENU menu, std::wstring &text, wil::unique_hmen
 	InsertMenuItem(menu, item, byPosition, &mii);
 }
 
-void MenuHelper::AttachSubMenu(HMENU parentMenu, wil::unique_hmenu subMenu, UINT item,
-	BOOL byPosition)
+void AttachSubMenu(HMENU parentMenu, wil::unique_hmenu subMenu, UINT item, BOOL byPosition)
 {
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
@@ -64,19 +66,28 @@ void MenuHelper::AttachSubMenu(HMENU parentMenu, wil::unique_hmenu subMenu, UINT
 	subMenu.release();
 }
 
-void MenuHelper::CheckItem(HMENU hMenu, UINT itemID, BOOL bCheck)
+void CheckItem(HMENU hMenu, UINT itemID, BOOL bCheck)
 {
 	UINT state = bCheck ? MF_CHECKED : MF_UNCHECKED;
 	CheckMenuItem(hMenu, itemID, state);
 }
 
-void MenuHelper::EnableItem(HMENU hMenu, UINT itemID, BOOL bEnable)
+void EnableItem(HMENU hMenu, UINT itemID, BOOL bEnable)
 {
 	UINT state = bEnable ? MF_ENABLED : MF_DISABLED;
 	EnableMenuItem(hMenu, itemID, state);
 }
 
-void MenuHelper::RemoveDuplicateSeperators(HMENU menu)
+void SetMenuStyle(HMENU menu, DWORD style)
+{
+	MENUINFO menuInfo = {};
+	menuInfo.cbSize = sizeof(menuInfo);
+	menuInfo.fMask = MIM_STYLE;
+	menuInfo.dwStyle = style;
+	SetMenuInfo(menu, &menuInfo);
+}
+
+void RemoveDuplicateSeperators(HMENU menu)
 {
 	int count = GetMenuItemCount(menu);
 
@@ -108,7 +119,7 @@ void MenuHelper::RemoveDuplicateSeperators(HMENU menu)
 }
 
 // Removes any separators from the end of a menu.
-void MenuHelper::RemoveTrailingSeparators(HMENU menu)
+void RemoveTrailingSeparators(HMENU menu)
 {
 	int count = GetMenuItemCount(menu);
 
@@ -131,4 +142,6 @@ void MenuHelper::RemoveTrailingSeparators(HMENU menu)
 
 		DeleteMenu(menu, i, MF_BYPOSITION);
 	}
+}
+
 }

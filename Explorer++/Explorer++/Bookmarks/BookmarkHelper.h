@@ -45,5 +45,5 @@ void PasteBookmarkItems(BookmarkTree *bookmarkTree, BookmarkItem *parentFolder, 
 
 BookmarkItem *GetBookmarkItemById(BookmarkTree *bookmarkTree, std::wstring_view guid);
 
-bool IsAncestor(BookmarkItem *bookmarkItem, BookmarkItem *possibleAncestor);
+bool IsAncestor(const BookmarkItem *bookmarkItem, const BookmarkItem *possibleAncestor);
 }

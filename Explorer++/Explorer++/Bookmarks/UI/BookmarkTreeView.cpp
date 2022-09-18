@@ -11,10 +11,10 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/DropSourceImpl.h"
 #include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
-#include "../Helper/iDropSource.h"
 #include <boost/range/adaptor/filtered.hpp>
 
 BookmarkTreeView::BookmarkTreeView(HWND hTreeView, HINSTANCE hInstance,
@@ -493,19 +493,13 @@ void BookmarkTreeView::OnBeginDrag(const NMTREEVIEW *treeView)
 		return;
 	}
 
-	wil::com_ptr_nothrow<IDropSource> dropSource;
-	HRESULT hr = CreateDropSource(&dropSource);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
+	auto dropSource = winrt::make_self<DropSourceImpl>();
 
 	auto &ownedPtr = bookmarkFolder->GetParent()->GetChildOwnedPtr(bookmarkFolder);
 	auto dataObject = BookmarkDataExchange::CreateDataObject({ ownedPtr });
 
 	wil::com_ptr_nothrow<IDragSourceHelper> dragSourceHelper;
-	hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_ALL,
+	HRESULT hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_ALL,
 		IID_PPV_ARGS(&dragSourceHelper));
 
 	if (SUCCEEDED(hr))

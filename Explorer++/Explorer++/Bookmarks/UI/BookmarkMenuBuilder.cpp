@@ -9,8 +9,8 @@
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/ImageHelper.h"
-#include <boost/format.hpp>
 #include <wil/common.h>
+#include <format>
 
 BookmarkMenuBuilder::BookmarkMenuBuilder(CoreInterface *coreInterface, IconFetcher *iconFetcher,
 	HMODULE resourceModule) :
@@ -21,9 +21,8 @@ BookmarkMenuBuilder::BookmarkMenuBuilder(CoreInterface *coreInterface, IconFetch
 }
 
 BOOL BookmarkMenuBuilder::BuildMenu(HWND parentWindow, HMENU menu, BookmarkItem *bookmarkItem,
-	const MenuIdRange &menuIdRange, int startPosition, ItemIdMap &itemIdMap,
-	std::vector<wil::unique_hbitmap> &menuImages, ItemPositionMap *itemPositionMap,
-	int *nextMenuItemId, IncludePredicate includePredicate)
+	const MenuIdRange &menuIdRange, int startPosition, std::vector<wil::unique_hbitmap> &menuImages,
+	MenuInfo &menuInfo, IncludePredicate includePredicate)
 {
 	assert(bookmarkItem->IsFolder());
 
@@ -37,21 +36,21 @@ BOOL BookmarkMenuBuilder::BuildMenu(HWND parentWindow, HMENU menu, BookmarkItem 
 
 	BookmarkIconManager bookmarkIconManager(m_coreInterface, m_iconFetcher, iconWidth, iconHeight);
 
-	BOOL res = BuildMenu(menu, bookmarkItem, startPosition, itemIdMap, bookmarkIconManager,
-		menuImages, itemPositionMap, true, includePredicate);
-	wil::assign_to_opt_param(nextMenuItemId, m_idCounter);
+	BOOL res = BuildMenu(menu, bookmarkItem, startPosition, bookmarkIconManager, menuImages,
+		menuInfo, true, includePredicate);
+	menuInfo.menus.insert(menu);
+	menuInfo.nextMenuId = m_idCounter;
 
 	return res;
 }
 
 BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, BookmarkItem *bookmarkItem, int startPosition,
-	ItemIdMap &itemIdMap, BookmarkIconManager &bookmarkIconManager,
-	std::vector<wil::unique_hbitmap> &menuImages, ItemPositionMap *itemPositionMap,
-	bool applyIncludePredicate, IncludePredicate includePredicate)
+	BookmarkIconManager &bookmarkIconManager, std::vector<wil::unique_hbitmap> &menuImages,
+	MenuInfo &menuInfo, bool applyIncludePredicate, IncludePredicate includePredicate)
 {
 	if (bookmarkItem->GetChildren().empty())
 	{
-		return AddEmptyBookmarkFolderToMenu(menu, bookmarkItem, startPosition, itemPositionMap);
+		return AddEmptyBookmarkFolderToMenu(menu, bookmarkItem, startPosition, menuInfo);
 	}
 
 	int position = startPosition;
@@ -67,13 +66,13 @@ BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, BookmarkItem *bookmarkItem, int 
 
 		if (childItem->IsFolder())
 		{
-			res = AddBookmarkFolderToMenu(menu, childItem.get(), position, itemIdMap,
-				bookmarkIconManager, menuImages, itemPositionMap);
+			res = AddBookmarkFolderToMenu(menu, childItem.get(), position, bookmarkIconManager,
+				menuImages, menuInfo);
 		}
 		else
 		{
-			res = AddBookmarkToMenu(menu, childItem.get(), position, itemIdMap, bookmarkIconManager,
-				menuImages, itemPositionMap);
+			res = AddBookmarkToMenu(menu, childItem.get(), position, bookmarkIconManager,
+				menuImages, menuInfo);
 		}
 
 		if (!res)
@@ -88,11 +87,11 @@ BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, BookmarkItem *bookmarkItem, int 
 }
 
 BOOL BookmarkMenuBuilder::AddEmptyBookmarkFolderToMenu(HMENU menu, BookmarkItem *bookmarkItem,
-	int position, ItemPositionMap *itemPositionMap)
+	int position, MenuInfo &menuInfo)
 {
 	std::wstring bookmarkFolderEmpty =
 		ResourceHelper::LoadString(m_resourceModule, IDS_BOOKMARK_FOLDER_EMPTY);
-	std::wstring menuText = (boost::wformat(L"(%s)") % bookmarkFolderEmpty).str();
+	std::wstring menuText = std::format(L"({})", bookmarkFolderEmpty);
 
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
@@ -106,23 +105,19 @@ BOOL BookmarkMenuBuilder::AddEmptyBookmarkFolderToMenu(HMENU menu, BookmarkItem 
 		return FALSE;
 	}
 
-	if (itemPositionMap)
-	{
-		// If you right-click the empty item shown in a bookmark drop-down in
-		// Chrome/Firefox, the parent item will be used as the target of any
-		// context menu operations (e.g. selecting "Copy" will copy the parent
-		// folder).
-		// To enable similar behavior here, the empty item is mapped to the
-		// parent.
-		itemPositionMap->insert({ { menu, position }, bookmarkItem });
-	}
+	// If you right-click the empty item shown in a bookmark drop-down in Chrome/Firefox, the parent
+	// item will be used as the target of any context menu operations (e.g. selecting "Copy" will
+	// copy the parent folder).
+	// To enable similar behavior here, the empty item is mapped to the parent.
+	menuInfo.itemPositionMap.insert(
+		{ { menu, position }, { bookmarkItem, MenuItemType::EmptyItem } });
 
 	return res;
 }
 
 BOOL BookmarkMenuBuilder::AddBookmarkFolderToMenu(HMENU menu, BookmarkItem *bookmarkItem,
-	int position, ItemIdMap &itemIdMap, BookmarkIconManager &bookmarkIconManager,
-	std::vector<wil::unique_hbitmap> &menuImages, ItemPositionMap *itemPositionMap)
+	int position, BookmarkIconManager &bookmarkIconManager,
+	std::vector<wil::unique_hbitmap> &menuImages, MenuInfo &menuInfo)
 {
 	HMENU subMenu = CreatePopupMenu();
 
@@ -147,18 +142,17 @@ BOOL BookmarkMenuBuilder::AddBookmarkFolderToMenu(HMENU menu, BookmarkItem *book
 
 	AddIconToMenuItem(menu, position, bookmarkItem, bookmarkIconManager, menuImages);
 
-	if (itemPositionMap)
-	{
-		itemPositionMap->insert({ { menu, position }, bookmarkItem });
-	}
+	menuInfo.itemPositionMap.insert(
+		{ { menu, position }, { bookmarkItem, MenuItemType::BookmarkItem } });
+	menuInfo.menus.insert(subMenu);
 
-	return BuildMenu(subMenu, bookmarkItem, 0, itemIdMap, bookmarkIconManager, menuImages,
-		itemPositionMap, false, nullptr);
+	return BuildMenu(subMenu, bookmarkItem, 0, bookmarkIconManager, menuImages, menuInfo, false,
+		nullptr);
 }
 
 BOOL BookmarkMenuBuilder::AddBookmarkToMenu(HMENU menu, BookmarkItem *bookmarkItem, int position,
-	ItemIdMap &itemIdMap, BookmarkIconManager &bookmarkIconManager,
-	std::vector<wil::unique_hbitmap> &menuImages, ItemPositionMap *itemPositionMap)
+	BookmarkIconManager &bookmarkIconManager, std::vector<wil::unique_hbitmap> &menuImages,
+	MenuInfo &menuInfo)
 {
 	int id = m_idCounter++;
 
@@ -183,12 +177,9 @@ BOOL BookmarkMenuBuilder::AddBookmarkToMenu(HMENU menu, BookmarkItem *bookmarkIt
 
 	AddIconToMenuItem(menu, position, bookmarkItem, bookmarkIconManager, menuImages);
 
-	itemIdMap.insert({ id, bookmarkItem });
-
-	if (itemPositionMap)
-	{
-		itemPositionMap->insert({ { menu, position }, bookmarkItem });
-	}
+	menuInfo.itemIdMap.insert({ id, bookmarkItem });
+	menuInfo.itemPositionMap.insert(
+		{ { menu, position }, { bookmarkItem, MenuItemType::BookmarkItem } });
 
 	return res;
 }

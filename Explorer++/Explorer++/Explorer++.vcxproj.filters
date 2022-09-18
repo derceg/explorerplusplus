@@ -478,6 +478,9 @@
     <ClCompile Include="Bookmarks\UI\BookmarksToolbar.cpp">
       <Filter>Bookmarks\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Bookmarks\UI\BookmarkMenuDropTarget.cpp">
+      <Filter>Bookmarks\UI</Filter>
+    </ClCompile>
     <ClCompile Include="Bookmarks\UI\Views\BookmarksToolbarView.cpp">
       <Filter>Bookmarks\UI\Views</Filter>
     </ClCompile>
@@ -973,6 +976,9 @@
       <Filter>Drives Toolbar\UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="Bookmarks\UI\BookmarksToolbar.h">
+      <Filter>Bookmarks\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Bookmarks\UI\BookmarkMenuDropTarget.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>
     <ClInclude Include="Bookmarks\UI\Views\BookmarksToolbarView.h">

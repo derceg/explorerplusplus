@@ -334,14 +334,15 @@ BookmarkItem *GetBookmarkItemByIdResursive(BookmarkItem *bookmarkItem, std::wstr
 	return nullptr;
 }
 
-bool BookmarkHelper::IsAncestor(BookmarkItem *bookmarkItem, BookmarkItem *possibleAncestor)
+bool BookmarkHelper::IsAncestor(const BookmarkItem *bookmarkItem,
+	const BookmarkItem *possibleAncestor)
 {
 	if (bookmarkItem == possibleAncestor)
 	{
 		return true;
 	}
 
-	BookmarkItem *parent = bookmarkItem->GetParent();
+	const BookmarkItem *parent = bookmarkItem->GetParent();
 
 	if (!parent)
 	{

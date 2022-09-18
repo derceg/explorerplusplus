@@ -22,7 +22,7 @@ void BookmarkDropper::SetBlockDrop(bool blockDrop)
 	m_blockDrop = blockDrop;
 }
 
-DWORD BookmarkDropper::GetDropEffect(BookmarkItem *targetFolder, size_t index)
+DWORD BookmarkDropper::GetDropEffect(const BookmarkItem *targetFolder, size_t index)
 {
 	assert(targetFolder->IsFolder());
 
@@ -106,8 +106,8 @@ DWORD BookmarkDropper::PerformDrop(BookmarkItem *targetFolder, size_t index)
 	return finalEffect;
 }
 
-bool BookmarkDropper::CanDropBookmarkItemAtLocation(BookmarkItem *bookmarkItem,
-	BookmarkItem *targetFolder, size_t index)
+bool BookmarkDropper::CanDropBookmarkItemAtLocation(const BookmarkItem *bookmarkItem,
+	const BookmarkItem *targetFolder, size_t index)
 {
 	if (bookmarkItem->IsFolder() && BookmarkHelper::IsAncestor(targetFolder, bookmarkItem))
 	{

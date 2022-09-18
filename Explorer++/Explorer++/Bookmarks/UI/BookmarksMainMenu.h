@@ -25,13 +25,11 @@ public:
 private:
 	void OnMainMenuPreShow(HMENU mainMenu);
 	wil::unique_hmenu BuildMainBookmarksMenu(std::vector<wil::unique_hbitmap> &menuImages,
-		BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings);
+		BookmarkMenuBuilder::MenuInfo &menuInfo);
 	void AddBookmarkItemsToMenu(HMENU menu, const MenuIdRange &menuIdRange, int position,
-		std::vector<wil::unique_hbitmap> &menuImages,
-		BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings, int *maxMenuItemId);
+		std::vector<wil::unique_hbitmap> &menuImages, BookmarkMenuBuilder::MenuInfo &menuInfo);
 	void AddOtherBookmarksToMenu(HMENU menu, const MenuIdRange &menuIdRange, int position,
-		std::vector<wil::unique_hbitmap> &menuImages,
-		BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings);
+		std::vector<wil::unique_hbitmap> &menuImages, BookmarkMenuBuilder::MenuInfo &menuInfo);
 
 	CoreInterface *m_coreInterface;
 	BookmarkTree *m_bookmarkTree;
@@ -39,10 +37,8 @@ private:
 	BookmarkMenuBuilder m_menuBuilder;
 
 	wil::unique_hmenu m_bookmarksMenu;
-
 	std::vector<wil::unique_hbitmap> m_menuImages;
-
-	BookmarkMenuBuilder::ItemIdMap m_menuItemIdMappings;
+	BookmarkMenuBuilder::MenuInfo m_menuInfo;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

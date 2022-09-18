@@ -15,7 +15,7 @@ public:
 	BookmarkDropper(IDataObject *dataObject, BookmarkTree *bookmarkTree);
 
 	void SetBlockDrop(bool blockDrop);
-	DWORD GetDropEffect(BookmarkItem *targetFolder, size_t index);
+	DWORD GetDropEffect(const BookmarkItem *targetFolder, size_t index);
 	DWORD PerformDrop(BookmarkItem *targetFolder, size_t index);
 
 private:
@@ -31,8 +31,8 @@ private:
 		std::optional<ExtractionSource> extractionSource;
 	};
 
-	static bool CanDropBookmarkItemAtLocation(BookmarkItem *bookmarkItem,
-		BookmarkItem *targetFolder, size_t index);
+	static bool CanDropBookmarkItemAtLocation(const BookmarkItem *bookmarkItem,
+		const BookmarkItem *targetFolder, size_t index);
 	ExtractedInfo &GetExtractedInfo();
 	ExtractedInfo ExtractBookmarkItems();
 	BookmarkItems ExtractBookmarkItemsFromCustomFormat();

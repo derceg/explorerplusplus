@@ -13,10 +13,10 @@
 #include "../Helper/Controls.h"
 #include "../Helper/DataExchangeHelper.h"
 #include "../Helper/DragDropHelper.h"
+#include "../Helper/DropSourceImpl.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/iDataObject.h"
-#include "../Helper/iDropSource.h"
 #include <wil/com.h>
 #include <wil/common.h>
 #include <wil/resource.h>
@@ -257,13 +257,7 @@ void AddressBar::OnBeginDrag()
 		return;
 	}
 
-	wil::com_ptr_nothrow<IDropSource> dropSource;
-	hr = CreateDropSource(&dropSource);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
+	auto dropSource = winrt::make_self<DropSourceImpl>();
 
 	POINT pt = { 0, 0 };
 	dragSourceHelper->InitializeFromWindow(m_hwnd, &pt, pDataObject.get());

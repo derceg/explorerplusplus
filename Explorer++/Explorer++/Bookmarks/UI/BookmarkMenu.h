@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include "Bookmarks/BookmarkItem.h"
 #include "Bookmarks/UI/BookmarkContextMenu.h"
 #include "Bookmarks/UI/BookmarkMenuBuilder.h"
 #include "Bookmarks/UI/BookmarkMenuController.h"
 #include "../Helper/WindowSubclassWrapper.h"
-#include <functional>
+#include <winrt/base.h>
 
+class BookmarkItem;
 class BookmarkTree;
 class CoreInterface;
 class IconFetcher;
@@ -36,6 +36,9 @@ private:
 		LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+	LRESULT OnMenuDrag(HMENU menu, int itemPosition);
+	LRESULT OnMenuGetObject(MENUGETOBJECTINFO *objectInfo);
+
 	void OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt);
 	void OnMenuItemSelected(int menuItemId, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings);
 
@@ -44,8 +47,11 @@ private:
 	BookmarkContextMenu m_bookmarkContextMenu;
 	BookmarkMenuController m_controller;
 
-	bool m_showingMenu;
-	BookmarkMenuBuilder::ItemPositionMap *m_menuItemPositionMappings;
+	BookmarkTree *m_bookmarkTree = nullptr;
+
+	bool m_showingMenu = false;
+	BookmarkMenuBuilder::MenuInfo *m_menuInfo = nullptr;
+	winrt::com_ptr<IDropTarget> m_dropTarget;
 
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 };

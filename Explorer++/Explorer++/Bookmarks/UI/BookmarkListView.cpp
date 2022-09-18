@@ -15,12 +15,12 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/DropSourceImpl.h"
 #include "../Helper/HeaderHelper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
-#include "../Helper/iDropSource.h"
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/adaptor/indexed.hpp>
 #include <utility>
@@ -823,13 +823,7 @@ void BookmarkListView::OnKeyDown(const NMLVKEYDOWN *keyDown)
 
 void BookmarkListView::OnBeginDrag()
 {
-	wil::com_ptr_nothrow<IDropSource> dropSource;
-	HRESULT hr = CreateDropSource(&dropSource);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
+	auto dropSource = winrt::make_self<DropSourceImpl>();
 
 	auto rawBookmarkItems = GetSelectedBookmarkItems();
 
@@ -849,7 +843,7 @@ void BookmarkListView::OnBeginDrag()
 	auto dataObject = BookmarkDataExchange::CreateDataObject(bookmarkItems);
 
 	wil::com_ptr_nothrow<IDragSourceHelper> dragSourceHelper;
-	hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_ALL,
+	HRESULT hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_ALL,
 		IID_PPV_ARGS(&dragSourceHelper));
 
 	if (SUCCEEDED(hr))

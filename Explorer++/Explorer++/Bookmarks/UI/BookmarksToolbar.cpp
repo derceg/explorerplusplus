@@ -16,9 +16,9 @@
 #include "Navigation.h"
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/DropSourceImpl.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
-#include "../Helper/iDropSource.h"
 #include <wil/com.h>
 #include <format>
 
@@ -424,13 +424,7 @@ void BookmarksToolbar::OnButtonDragStarted(const BookmarkItem *bookmarkItem)
 		return;
 	}
 
-	wil::com_ptr_nothrow<IDropSource> dropSource;
-	hr = CreateDropSource(&dropSource);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
+	auto dropSource = winrt::make_self<DropSourceImpl>();
 
 	auto &ownedPtr = bookmarkItem->GetParent()->GetChildOwnedPtr(bookmarkItem);
 	auto dataObject = BookmarkDataExchange::CreateDataObject({ ownedPtr });
