@@ -149,6 +149,7 @@ public:
 	bool IsButtonVisible(size_t index) const;
 	RECT GetButtonRect(size_t index) const;
 	size_t FindNextButtonIndex(const POINT &ptClient) const;
+	void SetHotItem(size_t index);
 
 	boost::signals2::connection AddToolbarUpdatedObserver(
 		const ToolbarUpdatedSignal::slot_type &observer);

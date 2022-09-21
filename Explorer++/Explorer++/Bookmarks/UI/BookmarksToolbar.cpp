@@ -415,6 +415,11 @@ void BookmarksToolbar::OnWindowDestroyed()
 
 void BookmarksToolbar::OnButtonDragStarted(const BookmarkItem *bookmarkItem)
 {
+	auto dropSource = winrt::make_self<DropSourceImpl>();
+
+	auto &ownedPtr = bookmarkItem->GetParent()->GetChildOwnedPtr(bookmarkItem);
+	auto dataObject = BookmarkDataExchange::CreateDataObject({ ownedPtr });
+
 	wil::com_ptr_nothrow<IDragSourceHelper> dragSourceHelper;
 	HRESULT hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_ALL,
 		IID_PPV_ARGS(&dragSourceHelper));
@@ -424,10 +429,19 @@ void BookmarksToolbar::OnButtonDragStarted(const BookmarkItem *bookmarkItem)
 		return;
 	}
 
-	auto dropSource = winrt::make_self<DropSourceImpl>();
+	// The image the toolbar generates below will be based on the hot item (i.e. whichever item the
+	// cursor is over). That's an issue, as the drag is only started once the cursor has moved a
+	// certain amount. By the time the cursor has moved enough to start a drag, it might be over
+	// another toolbar item or not over the toolbar at all. The drag image would then either include
+	// the wrong button, or no button at all (a default empty image would be used instead).
+	// Setting the hot item here ensures the correct button is shown in the drag image in both of
+	// those cases.
+	m_view->SetHotItem(bookmarkItem->GetParent()->GetChildIndex(bookmarkItem));
 
-	auto &ownedPtr = bookmarkItem->GetParent()->GetChildOwnedPtr(bookmarkItem);
-	auto dataObject = BookmarkDataExchange::CreateDataObject({ ownedPtr });
+	// The toolbar control has built-in handling for the DI_GETDRAGIMAGE message, so it will
+	// generate the appropriate image, based on the hot item and current cursor position (the offset
+	// parameter provided to the function below is ignored).
+	dragSourceHelper->InitializeFromWindow(m_view->GetHWND(), nullptr, dataObject.get());
 
 	DWORD effect;
 	DoDragDrop(dataObject.get(), dropSource.get(), DROPEFFECT_MOVE, &effect);

@@ -578,6 +578,11 @@ size_t ToolbarView::FindNextButtonIndex(const POINT &ptClient) const
 	return nextIndex;
 }
 
+void ToolbarView::SetHotItem(size_t index)
+{
+	SendMessage(m_hwnd, TB_SETHOTITEM, index, 0);
+}
+
 boost::signals2::connection ToolbarView::AddToolbarUpdatedObserver(
 	const ToolbarUpdatedSignal::slot_type &observer)
 {
