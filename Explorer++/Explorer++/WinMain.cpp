@@ -225,16 +225,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 					if (bControlPanelChild)
 					{
-						TCHAR szExplorerPath[MAX_PATH];
+						auto explorerPath =
+							ExpandEnvironmentStringsWrapper(_T("%windir%\\explorer.exe"));
 
-						MyExpandEnvironmentStrings(_T("%windir%\\explorer.exe"), szExplorerPath,
-							SIZEOF_ARRAY(szExplorerPath));
-
-						/* This is a child of the control panel,
-						so send it to Windows Explorer to open
-						directly. */
-						ShellExecute(nullptr, _T("open"), szExplorerPath, itr->c_str(), nullptr,
-							SW_SHOWNORMAL);
+						if (explorerPath)
+						{
+							/* This is a child of the control panel,
+							so send it to Windows Explorer to open
+							directly. */
+							ShellExecute(nullptr, _T("open"), explorerPath->c_str(), itr->c_str(),
+								nullptr, SW_SHOWNORMAL);
+						}
 
 						itr = commandLineSettings.directories.erase(itr);
 					}

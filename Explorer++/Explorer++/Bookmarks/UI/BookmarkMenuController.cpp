@@ -4,15 +4,18 @@
 
 #include "stdafx.h"
 #include "Bookmarks/UI/BookmarkMenuController.h"
+#include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkItem.h"
-#include "Navigation.h"
 
-BookmarkMenuController::BookmarkMenuController(Navigation *navigation) : m_navigation(navigation)
+BookmarkMenuController::BookmarkMenuController(CoreInterface *coreInterface) :
+	m_coreInterface(coreInterface)
 {
 }
 
 void BookmarkMenuController::OnBookmarkMenuItemSelected(const BookmarkItem *bookmarkItem)
 {
 	assert(bookmarkItem->IsBookmark());
-	m_navigation->BrowseFolderInCurrentTab(bookmarkItem->GetLocation().c_str());
+
+	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, m_coreInterface,
+		OpenFolderDisposition::CurrentTab);
 }

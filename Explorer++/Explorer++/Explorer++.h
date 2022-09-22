@@ -437,7 +437,8 @@ private:
 	void OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
 	void OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters) override;
-	OpenFolderDisposition DetermineOpenDisposition(bool isCtrlKeyDown, bool isShiftKeyDown);
+	OpenFolderDisposition DetermineOpenDisposition(bool isMiddleButtonDown, bool isCtrlKeyDown,
+		bool isShiftKeyDown) override;
 
 	// FileContextMenuHandler
 	void UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
@@ -479,10 +480,6 @@ private:
 
 	/* Columns. */
 	void CopyColumnInfoToClipboard();
-
-	/* Bookmark handling. */
-	void ExpandAndBrowsePath(const TCHAR *szPath);
-	void ExpandAndBrowsePath(const TCHAR *szPath, BOOL bOpenInNewTab, BOOL bSwitchToNewTab);
 
 	/* IExplorerplusplus methods. */
 	const Config *GetConfig() const override;
@@ -560,7 +557,7 @@ private:
 	bool m_bAttemptToolbarRestore;
 	bool m_bLanguageLoaded;
 	bool m_bShowTabBar;
-	int m_iLastSelectedTab;
+	int m_iLastSelectedTab = 0;
 	ULONG m_SHChangeNotifyID;
 	ValueWrapper<bool> m_InitializationFinished;
 

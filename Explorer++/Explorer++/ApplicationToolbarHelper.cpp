@@ -63,12 +63,16 @@ ApplicationInfo ParseCommandString(const std::wstring &command)
 	std::wstring trimmedApplication = trimmedCommand.substr(applicationStart, applicationLength);
 	boost::trim(trimmedApplication);
 
-	TCHAR expandedApplicationPath[MAX_PATH];
-	MyExpandEnvironmentStrings(trimmedApplication.c_str(), expandedApplicationPath,
-		SIZEOF_ARRAY(expandedApplicationPath));
+	std::wstring finalApplicationPath = trimmedApplication;
+	auto expandedApplicationPath = ExpandEnvironmentStringsWrapper(finalApplicationPath);
+
+	if (expandedApplicationPath)
+	{
+		finalApplicationPath = *expandedApplicationPath;
+	}
 
 	ApplicationInfo applicationInfo;
-	applicationInfo.application = expandedApplicationPath;
+	applicationInfo.application = finalApplicationPath;
 
 	if (applicationEnd != std::wstring::npos)
 	{

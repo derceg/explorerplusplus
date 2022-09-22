@@ -534,8 +534,10 @@ void BookmarkListView::OnDblClk(const NMITEMACTIVATE *itemActivate)
 	}
 	else
 	{
-		BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_coreInterface,
-			m_coreInterface->GetConfig()->openTabsInForeground);
+		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, m_coreInterface,
+			m_coreInterface->GetConfig()->openTabsInForeground
+				? OpenFolderDisposition::ForegroundTab
+				: OpenFolderDisposition::BackgroundTab);
 	}
 }
 
@@ -892,13 +894,16 @@ void BookmarkListView::OnEnterPressed()
 	}
 	else
 	{
-		bool switchToNewTab = m_coreInterface->GetConfig()->openTabsInForeground;
+		OpenFolderDisposition disposition = m_coreInterface->GetConfig()->openTabsInForeground
+			? OpenFolderDisposition::ForegroundTab
+			: OpenFolderDisposition::BackgroundTab;
 
 		for (BookmarkItem *bookmarkItem : bookmarkItems)
 		{
-			BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_coreInterface, switchToNewTab);
+			BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, m_coreInterface,
+				disposition);
 
-			switchToNewTab = false;
+			disposition = OpenFolderDisposition::BackgroundTab;
 		}
 	}
 }

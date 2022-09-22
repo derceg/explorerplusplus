@@ -271,16 +271,12 @@ void Explorerplusplus::OnResolveLink()
 			StringCchCopy(szPath, SIZEOF_ARRAY(szPath), szFullFileName);
 			PathRemoveFileSpec(szPath);
 
-			int newTabId;
-			m_tabContainer->CreateNewTab(szPath, TabSettings(_selected = true), nullptr, nullptr,
-				&newTabId);
+			Tab &newTab = m_tabContainer->CreateNewTab(szPath, TabSettings(_selected = true));
 
-			Tab &tab = m_tabContainer->GetTab(newTabId);
-
-			if (tab.GetShellBrowser()->GetDirectory() == szPath)
+			if (newTab.GetShellBrowser()->GetDirectory() == szPath)
 			{
 				wil::com_ptr_nothrow<IShellFolder> parent;
-				hr = SHBindToObject(nullptr, tab.GetShellBrowser()->GetDirectoryIdl().get(),
+				hr = SHBindToObject(nullptr, newTab.GetShellBrowser()->GetDirectoryIdl().get(),
 					nullptr, IID_PPV_ARGS(&parent));
 
 				if (hr == S_OK)

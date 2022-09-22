@@ -537,7 +537,6 @@
     <ClCompile Include="ShellTreeView\ShellTreeView.cpp" />
     <ClCompile Include="ShellView.cpp" />
     <ClCompile Include="SortMenuBuilder.cpp" />
-    <ClCompile Include="Bookmarks\BookmarkHandler.cpp" />
     <ClCompile Include="Bookmarks\BookmarkHelper.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkListView.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkMenu.cpp" />

@@ -242,21 +242,6 @@ void PreprocessDirectories(std::vector<std::wstring> &directories)
 			directory[directory.size() - 1] = '\\';
 		}
 	}
-
-	TCHAR processImageName[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), processImageName, SIZEOF_ARRAY(processImageName));
-
-	std::filesystem::path processDirectoryPath(processImageName);
-	processDirectoryPath.remove_filename();
-
-	for (std::wstring &directory : directories)
-	{
-		TCHAR szParsingPath[MAX_PATH];
-		DecodePath(directory.c_str(), processDirectoryPath.wstring().c_str(), szParsingPath,
-			SIZEOF_ARRAY(szParsingPath));
-
-		directory = szParsingPath;
-	}
 }
 
 std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(const CLI::App &app,

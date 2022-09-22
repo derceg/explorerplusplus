@@ -69,6 +69,9 @@
     <ClCompile Include="RegistryStorageHelper.cpp">
       <Filter>Storage</Filter>
     </ClCompile>
+    <ClCompile Include="ShellHelperTest.cpp">
+      <Filter>Helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

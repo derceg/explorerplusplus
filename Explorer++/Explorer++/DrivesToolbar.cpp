@@ -169,7 +169,7 @@ void DrivesToolbar::OnButtonMiddleClicked(const std::wstring &drivePath, const M
 		switchToNewTab = !switchToNewTab;
 	}
 
-	m_coreInterface->GetTabContainer()->CreateNewTab(drivePath.c_str(),
+	m_coreInterface->GetTabContainer()->CreateNewTab(drivePath,
 		TabSettings(_selected = switchToNewTab));
 }
 

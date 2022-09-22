@@ -76,6 +76,8 @@ public:
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) = 0;
 	virtual void OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) = 0;
+	virtual OpenFolderDisposition DetermineOpenDisposition(bool isMiddleButtonDown,
+		bool isCtrlKeyDown, bool isShiftKeyDown) = 0;
 
 	virtual StatusBar *GetStatusBar() = 0;
 

@@ -11,9 +11,14 @@
 #include "StringHelper.h"
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/algorithm/string/trim.hpp>
 #include <boost/container_hash/hash.hpp>
 #include <wil/com.h>
 #include <propkey.h>
+
+std::optional<std::wstring> TransformUserEnteredPathToAbsolutePath(
+	const std::wstring &userEnteredPath, const std::wstring &currentDirectory,
+	EnvVarsExpansion envVarsExpansionType);
 
 bool AddJumpListTasksInternal(IObjectCollection *objectCollection,
 	const std::list<JumpListTaskInformation> &taskList);
@@ -379,101 +384,6 @@ int GetDefaultIcon(DefaultIconType defaultIconType)
 	return shfi.iIcon;
 }
 
-BOOL MyExpandEnvironmentStrings(const TCHAR *szSrc, TCHAR *szExpandedPath, DWORD nSize)
-{
-	HANDLE hProcess;
-	HANDLE hToken;
-	BOOL bRet = FALSE;
-
-	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, GetCurrentProcessId());
-
-	if (hProcess != nullptr)
-	{
-		bRet = OpenProcessToken(hProcess, TOKEN_IMPERSONATE | TOKEN_QUERY, &hToken);
-
-		if (bRet)
-		{
-			bRet = ExpandEnvironmentStringsForUser(hToken, szSrc, szExpandedPath, nSize);
-
-			CloseHandle(hToken);
-		}
-
-		CloseHandle(hProcess);
-	}
-
-	return bRet;
-}
-
-DWORD DetermineDragEffect(DWORD grfKeyState, DWORD dwCurrentEffect, BOOL bDataAccept,
-	BOOL bOnSameDrive)
-{
-	DWORD dwEffect = DROPEFFECT_NONE;
-
-	if (!bDataAccept)
-	{
-		dwEffect = DROPEFFECT_NONE;
-	}
-	else
-	{
-		/* Test the state of modifier keys. */
-		if ((((grfKeyState & MK_CONTROL) == MK_CONTROL && (grfKeyState & MK_SHIFT) == MK_SHIFT)
-				|| (grfKeyState & MK_ALT) == MK_ALT)
-			&& dwCurrentEffect & DROPEFFECT_LINK)
-		{
-			/* Shortcut. */
-			dwEffect = DROPEFFECT_LINK;
-		}
-		else if ((grfKeyState & MK_SHIFT) == MK_SHIFT && dwCurrentEffect & DROPEFFECT_MOVE)
-		{
-			/* Move. */
-			dwEffect = DROPEFFECT_MOVE;
-		}
-		else if ((grfKeyState & MK_CONTROL) == MK_CONTROL && dwCurrentEffect & DROPEFFECT_COPY)
-		{
-			/* Copy. */
-			dwEffect = DROPEFFECT_COPY;
-		}
-		else
-		{
-			/* No modifier. Determine the drag effect from
-			the location of the source and destination
-			directories. */
-			if (bOnSameDrive && (dwCurrentEffect & DROPEFFECT_MOVE))
-			{
-				dwEffect = DROPEFFECT_MOVE;
-			}
-			else if (dwCurrentEffect & DROPEFFECT_COPY)
-			{
-				dwEffect = DROPEFFECT_COPY;
-			}
-
-			if (dwEffect == DROPEFFECT_NONE)
-			{
-				/* No suitable drop type found above. Use whichever
-				method is available. */
-				if (dwCurrentEffect & DROPEFFECT_MOVE)
-				{
-					dwEffect = DROPEFFECT_MOVE;
-				}
-				else if (dwCurrentEffect & DROPEFFECT_COPY)
-				{
-					dwEffect = DROPEFFECT_COPY;
-				}
-				else if (dwCurrentEffect & DROPEFFECT_LINK)
-				{
-					dwEffect = DROPEFFECT_LINK;
-				}
-				else
-				{
-					dwEffect = DROPEFFECT_NONE;
-				}
-			}
-		}
-	}
-
-	return dwEffect;
-}
-
 HRESULT BindToIdl(PCIDLIST_ABSOLUTE pidl, REFIID riid, void **ppv)
 {
 	IShellFolder *pDesktop = nullptr;
@@ -501,21 +411,6 @@ HRESULT GetUIObjectOf(IShellFolder *pShellFolder, HWND hwndOwner, UINT cidl,
 	PCUITEMID_CHILD_ARRAY apidl, REFIID riid, void **ppv)
 {
 	return pShellFolder->GetUIObjectOf(hwndOwner, cidl, apidl, riid, nullptr, ppv);
-}
-
-HRESULT GetShellItemDetailsEx(IShellFolder2 *pShellFolder, const SHCOLUMNID *pscid,
-	PCUITEMID_CHILD pidl, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate)
-{
-	VARIANT vt;
-	HRESULT hr = pShellFolder->GetDetailsEx(pidl, pscid, &vt);
-
-	if (SUCCEEDED(hr))
-	{
-		hr = ConvertVariantToString(&vt, szDetail, cchMax, friendlyDate);
-		VariantClear(&vt);
-	}
-
-	return hr;
 }
 
 HRESULT ConvertVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate)
@@ -639,30 +534,6 @@ HRESULT ConvertGenericVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t
 	return hr;
 }
 
-HRESULT GetDateDetailsEx(IShellFolder2 *shellFolder2, PCITEMID_CHILD pidlChild,
-	const SHCOLUMNID *column, FILETIME &filetime)
-{
-	VARIANT dateVariant;
-	HRESULT hr = shellFolder2->GetDetailsEx(pidlChild, column, &dateVariant);
-
-	if (FAILED(hr))
-	{
-		return hr;
-	}
-
-	FILETIME date;
-	hr = VariantToFileTime(dateVariant, PSTF_UTC, &date);
-
-	if (FAILED(hr))
-	{
-		return hr;
-	}
-
-	filetime = date;
-
-	return hr;
-}
-
 BOOL GetBooleanVariant(IShellFolder2 *shellFolder2, PCITEMID_CHILD pidlChild,
 	const SHCOLUMNID *column, BOOL defaultValue)
 {
@@ -698,7 +569,7 @@ std::optional<std::wstring> GetFolderPathForDisplay(PCIDLIST_ABSOLUTE pidl)
 		return std::nullopt;
 	}
 
-	if (IsPathGUID(parsingPath.c_str()))
+	if (IsPathGUID(parsingPath))
 	{
 		hr = GetDisplayName(pidl, SHGDN_INFOLDER, parsingPath);
 
@@ -711,117 +582,237 @@ std::optional<std::wstring> GetFolderPathForDisplay(PCIDLIST_ABSOLUTE pidl)
 	return parsingPath;
 }
 
-/* Returns TRUE if a path is a GUID;
-i.e. of the form:
-
-::{20D04FE0-3AEA-1069-A2D8-08002B30309D}
-(My Computer GUID, Windows 7)
-*/
-BOOL IsPathGUID(const TCHAR *szPath)
+// Returns true if a path is a GUID; i.e. of the form:
+//
+// ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}
+// (My Computer GUID, Windows 7)
+bool IsPathGUID(const std::wstring &path)
 {
-	if (szPath == nullptr)
-	{
-		return FALSE;
-	}
-
-	if (lstrlen(szPath) > 2)
-	{
-		if (szPath[0] == ':' && szPath[1] == ':')
-		{
-			return TRUE;
-		}
-	}
-
-	return FALSE;
+	return path.starts_with(L"::");
 }
 
-/*
-A path passed into this function may be one of the
-following:
- - A real path, either complete (e.g. C:\Windows), or
-   relative (e.g. \Windows)
- - A virtual Path (e.g. ::{21EC2020-3AEA-1069-A2DD-08002B30309D} - Control Panel)
- - A URL (e.g. http://www.google.com.au)
- - A real path that is either canonicalized (i.e. contains
-   "." or ".."), or contains embedded environments variables
-   (i.e. %systemroot%\system32)
-
-Basic procedure:
- 1. Check if the path is an identifier for a virtual folder
-   (e.g. ::{21EC2020-3AEA-1069-A2DD-08002B30309D}). If it is,
-   it is copied straight to the output. No additional checks are
-   performed to verify whether or not the path given actually
-   exists (i.e. "::{}" will be copied straight to the output
-   even though it's not a valid folder)
- 2. If it isn't, check if it's a friendly name for a virtual
-   folder (e.g. "my computer", "control panel", etc), else
- 3. The path is expanded (if possible)
- 4. Any special character sequences ("..", ".") are removed
- 5. If the path is a URL, pass it straight out, else
- 6. If the path is relative, add it onto onto the current directory
-*/
-void DecodePath(const TCHAR *szInitialPath, const TCHAR *szCurrentDirectory, TCHAR *szParsingPath,
-	size_t cchDest)
+// Note that this function doesn't currently support paths that cross from the file system to the
+// shell namespace. For example, the path "c:\..\" refers to the computer folder. That folder,
+// however, isn't part of the file system; instead it's part of the shell namespace.
+std::optional<std::wstring> TransformUserEnteredPathToAbsolutePathAndNormalize(
+	const std::wstring &userEnteredPath, const std::wstring &currentDirectory,
+	EnvVarsExpansion envVarsExpansionType)
 {
-	TCHAR szExpandedPath[MAX_PATH];
-	TCHAR szCanonicalPath[MAX_PATH];
-	HRESULT hr;
-	BOOL bRelative;
-	BOOL bRet;
+	auto absolutePath = TransformUserEnteredPathToAbsolutePath(userEnteredPath, currentDirectory,
+		envVarsExpansionType);
 
-	/* If the path starts with "::", then this is a GUID for
-	a particular folder. Copy it straight to the output. */
-	if (lstrlen(szInitialPath) >= 2 && szInitialPath[0] == ':' && szInitialPath[1] == ':')
+	if (!absolutePath)
 	{
-		StringCchCopy(szParsingPath, cchDest, szInitialPath);
+		return std::nullopt;
 	}
-	else
+
+	return PathCanonicalizeWrapper(*absolutePath);
+}
+
+std::optional<std::wstring> TransformUserEnteredPathToAbsolutePath(
+	const std::wstring &userEnteredPath, const std::wstring &currentDirectory,
+	EnvVarsExpansion envVarsExpansionType)
+{
+	std::wstring updatedPath = userEnteredPath;
+
+	// It's important environment variables are expanded first. A path like "%WINDIR%", for example,
+	// isn't absolute until it's expanded to "C:\WINDOWS".
+	if (envVarsExpansionType == EnvVarsExpansion::Expand)
 	{
-		std::wstring virtualParsingPath;
-		hr = DecodeFriendlyPath(szInitialPath, virtualParsingPath);
+		auto expandedPath = ExpandEnvironmentStringsWrapper(updatedPath);
 
-		if (SUCCEEDED(hr))
+		if (expandedPath)
 		{
-			StringCchCopy(szParsingPath, cchDest, virtualParsingPath.c_str());
-		}
-		else
-		{
-			/* Attempt to expand the path (in the event that
-			it contains embedded environment variables). */
-			bRet = MyExpandEnvironmentStrings(szInitialPath, szExpandedPath,
-				SIZEOF_ARRAY(szExpandedPath));
-
-			if (!bRet)
-			{
-				StringCchCopy(szExpandedPath, SIZEOF_ARRAY(szExpandedPath), szInitialPath);
-			}
-
-			/* Canonicalizing the path will remove any "." and
-			".." components. */
-			PathCanonicalize(szCanonicalPath, szExpandedPath);
-
-			if (PathIsURL(szCanonicalPath))
-			{
-				StringCchCopy(szParsingPath, cchDest, szCanonicalPath);
-			}
-			else
-			{
-				bRelative = PathIsRelative(szCanonicalPath);
-
-				/* If the path is relative, prepend it
-				with the current directory. */
-				if (bRelative)
-				{
-					StringCchCopy(szParsingPath, cchDest, szCurrentDirectory);
-					PathAppend(szParsingPath, szCanonicalPath);
-				}
-				else
-				{
-					StringCchCopy(szParsingPath, cchDest, szCanonicalPath);
-				}
-			}
+			updatedPath = *expandedPath;
 		}
 	}
+
+	// Trimming the path after expanding environment variables makes the most sense, since the
+	// environment variables may themselves contain trailing spaces.
+	boost::algorithm::trim_if(updatedPath,
+		[](wchar_t character)
+		{
+			// As documented in
+			// https://learn.microsoft.com/en-us/troubleshoot/windows-client/shell-experience/file-folder-name-whitespace-characters#summary,
+			// leading and trailing whitespace will be removed from a file/folder name when saved.
+			// In this context, only the ASCII space (0x20) counts as a whitespace character. So, it
+			// should be safe to trim ASCII space characters here, but not any other whitespace
+			// characters.
+			return character == '\u0020';
+		});
+
+	if (updatedPath.empty())
+	{
+		return std::nullopt;
+	}
+
+	if (IsPathGUID(updatedPath) || !PathIsRelative(updatedPath.c_str()))
+	{
+		// Absolute paths can be returned unmodified, except for the case where a root path like
+		// "\directory" is specified. In that case, the path is actually relative to the root of the
+		// current directory.
+		return MaybeTransformRootPathToAbsolutePath(updatedPath, currentDirectory);
+	}
+
+	return PathAppendWrapper(currentDirectory, updatedPath);
+}
+
+std::optional<std::wstring> ExpandEnvironmentStringsWrapper(const std::wstring &sourceString)
+{
+	auto length = ExpandEnvironmentStrings(sourceString.c_str(), nullptr, 0);
+
+	if (length == 0)
+	{
+		return std::nullopt;
+	}
+
+	std::wstring expandedString;
+	expandedString.resize(length);
+
+	length = ExpandEnvironmentStrings(sourceString.c_str(), expandedString.data(), length);
+
+	if (length == 0)
+	{
+		return std::nullopt;
+	}
+
+	// length includes the terminating NULL character, which shouldn't be included in the actual
+	// string.
+	expandedString.resize(length - 1);
+
+	return expandedString;
+}
+
+// Transforms a path of the form "\directory" (referred to in the documentation as an absolute path,
+// but here as a root path, since it's relative to the root of the current directory) into a full
+// path (e.g. "c:\directory"). If the supplied path isn't in that form, it will simply be returned
+// without modification.
+std::optional<std::wstring> MaybeTransformRootPathToAbsolutePath(const std::wstring path,
+	const std::wstring &currentDirectory)
+{
+	// As described in
+	// https://learn.microsoft.com/en-au/windows/win32/fileio/naming-a-file#fully-qualified-vs-relative-paths,
+	// a path like "\directory" is an absolute path. It refers to an item under the root of the
+	// current directory. For example, with the following:
+	//
+	// Current directory: c:\users\public
+	// Path: \windows
+	//
+	// The resulting path should be "c:\windows".
+	if ((path.size() == 1 && path[0] == '\\')
+		|| (path.size() >= 2 && path[0] == '\\' && path[1] != '\\'))
+	{
+		auto root = PathStripToRootWrapper(currentDirectory);
+
+		if (!root)
+		{
+			return std::nullopt;
+		}
+
+		if (!root->ends_with('\\'))
+		{
+			*root += '\\';
+		}
+
+		return *root + path.substr(1);
+	}
+
+	return path;
+}
+
+std::optional<std::wstring> PathCanonicalizeWrapper(const std::wstring &path)
+{
+	// The input path passed to PathCanonicalize can't be longer than MAX_PATH.
+	if (path.size() >= MAX_PATH)
+	{
+		return std::nullopt;
+	}
+
+	// Ideally, it would be better to use std::filesystem to normalize the path, but that has some
+	// unusual behavior in how it treats paths that use the long path prefix (also see
+	// https://github.com/microsoft/STL/issues/2256). For example:
+	//
+	// std::filesystem::path("\\\\?\\c:\\..\\").lexically_normal() == "\\\\?\\"
+	//
+	// whereas PathCanonicalize produces "c:\\".
+	// TODO: If supporting only Windows 8 and above, it would make more sense to use
+	// PathCchCanonicalize or PathCchCanonicalizeEx.
+	TCHAR normalizedPath[MAX_PATH];
+	BOOL res = PathCanonicalize(normalizedPath, path.c_str());
+
+	if (!res)
+	{
+		return std::nullopt;
+	}
+
+	return normalizedPath;
+}
+
+std::optional<std::wstring> PathAppendWrapper(const std::wstring &path,
+	const std::wstring &pathToAppend)
+{
+	if (path.size() >= MAX_PATH || pathToAppend.size() >= MAX_PATH)
+	{
+		return std::nullopt;
+	}
+
+	TCHAR finalPath[MAX_PATH];
+	StringCchCopy(finalPath, SIZEOF_ARRAY(finalPath), path.c_str());
+	BOOL res = PathAppend(finalPath, pathToAppend.c_str());
+
+	if (!res)
+	{
+		return std::nullopt;
+	}
+
+	return finalPath;
+}
+
+std::optional<std::wstring> PathStripToRootWrapper(const std::wstring &path)
+{
+	if (path.size() >= MAX_PATH)
+	{
+		return std::nullopt;
+	}
+
+	TCHAR root[MAX_PATH];
+	StringCchCopy(root, SIZEOF_ARRAY(root), path.c_str());
+	BOOL res = PathStripToRoot(root);
+
+	if (!res)
+	{
+		return std::nullopt;
+	}
+
+	return root;
+}
+
+std::optional<std::wstring> GetCurrentDirectoryWrapper()
+{
+	auto length = GetCurrentDirectory(0, nullptr);
+
+	if (length == 0)
+	{
+		return std::nullopt;
+	}
+
+	std::wstring currentDirectory;
+	currentDirectory.resize(length);
+
+	length = GetCurrentDirectory(length, currentDirectory.data());
+
+	if (length == 0)
+	{
+		return std::nullopt;
+	}
+
+	// When requesting the length of the buffer, the return value includes the terminating NULL
+	// character. When the function succeeds, the return value doesn't include the terminating NULL
+	// character. So, resizing to length here simply excludes the terminating NULL character from
+	// the string.
+	currentDirectory.resize(length);
+
+	return currentDirectory;
 }
 
 BOOL ArePidlsEquivalent(PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2)

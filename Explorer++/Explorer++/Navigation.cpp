@@ -27,13 +27,13 @@ void Navigation::OnNavigateUp()
 	unique_pidl_absolute directory = tab.GetShellBrowser()->GetDirectoryIdl();
 
 	HRESULT hr = E_FAIL;
-	int resultingTabId = -1;
+	Tab *resultingTab = nullptr;
 
 	if (tab.GetLockState() != Tab::LockState::AddressLocked)
 	{
 		hr = tab.GetShellBrowser()->GetNavigationController()->GoUp();
 
-		resultingTabId = tab.GetId();
+		resultingTab = &tab;
 	}
 	else
 	{
@@ -43,15 +43,16 @@ void Navigation::OnNavigateUp()
 
 		if (SUCCEEDED(hr))
 		{
-			m_tabContainer->CreateNewTab(pidlParent.get(), TabSettings(_selected = true), nullptr,
-				nullptr, &resultingTabId);
+			Tab &newTab =
+				m_tabContainer->CreateNewTab(pidlParent.get(), TabSettings(_selected = true));
+
+			resultingTab = &newTab;
 		}
 	}
 
 	if (SUCCEEDED(hr))
 	{
-		const Tab &resultingTab = m_tabContainer->GetTab(resultingTabId);
-		resultingTab.GetShellBrowser()->SelectItems({ directory.get() });
+		resultingTab->GetShellBrowser()->SelectItems({ directory.get() });
 	}
 }
 

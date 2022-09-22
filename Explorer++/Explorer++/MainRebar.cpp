@@ -438,7 +438,7 @@ void Explorerplusplus::CreateBookmarksToolbar()
 {
 	auto bookmarksToolbarView = new BookmarksToolbarView(m_hMainRebar);
 
-	m_bookmarksToolbar = BookmarksToolbar::Create(bookmarksToolbarView, this, m_navigation.get(),
+	m_bookmarksToolbar = BookmarksToolbar::Create(bookmarksToolbarView, this,
 		&m_bookmarkIconFetcher, &m_bookmarkTree);
 	m_bookmarksToolbar->GetView()->AddToolbarUpdatedObserver(std::bind_front(
 		&Explorerplusplus::OnRebarToolbarUpdated, this, m_bookmarksToolbar->GetView()->GetHWND()));

@@ -138,60 +138,58 @@ void Explorerplusplus::OnNewTab()
 
 HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 {
-	TCHAR szDirectory[MAX_PATH];
-	int nTabsCreated = 0;
+	// It's implicitly assumed that this will succeed. Although the documentation states that
+	// GetCurrentDirectory() can fail, I'm not sure under what circumstances it ever would.
+	// Also note that it's important that this is called before creating any tabs, as
+	// SetCurrentDirectory() is currently called when navigating/switching to a tab.
+	auto currentDirectory = GetCurrentDirectoryWrapper();
 
-	if (!m_commandLineSettings.directories.empty())
+	if (m_config->startupMode == StartupMode::PreviousTabs)
 	{
-		for (const auto &strDirectory : m_commandLineSettings.directories)
-		{
-			StringCchCopy(szDirectory, SIZEOF_ARRAY(szDirectory), strDirectory.c_str());
+		pLoadSave->LoadPreviousTabs();
 
-			if (lstrcmp(strDirectory.c_str(), _T("..")) == 0)
-			{
-				/* Get the parent of the current directory,
-				and browse to it. */
-				GetCurrentDirectory(SIZEOF_ARRAY(szDirectory), szDirectory);
-				PathRemoveFileSpec(szDirectory);
-			}
-			else if (lstrcmp(strDirectory.c_str(), _T(".")) == 0)
-			{
-				GetCurrentDirectory(SIZEOF_ARRAY(szDirectory), szDirectory);
-			}
-
-			m_tabContainer->CreateNewTab(szDirectory, TabSettings(_selected = true));
-			nTabsCreated++;
-		}
-	}
-	else
-	{
-		if (m_config->startupMode == StartupMode::PreviousTabs)
+		// It's possible that the above call might not have loaded any tabs (e.g. because there are
+		// no saved settings). So, it's important that tab selection is only set when the last
+		// selected tab value is in the appropriate range.
+		if (m_iLastSelectedTab >= 0 && m_iLastSelectedTab < m_tabContainer->GetNumTabs())
 		{
-			nTabsCreated = pLoadSave->LoadPreviousTabs();
+			m_tabContainer->SelectTabAtIndex(m_iLastSelectedTab);
 		}
 	}
 
-	if (nTabsCreated == 0)
+	for (const auto &directory : m_commandLineSettings.directories)
+	{
+		// Windows Explorer doesn't expand environment variables passed in on the command line. The
+		// command-line interpreter that's being used can expand variables - for example, running:
+		//
+		// explorer.exe %windir%
+		//
+		// from cmd.exe will result in %windir% being expanded before being passed to explorer.exe.
+		// But if explorer.exe is launched with the string %windir% passed as a parameter, no
+		// expansion will occur.
+		// Therefore, no expansion is performed here either.
+		// One difference from Explorer is that paths here are trimmed, which means that passing
+		// "  C:\Windows  " will result in "C:\Windows" being opened.
+		auto absolutePath = TransformUserEnteredPathToAbsolutePathAndNormalize(directory,
+			currentDirectory.value(), EnvVarsExpansion::DontExpand);
+
+		if (!absolutePath)
+		{
+			continue;
+		}
+
+		m_tabContainer->CreateNewTab(*absolutePath, TabSettings(_selected = true));
+	}
+
+	if (m_tabContainer->GetNumTabs() == 0)
 	{
 		m_tabContainer->CreateNewTabInDefaultDirectory(TabSettings(_selected = true));
-		nTabsCreated++;
 	}
 
-	if (!m_config->alwaysShowTabBar.get() && nTabsCreated == 1)
+	if (!m_config->alwaysShowTabBar.get() && m_tabContainer->GetNumTabs() == 1)
 	{
 		m_bShowTabBar = false;
 	}
-
-	/* m_iLastSelectedTab is the tab that was selected when the
-	program was last closed. */
-	if (m_iLastSelectedTab >= m_tabContainer->GetNumTabs() || m_iLastSelectedTab < 0)
-	{
-		m_iLastSelectedTab = 0;
-	}
-
-	/* Set the focus back to the tab that had the focus when the program
-	was last closed. */
-	m_tabContainer->SelectTabAtIndex(m_iLastSelectedTab);
 
 	return S_OK;
 }

@@ -184,33 +184,35 @@ LRESULT CALLBACK AddressBar::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-/* Called when the user presses 'Enter' while
-the address bar has focus, or when the 'Go'
-toolbar button to the right of the address
-bar is pressed.
-
-The path entered may be relative to the current
-directory, or absolute.
-Basic procedure:
-1. Path is expanded (if possible)
-2. Any special character sequences ("..", ".") are removed
-3. If the path is a URL, pass it straight out, else
-4. If the path is relative, add it onto onto the current directory
-*/
 void AddressBar::OnGo()
 {
-	/* Retrieve the combobox text, and determine if it is a
-	valid path. */
 	std::wstring path = GetWindowString(m_hwnd);
 
 	const Tab &selectedTab = m_coreInterface->GetTabContainer()->GetSelectedTab();
 	std::wstring currentDirectory = selectedTab.GetShellBrowser()->GetDirectory();
 
-	TCHAR szFullFilePath[MAX_PATH];
-	DecodePath(path.c_str(), currentDirectory.c_str(), szFullFilePath,
-		SIZEOF_ARRAY(szFullFilePath));
+	// When entering a path in the address bar in Windows Explorer, environment variables will be
+	// expanded. The behavior here is designed to match that.
+	// Note that this does result in potential ambiguity. '%' is a valid character in a filename.
+	// That means, for example, it's valid to have a file or folder called %windir%. In cases like
+	// that, entering the text %windir% would be ambiguous - the path could refer either to the
+	// file/folder or environment variable. Explorer treats it as an environment variable, which is
+	// also the behavior here.
+	// Additionally, it appears that Explorer doesn't normalize "." in paths (though ".." is
+	// normalized). For example, entering "c:\windows\.\" results in an error. Whereas here, the
+	// path is normalized before navigation, meaning entering "c:\windows\.\" will result in a
+	// navigation to "c:\windows". That also means that entering the relative path ".\" works as
+	// expected.
+	auto absolutePath = TransformUserEnteredPathToAbsolutePathAndNormalize(path, currentDirectory,
+		EnvVarsExpansion::Expand);
 
-	m_coreInterface->OpenItem(szFullFilePath);
+	if (!absolutePath)
+	{
+		// TODO: Should possibly display an error here (perhaps in the status bar).
+		return;
+	}
+
+	m_coreInterface->OpenItem(absolutePath->c_str());
 }
 
 void AddressBar::OnBeginDrag()

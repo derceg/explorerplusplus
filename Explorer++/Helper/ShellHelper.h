@@ -10,6 +10,7 @@
 #include <exdisp.h>
 #include <list>
 #include <optional>
+#include <string>
 #include <vector>
 
 #define CONTROL_PANEL_CATEGORY_VIEW _T("::{26EE0668-A00A-44D7-9371-BEB064C98683}")
@@ -31,6 +32,12 @@ enum class DefaultIconType
 {
 	Folder,
 	File
+};
+
+enum class EnvVarsExpansion
+{
+	Expand,
+	DontExpand
 };
 
 struct JumpListTaskInformation
@@ -55,8 +62,6 @@ using unique_pidl_child = wil::unique_cotaskmem_ptr<std::remove_pointer_t<PITEMI
 using unique_shell_window_cookie = wil::unique_com_token<IShellWindows, long,
 	decltype(&IShellWindows::Revoke), &IShellWindows::Revoke>;
 
-void DecodePath(const TCHAR *szInitialPath, const TCHAR *szCurrentDirectory, TCHAR *szParsingPath,
-	size_t cchDest);
 HRESULT GetDisplayName(const std::wstring &parsingPath, DWORD flags, std::wstring &output);
 HRESULT GetDisplayName(PCIDLIST_ABSOLUTE pidl, DWORD flags, std::wstring &output);
 HRESULT GetDisplayName(IShellFolder *shellFolder, PCITEMID_CHILD pidlChild, DWORD flags,
@@ -64,23 +69,18 @@ HRESULT GetDisplayName(IShellFolder *shellFolder, PCITEMID_CHILD pidlChild, DWOR
 HRESULT GetCsidlDisplayName(int csidl, DWORD flags, std::wstring &output);
 HRESULT GetVirtualParentPath(PCIDLIST_ABSOLUTE pidlDirectory, PIDLIST_ABSOLUTE *pidlParent);
 BOOL IsNamespaceRoot(PCIDLIST_ABSOLUTE pidl);
-BOOL MyExpandEnvironmentStrings(const TCHAR *szSrc, TCHAR *szExpandedPath, DWORD nSize);
 HRESULT BindToIdl(PCIDLIST_ABSOLUTE pidl, REFIID riid, void **ppv);
 HRESULT GetUIObjectOf(IShellFolder *pShellFolder, HWND hwndOwner, UINT cidl,
 	PCUITEMID_CHILD_ARRAY apidl, REFIID riid, void **ppv);
-HRESULT GetShellItemDetailsEx(IShellFolder2 *pShellFolder, const SHCOLUMNID *pscid,
-	PCUITEMID_CHILD pidl, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate);
 HRESULT ConvertVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchMax,
 	BOOL friendlyDate);
 HRESULT ConvertVariantStringArrayToString(SAFEARRAY *array, TCHAR *szDetail, size_t cchMax);
 HRESULT ConvertGenericVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchMax);
 HRESULT ConvertDateVariantToString(DATE date, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate);
-HRESULT GetDateDetailsEx(IShellFolder2 *shellFolder2, PCITEMID_CHILD pidlChild,
-	const SHCOLUMNID *column, FILETIME &filetime);
 BOOL GetBooleanVariant(IShellFolder2 *shellFolder2, PCITEMID_CHILD pidlChild,
 	const SHCOLUMNID *column, BOOL defaultValue);
 std::optional<std::wstring> GetFolderPathForDisplay(PCIDLIST_ABSOLUTE pidl);
-BOOL IsPathGUID(const TCHAR *szPath);
+bool IsPathGUID(const std::wstring &path);
 BOOL ArePidlsEquivalent(PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2);
 HRESULT AddJumpListTasks(const std::list<JumpListTaskInformation> &taskList);
 BOOL LoadContextMenuHandlers(const TCHAR *szRegKey,
@@ -108,9 +108,17 @@ std::vector<unique_pidl_absolute> DeepCopyPidls(const std::vector<PCIDLIST_ABSOL
 std::vector<unique_pidl_absolute> DeepCopyPidls(const std::vector<unique_pidl_absolute> &pidls);
 std::vector<PCIDLIST_ABSOLUTE> ShallowCopyPidls(const std::vector<unique_pidl_absolute> &pidls);
 
-/* Drag and drop helpers. */
-DWORD DetermineDragEffect(DWORD grfKeyState, DWORD dwCurrentEffect, BOOL bDataAccept,
-	BOOL bOnSameDrive);
+std::optional<std::wstring> TransformUserEnteredPathToAbsolutePathAndNormalize(
+	const std::wstring &userEnteredPath, const std::wstring &currentDirectory,
+	EnvVarsExpansion envVarsExpansionType);
+std::optional<std::wstring> ExpandEnvironmentStringsWrapper(const std::wstring &sourceString);
+std::optional<std::wstring> MaybeTransformRootPathToAbsolutePath(const std::wstring path,
+	const std::wstring &currentDirectory);
+std::optional<std::wstring> PathCanonicalizeWrapper(const std::wstring &path);
+std::optional<std::wstring> PathAppendWrapper(const std::wstring &path,
+	const std::wstring &pathToAppend);
+std::optional<std::wstring> PathStripToRootWrapper(const std::wstring &path);
+std::optional<std::wstring> GetCurrentDirectoryWrapper();
 
 /* Default icon indices. */
 int GetDefaultFolderIconIndex();

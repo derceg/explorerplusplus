@@ -908,25 +908,19 @@ void TabContainer::SetTabIconFromImageList(const Tab &tab, int imageIndex)
 
 void TabContainer::CreateNewTabInDefaultDirectory(const TabSettings &tabSettings)
 {
-	CreateNewTab(m_config->defaultTabDirectory.c_str(), tabSettings);
+	CreateNewTab(m_config->defaultTabDirectory, tabSettings);
 }
 
-void TabContainer::CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings,
-	const FolderSettings *folderSettings, const FolderColumns *initialColumns, int *newTabId)
+// Note that although it's guaranteed that the tab will be created, it's not guaranteed that it will
+// be navigated to the directory that's provided. For example, the directory may not exist, or the
+// user may not have access to it, or the path may be temporarily unavailable (e.g. because a
+// network location has been disconnected). Therefore, it's not safe to make any assumptions about
+// the actual directory the tab is in once it's been created.
+Tab &TabContainer::CreateNewTab(const std::wstring &directory, const TabSettings &tabSettings,
+	const FolderSettings *folderSettings, const FolderColumns *initialColumns)
 {
-	/* Attempt to expand the path (in the event that
-	it contains embedded environment variables). */
-	TCHAR szExpandedPath[MAX_PATH];
-	BOOL bRet =
-		MyExpandEnvironmentStrings(TabDirectory, szExpandedPath, SIZEOF_ARRAY(szExpandedPath));
-
-	if (!bRet)
-	{
-		StringCchCopy(szExpandedPath, SIZEOF_ARRAY(szExpandedPath), TabDirectory);
-	}
-
 	unique_pidl_absolute pidl;
-	HRESULT hr = SHParseDisplayName(szExpandedPath, nullptr, wil::out_param(pidl), 0, nullptr);
+	HRESULT hr = SHParseDisplayName(directory.c_str(), nullptr, wil::out_param(pidl), 0, nullptr);
 
 	if (FAILED(hr))
 	{
@@ -940,10 +934,10 @@ void TabContainer::CreateNewTab(const TCHAR *TabDirectory, const TabSettings &ta
 		}
 	}
 
-	CreateNewTab(pidl.get(), tabSettings, folderSettings, initialColumns, newTabId);
+	return CreateNewTab(pidl.get(), tabSettings, folderSettings, initialColumns);
 }
 
-void TabContainer::CreateNewTab(const PreservedTab &preservedTab, int *newTabId)
+Tab &TabContainer::CreateNewTab(const PreservedTab &preservedTab)
 {
 	PreservedHistoryEntry *entry = preservedTab.history.at(preservedTab.currentEntry).get();
 
@@ -955,11 +949,11 @@ void TabContainer::CreateNewTab(const PreservedTab &preservedTab, int *newTabId)
 
 	TabSettings tabSettings(_index = preservedTab.index, _selected = true);
 
-	SetUpNewTab(tab, entry->pidl.get(), tabSettings, false, newTabId);
+	return SetUpNewTab(tab, entry->pidl.get(), tabSettings, false);
 }
 
-void TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings,
-	const FolderSettings *folderSettings, const FolderColumns *initialColumns, int *newTabId)
+Tab &TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings,
+	const FolderSettings *folderSettings, const FolderColumns *initialColumns)
 {
 	auto tabTemp = std::make_unique<Tab>(m_coreInterface, m_tabNavigation, m_fileActionHandler,
 		folderSettings, initialColumns);
@@ -977,11 +971,11 @@ void TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSettin
 		tab.SetCustomName(*tabSettings.name);
 	}
 
-	SetUpNewTab(tab, pidlDirectory, tabSettings, true, newTabId);
+	return SetUpNewTab(tab, pidlDirectory, tabSettings, true);
 }
 
-void TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
-	const TabSettings &tabSettings, bool addHistoryEntry, int *newTabId)
+Tab &TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
+	const TabSettings &tabSettings, bool addHistoryEntry)
 {
 	int index;
 
@@ -1098,11 +1092,6 @@ void TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 		}
 	}
 
-	if (newTabId)
-	{
-		*newTabId = tab.GetId();
-	}
-
 	// There's no need to manually disconnect this. Either it will be
 	// disconnected when the tab is closed and the tab object (and
 	// associated signal) is destroyed or when the tab is destroyed
@@ -1110,6 +1099,8 @@ void TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 	tab.AddTabUpdatedObserver(std::bind_front(&TabContainer::OnTabUpdated, this));
 
 	tabCreatedSignal.m_signal(tab.GetId(), selected);
+
+	return tab;
 }
 
 void TabContainer::InsertNewTab(int index, int tabId, PCIDLIST_ABSOLUTE pidlDirectory,

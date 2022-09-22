@@ -121,11 +121,9 @@ int Plugins::TabsApi::create(sol::table createProperties)
 		extractFolderSettingsForCreation(*folderSettingsTable, folderSettings);
 	}
 
-	int tabId = -1;
-	m_tabContainer->CreateNewTab(pidlDirectory.get(), tabSettings, &folderSettings, nullptr,
-		&tabId);
+	auto &newTab = m_tabContainer->CreateNewTab(pidlDirectory.get(), tabSettings, &folderSettings);
 
-	return tabId;
+	return newTab.GetId();
 }
 
 void Plugins::TabsApi::extractTabPropertiesForCreation(sol::table createProperties,

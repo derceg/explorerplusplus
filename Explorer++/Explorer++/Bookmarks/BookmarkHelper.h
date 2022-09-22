@@ -5,16 +5,17 @@
 #pragma once
 
 #include "Bookmarks/BookmarkItem.h"
+#include "CoreInterface.h"
 #include <optional>
 
 class BookmarkTree;
-class CoreInterface;
 class TabContainer;
 
 using RawBookmarkItems = std::vector<BookmarkItem *>;
 
 namespace BookmarkHelper
 {
+
 enum class ColumnType
 {
 	Default = 0,
@@ -37,8 +38,8 @@ BookmarkItem *AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type typ
 	CoreInterface *coreInterface, std::optional<std::wstring> customDialogTitle = std::nullopt);
 void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
 	HMODULE resoureceModule, HWND parentWindow, CoreInterface *coreInterface);
-void OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem, CoreInterface *coreInterface,
-	bool switchToNewTab);
+void OpenBookmarkItemWithDisposition(const BookmarkItem *bookmarkItem, CoreInterface *coreInterface,
+	OpenFolderDisposition disposition);
 
 bool CopyBookmarkItems(BookmarkTree *bookmarkTree, const RawBookmarkItems &bookmarkItems, bool cut);
 void PasteBookmarkItems(BookmarkTree *bookmarkTree, BookmarkItem *parentFolder, size_t index);
@@ -46,4 +47,5 @@ void PasteBookmarkItems(BookmarkTree *bookmarkTree, BookmarkItem *parentFolder, 
 BookmarkItem *GetBookmarkItemById(BookmarkTree *bookmarkTree, std::wstring_view guid);
 
 bool IsAncestor(const BookmarkItem *bookmarkItem, const BookmarkItem *possibleAncestor);
+
 }

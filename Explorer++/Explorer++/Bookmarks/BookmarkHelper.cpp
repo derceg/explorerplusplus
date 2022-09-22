@@ -8,12 +8,12 @@
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/AddBookmarkDialog.h"
-#include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainer.h"
+#include "../Helper/ShellHelper.h"
 #include <boost/range/adaptor/filtered.hpp>
 #include <algorithm>
 
@@ -22,6 +22,10 @@ int CALLBACK SortByName(const BookmarkItem *firstItem, const BookmarkItem *secon
 int CALLBACK SortByLocation(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
 int CALLBACK SortByDateAdded(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
 int CALLBACK SortByDateModified(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
+
+void OpenBookmarkWithDisposition(const BookmarkItem *bookmarkItem,
+	const std::wstring &currentDirectory, CoreInterface *coreInterface,
+	OpenFolderDisposition disposition);
 
 BookmarkItem *GetBookmarkItemByIdResursive(BookmarkItem *bookmarkItem, std::wstring_view guid);
 
@@ -230,29 +234,63 @@ void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *
 	}
 }
 
-// If the specified item is a bookmark, it will be opened in a new tab.
-// If it's a bookmark folder, each of its children will be opened in new
-// tabs.
-void BookmarkHelper::OpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem,
-	CoreInterface *coreInterface, bool switchToNewTab)
+// If the specified item is a bookmark, it will be opened directly. If the item is a bookmark
+// folder, each child bookmark will be opened.
+void BookmarkHelper::OpenBookmarkItemWithDisposition(const BookmarkItem *bookmarkItem,
+	CoreInterface *coreInterface, OpenFolderDisposition disposition)
 {
+	// It doesn't make any sense to open a folder in the current tab.
+	if (bookmarkItem->IsFolder() && disposition == OpenFolderDisposition::CurrentTab)
+	{
+		assert(false);
+		return;
+	}
+
+	// This isn't currently supported.
+	if (bookmarkItem->IsFolder() && disposition == OpenFolderDisposition::NewWindow)
+	{
+		return;
+	}
+
+	Tab &selectedTab = coreInterface->GetTabContainer()->GetSelectedTab();
+	std::wstring currentDirectory = selectedTab.GetShellBrowser()->GetDirectory();
+
 	if (bookmarkItem->IsFolder())
 	{
 		for (auto &childItem : bookmarkItem->GetChildren() | boost::adaptors::filtered(IsBookmark))
 		{
-			coreInterface->GetTabContainer()->CreateNewTab(childItem->GetLocation().c_str(),
-				TabSettings(_selected = switchToNewTab));
+			OpenBookmarkWithDisposition(childItem.get(), currentDirectory, coreInterface,
+				disposition);
 
 			// When opening a set of bookmarks within a folder, only the first item should be
 			// switched to.
-			switchToNewTab = false;
+			if (disposition == OpenFolderDisposition::ForegroundTab)
+			{
+				disposition = OpenFolderDisposition::BackgroundTab;
+			}
 		}
 	}
 	else
 	{
-		coreInterface->GetTabContainer()->CreateNewTab(bookmarkItem->GetLocation().c_str(),
-			TabSettings(_selected = switchToNewTab));
+		OpenBookmarkWithDisposition(bookmarkItem, currentDirectory, coreInterface, disposition);
 	}
+}
+
+void OpenBookmarkWithDisposition(const BookmarkItem *bookmarkItem,
+	const std::wstring &currentDirectory, CoreInterface *coreInterface,
+	OpenFolderDisposition disposition)
+{
+	assert(bookmarkItem->IsBookmark());
+
+	auto absolutePath = TransformUserEnteredPathToAbsolutePathAndNormalize(
+		bookmarkItem->GetLocation(), currentDirectory, EnvVarsExpansion::Expand);
+
+	if (!absolutePath)
+	{
+		return;
+	}
+
+	coreInterface->OpenItem(absolutePath->c_str(), disposition);
 }
 
 // Cuts/copies the selected bookmark items. Each bookmark item needs to be part

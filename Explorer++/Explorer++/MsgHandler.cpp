@@ -267,22 +267,22 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 		}
 		else if (bControlPanelParent && (uAttributes & SFGAO_FOLDER))
 		{
-			TCHAR szExplorerPath[MAX_PATH];
-
 			std::wstring parsingPath;
 			GetDisplayName(pidlItem, SHGDN_FORPARSING, parsingPath);
 
-			MyExpandEnvironmentStrings(_T("%windir%\\explorer.exe"), szExplorerPath,
-				SIZEOF_ARRAY(szExplorerPath));
+			auto explorerPath = ExpandEnvironmentStringsWrapper(_T("%windir%\\explorer.exe"));
 
-			/* Invoke Windows Explorer directly. Note that only folder
-			items need to be passed directly to Explorer. Two central
-			reasons:
-			1. Explorer can only open folder items.
-			2. Non-folder items can be opened directly (regardless of
-			whether or not they're children of the control panel). */
-			ShellExecute(m_hContainer, _T("open"), szExplorerPath, parsingPath.c_str(), nullptr,
-				SW_SHOWNORMAL);
+			if (explorerPath)
+			{
+				/* Invoke Windows Explorer directly. Note that only folder
+				items need to be passed directly to Explorer. Two central
+				reasons:
+				1. Explorer can only open folder items.
+				2. Non-folder items can be opened directly (regardless of
+				whether or not they're children of the control panel). */
+				ShellExecute(m_hContainer, _T("open"), explorerPath->c_str(), parsingPath.c_str(),
+					nullptr, SW_SHOWNORMAL);
+			}
 		}
 		else
 		{
@@ -329,6 +329,44 @@ void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szP
 	GetDisplayName(pidlParent.get(), SHGDN_FORPARSING, itemDirectory);
 
 	ExecuteFileAction(m_hContainer, EMPTY_STRING, szParameters, itemDirectory.c_str(), pidlItem);
+}
+
+OpenFolderDisposition Explorerplusplus::DetermineOpenDisposition(bool isMiddleButtonDown,
+	bool isCtrlKeyDown, bool isShiftKeyDown)
+{
+	if (isMiddleButtonDown || isCtrlKeyDown)
+	{
+		if (!isShiftKeyDown)
+		{
+			if (m_config->openTabsInForeground)
+			{
+				return OpenFolderDisposition::ForegroundTab;
+			}
+			else
+			{
+				return OpenFolderDisposition::BackgroundTab;
+			}
+		}
+		else
+		{
+			// Shift inverts the usual behavior.
+			if (m_config->openTabsInForeground)
+			{
+				return OpenFolderDisposition::BackgroundTab;
+			}
+			else
+			{
+				return OpenFolderDisposition::ForegroundTab;
+			}
+		}
+	}
+
+	if (isShiftKeyDown)
+	{
+		return OpenFolderDisposition::NewWindow;
+	}
+
+	return OpenFolderDisposition::CurrentTab;
 }
 
 BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)

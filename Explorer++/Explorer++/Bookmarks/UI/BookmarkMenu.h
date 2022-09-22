@@ -23,7 +23,7 @@ class BookmarkMenu
 {
 public:
 	BookmarkMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule, CoreInterface *coreInterface,
-		Navigation *navigation, IconFetcher *iconFetcher, HWND parentWindow);
+		IconFetcher *iconFetcher, HWND parentWindow);
 
 	BOOL ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt,
 		BookmarkMenuBuilder::IncludePredicate includePredicate = nullptr);

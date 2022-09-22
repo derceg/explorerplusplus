@@ -13,7 +13,6 @@
 #include "Config.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
-#include "Navigation.h"
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/DropSourceImpl.h"
@@ -128,21 +127,20 @@ private:
 };
 
 BookmarksToolbar *BookmarksToolbar::Create(BookmarksToolbarView *view, CoreInterface *coreInterface,
-	Navigation *navigation, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree)
+	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree)
 {
-	return new BookmarksToolbar(view, coreInterface, navigation, iconFetcher, bookmarkTree);
+	return new BookmarksToolbar(view, coreInterface, iconFetcher, bookmarkTree);
 }
 
 BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, CoreInterface *coreInterface,
-	Navigation *navigation, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree) :
+	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree) :
 	BookmarkDropTargetWindow(view->GetHWND(), bookmarkTree),
 	m_view(view),
 	m_coreInterface(coreInterface),
-	m_navigation(navigation),
 	m_bookmarkTree(bookmarkTree),
 	m_contextMenu(bookmarkTree, coreInterface->GetResourceModule(), coreInterface),
-	m_bookmarkMenu(bookmarkTree, coreInterface->GetResourceModule(), coreInterface, navigation,
-		iconFetcher, view->GetHWND())
+	m_bookmarkMenu(bookmarkTree, coreInterface->GetResourceModule(), coreInterface, iconFetcher,
+		view->GetHWND())
 {
 	Initialize(iconFetcher);
 }
@@ -274,14 +272,16 @@ void BookmarksToolbar::OnBookmarkClicked(BookmarkItem *bookmarkItem, const Mouse
 {
 	UNREFERENCED_PARAMETER(event);
 
-	m_navigation->BrowseFolderInCurrentTab(bookmarkItem->GetLocation().c_str());
+	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, m_coreInterface,
+		m_coreInterface->DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey));
 }
 
 void BookmarksToolbar::OnBookmarkFolderClicked(BookmarkItem *bookmarkItem, const MouseEvent &event)
 {
 	if (event.ctrlKey)
 	{
-		OnOpenBookmarkItemInNewTab(bookmarkItem, event.shiftKey);
+		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, m_coreInterface,
+			m_coreInterface->DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey));
 		return;
 	}
 
@@ -297,19 +297,8 @@ void BookmarksToolbar::OnBookmarkFolderClicked(BookmarkItem *bookmarkItem, const
 void BookmarksToolbar::OnButtonMiddleClicked(const BookmarkItem *bookmarkItem,
 	const MouseEvent &event)
 {
-	OnOpenBookmarkItemInNewTab(bookmarkItem, event.shiftKey);
-}
-
-void BookmarksToolbar::OnOpenBookmarkItemInNewTab(const BookmarkItem *bookmarkItem, bool shiftKey)
-{
-	bool switchToNewTab = m_coreInterface->GetConfig()->openTabsInForeground;
-
-	if (shiftKey)
-	{
-		switchToNewTab = !switchToNewTab;
-	}
-
-	BookmarkHelper::OpenBookmarkItemInNewTab(bookmarkItem, m_coreInterface, switchToNewTab);
+	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, m_coreInterface,
+		m_coreInterface->DetermineOpenDisposition(true, event.ctrlKey, event.shiftKey));
 }
 
 void BookmarksToolbar::OnButtonRightClicked(BookmarkItem *bookmarkItem, const MouseEvent &event)

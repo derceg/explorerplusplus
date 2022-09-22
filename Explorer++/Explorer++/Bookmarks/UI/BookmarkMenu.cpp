@@ -11,13 +11,12 @@
 #include "../Helper/MenuHelper.h"
 
 BookmarkMenu::BookmarkMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule,
-	CoreInterface *coreInterface, Navigation *navigation, IconFetcher *iconFetcher,
-	HWND parentWindow) :
+	CoreInterface *coreInterface, IconFetcher *iconFetcher, HWND parentWindow) :
 	m_bookmarkTree(bookmarkTree),
 	m_parentWindow(parentWindow),
 	m_menuBuilder(coreInterface, iconFetcher, resourceModule),
 	m_bookmarkContextMenu(bookmarkTree, resourceModule, coreInterface),
-	m_controller(navigation)
+	m_controller(coreInterface)
 {
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parentWindow,
 		ParentWindowSubclassStub, reinterpret_cast<DWORD_PTR>(this)));

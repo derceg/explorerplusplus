@@ -5,15 +5,15 @@
 #pragma once
 
 class BookmarkItem;
-class Navigation;
+class CoreInterface;
 
 class BookmarkMenuController
 {
 public:
-	BookmarkMenuController(Navigation *navigation);
+	BookmarkMenuController(CoreInterface *coreInterface);
 
 	void OnBookmarkMenuItemSelected(const BookmarkItem *bookmarkItem);
 
 private:
-	Navigation *m_navigation;
+	CoreInterface *m_coreInterface;
 };

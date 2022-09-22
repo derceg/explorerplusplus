@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
+#include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
@@ -137,6 +138,6 @@ void BookmarksMainMenu::OnMenuItemClicked(int menuItemId)
 
 	assert(bookmark->IsBookmark());
 
-	Tab &selectedTab = m_coreInterface->GetTabContainer()->GetSelectedTab();
-	selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(bookmark->GetLocation());
+	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmark, m_coreInterface,
+		OpenFolderDisposition::CurrentTab);
 }

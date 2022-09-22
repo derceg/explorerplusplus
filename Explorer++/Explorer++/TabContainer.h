@@ -79,13 +79,13 @@ public:
 		std::shared_ptr<Config> config);
 
 	void CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
-	void CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {},
+	Tab &CreateNewTab(const std::wstring &directory, const TabSettings &tabSettings = {},
 		const FolderSettings *folderSettings = nullptr,
-		const FolderColumns *initialColumns = nullptr, int *newTabId = nullptr);
-	void CreateNewTab(const PreservedTab &preservedTab, int *newTabId = nullptr);
-	void CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings = {},
+		const FolderColumns *initialColumns = nullptr);
+	Tab &CreateNewTab(const PreservedTab &preservedTab);
+	Tab &CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings = {},
 		const FolderSettings *folderSettings = nullptr,
-		const FolderColumns *initialColumns = nullptr, int *newTabId = nullptr);
+		const FolderColumns *initialColumns = nullptr);
 
 	Tab &GetTab(int tabId);
 	Tab *GetTabOptional(int tabId);
@@ -166,8 +166,8 @@ private:
 	void AddDefaultTabIcons(HIMAGELIST himlTab);
 	bool IsDefaultIcon(int iconIndex);
 
-	void SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings,
-		bool addHistoryEntry, int *newTabId);
+	Tab &SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings,
+		bool addHistoryEntry);
 
 	void OnTabCtrlLButtonDown(POINT *pt);
 	void OnTabCtrlLButtonUp();
