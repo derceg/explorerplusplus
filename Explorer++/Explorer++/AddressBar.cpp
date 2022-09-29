@@ -14,6 +14,7 @@
 #include "../Helper/DataExchangeHelper.h"
 #include "../Helper/DragDropHelper.h"
 #include "../Helper/DropSourceImpl.h"
+#include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/iDataObject.h"
@@ -220,7 +221,9 @@ void AddressBar::OnGo()
 	// the text won't be reverted. That gives the user the chance to update the text and try again.
 	RevertTextInUI();
 
-	m_coreInterface->OpenItem(absolutePath->c_str());
+	m_coreInterface->OpenItem(absolutePath->c_str(),
+		m_coreInterface->DetermineOpenDisposition(false, IsKeyDown(VK_CONTROL),
+			IsKeyDown(VK_SHIFT)));
 	m_coreInterface->FocusActiveTab();
 }
 
