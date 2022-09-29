@@ -136,7 +136,11 @@ LRESULT CALLBACK AddressBar::EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LP
 		switch (wParam)
 		{
 		case VK_RETURN:
-			OnGo();
+			OnEnterPressed();
+			return 0;
+
+		case VK_ESCAPE:
+			OnEscapePressed();
 			return 0;
 		}
 		break;
@@ -185,7 +189,7 @@ LRESULT CALLBACK AddressBar::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-void AddressBar::OnGo()
+void AddressBar::OnEnterPressed()
 {
 	std::wstring path = GetWindowString(m_hwnd);
 
@@ -225,6 +229,24 @@ void AddressBar::OnGo()
 		m_coreInterface->DetermineOpenDisposition(false, IsKeyDown(VK_CONTROL),
 			IsKeyDown(VK_SHIFT)));
 	m_coreInterface->FocusActiveTab();
+}
+
+void AddressBar::OnEscapePressed()
+{
+	HWND edit = reinterpret_cast<HWND>(SendMessage(m_hwnd, CBEM_GETEDITCONTROL, 0, 0));
+
+	auto modified = SendMessage(edit, EM_GETMODIFY, 0, 0);
+
+	if (modified)
+	{
+		RevertTextInUI();
+
+		SendMessage(edit, EM_SETSEL, 0, -1);
+	}
+	else
+	{
+		m_coreInterface->FocusActiveTab();
+	}
 }
 
 void AddressBar::OnBeginDrag()

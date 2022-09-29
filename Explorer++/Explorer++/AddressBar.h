@@ -39,7 +39,8 @@ private:
 
 	void Initialize(HWND parent);
 	std::optional<LRESULT> OnComboBoxExCtlColorEdit(HWND hwnd, HDC hdc);
-	void OnGo();
+	void OnEnterPressed();
+	void OnEscapePressed();
 	void OnBeginDrag();
 	static std::optional<wil::unique_stg_medium> GenerateShortcutDescriptorStgMedium(
 		PCIDLIST_ABSOLUTE pidl);
