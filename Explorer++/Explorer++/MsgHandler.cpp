@@ -1366,3 +1366,9 @@ boost::signals2::connection Explorerplusplus::AddFocusChangeObserver(
 {
 	return m_focusChangedSignal.connect(observer);
 }
+
+void Explorerplusplus::FocusActiveTab()
+{
+	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	SetFocus(selectedTab.GetShellBrowser()->GetListView());
+}

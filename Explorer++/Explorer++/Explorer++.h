@@ -481,7 +481,7 @@ private:
 	/* Columns. */
 	void CopyColumnInfoToClipboard();
 
-	/* IExplorerplusplus methods. */
+	/* CoreInterface methods. */
 	const Config *GetConfig() const override;
 	HMODULE GetResourceModule() const override;
 	HACCEL *GetAcceleratorTable() const;
@@ -501,6 +501,7 @@ private:
 		const FocusChangedSignal::slot_type &observer) override;
 	boost::signals2::connection AddApplicationShuttingDownObserver(
 		const ApplicationShuttingDownSignal::slot_type &observer) override;
+	void FocusActiveTab() override;
 
 	/* Menus. */
 	void InitializeMainMenu();

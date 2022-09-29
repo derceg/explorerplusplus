@@ -221,6 +221,7 @@ void AddressBar::OnGo()
 	RevertTextInUI();
 
 	m_coreInterface->OpenItem(absolutePath->c_str());
+	m_coreInterface->FocusActiveTab();
 }
 
 void AddressBar::OnBeginDrag()
