@@ -50,6 +50,7 @@ private:
 	void OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
 	void UpdateTextAndIcon(const Tab &tab);
 	void UpdateTextAndIconInUI(std::wstring *text, int iconIndex);
+	void RevertTextInUI();
 	void OnHistoryEntryUpdated(const HistoryEntry &entry, HistoryEntry::PropertyType propertyType);
 
 	CoreInterface *m_coreInterface;
@@ -57,6 +58,8 @@ private:
 
 	boost::signals2::scoped_connection m_historyEntryUpdatedConnection;
 	int m_defaultFolderIconIndex;
+
+	std::wstring m_currentText;
 
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;

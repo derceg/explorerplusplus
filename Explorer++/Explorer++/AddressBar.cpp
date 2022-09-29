@@ -212,6 +212,14 @@ void AddressBar::OnGo()
 		return;
 	}
 
+	/* TODO: Could keep text user has entered and only revert if navigation fails. */
+	// Whether a file or folder is being opened, the address bar text should be reverted to the
+	// original text. If the item being opened is a folder, the text will be updated once the
+	// navigation commits.
+	// Note that if the above call to TransformUserEnteredPathToAbsolutePathAndNormalize() fails,
+	// the text won't be reverted. That gives the user the chance to update the text and try again.
+	RevertTextInUI();
+
 	m_coreInterface->OpenItem(absolutePath->c_str());
 }
 
@@ -452,9 +460,16 @@ void AddressBar::UpdateTextAndIconInUI(std::wstring *text, int iconIndex)
 	{
 		WI_SetFlag(cbItem.mask, CBEIF_TEXT);
 		cbItem.pszText = text->data();
+
+		m_currentText = *text;
 	}
 
 	SendMessage(m_hwnd, CBEM_SETITEM, 0, reinterpret_cast<LPARAM>(&cbItem));
+}
+
+void AddressBar::RevertTextInUI()
+{
+	SendMessage(m_hwnd, WM_SETTEXT, 0, reinterpret_cast<LPARAM>(m_currentText.c_str()));
 }
 
 void AddressBar::OnHistoryEntryUpdated(const HistoryEntry &entry,
