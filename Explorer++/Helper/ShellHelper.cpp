@@ -1174,9 +1174,20 @@ HRESULT ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory,
 
 	if (site)
 	{
+		// The IObjectWithSite interface may not be available in some cases - for example, when the
+		// directory is a .zip file. So it's not safe to assume that this will always succeed.
 		wil::com_ptr_nothrow<IObjectWithSite> objectWithSite;
-		RETURN_IF_FAILED(contextMenu->QueryInterface(IID_PPV_ARGS(&objectWithSite)));
-		RETURN_IF_FAILED(objectWithSite->SetSite(site));
+		HRESULT hr = contextMenu->QueryInterface(IID_PPV_ARGS(&objectWithSite));
+
+		if (SUCCEEDED(hr))
+		{
+			// The site here is used to select items after they've been pasted. If SetSite() fails,
+			// it would still be useful to perform the paste operation anyway. It's not expected
+			// that the call would actually fail, but if it does, it would be useful to know, hence
+			// the assert.
+			hr = objectWithSite->SetSite(site);
+			assert(SUCCEEDED(hr));
+		}
 	}
 
 	auto actionNarrow = wstrToStr(action);
