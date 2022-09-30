@@ -295,6 +295,11 @@ HRESULT ShellBrowser::RegisterShellWindowIfNecessary(PCIDLIST_ABSOLUTE pidl)
 // be brought to the foreground if present.
 HRESULT ShellBrowser::RegisterShellWindow(PCIDLIST_ABSOLUTE pidl)
 {
+	if (!m_shellWindows)
+	{
+		return E_FAIL;
+	}
+
 	wil::unique_variant pidlVariant;
 	RETURN_IF_FAILED(InitVariantFromBuffer(pidl, ILGetSize(pidl), &pidlVariant));
 

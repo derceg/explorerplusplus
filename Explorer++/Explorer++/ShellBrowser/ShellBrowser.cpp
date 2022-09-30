@@ -133,7 +133,7 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, CoreInterface *coreInterface,
 
 	if (!m_shellWindows)
 	{
-		m_shellWindows = winrt::create_instance<IShellWindows>(CLSID_ShellWindows, CLSCTX_ALL);
+		m_shellWindows = winrt::try_create_instance<IShellWindows>(CLSID_ShellWindows, CLSCTX_ALL);
 	}
 }
 
