@@ -14,6 +14,7 @@ struct Settings
 	bool enablePlugins;
 	ShellChangeNotificationType shellChangeNotificationType;
 	std::wstring language;
+	std::vector<std::wstring> filesToSelect;
 	std::vector<std::wstring> directories;
 };
 

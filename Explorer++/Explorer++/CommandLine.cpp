@@ -161,6 +161,20 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 		"Allows you to select your desired language. Should be a two-letter language code (e.g. "
 		"FR, RU, etc).");
 
+	// Note that allow_extra_args is set to false, which means that multiple items need to be
+	// specified by supplying the option multiple times. That's done because allowing multiple items
+	// to be specified at once would create ambiguity with the directories option:
+	//
+	// explorer++.exe --select c:\windows c:\users\public
+	//
+	// That could mean: select two items (c:\windows and c:\users\public) or select one item
+	// (c:\windows) and open a directory (c:\users\public).
+	app.add_option("--select", settings.filesToSelect,
+		   "When supplied a path like \"C:\\path\\to\\file\", will open \"C:\\path\\to\" in a tab "
+		   "and select \"file\". This option can be supplied multiple times, in which case each "
+		   "path will be opened in a separate tab.")
+		->allow_extra_args(false);
+
 	app.add_option("directories", settings.directories, "Directories to open");
 
 	int numArgs;

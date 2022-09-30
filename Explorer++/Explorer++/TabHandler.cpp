@@ -157,6 +157,42 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 		}
 	}
 
+	for (const auto &fileToSelect : m_commandLineSettings.filesToSelect)
+	{
+		auto absolutePath = TransformUserEnteredPathToAbsolutePathAndNormalize(fileToSelect,
+			currentDirectory.value(), EnvVarsExpansion::DontExpand);
+
+		if (!absolutePath)
+		{
+			continue;
+		}
+
+		unique_pidl_absolute fullPidl;
+		HRESULT hr = SHParseDisplayName(absolutePath->c_str(), nullptr, wil::out_param(fullPidl), 0,
+			nullptr);
+
+		if (FAILED(hr))
+		{
+			continue;
+		}
+
+		unique_pidl_absolute parentPidl(ILCloneFull(fullPidl.get()));
+
+		BOOL res = ILRemoveLastID(parentPidl.get());
+
+		if (!res)
+		{
+			continue;
+		}
+
+		Tab &newTab = m_tabContainer->CreateNewTab(parentPidl.get(), TabSettings(_selected = true));
+
+		if (ArePidlsEquivalent(newTab.GetShellBrowser()->GetDirectoryIdl().get(), parentPidl.get()))
+		{
+			newTab.GetShellBrowser()->SelectItems({ fullPidl.get() });
+		}
+	}
+
 	for (const auto &directory : m_commandLineSettings.directories)
 	{
 		// Windows Explorer doesn't expand environment variables passed in on the command line. The
