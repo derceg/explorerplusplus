@@ -3,8 +3,8 @@
 // See LICENSE in the top level directory
 
 #include "../Helper/DataExchangeHelper.h"
+#include "../Helper/DataObjectImpl.h"
 #include "../Helper/DragDropHelper.h"
-#include "../Helper/iDataObject.h"
 #include <gtest/gtest.h>
 #include <wil/com.h>
 
@@ -15,10 +15,10 @@ class DataObjectTest : public Test
 protected:
 	DataObjectTest()
 	{
-		m_dataObject.attach(CreateDataObject(nullptr, nullptr, 0));
+		m_dataObject = winrt::make_self<DataObjectImpl>(nullptr, nullptr, 0);
 	}
 
-	wil::com_ptr_nothrow<IDataObject> m_dataObject;
+	winrt::com_ptr<IDataObject> m_dataObject;
 };
 
 TEST_F(DataObjectTest, QueryInterface)

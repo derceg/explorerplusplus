@@ -16,6 +16,7 @@
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/range/adaptor/filtered.hpp>
+#include <wil/com.h>
 
 BookmarkTreeView::BookmarkTreeView(HWND hTreeView, HINSTANCE hInstance,
 	CoreInterface *coreInterface, BookmarkTree *bookmarkTree,

@@ -7,10 +7,9 @@
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "../Helper/DataExchangeHelper.h"
+#include "../Helper/DataObjectImpl.h"
 #include "../Helper/DragDropHelper.h"
-#include "../Helper/iDataObject.h"
 #include <gtest/gtest.h>
-#include <wil/com.h>
 
 using namespace testing;
 
@@ -49,7 +48,7 @@ protected:
 	BookmarkTree m_bookmarkTree;
 
 	std::unique_ptr<BookmarkDropper> m_dropper;
-	wil::com_ptr_nothrow<IDataObject> m_dataObject;
+	winrt::com_ptr<IDataObject> m_dataObject;
 	BookmarkItem *m_rawGrandparentFolder;
 	BookmarkItem *m_rawParentFolder;
 	BookmarkItem *m_rawBookmark;
@@ -65,7 +64,7 @@ protected:
 		auto global = WriteStringToGlobal(L"Test");
 		STGMEDIUM stgMedium = GetStgMediumForGlobal(global.get());
 
-		m_dataObject.attach(CreateDataObject(&formatEtc, &stgMedium, 1));
+		m_dataObject = winrt::make_self<DataObjectImpl>(&formatEtc, &stgMedium, 1);
 
 		global.release();
 
@@ -75,7 +74,7 @@ protected:
 	BookmarkTree m_bookmarkTree;
 
 	std::unique_ptr<BookmarkDropper> m_dropper;
-	wil::com_ptr_nothrow<IDataObject> m_dataObject;
+	winrt::com_ptr<IDataObject> m_dataObject;
 };
 
 TEST_F(BookmarkDropperValidTest, DropEffect)

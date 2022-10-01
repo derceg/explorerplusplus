@@ -12,12 +12,12 @@
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DataExchangeHelper.h"
+#include "../Helper/DataObjectImpl.h"
 #include "../Helper/DragDropHelper.h"
 #include "../Helper/DropSourceImpl.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
-#include "../Helper/iDataObject.h"
 #include <wil/com.h>
 #include <wil/common.h>
 #include <wil/resource.h>
@@ -281,8 +281,8 @@ void AddressBar::OnBeginDrag()
 		DVASPECT_CONTENT, 0, TYMED_ISTREAM };
 	stg[1] = contentsStgMedium->release();
 
-	wil::com_ptr_nothrow<IDataObject> pDataObject;
-	pDataObject.attach(CreateDataObject(ftc, stg, SIZEOF_ARRAY(ftc)));
+	auto dataObject =
+		winrt::make_self<DataObjectImpl>(ftc, stg, static_cast<int>(SIZEOF_ARRAY(ftc)));
 
 	wil::com_ptr_nothrow<IDragSourceHelper> dragSourceHelper;
 	HRESULT hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_INPROC_SERVER,
@@ -296,10 +296,10 @@ void AddressBar::OnBeginDrag()
 	auto dropSource = winrt::make_self<DropSourceImpl>();
 
 	POINT pt = { 0, 0 };
-	dragSourceHelper->InitializeFromWindow(m_hwnd, &pt, pDataObject.get());
+	dragSourceHelper->InitializeFromWindow(m_hwnd, &pt, dataObject.get());
 
 	DWORD dwEffect;
-	DoDragDrop(pDataObject.get(), dropSource.get(), DROPEFFECT_LINK, &dwEffect);
+	DoDragDrop(dataObject.get(), dropSource.get(), DROPEFFECT_LINK, &dwEffect);
 }
 
 std::optional<wil::unique_stg_medium> AddressBar::GenerateShortcutDescriptorStgMedium(

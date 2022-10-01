@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Bookmarks/BookmarkItem.h"
-#include <wil/com.h>
+#include <winrt/base.h>
 #include <functional>
 
 // This type is used when serializing multiple independent bookmark items and is
@@ -37,8 +37,10 @@ using OwnedRefBookmarkItems =
 
 namespace BookmarkDataExchange
 {
+
 FORMATETC GetFormatEtc();
-wil::com_ptr_nothrow<IDataObject> CreateDataObject(const OwnedRefBookmarkItems &bookmarkItems);
+winrt::com_ptr<IDataObject> CreateDataObject(const OwnedRefBookmarkItems &bookmarkItems);
 std::string SerializeBookmarkItems(const OwnedRefBookmarkItems &bookmarkItems);
 BookmarkItems DeserializeBookmarkItems(const std::string &data);
+
 }

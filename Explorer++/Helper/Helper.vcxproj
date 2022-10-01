@@ -322,7 +322,7 @@
     <ClCompile Include="HeaderHelper.cpp" />
     <ClCompile Include="Helper.cpp" />
     <ClCompile Include="IconFetcher.cpp" />
-    <ClCompile Include="iDataObject.cpp" />
+    <ClCompile Include="DataObjectImpl.cpp" />
     <ClCompile Include="iDirectoryMonitor.cpp" />
     <ClCompile Include="DropSourceImpl.cpp" />
     <ClCompile Include="DropTargetWindow.cpp" />
@@ -391,7 +391,7 @@
     <ClInclude Include="HeaderHelper.h" />
     <ClInclude Include="Helper.h" />
     <ClInclude Include="IconFetcher.h" />
-    <ClInclude Include="iDataObject.h" />
+    <ClInclude Include="DataObjectImpl.h" />
     <ClInclude Include="iDirectoryMonitor.h" />
     <ClInclude Include="DropSourceImpl.h" />
     <ClInclude Include="DropTargetWindow.h" />

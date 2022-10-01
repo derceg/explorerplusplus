@@ -6,8 +6,8 @@
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkClipboard.h"
 #include "../Helper/DataExchangeHelper.h"
+#include "../Helper/DataObjectImpl.h"
 #include "../Helper/DragDropHelper.h"
-#include "../Helper/iDataObject.h"
 #include "../ThirdParty/cereal/archives/binary.hpp"
 #include "../ThirdParty/cereal/types/memory.hpp"
 
@@ -18,7 +18,7 @@ FORMATETC BookmarkDataExchange::GetFormatEtc()
 	return formatEtc;
 }
 
-wil::com_ptr_nothrow<IDataObject> BookmarkDataExchange::CreateDataObject(
+winrt::com_ptr<IDataObject> BookmarkDataExchange::CreateDataObject(
 	const OwnedRefBookmarkItems &bookmarkItems)
 {
 	FORMATETC formatEtc = GetFormatEtc();
@@ -27,8 +27,7 @@ wil::com_ptr_nothrow<IDataObject> BookmarkDataExchange::CreateDataObject(
 	auto global = WriteBinaryDataToGlobal(data);
 	STGMEDIUM stgMedium = GetStgMediumForGlobal(global.get());
 
-	wil::com_ptr_nothrow<IDataObject> dataObject;
-	dataObject.attach(CreateDataObject(&formatEtc, &stgMedium, 1));
+	auto dataObject = winrt::make_self<DataObjectImpl>(&formatEtc, &stgMedium, 1);
 
 	// TODO: Probably worth updating the code so that this doesn't need to be
 	// done manually.
