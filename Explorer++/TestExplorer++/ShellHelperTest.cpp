@@ -73,6 +73,10 @@ TEST_F(TransformPathTest, AbsolutePath)
 	// Absolute paths, anchored to the root of the current directory.
 	PerformTest(L"\\", L"c:\\users\\public", L"c:\\");
 	PerformTest(L"\\nested\\directory", L"d:\\path\\to\\item", L"d:\\nested\\directory");
+
+	// file: URLs.
+	PerformTest(L"file:///c:/users/", currentDirectory, L"c:\\users\\");
+	PerformTest(L"file:///d:/path/to/file", currentDirectory, L"d:\\path\\to\\file");
 }
 
 TEST_F(TransformPathTest, RelativePath)
@@ -95,6 +99,13 @@ TEST_F(TransformPathTest, Normalization)
 	PerformTest(L"c:\\path\\.\\", currentDirectory, L"c:\\path\\");
 	PerformTest(L".", currentDirectory, L"c:\\windows");
 	PerformTest(L"..", currentDirectory, L"c:\\");
+	PerformTest(L"file:///c:/users/..", currentDirectory, L"c:\\");
+
+	// Paths expanded from environment variables should be normalized as well.
+	BOOL set =
+		SetEnvironmentVariable(L"VarWithRelativeReferences", L"d:\\path\\to\\nested\\..\\file");
+	ASSERT_TRUE(set);
+	PerformTest(L"%VarWithRelativeReferences%", currentDirectory, L"d:\\path\\to\\file");
 }
 
 TEST_F(TransformPathTest, Whitespace)

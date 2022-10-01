@@ -15,6 +15,7 @@
 #include <boost/container_hash/hash.hpp>
 #include <wil/com.h>
 #include <propkey.h>
+#include <wininet.h>
 
 std::optional<std::wstring> TransformUserEnteredPathToAbsolutePath(
 	const std::wstring &userEnteredPath, const std::wstring &currentDirectory,
@@ -613,6 +614,17 @@ std::optional<std::wstring> TransformUserEnteredPathToAbsolutePath(
 	const std::wstring &userEnteredPath, const std::wstring &currentDirectory,
 	EnvVarsExpansion envVarsExpansionType)
 {
+	if (PathIsUrlWrapper(userEnteredPath))
+	{
+		// If the path is a file: URL, none of the steps below should be performed (e.g. it makes no
+		// sense to perform environment variable expansion).
+		// Also, while Explorer doesn't normalize paths retrieved from file: URLs, it appears that
+		// it is valid for a file: URL to contain relative references (see
+		// https://datatracker.ietf.org/doc/html/rfc8089#appendix-E.2.1), so the path returned here
+		// can still be normalized.
+		return MaybeExtractPathFromFileUrl(userEnteredPath);
+	}
+
 	std::wstring updatedPath = userEnteredPath;
 
 	// It's important environment variables are expanded first. A path like "%WINDIR%", for example,
@@ -655,6 +667,35 @@ std::optional<std::wstring> TransformUserEnteredPathToAbsolutePath(
 	}
 
 	return PathAppendWrapper(currentDirectory, updatedPath);
+}
+
+bool PathIsUrlWrapper(const std::wstring &path)
+{
+	if (path.size() >= MAX_PATH)
+	{
+		return false;
+	}
+
+	return PathIsURL(path.c_str());
+}
+
+std::optional<std::wstring> MaybeExtractPathFromFileUrl(const std::wstring &url)
+{
+	if (url.size() >= INTERNET_MAX_URL_LENGTH)
+	{
+		return std::nullopt;
+	}
+
+	TCHAR path[MAX_PATH];
+	DWORD size = SIZEOF_ARRAY(path);
+	HRESULT hr = PathCreateFromUrl(url.c_str(), path, &size, 0);
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	return path;
 }
 
 std::optional<std::wstring> ExpandEnvironmentStringsWrapper(const std::wstring &sourceString)
