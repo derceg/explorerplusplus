@@ -10,6 +10,7 @@
 #include <boost/locale/generator.hpp>
 #include <boost/log/expressions.hpp>
 #include <boost/log/support/date_time.hpp>
+#include <boost/log/utility/exception_handler.hpp>
 #include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/log/utility/setup/file.hpp>
 
@@ -17,6 +18,8 @@ BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", SeverityLevel);
 
 void InitializeLogging(const TCHAR *filename)
 {
+	// TODO: The file should be created in a directory that's intended to be writeable, rather than
+	// the application directory.
 	TCHAR szLogFile[MAX_PATH];
 	GetProcessImageName(GetCurrentProcessId(), szLogFile, SIZEOF_ARRAY(szLogFile));
 
@@ -38,6 +41,10 @@ void InitializeLogging(const TCHAR *filename)
 			)
 	);
 	// clang-format on
+
+	// Creating or writing to the log file may fail. In that case, the error should simply be
+	// ignored, as there's not a lot that can be done.
+	sink->set_exception_handler(boost::log::make_exception_suppressor());
 
 	std::locale locale = boost::locale::generator()("en_US.UTF-8");
 	sink->imbue(locale);
