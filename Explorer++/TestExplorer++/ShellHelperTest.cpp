@@ -48,6 +48,23 @@ TEST_F(TransformPathTest, EnvironmentVariablesExpansion)
 	PerformTest(L"%CustomFileName%", currentDirectory, L"c:\\windows\\custom_file_name.txt");
 	PerformTest(L"%CustomFileName%", currentDirectory, L"c:\\windows\\%CustomFileName%",
 		EnvVarsExpansion::DontExpand);
+
+	// Environment variables should be expanded consistently, regardless of the path they're
+	// embedded within.
+	set = SetEnvironmentVariable(L"DownloadsVar", L"downloads");
+	ASSERT_TRUE(set);
+	PerformTest(L"file:///c:/users/default/%DownloadsVar%", currentDirectory,
+		L"c:\\users\\default\\downloads");
+	PerformTest(L"shell:%DownloadsVar%", currentDirectory, L"shell:downloads");
+
+	// Environment variables can contain arbitrary paths.
+	set = SetEnvironmentVariable(L"FilePath", L"file:///c:/path/to/file");
+	ASSERT_TRUE(set);
+	PerformTest(L"%FilePath%", currentDirectory, L"c:\\path\\to\\file");
+
+	set = SetEnvironmentVariable(L"ShellFolderPath", L"shell:public");
+	ASSERT_TRUE(set);
+	PerformTest(L"%ShellFolderPath%", currentDirectory, L"shell:public");
 }
 
 TEST_F(TransformPathTest, AbsolutePath)
@@ -77,6 +94,9 @@ TEST_F(TransformPathTest, AbsolutePath)
 	// file: URLs.
 	PerformTest(L"file:///c:/users/", currentDirectory, L"c:\\users\\");
 	PerformTest(L"file:///d:/path/to/file", currentDirectory, L"d:\\path\\to\\file");
+
+	// A shell folder path.
+	PerformTest(L"shell:downloads", currentDirectory, L"shell:downloads");
 }
 
 TEST_F(TransformPathTest, RelativePath)
@@ -106,6 +126,10 @@ TEST_F(TransformPathTest, Normalization)
 		SetEnvironmentVariable(L"VarWithRelativeReferences", L"d:\\path\\to\\nested\\..\\file");
 	ASSERT_TRUE(set);
 	PerformTest(L"%VarWithRelativeReferences%", currentDirectory, L"d:\\path\\to\\file");
+
+	// It's not valid to try and perform normalization on a path like this. That is, this shouldn't
+	// be transformed into "shell:public".
+	PerformTest(L"shell:public\\subfolder\\..", currentDirectory, L"shell:public\\subfolder\\..");
 }
 
 TEST_F(TransformPathTest, Whitespace)

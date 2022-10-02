@@ -20,6 +20,7 @@
 std::optional<std::wstring> TransformUserEnteredPathToAbsolutePath(
 	const std::wstring &userEnteredPath, const std::wstring &currentDirectory,
 	EnvVarsExpansion envVarsExpansionType);
+bool ShouldNormalizePath(const std::wstring &path);
 
 bool AddJumpListTasksInternal(IObjectCollection *objectCollection,
 	const std::list<JumpListTaskInformation> &taskList);
@@ -607,6 +608,11 @@ std::optional<std::wstring> TransformUserEnteredPathToAbsolutePathAndNormalize(
 		return std::nullopt;
 	}
 
+	if (!ShouldNormalizePath(*absolutePath))
+	{
+		return *absolutePath;
+	}
+
 	return PathCanonicalizeWrapper(*absolutePath);
 }
 
@@ -614,21 +620,11 @@ std::optional<std::wstring> TransformUserEnteredPathToAbsolutePath(
 	const std::wstring &userEnteredPath, const std::wstring &currentDirectory,
 	EnvVarsExpansion envVarsExpansionType)
 {
-	if (PathIsUrlWrapper(userEnteredPath))
-	{
-		// If the path is a file: URL, none of the steps below should be performed (e.g. it makes no
-		// sense to perform environment variable expansion).
-		// Also, while Explorer doesn't normalize paths retrieved from file: URLs, it appears that
-		// it is valid for a file: URL to contain relative references (see
-		// https://datatracker.ietf.org/doc/html/rfc8089#appendix-E.2.1), so the path returned here
-		// can still be normalized.
-		return MaybeExtractPathFromFileUrl(userEnteredPath);
-	}
-
 	std::wstring updatedPath = userEnteredPath;
 
-	// It's important environment variables are expanded first. A path like "%WINDIR%", for example,
-	// isn't absolute until it's expanded to "C:\WINDOWS".
+	// An environment variable can appear anywhere in the path (regardless of what type of path has
+	// been entered), so environment variables need to be expanded first. This means that it's also
+	// not possible to interpret the path in any way until that expansion has taken place.
 	if (envVarsExpansionType == EnvVarsExpansion::Expand)
 	{
 		auto expandedPath = ExpandEnvironmentStringsWrapper(updatedPath);
@@ -658,6 +654,37 @@ std::optional<std::wstring> TransformUserEnteredPathToAbsolutePath(
 		return std::nullopt;
 	}
 
+	// The documentation for this method states that it performs rudimentary parsing. That should be
+	// good enough, given that the goal here is simply to detect shell: and file: URLs.
+	PARSEDURL parsedUrl = {};
+	parsedUrl.cbSize = sizeof(parsedUrl);
+	HRESULT hr = ParseURL(updatedPath.c_str(), &parsedUrl);
+
+	if (SUCCEEDED(hr))
+	{
+		if (parsedUrl.nScheme == URL_SCHEME_SHELL)
+		{
+			// A shell: URL represents a shell folder path. For example, "shell:downloads" will
+			// resolve to the user's downloads folder. These paths can be handled directly by
+			// SHParseDisplayName().
+			return updatedPath;
+		}
+		else if (parsedUrl.nScheme == URL_SCHEME_FILE)
+		{
+			// If the path is a file: URL, it should be absolute, meaning it can be returned
+			// immediately. While Explorer doesn't normalize paths retrieved from file: URLs, it
+			// appears that it is valid for a file: URL to contain relative references (see
+			// https://datatracker.ietf.org/doc/html/rfc8089#appendix-E.2.1), so the path returned
+			// here can still be normalized.
+			return MaybeExtractPathFromFileUrl(updatedPath);
+		}
+		else
+		{
+			// Other types of URLs aren't supported.
+			return std::nullopt;
+		}
+	}
+
 	if (IsPathGUID(updatedPath) || !PathIsRelative(updatedPath.c_str()))
 	{
 		// Absolute paths can be returned unmodified, except for the case where a root path like
@@ -669,14 +696,19 @@ std::optional<std::wstring> TransformUserEnteredPathToAbsolutePath(
 	return PathAppendWrapper(currentDirectory, updatedPath);
 }
 
-bool PathIsUrlWrapper(const std::wstring &path)
+bool ShouldNormalizePath(const std::wstring &path)
 {
-	if (path.size() >= MAX_PATH)
+	PARSEDURL parsedUrl = {};
+	parsedUrl.cbSize = sizeof(parsedUrl);
+	HRESULT hr = ParseURL(path.c_str(), &parsedUrl);
+
+	// Shell folder paths can't contain relative references.
+	if (SUCCEEDED(hr) && parsedUrl.nScheme == URL_SCHEME_SHELL)
 	{
 		return false;
 	}
 
-	return PathIsURL(path.c_str());
+	return true;
 }
 
 std::optional<std::wstring> MaybeExtractPathFromFileUrl(const std::wstring &url)

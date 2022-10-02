@@ -111,7 +111,6 @@ std::vector<PCIDLIST_ABSOLUTE> ShallowCopyPidls(const std::vector<unique_pidl_ab
 std::optional<std::wstring> TransformUserEnteredPathToAbsolutePathAndNormalize(
 	const std::wstring &userEnteredPath, const std::wstring &currentDirectory,
 	EnvVarsExpansion envVarsExpansionType);
-bool PathIsUrlWrapper(const std::wstring &path);
 std::optional<std::wstring> MaybeExtractPathFromFileUrl(const std::wstring &url);
 std::optional<std::wstring> ExpandEnvironmentStringsWrapper(const std::wstring &sourceString);
 std::optional<std::wstring> MaybeTransformRootPathToAbsolutePath(const std::wstring path,
