@@ -182,7 +182,12 @@ HRESULT STDMETHODCALLTYPE FileProgressSink::PostNewItem(DWORD dwFlags,
 		return S_OK;
 	}
 
-	if (FAILED(hrNew))
+	// When attempting to create a folder in a location where the total path length would exceed
+	// MAX_PATH, the operation will fail, with hrNew being set to a value of 0x0027000b. That's
+	// greater than 0, which means that FAILED(hrNew) will return false. In that case, psiNewItem
+	// will be NULL, which will cause a crash if an attempt is made to use it. So, rather than using
+	// FAILED, a check is performed against S_OK directly, which is the value used when successful.
+	if (hrNew != S_OK)
 	{
 		return S_OK;
 	}
