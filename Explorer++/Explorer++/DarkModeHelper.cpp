@@ -216,6 +216,7 @@ void DarkModeHelper::SetTreeViewDarkModeColors(HWND treeView)
 
 	TreeView_SetBkColor(treeView, BACKGROUND_COLOR);
 	TreeView_SetTextColor(treeView, TEXT_COLOR);
+	TreeView_SetInsertMarkColor(treeView, FOREGROUND_COLOR);
 
 	InvalidateRect(treeView, nullptr, TRUE);
 }
