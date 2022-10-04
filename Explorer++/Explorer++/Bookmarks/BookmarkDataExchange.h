@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Bookmarks/BookmarkItem.h"
-#include <winrt/base.h>
+#include "../Helper/WinRTBaseWrapper.h"
 #include <functional>
 
 // This type is used when serializing multiple independent bookmark items and is

@@ -674,8 +674,8 @@ SplitFileDialogPersistentSettings &SplitFileDialogPersistentSettings::GetInstanc
 
 void SplitFileDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	RegistrySettings::SaveString(hKey, SETTING_SIZE, m_strSplitSize.c_str());
-	RegistrySettings::SaveString(hKey, SETTING_SIZE_GROUP, m_strSplitGroup.c_str());
+	RegistrySettings::SaveString(hKey, SETTING_SIZE, m_strSplitSize);
+	RegistrySettings::SaveString(hKey, SETTING_SIZE_GROUP, m_strSplitGroup);
 }
 
 void SplitFileDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)

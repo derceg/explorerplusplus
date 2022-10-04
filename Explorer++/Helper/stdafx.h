@@ -64,10 +64,8 @@
 #include <winioctl.h>
 #include <wmsdk.h>
 
-// clang-format off
-#include <Unknwn.h>
-#include <winrt/base.h>
-// clang-format on
+// WinRT
+#include "WinRTBaseWrapper.h"
 
 // C++ Header Files:
 #include <iostream>

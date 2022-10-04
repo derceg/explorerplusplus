@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <winrt/base.h>
+#include "WinRTBaseWrapper.h"
 #include <oleidl.h>
 
 class DropSourceImpl : public winrt::implements<DropSourceImpl, IDropSource>

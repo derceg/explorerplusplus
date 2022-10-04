@@ -424,7 +424,7 @@ void SetDefaultColumnsDialogPersistentSettings::SaveExtraRegistrySettings(HKEY h
 void SetDefaultColumnsDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
 	DWORD value;
-	RegistrySettings::ReadDword(hKey, SETTING_FOLDER_TYPE, &value);
+	RegistrySettings::ReadDword(hKey, SETTING_FOLDER_TYPE, value);
 	m_FolderType = static_cast<FolderType>(value);
 }
 

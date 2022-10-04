@@ -149,7 +149,6 @@
     </ClCompile>
     <ClCompile Include="TestFolderSize.cpp" />
     <ClCompile Include="TestHelper.cpp" />
-    <ClCompile Include="TestRegistry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Helper\Helper.vcxproj">

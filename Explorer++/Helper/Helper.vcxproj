@@ -420,6 +420,7 @@
     <ClInclude Include="TimeHelper.h" />
     <ClInclude Include="WindowHelper.h" />
     <ClInclude Include="WindowSubclassWrapper.h" />
+    <ClInclude Include="WinRTBaseWrapper.h" />
     <ClInclude Include="WinUserBackwardsCompatibility.h" />
     <ClInclude Include="XMLSettings.h" />
   </ItemGroup>

@@ -15,6 +15,7 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/WinRTBaseWrapper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/member.hpp>
@@ -22,7 +23,6 @@
 #include <boost/signals2.hpp>
 #include <wil/com.h>
 #include <wil/resource.h>
-#include <winrt/base.h>
 #include <thumbcache.h>
 #include <future>
 #include <list>

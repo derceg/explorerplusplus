@@ -1064,7 +1064,6 @@ BOOL LoadContextMenuHandlers(const TCHAR *szRegKey,
 		{
 			HKEY hSubKey;
 			TCHAR szSubKey[512];
-			TCHAR szCLSID[256];
 			LONG lSubKeyRes;
 
 			StringCchPrintf(szSubKey, SIZEOF_ARRAY(szSubKey), _T("%s\\%s"), szRegKey, szKeyName);
@@ -1073,20 +1072,20 @@ BOOL LoadContextMenuHandlers(const TCHAR *szRegKey,
 
 			if (lSubKeyRes == ERROR_SUCCESS)
 			{
-				lSubKeyRes =
-					RegistrySettings::ReadString(hSubKey, nullptr, szCLSID, SIZEOF_ARRAY(szCLSID));
+				std::wstring clsid;
+				LSTATUS clsidRes = RegistrySettings::ReadString(hSubKey, L"", clsid);
 
-				if (lSubKeyRes == ERROR_SUCCESS)
+				if (clsidRes == ERROR_SUCCESS)
 				{
 					if (std::none_of(blacklistedCLSIDEntries.begin(), blacklistedCLSIDEntries.end(),
-							[&szCLSID](const std::wstring &blacklistedEntry)
+							[&clsid](const std::wstring &blacklistedEntry)
 							{
-								return boost::iequals(szCLSID, blacklistedEntry);
+								return boost::iequals(clsid, blacklistedEntry);
 							}))
 					{
 						ContextMenuHandler contextMenuHandler;
 
-						BOOL bRes = LoadIUnknownFromCLSID(szCLSID, &contextMenuHandler);
+						BOOL bRes = LoadIUnknownFromCLSID(clsid.c_str(), &contextMenuHandler);
 
 						if (bRes)
 						{
@@ -1138,14 +1137,13 @@ BOOL LoadIUnknownFromCLSID(const TCHAR *szCLSID, ContextMenuHandler *pContextMen
 
 		if (lRes == ERROR_SUCCESS)
 		{
-			TCHAR szDLL[MAX_PATH];
+			std::wstring dll;
+			LSTATUS dllRes = RegistrySettings::ReadString(hDllKey, L"", dll);
 
-			lRes = RegistrySettings::ReadString(hDllKey, nullptr, szDLL, SIZEOF_ARRAY(szDLL));
-
-			if (lRes == ERROR_SUCCESS)
+			if (dllRes == ERROR_SUCCESS)
 			{
 				/* Now, load the DLL it refers to. */
-				hDLL = LoadLibrary(szDLL);
+				hDLL = LoadLibrary(dll.c_str());
 			}
 
 			RegCloseKey(hDllKey);

@@ -1001,7 +1001,6 @@ void Explorerplusplus::OnAssocChanged()
 	FII_PROC fileIconInit;
 	HKEY hKey;
 	HMODULE hShell32;
-	TCHAR szShellIconSize[32];
 	TCHAR szTemp[32];
 	DWORD dwShellIconSize;
 	LONG res;
@@ -1015,10 +1014,10 @@ void Explorerplusplus::OnAssocChanged()
 
 	if (res == ERROR_SUCCESS)
 	{
-		RegistrySettings::ReadString(hKey, _T("Shell Icon Size"), szShellIconSize,
-			SIZEOF_ARRAY(szShellIconSize));
+		std::wstring shellIconSize;
+		RegistrySettings::ReadString(hKey, _T("Shell Icon Size"), shellIconSize);
 
-		dwShellIconSize = _wtoi(szShellIconSize);
+		dwShellIconSize = _wtoi(shellIconSize.c_str());
 
 		/* Increment the value by one, and save it back to the registry. */
 		StringCchPrintf(szTemp, SIZEOF_ARRAY(szTemp), _T("%d"), dwShellIconSize + 1);
@@ -1028,7 +1027,7 @@ void Explorerplusplus::OnAssocChanged()
 			fileIconInit(TRUE);
 
 		/* Now, set it back to the original value. */
-		RegistrySettings::SaveString(hKey, _T("Shell Icon Size"), szShellIconSize);
+		RegistrySettings::SaveString(hKey, _T("Shell Icon Size"), shellIconSize);
 
 		if (fileIconInit != nullptr)
 			fileIconInit(FALSE);

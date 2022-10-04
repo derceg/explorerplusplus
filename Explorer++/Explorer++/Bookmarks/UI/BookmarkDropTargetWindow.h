@@ -6,7 +6,7 @@
 
 #include "Bookmarks/BookmarkDropper.h"
 #include "../Helper/DropTargetWindow.h"
-#include <winrt/base.h>
+#include "../Helper/WinRTBaseWrapper.h"
 #include <optional>
 
 class BookmarkDropTargetWindow : private DropTargetInternal

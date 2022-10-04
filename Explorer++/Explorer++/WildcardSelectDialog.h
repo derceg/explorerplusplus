@@ -41,7 +41,7 @@ private:
 	void SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode) override;
 	void LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue) override;
 
-	TCHAR m_szPattern[256];
+	std::wstring m_pattern;
 	std::list<std::wstring> m_PatternList;
 };
 

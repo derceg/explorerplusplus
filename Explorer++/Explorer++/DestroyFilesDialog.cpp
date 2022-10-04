@@ -306,8 +306,9 @@ void DestroyFilesDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 
 void DestroyFilesDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	RegistrySettings::ReadDword(hKey, SETTING_OVERWRITE_METHOD,
-		reinterpret_cast<LPDWORD>(&m_overwriteMethod));
+	DWORD value;
+	RegistrySettings::Read32BitValueFromRegistry(hKey, SETTING_OVERWRITE_METHOD, value);
+	m_overwriteMethod = static_cast<NFileOperations::OverwriteMethod>(value);
 }
 
 void DestroyFilesDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,

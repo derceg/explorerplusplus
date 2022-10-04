@@ -80,7 +80,7 @@ private:
 	template <typename T>
 	void ListToCircularBuffer(const std::list<T> &list, boost::circular_buffer<T> &cb);
 
-	TCHAR m_szSearchPattern[MAX_PATH];
+	std::wstring m_searchPattern;
 	boost::circular_buffer<std::wstring> m_searchPatterns;
 	boost::circular_buffer<std::wstring> m_searchDirectories;
 	BOOL m_bSearchSubFolders;

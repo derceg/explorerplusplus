@@ -96,7 +96,7 @@ LSTATUS DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
 
 	// Now, set the default value for the key. This default value will be the text that is shown on
 	// the context menu for folders.
-	res = RegistrySettings::SaveString(appKey.get(), nullptr, menuText.c_str());
+	res = RegistrySettings::SaveString(appKey.get(), L"", menuText);
 
 	if (res != ERROR_SUCCESS)
 	{
@@ -119,7 +119,7 @@ LSTATUS DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
 	GetProcessImageName(GetCurrentProcessId(), executable, SIZEOF_ARRAY(executable));
 	StringCchPrintf(command, SIZEOF_ARRAY(command), _T("\"%s\" \"%%1\""), executable);
 
-	res = RegistrySettings::SaveString(commandKey.get(), nullptr, command);
+	res = RegistrySettings::SaveString(commandKey.get(), L"", command);
 
 	if (res != ERROR_SUCCESS)
 	{
@@ -127,7 +127,7 @@ LSTATUS DefaultFileManagerInternal::SetAsDefaultFileManagerInternal(
 	}
 
 	// Set the current entry as the default.
-	res = RegistrySettings::SaveString(shellKey.get(), nullptr, applicationKeyName.c_str());
+	res = RegistrySettings::SaveString(shellKey.get(), L"", applicationKeyName);
 
 	return res;
 }
@@ -174,7 +174,7 @@ LSTATUS DefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(
 		return res;
 	}
 
-	res = RegistrySettings::SaveString(shellKey.get(), nullptr, defaultValue);
+	res = RegistrySettings::SaveString(shellKey.get(), L"", defaultValue);
 
 	if (res != ERROR_SUCCESS)
 	{

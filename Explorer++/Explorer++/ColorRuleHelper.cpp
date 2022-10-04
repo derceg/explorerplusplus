@@ -57,7 +57,7 @@ void NColorRuleHelper::LoadColorRulesFromRegistry(
 	std::vector<NColorRuleHelper::ColorRule> &ColorRules)
 {
 	HKEY hKey;
-	LONG lRes = RegOpenKeyEx(HKEY_CURRENT_USER, REG_COLORS_KEY, 0, KEY_READ, &hKey);
+	LSTATUS lRes = RegOpenKeyEx(HKEY_CURRENT_USER, REG_COLORS_KEY, 0, KEY_READ, &hKey);
 
 	if (lRes == ERROR_SUCCESS)
 	{
@@ -81,7 +81,7 @@ void LoadColorRulesFromRegistryInternal(HKEY hKey,
 		== ERROR_SUCCESS)
 	{
 		HKEY hKeyChild;
-		LONG res = RegOpenKeyEx(hKey, szKeyName, 0, KEY_READ, &hKeyChild);
+		LSTATUS res = RegOpenKeyEx(hKey, szKeyName, 0, KEY_READ, &hKeyChild);
 
 		if (res == ERROR_SUCCESS)
 		{
@@ -89,20 +89,20 @@ void LoadColorRulesFromRegistryInternal(HKEY hKey,
 
 			colorRule.caseInsensitive = FALSE;
 
-			LONG lDescriptionStatus = RegistrySettings::ReadString(hKeyChild, _T("Description"),
+			LSTATUS descriptionResult = RegistrySettings::ReadString(hKeyChild, _T("Description"),
 				colorRule.strDescription);
-			LONG lFilenamePatternStatus = RegistrySettings::ReadString(hKeyChild,
+			LSTATUS filenamePatternResult = RegistrySettings::ReadString(hKeyChild,
 				_T("FilenamePattern"), colorRule.strFilterPattern);
-			RegistrySettings::ReadDword(hKeyChild, _T("CaseInsensitive"),
-				(LPDWORD) &colorRule.caseInsensitive);
-			RegistrySettings::ReadDword(hKeyChild, _T("Attributes"), &colorRule.dwFilterAttributes);
+			RegistrySettings::Read32BitValueFromRegistry(hKeyChild, _T("CaseInsensitive"),
+				colorRule.caseInsensitive);
+			RegistrySettings::ReadDword(hKeyChild, _T("Attributes"), colorRule.dwFilterAttributes);
 
 			DWORD dwType = REG_BINARY;
 			DWORD dwSize = sizeof(colorRule.rgbColour);
 			RegQueryValueEx(hKeyChild, _T("Color"), nullptr, &dwType,
 				reinterpret_cast<LPBYTE>(&colorRule.rgbColour), &dwSize);
 
-			if (lDescriptionStatus == ERROR_SUCCESS && lFilenamePatternStatus == ERROR_SUCCESS)
+			if (descriptionResult == ERROR_SUCCESS && filenamePatternResult == ERROR_SUCCESS)
 			{
 				ColorRules.push_back(colorRule);
 			}
@@ -121,7 +121,7 @@ void NColorRuleHelper::SaveColorRulesToRegistry(
 	SHDeleteKey(HKEY_CURRENT_USER, REG_COLORS_KEY);
 
 	HKEY hKey;
-	LONG lRes = RegCreateKeyEx(HKEY_CURRENT_USER, REG_COLORS_KEY, 0, nullptr,
+	LSTATUS lRes = RegCreateKeyEx(HKEY_CURRENT_USER, REG_COLORS_KEY, 0, nullptr,
 		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &hKey, nullptr);
 
 	if (lRes == ERROR_SUCCESS)
@@ -147,15 +147,13 @@ void SaveColorRulesToRegistryInternal(HKEY hKey, const NColorRuleHelper::ColorRu
 	_itow_s(iCount, szKeyName, SIZEOF_ARRAY(szKeyName), 10);
 
 	HKEY hKeyChild;
-	LONG res = RegCreateKeyEx(hKey, szKeyName, 0, nullptr, REG_OPTION_NON_VOLATILE, KEY_WRITE,
+	LSTATUS res = RegCreateKeyEx(hKey, szKeyName, 0, nullptr, REG_OPTION_NON_VOLATILE, KEY_WRITE,
 		nullptr, &hKeyChild, nullptr);
 
 	if (res == ERROR_SUCCESS)
 	{
-		RegistrySettings::SaveString(hKeyChild, _T("Description"),
-			ColorRule.strDescription.c_str());
-		RegistrySettings::SaveString(hKeyChild, _T("FilenamePattern"),
-			ColorRule.strFilterPattern.c_str());
+		RegistrySettings::SaveString(hKeyChild, _T("Description"), ColorRule.strDescription);
+		RegistrySettings::SaveString(hKeyChild, _T("FilenamePattern"), ColorRule.strFilterPattern);
 		RegistrySettings::SaveDword(hKeyChild, _T("CaseInsensitive"), ColorRule.caseInsensitive);
 		RegistrySettings::SaveDword(hKeyChild, _T("Attributes"), ColorRule.dwFilterAttributes);
 		RegSetValueEx(hKeyChild, _T("Color"), 0, REG_BINARY,

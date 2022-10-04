@@ -32,8 +32,8 @@
 #include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/WinRTBaseWrapper.h"
 #include <wil/com.h>
-#include <winrt/base.h>
 
 LRESULT CALLBACK Explorerplusplus::ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
 	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)

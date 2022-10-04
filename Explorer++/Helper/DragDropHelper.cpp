@@ -6,8 +6,8 @@
 #include "DragDropHelper.h"
 #include "DataObjectWrapper.h"
 #include "Macros.h"
+#include "WinRTBaseWrapper.h"
 #include <wil/com.h>
-#include <winrt/base.h>
 
 STGMEDIUM GetStgMediumForGlobal(HGLOBAL global)
 {

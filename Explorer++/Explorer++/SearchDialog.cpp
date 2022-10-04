@@ -145,7 +145,7 @@ INT_PTR SearchDialog::OnInitDialog()
 			reinterpret_cast<LPARAM>(strPattern.c_str()));
 	}
 
-	SetDlgItemText(m_hDlg, IDC_COMBO_NAME, m_persistentSettings->m_szSearchPattern);
+	SetDlgItemText(m_hDlg, IDC_COMBO_NAME, m_persistentSettings->m_searchPattern.c_str());
 	SetDlgItemText(m_hDlg, IDC_COMBO_DIRECTORY, m_searchDirectory.c_str());
 
 	ComboBox::CreateNew(GetDlgItem(m_hDlg, IDC_COMBO_NAME));
@@ -353,7 +353,6 @@ void SearchDialog::StartSearching()
 
 	/* Get the directory and name, and remove leading and
 	trailing whitespace. */
-	/* TODO: Verify fields. */
 	GetDlgItemText(m_hDlg, IDC_COMBO_DIRECTORY, szBaseDirectory, SIZEOF_ARRAY(szBaseDirectory));
 	PathRemoveBlanks(szBaseDirectory);
 	GetDlgItemText(m_hDlg, IDC_COMBO_NAME, szSearchPattern, SIZEOF_ARRAY(szSearchPattern));
@@ -1240,8 +1239,7 @@ void SearchDialog::SaveState()
 	m_persistentSettings->m_iColumnWidth1 = ListView_GetColumnWidth(hListView, 0);
 	m_persistentSettings->m_iColumnWidth2 = ListView_GetColumnWidth(hListView, 1);
 
-	GetDlgItemText(m_hDlg, IDC_COMBO_NAME, m_persistentSettings->m_szSearchPattern,
-		SIZEOF_ARRAY(m_persistentSettings->m_szSearchPattern));
+	m_persistentSettings->m_searchPattern = GetDlgItemString(m_hDlg, IDC_COMBO_NAME);
 
 	m_persistentSettings->m_bStateSaved = TRUE;
 }
@@ -1260,8 +1258,6 @@ SearchDialogPersistentSettings::SearchDialogPersistentSettings() :
 	m_bSystem = FALSE;
 	m_iColumnWidth1 = -1;
 	m_iColumnWidth2 = -1;
-
-	StringCchCopy(m_szSearchPattern, SIZEOF_ARRAY(m_szSearchPattern), EMPTY_STRING);
 
 	ColumnInfo ci;
 	ci.sortMode = SortMode::Name;
@@ -1288,7 +1284,7 @@ void SearchDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
 	RegistrySettings::SaveDword(hKey, SETTING_COLUMN_WIDTH_1, m_iColumnWidth1);
 	RegistrySettings::SaveDword(hKey, SETTING_COLUMN_WIDTH_2, m_iColumnWidth2);
-	RegistrySettings::SaveString(hKey, SETTING_SEARCH_DIRECTORY_TEXT, m_szSearchPattern);
+	RegistrySettings::SaveString(hKey, SETTING_SEARCH_DIRECTORY_TEXT, m_searchPattern);
 	RegistrySettings::SaveDword(hKey, SETTING_SEARCH_SUB_FOLDERS, m_bSearchSubFolders);
 	RegistrySettings::SaveDword(hKey, SETTING_USE_REGULAR_EXPRESSIONS, m_bUseRegularExpressions);
 	RegistrySettings::SaveDword(hKey, SETTING_CASE_INSENSITIVE, m_bCaseInsensitive);
@@ -1310,27 +1306,23 @@ void SearchDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 
 void SearchDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	RegistrySettings::ReadDword(hKey, SETTING_COLUMN_WIDTH_1,
-		reinterpret_cast<LPDWORD>(&m_iColumnWidth1));
-	RegistrySettings::ReadDword(hKey, SETTING_COLUMN_WIDTH_2,
-		reinterpret_cast<LPDWORD>(&m_iColumnWidth2));
-	RegistrySettings::ReadString(hKey, SETTING_SEARCH_DIRECTORY_TEXT, m_szSearchPattern,
-		SIZEOF_ARRAY(m_szSearchPattern));
-	RegistrySettings::ReadDword(hKey, SETTING_SEARCH_SUB_FOLDERS,
-		reinterpret_cast<LPDWORD>(&m_bSearchSubFolders));
-	RegistrySettings::ReadDword(hKey, SETTING_USE_REGULAR_EXPRESSIONS,
-		reinterpret_cast<LPDWORD>(&m_bUseRegularExpressions));
-	RegistrySettings::ReadDword(hKey, SETTING_CASE_INSENSITIVE,
-		reinterpret_cast<LPDWORD>(&m_bCaseInsensitive));
-	RegistrySettings::ReadDword(hKey, SETTING_ARCHIVE, reinterpret_cast<LPDWORD>(&m_bArchive));
-	RegistrySettings::ReadDword(hKey, SETTING_HIDDEN, reinterpret_cast<LPDWORD>(&m_bHidden));
-	RegistrySettings::ReadDword(hKey, SETTING_READ_ONLY, reinterpret_cast<LPDWORD>(&m_bReadOnly));
-	RegistrySettings::ReadDword(hKey, SETTING_SYSTEM, reinterpret_cast<LPDWORD>(&m_bSystem));
-	RegistrySettings::ReadDword(hKey, SETTING_SORT_ASCENDING,
-		reinterpret_cast<LPDWORD>(&m_bSortAscending));
+	RegistrySettings::Read32BitValueFromRegistry(hKey, SETTING_COLUMN_WIDTH_1, m_iColumnWidth1);
+	RegistrySettings::Read32BitValueFromRegistry(hKey, SETTING_COLUMN_WIDTH_2, m_iColumnWidth2);
+	RegistrySettings::ReadString(hKey, SETTING_SEARCH_DIRECTORY_TEXT, m_searchPattern);
+	RegistrySettings::Read32BitValueFromRegistry(hKey, SETTING_SEARCH_SUB_FOLDERS,
+		m_bSearchSubFolders);
+	RegistrySettings::Read32BitValueFromRegistry(hKey, SETTING_USE_REGULAR_EXPRESSIONS,
+		m_bUseRegularExpressions);
+	RegistrySettings::Read32BitValueFromRegistry(hKey, SETTING_CASE_INSENSITIVE,
+		m_bCaseInsensitive);
+	RegistrySettings::Read32BitValueFromRegistry(hKey, SETTING_ARCHIVE, m_bArchive);
+	RegistrySettings::Read32BitValueFromRegistry(hKey, SETTING_HIDDEN, m_bHidden);
+	RegistrySettings::Read32BitValueFromRegistry(hKey, SETTING_READ_ONLY, m_bReadOnly);
+	RegistrySettings::Read32BitValueFromRegistry(hKey, SETTING_SYSTEM, m_bSystem);
+	RegistrySettings::Read32BitValueFromRegistry(hKey, SETTING_SORT_ASCENDING, m_bSortAscending);
 
 	DWORD value;
-	RegistrySettings::ReadDword(hKey, SETTING_SORT_MODE, &value);
+	RegistrySettings::ReadDword(hKey, SETTING_SORT_MODE, value);
 	m_SortMode = static_cast<SortMode>(value);
 
 	std::list<std::wstring> searchDirectoriesList;
@@ -1350,7 +1342,7 @@ void SearchDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLD
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_COLUMN_WIDTH_2,
 		NXMLSettings::EncodeIntValue(m_iColumnWidth2));
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SEARCH_DIRECTORY_TEXT,
-		m_szSearchPattern);
+		m_searchPattern.c_str());
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SEARCH_SUB_FOLDERS,
 		NXMLSettings::EncodeBoolValue(m_bSearchSubFolders));
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_USE_REGULAR_EXPRESSIONS,
@@ -1393,7 +1385,7 @@ void SearchDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName, BSTR bs
 	}
 	else if (lstrcmpi(bstrName, SETTING_SEARCH_DIRECTORY_TEXT) == 0)
 	{
-		StringCchCopy(m_szSearchPattern, SIZEOF_ARRAY(m_szSearchPattern), bstrValue);
+		m_searchPattern = bstrValue;
 	}
 	else if (lstrcmpi(bstrName, SETTING_SEARCH_SUB_FOLDERS) == 0)
 	{

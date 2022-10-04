@@ -4,33 +4,39 @@
 
 #pragma once
 
-#include <tchar.h>
+#include <windows.h>
+#include <functional>
 #include <list>
 #include <string>
 
 namespace RegistrySettings
 {
-LONG SaveDword(HKEY hKey, const TCHAR *valueName, DWORD dwValue);
-LONG ReadDword(HKEY hKey, const TCHAR *valueName, DWORD *pReturnValue);
-LONG SaveString(HKEY hKey, const TCHAR *valueName, const TCHAR *szValue);
-LONG ReadString(HKEY hKey, const TCHAR *szKey, TCHAR *valueName, DWORD cchMax);
-LONG ReadString(HKEY hKey, const std::wstring &valueName, std::wstring &strOutput);
-LONG SaveStringList(HKEY hKey, const TCHAR *baseValueName, const std::list<std::wstring> &strList);
-LONG ReadStringList(HKEY hKey, const TCHAR *baseValueName, std::list<std::wstring> &strList);
+
+LSTATUS SaveDword(HKEY key, const std::wstring &valueName, DWORD value);
+LSTATUS ReadDword(HKEY key, const std::wstring &valueName, DWORD &output);
+void ReadDword(HKEY key, const std::wstring &valueName,
+	std::function<void(DWORD value)> successCallback);
+LSTATUS SaveString(HKEY key, const std::wstring &valueName, const std::wstring &value);
+LSTATUS ReadString(HKEY key, const std::wstring &valueName, std::wstring &output);
+LSTATUS SaveStringList(HKEY key, const std::wstring &baseValueName,
+	const std::list<std::wstring> &strings);
+LSTATUS ReadStringList(HKEY key, const std::wstring &baseValueName,
+	std::list<std::wstring> &outputStrings);
 bool SaveDateTime(HKEY key, const std::wstring &baseValueName, const FILETIME &dateTime);
-bool ReadDateTime(HKEY key, const std::wstring &baseValueName, FILETIME &dateTime);
+bool ReadDateTime(HKEY key, const std::wstring &baseValueName, FILETIME &outputDateTime);
 
 template <typename T>
-LONG Read32BitValueFromRegistry(HKEY key, const std::wstring &valueName, T &output)
+LSTATUS Read32BitValueFromRegistry(HKEY key, const std::wstring &valueName, T &output)
 {
 	DWORD value;
-	LONG result = ReadDword(key, valueName.c_str(), &value);
+	auto res = ReadDword(key, valueName, value);
 
-	if (result == ERROR_SUCCESS)
+	if (res == ERROR_SUCCESS)
 	{
 		output = value;
 	}
 
-	return result;
+	return res;
 }
+
 }

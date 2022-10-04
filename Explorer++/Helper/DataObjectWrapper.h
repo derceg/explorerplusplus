@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include "WinRTBaseWrapper.h"
 #include <wil/com.h>
-#include <winrt/base.h>
 #include <objidl.h>
 #include <shldisp.h>
 

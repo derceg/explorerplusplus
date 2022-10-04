@@ -26,7 +26,7 @@ const TCHAR SETTING_SHOW_NAME_ON_TOOLBAR[] = _T("ShowNameOnToolbar");
 std::unique_ptr<Application> LoadApplication(HKEY key)
 {
 	std::wstring name;
-	LONG result = RegistrySettings::ReadString(key, SETTING_NAME, name);
+	LSTATUS result = RegistrySettings::ReadString(key, SETTING_NAME, name);
 
 	if (result != ERROR_SUCCESS)
 	{
@@ -76,8 +76,8 @@ void LoadFromKey(HKEY parentKey, ApplicationModel *model)
 
 void SaveApplication(HKEY key, const Application *application)
 {
-	RegistrySettings::SaveString(key, SETTING_NAME, application->GetName().c_str());
-	RegistrySettings::SaveString(key, SETTING_COMMAND, application->GetCommand().c_str());
+	RegistrySettings::SaveString(key, SETTING_NAME, application->GetName());
+	RegistrySettings::SaveString(key, SETTING_COMMAND, application->GetCommand());
 	RegistrySettings::SaveDword(key, SETTING_SHOW_NAME_ON_TOOLBAR,
 		application->GetShowNameOnToolbar());
 }
@@ -89,7 +89,7 @@ void SaveToKey(HKEY parentKey, const ApplicationModel *model)
 	for (const auto &application : model->GetApplications())
 	{
 		wil::unique_hkey childKey;
-		LONG res = RegCreateKeyEx(parentKey, std::to_wstring(index).c_str(), 0, nullptr,
+		LSTATUS res = RegCreateKeyEx(parentKey, std::to_wstring(index).c_str(), 0, nullptr,
 			REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &childKey, nullptr);
 
 		if (res == ERROR_SUCCESS)
@@ -107,7 +107,7 @@ void Load(const std::wstring &applicationKeyPath, ApplicationModel *model)
 {
 	wil::unique_hkey applicationToolbarKey;
 	std::wstring fullKeyPath = applicationKeyPath + L"\\" + APPLICATION_TOOLBAR_KEY_PATH;
-	LONG res =
+	LSTATUS res =
 		RegOpenKeyEx(HKEY_CURRENT_USER, fullKeyPath.c_str(), 0, KEY_READ, &applicationToolbarKey);
 
 	if (res == ERROR_SUCCESS)
@@ -122,7 +122,7 @@ void Save(const std::wstring &applicationKeyPath, const ApplicationModel *model)
 	SHDeleteKey(HKEY_CURRENT_USER, fullKeyPath.c_str());
 
 	wil::unique_hkey applicationToolbarKey;
-	LONG res = RegCreateKeyEx(HKEY_CURRENT_USER, fullKeyPath.c_str(), 0, nullptr,
+	LSTATUS res = RegCreateKeyEx(HKEY_CURRENT_USER, fullKeyPath.c_str(), 0, nullptr,
 		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &applicationToolbarKey, nullptr);
 
 	if (res == ERROR_SUCCESS)

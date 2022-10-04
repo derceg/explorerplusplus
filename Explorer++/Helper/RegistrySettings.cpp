@@ -4,152 +4,167 @@
 
 #include "stdafx.h"
 #include "RegistrySettings.h"
-#include "Macros.h"
-#include <list>
-#include <string>
 
-LONG RegistrySettings::SaveDword(HKEY hKey, const TCHAR *valueName, DWORD dwValue)
+namespace RegistrySettings
 {
-	return RegSetValueEx(hKey, valueName, 0, REG_DWORD, reinterpret_cast<const BYTE *>(&dwValue),
-		sizeof(dwValue));
+
+LSTATUS SaveDword(HKEY key, const std::wstring &valueName, DWORD value)
+{
+	return RegSetValueEx(key, valueName.c_str(), 0, REG_DWORD,
+		reinterpret_cast<const BYTE *>(&value), sizeof(value));
 }
 
-LONG RegistrySettings::ReadDword(HKEY hKey, const TCHAR *valueName, DWORD *pReturnValue)
+// This could return something like:
+//
+// outcome::std_result<DWORD>
+//
+// but it would make the function more cumbersome to use in some cases. Which is why the output
+// value is returned via a parameter.
+//
+// There are essentially two ways in which this function is used:
+//
+// 1. To read configuration values. In this case, it doesn't matter if the function fails and the
+// output value can be left unchanged. Having to manually unwrap every value returned in an
+// outcome::std_result would be cumbersome.
+// 2. To read a specific set of items that all need to be successfully read. In this case,
+// unwrapping the values isn't too big a deal, since the return values need to be checked.
+//
+// Since using an output parameter makes the first case simpler and also works for the second case,
+// that's what's used here.
+LSTATUS ReadDword(HKEY key, const std::wstring &valueName, DWORD &output)
 {
-	DWORD dwSize = sizeof(DWORD);
+	DWORD value;
+	DWORD size = sizeof(DWORD);
 
-	return RegQueryValueEx(hKey, valueName, nullptr, nullptr,
-		reinterpret_cast<LPBYTE>(pReturnValue), &dwSize);
-}
+	LSTATUS res =
+		RegGetValue(key, nullptr, valueName.c_str(), RRF_RT_REG_DWORD, nullptr, &value, &size);
 
-LONG RegistrySettings::SaveString(HKEY hKey, const TCHAR *valueName, const TCHAR *szValue)
-{
-	return RegSetValueEx(hKey, valueName, 0, REG_SZ, reinterpret_cast<const BYTE *>(szValue),
-		(lstrlen(szValue) + 1) * sizeof(TCHAR));
-}
-
-LONG RegistrySettings::ReadString(HKEY hKey, const TCHAR *valueName, TCHAR *szOutput, DWORD cchMax)
-{
-	LONG lRes;
-	DWORD dwType;
-	DWORD dwBufByteSize;
-	DWORD dwBufChSize;
-
-	dwBufByteSize = cchMax * sizeof(TCHAR);
-	lRes = RegQueryValueEx(hKey, valueName, nullptr, &dwType, reinterpret_cast<LPBYTE>(szOutput),
-		&dwBufByteSize);
-	dwBufChSize = dwBufByteSize / sizeof(TCHAR);
-
-	/* The returned buffer size includes any terminating
-	NULL bytes (if the string was stored with a NULL byte).
-	Therefore, if the string was stored with a NULL byte,
-	the returned character String[dwBufChSize - 1] will be
-	a NULL byte; if a string was not stored with a NULL byte,
-	the size (and string) will not include any NULL bytes,
-	and a NULL byte must be placed at String[dwBufChSize],
-	providing that buffer size is smaller than the size
-	of the incoming buffer. */
-	if (dwBufChSize == 0 || dwType != REG_SZ)
+	if (res != ERROR_SUCCESS)
 	{
-		szOutput[0] = '\0';
-	}
-	else
-	{
-		if (szOutput[dwBufChSize - 1] != '\0')
-		{
-			dwBufChSize = min(dwBufChSize, cchMax - 1);
-			szOutput[dwBufChSize] = '\0';
-		}
+		return res;
 	}
 
-	return lRes;
+	output = value;
+
+	return res;
 }
 
-LONG RegistrySettings::ReadString(HKEY hKey, const std::wstring &valueName, std::wstring &strOutput)
+void ReadDword(HKEY key, const std::wstring &valueName,
+	std::function<void(DWORD value)> successCallback)
 {
-	TCHAR szTemp[512];
-	LONG lRes = RegistrySettings::ReadString(hKey, valueName.c_str(), szTemp, SIZEOF_ARRAY(szTemp));
+	DWORD value;
+	LSTATUS result = ReadDword(key, valueName, value);
 
-	if (lRes == ERROR_SUCCESS)
+	if (result != ERROR_SUCCESS)
 	{
-		strOutput = szTemp;
+		return;
 	}
 
-	return lRes;
+	successCallback(value);
 }
 
-/* Saves a set of strings to the registry. Returns something other
-than ERROR_SUCCESS on failure. If this function does fail, any values
-that have been written will not be deleted (i.e. this function is
-not transactional). */
-LONG RegistrySettings::SaveStringList(HKEY hKey, const TCHAR *baseValueName,
-	const std::list<std::wstring> &strList)
+LSTATUS SaveString(HKEY key, const std::wstring &valueName, const std::wstring &value)
 {
-	TCHAR szItemKey[128];
-	LONG lRes;
+	return RegSetValueEx(key, valueName.c_str(), 0, REG_SZ,
+		reinterpret_cast<const BYTE *>(value.c_str()),
+		static_cast<DWORD>((value.size() + 1) * sizeof(wchar_t)));
+}
+
+LSTATUS ReadString(HKEY key, const std::wstring &valueName, std::wstring &output)
+{
+	DWORD size;
+	LSTATUS res =
+		RegGetValue(key, nullptr, valueName.c_str(), RRF_RT_REG_SZ, nullptr, nullptr, &size);
+
+	if (res != ERROR_SUCCESS)
+	{
+		return res;
+	}
+
+	// size is in bytes and includes space for the terminating null character.
+	std::wstring text;
+	text.resize(size / sizeof(wchar_t));
+
+	res = RegGetValue(key, nullptr, valueName.c_str(), RRF_RT_REG_SZ, nullptr, text.data(), &size);
+
+	if (res != ERROR_SUCCESS)
+	{
+		return res;
+	}
+
+	text.resize((size / sizeof(wchar_t)) - 1);
+
+	output = text;
+
+	return res;
+}
+
+// Saves a set of strings to the registry. Returns something other than ERROR_SUCCESS on failure. If
+// this function does fail, any values that have been written will not be deleted (i.e. this
+// function is not transactional).
+LSTATUS SaveStringList(HKEY key, const std::wstring &baseValueName,
+	const std::list<std::wstring> &strings)
+{
 	int i = 0;
 
-	for (const auto &str : strList)
+	for (const auto &str : strings)
 	{
-		StringCchPrintf(szItemKey, SIZEOF_ARRAY(szItemKey), _T("%s%d"), baseValueName, i++);
-		lRes = SaveString(hKey, szItemKey, str.c_str());
+		std::wstring itemValueName = std::format(L"{}{}", baseValueName, i++);
 
-		if (lRes != ERROR_SUCCESS)
+		LSTATUS res = SaveString(key, itemValueName, str);
+
+		if (res != ERROR_SUCCESS)
 		{
-			return lRes;
+			return res;
 		}
 	}
 
 	return ERROR_SUCCESS;
 }
 
-LONG RegistrySettings::ReadStringList(HKEY hKey, const TCHAR *baseValueName,
-	std::list<std::wstring> &strList)
+LSTATUS ReadStringList(HKEY key, const std::wstring &baseValueName,
+	std::list<std::wstring> &outputStrings)
 {
-	TCHAR szItemKey[128];
-	TCHAR szTemp[512];
-	LONG lRes;
+	LSTATUS res;
 	int i = 0;
 
 	do
 	{
-		StringCchPrintf(szItemKey, SIZEOF_ARRAY(szItemKey), _T("%s%d"), baseValueName, i++);
+		std::wstring itemValueName = std::format(L"{}{}", baseValueName, i++);
 
-		lRes = ReadString(hKey, szItemKey, szTemp, SIZEOF_ARRAY(szTemp));
+		std::wstring value;
+		res = ReadString(key, itemValueName, value);
 
-		if (lRes == ERROR_SUCCESS)
+		if (res == ERROR_SUCCESS)
 		{
-			strList.emplace_back(szTemp);
+			outputStrings.push_back(value);
 		}
-	} while (lRes == ERROR_SUCCESS);
+	} while (res == ERROR_SUCCESS);
 
-	/* It is expected that the loop
-	above will halt when the next
-	key in the list doesn't exist.
-	If it halts for some other
-	reason (such as the buffer been
-	to small), then that's an error. */
-	if (lRes == ERROR_FILE_NOT_FOUND)
+	// It is expected that the loop above will halt when the next key in the list doesn't exist. If
+	// it halts for some other reason, then that's an error.
+	if (res == ERROR_FILE_NOT_FOUND)
 	{
 		return ERROR_SUCCESS;
 	}
 
-	return lRes;
+	return res;
 }
 
-bool RegistrySettings::SaveDateTime(HKEY key, const std::wstring &baseValueName,
-	const FILETIME &dateTime)
+bool SaveDateTime(HKEY key, const std::wstring &baseValueName, const FILETIME &dateTime)
 {
-	LONG res1 = SaveDword(key, (baseValueName + L"Low").c_str(), dateTime.dwLowDateTime);
-	LONG res2 = SaveDword(key, (baseValueName + L"High").c_str(), dateTime.dwHighDateTime);
+	auto res1 = SaveDword(key, baseValueName + L"Low", dateTime.dwLowDateTime);
+	auto res2 = SaveDword(key, baseValueName + L"High", dateTime.dwHighDateTime);
 
 	return (res1 == ERROR_SUCCESS && res2 == ERROR_SUCCESS);
 }
 
-bool RegistrySettings::ReadDateTime(HKEY key, const std::wstring &baseValueName, FILETIME &dateTime)
+bool ReadDateTime(HKEY key, const std::wstring &baseValueName, FILETIME &outputDateTime)
 {
-	LONG res1 = ReadDword(key, (baseValueName + L"Low").c_str(), &dateTime.dwLowDateTime);
-	LONG res2 = ReadDword(key, (baseValueName + L"High").c_str(), &dateTime.dwHighDateTime);
+	auto res1 = ReadDword(key, baseValueName + L"Low", outputDateTime.dwLowDateTime);
+	auto res2 = ReadDword(key, baseValueName + L"High", outputDateTime.dwHighDateTime);
 
 	return (res1 == ERROR_SUCCESS && res2 == ERROR_SUCCESS);
+}
+
 }

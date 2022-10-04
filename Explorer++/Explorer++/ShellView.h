@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <winrt/base.h>
+#include "../Helper/WinRTBaseWrapper.h"
 #include <memory>
 
 class ShellBrowser;

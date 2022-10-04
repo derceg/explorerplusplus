@@ -6,8 +6,8 @@
 
 #include "DropTargetWindow.h"
 #include "ShellHelper.h"
+#include "WinRTBaseWrapper.h"
 #include <wil/com.h>
-#include <winrt/base.h>
 #include <optional>
 
 template <typename DropTargetItemIdentifierType>

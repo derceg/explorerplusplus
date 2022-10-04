@@ -2,18 +2,18 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // See LICENSE in the top level directory
 
-#include "../Helper/DataExchangeHelper.h"
 #include "../Helper/DataObjectImpl.h"
+#include "../Helper/DataExchangeHelper.h"
 #include "../Helper/DragDropHelper.h"
 #include <gtest/gtest.h>
 #include <wil/com.h>
 
 using namespace testing;
 
-class DataObjectTest : public Test
+class DataObjectImplTest : public Test
 {
 protected:
-	DataObjectTest()
+	DataObjectImplTest()
 	{
 		m_dataObject = winrt::make_self<DataObjectImpl>(nullptr, nullptr, 0);
 	}
@@ -21,7 +21,7 @@ protected:
 	winrt::com_ptr<IDataObject> m_dataObject;
 };
 
-TEST_F(DataObjectTest, QueryInterface)
+TEST_F(DataObjectImplTest, QueryInterface)
 {
 	wil::com_ptr_nothrow<IUnknown> unknown;
 	HRESULT hr = m_dataObject->QueryInterface(IID_PPV_ARGS(&unknown));
@@ -32,14 +32,14 @@ TEST_F(DataObjectTest, QueryInterface)
 	EXPECT_HRESULT_SUCCEEDED(hr);
 }
 
-TEST_F(DataObjectTest, QueryGetDataEmpty)
+TEST_F(DataObjectImplTest, QueryGetDataEmpty)
 {
 	FORMATETC formatEtc = { CF_TEXT, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 	HRESULT hr = m_dataObject->QueryGetData(&formatEtc);
 	EXPECT_EQ(DV_E_FORMATETC, hr);
 }
 
-TEST_F(DataObjectTest, GetDataEmpty)
+TEST_F(DataObjectImplTest, GetDataEmpty)
 {
 	FORMATETC formatEtc = { CF_TEXT, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 	STGMEDIUM stgMedium;
@@ -47,7 +47,7 @@ TEST_F(DataObjectTest, GetDataEmpty)
 	EXPECT_EQ(DV_E_FORMATETC, hr);
 }
 
-TEST_F(DataObjectTest, SetDataAndGetData)
+TEST_F(DataObjectImplTest, SetDataAndGetData)
 {
 	FORMATETC formatEtc = { CF_UNICODETEXT, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 

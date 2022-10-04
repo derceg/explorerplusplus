@@ -17,8 +17,8 @@
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/WinRTBaseWrapper.h"
 #include <wil/com.h>
-#include <winrt/base.h>
 #include <propkey.h>
 #include <propvarutil.h>
 #include <list>

@@ -40,7 +40,7 @@ void DialogSettings::SaveRegistrySettings(HKEY hParentKey)
 	HKEY hKey;
 	DWORD dwDisposition;
 
-	LONG lRes = RegCreateKeyEx(hParentKey, m_szSettingsKey.c_str(), 0, nullptr,
+	LSTATUS lRes = RegCreateKeyEx(hParentKey, m_szSettingsKey.c_str(), 0, nullptr,
 		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &hKey, &dwDisposition);
 
 	if (lRes == ERROR_SUCCESS)
@@ -63,7 +63,7 @@ void DialogSettings::SaveRegistrySettings(HKEY hParentKey)
 void DialogSettings::LoadRegistrySettings(HKEY hParentKey)
 {
 	HKEY hKey;
-	LONG lRes;
+	LSTATUS lRes;
 
 	lRes = RegOpenKeyEx(hParentKey, m_szSettingsKey.c_str(), 0, KEY_READ, &hKey);
 
@@ -75,9 +75,8 @@ void DialogSettings::LoadRegistrySettings(HKEY hParentKey)
 			RegQueryValueEx(hKey, SETTING_POSITION, nullptr, nullptr, (LPBYTE) &m_ptDialog,
 				&dwSize);
 
-			RegistrySettings::ReadDword(hKey, SETTING_WIDTH, reinterpret_cast<DWORD *>(&m_iWidth));
-			RegistrySettings::ReadDword(hKey, SETTING_HEIGHT,
-				reinterpret_cast<DWORD *>(&m_iHeight));
+			RegistrySettings::Read32BitValueFromRegistry(hKey, SETTING_WIDTH, m_iWidth);
+			RegistrySettings::Read32BitValueFromRegistry(hKey, SETTING_HEIGHT, m_iHeight);
 		}
 
 		LoadExtraRegistrySettings(hKey);

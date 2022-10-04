@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include "WinRTBaseWrapper.h"
 #include "WindowSubclassWrapper.h"
-#include <winrt/base.h>
 
 class DropTargetInternal
 {

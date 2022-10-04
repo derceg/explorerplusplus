@@ -7,8 +7,8 @@
 #include "Bookmarks/UI/BookmarkContextMenu.h"
 #include "Bookmarks/UI/BookmarkMenuBuilder.h"
 #include "Bookmarks/UI/BookmarkMenuController.h"
+#include "../Helper/WinRTBaseWrapper.h"
 #include "../Helper/WindowSubclassWrapper.h"
-#include <winrt/base.h>
 
 class BookmarkItem;
 class BookmarkTree;

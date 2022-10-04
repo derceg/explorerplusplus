@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <winrt/base.h>
+#include "../Helper/WinRTBaseWrapper.h"
 #include <oleidl.h>
 
 class BookmarkDropper;

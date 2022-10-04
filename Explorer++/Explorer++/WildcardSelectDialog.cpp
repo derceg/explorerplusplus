@@ -12,6 +12,7 @@
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
+#include "../Helper/WindowHelper.h"
 #include "../Helper/XMLSettings.h"
 
 const TCHAR WildcardSelectDialogPersistentSettings::SETTINGS_KEY[] = _T("WildcardSelect");
@@ -41,7 +42,7 @@ INT_PTR WildcardSelectDialog::OnInitDialog()
 		ComboBox_InsertString(hComboBox, -1, strPattern.c_str());
 	}
 
-	ComboBox_SetText(hComboBox, m_pwsdps->m_szPattern);
+	ComboBox_SetText(hComboBox, m_pwsdps->m_pattern.c_str());
 
 	if (!m_bSelect)
 	{
@@ -166,8 +167,7 @@ void WildcardSelectDialog::SaveState()
 {
 	m_pwsdps->SaveDialogPosition(m_hDlg);
 
-	HWND hComboBox = GetDlgItem(m_hDlg, IDC_SELECTGROUP_COMBOBOX);
-	ComboBox_GetText(hComboBox, m_pwsdps->m_szPattern, SIZEOF_ARRAY(m_pwsdps->m_szPattern));
+	m_pwsdps->m_pattern = GetDlgItemString(m_hDlg, IDC_SELECTGROUP_COMBOBOX);
 
 	m_pwsdps->m_bStateSaved = TRUE;
 }
@@ -175,7 +175,6 @@ void WildcardSelectDialog::SaveState()
 WildcardSelectDialogPersistentSettings::WildcardSelectDialogPersistentSettings() :
 	DialogSettings(SETTINGS_KEY)
 {
-	StringCchCopy(m_szPattern, SIZEOF_ARRAY(m_szPattern), EMPTY_STRING);
 }
 
 WildcardSelectDialogPersistentSettings &WildcardSelectDialogPersistentSettings::GetInstance()
@@ -187,21 +186,20 @@ WildcardSelectDialogPersistentSettings &WildcardSelectDialogPersistentSettings::
 void WildcardSelectDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
 	RegistrySettings::SaveStringList(hKey, SETTING_PATTERN_LIST, m_PatternList);
-	RegistrySettings::SaveString(hKey, SETTING_CURRENT_TEXT, m_szPattern);
+	RegistrySettings::SaveString(hKey, SETTING_CURRENT_TEXT, m_pattern);
 }
 
 void WildcardSelectDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
 	RegistrySettings::ReadStringList(hKey, SETTING_PATTERN_LIST, m_PatternList);
-	RegistrySettings::ReadString(hKey, SETTING_CURRENT_TEXT, m_szPattern,
-		SIZEOF_ARRAY(m_szPattern));
+	RegistrySettings::ReadString(hKey, SETTING_CURRENT_TEXT, m_pattern);
 }
 
 void WildcardSelectDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
 	IXMLDOMElement *pParentNode)
 {
 	NXMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_PATTERN_LIST, m_PatternList);
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_CURRENT_TEXT, m_szPattern);
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_CURRENT_TEXT, m_pattern.c_str());
 }
 
 void WildcardSelectDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue)
@@ -214,6 +212,6 @@ void WildcardSelectDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,
 	}
 	else if (lstrcmpi(bstrName, SETTING_CURRENT_TEXT) == 0)
 	{
-		StringCchCopy(m_szPattern, SIZEOF_ARRAY(m_szPattern), bstrValue);
+		m_pattern = bstrValue;
 	}
 }

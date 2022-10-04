@@ -9,7 +9,7 @@
 #include "ViewModes.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ShellHelper.h"
-#include <winrt/base.h>
+#include "../Helper/WinRTBaseWrapper.h"
 
 /* Scroll definitions. */
 #define MIN_X_POS 20

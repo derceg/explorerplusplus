@@ -52,7 +52,7 @@ void BookmarkRegistryStorage::Load(const std::wstring &applicationKeyPath,
 	// key exists).
 	wil::unique_hkey bookmarksKey;
 	std::wstring v2KeyPath = BuildFullKeyPath(applicationKeyPath, V2::bookmarksKeyPath);
-	LONG res = RegOpenKeyEx(HKEY_CURRENT_USER, v2KeyPath.c_str(), 0, KEY_READ, &bookmarksKey);
+	LSTATUS res = RegOpenKeyEx(HKEY_CURRENT_USER, v2KeyPath.c_str(), 0, KEY_READ, &bookmarksKey);
 
 	if (res == ERROR_SUCCESS)
 	{
@@ -84,7 +84,7 @@ void V2::LoadPermanentFolder(HKEY parentKey, BookmarkTree *bookmarkTree, Bookmar
 	const std::wstring &name)
 {
 	wil::unique_hkey childKey;
-	LONG res = RegOpenKeyEx(parentKey, name.c_str(), 0, KEY_READ, &childKey);
+	LSTATUS res = RegOpenKeyEx(parentKey, name.c_str(), 0, KEY_READ, &childKey);
 
 	if (res == ERROR_SUCCESS)
 	{
@@ -128,7 +128,7 @@ void V2::LoadBookmarkChildren(HKEY parentKey, BookmarkTree *bookmarkTree,
 std::unique_ptr<BookmarkItem> V2::LoadBookmarkItem(HKEY key, BookmarkTree *bookmarkTree)
 {
 	DWORD type;
-	RegistrySettings::ReadDword(key, _T("Type"), &type);
+	RegistrySettings::ReadDword(key, _T("Type"), type);
 
 	std::wstring guid;
 	RegistrySettings::ReadString(key, _T("GUID"), guid);
@@ -227,13 +227,13 @@ std::unique_ptr<BookmarkItem> V1::LoadBookmarkItem(HKEY key, BookmarkTree *bookm
 	bool &showOnToolbarOutput)
 {
 	DWORD type;
-	RegistrySettings::ReadDword(key, _T("Type"), &type);
+	RegistrySettings::ReadDword(key, _T("Type"), type);
 
 	std::wstring name;
 	RegistrySettings::ReadString(key, _T("Name"), name);
 
 	DWORD showOnToolbar;
-	RegistrySettings::ReadDword(key, _T("ShowOnBookmarksToolbar"), &showOnToolbar);
+	RegistrySettings::ReadDword(key, _T("ShowOnBookmarksToolbar"), showOnToolbar);
 
 	showOnToolbarOutput = showOnToolbar;
 
@@ -264,7 +264,7 @@ void BookmarkRegistryStorage::Save(const std::wstring &applicationKeyPath,
 	SHDeleteKey(HKEY_CURRENT_USER, v2KeyPath.c_str());
 
 	wil::unique_hkey bookmarksKey;
-	LONG res = RegCreateKeyEx(HKEY_CURRENT_USER, v2KeyPath.c_str(), 0, nullptr,
+	LSTATUS res = RegCreateKeyEx(HKEY_CURRENT_USER, v2KeyPath.c_str(), 0, nullptr,
 		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &bookmarksKey, nullptr);
 
 	if (res == ERROR_SUCCESS)
@@ -287,7 +287,7 @@ void V2::SavePermanentFolder(HKEY parentKey, const BookmarkItem *bookmarkItem,
 	const std::wstring &name)
 {
 	wil::unique_hkey childKey;
-	LONG res = RegCreateKeyEx(parentKey, name.c_str(), 0, nullptr, REG_OPTION_NON_VOLATILE,
+	LSTATUS res = RegCreateKeyEx(parentKey, name.c_str(), 0, nullptr, REG_OPTION_NON_VOLATILE,
 		KEY_WRITE, nullptr, &childKey, nullptr);
 
 	if (res == ERROR_SUCCESS)
@@ -308,7 +308,7 @@ void V2::SaveBookmarkChildren(HKEY parentKey, const BookmarkItem *parentBookmark
 	for (auto &child : parentBookmarkItem->GetChildren())
 	{
 		wil::unique_hkey childKey;
-		LONG res = RegCreateKeyEx(parentKey, std::to_wstring(index).c_str(), 0, nullptr,
+		LSTATUS res = RegCreateKeyEx(parentKey, std::to_wstring(index).c_str(), 0, nullptr,
 			REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &childKey, nullptr);
 
 		if (res == ERROR_SUCCESS)
@@ -323,12 +323,12 @@ void V2::SaveBookmarkChildren(HKEY parentKey, const BookmarkItem *parentBookmark
 void V2::SaveBookmarkItem(HKEY key, const BookmarkItem *bookmarkItem)
 {
 	RegistrySettings::SaveDword(key, _T("Type"), static_cast<int>(bookmarkItem->GetType()));
-	RegistrySettings::SaveString(key, _T("GUID"), bookmarkItem->GetGUID().c_str());
-	RegistrySettings::SaveString(key, _T("Name"), bookmarkItem->GetName().c_str());
+	RegistrySettings::SaveString(key, _T("GUID"), bookmarkItem->GetGUID());
+	RegistrySettings::SaveString(key, _T("Name"), bookmarkItem->GetName());
 
 	if (bookmarkItem->GetType() == BookmarkItem::Type::Bookmark)
 	{
-		RegistrySettings::SaveString(key, _T("Location"), bookmarkItem->GetLocation().c_str());
+		RegistrySettings::SaveString(key, _T("Location"), bookmarkItem->GetLocation());
 	}
 
 	RegistrySettings::SaveDateTime(key, _T("DateCreated"), bookmarkItem->GetDateCreated());

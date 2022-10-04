@@ -26,7 +26,6 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/com.h>
-#include <winrt/base.h>
 #include <list>
 
 void CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);

@@ -13,13 +13,7 @@
     <ClCompile Include="BookmarkTreeTest.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="CachedIconsTest.cpp">
-      <Filter>Helper</Filter>
-    </ClCompile>
     <ClCompile Include="ViewModeHelperTest.cpp" />
-    <ClCompile Include="DataObjectTest.cpp">
-      <Filter>Helper</Filter>
-    </ClCompile>
     <ClCompile Include="ShellNavigationControllerTest.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
@@ -38,9 +32,6 @@
     </ClCompile>
     <ClCompile Include="BookmarkStorageHelper.cpp">
       <Filter>Bookmarks</Filter>
-    </ClCompile>
-    <ClCompile Include="StringHelperTest.cpp">
-      <Filter>Helper</Filter>
     </ClCompile>
     <ClCompile Include="ManifestTest.cpp">
       <Filter>Plugins</Filter>
@@ -69,8 +60,20 @@
     <ClCompile Include="RegistryStorageHelper.cpp">
       <Filter>Storage</Filter>
     </ClCompile>
+    <ClCompile Include="CachedIconsTest.cpp">
+      <Filter>Helper\Shell</Filter>
+    </ClCompile>
+    <ClCompile Include="DataObjectImplTest.cpp">
+      <Filter>Helper\Data Exchange\Drag and Drop</Filter>
+    </ClCompile>
     <ClCompile Include="ShellHelperTest.cpp">
-      <Filter>Helper</Filter>
+      <Filter>Helper\Shell</Filter>
+    </ClCompile>
+    <ClCompile Include="StringHelperTest.cpp">
+      <Filter>Helper\Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="RegistrySettingsTest.cpp">
+      <Filter>Helper\Settings</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -100,6 +103,21 @@
     </Filter>
     <Filter Include="Storage">
       <UniqueIdentifier>{7042eb7a-fa80-40c3-9b18-ffdc1a65e513}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helper\Shell">
+      <UniqueIdentifier>{ebff0c35-38df-426b-b598-43b788aa751e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helper\Data Exchange">
+      <UniqueIdentifier>{e85681b4-6cf8-4b95-927c-dbd538bc6d24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helper\Data Exchange\Drag and Drop">
+      <UniqueIdentifier>{164ad606-cd00-4c65-9876-4c5ba445f906}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helper\Miscellaneous">
+      <UniqueIdentifier>{c5bada54-a50b-4d05-998a-b63583520136}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helper\Settings">
+      <UniqueIdentifier>{95d9ff99-0410-43a6-b30b-740876190973}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

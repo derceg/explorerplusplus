@@ -5,7 +5,7 @@
 #pragma once
 
 #include "../Helper/ServiceProviderBase.h"
-#include <winrt/base.h>
+#include "../Helper/WinRTBaseWrapper.h"
 
 class DocumentServiceProvider :
 	public winrt::implements<DocumentServiceProvider, IDispatch, IServiceProvider>,

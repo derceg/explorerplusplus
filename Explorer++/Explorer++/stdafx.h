@@ -61,12 +61,9 @@
 #include <winuser.h>
 #include <wmsdk.h>
 
-// It's important that Unknwn.h is included before any WinRT headers to ensure there is support for
-// classic COM interfaces (i.e. IUnknown).
-// clang-format off
-#include <Unknwn.h>
-#include <winrt/base.h>
-// clang-format on
+// The wrapper here will include Unknwn.h, which is why this appears after the rest of the Windows
+// headers.
+#include "../Helper/WinRTBaseWrapper.h"
 
 // The boost headers can include Windows header files. If the boost header files are included before
 // the Windows header files above, that can cause issues, specifically with winsock.h and

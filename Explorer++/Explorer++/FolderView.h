@@ -5,8 +5,8 @@
 #pragma once
 
 #include "../Helper/ShellHelper.h"
+#include "../Helper/WinRTBaseWrapper.h"
 #include <wil/com.h>
-#include <winrt/base.h>
 #include <ShlObj.h>
 #include <memory>
 

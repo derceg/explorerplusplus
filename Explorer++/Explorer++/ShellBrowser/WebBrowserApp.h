@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <winrt/base.h>
+#include "../Helper/WinRTBaseWrapper.h"
 #include <exdisp.h>
 
 // This isn't a web browser application, but the IWebBrowserApp interface is used when finding shell

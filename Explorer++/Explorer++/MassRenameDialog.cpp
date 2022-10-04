@@ -414,10 +414,8 @@ void MassRenameDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 
 void MassRenameDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	RegistrySettings::ReadDword(hKey, SETTING_COLUMN_WIDTH_1,
-		reinterpret_cast<DWORD *>(&m_iColumnWidth1));
-	RegistrySettings::ReadDword(hKey, SETTING_COLUMN_WIDTH_2,
-		reinterpret_cast<DWORD *>(&m_iColumnWidth2));
+	RegistrySettings::Read32BitValueFromRegistry(hKey, SETTING_COLUMN_WIDTH_1, m_iColumnWidth1);
+	RegistrySettings::Read32BitValueFromRegistry(hKey, SETTING_COLUMN_WIDTH_2, m_iColumnWidth2);
 }
 
 void MassRenameDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
