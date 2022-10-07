@@ -546,56 +546,6 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 	return returnValue;
 }
 
-void DeleteKey(HKEY hKey)
-{
-	HKEY hChildKey;
-	TCHAR lpName[512];
-	DWORD dwName;
-	DWORD nSubKeys;
-	DWORD nChildSubKeys;
-	DWORD disposition;
-	LONG returnValue;
-	int i = 0;
-
-	/* Enumerate all the previous bookmarks keys and
-	delete them. */
-	if (RegQueryInfoKey(hKey, nullptr, nullptr, nullptr, &nSubKeys, nullptr, nullptr, nullptr,
-			nullptr, nullptr, nullptr, nullptr)
-		== ERROR_SUCCESS)
-	{
-		for (i = nSubKeys - 1; i >= 0; i--)
-		{
-			dwName = SIZEOF_ARRAY(lpName);
-
-			if (RegEnumKeyEx(hKey, i, lpName, &dwName, nullptr, nullptr, nullptr, nullptr)
-				== ERROR_SUCCESS)
-			{
-				returnValue = RegCreateKeyEx(hKey, lpName, 0, nullptr, REG_OPTION_NON_VOLATILE,
-					KEY_WRITE | KEY_ENUMERATE_SUB_KEYS | KEY_QUERY_VALUE | DELETE, nullptr,
-					&hChildKey, &disposition);
-
-				if (returnValue == ERROR_SUCCESS)
-				{
-					RegQueryInfoKey(hChildKey, nullptr, nullptr, nullptr, &nChildSubKeys, nullptr,
-						nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
-
-					/* If this key contains subkeys, it cannot just
-					be deleted. It must have each of it's subkeys
-					deleted individually. */
-					if (nChildSubKeys != 0)
-					{
-						DeleteKey(hChildKey);
-					}
-
-					RegCloseKey(hChildKey);
-
-					RegDeleteKey(hKey, lpName);
-				}
-			}
-		}
-	}
-}
-
 void Explorerplusplus::SaveBookmarksToRegistry()
 {
 	BookmarkRegistryStorage::Save(NExplorerplusplus::REG_MAIN_KEY, &m_bookmarkTree);
