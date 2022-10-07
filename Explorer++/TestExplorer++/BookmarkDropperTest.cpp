@@ -110,6 +110,11 @@ TEST_F(BookmarkDropperValidTest, DropEffect)
 	// It also can't be dropped on one of its children.
 	effect = m_dropper->GetDropEffect(m_rawParentFolder, 0);
 	EXPECT_EQ(effect, DROPEFFECT_NONE);
+
+	// It shouldn't be possible to drop an item if the drop has been manually blocked.
+	m_dropper->SetBlockDrop(true);
+	effect = m_dropper->GetDropEffect(m_bookmarkTree.GetBookmarksToolbarFolder(), 0);
+	EXPECT_EQ(effect, DROPEFFECT_NONE);
 }
 
 TEST_F(BookmarkDropperValidTest, DropOnRoot)
@@ -132,6 +137,13 @@ TEST_F(BookmarkDropperValidTest, DropOnFolder)
 
 	DWORD effect = m_dropper->PerformDrop(m_bookmarkTree.GetBookmarksToolbarFolder(), 0);
 	EXPECT_EQ(effect, DROPEFFECT_MOVE);
+}
+
+TEST_F(BookmarkDropperValidTest, DropWhenBlocked)
+{
+	m_dropper->SetBlockDrop(true);
+	DWORD effect = m_dropper->PerformDrop(m_bookmarkTree.GetBookmarksToolbarFolder(), 0);
+	EXPECT_EQ(effect, DROPEFFECT_NONE);
 }
 
 TEST_F(BookmarkDropperInvalidTest, DropEffect)
