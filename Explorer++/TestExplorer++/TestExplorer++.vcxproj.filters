@@ -75,6 +75,9 @@
     <ClCompile Include="RegistrySettingsTest.cpp">
       <Filter>Helper\Settings</Filter>
     </ClCompile>
+    <ClCompile Include="ClipboardTest.cpp">
+      <Filter>Helper\Data Exchange\Clipboard</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -118,6 +121,9 @@
     </Filter>
     <Filter Include="Helper\Settings">
       <UniqueIdentifier>{95d9ff99-0410-43a6-b30b-740876190973}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helper\Data Exchange\Clipboard">
+      <UniqueIdentifier>{516b410f-8b61-48a5-8870-1dc716e62992}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

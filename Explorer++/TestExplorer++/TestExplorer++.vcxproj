@@ -89,6 +89,7 @@
     <ClCompile Include="BookmarkRegistryStorageTest.cpp" />
     <ClCompile Include="BookmarkStorageHelper.cpp" />
     <ClCompile Include="BookmarkXmlStorageTest.cpp" />
+    <ClCompile Include="ClipboardTest.cpp" />
     <ClCompile Include="DataObjectImplTest.cpp" />
     <ClCompile Include="DriveModelTest.cpp" />
     <ClCompile Include="Main.cpp" />

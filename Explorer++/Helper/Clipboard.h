@@ -6,6 +6,7 @@
 
 #include <wil/resource.h>
 #include <optional>
+#include <string>
 
 class Clipboard
 {
