@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "DataObjectImpl.h"
-#include "iEnumFormatEtc.h"
+#include "EnumFormatEtcImpl.h"
 #include <list>
 
 DataObjectImpl::DataObjectImpl(FORMATETC *pFormatEtc, STGMEDIUM *pMedium, int count)
@@ -226,7 +226,10 @@ IFACEMETHODIMP DataObjectImpl::EnumFormatEtc(DWORD dwDirection, IEnumFORMATETC *
 			feList.push_back(dao.fe);
 		}
 
-		return CreateEnumFormatEtc(feList, ppEnumFormatEtc);
+		auto enumFormatEtcImpl = winrt::make_self<EnumFormatEtcImpl>(feList);
+		*ppEnumFormatEtc = enumFormatEtcImpl.detach();
+
+		return S_OK;
 	}
 
 	return E_NOTIMPL;

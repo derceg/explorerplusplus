@@ -58,7 +58,7 @@
     <ClCompile Include="DataObjectImpl.cpp">
       <Filter>Data Exchange\Drag and Drop</Filter>
     </ClCompile>
-    <ClCompile Include="iEnumFormatEtc.cpp">
+    <ClCompile Include="EnumFormatEtcImpl.cpp">
       <Filter>Data Exchange\Drag and Drop</Filter>
     </ClCompile>
     <ClCompile Include="DropSourceImpl.cpp">
@@ -195,7 +195,7 @@
     <ClInclude Include="DropSourceImpl.h">
       <Filter>Data Exchange\Drag and Drop</Filter>
     </ClInclude>
-    <ClInclude Include="iEnumFormatEtc.h">
+    <ClInclude Include="EnumFormatEtcImpl.h">
       <Filter>Data Exchange\Drag and Drop</Filter>
     </ClInclude>
     <ClInclude Include="BaseWindow.h">
