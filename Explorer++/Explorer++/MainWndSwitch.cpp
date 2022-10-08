@@ -9,7 +9,6 @@
 #include "ApplicationEditorDialog.h"
 #include "ApplicationToolbar.h"
 #include "ApplicationToolbarView.h"
-#include "Bookmarks/UI/AddBookmarkDialog.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "Bookmarks/UI/BookmarksToolbar.h"
 #include "Bookmarks/UI/ManageBookmarksDialog.h"
