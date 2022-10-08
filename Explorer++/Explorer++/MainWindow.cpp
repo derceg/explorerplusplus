@@ -45,6 +45,16 @@ MainWindow::MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE inst
 		std::bind_front(&MainWindow::OnShowUserNameInTitleBarUpdated, this)));
 	m_connections.push_back(m_config->showPrivilegeLevelInTitleBar.addObserver(
 		std::bind_front(&MainWindow::OnShowPrivilegeLevelInTitleBarUpdated, this)));
+
+	// The main window is registered as a drop target only so that the drag image will be
+	// consistently shown when an item is being dragged. For the drag image to be shown, the
+	// relevant IDropTargetHelper methods need to be called during the drag. To do that, the window
+	// under the mouse needs to be registered as a drop target.
+	// Rather than having to register every window, the top-level window can simply be registered
+	// instead. That way, it will act as a fallback if there isn't a more specific child window
+	// registered.
+	m_dropTargetWindow =
+		winrt::make_self<DropTargetWindow>(m_hwnd, static_cast<DropTargetInternal *>(this));
 }
 
 void MainWindow::OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
@@ -170,4 +180,40 @@ void MainWindow::UpdateWindowText()
 	}
 
 	SetWindowText(m_hwnd, szTitle);
+}
+
+// DropTargetInternal
+// Note that, as described above, this window is registered as a drop target only so that drag
+// images are shown consistently. Dropping items isn't supported at all.
+DWORD MainWindow::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
+{
+	UNREFERENCED_PARAMETER(dataObject);
+	UNREFERENCED_PARAMETER(keyState);
+	UNREFERENCED_PARAMETER(pt);
+	UNREFERENCED_PARAMETER(effect);
+
+	return DROPEFFECT_NONE;
+}
+
+DWORD MainWindow::DragOver(DWORD keyState, POINT pt, DWORD effect)
+{
+	UNREFERENCED_PARAMETER(keyState);
+	UNREFERENCED_PARAMETER(pt);
+	UNREFERENCED_PARAMETER(effect);
+
+	return DROPEFFECT_NONE;
+}
+
+void MainWindow::DragLeave()
+{
+}
+
+DWORD MainWindow::Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
+{
+	UNREFERENCED_PARAMETER(dataObject);
+	UNREFERENCED_PARAMETER(keyState);
+	UNREFERENCED_PARAMETER(pt);
+	UNREFERENCED_PARAMETER(effect);
+
+	return DROPEFFECT_NONE;
 }
