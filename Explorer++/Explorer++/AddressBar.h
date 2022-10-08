@@ -42,11 +42,6 @@ private:
 	void OnEnterPressed();
 	void OnEscapePressed();
 	void OnBeginDrag();
-	static std::optional<wil::unique_stg_medium> GenerateShortcutDescriptorStgMedium(
-		PCIDLIST_ABSOLUTE pidl);
-	static std::optional<FILEGROUPDESCRIPTOR> GenerateShortcutDescriptor(PCIDLIST_ABSOLUTE pidl);
-	static std::optional<wil::unique_stg_medium> GenerateShortcutContentsStgMedium(
-		PCIDLIST_ABSOLUTE pidl);
 	void OnTabSelected(const Tab &tab);
 	void OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
 	void UpdateTextAndIcon(const Tab &tab);

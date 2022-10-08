@@ -254,153 +254,48 @@ void AddressBar::OnBeginDrag()
 	const Tab &selectedTab = m_coreInterface->GetTabContainer()->GetSelectedTab();
 	auto pidlDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
 
-	auto descriptorStgMedium = GenerateShortcutDescriptorStgMedium(pidlDirectory.get());
+	SFGAOF attributes = SFGAO_CANCOPY | SFGAO_CANMOVE | SFGAO_CANLINK;
+	HRESULT hr = GetItemAttributes(pidlDirectory.get(), &attributes);
 
-	if (!descriptorStgMedium)
+	if (FAILED(hr)
+		|| WI_AreAllFlagsClear(attributes, SFGAO_CANCOPY | SFGAO_CANMOVE | SFGAO_CANLINK))
 	{
+		// The root desktop folder is at least one item that can't be copied/moved/linked to. In a
+		// situation like that, it's not possible to start a drag at all.
 		return;
 	}
 
-	auto contentsStgMedium = GenerateShortcutContentsStgMedium(pidlDirectory.get());
-
-	if (!contentsStgMedium)
-	{
-		return;
-	}
-
-	FORMATETC ftc[2];
-	STGMEDIUM stg[2];
-
-	// The IDataObject instance created below will take ownership of the STGMEDIUMs and the data
-	// they contain, which is why they're released here.
-	ftc[0] = { static_cast<CLIPFORMAT>(RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR)), nullptr,
-		DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-	stg[0] = descriptorStgMedium->release();
-
-	ftc[1] = { static_cast<CLIPFORMAT>(RegisterClipboardFormat(CFSTR_FILECONTENTS)), nullptr,
-		DVASPECT_CONTENT, 0, TYMED_ISTREAM };
-	stg[1] = contentsStgMedium->release();
-
-	auto dataObject =
-		winrt::make_self<DataObjectImpl>(ftc, stg, static_cast<int>(SIZEOF_ARRAY(ftc)));
-
-	wil::com_ptr_nothrow<IDragSourceHelper> dragSourceHelper;
-	HRESULT hr = CoCreateInstance(CLSID_DragDropHelper, nullptr, CLSCTX_INPROC_SERVER,
-		IID_PPV_ARGS(&dragSourceHelper));
+	wil::com_ptr_nothrow<IDataObject> dataObject;
+	std::vector<PCIDLIST_ABSOLUTE> items = { pidlDirectory.get() };
+	hr = CreateDataObjectForShellTransfer(items, &dataObject);
 
 	if (FAILED(hr))
 	{
 		return;
 	}
 
-	auto dropSource = winrt::make_self<DropSourceImpl>();
+	DWORD allowedEffects = 0;
 
-	POINT pt = { 0, 0 };
-	dragSourceHelper->InitializeFromWindow(m_hwnd, &pt, dataObject.get());
-
-	DWORD dwEffect;
-	DoDragDrop(dataObject.get(), dropSource.get(), DROPEFFECT_LINK, &dwEffect);
-}
-
-std::optional<wil::unique_stg_medium> AddressBar::GenerateShortcutDescriptorStgMedium(
-	PCIDLIST_ABSOLUTE pidl)
-{
-	auto fileGroupDescriptor = GenerateShortcutDescriptor(pidl);
-
-	if (!fileGroupDescriptor)
+	if (WI_IsFlagSet(attributes, SFGAO_CANCOPY))
 	{
-		return std::nullopt;
+		WI_SetFlag(allowedEffects, DROPEFFECT_COPY);
 	}
 
-	auto global = WriteDataToGlobal(&*fileGroupDescriptor, sizeof(fileGroupDescriptor));
-
-	if (!global)
+	if (WI_IsFlagSet(attributes, SFGAO_CANMOVE))
 	{
-		return std::nullopt;
+		WI_SetFlag(allowedEffects, DROPEFFECT_MOVE);
 	}
 
-	return wil::unique_stg_medium(GetStgMediumForGlobal(global.release()));
-}
-
-std::optional<FILEGROUPDESCRIPTOR> AddressBar::GenerateShortcutDescriptor(PCIDLIST_ABSOLUTE pidl)
-{
-	FILEGROUPDESCRIPTOR fileGroupDescriptor;
-	fileGroupDescriptor.cItems = 1;
-	fileGroupDescriptor.fgd[0].dwFlags = FD_ATTRIBUTES;
-	fileGroupDescriptor.fgd[0].dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
-
-	// The name of the file will be the item name, followed by .lnk.
-	std::wstring displayName;
-	HRESULT hr = GetDisplayName(pidl, SHGDN_INFOLDER, displayName);
-
-	if (FAILED(hr))
+	if (WI_IsFlagSet(attributes, SFGAO_CANLINK))
 	{
-		return std::nullopt;
+		WI_SetFlag(allowedEffects, DROPEFFECT_LINK);
+
+		hr = SetPreferredDropEffect(dataObject.get(), DROPEFFECT_LINK);
+		assert(SUCCEEDED(hr));
 	}
 
-	displayName += L".lnk";
-
-	hr = StringCchCopy(fileGroupDescriptor.fgd[0].cFileName,
-		SIZEOF_ARRAY(fileGroupDescriptor.fgd[0].cFileName), displayName.c_str());
-
-	if (FAILED(hr))
-	{
-		return std::nullopt;
-	}
-
-	return fileGroupDescriptor;
-}
-
-std::optional<wil::unique_stg_medium> AddressBar::GenerateShortcutContentsStgMedium(
-	PCIDLIST_ABSOLUTE pidl)
-{
-	wil::com_ptr_nothrow<IShellLink> shellLink;
-	HRESULT hr =
-		CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellLink));
-
-	if (FAILED(hr))
-	{
-		return std::nullopt;
-	}
-
-	hr = shellLink->SetIDList(pidl);
-
-	if (FAILED(hr))
-	{
-		return std::nullopt;
-	}
-
-	wil::com_ptr_nothrow<IPersistStream> pPersistStream;
-	hr = shellLink->QueryInterface(IID_PPV_ARGS(&pPersistStream));
-
-	if (FAILED(hr))
-	{
-		return std::nullopt;
-	}
-
-	wil::com_ptr_nothrow<IStream> stream;
-	stream.attach(SHCreateMemStream(nullptr, 0));
-
-	if (!stream)
-	{
-		return std::nullopt;
-	}
-
-	hr = pPersistStream->Save(stream.get(), TRUE);
-
-	if (FAILED(hr))
-	{
-		return std::nullopt;
-	}
-
-	hr = stream->Seek({ 0, 0 }, STREAM_SEEK_SET, nullptr);
-
-	if (FAILED(hr))
-	{
-		return std::nullopt;
-	}
-
-	return wil::unique_stg_medium(GetStgMediumForStream(stream.detach()));
+	DWORD effect;
+	SHDoDragDrop(m_hwnd, dataObject.get(), nullptr, allowedEffects, &effect);
 }
 
 void AddressBar::OnTabSelected(const Tab &tab)

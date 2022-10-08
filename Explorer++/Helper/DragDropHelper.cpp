@@ -18,15 +18,6 @@ STGMEDIUM GetStgMediumForGlobal(HGLOBAL global)
 	return storage;
 }
 
-STGMEDIUM GetStgMediumForStream(IStream *stream)
-{
-	STGMEDIUM storage;
-	storage.tymed = TYMED_ISTREAM;
-	storage.pstm = stream;
-	storage.pUnkForRelease = nullptr;
-	return storage;
-}
-
 HRESULT SetPreferredDropEffect(IDataObject *dataObject, DWORD effect)
 {
 	return SetBlobData(dataObject,
