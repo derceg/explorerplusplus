@@ -61,6 +61,11 @@ LRESULT CALLBACK ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 {
 	if (m_getDragImageMessage != 0 && uMsg == m_getDragImageMessage)
 	{
+		// The listview control has built-in handling for this message (DI_GETDRAGIMAGE). It will,
+		// by default, build an image based on the item being dragged. However, that's undesirable
+		// here. When using SHDoDragDrop(), the drag image will be set up by that method. If the
+		// listview is allowed to process the DI_GETDRAGIMAGE message, it will set the default
+		// image. So, returning FALSE here allows SHDoDragDrop() to set up the image itself.
 		return FALSE;
 	}
 
