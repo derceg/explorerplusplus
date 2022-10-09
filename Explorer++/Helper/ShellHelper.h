@@ -40,6 +40,12 @@ enum class EnvVarsExpansion
 	DontExpand
 };
 
+enum class ShellItemType
+{
+	File,
+	Folder
+};
+
 struct JumpListTaskInformation
 {
 	const TCHAR *pszName;
@@ -102,7 +108,7 @@ HRESULT ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory,
 BOOL CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL);
 bool IsChildOfLibrariesFolder(PCIDLIST_ABSOLUTE pidl);
 HRESULT CreateSimplePidl(const std::wstring &path, PIDLIST_ABSOLUTE *pidl,
-	IShellFolder *parent = nullptr);
+	IShellFolder *parent = nullptr, ShellItemType shellItemType = ShellItemType::File);
 HRESULT SimplePidlToFullPidl(PCIDLIST_ABSOLUTE simplePidl, PIDLIST_ABSOLUTE *fullPidl);
 std::vector<unique_pidl_absolute> DeepCopyPidls(const std::vector<PCIDLIST_ABSOLUTE> &pidls);
 std::vector<unique_pidl_absolute> DeepCopyPidls(const std::vector<unique_pidl_absolute> &pidls);

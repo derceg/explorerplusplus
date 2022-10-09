@@ -5,6 +5,8 @@
 #pragma once
 
 #include "Bookmarks/BookmarkItem.h"
+#include <ShObjIdl.h>
+#include <memory>
 #include <optional>
 
 class BookmarkTree;
@@ -12,7 +14,7 @@ class BookmarkTree;
 class BookmarkDropper
 {
 public:
-	BookmarkDropper(IDataObject *dataObject, BookmarkTree *bookmarkTree);
+	BookmarkDropper(IDataObject *dataObject, DWORD allowedEffects, BookmarkTree *bookmarkTree);
 
 	void SetBlockDrop(bool blockDrop);
 	DWORD GetDropEffect(const BookmarkItem *targetFolder, size_t index);
@@ -22,13 +24,13 @@ private:
 	enum class ExtractionSource
 	{
 		CustomFormat,
-		HDrop
+		Other
 	};
 
 	struct ExtractedInfo
 	{
 		BookmarkItems bookmarkItems;
-		std::optional<ExtractionSource> extractionSource;
+		ExtractionSource extractionSource;
 	};
 
 	static bool CanDropBookmarkItemAtLocation(const BookmarkItem *bookmarkItem,
@@ -36,9 +38,11 @@ private:
 	ExtractedInfo &GetExtractedInfo();
 	ExtractedInfo ExtractBookmarkItems();
 	BookmarkItems ExtractBookmarkItemsFromCustomFormat();
-	BookmarkItems ExtractBookmarkItemsFromHDrop();
+	BookmarkItems MaybeExtractBookmarkItemsFromShellItems();
+	std::unique_ptr<BookmarkItem> MaybeBuildBookmarkItemFromShellItem(IShellItem *shellItem);
 
 	IDataObject *m_dataObject;
+	DWORD m_allowedEffects;
 	BookmarkTree *m_bookmarkTree;
 	std::optional<ExtractedInfo> m_extractedInfo;
 	bool m_blockDrop;

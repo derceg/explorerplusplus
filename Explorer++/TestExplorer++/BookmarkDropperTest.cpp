@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // See LICENSE in the top level directory
 
+#define STRICT_TYPED_ITEMIDS
+
 #include "Bookmarks/BookmarkDropper.h"
 #include "BookmarkTreeHelper.h"
 #include "Bookmarks/BookmarkDataExchange.h"
@@ -9,14 +11,17 @@
 #include "../Helper/DataExchangeHelper.h"
 #include "../Helper/DataObjectImpl.h"
 #include "../Helper/DragDropHelper.h"
+#include "../Helper/ShellHelper.h"
 #include <gtest/gtest.h>
+#include <wil/com.h>
 
 using namespace testing;
 
-class BookmarkDropperValidTest : public Test
+// Tests dropping a bookmark item.
+class BookmarkDropperBookmarkItemTest : public Test
 {
 protected:
-	BookmarkDropperValidTest()
+	BookmarkDropperBookmarkItemTest()
 	{
 		auto grandparentFolder =
 			std::make_unique<BookmarkItem>(std::nullopt, L"Test grandparent folder", std::nullopt);
@@ -42,11 +47,11 @@ protected:
 			m_rawGrandparentFolder->GetParent()->GetChildOwnedPtr(m_rawGrandparentFolder);
 		m_dataObject = BookmarkDataExchange::CreateDataObject({ ownedPtr });
 
-		m_dropper = std::make_unique<BookmarkDropper>(m_dataObject.get(), &m_bookmarkTree);
+		m_dropper =
+			std::make_unique<BookmarkDropper>(m_dataObject.get(), DROPEFFECT_MOVE, &m_bookmarkTree);
 	}
 
 	BookmarkTree m_bookmarkTree;
-
 	std::unique_ptr<BookmarkDropper> m_dropper;
 	winrt::com_ptr<IDataObject> m_dataObject;
 	BookmarkItem *m_rawGrandparentFolder;
@@ -54,30 +59,7 @@ protected:
 	BookmarkItem *m_rawBookmark;
 };
 
-class BookmarkDropperInvalidTest : public Test
-{
-protected:
-	BookmarkDropperInvalidTest()
-	{
-		FORMATETC formatEtc = { CF_UNICODETEXT, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-
-		auto global = WriteStringToGlobal(L"Test");
-		STGMEDIUM stgMedium = GetStgMediumForGlobal(global.get());
-
-		m_dataObject = winrt::make_self<DataObjectImpl>(&formatEtc, &stgMedium, 1);
-
-		global.release();
-
-		m_dropper = std::make_unique<BookmarkDropper>(m_dataObject.get(), &m_bookmarkTree);
-	}
-
-	BookmarkTree m_bookmarkTree;
-
-	std::unique_ptr<BookmarkDropper> m_dropper;
-	winrt::com_ptr<IDataObject> m_dataObject;
-};
-
-TEST_F(BookmarkDropperValidTest, DropEffect)
+TEST_F(BookmarkDropperBookmarkItemTest, DropEffect)
 {
 	// Drops on the root folder should be blocked.
 	DWORD effect = m_dropper->GetDropEffect(m_bookmarkTree.GetRoot(), 0);
@@ -117,14 +99,14 @@ TEST_F(BookmarkDropperValidTest, DropEffect)
 	EXPECT_EQ(effect, DROPEFFECT_NONE);
 }
 
-TEST_F(BookmarkDropperValidTest, DropOnRoot)
+TEST_F(BookmarkDropperBookmarkItemTest, DropOnRoot)
 {
 	DWORD effect = m_dropper->PerformDrop(m_bookmarkTree.GetRoot(), 0);
 	EXPECT_EQ(effect, DROPEFFECT_NONE);
 	EXPECT_EQ(m_rawGrandparentFolder->GetParent(), m_bookmarkTree.GetBookmarksMenuFolder());
 }
 
-TEST_F(BookmarkDropperValidTest, DropOnFolder)
+TEST_F(BookmarkDropperBookmarkItemTest, DropOnFolder)
 {
 	BookmarkTreeObserver observer;
 
@@ -139,16 +121,116 @@ TEST_F(BookmarkDropperValidTest, DropOnFolder)
 	EXPECT_EQ(effect, DROPEFFECT_MOVE);
 }
 
-TEST_F(BookmarkDropperValidTest, DropWhenBlocked)
+TEST_F(BookmarkDropperBookmarkItemTest, DropWhenBlocked)
 {
 	m_dropper->SetBlockDrop(true);
 	DWORD effect = m_dropper->PerformDrop(m_bookmarkTree.GetBookmarksToolbarFolder(), 0);
 	EXPECT_EQ(effect, DROPEFFECT_NONE);
 }
 
-TEST_F(BookmarkDropperInvalidTest, DropEffect)
+// Tests dropping a shell item.
+class BookmarkDropperShellItemTest : public TestWithParam<ShellItemType>
 {
-	// There are no bookmarks contained within the drop, so it shouldn't be
+protected:
+	void SetUp() override
+	{
+		// This is needed to be able to successfully call SHCreateShellItemArrayFromIDLists (used by
+		// CreateDataObjectForShellTransfer).
+		HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+		ASSERT_HRESULT_SUCCEEDED(hr);
+
+		m_itemName = L"item";
+		m_itemPath = L"c:\\path\\to\\" + m_itemName;
+
+		unique_pidl_absolute pidl;
+		hr = CreateSimplePidl(m_itemPath, wil::out_param(pidl), nullptr, GetParam());
+		ASSERT_HRESULT_SUCCEEDED(hr);
+
+		std::vector<PCIDLIST_ABSOLUTE> items = { pidl.get() };
+		hr = CreateDataObjectForShellTransfer(items, &m_dataObject);
+		ASSERT_HRESULT_SUCCEEDED(hr);
+	}
+
+	void TearDown() override
+	{
+		CoUninitialize();
+	}
+
+	BookmarkTree m_bookmarkTree;
+	wil::com_ptr_nothrow<IDataObject> m_dataObject;
+	std::wstring m_itemName;
+	std::wstring m_itemPath;
+};
+
+TEST_P(BookmarkDropperShellItemTest, DropEffect)
+{
+	auto dropper =
+		std::make_unique<BookmarkDropper>(m_dataObject.get(), DROPEFFECT_COPY, &m_bookmarkTree);
+	DWORD effect = dropper->GetDropEffect(m_bookmarkTree.GetBookmarksMenuFolder(), 0);
+	EXPECT_EQ(effect, DROPEFFECT_COPY);
+
+	dropper =
+		std::make_unique<BookmarkDropper>(m_dataObject.get(), DROPEFFECT_LINK, &m_bookmarkTree);
+	effect = dropper->GetDropEffect(m_bookmarkTree.GetBookmarksMenuFolder(), 0);
+	EXPECT_EQ(effect, DROPEFFECT_LINK);
+
+	// It's not possible to move shell items into the bookmarks tree (the only items that can be
+	// moved are actual bookmarks).
+	dropper =
+		std::make_unique<BookmarkDropper>(m_dataObject.get(), DROPEFFECT_MOVE, &m_bookmarkTree);
+	effect = dropper->GetDropEffect(m_bookmarkTree.GetBookmarksMenuFolder(), 0);
+	EXPECT_EQ(effect, DROPEFFECT_NONE);
+}
+
+TEST_P(BookmarkDropperShellItemTest, Drop)
+{
+	auto dropper =
+		std::make_unique<BookmarkDropper>(m_dataObject.get(), DROPEFFECT_COPY, &m_bookmarkTree);
+
+	DWORD effect = dropper->PerformDrop(m_bookmarkTree.GetBookmarksMenuFolder(), 0);
+	ASSERT_EQ(effect, DROPEFFECT_COPY);
+	ASSERT_EQ(m_bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1);
+
+	auto bookmarkItem = m_bookmarkTree.GetBookmarksMenuFolder()->GetChildren()[0].get();
+	EXPECT_TRUE(bookmarkItem->IsBookmark());
+	EXPECT_EQ(bookmarkItem->GetName(), m_itemName);
+	EXPECT_THAT(bookmarkItem->GetLocation(), StrCaseEq(m_itemPath));
+}
+
+// It should be possible to drop both files and folders. The BookmarkDropperShellItemTest suite will
+// be run for both a file item and a folder item.
+INSTANTIATE_TEST_SUITE_P(FileAndFolder, BookmarkDropperShellItemTest,
+	Values(ShellItemType::File, ShellItemType::Folder));
+
+// Tests dropping data which can't be converted to a bookmark (in this case, text).
+class BookmarkDropperInvalidDataTest : public Test
+{
+protected:
+	BookmarkDropperInvalidDataTest()
+	{
+		FORMATETC formatEtc = { CF_UNICODETEXT, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+
+		auto global = WriteStringToGlobal(L"Test");
+		STGMEDIUM stgMedium = GetStgMediumForGlobal(global.get());
+
+		m_dataObject = winrt::make_self<DataObjectImpl>(&formatEtc, &stgMedium, 1);
+
+		// The IDataObject instance now owns the STGMEDIUM structure and is responsible for freeing
+		// the memory associated with it.
+		global.release();
+
+		m_dropper =
+			std::make_unique<BookmarkDropper>(m_dataObject.get(), DROPEFFECT_COPY, &m_bookmarkTree);
+	}
+
+	BookmarkTree m_bookmarkTree;
+	std::unique_ptr<BookmarkDropper> m_dropper;
+	winrt::com_ptr<IDataObject> m_dataObject;
+};
+
+TEST_F(BookmarkDropperInvalidDataTest, DropEffect)
+{
+	// It's not possible to extract any bookmarks items from the drop data, so it shouldn't be
 	// possible to drop anywhere.
 	DWORD effect = m_dropper->GetDropEffect(m_bookmarkTree.GetRoot(), 0);
 	EXPECT_EQ(effect, DROPEFFECT_NONE);
@@ -163,7 +245,7 @@ TEST_F(BookmarkDropperInvalidTest, DropEffect)
 	EXPECT_EQ(effect, DROPEFFECT_NONE);
 }
 
-TEST_F(BookmarkDropperInvalidTest, Drop)
+TEST_F(BookmarkDropperInvalidDataTest, Drop)
 {
 	DWORD effect = m_dropper->PerformDrop(m_bookmarkTree.GetBookmarksMenuFolder(), 0);
 	EXPECT_EQ(effect, DROPEFFECT_NONE);

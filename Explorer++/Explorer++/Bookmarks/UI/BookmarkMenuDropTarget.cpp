@@ -23,7 +23,7 @@ IFACEMETHODIMP BookmarkMenuDropTarget::DragEnter(IDataObject *dataObject, DWORD 
 	UNREFERENCED_PARAMETER(keyState);
 	UNREFERENCED_PARAMETER(ptl);
 
-	m_bookmarkDropper = std::make_unique<BookmarkDropper>(dataObject, m_bookmarkTree);
+	m_bookmarkDropper = std::make_unique<BookmarkDropper>(dataObject, *effect, m_bookmarkTree);
 
 	*effect = m_bookmarkDropper->GetDropEffect(m_targetFolder, m_targetIndex);
 	return S_OK;

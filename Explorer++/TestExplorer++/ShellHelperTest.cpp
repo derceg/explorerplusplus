@@ -7,6 +7,7 @@
 #include "../Helper/ShellHelper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <wil/com.h>
 #include <ShlObj.h>
 
 using namespace testing;
@@ -152,6 +153,86 @@ TEST_F(TransformPathTest, Whitespace)
 		L"c:\\users\\public\\file-with-trailing-whitespace\u2002");
 }
 
+// This class is essentially used to test that CreateSimplePidl returns a pidl with the correct set
+// of properties. It's important the properties are set correctly, as other things (e.g. tests) rely
+// on them.
+class CreateSimplePidlTest : public TestWithParam<ShellItemType>
+{
+protected:
+	void SetUp() override
+	{
+		// This is needed for SHCreateItemFromIDList.
+		HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+		ASSERT_HRESULT_SUCCEEDED(hr);
+
+		m_parentPath = L"c:\\path\\to";
+		m_itemName = L"item";
+		m_itemPath = m_parentPath + L"\\" + m_itemName;
+	}
+
+	void TearDown() override
+	{
+		CoUninitialize();
+	}
+
+	static void TestPidlProperties(PCIDLIST_ABSOLUTE pidl, const std::wstring &itemPath,
+		const std::wstring &itemName, ShellItemType shellItemType)
+	{
+		wil::com_ptr_nothrow<IShellItem> shellItem;
+		HRESULT hr = SHCreateItemFromIDList(pidl, IID_PPV_ARGS(&shellItem));
+		ASSERT_HRESULT_SUCCEEDED(hr);
+
+		wil::unique_cotaskmem_string displayName;
+		hr = shellItem->GetDisplayName(SIGDN_NORMALDISPLAY, &displayName);
+		ASSERT_HRESULT_SUCCEEDED(hr);
+		EXPECT_EQ(displayName.get(), itemName);
+
+		wil::unique_cotaskmem_string parsingPath;
+		hr = shellItem->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &parsingPath);
+		ASSERT_HRESULT_SUCCEEDED(hr);
+		EXPECT_THAT(parsingPath.get(), StrCaseEq(itemPath));
+
+		SFGAOF attributes;
+		hr = shellItem->GetAttributes(SFGAO_FOLDER, &attributes);
+		ASSERT_HRESULT_SUCCEEDED(hr);
+		EXPECT_EQ(WI_IsFlagSet(attributes, SFGAO_FOLDER), shellItemType == ShellItemType::Folder);
+	}
+
+	std::wstring m_parentPath;
+	std::wstring m_itemName;
+	std::wstring m_itemPath;
+};
+
+TEST_P(CreateSimplePidlTest, Absolute)
+{
+	unique_pidl_absolute pidl;
+	HRESULT hr = CreateSimplePidl(m_itemPath, wil::out_param(pidl), nullptr, GetParam());
+	ASSERT_HRESULT_SUCCEEDED(hr);
+
+	TestPidlProperties(pidl.get(), m_itemPath, m_itemName, GetParam());
+}
+
+TEST_P(CreateSimplePidlTest, Relative)
+{
+	unique_pidl_absolute pidlParent;
+	HRESULT hr =
+		CreateSimplePidl(m_parentPath, wil::out_param(pidlParent), nullptr, ShellItemType::Folder);
+	ASSERT_HRESULT_SUCCEEDED(hr);
+
+	wil::com_ptr_nothrow<IShellFolder> parent;
+	hr = SHBindToObject(nullptr, pidlParent.get(), nullptr, IID_PPV_ARGS(&parent));
+	ASSERT_HRESULT_SUCCEEDED(hr);
+
+	unique_pidl_absolute pidl;
+	hr = CreateSimplePidl(m_itemName, wil::out_param(pidl), parent.get(), GetParam());
+	ASSERT_HRESULT_SUCCEEDED(hr);
+
+	TestPidlProperties(pidl.get(), m_itemPath, m_itemName, GetParam());
+}
+
+INSTANTIATE_TEST_SUITE_P(FileAndFolder, CreateSimplePidlTest,
+	Values(ShellItemType::File, ShellItemType::Folder));
+
 TEST(IsPathGUID, GUIDPath)
 {
 	bool res = IsPathGUID(L"::{26EE0668-A00A-44D7-9371-BEB064C98683}");
@@ -173,7 +254,7 @@ TEST(IsPathGUID, NonGUIDPath)
 TEST(IsNamespaceRoot, NonRoot)
 {
 	unique_pidl_absolute pidl;
-	HRESULT hr = CreateSimplePidl(L"c:\\", wil::out_param(pidl), nullptr);
+	HRESULT hr = CreateSimplePidl(L"c:\\", wil::out_param(pidl));
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	BOOL res = IsNamespaceRoot(pidl.get());
@@ -205,11 +286,11 @@ TEST(ArePidlsEquivalent, Different)
 void TestArePidlsEquivalent(const std::wstring &path1, const std::wstring &path2, bool equivalent)
 {
 	unique_pidl_absolute pidl1;
-	HRESULT hr = CreateSimplePidl(path1, wil::out_param(pidl1), nullptr);
+	HRESULT hr = CreateSimplePidl(path1, wil::out_param(pidl1));
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	unique_pidl_absolute pidl2;
-	hr = CreateSimplePidl(path2, wil::out_param(pidl2), nullptr);
+	hr = CreateSimplePidl(path2, wil::out_param(pidl2));
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	BOOL res = ArePidlsEquivalent(pidl1.get(), pidl2.get());
@@ -220,7 +301,7 @@ TEST(GetDisplayName, ParsingName)
 {
 	unique_pidl_absolute pidl;
 	std::wstring pidlPath = L"c:\\path\\to\\file.txt";
-	HRESULT hr = CreateSimplePidl(pidlPath, wil::out_param(pidl), nullptr);
+	HRESULT hr = CreateSimplePidl(pidlPath, wil::out_param(pidl));
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	std::wstring parsingName;

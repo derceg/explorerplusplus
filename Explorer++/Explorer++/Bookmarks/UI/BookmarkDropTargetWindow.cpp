@@ -17,9 +17,8 @@ DWORD BookmarkDropTargetWindow::DragEnter(IDataObject *dataObject, DWORD keyStat
 	DWORD effect)
 {
 	UNREFERENCED_PARAMETER(keyState);
-	UNREFERENCED_PARAMETER(effect);
 
-	m_bookmarkDropper = std::make_unique<BookmarkDropper>(dataObject, m_bookmarkTree);
+	m_bookmarkDropper = std::make_unique<BookmarkDropper>(dataObject, effect, m_bookmarkTree);
 	m_bookmarkDropper->SetBlockDrop(m_blockDrop);
 
 	auto dropLocation = GetDropLocation(pt);

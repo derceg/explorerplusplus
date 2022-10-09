@@ -1371,7 +1371,8 @@ private:
 // This performs the same function as SHSimpleIDListFromPath(), which is deprecated.
 // The path provided should be relative to the parent. If parent is null, the path should be
 // absolute.
-HRESULT CreateSimplePidl(const std::wstring &path, PIDLIST_ABSOLUTE *pidl, IShellFolder *parent)
+HRESULT CreateSimplePidl(const std::wstring &path, PIDLIST_ABSOLUTE *pidl, IShellFolder *parent,
+	ShellItemType shellItemType)
 {
 	wil::com_ptr_nothrow<IBindCtx> bindCtx;
 	RETURN_IF_FAILED(CreateBindCtx(0, &bindCtx));
@@ -1380,7 +1381,18 @@ HRESULT CreateSimplePidl(const std::wstring &path, PIDLIST_ABSOLUTE *pidl, IShel
 	RETURN_IF_FAILED(bindCtx->SetBindOptions(&opts));
 
 	WIN32_FIND_DATA wfd = {};
-	wfd.dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
+
+	switch (shellItemType)
+	{
+	case ShellItemType::File:
+		wfd.dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
+		break;
+
+	case ShellItemType::Folder:
+		wfd.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
+		break;
+	}
+
 	auto fsBindData = FileSystemBindData::Create(&wfd);
 
 	RETURN_IF_FAILED(

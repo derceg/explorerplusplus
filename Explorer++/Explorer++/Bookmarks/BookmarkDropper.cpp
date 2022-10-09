@@ -9,9 +9,12 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "../Helper/DataExchangeHelper.h"
 #include "../Helper/ShellHelper.h"
+#include <wil/com.h>
 
-BookmarkDropper::BookmarkDropper(IDataObject *dataObject, BookmarkTree *bookmarkTree) :
+BookmarkDropper::BookmarkDropper(IDataObject *dataObject, DWORD allowedEffects,
+	BookmarkTree *bookmarkTree) :
 	m_dataObject(dataObject),
+	m_allowedEffects(allowedEffects),
 	m_bookmarkTree(bookmarkTree),
 	m_blockDrop(false)
 {
@@ -43,12 +46,14 @@ DWORD BookmarkDropper::GetDropEffect(const BookmarkItem *targetFolder, size_t in
 		return DROPEFFECT_NONE;
 	}
 
-	if (*extractedInfo.extractionSource == ExtractionSource::HDrop)
+	if (extractedInfo.extractionSource == ExtractionSource::CustomFormat)
 	{
-		return DROPEFFECT_COPY;
-	}
-	else if (*extractedInfo.extractionSource == ExtractionSource::CustomFormat)
-	{
+		// When dropping an existing bookmark, it's only possible to move it.
+		if (WI_IsFlagClear(m_allowedEffects, DROPEFFECT_MOVE))
+		{
+			return DROPEFFECT_NONE;
+		}
+
 		if (extractedInfo.bookmarkItems.size() == 1)
 		{
 			auto existingBookmarkItem = BookmarkHelper::GetBookmarkItemById(m_bookmarkTree,
@@ -64,8 +69,24 @@ DWORD BookmarkDropper::GetDropEffect(const BookmarkItem *targetFolder, size_t in
 
 		return DROPEFFECT_MOVE;
 	}
-
-	return DROPEFFECT_NONE;
+	else
+	{
+		if (WI_IsFlagSet(m_allowedEffects, DROPEFFECT_COPY))
+		{
+			return DROPEFFECT_COPY;
+		}
+		else if (WI_IsFlagSet(m_allowedEffects, DROPEFFECT_LINK))
+		{
+			return DROPEFFECT_LINK;
+		}
+		else
+		{
+			// In this case, the only allowed effect must be DROPEFFECT_MOVE. The only items that
+			// can be moved are bookmarks. It's not possible to move files/folders in to the
+			// bookmarks tree, so the drop is blocked in that case.
+			return DROPEFFECT_NONE;
+		}
+	}
 }
 
 DWORD BookmarkDropper::PerformDrop(BookmarkItem *targetFolder, size_t index)
@@ -79,7 +100,7 @@ DWORD BookmarkDropper::PerformDrop(BookmarkItem *targetFolder, size_t index)
 
 	for (auto &bookmarkItem : extractedInfo.bookmarkItems)
 	{
-		if (targetEffect == DROPEFFECT_COPY)
+		if (targetEffect == DROPEFFECT_COPY || targetEffect == DROPEFFECT_LINK)
 		{
 			m_bookmarkTree->AddBookmarkItem(targetFolder, std::move(bookmarkItem), index + i);
 		}
@@ -140,17 +161,17 @@ BookmarkDropper::ExtractedInfo &BookmarkDropper::GetExtractedInfo()
 BookmarkDropper::ExtractedInfo BookmarkDropper::ExtractBookmarkItems()
 {
 	BookmarkItems bookmarkItems;
-	std::optional<ExtractionSource> extractionSource;
+	ExtractionSource extractionSource;
 
 	if (IsDropFormatAvailable(m_dataObject, BookmarkDataExchange::GetFormatEtc()))
 	{
 		bookmarkItems = ExtractBookmarkItemsFromCustomFormat();
 		extractionSource = ExtractionSource::CustomFormat;
 	}
-	else if (IsDropFormatAvailable(m_dataObject, GetDroppedFilesFormatEtc()))
+	else
 	{
-		bookmarkItems = ExtractBookmarkItemsFromHDrop();
-		extractionSource = ExtractionSource::HDrop;
+		bookmarkItems = MaybeExtractBookmarkItemsFromShellItems();
+		extractionSource = ExtractionSource::Other;
 	}
 
 	return { std::move(bookmarkItems), extractionSource };
@@ -177,25 +198,67 @@ BookmarkItems BookmarkDropper::ExtractBookmarkItemsFromCustomFormat()
 	return BookmarkDataExchange::DeserializeBookmarkItems(*data);
 }
 
-BookmarkItems BookmarkDropper::ExtractBookmarkItemsFromHDrop()
+BookmarkItems BookmarkDropper::MaybeExtractBookmarkItemsFromShellItems()
 {
-	BookmarkItems bookmarkItems;
-	auto droppedFiles = ExtractDroppedFilesList(m_dataObject);
+	wil::com_ptr_nothrow<IShellItemArray> dropShellItems;
+	HRESULT hr = SHCreateShellItemArrayFromDataObject(m_dataObject, IID_PPV_ARGS(&dropShellItems));
 
-	for (auto &droppedFile : droppedFiles)
+	if (FAILED(hr))
 	{
-		if (!PathIsDirectory(droppedFile.c_str()))
+		return {};
+	}
+
+	DWORD numItems;
+	hr = dropShellItems->GetCount(&numItems);
+
+	if (FAILED(hr))
+	{
+		return {};
+	}
+
+	BookmarkItems bookmarkItems;
+
+	for (DWORD i = 0; i < numItems; i++)
+	{
+		wil::com_ptr_nothrow<IShellItem> shellItem;
+		hr = dropShellItems->GetItemAt(i, &shellItem);
+
+		if (FAILED(hr))
 		{
 			continue;
 		}
 
-		std::wstring displayName;
-		GetDisplayName(droppedFile.c_str(), SHGDN_INFOLDER, displayName);
+		auto bookmarkItem = MaybeBuildBookmarkItemFromShellItem(shellItem.get());
 
-		auto bookmarkItem =
-			std::make_unique<BookmarkItem>(std::nullopt, displayName, droppedFile.c_str());
+		if (!bookmarkItem)
+		{
+			continue;
+		}
+
 		bookmarkItems.push_back(std::move(bookmarkItem));
 	}
 
 	return bookmarkItems;
+}
+
+std::unique_ptr<BookmarkItem> BookmarkDropper::MaybeBuildBookmarkItemFromShellItem(
+	IShellItem *shellItem)
+{
+	wil::unique_cotaskmem_string displayName;
+	HRESULT hr = shellItem->GetDisplayName(SIGDN_NORMALDISPLAY, &displayName);
+
+	if (FAILED(hr))
+	{
+		return nullptr;
+	}
+
+	wil::unique_cotaskmem_string parsingPath;
+	hr = shellItem->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &parsingPath);
+
+	if (FAILED(hr))
+	{
+		return nullptr;
+	}
+
+	return std::make_unique<BookmarkItem>(std::nullopt, displayName.get(), parsingPath.get());
 }
