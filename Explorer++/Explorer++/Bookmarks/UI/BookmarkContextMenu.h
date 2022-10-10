@@ -10,12 +10,13 @@
 
 class BookmarkTree;
 class CoreInterface;
+class Navigator;
 
 class BookmarkContextMenu
 {
 public:
 	BookmarkContextMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule,
-		CoreInterface *coreInterface);
+		CoreInterface *coreInterface, Navigator *navigator);
 
 	BOOL ShowMenu(HWND parentWindow, BookmarkItem *parentFolder,
 		const RawBookmarkItems &bookmarkItems, const POINT &ptScreen, bool recursive = false);

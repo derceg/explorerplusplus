@@ -9,12 +9,13 @@
 
 class BookmarkTree;
 class CoreInterface;
+class Navigator;
 
 class BookmarkContextMenuController
 {
 public:
 	BookmarkContextMenuController(BookmarkTree *bookmarkTree, HMODULE resourceModule,
-		CoreInterface *coreInterface);
+		CoreInterface *coreInterface, Navigator *navigator);
 
 	void OnMenuItemSelected(int menuItemId, BookmarkItem *targetParentFolder, size_t targetIndex,
 		const RawBookmarkItems &bookmarkItems, HWND parentWindow);
@@ -31,4 +32,5 @@ private:
 	BookmarkTree *m_bookmarkTree;
 	HMODULE m_resourceModule;
 	CoreInterface *m_coreInterface;
+	Navigator *m_navigator;
 };

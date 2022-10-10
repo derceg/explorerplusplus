@@ -13,10 +13,11 @@
 #include "TabContainer.h"
 
 BookmarkContextMenuController::BookmarkContextMenuController(BookmarkTree *bookmarkTree,
-	HMODULE resourceModule, CoreInterface *coreInterface) :
+	HMODULE resourceModule, CoreInterface *coreInterface, Navigator *navigator) :
 	m_bookmarkTree(bookmarkTree),
 	m_resourceModule(resourceModule),
-	m_coreInterface(coreInterface)
+	m_coreInterface(coreInterface),
+	m_navigator(navigator)
 {
 }
 
@@ -38,10 +39,11 @@ void BookmarkContextMenuController::OnMenuItemSelected(int menuItemId,
 
 	case IDM_BOOKMARKS_OPEN_IN_NEW_TAB:
 		assert(bookmarkItems.size() == 1 && bookmarkItems[0]->IsBookmark());
-		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItems[0], m_coreInterface,
+		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItems[0],
 			m_coreInterface->GetConfig()->openTabsInForeground
 				? OpenFolderDisposition::ForegroundTab
-				: OpenFolderDisposition::BackgroundTab);
+				: OpenFolderDisposition::BackgroundTab,
+			m_coreInterface, m_navigator);
 		break;
 
 	case IDM_BOOKMARKS_OPEN_ALL:
@@ -93,7 +95,8 @@ void BookmarkContextMenuController::OnOpenAll(const RawBookmarkItems &bookmarkIt
 
 	for (auto *bookmarkItem : bookmarkItems)
 	{
-		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, m_coreInterface, disposition);
+		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, disposition, m_coreInterface,
+			m_navigator);
 
 		disposition = OpenFolderDisposition::BackgroundTab;
 	}

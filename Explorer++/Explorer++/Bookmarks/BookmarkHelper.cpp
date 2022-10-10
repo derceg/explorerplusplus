@@ -8,6 +8,7 @@
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/AddBookmarkDialog.h"
+#include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -24,8 +25,7 @@ int CALLBACK SortByDateAdded(const BookmarkItem *firstItem, const BookmarkItem *
 int CALLBACK SortByDateModified(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
 
 void OpenBookmarkWithDisposition(const BookmarkItem *bookmarkItem,
-	const std::wstring &currentDirectory, CoreInterface *coreInterface,
-	OpenFolderDisposition disposition);
+	OpenFolderDisposition disposition, const std::wstring &currentDirectory, Navigator *navigator);
 
 BookmarkItem *GetBookmarkItemByIdResursive(BookmarkItem *bookmarkItem, std::wstring_view guid);
 
@@ -237,7 +237,7 @@ void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *
 // If the specified item is a bookmark, it will be opened directly. If the item is a bookmark
 // folder, each child bookmark will be opened.
 void BookmarkHelper::OpenBookmarkItemWithDisposition(const BookmarkItem *bookmarkItem,
-	CoreInterface *coreInterface, OpenFolderDisposition disposition)
+	OpenFolderDisposition disposition, CoreInterface *coreInterface, Navigator *navigator)
 {
 	// It doesn't make any sense to open a folder in the current tab.
 	if (bookmarkItem->IsFolder() && disposition == OpenFolderDisposition::CurrentTab)
@@ -259,8 +259,7 @@ void BookmarkHelper::OpenBookmarkItemWithDisposition(const BookmarkItem *bookmar
 	{
 		for (auto &childItem : bookmarkItem->GetChildren() | boost::adaptors::filtered(IsBookmark))
 		{
-			OpenBookmarkWithDisposition(childItem.get(), currentDirectory, coreInterface,
-				disposition);
+			OpenBookmarkWithDisposition(childItem.get(), disposition, currentDirectory, navigator);
 
 			// When opening a set of bookmarks within a folder, only the first item should be
 			// switched to.
@@ -272,13 +271,12 @@ void BookmarkHelper::OpenBookmarkItemWithDisposition(const BookmarkItem *bookmar
 	}
 	else
 	{
-		OpenBookmarkWithDisposition(bookmarkItem, currentDirectory, coreInterface, disposition);
+		OpenBookmarkWithDisposition(bookmarkItem, disposition, currentDirectory, navigator);
 	}
 }
 
 void OpenBookmarkWithDisposition(const BookmarkItem *bookmarkItem,
-	const std::wstring &currentDirectory, CoreInterface *coreInterface,
-	OpenFolderDisposition disposition)
+	OpenFolderDisposition disposition, const std::wstring &currentDirectory, Navigator *navigator)
 {
 	assert(bookmarkItem->IsBookmark());
 
@@ -290,7 +288,7 @@ void OpenBookmarkWithDisposition(const BookmarkItem *bookmarkItem,
 		return;
 	}
 
-	coreInterface->OpenItem(*absolutePath, disposition);
+	navigator->OpenItem(*absolutePath, disposition);
 }
 
 // Cuts/copies the selected bookmark items. Each bookmark item needs to be part

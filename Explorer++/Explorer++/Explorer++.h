@@ -9,7 +9,7 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "CommandLine.h"
 #include "CoreInterface.h"
-#include "Navigation.h"
+#include "Navigator.h"
 #include "PluginInterface.h"
 #include "Plugins/PluginCommandManager.h"
 #include "Plugins/PluginMenuManager.h"
@@ -75,9 +75,10 @@ class PluginManager;
 
 class Explorerplusplus :
 	public CoreInterface,
-	public TabNavigationInterface,
 	private FileContextMenuHandler,
-	public PluginInterface
+	public Navigator,
+	public PluginInterface,
+	public TabNavigationInterface
 {
 	friend LoadSaveRegistry;
 	friend LoadSaveXML;
@@ -298,7 +299,6 @@ private:
 	/* PluginInterface. */
 	CoreInterface *GetCoreInterface() override;
 	TabContainer *GetTabContainer() override;
-	Navigation *GetNavigation() override;
 	Plugins::PluginMenuManager *GetPluginMenuManager() override;
 	UiTheming *GetUiTheming() override;
 	AcceleratorUpdater *GetAccleratorUpdater() override;
@@ -430,15 +430,21 @@ private:
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
 	void OpenListViewItem(int index,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
+
+	// Navigator
 	void OpenItem(const std::wstring &itemPath,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) override;
 	void OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) override;
+	OpenFolderDisposition DetermineOpenDisposition(bool isMiddleButtonDown, bool isCtrlKeyDown,
+		bool isShiftKeyDown) override;
+
 	void OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
 	void OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters) override;
-	OpenFolderDisposition DetermineOpenDisposition(bool isMiddleButtonDown, bool isCtrlKeyDown,
-		bool isShiftKeyDown) override;
+
+	void OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory);
+	void OnNavigateUp();
 
 	// FileContextMenuHandler
 	void UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
@@ -567,8 +573,6 @@ private:
 
 	MainWindow *m_mainWindow;
 	AddressBar *m_addressBar;
-
-	std::unique_ptr<Navigation> m_navigation;
 
 	std::unique_ptr<IconResourceLoader> m_iconResourceLoader;
 

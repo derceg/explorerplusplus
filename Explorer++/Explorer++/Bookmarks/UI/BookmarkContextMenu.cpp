@@ -11,9 +11,9 @@
 #include <wil/resource.h>
 
 BookmarkContextMenu::BookmarkContextMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule,
-	CoreInterface *coreInterface) :
+	CoreInterface *coreInterface, Navigator *navigator) :
 	m_resourceModule(resourceModule),
-	m_controller(bookmarkTree, resourceModule, coreInterface),
+	m_controller(bookmarkTree, resourceModule, coreInterface, navigator),
 	m_showingMenu(false)
 {
 }

@@ -13,6 +13,7 @@
 #include "Config.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
+#include "Navigator.h"
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/DropSourceImpl.h"
@@ -127,20 +128,21 @@ private:
 };
 
 BookmarksToolbar *BookmarksToolbar::Create(BookmarksToolbarView *view, CoreInterface *coreInterface,
-	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree)
+	Navigator *navigator, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree)
 {
-	return new BookmarksToolbar(view, coreInterface, iconFetcher, bookmarkTree);
+	return new BookmarksToolbar(view, coreInterface, navigator, iconFetcher, bookmarkTree);
 }
 
 BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, CoreInterface *coreInterface,
-	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree) :
+	Navigator *navigator, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree) :
 	BookmarkDropTargetWindow(view->GetHWND(), bookmarkTree),
 	m_view(view),
 	m_coreInterface(coreInterface),
+	m_navigator(navigator),
 	m_bookmarkTree(bookmarkTree),
-	m_contextMenu(bookmarkTree, coreInterface->GetResourceModule(), coreInterface),
-	m_bookmarkMenu(bookmarkTree, coreInterface->GetResourceModule(), coreInterface, iconFetcher,
-		view->GetHWND())
+	m_contextMenu(bookmarkTree, coreInterface->GetResourceModule(), coreInterface, navigator),
+	m_bookmarkMenu(bookmarkTree, coreInterface->GetResourceModule(), coreInterface, navigator,
+		iconFetcher, view->GetHWND())
 {
 	Initialize(iconFetcher);
 }
@@ -272,16 +274,18 @@ void BookmarksToolbar::OnBookmarkClicked(BookmarkItem *bookmarkItem, const Mouse
 {
 	UNREFERENCED_PARAMETER(event);
 
-	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, m_coreInterface,
-		m_coreInterface->DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey));
+	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
+		m_navigator->DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey),
+		m_coreInterface, m_navigator);
 }
 
 void BookmarksToolbar::OnBookmarkFolderClicked(BookmarkItem *bookmarkItem, const MouseEvent &event)
 {
 	if (event.ctrlKey)
 	{
-		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, m_coreInterface,
-			m_coreInterface->DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey));
+		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
+			m_navigator->DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey),
+			m_coreInterface, m_navigator);
 		return;
 	}
 
@@ -297,8 +301,9 @@ void BookmarksToolbar::OnBookmarkFolderClicked(BookmarkItem *bookmarkItem, const
 void BookmarksToolbar::OnButtonMiddleClicked(const BookmarkItem *bookmarkItem,
 	const MouseEvent &event)
 {
-	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, m_coreInterface,
-		m_coreInterface->DetermineOpenDisposition(true, event.ctrlKey, event.shiftKey));
+	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
+		m_navigator->DetermineOpenDisposition(true, event.ctrlKey, event.shiftKey), m_coreInterface,
+		m_navigator);
 }
 
 void BookmarksToolbar::OnButtonRightClicked(BookmarkItem *bookmarkItem, const MouseEvent &event)

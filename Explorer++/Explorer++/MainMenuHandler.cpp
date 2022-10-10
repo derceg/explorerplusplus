@@ -106,7 +106,7 @@ void Explorerplusplus::OnSearch()
 		std::wstring currentDirectory = selectedTab.GetShellBrowser()->GetDirectory();
 
 		auto *searchDialog = new SearchDialog(m_resourceModule, m_hContainer, currentDirectory,
-			this, m_tabContainer);
+			this, this, m_tabContainer);
 		g_hwndSearch = searchDialog->ShowModelessDialog(new ModelessDialogNotification());
 	}
 	else

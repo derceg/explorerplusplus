@@ -18,7 +18,7 @@ class BookmarkTreeView;
 class CoreInterface;
 class IconFetcher;
 class ManageBookmarksDialog;
-class Navigation;
+class Navigator;
 class WindowSubclassWrapper;
 
 class ManageBookmarksDialogPersistentSettings : public DialogSettings
@@ -50,7 +50,7 @@ class ManageBookmarksDialog : public DarkModeDialogBase
 {
 public:
 	ManageBookmarksDialog(HINSTANCE hInstance, HWND hParent, CoreInterface *coreInterface,
-		Navigation *navigation, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
+		Navigator *navigator, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
 	~ManageBookmarksDialog();
 
 protected:
@@ -117,7 +117,7 @@ private:
 	IconImageListMapping m_imageListToolbarMappings;
 
 	CoreInterface *m_coreInterface;
-	Navigation *m_navigation;
+	Navigator *m_navigator;
 	IconFetcher *m_iconFetcher;
 
 	BookmarkTree *m_bookmarkTree;

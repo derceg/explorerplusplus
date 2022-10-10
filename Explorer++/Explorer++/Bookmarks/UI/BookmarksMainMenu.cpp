@@ -15,9 +15,10 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/MenuHelper.h"
 
-BookmarksMainMenu::BookmarksMainMenu(CoreInterface *coreInterface, IconFetcher *iconFetcher,
-	BookmarkTree *bookmarkTree, const MenuIdRange &menuIdRange) :
+BookmarksMainMenu::BookmarksMainMenu(CoreInterface *coreInterface, Navigator *navigator,
+	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, const MenuIdRange &menuIdRange) :
 	m_coreInterface(coreInterface),
+	m_navigator(navigator),
 	m_bookmarkTree(bookmarkTree),
 	m_menuIdRange(menuIdRange),
 	m_menuBuilder(coreInterface, iconFetcher, coreInterface->GetResourceModule())
@@ -138,6 +139,6 @@ void BookmarksMainMenu::OnMenuItemClicked(int menuItemId)
 
 	assert(bookmark->IsBookmark());
 
-	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmark, m_coreInterface,
-		OpenFolderDisposition::CurrentTab);
+	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmark, OpenFolderDisposition::CurrentTab,
+		m_coreInterface, m_navigator);
 }

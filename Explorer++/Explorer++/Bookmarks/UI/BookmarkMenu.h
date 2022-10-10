@@ -14,6 +14,7 @@ class BookmarkItem;
 class BookmarkTree;
 class CoreInterface;
 class IconFetcher;
+class Navigator;
 
 // Although it's not necessary, this class is effectively designed to be held
 // for the lifetime of its parent class. Doing so is more efficient, as the
@@ -23,7 +24,7 @@ class BookmarkMenu
 {
 public:
 	BookmarkMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule, CoreInterface *coreInterface,
-		IconFetcher *iconFetcher, HWND parentWindow);
+		Navigator *navigator, IconFetcher *iconFetcher, HWND parentWindow);
 
 	BOOL ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt,
 		BookmarkMenuBuilder::IncludePredicate includePredicate = nullptr);

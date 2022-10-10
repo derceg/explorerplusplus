@@ -12,11 +12,12 @@
 class BookmarkTree;
 class CoreInterface;
 class IconFetcher;
+class Navigator;
 
 class BookmarksMainMenu
 {
 public:
-	BookmarksMainMenu(CoreInterface *coreInterface, IconFetcher *iconFetcher,
+	BookmarksMainMenu(CoreInterface *coreInterface, Navigator *navigator, IconFetcher *iconFetcher,
 		BookmarkTree *bookmarkTree, const MenuIdRange &menuIdRange);
 	~BookmarksMainMenu();
 
@@ -32,6 +33,7 @@ private:
 		std::vector<wil::unique_hbitmap> &menuImages, BookmarkMenuBuilder::MenuInfo &menuInfo);
 
 	CoreInterface *m_coreInterface;
+	Navigator *m_navigator;
 	BookmarkTree *m_bookmarkTree;
 	const MenuIdRange m_menuIdRange;
 	BookmarkMenuBuilder m_menuBuilder;

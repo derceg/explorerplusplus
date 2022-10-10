@@ -130,9 +130,6 @@
     <ClCompile Include="Language.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Navigation.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="MainMenuHandler.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -735,9 +732,6 @@
     <ClInclude Include="SignalWrapper.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Navigation.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="TabBacking.h">
       <Filter>Tabs</Filter>
     </ClInclude>
@@ -992,6 +986,9 @@
     </ClInclude>
     <ClInclude Include="DarkModeHelper.h">
       <Filter>Dark Mode Support</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigator.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

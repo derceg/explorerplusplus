@@ -6,6 +6,7 @@
 #include "AddressBar.h"
 #include "CoreInterface.h"
 #include "DarkModeHelper.h"
+#include "Navigator.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "Tab.h"
@@ -22,14 +23,15 @@
 #include <wil/common.h>
 #include <wil/resource.h>
 
-AddressBar *AddressBar::Create(HWND parent, CoreInterface *coreInterface)
+AddressBar *AddressBar::Create(HWND parent, CoreInterface *coreInterface, Navigator *navigator)
 {
-	return new AddressBar(parent, coreInterface);
+	return new AddressBar(parent, coreInterface, navigator);
 }
 
-AddressBar::AddressBar(HWND parent, CoreInterface *coreInterface) :
+AddressBar::AddressBar(HWND parent, CoreInterface *coreInterface, Navigator *navigator) :
 	BaseWindow(CreateAddressBar(parent)),
 	m_coreInterface(coreInterface),
+	m_navigator(navigator),
 	m_backgroundBrush(CreateSolidBrush(DARK_MODE_BACKGROUND_COLOR)),
 	m_defaultFolderIconIndex(GetDefaultFolderIconIndex())
 {
@@ -225,9 +227,8 @@ void AddressBar::OnEnterPressed()
 	// the text won't be reverted. That gives the user the chance to update the text and try again.
 	RevertTextInUI();
 
-	m_coreInterface->OpenItem(*absolutePath,
-		m_coreInterface->DetermineOpenDisposition(false, IsKeyDown(VK_CONTROL),
-			IsKeyDown(VK_SHIFT)));
+	m_navigator->OpenItem(*absolutePath,
+		m_navigator->DetermineOpenDisposition(false, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT)));
 	m_coreInterface->FocusActiveTab();
 }
 

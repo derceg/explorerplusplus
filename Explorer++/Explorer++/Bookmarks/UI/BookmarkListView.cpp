@@ -26,17 +26,18 @@
 #include <utility>
 
 BookmarkListView::BookmarkListView(HWND hListView, HMODULE resourceModule,
-	BookmarkTree *bookmarkTree, CoreInterface *coreInterface, IconFetcher *iconFetcher,
-	const std::vector<Column> &initialColumns) :
+	BookmarkTree *bookmarkTree, CoreInterface *coreInterface, Navigator *navigator,
+	IconFetcher *iconFetcher, const std::vector<Column> &initialColumns) :
 	BookmarkDropTargetWindow(hListView, bookmarkTree),
 	m_hListView(hListView),
 	m_resourceModule(resourceModule),
 	m_bookmarkTree(bookmarkTree),
 	m_coreInterface(coreInterface),
+	m_navigator(navigator),
 	m_columns(initialColumns),
 	m_sortColumn(BookmarkHelper::ColumnType::Default),
 	m_sortAscending(true),
-	m_bookmarkContextMenu(bookmarkTree, resourceModule, coreInterface)
+	m_bookmarkContextMenu(bookmarkTree, resourceModule, coreInterface, navigator)
 {
 	SetWindowTheme(hListView, L"Explorer", nullptr);
 	ListView_SetExtendedListViewStyleEx(hListView,
@@ -534,10 +535,11 @@ void BookmarkListView::OnDblClk(const NMITEMACTIVATE *itemActivate)
 	}
 	else
 	{
-		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, m_coreInterface,
+		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
 			m_coreInterface->GetConfig()->openTabsInForeground
 				? OpenFolderDisposition::ForegroundTab
-				: OpenFolderDisposition::BackgroundTab);
+				: OpenFolderDisposition::BackgroundTab,
+			m_coreInterface, m_navigator);
 	}
 }
 
@@ -900,8 +902,8 @@ void BookmarkListView::OnEnterPressed()
 
 		for (BookmarkItem *bookmarkItem : bookmarkItems)
 		{
-			BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, m_coreInterface,
-				disposition);
+			BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, disposition,
+				m_coreInterface, m_navigator);
 
 			disposition = OpenFolderDisposition::BackgroundTab;
 		}

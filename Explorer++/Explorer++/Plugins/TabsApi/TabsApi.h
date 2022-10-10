@@ -11,7 +11,6 @@
 #include <optional>
 
 class CoreInterface;
-class Navigation;
 class ShellBrowser;
 class TabContainer;
 struct TabSettings;

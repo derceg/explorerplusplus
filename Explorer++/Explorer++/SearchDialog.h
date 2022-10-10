@@ -18,6 +18,7 @@
 #include <vector>
 
 class CoreInterface;
+class Navigator;
 class SearchDialog;
 class TabContainer;
 
@@ -136,7 +137,7 @@ class SearchDialog : public DarkModeDialogBase, private FileContextMenuHandler
 {
 public:
 	SearchDialog(HINSTANCE hInstance, HWND hParent, std::wstring_view searchDirectory,
-		CoreInterface *coreInterface, TabContainer *tabContainer);
+		CoreInterface *coreInterface, Navigator *navigator, TabContainer *tabContainer);
 	~SearchDialog();
 
 	/* Sorting methods. */
@@ -202,6 +203,7 @@ private:
 	BOOL m_bSetSearchTimer;
 
 	CoreInterface *m_coreInterface;
+	Navigator *m_navigator;
 	TabContainer *m_tabContainer;
 
 	SearchDialogPersistentSettings *m_persistentSettings;

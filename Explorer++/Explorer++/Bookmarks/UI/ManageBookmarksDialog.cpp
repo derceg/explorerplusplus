@@ -13,7 +13,6 @@
 #include "DarkModeHelper.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
-#include "Navigation.h"
 #include "ResourceHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
@@ -25,11 +24,11 @@
 const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
 ManageBookmarksDialog::ManageBookmarksDialog(HINSTANCE hInstance, HWND hParent,
-	CoreInterface *coreInterface, Navigation *navigation, IconFetcher *iconFetcher,
+	CoreInterface *coreInterface, Navigator *navigator, IconFetcher *iconFetcher,
 	BookmarkTree *bookmarkTree) :
 	DarkModeDialogBase(hInstance, IDD_MANAGE_BOOKMARKS, hParent, true),
 	m_coreInterface(coreInterface),
-	m_navigation(navigation),
+	m_navigator(navigator),
 	m_iconFetcher(iconFetcher),
 	m_bookmarkTree(bookmarkTree)
 {
@@ -196,7 +195,7 @@ void ManageBookmarksDialog::SetupListView()
 	HWND hListView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW);
 
 	m_bookmarkListView = new BookmarkListView(hListView, GetInstance(), m_bookmarkTree,
-		m_coreInterface, m_iconFetcher, m_persistentSettings->m_listViewColumns);
+		m_coreInterface, m_navigator, m_iconFetcher, m_persistentSettings->m_listViewColumns);
 
 	m_connections.push_back(m_bookmarkListView->AddNavigationCompletedObserver(
 		std::bind_front(&ManageBookmarksDialog::OnListViewNavigation, this)));

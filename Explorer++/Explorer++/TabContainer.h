@@ -23,7 +23,6 @@ class CachedIcons;
 struct Config;
 class CoreInterface;
 class FileActionHandler;
-class Navigation;
 struct PreservedTab;
 
 BOOST_PARAMETER_NAME(name)

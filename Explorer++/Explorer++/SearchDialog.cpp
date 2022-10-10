@@ -9,6 +9,7 @@
 #include "DialogConstants.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
+#include "Navigator.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
@@ -58,10 +59,11 @@ const TCHAR SearchDialogPersistentSettings::SETTING_DIRECTORY_LIST[] = _T("Direc
 const TCHAR SearchDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
 
 SearchDialog::SearchDialog(HINSTANCE hInstance, HWND hParent, std::wstring_view searchDirectory,
-	CoreInterface *coreInterface, TabContainer *tabContainer) :
+	CoreInterface *coreInterface, Navigator *navigator, TabContainer *tabContainer) :
 	DarkModeDialogBase(hInstance, IDD_SEARCH, hParent, true),
 	m_searchDirectory(searchDirectory),
 	m_coreInterface(coreInterface),
+	m_navigator(navigator),
 	m_tabContainer(tabContainer),
 	m_bSearching(FALSE),
 	m_bStopSearching(FALSE),
@@ -660,7 +662,7 @@ BOOL SearchDialog::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		for (auto pidlItem : pidlItems)
 		{
 			unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItem));
-			m_coreInterface->OpenItem(pidlComplete.get());
+			m_navigator->OpenItem(pidlComplete.get());
 		}
 
 		return TRUE;
@@ -718,7 +720,7 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 
 					if (hr == S_OK)
 					{
-						m_coreInterface->OpenItem(pidlFull.get());
+						m_navigator->OpenItem(pidlFull.get());
 					}
 				}
 			}

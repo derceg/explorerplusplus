@@ -5,10 +5,11 @@
 #pragma once
 
 #include "Bookmarks/BookmarkItem.h"
-#include "CoreInterface.h"
+#include "Navigator.h"
 #include <optional>
 
 class BookmarkTree;
+class CoreInterface;
 class TabContainer;
 
 using RawBookmarkItems = std::vector<BookmarkItem *>;
@@ -38,8 +39,8 @@ BookmarkItem *AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type typ
 	CoreInterface *coreInterface, std::optional<std::wstring> customDialogTitle = std::nullopt);
 void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
 	HMODULE resoureceModule, HWND parentWindow, CoreInterface *coreInterface);
-void OpenBookmarkItemWithDisposition(const BookmarkItem *bookmarkItem, CoreInterface *coreInterface,
-	OpenFolderDisposition disposition);
+void OpenBookmarkItemWithDisposition(const BookmarkItem *bookmarkItem,
+	OpenFolderDisposition disposition, CoreInterface *coreInterface, Navigator *navigator);
 
 bool CopyBookmarkItems(BookmarkTree *bookmarkTree, const RawBookmarkItems &bookmarkItems, bool cut);
 void PasteBookmarkItems(BookmarkTree *bookmarkTree, BookmarkItem *parentFolder, size_t index);

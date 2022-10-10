@@ -13,7 +13,6 @@
 #include "LoadSaveXml.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
-#include "Navigation.h"
 #include "Plugins/PluginManager.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -305,8 +304,11 @@ void Explorerplusplus::OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 	switch (openFolderDisposition)
 	{
 	case OpenFolderDisposition::CurrentTab:
-		m_navigation->BrowseFolderInCurrentTab(pidlItem);
-		break;
+	{
+		Tab &tab = m_tabContainer->GetSelectedTab();
+		tab.GetShellBrowser()->GetNavigationController()->BrowseFolder(pidlItem);
+	}
+	break;
 
 	case OpenFolderDisposition::BackgroundTab:
 		m_tabContainer->CreateNewTab(pidlItem);
@@ -317,9 +319,22 @@ void Explorerplusplus::OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 		break;
 
 	case OpenFolderDisposition::NewWindow:
-		m_navigation->OpenDirectoryInNewWindow(pidlItem);
+		OpenDirectoryInNewWindow(pidlItem);
 		break;
 	}
+}
+
+void Explorerplusplus::OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory)
+{
+	/* Create a new instance of this program, with the
+	specified path as an argument. */
+	std::wstring path;
+	GetDisplayName(pidlDirectory, SHGDN_FORPARSING, path);
+
+	TCHAR szParameters[512];
+	StringCchPrintf(szParameters, SIZEOF_ARRAY(szParameters), _T("\"%s\""), path.c_str());
+
+	ExecuteAndShowCurrentProcess(m_hContainer, szParameters);
 }
 
 void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters)
@@ -369,6 +384,41 @@ OpenFolderDisposition Explorerplusplus::DetermineOpenDisposition(bool isMiddleBu
 	}
 
 	return OpenFolderDisposition::CurrentTab;
+}
+
+void Explorerplusplus::OnNavigateUp()
+{
+	Tab &tab = m_tabContainer->GetSelectedTab();
+	unique_pidl_absolute directory = tab.GetShellBrowser()->GetDirectoryIdl();
+
+	HRESULT hr = E_FAIL;
+	Tab *resultingTab = nullptr;
+
+	if (tab.GetLockState() != Tab::LockState::AddressLocked)
+	{
+		hr = tab.GetShellBrowser()->GetNavigationController()->GoUp();
+
+		resultingTab = &tab;
+	}
+	else
+	{
+		unique_pidl_absolute pidlParent;
+		hr = GetVirtualParentPath(tab.GetShellBrowser()->GetDirectoryIdl().get(),
+			wil::out_param(pidlParent));
+
+		if (SUCCEEDED(hr))
+		{
+			Tab &newTab =
+				m_tabContainer->CreateNewTab(pidlParent.get(), TabSettings(_selected = true));
+
+			resultingTab = &newTab;
+		}
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		resultingTab->GetShellBrowser()->SelectItems({ directory.get() });
+	}
 }
 
 BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)

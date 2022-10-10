@@ -12,12 +12,13 @@ class CoreInterface;
 class DriveModel;
 class DrivesToolbarView;
 struct MouseEvent;
+class Navigator;
 
 class DrivesToolbar : private FileContextMenuHandler
 {
 public:
 	static DrivesToolbar *Create(DrivesToolbarView *view, std::unique_ptr<DriveModel> driveModel,
-		CoreInterface *coreInterface);
+		CoreInterface *coreInterface, Navigator *navigator);
 
 	DrivesToolbar(const DrivesToolbar &) = delete;
 	DrivesToolbar(DrivesToolbar &&) = delete;
@@ -33,7 +34,7 @@ private:
 	static constexpr int MENU_ID_OPEN_IN_NEW_TAB = (MAX_SHELL_MENU_ID + 1);
 
 	DrivesToolbar(DrivesToolbarView *view, std::unique_ptr<DriveModel> driveModel,
-		CoreInterface *coreInterface);
+		CoreInterface *coreInterface, Navigator *navigator);
 	~DrivesToolbar();
 
 	void Initialize();
@@ -65,4 +66,5 @@ private:
 	DrivesToolbarView *m_view;
 	std::unique_ptr<DriveModel> m_driveModel;
 	CoreInterface *m_coreInterface;
+	Navigator *m_navigator;
 };

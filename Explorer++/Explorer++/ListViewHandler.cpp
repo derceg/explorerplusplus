@@ -9,7 +9,6 @@
 #include "IDropFilesCallback.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
-#include "Navigation.h"
 #include "NewMenuClient.h"
 #include "ResourceHelper.h"
 #include "ServiceProvider.h"
@@ -81,7 +80,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 		{
 			/* The user has double clicked in the whitespace
 			area for this tab, so go up one folder... */
-			m_navigation->OnNavigateUp();
+			OnNavigateUp();
 			return 0;
 		}
 	}

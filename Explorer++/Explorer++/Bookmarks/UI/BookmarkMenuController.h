@@ -6,14 +6,16 @@
 
 class BookmarkItem;
 class CoreInterface;
+class Navigator;
 
 class BookmarkMenuController
 {
 public:
-	BookmarkMenuController(CoreInterface *coreInterface);
+	BookmarkMenuController(CoreInterface *coreInterface, Navigator *navigator);
 
 	void OnBookmarkMenuItemSelected(const BookmarkItem *bookmarkItem);
 
 private:
 	CoreInterface *m_coreInterface;
+	Navigator *m_navigator;
 };

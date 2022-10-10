@@ -13,14 +13,6 @@ enum class MousewheelSource
 	Other
 };
 
-enum class OpenFolderDisposition
-{
-	CurrentTab,
-	BackgroundTab,
-	ForegroundTab,
-	NewWindow
-};
-
 enum class WindowFocusSource
 {
 	AddressBar,
@@ -71,13 +63,6 @@ public:
 	virtual CachedIcons *GetCachedIcons() = 0;
 
 	virtual HWND GetTreeView() const = 0;
-
-	virtual void OpenItem(const std::wstring &itemPath,
-		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) = 0;
-	virtual void OpenItem(PCIDLIST_ABSOLUTE pidlItem,
-		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) = 0;
-	virtual OpenFolderDisposition DetermineOpenDisposition(bool isMiddleButtonDown,
-		bool isCtrlKeyDown, bool isShiftKeyDown) = 0;
 
 	virtual StatusBar *GetStatusBar() = 0;
 

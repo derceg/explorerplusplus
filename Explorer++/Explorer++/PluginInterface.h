@@ -6,7 +6,6 @@
 
 class AcceleratorUpdater;
 class CoreInterface;
-class Navigation;
 class TabContainer;
 class UiTheming;
 
@@ -20,7 +19,6 @@ __interface PluginInterface
 {
 	CoreInterface *GetCoreInterface();
 	TabContainer *GetTabContainer();
-	Navigation *GetNavigation();
 	Plugins::PluginMenuManager *GetPluginMenuManager();
 	UiTheming *GetUiTheming();
 	AcceleratorUpdater *GetAccleratorUpdater();

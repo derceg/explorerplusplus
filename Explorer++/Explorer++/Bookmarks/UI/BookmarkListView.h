@@ -19,6 +19,7 @@ class BookmarkIconManager;
 class BookmarkTree;
 class CoreInterface;
 class IconFetcher;
+class Navigator;
 
 class BookmarkListView : public BookmarkNavigatorInterface, private BookmarkDropTargetWindow
 {
@@ -31,7 +32,7 @@ public:
 	};
 
 	BookmarkListView(HWND hListView, HMODULE resourceModule, BookmarkTree *bookmarkTree,
-		CoreInterface *coreInterface, IconFetcher *iconFetcher,
+		CoreInterface *coreInterface, Navigator *navigator, IconFetcher *iconFetcher,
 		const std::vector<Column> &initialColumns);
 
 	void NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder, bool addHistoryEntry) override;
@@ -133,6 +134,7 @@ private:
 	HWND m_hListView;
 	HMODULE m_resourceModule;
 	CoreInterface *m_coreInterface;
+	Navigator *m_navigator;
 	std::unique_ptr<BookmarkIconManager> m_bookmarkIconManager;
 	std::vector<Column> m_columns;
 

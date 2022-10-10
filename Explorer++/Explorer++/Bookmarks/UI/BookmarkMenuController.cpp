@@ -7,8 +7,9 @@
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkItem.h"
 
-BookmarkMenuController::BookmarkMenuController(CoreInterface *coreInterface) :
-	m_coreInterface(coreInterface)
+BookmarkMenuController::BookmarkMenuController(CoreInterface *coreInterface, Navigator *navigator) :
+	m_coreInterface(coreInterface),
+	m_navigator(navigator)
 {
 }
 
@@ -16,6 +17,6 @@ void BookmarkMenuController::OnBookmarkMenuItemSelected(const BookmarkItem *book
 {
 	assert(bookmarkItem->IsBookmark());
 
-	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, m_coreInterface,
-		OpenFolderDisposition::CurrentTab);
+	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, OpenFolderDisposition::CurrentTab,
+		m_coreInterface, m_navigator);
 }

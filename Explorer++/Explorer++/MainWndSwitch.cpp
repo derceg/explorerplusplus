@@ -25,7 +25,6 @@
 #include "MainToolbarButtons.h"
 #include "MenuRanges.h"
 #include "ModelessDialogs.h"
-#include "Navigation.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
@@ -1194,7 +1193,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 
 	case MainToolbarButton::Up:
 	case IDM_GO_UPONELEVEL:
-		m_navigation->OnNavigateUp();
+		OnNavigateUp();
 		break;
 
 	case IDM_GO_MYCOMPUTER:
@@ -1256,7 +1255,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		if (g_hwndManageBookmarks == nullptr)
 		{
 			auto *pManageBookmarksDialog = new ManageBookmarksDialog(m_resourceModule, hwnd, this,
-				m_navigation.get(), &m_bookmarkIconFetcher, &m_bookmarkTree);
+				this, &m_bookmarkIconFetcher, &m_bookmarkTree);
 			g_hwndManageBookmarks =
 				pManageBookmarksDialog->ShowModelessDialog(new ModelessDialogNotification());
 		}

@@ -386,7 +386,7 @@ boost::signals2::connection Explorerplusplus::AddToolbarContextMenuSelectedObser
 
 void Explorerplusplus::CreateAddressBar()
 {
-	m_addressBar = AddressBar::Create(m_hMainRebar, this);
+	m_addressBar = AddressBar::Create(m_hMainRebar, this, this);
 }
 
 void Explorerplusplus::CreateMainToolbar()
@@ -438,7 +438,7 @@ void Explorerplusplus::CreateBookmarksToolbar()
 {
 	auto bookmarksToolbarView = new BookmarksToolbarView(m_hMainRebar);
 
-	m_bookmarksToolbar = BookmarksToolbar::Create(bookmarksToolbarView, this,
+	m_bookmarksToolbar = BookmarksToolbar::Create(bookmarksToolbarView, this, this,
 		&m_bookmarkIconFetcher, &m_bookmarkTree);
 	m_bookmarksToolbar->GetView()->AddToolbarUpdatedObserver(std::bind_front(
 		&Explorerplusplus::OnRebarToolbarUpdated, this, m_bookmarksToolbar->GetView()->GetHWND()));
@@ -453,7 +453,7 @@ void Explorerplusplus::CreateDrivesToolbar()
 	auto driveModel =
 		std::make_unique<DriveModel>(std::move(driveEnumerator), std::move(driveWatcher));
 
-	m_drivesToolbar = DrivesToolbar::Create(drivesToolbarView, std::move(driveModel), this);
+	m_drivesToolbar = DrivesToolbar::Create(drivesToolbarView, std::move(driveModel), this, this);
 	m_drivesToolbar->GetView()->AddToolbarUpdatedObserver(std::bind_front(
 		&Explorerplusplus::OnRebarToolbarUpdated, this, m_drivesToolbar->GetView()->GetHWND()));
 }

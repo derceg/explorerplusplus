@@ -9,6 +9,7 @@
 #include "DriveModel.h"
 #include "DrivesToolbarView.h"
 #include "MainResource.h"
+#include "Navigator.h"
 #include "ResourceHelper.h"
 #include "TabContainer.h"
 #include "../Helper/MenuHelper.h"
@@ -69,16 +70,17 @@ private:
 };
 
 DrivesToolbar *DrivesToolbar::Create(DrivesToolbarView *view,
-	std::unique_ptr<DriveModel> driveModel, CoreInterface *coreInterface)
+	std::unique_ptr<DriveModel> driveModel, CoreInterface *coreInterface, Navigator *navigator)
 {
-	return new DrivesToolbar(view, std::move(driveModel), coreInterface);
+	return new DrivesToolbar(view, std::move(driveModel), coreInterface, navigator);
 }
 
 DrivesToolbar::DrivesToolbar(DrivesToolbarView *view, std::unique_ptr<DriveModel> driveModel,
-	CoreInterface *coreInterface) :
+	CoreInterface *coreInterface, Navigator *navigator) :
 	m_view(view),
 	m_driveModel(std::move(driveModel)),
-	m_coreInterface(coreInterface)
+	m_coreInterface(coreInterface),
+	m_navigator(navigator)
 {
 	Initialize();
 }
@@ -155,14 +157,14 @@ void DrivesToolbar::OnButtonClicked(const std::wstring &drivePath, const MouseEv
 {
 	UNREFERENCED_PARAMETER(event);
 
-	m_coreInterface->OpenItem(drivePath,
-		m_coreInterface->DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey));
+	m_navigator->OpenItem(drivePath,
+		m_navigator->DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey));
 }
 
 void DrivesToolbar::OnButtonMiddleClicked(const std::wstring &drivePath, const MouseEvent &event)
 {
-	m_coreInterface->OpenItem(drivePath,
-		m_coreInterface->DetermineOpenDisposition(true, event.ctrlKey, event.shiftKey));
+	m_navigator->OpenItem(drivePath,
+		m_navigator->DetermineOpenDisposition(true, event.ctrlKey, event.shiftKey));
 }
 
 void DrivesToolbar::OnButtonRightClicked(const std::wstring &drivePath, const MouseEvent &event)
@@ -219,7 +221,7 @@ BOOL DrivesToolbar::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		assert(pidlItems.size() == 1);
 
 		unique_pidl_absolute pidl(ILCombine(pidlParent, pidlItems[0]));
-		m_coreInterface->OpenItem(pidl.get());
+		m_navigator->OpenItem(pidl.get());
 		return TRUE;
 	}
 
