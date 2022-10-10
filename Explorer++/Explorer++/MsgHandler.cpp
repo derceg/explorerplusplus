@@ -116,10 +116,12 @@ void Explorerplusplus::LoadAllSettings(ILoadSave **pLoadSave)
 	ValidateLoadedSettings();
 }
 
-void Explorerplusplus::OpenItem(const TCHAR *itemPath, OpenFolderDisposition openFolderDisposition)
+void Explorerplusplus::OpenItem(const std::wstring &itemPath,
+	OpenFolderDisposition openFolderDisposition)
 {
 	unique_pidl_absolute pidlItem;
-	HRESULT hr = SHParseDisplayName(itemPath, nullptr, wil::out_param(pidlItem), 0, nullptr);
+	HRESULT hr =
+		SHParseDisplayName(itemPath.c_str(), nullptr, wil::out_param(pidlItem), 0, nullptr);
 
 	if (SUCCEEDED(hr))
 	{

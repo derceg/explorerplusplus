@@ -430,7 +430,7 @@ private:
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
 	void OpenListViewItem(int index,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
-	void OpenItem(const TCHAR *itemPath,
+	void OpenItem(const std::wstring &itemPath,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) override;
 	void OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) override;

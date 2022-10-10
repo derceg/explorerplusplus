@@ -9,7 +9,6 @@
 #include "DriveModel.h"
 #include "DrivesToolbarView.h"
 #include "MainResource.h"
-#include "Navigation.h"
 #include "ResourceHelper.h"
 #include "TabContainer.h"
 #include "../Helper/MenuHelper.h"
@@ -70,17 +69,16 @@ private:
 };
 
 DrivesToolbar *DrivesToolbar::Create(DrivesToolbarView *view,
-	std::unique_ptr<DriveModel> driveModel, CoreInterface *coreInterface, Navigation *navigation)
+	std::unique_ptr<DriveModel> driveModel, CoreInterface *coreInterface)
 {
-	return new DrivesToolbar(view, std::move(driveModel), coreInterface, navigation);
+	return new DrivesToolbar(view, std::move(driveModel), coreInterface);
 }
 
 DrivesToolbar::DrivesToolbar(DrivesToolbarView *view, std::unique_ptr<DriveModel> driveModel,
-	CoreInterface *coreInterface, Navigation *navigation) :
+	CoreInterface *coreInterface) :
 	m_view(view),
 	m_driveModel(std::move(driveModel)),
-	m_coreInterface(coreInterface),
-	m_navigation(navigation)
+	m_coreInterface(coreInterface)
 {
 	Initialize();
 }
@@ -157,20 +155,14 @@ void DrivesToolbar::OnButtonClicked(const std::wstring &drivePath, const MouseEv
 {
 	UNREFERENCED_PARAMETER(event);
 
-	m_navigation->BrowseFolderInCurrentTab(drivePath.c_str());
+	m_coreInterface->OpenItem(drivePath,
+		m_coreInterface->DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey));
 }
 
 void DrivesToolbar::OnButtonMiddleClicked(const std::wstring &drivePath, const MouseEvent &event)
 {
-	bool switchToNewTab = m_coreInterface->GetConfig()->openTabsInForeground;
-
-	if (event.shiftKey)
-	{
-		switchToNewTab = !switchToNewTab;
-	}
-
-	m_coreInterface->GetTabContainer()->CreateNewTab(drivePath,
-		TabSettings(_selected = switchToNewTab));
+	m_coreInterface->OpenItem(drivePath,
+		m_coreInterface->DetermineOpenDisposition(true, event.ctrlKey, event.shiftKey));
 }
 
 void DrivesToolbar::OnButtonRightClicked(const std::wstring &drivePath, const MouseEvent &event)

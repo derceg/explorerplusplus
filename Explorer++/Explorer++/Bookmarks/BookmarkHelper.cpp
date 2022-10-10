@@ -290,7 +290,7 @@ void OpenBookmarkWithDisposition(const BookmarkItem *bookmarkItem,
 		return;
 	}
 
-	coreInterface->OpenItem(absolutePath->c_str(), disposition);
+	coreInterface->OpenItem(*absolutePath, disposition);
 }
 
 // Cuts/copies the selected bookmark items. Each bookmark item needs to be part

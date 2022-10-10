@@ -453,8 +453,7 @@ void Explorerplusplus::CreateDrivesToolbar()
 	auto driveModel =
 		std::make_unique<DriveModel>(std::move(driveEnumerator), std::move(driveWatcher));
 
-	m_drivesToolbar =
-		DrivesToolbar::Create(drivesToolbarView, std::move(driveModel), this, m_navigation.get());
+	m_drivesToolbar = DrivesToolbar::Create(drivesToolbarView, std::move(driveModel), this);
 	m_drivesToolbar->GetView()->AddToolbarUpdatedObserver(std::bind_front(
 		&Explorerplusplus::OnRebarToolbarUpdated, this, m_drivesToolbar->GetView()->GetHWND()));
 }

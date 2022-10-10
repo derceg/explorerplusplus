@@ -72,7 +72,7 @@ public:
 
 	virtual HWND GetTreeView() const = 0;
 
-	virtual void OpenItem(const TCHAR *itemPath,
+	virtual void OpenItem(const std::wstring &itemPath,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) = 0;
 	virtual void OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) = 0;
