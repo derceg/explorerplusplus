@@ -31,9 +31,8 @@ void BookmarkContextMenuController::OnMenuItemSelected(int menuItemId,
 	{
 		assert(bookmarkItems.size() == 1 && bookmarkItems[0]->IsBookmark());
 
-		Tab &selectedTab = m_coreInterface->GetTabContainer()->GetSelectedTab();
-		selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(
-			bookmarkItems[0]->GetLocation());
+		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItems[0],
+			OpenFolderDisposition::CurrentTab, m_coreInterface, m_navigator);
 	}
 	break;
 
