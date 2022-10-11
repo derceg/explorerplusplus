@@ -37,10 +37,12 @@ private:
 		LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+	void OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt);
+	void OnMenuMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown);
+
 	LRESULT OnMenuDrag(HMENU menu, int itemPosition);
 	LRESULT OnMenuGetObject(MENUGETOBJECTINFO *objectInfo);
 
-	void OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt);
 	void OnMenuItemSelected(int menuItemId, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings);
 
 	HWND m_parentWindow;

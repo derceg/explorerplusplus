@@ -13,7 +13,10 @@ class BookmarkMenuController
 public:
 	BookmarkMenuController(CoreInterface *coreInterface, Navigator *navigator);
 
-	void OnBookmarkMenuItemSelected(const BookmarkItem *bookmarkItem);
+	void OnBookmarkMenuItemSelected(const BookmarkItem *bookmarkItem, bool isCtrlKeyDown,
+		bool isShiftKeyDown);
+	void OnMenuItemMiddleClicked(const BookmarkItem *bookmarkItem, bool isCtrlKeyDown,
+		bool isShiftKeyDown);
 
 private:
 	CoreInterface *m_coreInterface;

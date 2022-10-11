@@ -13,10 +13,20 @@ BookmarkMenuController::BookmarkMenuController(CoreInterface *coreInterface, Nav
 {
 }
 
-void BookmarkMenuController::OnBookmarkMenuItemSelected(const BookmarkItem *bookmarkItem)
+void BookmarkMenuController::OnBookmarkMenuItemSelected(const BookmarkItem *bookmarkItem,
+	bool isCtrlKeyDown, bool isShiftKeyDown)
 {
 	assert(bookmarkItem->IsBookmark());
 
-	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, OpenFolderDisposition::CurrentTab,
+	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
+		m_navigator->DetermineOpenDisposition(false, isCtrlKeyDown, isShiftKeyDown),
 		m_coreInterface, m_navigator);
+}
+
+void BookmarkMenuController::OnMenuItemMiddleClicked(const BookmarkItem *bookmarkItem,
+	bool isCtrlKeyDown, bool isShiftKeyDown)
+{
+	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
+		m_navigator->DetermineOpenDisposition(true, isCtrlKeyDown, isShiftKeyDown), m_coreInterface,
+		m_navigator);
 }

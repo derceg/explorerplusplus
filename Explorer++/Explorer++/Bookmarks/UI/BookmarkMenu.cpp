@@ -46,6 +46,11 @@ LRESULT CALLBACK BookmarkMenu::ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM 
 	}
 	break;
 
+	case WM_MBUTTONUP:
+		OnMenuMiddleButtonUp({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) },
+			WI_IsFlagSet(wParam, MK_CONTROL), WI_IsFlagSet(wParam, MK_SHIFT));
+		break;
+
 	case WM_MENUDRAG:
 		return OnMenuDrag(reinterpret_cast<HMENU>(lParam), static_cast<int>(wParam));
 
@@ -54,6 +59,84 @@ LRESULT CALLBACK BookmarkMenu::ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM 
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+void BookmarkMenu::OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt)
+{
+	// The bookmark context menu can be shown on top of this menu, so the menu item that was
+	// right-clicked might be from that menu.
+	if (!m_showingMenu || !m_menuInfo->menus.contains(menu))
+	{
+		return;
+	}
+
+	auto itr = m_menuInfo->itemPositionMap.find({ menu, index });
+
+	if (itr == m_menuInfo->itemPositionMap.end())
+	{
+		assert(false);
+		return;
+	}
+
+	m_bookmarkContextMenu.ShowMenu(m_parentWindow, itr->second.bookmarkItem->GetParent(),
+		{ itr->second.bookmarkItem }, pt, true);
+}
+
+void BookmarkMenu::OnMenuMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown)
+{
+	// The context menu can cover part of this menu, so a middle click over an item from that menu
+	// might also be over this menu. However, it appears that MenuItemFromPoint() only considers the
+	// top-most menu. That is, if the middle click occurs while the context menu is being shown,
+	// MenuItemFromPoint() will fail for each of the menus that make up this menu, regardless of
+	// where the click occurs.
+	// Therefore, it's not necessary to check here whether the context menu is being shown.
+	if (!m_showingMenu)
+	{
+		return;
+	}
+
+	HMENU targetMenu = nullptr;
+	int targetItem = -1;
+	bool targetFound = false;
+
+	for (auto menu : m_menuInfo->menus)
+	{
+		// Note that the POINT passed to MenuItemFromPoint() needs to be in screen coordinates (even
+		// though the documentation for that method indicates the POINT needs to be in client
+		// coordinates). The POINT passed to the WM_MBUTTONUP handler will be in client coordinates
+		// normally and in screen coordinates if a menu is being shown. As execution can only reach
+		// this point if the bookmark menu is actually being shown, it's known at this stage that
+		// the POINT is in screen coordinates.
+		int item = MenuItemFromPoint(m_parentWindow, menu, pt);
+
+		if (item != -1)
+		{
+			targetMenu = menu;
+			targetItem = item;
+			targetFound = true;
+			break;
+		}
+	}
+
+	if (!targetFound)
+	{
+		return;
+	}
+
+	auto itr = m_menuInfo->itemPositionMap.find({ targetMenu, targetItem });
+
+	if (itr == m_menuInfo->itemPositionMap.end())
+	{
+		assert(false);
+		return;
+	}
+
+	if (itr->second.menuItemType == BookmarkMenuBuilder::MenuItemType::EmptyItem)
+	{
+		return;
+	}
+
+	m_controller.OnMenuItemMiddleClicked(itr->second.bookmarkItem, isCtrlKeyDown, isShiftKeyDown);
 }
 
 LRESULT BookmarkMenu::OnMenuDrag(HMENU menu, int itemPosition)
@@ -193,27 +276,6 @@ LRESULT BookmarkMenu::OnMenuGetObject(MENUGETOBJECTINFO *objectInfo)
 	return MNGO_NOERROR;
 }
 
-void BookmarkMenu::OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt)
-{
-	// The bookmark context menu can be shown on top of this menu, so the menu item that was
-	// right-clicked might be from that menu.
-	if (!m_showingMenu || !m_menuInfo->menus.contains(menu))
-	{
-		return;
-	}
-
-	auto itr = m_menuInfo->itemPositionMap.find({ menu, index });
-
-	if (itr == m_menuInfo->itemPositionMap.end())
-	{
-		assert(false);
-		return;
-	}
-
-	m_bookmarkContextMenu.ShowMenu(m_parentWindow, itr->second.bookmarkItem->GetParent(),
-		{ itr->second.bookmarkItem }, pt, true);
-}
-
 BOOL BookmarkMenu::ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt,
 	BookmarkMenuBuilder::IncludePredicate includePredicate)
 {
@@ -264,5 +326,6 @@ void BookmarkMenu::OnMenuItemSelected(int menuItemId,
 		return;
 	}
 
-	m_controller.OnBookmarkMenuItemSelected(itr->second);
+	m_controller.OnBookmarkMenuItemSelected(itr->second, IsKeyDown(VK_CONTROL),
+		IsKeyDown(VK_SHIFT));
 }
