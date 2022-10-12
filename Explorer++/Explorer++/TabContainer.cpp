@@ -437,6 +437,8 @@ void TabContainer::CreateTabContextMenu(Tab &tab, const POINT &pt)
 	std::vector<wil::unique_hbitmap> menuImages;
 	AddImagesToTabContextMenu(menu, menuImages);
 
+	MenuHelper::EnableItem(menu, IDM_TAB_OPENPARENTINNEWTAB,
+		!IsNamespaceRoot(tab.GetShellBrowser()->GetDirectoryIdl().get()));
 	MenuHelper::CheckItem(menu, IDM_TAB_LOCKTAB, tab.GetLockState() == Tab::LockState::Locked);
 	MenuHelper::CheckItem(menu, IDM_TAB_LOCKTABANDADDRESS,
 		tab.GetLockState() == Tab::LockState::AddressLocked);
