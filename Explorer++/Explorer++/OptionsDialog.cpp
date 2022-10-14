@@ -343,13 +343,17 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 	}
 	break;
 
-	case WM_CTLCOLORDLG:
-		return OnCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
-
 	case WM_CTLCOLORSTATIC:
 	case WM_CTLCOLOREDIT:
 	case WM_CTLCOLORLISTBOX:
 		return OnCtlColor(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
+	// Normally, the background brush for the dialog could be returned by WM_CTLCOLORDLG, however
+	// that doesn't appear to work for a property sheet page on Windows 11. Therefore, WM_ERASEBKGND
+	// will be used instead (as described in the comment at
+	// https://stackoverflow.com/questions/70078687/property-page-inside-property-sheet-paints-incorrect-background-on-windows-11#comment123968209_70078687).
+	case WM_ERASEBKGND:
+		return OnEraseBackground(hDlg, reinterpret_cast<HDC>(wParam));
 
 	case WM_COMMAND:
 		if (HIWORD(wParam) != 0)
@@ -742,13 +746,13 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 	}
 	break;
 
-	case WM_CTLCOLORDLG:
-		return OnCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
-
 	case WM_CTLCOLORSTATIC:
 	case WM_CTLCOLOREDIT:
 	case WM_CTLCOLORLISTBOX:
 		return OnCtlColor(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
+	case WM_ERASEBKGND:
+		return OnEraseBackground(hDlg, reinterpret_cast<HDC>(wParam));
 
 	case WM_COMMAND:
 		if (HIWORD(wParam) != 0)
@@ -1041,13 +1045,13 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 	}
 	break;
 
-	case WM_CTLCOLORDLG:
-		return OnCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
-
 	case WM_CTLCOLORSTATIC:
 	case WM_CTLCOLOREDIT:
 	case WM_CTLCOLORLISTBOX:
 		return OnCtlColor(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
+	case WM_ERASEBKGND:
+		return OnEraseBackground(hDlg, reinterpret_cast<HDC>(wParam));
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
@@ -1255,13 +1259,13 @@ INT_PTR CALLBACK OptionsDialog::TabSettingsProc(HWND hDlg, UINT uMsg, WPARAM wPa
 	}
 	break;
 
-	case WM_CTLCOLORDLG:
-		return OnCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
-
 	case WM_CTLCOLORSTATIC:
 	case WM_CTLCOLOREDIT:
 	case WM_CTLCOLORLISTBOX:
 		return OnCtlColor(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
+	case WM_ERASEBKGND:
+		return OnEraseBackground(hDlg, reinterpret_cast<HDC>(wParam));
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
@@ -1413,13 +1417,13 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 	}
 	break;
 
-	case WM_CTLCOLORDLG:
-		return OnCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
-
 	case WM_CTLCOLORSTATIC:
 	case WM_CTLCOLOREDIT:
 	case WM_CTLCOLORLISTBOX:
 		return OnCtlColor(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
+	case WM_ERASEBKGND:
+		return OnEraseBackground(hDlg, reinterpret_cast<HDC>(wParam));
 
 	case WM_COMMAND:
 		if (HIWORD(wParam) != 0)
@@ -1592,12 +1596,12 @@ INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(HWND hDlg, UINT uMsg, WPARA
 	}
 	break;
 
-	case WM_CTLCOLORDLG:
-		return OnCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
-
 	case WM_CTLCOLORSTATIC:
 	case WM_CTLCOLOREDIT:
 		return OnCtlColor(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
+	case WM_ERASEBKGND:
+		return OnEraseBackground(hDlg, reinterpret_cast<HDC>(wParam));
 
 	case WM_NOTIFY:
 		switch (reinterpret_cast<NMHDR *>(lParam)->code)
@@ -1922,6 +1926,22 @@ INT_PTR OptionsDialog::OnCtlColor(HWND hwnd, HDC hdc)
 	SetTextColor(hdc, DarkModeHelper::TEXT_COLOR);
 
 	return reinterpret_cast<INT_PTR>(darkModeHelper.GetBackgroundBrush());
+}
+
+INT_PTR OptionsDialog::OnEraseBackground(HWND hwnd, HDC hdc)
+{
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (!darkModeHelper.IsDarkModeEnabled())
+	{
+		return 0;
+	}
+
+	RECT rc;
+	GetClientRect(hwnd, &rc);
+	FillRect(hdc, &rc, darkModeHelper.GetBackgroundBrush());
+
+	return 1;
 }
 
 INT_PTR OptionsDialog::OnCustomDraw(const NMCUSTOMDRAW *customDraw)

@@ -82,6 +82,7 @@ private:
 
 	INT_PTR OnCtlColorDlg(HWND hwnd, HDC hdc);
 	INT_PTR OnCtlColor(HWND hwnd, HDC hdc);
+	INT_PTR OnEraseBackground(HWND hwnd, HDC hdc);
 	INT_PTR OnCustomDraw(const NMCUSTOMDRAW *customDraw);
 
 	void OnReplaceExplorerSettingChanged(HWND dialog,
