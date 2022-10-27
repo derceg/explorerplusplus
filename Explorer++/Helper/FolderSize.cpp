@@ -13,7 +13,15 @@ FolderInfo GetFolderInfo(const std::wstring &path)
 
 	for (const auto &entry : std::filesystem::directory_iterator(path, error))
 	{
-		if (std::filesystem::is_directory(entry.status()))
+		std::error_code typeErrorCode;
+		auto isDirectory = entry.is_directory(typeErrorCode);
+
+		if (typeErrorCode)
+		{
+			continue;
+		}
+
+		if (isDirectory)
 		{
 			folderInfo.numFolders++;
 
