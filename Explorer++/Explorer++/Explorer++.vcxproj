@@ -491,6 +491,7 @@
     <ClCompile Include="Bookmarks\UI\BookmarksToolbar.cpp" />
     <ClCompile Include="Bookmarks\UI\Views\BookmarksToolbarView.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkMenuDropTarget.cpp" />
+    <ClCompile Include="CrashHandlerHelper.cpp" />
     <ClCompile Include="DriveEnumeratorImpl.cpp" />
     <ClCompile Include="DriveModel.cpp" />
     <ClCompile Include="DrivesToolbarView.cpp" />
@@ -672,6 +673,7 @@
     <ClInclude Include="Bookmarks\UI\BookmarksToolbar.h" />
     <ClInclude Include="Bookmarks\UI\Views\BookmarksToolbarView.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkMenuDropTarget.h" />
+    <ClInclude Include="CrashHandlerHelper.h" />
     <ClInclude Include="DriveEnumerator.h" />
     <ClInclude Include="DriveEnumeratorImpl.h" />
     <ClInclude Include="DriveModel.h" />
@@ -864,6 +866,9 @@
     <Manifest Include="Explorer++.exe.manifest" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Detours\Detours.vcxproj">
+      <Project>{baa69c60-4384-434c-a5f7-adc2145fda2c}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Helper\Helper.vcxproj">
       <Project>{faadbe00-9376-45f8-aeac-1ba3a8e58a1d}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

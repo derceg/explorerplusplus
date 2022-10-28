@@ -5,6 +5,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++", "Explorer++\Explorer++.vcxproj", "{7544A240-2EBF-4DC1-B55B-C8AE32672ED0}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0977324A-4826-461A-A3B6-D88AFFD444D2} = {0977324A-4826-461A-A3B6-D88AFFD444D2}
+		{BAA69C60-4384-434C-A5F7-ADC2145FDA2C} = {BAA69C60-4384-434C-A5F7-ADC2145FDA2C}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Helper", "Helper\Helper.vcxproj", "{FAADBE00-9376-45F8-AEAC-1BA3A8E58A1D}"
@@ -80,6 +81,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++PT_BR", "..\Translations\Explorer++PT_BR\Explorer++PT_BR.vcxproj", "{EA5B918A-CE1E-4E03-81A7-C9E7A590627C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++EL", "..\Translations\Explorer++EL\Explorer++EL.vcxproj", "{28A90A7D-8A10-4772-9882-1ECA5ADFA72E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Detours", "Detours\Detours.vcxproj", "{BAA69C60-4384-434C-A5F7-ADC2145FDA2C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -449,6 +452,20 @@ Global
 		{28A90A7D-8A10-4772-9882-1ECA5ADFA72E}.Release|x64.Build.0 = Release|Win32
 		{28A90A7D-8A10-4772-9882-1ECA5ADFA72E}.Test|Win32.ActiveCfg = Debug|Win32
 		{28A90A7D-8A10-4772-9882-1ECA5ADFA72E}.Test|x64.ActiveCfg = Debug|Win32
+		{BAA69C60-4384-434C-A5F7-ADC2145FDA2C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BAA69C60-4384-434C-A5F7-ADC2145FDA2C}.Debug|Win32.Build.0 = Debug|Win32
+		{BAA69C60-4384-434C-A5F7-ADC2145FDA2C}.Debug|x64.ActiveCfg = Debug|x64
+		{BAA69C60-4384-434C-A5F7-ADC2145FDA2C}.Debug|x64.Build.0 = Debug|x64
+		{BAA69C60-4384-434C-A5F7-ADC2145FDA2C}.Debug-LLVM|Win32.ActiveCfg = Debug-LLVM|Win32
+		{BAA69C60-4384-434C-A5F7-ADC2145FDA2C}.Debug-LLVM|Win32.Build.0 = Debug-LLVM|Win32
+		{BAA69C60-4384-434C-A5F7-ADC2145FDA2C}.Debug-LLVM|x64.ActiveCfg = Debug-LLVM|x64
+		{BAA69C60-4384-434C-A5F7-ADC2145FDA2C}.Debug-LLVM|x64.Build.0 = Debug-LLVM|x64
+		{BAA69C60-4384-434C-A5F7-ADC2145FDA2C}.Release|Win32.ActiveCfg = Release|Win32
+		{BAA69C60-4384-434C-A5F7-ADC2145FDA2C}.Release|Win32.Build.0 = Release|Win32
+		{BAA69C60-4384-434C-A5F7-ADC2145FDA2C}.Release|x64.ActiveCfg = Release|x64
+		{BAA69C60-4384-434C-A5F7-ADC2145FDA2C}.Release|x64.Build.0 = Release|x64
+		{BAA69C60-4384-434C-A5F7-ADC2145FDA2C}.Test|Win32.ActiveCfg = Debug|Win32
+		{BAA69C60-4384-434C-A5F7-ADC2145FDA2C}.Test|x64.ActiveCfg = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

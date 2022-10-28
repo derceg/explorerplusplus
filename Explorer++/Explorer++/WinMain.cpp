@@ -10,6 +10,7 @@
 #include "Explorer++.h"
 #include "CommandLine.h"
 #include "Console.h"
+#include "CrashHandlerHelper.h"
 #include "Explorer++_internal.h"
 #include "Logging.h"
 #include "MainResource.h"
@@ -35,7 +36,6 @@
 #define DEFAULT_WINDOWPOS_HEIGHT_PERCENTAGE 0.82
 
 ATOM RegisterMainWindowClass(HINSTANCE hInstance);
-LONG WINAPI TopLevelExceptionFilter(EXCEPTION_POINTERS *exception);
 void InitializeLocale();
 
 DWORD dwControlClasses = ICC_BAR_CLASSES | ICC_COOL_CLASSES | ICC_LISTVIEW_CLASSES
@@ -67,45 +67,6 @@ ATOM RegisterMainWindowClass(HINSTANCE hInstance)
 	wcex.lpszMenuName = nullptr;
 	wcex.lpszClassName = NExplorerplusplus::CLASS_NAME;
 	return RegisterClassEx(&wcex);
-}
-
-LONG WINAPI TopLevelExceptionFilter(EXCEPTION_POINTERS *exception)
-{
-	TCHAR currentProcess[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), currentProcess, SIZEOF_ARRAY(currentProcess));
-
-	// Event names are global in the system. Therefore, the event name used for signaling should be
-	// unique.
-	auto eventName = CreateGUID();
-	wil::unique_event_nothrow event;
-	bool res = event.try_create(wil::EventOptions::ManualReset, eventName.c_str());
-
-	if (!res)
-	{
-		return EXCEPTION_CONTINUE_SEARCH;
-	}
-
-	std::wstring arguments = std::format(L"\"{}\" {} {} {} {} {}", currentProcess,
-		NExplorerplusplus::APPLICATION_CRASHED_ARGUMENT, GetCurrentProcessId(),
-		GetCurrentThreadId(), static_cast<void *>(exception), eventName);
-
-	STARTUPINFO startupInfo = { 0 };
-	startupInfo.cb = sizeof(startupInfo);
-	wil::unique_process_information processInformation;
-	res = CreateProcess(currentProcess, arguments.data(), nullptr, nullptr, false,
-		NORMAL_PRIORITY_CLASS, nullptr, nullptr, &startupInfo, &processInformation);
-
-	if (!res)
-	{
-		return EXCEPTION_CONTINUE_SEARCH;
-	}
-
-	// The process that's created above will attempt to create a minidump for this process. It's
-	// possible that the new process will itself crash for whatever reason, so the wait here
-	// shouldn't be indefinite.
-	event.wait(30000);
-
-	return EXCEPTION_EXECUTE_HANDLER;
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -329,7 +290,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 0;
 	}
 
-	SetUnhandledExceptionFilter(TopLevelExceptionFilter);
+	InitializeCrashHandler();
 
 	InitializeLocale();
 
