@@ -20,10 +20,10 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include "../ThirdParty/CLI11/CLI11.hpp"
-#include <boost/format.hpp>
 #include <boost/locale.hpp>
 #include <boost/scope_exit.hpp>
 #include <wil/resource.h>
+#include <format>
 
 #pragma warning(                                                                                   \
 	disable : 4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
@@ -85,13 +85,9 @@ LONG WINAPI TopLevelExceptionFilter(EXCEPTION_POINTERS *exception)
 		return EXCEPTION_CONTINUE_SEARCH;
 	}
 
-	// Note that while %#p should print the base (i.e. 0x), that doesn't appear to work. That's why
-	// the 0x prefix is manually set in the string below. It's important that the base is set so
-	// that the value is correctly interpreted as a hex value.
-	std::wstring arguments = (boost::wformat(L"\"%s\" %s %lu %lu 0x%p %s") % currentProcess
-		% NExplorerplusplus::APPLICATION_CRASHED_ARGUMENT % GetCurrentProcessId()
-		% GetCurrentThreadId() % exception % eventName)
-								 .str();
+	std::wstring arguments = std::format(L"\"{}\" {} {} {} {} {}", currentProcess,
+		NExplorerplusplus::APPLICATION_CRASHED_ARGUMENT, GetCurrentProcessId(),
+		GetCurrentThreadId(), static_cast<void *>(exception), eventName);
 
 	STARTUPINFO startupInfo = { 0 };
 	startupInfo.cb = sizeof(startupInfo);
