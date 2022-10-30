@@ -483,6 +483,7 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="ApplicationContextMenu.cpp" />
     <ClCompile Include="ApplicationContextMenuController.cpp" />
+    <ClCompile Include="ApplicationCrashedDialog.cpp" />
     <ClCompile Include="ApplicationModel.cpp" />
     <ClCompile Include="ApplicationToolbarHelper.cpp" />
     <ClCompile Include="ApplicationToolbarRegistryStorage.cpp" />
@@ -665,6 +666,7 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationContextMenu.h" />
     <ClInclude Include="ApplicationContextMenuController.h" />
+    <ClInclude Include="ApplicationCrashedDialog.h" />
     <ClInclude Include="ApplicationModel.h" />
     <ClInclude Include="ApplicationToolbarHelper.h" />
     <ClInclude Include="ApplicationToolbarRegistryStorage.h" />
