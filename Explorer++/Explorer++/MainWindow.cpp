@@ -12,6 +12,7 @@
 #include "TabContainer.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ProcessHelper.h"
+#include "../Helper/WindowSubclassWrapper.h"
 #include <wil/resource.h>
 
 MainWindow *MainWindow::Create(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
@@ -22,12 +23,14 @@ MainWindow *MainWindow::Create(HWND hwnd, std::shared_ptr<Config> config, HINSTA
 
 MainWindow::MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
 	CoreInterface *coreInterface) :
-	BaseWindow(hwnd),
 	m_hwnd(hwnd),
 	m_config(config),
 	m_instance(instance),
 	m_coreInterface(coreInterface)
 {
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
+		std::bind_front(&MainWindow::WndProc, this)));
+
 	m_coreInterface->AddTabsInitializedObserver(
 		[this]
 		{
@@ -55,6 +58,18 @@ MainWindow::MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE inst
 	// registered.
 	m_dropTargetWindow =
 		winrt::make_self<DropTargetWindow>(m_hwnd, static_cast<DropTargetInternal *>(this));
+}
+
+LRESULT MainWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_NCDESTROY:
+		OnNcDestroy();
+		break;
+	}
+
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
 void MainWindow::OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
@@ -216,4 +231,9 @@ DWORD MainWindow::Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD 
 	UNREFERENCED_PARAMETER(effect);
 
 	return DROPEFFECT_NONE;
+}
+
+void MainWindow::OnNcDestroy()
+{
+	delete this;
 }

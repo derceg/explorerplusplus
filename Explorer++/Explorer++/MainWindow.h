@@ -5,14 +5,14 @@
 #pragma once
 
 #include "Tab.h"
-#include "../Helper/BaseWindow.h"
 #include "../Helper/DropTargetWindow.h"
 #include "../Helper/WinRTBaseWrapper.h"
 
 struct Config;
 class CoreInterface;
+class WindowSubclassWrapper;
 
-class MainWindow : public BaseWindow, private DropTargetInternal
+class MainWindow : private DropTargetInternal
 {
 public:
 	static MainWindow *Create(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
@@ -22,6 +22,8 @@ private:
 	MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
 		CoreInterface *coreInterface);
 	~MainWindow() = default;
+
+	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	void OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
 	void OnTabSelected(const Tab &tab);
@@ -38,11 +40,14 @@ private:
 	void DragLeave() override;
 	DWORD Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) override;
 
+	void OnNcDestroy();
+
 	HWND m_hwnd;
 	std::shared_ptr<Config> m_config;
 	HINSTANCE m_instance;
 	CoreInterface *m_coreInterface;
 
+	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	winrt::com_ptr<DropTargetWindow> m_dropTargetWindow;

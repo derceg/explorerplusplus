@@ -663,8 +663,6 @@ int Explorerplusplus::OnDestroy()
 
 	delete m_pStatusBar;
 
-	PostQuitMessage(0);
-
 	return 0;
 }
 
