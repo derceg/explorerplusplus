@@ -61,7 +61,7 @@ LRESULT CALLBACK Explorerplusplus::WndProcStub(HWND hwnd, UINT msg, WPARAM wPara
 
 		if (!pContainer)
 		{
-			PostQuitMessage(0);
+			PostQuitMessage(EXIT_CODE_ERROR);
 			return 0;
 		}
 
@@ -72,7 +72,7 @@ LRESULT CALLBACK Explorerplusplus::WndProcStub(HWND hwnd, UINT msg, WPARAM wPara
 	case WM_NCDESTROY:
 		SetWindowLongPtr(hwnd, GWLP_USERDATA, 0);
 		delete pContainer;
-		PostQuitMessage(0);
+		PostQuitMessage(EXIT_CODE_NORMAL_EXIT);
 		break;
 	}
 

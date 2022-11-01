@@ -56,6 +56,12 @@ struct ColumnWidth
 	int iWidth;
 };
 
+enum ExitCode
+{
+	EXIT_CODE_NORMAL_EXIT = 0,
+	EXIT_CODE_ERROR = 1
+};
+
 extern HACCEL g_hAccl;
 
 BOOL TestConfigFileInternal(void);

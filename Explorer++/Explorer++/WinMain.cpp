@@ -98,7 +98,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	if (status != Gdiplus::Status::Ok)
 	{
-		return 0;
+		return EXIT_CODE_ERROR;
 	}
 
 	auto gdiplusCleanup = wil::scope_exit(
@@ -213,7 +213,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	if (shouldExit)
 	{
-		return 0;
+		return EXIT_CODE_NORMAL_EXIT;
 	}
 
 	BOOL bAllowMultipleInstances = TRUE;
@@ -272,7 +272,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 				SetForegroundWindow(hPrev);
 				ShowWindow(hPrev, SW_RESTORE);
-				return 0;
+				return EXIT_CODE_NORMAL_EXIT;
 			}
 		}
 	}
@@ -287,7 +287,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		MessageBox(nullptr, _T("Could not register class"), NExplorerplusplus::APP_NAME,
 			MB_OK | MB_ICONERROR);
 
-		return 0;
+		return EXIT_CODE_ERROR;
 	}
 
 	InitializeCrashHandler();
@@ -307,7 +307,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		MessageBox(nullptr, _T("Could not create main window."), NExplorerplusplus::APP_NAME,
 			MB_OK | MB_ICONERROR);
 
-		return 0;
+		return EXIT_CODE_ERROR;
 	}
 
 	WINDOWPLACEMENT wndpl;
