@@ -13,6 +13,9 @@ environment:
   PFX_PASS:
     secure: rgMy2ixSiaW0sk2CwaHwO5pK8U98ynzt/jjiGNRSYPfaAcOTRZ5oX+fsgqn6qP54
 
+cache:
+  - vcpkg_installed -> vcpkg.json
+
 for:
 
 -
@@ -32,16 +35,20 @@ init:
 # Decrypt the code signing certificate.
 install:
 - cmd: >-
-    nuget install secure-file -ExcludeVersion
+    git submodule init
 
-    SET PATH=C:\Program Files (x86)\HTML Help Workshop;%PATH%
+    git submodule update
+
+    .\Explorer++\ThirdParty\vcpkg\bootstrap-vcpkg.bat
+
+    nuget install secure-file -ExcludeVersion
 
     IF DEFINED PFX_ENC_PASS (secure-file\tools\secure-file -decrypt %APPVEYOR_BUILD_FOLDER%\authenticode.pfx.enc -secret %PFX_ENC_PASS%)
 
+    SET PATH=C:\Program Files (x86)\HTML Help Workshop;%PATH%
+
 before_build:
 - ps: >-
-    nuget restore Explorer++\Explorer++.sln
-
     if (Test-Path env:APPVEYOR_REPO_TAG_NAME) {
       if ($env:APPVEYOR_REPO_TAG_NAME -match '-beta(-\d)?$') {
         $env:RELEASE_MODE = 'beta'

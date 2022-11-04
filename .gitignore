@@ -288,3 +288,8 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+
+# Manually added entries
+
+# vcpkg
+vcpkg_installed/

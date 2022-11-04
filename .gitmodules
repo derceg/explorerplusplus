@@ -1,0 +1,3 @@
+[submodule "Explorer++/ThirdParty/vcpkg"]
+	path = Explorer++/ThirdParty/vcpkg
+	url = https://github.com/microsoft/vcpkg.git

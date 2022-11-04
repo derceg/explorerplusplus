@@ -1036,7 +1036,6 @@
     <None Include="Version.h">
       <Filter>Core</Filter>
     </None>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource Files">
