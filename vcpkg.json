@@ -24,6 +24,7 @@
     "cppwinrt",
     "detours",
     "gtest",
+    "lua",
     "nlohmann-json",
     "wil"
   ],
