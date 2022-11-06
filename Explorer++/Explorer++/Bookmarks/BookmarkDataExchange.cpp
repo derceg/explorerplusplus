@@ -8,8 +8,8 @@
 #include "../Helper/DataExchangeHelper.h"
 #include "../Helper/DataObjectImpl.h"
 #include "../Helper/DragDropHelper.h"
-#include "../ThirdParty/cereal/archives/binary.hpp"
-#include "../ThirdParty/cereal/types/memory.hpp"
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/memory.hpp>
 
 FORMATETC BookmarkDataExchange::GetFormatEtc()
 {

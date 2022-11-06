@@ -7,8 +7,8 @@
 #include "SignalWrapper.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
-#include "../ThirdParty/cereal/types/string.hpp"
-#include "../ThirdParty/cereal/types/vector.hpp"
+#include <cereal/types/string.hpp>
+#include <cereal/types/vector.hpp>
 #include <optional>
 #include <vector>
 

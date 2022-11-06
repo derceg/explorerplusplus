@@ -24,10 +24,10 @@
 // Third-party Header Files:
 #include "SolWrapper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
-#include "../ThirdParty/cereal/archives/binary.hpp"
-#include "../ThirdParty/cereal/types/memory.hpp"
-#include "../ThirdParty/cereal/types/string.hpp"
-#include "../ThirdParty/cereal/types/vector.hpp"
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/memory.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/types/vector.hpp>
 
 // Windows Header Files:
 // clang-format off
