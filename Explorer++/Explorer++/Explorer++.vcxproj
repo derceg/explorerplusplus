@@ -887,9 +887,6 @@
     <Manifest Include="Explorer++.exe.manifest" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Detours\Detours.vcxproj">
-      <Project>{baa69c60-4384-434c-a5f7-adc2145fda2c}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\Helper\Helper.vcxproj">
       <Project>{faadbe00-9376-45f8-aeac-1ba3a8e58a1d}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

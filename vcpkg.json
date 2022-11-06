@@ -20,6 +20,7 @@
     "boost-scope-exit",
     "boost-signals2",
     "cppwinrt",
+    "detours",
     "gtest",
     "nlohmann-json",
     "wil"

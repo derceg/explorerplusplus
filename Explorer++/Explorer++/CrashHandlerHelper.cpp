@@ -7,12 +7,12 @@
 #include "ApplicationCrashedDialog.h"
 #include "Explorer++_internal.h"
 #include "Version.h"
-#include "../Detours/detours.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Logging.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/StringHelper.h"
 #include <wil/resource.h>
+#include <detours/detours.h>
 #include <format>
 
 using MiniDumpWriteDumpType = BOOL(WINAPI *)(HANDLE hProcee, DWORD ProcessId, HANDLE hFile,
