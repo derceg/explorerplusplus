@@ -7,8 +7,8 @@
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
 #include "Tab.h"
-#include "../ThirdParty/Sol/forward.hpp"
 #include <optional>
+#include <sol/forward.hpp>
 
 class CoreInterface;
 class ShellBrowser;

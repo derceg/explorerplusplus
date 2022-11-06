@@ -5,9 +5,9 @@
 #pragma once
 
 #include "Accelerator.h"
-#include "SolWrapper.h"
 #include <nlohmann/json.hpp>
 #include <optional>
+#include <sol/sol.hpp>
 
 namespace std
 {

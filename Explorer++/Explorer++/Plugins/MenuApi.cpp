@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "Plugins/MenuApi.h"
-#include "SolWrapper.h"
+#include <sol/sol.hpp>
 
 Plugins::MenuApi::MenuApi(PluginMenuManager *pluginMenuManager) :
 	m_pluginMenuManager(pluginMenuManager)

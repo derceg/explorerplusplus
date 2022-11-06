@@ -876,9 +876,6 @@
     <ClInclude Include="ApplicationToolbarHelper.h">
       <Filter>Application Toolbar</Filter>
     </ClInclude>
-    <ClInclude Include="SolWrapper.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="Bookmarks\UI\BookmarkMenuController.h">
       <Filter>Bookmarks\UI</Filter>
     </ClInclude>

@@ -6,7 +6,7 @@
 
 #include "PluginInterface.h"
 #include "Plugins/Manifest.h"
-#include "../ThirdParty/Sol/forward.hpp"
+#include <sol/forward.hpp>
 
 namespace Plugins
 {

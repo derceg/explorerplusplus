@@ -22,12 +22,12 @@
 #define WIL_SUPPRESS_EXCEPTIONS
 
 // Third-party Header Files:
-#include "SolWrapper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/memory.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
+#include <sol/sol.hpp>
 
 // Windows Header Files:
 // clang-format off

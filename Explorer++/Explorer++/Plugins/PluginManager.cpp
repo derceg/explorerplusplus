@@ -7,8 +7,8 @@
 #include "AcceleratorUpdater.h"
 #include "Plugins/Manifest.h"
 #include "Plugins/PluginCommandManager.h"
-#include "../ThirdParty/Sol/forward.hpp"
 #include <filesystem>
+#include <sol/forward.hpp>
 
 const std::wstring Plugins::PluginManager::MANIFEST_NAME = L"plugin.json";
 

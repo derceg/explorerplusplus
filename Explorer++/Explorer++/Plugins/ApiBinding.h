@@ -5,7 +5,7 @@
 #pragma once
 
 #include "PluginInterface.h"
-#include "../ThirdParty/Sol/forward.hpp"
+#include <sol/forward.hpp>
 
 namespace Plugins
 {

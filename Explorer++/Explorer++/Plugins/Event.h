@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "../ThirdParty/Sol/forward.hpp"
 #include <boost/signals2.hpp>
+#include <sol/forward.hpp>
 #include <unordered_map>
 
 namespace Plugins

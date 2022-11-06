@@ -15,9 +15,9 @@
 #include "Plugins/UiApi.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
-#include "SolWrapper.h"
 #include "TabContainer.h"
 #include "UiTheming.h"
+#include <sol/sol.hpp>
 
 void BindTabsAPI(sol::state &state, CoreInterface *coreInterface, TabContainer *tabContainer);
 void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager);

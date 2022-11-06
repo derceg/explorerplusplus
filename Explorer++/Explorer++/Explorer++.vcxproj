@@ -820,7 +820,6 @@
     <ClInclude Include="ShellTreeView\ShellTreeView.h" />
     <ClInclude Include="ShellView.h" />
     <ClInclude Include="SignalWrapper.h" />
-    <ClInclude Include="SolWrapper.h" />
     <ClInclude Include="SortMenuBuilder.h" />
     <ClInclude Include="SplitFileDialog.h" />
     <ClInclude Include="stdafx.h" />

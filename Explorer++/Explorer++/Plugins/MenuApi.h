@@ -5,9 +5,9 @@
 #pragma once
 
 #include "Plugins/PluginMenuManager.h"
-#include "../ThirdParty/Sol/forward.hpp"
 #include <boost/signals2.hpp>
 #include <optional>
+#include <sol/forward.hpp>
 #include <unordered_map>
 
 namespace Plugins
