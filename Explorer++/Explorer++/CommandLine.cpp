@@ -9,8 +9,10 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/SetDefaultFileManager.h"
-#include "../ThirdParty/CLI11/CLI11.hpp"
 #include <boost/log/core.hpp>
+#include <CLI/App.hpp>
+#include <CLI/Config.hpp>
+#include <CLI/Formatter.hpp>
 #include <iostream>
 #include <optional>
 

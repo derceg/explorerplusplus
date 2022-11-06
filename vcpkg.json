@@ -19,6 +19,7 @@
     "boost-range",
     "boost-scope-exit",
     "boost-signals2",
+    "cli11",
     "cppwinrt",
     "detours",
     "gtest",
