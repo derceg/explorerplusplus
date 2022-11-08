@@ -23,6 +23,7 @@
 
 // Third-party Header Files:
 #include "../ThirdParty/CTPL/cpl_stl.h"
+#include <nlohmann/json.hpp>
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/memory.hpp>
 #include <cereal/types/string.hpp>
@@ -70,6 +71,7 @@
 // Winsock2.h.
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/join.hpp>
+#include <boost/bimap.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/functional/hash.hpp>
@@ -86,6 +88,7 @@
 // wil/resource.h can use declarations from the Windows header files. For example,
 // wil::unique_htheme depends on uxtheme.h being included first. So, this file is specifically
 // included after the Windows headers.
+#include <wil/com.h>
 #include <wil/resource.h>
 
 // C++ Header Files:
