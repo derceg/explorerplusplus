@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // See LICENSE in the top level directory
 
-#define STRICT_TYPED_ITEMIDS
-
+#include "pch.h"
 #include "../Explorer++/ShellBrowser/ShellNavigationController.h"
 #include "../Explorer++/ShellBrowser/HistoryEntry.h"
 #include "../Explorer++/ShellBrowser/NavigatorInterface.h"

@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // See LICENSE in the top level directory
 
-#define STRICT_TYPED_ITEMIDS
-
+#include "pch.h"
 #include "../Helper/ShellHelper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

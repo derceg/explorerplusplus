@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // See LICENSE in the top level directory
 
+#include "pch.h"
 #include "Bookmarks/BookmarkRegistryStorage.h"
 #include "BookmarkStorageHelper.h"
 #include "Bookmarks/BookmarkTree.h"

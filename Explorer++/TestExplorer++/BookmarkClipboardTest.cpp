@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // See LICENSE in the top level directory
 
+#include "pch.h"
 #include "Bookmarks/BookmarkClipboard.h"
 #include "Bookmarks/BookmarkItem.h"
 #include <gtest/gtest.h>
