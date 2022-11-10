@@ -55,7 +55,7 @@ BOOL GetFileNameFromUser(HWND hwnd, TCHAR *fullFileName, UINT cchMax,
 
 /* General helper functions. */
 HINSTANCE StartCommandPrompt(const std::wstring &directory, bool elevated);
-void GetCPUBrandString(char *pszCPUBrand, UINT cchBuf);
+HRESULT GetCPUBrandString(std::wstring &cpuBrand);
 void SetFORMATETC(FORMATETC *pftc, CLIPFORMAT cfFormat, DVTARGETDEVICE *ptd, DWORD dwAspect,
 	LONG lindex, DWORD tymed);
 bool IsKeyDown(int nVirtKey);

@@ -558,6 +558,16 @@ BOOL GetBooleanVariant(IShellFolder2 *shellFolder2, PCITEMID_CHILD pidlChild,
 	return convertedValue;
 }
 
+std::wstring ConvertBstrToString(BSTR str)
+{
+	if (str == nullptr)
+	{
+		return {};
+	}
+
+	return { str, SysStringLen(str) };
+}
+
 // Returns either the parsing path for the specified item, or its in
 // folder name. The in folder name will be returned when the parsing
 // path is a GUID (which typically shouldn't be displayed to the user).

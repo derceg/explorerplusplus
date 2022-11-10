@@ -51,16 +51,17 @@ void Explorerplusplus::UpdateDisplayWindowForZeroFiles(const Tab &tab)
 		GetComputerName(szDisplay, &dwSize);
 		DisplayWindow_BufferText(m_hDisplayWindow, szDisplay);
 
-		char szCPUBrand[64];
-		GetCPUBrandString(szCPUBrand, SIZEOF_ARRAY(szCPUBrand));
-
+		std::wstring cpuBrand;
 		TCHAR szTemp[512];
-		WCHAR wszCPUBrand[64];
-		MultiByteToWideChar(CP_ACP, 0, szCPUBrand, -1, wszCPUBrand, SIZEOF_ARRAY(wszCPUBrand));
-		LoadString(m_resourceModule, IDS_GENERAL_DISPLAY_WINDOW_PROCESSOR, szTemp,
-			SIZEOF_ARRAY(szTemp));
-		StringCchPrintf(szDisplay, SIZEOF_ARRAY(szDisplay), szTemp, wszCPUBrand);
-		DisplayWindow_BufferText(m_hDisplayWindow, szDisplay);
+		HRESULT hr = GetCPUBrandString(cpuBrand);
+
+		if (SUCCEEDED(hr))
+		{
+			LoadString(m_resourceModule, IDS_GENERAL_DISPLAY_WINDOW_PROCESSOR, szTemp,
+				SIZEOF_ARRAY(szTemp));
+			StringCchPrintf(szDisplay, SIZEOF_ARRAY(szDisplay), szTemp, cpuBrand.c_str());
+			DisplayWindow_BufferText(m_hDisplayWindow, szDisplay);
+		}
 
 		MEMORYSTATUSEX msex;
 		msex.dwLength = sizeof(msex);

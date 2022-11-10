@@ -5,10 +5,17 @@
 #include "stdafx.h"
 #include "Helper.h"
 #include "Macros.h"
+#include "ShellHelper.h"
 #include "TimeHelper.h"
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <wil/com.h>
 #include <wil/resource.h>
+#include <WbemIdl.h>
+#include <comutil.h>
+
+// Required for CLSID_WbemLocator.
+#pragma comment(lib, "wbemuuid.lib")
 
 enum class VersionSubBlockType
 {
@@ -626,21 +633,43 @@ BOOL GetStringTableValue(void *pBlock, LangAndCodePage *plcp, UINT nItems,
 	return bSuccess;
 }
 
-void GetCPUBrandString(char *pszCPUBrand, UINT cchBuf)
+HRESULT GetCPUBrandString(std::wstring &cpuBrand)
 {
-	int cpuInfo[4] = { -1 };
-	char szCPUBrand[64];
+	// The code below is modeled very closely on the example WMI code provided in
+	// https://learn.microsoft.com/en-us/windows/win32/wmisdk/example--getting-wmi-data-from-the-local-computer.
+	wil::com_ptr_nothrow<IWbemLocator> locator;
+	RETURN_IF_FAILED(
+		CoCreateInstance(CLSID_WbemLocator, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&locator)));
 
-	/* Refer to cpuid documentation at:
-	http://msdn.microsoft.com/en-us/library/hskdteyh(v=vs.100).aspx */
-	__cpuid(cpuInfo, 0x80000002);
-	memcpy(szCPUBrand, cpuInfo, sizeof(cpuInfo));
-	__cpuid(cpuInfo, 0x80000003);
-	memcpy(szCPUBrand + 16, cpuInfo, sizeof(cpuInfo));
-	__cpuid(cpuInfo, 0x80000004);
-	memcpy(szCPUBrand + 32, cpuInfo, sizeof(cpuInfo));
+	wil::com_ptr_nothrow<IWbemServices> service;
+	RETURN_IF_FAILED(locator->ConnectServer(_bstr_t(L"ROOT\\CIMV2"), nullptr, nullptr, nullptr, 0,
+		nullptr, nullptr, &service));
 
-	StringCchCopyA(pszCPUBrand, cchBuf, szCPUBrand);
+	RETURN_IF_FAILED(CoSetProxyBlanket(service.get(), RPC_C_AUTHN_WINNT, RPC_C_AUTHZ_NONE, nullptr,
+		RPC_C_AUTHN_LEVEL_CALL, RPC_C_IMP_LEVEL_IMPERSONATE, nullptr, EOAC_NONE));
+
+	wil::com_ptr_nothrow<IEnumWbemClassObject> enumerator;
+	RETURN_IF_FAILED(service->ExecQuery(bstr_t("WQL"), bstr_t("SELECT Name FROM Win32_Processor"),
+		WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr, &enumerator));
+
+	wil::com_ptr_nothrow<IWbemClassObject> object;
+	ULONG numReturned;
+	enumerator->Next(WBEM_INFINITE, 1, &object, &numReturned);
+
+	if (numReturned == 0)
+	{
+		return E_FAIL;
+	}
+
+	wil::unique_variant property;
+	RETURN_IF_FAILED(object->Get(L"Name", 0, &property, nullptr, nullptr));
+
+	// As per the documentation for the Win32_Processor WMI class, the name field is a string, which
+	// means it's safe to assume that here (rather than having to perform a string conversion on a
+	// generic VARIANT).
+	cpuBrand = ConvertBstrToString(V_BSTR(&property));
+
+	return S_OK;
 }
 
 HRESULT GetMediaMetadata(const TCHAR *szFileName, const TCHAR *szAttribute, BYTE **pszOutput)

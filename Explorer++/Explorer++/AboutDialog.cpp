@@ -32,11 +32,15 @@ INT_PTR AboutDialog::OnInitDialog()
 	std::wstring versionTemplate = ResourceHelper::LoadString(GetInstance(), IDS_ABOUT_VERSION);
 	std::wstring platform;
 
-	// Indicate which platform (32-bit or 64-bit) we are building for in the version string.
-#ifdef WIN64
+	// Indicate which platform we are building for in the version string.
+#if defined(ARM64)
+	platform = ResourceHelper::LoadString(GetInstance(), IDS_ABOUT_ARM64_BUILD);
+#elif defined(WIN64)
 	platform = ResourceHelper::LoadString(GetInstance(), IDS_ABOUT_64BIT_BUILD);
-#else
+#elif defined(WIN32)
 	platform = ResourceHelper::LoadString(GetInstance(), IDS_ABOUT_32BIT_BUILD);
+#else
+	static_assert(false, "Unknown target platform");
 #endif
 
 	std::wstring versionAndReleaseMode = VERSION_STRING_W;
