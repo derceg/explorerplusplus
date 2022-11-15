@@ -459,17 +459,7 @@
     <ClCompile Include="ComboBox.cpp" />
     <ClCompile Include="ComboBoxHelper.cpp" />
     <ClCompile Include="ContextMenuManager.cpp" />
-    <ClCompile Include="Controls.cpp">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug-LLVM|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug-LLVM|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug-LLVM|ARM64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">CompileAsCpp</CompileAs>
-    </ClCompile>
+    <ClCompile Include="Controls.cpp" />
     <ClCompile Include="CustomGripper.cpp" />
     <ClCompile Include="DataExchangeHelper.cpp" />
     <ClCompile Include="DataObjectWrapper.cpp" />
