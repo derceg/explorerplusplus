@@ -1,7 +1,12 @@
 # Requirements
 
-* Visual Studio 2019, 2022 (recommended)
-* Windows 10 SDK
+- Visual Studio 2019/2022 (2022 recommended). Install the "Desktop development with C++" workload.
+- Windows 10 SDK (most recent version recommended)
+- (Optional) To build for ARM64, the following Visual Studio components should be installed:
+    - MSVC v143 - VS 2022 C++ ARM64 build tools (Latest)
+- (Optional) To build with Clang (using the experimental Debug-LLVM solution configuration), the following Visual Studio components should be installed:
+    - C++ Clang tools for Windows
+- (Optional) To build the installer, WiX 3.11 and the relevant Visual Studio extension should be installed. Download links for both of those items can be found on the [WiX website](https://wixtoolset.org/docs/wix3/).
 
 # Setup
 
