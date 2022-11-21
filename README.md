@@ -46,7 +46,7 @@ For a full list of builds, see the [AppVeyor page](https://ci.appveyor.com/proje
 
 ## Building Explorer++
 
-For instructions on how to build Explorer++, see the [wiki](https://github.com/derceg/explorerplusplus/wiki/Building-Explorerplusplus).
+For instructions on how to build Explorer++, see [BUILDING.md](BUILDING.md).
 
 ## Documentation
 
