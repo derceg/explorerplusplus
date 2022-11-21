@@ -27,3 +27,9 @@ Open `Explorer++\Explorer++.sln`. From within Visual Studio, select `Debug` > `S
 # Translations
 
 Building the program in release mode will also build all of the translations. The resulting DLLs can then be used with Explorer++.
+
+# Tests
+
+The `TestExplorer++` project contains unit tests for the solution as a whole. The GoogleTest package is installed via vcpkg, so provided vcpkg has been initialized and you've been able to build the solution, you should just need to build the `TestExplorer++` project, then run the tests via the Visual Studio Test Explorer.
+
+Note that the `TestHelper` project is older and is in the process of being removed. It doesn't currently compile and shouldn't be used.
