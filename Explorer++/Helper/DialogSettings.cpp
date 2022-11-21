@@ -214,7 +214,30 @@ void DialogSettings::SaveDialogPosition(HWND hDlg)
 
 void DialogSettings::RestoreDialogPosition(HWND hDlg, bool bRestoreSize)
 {
+	bool shouldRestore = false;
+
 	if (m_bStateSaved)
+	{
+		// Some portion of the dialog window should at least be visible for the position of the
+		// dialog to be restored. Note that although the dialog size isn't always restored (e.g.
+		// because the dialog is a fixed size), the dialog width + height values are always saved,
+		// so it's valid to use them here.
+		// Also, this check will be run every time the dialog is opened (not just the first time the
+		// dialog is opened after starting the application). That's likely the best option, since
+		// the monitor setup could change while the application is running, or the user could have
+		// moved the dialog off screen the last time it was opened. Either way, the dialog should
+		// still be moved back on screen.
+		RECT dialogRect = { m_ptDialog.x, m_ptDialog.y, m_ptDialog.x + m_iWidth,
+			m_ptDialog.y + m_iHeight };
+		HMONITOR monitor = MonitorFromRect(&dialogRect, MONITOR_DEFAULTTONULL);
+
+		if (monitor)
+		{
+			shouldRestore = true;
+		}
+	}
+
+	if (shouldRestore)
 	{
 		if (bRestoreSize)
 		{
