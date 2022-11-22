@@ -68,13 +68,7 @@ after_build:
     cd %APPVEYOR_BUILD_FOLDER%
 
 
-    IF "%PLATFORM%" == "Win32" (
-        SET "arch=x86"
-    ) ELSE IF "%PLATFORM%" == "x64" (
-        SET "arch=x64"
-    ) ELSE IF "%PLATFORM%" == "ARM64" (
-        SET "arch=arm64"
-    )
+    IF "%PLATFORM%" == "Win32" ( SET "arch=x86" ) ELSE IF "%PLATFORM%" == "x64" ( SET "arch=x64" ) ELSE IF "%PLATFORM%" == "ARM64" ( SET "arch=arm64" )
 
 
     SET "archiveName=explorerpp_%arch%.zip"
@@ -97,9 +91,7 @@ after_build:
     7z a explorerpp_%arch%_symbols.zip %APPVEYOR_BUILD_FOLDER%\Explorer++\Explorer++\%PLATFORM%\%CONFIGURATION%\Explorer++.pdb
 
 
-    IF NOT "%PLATFORM%" == "ARM64" (
-        copy "%APPVEYOR_BUILD_FOLDER%\Explorer++\Installer\bin\%arch%\%CONFIGURATION%\Explorer++ Setup.msi" "Explorer++ Setup.msi"
-    )
+    IF NOT "%PLATFORM%" == "ARM64" ( copy "%APPVEYOR_BUILD_FOLDER%\Explorer++\Installer\bin\%arch%\%CONFIGURATION%\Explorer++ Setup.msi" "Explorer++ Setup.msi" )
 
 
     7z a explorerpp_translations.zip %APPVEYOR_BUILD_FOLDER%\Explorer++\Win32\%CONFIGURATION%\Explorer++*.dll
