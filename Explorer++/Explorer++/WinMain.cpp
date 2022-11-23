@@ -213,7 +213,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	if (shouldExit)
 	{
-		return EXIT_CODE_NORMAL_EXIT;
+		return EXIT_CODE_NORMAL;
 	}
 
 	BOOL bAllowMultipleInstances = TRUE;
@@ -271,7 +271,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				}
 
 				BringWindowToForeground(hPrev);
-				return EXIT_CODE_NORMAL_EXIT;
+				return EXIT_CODE_NORMAL_EXISTING_PROCESS;
 			}
 		}
 	}

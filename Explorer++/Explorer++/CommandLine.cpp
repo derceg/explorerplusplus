@@ -235,7 +235,7 @@ std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(const CLI::App &app
 		HandleProcessCrashedNotification(
 			{ std::get<0>(crashedDataTuple), std::get<1>(crashedDataTuple),
 				std::get<2>(crashedDataTuple), std::get<3>(crashedDataTuple) });
-		return CommandLine::ExitInfo{ EXIT_SUCCESS };
+		return CommandLine::ExitInfo{ EXIT_CODE_NORMAL_CRASH_HANDLER };
 	}
 
 	if (immediatelyHandledOptions.jumplistNewTab)
