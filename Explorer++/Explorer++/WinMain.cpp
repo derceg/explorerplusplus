@@ -20,6 +20,7 @@
 #include "../Helper/Logging.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
+#include "../Helper/WindowHelper.h"
 #include <boost/locale.hpp>
 #include <boost/scope_exit.hpp>
 #include <wil/resource.h>
@@ -269,8 +270,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 					SendMessage(hPrev, WM_COPYDATA, NULL, reinterpret_cast<LPARAM>(&cds));
 				}
 
-				SetForegroundWindow(hPrev);
-				ShowWindow(hPrev, SW_RESTORE);
+				BringWindowToForeground(hPrev);
 				return EXIT_CODE_NORMAL_EXIT;
 			}
 		}

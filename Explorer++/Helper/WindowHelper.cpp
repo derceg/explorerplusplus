@@ -143,3 +143,16 @@ int GetRectWidth(const RECT *rc)
 {
 	return rc->right - rc->left;
 }
+
+bool BringWindowToForeground(HWND wnd)
+{
+	if (IsIconic(wnd))
+	{
+		// The window is minimized, so this will restore it to its previous position. The window
+		// will be maximized if it was previously maximized and restored to its normal position
+		// otherwise.
+		ShowWindow(wnd, SW_RESTORE);
+	}
+
+	return SetForegroundWindow(wnd);
+}

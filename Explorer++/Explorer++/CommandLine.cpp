@@ -9,6 +9,7 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/SetDefaultFileManager.h"
+#include "../Helper/WindowHelper.h"
 #include <boost/log/core.hpp>
 #include <CLI/App.hpp>
 #include <CLI/Config.hpp>
@@ -373,8 +374,7 @@ void OnJumplistNewTab()
 			cds.lpData = nullptr;
 			SendMessage(hPrev, WM_COPYDATA, NULL, (LPARAM) &cds);
 
-			SetForegroundWindow(hPrev);
-			ShowWindow(hPrev, SW_SHOW);
+			BringWindowToForeground(hPrev);
 		}
 	}
 
