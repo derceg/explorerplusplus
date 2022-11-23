@@ -65,11 +65,11 @@ struct ReplaceExplorerResults
 
 void PreprocessDirectories(std::vector<std::wstring> &directories);
 std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(const CLI::App &app,
-	const ImmediatelyHandledOptions &immediatelyHandledOptions);
+	const ImmediatelyHandledOptions &immediatelyHandledOptions, CommandLine::Settings &settings);
 void OnClearRegistrySettings();
 void OnUpdateReplaceExplorerSetting(ReplaceExplorerMode updatedReplaceMode);
 ReplaceExplorerResults UpdateReplaceExplorerSetting(ReplaceExplorerMode updatedReplaceMode);
-void OnJumplistNewTab();
+std::optional<CommandLine::ExitInfo> OnJumplistNewTab();
 
 std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
 {
@@ -113,6 +113,7 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 		immediatelyHandledOptions.crashedDataTuple);
 
 	CommandLine::Settings settings;
+	settings.createJumplistTab = false;
 
 	settings.enablePlugins = false;
 	app.add_flag("--enable-plugins", settings.enablePlugins, "Enable the Lua plugin system");
@@ -178,7 +179,7 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 		return ExitInfo{ app.exit(e) };
 	}
 
-	auto exitInfo = ProcessCommandLineFlags(app, immediatelyHandledOptions);
+	auto exitInfo = ProcessCommandLineFlags(app, immediatelyHandledOptions, settings);
 
 	if (exitInfo)
 	{
@@ -227,7 +228,7 @@ void PreprocessDirectories(std::vector<std::wstring> &directories)
 }
 
 std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(const CLI::App &app,
-	const ImmediatelyHandledOptions &immediatelyHandledOptions)
+	const ImmediatelyHandledOptions &immediatelyHandledOptions, CommandLine::Settings &settings)
 {
 	if (app.count(wstrToUtf8Str(NExplorerplusplus::APPLICATION_CRASHED_ARGUMENT)) > 0)
 	{
@@ -240,8 +241,14 @@ std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(const CLI::App &app
 
 	if (immediatelyHandledOptions.jumplistNewTab)
 	{
-		OnJumplistNewTab();
-		return CommandLine::ExitInfo{ EXIT_SUCCESS };
+		auto exitInfo = OnJumplistNewTab();
+
+		if (exitInfo)
+		{
+			return exitInfo;
+		}
+
+		settings.createJumplistTab = true;
 	}
 
 	if (immediatelyHandledOptions.clearRegistrySettings)
@@ -350,36 +357,28 @@ ReplaceExplorerResults UpdateReplaceExplorerSetting(ReplaceExplorerMode updatedR
 	return results;
 }
 
-void OnJumplistNewTab()
+std::optional<CommandLine::ExitInfo> OnJumplistNewTab()
 {
-	/* This will be called when the user clicks the
-	'New Tab' item on the tasks menu in Windows 7 and above.
-	Find the already opened version of Explorer++,
-	and tell it to open a new tab. */
-	HANDLE hMutex;
+	wil::unique_mutex_nothrow mutex;
 
-	hMutex = CreateMutex(nullptr, TRUE, _T("Explorer++"));
-
-	if (GetLastError() == ERROR_ALREADY_EXISTS)
+	if (!mutex.try_open(NExplorerplusplus::APPLICATION_MUTEX_NAME))
 	{
-		HWND hPrev;
-
-		hPrev = FindWindow(NExplorerplusplus::CLASS_NAME, nullptr);
-
-		if (hPrev != nullptr)
-		{
-			COPYDATASTRUCT cds;
-
-			cds.cbData = 0;
-			cds.lpData = nullptr;
-			SendMessage(hPrev, WM_COPYDATA, NULL, (LPARAM) &cds);
-
-			BringWindowToForeground(hPrev);
-		}
+		return std::nullopt;
 	}
 
-	if (hMutex != nullptr)
+	HWND existingWindow = FindWindow(NExplorerplusplus::CLASS_NAME, nullptr);
+
+	if (!existingWindow)
 	{
-		CloseHandle(hMutex);
+		return std::nullopt;
 	}
+
+	COPYDATASTRUCT cds;
+	cds.cbData = 0;
+	cds.lpData = nullptr;
+	SendMessage(existingWindow, WM_COPYDATA, NULL, reinterpret_cast<LPARAM>(&cds));
+
+	BringWindowToForeground(existingWindow);
+
+	return CommandLine::ExitInfo{ EXIT_CODE_NORMAL_EXISTING_PROCESS };
 }

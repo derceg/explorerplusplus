@@ -235,7 +235,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if the first instance is run, and multiple instances are allowed,
 	and then disallowed, still need to be able to load back to the
 	original instance. */
-	wil::unique_mutex_nothrow applicationMutex(CreateMutex(nullptr, TRUE, _T("Explorer++")));
+	wil::unique_mutex_nothrow applicationMutex(
+		CreateMutex(nullptr, TRUE, NExplorerplusplus::APPLICATION_MUTEX_NAME));
 
 	if (!bAllowMultipleInstances)
 	{
