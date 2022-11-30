@@ -316,7 +316,7 @@ HTREEITEM ShellTreeView::AddRoot()
 	TreeView_DeleteAllItems(m_hTreeView);
 
 	unique_pidl_absolute pidl;
-	HRESULT hr = SHGetFolderLocation(nullptr, CSIDL_DESKTOP, nullptr, 0, wil::out_param(pidl));
+	HRESULT hr = GetRootPidl(wil::out_param(pidl));
 
 	if (FAILED(hr))
 	{

@@ -188,19 +188,29 @@ HRESULT GetVirtualParentPath(PCIDLIST_ABSOLUTE pidlDirectory, PIDLIST_ABSOLUTE *
 	}
 }
 
+HRESULT GetRootPidl(PIDLIST_ABSOLUTE *pidl)
+{
+	// While using SHGetKnownFolderIDList() with FOLDERID_Desktop would be simpler than the method
+	// used here, that method fails in Windows PE (with ERROR_FILE_NOT_FOUND). That failure is
+	// unusual, since although the filesystem desktop folder doesn't exist, the virtual desktop
+	// folder at the root of the shell namespace is still accessible and the pidl returned by
+	// SHGetKnownFolderIDList() represents the root folder.
+	// Retrieving the pidl using the method below works consistently, however.
+	wil::com_ptr_nothrow<IShellFolder> desktop;
+	RETURN_IF_FAILED(SHGetDesktopFolder(&desktop));
+	return SHGetIDListFromObject(desktop.get(), pidl);
+}
+
 BOOL IsNamespaceRoot(PCIDLIST_ABSOLUTE pidl)
 {
-	BOOL bNamespaceRoot = FALSE;
-	unique_pidl_absolute pidlDesktop;
-	HRESULT hr =
-		SHGetFolderLocation(nullptr, CSIDL_DESKTOP, nullptr, 0, wil::out_param(pidlDesktop));
-
-	if (SUCCEEDED(hr))
-	{
-		bNamespaceRoot = ArePidlsEquivalent(pidl, pidlDesktop.get());
-	}
-
-	return bNamespaceRoot;
+	// This method essentially just checks whether pidl->mkid.cb is 0. That will be the case for the
+	// pidl representing the root desktop folder. Although the documentation doesn't appear to state
+	// that, it can be confirmed by retrieving the root desktop pidl (pidl->mkid.cb will always be
+	// 0).
+	// The Wine test at
+	// https://gitlab.winehq.org/wine/wine/-/blob/7ed17ec2511c85ce2e1f1fed0a9d04d85f658a5b/dlls/shell32/tests/shellpath.c#L2916
+	// also provides evidence that an empty pidl represents the root desktop folder.
+	return ILIsEmpty(pidl);
 }
 
 HRESULT DecodeFriendlyPath(const std::wstring &friendlyPath, std::wstring &parsingPath)
