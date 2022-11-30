@@ -7,6 +7,7 @@
 #include "Tab.h"
 #include "../Helper/Macros.h"
 #include <boost/signals2.hpp>
+#include <wil/com.h>
 #include <wil/resource.h>
 
 struct Config;
@@ -42,6 +43,8 @@ private:
 	LRESULT CALLBACK TabProxyWndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam, int iTabId);
 
 	void Initialize();
+	void OnTaskbarButtonCreated();
+	void SetUpObservers();
 	void SetupJumplistTasks();
 	ATOM RegisterTabProxyClass(const TCHAR *szClassName);
 	void CreateTabProxy(int iTabId, BOOL bSwitchToNewTab);
@@ -64,9 +67,8 @@ private:
 	HINSTANCE m_instance;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
-	ITaskbarList4 *m_pTaskbarList;
+	wil::com_ptr_nothrow<ITaskbarList4> m_taskbarList;
 	std::list<TabProxyInfo> m_TabProxyList;
 	UINT m_uTaskbarButtonCreatedMessage;
-	BOOL m_bTaskbarInitialised;
 	BOOL m_enabled;
 };

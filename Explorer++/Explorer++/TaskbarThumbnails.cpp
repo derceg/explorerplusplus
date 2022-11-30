@@ -42,9 +42,7 @@ TaskbarThumbnails::TaskbarThumbnails(CoreInterface *coreInterface, TabContainer 
 	m_coreInterface(coreInterface),
 	m_tabContainer(tabContainer),
 	m_instance(instance),
-	m_bTaskbarInitialised(false),
-	m_enabled(config->showTaskbarThumbnails),
-	m_pTaskbarList(nullptr)
+	m_enabled(config->showTaskbarThumbnails)
 {
 	Initialize();
 }
@@ -65,20 +63,6 @@ void TaskbarThumbnails::Initialize()
 	/* Subclass the main window until the above message (TaskbarButtonCreated) is caught. */
 	SetWindowSubclass(m_coreInterface->GetMainWindow(), MainWndProcStub, 0,
 		reinterpret_cast<DWORD_PTR>(this));
-
-	m_tabContainer->tabCreatedSignal.AddObserver(
-		std::bind_front(&TaskbarThumbnails::CreateTabProxy, this));
-	m_tabContainer->tabNavigationCommittedSignal.AddObserver(
-		std::bind_front(&TaskbarThumbnails::OnNavigationCommitted, this));
-	m_tabContainer->tabNavigationCompletedSignal.AddObserver(
-		std::bind_front(&TaskbarThumbnails::OnNavigationCompleted, this));
-	m_tabContainer->tabSelectedSignal.AddObserver(
-		std::bind_front(&TaskbarThumbnails::OnTabSelectionChanged, this));
-	m_tabContainer->tabRemovedSignal.AddObserver(
-		std::bind_front(&TaskbarThumbnails::RemoveTabProxy, this));
-
-	m_connections.push_back(m_coreInterface->AddApplicationShuttingDownObserver(
-		std::bind_front(&TaskbarThumbnails::OnApplicationShuttingDown, this)));
 }
 
 LRESULT CALLBACK TaskbarThumbnails::MainWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
@@ -93,41 +77,63 @@ LRESULT CALLBACK TaskbarThumbnails::MainWndProcStub(HWND hwnd, UINT uMsg, WPARAM
 
 LRESULT CALLBACK TaskbarThumbnails::MainWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	// Note that this message won't be received in environments like Windows PE, where there is no
+	// shell/taskbar.
 	if (uMsg == m_uTaskbarButtonCreatedMessage)
 	{
-		if (m_pTaskbarList != nullptr)
-		{
-			m_pTaskbarList->Release();
-		}
-
-		CoCreateInstance(CLSID_TaskbarList, nullptr, CLSCTX_INPROC_SERVER,
-			IID_PPV_ARGS(&m_pTaskbarList));
-		m_pTaskbarList->HrInit();
-
-		m_bTaskbarInitialised = TRUE;
-
-		/* Add each of the jump list tasks. */
-		SetupJumplistTasks();
-
-		/* Register each of the tabs. */
-		for (auto itr = m_TabProxyList.begin(); itr != m_TabProxyList.end(); itr++)
-		{
-			const Tab &tab = m_tabContainer->GetTab(itr->iTabId);
-
-			BOOL bActive = m_tabContainer->IsTabSelected(tab);
-
-			RegisterTab(itr->hProxy, EMPTY_STRING, bActive);
-
-			UpdateTaskbarThumbnailTitle(tab);
-			SetTabProxyIcon(tab);
-		}
-
+		OnTaskbarButtonCreated();
 		RemoveWindowSubclass(hwnd, MainWndProcStub, 0);
-
 		return 0;
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
+}
+
+void TaskbarThumbnails::OnTaskbarButtonCreated()
+{
+	HRESULT hr = CoCreateInstance(CLSID_TaskbarList, nullptr, CLSCTX_INPROC_SERVER,
+		IID_PPV_ARGS(&m_taskbarList));
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	hr = m_taskbarList->HrInit();
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	SetupJumplistTasks();
+
+	for (const auto &tab : m_tabContainer->GetAllTabsInOrder())
+	{
+		CreateTabProxy(tab.get().GetId(), m_tabContainer->IsTabSelected(tab.get()));
+	}
+
+	SetUpObservers();
+}
+
+// Sets up the observers required to manage the taskbar thumbnails (e.g. to keep the thumbnails in
+// sync with the list of tabs). These observers are only needed if the taskbar thumbnails are
+// enabled and the functionality is available.
+void TaskbarThumbnails::SetUpObservers()
+{
+	m_connections.push_back(m_tabContainer->tabCreatedSignal.AddObserver(
+		std::bind_front(&TaskbarThumbnails::CreateTabProxy, this)));
+	m_connections.push_back(m_tabContainer->tabNavigationCommittedSignal.AddObserver(
+		std::bind_front(&TaskbarThumbnails::OnNavigationCommitted, this)));
+	m_connections.push_back(m_tabContainer->tabNavigationCompletedSignal.AddObserver(
+		std::bind_front(&TaskbarThumbnails::OnNavigationCompleted, this)));
+	m_connections.push_back(m_tabContainer->tabSelectedSignal.AddObserver(
+		std::bind_front(&TaskbarThumbnails::OnTabSelectionChanged, this)));
+	m_connections.push_back(m_tabContainer->tabRemovedSignal.AddObserver(
+		std::bind_front(&TaskbarThumbnails::RemoveTabProxy, this)));
+
+	m_connections.push_back(m_coreInterface->AddApplicationShuttingDownObserver(
+		std::bind_front(&TaskbarThumbnails::OnApplicationShuttingDown, this)));
 }
 
 void TaskbarThumbnails::SetupJumplistTasks()
@@ -180,64 +186,48 @@ http://channel9.msdn.com/learn/courses/Windows7/Taskbar/Win7TaskbarNative/Exerci
 */
 void TaskbarThumbnails::CreateTabProxy(int iTabId, BOOL bSwitchToNewTab)
 {
-	HWND hTabProxy;
-	TabProxyInfo tpi;
+	static int iCount = 0;
 	TCHAR szClassName[512];
-	ATOM aRet;
-	BOOL bValue = TRUE;
+	StringCchPrintf(szClassName, SIZEOF_ARRAY(szClassName), _T("Explorer++TabProxy%d"), iCount++);
 
-	if (!m_enabled)
+	ATOM aRet = RegisterTabProxyClass(szClassName);
+
+	if (aRet == 0)
 	{
 		return;
 	}
 
-	static int iCount = 0;
+	TabProxy *ptp = new TabProxy();
+	ptp->taskbarThumbnails = this;
+	ptp->iTabId = iTabId;
 
-	StringCchPrintf(szClassName, SIZEOF_ARRAY(szClassName), _T("Explorer++TabProxy%d"), iCount++);
+	HWND hTabProxy = CreateWindow(szClassName, EMPTY_STRING, WS_OVERLAPPEDWINDOW, 0, 0, 0, 0,
+		nullptr, nullptr, GetModuleHandle(nullptr), (LPVOID) ptp);
 
-	aRet = RegisterTabProxyClass(szClassName);
-
-	if (aRet != 0)
+	if (!hTabProxy)
 	{
-		TabProxy *ptp = new TabProxy();
-		ptp->taskbarThumbnails = this;
-		ptp->iTabId = iTabId;
-
-		hTabProxy = CreateWindow(szClassName, EMPTY_STRING, WS_OVERLAPPEDWINDOW, 0, 0, 0, 0,
-			nullptr, nullptr, GetModuleHandle(nullptr), (LPVOID) ptp);
-
-		if (hTabProxy != nullptr)
-		{
-			DwmSetWindowAttribute(hTabProxy, DWMWA_FORCE_ICONIC_REPRESENTATION, &bValue,
-				sizeof(BOOL));
-
-			DwmSetWindowAttribute(hTabProxy, DWMWA_HAS_ICONIC_BITMAP, &bValue, sizeof(BOOL));
-
-			if (m_bTaskbarInitialised)
-			{
-				RegisterTab(hTabProxy, EMPTY_STRING, bSwitchToNewTab);
-			}
-
-			tpi.hProxy = hTabProxy;
-			tpi.iTabId = iTabId;
-			tpi.atomClass = aRet;
-
-			m_TabProxyList.push_back(std::move(tpi));
-
-			const Tab &tab = m_tabContainer->GetTab(iTabId);
-			SetTabProxyIcon(tab);
-			UpdateTaskbarThumbnailTitle(tab);
-		}
+		return;
 	}
+
+	BOOL bValue = TRUE;
+	DwmSetWindowAttribute(hTabProxy, DWMWA_FORCE_ICONIC_REPRESENTATION, &bValue, sizeof(BOOL));
+	DwmSetWindowAttribute(hTabProxy, DWMWA_HAS_ICONIC_BITMAP, &bValue, sizeof(BOOL));
+	RegisterTab(hTabProxy, EMPTY_STRING, bSwitchToNewTab);
+
+	TabProxyInfo tpi;
+	tpi.hProxy = hTabProxy;
+	tpi.iTabId = iTabId;
+	tpi.atomClass = aRet;
+
+	m_TabProxyList.push_back(std::move(tpi));
+
+	const Tab &tab = m_tabContainer->GetTab(iTabId);
+	SetTabProxyIcon(tab);
+	UpdateTaskbarThumbnailTitle(tab);
 }
 
 void TaskbarThumbnails::RemoveTabProxy(int iTabId)
 {
-	if (!m_bTaskbarInitialised)
-	{
-		return;
-	}
-
 	auto tabProxy = std::find_if(m_TabProxyList.begin(), m_TabProxyList.end(),
 		[iTabId](const TabProxyInfo &currentTabProxy)
 		{
@@ -257,7 +247,7 @@ void TaskbarThumbnails::RemoveTabProxy(int iTabId)
 
 void TaskbarThumbnails::DestroyTabProxy(TabProxyInfo &tabProxy)
 {
-	m_pTaskbarList->UnregisterTab(tabProxy.hProxy);
+	m_taskbarList->UnregisterTab(tabProxy.hProxy);
 
 	auto *ptp = reinterpret_cast<TabProxy *>(GetWindowLongPtr(tabProxy.hProxy, GWLP_USERDATA));
 	DestroyWindow(tabProxy.hProxy);
@@ -283,14 +273,14 @@ void TaskbarThumbnails::RegisterTab(HWND hTabProxy, const TCHAR *szDisplayName, 
 {
 	/* Register and insert the tab into the current list of
 	taskbar thumbnails. */
-	m_pTaskbarList->RegisterTab(hTabProxy, m_coreInterface->GetMainWindow());
-	m_pTaskbarList->SetTabOrder(hTabProxy, nullptr);
+	m_taskbarList->RegisterTab(hTabProxy, m_coreInterface->GetMainWindow());
+	m_taskbarList->SetTabOrder(hTabProxy, nullptr);
 
-	m_pTaskbarList->SetThumbnailTooltip(hTabProxy, szDisplayName);
+	m_taskbarList->SetThumbnailTooltip(hTabProxy, szDisplayName);
 
 	if (bTabActive)
 	{
-		m_pTaskbarList->SetTabActive(hTabProxy, m_coreInterface->GetMainWindow(), 0);
+		m_taskbarList->SetTabActive(hTabProxy, m_coreInterface->GetMainWindow(), 0);
 	}
 }
 
@@ -601,11 +591,6 @@ wil::unique_hbitmap TaskbarThumbnails::GetTabLivePreviewBitmap(const Tab &tab)
 
 void TaskbarThumbnails::OnTabSelectionChanged(const Tab &tab)
 {
-	if (!m_bTaskbarInitialised)
-	{
-		return;
-	}
-
 	for (const TabProxyInfo &tabProxyInfo : m_TabProxyList)
 	{
 		if (tabProxyInfo.iTabId == tab.GetId())
@@ -618,7 +603,7 @@ void TaskbarThumbnails::OnTabSelectionChanged(const Tab &tab)
 			tell the taskbar to reposition it. */
 			if (index == (nTabs - 1))
 			{
-				m_pTaskbarList->SetTabOrder(tabProxyInfo.hProxy, nullptr);
+				m_taskbarList->SetTabOrder(tabProxyInfo.hProxy, nullptr);
 			}
 			else
 			{
@@ -628,13 +613,13 @@ void TaskbarThumbnails::OnTabSelectionChanged(const Tab &tab)
 				{
 					if (tabProxyInfoNext.iTabId == nextTab.GetId())
 					{
-						m_pTaskbarList->SetTabOrder(tabProxyInfo.hProxy, tabProxyInfoNext.hProxy);
+						m_taskbarList->SetTabOrder(tabProxyInfo.hProxy, tabProxyInfoNext.hProxy);
 						break;
 					}
 				}
 			}
 
-			m_pTaskbarList->SetTabActive(tabProxyInfo.hProxy, m_coreInterface->GetMainWindow(), 0);
+			m_taskbarList->SetTabActive(tabProxyInfo.hProxy, m_coreInterface->GetMainWindow(), 0);
 			break;
 		}
 	}
@@ -658,17 +643,12 @@ void TaskbarThumbnails::OnNavigationCompleted(const Tab &tab)
 
 void TaskbarThumbnails::UpdateTaskbarThumbnailTitle(const Tab &tab)
 {
-	if (!m_bTaskbarInitialised)
-	{
-		return;
-	}
-
 	for (const TabProxyInfo &tabProxyInfo : m_TabProxyList)
 	{
 		if (tabProxyInfo.iTabId == tab.GetId())
 		{
 			SetWindowText(tabProxyInfo.hProxy, tab.GetName().c_str());
-			m_pTaskbarList->SetThumbnailTooltip(tabProxyInfo.hProxy, tab.GetName().c_str());
+			m_taskbarList->SetThumbnailTooltip(tabProxyInfo.hProxy, tab.GetName().c_str());
 			break;
 		}
 	}
