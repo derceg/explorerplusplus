@@ -38,6 +38,12 @@ Up-to-date builds can be downloaded via AppVeyor. The links below will be for th
 
 [explorerpp_x64_symbols.zip](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/explorerpp_x64_symbols.zip?branch=master&pr=false&job=Platform%3A%20x64)
 
+### ARM64
+
+[explorerpp_arm64.zip](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/explorerpp_arm64.zip?branch=master&pr=false&job=Platform%3A%20ARM64)
+
+[explorerpp_arm64_symbols.zip](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/explorerpp_arm64_symbols.zip?branch=master&pr=false&job=Platform%3A%20ARM64)
+
 ### Translations
 
 [explorerpp_translations.zip](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/explorerpp_translations.zip?branch=master&pr=false&job=Platform%3A%20Win32)
