@@ -16,6 +16,7 @@ environment:
 
 cache:
   - vcpkg_installed -> vcpkg.json
+  - '%LOCALAPPDATA%\vcpkg\archives -> vcpkg.json'
 
 for:
 
