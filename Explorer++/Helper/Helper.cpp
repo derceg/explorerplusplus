@@ -781,3 +781,14 @@ std::optional<std::wstring> GetLastErrorMessage(DWORD error)
 
 	return std::nullopt;
 }
+
+bool IsWindowsPE()
+{
+	// As per
+	// https://groups.google.com/g/microsoft.public.win32.programmer.kernel/c/jam056kRtBA/m/Nsoadoca4IUJ,
+	// the MiniNT key will only be present on Windows PE.
+	wil::unique_hkey key;
+	LSTATUS result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"System\\ControlSet001\\Control\\MiniNT", 0,
+		KEY_READ, &key);
+	return result == ERROR_SUCCESS;
+}

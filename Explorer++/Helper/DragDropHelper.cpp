@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "DragDropHelper.h"
 #include "DataObjectWrapper.h"
+#include "Helper.h"
 #include "Macros.h"
 #include "WinRTBaseWrapper.h"
 #include <wil/com.h>
@@ -54,9 +55,14 @@ HRESULT CreateDataObjectForShellTransfer(const std::vector<PCIDLIST_ABSOLUTE> &i
 	// asynchronous transfer. That's the reason the shell IDataObject instance is wrapped here.
 	auto dataObject = winrt::make<DataObjectWrapper>(shellDataObject.get());
 
-	wil::com_ptr_nothrow<IDataObjectAsyncCapability> asyncCapability;
-	RETURN_IF_FAILED(dataObject->QueryInterface(IID_PPV_ARGS(&asyncCapability)));
-	RETURN_IF_FAILED(asyncCapability->SetAsyncMode(TRUE));
+	// Attempting an asynchronous transfer on Windows PE will fail, so the transfer should be left
+	// as synchronous (the default) in that case.
+	if (!IsWindowsPE())
+	{
+		wil::com_ptr_nothrow<IDataObjectAsyncCapability> asyncCapability;
+		RETURN_IF_FAILED(dataObject->QueryInterface(IID_PPV_ARGS(&asyncCapability)));
+		RETURN_IF_FAILED(asyncCapability->SetAsyncMode(TRUE));
+	}
 
 	*dataObjectOut = dataObject.detach();
 

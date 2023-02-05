@@ -61,6 +61,7 @@ void SetFORMATETC(FORMATETC *pftc, CLIPFORMAT cfFormat, DVTARGETDEVICE *ptd, DWO
 bool IsKeyDown(int nVirtKey);
 std::wstring CreateGUID();
 std::optional<std::wstring> GetLastErrorMessage(DWORD error);
+bool IsWindowsPE();
 
 template <typename L, typename R>
 boost::bimap<L, R> MakeBimap(std::initializer_list<typename boost::bimap<L, R>::value_type> list)
