@@ -14,7 +14,7 @@ StatusBar::StatusBar(HWND hwnd) : m_hwnd(hwnd)
 
 void StatusBar::SetPartText(int iPart, const TCHAR *szText)
 {
-	SendMessage(m_hwnd, SB_SETTEXT, MAKEWORD(iPart, 0), reinterpret_cast<LPARAM>(szText));
+	SendMessage(m_hwnd, SB_SETTEXT, iPart, reinterpret_cast<LPARAM>(szText));
 }
 
 void StatusBar::HandleStatusBarMenuOpen()
@@ -70,7 +70,7 @@ void StatusBar::HandleStatusBarMenuClose()
 	for (const auto &strText : m_TextList)
 	{
 		/* Restore the text that was present before the menu was opened. */
-		SendMessage(m_hwnd, SB_SETTEXT, (WPARAM) i | 0, reinterpret_cast<LPARAM>(strText.c_str()));
+		SendMessage(m_hwnd, SB_SETTEXT, (WPARAM) i, reinterpret_cast<LPARAM>(strText.c_str()));
 
 		i++;
 	}

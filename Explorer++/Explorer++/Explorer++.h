@@ -418,7 +418,7 @@ private:
 	void OnNavigationCompletedStatusBar(const Tab &tab);
 	void OnNavigationFailedStatusBar(const Tab &tab);
 	HRESULT UpdateStatusBarText(const Tab &tab);
-	int CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer);
+	std::wstring CreateDriveFreeSpaceString(const std::wstring &path);
 
 	/* Languages. */
 	void SetLanguageModule();

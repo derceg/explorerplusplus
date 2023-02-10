@@ -38,7 +38,7 @@ INT_PTR FilterDialog::OnInitDialog()
 			reinterpret_cast<LPARAM>(strFilter.c_str()));
 	}
 
-	std::wstring filter = m_coreInterface->GetActiveShellBrowser()->GetFilter();
+	std::wstring filter = m_coreInterface->GetActiveShellBrowser()->GetFilterText();
 
 	ComboBox_SelectString(hComboBox, -1, filter.c_str());
 
@@ -141,11 +141,11 @@ void FilterDialog::OnOk()
 	m_coreInterface->GetActiveShellBrowser()->SetFilterCaseSensitive(
 		IsDlgButtonChecked(m_hDlg, IDC_FILTERS_CASESENSITIVE) == BST_CHECKED);
 
-	m_coreInterface->GetActiveShellBrowser()->SetFilter(filter);
+	m_coreInterface->GetActiveShellBrowser()->SetFilterText(filter);
 
-	if (!m_coreInterface->GetActiveShellBrowser()->GetFilterStatus())
+	if (!m_coreInterface->GetActiveShellBrowser()->IsFilterApplied())
 	{
-		m_coreInterface->GetActiveShellBrowser()->SetFilterStatus(TRUE);
+		m_coreInterface->GetActiveShellBrowser()->SetFilterApplied(TRUE);
 	}
 
 	EndDialog(m_hDlg, 1);

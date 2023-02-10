@@ -19,11 +19,8 @@ enum class SizeDisplayFormat
 	PB = 6
 };
 
-void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize, size_t cchBuf);
-void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize, size_t cchBuf, BOOL bForceSize,
-	SizeDisplayFormat sdf);
-TCHAR *PrintComma(unsigned long nPrint);
-TCHAR *PrintCommaLargeNum(LARGE_INTEGER lPrint);
+[[nodiscard]] std::wstring FormatSizeString(uint64_t size,
+	SizeDisplayFormat sizeDisplayFormat = SizeDisplayFormat::None);
 BOOL CheckWildcardMatch(const TCHAR *szWildcard, const TCHAR *szString, BOOL bCaseSensitive);
 void ReplaceCharacter(TCHAR *str, TCHAR ch, TCHAR chReplacement);
 void ReplaceCharacterWithString(const TCHAR *szBaseString, TCHAR *szOutput, UINT cchMax,

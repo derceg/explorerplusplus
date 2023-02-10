@@ -85,12 +85,8 @@ INT_PTR SplitFileDialog::OnInitDialog()
 		LARGE_INTEGER lFileSize;
 		GetFileSizeEx(hFile, &lFileSize);
 
-		ULARGE_INTEGER ulFileSize;
-		ulFileSize.QuadPart = lFileSize.QuadPart;
-
-		TCHAR szFileSize[32];
-		FormatSizeString(ulFileSize, szFileSize, SIZEOF_ARRAY(szFileSize));
-		SetDlgItemText(m_hDlg, IDC_SPLIT_EDIT_FILESIZE, szFileSize);
+		auto fileSizeText = FormatSizeString(lFileSize.QuadPart);
+		SetDlgItemText(m_hDlg, IDC_SPLIT_EDIT_FILESIZE, fileSizeText.c_str());
 
 		CloseHandle(hFile);
 	}

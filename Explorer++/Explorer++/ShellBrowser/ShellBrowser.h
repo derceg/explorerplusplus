@@ -137,10 +137,10 @@ public:
 	static int LookupColumnDescriptionStringIndex(ColumnType columnType);
 
 	/* Filtering. */
-	std::wstring GetFilter() const;
-	void SetFilter(std::wstring_view filter);
-	BOOL GetFilterStatus() const;
-	void SetFilterStatus(BOOL bFilter);
+	std::wstring GetFilterText() const;
+	void SetFilterText(std::wstring_view filter);
+	BOOL IsFilterApplied() const;
+	void SetFilterApplied(BOOL bFilter);
 	BOOL GetFilterCaseSensitive() const;
 	void SetFilterCaseSensitive(BOOL filterCaseSensitive);
 
@@ -150,7 +150,8 @@ public:
 	void SetFileAttributesForSelection();
 
 	void SelectItems(const std::vector<PCIDLIST_ABSOLUTE> &pidls);
-	void GetFolderInfo(FolderInfo_t *pFolderInfo);
+	uint64_t GetTotalDirectorySize();
+	uint64_t GetSelectionSize();
 	int LocateFileItemIndex(const TCHAR *szFileName) const;
 	bool InVirtualFolder() const;
 	BOOL CanCreate() const;
@@ -325,8 +326,8 @@ private:
 		int numItems;
 		int numFilesSelected;
 		int numFoldersSelected;
-		ULARGE_INTEGER totalDirSize;
-		ULARGE_INTEGER fileSelectionSize;
+		uint64_t totalDirSize;
+		uint64_t fileSelectionSize;
 
 		/* Cached folder size data. */
 		mutable std::unordered_map<int, ULONGLONG> cachedFolderSizes;
@@ -339,8 +340,8 @@ private:
 			numItems(0),
 			numFilesSelected(0),
 			numFoldersSelected(0),
-			totalDirSize({}),
-			fileSelectionSize({})
+			totalDirSize(0),
+			fileSelectionSize(0)
 		{
 		}
 	};
@@ -407,7 +408,6 @@ private:
 	void SetViewModeInternal(ViewMode viewMode);
 	void SetFirstColumnTextToCallback();
 	void SetFirstColumnTextToFilename();
-	void ApplyFolderEmptyBackgroundImage(bool apply);
 
 	// Shell window integration
 	void NotifyShellOfNavigation(PCIDLIST_ABSOLUTE pidl);
@@ -433,6 +433,7 @@ private:
 	void OnRButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT keyFlags);
 	void OnListViewGetDisplayInfo(LPARAM lParam);
 	LRESULT OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip);
+	BOOL OnListViewGetEmptyMarkup(NMLVEMPTYMARKUP *emptyMarkup);
 	void QueueInfoTipTask(int internalIndex, const std::wstring &existingInfoTip);
 	static std::optional<InfoTipResult> GetInfoTipAsync(HWND listView, int infoTipResultId,
 		int internalIndex, const BasicItemInfo_t &basicItemInfo, const Config &config,
@@ -518,7 +519,6 @@ private:
 	void UnfilterAllItems();
 	void UnfilterItem(int internalIndex);
 	void RestoreFilteredItem(int internalIndex);
-	void ApplyFilteringBackgroundImage(bool apply);
 
 	/* Listview group support. */
 	static int CALLBACK GroupComparisonStub(int id1, int id2, void *data);

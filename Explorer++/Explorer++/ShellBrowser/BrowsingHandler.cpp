@@ -595,22 +595,9 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 	if (nPrevItems == 0 && m_directoryState.awaitingAddList.empty())
 	{
-		if (m_folderSettings.applyFilter)
-		{
-			ApplyFilteringBackgroundImage(true);
-		}
-		else
-		{
-			ApplyFolderEmptyBackgroundImage(true);
-		}
-
 		m_directoryState.numItems = 0;
 
 		return;
-	}
-	else if (!m_folderSettings.applyFilter)
-	{
-		ApplyFolderEmptyBackgroundImage(false);
 	}
 
 	/* Make the listview allocate space (for internal data structures)
@@ -715,7 +702,7 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 		ulFileSize.LowPart = itemInfo.wfd.nFileSizeLow;
 		ulFileSize.HighPart = itemInfo.wfd.nFileSizeHigh;
 
-		m_directoryState.totalDirSize.QuadPart += ulFileSize.QuadPart;
+		m_directoryState.totalDirSize += ulFileSize.QuadPart;
 
 		nAdded++;
 	}
@@ -735,18 +722,6 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	{
 		m_queuedRenameItem.reset();
 		ListView_EditLabel(m_hListView, *itemToRename);
-	}
-}
-
-void ShellBrowser::ApplyFolderEmptyBackgroundImage(bool apply)
-{
-	if (apply)
-	{
-		ListViewHelper::SetBackgroundImage(m_hListView, IDB_FOLDEREMPTY);
-	}
-	else
-	{
-		ListViewHelper::SetBackgroundImage(m_hListView, NULL);
 	}
 }
 
@@ -787,7 +762,7 @@ void ShellBrowser::RemoveItem(int iItemInternal)
 	ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
 	ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
 
-	m_directoryState.totalDirSize.QuadPart -= ulFileSize.QuadPart;
+	m_directoryState.totalDirSize -= ulFileSize.QuadPart;
 
 	/* Locate the item within the listview.
 	Could use filename, providing removed
@@ -818,11 +793,6 @@ void ShellBrowser::RemoveItem(int iItemInternal)
 	nItems = ListView_GetItemCount(m_hListView);
 
 	m_directoryState.numItems--;
-
-	if (nItems == 0 && !m_folderSettings.applyFilter)
-	{
-		ApplyFolderEmptyBackgroundImage(true);
-	}
 }
 
 ShellNavigationController *ShellBrowser::GetNavigationController() const

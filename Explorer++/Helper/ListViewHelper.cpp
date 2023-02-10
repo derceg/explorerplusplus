@@ -233,46 +233,6 @@ void AddRemoveExtendedStyle(HWND hListView, DWORD dwStyle, BOOL bAdd)
 	ListView_SetExtendedListViewStyle(hListView, dwExtendedStyle);
 }
 
-/* Sets the background image in the
-listview. uImage should be the index
-of a bitmap resource in the current
-executable. */
-BOOL SetBackgroundImage(HWND hListView, UINT uImage)
-{
-	TCHAR szModuleName[MAX_PATH];
-	DWORD dwRet = GetModuleFileName(nullptr, szModuleName, SIZEOF_ARRAY(szModuleName));
-
-	if (dwRet == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
-	{
-		return FALSE;
-	}
-
-	LVBKIMAGE lvbki;
-
-	TCHAR szBitmap[512];
-
-	if (uImage == 0)
-	{
-		lvbki.ulFlags = LVBKIF_SOURCE_NONE;
-	}
-	else
-	{
-		/* See http://msdn.microsoft.com/en-us/library/aa767740(v=vs.85).aspx
-		for information on the res protocol, and
-		http://msdn.microsoft.com/en-us/library/ms648009(v=vs.85).aspx for
-		a list of resource types. */
-		StringCchPrintf(szBitmap, SIZEOF_ARRAY(szBitmap), _T("res://%s/#%d/#%d"), szModuleName,
-			RT_BITMAP, uImage);
-
-		lvbki.ulFlags = LVBKIF_STYLE_NORMAL | LVBKIF_SOURCE_URL;
-		lvbki.xOffsetPercent = 45;
-		lvbki.yOffsetPercent = 50;
-		lvbki.pszImage = szBitmap;
-	}
-
-	return ListView_SetBkImage(hListView, &lvbki);
-}
-
 BOOL SwapItems(HWND hListView, int iItem1, int iItem2, BOOL bSwapLPARAM)
 {
 	UINT mask = LVIF_IMAGE | LVIF_INDENT | LVIF_STATE | LVIF_TEXT;

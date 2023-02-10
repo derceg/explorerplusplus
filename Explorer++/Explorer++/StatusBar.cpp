@@ -7,6 +7,7 @@
 #include "Config.h"
 #include "DarkModeHelper.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
@@ -100,11 +101,11 @@ void Explorerplusplus::SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl)
 
 	/* Browsing of a folder has started. Set the status bar text to indicate that
 	the folder is being loaded. */
-	SendMessage(m_hStatusBar, SB_SETTEXT, 0 | 0, (LPARAM) szLoadingText);
+	SendMessage(m_hStatusBar, SB_SETTEXT, 0, (LPARAM) szLoadingText);
 
 	/* Clear the text in all other parts of the status bar. */
-	SendMessage(m_hStatusBar, SB_SETTEXT, 1 | 0, (LPARAM) EMPTY_STRING);
-	SendMessage(m_hStatusBar, SB_SETTEXT, 2 | 0, (LPARAM) EMPTY_STRING);
+	SendMessage(m_hStatusBar, SB_SETTEXT, 1, (LPARAM) EMPTY_STRING);
+	SendMessage(m_hStatusBar, SB_SETTEXT, 2, (LPARAM) EMPTY_STRING);
 }
 
 void Explorerplusplus::OnNavigationCompletedStatusBar(const Tab &tab)
@@ -125,143 +126,93 @@ void Explorerplusplus::OnNavigationFailedStatusBar(const Tab &tab)
 
 HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 {
-	FolderInfo_t folderInfo;
-	int nTotal;
-	int nFilesSelected;
-	int nFoldersSelected;
-	TCHAR szItemsSelected[64];
-	TCHAR lpszSizeBuffer[32];
-	TCHAR szBuffer[64];
-	TCHAR szTemp[64];
-	TCHAR *szNumSelected = nullptr;
-	int res;
+	int numItemsSelected = tab.GetShellBrowser()->GetNumSelected();
+	std::wstring numItemsText;
 
-	nTotal = tab.GetShellBrowser()->GetNumItems();
-	nFilesSelected = tab.GetShellBrowser()->GetNumSelectedFiles();
-	nFoldersSelected = tab.GetShellBrowser()->GetNumSelectedFolders();
-
-	if ((nFilesSelected + nFoldersSelected) != 0)
+	// The item count that's shown will either be the number of items selected, or the total number
+	// of items if there is no selection.
+	if (numItemsSelected != 0)
 	{
-		szNumSelected = PrintComma(nFilesSelected + nFoldersSelected);
-
-		if ((nFilesSelected + nFoldersSelected) == 1)
+		if (numItemsSelected == 1)
 		{
-			LoadString(m_resourceModule, IDS_GENERAL_SELECTED_ONEITEM, szTemp,
-				SIZEOF_ARRAY(szTemp));
-
-			/* One item selected. Form:
-			1 item selected */
-			StringCchPrintf(szItemsSelected, SIZEOF_ARRAY(szItemsSelected), _T("%s %s"),
-				szNumSelected, szTemp);
+			numItemsText =
+				ResourceHelper::LoadString(m_resourceModule, IDS_GENERAL_SELECTED_ONE_ITEM);
 		}
 		else
 		{
-			LoadString(m_resourceModule, IDS_GENERAL_SELECTED_MOREITEMS, szTemp,
-				SIZEOF_ARRAY(szTemp));
-
-			/* More than one item selected. Form:
-			n items selected */
-			StringCchPrintf(szItemsSelected, SIZEOF_ARRAY(szItemsSelected), _T("%s %s"),
-				szNumSelected, szTemp);
+			auto multipleItemsText =
+				ResourceHelper::LoadString(m_resourceModule, IDS_GENERAL_SELECTED_MULTIPLE_ITEMS);
+			numItemsText = std::format(L"{:L} {}", numItemsSelected, multipleItemsText);
 		}
 	}
 	else
 	{
-		szNumSelected = PrintComma(nTotal);
+		int numItems = tab.GetShellBrowser()->GetNumItems();
 
-		if (nTotal == 1)
+		if (numItems == 1)
 		{
-			LoadString(m_resourceModule, IDS_GENERAL_ONEITEM, szTemp, SIZEOF_ARRAY(szTemp));
-
-			/* Text: '1 item' */
-			StringCchPrintf(szItemsSelected, SIZEOF_ARRAY(szItemsSelected), _T("%s %s"),
-				szNumSelected, szTemp);
+			numItemsText = ResourceHelper::LoadString(m_resourceModule, IDS_GENERAL_ONE_ITEM);
 		}
 		else
 		{
-			LoadString(m_resourceModule, IDS_GENERAL_MOREITEMS, szTemp, SIZEOF_ARRAY(szTemp));
-
-			/* Text: 'n Items' */
-			StringCchPrintf(szItemsSelected, SIZEOF_ARRAY(szItemsSelected), _T("%s %s"),
-				szNumSelected, szTemp);
+			auto multipleItemsText =
+				ResourceHelper::LoadString(m_resourceModule, IDS_GENERAL_MULTIPLE_ITEMS);
+			numItemsText = std::format(L"{:L} {}", numItems, multipleItemsText);
 		}
 	}
 
-	SendMessage(m_hStatusBar, SB_SETTEXT, 0 | 0, (LPARAM) szItemsSelected);
-
-	tab.GetShellBrowser()->GetFolderInfo(&folderInfo);
-
-	if ((nFilesSelected + nFoldersSelected) == 0)
+	if (tab.GetShellBrowser()->IsFilterApplied())
 	{
-		/* No items(files or folders) selected. */
-		FormatSizeString(folderInfo.TotalFolderSize, lpszSizeBuffer, SIZEOF_ARRAY(lpszSizeBuffer),
-			m_config->globalFolderSettings.forceSize,
-			m_config->globalFolderSettings.sizeDisplayFormat);
+		auto filterAppliedText = ResourceHelper::LoadString(m_resourceModule, IDS_FILTER_APPLIED);
+		numItemsText += L" | " + filterAppliedText;
+	}
+
+	SendMessage(m_hStatusBar, SB_SETTEXT, 0, reinterpret_cast<LPARAM>(numItemsText.c_str()));
+
+	std::wstring sizeText;
+
+	if (numItemsSelected == 0)
+	{
+		SizeDisplayFormat displayFormat = m_config->globalFolderSettings.forceSize
+			? m_config->globalFolderSettings.sizeDisplayFormat
+			: SizeDisplayFormat::None;
+		sizeText = FormatSizeString(tab.GetShellBrowser()->GetTotalDirectorySize(), displayFormat);
 	}
 	else
 	{
-		if (nFilesSelected == 0)
+		// Note that no size will be shown if only folders are selected.
+		if (tab.GetShellBrowser()->GetNumSelectedFiles() != 0)
 		{
-			/* Only folders selected. Don't show any size in the status bar. */
-			StringCchCopy(lpszSizeBuffer, SIZEOF_ARRAY(lpszSizeBuffer), EMPTY_STRING);
-		}
-		else
-		{
-			/* Mixture of files and folders selected. Show size of currently
-			selected files. */
-			FormatSizeString(folderInfo.TotalSelectionSize, lpszSizeBuffer,
-				SIZEOF_ARRAY(lpszSizeBuffer), m_config->globalFolderSettings.forceSize,
-				m_config->globalFolderSettings.sizeDisplayFormat);
+			SizeDisplayFormat displayFormat = m_config->globalFolderSettings.forceSize
+				? m_config->globalFolderSettings.sizeDisplayFormat
+				: SizeDisplayFormat::None;
+			sizeText = FormatSizeString(tab.GetShellBrowser()->GetSelectionSize(), displayFormat);
 		}
 	}
 
-	SendMessage(m_hStatusBar, SB_SETTEXT, 1 | 0, (LPARAM) lpszSizeBuffer);
+	SendMessage(m_hStatusBar, SB_SETTEXT, 1, reinterpret_cast<LPARAM>(sizeText.c_str()));
 
-	res = CreateDriveFreeSpaceString(tab.GetShellBrowser()->GetDirectory().c_str(), szBuffer,
-		SIZEOF_ARRAY(szBuffer));
+	std::wstring driveFreeSpaceText =
+		CreateDriveFreeSpaceString(tab.GetShellBrowser()->GetDirectory().c_str());
 
-	if (res == -1)
-	{
-		StringCchCopy(szBuffer, SIZEOF_ARRAY(szBuffer), EMPTY_STRING);
-	}
-
-	SendMessage(m_hStatusBar, SB_SETTEXT, 2 | 0, (LPARAM) szBuffer);
+	SendMessage(m_hStatusBar, SB_SETTEXT, 2, reinterpret_cast<LPARAM>(driveFreeSpaceText.c_str()));
 
 	return S_OK;
 }
 
-int Explorerplusplus::CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer)
+std::wstring Explorerplusplus::CreateDriveFreeSpaceString(const std::wstring &path)
 {
 	ULARGE_INTEGER totalNumberOfBytes;
 	ULARGE_INTEGER totalNumberOfFreeBytes;
 	ULARGE_INTEGER bytesAvailableToCaller;
-	TCHAR szFreeSpace[32];
-	TCHAR szFree[16];
-	TCHAR szFreeSpaceString[512];
-
-	if (GetDiskFreeSpaceEx(szPath, &bytesAvailableToCaller, &totalNumberOfBytes,
+	if (GetDiskFreeSpaceEx(path.c_str(), &bytesAvailableToCaller, &totalNumberOfBytes,
 			&totalNumberOfFreeBytes)
 		== 0)
 	{
-		szBuffer = nullptr;
-		return -1;
+		return {};
 	}
 
-	FormatSizeString(totalNumberOfFreeBytes, szFreeSpace, SIZEOF_ARRAY(szFreeSpace));
-
-	LoadString(m_resourceModule, IDS_GENERAL_FREE, szFree, SIZEOF_ARRAY(szFree));
-
-	StringCchPrintf(szFreeSpaceString, SIZEOF_ARRAY(szFreeSpace), _T("%s %s (%.0f%%)"), szFreeSpace,
-		szFree, totalNumberOfFreeBytes.QuadPart * 100.0 / totalNumberOfBytes.QuadPart);
-
-	if (nBuffer > lstrlen(szFreeSpaceString))
-	{
-		StringCchCopy(szBuffer, nBuffer, szFreeSpaceString);
-	}
-	else
-	{
-		szBuffer = nullptr;
-	}
-
-	return lstrlen(szFreeSpaceString);
+	return std::format(L"{} {} ({:.0Lf}%)", FormatSizeString(totalNumberOfFreeBytes.QuadPart),
+		ResourceHelper::LoadString(m_resourceModule, IDS_GENERAL_FREE),
+		totalNumberOfFreeBytes.QuadPart * 100.0 / totalNumberOfBytes.QuadPart);
 }

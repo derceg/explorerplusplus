@@ -37,7 +37,7 @@ Cpp11BracedListStyle: false
 FixNamespaceComments: false
 IncludeBlocks: Merge
 IncludeCategories:
-    - Regex:           'stdafx.h'
+    - Regex:           '^"(stdafx.h|pch.h)"$'
       Priority:        -1
     - Regex:           '^"(Explorer\+\+\.h|ShellBrowser\.h)"$'
       Priority:        0

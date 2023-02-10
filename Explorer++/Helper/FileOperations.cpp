@@ -349,10 +349,8 @@ BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,
 	ss << std::fixed << fileList.size();
 	strContents += _T("Number of files: ") + ss.str() + std::wstring(_T("\r\n"));
 
-	TCHAR szTotalSize[32];
-	FormatSizeString(ulTotalSize, szTotalSize, SIZEOF_ARRAY(szTotalSize));
-	strContents += _T("Total size (not including subfolders): ") + std::wstring(szTotalSize)
-		+ std::wstring(_T("\r\n"));
+	auto totalSizeText = FormatSizeString(ulTotalSize.QuadPart);
+	strContents += _T("Total size (not including subfolders): ") + totalSizeText + _T("\r\n");
 
 	strContents += _T("\r\nFolders\r\n-------\r\n");
 

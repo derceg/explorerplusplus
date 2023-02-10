@@ -38,38 +38,23 @@ http://connect.microsoft.com/VisualStudio/feedback/details/431433/unicode-string
 
 TEST(FormatSizeString, Simple)
 {
-	ULARGE_INTEGER size;
-	TCHAR formattedSize[128];
+	auto formattedSize = FormatSizeString(1);
+	EXPECT_EQ(formattedSize, L"1 bytes");
 
-	size.QuadPart = 1;
-	FormatSizeString(size, formattedSize, SIZEOF_ARRAY(formattedSize));
-	EXPECT_STREQ(formattedSize, L"1 bytes");
+	formattedSize = FormatSizeString(1024);
+	EXPECT_EQ(formattedSize, L"1.00 KB");
 
-	size.QuadPart = 1024;
-	FormatSizeString(size, formattedSize, SIZEOF_ARRAY(formattedSize));
-	EXPECT_STREQ(formattedSize, L"1.00 KB");
+	formattedSize = FormatSizeString(1024 * 1024 * 2);
+	EXPECT_EQ(formattedSize, L"2.00 MB");
 
-	size.QuadPart = 1024 * 1024 * 2;
-	FormatSizeString(size, formattedSize, SIZEOF_ARRAY(formattedSize));
-	EXPECT_STREQ(formattedSize, L"2.00 MB");
+	formattedSize = FormatSizeString(48169402368);
+	EXPECT_EQ(formattedSize, L"44.8 GB");
 
-	size.QuadPart = 48169402368;
-	FormatSizeString(size, formattedSize, SIZEOF_ARRAY(formattedSize));
-	EXPECT_STREQ(formattedSize, L"44.8 GB");
+	formattedSize = FormatSizeString(517637815320);
+	EXPECT_EQ(formattedSize, L"482 GB");
 
-	size.QuadPart = 517637815320;
-	FormatSizeString(size, formattedSize, SIZEOF_ARRAY(formattedSize));
-	EXPECT_STREQ(formattedSize, L"482 GB");
-
-	size.QuadPart = 1000202039296;
-	FormatSizeString(size, formattedSize, SIZEOF_ARRAY(formattedSize));
-	EXPECT_STREQ(formattedSize, L"931 GB");
-}
-
-TEST(PrintComma, Simple)
-{
-	TCHAR *outputText = PrintComma(1234567890);
-	EXPECT_STREQ(outputText, L"1,234,567,890");
+	formattedSize = FormatSizeString(1000202039296);
+	EXPECT_EQ(formattedSize, L"931 GB");
 }
 
 TEST(ReplaceCharacter, NoMatches)

@@ -446,7 +446,7 @@ void ShellBrowser::UpdateItem(PCIDLIST_ABSOLUTE pidl, PCIDLIST_ABSOLUTE updatedP
 		m_itemInfoMap[*internalIndex].wfd.nFileSizeHigh };
 	ULARGE_INTEGER newFileSize = { itemInfo->wfd.nFileSizeLow, itemInfo->wfd.nFileSizeHigh };
 
-	m_directoryState.totalDirSize.QuadPart += newFileSize.QuadPart - oldFileSize.QuadPart;
+	m_directoryState.totalDirSize += newFileSize.QuadPart - oldFileSize.QuadPart;
 
 	m_itemInfoMap[*internalIndex] = std::move(*itemInfo);
 	const ItemInfo_t &updatedItemInfo = m_itemInfoMap[*internalIndex];
@@ -468,7 +468,7 @@ void ShellBrowser::UpdateItem(PCIDLIST_ABSOLUTE pidl, PCIDLIST_ABSOLUTE updatedP
 
 	if (WI_IsFlagSet(state, LVIS_SELECTED))
 	{
-		m_directoryState.fileSelectionSize.QuadPart += newFileSize.QuadPart - oldFileSize.QuadPart;
+		m_directoryState.fileSelectionSize += newFileSize.QuadPart - oldFileSize.QuadPart;
 	}
 
 	if (IsFileFiltered(updatedItemInfo))

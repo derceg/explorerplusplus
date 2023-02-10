@@ -7,12 +7,12 @@
 #include "MainResource.h"
 #include "../Helper/ListViewHelper.h"
 
-std::wstring ShellBrowser::GetFilter() const
+std::wstring ShellBrowser::GetFilterText() const
 {
 	return m_folderSettings.filter;
 }
 
-void ShellBrowser::SetFilter(std::wstring_view filter)
+void ShellBrowser::SetFilterText(std::wstring_view filter)
 {
 	m_folderSettings.filter = filter;
 
@@ -23,14 +23,14 @@ void ShellBrowser::SetFilter(std::wstring_view filter)
 	}
 }
 
-void ShellBrowser::SetFilterStatus(BOOL bFilter)
+void ShellBrowser::SetFilterApplied(BOOL bFilter)
 {
 	m_folderSettings.applyFilter = bFilter;
 
 	UpdateFiltering();
 }
 
-BOOL ShellBrowser::GetFilterStatus() const
+BOOL ShellBrowser::IsFilterApplied() const
 {
 	return m_folderSettings.applyFilter;
 }
@@ -50,21 +50,10 @@ void ShellBrowser::UpdateFiltering()
 	if (m_folderSettings.applyFilter)
 	{
 		RemoveFilteredItems();
-
-		ApplyFilteringBackgroundImage(true);
 	}
 	else
 	{
 		UnfilterAllItems();
-
-		if (m_directoryState.numItems == 0)
-		{
-			ApplyFolderEmptyBackgroundImage(true);
-		}
-		else
-		{
-			ApplyFilteringBackgroundImage(false);
-		}
 	}
 }
 
@@ -105,7 +94,7 @@ void ShellBrowser::RemoveFilteredItem(int iItem, int iItemInternal)
 		ulFileSize.LowPart = item.wfd.nFileSizeLow;
 		ulFileSize.HighPart = item.wfd.nFileSizeHigh;
 
-		m_directoryState.fileSelectionSize.QuadPart -= ulFileSize.QuadPart;
+		m_directoryState.fileSelectionSize -= ulFileSize.QuadPart;
 	}
 
 	/* Take the file size of the removed file away from the total
@@ -113,7 +102,7 @@ void ShellBrowser::RemoveFilteredItem(int iItem, int iItemInternal)
 	ulFileSize.LowPart = item.wfd.nFileSizeLow;
 	ulFileSize.HighPart = item.wfd.nFileSizeHigh;
 
-	m_directoryState.totalDirSize.QuadPart -= ulFileSize.QuadPart;
+	m_directoryState.totalDirSize -= ulFileSize.QuadPart;
 
 	/* Remove the item from the m_hListView. */
 	ListView_DeleteItem(m_hListView, iItem);
@@ -167,16 +156,4 @@ void ShellBrowser::RestoreFilteredItem(int internalIndex)
 	m_directoryState.awaitingAddList.push_back(awaitingAdd);
 
 	InsertAwaitingItems(m_folderSettings.showInGroups);
-}
-
-void ShellBrowser::ApplyFilteringBackgroundImage(bool apply)
-{
-	if (apply)
-	{
-		ListViewHelper::SetBackgroundImage(m_hListView, IDB_FILTERINGAPPLIED);
-	}
-	else
-	{
-		ListViewHelper::SetBackgroundImage(m_hListView, NULL);
-	}
 }

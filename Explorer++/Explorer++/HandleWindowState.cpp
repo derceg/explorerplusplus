@@ -79,7 +79,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_SHOWHIDDENFILES,
 		tab.GetShellBrowser()->GetShowHidden());
 	MenuHelper::CheckItem(hProgramMenu, IDM_FILTER_APPLYFILTER,
-		tab.GetShellBrowser()->GetFilterStatus());
+		tab.GetShellBrowser()->IsFilterApplied());
 
 	MenuHelper::EnableItem(hProgramMenu, IDM_ACTIONS_NEWFOLDER, CanCreate());
 	MenuHelper::EnableItem(hProgramMenu, IDM_ACTIONS_SPLITFILE,

@@ -172,7 +172,6 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM w
 	case WM_APP_FOLDERSIZECOMPLETED:
 	{
 		DWFolderSizeCompletion *pDWFolderSizeCompletion = nullptr;
-		TCHAR szFolderSize[32];
 		TCHAR szSizeString[64];
 		TCHAR szTotalSize[64];
 		BOOL bValid = FALSE;
@@ -202,15 +201,17 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM w
 
 		if (bValid)
 		{
-			FormatSizeString(pDWFolderSizeCompletion->liFolderSize, szFolderSize,
-				SIZEOF_ARRAY(szFolderSize), m_config->globalFolderSettings.forceSize,
-				m_config->globalFolderSettings.sizeDisplayFormat);
+			SizeDisplayFormat displayFormat = m_config->globalFolderSettings.forceSize
+				? m_config->globalFolderSettings.sizeDisplayFormat
+				: SizeDisplayFormat::None;
+			auto folderSizeText =
+				FormatSizeString(pDWFolderSizeCompletion->liFolderSize.QuadPart, displayFormat);
 
 			LoadString(m_resourceModule, IDS_GENERAL_TOTALSIZE, szTotalSize,
 				SIZEOF_ARRAY(szTotalSize));
 
 			StringCchPrintf(szSizeString, SIZEOF_ARRAY(szSizeString), _T("%s: %s"), szTotalSize,
-				szFolderSize);
+				folderSizeText.c_str());
 
 			/* TODO: The line index should be stored in some other (variable) way. */
 			DisplayWindow_SetLine(m_hDisplayWindow, FOLDER_SIZE_LINE_INDEX, szSizeString);
@@ -566,7 +567,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_FILTER_APPLYFILTER:
-		m_pActiveShellBrowser->SetFilterStatus(!m_pActiveShellBrowser->GetFilterStatus());
+		m_pActiveShellBrowser->SetFilterApplied(!m_pActiveShellBrowser->IsFilterApplied());
 		break;
 
 	case IDM_SORTBY_NAME:

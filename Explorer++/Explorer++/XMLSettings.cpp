@@ -944,12 +944,12 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom, IXM
 			tabDirectory.c_str());
 
 		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("ApplyFilter"),
-			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetFilterStatus()));
+			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->IsFilterApplied()));
 
 		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("AutoArrange"),
 			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetAutoArrange()));
 
-		std::wstring filter = tab.GetShellBrowser()->GetFilter();
+		std::wstring filter = tab.GetShellBrowser()->GetFilterText();
 		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Filter"), filter.c_str());
 
 		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("FilterCaseSensitive"),

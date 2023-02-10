@@ -607,7 +607,7 @@ void Explorerplusplus::SaveTabSettingsToRegistry()
 				RegistrySettings::SaveDword(hTabKey, _T("ShowInGroups"),
 					tab.GetShellBrowser()->GetShowInGroups());
 				RegistrySettings::SaveDword(hTabKey, _T("ApplyFilter"),
-					tab.GetShellBrowser()->GetFilterStatus());
+					tab.GetShellBrowser()->IsFilterApplied());
 				RegistrySettings::SaveDword(hTabKey, _T("FilterCaseSensitive"),
 					tab.GetShellBrowser()->GetFilterCaseSensitive());
 				RegistrySettings::SaveDword(hTabKey, _T("ShowHidden"),
@@ -615,7 +615,7 @@ void Explorerplusplus::SaveTabSettingsToRegistry()
 				RegistrySettings::SaveDword(hTabKey, _T("AutoArrange"),
 					tab.GetShellBrowser()->GetAutoArrange());
 
-				std::wstring filter = tab.GetShellBrowser()->GetFilter();
+				std::wstring filter = tab.GetShellBrowser()->GetFilterText();
 				RegistrySettings::SaveString(hTabKey, _T("Filter"), filter);
 
 				/* Now save the tabs columns. */

@@ -75,16 +75,13 @@ void ShellBrowser::SetTileViewItemInfo(int iItem, int iItemInternal)
 	if ((m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 		!= FILE_ATTRIBUTE_DIRECTORY)
 	{
-		TCHAR lpszFileSize[32];
-		ULARGE_INTEGER lFileSize;
+		ULARGE_INTEGER fileSize = { m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow,
+			m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh };
 
-		lFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
-		lFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
-
-		FormatSizeString(lFileSize, lpszFileSize, SIZEOF_ARRAY(lpszFileSize),
-			m_config->globalFolderSettings.forceSize,
-			m_config->globalFolderSettings.sizeDisplayFormat);
-
-		ListView_SetItemText(m_hListView, iItem, 2, lpszFileSize);
+		SizeDisplayFormat displayFormat = m_config->globalFolderSettings.forceSize
+			? m_config->globalFolderSettings.sizeDisplayFormat
+			: SizeDisplayFormat::None;
+		std::wstring fileSizeText = FormatSizeString(fileSize.QuadPart, displayFormat);
+		ListView_SetItemText(m_hListView, iItem, 2, fileSizeText.data());
 	}
 }

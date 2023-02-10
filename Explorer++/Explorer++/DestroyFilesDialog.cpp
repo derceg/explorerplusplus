@@ -92,10 +92,9 @@ INT_PTR DestroyFilesDialog::OnInitDialog()
 		WIN32_FILE_ATTRIBUTE_DATA wfad;
 		GetFileAttributesEx(szFullFilename, GetFileExInfoStandard, &wfad);
 
-		TCHAR szFileSize[32];
-		ULARGE_INTEGER lFileSize = { wfad.nFileSizeLow, wfad.nFileSizeHigh };
-		FormatSizeString(lFileSize, szFileSize, SIZEOF_ARRAY(szFileSize));
-		ListView_SetItemText(hListView, iItem, 2, szFileSize);
+		ULARGE_INTEGER fileSize = { wfad.nFileSizeLow, wfad.nFileSizeHigh };
+		auto fileSizeText = FormatSizeString(fileSize.QuadPart);
+		ListView_SetItemText(hListView, iItem, 2, fileSizeText.data());
 
 		TCHAR szDateModified[32];
 		CreateFileTimeString(&wfad.ftLastWriteTime, szDateModified, SIZEOF_ARRAY(szDateModified),

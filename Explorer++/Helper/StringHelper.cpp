@@ -10,83 +10,76 @@
 BOOL CheckWildcardMatchInternal(const TCHAR *szWildcard, const TCHAR *szString,
 	BOOL bCaseSensitive);
 
-void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize, size_t cchBuf)
-{
-	FormatSizeString(lFileSize, pszFileSize, cchBuf, FALSE, SizeDisplayFormat::None);
-}
-
-void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize, size_t cchBuf, BOOL bForceSize,
-	SizeDisplayFormat sdf)
+std::wstring FormatSizeString(uint64_t size, SizeDisplayFormat sizeDisplayFormat)
 {
 	static const TCHAR *SIZE_STRINGS[] = { _T("bytes"), _T("KB"), _T("MB"), _T("GB"), _T("TB"),
 		_T("PB") };
 
-	auto fFileSize = static_cast<double>(lFileSize.QuadPart);
-	int iSizeIndex = 0;
+	auto sizeAsDouble = static_cast<double>(size);
+	int sizeIndex = 0;
 
-	if (bForceSize)
+	if (sizeDisplayFormat != SizeDisplayFormat::None)
 	{
-		switch (sdf)
+		switch (sizeDisplayFormat)
 		{
 		case SizeDisplayFormat::Bytes:
-			iSizeIndex = 0;
+			sizeIndex = 0;
 			break;
 
 		case SizeDisplayFormat::KB:
-			iSizeIndex = 1;
+			sizeIndex = 1;
 			break;
 
 		case SizeDisplayFormat::MB:
-			iSizeIndex = 2;
+			sizeIndex = 2;
 			break;
 
 		case SizeDisplayFormat::GB:
-			iSizeIndex = 3;
+			sizeIndex = 3;
 			break;
 
 		case SizeDisplayFormat::TB:
-			iSizeIndex = 4;
+			sizeIndex = 4;
 			break;
 
 		case SizeDisplayFormat::PB:
-			iSizeIndex = 5;
+			sizeIndex = 5;
 			break;
 		}
 
-		for (int i = 0; i < iSizeIndex; i++)
+		for (int i = 0; i < sizeIndex; i++)
 		{
-			fFileSize /= 1024;
+			sizeAsDouble /= 1024;
 		}
 	}
 	else
 	{
-		while ((fFileSize / 1024) >= 1)
+		while ((sizeAsDouble / 1024) >= 1)
 		{
-			fFileSize /= 1024;
+			sizeAsDouble /= 1024;
 
-			iSizeIndex++;
+			sizeIndex++;
 		}
 
-		if (iSizeIndex > (SIZEOF_ARRAY(SIZE_STRINGS) - 1))
+		if (sizeIndex > (SIZEOF_ARRAY(SIZE_STRINGS) - 1))
 		{
-			StringCchCopy(pszFileSize, cchBuf, EMPTY_STRING);
-			return;
+			return {};
 		}
 	}
 
 	int iPrecision;
 
-	if (iSizeIndex == 0)
+	if (sizeIndex == 0)
 	{
 		iPrecision = 0;
 	}
 	else
 	{
-		if (fFileSize < 10)
+		if (sizeAsDouble < 10)
 		{
 			iPrecision = 2;
 		}
-		else if (fFileSize < 100)
+		else if (sizeAsDouble < 100)
 		{
 			iPrecision = 1;
 		}
@@ -96,67 +89,23 @@ void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize, size_t cchBu
 		}
 	}
 
-	int iLeast =
-		static_cast<int>((fFileSize - static_cast<int>(fFileSize)) * pow(10.0, iPrecision + 1));
+	int iLeast = static_cast<int>(
+		(sizeAsDouble - static_cast<int>(sizeAsDouble)) * pow(10.0, iPrecision + 1));
 
 	/* Setting the precision will cause automatic rounding. Therefore,
 	if the least significant digit to be dropped is greater than 0.5,
 	reduce it to below 0.5. */
 	if (iLeast >= 5)
 	{
-		fFileSize -= 5.0 * pow(10.0, -(iPrecision + 1));
+		sizeAsDouble -= 5.0 * pow(10.0, -(iPrecision + 1));
 	}
 
 	std::wstringstream ss;
 	ss.imbue(std::locale(""));
 	ss.precision(iPrecision);
 
-	ss << std::fixed << fFileSize << _T(" ") << SIZE_STRINGS[iSizeIndex];
-	std::wstring str = ss.str();
-	StringCchCopy(pszFileSize, cchBuf, str.c_str());
-}
-
-TCHAR *PrintComma(unsigned long nPrint)
-{
-	LARGE_INTEGER lPrint;
-
-	lPrint.LowPart = nPrint;
-	lPrint.HighPart = 0;
-
-	return PrintCommaLargeNum(lPrint);
-}
-
-TCHAR *PrintCommaLargeNum(LARGE_INTEGER lPrint)
-{
-	static TCHAR szBuffer[14];
-	TCHAR *p = &szBuffer[SIZEOF_ARRAY(szBuffer) - 1];
-	static TCHAR chComma = ',';
-	auto nTemp = (unsigned long long) (lPrint.LowPart + (lPrint.HighPart * pow(2.0, 32.0)));
-	int i = 0;
-
-	if (nTemp == 0)
-	{
-		StringCchPrintf(szBuffer, SIZEOF_ARRAY(szBuffer), _T("%d"), 0);
-		return szBuffer;
-	}
-
-	*p = (TCHAR) '\0';
-
-	while (nTemp != 0)
-	{
-		if (i % 3 == 0 && i != 0)
-		{
-			*--p = chComma;
-		}
-
-		*--p = '0' + (TCHAR) (nTemp % 10);
-
-		nTemp /= 10;
-
-		i++;
-	}
-
-	return p;
+	ss << std::fixed << sizeAsDouble << _T(" ") << SIZE_STRINGS[sizeIndex];
+	return ss.str();
 }
 
 BOOL CheckWildcardMatch(const TCHAR *szWildcard, const TCHAR *szString, BOOL bCaseSensitive)

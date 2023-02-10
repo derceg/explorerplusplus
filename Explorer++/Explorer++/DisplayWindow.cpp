@@ -63,18 +63,14 @@ void Explorerplusplus::UpdateDisplayWindowForZeroFiles(const Tab &tab)
 			DisplayWindow_BufferText(m_hDisplayWindow, szDisplay);
 		}
 
-		MEMORYSTATUSEX msex;
-		msex.dwLength = sizeof(msex);
-		GlobalMemoryStatusEx(&msex);
+		MEMORYSTATUSEX memoryStatus = {};
+		memoryStatus.dwLength = sizeof(memoryStatus);
+		GlobalMemoryStatusEx(&memoryStatus);
 
-		ULARGE_INTEGER lTotalPhysicalMem;
-		lTotalPhysicalMem.QuadPart = msex.ullTotalPhys;
-
-		TCHAR szMemorySize[32];
-		FormatSizeString(lTotalPhysicalMem, szMemorySize, SIZEOF_ARRAY(szMemorySize));
+		auto memorySizeText = FormatSizeString(memoryStatus.ullTotalPhys);
 		LoadString(m_resourceModule, IDS_GENERAL_DISPLAY_WINDOW_MEMORY, szTemp,
 			SIZEOF_ARRAY(szTemp));
-		StringCchPrintf(szDisplay, SIZEOF_ARRAY(szDisplay), szTemp, szMemorySize);
+		StringCchPrintf(szDisplay, SIZEOF_ARRAY(szDisplay), szTemp, memorySizeText.c_str());
 		DisplayWindow_BufferText(m_hDisplayWindow, szDisplay);
 	}
 	else
@@ -325,17 +321,16 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(const Tab &tab)
 
 				if (bRet)
 				{
-					TCHAR szSize[32];
-					FormatSizeString(ulTotalNumberOfFreeBytes, szSize, SIZEOF_ARRAY(szSize));
+					auto sizeText = FormatSizeString(ulTotalNumberOfFreeBytes.QuadPart);
 					LoadString(m_resourceModule, IDS_GENERAL_DISPLAY_WINDOW_FREE_SPACE, szTemp,
 						SIZEOF_ARRAY(szTemp));
-					StringCchPrintf(szMsg, SIZEOF_ARRAY(szMsg), szTemp, szSize);
+					StringCchPrintf(szMsg, SIZEOF_ARRAY(szMsg), szTemp, sizeText.c_str());
 					DisplayWindow_BufferText(m_hDisplayWindow, szMsg);
 
-					FormatSizeString(ulTotalNumberOfBytes, szSize, SIZEOF_ARRAY(szSize));
+					sizeText = FormatSizeString(ulTotalNumberOfBytes.QuadPart);
 					LoadString(m_resourceModule, IDS_GENERAL_DISPLAY_WINDOW_TOTAL_SIZE, szTemp,
 						SIZEOF_ARRAY(szTemp));
-					StringCchPrintf(szMsg, SIZEOF_ARRAY(szMsg), szTemp, szSize);
+					StringCchPrintf(szMsg, SIZEOF_ARRAY(szMsg), szTemp, sizeText.c_str());
 					DisplayWindow_BufferText(m_hDisplayWindow, szMsg);
 				}
 
@@ -359,17 +354,15 @@ void Explorerplusplus::UpdateDisplayWindowForMultipleFiles(const Tab &tab)
 {
 	TCHAR szNumSelected[64] = EMPTY_STRING;
 	TCHAR szTotalSize[64] = EMPTY_STRING;
-	TCHAR szTotalSizeFragment[32] = EMPTY_STRING;
 	TCHAR szMore[64];
 	TCHAR szTotalSizeString[64];
-	FolderInfo_t folderInfo;
 	int nSelected;
 
 	DisplayWindow_SetThumbnailFile(m_hDisplayWindow, EMPTY_STRING, FALSE);
 
 	nSelected = tab.GetShellBrowser()->GetNumSelected();
 
-	LoadString(m_resourceModule, IDS_GENERAL_SELECTED_MOREITEMS, szMore, SIZEOF_ARRAY(szMore));
+	LoadString(m_resourceModule, IDS_GENERAL_SELECTED_MULTIPLE_ITEMS, szMore, SIZEOF_ARRAY(szMore));
 
 	StringCchPrintf(szNumSelected, SIZEOF_ARRAY(szNumSelected), _T("%d %s"), nSelected, szMore);
 
@@ -377,17 +370,17 @@ void Explorerplusplus::UpdateDisplayWindowForMultipleFiles(const Tab &tab)
 
 	if (!tab.GetShellBrowser()->InVirtualFolder())
 	{
-		tab.GetShellBrowser()->GetFolderInfo(&folderInfo);
-
-		FormatSizeString(folderInfo.TotalSelectionSize, szTotalSizeFragment,
-			SIZEOF_ARRAY(szTotalSizeFragment), m_config->globalFolderSettings.forceSize,
-			m_config->globalFolderSettings.sizeDisplayFormat);
+		uint64_t selectionSize = tab.GetShellBrowser()->GetSelectionSize();
+		SizeDisplayFormat displayFormat = m_config->globalFolderSettings.forceSize
+			? m_config->globalFolderSettings.sizeDisplayFormat
+			: SizeDisplayFormat::None;
+		auto selectionSizeText = FormatSizeString(selectionSize, displayFormat);
 
 		LoadString(m_resourceModule, IDS_GENERAL_TOTALFILESIZE, szTotalSizeString,
 			SIZEOF_ARRAY(szTotalSizeString));
 
 		StringCchPrintf(szTotalSize, SIZEOF_ARRAY(szTotalSize), _T("%s: %s"), szTotalSizeString,
-			szTotalSizeFragment);
+			selectionSizeText.c_str());
 	}
 
 	DisplayWindow_BufferText(m_hDisplayWindow, szTotalSize);

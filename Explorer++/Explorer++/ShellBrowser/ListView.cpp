@@ -186,6 +186,9 @@ LRESULT CALLBACK ShellBrowser::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM w
 			case LVN_GETINFOTIP:
 				return OnListViewGetInfoTip(reinterpret_cast<NMLVGETINFOTIP *>(lParam));
 
+			case LVN_GETEMPTYMARKUP:
+				return OnListViewGetEmptyMarkup(reinterpret_cast<NMLVEMPTYMARKUP *>(lParam));
+
 			case LVN_INSERTITEM:
 				OnListViewItemInserted(reinterpret_cast<NMLISTVIEW *>(lParam));
 				break;
@@ -449,6 +452,16 @@ LRESULT ShellBrowser::OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip)
 	return 0;
 }
 
+BOOL ShellBrowser::OnListViewGetEmptyMarkup(NMLVEMPTYMARKUP *emptyMarkup)
+{
+	emptyMarkup->dwFlags = EMF_CENTERED;
+
+	auto folderEmptyText = ResourceHelper::LoadString(m_hResourceModule, IDS_LISTVIEW_FOLDER_EMPTY);
+	StringCchCopy(emptyMarkup->szMarkup, std::size(emptyMarkup->szMarkup), folderEmptyText.c_str());
+
+	return TRUE;
+}
+
 void ShellBrowser::QueueInfoTipTask(int internalIndex, const std::wstring &existingInfoTip)
 {
 	int infoTipResultId = m_infoTipResultIDCounter++;
@@ -637,7 +650,7 @@ void ShellBrowser::UpdateFileSelectionInfo(int internalIndex, BOOL selected)
 			m_directoryState.numFilesSelected++;
 		}
 
-		m_directoryState.fileSelectionSize.QuadPart += ulFileSize.QuadPart;
+		m_directoryState.fileSelectionSize += ulFileSize.QuadPart;
 	}
 	else
 	{
@@ -650,7 +663,7 @@ void ShellBrowser::UpdateFileSelectionInfo(int internalIndex, BOOL selected)
 			m_directoryState.numFilesSelected--;
 		}
 
-		m_directoryState.fileSelectionSize.QuadPart -= ulFileSize.QuadPart;
+		m_directoryState.fileSelectionSize -= ulFileSize.QuadPart;
 	}
 }
 

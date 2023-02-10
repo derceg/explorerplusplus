@@ -187,11 +187,6 @@ void ShellBrowser::InitializeListView()
 	ListViewHelper::SetAutoArrange(m_hListView, m_folderSettings.autoArrange);
 	ListViewHelper::SetGridlines(m_hListView, m_config->globalFolderSettings.showGridlines);
 
-	if (m_folderSettings.applyFilter)
-	{
-		ListViewHelper::SetBackgroundImage(m_hListView, IDB_FILTERINGAPPLIED);
-	}
-
 	ListViewHelper::ActivateOneClickSelect(m_hListView,
 		m_config->globalFolderSettings.oneClickActivate,
 		m_config->globalFolderSettings.oneClickActivateHoverTime);
@@ -929,10 +924,16 @@ int ShellBrowser::GetNumSelected() const
 	return m_directoryState.numFilesSelected + m_directoryState.numFoldersSelected;
 }
 
-void ShellBrowser::GetFolderInfo(FolderInfo_t *pFolderInfo)
+// Returns the total size of the items in the current directory (not including any sub-directories).
+uint64_t ShellBrowser::GetTotalDirectorySize()
 {
-	pFolderInfo->TotalFolderSize.QuadPart = m_directoryState.totalDirSize.QuadPart;
-	pFolderInfo->TotalSelectionSize.QuadPart = m_directoryState.fileSelectionSize.QuadPart;
+	return m_directoryState.totalDirSize;
+}
+
+// Returns the size of the currently selected items.
+uint64_t ShellBrowser::GetSelectionSize()
+{
+	return m_directoryState.fileSelectionSize;
 }
 
 void ShellBrowser::VerifySortMode()
