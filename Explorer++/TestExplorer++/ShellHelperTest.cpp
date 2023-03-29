@@ -97,6 +97,10 @@ TEST_F(TransformPathTest, AbsolutePath)
 
 	// A shell folder path.
 	PerformTest(L"shell:downloads", currentDirectory, L"shell:downloads");
+
+	// Paths that are separated by forward slashes, rather than backslashes.
+	PerformTest(L"c:/users/public", currentDirectory, L"c:\\users\\public");
+	PerformTest(L"\\nested/directory", L"d:\\path\\to\\item", L"d:\\nested\\directory");
 }
 
 TEST_F(TransformPathTest, RelativePath)
@@ -108,6 +112,8 @@ TEST_F(TransformPathTest, RelativePath)
 	PerformTest(L".\\path\\to\\nested\\directory", currentDirectory,
 		L"c:\\windows\\path\\to\\nested\\directory");
 	PerformTest(L"..\\users\\public", currentDirectory, L"c:\\users\\public");
+	PerformTest(L"./system32/drivers", currentDirectory, L"c:\\windows\\system32\\drivers");
+	PerformTest(L"../users/default", currentDirectory, L"c:\\users\\default");
 }
 
 TEST_F(TransformPathTest, Normalization)

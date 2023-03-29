@@ -705,6 +705,10 @@ std::optional<std::wstring> TransformUserEnteredPathToAbsolutePath(
 		}
 	}
 
+	// '/' characters aren't valid filename characters, so it should be safe to transform them into
+	// '\' characters. This allows paths like "c:/users" to be supported.
+	std::replace(updatedPath.begin(), updatedPath.end(), '/', '\\');
+
 	if (IsPathGUID(updatedPath) || !PathIsRelative(updatedPath.c_str()))
 	{
 		// Absolute paths can be returned unmodified, except for the case where a root path like
