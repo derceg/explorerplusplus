@@ -655,6 +655,16 @@ boost::signals2::connection Explorerplusplus::AddApplicationShuttingDownObserver
 int Explorerplusplus::OnDestroy()
 {
 	m_applicationShuttingDownSignal();
+	m_applicationShuttingDown = true;
+
+	// Broadcasting focus changed events during shutdown is both unnecessary and unsafe. It's
+	// unsafe, because guarantees that are normally upheld while the application is running won't
+	// necessarily be upheld while the application is shutting down. For example, normally there
+	// should always be at least one tab. During shutdown, the tab container will be destroyed, so
+	// the assumption that there is at least a single tab won't necessarily hold.
+	// Therefore, all slots are disconnected here, as focus changes during shutdown aren't
+	// meaningful anyway.
+	m_focusChangedSignal.disconnect_all_slots();
 
 	if (m_SHChangeNotifyID != 0)
 	{
@@ -1413,6 +1423,11 @@ void Explorerplusplus::FocusChanged(WindowFocusSource windowFocusSource)
 boost::signals2::connection Explorerplusplus::AddFocusChangeObserver(
 	const FocusChangedSignal::slot_type &observer)
 {
+	if (m_applicationShuttingDown)
+	{
+		throw std::runtime_error("Adding a focus changed observer during shutdown is unsafe");
+	}
+
 	return m_focusChangedSignal.connect(observer);
 }
 

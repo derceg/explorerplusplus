@@ -581,6 +581,7 @@ private:
 	MainMenuPreShowSignal m_mainMenuPreShowSignal;
 	FocusChangedSignal m_focusChangedSignal;
 	ApplicationShuttingDownSignal m_applicationShuttingDownSignal;
+	bool m_applicationShuttingDown = false;
 
 	/* Tabs. */
 	TabContainer *m_tabContainer;
