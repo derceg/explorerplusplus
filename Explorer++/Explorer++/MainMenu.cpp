@@ -8,6 +8,7 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/resource.h>
 #include <map>
@@ -71,17 +72,7 @@ void Explorerplusplus::InitializeMainMenu()
 
 	SetMainMenuImages();
 
-	SetGoMenuName(mainMenu, IDM_GO_MYCOMPUTER, CSIDL_DRIVES);
-	SetGoMenuName(mainMenu, IDM_GO_MYDOCUMENTS, CSIDL_PERSONAL);
-	SetGoMenuName(mainMenu, IDM_GO_MYMUSIC, CSIDL_MYMUSIC);
-	SetGoMenuName(mainMenu, IDM_GO_MYPICTURES, CSIDL_MYPICTURES);
-	SetGoMenuName(mainMenu, IDM_GO_DESKTOP, CSIDL_DESKTOP);
-	SetGoMenuName(mainMenu, IDM_GO_RECYCLEBIN, CSIDL_BITBUCKET);
-	SetGoMenuName(mainMenu, IDM_GO_CONTROLPANEL, CSIDL_CONTROLS);
-	SetGoMenuName(mainMenu, IDM_GO_PRINTERS, CSIDL_PRINTERS);
-	SetGoMenuName(mainMenu, IDM_GO_CDBURNING, CSIDL_CDBURN_AREA);
-	SetGoMenuName(mainMenu, IDM_GO_MYNETWORKPLACES, CSIDL_NETWORK);
-	SetGoMenuName(mainMenu, IDM_GO_NETWORKCONNECTIONS, CSIDL_CONNECTIONS);
+	InitializeGoMenu(mainMenu);
 }
 
 void Explorerplusplus::SetMainMenuImages()
@@ -96,30 +87,57 @@ void Explorerplusplus::SetMainMenuImages()
 	}
 }
 
-void Explorerplusplus::SetGoMenuName(HMENU hMenu, UINT uMenuID, UINT csidl)
+void Explorerplusplus::InitializeGoMenu(HMENU mainMenu)
+{
+	// This is a bit indirect, but it's better than using something like GetSubMenu(), which would
+	// rely on the "Go" menu remaining in a fixed position.
+	HMENU goMenu = MenuHelper::FindParentMenu(mainMenu, IDM_GO_BACK);
+	assert(goMenu);
+
+	MenuHelper::AddSeparator(goMenu);
+
+	AddGoMenuItem(goMenu, IDM_GO_MYCOMPUTER, FOLDERID_ComputerFolder);
+	AddGoMenuItem(goMenu, IDM_GO_MYDOCUMENTS, FOLDERID_Documents);
+	AddGoMenuItem(goMenu, IDM_GO_MYMUSIC, FOLDERID_Music);
+	AddGoMenuItem(goMenu, IDM_GO_MYPICTURES, FOLDERID_Pictures);
+	AddGoMenuItem(goMenu, IDM_GO_DESKTOP, FOLDERID_Desktop);
+
+	MenuHelper::AddSeparator(goMenu);
+
+	AddGoMenuItem(goMenu, IDM_GO_RECYCLEBIN, FOLDERID_RecycleBinFolder);
+	AddGoMenuItem(goMenu, IDM_GO_CONTROLPANEL, FOLDERID_ControlPanelFolder);
+	AddGoMenuItem(goMenu, IDM_GO_PRINTERS, FOLDERID_PrintersFolder);
+	AddGoMenuItem(goMenu, IDM_GO_CDBURNING, FOLDERID_CDBurning);
+	AddGoMenuItem(goMenu, IDM_GO_MYNETWORKPLACES, FOLDERID_NetworkFolder);
+	AddGoMenuItem(goMenu, IDM_GO_NETWORKCONNECTIONS, FOLDERID_ConnectionsFolder);
+
+	MenuHelper::RemoveTrailingSeparators(goMenu);
+}
+
+void Explorerplusplus::AddGoMenuItem(HMENU goMenu, UINT id, const KNOWNFOLDERID &folderId)
 {
 	unique_pidl_absolute pidl;
-	HRESULT hr = SHGetFolderLocation(nullptr, csidl, nullptr, 0, wil::out_param(pidl));
+	HRESULT hr = SHGetKnownFolderIDList(folderId, KF_FLAG_DEFAULT, nullptr, wil::out_param(pidl));
 
-	/* Don't use SUCCEEDED(hr). */
-	if (hr == S_OK)
+	if (FAILED(hr))
 	{
-		std::wstring folderName;
-		hr = GetDisplayName(pidl.get(), SHGDN_INFOLDER, folderName);
-
-		if (SUCCEEDED(hr))
-		{
-			MENUITEMINFO mii;
-			mii.cbSize = sizeof(mii);
-			mii.fMask = MIIM_STRING;
-			mii.dwTypeData = folderName.data();
-			SetMenuItemInfo(hMenu, uMenuID, FALSE, &mii);
-
-			return;
-		}
+		return;
 	}
 
-	DeleteMenu(hMenu, uMenuID, MF_BYCOMMAND);
+	AddGoMenuItem(goMenu, id, pidl.get());
+}
+
+void Explorerplusplus::AddGoMenuItem(HMENU goMenu, UINT id, PCIDLIST_ABSOLUTE pidl)
+{
+	std::wstring folderName;
+	HRESULT hr = GetDisplayName(pidl, SHGDN_INFOLDER, folderName);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	MenuHelper::AddStringItem(goMenu, id, folderName);
 }
 
 boost::signals2::connection Explorerplusplus::AddMainMenuPreShowObserver(

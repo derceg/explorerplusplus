@@ -144,4 +144,33 @@ void RemoveTrailingSeparators(HMENU menu)
 	}
 }
 
+HMENU FindParentMenu(HMENU menu, UINT id)
+{
+	int numItems = GetMenuItemCount(menu);
+
+	for (int i = 0; i < numItems; i++)
+	{
+		UINT currentId = GetMenuItemID(menu, i);
+
+		if (currentId != -1 && currentId == id)
+		{
+			return menu;
+		}
+
+		HMENU subMenu = GetSubMenu(menu, i);
+
+		if (subMenu)
+		{
+			HMENU parentMenu = FindParentMenu(subMenu, id);
+
+			if (parentMenu)
+			{
+				return parentMenu;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
 }

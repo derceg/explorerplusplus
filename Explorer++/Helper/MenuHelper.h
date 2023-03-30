@@ -26,4 +26,6 @@ void SetMenuStyle(HMENU menu, DWORD style);
 void RemoveDuplicateSeperators(HMENU menu);
 void RemoveTrailingSeparators(HMENU menu);
 
+HMENU FindParentMenu(HMENU menu, UINT id);
+
 }

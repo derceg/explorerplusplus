@@ -511,8 +511,10 @@ private:
 
 	/* Menus. */
 	void InitializeMainMenu();
-	void SetGoMenuName(HMENU hMenu, UINT uMenuID, UINT csidl);
 	void SetMainMenuImages();
+	void InitializeGoMenu(HMENU mainMenu);
+	void AddGoMenuItem(HMENU goMenu, UINT id, const KNOWNFOLDERID &folderId);
+	void AddGoMenuItem(HMENU goMenu, UINT id, PCIDLIST_ABSOLUTE pidl);
 	boost::signals2::connection AddMainMenuPreShowObserver(
 		const MainMenuPreShowSignal::slot_type &observer) override;
 	wil::unique_hmenu BuildViewsMenu() override;
