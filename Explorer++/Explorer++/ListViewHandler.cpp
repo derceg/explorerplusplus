@@ -289,7 +289,7 @@ void Explorerplusplus::OnListViewBackgroundRClickWindows8OrGreater(POINT *pCurso
 
 	auto serviceProvider = winrt::make_self<ServiceProvider>();
 
-	auto newMenuClient = winrt::make<NewMenuClient>(this);
+	auto newMenuClient = winrt::make<NewMenuClient>(selectedTab.GetShellBrowser());
 	serviceProvider->RegisterService(IID_INewMenuClient, newMenuClient.get());
 
 	winrt::com_ptr<IFolderView2> folderView =
@@ -308,7 +308,8 @@ void Explorerplusplus::OnListViewBackgroundRClickWindows7(POINT *pCursorPos)
 	auto parentMenu = InitializeRightClickMenu();
 	HMENU menu = GetSubMenu(parentMenu.get(), 0);
 
-	auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
+	const auto &selectedTab = m_tabContainer->GetSelectedTab();
+	auto pidlDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
 
 	unique_pidl_absolute pidlParent(ILCloneFull(pidlDirectory.get()));
 	ILRemoveLastID(pidlParent.get());
@@ -333,7 +334,7 @@ void Explorerplusplus::OnListViewBackgroundRClickWindows7(POINT *pCursorPos)
 
 	auto serviceProvider = winrt::make_self<ServiceProvider>();
 
-	auto newMenuClient = winrt::make<NewMenuClient>(this);
+	auto newMenuClient = winrt::make<NewMenuClient>(selectedTab.GetShellBrowser());
 	serviceProvider->RegisterService(IID_INewMenuClient, newMenuClient.get());
 
 	ContextMenuManager cmm(ContextMenuManager::ContextMenuType::Background, pidlDirectory.get(),

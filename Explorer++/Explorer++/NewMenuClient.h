@@ -7,12 +7,12 @@
 #include "../Helper/WinRTBaseWrapper.h"
 #include <ShObjIdl.h>
 
-class CoreInterface;
+class ShellBrowser;
 
 class NewMenuClient : public winrt::implements<NewMenuClient, INewMenuClient>
 {
 public:
-	NewMenuClient(CoreInterface *coreInterface);
+	NewMenuClient(ShellBrowser *shellBrowser);
 
 	// INewMenuClient
 	IFACEMETHODIMP IncludeItems(NMCII_FLAGS *flags);
@@ -22,5 +22,5 @@ private:
 	// From testing, this value is sent on Windows 10 when an item needs to be put into rename mode.
 	static const int NMCSAEI_EDIT_WINDOWS_10 = 0x0003;
 
-	CoreInterface *m_coreInterface;
+	ShellBrowser *m_shellBrowser;
 };

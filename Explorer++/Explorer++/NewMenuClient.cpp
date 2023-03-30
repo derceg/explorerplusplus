@@ -4,11 +4,10 @@
 
 #include "stdafx.h"
 #include "NewMenuClient.h"
-#include "CoreInterface.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/Logging.h"
 
-NewMenuClient::NewMenuClient(CoreInterface *coreInterface) : m_coreInterface(coreInterface)
+NewMenuClient::NewMenuClient(ShellBrowser *shellBrowser) : m_shellBrowser(shellBrowser)
 {
 }
 
@@ -42,7 +41,7 @@ IFACEMETHODIMP NewMenuClient::SelectAndEditItem(PCIDLIST_ABSOLUTE pidlItem, NMCS
 	case NMCSAEI_EDIT:
 	case NMCSAEI_EDIT_WINDOWS_10:
 		LOG(info) << _T("Starting in-place rename of item created via new menu");
-		m_coreInterface->GetActiveShellBrowser()->QueueRename(pidlItem);
+		m_shellBrowser->QueueRename(pidlItem);
 		break;
 	}
 
