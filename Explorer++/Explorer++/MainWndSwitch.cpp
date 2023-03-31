@@ -1198,31 +1198,43 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		OnNavigateUp();
 		break;
 
-	case IDM_GO_MYCOMPUTER:
+	case IDM_GO_QUICK_ACCESS:
+		OnGoToPath(QUICK_ACCESS_PATH);
+		break;
+
+	case IDM_GO_COMPUTER:
 		OnGoToKnownFolder(FOLDERID_ComputerFolder);
 		break;
 
-	case IDM_GO_MYDOCUMENTS:
+	case IDM_GO_DOCUMENTS:
 		OnGoToKnownFolder(FOLDERID_Documents);
 		break;
 
-	case IDM_GO_MYMUSIC:
+	case IDM_GO_DOWNLOADS:
+		OnGoToKnownFolder(FOLDERID_Downloads);
+		break;
+
+	case IDM_GO_MUSIC:
 		OnGoToKnownFolder(FOLDERID_Music);
 		break;
 
-	case IDM_GO_MYPICTURES:
+	case IDM_GO_PICTURES:
 		OnGoToKnownFolder(FOLDERID_Pictures);
+		break;
+
+	case IDM_GO_VIDEOS:
+		OnGoToKnownFolder(FOLDERID_Videos);
 		break;
 
 	case IDM_GO_DESKTOP:
 		OnGoToKnownFolder(FOLDERID_Desktop);
 		break;
 
-	case IDM_GO_RECYCLEBIN:
+	case IDM_GO_RECYCLE_BIN:
 		OnGoToKnownFolder(FOLDERID_RecycleBinFolder);
 		break;
 
-	case IDM_GO_CONTROLPANEL:
+	case IDM_GO_CONTROL_PANEL:
 		OnGoToKnownFolder(FOLDERID_ControlPanelFolder);
 		break;
 
@@ -1230,16 +1242,12 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		OnGoToKnownFolder(FOLDERID_PrintersFolder);
 		break;
 
-	case IDM_GO_CDBURNING:
-		OnGoToKnownFolder(FOLDERID_CDBurning);
-		break;
-
-	case IDM_GO_MYNETWORKPLACES:
+	case IDM_GO_NETWORK:
 		OnGoToKnownFolder(FOLDERID_NetworkFolder);
 		break;
 
-	case IDM_GO_NETWORKCONNECTIONS:
-		OnGoToKnownFolder(FOLDERID_ConnectionsFolder);
+	case IDM_GO_WSL_DISTRIBUTIONS:
+		OnGoToPath(WSL_DISTRIBUTIONS_PATH);
 		break;
 
 	case MainToolbarButton::AddBookmark:

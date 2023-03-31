@@ -96,20 +96,29 @@ void Explorerplusplus::InitializeGoMenu(HMENU mainMenu)
 
 	MenuHelper::AddSeparator(goMenu);
 
-	AddGoMenuItem(goMenu, IDM_GO_MYCOMPUTER, FOLDERID_ComputerFolder);
-	AddGoMenuItem(goMenu, IDM_GO_MYDOCUMENTS, FOLDERID_Documents);
-	AddGoMenuItem(goMenu, IDM_GO_MYMUSIC, FOLDERID_Music);
-	AddGoMenuItem(goMenu, IDM_GO_MYPICTURES, FOLDERID_Pictures);
+	// This is the quick access/home folder in Windows 10/11.
+	AddGoMenuItem(goMenu, IDM_GO_QUICK_ACCESS, QUICK_ACCESS_PATH);
+	AddGoMenuItem(goMenu, IDM_GO_COMPUTER, FOLDERID_ComputerFolder);
+
+	MenuHelper::AddSeparator(goMenu);
+
+	AddGoMenuItem(goMenu, IDM_GO_DOCUMENTS, FOLDERID_Documents);
+	AddGoMenuItem(goMenu, IDM_GO_DOWNLOADS, FOLDERID_Downloads);
+	AddGoMenuItem(goMenu, IDM_GO_MUSIC, FOLDERID_Music);
+	AddGoMenuItem(goMenu, IDM_GO_PICTURES, FOLDERID_Pictures);
+	AddGoMenuItem(goMenu, IDM_GO_VIDEOS, FOLDERID_Videos);
 	AddGoMenuItem(goMenu, IDM_GO_DESKTOP, FOLDERID_Desktop);
 
 	MenuHelper::AddSeparator(goMenu);
 
-	AddGoMenuItem(goMenu, IDM_GO_RECYCLEBIN, FOLDERID_RecycleBinFolder);
-	AddGoMenuItem(goMenu, IDM_GO_CONTROLPANEL, FOLDERID_ControlPanelFolder);
+	AddGoMenuItem(goMenu, IDM_GO_RECYCLE_BIN, FOLDERID_RecycleBinFolder);
+	AddGoMenuItem(goMenu, IDM_GO_CONTROL_PANEL, FOLDERID_ControlPanelFolder);
 	AddGoMenuItem(goMenu, IDM_GO_PRINTERS, FOLDERID_PrintersFolder);
-	AddGoMenuItem(goMenu, IDM_GO_CDBURNING, FOLDERID_CDBurning);
-	AddGoMenuItem(goMenu, IDM_GO_MYNETWORKPLACES, FOLDERID_NetworkFolder);
-	AddGoMenuItem(goMenu, IDM_GO_NETWORKCONNECTIONS, FOLDERID_ConnectionsFolder);
+	AddGoMenuItem(goMenu, IDM_GO_NETWORK, FOLDERID_NetworkFolder);
+
+	MenuHelper::AddSeparator(goMenu);
+
+	AddGoMenuItem(goMenu, IDM_GO_WSL_DISTRIBUTIONS, WSL_DISTRIBUTIONS_PATH);
 
 	MenuHelper::RemoveTrailingSeparators(goMenu);
 }
@@ -118,6 +127,19 @@ void Explorerplusplus::AddGoMenuItem(HMENU goMenu, UINT id, const KNOWNFOLDERID 
 {
 	unique_pidl_absolute pidl;
 	HRESULT hr = SHGetKnownFolderIDList(folderId, KF_FLAG_DEFAULT, nullptr, wil::out_param(pidl));
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	AddGoMenuItem(goMenu, id, pidl.get());
+}
+
+void Explorerplusplus::AddGoMenuItem(HMENU goMenu, UINT id, const std::wstring &path)
+{
+	unique_pidl_absolute pidl;
+	HRESULT hr = SHParseDisplayName(path.c_str(), nullptr, wil::out_param(pidl), 0, nullptr);
 
 	if (FAILED(hr))
 	{

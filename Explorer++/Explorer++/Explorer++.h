@@ -239,6 +239,8 @@ private:
 	HRESULT OnGoToOffset(int offset);
 	HRESULT OnGoHome();
 	HRESULT OnGoToKnownFolder(REFKNOWNFOLDERID knownFolderId);
+	HRESULT OnGoToPath(const std::wstring &path);
+	HRESULT GoToPidl(PCIDLIST_ABSOLUTE pidl);
 
 	int HighlightSimilarFiles(HWND ListView) const;
 
@@ -514,6 +516,7 @@ private:
 	void SetMainMenuImages();
 	void InitializeGoMenu(HMENU mainMenu);
 	void AddGoMenuItem(HMENU goMenu, UINT id, const KNOWNFOLDERID &folderId);
+	void AddGoMenuItem(HMENU goMenu, UINT id, const std::wstring &path);
 	void AddGoMenuItem(HMENU goMenu, UINT id, PCIDLIST_ABSOLUTE pidl);
 	boost::signals2::connection AddMainMenuPreShowObserver(
 		const MainMenuPreShowSignal::slot_type &observer) override;

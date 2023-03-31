@@ -328,8 +328,26 @@ HRESULT Explorerplusplus::OnGoToKnownFolder(REFKNOWNFOLDERID knownFolderId)
 		return hr;
 	}
 
+	return GoToPidl(pidl.get());
+}
+
+HRESULT Explorerplusplus::OnGoToPath(const std::wstring &path)
+{
+	unique_pidl_absolute pidl;
+	HRESULT hr = SHParseDisplayName(path.c_str(), nullptr, wil::out_param(pidl), 0, nullptr);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	return GoToPidl(pidl.get());
+}
+
+HRESULT Explorerplusplus::GoToPidl(PCIDLIST_ABSOLUTE pidl)
+{
 	Tab &selectedTab = m_tabContainer->GetSelectedTab();
-	return selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(pidl.get());
+	return selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(pidl);
 }
 
 HRESULT Explorerplusplus::OnGoHome()

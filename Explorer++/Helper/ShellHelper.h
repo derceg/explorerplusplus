@@ -21,6 +21,12 @@
 #define FRIENDLY_NAME_VIDEOS _T("Videos")
 #define FRIENDLY_NAME_DOCUMENTS _T("Documents")
 
+// The path to the quick access/home folder in Windows 10/11.
+static inline const WCHAR QUICK_ACCESS_PATH[] = L"shell:::{679f85cb-0220-4080-b29b-5540cc05aab6}";
+
+// The path to the Linux distributions folder.
+static inline const WCHAR WSL_DISTRIBUTIONS_PATH[] = L"\\\\wsl$";
+
 /* See: http://msdn.microsoft.com/en-us/library/bb776902(v=VS.85).aspx#CFSTR_SHELLIDLIST */
 #define HIDA_GetPIDLFolder(pida) (PCIDLIST_ABSOLUTE)(((LPBYTE) pida) + (pida)->aoffset[0])
 #define HIDA_GetPIDLItem(pida, i) (PCIDLIST_RELATIVE)(((LPBYTE) pida) + (pida)->aoffset[i + 1])
