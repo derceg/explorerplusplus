@@ -85,7 +85,7 @@ protected:
 
 	INT_PTR OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
-	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
+	wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 
 private:
 	enum class SizeType
