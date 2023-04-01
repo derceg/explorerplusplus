@@ -9,11 +9,7 @@
 #include "ReferenceCount.h"
 #include "ResizableDialog.h"
 #include <wil/resource.h>
-
-__interface IModelessDialogNotification : public IReferenceCount
-{
-	void OnModelessDialogDestroy(int iResource);
-};
+#include <functional>
 
 /* Provides a degree of abstraction off a standard dialog.
 For instance, provides the ability for a class to manage
@@ -37,7 +33,7 @@ public:
 	virtual ~BaseDialog() = default;
 
 	INT_PTR ShowModalDialog();
-	HWND ShowModelessDialog(IModelessDialogNotification *pmdn = nullptr);
+	HWND ShowModelessDialog(std::function<void()> dialogDestroyedObserver);
 
 protected:
 	BaseDialog(HINSTANCE hInstance, int iResource, HWND hParent, bool bResizable);
@@ -68,11 +64,11 @@ private:
 	const HINSTANCE m_hInstance;
 	const int m_iResource;
 	const HWND m_hParent;
-	IModelessDialogNotification *m_pmdn;
+	std::function<void()> m_modelessDialogDestroyedObserver;
 
 	wil::unique_hicon m_icon;
 
-	BOOL m_bShowingModelessDialog;
+	bool m_showingModelessDialog = false;
 
 	/* Used only with resizable dialogs. */
 	const bool m_bResizable;

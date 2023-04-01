@@ -18,6 +18,7 @@ protected:
 
 	void AllowDarkModeForControls(const std::vector<int> &controlIds);
 	void AllowDarkModeForListView(int controlId);
+	void AllowDarkModeForTreeView(int controlId);
 	void AllowDarkModeForCheckboxes(const std::vector<int> &controlIds);
 	void AllowDarkModeForRadioButtons(const std::vector<int> &controlIds);
 	void AllowDarkModeForGroupBoxes(const std::vector<int> &controlIds);

@@ -19,7 +19,6 @@
 #include "DrivesToolbarView.h"
 #include "Explorer++_internal.h"
 #include "HolderWindow.h"
-#include "IModelessDialogNotification.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
 #include "MainToolbarButtons.h"
@@ -1266,8 +1265,11 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		{
 			auto *pManageBookmarksDialog = new ManageBookmarksDialog(m_resourceModule, hwnd, this,
 				this, &m_bookmarkIconFetcher, &m_bookmarkTree);
-			g_hwndManageBookmarks =
-				pManageBookmarksDialog->ShowModelessDialog(new ModelessDialogNotification());
+			g_hwndManageBookmarks = pManageBookmarksDialog->ShowModelessDialog(
+				[]()
+				{
+					g_hwndManageBookmarks = nullptr;
+				});
 		}
 		else
 		{

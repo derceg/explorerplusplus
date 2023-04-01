@@ -13,7 +13,6 @@
 #include "FileProgressSink.h"
 #include "FilterDialog.h"
 #include "HelpFileMissingDialog.h"
-#include "IModelessDialogNotification.h"
 #include "MainResource.h"
 #include "MergeFilesDialog.h"
 #include "ModelessDialogs.h"
@@ -107,7 +106,11 @@ void Explorerplusplus::OnSearch()
 
 		auto *searchDialog = new SearchDialog(m_resourceModule, m_hContainer, currentDirectory,
 			this, this, m_tabContainer);
-		g_hwndSearch = searchDialog->ShowModelessDialog(new ModelessDialogNotification());
+		g_hwndSearch = searchDialog->ShowModelessDialog(
+			[]()
+			{
+				g_hwndSearch = nullptr;
+			});
 	}
 	else
 	{
@@ -131,7 +134,11 @@ void Explorerplusplus::OnRunScript()
 	if (g_hwndRunScript == nullptr)
 	{
 		auto *scriptingDialog = new ScriptingDialog(m_resourceModule, m_hContainer, this);
-		g_hwndRunScript = scriptingDialog->ShowModelessDialog(new ModelessDialogNotification());
+		g_hwndRunScript = scriptingDialog->ShowModelessDialog(
+			[]()
+			{
+				g_hwndRunScript = nullptr;
+			});
 	}
 	else
 	{
@@ -143,9 +150,13 @@ void Explorerplusplus::OnShowOptions()
 {
 	if (g_hwndOptions == nullptr)
 	{
-		OptionsDialog *optionsDialog =
-			OptionsDialog::Create(m_config, m_resourceModule, this, m_tabContainer);
-		g_hwndOptions = optionsDialog->Show(m_hContainer);
+		auto *optionsDialog =
+			new OptionsDialog(m_resourceModule, m_hContainer, m_config, this, m_tabContainer);
+		g_hwndOptions = optionsDialog->ShowModelessDialog(
+			[]()
+			{
+				g_hwndOptions = nullptr;
+			});
 	}
 	else
 	{

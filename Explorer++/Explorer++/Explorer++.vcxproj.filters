@@ -25,9 +25,6 @@
     <ClCompile Include="DialogHelper.cpp">
       <Filter>Dialog Support</Filter>
     </ClCompile>
-    <ClCompile Include="IModelessDialogNotification.cpp">
-      <Filter>Dialog Support</Filter>
-    </ClCompile>
     <ClCompile Include="AboutDialog.cpp">
       <Filter>General Dialogs</Filter>
     </ClCompile>
@@ -536,9 +533,6 @@
     </ClInclude>
     <ClInclude Include="IDropFilesCallback.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="IModelessDialogNotification.h">
-      <Filter>Dialog Support</Filter>
     </ClInclude>
     <ClInclude Include="MassRenameDialog.h">
       <Filter>General Dialogs</Filter>

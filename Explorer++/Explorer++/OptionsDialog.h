@@ -5,26 +5,28 @@
 #pragma once
 
 #include "Config.h"
+#include "DarkModeDialogBase.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <wil/resource.h>
+#include <optional>
+#include <unordered_map>
 
 class CoreInterface;
 class DarkModeGroupBox;
 class TabContainer;
 
-class OptionsDialog
+class OptionsDialog : public DarkModeDialogBase
 {
 public:
-	static OptionsDialog *Create(std::shared_ptr<Config> config, HINSTANCE instance,
+	OptionsDialog(HINSTANCE instance, HWND parent, std::shared_ptr<Config> config,
 		CoreInterface *coreInterface, TabContainer *tabContainer);
 
-	HWND Show(HWND parentWindow);
-
 private:
-	struct OptionsDialogSheetInfo
+	struct PageInfo
 	{
-		UINT resourceId;
-		DLGPROC dlgProc;
+		UINT dialogResourceId;
+		UINT titleResourceId;
+		DLGPROC dialogProc;
 	};
 
 	enum class AdvancedOptionId
@@ -47,22 +49,34 @@ private:
 		std::wstring description;
 	};
 
-	static const OptionsDialogSheetInfo OPTIONS_DIALOG_SHEETS[];
+	static const PageInfo SETTINGS_PAGES[];
 
-	OptionsDialog(std::shared_ptr<Config> config, HINSTANCE instance, CoreInterface *coreInterface,
-		TabContainer *tabContainer);
-	~OptionsDialog() = default;
+	// The amount of horizontal spacing between the treeview and each page.
+	static constexpr int TREEVIEW_PAGE_HORIZONTAL_SPACING = 4;
 
-	PROPSHEETPAGE GeneratePropertySheetDefinition(const OptionsDialogSheetInfo &sheetInfo);
+	static constexpr UINT WM_APP_SAVE_SETTINGS = WM_APP + 1;
 
-	static int CALLBACK PropertySheetCallback(HWND dialog, UINT msg, LPARAM lParam);
-	static void OnPropertySheetInitialized(HWND dialog);
+	INT_PTR OnInitDialog() override;
+	wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
+	void AddSettingsPages();
+	void AddSettingsPage(UINT dialogResourceId, UINT titleResourceId, int pageIndex,
+		DLGPROC dialogProc, LPARAM dialogProcParam);
+	void SelectPage(int index);
 
-	static LRESULT CALLBACK PropSheetProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-	LRESULT CALLBACK PropSheetProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	INT_PTR OnNotify(NMHDR *nmhdr) override;
+	void OnTreeViewSelectionChanged(const NMTREEVIEW *changeInfo);
 
-	void OnDestroyDialog(HWND dlg);
+	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
+	LRESULT HandleMenuOrAccelerator(WPARAM wParam);
+	void OnOk();
+	void OnApply();
+	void OnCancel();
+	INT_PTR OnClose() override;
+
+	void OnSettingChanged();
+
+	INT_PTR OnDestroy() override;
+	INT_PTR OnNcDestroy() override;
 
 	static INT_PTR CALLBACK GeneralSettingsProcStub(HWND hDlg, UINT uMsg, WPARAM wParam,
 		LPARAM lParam);
@@ -80,9 +94,8 @@ private:
 		LPARAM lParam);
 	INT_PTR CALLBACK AdvancedSettingsProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	INT_PTR OnCtlColorDlg(HWND hwnd, HDC hdc);
+	INT_PTR OnPageCtlColorDlg(HWND hwnd, HDC hdc);
 	INT_PTR OnCtlColor(HWND hwnd, HDC hdc);
-	INT_PTR OnEraseBackground(HWND hwnd, HDC hdc);
 	INT_PTR OnCustomDraw(const NMCUSTOMDRAW *customDraw);
 
 	void OnReplaceExplorerSettingChanged(HWND dialog,
@@ -118,6 +131,11 @@ private:
 	CoreInterface *m_coreInterface;
 	HWND m_tipWnd;
 
+	std::unordered_map<int, HWND> m_dialogMap;
+	std::unordered_map<int, HTREEITEM> m_treeMap;
+	std::optional<int> m_currentPageIndex;
+	bool m_initializationFinished = false;
+
 	TabContainer *m_tabContainer;
 
 	wil::unique_hicon m_optionsDialogIcon;
@@ -131,5 +149,5 @@ private:
 	std::vector<AdvancedOption> m_advancedOptions;
 	std::unique_ptr<WindowSubclassWrapper> m_advancedOptionsListViewSubclass;
 
-	static inline int m_lastSelectedSheetIndex = 0;
+	static inline int m_lastSelectedPageIndex = 0;
 };

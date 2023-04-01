@@ -23,7 +23,6 @@ BaseDialog::BaseDialog(HINSTANCE hInstance, int iResource, HWND hParent, bool bR
 	m_bResizable(bResizable)
 {
 	m_prd = nullptr;
-	m_bShowingModelessDialog = FALSE;
 }
 
 INT_PTR CALLBACK BaseDialogProcStub(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -156,15 +155,9 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 
 	case WM_DESTROY:
 	{
-		/* If this is a modeless dialog, notify the
-		caller that the dialog is been destroyed. */
-		if (m_bShowingModelessDialog)
+		if (m_showingModelessDialog && m_modelessDialogDestroyedObserver)
 		{
-			if (m_pmdn != nullptr)
-			{
-				m_pmdn->OnModelessDialogDestroy(m_iResource);
-				m_pmdn->Release();
-			}
+			m_modelessDialogDestroyedObserver();
 		}
 
 		/* Within WM_DESTROY, all child windows
@@ -213,7 +206,7 @@ INT_PTR BaseDialog::ShowModalDialog()
 	/* Explicitly disallow the creation of another
 	dialog from this object while a modeless dialog
 	is been shown. */
-	if (m_bShowingModelessDialog)
+	if (m_showingModelessDialog)
 	{
 		return -1;
 	}
@@ -222,24 +215,25 @@ INT_PTR BaseDialog::ShowModalDialog()
 		reinterpret_cast<LPARAM>(this));
 }
 
-HWND BaseDialog::ShowModelessDialog(IModelessDialogNotification *pmdn)
+HWND BaseDialog::ShowModelessDialog(std::function<void()> dialogDestroyedObserver)
 {
-	if (m_bShowingModelessDialog)
+	if (m_showingModelessDialog)
 	{
 		return nullptr;
 	}
 
-	HWND hDlg = CreateDialogParam(m_hInstance, MAKEINTRESOURCE(m_iResource), m_hParent,
+	HWND dialog = CreateDialogParam(m_hInstance, MAKEINTRESOURCE(m_iResource), m_hParent,
 		BaseDialogProcStub, reinterpret_cast<LPARAM>(this));
 
-	if (hDlg != nullptr)
+	if (!dialog)
 	{
-		m_bShowingModelessDialog = TRUE;
+		return nullptr;
 	}
 
-	m_pmdn = pmdn;
+	m_showingModelessDialog = true;
+	m_modelessDialogDestroyedObserver = dialogDestroyedObserver;
 
-	return hDlg;
+	return dialog;
 }
 
 void BaseDialog::GetResizableControlInformation(DialogSizeConstraint &dsc,

@@ -387,20 +387,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		otherwise various accelerator keys (such as tab)
 		would be taken even when the dialog has focus. */
 		if (!IsDialogMessage(g_hwndSearch, &msg) && !IsDialogMessage(g_hwndManageBookmarks, &msg)
-			&& !IsDialogMessage(g_hwndRunScript, &msg)
-			&& !PropSheet_IsDialogMessage(g_hwndOptions, &msg))
+			&& !IsDialogMessage(g_hwndRunScript, &msg) && !IsDialogMessage(g_hwndOptions, &msg))
 		{
 			if (!TranslateAccelerator(hwnd, g_hAccl, &msg))
 			{
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
-		}
-
-		if (g_hwndOptions && PropSheet_GetCurrentPageHwnd(g_hwndOptions) == nullptr)
-		{
-			DestroyWindow(g_hwndOptions);
-			g_hwndOptions = nullptr;
 		}
 	}
 

@@ -812,7 +812,6 @@
     <ClCompile Include="HolderWindow.cpp" />
     <ClCompile Include="IDropFilesCallback.cpp" />
     <ClCompile Include="IconResourceLoader.cpp" />
-    <ClCompile Include="IModelessDialogNotification.cpp" />
     <ClCompile Include="NewMenuClient.cpp" />
     <ClCompile Include="Initialization.cpp" />
     <ClCompile Include="LoadSaveRegistry.cpp" />
@@ -996,7 +995,6 @@
     <ClInclude Include="IconMappings.h" />
     <ClInclude Include="IconResourceLoader.h" />
     <ClInclude Include="IDropFilesCallback.h" />
-    <ClInclude Include="IModelessDialogNotification.h" />
     <ClInclude Include="NewMenuClient.h" />
     <ClInclude Include="ServiceProvider.h" />
     <ClInclude Include="LoadSaveInterface.h" />

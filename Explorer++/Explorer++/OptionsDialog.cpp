@@ -18,6 +18,8 @@
 #include "DarkModeGroupBox.h"
 #include "DarkModeHelper.h"
 #include "Explorer++_internal.h"
+#include "Icon.h"
+#include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "SetDefaultColumnsDialog.h"
@@ -32,7 +34,6 @@
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
-#include "../Helper/PropertySheet.h"
 #include "../Helper/RichEditHelper.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/ShellHelper.h"
@@ -51,13 +52,13 @@ int CALLBACK NewTabDirectoryBrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lPar
 UINT GetIconThemeStringResourceId(IconTheme iconTheme);
 
 // clang-format off
-const OptionsDialog::OptionsDialogSheetInfo OptionsDialog::OPTIONS_DIALOG_SHEETS[] = {
-	{IDD_OPTIONS_GENERAL, GeneralSettingsProcStub},
-	{IDD_OPTIONS_FILESFOLDERS, FilesFoldersProcStub},
-	{IDD_OPTIONS_WINDOW, WindowProcStub},
-	{IDD_OPTIONS_TABS, TabSettingsProcStub},
-	{IDD_OPTIONS_DEFAULT, DefaultSettingsProcStub},
-	{IDD_OPTIONS_ADVANCED, AdvancedSettingsProcStub}
+const OptionsDialog::PageInfo OptionsDialog::SETTINGS_PAGES[] = {
+	{IDD_OPTIONS_GENERAL, IDS_OPTIONS_GENERAL_TITLE, GeneralSettingsProcStub},
+	{IDD_OPTIONS_FILES_FOLDERS, IDS_OPTIONS_FILES_FOLDERS_TITLE, FilesFoldersProcStub},
+	{IDD_OPTIONS_WINDOW, IDS_OPTIONS_WINDOW_TITLE, WindowProcStub},
+	{IDD_OPTIONS_TABS, IDS_OPTIONS_TABS_TITLE, TabSettingsProcStub},
+	{IDD_OPTIONS_DEFAULT, IDS_OPTIONS_DEFAULT_TITLE, DefaultSettingsProcStub},
+	{IDD_OPTIONS_ADVANCED, IDS_OPTIONS_ADVANCED_TITLE, AdvancedSettingsProcStub}
 };
 // clang-format on
 
@@ -97,14 +98,9 @@ const boost::bimap<bool, std::wstring> BOOL_MAPPINGS =
 
 TCHAR g_szNewTabDirectory[MAX_PATH];
 
-OptionsDialog *OptionsDialog::Create(std::shared_ptr<Config> config, HINSTANCE instance,
-	CoreInterface *coreInterface, TabContainer *tabContainer)
-{
-	return new OptionsDialog(config, instance, coreInterface, tabContainer);
-}
-
-OptionsDialog::OptionsDialog(std::shared_ptr<Config> config, HINSTANCE instance,
+OptionsDialog::OptionsDialog(HINSTANCE instance, HWND parent, std::shared_ptr<Config> config,
 	CoreInterface *coreInterface, TabContainer *tabContainer) :
+	DarkModeDialogBase(instance, IDD_OPTIONS, parent, false),
 	m_config(config),
 	m_instance(instance),
 	m_coreInterface(coreInterface),
@@ -112,145 +108,198 @@ OptionsDialog::OptionsDialog(std::shared_ptr<Config> config, HINSTANCE instance,
 {
 }
 
-HWND OptionsDialog::Show(HWND parentWindow)
+INT_PTR OptionsDialog::OnInitDialog()
 {
-	std::vector<HPROPSHEETPAGE> sheetHandles;
+	SetWindowTheme(GetDlgItem(m_hDlg, IDC_SETTINGS_PAGES_TREE), L"Explorer", nullptr);
 
-	for (const auto &optionDialogSheet : OPTIONS_DIALOG_SHEETS)
-	{
-		PROPSHEETPAGE sheet = GeneratePropertySheetDefinition(optionDialogSheet);
-		sheetHandles.push_back(CreatePropertySheetPage(&sheet));
-	}
-
-	std::wstring title = ResourceHelper::LoadString(m_instance, IDS_OPTIONSDIALOG_TITLE);
-
-	auto &dpiCompat = DpiCompatibility::GetInstance();
-	UINT dpi = dpiCompat.GetDpiForWindow(parentWindow);
-	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
-	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
-	m_optionsDialogIcon = m_coreInterface->GetIconResourceLoader()->LoadIconFromPNGForDpi(
-		Icon::Options, iconWidth, iconHeight, dpi);
-
-	PROPSHEETHEADER psh;
-	psh.dwSize = sizeof(PROPSHEETHEADER);
-	psh.dwFlags = PSH_DEFAULT | PSH_USECALLBACK | PSH_NOCONTEXTHELP | PSH_USEHICON | PSH_MODELESS;
-	psh.hwndParent = parentWindow;
-	psh.pszCaption = title.c_str();
-	psh.nPages = static_cast<UINT>(sheetHandles.size());
-	psh.nStartPage = m_lastSelectedSheetIndex;
-	psh.hIcon = m_optionsDialogIcon.get();
-	psh.ppsp = nullptr;
-	psh.phpage = sheetHandles.data();
-	psh.pfnCallback = PropertySheetCallback;
-	HWND propertySheet = reinterpret_cast<HWND>(PropertySheet(&psh));
-
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(propertySheet,
-		PropSheetProcStub, reinterpret_cast<DWORD_PTR>(this)));
-
-	m_tipWnd = CreateTooltipControl(propertySheet, m_instance);
+	AllowDarkModeForTreeView(IDC_SETTINGS_PAGES_TREE);
+	AllowDarkModeForControls({ IDAPPLY });
 
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	m_tipWnd = CreateTooltipControl(m_hDlg, m_instance);
 
 	if (darkModeHelper.IsDarkModeEnabled())
 	{
 		darkModeHelper.SetDarkModeForControl(m_tipWnd);
 	}
 
-	// Needed to ensure that the background color is correctly set in dark mode when opening the
-	// dialog.
-	InvalidateRect(propertySheet, nullptr, true);
+	AddSettingsPages();
+	SelectPage(m_lastSelectedPageIndex);
 
-	CenterWindow(parentWindow, propertySheet);
+	// Focus the treeview by default.
+	SendMessage(m_hDlg, WM_NEXTDLGCTL,
+		reinterpret_cast<WPARAM>(GetDlgItem(m_hDlg, IDC_SETTINGS_PAGES_TREE)), true);
 
-	return propertySheet;
+	CenterWindow(GetParent(m_hDlg), m_hDlg);
+
+	m_initializationFinished = true;
+
+	return FALSE;
 }
 
-int CALLBACK OptionsDialog::PropertySheetCallback(HWND dialog, UINT msg, LPARAM lParam)
+wil::unique_hicon OptionsDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	UNREFERENCED_PARAMETER(lParam);
+	return m_coreInterface->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::Options,
+		iconWidth, iconHeight);
+}
 
-	switch (msg)
+void OptionsDialog::AddSettingsPages()
+{
+	int index = 0;
+
+	for (auto &page : SETTINGS_PAGES)
 	{
-	case PSCB_INITIALIZED:
-		OnPropertySheetInitialized(dialog);
+		AddSettingsPage(page.dialogResourceId, page.titleResourceId, index++, page.dialogProc,
+			reinterpret_cast<LPARAM>(this));
+	}
+}
+
+void OptionsDialog::AddSettingsPage(UINT dialogResourceId, UINT titleResourceId, int pageIndex,
+	DLGPROC dialogProc, LPARAM dialogProcParam)
+{
+	HWND dialog = CreateDialogParam(GetInstance(), MAKEINTRESOURCE(dialogResourceId), m_hDlg,
+		dialogProc, dialogProcParam);
+
+	auto treeView = GetDlgItem(m_hDlg, IDC_SETTINGS_PAGES_TREE);
+
+	RECT treeViewRect;
+	GetWindowRect(treeView, &treeViewRect);
+	MapWindowPoints(HWND_DESKTOP, m_hDlg, reinterpret_cast<LPPOINT>(&treeViewRect), 2);
+
+	SetWindowPos(dialog, nullptr, treeViewRect.right + TREEVIEW_PAGE_HORIZONTAL_SPACING,
+		treeViewRect.top, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+
+	auto title = ResourceHelper::LoadString(m_instance, titleResourceId);
+
+	TVITEMEX treeViewItem;
+	treeViewItem.mask = TVIF_TEXT | TVIF_PARAM;
+	treeViewItem.pszText = title.data();
+	treeViewItem.lParam = pageIndex;
+
+	TVINSERTSTRUCT insertInfo;
+	insertInfo.hParent = nullptr;
+	insertInfo.hInsertAfter = TVI_LAST;
+	insertInfo.itemex = treeViewItem;
+
+	auto insertedItem = TreeView_InsertItem(treeView, &insertInfo);
+
+	m_dialogMap.insert({ pageIndex, dialog });
+	m_treeMap.insert({ pageIndex, insertedItem });
+}
+
+void OptionsDialog::SelectPage(int index)
+{
+	// This will trigger a TVN_SELCHANGED notification. The handler for that will take care of
+	// updating the page visibility.
+	auto treeView = GetDlgItem(m_hDlg, IDC_SETTINGS_PAGES_TREE);
+	TreeView_SelectItem(treeView, m_treeMap.at(index));
+}
+
+INT_PTR OptionsDialog::OnNotify(NMHDR *nmhdr)
+{
+	switch (nmhdr->code)
+	{
+	case TVN_SELCHANGED:
+		OnTreeViewSelectionChanged(reinterpret_cast<NMTREEVIEW *>(nmhdr));
 		break;
 	}
 
 	return 0;
 }
 
-void OptionsDialog::OnPropertySheetInitialized(HWND dialog)
+void OptionsDialog::OnTreeViewSelectionChanged(const NMTREEVIEW *changeInfo)
 {
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (!darkModeHelper.IsDarkModeEnabled())
+	if (m_currentPageIndex)
 	{
-		return;
+		ShowWindow(m_dialogMap.at(*m_currentPageIndex), SW_HIDE);
 	}
 
-	darkModeHelper.AllowDarkModeForWindow(dialog, true);
-
-	BOOL dark = TRUE;
-	DarkModeHelper::WINDOWCOMPOSITIONATTRIBDATA compositionData = {
-		DarkModeHelper::WCA_USEDARKMODECOLORS, &dark, sizeof(dark)
-	};
-	darkModeHelper.SetWindowCompositionAttribute(dialog, &compositionData);
-
-	darkModeHelper.SetDarkModeForControl(GetDlgItem(dialog, IDOK));
-	darkModeHelper.SetDarkModeForControl(GetDlgItem(dialog, IDCANCEL));
-	darkModeHelper.SetDarkModeForControl(GetDlgItem(dialog, IDAPPLY));
+	int updatedPageIndex = static_cast<int>(changeInfo->itemNew.lParam);
+	ShowWindow(m_dialogMap.at(updatedPageIndex), SW_SHOW);
+	m_currentPageIndex = updatedPageIndex;
 }
 
-PROPSHEETPAGE OptionsDialog::GeneratePropertySheetDefinition(
-	const OptionsDialogSheetInfo &sheetInfo)
+INT_PTR OptionsDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 {
-	PROPSHEETPAGE sheet;
-	sheet.dwSize = sizeof(PROPSHEETPAGE);
-	sheet.dwFlags = PSP_DEFAULT;
-	sheet.hInstance = m_instance;
-	sheet.pszTemplate = MAKEINTRESOURCE(sheetInfo.resourceId);
-	sheet.lParam = reinterpret_cast<LPARAM>(this);
-	sheet.pfnDlgProc = sheetInfo.dlgProc;
-	return sheet;
-}
+	UNREFERENCED_PARAMETER(lParam);
 
-LRESULT CALLBACK OptionsDialog::PropSheetProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
-	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
-{
-	UNREFERENCED_PARAMETER(uIdSubclass);
-
-	auto *optionsDialog = reinterpret_cast<OptionsDialog *>(dwRefData);
-	return optionsDialog->PropSheetProc(hwnd, uMsg, wParam, lParam);
-}
-
-LRESULT CALLBACK OptionsDialog::PropSheetProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	switch (uMsg)
+	if (HIWORD(wParam) == 0 || HIWORD(wParam) == 1)
 	{
-	case WM_CTLCOLORDLG:
-		return OnCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+		return HandleMenuOrAccelerator(wParam);
+	}
 
-	case WM_DESTROY:
-		OnDestroyDialog(hwnd);
+	return 1;
+}
+
+LRESULT OptionsDialog::HandleMenuOrAccelerator(WPARAM wParam)
+{
+	switch (LOWORD(wParam))
+	{
+	case IDOK:
+		OnOk();
 		break;
 
-	case WM_NCDESTROY:
-		delete this;
-		return 0;
+	case IDAPPLY:
+		OnApply();
+		break;
+
+	case IDCANCEL:
+		OnCancel();
+		break;
 	}
 
-	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
+	return 0;
 }
 
-void OptionsDialog::OnDestroyDialog(HWND dlg)
+void OptionsDialog::OnOk()
 {
-	HWND tabControl = PropSheet_GetTabControl(dlg);
-	int index = TabCtrl_GetCurSel(tabControl);
+	OnApply();
+	DestroyWindow(m_hDlg);
+}
 
-	if (index != -1)
+void OptionsDialog::OnApply()
+{
+	for (auto dialog : m_dialogMap | std::views::values)
 	{
-		m_lastSelectedSheetIndex = index;
+		SendMessage(dialog, WM_APP_SAVE_SETTINGS, 0, 0);
 	}
+
+	m_coreInterface->SaveAllSettings();
+
+	EnableWindow(GetDlgItem(m_hDlg, IDAPPLY), false);
+}
+
+void OptionsDialog::OnCancel()
+{
+	DestroyWindow(m_hDlg);
+}
+
+INT_PTR OptionsDialog::OnClose()
+{
+	DestroyWindow(m_hDlg);
+	return 0;
+}
+
+void OptionsDialog::OnSettingChanged()
+{
+	if (m_initializationFinished)
+	{
+		EnableWindow(GetDlgItem(m_hDlg, IDAPPLY), true);
+	}
+}
+
+INT_PTR OptionsDialog::OnDestroy()
+{
+	m_lastSelectedPageIndex = *m_currentPageIndex;
+	return 0;
+}
+
+INT_PTR OptionsDialog::OnNcDestroy()
+{
+	delete this;
+
+	return 0;
 }
 
 INT_PTR CALLBACK OptionsDialog::GeneralSettingsProcStub(HWND hDlg, UINT uMsg, WPARAM wParam,
@@ -261,11 +310,8 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProcStub(HWND hDlg, UINT uMsg, WP
 	switch (uMsg)
 	{
 	case WM_INITDIALOG:
-	{
-		auto *ppsp = reinterpret_cast<PROPSHEETPAGE *>(lParam);
-		optionsDialog = reinterpret_cast<OptionsDialog *>(ppsp->lParam);
-	}
-	break;
+		optionsDialog = reinterpret_cast<OptionsDialog *>(lParam);
+		break;
 	}
 
 	return optionsDialog->GeneralSettingsProc(hDlg, uMsg, wParam, lParam);
@@ -343,17 +389,13 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 	}
 	break;
 
+	case WM_CTLCOLORDLG:
+		return OnPageCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
 	case WM_CTLCOLORSTATIC:
 	case WM_CTLCOLOREDIT:
 	case WM_CTLCOLORLISTBOX:
 		return OnCtlColor(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
-
-	// Normally, the background brush for the dialog could be returned by WM_CTLCOLORDLG, however
-	// that doesn't appear to work for a property sheet page on Windows 11. Therefore, WM_ERASEBKGND
-	// will be used instead (as described in the comment at
-	// https://stackoverflow.com/questions/70078687/property-page-inside-property-sheet-paints-incorrect-background-on-windows-11#comment123968209_70078687).
-	case WM_ERASEBKGND:
-		return OnEraseBackground(hDlg, reinterpret_cast<HDC>(wParam));
 
 	case WM_COMMAND:
 		if (HIWORD(wParam) != 0)
@@ -362,7 +404,7 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 			{
 			case EN_CHANGE:
 			case CBN_SELCHANGE:
-				PropSheet_Changed(GetParent(hDlg), hDlg);
+				OnSettingChanged();
 				break;
 			}
 		}
@@ -374,7 +416,7 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 			case IDC_STARTUP_DEFAULTFOLDER:
 				if (IsDlgButtonChecked(hDlg, LOWORD(wParam)) == BST_CHECKED)
 				{
-					PropSheet_Changed(GetParent(hDlg), hDlg);
+					OnSettingChanged();
 				}
 				break;
 
@@ -382,12 +424,11 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 			case IDC_OPTION_REPLACEEXPLORER_FILESYSTEM:
 			case IDC_OPTION_REPLACEEXPLORER_ALL:
 			case IDC_OPTION_XML:
-				PropSheet_Changed(GetParent(hDlg), hDlg);
+				OnSettingChanged();
 				break;
 
 			case IDC_DEFAULT_NEWTABDIR_BUTTON:
 				OnDefaultSettingsNewTabDir(hDlg);
-				PropSheet_Changed(GetParent(hDlg), hDlg);
 				break;
 			}
 		}
@@ -406,85 +447,77 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 			return result;
 		}
 		break;
-
-		case PSN_APPLY:
-		{
-			HWND hEdit;
-			ReplaceExplorerMode replaceExplorerMode = ReplaceExplorerMode::None;
-			HRESULT hr;
-			int iSel;
-
-			if (IsDlgButtonChecked(hDlg, IDC_STARTUP_PREVIOUSTABS) == BST_CHECKED)
-			{
-				m_config->startupMode = StartupMode::PreviousTabs;
-			}
-			else if (IsDlgButtonChecked(hDlg, IDC_STARTUP_DEFAULTFOLDER) == BST_CHECKED)
-			{
-				m_config->startupMode = StartupMode::DefaultFolder;
-			}
-
-			if (IsDlgButtonChecked(hDlg, IDC_OPTION_REPLACEEXPLORER_NONE) == BST_CHECKED)
-			{
-				replaceExplorerMode = ReplaceExplorerMode::None;
-			}
-			else if (IsDlgButtonChecked(hDlg, IDC_OPTION_REPLACEEXPLORER_FILESYSTEM) == BST_CHECKED)
-			{
-				replaceExplorerMode = ReplaceExplorerMode::FileSystem;
-			}
-			else if (IsDlgButtonChecked(hDlg, IDC_OPTION_REPLACEEXPLORER_ALL) == BST_CHECKED)
-			{
-				replaceExplorerMode = ReplaceExplorerMode::All;
-			}
-
-			if (m_config->replaceExplorerMode != replaceExplorerMode)
-			{
-				OnReplaceExplorerSettingChanged(hDlg, replaceExplorerMode);
-			}
-
-			BOOL savePreferencesToXmlFile =
-				(IsDlgButtonChecked(hDlg, IDC_OPTION_XML) == BST_CHECKED);
-			m_coreInterface->SetSavePreferencesToXmlFile(savePreferencesToXmlFile);
-
-			hEdit = GetDlgItem(hDlg, IDC_DEFAULT_NEWTABDIR_EDIT);
-
-			std::wstring newTabDir = GetWindowString(hEdit);
-
-			/* The folder may be virtual, in which case, it needs
-			to be decoded. */
-			std::wstring virtualParsingPath;
-			hr = DecodeFriendlyPath(newTabDir, virtualParsingPath);
-
-			if (SUCCEEDED(hr))
-			{
-				m_config->defaultTabDirectory = virtualParsingPath;
-			}
-			else
-			{
-				m_config->defaultTabDirectory = newTabDir;
-			}
-
-			iSel = static_cast<int>(
-				SendDlgItemMessage(hDlg, IDC_OPTIONS_ICON_THEME, CB_GETCURSEL, 0, 0));
-			int iconThemeItemData = static_cast<int>(
-				SendDlgItemMessage(hDlg, IDC_OPTIONS_ICON_THEME, CB_GETITEMDATA, iSel, 0));
-			m_config->iconTheme = IconTheme::_from_integral(iconThemeItemData);
-
-			iSel = static_cast<int>(
-				SendDlgItemMessage(hDlg, IDC_OPTIONS_LANGUAGE, CB_GETCURSEL, 0, 0));
-
-			int language = GetLanguageIDFromIndex(hDlg, iSel);
-			m_config->language = language;
-
-			m_coreInterface->SaveAllSettings();
-		}
-		break;
 		}
 	}
 	break;
 
-	case WM_CLOSE:
-		EndDialog(hDlg, 0);
-		break;
+	case WM_APP_SAVE_SETTINGS:
+	{
+		HWND hEdit;
+		ReplaceExplorerMode replaceExplorerMode = ReplaceExplorerMode::None;
+		HRESULT hr;
+		int iSel;
+
+		if (IsDlgButtonChecked(hDlg, IDC_STARTUP_PREVIOUSTABS) == BST_CHECKED)
+		{
+			m_config->startupMode = StartupMode::PreviousTabs;
+		}
+		else if (IsDlgButtonChecked(hDlg, IDC_STARTUP_DEFAULTFOLDER) == BST_CHECKED)
+		{
+			m_config->startupMode = StartupMode::DefaultFolder;
+		}
+
+		if (IsDlgButtonChecked(hDlg, IDC_OPTION_REPLACEEXPLORER_NONE) == BST_CHECKED)
+		{
+			replaceExplorerMode = ReplaceExplorerMode::None;
+		}
+		else if (IsDlgButtonChecked(hDlg, IDC_OPTION_REPLACEEXPLORER_FILESYSTEM) == BST_CHECKED)
+		{
+			replaceExplorerMode = ReplaceExplorerMode::FileSystem;
+		}
+		else if (IsDlgButtonChecked(hDlg, IDC_OPTION_REPLACEEXPLORER_ALL) == BST_CHECKED)
+		{
+			replaceExplorerMode = ReplaceExplorerMode::All;
+		}
+
+		if (m_config->replaceExplorerMode != replaceExplorerMode)
+		{
+			OnReplaceExplorerSettingChanged(hDlg, replaceExplorerMode);
+		}
+
+		BOOL savePreferencesToXmlFile = (IsDlgButtonChecked(hDlg, IDC_OPTION_XML) == BST_CHECKED);
+		m_coreInterface->SetSavePreferencesToXmlFile(savePreferencesToXmlFile);
+
+		hEdit = GetDlgItem(hDlg, IDC_DEFAULT_NEWTABDIR_EDIT);
+
+		std::wstring newTabDir = GetWindowString(hEdit);
+
+		/* The folder may be virtual, in which case, it needs
+		to be decoded. */
+		std::wstring virtualParsingPath;
+		hr = DecodeFriendlyPath(newTabDir, virtualParsingPath);
+
+		if (SUCCEEDED(hr))
+		{
+			m_config->defaultTabDirectory = virtualParsingPath;
+		}
+		else
+		{
+			m_config->defaultTabDirectory = newTabDir;
+		}
+
+		iSel =
+			static_cast<int>(SendDlgItemMessage(hDlg, IDC_OPTIONS_ICON_THEME, CB_GETCURSEL, 0, 0));
+		int iconThemeItemData = static_cast<int>(
+			SendDlgItemMessage(hDlg, IDC_OPTIONS_ICON_THEME, CB_GETITEMDATA, iSel, 0));
+		m_config->iconTheme = IconTheme::_from_integral(iconThemeItemData);
+
+		iSel = static_cast<int>(SendDlgItemMessage(hDlg, IDC_OPTIONS_LANGUAGE, CB_GETCURSEL, 0, 0));
+
+		int language = GetLanguageIDFromIndex(hDlg, iSel);
+		m_config->language = language;
+	}
+	break;
 	}
 
 	return 0;
@@ -598,11 +631,8 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProcStub(HWND hDlg, UINT uMsg, WPARA
 	switch (uMsg)
 	{
 	case WM_INITDIALOG:
-	{
-		auto *ppsp = reinterpret_cast<PROPSHEETPAGE *>(lParam);
-		optionsDialog = reinterpret_cast<OptionsDialog *>(ppsp->lParam);
-	}
-	break;
+		optionsDialog = reinterpret_cast<OptionsDialog *>(lParam);
+		break;
 	}
 
 	return optionsDialog->FilesFoldersProc(hDlg, uMsg, wParam, lParam);
@@ -746,13 +776,13 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 	}
 	break;
 
+	case WM_CTLCOLORDLG:
+		return OnPageCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
 	case WM_CTLCOLORSTATIC:
 	case WM_CTLCOLOREDIT:
 	case WM_CTLCOLORLISTBOX:
 		return OnCtlColor(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
-
-	case WM_ERASEBKGND:
-		return OnEraseBackground(hDlg, reinterpret_cast<HDC>(wParam));
 
 	case WM_COMMAND:
 		if (HIWORD(wParam) != 0)
@@ -760,7 +790,7 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 			switch (HIWORD(wParam))
 			{
 			case CBN_SELCHANGE:
-				PropSheet_Changed(GetParent(hDlg), hDlg);
+				OnSettingChanged();
 				break;
 			}
 		}
@@ -779,31 +809,31 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 			case IDC_OPTIONS_HOVER_TIME:
 			case IDC_DISPLAY_MIXED_FILES_AND_FOLDERS:
 			case IDC_USE_NATURAL_SORT_ORDER:
-				PropSheet_Changed(GetParent(hDlg), hDlg);
+				OnSettingChanged();
 				break;
 
 			case IDC_SETTINGS_CHECK_FORCESIZE:
 				EnableWindow(GetDlgItem(hDlg, IDC_COMBO_FILESIZES),
 					IsDlgButtonChecked(hDlg, LOWORD(wParam)) == BST_CHECKED);
-				PropSheet_Changed(GetParent(hDlg), hDlg);
+				OnSettingChanged();
 				break;
 
 			case IDC_OPTIONS_RADIO_SYSTEMINFOTIPS:
 			case IDC_OPTIONS_RADIO_CUSTOMINFOTIPS:
 				if (IsDlgButtonChecked(hDlg, LOWORD(wParam)) == BST_CHECKED)
 				{
-					PropSheet_Changed(GetParent(hDlg), hDlg);
+					OnSettingChanged();
 				}
 				break;
 
 			case IDC_OPTIONS_CHECK_SHOWINFOTIPS:
 				SetInfoTipWindowStates(hDlg);
-				PropSheet_Changed(GetParent(hDlg), hDlg);
+				OnSettingChanged();
 				break;
 
 			case IDC_SETTINGS_CHECK_FOLDERSIZES:
 				SetFolderSizeWindowState(hDlg);
-				PropSheet_Changed(GetParent(hDlg), hDlg);
+				OnSettingChanged();
 				break;
 
 			case IDC_SETTINGS_CHECK_SINGLECLICK:
@@ -811,7 +841,7 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 					IsDlgButtonChecked(hDlg, LOWORD(wParam)) == BST_CHECKED);
 				EnableWindow(GetDlgItem(hDlg, IDC_LABEL_HOVER_TIME),
 					IsDlgButtonChecked(hDlg, LOWORD(wParam)) == BST_CHECKED);
-				PropSheet_Changed(GetParent(hDlg), hDlg);
+				OnSettingChanged();
 				break;
 			}
 		}
@@ -830,93 +860,86 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 			return result;
 		}
 		break;
-
-		case PSN_APPLY:
-		{
-			HWND hCBSize;
-			int iSel;
-
-			m_config->globalFolderSettings.hideSystemFiles =
-				(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_SYSTEMFILES) == BST_CHECKED);
-
-			m_config->globalFolderSettings.showExtensions =
-				!(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_EXTENSIONS) == BST_CHECKED);
-
-			m_config->globalFolderSettings.hideLinkExtension =
-				(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_LINK) == BST_CHECKED);
-
-			m_config->globalFolderSettings.insertSorted =
-				(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_INSERTSORTED) == BST_CHECKED);
-
-			m_config->globalFolderSettings.oneClickActivate =
-				(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_SINGLECLICK) == BST_CHECKED);
-
-			m_config->globalFolderSettings.oneClickActivateHoverTime =
-				GetDlgItemInt(hDlg, IDC_OPTIONS_HOVER_TIME, nullptr, FALSE);
-
-			m_config->overwriteExistingFilesConfirmation =
-				(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION)
-					== BST_CHECKED);
-
-			m_config->globalFolderSettings.showFolderSizes =
-				(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_FOLDERSIZES) == BST_CHECKED);
-
-			m_config->globalFolderSettings.disableFolderSizesNetworkRemovable =
-				(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE)
-					== BST_CHECKED);
-
-			m_config->globalFolderSettings.forceSize =
-				(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_FORCESIZE) == BST_CHECKED);
-
-			m_config->handleZipFiles =
-				(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_ZIPFILES) == BST_CHECKED);
-
-			m_config->globalFolderSettings.showFriendlyDates =
-				(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_FRIENDLYDATES) == BST_CHECKED);
-
-			m_config->showInfoTips =
-				(IsDlgButtonChecked(hDlg, IDC_OPTIONS_CHECK_SHOWINFOTIPS) == BST_CHECKED);
-
-			if (IsDlgButtonChecked(hDlg, IDC_OPTIONS_RADIO_SYSTEMINFOTIPS) == BST_CHECKED)
-			{
-				m_config->infoTipType = InfoTipType::System;
-			}
-			else
-			{
-				m_config->infoTipType = InfoTipType::Custom;
-			}
-
-			m_config->globalFolderSettings.displayMixedFilesAndFolders =
-				(IsDlgButtonChecked(hDlg, IDC_DISPLAY_MIXED_FILES_AND_FOLDERS) == BST_CHECKED);
-
-			m_config->globalFolderSettings.useNaturalSortOrder =
-				(IsDlgButtonChecked(hDlg, IDC_USE_NATURAL_SORT_ORDER) == BST_CHECKED);
-
-			hCBSize = GetDlgItem(hDlg, IDC_COMBO_FILESIZES);
-
-			iSel = (int) SendMessage(hCBSize, CB_GETCURSEL, 0, 0);
-			m_config->globalFolderSettings.sizeDisplayFormat =
-				(SizeDisplayFormat) SendMessage(hCBSize, CB_GETITEMDATA, iSel, 0);
-
-			for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
-			{
-				tab->GetShellBrowser()->GetNavigationController()->Refresh();
-
-				ListViewHelper::ActivateOneClickSelect(tab->GetShellBrowser()->GetListView(),
-					m_config->globalFolderSettings.oneClickActivate,
-					m_config->globalFolderSettings.oneClickActivateHoverTime);
-			}
-
-			m_coreInterface->SaveAllSettings();
-		}
-		break;
 		}
 	}
 	break;
 
-	case WM_CLOSE:
-		EndDialog(hDlg, 0);
-		break;
+	case WM_APP_SAVE_SETTINGS:
+	{
+		HWND hCBSize;
+		int iSel;
+
+		m_config->globalFolderSettings.hideSystemFiles =
+			(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_SYSTEMFILES) == BST_CHECKED);
+
+		m_config->globalFolderSettings.showExtensions =
+			!(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_EXTENSIONS) == BST_CHECKED);
+
+		m_config->globalFolderSettings.hideLinkExtension =
+			(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_LINK) == BST_CHECKED);
+
+		m_config->globalFolderSettings.insertSorted =
+			(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_INSERTSORTED) == BST_CHECKED);
+
+		m_config->globalFolderSettings.oneClickActivate =
+			(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_SINGLECLICK) == BST_CHECKED);
+
+		m_config->globalFolderSettings.oneClickActivateHoverTime =
+			GetDlgItemInt(hDlg, IDC_OPTIONS_HOVER_TIME, nullptr, FALSE);
+
+		m_config->overwriteExistingFilesConfirmation =
+			(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION) == BST_CHECKED);
+
+		m_config->globalFolderSettings.showFolderSizes =
+			(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_FOLDERSIZES) == BST_CHECKED);
+
+		m_config->globalFolderSettings.disableFolderSizesNetworkRemovable =
+			(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE)
+				== BST_CHECKED);
+
+		m_config->globalFolderSettings.forceSize =
+			(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_FORCESIZE) == BST_CHECKED);
+
+		m_config->handleZipFiles =
+			(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_ZIPFILES) == BST_CHECKED);
+
+		m_config->globalFolderSettings.showFriendlyDates =
+			(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_FRIENDLYDATES) == BST_CHECKED);
+
+		m_config->showInfoTips =
+			(IsDlgButtonChecked(hDlg, IDC_OPTIONS_CHECK_SHOWINFOTIPS) == BST_CHECKED);
+
+		if (IsDlgButtonChecked(hDlg, IDC_OPTIONS_RADIO_SYSTEMINFOTIPS) == BST_CHECKED)
+		{
+			m_config->infoTipType = InfoTipType::System;
+		}
+		else
+		{
+			m_config->infoTipType = InfoTipType::Custom;
+		}
+
+		m_config->globalFolderSettings.displayMixedFilesAndFolders =
+			(IsDlgButtonChecked(hDlg, IDC_DISPLAY_MIXED_FILES_AND_FOLDERS) == BST_CHECKED);
+
+		m_config->globalFolderSettings.useNaturalSortOrder =
+			(IsDlgButtonChecked(hDlg, IDC_USE_NATURAL_SORT_ORDER) == BST_CHECKED);
+
+		hCBSize = GetDlgItem(hDlg, IDC_COMBO_FILESIZES);
+
+		iSel = (int) SendMessage(hCBSize, CB_GETCURSEL, 0, 0);
+		m_config->globalFolderSettings.sizeDisplayFormat =
+			(SizeDisplayFormat) SendMessage(hCBSize, CB_GETITEMDATA, iSel, 0);
+
+		for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
+		{
+			tab->GetShellBrowser()->GetNavigationController()->Refresh();
+
+			ListViewHelper::ActivateOneClickSelect(tab->GetShellBrowser()->GetListView(),
+				m_config->globalFolderSettings.oneClickActivate,
+				m_config->globalFolderSettings.oneClickActivateHoverTime);
+		}
+	}
+	break;
 	}
 
 	return 0;
@@ -929,11 +952,8 @@ INT_PTR CALLBACK OptionsDialog::WindowProcStub(HWND hDlg, UINT uMsg, WPARAM wPar
 	switch (uMsg)
 	{
 	case WM_INITDIALOG:
-	{
-		auto *ppsp = reinterpret_cast<PROPSHEETPAGE *>(lParam);
-		optionsDialog = reinterpret_cast<OptionsDialog *>(ppsp->lParam);
-	}
-	break;
+		optionsDialog = reinterpret_cast<OptionsDialog *>(lParam);
+		break;
 	}
 
 	return optionsDialog->WindowProc(hDlg, uMsg, wParam, lParam);
@@ -1045,13 +1065,13 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 	}
 	break;
 
+	case WM_CTLCOLORDLG:
+		return OnPageCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
 	case WM_CTLCOLORSTATIC:
 	case WM_CTLCOLOREDIT:
 	case WM_CTLCOLORLISTBOX:
 		return OnCtlColor(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
-
-	case WM_ERASEBKGND:
-		return OnEraseBackground(hDlg, reinterpret_cast<HDC>(wParam));
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
@@ -1071,7 +1091,7 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 		case IDC_OPTION_GRIDLINES:
 		case IDC_OPTION_CHECKBOXSELECTION:
 		case IDC_OPTION_FULLROWSELECT:
-			PropSheet_Changed(GetParent(hDlg), hDlg);
+			OnSettingChanged();
 			break;
 		}
 		break;
@@ -1089,100 +1109,94 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 			return result;
 		}
 		break;
-
-		case PSN_APPLY:
-		{
-			BOOL bCheckBoxSelection;
-
-			m_config->allowMultipleInstances =
-				(IsDlgButtonChecked(hDlg, IDC_OPTION_MULTIPLEINSTANCES) == BST_CHECKED);
-
-			m_config->alwaysShowTabBar.set(
-				IsDlgButtonChecked(hDlg, IDC_OPTION_ALWAYSSHOWTABBAR) == BST_CHECKED);
-
-			m_config->showTabBarAtBottom.set(
-				(IsDlgButtonChecked(hDlg, IDC_OPTION_SHOWTABBARATBOTTOM) == BST_CHECKED));
-
-			m_config->extendTabControl.set(
-				(IsDlgButtonChecked(hDlg, IDC_OPTION_EXTENDTABCONTROL) == BST_CHECKED));
-
-			m_config->showFilePreviews =
-				(IsDlgButtonChecked(hDlg, IDC_OPTION_FILEPREVIEWS) == BST_CHECKED);
-
-			m_config->showFullTitlePath.set(
-				IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_TITLEPATH) == BST_CHECKED);
-
-			m_config->showUserNameInTitleBar.set(
-				IsDlgButtonChecked(hDlg, IDC_OPTION_USERNAMEINTITLEBAR) == BST_CHECKED);
-
-			m_config->showPrivilegeLevelInTitleBar.set(
-				IsDlgButtonChecked(hDlg, IDC_OPTION_PRIVILEGELEVELINTITLEBAR) == BST_CHECKED);
-
-			m_config->synchronizeTreeview =
-				(IsDlgButtonChecked(hDlg, IDC_OPTION_SYNCTREEVIEW) == BST_CHECKED);
-
-			m_config->treeViewAutoExpandSelected =
-				(IsDlgButtonChecked(hDlg, IDC_OPTION_TREEVIEWSELECTIONEXPAND) == BST_CHECKED);
-
-			m_config->treeViewDelayEnabled =
-				!(IsDlgButtonChecked(hDlg, IDC_OPTION_TREEVIEWDELAY) == BST_CHECKED);
-
-			m_config->globalFolderSettings.showGridlines =
-				(IsDlgButtonChecked(hDlg, IDC_OPTION_GRIDLINES) == BST_CHECKED);
-
-			bCheckBoxSelection =
-				(IsDlgButtonChecked(hDlg, IDC_OPTION_CHECKBOXSELECTION) == BST_CHECKED);
-
-			if (m_config->checkBoxSelection != bCheckBoxSelection)
-			{
-				for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
-				{
-					auto dwExtendedStyle =
-						ListView_GetExtendedListViewStyle(tab->GetShellBrowser()->GetListView());
-
-					if (bCheckBoxSelection)
-					{
-						dwExtendedStyle |= LVS_EX_CHECKBOXES;
-					}
-					else
-					{
-						dwExtendedStyle &= ~LVS_EX_CHECKBOXES;
-					}
-
-					ListView_SetExtendedListViewStyle(tab->GetShellBrowser()->GetListView(),
-						dwExtendedStyle);
-				}
-
-				m_config->checkBoxSelection =
-					(IsDlgButtonChecked(hDlg, IDC_OPTION_CHECKBOXSELECTION) == BST_CHECKED);
-			}
-
-			m_config->useFullRowSelect =
-				(IsDlgButtonChecked(hDlg, IDC_OPTION_FULLROWSELECT) == BST_CHECKED);
-
-			m_config->useLargeToolbarIcons.set(
-				IsDlgButtonChecked(hDlg, IDC_OPTION_LARGETOOLBARICONS) == BST_CHECKED);
-
-			for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
-			{
-				/* TODO: The tab should monitor for settings
-				changes itself. */
-				tab->GetShellBrowser()->OnGridlinesSettingChanged();
-
-				ListViewHelper::AddRemoveExtendedStyle(tab->GetShellBrowser()->GetListView(),
-					LVS_EX_FULLROWSELECT, m_config->useFullRowSelect);
-			}
-
-			m_coreInterface->SaveAllSettings();
-		}
-		break;
 		}
 	}
 	break;
 
-	case WM_CLOSE:
-		EndDialog(hDlg, 0);
-		break;
+	case WM_APP_SAVE_SETTINGS:
+	{
+		BOOL bCheckBoxSelection;
+
+		m_config->allowMultipleInstances =
+			(IsDlgButtonChecked(hDlg, IDC_OPTION_MULTIPLEINSTANCES) == BST_CHECKED);
+
+		m_config->alwaysShowTabBar.set(
+			IsDlgButtonChecked(hDlg, IDC_OPTION_ALWAYSSHOWTABBAR) == BST_CHECKED);
+
+		m_config->showTabBarAtBottom.set(
+			(IsDlgButtonChecked(hDlg, IDC_OPTION_SHOWTABBARATBOTTOM) == BST_CHECKED));
+
+		m_config->extendTabControl.set(
+			(IsDlgButtonChecked(hDlg, IDC_OPTION_EXTENDTABCONTROL) == BST_CHECKED));
+
+		m_config->showFilePreviews =
+			(IsDlgButtonChecked(hDlg, IDC_OPTION_FILEPREVIEWS) == BST_CHECKED);
+
+		m_config->showFullTitlePath.set(
+			IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_TITLEPATH) == BST_CHECKED);
+
+		m_config->showUserNameInTitleBar.set(
+			IsDlgButtonChecked(hDlg, IDC_OPTION_USERNAMEINTITLEBAR) == BST_CHECKED);
+
+		m_config->showPrivilegeLevelInTitleBar.set(
+			IsDlgButtonChecked(hDlg, IDC_OPTION_PRIVILEGELEVELINTITLEBAR) == BST_CHECKED);
+
+		m_config->synchronizeTreeview =
+			(IsDlgButtonChecked(hDlg, IDC_OPTION_SYNCTREEVIEW) == BST_CHECKED);
+
+		m_config->treeViewAutoExpandSelected =
+			(IsDlgButtonChecked(hDlg, IDC_OPTION_TREEVIEWSELECTIONEXPAND) == BST_CHECKED);
+
+		m_config->treeViewDelayEnabled =
+			!(IsDlgButtonChecked(hDlg, IDC_OPTION_TREEVIEWDELAY) == BST_CHECKED);
+
+		m_config->globalFolderSettings.showGridlines =
+			(IsDlgButtonChecked(hDlg, IDC_OPTION_GRIDLINES) == BST_CHECKED);
+
+		bCheckBoxSelection =
+			(IsDlgButtonChecked(hDlg, IDC_OPTION_CHECKBOXSELECTION) == BST_CHECKED);
+
+		if (m_config->checkBoxSelection != bCheckBoxSelection)
+		{
+			for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
+			{
+				auto dwExtendedStyle =
+					ListView_GetExtendedListViewStyle(tab->GetShellBrowser()->GetListView());
+
+				if (bCheckBoxSelection)
+				{
+					dwExtendedStyle |= LVS_EX_CHECKBOXES;
+				}
+				else
+				{
+					dwExtendedStyle &= ~LVS_EX_CHECKBOXES;
+				}
+
+				ListView_SetExtendedListViewStyle(tab->GetShellBrowser()->GetListView(),
+					dwExtendedStyle);
+			}
+
+			m_config->checkBoxSelection =
+				(IsDlgButtonChecked(hDlg, IDC_OPTION_CHECKBOXSELECTION) == BST_CHECKED);
+		}
+
+		m_config->useFullRowSelect =
+			(IsDlgButtonChecked(hDlg, IDC_OPTION_FULLROWSELECT) == BST_CHECKED);
+
+		m_config->useLargeToolbarIcons.set(
+			IsDlgButtonChecked(hDlg, IDC_OPTION_LARGETOOLBARICONS) == BST_CHECKED);
+
+		for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
+		{
+			/* TODO: The tab should monitor for settings
+			changes itself. */
+			tab->GetShellBrowser()->OnGridlinesSettingChanged();
+
+			ListViewHelper::AddRemoveExtendedStyle(tab->GetShellBrowser()->GetListView(),
+				LVS_EX_FULLROWSELECT, m_config->useFullRowSelect);
+		}
+	}
+	break;
 	}
 
 	return 0;
@@ -1196,11 +1210,8 @@ INT_PTR CALLBACK OptionsDialog::TabSettingsProcStub(HWND hDlg, UINT uMsg, WPARAM
 	switch (uMsg)
 	{
 	case WM_INITDIALOG:
-	{
-		auto *ppsp = reinterpret_cast<PROPSHEETPAGE *>(lParam);
-		optionsDialog = reinterpret_cast<OptionsDialog *>(ppsp->lParam);
-	}
-	break;
+		optionsDialog = reinterpret_cast<OptionsDialog *>(lParam);
+		break;
 	}
 
 	return optionsDialog->TabSettingsProc(hDlg, uMsg, wParam, lParam);
@@ -1259,13 +1270,13 @@ INT_PTR CALLBACK OptionsDialog::TabSettingsProc(HWND hDlg, UINT uMsg, WPARAM wPa
 	}
 	break;
 
+	case WM_CTLCOLORDLG:
+		return OnPageCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
 	case WM_CTLCOLORSTATIC:
 	case WM_CTLCOLOREDIT:
 	case WM_CTLCOLORLISTBOX:
 		return OnCtlColor(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
-
-	case WM_ERASEBKGND:
-		return OnEraseBackground(hDlg, reinterpret_cast<HDC>(wParam));
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
@@ -1277,7 +1288,7 @@ INT_PTR CALLBACK OptionsDialog::TabSettingsProc(HWND hDlg, UINT uMsg, WPARAM wPa
 		case IDC_SETTINGS_CHECK_ALWAYSNEWTAB:
 		case IDC_TABS_DOUBLECLICKCLOSE:
 		case IDC_TABS_CLOSEMAINWINDOW:
-			PropSheet_Changed(GetParent(hDlg), hDlg);
+			OnSettingChanged();
 			break;
 		}
 		break;
@@ -1295,40 +1306,34 @@ INT_PTR CALLBACK OptionsDialog::TabSettingsProc(HWND hDlg, UINT uMsg, WPARAM wPa
 			return result;
 		}
 		break;
-
-		case PSN_APPLY:
-		{
-			m_config->showTaskbarThumbnails =
-				(IsDlgButtonChecked(hDlg, IDC_TABS_TASKBARTHUMBNAILS) == BST_CHECKED);
-
-			m_config->forceSameTabWidth.set(
-				IsDlgButtonChecked(hDlg, IDC_TABS_SAMEWIDTH) == BST_CHECKED);
-
-			m_config->confirmCloseTabs =
-				(IsDlgButtonChecked(hDlg, IDC_TABS_CLOSECONFIRMATION) == BST_CHECKED);
-
-			m_config->openNewTabNextToCurrent =
-				(IsDlgButtonChecked(hDlg, IDC_TABS_OPENNEXTTOCURRENT) == BST_CHECKED);
-
-			m_config->alwaysOpenNewTab =
-				(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_ALWAYSNEWTAB) == BST_CHECKED);
-
-			m_config->doubleClickTabClose =
-				(IsDlgButtonChecked(hDlg, IDC_TABS_DOUBLECLICKCLOSE) == BST_CHECKED);
-
-			m_config->closeMainWindowOnTabClose =
-				(IsDlgButtonChecked(hDlg, IDC_TABS_CLOSEMAINWINDOW) == BST_CHECKED);
-
-			m_coreInterface->SaveAllSettings();
-		}
-		break;
 		}
 	}
 	break;
 
-	case WM_CLOSE:
-		EndDialog(hDlg, 0);
-		break;
+	case WM_APP_SAVE_SETTINGS:
+	{
+		m_config->showTaskbarThumbnails =
+			(IsDlgButtonChecked(hDlg, IDC_TABS_TASKBARTHUMBNAILS) == BST_CHECKED);
+
+		m_config->forceSameTabWidth.set(
+			IsDlgButtonChecked(hDlg, IDC_TABS_SAMEWIDTH) == BST_CHECKED);
+
+		m_config->confirmCloseTabs =
+			(IsDlgButtonChecked(hDlg, IDC_TABS_CLOSECONFIRMATION) == BST_CHECKED);
+
+		m_config->openNewTabNextToCurrent =
+			(IsDlgButtonChecked(hDlg, IDC_TABS_OPENNEXTTOCURRENT) == BST_CHECKED);
+
+		m_config->alwaysOpenNewTab =
+			(IsDlgButtonChecked(hDlg, IDC_SETTINGS_CHECK_ALWAYSNEWTAB) == BST_CHECKED);
+
+		m_config->doubleClickTabClose =
+			(IsDlgButtonChecked(hDlg, IDC_TABS_DOUBLECLICKCLOSE) == BST_CHECKED);
+
+		m_config->closeMainWindowOnTabClose =
+			(IsDlgButtonChecked(hDlg, IDC_TABS_CLOSEMAINWINDOW) == BST_CHECKED);
+	}
+	break;
 	}
 
 	return 0;
@@ -1342,11 +1347,8 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProcStub(HWND hDlg, UINT uMsg, WP
 	switch (uMsg)
 	{
 	case WM_INITDIALOG:
-	{
-		auto *ppsp = reinterpret_cast<PROPSHEETPAGE *>(lParam);
-		optionsDialog = reinterpret_cast<OptionsDialog *>(ppsp->lParam);
-	}
-	break;
+		optionsDialog = reinterpret_cast<OptionsDialog *>(lParam);
+		break;
 	}
 
 	return optionsDialog->DefaultSettingsProc(hDlg, uMsg, wParam, lParam);
@@ -1417,13 +1419,13 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 	}
 	break;
 
+	case WM_CTLCOLORDLG:
+		return OnPageCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
 	case WM_CTLCOLORSTATIC:
 	case WM_CTLCOLOREDIT:
 	case WM_CTLCOLORLISTBOX:
 		return OnCtlColor(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
-
-	case WM_ERASEBKGND:
-		return OnEraseBackground(hDlg, reinterpret_cast<HDC>(wParam));
 
 	case WM_COMMAND:
 		if (HIWORD(wParam) != 0)
@@ -1431,7 +1433,7 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 			switch (HIWORD(wParam))
 			{
 			case CBN_SELCHANGE:
-				PropSheet_Changed(GetParent(hDlg), hDlg);
+				OnSettingChanged();
 				break;
 			}
 		}
@@ -1443,7 +1445,7 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 			case IDC_AUTOARRANGEGLOBAL:
 			case IDC_SORTASCENDINGGLOBAL:
 			case IDC_SHOWINGROUPSGLOBAL:
-				PropSheet_Changed(GetParent(hDlg), hDlg);
+				OnSettingChanged();
 				break;
 
 			case IDC_BUTTON_DEFAULTCOLUMNS:
@@ -1470,36 +1472,30 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 			return result;
 		}
 		break;
-
-		case PSN_APPLY:
-		{
-			m_config->defaultFolderSettings.showHidden =
-				(IsDlgButtonChecked(hDlg, IDC_SHOWHIDDENGLOBAL) == BST_CHECKED);
-
-			m_config->defaultFolderSettings.showInGroups =
-				(IsDlgButtonChecked(hDlg, IDC_SHOWINGROUPSGLOBAL) == BST_CHECKED);
-
-			m_config->defaultFolderSettings.autoArrange =
-				(IsDlgButtonChecked(hDlg, IDC_AUTOARRANGEGLOBAL) == BST_CHECKED);
-
-			m_config->defaultFolderSettings.sortAscending =
-				(IsDlgButtonChecked(hDlg, IDC_SORTASCENDINGGLOBAL) == BST_CHECKED);
-
-			HWND hComboBox = GetDlgItem(hDlg, IDC_OPTIONS_DEFAULT_VIEW);
-			int selectedIndex = static_cast<int>(SendMessage(hComboBox, CB_GETCURSEL, 0, 0));
-			m_config->defaultFolderSettings.viewMode = ViewMode::_from_integral(
-				static_cast<int>(SendMessage(hComboBox, CB_GETITEMDATA, selectedIndex, 0)));
-
-			m_coreInterface->SaveAllSettings();
-		}
-		break;
 		}
 	}
 	break;
 
-	case WM_CLOSE:
-		EndDialog(hDlg, 0);
-		break;
+	case WM_APP_SAVE_SETTINGS:
+	{
+		m_config->defaultFolderSettings.showHidden =
+			(IsDlgButtonChecked(hDlg, IDC_SHOWHIDDENGLOBAL) == BST_CHECKED);
+
+		m_config->defaultFolderSettings.showInGroups =
+			(IsDlgButtonChecked(hDlg, IDC_SHOWINGROUPSGLOBAL) == BST_CHECKED);
+
+		m_config->defaultFolderSettings.autoArrange =
+			(IsDlgButtonChecked(hDlg, IDC_AUTOARRANGEGLOBAL) == BST_CHECKED);
+
+		m_config->defaultFolderSettings.sortAscending =
+			(IsDlgButtonChecked(hDlg, IDC_SORTASCENDINGGLOBAL) == BST_CHECKED);
+
+		HWND hComboBox = GetDlgItem(hDlg, IDC_OPTIONS_DEFAULT_VIEW);
+		int selectedIndex = static_cast<int>(SendMessage(hComboBox, CB_GETCURSEL, 0, 0));
+		m_config->defaultFolderSettings.viewMode = ViewMode::_from_integral(
+			static_cast<int>(SendMessage(hComboBox, CB_GETITEMDATA, selectedIndex, 0)));
+	}
+	break;
 	}
 
 	return 0;
@@ -1513,11 +1509,8 @@ INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProcStub(HWND hDlg, UINT uMsg, W
 	switch (uMsg)
 	{
 	case WM_INITDIALOG:
-	{
-		auto *ppsp = reinterpret_cast<PROPSHEETPAGE *>(lParam);
-		optionsDialog = reinterpret_cast<OptionsDialog *>(ppsp->lParam);
-	}
-	break;
+		optionsDialog = reinterpret_cast<OptionsDialog *>(lParam);
+		break;
 	}
 
 	return optionsDialog->AdvancedSettingsProc(hDlg, uMsg, wParam, lParam);
@@ -1596,12 +1589,12 @@ INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(HWND hDlg, UINT uMsg, WPARA
 	}
 	break;
 
+	case WM_CTLCOLORDLG:
+		return OnPageCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
 	case WM_CTLCOLORSTATIC:
 	case WM_CTLCOLOREDIT:
 		return OnCtlColor(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
-
-	case WM_ERASEBKGND:
-		return OnEraseBackground(hDlg, reinterpret_cast<HDC>(wParam));
 
 	case WM_NOTIFY:
 		switch (reinterpret_cast<NMHDR *>(lParam)->code)
@@ -1677,7 +1670,7 @@ INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(HWND hDlg, UINT uMsg, WPARA
 				return FALSE;
 			}
 
-			PropSheet_Changed(GetParent(hDlg), hDlg);
+			OnSettingChanged();
 
 			SetWindowLongPtr(hDlg, DWLP_MSGRESULT, TRUE);
 			return TRUE;
@@ -1698,37 +1691,35 @@ INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(HWND hDlg, UINT uMsg, WPARA
 			}
 		}
 		break;
+		}
+		break;
 
-		case PSN_APPLY:
+	case WM_APP_SAVE_SETTINGS:
+	{
+		HWND listView = GetDlgItem(hDlg, IDC_ADVANCED_OPTIONS);
+		int numItems = ListView_GetItemCount(listView);
+
+		for (int i = 0; i < numItems; i++)
 		{
-			HWND listView = GetDlgItem(hDlg, IDC_ADVANCED_OPTIONS);
-			int numItems = ListView_GetItemCount(listView);
+			TCHAR text[256];
+			ListView_GetItemText(listView, i, 0, text, SIZEOF_ARRAY(text));
 
-			for (int i = 0; i < numItems; i++)
+			auto &option = m_advancedOptions[i];
+
+			switch (option.type)
 			{
-				TCHAR text[256];
-				ListView_GetItemText(listView, i, 0, text, SIZEOF_ARRAY(text));
-
-				auto &option = m_advancedOptions[i];
-
-				switch (option.type)
-				{
-				case AdvancedOptionType::Boolean:
-				{
-					// Values are validated when editing, so the current value should always be
-					// valid.
-					bool newValue = BOOL_MAPPINGS.right.at(text);
-					SetBooleanConfigValue(option.id, newValue);
-				}
-				break;
-				}
+			case AdvancedOptionType::Boolean:
+			{
+				// Values are validated when editing, so the current value should always be
+				// valid.
+				bool newValue = BOOL_MAPPINGS.right.at(text);
+				SetBooleanConfigValue(option.id, newValue);
 			}
-
-			m_coreInterface->SaveAllSettings();
+			break;
+			}
 		}
-		break;
-		}
-		break;
+	}
+	break;
 
 	case WM_DESTROY:
 		m_advancedOptionsListViewSubclass.reset();
@@ -1896,7 +1887,7 @@ OptionsDialog::AdvancedOption *OptionsDialog::GetAdvancedOptionByIndex(HWND dlg,
 	return reinterpret_cast<AdvancedOption *>(lvItem.lParam);
 }
 
-INT_PTR OptionsDialog::OnCtlColorDlg(HWND hwnd, HDC hdc)
+INT_PTR OptionsDialog::OnPageCtlColorDlg(HWND hwnd, HDC hdc)
 {
 	UNREFERENCED_PARAMETER(hwnd);
 	UNREFERENCED_PARAMETER(hdc);
@@ -1926,22 +1917,6 @@ INT_PTR OptionsDialog::OnCtlColor(HWND hwnd, HDC hdc)
 	SetTextColor(hdc, DarkModeHelper::TEXT_COLOR);
 
 	return reinterpret_cast<INT_PTR>(darkModeHelper.GetBackgroundBrush());
-}
-
-INT_PTR OptionsDialog::OnEraseBackground(HWND hwnd, HDC hdc)
-{
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (!darkModeHelper.IsDarkModeEnabled())
-	{
-		return 0;
-	}
-
-	RECT rc;
-	GetClientRect(hwnd, &rc);
-	FillRect(hdc, &rc, darkModeHelper.GetBackgroundBrush());
-
-	return 1;
 }
 
 INT_PTR OptionsDialog::OnCustomDraw(const NMCUSTOMDRAW *customDraw)

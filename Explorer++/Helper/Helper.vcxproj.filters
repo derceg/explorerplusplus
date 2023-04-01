@@ -312,9 +312,6 @@
     <ClInclude Include="CustomGripper.h">
       <Filter>Control Support</Filter>
     </ClInclude>
-    <ClInclude Include="PropertySheet.h">
-      <Filter>Control Support</Filter>
-    </ClInclude>
     <ClInclude Include="RichEditHelper.h">
       <Filter>Control Support</Filter>
     </ClInclude>
