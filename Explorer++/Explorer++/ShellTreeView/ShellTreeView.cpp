@@ -452,27 +452,36 @@ std::optional<ShellTreeView::IconResult> ShellTreeView::FindIconAsync(HWND treeV
 
 void ShellTreeView::ProcessIconResult(int iconResultId)
 {
-	auto itr = m_iconResults.find(iconResultId);
+	auto iconResultsItr = m_iconResults.find(iconResultId);
 
-	if (itr == m_iconResults.end())
+	if (iconResultsItr == m_iconResults.end())
 	{
 		return;
 	}
 
 	auto cleanup = wil::scope_exit(
-		[this, itr]()
+		[this, iconResultsItr]()
 		{
-			m_iconResults.erase(itr);
+			m_iconResults.erase(iconResultsItr);
 		});
 
-	auto result = itr->second.get();
+	auto result = iconResultsItr->second.get();
 
 	if (!result)
 	{
 		return;
 	}
 
-	const ItemInfo_t &itemInfo = m_itemInfoMap.at(result->internalIndex);
+	auto itemMapItr = m_itemInfoMap.find(result->internalIndex);
+
+	// The item may have been removed (e.g. if the associated folder was deleted, or the parent was
+	// collapsed).
+	if (itemMapItr == m_itemInfoMap.end())
+	{
+		return;
+	}
+
+	const ItemInfo_t &itemInfo = itemMapItr->second;
 
 	std::wstring filePath;
 	HRESULT hr = GetDisplayName(itemInfo.pidl.get(), SHGDN_FORPARSING, filePath);
