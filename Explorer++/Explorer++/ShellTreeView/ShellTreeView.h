@@ -137,7 +137,7 @@ private:
 	void RenameItem(HTREEITEM hItem, const TCHAR *szFullFileName);
 	void RemoveItem(const TCHAR *szFullFileName);
 	void RemoveItem(HTREEITEM hItem);
-	void EraseItems(HTREEITEM hParent);
+	void RemoveChildrenFromInternalMap(HTREEITEM hParent);
 	void UpdateParent(const TCHAR *szParent);
 	void UpdateParent(HTREEITEM hParent);
 	LRESULT CALLBACK OnDeviceChange(WPARAM wParam, LPARAM lParam);

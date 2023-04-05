@@ -614,7 +614,7 @@ void ShellTreeView::OnItemExpanding(const NMTREEVIEW *nmtv)
 			}
 		}
 
-		EraseItems(parentItem);
+		RemoveChildrenFromInternalMap(parentItem);
 
 		SendMessage(m_hTreeView, TVM_EXPAND, TVE_COLLAPSE | TVE_COLLAPSERESET,
 			reinterpret_cast<LPARAM>(parentItem));
@@ -1322,7 +1322,7 @@ HTREEITEM ShellTreeView::LocateItemOnDesktopTree(const TCHAR *szFullFileName)
 	return hItem;
 }
 
-void ShellTreeView::EraseItems(HTREEITEM hParent)
+void ShellTreeView::RemoveChildrenFromInternalMap(HTREEITEM hParent)
 {
 	auto hItem = TreeView_GetChild(m_hTreeView, hParent);
 
@@ -1335,7 +1335,7 @@ void ShellTreeView::EraseItems(HTREEITEM hParent)
 
 		if (tvItemEx.cChildren != 0)
 		{
-			EraseItems(hItem);
+			RemoveChildrenFromInternalMap(hItem);
 		}
 
 		m_itemInfoMap.erase(static_cast<int>(tvItemEx.lParam));

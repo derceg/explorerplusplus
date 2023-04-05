@@ -564,8 +564,19 @@ void ShellTreeView::RemoveItem(const TCHAR *szFullFileName)
 
 void ShellTreeView::RemoveItem(HTREEITEM hItem)
 {
-	EraseItems(hItem);
-	TreeView_DeleteItem(m_hTreeView, hItem);
+	RemoveChildrenFromInternalMap(hItem);
+
+	TVITEMEX tvItem = {};
+	tvItem.mask = TVIF_PARAM | TVIF_HANDLE;
+	tvItem.hItem = hItem;
+	[[maybe_unused]] bool itemRetrieved = TreeView_GetItem(m_hTreeView, &tvItem);
+	assert(itemRetrieved);
+
+	[[maybe_unused]] bool deleted = TreeView_DeleteItem(m_hTreeView, hItem);
+	assert(deleted);
+
+	[[maybe_unused]] auto numErased = m_itemInfoMap.erase(static_cast<int>(tvItem.lParam));
+	assert(numErased == 1);
 }
 
 void ShellTreeView::UpdateParent(const TCHAR *szParent)
