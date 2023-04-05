@@ -113,6 +113,8 @@ private:
 
 	// Windows 10 1809
 	AllowDarkModeForAppType m_AllowDarkModeForApp = nullptr;
+	// Note that ShouldAppsUseDarkMode() is broken on Windows 10 1903+ (a random value is returned,
+	// regardless of the system setting), so should only be used on 1809.
 	ShouldAppsUseDarkModeType m_ShouldAppsUseDarkMode = nullptr;
 	FlushMenuThemesType m_FlushMenuThemes = nullptr;
 	RefreshImmersiveColorPolicyStateType m_RefreshImmersiveColorPolicyState = nullptr;
@@ -123,6 +125,7 @@ private:
 	SetPreferredAppModeType m_SetPreferredAppMode = nullptr;
 
 	wil::unique_hmodule m_uxThemeLib;
+	bool m_isWindows10Version1809 = false;
 	bool m_darkModeSupported;
 	bool m_darkModeEnabled;
 	wil::unique_hbrush m_backgroundBrush;

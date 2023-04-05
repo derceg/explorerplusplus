@@ -32,6 +32,11 @@ DarkModeHelper::DarkModeHelper() : m_darkModeSupported(false), m_darkModeEnabled
 		return;
 	}
 
+	if (osVersionInfo.dwBuildNumber == BUILD_NUMBER_1809)
+	{
+		m_isWindows10Version1809 = true;
+	}
+
 	m_uxThemeLib.reset(LoadLibrary(_T("uxtheme.dll")));
 
 	if (!m_uxThemeLib)
@@ -67,8 +72,24 @@ DarkModeHelper::DarkModeHelper() : m_darkModeSupported(false), m_darkModeEnabled
 
 void DarkModeHelper::EnableForApp()
 {
-	if (!m_darkModeSupported)
+	if (!m_darkModeSupported || IsHighContrast())
 	{
+		return;
+	}
+
+	if (m_isWindows10Version1809 && !m_ShouldAppsUseDarkMode())
+	{
+		// SetPreferredAppMode() was added in Windows 10 1903. That method allows dark mode to be
+		// force enabled for an application, regardless of any system settings. In Windows 10 1809,
+		// only the AllowDarkModeForApp() function exists. Whether or not dark mode is enabled for
+		// the application then depends on whether it's enabled at the system level.
+		// Therefore, if the application is running on Windows 10 1809, dark mode shouldn't be
+		// enabled in the application unless it's enabled at the system level.
+		// Without this check, enabling dark mode in the application would mean that some of the
+		// controls would appear dark (where custom colors have been set on the control), but
+		// controls drawn by the system (e.g. menus) would still appear light.
+		// Since dark mode can be forcibly enabled for an application in later versions of Windows,
+		// this check is unnecessary in those situations.
 		return;
 	}
 
@@ -76,14 +97,14 @@ void DarkModeHelper::EnableForApp()
 	FlushMenuThemes();
 	RefreshImmersiveColorPolicyState();
 
-	m_darkModeEnabled = m_ShouldAppsUseDarkMode() && !IsHighContrast();
+	m_darkModeEnabled = true;
 }
 
 void DarkModeHelper::AllowDarkModeForApp(bool allow)
 {
 	if (m_SetPreferredAppMode)
 	{
-		m_SetPreferredAppMode(allow ? AllowDark : Default);
+		m_SetPreferredAppMode(allow ? ForceDark : Default);
 	}
 	else if (m_AllowDarkModeForApp)
 	{
