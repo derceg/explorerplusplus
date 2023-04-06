@@ -99,11 +99,11 @@ private:
 		WINAPI *)(HWND hWnd, WINDOWCOMPOSITIONATTRIBDATA *data);
 
 	// Windows 10 1809
-	using AllowDarkModeForAppType = BOOL(WINAPI *)(BOOL allow);
-	using ShouldAppsUseDarkModeType = BOOL(WINAPI *)();
+	using AllowDarkModeForAppType = bool(WINAPI *)(bool allow);
+	using ShouldAppsUseDarkModeType = bool(WINAPI *)();
 	using FlushMenuThemesType = void(WINAPI *)();
 	using RefreshImmersiveColorPolicyStateType = void(WINAPI *)();
-	using AllowDarkModeForWindowType = BOOL(WINAPI *)(HWND hWnd, BOOL allow);
+	using AllowDarkModeForWindowType = bool(WINAPI *)(HWND hWnd, bool allow);
 
 	// Windows 10 1903
 	using SetPreferredAppModeType = PreferredAppMode(WINAPI *)(PreferredAppMode appMode);
@@ -114,8 +114,6 @@ private:
 
 	// Windows 10 1809
 	AllowDarkModeForAppType m_AllowDarkModeForApp = nullptr;
-	// Note that ShouldAppsUseDarkMode() is broken on Windows 10 1903+ (a random value is returned,
-	// regardless of the system setting), so should only be used on 1809.
 	ShouldAppsUseDarkModeType m_ShouldAppsUseDarkMode = nullptr;
 	FlushMenuThemesType m_FlushMenuThemes = nullptr;
 	RefreshImmersiveColorPolicyStateType m_RefreshImmersiveColorPolicyState = nullptr;
