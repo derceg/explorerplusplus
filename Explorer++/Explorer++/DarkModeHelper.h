@@ -71,6 +71,9 @@ public:
 
 	static DarkModeHelper &GetInstance();
 
+	bool IsDarkModeSupported() const;
+	bool IsDarkModeEnabled() const;
+
 	void EnableForApp();
 
 	void AllowDarkModeForApp(bool allow);
@@ -83,8 +86,6 @@ public:
 	void SetDarkModeForComboBox(HWND comboBox);
 	void SetListViewDarkModeColors(HWND listView);
 	void SetTreeViewDarkModeColors(HWND treeView);
-
-	bool IsDarkModeEnabled() const;
 
 	HBRUSH GetBackgroundBrush();
 

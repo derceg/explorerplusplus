@@ -70,6 +70,16 @@ DarkModeHelper::DarkModeHelper() : m_darkModeSupported(false), m_darkModeEnabled
 	m_darkModeSupported = true;
 }
 
+bool DarkModeHelper::IsDarkModeSupported() const
+{
+	return m_darkModeSupported;
+}
+
+bool DarkModeHelper::IsDarkModeEnabled() const
+{
+	return m_darkModeEnabled;
+}
+
 void DarkModeHelper::EnableForApp()
 {
 	if (!m_darkModeSupported || IsHighContrast())
@@ -185,11 +195,6 @@ void DarkModeHelper::SetDarkModeForComboBox(HWND comboBox)
 {
 	AllowDarkModeForWindow(comboBox, true);
 	SetWindowTheme(comboBox, L"CFD", nullptr);
-}
-
-bool DarkModeHelper::IsDarkModeEnabled() const
-{
-	return m_darkModeEnabled;
 }
 
 HBRUSH DarkModeHelper::GetBackgroundBrush()

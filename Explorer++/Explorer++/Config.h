@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "BetterEnumsWrapper.h"
 #include "DefaultColumns.h"
 #include "IconResourceLoader.h"
 #include "ShellBrowser/FolderSettings.h"
@@ -14,6 +15,12 @@
 #include "../Helper/StringHelper.h"
 
 static const int DEFAULT_LISTVIEW_HOVER_TIME = 500;
+
+enum class InfoTipType
+{
+	System = 0,
+	Custom = 1
+};
 
 enum class ShellChangeNotificationType
 {
@@ -30,19 +37,20 @@ enum class StartupMode
 	DefaultFolder = 2
 };
 
-enum class InfoTipType
-{
-	System = 0,
-	Custom = 1
-};
+// clang-format off
+BETTER_ENUM(Theme, int,
+	Light = 0,
+	Dark = 1
+)
+// clang-format on
 
 struct Config
 {
 	Config() : defaultTabDirectoryStatic(GetComputerFolderPath())
 	{
 		language = LANG_ENGLISH;
-		iconTheme = IconTheme::Color;
-		enableDarkMode = false;
+		iconSet = IconSet::Color;
+		theme = Theme::Light;
 		startupMode = StartupMode::PreviousTabs;
 		defaultTabDirectory = GetComputerFolderPath();
 		showStatusBar = TRUE;
@@ -147,8 +155,8 @@ struct Config
 	static const UINT DEFAULT_TREEVIEW_WIDTH = 208;
 
 	DWORD language;
-	IconTheme iconTheme;
-	bool enableDarkMode;
+	IconSet iconSet;
+	Theme theme;
 	StartupMode startupMode;
 	std::wstring defaultTabDirectory;
 	const std::wstring defaultTabDirectoryStatic;

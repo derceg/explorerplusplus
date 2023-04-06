@@ -325,14 +325,44 @@ SIZE GetButtonSize(HWND hwnd, int partId, int stateId, int defaultWidth, int def
 		MulDiv(defaultHeight, dpi, USER_DEFAULT_SCREEN_DPI) };
 }
 
-void AddTooltipForControl(HWND tipWnd, HWND control, HINSTANCE instance, int stringResourceId)
+bool AddTooltipForControl(HWND tipWnd, HWND control, HINSTANCE instance, int stringResourceId,
+	TooltipType tooltipType)
 {
+	// Note that the lpszText field of the TOOLINFO struct can be set to the identifier of the
+	// appropriate string resource. However, in that case, the maximum text length is 80 characters,
+	// which is why the string is instead manually loaded here.
+	WCHAR *rawString;
+	int numCharacters =
+		LoadString(instance, stringResourceId, reinterpret_cast<LPWSTR>(&rawString), 0);
+
+	if (numCharacters == 0)
+	{
+		throw std::runtime_error("String resource not found");
+	}
+
+	std::wstring string(rawString, numCharacters);
+
 	TOOLINFO toolInfo = {};
 	toolInfo.cbSize = sizeof(toolInfo);
-	toolInfo.uFlags = TTF_IDISHWND | TTF_SUBCLASS;
-	toolInfo.hwnd = nullptr;
-	toolInfo.uId = reinterpret_cast<UINT_PTR>(control);
-	toolInfo.hinst = instance;
-	toolInfo.lpszText = MAKEINTRESOURCE(stringResourceId);
-	SendMessage(tipWnd, TTM_ADDTOOL, 0, reinterpret_cast<LPARAM>(&toolInfo));
+	toolInfo.uFlags = TTF_SUBCLASS;
+	toolInfo.lpszText = string.data();
+
+	if (tooltipType == TooltipType::Control)
+	{
+		WI_SetFlag(toolInfo.uFlags, TTF_IDISHWND);
+		toolInfo.uId = reinterpret_cast<UINT_PTR>(control);
+	}
+	else
+	{
+		HWND parent = GetParent(control);
+
+		RECT controlRect;
+		GetWindowRect(control, &controlRect);
+		MapWindowPoints(HWND_DESKTOP, parent, reinterpret_cast<LPPOINT>(&controlRect), 2);
+
+		toolInfo.hwnd = parent;
+		toolInfo.rect = controlRect;
+	}
+
+	return SendMessage(tipWnd, TTM_ADDTOOL, 0, reinterpret_cast<LPARAM>(&toolInfo));
 }

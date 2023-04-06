@@ -174,12 +174,12 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 			m_config->useLargeToolbarIcons.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("CheckPinnedToNamespaceTreeProperty"),
 			m_config->checkPinnedToNamespaceTreeProperty);
-		RegistrySettings::SaveDword(hSettingsKey, _T("EnableDarkMode"), m_config->enableDarkMode);
+		RegistrySettings::SaveDword(hSettingsKey, _T("Theme"), m_config->theme);
 
 		RegistrySettings::SaveString(hSettingsKey, _T("NewTabDirectory"),
 			m_config->defaultTabDirectory);
 
-		RegistrySettings::SaveDword(hSettingsKey, _T("IconTheme"), m_config->iconTheme);
+		RegistrySettings::SaveDword(hSettingsKey, _T("IconTheme"), m_config->iconSet);
 		RegistrySettings::SaveDword(hSettingsKey, _T("Language"), m_config->language);
 		RegistrySettings::SaveDword(hSettingsKey, _T("OpenTabsInForeground"),
 			m_config->openTabsInForeground);
@@ -426,8 +426,24 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey,
 			_T("CheckPinnedToNamespaceTreeProperty"), m_config->checkPinnedToNamespaceTreeProperty);
-		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("EnableDarkMode"),
-			m_config->enableDarkMode);
+
+		bool themeLoaded = false;
+		RegistrySettings::ReadDword(hSettingsKey, _T("Theme"),
+			[this, &themeLoaded](DWORD value)
+			{
+				m_config->theme = Theme::_from_integral(value);
+				themeLoaded = true;
+			});
+
+		if (!themeLoaded)
+		{
+			// Theme data was previously stored using this key.
+			RegistrySettings::ReadDword(hSettingsKey, _T("EnableDarkMode"),
+				[this](DWORD value)
+				{
+					m_config->theme = value ? Theme::Dark : Theme::Light;
+				});
+		}
 
 		RegistrySettings::ReadString(hSettingsKey, _T("NewTabDirectory"),
 			m_config->defaultTabDirectory);
@@ -435,7 +451,7 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		RegistrySettings::ReadDword(hSettingsKey, _T("IconTheme"),
 			[this](DWORD value)
 			{
-				m_config->iconTheme = IconTheme::_from_integral(value);
+				m_config->iconSet = IconSet::_from_integral(value);
 			});
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("Language"),

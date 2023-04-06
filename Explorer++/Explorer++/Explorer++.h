@@ -614,6 +614,8 @@ private:
 	std::shared_ptr<Config> m_config;
 	BOOL m_bSavePreferencesToXMLFile;
 
+	bool m_themeValueLoadedFromXml = false;
+
 	TaskbarThumbnails *m_taskbarThumbnails;
 
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;

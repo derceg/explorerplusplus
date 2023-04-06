@@ -6,7 +6,7 @@
 #include "ViewModes.h"
 #include "MainResource.h"
 
-int GetViewModeMenuId(ViewMode viewMode)
+UINT GetViewModeMenuId(ViewMode viewMode)
 {
 	switch (viewMode)
 	{
@@ -33,12 +33,13 @@ int GetViewModeMenuId(ViewMode viewMode)
 
 	case ViewMode::Details:
 		return IDM_VIEW_DETAILS;
-	}
 
-	return -1;
+	default:
+		throw std::runtime_error("ViewMode value not found");
+	}
 }
 
-int GetViewModeMenuStringId(ViewMode viewMode)
+UINT GetViewModeMenuStringId(ViewMode viewMode)
 {
 	switch (viewMode)
 	{
@@ -65,7 +66,8 @@ int GetViewModeMenuStringId(ViewMode viewMode)
 
 	case ViewMode::Details:
 		return IDS_VIEW_DETAILS;
-	}
 
-	return -1;
+	default:
+		throw std::runtime_error("ViewMode value not found");
+	}
 }

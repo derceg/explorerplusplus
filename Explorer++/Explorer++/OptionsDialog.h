@@ -32,7 +32,6 @@ private:
 	enum class AdvancedOptionId
 	{
 		CheckSystemIsPinnedToNameSpaceTree,
-		EnableDarkMode,
 		OpenTabsInForeground
 	};
 
@@ -81,6 +80,8 @@ private:
 	static INT_PTR CALLBACK GeneralSettingsProcStub(HWND hDlg, UINT uMsg, WPARAM wParam,
 		LPARAM lParam);
 	INT_PTR CALLBACK GeneralSettingsProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	static INT_PTR CALLBACK AppearanceProcStub(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	INT_PTR CALLBACK AppearanceProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static INT_PTR CALLBACK FilesFoldersProcStub(HWND, UINT, WPARAM, LPARAM);
 	INT_PTR CALLBACK FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static INT_PTR CALLBACK WindowProcStub(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -112,7 +113,10 @@ private:
 	void SetInfoTipWindowStates(HWND hDlg);
 	void SetFolderSizeWindowState(HWND hDlg);
 
-	void AddIconThemes(HWND dlg);
+	template <typename T>
+	void AddItemsToComboBox(HWND comboBox, const std::vector<T> &itemIds, T currentItemId,
+		std::function<UINT(T)> getStringResourceId);
+
 	void AddLanguages(HWND hDlg);
 	BOOL AddLanguageToComboBox(HWND hComboBox, const TCHAR *szImageDirectory,
 		const TCHAR *szFileName, WORD *pdwLanguage);

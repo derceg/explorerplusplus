@@ -49,11 +49,14 @@ using namespace DarkModeButton;
 using namespace DefaultFileManager;
 
 int CALLBACK NewTabDirectoryBrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData);
-UINT GetIconThemeStringResourceId(IconTheme iconTheme);
+UINT GetSizeDisplayFormatStringResourceId(SizeDisplayFormat sizeDisplayFormat);
+UINT GetIconSetStringResourceId(IconSet iconSet);
+UINT GetThemeStringResourceId(Theme theme);
 
 // clang-format off
 const OptionsDialog::PageInfo OptionsDialog::SETTINGS_PAGES[] = {
 	{IDD_OPTIONS_GENERAL, IDS_OPTIONS_GENERAL_TITLE, GeneralSettingsProcStub},
+	{IDD_OPTIONS_APPEARANCE, IDS_OPTIONS_APPEARANCE_TITLE, AppearanceProcStub},
 	{IDD_OPTIONS_FILES_FOLDERS, IDS_OPTIONS_FILES_FOLDERS_TITLE, FilesFoldersProcStub},
 	{IDD_OPTIONS_WINDOW, IDS_OPTIONS_WINDOW_TITLE, WindowProcStub},
 	{IDD_OPTIONS_TABS, IDS_OPTIONS_TABS_TITLE, TabSettingsProcStub},
@@ -67,23 +70,6 @@ const std::unordered_map<ReplaceExplorerMode, int> REPLACE_EXPLORER_ENUM_CONTROL
 	{ ReplaceExplorerMode::FileSystem, IDC_OPTION_REPLACEEXPLORER_FILESYSTEM },
 	{ ReplaceExplorerMode::All, IDC_OPTION_REPLACEEXPLORER_ALL }
 };
-
-struct FileSize
-{
-	SizeDisplayFormat sdf;
-	UINT StringID;
-};
-
-// clang-format off
-static const FileSize FILE_SIZES[] = {
-	{SizeDisplayFormat::Bytes, IDS_OPTIONS_DIALOG_FILE_SIZE_BYTES},
-	{SizeDisplayFormat::KB, IDS_OPTIONS_DIALOG_FILE_SIZE_KB},
-	{SizeDisplayFormat::MB, IDS_OPTIONS_DIALOG_FILE_SIZE_MB},
-	{SizeDisplayFormat::GB, IDS_OPTIONS_DIALOG_FILE_SIZE_GB},
-	{SizeDisplayFormat::TB, IDS_OPTIONS_DIALOG_FILE_SIZE_TB},
-	{SizeDisplayFormat::PB, IDS_OPTIONS_DIALOG_FILE_SIZE_PB}
-};
-// clang-format on
 
 #pragma warning(push)
 #pragma warning(                                                                                   \
@@ -363,7 +349,6 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 		hEdit = GetDlgItem(hDlg, IDC_DEFAULT_NEWTABDIR_EDIT);
 		DefaultSettingsSetNewTabDir(hEdit, m_config->defaultTabDirectory.c_str());
 
-		AddIconThemes(hDlg);
 		AddLanguages(hDlg);
 
 		auto &darkModeHelper = DarkModeHelper::GetInstance();
@@ -371,7 +356,6 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 		if (darkModeHelper.IsDarkModeEnabled())
 		{
 			darkModeHelper.SetDarkModeForControl(GetDlgItem(hDlg, IDC_DEFAULT_NEWTABDIR_BUTTON));
-			darkModeHelper.SetDarkModeForComboBox(GetDlgItem(hDlg, IDC_OPTIONS_ICON_THEME));
 			darkModeHelper.SetDarkModeForComboBox(GetDlgItem(hDlg, IDC_OPTIONS_LANGUAGE));
 
 			m_checkboxControlIds.insert(IDC_OPTION_XML);
@@ -506,16 +490,109 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 			m_config->defaultTabDirectory = newTabDir;
 		}
 
-		iSel =
-			static_cast<int>(SendDlgItemMessage(hDlg, IDC_OPTIONS_ICON_THEME, CB_GETCURSEL, 0, 0));
-		int iconThemeItemData = static_cast<int>(
-			SendDlgItemMessage(hDlg, IDC_OPTIONS_ICON_THEME, CB_GETITEMDATA, iSel, 0));
-		m_config->iconTheme = IconTheme::_from_integral(iconThemeItemData);
-
 		iSel = static_cast<int>(SendDlgItemMessage(hDlg, IDC_OPTIONS_LANGUAGE, CB_GETCURSEL, 0, 0));
 
 		int language = GetLanguageIDFromIndex(hDlg, iSel);
 		m_config->language = language;
+	}
+	break;
+	}
+
+	return 0;
+}
+
+INT_PTR CALLBACK OptionsDialog::AppearanceProcStub(HWND hDlg, UINT uMsg, WPARAM wParam,
+	LPARAM lParam)
+{
+	static OptionsDialog *optionsDialog;
+
+	switch (uMsg)
+	{
+	case WM_INITDIALOG:
+		optionsDialog = reinterpret_cast<OptionsDialog *>(lParam);
+		break;
+	}
+
+	return optionsDialog->AppearanceProc(hDlg, uMsg, wParam, lParam);
+}
+
+INT_PTR CALLBACK OptionsDialog::AppearanceProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{
+	case WM_INITDIALOG:
+	{
+		// Adding a tooltip to a static control works, provided that the SS_NOTIFY style is set.
+		// However, the tooltip won't show up if the control is disabled.
+		// Adding the tooltip based on the control rectangle, while leaving out the SS_NOTIFY style,
+		// will work in both cases.
+		AddTooltipForControl(m_tipWnd, GetDlgItem(hDlg, IDC_OPTIONS_THEME_LABEL), m_instance,
+			IDS_OPTIONS_THEME_TOOLTIP, TooltipType::Rectangle);
+
+		// These calls add a tooltip both to the combobox control and to the control rectangle. The
+		// first tooltip will activate when the control is enabled, while the second will activate
+		// when the control is disabled.
+		AddTooltipForControl(m_tipWnd, GetDlgItem(hDlg, IDC_OPTIONS_THEME), m_instance,
+			IDS_OPTIONS_THEME_TOOLTIP, TooltipType::Control);
+		AddTooltipForControl(m_tipWnd, GetDlgItem(hDlg, IDC_OPTIONS_THEME), m_instance,
+			IDS_OPTIONS_THEME_TOOLTIP, TooltipType::Rectangle);
+
+		auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+		if (!darkModeHelper.IsDarkModeSupported())
+		{
+			EnableWindow(GetDlgItem(hDlg, IDC_OPTIONS_THEME_LABEL), false);
+			EnableWindow(GetDlgItem(hDlg, IDC_OPTIONS_THEME), false);
+		}
+
+		std::vector<IconSet> iconSets(IconSet::_values().begin(), IconSet::_values().end());
+		AddItemsToComboBox<IconSet>(GetDlgItem(hDlg, IDC_OPTIONS_ICON_SET), iconSets,
+			m_config->iconSet, GetIconSetStringResourceId);
+
+		std::vector<Theme> themes(Theme::_values().begin(), Theme::_values().end());
+		AddItemsToComboBox<Theme>(GetDlgItem(hDlg, IDC_OPTIONS_THEME), themes, m_config->theme,
+			GetThemeStringResourceId);
+
+		if (darkModeHelper.IsDarkModeEnabled())
+		{
+			darkModeHelper.SetDarkModeForComboBox(GetDlgItem(hDlg, IDC_OPTIONS_ICON_SET));
+			darkModeHelper.SetDarkModeForComboBox(GetDlgItem(hDlg, IDC_OPTIONS_THEME));
+		}
+	}
+	break;
+
+	case WM_CTLCOLORDLG:
+		return OnPageCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
+	case WM_CTLCOLORSTATIC:
+	case WM_CTLCOLORLISTBOX:
+		return OnCtlColor(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
+
+	case WM_COMMAND:
+		if (HIWORD(wParam) != 0)
+		{
+			switch (HIWORD(wParam))
+			{
+			case CBN_SELCHANGE:
+				OnSettingChanged();
+				break;
+			}
+		}
+		break;
+
+	case WM_APP_SAVE_SETTINGS:
+	{
+		int selectedIndex =
+			static_cast<int>(SendDlgItemMessage(hDlg, IDC_OPTIONS_ICON_SET, CB_GETCURSEL, 0, 0));
+		int iconSetItemData = static_cast<int>(
+			SendDlgItemMessage(hDlg, IDC_OPTIONS_ICON_SET, CB_GETITEMDATA, selectedIndex, 0));
+		m_config->iconSet = IconSet::_from_integral(iconSetItemData);
+
+		selectedIndex =
+			static_cast<int>(SendDlgItemMessage(hDlg, IDC_OPTIONS_THEME, CB_GETCURSEL, 0, 0));
+		int themeItemData = static_cast<int>(
+			SendDlgItemMessage(hDlg, IDC_OPTIONS_THEME, CB_GETITEMDATA, selectedIndex, 0));
+		m_config->theme = Theme::_from_integral(themeItemData);
 	}
 	break;
 	}
@@ -644,8 +721,6 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 	{
 	case WM_INITDIALOG:
 	{
-		HWND hCBSize;
-
 		if (m_config->globalFolderSettings.hideSystemFiles)
 		{
 			CheckDlgButton(hDlg, IDC_SETTINGS_CHECK_SYSTEMFILES, BST_CHECKED);
@@ -735,22 +810,14 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 		AddTooltipForControl(m_tipWnd, GetDlgItem(hDlg, IDC_USE_NATURAL_SORT_ORDER), m_instance,
 			IDS_USE_NATURAL_SORT_ORDER_TOOLTIP);
 
-		hCBSize = GetDlgItem(hDlg, IDC_COMBO_FILESIZES);
+		HWND fileSizesComboBox = GetDlgItem(hDlg, IDC_COMBO_FILESIZES);
+		std::vector<SizeDisplayFormat> fileSizeOptions = { SizeDisplayFormat::Bytes,
+			SizeDisplayFormat::KB, SizeDisplayFormat::MB, SizeDisplayFormat::GB,
+			SizeDisplayFormat::TB, SizeDisplayFormat::PB };
+		AddItemsToComboBox<SizeDisplayFormat>(fileSizesComboBox, fileSizeOptions,
+			m_config->globalFolderSettings.sizeDisplayFormat, GetSizeDisplayFormatStringResourceId);
 
-		for (int i = 0; i < SIZEOF_ARRAY(FILE_SIZES); i++)
-		{
-			std::wstring fileSizeText =
-				ResourceHelper::LoadString(m_instance, FILE_SIZES[i].StringID);
-			SendMessage(hCBSize, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(fileSizeText.c_str()));
-			SendMessage(hCBSize, CB_SETITEMDATA, i, static_cast<LPARAM>(FILE_SIZES[i].sdf));
-
-			if (FILE_SIZES[i].sdf == m_config->globalFolderSettings.sizeDisplayFormat)
-			{
-				SendMessage(hCBSize, CB_SETCURSEL, i, 0);
-			}
-		}
-
-		EnableWindow(hCBSize, m_config->globalFolderSettings.forceSize);
+		EnableWindow(fileSizesComboBox, m_config->globalFolderSettings.forceSize);
 
 		SetInfoTipWindowStates(hDlg);
 		SetFolderSizeWindowState(hDlg);
@@ -1381,30 +1448,9 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 			CheckDlgButton(hDlg, IDC_SORTASCENDINGGLOBAL, BST_CHECKED);
 		}
 
-		HWND hComboBox = GetDlgItem(hDlg, IDC_OPTIONS_DEFAULT_VIEW);
-		int selectedIndex = -1;
-
-		for (auto viewMode : VIEW_MODES)
-		{
-			int stringId = GetViewModeMenuStringId(viewMode);
-
-			std::wstring viewModeText = ResourceHelper::LoadString(m_instance, stringId);
-
-			int index = static_cast<int>(SendMessage(hComboBox, CB_ADDSTRING, 0,
-				reinterpret_cast<LPARAM>(viewModeText.c_str())));
-
-			if (index != CB_ERR)
-			{
-				SendMessage(hComboBox, CB_SETITEMDATA, index, viewMode);
-			}
-
-			if (viewMode == m_config->defaultFolderSettings.viewMode)
-			{
-				selectedIndex = index;
-			}
-		}
-
-		SendMessage(hComboBox, CB_SETCURSEL, selectedIndex, 0);
+		std::vector<ViewMode> viewModes(VIEW_MODES.begin(), VIEW_MODES.end());
+		AddItemsToComboBox<ViewMode>(GetDlgItem(hDlg, IDC_OPTIONS_DEFAULT_VIEW), viewModes,
+			m_config->defaultFolderSettings.viewMode, GetViewModeMenuStringId);
 
 		auto &darkModeHelper = DarkModeHelper::GetInstance();
 
@@ -1778,13 +1824,6 @@ std::vector<OptionsDialog::AdvancedOption> OptionsDialog::InitializeAdvancedOpti
 		IDS_ADVANCED_OPTION_CHECK_PINNED_TO_NAMESPACE_TREE_DESCRIPTION);
 	advancedOptions.push_back(option);
 
-	option.id = AdvancedOptionId::EnableDarkMode;
-	option.name = ResourceHelper::LoadString(m_instance, IDS_ADVANCED_OPTION_ENABLE_DARK_MODE_NAME);
-	option.type = AdvancedOptionType::Boolean;
-	option.description =
-		ResourceHelper::LoadString(m_instance, IDS_ADVANCED_OPTION_ENABLE_DARK_MODE_DESCRIPTION);
-	advancedOptions.push_back(option);
-
 	option.id = AdvancedOptionId::OpenTabsInForeground;
 	option.name =
 		ResourceHelper::LoadString(m_instance, IDS_ADVANCED_OPTION_OPEN_TABS_IN_FOREGROUND_NAME);
@@ -1835,9 +1874,6 @@ bool OptionsDialog::GetBooleanConfigValue(OptionsDialog::AdvancedOptionId id)
 	case AdvancedOptionId::CheckSystemIsPinnedToNameSpaceTree:
 		return m_config->checkPinnedToNamespaceTreeProperty;
 
-	case AdvancedOptionId::EnableDarkMode:
-		return m_config->enableDarkMode;
-
 	case AdvancedOptionId::OpenTabsInForeground:
 		return m_config->openTabsInForeground;
 
@@ -1855,10 +1891,6 @@ void OptionsDialog::SetBooleanConfigValue(OptionsDialog::AdvancedOptionId id, bo
 	{
 	case OptionsDialog::AdvancedOptionId::CheckSystemIsPinnedToNameSpaceTree:
 		m_config->checkPinnedToNamespaceTreeProperty = value;
-		break;
-
-	case AdvancedOptionId::EnableDarkMode:
-		m_config->enableDarkMode = value;
 		break;
 
 	case AdvancedOptionId::OpenTabsInForeground:
@@ -2033,47 +2065,97 @@ void OptionsDialog::DefaultSettingsSetNewTabDir(HWND hEdit, PCIDLIST_ABSOLUTE pi
 	SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM) newTabDir.c_str());
 }
 
-void OptionsDialog::AddIconThemes(HWND dlg)
+template <typename T>
+void OptionsDialog::AddItemsToComboBox(HWND comboBox, const std::vector<T> &itemIds,
+	T currentItemId, std::function<UINT(T)> getStringResourceId)
 {
-	HWND iconThemeControl = GetDlgItem(dlg, IDC_OPTIONS_ICON_THEME);
-
-	for (auto theme : IconTheme::_values())
+	for (auto itemId : itemIds)
 	{
-		UINT stringResourceId = GetIconThemeStringResourceId(theme);
-		std::wstring iconThemeName = ResourceHelper::LoadString(m_instance, stringResourceId);
+		UINT stringResourceId = getStringResourceId(itemId);
+		std::wstring itemName = ResourceHelper::LoadString(m_instance, stringResourceId);
 
-		int index = static_cast<int>(SendMessage(iconThemeControl, CB_ADDSTRING, 0,
-			reinterpret_cast<LPARAM>(iconThemeName.c_str())));
+		int index = static_cast<int>(
+			SendMessage(comboBox, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(itemName.c_str())));
 
 		if (index == CB_ERR)
 		{
+			assert(false);
 			continue;
 		}
 
-		SendMessage(iconThemeControl, CB_SETITEMDATA, index, theme);
+		[[maybe_unused]] auto res =
+			SendMessage(comboBox, CB_SETITEMDATA, index, static_cast<LPARAM>(itemId));
+		assert(res != CB_ERR);
 
-		if (theme == m_config->iconTheme)
+		if (itemId == currentItemId)
 		{
-			SendMessage(iconThemeControl, CB_SETCURSEL, index, 0);
+			res = SendMessage(comboBox, CB_SETCURSEL, index, 0);
+			assert(res != CB_ERR);
 		}
 	}
 }
 
-UINT GetIconThemeStringResourceId(IconTheme iconTheme)
+UINT GetSizeDisplayFormatStringResourceId(SizeDisplayFormat sizeDisplayFormat)
 {
-	switch (iconTheme)
+	switch (sizeDisplayFormat)
 	{
-	case IconTheme::Color:
-		return IDS_ICON_THEME_COLOR;
+		break;
+	case SizeDisplayFormat::Bytes:
+		return IDS_OPTIONS_DIALOG_FILE_SIZE_BYTES;
 
-	case IconTheme::FluentUi:
-		return IDS_ICON_THEME_FLUENT_UI;
+	case SizeDisplayFormat::KB:
+		return IDS_OPTIONS_DIALOG_FILE_SIZE_KB;
 
-	case IconTheme::Windows10:
-		return IDS_ICON_THEME_WINDOWS_10;
+	case SizeDisplayFormat::MB:
+		return IDS_OPTIONS_DIALOG_FILE_SIZE_MB;
+
+	case SizeDisplayFormat::GB:
+		return IDS_OPTIONS_DIALOG_FILE_SIZE_GB;
+
+	case SizeDisplayFormat::TB:
+		return IDS_OPTIONS_DIALOG_FILE_SIZE_TB;
+
+	case SizeDisplayFormat::PB:
+		return IDS_OPTIONS_DIALOG_FILE_SIZE_PB;
+
+	// SizeDisplayFormat::None isn't an option that's displayed to the user, so there should never
+	// be a string lookup for that item.
+	case SizeDisplayFormat::None:
+	default:
+		throw std::runtime_error("SizeDisplayFormat value not found or invalid");
+	}
+}
+
+UINT GetIconSetStringResourceId(IconSet iconSet)
+{
+	switch (iconSet)
+	{
+	case IconSet::Color:
+		return IDS_ICON_SET_COLOR;
+
+	case IconSet::FluentUi:
+		return IDS_ICON_SET_FLUENT_UI;
+
+	case IconSet::Windows10:
+		return IDS_ICON_SET_WINDOWS_10;
 
 	default:
-		throw std::runtime_error("IconTheme value not found");
+		throw std::runtime_error("IconSet value not found");
+	}
+}
+
+UINT GetThemeStringResourceId(Theme theme)
+{
+	switch (theme)
+	{
+	case Theme::Light:
+		return IDS_THEME_LIGHT;
+
+	case Theme::Dark:
+		return IDS_THEME_DARK;
+
+	default:
+		throw std::runtime_error("Theme value not found");
 	}
 }
 

@@ -8,7 +8,7 @@
 #include "IconMappings.h"
 #include "../Helper/ImageHelper.h"
 
-IconResourceLoader::IconResourceLoader(IconTheme iconTheme) : m_iconTheme(iconTheme)
+IconResourceLoader::IconResourceLoader(IconSet iconSet) : m_iconSet(iconSet)
 {
 }
 
@@ -93,7 +93,7 @@ std::unique_ptr<Gdiplus::Bitmap> IconResourceLoader::LoadGdiplusBitmapFromPNGAnd
 {
 	auto bitmap = LoadGdiplusBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
 
-	if (m_iconTheme == +IconTheme::Color || !DarkModeHelper::GetInstance().IsDarkModeEnabled())
+	if (m_iconSet == +IconSet::Color || !DarkModeHelper::GetInstance().IsDarkModeEnabled())
 	{
 		return bitmap;
 	}
@@ -134,17 +134,17 @@ std::unique_ptr<Gdiplus::Bitmap> IconResourceLoader::LoadGdiplusBitmapFromPNGAnd
 {
 	const IconMapping *mapping = nullptr;
 
-	switch (m_iconTheme)
+	switch (m_iconSet)
 	{
-	case IconTheme::Color:
+	case IconSet::Color:
 		mapping = &ICON_RESOURCE_MAPPINGS_COLOR;
 		break;
 
-	case IconTheme::FluentUi:
+	case IconSet::FluentUi:
 		mapping = &ICON_RESOURCE_MAPPINGS_FLUENT_UI;
 		break;
 
-	case IconTheme::Windows10:
+	case IconSet::Windows10:
 		mapping = &ICON_RESOURCE_MAPPINGS_WINDOWS_10;
 		break;
 	}

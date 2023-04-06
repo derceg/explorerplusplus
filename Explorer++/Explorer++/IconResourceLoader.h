@@ -9,10 +9,10 @@
 #include <wil/resource.h>
 #include <gdiplus.h>
 
-// Note that the values in this enumeration are used when saving/loading the icon theme and should
-// not be changed.
+// Note that the values in this enumeration are used when saving/loading the icon set and should not
+// be changed.
 // clang-format off
-BETTER_ENUM(IconTheme, int,
+BETTER_ENUM(IconSet, int,
 	Color = 0,
 	Windows10 = 1,
 	FluentUi = 2
@@ -22,7 +22,7 @@ BETTER_ENUM(IconTheme, int,
 class IconResourceLoader
 {
 public:
-	IconResourceLoader(IconTheme iconTheme);
+	IconResourceLoader(IconSet iconSet);
 
 	wil::unique_hbitmap LoadBitmapFromPNGForDpi(Icon icon, int iconWidth, int iconHeight,
 		int dpi) const;
@@ -42,5 +42,5 @@ private:
 	std::unique_ptr<Gdiplus::Bitmap> LoadGdiplusBitmapFromPNGAndScale(Icon icon, int iconWidth,
 		int iconHeight) const;
 
-	const IconTheme m_iconTheme;
+	const IconSet m_iconSet;
 };

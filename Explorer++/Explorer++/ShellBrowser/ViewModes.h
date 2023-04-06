@@ -19,5 +19,5 @@ BETTER_ENUM(ViewMode, int,
 )
 // clang-format on
 
-int GetViewModeMenuId(ViewMode viewMode);
-int GetViewModeMenuStringId(ViewMode viewMode);
+UINT GetViewModeMenuId(ViewMode viewMode);
+UINT GetViewModeMenuStringId(ViewMode viewMode);

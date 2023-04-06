@@ -41,11 +41,11 @@ void Explorerplusplus::OnCreate()
 
 	m_config->shellChangeNotificationType = m_commandLineSettings.shellChangeNotificationType;
 
-	m_iconResourceLoader = std::make_unique<IconResourceLoader>(m_config->iconTheme);
+	m_iconResourceLoader = std::make_unique<IconResourceLoader>(m_config->iconSet);
 
 	SetLanguageModule();
 
-	if (m_config->enableDarkMode)
+	if (m_config->theme == +Theme::Dark)
 	{
 		SetUpDarkMode();
 	}

@@ -112,6 +112,7 @@ will need to be changed correspondingly. */
 #define HASH_LARGETOOLBARICONS 10895007
 #define HASH_ICON_THEME 3998265761
 #define HASH_CHECK_PINNED_TO_NAMESPACE_TREE_PROPERTY 145831142
+#define HASH_THEME 237620728
 #define HASH_ENABLE_DARK_MODE 1623404723
 #define HASH_DISPLAY_MIXED_FILES_AND_FOLDERS 1168704423
 #define HASH_USE_NATURAL_SORT_ORDER 528323501
@@ -695,7 +696,7 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("IconTheme"),
-		NXMLSettings::EncodeIntValue(m_config->iconTheme));
+		NXMLSettings::EncodeIntValue(m_config->iconSet));
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
@@ -723,8 +724,8 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 		NXMLSettings::EncodeBoolValue(m_config->checkPinnedToNamespaceTreeProperty));
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("EnableDarkMode"),
-		NXMLSettings::EncodeBoolValue(m_config->enableDarkMode));
+	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("Theme"),
+		NXMLSettings::EncodeIntValue(m_config->theme));
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
@@ -1783,15 +1784,24 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 		break;
 
 	case HASH_ICON_THEME:
-		m_config->iconTheme = IconTheme::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
+		m_config->iconSet = IconSet::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_CHECK_PINNED_TO_NAMESPACE_TREE_PROPERTY:
 		m_config->checkPinnedToNamespaceTreeProperty = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
+	case HASH_THEME:
+		m_config->theme = Theme::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
+		m_themeValueLoadedFromXml = true;
+		break;
+
 	case HASH_ENABLE_DARK_MODE:
-		m_config->enableDarkMode = NXMLSettings::DecodeBoolValue(wszValue);
+		if (!m_themeValueLoadedFromXml)
+		{
+			bool enableDarkMode = NXMLSettings::DecodeBoolValue(wszValue);
+			m_config->theme = enableDarkMode ? Theme::Dark : Theme::Light;
+		}
 		break;
 
 	case HASH_DISPLAY_MIXED_FILES_AND_FOLDERS:

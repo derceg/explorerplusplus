@@ -4,6 +4,12 @@
 
 #pragma once
 
+enum class TooltipType
+{
+	Control,
+	Rectangle
+};
+
 HWND CreateListView(HWND hParent, DWORD dwStyle);
 HWND CreateTreeView(HWND hParent, DWORD dwStyle);
 HWND CreateStatusBar(HWND hParent, DWORD dwStyle);
@@ -26,4 +32,5 @@ SIZE GetCheckboxSize(HWND hwnd);
 SIZE GetRadioButtonSize(HWND hwnd);
 SIZE GetButtonSize(HWND hwnd, int partId, int stateId, int defaultWidth, int defaultHeight);
 
-void AddTooltipForControl(HWND tipWnd, HWND control, HINSTANCE instance, int stringResourceId);
+bool AddTooltipForControl(HWND tipWnd, HWND control, HINSTANCE instance, int stringResourceId,
+	TooltipType tooltipType = TooltipType::Control);
