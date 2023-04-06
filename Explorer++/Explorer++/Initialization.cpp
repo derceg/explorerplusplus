@@ -45,7 +45,7 @@ void Explorerplusplus::OnCreate()
 
 	SetLanguageModule();
 
-	if (m_config->theme == +Theme::Dark)
+	if (ShouldEnableDarkMode(m_config->theme))
 	{
 		SetUpDarkMode();
 	}
@@ -163,6 +163,12 @@ void Explorerplusplus::AddViewModesToMenu(HMENU menu, UINT startPosition, BOOL b
 			position++;
 		}
 	}
+}
+
+bool Explorerplusplus::ShouldEnableDarkMode(Theme theme)
+{
+	return theme == +Theme::Dark
+		|| (theme == +Theme::System && DarkModeHelper::GetInstance().ShouldAppsUseDarkMode());
 }
 
 void Explorerplusplus::SetUpDarkMode()

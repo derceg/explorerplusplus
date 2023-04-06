@@ -2154,6 +2154,9 @@ UINT GetThemeStringResourceId(Theme theme)
 	case Theme::Dark:
 		return IDS_THEME_DARK;
 
+	case Theme::System:
+		return IDS_THEME_SYSTEM_DEFAULT;
+
 	default:
 		throw std::runtime_error("Theme value not found");
 	}

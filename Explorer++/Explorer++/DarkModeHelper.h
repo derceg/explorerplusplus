@@ -77,6 +77,7 @@ public:
 	void EnableForApp();
 
 	void AllowDarkModeForApp(bool allow);
+	bool ShouldAppsUseDarkMode();
 	void FlushMenuThemes();
 	void RefreshImmersiveColorPolicyState();
 	void AllowDarkModeForWindow(HWND hWnd, bool allow);

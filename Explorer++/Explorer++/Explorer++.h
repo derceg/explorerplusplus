@@ -524,6 +524,7 @@ private:
 	void AddViewModesToMenu(HMENU menu, UINT startPosition, BOOL byPosition);
 
 	// Dark mode
+	static bool ShouldEnableDarkMode(Theme theme);
 	void SetUpDarkMode();
 
 	// Rebar

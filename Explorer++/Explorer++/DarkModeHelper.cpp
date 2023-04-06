@@ -130,6 +130,16 @@ void DarkModeHelper::AllowDarkModeForWindow(HWND hWnd, bool allow)
 	}
 }
 
+bool DarkModeHelper::ShouldAppsUseDarkMode()
+{
+	if (!m_ShouldAppsUseDarkMode)
+	{
+		return false;
+	}
+
+	return m_ShouldAppsUseDarkMode();
+}
+
 void DarkModeHelper::FlushMenuThemes()
 {
 	if (m_FlushMenuThemes)

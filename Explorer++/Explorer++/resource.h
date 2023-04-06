@@ -186,6 +186,7 @@
 #define IDS_LISTVIEW_FOLDER_EMPTY       369
 #define IDS_FILTER_APPLIED              370
 #define IDM_GO_QUICK_ACCESS             371
+#define IDS_THEME_SYSTEM_DEFAULT        371
 #define IDM_GO_DOWNLOADS                372
 #define IDM_GO_VIDEOS                   373
 #define IDM_GO_WSL_DISTRIBUTIONS        374
