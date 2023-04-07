@@ -5,6 +5,9 @@
 #include "stdafx.h"
 #include "DarkModeHelper.h"
 #include <wil/common.h>
+#include <detours/detours.h>
+
+DarkModeHelper::OpenNcThemeDataType DarkModeHelper::m_OpenNcThemeData = nullptr;
 
 DarkModeHelper &DarkModeHelper::GetInstance()
 {
@@ -63,6 +66,8 @@ DarkModeHelper::DarkModeHelper() : m_darkModeSupported(false), m_darkModeEnabled
 		GetProcAddress(m_uxThemeLib.get(), MAKEINTRESOURCEA(104)));
 	m_AllowDarkModeForWindow = reinterpret_cast<AllowDarkModeForWindowType>(
 		GetProcAddress(m_uxThemeLib.get(), MAKEINTRESOURCEA(133)));
+	m_OpenNcThemeData = reinterpret_cast<OpenNcThemeDataType>(
+		GetProcAddress(m_uxThemeLib.get(), MAKEINTRESOURCEA(49)));
 
 	m_SetWindowCompositionAttribute = reinterpret_cast<SetWindowCompositionAttributeType>(
 		GetProcAddress(GetModuleHandleW(L"user32.dll"), "SetWindowCompositionAttribute"));
@@ -106,6 +111,9 @@ void DarkModeHelper::EnableForApp()
 	AllowDarkModeForApp(true);
 	FlushMenuThemes();
 	RefreshImmersiveColorPolicyState();
+
+	[[maybe_unused]] LONG res = DetourOpenNcThemeData();
+	assert(res == NO_ERROR);
 
 	m_darkModeEnabled = true;
 }
@@ -154,6 +162,53 @@ void DarkModeHelper::RefreshImmersiveColorPolicyState()
 	{
 		m_RefreshImmersiveColorPolicyState();
 	}
+}
+
+LONG DarkModeHelper::DetourOpenNcThemeData()
+{
+	LONG res = DetourTransactionBegin();
+
+	if (res != NO_ERROR)
+	{
+		return res;
+	}
+
+	res = DetourUpdateThread(GetCurrentThread());
+
+	if (res != NO_ERROR)
+	{
+		return res;
+	}
+
+	res = DetourAttach(&(PVOID &) m_OpenNcThemeData, DetouredOpenNcThemeData);
+
+	if (res != NO_ERROR)
+	{
+		return res;
+	}
+
+	res = DetourTransactionCommit();
+
+	if (res != NO_ERROR)
+	{
+		return res;
+	}
+
+	return res;
+}
+
+HTHEME WINAPI DarkModeHelper::DetouredOpenNcThemeData(HWND hwnd, LPCWSTR classList)
+{
+	// The "ItemsView" theme used to style listview controls in dark mode doesn't change the
+	// scrollbar colors. By changing the class here, the scrollbars in a listview control will
+	// appear dark in dark mode.
+	if (lstrcmp(classList, L"ScrollBar") == 0)
+	{
+		hwnd = nullptr;
+		classList = L"Explorer::ScrollBar";
+	}
+
+	return m_OpenNcThemeData(hwnd, classList);
 }
 
 void DarkModeHelper::SetWindowCompositionAttribute(HWND hWnd, WINDOWCOMPOSITIONATTRIBDATA *data)

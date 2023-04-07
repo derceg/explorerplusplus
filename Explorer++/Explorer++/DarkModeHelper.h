@@ -105,6 +105,7 @@ private:
 	using FlushMenuThemesType = void(WINAPI *)();
 	using RefreshImmersiveColorPolicyStateType = void(WINAPI *)();
 	using AllowDarkModeForWindowType = bool(WINAPI *)(HWND hWnd, bool allow);
+	using OpenNcThemeDataType = HTHEME(WINAPI *)(HWND hwnd, LPCWSTR classList);
 
 	// Windows 10 1903
 	using SetPreferredAppModeType = PreferredAppMode(WINAPI *)(PreferredAppMode appMode);
@@ -112,6 +113,9 @@ private:
 	DarkModeHelper();
 
 	static bool IsHighContrast();
+
+	LONG DetourOpenNcThemeData();
+	static HTHEME WINAPI DetouredOpenNcThemeData(HWND hwnd, LPCWSTR classList);
 
 	// Windows 10 1809
 	AllowDarkModeForAppType m_AllowDarkModeForApp = nullptr;
@@ -123,6 +127,10 @@ private:
 
 	// Windows 10 1903
 	SetPreferredAppModeType m_SetPreferredAppMode = nullptr;
+
+	// This is static, as it needs to be called by DetouredOpenNcThemeData(). The only two options
+	// here are a static variable or a global variable.
+	static OpenNcThemeDataType m_OpenNcThemeData;
 
 	wil::unique_hmodule m_uxThemeLib;
 	bool m_isWindows10Version1809 = false;
