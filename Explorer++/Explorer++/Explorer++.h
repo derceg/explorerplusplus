@@ -5,7 +5,6 @@
 #pragma once
 
 #include "AcceleratorUpdater.h"
-#include "ApplicationModel.h"
 #include "CommandLine.h"
 #include "CoreInterface.h"
 #include "Navigator.h"
@@ -654,8 +653,6 @@ private:
 	MainToolbar *m_mainToolbar;
 	DrivesToolbar *m_drivesToolbar = nullptr;
 	Applications::ApplicationToolbar *m_applicationToolbar = nullptr;
-
-	Applications::ApplicationModel m_applicationModel;
 
 	/* Display window folder sizes. */
 	std::list<DWFolderSize> m_DWFolderSizes;

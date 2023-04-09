@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "AddressBar.h"
+#include "ApplicationModelFactory.h"
 #include "ApplicationToolbar.h"
 #include "ApplicationToolbarView.h"
 #include "Bookmarks/BookmarkTreeFactory.h"
@@ -463,8 +464,8 @@ void Explorerplusplus::CreateApplicationToolbar()
 {
 	auto applicationToolbarView = Applications::ApplicationToolbarView::Create(m_hMainRebar);
 
-	m_applicationToolbar =
-		Applications::ApplicationToolbar::Create(applicationToolbarView, &m_applicationModel, this);
+	m_applicationToolbar = Applications::ApplicationToolbar::Create(applicationToolbarView,
+		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel(), this);
 	m_applicationToolbar->GetView()->AddToolbarUpdatedObserver(
 		std::bind_front(&Explorerplusplus::OnRebarToolbarUpdated, this,
 			m_applicationToolbar->GetView()->GetHWND()));

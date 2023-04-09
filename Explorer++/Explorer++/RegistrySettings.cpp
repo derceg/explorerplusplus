@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "ApplicationModelFactory.h"
 #include "ApplicationToolbar.h"
 #include "ApplicationToolbarRegistryStorage.h"
 #include "Bookmarks/BookmarkRegistryStorage.h"
@@ -1192,11 +1193,11 @@ void Explorerplusplus::LoadToolbarInformationFromRegistry()
 void Explorerplusplus::LoadApplicationToolbarFromRegistry()
 {
 	Applications::ApplicationToolbarRegistryStorage::Load(NExplorerplusplus::REG_MAIN_KEY,
-		&m_applicationModel);
+		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
 }
 
 void Explorerplusplus::SaveApplicationToolbarToRegistry()
 {
 	Applications::ApplicationToolbarRegistryStorage::Save(NExplorerplusplus::REG_MAIN_KEY,
-		&m_applicationModel);
+		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
 }

@@ -496,6 +496,9 @@
     <ClCompile Include="Bookmarks\BookmarkTreeFactory.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
+    <ClCompile Include="ApplicationModelFactory.cpp">
+      <Filter>Application Toolbar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -998,6 +1001,9 @@
     </ClInclude>
     <ClInclude Include="Bookmarks\BookmarkTreeFactory.h">
       <Filter>Bookmarks</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationModelFactory.h">
+      <Filter>Application Toolbar</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -6,7 +6,7 @@
 #include "BookmarkTreeFactory.h"
 #include "Bookmarks/BookmarkTree.h"
 
-BookmarkTreeFactory *BookmarkTreeFactory::m_staticInstance = nullptr;
+BookmarkTreeFactory::~BookmarkTreeFactory() = default;
 
 BookmarkTreeFactory *BookmarkTreeFactory::GetInstance()
 {
@@ -19,8 +19,6 @@ BookmarkTreeFactory *BookmarkTreeFactory::GetInstance()
 
 	return m_staticInstance;
 }
-
-BookmarkTreeFactory::~BookmarkTreeFactory() = default;
 
 BookmarkTree *BookmarkTreeFactory::GetBookmarkTree()
 {

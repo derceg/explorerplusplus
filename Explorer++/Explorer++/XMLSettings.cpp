@@ -15,6 +15,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "ApplicationModelFactory.h"
 #include "ApplicationToolbar.h"
 #include "ApplicationToolbarXmlStorage.h"
 #include "Bookmarks/BookmarkTreeFactory.h"
@@ -1429,12 +1430,14 @@ void Explorerplusplus::SaveToolbarInformationToXMLnternal(IXMLDOMDocument *pXMLD
 
 void Explorerplusplus::LoadApplicationToolbarFromXML(IXMLDOMDocument *pXMLDom)
 {
-	Applications::ApplicationToolbarXmlStorage::Load(pXMLDom, &m_applicationModel);
+	Applications::ApplicationToolbarXmlStorage::Load(pXMLDom,
+		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
 }
 
 void Explorerplusplus::SaveApplicationToolbarToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
 {
-	Applications::ApplicationToolbarXmlStorage::Save(pXMLDom, pRoot, &m_applicationModel);
+	Applications::ApplicationToolbarXmlStorage::Save(pXMLDom, pRoot,
+		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
 }
 
 unsigned long hash_setting(unsigned char *str)

@@ -19,7 +19,7 @@ private:
 	BookmarkTreeFactory() = default;
 	~BookmarkTreeFactory();
 
-	static BookmarkTreeFactory *m_staticInstance;
+	static inline BookmarkTreeFactory *m_staticInstance = nullptr;
 
 	std::unique_ptr<BookmarkTree> m_bookmarkTree;
 };
