@@ -101,15 +101,6 @@ INT_PTR OptionsDialog::OnInitDialog()
 	AllowDarkModeForTreeView(IDC_SETTINGS_PAGES_TREE);
 	AllowDarkModeForControls({ IDAPPLY });
 
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	m_tipWnd = CreateTooltipControl(m_hDlg, m_instance);
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		darkModeHelper.SetDarkModeForControl(m_tipWnd);
-	}
-
 	AddSettingsPages();
 	SelectPage(m_lastSelectedPageIndex);
 

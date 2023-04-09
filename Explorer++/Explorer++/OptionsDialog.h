@@ -133,7 +133,6 @@ private:
 	std::shared_ptr<Config> m_config;
 	HINSTANCE m_instance;
 	CoreInterface *m_coreInterface;
-	HWND m_tipWnd;
 
 	std::unordered_map<int, HWND> m_dialogMap;
 	std::unordered_map<int, HTREEITEM> m_treeMap;
