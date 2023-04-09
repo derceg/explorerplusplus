@@ -8,6 +8,7 @@
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "../Helper/Helper.h"
 #include "../Helper/ProcessHelper.h"
 
 /*

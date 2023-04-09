@@ -9,6 +9,7 @@
 #include "ApplicationEditorDialog.h"
 #include "ApplicationToolbar.h"
 #include "ApplicationToolbarView.h"
+#include "Bookmarks/BookmarkTreeFactory.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "Bookmarks/UI/BookmarksToolbar.h"
 #include "Bookmarks/UI/ManageBookmarksDialog.h"
@@ -1251,20 +1252,22 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 
 	case MainToolbarButton::AddBookmark:
 	case IDM_BOOKMARKS_BOOKMARKTHISTAB:
-		BookmarkHelper::AddBookmarkItem(&m_bookmarkTree, BookmarkItem::Type::Bookmark, nullptr,
-			std::nullopt, hwnd, this);
+		BookmarkHelper::AddBookmarkItem(BookmarkTreeFactory::GetInstance()->GetBookmarkTree(),
+			BookmarkItem::Type::Bookmark, nullptr, std::nullopt, hwnd, this);
 		break;
 
 	case IDM_BOOKMARKS_BOOKMARK_ALL_TABS:
-		BookmarkHelper::BookmarkAllTabs(&m_bookmarkTree, m_resourceModule, hwnd, this);
+		BookmarkHelper::BookmarkAllTabs(BookmarkTreeFactory::GetInstance()->GetBookmarkTree(),
+			m_resourceModule, hwnd, this);
 		break;
 
 	case MainToolbarButton::Bookmarks:
 	case IDM_BOOKMARKS_MANAGEBOOKMARKS:
 		if (g_hwndManageBookmarks == nullptr)
 		{
-			auto *pManageBookmarksDialog = new ManageBookmarksDialog(m_resourceModule, hwnd, this,
-				this, &m_bookmarkIconFetcher, &m_bookmarkTree);
+			auto *pManageBookmarksDialog =
+				new ManageBookmarksDialog(m_resourceModule, hwnd, this, this,
+					&m_bookmarkIconFetcher, BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
 			g_hwndManageBookmarks = pManageBookmarksDialog->ShowModelessDialog(
 				[]()
 				{

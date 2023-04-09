@@ -17,6 +17,7 @@
 #include "Explorer++.h"
 #include "ApplicationToolbar.h"
 #include "ApplicationToolbarXmlStorage.h"
+#include "Bookmarks/BookmarkTreeFactory.h"
 #include "Bookmarks/BookmarkXmlStorage.h"
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
@@ -1104,12 +1105,13 @@ int Explorerplusplus::LoadColumnFromXML(IXMLDOMNode *pNode, std::vector<Column_t
 
 void Explorerplusplus::LoadBookmarksFromXML(IXMLDOMDocument *pXMLDom)
 {
-	BookmarkXmlStorage::Load(pXMLDom, &m_bookmarkTree);
+	BookmarkXmlStorage::Load(pXMLDom, BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
 }
 
 void Explorerplusplus::SaveBookmarksToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
 {
-	BookmarkXmlStorage::Save(pXMLDom, pRoot, &m_bookmarkTree, 1);
+	BookmarkXmlStorage::Save(pXMLDom, pRoot, BookmarkTreeFactory::GetInstance()->GetBookmarkTree(),
+		1);
 }
 
 void Explorerplusplus::LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom)

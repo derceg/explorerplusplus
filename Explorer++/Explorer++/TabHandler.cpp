@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "Bookmarks/BookmarkTreeFactory.h"
 #include "Config.h"
 #include "LoadSaveInterface.h"
 #include "MenuRanges.h"
@@ -21,8 +22,9 @@ void Explorerplusplus::InitializeTabs()
 	/* The tab backing will hold the tab window. */
 	CreateTabBacking();
 
-	m_tabContainer = TabContainer::Create(m_hTabBacking, this, this, &m_FileActionHandler,
-		&m_cachedIcons, &m_bookmarkTree, m_resourceModule, m_config);
+	m_tabContainer =
+		TabContainer::Create(m_hTabBacking, this, this, &m_FileActionHandler, &m_cachedIcons,
+			BookmarkTreeFactory::GetInstance()->GetBookmarkTree(), m_resourceModule, m_config);
 	m_tabContainer->tabCreatedSignal.AddObserver(
 		std::bind_front(&Explorerplusplus::OnTabCreated, this), boost::signals2::at_front);
 	m_tabContainer->tabNavigationStartedSignal.AddObserver(

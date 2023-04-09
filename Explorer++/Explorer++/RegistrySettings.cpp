@@ -7,6 +7,7 @@
 #include "ApplicationToolbar.h"
 #include "ApplicationToolbarRegistryStorage.h"
 #include "Bookmarks/BookmarkRegistryStorage.h"
+#include "Bookmarks/BookmarkTreeFactory.h"
 #include "Config.h"
 #include "DefaultColumns.h"
 #include "DisplayWindow/DisplayWindow.h"
@@ -564,12 +565,14 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 
 void Explorerplusplus::SaveBookmarksToRegistry()
 {
-	BookmarkRegistryStorage::Save(NExplorerplusplus::REG_MAIN_KEY, &m_bookmarkTree);
+	BookmarkRegistryStorage::Save(NExplorerplusplus::REG_MAIN_KEY,
+		BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
 }
 
 void Explorerplusplus::LoadBookmarksFromRegistry()
 {
-	BookmarkRegistryStorage::Load(NExplorerplusplus::REG_MAIN_KEY, &m_bookmarkTree);
+	BookmarkRegistryStorage::Load(NExplorerplusplus::REG_MAIN_KEY,
+		BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
 }
 
 void Explorerplusplus::SaveTabSettingsToRegistry()

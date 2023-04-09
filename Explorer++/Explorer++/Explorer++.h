@@ -6,7 +6,6 @@
 
 #include "AcceleratorUpdater.h"
 #include "ApplicationModel.h"
-#include "Bookmarks/BookmarkTree.h"
 #include "CommandLine.h"
 #include "CoreInterface.h"
 #include "Navigator.h"
@@ -623,7 +622,6 @@ private:
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	/* Bookmarks. */
-	BookmarkTree m_bookmarkTree;
 	std::unique_ptr<BookmarksMainMenu> m_bookmarksMainMenu;
 	BookmarksToolbar *m_bookmarksToolbar;
 

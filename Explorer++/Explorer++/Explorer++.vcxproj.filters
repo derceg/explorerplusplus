@@ -493,6 +493,9 @@
     <ClCompile Include="ApplicationCrashedDialog.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Bookmarks\BookmarkTreeFactory.cpp">
+      <Filter>Bookmarks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -992,6 +995,9 @@
     </ClInclude>
     <ClInclude Include="ApplicationCrashedDialog.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Bookmarks\BookmarkTreeFactory.h">
+      <Filter>Bookmarks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

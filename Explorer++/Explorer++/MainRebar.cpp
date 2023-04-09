@@ -7,6 +7,7 @@
 #include "AddressBar.h"
 #include "ApplicationToolbar.h"
 #include "ApplicationToolbarView.h"
+#include "Bookmarks/BookmarkTreeFactory.h"
 #include "Bookmarks/UI/BookmarksToolbar.h"
 #include "Bookmarks/UI/Views/BookmarksToolbarView.h"
 #include "Config.h"
@@ -439,7 +440,7 @@ void Explorerplusplus::CreateBookmarksToolbar()
 	auto bookmarksToolbarView = new BookmarksToolbarView(m_hMainRebar);
 
 	m_bookmarksToolbar = BookmarksToolbar::Create(bookmarksToolbarView, this, this,
-		&m_bookmarkIconFetcher, &m_bookmarkTree);
+		&m_bookmarkIconFetcher, BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
 	m_bookmarksToolbar->GetView()->AddToolbarUpdatedObserver(std::bind_front(
 		&Explorerplusplus::OnRebarToolbarUpdated, this, m_bookmarksToolbar->GetView()->GetHWND()));
 }

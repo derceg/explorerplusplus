@@ -25,6 +25,7 @@
 #include "TabContainer.h"
 #include "UpdateCheckDialog.h"
 #include "WildcardSelectDialog.h"
+#include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"

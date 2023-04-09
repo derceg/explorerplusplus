@@ -10,6 +10,7 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
 #include "../Helper/FolderSize.h"
+#include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
 
 void Explorerplusplus::UpdateDisplayWindow(const Tab &tab)
