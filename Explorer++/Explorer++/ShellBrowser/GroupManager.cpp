@@ -667,18 +667,13 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemFreeSpaceGroup
 std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemAttributeGroup(
 	const BasicItemInfo_t &itemInfo) const
 {
-	std::wstring fullFileName = itemInfo.getFullPath();
-
-	TCHAR szAttributes[32];
-	HRESULT hr =
-		BuildFileAttributeString(fullFileName.c_str(), szAttributes, std::size(szAttributes));
-
-	if (FAILED(hr))
+	if (!itemInfo.isFindDataValid)
 	{
 		return std::nullopt;
 	}
 
-	return GroupInfo(szAttributes);
+	auto attributesString = BuildFileAttributesString(itemInfo.wfd.dwFileAttributes);
+	return GroupInfo(attributesString);
 }
 
 std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemOwnerGroup(

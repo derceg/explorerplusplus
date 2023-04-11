@@ -4,6 +4,8 @@
 
 #include "stdafx.h"
 #include "ShellBrowser.h"
+#include "ColorRuleModel.h"
+#include "ColorRuleModelFactory.h"
 #include "Config.h"
 #include "DarkModeHelper.h"
 #include "ItemData.h"
@@ -215,6 +217,9 @@ LRESULT CALLBACK ShellBrowser::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM w
 				// Respond to the notification in order to speed up calls to ListView_DeleteAllItems
 				// per http://www.verycomputer.com/5_0c959e6a4fd713e2_1.htm
 				return TRUE;
+
+			case NM_CUSTOMDRAW:
+				return OnListViewCustomDraw(reinterpret_cast<NMLVCUSTOMDRAW *>(lParam));
 			}
 		}
 		else if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == ListView_GetHeader(m_hListView))
@@ -1271,4 +1276,69 @@ BOOL ShellBrowser::OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo)
 	// The text will be set by UpdateItem. It's not safe to return true here, since items can sorted
 	// by UpdateItem, which can result in the index of this item being changed.
 	return FALSE;
+}
+
+LRESULT ShellBrowser::OnListViewCustomDraw(NMLVCUSTOMDRAW *listViewCustomDraw)
+{
+	switch (listViewCustomDraw->nmcd.dwDrawStage)
+	{
+	case CDDS_PREPAINT:
+		return CDRF_NOTIFYITEMDRAW;
+
+	case CDDS_ITEMPREPAINT:
+	{
+		const auto &itemInfo =
+			GetItemByIndex(static_cast<int>(listViewCustomDraw->nmcd.dwItemSpec));
+
+		for (const auto &colorRule :
+			ColorRuleModelFactory::GetInstance()->GetColorRuleModel()->GetItems())
+		{
+			bool matchedFileName = false;
+			bool matchedAttributes = false;
+
+			if (!colorRule->GetFilterPattern().empty())
+			{
+				if (CheckWildcardMatch(colorRule->GetFilterPattern().c_str(),
+						itemInfo.displayName.c_str(), !colorRule->GetFilterPatternCaseInsensitive())
+					== 1)
+				{
+					matchedFileName = true;
+				}
+			}
+			else
+			{
+				matchedFileName = true;
+			}
+
+			if (colorRule->GetFilterAttributes() != 0)
+			{
+				if (itemInfo.isFindDataValid
+					&& WI_IsAnyFlagSet(itemInfo.wfd.dwFileAttributes,
+						colorRule->GetFilterAttributes()))
+				{
+					matchedAttributes = true;
+				}
+			}
+			else
+			{
+				matchedAttributes = true;
+			}
+
+			if (matchedFileName && matchedAttributes)
+			{
+				listViewCustomDraw->clrText = colorRule->GetColor();
+				return CDRF_NEWFONT;
+			}
+		}
+	}
+	break;
+	}
+
+	return CDRF_DODEFAULT;
+}
+
+void ShellBrowser::OnColorRulesUpdated()
+{
+	// Any changes to the color rules will require the listview to be redrawn.
+	InvalidateRect(m_hListView, nullptr, false);
 }

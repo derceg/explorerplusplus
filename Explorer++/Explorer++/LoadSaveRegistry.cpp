@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "LoadSaveRegistry.h"
-#include "ColorRuleHelper.h"
 // clang-format off
 #include "Explorer++.h"
 // clang-format on
@@ -45,7 +44,7 @@ void LoadSaveRegistry::LoadToolbarInformation()
 
 void LoadSaveRegistry::LoadColorRules()
 {
-	NColorRuleHelper::LoadColorRulesFromRegistry(m_pContainer->m_ColorRules);
+	m_pContainer->LoadColorRulesFromRegistry();
 }
 
 void LoadSaveRegistry::LoadDialogStates()
@@ -85,7 +84,7 @@ void LoadSaveRegistry::SaveToolbarInformation()
 
 void LoadSaveRegistry::SaveColorRules()
 {
-	NColorRuleHelper::SaveColorRulesToRegistry(m_pContainer->m_ColorRules);
+	m_pContainer->SaveColorRulesToRegistry();
 }
 
 void LoadSaveRegistry::SaveDialogStates()

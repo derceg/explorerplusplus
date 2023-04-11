@@ -32,8 +32,7 @@ BOOL CreateFriendlySystemTimeString(const SYSTEMTIME *localSystemTime, TCHAR *sz
 	size_t cchMax);
 BOOL GetFileSizeEx(const TCHAR *szFileName, PLARGE_INTEGER lpFileSize);
 BOOL CompareFileTypes(const TCHAR *pszFile1, const TCHAR *pszFile2);
-HRESULT BuildFileAttributeString(const TCHAR *lpszFileName, TCHAR *szOutput, size_t cchMax);
-HRESULT BuildFileAttributeString(DWORD dwFileAttributes, TCHAR *szOutput, size_t cchMax);
+std::wstring BuildFileAttributesString(DWORD fileAttributes);
 BOOL GetFileOwner(const TCHAR *szFile, TCHAR *szOwner, size_t cchMax);
 DWORD GetNumFileHardLinks(const TCHAR *lpszFileName);
 BOOL ReadImageProperty(const TCHAR *lpszImage, PROPID propId, TCHAR *szProperty, int cchMax);

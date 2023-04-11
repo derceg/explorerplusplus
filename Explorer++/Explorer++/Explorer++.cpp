@@ -7,7 +7,6 @@
 #include "Application.h"
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
-#include "ColorRuleHelper.h"
 #include "Config.h"
 #include "Explorer++_internal.h"
 #include "MenuRanges.h"
@@ -62,8 +61,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd, CommandLine::Settings *commandLine
 	m_hActiveListView = nullptr;
 	m_zDeltaTotal = 0;
 	m_InitializationFinished.set(false);
-
-	m_ColorRules = NColorRuleHelper::GetDefaultColorRules();
 
 	m_iDWFolderSizeUniqueId = 0;
 }

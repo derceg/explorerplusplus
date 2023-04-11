@@ -7,6 +7,7 @@
 #include "Application.h"
 #include "ApplicationModel.h"
 #include "ApplicationToolbarStorageHelper.h"
+#include "MovableModelHelper.h"
 #include "RegistryStorageHelper.h"
 #include <gtest/gtest.h>
 

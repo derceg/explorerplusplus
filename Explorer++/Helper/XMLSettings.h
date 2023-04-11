@@ -35,6 +35,8 @@ bool ReadDateTime(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &baseKey
 	FILETIME &dateTime);
 void SaveDateTime(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
 	const std::wstring &baseKeyName, const FILETIME &dateTime);
+HRESULT ReadRgb(IXMLDOMNamedNodeMap *attributeMap, COLORREF &outputValue);
+void SaveRgb(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode, COLORREF color);
 HRESULT GetIntFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name,
 	int &outputValue);
 HRESULT GetBoolFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name,

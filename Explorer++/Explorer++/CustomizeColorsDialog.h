@@ -4,12 +4,13 @@
 
 #pragma once
 
-#include "ColorRuleHelper.h"
 #include "DarkModeDialogBase.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
-#include <vector>
+#include <memory>
 
+class ColorRuleListView;
+class ColorRuleModel;
 class CoreInterface;
 class CustomizeColorsDialog;
 
@@ -33,36 +34,41 @@ private:
 class CustomizeColorsDialog : public DarkModeDialogBase
 {
 public:
-	CustomizeColorsDialog(HINSTANCE hInstance, HWND hParent, CoreInterface *coreInterface,
-		std::vector<NColorRuleHelper::ColorRule> *pColorRuleList);
+	CustomizeColorsDialog(HINSTANCE instance, HWND parent, CoreInterface *coreInterface,
+		ColorRuleModel *model);
+	~CustomizeColorsDialog();
 
 protected:
 	INT_PTR OnInitDialog() override;
 	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
-	INT_PTR OnNotify(NMHDR *pnmhdr) override;
 	INT_PTR OnClose() override;
 
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 
 private:
+	enum class MovementDirection
+	{
+		Up,
+		Down
+	};
+
 	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
 		std::list<ResizableDialog::Control> &ControlList) override;
 	void SaveState() override;
 
 	void OnNew();
 	void OnEdit();
-	void InsertColorRuleIntoListView(HWND hListView, const NColorRuleHelper::ColorRule &colorRule,
-		int iIndex);
-	void EditColorRule(int iSelected);
-	void OnMove(BOOL bUp);
+	void OnMove(MovementDirection direction);
 	void OnDelete();
+	void OnDeleteAll();
 
 	void OnOk();
-	void OnCancel();
+
+	void UpdateControlStates();
 
 	CoreInterface *m_coreInterface;
-
-	std::vector<NColorRuleHelper::ColorRule> *m_pColorRuleList;
+	ColorRuleModel *m_model;
+	std::unique_ptr<ColorRuleListView> m_colorRuleListView;
 
 	CustomizeColorsDialogPersistentSettings *m_persistentSettings;
 };

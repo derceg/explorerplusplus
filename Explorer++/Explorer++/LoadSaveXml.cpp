@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "LoadSaveXml.h"
-#include "ColorRuleHelper.h"
 // clang-format off
 #include "Explorer++.h"
 // clang-format on
@@ -152,7 +151,7 @@ void LoadSaveXML::LoadToolbarInformation()
 
 void LoadSaveXML::LoadColorRules()
 {
-	NColorRuleHelper::LoadColorRulesFromXML(m_pXMLDom.get(), m_pContainer->m_ColorRules);
+	m_pContainer->LoadColorRulesFromXML(m_pXMLDom.get());
 }
 
 void LoadSaveXML::LoadDialogStates()
@@ -192,8 +191,7 @@ void LoadSaveXML::SaveToolbarInformation()
 
 void LoadSaveXML::SaveColorRules()
 {
-	NColorRuleHelper::SaveColorRulesToXML(m_pXMLDom.get(), m_pRoot.get(),
-		m_pContainer->m_ColorRules);
+	m_pContainer->SaveColorRulesToXML(m_pXMLDom.get(), m_pRoot.get());
 }
 
 void LoadSaveXML::SaveDialogStates()

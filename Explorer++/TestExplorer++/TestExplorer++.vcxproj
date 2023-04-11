@@ -136,7 +136,7 @@
     <VcpkgUseStatic>true</VcpkgUseStatic>
   </PropertyGroup>
   <ItemGroup>
-    <ClCompile Include="ApplicationModelTest.cpp" />
+    <ClCompile Include="ApplicationTest.cpp" />
     <ClCompile Include="ApplicationToolbarHelperTest.cpp" />
     <ClCompile Include="ApplicationToolbarRegistryStorageTest.cpp" />
     <ClCompile Include="ApplicationToolbarStorageHelper.cpp" />
@@ -146,6 +146,10 @@
     <ClCompile Include="BookmarkStorageHelper.cpp" />
     <ClCompile Include="BookmarkXmlStorageTest.cpp" />
     <ClCompile Include="ClipboardTest.cpp" />
+    <ClCompile Include="ColorRuleRegistryStorageTest.cpp" />
+    <ClCompile Include="ColorRulesStorageHelper.cpp" />
+    <ClCompile Include="ColorRuleTest.cpp" />
+    <ClCompile Include="ColorRuleXmlStorageTest.cpp" />
     <ClCompile Include="DataObjectImplTest.cpp" />
     <ClCompile Include="DriveModelTest.cpp" />
     <ClCompile Include="AcceleratorParserTest.cpp" />
@@ -153,7 +157,9 @@
     <ClCompile Include="BookmarkItemTest.cpp" />
     <ClCompile Include="BookmarkTreeTest.cpp" />
     <ClCompile Include="CachedIconsTest.cpp" />
+    <ClCompile Include="HelperTest.cpp" />
     <ClCompile Include="ManifestTest.cpp" />
+    <ClCompile Include="MovableModelTest.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug-LLVM|Win32'">Create</PrecompiledHeader>
@@ -186,6 +192,8 @@
     <ClInclude Include="ApplicationToolbarStorageHelper.h" />
     <ClInclude Include="BookmarkStorageHelper.h" />
     <ClInclude Include="BookmarkTreeHelper.h" />
+    <ClInclude Include="ColorRulesStorageHelper.h" />
+    <ClInclude Include="MovableModelHelper.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RegistryStorageHelper.h" />
     <ClInclude Include="ResourceHelper.h" />

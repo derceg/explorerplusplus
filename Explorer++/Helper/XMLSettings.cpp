@@ -390,6 +390,32 @@ void NXMLSettings::SaveDateTime(IXMLDOMDocument *xmlDocument, IXMLDOMElement *pa
 		std::to_wstring(dateTime.dwHighDateTime).c_str());
 }
 
+HRESULT NXMLSettings::ReadRgb(IXMLDOMNamedNodeMap *attributeMap, COLORREF &outputValue)
+{
+	int red;
+	RETURN_IF_FAILED(GetIntFromMap(attributeMap, L"r", red));
+
+	int green;
+	RETURN_IF_FAILED(GetIntFromMap(attributeMap, L"g", green));
+
+	int blue;
+	RETURN_IF_FAILED(GetIntFromMap(attributeMap, L"b", blue));
+
+	outputValue = RGB(red, green, blue);
+
+	return S_OK;
+}
+
+void NXMLSettings::SaveRgb(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode, COLORREF color)
+{
+	AddAttributeToNode(xmlDocument, parentNode, L"r",
+		NXMLSettings::EncodeIntValue(GetRValue(color)));
+	AddAttributeToNode(xmlDocument, parentNode, L"g",
+		NXMLSettings::EncodeIntValue(GetGValue(color)));
+	AddAttributeToNode(xmlDocument, parentNode, L"b",
+		NXMLSettings::EncodeIntValue(GetBValue(color)));
+}
+
 HRESULT NXMLSettings::GetIntFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name,
 	int &outputValue)
 {

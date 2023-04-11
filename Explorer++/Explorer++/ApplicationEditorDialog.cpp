@@ -177,7 +177,7 @@ void ApplicationEditorDialog::ApplyEdits(const std::wstring &newName,
 	if (m_editDetails->type == EditDetails::Type::NewItem)
 	{
 		size_t index;
-		size_t numItems = m_model->GetApplications().size();
+		size_t numItems = m_model->GetItems().size();
 
 		if (m_editDetails->index.has_value() && m_editDetails->index.value() <= numItems)
 		{
@@ -188,7 +188,7 @@ void ApplicationEditorDialog::ApplyEdits(const std::wstring &newName,
 			index = numItems;
 		}
 
-		m_model->AddApplication(std::move(m_editDetails->newApplication), index);
+		m_model->AddItem(std::move(m_editDetails->newApplication), index);
 	}
 }
 

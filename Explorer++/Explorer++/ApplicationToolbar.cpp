@@ -86,11 +86,11 @@ void ApplicationToolbar::Initialize()
 {
 	AddButtons();
 
-	m_connections.push_back(m_model->AddApplicationAddedObserver(
+	m_connections.push_back(m_model->AddItemAddedObserver(
 		std::bind_front(&ApplicationToolbar::OnApplicationAdded, this)));
-	m_connections.push_back(m_model->AddApplicationUpdatedObserver(
+	m_connections.push_back(m_model->AddItemUpdatedObserver(
 		std::bind_front(&ApplicationToolbar::OnApplicationUpdated, this)));
-	m_connections.push_back(m_model->AddApplicationRemovedObserver(
+	m_connections.push_back(m_model->AddItemRemovedObserver(
 		std::bind_front(&ApplicationToolbar::OnApplicationRemoved, this)));
 
 	m_connections.push_back(m_coreInterface->AddToolbarContextMenuObserver(
@@ -114,7 +114,7 @@ void ApplicationToolbar::AddButtons()
 {
 	size_t index = 0;
 
-	for (auto &application : m_model->GetApplications())
+	for (auto &application : m_model->GetItems())
 	{
 		AddButton(application.get(), index);
 		++index;
@@ -140,8 +140,8 @@ void ApplicationToolbar::OnApplicationUpdated(Application *application)
 {
 	// The ApplicationToolbarButton class holds a pointer to the associated Application (so there's
 	// no need to update it). Only the view needs to be updated.
-	auto index = m_model->GetApplicationIndex(application);
-	m_view->UpdateButton(*index);
+	auto index = m_model->GetItemIndex(application);
+	m_view->UpdateButton(index);
 }
 
 void ApplicationToolbar::OnApplicationRemoved(const Application *application, size_t oldIndex)
@@ -359,8 +359,7 @@ DWORD ApplicationToolbar::DropItemsOnButton(size_t target)
 
 	std::wstring extraParameters = boost::algorithm::join(extraParametersVector, L" ");
 
-	auto application = m_model->GetApplicationAtIndex(target);
-	assert(application);
+	auto application = m_model->GetItemAtIndex(target);
 	OpenApplication(m_coreInterface, m_view->GetHWND(), application, extraParameters);
 
 	return DROPEFFECT_COPY;
@@ -441,7 +440,7 @@ HRESULT ApplicationToolbar::AddDropItem(IShellItem *shellItem, size_t index)
 	}
 
 	auto application = std::make_unique<Application>(displayName.get(), quotedParsingPath, true);
-	m_model->AddApplication(std::move(application), index);
+	m_model->AddItem(std::move(application), index);
 
 	return S_OK;
 }

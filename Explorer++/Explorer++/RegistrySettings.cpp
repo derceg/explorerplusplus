@@ -9,6 +9,8 @@
 #include "ApplicationToolbarRegistryStorage.h"
 #include "Bookmarks/BookmarkRegistryStorage.h"
 #include "Bookmarks/BookmarkTreeFactory.h"
+#include "ColorRuleModelFactory.h"
+#include "ColorRuleRegistryStorage.h"
 #include "Config.h"
 #include "DefaultColumns.h"
 #include "DisplayWindow/DisplayWindow.h"
@@ -1200,4 +1202,16 @@ void Explorerplusplus::SaveApplicationToolbarToRegistry()
 {
 	Applications::ApplicationToolbarRegistryStorage::Save(NExplorerplusplus::REG_MAIN_KEY,
 		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
+}
+
+void Explorerplusplus::LoadColorRulesFromRegistry()
+{
+	ColorRuleRegistryStorage::Load(NExplorerplusplus::REG_MAIN_KEY,
+		ColorRuleModelFactory::GetInstance()->GetColorRuleModel());
+}
+
+void Explorerplusplus::SaveColorRulesToRegistry()
+{
+	ColorRuleRegistryStorage::Save(NExplorerplusplus::REG_MAIN_KEY,
+		ColorRuleModelFactory::GetInstance()->GetColorRuleModel());
 }

@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <memory>
+
 class BookmarkTree;
 
 // This class doesn't do much at the moment. But it could be updated to return different

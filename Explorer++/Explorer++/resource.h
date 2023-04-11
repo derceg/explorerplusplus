@@ -34,11 +34,11 @@
 #define IDR_APPLICATIONTOOLBAR_MENU     217
 #define IDR_HEADER_MENU                 218
 #define IDR_DISPLAYWINDOW_RCLICK        219
-#define IDD_NEWCOLORRULE                220
+#define IDD_NEW_COLOR_RULE              220
 #define IDR_MASSRENAME_MENU             223
 #define IDD_SEARCH                      224
 #define IDD_OPTIONS_WINDOW              227
-#define IDD_CUSTOMIZECOLORS             228
+#define IDD_CUSTOMIZE_COLORS            228
 #define IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_CHINESE_SIMPLIFIED 232
 #define IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_CZECH 233
 #define IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_DANISH 234
@@ -188,6 +188,7 @@
 #define IDM_GO_QUICK_ACCESS             371
 #define IDS_THEME_SYSTEM_DEFAULT        371
 #define IDM_GO_DOWNLOADS                372
+#define IDS_COLOR_RULE_DELETE_ALL       372
 #define IDM_GO_VIDEOS                   373
 #define IDM_GO_WSL_DISTRIBUTIONS        374
 #define IDD_OPTIONS                     375
@@ -239,7 +240,7 @@
 #define IDC_CHECK_ARCHIVE               1060
 #define IDC_CHECK_HIDDEN                1061
 #define IDC_CHECK_READONLY              1062
-#define IDC_CHECK_INDEXED               1063
+#define IDC_CHECK_NOT_INDEXED           1063
 #define IDC_DESTROYFILES_RADIO_ONEPASS  1073
 #define IDC_RENAMETAB_USECUSTOMNAME     1074
 #define IDC_SETTINGS_CHECK_FRIENDLYDATES 1081
@@ -307,8 +308,7 @@
 #define IDC_OPTION_FILEPREVIEWS         1203
 #define IDC_CHECK_COMPRESSED            1204
 #define IDC_CHECK_ENCRYPTED             1205
-#define IDC_EDIT_FILENAMEPATTERN        1207
-#define IDC_STATIC_FILENAMEFILTER       1214
+#define IDC_EDIT_FILENAME_PATTERN       1207
 #define IDC_EDIT_DESCRIPTION            1215
 #define IDC_STATIC_ATTRIBUTES           1216
 #define IDC_BUTTON_RESTOREDEFAULTS      1217
@@ -323,16 +323,16 @@
 #define IDEXIT                          1228
 #define IDC_BUTTON_DIRECTORY            1229
 #define IDC_BUTTON_DELETE               1232
-#define IDC_BUTTON_MOVEUP               1233
-#define IDC_BUTTON_MOVEDOWN             1234
+#define IDC_BUTTON_MOVE_UP              1233
+#define IDC_BUTTON_MOVE_DOWN            1234
 #define IDC_BUTTON_EDIT                 1237
 #define IDC_SETTINGS_CHECK_LINK         1240
 #define IDC_SETTINGS_CHECK_SYSTEMFILES  1241
 #define IDC_SETTINGS_CHECK_SINGLECLICK  1242
 #define IDC_BUTTON_NEW                  1243
-#define IDC_LISTVIEW_COLORRULES         1245
+#define IDC_LISTVIEW_COLOR_RULES        1245
 #define IDC_STATIC_COLOR                1247
-#define IDC_BUTTON_CHANGECOLOR          1248
+#define IDC_BUTTON_CHANGE_COLOR         1248
 #define IDC_CHECK_SEARCHSUBFOLDERS      1249
 #define IDC_STATIC_STATUS               1250
 #define IDC_BUTTON_DEFAULTCOLUMNS       1253
@@ -409,6 +409,7 @@
 #define IDAPPLY                         1352
 #define IDC_OPTIONS_THEME               1353
 #define IDC_OPTIONS_THEME_LABEL         1354
+#define IDC_BUTTON_DELETE_ALL           1355
 #define IDS_COLUMN_DESCRIPTION_NAME     2000
 #define IDS_COLUMN_DESCRIPTION_TYPE     2001
 #define IDS_COLUMN_DESCRIPTION_SIZE     2002
@@ -518,9 +519,9 @@
 #define IDS_COLUMN_NAME_WRITER          2115
 #define IDS_COLUMN_NAME_YEAR            2116
 #define IDS_COLUMN_NAME_PRINTERMODEL    2117
-#define IDS_COLORRULE_DELETE            2118
+#define IDS_COLOR_RULE_DELETE           2118
 #define IDS_WILDCARDDESELECTION         2119
-#define IDS_EDITCOLORRULE               2120
+#define IDS_EDIT_COLOR_RULE             2120
 #define IDS_STOP                        2121
 #define IDS_SEARCHING                   2122
 #define IDS_GENERAL_NEWAPPLICATIONBUTTON 2123
@@ -974,7 +975,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        385
 #define _APS_NEXT_COMMAND_VALUE         40544
-#define _APS_NEXT_CONTROL_VALUE         1355
+#define _APS_NEXT_CONTROL_VALUE         1356
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

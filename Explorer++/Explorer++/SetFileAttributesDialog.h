@@ -57,11 +57,6 @@ private:
 		DWORD Attribute;
 		UINT uControlId;
 		UINT uChecked;
-
-		/* Set if the attribute state is on
-		when the corresponding GUI element is
-		'off'. */
-		BOOL bReversed;
 	} Attribute_t;
 
 	enum class DateTimeType

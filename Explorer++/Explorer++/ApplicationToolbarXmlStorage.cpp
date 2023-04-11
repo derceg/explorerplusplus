@@ -84,7 +84,7 @@ void LoadFromNode(IXMLDOMNode *parentNode, ApplicationModel *model)
 			continue;
 		}
 
-		model->AddApplication(std::move(application));
+		model->AddItem(std::move(application));
 	}
 }
 
@@ -104,7 +104,7 @@ void SaveApplication(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
 void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
 	const ApplicationModel *model)
 {
-	for (const auto &application : model->GetApplications())
+	for (const auto &application : model->GetItems())
 	{
 		SaveApplication(xmlDocument, parentNode, application.get());
 	}

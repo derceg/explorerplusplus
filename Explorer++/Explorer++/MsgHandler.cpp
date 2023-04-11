@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "AddressBar.h"
-#include "ColorRuleHelper.h"
+#include "ColorRule.h"
 #include "Config.h"
 #include "DarkModeHelper.h"
 #include "Explorer++_internal.h"
@@ -1175,85 +1175,6 @@ void Explorerplusplus::OnDisplayWindowRClick(POINT *ptClient)
 
 	TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL, ptScreen.x, ptScreen.y, 0,
 		m_hContainer, nullptr);
-}
-
-LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)
-{
-	NMLVCUSTOMDRAW *pnmlvcd = nullptr;
-	NMCUSTOMDRAW *pnmcd = nullptr;
-
-	pnmlvcd = (NMLVCUSTOMDRAW *) lParam;
-
-	if (pnmlvcd->nmcd.hdr.hwndFrom == m_hActiveListView)
-	{
-		pnmcd = &pnmlvcd->nmcd;
-
-		switch (pnmcd->dwDrawStage)
-		{
-		case CDDS_PREPAINT:
-			return CDRF_NOTIFYITEMDRAW;
-
-		case CDDS_ITEMPREPAINT:
-		{
-			DWORD dwAttributes =
-				m_pActiveShellBrowser->GetItemFileFindData(static_cast<int>(pnmcd->dwItemSpec))
-					.dwFileAttributes;
-
-			std::wstring fullFileName =
-				m_pActiveShellBrowser->GetItemFullName(static_cast<int>(pnmcd->dwItemSpec));
-
-			TCHAR fileName[MAX_PATH];
-			StringCchCopy(fileName, SIZEOF_ARRAY(fileName), fullFileName.c_str());
-			PathStripPath(fileName);
-
-			/* Loop through each filter. Decide whether to change the font of the
-			current item based on its filename and/or attributes. */
-			for (const auto &colorRule : m_ColorRules)
-			{
-				BOOL bMatchFileName = FALSE;
-				BOOL bMatchAttributes = FALSE;
-
-				/* Only match against the filename if it's not empty. */
-				if (!colorRule.strFilterPattern.empty())
-				{
-					if (CheckWildcardMatch(colorRule.strFilterPattern.c_str(), fileName,
-							!colorRule.caseInsensitive)
-						== 1)
-					{
-						bMatchFileName = TRUE;
-					}
-				}
-				else
-				{
-					bMatchFileName = TRUE;
-				}
-
-				if (colorRule.dwFilterAttributes != 0)
-				{
-					if (colorRule.dwFilterAttributes & dwAttributes)
-					{
-						bMatchAttributes = TRUE;
-					}
-				}
-				else
-				{
-					bMatchAttributes = TRUE;
-				}
-
-				if (bMatchFileName && bMatchAttributes)
-				{
-					pnmlvcd->clrText = colorRule.rgbColour;
-					return CDRF_NEWFONT;
-				}
-			}
-		}
-		break;
-		}
-
-		return CDRF_NOTIFYITEMDRAW;
-	}
-
-	return 0;
 }
 
 void Explorerplusplus::OnSortBy(SortMode sortMode)

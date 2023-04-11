@@ -24,7 +24,6 @@ enum class VersionSubBlockType
 	StringTableValue
 };
 
-void EnterAttributeIntoString(BOOL bEnter, TCHAR *string, int pos, TCHAR chAttribute);
 BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType subBlockType,
 	WORD *pwLanguage, DWORD *pdwProductVersionLS, DWORD *pdwProductVersionMS,
 	const TCHAR *szVersionInfo, TCHAR *szVersionBuffer, UINT cchMax);
@@ -199,55 +198,34 @@ BOOL CompareFileTypes(const TCHAR *pszFile1, const TCHAR *pszFile2)
 	return FALSE;
 }
 
-HRESULT BuildFileAttributeString(const TCHAR *lpszFileName, TCHAR *szOutput, size_t cchMax)
+std::wstring BuildFileAttributesString(DWORD fileAttributes)
 {
-	/* FindFirstFile is used instead of GetFileAttributes() or
-	GetFileAttributesEx() because of its behaviour
-	in relation to system files that normally
-	won't have their attributes given (such as the
-	pagefile, which neither of the two functions
-	above can retrieve the attributes of). */
-	WIN32_FIND_DATA wfd;
-	wil::unique_hfind findFile(FindFirstFile(lpszFileName, &wfd));
-	HRESULT hr = E_FAIL;
-
-	if (findFile)
+	auto appendAttribute = [](std::wstring &text, bool isAttributeSet, WCHAR attributeCharacter)
 	{
-		hr = BuildFileAttributeString(wfd.dwFileAttributes, szOutput, cchMax);
-	}
+		if (isAttributeSet)
+		{
+			text += attributeCharacter;
+		}
+		else
+		{
+			text += '-';
+		}
+	};
 
-	return hr;
-}
+	std::wstring attributesString;
+	appendAttribute(attributesString, WI_IsFlagSet(fileAttributes, FILE_ATTRIBUTE_ARCHIVE), 'A');
+	appendAttribute(attributesString, WI_IsFlagSet(fileAttributes, FILE_ATTRIBUTE_HIDDEN), 'H');
+	appendAttribute(attributesString, WI_IsFlagSet(fileAttributes, FILE_ATTRIBUTE_READONLY), 'R');
+	appendAttribute(attributesString, WI_IsFlagSet(fileAttributes, FILE_ATTRIBUTE_SYSTEM), 'S');
+	appendAttribute(attributesString, WI_IsFlagSet(fileAttributes, FILE_ATTRIBUTE_DIRECTORY), 'D');
+	appendAttribute(attributesString, WI_IsFlagSet(fileAttributes, FILE_ATTRIBUTE_COMPRESSED), 'C');
+	appendAttribute(attributesString, WI_IsFlagSet(fileAttributes, FILE_ATTRIBUTE_SPARSE_FILE),
+		'P');
+	appendAttribute(attributesString, WI_IsFlagSet(fileAttributes, FILE_ATTRIBUTE_ENCRYPTED), 'E');
+	appendAttribute(attributesString,
+		WI_IsFlagSet(fileAttributes, FILE_ATTRIBUTE_NOT_CONTENT_INDEXED), 'I');
 
-HRESULT BuildFileAttributeString(DWORD dwFileAttributes, TCHAR *szOutput, size_t cchMax)
-{
-	TCHAR szAttributes[9];
-	int i = 0;
-
-	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE, szAttributes, i++, 'A');
-	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_HIDDEN, szAttributes, i++, 'H');
-	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_READONLY, szAttributes, i++, 'R');
-	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_SYSTEM, szAttributes, i++, 'S');
-	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY, szAttributes, i++, 'D');
-	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED, szAttributes, i++, 'C');
-	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_SPARSE_FILE, szAttributes, i++, 'P');
-	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_ENCRYPTED, szAttributes, i++, 'E');
-
-	szAttributes[i] = '\0';
-
-	return StringCchCopy(szOutput, cchMax, szAttributes);
-}
-
-void EnterAttributeIntoString(BOOL bEnter, TCHAR *string, int pos, TCHAR chAttribute)
-{
-	if (bEnter)
-	{
-		string[pos] = chAttribute;
-	}
-	else
-	{
-		string[pos] = '-';
-	}
+	return attributesString;
 }
 
 BOOL GetFileOwner(const TCHAR *szFile, TCHAR *szOwner, size_t cchMax)

@@ -61,11 +61,6 @@ namespace Applications
 class ApplicationToolbar;
 }
 
-namespace NColorRuleHelper
-{
-struct ColorRule;
-}
-
 namespace Plugins
 {
 class PluginManager;
@@ -192,7 +187,6 @@ private:
 	void OnAppCommand(UINT cmd);
 	void OnDirectoryModified(const Tab &tab);
 	void OnAssocChanged();
-	LRESULT OnCustomDraw(LPARAM lParam);
 	void OnSelectTabByIndex(int iTab);
 
 	/* Main menu handlers. */
@@ -368,6 +362,8 @@ private:
 	void LoadBookmarksFromRegistry();
 	void LoadApplicationToolbarFromRegistry();
 	void SaveApplicationToolbarToRegistry();
+	void LoadColorRulesFromRegistry();
+	void SaveColorRulesToRegistry();
 	void SaveToolbarInformationToRegistry();
 	void LoadToolbarInformationFromRegistry();
 	void SaveDialogStatesToRegistry();
@@ -391,6 +387,8 @@ private:
 	void SaveWindowPositionToXMLInternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pWndPosNode);
 	void LoadApplicationToolbarFromXML(IXMLDOMDocument *pXMLDom);
 	void SaveApplicationToolbarToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
+	void LoadColorRulesFromXML(IXMLDOMDocument *pXMLDom);
+	void SaveColorRulesToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void LoadToolbarInformationFromXML(IXMLDOMDocument *pXMLDom);
 	void SaveToolbarInformationToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void SaveToolbarInformationToXMLnternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe);
@@ -530,6 +528,9 @@ private:
 	std::optional<int> OnRebarCustomDraw(NMHDR *nmhdr);
 	bool OnRebarEraseBackground(HDC hdc);
 
+	// Customize colors
+	void InitializeDefaultColorRules();
+
 	/* Miscellaneous. */
 	void InitializeDisplayWindow();
 	void ShowMainRebarBand(HWND hwnd, BOOL bShow);
@@ -641,9 +642,6 @@ private:
 	// but as far as I'm aware, it's not possible to cancel SHGetFileInfo (which is what's
 	// ultimately used to retrieve the icons).
 	IconFetcher m_bookmarkIconFetcher;
-
-	/* Customize colors. */
-	std::vector<NColorRuleHelper::ColorRule> m_ColorRules;
 
 	/* Undo support. */
 	FileActionHandler m_FileActionHandler;

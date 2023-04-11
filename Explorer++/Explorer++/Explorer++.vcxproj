@@ -731,7 +731,6 @@
     <ClCompile Include="ApplicationContextMenu.cpp" />
     <ClCompile Include="ApplicationContextMenuController.cpp" />
     <ClCompile Include="ApplicationCrashedDialog.cpp" />
-    <ClCompile Include="ApplicationModel.cpp" />
     <ClCompile Include="ApplicationModelFactory.cpp" />
     <ClCompile Include="ApplicationToolbarHelper.cpp" />
     <ClCompile Include="ApplicationToolbarRegistryStorage.cpp" />
@@ -741,6 +740,11 @@
     <ClCompile Include="Bookmarks\UI\BookmarksToolbar.cpp" />
     <ClCompile Include="Bookmarks\UI\Views\BookmarksToolbarView.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkMenuDropTarget.cpp" />
+    <ClCompile Include="ColorRule.cpp" />
+    <ClCompile Include="ColorRuleListView.cpp" />
+    <ClCompile Include="ColorRuleModelFactory.cpp" />
+    <ClCompile Include="ColorRuleRegistryStorage.cpp" />
+    <ClCompile Include="ColorRuleXmlStorage.cpp" />
     <ClCompile Include="CrashHandlerHelper.cpp" />
     <ClCompile Include="DriveEnumeratorImpl.cpp" />
     <ClCompile Include="DriveModel.cpp" />
@@ -792,8 +796,7 @@
     <ClCompile Include="Bookmarks\UI\BookmarkListView.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkMenu.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkTreeView.cpp" />
-    <ClCompile Include="ColorRuleDialog.cpp" />
-    <ClCompile Include="ColorRuleHelper.cpp" />
+    <ClCompile Include="ColorRuleEditorDialog.cpp" />
     <ClCompile Include="Plugins\CommandApi\Events\CommandInvoked.cpp" />
     <ClCompile Include="CommandLine.cpp" />
     <ClCompile Include="Console.cpp" />
@@ -931,6 +934,12 @@
     <ClInclude Include="Bookmarks\UI\BookmarksToolbar.h" />
     <ClInclude Include="Bookmarks\UI\Views\BookmarksToolbarView.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkMenuDropTarget.h" />
+    <ClInclude Include="ColorRule.h" />
+    <ClInclude Include="ColorRuleListView.h" />
+    <ClInclude Include="ColorRuleModel.h" />
+    <ClInclude Include="ColorRuleModelFactory.h" />
+    <ClInclude Include="ColorRuleRegistryStorage.h" />
+    <ClInclude Include="ColorRuleXmlStorage.h" />
     <ClInclude Include="CrashHandlerHelper.h" />
     <ClInclude Include="DriveEnumerator.h" />
     <ClInclude Include="DriveEnumeratorImpl.h" />
@@ -971,8 +980,7 @@
     <ClInclude Include="Bookmarks\BookmarkTree.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkTreeView.h" />
     <ClInclude Include="Bookmarks\BookmarkXmlStorage.h" />
-    <ClInclude Include="ColorRuleDialog.h" />
-    <ClInclude Include="ColorRuleHelper.h" />
+    <ClInclude Include="ColorRuleEditorDialog.h" />
     <ClInclude Include="Plugins\CommandApi\Events\CommandInvoked.h" />
     <ClInclude Include="CommandLine.h" />
     <ClInclude Include="Console.h" />

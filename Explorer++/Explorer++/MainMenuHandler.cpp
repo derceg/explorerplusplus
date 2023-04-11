@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "AboutDialog.h"
+#include "ColorRuleModelFactory.h"
 #include "Config.h"
 #include "CustomizeColorsDialog.h"
 #include "DestroyFilesDialog.h"
@@ -122,12 +123,8 @@ void Explorerplusplus::OnSearch()
 void Explorerplusplus::OnCustomizeColors()
 {
 	CustomizeColorsDialog customizeColorsDialog(m_resourceModule, m_hContainer, this,
-		&m_ColorRules);
+		ColorRuleModelFactory::GetInstance()->GetColorRuleModel());
 	customizeColorsDialog.ShowModalDialog();
-
-	/* Causes the active listview to redraw (therefore
-	applying any updated color schemes). */
-	InvalidateRect(m_hActiveListView, nullptr, FALSE);
 }
 
 void Explorerplusplus::OnRunScript()

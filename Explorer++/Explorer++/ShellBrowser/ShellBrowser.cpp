@@ -4,6 +4,8 @@
 
 #include "stdafx.h"
 #include "ShellBrowser.h"
+#include "ColorRuleModel.h"
+#include "ColorRuleModelFactory.h"
 #include "Config.h"
 #include "CoreInterface.h"
 #include "DarkModeHelper.h"
@@ -207,6 +209,22 @@ void ShellBrowser::InitializeListView()
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(m_hListView),
 		ListViewParentProcStub, reinterpret_cast<DWORD_PTR>(this)));
+
+	m_connections.push_back(
+		ColorRuleModelFactory::GetInstance()->GetColorRuleModel()->AddItemAddedObserver(
+			std::bind(&ShellBrowser::OnColorRulesUpdated, this)));
+	m_connections.push_back(
+		ColorRuleModelFactory::GetInstance()->GetColorRuleModel()->AddItemUpdatedObserver(
+			std::bind(&ShellBrowser::OnColorRulesUpdated, this)));
+	m_connections.push_back(
+		ColorRuleModelFactory::GetInstance()->GetColorRuleModel()->AddItemMovedObserver(
+			std::bind(&ShellBrowser::OnColorRulesUpdated, this)));
+	m_connections.push_back(
+		ColorRuleModelFactory::GetInstance()->GetColorRuleModel()->AddItemRemovedObserver(
+			std::bind(&ShellBrowser::OnColorRulesUpdated, this)));
+	m_connections.push_back(
+		ColorRuleModelFactory::GetInstance()->GetColorRuleModel()->AddAllItemsRemovedObserver(
+			std::bind(&ShellBrowser::OnColorRulesUpdated, this)));
 }
 
 BOOL ShellBrowser::GetAutoArrange() const

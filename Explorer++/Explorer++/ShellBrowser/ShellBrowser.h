@@ -449,6 +449,8 @@ private:
 	HRESULT StartDrag(int draggedItem, const POINT &startPoint);
 	BOOL OnListViewBeginLabelEdit(const NMLVDISPINFO *dispInfo);
 	BOOL OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo);
+	LRESULT OnListViewCustomDraw(NMLVCUSTOMDRAW *listViewCustomDraw);
+	void OnColorRulesUpdated();
 
 	HRESULT GetListViewItemAttributes(int item, SFGAOF *attributes) const;
 

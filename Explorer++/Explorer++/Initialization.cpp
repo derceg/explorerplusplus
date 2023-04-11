@@ -6,6 +6,9 @@
 #include "Explorer++.h"
 #include "Bookmarks/BookmarkTreeFactory.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
+#include "ColorRule.h"
+#include "ColorRuleModel.h"
+#include "ColorRuleModelFactory.h"
 #include "Config.h"
 #include "DarkModeHelper.h"
 #include "DisplayWindow/DisplayWindow.h"
@@ -35,6 +38,7 @@
 void Explorerplusplus::OnCreate()
 {
 	InitializeMainToolbars();
+	InitializeDefaultColorRules();
 
 	ILoadSave *pLoadSave = nullptr;
 	LoadAllSettings(&pLoadSave);
@@ -113,6 +117,19 @@ void Explorerplusplus::OnCreate()
 	SetTimer(m_hContainer, AUTOSAVE_TIMER_ID, AUTOSAVE_TIMEOUT, nullptr);
 
 	m_InitializationFinished.set(true);
+}
+
+void Explorerplusplus::InitializeDefaultColorRules()
+{
+	auto *colorRuleModel = ColorRuleModelFactory::GetInstance()->GetColorRuleModel();
+
+	colorRuleModel->AddItem(std::make_unique<ColorRule>(
+		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_GENERAL_COLOR_RULE_COMPRESSED),
+		L"", false, FILE_ATTRIBUTE_COMPRESSED, RGB(0, 0, 255)));
+
+	colorRuleModel->AddItem(std::make_unique<ColorRule>(
+		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_GENERAL_COLOR_RULE_ENCRYPTED), L"",
+		false, FILE_ATTRIBUTE_ENCRYPTED, RGB(0, 128, 0)));
 }
 
 void Explorerplusplus::InitializeDisplayWindow()

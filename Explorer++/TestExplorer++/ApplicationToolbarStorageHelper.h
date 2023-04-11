@@ -10,7 +10,6 @@ namespace Applications
 class Application;
 class ApplicationModel;
 
-bool operator==(const ApplicationModel &first, const ApplicationModel &second);
 bool operator==(const Application &first, const Application &second);
 
 }

@@ -33,33 +33,33 @@ INT_PTR SetFileAttributesDialog::OnInitDialog()
 	int nHidden = 0;
 	int nSystem = 0;
 	int nReadOnly = 0;
-	int nIndexed = 0;
+	int nNotIndexed = 0;
 
 	for (const auto &file : m_FileList)
 	{
-		if (file.wfd.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)
+		if (WI_IsFlagSet(file.wfd.dwFileAttributes, FILE_ATTRIBUTE_ARCHIVE))
 		{
 			nArchived++;
 		}
 
-		if ((file.wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) == FILE_ATTRIBUTE_HIDDEN)
+		if (WI_IsFlagSet(file.wfd.dwFileAttributes, FILE_ATTRIBUTE_HIDDEN))
 		{
 			nHidden++;
 		}
 
-		if (file.wfd.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
+		if (WI_IsFlagSet(file.wfd.dwFileAttributes, FILE_ATTRIBUTE_SYSTEM))
 		{
 			nSystem++;
 		}
 
-		if (file.wfd.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
+		if (WI_IsFlagSet(file.wfd.dwFileAttributes, FILE_ATTRIBUTE_READONLY))
 		{
 			nReadOnly++;
 		}
 
-		if (!(file.wfd.dwFileAttributes & FILE_ATTRIBUTE_NOT_CONTENT_INDEXED))
+		if (WI_IsFlagSet(file.wfd.dwFileAttributes, FILE_ATTRIBUTE_NOT_CONTENT_INDEXED))
 		{
-			nIndexed++;
+			nNotIndexed++;
 		}
 	}
 
@@ -67,20 +67,21 @@ INT_PTR SetFileAttributesDialog::OnInitDialog()
 	ResetButtonState(GetDlgItem(m_hDlg, IDC_CHECK_HIDDEN), nHidden == 0 || nHidden == nItems);
 	ResetButtonState(GetDlgItem(m_hDlg, IDC_CHECK_SYSTEM), nSystem == 0 || nSystem == nItems);
 	ResetButtonState(GetDlgItem(m_hDlg, IDC_CHECK_READONLY), nReadOnly == 0 || nReadOnly == nItems);
-	ResetButtonState(GetDlgItem(m_hDlg, IDC_CHECK_INDEXED), nIndexed == 0 || nIndexed == nItems);
+	ResetButtonState(GetDlgItem(m_hDlg, IDC_CHECK_NOT_INDEXED),
+		nNotIndexed == 0 || nNotIndexed == nItems);
 
 	SetAttributeCheckState(GetDlgItem(m_hDlg, IDC_CHECK_ARCHIVE), nArchived, nItems);
 	SetAttributeCheckState(GetDlgItem(m_hDlg, IDC_CHECK_HIDDEN), nHidden, nItems);
 	SetAttributeCheckState(GetDlgItem(m_hDlg, IDC_CHECK_SYSTEM), nSystem, nItems);
 	SetAttributeCheckState(GetDlgItem(m_hDlg, IDC_CHECK_READONLY), nReadOnly, nItems);
-	SetAttributeCheckState(GetDlgItem(m_hDlg, IDC_CHECK_INDEXED), nIndexed, nItems);
+	SetAttributeCheckState(GetDlgItem(m_hDlg, IDC_CHECK_NOT_INDEXED), nNotIndexed, nItems);
 
 	m_bModificationDateEnabled = FALSE;
 	m_bCreationDateEnabled = FALSE;
 	m_bAccessDateEnabled = FALSE;
 
 	AllowDarkModeForControls({ IDC_MODIFICATION_RESET, IDC_CREATION_RESET, IDC_ACCESS_RESET });
-	AllowDarkModeForCheckboxes({ IDC_CHECK_ARCHIVE, IDC_CHECK_HIDDEN, IDC_CHECK_INDEXED,
+	AllowDarkModeForCheckboxes({ IDC_CHECK_ARCHIVE, IDC_CHECK_HIDDEN, IDC_CHECK_NOT_INDEXED,
 		IDC_CHECK_READONLY, IDC_CHECK_SYSTEM });
 	AllowDarkModeForGroupBoxes({ IDC_GROUP_ATTRIBUTES });
 
@@ -127,27 +128,22 @@ void SetFileAttributesDialog::InitializeAttributesStructure()
 
 	attribute.Attribute = FILE_ATTRIBUTE_ARCHIVE;
 	attribute.uControlId = IDC_CHECK_ARCHIVE;
-	attribute.bReversed = FALSE;
 	m_AttributeList.push_back(attribute);
 
 	attribute.Attribute = FILE_ATTRIBUTE_HIDDEN;
 	attribute.uControlId = IDC_CHECK_HIDDEN;
-	attribute.bReversed = FALSE;
 	m_AttributeList.push_back(attribute);
 
 	attribute.Attribute = FILE_ATTRIBUTE_SYSTEM;
 	attribute.uControlId = IDC_CHECK_SYSTEM;
-	attribute.bReversed = FALSE;
 	m_AttributeList.push_back(attribute);
 
 	attribute.Attribute = FILE_ATTRIBUTE_READONLY;
 	attribute.uControlId = IDC_CHECK_READONLY;
-	attribute.bReversed = FALSE;
 	m_AttributeList.push_back(attribute);
 
 	attribute.Attribute = FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;
-	attribute.uControlId = IDC_CHECK_INDEXED;
-	attribute.bReversed = TRUE;
+	attribute.uControlId = IDC_CHECK_NOT_INDEXED;
 	m_AttributeList.push_back(attribute);
 }
 
@@ -287,8 +283,7 @@ void SetFileAttributesDialog::OnOk()
 		attribute.uChecked = static_cast<UINT>(
 			SendMessage(GetDlgItem(m_hDlg, attribute.uControlId), BM_GETCHECK, 0, 0));
 
-		if ((!attribute.bReversed && attribute.uChecked == BST_CHECKED)
-			|| (attribute.bReversed && attribute.uChecked != BST_CHECKED))
+		if (attribute.uChecked == BST_CHECKED)
 		{
 			allFileAttributes |= attribute.Attribute;
 		}
@@ -305,7 +300,7 @@ void SetFileAttributesDialog::OnOk()
 			initially, it will still have it applied, and vice versa). */
 			if (attribute.uChecked == BST_INDETERMINATE)
 			{
-				if ((!attribute.bReversed) && (file.wfd.dwFileAttributes & attribute.Attribute))
+				if (file.wfd.dwFileAttributes & attribute.Attribute)
 				{
 					fileAttributes |= attribute.Attribute;
 				}

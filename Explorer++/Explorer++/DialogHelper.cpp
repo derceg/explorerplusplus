@@ -6,7 +6,7 @@
 #include "Explorer++.h"
 #include "Bookmarks/UI/AddBookmarkDialog.h"
 #include "Bookmarks/UI/ManageBookmarksDialog.h"
-#include "ColorRuleDialog.h"
+#include "ColorRuleEditorDialog.h"
 #include "CustomizeColorsDialog.h"
 #include "DestroyFilesDialog.h"
 #include "DisplayColoursDialog.h"
@@ -40,7 +40,7 @@ DialogSettings *const DIALOG_SETTINGS[] = { &SearchDialogPersistentSettings::Get
 	&RenameTabDialogPersistentSettings::GetInstance(),
 	&MassRenameDialogPersistentSettings::GetInstance(),
 	&FilterDialogPersistentSettings::GetInstance(),
-	&ColorRuleDialogPersistentSettings::GetInstance(),
+	&ColorRuleEditorDialogPersistentSettings::GetInstance(),
 	&CustomizeColorsDialogPersistentSettings::GetInstance(),
 	&SplitFileDialogPersistentSettings::GetInstance(),
 	&DestroyFilesDialogPersistentSettings::GetInstance(),

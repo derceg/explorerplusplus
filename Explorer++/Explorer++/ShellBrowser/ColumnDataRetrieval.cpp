@@ -393,16 +393,12 @@ bool GetRealSizeColumnRawData(const BasicItemInfo_t &itemInfo, ULARGE_INTEGER &R
 
 std::wstring GetAttributeColumnText(const BasicItemInfo_t &itemInfo)
 {
-	TCHAR attributeString[32];
-	HRESULT hr = BuildFileAttributeString(itemInfo.getFullPath().c_str(), attributeString,
-		SIZEOF_ARRAY(attributeString));
-
-	if (SUCCEEDED(hr))
+	if (!itemInfo.isFindDataValid)
 	{
-		return attributeString;
+		return {};
 	}
 
-	return L"";
+	return BuildFileAttributesString(itemInfo.wfd.dwFileAttributes);
 }
 
 std::wstring GetShortNameColumnText(const BasicItemInfo_t &itemInfo)

@@ -167,4 +167,28 @@ bool ReadDateTime(HKEY key, const std::wstring &baseValueName, FILETIME &outputD
 	return (res1 == ERROR_SUCCESS && res2 == ERROR_SUCCESS);
 }
 
+LSTATUS SaveBinaryValue(HKEY key, const std::wstring &valueName, const BYTE *data, DWORD length)
+{
+	return RegSetValueEx(key, valueName.c_str(), 0, REG_BINARY, data, length);
+}
+
+LSTATUS ReadBinaryValue(HKEY key, const std::wstring &valueName, void *data, DWORD length)
+{
+	DWORD outputLength = length;
+	auto res = RegGetValue(key, nullptr, valueName.c_str(), RRF_RT_REG_BINARY, nullptr, data,
+		&outputLength);
+
+	if (res != ERROR_SUCCESS)
+	{
+		return res;
+	}
+
+	if (outputLength != length)
+	{
+		return ERROR_BAD_LENGTH;
+	}
+
+	return res;
+}
+
 }

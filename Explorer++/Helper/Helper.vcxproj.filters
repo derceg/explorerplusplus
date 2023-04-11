@@ -333,6 +333,9 @@
     <ClInclude Include="WinRTBaseWrapper.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
+    <ClInclude Include="MovableModel.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dialog Support">

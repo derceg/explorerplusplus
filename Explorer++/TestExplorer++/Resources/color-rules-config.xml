@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!-- Preference file for Explorer++ -->
+<ExplorerPlusPlus>
+	<ColorRules>
+		<ColorRule name="Compressed files" FilenamePattern="" CaseInsensitive="no" Attributes="2048" r="0" g="0" b="255"/>
+		<ColorRule name="Encrypted files" FilenamePattern="" CaseInsensitive="no" Attributes="16384" r="0" g="128" b="0"/>
+		<ColorRule name="Text files" FilenamePattern="*.txt" CaseInsensitive="yes" Attributes="0" r="192" g="192" b="192"/>
+		<ColorRule name="Log files" FilenamePattern="*.log" CaseInsensitive="no" Attributes="0" r="128" g="128" b="255"/>
+	</ColorRules>
+</ExplorerPlusPlus>

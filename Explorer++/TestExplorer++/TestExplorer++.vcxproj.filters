@@ -39,7 +39,7 @@
     <ClCompile Include="DriveModelTest.cpp">
       <Filter>Drives Toolbar</Filter>
     </ClCompile>
-    <ClCompile Include="ApplicationModelTest.cpp">
+    <ClCompile Include="ApplicationTest.cpp">
       <Filter>Application Toolbar</Filter>
     </ClCompile>
     <ClCompile Include="ApplicationToolbarXmlStorageTest.cpp">
@@ -76,6 +76,24 @@
       <Filter>Helper\Data Exchange\Clipboard</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="ColorRuleRegistryStorageTest.cpp">
+      <Filter>Color Rules</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorRulesStorageHelper.cpp">
+      <Filter>Color Rules</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorRuleXmlStorageTest.cpp">
+      <Filter>Color Rules</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorRuleTest.cpp">
+      <Filter>Color Rules</Filter>
+    </ClCompile>
+    <ClCompile Include="MovableModelTest.cpp">
+      <Filter>Helper\Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="HelperTest.cpp">
+      <Filter>Helper\Miscellaneous</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -120,6 +138,9 @@
     <Filter Include="Helper\Data Exchange\Clipboard">
       <UniqueIdentifier>{516b410f-8b61-48a5-8870-1dc716e62992}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Color Rules">
+      <UniqueIdentifier>{6642ce38-3d5a-404a-bd42-e4ab89f4fe91}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -144,5 +165,11 @@
       <Filter>Storage</Filter>
     </ClInclude>
     <ClInclude Include="pch.h" />
+    <ClInclude Include="ColorRulesStorageHelper.h">
+      <Filter>Color Rules</Filter>
+    </ClInclude>
+    <ClInclude Include="MovableModelHelper.h">
+      <Filter>Storage</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

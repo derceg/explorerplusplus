@@ -63,12 +63,10 @@ void LoadFromKey(HKEY parentKey, ApplicationModel *model)
 	{
 		auto application = LoadApplication(childKey.get());
 
-		if (!application)
+		if (application)
 		{
-			continue;
+			model->AddItem(std::move(application));
 		}
-
-		model->AddApplication(std::move(application));
 
 		index++;
 	}
@@ -86,7 +84,7 @@ void SaveToKey(HKEY parentKey, const ApplicationModel *model)
 {
 	size_t index = 0;
 
-	for (const auto &application : model->GetApplications())
+	for (const auto &application : model->GetItems())
 	{
 		wil::unique_hkey childKey;
 		LSTATUS res = RegCreateKeyEx(parentKey, std::to_wstring(index).c_str(), 0, nullptr,
@@ -103,10 +101,10 @@ void SaveToKey(HKEY parentKey, const ApplicationModel *model)
 
 }
 
-void Load(const std::wstring &applicationKeyPath, ApplicationModel *model)
+void Load(const std::wstring &mainKeyPath, ApplicationModel *model)
 {
 	wil::unique_hkey applicationToolbarKey;
-	std::wstring fullKeyPath = applicationKeyPath + L"\\" + APPLICATION_TOOLBAR_KEY_PATH;
+	std::wstring fullKeyPath = mainKeyPath + L"\\" + APPLICATION_TOOLBAR_KEY_PATH;
 	LSTATUS res =
 		RegOpenKeyEx(HKEY_CURRENT_USER, fullKeyPath.c_str(), 0, KEY_READ, &applicationToolbarKey);
 
@@ -116,9 +114,9 @@ void Load(const std::wstring &applicationKeyPath, ApplicationModel *model)
 	}
 }
 
-void Save(const std::wstring &applicationKeyPath, const ApplicationModel *model)
+void Save(const std::wstring &mainKeyPath, const ApplicationModel *model)
 {
-	std::wstring fullKeyPath = applicationKeyPath + L"\\" + APPLICATION_TOOLBAR_KEY_PATH;
+	std::wstring fullKeyPath = mainKeyPath + L"\\" + APPLICATION_TOOLBAR_KEY_PATH;
 	SHDeleteKey(HKEY_CURRENT_USER, fullKeyPath.c_str());
 
 	wil::unique_hkey applicationToolbarKey;

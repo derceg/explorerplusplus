@@ -4,15 +4,6 @@
     <ClCompile Include="Bookmarks\BookmarkHelper.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="CustomizeColorsDialog.cpp">
-      <Filter>Color Rules</Filter>
-    </ClCompile>
-    <ClCompile Include="ColorRuleDialog.cpp">
-      <Filter>Color Rules</Filter>
-    </ClCompile>
-    <ClCompile Include="ColorRuleHelper.cpp">
-      <Filter>Color Rules</Filter>
-    </ClCompile>
     <ClCompile Include="TabBackingHandler.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
@@ -433,9 +424,6 @@
     <ClCompile Include="DriveWatcherImpl.cpp">
       <Filter>Drives Toolbar</Filter>
     </ClCompile>
-    <ClCompile Include="ApplicationModel.cpp">
-      <Filter>Application Toolbar</Filter>
-    </ClCompile>
     <ClCompile Include="ApplicationToolbarRegistryStorage.cpp">
       <Filter>Application Toolbar</Filter>
     </ClCompile>
@@ -499,19 +487,31 @@
     <ClCompile Include="ApplicationModelFactory.cpp">
       <Filter>Application Toolbar</Filter>
     </ClCompile>
+    <ClCompile Include="ColorRuleRegistryStorage.cpp">
+      <Filter>Color Rules</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorRuleXmlStorage.cpp">
+      <Filter>Color Rules</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorRule.cpp">
+      <Filter>Color Rules</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorRuleEditorDialog.cpp">
+      <Filter>Color Rules\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomizeColorsDialog.cpp">
+      <Filter>Color Rules\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorRuleListView.cpp">
+      <Filter>Color Rules\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorRuleModelFactory.cpp">
+      <Filter>Color Rules</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
       <Filter>Bookmarks</Filter>
-    </ClInclude>
-    <ClInclude Include="ColorRuleDialog.h">
-      <Filter>Color Rules</Filter>
-    </ClInclude>
-    <ClInclude Include="ColorRuleHelper.h">
-      <Filter>Color Rules</Filter>
-    </ClInclude>
-    <ClInclude Include="CustomizeColorsDialog.h">
-      <Filter>Color Rules</Filter>
     </ClInclude>
     <ClInclude Include="TabContainer.h">
       <Filter>Tabs</Filter>
@@ -1005,6 +1005,30 @@
     <ClInclude Include="ApplicationModelFactory.h">
       <Filter>Application Toolbar</Filter>
     </ClInclude>
+    <ClInclude Include="ColorRuleRegistryStorage.h">
+      <Filter>Color Rules</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorRuleXmlStorage.h">
+      <Filter>Color Rules</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorRule.h">
+      <Filter>Color Rules</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorRuleModel.h">
+      <Filter>Color Rules</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorRuleEditorDialog.h">
+      <Filter>Color Rules\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomizeColorsDialog.h">
+      <Filter>Color Rules\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorRuleListView.h">
+      <Filter>Color Rules\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorRuleModelFactory.h">
+      <Filter>Color Rules</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1136,6 +1160,9 @@
     </Filter>
     <Filter Include="Dark Mode Support">
       <UniqueIdentifier>{9ba5d339-25dc-420e-97ef-a84e1cc12f84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Color Rules\UI">
+      <UniqueIdentifier>{75d9a3fc-5fa8-45b6-a300-6e1d711ec008}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

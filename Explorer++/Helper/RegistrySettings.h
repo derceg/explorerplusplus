@@ -24,6 +24,8 @@ LSTATUS ReadStringList(HKEY key, const std::wstring &baseValueName,
 	std::list<std::wstring> &outputStrings);
 bool SaveDateTime(HKEY key, const std::wstring &baseValueName, const FILETIME &dateTime);
 bool ReadDateTime(HKEY key, const std::wstring &baseValueName, FILETIME &outputDateTime);
+LSTATUS SaveBinaryValue(HKEY key, const std::wstring &valueName, const BYTE *data, DWORD length);
+LSTATUS ReadBinaryValue(HKEY key, const std::wstring &valueName, void *data, DWORD length);
 
 template <typename T>
 LSTATUS Read32BitValueFromRegistry(HKEY key, const std::wstring &valueName, T &output)

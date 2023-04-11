@@ -35,9 +35,9 @@ void ApplicationContextMenu::ShowMenu(HWND parentWindow, Application *applicatio
 		return;
 	}
 
-	auto index = m_model->GetApplicationIndex(application);
+	auto index = m_model->GetItemIndex(application);
 
-	m_controller.OnMenuItemSelected(menuItemId, m_model, application, *index + 1, parentWindow);
+	m_controller.OnMenuItemSelected(menuItemId, m_model, application, index + 1, parentWindow);
 }
 
 }

@@ -1432,9 +1432,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 		OnListViewDoubleClick(nmhdr);
 		break;
 
-	case NM_CUSTOMDRAW:
-		return OnCustomDraw(lParam);
-
 	case LVN_KEYDOWN:
 		return OnListViewKeyDown(lParam);
 

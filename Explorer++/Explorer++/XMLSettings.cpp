@@ -20,6 +20,8 @@
 #include "ApplicationToolbarXmlStorage.h"
 #include "Bookmarks/BookmarkTreeFactory.h"
 #include "Bookmarks/BookmarkXmlStorage.h"
+#include "ColorRuleModelFactory.h"
+#include "ColorRuleXmlStorage.h"
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"
@@ -1438,6 +1440,17 @@ void Explorerplusplus::SaveApplicationToolbarToXML(IXMLDOMDocument *pXMLDom, IXM
 {
 	Applications::ApplicationToolbarXmlStorage::Save(pXMLDom, pRoot,
 		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
+}
+
+void Explorerplusplus::LoadColorRulesFromXML(IXMLDOMDocument *pXMLDom)
+{
+	ColorRuleXmlStorage::Load(pXMLDom, ColorRuleModelFactory::GetInstance()->GetColorRuleModel());
+}
+
+void Explorerplusplus::SaveColorRulesToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
+{
+	ColorRuleXmlStorage::Save(pXMLDom, pRoot,
+		ColorRuleModelFactory::GetInstance()->GetColorRuleModel());
 }
 
 unsigned long hash_setting(unsigned char *str)

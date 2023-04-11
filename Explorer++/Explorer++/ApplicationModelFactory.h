@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <memory>
+
 namespace Applications
 {
 

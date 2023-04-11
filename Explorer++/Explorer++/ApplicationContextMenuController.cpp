@@ -71,7 +71,7 @@ void ApplicationContextMenuController::OnDelete(ApplicationModel *model,
 		return;
 	}
 
-	model->RemoveApplication(targetApplication);
+	model->RemoveItem(targetApplication);
 }
 
 void ApplicationContextMenuController::OnNew(HWND parentWindow, ApplicationModel *model,
