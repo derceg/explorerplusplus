@@ -125,7 +125,7 @@ void Explorerplusplus::InitializeDefaultColorRules()
 
 	colorRuleModel->AddItem(std::make_unique<ColorRule>(
 		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_GENERAL_COLOR_RULE_COMPRESSED),
-		L"", false, FILE_ATTRIBUTE_COMPRESSED, RGB(0, 0, 255)));
+		L"", false, FILE_ATTRIBUTE_COMPRESSED, RGB(0, 116, 232)));
 
 	colorRuleModel->AddItem(std::make_unique<ColorRule>(
 		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_GENERAL_COLOR_RULE_ENCRYPTED), L"",
