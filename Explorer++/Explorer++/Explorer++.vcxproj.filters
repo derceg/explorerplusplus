@@ -1029,6 +1029,9 @@
     <ClInclude Include="ColorRuleModelFactory.h">
       <Filter>Color Rules</Filter>
     </ClInclude>
+    <ClInclude Include="DialogHelper.h">
+      <Filter>Dialog Support</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

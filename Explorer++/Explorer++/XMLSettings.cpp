@@ -15,13 +15,6 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "ApplicationModelFactory.h"
-#include "ApplicationToolbar.h"
-#include "ApplicationToolbarXmlStorage.h"
-#include "Bookmarks/BookmarkTreeFactory.h"
-#include "Bookmarks/BookmarkXmlStorage.h"
-#include "ColorRuleModelFactory.h"
-#include "ColorRuleXmlStorage.h"
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"
@@ -1106,17 +1099,6 @@ int Explorerplusplus::LoadColumnFromXML(IXMLDOMNode *pNode, std::vector<Column_t
 	return iColumnType;
 }
 
-void Explorerplusplus::LoadBookmarksFromXML(IXMLDOMDocument *pXMLDom)
-{
-	BookmarkXmlStorage::Load(pXMLDom, BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
-}
-
-void Explorerplusplus::SaveBookmarksToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
-{
-	BookmarkXmlStorage::Save(pXMLDom, pRoot, BookmarkTreeFactory::GetInstance()->GetBookmarkTree(),
-		1);
-}
-
 void Explorerplusplus::LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom)
 {
 	if (!pXMLDom)
@@ -1428,29 +1410,6 @@ void Explorerplusplus::SaveToolbarInformationToXMLnternal(IXMLDOMDocument *pXMLD
 		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Length"),
 			NXMLSettings::EncodeIntValue(rbi.cx));
 	}
-}
-
-void Explorerplusplus::LoadApplicationToolbarFromXML(IXMLDOMDocument *pXMLDom)
-{
-	Applications::ApplicationToolbarXmlStorage::Load(pXMLDom,
-		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
-}
-
-void Explorerplusplus::SaveApplicationToolbarToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
-{
-	Applications::ApplicationToolbarXmlStorage::Save(pXMLDom, pRoot,
-		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
-}
-
-void Explorerplusplus::LoadColorRulesFromXML(IXMLDOMDocument *pXMLDom)
-{
-	ColorRuleXmlStorage::Load(pXMLDom, ColorRuleModelFactory::GetInstance()->GetColorRuleModel());
-}
-
-void Explorerplusplus::SaveColorRulesToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
-{
-	ColorRuleXmlStorage::Save(pXMLDom, pRoot,
-		ColorRuleModelFactory::GetInstance()->GetColorRuleModel());
 }
 
 unsigned long hash_setting(unsigned char *str)

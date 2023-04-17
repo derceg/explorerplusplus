@@ -7,6 +7,13 @@
 // clang-format off
 #include "Explorer++.h"
 // clang-format on
+#include "ApplicationModelFactory.h"
+#include "ApplicationToolbarXmlStorage.h"
+#include "Bookmarks/BookmarkTreeFactory.h"
+#include "Bookmarks/BookmarkXmlStorage.h"
+#include "ColorRuleModelFactory.h"
+#include "ColorRuleXmlStorage.h"
+#include "DialogHelper.h"
 #include "Explorer++_internal.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/XMLSettings.h"
@@ -126,7 +133,8 @@ void LoadSaveXML::LoadGenericSettings()
 
 void LoadSaveXML::LoadBookmarks()
 {
-	m_pContainer->LoadBookmarksFromXML(m_pXMLDom.get());
+	BookmarkXmlStorage::Load(m_pXMLDom.get(),
+		BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
 }
 
 int LoadSaveXML::LoadPreviousTabs()
@@ -141,7 +149,8 @@ void LoadSaveXML::LoadDefaultColumns()
 
 void LoadSaveXML::LoadApplicationToolbar()
 {
-	m_pContainer->LoadApplicationToolbarFromXML(m_pXMLDom.get());
+	Applications::ApplicationToolbarXmlStorage::Load(m_pXMLDom.get(),
+		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
 }
 
 void LoadSaveXML::LoadToolbarInformation()
@@ -151,12 +160,13 @@ void LoadSaveXML::LoadToolbarInformation()
 
 void LoadSaveXML::LoadColorRules()
 {
-	m_pContainer->LoadColorRulesFromXML(m_pXMLDom.get());
+	ColorRuleXmlStorage::Load(m_pXMLDom.get(),
+		ColorRuleModelFactory::GetInstance()->GetColorRuleModel());
 }
 
 void LoadSaveXML::LoadDialogStates()
 {
-	m_pContainer->LoadDialogStatesFromXML(m_pXMLDom.get());
+	DialogHelper::LoadDialogStatesFromXML(m_pXMLDom.get());
 }
 
 void LoadSaveXML::SaveGenericSettings()
@@ -166,7 +176,8 @@ void LoadSaveXML::SaveGenericSettings()
 
 void LoadSaveXML::SaveBookmarks()
 {
-	m_pContainer->SaveBookmarksToXML(m_pXMLDom.get(), m_pRoot.get());
+	BookmarkXmlStorage::Save(m_pXMLDom.get(), m_pRoot.get(),
+		BookmarkTreeFactory::GetInstance()->GetBookmarkTree(), 1);
 }
 
 void LoadSaveXML::SaveTabs()
@@ -181,7 +192,8 @@ void LoadSaveXML::SaveDefaultColumns()
 
 void LoadSaveXML::SaveApplicationToolbar()
 {
-	m_pContainer->SaveApplicationToolbarToXML(m_pXMLDom.get(), m_pRoot.get());
+	Applications::ApplicationToolbarXmlStorage::Save(m_pXMLDom.get(), m_pRoot.get(),
+		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
 }
 
 void LoadSaveXML::SaveToolbarInformation()
@@ -191,10 +203,11 @@ void LoadSaveXML::SaveToolbarInformation()
 
 void LoadSaveXML::SaveColorRules()
 {
-	m_pContainer->SaveColorRulesToXML(m_pXMLDom.get(), m_pRoot.get());
+	ColorRuleXmlStorage::Save(m_pXMLDom.get(), m_pRoot.get(),
+		ColorRuleModelFactory::GetInstance()->GetColorRuleModel());
 }
 
 void LoadSaveXML::SaveDialogStates()
 {
-	m_pContainer->SaveDialogStatesToXML(m_pXMLDom.get(), m_pRoot.get());
+	DialogHelper::SaveDialogStatesToXML(m_pXMLDom.get(), m_pRoot.get());
 }

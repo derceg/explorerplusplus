@@ -941,6 +941,7 @@
     <ClInclude Include="ColorRuleRegistryStorage.h" />
     <ClInclude Include="ColorRuleXmlStorage.h" />
     <ClInclude Include="CrashHandlerHelper.h" />
+    <ClInclude Include="DialogHelper.h" />
     <ClInclude Include="DriveEnumerator.h" />
     <ClInclude Include="DriveEnumeratorImpl.h" />
     <ClInclude Include="DriveModel.h" />

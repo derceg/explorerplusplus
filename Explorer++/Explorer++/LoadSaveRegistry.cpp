@@ -7,6 +7,14 @@
 // clang-format off
 #include "Explorer++.h"
 // clang-format on
+#include "ApplicationModelFactory.h"
+#include "ApplicationToolbarRegistryStorage.h"
+#include "Bookmarks/BookmarkRegistryStorage.h"
+#include "Bookmarks/BookmarkTreeFactory.h"
+#include "ColorRuleModelFactory.h"
+#include "ColorRuleRegistryStorage.h"
+#include "DialogHelper.h"
+#include "Explorer++_internal.h"
 
 LoadSaveRegistry::LoadSaveRegistry(Explorerplusplus *pContainer) : m_pContainer(pContainer)
 {
@@ -19,7 +27,8 @@ void LoadSaveRegistry::LoadGenericSettings()
 
 void LoadSaveRegistry::LoadBookmarks()
 {
-	m_pContainer->LoadBookmarksFromRegistry();
+	BookmarkRegistryStorage::Load(NExplorerplusplus::REG_MAIN_KEY,
+		BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
 }
 
 int LoadSaveRegistry::LoadPreviousTabs()
@@ -34,7 +43,8 @@ void LoadSaveRegistry::LoadDefaultColumns()
 
 void LoadSaveRegistry::LoadApplicationToolbar()
 {
-	m_pContainer->LoadApplicationToolbarFromRegistry();
+	Applications::ApplicationToolbarRegistryStorage::Load(NExplorerplusplus::REG_MAIN_KEY,
+		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
 }
 
 void LoadSaveRegistry::LoadToolbarInformation()
@@ -44,12 +54,13 @@ void LoadSaveRegistry::LoadToolbarInformation()
 
 void LoadSaveRegistry::LoadColorRules()
 {
-	m_pContainer->LoadColorRulesFromRegistry();
+	ColorRuleRegistryStorage::Load(NExplorerplusplus::REG_MAIN_KEY,
+		ColorRuleModelFactory::GetInstance()->GetColorRuleModel());
 }
 
 void LoadSaveRegistry::LoadDialogStates()
 {
-	m_pContainer->LoadDialogStatesFromRegistry();
+	DialogHelper::LoadDialogStatesFromRegistry();
 }
 
 void LoadSaveRegistry::SaveGenericSettings()
@@ -59,7 +70,8 @@ void LoadSaveRegistry::SaveGenericSettings()
 
 void LoadSaveRegistry::SaveBookmarks()
 {
-	m_pContainer->SaveBookmarksToRegistry();
+	BookmarkRegistryStorage::Save(NExplorerplusplus::REG_MAIN_KEY,
+		BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
 }
 
 void LoadSaveRegistry::SaveTabs()
@@ -74,7 +86,8 @@ void LoadSaveRegistry::SaveDefaultColumns()
 
 void LoadSaveRegistry::SaveApplicationToolbar()
 {
-	m_pContainer->SaveApplicationToolbarToRegistry();
+	Applications::ApplicationToolbarRegistryStorage::Save(NExplorerplusplus::REG_MAIN_KEY,
+		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
 }
 
 void LoadSaveRegistry::SaveToolbarInformation()
@@ -84,10 +97,11 @@ void LoadSaveRegistry::SaveToolbarInformation()
 
 void LoadSaveRegistry::SaveColorRules()
 {
-	m_pContainer->SaveColorRulesToRegistry();
+	ColorRuleRegistryStorage::Save(NExplorerplusplus::REG_MAIN_KEY,
+		ColorRuleModelFactory::GetInstance()->GetColorRuleModel());
 }
 
 void LoadSaveRegistry::SaveDialogStates()
 {
-	m_pContainer->SaveDialogStatesToRegistry();
+	DialogHelper::SaveDialogStatesToRegistry();
 }

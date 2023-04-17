@@ -358,16 +358,8 @@ private:
 		std::vector<Column_t> *pColumns);
 	void LoadDefaultColumnsFromRegistry();
 	void SaveDefaultColumnsToRegistry();
-	void SaveBookmarksToRegistry();
-	void LoadBookmarksFromRegistry();
-	void LoadApplicationToolbarFromRegistry();
-	void SaveApplicationToolbarToRegistry();
-	void LoadColorRulesFromRegistry();
-	void SaveColorRulesToRegistry();
 	void SaveToolbarInformationToRegistry();
 	void LoadToolbarInformationFromRegistry();
-	void SaveDialogStatesToRegistry();
-	void LoadDialogStatesFromRegistry();
 
 	/* XML Settings. */
 	void LoadGenericSettingsFromXML(IXMLDOMDocument *pXMLDom);
@@ -378,22 +370,14 @@ private:
 	int LoadColumnFromXML(IXMLDOMNode *pNode, std::vector<Column_t> &outputColumns);
 	void SaveColumnToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pColumnsNode,
 		const std::vector<Column_t> &columns, const TCHAR *szColumnSet, int iIndent);
-	void LoadBookmarksFromXML(IXMLDOMDocument *pXMLDom);
-	void SaveBookmarksToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom);
 	void SaveDefaultColumnsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void SaveDefaultColumnsToXMLInternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pColumnsNode);
 	void SaveWindowPositionToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void SaveWindowPositionToXMLInternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pWndPosNode);
-	void LoadApplicationToolbarFromXML(IXMLDOMDocument *pXMLDom);
-	void SaveApplicationToolbarToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
-	void LoadColorRulesFromXML(IXMLDOMDocument *pXMLDom);
-	void SaveColorRulesToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void LoadToolbarInformationFromXML(IXMLDOMDocument *pXMLDom);
 	void SaveToolbarInformationToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void SaveToolbarInformationToXMLnternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe);
-	void LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom);
-	void SaveDialogStatesToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, WCHAR *wszValue);
 	void MapTabAttributeValue(WCHAR *wszName, WCHAR *wszValue, TabSettings &tabSettings,
 		FolderSettings &folderSettings);

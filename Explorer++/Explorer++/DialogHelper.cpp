@@ -9,6 +9,7 @@
 #include "ColorRuleEditorDialog.h"
 #include "CustomizeColorsDialog.h"
 #include "DestroyFilesDialog.h"
+#include "DialogHelper.h"
 #include "DisplayColoursDialog.h"
 #include "FilterDialog.h"
 #include "MassRenameDialog.h"
@@ -27,6 +28,7 @@
 
 namespace
 {
+
 const TCHAR DIALOGS_REGISTRY_KEY[] = _T("Software\\Explorer++\\Dialogs");
 const TCHAR DIALOGS_XML_KEY[] = _T("State");
 
@@ -34,7 +36,9 @@ const TCHAR DIALOGS_XML_KEY[] = _T("State");
 GetInstance is stable throughout the lifetime of
 the program (which is true, as these are all
 singletons). */
-DialogSettings *const DIALOG_SETTINGS[] = { &SearchDialogPersistentSettings::GetInstance(),
+// clang-format off
+DialogSettings *const DIALOG_SETTINGS[] = {
+	&SearchDialogPersistentSettings::GetInstance(),
 	&WildcardSelectDialogPersistentSettings::GetInstance(),
 	&SetFileAttributesDialogPersistentSettings::GetInstance(),
 	&RenameTabDialogPersistentSettings::GetInstance(),
@@ -50,45 +54,47 @@ DialogSettings *const DIALOG_SETTINGS[] = { &SearchDialogPersistentSettings::Get
 	&AddBookmarkDialogPersistentSettings::GetInstance(),
 	&ManageBookmarksDialogPersistentSettings::GetInstance(),
 	&DisplayColoursDialogPersistentSettings::GetInstance(),
-	&UpdateCheckDialogPersistentSettings::GetInstance() };
+	&UpdateCheckDialogPersistentSettings::GetInstance()
+};
+// clang-format on
+
 }
 
-void Explorerplusplus::LoadDialogStatesFromRegistry()
+namespace DialogHelper
 {
-	HKEY hKey;
-	LONG returnValue = RegOpenKeyEx(HKEY_CURRENT_USER, DIALOGS_REGISTRY_KEY, 0, KEY_READ, &hKey);
 
-	if (returnValue == ERROR_SUCCESS)
+void LoadDialogStatesFromRegistry()
+{
+	wil::unique_hkey key;
+	LSTATUS res = RegOpenKeyEx(HKEY_CURRENT_USER, DIALOGS_REGISTRY_KEY, 0, KEY_READ, &key);
+
+	if (res == ERROR_SUCCESS)
 	{
 		for (DialogSettings *ds : DIALOG_SETTINGS)
 		{
-			ds->LoadRegistrySettings(hKey);
+			ds->LoadRegistrySettings(key.get());
 		}
-
-		RegCloseKey(hKey);
 	}
 }
 
-void Explorerplusplus::SaveDialogStatesToRegistry()
+void SaveDialogStatesToRegistry()
 {
-	HKEY hKey;
-	LONG returnValue = RegCreateKeyEx(HKEY_CURRENT_USER, DIALOGS_REGISTRY_KEY, 0, nullptr,
-		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &hKey, nullptr);
+	wil::unique_hkey key;
+	LSTATUS res = RegCreateKeyEx(HKEY_CURRENT_USER, DIALOGS_REGISTRY_KEY, 0, nullptr,
+		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &key, nullptr);
 
-	if (returnValue == ERROR_SUCCESS)
+	if (res == ERROR_SUCCESS)
 	{
 		for (DialogSettings *ds : DIALOG_SETTINGS)
 		{
-			ds->SaveRegistrySettings(hKey);
+			ds->SaveRegistrySettings(key.get());
 		}
-
-		RegCloseKey(hKey);
 	}
 }
 
-void Explorerplusplus::LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom)
+void LoadDialogStatesFromXML(IXMLDOMDocument *xmlDocument)
 {
-	if (!pXMLDom)
+	if (!xmlDocument)
 	{
 		return;
 	}
@@ -99,7 +105,7 @@ void Explorerplusplus::LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom)
 	auto bstr = wil::make_bstr_nothrow(tempNodeSelector);
 
 	wil::com_ptr_nothrow<IXMLDOMNodeList> pNodes;
-	pXMLDom->selectNodes(bstr.get(), &pNodes);
+	xmlDocument->selectNodes(bstr.get(), &pNodes);
 
 	if (!pNodes)
 	{
@@ -159,20 +165,22 @@ void Explorerplusplus::LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom)
 	}
 }
 
-void Explorerplusplus::SaveDialogStatesToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
+void SaveDialogStatesToXML(IXMLDOMDocument *xmlDocument, IXMLDOMElement *rootNode)
 {
 	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pRoot);
+	NXMLSettings::AddWhiteSpaceToNode(xmlDocument, bstr_wsnt.get(), rootNode);
 
 	wil::com_ptr_nothrow<IXMLDOMElement> pe;
 	auto bstr = wil::make_bstr_nothrow(DIALOGS_XML_KEY);
-	pXMLDom->createElement(bstr.get(), &pe);
+	xmlDocument->createElement(bstr.get(), &pe);
 
 	for (DialogSettings *ds : DIALOG_SETTINGS)
 	{
-		ds->SaveXMLSettings(pXMLDom, pe.get());
+		ds->SaveXMLSettings(xmlDocument, pe.get());
 	}
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pe.get());
-	NXMLSettings::AppendChildToParent(pe.get(), pRoot);
+	NXMLSettings::AddWhiteSpaceToNode(xmlDocument, bstr_wsnt.get(), pe.get());
+	NXMLSettings::AppendChildToParent(pe.get(), rootNode);
+}
+
 }

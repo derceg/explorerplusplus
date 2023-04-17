@@ -4,13 +4,6 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "ApplicationModelFactory.h"
-#include "ApplicationToolbar.h"
-#include "ApplicationToolbarRegistryStorage.h"
-#include "Bookmarks/BookmarkRegistryStorage.h"
-#include "Bookmarks/BookmarkTreeFactory.h"
-#include "ColorRuleModelFactory.h"
-#include "ColorRuleRegistryStorage.h"
 #include "Config.h"
 #include "DefaultColumns.h"
 #include "DisplayWindow/DisplayWindow.h"
@@ -564,18 +557,6 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 	}
 
 	return returnValue;
-}
-
-void Explorerplusplus::SaveBookmarksToRegistry()
-{
-	BookmarkRegistryStorage::Save(NExplorerplusplus::REG_MAIN_KEY,
-		BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
-}
-
-void Explorerplusplus::LoadBookmarksFromRegistry()
-{
-	BookmarkRegistryStorage::Load(NExplorerplusplus::REG_MAIN_KEY,
-		BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
 }
 
 void Explorerplusplus::SaveTabSettingsToRegistry()
@@ -1190,28 +1171,4 @@ void Explorerplusplus::LoadToolbarInformationFromRegistry()
 
 		RegCloseKey(hKey);
 	}
-}
-
-void Explorerplusplus::LoadApplicationToolbarFromRegistry()
-{
-	Applications::ApplicationToolbarRegistryStorage::Load(NExplorerplusplus::REG_MAIN_KEY,
-		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
-}
-
-void Explorerplusplus::SaveApplicationToolbarToRegistry()
-{
-	Applications::ApplicationToolbarRegistryStorage::Save(NExplorerplusplus::REG_MAIN_KEY,
-		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
-}
-
-void Explorerplusplus::LoadColorRulesFromRegistry()
-{
-	ColorRuleRegistryStorage::Load(NExplorerplusplus::REG_MAIN_KEY,
-		ColorRuleModelFactory::GetInstance()->GetColorRuleModel());
-}
-
-void Explorerplusplus::SaveColorRulesToRegistry()
-{
-	ColorRuleRegistryStorage::Save(NExplorerplusplus::REG_MAIN_KEY,
-		ColorRuleModelFactory::GetInstance()->GetColorRuleModel());
 }
