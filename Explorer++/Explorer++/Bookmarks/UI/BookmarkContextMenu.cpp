@@ -10,10 +10,10 @@
 #include "../Helper/MenuHelper.h"
 #include <wil/resource.h>
 
-BookmarkContextMenu::BookmarkContextMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule,
+BookmarkContextMenu::BookmarkContextMenu(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
 	CoreInterface *coreInterface, Navigator *navigator) :
-	m_resourceModule(resourceModule),
-	m_controller(bookmarkTree, resourceModule, coreInterface, navigator),
+	m_resourceInstance(resourceInstance),
+	m_controller(bookmarkTree, resourceInstance, coreInterface, navigator),
 	m_showingMenu(false)
 {
 }
@@ -28,12 +28,12 @@ BOOL BookmarkContextMenu::ShowMenu(HWND parentWindow, BookmarkItem *parentFolder
 	if (bookmarkItems.size() == 1)
 	{
 		parentMenu.reset(
-			LoadMenu(m_resourceModule, MAKEINTRESOURCE(IDR_SINGLE_BOOKMARK_CONTEXT_MENU)));
+			LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_SINGLE_BOOKMARK_CONTEXT_MENU)));
 	}
 	else
 	{
 		parentMenu.reset(
-			LoadMenu(m_resourceModule, MAKEINTRESOURCE(IDR_MULTIPLE_BOOKMARK_CONTEXT_MENU)));
+			LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_MULTIPLE_BOOKMARK_CONTEXT_MENU)));
 	}
 
 	if (!parentMenu)
@@ -104,7 +104,8 @@ void BookmarkContextMenu::SetUpMenu(HMENU menu, const RawBookmarkItems &bookmark
 		DeleteMenu(menu, IDM_BOOKMARKS_OPEN, MF_BYCOMMAND);
 		DeleteMenu(menu, IDM_BOOKMARKS_OPEN_IN_NEW_TAB, MF_BYCOMMAND);
 
-		std::wstring openAll = ResourceHelper::LoadString(m_resourceModule, IDS_BOOKMARK_OPEN_ALL);
+		std::wstring openAll =
+			ResourceHelper::LoadString(m_resourceInstance, IDS_BOOKMARK_OPEN_ALL);
 
 		MENUITEMINFO mii;
 		mii.cbSize = sizeof(mii);
@@ -145,7 +146,7 @@ void BookmarkContextMenu::SetUpMenu(HMENU menu, const RawBookmarkItems &bookmark
 		else
 		{
 			std::wstring openAll =
-				ResourceHelper::LoadString(m_resourceModule, IDS_BOOKMARK_OPEN_ALL);
+				ResourceHelper::LoadString(m_resourceInstance, IDS_BOOKMARK_OPEN_ALL);
 			openAll += L"\t" + std::to_wstring(totalBookmarks);
 
 			MENUITEMINFO menuItemInfo;

@@ -19,9 +19,9 @@ const TCHAR SetDefaultColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SetD
 
 const TCHAR SetDefaultColumnsDialogPersistentSettings::SETTING_FOLDER_TYPE[] = _T("Folder");
 
-SetDefaultColumnsDialog::SetDefaultColumnsDialog(HINSTANCE hInstance, HWND hParent,
+SetDefaultColumnsDialog::SetDefaultColumnsDialog(HINSTANCE resourceInstance, HWND hParent,
 	FolderColumns &folderColumns) :
-	DarkModeDialogBase(hInstance, IDD_SETDEFAULTCOLUMNS, hParent, true),
+	DarkModeDialogBase(resourceInstance, IDD_SETDEFAULTCOLUMNS, hParent, true),
 	m_folderColumns(folderColumns)
 {
 	m_psdcdps = &SetDefaultColumnsDialogPersistentSettings::GetInstance();
@@ -43,7 +43,7 @@ INT_PTR SetDefaultColumnsDialog::OnInitDialog()
 	m_FolderMap.insert(
 		std::unordered_map<int, FolderType>::value_type(pos, FolderType::ControlPanel));
 
-	folderName = ResourceHelper::LoadString(GetInstance(), IDS_DEFAULTCOLUMNS_GENERAL);
+	folderName = ResourceHelper::LoadString(GetResourceInstance(), IDS_DEFAULTCOLUMNS_GENERAL);
 	pos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
 		reinterpret_cast<LPARAM>(folderName.c_str())));
 	m_FolderMap.insert(std::unordered_map<int, FolderType>::value_type(pos, FolderType::General));
@@ -313,8 +313,8 @@ void SetDefaultColumnsDialog::SetupFolderColumns(FolderType folderType)
 	for (const auto &column : columns)
 	{
 		TCHAR szText[64];
-		LoadString(GetInstance(), ShellBrowser::LookupColumnNameStringIndex(column.type), szText,
-			SIZEOF_ARRAY(szText));
+		LoadString(GetResourceInstance(), ShellBrowser::LookupColumnNameStringIndex(column.type),
+			szText, SIZEOF_ARRAY(szText));
 
 		LVITEM lvItem;
 		lvItem.mask = LVIF_TEXT | LVIF_PARAM;
@@ -377,7 +377,7 @@ void SetDefaultColumnsDialog::OnLvnItemChanged(NMLISTVIEW *pnmlv)
 			static_cast<ColumnType>(lvItem.lParam));
 
 		TCHAR szColumnDescription[128];
-		LoadString(GetInstance(), iDescriptionStringIndex, szColumnDescription,
+		LoadString(GetResourceInstance(), iDescriptionStringIndex, szColumnDescription,
 			SIZEOF_ARRAY(szColumnDescription));
 		SetDlgItemText(m_hDlg, IDC_COLUMNS_DESCRIPTION, szColumnDescription);
 	}

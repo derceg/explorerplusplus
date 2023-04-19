@@ -18,7 +18,7 @@ class TaskbarThumbnails
 {
 public:
 	static TaskbarThumbnails *Create(CoreInterface *coreInterface, TabContainer *tabContainer,
-		HINSTANCE instance, std::shared_ptr<Config> config);
+		HINSTANCE resourceInstance, std::shared_ptr<Config> config);
 
 private:
 	DISALLOW_COPY_AND_ASSIGN(TaskbarThumbnails);
@@ -31,8 +31,8 @@ private:
 		wil::unique_hicon icon;
 	};
 
-	TaskbarThumbnails(CoreInterface *coreInterface, TabContainer *tabContainer, HINSTANCE instance,
-		std::shared_ptr<Config> config);
+	TaskbarThumbnails(CoreInterface *coreInterface, TabContainer *tabContainer,
+		HINSTANCE resourceInstance, std::shared_ptr<Config> config);
 	~TaskbarThumbnails() = default;
 
 	static LRESULT CALLBACK MainWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,

@@ -94,10 +94,10 @@ HWND CreateTabControl(HWND hParent, DWORD dwStyle)
 	return hTabControl;
 }
 
-HWND CreateTooltipControl(HWND parent, HINSTANCE instance)
+HWND CreateTooltipControl(HWND parent, HINSTANCE resourceInstance)
 {
 	HWND tipWnd = CreateWindowEx(0, TOOLTIPS_CLASS, nullptr, WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT,
-		CW_USEDEFAULT, CW_USEDEFAULT, parent, nullptr, instance, nullptr);
+		CW_USEDEFAULT, CW_USEDEFAULT, parent, nullptr, resourceInstance, nullptr);
 
 	SetWindowPos(tipWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 
@@ -325,15 +325,15 @@ SIZE GetButtonSize(HWND hwnd, int partId, int stateId, int defaultWidth, int def
 		MulDiv(defaultHeight, dpi, USER_DEFAULT_SCREEN_DPI) };
 }
 
-bool AddTooltipForControl(HWND tipWnd, HWND control, HINSTANCE instance, int stringResourceId,
-	TooltipType tooltipType)
+bool AddTooltipForControl(HWND tipWnd, HWND control, HINSTANCE resourceInstance,
+	int stringResourceId, TooltipType tooltipType)
 {
 	// Note that the lpszText field of the TOOLINFO struct can be set to the identifier of the
 	// appropriate string resource. However, in that case, the maximum text length is 80 characters,
 	// which is why the string is instead manually loaded here.
 	WCHAR *rawString;
 	int numCharacters =
-		LoadString(instance, stringResourceId, reinterpret_cast<LPWSTR>(&rawString), 0);
+		LoadString(resourceInstance, stringResourceId, reinterpret_cast<LPWSTR>(&rawString), 0);
 
 	if (numCharacters == 0)
 	{

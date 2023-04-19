@@ -32,16 +32,16 @@ struct TabProxy
 }
 
 TaskbarThumbnails *TaskbarThumbnails::Create(CoreInterface *coreInterface,
-	TabContainer *tabContainer, HINSTANCE instance, std::shared_ptr<Config> config)
+	TabContainer *tabContainer, HINSTANCE resourceInstance, std::shared_ptr<Config> config)
 {
-	return new TaskbarThumbnails(coreInterface, tabContainer, instance, config);
+	return new TaskbarThumbnails(coreInterface, tabContainer, resourceInstance, config);
 }
 
 TaskbarThumbnails::TaskbarThumbnails(CoreInterface *coreInterface, TabContainer *tabContainer,
-	HINSTANCE instance, std::shared_ptr<Config> config) :
+	HINSTANCE resourceInstance, std::shared_ptr<Config> config) :
 	m_coreInterface(coreInterface),
 	m_tabContainer(tabContainer),
-	m_instance(instance),
+	m_instance(resourceInstance),
 	m_enabled(config->showTaskbarThumbnails)
 {
 	Initialize();

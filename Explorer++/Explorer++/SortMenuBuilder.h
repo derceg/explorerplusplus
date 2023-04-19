@@ -18,7 +18,7 @@ public:
 		wil::unique_hmenu groupByMenu;
 	};
 
-	SortMenuBuilder(HMODULE resourceModule);
+	SortMenuBuilder(HINSTANCE resourceInstance);
 
 	SortMenus BuildMenus(const Tab &tab);
 
@@ -30,5 +30,5 @@ private:
 	int DetermineSortModeMenuId(SortMode sortMode);
 	int DetermineGroupModeMenuId(SortMode sortMode);
 
-	HMODULE m_resourceModule;
+	HINSTANCE m_resourceInstance;
 };

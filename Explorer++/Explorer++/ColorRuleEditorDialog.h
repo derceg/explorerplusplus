@@ -87,7 +87,7 @@ public:
 		ColorRule *existingColorRule = nullptr;
 	};
 
-	ColorRuleEditorDialog(HMODULE resourceModule, HWND parent, ColorRuleModel *model,
+	ColorRuleEditorDialog(HINSTANCE resourceInstance, HWND parent, ColorRuleModel *model,
 		std::unique_ptr<EditDetails> editDetails);
 
 protected:

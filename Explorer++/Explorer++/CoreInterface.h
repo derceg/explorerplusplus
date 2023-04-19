@@ -47,7 +47,7 @@ public:
 	virtual ~CoreInterface() = default;
 
 	virtual const Config *GetConfig() const = 0;
-	virtual HMODULE GetResourceModule() const = 0;
+	virtual HINSTANCE GetResourceInstance() const = 0;
 	virtual HACCEL *GetAcceleratorTable() const = 0;
 
 	virtual HWND GetMainWindow() const = 0;

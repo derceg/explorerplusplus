@@ -12,7 +12,7 @@
 
 const int SORT_MENU_RESOURCE_BLOCK_SIZE = 1000;
 
-SortMenuBuilder::SortMenuBuilder(HMODULE resourceModule) : m_resourceModule(resourceModule)
+SortMenuBuilder::SortMenuBuilder(HINSTANCE resourceInstance) : m_resourceInstance(resourceInstance)
 {
 }
 
@@ -30,7 +30,7 @@ SortMenuBuilder::SortMenus SortMenuBuilder::BuildMenus(const Tab &tab)
 		int groupById = DetermineGroupModeMenuId(sortMode);
 
 		UINT stringIndex = GetSortMenuItemStringIndex(sortById);
-		std::wstring menuText = ResourceHelper::LoadString(m_resourceModule, stringIndex);
+		std::wstring menuText = ResourceHelper::LoadString(m_resourceInstance, stringIndex);
 
 		MenuHelper::AddStringItem(sortByMenu.get(), sortById, menuText, position, TRUE);
 		MenuHelper::AddStringItem(groupByMenu.get(), groupById, menuText, position, TRUE);
@@ -50,16 +50,16 @@ wil::unique_hmenu SortMenuBuilder::CreateDefaultMenu()
 	MenuHelper::AddSeparator(menu.get());
 
 	std::wstring sortAscending =
-		ResourceHelper::LoadString(m_resourceModule, IDS_MENU_SORT_ASCENDING);
+		ResourceHelper::LoadString(m_resourceInstance, IDS_MENU_SORT_ASCENDING);
 	MenuHelper::AddStringItem(menu.get(), IDM_SORT_ASCENDING, sortAscending);
 
 	std::wstring sortDescending =
-		ResourceHelper::LoadString(m_resourceModule, IDS_MENU_SORT_DESCENDING);
+		ResourceHelper::LoadString(m_resourceInstance, IDS_MENU_SORT_DESCENDING);
 	MenuHelper::AddStringItem(menu.get(), IDM_SORT_DESCENDING, sortDescending);
 
 	MenuHelper::AddSeparator(menu.get());
 
-	std::wstring sortByMore = ResourceHelper::LoadString(m_resourceModule, IDS_MENU_SORT_MORE);
+	std::wstring sortByMore = ResourceHelper::LoadString(m_resourceInstance, IDS_MENU_SORT_MORE);
 	MenuHelper::AddStringItem(menu.get(), IDM_SORTBY_MORE, sortByMore);
 
 	return menu;

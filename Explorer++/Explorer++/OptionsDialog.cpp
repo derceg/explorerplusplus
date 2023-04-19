@@ -84,11 +84,11 @@ const boost::bimap<bool, std::wstring> BOOL_MAPPINGS =
 
 TCHAR g_szNewTabDirectory[MAX_PATH];
 
-OptionsDialog::OptionsDialog(HINSTANCE instance, HWND parent, std::shared_ptr<Config> config,
-	CoreInterface *coreInterface, TabContainer *tabContainer) :
-	DarkModeDialogBase(instance, IDD_OPTIONS, parent, false),
+OptionsDialog::OptionsDialog(HINSTANCE resourceInstance, HWND parent,
+	std::shared_ptr<Config> config, CoreInterface *coreInterface, TabContainer *tabContainer) :
+	DarkModeDialogBase(resourceInstance, IDD_OPTIONS, parent, false),
 	m_config(config),
-	m_instance(instance),
+	m_resourceInstance(resourceInstance),
 	m_coreInterface(coreInterface),
 	m_tabContainer(tabContainer)
 {
@@ -135,8 +135,8 @@ void OptionsDialog::AddSettingsPages()
 void OptionsDialog::AddSettingsPage(UINT dialogResourceId, UINT titleResourceId, int pageIndex,
 	DLGPROC dialogProc, LPARAM dialogProcParam)
 {
-	HWND dialog = CreateDialogParam(GetInstance(), MAKEINTRESOURCE(dialogResourceId), m_hDlg,
-		dialogProc, dialogProcParam);
+	HWND dialog = CreateDialogParam(GetResourceInstance(), MAKEINTRESOURCE(dialogResourceId),
+		m_hDlg, dialogProc, dialogProcParam);
 
 	auto treeView = GetDlgItem(m_hDlg, IDC_SETTINGS_PAGES_TREE);
 
@@ -147,7 +147,7 @@ void OptionsDialog::AddSettingsPage(UINT dialogResourceId, UINT titleResourceId,
 	SetWindowPos(dialog, nullptr, treeViewRect.right + TREEVIEW_PAGE_HORIZONTAL_SPACING,
 		treeViewRect.top, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 
-	auto title = ResourceHelper::LoadString(m_instance, titleResourceId);
+	auto title = ResourceHelper::LoadString(m_resourceInstance, titleResourceId);
 
 	TVITEMEX treeViewItem;
 	treeViewItem.mask = TVIF_TEXT | TVIF_PARAM;
@@ -517,15 +517,15 @@ INT_PTR CALLBACK OptionsDialog::AppearanceProc(HWND hDlg, UINT uMsg, WPARAM wPar
 		// However, the tooltip won't show up if the control is disabled.
 		// Adding the tooltip based on the control rectangle, while leaving out the SS_NOTIFY style,
 		// will work in both cases.
-		AddTooltipForControl(m_tipWnd, GetDlgItem(hDlg, IDC_OPTIONS_THEME_LABEL), m_instance,
-			IDS_OPTIONS_THEME_TOOLTIP, TooltipType::Rectangle);
+		AddTooltipForControl(m_tipWnd, GetDlgItem(hDlg, IDC_OPTIONS_THEME_LABEL),
+			m_resourceInstance, IDS_OPTIONS_THEME_TOOLTIP, TooltipType::Rectangle);
 
 		// These calls add a tooltip both to the combobox control and to the control rectangle. The
 		// first tooltip will activate when the control is enabled, while the second will activate
 		// when the control is disabled.
-		AddTooltipForControl(m_tipWnd, GetDlgItem(hDlg, IDC_OPTIONS_THEME), m_instance,
+		AddTooltipForControl(m_tipWnd, GetDlgItem(hDlg, IDC_OPTIONS_THEME), m_resourceInstance,
 			IDS_OPTIONS_THEME_TOOLTIP, TooltipType::Control);
-		AddTooltipForControl(m_tipWnd, GetDlgItem(hDlg, IDC_OPTIONS_THEME), m_instance,
+		AddTooltipForControl(m_tipWnd, GetDlgItem(hDlg, IDC_OPTIONS_THEME), m_resourceInstance,
 			IDS_OPTIONS_THEME_TOOLTIP, TooltipType::Rectangle);
 
 		auto &darkModeHelper = DarkModeHelper::GetInstance();
@@ -611,8 +611,8 @@ bool OptionsDialog::UpdateReplaceExplorerSetting(HWND dialog,
 	if (updatedReplaceMode != ReplaceExplorerMode::None
 		&& m_config->replaceExplorerMode == ReplaceExplorerMode::None)
 	{
-		std::wstring warningMessage =
-			ResourceHelper::LoadString(m_instance, IDS_OPTIONS_DIALOG_REPLACE_EXPLORER_WARNING);
+		std::wstring warningMessage = ResourceHelper::LoadString(m_resourceInstance,
+			IDS_OPTIONS_DIALOG_REPLACE_EXPLORER_WARNING);
 
 		int selectedButton = MessageBox(dialog, warningMessage.c_str(), NExplorerplusplus::APP_NAME,
 			MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2);
@@ -624,7 +624,8 @@ bool OptionsDialog::UpdateReplaceExplorerSetting(HWND dialog,
 	}
 
 	LSTATUS res = ERROR_SUCCESS;
-	std::wstring menuText = ResourceHelper::LoadString(m_instance, IDS_OPEN_IN_EXPLORERPLUSPLUS);
+	std::wstring menuText =
+		ResourceHelper::LoadString(m_resourceInstance, IDS_OPEN_IN_EXPLORERPLUSPLUS);
 
 	switch (updatedReplaceMode)
 	{
@@ -677,13 +678,14 @@ bool OptionsDialog::UpdateReplaceExplorerSetting(HWND dialog,
 		}
 		else
 		{
-			std::wstring errorCodeTemplate = ResourceHelper::LoadString(m_instance, IDS_ERROR_CODE);
+			std::wstring errorCodeTemplate =
+				ResourceHelper::LoadString(m_resourceInstance, IDS_ERROR_CODE);
 			finalSystemErrorMessage = (boost::wformat(errorCodeTemplate) % res).str();
 		}
 
 		std::wstring errorMessage =
-			ResourceHelper::LoadString(m_instance, IDS_ERROR_REPLACE_EXPLORER_SETTING) + L"\n\n"
-			+ finalSystemErrorMessage;
+			ResourceHelper::LoadString(m_resourceInstance, IDS_ERROR_REPLACE_EXPLORER_SETTING)
+			+ L"\n\n" + finalSystemErrorMessage;
 
 		MessageBox(dialog, errorMessage.c_str(), NExplorerplusplus::APP_NAME, MB_ICONWARNING);
 
@@ -798,8 +800,8 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 			CheckDlgButton(hDlg, IDC_USE_NATURAL_SORT_ORDER, BST_CHECKED);
 		}
 
-		AddTooltipForControl(m_tipWnd, GetDlgItem(hDlg, IDC_USE_NATURAL_SORT_ORDER), m_instance,
-			IDS_USE_NATURAL_SORT_ORDER_TOOLTIP);
+		AddTooltipForControl(m_tipWnd, GetDlgItem(hDlg, IDC_USE_NATURAL_SORT_ORDER),
+			m_resourceInstance, IDS_USE_NATURAL_SORT_ORDER_TOOLTIP);
 
 		HWND fileSizesComboBox = GetDlgItem(hDlg, IDC_COMBO_FILESIZES);
 		std::vector<SizeDisplayFormat> fileSizeOptions = { SizeDisplayFormat::Bytes,
@@ -1487,7 +1489,7 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 
 			case IDC_BUTTON_DEFAULTCOLUMNS:
 			{
-				SetDefaultColumnsDialog setDefaultColumnsDialog(m_instance, hDlg,
+				SetDefaultColumnsDialog setDefaultColumnsDialog(m_resourceInstance, hDlg,
 					m_config->globalFolderSettings.folderColumns);
 				setDefaultColumnsDialog.ShowModalDialog();
 			}
@@ -1595,14 +1597,15 @@ INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(HWND hDlg, UINT uMsg, WPARA
 		}
 
 		std::wstring valueColumnText =
-			ResourceHelper::LoadString(m_instance, IDS_ADVANCED_OPTION_VALUE);
+			ResourceHelper::LoadString(m_resourceInstance, IDS_ADVANCED_OPTION_VALUE);
 
 		LV_COLUMN lvColumn;
 		lvColumn.mask = LVCF_TEXT;
 		lvColumn.pszText = valueColumnText.data();
 		ListView_InsertColumn(listView, 0, &lvColumn);
 
-		std::wstring optionColumnText = ResourceHelper::LoadString(m_instance, IDS_ADVANCED_OPTION);
+		std::wstring optionColumnText =
+			ResourceHelper::LoadString(m_resourceInstance, IDS_ADVANCED_OPTION);
 
 		lvColumn.mask = LVCF_TEXT;
 		lvColumn.pszText = optionColumnText.data();
@@ -1808,18 +1811,18 @@ std::vector<OptionsDialog::AdvancedOption> OptionsDialog::InitializeAdvancedOpti
 
 	AdvancedOption option;
 	option.id = AdvancedOptionId::CheckSystemIsPinnedToNameSpaceTree;
-	option.name = ResourceHelper::LoadString(m_instance,
+	option.name = ResourceHelper::LoadString(m_resourceInstance,
 		IDS_ADVANCED_OPTION_CHECK_PINNED_TO_NAMESPACE_TREE_NAME);
 	option.type = AdvancedOptionType::Boolean;
-	option.description = ResourceHelper::LoadString(m_instance,
+	option.description = ResourceHelper::LoadString(m_resourceInstance,
 		IDS_ADVANCED_OPTION_CHECK_PINNED_TO_NAMESPACE_TREE_DESCRIPTION);
 	advancedOptions.push_back(option);
 
 	option.id = AdvancedOptionId::OpenTabsInForeground;
-	option.name =
-		ResourceHelper::LoadString(m_instance, IDS_ADVANCED_OPTION_OPEN_TABS_IN_FOREGROUND_NAME);
+	option.name = ResourceHelper::LoadString(m_resourceInstance,
+		IDS_ADVANCED_OPTION_OPEN_TABS_IN_FOREGROUND_NAME);
 	option.type = AdvancedOptionType::Boolean;
-	option.description = ResourceHelper::LoadString(m_instance,
+	option.description = ResourceHelper::LoadString(m_resourceInstance,
 		IDS_ADVANCED_OPTION_OPEN_TABS_IN_FOREGROUND_DESCRIPTION);
 	advancedOptions.push_back(option);
 
@@ -1973,7 +1976,8 @@ void OptionsDialog::OnDefaultSettingsNewTabDir(HWND hDlg)
 	HRESULT hr;
 
 	/* Load the dialog helper message. */
-	std::wstring helperText = ResourceHelper::LoadString(m_instance, IDS_DEFAULTSETTINGS_NEWTAB);
+	std::wstring helperText =
+		ResourceHelper::LoadString(m_resourceInstance, IDS_DEFAULTSETTINGS_NEWTAB);
 
 	GetDlgItemText(hDlg, IDC_DEFAULT_NEWTABDIR_EDIT, szNewTabDir, SIZEOF_ARRAY(szNewTabDir));
 
@@ -2063,7 +2067,7 @@ void OptionsDialog::AddItemsToComboBox(HWND comboBox, const std::vector<T> &item
 	for (auto itemId : itemIds)
 	{
 		UINT stringResourceId = getStringResourceId(itemId);
-		std::wstring itemName = ResourceHelper::LoadString(m_instance, stringResourceId);
+		std::wstring itemName = ResourceHelper::LoadString(m_resourceInstance, stringResourceId);
 
 		int index = static_cast<int>(
 			SendMessage(comboBox, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(itemName.c_str())));

@@ -23,10 +23,10 @@
 
 const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
-ManageBookmarksDialog::ManageBookmarksDialog(HINSTANCE hInstance, HWND hParent,
+ManageBookmarksDialog::ManageBookmarksDialog(HINSTANCE resourceInstance, HWND hParent,
 	CoreInterface *coreInterface, Navigator *navigator, IconFetcher *iconFetcher,
 	BookmarkTree *bookmarkTree) :
-	DarkModeDialogBase(hInstance, IDD_MANAGE_BOOKMARKS, hParent, true),
+	DarkModeDialogBase(resourceInstance, IDD_MANAGE_BOOKMARKS, hParent, true),
 	m_coreInterface(coreInterface),
 	m_navigator(navigator),
 	m_iconFetcher(iconFetcher),
@@ -122,7 +122,7 @@ void ManageBookmarksDialog::SetupToolbar()
 	TBBUTTON tbb;
 
 	std::wstring text =
-		ResourceHelper::LoadString(GetInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_BACK);
+		ResourceHelper::LoadString(GetResourceInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_BACK);
 
 	tbb.iBitmap = m_imageListToolbarMappings.at(Icon::Back);
 	tbb.idCommand = TOOLBAR_ID_BACK;
@@ -132,7 +132,7 @@ void ManageBookmarksDialog::SetupToolbar()
 	tbb.iString = reinterpret_cast<INT_PTR>(text.c_str());
 	SendMessage(m_hToolbar, TB_INSERTBUTTON, 0, reinterpret_cast<LPARAM>(&tbb));
 
-	text = ResourceHelper::LoadString(GetInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_FORWARD);
+	text = ResourceHelper::LoadString(GetResourceInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_FORWARD);
 
 	tbb.iBitmap = m_imageListToolbarMappings.at(Icon::Forward);
 	tbb.idCommand = TOOLBAR_ID_FORWARD;
@@ -142,7 +142,7 @@ void ManageBookmarksDialog::SetupToolbar()
 	tbb.iString = reinterpret_cast<INT_PTR>(text.c_str());
 	SendMessage(m_hToolbar, TB_INSERTBUTTON, 1, reinterpret_cast<LPARAM>(&tbb));
 
-	text = ResourceHelper::LoadString(GetInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_ORGANIZE);
+	text = ResourceHelper::LoadString(GetResourceInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_ORGANIZE);
 
 	tbb.iBitmap = m_imageListToolbarMappings.at(Icon::Copy);
 	tbb.idCommand = TOOLBAR_ID_ORGANIZE;
@@ -152,7 +152,7 @@ void ManageBookmarksDialog::SetupToolbar()
 	tbb.iString = reinterpret_cast<INT_PTR>(text.c_str());
 	SendMessage(m_hToolbar, TB_INSERTBUTTON, 2, reinterpret_cast<LPARAM>(&tbb));
 
-	text = ResourceHelper::LoadString(GetInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_VIEWS);
+	text = ResourceHelper::LoadString(GetResourceInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_VIEWS);
 
 	tbb.iBitmap = m_imageListToolbarMappings.at(Icon::Views);
 	tbb.idCommand = TOOLBAR_ID_VIEWS;
@@ -183,7 +183,7 @@ void ManageBookmarksDialog::SetupTreeView()
 {
 	HWND hTreeView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW);
 
-	m_bookmarkTreeView = new BookmarkTreeView(hTreeView, GetInstance(), m_coreInterface,
+	m_bookmarkTreeView = new BookmarkTreeView(hTreeView, GetResourceInstance(), m_coreInterface,
 		m_bookmarkTree, m_persistentSettings->m_setExpansion);
 
 	m_connections.push_back(m_bookmarkTreeView->selectionChangedSignal.AddObserver(
@@ -194,7 +194,7 @@ void ManageBookmarksDialog::SetupListView()
 {
 	HWND hListView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW);
 
-	m_bookmarkListView = new BookmarkListView(hListView, GetInstance(), m_bookmarkTree,
+	m_bookmarkListView = new BookmarkListView(hListView, GetResourceInstance(), m_bookmarkTree,
 		m_coreInterface, m_navigator, m_iconFetcher, m_persistentSettings->m_listViewColumns);
 
 	m_connections.push_back(m_bookmarkListView->AddNavigationCompletedObserver(
@@ -341,7 +341,7 @@ void ManageBookmarksDialog::OnTbnDropDown(NMTOOLBAR *nmtb)
 void ManageBookmarksDialog::ShowViewMenu()
 {
 	wil::unique_hmenu parentMenu(
-		LoadMenu(GetInstance(), MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_VIEW_MENU)));
+		LoadMenu(GetResourceInstance(), MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_VIEW_MENU)));
 
 	if (!parentMenu)
 	{
@@ -516,7 +516,7 @@ void ManageBookmarksDialog::OnViewMenuItemSelected(int menuItemId)
 void ManageBookmarksDialog::ShowOrganizeMenu()
 {
 	wil::unique_hmenu parentMenu(
-		LoadMenu(GetInstance(), MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_ORGANIZE_MENU)));
+		LoadMenu(GetResourceInstance(), MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_ORGANIZE_MENU)));
 
 	if (!parentMenu)
 	{

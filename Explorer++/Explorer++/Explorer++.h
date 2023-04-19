@@ -471,7 +471,7 @@ private:
 
 	/* CoreInterface methods. */
 	const Config *GetConfig() const override;
-	HMODULE GetResourceModule() const override;
+	HINSTANCE GetResourceInstance() const override;
 	HACCEL *GetAcceleratorTable() const;
 	HWND GetMainWindow() const override;
 	HWND GetActiveListView() const override;
@@ -545,7 +545,7 @@ private:
 	ShellTreeView *m_shellTreeView;
 	StatusBar *m_pStatusBar;
 
-	HMODULE m_resourceModule;
+	HINSTANCE m_resourceInstance;
 
 	/** Internal state. **/
 	HWND m_hLastActiveWindow;

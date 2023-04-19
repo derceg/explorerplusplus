@@ -69,7 +69,7 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, CoreInterface *coreInterface,
 	m_hListView(GetHWND()),
 	m_ID(id),
 	m_shChangeNotifyId(0),
-	m_hResourceModule(coreInterface->GetResourceModule()),
+	m_resourceInstance(coreInterface->GetResourceInstance()),
 	m_acceleratorTable(coreInterface->GetAcceleratorTable()),
 	m_hOwner(hOwner),
 	m_cachedIcons(coreInterface->GetCachedIcons()),
@@ -1385,7 +1385,7 @@ void ShellBrowser::StartRenamingMultipleFiles()
 		return;
 	}
 
-	MassRenameDialog massRenameDialog(m_hResourceModule, m_hListView, fullFilenameList,
+	MassRenameDialog massRenameDialog(m_resourceInstance, m_hListView, fullFilenameList,
 		m_iconResourceLoader, m_fileActionHandler);
 	massRenameDialog.ShowModalDialog();
 }

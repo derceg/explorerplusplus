@@ -10,13 +10,13 @@
 #include "../Helper/DropSourceImpl.h"
 #include "../Helper/MenuHelper.h"
 
-BookmarkMenu::BookmarkMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule,
+BookmarkMenu::BookmarkMenu(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
 	CoreInterface *coreInterface, Navigator *navigator, IconFetcher *iconFetcher,
 	HWND parentWindow) :
 	m_bookmarkTree(bookmarkTree),
 	m_parentWindow(parentWindow),
-	m_menuBuilder(coreInterface, iconFetcher, resourceModule),
-	m_bookmarkContextMenu(bookmarkTree, resourceModule, coreInterface, navigator),
+	m_menuBuilder(coreInterface, iconFetcher, resourceInstance),
+	m_bookmarkContextMenu(bookmarkTree, resourceInstance, coreInterface, navigator),
 	m_controller(coreInterface, navigator)
 {
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parentWindow,

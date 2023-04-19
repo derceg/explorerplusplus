@@ -16,8 +16,8 @@ class CoreInterface;
 class TabRestorerUI
 {
 public:
-	TabRestorerUI(HINSTANCE instance, CoreInterface *coreInterface, TabRestorer *tabRestorer,
-		int menuStartId, int menuEndId);
+	TabRestorerUI(HINSTANCE resourceInstance, CoreInterface *coreInterface,
+		TabRestorer *tabRestorer, int menuStartId, int menuEndId);
 	~TabRestorerUI();
 
 	void OnMenuItemClicked(int menuItemId);
@@ -31,7 +31,7 @@ private:
 	wil::unique_hmenu BuildRecentlyClosedTabsMenu(std::vector<wil::unique_hbitmap> &menuImages,
 		std::unordered_map<int, int> &menuItemMappings);
 
-	HINSTANCE m_instance;
+	HINSTANCE m_resourceInstance;
 	CoreInterface *m_coreInterface;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;

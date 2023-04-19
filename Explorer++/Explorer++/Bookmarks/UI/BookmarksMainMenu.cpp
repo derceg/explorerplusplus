@@ -21,7 +21,7 @@ BookmarksMainMenu::BookmarksMainMenu(CoreInterface *coreInterface, Navigator *na
 	m_navigator(navigator),
 	m_bookmarkTree(bookmarkTree),
 	m_menuIdRange(menuIdRange),
-	m_menuBuilder(coreInterface, iconFetcher, coreInterface->GetResourceModule())
+	m_menuBuilder(coreInterface, iconFetcher, coreInterface->GetResourceInstance())
 {
 	m_connections.push_back(coreInterface->AddMainMenuPreShowObserver(
 		std::bind_front(&BookmarksMainMenu::OnMainMenuPreShow, this)));
@@ -61,19 +61,19 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_coreInterface->GetMainWindow());
 
 	std::wstring bookmarkThisTabText = ResourceHelper::LoadString(
-		m_coreInterface->GetResourceModule(), IDS_MENU_BOOKMARK_THIS_TAB);
+		m_coreInterface->GetResourceInstance(), IDS_MENU_BOOKMARK_THIS_TAB);
 	MenuHelper::AddStringItem(menu.get(), IDM_BOOKMARKS_BOOKMARKTHISTAB, bookmarkThisTabText, 0,
 		TRUE);
 	ResourceHelper::SetMenuItemImage(menu.get(), IDM_BOOKMARKS_BOOKMARKTHISTAB,
 		m_coreInterface->GetIconResourceLoader(), Icon::AddBookmark, dpi, menuImages);
 
 	std::wstring bookmarkAllTabsText = ResourceHelper::LoadString(
-		m_coreInterface->GetResourceModule(), IDS_MENU_BOOKMARK_ALL_TABS);
+		m_coreInterface->GetResourceInstance(), IDS_MENU_BOOKMARK_ALL_TABS);
 	MenuHelper::AddStringItem(menu.get(), IDM_BOOKMARKS_BOOKMARK_ALL_TABS, bookmarkAllTabsText, 1,
 		TRUE);
 
-	std::wstring manageBookmarksText =
-		ResourceHelper::LoadString(m_coreInterface->GetResourceModule(), IDS_MENU_MANAGE_BOOKMARKS);
+	std::wstring manageBookmarksText = ResourceHelper::LoadString(
+		m_coreInterface->GetResourceInstance(), IDS_MENU_MANAGE_BOOKMARKS);
 	MenuHelper::AddStringItem(menu.get(), IDM_BOOKMARKS_MANAGEBOOKMARKS, manageBookmarksText, 2,
 		TRUE);
 	ResourceHelper::SetMenuItemImage(menu.get(), IDM_BOOKMARKS_MANAGEBOOKMARKS,

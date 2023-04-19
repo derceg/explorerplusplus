@@ -14,9 +14,10 @@
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclassWrapper.h"
 
-ColorRuleListView::ColorRuleListView(HWND listView, HMODULE resourceModule, ColorRuleModel *model) :
+ColorRuleListView::ColorRuleListView(HWND listView, HINSTANCE resourceInstance,
+	ColorRuleModel *model) :
 	m_listView(listView),
-	m_resourceModule(resourceModule),
+	m_resourceInstance(resourceInstance),
 	m_model(model)
 {
 	SetWindowTheme(listView, L"Explorer", nullptr);
@@ -132,7 +133,7 @@ void ColorRuleListView::OnDoubleClick(const NMITEMACTIVATE *itemActivate)
 
 	auto *colorRule = m_model->GetItemAtIndex(itemActivate->iItem);
 
-	ColorRuleEditorDialog editorDialog(m_resourceModule, GetParent(m_listView), m_model,
+	ColorRuleEditorDialog editorDialog(m_resourceInstance, GetParent(m_listView), m_model,
 		ColorRuleEditorDialog::EditDetails::EditColorRule(colorRule));
 	editorDialog.ShowModalDialog();
 }
@@ -140,19 +141,19 @@ void ColorRuleListView::OnDoubleClick(const NMITEMACTIVATE *itemActivate)
 void ColorRuleListView::InsertColumns()
 {
 	std::wstring text =
-		ResourceHelper::LoadString(m_resourceModule, IDS_CUSTOMIZE_COLORS_COLUMN_DESCRIPTION);
+		ResourceHelper::LoadString(m_resourceInstance, IDS_CUSTOMIZE_COLORS_COLUMN_DESCRIPTION);
 	LVCOLUMN lvColumn;
 	lvColumn.mask = LVCF_TEXT;
 	lvColumn.pszText = text.data();
 	ListView_InsertColumn(m_listView, 0, &lvColumn);
 
-	text =
-		ResourceHelper::LoadString(m_resourceModule, IDS_CUSTOMIZE_COLORS_COLUMN_FILENAME_PATTERN);
+	text = ResourceHelper::LoadString(m_resourceInstance,
+		IDS_CUSTOMIZE_COLORS_COLUMN_FILENAME_PATTERN);
 	lvColumn.mask = LVCF_TEXT;
 	lvColumn.pszText = text.data();
 	ListView_InsertColumn(m_listView, 1, &lvColumn);
 
-	text = ResourceHelper::LoadString(m_resourceModule, IDS_CUSTOMIZE_COLORS_COLUMN_ATTRIBUTES);
+	text = ResourceHelper::LoadString(m_resourceInstance, IDS_CUSTOMIZE_COLORS_COLUMN_ATTRIBUTES);
 	lvColumn.mask = LVCF_TEXT;
 	lvColumn.pszText = text.data();
 	ListView_InsertColumn(m_listView, 2, &lvColumn);

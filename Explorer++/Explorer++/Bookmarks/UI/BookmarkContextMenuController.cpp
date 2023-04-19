@@ -13,9 +13,9 @@
 #include "TabContainer.h"
 
 BookmarkContextMenuController::BookmarkContextMenuController(BookmarkTree *bookmarkTree,
-	HMODULE resourceModule, CoreInterface *coreInterface, Navigator *navigator) :
+	HINSTANCE resourceInstance, CoreInterface *coreInterface, Navigator *navigator) :
 	m_bookmarkTree(bookmarkTree),
-	m_resourceModule(resourceModule),
+	m_resourceInstance(resourceInstance),
 	m_coreInterface(coreInterface),
 	m_navigator(navigator)
 {
@@ -129,6 +129,6 @@ void BookmarkContextMenuController::OnDelete(const RawBookmarkItems &bookmarkIte
 void BookmarkContextMenuController::OnEditBookmarkItem(BookmarkItem *bookmarkItem,
 	HWND parentWindow)
 {
-	BookmarkHelper::EditBookmarkItem(bookmarkItem, m_bookmarkTree, m_resourceModule, parentWindow,
+	BookmarkHelper::EditBookmarkItem(bookmarkItem, m_bookmarkTree, m_resourceInstance, parentWindow,
 		m_coreInterface);
 }

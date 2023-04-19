@@ -437,7 +437,7 @@ private:
 	void QueueInfoTipTask(int internalIndex, const std::wstring &existingInfoTip);
 	static std::optional<InfoTipResult> GetInfoTipAsync(HWND listView, int infoTipResultId,
 		int internalIndex, const BasicItemInfo_t &basicItemInfo, const Config &config,
-		HINSTANCE instance, bool virtualFolder);
+		HINSTANCE resourceInstance, bool virtualFolder);
 	void ProcessInfoTipResult(int infoTipResultId);
 	void OnListViewItemInserted(const NMLISTVIEW *itemData);
 	void OnListViewItemChanged(const NMLISTVIEW *changeData);
@@ -651,7 +651,7 @@ private:
 	int m_infoTipResultIDCounter;
 
 	/* Internal state. */
-	const HINSTANCE m_hResourceModule;
+	const HINSTANCE m_resourceInstance;
 	HACCEL *m_acceleratorTable;
 	BOOL m_bFolderVisited;
 	std::optional<int> m_dirMonitorId;

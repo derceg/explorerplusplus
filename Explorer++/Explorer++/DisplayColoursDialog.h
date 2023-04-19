@@ -29,7 +29,7 @@ private:
 class DisplayColoursDialog : public DarkModeDialogBase
 {
 public:
-	DisplayColoursDialog(HINSTANCE hInstance, HWND hParent, HWND hDisplayWindow,
+	DisplayColoursDialog(HINSTANCE resourceInstance, HWND hParent, HWND hDisplayWindow,
 		COLORREF DefaultCenterColor, COLORREF DefaultSurroundingColor);
 
 protected:

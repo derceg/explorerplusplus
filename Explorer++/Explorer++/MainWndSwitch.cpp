@@ -207,7 +207,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM w
 			auto folderSizeText =
 				FormatSizeString(pDWFolderSizeCompletion->liFolderSize.QuadPart, displayFormat);
 
-			LoadString(m_resourceModule, IDS_GENERAL_TOTALSIZE, szTotalSize,
+			LoadString(m_resourceInstance, IDS_GENERAL_TOTALSIZE, szTotalSize,
 				SIZEOF_ARRAY(szTotalSize));
 
 			StringCchPrintf(szSizeString, SIZEOF_ARRAY(szSizeString), _T("%s: %s"), szTotalSize,
@@ -1258,7 +1258,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 
 	case IDM_BOOKMARKS_BOOKMARK_ALL_TABS:
 		BookmarkHelper::BookmarkAllTabs(BookmarkTreeFactory::GetInstance()->GetBookmarkTree(),
-			m_resourceModule, hwnd, this);
+			m_resourceInstance, hwnd, this);
 		break;
 
 	case MainToolbarButton::Bookmarks:
@@ -1266,7 +1266,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		if (g_hwndManageBookmarks == nullptr)
 		{
 			auto *pManageBookmarksDialog =
-				new ManageBookmarksDialog(m_resourceModule, hwnd, this, this,
+				new ManageBookmarksDialog(m_resourceInstance, hwnd, this, this,
 					&m_bookmarkIconFetcher, BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
 			g_hwndManageBookmarks = pManageBookmarksDialog->ShowModelessDialog(
 				[]()

@@ -346,19 +346,20 @@ void Explorerplusplus::OnListViewBackgroundRClickWindows7(POINT *pCursorPos)
 
 wil::unique_hmenu Explorerplusplus::InitializeRightClickMenu()
 {
-	wil::unique_hmenu parentMenu(LoadMenu(m_resourceModule, MAKEINTRESOURCE(IDR_MAINMENU_RCLICK)));
+	wil::unique_hmenu parentMenu(
+		LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_MAINMENU_RCLICK)));
 
 	for (auto viewMode : VIEW_MODES)
 	{
 		std::wstring text =
-			ResourceHelper::LoadString(m_resourceModule, GetViewModeMenuStringId(viewMode));
+			ResourceHelper::LoadString(m_resourceInstance, GetViewModeMenuStringId(viewMode));
 		MenuHelper::AddStringItem(parentMenu.get(), GetViewModeMenuId(viewMode), text,
 			IDM_RCLICK_VIEW_PLACEHOLDER, FALSE);
 	}
 
 	DeleteMenu(parentMenu.get(), IDM_RCLICK_VIEW_PLACEHOLDER, MF_BYCOMMAND);
 
-	SortMenuBuilder sortMenuBuilder(m_resourceModule);
+	SortMenuBuilder sortMenuBuilder(m_resourceInstance);
 	auto [sortByMenu, groupByMenu] = sortMenuBuilder.BuildMenus(m_tabContainer->GetSelectedTab());
 
 	MenuHelper::AttachSubMenu(parentMenu.get(), std::move(sortByMenu), IDM_POPUP_SORTBY, FALSE);

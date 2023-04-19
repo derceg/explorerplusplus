@@ -13,9 +13,9 @@
 namespace Applications
 {
 
-ApplicationEditorDialog::ApplicationEditorDialog(HWND parent, HMODULE resourceModule,
+ApplicationEditorDialog::ApplicationEditorDialog(HWND parent, HINSTANCE resourceInstance,
 	ApplicationModel *model, std::unique_ptr<EditDetails> editDetails) :
-	DarkModeDialogBase(resourceModule, IDD_EDITAPPLICATIONBUTTON, parent, false),
+	DarkModeDialogBase(resourceInstance, IDD_EDITAPPLICATIONBUTTON, parent, false),
 	m_model(model),
 	m_editDetails(std::move(editDetails))
 {
@@ -26,11 +26,11 @@ INT_PTR ApplicationEditorDialog::OnInitDialog()
 	if (m_editDetails->type == EditDetails::Type::NewItem)
 	{
 		std::wstring newText =
-			ResourceHelper::LoadString(GetInstance(), IDS_GENERAL_NEWAPPLICATIONBUTTON);
+			ResourceHelper::LoadString(GetResourceInstance(), IDS_GENERAL_NEWAPPLICATIONBUTTON);
 		SetWindowText(m_hDlg, newText.c_str());
 	}
 
-	AddTooltipForControl(m_tipWnd, GetDlgItem(m_hDlg, IDC_APP_EDIT_COMMAND), GetInstance(),
+	AddTooltipForControl(m_tipWnd, GetDlgItem(m_hDlg, IDC_APP_EDIT_COMMAND), GetResourceInstance(),
 		IDS_APP_EDIT_COMMAND_TOOLTIP);
 
 	const Application *targetApplication = m_editDetails->type == EditDetails::Type::NewItem

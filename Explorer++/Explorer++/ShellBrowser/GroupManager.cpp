@@ -303,7 +303,7 @@ int ShellBrowser::DetermineItemGroup(int iItemInternal)
 	if (!groupInfo)
 	{
 		groupInfo = GroupInfo(
-			ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_UNSPECIFIED), INT_MIN);
+			ResourceHelper::LoadString(m_resourceInstance, IDS_GROUPBY_UNSPECIFIED), INT_MIN);
 	}
 
 	return GetOrCreateListViewGroup(*groupInfo);
@@ -341,7 +341,7 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemNameGroup(
 	}
 	else
 	{
-		return GroupInfo(ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_NAME_OTHER),
+		return GroupInfo(ResourceHelper::LoadString(m_resourceInstance, IDS_GROUPBY_NAME_OTHER),
 			INT_MAX);
 	}
 }
@@ -351,7 +351,7 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemSizeGroup(
 {
 	if ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
-		return GroupInfo(ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_SIZE_FOLDERS),
+		return GroupInfo(ResourceHelper::LoadString(m_resourceInstance, IDS_GROUPBY_SIZE_FOLDERS),
 			0);
 	}
 	else if (!itemInfo.isFindDataValid)
@@ -382,7 +382,7 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemSizeGroup(
 	}
 
 	return GroupInfo(
-		ResourceHelper::LoadString(m_hResourceModule, sizeGroups[currentIndex].nameResourceId),
+		ResourceHelper::LoadString(m_resourceInstance, sizeGroups[currentIndex].nameResourceId),
 		currentIndex + 1);
 }
 
@@ -508,7 +508,7 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemDateGroup(
 
 	if (fileDate > today)
 	{
-		return GroupInfo(ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_DATE_FUTURE),
+		return GroupInfo(ResourceHelper::LoadString(m_resourceInstance, IDS_GROUPBY_DATE_FUTURE),
 			relativeSortPosition);
 	}
 
@@ -516,7 +516,7 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemDateGroup(
 
 	if (fileDate == today)
 	{
-		return GroupInfo(ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_DATE_TODAY),
+		return GroupInfo(ResourceHelper::LoadString(m_resourceInstance, IDS_GROUPBY_DATE_TODAY),
 			relativeSortPosition);
 	}
 
@@ -526,7 +526,7 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemDateGroup(
 
 	if (fileDate == yesterday)
 	{
-		return GroupInfo(ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_DATE_YESTERDAY),
+		return GroupInfo(ResourceHelper::LoadString(m_resourceInstance, IDS_GROUPBY_DATE_YESTERDAY),
 			relativeSortPosition);
 	}
 
@@ -538,7 +538,7 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemDateGroup(
 
 	if (fileDate >= startOfWeek)
 	{
-		return GroupInfo(ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_DATE_THIS_WEEK),
+		return GroupInfo(ResourceHelper::LoadString(m_resourceInstance, IDS_GROUPBY_DATE_THIS_WEEK),
 			relativeSortPosition);
 	}
 
@@ -548,7 +548,7 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemDateGroup(
 
 	if (fileDate >= startOfLastWeek)
 	{
-		return GroupInfo(ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_DATE_LAST_WEEK),
+		return GroupInfo(ResourceHelper::LoadString(m_resourceInstance, IDS_GROUPBY_DATE_LAST_WEEK),
 			relativeSortPosition);
 	}
 
@@ -558,7 +558,8 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemDateGroup(
 
 	if (fileDate >= startOfMonth)
 	{
-		return GroupInfo(ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_DATE_THIS_MONTH),
+		return GroupInfo(
+			ResourceHelper::LoadString(m_resourceInstance, IDS_GROUPBY_DATE_THIS_MONTH),
 			relativeSortPosition);
 	}
 
@@ -568,7 +569,8 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemDateGroup(
 
 	if (fileDate >= startOfLastMonth)
 	{
-		return GroupInfo(ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_DATE_LAST_MONTH),
+		return GroupInfo(
+			ResourceHelper::LoadString(m_resourceInstance, IDS_GROUPBY_DATE_LAST_MONTH),
 			relativeSortPosition);
 	}
 
@@ -578,7 +580,7 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemDateGroup(
 
 	if (fileDate >= startOfYear)
 	{
-		return GroupInfo(ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_DATE_THIS_YEAR),
+		return GroupInfo(ResourceHelper::LoadString(m_resourceInstance, IDS_GROUPBY_DATE_THIS_YEAR),
 			relativeSortPosition);
 	}
 
@@ -588,13 +590,13 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemDateGroup(
 
 	if (fileDate >= startOfLastYear)
 	{
-		return GroupInfo(ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_DATE_LAST_YEAR),
+		return GroupInfo(ResourceHelper::LoadString(m_resourceInstance, IDS_GROUPBY_DATE_LAST_YEAR),
 			relativeSortPosition);
 	}
 
 	relativeSortPosition--;
 
-	return GroupInfo(ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_DATE_LONG_AGO),
+	return GroupInfo(ResourceHelper::LoadString(m_resourceInstance, IDS_GROUPBY_DATE_LONG_AGO),
 		relativeSortPosition);
 }
 
@@ -820,7 +822,7 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemNetworkStatus(
 			break;
 	}*/
 
-	LoadString(m_hResourceModule, uStatusID, szStatus, SIZEOF_ARRAY(szStatus));
+	LoadString(m_resourceInstance, uStatusID, szStatus, SIZEOF_ARRAY(szStatus));
 
 	return GroupInfo(szStatus);
 }

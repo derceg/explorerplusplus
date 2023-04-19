@@ -60,7 +60,7 @@ public:
 		Application *existingApplication = nullptr;
 	};
 
-	ApplicationEditorDialog(HWND parent, HMODULE resourceModule, ApplicationModel *model,
+	ApplicationEditorDialog(HWND parent, HINSTANCE resourceInstance, ApplicationModel *model,
 		std::unique_ptr<EditDetails> editDetails);
 
 protected:

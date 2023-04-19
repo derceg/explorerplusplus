@@ -206,8 +206,8 @@ void DrivesToolbar::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
 	UNREFERENCED_PARAMETER(dwData);
 	UNREFERENCED_PARAMETER(contextMenu);
 
-	std::wstring openInNewTabText = ResourceHelper::LoadString(m_coreInterface->GetResourceModule(),
-		IDS_GENERAL_OPEN_IN_NEW_TAB);
+	std::wstring openInNewTabText = ResourceHelper::LoadString(
+		m_coreInterface->GetResourceInstance(), IDS_GENERAL_OPEN_IN_NEW_TAB);
 	MenuHelper::AddStringItem(hMenu, MENU_ID_OPEN_IN_NEW_TAB, openInNewTabText, 1, TRUE);
 }
 

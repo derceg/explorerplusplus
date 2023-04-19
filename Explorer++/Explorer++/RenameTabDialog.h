@@ -29,7 +29,8 @@ private:
 class RenameTabDialog : public DarkModeDialogBase
 {
 public:
-	RenameTabDialog(HINSTANCE hInstance, HWND hParent, int tabId, TabContainer *tabContainer);
+	RenameTabDialog(HINSTANCE resourceInstance, HWND hParent, int tabId,
+		TabContainer *tabContainer);
 
 protected:
 	INT_PTR OnInitDialog() override;

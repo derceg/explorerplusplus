@@ -16,7 +16,7 @@ HWND CreateStatusBar(HWND hParent, DWORD dwStyle);
 HWND CreateToolbar(HWND hParent, DWORD dwStyle, DWORD dwExStyle);
 HWND CreateComboBox(HWND parent, DWORD dwStyle);
 HWND CreateTabControl(HWND hParent, DWORD dwStyle);
-HWND CreateTooltipControl(HWND parent, HINSTANCE instance);
+HWND CreateTooltipControl(HWND parent, HINSTANCE resourceInstance);
 BOOL PinStatusBar(HWND hStatusBar, int width, int height);
 BOOL AddPathsToComboBoxEx(HWND hComboBoxEx, const TCHAR *path);
 
@@ -32,5 +32,5 @@ SIZE GetCheckboxSize(HWND hwnd);
 SIZE GetRadioButtonSize(HWND hwnd);
 SIZE GetButtonSize(HWND hwnd, int partId, int stateId, int defaultWidth, int defaultHeight);
 
-bool AddTooltipForControl(HWND tipWnd, HWND control, HINSTANCE instance, int stringResourceId,
-	TooltipType tooltipType = TooltipType::Control);
+bool AddTooltipForControl(HWND tipWnd, HWND control, HINSTANCE resourceInstance,
+	int stringResourceId, TooltipType tooltipType = TooltipType::Control);

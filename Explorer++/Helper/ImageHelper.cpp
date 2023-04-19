@@ -216,31 +216,32 @@ HBITMAP ImageHelper::IconToBitmapPARGB32(HICON hicon, int width, int height)
 }
 
 // See https://stackoverflow.com/a/24571173.
-std::unique_ptr<Gdiplus::Bitmap> ImageHelper::LoadGdiplusBitmapFromPNG(HINSTANCE instance,
+std::unique_ptr<Gdiplus::Bitmap> ImageHelper::LoadGdiplusBitmapFromPNG(HINSTANCE resourceInstance,
 	UINT resourceId)
 {
-	HRSRC resourceHandle = FindResource(instance, MAKEINTRESOURCE(resourceId), L"PNG");
+	HRSRC resourceInformationHandle =
+		FindResource(resourceInstance, MAKEINTRESOURCE(resourceId), L"PNG");
 
-	if (!resourceHandle)
+	if (!resourceInformationHandle)
 	{
 		return nullptr;
 	}
 
-	DWORD resourceSize = SizeofResource(instance, resourceHandle);
+	DWORD resourceSize = SizeofResource(resourceInstance, resourceInformationHandle);
 
 	if (resourceSize == 0)
 	{
 		return nullptr;
 	}
 
-	HGLOBAL resourceInstance = LoadResource(instance, resourceHandle);
+	HGLOBAL resourceHandle = LoadResource(resourceInstance, resourceInformationHandle);
 
-	if (!resourceInstance)
+	if (!resourceHandle)
 	{
 		return nullptr;
 	}
 
-	const void *resourceData = LockResource(resourceInstance);
+	const void *resourceData = LockResource(resourceHandle);
 
 	if (!resourceData)
 	{

@@ -103,17 +103,17 @@ const boost::bimap<MainToolbarButton, std::wstring> TOOLBAR_BUTTON_XML_NAME_MAPP
 
 #pragma warning(pop)
 
-MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE instance, CoreInterface *coreInterface,
-	std::shared_ptr<Config> config)
+MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE resourceInstance,
+	CoreInterface *coreInterface, std::shared_ptr<Config> config)
 {
-	return new MainToolbar(parent, instance, coreInterface, config);
+	return new MainToolbar(parent, resourceInstance, coreInterface, config);
 }
 
-MainToolbar::MainToolbar(HWND parent, HINSTANCE instance, CoreInterface *coreInterface,
+MainToolbar::MainToolbar(HWND parent, HINSTANCE resourceInstance, CoreInterface *coreInterface,
 	std::shared_ptr<Config> config) :
 	BaseWindow(CreateMainToolbar(parent)),
 	m_persistentSettings(&MainToolbarPersistentSettings::GetInstance()),
-	m_instance(instance),
+	m_resourceInstance(resourceInstance),
 	m_coreInterface(coreInterface),
 	m_config(config)
 {
@@ -400,7 +400,7 @@ void MainToolbar::AddStringToToolbar(MainToolbarButton button)
 
 void MainToolbar::GetToolbarButtonText(MainToolbarButton button, TCHAR *szText, int bufSize) const
 {
-	int res = LoadString(m_instance, LookupToolbarButtonTextID(button), szText, bufSize);
+	int res = LoadString(m_resourceInstance, LookupToolbarButtonTextID(button), szText, bufSize);
 	assert(res != 0);
 
 	/* It doesn't really make sense to return this. If the string isn't in the
@@ -668,7 +668,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 		{
 			TCHAR szInfoTip[1024];
 			TCHAR szTemp[64];
-			LoadString(m_instance, IDS_MAIN_TOOLBAR_BACK, szTemp, SIZEOF_ARRAY(szTemp));
+			LoadString(m_resourceInstance, IDS_MAIN_TOOLBAR_BACK, szTemp, SIZEOF_ARRAY(szTemp));
 			StringCchPrintf(szInfoTip, SIZEOF_ARRAY(szInfoTip), szTemp,
 				entry->GetDisplayName().c_str());
 
@@ -683,7 +683,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 		{
 			TCHAR szInfoTip[1024];
 			TCHAR szTemp[64];
-			LoadString(m_instance, IDS_MAIN_TOOLBAR_FORWARD, szTemp, SIZEOF_ARRAY(szTemp));
+			LoadString(m_resourceInstance, IDS_MAIN_TOOLBAR_FORWARD, szTemp, SIZEOF_ARRAY(szTemp));
 			StringCchPrintf(szInfoTip, SIZEOF_ARRAY(szInfoTip), szTemp,
 				entry->GetDisplayName().c_str());
 

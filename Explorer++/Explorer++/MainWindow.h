@@ -15,11 +15,11 @@ class WindowSubclassWrapper;
 class MainWindow : private DropTargetInternal
 {
 public:
-	static MainWindow *Create(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
+	static MainWindow *Create(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE resourceInstance,
 		CoreInterface *coreInterface);
 
 private:
-	MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
+	MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE resourceInstance,
 		CoreInterface *coreInterface);
 	~MainWindow() = default;
 
@@ -44,7 +44,7 @@ private:
 
 	HWND m_hwnd;
 	std::shared_ptr<Config> m_config;
-	HINSTANCE m_instance;
+	HINSTANCE m_resourceInstance;
 	CoreInterface *m_coreInterface;
 
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;

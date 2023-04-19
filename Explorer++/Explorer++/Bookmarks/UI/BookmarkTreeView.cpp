@@ -18,13 +18,13 @@
 #include <boost/range/adaptor/filtered.hpp>
 #include <wil/com.h>
 
-BookmarkTreeView::BookmarkTreeView(HWND hTreeView, HINSTANCE hInstance,
+BookmarkTreeView::BookmarkTreeView(HWND hTreeView, HINSTANCE resourceInstance,
 	CoreInterface *coreInterface, BookmarkTree *bookmarkTree,
 	const std::unordered_set<std::wstring> &setExpansion,
 	std::optional<std::wstring> guidSelected) :
 	BookmarkDropTargetWindow(hTreeView, bookmarkTree),
 	m_hTreeView(hTreeView),
-	m_instance(hInstance),
+	m_resourceInstance(resourceInstance),
 	m_bookmarkTree(bookmarkTree),
 	m_bNewFolderCreated(false)
 {
@@ -559,7 +559,7 @@ void BookmarkTreeView::OnRClick(const NMHDR *pnmhdr)
 	auto bookmarkFolder = GetBookmarkFolderFromTreeView(hItem);
 
 	wil::unique_hmenu menu(
-		LoadMenu(m_instance, MAKEINTRESOURCE(IDR_BOOKMARK_TREEVIEW_RCLICK_MENU)));
+		LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_BOOKMARK_TREEVIEW_RCLICK_MENU)));
 
 	MenuHelper::EnableItem(menu.get(), IDM_BOOKMARK_TREEVIEW_RLICK_RENAME,
 		!m_bookmarkTree->IsPermanentNode(bookmarkFolder));
@@ -573,7 +573,7 @@ void BookmarkTreeView::OnRClick(const NMHDR *pnmhdr)
 void BookmarkTreeView::CreateNewFolder()
 {
 	std::wstring newBookmarkFolderName =
-		ResourceHelper::LoadString(m_instance, IDS_BOOKMARKS_NEWBOOKMARKFOLDER);
+		ResourceHelper::LoadString(m_resourceInstance, IDS_BOOKMARKS_NEWBOOKMARKFOLDER);
 	auto newBookmarkFolder =
 		std::make_unique<BookmarkItem>(std::nullopt, newBookmarkFolderName, std::nullopt);
 

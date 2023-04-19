@@ -40,7 +40,7 @@ private:
 class AddBookmarkDialog : public DarkModeDialogBase
 {
 public:
-	AddBookmarkDialog(HINSTANCE hInstance, HWND hParent, CoreInterface *coreInterface,
+	AddBookmarkDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface,
 		BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
 		BookmarkItem *defaultParentSelection, BookmarkItem **selectedParentFolder,
 		std::optional<std::wstring> customDialogTitle = std::nullopt);

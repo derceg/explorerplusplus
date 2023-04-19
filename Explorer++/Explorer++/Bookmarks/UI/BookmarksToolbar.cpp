@@ -140,8 +140,8 @@ BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, CoreInterface *co
 	m_coreInterface(coreInterface),
 	m_navigator(navigator),
 	m_bookmarkTree(bookmarkTree),
-	m_contextMenu(bookmarkTree, coreInterface->GetResourceModule(), coreInterface, navigator),
-	m_bookmarkMenu(bookmarkTree, coreInterface->GetResourceModule(), coreInterface, navigator,
+	m_contextMenu(bookmarkTree, coreInterface->GetResourceInstance(), coreInterface, navigator),
+	m_bookmarkMenu(bookmarkTree, coreInterface->GetResourceInstance(), coreInterface, navigator,
 		iconFetcher, view->GetHWND())
 {
 	Initialize(iconFetcher);
@@ -322,16 +322,16 @@ void BookmarksToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow
 		return;
 	}
 
-	std::wstring newBookmark = ResourceHelper::LoadString(m_coreInterface->GetResourceModule(),
+	std::wstring newBookmark = ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),
 		IDS_BOOKMARKS_TOOLBAR_NEW_BOOKMARK);
 	MenuHelper::AddStringItem(menu, IDM_BT_NEWBOOKMARK, newBookmark, IDM_TOOLBARS_CUSTOMIZE, FALSE);
 
 	std::wstring newBookmarkFolder = ResourceHelper::LoadString(
-		m_coreInterface->GetResourceModule(), IDS_BOOKMARKS_TOOLBAR_NEW_FOLDER);
+		m_coreInterface->GetResourceInstance(), IDS_BOOKMARKS_TOOLBAR_NEW_FOLDER);
 	MenuHelper::AddStringItem(menu, IDM_BT_NEWFOLDER, newBookmarkFolder, IDM_TOOLBARS_CUSTOMIZE,
 		FALSE);
 
-	std::wstring paste = ResourceHelper::LoadString(m_coreInterface->GetResourceModule(),
+	std::wstring paste = ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),
 		IDS_BOOKMARKS_TOOLBAR_PASTE);
 	MenuHelper::AddStringItem(menu, IDM_BT_PASTE, paste, IDM_TOOLBARS_CUSTOMIZE, FALSE);
 

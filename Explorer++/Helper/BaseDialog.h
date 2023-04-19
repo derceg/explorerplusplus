@@ -36,12 +36,12 @@ public:
 	HWND ShowModelessDialog(std::function<void()> dialogDestroyedObserver);
 
 protected:
-	BaseDialog(HINSTANCE hInstance, int iResource, HWND hParent, bool bResizable);
+	BaseDialog(HINSTANCE resourceInstance, int iResource, HWND hParent, bool bResizable);
 
 	virtual void OnInitDialogBase();
 	virtual int GetGripperControlId() = 0;
 
-	HINSTANCE GetInstance() const;
+	HINSTANCE GetResourceInstance() const;
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const;
 
 	INT_PTR GetDefaultReturnValue(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
@@ -61,7 +61,7 @@ private:
 		std::list<ResizableDialog::Control> &controlList);
 	virtual void SaveState();
 
-	const HINSTANCE m_hInstance;
+	const HINSTANCE m_resourceInstance;
 	const int m_iResource;
 	const HWND m_hParent;
 	std::function<void()> m_modelessDialogDestroyedObserver;

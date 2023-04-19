@@ -18,9 +18,9 @@
 
 const TCHAR SelectColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SelectColumns");
 
-SelectColumnsDialog::SelectColumnsDialog(HINSTANCE hInstance, HWND hParent,
+SelectColumnsDialog::SelectColumnsDialog(HINSTANCE resourceInstance, HWND hParent,
 	ShellBrowser *shellBrowser, IconResourceLoader *iconResourceLoader) :
-	DarkModeDialogBase(hInstance, IDD_SELECTCOLUMNS, hParent, true),
+	DarkModeDialogBase(resourceInstance, IDD_SELECTCOLUMNS, hParent, true),
 	m_shellBrowser(shellBrowser),
 	m_iconResourceLoader(iconResourceLoader),
 	m_bColumnsSwapped(FALSE)
@@ -48,7 +48,7 @@ INT_PTR SelectColumnsDialog::OnInitDialog()
 
 	for (const auto &column : currentColumns)
 	{
-		std::wstring text = ResourceHelper::LoadString(GetInstance(),
+		std::wstring text = ResourceHelper::LoadString(GetResourceInstance(),
 			ShellBrowser::LookupColumnNameStringIndex(column.type));
 
 		LVITEM lvItem;
@@ -108,12 +108,12 @@ bool SelectColumnsDialog::CompareColumns(const Column_t &column1, const Column_t
 	}
 
 	TCHAR column1Text[64];
-	LoadString(GetInstance(), ShellBrowser::LookupColumnNameStringIndex(column1.type), column1Text,
-		SIZEOF_ARRAY(column1Text));
+	LoadString(GetResourceInstance(), ShellBrowser::LookupColumnNameStringIndex(column1.type),
+		column1Text, SIZEOF_ARRAY(column1Text));
 
 	TCHAR column2Text[64];
-	LoadString(GetInstance(), ShellBrowser::LookupColumnNameStringIndex(column2.type), column2Text,
-		SIZEOF_ARRAY(column2Text));
+	LoadString(GetResourceInstance(), ShellBrowser::LookupColumnNameStringIndex(column2.type),
+		column2Text, SIZEOF_ARRAY(column2Text));
 
 	int ret = StrCmpLogicalW(column1Text, column2Text);
 
@@ -343,7 +343,7 @@ void SelectColumnsDialog::OnLvnItemChanged(const NMLISTVIEW *pnmlv)
 			static_cast<ColumnType>(lvItem.lParam));
 
 		TCHAR szColumnDescription[128];
-		LoadString(GetInstance(), iDescriptionStringIndex, szColumnDescription,
+		LoadString(GetResourceInstance(), iDescriptionStringIndex, szColumnDescription,
 			SIZEOF_ARRAY(szColumnDescription));
 		SetDlgItemText(m_hDlg, IDC_COLUMNS_DESCRIPTION, szColumnDescription);
 	}

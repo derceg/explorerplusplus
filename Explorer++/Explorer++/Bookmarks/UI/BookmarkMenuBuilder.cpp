@@ -13,10 +13,10 @@
 #include <format>
 
 BookmarkMenuBuilder::BookmarkMenuBuilder(CoreInterface *coreInterface, IconFetcher *iconFetcher,
-	HMODULE resourceModule) :
+	HINSTANCE resourceInstance) :
 	m_coreInterface(coreInterface),
 	m_iconFetcher(iconFetcher),
-	m_resourceModule(resourceModule)
+	m_resourceInstance(resourceInstance)
 {
 }
 
@@ -90,7 +90,7 @@ BOOL BookmarkMenuBuilder::AddEmptyBookmarkFolderToMenu(HMENU menu, BookmarkItem 
 	int position, MenuInfo &menuInfo)
 {
 	std::wstring bookmarkFolderEmpty =
-		ResourceHelper::LoadString(m_resourceModule, IDS_BOOKMARK_FOLDER_EMPTY);
+		ResourceHelper::LoadString(m_resourceInstance, IDS_BOOKMARK_FOLDER_EMPTY);
 	std::wstring menuText = std::format(L"({})", bookmarkFolderEmpty);
 
 	MENUITEMINFO mii;

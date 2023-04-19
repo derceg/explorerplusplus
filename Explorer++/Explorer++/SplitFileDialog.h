@@ -69,7 +69,7 @@ private:
 class SplitFileDialog : public DarkModeDialogBase
 {
 public:
-	SplitFileDialog(HINSTANCE hInstance, HWND hParent, CoreInterface *coreInterface,
+	SplitFileDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface,
 		const std::wstring &strFullFilename);
 	~SplitFileDialog();
 

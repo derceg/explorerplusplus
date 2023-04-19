@@ -32,7 +32,7 @@ private:
 class SelectColumnsDialog : public DarkModeDialogBase
 {
 public:
-	SelectColumnsDialog(HINSTANCE hInstance, HWND hParent, ShellBrowser *shellBrowser,
+	SelectColumnsDialog(HINSTANCE resourceInstance, HWND hParent, ShellBrowser *shellBrowser,
 		IconResourceLoader *iconResourceLoader);
 
 protected:

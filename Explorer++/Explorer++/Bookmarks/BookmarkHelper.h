@@ -32,13 +32,13 @@ bool IsBookmark(const std::unique_ptr<BookmarkItem> &bookmarkItem);
 int CALLBACK Sort(ColumnType columnType, const BookmarkItem *firstItem,
 	const BookmarkItem *secondItem);
 
-void BookmarkAllTabs(BookmarkTree *bookmarkTree, HMODULE resoureceModule, HWND parentWindow,
+void BookmarkAllTabs(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance, HWND parentWindow,
 	CoreInterface *coreInterface);
 BookmarkItem *AddBookmarkItem(BookmarkTree *bookmarkTree, BookmarkItem::Type type,
 	BookmarkItem *defaultParentSelection, std::optional<size_t> suggestedIndex, HWND parentWindow,
 	CoreInterface *coreInterface, std::optional<std::wstring> customDialogTitle = std::nullopt);
 void EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
-	HMODULE resoureceModule, HWND parentWindow, CoreInterface *coreInterface);
+	HINSTANCE resourceInstance, HWND parentWindow, CoreInterface *coreInterface);
 void OpenBookmarkItemWithDisposition(const BookmarkItem *bookmarkItem,
 	OpenFolderDisposition disposition, CoreInterface *coreInterface, Navigator *navigator);
 

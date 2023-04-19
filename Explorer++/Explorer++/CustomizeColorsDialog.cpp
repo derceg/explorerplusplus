@@ -24,9 +24,9 @@ static constexpr COLORREF DEFAULT_INITIAL_COLOR = RGB(0, 94, 138);
 
 CustomizeColorsDialog::~CustomizeColorsDialog() = default;
 
-CustomizeColorsDialog::CustomizeColorsDialog(HINSTANCE instance, HWND parent,
+CustomizeColorsDialog::CustomizeColorsDialog(HINSTANCE resourceInstance, HWND parent,
 	CoreInterface *coreInterface, ColorRuleModel *model) :
-	DarkModeDialogBase(instance, IDD_CUSTOMIZE_COLORS, parent, true),
+	DarkModeDialogBase(resourceInstance, IDD_CUSTOMIZE_COLORS, parent, true),
 	m_coreInterface(coreInterface),
 	m_model(model)
 {
@@ -36,7 +36,8 @@ CustomizeColorsDialog::CustomizeColorsDialog(HINSTANCE instance, HWND parent,
 INT_PTR CustomizeColorsDialog::OnInitDialog()
 {
 	HWND listView = GetDlgItem(m_hDlg, IDC_LISTVIEW_COLOR_RULES);
-	m_colorRuleListView = std::make_unique<ColorRuleListView>(listView, GetInstance(), m_model);
+	m_colorRuleListView =
+		std::make_unique<ColorRuleListView>(listView, GetResourceInstance(), m_model);
 
 	// This object outlives the ColorRuleListView object, so there's no need to remove these
 	// observers.
@@ -164,7 +165,7 @@ void CustomizeColorsDialog::SaveState()
 
 void CustomizeColorsDialog::OnNew()
 {
-	ColorRuleEditorDialog editorDialog(GetInstance(), m_hDlg, m_model,
+	ColorRuleEditorDialog editorDialog(GetResourceInstance(), m_hDlg, m_model,
 		ColorRuleEditorDialog::EditDetails::AddNewColorRule(
 			std::make_unique<ColorRule>(L"", L"", false, 0, DEFAULT_INITIAL_COLOR)));
 	editorDialog.ShowModalDialog();
@@ -179,7 +180,7 @@ void CustomizeColorsDialog::OnEdit()
 		return;
 	}
 
-	ColorRuleEditorDialog editorDialog(GetInstance(), m_hDlg, m_model,
+	ColorRuleEditorDialog editorDialog(GetResourceInstance(), m_hDlg, m_model,
 		ColorRuleEditorDialog::EditDetails::EditColorRule(selectedColorRule));
 	editorDialog.ShowModalDialog();
 }
@@ -227,7 +228,8 @@ void CustomizeColorsDialog::OnDelete()
 		return;
 	}
 
-	std::wstring deleteMessage = ResourceHelper::LoadString(GetInstance(), IDS_COLOR_RULE_DELETE);
+	std::wstring deleteMessage =
+		ResourceHelper::LoadString(GetResourceInstance(), IDS_COLOR_RULE_DELETE);
 	int confirmResult = MessageBox(m_hDlg, deleteMessage.c_str(), NExplorerplusplus::APP_NAME,
 		MB_YESNO | MB_ICONINFORMATION | MB_DEFBUTTON2);
 
@@ -244,7 +246,7 @@ void CustomizeColorsDialog::OnDelete()
 void CustomizeColorsDialog::OnDeleteAll()
 {
 	std::wstring deleteAllMessage =
-		ResourceHelper::LoadString(GetInstance(), IDS_COLOR_RULE_DELETE_ALL);
+		ResourceHelper::LoadString(GetResourceInstance(), IDS_COLOR_RULE_DELETE_ALL);
 	int confirmResult = MessageBox(m_hDlg, deleteAllMessage.c_str(), NExplorerplusplus::APP_NAME,
 		MB_YESNO | MB_ICONINFORMATION | MB_DEFBUTTON2);
 

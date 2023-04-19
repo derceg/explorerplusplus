@@ -7,7 +7,7 @@
 class ScriptingDialog : public DarkModeDialogBase
 {
 public:
-	ScriptingDialog(HINSTANCE hInstance, HWND hParent, PluginInterface *pluginInterface);
+	ScriptingDialog(HINSTANCE resourceInstance, HWND hParent, PluginInterface *pluginInterface);
 
 protected:
 	INT_PTR OnInitDialog() override;

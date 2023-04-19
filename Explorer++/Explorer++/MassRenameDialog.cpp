@@ -33,10 +33,10 @@ const TCHAR MassRenameDialogPersistentSettings::SETTINGS_KEY[] = _T("MassRename"
 const TCHAR MassRenameDialogPersistentSettings::SETTING_COLUMN_WIDTH_1[] = _T("ColumnWidth1");
 const TCHAR MassRenameDialogPersistentSettings::SETTING_COLUMN_WIDTH_2[] = _T("ColumnWidth2");
 
-MassRenameDialog::MassRenameDialog(HINSTANCE hInstance, HWND hParent,
+MassRenameDialog::MassRenameDialog(HINSTANCE resourceInstance, HWND hParent,
 	const std::list<std::wstring> &FullFilenameList, IconResourceLoader *iconResourceLoader,
 	FileActionHandler *pFileActionHandler) :
-	DarkModeDialogBase(hInstance, IDD_MASSRENAME, hParent, true),
+	DarkModeDialogBase(resourceInstance, IDD_MASSRENAME, hParent, true),
 	m_FullFilenameList(FullFilenameList),
 	m_iconResourceLoader(iconResourceLoader),
 	m_pFileActionHandler(pFileActionHandler)
@@ -65,13 +65,13 @@ INT_PTR MassRenameDialog::OnInitDialog()
 	LVCOLUMN lvCol;
 
 	std::wstring currentNameText =
-		ResourceHelper::LoadString(GetInstance(), IDS_MASS_RENAME_CURRENT_NAME);
+		ResourceHelper::LoadString(GetResourceInstance(), IDS_MASS_RENAME_CURRENT_NAME);
 	lvCol.mask = LVCF_TEXT;
 	lvCol.pszText = currentNameText.data();
 	ListView_InsertColumn(hListView, 1, &lvCol);
 
 	std::wstring previewNameText =
-		ResourceHelper::LoadString(GetInstance(), IDS_MASS_RENAME_PREVIEW_NAME);
+		ResourceHelper::LoadString(GetResourceInstance(), IDS_MASS_RENAME_PREVIEW_NAME);
 	lvCol.mask = LVCF_TEXT;
 	lvCol.pszText = previewNameText.data();
 	ListView_InsertColumn(hListView, 2, &lvCol);
@@ -206,8 +206,8 @@ INT_PTR MassRenameDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 		{
 		case IDC_MASSRENAME_MORE:
 		{
-			HMENU hMenu =
-				GetSubMenu(LoadMenu(GetInstance(), MAKEINTRESOURCE(IDR_MASSRENAME_MENU)), 0);
+			HMENU hMenu = GetSubMenu(
+				LoadMenu(GetResourceInstance(), MAKEINTRESOURCE(IDR_MASSRENAME_MENU)), 0);
 
 			RECT rc;
 			GetWindowRect(GetDlgItem(m_hDlg, IDC_MASSRENAME_MORE), &rc);

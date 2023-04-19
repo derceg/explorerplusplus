@@ -24,7 +24,7 @@ void Explorerplusplus::InitializeTabs()
 
 	m_tabContainer =
 		TabContainer::Create(m_hTabBacking, this, this, &m_FileActionHandler, &m_cachedIcons,
-			BookmarkTreeFactory::GetInstance()->GetBookmarkTree(), m_resourceModule, m_config);
+			BookmarkTreeFactory::GetInstance()->GetBookmarkTree(), m_resourceInstance, m_config);
 	m_tabContainer->tabCreatedSignal.AddObserver(
 		std::bind_front(&Explorerplusplus::OnTabCreated, this), boost::signals2::at_front);
 	m_tabContainer->tabNavigationStartedSignal.AddObserver(
@@ -63,7 +63,7 @@ void Explorerplusplus::InitializeTabs()
 		SWP_NOMOVE | SWP_NOZORDER);
 
 	m_tabRestorer = std::make_unique<TabRestorer>(m_tabContainer);
-	m_tabRestorerUI = std::make_unique<TabRestorerUI>(m_resourceModule, this, m_tabRestorer.get(),
+	m_tabRestorerUI = std::make_unique<TabRestorerUI>(m_resourceInstance, this, m_tabRestorer.get(),
 		MENU_RECENT_TABS_STARTID, MENU_RECENT_TABS_ENDID);
 
 	m_tabsInitializedSignal();

@@ -42,7 +42,7 @@ private:
 class FilterDialog : public DarkModeDialogBase
 {
 public:
-	FilterDialog(HINSTANCE hInstance, HWND hParent, CoreInterface *coreInterface);
+	FilterDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface);
 
 protected:
 	INT_PTR OnInitDialog() override;

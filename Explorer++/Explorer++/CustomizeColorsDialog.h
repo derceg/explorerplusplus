@@ -34,7 +34,7 @@ private:
 class CustomizeColorsDialog : public DarkModeDialogBase
 {
 public:
-	CustomizeColorsDialog(HINSTANCE instance, HWND parent, CoreInterface *coreInterface,
+	CustomizeColorsDialog(HINSTANCE resourceInstance, HWND parent, CoreInterface *coreInterface,
 		ColorRuleModel *model);
 	~CustomizeColorsDialog();
 

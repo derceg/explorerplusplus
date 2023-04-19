@@ -14,7 +14,7 @@ class WindowSubclassWrapper;
 class ColorRuleListView
 {
 public:
-	ColorRuleListView(HWND listView, HMODULE resourceModule, ColorRuleModel *model);
+	ColorRuleListView(HWND listView, HINSTANCE resourceInstance, ColorRuleModel *model);
 
 	ColorRule *MaybeGetSelectedColorRule();
 
@@ -38,7 +38,7 @@ private:
 	void OnAllColorRulesRemoved();
 
 	HWND m_listView;
-	HMODULE m_resourceModule;
+	HINSTANCE m_resourceInstance;
 	ColorRuleModel *m_model;
 
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;

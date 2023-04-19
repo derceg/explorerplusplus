@@ -175,8 +175,8 @@ void ApplicationToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWind
 		return;
 	}
 
-	std::wstring newText =
-		ResourceHelper::LoadString(m_coreInterface->GetResourceModule(), IDS_APPLICATIONBUTTON_NEW);
+	std::wstring newText = ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),
+		IDS_APPLICATIONBUTTON_NEW);
 	MenuHelper::AddStringItem(menu, IDM_APP_NEW, newText, IDM_TOOLBARS_CUSTOMIZE, FALSE);
 }
 
@@ -192,7 +192,7 @@ void ApplicationToolbar::OnToolbarContextMenuItemSelected(HWND sourceWindow, int
 	case IDM_APP_NEW:
 	{
 		ApplicationEditorDialog editorDialog(m_view->GetHWND(),
-			m_coreInterface->GetResourceModule(), m_model,
+			m_coreInterface->GetResourceInstance(), m_model,
 			ApplicationEditorDialog::EditDetails::AddNewApplication(
 				std::make_unique<Application>(L"", L"")));
 		editorDialog.ShowModalDialog();

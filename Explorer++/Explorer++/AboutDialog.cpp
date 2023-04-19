@@ -12,8 +12,8 @@
 #include "../Helper/WindowHelper.h"
 #include <boost/format.hpp>
 
-AboutDialog::AboutDialog(HINSTANCE hInstance, HWND hParent) :
-	DarkModeDialogBase(hInstance, IDD_ABOUT, hParent, false)
+AboutDialog::AboutDialog(HINSTANCE resourceInstance, HWND hParent) :
+	DarkModeDialogBase(resourceInstance, IDD_ABOUT, hParent, false)
 {
 }
 
@@ -29,16 +29,17 @@ INT_PTR AboutDialog::OnInitDialog()
 	SendDlgItemMessage(m_hDlg, IDC_ABOUT_STATIC_IMAGE, STM_SETICON,
 		reinterpret_cast<WPARAM>(m_mainIcon.get()), 0);
 
-	std::wstring versionTemplate = ResourceHelper::LoadString(GetInstance(), IDS_ABOUT_VERSION);
+	std::wstring versionTemplate =
+		ResourceHelper::LoadString(GetResourceInstance(), IDS_ABOUT_VERSION);
 	std::wstring platform;
 
 	// Indicate which platform we are building for in the version string.
 #if defined(ARM64)
-	platform = ResourceHelper::LoadString(GetInstance(), IDS_ABOUT_ARM64_BUILD);
+	platform = ResourceHelper::LoadString(GetResourceInstance(), IDS_ABOUT_ARM64_BUILD);
 #elif defined(WIN64)
-	platform = ResourceHelper::LoadString(GetInstance(), IDS_ABOUT_64BIT_BUILD);
+	platform = ResourceHelper::LoadString(GetResourceInstance(), IDS_ABOUT_64BIT_BUILD);
 #elif defined(WIN32)
-	platform = ResourceHelper::LoadString(GetInstance(), IDS_ABOUT_32BIT_BUILD);
+	platform = ResourceHelper::LoadString(GetResourceInstance(), IDS_ABOUT_32BIT_BUILD);
 #else
 	static_assert(false, "Unknown target platform");
 #endif
@@ -49,9 +50,11 @@ INT_PTR AboutDialog::OnInitDialog()
 	// There is no release mode shown when building a stable release.
 	std::wstring releaseMode;
 #elif defined(ENVIRONMENT_RELEASE_BETA)
-	std::wstring releaseMode = ResourceHelper::LoadString(GetInstance(), IDS_RELEASE_MODE_BETA);
+	std::wstring releaseMode =
+		ResourceHelper::LoadString(GetResourceInstance(), IDS_RELEASE_MODE_BETA);
 #else
-	std::wstring releaseMode = ResourceHelper::LoadString(GetInstance(), IDS_RELEASE_MODE_DEV);
+	std::wstring releaseMode =
+		ResourceHelper::LoadString(GetResourceInstance(), IDS_RELEASE_MODE_DEV);
 #endif
 
 	if (!releaseMode.empty())
@@ -63,7 +66,7 @@ INT_PTR AboutDialog::OnInitDialog()
 		(boost::wformat(versionTemplate) % versionAndReleaseMode % platform).str();
 
 	std::wstring buildDateTemplate =
-		ResourceHelper::LoadString(GetInstance(), IDS_ABOUT_BUILD_DATE);
+		ResourceHelper::LoadString(GetResourceInstance(), IDS_ABOUT_BUILD_DATE);
 	std::wstring buildDate = (boost::wformat(buildDateTemplate) % BUILD_DATE_STRING).str();
 
 	std::wstring versionInfo = version + L"\r\n\r\n" + buildDate;
@@ -107,7 +110,7 @@ INT_PTR AboutDialog::OnNotify(NMHDR *pnmhdr)
 		}
 		else if (pnmhdr->idFrom == IDC_THIRD_PARTY_CREDITS_LINK)
 		{
-			ThirdPartyCreditsDialog thirdPartyCreditsDialog(GetInstance(), m_hDlg);
+			ThirdPartyCreditsDialog thirdPartyCreditsDialog(GetResourceInstance(), m_hDlg);
 			thirdPartyCreditsDialog.ShowModalDialog();
 		}
 	}

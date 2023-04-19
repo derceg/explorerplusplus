@@ -95,7 +95,7 @@ void OpenApplication(CoreInterface *coreInterface, HWND errorDialogParent,
 	if (FAILED(hr))
 	{
 		std::wstring messageTemplate = ResourceHelper::LoadString(
-			coreInterface->GetResourceModule(), IDS_APPLICATION_TOOLBAR_OPEN_ERROR);
+			coreInterface->GetResourceInstance(), IDS_APPLICATION_TOOLBAR_OPEN_ERROR);
 		_com_error error(hr);
 		std::wstring message =
 			(boost::wformat(messageTemplate) % applicationInfo.application % error.ErrorMessage())

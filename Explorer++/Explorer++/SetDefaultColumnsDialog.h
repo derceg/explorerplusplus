@@ -54,7 +54,7 @@ private:
 class SetDefaultColumnsDialog : public DarkModeDialogBase
 {
 public:
-	SetDefaultColumnsDialog(HINSTANCE hInstance, HWND hParent, FolderColumns &folderColumns);
+	SetDefaultColumnsDialog(HINSTANCE resourceInstance, HWND hParent, FolderColumns &folderColumns);
 
 protected:
 	INT_PTR OnInitDialog() override;

@@ -69,7 +69,7 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
 		m_pStatusBar->HandleStatusBarMenuOpen();
 
 		TCHAR szBuffer[512];
-		LoadString(m_resourceModule, LOWORD(wParam), szBuffer, SIZEOF_ARRAY(szBuffer));
+		LoadString(m_resourceInstance, LOWORD(wParam), szBuffer, SIZEOF_ARRAY(szBuffer));
 		SetWindowText(m_hStatusBar, szBuffer);
 	}
 
@@ -96,7 +96,7 @@ void Explorerplusplus::SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl)
 
 	TCHAR szTemp[64];
 	TCHAR szLoadingText[512];
-	LoadString(m_resourceModule, IDS_GENERAL_LOADING, szTemp, SIZEOF_ARRAY(szTemp));
+	LoadString(m_resourceInstance, IDS_GENERAL_LOADING, szTemp, SIZEOF_ARRAY(szTemp));
 	StringCchPrintf(szLoadingText, SIZEOF_ARRAY(szLoadingText), szTemp, displayName.c_str());
 
 	/* Browsing of a folder has started. Set the status bar text to indicate that
@@ -136,12 +136,12 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 		if (numItemsSelected == 1)
 		{
 			numItemsText =
-				ResourceHelper::LoadString(m_resourceModule, IDS_GENERAL_SELECTED_ONE_ITEM);
+				ResourceHelper::LoadString(m_resourceInstance, IDS_GENERAL_SELECTED_ONE_ITEM);
 		}
 		else
 		{
 			auto multipleItemsText =
-				ResourceHelper::LoadString(m_resourceModule, IDS_GENERAL_SELECTED_MULTIPLE_ITEMS);
+				ResourceHelper::LoadString(m_resourceInstance, IDS_GENERAL_SELECTED_MULTIPLE_ITEMS);
 			numItemsText = std::format(L"{:L} {}", numItemsSelected, multipleItemsText);
 		}
 	}
@@ -151,19 +151,19 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 
 		if (numItems == 1)
 		{
-			numItemsText = ResourceHelper::LoadString(m_resourceModule, IDS_GENERAL_ONE_ITEM);
+			numItemsText = ResourceHelper::LoadString(m_resourceInstance, IDS_GENERAL_ONE_ITEM);
 		}
 		else
 		{
 			auto multipleItemsText =
-				ResourceHelper::LoadString(m_resourceModule, IDS_GENERAL_MULTIPLE_ITEMS);
+				ResourceHelper::LoadString(m_resourceInstance, IDS_GENERAL_MULTIPLE_ITEMS);
 			numItemsText = std::format(L"{:L} {}", numItems, multipleItemsText);
 		}
 	}
 
 	if (tab.GetShellBrowser()->IsFilterApplied())
 	{
-		auto filterAppliedText = ResourceHelper::LoadString(m_resourceModule, IDS_FILTER_APPLIED);
+		auto filterAppliedText = ResourceHelper::LoadString(m_resourceInstance, IDS_FILTER_APPLIED);
 		numItemsText += L" | " + filterAppliedText;
 	}
 
@@ -213,6 +213,6 @@ std::wstring Explorerplusplus::CreateDriveFreeSpaceString(const std::wstring &pa
 	}
 
 	return std::format(L"{} {} ({:.0Lf}%)", FormatSizeString(totalNumberOfFreeBytes.QuadPart),
-		ResourceHelper::LoadString(m_resourceModule, IDS_GENERAL_FREE),
+		ResourceHelper::LoadString(m_resourceInstance, IDS_GENERAL_FREE),
 		totalNumberOfFreeBytes.QuadPart * 100.0 / totalNumberOfBytes.QuadPart);
 }

@@ -258,7 +258,7 @@ LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd, UINT msg, WPARAM wPa
 void Explorerplusplus::OnToolbarRClick(HWND sourceWindow)
 {
 	auto parentMenu =
-		wil::unique_hmenu(LoadMenu(m_resourceModule, MAKEINTRESOURCE(IDR_TOOLBAR_MENU)));
+		wil::unique_hmenu(LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_TOOLBAR_MENU)));
 
 	if (!parentMenu)
 	{
@@ -393,7 +393,7 @@ void Explorerplusplus::CreateAddressBar()
 
 void Explorerplusplus::CreateMainToolbar()
 {
-	m_mainToolbar = MainToolbar::Create(m_hMainRebar, m_resourceModule, this, m_config);
+	m_mainToolbar = MainToolbar::Create(m_hMainRebar, m_resourceInstance, this, m_config);
 
 	// This should be done in the MainToolbar class. However, the TB_SAVERESTORE
 	// message needs to be sent to the toolbar window. That's incompatible with

@@ -10,9 +10,9 @@
 #include "../Helper/WindowHelper.h"
 #include <boost/algorithm/string.hpp>
 
-ScriptingDialog::ScriptingDialog(HINSTANCE hInstance, HWND hParent,
+ScriptingDialog::ScriptingDialog(HINSTANCE resourceInstance, HWND hParent,
 	PluginInterface *pluginInterface) :
-	DarkModeDialogBase(hInstance, IDD_SCRIPTING, hParent, true),
+	DarkModeDialogBase(resourceInstance, IDD_SCRIPTING, hParent, true),
 	m_luaPlugin(L"", Plugins::Manifest(), pluginInterface)
 {
 	m_luaPlugin.GetLuaState().open_libraries(sol::lib::base);

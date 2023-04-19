@@ -18,8 +18,8 @@ const TCHAR FilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");
 
 const TCHAR FilterDialogPersistentSettings::SETTING_FILTER_LIST[] = _T("Filter");
 
-FilterDialog::FilterDialog(HINSTANCE hInstance, HWND hParent, CoreInterface *coreInterface) :
-	DarkModeDialogBase(hInstance, IDD_FILTER, hParent, true)
+FilterDialog::FilterDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface) :
+	DarkModeDialogBase(resourceInstance, IDD_FILTER, hParent, true)
 {
 	m_coreInterface = coreInterface;
 

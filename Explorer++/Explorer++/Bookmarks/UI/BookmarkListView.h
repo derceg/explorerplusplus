@@ -31,7 +31,7 @@ public:
 		bool active;
 	};
 
-	BookmarkListView(HWND hListView, HMODULE resourceModule, BookmarkTree *bookmarkTree,
+	BookmarkListView(HWND hListView, HINSTANCE resourceInstance, BookmarkTree *bookmarkTree,
 		CoreInterface *coreInterface, Navigator *navigator, IconFetcher *iconFetcher,
 		const std::vector<Column> &initialColumns);
 
@@ -132,7 +132,7 @@ private:
 	void RemoveDropHighlight();
 
 	HWND m_hListView;
-	HMODULE m_resourceModule;
+	HINSTANCE m_resourceInstance;
 	CoreInterface *m_coreInterface;
 	Navigator *m_navigator;
 	std::unique_ptr<BookmarkIconManager> m_bookmarkIconManager;

@@ -16,8 +16,8 @@ namespace
 std::unordered_map<HWND, BaseDialog *> g_windowMap;
 }
 
-BaseDialog::BaseDialog(HINSTANCE hInstance, int iResource, HWND hParent, bool bResizable) :
-	m_hInstance(hInstance),
+BaseDialog::BaseDialog(HINSTANCE resourceInstance, int iResource, HWND hParent, bool bResizable) :
+	m_resourceInstance(resourceInstance),
 	m_iResource(iResource),
 	m_hParent(hParent),
 	m_bResizable(bResizable)
@@ -117,7 +117,7 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 			SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
 		}
 
-		m_tipWnd = CreateTooltipControl(m_hDlg, m_hInstance);
+		m_tipWnd = CreateTooltipControl(m_hDlg, m_resourceInstance);
 
 		OnInitDialogBase();
 	}
@@ -196,9 +196,9 @@ INT_PTR BaseDialog::GetDefaultReturnValue(HWND hwnd, UINT uMsg, WPARAM wParam, L
 	return 0;
 }
 
-HINSTANCE BaseDialog::GetInstance() const
+HINSTANCE BaseDialog::GetResourceInstance() const
 {
-	return m_hInstance;
+	return m_resourceInstance;
 }
 
 INT_PTR BaseDialog::ShowModalDialog()
@@ -211,8 +211,8 @@ INT_PTR BaseDialog::ShowModalDialog()
 		return -1;
 	}
 
-	return DialogBoxParam(m_hInstance, MAKEINTRESOURCE(m_iResource), m_hParent, BaseDialogProcStub,
-		reinterpret_cast<LPARAM>(this));
+	return DialogBoxParam(m_resourceInstance, MAKEINTRESOURCE(m_iResource), m_hParent,
+		BaseDialogProcStub, reinterpret_cast<LPARAM>(this));
 }
 
 HWND BaseDialog::ShowModelessDialog(std::function<void()> dialogDestroyedObserver)
@@ -222,7 +222,7 @@ HWND BaseDialog::ShowModelessDialog(std::function<void()> dialogDestroyedObserve
 		return nullptr;
 	}
 
-	HWND dialog = CreateDialogParam(m_hInstance, MAKEINTRESOURCE(m_iResource), m_hParent,
+	HWND dialog = CreateDialogParam(m_resourceInstance, MAKEINTRESOURCE(m_iResource), m_hParent,
 		BaseDialogProcStub, reinterpret_cast<LPARAM>(this));
 
 	if (!dialog)

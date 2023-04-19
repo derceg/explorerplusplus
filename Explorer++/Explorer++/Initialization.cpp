@@ -59,7 +59,7 @@ void Explorerplusplus::OnCreate()
 		BookmarkTreeFactory::GetInstance()->GetBookmarkTree(),
 		MenuIdRange{ MENU_BOOKMARK_STARTID, MENU_BOOKMARK_ENDID });
 
-	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_resourceModule, this);
+	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_resourceInstance, this);
 
 	InitializeMainMenu();
 
@@ -82,7 +82,7 @@ void Explorerplusplus::OnCreate()
 	ResizeWindows();
 
 	m_taskbarThumbnails =
-		TaskbarThumbnails::Create(this, m_tabContainer, m_resourceModule, m_config);
+		TaskbarThumbnails::Create(this, m_tabContainer, m_resourceInstance, m_config);
 
 	RestoreTabs(pLoadSave);
 	delete pLoadSave;
@@ -168,7 +168,7 @@ void Explorerplusplus::AddViewModesToMenu(HMENU menu, UINT startPosition, BOOL b
 	for (auto viewMode : VIEW_MODES)
 	{
 		std::wstring text =
-			ResourceHelper::LoadString(m_resourceModule, GetViewModeMenuStringId(viewMode));
+			ResourceHelper::LoadString(m_resourceInstance, GetViewModeMenuStringId(viewMode));
 
 		MENUITEMINFO itemInfo;
 		itemInfo.cbSize = sizeof(itemInfo);

@@ -16,11 +16,11 @@
 
 const TCHAR AddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmark");
 
-AddBookmarkDialog::AddBookmarkDialog(HINSTANCE hInstance, HWND hParent,
+AddBookmarkDialog::AddBookmarkDialog(HINSTANCE resourceInstance, HWND hParent,
 	CoreInterface *coreInterface, BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
 	BookmarkItem *defaultParentSelection, BookmarkItem **selectedParentFolder,
 	std::optional<std::wstring> customDialogTitle) :
-	DarkModeDialogBase(hInstance, IDD_ADD_BOOKMARK, hParent, true),
+	DarkModeDialogBase(resourceInstance, IDD_ADD_BOOKMARK, hParent, true),
 	m_coreInterface(coreInterface),
 	m_bookmarkTree(bookmarkTree),
 	m_bookmarkItem(bookmarkItem),
@@ -79,7 +79,7 @@ INT_PTR AddBookmarkDialog::OnInitDialog()
 
 	HWND hTreeView = GetDlgItem(m_hDlg, IDC_BOOKMARK_TREEVIEW);
 
-	m_pBookmarkTreeView = new BookmarkTreeView(hTreeView, GetInstance(), m_coreInterface,
+	m_pBookmarkTreeView = new BookmarkTreeView(hTreeView, GetResourceInstance(), m_coreInterface,
 		m_bookmarkTree, m_persistentSettings->m_setExpansion, m_persistentSettings->m_guidSelected);
 
 	HWND hEditName = GetDlgItem(m_hDlg, IDC_BOOKMARK_NAME);
@@ -178,7 +178,7 @@ std::wstring AddBookmarkDialog::LoadDialogTitle()
 		}
 	}
 
-	return ResourceHelper::LoadString(GetInstance(), stringId);
+	return ResourceHelper::LoadString(GetResourceInstance(), stringId);
 }
 
 wil::unique_hicon AddBookmarkDialog::GetDialogIcon(int iconWidth, int iconHeight) const

@@ -461,7 +461,8 @@ BOOL ShellBrowser::OnListViewGetEmptyMarkup(NMLVEMPTYMARKUP *emptyMarkup)
 {
 	emptyMarkup->dwFlags = EMF_CENTERED;
 
-	auto folderEmptyText = ResourceHelper::LoadString(m_hResourceModule, IDS_LISTVIEW_FOLDER_EMPTY);
+	auto folderEmptyText =
+		ResourceHelper::LoadString(m_resourceInstance, IDS_LISTVIEW_FOLDER_EMPTY);
 	StringCchCopy(emptyMarkup->szMarkup, std::size(emptyMarkup->szMarkup), folderEmptyText.c_str());
 
 	return TRUE;
@@ -482,7 +483,7 @@ void ShellBrowser::QueueInfoTipTask(int internalIndex, const std::wstring &exist
 			UNREFERENCED_PARAMETER(id);
 
 			auto result = GetInfoTipAsync(m_hListView, infoTipResultId, internalIndex,
-				basicItemInfo, configCopy, m_hResourceModule, virtualFolder);
+				basicItemInfo, configCopy, m_resourceInstance, virtualFolder);
 
 			// If the item name is truncated in the listview,
 			// existingInfoTip will contain that value. Therefore, it's
@@ -501,7 +502,7 @@ void ShellBrowser::QueueInfoTipTask(int internalIndex, const std::wstring &exist
 
 std::optional<ShellBrowser::InfoTipResult> ShellBrowser::GetInfoTipAsync(HWND listView,
 	int infoTipResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo,
-	const Config &config, HINSTANCE instance, bool virtualFolder)
+	const Config &config, HINSTANCE resourceInstance, bool virtualFolder)
 {
 	std::wstring infoTip;
 
@@ -522,7 +523,8 @@ std::optional<ShellBrowser::InfoTipResult> ShellBrowser::GetInfoTipAsync(HWND li
 	else
 	{
 		TCHAR dateModified[64];
-		LoadString(instance, IDS_GENERAL_DATEMODIFIED, dateModified, SIZEOF_ARRAY(dateModified));
+		LoadString(resourceInstance, IDS_GENERAL_DATEMODIFIED, dateModified,
+			SIZEOF_ARRAY(dateModified));
 
 		TCHAR fileModificationText[256];
 		BOOL fileTimeResult =
@@ -812,7 +814,7 @@ void ShellBrowser::ShowPropertiesForSelectedFiles() const
 void ShellBrowser::OnListViewHeaderRightClick(const POINTS &cursorPos)
 {
 	wil::unique_hmenu headerPopupMenu(
-		LoadMenu(m_hResourceModule, MAKEINTRESOURCE(IDR_HEADER_MENU)));
+		LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_HEADER_MENU)));
 	HMENU headerMenu = GetSubMenu(headerPopupMenu.get(), 0);
 
 	auto commonColumns = GetColumnHeaderMenuList(m_directoryState.directory.c_str());
@@ -835,8 +837,8 @@ void ShellBrowser::OnListViewHeaderRightClick(const POINTS &cursorPos)
 		mii.cbSize = sizeof(mii);
 		mii.fMask = MIIM_STRING | MIIM_STATE | MIIM_ID;
 
-		std::wstring columnText =
-			ResourceHelper::LoadString(m_hResourceModule, LookupColumnNameStringIndex(column.type));
+		std::wstring columnText = ResourceHelper::LoadString(m_resourceInstance,
+			LookupColumnNameStringIndex(column.type));
 
 		if (column.bChecked)
 		{
@@ -931,7 +933,7 @@ void ShellBrowser::OnListViewHeaderMenuItemSelected(int menuItemId,
 
 void ShellBrowser::OnShowMoreColumnsSelected()
 {
-	SelectColumnsDialog selectColumnsDialog(m_hResourceModule, m_hListView, this,
+	SelectColumnsDialog selectColumnsDialog(m_resourceInstance, m_hListView, this,
 		m_iconResourceLoader);
 	selectColumnsDialog.ShowModalDialog();
 }
@@ -981,7 +983,7 @@ void ShellBrowser::SetFileAttributesForSelection()
 		sfaiList.push_back(sfai);
 	}
 
-	SetFileAttributesDialog setFileAttributesDialog(m_hResourceModule, m_hListView, sfaiList);
+	SetFileAttributesDialog setFileAttributesDialog(m_resourceInstance, m_hListView, sfaiList);
 	setFileAttributesDialog.ShowModalDialog();
 }
 

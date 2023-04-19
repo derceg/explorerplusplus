@@ -36,9 +36,9 @@ const TCHAR SplitFileDialogPersistentSettings::SETTINGS_KEY[] = _T("SplitFile");
 const TCHAR SplitFileDialogPersistentSettings::SETTING_SIZE[] = _T("Size");
 const TCHAR SplitFileDialogPersistentSettings::SETTING_SIZE_GROUP[] = _T("SizeGroup");
 
-SplitFileDialog::SplitFileDialog(HINSTANCE hInstance, HWND hParent, CoreInterface *coreInterface,
-	const std::wstring &strFullFilename) :
-	DarkModeDialogBase(hInstance, IDD_SPLITFILE, hParent, false),
+SplitFileDialog::SplitFileDialog(HINSTANCE resourceInstance, HWND hParent,
+	CoreInterface *coreInterface, const std::wstring &strFullFilename) :
+	DarkModeDialogBase(resourceInstance, IDD_SPLITFILE, hParent, false),
 	m_coreInterface(coreInterface),
 	m_strFullFilename(strFullFilename),
 	m_bSplittingFile(false),
@@ -101,19 +101,19 @@ INT_PTR SplitFileDialog::OnInitDialog()
 
 	TCHAR szTemp[64];
 
-	LoadString(GetInstance(), IDS_SPLIT_FILE_SIZE_BYTES, szTemp, SIZEOF_ARRAY(szTemp));
+	LoadString(GetResourceInstance(), IDS_SPLIT_FILE_SIZE_BYTES, szTemp, SIZEOF_ARRAY(szTemp));
 	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
 		reinterpret_cast<LPARAM>(szTemp)));
 	m_SizeMap.insert(std::unordered_map<int, SizeType>::value_type(iPos, SizeType::Bytes));
-	LoadString(GetInstance(), IDS_SPLIT_FILE_SIZE_KB, szTemp, SIZEOF_ARRAY(szTemp));
+	LoadString(GetResourceInstance(), IDS_SPLIT_FILE_SIZE_KB, szTemp, SIZEOF_ARRAY(szTemp));
 	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
 		reinterpret_cast<LPARAM>(szTemp)));
 	m_SizeMap.insert(std::unordered_map<int, SizeType>::value_type(iPos, SizeType::KB));
-	LoadString(GetInstance(), IDS_SPLIT_FILE_SIZE_MB, szTemp, SIZEOF_ARRAY(szTemp));
+	LoadString(GetResourceInstance(), IDS_SPLIT_FILE_SIZE_MB, szTemp, SIZEOF_ARRAY(szTemp));
 	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
 		reinterpret_cast<LPARAM>(szTemp)));
 	m_SizeMap.insert(std::unordered_map<int, SizeType>::value_type(iPos, SizeType::MB));
-	LoadString(GetInstance(), IDS_SPLIT_FILE_SIZE_GB, szTemp, SIZEOF_ARRAY(szTemp));
+	LoadString(GetResourceInstance(), IDS_SPLIT_FILE_SIZE_GB, szTemp, SIZEOF_ARRAY(szTemp));
 	iPos = static_cast<int>(SendMessage(hComboBox, CB_INSERTSTRING, static_cast<WPARAM>(-1),
 		reinterpret_cast<LPARAM>(szTemp)));
 	m_SizeMap.insert(std::unordered_map<int, SizeType>::value_type(iPos, SizeType::GB));
@@ -301,7 +301,7 @@ INT_PTR SplitFileDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lPara
 	case NSplitFileDialog::WM_APP_INPUTFILEINVALID:
 	{
 		TCHAR szTemp[128];
-		LoadString(GetInstance(), IDS_SPLITFILEDIALOG_INPUTFILEINVALID, szTemp,
+		LoadString(GetResourceInstance(), IDS_SPLITFILEDIALOG_INPUTFILEINVALID, szTemp,
 			SIZEOF_ARRAY(szTemp));
 		SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, szTemp);
 
@@ -333,7 +333,7 @@ void SplitFileDialog::OnOk()
 		{
 			TCHAR szTemp[128];
 
-			LoadString(GetInstance(), IDS_SPLITFILEDIALOG_OUTPUTFILENAMEERROR, szTemp,
+			LoadString(GetResourceInstance(), IDS_SPLITFILEDIALOG_OUTPUTFILENAMEERROR, szTemp,
 				SIZEOF_ARRAY(szTemp));
 
 			SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, szTemp);
@@ -353,8 +353,8 @@ void SplitFileDialog::OnOk()
 		{
 			TCHAR szTemp[128];
 
-			LoadString(GetInstance(), IDS_SPLITFILEDIALOG_OUTPUTFILENAMECONSTANTERROR, szTemp,
-				SIZEOF_ARRAY(szTemp));
+			LoadString(GetResourceInstance(), IDS_SPLITFILEDIALOG_OUTPUTFILENAMECONSTANTERROR,
+				szTemp, SIZEOF_ARRAY(szTemp));
 
 			SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, szTemp);
 
@@ -370,7 +370,7 @@ void SplitFileDialog::OnOk()
 		{
 			TCHAR szTemp[128];
 
-			LoadString(GetInstance(), IDS_SPLITFILEDIALOG_OUTPUTDIRECTORYERROR, szTemp,
+			LoadString(GetResourceInstance(), IDS_SPLITFILEDIALOG_OUTPUTDIRECTORYERROR, szTemp,
 				SIZEOF_ARRAY(szTemp));
 
 			SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, szTemp);
@@ -390,7 +390,8 @@ void SplitFileDialog::OnOk()
 		{
 			TCHAR szTemp[128];
 
-			LoadString(GetInstance(), IDS_SPLITFILEDIALOG_SIZEERROR, szTemp, SIZEOF_ARRAY(szTemp));
+			LoadString(GetResourceInstance(), IDS_SPLITFILEDIALOG_SIZEERROR, szTemp,
+				SIZEOF_ARRAY(szTemp));
 
 			SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, szTemp);
 
@@ -434,7 +435,7 @@ void SplitFileDialog::OnOk()
 		GetDlgItemText(m_hDlg, IDOK, m_szOk, SIZEOF_ARRAY(m_szOk));
 
 		TCHAR szTemp[64];
-		LoadString(GetInstance(), IDS_STOP, szTemp, SIZEOF_ARRAY(szTemp));
+		LoadString(GetResourceInstance(), IDS_STOP, szTemp, SIZEOF_ARRAY(szTemp));
 		SetDlgItemText(m_hDlg, IDOK, szTemp);
 
 		m_bSplittingFile = true;
@@ -442,7 +443,8 @@ void SplitFileDialog::OnOk()
 		m_uElapsedTime = 0;
 		SetTimer(m_hDlg, ELPASED_TIMER_ID, ELPASED_TIMER_TIMEOUT, nullptr);
 
-		LoadString(GetInstance(), IDS_SPLITFILEDIALOG_SPLITTING, szTemp, SIZEOF_ARRAY(szTemp));
+		LoadString(GetResourceInstance(), IDS_SPLITFILEDIALOG_SPLITTING, szTemp,
+			SIZEOF_ARRAY(szTemp));
 		SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, szTemp);
 
 		HANDLE hThread = CreateThread(nullptr, 0, NSplitFileDialog::SplitFileThreadProcStub,
@@ -476,7 +478,8 @@ void SplitFileDialog::OnCancel()
 void SplitFileDialog::OnChangeOutputDirectory()
 {
 	TCHAR szTitle[128];
-	LoadString(GetInstance(), IDS_SPLITFILEDIALOG_DIRECTORYTITLE, szTitle, SIZEOF_ARRAY(szTitle));
+	LoadString(GetResourceInstance(), IDS_SPLITFILEDIALOG_DIRECTORYTITLE, szTitle,
+		SIZEOF_ARRAY(szTitle));
 
 	unique_pidl_absolute pidl;
 	BOOL bSucceeded = NFileOperations::CreateBrowseDialog(m_hDlg, szTitle, wil::out_param(pidl));
@@ -503,11 +506,13 @@ void SplitFileDialog::OnSplitFinished()
 
 	if (!m_bStopSplitting)
 	{
-		LoadString(GetInstance(), IDS_SPLITFILEDIALOG_FINISHED, szTemp, SIZEOF_ARRAY(szTemp));
+		LoadString(GetResourceInstance(), IDS_SPLITFILEDIALOG_FINISHED, szTemp,
+			SIZEOF_ARRAY(szTemp));
 	}
 	else
 	{
-		LoadString(GetInstance(), IDS_SPLITFILEDIALOG_CANCELLED, szTemp, SIZEOF_ARRAY(szTemp));
+		LoadString(GetResourceInstance(), IDS_SPLITFILEDIALOG_CANCELLED, szTemp,
+			SIZEOF_ARRAY(szTemp));
 	}
 
 	SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_MESSAGE, szTemp);

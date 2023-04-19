@@ -15,7 +15,7 @@ class Navigator;
 class BookmarkContextMenu
 {
 public:
-	BookmarkContextMenu(BookmarkTree *bookmarkTree, HMODULE resourceModule,
+	BookmarkContextMenu(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
 		CoreInterface *coreInterface, Navigator *navigator);
 
 	BOOL ShowMenu(HWND parentWindow, BookmarkItem *parentFolder,
@@ -26,7 +26,7 @@ private:
 	void SetUpMenu(HMENU menu, const RawBookmarkItems &bookmarkItems);
 	void SetMenuItemStates(HMENU menu);
 
-	HMODULE m_resourceModule;
+	HINSTANCE m_resourceInstance;
 	BookmarkContextMenuController m_controller;
 	bool m_showingMenu;
 };

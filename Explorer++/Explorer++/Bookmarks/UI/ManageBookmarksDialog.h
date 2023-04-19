@@ -49,7 +49,7 @@ private:
 class ManageBookmarksDialog : public DarkModeDialogBase
 {
 public:
-	ManageBookmarksDialog(HINSTANCE hInstance, HWND hParent, CoreInterface *coreInterface,
+	ManageBookmarksDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface,
 		Navigator *navigator, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
 	~ManageBookmarksDialog();
 

@@ -10,9 +10,9 @@
 
 const TCHAR DisplayColoursDialogPersistentSettings::SETTINGS_KEY[] = _T("DisplayColors");
 
-DisplayColoursDialog::DisplayColoursDialog(HINSTANCE hInstance, HWND hParent, HWND hDisplayWindow,
-	COLORREF DefaultCenterColor, COLORREF DefaultSurroundingColor) :
-	DarkModeDialogBase(hInstance, IDD_DISPLAYCOLOURS, hParent, false),
+DisplayColoursDialog::DisplayColoursDialog(HINSTANCE resourceInstance, HWND hParent,
+	HWND hDisplayWindow, COLORREF DefaultCenterColor, COLORREF DefaultSurroundingColor) :
+	DarkModeDialogBase(resourceInstance, IDD_DISPLAYCOLOURS, hParent, false),
 	m_hDisplayWindow(hDisplayWindow),
 	m_DefaultCenterColor(DefaultCenterColor),
 	m_DefaultSurroundingColor(DefaultSurroundingColor)
@@ -135,13 +135,14 @@ void DisplayColoursDialog::InitializePreviewWindow()
 	DisplayWindow_ClearTextBuffer(m_hPreviewDisplayWindow);
 
 	TCHAR szTemp[64];
-	LoadString(GetInstance(), IDS_DISPLAYCOLORS_FILENAME, szTemp, SIZEOF_ARRAY(szTemp));
+	LoadString(GetResourceInstance(), IDS_DISPLAYCOLORS_FILENAME, szTemp, SIZEOF_ARRAY(szTemp));
 	DisplayWindow_BufferText(m_hPreviewDisplayWindow, szTemp);
 
-	LoadString(GetInstance(), IDS_DISPLAYCOLORS_FILE_TYPE, szTemp, SIZEOF_ARRAY(szTemp));
+	LoadString(GetResourceInstance(), IDS_DISPLAYCOLORS_FILE_TYPE, szTemp, SIZEOF_ARRAY(szTemp));
 	DisplayWindow_BufferText(m_hPreviewDisplayWindow, szTemp);
 
-	LoadString(GetInstance(), IDS_DISPLAYCOLORS_MODIFICATION_DATE, szTemp, SIZEOF_ARRAY(szTemp));
+	LoadString(GetResourceInstance(), IDS_DISPLAYCOLORS_MODIFICATION_DATE, szTemp,
+		SIZEOF_ARRAY(szTemp));
 	DisplayWindow_BufferText(m_hPreviewDisplayWindow, szTemp);
 
 	RECT rc;

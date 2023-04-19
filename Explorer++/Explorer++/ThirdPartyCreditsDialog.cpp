@@ -10,8 +10,8 @@
 #include "../Helper/RichEditHelper.h"
 #include "../Helper/WindowHelper.h"
 
-ThirdPartyCreditsDialog::ThirdPartyCreditsDialog(HINSTANCE instance, HWND parent) :
-	DarkModeDialogBase(instance, IDD_THIRD_PARTY_CREDITS, parent, false)
+ThirdPartyCreditsDialog::ThirdPartyCreditsDialog(HINSTANCE resourceInstance, HWND parent) :
+	DarkModeDialogBase(resourceInstance, IDD_THIRD_PARTY_CREDITS, parent, false)
 {
 }
 
@@ -20,7 +20,8 @@ INT_PTR ThirdPartyCreditsDialog::OnInitDialog()
 	SendDlgItemMessage(m_hDlg, IDC_CREDITS, EM_AUTOURLDETECT, AURL_ENABLEURL, NULL);
 	SendDlgItemMessage(m_hDlg, IDC_CREDITS, EM_SETEVENTMASK, 0, ENM_LINK);
 
-	std::wstring credits = ResourceHelper::LoadString(GetInstance(), IDS_THIRD_PARTY_CREDITS);
+	std::wstring credits =
+		ResourceHelper::LoadString(GetResourceInstance(), IDS_THIRD_PARTY_CREDITS);
 	SetDlgItemText(m_hDlg, IDC_CREDITS, credits.c_str());
 
 	if (DarkModeHelper::GetInstance().IsDarkModeEnabled())

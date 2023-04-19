@@ -41,7 +41,7 @@ private:
 class DestroyFilesDialog : public DarkModeDialogBase
 {
 public:
-	DestroyFilesDialog(HINSTANCE hInstance, HWND hParent,
+	DestroyFilesDialog(HINSTANCE resourceInstance, HWND hParent,
 		const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates);
 
 protected:

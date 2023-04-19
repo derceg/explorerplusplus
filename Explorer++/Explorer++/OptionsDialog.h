@@ -18,7 +18,7 @@ class TabContainer;
 class OptionsDialog : public DarkModeDialogBase
 {
 public:
-	OptionsDialog(HINSTANCE instance, HWND parent, std::shared_ptr<Config> config,
+	OptionsDialog(HINSTANCE resourceInstance, HWND parent, std::shared_ptr<Config> config,
 		CoreInterface *coreInterface, TabContainer *tabContainer);
 
 private:
@@ -131,7 +131,7 @@ private:
 	AdvancedOption *GetAdvancedOptionByIndex(HWND dlg, int index);
 
 	std::shared_ptr<Config> m_config;
-	HINSTANCE m_instance;
+	HINSTANCE m_resourceInstance;
 	CoreInterface *m_coreInterface;
 
 	std::unordered_map<int, HWND> m_dialogMap;

@@ -15,17 +15,17 @@
 #include "../Helper/WindowSubclassWrapper.h"
 #include <wil/resource.h>
 
-MainWindow *MainWindow::Create(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
-	CoreInterface *coreInterface)
+MainWindow *MainWindow::Create(HWND hwnd, std::shared_ptr<Config> config,
+	HINSTANCE resourceInstance, CoreInterface *coreInterface)
 {
-	return new MainWindow(hwnd, config, instance, coreInterface);
+	return new MainWindow(hwnd, config, resourceInstance, coreInterface);
 }
 
-MainWindow::MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
+MainWindow::MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE resourceInstance,
 	CoreInterface *coreInterface) :
 	m_hwnd(hwnd),
 	m_config(config),
-	m_instance(instance),
+	m_resourceInstance(resourceInstance),
 	m_coreInterface(coreInterface)
 {
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
@@ -132,7 +132,7 @@ void MainWindow::UpdateWindowText()
 	TCHAR szTitle[512];
 
 	TCHAR szTemp[64];
-	LoadString(m_instance, IDS_MAIN_WINDOW_TITLE, szTemp, SIZEOF_ARRAY(szTemp));
+	LoadString(m_resourceInstance, IDS_MAIN_WINDOW_TITLE, szTemp, SIZEOF_ARRAY(szTemp));
 	StringCchPrintf(szTitle, SIZEOF_ARRAY(szTitle), szTemp, folderDisplayName.c_str(),
 		NExplorerplusplus::APP_NAME);
 
@@ -156,22 +156,22 @@ void MainWindow::UpdateWindowText()
 
 		if (CheckGroupMembership(GroupType::Administrators))
 		{
-			LoadString(m_instance, IDS_PRIVILEGE_LEVEL_ADMINISTRATORS, szPrivilege,
+			LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_ADMINISTRATORS, szPrivilege,
 				SIZEOF_ARRAY(szPrivilege));
 		}
 		else if (CheckGroupMembership(GroupType::PowerUsers))
 		{
-			LoadString(m_instance, IDS_PRIVILEGE_LEVEL_POWER_USERS, szPrivilege,
+			LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_POWER_USERS, szPrivilege,
 				SIZEOF_ARRAY(szPrivilege));
 		}
 		else if (CheckGroupMembership(GroupType::Users))
 		{
-			LoadString(m_instance, IDS_PRIVILEGE_LEVEL_USERS, szPrivilege,
+			LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_USERS, szPrivilege,
 				SIZEOF_ARRAY(szPrivilege));
 		}
 		else if (CheckGroupMembership(GroupType::UsersRestricted))
 		{
-			LoadString(m_instance, IDS_PRIVILEGE_LEVEL_USERS_RESTRICTED, szPrivilege,
+			LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_USERS_RESTRICTED, szPrivilege,
 				SIZEOF_ARRAY(szPrivilege));
 		}
 

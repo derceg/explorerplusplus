@@ -41,8 +41,8 @@ private:
 class MainToolbar : public BaseWindow
 {
 public:
-	static MainToolbar *Create(HWND parent, HINSTANCE instance, CoreInterface *coreInterface,
-		std::shared_ptr<Config> config);
+	static MainToolbar *Create(HWND parent, HINSTANCE resourceInstance,
+		CoreInterface *coreInterface, std::shared_ptr<Config> config);
 
 	void UpdateConfigDependentButtonStates();
 	void UpdateToolbarButtonStates();
@@ -54,7 +54,7 @@ private:
 		Forward
 	};
 
-	MainToolbar(HWND parent, HINSTANCE instance, CoreInterface *coreInterface,
+	MainToolbar(HWND parent, HINSTANCE resourceInstance, CoreInterface *coreInterface,
 		std::shared_ptr<Config> config);
 	~MainToolbar();
 
@@ -105,7 +105,7 @@ private:
 
 	MainToolbarPersistentSettings *m_persistentSettings;
 
-	HINSTANCE m_instance;
+	HINSTANCE m_resourceInstance;
 	CoreInterface *m_coreInterface;
 	std::shared_ptr<Config> m_config;
 

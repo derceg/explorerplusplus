@@ -136,7 +136,7 @@ private:
 class SearchDialog : public DarkModeDialogBase, private FileContextMenuHandler
 {
 public:
-	SearchDialog(HINSTANCE hInstance, HWND hParent, std::wstring_view searchDirectory,
+	SearchDialog(HINSTANCE resourceInstance, HWND hParent, std::wstring_view searchDirectory,
 		CoreInterface *coreInterface, Navigator *navigator, TabContainer *tabContainer);
 	~SearchDialog();
 

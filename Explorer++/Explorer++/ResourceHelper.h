@@ -14,7 +14,8 @@ using IconImageListMapping = std::unordered_map<Icon, int>;
 
 namespace ResourceHelper
 {
-std::wstring LoadString(HINSTANCE instance, UINT stringId);
+
+std::wstring LoadString(HINSTANCE resourceInstance, UINT stringId);
 void SetMenuItemImage(HMENU menu, UINT menuItemId, IconResourceLoader *iconResourceLoader,
 	Icon icon, int dpi, std::vector<wil::unique_hbitmap> &menuImages);
 std::tuple<wil::unique_himagelist, IconImageListMapping> CreateIconImageList(
@@ -22,4 +23,5 @@ std::tuple<wil::unique_himagelist, IconImageListMapping> CreateIconImageList(
 	const std::initializer_list<Icon> &icons);
 void AddIconToImageList(HIMAGELIST imageList, IconResourceLoader *iconResourceLoader, Icon icon,
 	int iconWidth, int iconHeight, IconImageListMapping &imageListMappings);
+
 }

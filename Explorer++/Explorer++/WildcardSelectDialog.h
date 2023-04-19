@@ -48,7 +48,7 @@ private:
 class WildcardSelectDialog : public DarkModeDialogBase
 {
 public:
-	WildcardSelectDialog(HINSTANCE hInstance, HWND hParent, BOOL bSelect,
+	WildcardSelectDialog(HINSTANCE resourceInstance, HWND hParent, BOOL bSelect,
 		CoreInterface *coreInterface);
 
 protected:

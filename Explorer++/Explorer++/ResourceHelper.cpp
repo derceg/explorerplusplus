@@ -6,10 +6,11 @@
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
 
-std::wstring ResourceHelper::LoadString(HINSTANCE instance, UINT stringId)
+std::wstring ResourceHelper::LoadString(HINSTANCE resourceInstance, UINT stringId)
 {
 	WCHAR *string;
-	int numCharacters = LoadString(instance, stringId, reinterpret_cast<LPWSTR>(&string), 0);
+	int numCharacters =
+		LoadString(resourceInstance, stringId, reinterpret_cast<LPWSTR>(&string), 0);
 
 	if (numCharacters == 0)
 	{

@@ -20,9 +20,9 @@ const TCHAR WildcardSelectDialogPersistentSettings::SETTINGS_KEY[] = _T("Wildcar
 const TCHAR WildcardSelectDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
 const TCHAR WildcardSelectDialogPersistentSettings::SETTING_CURRENT_TEXT[] = _T("CurrentText");
 
-WildcardSelectDialog::WildcardSelectDialog(HINSTANCE hInstance, HWND hParent, BOOL bSelect,
+WildcardSelectDialog::WildcardSelectDialog(HINSTANCE resourceInstance, HWND hParent, BOOL bSelect,
 	CoreInterface *coreInterface) :
-	DarkModeDialogBase(hInstance, IDD_WILDCARDSELECT, hParent, true)
+	DarkModeDialogBase(resourceInstance, IDD_WILDCARDSELECT, hParent, true)
 {
 	m_bSelect = bSelect;
 	m_coreInterface = coreInterface;
@@ -47,7 +47,7 @@ INT_PTR WildcardSelectDialog::OnInitDialog()
 	if (!m_bSelect)
 	{
 		std::wstring deselectTitle =
-			ResourceHelper::LoadString(GetInstance(), IDS_WILDCARDDESELECTION);
+			ResourceHelper::LoadString(GetResourceInstance(), IDS_WILDCARDDESELECTION);
 		SetWindowText(m_hDlg, deselectTitle.c_str());
 	}
 

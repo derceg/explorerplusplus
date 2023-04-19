@@ -24,7 +24,7 @@ void Explorerplusplus::CreateTabBacking()
 	/* Create the toolbar that will appear on the tab control.
 	Only contains the close button used to close tabs. */
 	m_hTabWindowToolbar = CreateTabToolbar(m_hTabBacking, TABTOOLBAR_CLOSE,
-		ResourceHelper::LoadString(m_resourceModule, IDS_TAB_CLOSE_TIP));
+		ResourceHelper::LoadString(m_resourceInstance, IDS_TAB_CLOSE_TIP));
 
 	AddTabsInitializedObserver(std::bind_front(&Explorerplusplus::OnTabsInitialized, this));
 }

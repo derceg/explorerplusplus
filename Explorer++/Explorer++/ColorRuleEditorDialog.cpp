@@ -19,9 +19,9 @@ const TCHAR ColorRuleEditorDialogPersistentSettings::SETTINGS_KEY[] = _T("ColorR
 
 const TCHAR ColorRuleEditorDialogPersistentSettings::SETTING_CUSTOM_COLORS[] = _T("CustomColors");
 
-ColorRuleEditorDialog::ColorRuleEditorDialog(HMODULE resourceModule, HWND parent,
+ColorRuleEditorDialog::ColorRuleEditorDialog(HINSTANCE resourceInstance, HWND parent,
 	ColorRuleModel *model, std::unique_ptr<EditDetails> editDetails) :
-	DarkModeDialogBase(resourceModule, IDD_NEW_COLOR_RULE, parent, false),
+	DarkModeDialogBase(resourceInstance, IDD_NEW_COLOR_RULE, parent, false),
 	m_model(model),
 	m_editDetails(std::move(editDetails))
 {
@@ -32,7 +32,8 @@ INT_PTR ColorRuleEditorDialog::OnInitDialog()
 {
 	if (m_editDetails->type == EditDetails::Type::ExistingItem)
 	{
-		std::wstring editText = ResourceHelper::LoadString(GetInstance(), IDS_EDIT_COLOR_RULE);
+		std::wstring editText =
+			ResourceHelper::LoadString(GetResourceInstance(), IDS_EDIT_COLOR_RULE);
 		SetWindowText(m_hDlg, editText.c_str());
 	}
 

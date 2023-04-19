@@ -15,7 +15,7 @@ namespace Applications
 ApplicationContextMenu::ApplicationContextMenu(ApplicationModel *model,
 	CoreInterface *coreInterface) :
 	m_model(model),
-	m_resourceModule(coreInterface->GetResourceModule()),
+	m_resourceInstance(coreInterface->GetResourceInstance()),
 	m_controller(coreInterface)
 {
 }
@@ -24,7 +24,7 @@ void ApplicationContextMenu::ShowMenu(HWND parentWindow, Application *applicatio
 	const POINT &ptScreen)
 {
 	wil::unique_hmenu parentMenu(
-		LoadMenu(m_resourceModule, MAKEINTRESOURCE(IDR_APPLICATIONTOOLBAR_MENU)));
+		LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_APPLICATIONTOOLBAR_MENU)));
 	HMENU menu = GetSubMenu(parentMenu.get(), 0);
 
 	int menuItemId = TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RETURNCMD, ptScreen.x, ptScreen.y, 0,

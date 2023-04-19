@@ -22,7 +22,7 @@ class CoreInterface;
 class BookmarkTreeView : private BookmarkDropTargetWindow
 {
 public:
-	BookmarkTreeView(HWND hTreeView, HINSTANCE hInstance, CoreInterface *coreInterface,
+	BookmarkTreeView(HWND hTreeView, HINSTANCE resourceInstance, CoreInterface *coreInterface,
 		BookmarkTree *bookmarkTree, const std::unordered_set<std::wstring> &setExpansion,
 		std::optional<std::wstring> guidSelected = std::nullopt);
 
@@ -90,7 +90,7 @@ private:
 	wil::unique_himagelist m_imageList;
 	IconImageListMapping m_imageListMappings;
 
-	HINSTANCE m_instance;
+	HINSTANCE m_resourceInstance;
 
 	BookmarkTree *m_bookmarkTree;
 

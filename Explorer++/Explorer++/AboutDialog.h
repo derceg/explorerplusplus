@@ -10,7 +10,7 @@
 class AboutDialog : public DarkModeDialogBase
 {
 public:
-	AboutDialog(HINSTANCE hInstance, HWND hParent);
+	AboutDialog(HINSTANCE resourceInstance, HWND hParent);
 
 protected:
 	INT_PTR OnInitDialog() override;

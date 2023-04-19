@@ -39,7 +39,7 @@ Explorerplusplus::Explorerplusplus(HWND hwnd, CommandLine::Settings *commandLine
 	m_bookmarkIconFetcher(hwnd, &m_cachedIcons),
 	m_tabBarBackgroundBrush(CreateSolidBrush(TAB_BAR_DARK_MODE_BACKGROUND_COLOR))
 {
-	m_resourceModule = nullptr;
+	m_resourceInstance = nullptr;
 
 	m_config = std::make_shared<Config>();
 

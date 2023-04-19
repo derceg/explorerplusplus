@@ -22,7 +22,7 @@ public:
 	void ShowMenu(HWND parentWindow, Application *application, const POINT &ptScreen);
 
 private:
-	HMODULE m_resourceModule;
+	HINSTANCE m_resourceInstance;
 	ApplicationModel *m_model;
 	ApplicationContextMenuController m_controller;
 };

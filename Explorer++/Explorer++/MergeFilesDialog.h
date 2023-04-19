@@ -51,7 +51,7 @@ private:
 class MergeFilesDialog : public DarkModeDialogBase
 {
 public:
-	MergeFilesDialog(HINSTANCE hInstance, HWND hParent, CoreInterface *coreInterface,
+	MergeFilesDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface,
 		const std::wstring &strOutputDirectory, const std::list<std::wstring> &FullFilenameList,
 		BOOL bShowFriendlyDates);
 	~MergeFilesDialog();

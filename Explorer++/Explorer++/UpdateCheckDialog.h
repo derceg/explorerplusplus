@@ -28,7 +28,7 @@ private:
 class UpdateCheckDialog : public DarkModeDialogBase
 {
 public:
-	UpdateCheckDialog(HINSTANCE hInstance, HWND hParent);
+	UpdateCheckDialog(HINSTANCE resourceInstance, HWND hParent);
 
 protected:
 	INT_PTR OnInitDialog() override;

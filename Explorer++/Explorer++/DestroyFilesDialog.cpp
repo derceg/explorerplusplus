@@ -17,9 +17,9 @@ const TCHAR DestroyFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("DestroyFi
 const TCHAR DestroyFilesDialogPersistentSettings::SETTING_OVERWRITE_METHOD[] =
 	_T("OverwriteMethod");
 
-DestroyFilesDialog::DestroyFilesDialog(HINSTANCE hInstance, HWND hParent,
+DestroyFilesDialog::DestroyFilesDialog(HINSTANCE resourceInstance, HWND hParent,
 	const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates) :
-	DarkModeDialogBase(hInstance, IDD_DESTROYFILES, hParent, true)
+	DarkModeDialogBase(resourceInstance, IDD_DESTROYFILES, hParent, true)
 {
 	m_FullFilenameList = FullFilenameList;
 	m_bShowFriendlyDates = bShowFriendlyDates;
@@ -47,22 +47,23 @@ INT_PTR DestroyFilesDialog::OnInitDialog()
 	LVCOLUMN lvColumn;
 	TCHAR szTemp[128];
 
-	LoadString(GetInstance(), IDS_DESTROY_FILES_COLUMN_FILE, szTemp, SIZEOF_ARRAY(szTemp));
+	LoadString(GetResourceInstance(), IDS_DESTROY_FILES_COLUMN_FILE, szTemp, SIZEOF_ARRAY(szTemp));
 	lvColumn.mask = LVCF_TEXT;
 	lvColumn.pszText = szTemp;
 	ListView_InsertColumn(hListView, 0, &lvColumn);
 
-	LoadString(GetInstance(), IDS_DESTROY_FILES_COLUMN_TYPE, szTemp, SIZEOF_ARRAY(szTemp));
+	LoadString(GetResourceInstance(), IDS_DESTROY_FILES_COLUMN_TYPE, szTemp, SIZEOF_ARRAY(szTemp));
 	lvColumn.mask = LVCF_TEXT;
 	lvColumn.pszText = szTemp;
 	ListView_InsertColumn(hListView, 1, &lvColumn);
 
-	LoadString(GetInstance(), IDS_DESTROY_FILES_COLUMN_SIZE, szTemp, SIZEOF_ARRAY(szTemp));
+	LoadString(GetResourceInstance(), IDS_DESTROY_FILES_COLUMN_SIZE, szTemp, SIZEOF_ARRAY(szTemp));
 	lvColumn.mask = LVCF_TEXT;
 	lvColumn.pszText = szTemp;
 	ListView_InsertColumn(hListView, 2, &lvColumn);
 
-	LoadString(GetInstance(), IDS_DESTROY_FILES_COLUMN_DATE_MODIFIED, szTemp, SIZEOF_ARRAY(szTemp));
+	LoadString(GetResourceInstance(), IDS_DESTROY_FILES_COLUMN_DATE_MODIFIED, szTemp,
+		SIZEOF_ARRAY(szTemp));
 	lvColumn.mask = LVCF_TEXT;
 	lvColumn.pszText = szTemp;
 	ListView_InsertColumn(hListView, 3, &lvColumn);
@@ -238,7 +239,7 @@ void DestroyFilesDialog::SaveState()
 void DestroyFilesDialog::OnOk()
 {
 	TCHAR szConfirmation[128];
-	LoadString(GetInstance(), IDS_DESTROY_FILES_CONFIRMATION, szConfirmation,
+	LoadString(GetResourceInstance(), IDS_DESTROY_FILES_CONFIRMATION, szConfirmation,
 		SIZEOF_ARRAY(szConfirmation));
 
 	/* The default button in this message box will be the second

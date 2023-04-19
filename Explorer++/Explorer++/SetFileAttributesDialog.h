@@ -40,7 +40,7 @@ private:
 class SetFileAttributesDialog : public DarkModeDialogBase
 {
 public:
-	SetFileAttributesDialog(HINSTANCE hInstance, HWND hParent,
+	SetFileAttributesDialog(HINSTANCE resourceInstance, HWND hParent,
 		const std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo> &sfaiList);
 
 protected:

@@ -123,11 +123,11 @@ int CALLBACK SortByDateModified(const BookmarkItem *firstItem, const BookmarkIte
 	return CompareFileTime(&firstItemDateModified, &secondItemDateModified);
 }
 
-void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree, HMODULE resoureceModule,
+void BookmarkHelper::BookmarkAllTabs(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
 	HWND parentWindow, CoreInterface *coreInterface)
 {
 	std::wstring bookmarkAllTabsText =
-		ResourceHelper::LoadString(resoureceModule, IDS_ADD_BOOKMARK_TITLE_BOOKMARK_ALL_TABS);
+		ResourceHelper::LoadString(resourceInstance, IDS_ADD_BOOKMARK_TITLE_BOOKMARK_ALL_TABS);
 	auto bookmarkFolder = AddBookmarkItem(bookmarkTree, BookmarkItem::Type::Folder, nullptr,
 		std::nullopt, parentWindow, coreInterface, bookmarkAllTabsText);
 
@@ -168,7 +168,7 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 	else
 	{
 		bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt,
-			ResourceHelper::LoadString(coreInterface->GetResourceModule(),
+			ResourceHelper::LoadString(coreInterface->GetResourceInstance(),
 				IDS_BOOKMARKS_NEWBOOKMARKFOLDER),
 			std::nullopt);
 	}
@@ -176,7 +176,7 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 	BookmarkItem *rawBookmarkItem = bookmarkItem.get();
 	BookmarkItem *selectedParentFolder = nullptr;
 
-	AddBookmarkDialog addBookmarkDialog(coreInterface->GetResourceModule(), parentWindow,
+	AddBookmarkDialog addBookmarkDialog(coreInterface->GetResourceInstance(), parentWindow,
 		coreInterface, bookmarkTree, bookmarkItem.get(), defaultParentSelection,
 		&selectedParentFolder, customDialogTitle);
 	auto res = addBookmarkDialog.ShowModalDialog();
@@ -205,10 +205,10 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 }
 
 void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
-	HMODULE resoureceModule, HWND parentWindow, CoreInterface *coreInterface)
+	HINSTANCE resourceInstance, HWND parentWindow, CoreInterface *coreInterface)
 {
 	BookmarkItem *selectedParentFolder = nullptr;
-	AddBookmarkDialog addBookmarkDialog(resoureceModule, parentWindow, coreInterface, bookmarkTree,
+	AddBookmarkDialog addBookmarkDialog(resourceInstance, parentWindow, coreInterface, bookmarkTree,
 		bookmarkItem, nullptr, &selectedParentFolder);
 	auto res = addBookmarkDialog.ShowModalDialog();
 

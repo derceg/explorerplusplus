@@ -22,8 +22,8 @@ const TCHAR UpdateCheckDialogPersistentSettings::SETTINGS_KEY[] = _T("UpdateChec
 const TCHAR UpdateCheckDialog::VERSION_FILE_URL[] =
 	_T("https://explorerplusplus.com/software/version.txt");
 
-UpdateCheckDialog::UpdateCheckDialog(HINSTANCE hInstance, HWND hParent) :
-	DarkModeDialogBase(hInstance, IDD_UPDATECHECK, hParent, false),
+UpdateCheckDialog::UpdateCheckDialog(HINSTANCE resourceInstance, HWND hParent) :
+	DarkModeDialogBase(resourceInstance, IDD_UPDATECHECK, hParent, false),
 	m_UpdateCheckComplete(false)
 {
 	m_pucdps = &UpdateCheckDialogPersistentSettings::GetInstance();
@@ -34,7 +34,7 @@ INT_PTR UpdateCheckDialog::OnInitDialog()
 	SetDlgItemText(m_hDlg, IDC_STATIC_CURRENT_VERSION, VERSION_STRING_W);
 
 	TCHAR szTemp[64];
-	LoadString(GetInstance(), IDS_UPDATE_CHECK_STATUS, szTemp, SIZEOF_ARRAY(szTemp));
+	LoadString(GetResourceInstance(), IDS_UPDATE_CHECK_STATUS, szTemp, SIZEOF_ARRAY(szTemp));
 	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, szTemp);
 
 	SetTimer(m_hDlg, 0, STATUS_TIMER_ELAPSED, nullptr);
@@ -179,7 +179,7 @@ INT_PTR UpdateCheckDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lPa
 void UpdateCheckDialog::OnUpdateCheckError()
 {
 	TCHAR szTemp[64];
-	LoadString(GetInstance(), IDS_UPDATE_CHECK_ERROR, szTemp, SIZEOF_ARRAY(szTemp));
+	LoadString(GetResourceInstance(), IDS_UPDATE_CHECK_ERROR, szTemp, SIZEOF_ARRAY(szTemp));
 	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, szTemp);
 }
 
@@ -193,13 +193,14 @@ void UpdateCheckDialog::OnUpdateCheckSuccess(Version *version)
 		|| (version->MajorVersion == MAJOR_VERSION && version->MinorVersion == MINOR_VERSION
 			&& version->MicroVersion > MICRO_VERSION))
 	{
-		LoadString(GetInstance(), IDS_UPDATE_CHECK_NEW_VERSION_AVAILABLE, szTemp,
+		LoadString(GetResourceInstance(), IDS_UPDATE_CHECK_NEW_VERSION_AVAILABLE, szTemp,
 			SIZEOF_ARRAY(szTemp));
 		StringCchPrintf(szStatus, SIZEOF_ARRAY(szStatus), szTemp, version->VersionString);
 	}
 	else
 	{
-		LoadString(GetInstance(), IDS_UPDATE_CHECK_UP_TO_DATE, szTemp, SIZEOF_ARRAY(szTemp));
+		LoadString(GetResourceInstance(), IDS_UPDATE_CHECK_UP_TO_DATE, szTemp,
+			SIZEOF_ARRAY(szTemp));
 		StringCchPrintf(szStatus, SIZEOF_ARRAY(szStatus), szTemp, version->VersionString);
 	}
 
@@ -234,7 +235,8 @@ INT_PTR UpdateCheckDialog::OnTimer(int iTimerID)
 	}
 
 	TCHAR updateStatus[64];
-	LoadString(GetInstance(), IDS_UPDATE_CHECK_STATUS, updateStatus, SIZEOF_ARRAY(updateStatus));
+	LoadString(GetResourceInstance(), IDS_UPDATE_CHECK_STATUS, updateStatus,
+		SIZEOF_ARRAY(updateStatus));
 
 	static int step = 0;
 

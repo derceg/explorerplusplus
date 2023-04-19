@@ -12,6 +12,7 @@ typedef DWORD ARGB;
 
 namespace ImageHelper
 {
+
 wil::unique_hbitmap ImageListIconToBitmap(IImageList *imageList, int iconIndex);
 void InitBitmapInfo(__out_bcount(cbInfo) BITMAPINFO *pbmi, ULONG cbInfo, LONG cx, LONG cy,
 	WORD bpp);
@@ -22,6 +23,8 @@ bool HasAlpha(__in ARGB *pargb, SIZE &sizImage, int cxRow);
 HRESULT ConvertBufferToPARGB32(HPAINTBUFFER hPaintBuffer, HDC hdc, HICON hicon, SIZE &sizIcon);
 HBITMAP IconToBitmapPARGB32(HICON hicon, int width, int height);
 
-std::unique_ptr<Gdiplus::Bitmap> LoadGdiplusBitmapFromPNG(HINSTANCE instance, UINT resourceId);
+std::unique_ptr<Gdiplus::Bitmap> LoadGdiplusBitmapFromPNG(HINSTANCE resourceInstance,
+	UINT resourceId);
 int CopyImageListIcon(HIMAGELIST destination, HIMAGELIST source, int sourceIconIndex);
+
 }

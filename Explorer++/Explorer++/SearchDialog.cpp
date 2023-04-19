@@ -58,9 +58,10 @@ const TCHAR SearchDialogPersistentSettings::SETTING_SORT_ASCENDING[] = _T("SortA
 const TCHAR SearchDialogPersistentSettings::SETTING_DIRECTORY_LIST[] = _T("Directory");
 const TCHAR SearchDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
 
-SearchDialog::SearchDialog(HINSTANCE hInstance, HWND hParent, std::wstring_view searchDirectory,
-	CoreInterface *coreInterface, Navigator *navigator, TabContainer *tabContainer) :
-	DarkModeDialogBase(hInstance, IDD_SEARCH, hParent, true),
+SearchDialog::SearchDialog(HINSTANCE resourceInstance, HWND hParent,
+	std::wstring_view searchDirectory, CoreInterface *coreInterface, Navigator *navigator,
+	TabContainer *tabContainer) :
+	DarkModeDialogBase(resourceInstance, IDD_SEARCH, hParent, true),
 	m_searchDirectory(searchDirectory),
 	m_coreInterface(coreInterface),
 	m_navigator(navigator),
@@ -108,7 +109,7 @@ INT_PTR SearchDialog::OnInitDialog()
 	for (const auto &ci : m_persistentSettings->m_Columns)
 	{
 		TCHAR szTemp[128];
-		LoadString(GetInstance(), ci.uStringID, szTemp, SIZEOF_ARRAY(szTemp));
+		LoadString(GetResourceInstance(), ci.uStringID, szTemp, SIZEOF_ARRAY(szTemp));
 
 		LVCOLUMN lvColumn;
 		lvColumn.mask = LVCF_TEXT;
@@ -276,7 +277,7 @@ INT_PTR SearchDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 		TCHAR szDisplayName[MAX_PATH];
 		TCHAR szTitle[256];
 
-		LoadString(GetInstance(), IDS_SEARCHDIALOG_TITLE, szTitle, SIZEOF_ARRAY(szTitle));
+		LoadString(GetResourceInstance(), IDS_SEARCHDIALOG_TITLE, szTitle, SIZEOF_ARRAY(szTitle));
 
 		GetDlgItemText(m_hDlg, IDC_COMBO_DIRECTORY, szDirectory, SIZEOF_ARRAY(szDirectory));
 
@@ -439,7 +440,7 @@ void SearchDialog::StartSearching()
 
 	TCHAR szTemp[64];
 
-	LoadString(GetInstance(), IDS_STOP, szTemp, SIZEOF_ARRAY(szTemp));
+	LoadString(GetResourceInstance(), IDS_STOP, szTemp, SIZEOF_ARRAY(szTemp));
 	SetDlgItemText(m_hDlg, IDSEARCH, szTemp);
 
 	m_bSearching = TRUE;
@@ -637,11 +638,13 @@ void SearchDialog::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
 
 	if ((itemAttributes & SFGAO_FOLDER) == SFGAO_FOLDER)
 	{
-		LoadString(GetInstance(), IDS_SEARCH_OPEN_FOLDER_LOCATION, szTemp, SIZEOF_ARRAY(szTemp));
+		LoadString(GetResourceInstance(), IDS_SEARCH_OPEN_FOLDER_LOCATION, szTemp,
+			SIZEOF_ARRAY(szTemp));
 	}
 	else
 	{
-		LoadString(GetInstance(), IDS_SEARCH_OPEN_FILE_LOCATION, szTemp, SIZEOF_ARRAY(szTemp));
+		LoadString(GetResourceInstance(), IDS_SEARCH_OPEN_FILE_LOCATION, szTemp,
+			SIZEOF_ARRAY(szTemp));
 	}
 
 	MENUITEMINFO mii;
@@ -859,14 +862,16 @@ INT_PTR SearchDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			int iFilesFound = HIWORD(lParam);
 
 			TCHAR szTemp[128];
-			LoadString(GetInstance(), IDS_SEARCH_FINISHED_MESSAGE, szTemp, SIZEOF_ARRAY(szTemp));
+			LoadString(GetResourceInstance(), IDS_SEARCH_FINISHED_MESSAGE, szTemp,
+				SIZEOF_ARRAY(szTemp));
 			StringCchPrintf(szStatus, SIZEOF_ARRAY(szStatus), szTemp, iFoldersFound, iFilesFound);
 			SetDlgItemText(m_hDlg, IDC_STATIC_STATUS, szStatus);
 		}
 		else
 		{
 			TCHAR szTemp[128];
-			LoadString(GetInstance(), IDS_SEARCH_CANCELLED_MESSAGE, szTemp, SIZEOF_ARRAY(szTemp));
+			LoadString(GetResourceInstance(), IDS_SEARCH_CANCELLED_MESSAGE, szTemp,
+				SIZEOF_ARRAY(szTemp));
 			SetDlgItemText(m_hDlg, IDC_STATIC_STATUS, szTemp);
 		}
 
@@ -889,7 +894,7 @@ INT_PTR SearchDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		pszDirectory = reinterpret_cast<TCHAR *>(wParam);
 
 		TCHAR szTemp[64];
-		LoadString(GetInstance(), IDS_SEARCHING, szTemp, SIZEOF_ARRAY(szTemp));
+		LoadString(GetResourceInstance(), IDS_SEARCHING, szTemp, SIZEOF_ARRAY(szTemp));
 		StringCchPrintf(szStatus, SIZEOF_ARRAY(szStatus), szTemp, pszDirectory);
 		SetDlgItemText(m_hDlg, IDC_STATIC_STATUS, szStatus);
 	}
@@ -906,7 +911,7 @@ INT_PTR SearchDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		/* The regular expression passed to the search
 		thread was invalid. Show the user an error message. */
 		TCHAR szTemp[128];
-		LoadString(GetInstance(), IDS_SEARCH_REGULAR_EXPRESSION_INVALID, szTemp,
+		LoadString(GetResourceInstance(), IDS_SEARCH_REGULAR_EXPRESSION_INVALID, szTemp,
 			SIZEOF_ARRAY(szTemp));
 		SetDlgItemText(m_hDlg, IDC_LINK_STATUS, szTemp);
 

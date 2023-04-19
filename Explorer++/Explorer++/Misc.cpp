@@ -272,7 +272,7 @@ void Explorerplusplus::CopyToFolder(bool move)
 	}
 
 	TCHAR szTemp[128];
-	LoadString(m_resourceModule, IDS_GENERAL_COPY_TO_FOLDER_TITLE, szTemp, SIZEOF_ARRAY(szTemp));
+	LoadString(m_resourceInstance, IDS_GENERAL_COPY_TO_FOLDER_TITLE, szTemp, SIZEOF_ARRAY(szTemp));
 	NFileOperations::CopyFilesToFolder(m_hContainer, szTemp, pidls, move);
 }
 
@@ -362,7 +362,7 @@ void Explorerplusplus::FolderSizeCallback(FolderSizeExtraInfo *pfsei, int nFolde
 
 void Explorerplusplus::OnSelectColumns()
 {
-	SelectColumnsDialog selectColumnsDialog(m_resourceModule, m_hContainer,
+	SelectColumnsDialog selectColumnsDialog(m_resourceInstance, m_hContainer,
 		m_tabContainer->GetSelectedTab().GetShellBrowser(), m_iconResourceLoader.get());
 	selectColumnsDialog.ShowModalDialog();
 }

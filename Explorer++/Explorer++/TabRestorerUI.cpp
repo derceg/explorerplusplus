@@ -12,9 +12,9 @@
 #include "../Helper/ShellHelper.h"
 #include <boost/range/adaptor/sliced.hpp>
 
-TabRestorerUI::TabRestorerUI(HINSTANCE instance, CoreInterface *coreInterface,
+TabRestorerUI::TabRestorerUI(HINSTANCE resourceInstance, CoreInterface *coreInterface,
 	TabRestorer *tabRestorer, int menuStartId, int menuEndId) :
-	m_instance(instance),
+	m_resourceInstance(resourceInstance),
 	m_coreInterface(coreInterface),
 	m_tabRestorer(tabRestorer),
 	m_menuStartId(menuStartId),
@@ -62,7 +62,7 @@ wil::unique_hmenu TabRestorerUI::BuildRecentlyClosedTabsMenu(
 
 	if (m_tabRestorer->GetClosedTabs().empty())
 	{
-		auto noRecentTabsText = ResourceHelper::LoadString(m_instance, IDS_NO_RECENT_TABS);
+		auto noRecentTabsText = ResourceHelper::LoadString(m_resourceInstance, IDS_NO_RECENT_TABS);
 
 		MENUITEMINFO mii;
 		mii.cbSize = sizeof(mii);

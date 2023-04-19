@@ -45,7 +45,7 @@ private:
 class MassRenameDialog : public DarkModeDialogBase
 {
 public:
-	MassRenameDialog(HINSTANCE hInstance, HWND hParent,
+	MassRenameDialog(HINSTANCE resourceInstance, HWND hParent,
 		const std::list<std::wstring> &FullFilenameList, IconResourceLoader *iconResourceLoader,
 		FileActionHandler *pFileActionHandler);
 

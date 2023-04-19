@@ -9,7 +9,7 @@
 class ThirdPartyCreditsDialog : public DarkModeDialogBase
 {
 public:
-	ThirdPartyCreditsDialog(HINSTANCE instance, HWND parent);
+	ThirdPartyCreditsDialog(HINSTANCE resourceInstance, HWND parent);
 
 protected:
 	INT_PTR OnInitDialog() override;

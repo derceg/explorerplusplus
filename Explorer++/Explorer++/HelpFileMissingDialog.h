@@ -9,7 +9,7 @@
 class HelpFileMissingDialog : public DarkModeDialogBase
 {
 public:
-	HelpFileMissingDialog(HINSTANCE hInstance, HWND hParent);
+	HelpFileMissingDialog(HINSTANCE resourceInstance, HWND hParent);
 
 protected:
 	INT_PTR OnInitDialog() override;

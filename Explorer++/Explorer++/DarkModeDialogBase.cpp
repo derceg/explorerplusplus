@@ -11,9 +11,9 @@
 
 using namespace DarkModeButton;
 
-DarkModeDialogBase::DarkModeDialogBase(HINSTANCE hInstance, int iResource, HWND hParent,
+DarkModeDialogBase::DarkModeDialogBase(HINSTANCE resourceInstance, int iResource, HWND hParent,
 	bool bResizable) :
-	BaseDialog(hInstance, iResource, hParent, bResizable)
+	BaseDialog(resourceInstance, iResource, hParent, bResizable)
 {
 }
 

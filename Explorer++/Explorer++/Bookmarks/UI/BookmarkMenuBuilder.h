@@ -62,7 +62,7 @@ public:
 	};
 
 	BookmarkMenuBuilder(CoreInterface *coreInterface, IconFetcher *iconFetcher,
-		HMODULE resourceModule);
+		HINSTANCE resourceInstance);
 
 	BOOL BuildMenu(HWND parentWindow, HMENU menu, BookmarkItem *bookmarkItem,
 		const MenuIdRange &menuIdRange, int startPosition,
@@ -86,7 +86,7 @@ private:
 
 	CoreInterface *m_coreInterface;
 	IconFetcher *m_iconFetcher;
-	HMODULE m_resourceModule;
+	HINSTANCE m_resourceInstance;
 	MenuIdRange m_menuIdRange;
 	int m_idCounter;
 };

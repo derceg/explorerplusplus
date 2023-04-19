@@ -74,7 +74,7 @@ class TabContainer : public ShellDropTargetWindow<int>
 public:
 	static TabContainer *Create(HWND parent, TabNavigationInterface *tabNavigation,
 		CoreInterface *coreInterface, FileActionHandler *fileActionHandler,
-		CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, HINSTANCE instance,
+		CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
 		std::shared_ptr<Config> config);
 
 	void CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
@@ -148,7 +148,7 @@ private:
 
 	TabContainer(HWND parent, TabNavigationInterface *tabNavigation, CoreInterface *coreInterface,
 		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-		HINSTANCE instance, std::shared_ptr<Config> config);
+		HINSTANCE resourceInstance, std::shared_ptr<Config> config);
 	~TabContainer();
 
 	static HWND CreateTabControl(HWND parent, BOOL forceSameTabWidth);
@@ -244,7 +244,7 @@ private:
 	CoreInterface *m_coreInterface;
 	FileActionHandler *m_fileActionHandler;
 
-	HINSTANCE m_instance;
+	HINSTANCE m_resourceInstance;
 	std::shared_ptr<Config> m_config;
 
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;

@@ -44,22 +44,22 @@ const std::map<UINT, Icon> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
 
 TabContainer *TabContainer::Create(HWND parent, TabNavigationInterface *tabNavigation,
 	CoreInterface *coreInterface, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons,
-	BookmarkTree *bookmarkTree, HINSTANCE instance, std::shared_ptr<Config> config)
+	BookmarkTree *bookmarkTree, HINSTANCE resourceInstance, std::shared_ptr<Config> config)
 {
 	return new TabContainer(parent, tabNavigation, coreInterface, fileActionHandler, cachedIcons,
-		bookmarkTree, instance, config);
+		bookmarkTree, resourceInstance, config);
 }
 
 TabContainer::TabContainer(HWND parent, TabNavigationInterface *tabNavigation,
 	CoreInterface *coreInterface, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons,
-	BookmarkTree *bookmarkTree, HINSTANCE instance, std::shared_ptr<Config> config) :
+	BookmarkTree *bookmarkTree, HINSTANCE resourceInstance, std::shared_ptr<Config> config) :
 	ShellDropTargetWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
 	m_tabNavigation(tabNavigation),
 	m_coreInterface(coreInterface),
 	m_fileActionHandler(fileActionHandler),
 	m_cachedIcons(cachedIcons),
 	m_bookmarkTree(bookmarkTree),
-	m_instance(instance),
+	m_resourceInstance(resourceInstance),
 	m_config(config),
 	m_bTabBeenDragged(FALSE),
 	m_iPreviousTabSelectionId(-1),
@@ -425,7 +425,8 @@ void TabContainer::OnTabCtrlRButtonUp(POINT *pt)
 
 void TabContainer::CreateTabContextMenu(Tab &tab, const POINT &pt)
 {
-	auto parentMenu = wil::unique_hmenu(LoadMenu(m_instance, MAKEINTRESOURCE(IDR_TAB_RCLICK)));
+	auto parentMenu =
+		wil::unique_hmenu(LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_TAB_RCLICK)));
 
 	if (!parentMenu)
 	{
@@ -543,8 +544,8 @@ void TabContainer::OnRefreshAllTabs()
 
 void TabContainer::OnRenameTab(const Tab &tab)
 {
-	RenameTabDialog renameTabDialog(m_instance, m_coreInterface->GetMainWindow(), tab.GetId(),
-		this);
+	RenameTabDialog renameTabDialog(m_resourceInstance, m_coreInterface->GetMainWindow(),
+		tab.GetId(), this);
 	renameTabDialog.ShowModalDialog();
 }
 
@@ -653,7 +654,7 @@ LRESULT CALLBACK TabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam
 void TabContainer::ShowBackgroundContextMenu(const POINT &ptClient)
 {
 	wil::unique_hmenu parentMenu(
-		LoadMenu(m_instance, MAKEINTRESOURCE(IDR_TAB_CONTAINER_CONTEXT_MENU)));
+		LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_TAB_CONTAINER_CONTEXT_MENU)));
 
 	if (!parentMenu)
 	{
@@ -692,7 +693,8 @@ void TabContainer::OnBackgroundMenuItemSelected(int menuItemId)
 		break;
 
 	case IDM_TAB_CONTAINER_BOOKMARK_ALL_TABS:
-		BookmarkHelper::BookmarkAllTabs(m_bookmarkTree, m_instance, m_hwnd, m_coreInterface);
+		BookmarkHelper::BookmarkAllTabs(m_bookmarkTree, m_resourceInstance, m_hwnd,
+			m_coreInterface);
 		break;
 
 	default:

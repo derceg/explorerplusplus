@@ -53,15 +53,15 @@ void ApplicationContextMenuController::OnOpen(HWND parentWindow,
 void ApplicationContextMenuController::OnShowProperties(HWND parentWindow, ApplicationModel *model,
 	Application *targetApplication)
 {
-	ApplicationEditorDialog editorDialog(parentWindow, m_coreInterface->GetResourceModule(), model,
-		ApplicationEditorDialog::EditDetails::EditApplication(targetApplication));
+	ApplicationEditorDialog editorDialog(parentWindow, m_coreInterface->GetResourceInstance(),
+		model, ApplicationEditorDialog::EditDetails::EditApplication(targetApplication));
 	editorDialog.ShowModalDialog();
 }
 
 void ApplicationContextMenuController::OnDelete(ApplicationModel *model,
 	const Application *targetApplication, HWND parentWindow)
 {
-	std::wstring message = ResourceHelper::LoadString(m_coreInterface->GetResourceModule(),
+	std::wstring message = ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),
 		IDS_APPLICATIONBUTTON_DELETE);
 	int messageBoxReturn = MessageBox(parentWindow, message.c_str(), NExplorerplusplus::APP_NAME,
 		MB_YESNO | MB_ICONINFORMATION | MB_DEFBUTTON2);
@@ -77,7 +77,8 @@ void ApplicationContextMenuController::OnDelete(ApplicationModel *model,
 void ApplicationContextMenuController::OnNew(HWND parentWindow, ApplicationModel *model,
 	size_t index)
 {
-	ApplicationEditorDialog editorDialog(parentWindow, m_coreInterface->GetResourceModule(), model,
+	ApplicationEditorDialog editorDialog(parentWindow, m_coreInterface->GetResourceInstance(),
+		model,
 		ApplicationEditorDialog::EditDetails::AddNewApplication(
 			std::make_unique<Application>(L"", L""), index));
 	editorDialog.ShowModalDialog();

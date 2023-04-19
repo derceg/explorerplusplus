@@ -25,19 +25,19 @@
 #include <boost/range/adaptor/indexed.hpp>
 #include <utility>
 
-BookmarkListView::BookmarkListView(HWND hListView, HMODULE resourceModule,
+BookmarkListView::BookmarkListView(HWND hListView, HINSTANCE resourceInstance,
 	BookmarkTree *bookmarkTree, CoreInterface *coreInterface, Navigator *navigator,
 	IconFetcher *iconFetcher, const std::vector<Column> &initialColumns) :
 	BookmarkDropTargetWindow(hListView, bookmarkTree),
 	m_hListView(hListView),
-	m_resourceModule(resourceModule),
+	m_resourceInstance(resourceInstance),
 	m_bookmarkTree(bookmarkTree),
 	m_coreInterface(coreInterface),
 	m_navigator(navigator),
 	m_columns(initialColumns),
 	m_sortColumn(BookmarkHelper::ColumnType::Default),
 	m_sortAscending(true),
-	m_bookmarkContextMenu(bookmarkTree, resourceModule, coreInterface, navigator)
+	m_bookmarkContextMenu(bookmarkTree, resourceInstance, coreInterface, navigator)
 {
 	SetWindowTheme(hListView, L"Explorer", nullptr);
 	ListView_SetExtendedListViewStyleEx(hListView,
@@ -113,7 +113,7 @@ void BookmarkListView::InsertColumn(const Column &column, int index)
 std::wstring BookmarkListView::GetColumnText(BookmarkHelper::ColumnType columnType)
 {
 	UINT resourceId = GetColumnTextResourceId(columnType);
-	return ResourceHelper::LoadString(m_resourceModule, resourceId);
+	return ResourceHelper::LoadString(m_resourceInstance, resourceId);
 }
 
 std::vector<BookmarkListView::Column> BookmarkListView::GetColumns()
@@ -588,7 +588,7 @@ void BookmarkListView::OnShowContextMenu(const POINT &ptScreen)
 void BookmarkListView::ShowBackgroundContextMenu(const POINT &ptScreen)
 {
 	wil::unique_hmenu parentMenu(
-		LoadMenu(m_resourceModule, MAKEINTRESOURCE(IDR_BOOKMARK_LISTVIEW_CONTEXT_MENU)));
+		LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_BOOKMARK_LISTVIEW_CONTEXT_MENU)));
 
 	if (!parentMenu)
 	{
@@ -690,7 +690,7 @@ void BookmarkListView::SelectItem(const BookmarkItem *bookmarkItem)
 void BookmarkListView::CreateNewFolder()
 {
 	auto bookmarkItem = std::make_unique<BookmarkItem>(std::nullopt,
-		ResourceHelper::LoadString(m_resourceModule, IDS_BOOKMARKS_NEWBOOKMARKFOLDER),
+		ResourceHelper::LoadString(m_resourceInstance, IDS_BOOKMARKS_NEWBOOKMARKFOLDER),
 		std::nullopt);
 	auto rawBookmarkItem = bookmarkItem.get();
 
