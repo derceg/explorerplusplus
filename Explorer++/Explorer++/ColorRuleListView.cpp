@@ -185,7 +185,7 @@ void ColorRuleListView::InsertColorRule(const ColorRule *colorRule, size_t index
 	lvItem.iItem = static_cast<int>(index);
 	lvItem.iSubItem = 0;
 	[[maybe_unused]] int finalIndex = ListView_InsertItem(m_listView, &lvItem);
-	assert(finalIndex == index);
+	assert(finalIndex == static_cast<int>(index));
 
 	UpdateColumnsForItem(colorRule, index);
 }
@@ -218,7 +218,7 @@ void ColorRuleListView::OnColorRuleMoved(ColorRule *colorRule, size_t oldIndex, 
 	bool selected = false;
 	int selectedIndex = ListView_GetNextItem(m_listView, -1, LVNI_SELECTED);
 
-	if (selectedIndex == oldIndex)
+	if (selectedIndex == static_cast<int>(oldIndex))
 	{
 		selected = true;
 	}
