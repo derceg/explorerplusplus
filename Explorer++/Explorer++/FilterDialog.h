@@ -6,7 +6,7 @@
 
 #include "DarkModeDialogBase.h"
 #include "../Helper/DialogSettings.h"
-#include "../Helper/ResizableDialog.h"
+#include "../Helper/ResizableDialogHelper.h"
 #include <MsXml2.h>
 #include <objbase.h>
 
@@ -52,8 +52,7 @@ protected:
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 
 private:
-	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-		std::list<ResizableDialog::Control> &ControlList) override;
+	std::vector<ResizableDialogControl> GetResizableControls() override;
 	void SaveState() override;
 
 	void OnOk();

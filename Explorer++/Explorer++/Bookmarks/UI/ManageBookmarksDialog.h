@@ -8,7 +8,7 @@
 #include "DarkModeDialogBase.h"
 #include "ResourceHelper.h"
 #include "../Helper/DialogSettings.h"
-#include "../Helper/ResizableDialog.h"
+#include "../Helper/ResizableDialogHelper.h"
 #include <boost/signals2.hpp>
 #include <unordered_set>
 
@@ -73,8 +73,7 @@ private:
 
 	ManageBookmarksDialog &operator=(const ManageBookmarksDialog &mbd);
 
-	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-		std::list<ResizableDialog::Control> &controlList) override;
+	std::vector<ResizableDialogControl> GetResizableControls() override;
 
 	void SetupToolbar();
 	void SetupTreeView();

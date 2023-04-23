@@ -20,7 +20,7 @@ const TCHAR SelectColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SelectCo
 
 SelectColumnsDialog::SelectColumnsDialog(HINSTANCE resourceInstance, HWND hParent,
 	ShellBrowser *shellBrowser, IconResourceLoader *iconResourceLoader) :
-	DarkModeDialogBase(resourceInstance, IDD_SELECTCOLUMNS, hParent, true),
+	DarkModeDialogBase(resourceInstance, IDD_SELECTCOLUMNS, hParent, DialogSizingType::Both),
 	m_shellBrowser(shellBrowser),
 	m_iconResourceLoader(iconResourceLoader),
 	m_bColumnsSwapped(FALSE)
@@ -127,62 +127,24 @@ bool SelectColumnsDialog::CompareColumns(const Column_t &column1, const Column_t
 	}
 }
 
-void SelectColumnsDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-	std::list<ResizableDialog::Control> &ControlList)
+std::vector<ResizableDialogControl> SelectColumnsDialog::GetResizableControls()
 {
-	dsc = BaseDialog::DialogSizeConstraint::None;
-
-	ResizableDialog::Control control;
-
-	control.iID = IDC_COLUMNS_LISTVIEW;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
-
-	control.iID = IDC_COLUMNS_MOVEUP;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_COLUMNS_MOVEDOWN;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_STATIC_DESCRIPTION;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	ControlList.push_back(control);
-
-	control.iID = IDC_COLUMNS_DESCRIPTION;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	ControlList.push_back(control);
-
-	control.iID = IDC_COLUMNS_DESCRIPTION;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_STATIC_ETCHEDHORZ;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	ControlList.push_back(control);
-
-	control.iID = IDC_STATIC_ETCHEDHORZ;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDOK;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
-
-	control.iID = IDCANCEL;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
+	std::vector<ResizableDialogControl> controls;
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_COLUMNS_LISTVIEW), MovingType::None,
+		SizingType::Both);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_COLUMNS_MOVEUP), MovingType::Horizontal,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_COLUMNS_MOVEDOWN), MovingType::Horizontal,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_STATIC_DESCRIPTION), MovingType::Vertical,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_COLUMNS_DESCRIPTION), MovingType::Vertical,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_STATIC_ETCHEDHORZ), MovingType::Vertical,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDOK), MovingType::Both, SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDCANCEL), MovingType::Both, SizingType::None);
+	return controls;
 }
 
 INT_PTR SelectColumnsDialog::OnCommand(WPARAM wParam, LPARAM lParam)

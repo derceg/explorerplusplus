@@ -488,7 +488,7 @@
     <ClCompile Include="ProcessHelper.cpp" />
     <ClCompile Include="ReferenceCount.cpp" />
     <ClCompile Include="RegistrySettings.cpp" />
-    <ClCompile Include="ResizableDialog.cpp" />
+    <ClCompile Include="ResizableDialogHelper.cpp" />
     <ClCompile Include="Rgb.cpp" />
     <ClCompile Include="RichEditHelper.cpp" />
     <ClCompile Include="ServiceProviderBase.cpp" />
@@ -565,7 +565,7 @@
     <ClInclude Include="ProcessHelper.h" />
     <ClInclude Include="ReferenceCount.h" />
     <ClInclude Include="RegistrySettings.h" />
-    <ClInclude Include="ResizableDialog.h" />
+    <ClInclude Include="ResizableDialogHelper.h" />
     <ClInclude Include="Rgb.h" />
     <ClInclude Include="RichEditHelper.h" />
     <ClInclude Include="ServiceProviderBase.h" />

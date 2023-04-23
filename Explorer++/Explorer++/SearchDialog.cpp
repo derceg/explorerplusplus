@@ -61,7 +61,7 @@ const TCHAR SearchDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern
 SearchDialog::SearchDialog(HINSTANCE resourceInstance, HWND hParent,
 	std::wstring_view searchDirectory, CoreInterface *coreInterface, Navigator *navigator,
 	TabContainer *tabContainer) :
-	DarkModeDialogBase(resourceInstance, IDD_SEARCH, hParent, true),
+	DarkModeDialogBase(resourceInstance, IDD_SEARCH, hParent, DialogSizingType::Both),
 	m_searchDirectory(searchDirectory),
 	m_coreInterface(coreInterface),
 	m_navigator(navigator),
@@ -187,77 +187,28 @@ wil::unique_hicon SearchDialog::GetDialogIcon(int iconWidth, int iconHeight) con
 		iconWidth, iconHeight);
 }
 
-void SearchDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-	std::list<ResizableDialog::Control> &ControlList)
+std::vector<ResizableDialogControl> SearchDialog::GetResizableControls()
 {
-	dsc = BaseDialog::DialogSizeConstraint::None;
-
-	ResizableDialog::Control control;
-
-	control.iID = IDC_COMBO_NAME;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_COMBO_DIRECTORY;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_BUTTON_DIRECTORY;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_LISTVIEW_SEARCHRESULTS;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
-
-	control.iID = IDC_STATIC_STATUSLABEL;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	ControlList.push_back(control);
-
-	control.iID = IDC_STATIC_STATUS;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	ControlList.push_back(control);
-
-	control.iID = IDC_STATIC_STATUS;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_LINK_STATUS;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	ControlList.push_back(control);
-
-	control.iID = IDC_LINK_STATUS;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_STATIC_ETCHEDHORZ;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	ControlList.push_back(control);
-
-	control.iID = IDC_STATIC_ETCHEDHORZ;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDSEARCH;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
-
-	control.iID = IDEXIT;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
+	std::vector<ResizableDialogControl> controls;
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_COMBO_NAME), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_COMBO_DIRECTORY), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_BUTTON_DIRECTORY), MovingType::Horizontal,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_LISTVIEW_SEARCHRESULTS), MovingType::None,
+		SizingType::Both);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_STATIC_STATUSLABEL), MovingType::Vertical,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_STATIC_STATUS), MovingType::Vertical,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_LINK_STATUS), MovingType::Vertical,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_STATIC_ETCHEDHORZ), MovingType::Vertical,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDSEARCH), MovingType::Both, SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDEXIT), MovingType::Both, SizingType::None);
+	return controls;
 }
 
 INT_PTR SearchDialog::OnCommand(WPARAM wParam, LPARAM lParam)

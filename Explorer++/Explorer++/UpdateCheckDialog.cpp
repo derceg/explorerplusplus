@@ -23,7 +23,7 @@ const TCHAR UpdateCheckDialog::VERSION_FILE_URL[] =
 	_T("https://explorerplusplus.com/software/version.txt");
 
 UpdateCheckDialog::UpdateCheckDialog(HINSTANCE resourceInstance, HWND hParent) :
-	DarkModeDialogBase(resourceInstance, IDD_UPDATECHECK, hParent, false),
+	DarkModeDialogBase(resourceInstance, IDD_UPDATECHECK, hParent, DialogSizingType::None),
 	m_UpdateCheckComplete(false)
 {
 	m_pucdps = &UpdateCheckDialogPersistentSettings::GetInstance();

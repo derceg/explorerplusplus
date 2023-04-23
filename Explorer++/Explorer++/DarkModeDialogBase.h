@@ -14,7 +14,8 @@
 class DarkModeDialogBase : public BaseDialog
 {
 protected:
-	DarkModeDialogBase(HINSTANCE resourceInstance, int iResource, HWND hParent, bool bResizable);
+	DarkModeDialogBase(HINSTANCE resourceInstance, int iResource, HWND hParent,
+		DialogSizingType dialogSizingType);
 
 	void AllowDarkModeForControls(const std::vector<int> &controlIds);
 	void AllowDarkModeForListView(int controlId);

@@ -19,7 +19,7 @@ const TCHAR FilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");
 const TCHAR FilterDialogPersistentSettings::SETTING_FILTER_LIST[] = _T("Filter");
 
 FilterDialog::FilterDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface) :
-	DarkModeDialogBase(resourceInstance, IDD_FILTER, hParent, true)
+	DarkModeDialogBase(resourceInstance, IDD_FILTER, hParent, DialogSizingType::Horizontal)
 {
 	m_coreInterface = coreInterface;
 
@@ -63,27 +63,16 @@ wil::unique_hicon FilterDialog::GetDialogIcon(int iconWidth, int iconHeight) con
 		iconWidth, iconHeight);
 }
 
-void FilterDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-	std::list<ResizableDialog::Control> &ControlList)
+std::vector<ResizableDialogControl> FilterDialog::GetResizableControls()
 {
-	dsc = BaseDialog::DialogSizeConstraint::X;
-
-	ResizableDialog::Control control;
-
-	control.iID = IDC_FILTER_COMBOBOX;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDOK;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
-
-	control.iID = IDCANCEL;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
+	std::vector<ResizableDialogControl> controls;
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_FILTER_COMBOBOX), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_FILTERS_CASESENSITIVE), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDOK), MovingType::Horizontal, SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDCANCEL), MovingType::Horizontal, SizingType::None);
+	return controls;
 }
 
 INT_PTR FilterDialog::OnCommand(WPARAM wParam, LPARAM lParam)

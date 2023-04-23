@@ -7,7 +7,7 @@
 #include "Macros.h"
 #include "MessageForwarder.h"
 #include "ReferenceCount.h"
-#include "ResizableDialog.h"
+#include "ResizableDialogHelper.h"
 #include <wil/resource.h>
 #include <functional>
 
@@ -20,11 +20,12 @@ class BaseDialog : public MessageForwarder
 	friend INT_PTR CALLBACK BaseDialogProcStub(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 public:
-	enum class DialogSizeConstraint
+	enum class DialogSizingType
 	{
 		None,
-		X,
-		Y
+		Horizontal,
+		Vertical,
+		Both
 	};
 
 	static const int RETURN_CANCEL = 0;
@@ -36,7 +37,8 @@ public:
 	HWND ShowModelessDialog(std::function<void()> dialogDestroyedObserver);
 
 protected:
-	BaseDialog(HINSTANCE resourceInstance, int iResource, HWND hParent, bool bResizable);
+	BaseDialog(HINSTANCE resourceInstance, int iResource, HWND hParent,
+		DialogSizingType dialogSizingType);
 
 	virtual void OnInitDialogBase();
 	virtual int GetGripperControlId() = 0;
@@ -57,8 +59,8 @@ private:
 
 	INT_PTR CALLBACK BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	virtual void GetResizableControlInformation(DialogSizeConstraint &dsc,
-		std::list<ResizableDialog::Control> &controlList);
+	virtual void AddDynamicControls();
+	virtual std::vector<ResizableDialogControl> GetResizableControls();
 	virtual void SaveState();
 
 	const HINSTANCE m_resourceInstance;
@@ -70,8 +72,6 @@ private:
 
 	bool m_showingModelessDialog = false;
 
-	/* Used only with resizable dialogs. */
-	const bool m_bResizable;
-	DialogSizeConstraint m_dsc;
-	std::unique_ptr<ResizableDialog> m_prd;
+	const DialogSizingType m_dialogSizingType;
+	std::unique_ptr<ResizableDialogHelper> m_resizableDialogHelper;
 };

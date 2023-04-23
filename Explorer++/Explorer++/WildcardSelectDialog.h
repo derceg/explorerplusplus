@@ -6,7 +6,7 @@
 
 #include "DarkModeDialogBase.h"
 #include "../Helper/DialogSettings.h"
-#include "../Helper/ResizableDialog.h"
+#include "../Helper/ResizableDialogHelper.h"
 #include <wil/resource.h>
 #include <MsXml2.h>
 #include <objbase.h>
@@ -57,8 +57,7 @@ protected:
 	INT_PTR OnClose() override;
 
 private:
-	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-		std::list<ResizableDialog::Control> &controlList) override;
+	std::vector<ResizableDialogControl> GetResizableControls() override;
 	void SaveState() override;
 
 	void OnOk();

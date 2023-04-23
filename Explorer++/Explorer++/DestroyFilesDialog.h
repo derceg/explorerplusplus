@@ -7,7 +7,7 @@
 #include "DarkModeDialogBase.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/FileOperations.h"
-#include "../Helper/ResizableDialog.h"
+#include "../Helper/ResizableDialogHelper.h"
 #include <wil/resource.h>
 
 class DestroyFilesDialog;
@@ -51,8 +51,7 @@ protected:
 	INT_PTR OnClose() override;
 
 private:
-	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-		std::list<ResizableDialog::Control> &ControlList) override;
+	std::vector<ResizableDialogControl> GetResizableControls() override;
 	void SaveState() override;
 
 	void OnOk();

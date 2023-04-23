@@ -10,7 +10,7 @@
     <ClCompile Include="MessageForwarder.cpp">
       <Filter>Dialog Support</Filter>
     </ClCompile>
-    <ClCompile Include="ResizableDialog.cpp">
+    <ClCompile Include="ResizableDialogHelper.cpp">
       <Filter>Dialog Support</Filter>
     </ClCompile>
     <ClCompile Include="ComboBox.cpp">
@@ -168,7 +168,7 @@
     <ClInclude Include="MessageForwarder.h">
       <Filter>Dialog Support</Filter>
     </ClInclude>
-    <ClInclude Include="ResizableDialog.h">
+    <ClInclude Include="ResizableDialogHelper.h">
       <Filter>Dialog Support</Filter>
     </ClInclude>
     <ClInclude Include="ComboBox.h">

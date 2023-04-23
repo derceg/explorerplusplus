@@ -20,7 +20,7 @@ AddBookmarkDialog::AddBookmarkDialog(HINSTANCE resourceInstance, HWND hParent,
 	CoreInterface *coreInterface, BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
 	BookmarkItem *defaultParentSelection, BookmarkItem **selectedParentFolder,
 	std::optional<std::wstring> customDialogTitle) :
-	DarkModeDialogBase(resourceInstance, IDD_ADD_BOOKMARK, hParent, true),
+	DarkModeDialogBase(resourceInstance, IDD_ADD_BOOKMARK, hParent, DialogSizingType::Both),
 	m_coreInterface(coreInterface),
 	m_bookmarkTree(bookmarkTree),
 	m_bookmarkItem(bookmarkItem),
@@ -187,42 +187,20 @@ wil::unique_hicon AddBookmarkDialog::GetDialogIcon(int iconWidth, int iconHeight
 		iconWidth, iconHeight);
 }
 
-void AddBookmarkDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-	std::list<ResizableDialog::Control> &ControlList)
+std::vector<ResizableDialogControl> AddBookmarkDialog::GetResizableControls()
 {
-	dsc = BaseDialog::DialogSizeConstraint::None;
-
-	ResizableDialog::Control control;
-
-	control.iID = IDC_BOOKMARK_NAME;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_BOOKMARK_LOCATION;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_BOOKMARK_TREEVIEW;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
-
-	control.iID = IDC_BOOKMARK_NEWFOLDER;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	ControlList.push_back(control);
-
-	control.iID = IDOK;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
-
-	control.iID = IDCANCEL;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
+	std::vector<ResizableDialogControl> controls;
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_BOOKMARK_NAME), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_BOOKMARK_LOCATION), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_BOOKMARK_TREEVIEW), MovingType::None,
+		SizingType::Both);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_BOOKMARK_NEWFOLDER), MovingType::Vertical,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDOK), MovingType::Both, SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDCANCEL), MovingType::Both, SizingType::None);
+	return controls;
 }
 
 INT_PTR AddBookmarkDialog::OnCtlColorEditExtra(HWND hwnd, HDC hdc)

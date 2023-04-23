@@ -16,13 +16,13 @@ namespace
 std::unordered_map<HWND, BaseDialog *> g_windowMap;
 }
 
-BaseDialog::BaseDialog(HINSTANCE resourceInstance, int iResource, HWND hParent, bool bResizable) :
+BaseDialog::BaseDialog(HINSTANCE resourceInstance, int iResource, HWND hParent,
+	DialogSizingType dialogSizingType) :
 	m_resourceInstance(resourceInstance),
 	m_iResource(iResource),
 	m_hParent(hParent),
-	m_bResizable(bResizable)
+	m_dialogSizingType(dialogSizingType)
 {
-	m_prd = nullptr;
 }
 
 INT_PTR CALLBACK BaseDialogProcStub(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -67,7 +67,9 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 	{
 		m_hDlg = hDlg;
 
-		if (m_bResizable)
+		AddDynamicControls();
+
+		if (m_dialogSizingType != DialogSizingType::None)
 		{
 			RECT windowRect;
 			GetWindowRect(m_hDlg, &windowRect);
@@ -85,25 +87,15 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 
 			const SIZE gripperSize = CustomGripper::GetDpiScaledSize(m_hDlg);
 
-			CreateWindow(CustomGripper::CLASS_NAME, L"", WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS,
-				clientRect.right - gripperSize.cx, clientRect.bottom - gripperSize.cy,
-				gripperSize.cx, gripperSize.cy, m_hDlg,
+			HWND gripper = CreateWindow(CustomGripper::CLASS_NAME, L"",
+				WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS, clientRect.right - gripperSize.cx,
+				clientRect.bottom - gripperSize.cy, gripperSize.cx, gripperSize.cy, m_hDlg,
 				reinterpret_cast<HMENU>(static_cast<INT_PTR>(GetGripperControlId())),
 				GetModuleHandle(nullptr), nullptr);
 
-			m_dsc = DialogSizeConstraint::None;
-
-			std::list<ResizableDialog::Control> controlList;
-
-			ResizableDialog::Control control;
-			control.iID = GetGripperControlId();
-			control.Type = ResizableDialog::ControlType::Move;
-			control.Constraint = ResizableDialog::ControlConstraint::None;
-			controlList.push_back(control);
-
-			GetResizableControlInformation(m_dsc, controlList);
-
-			m_prd = std::make_unique<ResizableDialog>(m_hDlg, controlList);
+			std::vector<ResizableDialogControl> controls = GetResizableControls();
+			controls.emplace_back(gripper, MovingType::Both, SizingType::None);
+			m_resizableDialogHelper = std::make_unique<ResizableDialogHelper>(m_hDlg, controls);
 		}
 
 		auto &dpiCompat = DpiCompatibility::GetInstance();
@@ -124,19 +116,19 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 	break;
 
 	case WM_GETMINMAXINFO:
-		if (m_bResizable)
+		if (m_dialogSizingType != DialogSizingType::None)
 		{
 			auto pmmi = reinterpret_cast<LPMINMAXINFO>(lParam);
 
 			pmmi->ptMinTrackSize.x = m_iMinWidth;
 			pmmi->ptMinTrackSize.y = m_iMinHeight;
 
-			if (m_dsc == DialogSizeConstraint::X)
+			if (m_dialogSizingType == DialogSizingType::Horizontal)
 			{
 				pmmi->ptMaxTrackSize.y = m_iMinHeight;
 			}
 
-			if (m_dsc == DialogSizeConstraint::Y)
+			if (m_dialogSizingType == DialogSizingType::Vertical)
 			{
 				pmmi->ptMaxTrackSize.x = m_iMinWidth;
 			}
@@ -146,9 +138,9 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 		break;
 
 	case WM_SIZE:
-		if (m_bResizable)
+		if (m_dialogSizingType != DialogSizingType::None)
 		{
-			m_prd->UpdateControls(LOWORD(lParam), HIWORD(lParam));
+			m_resizableDialogHelper->UpdateControls(LOWORD(lParam), HIWORD(lParam));
 			return 0;
 		}
 		break;
@@ -172,6 +164,10 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 	}
 
 	return ForwardMessage(hDlg, uMsg, wParam, lParam);
+}
+
+void BaseDialog::AddDynamicControls()
+{
 }
 
 wil::unique_hicon BaseDialog::GetDialogIcon(int iconWidth, int iconHeight) const
@@ -236,11 +232,9 @@ HWND BaseDialog::ShowModelessDialog(std::function<void()> dialogDestroyedObserve
 	return dialog;
 }
 
-void BaseDialog::GetResizableControlInformation(DialogSizeConstraint &dsc,
-	std::list<ResizableDialog::Control> &controlList)
+std::vector<ResizableDialogControl> BaseDialog::GetResizableControls()
 {
-	UNREFERENCED_PARAMETER(dsc);
-	UNREFERENCED_PARAMETER(controlList);
+	return {};
 }
 
 void BaseDialog::SaveState()

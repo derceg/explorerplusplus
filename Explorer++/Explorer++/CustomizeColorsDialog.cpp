@@ -26,7 +26,7 @@ CustomizeColorsDialog::~CustomizeColorsDialog() = default;
 
 CustomizeColorsDialog::CustomizeColorsDialog(HINSTANCE resourceInstance, HWND parent,
 	CoreInterface *coreInterface, ColorRuleModel *model) :
-	DarkModeDialogBase(resourceInstance, IDD_CUSTOMIZE_COLORS, parent, true),
+	DarkModeDialogBase(resourceInstance, IDD_CUSTOMIZE_COLORS, parent, DialogSizingType::Both),
 	m_coreInterface(coreInterface),
 	m_model(model)
 {
@@ -64,52 +64,25 @@ wil::unique_hicon CustomizeColorsDialog::GetDialogIcon(int iconWidth, int iconHe
 		iconWidth, iconHeight);
 }
 
-void CustomizeColorsDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-	std::list<ResizableDialog::Control> &ControlList)
+std::vector<ResizableDialogControl> CustomizeColorsDialog::GetResizableControls()
 {
-	dsc = BaseDialog::DialogSizeConstraint::None;
-
-	ResizableDialog::Control control;
-
-	control.iID = IDC_LISTVIEW_COLOR_RULES;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
-
-	control.iID = IDC_BUTTON_NEW;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_BUTTON_EDIT;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_BUTTON_MOVE_UP;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_BUTTON_MOVE_DOWN;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_BUTTON_DELETE;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_BUTTON_DELETE_ALL;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDOK;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
+	std::vector<ResizableDialogControl> controls;
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_LISTVIEW_COLOR_RULES), MovingType::None,
+		SizingType::Both);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_BUTTON_NEW), MovingType::Horizontal,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_BUTTON_EDIT), MovingType::Horizontal,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_BUTTON_MOVE_UP), MovingType::Horizontal,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_BUTTON_MOVE_DOWN), MovingType::Horizontal,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_BUTTON_DELETE), MovingType::Horizontal,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_BUTTON_DELETE_ALL), MovingType::Horizontal,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDOK), MovingType::Both, SizingType::None);
+	return controls;
 }
 
 INT_PTR CustomizeColorsDialog::OnCommand(WPARAM wParam, LPARAM lParam)

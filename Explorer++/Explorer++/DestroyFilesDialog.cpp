@@ -19,7 +19,7 @@ const TCHAR DestroyFilesDialogPersistentSettings::SETTING_OVERWRITE_METHOD[] =
 
 DestroyFilesDialog::DestroyFilesDialog(HINSTANCE resourceInstance, HWND hParent,
 	const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates) :
-	DarkModeDialogBase(resourceInstance, IDD_DESTROYFILES, hParent, true)
+	DarkModeDialogBase(resourceInstance, IDD_DESTROYFILES, hParent, DialogSizingType::Both)
 {
 	m_FullFilenameList = FullFilenameList;
 	m_bShowFriendlyDates = bShowFriendlyDates;
@@ -131,57 +131,22 @@ INT_PTR DestroyFilesDialog::OnInitDialog()
 	return 0;
 }
 
-void DestroyFilesDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-	std::list<ResizableDialog::Control> &ControlList)
+std::vector<ResizableDialogControl> DestroyFilesDialog::GetResizableControls()
 {
-	dsc = BaseDialog::DialogSizeConstraint::None;
-
-	ResizableDialog::Control control;
-
-	control.iID = IDC_DESTROYFILES_LISTVIEW;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
-
-	control.iID = IDC_GROUP_WIPE_METHOD;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_GROUP_WIPE_METHOD;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	ControlList.push_back(control);
-
-	control.iID = IDC_DESTROYFILES_RADIO_ONEPASS;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	ControlList.push_back(control);
-
-	control.iID = IDC_DESTROYFILES_RADIO_THREEPASS;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	ControlList.push_back(control);
-
-	control.iID = IDC_DESTROYFILES_STATIC_WARNING_MESSAGE;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	ControlList.push_back(control);
-
-	control.iID = IDC_DESTROYFILES_STATIC_WARNING_MESSAGE;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDOK;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
-
-	control.iID = IDCANCEL;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
+	std::vector<ResizableDialogControl> controls;
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_DESTROYFILES_LISTVIEW), MovingType::None,
+		SizingType::Both);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_GROUP_WIPE_METHOD), MovingType::Vertical,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_DESTROYFILES_RADIO_ONEPASS), MovingType::Vertical,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_DESTROYFILES_RADIO_THREEPASS),
+		MovingType::Vertical, SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_DESTROYFILES_STATIC_WARNING_MESSAGE),
+		MovingType::Vertical, SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDOK), MovingType::Both, SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDCANCEL), MovingType::Both, SizingType::None);
+	return controls;
 }
 
 INT_PTR DestroyFilesDialog::OnCtlColorStaticExtra(HWND hwnd, HDC hdc)

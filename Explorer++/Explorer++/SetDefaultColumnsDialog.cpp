@@ -21,7 +21,7 @@ const TCHAR SetDefaultColumnsDialogPersistentSettings::SETTING_FOLDER_TYPE[] = _
 
 SetDefaultColumnsDialog::SetDefaultColumnsDialog(HINSTANCE resourceInstance, HWND hParent,
 	FolderColumns &folderColumns) :
-	DarkModeDialogBase(resourceInstance, IDD_SETDEFAULTCOLUMNS, hParent, true),
+	DarkModeDialogBase(resourceInstance, IDD_SETDEFAULTCOLUMNS, hParent, DialogSizingType::Both),
 	m_folderColumns(folderColumns)
 {
 	m_psdcdps = &SetDefaultColumnsDialogPersistentSettings::GetInstance();
@@ -114,62 +114,26 @@ INT_PTR SetDefaultColumnsDialog::OnInitDialog()
 	return 0;
 }
 
-void SetDefaultColumnsDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-	std::list<ResizableDialog::Control> &ControlList)
+std::vector<ResizableDialogControl> SetDefaultColumnsDialog::GetResizableControls()
 {
-	dsc = BaseDialog::DialogSizeConstraint::None;
-
-	ResizableDialog::Control control;
-
-	control.iID = IDC_COLUMNS_LISTVIEW;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
-
-	control.iID = IDC_COLUMNS_MOVEUP;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_COLUMNS_MOVEDOWN;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_STATIC_DESCRIPTION;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	ControlList.push_back(control);
-
-	control.iID = IDC_DEFAULTCOLUMNS_DESCRIPTION;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	ControlList.push_back(control);
-
-	control.iID = IDC_DEFAULTCOLUMNS_DESCRIPTION;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_STATIC_ETCHEDHORZ;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	ControlList.push_back(control);
-
-	control.iID = IDC_STATIC_ETCHEDHORZ;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDOK;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
-
-	control.iID = IDCANCEL;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
+	std::vector<ResizableDialogControl> controls;
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_STATIC_DEFAULT_COLUMNS_DESCRIPTION),
+		MovingType::None, SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_COLUMNS_LISTVIEW), MovingType::None,
+		SizingType::Both);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_COLUMNS_MOVEUP), MovingType::Horizontal,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_COLUMNS_MOVEDOWN), MovingType::Horizontal,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_STATIC_DESCRIPTION), MovingType::Vertical,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_DEFAULTCOLUMNS_DESCRIPTION), MovingType::Vertical,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_STATIC_ETCHEDHORZ), MovingType::Vertical,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDOK), MovingType::Both, SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDCANCEL), MovingType::Both, SizingType::None);
+	return controls;
 }
 
 INT_PTR SetDefaultColumnsDialog::OnCommand(WPARAM wParam, LPARAM lParam)

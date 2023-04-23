@@ -13,7 +13,7 @@ const TCHAR SetFileAttributesDialogPersistentSettings::SETTINGS_KEY[] = _T("SetF
 
 SetFileAttributesDialog::SetFileAttributesDialog(HINSTANCE resourceInstance, HWND hParent,
 	const std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo> &sfaiList) :
-	DarkModeDialogBase(resourceInstance, IDD_SETFILEATTRIBUTES, hParent, false)
+	DarkModeDialogBase(resourceInstance, IDD_SETFILEATTRIBUTES, hParent, DialogSizingType::None)
 {
 	assert(!sfaiList.empty());
 

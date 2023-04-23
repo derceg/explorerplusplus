@@ -86,7 +86,7 @@ TCHAR g_szNewTabDirectory[MAX_PATH];
 
 OptionsDialog::OptionsDialog(HINSTANCE resourceInstance, HWND parent,
 	std::shared_ptr<Config> config, CoreInterface *coreInterface, TabContainer *tabContainer) :
-	DarkModeDialogBase(resourceInstance, IDD_OPTIONS, parent, false),
+	DarkModeDialogBase(resourceInstance, IDD_OPTIONS, parent, DialogSizingType::Both),
 	m_config(config),
 	m_resourceInstance(resourceInstance),
 	m_coreInterface(coreInterface),
@@ -101,7 +101,6 @@ INT_PTR OptionsDialog::OnInitDialog()
 	AllowDarkModeForTreeView(IDC_SETTINGS_PAGES_TREE);
 	AllowDarkModeForControls({ IDAPPLY });
 
-	AddSettingsPages();
 	SelectPage(m_lastSelectedPageIndex);
 
 	// Focus the treeview by default.
@@ -115,10 +114,32 @@ INT_PTR OptionsDialog::OnInitDialog()
 	return FALSE;
 }
 
+void OptionsDialog::AddDynamicControls()
+{
+	AddSettingsPages();
+}
+
 wil::unique_hicon OptionsDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
 	return m_coreInterface->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::Options,
 		iconWidth, iconHeight);
+}
+
+std::vector<ResizableDialogControl> OptionsDialog::GetResizableControls()
+{
+	std::vector<ResizableDialogControl> controls;
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_SETTINGS_PAGES_TREE), MovingType::None,
+		SizingType::Vertical);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDOK), MovingType::Both, SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDCANCEL), MovingType::Both, SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDAPPLY), MovingType::Both, SizingType::None);
+
+	for (HWND dialogPage : m_dialogMap | std::views::values)
+	{
+		controls.emplace_back(dialogPage, MovingType::None, SizingType::Both);
+	}
+
+	return controls;
 }
 
 void OptionsDialog::AddSettingsPages()
@@ -301,6 +322,8 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 	{
 	case WM_INITDIALOG:
 	{
+		InitializeResizeDialogHelperGeneral(hDlg);
+
 		HWND hButton;
 		HWND hEdit;
 		int nIDButton;
@@ -426,6 +449,10 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 	}
 	break;
 
+	case WM_SIZE:
+		m_resizableDialogHelperGeneral->UpdateControls(LOWORD(lParam), HIWORD(lParam));
+		return 0;
+
 	case WM_APP_SAVE_SETTINGS:
 	{
 		HWND hEdit;
@@ -492,6 +519,42 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 	return 0;
 }
 
+void OptionsDialog::InitializeResizeDialogHelperGeneral(HWND dialog)
+{
+	std::vector<ResizableDialogControl> controls;
+	controls.emplace_back(GetDlgItem(dialog, IDC_GROUP_STARTUP), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_STARTUP_PREVIOUSTABS), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_STARTUP_DEFAULTFOLDER), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_GROUP_DEFAULT_FILE_MANAGER), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTION_REPLACEEXPLORER_NONE), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTION_REPLACEEXPLORER_FILESYSTEM),
+		MovingType::None, SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTION_REPLACEEXPLORER_ALL), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_GROUP_GENERAL_SETTINGS), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTION_XML), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_STATIC_NEW_TAB_FOLDER), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_DEFAULT_NEWTABDIR_EDIT), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_DEFAULT_NEWTABDIR_BUTTON), MovingType::Horizontal,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTIONS_LANGUAGE), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_STATIC_RESTART_FOOTNOTE), MovingType::Horizontal,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(dialog, IDC_STATIC_RESTART_NOTICE), MovingType::None,
+		SizingType::Horizontal);
+	m_resizableDialogHelperGeneral = std::make_unique<ResizableDialogHelper>(dialog, controls);
+}
+
 INT_PTR CALLBACK OptionsDialog::AppearanceProcStub(HWND hDlg, UINT uMsg, WPARAM wParam,
 	LPARAM lParam)
 {
@@ -513,6 +576,8 @@ INT_PTR CALLBACK OptionsDialog::AppearanceProc(HWND hDlg, UINT uMsg, WPARAM wPar
 	{
 	case WM_INITDIALOG:
 	{
+		InitializeResizeDialogHelperAppearance(hDlg);
+
 		// Adding a tooltip to a static control works, provided that the SS_NOTIFY style is set.
 		// However, the tooltip won't show up if the control is disabled.
 		// Adding the tooltip based on the control rectangle, while leaving out the SS_NOTIFY style,
@@ -571,6 +636,10 @@ INT_PTR CALLBACK OptionsDialog::AppearanceProc(HWND hDlg, UINT uMsg, WPARAM wPar
 		}
 		break;
 
+	case WM_SIZE:
+		m_resizableDialogHelperAppearance->UpdateControls(LOWORD(lParam), HIWORD(lParam));
+		return 0;
+
 	case WM_APP_SAVE_SETTINGS:
 	{
 		int selectedIndex =
@@ -589,6 +658,22 @@ INT_PTR CALLBACK OptionsDialog::AppearanceProc(HWND hDlg, UINT uMsg, WPARAM wPar
 	}
 
 	return 0;
+}
+
+void OptionsDialog::InitializeResizeDialogHelperAppearance(HWND dialog)
+{
+	std::vector<ResizableDialogControl> controls;
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTIONS_ICON_SET), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_STATIC_RESTART_FOOTNOTE_1), MovingType::Horizontal,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTIONS_THEME), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_STATIC_RESTART_FOOTNOTE_2), MovingType::Horizontal,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(dialog, IDC_STATIC_RESTART_NOTICE), MovingType::None,
+		SizingType::Horizontal);
+	m_resizableDialogHelperAppearance = std::make_unique<ResizableDialogHelper>(dialog, controls);
 }
 
 void OptionsDialog::OnReplaceExplorerSettingChanged(HWND dialog,
@@ -714,6 +799,8 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 	{
 	case WM_INITDIALOG:
 	{
+		InitializeResizeDialogHelperFilesFolders(hDlg);
+
 		if (m_config->globalFolderSettings.hideSystemFiles)
 		{
 			CheckDlgButton(hDlg, IDC_SETTINGS_CHECK_SYSTEMFILES, BST_CHECKED);
@@ -924,6 +1011,10 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 	}
 	break;
 
+	case WM_SIZE:
+		m_resizableDialogHelperFilesFolders->UpdateControls(LOWORD(lParam), HIWORD(lParam));
+		return 0;
+
 	case WM_APP_SAVE_SETTINGS:
 	{
 		HWND hCBSize;
@@ -1005,6 +1096,42 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wP
 	return 0;
 }
 
+void OptionsDialog::InitializeResizeDialogHelperFilesFolders(HWND dialog)
+{
+	std::vector<ResizableDialogControl> controls;
+	controls.emplace_back(GetDlgItem(dialog, IDC_SETTINGS_CHECK_SYSTEMFILES), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_SETTINGS_CHECK_EXTENSIONS), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_SETTINGS_CHECK_LINK), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_SETTINGS_CHECK_INSERTSORTED), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_SETTINGS_CHECK_SINGLECLICK), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION),
+		MovingType::None, SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_SETTINGS_CHECK_FOLDERSIZES), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE),
+		MovingType::None, SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_SETTINGS_CHECK_ZIPFILES), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_SETTINGS_CHECK_FRIENDLYDATES), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTIONS_CHECK_SHOWINFOTIPS), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTIONS_RADIO_SYSTEMINFOTIPS), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTIONS_RADIO_CUSTOMINFOTIPS), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_DISPLAY_MIXED_FILES_AND_FOLDERS), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_USE_NATURAL_SORT_ORDER), MovingType::None,
+		SizingType::Horizontal);
+	m_resizableDialogHelperFilesFolders = std::make_unique<ResizableDialogHelper>(dialog, controls);
+}
+
 INT_PTR CALLBACK OptionsDialog::WindowProcStub(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	static OptionsDialog *optionsDialog;
@@ -1025,6 +1152,8 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 	{
 	case WM_INITDIALOG:
 	{
+		InitializeResizeDialogHelperWindow(hDlg);
+
 		if (m_config->allowMultipleInstances)
 		{
 			CheckDlgButton(hDlg, IDC_OPTION_MULTIPLEINSTANCES, BST_CHECKED);
@@ -1173,6 +1302,10 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 	}
 	break;
 
+	case WM_SIZE:
+		m_resizableDialogHelperWindow->UpdateControls(LOWORD(lParam), HIWORD(lParam));
+		return 0;
+
 	case WM_APP_SAVE_SETTINGS:
 	{
 		BOOL bCheckBoxSelection;
@@ -1262,6 +1395,50 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 	return 0;
 }
 
+void OptionsDialog::InitializeResizeDialogHelperWindow(HWND dialog)
+{
+	std::vector<ResizableDialogControl> controls;
+	controls.emplace_back(GetDlgItem(dialog, IDC_GROUP_GENERAL), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTION_MULTIPLEINSTANCES), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTION_LARGETOOLBARICONS), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTION_ALWAYSSHOWTABBAR), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTION_SHOWTABBARATBOTTOM), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTION_EXTENDTABCONTROL), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_SETTINGS_CHECK_TITLEPATH), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTION_USERNAMEINTITLEBAR), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTION_PRIVILEGELEVELINTITLEBAR), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_GROUP_MAIN_PANE), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTION_GRIDLINES), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTION_CHECKBOXSELECTION), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTION_FULLROWSELECT), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_GROUP_NAVIGATION_PANE), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTION_SYNCTREEVIEW), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTION_TREEVIEWSELECTIONEXPAND), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTION_TREEVIEWDELAY), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_GROUP_DISPLAY_WINDOW), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_OPTION_FILEPREVIEWS), MovingType::None,
+		SizingType::Horizontal);
+	m_resizableDialogHelperWindow = std::make_unique<ResizableDialogHelper>(dialog, controls);
+}
+
 INT_PTR CALLBACK OptionsDialog::TabSettingsProcStub(HWND hDlg, UINT uMsg, WPARAM wParam,
 	LPARAM lParam)
 {
@@ -1283,6 +1460,8 @@ INT_PTR CALLBACK OptionsDialog::TabSettingsProc(HWND hDlg, UINT uMsg, WPARAM wPa
 	{
 	case WM_INITDIALOG:
 	{
+		InitializeResizeDialogHelperTabs(hDlg);
+
 		if (m_config->showTaskbarThumbnails)
 		{
 			CheckDlgButton(hDlg, IDC_TABS_TASKBARTHUMBNAILS, BST_CHECKED);
@@ -1370,6 +1549,10 @@ INT_PTR CALLBACK OptionsDialog::TabSettingsProc(HWND hDlg, UINT uMsg, WPARAM wPa
 	}
 	break;
 
+	case WM_SIZE:
+		m_resizableDialogHelperTabs->UpdateControls(LOWORD(lParam), HIWORD(lParam));
+		return 0;
+
 	case WM_APP_SAVE_SETTINGS:
 	{
 		m_config->showTaskbarThumbnails =
@@ -1399,6 +1582,26 @@ INT_PTR CALLBACK OptionsDialog::TabSettingsProc(HWND hDlg, UINT uMsg, WPARAM wPa
 	return 0;
 }
 
+void OptionsDialog::InitializeResizeDialogHelperTabs(HWND dialog)
+{
+	std::vector<ResizableDialogControl> controls;
+	controls.emplace_back(GetDlgItem(dialog, IDC_TABS_TASKBARTHUMBNAILS), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_TABS_SAMEWIDTH), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_TABS_CLOSECONFIRMATION), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_TABS_OPENNEXTTOCURRENT), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_SETTINGS_CHECK_ALWAYSNEWTAB), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_TABS_DOUBLECLICKCLOSE), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_TABS_CLOSEMAINWINDOW), MovingType::None,
+		SizingType::Horizontal);
+	m_resizableDialogHelperTabs = std::make_unique<ResizableDialogHelper>(dialog, controls);
+}
+
 INT_PTR CALLBACK OptionsDialog::DefaultSettingsProcStub(HWND hDlg, UINT uMsg, WPARAM wParam,
 	LPARAM lParam)
 {
@@ -1421,6 +1624,8 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 	{
 	case WM_INITDIALOG:
 	{
+		InitializeResizeDialogHelperDefaultSettings(hDlg);
+
 		if (m_config->defaultFolderSettings.showHidden)
 		{
 			CheckDlgButton(hDlg, IDC_SHOWHIDDENGLOBAL, BST_CHECKED);
@@ -1515,6 +1720,10 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 	}
 	break;
 
+	case WM_SIZE:
+		m_resizableDialogHelperDefaultSettings->UpdateControls(LOWORD(lParam), HIWORD(lParam));
+		return 0;
+
 	case WM_APP_SAVE_SETTINGS:
 	{
 		m_config->defaultFolderSettings.showHidden =
@@ -1540,6 +1749,23 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 	return 0;
 }
 
+void OptionsDialog::InitializeResizeDialogHelperDefaultSettings(HWND dialog)
+{
+	std::vector<ResizableDialogControl> controls;
+	controls.emplace_back(GetDlgItem(dialog, IDC_STATIC_DEFAULT_SETTINGS_NOTICE), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_SHOWHIDDENGLOBAL), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_AUTOARRANGEGLOBAL), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_SHOWINGROUPSGLOBAL), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_SORTASCENDINGGLOBAL), MovingType::None,
+		SizingType::Horizontal);
+	m_resizableDialogHelperDefaultSettings =
+		std::make_unique<ResizableDialogHelper>(dialog, controls);
+}
+
 INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProcStub(HWND hDlg, UINT uMsg, WPARAM wParam,
 	LPARAM lParam)
 {
@@ -1562,6 +1788,8 @@ INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(HWND hDlg, UINT uMsg, WPARA
 	{
 	case WM_INITDIALOG:
 	{
+		InitializeResizeDialogHelperAdvanced(hDlg);
+
 		HWND listView = GetDlgItem(hDlg, IDC_ADVANCED_OPTIONS);
 
 		ListView_SetExtendedListViewStyle(listView,
@@ -1621,9 +1849,7 @@ INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(HWND hDlg, UINT uMsg, WPARA
 
 		std::sort(m_advancedOptions.begin(), m_advancedOptions.end(),
 			[](const AdvancedOption &option1, const AdvancedOption &option2)
-			{
-				return option1.name < option2.name;
-			});
+			{ return option1.name < option2.name; });
 
 		InsertAdvancedOptionsIntoListView(hDlg);
 	}
@@ -1734,6 +1960,10 @@ INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(HWND hDlg, UINT uMsg, WPARA
 		}
 		break;
 
+	case WM_SIZE:
+		m_resizableDialogHelperAdvanced->UpdateControls(LOWORD(lParam), HIWORD(lParam));
+		return 0;
+
 	case WM_APP_SAVE_SETTINGS:
 	{
 		HWND listView = GetDlgItem(hDlg, IDC_ADVANCED_OPTIONS);
@@ -1767,6 +1997,18 @@ INT_PTR CALLBACK OptionsDialog::AdvancedSettingsProc(HWND hDlg, UINT uMsg, WPARA
 	}
 
 	return 0;
+}
+
+void OptionsDialog::InitializeResizeDialogHelperAdvanced(HWND dialog)
+{
+	std::vector<ResizableDialogControl> controls;
+	controls.emplace_back(GetDlgItem(dialog, IDC_ADVANCED_OPTIONS), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_STATIC_ADVANCED_OPTION_DESCRIPTION),
+		MovingType::None, SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(dialog, IDC_ADVANCED_OPTION_DESCRIPTION), MovingType::None,
+		SizingType::Horizontal);
+	m_resizableDialogHelperAdvanced = std::make_unique<ResizableDialogHelper>(dialog, controls);
 }
 
 LRESULT CALLBACK OptionsDialog::AdvancedOptionsListViewWndProc(HWND hwnd, UINT msg, WPARAM wParam,

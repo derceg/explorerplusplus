@@ -6,7 +6,7 @@
 
 #include "DarkModeDialogBase.h"
 #include "../Helper/DialogSettings.h"
-#include "../Helper/ResizableDialog.h"
+#include "../Helper/ResizableDialogHelper.h"
 
 struct Column_t;
 class IconResourceLoader;
@@ -46,8 +46,7 @@ protected:
 private:
 	bool CompareColumns(const Column_t &column1, const Column_t &column2);
 
-	void GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-		std::list<ResizableDialog::Control> &ControlList) override;
+	std::vector<ResizableDialogControl> GetResizableControls() override;
 	void SaveState() override;
 
 	void OnOk();

@@ -36,7 +36,7 @@ const TCHAR MassRenameDialogPersistentSettings::SETTING_COLUMN_WIDTH_2[] = _T("C
 MassRenameDialog::MassRenameDialog(HINSTANCE resourceInstance, HWND hParent,
 	const std::list<std::wstring> &FullFilenameList, IconResourceLoader *iconResourceLoader,
 	FileActionHandler *pFileActionHandler) :
-	DarkModeDialogBase(resourceInstance, IDD_MASSRENAME, hParent, true),
+	DarkModeDialogBase(resourceInstance, IDD_MASSRENAME, hParent, DialogSizingType::Both),
 	m_FullFilenameList(FullFilenameList),
 	m_iconResourceLoader(iconResourceLoader),
 	m_pFileActionHandler(pFileActionHandler)
@@ -125,37 +125,18 @@ wil::unique_hicon MassRenameDialog::GetDialogIcon(int iconWidth, int iconHeight)
 	return m_iconResourceLoader->LoadIconFromPNGAndScale(Icon::MassRename, iconWidth, iconHeight);
 }
 
-void MassRenameDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-	std::list<ResizableDialog::Control> &ControlList)
+std::vector<ResizableDialogControl> MassRenameDialog::GetResizableControls()
 {
-	dsc = BaseDialog::DialogSizeConstraint::None;
-
-	ResizableDialog::Control control;
-
-	control.iID = IDC_MASSRENAME_EDIT;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_MASSRENAME_MORE;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_MASSRENAME_FILELISTVIEW;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
-
-	control.iID = IDOK;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
-
-	control.iID = IDCANCEL;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
+	std::vector<ResizableDialogControl> controls;
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_MASSRENAME_EDIT), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_MASSRENAME_MORE), MovingType::Horizontal,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_MASSRENAME_FILELISTVIEW), MovingType::None,
+		SizingType::Both);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDOK), MovingType::Both, SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDCANCEL), MovingType::Both, SizingType::None);
+	return controls;
 }
 
 INT_PTR MassRenameDialog::OnCommand(WPARAM wParam, LPARAM lParam)

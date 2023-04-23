@@ -36,7 +36,7 @@ bool CompareFilenames(const std::wstring &strFirst, const std::wstring &strSecon
 MergeFilesDialog::MergeFilesDialog(HINSTANCE resourceInstance, HWND hParent,
 	CoreInterface *coreInterface, const std::wstring &strOutputDirectory,
 	const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates) :
-	DarkModeDialogBase(resourceInstance, IDD_MERGEFILES, hParent, true),
+	DarkModeDialogBase(resourceInstance, IDD_MERGEFILES, hParent, DialogSizingType::Both),
 	m_coreInterface(coreInterface),
 	m_strOutputDirectory(strOutputDirectory),
 	m_FullFilenameList(FullFilenameList),
@@ -200,77 +200,28 @@ wil::unique_hicon MergeFilesDialog::GetDialogIcon(int iconWidth, int iconHeight)
 		iconWidth, iconHeight);
 }
 
-void MergeFilesDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-	std::list<ResizableDialog::Control> &ControlList)
+std::vector<ResizableDialogControl> MergeFilesDialog::GetResizableControls()
 {
-	dsc = BaseDialog::DialogSizeConstraint::None;
-
-	ResizableDialog::Control control;
-
-	control.iID = IDC_MERGE_LISTVIEW;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
-
-	control.iID = IDC_MERGE_BUTTON_MOVEUP;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_MERGE_BUTTON_MOVEDOWN;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_MERGE_STATIC_OUTPUT;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	ControlList.push_back(control);
-
-	control.iID = IDC_MERGE_EDIT_FILENAME;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	ControlList.push_back(control);
-
-	control.iID = IDC_MERGE_EDIT_FILENAME;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_MERGE_BUTTON_OUTPUT;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
-
-	control.iID = IDC_MERGE_PROGRESS;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	ControlList.push_back(control);
-
-	control.iID = IDC_MERGE_PROGRESS;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_MERGE_STATIC_ETCHED;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	ControlList.push_back(control);
-
-	control.iID = IDC_MERGE_STATIC_ETCHED;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDOK;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
-
-	control.iID = IDCANCEL;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
+	std::vector<ResizableDialogControl> controls;
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_MERGE_LISTVIEW), MovingType::None,
+		SizingType::Both);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_MERGE_BUTTON_MOVEUP), MovingType::Horizontal,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_MERGE_BUTTON_MOVEDOWN), MovingType::Horizontal,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_MERGE_STATIC_OUTPUT), MovingType::Vertical,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_MERGE_EDIT_FILENAME), MovingType::Vertical,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_MERGE_BUTTON_OUTPUT), MovingType::Both,
+		SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_MERGE_PROGRESS), MovingType::Vertical,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_MERGE_STATIC_ETCHED), MovingType::Vertical,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDOK), MovingType::Both, SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDCANCEL), MovingType::Both, SizingType::None);
+	return controls;
 }
 
 INT_PTR MergeFilesDialog::OnCommand(WPARAM wParam, LPARAM lParam)

@@ -26,7 +26,7 @@ const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("Manage
 ManageBookmarksDialog::ManageBookmarksDialog(HINSTANCE resourceInstance, HWND hParent,
 	CoreInterface *coreInterface, Navigator *navigator, IconFetcher *iconFetcher,
 	BookmarkTree *bookmarkTree) :
-	DarkModeDialogBase(resourceInstance, IDD_MANAGE_BOOKMARKS, hParent, true),
+	DarkModeDialogBase(resourceInstance, IDD_MANAGE_BOOKMARKS, hParent, DialogSizingType::Both),
 	m_coreInterface(coreInterface),
 	m_navigator(navigator),
 	m_iconFetcher(iconFetcher),
@@ -63,27 +63,15 @@ INT_PTR ManageBookmarksDialog::OnInitDialog()
 	return 0;
 }
 
-void ManageBookmarksDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-	std::list<ResizableDialog::Control> &controlList)
+std::vector<ResizableDialogControl> ManageBookmarksDialog::GetResizableControls()
 {
-	dsc = BaseDialog::DialogSizeConstraint::None;
-
-	ResizableDialog::Control control;
-
-	control.iID = IDC_MANAGEBOOKMARKS_TREEVIEW;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	controlList.push_back(control);
-
-	control.iID = IDC_MANAGEBOOKMARKS_LISTVIEW;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	controlList.push_back(control);
-
-	control.iID = IDOK;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	controlList.push_back(control);
+	std::vector<ResizableDialogControl> controls;
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_TREEVIEW), MovingType::None,
+		SizingType::Vertical);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW), MovingType::None,
+		SizingType::Both);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDOK), MovingType::Both, SizingType::None);
+	return controls;
 }
 
 wil::unique_hicon ManageBookmarksDialog::GetDialogIcon(int iconWidth, int iconHeight) const

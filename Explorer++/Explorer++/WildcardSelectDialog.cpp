@@ -22,7 +22,7 @@ const TCHAR WildcardSelectDialogPersistentSettings::SETTING_CURRENT_TEXT[] = _T(
 
 WildcardSelectDialog::WildcardSelectDialog(HINSTANCE resourceInstance, HWND hParent, BOOL bSelect,
 	CoreInterface *coreInterface) :
-	DarkModeDialogBase(resourceInstance, IDD_WILDCARDSELECT, hParent, true)
+	DarkModeDialogBase(resourceInstance, IDD_WILDCARDSELECT, hParent, DialogSizingType::Horizontal)
 {
 	m_bSelect = bSelect;
 	m_coreInterface = coreInterface;
@@ -60,27 +60,14 @@ INT_PTR WildcardSelectDialog::OnInitDialog()
 	return 0;
 }
 
-void WildcardSelectDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-	std::list<ResizableDialog::Control> &controlList)
+std::vector<ResizableDialogControl> WildcardSelectDialog::GetResizableControls()
 {
-	dsc = BaseDialog::DialogSizeConstraint::X;
-
-	ResizableDialog::Control control;
-
-	control.iID = IDC_SELECTGROUP_COMBOBOX;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	controlList.push_back(control);
-
-	control.iID = IDOK;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	controlList.push_back(control);
-
-	control.iID = IDCANCEL;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	controlList.push_back(control);
+	std::vector<ResizableDialogControl> controls;
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_SELECTGROUP_COMBOBOX), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDOK), MovingType::Horizontal, SizingType::None);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDCANCEL), MovingType::Horizontal, SizingType::None);
+	return controls;
 }
 
 INT_PTR WildcardSelectDialog::OnCommand(WPARAM wParam, LPARAM lParam)

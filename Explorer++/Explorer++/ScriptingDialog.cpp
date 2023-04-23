@@ -12,7 +12,7 @@
 
 ScriptingDialog::ScriptingDialog(HINSTANCE resourceInstance, HWND hParent,
 	PluginInterface *pluginInterface) :
-	DarkModeDialogBase(resourceInstance, IDD_SCRIPTING, hParent, true),
+	DarkModeDialogBase(resourceInstance, IDD_SCRIPTING, hParent, DialogSizingType::Both),
 	m_luaPlugin(L"", Plugins::Manifest(), pluginInterface)
 {
 	m_luaPlugin.GetLuaState().open_libraries(sol::lib::base);
@@ -28,37 +28,16 @@ INT_PTR ScriptingDialog::OnInitDialog()
 	return FALSE;
 }
 
-void ScriptingDialog::GetResizableControlInformation(BaseDialog::DialogSizeConstraint &dsc,
-	std::list<ResizableDialog::Control> &ControlList)
+std::vector<ResizableDialogControl> ScriptingDialog::GetResizableControls()
 {
-	dsc = BaseDialog::DialogSizeConstraint::None;
-
-	ResizableDialog::Control control;
-
-	control.iID = IDC_LOG;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
-
-	control.iID = IDC_COMMAND;
-	control.Type = ResizableDialog::ControlType::Resize;
-	control.Constraint = ResizableDialog::ControlConstraint::X;
-	ControlList.push_back(control);
-
-	control.iID = IDC_COMMAND;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	ControlList.push_back(control);
-
-	control.iID = IDC_STATIC_COMMAND_LABEL;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::Y;
-	ControlList.push_back(control);
-
-	control.iID = ID_RUN;
-	control.Type = ResizableDialog::ControlType::Move;
-	control.Constraint = ResizableDialog::ControlConstraint::None;
-	ControlList.push_back(control);
+	std::vector<ResizableDialogControl> controls;
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_LOG), MovingType::None, SizingType::Both);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_COMMAND), MovingType::Vertical,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, IDC_STATIC_COMMAND_LABEL), MovingType::Vertical,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(m_hDlg, ID_RUN), MovingType::Both, SizingType::None);
+	return controls;
 }
 
 INT_PTR ScriptingDialog::OnCommand(WPARAM wParam, LPARAM lParam)

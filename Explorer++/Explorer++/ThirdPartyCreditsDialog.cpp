@@ -11,7 +11,7 @@
 #include "../Helper/WindowHelper.h"
 
 ThirdPartyCreditsDialog::ThirdPartyCreditsDialog(HINSTANCE resourceInstance, HWND parent) :
-	DarkModeDialogBase(resourceInstance, IDD_THIRD_PARTY_CREDITS, parent, false)
+	DarkModeDialogBase(resourceInstance, IDD_THIRD_PARTY_CREDITS, parent, DialogSizingType::None)
 {
 }
 

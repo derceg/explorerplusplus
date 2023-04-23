@@ -13,7 +13,7 @@
 #include <boost/format.hpp>
 
 AboutDialog::AboutDialog(HINSTANCE resourceInstance, HWND hParent) :
-	DarkModeDialogBase(resourceInstance, IDD_ABOUT, hParent, false)
+	DarkModeDialogBase(resourceInstance, IDD_ABOUT, hParent, DialogSizingType::None)
 {
 }
 

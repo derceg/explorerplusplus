@@ -21,7 +21,7 @@ const TCHAR ColorRuleEditorDialogPersistentSettings::SETTING_CUSTOM_COLORS[] = _
 
 ColorRuleEditorDialog::ColorRuleEditorDialog(HINSTANCE resourceInstance, HWND parent,
 	ColorRuleModel *model, std::unique_ptr<EditDetails> editDetails) :
-	DarkModeDialogBase(resourceInstance, IDD_NEW_COLOR_RULE, parent, false),
+	DarkModeDialogBase(resourceInstance, IDD_NEW_COLOR_RULE, parent, DialogSizingType::None),
 	m_model(model),
 	m_editDetails(std::move(editDetails))
 {

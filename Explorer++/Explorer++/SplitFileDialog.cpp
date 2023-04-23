@@ -38,7 +38,7 @@ const TCHAR SplitFileDialogPersistentSettings::SETTING_SIZE_GROUP[] = _T("SizeGr
 
 SplitFileDialog::SplitFileDialog(HINSTANCE resourceInstance, HWND hParent,
 	CoreInterface *coreInterface, const std::wstring &strFullFilename) :
-	DarkModeDialogBase(resourceInstance, IDD_SPLITFILE, hParent, false),
+	DarkModeDialogBase(resourceInstance, IDD_SPLITFILE, hParent, DialogSizingType::None),
 	m_coreInterface(coreInterface),
 	m_strFullFilename(strFullFilename),
 	m_bSplittingFile(false),

@@ -56,7 +56,9 @@ private:
 	static constexpr UINT WM_APP_SAVE_SETTINGS = WM_APP + 1;
 
 	INT_PTR OnInitDialog() override;
+	void AddDynamicControls() override;
 	wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
+	std::vector<ResizableDialogControl> GetResizableControls() override;
 	void AddSettingsPages();
 	void AddSettingsPage(UINT dialogResourceId, UINT titleResourceId, int pageIndex,
 		DLGPROC dialogProc, LPARAM dialogProcParam);
@@ -94,6 +96,14 @@ private:
 	static INT_PTR CALLBACK AdvancedSettingsProcStub(HWND hDlg, UINT uMsg, WPARAM wParam,
 		LPARAM lParam);
 	INT_PTR CALLBACK AdvancedSettingsProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+	void InitializeResizeDialogHelperGeneral(HWND dialog);
+	void InitializeResizeDialogHelperAppearance(HWND dialog);
+	void InitializeResizeDialogHelperFilesFolders(HWND dialog);
+	void InitializeResizeDialogHelperWindow(HWND dialog);
+	void InitializeResizeDialogHelperTabs(HWND dialog);
+	void InitializeResizeDialogHelperDefaultSettings(HWND dialog);
+	void InitializeResizeDialogHelperAdvanced(HWND dialog);
 
 	INT_PTR OnPageCtlColorDlg(HWND hwnd, HDC hdc);
 	INT_PTR OnCtlColor(HWND hwnd, HDC hdc);
@@ -153,4 +163,12 @@ private:
 	std::unique_ptr<WindowSubclassWrapper> m_advancedOptionsListViewSubclass;
 
 	static inline int m_lastSelectedPageIndex = 0;
+
+	std::unique_ptr<ResizableDialogHelper> m_resizableDialogHelperGeneral;
+	std::unique_ptr<ResizableDialogHelper> m_resizableDialogHelperAppearance;
+	std::unique_ptr<ResizableDialogHelper> m_resizableDialogHelperFilesFolders;
+	std::unique_ptr<ResizableDialogHelper> m_resizableDialogHelperWindow;
+	std::unique_ptr<ResizableDialogHelper> m_resizableDialogHelperTabs;
+	std::unique_ptr<ResizableDialogHelper> m_resizableDialogHelperDefaultSettings;
+	std::unique_ptr<ResizableDialogHelper> m_resizableDialogHelperAdvanced;
 };
