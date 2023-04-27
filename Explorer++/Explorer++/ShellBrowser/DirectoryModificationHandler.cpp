@@ -26,7 +26,8 @@ void ShellBrowser::StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl)
 	m_shChangeNotifyId = SHChangeNotifyRegister(m_hListView,
 		SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
 		SHCNE_ATTRIBUTES | SHCNE_CREATE | SHCNE_DELETE | SHCNE_MKDIR | SHCNE_RENAMEFOLDER
-			| SHCNE_RENAMEITEM | SHCNE_RMDIR | SHCNE_UPDATEDIR | SHCNE_UPDATEITEM,
+			| SHCNE_RENAMEITEM | SHCNE_RMDIR | SHCNE_UPDATEDIR | SHCNE_UPDATEITEM | SHCNE_DRIVEADD
+			| SHCNE_DRIVEREMOVED,
 		WM_APP_SHELL_NOTIFY, 1, &shcne);
 
 	if (m_shChangeNotifyId == 0)
@@ -91,6 +92,7 @@ void ShellBrowser::ProcessShellChangeNotification(const ShellChangeNotification 
 {
 	switch (change.event)
 	{
+	case SHCNE_DRIVEADD:
 	case SHCNE_MKDIR:
 	case SHCNE_CREATE:
 		if (ILIsParent(m_directoryState.pidlDirectory.get(), change.pidl1.get(), TRUE))
@@ -122,6 +124,7 @@ void ShellBrowser::ProcessShellChangeNotification(const ShellChangeNotification 
 		}
 		break;
 
+	case SHCNE_DRIVEREMOVED:
 	case SHCNE_RMDIR:
 	case SHCNE_DELETE:
 		// Only the current directory is monitored, so notifications should only arrive for items in
