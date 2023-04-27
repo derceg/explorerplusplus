@@ -90,7 +90,6 @@ ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, IDirect
 
 	m_getDragImageMessage = RegisterWindowMessage(DI_GETDRAGIMAGE);
 
-	m_bQueryRemoveCompleted = FALSE;
 	HANDLE hThread = CreateThread(nullptr, 0, Thread_MonitorAllDrives, this, 0, nullptr);
 	CloseHandle(hThread);
 
@@ -1435,11 +1434,6 @@ void ShellTreeView::OnDeviceChange(UINT eventType, LONG_PTR eventData)
 						m_pDirMon->StopDirectoryMonitor(*itr->monitorId);
 					}
 
-					/* Log the removal. If a device removal failure message
-					is later received, the last entry logged here will be
-					restored. */
-					m_bQueryRemoveCompleted = TRUE;
-					StringCchCopy(m_szQueryRemove, SIZEOF_ARRAY(m_szQueryRemove), itr->szDrive);
 					break;
 				}
 			}
@@ -1447,27 +1441,6 @@ void ShellTreeView::OnDeviceChange(UINT eventType, LONG_PTR eventData)
 		break;
 		}
 	}
-
-	case DBT_DEVICEQUERYREMOVEFAILED:
-	{
-		/* The device was not removed from the system. */
-		DEV_BROADCAST_HDR *dbh = nullptr;
-		DEV_BROADCAST_HANDLE *pdbHandle = nullptr;
-
-		dbh = (DEV_BROADCAST_HDR *) eventData;
-
-		switch (dbh->dbch_devicetype)
-		{
-		case DBT_DEVTYP_HANDLE:
-			pdbHandle = (DEV_BROADCAST_HANDLE *) dbh;
-
-			if (m_bQueryRemoveCompleted)
-			{
-			}
-			break;
-		}
-	}
-	break;
 
 	case DBT_DEVICEREMOVECOMPLETE:
 	{

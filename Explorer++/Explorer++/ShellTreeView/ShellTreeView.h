@@ -256,6 +256,4 @@ private:
 
 	/* Hardware events. */
 	std::list<DriveEvent_t> m_pDriveList;
-	BOOL m_bQueryRemoveCompleted;
-	TCHAR m_szQueryRemove[MAX_PATH];
 };
