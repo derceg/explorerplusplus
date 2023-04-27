@@ -140,7 +140,7 @@ private:
 	void RemoveChildrenFromInternalMap(HTREEITEM hParent);
 	void UpdateParent(const TCHAR *szParent);
 	void UpdateParent(HTREEITEM hParent);
-	LRESULT CALLBACK OnDeviceChange(WPARAM wParam, LPARAM lParam);
+	void OnDeviceChange(UINT eventType, LONG_PTR eventData);
 	void OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi);
 	void OnItemExpanding(const NMTREEVIEW *nmtv);
 	LRESULT OnKeyDown(const NMTVKEYDOWN *keyDown);

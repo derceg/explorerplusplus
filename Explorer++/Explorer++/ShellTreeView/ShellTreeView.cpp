@@ -96,6 +96,8 @@ ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, IDirect
 
 	AddClipboardFormatListener(m_hTreeView);
 
+	m_connections.push_back(coreInterface->AddDeviceChangeObserver(
+		std::bind_front(&ShellTreeView::OnDeviceChange, this)));
 	m_connections.push_back(coreInterface->AddApplicationShuttingDownObserver(
 		std::bind_front(&ShellTreeView::OnApplicationShuttingDown, this)));
 }
@@ -153,7 +155,7 @@ LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam,
 		break;
 
 	case WM_DEVICECHANGE:
-		return OnDeviceChange(wParam, lParam);
+		OnDeviceChange(static_cast<UINT>(wParam), lParam);
 
 	case WM_RBUTTONDOWN:
 		if ((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON) && !(wParam & MK_MBUTTON))
@@ -1344,17 +1346,17 @@ void ShellTreeView::RemoveChildrenFromInternalMap(HTREEITEM hParent)
 	}
 }
 
-LRESULT CALLBACK ShellTreeView::OnDeviceChange(WPARAM wParam, LPARAM lParam)
+void ShellTreeView::OnDeviceChange(UINT eventType, LONG_PTR eventData)
 {
-	switch (wParam)
+	switch (eventType)
 	{
 	/* Device has being added/inserted into the system. Update the
-	treeview as neccessary. */
+	treeview as necessary. */
 	case DBT_DEVICEARRIVAL:
 	{
 		DEV_BROADCAST_HDR *dbh;
 
-		dbh = (DEV_BROADCAST_HDR *) lParam;
+		dbh = (DEV_BROADCAST_HDR *) eventData;
 
 		if (dbh->dbch_devicetype == DBT_DEVTYP_VOLUME)
 		{
@@ -1410,7 +1412,7 @@ LRESULT CALLBACK ShellTreeView::OnDeviceChange(WPARAM wParam, LPARAM lParam)
 		DEV_BROADCAST_HANDLE *pdbHandle = nullptr;
 		std::list<DriveEvent_t>::iterator itr;
 
-		dbh = (DEV_BROADCAST_HDR *) lParam;
+		dbh = (DEV_BROADCAST_HDR *) eventData;
 
 		switch (dbh->dbch_devicetype)
 		{
@@ -1444,8 +1446,6 @@ LRESULT CALLBACK ShellTreeView::OnDeviceChange(WPARAM wParam, LPARAM lParam)
 		}
 		break;
 		}
-
-		return TRUE;
 	}
 
 	case DBT_DEVICEQUERYREMOVEFAILED:
@@ -1454,7 +1454,7 @@ LRESULT CALLBACK ShellTreeView::OnDeviceChange(WPARAM wParam, LPARAM lParam)
 		DEV_BROADCAST_HDR *dbh = nullptr;
 		DEV_BROADCAST_HANDLE *pdbHandle = nullptr;
 
-		dbh = (DEV_BROADCAST_HDR *) lParam;
+		dbh = (DEV_BROADCAST_HDR *) eventData;
 
 		switch (dbh->dbch_devicetype)
 		{
@@ -1475,7 +1475,7 @@ LRESULT CALLBACK ShellTreeView::OnDeviceChange(WPARAM wParam, LPARAM lParam)
 		DEV_BROADCAST_HANDLE *pdbHandle = nullptr;
 		std::list<DriveEvent_t>::iterator itr;
 
-		dbh = (DEV_BROADCAST_HDR *) lParam;
+		dbh = (DEV_BROADCAST_HDR *) eventData;
 
 		switch (dbh->dbch_devicetype)
 		{
@@ -1532,12 +1532,8 @@ LRESULT CALLBACK ShellTreeView::OnDeviceChange(WPARAM wParam, LPARAM lParam)
 		}
 		break;
 		}
-
-		return TRUE;
 	}
 	}
-
-	return FALSE;
 }
 
 DWORD WINAPI Thread_MonitorAllDrives(LPVOID pParam)

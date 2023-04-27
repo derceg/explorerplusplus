@@ -181,7 +181,7 @@ private:
 	int CloseApplication();
 	int OnDestroy();
 	void OnSetFocus();
-	LRESULT OnDeviceChange(WPARAM wParam, LPARAM lParam);
+	void OnDeviceChange(WPARAM wParam, LPARAM lParam);
 	void OnPreviousWindow();
 	void OnNextWindow();
 	void OnAppCommand(UINT cmd);
@@ -487,6 +487,8 @@ private:
 	void FocusChanged(WindowFocusSource windowFocusSource) override;
 	boost::signals2::connection AddFocusChangeObserver(
 		const FocusChangedSignal::slot_type &observer) override;
+	boost::signals2::connection AddDeviceChangeObserver(
+		const DeviceChangeSignal::slot_type &observer) override;
 	boost::signals2::connection AddApplicationShuttingDownObserver(
 		const ApplicationShuttingDownSignal::slot_type &observer) override;
 	void FocusActiveTab() override;
@@ -645,4 +647,7 @@ private:
 
 	/* Mousewheel. */
 	int m_zDeltaTotal;
+
+	// WM_DEVICECHANGE notifications
+	DeviceChangeSignal m_deviceChangeSignal;
 };

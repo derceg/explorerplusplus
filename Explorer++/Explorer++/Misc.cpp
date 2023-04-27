@@ -276,21 +276,15 @@ void Explorerplusplus::CopyToFolder(bool move)
 	NFileOperations::CopyFilesToFolder(m_hContainer, szTemp, pidls, move);
 }
 
-LRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam, LPARAM lParam)
+void Explorerplusplus::OnDeviceChange(WPARAM wParam, LPARAM lParam)
 {
-	/* Forward this notification out to all tabs (if a
-	tab is currently in my computer, it will need to
-	update its contents). */
-	for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
-	{
-		tab->GetShellBrowser()->OnDeviceChange(wParam, lParam);
-	}
+	m_deviceChangeSignal(static_cast<UINT>(wParam), lParam);
+}
 
-	/* Forward the message to the treeview, so that
-	it can handle the message as well. */
-	SendMessage(m_shellTreeView->GetHWND(), WM_DEVICECHANGE, wParam, lParam);
-
-	return TRUE;
+boost::signals2::connection Explorerplusplus::AddDeviceChangeObserver(
+	const DeviceChangeSignal::slot_type &observer)
+{
+	return m_deviceChangeSignal.connect(observer);
 }
 
 /*

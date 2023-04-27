@@ -171,7 +171,7 @@ public:
 	FolderColumns ExportAllColumns();
 	void QueueRename(PCIDLIST_ABSOLUTE pidlItem);
 	void SelectItems(const std::list<std::wstring> &PastedFileList);
-	void OnDeviceChange(WPARAM wParam, LPARAM lParam);
+	void OnDeviceChange(UINT eventType, LONG_PTR eventData);
 	void OnGridlinesSettingChanged();
 	void AutoSizeColumns();
 

@@ -27,6 +27,7 @@ using ToolbarContextMenuSignal =
 using ToolbarContextMenuSelectedSignal =
 	boost::signals2::signal<void(HWND sourceWindow, int menuItemId)>;
 using FocusChangedSignal = boost::signals2::signal<void(WindowFocusSource windowFocusSource)>;
+using DeviceChangeSignal = boost::signals2::signal<void(UINT eventType, LONG_PTR eventData)>;
 using ApplicationShuttingDownSignal = boost::signals2::signal<void()>;
 
 class CachedIcons;
@@ -105,6 +106,8 @@ public:
 		const ToolbarContextMenuSelectedSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddFocusChangeObserver(
 		const FocusChangedSignal::slot_type &observer) = 0;
+	virtual boost::signals2::connection AddDeviceChangeObserver(
+		const DeviceChangeSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddApplicationShuttingDownObserver(
 		const ApplicationShuttingDownSignal::slot_type &observer) = 0;
 };

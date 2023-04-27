@@ -129,6 +129,8 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, CoreInterface *coreInterface,
 
 	AddClipboardFormatListener(m_hListView);
 
+	m_connections.push_back(coreInterface->AddDeviceChangeObserver(
+		std::bind_front(&ShellBrowser::OnDeviceChange, this)));
 	m_connections.push_back(coreInterface->AddApplicationShuttingDownObserver(
 		std::bind_front(&ShellBrowser::OnApplicationShuttingDown, this)));
 
@@ -1094,7 +1096,7 @@ void ShellBrowser::SelectItems(const std::list<std::wstring> &PastedFileList)
 	}
 }
 
-void ShellBrowser::OnDeviceChange(WPARAM wParam, LPARAM lParam)
+void ShellBrowser::OnDeviceChange(UINT eventType, LONG_PTR eventData)
 {
 	// If shell change notifications are enabled, drive additions/removals will be handled through
 	// that.
@@ -1113,7 +1115,7 @@ void ShellBrowser::OnDeviceChange(WPARAM wParam, LPARAM lParam)
 	shown in my computer). */
 	if (CompareVirtualFolders(CSIDL_DRIVES))
 	{
-		switch (wParam)
+		switch (eventType)
 		{
 			/* Device has being added/inserted into the system. Update the
 			drives toolbar as necessary. */
@@ -1121,7 +1123,7 @@ void ShellBrowser::OnDeviceChange(WPARAM wParam, LPARAM lParam)
 		{
 			DEV_BROADCAST_HDR *dbh = nullptr;
 
-			dbh = (DEV_BROADCAST_HDR *) lParam;
+			dbh = (DEV_BROADCAST_HDR *) eventData;
 
 			if (dbh->dbch_devicetype == DBT_DEVTYP_VOLUME)
 			{
@@ -1157,7 +1159,7 @@ void ShellBrowser::OnDeviceChange(WPARAM wParam, LPARAM lParam)
 		{
 			DEV_BROADCAST_HDR *dbh = nullptr;
 
-			dbh = (DEV_BROADCAST_HDR *) lParam;
+			dbh = (DEV_BROADCAST_HDR *) eventData;
 
 			if (dbh->dbch_devicetype == DBT_DEVTYP_VOLUME)
 			{
