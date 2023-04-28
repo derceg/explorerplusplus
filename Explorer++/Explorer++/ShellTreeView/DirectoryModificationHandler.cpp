@@ -4,8 +4,48 @@
 
 #include "stdafx.h"
 #include "ShellTreeView.h"
+#include "../Helper/Logging.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
+
+void ShellTreeView::StartDirectoryMonitoringForItem(ItemInfo_t &item)
+{
+	// There shouldn't be more than one call to monitor a directory.
+	assert(item.shChangeNotifyId == 0);
+
+	SHChangeNotifyEntry shcne;
+	shcne.pidl = item.pidl.get();
+	shcne.fRecursive = false;
+	item.shChangeNotifyId = SHChangeNotifyRegister(m_hTreeView,
+		SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
+		SHCNE_ATTRIBUTES | SHCNE_MKDIR | SHCNE_RENAMEFOLDER | SHCNE_RMDIR | SHCNE_UPDATEDIR
+			| SHCNE_UPDATEITEM,
+		WM_APP_SHELL_NOTIFY, 1, &shcne);
+
+	if (item.shChangeNotifyId == 0)
+	{
+		std::wstring path;
+		HRESULT hr = GetDisplayName(item.pidl.get(), SHGDN_FORPARSING, path);
+
+		if (SUCCEEDED(hr))
+		{
+			LOG(warning) << L"Couldn't monitor directory \"" << path << L"\" for changes.";
+		}
+	}
+}
+
+void ShellTreeView::StopDirectoryMonitoringForItem(ItemInfo_t &item)
+{
+	if (item.shChangeNotifyId == 0)
+	{
+		return;
+	}
+
+	[[maybe_unused]] auto res = SHChangeNotifyDeregister(item.shChangeNotifyId);
+	assert(res);
+
+	item.shChangeNotifyId = 0;
+}
 
 void ShellTreeView::DirectoryAltered()
 {
@@ -564,6 +604,8 @@ void ShellTreeView::RemoveItem(const TCHAR *szFullFileName)
 
 void ShellTreeView::RemoveItem(HTREEITEM hItem)
 {
+	StopDirectoryMonitoringForItem(GetItemByHandle(hItem));
+
 	RemoveChildrenFromInternalMap(hItem);
 
 	TVITEMEX tvItem = {};

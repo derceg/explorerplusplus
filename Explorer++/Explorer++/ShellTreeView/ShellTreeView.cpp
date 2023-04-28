@@ -90,13 +90,17 @@ ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, IDirect
 
 	m_getDragImageMessage = RegisterWindowMessage(DI_GETDRAGIMAGE);
 
-	HANDLE hThread = CreateThread(nullptr, 0, Thread_MonitorAllDrives, this, 0, nullptr);
-	CloseHandle(hThread);
-
 	AddClipboardFormatListener(m_hTreeView);
 
-	m_connections.push_back(coreInterface->AddDeviceChangeObserver(
-		std::bind_front(&ShellTreeView::OnDeviceChange, this)));
+	if (m_config->shellChangeNotificationType != ShellChangeNotificationType::All)
+	{
+		HANDLE hThread = CreateThread(nullptr, 0, Thread_MonitorAllDrives, this, 0, nullptr);
+		CloseHandle(hThread);
+
+		m_connections.push_back(coreInterface->AddDeviceChangeObserver(
+			std::bind_front(&ShellTreeView::OnDeviceChange, this)));
+	}
+
 	m_connections.push_back(coreInterface->AddApplicationShuttingDownObserver(
 		std::bind_front(&ShellTreeView::OnApplicationShuttingDown, this)));
 }
@@ -619,6 +623,9 @@ void ShellTreeView::OnItemExpanding(const NMTREEVIEW *nmtv)
 
 		SendMessage(m_hTreeView, TVM_EXPAND, TVE_COLLAPSE | TVE_COLLAPSERESET,
 			reinterpret_cast<LPARAM>(parentItem));
+
+		ItemInfo_t &itemInfo = GetItemByHandle(parentItem);
+		StopDirectoryMonitoringForItem(itemInfo);
 	}
 }
 
@@ -846,6 +853,12 @@ HRESULT ShellTreeView::ExpandDirectory(HTREEITEM hParent)
 	TreeView_SortChildrenCB(m_hTreeView, &tvscb, 0);
 
 	SendMessage(m_hTreeView, WM_SETREDRAW, TRUE, 0);
+
+	if (m_config->shellChangeNotificationType == ShellChangeNotificationType::All)
+	{
+		ItemInfo_t &itemInfo = GetItemByHandle(hParent);
+		StartDirectoryMonitoringForItem(itemInfo);
+	}
 
 	return hr;
 }

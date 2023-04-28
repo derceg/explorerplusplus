@@ -48,6 +48,7 @@ public:
 private:
 	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 1;
 	static const UINT WM_APP_SUBFOLDERS_RESULT_READY = WM_APP + 2;
+	static const UINT WM_APP_SHELL_NOTIFY = WM_APP + 3;
 
 	// This is the same background color as used in the Explorer treeview.
 	static inline constexpr COLORREF TREE_VIEW_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
@@ -61,11 +62,15 @@ private:
 	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 10;
 	static const LONG DROP_SCROLL_MARGIN_Y_96DPI = 10;
 
-	typedef struct
+	struct ItemInfo_t
 	{
 		unique_pidl_absolute pidl;
 		unique_pidl_child pridl;
-	} ItemInfo_t;
+
+		// This will be non-zero if the directory associated with this item is being monitored for
+		// changes.
+		ULONG shChangeNotifyId = 0;
+	};
 
 	typedef struct
 	{
@@ -161,6 +166,8 @@ private:
 	unique_pidl_absolute GetSelectedItemPidl() const;
 
 	/* Directory modification. */
+	void StartDirectoryMonitoringForItem(ItemInfo_t &item);
+	void StopDirectoryMonitoringForItem(ItemInfo_t &item);
 	void DirectoryAlteredAddFile(const TCHAR *szFullFileName);
 	void DirectoryAlteredRemoveFile(const TCHAR *szFullFileName);
 	void DirectoryAlteredRenameFile(const TCHAR *szFullFileName);
