@@ -83,6 +83,10 @@ void ShellTreeView::ProcessShellChangeNotification(const ShellChangeNotification
 		OnItemAdded(change.pidl1.get());
 		break;
 
+	case SHCNE_UPDATEITEM:
+		OnItemUpdated(change.pidl1.get());
+		break;
+
 	case SHCNE_RMDIR:
 		OnItemRemoved(change.pidl1.get());
 		break;
@@ -143,6 +147,28 @@ void ShellTreeView::OnItemAdded(PCIDLIST_ABSOLUTE simplePidl)
 	}
 
 	AddItem(parentItem, pidl);
+}
+
+void ShellTreeView::OnItemUpdated(PCIDLIST_ABSOLUTE simplePidl)
+{
+	auto item = LocateExistingItem(simplePidl);
+
+	if (!item)
+	{
+		return;
+	}
+
+	// An SHCNE_UPDATEITEM notification will be sent to a folder when one of the items within it
+	// changes. The image and child count for the item will need to be invalidated, as a sub-folder
+	// may have been added/removed, or the item's icon may have changed.
+	TVITEM tvItemUpdate = {};
+	tvItemUpdate.mask = TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_CHILDREN;
+	tvItemUpdate.hItem = item;
+	tvItemUpdate.iImage = I_IMAGECALLBACK;
+	tvItemUpdate.iSelectedImage = I_IMAGECALLBACK;
+	tvItemUpdate.cChildren = I_CHILDRENCALLBACK;
+	[[maybe_unused]] auto updated = TreeView_SetItem(m_hTreeView, &tvItemUpdate);
+	assert(updated);
 }
 
 void ShellTreeView::OnItemRemoved(PCIDLIST_ABSOLUTE simplePidl)

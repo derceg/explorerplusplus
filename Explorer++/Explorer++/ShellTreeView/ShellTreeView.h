@@ -141,6 +141,7 @@ private:
 	void OnProcessShellChangeNotifications();
 	void ProcessShellChangeNotification(const ShellChangeNotification &change);
 	void OnItemAdded(PCIDLIST_ABSOLUTE simplePidl);
+	void OnItemUpdated(PCIDLIST_ABSOLUTE simplePidl);
 	void OnItemRemoved(PCIDLIST_ABSOLUTE simplePidl);
 	void RemoveItem(HTREEITEM item);
 	bool ItemHasMultipleChildren(HTREEITEM item);
