@@ -63,17 +63,10 @@ private:
 	struct ItemInfo
 	{
 		unique_pidl_absolute pidl;
-		unique_pidl_child pridl;
 
 		// This will be non-zero if the directory associated with this item is being monitored for
 		// changes.
 		ULONG shChangeNotifyId = 0;
-	};
-
-	struct EnumeratedItem
-	{
-		int internalIndex;
-		std::wstring name;
 	};
 
 	struct ShellChangeNotification
@@ -125,8 +118,9 @@ private:
 		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	HRESULT ExpandDirectory(HTREEITEM hParent);
 	HTREEITEM AddRoot();
+	HRESULT ExpandDirectory(HTREEITEM hParent);
+	void AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl);
 	void RemoveChildrenFromInternalMap(HTREEITEM hParent);
 	void OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi);
 	void OnItemExpanding(const NMTREEVIEW *nmtv);
@@ -146,6 +140,7 @@ private:
 	void OnShellNotify(WPARAM wParam, LPARAM lParam);
 	void OnProcessShellChangeNotifications();
 	void ProcessShellChangeNotification(const ShellChangeNotification &change);
+	void OnItemAdded(PCIDLIST_ABSOLUTE simplePidl);
 	void OnItemRemoved(PCIDLIST_ABSOLUTE simplePidl);
 	void RemoveItem(HTREEITEM item);
 	bool ItemHasMultipleChildren(HTREEITEM item);

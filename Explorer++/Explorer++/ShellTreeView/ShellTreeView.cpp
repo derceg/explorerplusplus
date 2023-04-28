@@ -762,7 +762,7 @@ HRESULT ShellTreeView::ExpandDirectory(HTREEITEM hParent)
 
 	SendMessage(m_hTreeView, WM_SETREDRAW, FALSE, 0);
 
-	std::vector<EnumeratedItem> items;
+	std::vector<unique_pidl_absolute> items;
 
 	unique_pidl_child pidlItem;
 	ULONG uFetched = 1;
@@ -792,44 +792,12 @@ HRESULT ShellTreeView::ExpandDirectory(HTREEITEM hParent)
 			}
 		}
 
-		STRRET str;
-		hr = shellFolder2->GetDisplayNameOf(pidlItem.get(), SHGDN_NORMAL, &str);
-
-		if (SUCCEEDED(hr))
-		{
-			TCHAR itemName[MAX_PATH];
-			hr = StrRetToBuf(&str, pidlItem.get(), itemName, SIZEOF_ARRAY(itemName));
-
-			if (SUCCEEDED(hr))
-			{
-				int itemId = GenerateUniqueItemId();
-				m_itemInfoMap[itemId].pidl.reset(ILCombine(pidlDirectory.get(), pidlItem.get()));
-				m_itemInfoMap[itemId].pridl.reset(ILCloneChild(pidlItem.get()));
-
-				EnumeratedItem item;
-				item.internalIndex = itemId;
-				item.name = itemName;
-				items.push_back(item);
-			}
-		}
+		items.emplace_back(ILCombine(pidlDirectory.get(), pidlItem.get()));
 	}
 
-	for (auto &item : items)
+	for (const auto &item : items)
 	{
-		TVITEMEX tvItem;
-		tvItem.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
-		tvItem.pszText = item.name.data();
-		tvItem.iImage = I_IMAGECALLBACK;
-		tvItem.iSelectedImage = I_IMAGECALLBACK;
-		tvItem.lParam = item.internalIndex;
-		tvItem.cChildren = I_CHILDRENCALLBACK;
-
-		TVINSERTSTRUCT tvis;
-		tvis.hInsertAfter = TVI_LAST;
-		tvis.hParent = hParent;
-		tvis.itemex = tvItem;
-
-		TreeView_InsertItem(m_hTreeView, &tvis);
+		AddItem(hParent, item.get());
 	}
 
 	TVSORTCB tvscb;
@@ -844,6 +812,36 @@ HRESULT ShellTreeView::ExpandDirectory(HTREEITEM hParent)
 	StartDirectoryMonitoringForItem(itemInfo);
 
 	return hr;
+}
+
+void ShellTreeView::AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl)
+{
+	std::wstring name;
+	HRESULT hr = GetDisplayName(pidl, SHGDN_NORMAL, name);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	int itemId = GenerateUniqueItemId();
+	m_itemInfoMap[itemId].pidl.reset(ILCloneFull(pidl));
+
+	TVITEMEX tvItem = {};
+	tvItem.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
+	tvItem.pszText = name.data();
+	tvItem.iImage = I_IMAGECALLBACK;
+	tvItem.iSelectedImage = I_IMAGECALLBACK;
+	tvItem.lParam = itemId;
+	tvItem.cChildren = I_CHILDRENCALLBACK;
+
+	TVINSERTSTRUCT tvInsertData = {};
+	tvInsertData.hInsertAfter = TVI_LAST;
+	tvInsertData.hParent = parent;
+	tvInsertData.itemex = tvItem;
+
+	[[maybe_unused]] auto item = TreeView_InsertItem(m_hTreeView, &tvInsertData);
+	assert(item);
 }
 
 int ShellTreeView::GenerateUniqueItemId()

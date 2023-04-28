@@ -79,10 +79,70 @@ void ShellTreeView::ProcessShellChangeNotification(const ShellChangeNotification
 {
 	switch (change.event)
 	{
+	case SHCNE_MKDIR:
+		OnItemAdded(change.pidl1.get());
+		break;
+
 	case SHCNE_RMDIR:
 		OnItemRemoved(change.pidl1.get());
 		break;
 	}
+}
+
+void ShellTreeView::OnItemAdded(PCIDLIST_ABSOLUTE simplePidl)
+{
+	auto existingItem = LocateExistingItem(simplePidl);
+
+	// Items shouldn't be added more than once.
+	if (existingItem)
+	{
+		assert(false);
+		return;
+	}
+
+	unique_pidl_absolute parent(ILCloneFull(simplePidl));
+	BOOL res = ILRemoveLastID(parent.get());
+
+	if (!res)
+	{
+		return;
+	}
+
+	auto parentItem = LocateExistingItem(parent.get());
+
+	// If the parent item isn't being shown, there's no need to add this item.
+	if (!parentItem)
+	{
+		return;
+	}
+
+	TVITEMEX tvParentItem = {};
+	tvParentItem.mask = TVIF_HANDLE | TVIF_STATE;
+	tvParentItem.hItem = parentItem;
+	res = TreeView_GetItem(m_hTreeView, &tvParentItem);
+	assert(res);
+
+	// If the parent exists, but isn't expanded, there's also no need to add this item.
+	if (WI_IsFlagClear(tvParentItem.state, TVIS_EXPANDED))
+	{
+		return;
+	}
+
+	unique_pidl_absolute pidlFull;
+	HRESULT hr = SimplePidlToFullPidl(simplePidl, wil::out_param(pidlFull));
+
+	PCIDLIST_ABSOLUTE pidl;
+
+	if (SUCCEEDED(hr))
+	{
+		pidl = pidlFull.get();
+	}
+	else
+	{
+		pidl = simplePidl;
+	}
+
+	AddItem(parentItem, pidl);
 }
 
 void ShellTreeView::OnItemRemoved(PCIDLIST_ABSOLUTE simplePidl)
@@ -125,11 +185,11 @@ void ShellTreeView::RemoveItem(HTREEITEM item)
 			TreeView_Expand(m_hTreeView, parent, TVE_COLLAPSE | TVE_COLLAPSERESET);
 		assert(expanded);
 
-		TVITEM parentTVItem = {};
-		parentTVItem.mask = TVIF_CHILDREN;
-		parentTVItem.hItem = parent;
-		parentTVItem.cChildren = 0;
-		[[maybe_unused]] auto updated = TreeView_SetItem(m_hTreeView, &parentTVItem);
+		TVITEM tvParentItem = {};
+		tvParentItem.mask = TVIF_CHILDREN;
+		tvParentItem.hItem = parent;
+		tvParentItem.cChildren = 0;
+		[[maybe_unused]] auto updated = TreeView_SetItem(m_hTreeView, &tvParentItem);
 		assert(updated);
 
 		StopDirectoryMonitoringForItem(GetItemByHandle(parent));
