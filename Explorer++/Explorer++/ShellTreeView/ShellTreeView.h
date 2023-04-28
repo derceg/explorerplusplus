@@ -23,8 +23,8 @@ class TabContainer;
 class ShellTreeView : public ShellDropTargetWindow<HTREEITEM>
 {
 public:
-	ShellTreeView(HWND hParent, CoreInterface *coreInterface, IDirectoryMonitor *pDirMon,
-		TabContainer *tabContainer, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons);
+	ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabContainer *tabContainer,
+		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons);
 	~ShellTreeView();
 
 	/* User functions. */
@@ -35,8 +35,6 @@ public:
 
 	/* Sorting. */
 	int CALLBACK CompareItems(LPARAM lParam1, LPARAM lParam2);
-
-	void MonitorDrivePublic(const TCHAR *szDrive);
 
 	void StartRenamingSelectedItem();
 	void ShowPropertiesOfSelectedItem() const;
@@ -52,9 +50,6 @@ private:
 
 	// This is the same background color as used in the Explorer treeview.
 	static inline constexpr COLORREF TREE_VIEW_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
-
-	static const UINT DIRECTORY_MODIFIED_TIMER_ID = 1;
-	static const UINT DIRECTORY_MODIFIED_TIMER_ELAPSE = 500;
 
 	static const UINT DROP_EXPAND_TIMER_ID = 2;
 	static const UINT DROP_EXPAND_TIMER_ELAPSE = 800;
@@ -76,12 +71,6 @@ private:
 	{
 		int internalIndex;
 		std::wstring name;
-	};
-
-	struct AlteredFile
-	{
-		TCHAR szFileName[MAX_PATH];
-		DWORD dwAction;
 	};
 
 	struct BasicItemInfo
@@ -109,19 +98,6 @@ private:
 		bool hasSubfolder;
 	};
 
-	struct DirectoryAlteredData
-	{
-		TCHAR szPath[MAX_PATH];
-		ShellTreeView *shellTreeView;
-	};
-
-	struct DriveEvent
-	{
-		TCHAR szDrive[MAX_PATH];
-		HANDLE hDrive;
-		std::optional<int> monitorId;
-	};
-
 	static HWND CreateTreeView(HWND parent);
 
 	static LRESULT CALLBACK TreeViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
@@ -133,27 +109,11 @@ private:
 	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	HRESULT ExpandDirectory(HTREEITEM hParent);
-	void DirectoryModified(DWORD dwAction, const TCHAR *szFullFileName);
-	void DirectoryAltered();
 	HTREEITEM AddRoot();
-	void AddItem(const TCHAR *szFullFileName);
-	void AddItemInternal(HTREEITEM hParent, const TCHAR *szFullFileName);
-	void AddDrive(const TCHAR *szDrive);
-	void RenameItem(HTREEITEM hItem, const TCHAR *szFullFileName);
-	void RemoveItem(const TCHAR *szFullFileName);
-	void RemoveItem(HTREEITEM hItem);
 	void RemoveChildrenFromInternalMap(HTREEITEM hParent);
-	void UpdateParent(const TCHAR *szParent);
-	void UpdateParent(HTREEITEM hParent);
-	void OnDeviceChange(UINT eventType, LONG_PTR eventData);
 	void OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi);
 	void OnItemExpanding(const NMTREEVIEW *nmtv);
 	LRESULT OnKeyDown(const NMTVKEYDOWN *keyDown);
-	void UpdateChildren(HTREEITEM hParent, PCIDLIST_ABSOLUTE pidlParent);
-	PCIDLIST_ABSOLUTE UpdateItemInfo(PCIDLIST_ABSOLUTE pidlParent, int iItemId);
-	HTREEITEM LocateDeletedItem(const TCHAR *szFullFileName);
-	HTREEITEM LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand);
-	HTREEITEM LocateItemOnDesktopTree(const TCHAR *szFullFileName);
 	void OnMiddleButtonDown(const POINT *pt);
 	void OnMiddleButtonUp(const POINT *pt, UINT keysDown);
 	bool OnEndLabelEdit(const NMTVDISPINFO *dispInfo);
@@ -161,16 +121,11 @@ private:
 	void UpdateCurrentClipboardObject(wil::com_ptr_nothrow<IDataObject> clipboardDataObject);
 	void OnClipboardUpdate();
 
-	static void DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData);
-
 	unique_pidl_absolute GetSelectedItemPidl() const;
 
 	/* Directory modification. */
 	void StartDirectoryMonitoringForItem(ItemInfo &item);
 	void StopDirectoryMonitoringForItem(ItemInfo &item);
-	void DirectoryAlteredAddFile(const TCHAR *szFullFileName);
-	void DirectoryAlteredRemoveFile(const TCHAR *szFullFileName);
-	void DirectoryAlteredRenameFile(const TCHAR *szFullFileName);
 
 	/* Icons. */
 	void QueueIconTask(HTREEITEM item, int internalIndex);
@@ -208,20 +163,13 @@ private:
 	/* Icon refresh. */
 	void RefreshAllIconsInternal(HTREEITEM hFirstSibling);
 
-	HTREEITEM LocateExistingItem(const TCHAR *szParsingPath);
 	HTREEITEM LocateExistingItem(PCIDLIST_ABSOLUTE pidlDirectory);
 	HTREEITEM LocateItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, BOOL bOnlyLocateExistingItem);
-	void MonitorDrive(const TCHAR *szDrive);
-	HTREEITEM DetermineDriveSortedPosition(HTREEITEM hParent, const TCHAR *szItemName);
-	HTREEITEM DetermineItemSortedPosition(HTREEITEM hParent, const TCHAR *szItem);
-	BOOL IsDesktop(const TCHAR *szPath);
-	BOOL IsDesktopSubChild(const TCHAR *szFullFileName);
 	void UpdateItemState(HTREEITEM item, UINT stateMask, UINT state);
 
 	void OnApplicationShuttingDown();
 
 	HWND m_hTreeView;
-	IDirectoryMonitor *m_pDirMon;
 	BOOL m_bShowHidden;
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
@@ -254,13 +202,4 @@ private:
 
 	HTREEITEM m_cutItem;
 	wil::com_ptr_nothrow<IDataObject> m_clipboardDataObject;
-
-	/* Directory modification. */
-	std::list<AlteredFile> m_AlteredList;
-	std::list<AlteredFile> m_AlteredTrackingList;
-	CRITICAL_SECTION m_cs;
-	TCHAR m_szAlteredOldFileName[MAX_PATH];
-
-	/* Hardware events. */
-	std::list<DriveEvent> m_pDriveList;
 };

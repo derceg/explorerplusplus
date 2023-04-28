@@ -48,8 +48,8 @@ void Explorerplusplus::CreateFolderControls()
 	m_hHolder = CreateHolderWindow(m_hContainer, szTemp, uStyle);
 	SetWindowSubclass(m_hHolder, TreeViewHolderProcStub, 0, (DWORD_PTR) this);
 
-	m_shellTreeView = new ShellTreeView(m_hHolder, this, m_pDirMon, m_tabContainer,
-		&m_FileActionHandler, &m_cachedIcons);
+	m_shellTreeView =
+		new ShellTreeView(m_hHolder, this, m_tabContainer, &m_FileActionHandler, &m_cachedIcons);
 
 	/* Now, subclass the treeview again. This is needed for messages
 	such as WM_MOUSEWHEEL, which need to be intercepted before they

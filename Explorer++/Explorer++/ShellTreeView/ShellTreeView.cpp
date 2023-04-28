@@ -34,14 +34,12 @@
 #include <propkey.h>
 
 int CALLBACK CompareItemsStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
-DWORD WINAPI Thread_MonitorAllDrives(LPVOID pParam);
 
-ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, IDirectoryMonitor *pDirMon,
-	TabContainer *tabContainer, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons) :
+ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabContainer *tabContainer,
+	FileActionHandler *fileActionHandler, CachedIcons *cachedIcons) :
 	ShellDropTargetWindow(CreateTreeView(hParent)),
 	m_hTreeView(GetHWND()),
 	m_config(coreInterface->GetConfig()),
-	m_pDirMon(pDirMon),
 	m_tabContainer(tabContainer),
 	m_fileActionHandler(fileActionHandler),
 	m_cachedIcons(cachedIcons),
@@ -78,8 +76,6 @@ ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, IDirect
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hParent, ParentWndProcStub,
 		reinterpret_cast<DWORD_PTR>(this)));
 
-	InitializeCriticalSection(&m_cs);
-
 	m_iFolderIcon = GetDefaultFolderIconIndex();
 
 	m_bDragCancelled = FALSE;
@@ -91,15 +87,6 @@ ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, IDirect
 	m_getDragImageMessage = RegisterWindowMessage(DI_GETDRAGIMAGE);
 
 	AddClipboardFormatListener(m_hTreeView);
-
-	if (m_config->shellChangeNotificationType != ShellChangeNotificationType::All)
-	{
-		HANDLE hThread = CreateThread(nullptr, 0, Thread_MonitorAllDrives, this, 0, nullptr);
-		CloseHandle(hThread);
-
-		m_connections.push_back(coreInterface->AddDeviceChangeObserver(
-			std::bind_front(&ShellTreeView::OnDeviceChange, this)));
-	}
 
 	m_connections.push_back(coreInterface->AddApplicationShuttingDownObserver(
 		std::bind_front(&ShellTreeView::OnApplicationShuttingDown, this)));
@@ -114,8 +101,6 @@ HWND ShellTreeView::CreateTreeView(HWND parent)
 
 ShellTreeView::~ShellTreeView()
 {
-	DeleteCriticalSection(&m_cs);
-
 	m_iconThreadPool.clear_queue();
 }
 
@@ -147,18 +132,11 @@ LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam,
 	switch (msg)
 	{
 	case WM_TIMER:
-		if (wParam == DIRECTORY_MODIFIED_TIMER_ID)
-		{
-			DirectoryAltered();
-		}
-		else if (wParam == DROP_EXPAND_TIMER_ID)
+		if (wParam == DROP_EXPAND_TIMER_ID)
 		{
 			OnDropExpandTimer();
 		}
 		break;
-
-	case WM_DEVICECHANGE:
-		OnDeviceChange(static_cast<UINT>(wParam), lParam);
 
 	case WM_RBUTTONDOWN:
 		if ((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON) && !(wParam & MK_MBUTTON))
@@ -854,11 +832,8 @@ HRESULT ShellTreeView::ExpandDirectory(HTREEITEM hParent)
 
 	SendMessage(m_hTreeView, WM_SETREDRAW, TRUE, 0);
 
-	if (m_config->shellChangeNotificationType == ShellChangeNotificationType::All)
-	{
-		ItemInfo &itemInfo = GetItemByHandle(hParent);
-		StartDirectoryMonitoringForItem(itemInfo);
-	}
+	ItemInfo &itemInfo = GetItemByHandle(hParent);
+	StartDirectoryMonitoringForItem(itemInfo);
 
 	return hr;
 }
@@ -866,114 +841,6 @@ HRESULT ShellTreeView::ExpandDirectory(HTREEITEM hParent)
 int ShellTreeView::GenerateUniqueItemId()
 {
 	return m_itemIDCounter++;
-}
-
-HTREEITEM ShellTreeView::DetermineItemSortedPosition(HTREEITEM hParent, const TCHAR *szItem)
-{
-	HTREEITEM htInsertAfter = nullptr;
-
-	if (PathIsRoot(szItem))
-	{
-		return DetermineDriveSortedPosition(hParent, szItem);
-	}
-	else
-	{
-		HTREEITEM htItem;
-		HTREEITEM hPreviousItem;
-		TVITEMEX item;
-		SFGAOF attributes;
-
-		/* Insert the item in its sorted position, skipping
-		past any drives or any non-filesystem items (i.e.
-		'My Computer', 'Recycle Bin', etc). */
-		htItem = TreeView_GetChild(m_hTreeView, hParent);
-
-		/* If the parent has no children, this item will
-		be the first that appears. */
-		if (htItem == nullptr)
-			return TVI_FIRST;
-
-		hPreviousItem = TVI_FIRST;
-
-		while (htInsertAfter == nullptr)
-		{
-			item.mask = TVIF_PARAM | TVIF_HANDLE;
-			item.hItem = htItem;
-			TreeView_GetItem(m_hTreeView, &item);
-
-			std::wstring fullItemPath;
-			GetDisplayName(m_itemInfoMap.at(static_cast<int>(item.lParam)).pidl.get(),
-				SHGDN_FORPARSING, fullItemPath);
-
-			attributes = GetFileAttributes(fullItemPath.c_str());
-
-			/* Only perform the comparison if the current item is a real
-			file or folder. */
-			if (!PathIsRoot(fullItemPath.c_str())
-				&& ((attributes & SFGAO_FILESYSTEM) != SFGAO_FILESYSTEM))
-			{
-				if (lstrcmpi(szItem, fullItemPath.c_str()) < 0)
-				{
-					htInsertAfter = hPreviousItem;
-				}
-			}
-
-			hPreviousItem = htItem;
-			htItem = TreeView_GetNextSibling(m_hTreeView, htItem);
-
-			if ((htItem == nullptr) && !htInsertAfter)
-			{
-				htInsertAfter = TVI_LAST;
-			}
-		}
-	}
-
-	return htInsertAfter;
-}
-
-HTREEITEM ShellTreeView::DetermineDriveSortedPosition(HTREEITEM hParent, const TCHAR *szItemName)
-{
-	HTREEITEM htItem;
-	HTREEITEM hPreviousItem;
-	TVITEMEX item;
-
-	/* Drives will always be the first children of the specified
-	item (usually 'My Computer'). Therefore, keep looping while
-	there are more child items and the current item comes
-	afterwards, or if there are no child items, place the item
-	as the first child. */
-	htItem = TreeView_GetChild(m_hTreeView, hParent);
-
-	if (htItem == nullptr)
-		return TVI_FIRST;
-
-	hPreviousItem = TVI_FIRST;
-
-	while (htItem != nullptr)
-	{
-		item.mask = TVIF_PARAM | TVIF_HANDLE;
-		item.hItem = htItem;
-		TreeView_GetItem(m_hTreeView, &item);
-
-		std::wstring fullItemPath;
-		GetDisplayName(m_itemInfoMap.at(static_cast<int>(item.lParam)).pidl.get(), SHGDN_FORPARSING,
-			fullItemPath);
-
-		if (PathIsRoot(fullItemPath.c_str()))
-		{
-			if (lstrcmp(szItemName, fullItemPath.c_str()) < 0)
-				return hPreviousItem;
-		}
-		else
-		{
-			return hPreviousItem;
-		}
-
-		hPreviousItem = htItem;
-		htItem = TreeView_GetNextSibling(m_hTreeView, htItem);
-	}
-
-	return htItem;
 }
 
 unique_pidl_absolute ShellTreeView::GetSelectedItemPidl() const
@@ -1015,93 +882,6 @@ int ShellTreeView::GetItemInternalIndex(HTREEITEM item) const
 HTREEITEM ShellTreeView::LocateItem(PCIDLIST_ABSOLUTE pidlDirectory)
 {
 	return LocateItemInternal(pidlDirectory, FALSE);
-}
-
-/* Finds items that have been deleted or renamed
-(meaning that their pidl's are no longer valid).
-
-Use two basic strategies to find the item:
-1. Find the parent item through its pidl, the child
-through it's name.
-2. Find the item simply by its name.
-The first method would not normally be needed, but
-real folders can have a display name that differs
-from their parsing name.
-For example, the C:\Users\Username\Documents
-folder in Windows 7 has a display name of
-"My Documents". This is an issue, since a
-direct path lookup will fail. */
-/* TODO: Store parsing name with each item, and
-match against that. */
-HTREEITEM ShellTreeView::LocateDeletedItem(const TCHAR *szFullFileName)
-{
-	HTREEITEM hItem = nullptr;
-	PIDLIST_ABSOLUTE pidl = nullptr;
-	TCHAR szParent[MAX_PATH];
-	BOOL bFound = FALSE;
-	HRESULT hr;
-
-	StringCchCopy(szParent, SIZEOF_ARRAY(szParent), szFullFileName);
-	PathRemoveFileSpec(szParent);
-	hr = SHParseDisplayName(szParent, nullptr, &pidl, 0, nullptr);
-
-	if (SUCCEEDED(hr))
-	{
-		hItem = LocateExistingItem(pidl);
-
-		if (hItem != nullptr)
-		{
-			HTREEITEM hChild;
-			TVITEM tvItem;
-			TCHAR szFileName[MAX_PATH];
-
-			hChild = TreeView_GetChild(m_hTreeView, hItem);
-
-			StringCchCopy(szFileName, SIZEOF_ARRAY(szFileName), szFullFileName);
-			PathStripPath(szFileName);
-
-			/* Now try to find the child folder. */
-			while (hChild != nullptr)
-			{
-				TCHAR szItem[MAX_PATH];
-
-				tvItem.mask = TVIF_TEXT | TVIF_HANDLE;
-				tvItem.hItem = hChild;
-				tvItem.pszText = szItem;
-				tvItem.cchTextMax = SIZEOF_ARRAY(szItem);
-				TreeView_GetItem(m_hTreeView, &tvItem);
-
-				if (lstrcmp(szFileName, szItem) == 0)
-				{
-					hItem = hChild;
-					bFound = TRUE;
-					break;
-				}
-
-				hChild = TreeView_GetNextSibling(m_hTreeView, hChild);
-			}
-		}
-	}
-
-	if (!bFound)
-	{
-		hItem = LocateItemByPath(szFullFileName, FALSE);
-	}
-
-	return hItem;
-}
-
-HTREEITEM ShellTreeView::LocateExistingItem(const TCHAR *szParsingPath)
-{
-	unique_pidl_absolute pidl;
-	HRESULT hr = SHParseDisplayName(szParsingPath, nullptr, wil::out_param(pidl), 0, nullptr);
-
-	if (SUCCEEDED(hr))
-	{
-		return LocateExistingItem(pidl.get());
-	}
-
-	return nullptr;
 }
 
 HTREEITEM ShellTreeView::LocateExistingItem(PCIDLIST_ABSOLUTE pidlDirectory)
@@ -1171,171 +951,6 @@ HTREEITEM ShellTreeView::LocateItemInternal(PCIDLIST_ABSOLUTE pidlDirectory,
 	return hItem;
 }
 
-HTREEITEM ShellTreeView::LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand)
-{
-	HTREEITEM hMyComputer;
-	HTREEITEM hItem;
-	HTREEITEM hNextItem;
-	TVITEMEX item;
-	TCHAR *ptr = nullptr;
-	TCHAR itemText[MAX_PATH];
-	TCHAR fullItemPathCopy[MAX_PATH];
-	TCHAR *nextToken = nullptr;
-
-	StringCchCopy(fullItemPathCopy, SIZEOF_ARRAY(fullItemPathCopy), szItemPath);
-
-	PathRemoveBackslash(fullItemPathCopy);
-
-	unique_pidl_absolute pidlMyComputer;
-	SHGetFolderLocation(nullptr, CSIDL_DRIVES, nullptr, 0, wil::out_param(pidlMyComputer));
-
-	hMyComputer = LocateItem(pidlMyComputer.get());
-
-	/* First of drives in system. */
-	hItem = TreeView_GetChild(m_hTreeView, hMyComputer);
-
-	/* My Computer node may not be expanded. */
-	if (hItem == nullptr)
-		return nullptr;
-
-	ptr = wcstok_s(fullItemPathCopy, _T("\\"), &nextToken);
-
-	StringCchCopy(itemText, SIZEOF_ARRAY(itemText), ptr);
-	StringCchCat(itemText, SIZEOF_ARRAY(itemText), _T("\\"));
-	ptr = itemText;
-
-	item.mask = TVIF_HANDLE | TVIF_PARAM;
-	item.hItem = hItem;
-	TreeView_GetItem(m_hTreeView, &item);
-
-	std::wstring itemName;
-	GetDisplayName(m_itemInfoMap.at(static_cast<int>(item.lParam)).pidl.get(), SHGDN_FORPARSING,
-		itemName);
-
-	while (StrCmpI(ptr, itemName.c_str()) != 0)
-	{
-		hItem = TreeView_GetNextSibling(m_hTreeView, hItem);
-
-		if (hItem == nullptr)
-			return nullptr;
-
-		item.mask = TVIF_PARAM;
-		item.hItem = hItem;
-		TreeView_GetItem(m_hTreeView, &item);
-
-		GetDisplayName(m_itemInfoMap.at(static_cast<int>(item.lParam)).pidl.get(), SHGDN_FORPARSING,
-			itemName);
-	}
-
-	item.mask = TVIF_TEXT;
-
-	while ((ptr = wcstok_s(nullptr, _T("\\"), &nextToken)) != nullptr)
-	{
-		if (TreeView_GetChild(m_hTreeView, hItem) == nullptr)
-		{
-			if (bExpand)
-				SendMessage(m_hTreeView, TVM_EXPAND, TVE_EXPAND, (LPARAM) hItem);
-			else
-				return nullptr;
-		}
-
-		hNextItem = TreeView_GetChild(m_hTreeView, hItem);
-		hItem = hNextItem;
-
-		item.pszText = itemText;
-		item.cchTextMax = SIZEOF_ARRAY(itemText);
-		item.hItem = hItem;
-		TreeView_GetItem(m_hTreeView, &item);
-
-		while (StrCmpI(ptr, itemText) != 0)
-		{
-			hItem = TreeView_GetNextSibling(m_hTreeView, hItem);
-
-			if (hItem == nullptr)
-				return nullptr;
-
-			item.pszText = itemText;
-			item.cchTextMax = SIZEOF_ARRAY(itemText);
-			item.hItem = hItem;
-			TreeView_GetItem(m_hTreeView, &item);
-		}
-	}
-
-	return hItem;
-}
-
-/* Locate an item which is a Desktop (sub)child, if visible.
-   Does not expand any item */
-HTREEITEM ShellTreeView::LocateItemOnDesktopTree(const TCHAR *szFullFileName)
-{
-	HTREEITEM hItem;
-	TVITEMEX tvItem;
-	TCHAR szFileName[MAX_PATH];
-	TCHAR szDesktop[MAX_PATH];
-	TCHAR szCurrentItem[MAX_PATH];
-	TCHAR *pItemName = nullptr;
-	TCHAR *nextToken = nullptr;
-	BOOL bDesktop;
-	BOOL bFound;
-
-	bDesktop = IsDesktopSubChild(szFullFileName);
-
-	if (!bDesktop)
-	{
-		return nullptr;
-	}
-
-	StringCchCopy(szFileName, SIZEOF_ARRAY(szFileName), szFullFileName);
-
-	SHGetFolderPath(nullptr, CSIDL_DESKTOP, nullptr, SHGFP_TYPE_CURRENT, szDesktop);
-
-	pItemName = &szFileName[lstrlen(szDesktop)];
-
-	if (lstrlen(szFullFileName) > lstrlen(szDesktop))
-	{
-		pItemName++; // Skip the "\\" after the desktop folder name
-	}
-
-	nextToken = nullptr;
-	pItemName = wcstok_s(pItemName, _T("\\"), &nextToken);
-
-	hItem = TreeView_GetRoot(m_hTreeView);
-
-	while (pItemName != nullptr)
-	{
-		hItem = TreeView_GetChild(m_hTreeView, hItem);
-		bFound = FALSE;
-
-		while (hItem != nullptr && !bFound)
-		{
-			tvItem.mask = TVIF_TEXT;
-			tvItem.hItem = hItem;
-			tvItem.pszText = szCurrentItem;
-			tvItem.cchTextMax = SIZEOF_ARRAY(szCurrentItem);
-			TreeView_GetItem(m_hTreeView, &tvItem);
-
-			if (lstrcmp(szCurrentItem, pItemName) == 0)
-			{
-				bFound = TRUE;
-			}
-			else
-			{
-				hItem = TreeView_GetNextSibling(m_hTreeView, hItem);
-			}
-		}
-
-		if (!bFound)
-		{
-			return nullptr;
-		}
-
-		// Item found, pass to sub-level
-		pItemName = wcstok_s(nextToken, _T("\\"), &nextToken);
-	}
-
-	return hItem;
-}
-
 void ShellTreeView::RemoveChildrenFromInternalMap(HTREEITEM hParent)
 {
 	auto hItem = TreeView_GetChild(m_hTreeView, hParent);
@@ -1355,258 +970,6 @@ void ShellTreeView::RemoveChildrenFromInternalMap(HTREEITEM hParent)
 		m_itemInfoMap.erase(static_cast<int>(tvItemEx.lParam));
 
 		hItem = TreeView_GetNextSibling(m_hTreeView, hItem);
-	}
-}
-
-void ShellTreeView::OnDeviceChange(UINT eventType, LONG_PTR eventData)
-{
-	switch (eventType)
-	{
-	/* Device has being added/inserted into the system. Update the
-	treeview as necessary. */
-	case DBT_DEVICEARRIVAL:
-	{
-		DEV_BROADCAST_HDR *dbh;
-
-		dbh = (DEV_BROADCAST_HDR *) eventData;
-
-		if (dbh->dbch_devicetype == DBT_DEVTYP_VOLUME)
-		{
-			DEV_BROADCAST_VOLUME *pdbv = nullptr;
-			SHFILEINFO shfi;
-			HTREEITEM hItem;
-			TVITEM tvItem;
-			TCHAR driveLetter;
-			TCHAR driveName[4];
-
-			pdbv = (DEV_BROADCAST_VOLUME *) dbh;
-
-			/* Build a string that will form the drive name. */
-			driveLetter = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
-			StringCchPrintf(driveName, SIZEOF_ARRAY(driveName), _T("%c:\\"), driveLetter);
-
-			if (pdbv->dbcv_flags & DBTF_MEDIA)
-			{
-				hItem = LocateItemByPath(driveName, FALSE);
-
-				if (hItem != nullptr)
-				{
-					SHGetFileInfo(driveName, 0, &shfi, sizeof(shfi), SHGFI_SYSICONINDEX);
-
-					std::wstring displayName;
-					GetDisplayName(driveName, SHGDN_INFOLDER, displayName);
-
-					/* Update the drives icon and display name. */
-					tvItem.mask = TVIF_HANDLE | TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
-					tvItem.hItem = hItem;
-					tvItem.iImage = shfi.iIcon;
-					tvItem.iSelectedImage = shfi.iIcon;
-					tvItem.pszText = displayName.data();
-					TreeView_SetItem(m_hTreeView, &tvItem);
-				}
-			}
-			else
-			{
-				/* Add the drive to the treeview. */
-				AddItem(driveName);
-
-				MonitorDrive(driveName);
-			}
-		}
-	}
-	break;
-
-	case DBT_DEVICEQUERYREMOVE:
-	{
-		/* The system is looking for permission to remove
-		a drive. Stop monitoring the drive. */
-		DEV_BROADCAST_HDR *dbh = nullptr;
-		DEV_BROADCAST_HANDLE *pdbHandle = nullptr;
-		std::list<DriveEvent>::iterator itr;
-
-		dbh = (DEV_BROADCAST_HDR *) eventData;
-
-		switch (dbh->dbch_devicetype)
-		{
-		case DBT_DEVTYP_HANDLE:
-		{
-			pdbHandle = (DEV_BROADCAST_HANDLE *) dbh;
-
-			/* Loop through each of the registered drives to
-			find the one that requested removal. Once it is
-			found, stop monitoring it, close its handle,
-			and allow the operating system to release the drive.
-			Don't remove the drive from the treeview (until it
-			has actually been removed). */
-			for (itr = m_pDriveList.begin(); itr != m_pDriveList.end(); itr++)
-			{
-				if (itr->hDrive == pdbHandle->dbch_handle)
-				{
-					if (itr->monitorId)
-					{
-						m_pDirMon->StopDirectoryMonitor(*itr->monitorId);
-					}
-
-					break;
-				}
-			}
-		}
-		break;
-		}
-	}
-
-	case DBT_DEVICEREMOVECOMPLETE:
-	{
-		DEV_BROADCAST_HDR *dbh = nullptr;
-		DEV_BROADCAST_HANDLE *pdbHandle = nullptr;
-		std::list<DriveEvent>::iterator itr;
-
-		dbh = (DEV_BROADCAST_HDR *) eventData;
-
-		switch (dbh->dbch_devicetype)
-		{
-		case DBT_DEVTYP_HANDLE:
-		{
-			pdbHandle = (DEV_BROADCAST_HANDLE *) dbh;
-
-			/* The device was removed from the system.
-			Unregister its notification handle. */
-			UnregisterDeviceNotification(pdbHandle->dbch_hdevnotify);
-		}
-		break;
-
-		case DBT_DEVTYP_VOLUME:
-		{
-			DEV_BROADCAST_VOLUME *pdbv = nullptr;
-			SHFILEINFO shfi;
-			HTREEITEM hItem;
-			TVITEM tvItem;
-			TCHAR driveLetter;
-			TCHAR driveName[4];
-
-			pdbv = (DEV_BROADCAST_VOLUME *) dbh;
-
-			/* Build a string that will form the drive name. */
-			driveLetter = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
-			StringCchPrintf(driveName, SIZEOF_ARRAY(driveName), _T("%c:\\"), driveLetter);
-
-			if (pdbv->dbcv_flags & DBTF_MEDIA)
-			{
-				hItem = LocateItemByPath(driveName, FALSE);
-
-				if (hItem != nullptr)
-				{
-					SHGetFileInfo(driveName, 0, &shfi, sizeof(shfi), SHGFI_SYSICONINDEX);
-
-					std::wstring displayName;
-					GetDisplayName(driveName, SHGDN_INFOLDER, displayName);
-
-					/* Update the drives icon and display name. */
-					tvItem.mask = TVIF_HANDLE | TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
-					tvItem.hItem = hItem;
-					tvItem.iImage = shfi.iIcon;
-					tvItem.iSelectedImage = shfi.iIcon;
-					tvItem.pszText = displayName.data();
-					TreeView_SetItem(m_hTreeView, &tvItem);
-				}
-			}
-			else
-			{
-				/* Remove the drive from the treeview. */
-				RemoveItem(driveName);
-			}
-		}
-		break;
-		}
-	}
-	}
-}
-
-DWORD WINAPI Thread_MonitorAllDrives(LPVOID pParam)
-{
-	ShellTreeView *shellTreeView = nullptr;
-	TCHAR *pszDriveStrings = nullptr;
-	TCHAR *ptrDrive = nullptr;
-	DWORD dwSize;
-
-	shellTreeView = (ShellTreeView *) pParam;
-
-	dwSize = GetLogicalDriveStrings(0, nullptr);
-
-	pszDriveStrings = (TCHAR *) malloc((dwSize + 1) * sizeof(TCHAR));
-
-	if (pszDriveStrings == nullptr)
-		return 0;
-
-	dwSize = GetLogicalDriveStrings(dwSize, pszDriveStrings);
-
-	if (dwSize != 0)
-	{
-		ptrDrive = pszDriveStrings;
-
-		while (*ptrDrive != '\0')
-		{
-			shellTreeView->MonitorDrivePublic(ptrDrive);
-
-			ptrDrive += lstrlen(ptrDrive) + 1;
-		}
-	}
-
-	free(pszDriveStrings);
-
-	return 1;
-}
-
-void ShellTreeView::MonitorDrivePublic(const TCHAR *szDrive)
-{
-	MonitorDrive(szDrive);
-}
-
-void ShellTreeView::MonitorDrive(const TCHAR *szDrive)
-{
-	DirectoryAlteredData *pDirectoryAltered = nullptr;
-	DEV_BROADCAST_HANDLE dbv;
-	HANDLE hDrive;
-	HDEVNOTIFY hDevNotify;
-	DriveEvent de;
-
-	/* Remote (i.e. network) drives will NOT be monitored. */
-	if (GetDriveType(szDrive) != DRIVE_REMOTE)
-	{
-		hDrive = CreateFile(szDrive, FILE_LIST_DIRECTORY,
-			FILE_SHARE_READ | FILE_SHARE_DELETE | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING,
-			FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, nullptr);
-
-		if (hDrive != INVALID_HANDLE_VALUE)
-		{
-			pDirectoryAltered = (DirectoryAlteredData *) malloc(sizeof(DirectoryAlteredData));
-
-			StringCchCopy(pDirectoryAltered->szPath, SIZEOF_ARRAY(pDirectoryAltered->szPath),
-				szDrive);
-			pDirectoryAltered->shellTreeView = this;
-
-			auto monitorId = m_pDirMon->WatchDirectory(hDrive, szDrive, FILE_NOTIFY_CHANGE_DIR_NAME,
-				ShellTreeView::DirectoryAlteredCallback, TRUE, (void *) pDirectoryAltered);
-
-			dbv.dbch_size = sizeof(dbv);
-			dbv.dbch_devicetype = DBT_DEVTYP_HANDLE;
-			dbv.dbch_handle = hDrive;
-
-			/* Register to receive hardware events (i.e. insertion,
-			removal, etc) for the specified drive. */
-			hDevNotify = RegisterDeviceNotification(m_hTreeView, &dbv, DEVICE_NOTIFY_WINDOW_HANDLE);
-
-			/* If the handle was successfully registered, log the
-			drive path, handle and monitoring id. */
-			if (hDevNotify != nullptr)
-			{
-				StringCchCopy(de.szDrive, SIZEOF_ARRAY(de.szDrive), szDrive);
-				de.hDrive = hDrive;
-				de.monitorId = monitorId;
-
-				m_pDriveList.push_back(de);
-			}
-		}
 	}
 }
 
@@ -1748,24 +1111,6 @@ HRESULT ShellTreeView::OnBeginDrag(int iItemId)
 	DWORD effect;
 	return SHDoDragDrop(m_hTreeView, dataObject.get(), nullptr,
 		DROPEFFECT_COPY | DROPEFFECT_MOVE | DROPEFFECT_LINK, &effect);
-}
-
-BOOL ShellTreeView::IsDesktop(const TCHAR *szPath)
-{
-	TCHAR szDesktop[MAX_PATH];
-
-	SHGetFolderPath(nullptr, CSIDL_DESKTOP, nullptr, SHGFP_TYPE_CURRENT, szDesktop);
-
-	return (lstrcmp(szPath, szDesktop) == 0);
-}
-
-BOOL ShellTreeView::IsDesktopSubChild(const TCHAR *szFullFileName)
-{
-	TCHAR szDesktop[MAX_PATH];
-
-	SHGetFolderPath(nullptr, CSIDL_DESKTOP, nullptr, SHGFP_TYPE_CURRENT, szDesktop);
-
-	return (wcsncmp(szFullFileName, szDesktop, lstrlen(szDesktop)) == 0);
 }
 
 void ShellTreeView::StartRenamingSelectedItem()
