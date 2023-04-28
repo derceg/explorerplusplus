@@ -132,7 +132,11 @@ LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam,
 	switch (msg)
 	{
 	case WM_TIMER:
-		if (wParam == DROP_EXPAND_TIMER_ID)
+		if (wParam == PROCESS_SHELL_CHANGES_TIMER_ID)
+		{
+			OnProcessShellChangeNotifications();
+		}
+		else if (wParam == DROP_EXPAND_TIMER_ID)
 		{
 			OnDropExpandTimer();
 		}
@@ -233,6 +237,10 @@ LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam,
 
 	case WM_APP_SUBFOLDERS_RESULT_READY:
 		ProcessSubfoldersResult(static_cast<int>(wParam));
+		break;
+
+	case WM_APP_SHELL_NOTIFY:
+		OnShellNotify(wParam, lParam);
 		break;
 
 	case WM_DESTROY:

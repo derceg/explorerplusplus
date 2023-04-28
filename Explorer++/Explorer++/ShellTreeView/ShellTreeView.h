@@ -51,6 +51,9 @@ private:
 	// This is the same background color as used in the Explorer treeview.
 	static inline constexpr COLORREF TREE_VIEW_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
 
+	static const UINT PROCESS_SHELL_CHANGES_TIMER_ID = 1;
+	static const UINT PROCESS_SHELL_CHANGES_TIMEOUT = 100;
+
 	static const UINT DROP_EXPAND_TIMER_ID = 2;
 	static const UINT DROP_EXPAND_TIMER_ELAPSE = 800;
 
@@ -71,6 +74,20 @@ private:
 	{
 		int internalIndex;
 		std::wstring name;
+	};
+
+	struct ShellChangeNotification
+	{
+		LONG event;
+		unique_pidl_absolute pidl1;
+		unique_pidl_absolute pidl2;
+
+		ShellChangeNotification(LONG event, PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2) :
+			event(event),
+			pidl1(pidl1 ? ILCloneFull(pidl1) : nullptr),
+			pidl2(pidl2 ? ILCloneFull(pidl2) : nullptr)
+		{
+		}
 	};
 
 	struct BasicItemInfo
@@ -123,9 +140,15 @@ private:
 
 	unique_pidl_absolute GetSelectedItemPidl() const;
 
-	/* Directory modification. */
+	// Directory monitoring
 	void StartDirectoryMonitoringForItem(ItemInfo &item);
 	void StopDirectoryMonitoringForItem(ItemInfo &item);
+	void OnShellNotify(WPARAM wParam, LPARAM lParam);
+	void OnProcessShellChangeNotifications();
+	void ProcessShellChangeNotification(const ShellChangeNotification &change);
+	void OnItemRemoved(PCIDLIST_ABSOLUTE simplePidl);
+	void RemoveItem(HTREEITEM item);
+	bool ItemHasMultipleChildren(HTREEITEM item);
 
 	/* Icons. */
 	void QueueIconTask(HTREEITEM item, int internalIndex);
@@ -202,4 +225,7 @@ private:
 
 	HTREEITEM m_cutItem;
 	wil::com_ptr_nothrow<IDataObject> m_clipboardDataObject;
+
+	// Directory monitoring
+	std::vector<ShellChangeNotification> m_shellChangeNotifications;
 };
