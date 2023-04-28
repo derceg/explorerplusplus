@@ -8,7 +8,7 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 
-void ShellTreeView::StartDirectoryMonitoringForItem(ItemInfo_t &item)
+void ShellTreeView::StartDirectoryMonitoringForItem(ItemInfo &item)
 {
 	// There shouldn't be more than one call to monitor a directory.
 	assert(item.shChangeNotifyId == 0);
@@ -34,7 +34,7 @@ void ShellTreeView::StartDirectoryMonitoringForItem(ItemInfo_t &item)
 	}
 }
 
-void ShellTreeView::StopDirectoryMonitoringForItem(ItemInfo_t &item)
+void ShellTreeView::StopDirectoryMonitoringForItem(ItemInfo &item)
 {
 	if (item.shChangeNotifyId == 0)
 	{
@@ -126,7 +126,7 @@ void ShellTreeView::DirectoryAlteredAddFile(const TCHAR *szFullFileName)
 	else
 	{
 		/* The file doesn't exist, so keep a record of it. */
-		AlteredFile_t af;
+		AlteredFile af;
 
 		StringCchCopy(af.szFileName, SIZEOF_ARRAY(af.szFileName), szFullFileName);
 		af.dwAction = FILE_ACTION_ADDED;
@@ -304,11 +304,11 @@ void ShellTreeView::DirectoryAlteredRenameFile(const TCHAR *szFullFileName)
 
 void ShellTreeView::DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData)
 {
-	DirectoryAltered_t *pDirectoryAltered = nullptr;
+	DirectoryAlteredData *pDirectoryAltered = nullptr;
 	ShellTreeView *shellTreeView = nullptr;
 	TCHAR szFullFileName[MAX_PATH];
 
-	pDirectoryAltered = (DirectoryAltered_t *) pData;
+	pDirectoryAltered = (DirectoryAlteredData *) pData;
 
 	shellTreeView = pDirectoryAltered->shellTreeView;
 
@@ -327,7 +327,7 @@ void ShellTreeView::DirectoryModified(DWORD dwAction, const TCHAR *szFullFileNam
 
 	SetTimer(m_hTreeView, DIRECTORY_MODIFIED_TIMER_ID, DIRECTORY_MODIFIED_TIMER_ELAPSE, nullptr);
 
-	AlteredFile_t af;
+	AlteredFile af;
 
 	StringCchCopy(af.szFileName, SIZEOF_ARRAY(af.szFileName), szFullFileName);
 	af.dwAction = dwAction;
@@ -521,7 +521,7 @@ void ShellTreeView::RenameItem(HTREEITEM hItem, const TCHAR *szFullFileName)
 		StringCchCopy(szFileName, SIZEOF_ARRAY(szFileName), szFullFileName);
 		PathStripPath(szFileName);
 
-		ItemInfo_t &iteminfo = m_itemInfoMap.at(static_cast<int>(tvItem.lParam));
+		ItemInfo &iteminfo = m_itemInfoMap.at(static_cast<int>(tvItem.lParam));
 		hr = SHParseDisplayName(szFullFileName, nullptr, wil::out_param(iteminfo.pidl), 0, nullptr);
 
 		pidlParent = iteminfo.pidl.get();
@@ -584,7 +584,7 @@ void ShellTreeView::UpdateChildren(HTREEITEM hParent, PCIDLIST_ABSOLUTE pidlPare
 
 PCIDLIST_ABSOLUTE ShellTreeView::UpdateItemInfo(PCIDLIST_ABSOLUTE pidlParent, int iItemId)
 {
-	ItemInfo_t &itemInfo = m_itemInfoMap.at(iItemId);
+	ItemInfo &itemInfo = m_itemInfoMap.at(iItemId);
 	itemInfo.pidl.reset(ILCombine(pidlParent, itemInfo.pridl.get()));
 
 	return itemInfo.pidl.get();

@@ -62,7 +62,7 @@ private:
 	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 10;
 	static const LONG DROP_SCROLL_MARGIN_Y_96DPI = 10;
 
-	struct ItemInfo_t
+	struct ItemInfo
 	{
 		unique_pidl_absolute pidl;
 		unique_pidl_child pridl;
@@ -78,7 +78,7 @@ private:
 		std::wstring name;
 	};
 
-	struct AlteredFile_t
+	struct AlteredFile
 	{
 		TCHAR szFileName[MAX_PATH];
 		DWORD dwAction;
@@ -109,13 +109,13 @@ private:
 		bool hasSubfolder;
 	};
 
-	struct DirectoryAltered_t
+	struct DirectoryAlteredData
 	{
 		TCHAR szPath[MAX_PATH];
 		ShellTreeView *shellTreeView;
 	};
 
-	struct DriveEvent_t
+	struct DriveEvent
 	{
 		TCHAR szDrive[MAX_PATH];
 		HANDLE hDrive;
@@ -166,8 +166,8 @@ private:
 	unique_pidl_absolute GetSelectedItemPidl() const;
 
 	/* Directory modification. */
-	void StartDirectoryMonitoringForItem(ItemInfo_t &item);
-	void StopDirectoryMonitoringForItem(ItemInfo_t &item);
+	void StartDirectoryMonitoringForItem(ItemInfo &item);
+	void StopDirectoryMonitoringForItem(ItemInfo &item);
 	void DirectoryAlteredAddFile(const TCHAR *szFullFileName);
 	void DirectoryAlteredRemoveFile(const TCHAR *szFullFileName);
 	void DirectoryAlteredRenameFile(const TCHAR *szFullFileName);
@@ -177,7 +177,7 @@ private:
 	static std::optional<IconResult> FindIconAsync(HWND treeView, int iconResultId, HTREEITEM item,
 		int internalIndex, PCIDLIST_ABSOLUTE pidl);
 	void ProcessIconResult(int iconResultId);
-	std::optional<int> GetCachedIconIndex(const ItemInfo_t &itemInfo);
+	std::optional<int> GetCachedIconIndex(const ItemInfo &itemInfo);
 
 	void QueueSubfoldersTask(HTREEITEM item);
 	static std::optional<SubfoldersResult> CheckSubfoldersAsync(HWND treeView,
@@ -187,8 +187,8 @@ private:
 	/* Item id's. */
 	int GenerateUniqueItemId();
 
-	const ItemInfo_t &GetItemByHandle(HTREEITEM item) const;
-	ItemInfo_t &GetItemByHandle(HTREEITEM item);
+	const ItemInfo &GetItemByHandle(HTREEITEM item) const;
+	ItemInfo &GetItemByHandle(HTREEITEM item);
 	int GetItemInternalIndex(HTREEITEM item) const;
 
 	// ShellDropTargetWindow
@@ -238,7 +238,7 @@ private:
 	int m_subfoldersResultIDCounter;
 
 	/* Item id's and info. */
-	std::unordered_map<int, ItemInfo_t> m_itemInfoMap;
+	std::unordered_map<int, ItemInfo> m_itemInfoMap;
 	int m_itemIDCounter;
 	CachedIcons *m_cachedIcons;
 
@@ -256,11 +256,11 @@ private:
 	wil::com_ptr_nothrow<IDataObject> m_clipboardDataObject;
 
 	/* Directory modification. */
-	std::list<AlteredFile_t> m_AlteredList;
-	std::list<AlteredFile_t> m_AlteredTrackingList;
+	std::list<AlteredFile> m_AlteredList;
+	std::list<AlteredFile> m_AlteredTrackingList;
 	CRITICAL_SECTION m_cs;
 	TCHAR m_szAlteredOldFileName[MAX_PATH];
 
 	/* Hardware events. */
-	std::list<DriveEvent_t> m_pDriveList;
+	std::list<DriveEvent> m_pDriveList;
 };

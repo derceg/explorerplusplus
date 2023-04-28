@@ -363,7 +363,7 @@ void ShellTreeView::OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi)
 
 	if (WI_IsFlagSet(ptvItem->mask, TVIF_IMAGE))
 	{
-		const ItemInfo_t &itemInfo = m_itemInfoMap.at(static_cast<int>(ptvItem->lParam));
+		const ItemInfo &itemInfo = m_itemInfoMap.at(static_cast<int>(ptvItem->lParam));
 		auto cachedIconIndex = GetCachedIconIndex(itemInfo);
 
 		if (cachedIconIndex)
@@ -390,7 +390,7 @@ void ShellTreeView::OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi)
 	ptvItem->mask |= TVIF_DI_SETITEM;
 }
 
-std::optional<int> ShellTreeView::GetCachedIconIndex(const ItemInfo_t &itemInfo)
+std::optional<int> ShellTreeView::GetCachedIconIndex(const ItemInfo &itemInfo)
 {
 	std::wstring filePath;
 	HRESULT hr = GetDisplayName(itemInfo.pidl.get(), SHGDN_FORPARSING, filePath);
@@ -412,7 +412,7 @@ std::optional<int> ShellTreeView::GetCachedIconIndex(const ItemInfo_t &itemInfo)
 
 void ShellTreeView::QueueIconTask(HTREEITEM item, int internalIndex)
 {
-	const ItemInfo_t &itemInfo = m_itemInfoMap.at(internalIndex);
+	const ItemInfo &itemInfo = m_itemInfoMap.at(internalIndex);
 
 	BasicItemInfo basicItemInfo;
 	basicItemInfo.pidl.reset(ILCloneFull(itemInfo.pidl.get()));
@@ -486,7 +486,7 @@ void ShellTreeView::ProcessIconResult(int iconResultId)
 		return;
 	}
 
-	const ItemInfo_t &itemInfo = itemMapItr->second;
+	const ItemInfo &itemInfo = itemMapItr->second;
 
 	std::wstring filePath;
 	HRESULT hr = GetDisplayName(itemInfo.pidl.get(), SHGDN_FORPARSING, filePath);
@@ -624,7 +624,7 @@ void ShellTreeView::OnItemExpanding(const NMTREEVIEW *nmtv)
 		SendMessage(m_hTreeView, TVM_EXPAND, TVE_COLLAPSE | TVE_COLLAPSERESET,
 			reinterpret_cast<LPARAM>(parentItem));
 
-		ItemInfo_t &itemInfo = GetItemByHandle(parentItem);
+		ItemInfo &itemInfo = GetItemByHandle(parentItem);
 		StopDirectoryMonitoringForItem(itemInfo);
 	}
 }
@@ -697,8 +697,8 @@ int CALLBACK ShellTreeView::CompareItems(LPARAM lParam1, LPARAM lParam2)
 	int iItemId1 = (int) lParam1;
 	int iItemId2 = (int) lParam2;
 
-	const ItemInfo_t &itemInfo1 = m_itemInfoMap.at(iItemId1);
-	const ItemInfo_t &itemInfo2 = m_itemInfoMap.at(iItemId2);
+	const ItemInfo &itemInfo1 = m_itemInfoMap.at(iItemId1);
+	const ItemInfo &itemInfo2 = m_itemInfoMap.at(iItemId2);
 
 	std::wstring displayName1;
 	GetDisplayName(itemInfo1.pidl.get(), SHGDN_FORPARSING, displayName1);
@@ -856,7 +856,7 @@ HRESULT ShellTreeView::ExpandDirectory(HTREEITEM hParent)
 
 	if (m_config->shellChangeNotificationType == ShellChangeNotificationType::All)
 	{
-		ItemInfo_t &itemInfo = GetItemByHandle(hParent);
+		ItemInfo &itemInfo = GetItemByHandle(hParent);
 		StartDirectoryMonitoringForItem(itemInfo);
 	}
 
@@ -984,18 +984,18 @@ unique_pidl_absolute ShellTreeView::GetSelectedItemPidl() const
 
 unique_pidl_absolute ShellTreeView::GetItemPidl(HTREEITEM hTreeItem) const
 {
-	const ItemInfo_t &itemInfo = GetItemByHandle(hTreeItem);
+	const ItemInfo &itemInfo = GetItemByHandle(hTreeItem);
 	unique_pidl_absolute pidl(ILCloneFull(itemInfo.pidl.get()));
 	return pidl;
 }
 
-const ShellTreeView::ItemInfo_t &ShellTreeView::GetItemByHandle(HTREEITEM item) const
+const ShellTreeView::ItemInfo &ShellTreeView::GetItemByHandle(HTREEITEM item) const
 {
 	int internalIndex = GetItemInternalIndex(item);
 	return m_itemInfoMap.at(internalIndex);
 }
 
-ShellTreeView::ItemInfo_t &ShellTreeView::GetItemByHandle(HTREEITEM item)
+ShellTreeView::ItemInfo &ShellTreeView::GetItemByHandle(HTREEITEM item)
 {
 	int internalIndex = GetItemInternalIndex(item);
 	return m_itemInfoMap.at(internalIndex);
@@ -1422,7 +1422,7 @@ void ShellTreeView::OnDeviceChange(UINT eventType, LONG_PTR eventData)
 		a drive. Stop monitoring the drive. */
 		DEV_BROADCAST_HDR *dbh = nullptr;
 		DEV_BROADCAST_HANDLE *pdbHandle = nullptr;
-		std::list<DriveEvent_t>::iterator itr;
+		std::list<DriveEvent>::iterator itr;
 
 		dbh = (DEV_BROADCAST_HDR *) eventData;
 
@@ -1459,7 +1459,7 @@ void ShellTreeView::OnDeviceChange(UINT eventType, LONG_PTR eventData)
 	{
 		DEV_BROADCAST_HDR *dbh = nullptr;
 		DEV_BROADCAST_HANDLE *pdbHandle = nullptr;
-		std::list<DriveEvent_t>::iterator itr;
+		std::list<DriveEvent>::iterator itr;
 
 		dbh = (DEV_BROADCAST_HDR *) eventData;
 
@@ -1564,11 +1564,11 @@ void ShellTreeView::MonitorDrivePublic(const TCHAR *szDrive)
 
 void ShellTreeView::MonitorDrive(const TCHAR *szDrive)
 {
-	DirectoryAltered_t *pDirectoryAltered = nullptr;
+	DirectoryAlteredData *pDirectoryAltered = nullptr;
 	DEV_BROADCAST_HANDLE dbv;
 	HANDLE hDrive;
 	HDEVNOTIFY hDevNotify;
-	DriveEvent_t de;
+	DriveEvent de;
 
 	/* Remote (i.e. network) drives will NOT be monitored. */
 	if (GetDriveType(szDrive) != DRIVE_REMOTE)
@@ -1579,7 +1579,7 @@ void ShellTreeView::MonitorDrive(const TCHAR *szDrive)
 
 		if (hDrive != INVALID_HANDLE_VALUE)
 		{
-			pDirectoryAltered = (DirectoryAltered_t *) malloc(sizeof(DirectoryAltered_t));
+			pDirectoryAltered = (DirectoryAlteredData *) malloc(sizeof(DirectoryAlteredData));
 
 			StringCchCopy(pDirectoryAltered->szPath, SIZEOF_ARRAY(pDirectoryAltered->szPath),
 				szDrive);
@@ -1671,7 +1671,7 @@ void ShellTreeView::RefreshAllIcons()
 	tvItemEx.hItem = hRoot;
 	TreeView_GetItem(m_hTreeView, &tvItemEx);
 
-	const ItemInfo_t &itemInfo = m_itemInfoMap.at(static_cast<int>(tvItemEx.lParam));
+	const ItemInfo &itemInfo = m_itemInfoMap.at(static_cast<int>(tvItemEx.lParam));
 
 	SHFILEINFO shfi;
 	SHGetFileInfo(reinterpret_cast<LPCTSTR>(itemInfo.pidl.get()), 0, &shfi, sizeof(shfi),
@@ -1699,7 +1699,7 @@ void ShellTreeView::RefreshAllIconsInternal(HTREEITEM hFirstSibling)
 	tvItem.hItem = hFirstSibling;
 	TreeView_GetItem(m_hTreeView, &tvItem);
 
-	const ItemInfo_t &itemInfo = m_itemInfoMap[static_cast<int>(tvItem.lParam)];
+	const ItemInfo &itemInfo = m_itemInfoMap[static_cast<int>(tvItem.lParam)];
 	SHGetFileInfo(reinterpret_cast<LPCTSTR>(itemInfo.pidl.get()), 0, &shfi, sizeof(shfi),
 		SHGFI_PIDL | SHGFI_SYSICONINDEX);
 
@@ -1720,7 +1720,7 @@ void ShellTreeView::RefreshAllIconsInternal(HTREEITEM hFirstSibling)
 		tvItem.hItem = hNextSibling;
 		TreeView_GetItem(m_hTreeView, &tvItem);
 
-		const ItemInfo_t &itemInfoNext = m_itemInfoMap[static_cast<int>(tvItem.lParam)];
+		const ItemInfo &itemInfoNext = m_itemInfoMap[static_cast<int>(tvItem.lParam)];
 		SHGetFileInfo(reinterpret_cast<LPCTSTR>(itemInfoNext.pidl.get()), 0, &shfi, sizeof(shfi),
 			SHGFI_PIDL | SHGFI_SYSICONINDEX);
 
