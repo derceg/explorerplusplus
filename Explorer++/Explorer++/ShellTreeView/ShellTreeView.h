@@ -72,17 +72,17 @@ private:
 		ULONG shChangeNotifyId = 0;
 	};
 
-	typedef struct
+	struct EnumeratedItem
 	{
 		int internalIndex;
 		std::wstring name;
-	} EnumeratedItem;
+	};
 
-	typedef struct
+	struct AlteredFile_t
 	{
 		TCHAR szFileName[MAX_PATH];
 		DWORD dwAction;
-	} AlteredFile_t;
+	};
 
 	struct BasicItemInfo
 	{
@@ -109,18 +109,18 @@ private:
 		bool hasSubfolder;
 	};
 
-	typedef struct
+	struct DirectoryAltered_t
 	{
 		TCHAR szPath[MAX_PATH];
 		ShellTreeView *shellTreeView;
-	} DirectoryAltered_t;
+	};
 
-	typedef struct
+	struct DriveEvent_t
 	{
 		TCHAR szDrive[MAX_PATH];
 		HANDLE hDrive;
 		std::optional<int> monitorId;
-	} DriveEvent_t;
+	};
 
 	static HWND CreateTreeView(HWND parent);
 
