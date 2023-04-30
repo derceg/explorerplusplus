@@ -11,23 +11,23 @@
 
 class WindowSubclassWrapper;
 
+struct ShellChangeNotification
+{
+	LONG event;
+	unique_pidl_absolute pidl1;
+	unique_pidl_absolute pidl2;
+
+	ShellChangeNotification(LONG event, PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2) :
+		event(event),
+		pidl1(pidl1 ? ILCloneFull(pidl1) : nullptr),
+		pidl2(pidl2 ? ILCloneFull(pidl2) : nullptr)
+	{
+	}
+};
+
 class ShellChangeWatcher
 {
 public:
-	struct ShellChangeNotification
-	{
-		LONG event;
-		unique_pidl_absolute pidl1;
-		unique_pidl_absolute pidl2;
-
-		ShellChangeNotification(LONG event, PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2) :
-			event(event),
-			pidl1(pidl1 ? ILCloneFull(pidl1) : nullptr),
-			pidl2(pidl2 ? ILCloneFull(pidl2) : nullptr)
-		{
-		}
-	};
-
 	using ProcessNotificationsCallback =
 		std::function<void(const std::vector<ShellChangeNotification> &shellNotifications)>;
 

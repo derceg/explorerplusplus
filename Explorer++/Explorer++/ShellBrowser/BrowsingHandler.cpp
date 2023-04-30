@@ -40,11 +40,7 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 {
 	SetCursor(LoadCursor(nullptr, IDC_WAIT));
 
-	auto resetCursor = wil::scope_exit(
-		[]
-		{
-			SetCursor(LoadCursor(nullptr, IDC_ARROW));
-		});
+	auto resetCursor = wil::scope_exit([] { SetCursor(LoadCursor(nullptr, IDC_ARROW)); });
 
 	m_navigationStartedSignal(pidlDirectory);
 
@@ -71,12 +67,7 @@ void ShellBrowser::PrepareToChangeFolders()
 
 	ClearPendingResults();
 
-	if (IsMonitoringShellChanges())
-	{
-		StopDirectoryMonitoring();
-
-		KillTimer(m_hListView, PROCESS_SHELL_CHANGES_TIMER_ID);
-	}
+	m_shellChangeWatcher.StopWatchingAll();
 
 	EnterCriticalSection(&m_csDirectoryAltered);
 	m_FileSelectionList.clear();

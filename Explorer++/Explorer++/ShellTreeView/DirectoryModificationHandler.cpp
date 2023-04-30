@@ -83,7 +83,7 @@ void ShellTreeView::RestartDirectoryMonitoringForItem(ItemInfo &item)
 }
 
 void ShellTreeView::ProcessShellChangeNotifications(
-	const std::vector<ShellChangeWatcher::ShellChangeNotification> &shellChangeNotifications)
+	const std::vector<ShellChangeNotification> &shellChangeNotifications)
 {
 	SendMessage(m_hTreeView, WM_SETREDRAW, FALSE, 0);
 
@@ -95,8 +95,7 @@ void ShellTreeView::ProcessShellChangeNotifications(
 	SendMessage(m_hTreeView, WM_SETREDRAW, TRUE, 0);
 }
 
-void ShellTreeView::ProcessShellChangeNotification(
-	const ShellChangeWatcher::ShellChangeNotification &change)
+void ShellTreeView::ProcessShellChangeNotification(const ShellChangeNotification &change)
 {
 	switch (change.event)
 	{

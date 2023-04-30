@@ -100,13 +100,6 @@ LRESULT CALLBACK ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 		OnClipboardUpdate();
 		return 0;
 
-	case WM_TIMER:
-		if (wParam == PROCESS_SHELL_CHANGES_TIMER_ID)
-		{
-			OnProcessShellChangeNotifications();
-		}
-		break;
-
 	case WM_NOTIFY:
 		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == ListView_GetHeader(m_hListView))
 		{
@@ -144,10 +137,6 @@ LRESULT CALLBACK ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 
 	case WM_APP_INFO_TIP_READY:
 		ProcessInfoTipResult(static_cast<int>(wParam));
-		break;
-
-	case WM_APP_SHELL_NOTIFY:
-		OnShellNotify(wParam, lParam);
 		break;
 	}
 
@@ -404,10 +393,7 @@ void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 		}
 
 		m_iconFetcher->QueueIconTask(itemInfo.pidlComplete.get(),
-			[this, internalIndex](int iconIndex)
-			{
-				ProcessIconResult(internalIndex, iconIndex);
-			});
+			[this, internalIndex](int iconIndex) { ProcessIconResult(internalIndex, iconIndex); });
 	}
 
 	plvItem->mask |= LVIF_DI_SETITEM;
@@ -945,10 +931,7 @@ void ShellBrowser::OnColumnMenuItemSelected(int menuItemId,
 
 	ColumnType columnType = menuItemMappings.at(menuItemId);
 	auto itr = std::find_if(currentColumns.begin(), currentColumns.end(),
-		[columnType](const Column_t &column)
-		{
-			return column.type == columnType;
-		});
+		[columnType](const Column_t &column) { return column.type == columnType; });
 
 	if (itr == currentColumns.end())
 	{

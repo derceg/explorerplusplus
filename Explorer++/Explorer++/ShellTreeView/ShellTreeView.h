@@ -212,8 +212,8 @@ private:
 	void RestartDirectoryMonitoringForItemAndChildren(ItemInfo &item);
 	void RestartDirectoryMonitoringForItem(ItemInfo &item);
 	void ProcessShellChangeNotifications(
-		const std::vector<ShellChangeWatcher::ShellChangeNotification> &shellChangeNotifications);
-	void ProcessShellChangeNotification(const ShellChangeWatcher::ShellChangeNotification &change);
+		const std::vector<ShellChangeNotification> &shellChangeNotifications);
+	void ProcessShellChangeNotification(const ShellChangeNotification &change);
 	void OnItemAdded(PCIDLIST_ABSOLUTE simplePidl);
 	void OnItemRenamed(PCIDLIST_ABSOLUTE simplePidlOld, PCIDLIST_ABSOLUTE simplePidlNew);
 	void OnItemUpdated(PCIDLIST_ABSOLUTE simplePidl);

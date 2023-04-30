@@ -20,70 +20,23 @@ void ShellBrowser::StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl)
 	// shell change notifications.
 	assert(!m_dirMonitorId);
 
-	SHChangeNotifyEntry shcne;
-	shcne.pidl = pidl;
-	shcne.fRecursive = FALSE;
-	m_shChangeNotifyId = SHChangeNotifyRegister(m_hListView,
-		SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
+	m_shellChangeWatcher.StartWatching(pidl,
 		SHCNE_ATTRIBUTES | SHCNE_CREATE | SHCNE_DELETE | SHCNE_MKDIR | SHCNE_RENAMEFOLDER
 			| SHCNE_RENAMEITEM | SHCNE_RMDIR | SHCNE_UPDATEDIR | SHCNE_UPDATEITEM | SHCNE_DRIVEADD
-			| SHCNE_DRIVEREMOVED,
-		WM_APP_SHELL_NOTIFY, 1, &shcne);
-
-	if (m_shChangeNotifyId == 0)
-	{
-		std::wstring path;
-		HRESULT hr = GetDisplayName(pidl, SHGDN_FORPARSING, path);
-
-		if (SUCCEEDED(hr))
-		{
-			LOG(warning) << L"Couldn't monitor directory \"" << path << L"\" for changes.";
-		}
-	}
+			| SHCNE_DRIVEREMOVED);
 }
 
-void ShellBrowser::StopDirectoryMonitoring()
+void ShellBrowser::ProcessShellChangeNotifications(
+	const std::vector<ShellChangeNotification> &shellChangeNotifications)
 {
-	if (m_shChangeNotifyId != 0)
-	{
-		SHChangeNotifyDeregister(m_shChangeNotifyId);
-		m_shChangeNotifyId = 0;
-	}
-}
-
-bool ShellBrowser::IsMonitoringShellChanges()
-{
-	return m_shChangeNotifyId != 0;
-}
-
-void ShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)
-{
-	PIDLIST_ABSOLUTE *pidls;
-	LONG event;
-	HANDLE lock = SHChangeNotification_Lock(reinterpret_cast<HANDLE>(wParam),
-		static_cast<DWORD>(lParam), &pidls, &event);
-
-	m_directoryState.shellChangeNotifications.emplace_back(event, pidls[0], pidls[1]);
-
-	SHChangeNotification_Unlock(lock);
-
-	SetTimer(m_hListView, PROCESS_SHELL_CHANGES_TIMER_ID, PROCESS_SHELL_CHANGES_TIMEOUT, nullptr);
-}
-
-void ShellBrowser::OnProcessShellChangeNotifications()
-{
-	KillTimer(m_hListView, PROCESS_SHELL_CHANGES_TIMER_ID);
-
 	SendMessage(m_hListView, WM_SETREDRAW, FALSE, NULL);
 
-	for (const auto &change : m_directoryState.shellChangeNotifications)
+	for (const auto &change : shellChangeNotifications)
 	{
 		ProcessShellChangeNotification(change);
 	}
 
 	SendMessage(m_hListView, WM_SETREDRAW, TRUE, NULL);
-
-	m_directoryState.shellChangeNotifications.clear();
 
 	directoryModified.m_signal();
 }
@@ -341,9 +294,7 @@ void ShellBrowser::AddItem(PCIDLIST_ABSOLUTE pidl)
 	const std::wstring displayName = m_itemInfoMap.at(*itemId).displayName;
 	auto droppedFilesItr = std::find_if(m_droppedFileNameList.begin(), m_droppedFileNameList.end(),
 		[&displayName](const DroppedFile_t &droppedFile)
-		{
-			return displayName == droppedFile.szFileName;
-		});
+		{ return displayName == droppedFile.szFileName; });
 
 	bool wasDropped = (droppedFilesItr != m_droppedFileNameList.end());
 
@@ -357,9 +308,7 @@ void ShellBrowser::AddItem(PCIDLIST_ABSOLUTE pidl)
 		auto itr = std::find_if(m_directoryState.awaitingAddList.begin(),
 			m_directoryState.awaitingAddList.end(),
 			[itemId](const AwaitingAdd_t &awaitingItem)
-			{
-				return *itemId == awaitingItem.iItemInternal;
-			});
+			{ return *itemId == awaitingItem.iItemInternal; });
 
 		// The item was added successfully above, so should be in the list of awaiting
 		// items.
@@ -553,10 +502,7 @@ void ShellBrowser::InvalidateAllColumnsForItem(int itemIndex)
 	}
 
 	auto numColumns = std::count_if(m_pActiveColumns->begin(), m_pActiveColumns->end(),
-		[](const Column_t &column)
-		{
-			return column.bChecked;
-		});
+		[](const Column_t &column) { return column.bChecked; });
 
 	for (int i = 0; i < numColumns; i++)
 	{

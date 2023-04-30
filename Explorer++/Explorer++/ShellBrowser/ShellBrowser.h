@@ -9,6 +9,7 @@
 #include "FolderSettings.h"
 #include "NavigatorInterface.h"
 #include "ServiceProvider.h"
+#include "ShellChangeWatcher.h"
 #include "SignalWrapper.h"
 #include "SortModes.h"
 #include "ViewModes.h"
@@ -210,20 +211,6 @@ private:
 		}
 	};
 
-	struct ShellChangeNotification
-	{
-		LONG event;
-		unique_pidl_absolute pidl1;
-		unique_pidl_absolute pidl2;
-
-		ShellChangeNotification(LONG event, PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2) :
-			event(event),
-			pidl1(pidl1 ? ILCloneFull(pidl1) : nullptr),
-			pidl2(pidl2 ? ILCloneFull(pidl2) : nullptr)
-		{
-		}
-	};
-
 	struct AlteredFile_t
 	{
 		TCHAR szFileName[MAX_PATH];
@@ -332,8 +319,6 @@ private:
 		/* Cached folder size data. */
 		mutable std::unordered_map<int, ULONGLONG> cachedFolderSizes;
 
-		std::vector<ShellChangeNotification> shellChangeNotifications;
-
 		DirectoryState() :
 			virtualFolder(false),
 			itemIDCounter(0),
@@ -362,13 +347,9 @@ private:
 	static const UINT WM_APP_COLUMN_RESULT_READY = WM_APP + 150;
 	static const UINT WM_APP_THUMBNAIL_RESULT_READY = WM_APP + 151;
 	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 152;
-	static const UINT WM_APP_SHELL_NOTIFY = WM_APP + 153;
 
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
-
-	static const UINT PROCESS_SHELL_CHANGES_TIMER_ID = 1;
-	static const UINT PROCESS_SHELL_CHANGES_TIMEOUT = 100;
 
 	ShellBrowser(int id, HWND hOwner, CoreInterface *coreInterface,
 		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
@@ -497,10 +478,8 @@ private:
 
 	/* Directory altered support. */
 	void StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl);
-	void StopDirectoryMonitoring();
-	bool IsMonitoringShellChanges();
-	void OnShellNotify(WPARAM wParam, LPARAM lParam);
-	void OnProcessShellChangeNotifications();
+	void ProcessShellChangeNotifications(
+		const std::vector<ShellChangeNotification> &shellChangeNotifications);
 	void ProcessShellChangeNotification(const ShellChangeNotification &change);
 	void OnItemAdded(PCIDLIST_ABSOLUTE simplePidl);
 	void AddItem(PCIDLIST_ABSOLUTE pidl);
@@ -671,8 +650,8 @@ private:
 	/* ID. */
 	const int m_ID;
 
-	/* Directory monitoring. */
-	ULONG m_shChangeNotifyId;
+	// Directory monitoring
+	ShellChangeWatcher m_shellChangeWatcher;
 	unique_pidl_absolute m_renamedItemOldPidl;
 
 	wil::com_ptr_nothrow<IShellFolder> m_desktopFolder;

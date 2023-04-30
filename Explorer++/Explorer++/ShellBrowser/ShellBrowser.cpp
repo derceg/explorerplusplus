@@ -68,7 +68,6 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, CoreInterface *coreInterface,
 	ShellDropTargetWindow(CreateListView(hOwner)),
 	m_hListView(GetHWND()),
 	m_ID(id),
-	m_shChangeNotifyId(0),
 	m_resourceInstance(coreInterface->GetResourceInstance()),
 	m_acceleratorTable(coreInterface->GetAcceleratorTable()),
 	m_hOwner(hOwner),
@@ -91,7 +90,9 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, CoreInterface *coreInterface,
 		CoUninitialize),
 	m_infoTipResultIDCounter(0),
 	m_draggedDataObject(nullptr),
-	m_shellWindowRegistered(false)
+	m_shellWindowRegistered(false),
+	m_shellChangeWatcher(GetHWND(),
+		std::bind_front(&ShellBrowser::ProcessShellChangeNotifications, this))
 {
 	InitializeListView();
 	m_iconFetcher = std::make_unique<IconFetcher>(m_hListView, m_cachedIcons);
@@ -142,11 +143,6 @@ ShellBrowser::ShellBrowser(int id, HWND hOwner, CoreInterface *coreInterface,
 
 ShellBrowser::~ShellBrowser()
 {
-	if (IsMonitoringShellChanges())
-	{
-		StopDirectoryMonitoring();
-	}
-
 	RemoveClipboardFormatListener(m_hListView);
 
 	DestroyWindow(m_hListView);
@@ -595,9 +591,7 @@ std::optional<int> ShellBrowser::GetItemInternalIndexForPidl(PCIDLIST_ABSOLUTE p
 {
 	auto itr = std::find_if(m_itemInfoMap.begin(), m_itemInfoMap.end(),
 		[pidl](const auto &pair)
-		{
-			return ArePidlsEquivalent(pidl, pair.second.pidlComplete.get());
-		});
+		{ return ArePidlsEquivalent(pidl, pair.second.pidlComplete.get()); });
 
 	if (itr == m_itemInfoMap.end())
 	{
@@ -991,9 +985,7 @@ void ShellBrowser::VerifySortMode()
 
 	auto itr = std::find_if(columns->begin(), columns->end(),
 		[this](const Column_t &column)
-		{
-			return DetermineColumnSortMode(column.type) == m_folderSettings.sortMode;
-		});
+		{ return DetermineColumnSortMode(column.type) == m_folderSettings.sortMode; });
 
 	if (itr != columns->end())
 	{
@@ -1100,7 +1092,8 @@ void ShellBrowser::OnDeviceChange(UINT eventType, LONG_PTR eventData)
 {
 	// If shell change notifications are enabled, drive additions/removals will be handled through
 	// that.
-	if (IsMonitoringShellChanges())
+	if (m_config->shellChangeNotificationType == ShellChangeNotificationType::All
+		|| m_config->shellChangeNotificationType == ShellChangeNotificationType::NonFilesystem)
 	{
 		return;
 	}
