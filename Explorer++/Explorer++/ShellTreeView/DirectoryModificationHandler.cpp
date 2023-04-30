@@ -5,25 +5,25 @@
 #include "stdafx.h"
 #include "ShellTreeView.h"
 #include "../Helper/Logging.h"
+#include <ranges>
 
 void ShellTreeView::StartDirectoryMonitoringForItem(ItemInfo &item)
 {
-	// There shouldn't be more than one call to monitor a directory.
-	assert(item.shChangeNotifyId == 0);
+	auto pidl = item.GetFullPidl();
 
 	SHChangeNotifyEntry shcne;
-	shcne.pidl = item.pidl.get();
+	shcne.pidl = pidl.get();
 	shcne.fRecursive = false;
-	item.shChangeNotifyId = SHChangeNotifyRegister(m_hTreeView,
+	item.SetChangeNotifyId(SHChangeNotifyRegister(m_hTreeView,
 		SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
 		SHCNE_ATTRIBUTES | SHCNE_MKDIR | SHCNE_RENAMEFOLDER | SHCNE_RMDIR | SHCNE_UPDATEDIR
 			| SHCNE_UPDATEITEM,
-		WM_APP_SHELL_NOTIFY, 1, &shcne);
+		WM_APP_SHELL_NOTIFY, 1, &shcne));
 
-	if (item.shChangeNotifyId == 0)
+	if (item.GetChangeNotifyId() == 0)
 	{
 		std::wstring path;
-		HRESULT hr = GetDisplayName(item.pidl.get(), SHGDN_FORPARSING, path);
+		HRESULT hr = GetDisplayName(pidl.get(), SHGDN_FORPARSING, path);
 
 		if (SUCCEEDED(hr))
 		{
@@ -34,15 +34,44 @@ void ShellTreeView::StartDirectoryMonitoringForItem(ItemInfo &item)
 
 void ShellTreeView::StopDirectoryMonitoringForItem(ItemInfo &item)
 {
-	if (item.shChangeNotifyId == 0)
+	if (item.GetChangeNotifyId() == 0)
 	{
 		return;
 	}
 
-	[[maybe_unused]] auto res = SHChangeNotifyDeregister(item.shChangeNotifyId);
+	[[maybe_unused]] auto res = SHChangeNotifyDeregister(item.GetChangeNotifyId());
 	assert(res);
 
-	item.shChangeNotifyId = 0;
+	item.ResetChangeNotifyId();
+}
+
+// When a directory is renamed, the directory monitoring which was originally set up will no longer
+// work (since it's tied to a specific path). In that case, the directory monitoring for that item
+// will need to be restarted. The directory monitoring for any children will also need to be
+// restarted (when necessary), since their paths will have changed as well.
+void ShellTreeView::RestartDirectoryMonitoringForItemAndChildren(ItemInfo &item)
+{
+	RestartDirectoryMonitoringForItem(item);
+
+	for (auto &child : m_itemInfoMap | std::views::values
+			| std::views::filter(
+				[&item](ItemInfo &currentItem) {
+					return currentItem.GetParent() == &item && currentItem.GetChangeNotifyId() != 0;
+				}))
+	{
+		RestartDirectoryMonitoringForItemAndChildren(child);
+	}
+}
+
+void ShellTreeView::RestartDirectoryMonitoringForItem(ItemInfo &item)
+{
+	if (item.GetChangeNotifyId() == 0)
+	{
+		return;
+	}
+
+	StopDirectoryMonitoringForItem(item);
+	StartDirectoryMonitoringForItem(item);
 }
 
 void ShellTreeView::OnShellNotify(WPARAM wParam, LPARAM lParam)
@@ -81,6 +110,10 @@ void ShellTreeView::ProcessShellChangeNotification(const ShellChangeNotification
 	{
 	case SHCNE_MKDIR:
 		OnItemAdded(change.pidl1.get());
+		break;
+
+	case SHCNE_RENAMEFOLDER:
+		OnItemRenamed(change.pidl1.get(), change.pidl2.get());
 		break;
 
 	case SHCNE_UPDATEITEM:
@@ -147,6 +180,44 @@ void ShellTreeView::OnItemAdded(PCIDLIST_ABSOLUTE simplePidl)
 	}
 
 	AddItem(parentItem, pidl);
+	SortChildren(parentItem);
+}
+
+void ShellTreeView::OnItemRenamed(PCIDLIST_ABSOLUTE simplePidlOld, PCIDLIST_ABSOLUTE simplePidlNew)
+{
+	auto item = LocateExistingItem(simplePidlOld);
+
+	if (!item)
+	{
+		return;
+	}
+
+	ItemInfo &itemInfo = GetItemByHandle(item);
+	itemInfo.UpdateChildPidl(unique_pidl_child(ILCloneChild(ILFindLastID(simplePidlNew))));
+
+	RestartDirectoryMonitoringForItemAndChildren(itemInfo);
+
+	std::wstring name;
+	HRESULT hr = GetDisplayName(simplePidlNew, SHGDN_NORMAL, name);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	TVITEM tvItemUpdate = {};
+	tvItemUpdate.mask = TVIF_TEXT;
+	tvItemUpdate.hItem = item;
+	tvItemUpdate.pszText = name.data();
+	[[maybe_unused]] auto updated = TreeView_SetItem(m_hTreeView, &tvItemUpdate);
+	assert(updated);
+
+	auto parent = TreeView_GetParent(m_hTreeView, item);
+
+	if (parent)
+	{
+		SortChildren(parent);
+	}
 }
 
 void ShellTreeView::OnItemUpdated(PCIDLIST_ABSOLUTE simplePidl)

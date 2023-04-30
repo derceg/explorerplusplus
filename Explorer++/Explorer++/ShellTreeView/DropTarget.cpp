@@ -29,7 +29,7 @@ unique_pidl_absolute ShellTreeView::GetPidlForTargetItem(HTREEITEM targetItem)
 	}
 
 	auto &item = GetItemByHandle(targetItem);
-	return unique_pidl_absolute(ILCloneFull(item.pidl.get()));
+	return item.GetFullPidl();
 }
 
 IUnknown *ShellTreeView::GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl)

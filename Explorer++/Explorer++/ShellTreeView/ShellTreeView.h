@@ -60,13 +60,91 @@ private:
 	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 10;
 	static const LONG DROP_SCROLL_MARGIN_Y_96DPI = 10;
 
-	struct ItemInfo
+	// Represents an item in the treeview. There are two types of items:
+	//
+	// 1. Root items. These items appear at the top level of the treeview and have an absolute path.
+	// 2. Child items. These appear at every other level. Each child only stores its relative path.
+	//
+	// Full item paths are then built dynamically.
+	class ItemInfo
 	{
-		unique_pidl_absolute pidl;
+	public:
+		ItemInfo(unique_pidl_child childPidl, ItemInfo *parent) :
+			m_childPidl(std::move(childPidl)),
+			m_parent(parent)
+		{
+			assert(parent != nullptr);
+		}
+
+		ItemInfo(unique_pidl_absolute pidl) : m_rootPidl(std::move(pidl))
+		{
+		}
+
+		unique_pidl_absolute GetFullPidl() const
+		{
+			std::vector<PCITEMID_CHILD> childPidls;
+			const ItemInfo *currentItem = this;
+
+			while (currentItem->m_parent != nullptr)
+			{
+				childPidls.push_back(currentItem->m_childPidl.get());
+
+				currentItem = currentItem->m_parent;
+			}
+
+			assert(currentItem->m_rootPidl);
+			unique_pidl_absolute fullPidl(ILCloneFull(currentItem->m_rootPidl.get()));
+
+			for (PCITEMID_CHILD childPidl : childPidls | std::views::reverse)
+			{
+				fullPidl.reset(ILCombine(fullPidl.get(), childPidl));
+			}
+
+			return fullPidl;
+		}
+
+		void UpdateChildPidl(unique_pidl_child childPidl)
+		{
+			assert(m_parent != nullptr);
+
+			m_childPidl = std::move(childPidl);
+		}
+
+		ULONG GetChangeNotifyId() const
+		{
+			return m_changeNotifyId;
+		}
+
+		void SetChangeNotifyId(ULONG changeNotifyId)
+		{
+			// The directory for an item should only be monitored once.
+			assert(m_changeNotifyId == 0);
+
+			m_changeNotifyId = changeNotifyId;
+		}
+
+		void ResetChangeNotifyId()
+		{
+			m_changeNotifyId = 0;
+		}
+
+		ItemInfo *GetParent()
+		{
+			return m_parent;
+		}
+
+	private:
+		// This is only used if this item is a root item.
+		unique_pidl_absolute m_rootPidl;
+
+		// This is only used if this item is a child item.
+		unique_pidl_child m_childPidl;
 
 		// This will be non-zero if the directory associated with this item is being monitored for
 		// changes.
-		ULONG shChangeNotifyId = 0;
+		ULONG m_changeNotifyId = 0;
+
+		ItemInfo *m_parent = nullptr;
 	};
 
 	struct ShellChangeNotification
@@ -118,9 +196,12 @@ private:
 		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+	static int CALLBACK CompareItemsStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
+
 	HTREEITEM AddRoot();
 	HRESULT ExpandDirectory(HTREEITEM hParent);
 	void AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl);
+	void SortChildren(HTREEITEM parent);
 	void RemoveChildrenFromInternalMap(HTREEITEM hParent);
 	void OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi);
 	void OnItemExpanding(const NMTREEVIEW *nmtv);
@@ -137,10 +218,13 @@ private:
 	// Directory monitoring
 	void StartDirectoryMonitoringForItem(ItemInfo &item);
 	void StopDirectoryMonitoringForItem(ItemInfo &item);
+	void RestartDirectoryMonitoringForItemAndChildren(ItemInfo &item);
+	void RestartDirectoryMonitoringForItem(ItemInfo &item);
 	void OnShellNotify(WPARAM wParam, LPARAM lParam);
 	void OnProcessShellChangeNotifications();
 	void ProcessShellChangeNotification(const ShellChangeNotification &change);
 	void OnItemAdded(PCIDLIST_ABSOLUTE simplePidl);
+	void OnItemRenamed(PCIDLIST_ABSOLUTE simplePidlOld, PCIDLIST_ABSOLUTE simplePidlNew);
 	void OnItemUpdated(PCIDLIST_ABSOLUTE simplePidl);
 	void OnItemRemoved(PCIDLIST_ABSOLUTE simplePidl);
 	void RemoveItem(HTREEITEM item);

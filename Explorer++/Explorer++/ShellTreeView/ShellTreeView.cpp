@@ -33,8 +33,6 @@
 #include <wil/common.h>
 #include <propkey.h>
 
-int CALLBACK CompareItemsStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
-
 ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabContainer *tabContainer,
 	FileActionHandler *fileActionHandler, CachedIcons *cachedIcons) :
 	ShellDropTargetWindow(CreateTreeView(hParent)),
@@ -288,12 +286,7 @@ LRESULT CALLBACK ShellTreeView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wPara
 				return OnKeyDown(reinterpret_cast<NMTVKEYDOWN *>(lParam));
 
 			case TVN_ENDLABELEDIT:
-				/* TODO: Should return the value from this function. Can't do it
-				at the moment, since the treeview looks items up by their label
-				when a directory modification event is received (meaning that if
-				the label changes, the lookup for the old file name will fail). */
-				OnEndLabelEdit(reinterpret_cast<NMTVDISPINFO *>(lParam));
-				break;
+				return OnEndLabelEdit(reinterpret_cast<NMTVDISPINFO *>(lParam));
 			}
 		}
 		break;
@@ -318,7 +311,7 @@ HTREEITEM ShellTreeView::AddRoot()
 	GetDisplayName(pidl.get(), SHGDN_INFOLDER, desktopDisplayName);
 
 	int itemId = GenerateUniqueItemId();
-	m_itemInfoMap[itemId].pidl.reset(ILCloneFull(pidl.get()));
+	m_itemInfoMap.emplace(itemId, unique_pidl_absolute(ILCloneFull(pidl.get())));
 
 	TVITEMEX tvItem;
 	tvItem.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
@@ -379,7 +372,7 @@ void ShellTreeView::OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi)
 std::optional<int> ShellTreeView::GetCachedIconIndex(const ItemInfo &itemInfo)
 {
 	std::wstring filePath;
-	HRESULT hr = GetDisplayName(itemInfo.pidl.get(), SHGDN_FORPARSING, filePath);
+	HRESULT hr = GetDisplayName(itemInfo.GetFullPidl().get(), SHGDN_FORPARSING, filePath);
 
 	if (FAILED(hr))
 	{
@@ -401,7 +394,7 @@ void ShellTreeView::QueueIconTask(HTREEITEM item, int internalIndex)
 	const ItemInfo &itemInfo = m_itemInfoMap.at(internalIndex);
 
 	BasicItemInfo basicItemInfo;
-	basicItemInfo.pidl.reset(ILCloneFull(itemInfo.pidl.get()));
+	basicItemInfo.pidl = itemInfo.GetFullPidl();
 
 	int iconResultID = m_iconResultIDCounter++;
 
@@ -450,11 +443,8 @@ void ShellTreeView::ProcessIconResult(int iconResultId)
 		return;
 	}
 
-	auto cleanup = wil::scope_exit(
-		[this, iconResultsItr]()
-		{
-			m_iconResults.erase(iconResultsItr);
-		});
+	auto cleanup =
+		wil::scope_exit([this, iconResultsItr]() { m_iconResults.erase(iconResultsItr); });
 
 	auto result = iconResultsItr->second.get();
 
@@ -475,7 +465,7 @@ void ShellTreeView::ProcessIconResult(int iconResultId)
 	const ItemInfo &itemInfo = itemMapItr->second;
 
 	std::wstring filePath;
-	HRESULT hr = GetDisplayName(itemInfo.pidl.get(), SHGDN_FORPARSING, filePath);
+	HRESULT hr = GetDisplayName(itemInfo.GetFullPidl().get(), SHGDN_FORPARSING, filePath);
 
 	if (SUCCEEDED(hr))
 	{
@@ -549,11 +539,7 @@ void ShellTreeView::ProcessSubfoldersResult(int subfoldersResultId)
 		return;
 	}
 
-	auto cleanup = wil::scope_exit(
-		[this, itr]()
-		{
-			m_subfoldersResults.erase(itr);
-		});
+	auto cleanup = wil::scope_exit([this, itr]() { m_subfoldersResults.erase(itr); });
 
 	auto result = itr->second.get();
 
@@ -668,7 +654,7 @@ LRESULT ShellTreeView::OnKeyDown(const NMTVKEYDOWN *keyDown)
  - Real Items
 
 Each set is ordered alphabetically. */
-int CALLBACK CompareItemsStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
+int CALLBACK ShellTreeView::CompareItemsStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 {
 	ShellTreeView *shellTreeView = nullptr;
 
@@ -686,11 +672,14 @@ int CALLBACK ShellTreeView::CompareItems(LPARAM lParam1, LPARAM lParam2)
 	const ItemInfo &itemInfo1 = m_itemInfoMap.at(iItemId1);
 	const ItemInfo &itemInfo2 = m_itemInfoMap.at(iItemId2);
 
+	auto pidl1 = itemInfo1.GetFullPidl();
+	auto pidl2 = itemInfo2.GetFullPidl();
+
 	std::wstring displayName1;
-	GetDisplayName(itemInfo1.pidl.get(), SHGDN_FORPARSING, displayName1);
+	GetDisplayName(pidl1.get(), SHGDN_FORPARSING, displayName1);
 
 	std::wstring displayName2;
-	GetDisplayName(itemInfo2.pidl.get(), SHGDN_FORPARSING, displayName2);
+	GetDisplayName(pidl2.get(), SHGDN_FORPARSING, displayName2);
 
 	if (PathIsRoot(displayName1.c_str()) && !PathIsRoot(displayName2.c_str()))
 	{
@@ -706,20 +695,19 @@ int CALLBACK ShellTreeView::CompareItems(LPARAM lParam1, LPARAM lParam2)
 	}
 	else
 	{
-		if (!SHGetPathFromIDList(itemInfo1.pidl.get(), szTemp)
-			&& SHGetPathFromIDList(itemInfo2.pidl.get(), szTemp))
+		if (!SHGetPathFromIDList(pidl1.get(), szTemp) && SHGetPathFromIDList(pidl2.get(), szTemp))
 		{
 			return -1;
 		}
-		else if (SHGetPathFromIDList(itemInfo1.pidl.get(), szTemp)
-			&& !SHGetPathFromIDList(itemInfo2.pidl.get(), szTemp))
+		else if (SHGetPathFromIDList(pidl1.get(), szTemp)
+			&& !SHGetPathFromIDList(pidl2.get(), szTemp))
 		{
 			return 1;
 		}
 		else
 		{
-			GetDisplayName(itemInfo1.pidl.get(), SHGDN_INFOLDER, displayName1);
-			GetDisplayName(itemInfo2.pidl.get(), SHGDN_INFOLDER, displayName2);
+			GetDisplayName(pidl1.get(), SHGDN_INFOLDER, displayName1);
+			GetDisplayName(pidl2.get(), SHGDN_INFOLDER, displayName2);
 
 			if (m_config->globalFolderSettings.useNaturalSortOrder)
 			{
@@ -800,11 +788,7 @@ HRESULT ShellTreeView::ExpandDirectory(HTREEITEM hParent)
 		AddItem(hParent, item.get());
 	}
 
-	TVSORTCB tvscb;
-	tvscb.hParent = hParent;
-	tvscb.lpfnCompare = CompareItemsStub;
-	tvscb.lParam = reinterpret_cast<LPARAM>(this);
-	TreeView_SortChildrenCB(m_hTreeView, &tvscb, 0);
+	SortChildren(hParent);
 
 	SendMessage(m_hTreeView, WM_SETREDRAW, TRUE, 0);
 
@@ -825,7 +809,9 @@ void ShellTreeView::AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl)
 	}
 
 	int itemId = GenerateUniqueItemId();
-	m_itemInfoMap[itemId].pidl.reset(ILCloneFull(pidl));
+	auto &parentItem = GetItemByHandle(parent);
+	m_itemInfoMap.emplace(std::piecewise_construct, std::forward_as_tuple(itemId),
+		std::forward_as_tuple(unique_pidl_child(ILCloneChild(ILFindLastID(pidl))), &parentItem));
 
 	TVITEMEX tvItem = {};
 	tvItem.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
@@ -844,6 +830,15 @@ void ShellTreeView::AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl)
 	assert(item);
 }
 
+void ShellTreeView::SortChildren(HTREEITEM parent)
+{
+	TVSORTCB tvSort;
+	tvSort.hParent = parent;
+	tvSort.lpfnCompare = ShellTreeView::CompareItemsStub;
+	tvSort.lParam = reinterpret_cast<LPARAM>(this);
+	TreeView_SortChildrenCB(m_hTreeView, &tvSort, 0);
+}
+
 int ShellTreeView::GenerateUniqueItemId()
 {
 	return m_itemIDCounter++;
@@ -858,8 +853,7 @@ unique_pidl_absolute ShellTreeView::GetSelectedItemPidl() const
 unique_pidl_absolute ShellTreeView::GetItemPidl(HTREEITEM hTreeItem) const
 {
 	const ItemInfo &itemInfo = GetItemByHandle(hTreeItem);
-	unique_pidl_absolute pidl(ILCloneFull(itemInfo.pidl.get()));
-	return pidl;
+	return itemInfo.GetFullPidl();
 }
 
 const ShellTreeView::ItemInfo &ShellTreeView::GetItemByHandle(HTREEITEM item) const
@@ -919,16 +913,16 @@ HTREEITEM ShellTreeView::LocateItemInternal(PCIDLIST_ABSOLUTE pidlDirectory,
 	the parent node if necessary. */
 	while (!bFound && hItem != nullptr)
 	{
-		if (ArePidlsEquivalent(m_itemInfoMap.at(static_cast<int>(item.lParam)).pidl.get(),
-				pidlDirectory))
+		auto currentPidl = m_itemInfoMap.at(static_cast<int>(item.lParam)).GetFullPidl();
+
+		if (ArePidlsEquivalent(currentPidl.get(), pidlDirectory))
 		{
 			bFound = TRUE;
 
 			break;
 		}
 
-		if (ILIsParent(m_itemInfoMap.at(static_cast<int>(item.lParam)).pidl.get(), pidlDirectory,
-				FALSE))
+		if (ILIsParent(currentPidl.get(), pidlDirectory, FALSE))
 		{
 			if ((TreeView_GetChild(m_hTreeView, hItem)) == nullptr)
 			{
@@ -1043,7 +1037,7 @@ void ShellTreeView::RefreshAllIcons()
 	const ItemInfo &itemInfo = m_itemInfoMap.at(static_cast<int>(tvItemEx.lParam));
 
 	SHFILEINFO shfi;
-	SHGetFileInfo(reinterpret_cast<LPCTSTR>(itemInfo.pidl.get()), 0, &shfi, sizeof(shfi),
+	SHGetFileInfo(reinterpret_cast<LPCTSTR>(itemInfo.GetFullPidl().get()), 0, &shfi, sizeof(shfi),
 		SHGFI_PIDL | SHGFI_SYSICONINDEX);
 
 	tvItemEx.mask = TVIF_HANDLE | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
@@ -1068,8 +1062,8 @@ void ShellTreeView::RefreshAllIconsInternal(HTREEITEM hFirstSibling)
 	tvItem.hItem = hFirstSibling;
 	TreeView_GetItem(m_hTreeView, &tvItem);
 
-	const ItemInfo &itemInfo = m_itemInfoMap[static_cast<int>(tvItem.lParam)];
-	SHGetFileInfo(reinterpret_cast<LPCTSTR>(itemInfo.pidl.get()), 0, &shfi, sizeof(shfi),
+	const ItemInfo &itemInfo = m_itemInfoMap.at(static_cast<int>(tvItem.lParam));
+	SHGetFileInfo(reinterpret_cast<LPCTSTR>(itemInfo.GetFullPidl().get()), 0, &shfi, sizeof(shfi),
 		SHGFI_PIDL | SHGFI_SYSICONINDEX);
 
 	tvItem.mask = TVIF_HANDLE | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
@@ -1089,9 +1083,9 @@ void ShellTreeView::RefreshAllIconsInternal(HTREEITEM hFirstSibling)
 		tvItem.hItem = hNextSibling;
 		TreeView_GetItem(m_hTreeView, &tvItem);
 
-		const ItemInfo &itemInfoNext = m_itemInfoMap[static_cast<int>(tvItem.lParam)];
-		SHGetFileInfo(reinterpret_cast<LPCTSTR>(itemInfoNext.pidl.get()), 0, &shfi, sizeof(shfi),
-			SHGFI_PIDL | SHGFI_SYSICONINDEX);
+		const ItemInfo &itemInfoNext = m_itemInfoMap.at(static_cast<int>(tvItem.lParam));
+		SHGetFileInfo(reinterpret_cast<LPCTSTR>(itemInfoNext.GetFullPidl().get()), 0, &shfi,
+			sizeof(shfi), SHGFI_PIDL | SHGFI_SYSICONINDEX);
 
 		tvItem.mask = TVIF_HANDLE | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
 		tvItem.hItem = hNextSibling;
@@ -1111,7 +1105,8 @@ void ShellTreeView::RefreshAllIconsInternal(HTREEITEM hFirstSibling)
 HRESULT ShellTreeView::OnBeginDrag(int iItemId)
 {
 	wil::com_ptr_nothrow<IDataObject> dataObject;
-	std::vector<PCIDLIST_ABSOLUTE> items = { m_itemInfoMap.at(iItemId).pidl.get() };
+	auto pidl = m_itemInfoMap.at(iItemId).GetFullPidl();
+	std::vector<PCIDLIST_ABSOLUTE> items = { pidl.get() };
 	RETURN_IF_FAILED(CreateDataObjectForShellTransfer(items, &dataObject));
 
 	DWORD effect;
@@ -1163,7 +1158,7 @@ bool ShellTreeView::OnEndLabelEdit(const NMTVDISPINFO *dispInfo)
 	const auto &itemInfo = GetItemByHandle(dispInfo->item.hItem);
 
 	std::wstring oldFileName;
-	HRESULT hr = GetDisplayName(itemInfo.pidl.get(), SHGDN_FORPARSING, oldFileName);
+	HRESULT hr = GetDisplayName(itemInfo.GetFullPidl().get(), SHGDN_FORPARSING, oldFileName);
 
 	if (FAILED(hr))
 	{
@@ -1197,8 +1192,9 @@ void ShellTreeView::CopySelectedItemToClipboard(bool copy)
 {
 	HTREEITEM item = TreeView_GetSelection(m_hTreeView);
 	auto &itemInfo = GetItemByHandle(item);
+	auto pidl = itemInfo.GetFullPidl();
 
-	std::vector<PCIDLIST_ABSOLUTE> items = { itemInfo.pidl.get() };
+	std::vector<PCIDLIST_ABSOLUTE> items = { pidl.get() };
 	wil::com_ptr_nothrow<IDataObject> clipboardDataObject;
 	HRESULT hr;
 
@@ -1236,17 +1232,17 @@ void ShellTreeView::Paste()
 	}
 
 	auto &selectedItem = GetItemByHandle(TreeView_GetSelection(m_hTreeView));
+	auto selectedItemPidl = selectedItem.GetFullPidl();
 
-	if (CanShellPasteDataObject(selectedItem.pidl.get(), clipboardObject.get(),
+	if (CanShellPasteDataObject(selectedItemPidl.get(), clipboardObject.get(),
 			DROPEFFECT_COPY | DROPEFFECT_MOVE))
 	{
-		ExecuteActionFromContextMenu(selectedItem.pidl.get(), {}, m_hTreeView, L"paste", 0,
-			nullptr);
+		ExecuteActionFromContextMenu(selectedItemPidl.get(), {}, m_hTreeView, L"paste", 0, nullptr);
 	}
 	else
 	{
 		std::wstring destinationPath;
-		hr = GetDisplayName(selectedItem.pidl.get(), SHGDN_FORPARSING, destinationPath);
+		hr = GetDisplayName(selectedItemPidl.get(), SHGDN_FORPARSING, destinationPath);
 
 		if (FAILED(hr))
 		{
@@ -1263,7 +1259,7 @@ void ShellTreeView::Paste()
 void ShellTreeView::PasteShortcut()
 {
 	auto &selectedItem = GetItemByHandle(TreeView_GetSelection(m_hTreeView));
-	ExecuteActionFromContextMenu(selectedItem.pidl.get(), {}, m_hTreeView, L"pastelink", 0,
+	ExecuteActionFromContextMenu(selectedItem.GetFullPidl().get(), {}, m_hTreeView, L"pastelink", 0,
 		nullptr);
 }
 
