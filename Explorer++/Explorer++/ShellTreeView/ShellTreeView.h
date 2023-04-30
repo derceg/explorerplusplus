@@ -19,6 +19,7 @@ class CachedIcons;
 struct Config;
 class CoreInterface;
 class FileActionHandler;
+class ShellTreeNode;
 class TabContainer;
 
 class ShellTreeView : public ShellDropTargetWindow<HTREEITEM>
@@ -28,7 +29,7 @@ public:
 		TabContainer *tabContainer, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons);
 
 	/* User functions. */
-	unique_pidl_absolute GetItemPidl(HTREEITEM hTreeItem) const;
+	unique_pidl_absolute GetNodePidl(HTREEITEM hTreeItem) const;
 	HTREEITEM LocateItem(PCIDLIST_ABSOLUTE pidlDirectory);
 	void SetShowHidden(BOOL bShowHidden);
 	void RefreshAllIcons();
@@ -58,93 +59,6 @@ private:
 	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 10;
 	static const LONG DROP_SCROLL_MARGIN_Y_96DPI = 10;
 
-	// Represents an item in the treeview. There are two types of items:
-	//
-	// 1. Root items. These items appear at the top level of the treeview and have an absolute path.
-	// 2. Child items. These appear at every other level. Each child only stores its relative path.
-	//
-	// Full item paths are then built dynamically.
-	class ItemInfo
-	{
-	public:
-		ItemInfo(unique_pidl_child childPidl, ItemInfo *parent) :
-			m_childPidl(std::move(childPidl)),
-			m_parent(parent)
-		{
-			assert(parent != nullptr);
-		}
-
-		ItemInfo(unique_pidl_absolute pidl) : m_rootPidl(std::move(pidl))
-		{
-		}
-
-		unique_pidl_absolute GetFullPidl() const
-		{
-			std::vector<PCITEMID_CHILD> childPidls;
-			const ItemInfo *currentItem = this;
-
-			while (currentItem->m_parent != nullptr)
-			{
-				childPidls.push_back(currentItem->m_childPidl.get());
-
-				currentItem = currentItem->m_parent;
-			}
-
-			assert(currentItem->m_rootPidl);
-			unique_pidl_absolute fullPidl(ILCloneFull(currentItem->m_rootPidl.get()));
-
-			for (PCITEMID_CHILD childPidl : childPidls | std::views::reverse)
-			{
-				fullPidl.reset(ILCombine(fullPidl.get(), childPidl));
-			}
-
-			return fullPidl;
-		}
-
-		void UpdateChildPidl(unique_pidl_child childPidl)
-		{
-			assert(m_parent != nullptr);
-
-			m_childPidl = std::move(childPidl);
-		}
-
-		ULONG GetChangeNotifyId() const
-		{
-			return m_changeNotifyId;
-		}
-
-		void SetChangeNotifyId(ULONG changeNotifyId)
-		{
-			// The directory for an item should only be monitored once.
-			assert(m_changeNotifyId == 0);
-
-			m_changeNotifyId = changeNotifyId;
-		}
-
-		void ResetChangeNotifyId()
-		{
-			m_changeNotifyId = 0;
-		}
-
-		ItemInfo *GetParent()
-		{
-			return m_parent;
-		}
-
-	private:
-		// This is only used if this item is a root item.
-		unique_pidl_absolute m_rootPidl;
-
-		// This is only used if this item is a child item.
-		unique_pidl_child m_childPidl;
-
-		// This will be non-zero if the directory associated with this item is being monitored for
-		// changes.
-		ULONG m_changeNotifyId = 0;
-
-		ItemInfo *m_parent = nullptr;
-	};
-
 	struct BasicItemInfo
 	{
 		BasicItemInfo() = default;
@@ -159,8 +73,8 @@ private:
 
 	struct IconResult
 	{
-		HTREEITEM item;
-		int internalIndex;
+		int nodeId;
+		HTREEITEM treeItem;
 		int iconIndex;
 	};
 
@@ -190,7 +104,6 @@ private:
 	HRESULT ExpandDirectory(HTREEITEM hParent);
 	HTREEITEM AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl);
 	void SortChildren(HTREEITEM parent);
-	void RemoveChildrenFromInternalMap(HTREEITEM hParent);
 	void OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi);
 	void OnItemExpanding(const NMTREEVIEW *nmtv);
 	LRESULT OnKeyDown(const NMTVKEYDOWN *keyDown);
@@ -202,15 +115,15 @@ private:
 	void UpdateCurrentClipboardObject(wil::com_ptr_nothrow<IDataObject> clipboardDataObject);
 	void OnClipboardUpdate();
 
-	unique_pidl_absolute GetSelectedItemPidl() const;
+	unique_pidl_absolute GetSelectedNodePidl() const;
 
 	// Directory monitoring
 	void StartDirectoryMonitoringForDrives();
-	void StartDirectoryMonitoringForItem(ItemInfo &item);
-	void StopDirectoryMonitoringForItem(ItemInfo &item);
-	void StopDirectoryMonitoringForItemAndChildren(ItemInfo &item);
-	void RestartDirectoryMonitoringForItemAndChildren(ItemInfo &item);
-	void RestartDirectoryMonitoringForItem(ItemInfo &item);
+	void StartDirectoryMonitoringForNode(ShellTreeNode *node);
+	void StopDirectoryMonitoringForNode(ShellTreeNode *node);
+	void StopDirectoryMonitoringForNodeAndChildren(ShellTreeNode *node);
+	void RestartDirectoryMonitoringForNodeAndChildren(ShellTreeNode *node);
+	void RestartDirectoryMonitoringForNode(ShellTreeNode *node);
 	void ProcessShellChangeNotifications(
 		const std::vector<ShellChangeNotification> &shellChangeNotifications);
 	void ProcessShellChangeNotification(const ShellChangeNotification &change);
@@ -222,23 +135,20 @@ private:
 	bool ItemHasMultipleChildren(HTREEITEM item);
 
 	/* Icons. */
-	void QueueIconTask(HTREEITEM item, int internalIndex);
-	static std::optional<IconResult> FindIconAsync(HWND treeView, int iconResultId, HTREEITEM item,
-		int internalIndex, PCIDLIST_ABSOLUTE pidl);
+	void QueueIconTask(HTREEITEM treeItem);
+	static std::optional<IconResult> FindIconAsync(HWND treeView, int iconResultId, int nodeId,
+		HTREEITEM treeItem, PCIDLIST_ABSOLUTE pidl);
 	void ProcessIconResult(int iconResultId);
-	std::optional<int> GetCachedIconIndex(const ItemInfo &itemInfo);
+	std::optional<int> GetCachedIconIndex(const ShellTreeNode *node);
 
 	void QueueSubfoldersTask(HTREEITEM item);
 	static std::optional<SubfoldersResult> CheckSubfoldersAsync(HWND treeView,
 		int subfoldersResultId, HTREEITEM item, PCIDLIST_ABSOLUTE pidl);
 	void ProcessSubfoldersResult(int subfoldersResultId);
 
-	/* Item id's. */
-	int GenerateUniqueItemId();
-
-	const ItemInfo &GetItemByHandle(HTREEITEM item) const;
-	ItemInfo &GetItemByHandle(HTREEITEM item);
-	int GetItemInternalIndex(HTREEITEM item) const;
+	ShellTreeNode *GetNodeFromTreeViewItem(HTREEITEM item) const;
+	ShellTreeNode *GetNodeById(int id) const;
+	ShellTreeNode *GetNodeByIdRecursive(ShellTreeNode *node, int id) const;
 
 	// ShellDropTargetWindow
 	HTREEITEM GetDropTargetItem(const POINT &pt) override;
@@ -252,7 +162,7 @@ private:
 	void UpdateUiForTargetItem(HTREEITEM targetItem);
 	void ScrollTreeViewForDrop(const POINT &pt);
 	void OnDropExpandTimer();
-	HRESULT OnBeginDrag(int iItemId);
+	HRESULT OnBeginDrag(const ShellTreeNode *node);
 
 	/* Icon refresh. */
 	void RefreshAllIconsInternal(HTREEITEM hFirstSibling);
@@ -279,9 +189,10 @@ private:
 	std::unordered_map<int, std::future<std::optional<SubfoldersResult>>> m_subfoldersResults;
 	int m_subfoldersResultIDCounter;
 
-	/* Item id's and info. */
-	std::unordered_map<int, ItemInfo> m_itemInfoMap;
-	int m_itemIDCounter;
+	// Contains information about each node stored in the tree. Only root nodes are stored directly
+	// in this vector; child nodes are stored underneath their parent node.
+	std::vector<std::unique_ptr<ShellTreeNode>> m_nodes;
+
 	CachedIcons *m_cachedIcons;
 
 	int m_iFolderIcon;

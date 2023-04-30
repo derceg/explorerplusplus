@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "ShellTreeView.h"
-#include <ranges>
+#include "ShellTreeNode.h"
 
 // Starts monitoring for drive additions and removals, since they won't necessarily trigger updates
 // in the parent folder.
@@ -20,36 +20,32 @@ void ShellTreeView::StartDirectoryMonitoringForDrives()
 	m_shellChangeWatcher.StartWatching(pidl.get(), SHCNE_DRIVEADD | SHCNE_DRIVEREMOVED);
 }
 
-void ShellTreeView::StartDirectoryMonitoringForItem(ItemInfo &item)
+void ShellTreeView::StartDirectoryMonitoringForNode(ShellTreeNode *node)
 {
-	auto pidl = item.GetFullPidl();
-	item.SetChangeNotifyId(m_shellChangeWatcher.StartWatching(pidl.get(),
+	auto pidl = node->GetFullPidl();
+	node->SetChangeNotifyId(m_shellChangeWatcher.StartWatching(pidl.get(),
 		SHCNE_ATTRIBUTES | SHCNE_MKDIR | SHCNE_RENAMEFOLDER | SHCNE_RMDIR | SHCNE_UPDATEDIR
 			| SHCNE_UPDATEITEM));
 }
 
-void ShellTreeView::StopDirectoryMonitoringForItem(ItemInfo &item)
+void ShellTreeView::StopDirectoryMonitoringForNode(ShellTreeNode *node)
 {
-	if (item.GetChangeNotifyId() == 0)
+	if (node->GetChangeNotifyId() == 0)
 	{
 		return;
 	}
 
-	m_shellChangeWatcher.StopWatching(item.GetChangeNotifyId());
-	item.ResetChangeNotifyId();
+	m_shellChangeWatcher.StopWatching(node->GetChangeNotifyId());
+	node->ResetChangeNotifyId();
 }
 
-void ShellTreeView::StopDirectoryMonitoringForItemAndChildren(ItemInfo &item)
+void ShellTreeView::StopDirectoryMonitoringForNodeAndChildren(ShellTreeNode *node)
 {
-	StopDirectoryMonitoringForItem(item);
+	StopDirectoryMonitoringForNode(node);
 
-	for (auto &child : m_itemInfoMap | std::views::values
-			| std::views::filter(
-				[&item](ItemInfo &currentItem) {
-					return currentItem.GetParent() == &item && currentItem.GetChangeNotifyId() != 0;
-				}))
+	for (auto &child : node->GetChildren())
 	{
-		StopDirectoryMonitoringForItemAndChildren(child);
+		StopDirectoryMonitoringForNodeAndChildren(child.get());
 	}
 }
 
@@ -57,29 +53,25 @@ void ShellTreeView::StopDirectoryMonitoringForItemAndChildren(ItemInfo &item)
 // work (since it's tied to a specific path). In that case, the directory monitoring for that item
 // will need to be restarted. The directory monitoring for any children will also need to be
 // restarted (when necessary), since their paths will have changed as well.
-void ShellTreeView::RestartDirectoryMonitoringForItemAndChildren(ItemInfo &item)
+void ShellTreeView::RestartDirectoryMonitoringForNodeAndChildren(ShellTreeNode *node)
 {
-	RestartDirectoryMonitoringForItem(item);
+	RestartDirectoryMonitoringForNode(node);
 
-	for (auto &child : m_itemInfoMap | std::views::values
-			| std::views::filter(
-				[&item](ItemInfo &currentItem) {
-					return currentItem.GetParent() == &item && currentItem.GetChangeNotifyId() != 0;
-				}))
+	for (auto &child : node->GetChildren())
 	{
-		RestartDirectoryMonitoringForItemAndChildren(child);
+		RestartDirectoryMonitoringForNodeAndChildren(child.get());
 	}
 }
 
-void ShellTreeView::RestartDirectoryMonitoringForItem(ItemInfo &item)
+void ShellTreeView::RestartDirectoryMonitoringForNode(ShellTreeNode *node)
 {
-	if (item.GetChangeNotifyId() == 0)
+	if (node->GetChangeNotifyId() == 0)
 	{
 		return;
 	}
 
-	StopDirectoryMonitoringForItem(item);
-	StartDirectoryMonitoringForItem(item);
+	StopDirectoryMonitoringForNode(node);
+	StartDirectoryMonitoringForNode(node);
 }
 
 void ShellTreeView::ProcessShellChangeNotifications(
@@ -185,10 +177,10 @@ void ShellTreeView::OnItemRenamed(PCIDLIST_ABSOLUTE simplePidlOld, PCIDLIST_ABSO
 		return;
 	}
 
-	ItemInfo &itemInfo = GetItemByHandle(item);
-	itemInfo.UpdateChildPidl(unique_pidl_child(ILCloneChild(ILFindLastID(simplePidlNew))));
+	ShellTreeNode *node = GetNodeFromTreeViewItem(item);
+	node->UpdateChildPidl(unique_pidl_child(ILCloneChild(ILFindLastID(simplePidlNew))));
 
-	RestartDirectoryMonitoringForItemAndChildren(itemInfo);
+	RestartDirectoryMonitoringForNodeAndChildren(node);
 
 	std::wstring name;
 	HRESULT hr = GetDisplayName(simplePidlNew, SHGDN_NORMAL, name);
@@ -247,8 +239,8 @@ void ShellTreeView::OnItemRemoved(PCIDLIST_ABSOLUTE simplePidl)
 
 void ShellTreeView::RemoveItem(HTREEITEM item)
 {
-	StopDirectoryMonitoringForItemAndChildren(GetItemByHandle(item));
-	RemoveChildrenFromInternalMap(item);
+	auto *node = GetNodeFromTreeViewItem(item);
+	StopDirectoryMonitoringForNodeAndChildren(node);
 
 	TVITEMEX tvItem = {};
 	tvItem.mask = TVIF_PARAM | TVIF_HANDLE;
@@ -281,11 +273,10 @@ void ShellTreeView::RemoveItem(HTREEITEM item)
 		[[maybe_unused]] auto updated = TreeView_SetItem(m_hTreeView, &tvParentItem);
 		assert(updated);
 
-		StopDirectoryMonitoringForItem(GetItemByHandle(parent));
+		StopDirectoryMonitoringForNode(node->GetParent());
 	}
 
-	[[maybe_unused]] auto numErased = m_itemInfoMap.erase(static_cast<int>(tvItem.lParam));
-	assert(numErased == 1);
+	node->GetParent()->RemoveChild(node);
 }
 
 bool ShellTreeView::ItemHasMultipleChildren(HTREEITEM item)

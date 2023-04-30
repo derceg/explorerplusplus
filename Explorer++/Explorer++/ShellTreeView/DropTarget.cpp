@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ShellTreeView.h"
+#include "ShellTreeNode.h"
 #include "../Helper/DpiCompatibility.h"
 
 HTREEITEM ShellTreeView::GetDropTargetItem(const POINT &pt)
@@ -28,8 +29,8 @@ unique_pidl_absolute ShellTreeView::GetPidlForTargetItem(HTREEITEM targetItem)
 		return nullptr;
 	}
 
-	auto &item = GetItemByHandle(targetItem);
-	return item.GetFullPidl();
+	auto *node = GetNodeFromTreeViewItem(targetItem);
+	return node->GetFullPidl();
 }
 
 IUnknown *ShellTreeView::GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl)

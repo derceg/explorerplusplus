@@ -750,6 +750,7 @@
     <ClCompile Include="DriveModel.cpp" />
     <ClCompile Include="DrivesToolbarView.cpp" />
     <ClCompile Include="ShellChangeWatcher.cpp" />
+    <ClCompile Include="ShellTreeView\ShellTreeNode.cpp" />
     <ClCompile Include="ToolbarView.cpp" />
     <ClCompile Include="Bookmarks\BookmarkIconManager.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkMenuController.cpp" />
@@ -950,6 +951,7 @@
     <ClInclude Include="DriveWatcher.h" />
     <ClInclude Include="Navigator.h" />
     <ClInclude Include="ShellChangeWatcher.h" />
+    <ClInclude Include="ShellTreeView\ShellTreeNode.h" />
     <ClInclude Include="ToolbarView.h" />
     <ClInclude Include="Bookmarks\BookmarkIconManager.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkMenuController.h" />

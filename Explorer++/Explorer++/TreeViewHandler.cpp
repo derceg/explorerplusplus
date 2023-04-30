@@ -215,7 +215,7 @@ void Explorerplusplus::OnShowTreeViewContextMenu(const POINT &ptScreen)
 			TVIS_DROPHILITED);
 	}
 
-	auto pidl = m_shellTreeView->GetItemPidl(targetItem);
+	auto pidl = m_shellTreeView->GetNodePidl(targetItem);
 
 	unique_pidl_child child(ILCloneChild(ILFindLastID(pidl.get())));
 
@@ -242,7 +242,7 @@ void Explorerplusplus::OnTreeViewCopyItemPath() const
 
 	if (hItem != nullptr)
 	{
-		auto pidl = m_shellTreeView->GetItemPidl(hItem);
+		auto pidl = m_shellTreeView->GetNodePidl(hItem);
 
 		std::wstring fullFileName;
 		GetDisplayName(pidl.get(), SHGDN_FORPARSING, fullFileName);
@@ -263,7 +263,7 @@ void Explorerplusplus::OnTreeViewCopyUniversalPaths() const
 
 	if (hItem != nullptr)
 	{
-		auto pidl = m_shellTreeView->GetItemPidl(hItem);
+		auto pidl = m_shellTreeView->GetNodePidl(hItem);
 
 		std::wstring fullFileName;
 		GetDisplayName(pidl.get(), SHGDN_FORPARSING, fullFileName);
@@ -293,7 +293,7 @@ void Explorerplusplus::OnTreeViewHolderWindowTimer()
 	// navigation, ad infinitum.
 	KillTimer(m_hHolder, 0);
 
-	auto pidlDirectory = m_shellTreeView->GetItemPidl(g_newSelectionItem);
+	auto pidlDirectory = m_shellTreeView->GetNodePidl(g_newSelectionItem);
 	auto pidlCurrentDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
 	if (!m_bSelectingTreeViewDirectory
@@ -446,7 +446,7 @@ void Explorerplusplus::OnTreeViewSetFileAttributes() const
 	std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo> sfaiList;
 	NSetFileAttributesDialogExternal::SetFileAttributesInfo sfai;
 
-	auto pidlItem = m_shellTreeView->GetItemPidl(hItem);
+	auto pidlItem = m_shellTreeView->GetNodePidl(hItem);
 
 	std::wstring fullFileName;
 	HRESULT hr = GetDisplayName(pidlItem.get(), SHGDN_FORPARSING, fullFileName);

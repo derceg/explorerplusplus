@@ -511,6 +511,9 @@
     <ClCompile Include="ShellChangeWatcher.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="ShellTreeView\ShellTreeNode.cpp">
+      <Filter>ShellTreeView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1037,6 +1040,9 @@
     </ClInclude>
     <ClInclude Include="ShellChangeWatcher.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellTreeView\ShellTreeNode.h">
+      <Filter>ShellTreeView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

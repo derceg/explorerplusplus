@@ -124,7 +124,7 @@ HRESULT Explorerplusplus::GetTreeViewSelectionAttributes(SFGAOF *pItemAttributes
 
 	if (hItem != nullptr)
 	{
-		auto pidl = m_shellTreeView->GetItemPidl(hItem);
+		auto pidl = m_shellTreeView->GetNodePidl(hItem);
 		hr = GetItemAttributes(pidl.get(), pItemAttributes);
 	}
 
@@ -170,7 +170,7 @@ BOOL Explorerplusplus::CanPasteShellData(PasteType pastType) const
 
 		if (item)
 		{
-			directory = m_shellTreeView->GetItemPidl(item);
+			directory = m_shellTreeView->GetNodePidl(item);
 		}
 	}
 
@@ -225,7 +225,7 @@ BOOL Explorerplusplus::CanPasteCustomData() const
 
 		if (hItem != nullptr)
 		{
-			auto pidl = m_shellTreeView->GetItemPidl(hItem);
+			auto pidl = m_shellTreeView->GetNodePidl(hItem);
 
 			SFGAOF attributes = SFGAO_FILESYSTEM;
 			HRESULT hr = GetItemAttributes(pidl.get(), &attributes);
