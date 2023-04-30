@@ -1120,6 +1120,18 @@ void ShellTreeView::StartRenamingSelectedItem()
 	TreeView_EditLabel(m_hTreeView, selectedItem);
 }
 
+void ShellTreeView::StartRenamingItem(PCIDLIST_ABSOLUTE pidl)
+{
+	auto item = LocateExistingItem(pidl);
+
+	if (!item)
+	{
+		return;
+	}
+
+	TreeView_EditLabel(m_hTreeView, item);
+}
+
 void ShellTreeView::ShowPropertiesOfSelectedItem() const
 {
 	auto pidlDirectory = GetSelectedItemPidl();

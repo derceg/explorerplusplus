@@ -235,7 +235,9 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		}
 		else if (pfcmi->uFrom == FROM_TREEVIEW)
 		{
-			m_shellTreeView->StartRenamingSelectedItem();
+			assert(pidlItems.size() == 1);
+			unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
+			m_shellTreeView->StartRenamingItem(pidlComplete.get());
 		}
 
 		return TRUE;

@@ -37,6 +37,7 @@ public:
 	int CALLBACK CompareItems(LPARAM lParam1, LPARAM lParam2);
 
 	void StartRenamingSelectedItem();
+	void StartRenamingItem(PCIDLIST_ABSOLUTE pidl);
 	void ShowPropertiesOfSelectedItem() const;
 	void DeleteSelectedItem(bool permanent);
 	void CopySelectedItemToClipboard(bool copy);
