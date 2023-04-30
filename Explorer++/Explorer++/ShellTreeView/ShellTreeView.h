@@ -24,9 +24,8 @@ class TabContainer;
 class ShellTreeView : public ShellDropTargetWindow<HTREEITEM>
 {
 public:
-	ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabContainer *tabContainer,
-		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons);
-	~ShellTreeView();
+	static ShellTreeView *Create(HWND hParent, CoreInterface *coreInterface,
+		TabContainer *tabContainer, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons);
 
 	/* User functions. */
 	unique_pidl_absolute GetItemPidl(HTREEITEM hTreeItem) const;
@@ -170,6 +169,10 @@ private:
 		HTREEITEM item;
 		bool hasSubfolder;
 	};
+
+	ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabContainer *tabContainer,
+		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons);
+	~ShellTreeView();
 
 	static HWND CreateTreeView(HWND parent);
 

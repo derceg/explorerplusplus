@@ -33,6 +33,12 @@
 #include <wil/common.h>
 #include <propkey.h>
 
+ShellTreeView *ShellTreeView::Create(HWND hParent, CoreInterface *coreInterface,
+	TabContainer *tabContainer, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons)
+{
+	return new ShellTreeView(hParent, coreInterface, tabContainer, fileActionHandler, cachedIcons);
+}
+
 ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabContainer *tabContainer,
 	FileActionHandler *fileActionHandler, CachedIcons *cachedIcons) :
 	ShellDropTargetWindow(CreateTreeView(hParent)),
@@ -240,6 +246,10 @@ LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam,
 	case WM_DESTROY:
 		RemoveClipboardFormatListener(m_hTreeView);
 		break;
+
+	case WM_NCDESTROY:
+		delete this;
+		return 0;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
