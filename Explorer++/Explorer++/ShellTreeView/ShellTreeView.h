@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "ShellChangeWatcher.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/ShellHelper.h"
@@ -48,15 +49,11 @@ public:
 private:
 	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 1;
 	static const UINT WM_APP_SUBFOLDERS_RESULT_READY = WM_APP + 2;
-	static const UINT WM_APP_SHELL_NOTIFY = WM_APP + 3;
 
 	// This is the same background color as used in the Explorer treeview.
 	static inline constexpr COLORREF TREE_VIEW_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
 
-	static const UINT PROCESS_SHELL_CHANGES_TIMER_ID = 1;
-	static const UINT PROCESS_SHELL_CHANGES_TIMEOUT = 100;
-
-	static const UINT DROP_EXPAND_TIMER_ID = 2;
+	static const UINT DROP_EXPAND_TIMER_ID = 1;
 	static const UINT DROP_EXPAND_TIMER_ELAPSE = 800;
 
 	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 10;
@@ -149,20 +146,6 @@ private:
 		ItemInfo *m_parent = nullptr;
 	};
 
-	struct ShellChangeNotification
-	{
-		LONG event;
-		unique_pidl_absolute pidl1;
-		unique_pidl_absolute pidl2;
-
-		ShellChangeNotification(LONG event, PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2) :
-			event(event),
-			pidl1(pidl1 ? ILCloneFull(pidl1) : nullptr),
-			pidl2(pidl2 ? ILCloneFull(pidl2) : nullptr)
-		{
-		}
-	};
-
 	struct BasicItemInfo
 	{
 		BasicItemInfo() = default;
@@ -220,15 +203,14 @@ private:
 
 	// Directory monitoring
 	void StartDirectoryMonitoringForDrives();
-	void StopDirectoryMonitoringForDrives();
 	void StartDirectoryMonitoringForItem(ItemInfo &item);
 	void StopDirectoryMonitoringForItem(ItemInfo &item);
 	void StopDirectoryMonitoringForItemAndChildren(ItemInfo &item);
 	void RestartDirectoryMonitoringForItemAndChildren(ItemInfo &item);
 	void RestartDirectoryMonitoringForItem(ItemInfo &item);
-	void OnShellNotify(WPARAM wParam, LPARAM lParam);
-	void OnProcessShellChangeNotifications();
-	void ProcessShellChangeNotification(const ShellChangeNotification &change);
+	void ProcessShellChangeNotifications(
+		const std::vector<ShellChangeWatcher::ShellChangeNotification> &shellChangeNotifications);
+	void ProcessShellChangeNotification(const ShellChangeWatcher::ShellChangeNotification &change);
 	void OnItemAdded(PCIDLIST_ABSOLUTE simplePidl);
 	void OnItemRenamed(PCIDLIST_ABSOLUTE simplePidlOld, PCIDLIST_ABSOLUTE simplePidlNew);
 	void OnItemUpdated(PCIDLIST_ABSOLUTE simplePidl);
@@ -313,6 +295,5 @@ private:
 	wil::com_ptr_nothrow<IDataObject> m_clipboardDataObject;
 
 	// Directory monitoring
-	ULONG m_driveChangeNotifyId = 0;
-	std::vector<ShellChangeNotification> m_shellChangeNotifications;
+	ShellChangeWatcher m_shellChangeWatcher;
 };

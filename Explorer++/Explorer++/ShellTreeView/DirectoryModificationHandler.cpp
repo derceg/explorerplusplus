@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "ShellTreeView.h"
-#include "../Helper/Logging.h"
 #include <ranges>
 
 // Starts monitoring for drive additions and removals, since they won't necessarily trigger updates
@@ -18,55 +17,15 @@ void ShellTreeView::StartDirectoryMonitoringForDrives()
 	[[maybe_unused]] HRESULT hr = GetRootPidl(wil::out_param(pidl));
 	assert(SUCCEEDED(hr));
 
-	SHChangeNotifyEntry shcne;
-	shcne.pidl = pidl.get();
-	shcne.fRecursive = false;
-	m_driveChangeNotifyId = SHChangeNotifyRegister(m_hTreeView,
-		SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
-		SHCNE_DRIVEADD | SHCNE_DRIVEREMOVED, WM_APP_SHELL_NOTIFY, 1, &shcne);
-
-	if (m_driveChangeNotifyId == 0)
-	{
-		LOG(warning) << L"Couldn't monitor drives for changes.";
-	}
-}
-
-void ShellTreeView::StopDirectoryMonitoringForDrives()
-{
-	if (m_driveChangeNotifyId == 0)
-	{
-		return;
-	}
-
-	[[maybe_unused]] auto res = SHChangeNotifyDeregister(m_driveChangeNotifyId);
-	assert(res);
-
-	m_driveChangeNotifyId = 0;
+	m_shellChangeWatcher.StartWatching(pidl.get(), SHCNE_DRIVEADD | SHCNE_DRIVEREMOVED);
 }
 
 void ShellTreeView::StartDirectoryMonitoringForItem(ItemInfo &item)
 {
 	auto pidl = item.GetFullPidl();
-
-	SHChangeNotifyEntry shcne;
-	shcne.pidl = pidl.get();
-	shcne.fRecursive = false;
-	item.SetChangeNotifyId(SHChangeNotifyRegister(m_hTreeView,
-		SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
+	item.SetChangeNotifyId(m_shellChangeWatcher.StartWatching(pidl.get(),
 		SHCNE_ATTRIBUTES | SHCNE_MKDIR | SHCNE_RENAMEFOLDER | SHCNE_RMDIR | SHCNE_UPDATEDIR
-			| SHCNE_UPDATEITEM,
-		WM_APP_SHELL_NOTIFY, 1, &shcne));
-
-	if (item.GetChangeNotifyId() == 0)
-	{
-		std::wstring path;
-		HRESULT hr = GetDisplayName(pidl.get(), SHGDN_FORPARSING, path);
-
-		if (SUCCEEDED(hr))
-		{
-			LOG(warning) << L"Couldn't monitor directory \"" << path << L"\" for changes.";
-		}
-	}
+			| SHCNE_UPDATEITEM));
 }
 
 void ShellTreeView::StopDirectoryMonitoringForItem(ItemInfo &item)
@@ -76,9 +35,7 @@ void ShellTreeView::StopDirectoryMonitoringForItem(ItemInfo &item)
 		return;
 	}
 
-	[[maybe_unused]] auto res = SHChangeNotifyDeregister(item.GetChangeNotifyId());
-	assert(res);
-
+	m_shellChangeWatcher.StopWatching(item.GetChangeNotifyId());
 	item.ResetChangeNotifyId();
 }
 
@@ -125,37 +82,21 @@ void ShellTreeView::RestartDirectoryMonitoringForItem(ItemInfo &item)
 	StartDirectoryMonitoringForItem(item);
 }
 
-void ShellTreeView::OnShellNotify(WPARAM wParam, LPARAM lParam)
+void ShellTreeView::ProcessShellChangeNotifications(
+	const std::vector<ShellChangeWatcher::ShellChangeNotification> &shellChangeNotifications)
 {
-	PIDLIST_ABSOLUTE *pidls;
-	LONG event;
-	HANDLE lock = SHChangeNotification_Lock(reinterpret_cast<HANDLE>(wParam),
-		static_cast<DWORD>(lParam), &pidls, &event);
-
-	m_shellChangeNotifications.emplace_back(event, pidls[0], pidls[1]);
-
-	SHChangeNotification_Unlock(lock);
-
-	SetTimer(m_hTreeView, PROCESS_SHELL_CHANGES_TIMER_ID, PROCESS_SHELL_CHANGES_TIMEOUT, nullptr);
-}
-
-void ShellTreeView::OnProcessShellChangeNotifications()
-{
-	KillTimer(m_hTreeView, PROCESS_SHELL_CHANGES_TIMER_ID);
-
 	SendMessage(m_hTreeView, WM_SETREDRAW, FALSE, 0);
 
-	for (const auto &change : m_shellChangeNotifications)
+	for (const auto &change : shellChangeNotifications)
 	{
 		ProcessShellChangeNotification(change);
 	}
 
 	SendMessage(m_hTreeView, WM_SETREDRAW, TRUE, 0);
-
-	m_shellChangeNotifications.clear();
 }
 
-void ShellTreeView::ProcessShellChangeNotification(const ShellChangeNotification &change)
+void ShellTreeView::ProcessShellChangeNotification(
+	const ShellChangeWatcher::ShellChangeNotification &change)
 {
 	switch (change.event)
 	{

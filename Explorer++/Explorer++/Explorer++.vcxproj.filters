@@ -508,6 +508,9 @@
     <ClCompile Include="ColorRuleModelFactory.cpp">
       <Filter>Color Rules</Filter>
     </ClCompile>
+    <ClCompile Include="ShellChangeWatcher.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1031,6 +1034,9 @@
     </ClInclude>
     <ClInclude Include="DialogHelper.h">
       <Filter>Dialog Support</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellChangeWatcher.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
