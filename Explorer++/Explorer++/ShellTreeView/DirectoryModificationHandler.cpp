@@ -82,6 +82,20 @@ void ShellTreeView::StopDirectoryMonitoringForItem(ItemInfo &item)
 	item.ResetChangeNotifyId();
 }
 
+void ShellTreeView::StopDirectoryMonitoringForItemAndChildren(ItemInfo &item)
+{
+	StopDirectoryMonitoringForItem(item);
+
+	for (auto &child : m_itemInfoMap | std::views::values
+			| std::views::filter(
+				[&item](ItemInfo &currentItem) {
+					return currentItem.GetParent() == &item && currentItem.GetChangeNotifyId() != 0;
+				}))
+	{
+		StopDirectoryMonitoringForItemAndChildren(child);
+	}
+}
+
 // When a directory is renamed, the directory monitoring which was originally set up will no longer
 // work (since it's tied to a specific path). In that case, the directory monitoring for that item
 // will need to be restarted. The directory monitoring for any children will also need to be
@@ -293,8 +307,7 @@ void ShellTreeView::OnItemRemoved(PCIDLIST_ABSOLUTE simplePidl)
 
 void ShellTreeView::RemoveItem(HTREEITEM item)
 {
-	StopDirectoryMonitoringForItem(GetItemByHandle(item));
-
+	StopDirectoryMonitoringForItemAndChildren(GetItemByHandle(item));
 	RemoveChildrenFromInternalMap(item);
 
 	TVITEMEX tvItem = {};

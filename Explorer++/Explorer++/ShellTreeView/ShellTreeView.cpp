@@ -595,13 +595,12 @@ void ShellTreeView::OnItemExpanding(const NMTREEVIEW *nmtv)
 			}
 		}
 
+		ItemInfo &itemInfo = GetItemByHandle(parentItem);
+		StopDirectoryMonitoringForItemAndChildren(itemInfo);
 		RemoveChildrenFromInternalMap(parentItem);
 
 		SendMessage(m_hTreeView, TVM_EXPAND, TVE_COLLAPSE | TVE_COLLAPSERESET,
 			reinterpret_cast<LPARAM>(parentItem));
-
-		ItemInfo &itemInfo = GetItemByHandle(parentItem);
-		StopDirectoryMonitoringForItem(itemInfo);
 	}
 }
 

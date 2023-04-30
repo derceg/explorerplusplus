@@ -223,6 +223,7 @@ private:
 	void StopDirectoryMonitoringForDrives();
 	void StartDirectoryMonitoringForItem(ItemInfo &item);
 	void StopDirectoryMonitoringForItem(ItemInfo &item);
+	void StopDirectoryMonitoringForItemAndChildren(ItemInfo &item);
 	void RestartDirectoryMonitoringForItemAndChildren(ItemInfo &item);
 	void RestartDirectoryMonitoringForItem(ItemInfo &item);
 	void OnShellNotify(WPARAM wParam, LPARAM lParam);
