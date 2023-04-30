@@ -188,7 +188,7 @@ private:
 
 	HTREEITEM AddRoot();
 	HRESULT ExpandDirectory(HTREEITEM hParent);
-	void AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl);
+	HTREEITEM AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl);
 	void SortChildren(HTREEITEM parent);
 	void RemoveChildrenFromInternalMap(HTREEITEM hParent);
 	void OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi);

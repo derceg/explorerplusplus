@@ -313,33 +313,11 @@ HTREEITEM ShellTreeView::AddRoot()
 		return nullptr;
 	}
 
-	std::wstring desktopDisplayName;
-	GetDisplayName(pidl.get(), SHGDN_INFOLDER, desktopDisplayName);
+	auto rootItem = AddItem(nullptr, pidl.get());
+	assert(rootItem);
+	SendMessage(m_hTreeView, TVM_EXPAND, TVE_EXPAND, reinterpret_cast<LPARAM>(rootItem));
 
-	int itemId = GenerateUniqueItemId();
-	m_itemInfoMap.emplace(itemId, unique_pidl_absolute(ILCloneFull(pidl.get())));
-
-	TVITEMEX tvItem;
-	tvItem.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
-	tvItem.pszText = desktopDisplayName.data();
-	tvItem.iImage = I_IMAGECALLBACK;
-	tvItem.iSelectedImage = I_IMAGECALLBACK;
-	tvItem.cChildren = 1;
-	tvItem.lParam = itemId;
-
-	TVINSERTSTRUCT tvis;
-	tvis.hParent = nullptr;
-	tvis.hInsertAfter = TVI_LAST;
-	tvis.itemex = tvItem;
-
-	auto hDesktop = TreeView_InsertItem(m_hTreeView, &tvis);
-
-	if (hDesktop != nullptr)
-	{
-		SendMessage(m_hTreeView, TVM_EXPAND, TVE_EXPAND, reinterpret_cast<LPARAM>(hDesktop));
-	}
-
-	return hDesktop;
+	return rootItem;
 }
 
 void ShellTreeView::OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi)
@@ -803,20 +781,29 @@ HRESULT ShellTreeView::ExpandDirectory(HTREEITEM hParent)
 	return hr;
 }
 
-void ShellTreeView::AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl)
+HTREEITEM ShellTreeView::AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl)
 {
 	std::wstring name;
 	HRESULT hr = GetDisplayName(pidl, SHGDN_NORMAL, name);
 
 	if (FAILED(hr))
 	{
-		return;
+		return nullptr;
 	}
 
 	int itemId = GenerateUniqueItemId();
-	auto &parentItem = GetItemByHandle(parent);
-	m_itemInfoMap.emplace(std::piecewise_construct, std::forward_as_tuple(itemId),
-		std::forward_as_tuple(unique_pidl_child(ILCloneChild(ILFindLastID(pidl))), &parentItem));
+
+	if (parent)
+	{
+		auto &parentItem = GetItemByHandle(parent);
+		m_itemInfoMap.emplace(std::piecewise_construct, std::forward_as_tuple(itemId),
+			std::forward_as_tuple(unique_pidl_child(ILCloneChild(ILFindLastID(pidl))),
+				&parentItem));
+	}
+	else
+	{
+		m_itemInfoMap.emplace(itemId, unique_pidl_absolute(ILCloneFull(pidl)));
+	}
 
 	TVITEMEX tvItem = {};
 	tvItem.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
@@ -833,6 +820,8 @@ void ShellTreeView::AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl)
 
 	[[maybe_unused]] auto item = TreeView_InsertItem(m_hTreeView, &tvInsertData);
 	assert(item);
+
+	return item;
 }
 
 void ShellTreeView::SortChildren(HTREEITEM parent)
