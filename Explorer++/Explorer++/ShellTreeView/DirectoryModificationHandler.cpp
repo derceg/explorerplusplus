@@ -7,6 +7,43 @@
 #include "../Helper/Logging.h"
 #include <ranges>
 
+// Starts monitoring for drive additions and removals, since they won't necessarily trigger updates
+// in the parent folder.
+void ShellTreeView::StartDirectoryMonitoringForDrives()
+{
+	// A pidl is needed in order to start monitoring, though in this case it's not relevant, since
+	// only drive events are monitored. Therefore, the pidl for the root folder (which should always
+	// be available) is used.
+	unique_pidl_absolute pidl;
+	[[maybe_unused]] HRESULT hr = GetRootPidl(wil::out_param(pidl));
+	assert(SUCCEEDED(hr));
+
+	SHChangeNotifyEntry shcne;
+	shcne.pidl = pidl.get();
+	shcne.fRecursive = false;
+	m_driveChangeNotifyId = SHChangeNotifyRegister(m_hTreeView,
+		SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
+		SHCNE_DRIVEADD | SHCNE_DRIVEREMOVED, WM_APP_SHELL_NOTIFY, 1, &shcne);
+
+	if (m_driveChangeNotifyId == 0)
+	{
+		LOG(warning) << L"Couldn't monitor drives for changes.";
+	}
+}
+
+void ShellTreeView::StopDirectoryMonitoringForDrives()
+{
+	if (m_driveChangeNotifyId == 0)
+	{
+		return;
+	}
+
+	[[maybe_unused]] auto res = SHChangeNotifyDeregister(m_driveChangeNotifyId);
+	assert(res);
+
+	m_driveChangeNotifyId = 0;
+}
+
 void ShellTreeView::StartDirectoryMonitoringForItem(ItemInfo &item)
 {
 	auto pidl = item.GetFullPidl();
@@ -108,6 +145,7 @@ void ShellTreeView::ProcessShellChangeNotification(const ShellChangeNotification
 {
 	switch (change.event)
 	{
+	case SHCNE_DRIVEADD:
 	case SHCNE_MKDIR:
 		OnItemAdded(change.pidl1.get());
 		break;
@@ -120,6 +158,7 @@ void ShellTreeView::ProcessShellChangeNotification(const ShellChangeNotification
 		OnItemUpdated(change.pidl1.get());
 		break;
 
+	case SHCNE_DRIVEREMOVED:
 	case SHCNE_RMDIR:
 		OnItemRemoved(change.pidl1.get());
 		break;

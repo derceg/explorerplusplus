@@ -219,6 +219,8 @@ private:
 	unique_pidl_absolute GetSelectedItemPidl() const;
 
 	// Directory monitoring
+	void StartDirectoryMonitoringForDrives();
+	void StopDirectoryMonitoringForDrives();
 	void StartDirectoryMonitoringForItem(ItemInfo &item);
 	void StopDirectoryMonitoringForItem(ItemInfo &item);
 	void RestartDirectoryMonitoringForItemAndChildren(ItemInfo &item);
@@ -310,5 +312,6 @@ private:
 	wil::com_ptr_nothrow<IDataObject> m_clipboardDataObject;
 
 	// Directory monitoring
+	ULONG m_driveChangeNotifyId = 0;
 	std::vector<ShellChangeNotification> m_shellChangeNotifications;
 };

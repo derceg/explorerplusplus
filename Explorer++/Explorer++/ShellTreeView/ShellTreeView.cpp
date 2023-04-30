@@ -86,6 +86,8 @@ ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabCont
 
 	AddClipboardFormatListener(m_hTreeView);
 
+	StartDirectoryMonitoringForDrives();
+
 	m_connections.push_back(coreInterface->AddApplicationShuttingDownObserver(
 		std::bind_front(&ShellTreeView::OnApplicationShuttingDown, this)));
 }
@@ -99,6 +101,8 @@ HWND ShellTreeView::CreateTreeView(HWND parent)
 
 ShellTreeView::~ShellTreeView()
 {
+	StopDirectoryMonitoringForDrives();
+
 	m_iconThreadPool.clear_queue();
 }
 
