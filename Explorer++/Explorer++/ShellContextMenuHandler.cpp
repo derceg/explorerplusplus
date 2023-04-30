@@ -251,7 +251,9 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		}
 		else if (pfcmi->uFrom == FROM_TREEVIEW)
 		{
-			m_shellTreeView->CopySelectedItemToClipboard(true);
+			assert(pidlItems.size() == 1);
+			unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
+			m_shellTreeView->CopyItemToClipboard(pidlComplete.get(), true);
 		}
 
 		return TRUE;
@@ -265,7 +267,9 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		}
 		else if (pfcmi->uFrom == FROM_TREEVIEW)
 		{
-			m_shellTreeView->CopySelectedItemToClipboard(false);
+			assert(pidlItems.size() == 1);
+			unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
+			m_shellTreeView->CopyItemToClipboard(pidlComplete.get(), false);
 		}
 
 		return TRUE;

@@ -41,6 +41,7 @@ public:
 	void ShowPropertiesOfSelectedItem() const;
 	void DeleteSelectedItem(bool permanent);
 	void CopySelectedItemToClipboard(bool copy);
+	void CopyItemToClipboard(PCIDLIST_ABSOLUTE pidl, bool copy);
 	void Paste();
 	void PasteShortcut();
 
@@ -211,6 +212,7 @@ private:
 	void OnMiddleButtonUp(const POINT *pt, UINT keysDown);
 	bool OnEndLabelEdit(const NMTVDISPINFO *dispInfo);
 
+	void CopyItemToClipboard(HTREEITEM treeItem, bool copy);
 	void UpdateCurrentClipboardObject(wil::com_ptr_nothrow<IDataObject> clipboardDataObject);
 	void OnClipboardUpdate();
 

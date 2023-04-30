@@ -1203,7 +1203,24 @@ bool ShellTreeView::OnEndLabelEdit(const NMTVDISPINFO *dispInfo)
 void ShellTreeView::CopySelectedItemToClipboard(bool copy)
 {
 	HTREEITEM item = TreeView_GetSelection(m_hTreeView);
-	auto &itemInfo = GetItemByHandle(item);
+	CopyItemToClipboard(item, copy);
+}
+
+void ShellTreeView::CopyItemToClipboard(PCIDLIST_ABSOLUTE pidl, bool copy)
+{
+	auto item = LocateExistingItem(pidl);
+
+	if (!item)
+	{
+		return;
+	}
+
+	CopyItemToClipboard(item, copy);
+}
+
+void ShellTreeView::CopyItemToClipboard(HTREEITEM treeItem, bool copy)
+{
+	auto &itemInfo = GetItemByHandle(treeItem);
 	auto pidl = itemInfo.GetFullPidl();
 
 	std::vector<PCIDLIST_ABSOLUTE> items = { pidl.get() };
@@ -1227,8 +1244,8 @@ void ShellTreeView::CopySelectedItemToClipboard(bool copy)
 		{
 			UpdateCurrentClipboardObject(clipboardDataObject);
 
-			m_cutItem = item;
-			UpdateItemState(item, TVIS_CUT, TVIS_CUT);
+			m_cutItem = treeItem;
+			UpdateItemState(treeItem, TVIS_CUT, TVIS_CUT);
 		}
 	}
 }
