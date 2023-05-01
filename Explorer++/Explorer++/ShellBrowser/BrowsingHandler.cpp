@@ -45,7 +45,7 @@ HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHist
 	m_navigationStartedSignal(pidlDirectory);
 
 	std::vector<ItemInfo_t> items;
-	HRESULT hr = EnumerateFolder(pidlDirectory, addHistoryEntry, items);
+	HRESULT hr = PerformEnumeration(pidlDirectory, addHistoryEntry, items);
 
 	if (FAILED(hr))
 	{
@@ -139,56 +139,20 @@ void ShellBrowser::StoreCurrentlySelectedItems()
 	entry->SetSelectedItems(selectedItems);
 }
 
-HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry,
+HRESULT ShellBrowser::PerformEnumeration(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry,
 	std::vector<ShellBrowser::ItemInfo_t> &items)
 {
 	wil::com_ptr_nothrow<IShellFolder> parent;
 	PCITEMID_CHILD child;
-	HRESULT hr = SHBindToParent(pidlDirectory, IID_PPV_ARGS(&parent), &child);
-
-	if (FAILED(hr))
-	{
-		return hr;
-	}
+	RETURN_IF_FAILED(SHBindToParent(pidlDirectory, IID_PPV_ARGS(&parent), &child));
 
 	SFGAOF attr = SFGAO_FILESYSTEM;
-	hr = parent->GetAttributesOf(1, &child, &attr);
-
-	if (FAILED(hr))
-	{
-		return hr;
-	}
+	RETURN_IF_FAILED(parent->GetAttributesOf(1, &child, &attr));
 
 	std::wstring parsingPath;
-	hr = GetDisplayName(parent.get(), child, SHGDN_FORPARSING, parsingPath);
+	RETURN_IF_FAILED(GetDisplayName(parent.get(), child, SHGDN_FORPARSING, parsingPath));
 
-	if (FAILED(hr))
-	{
-		return hr;
-	}
-
-	wil::com_ptr_nothrow<IShellFolder> shellFolder;
-	hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&shellFolder));
-
-	if (FAILED(hr))
-	{
-		return hr;
-	}
-
-	SHCONTF enumFlags = SHCONTF_FOLDERS | SHCONTF_NONFOLDERS;
-
-	if (m_folderSettings.showHidden)
-	{
-		WI_SetAllFlags(enumFlags, SHCONTF_INCLUDEHIDDEN | SHCONTF_INCLUDESUPERHIDDEN);
-	}
-
-	wil::com_ptr_nothrow<IEnumIDList> enumerator;
-	hr = shellFolder->EnumObjects(m_hOwner, enumFlags, &enumerator);
-
-	if (FAILED(hr) || !enumerator)
-	{
-		return hr;
-	}
+	RETURN_IF_FAILED(EnumerateFolder(pidlDirectory, m_hOwner, m_folderSettings.showHidden, items));
 
 	PrepareToChangeFolders();
 
@@ -201,11 +165,33 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addH
 	VerifySortMode();
 	SetViewModeInternal(m_folderSettings.viewMode);
 
-	// It makes sense to trigger this here, rather than on navigation completion, since
-	// otherwise requests could still come in for the previous directory.
 	NotifyShellOfNavigation(pidlDirectory);
 
 	m_navigationCommittedSignal(pidlDirectory, addHistoryEntry);
+
+	return S_OK;
+}
+
+HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owner, bool showHidden,
+	std::vector<ShellBrowser::ItemInfo_t> &items)
+{
+	wil::com_ptr_nothrow<IShellFolder> shellFolder;
+	RETURN_IF_FAILED(BindToIdl(pidlDirectory, IID_PPV_ARGS(&shellFolder)));
+
+	SHCONTF enumFlags = SHCONTF_FOLDERS | SHCONTF_NONFOLDERS;
+
+	if (showHidden)
+	{
+		WI_SetAllFlags(enumFlags, SHCONTF_INCLUDEHIDDEN | SHCONTF_INCLUDESUPERHIDDEN);
+	}
+
+	wil::com_ptr_nothrow<IEnumIDList> enumerator;
+	HRESULT hr = shellFolder->EnumObjects(owner, enumFlags, &enumerator);
+
+	if (FAILED(hr) || !enumerator)
+	{
+		return hr;
+	}
 
 	ULONG numFetched = 1;
 	unique_pidl_child pidlItem;
@@ -424,9 +410,11 @@ std::optional<ShellBrowser::ItemInfo_t> ShellBrowser::GetItemInformation(IShellF
 
 	SHGDNF displayNameFlags = SHGDN_INFOLDER;
 
-	bool isRecycleBin = m_recycleBinPidl
-		&& m_desktopFolder->CompareIDs(SHCIDS_CANONICALONLY, pidlDirectory, m_recycleBinPidl.get())
-			== 0;
+	unique_pidl_absolute recycleBinPidl;
+	hr = SHGetKnownFolderIDList(FOLDERID_RecycleBinFolder, KF_FLAG_DEFAULT, nullptr,
+		wil::out_param(recycleBinPidl));
+
+	bool isRecycleBin = SUCCEEDED(hr) && ArePidlsEquivalent(pidlDirectory, recycleBinPidl.get());
 
 	// SHGDN_INFOLDER | SHGDN_FORPARSING is used to ensure that the name retrieved for a filesystem
 	// file contains an extension, even if extensions are hidden in Windows Explorer. When using

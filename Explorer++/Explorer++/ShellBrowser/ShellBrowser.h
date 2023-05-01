@@ -370,8 +370,12 @@ private:
 	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true) override;
 
 	/* Browsing support. */
-	HRESULT EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry,
+	HRESULT PerformEnumeration(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry,
 		std::vector<ItemInfo_t> &items);
+	static HRESULT EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owner, bool showHidden,
+		std::vector<ItemInfo_t> &items);
+	static std::optional<ItemInfo_t> GetItemInformation(IShellFolder *shellFolder,
+		PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild);
 	void PrepareToChangeFolders();
 	void ClearPendingResults();
 	void ResetFolderState();
@@ -382,8 +386,6 @@ private:
 	std::optional<int> AddItemInternal(IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory,
 		PCITEMID_CHILD pidlChild, int itemIndex, BOOL setPosition);
 	int AddItemInternal(int itemIndex, ItemInfo_t itemInfo, BOOL setPosition);
-	std::optional<ItemInfo_t> GetItemInformation(IShellFolder *shellFolder,
-		PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild);
 	static HRESULT ExtractFindDataUsingPropertyStore(IShellFolder *shellFolder,
 		PCITEMID_CHILD pidlChild, WIN32_FIND_DATA &output);
 	void SetViewModeInternal(ViewMode viewMode);
@@ -653,9 +655,6 @@ private:
 	// Directory monitoring
 	ShellChangeWatcher m_shellChangeWatcher;
 	unique_pidl_absolute m_renamedItemOldPidl;
-
-	wil::com_ptr_nothrow<IShellFolder> m_desktopFolder;
-	unique_pidl_absolute m_recycleBinPidl;
 
 	/* Stores information on files that
 	have been modified (i.e. created, deleted,
