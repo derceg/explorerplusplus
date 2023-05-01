@@ -1099,9 +1099,17 @@ HRESULT ShellTreeView::OnBeginDrag(const ShellTreeNode *node)
 	std::vector<PCIDLIST_ABSOLUTE> items = { pidl.get() };
 	RETURN_IF_FAILED(CreateDataObjectForShellTransfer(items, &dataObject));
 
+	m_performingDrag = true;
+	m_draggedItemPidl = pidl.get();
+
 	DWORD effect;
-	return SHDoDragDrop(m_hTreeView, dataObject.get(), nullptr,
+	HRESULT hr = SHDoDragDrop(m_hTreeView, dataObject.get(), nullptr,
 		DROPEFFECT_COPY | DROPEFFECT_MOVE | DROPEFFECT_LINK, &effect);
+
+	m_draggedItemPidl = nullptr;
+	m_performingDrag = false;
+
+	return hr;
 }
 
 void ShellTreeView::StartRenamingSelectedItem()

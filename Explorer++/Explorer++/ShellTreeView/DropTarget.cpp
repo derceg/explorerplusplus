@@ -19,7 +19,25 @@ HTREEITEM ShellTreeView::GetDropTargetItem(const POINT &pt)
 
 	TVHITTESTINFO hitTestInfo;
 	hitTestInfo.pt = ptClient;
-	return TreeView_HitTest(m_hTreeView, &hitTestInfo);
+	HTREEITEM item = TreeView_HitTest(m_hTreeView, &hitTestInfo);
+
+	if (!item)
+	{
+		return nullptr;
+	}
+
+	if (m_performingDrag)
+	{
+		ShellTreeNode *node = GetNodeFromTreeViewItem(item);
+
+		// An item can't be dropped on itself.
+		if (ArePidlsEquivalent(node->GetFullPidl().get(), m_draggedItemPidl))
+		{
+			return nullptr;
+		}
+	}
+
+	return item;
 }
 
 unique_pidl_absolute ShellTreeView::GetPidlForTargetItem(HTREEITEM targetItem)

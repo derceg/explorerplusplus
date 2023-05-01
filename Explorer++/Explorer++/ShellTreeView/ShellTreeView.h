@@ -204,6 +204,8 @@ private:
 	HTREEITEM m_dropExpandItem;
 	BOOL m_bDragCancelled;
 	BOOL m_bDragAllowed;
+	bool m_performingDrag = false;
+	PCIDLIST_ABSOLUTE m_draggedItemPidl = nullptr;
 
 	HTREEITEM m_cutItem;
 	wil::com_ptr_nothrow<IDataObject> m_clipboardDataObject;
