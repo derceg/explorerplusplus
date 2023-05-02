@@ -14,7 +14,7 @@ struct FolderColumns;
 struct FolderSettings;
 struct PreservedTab;
 class ShellBrowser;
-__interface TabNavigationInterface;
+class TabNavigationInterface;
 
 class Tab
 {

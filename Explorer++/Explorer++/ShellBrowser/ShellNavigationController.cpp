@@ -4,8 +4,11 @@
 
 #include "stdafx.h"
 #include "ShellNavigationController.h"
+#include "ShellNavigator.h"
+#include "TabNavigationInterface.h"
+#include "../Helper/IconFetcher.h"
 
-ShellNavigationController::ShellNavigationController(NavigatorInterface *navigator,
+ShellNavigationController::ShellNavigationController(ShellNavigator *navigator,
 	TabNavigationInterface *tabNavigation, IconFetcherInterface *iconFetcher) :
 	m_navigator(navigator),
 	m_tabNavigation(tabNavigation),
@@ -14,7 +17,7 @@ ShellNavigationController::ShellNavigationController(NavigatorInterface *navigat
 	Initialize();
 }
 
-ShellNavigationController::ShellNavigationController(NavigatorInterface *navigator,
+ShellNavigationController::ShellNavigationController(ShellNavigator *navigator,
 	TabNavigationInterface *tabNavigation, IconFetcherInterface *iconFetcher,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries, int currentEntry) :
 	NavigationController(CopyPreservedHistoryEntries(preservedEntries), currentEntry),
@@ -46,21 +49,20 @@ std::vector<std::unique_ptr<HistoryEntry>> ShellNavigationController::CopyPreser
 	return entries;
 }
 
-void ShellNavigationController::OnNavigationCommitted(PCIDLIST_ABSOLUTE pidlDirectory,
-	bool addHistoryEntry)
+void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navigateParams)
 {
-	if (addHistoryEntry)
+	if (navigateParams.addHistoryEntry)
 	{
 		std::wstring displayName;
-		GetDisplayName(pidlDirectory, SHGDN_INFOLDER, displayName);
+		GetDisplayName(navigateParams.pidl.Raw(), SHGDN_INFOLDER, displayName);
 
-		auto newEntry = std::make_unique<HistoryEntry>(pidlDirectory, displayName);
+		auto newEntry = std::make_unique<HistoryEntry>(navigateParams.pidl.Raw(), displayName);
 		int entryId = newEntry->GetId();
 		int index = AddEntry(std::move(newEntry));
 
 		// TODO: It would probably be better to do this somewhere else, since
 		// this class is focused on navigation.
-		m_iconFetcher->QueueIconTask(pidlDirectory,
+		m_iconFetcher->QueueIconTask(navigateParams.pidl.Raw(),
 			[this, index, entryId](int iconIndex)
 			{
 				auto *entry = GetEntryAtIndex(index);
@@ -73,6 +75,17 @@ void ShellNavigationController::OnNavigationCommitted(PCIDLIST_ABSOLUTE pidlDire
 				entry->SetSystemIconIndex(iconIndex);
 			});
 	}
+
+	if (navigateParams.historyEntryId)
+	{
+		auto *entry = GetEntryById(*navigateParams.historyEntryId);
+
+		if (entry)
+		{
+			auto index = GetIndexOfEntry(entry);
+			SetCurrentIndex(*index);
+		}
+	}
 }
 
 HRESULT ShellNavigationController::GoToOffset(int offset)
@@ -84,26 +97,7 @@ HRESULT ShellNavigationController::GoToOffset(int offset)
 		return E_FAIL;
 	}
 
-	auto connection = m_navigator->AddNavigationCommittedObserver(
-		[this, offset](PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
-		{
-			UNREFERENCED_PARAMETER(pidl);
-			UNREFERENCED_PARAMETER(addHistoryEntry);
-
-			// The entry retrieval above will fail if the provided offset is invalid, so there's no
-			// need to re-check the offset here.
-			int index = GetCurrentIndex() + offset;
-			SetCurrentIndex(index);
-		},
-		boost::signals2::at_front);
-
-	auto disconnect = wil::scope_exit(
-		[&connection]
-		{
-			connection.disconnect();
-		});
-
-	return BrowseFolder(entry);
+	return Navigate(entry);
 }
 
 bool ShellNavigationController::CanGoUp() const
@@ -135,7 +129,17 @@ HRESULT ShellNavigationController::GoUp()
 		return hr;
 	}
 
-	return BrowseFolder(pidlParent.get());
+	auto navigateParams = NavigateParams::Up(pidlParent.get(), currentEntry->GetPidl().get());
+
+	if (m_navigationMode == NavigationMode::ForceNewTab && GetCurrentEntry())
+	{
+		m_tabNavigation->CreateNewTab(navigateParams, true);
+		return S_OK;
+	}
+	else
+	{
+		return m_navigator->Navigate(navigateParams);
+	}
 }
 
 HRESULT ShellNavigationController::Refresh()
@@ -147,52 +151,43 @@ HRESULT ShellNavigationController::Refresh()
 		return E_FAIL;
 	}
 
-	return m_navigator->BrowseFolder(*currentEntry);
+	auto navigateParams = NavigateParams::History(currentEntry);
+	return m_navigator->Navigate(navigateParams);
 }
 
-HRESULT ShellNavigationController::BrowseFolder(const HistoryEntry *entry)
+HRESULT ShellNavigationController::Navigate(const HistoryEntry *entry)
 {
-	if (m_navigationMode == NavigationMode::ForceNewTab && GetCurrentEntry() != nullptr)
-	{
-		m_tabNavigation->CreateNewTab(entry->GetPidl().get(), true);
-		return S_OK;
-	}
-
-	return m_navigator->BrowseFolder(*entry);
+	auto navigateParams = NavigateParams::History(entry);
+	return Navigate(navigateParams);
 }
 
-HRESULT ShellNavigationController::BrowseFolder(const std::wstring &path, bool addHistoryEntry)
+HRESULT ShellNavigationController::Navigate(const std::wstring &path, bool addHistoryEntry)
 {
 	unique_pidl_absolute pidlDirectory;
-	HRESULT hr =
-		SHParseDisplayName(path.c_str(), nullptr, wil::out_param(pidlDirectory), 0, nullptr);
+	RETURN_IF_FAILED(
+		SHParseDisplayName(path.c_str(), nullptr, wil::out_param(pidlDirectory), 0, nullptr));
 
-	if (SUCCEEDED(hr))
-	{
-		hr = BrowseFolder(pidlDirectory.get(), addHistoryEntry);
-	}
-
-	return hr;
+	auto navigateParams = NavigateParams::Normal(pidlDirectory.get(), addHistoryEntry);
+	return Navigate(navigateParams);
 }
 
-HRESULT ShellNavigationController::BrowseFolder(PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
+HRESULT ShellNavigationController::Navigate(NavigateParams &navigateParams)
 {
 	auto currentEntry = GetCurrentEntry();
 
 	if (m_navigationMode == NavigationMode::ForceNewTab && currentEntry)
 	{
-		m_tabNavigation->CreateNewTab(pidl, true);
+		m_tabNavigation->CreateNewTab(navigateParams, true);
 		return S_OK;
 	}
 
-	bool finalAddHistoryEntry = addHistoryEntry;
-
-	if (currentEntry && ArePidlsEquivalent(currentEntry->GetPidl().get(), pidl))
+	if (currentEntry
+		&& ArePidlsEquivalent(currentEntry->GetPidl().get(), navigateParams.pidl.Raw()))
 	{
-		finalAddHistoryEntry = false;
+		navigateParams.addHistoryEntry = false;
 	}
 
-	return m_navigator->BrowseFolder(pidl, finalAddHistoryEntry);
+	return m_navigator->Navigate(navigateParams);
 }
 
 HRESULT ShellNavigationController::GetFailureValue()
@@ -203,4 +198,19 @@ HRESULT ShellNavigationController::GetFailureValue()
 void ShellNavigationController::SetNavigationMode(NavigationMode navigationMode)
 {
 	m_navigationMode = navigationMode;
+}
+
+HistoryEntry *ShellNavigationController::GetEntryById(int id)
+{
+	for (int i = 0; i < GetNumHistoryEntries(); i++)
+	{
+		auto *entry = GetEntryAtIndex(i);
+
+		if (entry->GetId() == id)
+		{
+			return entry;
+		}
+	}
+
+	return nullptr;
 }

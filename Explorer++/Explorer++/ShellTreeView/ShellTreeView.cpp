@@ -19,6 +19,7 @@
 #include "Config.h"
 #include "CoreInterface.h"
 #include "DarkModeHelper.h"
+#include "ShellBrowser/ShellNavigator.h"
 #include "ShellTreeNode.h"
 #include "TabContainer.h"
 #include "../Helper/CachedIcons.h"
@@ -1007,7 +1008,8 @@ void ShellTreeView::OnMiddleButtonUp(const POINT *pt, UINT keysDown)
 	}
 
 	auto pidl = GetNodePidl(hitTestInfo.hItem);
-	m_tabContainer->CreateNewTab(pidl.get(), TabSettings(_selected = switchToNewTab));
+	auto navigateParams = NavigateParams::Normal(pidl.get());
+	m_tabContainer->CreateNewTab(navigateParams, TabSettings(_selected = switchToNewTab));
 }
 
 void ShellTreeView::SetShowHidden(BOOL bShowHidden)

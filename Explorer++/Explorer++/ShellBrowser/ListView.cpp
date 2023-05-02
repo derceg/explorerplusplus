@@ -15,6 +15,7 @@
 #include "SelectColumnsDialog.h"
 #include "SetFileAttributesDialog.h"
 #include "ShellNavigationController.h"
+#include "TabNavigationInterface.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/DragDropHelper.h"
 #include "../Helper/Helper.h"
@@ -280,7 +281,8 @@ void ShellBrowser::OnListViewMButtonUp(const POINT *pt, UINT keysDown)
 		switchToNewTab = !switchToNewTab;
 	}
 
-	m_tabNavigation->CreateNewTab(itemInfo.pidlComplete.get(), switchToNewTab);
+	auto navigateParams = NavigateParams::Normal(itemInfo.pidlComplete.get());
+	m_tabNavigation->CreateNewTab(navigateParams, switchToNewTab);
 }
 
 void ShellBrowser::OnRButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT keyFlags)
@@ -707,7 +709,7 @@ void ShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 
 				if (bRes)
 				{
-					m_navigationController->BrowseFolder(root);
+					m_navigationController->Navigate(root);
 				}
 			}
 		}

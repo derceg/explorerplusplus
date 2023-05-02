@@ -54,7 +54,7 @@ INT_PTR ManageBookmarksDialog::OnInitDialog()
 
 	m_navigationController =
 		std::make_unique<BookmarkNavigationController>(m_bookmarkTree, m_bookmarkListView);
-	m_navigationController->BrowseFolder(m_bookmarkTree->GetBookmarksToolbarFolder());
+	m_navigationController->Navigate(m_bookmarkTree->GetBookmarksToolbarFolder());
 
 	SetFocus(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW));
 
@@ -744,7 +744,7 @@ void ManageBookmarksDialog::OnTreeViewSelectionChanged(BookmarkItem *bookmarkFol
 		return;
 	}
 
-	m_navigationController->BrowseFolder(bookmarkFolder);
+	m_navigationController->Navigate(bookmarkFolder);
 }
 
 void ManageBookmarksDialog::OnListViewNavigation(BookmarkItem *bookmarkFolder, bool addHistoryEntry)

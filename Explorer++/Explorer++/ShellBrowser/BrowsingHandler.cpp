@@ -23,37 +23,24 @@
 #include <propvarutil.h>
 #include <list>
 
-HRESULT ShellBrowser::BrowseFolder(const HistoryEntry &entry)
-{
-	HRESULT hr = BrowseFolder(entry.GetPidl().get(), false);
-
-	if (SUCCEEDED(hr))
-	{
-		auto selectedItems = entry.GetSelectedItems();
-		SelectItems(ShallowCopyPidls(selectedItems));
-	}
-
-	return hr;
-}
-
-HRESULT ShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)
+HRESULT ShellBrowser::Navigate(const NavigateParams &navigateParams)
 {
 	SetCursor(LoadCursor(nullptr, IDC_WAIT));
 
 	auto resetCursor = wil::scope_exit([] { SetCursor(LoadCursor(nullptr, IDC_ARROW)); });
 
-	m_navigationStartedSignal(pidlDirectory);
+	m_navigationStartedSignal(navigateParams);
 
 	std::vector<ItemInfo_t> items;
-	HRESULT hr = PerformEnumeration(pidlDirectory, addHistoryEntry, items);
+	HRESULT hr = PerformEnumeration(navigateParams, items);
 
 	if (FAILED(hr))
 	{
-		m_navigationFailedSignal();
+		m_navigationFailedSignal(navigateParams);
 		return hr;
 	}
 
-	OnEnumerationCompleted(std::move(items));
+	OnEnumerationCompleted(std::move(items), navigateParams);
 
 	return hr;
 }
@@ -139,12 +126,12 @@ void ShellBrowser::StoreCurrentlySelectedItems()
 	entry->SetSelectedItems(selectedItems);
 }
 
-HRESULT ShellBrowser::PerformEnumeration(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry,
+HRESULT ShellBrowser::PerformEnumeration(const NavigateParams &navigateParams,
 	std::vector<ShellBrowser::ItemInfo_t> &items)
 {
 	wil::com_ptr_nothrow<IShellFolder> parent;
 	PCITEMID_CHILD child;
-	RETURN_IF_FAILED(SHBindToParent(pidlDirectory, IID_PPV_ARGS(&parent), &child));
+	RETURN_IF_FAILED(SHBindToParent(navigateParams.pidl.Raw(), IID_PPV_ARGS(&parent), &child));
 
 	SFGAOF attr = SFGAO_FILESYSTEM;
 	RETURN_IF_FAILED(parent->GetAttributesOf(1, &child, &attr));
@@ -152,11 +139,12 @@ HRESULT ShellBrowser::PerformEnumeration(PCIDLIST_ABSOLUTE pidlDirectory, bool a
 	std::wstring parsingPath;
 	RETURN_IF_FAILED(GetDisplayName(parent.get(), child, SHGDN_FORPARSING, parsingPath));
 
-	RETURN_IF_FAILED(EnumerateFolder(pidlDirectory, m_hOwner, m_folderSettings.showHidden, items));
+	RETURN_IF_FAILED(
+		EnumerateFolder(navigateParams.pidl.Raw(), m_hOwner, m_folderSettings.showHidden, items));
 
 	PrepareToChangeFolders();
 
-	m_directoryState.pidlDirectory.reset(ILCloneFull(pidlDirectory));
+	m_directoryState.pidlDirectory.reset(ILCloneFull(navigateParams.pidl.Raw()));
 	m_directoryState.directory = parsingPath;
 	m_directoryState.virtualFolder = WI_IsFlagClear(attr, SFGAO_FILESYSTEM);
 	m_uniqueFolderId++;
@@ -165,9 +153,9 @@ HRESULT ShellBrowser::PerformEnumeration(PCIDLIST_ABSOLUTE pidlDirectory, bool a
 	VerifySortMode();
 	SetViewModeInternal(m_folderSettings.viewMode);
 
-	NotifyShellOfNavigation(pidlDirectory);
+	NotifyShellOfNavigation(navigateParams.pidl.Raw());
 
-	m_navigationCommittedSignal(pidlDirectory, addHistoryEntry);
+	m_navigationCommittedSignal(navigateParams);
 
 	return S_OK;
 }
@@ -532,7 +520,8 @@ HRESULT ShellBrowser::ExtractFindDataUsingPropertyStore(IShellFolder *shellFolde
 	return hr;
 }
 
-void ShellBrowser::OnEnumerationCompleted(std::vector<ShellBrowser::ItemInfo_t> &&items)
+void ShellBrowser::OnEnumerationCompleted(std::vector<ShellBrowser::ItemInfo_t> &&items,
+	const NavigateParams &navigateParams)
 {
 	for (auto &item : items)
 	{
@@ -556,6 +545,22 @@ void ShellBrowser::OnEnumerationCompleted(std::vector<ShellBrowser::ItemInfo_t> 
 	/* Set the focus back to the first item. */
 	ListView_SetItemState(m_hListView, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
+	if (navigateParams.historyEntryId)
+	{
+		auto entry = m_navigationController->GetEntryById(*navigateParams.historyEntryId);
+
+		if (entry)
+		{
+			auto selectedItems = entry->GetSelectedItems();
+			SelectItems(ShallowCopyPidls(selectedItems));
+		}
+	}
+
+	if (navigateParams.navigationType == NavigationType::Up)
+	{
+		SelectItems({ navigateParams.originalPidl.Raw() });
+	}
+
 	if (m_config->shellChangeNotificationType == ShellChangeNotificationType::All
 		|| (m_config->shellChangeNotificationType == ShellChangeNotificationType::NonFilesystem
 			&& m_directoryState.virtualFolder))
@@ -565,7 +570,7 @@ void ShellBrowser::OnEnumerationCompleted(std::vector<ShellBrowser::ItemInfo_t> 
 
 	m_bFolderVisited = TRUE;
 
-	m_navigationCompletedSignal(m_directoryState.pidlDirectory.get());
+	m_navigationCompletedSignal(navigateParams);
 }
 
 void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)

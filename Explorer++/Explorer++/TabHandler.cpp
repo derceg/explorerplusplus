@@ -86,11 +86,9 @@ boost::signals2::connection Explorerplusplus::AddTabsInitializedObserver(
 	return m_tabsInitializedSignal.connect(observer);
 }
 
-void Explorerplusplus::OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl,
-	bool addHistoryEntry)
+void Explorerplusplus::OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams)
 {
-	UNREFERENCED_PARAMETER(pidl);
-	UNREFERENCED_PARAMETER(addHistoryEntry);
+	UNREFERENCED_PARAMETER(navigateParams);
 
 	if (m_tabContainer->IsTabSelected(tab))
 	{
@@ -128,7 +126,10 @@ void Explorerplusplus::OnNewTab()
 		{
 			auto pidl = selectedTab.GetShellBrowser()->GetItemCompleteIdl(selectionIndex);
 			FolderColumns cols = selectedTab.GetShellBrowser()->ExportAllColumns();
-			m_tabContainer->CreateNewTab(pidl.get(), TabSettings(_selected = true), nullptr, &cols);
+
+			auto navigateParams = NavigateParams::Normal(pidl.get());
+			m_tabContainer->CreateNewTab(navigateParams, TabSettings(_selected = true), nullptr,
+				&cols);
 			return;
 		}
 	}
@@ -187,7 +188,8 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 			continue;
 		}
 
-		Tab &newTab = m_tabContainer->CreateNewTab(parentPidl.get(), TabSettings(_selected = true));
+		auto navigateParams = NavigateParams::Normal(parentPidl.get());
+		Tab &newTab = m_tabContainer->CreateNewTab(navigateParams, TabSettings(_selected = true));
 
 		if (ArePidlsEquivalent(newTab.GetShellBrowser()->GetDirectoryIdl().get(), parentPidl.get()))
 		{
@@ -318,9 +320,9 @@ void Explorerplusplus::OnTabListViewSelectionChanged(const Tab &tab)
 }
 
 // TabNavigationInterface
-void Explorerplusplus::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected)
+void Explorerplusplus::CreateNewTab(NavigateParams &navigateParams, bool selected)
 {
-	m_tabContainer->CreateNewTab(pidlDirectory, TabSettings(_selected = selected));
+	m_tabContainer->CreateNewTab(navigateParams, TabSettings(_selected = selected));
 }
 
 void Explorerplusplus::SelectTabById(int tabId)

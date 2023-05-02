@@ -309,7 +309,8 @@ void Explorerplusplus::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		assert(pidlItems.size() == 1);
 
 		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
-		m_tabContainer->CreateNewTab(pidlComplete.get(),
+		auto navigateParams = NavigateParams::Normal(pidlComplete.get());
+		m_tabContainer->CreateNewTab(navigateParams,
 			TabSettings(_selected = m_config->openTabsInForeground));
 	}
 	break;

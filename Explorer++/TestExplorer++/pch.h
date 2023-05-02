@@ -10,6 +10,8 @@
 
 #define WIL_SUPPRESS_EXCEPTIONS
 
+#include "../Helper/DisableUnaligned.h"
+
 // Third-party Header Files:
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

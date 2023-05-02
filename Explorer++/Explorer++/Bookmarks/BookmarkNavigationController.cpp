@@ -17,7 +17,7 @@ BookmarkNavigationController::BookmarkNavigationController(BookmarkTree *bookmar
 		boost::signals2::at_front));
 }
 
-bool BookmarkNavigationController::BrowseFolder(const BookmarkHistoryEntry *entry)
+bool BookmarkNavigationController::Navigate(const BookmarkHistoryEntry *entry)
 {
 	auto bookmarkFolder = BookmarkHelper::GetBookmarkItemById(m_bookmarkTree, entry->getGuid());
 
@@ -28,11 +28,11 @@ bool BookmarkNavigationController::BrowseFolder(const BookmarkHistoryEntry *entr
 		return false;
 	}
 
-	BrowseFolder(bookmarkFolder);
+	Navigate(bookmarkFolder);
 	return true;
 }
 
-bool BookmarkNavigationController::BrowseFolder(BookmarkItem *bookmarkFolder, bool addHistoryEntry)
+bool BookmarkNavigationController::Navigate(BookmarkItem *bookmarkFolder, bool addHistoryEntry)
 {
 	m_navigator->NavigateToBookmarkFolder(bookmarkFolder, addHistoryEntry);
 	return true;

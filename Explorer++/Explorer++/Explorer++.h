@@ -46,6 +46,7 @@ class LoadSaveRegistry;
 class LoadSaveXML;
 class MainToolbar;
 class MainWindow;
+struct NavigateParams;
 class ShellBrowser;
 class ShellTreeView;
 class TabContainer;
@@ -285,10 +286,10 @@ private:
 	void OnTabListViewSelectionChanged(const Tab &tab);
 
 	/* TabNavigationInterface methods. */
-	void CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected) override;
+	void CreateNewTab(NavigateParams &navigateParams, bool selected) override;
 	void SelectTabById(int tabId) override;
 
-	void OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
+	void OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams);
 
 	/* PluginInterface. */
 	CoreInterface *GetCoreInterface() override;
@@ -395,10 +396,10 @@ private:
 	void CreateStatusBar();
 	void SetStatusBarParts(int width);
 	LRESULT StatusBarMenuSelect(WPARAM wParam, LPARAM lParam);
-	void OnNavigationStartedStatusBar(const Tab &tab, PCIDLIST_ABSOLUTE pidl);
+	void OnNavigationStartedStatusBar(const Tab &tab, const NavigateParams &navigateParams);
 	void SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl);
-	void OnNavigationCompletedStatusBar(const Tab &tab);
-	void OnNavigationFailedStatusBar(const Tab &tab);
+	void OnNavigationCompletedStatusBar(const Tab &tab, const NavigateParams &navigateParams);
+	void OnNavigationFailedStatusBar(const Tab &tab, const NavigateParams &navigateParams);
 	HRESULT UpdateStatusBarText(const Tab &tab);
 	std::wstring CreateDriveFreeSpaceString(const std::wstring &path);
 
@@ -426,7 +427,7 @@ private:
 	void OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters) override;
 
 	void OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory);
-	void OnNavigateUp();
+	HRESULT OnNavigateUp();
 
 	// FileContextMenuHandler
 	void UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,

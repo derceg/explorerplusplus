@@ -59,6 +59,19 @@ public:
 		return m_entries[index].get();
 	}
 
+	std::optional<int> GetIndexOfEntry(HistoryEntryType *entry) const
+	{
+		auto itr = std::find_if(m_entries.begin(), m_entries.end(),
+			[entry](auto &currentEntry) { return currentEntry.get() == entry; });
+
+		if (itr == m_entries.end())
+		{
+			return std::nullopt;
+		}
+
+		return static_cast<int>(itr - m_entries.begin());
+	}
+
 	bool CanGoBack() const
 	{
 		if (m_currentEntry == -1)
@@ -132,7 +145,7 @@ public:
 			return GetFailureValue();
 		}
 
-		auto res = BrowseFolder(entry);
+		auto res = Navigate(entry);
 
 		if (res != GetFailureValue())
 		{
@@ -144,7 +157,7 @@ public:
 	}
 
 protected:
-	virtual BrowseFolderReturnType BrowseFolder(const HistoryEntryType *entry) = 0;
+	virtual BrowseFolderReturnType Navigate(const HistoryEntryType *entry) = 0;
 	virtual BrowseFolderReturnType GetFailureValue() = 0;
 
 	int AddEntry(std::unique_ptr<HistoryEntryType> entry)

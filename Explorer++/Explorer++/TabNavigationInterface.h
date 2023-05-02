@@ -4,14 +4,19 @@
 
 #pragma once
 
+struct NavigateParams;
+
 // Tabs need to have the ability to open new tabs. They don't, however, need
 // access to the full TabContainer interface (e.g. a tab has no need to close a
 // tab or retrieve the selected tab). The simple interface here exists purely to
 // allow a tab to create a new tab when necessary.
 // Note that this function also doesn't allow the caller to customize the new
 // tab in any way.
-__interface TabNavigationInterface
+class TabNavigationInterface
 {
-	void CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected);
-	void SelectTabById(int tabId);
+public:
+	virtual ~TabNavigationInterface() = default;
+
+	virtual void CreateNewTab(NavigateParams &navigateParams, bool selected) = 0;
+	virtual void SelectTabById(int tabId) = 0;
 };

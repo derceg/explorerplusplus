@@ -5,8 +5,8 @@
 #include "pch.h"
 #include "../Explorer++/ShellBrowser/ShellNavigationController.h"
 #include "../Explorer++/ShellBrowser/HistoryEntry.h"
-#include "../Explorer++/ShellBrowser/NavigatorInterface.h"
 #include "../Explorer++/ShellBrowser/PreservedHistoryEntry.h"
+#include "../Explorer++/ShellBrowser/ShellNavigator.h"
 #include "../Explorer++/TabNavigationInterface.h"
 #include "../Helper/IconFetcher.h"
 #include "../Helper/ShellHelper.h"
@@ -16,24 +16,14 @@
 
 using namespace testing;
 
-class NavigatorFake : public NavigatorInterface
+class NavigatorFake : public ShellNavigator
 {
 public:
-	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true) override
+	HRESULT Navigate(const NavigateParams &navigateParams) override
 	{
-		m_navigationStartedSignal(pidlDirectory);
-		m_navigationCommittedSignal(pidlDirectory, addHistoryEntry);
-		m_navigationCompletedSignal(pidlDirectory);
-
-		return S_OK;
-	}
-
-	HRESULT BrowseFolder(const HistoryEntry &entry) override
-	{
-		m_navigationStartedSignal(entry.GetPidl().get());
-		m_navigationCommittedSignal(entry.GetPidl().get(), false);
-		m_navigationCompletedSignal(entry.GetPidl().get());
-
+		m_navigationStartedSignal(navigateParams);
+		m_navigationCommittedSignal(navigateParams);
+		m_navigationCompletedSignal(navigateParams);
 		return S_OK;
 	}
 
@@ -72,60 +62,37 @@ private:
 	NavigationFailedSignal m_navigationFailedSignal;
 };
 
-class NavigatorMock : public NavigatorInterface
+class NavigatorMock : public ShellNavigator
 {
 public:
 	NavigatorMock()
 	{
-		ON_CALL(*this, BrowseFolderImpl(_, _))
-			.WillByDefault(
-				[this](PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)
-				{
-					return m_fake.BrowseFolder(pidlDirectory, addHistoryEntry);
-				});
-
-		ON_CALL(*this, BrowseFolderImpl(_))
-			.WillByDefault(
-				[this](const HistoryEntry &entry)
-				{
-					return m_fake.BrowseFolder(entry);
-				});
+		ON_CALL(*this, NavigateImpl)
+			.WillByDefault([this](const NavigateParams &navigateParams)
+				{ return m_fake.Navigate(navigateParams); });
 
 		ON_CALL(*this, AddNavigationStartedObserverImpl)
-			.WillByDefault(
-				[this](const NavigationStartedSignal::slot_type &observer,
-					boost::signals2::connect_position position)
-				{
-					return m_fake.AddNavigationStartedObserver(observer, position);
-				});
+			.WillByDefault([this](const NavigationStartedSignal::slot_type &observer,
+							   boost::signals2::connect_position position)
+				{ return m_fake.AddNavigationStartedObserver(observer, position); });
 
 		ON_CALL(*this, AddNavigationCommittedObserverImpl)
-			.WillByDefault(
-				[this](const NavigationCommittedSignal::slot_type &observer,
-					boost::signals2::connect_position position)
-				{
-					return m_fake.AddNavigationCommittedObserver(observer, position);
-				});
+			.WillByDefault([this](const NavigationCommittedSignal::slot_type &observer,
+							   boost::signals2::connect_position position)
+				{ return m_fake.AddNavigationCommittedObserver(observer, position); });
 
 		ON_CALL(*this, AddNavigationCompletedObserverImpl)
-			.WillByDefault(
-				[this](const NavigationCompletedSignal::slot_type &observer,
-					boost::signals2::connect_position position)
-				{
-					return m_fake.AddNavigationCompletedObserver(observer, position);
-				});
+			.WillByDefault([this](const NavigationCompletedSignal::slot_type &observer,
+							   boost::signals2::connect_position position)
+				{ return m_fake.AddNavigationCompletedObserver(observer, position); });
 
 		ON_CALL(*this, AddNavigationFailedObserverImpl)
-			.WillByDefault(
-				[this](const NavigationFailedSignal::slot_type &observer,
-					boost::signals2::connect_position position)
-				{
-					return m_fake.AddNavigationFailedObserver(observer, position);
-				});
+			.WillByDefault([this](const NavigationFailedSignal::slot_type &observer,
+							   boost::signals2::connect_position position)
+				{ return m_fake.AddNavigationFailedObserver(observer, position); });
 	}
 
-	MOCK_METHOD(HRESULT, BrowseFolderImpl, (PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry));
-	MOCK_METHOD(HRESULT, BrowseFolderImpl, (const HistoryEntry &entry));
+	MOCK_METHOD(HRESULT, NavigateImpl, (const NavigateParams &navigateParams));
 	MOCK_METHOD(boost::signals2::connection, AddNavigationStartedObserverImpl,
 		(const NavigationStartedSignal::slot_type &observer,
 			boost::signals2::connect_position position));
@@ -139,14 +106,9 @@ public:
 		(const NavigationFailedSignal::slot_type &observer,
 			boost::signals2::connect_position position));
 
-	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true) override
+	HRESULT Navigate(const NavigateParams &navigateParams) override
 	{
-		return BrowseFolderImpl(pidlDirectory, addHistoryEntry);
-	}
-
-	HRESULT BrowseFolder(const HistoryEntry &entry) override
-	{
-		return BrowseFolderImpl(entry);
+		return NavigateImpl(navigateParams);
 	}
 
 	boost::signals2::connection AddNavigationStartedObserver(
@@ -184,7 +146,7 @@ private:
 class TabNavigationMock : public TabNavigationInterface
 {
 public:
-	MOCK_METHOD(void, CreateNewTab, (PCIDLIST_ABSOLUTE pidlDirectory, bool selected), (override));
+	MOCK_METHOD(void, CreateNewTab, (NavigateParams & navigateParams, bool selected), (override));
 	MOCK_METHOD(void, SelectTabById, (int tabId), (override));
 };
 
@@ -217,7 +179,8 @@ protected:
 			return E_FAIL;
 		}
 
-		return m_navigationController.BrowseFolder(pidl.get());
+		auto navigateParams = NavigateParams::Normal(pidl.get());
+		return m_navigationController.Navigate(navigateParams);
 	}
 
 	NavigatorMock m_navigator;
@@ -402,7 +365,8 @@ TEST_F(ShellNavigationControllerTest, GoUp)
 {
 	unique_pidl_absolute pidlFolder(SHSimpleIDListFromPath(L"C:\\Fake"));
 	ASSERT_TRUE(pidlFolder);
-	HRESULT hr = m_navigationController.BrowseFolder(pidlFolder.get());
+	auto navigateParamsFolder = NavigateParams::Normal(pidlFolder.get());
+	HRESULT hr = m_navigationController.Navigate(navigateParamsFolder);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	EXPECT_TRUE(m_navigationController.CanGoUp());
@@ -423,7 +387,8 @@ TEST_F(ShellNavigationControllerTest, GoUp)
 		wil::out_param(pidlDesktop));
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
-	hr = m_navigationController.BrowseFolder(pidlDesktop.get());
+	auto navigateParamsDesktop = NavigateParams::Normal(pidlDesktop.get());
+	hr = m_navigationController.Navigate(navigateParamsDesktop);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	EXPECT_FALSE(m_navigationController.CanGoUp());
@@ -436,7 +401,7 @@ TEST_F(ShellNavigationControllerTest, GoUp)
 	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidlDesktop.get()));
 }
 
-TEST_F(ShellNavigationControllerTest, GetEntry)
+TEST_F(ShellNavigationControllerTest, HistoryEntries)
 {
 	auto entry = m_navigationController.GetCurrentEntry();
 	EXPECT_EQ(entry, nullptr);
@@ -447,7 +412,8 @@ TEST_F(ShellNavigationControllerTest, GetEntry)
 	unique_pidl_absolute pidl1(SHSimpleIDListFromPath(L"C:\\Fake1"));
 	ASSERT_TRUE(pidl1);
 
-	HRESULT hr = m_navigationController.BrowseFolder(pidl1.get());
+	auto navigateParams1 = NavigateParams::Normal(pidl1.get());
+	HRESULT hr = m_navigationController.Navigate(navigateParams1);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	EXPECT_EQ(m_navigationController.GetCurrentIndex(), 0);
@@ -456,15 +422,22 @@ TEST_F(ShellNavigationControllerTest, GetEntry)
 	ASSERT_NE(entry, nullptr);
 	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl1.get()));
 
+	EXPECT_EQ(m_navigationController.GetIndexOfEntry(entry), 0);
+	EXPECT_EQ(m_navigationController.GetEntryById(entry->GetId()), entry);
+
 	unique_pidl_absolute pidl2(SHSimpleIDListFromPath(L"C:\\Fake2"));
 	ASSERT_TRUE(pidl2);
 
-	hr = m_navigationController.BrowseFolder(pidl2.get());
+	auto navigateParams2 = NavigateParams::Normal(pidl2.get());
+	hr = m_navigationController.Navigate(navigateParams2);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	entry = m_navigationController.GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
 	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl2.get()));
+
+	EXPECT_EQ(m_navigationController.GetIndexOfEntry(entry), 1);
+	EXPECT_EQ(m_navigationController.GetEntryById(entry->GetId()), entry);
 
 	EXPECT_EQ(m_navigationController.GetCurrentIndex(), 1);
 	EXPECT_EQ(m_navigationController.GetCurrentEntry(), m_navigationController.GetEntryAtIndex(1));
@@ -479,22 +452,24 @@ TEST_F(ShellNavigationControllerTest, NavigationMode)
 	unique_pidl_absolute pidl(SHSimpleIDListFromPath(L"C:\\Fake"));
 	ASSERT_TRUE(pidl);
 
-	EXPECT_CALL(m_navigator, BrowseFolderImpl(pidl.get(), _));
+	auto params = NavigateParams::Normal(pidl.get());
+
+	EXPECT_CALL(m_navigator, NavigateImpl(Ref(params)));
 
 	// By default, all navigations should proceed in the current tab.
 	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
 
-	HRESULT hr = m_navigationController.BrowseFolder(pidl.get());
+	HRESULT hr = m_navigationController.Navigate(params);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	m_navigationController.SetNavigationMode(
 		ShellNavigationController::NavigationMode::ForceNewTab);
 
-	EXPECT_CALL(m_navigator, BrowseFolderImpl(_, _)).Times(0);
+	EXPECT_CALL(m_navigator, NavigateImpl(_)).Times(0);
 
-	EXPECT_CALL(m_tabNavigation, CreateNewTab(pidl.get(), _));
+	EXPECT_CALL(m_tabNavigation, CreateNewTab(Ref(params), _));
 
-	hr = m_navigationController.BrowseFolder(pidl.get());
+	hr = m_navigationController.Navigate(params);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 }
 
@@ -506,22 +481,26 @@ TEST_F(ShellNavigationControllerTest, NavigationModeFirstNavigation)
 	unique_pidl_absolute pidl1(SHSimpleIDListFromPath(L"C:\\Fake1"));
 	ASSERT_TRUE(pidl1);
 
+	auto params = NavigateParams::Normal(pidl1.get());
+
 	// The first navigation in a tab should always take place within that tab, regardless of the
 	// navigation mode in effect.
-	EXPECT_CALL(m_navigator, BrowseFolderImpl(pidl1.get(), _));
+	EXPECT_CALL(m_navigator, NavigateImpl(Ref(params)));
 	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
 
-	HRESULT hr = m_navigationController.BrowseFolder(pidl1.get());
+	HRESULT hr = m_navigationController.Navigate(params);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	unique_pidl_absolute pidl2(SHSimpleIDListFromPath(L"C:\\Fake2"));
 	ASSERT_TRUE(pidl2);
 
-	// Subsequent navigations should then open in a new tab when necessary.
-	EXPECT_CALL(m_navigator, BrowseFolderImpl(pidl2.get(), _)).Times(0);
-	EXPECT_CALL(m_tabNavigation, CreateNewTab(pidl2.get(), _));
+	auto params2 = NavigateParams::Normal(pidl2.get());
 
-	hr = m_navigationController.BrowseFolder(pidl2.get());
+	// Subsequent navigations should then open in a new tab when necessary.
+	EXPECT_CALL(m_navigator, NavigateImpl(Ref(params2))).Times(0);
+	EXPECT_CALL(m_tabNavigation, CreateNewTab(Ref(params2), _));
+
+	hr = m_navigationController.Navigate(params2);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 }
 

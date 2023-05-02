@@ -14,6 +14,7 @@
 #include "PreservedTab.h"
 #include "RenameTabDialog.h"
 #include "ResourceHelper.h"
+#include "ShellBrowser/PreservedHistoryEntry.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabBacking.h"
@@ -519,13 +520,13 @@ void TabContainer::OnOpenParentInNewTab(const Tab &tab)
 {
 	auto pidlCurrent = tab.GetShellBrowser()->GetDirectoryIdl();
 
-	PIDLIST_ABSOLUTE pidlParent = nullptr;
-	HRESULT hr = GetVirtualParentPath(pidlCurrent.get(), &pidlParent);
+	unique_pidl_absolute pidlParent;
+	HRESULT hr = GetVirtualParentPath(pidlCurrent.get(), wil::out_param(pidlParent));
 
 	if (SUCCEEDED(hr))
 	{
-		CreateNewTab(pidlParent, TabSettings(_selected = true));
-		CoTaskMemFree(pidlParent);
+		auto navigateParams = NavigateParams::Normal(pidlParent.get());
+		CreateNewTab(navigateParams, TabSettings(_selected = true));
 	}
 }
 
@@ -784,11 +785,9 @@ void TabContainer::OnForceSameTabWidthUpdated(BOOL newValue)
 	AddWindowStyle(m_hwnd, TCS_FIXEDWIDTH, newValue);
 }
 
-void TabContainer::OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl,
-	bool addHistoryEntry)
+void TabContainer::OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams)
 {
-	UNREFERENCED_PARAMETER(pidl);
-	UNREFERENCED_PARAMETER(addHistoryEntry);
+	UNREFERENCED_PARAMETER(navigateParams);
 
 	UpdateTabNameInWindow(tab);
 	SetTabIcon(tab);
@@ -938,7 +937,8 @@ Tab &TabContainer::CreateNewTab(const std::wstring &directory, const TabSettings
 		}
 	}
 
-	return CreateNewTab(pidl.get(), tabSettings, folderSettings, initialColumns);
+	auto navigateParams = NavigateParams::Normal(pidl.get());
+	return CreateNewTab(navigateParams, tabSettings, folderSettings, initialColumns);
 }
 
 Tab &TabContainer::CreateNewTab(const PreservedTab &preservedTab)
@@ -953,10 +953,11 @@ Tab &TabContainer::CreateNewTab(const PreservedTab &preservedTab)
 
 	TabSettings tabSettings(_index = preservedTab.index, _selected = true);
 
-	return SetUpNewTab(tab, entry->pidl.get(), tabSettings, false);
+	auto navigateParams = NavigateParams::Normal(entry->pidl.get(), false);
+	return SetUpNewTab(tab, navigateParams, tabSettings);
 }
 
-Tab &TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings,
+Tab &TabContainer::CreateNewTab(NavigateParams &navigateParams, const TabSettings &tabSettings,
 	const FolderSettings *folderSettings, const FolderColumns *initialColumns)
 {
 	auto tabTemp = std::make_unique<Tab>(m_coreInterface, m_tabNavigation, m_fileActionHandler,
@@ -975,11 +976,11 @@ Tab &TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSettin
 		tab.SetCustomName(*tabSettings.name);
 	}
 
-	return SetUpNewTab(tab, pidlDirectory, tabSettings, true);
+	return SetUpNewTab(tab, navigateParams, tabSettings);
 }
 
-Tab &TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
-	const TabSettings &tabSettings, bool addHistoryEntry)
+Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
+	const TabSettings &tabSettings)
 {
 	int index;
 
@@ -1005,7 +1006,7 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 	/* Browse folder sends a message back to the main window, which
 	attempts to contact the new tab (needs to be created before browsing
 	the folder). */
-	InsertNewTab(index, tab.GetId(), pidlDirectory, tabSettings.name);
+	InsertNewTab(index, tab.GetId(), navigateParams.pidl, tabSettings.name);
 
 	// Note that for the listview window to be shown, it has to have a non-zero
 	// size. If the size is zero at the point it's shown, it will instead remain
@@ -1022,67 +1023,49 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 	}
 
 	tab.GetShellBrowser()->AddNavigationStartedObserver(
-		[this, &tab](PCIDLIST_ABSOLUTE pidl)
-		{
-			tabNavigationStartedSignal.m_signal(tab, pidl);
-		});
+		[this, &tab](const NavigateParams &navigateParams)
+		{ tabNavigationStartedSignal.m_signal(tab, navigateParams); });
 
 	tab.GetShellBrowser()->AddNavigationCommittedObserver(
-		[this, &tab](PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
-		{
-			tabNavigationCommittedSignal.m_signal(tab, pidl, addHistoryEntry);
-		});
+		[this, &tab](const NavigateParams &navigateParams)
+		{ tabNavigationCommittedSignal.m_signal(tab, navigateParams); });
 
 	// Capturing the tab by reference here is safe, since the tab object is
 	// guaranteed to exist whenever this method is called.
 	tab.GetShellBrowser()->AddNavigationCompletedObserver(
-		[this, &tab](PCIDLIST_ABSOLUTE pidlDirectory)
+		[this, &tab](const NavigateParams &navigateParams)
 		{
-			UNREFERENCED_PARAMETER(pidlDirectory);
-
 			// Re-broadcast the event. This allows other classes to be notified of
 			// navigations in any tab, without having to observe navigation events
 			// for each tab individually.
-			tabNavigationCompletedSignal.m_signal(tab);
+			tabNavigationCompletedSignal.m_signal(tab, navigateParams);
 		});
 
 	tab.GetShellBrowser()->AddNavigationFailedObserver(
-		[this, &tab]()
-		{
-			tabNavigationFailedSignal.m_signal(tab);
-		});
+		[this, &tab](const NavigateParams &navigateParams)
+		{ tabNavigationFailedSignal.m_signal(tab, navigateParams); });
 
 	tab.GetShellBrowser()->directoryModified.AddObserver(
-		[this, &tab]()
-		{
-			tabDirectoryModifiedSignal.m_signal(tab);
-		});
+		[this, &tab]() { tabDirectoryModifiedSignal.m_signal(tab); });
 
 	tab.GetShellBrowser()->listViewSelectionChanged.AddObserver(
-		[this, &tab]()
-		{
-			tabListViewSelectionChangedSignal.m_signal(tab);
-		});
+		[this, &tab]() { tabListViewSelectionChangedSignal.m_signal(tab); });
 
 	tab.GetShellBrowser()->columnsChanged.AddObserver(
-		[this, &tab]()
-		{
-			tabColumnsChangedSignal.m_signal(tab);
-		});
+		[this, &tab]() { tabColumnsChangedSignal.m_signal(tab); });
 
-	HRESULT hr = tab.GetShellBrowser()->GetNavigationController()->BrowseFolder(pidlDirectory,
-		addHistoryEntry);
+	HRESULT hr = tab.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
 
 	if (FAILED(hr))
 	{
-		hr = tab.GetShellBrowser()->GetNavigationController()->BrowseFolder(
-			m_config->defaultTabDirectory, addHistoryEntry);
+		hr = tab.GetShellBrowser()->GetNavigationController()->Navigate(
+			m_config->defaultTabDirectory);
 
 		if (FAILED(hr))
 		{
 			// The computer folder should always exist, so this call shouldn't fail.
-			tab.GetShellBrowser()->GetNavigationController()->BrowseFolder(
-				m_config->defaultTabDirectoryStatic, addHistoryEntry);
+			tab.GetShellBrowser()->GetNavigationController()->Navigate(
+				m_config->defaultTabDirectoryStatic);
 		}
 	}
 
@@ -1107,7 +1090,7 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
 	return tab;
 }
 
-void TabContainer::InsertNewTab(int index, int tabId, PCIDLIST_ABSOLUTE pidlDirectory,
+void TabContainer::InsertNewTab(int index, int tabId, const PidlAbsolute &pidlDirectory,
 	std::optional<std::wstring> customName)
 {
 	std::wstring name;
@@ -1118,7 +1101,7 @@ void TabContainer::InsertNewTab(int index, int tabId, PCIDLIST_ABSOLUTE pidlDire
 	}
 	else
 	{
-		GetDisplayName(pidlDirectory, SHGDN_INFOLDER, name);
+		GetDisplayName(pidlDirectory.Raw(), SHGDN_INFOLDER, name);
 	}
 
 	boost::replace_all(name, L"&", L"&&");
@@ -1420,9 +1403,7 @@ std::vector<std::reference_wrapper<const Tab>> TabContainer::GetAllTabsInOrder()
 	// accomplish the same thing.
 	std::sort(sortedTabs.begin(), sortedTabs.end(),
 		[this](const auto &tab1, const auto &tab2)
-		{
-			return GetTabIndex(tab1.get()) < GetTabIndex(tab2.get());
-		});
+		{ return GetTabIndex(tab1.get()) < GetTabIndex(tab2.get()); });
 
 	return sortedTabs;
 }
@@ -1431,8 +1412,8 @@ void TabContainer::DuplicateTab(const Tab &tab)
 {
 	auto folderSettings = tab.GetShellBrowser()->GetFolderSettings();
 	auto folderColumns = tab.GetShellBrowser()->ExportAllColumns();
-	CreateNewTab(tab.GetShellBrowser()->GetDirectoryIdl().get(), {}, &folderSettings,
-		&folderColumns);
+	auto navigateParams = NavigateParams::Normal(tab.GetShellBrowser()->GetDirectoryIdl().get());
+	CreateNewTab(navigateParams, {}, &folderSettings, &folderColumns);
 }
 
 int TabContainer::GetDropTargetItem(const POINT &pt)

@@ -8,7 +8,7 @@
 #include <memory>
 
 class ShellBrowser;
-__interface TabNavigationInterface;
+class TabNavigationInterface;
 
 // This isn't a complete implementation. There's only enough functionality to support the "New
 // Folder" item shown on the background context menu in a phone's virtual folder (when that phone is

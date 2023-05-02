@@ -10,6 +10,7 @@
 
 struct Config;
 class CoreInterface;
+struct NavigateParams;
 class WindowSubclassWrapper;
 
 class MainWindow : private DropTargetInternal
@@ -25,7 +26,7 @@ private:
 
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	void OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
+	void OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams);
 	void OnTabSelected(const Tab &tab);
 
 	void OnShowFullTitlePathUpdated(BOOL newValue);

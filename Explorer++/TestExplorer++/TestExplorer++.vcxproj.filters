@@ -94,6 +94,9 @@
     <ClCompile Include="HelperTest.cpp">
       <Filter>Helper\Miscellaneous</Filter>
     </ClCompile>
+    <ClCompile Include="PidlHelperTest.cpp">
+      <Filter>Helper\Shell</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

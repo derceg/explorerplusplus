@@ -17,6 +17,7 @@
 
 struct Config;
 class MainToolbar;
+struct NavigateParams;
 
 class MainToolbarPersistentSettings
 {
@@ -92,7 +93,7 @@ private:
 	void CreateViewsMenu(POINT *ptOrigin);
 
 	void OnTabSelected(const Tab &tab);
-	void OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
+	void OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams);
 	void OnFocusChanged(WindowFocusSource windowFocusSource);
 
 	void UpdateToolbarButtonImageIndexes();

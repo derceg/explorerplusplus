@@ -321,69 +321,40 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 			m_config->showFilePreviews);
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("ReplaceExplorerMode"),
-			[this](DWORD value)
-			{
+			[this](DWORD value) {
 				m_config->replaceExplorerMode =
 					static_cast<DefaultFileManager::ReplaceExplorerMode>(value);
 			});
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("ShowFullTitlePath"),
-			[this](DWORD value)
-			{
-				m_config->showFullTitlePath.set(value);
-			});
+			[this](DWORD value) { m_config->showFullTitlePath.set(value); });
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("ShowUserNameTitleBar"),
-			[this](DWORD value)
-			{
-				m_config->showUserNameInTitleBar.set(value);
-			});
+			[this](DWORD value) { m_config->showUserNameInTitleBar.set(value); });
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("ShowPrivilegeLevelInTitleBar"),
-			[this](DWORD value)
-			{
-				m_config->showPrivilegeLevelInTitleBar.set(value);
-			});
+			[this](DWORD value) { m_config->showPrivilegeLevelInTitleBar.set(value); });
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("AlwaysShowTabBar"),
-			[this](DWORD value)
-			{
-				m_config->alwaysShowTabBar.set(value);
-			});
+			[this](DWORD value) { m_config->alwaysShowTabBar.set(value); });
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("ShowTabBarAtBottom"),
-			[this](DWORD value)
-			{
-				m_config->showTabBarAtBottom.set(value);
-			});
+			[this](DWORD value) { m_config->showTabBarAtBottom.set(value); });
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("ExtendTabControl"),
-			[this](DWORD value)
-			{
-				m_config->extendTabControl.set(value);
-			});
+			[this](DWORD value) { m_config->extendTabControl.set(value); });
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("ForceSameTabWidth"),
-			[this](DWORD value)
-			{
-				m_config->forceSameTabWidth.set(value);
-			});
+			[this](DWORD value) { m_config->forceSameTabWidth.set(value); });
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("StartupMode"),
-			[this](DWORD value)
-			{
-				m_config->startupMode = static_cast<StartupMode>(value);
-			});
+			[this](DWORD value) { m_config->startupMode = static_cast<StartupMode>(value); });
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("InfoTipType"),
-			[this](DWORD value)
-			{
-				m_config->infoTipType = static_cast<InfoTipType>(value);
-			});
+			[this](DWORD value) { m_config->infoTipType = static_cast<InfoTipType>(value); });
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("SizeDisplayFormat"),
-			[this](DWORD value)
-			{
+			[this](DWORD value) {
 				m_config->globalFolderSettings.sizeDisplayFormat =
 					static_cast<SizeDisplayFormat>(value);
 			});
@@ -416,10 +387,7 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 			_T("OverwriteExistingFilesConfirmation"), m_config->overwriteExistingFilesConfirmation);
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("LargeToolbarIcons"),
-			[this](DWORD value)
-			{
-				m_config->useLargeToolbarIcons.set(value);
-			});
+			[this](DWORD value) { m_config->useLargeToolbarIcons.set(value); });
 
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey,
 			_T("CheckPinnedToNamespaceTreeProperty"), m_config->checkPinnedToNamespaceTreeProperty);
@@ -436,20 +404,14 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		{
 			// Theme data was previously stored using this key.
 			RegistrySettings::ReadDword(hSettingsKey, _T("EnableDarkMode"),
-				[this](DWORD value)
-				{
-					m_config->theme = value ? Theme::Dark : Theme::Light;
-				});
+				[this](DWORD value) { m_config->theme = value ? Theme::Dark : Theme::Light; });
 		}
 
 		RegistrySettings::ReadString(hSettingsKey, _T("NewTabDirectory"),
 			m_config->defaultTabDirectory);
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("IconTheme"),
-			[this](DWORD value)
-			{
-				m_config->iconSet = IconSet::_from_integral(value);
-			});
+			[this](DWORD value) { m_config->iconSet = IconSet::_from_integral(value); });
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("Language"),
 			[this](DWORD value)
@@ -485,9 +447,7 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("ViewModeGlobal"),
 			[this](DWORD value)
-			{
-				m_config->defaultFolderSettings.viewMode = ViewMode::_from_integral(value);
-			});
+			{ m_config->defaultFolderSettings.viewMode = ViewMode::_from_integral(value); });
 
 		/* Display window settings. */
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("DisplayWindowWidth"),
@@ -742,15 +702,11 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 
 			RegistrySettings::ReadDword(hTabKey, _T("ViewMode"),
 				[&folderSettings](DWORD value)
-				{
-					folderSettings.viewMode = ViewMode::_from_integral(value);
-				});
+				{ folderSettings.viewMode = ViewMode::_from_integral(value); });
 
 			RegistrySettings::ReadDword(hTabKey, _T("SortMode"),
 				[&folderSettings](DWORD value)
-				{
-					folderSettings.sortMode = SortMode::_from_integral(value);
-				});
+				{ folderSettings.sortMode = SortMode::_from_integral(value); });
 
 			RegistrySettings::Read32BitValueFromRegistry(hTabKey, _T("SortAscending"),
 				folderSettings.sortAscending);
@@ -849,7 +805,8 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 				tabSettings.name = customName;
 			}
 
-			m_tabContainer->CreateNewTab(pidlDirectory, tabSettings, &folderSettings,
+			auto navigateParams = NavigateParams::Normal(pidlDirectory);
+			m_tabContainer->CreateNewTab(navigateParams, tabSettings, &folderSettings,
 				&initialColumns);
 
 			nTabsCreated++;

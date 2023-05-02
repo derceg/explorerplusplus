@@ -8,6 +8,7 @@
 #include "SignalWrapper.h"
 #include "Tab.h"
 #include "../Helper/IconFetcher.h"
+#include "../Helper/PidlHelper.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/parameter.hpp>
@@ -23,6 +24,7 @@ class CachedIcons;
 struct Config;
 class CoreInterface;
 class FileActionHandler;
+struct NavigateParams;
 struct PreservedTab;
 
 BOOST_PARAMETER_NAME(name)
@@ -82,7 +84,7 @@ public:
 		const FolderSettings *folderSettings = nullptr,
 		const FolderColumns *initialColumns = nullptr);
 	Tab &CreateNewTab(const PreservedTab &preservedTab);
-	Tab &CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings = {},
+	Tab &CreateNewTab(NavigateParams &navigateParams, const TabSettings &tabSettings = {},
 		const FolderSettings *folderSettings = nullptr,
 		const FolderColumns *initialColumns = nullptr);
 
@@ -112,12 +114,14 @@ public:
 
 	// Signals
 	SignalWrapper<TabContainer, void(int tabId, BOOL switchToNewTab)> tabCreatedSignal;
-	SignalWrapper<TabContainer, void(const Tab &tab, PCIDLIST_ABSOLUTE pidl)>
+	SignalWrapper<TabContainer, void(const Tab &tab, const NavigateParams &navigateParams)>
 		tabNavigationStartedSignal;
-	SignalWrapper<TabContainer, void(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)>
+	SignalWrapper<TabContainer, void(const Tab &tab, const NavigateParams &navigateParams)>
 		tabNavigationCommittedSignal;
-	SignalWrapper<TabContainer, void(const Tab &tab)> tabNavigationCompletedSignal;
-	SignalWrapper<TabContainer, void(const Tab &tab)> tabNavigationFailedSignal;
+	SignalWrapper<TabContainer, void(const Tab &tab, const NavigateParams &navigateParams)>
+		tabNavigationCompletedSignal;
+	SignalWrapper<TabContainer, void(const Tab &tab, const NavigateParams &navigateParams)>
+		tabNavigationFailedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, Tab::PropertyType propertyType)>
 		tabUpdatedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, int fromIndex, int toIndex)> tabMovedSignal;
@@ -165,8 +169,7 @@ private:
 	void AddDefaultTabIcons(HIMAGELIST himlTab);
 	bool IsDefaultIcon(int iconIndex);
 
-	Tab &SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings,
-		bool addHistoryEntry);
+	Tab &SetUpNewTab(Tab &tab, NavigateParams &navigateParams, const TabSettings &tabSettings);
 
 	void OnTabCtrlLButtonDown(POINT *pt);
 	void OnTabCtrlLButtonUp();
@@ -202,14 +205,14 @@ private:
 	void OnAlwaysShowTabBarUpdated(BOOL newValue);
 	void OnForceSameTabWidthUpdated(BOOL newValue);
 
-	void OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
+	void OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams);
 	void OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
 	void UpdateTabNameInWindow(const Tab &tab);
 	void SetTabIcon(const Tab &tab);
 	void SetTabIconFromSystemImageList(const Tab &tab, int systemIconIndex);
 	void SetTabIconFromImageList(const Tab &tab, int imageIndex);
 
-	void InsertNewTab(int index, int tabId, PCIDLIST_ABSOLUTE pidlDirectory,
+	void InsertNewTab(int index, int tabId, const PidlAbsolute &pidlDirectory,
 		std::optional<std::wstring> customName);
 
 	void RemoveTabFromControl(const Tab &tab);

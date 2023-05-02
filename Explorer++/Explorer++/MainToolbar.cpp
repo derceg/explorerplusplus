@@ -976,7 +976,8 @@ void MainToolbar::OnMButtonUp(HWND hwnd, int x, int y, UINT keysDown)
 		switchToNewTab = !switchToNewTab;
 	}
 
-	m_coreInterface->GetTabContainer()->CreateNewTab(pidl.get(),
+	auto navigateParams = NavigateParams::Normal(pidl.get());
+	m_coreInterface->GetTabContainer()->CreateNewTab(navigateParams,
 		TabSettings(_selected = switchToNewTab));
 }
 
@@ -987,11 +988,9 @@ void MainToolbar::OnTabSelected(const Tab &tab)
 	UpdateToolbarButtonStates();
 }
 
-void MainToolbar::OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl,
-	bool addHistoryEntry)
+void MainToolbar::OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams)
 {
-	UNREFERENCED_PARAMETER(pidl);
-	UNREFERENCED_PARAMETER(addHistoryEntry);
+	UNREFERENCED_PARAMETER(navigateParams);
 
 	if (m_coreInterface->GetTabContainer()->IsTabSelected(tab))
 	{

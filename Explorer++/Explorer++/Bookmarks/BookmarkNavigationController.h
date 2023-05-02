@@ -27,12 +27,12 @@ class BookmarkNavigationController : public NavigationController<BookmarkHistory
 public:
 	BookmarkNavigationController(BookmarkTree *bookmarkTree, BookmarkNavigatorInterface *navigator);
 
-	bool BrowseFolder(BookmarkItem *bookmarkFolder, bool addHistoryEntry = true);
+	bool Navigate(BookmarkItem *bookmarkFolder, bool addHistoryEntry = true);
 
 private:
 	DISALLOW_COPY_AND_ASSIGN(BookmarkNavigationController);
 
-	bool BrowseFolder(const BookmarkHistoryEntry *entry) override;
+	bool Navigate(const BookmarkHistoryEntry *entry) override;
 	bool GetFailureValue() override;
 
 	void OnNavigationCompleted(BookmarkItem *bookmarkFolder, bool addHistoryEntry);

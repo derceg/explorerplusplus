@@ -304,10 +304,9 @@ void AddressBar::OnTabSelected(const Tab &tab)
 	UpdateTextAndIcon(tab);
 }
 
-void AddressBar::OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
+void AddressBar::OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams)
 {
-	UNREFERENCED_PARAMETER(pidl);
-	UNREFERENCED_PARAMETER(addHistoryEntry);
+	UNREFERENCED_PARAMETER(navigateParams);
 
 	if (m_coreInterface->GetTabContainer()->IsTabSelected(tab))
 	{

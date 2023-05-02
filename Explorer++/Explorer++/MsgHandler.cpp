@@ -306,17 +306,24 @@ void Explorerplusplus::OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 	case OpenFolderDisposition::CurrentTab:
 	{
 		Tab &tab = m_tabContainer->GetSelectedTab();
-		tab.GetShellBrowser()->GetNavigationController()->BrowseFolder(pidlItem);
+		auto navigateParams = NavigateParams::Normal(pidlItem);
+		tab.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
 	}
 	break;
 
 	case OpenFolderDisposition::BackgroundTab:
-		m_tabContainer->CreateNewTab(pidlItem);
-		break;
+	{
+		auto navigateParams = NavigateParams::Normal(pidlItem);
+		m_tabContainer->CreateNewTab(navigateParams);
+	}
+	break;
 
 	case OpenFolderDisposition::ForegroundTab:
-		m_tabContainer->CreateNewTab(pidlItem, TabSettings(_selected = true));
-		break;
+	{
+		auto navigateParams = NavigateParams::Normal(pidlItem);
+		m_tabContainer->CreateNewTab(navigateParams, TabSettings(_selected = true));
+	}
+	break;
 
 	case OpenFolderDisposition::NewWindow:
 		OpenDirectoryInNewWindow(pidlItem);
@@ -384,41 +391,6 @@ OpenFolderDisposition Explorerplusplus::DetermineOpenDisposition(bool isMiddleBu
 	}
 
 	return OpenFolderDisposition::CurrentTab;
-}
-
-void Explorerplusplus::OnNavigateUp()
-{
-	Tab &tab = m_tabContainer->GetSelectedTab();
-	unique_pidl_absolute directory = tab.GetShellBrowser()->GetDirectoryIdl();
-
-	HRESULT hr = E_FAIL;
-	Tab *resultingTab = nullptr;
-
-	if (tab.GetLockState() != Tab::LockState::AddressLocked)
-	{
-		hr = tab.GetShellBrowser()->GetNavigationController()->GoUp();
-
-		resultingTab = &tab;
-	}
-	else
-	{
-		unique_pidl_absolute pidlParent;
-		hr = GetVirtualParentPath(tab.GetShellBrowser()->GetDirectoryIdl().get(),
-			wil::out_param(pidlParent));
-
-		if (SUCCEEDED(hr))
-		{
-			Tab &newTab =
-				m_tabContainer->CreateNewTab(pidlParent.get(), TabSettings(_selected = true));
-
-			resultingTab = &newTab;
-		}
-	}
-
-	if (SUCCEEDED(hr))
-	{
-		resultingTab->GetShellBrowser()->SelectItems({ directory.get() });
-	}
 }
 
 BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)

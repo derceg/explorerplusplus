@@ -539,6 +539,7 @@
     <ClInclude Include="DataExchangeHelper.h" />
     <ClInclude Include="DataObjectWrapper.h" />
     <ClInclude Include="DialogSettings.h" />
+    <ClInclude Include="DisableUnaligned.h" />
     <ClInclude Include="DpiCompatibility.h" />
     <ClInclude Include="DragDropHelper.h" />
     <ClInclude Include="DriveInfo.h" />
@@ -562,6 +563,7 @@
     <ClInclude Include="MenuHelper.h" />
     <ClInclude Include="MessageForwarder.h" />
     <ClInclude Include="MovableModel.h" />
+    <ClInclude Include="PidlHelper.h" />
     <ClInclude Include="ProcessHelper.h" />
     <ClInclude Include="ReferenceCount.h" />
     <ClInclude Include="RegistrySettings.h" />

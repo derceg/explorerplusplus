@@ -98,11 +98,10 @@ void Explorerplusplus::CreateFolderControls()
 		});
 
 	m_tabContainer->tabNavigationCommittedSignal.AddObserver(
-		[this](const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry)
+		[this](const Tab &tab, const NavigateParams &navigateParams)
 		{
 			UNREFERENCED_PARAMETER(tab);
-			UNREFERENCED_PARAMETER(pidl);
-			UNREFERENCED_PARAMETER(addHistoryEntry);
+			UNREFERENCED_PARAMETER(navigateParams);
 
 			UpdateTreeViewSelection();
 		});
@@ -300,8 +299,9 @@ void Explorerplusplus::OnTreeViewHolderWindowTimer()
 		&& !ArePidlsEquivalent(pidlDirectory.get(), pidlCurrentDirectory.get()))
 	{
 		Tab &selectedTab = m_tabContainer->GetSelectedTab();
-		HRESULT hr = selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(
-			pidlDirectory.get());
+		auto navigateParams = NavigateParams::Normal(pidlDirectory.get());
+		HRESULT hr =
+			selectedTab.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
 
 		if (SUCCEEDED(hr))
 		{

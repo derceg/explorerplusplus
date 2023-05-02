@@ -6,12 +6,15 @@
 
 #include "HistoryEntry.h"
 #include "NavigationController.h"
-#include "NavigatorInterface.h"
-#include "PreservedHistoryEntry.h"
-#include "TabNavigationInterface.h"
-#include "../Helper/IconFetcher.h"
 #include "../Helper/Macros.h"
 #include <boost/signals2.hpp>
+#include <vector>
+
+class IconFetcherInterface;
+struct NavigateParams;
+struct PreservedHistoryEntry;
+class ShellNavigator;
+class TabNavigationInterface;
 
 class ShellNavigationController : public NavigationController<HistoryEntry, HRESULT>
 {
@@ -22,9 +25,9 @@ public:
 		ForceNewTab
 	};
 
-	ShellNavigationController(NavigatorInterface *navigator, TabNavigationInterface *tabNavigation,
+	ShellNavigationController(ShellNavigator *navigator, TabNavigationInterface *tabNavigation,
 		IconFetcherInterface *iconFetcher);
-	ShellNavigationController(NavigatorInterface *navigator, TabNavigationInterface *tabNavigation,
+	ShellNavigationController(ShellNavigator *navigator, TabNavigationInterface *tabNavigation,
 		IconFetcherInterface *iconFetcher,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
 		int currentEntry);
@@ -36,10 +39,12 @@ public:
 
 	HRESULT Refresh();
 
-	HRESULT BrowseFolder(const std::wstring &path, bool addHistoryEntry = true);
-	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry = true);
+	HRESULT Navigate(const std::wstring &path, bool addHistoryEntry = true);
+	HRESULT Navigate(NavigateParams &navigateParams);
 
 	void SetNavigationMode(NavigationMode navigationMode);
+
+	HistoryEntry *GetEntryById(int id);
 
 private:
 	DISALLOW_COPY_AND_ASSIGN(ShellNavigationController);
@@ -49,12 +54,12 @@ private:
 	static std::vector<std::unique_ptr<HistoryEntry>> CopyPreservedHistoryEntries(
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries);
 
-	HRESULT BrowseFolder(const HistoryEntry *entry) override;
+	HRESULT Navigate(const HistoryEntry *entry) override;
 	HRESULT GetFailureValue() override;
 
-	void OnNavigationCommitted(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry);
+	void OnNavigationCommitted(const NavigateParams &navigateParams);
 
-	NavigatorInterface *m_navigator;
+	ShellNavigator *m_navigator;
 
 	TabNavigationInterface *m_tabNavigation;
 	NavigationMode m_navigationMode = NavigationMode::Normal;

@@ -24,6 +24,8 @@
 
 #define WIL_SUPPRESS_EXCEPTIONS
 
+#include "DisableUnaligned.h"
+
 // Windows Header Files:
 // clang-format off
 #include <winsock2.h>

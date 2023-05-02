@@ -11,6 +11,7 @@
 #include "MainResource.h"
 #include "Navigator.h"
 #include "ResourceHelper.h"
+#include "ShellBrowser/ShellNavigator.h"
 #include "TabContainer.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
@@ -240,7 +241,8 @@ void DrivesToolbar::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		assert(pidlItems.size() == 1);
 
 		unique_pidl_absolute pidl(ILCombine(pidlParent, pidlItems[0]));
-		m_coreInterface->GetTabContainer()->CreateNewTab(pidl.get(),
+		auto navigateParams = NavigateParams::Normal(pidl.get());
+		m_coreInterface->GetTabContainer()->CreateNewTab(navigateParams,
 			TabSettings(_selected = m_coreInterface->GetConfig()->openTabsInForeground));
 	}
 	break;

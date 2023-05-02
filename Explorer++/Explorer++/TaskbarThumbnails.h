@@ -12,6 +12,7 @@
 
 struct Config;
 class CoreInterface;
+struct NavigateParams;
 class TabContainer;
 
 class TaskbarThumbnails
@@ -55,8 +56,8 @@ private:
 	wil::unique_hbitmap CaptureTabScreenshot(const Tab &tab);
 	wil::unique_hbitmap GetTabLivePreviewBitmap(const Tab &tab);
 	void OnTabSelectionChanged(const Tab &tab);
-	void OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
-	void OnNavigationCompleted(const Tab &tab);
+	void OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams);
+	void OnNavigationCompleted(const Tab &tab, const NavigateParams &navigateParams);
 	void SetTabProxyIcon(const Tab &tab);
 	void InvalidateTaskbarThumbnailBitmap(const Tab &tab);
 	void UpdateTaskbarThumbnailTitle(const Tab &tab);

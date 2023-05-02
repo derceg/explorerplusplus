@@ -11,6 +11,7 @@
 #include <optional>
 
 class CoreInterface;
+struct NavigateParams;
 class Navigator;
 class Tab;
 
@@ -44,7 +45,7 @@ private:
 	void OnEscapePressed();
 	void OnBeginDrag();
 	void OnTabSelected(const Tab &tab);
-	void OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry);
+	void OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams);
 	void UpdateTextAndIcon(const Tab &tab);
 	void UpdateTextAndIconInUI(std::wstring *text, int iconIndex);
 	void RevertTextInUI();

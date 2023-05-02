@@ -7,9 +7,9 @@
 #include "ColumnDataRetrieval.h"
 #include "Columns.h"
 #include "FolderSettings.h"
-#include "NavigatorInterface.h"
 #include "ServiceProvider.h"
 #include "ShellChangeWatcher.h"
+#include "ShellNavigator.h"
 #include "SignalWrapper.h"
 #include "SortModes.h"
 #include "ViewModes.h"
@@ -44,7 +44,7 @@ class IconResourceLoader;
 struct PreservedFolderState;
 struct PreservedHistoryEntry;
 class ShellNavigationController;
-__interface TabNavigationInterface;
+class TabNavigationInterface;
 class WindowSubclassWrapper;
 
 typedef struct
@@ -55,7 +55,7 @@ typedef struct
 
 class ShellBrowser :
 	public ShellDropTargetWindow<int>,
-	public NavigatorInterface,
+	public ShellNavigator,
 	public std::enable_shared_from_this<ShellBrowser>
 {
 public:
@@ -366,11 +366,10 @@ private:
 	void VerifySortMode();
 
 	/* NavigatorInterface methods. */
-	HRESULT BrowseFolder(const HistoryEntry &entry) override;
-	HRESULT BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true) override;
+	HRESULT Navigate(const NavigateParams &navigateParams) override;
 
 	/* Browsing support. */
-	HRESULT PerformEnumeration(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry,
+	HRESULT PerformEnumeration(const NavigateParams &navigateParams,
 		std::vector<ItemInfo_t> &items);
 	static HRESULT EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owner, bool showHidden,
 		std::vector<ItemInfo_t> &items);
@@ -380,7 +379,8 @@ private:
 	void ClearPendingResults();
 	void ResetFolderState();
 	void StoreCurrentlySelectedItems();
-	void OnEnumerationCompleted(std::vector<ItemInfo_t> &&items);
+	void OnEnumerationCompleted(std::vector<ItemInfo_t> &&items,
+		const NavigateParams &navigateParams);
 	void InsertAwaitingItems(BOOL bInsertIntoGroup);
 	BOOL IsFileFiltered(const ItemInfo_t &itemInfo) const;
 	std::optional<int> AddItemInternal(IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory,

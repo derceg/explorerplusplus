@@ -336,6 +336,12 @@
     <ClInclude Include="MovableModel.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
+    <ClInclude Include="DisableUnaligned.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="PidlHelper.h">
+      <Filter>Shell</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dialog Support">

@@ -108,11 +108,7 @@ void Explorerplusplus::OnSearch()
 
 		auto *searchDialog = new SearchDialog(m_resourceInstance, m_hContainer, currentDirectory,
 			this, this, m_tabContainer);
-		g_hwndSearch = searchDialog->ShowModelessDialog(
-			[]()
-			{
-				g_hwndSearch = nullptr;
-			});
+		g_hwndSearch = searchDialog->ShowModelessDialog([]() { g_hwndSearch = nullptr; });
 	}
 	else
 	{
@@ -132,11 +128,7 @@ void Explorerplusplus::OnRunScript()
 	if (g_hwndRunScript == nullptr)
 	{
 		auto *scriptingDialog = new ScriptingDialog(m_resourceInstance, m_hContainer, this);
-		g_hwndRunScript = scriptingDialog->ShowModelessDialog(
-			[]()
-			{
-				g_hwndRunScript = nullptr;
-			});
+		g_hwndRunScript = scriptingDialog->ShowModelessDialog([]() { g_hwndRunScript = nullptr; });
 	}
 	else
 	{
@@ -150,11 +142,7 @@ void Explorerplusplus::OnShowOptions()
 	{
 		auto *optionsDialog =
 			new OptionsDialog(m_resourceInstance, m_hContainer, m_config, this, m_tabContainer);
-		g_hwndOptions = optionsDialog->ShowModelessDialog(
-			[]()
-			{
-				g_hwndOptions = nullptr;
-			});
+		g_hwndOptions = optionsDialog->ShowModelessDialog([]() { g_hwndOptions = nullptr; });
 	}
 	else
 	{
@@ -320,6 +308,12 @@ HRESULT Explorerplusplus::OnGoForward()
 	return selectedTab.GetShellBrowser()->GetNavigationController()->GoForward();
 }
 
+HRESULT Explorerplusplus::OnNavigateUp()
+{
+	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	return selectedTab.GetShellBrowser()->GetNavigationController()->GoUp();
+}
+
 HRESULT Explorerplusplus::OnGoToOffset(int offset)
 {
 	Tab &selectedTab = m_tabContainer->GetSelectedTab();
@@ -356,18 +350,19 @@ HRESULT Explorerplusplus::OnGoToPath(const std::wstring &path)
 HRESULT Explorerplusplus::GoToPidl(PCIDLIST_ABSOLUTE pidl)
 {
 	Tab &selectedTab = m_tabContainer->GetSelectedTab();
-	return selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(pidl);
+	auto navigateParams = NavigateParams::Normal(pidl);
+	return selectedTab.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
 }
 
 HRESULT Explorerplusplus::OnGoHome()
 {
 	Tab &selectedTab = m_tabContainer->GetSelectedTab();
-	HRESULT hr = selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(
+	HRESULT hr = selectedTab.GetShellBrowser()->GetNavigationController()->Navigate(
 		m_config->defaultTabDirectory);
 
 	if (FAILED(hr))
 	{
-		hr = selectedTab.GetShellBrowser()->GetNavigationController()->BrowseFolder(
+		hr = selectedTab.GetShellBrowser()->GetNavigationController()->Navigate(
 			m_config->defaultTabDirectoryStatic);
 	}
 

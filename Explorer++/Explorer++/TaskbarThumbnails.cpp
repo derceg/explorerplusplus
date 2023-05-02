@@ -229,10 +229,7 @@ void TaskbarThumbnails::CreateTabProxy(int iTabId, BOOL bSwitchToNewTab)
 void TaskbarThumbnails::RemoveTabProxy(int iTabId)
 {
 	auto tabProxy = std::find_if(m_TabProxyList.begin(), m_TabProxyList.end(),
-		[iTabId](const TabProxyInfo &currentTabProxy)
-		{
-			return currentTabProxy.iTabId == iTabId;
-		});
+		[iTabId](const TabProxyInfo &currentTabProxy) { return currentTabProxy.iTabId == iTabId; });
 
 	if (tabProxy == m_TabProxyList.end())
 	{
@@ -625,19 +622,19 @@ void TaskbarThumbnails::OnTabSelectionChanged(const Tab &tab)
 	}
 }
 
-void TaskbarThumbnails::OnNavigationCommitted(const Tab &tab, PCIDLIST_ABSOLUTE pidl,
-	bool addHistoryEntry)
+void TaskbarThumbnails::OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams)
 {
-	UNREFERENCED_PARAMETER(pidl);
-	UNREFERENCED_PARAMETER(addHistoryEntry);
+	UNREFERENCED_PARAMETER(navigateParams);
 
 	InvalidateTaskbarThumbnailBitmap(tab);
 	SetTabProxyIcon(tab);
 	UpdateTaskbarThumbnailTitle(tab);
 }
 
-void TaskbarThumbnails::OnNavigationCompleted(const Tab &tab)
+void TaskbarThumbnails::OnNavigationCompleted(const Tab &tab, const NavigateParams &navigateParams)
 {
+	UNREFERENCED_PARAMETER(navigateParams);
+
 	InvalidateTaskbarThumbnailBitmap(tab);
 }
 

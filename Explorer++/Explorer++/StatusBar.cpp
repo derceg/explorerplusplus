@@ -76,11 +76,12 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void Explorerplusplus::OnNavigationStartedStatusBar(const Tab &tab, PCIDLIST_ABSOLUTE pidl)
+void Explorerplusplus::OnNavigationStartedStatusBar(const Tab &tab,
+	const NavigateParams &navigateParams)
 {
 	if (m_tabContainer->IsTabSelected(tab))
 	{
-		SetStatusBarLoadingText(pidl);
+		SetStatusBarLoadingText(navigateParams.pidl.Raw());
 	}
 }
 
@@ -108,16 +109,22 @@ void Explorerplusplus::SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl)
 	SendMessage(m_hStatusBar, SB_SETTEXT, 2, (LPARAM) EMPTY_STRING);
 }
 
-void Explorerplusplus::OnNavigationCompletedStatusBar(const Tab &tab)
+void Explorerplusplus::OnNavigationCompletedStatusBar(const Tab &tab,
+	const NavigateParams &navigateParams)
 {
+	UNREFERENCED_PARAMETER(navigateParams);
+
 	if (m_tabContainer->IsTabSelected(tab))
 	{
 		UpdateStatusBarText(tab);
 	}
 }
 
-void Explorerplusplus::OnNavigationFailedStatusBar(const Tab &tab)
+void Explorerplusplus::OnNavigationFailedStatusBar(const Tab &tab,
+	const NavigateParams &navigateParams)
 {
+	UNREFERENCED_PARAMETER(navigateParams);
+
 	if (m_tabContainer->IsTabSelected(tab))
 	{
 		UpdateStatusBarText(tab);

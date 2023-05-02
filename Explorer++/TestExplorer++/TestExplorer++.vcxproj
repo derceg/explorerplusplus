@@ -171,6 +171,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="PidlHelperTest.cpp" />
     <ClCompile Include="RegistrySettingsTest.cpp" />
     <ClCompile Include="RegistryStorageHelper.cpp" />
     <ClCompile Include="ResourceHelper.cpp" />

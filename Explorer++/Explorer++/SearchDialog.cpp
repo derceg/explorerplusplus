@@ -409,10 +409,7 @@ void SearchDialog::SaveEntry(int comboBoxId, boost::circular_buffer<std::wstring
 
 	std::wstring strEntry(entry);
 	auto itr = std::find_if(buffer.begin(), buffer.end(),
-		[strEntry](const std::wstring &Pattern)
-		{
-			return Pattern == strEntry;
-		});
+		[strEntry](const std::wstring &Pattern) { return Pattern == strEntry; });
 
 	HWND hComboBox = GetDlgItem(m_hDlg, comboBoxId);
 	ComboBox_SetCurSel(hComboBox, -1);
@@ -632,7 +629,8 @@ void SearchDialog::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	{
 	case MENU_ID_OPEN_FILE_LOCATION:
 	{
-		m_tabContainer->CreateNewTab(pidlParent, TabSettings(_selected = true));
+		auto navigateParams = NavigateParams::Normal(pidlParent);
+		m_tabContainer->CreateNewTab(navigateParams, TabSettings(_selected = true));
 
 		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems.front()));
 		m_coreInterface->GetActiveShellBrowser()->SelectItems({ pidlComplete.get() });

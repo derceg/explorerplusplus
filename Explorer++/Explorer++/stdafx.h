@@ -21,6 +21,8 @@
 
 #define WIL_SUPPRESS_EXCEPTIONS
 
+#include "../Helper/DisableUnaligned.h"
+
 // Third-party Header Files:
 #include "../ThirdParty/CTPL/cpl_stl.h"
 #include <nlohmann/json.hpp>

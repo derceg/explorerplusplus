@@ -121,7 +121,8 @@ int Plugins::TabsApi::create(sol::table createProperties)
 		extractFolderSettingsForCreation(*folderSettingsTable, folderSettings);
 	}
 
-	auto &newTab = m_tabContainer->CreateNewTab(pidlDirectory.get(), tabSettings, &folderSettings);
+	auto navigateParams = NavigateParams::Normal(pidlDirectory.get());
+	auto &newTab = m_tabContainer->CreateNewTab(navigateParams, tabSettings, &folderSettings);
 
 	return newTab.GetId();
 }
@@ -231,7 +232,7 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 
 	if (location && !location->empty())
 	{
-		tabInternal->GetShellBrowser()->GetNavigationController()->BrowseFolder(*location);
+		tabInternal->GetShellBrowser()->GetNavigationController()->Navigate(*location);
 	}
 
 	sol::optional<std::wstring> name = properties[TabConstants::NAME];
