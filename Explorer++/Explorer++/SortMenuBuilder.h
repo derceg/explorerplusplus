@@ -23,7 +23,7 @@ public:
 	SortMenus BuildMenus(const Tab &tab);
 
 private:
-	wil::unique_hmenu CreateDefaultMenu();
+	wil::unique_hmenu CreateDefaultMenu(UINT ascendingMenuItemId, UINT descendingMenuItemId);
 	void SetMenuItemStates(HMENU sortByMenu, HMENU groupByMenu, const Tab &tab);
 
 	UINT GetSortMenuItemStringIndex(UINT uItemId);

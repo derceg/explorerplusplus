@@ -198,7 +198,9 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 		RegistrySettings::SaveDword(hSettingsKey, _T("AutoArrangeGlobal"),
 			m_config->defaultFolderSettings.autoArrange);
 		RegistrySettings::SaveDword(hSettingsKey, _T("SortAscendingGlobal"),
-			m_config->defaultFolderSettings.sortAscending);
+			m_config->defaultFolderSettings.sortDirection == +SortDirection::Ascending);
+		RegistrySettings::SaveDword(hSettingsKey, _T("GroupSortDirectionGlobal"),
+			m_config->defaultFolderSettings.groupSortDirection);
 		RegistrySettings::SaveDword(hSettingsKey, _T("HideSystemFilesGlobal"),
 			m_config->globalFolderSettings.hideSystemFiles);
 		RegistrySettings::SaveDword(hSettingsKey, _T("HideLinkExtensionGlobal"),
@@ -438,8 +440,19 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 			m_config->defaultFolderSettings.showInGroups);
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("AutoArrangeGlobal"),
 			m_config->defaultFolderSettings.autoArrange);
-		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("SortAscendingGlobal"),
-			m_config->defaultFolderSettings.sortAscending);
+		RegistrySettings::ReadDword(hSettingsKey, _T("SortAscendingGlobal"),
+			[this](DWORD value)
+			{
+				m_config->defaultFolderSettings.sortDirection =
+					value ? SortDirection::Ascending : SortDirection::Descending;
+				m_config->defaultFolderSettings.groupSortDirection =
+					value ? SortDirection::Ascending : SortDirection::Descending;
+			});
+		RegistrySettings::ReadDword(hSettingsKey, _T("GroupSortDirectionGlobal"),
+			[this](DWORD value) {
+				m_config->defaultFolderSettings.groupSortDirection =
+					SortDirection::_from_integral(value);
+			});
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("HideSystemFilesGlobal"),
 			m_config->globalFolderSettings.hideSystemFiles);
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("HideLinkExtensionGlobal"),
@@ -525,8 +538,6 @@ void Explorerplusplus::SaveTabSettingsToRegistry()
 	HKEY hTabKey;
 	HKEY hColumnsKey;
 	TCHAR szItemKey[128];
-	UINT viewMode;
-	UINT sortMode;
 	DWORD disposition;
 	LONG returnValue;
 
@@ -558,15 +569,19 @@ void Explorerplusplus::SaveTabSettingsToRegistry()
 				RegSetValueEx(hTabKey, _T("Directory"), 0, REG_BINARY, (LPBYTE) pidlDirectory.get(),
 					ILGetSize(pidlDirectory.get()));
 
-				viewMode = tab.GetShellBrowser()->GetViewMode();
+				RegistrySettings::SaveDword(hTabKey, _T("ViewMode"),
+					tab.GetShellBrowser()->GetViewMode());
+				RegistrySettings::SaveDword(hTabKey, _T("SortMode"),
+					tab.GetShellBrowser()->GetSortMode());
 
-				RegistrySettings::SaveDword(hTabKey, _T("ViewMode"), viewMode);
-
-				sortMode = tab.GetShellBrowser()->GetSortMode();
-				RegistrySettings::SaveDword(hTabKey, _T("SortMode"), sortMode);
-
+				// For backwards compatibility, the value saved here is a bool.
 				RegistrySettings::SaveDword(hTabKey, _T("SortAscending"),
-					tab.GetShellBrowser()->GetSortAscending());
+					tab.GetShellBrowser()->GetSortDirection() == +SortDirection::Ascending);
+
+				RegistrySettings::SaveDword(hTabKey, _T("GroupMode"),
+					tab.GetShellBrowser()->GetGroupMode());
+				RegistrySettings::SaveDword(hTabKey, _T("GroupSortDirection"),
+					tab.GetShellBrowser()->GetGroupSortDirection());
 				RegistrySettings::SaveDword(hTabKey, _T("ShowInGroups"),
 					tab.GetShellBrowser()->GetShowInGroups());
 				RegistrySettings::SaveDword(hTabKey, _T("ApplyFilter"),
@@ -703,13 +718,35 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 			RegistrySettings::ReadDword(hTabKey, _T("ViewMode"),
 				[&folderSettings](DWORD value)
 				{ folderSettings.viewMode = ViewMode::_from_integral(value); });
-
 			RegistrySettings::ReadDword(hTabKey, _T("SortMode"),
 				[&folderSettings](DWORD value)
-				{ folderSettings.sortMode = SortMode::_from_integral(value); });
+				{
+					folderSettings.sortMode = SortMode::_from_integral(value);
 
-			RegistrySettings::Read32BitValueFromRegistry(hTabKey, _T("SortAscending"),
-				folderSettings.sortAscending);
+					// Previously, the group mode and sort mode were always the same. Therefore, the
+					// group mode is set here to preserve the behavior. This will only have an
+					// effect when updating from a version that didn't save a separate group mode.
+					// If a group mode has been saved, it will be loaded below and the value loaded
+					// here will be overwritten.
+					folderSettings.groupMode = SortMode::_from_integral(value);
+				});
+			RegistrySettings::ReadDword(hTabKey, _T("SortAscending"),
+				[&folderSettings](DWORD value)
+				{
+					folderSettings.sortDirection =
+						value ? SortDirection::Ascending : SortDirection::Descending;
+
+					// As with the group mode/sort mode, the group sort direction and standard sort
+					// direction were always the same in previous versions.
+					folderSettings.groupSortDirection =
+						value ? SortDirection::Ascending : SortDirection::Descending;
+				});
+			RegistrySettings::ReadDword(hTabKey, _T("GroupMode"),
+				[&folderSettings](DWORD value)
+				{ folderSettings.groupMode = SortMode::_from_integral(value); });
+			RegistrySettings::ReadDword(hTabKey, _T("GroupSortDirection"),
+				[&folderSettings](DWORD value)
+				{ folderSettings.groupSortDirection = SortDirection::_from_integral(value); });
 			RegistrySettings::Read32BitValueFromRegistry(hTabKey, _T("ShowInGroups"),
 				folderSettings.showInGroups);
 			RegistrySettings::Read32BitValueFromRegistry(hTabKey, _T("ApplyFilter"),

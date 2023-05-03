@@ -42,14 +42,16 @@ struct GlobalFolderSettings
 
 struct FolderSettings
 {
-	SortMode sortMode;
-	ViewMode viewMode;
-	BOOL autoArrange;
-	BOOL sortAscending;
-	BOOL showInGroups;
-	BOOL showHidden;
+	SortMode sortMode = SortMode::Name;
+	SortMode groupMode = SortMode::Name;
+	ViewMode viewMode = ViewMode::Icons;
+	bool autoArrange = true;
+	SortDirection sortDirection = SortDirection::Ascending;
+	SortDirection groupSortDirection = SortDirection::Ascending;
+	bool showInGroups = false;
+	bool showHidden = true;
 
-	BOOL applyFilter;
-	BOOL filterCaseSensitive;
+	bool applyFilter = false;
+	bool filterCaseSensitive = false;
 	std::wstring filter;
 };

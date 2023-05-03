@@ -533,9 +533,8 @@ void ShellBrowser::OnEnumerationCompleted(std::vector<ShellBrowser::ItemInfo_t> 
 	(reduces lag when a large number of items are going to be inserted). */
 	SendMessage(m_hListView, WM_SETREDRAW, FALSE, NULL);
 
-	InsertAwaitingItems(FALSE);
-
-	SortFolder(m_folderSettings.sortMode);
+	InsertAwaitingItems();
+	SortFolder();
 
 	ListView_EnsureVisible(m_hListView, 0, FALSE);
 
@@ -573,7 +572,7 @@ void ShellBrowser::OnEnumerationCompleted(std::vector<ShellBrowser::ItemInfo_t> 
 	m_navigationCompletedSignal(navigateParams);
 }
 
-void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
+void ShellBrowser::InsertAwaitingItems()
 {
 	int nPrevItems = ListView_GetItemCount(m_hListView);
 
@@ -613,7 +612,7 @@ void ShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 		LVITEM lv;
 		lv.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
 
-		if (bInsertIntoGroup)
+		if (m_folderSettings.showInGroups)
 		{
 			int groupId = DetermineItemGroup(awaitingItem.iItemInternal);
 

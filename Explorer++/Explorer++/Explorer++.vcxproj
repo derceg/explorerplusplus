@@ -749,6 +749,7 @@
     <ClCompile Include="DriveEnumeratorImpl.cpp" />
     <ClCompile Include="DriveModel.cpp" />
     <ClCompile Include="DrivesToolbarView.cpp" />
+    <ClCompile Include="ShellBrowser\SortModes.cpp" />
     <ClCompile Include="ShellChangeWatcher.cpp" />
     <ClCompile Include="ShellTreeView\ShellTreeNode.cpp" />
     <ClCompile Include="ToolbarView.cpp" />

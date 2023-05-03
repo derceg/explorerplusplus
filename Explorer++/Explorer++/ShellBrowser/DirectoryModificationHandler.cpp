@@ -319,7 +319,7 @@ void ShellBrowser::AddItem(PCIDLIST_ABSOLUTE pidl)
 		itr->iAfter = sortedPosition - 1;
 	}
 
-	InsertAwaitingItems(m_folderSettings.showInGroups);
+	InsertAwaitingItems();
 }
 
 void ShellBrowser::OnItemRemoved(PCIDLIST_ABSOLUTE simplePidl)

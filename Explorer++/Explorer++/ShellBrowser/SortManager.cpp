@@ -12,25 +12,11 @@
 #include <propkey.h>
 #include <cassert>
 
-void ShellBrowser::SortFolder(SortMode sortMode)
+void ShellBrowser::SortFolder()
 {
-	m_folderSettings.sortMode = sortMode;
-
-	if (m_folderSettings.showInGroups)
-	{
-		ListView_EnableGroupView(m_hListView, FALSE);
-		ListView_RemoveAllGroups(m_hListView);
-		ListView_EnableGroupView(m_hListView, TRUE);
-
-		SetShowInGroups(TRUE);
-	}
-
 	SendMessage(m_hListView, LVM_SORTITEMS, reinterpret_cast<WPARAM>(this),
 		reinterpret_cast<LPARAM>(SortStub));
 
-	/* If in details view, the column sort
-	arrow will need to be changed to reflect
-	the new sorting mode. */
 	if (m_folderSettings.viewMode == +ViewMode::Details)
 	{
 		ApplyHeaderSortArrow();
@@ -385,7 +371,7 @@ int CALLBACK ShellBrowser::Sort(int InternalIndex1, int InternalIndex2) const
 		}
 	}
 
-	if (!m_folderSettings.sortAscending)
+	if (m_folderSettings.sortDirection == +SortDirection::Descending)
 	{
 		comparisonResult = -comparisonResult;
 	}

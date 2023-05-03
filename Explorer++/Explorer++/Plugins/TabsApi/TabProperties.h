@@ -19,10 +19,12 @@ extern const char FOLDER_SETTINGS[];
 namespace FolderSettingsConstants
 {
 extern const char SORT_MODE[];
+extern const char GROUP_MODE[];
 extern const char VIEW_MODE[];
-extern const char SORT_ASCENDING[];
+extern const char AUTO_ARRANGE[];
+extern const char SORT_DIRECTION[];
+extern const char GROUP_SORT_DIRECTION[];
 extern const char SHOW_IN_GROUPS[];
 extern const char SHOW_HIDDEN[];
-extern const char AUTO_ARRANGE[];
 }
 }

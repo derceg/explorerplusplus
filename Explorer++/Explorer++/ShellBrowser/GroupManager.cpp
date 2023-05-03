@@ -28,27 +28,23 @@ const uint64_t MBYTE = 1024 * 1024;
 const uint64_t GBYTE = 1024 * 1024 * 1024;
 }
 
-BOOL ShellBrowser::GetShowInGroups() const
+bool ShellBrowser::GetShowInGroups() const
 {
 	return m_folderSettings.showInGroups;
 }
 
-/* Simply sets the grouping flag, without actually moving
-items into groups. */
-void ShellBrowser::SetShowInGroupsFlag(BOOL bShowInGroups)
+void ShellBrowser::SetShowInGroups(bool showInGroups)
 {
-	m_folderSettings.showInGroups = bShowInGroups;
-}
-
-void ShellBrowser::SetShowInGroups(BOOL bShowInGroups)
-{
-	m_folderSettings.showInGroups = bShowInGroups;
-
-	if (!m_folderSettings.showInGroups)
+	if (showInGroups == m_folderSettings.showInGroups)
 	{
-		ListView_EnableGroupView(m_hListView, FALSE);
-		SortFolder(m_folderSettings.sortMode);
 		return;
+	}
+
+	m_folderSettings.showInGroups = showInGroups;
+
+	if (!showInGroups)
+	{
+		ListView_EnableGroupView(m_hListView, false);
 	}
 	else
 	{
@@ -115,7 +111,7 @@ int ShellBrowser::GroupComparison(int id1, int id2)
 		comparisonResult = GroupNameComparison(group1, group2);
 	}
 
-	if (!m_folderSettings.sortAscending)
+	if (m_folderSettings.groupSortDirection == +SortDirection::Descending)
 	{
 		comparisonResult = -comparisonResult;
 	}
@@ -147,7 +143,7 @@ int ShellBrowser::DetermineItemGroup(int iItemInternal)
 	BasicItemInfo_t basicItemInfo = getBasicItemInfo(iItemInternal);
 	std::optional<GroupInfo> groupInfo;
 
-	switch (m_folderSettings.sortMode)
+	switch (m_folderSettings.groupMode)
 	{
 	case SortMode::Name:
 		groupInfo = DetermineItemNameGroup(basicItemInfo);
@@ -835,7 +831,7 @@ void ShellBrowser::MoveItemsIntoGroups()
 	int i = 0;
 
 	ListView_RemoveAllGroups(m_hListView);
-	ListView_EnableGroupView(m_hListView, TRUE);
+	ListView_EnableGroupView(m_hListView, true);
 
 	nItems = ListView_GetItemCount(m_hListView);
 

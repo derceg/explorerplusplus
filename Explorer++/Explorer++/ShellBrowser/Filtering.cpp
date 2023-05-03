@@ -23,24 +23,24 @@ void ShellBrowser::SetFilterText(std::wstring_view filter)
 	}
 }
 
-void ShellBrowser::SetFilterApplied(BOOL bFilter)
+void ShellBrowser::SetFilterApplied(bool filter)
 {
-	m_folderSettings.applyFilter = bFilter;
+	m_folderSettings.applyFilter = filter;
 
 	UpdateFiltering();
 }
 
-BOOL ShellBrowser::IsFilterApplied() const
+bool ShellBrowser::IsFilterApplied() const
 {
 	return m_folderSettings.applyFilter;
 }
 
-void ShellBrowser::SetFilterCaseSensitive(BOOL filterCaseSensitive)
+void ShellBrowser::SetFilterCaseSensitive(bool filterCaseSensitive)
 {
 	m_folderSettings.filterCaseSensitive = filterCaseSensitive;
 }
 
-BOOL ShellBrowser::GetFilterCaseSensitive() const
+bool ShellBrowser::GetFilterCaseSensitive() const
 {
 	return m_folderSettings.filterCaseSensitive;
 }
@@ -155,5 +155,5 @@ void ShellBrowser::RestoreFilteredItem(int internalIndex)
 	awaitingAdd.iItemInternal = internalIndex;
 	m_directoryState.awaitingAddList.push_back(awaitingAdd);
 
-	InsertAwaitingItems(m_folderSettings.showInGroups);
+	InsertAwaitingItems();
 }

@@ -17,22 +17,26 @@
 Plugins::TabsApi::FolderSettings::FolderSettings(const ShellBrowser &shellBrowser)
 {
 	sortMode = shellBrowser.GetSortMode();
+	groupMode = shellBrowser.GetGroupMode();
 	viewMode = shellBrowser.GetViewMode();
-	sortAscending = shellBrowser.GetSortAscending();
+	autoArrange = shellBrowser.GetAutoArrange();
+	sortDirection = shellBrowser.GetSortDirection();
+	groupSortDirection = shellBrowser.GetGroupSortDirection();
 	showInGroups = shellBrowser.GetShowInGroups();
 	showHidden = shellBrowser.GetShowHidden();
-	autoArrange = shellBrowser.GetAutoArrange();
 }
 
 std::wstring Plugins::TabsApi::FolderSettings::toString()
 {
 	// clang-format off
 	return _T("sortMode = ") + utf8StrToWstr(sortMode._to_string())
+		+ _T(", groupMode = ") + utf8StrToWstr(groupMode._to_string())
 		+ _T(", viewMode = ") + utf8StrToWstr(viewMode._to_string())
-		+ _T(", sortAscending = ") + std::to_wstring(sortAscending)
+		+ _T(", autoArrange = ") + std::to_wstring(autoArrange)
+		+ _T(", sortDirection = ") + std::to_wstring(sortDirection)
+		+ _T(", groupSortDirection = ") + std::to_wstring(groupSortDirection)
 		+ _T(", showInGroups = ") + std::to_wstring(showInGroups)
-		+ _T(", showHidden = ") + std::to_wstring(showHidden)
-		+ _T(", autoArrange = ") + std::to_wstring(autoArrange);
+		+ _T(", showHidden = ") + std::to_wstring(showHidden);
 	// clang-format on
 }
 
@@ -182,6 +186,13 @@ void Plugins::TabsApi::extractFolderSettingsForCreation(sol::table folderSetting
 		folderSettings.sortMode = SortMode::_from_integral(*sortMode);
 	}
 
+	sol::optional<int> groupMode = folderSettingsTable[FolderSettingsConstants::GROUP_MODE];
+
+	if (groupMode && SortMode::_is_valid(*groupMode))
+	{
+		folderSettings.groupMode = SortMode::_from_integral(*groupMode);
+	}
+
 	sol::optional<int> viewMode = folderSettingsTable[FolderSettingsConstants::VIEW_MODE];
 
 	if (viewMode && ViewMode::_is_valid(*viewMode))
@@ -196,12 +207,19 @@ void Plugins::TabsApi::extractFolderSettingsForCreation(sol::table folderSetting
 		folderSettings.autoArrange = *autoArrange;
 	}
 
-	sol::optional<bool> sortAscending =
-		folderSettingsTable[FolderSettingsConstants::SORT_ASCENDING];
+	sol::optional<int> sortDirection = folderSettingsTable[FolderSettingsConstants::SORT_DIRECTION];
 
-	if (sortAscending)
+	if (sortDirection && SortDirection::_is_valid(*sortDirection))
 	{
-		folderSettings.sortAscending = *sortAscending;
+		folderSettings.sortDirection = SortDirection::_from_integral(*sortDirection);
+	}
+
+	sol::optional<int> groupSortDirection =
+		folderSettingsTable[FolderSettingsConstants::GROUP_SORT_DIRECTION];
+
+	if (groupSortDirection && SortDirection::_is_valid(*groupSortDirection))
+	{
+		folderSettings.groupSortDirection = SortDirection::_from_integral(*groupSortDirection);
 	}
 
 	sol::optional<bool> showInGroups = folderSettingsTable[FolderSettingsConstants::SHOW_IN_GROUPS];

@@ -190,6 +190,7 @@
 #define IDM_GO_DOWNLOADS                372
 #define IDS_COLOR_RULE_DELETE_ALL       372
 #define IDM_GO_VIDEOS                   373
+#define IDS_GROUP_BY_NONE               373
 #define IDM_GO_WSL_DISTRIBUTIONS        374
 #define IDD_OPTIONS                     375
 #define IDS_OPTIONS_ADVANCED_TITLE      376
@@ -266,6 +267,7 @@
 #define IDC_SORTASCENDINGGLOBAL         1128
 #define IDC_AUTOARRANGEGLOBAL           1129
 #define IDC_SHOWINGROUPSGLOBAL          1130
+#define IDC_GROUP_SORT_ASCENDING_GLOBAL 1131
 #define IDC_BOOKMARK_DESCRIPTION        1134
 #define IDC_TABS_OPENNEXTTOCURRENT      1137
 #define IDC_TABS_SAMEWIDTH              1138
@@ -976,6 +978,9 @@
 #define IDM_VIEW_DETAILS                60005
 #define IDM_VIEW_LARGEICONS             60007
 #define IDM_VIEW_EXTRALARGEICONS        60008
+#define IDM_GROUP_SORT_ASCENDING        60009
+#define IDM_GROUP_SORT_DESCENDING       60010
+#define IDM_GROUP_BY_NONE               60011
 
 // Next default values for new objects
 // 

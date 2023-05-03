@@ -92,18 +92,21 @@ public:
 	/* Get/Set current state. */
 	unique_pidl_absolute GetDirectoryIdl() const;
 	std::wstring GetDirectory() const;
-	BOOL GetAutoArrange() const;
-	void SetAutoArrange(BOOL autoArrange);
+	bool GetAutoArrange() const;
+	void SetAutoArrange(bool autoArrange);
 	ViewMode GetViewMode() const;
 	void SetViewMode(ViewMode viewMode);
 	void CycleViewMode(bool cycleForward);
 	SortMode GetSortMode() const;
 	void SetSortMode(SortMode sortMode);
-	void SortFolder(SortMode sortMode);
-	BOOL GetSortAscending() const;
-	BOOL SetSortAscending(BOOL bAscending);
-	BOOL GetShowHidden() const;
-	BOOL SetShowHidden(BOOL bShowHidden);
+	SortMode GetGroupMode() const;
+	void SetGroupMode(SortMode sortMode);
+	SortDirection GetSortDirection() const;
+	void SetSortDirection(SortDirection direction);
+	SortDirection GetGroupSortDirection() const;
+	void SetGroupSortDirection(SortDirection direction);
+	bool GetShowHidden() const;
+	void SetShowHidden(bool showHidden);
 	int GetNumItems() const;
 	int GetNumSelectedFiles() const;
 	int GetNumSelectedFolders() const;
@@ -140,10 +143,10 @@ public:
 	/* Filtering. */
 	std::wstring GetFilterText() const;
 	void SetFilterText(std::wstring_view filter);
-	BOOL IsFilterApplied() const;
-	void SetFilterApplied(BOOL bFilter);
-	BOOL GetFilterCaseSensitive() const;
-	void SetFilterCaseSensitive(BOOL filterCaseSensitive);
+	bool IsFilterApplied() const;
+	void SetFilterApplied(bool filter);
+	bool GetFilterCaseSensitive() const;
+	void SetFilterCaseSensitive(bool filterCaseSensitive);
 
 	bool TestListViewItemAttributes(int item, SFGAOF attributes) const;
 	HRESULT GetListViewSelectionAttributes(SFGAOF *attributes) const;
@@ -161,9 +164,8 @@ public:
 	void StartRenamingSelectedItems();
 	void DeleteSelectedItems(bool permanent);
 
-	BOOL GetShowInGroups() const;
-	void SetShowInGroups(BOOL bShowInGroups);
-	void SetShowInGroupsFlag(BOOL bShowInGroups);
+	bool GetShowInGroups() const;
+	void SetShowInGroups(bool showInGroups);
 
 	int CALLBACK SortTemporary(LPARAM lParam1, LPARAM lParam2);
 
@@ -381,7 +383,7 @@ private:
 	void StoreCurrentlySelectedItems();
 	void OnEnumerationCompleted(std::vector<ItemInfo_t> &&items,
 		const NavigateParams &navigateParams);
-	void InsertAwaitingItems(BOOL bInsertIntoGroup);
+	void InsertAwaitingItems();
 	BOOL IsFileFiltered(const ItemInfo_t &itemInfo) const;
 	std::optional<int> AddItemInternal(IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory,
 		PCITEMID_CHILD pidlChild, int itemIndex, BOOL setPosition);
@@ -456,6 +458,7 @@ private:
 	BasicItemInfo_t getBasicItemInfo(int internalIndex) const;
 
 	/* Sorting. */
+	void SortFolder();
 	int CALLBACK Sort(int InternalIndex1, int InternalIndex2) const;
 
 	/* Listview column support. */

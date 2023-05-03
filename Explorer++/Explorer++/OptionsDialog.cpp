@@ -1631,19 +1631,24 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 			CheckDlgButton(hDlg, IDC_SHOWHIDDENGLOBAL, BST_CHECKED);
 		}
 
-		if (m_config->defaultFolderSettings.showInGroups)
-		{
-			CheckDlgButton(hDlg, IDC_SHOWINGROUPSGLOBAL, BST_CHECKED);
-		}
-
 		if (m_config->defaultFolderSettings.autoArrange)
 		{
 			CheckDlgButton(hDlg, IDC_AUTOARRANGEGLOBAL, BST_CHECKED);
 		}
 
-		if (m_config->defaultFolderSettings.sortAscending)
+		if (m_config->defaultFolderSettings.sortDirection == +SortDirection::Ascending)
 		{
 			CheckDlgButton(hDlg, IDC_SORTASCENDINGGLOBAL, BST_CHECKED);
+		}
+
+		if (m_config->defaultFolderSettings.showInGroups)
+		{
+			CheckDlgButton(hDlg, IDC_SHOWINGROUPSGLOBAL, BST_CHECKED);
+		}
+
+		if (m_config->defaultFolderSettings.groupSortDirection == +SortDirection::Ascending)
+		{
+			CheckDlgButton(hDlg, IDC_GROUP_SORT_ASCENDING_GLOBAL, BST_CHECKED);
 		}
 
 		std::vector<ViewMode> viewModes(VIEW_MODES.begin(), VIEW_MODES.end());
@@ -1689,6 +1694,7 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 			case IDC_AUTOARRANGEGLOBAL:
 			case IDC_SORTASCENDINGGLOBAL:
 			case IDC_SHOWINGROUPSGLOBAL:
+			case IDC_GROUP_SORT_ASCENDING_GLOBAL:
 				OnSettingChanged();
 				break;
 
@@ -1729,14 +1735,20 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg, UINT uMsg, WPARAM
 		m_config->defaultFolderSettings.showHidden =
 			(IsDlgButtonChecked(hDlg, IDC_SHOWHIDDENGLOBAL) == BST_CHECKED);
 
-		m_config->defaultFolderSettings.showInGroups =
-			(IsDlgButtonChecked(hDlg, IDC_SHOWINGROUPSGLOBAL) == BST_CHECKED);
-
 		m_config->defaultFolderSettings.autoArrange =
 			(IsDlgButtonChecked(hDlg, IDC_AUTOARRANGEGLOBAL) == BST_CHECKED);
 
-		m_config->defaultFolderSettings.sortAscending =
-			(IsDlgButtonChecked(hDlg, IDC_SORTASCENDINGGLOBAL) == BST_CHECKED);
+		bool sortAscending = (IsDlgButtonChecked(hDlg, IDC_SORTASCENDINGGLOBAL) == BST_CHECKED);
+		m_config->defaultFolderSettings.sortDirection =
+			sortAscending ? SortDirection::Ascending : SortDirection::Descending;
+
+		m_config->defaultFolderSettings.showInGroups =
+			(IsDlgButtonChecked(hDlg, IDC_SHOWINGROUPSGLOBAL) == BST_CHECKED);
+
+		bool groupSortAscending =
+			(IsDlgButtonChecked(hDlg, IDC_GROUP_SORT_ASCENDING_GLOBAL) == BST_CHECKED);
+		m_config->defaultFolderSettings.groupSortDirection =
+			groupSortAscending ? SortDirection::Ascending : SortDirection::Descending;
 
 		HWND hComboBox = GetDlgItem(hDlg, IDC_OPTIONS_DEFAULT_VIEW);
 		int selectedIndex = static_cast<int>(SendMessage(hComboBox, CB_GETCURSEL, 0, 0));

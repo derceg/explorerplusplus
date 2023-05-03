@@ -23,11 +23,13 @@ public:
 	struct FolderSettings
 	{
 		SortMode sortMode;
+		SortMode groupMode;
 		ViewMode viewMode;
-		bool sortAscending;
+		bool autoArrange;
+		SortDirection sortDirection;
+		SortDirection groupSortDirection;
 		bool showInGroups;
 		bool showHidden;
-		bool autoArrange;
 
 		FolderSettings(const ShellBrowser &shellBrowser);
 		std::wstring toString();

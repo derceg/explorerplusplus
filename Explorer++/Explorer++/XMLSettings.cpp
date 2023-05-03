@@ -114,6 +114,7 @@ will need to be changed correspondingly. */
 #define HASH_DISPLAY_MIXED_FILES_AND_FOLDERS 1168704423
 #define HASH_USE_NATURAL_SORT_ORDER 528323501
 #define HASH_OPEN_TABS_IN_FOREGROUND 2957281235
+#define HASH_GROUP_SORT_DIRECTION_GLOBAL 790225996
 
 struct ColumnXMLSaveData
 {
@@ -677,7 +678,8 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 			static_cast<int>(m_config->globalFolderSettings.sizeDisplayFormat)));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("SortAscendingGlobal"),
-		NXMLSettings::EncodeBoolValue(m_config->defaultFolderSettings.sortAscending));
+		NXMLSettings::EncodeBoolValue(
+			m_config->defaultFolderSettings.sortDirection == +SortDirection::Ascending));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("StartupMode"),
 		NXMLSettings::EncodeIntValue(static_cast<int>(m_config->startupMode)));
@@ -736,6 +738,11 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("OpenTabsInForeground"),
 		NXMLSettings::EncodeBoolValue(m_config->openTabsInForeground));
 
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
+		_T("GroupSortDirectionGlobal"),
+		NXMLSettings::EncodeIntValue(m_config->defaultFolderSettings.groupSortDirection));
+
 	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pe.get());
 
@@ -791,6 +798,9 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 				long lChildNodes;
 				am->get_length(&lChildNodes);
 
+				bool groupModeLoaded = false;
+				bool groupSortDirectionLoaded = false;
+
 				/* For each tab, the first attribute will just be
 				a tab number (0,1,2...). This number can be safely
 				ignored. */
@@ -812,7 +822,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 					else
 					{
 						MapTabAttributeValue(bstrName.get(), bstrValue.get(), tabSettings,
-							folderSettings);
+							folderSettings, groupModeLoaded, groupSortDirectionLoaded);
 					}
 				}
 
@@ -953,6 +963,9 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom, IXM
 		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("FilterCaseSensitive"),
 			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetFilterCaseSensitive()));
 
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("GroupMode"),
+			NXMLSettings::EncodeIntValue(tab.GetShellBrowser()->GetGroupMode()));
+
 		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("ShowHidden"),
 			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetShowHidden()));
 
@@ -960,15 +973,17 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom, IXM
 			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetShowInGroups()));
 
 		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("SortAscending"),
-			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetSortAscending()));
+			NXMLSettings::EncodeBoolValue(
+				tab.GetShellBrowser()->GetSortDirection() == +SortDirection::Ascending));
 
-		UINT sortMode = tab.GetShellBrowser()->GetSortMode();
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("GroupSortDirection"),
+			NXMLSettings::EncodeIntValue(tab.GetShellBrowser()->GetGroupSortDirection()));
+
 		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("SortMode"),
-			NXMLSettings::EncodeIntValue(sortMode));
+			NXMLSettings::EncodeIntValue(tab.GetShellBrowser()->GetSortMode()));
 
-		UINT viewMode = tab.GetShellBrowser()->GetViewMode();
 		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("ViewMode"),
-			NXMLSettings::EncodeIntValue(viewMode));
+			NXMLSettings::EncodeIntValue(tab.GetShellBrowser()->GetViewMode()));
 
 		wil::com_ptr_nothrow<IXMLDOMElement> pColumnsNode;
 		auto bstr = wil::make_bstr_nothrow(L"Columns");
@@ -1660,7 +1675,16 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 		break;
 
 	case HASH_SORTASCENDINGGLOBAL:
-		m_config->defaultFolderSettings.sortAscending = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->defaultFolderSettings.sortDirection = NXMLSettings::DecodeBoolValue(wszValue)
+			? SortDirection::Ascending
+			: SortDirection::Descending;
+
+		if (!m_groupSortDirectionGlobalLoadedFromXml)
+		{
+			m_config->defaultFolderSettings.groupSortDirection =
+				NXMLSettings::DecodeBoolValue(wszValue) ? SortDirection::Ascending
+														: SortDirection::Descending;
+		}
 		break;
 
 	case HASH_STARTUPMODE:
@@ -1794,11 +1818,18 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 	case HASH_OPEN_TABS_IN_FOREGROUND:
 		m_config->openTabsInForeground = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
+
+	case HASH_GROUP_SORT_DIRECTION_GLOBAL:
+		m_config->defaultFolderSettings.groupSortDirection =
+			SortDirection::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
+		m_groupSortDirectionGlobalLoadedFromXml = true;
+		break;
 	}
 }
 
 void Explorerplusplus::MapTabAttributeValue(WCHAR *wszName, WCHAR *wszValue,
-	TabSettings &tabSettings, FolderSettings &folderSettings)
+	TabSettings &tabSettings, FolderSettings &folderSettings, bool &groupModeLoaded,
+	bool &groupSortDirectionLoaded)
 {
 	if (lstrcmp(wszName, L"ApplyFilter") == 0)
 	{
@@ -1816,6 +1847,11 @@ void Explorerplusplus::MapTabAttributeValue(WCHAR *wszName, WCHAR *wszValue,
 	{
 		folderSettings.filterCaseSensitive = NXMLSettings::DecodeBoolValue(wszValue);
 	}
+	else if (lstrcmp(wszName, L"GroupMode") == 0)
+	{
+		folderSettings.groupMode = SortMode::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
+		groupModeLoaded = true;
+	}
 	else if (lstrcmp(wszName, L"ShowHidden") == 0)
 	{
 		folderSettings.showHidden = NXMLSettings::DecodeBoolValue(wszValue);
@@ -1826,11 +1862,32 @@ void Explorerplusplus::MapTabAttributeValue(WCHAR *wszName, WCHAR *wszValue,
 	}
 	else if (lstrcmp(wszName, L"SortAscending") == 0)
 	{
-		folderSettings.sortAscending = NXMLSettings::DecodeBoolValue(wszValue);
+		folderSettings.sortDirection = NXMLSettings::DecodeBoolValue(wszValue)
+			? SortDirection::Ascending
+			: SortDirection::Descending;
+
+		if (!groupSortDirectionLoaded)
+		{
+			folderSettings.groupSortDirection = NXMLSettings::DecodeBoolValue(wszValue)
+				? SortDirection::Ascending
+				: SortDirection::Descending;
+		}
+	}
+	else if (lstrcmp(wszName, L"GroupSortDirection") == 0)
+	{
+		folderSettings.groupSortDirection =
+			SortDirection::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
+		groupSortDirectionLoaded = true;
 	}
 	else if (lstrcmp(wszName, L"SortMode") == 0)
 	{
 		folderSettings.sortMode = SortMode::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
+
+		if (!groupModeLoaded)
+		{
+			folderSettings.groupMode =
+				SortMode::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
+		}
 	}
 	else if (lstrcmp(wszName, L"ViewMode") == 0)
 	{

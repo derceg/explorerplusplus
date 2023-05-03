@@ -804,10 +804,15 @@ void ShellBrowser::ColumnClicked(int iClickedColumn)
 
 				if (m_previousSortColumn == columnType)
 				{
-					m_folderSettings.sortAscending = !m_folderSettings.sortAscending;
+					m_folderSettings.sortDirection =
+						InvertSortDirection(m_folderSettings.sortDirection);
+				}
+				else
+				{
+					m_folderSettings.sortMode = sortMode;
 				}
 
-				SortFolder(sortMode);
+				SortFolder();
 
 				break;
 			}
@@ -885,13 +890,13 @@ void ShellBrowser::ApplyHeaderSortArrow()
 	hdItem.mask = HDI_FORMAT;
 	Header_GetItem(hHeader, iColumn, &hdItem);
 
-	if (!m_folderSettings.sortAscending)
+	if (m_folderSettings.sortDirection == +SortDirection::Ascending)
 	{
-		hdItem.fmt |= HDF_SORTDOWN;
+		hdItem.fmt |= HDF_SORTUP;
 	}
 	else
 	{
-		hdItem.fmt |= HDF_SORTUP;
+		hdItem.fmt |= HDF_SORTDOWN;
 	}
 
 	/* Add the up/down arrow to the column by which
@@ -984,10 +989,7 @@ void ShellBrowser::SetCurrentColumns(const std::vector<Column_t> &columns)
 		if (!column.bChecked && DetermineColumnSortMode(column.type) == m_folderSettings.sortMode)
 		{
 			auto firstChecked = std::find_if(columns.begin(), columns.end(),
-				[](const Column_t &currentColumn)
-				{
-					return currentColumn.bChecked;
-				});
+				[](const Column_t &currentColumn) { return currentColumn.bChecked; });
 			assert(firstChecked != columns.end());
 
 			m_folderSettings.sortMode = DetermineColumnSortMode(firstChecked->type);
@@ -1000,10 +1002,7 @@ void ShellBrowser::SetCurrentColumns(const std::vector<Column_t> &columns)
 		}
 
 		auto existingColumn = std::find_if(m_pActiveColumns->begin(), m_pActiveColumns->end(),
-			[column](const Column_t &currentColumn)
-			{
-				return currentColumn.type == column.type;
-			});
+			[column](const Column_t &currentColumn) { return currentColumn.type == column.type; });
 		assert(existingColumn != m_pActiveColumns->end());
 
 		if (column.bChecked && !existingColumn->bChecked)
@@ -1026,7 +1025,7 @@ void ShellBrowser::SetCurrentColumns(const std::vector<Column_t> &columns)
 	// The folder will need to be re-sorted if the sorting column was removed.
 	if (sortFolder)
 	{
-		SortFolder(m_folderSettings.sortMode);
+		SortFolder();
 	}
 
 	columnsChanged.m_signal();
@@ -1047,10 +1046,7 @@ void ShellBrowser::GetColumnInternal(ColumnType columnType, Column_t *pci) const
 Column_t ShellBrowser::GetFirstCheckedColumn()
 {
 	auto itr = std::find_if(m_pActiveColumns->begin(), m_pActiveColumns->end(),
-		[](const Column_t &column)
-		{
-			return column.bChecked;
-		});
+		[](const Column_t &column) { return column.bChecked; });
 
 	// There should always be at least one checked column.
 	assert(itr != m_pActiveColumns->end());

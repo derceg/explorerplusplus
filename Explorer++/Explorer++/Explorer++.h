@@ -210,8 +210,10 @@ private:
 	void OnChangeDisplayColors();
 	void OnFilterResults();
 	void OnSortBy(SortMode sortMode);
-	void OnGroupBy(SortMode sortMode);
-	void OnSortByAscending(BOOL bSortAscending);
+	void OnGroupBy(SortMode groupMode);
+	void OnGroupByNone();
+	void OnSortDirectionSelected(SortDirection direction);
+	void OnGroupSortDirectionSelected(SortDirection direction);
 	void OnShowHiddenFiles();
 	void OnRefresh();
 	void OnSelectColumns();
@@ -381,7 +383,7 @@ private:
 	void SaveToolbarInformationToXMLnternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe);
 	void MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, WCHAR *wszValue);
 	void MapTabAttributeValue(WCHAR *wszName, WCHAR *wszValue, TabSettings &tabSettings,
-		FolderSettings &folderSettings);
+		FolderSettings &folderSettings, bool &groupModeLoaded, bool &groupSortDirectionLoaded);
 
 	/* Window state update. */
 	void UpdateWindowStates(const Tab &tab);
@@ -602,6 +604,7 @@ private:
 	BOOL m_bSavePreferencesToXMLFile;
 
 	bool m_themeValueLoadedFromXml = false;
+	bool m_groupSortDirectionGlobalLoadedFromXml = false;
 
 	TaskbarThumbnails *m_taskbarThumbnails;
 

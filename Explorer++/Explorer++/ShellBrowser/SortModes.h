@@ -6,6 +6,8 @@
 
 #include "BetterEnumsWrapper.h"
 
+// These are used for both sorting and grouping. For example, it's possible to both sort a folder by
+// name and group a folder by name.
 // clang-format off
 BETTER_ENUM(SortMode, int,
 	Name = 1,
@@ -81,3 +83,12 @@ BETTER_ENUM(SortMode, int,
 	MediaYear = 64
 )
 // clang-format on
+
+// clang-format off
+BETTER_ENUM(SortDirection, int,
+	Ascending = 0,
+	Descending = 1
+)
+// clang-format on
+
+SortDirection InvertSortDirection(SortDirection direction);

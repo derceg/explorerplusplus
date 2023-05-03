@@ -1066,12 +1066,24 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		OnGroupBy(SortMode::MediaYear);
 		break;
 
+	case IDM_GROUP_BY_NONE:
+		OnGroupByNone();
+		break;
+
 	case IDM_SORT_ASCENDING:
-		OnSortByAscending(TRUE);
+		OnSortDirectionSelected(SortDirection::Ascending);
 		break;
 
 	case IDM_SORT_DESCENDING:
-		OnSortByAscending(FALSE);
+		OnSortDirectionSelected(SortDirection::Descending);
+		break;
+
+	case IDM_GROUP_SORT_ASCENDING:
+		OnGroupSortDirectionSelected(SortDirection::Ascending);
+		break;
+
+	case IDM_GROUP_SORT_DESCENDING:
+		OnGroupSortDirectionSelected(SortDirection::Descending);
 		break;
 
 	case IDM_VIEW_AUTOARRANGE:
@@ -1269,10 +1281,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 				new ManageBookmarksDialog(m_resourceInstance, hwnd, this, this,
 					&m_bookmarkIconFetcher, BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
 			g_hwndManageBookmarks = pManageBookmarksDialog->ShowModelessDialog(
-				[]()
-				{
-					g_hwndManageBookmarks = nullptr;
-				});
+				[]() { g_hwndManageBookmarks = nullptr; });
 		}
 		else
 		{

@@ -139,15 +139,6 @@ struct Config
 		globalFolderSettings.folderColumns.myNetworkPlacesColumns =
 			std::vector<Column_t>(std::begin(MY_NETWORK_PLACES_DEFAULT_COLUMNS),
 				std::end(MY_NETWORK_PLACES_DEFAULT_COLUMNS));
-
-		defaultFolderSettings.sortMode = SortMode::Name;
-		defaultFolderSettings.viewMode = ViewMode::Icons;
-		defaultFolderSettings.sortAscending = TRUE;
-		defaultFolderSettings.showInGroups = FALSE;
-		defaultFolderSettings.showHidden = TRUE;
-		defaultFolderSettings.autoArrange = TRUE;
-		defaultFolderSettings.applyFilter = FALSE;
-		defaultFolderSettings.filterCaseSensitive = FALSE;
 	}
 
 	static const UINT DEFAULT_DISPLAYWINDOW_WIDTH = 300;

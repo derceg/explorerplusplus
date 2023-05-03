@@ -215,14 +215,19 @@ void ShellBrowser::InitializeListView()
 	m_connections.push_back(
 		ColorRuleModelFactory::GetInstance()->GetColorRuleModel()->AddAllItemsRemovedObserver(
 			std::bind(&ShellBrowser::OnColorRulesUpdated, this)));
+
+	if (m_folderSettings.showInGroups)
+	{
+		ListView_EnableGroupView(m_hListView, true);
+	}
 }
 
-BOOL ShellBrowser::GetAutoArrange() const
+bool ShellBrowser::GetAutoArrange() const
 {
 	return m_folderSettings.autoArrange;
 }
 
-void ShellBrowser::SetAutoArrange(BOOL autoArrange)
+void ShellBrowser::SetAutoArrange(bool autoArrange)
 {
 	m_folderSettings.autoArrange = autoArrange;
 
@@ -446,7 +451,63 @@ SortMode ShellBrowser::GetSortMode() const
 
 void ShellBrowser::SetSortMode(SortMode sortMode)
 {
+	if (sortMode == m_folderSettings.sortMode)
+	{
+		return;
+	}
+
 	m_folderSettings.sortMode = sortMode;
+
+	SortFolder();
+}
+
+SortMode ShellBrowser::GetGroupMode() const
+{
+	return m_folderSettings.groupMode;
+}
+
+void ShellBrowser::SetGroupMode(SortMode sortMode)
+{
+	m_folderSettings.groupMode = sortMode;
+
+	if (m_folderSettings.showInGroups)
+	{
+		MoveItemsIntoGroups();
+	}
+}
+
+SortDirection ShellBrowser::GetSortDirection() const
+{
+	return m_folderSettings.sortDirection;
+}
+
+void ShellBrowser::SetSortDirection(SortDirection direction)
+{
+	if (direction == m_folderSettings.sortDirection)
+	{
+		return;
+	}
+
+	m_folderSettings.sortDirection = direction;
+
+	SortFolder();
+}
+
+SortDirection ShellBrowser::GetGroupSortDirection() const
+{
+	return m_folderSettings.groupSortDirection;
+}
+
+void ShellBrowser::SetGroupSortDirection(SortDirection direction)
+{
+	if (direction == m_folderSettings.groupSortDirection)
+	{
+		return;
+	}
+
+	m_folderSettings.groupSortDirection = direction;
+
+	ListView_SortGroups(m_hListView, GroupComparisonStub, this);
 }
 
 int ShellBrowser::GetId() const
@@ -975,41 +1036,35 @@ void ShellBrowser::VerifySortMode()
 		columns = &m_folderColumns.realFolderColumns;
 	}
 
+	auto firstChecked = GetFirstCheckedColumn();
+
 	auto itr = std::find_if(columns->begin(), columns->end(),
 		[this](const Column_t &column)
 		{ return DetermineColumnSortMode(column.type) == m_folderSettings.sortMode; });
 
-	if (itr != columns->end())
+	if (itr == columns->end())
 	{
-		return;
+		m_folderSettings.sortMode = DetermineColumnSortMode(firstChecked.type);
 	}
 
-	auto firstChecked = GetFirstCheckedColumn();
-	m_folderSettings.sortMode = DetermineColumnSortMode(firstChecked.type);
+	itr = std::find_if(columns->begin(), columns->end(),
+		[this](const Column_t &column)
+		{ return DetermineColumnSortMode(column.type) == m_folderSettings.groupMode; });
+
+	if (itr == columns->end())
+	{
+		m_folderSettings.groupMode = DetermineColumnSortMode(firstChecked.type);
+	}
 }
 
-BOOL ShellBrowser::GetSortAscending() const
-{
-	return m_folderSettings.sortAscending;
-}
-
-BOOL ShellBrowser::SetSortAscending(BOOL bAscending)
-{
-	m_folderSettings.sortAscending = bAscending;
-
-	return m_folderSettings.sortAscending;
-}
-
-BOOL ShellBrowser::GetShowHidden() const
+bool ShellBrowser::GetShowHidden() const
 {
 	return m_folderSettings.showHidden;
 }
 
-BOOL ShellBrowser::SetShowHidden(BOOL bShowHidden)
+void ShellBrowser::SetShowHidden(bool showHidden)
 {
-	m_folderSettings.showHidden = bShowHidden;
-
-	return m_folderSettings.showHidden;
+	m_folderSettings.showHidden = showHidden;
 }
 
 std::vector<SortMode> ShellBrowser::GetAvailableSortModes() const

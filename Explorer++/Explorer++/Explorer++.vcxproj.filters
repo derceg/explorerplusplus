@@ -514,6 +514,9 @@
     <ClCompile Include="ShellTreeView\ShellTreeNode.cpp">
       <Filter>ShellTreeView</Filter>
     </ClCompile>
+    <ClCompile Include="ShellBrowser\SortModes.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">

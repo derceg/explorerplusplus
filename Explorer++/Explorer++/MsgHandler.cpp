@@ -756,21 +756,6 @@ void Explorerplusplus::OnToolbarViews()
 	selectedTab.GetShellBrowser()->CycleViewMode(true);
 }
 
-void Explorerplusplus::OnSortByAscending(BOOL bSortAscending)
-{
-	Tab &selectedTab = m_tabContainer->GetSelectedTab();
-
-	if (bSortAscending != selectedTab.GetShellBrowser()->GetSortAscending())
-	{
-		selectedTab.GetShellBrowser()->SetSortAscending(bSortAscending);
-
-		SortMode sortMode = selectedTab.GetShellBrowser()->GetSortMode();
-
-		/* It is quicker to re-sort the folder than refresh it. */
-		selectedTab.GetShellBrowser()->SortFolder(sortMode);
-	}
-}
-
 void Explorerplusplus::OnPreviousWindow()
 {
 	HWND hFocus = GetFocus();
@@ -1154,38 +1139,50 @@ void Explorerplusplus::OnSortBy(SortMode sortMode)
 	Tab &selectedTab = m_tabContainer->GetSelectedTab();
 	SortMode currentSortMode = selectedTab.GetShellBrowser()->GetSortMode();
 
-	if (!selectedTab.GetShellBrowser()->GetShowInGroups() && sortMode == currentSortMode)
+	if (sortMode == currentSortMode)
 	{
-		selectedTab.GetShellBrowser()->SetSortAscending(
-			!selectedTab.GetShellBrowser()->GetSortAscending());
+		selectedTab.GetShellBrowser()->SetSortDirection(
+			InvertSortDirection(selectedTab.GetShellBrowser()->GetSortDirection()));
 	}
-	else if (selectedTab.GetShellBrowser()->GetShowInGroups())
+	else
 	{
-		selectedTab.GetShellBrowser()->SetShowInGroups(FALSE);
+		selectedTab.GetShellBrowser()->SetSortMode(sortMode);
 	}
-
-	selectedTab.GetShellBrowser()->SortFolder(sortMode);
 }
 
-void Explorerplusplus::OnGroupBy(SortMode sortMode)
+void Explorerplusplus::OnGroupBy(SortMode groupMode)
 {
 	Tab &selectedTab = m_tabContainer->GetSelectedTab();
-	SortMode currentSortMode = selectedTab.GetShellBrowser()->GetSortMode();
+	SortMode currentGroupMode = selectedTab.GetShellBrowser()->GetGroupMode();
 
-	/* If group view is already enabled, and the current sort
-	mode matches the supplied sort mode, toggle the ascending/
-	descending flag. */
-	if (selectedTab.GetShellBrowser()->GetShowInGroups() && sortMode == currentSortMode)
+	if (selectedTab.GetShellBrowser()->GetShowInGroups() && groupMode == currentGroupMode)
 	{
-		selectedTab.GetShellBrowser()->SetSortAscending(
-			!selectedTab.GetShellBrowser()->GetSortAscending());
+		selectedTab.GetShellBrowser()->SetGroupSortDirection(
+			InvertSortDirection(selectedTab.GetShellBrowser()->GetGroupSortDirection()));
 	}
-	else if (!selectedTab.GetShellBrowser()->GetShowInGroups())
+	else
 	{
-		selectedTab.GetShellBrowser()->SetShowInGroupsFlag(TRUE);
+		selectedTab.GetShellBrowser()->SetGroupMode(groupMode);
+		selectedTab.GetShellBrowser()->SetShowInGroups(true);
 	}
+}
 
-	selectedTab.GetShellBrowser()->SortFolder(sortMode);
+void Explorerplusplus::OnGroupByNone()
+{
+	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	selectedTab.GetShellBrowser()->SetShowInGroups(false);
+}
+
+void Explorerplusplus::OnSortDirectionSelected(SortDirection direction)
+{
+	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	selectedTab.GetShellBrowser()->SetSortDirection(direction);
+}
+
+void Explorerplusplus::OnGroupSortDirectionSelected(SortDirection direction)
+{
+	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	selectedTab.GetShellBrowser()->SetGroupSortDirection(direction);
 }
 
 void Explorerplusplus::SaveAllSettings()
