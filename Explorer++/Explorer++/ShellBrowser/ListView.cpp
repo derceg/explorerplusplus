@@ -74,6 +74,18 @@ LRESULT CALLBACK ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 
 	switch (uMsg)
 	{
+	// NM_DBLCLK for the listview is sent both on double clicks (by default), as well as in the
+	// situation when LVS_EX_ONECLICKACTIVATE is active (in which case it's sent on a single mouse
+	// click). Navigation up should only occur on a double click, which is why WM_LBUTTONDBLCLK is
+	// used.
+	case WM_LBUTTONDBLCLK:
+	{
+		POINT pt;
+		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+		OnListViewLeftButtonDoubleClick(&pt);
+	}
+	break;
+
 	case WM_MBUTTONDOWN:
 	{
 		POINT pt;
@@ -228,6 +240,18 @@ LRESULT CALLBACK ShellBrowser::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM w
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
+}
+
+void ShellBrowser::OnListViewLeftButtonDoubleClick(const POINT *pt)
+{
+	LV_HITTESTINFO ht;
+	ht.pt = *pt;
+	ListView_HitTest(m_hListView, &ht);
+
+	if (ht.flags == LVHT_NOWHERE)
+	{
+		m_navigationController->GoUp();
+	}
 }
 
 void ShellBrowser::OnListViewMButtonDown(const POINT *pt)

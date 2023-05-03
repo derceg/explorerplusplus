@@ -57,35 +57,6 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 		FocusChanged(WindowFocusSource::ListView);
 		break;
 
-	case WM_LBUTTONDBLCLK:
-	{
-		LV_HITTESTINFO ht;
-		DWORD dwPos;
-		POINT mousePos;
-
-		dwPos = GetMessagePos();
-		mousePos.x = GET_X_LPARAM(dwPos);
-		mousePos.y = GET_Y_LPARAM(dwPos);
-		ScreenToClient(m_hActiveListView, &mousePos);
-
-		ht.pt = mousePos;
-		ListView_HitTest(ListView, &ht);
-
-		/* NM_DBLCLK for the listview is sent both on double clicks
-		(by default), as well as in the situation when LVS_EX_ONECLICKACTIVATE
-		is active (in which case it is sent on a single mouse click).
-		Therefore, because we only want to navigate up one folder on
-		a DOUBLE click, we'll handle the event here. */
-		if (ht.flags == LVHT_NOWHERE)
-		{
-			/* The user has double clicked in the whitespace
-			area for this tab, so go up one folder... */
-			OnNavigateUp();
-			return 0;
-		}
-	}
-	break;
-
 	case WM_CONTEXTMENU:
 		if (reinterpret_cast<HWND>(wParam)
 			== m_tabContainer->GetSelectedTab().GetShellBrowser()->GetListView())
