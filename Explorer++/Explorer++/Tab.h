@@ -27,8 +27,14 @@ public:
 
 	enum class LockState
 	{
+		// The tab isn't locked; it can be navigated freely and closed.
 		NotLocked,
+
+		// The tab is locked. It can be navigated freely, but not closed.
 		Locked,
+
+		// Both the tab and address are locked. The tab can't be navigated or closed. All
+		// navigations will proceed in a new tab.
 		AddressLocked
 	};
 

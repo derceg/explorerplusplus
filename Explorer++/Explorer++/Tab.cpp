@@ -123,11 +123,11 @@ void Tab::SetLockState(LockState lockState)
 	switch (lockState)
 	{
 	case Tab::LockState::NotLocked:
+	case Tab::LockState::Locked:
 		m_shellBrowser->GetNavigationController()->SetNavigationMode(
 			ShellNavigationController::NavigationMode::Normal);
 		break;
 
-	case Tab::LockState::Locked:
 	case Tab::LockState::AddressLocked:
 		m_shellBrowser->GetNavigationController()->SetNavigationMode(
 			ShellNavigationController::NavigationMode::ForceNewTab);
