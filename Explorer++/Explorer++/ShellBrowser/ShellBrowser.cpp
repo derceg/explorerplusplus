@@ -349,6 +349,7 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 		dwStyle = LV_VIEW_DETAILS;
 
 		SetUpListViewColumns();
+		ApplyHeaderSortArrow();
 		break;
 
 	case ViewMode::Thumbnails:

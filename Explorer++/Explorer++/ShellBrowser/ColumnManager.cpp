@@ -221,6 +221,8 @@ void ShellBrowser::DeleteAllColumns()
 	{
 		ListView_DeleteColumn(m_hListView, i);
 	}
+
+	m_PreviousSortColumnExists = false;
 }
 
 void ShellBrowser::SetActiveColumnSet()
