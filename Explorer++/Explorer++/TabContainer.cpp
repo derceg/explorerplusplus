@@ -364,7 +364,7 @@ void TabContainer::OnMouseWheel(HWND hwnd, int xPos, int yPos, int delta, UINT k
 	UNREFERENCED_PARAMETER(yPos);
 	UNREFERENCED_PARAMETER(keys);
 
-	auto scrollDirection = delta < 0 ? ScrollDirection::Left : ScrollDirection::Right;
+	auto scrollDirection = delta > 0 ? ScrollDirection::Left : ScrollDirection::Right;
 
 	for (int i = 0; i < abs(delta / WHEEL_DELTA); i++)
 	{
@@ -614,6 +614,8 @@ LRESULT CALLBACK TabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam
 {
 	switch (uMsg)
 	{
+		HANDLE_MSG(hwnd, WM_MOUSEWHEEL, OnMouseWheel);
+
 	case WM_LBUTTONDBLCLK:
 		CreateNewTabInDefaultDirectory(TabSettings(_selected = true));
 		break;
