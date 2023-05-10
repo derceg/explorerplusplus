@@ -192,6 +192,7 @@
 #define IDM_GO_VIDEOS                   373
 #define IDS_GROUP_BY_NONE               373
 #define IDM_GO_WSL_DISTRIBUTIONS        374
+#define IDS_ADVANCED_OPTION_GO_UP_ON_DOUBLE_CLICK_NAME 374
 #define IDD_OPTIONS                     375
 #define IDS_OPTIONS_ADVANCED_TITLE      376
 #define IDS_OPTIONS_DEFAULT_TITLE       377

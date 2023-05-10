@@ -185,6 +185,8 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 			m_config->globalFolderSettings.displayMixedFilesAndFolders);
 		RegistrySettings::SaveDword(hSettingsKey, _T("UseNaturalSortOrder"),
 			m_config->globalFolderSettings.useNaturalSortOrder);
+		RegistrySettings::SaveDword(hSettingsKey, _T("GoUpOnDoubleClick"),
+			m_config->goUpOnDoubleClick);
 
 		/* Global settings. */
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowHiddenGlobal"),
@@ -430,6 +432,8 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 			m_config->globalFolderSettings.displayMixedFilesAndFolders);
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("UseNaturalSortOrder"),
 			m_config->globalFolderSettings.useNaturalSortOrder);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("GoUpOnDoubleClick"),
+			m_config->goUpOnDoubleClick);
 
 		/* Global settings. */
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowHiddenGlobal"),

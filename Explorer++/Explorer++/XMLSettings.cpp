@@ -115,6 +115,7 @@ will need to be changed correspondingly. */
 #define HASH_USE_NATURAL_SORT_ORDER 528323501
 #define HASH_OPEN_TABS_IN_FOREGROUND 2957281235
 #define HASH_GROUP_SORT_DIRECTION_GLOBAL 790225996
+#define HASH_GO_UP_ON_DOUBLE_CLICK 1809284638
 
 struct ColumnXMLSaveData
 {
@@ -742,6 +743,10 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
 		_T("GroupSortDirectionGlobal"),
 		NXMLSettings::EncodeIntValue(m_config->defaultFolderSettings.groupSortDirection));
+
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("GoUpOnDoubleClick"),
+		NXMLSettings::EncodeBoolValue(m_config->goUpOnDoubleClick));
 
 	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pe.get());
@@ -1823,6 +1828,10 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 		m_config->defaultFolderSettings.groupSortDirection =
 			SortDirection::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
 		m_groupSortDirectionGlobalLoadedFromXml = true;
+		break;
+
+	case HASH_GO_UP_ON_DOUBLE_CLICK:
+		m_config->goUpOnDoubleClick = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 	}
 }

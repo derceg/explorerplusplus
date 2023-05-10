@@ -32,7 +32,8 @@ private:
 	enum class AdvancedOptionId
 	{
 		CheckSystemIsPinnedToNameSpaceTree,
-		OpenTabsInForeground
+		OpenTabsInForeground,
+		GoUpOnDoubleClick
 	};
 
 	enum class AdvancedOptionType

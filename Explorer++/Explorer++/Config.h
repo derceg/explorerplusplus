@@ -183,6 +183,7 @@ struct Config
 	unsigned int treeViewWidth;
 	bool checkPinnedToNamespaceTreeProperty;
 	ShellChangeNotificationType shellChangeNotificationType;
+	bool goUpOnDoubleClick = true;
 
 	DefaultFileManager::ReplaceExplorerMode replaceExplorerMode;
 

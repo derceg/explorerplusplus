@@ -244,6 +244,11 @@ LRESULT CALLBACK ShellBrowser::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM w
 
 void ShellBrowser::OnListViewLeftButtonDoubleClick(const POINT *pt)
 {
+	if (!m_config->goUpOnDoubleClick)
+	{
+		return;
+	}
+
 	LV_HITTESTINFO ht;
 	ht.pt = *pt;
 	ListView_HitTest(m_hListView, &ht);

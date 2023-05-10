@@ -2080,6 +2080,13 @@ std::vector<OptionsDialog::AdvancedOption> OptionsDialog::InitializeAdvancedOpti
 		IDS_ADVANCED_OPTION_OPEN_TABS_IN_FOREGROUND_DESCRIPTION);
 	advancedOptions.push_back(option);
 
+	option.id = AdvancedOptionId::GoUpOnDoubleClick;
+	option.name = ResourceHelper::LoadString(m_resourceInstance,
+		IDS_ADVANCED_OPTION_GO_UP_ON_DOUBLE_CLICK_NAME);
+	option.type = AdvancedOptionType::Boolean;
+	option.description = {};
+	advancedOptions.push_back(option);
+
 	return advancedOptions;
 }
 
@@ -2125,6 +2132,9 @@ bool OptionsDialog::GetBooleanConfigValue(OptionsDialog::AdvancedOptionId id)
 	case AdvancedOptionId::OpenTabsInForeground:
 		return m_config->openTabsInForeground;
 
+	case AdvancedOptionId::GoUpOnDoubleClick:
+		return m_config->goUpOnDoubleClick;
+
 	default:
 		assert(false);
 		break;
@@ -2143,6 +2153,10 @@ void OptionsDialog::SetBooleanConfigValue(OptionsDialog::AdvancedOptionId id, bo
 
 	case AdvancedOptionId::OpenTabsInForeground:
 		m_config->openTabsInForeground = value;
+		break;
+
+	case AdvancedOptionId::GoUpOnDoubleClick:
+		m_config->goUpOnDoubleClick = value;
 		break;
 
 	default:
