@@ -44,6 +44,12 @@ protected:
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 
 private:
+	enum class MoveDirection
+	{
+		Up,
+		Down
+	};
+
 	bool CompareColumns(const Column_t &column1, const Column_t &column2);
 
 	std::vector<ResizableDialogControl> GetResizableControls() override;
@@ -53,7 +59,7 @@ private:
 	void OnCancel();
 	BOOL OnLvnItemChanging(const NMLISTVIEW *nmlv);
 	void OnLvnItemChanged(const NMLISTVIEW *pnmlv);
-	void OnMoveColumn(bool bUp);
+	void OnMoveColumn(MoveDirection direction);
 
 	ShellBrowser *m_shellBrowser;
 	IconResourceLoader *m_iconResourceLoader;

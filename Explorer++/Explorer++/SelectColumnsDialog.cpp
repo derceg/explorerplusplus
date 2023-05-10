@@ -154,11 +154,11 @@ INT_PTR SelectColumnsDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 	switch (LOWORD(wParam))
 	{
 	case IDC_COLUMNS_MOVEUP:
-		OnMoveColumn(true);
+		OnMoveColumn(MoveDirection::Up);
 		break;
 
 	case IDC_COLUMNS_MOVEDOWN:
-		OnMoveColumn(false);
+		OnMoveColumn(MoveDirection::Down);
 		break;
 
 	case IDOK:
@@ -221,10 +221,7 @@ void SelectColumnsDialog::OnOk()
 
 		ColumnType columnType = static_cast<ColumnType>(lvItem.lParam);
 		auto itr = std::find_if(currentColumns.begin(), currentColumns.end(),
-			[columnType](const Column_t &column)
-			{
-				return column.type == columnType;
-			});
+			[columnType](const Column_t &column) { return column.type == columnType; });
 
 		Column_t column;
 		column.type = columnType;
@@ -311,27 +308,39 @@ void SelectColumnsDialog::OnLvnItemChanged(const NMLISTVIEW *pnmlv)
 	}
 }
 
-void SelectColumnsDialog::OnMoveColumn(bool bUp)
+void SelectColumnsDialog::OnMoveColumn(MoveDirection direction)
 {
-	HWND hListView = GetDlgItem(m_hDlg, IDC_COLUMNS_LISTVIEW);
+	HWND listView = GetDlgItem(m_hDlg, IDC_COLUMNS_LISTVIEW);
 
-	int iSelected = ListView_GetNextItem(hListView, -1, LVNI_SELECTED);
+	int selectedItemIndex = ListView_GetNextItem(listView, -1, LVNI_SELECTED);
 
-	if (iSelected != -1)
+	if (selectedItemIndex == -1)
 	{
-		if (bUp)
-		{
-			ListViewHelper::SwapItems(hListView, iSelected, iSelected - 1, TRUE);
-		}
-		else
-		{
-			ListViewHelper::SwapItems(hListView, iSelected, iSelected + 1, TRUE);
-		}
-
-		m_bColumnsSwapped = TRUE;
-
-		SetFocus(hListView);
+		return;
 	}
+
+	int newIndex;
+
+	if (direction == MoveDirection::Up)
+	{
+		newIndex = selectedItemIndex - 1;
+	}
+	else
+	{
+		newIndex = selectedItemIndex + 1;
+	}
+
+	if (newIndex < 0 || newIndex >= ListView_GetItemCount(listView))
+	{
+		return;
+	}
+
+	ListViewHelper::SwapItems(listView, selectedItemIndex, newIndex, TRUE);
+	ListView_EnsureVisible(listView, newIndex, false);
+
+	m_bColumnsSwapped = TRUE;
+
+	SetFocus(listView);
 }
 
 SelectColumnsDialogPersistentSettings::SelectColumnsDialogPersistentSettings() :
