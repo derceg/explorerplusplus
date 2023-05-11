@@ -23,6 +23,10 @@ public:
 	{
 	}
 
+	ValueWrapper(T value) : m_value(value)
+	{
+	}
+
 	// This is designed to allow the parent Config struct to be copied
 	// when necessary. None of the observers are copied, you only get a
 	// copy of the data.

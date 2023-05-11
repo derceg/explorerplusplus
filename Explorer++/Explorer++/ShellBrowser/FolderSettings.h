@@ -5,37 +5,48 @@
 #pragma once
 
 #include "Columns.h"
+#include "DefaultColumns.h"
 #include "SortModes.h"
 #include "ViewModes.h"
 #include "../Helper/StringHelper.h"
 
+static const int DEFAULT_LISTVIEW_HOVER_TIME = 500;
+
 struct FolderColumns
 {
-	std::vector<Column_t> realFolderColumns;
-	std::vector<Column_t> myComputerColumns;
-	std::vector<Column_t> controlPanelColumns;
-	std::vector<Column_t> recycleBinColumns;
-	std::vector<Column_t> printersColumns;
-	std::vector<Column_t> networkConnectionsColumns;
-	std::vector<Column_t> myNetworkPlacesColumns;
+	std::vector<Column_t> realFolderColumns = std::vector<Column_t>(
+		std::begin(REAL_FOLDER_DEFAULT_COLUMNS), std::end(REAL_FOLDER_DEFAULT_COLUMNS));
+	std::vector<Column_t> myComputerColumns = std::vector<Column_t>(
+		std::begin(MY_COMPUTER_DEFAULT_COLUMNS), std::end(MY_COMPUTER_DEFAULT_COLUMNS));
+	std::vector<Column_t> controlPanelColumns = std::vector<Column_t>(
+		std::begin(CONTROL_PANEL_DEFAULT_COLUMNS), std::end(CONTROL_PANEL_DEFAULT_COLUMNS));
+	std::vector<Column_t> recycleBinColumns = std::vector<Column_t>(
+		std::begin(RECYCLE_BIN_DEFAULT_COLUMNS), std::end(RECYCLE_BIN_DEFAULT_COLUMNS));
+	std::vector<Column_t> printersColumns = std::vector<Column_t>(
+		std::begin(PRINTERS_DEFAULT_COLUMNS), std::end(PRINTERS_DEFAULT_COLUMNS));
+	std::vector<Column_t> networkConnectionsColumns =
+		std::vector<Column_t>(std::begin(NETWORK_CONNECTIONS_DEFAULT_COLUMNS),
+			std::end(NETWORK_CONNECTIONS_DEFAULT_COLUMNS));
+	std::vector<Column_t> myNetworkPlacesColumns = std::vector<Column_t>(
+		std::begin(MY_NETWORK_PLACES_DEFAULT_COLUMNS), std::end(MY_NETWORK_PLACES_DEFAULT_COLUMNS));
 };
 
 struct GlobalFolderSettings
 {
-	BOOL showExtensions;
-	BOOL showFriendlyDates;
-	BOOL showFolderSizes;
-	BOOL disableFolderSizesNetworkRemovable;
-	BOOL hideSystemFiles;
-	BOOL hideLinkExtension;
-	BOOL insertSorted;
-	BOOL showGridlines;
-	BOOL forceSize;
-	SizeDisplayFormat sizeDisplayFormat;
-	BOOL oneClickActivate;
-	UINT oneClickActivateHoverTime;
-	BOOL displayMixedFilesAndFolders;
-	BOOL useNaturalSortOrder;
+	BOOL showExtensions = TRUE;
+	BOOL showFriendlyDates = TRUE;
+	BOOL showFolderSizes = FALSE;
+	BOOL disableFolderSizesNetworkRemovable = FALSE;
+	BOOL hideSystemFiles = FALSE;
+	BOOL hideLinkExtension = FALSE;
+	BOOL insertSorted = TRUE;
+	BOOL showGridlines = TRUE;
+	BOOL forceSize = FALSE;
+	SizeDisplayFormat sizeDisplayFormat = SizeDisplayFormat::Bytes;
+	BOOL oneClickActivate = FALSE;
+	UINT oneClickActivateHoverTime = DEFAULT_LISTVIEW_HOVER_TIME;
+	BOOL displayMixedFilesAndFolders = FALSE;
+	BOOL useNaturalSortOrder = TRUE;
 
 	FolderColumns folderColumns;
 };

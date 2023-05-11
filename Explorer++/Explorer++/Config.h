@@ -14,8 +14,6 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/StringHelper.h"
 
-static const int DEFAULT_LISTVIEW_HOVER_TIME = 500;
-
 enum class InfoTipType
 {
 	System = 0,
@@ -47,166 +45,75 @@ BETTER_ENUM(Theme, int,
 
 struct Config
 {
-	Config() : defaultTabDirectoryStatic(GetComputerFolderPath())
-	{
-		language = LANG_ENGLISH;
-		iconSet = IconSet::Color;
-		theme = Theme::Light;
-		startupMode = StartupMode::PreviousTabs;
-		defaultTabDirectory = GetComputerFolderPath();
-		showStatusBar = TRUE;
-		showFolders = TRUE;
-		showAddressBar = TRUE;
-		showDisplayWindow = TRUE;
-		showMainToolbar = TRUE;
-		showBookmarksToolbar = FALSE;
-		showDrivesToolbar = TRUE;
-		showApplicationToolbar = FALSE;
-		alwaysOpenNewTab = FALSE;
-		openNewTabNextToCurrent = FALSE;
-		lockToolbars = TRUE;
-		treeViewDelayEnabled = FALSE;
-		treeViewAutoExpandSelected = FALSE;
-		showTaskbarThumbnails = TRUE;
-		useFullRowSelect = FALSE;
-		showFilePreviews = TRUE;
-		allowMultipleInstances = TRUE;
-		doubleClickTabClose = TRUE;
-		useLargeToolbarIcons.set(FALSE);
-		handleZipFiles = FALSE;
-		overwriteExistingFilesConfirmation = TRUE;
-		checkBoxSelection = FALSE;
-		closeMainWindowOnTabClose = TRUE;
-		confirmCloseTabs = FALSE;
-		synchronizeTreeview = TRUE;
-		displayWindowWidth = DEFAULT_DISPLAYWINDOW_WIDTH;
-		displayWindowHeight = DEFAULT_DISPLAYWINDOW_HEIGHT;
-		displayWindowVertical = FALSE;
-		treeViewWidth = DEFAULT_TREEVIEW_WIDTH;
-		checkPinnedToNamespaceTreeProperty = false;
-		shellChangeNotificationType = ShellChangeNotificationType::Disabled;
-
-		replaceExplorerMode = DefaultFileManager::ReplaceExplorerMode::None;
-
-		showInfoTips = TRUE;
-		infoTipType = InfoTipType::System;
-
-		showFullTitlePath.set(FALSE);
-		showUserNameInTitleBar.set(FALSE);
-		showPrivilegeLevelInTitleBar.set(FALSE);
-
-		alwaysShowTabBar.set(TRUE);
-		showTabBarAtBottom.set(FALSE);
-		extendTabControl.set(FALSE);
-		forceSameTabWidth.set(FALSE);
-		openTabsInForeground = false;
-
-		displayWindowSurroundColor = Gdiplus::Color(0, 94, 138);
-		displayWindowCentreColor = Gdiplus::Color(255, 255, 255);
-		displayWindowTextColor = RGB(0, 0, 0);
-		displayWindowFont = CreateFont(-13, 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE,
-			DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY,
-			FIXED_PITCH | FF_MODERN, _T("Segoe UI"));
-
-		globalFolderSettings.showExtensions = TRUE;
-		globalFolderSettings.showFriendlyDates = TRUE;
-		globalFolderSettings.showFolderSizes = FALSE;
-		globalFolderSettings.disableFolderSizesNetworkRemovable = FALSE;
-		globalFolderSettings.hideSystemFiles = FALSE;
-		globalFolderSettings.hideLinkExtension = FALSE;
-		globalFolderSettings.insertSorted = TRUE;
-		globalFolderSettings.showGridlines = TRUE;
-		globalFolderSettings.forceSize = FALSE;
-		globalFolderSettings.sizeDisplayFormat = SizeDisplayFormat::Bytes;
-		globalFolderSettings.oneClickActivate = FALSE;
-		globalFolderSettings.oneClickActivateHoverTime = DEFAULT_LISTVIEW_HOVER_TIME;
-		globalFolderSettings.displayMixedFilesAndFolders = FALSE;
-		globalFolderSettings.useNaturalSortOrder = TRUE;
-
-		globalFolderSettings.folderColumns.realFolderColumns = std::vector<Column_t>(
-			std::begin(REAL_FOLDER_DEFAULT_COLUMNS), std::end(REAL_FOLDER_DEFAULT_COLUMNS));
-		globalFolderSettings.folderColumns.myComputerColumns = std::vector<Column_t>(
-			std::begin(MY_COMPUTER_DEFAULT_COLUMNS), std::end(MY_COMPUTER_DEFAULT_COLUMNS));
-		globalFolderSettings.folderColumns.controlPanelColumns = std::vector<Column_t>(
-			std::begin(CONTROL_PANEL_DEFAULT_COLUMNS), std::end(CONTROL_PANEL_DEFAULT_COLUMNS));
-		globalFolderSettings.folderColumns.recycleBinColumns = std::vector<Column_t>(
-			std::begin(RECYCLE_BIN_DEFAULT_COLUMNS), std::end(RECYCLE_BIN_DEFAULT_COLUMNS));
-		globalFolderSettings.folderColumns.printersColumns = std::vector<Column_t>(
-			std::begin(PRINTERS_DEFAULT_COLUMNS), std::end(PRINTERS_DEFAULT_COLUMNS));
-		globalFolderSettings.folderColumns.networkConnectionsColumns =
-			std::vector<Column_t>(std::begin(NETWORK_CONNECTIONS_DEFAULT_COLUMNS),
-				std::end(NETWORK_CONNECTIONS_DEFAULT_COLUMNS));
-		globalFolderSettings.folderColumns.myNetworkPlacesColumns =
-			std::vector<Column_t>(std::begin(MY_NETWORK_PLACES_DEFAULT_COLUMNS),
-				std::end(MY_NETWORK_PLACES_DEFAULT_COLUMNS));
-	}
-
 	static const UINT DEFAULT_DISPLAYWINDOW_WIDTH = 300;
 	static const UINT DEFAULT_DISPLAYWINDOW_HEIGHT = 90;
 
 	static const UINT DEFAULT_TREEVIEW_WIDTH = 208;
 
-	DWORD language;
-	IconSet iconSet;
-	Theme theme;
-	StartupMode startupMode;
-	std::wstring defaultTabDirectory;
-	const std::wstring defaultTabDirectoryStatic;
-	BOOL showStatusBar;
-	BOOL showFolders;
-	BOOL showAddressBar;
-	BOOL showDisplayWindow;
-	BOOL showMainToolbar;
-	BOOL showBookmarksToolbar;
-	BOOL showDrivesToolbar;
-	BOOL showApplicationToolbar;
-	BOOL alwaysOpenNewTab;
-	BOOL openNewTabNextToCurrent;
-	BOOL lockToolbars;
-	BOOL treeViewDelayEnabled;
-	BOOL treeViewAutoExpandSelected;
-	BOOL showTaskbarThumbnails;
-	BOOL useFullRowSelect;
-	BOOL showFilePreviews;
-	BOOL allowMultipleInstances;
-	BOOL doubleClickTabClose;
-	ValueWrapper<BOOL> useLargeToolbarIcons;
-	BOOL handleZipFiles;
-	BOOL overwriteExistingFilesConfirmation;
-	BOOL checkBoxSelection;
-	BOOL closeMainWindowOnTabClose;
-	BOOL confirmCloseTabs;
-	BOOL synchronizeTreeview;
-	LONG displayWindowWidth;
-	LONG displayWindowHeight;
-	BOOL displayWindowVertical;
-	unsigned int treeViewWidth;
-	bool checkPinnedToNamespaceTreeProperty;
-	ShellChangeNotificationType shellChangeNotificationType;
+	DWORD language = LANG_ENGLISH;
+	IconSet iconSet = IconSet::Color;
+	Theme theme = Theme::Light;
+	StartupMode startupMode = StartupMode::PreviousTabs;
+	std::wstring defaultTabDirectory = GetComputerFolderPath();
+	const std::wstring defaultTabDirectoryStatic = GetComputerFolderPath();
+	BOOL showStatusBar = TRUE;
+	BOOL showFolders = TRUE;
+	BOOL showAddressBar = TRUE;
+	BOOL showDisplayWindow = TRUE;
+	BOOL showMainToolbar = TRUE;
+	BOOL showBookmarksToolbar = FALSE;
+	BOOL showDrivesToolbar = TRUE;
+	BOOL showApplicationToolbar = FALSE;
+	BOOL alwaysOpenNewTab = FALSE;
+	BOOL openNewTabNextToCurrent = FALSE;
+	BOOL lockToolbars = TRUE;
+	BOOL treeViewDelayEnabled = FALSE;
+	BOOL treeViewAutoExpandSelected = FALSE;
+	BOOL showTaskbarThumbnails = TRUE;
+	BOOL useFullRowSelect = FALSE;
+	BOOL showFilePreviews = TRUE;
+	BOOL allowMultipleInstances = TRUE;
+	BOOL doubleClickTabClose = TRUE;
+	ValueWrapper<BOOL> useLargeToolbarIcons = FALSE;
+	BOOL handleZipFiles = FALSE;
+	BOOL overwriteExistingFilesConfirmation = TRUE;
+	BOOL checkBoxSelection = FALSE;
+	BOOL closeMainWindowOnTabClose = TRUE;
+	BOOL confirmCloseTabs = FALSE;
+	BOOL synchronizeTreeview = TRUE;
+	LONG displayWindowWidth = DEFAULT_DISPLAYWINDOW_WIDTH;
+	LONG displayWindowHeight = DEFAULT_DISPLAYWINDOW_HEIGHT;
+	BOOL displayWindowVertical = FALSE;
+	unsigned int treeViewWidth = DEFAULT_TREEVIEW_WIDTH;
+	bool checkPinnedToNamespaceTreeProperty = false;
+	ShellChangeNotificationType shellChangeNotificationType = ShellChangeNotificationType::Disabled;
 	bool goUpOnDoubleClick = true;
 
-	DefaultFileManager::ReplaceExplorerMode replaceExplorerMode;
+	DefaultFileManager::ReplaceExplorerMode replaceExplorerMode =
+		DefaultFileManager::ReplaceExplorerMode::None;
 
-	BOOL showInfoTips;
-	InfoTipType infoTipType;
+	BOOL showInfoTips = TRUE;
+	InfoTipType infoTipType = InfoTipType::System;
 
 	// Main window
-	ValueWrapper<BOOL> showFullTitlePath;
-	ValueWrapper<BOOL> showUserNameInTitleBar;
-	ValueWrapper<BOOL> showPrivilegeLevelInTitleBar;
+	ValueWrapper<BOOL> showFullTitlePath = FALSE;
+	ValueWrapper<BOOL> showUserNameInTitleBar = FALSE;
+	ValueWrapper<BOOL> showPrivilegeLevelInTitleBar = FALSE;
 
 	// Tabs
-	ValueWrapper<BOOL> alwaysShowTabBar;
-	ValueWrapper<BOOL> showTabBarAtBottom;
-	ValueWrapper<BOOL> extendTabControl;
-	ValueWrapper<BOOL> forceSameTabWidth;
-	bool openTabsInForeground;
+	ValueWrapper<BOOL> alwaysShowTabBar = TRUE;
+	ValueWrapper<BOOL> showTabBarAtBottom = FALSE;
+	ValueWrapper<BOOL> extendTabControl = FALSE;
+	ValueWrapper<BOOL> forceSameTabWidth = FALSE;
+	bool openTabsInForeground = false;
 
 	// Display window
-	Gdiplus::Color displayWindowCentreColor;
-	Gdiplus::Color displayWindowSurroundColor;
-	COLORREF displayWindowTextColor;
-	HFONT displayWindowFont;
+	Gdiplus::Color displayWindowCentreColor = Gdiplus::Color(255, 255, 255);
+	Gdiplus::Color displayWindowSurroundColor = Gdiplus::Color(0, 94, 138);
+	COLORREF displayWindowTextColor = RGB(0, 0, 0);
+	HFONT displayWindowFont = CreateFont(-13, 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE,
+		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY,
+		FIXED_PITCH | FF_MODERN, _T("Segoe UI"));
 
 	// These are settings that are shared between all tabs. It's not
 	// possible to adjust them on a per-tab basis.
