@@ -67,6 +67,8 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 	{
 		m_hDlg = hDlg;
 
+		m_tipWnd = CreateTooltipControl(m_hDlg, m_resourceInstance);
+
 		AddDynamicControls();
 
 		if (m_dialogSizingType != DialogSizingType::None)
@@ -108,8 +110,6 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 		{
 			SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
 		}
-
-		m_tipWnd = CreateTooltipControl(m_hDlg, m_resourceInstance);
 
 		OnInitDialogBase();
 	}
