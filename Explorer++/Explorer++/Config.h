@@ -70,7 +70,7 @@ struct Config
 	ValueWrapper<BOOL> useLargeToolbarIcons = FALSE;
 	BOOL handleZipFiles = FALSE;
 	BOOL overwriteExistingFilesConfirmation = TRUE;
-	BOOL checkBoxSelection = FALSE;
+	ValueWrapper<BOOL> checkBoxSelection = FALSE;
 	BOOL closeMainWindowOnTabClose = TRUE;
 	BOOL confirmCloseTabs = FALSE;
 	BOOL synchronizeTreeview = TRUE;

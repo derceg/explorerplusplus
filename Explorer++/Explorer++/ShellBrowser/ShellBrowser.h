@@ -433,6 +433,7 @@ private:
 	LRESULT OnListViewCustomDraw(NMLVCUSTOMDRAW *listViewCustomDraw);
 	void OnColorRulesUpdated();
 	void OnFullRowSelectUpdated(BOOL newValue);
+	void OnCheckBoxSelectionUpdated(BOOL newValue);
 
 	HRESULT GetListViewItemAttributes(int item, SFGAOF *attributes) const;
 

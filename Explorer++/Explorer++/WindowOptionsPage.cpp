@@ -134,7 +134,7 @@ void WindowOptionsPage::InitializeControls()
 		CheckDlgButton(GetDialog(), IDC_OPTION_GRIDLINES, BST_CHECKED);
 	}
 
-	if (m_config->checkBoxSelection)
+	if (m_config->checkBoxSelection.get())
 	{
 		CheckDlgButton(GetDialog(), IDC_OPTION_CHECKBOXSELECTION, BST_CHECKED);
 	}
@@ -194,8 +194,6 @@ void WindowOptionsPage::OnCommand(WPARAM wParam, LPARAM lParam)
 
 void WindowOptionsPage::SaveSettings()
 {
-	BOOL bCheckBoxSelection;
-
 	m_config->allowMultipleInstances =
 		(IsDlgButtonChecked(GetDialog(), IDC_OPTION_MULTIPLEINSTANCES) == BST_CHECKED);
 
@@ -232,33 +230,8 @@ void WindowOptionsPage::SaveSettings()
 	m_config->globalFolderSettings.showGridlines =
 		(IsDlgButtonChecked(GetDialog(), IDC_OPTION_GRIDLINES) == BST_CHECKED);
 
-	bCheckBoxSelection =
+	m_config->checkBoxSelection =
 		(IsDlgButtonChecked(GetDialog(), IDC_OPTION_CHECKBOXSELECTION) == BST_CHECKED);
-
-	if (m_config->checkBoxSelection != bCheckBoxSelection)
-	{
-		for (auto &tab :
-			m_coreInterface->GetTabContainer()->GetAllTabs() | boost::adaptors::map_values)
-		{
-			auto dwExtendedStyle =
-				ListView_GetExtendedListViewStyle(tab->GetShellBrowser()->GetListView());
-
-			if (bCheckBoxSelection)
-			{
-				dwExtendedStyle |= LVS_EX_CHECKBOXES;
-			}
-			else
-			{
-				dwExtendedStyle &= ~LVS_EX_CHECKBOXES;
-			}
-
-			ListView_SetExtendedListViewStyle(tab->GetShellBrowser()->GetListView(),
-				dwExtendedStyle);
-		}
-
-		m_config->checkBoxSelection =
-			(IsDlgButtonChecked(GetDialog(), IDC_OPTION_CHECKBOXSELECTION) == BST_CHECKED);
-	}
 
 	m_config->useFullRowSelect =
 		(IsDlgButtonChecked(GetDialog(), IDC_OPTION_FULLROWSELECT) == BST_CHECKED);

@@ -602,7 +602,7 @@ void ShellBrowser::OnListViewItemChanged(const NMLISTVIEW *changeData)
 		return;
 	}
 
-	if (m_config->checkBoxSelection && (LVIS_STATEIMAGEMASK & changeData->uNewState) != 0)
+	if (m_config->checkBoxSelection.get() && (LVIS_STATEIMAGEMASK & changeData->uNewState) != 0)
 	{
 		bool checked = ((changeData->uNewState & LVIS_STATEIMAGEMASK) >> 12) == 2;
 		ListViewHelper::SelectItem(m_hListView, changeData->iItem, checked);
@@ -616,7 +616,7 @@ void ShellBrowser::OnListViewItemChanged(const NMLISTVIEW *changeData)
 		return;
 	}
 
-	if (m_config->checkBoxSelection)
+	if (m_config->checkBoxSelection.get())
 	{
 		if (!previouslySelected && currentlySelected)
 		{
@@ -1343,4 +1343,9 @@ void ShellBrowser::OnColorRulesUpdated()
 void ShellBrowser::OnFullRowSelectUpdated(BOOL newValue)
 {
 	ListViewHelper::AddRemoveExtendedStyle(m_hListView, LVS_EX_FULLROWSELECT, newValue);
+}
+
+void ShellBrowser::OnCheckBoxSelectionUpdated(BOOL newValue)
+{
+	ListViewHelper::AddRemoveExtendedStyle(m_hListView, LVS_EX_CHECKBOXES, newValue);
 }

@@ -156,7 +156,7 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 		RegistrySettings::SaveDword(hSettingsKey, _T("AlwaysShowTabBar"),
 			m_config->alwaysShowTabBar.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("CheckBoxSelection"),
-			m_config->checkBoxSelection);
+			m_config->checkBoxSelection.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("ForceSize"),
 			m_config->globalFolderSettings.forceSize);
 		RegistrySettings::SaveDword(hSettingsKey, _T("SizeDisplayFormat"),

@@ -170,10 +170,13 @@ void ShellBrowser::InitializeListView()
 	m_connections.push_back(m_config->useFullRowSelect.addObserver(
 		std::bind_front(&ShellBrowser::OnFullRowSelectUpdated, this)));
 
-	if (m_config->checkBoxSelection)
+	if (m_config->checkBoxSelection.get())
 	{
 		dwExtendedStyle |= LVS_EX_CHECKBOXES;
 	}
+
+	m_connections.push_back(m_config->checkBoxSelection.addObserver(
+		std::bind_front(&ShellBrowser::OnCheckBoxSelectionUpdated, this)));
 
 	ListView_SetExtendedListViewStyle(m_hListView, dwExtendedStyle);
 
