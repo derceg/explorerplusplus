@@ -366,3 +366,28 @@ bool AddTooltipForControl(HWND tipWnd, HWND control, HINSTANCE resourceInstance,
 
 	return SendMessage(tipWnd, TTM_ADDTOOL, 0, reinterpret_cast<LPARAM>(&toolInfo));
 }
+
+void AddItemsToComboBox(HWND comboBox, const std::vector<ComboBoxItem> &items, int currentItemId)
+{
+	for (const auto &item : items)
+	{
+		int index = static_cast<int>(
+			SendMessage(comboBox, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(item.text.c_str())));
+
+		if (index == CB_ERR)
+		{
+			assert(false);
+			continue;
+		}
+
+		[[maybe_unused]] auto res =
+			SendMessage(comboBox, CB_SETITEMDATA, index, static_cast<LPARAM>(item.id));
+		assert(res != CB_ERR);
+
+		if (item.id == currentItemId)
+		{
+			res = SendMessage(comboBox, CB_SETCURSEL, index, 0);
+			assert(res != CB_ERR);
+		}
+	}
+}

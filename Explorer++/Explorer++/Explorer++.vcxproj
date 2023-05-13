@@ -727,6 +727,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AboutDialog.cpp" />
+    <ClCompile Include="AdvancedOptionsPage.cpp" />
+    <ClCompile Include="AppearanceOptionsPage.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="ApplicationContextMenu.cpp" />
     <ClCompile Include="ApplicationContextMenuController.cpp" />
@@ -746,12 +748,18 @@
     <ClCompile Include="ColorRuleRegistryStorage.cpp" />
     <ClCompile Include="ColorRuleXmlStorage.cpp" />
     <ClCompile Include="CrashHandlerHelper.cpp" />
+    <ClCompile Include="DefaultSettingsOptionsPage.cpp" />
     <ClCompile Include="DriveEnumeratorImpl.cpp" />
     <ClCompile Include="DriveModel.cpp" />
     <ClCompile Include="DrivesToolbarView.cpp" />
+    <ClCompile Include="FilesFoldersOptionsPage.cpp" />
+    <ClCompile Include="GeneralOptionsPage.cpp" />
+    <ClCompile Include="OptionsPage.cpp" />
     <ClCompile Include="ShellBrowser\SortModes.cpp" />
     <ClCompile Include="ShellChangeWatcher.cpp" />
     <ClCompile Include="ShellTreeView\ShellTreeNode.cpp" />
+    <ClCompile Include="TabsOptionsPage.cpp" />
+    <ClCompile Include="Theme.cpp" />
     <ClCompile Include="ToolbarView.cpp" />
     <ClCompile Include="Bookmarks\BookmarkIconManager.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkMenuController.cpp" />
@@ -915,6 +923,7 @@
     <ClCompile Include="ApplicationToolbar.cpp" />
     <ClCompile Include="WildcardSelectDialog.cpp" />
     <ClCompile Include="WindowHandler.cpp" />
+    <ClCompile Include="WindowOptionsPage.cpp" />
     <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="XMLSettings.cpp" />
   </ItemGroup>
@@ -923,6 +932,8 @@
     <ClInclude Include="AboutDialog.h" />
     <ClInclude Include="Accelerator.h" />
     <ClInclude Include="AcceleratorMappings.h" />
+    <ClInclude Include="AdvancedOptionsPage.h" />
+    <ClInclude Include="AppearanceOptionsPage.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationContextMenu.h" />
     <ClInclude Include="ApplicationContextMenuController.h" />
@@ -944,15 +955,21 @@
     <ClInclude Include="ColorRuleRegistryStorage.h" />
     <ClInclude Include="ColorRuleXmlStorage.h" />
     <ClInclude Include="CrashHandlerHelper.h" />
+    <ClInclude Include="DefaultSettingsOptionsPage.h" />
     <ClInclude Include="DialogHelper.h" />
     <ClInclude Include="DriveEnumerator.h" />
     <ClInclude Include="DriveEnumeratorImpl.h" />
     <ClInclude Include="DriveModel.h" />
     <ClInclude Include="DrivesToolbarView.h" />
     <ClInclude Include="DriveWatcher.h" />
+    <ClInclude Include="FilesFoldersOptionsPage.h" />
+    <ClInclude Include="GeneralOptionsPage.h" />
     <ClInclude Include="Navigator.h" />
+    <ClInclude Include="OptionsPage.h" />
     <ClInclude Include="ShellChangeWatcher.h" />
     <ClInclude Include="ShellTreeView\ShellTreeNode.h" />
+    <ClInclude Include="TabsOptionsPage.h" />
+    <ClInclude Include="Theme.h" />
     <ClInclude Include="ToolbarView.h" />
     <ClInclude Include="Bookmarks\BookmarkIconManager.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkMenuController.h" />
@@ -1094,6 +1111,7 @@
     <ClInclude Include="ValueWrapper.h" />
     <ClInclude Include="ViewModeHelper.h" />
     <ClInclude Include="WildcardSelectDialog.h" />
+    <ClInclude Include="WindowOptionsPage.h" />
     <ClInclude Include="XMLSettings.h" />
   </ItemGroup>
   <ItemGroup>

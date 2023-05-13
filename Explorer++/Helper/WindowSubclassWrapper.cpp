@@ -27,7 +27,8 @@ WindowSubclassWrapper::~WindowSubclassWrapper()
 {
 	if (m_subclassInstalled)
 	{
-		RemoveWindowSubclass(m_hwnd, m_subclassProc, m_subclassId);
+		[[maybe_unused]] BOOL res = RemoveWindowSubclass(m_hwnd, m_subclassProc, m_subclassId);
+		assert(res);
 	}
 }
 
@@ -37,6 +38,12 @@ LRESULT CALLBACK WindowSubclassWrapper::SubclassProcStub(HWND hwnd, UINT msg, WP
 	UNREFERENCED_PARAMETER(subclassId);
 
 	auto *subclassWrapper = reinterpret_cast<WindowSubclassWrapper *>(data);
+
+	if (msg == WM_NCDESTROY)
+	{
+		// There's no need to remove the subclass if the window is about to be destroyed.
+		subclassWrapper->m_subclassInstalled = false;
+	}
 
 	return subclassWrapper->m_subclass(hwnd, msg, wParam, lParam);
 }

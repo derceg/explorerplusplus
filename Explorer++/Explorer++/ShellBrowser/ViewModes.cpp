@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ViewModes.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 
 UINT GetViewModeMenuId(ViewMode viewMode)
 {
@@ -39,35 +40,47 @@ UINT GetViewModeMenuId(ViewMode viewMode)
 	}
 }
 
-UINT GetViewModeMenuStringId(ViewMode viewMode)
+std::wstring GetViewModeMenuText(ViewMode viewMode, HINSTANCE resourceInstance)
 {
+	UINT stringId;
+
 	switch (viewMode)
 	{
 	case ViewMode::Thumbnails:
-		return IDS_VIEW_THUMBNAILS;
+		stringId = IDS_VIEW_THUMBNAILS;
+		break;
 
 	case ViewMode::Tiles:
-		return IDS_VIEW_TILES;
+		stringId = IDS_VIEW_TILES;
+		break;
 
 	case ViewMode::ExtraLargeIcons:
-		return IDS_VIEW_EXTRALARGEICONS;
+		stringId = IDS_VIEW_EXTRALARGEICONS;
+		break;
 
 	case ViewMode::LargeIcons:
-		return IDS_VIEW_LARGEICONS;
+		stringId = IDS_VIEW_LARGEICONS;
+		break;
 
 	case ViewMode::Icons:
-		return IDS_VIEW_MEDIUMICONS;
+		stringId = IDS_VIEW_MEDIUMICONS;
+		break;
 
 	case ViewMode::SmallIcons:
-		return IDS_VIEW_SMALLICONS;
+		stringId = IDS_VIEW_SMALLICONS;
+		break;
 
 	case ViewMode::List:
-		return IDS_VIEW_LIST;
+		stringId = IDS_VIEW_LIST;
+		break;
 
 	case ViewMode::Details:
-		return IDS_VIEW_DETAILS;
+		stringId = IDS_VIEW_DETAILS;
+		break;
 
 	default:
 		throw std::runtime_error("ViewMode value not found");
 	}
+
+	return ResourceHelper::LoadString(resourceInstance, stringId);
 }

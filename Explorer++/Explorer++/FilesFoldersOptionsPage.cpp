@@ -1,0 +1,400 @@
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+#include "stdafx.h"
+#include "FilesFoldersOptionsPage.h"
+#include "Config.h"
+#include "CoreInterface.h"
+#include "DarkModeHelper.h"
+#include "MainResource.h"
+#include "ResourceHelper.h"
+#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellNavigationController.h"
+#include "TabContainer.h"
+#include "../Helper/Controls.h"
+#include "../Helper/ListViewHelper.h"
+#include "../Helper/ResizableDialogHelper.h"
+#include <boost/range/adaptor/map.hpp>
+
+std::wstring GetSizeDisplayFormatText(SizeDisplayFormat sizeDisplayFormat,
+	HINSTANCE resourceInstance);
+
+FilesFoldersOptionsPage::FilesFoldersOptionsPage(HWND parent, HINSTANCE resourceInstance,
+	Config *config, CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
+	HWND tooltipWindow) :
+	OptionsPage(IDD_OPTIONS_FILES_FOLDERS, IDS_OPTIONS_FILES_FOLDERS_TITLE, parent,
+		resourceInstance, config, coreInterface, settingChangedCallback, tooltipWindow)
+{
+}
+
+std::unique_ptr<ResizableDialogHelper> FilesFoldersOptionsPage::InitializeResizeDialogHelper()
+{
+	std::vector<ResizableDialogControl> controls;
+	controls.emplace_back(GetDlgItem(GetDialog(), IDC_SETTINGS_CHECK_SYSTEMFILES), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(GetDialog(), IDC_SETTINGS_CHECK_EXTENSIONS), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(GetDialog(), IDC_SETTINGS_CHECK_LINK), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(GetDialog(), IDC_SETTINGS_CHECK_INSERTSORTED),
+		MovingType::None, SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(GetDialog(), IDC_SETTINGS_CHECK_SINGLECLICK), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(GetDialog(), IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION),
+		MovingType::None, SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(GetDialog(), IDC_SETTINGS_CHECK_FOLDERSIZES), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(GetDialog(), IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE),
+		MovingType::None, SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(GetDialog(), IDC_SETTINGS_CHECK_ZIPFILES), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(GetDialog(), IDC_SETTINGS_CHECK_FRIENDLYDATES),
+		MovingType::None, SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(GetDialog(), IDC_OPTIONS_CHECK_SHOWINFOTIPS), MovingType::None,
+		SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(GetDialog(), IDC_OPTIONS_RADIO_SYSTEMINFOTIPS),
+		MovingType::None, SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(GetDialog(), IDC_OPTIONS_RADIO_CUSTOMINFOTIPS),
+		MovingType::None, SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(GetDialog(), IDC_DISPLAY_MIXED_FILES_AND_FOLDERS),
+		MovingType::None, SizingType::Horizontal);
+	controls.emplace_back(GetDlgItem(GetDialog(), IDC_USE_NATURAL_SORT_ORDER), MovingType::None,
+		SizingType::Horizontal);
+	return std::make_unique<ResizableDialogHelper>(GetDialog(), controls);
+}
+
+void FilesFoldersOptionsPage::InitializeControls()
+{
+	if (m_config->globalFolderSettings.hideSystemFiles)
+	{
+		CheckDlgButton(GetDialog(), IDC_SETTINGS_CHECK_SYSTEMFILES, BST_CHECKED);
+	}
+
+	if (!m_config->globalFolderSettings.showExtensions)
+	{
+		CheckDlgButton(GetDialog(), IDC_SETTINGS_CHECK_EXTENSIONS, BST_CHECKED);
+	}
+
+	if (m_config->globalFolderSettings.hideLinkExtension)
+	{
+		CheckDlgButton(GetDialog(), IDC_SETTINGS_CHECK_LINK, BST_CHECKED);
+	}
+
+	if (m_config->globalFolderSettings.insertSorted)
+	{
+		CheckDlgButton(GetDialog(), IDC_SETTINGS_CHECK_INSERTSORTED, BST_CHECKED);
+	}
+
+	if (m_config->globalFolderSettings.oneClickActivate)
+	{
+		CheckDlgButton(GetDialog(), IDC_SETTINGS_CHECK_SINGLECLICK, BST_CHECKED);
+	}
+
+	SetDlgItemInt(GetDialog(), IDC_OPTIONS_HOVER_TIME,
+		m_config->globalFolderSettings.oneClickActivateHoverTime, FALSE);
+	EnableWindow(GetDlgItem(GetDialog(), IDC_OPTIONS_HOVER_TIME),
+		m_config->globalFolderSettings.oneClickActivate);
+	EnableWindow(GetDlgItem(GetDialog(), IDC_LABEL_HOVER_TIME),
+		m_config->globalFolderSettings.oneClickActivate);
+
+	if (m_config->overwriteExistingFilesConfirmation)
+	{
+		CheckDlgButton(GetDialog(), IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION, BST_CHECKED);
+	}
+
+	if (m_config->globalFolderSettings.showFolderSizes)
+	{
+		CheckDlgButton(GetDialog(), IDC_SETTINGS_CHECK_FOLDERSIZES, BST_CHECKED);
+	}
+
+	if (m_config->globalFolderSettings.disableFolderSizesNetworkRemovable)
+	{
+		CheckDlgButton(GetDialog(), IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE, BST_CHECKED);
+	}
+
+	if (m_config->globalFolderSettings.forceSize)
+	{
+		CheckDlgButton(GetDialog(), IDC_SETTINGS_CHECK_FORCESIZE, BST_CHECKED);
+	}
+
+	if (m_config->handleZipFiles)
+	{
+		CheckDlgButton(GetDialog(), IDC_SETTINGS_CHECK_ZIPFILES, BST_CHECKED);
+	}
+
+	if (m_config->globalFolderSettings.showFriendlyDates)
+	{
+		CheckDlgButton(GetDialog(), IDC_SETTINGS_CHECK_FRIENDLYDATES, BST_CHECKED);
+	}
+
+	if (m_config->showInfoTips)
+	{
+		CheckDlgButton(GetDialog(), IDC_OPTIONS_CHECK_SHOWINFOTIPS, BST_CHECKED);
+	}
+
+	if (m_config->infoTipType == InfoTipType::System)
+	{
+		CheckDlgButton(GetDialog(), IDC_OPTIONS_RADIO_SYSTEMINFOTIPS, BST_CHECKED);
+	}
+	else
+	{
+		CheckDlgButton(GetDialog(), IDC_OPTIONS_RADIO_CUSTOMINFOTIPS, BST_CHECKED);
+	}
+
+	if (m_config->globalFolderSettings.displayMixedFilesAndFolders)
+	{
+		CheckDlgButton(GetDialog(), IDC_DISPLAY_MIXED_FILES_AND_FOLDERS, BST_CHECKED);
+	}
+
+	if (m_config->globalFolderSettings.useNaturalSortOrder)
+	{
+		CheckDlgButton(GetDialog(), IDC_USE_NATURAL_SORT_ORDER, BST_CHECKED);
+	}
+
+	AddTooltipForControl(m_tooltipWindow, GetDlgItem(GetDialog(), IDC_USE_NATURAL_SORT_ORDER),
+		m_resourceInstance, IDS_USE_NATURAL_SORT_ORDER_TOOLTIP);
+
+	HWND fileSizesComboBox = GetDlgItem(GetDialog(), IDC_COMBO_FILESIZES);
+	std::vector<ComboBoxItem> fileSizeItems;
+
+	for (auto size : { SizeDisplayFormat::Bytes, SizeDisplayFormat::KB, SizeDisplayFormat::MB,
+			 SizeDisplayFormat::GB, SizeDisplayFormat::TB, SizeDisplayFormat::PB })
+	{
+		fileSizeItems.emplace_back(static_cast<int>(size),
+			GetSizeDisplayFormatText(size, m_resourceInstance));
+	}
+
+	AddItemsToComboBox(fileSizesComboBox, fileSizeItems,
+		static_cast<int>(m_config->globalFolderSettings.sizeDisplayFormat));
+
+	EnableWindow(fileSizesComboBox, m_config->globalFolderSettings.forceSize);
+
+	SetInfoTipControlStates();
+	SetFolderSizeControlState();
+
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+
+	if (darkModeHelper.IsDarkModeEnabled())
+	{
+		darkModeHelper.SetDarkModeForComboBox(GetDlgItem(GetDialog(), IDC_COMBO_FILESIZES));
+
+		m_checkboxControlIds.insert({ IDC_SETTINGS_CHECK_SYSTEMFILES, IDC_SETTINGS_CHECK_EXTENSIONS,
+			IDC_SETTINGS_CHECK_LINK, IDC_SETTINGS_CHECK_INSERTSORTED,
+			IDC_SETTINGS_CHECK_SINGLECLICK, IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION,
+			IDC_SETTINGS_CHECK_FOLDERSIZES, IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE,
+			IDC_SETTINGS_CHECK_FORCESIZE, IDC_SETTINGS_CHECK_ZIPFILES,
+			IDC_SETTINGS_CHECK_FRIENDLYDATES, IDC_OPTIONS_CHECK_SHOWINFOTIPS,
+			IDC_DISPLAY_MIXED_FILES_AND_FOLDERS, IDC_USE_NATURAL_SORT_ORDER });
+
+		m_radioButtonControlIds.insert(
+			{ IDC_OPTIONS_RADIO_SYSTEMINFOTIPS, IDC_OPTIONS_RADIO_CUSTOMINFOTIPS });
+	}
+}
+
+void FilesFoldersOptionsPage::OnCommand(WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+
+	if (HIWORD(wParam) != 0)
+	{
+		switch (HIWORD(wParam))
+		{
+		case EN_CHANGE:
+		case CBN_SELCHANGE:
+			m_settingChangedCallback();
+			break;
+		}
+	}
+	else
+	{
+		switch (LOWORD(wParam))
+		{
+		case IDC_SETTINGS_CHECK_SYSTEMFILES:
+		case IDC_SETTINGS_CHECK_EXTENSIONS:
+		case IDC_SETTINGS_CHECK_LINK:
+		case IDC_SETTINGS_CHECK_INSERTSORTED:
+		case IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION:
+		case IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE:
+		case IDC_SETTINGS_CHECK_ZIPFILES:
+		case IDC_SETTINGS_CHECK_FRIENDLYDATES:
+		case IDC_OPTIONS_HOVER_TIME:
+		case IDC_DISPLAY_MIXED_FILES_AND_FOLDERS:
+		case IDC_USE_NATURAL_SORT_ORDER:
+			m_settingChangedCallback();
+			break;
+
+		case IDC_SETTINGS_CHECK_FORCESIZE:
+			EnableWindow(GetDlgItem(GetDialog(), IDC_COMBO_FILESIZES),
+				IsDlgButtonChecked(GetDialog(), LOWORD(wParam)) == BST_CHECKED);
+			m_settingChangedCallback();
+			break;
+
+		case IDC_OPTIONS_RADIO_SYSTEMINFOTIPS:
+		case IDC_OPTIONS_RADIO_CUSTOMINFOTIPS:
+			if (IsDlgButtonChecked(GetDialog(), LOWORD(wParam)) == BST_CHECKED)
+			{
+				m_settingChangedCallback();
+			}
+			break;
+
+		case IDC_OPTIONS_CHECK_SHOWINFOTIPS:
+			SetInfoTipControlStates();
+			m_settingChangedCallback();
+			break;
+
+		case IDC_SETTINGS_CHECK_FOLDERSIZES:
+			SetFolderSizeControlState();
+			m_settingChangedCallback();
+			break;
+
+		case IDC_SETTINGS_CHECK_SINGLECLICK:
+			EnableWindow(GetDlgItem(GetDialog(), IDC_OPTIONS_HOVER_TIME),
+				IsDlgButtonChecked(GetDialog(), LOWORD(wParam)) == BST_CHECKED);
+			EnableWindow(GetDlgItem(GetDialog(), IDC_LABEL_HOVER_TIME),
+				IsDlgButtonChecked(GetDialog(), LOWORD(wParam)) == BST_CHECKED);
+			m_settingChangedCallback();
+			break;
+		}
+	}
+}
+
+void FilesFoldersOptionsPage::SetInfoTipControlStates()
+{
+	HWND systemInfoTipsCheckBox = GetDlgItem(GetDialog(), IDC_OPTIONS_RADIO_SYSTEMINFOTIPS);
+	HWND customInfoTipsCheckBox = GetDlgItem(GetDialog(), IDC_OPTIONS_RADIO_CUSTOMINFOTIPS);
+
+	BOOL enable = (IsDlgButtonChecked(GetDialog(), IDC_OPTIONS_CHECK_SHOWINFOTIPS) == BST_CHECKED);
+
+	EnableWindow(systemInfoTipsCheckBox, enable);
+	EnableWindow(customInfoTipsCheckBox, enable);
+}
+
+void FilesFoldersOptionsPage::SetFolderSizeControlState()
+{
+	HWND folderSizesNetworkRemovable =
+		GetDlgItem(GetDialog(), IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE);
+
+	BOOL enable = (IsDlgButtonChecked(GetDialog(), IDC_SETTINGS_CHECK_FOLDERSIZES) == BST_CHECKED);
+
+	EnableWindow(folderSizesNetworkRemovable, enable);
+}
+
+std::wstring GetSizeDisplayFormatText(SizeDisplayFormat sizeDisplayFormat,
+	HINSTANCE resourceInstance)
+{
+	UINT stringId;
+
+	switch (sizeDisplayFormat)
+	{
+		break;
+	case SizeDisplayFormat::Bytes:
+		stringId = IDS_OPTIONS_DIALOG_FILE_SIZE_BYTES;
+		break;
+
+	case SizeDisplayFormat::KB:
+		stringId = IDS_OPTIONS_DIALOG_FILE_SIZE_KB;
+		break;
+
+	case SizeDisplayFormat::MB:
+		stringId = IDS_OPTIONS_DIALOG_FILE_SIZE_MB;
+		break;
+
+	case SizeDisplayFormat::GB:
+		stringId = IDS_OPTIONS_DIALOG_FILE_SIZE_GB;
+		break;
+
+	case SizeDisplayFormat::TB:
+		stringId = IDS_OPTIONS_DIALOG_FILE_SIZE_TB;
+		break;
+
+	case SizeDisplayFormat::PB:
+		stringId = IDS_OPTIONS_DIALOG_FILE_SIZE_PB;
+		break;
+
+	// SizeDisplayFormat::None isn't an option that's displayed to the user, so there should
+	// never be a string lookup for that item.
+	case SizeDisplayFormat::None:
+	default:
+		throw std::runtime_error("SizeDisplayFormat value not found or invalid");
+	}
+
+	return ResourceHelper::LoadString(resourceInstance, stringId);
+}
+
+void FilesFoldersOptionsPage::SaveSettings()
+{
+	HWND hCBSize;
+	int iSel;
+
+	m_config->globalFolderSettings.hideSystemFiles =
+		(IsDlgButtonChecked(GetDialog(), IDC_SETTINGS_CHECK_SYSTEMFILES) == BST_CHECKED);
+
+	m_config->globalFolderSettings.showExtensions =
+		!(IsDlgButtonChecked(GetDialog(), IDC_SETTINGS_CHECK_EXTENSIONS) == BST_CHECKED);
+
+	m_config->globalFolderSettings.hideLinkExtension =
+		(IsDlgButtonChecked(GetDialog(), IDC_SETTINGS_CHECK_LINK) == BST_CHECKED);
+
+	m_config->globalFolderSettings.insertSorted =
+		(IsDlgButtonChecked(GetDialog(), IDC_SETTINGS_CHECK_INSERTSORTED) == BST_CHECKED);
+
+	m_config->globalFolderSettings.oneClickActivate =
+		(IsDlgButtonChecked(GetDialog(), IDC_SETTINGS_CHECK_SINGLECLICK) == BST_CHECKED);
+
+	m_config->globalFolderSettings.oneClickActivateHoverTime =
+		GetDlgItemInt(GetDialog(), IDC_OPTIONS_HOVER_TIME, nullptr, FALSE);
+
+	m_config->overwriteExistingFilesConfirmation =
+		(IsDlgButtonChecked(GetDialog(), IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION)
+			== BST_CHECKED);
+
+	m_config->globalFolderSettings.showFolderSizes =
+		(IsDlgButtonChecked(GetDialog(), IDC_SETTINGS_CHECK_FOLDERSIZES) == BST_CHECKED);
+
+	m_config->globalFolderSettings.disableFolderSizesNetworkRemovable =
+		(IsDlgButtonChecked(GetDialog(), IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE)
+			== BST_CHECKED);
+
+	m_config->globalFolderSettings.forceSize =
+		(IsDlgButtonChecked(GetDialog(), IDC_SETTINGS_CHECK_FORCESIZE) == BST_CHECKED);
+
+	m_config->handleZipFiles =
+		(IsDlgButtonChecked(GetDialog(), IDC_SETTINGS_CHECK_ZIPFILES) == BST_CHECKED);
+
+	m_config->globalFolderSettings.showFriendlyDates =
+		(IsDlgButtonChecked(GetDialog(), IDC_SETTINGS_CHECK_FRIENDLYDATES) == BST_CHECKED);
+
+	m_config->showInfoTips =
+		(IsDlgButtonChecked(GetDialog(), IDC_OPTIONS_CHECK_SHOWINFOTIPS) == BST_CHECKED);
+
+	if (IsDlgButtonChecked(GetDialog(), IDC_OPTIONS_RADIO_SYSTEMINFOTIPS) == BST_CHECKED)
+	{
+		m_config->infoTipType = InfoTipType::System;
+	}
+	else
+	{
+		m_config->infoTipType = InfoTipType::Custom;
+	}
+
+	m_config->globalFolderSettings.displayMixedFilesAndFolders =
+		(IsDlgButtonChecked(GetDialog(), IDC_DISPLAY_MIXED_FILES_AND_FOLDERS) == BST_CHECKED);
+
+	m_config->globalFolderSettings.useNaturalSortOrder =
+		(IsDlgButtonChecked(GetDialog(), IDC_USE_NATURAL_SORT_ORDER) == BST_CHECKED);
+
+	hCBSize = GetDlgItem(GetDialog(), IDC_COMBO_FILESIZES);
+
+	iSel = (int) SendMessage(hCBSize, CB_GETCURSEL, 0, 0);
+	m_config->globalFolderSettings.sizeDisplayFormat =
+		(SizeDisplayFormat) SendMessage(hCBSize, CB_GETITEMDATA, iSel, 0);
+
+	for (auto &tab : m_coreInterface->GetTabContainer()->GetAllTabs() | boost::adaptors::map_values)
+	{
+		tab->GetShellBrowser()->GetNavigationController()->Refresh();
+
+		ListViewHelper::ActivateOneClickSelect(tab->GetShellBrowser()->GetListView(),
+			m_config->globalFolderSettings.oneClickActivate,
+			m_config->globalFolderSettings.oneClickActivateHoverTime);
+	}
+}

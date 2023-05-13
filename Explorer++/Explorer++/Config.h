@@ -9,6 +9,7 @@
 #include "IconResourceLoader.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ViewModes.h"
+#include "Theme.h"
 #include "ValueWrapper.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/ShellHelper.h"
@@ -34,14 +35,6 @@ enum class StartupMode
 	PreviousTabs = 1,
 	DefaultFolder = 2
 };
-
-// clang-format off
-BETTER_ENUM(Theme, int,
-	Light = 0,
-	Dark = 1,
-	System = 2
-)
-// clang-format on
 
 struct Config
 {

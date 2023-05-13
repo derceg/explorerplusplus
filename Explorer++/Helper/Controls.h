@@ -34,3 +34,11 @@ SIZE GetButtonSize(HWND hwnd, int partId, int stateId, int defaultWidth, int def
 
 bool AddTooltipForControl(HWND tipWnd, HWND control, HINSTANCE resourceInstance,
 	int stringResourceId, TooltipType tooltipType = TooltipType::Control);
+
+struct ComboBoxItem
+{
+	int id;
+	std::wstring text;
+};
+
+void AddItemsToComboBox(HWND comboBox, const std::vector<ComboBoxItem> &items, int currentItemId);

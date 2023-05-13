@@ -140,8 +140,7 @@ void Explorerplusplus::OnShowOptions()
 {
 	if (g_hwndOptions == nullptr)
 	{
-		auto *optionsDialog =
-			new OptionsDialog(m_resourceInstance, m_hContainer, m_config, this, m_tabContainer);
+		auto *optionsDialog = new OptionsDialog(m_resourceInstance, m_hContainer, m_config, this);
 		g_hwndOptions = optionsDialog->ShowModelessDialog([]() { g_hwndOptions = nullptr; });
 	}
 	else

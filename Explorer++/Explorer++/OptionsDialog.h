@@ -4,66 +4,32 @@
 
 #pragma once
 
-#include "Config.h"
 #include "DarkModeDialogBase.h"
-#include "../Helper/WindowSubclassWrapper.h"
 #include <wil/resource.h>
 #include <optional>
 #include <unordered_map>
 
+struct Config;
 class CoreInterface;
-class DarkModeGroupBox;
-class TabContainer;
+class OptionsPage;
 
 class OptionsDialog : public DarkModeDialogBase
 {
 public:
 	OptionsDialog(HINSTANCE resourceInstance, HWND parent, std::shared_ptr<Config> config,
-		CoreInterface *coreInterface, TabContainer *tabContainer);
+		CoreInterface *coreInterface);
 
 private:
-	struct PageInfo
-	{
-		UINT dialogResourceId;
-		UINT titleResourceId;
-		DLGPROC dialogProc;
-	};
-
-	enum class AdvancedOptionId
-	{
-		CheckSystemIsPinnedToNameSpaceTree,
-		OpenTabsInForeground,
-		GoUpOnDoubleClick
-	};
-
-	enum class AdvancedOptionType
-	{
-		Boolean
-	};
-
-	struct AdvancedOption
-	{
-		AdvancedOptionId id;
-		std::wstring name;
-		AdvancedOptionType type;
-		std::wstring description;
-	};
-
-	static const PageInfo SETTINGS_PAGES[];
-
 	// The amount of horizontal spacing between the treeview and each page.
 	static constexpr int TREEVIEW_PAGE_HORIZONTAL_SPACING = 4;
-
-	static constexpr UINT WM_APP_SAVE_SETTINGS = WM_APP + 1;
 
 	INT_PTR OnInitDialog() override;
 	void AddDynamicControls() override;
 	wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 	std::vector<ResizableDialogControl> GetResizableControls() override;
-	void AddSettingsPages();
-	void AddSettingsPage(UINT dialogResourceId, UINT titleResourceId, int pageIndex,
-		DLGPROC dialogProc, LPARAM dialogProcParam);
-	void SelectPage(int index);
+	void AddPages();
+	void AddPage(std::unique_ptr<OptionsPage> page);
+	void SelectPage(int id);
 
 	INT_PTR OnNotify(NMHDR *nmhdr) override;
 	void OnTreeViewSelectionChanged(const NMTREEVIEW *changeInfo);
@@ -80,96 +46,17 @@ private:
 	INT_PTR OnDestroy() override;
 	INT_PTR OnNcDestroy() override;
 
-	static INT_PTR CALLBACK GeneralSettingsProcStub(HWND hDlg, UINT uMsg, WPARAM wParam,
-		LPARAM lParam);
-	INT_PTR CALLBACK GeneralSettingsProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	static INT_PTR CALLBACK AppearanceProcStub(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	INT_PTR CALLBACK AppearanceProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	static INT_PTR CALLBACK FilesFoldersProcStub(HWND, UINT, WPARAM, LPARAM);
-	INT_PTR CALLBACK FilesFoldersProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	static INT_PTR CALLBACK WindowProcStub(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	INT_PTR CALLBACK WindowProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	static INT_PTR CALLBACK TabSettingsProcStub(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	INT_PTR CALLBACK TabSettingsProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	static INT_PTR CALLBACK DefaultSettingsProcStub(HWND hDlg, UINT uMsg, WPARAM wParam,
-		LPARAM lParam);
-	INT_PTR CALLBACK DefaultSettingsProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	static INT_PTR CALLBACK AdvancedSettingsProcStub(HWND hDlg, UINT uMsg, WPARAM wParam,
-		LPARAM lParam);
-	INT_PTR CALLBACK AdvancedSettingsProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-	void InitializeResizeDialogHelperGeneral(HWND dialog);
-	void InitializeResizeDialogHelperAppearance(HWND dialog);
-	void InitializeResizeDialogHelperFilesFolders(HWND dialog);
-	void InitializeResizeDialogHelperWindow(HWND dialog);
-	void InitializeResizeDialogHelperTabs(HWND dialog);
-	void InitializeResizeDialogHelperDefaultSettings(HWND dialog);
-	void InitializeResizeDialogHelperAdvanced(HWND dialog);
-
-	INT_PTR OnPageCtlColorDlg(HWND hwnd, HDC hdc);
-	INT_PTR OnCtlColor(HWND hwnd, HDC hdc);
-	INT_PTR OnCustomDraw(const NMCUSTOMDRAW *customDraw);
-
-	void OnReplaceExplorerSettingChanged(HWND dialog,
-		DefaultFileManager::ReplaceExplorerMode updatedReplaceMode);
-	bool UpdateReplaceExplorerSetting(HWND dialog,
-		DefaultFileManager::ReplaceExplorerMode updatedReplaceMode);
-
-	/* Default settings dialog. */
-	void OnDefaultSettingsNewTabDir(HWND hDlg);
-	void DefaultSettingsSetNewTabDir(HWND hEdit, const TCHAR *szPath);
-	void DefaultSettingsSetNewTabDir(HWND hEdit, PCIDLIST_ABSOLUTE pidl);
-
-	/* Files and folders dialog. */
-	void SetInfoTipWindowStates(HWND hDlg);
-	void SetFolderSizeWindowState(HWND hDlg);
-
-	template <typename T>
-	void AddItemsToComboBox(HWND comboBox, const std::vector<T> &itemIds, T currentItemId,
-		std::function<UINT(T)> getStringResourceId);
-
-	void AddLanguages(HWND hDlg);
-	BOOL AddLanguageToComboBox(HWND hComboBox, const TCHAR *szImageDirectory,
-		const TCHAR *szFileName, WORD *pdwLanguage);
-	int GetLanguageIDFromIndex(HWND hDlg, int iIndex);
-
-	LRESULT CALLBACK AdvancedOptionsListViewWndProc(HWND hwnd, UINT msg, WPARAM wParam,
-		LPARAM lParam);
-	std::vector<AdvancedOption> InitializeAdvancedOptions();
-	void InsertAdvancedOptionsIntoListView(HWND dlg);
-	bool GetBooleanConfigValue(AdvancedOptionId id);
-	void SetBooleanConfigValue(AdvancedOptionId id, bool value);
-	AdvancedOption *GetAdvancedOptionByIndex(HWND dlg, int index);
-
 	std::shared_ptr<Config> m_config;
 	HINSTANCE m_resourceInstance;
 	CoreInterface *m_coreInterface;
 
-	std::unordered_map<int, HWND> m_dialogMap;
+	int m_idCounter = 0;
+	std::unordered_map<int, std::unique_ptr<OptionsPage>> m_pageMap;
 	std::unordered_map<int, HTREEITEM> m_treeMap;
-	std::optional<int> m_currentPageIndex;
+	std::optional<int> m_currentPageId;
 	bool m_initializationFinished = false;
 
-	TabContainer *m_tabContainer;
-
 	wil::unique_hicon m_optionsDialogIcon;
-	wil::unique_hicon m_newTabDirectoryIcon;
 
-	std::unordered_set<int> m_checkboxControlIds;
-	std::unordered_set<int> m_radioButtonControlIds;
-	std::vector<std::unique_ptr<DarkModeGroupBox>> m_darkModeGroupBoxes;
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
-
-	std::vector<AdvancedOption> m_advancedOptions;
-	std::unique_ptr<WindowSubclassWrapper> m_advancedOptionsListViewSubclass;
-
-	static inline int m_lastSelectedPageIndex = 0;
-
-	std::unique_ptr<ResizableDialogHelper> m_resizableDialogHelperGeneral;
-	std::unique_ptr<ResizableDialogHelper> m_resizableDialogHelperAppearance;
-	std::unique_ptr<ResizableDialogHelper> m_resizableDialogHelperFilesFolders;
-	std::unique_ptr<ResizableDialogHelper> m_resizableDialogHelperWindow;
-	std::unique_ptr<ResizableDialogHelper> m_resizableDialogHelperTabs;
-	std::unique_ptr<ResizableDialogHelper> m_resizableDialogHelperDefaultSettings;
-	std::unique_ptr<ResizableDialogHelper> m_resizableDialogHelperAdvanced;
+	static inline std::optional<int> m_lastSelectedPageId;
 };

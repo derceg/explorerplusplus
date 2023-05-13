@@ -322,8 +322,7 @@ wil::unique_hmenu Explorerplusplus::InitializeRightClickMenu()
 
 	for (auto viewMode : VIEW_MODES)
 	{
-		std::wstring text =
-			ResourceHelper::LoadString(m_resourceInstance, GetViewModeMenuStringId(viewMode));
+		std::wstring text = GetViewModeMenuText(viewMode, m_resourceInstance);
 		MenuHelper::AddStringItem(parentMenu.get(), GetViewModeMenuId(viewMode), text,
 			IDM_RCLICK_VIEW_PLACEHOLDER, FALSE);
 	}

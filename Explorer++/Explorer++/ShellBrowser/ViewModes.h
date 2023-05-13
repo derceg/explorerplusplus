@@ -20,4 +20,4 @@ BETTER_ENUM(ViewMode, int,
 // clang-format on
 
 UINT GetViewModeMenuId(ViewMode viewMode);
-UINT GetViewModeMenuStringId(ViewMode viewMode);
+std::wstring GetViewModeMenuText(ViewMode viewMode, HINSTANCE resourceInstance);

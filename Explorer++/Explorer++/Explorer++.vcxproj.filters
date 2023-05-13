@@ -34,9 +34,6 @@
     <ClCompile Include="MergeFilesDialog.cpp">
       <Filter>General Dialogs</Filter>
     </ClCompile>
-    <ClCompile Include="OptionsDialog.cpp">
-      <Filter>General Dialogs</Filter>
-    </ClCompile>
     <ClCompile Include="RenameTabDialog.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
@@ -517,6 +514,36 @@
     <ClCompile Include="ShellBrowser\SortModes.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="OptionsPage.cpp">
+      <Filter>General Dialogs\Options</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneralOptionsPage.cpp">
+      <Filter>General Dialogs\Options</Filter>
+    </ClCompile>
+    <ClCompile Include="AppearanceOptionsPage.cpp">
+      <Filter>General Dialogs\Options</Filter>
+    </ClCompile>
+    <ClCompile Include="DefaultSettingsOptionsPage.cpp">
+      <Filter>General Dialogs\Options</Filter>
+    </ClCompile>
+    <ClCompile Include="FilesFoldersOptionsPage.cpp">
+      <Filter>General Dialogs\Options</Filter>
+    </ClCompile>
+    <ClCompile Include="TabsOptionsPage.cpp">
+      <Filter>General Dialogs\Options</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowOptionsPage.cpp">
+      <Filter>General Dialogs\Options</Filter>
+    </ClCompile>
+    <ClCompile Include="AdvancedOptionsPage.cpp">
+      <Filter>General Dialogs\Options</Filter>
+    </ClCompile>
+    <ClCompile Include="OptionsDialog.cpp">
+      <Filter>General Dialogs\Options</Filter>
+    </ClCompile>
+    <ClCompile Include="Theme.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -770,9 +797,6 @@
     </ClInclude>
     <ClInclude Include="IconResourceLoader.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="OptionsDialog.h">
-      <Filter>General Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowser\SortHelper.h">
       <Filter>ShellBrowser</Filter>
@@ -1047,6 +1071,36 @@
     <ClInclude Include="ShellTreeView\ShellTreeNode.h">
       <Filter>ShellTreeView</Filter>
     </ClInclude>
+    <ClInclude Include="OptionsPage.h">
+      <Filter>General Dialogs\Options</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneralOptionsPage.h">
+      <Filter>General Dialogs\Options</Filter>
+    </ClInclude>
+    <ClInclude Include="AppearanceOptionsPage.h">
+      <Filter>General Dialogs\Options</Filter>
+    </ClInclude>
+    <ClInclude Include="DefaultSettingsOptionsPage.h">
+      <Filter>General Dialogs\Options</Filter>
+    </ClInclude>
+    <ClInclude Include="FilesFoldersOptionsPage.h">
+      <Filter>General Dialogs\Options</Filter>
+    </ClInclude>
+    <ClInclude Include="TabsOptionsPage.h">
+      <Filter>General Dialogs\Options</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowOptionsPage.h">
+      <Filter>General Dialogs\Options</Filter>
+    </ClInclude>
+    <ClInclude Include="AdvancedOptionsPage.h">
+      <Filter>General Dialogs\Options</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionsDialog.h">
+      <Filter>General Dialogs\Options</Filter>
+    </ClInclude>
+    <ClInclude Include="Theme.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1181,6 +1235,9 @@
     </Filter>
     <Filter Include="Color Rules\UI">
       <UniqueIdentifier>{75d9a3fc-5fa8-45b6-a300-6e1d711ec008}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="General Dialogs\Options">
+      <UniqueIdentifier>{2904c500-a16e-431c-a86d-9c687bb0bb42}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
