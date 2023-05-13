@@ -195,10 +195,9 @@ void ShellBrowser::InitializeListView()
 	}
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hListView,
-		ListViewProcStub, reinterpret_cast<DWORD_PTR>(this)));
-
+		std::bind_front(&ShellBrowser::ListViewProc, this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(m_hListView),
-		ListViewParentProcStub, reinterpret_cast<DWORD_PTR>(this)));
+		std::bind_front(&ShellBrowser::ListViewParentProc, this)));
 
 	m_connections.push_back(
 		ColorRuleModelFactory::GetInstance()->GetColorRuleModel()->AddItemAddedObserver(

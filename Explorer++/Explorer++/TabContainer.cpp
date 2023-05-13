@@ -118,10 +118,10 @@ void TabContainer::Initialize(HWND parent)
 		SetWindowTheme(tooltips, L"Explorer", nullptr);
 	}
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd, WndProcStub,
-		reinterpret_cast<DWORD_PTR>(this)));
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parent, ParentWndProcStub,
-		reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
+		std::bind_front(&TabContainer::WndProc, this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parent,
+		std::bind_front(&TabContainer::ParentWndProc, this)));
 
 	m_connections.push_back(
 		tabCreatedSignal.AddObserver(std::bind_front(&TabContainer::OnTabCreated, this)));
@@ -165,16 +165,7 @@ TabContainer::~TabContainer()
 	RevokeDragDrop(m_hwnd);
 }
 
-LRESULT CALLBACK TabContainer::WndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-	UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
-{
-	UNREFERENCED_PARAMETER(uIdSubclass);
-
-	auto *tabContainer = reinterpret_cast<TabContainer *>(dwRefData);
-	return tabContainer->WndProc(hwnd, uMsg, wParam, lParam);
-}
-
-LRESULT CALLBACK TabContainer::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT TabContainer::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -601,16 +592,7 @@ void TabContainer::OnCloseTabsToRight(int index)
 	}
 }
 
-LRESULT CALLBACK TabContainer::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-	UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
-{
-	UNREFERENCED_PARAMETER(uIdSubclass);
-
-	auto *tabContainer = reinterpret_cast<TabContainer *>(dwRefData);
-	return tabContainer->ParentWndProc(hwnd, uMsg, wParam, lParam);
-}
-
-LRESULT CALLBACK TabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT TabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{

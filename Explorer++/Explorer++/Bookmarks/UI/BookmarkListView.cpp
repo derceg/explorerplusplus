@@ -55,10 +55,10 @@ BookmarkListView::BookmarkListView(HWND hListView, HINSTANCE resourceInstance,
 
 	InsertColumns(initialColumns);
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hListView, WndProcStub,
-		reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hListView,
+		std::bind_front(&BookmarkListView::WndProc, this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(m_hListView),
-		ParentWndProcStub, reinterpret_cast<DWORD_PTR>(this)));
+		std::bind_front(&BookmarkListView::ParentWndProc, this)));
 
 	m_connections.push_back(m_bookmarkTree->bookmarkItemAddedSignal.AddObserver(
 		std::bind_front(&BookmarkListView::OnBookmarkItemAdded, this)));
@@ -169,16 +169,7 @@ UINT BookmarkListView::GetColumnTextResourceId(BookmarkHelper::ColumnType column
 	throw std::runtime_error("Bookmark column string resource not found");
 }
 
-LRESULT CALLBACK BookmarkListView::WndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-	UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
-{
-	UNREFERENCED_PARAMETER(uIdSubclass);
-
-	auto *listView = reinterpret_cast<BookmarkListView *>(dwRefData);
-	return listView->WndProc(hwnd, uMsg, wParam, lParam);
-}
-
-LRESULT CALLBACK BookmarkListView::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT BookmarkListView::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -230,16 +221,7 @@ LRESULT CALLBACK BookmarkListView::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK BookmarkListView::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
-	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
-{
-	UNREFERENCED_PARAMETER(uIdSubclass);
-
-	auto *listView = reinterpret_cast<BookmarkListView *>(dwRefData);
-	return listView->ParentWndProc(hwnd, uMsg, wParam, lParam);
-}
-
-LRESULT CALLBACK BookmarkListView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT BookmarkListView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -1161,10 +1143,7 @@ BookmarkHelper::ColumnType BookmarkListView::MapPropertyTypeToColumnType(
 BookmarkListView::Column &BookmarkListView::GetColumnByType(BookmarkHelper::ColumnType columnType)
 {
 	auto itr = std::find_if(m_columns.begin(), m_columns.end(),
-		[columnType](const Column &column)
-		{
-			return column.columnType == columnType;
-		});
+		[columnType](const Column &column) { return column.columnType == columnType; });
 
 	assert(itr != m_columns.end());
 
@@ -1177,10 +1156,7 @@ std::optional<int> BookmarkListView::GetColumnHeaderIndexByType(
 	BookmarkHelper::ColumnType columnType) const
 {
 	auto itr = std::find_if(m_columns.begin(), m_columns.end(),
-		[columnType](const Column &column)
-		{
-			return column.columnType == columnType;
-		});
+		[columnType](const Column &column) { return column.columnType == columnType; });
 
 	if (itr == m_columns.end())
 	{
@@ -1192,11 +1168,8 @@ std::optional<int> BookmarkListView::GetColumnHeaderIndexByType(
 		return std::nullopt;
 	}
 
-	auto columnIndex = std::count_if(m_columns.begin(), itr,
-		[](const Column &column)
-		{
-			return column.active;
-		});
+	auto columnIndex =
+		std::count_if(m_columns.begin(), itr, [](const Column &column) { return column.active; });
 
 	return static_cast<int>(columnIndex);
 }
@@ -1207,18 +1180,12 @@ std::optional<int> BookmarkListView::GetColumnHeaderIndexByType(
 int BookmarkListView::GetColumnIndexByType(BookmarkHelper::ColumnType columnType) const
 {
 	auto itr = std::find_if(m_columns.begin(), m_columns.end(),
-		[columnType](const Column &column)
-		{
-			return column.columnType == columnType;
-		});
+		[columnType](const Column &column) { return column.columnType == columnType; });
 
 	assert(itr != m_columns.end());
 
-	auto columnIndex = std::count_if(m_columns.begin(), itr,
-		[](const Column &column)
-		{
-			return column.active;
-		});
+	auto columnIndex =
+		std::count_if(m_columns.begin(), itr, [](const Column &column) { return column.active; });
 
 	return static_cast<int>(columnIndex);
 }

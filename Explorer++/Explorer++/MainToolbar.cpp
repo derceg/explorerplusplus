@@ -165,8 +165,8 @@ void MainToolbar::Initialize(HWND parent)
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
 		std::bind_front(&MainToolbar::WndProc, this)));
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parent, ParentWndProcStub,
-		reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parent,
+		std::bind_front(&MainToolbar::ParentWndProc, this)));
 
 	m_coreInterface->AddTabsInitializedObserver(
 		[this]
@@ -243,7 +243,7 @@ std::unordered_map<int, int> MainToolbar::SetUpToolbarImageList(HIMAGELIST image
 	return imageListMappings;
 }
 
-LRESULT CALLBACK MainToolbar::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT MainToolbar::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -258,16 +258,7 @@ LRESULT CALLBACK MainToolbar::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK MainToolbar::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-	UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
-{
-	UNREFERENCED_PARAMETER(uIdSubclass);
-
-	auto *mainToolbar = reinterpret_cast<MainToolbar *>(dwRefData);
-	return mainToolbar->ParentWndProc(hwnd, uMsg, wParam, lParam);
-}
-
-LRESULT CALLBACK MainToolbar::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT MainToolbar::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{

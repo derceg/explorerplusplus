@@ -20,20 +20,10 @@ BookmarkMenu::BookmarkMenu(BookmarkTree *bookmarkTree, HINSTANCE resourceInstanc
 	m_controller(coreInterface, navigator)
 {
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parentWindow,
-		ParentWindowSubclassStub, reinterpret_cast<DWORD_PTR>(this)));
+		std::bind_front(&BookmarkMenu::ParentWindowSubclass, this)));
 }
 
-LRESULT CALLBACK BookmarkMenu::ParentWindowSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam,
-	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
-{
-	UNREFERENCED_PARAMETER(uIdSubclass);
-
-	auto *bookmarkMenu = reinterpret_cast<BookmarkMenu *>(dwRefData);
-	return bookmarkMenu->ParentWindowSubclass(hwnd, uMsg, wParam, lParam);
-}
-
-LRESULT CALLBACK BookmarkMenu::ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam,
-	LPARAM lParam)
+LRESULT BookmarkMenu::ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{

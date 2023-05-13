@@ -14,8 +14,8 @@ IconFetcher::IconFetcher(HWND hwnd, CachedIcons *cachedIcons) :
 		CoUninitialize),
 	m_iconResultIDCounter(0)
 {
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hwnd, WindowSubclassStub,
-		reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hwnd,
+		std::bind_front(&IconFetcher::WindowSubclass, this)));
 }
 
 IconFetcher::~IconFetcher()
@@ -23,17 +23,7 @@ IconFetcher::~IconFetcher()
 	m_iconThreadPool.clear_queue();
 }
 
-LRESULT CALLBACK IconFetcher::WindowSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-	UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
-{
-	UNREFERENCED_PARAMETER(uIdSubclass);
-
-	auto *iconFetcher = reinterpret_cast<IconFetcher *>(dwRefData);
-
-	return iconFetcher->WindowSubclass(hwnd, uMsg, wParam, lParam);
-}
-
-LRESULT CALLBACK IconFetcher::WindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT IconFetcher::WindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{

@@ -51,16 +51,7 @@ const std::vector<ColumnType> COMMON_RECYCLE_BIN_COLUMNS = { ColumnType::Name,
 
 std::vector<ColumnType> GetColumnHeaderMenuList(const std::wstring &directory);
 
-LRESULT CALLBACK ShellBrowser::ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-	UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
-{
-	UNREFERENCED_PARAMETER(uIdSubclass);
-
-	auto *shellBrowser = reinterpret_cast<ShellBrowser *>(dwRefData);
-	return shellBrowser->ListViewProc(hwnd, uMsg, wParam, lParam);
-}
-
-LRESULT CALLBACK ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	if (m_getDragImageMessage != 0 && uMsg == m_getDragImageMessage)
 	{
@@ -156,17 +147,7 @@ LRESULT CALLBACK ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK ShellBrowser::ListViewParentProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
-	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
-{
-	UNREFERENCED_PARAMETER(uIdSubclass);
-
-	auto *shellBrowser = reinterpret_cast<ShellBrowser *>(dwRefData);
-	return shellBrowser->ListViewParentProc(hwnd, uMsg, wParam, lParam);
-}
-
-LRESULT CALLBACK ShellBrowser::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM wParam,
-	LPARAM lParam)
+LRESULT ShellBrowser::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{

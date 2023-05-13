@@ -65,15 +65,15 @@ void AddressBar::Initialize(HWND parent)
 		std::bind_front(&AddressBar::ComboBoxExSubclass, this)));
 
 	HWND hEdit = reinterpret_cast<HWND>(SendMessage(m_hwnd, CBEM_GETEDITCONTROL, 0, 0));
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hEdit, EditSubclassStub,
-		reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hEdit,
+		std::bind_front(&AddressBar::EditSubclass, this)));
 
 	/* Turn on auto complete for the edit control within the combobox.
 	This will let the os complete paths as they are typed. */
 	SHAutoComplete(hEdit, SHACF_FILESYSTEM | SHACF_AUTOSUGGEST_FORCE_ON);
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parent, ParentWndProcStub,
-		reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parent,
+		std::bind_front(&AddressBar::ParentWndProc, this)));
 
 	m_coreInterface->AddTabsInitializedObserver(
 		[this]
@@ -120,17 +120,7 @@ std::optional<LRESULT> AddressBar::OnComboBoxExCtlColorEdit(HWND hwnd, HDC hdc)
 	return reinterpret_cast<LRESULT>(m_backgroundBrush.get());
 }
 
-LRESULT CALLBACK AddressBar::EditSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-	UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
-{
-	UNREFERENCED_PARAMETER(uIdSubclass);
-
-	auto *addressBar = reinterpret_cast<AddressBar *>(dwRefData);
-
-	return addressBar->EditSubclass(hwnd, uMsg, wParam, lParam);
-}
-
-LRESULT CALLBACK AddressBar::EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT AddressBar::EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -162,16 +152,7 @@ LRESULT CALLBACK AddressBar::EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LP
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK AddressBar::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-	UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
-{
-	UNREFERENCED_PARAMETER(uIdSubclass);
-
-	auto *addressBar = reinterpret_cast<AddressBar *>(dwRefData);
-	return addressBar->ParentWndProc(hwnd, uMsg, wParam, lParam);
-}
-
-LRESULT CALLBACK AddressBar::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT AddressBar::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{

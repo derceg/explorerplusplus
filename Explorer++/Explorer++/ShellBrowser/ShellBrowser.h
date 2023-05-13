@@ -399,13 +399,8 @@ private:
 	HRESULT RegisterShellWindowIfNecessary(PCIDLIST_ABSOLUTE pidl);
 	HRESULT RegisterShellWindow(PCIDLIST_ABSOLUTE pidl);
 
-	static LRESULT CALLBACK ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-	LRESULT CALLBACK ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-	static LRESULT CALLBACK ListViewParentProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
-		LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-	LRESULT CALLBACK ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	LRESULT ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	LRESULT ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	static int CALLBACK SortStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 

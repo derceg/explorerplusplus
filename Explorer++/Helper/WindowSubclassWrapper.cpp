@@ -5,17 +5,8 @@
 #include "stdafx.h"
 #include "WindowSubclassWrapper.h"
 
-WindowSubclassWrapper::WindowSubclassWrapper(HWND hwnd, SUBCLASSPROC subclassProc, DWORD_PTR data) :
-	m_hwnd(hwnd),
-	m_subclassProc(subclassProc),
-	m_subclassId(m_subclassIdCounter++)
-{
-	m_subclassInstalled = SetWindowSubclass(hwnd, subclassProc, m_subclassId, data);
-}
-
 WindowSubclassWrapper::WindowSubclassWrapper(HWND hwnd, Subclass subclass) :
 	m_hwnd(hwnd),
-	m_subclassProc(SubclassProcStub),
 	m_subclass(subclass),
 	m_subclassId(m_subclassIdCounter++)
 {
@@ -27,7 +18,7 @@ WindowSubclassWrapper::~WindowSubclassWrapper()
 {
 	if (m_subclassInstalled)
 	{
-		[[maybe_unused]] BOOL res = RemoveWindowSubclass(m_hwnd, m_subclassProc, m_subclassId);
+		[[maybe_unused]] BOOL res = RemoveWindowSubclass(m_hwnd, SubclassProcStub, m_subclassId);
 		assert(res);
 	}
 }

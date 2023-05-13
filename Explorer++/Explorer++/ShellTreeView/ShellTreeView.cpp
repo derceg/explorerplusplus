@@ -79,9 +79,9 @@ ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabCont
 	SetWindowTheme(m_hTreeView, L"Explorer", nullptr);
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hTreeView,
-		TreeViewProcStub, reinterpret_cast<DWORD_PTR>(this)));
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hParent, ParentWndProcStub,
-		reinterpret_cast<DWORD_PTR>(this)));
+		std::bind_front(&ShellTreeView::TreeViewProc, this)));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hParent,
+		std::bind_front(&ShellTreeView::ParentWndProc, this)));
 
 	m_iFolderIcon = GetDefaultFolderIconIndex();
 
@@ -121,17 +121,7 @@ void ShellTreeView::OnApplicationShuttingDown()
 	}
 }
 
-LRESULT CALLBACK ShellTreeView::TreeViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-	UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
-{
-	UNREFERENCED_PARAMETER(uIdSubclass);
-
-	auto *shellTreeView = reinterpret_cast<ShellTreeView *>(dwRefData);
-
-	return shellTreeView->TreeViewProc(hwnd, uMsg, wParam, lParam);
-}
-
-LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	if (m_getDragImageMessage != 0 && msg == m_getDragImageMessage)
 	{
@@ -256,16 +246,7 @@ LRESULT CALLBACK ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam,
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK ShellTreeView::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
-	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
-{
-	UNREFERENCED_PARAMETER(uIdSubclass);
-
-	auto *treeView = reinterpret_cast<ShellTreeView *>(dwRefData);
-	return treeView->ParentWndProc(hwnd, uMsg, wParam, lParam);
-}
-
-LRESULT CALLBACK ShellTreeView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT ShellTreeView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{

@@ -66,9 +66,7 @@ private:
 		std::future<std::optional<IconResult>> iconResult;
 	};
 
-	static LRESULT CALLBACK WindowSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-	LRESULT CALLBACK WindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	LRESULT WindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	static std::optional<int> FindIconAsync(PCIDLIST_ABSOLUTE pidl);
 	void ProcessIconResult(int iconResultId);

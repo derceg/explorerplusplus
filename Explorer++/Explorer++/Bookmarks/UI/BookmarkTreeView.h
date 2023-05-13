@@ -41,13 +41,8 @@ private:
 
 	static inline const double FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE = 0.2;
 
-	static LRESULT CALLBACK BookmarkTreeViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
-		LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-	LRESULT CALLBACK TreeViewProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam);
-
-	static LRESULT CALLBACK BookmarkTreeViewParentProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
-		LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-	LRESULT CALLBACK TreeViewParentProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+	LRESULT TreeViewProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+	LRESULT TreeViewParentProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
 	static LRESULT CALLBACK TreeViewEditProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);

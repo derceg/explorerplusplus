@@ -32,8 +32,7 @@ public:
 	bool IsWithinDrag() const;
 
 private:
-	static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
-		UINT_PTR subclassId, DWORD_PTR data);
+	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	static IDropTargetHelper *GetDropTargetHelper();
 

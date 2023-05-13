@@ -12,15 +12,12 @@ DropTargetWindow::DropTargetWindow(HWND hwnd, DropTargetInternal *dropTargetInte
 {
 	RegisterDragDrop(hwnd, this);
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hwnd, WndProc, 0));
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hwnd,
+		std::bind_front(&DropTargetWindow::WndProc, this)));
 }
 
-LRESULT CALLBACK DropTargetWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
-	UINT_PTR subclassId, DWORD_PTR data)
+LRESULT DropTargetWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	UNREFERENCED_PARAMETER(subclassId);
-	UNREFERENCED_PARAMETER(data);
-
 	switch (msg)
 	{
 	case WM_DESTROY:
