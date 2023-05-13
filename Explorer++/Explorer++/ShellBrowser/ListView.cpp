@@ -1339,3 +1339,8 @@ void ShellBrowser::OnColorRulesUpdated()
 	// Any changes to the color rules will require the listview to be redrawn.
 	InvalidateRect(m_hListView, nullptr, false);
 }
+
+void ShellBrowser::OnFullRowSelectUpdated(BOOL newValue)
+{
+	ListViewHelper::AddRemoveExtendedStyle(m_hListView, LVS_EX_FULLROWSELECT, newValue);
+}

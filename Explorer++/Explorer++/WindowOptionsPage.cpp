@@ -139,7 +139,7 @@ void WindowOptionsPage::InitializeControls()
 		CheckDlgButton(GetDialog(), IDC_OPTION_CHECKBOXSELECTION, BST_CHECKED);
 	}
 
-	if (m_config->useFullRowSelect)
+	if (m_config->useFullRowSelect.get())
 	{
 		CheckDlgButton(GetDialog(), IDC_OPTION_FULLROWSELECT, BST_CHECKED);
 	}
@@ -271,8 +271,5 @@ void WindowOptionsPage::SaveSettings()
 		/* TODO: The tab should monitor for settings
 		changes itself. */
 		tab->GetShellBrowser()->OnGridlinesSettingChanged();
-
-		ListViewHelper::AddRemoveExtendedStyle(tab->GetShellBrowser()->GetListView(),
-			LVS_EX_FULLROWSELECT, m_config->useFullRowSelect);
 	}
 }

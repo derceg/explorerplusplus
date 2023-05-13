@@ -63,7 +63,7 @@ struct Config
 	BOOL treeViewDelayEnabled = FALSE;
 	BOOL treeViewAutoExpandSelected = FALSE;
 	BOOL showTaskbarThumbnails = TRUE;
-	BOOL useFullRowSelect = FALSE;
+	ValueWrapper<BOOL> useFullRowSelect = FALSE;
 	BOOL showFilePreviews = TRUE;
 	BOOL allowMultipleInstances = TRUE;
 	BOOL doubleClickTabClose = TRUE;

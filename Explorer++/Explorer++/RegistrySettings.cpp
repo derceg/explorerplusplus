@@ -131,7 +131,7 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 		RegistrySettings::SaveDword(hSettingsKey, _T("ExtendTabControl"),
 			m_config->extendTabControl.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("UseFullRowSelect"),
-			m_config->useFullRowSelect);
+			m_config->useFullRowSelect.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowFilePreviews"),
 			m_config->showFilePreviews);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ReplaceExplorerMode"),

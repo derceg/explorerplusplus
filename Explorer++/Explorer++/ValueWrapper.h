@@ -49,13 +49,19 @@ public:
 		}
 	}
 
+	ValueWrapper &operator=(T value)
+	{
+		set(value);
+		return *this;
+	}
+
 	template <typename... Args>
-	boost::signals2::connection addObserver(Args &&...args)
+	boost::signals2::connection addObserver(Args &&...args) const
 	{
 		return m_valueUpdatedSignal.connect(std::forward<Args>(args)...);
 	}
 
 private:
 	T m_value;
-	ValueUpdatedSignal m_valueUpdatedSignal;
+	mutable ValueUpdatedSignal m_valueUpdatedSignal;
 };

@@ -692,7 +692,7 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 		NXMLSettings::EncodeBoolValue(m_config->treeViewAutoExpandSelected));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("UseFullRowSelect"),
-		NXMLSettings::EncodeBoolValue(m_config->useFullRowSelect));
+		NXMLSettings::EncodeBoolValue(m_config->useFullRowSelect.get()));
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("IconTheme"),

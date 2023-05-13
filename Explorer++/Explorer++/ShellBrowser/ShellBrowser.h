@@ -432,6 +432,7 @@ private:
 	BOOL OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo);
 	LRESULT OnListViewCustomDraw(NMLVCUSTOMDRAW *listViewCustomDraw);
 	void OnColorRulesUpdated();
+	void OnFullRowSelectUpdated(BOOL newValue);
 
 	HRESULT GetListViewItemAttributes(int item, SFGAOF *attributes) const;
 
