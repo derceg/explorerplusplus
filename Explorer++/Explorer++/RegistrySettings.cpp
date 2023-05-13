@@ -194,7 +194,7 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 		RegistrySettings::SaveDword(hSettingsKey, _T("ViewModeGlobal"),
 			m_config->defaultFolderSettings.viewMode);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowGridlinesGlobal"),
-			m_config->globalFolderSettings.showGridlines);
+			m_config->globalFolderSettings.showGridlines.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowInGroupsGlobal"),
 			m_config->defaultFolderSettings.showInGroups);
 		RegistrySettings::SaveDword(hSettingsKey, _T("AutoArrangeGlobal"),

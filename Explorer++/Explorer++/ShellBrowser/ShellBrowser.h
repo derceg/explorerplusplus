@@ -175,7 +175,6 @@ public:
 	void QueueRename(PCIDLIST_ABSOLUTE pidlItem);
 	void SelectItems(const std::list<std::wstring> &PastedFileList);
 	void OnDeviceChange(UINT eventType, LONG_PTR eventData);
-	void OnGridlinesSettingChanged();
 	void AutoSizeColumns();
 
 	// Signals
@@ -434,6 +433,7 @@ private:
 	void OnColorRulesUpdated();
 	void OnFullRowSelectUpdated(BOOL newValue);
 	void OnCheckBoxSelectionUpdated(BOOL newValue);
+	void OnShowGridlinesUpdated(BOOL newValue);
 
 	HRESULT GetListViewItemAttributes(int item, SFGAOF *attributes) const;
 

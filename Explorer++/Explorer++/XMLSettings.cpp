@@ -643,7 +643,7 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 		NXMLSettings::EncodeBoolValue(m_config->showFullTitlePath.get()));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowGridlinesGlobal"),
-		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.showGridlines));
+		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.showGridlines.get()));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowHiddenGlobal"),
 		NXMLSettings::EncodeBoolValue(m_config->defaultFolderSettings.showHidden));

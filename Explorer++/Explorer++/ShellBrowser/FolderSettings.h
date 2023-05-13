@@ -7,6 +7,7 @@
 #include "Columns.h"
 #include "DefaultColumns.h"
 #include "SortModes.h"
+#include "ValueWrapper.h"
 #include "ViewModes.h"
 #include "../Helper/StringHelper.h"
 
@@ -40,7 +41,7 @@ struct GlobalFolderSettings
 	BOOL hideSystemFiles = FALSE;
 	BOOL hideLinkExtension = FALSE;
 	BOOL insertSorted = TRUE;
-	BOOL showGridlines = TRUE;
+	ValueWrapper<BOOL> showGridlines = TRUE;
 	BOOL forceSize = FALSE;
 	SizeDisplayFormat sizeDisplayFormat = SizeDisplayFormat::Bytes;
 	BOOL oneClickActivate = FALSE;

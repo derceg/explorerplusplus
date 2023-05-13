@@ -5,15 +5,10 @@
 #include "stdafx.h"
 #include "WindowOptionsPage.h"
 #include "Config.h"
-#include "CoreInterface.h"
 #include "DarkModeGroupBox.h"
 #include "DarkModeHelper.h"
 #include "MainResource.h"
-#include "ShellBrowser/ShellBrowser.h"
-#include "TabContainer.h"
-#include "../Helper/ListViewHelper.h"
 #include "../Helper/ResizableDialogHelper.h"
-#include <boost/range/adaptor/map.hpp>
 
 WindowOptionsPage::WindowOptionsPage(HWND parent, HINSTANCE resourceInstance, Config *config,
 	CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
@@ -129,7 +124,7 @@ void WindowOptionsPage::InitializeControls()
 		CheckDlgButton(GetDialog(), IDC_OPTION_TREEVIEWDELAY, BST_CHECKED);
 	}
 
-	if (m_config->globalFolderSettings.showGridlines)
+	if (m_config->globalFolderSettings.showGridlines.get())
 	{
 		CheckDlgButton(GetDialog(), IDC_OPTION_GRIDLINES, BST_CHECKED);
 	}
@@ -238,11 +233,4 @@ void WindowOptionsPage::SaveSettings()
 
 	m_config->useLargeToolbarIcons.set(
 		IsDlgButtonChecked(GetDialog(), IDC_OPTION_LARGETOOLBARICONS) == BST_CHECKED);
-
-	for (auto &tab : m_coreInterface->GetTabContainer()->GetAllTabs() | boost::adaptors::map_values)
-	{
-		/* TODO: The tab should monitor for settings
-		changes itself. */
-		tab->GetShellBrowser()->OnGridlinesSettingChanged();
-	}
 }

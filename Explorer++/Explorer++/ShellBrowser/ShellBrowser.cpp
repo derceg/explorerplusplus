@@ -181,7 +181,10 @@ void ShellBrowser::InitializeListView()
 	ListView_SetExtendedListViewStyle(m_hListView, dwExtendedStyle);
 
 	ListViewHelper::SetAutoArrange(m_hListView, m_folderSettings.autoArrange);
-	ListViewHelper::SetGridlines(m_hListView, m_config->globalFolderSettings.showGridlines);
+	ListViewHelper::SetGridlines(m_hListView, m_config->globalFolderSettings.showGridlines.get());
+
+	m_connections.push_back(m_config->globalFolderSettings.showGridlines.addObserver(
+		std::bind_front(&ShellBrowser::OnShowGridlinesUpdated, this)));
 
 	ListViewHelper::ActivateOneClickSelect(m_hListView,
 		m_config->globalFolderSettings.oneClickActivate,
@@ -526,11 +529,6 @@ int ShellBrowser::GetId() const
 	assert(m_ID);
 
 	return *m_ID;
-}
-
-void ShellBrowser::OnGridlinesSettingChanged()
-{
-	ListViewHelper::SetGridlines(m_hListView, m_config->globalFolderSettings.showGridlines);
 }
 
 std::wstring ShellBrowser::GetItemName(int index) const

@@ -1349,3 +1349,8 @@ void ShellBrowser::OnCheckBoxSelectionUpdated(BOOL newValue)
 {
 	ListViewHelper::AddRemoveExtendedStyle(m_hListView, LVS_EX_CHECKBOXES, newValue);
 }
+
+void ShellBrowser::OnShowGridlinesUpdated(BOOL newValue)
+{
+	ListViewHelper::SetGridlines(m_hListView, newValue);
+}
