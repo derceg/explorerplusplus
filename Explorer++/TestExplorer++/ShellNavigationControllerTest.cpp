@@ -447,7 +447,7 @@ TEST_F(ShellNavigationControllerTest, HistoryEntries)
 	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl1.get()));
 }
 
-TEST_F(ShellNavigationControllerTest, NavigationMode)
+TEST_F(ShellNavigationControllerTest, SetNavigationMode)
 {
 	unique_pidl_absolute pidl(SHSimpleIDListFromPath(L"C:\\Fake"));
 	ASSERT_TRUE(pidl);
@@ -462,8 +462,7 @@ TEST_F(ShellNavigationControllerTest, NavigationMode)
 	HRESULT hr = m_navigationController.Navigate(params);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
-	m_navigationController.SetNavigationMode(
-		ShellNavigationController::NavigationMode::ForceNewTab);
+	m_navigationController.SetNavigationMode(NavigationMode::ForceNewTab);
 
 	EXPECT_CALL(m_navigator, NavigateImpl(_)).Times(0);
 
@@ -473,10 +472,9 @@ TEST_F(ShellNavigationControllerTest, NavigationMode)
 	ASSERT_HRESULT_SUCCEEDED(hr);
 }
 
-TEST_F(ShellNavigationControllerTest, NavigationModeFirstNavigation)
+TEST_F(ShellNavigationControllerTest, SetNavigationModeFirstNavigation)
 {
-	m_navigationController.SetNavigationMode(
-		ShellNavigationController::NavigationMode::ForceNewTab);
+	m_navigationController.SetNavigationMode(NavigationMode::ForceNewTab);
 
 	unique_pidl_absolute pidl1(SHSimpleIDListFromPath(L"C:\\Fake1"));
 	ASSERT_TRUE(pidl1);

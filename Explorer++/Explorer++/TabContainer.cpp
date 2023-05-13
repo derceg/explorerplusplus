@@ -927,16 +927,17 @@ Tab &TabContainer::CreateNewTab(const std::wstring &directory, const TabSettings
 
 Tab &TabContainer::CreateNewTab(const PreservedTab &preservedTab)
 {
-	PreservedHistoryEntry *entry = preservedTab.history.at(preservedTab.currentEntry).get();
-
-	auto tabTemp =
-		std::make_unique<Tab>(preservedTab, m_coreInterface, m_tabNavigation, m_fileActionHandler);
+	auto shellBrowser = ShellBrowser::CreateFromPreserved(m_coreInterface->GetMainWindow(),
+		m_coreInterface, m_tabNavigation, m_fileActionHandler, preservedTab.history,
+		preservedTab.currentEntry, preservedTab.preservedFolderState);
+	auto tabTemp = std::make_unique<Tab>(preservedTab, shellBrowser);
 	auto item = m_tabs.insert({ tabTemp->GetId(), std::move(tabTemp) });
 
 	Tab &tab = *item.first->second;
 
 	TabSettings tabSettings(_index = preservedTab.index, _selected = true);
 
+	PreservedHistoryEntry *entry = preservedTab.history.at(preservedTab.currentEntry).get();
 	auto navigateParams = NavigateParams::Normal(entry->pidl.get(), false);
 	return SetUpNewTab(tab, navigateParams, tabSettings);
 }
@@ -944,8 +945,20 @@ Tab &TabContainer::CreateNewTab(const PreservedTab &preservedTab)
 Tab &TabContainer::CreateNewTab(NavigateParams &navigateParams, const TabSettings &tabSettings,
 	const FolderSettings *folderSettings, const FolderColumns *initialColumns)
 {
-	auto tabTemp = std::make_unique<Tab>(m_coreInterface, m_tabNavigation, m_fileActionHandler,
-		folderSettings, initialColumns);
+	FolderSettings folderSettingsFinal;
+
+	if (folderSettings)
+	{
+		folderSettingsFinal = *folderSettings;
+	}
+	else
+	{
+		folderSettingsFinal = m_coreInterface->GetConfig()->defaultFolderSettings;
+	}
+
+	auto shellBrowser = ShellBrowser::CreateNew(m_coreInterface->GetMainWindow(), m_coreInterface,
+		m_tabNavigation, m_fileActionHandler, folderSettingsFinal, initialColumns);
+	auto tabTemp = std::make_unique<Tab>(shellBrowser);
 	auto item = m_tabs.insert({ tabTemp->GetId(), std::move(tabTemp) });
 
 	Tab &tab = *item.first->second;

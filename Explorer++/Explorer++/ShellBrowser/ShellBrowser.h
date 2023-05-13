@@ -59,12 +59,11 @@ class ShellBrowser :
 	public std::enable_shared_from_this<ShellBrowser>
 {
 public:
-	static std::shared_ptr<ShellBrowser> CreateNew(int id, HWND hOwner,
-		CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
-		FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
-		const FolderColumns *initialColumns);
+	static std::shared_ptr<ShellBrowser> CreateNew(HWND hOwner, CoreInterface *coreInterface,
+		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
+		const FolderSettings &folderSettings, const FolderColumns *initialColumns);
 
-	static std::shared_ptr<ShellBrowser> CreateFromPreserved(int id, HWND hOwner,
+	static std::shared_ptr<ShellBrowser> CreateFromPreserved(HWND hOwner,
 		CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
 		FileActionHandler *fileActionHandler,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
@@ -113,6 +112,7 @@ public:
 	int GetNumSelected() const;
 
 	/* ID. */
+	void SetID(int id);
 	int GetId() const;
 
 	/* Directory modification support. */
@@ -353,13 +353,13 @@ private:
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
 
-	ShellBrowser(int id, HWND hOwner, CoreInterface *coreInterface,
-		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
+	ShellBrowser(HWND hOwner, CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
+		FileActionHandler *fileActionHandler,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 		const PreservedFolderState &preservedFolderState);
-	ShellBrowser(int id, HWND hOwner, CoreInterface *coreInterface,
-		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
-		const FolderSettings &folderSettings, const FolderColumns *initialColumns);
+	ShellBrowser(HWND hOwner, CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
+		FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
+		const FolderColumns *initialColumns);
 
 	static HWND CreateListView(HWND parent);
 	void InitializeListView();
@@ -649,7 +649,7 @@ private:
 	FolderSettings m_folderSettings;
 
 	/* ID. */
-	const int m_ID;
+	std::optional<int> m_ID;
 
 	// Directory monitoring
 	ShellChangeWatcher m_shellChangeWatcher;

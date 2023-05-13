@@ -14,38 +14,30 @@
 
 int Tab::idCounter = 1;
 
-Tab::Tab(CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
-	FileActionHandler *fileActionHandler, const FolderSettings *folderSettings,
-	const FolderColumns *initialColumns) :
+Tab::Tab(std::shared_ptr<ShellBrowser> shellBrowser) :
 	m_id(idCounter++),
 	m_useCustomName(false),
-	m_lockState(LockState::NotLocked)
+	m_lockState(LockState::NotLocked),
+	m_shellBrowser(shellBrowser)
 {
-	FolderSettings folderSettingsFinal;
-
-	if (folderSettings)
+	// The provided ShellBrowser instance may be null in tests.
+	if (m_shellBrowser)
 	{
-		folderSettingsFinal = *folderSettings;
+		m_shellBrowser->SetID(m_id);
 	}
-	else
-	{
-		folderSettingsFinal = coreInterface->GetConfig()->defaultFolderSettings;
-	}
-
-	m_shellBrowser = ShellBrowser::CreateNew(m_id, coreInterface->GetMainWindow(), coreInterface,
-		tabNavigation, fileActionHandler, folderSettingsFinal, initialColumns);
 }
 
-Tab::Tab(const PreservedTab &preservedTab, CoreInterface *coreInterface,
-	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler) :
+Tab::Tab(const PreservedTab &preservedTab, std::shared_ptr<ShellBrowser> shellBrowser) :
 	m_id(idCounter++),
 	m_useCustomName(preservedTab.useCustomName),
 	m_customName(preservedTab.customName),
-	m_lockState(preservedTab.lockState)
+	m_lockState(preservedTab.lockState),
+	m_shellBrowser(shellBrowser)
 {
-	m_shellBrowser = ShellBrowser::CreateFromPreserved(m_id, coreInterface->GetMainWindow(),
-		coreInterface, tabNavigation, fileActionHandler, preservedTab.history,
-		preservedTab.currentEntry, preservedTab.preservedFolderState);
+	if (m_shellBrowser)
+	{
+		m_shellBrowser->SetID(m_id);
+	}
 }
 
 int Tab::GetId() const
@@ -70,6 +62,11 @@ std::wstring Tab::GetName() const
 	if (m_useCustomName)
 	{
 		return m_customName;
+	}
+
+	if (!m_shellBrowser)
+	{
+		return {};
 	}
 
 	auto pidlDirectory = m_shellBrowser->GetDirectoryIdl();
@@ -120,18 +117,12 @@ void Tab::SetLockState(LockState lockState)
 
 	m_lockState = lockState;
 
-	switch (lockState)
+	if (m_shellBrowser)
 	{
-	case Tab::LockState::NotLocked:
-	case Tab::LockState::Locked:
-		m_shellBrowser->GetNavigationController()->SetNavigationMode(
-			ShellNavigationController::NavigationMode::Normal);
-		break;
-
-	case Tab::LockState::AddressLocked:
-		m_shellBrowser->GetNavigationController()->SetNavigationMode(
-			ShellNavigationController::NavigationMode::ForceNewTab);
-		break;
+		NavigationMode navigationMode = (lockState == LockState::AddressLocked)
+			? NavigationMode::ForceNewTab
+			: NavigationMode::Normal;
+		m_shellBrowser->GetNavigationController()->SetNavigationMode(navigationMode);
 	}
 
 	m_tabUpdatedSignal(*this, PropertyType::LockState);

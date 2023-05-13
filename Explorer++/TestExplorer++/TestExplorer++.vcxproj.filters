@@ -97,6 +97,9 @@
     <ClCompile Include="PidlHelperTest.cpp">
       <Filter>Helper\Shell</Filter>
     </ClCompile>
+    <ClCompile Include="TabTest.cpp">
+      <Filter>Tabs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -143,6 +146,9 @@
     </Filter>
     <Filter Include="Color Rules">
       <UniqueIdentifier>{6642ce38-3d5a-404a-bd42-e4ab89f4fe91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tabs">
+      <UniqueIdentifier>{d70d355e-ee53-4060-8e33-1c5a87ef6f71}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

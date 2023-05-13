@@ -16,15 +16,15 @@ struct PreservedHistoryEntry;
 class ShellNavigator;
 class TabNavigationInterface;
 
+enum class NavigationMode
+{
+	Normal,
+	ForceNewTab
+};
+
 class ShellNavigationController : public NavigationController<HistoryEntry, HRESULT>
 {
 public:
-	enum class NavigationMode
-	{
-		Normal,
-		ForceNewTab
-	};
-
 	ShellNavigationController(ShellNavigator *navigator, TabNavigationInterface *tabNavigation,
 		IconFetcherInterface *iconFetcher);
 	ShellNavigationController(ShellNavigator *navigator, TabNavigationInterface *tabNavigation,

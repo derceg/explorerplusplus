@@ -32,42 +32,40 @@
 
 void CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 
-std::shared_ptr<ShellBrowser> ShellBrowser::CreateNew(int id, HWND hOwner,
-	CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
-	FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
-	const FolderColumns *initialColumns)
+std::shared_ptr<ShellBrowser> ShellBrowser::CreateNew(HWND hOwner, CoreInterface *coreInterface,
+	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
+	const FolderSettings &folderSettings, const FolderColumns *initialColumns)
 {
-	return std::shared_ptr<ShellBrowser>(new ShellBrowser(id, hOwner, coreInterface, tabNavigation,
+	return std::shared_ptr<ShellBrowser>(new ShellBrowser(hOwner, coreInterface, tabNavigation,
 		fileActionHandler, folderSettings, initialColumns));
 }
 
-std::shared_ptr<ShellBrowser> ShellBrowser::CreateFromPreserved(int id, HWND hOwner,
+std::shared_ptr<ShellBrowser> ShellBrowser::CreateFromPreserved(HWND hOwner,
 	CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
 	FileActionHandler *fileActionHandler,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState)
 {
-	return std::shared_ptr<ShellBrowser>(new ShellBrowser(id, hOwner, coreInterface, tabNavigation,
+	return std::shared_ptr<ShellBrowser>(new ShellBrowser(hOwner, coreInterface, tabNavigation,
 		fileActionHandler, history, currentEntry, preservedFolderState));
 }
 
-ShellBrowser::ShellBrowser(int id, HWND hOwner, CoreInterface *coreInterface,
+ShellBrowser::ShellBrowser(HWND hOwner, CoreInterface *coreInterface,
 	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState) :
-	ShellBrowser(id, hOwner, coreInterface, tabNavigation, fileActionHandler,
+	ShellBrowser(hOwner, coreInterface, tabNavigation, fileActionHandler,
 		preservedFolderState.folderSettings, nullptr)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(this, tabNavigation,
 		m_iconFetcher.get(), history, currentEntry);
 }
 
-ShellBrowser::ShellBrowser(int id, HWND hOwner, CoreInterface *coreInterface,
+ShellBrowser::ShellBrowser(HWND hOwner, CoreInterface *coreInterface,
 	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 	const FolderSettings &folderSettings, const FolderColumns *initialColumns) :
 	ShellDropTargetWindow(CreateListView(hOwner)),
 	m_hListView(GetHWND()),
-	m_ID(id),
 	m_resourceInstance(coreInterface->GetResourceInstance()),
 	m_acceleratorTable(coreInterface->GetAcceleratorTable()),
 	m_hOwner(hOwner),
@@ -510,9 +508,18 @@ void ShellBrowser::SetGroupSortDirection(SortDirection direction)
 	ListView_SortGroups(m_hListView, GroupComparisonStub, this);
 }
 
+void ShellBrowser::SetID(int id)
+{
+	assert(!m_ID);
+
+	m_ID = id;
+}
+
 int ShellBrowser::GetId() const
 {
-	return m_ID;
+	assert(m_ID);
+
+	return *m_ID;
 }
 
 void ShellBrowser::OnGridlinesSettingChanged()

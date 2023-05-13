@@ -41,11 +41,8 @@ public:
 	typedef boost::signals2::signal<void(const Tab &tab, PropertyType propertyType)>
 		TabUpdatedSignal;
 
-	Tab(CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
-		FileActionHandler *fileActionHandler, const FolderSettings *folderSettings,
-		const FolderColumns *initialColumns);
-	Tab(const PreservedTab &preservedTab, CoreInterface *coreInterface,
-		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler);
+	Tab(std::shared_ptr<ShellBrowser> shellBrowser);
+	Tab(const PreservedTab &preservedTab, std::shared_ptr<ShellBrowser> shellBrowser);
 
 	int GetId() const;
 

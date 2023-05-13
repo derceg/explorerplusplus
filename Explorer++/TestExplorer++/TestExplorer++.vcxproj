@@ -178,6 +178,7 @@
     <ClCompile Include="ShellHelperTest.cpp" />
     <ClCompile Include="ShellNavigationControllerTest.cpp" />
     <ClCompile Include="StringHelperTest.cpp" />
+    <ClCompile Include="TabTest.cpp" />
     <ClCompile Include="ViewModeHelperTest.cpp" />
     <ClCompile Include="XmlStorageHelper.cpp" />
   </ItemGroup>
