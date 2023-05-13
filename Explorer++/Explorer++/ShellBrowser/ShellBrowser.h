@@ -434,6 +434,8 @@ private:
 	void OnFullRowSelectUpdated(BOOL newValue);
 	void OnCheckBoxSelectionUpdated(BOOL newValue);
 	void OnShowGridlinesUpdated(BOOL newValue);
+	void OnOneClickActivateUpdated(BOOL newValue);
+	void OnOneClickActivateHoverTimeUpdated(UINT newValue);
 
 	HRESULT GetListViewItemAttributes(int item, SFGAOF *attributes) const;
 

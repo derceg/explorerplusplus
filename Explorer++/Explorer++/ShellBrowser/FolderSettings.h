@@ -44,8 +44,8 @@ struct GlobalFolderSettings
 	ValueWrapper<BOOL> showGridlines = TRUE;
 	BOOL forceSize = FALSE;
 	SizeDisplayFormat sizeDisplayFormat = SizeDisplayFormat::Bytes;
-	BOOL oneClickActivate = FALSE;
-	UINT oneClickActivateHoverTime = DEFAULT_LISTVIEW_HOVER_TIME;
+	ValueWrapper<BOOL> oneClickActivate = FALSE;
+	ValueWrapper<UINT> oneClickActivateHoverTime = DEFAULT_LISTVIEW_HOVER_TIME;
 	BOOL displayMixedFilesAndFolders = FALSE;
 	BOOL useNaturalSortOrder = TRUE;
 

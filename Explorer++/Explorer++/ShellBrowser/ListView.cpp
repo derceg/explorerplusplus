@@ -1354,3 +1354,15 @@ void ShellBrowser::OnShowGridlinesUpdated(BOOL newValue)
 {
 	ListViewHelper::SetGridlines(m_hListView, newValue);
 }
+
+void ShellBrowser::OnOneClickActivateUpdated(BOOL newValue)
+{
+	ListViewHelper::ActivateOneClickSelect(m_hListView, newValue,
+		m_config->globalFolderSettings.oneClickActivateHoverTime.get());
+}
+
+void ShellBrowser::OnOneClickActivateHoverTimeUpdated(UINT newValue)
+{
+	ListViewHelper::ActivateOneClickSelect(m_hListView,
+		m_config->globalFolderSettings.oneClickActivate.get(), newValue);
+}

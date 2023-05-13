@@ -1431,7 +1431,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 	switch (nmhdr->code)
 	{
 	case NM_CLICK:
-		if (m_config->globalFolderSettings.oneClickActivate)
+		if (m_config->globalFolderSettings.oneClickActivate.get())
 		{
 			OnListViewDoubleClick(&((NMITEMACTIVATE *) lParam)->hdr);
 		}

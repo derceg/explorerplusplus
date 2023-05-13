@@ -86,17 +86,17 @@ void FilesFoldersOptionsPage::InitializeControls()
 		CheckDlgButton(GetDialog(), IDC_SETTINGS_CHECK_INSERTSORTED, BST_CHECKED);
 	}
 
-	if (m_config->globalFolderSettings.oneClickActivate)
+	if (m_config->globalFolderSettings.oneClickActivate.get())
 	{
 		CheckDlgButton(GetDialog(), IDC_SETTINGS_CHECK_SINGLECLICK, BST_CHECKED);
 	}
 
 	SetDlgItemInt(GetDialog(), IDC_OPTIONS_HOVER_TIME,
-		m_config->globalFolderSettings.oneClickActivateHoverTime, FALSE);
+		m_config->globalFolderSettings.oneClickActivateHoverTime.get(), FALSE);
 	EnableWindow(GetDlgItem(GetDialog(), IDC_OPTIONS_HOVER_TIME),
-		m_config->globalFolderSettings.oneClickActivate);
+		m_config->globalFolderSettings.oneClickActivate.get());
 	EnableWindow(GetDlgItem(GetDialog(), IDC_LABEL_HOVER_TIME),
-		m_config->globalFolderSettings.oneClickActivate);
+		m_config->globalFolderSettings.oneClickActivate.get());
 
 	if (m_config->overwriteExistingFilesConfirmation)
 	{
@@ -392,9 +392,5 @@ void FilesFoldersOptionsPage::SaveSettings()
 	for (auto &tab : m_coreInterface->GetTabContainer()->GetAllTabs() | boost::adaptors::map_values)
 	{
 		tab->GetShellBrowser()->GetNavigationController()->Refresh();
-
-		ListViewHelper::ActivateOneClickSelect(tab->GetShellBrowser()->GetListView(),
-			m_config->globalFolderSettings.oneClickActivate,
-			m_config->globalFolderSettings.oneClickActivateHoverTime);
 	}
 }

@@ -187,8 +187,13 @@ void ShellBrowser::InitializeListView()
 		std::bind_front(&ShellBrowser::OnShowGridlinesUpdated, this)));
 
 	ListViewHelper::ActivateOneClickSelect(m_hListView,
-		m_config->globalFolderSettings.oneClickActivate,
-		m_config->globalFolderSettings.oneClickActivateHoverTime);
+		m_config->globalFolderSettings.oneClickActivate.get(),
+		m_config->globalFolderSettings.oneClickActivateHoverTime.get());
+
+	m_connections.push_back(m_config->globalFolderSettings.oneClickActivate.addObserver(
+		std::bind_front(&ShellBrowser::OnOneClickActivateUpdated, this)));
+	m_connections.push_back(m_config->globalFolderSettings.oneClickActivateHoverTime.addObserver(
+		std::bind_front(&ShellBrowser::OnOneClickActivateHoverTimeUpdated, this)));
 
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
 

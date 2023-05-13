@@ -595,11 +595,12 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 		m_config->defaultTabDirectory.c_str());
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("OneClickActivate"),
-		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.oneClickActivate));
+		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.oneClickActivate.get()));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
 		_T("OneClickActivateHoverTime"),
-		NXMLSettings::EncodeIntValue(m_config->globalFolderSettings.oneClickActivateHoverTime));
+		NXMLSettings::EncodeIntValue(
+			m_config->globalFolderSettings.oneClickActivateHoverTime.get()));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
 		_T("OverwriteExistingFilesConfirmation"),

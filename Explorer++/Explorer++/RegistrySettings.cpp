@@ -141,9 +141,9 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 		RegistrySettings::SaveDword(hSettingsKey, _T("AllowMultipleInstances"),
 			m_config->allowMultipleInstances);
 		RegistrySettings::SaveDword(hSettingsKey, _T("OneClickActivate"),
-			m_config->globalFolderSettings.oneClickActivate);
+			m_config->globalFolderSettings.oneClickActivate.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("OneClickActivateHoverTime"),
-			m_config->globalFolderSettings.oneClickActivateHoverTime);
+			m_config->globalFolderSettings.oneClickActivateHoverTime.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("ForceSameTabWidth"),
 			m_config->forceSameTabWidth.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("DoubleClickTabClose"),
