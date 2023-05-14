@@ -9,7 +9,7 @@
 
 class ShellBrowser;
 
-class NewMenuClient : public winrt::implements<NewMenuClient, INewMenuClient>
+class NewMenuClient : public winrt::implements<NewMenuClient, INewMenuClient, winrt::non_agile>
 {
 public:
 	NewMenuClient(ShellBrowser *shellBrowser);

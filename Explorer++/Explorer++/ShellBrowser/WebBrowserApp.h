@@ -9,7 +9,7 @@
 
 // This isn't a web browser application, but the IWebBrowserApp interface is used when finding shell
 // windows.
-class WebBrowserApp : public winrt::implements<WebBrowserApp, IWebBrowserApp>
+class WebBrowserApp : public winrt::implements<WebBrowserApp, IWebBrowserApp, winrt::non_agile>
 {
 public:
 	WebBrowserApp(HWND hwnd, IDispatch *document);

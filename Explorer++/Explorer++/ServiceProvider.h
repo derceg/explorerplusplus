@@ -8,7 +8,7 @@
 #include <servprov.h>
 
 class ServiceProvider :
-	public winrt::implements<ServiceProvider, IServiceProvider>,
+	public winrt::implements<ServiceProvider, IServiceProvider, winrt::non_agile>,
 	public ServiceProviderBase
 {
 public:

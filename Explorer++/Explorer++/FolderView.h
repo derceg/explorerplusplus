@@ -14,7 +14,8 @@ class ShellBrowser;
 
 // This isn't a complete implementation. There's only enough functionality to support some context
 // menu items.
-class FolderView : public winrt::implements<FolderView, IFolderView2, IShellFolderView>
+class FolderView :
+	public winrt::implements<FolderView, IFolderView2, IShellFolderView, winrt::non_agile>
 {
 public:
 	FolderView(std::weak_ptr<ShellBrowser> shellBrowserWeak);

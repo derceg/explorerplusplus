@@ -13,7 +13,8 @@ class BookmarkTree;
 
 // When dragging over a bookmark menu, an IDropTarget instance will be requested for the current
 // position. This class represents a drop target at a fixed position in a parent folder.
-class BookmarkMenuDropTarget : public winrt::implements<BookmarkMenuDropTarget, IDropTarget>
+class BookmarkMenuDropTarget :
+	public winrt::implements<BookmarkMenuDropTarget, IDropTarget, winrt::non_agile>
 {
 public:
 	BookmarkMenuDropTarget(BookmarkItem *targetFolder, size_t targetIndex,

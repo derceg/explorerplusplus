@@ -7,7 +7,7 @@
 #include "WinRTBaseWrapper.h"
 #include <oleidl.h>
 
-class DropSourceImpl : public winrt::implements<DropSourceImpl, IDropSource>
+class DropSourceImpl : public winrt::implements<DropSourceImpl, IDropSource, winrt::non_agile>
 {
 public:
 	IFACEMETHODIMP QueryContinueDrag(BOOL fEscapePressed, DWORD grfKeyState);

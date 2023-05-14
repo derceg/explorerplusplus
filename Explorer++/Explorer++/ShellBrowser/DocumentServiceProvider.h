@@ -8,7 +8,8 @@
 #include "../Helper/WinRTBaseWrapper.h"
 
 class DocumentServiceProvider :
-	public winrt::implements<DocumentServiceProvider, IDispatch, IServiceProvider>,
+	public winrt::implements<DocumentServiceProvider, IDispatch, IServiceProvider,
+		winrt::non_agile>,
 	public ServiceProviderBase
 {
 public:

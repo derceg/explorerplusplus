@@ -9,7 +9,8 @@
 #include <vector>
 
 class DataObjectImpl :
-	public winrt::implements<DataObjectImpl, IDataObject, IDataObjectAsyncCapability>
+	public winrt::implements<DataObjectImpl, IDataObject, IDataObjectAsyncCapability,
+		winrt::non_agile>
 {
 public:
 	DataObjectImpl(FORMATETC *pFormatEtc, STGMEDIUM *pMedium, int count);

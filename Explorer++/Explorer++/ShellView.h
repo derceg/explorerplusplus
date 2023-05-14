@@ -13,7 +13,7 @@ class TabNavigationInterface;
 // This isn't a complete implementation. There's only enough functionality to support the "New
 // Folder" item shown on the background context menu in a phone's virtual folder (when that phone is
 // connected via USB).
-class ShellView : public winrt::implements<ShellView, IShellView>
+class ShellView : public winrt::implements<ShellView, IShellView, winrt::non_agile>
 {
 public:
 	ShellView(std::weak_ptr<ShellBrowser> shellBrowserWeak, TabNavigationInterface *tabNavigation,

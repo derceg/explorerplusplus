@@ -7,7 +7,8 @@
 #include "WinRTBaseWrapper.h"
 #include <list>
 
-class EnumFormatEtcImpl : public winrt::implements<EnumFormatEtcImpl, IEnumFORMATETC>
+class EnumFormatEtcImpl :
+	public winrt::implements<EnumFormatEtcImpl, IEnumFORMATETC, winrt::non_agile>
 {
 public:
 	EnumFormatEtcImpl(const std::list<FORMATETC> &feList);

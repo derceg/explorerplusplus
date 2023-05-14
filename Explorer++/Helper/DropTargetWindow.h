@@ -18,7 +18,7 @@ public:
 	virtual DWORD Drop(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect) = 0;
 };
 
-class DropTargetWindow : public winrt::implements<DropTargetWindow, IDropTarget>
+class DropTargetWindow : public winrt::implements<DropTargetWindow, IDropTarget, winrt::non_agile>
 {
 public:
 	DropTargetWindow(HWND hwnd, DropTargetInternal *dropTargetInternal);
