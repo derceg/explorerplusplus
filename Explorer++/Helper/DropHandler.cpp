@@ -9,7 +9,6 @@
 #include "Macros.h"
 
 /* Drop formats supported. */
-FORMATETC DropHandler::m_ftcText = { CF_TEXT, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 FORMATETC DropHandler::m_ftcUnicodeText = { CF_UNICODETEXT, nullptr, DVASPECT_CONTENT, -1,
 	TYMED_HGLOBAL };
 FORMATETC DropHandler::m_ftcDIBV5 = { CF_DIBV5, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
@@ -21,7 +20,6 @@ DropHandler *DropHandler::CreateNew()
 
 HRESULT DropHandler::GetDropFormats(std::list<FORMATETC> &ftcList)
 {
-	ftcList.push_back(m_ftcText);
 	ftcList.push_back(m_ftcUnicodeText);
 	ftcList.push_back(m_ftcDIBV5);
 
@@ -82,11 +80,6 @@ void DropHandler::HandleLeftClickDrop(IDataObject *pDataObject, POINT *pt)
 	{
 		LOG(debug) << _T("Helper - Copying CF_UNICODETEXT data");
 		hrCopy = CopyUnicodeTextData(pDataObject, pastedFileList);
-	}
-	else if (CheckDropFormatSupported(pDataObject, &m_ftcText))
-	{
-		LOG(debug) << _T("Helper - Copying CF_TEXT data");
-		hrCopy = CopyAnsiTextData(pDataObject, pastedFileList);
 	}
 	else if (CheckDropFormatSupported(pDataObject, &m_ftcDIBV5))
 	{
@@ -165,49 +158,6 @@ HRESULT DropHandler::CopyUnicodeTextData(IDataObject *pDataObject,
 			{
 				PastedFileList.emplace_back(szFullFileName);
 			}
-
-			GlobalUnlock(stg.hGlobal);
-		}
-
-		ReleaseStgMedium(&stg);
-	}
-
-	return hr;
-}
-
-HRESULT DropHandler::CopyAnsiTextData(IDataObject *pDataObject,
-	std::list<std::wstring> &PastedFileList)
-{
-	STGMEDIUM stg;
-	HRESULT hr;
-
-	hr = pDataObject->GetData(&m_ftcText, &stg);
-
-	if (hr == S_OK)
-	{
-		char *pText = static_cast<char *>(GlobalLock(stg.hGlobal));
-
-		if (pText != nullptr)
-		{
-			auto *pszUnicodeText = new WCHAR[strlen(pText) + 1];
-
-			int iRet = MultiByteToWideChar(CP_ACP, 0, pText, -1, pszUnicodeText,
-				static_cast<int>(strlen(pText) + 1));
-
-			if (iRet != 0)
-			{
-				TCHAR szFullFileName[MAX_PATH];
-
-				hr = CopyTextToFile(m_destDirectory.c_str(), pszUnicodeText, szFullFileName,
-					SIZEOF_ARRAY(szFullFileName));
-
-				if (hr == S_OK)
-				{
-					PastedFileList.emplace_back(szFullFileName);
-				}
-			}
-
-			delete[] pszUnicodeText;
 
 			GlobalUnlock(stg.hGlobal);
 		}

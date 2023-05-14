@@ -36,14 +36,12 @@ private:
 	BOOL CheckDropFormatSupported(IDataObject *pDataObject, FORMATETC *pftc);
 
 	HRESULT CopyUnicodeTextData(IDataObject *pDataObject, std::list<std::wstring> &PastedFileList);
-	HRESULT CopyAnsiTextData(IDataObject *pDataObject, std::list<std::wstring> &PastedFileList);
 	HRESULT CopyDIBV5Data(IDataObject *pDataObject, std::list<std::wstring> &PastedFileList);
 
 	HRESULT CopyTextToFile(const TCHAR *pszDestDirectory, const WCHAR *pszText,
 		TCHAR *pszFullFileNameOut, size_t outLen);
 
 	/* Holds the drop formats supported. */
-	static FORMATETC m_ftcText;
 	static FORMATETC m_ftcUnicodeText;
 	static FORMATETC m_ftcDIBV5;
 
