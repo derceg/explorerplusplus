@@ -173,7 +173,6 @@ public:
 	void ImportAllColumns(const FolderColumns &folderColumns);
 	FolderColumns ExportAllColumns();
 	void QueueRename(PCIDLIST_ABSOLUTE pidlItem);
-	void SelectItems(const std::list<std::wstring> &PastedFileList);
 	void OnDeviceChange(UINT eventType, LONG_PTR eventData);
 	void AutoSizeColumns();
 
@@ -310,6 +309,11 @@ private:
 		std::vector<AwaitingAdd_t> awaitingAddList;
 
 		std::unordered_set<int> filteredItemsList;
+
+		// When an item is pasted or dropped, it will be selected. However, the item may not exist
+		// at the time the call is made to select the file. This field keeps track of items in the
+		// current directory which need to be selected, once added.
+		std::vector<PidlAbsolute> filesToSelect;
 
 		int numItems;
 		int numFilesSelected;
@@ -582,7 +586,6 @@ private:
 	/* Drag and Drop support. */
 	void RepositionLocalFiles(const POINT *ppt);
 	void ScrollListViewForDrop(const POINT &pt);
-	void PositionDroppedItems();
 
 	void OnApplicationShuttingDown();
 
@@ -641,7 +644,6 @@ private:
 	std::optional<int> m_dirMonitorId;
 	int m_iFolderIcon;
 	int m_iFileIcon;
-	int m_iDropped;
 
 	/* Stores a unique index for each folder.
 	This may be needed so that folders can be
@@ -675,9 +677,6 @@ private:
 	/* Shell new. */
 	unique_pidl_absolute m_queuedRenameItem;
 
-	/* File selection. */
-	std::list<std::wstring> m_FileSelectionList;
-
 	/* Thumbnails. */
 	BOOL m_bThumbnailsSetup;
 
@@ -699,7 +698,6 @@ private:
 	POINT m_ptDraggedOffset;
 	bool m_performingDrag;
 	IDataObject *m_draggedDataObject;
-	std::list<DroppedFile_t> m_droppedFileNameList;
 
 	ListViewGroupSet m_listViewGroups;
 	int m_groupIdCounter;

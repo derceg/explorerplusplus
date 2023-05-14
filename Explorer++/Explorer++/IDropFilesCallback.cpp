@@ -59,8 +59,17 @@ void DropFilesCallback::OnDropFile(const std::list<std::wstring> &PastedFileList
 {
 	UNREFERENCED_PARAMETER(ppt);
 
-	if (m_coreInterface->GetActiveShellBrowser()->GetNumSelected() == 0)
+	std::vector<unique_pidl_absolute> pidls;
+
+	for (const auto &pastedFile : PastedFileList)
 	{
-		m_coreInterface->GetActiveShellBrowser()->SelectItems(PastedFileList);
+		unique_pidl_absolute pidl(SHSimpleIDListFromPath(pastedFile.c_str()));
+
+		if (pidl)
+		{
+			pidls.push_back(std::move(pidl));
+		}
 	}
+
+	m_coreInterface->GetActiveShellBrowser()->SelectItems(ShallowCopyPidls(pidls));
 }

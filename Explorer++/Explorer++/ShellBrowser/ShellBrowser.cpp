@@ -106,7 +106,6 @@ ShellBrowser::ShellBrowser(HWND hOwner, CoreInterface *coreInterface,
 	m_nCurrentColumns = 0;
 	m_pActiveColumns = nullptr;
 	m_nActiveColumns = 0;
-	m_iDropped = -1;
 	m_middleButtonItem = -1;
 
 	m_uniqueFolderId = 0;
@@ -580,17 +579,11 @@ void ShellBrowser::SelectItems(const std::vector<PCIDLIST_ABSOLUTE> &pidls)
 
 	for (auto &pidl : pidls)
 	{
-		auto internalIndex = GetItemInternalIndexForPidl(pidl);
-
-		if (!internalIndex)
-		{
-			continue;
-		}
-
-		auto index = LocateItemByInternalIndex(*internalIndex);
+		auto index = GetItemIndexForPidl(pidl);
 
 		if (!index)
 		{
+			m_directoryState.filesToSelect.emplace_back(pidl);
 			continue;
 		}
 
@@ -754,193 +747,6 @@ BOOL ShellBrowser::CompareVirtualFolders(UINT uFolderCSIDL) const
 int ShellBrowser::GenerateUniqueItemId()
 {
 	return m_directoryState.itemIDCounter++;
-}
-
-void ShellBrowser::PositionDroppedItems()
-{
-	std::list<DroppedFile_t>::iterator itr;
-	BOOL bDropItemSet = FALSE;
-	int iItem;
-
-	/* LVNI_TOLEFT and LVNI_TORIGHT cause exceptions
-	in details view. */
-	if (m_folderSettings.viewMode == +ViewMode::Details)
-	{
-		m_droppedFileNameList.clear();
-		return;
-	}
-
-	if (!m_droppedFileNameList.empty())
-	{
-		/* The auto arrange style must be off for the items
-		to be moved. Therefore, if the style is on, turn it
-		off, move the items, and the turn it back on. */
-		if (m_folderSettings.autoArrange)
-		{
-			ListViewHelper::SetAutoArrange(m_hListView, FALSE);
-		}
-
-		for (itr = m_droppedFileNameList.begin(); itr != m_droppedFileNameList.end();)
-		{
-			iItem = LocateFileItemIndex(itr->szFileName);
-
-			if (iItem != -1)
-			{
-				if (!bDropItemSet)
-				{
-					m_iDropped = iItem;
-				}
-
-				if (m_folderSettings.autoArrange)
-				{
-					/* TODO: Merge this code with RepositionLocalFiles(). */
-					LVFINDINFO lvfi;
-					LVHITTESTINFO lvhti;
-					RECT rcItem;
-					POINT ptOrigin;
-					POINT pt;
-					POINT ptNext;
-					BOOL bRowEnd = FALSE;
-					BOOL bRowStart = FALSE;
-					int iNext;
-					int iHitItem;
-					int nItems;
-
-					pt = itr->DropPoint;
-
-					ListView_GetOrigin(m_hListView, &ptOrigin);
-					pt.x -= ptOrigin.x;
-					pt.y -= ptOrigin.y;
-
-					lvhti.pt = pt;
-					iHitItem = ListView_HitTest(m_hListView, &lvhti);
-
-					/* Based on ListView_HandleInsertionMark() code. */
-					if (iHitItem != -1 && lvhti.flags & LVHT_ONITEM)
-					{
-						ListView_GetItemRect(m_hListView, lvhti.iItem, &rcItem, LVIR_BOUNDS);
-
-						if ((pt.x - rcItem.left) > ((rcItem.right - rcItem.left) / 2))
-						{
-							iNext = iHitItem;
-						}
-						else
-						{
-							/* Can just insert the item _after_ the item to the
-							left, unless this is the start of a row. */
-							iNext = ListView_GetNextItem(m_hListView, iHitItem, LVNI_TOLEFT);
-
-							if (iNext == -1)
-							{
-								iNext = iHitItem;
-							}
-
-							bRowStart =
-								(ListView_GetNextItem(m_hListView, iNext, LVNI_TOLEFT) == -1);
-						}
-					}
-					else
-					{
-						lvfi.flags = LVFI_NEARESTXY;
-						lvfi.pt = pt;
-						lvfi.vkDirection = VK_UP;
-						iNext = ListView_FindItem(m_hListView, -1, &lvfi);
-
-						if (iNext == -1)
-						{
-							lvfi.flags = LVFI_NEARESTXY;
-							lvfi.pt = pt;
-							lvfi.vkDirection = VK_LEFT;
-							iNext = ListView_FindItem(m_hListView, -1, &lvfi);
-						}
-
-						ListView_GetItemRect(m_hListView, iNext, &rcItem, LVIR_BOUNDS);
-
-						if (pt.x > rcItem.left + ((rcItem.right - rcItem.left) / 2))
-						{
-							if (pt.y > rcItem.bottom)
-							{
-								int iBelow;
-
-								iBelow = ListView_GetNextItem(m_hListView, iNext, LVNI_BELOW);
-
-								if (iBelow != -1)
-								{
-									iNext = iBelow;
-								}
-							}
-
-							bRowEnd = TRUE;
-						}
-
-						nItems = ListView_GetItemCount(m_hListView);
-
-						ListView_GetItemRect(m_hListView, nItems - 1, &rcItem, LVIR_BOUNDS);
-
-						if ((pt.x > rcItem.left + ((rcItem.right - rcItem.left) / 2))
-							&& pt.x < rcItem.right + ((rcItem.right - rcItem.left) / 2) + 2
-							&& pt.y > rcItem.top)
-						{
-							iNext = nItems - 1;
-
-							bRowEnd = TRUE;
-						}
-
-						if (!bRowEnd)
-						{
-							int iLeft;
-
-							iLeft = ListView_GetNextItem(m_hListView, iNext, LVNI_TOLEFT);
-
-							if (iLeft != -1)
-							{
-								iNext = iLeft;
-							}
-							else
-							{
-								bRowStart = TRUE;
-							}
-						}
-					}
-
-					ListView_GetItemPosition(m_hListView, iNext, &ptNext);
-
-					/* Offset by 1 pixel in the x-direction. This ensures that
-					the dropped item will always be placed AFTER iNext. */
-					if (bRowStart)
-					{
-						/* If at the start of a row, simply place at x = 0
-						so that dropped item will be placed before first
-						item... */
-						ListView_SetItemPosition32(m_hListView, iItem, 0, ptNext.y);
-					}
-					else
-					{
-						ListView_SetItemPosition32(m_hListView, iItem, ptNext.x + 1, ptNext.y);
-					}
-				}
-				else
-				{
-					ListView_SetItemPosition32(m_hListView, iItem, itr->DropPoint.x,
-						itr->DropPoint.y);
-				}
-
-				ListViewHelper::SelectItem(m_hListView, iItem, TRUE);
-				ListViewHelper::FocusItem(m_hListView, iItem, TRUE);
-
-				itr = m_droppedFileNameList.erase(itr);
-			}
-			else
-			{
-				++itr;
-			}
-		}
-
-		if (m_folderSettings.autoArrange)
-		{
-			ListViewHelper::SetAutoArrange(m_hListView, TRUE);
-		}
-	}
 }
 
 int ShellBrowser::DetermineItemSortedPosition(LPARAM lParam) const
@@ -1119,36 +925,6 @@ void ShellBrowser::QueueRename(PCIDLIST_ABSOLUTE pidlItem)
 	}
 
 	m_queuedRenameItem.reset(ILCloneFull(pidlItem));
-}
-
-void ShellBrowser::SelectItems(const std::list<std::wstring> &PastedFileList)
-{
-	int i = 0;
-
-	m_FileSelectionList.clear();
-
-	for (const auto &pastedFile : PastedFileList)
-	{
-		int iIndex = LocateFileItemIndex(pastedFile.c_str());
-
-		if (iIndex != -1)
-		{
-			ListViewHelper::SelectItem(m_hListView, iIndex, TRUE);
-
-			if (i == 0)
-			{
-				/* Focus on the first item, and ensure it is visible. */
-				ListViewHelper::FocusItem(m_hListView, iIndex, TRUE);
-				ListView_EnsureVisible(m_hListView, iIndex, FALSE);
-
-				i++;
-			}
-		}
-		else
-		{
-			m_FileSelectionList.push_back(pastedFile);
-		}
-	}
 }
 
 void ShellBrowser::OnDeviceChange(UINT eventType, LONG_PTR eventData)

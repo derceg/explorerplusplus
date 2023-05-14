@@ -56,10 +56,6 @@ void ShellBrowser::PrepareToChangeFolders()
 
 	m_shellChangeWatcher.StopWatchingAll();
 
-	EnterCriticalSection(&m_csDirectoryAltered);
-	m_FileSelectionList.clear();
-	LeaveCriticalSection(&m_csDirectoryAltered);
-
 	StoreCurrentlySelectedItems();
 
 	ListView_DeleteAllItems(m_hListView);
@@ -672,6 +668,26 @@ void ShellBrowser::InsertAwaitingItems()
 			itemToRename = iItemIndex;
 		}
 
+		auto selectItr = std::find_if(m_directoryState.filesToSelect.begin(),
+			m_directoryState.filesToSelect.end(),
+			[&itemInfo](const auto &pidl)
+			{ return ArePidlsEquivalent(pidl.Raw(), itemInfo.pidlComplete.get()); });
+
+		if (selectItr != m_directoryState.filesToSelect.end())
+		{
+			ListViewHelper::SelectItem(m_hListView, iItemIndex, TRUE);
+
+			int selectedCount = ListView_GetSelectedCount(m_hListView);
+
+			if (selectedCount == 1)
+			{
+				ListViewHelper::FocusItem(m_hListView, iItemIndex, TRUE);
+				ListView_EnsureVisible(m_hListView, iItemIndex, FALSE);
+			}
+
+			m_directoryState.filesToSelect.erase(selectItr);
+		}
+
 		/* If the file is marked as hidden, ghost it out. */
 		if (itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
 		{
@@ -696,8 +712,6 @@ void ShellBrowser::InsertAwaitingItems()
 	}
 
 	m_directoryState.numItems = nPrevItems + nAdded;
-
-	PositionDroppedItems();
 
 	m_directoryState.awaitingAddList.clear();
 

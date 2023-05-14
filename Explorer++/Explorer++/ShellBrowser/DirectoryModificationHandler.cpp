@@ -158,50 +158,9 @@ void ShellBrowser::DirectoryAltered()
 
 	SendMessage(m_hListView, WM_SETREDRAW, TRUE, NULL);
 
-	/* Ensure the first dropped item is visible. */
-	if (m_iDropped != -1)
-	{
-		if (!ListView_IsItemVisible(m_hListView, m_iDropped))
-		{
-			ListView_EnsureVisible(m_hListView, m_iDropped, TRUE);
-		}
-
-		m_iDropped = -1;
-	}
-
 	directoryModified.m_signal();
 
 	m_AlteredList.clear();
-
-	BOOL bFocusSet = FALSE;
-	int iIndex;
-
-	/* Select the specified items, and place the
-	focus on the first item. */
-	auto itr = m_FileSelectionList.begin();
-	while (itr != m_FileSelectionList.end())
-	{
-		iIndex = LocateFileItemIndex(itr->c_str());
-
-		if (iIndex != -1)
-		{
-			ListViewHelper::SelectItem(m_hListView, iIndex, TRUE);
-
-			if (!bFocusSet)
-			{
-				ListViewHelper::FocusItem(m_hListView, iIndex, TRUE);
-				ListView_EnsureVisible(m_hListView, iIndex, TRUE);
-
-				bFocusSet = TRUE;
-			}
-
-			itr = m_FileSelectionList.erase(itr);
-		}
-		else
-		{
-			++itr;
-		}
-	}
 
 	LeaveCriticalSection(&m_csDirectoryAltered);
 }
@@ -291,15 +250,7 @@ void ShellBrowser::AddItem(PCIDLIST_ABSOLUTE pidl)
 		return;
 	}
 
-	const std::wstring displayName = m_itemInfoMap.at(*itemId).displayName;
-	auto droppedFilesItr = std::find_if(m_droppedFileNameList.begin(), m_droppedFileNameList.end(),
-		[&displayName](const DroppedFile_t &droppedFile)
-		{ return displayName == droppedFile.szFileName; });
-
-	bool wasDropped = (droppedFilesItr != m_droppedFileNameList.end());
-
-	// Only insert the item in its sorted position if it wasn't dropped in.
-	if (m_config->globalFolderSettings.insertSorted && !wasDropped)
+	if (m_config->globalFolderSettings.insertSorted)
 	{
 		// TODO: It would be better to pass the items details to this function directly
 		// instead (before the item is added to the awaiting list).

@@ -163,11 +163,7 @@ HRESULT DropHandler::CopyUnicodeTextData(IDataObject *pDataObject,
 
 			if (hr == S_OK)
 			{
-				TCHAR szFileName[MAX_PATH];
-				StringCchCopy(szFileName, SIZEOF_ARRAY(szFileName), szFullFileName);
-				PathStripPath(szFileName);
-
-				PastedFileList.emplace_back(szFileName);
+				PastedFileList.emplace_back(szFullFileName);
 			}
 
 			GlobalUnlock(stg.hGlobal);
@@ -207,11 +203,7 @@ HRESULT DropHandler::CopyAnsiTextData(IDataObject *pDataObject,
 
 				if (hr == S_OK)
 				{
-					TCHAR szFileName[MAX_PATH];
-					StringCchCopy(szFileName, SIZEOF_ARRAY(szFileName), szFullFileName);
-					PathStripPath(szFileName);
-
-					PastedFileList.emplace_back(szFileName);
+					PastedFileList.emplace_back(szFullFileName);
 				}
 			}
 
@@ -308,7 +300,7 @@ HRESULT DropHandler::CopyDIBV5Data(IDataObject *pDataObject,
 
 				delete[] pData;
 
-				PastedFileList.emplace_back(szFileName);
+				PastedFileList.emplace_back(szFullFileName);
 			}
 
 			GlobalUnlock(stg.hGlobal);
