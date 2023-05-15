@@ -160,6 +160,9 @@
     <ClCompile Include="ServiceProviderBase.cpp">
       <Filter>COM</Filter>
     </ClCompile>
+    <ClCompile Include="GdiplusHelper.cpp">
+      <Filter>Miscellaneous</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
@@ -341,6 +344,9 @@
     </ClInclude>
     <ClInclude Include="PidlHelper.h">
       <Filter>Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="GdiplusHelper.h">
+      <Filter>Miscellaneous</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

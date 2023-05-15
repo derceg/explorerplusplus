@@ -4,14 +4,19 @@
 
 #include "stdafx.h"
 #include "DropHandler.h"
+#include "GdiplusHelper.h"
 #include "Helper.h"
 #include "Logging.h"
 #include "Macros.h"
+#include <wil/resource.h>
+#include <chrono>
 
 /* Drop formats supported. */
 FORMATETC DropHandler::m_ftcUnicodeText = { CF_UNICODETEXT, nullptr, DVASPECT_CONTENT, -1,
 	TYMED_HGLOBAL };
-FORMATETC DropHandler::m_ftcDIBV5 = { CF_DIBV5, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+FORMATETC DropHandler::m_ftcDIB = { CF_DIB, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+
+std::wstring GenerateTimestampForFilename();
 
 DropHandler *DropHandler::CreateNew()
 {
@@ -21,7 +26,7 @@ DropHandler *DropHandler::CreateNew()
 HRESULT DropHandler::GetDropFormats(std::list<FORMATETC> &ftcList)
 {
 	ftcList.push_back(m_ftcUnicodeText);
-	ftcList.push_back(m_ftcDIBV5);
+	ftcList.push_back(m_ftcDIB);
 
 	return S_OK;
 }
@@ -81,10 +86,12 @@ void DropHandler::HandleLeftClickDrop(IDataObject *pDataObject, POINT *pt)
 		LOG(debug) << _T("Helper - Copying CF_UNICODETEXT data");
 		hrCopy = CopyUnicodeTextData(pDataObject, pastedFileList);
 	}
-	else if (CheckDropFormatSupported(pDataObject, &m_ftcDIBV5))
+	else if (CheckDropFormatSupported(pDataObject, &m_ftcDIB))
 	{
-		LOG(debug) << _T("Helper - Copying CF_DIBV5 data");
-		hrCopy = CopyDIBV5Data(pDataObject, pastedFileList);
+		LOG(debug) << _T("Helper - Copying CF_DIB data");
+
+		bool res = CopyDIBData(pDataObject, pastedFileList);
+		hrCopy = res ? S_OK : E_FAIL;
 	}
 
 	if (hrCopy == S_OK && !pastedFileList.empty())
@@ -168,134 +175,110 @@ HRESULT DropHandler::CopyUnicodeTextData(IDataObject *pDataObject,
 	return hr;
 }
 
-HRESULT DropHandler::CopyDIBV5Data(IDataObject *pDataObject,
-	std::list<std::wstring> &PastedFileList)
+bool DropHandler::CopyDIBData(IDataObject *dataObject, std::list<std::wstring> &pastedFileList)
 {
-	STGMEDIUM stg;
-	HRESULT hr;
+	wil::unique_stg_medium stg;
+	HRESULT hr = dataObject->GetData(&m_ftcDIB, &stg);
 
-	hr = pDataObject->GetData(&m_ftcDIBV5, &stg);
-
-	if (hr == S_OK)
+	if (FAILED(hr))
 	{
-		auto *pbmp = static_cast<BITMAPINFO *>(GlobalLock(stg.hGlobal));
-
-		if (pbmp != nullptr)
-		{
-			SYSTEMTIME st;
-			FILETIME ft;
-			FILETIME lft;
-			TCHAR szTime[512];
-
-			GetLocalTime(&st);
-			SystemTimeToFileTime(&st, &ft);
-			LocalFileTimeToFileTime(&ft, &lft);
-			CreateFileTimeString(&lft, szTime, SIZEOF_ARRAY(szTime), FALSE);
-
-			for (int i = 0; i < lstrlen(szTime); i++)
-			{
-				if (szTime[i] == '/')
-				{
-					szTime[i] = '-';
-				}
-				else if (szTime[i] == ':')
-				{
-					szTime[i] = '.';
-				}
-			}
-
-			TCHAR szFullFileName[MAX_PATH];
-			TCHAR szFileName[MAX_PATH];
-
-			/* TODO: Move text into string table. */
-			StringCchPrintf(szFileName, SIZEOF_ARRAY(szFileName), _T("Clipboard Image (%s).bmp"),
-				szTime);
-
-			PathCombine(szFullFileName, m_destDirectory.c_str(), szFileName);
-
-			HANDLE hFile = CreateFile(szFullFileName, GENERIC_WRITE, 0, nullptr, CREATE_NEW,
-				FILE_ATTRIBUTE_NORMAL, nullptr);
-
-			if (hFile != INVALID_HANDLE_VALUE)
-			{
-				auto dwSize = static_cast<DWORD>(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER)
-					+ (GlobalSize(stg.hGlobal) - sizeof(BITMAPINFOHEADER)));
-
-				auto pData = new BYTE[dwSize];
-
-				auto *pbfh = (BITMAPFILEHEADER *) pData;
-
-				/* 'BM'. */
-				pbfh->bfType = 0x4D42;
-
-				pbfh->bfSize = pbmp->bmiHeader.biSize;
-				pbfh->bfReserved1 = 0;
-				pbfh->bfReserved2 = 0;
-				pbfh->bfOffBits = sizeof(BITMAPFILEHEADER);
-
-				auto *pb5h = (BITMAPINFOHEADER *) (pData + sizeof(BITMAPFILEHEADER));
-
-				memcpy(pb5h, &pbmp->bmiHeader, sizeof(BITMAPINFOHEADER));
-
-				auto *prgb =
-					(RGBQUAD *) (pData + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER));
-
-				memcpy(prgb, pbmp->bmiColors, GlobalSize(stg.hGlobal) - sizeof(BITMAPINFOHEADER));
-
-				DWORD nBytesWritten;
-
-				WriteFile(hFile, (LPCVOID) pData, dwSize, &nBytesWritten, nullptr);
-
-				CloseHandle(hFile);
-
-				delete[] pData;
-
-				PastedFileList.emplace_back(szFullFileName);
-			}
-
-			GlobalUnlock(stg.hGlobal);
-		}
-
-		/* Must release the storage medium. */
-		ReleaseStgMedium(&stg);
+		return false;
 	}
 
-	return hr;
+	wil::unique_hglobal_locked mem(stg.hGlobal);
+
+	if (!mem)
+	{
+		return false;
+	}
+
+	auto *bitmapInfo = reinterpret_cast<BITMAPINFO *>(mem.get());
+
+	int colorTableLength = 0;
+
+	// See
+	// https://source.chromium.org/chromium/chromium/src/+/main:ui/base/clipboard/clipboard_win.cc;l=833;drc=177693cc196465bf71d8d0c0fab8c4f1bb9d95b4.
+	switch (bitmapInfo->bmiHeader.biBitCount)
+	{
+	case 1:
+	case 4:
+	case 8:
+		colorTableLength = bitmapInfo->bmiHeader.biClrUsed ? bitmapInfo->bmiHeader.biClrUsed
+														   : 1 << bitmapInfo->bmiHeader.biBitCount;
+		break;
+
+	case 16:
+	case 32:
+		if (bitmapInfo->bmiHeader.biCompression == BI_BITFIELDS)
+		{
+			colorTableLength = 3;
+		}
+		break;
+	}
+
+	void *data = reinterpret_cast<std::byte *>(bitmapInfo) + bitmapInfo->bmiHeader.biSize
+		+ (colorTableLength * sizeof(RGBQUAD));
+
+	// Although it's not stated in the documentation for this Gdiplus::Bitmap constructor, it
+	// appears that the object references the data passed in, rather than copying it. Therefore, the
+	// STGMEDIUM shouldn't be released until this object is destroyed.
+	auto bitmap = std::make_unique<Gdiplus::Bitmap>(bitmapInfo, data);
+
+	if (bitmap->GetLastStatus() != Gdiplus::Ok)
+	{
+		return false;
+	}
+
+	/* TODO: Move text into string table. */
+	WCHAR fullPath[MAX_PATH];
+	auto filename = std::format(L"Clipboard Image ({}).png", GenerateTimestampForFilename());
+	auto combineResult = PathCombine(fullPath, m_destDirectory.c_str(), filename.c_str());
+
+	if (!combineResult)
+	{
+		return false;
+	}
+
+	auto pngClsid = GdiplusHelper::GetEncoderClsid(L"image/png");
+
+	if (!pngClsid)
+	{
+		return false;
+	}
+
+	auto status = bitmap->Save(fullPath, &pngClsid.value(), nullptr);
+
+	if (status != Gdiplus::Ok)
+	{
+		return false;
+	}
+
+	pastedFileList.emplace_back(fullPath);
+
+	return true;
+}
+
+std::wstring GenerateTimestampForFilename()
+{
+	auto now = std::chrono::system_clock::now();
+	auto time = std::chrono::current_zone()->to_local(now);
+
+	auto timeText = std::format(L"{:L%c}", time);
+	std::replace(timeText.begin(), timeText.end(), '/', '-');
+	std::replace(timeText.begin(), timeText.end(), ':', '.');
+
+	return timeText;
 }
 
 HRESULT DropHandler::CopyTextToFile(const TCHAR *pszDestDirectory, const WCHAR *pszText,
 	TCHAR *pszFullFileNameOut, size_t outLen)
 {
-	SYSTEMTIME st;
-	FILETIME ft;
-	FILETIME lft;
 	HRESULT hr = E_FAIL;
-	TCHAR szTime[512];
-
-	GetLocalTime(&st);
-	SystemTimeToFileTime(&st, &ft);
-	LocalFileTimeToFileTime(&ft, &lft);
-	CreateFileTimeString(&lft, szTime, SIZEOF_ARRAY(szTime), FALSE);
-
-	for (int i = 0; i < lstrlen(szTime); i++)
-	{
-		if (szTime[i] == '/')
-		{
-			szTime[i] = '-';
-		}
-		else if (szTime[i] == ':')
-		{
-			szTime[i] = '.';
-		}
-	}
-
-	TCHAR szFullFileName[MAX_PATH];
-	TCHAR szFileName[MAX_PATH];
 
 	/* TODO: Move text into string table. */
-	StringCchPrintf(szFileName, SIZEOF_ARRAY(szFileName), _T("Clipboard Text (%s).txt"), szTime);
-
-	PathCombine(szFullFileName, pszDestDirectory, szFileName);
+	TCHAR szFullFileName[MAX_PATH];
+	auto filename = std::format(L"Clipboard Text ({}).txt", GenerateTimestampForFilename());
+	PathCombine(szFullFileName, pszDestDirectory, filename.c_str());
 
 	HANDLE hFile = CreateFile(szFullFileName, GENERIC_WRITE, 0, nullptr, CREATE_NEW,
 		FILE_ATTRIBUTE_NORMAL, nullptr);

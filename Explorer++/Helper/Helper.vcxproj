@@ -472,6 +472,7 @@
     <ClCompile Include="FileContextMenuManager.cpp" />
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="FolderSize.cpp" />
+    <ClCompile Include="GdiplusHelper.cpp" />
     <ClCompile Include="HeaderHelper.cpp" />
     <ClCompile Include="Helper.cpp" />
     <ClCompile Include="IconFetcher.cpp" />
@@ -548,6 +549,7 @@
     <ClInclude Include="FileContextMenuManager.h" />
     <ClInclude Include="FileOperations.h" />
     <ClInclude Include="FolderSize.h" />
+    <ClInclude Include="GdiplusHelper.h" />
     <ClInclude Include="HeaderHelper.h" />
     <ClInclude Include="Helper.h" />
     <ClInclude Include="IconFetcher.h" />
