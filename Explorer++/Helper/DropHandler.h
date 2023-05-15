@@ -36,6 +36,7 @@ private:
 	BOOL CheckDropFormatSupported(IDataObject *pDataObject, FORMATETC *pftc);
 
 	HRESULT CopyUnicodeTextData(IDataObject *pDataObject, std::list<std::wstring> &PastedFileList);
+	bool CopyPngData(IDataObject *dataObject, std::list<std::wstring> &pastedFileList);
 	bool CopyDIBData(IDataObject *dataObject, std::list<std::wstring> &pastedFileList);
 
 	HRESULT CopyTextToFile(const TCHAR *pszDestDirectory, const WCHAR *pszText,
@@ -43,6 +44,7 @@ private:
 
 	/* Holds the drop formats supported. */
 	static FORMATETC m_ftcUnicodeText;
+	static FORMATETC m_ftcPng;
 	static FORMATETC m_ftcDIB;
 
 	IDataObject *m_pDataObject;

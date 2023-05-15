@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "DropHandler.h"
+#include "DataExchangeHelper.h"
 #include "GdiplusHelper.h"
 #include "Helper.h"
 #include "Logging.h"
@@ -14,6 +15,8 @@
 /* Drop formats supported. */
 FORMATETC DropHandler::m_ftcUnicodeText = { CF_UNICODETEXT, nullptr, DVASPECT_CONTENT, -1,
 	TYMED_HGLOBAL };
+FORMATETC DropHandler::m_ftcPng = { static_cast<CLIPFORMAT>(GetPngClipboardFormat()), nullptr,
+	DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 FORMATETC DropHandler::m_ftcDIB = { CF_DIB, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 
 std::wstring GenerateTimestampForFilename();
@@ -85,6 +88,13 @@ void DropHandler::HandleLeftClickDrop(IDataObject *pDataObject, POINT *pt)
 	{
 		LOG(debug) << _T("Helper - Copying CF_UNICODETEXT data");
 		hrCopy = CopyUnicodeTextData(pDataObject, pastedFileList);
+	}
+	else if (CheckDropFormatSupported(pDataObject, &m_ftcPng))
+	{
+		LOG(debug) << _T("Helper - Copying PNG data");
+
+		bool res = CopyPngData(pDataObject, pastedFileList);
+		hrCopy = res ? S_OK : E_FAIL;
 	}
 	else if (CheckDropFormatSupported(pDataObject, &m_ftcDIB))
 	{
@@ -173,6 +183,59 @@ HRESULT DropHandler::CopyUnicodeTextData(IDataObject *pDataObject,
 	}
 
 	return hr;
+}
+
+bool DropHandler::CopyPngData(IDataObject *dataObject, std::list<std::wstring> &pastedFileList)
+{
+	wil::unique_stg_medium stg;
+	HRESULT hr = dataObject->GetData(&m_ftcPng, &stg);
+
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	wil::unique_hglobal_locked mem(stg.hGlobal);
+
+	if (!mem)
+	{
+		return false;
+	}
+
+	auto dataSize = GlobalSize(mem.get());
+
+	// dataSize is cast to a DWORD in the WriteFile() call below. It's not expected that an image
+	// would ever be larger than the size that can be represented in a DWORD (4GB), but if it is,
+	// the method should fail here, rather than blindly writing some of the data out.
+	if (dataSize == 0 || dataSize > (std::numeric_limits<DWORD>::max)())
+	{
+		return false;
+	}
+
+	/* TODO: Move text into string table. */
+	WCHAR fullPath[MAX_PATH];
+	auto filename = std::format(L"Clipboard Image ({}).png", GenerateTimestampForFilename());
+	auto combineResult = PathCombine(fullPath, m_destDirectory.c_str(), filename.c_str());
+
+	if (!combineResult)
+	{
+		return false;
+	}
+
+	wil::unique_hfile file(CreateFile(fullPath, GENERIC_WRITE, 0, nullptr, CREATE_NEW,
+		FILE_ATTRIBUTE_NORMAL, nullptr));
+
+	if (!file)
+	{
+		return false;
+	}
+
+	DWORD bytesWritten = 0;
+	WriteFile(file.get(), mem.get(), static_cast<DWORD>(dataSize), &bytesWritten, nullptr);
+
+	pastedFileList.emplace_back(fullPath);
+
+	return true;
 }
 
 bool DropHandler::CopyDIBData(IDataObject *dataObject, std::list<std::wstring> &pastedFileList)

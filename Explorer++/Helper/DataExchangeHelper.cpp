@@ -80,3 +80,11 @@ bool IsDropFormatAvailable(IDataObject *dataObject, const FORMATETC &formatEtc)
 	HRESULT hr = dataObject->QueryGetData(&formatEtcCopy);
 	return (hr == S_OK);
 }
+
+UINT GetPngClipboardFormat()
+{
+	// This is used by applications like Chrome when copying an image. The clipboard will contain
+	// the raw png data.
+	static UINT clipboardFormat = RegisterClipboardFormat(L"PNG");
+	return clipboardFormat;
+}
