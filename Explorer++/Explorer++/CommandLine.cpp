@@ -123,8 +123,7 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 		->transform(CLI::CheckedTransformer(CLI::TransformPairs<ShellChangeNotificationType>{
 			{ "disabled", ShellChangeNotificationType::Disabled },
 			{ "non-filesystem", ShellChangeNotificationType::NonFilesystem },
-			{ "all", ShellChangeNotificationType::All } }))
-		->default_val("non-filesystem");
+			{ "all", ShellChangeNotificationType::All } }));
 
 	app.add_option("--language", settings.language,
 		"Allows you to select your desired language. Should be a two-letter language code (e.g. "
@@ -154,11 +153,7 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 		return settings;
 	}
 
-	auto freeArgs = wil::scope_exit(
-		[args]
-		{
-			LocalFree(args);
-		});
+	auto freeArgs = wil::scope_exit([args] { LocalFree(args); });
 
 	std::vector<std::string> utf8Args;
 

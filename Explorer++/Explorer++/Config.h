@@ -79,7 +79,7 @@ struct Config
 	BOOL displayWindowVertical = FALSE;
 	unsigned int treeViewWidth = DEFAULT_TREEVIEW_WIDTH;
 	bool checkPinnedToNamespaceTreeProperty = false;
-	ShellChangeNotificationType shellChangeNotificationType = ShellChangeNotificationType::Disabled;
+	ShellChangeNotificationType shellChangeNotificationType = ShellChangeNotificationType::All;
 	bool goUpOnDoubleClick = true;
 
 	DefaultFileManager::ReplaceExplorerMode replaceExplorerMode =
