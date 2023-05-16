@@ -212,3 +212,9 @@ void Explorerplusplus::OnMenuRightButtonUp(HMENU menu, int index, const POINT &p
 
 	m_mainMenuItemRightClickedSignal(menu, index, pt);
 }
+
+boost::signals2::connection Explorerplusplus::AddGetMenuItemHelperTextObserver(
+	const GetMenuItemHelperTextSignal::slot_type &observer)
+{
+	return m_getMenuItemHelperTextSignal.connect(observer);
+}

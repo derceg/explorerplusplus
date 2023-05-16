@@ -68,9 +68,29 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
 	{
 		m_pStatusBar->HandleStatusBarMenuOpen();
 
-		TCHAR szBuffer[512];
-		LoadString(m_resourceInstance, LOWORD(wParam), szBuffer, SIZEOF_ARRAY(szBuffer));
-		SetWindowText(m_hStatusBar, szBuffer);
+		std::optional<std::wstring> helperText;
+
+		if (WI_IsFlagClear(HIWORD(wParam), MF_POPUP))
+		{
+			HMENU menu = reinterpret_cast<HMENU>(lParam);
+			int menuItemId = LOWORD(wParam);
+
+			helperText = m_getMenuItemHelperTextSignal(menu, menuItemId);
+
+			if (!helperText)
+			{
+				helperText = ResourceHelper::MaybeLoadString(m_resourceInstance, menuItemId);
+			}
+		}
+
+		if (helperText)
+		{
+			SetWindowText(m_hStatusBar, helperText->c_str());
+		}
+		else
+		{
+			SetWindowText(m_hStatusBar, L"");
+		}
 	}
 
 	return 0;

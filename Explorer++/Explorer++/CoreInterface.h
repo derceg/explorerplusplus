@@ -21,17 +21,18 @@ enum class WindowFocusSource
 };
 
 // Stops signal propagation after the first successful handler (i.e. the first handler that returns
-// true).
+// a result that evaluates to true).
+template <typename T>
 struct FirstSuccessfulRequestCombiner
 {
-	typedef bool result_type;
+	typedef T result_type;
 
 	template <typename InputIterator>
-	result_type operator()(InputIterator first, InputIterator last) const
+	T operator()(InputIterator first, InputIterator last) const
 	{
 		while (first != last)
 		{
-			if (result_type fullfilled = *first)
+			if (T fullfilled = *first)
 			{
 				return fullfilled;
 			}
@@ -39,7 +40,7 @@ struct FirstSuccessfulRequestCombiner
 			++first;
 		}
 
-		return false;
+		return T();
 	}
 };
 
@@ -47,7 +48,10 @@ using TabsInitializedSignal = boost::signals2::signal<void()>;
 using MainMenuPreShowSignal = boost::signals2::signal<void(HMENU mainMenu)>;
 using MainMenuItemRightClickedSignal =
 	boost::signals2::signal<bool(HMENU menu, int index, const POINT &pt),
-		FirstSuccessfulRequestCombiner>;
+		FirstSuccessfulRequestCombiner<bool>>;
+using GetMenuItemHelperTextSignal =
+	boost::signals2::signal<std::optional<std::wstring>(HMENU menu, int id),
+		FirstSuccessfulRequestCombiner<std::optional<std::wstring>>>;
 using ToolbarContextMenuSignal =
 	boost::signals2::signal<void(HMENU menu, HWND sourceWindow, const POINT &pt)>;
 using ToolbarContextMenuSelectedSignal =
@@ -128,6 +132,8 @@ public:
 		const MainMenuPreShowSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddMainMenuItemRightClickedObserver(
 		const MainMenuItemRightClickedSignal::slot_type &observer) = 0;
+	virtual boost::signals2::connection AddGetMenuItemHelperTextObserver(
+		const GetMenuItemHelperTextSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddToolbarContextMenuObserver(
 		const ToolbarContextMenuSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddToolbarContextMenuSelectedObserver(

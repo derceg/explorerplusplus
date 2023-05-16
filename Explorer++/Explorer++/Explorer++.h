@@ -512,6 +512,8 @@ private:
 	boost::signals2::connection AddMainMenuItemRightClickedObserver(
 		const MainMenuItemRightClickedSignal::slot_type &observer) override;
 	void OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt);
+	boost::signals2::connection AddGetMenuItemHelperTextObserver(
+		const GetMenuItemHelperTextSignal::slot_type &observer) override;
 
 	// Dark mode
 	static bool ShouldEnableDarkMode(Theme theme);
@@ -580,6 +582,7 @@ private:
 	MainMenuPreShowSignal m_mainMenuPreShowSignal;
 	MainMenuItemRightClickedSignal m_mainMenuItemRightClickedSignal;
 	bool m_mainMenuShowing = false;
+	GetMenuItemHelperTextSignal m_getMenuItemHelperTextSignal;
 	FocusChangedSignal m_focusChangedSignal;
 	ApplicationShuttingDownSignal m_applicationShuttingDownSignal;
 	bool m_applicationShuttingDown = false;

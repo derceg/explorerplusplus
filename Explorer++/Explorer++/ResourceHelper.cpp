@@ -8,13 +8,26 @@
 
 std::wstring ResourceHelper::LoadString(HINSTANCE resourceInstance, UINT stringId)
 {
+	auto string = MaybeLoadString(resourceInstance, stringId);
+
+	if (!string)
+	{
+		throw std::runtime_error("String resource not found");
+	}
+
+	return *string;
+}
+
+std::optional<std::wstring> ResourceHelper::MaybeLoadString(HINSTANCE resourceInstance,
+	UINT stringId)
+{
 	WCHAR *string;
 	int numCharacters =
 		LoadString(resourceInstance, stringId, reinterpret_cast<LPWSTR>(&string), 0);
 
 	if (numCharacters == 0)
 	{
-		throw std::runtime_error("String resource not found");
+		return std::nullopt;
 	}
 
 	return std::wstring(string, numCharacters);

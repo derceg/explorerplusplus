@@ -26,6 +26,8 @@ BookmarksMainMenu::BookmarksMainMenu(CoreInterface *coreInterface, Navigator *na
 {
 	m_connections.push_back(coreInterface->AddMainMenuPreShowObserver(
 		std::bind_front(&BookmarksMainMenu::OnMainMenuPreShow, this)));
+	m_connections.push_back(coreInterface->AddGetMenuItemHelperTextObserver(
+		std::bind_front(&BookmarksMainMenu::MaybeGetMenuItemHelperText, this)));
 	m_connections.push_back(coreInterface->AddMainMenuItemRightClickedObserver(
 		std::bind_front(&BookmarksMainMenu::OnMenuItemRightClicked, this)));
 }
@@ -127,6 +129,24 @@ void BookmarksMainMenu::AddOtherBookmarksToMenu(HMENU menu, const MenuIdRange &m
 
 	std::wstring otherBookmarksName = otherBookmarksFolder->GetName();
 	MenuHelper::AddSubMenuItem(menu, otherBookmarksName, std::move(subMenu), position++, TRUE);
+}
+
+std::optional<std::wstring> BookmarksMainMenu::MaybeGetMenuItemHelperText(HMENU menu, int id)
+{
+	if (!m_menuInfo.menus.contains(menu))
+	{
+		return std::nullopt;
+	}
+
+	auto itr = m_menuInfo.itemIdMap.find(id);
+
+	if (itr == m_menuInfo.itemIdMap.end())
+	{
+		return std::nullopt;
+	}
+
+	const BookmarkItem *bookmark = itr->second;
+	return bookmark->GetLocation();
 }
 
 void BookmarksMainMenu::OnMenuItemClicked(int menuItemId)
