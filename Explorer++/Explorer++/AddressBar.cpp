@@ -307,27 +307,7 @@ void AddressBar::UpdateTextAndIcon(const Tab &tab)
 
 	auto entry = tab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
 
-	auto cachedFullPath = entry->GetFullPathForDisplay();
-	std::optional<std::wstring> text;
-
-	if (cachedFullPath)
-	{
-		text = cachedFullPath;
-	}
-	else
-	{
-		text = GetFolderPathForDisplay(entry->GetPidl().get());
-
-		if (text)
-		{
-			entry->SetFullPathForDisplay(*text);
-		}
-	}
-
-	if (!text)
-	{
-		return;
-	}
+	auto fullPathForDisplay = entry->GetFullPathForDisplay();
 
 	auto cachedIconIndex = entry->GetSystemIconIndex();
 	int iconIndex;
@@ -346,7 +326,7 @@ void AddressBar::UpdateTextAndIcon(const Tab &tab)
 
 	SendMessage(m_hwnd, CB_RESETCONTENT, 0, 0);
 
-	UpdateTextAndIconInUI(&*text, iconIndex);
+	UpdateTextAndIconInUI(&fullPathForDisplay, iconIndex);
 }
 
 void AddressBar::UpdateTextAndIconInUI(std::wstring *text, int iconIndex)

@@ -30,6 +30,7 @@ private:
 	void OnMainMenuPreShow(HMENU mainMenu);
 	wil::unique_hmenu BuildRecentlyClosedTabsMenu(std::vector<wil::unique_hbitmap> &menuImages,
 		std::unordered_map<int, int> &menuItemMappings);
+	std::optional<std::wstring> MaybeGetMenuItemHelperText(HMENU menu, int id);
 
 	HINSTANCE m_resourceInstance;
 	CoreInterface *m_coreInterface;

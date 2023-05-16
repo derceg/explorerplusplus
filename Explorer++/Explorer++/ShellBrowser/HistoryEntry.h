@@ -21,14 +21,13 @@ public:
 	};
 
 	HistoryEntry(PCIDLIST_ABSOLUTE pidl, std::wstring_view displayName,
-		std::optional<int> systemIconIndex = std::nullopt);
+		std::wstring_view fullPathForDisplay, std::optional<int> systemIconIndex = std::nullopt);
 	HistoryEntry(const PreservedHistoryEntry &preservedHistoryEntry);
 
 	int GetId() const;
 	unique_pidl_absolute GetPidl() const;
 	std::wstring GetDisplayName() const;
-	std::optional<std::wstring> GetFullPathForDisplay() const;
-	void SetFullPathForDisplay(const std::wstring &fullPathForDisplay);
+	std::wstring GetFullPathForDisplay() const;
 	std::optional<int> GetSystemIconIndex() const;
 	void SetSystemIconIndex(int iconIndex);
 	std::vector<unique_pidl_absolute> GetSelectedItems() const;
@@ -45,7 +44,7 @@ private:
 
 	unique_pidl_absolute m_pidl;
 	std::wstring m_displayName;
-	std::optional<std::wstring> m_fullPathForDisplay;
+	std::wstring m_fullPathForDisplay;
 	std::optional<int> m_systemIconIndex;
 	std::vector<unique_pidl_absolute> m_selectedItems;
 };

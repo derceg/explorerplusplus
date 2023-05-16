@@ -221,7 +221,14 @@ protected:
 			return nullptr;
 		}
 
-		HistoryEntry entry(pidl.get(), displayName);
+		auto fullPathForDisplay = GetFolderPathForDisplay(pidl.get());
+
+		if (!fullPathForDisplay)
+		{
+			return nullptr;
+		}
+
+		HistoryEntry entry(pidl.get(), displayName, *fullPathForDisplay);
 		return std::make_unique<PreservedHistoryEntry>(entry);
 	}
 
@@ -531,5 +538,7 @@ TEST_F(ShellNavigationControllerPreservedTest, CheckEntries)
 		auto entry = m_navigationController->GetEntryAtIndex(static_cast<int>(i));
 		ASSERT_NE(entry, nullptr);
 		EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), m_preservedEntries[i]->pidl.get()));
+		EXPECT_EQ(entry->GetDisplayName(), m_preservedEntries[i]->displayName);
+		EXPECT_EQ(entry->GetFullPathForDisplay(), m_preservedEntries[i]->fullPathForDisplay);
 	}
 }

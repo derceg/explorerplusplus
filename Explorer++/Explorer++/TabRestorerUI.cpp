@@ -26,6 +26,8 @@ TabRestorerUI::TabRestorerUI(HINSTANCE resourceInstance, CoreInterface *coreInte
 
 	m_connections.push_back(m_coreInterface->AddMainMenuPreShowObserver(
 		std::bind_front(&TabRestorerUI::OnMainMenuPreShow, this)));
+	m_connections.push_back(coreInterface->AddGetMenuItemHelperTextObserver(
+		std::bind_front(&TabRestorerUI::MaybeGetMenuItemHelperText, this)));
 }
 
 TabRestorerUI::~TabRestorerUI()
@@ -136,6 +138,28 @@ wil::unique_hmenu TabRestorerUI::BuildRecentlyClosedTabsMenu(
 	}
 
 	return menu;
+}
+
+std::optional<std::wstring> TabRestorerUI::MaybeGetMenuItemHelperText(HMENU menu, int id)
+{
+	if (menu != m_recentTabsMenu.get())
+	{
+		return std::nullopt;
+	}
+
+	auto itr = m_menuItemMappings.find(id);
+
+	if (itr == m_menuItemMappings.end())
+	{
+		// This branch will be taken if the cursor is over the "No Recent Tabs" item.
+		return std::nullopt;
+	}
+
+	auto *closedTab = m_tabRestorer->GetTabById(itr->second);
+	assert(closedTab);
+
+	auto currentEntry = closedTab->history.at(closedTab->currentEntry).get();
+	return currentEntry->fullPathForDisplay;
 }
 
 void TabRestorerUI::OnMenuItemClicked(int menuItemId)

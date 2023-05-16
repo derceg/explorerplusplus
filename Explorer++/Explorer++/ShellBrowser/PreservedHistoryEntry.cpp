@@ -10,6 +10,7 @@ PreservedHistoryEntry::PreservedHistoryEntry(const HistoryEntry &entry) :
 	id(entry.GetId()),
 	pidl(ILCloneFull(entry.GetPidl().get())),
 	displayName(entry.GetDisplayName()),
+	fullPathForDisplay(entry.GetFullPathForDisplay()),
 	systemIconIndex(entry.GetSystemIconIndex())
 {
 }

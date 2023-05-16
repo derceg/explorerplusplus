@@ -9,10 +9,11 @@
 int HistoryEntry::idCounter = 0;
 
 HistoryEntry::HistoryEntry(PCIDLIST_ABSOLUTE pidl, std::wstring_view displayName,
-	std::optional<int> systemIconIndex) :
+	std::wstring_view fullPathForDisplay, std::optional<int> systemIconIndex) :
 	m_id(idCounter++),
 	m_pidl(ILCloneFull(pidl)),
 	m_displayName(displayName),
+	m_fullPathForDisplay(fullPathForDisplay),
 	m_systemIconIndex(systemIconIndex)
 {
 }
@@ -21,6 +22,7 @@ HistoryEntry::HistoryEntry(const PreservedHistoryEntry &preservedHistoryEntry) :
 	m_id(idCounter++),
 	m_pidl(ILCloneFull(preservedHistoryEntry.pidl.get())),
 	m_displayName(preservedHistoryEntry.displayName),
+	m_fullPathForDisplay(preservedHistoryEntry.fullPathForDisplay),
 	m_systemIconIndex(preservedHistoryEntry.systemIconIndex)
 {
 }
@@ -40,14 +42,9 @@ std::wstring HistoryEntry::GetDisplayName() const
 	return m_displayName;
 }
 
-std::optional<std::wstring> HistoryEntry::GetFullPathForDisplay() const
+std::wstring HistoryEntry::GetFullPathForDisplay() const
 {
 	return m_fullPathForDisplay;
-}
-
-void HistoryEntry::SetFullPathForDisplay(const std::wstring &fullPathForDisplay)
-{
-	m_fullPathForDisplay = fullPathForDisplay;
 }
 
 std::optional<int> HistoryEntry::GetSystemIconIndex() const

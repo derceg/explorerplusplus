@@ -23,6 +23,19 @@ const std::vector<std::unique_ptr<PreservedTab>> &TabRestorer::GetClosedTabs() c
 	return m_closedTabs;
 }
 
+const PreservedTab *TabRestorer::GetTabById(int id) const
+{
+	auto itr = std::find_if(m_closedTabs.begin(), m_closedTabs.end(),
+		[id](const std::unique_ptr<PreservedTab> &preservedTab) { return preservedTab->id == id; });
+
+	if (itr == m_closedTabs.end())
+	{
+		return nullptr;
+	}
+
+	return itr->get();
+}
+
 void TabRestorer::RestoreLastTab()
 {
 	if (m_closedTabs.empty())
@@ -40,10 +53,7 @@ void TabRestorer::RestoreLastTab()
 void TabRestorer::RestoreTabById(int id)
 {
 	auto itr = std::find_if(m_closedTabs.begin(), m_closedTabs.end(),
-		[id](const std::unique_ptr<PreservedTab> &preservedTab)
-		{
-			return preservedTab->id == id;
-		});
+		[id](const std::unique_ptr<PreservedTab> &preservedTab) { return preservedTab->id == id; });
 
 	if (itr == m_closedTabs.end())
 	{

@@ -54,9 +54,28 @@ void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navi
 	if (navigateParams.addHistoryEntry)
 	{
 		std::wstring displayName;
-		GetDisplayName(navigateParams.pidl.Raw(), SHGDN_INFOLDER, displayName);
+		HRESULT hr = GetDisplayName(navigateParams.pidl.Raw(), SHGDN_INFOLDER, displayName);
 
-		auto newEntry = std::make_unique<HistoryEntry>(navigateParams.pidl.Raw(), displayName);
+		if (FAILED(hr))
+		{
+			// It's not expected that this would happen, so it would be useful to have some
+			// indication if the call above ever does fail.
+			assert(false);
+
+			displayName = L"(Unknown)";
+		}
+
+		auto fullPathForDisplay = GetFolderPathForDisplay(navigateParams.pidl.Raw());
+
+		if (!fullPathForDisplay)
+		{
+			assert(false);
+
+			fullPathForDisplay = L"(Unknown)";
+		}
+
+		auto newEntry = std::make_unique<HistoryEntry>(navigateParams.pidl.Raw(), displayName,
+			*fullPathForDisplay);
 		int entryId = newEntry->GetId();
 		int index = AddEntry(std::move(newEntry));
 

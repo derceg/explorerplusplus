@@ -19,6 +19,7 @@ public:
 
 	unique_pidl_absolute pidl;
 	std::wstring displayName;
+	std::wstring fullPathForDisplay;
 	std::optional<int> systemIconIndex;
 
 private:
