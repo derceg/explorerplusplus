@@ -171,6 +171,8 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 			m_config->useLargeToolbarIcons.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("CheckPinnedToNamespaceTreeProperty"),
 			m_config->checkPinnedToNamespaceTreeProperty);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ShowQuickAccessInTreeView"),
+			m_config->showQuickAccessInTreeView.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("Theme"), m_config->theme);
 
 		RegistrySettings::SaveString(hSettingsKey, _T("NewTabDirectory"),
@@ -395,6 +397,8 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey,
 			_T("CheckPinnedToNamespaceTreeProperty"), m_config->checkPinnedToNamespaceTreeProperty);
+		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowQuickAccessInTreeView"),
+			m_config->showQuickAccessInTreeView);
 
 		bool themeLoaded = false;
 		RegistrySettings::ReadDword(hSettingsKey, _T("Theme"),

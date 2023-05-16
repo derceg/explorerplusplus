@@ -89,7 +89,7 @@ ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabCont
 	m_bDragAllowed = FALSE;
 	m_bShowHidden = TRUE;
 
-	AddRoot();
+	AddRootItems();
 
 	m_getDragImageMessage = RegisterWindowMessage(DI_GETDRAGIMAGE);
 
@@ -97,6 +97,8 @@ ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabCont
 
 	StartDirectoryMonitoringForDrives();
 
+	m_connections.push_back(m_config->showQuickAccessInTreeView.addObserver(
+		std::bind_front(&ShellTreeView::OnShowQuickAccessUpdated, this)));
 	m_connections.push_back(coreInterface->AddApplicationShuttingDownObserver(
 		std::bind_front(&ShellTreeView::OnApplicationShuttingDown, this)));
 }
@@ -283,23 +285,65 @@ LRESULT ShellTreeView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-HTREEITEM ShellTreeView::AddRoot()
+void ShellTreeView::AddRootItems()
 {
-	TreeView_DeleteAllItems(m_hTreeView);
-
-	unique_pidl_absolute pidl;
-	HRESULT hr = GetRootPidl(wil::out_param(pidl));
-
-	if (FAILED(hr))
+	if (m_config->showQuickAccessInTreeView.get())
 	{
-		return nullptr;
+		AddQuickAccessRootItem();
 	}
 
-	auto rootItem = AddItem(nullptr, pidl.get());
+	AddShellNamespaceRootItem();
+}
+
+void ShellTreeView::AddQuickAccessRootItem()
+{
+	// The quick access root item should only be added to the treeview if it's not already there.
+	assert(!m_quickAccessRootItem);
+
+	unique_pidl_absolute quickAccessPidl;
+	HRESULT hr =
+		SHParseDisplayName(QUICK_ACCESS_PATH, nullptr, wil::out_param(quickAccessPidl), 0, nullptr);
+
+	if (SUCCEEDED(hr))
+	{
+		m_quickAccessRootItem = AddRootItem(quickAccessPidl.get(), TVI_FIRST);
+	}
+}
+
+void ShellTreeView::AddShellNamespaceRootItem()
+{
+	unique_pidl_absolute rootPidl;
+	HRESULT hr = GetRootPidl(wil::out_param(rootPidl));
+
+	if (SUCCEEDED(hr))
+	{
+		AddRootItem(rootPidl.get());
+	}
+}
+
+HTREEITEM ShellTreeView::AddRootItem(PCIDLIST_ABSOLUTE pidl, HTREEITEM insertAfter)
+{
+	auto rootItem = AddItem(nullptr, pidl, insertAfter);
 	assert(rootItem);
 	SendMessage(m_hTreeView, TVM_EXPAND, TVE_EXPAND, reinterpret_cast<LPARAM>(rootItem));
 
 	return rootItem;
+}
+
+void ShellTreeView::OnShowQuickAccessUpdated(bool newValue)
+{
+	if (newValue)
+	{
+		AddQuickAccessRootItem();
+	}
+	else
+	{
+		if (m_quickAccessRootItem)
+		{
+			RemoveItem(m_quickAccessRootItem);
+			m_quickAccessRootItem = nullptr;
+		}
+	}
 }
 
 void ShellTreeView::OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi)
@@ -758,7 +802,7 @@ HRESULT ShellTreeView::ExpandDirectory(HTREEITEM hParent)
 	return hr;
 }
 
-HTREEITEM ShellTreeView::AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl)
+HTREEITEM ShellTreeView::AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl, HTREEITEM insertAfter)
 {
 	std::wstring name;
 	HRESULT hr = GetDisplayName(pidl, SHGDN_NORMAL, name);
@@ -795,7 +839,7 @@ HTREEITEM ShellTreeView::AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl)
 	tvItem.cChildren = I_CHILDRENCALLBACK;
 
 	TVINSERTSTRUCT tvInsertData = {};
-	tvInsertData.hInsertAfter = TVI_LAST;
+	tvInsertData.hInsertAfter = insertAfter;
 	tvInsertData.hParent = parent;
 	tvInsertData.itemex = tvItem;
 

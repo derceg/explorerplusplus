@@ -109,6 +109,7 @@ will need to be changed correspondingly. */
 #define HASH_LARGETOOLBARICONS 10895007
 #define HASH_ICON_THEME 3998265761
 #define HASH_CHECK_PINNED_TO_NAMESPACE_TREE_PROPERTY 145831142
+#define HASH_SHOW_QUICK_ACCESS_IN_TREEVIEW 4287034967
 #define HASH_THEME 237620728
 #define HASH_ENABLE_DARK_MODE 1623404723
 #define HASH_DISPLAY_MIXED_FILES_AND_FOLDERS 1168704423
@@ -723,6 +724,11 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
 		_T("CheckPinnedToNamespaceTreeProperty"),
 		NXMLSettings::EncodeBoolValue(m_config->checkPinnedToNamespaceTreeProperty));
+
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
+		_T("ShowQuickAccessInTreeView"),
+		NXMLSettings::EncodeBoolValue(m_config->showQuickAccessInTreeView.get()));
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("Theme"),
@@ -1796,6 +1802,10 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 
 	case HASH_CHECK_PINNED_TO_NAMESPACE_TREE_PROPERTY:
 		m_config->checkPinnedToNamespaceTreeProperty = NXMLSettings::DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_SHOW_QUICK_ACCESS_IN_TREEVIEW:
+		m_config->showQuickAccessInTreeView = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_THEME:

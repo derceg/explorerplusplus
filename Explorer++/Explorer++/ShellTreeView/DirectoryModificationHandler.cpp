@@ -248,12 +248,22 @@ void ShellTreeView::RemoveItem(HTREEITEM item)
 	[[maybe_unused]] bool itemRetrieved = TreeView_GetItem(m_hTreeView, &tvItem);
 	assert(itemRetrieved);
 
+	bool deleteIndividualItem;
 	auto parent = TreeView_GetParent(m_hTreeView, item);
-	assert(parent);
 
-	bool multipleChildren = ItemHasMultipleChildren(parent);
+	// It's valid for the item that's being removed to have no parent, since root items may be
+	// dynamically added and removed.
+	if (parent)
+	{
+		deleteIndividualItem = ItemHasMultipleChildren(parent);
+	}
+	else
+	{
+		// This is a root item.
+		deleteIndividualItem = true;
+	}
 
-	if (multipleChildren)
+	if (deleteIndividualItem)
 	{
 		[[maybe_unused]] bool deleted = TreeView_DeleteItem(m_hTreeView, item);
 		assert(deleted);
@@ -276,7 +286,16 @@ void ShellTreeView::RemoveItem(HTREEITEM item)
 		StopDirectoryMonitoringForNode(node->GetParent());
 	}
 
-	node->GetParent()->RemoveChild(node);
+	if (parent)
+	{
+		node->GetParent()->RemoveChild(node);
+	}
+	else
+	{
+		[[maybe_unused]] auto numErased =
+			std::erase_if(m_nodes, [node](const auto &rootNode) { return rootNode.get() == node; });
+		assert(numErased == 1);
+	}
 }
 
 bool ShellTreeView::ItemHasMultipleChildren(HTREEITEM item)

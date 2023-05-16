@@ -95,9 +95,13 @@ private:
 
 	static int CALLBACK CompareItemsStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 
-	HTREEITEM AddRoot();
+	void AddRootItems();
+	void AddQuickAccessRootItem();
+	void AddShellNamespaceRootItem();
+	HTREEITEM AddRootItem(PCIDLIST_ABSOLUTE pidl, HTREEITEM insertAfter = TVI_LAST);
+	void OnShowQuickAccessUpdated(bool newValue);
 	HRESULT ExpandDirectory(HTREEITEM hParent);
-	HTREEITEM AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl);
+	HTREEITEM AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl, HTREEITEM insertAfter = TVI_LAST);
 	void SortChildren(HTREEITEM parent);
 	void OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi);
 	void OnItemExpanding(const NMTREEVIEW *nmtv);
@@ -169,6 +173,7 @@ private:
 	void OnApplicationShuttingDown();
 
 	HWND m_hTreeView;
+	HTREEITEM m_quickAccessRootItem = nullptr;
 	BOOL m_bShowHidden;
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;

@@ -78,7 +78,6 @@ struct Config
 	LONG displayWindowHeight = DEFAULT_DISPLAYWINDOW_HEIGHT;
 	BOOL displayWindowVertical = FALSE;
 	unsigned int treeViewWidth = DEFAULT_TREEVIEW_WIDTH;
-	bool checkPinnedToNamespaceTreeProperty = false;
 	ShellChangeNotificationType shellChangeNotificationType = ShellChangeNotificationType::All;
 	bool goUpOnDoubleClick = true;
 
@@ -99,6 +98,10 @@ struct Config
 	ValueWrapper<BOOL> extendTabControl = FALSE;
 	ValueWrapper<BOOL> forceSameTabWidth = FALSE;
 	bool openTabsInForeground = false;
+
+	// Treeview
+	bool checkPinnedToNamespaceTreeProperty = false;
+	ValueWrapper<bool> showQuickAccessInTreeView = true;
 
 	// Display window
 	Gdiplus::Color displayWindowCentreColor = Gdiplus::Color(255, 255, 255);

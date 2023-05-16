@@ -24,7 +24,8 @@ private:
 	{
 		CheckSystemIsPinnedToNameSpaceTree,
 		OpenTabsInForeground,
-		GoUpOnDoubleClick
+		GoUpOnDoubleClick,
+		QuickAccessInTreeView
 	};
 
 	enum class AdvancedOptionType

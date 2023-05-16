@@ -130,6 +130,13 @@ std::vector<AdvancedOptionsPage::AdvancedOption> AdvancedOptionsPage::Initialize
 	option.description = {};
 	advancedOptions.push_back(option);
 
+	option.id = AdvancedOptionId::QuickAccessInTreeView;
+	option.name = ResourceHelper::LoadString(m_resourceInstance,
+		IDS_ADVANCED_OPTION_SHOW_QUICK_ACCESS_IN_TREEVIEW_NAME);
+	option.type = AdvancedOptionType::Boolean;
+	option.description = {};
+	advancedOptions.push_back(option);
+
 	return advancedOptions;
 }
 
@@ -178,6 +185,9 @@ bool AdvancedOptionsPage::GetBooleanConfigValue(AdvancedOptionId id)
 	case AdvancedOptionId::GoUpOnDoubleClick:
 		return m_config->goUpOnDoubleClick;
 
+	case AdvancedOptionId::QuickAccessInTreeView:
+		return m_config->showQuickAccessInTreeView.get();
+
 	default:
 		assert(false);
 		break;
@@ -200,6 +210,10 @@ void AdvancedOptionsPage::SetBooleanConfigValue(AdvancedOptionId id, bool value)
 
 	case AdvancedOptionId::GoUpOnDoubleClick:
 		m_config->goUpOnDoubleClick = value;
+		break;
+
+	case AdvancedOptionId::QuickAccessInTreeView:
+		m_config->showQuickAccessInTreeView = value;
 		break;
 
 	default:
