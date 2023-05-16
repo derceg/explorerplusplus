@@ -20,8 +20,34 @@ enum class WindowFocusSource
 	ListView
 };
 
+// Stops signal propagation after the first successful handler (i.e. the first handler that returns
+// true).
+struct FirstSuccessfulRequestCombiner
+{
+	typedef bool result_type;
+
+	template <typename InputIterator>
+	result_type operator()(InputIterator first, InputIterator last) const
+	{
+		while (first != last)
+		{
+			if (result_type fullfilled = *first)
+			{
+				return fullfilled;
+			}
+
+			++first;
+		}
+
+		return false;
+	}
+};
+
 using TabsInitializedSignal = boost::signals2::signal<void()>;
 using MainMenuPreShowSignal = boost::signals2::signal<void(HMENU mainMenu)>;
+using MainMenuItemRightClickedSignal =
+	boost::signals2::signal<bool(HMENU menu, int index, const POINT &pt),
+		FirstSuccessfulRequestCombiner>;
 using ToolbarContextMenuSignal =
 	boost::signals2::signal<void(HMENU menu, HWND sourceWindow, const POINT &pt)>;
 using ToolbarContextMenuSelectedSignal =
@@ -100,6 +126,8 @@ public:
 		const TabsInitializedSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddMainMenuPreShowObserver(
 		const MainMenuPreShowSignal::slot_type &observer) = 0;
+	virtual boost::signals2::connection AddMainMenuItemRightClickedObserver(
+		const MainMenuItemRightClickedSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddToolbarContextMenuObserver(
 		const ToolbarContextMenuSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddToolbarContextMenuSelectedObserver(

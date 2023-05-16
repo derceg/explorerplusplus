@@ -12,6 +12,12 @@ class BookmarkTree;
 class CoreInterface;
 class Navigator;
 
+enum class MenuType
+{
+	NonRecursive,
+	Recursive
+};
+
 class BookmarkContextMenu
 {
 public:
@@ -19,7 +25,8 @@ public:
 		CoreInterface *coreInterface, Navigator *navigator);
 
 	BOOL ShowMenu(HWND parentWindow, BookmarkItem *parentFolder,
-		const RawBookmarkItems &bookmarkItems, const POINT &ptScreen, bool recursive = false);
+		const RawBookmarkItems &bookmarkItems, const POINT &ptScreen,
+		MenuType menuType = MenuType::NonRecursive);
 	bool IsShowingMenu() const;
 
 private:

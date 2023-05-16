@@ -507,6 +507,11 @@ private:
 		const MainMenuPreShowSignal::slot_type &observer) override;
 	wil::unique_hmenu BuildViewsMenu() override;
 	void AddViewModesToMenu(HMENU menu, UINT startPosition, BOOL byPosition);
+	void OnInitMenu(HMENU menu);
+	void OnExitMenuLoop(bool shortcutMenu);
+	boost::signals2::connection AddMainMenuItemRightClickedObserver(
+		const MainMenuItemRightClickedSignal::slot_type &observer) override;
+	void OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt);
 
 	// Dark mode
 	static bool ShouldEnableDarkMode(Theme theme);
@@ -573,6 +578,8 @@ private:
 	CachedIcons m_cachedIcons;
 
 	MainMenuPreShowSignal m_mainMenuPreShowSignal;
+	MainMenuItemRightClickedSignal m_mainMenuItemRightClickedSignal;
+	bool m_mainMenuShowing = false;
 	FocusChangedSignal m_focusChangedSignal;
 	ApplicationShuttingDownSignal m_applicationShuttingDownSignal;
 	bool m_applicationShuttingDown = false;

@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "Bookmarks/UI/BookmarkContextMenu.h"
 #include "Bookmarks/UI/BookmarkMenuBuilder.h"
 #include "Bookmarks/UI/BookmarkMenuController.h"
 #include "../Helper/WinRTBaseWrapper.h"
@@ -46,7 +45,6 @@ private:
 
 	HWND m_parentWindow;
 	BookmarkMenuBuilder m_menuBuilder;
-	BookmarkContextMenu m_bookmarkContextMenu;
 	BookmarkMenuController m_controller;
 
 	BookmarkTree *m_bookmarkTree = nullptr;

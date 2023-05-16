@@ -16,8 +16,7 @@ BookmarkMenu::BookmarkMenu(BookmarkTree *bookmarkTree, HINSTANCE resourceInstanc
 	m_bookmarkTree(bookmarkTree),
 	m_parentWindow(parentWindow),
 	m_menuBuilder(coreInterface, iconFetcher, resourceInstance),
-	m_bookmarkContextMenu(bookmarkTree, resourceInstance, coreInterface, navigator),
-	m_controller(coreInterface, navigator)
+	m_controller(bookmarkTree, coreInterface, navigator, parentWindow)
 {
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parentWindow,
 		std::bind_front(&BookmarkMenu::ParentWindowSubclass, this)));
@@ -68,8 +67,7 @@ void BookmarkMenu::OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt)
 		return;
 	}
 
-	m_bookmarkContextMenu.ShowMenu(m_parentWindow, itr->second.bookmarkItem->GetParent(),
-		{ itr->second.bookmarkItem }, pt, true);
+	m_controller.OnMenuItemRightClicked(itr->second.bookmarkItem, pt);
 }
 
 void BookmarkMenu::OnMenuMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown)
@@ -316,6 +314,5 @@ void BookmarkMenu::OnMenuItemSelected(int menuItemId,
 		return;
 	}
 
-	m_controller.OnBookmarkMenuItemSelected(itr->second, IsKeyDown(VK_CONTROL),
-		IsKeyDown(VK_SHIFT));
+	m_controller.OnMenuItemSelected(itr->second, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
 }

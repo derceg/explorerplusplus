@@ -4,21 +4,28 @@
 
 #pragma once
 
+#include "BookmarkContextMenu.h"
+
 class BookmarkItem;
+class BookmarkTree;
 class CoreInterface;
 class Navigator;
 
 class BookmarkMenuController
 {
 public:
-	BookmarkMenuController(CoreInterface *coreInterface, Navigator *navigator);
+	BookmarkMenuController(BookmarkTree *bookmarkTree, CoreInterface *coreInterface,
+		Navigator *navigator, HWND parentWindow);
 
-	void OnBookmarkMenuItemSelected(const BookmarkItem *bookmarkItem, bool isCtrlKeyDown,
+	void OnMenuItemSelected(const BookmarkItem *bookmarkItem, bool isCtrlKeyDown,
 		bool isShiftKeyDown);
 	void OnMenuItemMiddleClicked(const BookmarkItem *bookmarkItem, bool isCtrlKeyDown,
 		bool isShiftKeyDown);
+	void OnMenuItemRightClicked(BookmarkItem *bookmarkItem, const POINT &pt);
 
 private:
 	CoreInterface *m_coreInterface;
 	Navigator *m_navigator;
+	HWND m_parentWindow;
+	BookmarkContextMenu m_bookmarkContextMenu;
 };

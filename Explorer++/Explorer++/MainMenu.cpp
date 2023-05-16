@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "Icon.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -166,4 +167,48 @@ boost::signals2::connection Explorerplusplus::AddMainMenuPreShowObserver(
 	const MainMenuPreShowSignal::slot_type &observer)
 {
 	return m_mainMenuPreShowSignal.connect(observer);
+}
+
+void Explorerplusplus::OnInitMenu(HMENU menu)
+{
+	// Note that as per
+	// https://stackoverflow.com/questions/69917594/wm-initmenu-has-unexpected-wparam-for-system-menu#comment123596433_69917594,
+	// the menu parameter passed to WM_INITMENU will be the main menu, even if the user is selecting
+	// an item from the system menu. Additionally, WM_INITMENU will be sent simply when clicking a
+	// blank spot the menu bar.
+	// That can result in some unnecessary work (to update the state of the main menu), but
+	// shouldn't have any functional issues. When an item is right-clicked, for example, the handle
+	// to the menu the click occurred on will be passed in and that can be used to determine whether
+	// or not the click should be processed.
+	if (menu == GetMenu(m_hContainer))
+	{
+		SetProgramMenuItemStates(menu);
+
+		m_mainMenuPreShowSignal(menu);
+		m_mainMenuShowing = true;
+	}
+}
+
+void Explorerplusplus::OnExitMenuLoop(bool shortcutMenu)
+{
+	if (!shortcutMenu)
+	{
+		m_mainMenuShowing = false;
+	}
+}
+
+boost::signals2::connection Explorerplusplus::AddMainMenuItemRightClickedObserver(
+	const MainMenuItemRightClickedSignal::slot_type &observer)
+{
+	return m_mainMenuItemRightClickedSignal.connect(observer);
+}
+
+void Explorerplusplus::OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt)
+{
+	if (!m_mainMenuShowing)
+	{
+		return;
+	}
+
+	m_mainMenuItemRightClickedSignal(menu, index, pt);
 }

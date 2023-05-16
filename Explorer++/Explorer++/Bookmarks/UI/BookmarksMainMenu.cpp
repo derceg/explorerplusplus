@@ -21,10 +21,13 @@ BookmarksMainMenu::BookmarksMainMenu(CoreInterface *coreInterface, Navigator *na
 	m_navigator(navigator),
 	m_bookmarkTree(bookmarkTree),
 	m_menuIdRange(menuIdRange),
-	m_menuBuilder(coreInterface, iconFetcher, coreInterface->GetResourceInstance())
+	m_menuBuilder(coreInterface, iconFetcher, coreInterface->GetResourceInstance()),
+	m_controller(bookmarkTree, coreInterface, navigator, coreInterface->GetMainWindow())
 {
 	m_connections.push_back(coreInterface->AddMainMenuPreShowObserver(
 		std::bind_front(&BookmarksMainMenu::OnMainMenuPreShow, this)));
+	m_connections.push_back(coreInterface->AddMainMenuItemRightClickedObserver(
+		std::bind_front(&BookmarksMainMenu::OnMenuItemRightClicked, this)));
 }
 
 BookmarksMainMenu::~BookmarksMainMenu()
@@ -135,10 +138,26 @@ void BookmarksMainMenu::OnMenuItemClicked(int menuItemId)
 		return;
 	}
 
-	const BookmarkItem *bookmark = itr->second;
+	m_controller.OnMenuItemSelected(itr->second, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
+}
 
-	assert(bookmark->IsBookmark());
+bool BookmarksMainMenu::OnMenuItemRightClicked(HMENU menu, int index, const POINT &pt)
+{
+	if (!m_menuInfo.menus.contains(menu))
+	{
+		return false;
+	}
 
-	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmark, OpenFolderDisposition::CurrentTab,
-		m_coreInterface, m_navigator);
+	auto itr = m_menuInfo.itemPositionMap.find({ menu, index });
+
+	if (itr == m_menuInfo.itemPositionMap.end())
+	{
+		// It's valid for the item not to be found, as the bookmarks menu contains several existing
+		// menu items and this class only manages the actual bookmark items on the menu.
+		return false;
+	}
+
+	m_controller.OnMenuItemRightClicked(itr->second.bookmarkItem, pt);
+
+	return true;
 }

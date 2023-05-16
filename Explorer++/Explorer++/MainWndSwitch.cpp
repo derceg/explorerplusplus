@@ -100,17 +100,25 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM w
 		return 0;
 
 	case WM_INITMENU:
-		SetProgramMenuItemStates(reinterpret_cast<HMENU>(wParam));
+		OnInitMenu(reinterpret_cast<HMENU>(wParam));
+		break;
 
-		if (reinterpret_cast<HMENU>(wParam) == GetMenu(m_hContainer))
-		{
-			m_mainMenuPreShowSignal(reinterpret_cast<HMENU>(wParam));
-		}
+	case WM_EXITMENULOOP:
+		OnExitMenuLoop(wParam);
 		break;
 
 	case WM_MENUSELECT:
 		StatusBarMenuSelect(wParam, lParam);
 		break;
+
+	case WM_MENURBUTTONUP:
+	{
+		POINT pt;
+		DWORD messagePos = GetMessagePos();
+		POINTSTOPOINT(pt, MAKEPOINTS(messagePos));
+		OnMenuRightButtonUp(reinterpret_cast<HMENU>(lParam), static_cast<int>(wParam), pt);
+	}
+	break;
 
 	case WM_DEVICECHANGE:
 		OnDeviceChange(wParam, lParam);

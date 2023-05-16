@@ -19,7 +19,7 @@ BookmarkContextMenu::BookmarkContextMenu(BookmarkTree *bookmarkTree, HINSTANCE r
 }
 
 BOOL BookmarkContextMenu::ShowMenu(HWND parentWindow, BookmarkItem *parentFolder,
-	const RawBookmarkItems &bookmarkItems, const POINT &ptScreen, bool recursive)
+	const RawBookmarkItems &bookmarkItems, const POINT &ptScreen, MenuType menuType)
 {
 	assert(!bookmarkItems.empty());
 
@@ -47,7 +47,7 @@ BOOL BookmarkContextMenu::ShowMenu(HWND parentWindow, BookmarkItem *parentFolder
 
 	UINT flags = TPM_LEFTALIGN | TPM_RETURNCMD;
 
-	if (recursive)
+	if (menuType == MenuType::Recursive)
 	{
 		// This flag is needed to show the popup menu when another menu is
 		// already being shown.
@@ -79,8 +79,7 @@ BOOL BookmarkContextMenu::ShowMenu(HWND parentWindow, BookmarkItem *parentFolder
 			targetParentFolder = parentFolder;
 
 			auto lastItem = std::max_element(bookmarkItems.begin(), bookmarkItems.end(),
-				[targetParentFolder](BookmarkItem *first, BookmarkItem *second)
-				{
+				[targetParentFolder](BookmarkItem *first, BookmarkItem *second) {
 					return targetParentFolder->GetChildIndex(first)
 						< targetParentFolder->GetChildIndex(second);
 				});
@@ -130,10 +129,7 @@ void BookmarkContextMenu::SetUpMenu(HMENU menu, const RawBookmarkItems &bookmark
 				const auto &children = bookmarkItem->GetChildren();
 
 				auto numChildBookmarks = std::count_if(children.begin(), children.end(),
-					[](auto &child)
-					{
-						return child->IsBookmark();
-					});
+					[](auto &child) { return child->IsBookmark(); });
 
 				totalBookmarks += static_cast<int>(numChildBookmarks);
 			}
