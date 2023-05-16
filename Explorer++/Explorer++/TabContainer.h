@@ -153,7 +153,6 @@ private:
 	TabContainer(HWND parent, TabNavigationInterface *tabNavigation, CoreInterface *coreInterface,
 		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
 		HINSTANCE resourceInstance, std::shared_ptr<Config> config);
-	~TabContainer();
 
 	static HWND CreateTabControl(HWND parent, BOOL forceSameTabWidth);
 

@@ -160,11 +160,6 @@ bool TabContainer::IsDefaultIcon(int iconIndex)
 	return false;
 }
 
-TabContainer::~TabContainer()
-{
-	RevokeDragDrop(m_hwnd);
-}
-
 LRESULT TabContainer::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
