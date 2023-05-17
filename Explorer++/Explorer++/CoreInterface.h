@@ -49,6 +49,9 @@ using MainMenuPreShowSignal = boost::signals2::signal<void(HMENU mainMenu)>;
 using MainMenuItemRightClickedSignal =
 	boost::signals2::signal<bool(HMENU menu, int index, const POINT &pt),
 		FirstSuccessfulRequestCombiner<bool>>;
+using MainMenuItemMiddleClickedSignal =
+	boost::signals2::signal<bool(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown),
+		FirstSuccessfulRequestCombiner<bool>>;
 using GetMenuItemHelperTextSignal =
 	boost::signals2::signal<std::optional<std::wstring>(HMENU menu, int id),
 		FirstSuccessfulRequestCombiner<std::optional<std::wstring>>>;
@@ -130,6 +133,8 @@ public:
 		const TabsInitializedSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddMainMenuPreShowObserver(
 		const MainMenuPreShowSignal::slot_type &observer) = 0;
+	virtual boost::signals2::connection AddMainMenuItemMiddleClickedObserver(
+		const MainMenuItemMiddleClickedSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddMainMenuItemRightClickedObserver(
 		const MainMenuItemRightClickedSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddGetMenuItemHelperTextObserver(

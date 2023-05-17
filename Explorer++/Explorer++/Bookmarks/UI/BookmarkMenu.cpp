@@ -97,7 +97,7 @@ void BookmarkMenu::OnMenuMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown, boo
 		// the POINT is in screen coordinates.
 		int item = MenuItemFromPoint(m_parentWindow, menu, pt);
 
-		if (item != -1)
+		if (item >= 0)
 		{
 			targetMenu = menu;
 			targetItem = item;

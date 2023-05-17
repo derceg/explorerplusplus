@@ -197,6 +197,23 @@ void Explorerplusplus::OnExitMenuLoop(bool shortcutMenu)
 	}
 }
 
+boost::signals2::connection Explorerplusplus::AddMainMenuItemMiddleClickedObserver(
+	const MainMenuItemMiddleClickedSignal::slot_type &observer)
+{
+	return m_mainMenuItemMiddleClickedSignal.connect(observer);
+}
+
+void Explorerplusplus::OnMenuMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown,
+	bool isShiftKeyDown)
+{
+	if (!m_mainMenuShowing)
+	{
+		return;
+	}
+
+	m_mainMenuItemMiddleClickedSignal(pt, isCtrlKeyDown, isShiftKeyDown);
+}
+
 boost::signals2::connection Explorerplusplus::AddMainMenuItemRightClickedObserver(
 	const MainMenuItemRightClickedSignal::slot_type &observer)
 {

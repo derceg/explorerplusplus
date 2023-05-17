@@ -28,6 +28,8 @@ BookmarksMainMenu::BookmarksMainMenu(CoreInterface *coreInterface, Navigator *na
 		std::bind_front(&BookmarksMainMenu::OnMainMenuPreShow, this)));
 	m_connections.push_back(coreInterface->AddGetMenuItemHelperTextObserver(
 		std::bind_front(&BookmarksMainMenu::MaybeGetMenuItemHelperText, this)));
+	m_connections.push_back(coreInterface->AddMainMenuItemMiddleClickedObserver(
+		std::bind_front(&BookmarksMainMenu::OnMenuItemMiddleClicked, this)));
 	m_connections.push_back(coreInterface->AddMainMenuItemRightClickedObserver(
 		std::bind_front(&BookmarksMainMenu::OnMenuItemRightClicked, this)));
 }
@@ -159,6 +161,55 @@ void BookmarksMainMenu::OnMenuItemClicked(int menuItemId)
 	}
 
 	m_controller.OnMenuItemSelected(itr->second, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
+}
+
+bool BookmarksMainMenu::OnMenuItemMiddleClicked(const POINT &pt, bool isCtrlKeyDown,
+	bool isShiftKeyDown)
+{
+	HMENU targetMenu = nullptr;
+	int targetItem = -1;
+	bool targetFound = false;
+
+	for (auto menu : m_menuInfo.menus)
+	{
+		int item = MenuItemFromPoint(m_coreInterface->GetMainWindow(), menu, pt);
+
+		// Although the documentation for MenuItemFromPoint() states that it returns -1 if there's
+		// no menu item at the specified position, it appears the method will also return other
+		// negative values on failure. So, it's better to check whether the return value is
+		// positive, rather than checking whether it's equal to -1.
+		if (item >= 0)
+		{
+			targetMenu = menu;
+			targetItem = item;
+			targetFound = true;
+			break;
+		}
+	}
+
+	if (!targetFound)
+	{
+		return false;
+	}
+
+	auto itr = m_menuInfo.itemPositionMap.find({ targetMenu, targetItem });
+
+	if (itr == m_menuInfo.itemPositionMap.end())
+	{
+		// This branch will be taken if one of the other, non-bookmark, items on this menu is
+		// clicked. In that case, there's nothing that needs to happen and there's no need for other
+		// handlers to try and process this event.
+		return true;
+	}
+
+	if (itr->second.menuItemType == BookmarkMenuBuilder::MenuItemType::EmptyItem)
+	{
+		return true;
+	}
+
+	m_controller.OnMenuItemMiddleClicked(itr->second.bookmarkItem, isCtrlKeyDown, isShiftKeyDown);
+
+	return true;
 }
 
 bool BookmarksMainMenu::OnMenuItemRightClicked(HMENU menu, int index, const POINT &pt)

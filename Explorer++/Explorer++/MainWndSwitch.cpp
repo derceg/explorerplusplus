@@ -111,6 +111,11 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM w
 		StatusBarMenuSelect(wParam, lParam);
 		break;
 
+	case WM_MBUTTONUP:
+		OnMenuMiddleButtonUp({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) },
+			WI_IsFlagSet(wParam, MK_CONTROL), WI_IsFlagSet(wParam, MK_SHIFT));
+		break;
+
 	case WM_MENURBUTTONUP:
 	{
 		POINT pt;

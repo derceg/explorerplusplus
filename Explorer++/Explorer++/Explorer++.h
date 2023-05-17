@@ -509,6 +509,9 @@ private:
 	void AddViewModesToMenu(HMENU menu, UINT startPosition, BOOL byPosition);
 	void OnInitMenu(HMENU menu);
 	void OnExitMenuLoop(bool shortcutMenu);
+	boost::signals2::connection AddMainMenuItemMiddleClickedObserver(
+		const MainMenuItemMiddleClickedSignal::slot_type &observer) override;
+	void OnMenuMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown);
 	boost::signals2::connection AddMainMenuItemRightClickedObserver(
 		const MainMenuItemRightClickedSignal::slot_type &observer) override;
 	void OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt);
@@ -580,6 +583,7 @@ private:
 	CachedIcons m_cachedIcons;
 
 	MainMenuPreShowSignal m_mainMenuPreShowSignal;
+	MainMenuItemMiddleClickedSignal m_mainMenuItemMiddleClickedSignal;
 	MainMenuItemRightClickedSignal m_mainMenuItemRightClickedSignal;
 	bool m_mainMenuShowing = false;
 	GetMenuItemHelperTextSignal m_getMenuItemHelperTextSignal;
