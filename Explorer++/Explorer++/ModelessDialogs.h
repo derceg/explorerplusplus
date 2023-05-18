@@ -9,3 +9,4 @@ extern HWND g_hwndSearch;
 extern HWND g_hwndRunScript;
 extern HWND g_hwndOptions;
 extern HWND g_hwndManageBookmarks;
+extern HWND g_hwndSearchTabs;

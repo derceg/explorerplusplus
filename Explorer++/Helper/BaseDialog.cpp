@@ -91,8 +91,7 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 
 			HWND gripper = CreateWindow(CustomGripper::CLASS_NAME, L"",
 				WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS, clientRect.right - gripperSize.cx,
-				clientRect.bottom - gripperSize.cy, gripperSize.cx, gripperSize.cy, m_hDlg,
-				reinterpret_cast<HMENU>(static_cast<INT_PTR>(GetGripperControlId())),
+				clientRect.bottom - gripperSize.cy, gripperSize.cx, gripperSize.cy, m_hDlg, 0,
 				GetModuleHandle(nullptr), nullptr);
 
 			std::vector<ResizableDialogControl> controls = GetResizableControls();

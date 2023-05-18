@@ -42,10 +42,11 @@ DWORD dwControlClasses = ICC_BAR_CLASSES | ICC_COOL_CLASSES | ICC_LISTVIEW_CLASS
 	| ICC_USEREX_CLASSES | ICC_STANDARD_CLASSES | ICC_LINK_CLASS;
 
 /* Modeless dialog handles. */
-HWND g_hwndSearch;
-HWND g_hwndRunScript;
-HWND g_hwndOptions;
-HWND g_hwndManageBookmarks;
+HWND g_hwndSearch = nullptr;
+HWND g_hwndRunScript = nullptr;
+HWND g_hwndOptions = nullptr;
+HWND g_hwndManageBookmarks = nullptr;
+HWND g_hwndSearchTabs = nullptr;
 
 HACCEL g_hAccl;
 
@@ -101,11 +102,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return EXIT_CODE_ERROR;
 	}
 
-	auto gdiplusCleanup = wil::scope_exit(
-		[gdiplusToken]
-		{
-			Gdiplus::GdiplusShutdown(gdiplusToken);
-		});
+	auto gdiplusCleanup =
+		wil::scope_exit([gdiplusToken] { Gdiplus::GdiplusShutdown(gdiplusToken); });
 
 	bool consoleAttached = Console::AttachParentConsole();
 
@@ -373,11 +371,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetWindowPlacement(hwnd, &wndpl);
 	UpdateWindow(hwnd);
 
-	g_hwndSearch = nullptr;
-	g_hwndRunScript = nullptr;
-	g_hwndOptions = nullptr;
-	g_hwndManageBookmarks = nullptr;
-
 	MSG msg;
 
 	/* Enter the message loop... */
@@ -387,7 +380,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		otherwise various accelerator keys (such as tab)
 		would be taken even when the dialog has focus. */
 		if (!IsDialogMessage(g_hwndSearch, &msg) && !IsDialogMessage(g_hwndManageBookmarks, &msg)
-			&& !IsDialogMessage(g_hwndRunScript, &msg) && !IsDialogMessage(g_hwndOptions, &msg))
+			&& !IsDialogMessage(g_hwndRunScript, &msg) && !IsDialogMessage(g_hwndOptions, &msg)
+			&& !IsDialogMessage(g_hwndSearchTabs, &msg))
 		{
 			if (!TranslateAccelerator(hwnd, g_hAccl, &msg))
 			{

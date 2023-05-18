@@ -1319,6 +1319,10 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		OnShowOptions();
 		break;
 
+	case IDM_WINDOW_SEARCH_TABS:
+		OnSearchTabs();
+		break;
+
 	case IDM_HELP_HELP:
 		OnShowHelp();
 		break;

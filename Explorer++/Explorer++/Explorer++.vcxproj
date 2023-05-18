@@ -748,6 +748,7 @@
     <ClCompile Include="ColorRuleRegistryStorage.cpp" />
     <ClCompile Include="ColorRuleXmlStorage.cpp" />
     <ClCompile Include="CrashHandlerHelper.cpp" />
+    <ClCompile Include="DarkModeThemeManager.cpp" />
     <ClCompile Include="DefaultSettingsOptionsPage.cpp" />
     <ClCompile Include="DriveEnumeratorImpl.cpp" />
     <ClCompile Include="DriveModel.cpp" />
@@ -755,6 +756,7 @@
     <ClCompile Include="FilesFoldersOptionsPage.cpp" />
     <ClCompile Include="GeneralOptionsPage.cpp" />
     <ClCompile Include="OptionsPage.cpp" />
+    <ClCompile Include="SearchTabsDialog.cpp" />
     <ClCompile Include="ShellBrowser\SortModes.cpp" />
     <ClCompile Include="ShellChangeWatcher.cpp" />
     <ClCompile Include="ShellTreeView\ShellTreeNode.cpp" />
@@ -955,6 +957,7 @@
     <ClInclude Include="ColorRuleRegistryStorage.h" />
     <ClInclude Include="ColorRuleXmlStorage.h" />
     <ClInclude Include="CrashHandlerHelper.h" />
+    <ClInclude Include="DarkModeThemeManager.h" />
     <ClInclude Include="DefaultSettingsOptionsPage.h" />
     <ClInclude Include="DialogHelper.h" />
     <ClInclude Include="DriveEnumerator.h" />
@@ -966,6 +969,7 @@
     <ClInclude Include="GeneralOptionsPage.h" />
     <ClInclude Include="Navigator.h" />
     <ClInclude Include="OptionsPage.h" />
+    <ClInclude Include="SearchTabsDialog.h" />
     <ClInclude Include="ShellChangeWatcher.h" />
     <ClInclude Include="ShellTreeView\ShellTreeNode.h" />
     <ClInclude Include="TabsOptionsPage.h" />

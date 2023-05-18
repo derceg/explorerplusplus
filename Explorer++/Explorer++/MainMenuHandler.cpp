@@ -20,6 +20,7 @@
 #include "OptionsDialog.h"
 #include "ScriptingDialog.h"
 #include "SearchDialog.h"
+#include "SearchTabsDialog.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "SplitFileDialog.h"
@@ -146,6 +147,20 @@ void Explorerplusplus::OnShowOptions()
 	else
 	{
 		SetFocus(g_hwndOptions);
+	}
+}
+
+void Explorerplusplus::OnSearchTabs()
+{
+	if (g_hwndSearchTabs == nullptr)
+	{
+		auto *searchTabsDialog = SearchTabsDialog::Create(m_resourceInstance, m_hContainer, this);
+		g_hwndSearchTabs =
+			searchTabsDialog->ShowModelessDialog([]() { g_hwndSearchTabs = nullptr; });
+	}
+	else
+	{
+		SetFocus(g_hwndSearchTabs);
 	}
 }
 

@@ -225,6 +225,7 @@ private:
 	void OnCustomizeColors();
 	void OnRunScript();
 	void OnShowOptions();
+	void OnSearchTabs();
 	void OnShowHelp();
 	void OnCheckForUpdates();
 	void OnAbout();

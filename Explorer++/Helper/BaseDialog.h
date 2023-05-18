@@ -41,7 +41,6 @@ protected:
 		DialogSizingType dialogSizingType);
 
 	virtual void OnInitDialogBase();
-	virtual int GetGripperControlId() = 0;
 
 	HINSTANCE GetResourceInstance() const;
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const;

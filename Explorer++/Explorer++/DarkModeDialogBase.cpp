@@ -325,8 +325,3 @@ INT_PTR DarkModeDialogBase::OnCtlColorListBoxExtra(HWND hwnd, HDC hdc)
 
 	return FALSE;
 }
-
-int DarkModeDialogBase::GetGripperControlId()
-{
-	return IDC_GRIPPER;
-}

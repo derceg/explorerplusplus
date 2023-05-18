@@ -112,8 +112,7 @@ void AddBookmarkDialog::UpdateDialogForBookmarkFolder()
 
 	int yOffset = treeViewRect.top - locationLabelRect.top;
 
-	const UINT controlsToMove[] = { IDC_BOOKMARK_TREEVIEW, IDC_BOOKMARK_NEWFOLDER, IDOK, IDCANCEL,
-		IDC_GRIPPER };
+	const UINT controlsToMove[] = { IDC_BOOKMARK_TREEVIEW, IDC_BOOKMARK_NEWFOLDER, IDOK, IDCANCEL };
 
 	for (auto control : controlsToMove)
 	{

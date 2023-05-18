@@ -31,7 +31,6 @@ protected:
 
 private:
 	void OnInitDialogBase() override final;
-	int GetGripperControlId() override final;
 
 	LRESULT CALLBACK DialogWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT OnCustomDraw(const NMCUSTOMDRAW *customDraw);

@@ -16,6 +16,7 @@
 #include "MergeFilesDialog.h"
 #include "RenameTabDialog.h"
 #include "SearchDialog.h"
+#include "SearchTabsDialog.h"
 #include "SelectColumnsDialog.h"
 #include "SetDefaultColumnsDialog.h"
 #include "SetFileAttributesDialog.h"
@@ -54,7 +55,8 @@ DialogSettings *const DIALOG_SETTINGS[] = {
 	&AddBookmarkDialogPersistentSettings::GetInstance(),
 	&ManageBookmarksDialogPersistentSettings::GetInstance(),
 	&DisplayColoursDialogPersistentSettings::GetInstance(),
-	&UpdateCheckDialogPersistentSettings::GetInstance()
+	&UpdateCheckDialogPersistentSettings::GetInstance(),
+	&SearchTabsDialogPersistentSettings::GetInstance()
 };
 // clang-format on
 
