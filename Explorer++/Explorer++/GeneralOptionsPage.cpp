@@ -6,8 +6,6 @@
 #include "GeneralOptionsPage.h"
 #include "Config.h"
 #include "CoreInterface.h"
-#include "DarkModeGroupBox.h"
-#include "DarkModeHelper.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -112,18 +110,6 @@ void GeneralOptionsPage::InitializeControls()
 	SetNewTabDirectory(hEdit, m_config->defaultTabDirectory.c_str());
 
 	AddLanguages();
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		m_darkModeGroupBoxes.push_back(
-			std::make_unique<DarkModeGroupBox>(GetDlgItem(GetDialog(), IDC_GROUP_STARTUP)));
-		m_darkModeGroupBoxes.push_back(std::make_unique<DarkModeGroupBox>(
-			GetDlgItem(GetDialog(), IDC_GROUP_DEFAULT_FILE_MANAGER)));
-		m_darkModeGroupBoxes.push_back(std::make_unique<DarkModeGroupBox>(
-			GetDlgItem(GetDialog(), IDC_GROUP_GENERAL_SETTINGS)));
-	}
 }
 
 void GeneralOptionsPage::SetNewTabDirectory(HWND hEdit, const TCHAR *szPath)

@@ -6,6 +6,8 @@
 #include "DarkModeThemeManager.h"
 #include "DarkModeButton.h"
 #include "DarkModeHelper.h"
+#include "../Helper/DpiCompatibility.h"
+#include "../Helper/WindowHelper.h"
 #include <vssym32.h>
 
 static const WCHAR DIALOG_CLASS_NAME[] = L"#32770";
@@ -144,6 +146,13 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 		else if (lstrcmp(className, WC_BUTTON) == 0)
 		{
 			SetWindowTheme(hwnd, L"Explorer", nullptr);
+
+			auto style = GetWindowLongPtr(hwnd, GWL_STYLE);
+
+			if ((style & BS_TYPEMASK) == BS_GROUPBOX)
+			{
+				SetWindowSubclass(hwnd, GroupBoxSubclass, SUBCLASS_ID, 0);
+			}
 		}
 		else if (lstrcmp(className, TOOLTIPS_CLASS) == 0)
 		{
@@ -241,6 +250,13 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 		else if (lstrcmp(className, WC_BUTTON) == 0)
 		{
 			SetWindowTheme(hwnd, L"Explorer", nullptr);
+
+			auto style = GetWindowLongPtr(hwnd, GWL_STYLE);
+
+			if ((style & BS_TYPEMASK) == BS_GROUPBOX)
+			{
+				RemoveWindowSubclass(hwnd, GroupBoxSubclass, SUBCLASS_ID);
+			}
 		}
 		else if (lstrcmp(className, TOOLTIPS_CLASS) == 0)
 		{
@@ -431,6 +447,77 @@ LRESULT CALLBACK DarkModeThemeManager::ListViewSubclass(HWND hwnd, UINT msg, WPA
 	case WM_NCDESTROY:
 	{
 		[[maybe_unused]] auto res = RemoveWindowSubclass(hwnd, ListViewSubclass, subclassId);
+		assert(res);
+	}
+	break;
+	}
+
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+LRESULT CALLBACK DarkModeThemeManager::GroupBoxSubclass(HWND hwnd, UINT msg, WPARAM wParam,
+	LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data)
+{
+	UNREFERENCED_PARAMETER(data);
+
+	switch (msg)
+	{
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hwnd, &ps);
+
+		RECT rect;
+		GetClientRect(hwnd, &rect);
+
+		std::wstring text = GetWindowString(hwnd);
+		assert(!text.empty());
+
+		SetBkMode(hdc, TRANSPARENT);
+		SetTextColor(hdc, DarkModeHelper::TEXT_COLOR);
+
+		auto &dpiCompat = DpiCompatibility::GetInstance();
+
+		NONCLIENTMETRICS metrics;
+		metrics.cbSize = sizeof(metrics);
+		dpiCompat.SystemParametersInfoForDpi(SPI_GETNONCLIENTMETRICS, sizeof(metrics), &metrics, 0,
+			dpiCompat.GetDpiForWindow(hwnd));
+
+		wil::unique_hfont captionFont(CreateFontIndirect(&metrics.lfCaptionFont));
+		wil::unique_select_object object(SelectObject(hdc, captionFont.get()));
+
+		RECT textRect = rect;
+		DrawText(hdc, text.c_str(), static_cast<int>(text.size()), &textRect, DT_CALCRECT);
+
+		// The top border of the group box isn't anchored to the top of the control. Rather, it cuts
+		// midway through the caption text. That is, the text is anchored to the top of the control
+		// and the border starts at the vertical mid-point of the text.
+		RECT groupBoxRect = rect;
+		groupBoxRect.top += GetRectHeight(&textRect) / 2;
+
+		wil::unique_htheme theme(OpenThemeData(nullptr, L"BUTTON"));
+
+		// The group box border isn't shown behind the caption; instead, the text appears as if its
+		// drawn directly on top of the parent.
+		DrawThemeBackground(theme.get(), hdc, BP_GROUPBOX, GBS_NORMAL, &groupBoxRect, &ps.rcPaint);
+
+		// It appears this offset isn't DPI-adjusted.
+		OffsetRect(&textRect, 9, 0);
+
+		// As with the above, it appears this offset isn't DPI-adjusted.
+		RECT textBackgroundRect = textRect;
+		textBackgroundRect.left -= 2;
+		DrawThemeParentBackground(hwnd, hdc, &textBackgroundRect);
+
+		DrawText(hdc, text.c_str(), static_cast<int>(text.size()), &textRect, DT_LEFT);
+
+		EndPaint(hwnd, &ps);
+	}
+		return 0;
+
+	case WM_NCDESTROY:
+	{
+		[[maybe_unused]] auto res = RemoveWindowSubclass(hwnd, GroupBoxSubclass, subclassId);
 		assert(res);
 	}
 	break;

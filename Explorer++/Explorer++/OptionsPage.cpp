@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "OptionsPage.h"
-#include "DarkModeGroupBox.h"
 #include "ResourceHelper.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include <memory>

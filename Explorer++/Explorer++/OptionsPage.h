@@ -9,7 +9,6 @@
 
 struct Config;
 class CoreInterface;
-class DarkModeGroupBox;
 class ResizableDialogHelper;
 
 class OptionsPage
@@ -33,8 +32,6 @@ protected:
 	CoreInterface *const m_coreInterface;
 	const HINSTANCE m_resourceInstance;
 	const HWND m_tooltipWindow;
-
-	std::vector<std::unique_ptr<DarkModeGroupBox>> m_darkModeGroupBoxes;
 
 	const SettingChangedCallback m_settingChangedCallback;
 

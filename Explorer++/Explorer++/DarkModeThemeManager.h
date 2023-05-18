@@ -31,4 +31,6 @@ private:
 	static LRESULT OnToolbarCustomDraw(NMTBCUSTOMDRAW *customDraw);
 	static LRESULT CALLBACK ListViewSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR subclassId, DWORD_PTR data);
+	static LRESULT CALLBACK GroupBoxSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
+		UINT_PTR subclassId, DWORD_PTR data);
 };

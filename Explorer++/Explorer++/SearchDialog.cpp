@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "SearchDialog.h"
 #include "CoreInterface.h"
-#include "DarkModeHelper.h"
+#include "DarkModeThemeManager.h"
 #include "DialogConstants.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
@@ -61,7 +61,7 @@ const TCHAR SearchDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern
 SearchDialog::SearchDialog(HINSTANCE resourceInstance, HWND hParent,
 	std::wstring_view searchDirectory, CoreInterface *coreInterface, Navigator *navigator,
 	TabContainer *tabContainer) :
-	DarkModeDialogBase(resourceInstance, IDD_SEARCH, hParent, DialogSizingType::Both),
+	BaseDialog(resourceInstance, IDD_SEARCH, hParent, DialogSizingType::Both),
 	m_searchDirectory(searchDirectory),
 	m_coreInterface(coreInterface),
 	m_navigator(navigator),
@@ -87,6 +87,8 @@ SearchDialog::~SearchDialog()
 
 INT_PTR SearchDialog::OnInitDialog()
 {
+	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hDlg);
 	m_directoryIcon =
 		m_coreInterface->GetIconResourceLoader()->LoadIconFromPNGForDpi(Icon::Folder, 16, 16, dpi);
@@ -101,8 +103,6 @@ INT_PTR SearchDialog::OnInitDialog()
 	HIMAGELIST himlSmall;
 	Shell_GetImageLists(nullptr, &himlSmall);
 	ListView_SetImageList(hListView, himlSmall, LVSIL_SMALL);
-
-	SetWindowTheme(hListView, L"Explorer", nullptr);
 
 	int i = 0;
 
@@ -167,14 +167,6 @@ INT_PTR SearchDialog::OnInitDialog()
 	}
 
 	SetFocus(GetDlgItem(m_hDlg, IDC_COMBO_NAME));
-
-	AllowDarkModeForControls({ IDC_BUTTON_DIRECTORY, IDSEARCH, IDEXIT });
-	AllowDarkModeForListView(IDC_LISTVIEW_SEARCHRESULTS);
-	AllowDarkModeForCheckboxes({ IDC_CHECK_ARCHIVE, IDC_CHECK_HIDDEN, IDC_CHECK_READONLY,
-		IDC_CHECK_SYSTEM, IDC_CHECK_CASEINSENSITIVE, IDC_CHECK_USEREGULAREXPRESSIONS,
-		IDC_CHECK_SEARCHSUBFOLDERS });
-	AllowDarkModeForGroupBoxes({ IDC_GROUP_ATTRIBUTES, IDC_GROUP_SEARCH_TYPE });
-	AllowDarkModeForComboBoxes({ IDC_COMBO_NAME, IDC_COMBO_DIRECTORY });
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 

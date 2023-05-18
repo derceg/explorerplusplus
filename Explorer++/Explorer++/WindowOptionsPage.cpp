@@ -5,8 +5,6 @@
 #include "stdafx.h"
 #include "WindowOptionsPage.h"
 #include "Config.h"
-#include "DarkModeGroupBox.h"
-#include "DarkModeHelper.h"
 #include "MainResource.h"
 #include "../Helper/ResizableDialogHelper.h"
 
@@ -137,20 +135,6 @@ void WindowOptionsPage::InitializeControls()
 	if (m_config->useFullRowSelect.get())
 	{
 		CheckDlgButton(GetDialog(), IDC_OPTION_FULLROWSELECT, BST_CHECKED);
-	}
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		m_darkModeGroupBoxes.push_back(
-			std::make_unique<DarkModeGroupBox>(GetDlgItem(GetDialog(), IDC_GROUP_GENERAL)));
-		m_darkModeGroupBoxes.push_back(
-			std::make_unique<DarkModeGroupBox>(GetDlgItem(GetDialog(), IDC_GROUP_MAIN_PANE)));
-		m_darkModeGroupBoxes.push_back(
-			std::make_unique<DarkModeGroupBox>(GetDlgItem(GetDialog(), IDC_GROUP_NAVIGATION_PANE)));
-		m_darkModeGroupBoxes.push_back(
-			std::make_unique<DarkModeGroupBox>(GetDlgItem(GetDialog(), IDC_GROUP_DISPLAY_WINDOW)));
 	}
 }
 
