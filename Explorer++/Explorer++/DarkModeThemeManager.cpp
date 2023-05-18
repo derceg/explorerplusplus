@@ -77,6 +77,17 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 
 			SetWindowSubclass(hwnd, ListViewSubclass, SUBCLASS_ID, 0);
 		}
+		else if (lstrcmp(className, MSFTEDIT_CLASS) == 0)
+		{
+			SendMessage(hwnd, EM_SETBKGNDCOLOR, 0, DarkModeHelper::BACKGROUND_COLOR);
+
+			CHARFORMAT charFormat = {};
+			charFormat.cbSize = sizeof(charFormat);
+			charFormat.dwMask = CFM_COLOR;
+			charFormat.crTextColor = DarkModeHelper::TEXT_COLOR;
+			charFormat.dwEffects = 0;
+			SendMessage(hwnd, EM_SETCHARFORMAT, SCF_ALL, reinterpret_cast<LPARAM>(&charFormat));
+		}
 		else if (lstrcmp(className, WC_BUTTON) == 0)
 		{
 			SetWindowTheme(hwnd, L"Explorer", nullptr);
@@ -124,6 +135,17 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 			}
 
 			RemoveWindowSubclass(hwnd, ListViewSubclass, SUBCLASS_ID);
+		}
+		else if (lstrcmp(className, MSFTEDIT_CLASS) == 0)
+		{
+			SendMessage(hwnd, EM_SETBKGNDCOLOR, 0, GetSysColor(COLOR_WINDOW));
+
+			CHARFORMAT charFormat = {};
+			charFormat.cbSize = sizeof(charFormat);
+			charFormat.dwMask = CFM_COLOR;
+			charFormat.crTextColor = GetSysColor(COLOR_WINDOWTEXT);
+			charFormat.dwEffects = 0;
+			SendMessage(hwnd, EM_SETCHARFORMAT, SCF_ALL, reinterpret_cast<LPARAM>(&charFormat));
 		}
 		else if (lstrcmp(className, WC_BUTTON) == 0)
 		{

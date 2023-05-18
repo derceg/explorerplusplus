@@ -276,7 +276,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	/* This dll is needed to create a richedit control. */
-	wil::unique_hmodule richEditLib(LoadLibrary(_T("Riched20.dll")));
+	wil::unique_hmodule richEditLib(LoadLibrary(_T("Msftedit.dll")));
 
 	LONG res = RegisterMainWindowClass(hInstance);
 

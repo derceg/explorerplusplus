@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "DarkModeDialogBase.h"
+#include "../Helper/BaseDialog.h"
 
-class ThirdPartyCreditsDialog : public DarkModeDialogBase
+class ThirdPartyCreditsDialog : public BaseDialog
 {
 public:
 	ThirdPartyCreditsDialog(HINSTANCE resourceInstance, HWND parent);

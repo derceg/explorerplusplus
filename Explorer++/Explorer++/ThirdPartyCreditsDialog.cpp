@@ -4,39 +4,27 @@
 
 #include "stdafx.h"
 #include "ThirdPartyCreditsDialog.h"
-#include "DarkModeHelper.h"
+#include "DarkModeThemeManager.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/RichEditHelper.h"
 #include "../Helper/WindowHelper.h"
 
 ThirdPartyCreditsDialog::ThirdPartyCreditsDialog(HINSTANCE resourceInstance, HWND parent) :
-	DarkModeDialogBase(resourceInstance, IDD_THIRD_PARTY_CREDITS, parent, DialogSizingType::None)
+	BaseDialog(resourceInstance, IDD_THIRD_PARTY_CREDITS, parent, DialogSizingType::None)
 {
 }
 
 INT_PTR ThirdPartyCreditsDialog::OnInitDialog()
 {
+	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+
 	SendDlgItemMessage(m_hDlg, IDC_CREDITS, EM_AUTOURLDETECT, AURL_ENABLEURL, NULL);
 	SendDlgItemMessage(m_hDlg, IDC_CREDITS, EM_SETEVENTMASK, 0, ENM_LINK);
 
 	std::wstring credits =
 		ResourceHelper::LoadString(GetResourceInstance(), IDS_THIRD_PARTY_CREDITS);
 	SetDlgItemText(m_hDlg, IDC_CREDITS, credits.c_str());
-
-	if (DarkModeHelper::GetInstance().IsDarkModeEnabled())
-	{
-		SendDlgItemMessage(m_hDlg, IDC_CREDITS, EM_SETBKGNDCOLOR, 0,
-			DarkModeHelper::BACKGROUND_COLOR);
-
-		CHARFORMAT charFormat;
-		charFormat.cbSize = sizeof(charFormat);
-		charFormat.dwMask = CFM_COLOR;
-		charFormat.crTextColor = DarkModeHelper::TEXT_COLOR;
-		charFormat.dwEffects = 0;
-		SendDlgItemMessage(m_hDlg, IDC_CREDITS, EM_SETCHARFORMAT, SCF_ALL,
-			reinterpret_cast<LPARAM>(&charFormat));
-	}
 
 	CenterWindow(GetParent(m_hDlg), m_hDlg);
 
