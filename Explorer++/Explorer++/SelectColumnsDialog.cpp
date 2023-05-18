@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "SelectColumnsDialog.h"
-#include "DarkModeHelper.h"
+#include "DarkModeThemeManager.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -20,7 +20,7 @@ const TCHAR SelectColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SelectCo
 
 SelectColumnsDialog::SelectColumnsDialog(HINSTANCE resourceInstance, HWND hParent,
 	ShellBrowser *shellBrowser, IconResourceLoader *iconResourceLoader) :
-	DarkModeDialogBase(resourceInstance, IDD_SELECTCOLUMNS, hParent, DialogSizingType::Both),
+	BaseDialog(resourceInstance, IDD_SELECTCOLUMNS, hParent, DialogSizingType::Both),
 	m_shellBrowser(shellBrowser),
 	m_iconResourceLoader(iconResourceLoader),
 	m_bColumnsSwapped(FALSE)
@@ -30,9 +30,9 @@ SelectColumnsDialog::SelectColumnsDialog(HINSTANCE resourceInstance, HWND hParen
 
 INT_PTR SelectColumnsDialog::OnInitDialog()
 {
-	HWND hListView = GetDlgItem(m_hDlg, IDC_COLUMNS_LISTVIEW);
-	SetWindowTheme(hListView, L"Explorer", nullptr);
+	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
 
+	HWND hListView = GetDlgItem(m_hDlg, IDC_COLUMNS_LISTVIEW);
 	ListView_SetExtendedListViewStyleEx(hListView, LVS_EX_CHECKBOXES, LVS_EX_CHECKBOXES);
 
 	LVCOLUMN lvColumn;
@@ -68,15 +68,6 @@ INT_PTR SelectColumnsDialog::OnInitDialog()
 
 	ListViewHelper::SelectItem(hListView, 0, TRUE);
 	SetFocus(hListView);
-
-	AllowDarkModeForControls({ IDC_COLUMNS_MOVEUP, IDC_COLUMNS_MOVEDOWN });
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		darkModeHelper.SetListViewDarkModeColors(hListView);
-	}
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 
