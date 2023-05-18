@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "SetDefaultColumnsDialog.h"
-#include "DarkModeHelper.h"
+#include "DarkModeThemeManager.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -21,7 +21,7 @@ const TCHAR SetDefaultColumnsDialogPersistentSettings::SETTING_FOLDER_TYPE[] = _
 
 SetDefaultColumnsDialog::SetDefaultColumnsDialog(HINSTANCE resourceInstance, HWND hParent,
 	FolderColumns &folderColumns) :
-	DarkModeDialogBase(resourceInstance, IDD_SETDEFAULTCOLUMNS, hParent, DialogSizingType::Both),
+	BaseDialog(resourceInstance, IDD_SETDEFAULTCOLUMNS, hParent, DialogSizingType::Both),
 	m_folderColumns(folderColumns)
 {
 	m_psdcdps = &SetDefaultColumnsDialogPersistentSettings::GetInstance();
@@ -29,6 +29,8 @@ SetDefaultColumnsDialog::SetDefaultColumnsDialog(HINSTANCE resourceInstance, HWN
 
 INT_PTR SetDefaultColumnsDialog::OnInitDialog()
 {
+	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+
 	m_icon.reset(LoadIcon(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_MAIN)));
 	SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
 
@@ -78,16 +80,12 @@ INT_PTR SetDefaultColumnsDialog::OnInitDialog()
 	auto folderType = m_psdcdps->m_FolderType;
 	auto itr = std::find_if(m_FolderMap.begin(), m_FolderMap.end(),
 		[folderType](const std::unordered_map<int, FolderType>::value_type &vt)
-		{
-			return vt.second == folderType;
-		});
+		{ return vt.second == folderType; });
 	SendMessage(hComboBox, CB_SETCURSEL, itr->first, 0);
 
 	m_PreviousFolderType = m_psdcdps->m_FolderType;
 
 	HWND hListView = GetDlgItem(m_hDlg, IDC_DEFAULTCOLUMNS_LISTVIEW);
-	SetWindowTheme(hListView, L"Explorer", nullptr);
-
 	ListView_SetExtendedListViewStyleEx(hListView, LVS_EX_CHECKBOXES, LVS_EX_CHECKBOXES);
 
 	LVCOLUMN lvColumn;
@@ -98,16 +96,6 @@ INT_PTR SetDefaultColumnsDialog::OnInitDialog()
 	SetupFolderColumns(m_psdcdps->m_FolderType);
 
 	SetFocus(hListView);
-
-	AllowDarkModeForControls({ IDC_DEFAULTCOLUMNS_MOVEUP, IDC_DEFAULTCOLUMNS_MOVEDOWN });
-	AllowDarkModeForComboBoxes({ IDC_DEFAULTCOLUMNS_COMBOBOX });
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		darkModeHelper.SetListViewDarkModeColors(hListView);
-	}
 
 	m_psdcdps->RestoreDialogPosition(m_hDlg, true);
 
@@ -250,10 +238,7 @@ void SetDefaultColumnsDialog::SaveCurrentColumnState(FolderType folderType)
 		in the current list, and reuse its width. */
 		ColumnType columnType = static_cast<ColumnType>(lvItem.lParam);
 		auto itr = std::find_if(currentColumns.begin(), currentColumns.end(),
-			[columnType](const Column_t &column)
-			{
-				return column.type == columnType;
-			});
+			[columnType](const Column_t &column) { return column.type == columnType; });
 
 		Column_t column;
 		column.type = columnType;

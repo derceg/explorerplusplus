@@ -88,6 +88,10 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 			charFormat.dwEffects = 0;
 			SendMessage(hwnd, EM_SETCHARFORMAT, SCF_ALL, reinterpret_cast<LPARAM>(&charFormat));
 		}
+		else if (lstrcmp(className, WC_COMBOBOX) == 0)
+		{
+			SetWindowTheme(hwnd, L"CFD", nullptr);
+		}
 		else if (lstrcmp(className, WC_BUTTON) == 0)
 		{
 			SetWindowTheme(hwnd, L"Explorer", nullptr);
@@ -146,6 +150,10 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 			charFormat.crTextColor = GetSysColor(COLOR_WINDOWTEXT);
 			charFormat.dwEffects = 0;
 			SendMessage(hwnd, EM_SETCHARFORMAT, SCF_ALL, reinterpret_cast<LPARAM>(&charFormat));
+		}
+		else if (lstrcmp(className, WC_COMBOBOX) == 0)
+		{
+			SetWindowTheme(hwnd, L"CFD", nullptr);
 		}
 		else if (lstrcmp(className, WC_BUTTON) == 0)
 		{
