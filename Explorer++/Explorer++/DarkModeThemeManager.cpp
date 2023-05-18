@@ -77,6 +77,25 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 
 			SetWindowSubclass(hwnd, ListViewSubclass, SUBCLASS_ID, 0);
 		}
+		else if (lstrcmp(className, WC_TREEVIEW) == 0)
+		{
+			// When in dark mode, this theme sets the following colors correctly:
+			//
+			// - the item selection color,
+			// - the colors of the arrows that appear to the left of the items,
+			// - the color of the scrollbars.
+			//
+			// It doesn't, however, change the background color, or the text color.
+			SetWindowTheme(hwnd, L"Explorer", nullptr);
+
+			TreeView_SetBkColor(hwnd, DarkModeHelper::BACKGROUND_COLOR);
+			TreeView_SetTextColor(hwnd, DarkModeHelper::TEXT_COLOR);
+			TreeView_SetInsertMarkColor(hwnd, DarkModeHelper::FOREGROUND_COLOR);
+
+			HWND tooltips = TreeView_GetToolTips(hwnd);
+			darkModeHelper.AllowDarkModeForWindow(tooltips, true);
+			SetWindowTheme(tooltips, L"Explorer", nullptr);
+		}
 		else if (lstrcmp(className, MSFTEDIT_CLASS) == 0)
 		{
 			SendMessage(hwnd, EM_SETBKGNDCOLOR, 0, DarkModeHelper::BACKGROUND_COLOR);
@@ -139,6 +158,37 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 			}
 
 			RemoveWindowSubclass(hwnd, ListViewSubclass, SUBCLASS_ID);
+		}
+		else if (lstrcmp(className, WC_TREEVIEW) == 0)
+		{
+			SetWindowTheme(hwnd, L"Explorer", nullptr);
+
+			wil::unique_htheme theme(OpenThemeData(nullptr, L"ItemsView"));
+
+			if (theme)
+			{
+				COLORREF textColor;
+				HRESULT hr = GetThemeColor(theme.get(), 0, 0, TMT_TEXTCOLOR, &textColor);
+
+				if (SUCCEEDED(hr))
+				{
+					TreeView_SetTextColor(hwnd, textColor);
+				}
+
+				COLORREF fillColor;
+				hr = GetThemeColor(theme.get(), 0, 0, TMT_FILLCOLOR, &fillColor);
+
+				if (SUCCEEDED(hr))
+				{
+					TreeView_SetBkColor(hwnd, fillColor);
+				}
+			}
+
+			TreeView_SetInsertMarkColor(hwnd, CLR_DEFAULT);
+
+			HWND tooltips = TreeView_GetToolTips(hwnd);
+			darkModeHelper.AllowDarkModeForWindow(tooltips, false);
+			SetWindowTheme(tooltips, L"Explorer", nullptr);
 		}
 		else if (lstrcmp(className, MSFTEDIT_CLASS) == 0)
 		{

@@ -153,21 +153,6 @@ LRESULT CALLBACK DarkModeDialogBase::ListViewWndProc(HWND hwnd, UINT msg, WPARAM
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-void DarkModeDialogBase::AllowDarkModeForTreeView(int controlId)
-{
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (!darkModeHelper.IsDarkModeEnabled())
-	{
-		return;
-	}
-
-	if (HWND control = GetDlgItem(m_hDlg, controlId))
-	{
-		darkModeHelper.SetTreeViewDarkModeColors(control);
-	}
-}
-
 void DarkModeDialogBase::AllowDarkModeForCheckboxes(const std::vector<int> &controlIds)
 {
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
