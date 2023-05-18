@@ -20,6 +20,11 @@ void DarkModeThemeManager::ApplyThemeToTopLevelWindow(HWND topLevelWindow)
 {
 	ApplyThemeToWindow(topLevelWindow);
 	EnumChildWindows(topLevelWindow, ProcessChildWindow, 0);
+
+	// Tooltip windows won't be enumerated by EnumChildWindows(). They will, however, be enumerated
+	// by EnumThreadWindows(), which is why that's called here.
+	EnumThreadWindows(GetCurrentThreadId(), ProcessThreadWindow, 0);
+
 	RedrawWindow(topLevelWindow, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN | RDW_ERASE);
 }
 
@@ -28,6 +33,29 @@ BOOL CALLBACK DarkModeThemeManager::ProcessChildWindow(HWND hwnd, LPARAM lParam)
 	UNREFERENCED_PARAMETER(lParam);
 
 	ApplyThemeToWindow(hwnd);
+	return TRUE;
+}
+
+BOOL CALLBACK DarkModeThemeManager::ProcessThreadWindow(HWND hwnd, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+
+	WCHAR className[256];
+	auto res = GetClassName(hwnd, className, static_cast<int>(std::size(className)));
+
+	if (res == 0)
+	{
+		assert(false);
+		return TRUE;
+	}
+
+	if (lstrcmp(className, TOOLTIPS_CLASS) != 0)
+	{
+		return TRUE;
+	}
+
+	ApplyThemeToWindow(hwnd);
+
 	return TRUE;
 }
 
@@ -64,19 +92,15 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 			darkModeHelper.AllowDarkModeForWindow(hwnd, true);
 			SetWindowTheme(hwnd, L"ItemsView", nullptr);
 
-			HWND header = ListView_GetHeader(hwnd);
-			darkModeHelper.AllowDarkModeForWindow(header, true);
-			SetWindowTheme(header, L"ItemsView", nullptr);
-
-			HWND tooltips = ListView_GetToolTips(hwnd);
-			darkModeHelper.AllowDarkModeForWindow(tooltips, true);
-			SetWindowTheme(tooltips, L"Explorer", nullptr);
-
 			ListView_SetBkColor(hwnd, DarkModeHelper::BACKGROUND_COLOR);
 			ListView_SetTextBkColor(hwnd, DarkModeHelper::BACKGROUND_COLOR);
 			ListView_SetTextColor(hwnd, DarkModeHelper::TEXT_COLOR);
 
 			SetWindowSubclass(hwnd, ListViewSubclass, SUBCLASS_ID, 0);
+		}
+		else if (lstrcmp(className, WC_HEADER) == 0)
+		{
+			SetWindowTheme(hwnd, L"ItemsView", nullptr);
 		}
 		else if (lstrcmp(className, WC_TREEVIEW) == 0)
 		{
@@ -92,10 +116,6 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 			TreeView_SetBkColor(hwnd, DarkModeHelper::BACKGROUND_COLOR);
 			TreeView_SetTextColor(hwnd, DarkModeHelper::TEXT_COLOR);
 			TreeView_SetInsertMarkColor(hwnd, DarkModeHelper::FOREGROUND_COLOR);
-
-			HWND tooltips = TreeView_GetToolTips(hwnd);
-			darkModeHelper.AllowDarkModeForWindow(tooltips, true);
-			SetWindowTheme(tooltips, L"Explorer", nullptr);
 		}
 		else if (lstrcmp(className, MSFTEDIT_CLASS) == 0)
 		{
@@ -125,6 +145,10 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 		{
 			SetWindowTheme(hwnd, L"Explorer", nullptr);
 		}
+		else if (lstrcmp(className, TOOLTIPS_CLASS) == 0)
+		{
+			SetWindowTheme(hwnd, L"Explorer", nullptr);
+		}
 	}
 	else
 	{
@@ -141,14 +165,6 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 		else if (lstrcmp(className, WC_LISTVIEW) == 0)
 		{
 			SetWindowTheme(hwnd, L"Explorer", nullptr);
-
-			HWND header = ListView_GetHeader(hwnd);
-			darkModeHelper.AllowDarkModeForWindow(header, false);
-			SetWindowTheme(header, L"ItemsView", nullptr);
-
-			HWND tooltips = ListView_GetToolTips(hwnd);
-			darkModeHelper.AllowDarkModeForWindow(tooltips, false);
-			SetWindowTheme(tooltips, L"Explorer", nullptr);
 
 			COLORREF backgroundColor = GetSysColor(COLOR_WINDOW);
 			ListView_SetBkColor(hwnd, backgroundColor);
@@ -168,6 +184,10 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 			}
 
 			RemoveWindowSubclass(hwnd, ListViewSubclass, SUBCLASS_ID);
+		}
+		else if (lstrcmp(className, WC_HEADER) == 0)
+		{
+			SetWindowTheme(hwnd, L"ItemsView", nullptr);
 		}
 		else if (lstrcmp(className, WC_TREEVIEW) == 0)
 		{
@@ -195,10 +215,6 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 			}
 
 			TreeView_SetInsertMarkColor(hwnd, CLR_DEFAULT);
-
-			HWND tooltips = TreeView_GetToolTips(hwnd);
-			darkModeHelper.AllowDarkModeForWindow(tooltips, false);
-			SetWindowTheme(tooltips, L"Explorer", nullptr);
 		}
 		else if (lstrcmp(className, MSFTEDIT_CLASS) == 0)
 		{
@@ -223,6 +239,10 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 			SetWindowTheme(hwnd, L"CFD", nullptr);
 		}
 		else if (lstrcmp(className, WC_BUTTON) == 0)
+		{
+			SetWindowTheme(hwnd, L"Explorer", nullptr);
+		}
+		else if (lstrcmp(className, TOOLTIPS_CLASS) == 0)
 		{
 			SetWindowTheme(hwnd, L"Explorer", nullptr);
 		}

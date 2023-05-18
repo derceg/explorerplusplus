@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ApplicationEditorDialog.h"
 #include "ApplicationModel.h"
+#include "DarkModeThemeManager.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/Controls.h"
@@ -15,7 +16,7 @@ namespace Applications
 
 ApplicationEditorDialog::ApplicationEditorDialog(HWND parent, HINSTANCE resourceInstance,
 	ApplicationModel *model, std::unique_ptr<EditDetails> editDetails) :
-	DarkModeDialogBase(resourceInstance, IDD_EDITAPPLICATIONBUTTON, parent, DialogSizingType::None),
+	BaseDialog(resourceInstance, IDD_EDITAPPLICATIONBUTTON, parent, DialogSizingType::None),
 	m_model(model),
 	m_editDetails(std::move(editDetails))
 {
@@ -23,6 +24,8 @@ ApplicationEditorDialog::ApplicationEditorDialog(HWND parent, HINSTANCE resource
 
 INT_PTR ApplicationEditorDialog::OnInitDialog()
 {
+	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+
 	if (m_editDetails->type == EditDetails::Type::NewItem)
 	{
 		std::wstring newText =
@@ -55,9 +58,6 @@ INT_PTR ApplicationEditorDialog::OnInitDialog()
 	HWND hEditName = GetDlgItem(m_hDlg, IDC_APP_EDIT_NAME);
 	SendMessage(hEditName, EM_SETSEL, 0, -1);
 	SetFocus(hEditName);
-
-	AllowDarkModeForControls({ IDC_APP_BUTTON_CHOOSE_FILE });
-	AllowDarkModeForCheckboxes({ IDC_CHECK_SHOWAPPNAME });
 
 	return 0;
 }

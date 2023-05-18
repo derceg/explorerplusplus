@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Application.h"
-#include "DarkModeDialogBase.h"
+#include "../Helper/BaseDialog.h"
 #include <memory>
 #include <optional>
 
@@ -14,7 +14,7 @@ namespace Applications
 
 class ApplicationModel;
 
-class ApplicationEditorDialog : public DarkModeDialogBase
+class ApplicationEditorDialog : public BaseDialog
 {
 public:
 	class EditDetails

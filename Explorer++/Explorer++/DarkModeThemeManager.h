@@ -19,6 +19,7 @@ private:
 	DarkModeThemeManager() = default;
 
 	static BOOL CALLBACK ProcessChildWindow(HWND hwnd, LPARAM lParam);
+	static BOOL CALLBACK ProcessThreadWindow(HWND hwnd, LPARAM lParam);
 	static void ApplyThemeToWindow(HWND hwnd);
 
 	static LRESULT CALLBACK DialogSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
