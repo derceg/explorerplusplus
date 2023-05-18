@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "DarkModeDialogBase.h"
+#include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 
 class RenameTabDialog;
@@ -26,7 +26,7 @@ private:
 	RenameTabDialogPersistentSettings &operator=(const RenameTabDialogPersistentSettings &);
 };
 
-class RenameTabDialog : public DarkModeDialogBase
+class RenameTabDialog : public BaseDialog
 {
 public:
 	RenameTabDialog(HINSTANCE resourceInstance, HWND hParent, int tabId,

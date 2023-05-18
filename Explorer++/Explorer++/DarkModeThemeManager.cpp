@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "DarkModeThemeManager.h"
+#include "DarkModeButton.h"
 #include "DarkModeHelper.h"
 #include <vssym32.h>
 
@@ -229,6 +230,64 @@ LRESULT CALLBACK DarkModeThemeManager::DialogSubclass(HWND hwnd, UINT msg, WPARA
 		SetBkColor(hdc, DarkModeHelper::BACKGROUND_COLOR);
 		SetTextColor(hdc, DarkModeHelper::TEXT_COLOR);
 		return reinterpret_cast<INT_PTR>(DarkModeHelper::GetInstance().GetBackgroundBrush());
+	}
+	break;
+
+	case WM_NOTIFY:
+	{
+		auto *nmhdr = reinterpret_cast<NMHDR *>(lParam);
+
+		switch (nmhdr->code)
+		{
+		case NM_CUSTOMDRAW:
+		{
+			auto *customDraw = reinterpret_cast<NMCUSTOMDRAW *>(lParam);
+
+			switch (customDraw->dwDrawStage)
+			{
+			case CDDS_PREPAINT:
+			{
+				WCHAR className[256];
+				auto res = GetClassName(customDraw->hdr.hwndFrom, className,
+					static_cast<int>(std::size(className)));
+
+				if (res == 0 || lstrcmp(className, WC_BUTTON) != 0)
+				{
+					break;
+				}
+
+				auto style = GetWindowLongPtr(customDraw->hdr.hwndFrom, GWL_STYLE);
+
+				DarkModeButton::ButtonType buttonType;
+
+				// Although the documentation
+				// (https://learn.microsoft.com/en-au/windows/win32/controls/button-styles#constants)
+				// states that BS_TYPEMASK is out of date and shouldn't be used, it's necessary
+				// here, for the reasons discussed in https://stackoverflow.com/a/7293345. That is,
+				// the type flags from BS_PUSHBUTTON to BS_OWNERDRAW are mutually exclusive and the
+				// values in that range can have multiple bits set. So, checking that a single bit
+				// is set isn't going to work.
+				if ((style & BS_TYPEMASK) == BS_AUTOCHECKBOX)
+				{
+					buttonType = DarkModeButton::ButtonType::Checkbox;
+				}
+				else if ((style & BS_TYPEMASK) == BS_AUTORADIOBUTTON)
+				{
+					buttonType = DarkModeButton::ButtonType::Radio;
+				}
+				else
+				{
+					break;
+				}
+
+				DarkModeButton::DrawButtonText(customDraw, buttonType);
+			}
+				return CDRF_SKIPDEFAULT;
+			}
+
+			return CDRF_DODEFAULT;
+		}
+		}
 	}
 	break;
 

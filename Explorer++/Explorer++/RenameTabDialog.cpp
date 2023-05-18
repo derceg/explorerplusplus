@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "RenameTabDialog.h"
+#include "DarkModeThemeManager.h"
 #include "MainResource.h"
 #include "TabContainer.h"
 #include "../Helper/WindowHelper.h"
@@ -12,7 +13,7 @@ const TCHAR RenameTabDialogPersistentSettings::SETTINGS_KEY[] = _T("RenameTab");
 
 RenameTabDialog::RenameTabDialog(HINSTANCE resourceInstance, HWND hParent, int tabId,
 	TabContainer *tabContainer) :
-	DarkModeDialogBase(resourceInstance, IDD_RENAMETAB, hParent, DialogSizingType::None),
+	BaseDialog(resourceInstance, IDD_RENAMETAB, hParent, DialogSizingType::None),
 	m_tabId(tabId),
 	m_tabContainer(tabContainer)
 {
@@ -24,6 +25,8 @@ RenameTabDialog::RenameTabDialog(HINSTANCE resourceInstance, HWND hParent, int t
 
 INT_PTR RenameTabDialog::OnInitDialog()
 {
+	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+
 	HWND hEditName = GetDlgItem(m_hDlg, IDC_RENAMETAB_NEWTABNAME);
 
 	Tab *tab = m_tabContainer->GetTabOptional(m_tabId);
@@ -38,8 +41,6 @@ INT_PTR RenameTabDialog::OnInitDialog()
 	EnableWindow(hEditName, TRUE);
 	SendMessage(hEditName, EM_SETSEL, 0, -1);
 	SetFocus(hEditName);
-
-	AllowDarkModeForRadioButtons({ IDC_RENAMETAB_USEFOLDERNAME, IDC_RENAMETAB_USECUSTOMNAME });
 
 	m_prtdps->RestoreDialogPosition(m_hDlg, false);
 
