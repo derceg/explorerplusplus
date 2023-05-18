@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "SetFileAttributesDialog.h"
-#include "DarkModeHelper.h"
+#include "DarkModeThemeManager.h"
 #include "MainResource.h"
 #include "../Helper/TimeHelper.h"
 #include <list>
@@ -13,7 +13,7 @@ const TCHAR SetFileAttributesDialogPersistentSettings::SETTINGS_KEY[] = _T("SetF
 
 SetFileAttributesDialog::SetFileAttributesDialog(HINSTANCE resourceInstance, HWND hParent,
 	const std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo> &sfaiList) :
-	DarkModeDialogBase(resourceInstance, IDD_SETFILEATTRIBUTES, hParent, DialogSizingType::None)
+	BaseDialog(resourceInstance, IDD_SETFILEATTRIBUTES, hParent, DialogSizingType::None)
 {
 	assert(!sfaiList.empty());
 
@@ -24,6 +24,8 @@ SetFileAttributesDialog::SetFileAttributesDialog(HINSTANCE resourceInstance, HWN
 
 INT_PTR SetFileAttributesDialog::OnInitDialog()
 {
+	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+
 	InitializeAttributesStructure();
 	InitializeDateFields();
 
@@ -79,11 +81,6 @@ INT_PTR SetFileAttributesDialog::OnInitDialog()
 	m_bModificationDateEnabled = FALSE;
 	m_bCreationDateEnabled = FALSE;
 	m_bAccessDateEnabled = FALSE;
-
-	AllowDarkModeForControls({ IDC_MODIFICATION_RESET, IDC_CREATION_RESET, IDC_ACCESS_RESET });
-	AllowDarkModeForCheckboxes({ IDC_CHECK_ARCHIVE, IDC_CHECK_HIDDEN, IDC_CHECK_NOT_INDEXED,
-		IDC_CHECK_READONLY, IDC_CHECK_SYSTEM });
-	AllowDarkModeForGroupBoxes({ IDC_GROUP_ATTRIBUTES });
 
 	m_psfadps->RestoreDialogPosition(m_hDlg, false);
 

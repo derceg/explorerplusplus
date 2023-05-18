@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "DarkModeDialogBase.h"
+#include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include <list>
 
@@ -37,7 +37,7 @@ private:
 		const SetFileAttributesDialogPersistentSettings &) = delete;
 };
 
-class SetFileAttributesDialog : public DarkModeDialogBase
+class SetFileAttributesDialog : public BaseDialog
 {
 public:
 	SetFileAttributesDialog(HINSTANCE resourceInstance, HWND hParent,
