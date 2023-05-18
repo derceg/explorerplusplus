@@ -4,16 +4,19 @@
 
 #include "stdafx.h"
 #include "HelpFileMissingDialog.h"
+#include "DarkModeThemeManager.h"
 #include "MainResource.h"
 #include "../Helper/WindowHelper.h"
 
 HelpFileMissingDialog::HelpFileMissingDialog(HINSTANCE resourceInstance, HWND hParent) :
-	DarkModeDialogBase(resourceInstance, IDD_HELPFILEMISSING, hParent, DialogSizingType::None)
+	BaseDialog(resourceInstance, IDD_HELPFILEMISSING, hParent, DialogSizingType::None)
 {
 }
 
 INT_PTR HelpFileMissingDialog::OnInitDialog()
 {
+	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+
 	CenterWindow(GetParent(m_hDlg), m_hDlg);
 
 	return TRUE;
