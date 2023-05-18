@@ -15,7 +15,7 @@
 
 #include "stdafx.h"
 #include "MassRenameDialog.h"
-#include "DarkModeHelper.h"
+#include "DarkModeThemeManager.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -36,7 +36,7 @@ const TCHAR MassRenameDialogPersistentSettings::SETTING_COLUMN_WIDTH_2[] = _T("C
 MassRenameDialog::MassRenameDialog(HINSTANCE resourceInstance, HWND hParent,
 	const std::list<std::wstring> &FullFilenameList, IconResourceLoader *iconResourceLoader,
 	FileActionHandler *pFileActionHandler) :
-	DarkModeDialogBase(resourceInstance, IDD_MASSRENAME, hParent, DialogSizingType::Both),
+	BaseDialog(resourceInstance, IDD_MASSRENAME, hParent, DialogSizingType::Both),
 	m_FullFilenameList(FullFilenameList),
 	m_iconResourceLoader(iconResourceLoader),
 	m_pFileActionHandler(pFileActionHandler)
@@ -46,14 +46,14 @@ MassRenameDialog::MassRenameDialog(HINSTANCE resourceInstance, HWND hParent,
 
 INT_PTR MassRenameDialog::OnInitDialog()
 {
+	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hDlg);
 	m_moreIcon = m_iconResourceLoader->LoadIconFromPNGForDpi(Icon::ArrowRight, 16, 16, dpi);
 	SendDlgItemMessage(m_hDlg, IDC_MASSRENAME_MORE, BM_SETIMAGE, IMAGE_ICON,
 		reinterpret_cast<LPARAM>(m_moreIcon.get()));
 
 	HWND hListView = GetDlgItem(m_hDlg, IDC_MASSRENAME_FILELISTVIEW);
-
-	SetWindowTheme(hListView, L"Explorer", nullptr);
 	ListView_SetExtendedListViewStyleEx(hListView,
 		LVS_EX_DOUBLEBUFFER | LVS_EX_SUBITEMIMAGES | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES,
 		LVS_EX_DOUBLEBUFFER | LVS_EX_SUBITEMIMAGES | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
@@ -111,9 +111,6 @@ INT_PTR MassRenameDialog::OnInitDialog()
 	SetDlgItemText(m_hDlg, IDC_MASSRENAME_EDIT, _T("/F"));
 	SendMessage(GetDlgItem(m_hDlg, IDC_MASSRENAME_EDIT), EM_SETSEL, 0, -1);
 	SetFocus(GetDlgItem(m_hDlg, IDC_MASSRENAME_EDIT));
-
-	AllowDarkModeForControls({ IDC_MASSRENAME_MORE });
-	AllowDarkModeForListView(IDC_MASSRENAME_FILELISTVIEW);
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 

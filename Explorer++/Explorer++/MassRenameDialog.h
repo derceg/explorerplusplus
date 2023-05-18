@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "DarkModeDialogBase.h"
+#include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/ResizableDialogHelper.h"
@@ -42,7 +42,7 @@ private:
 	int m_iColumnWidth2;
 };
 
-class MassRenameDialog : public DarkModeDialogBase
+class MassRenameDialog : public BaseDialog
 {
 public:
 	MassRenameDialog(HINSTANCE resourceInstance, HWND hParent,
