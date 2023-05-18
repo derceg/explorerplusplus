@@ -6,6 +6,7 @@
 #include "ColorRuleEditorDialog.h"
 #include "ColorRule.h"
 #include "ColorRuleModel.h"
+#include "DarkModeThemeManager.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/Macros.h"
@@ -21,7 +22,7 @@ const TCHAR ColorRuleEditorDialogPersistentSettings::SETTING_CUSTOM_COLORS[] = _
 
 ColorRuleEditorDialog::ColorRuleEditorDialog(HINSTANCE resourceInstance, HWND parent,
 	ColorRuleModel *model, std::unique_ptr<EditDetails> editDetails) :
-	DarkModeDialogBase(resourceInstance, IDD_NEW_COLOR_RULE, parent, DialogSizingType::None),
+	BaseDialog(resourceInstance, IDD_NEW_COLOR_RULE, parent, DialogSizingType::None),
 	m_model(model),
 	m_editDetails(std::move(editDetails))
 {
@@ -30,6 +31,8 @@ ColorRuleEditorDialog::ColorRuleEditorDialog(HINSTANCE resourceInstance, HWND pa
 
 INT_PTR ColorRuleEditorDialog::OnInitDialog()
 {
+	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+
 	if (m_editDetails->type == EditDetails::Type::ExistingItem)
 	{
 		std::wstring editText =
@@ -92,12 +95,6 @@ INT_PTR ColorRuleEditorDialog::OnInitDialog()
 
 	SendMessage(GetDlgItem(m_hDlg, IDC_EDIT_DESCRIPTION), EM_SETSEL, 0, -1);
 	SetFocus(GetDlgItem(m_hDlg, IDC_EDIT_DESCRIPTION));
-
-	AllowDarkModeForControls({ IDC_BUTTON_CHANGE_COLOR });
-	AllowDarkModeForCheckboxes(
-		{ IDC_CHECK_CASE_INSENSITIVE, IDC_CHECK_COMPRESSED, IDC_CHECK_ENCRYPTED, IDC_CHECK_ARCHIVE,
-			IDC_CHECK_HIDDEN, IDC_CHECK_NOT_INDEXED, IDC_CHECK_READONLY, IDC_CHECK_SYSTEM });
-	AllowDarkModeForGroupBoxes({ IDC_GROUP_ATTRIBUTES });
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, false);
 
