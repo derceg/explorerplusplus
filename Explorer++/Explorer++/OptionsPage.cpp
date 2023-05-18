@@ -4,15 +4,11 @@
 
 #include "stdafx.h"
 #include "OptionsPage.h"
-#include "DarkModeButton.h"
 #include "DarkModeGroupBox.h"
-#include "DarkModeHelper.h"
 #include "ResourceHelper.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include <memory>
 #include <unordered_set>
-
-using namespace DarkModeButton;
 
 OptionsPage::OptionsPage(UINT dialogResourceId, UINT titleResourceId, HWND parent,
 	HINSTANCE resourceInstance, Config *config, CoreInterface *coreInterface,
@@ -99,36 +95,12 @@ INT_PTR CALLBACK OptionsPage::DialogProc(HWND dlg, UINT msg, WPARAM wParam, LPAR
 	}
 	break;
 
-	case WM_CTLCOLORDLG:
-		return OnPageCtlColorDlg(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
-
-	case WM_CTLCOLORSTATIC:
-	case WM_CTLCOLOREDIT:
-	case WM_CTLCOLORLISTBOX:
-		return OnCtlColor(reinterpret_cast<HWND>(lParam), reinterpret_cast<HDC>(wParam));
-
 	case WM_COMMAND:
 		OnCommand(wParam, lParam);
 		break;
 
 	case WM_NOTIFY:
-	{
-		auto *nmhdr = reinterpret_cast<NMHDR *>(lParam);
-
-		switch (nmhdr->code)
-		{
-		case NM_CUSTOMDRAW:
-		{
-			auto result = OnCustomDraw(reinterpret_cast<NMCUSTOMDRAW *>(lParam));
-			SetWindowLongPtr(dlg, DWLP_MSGRESULT, result);
-			return result;
-		}
-		break;
-		}
-
 		return OnNotify(wParam, lParam);
-	}
-	break;
 
 	case WM_SIZE:
 		m_resizableDialogHelper->UpdateControls(LOWORD(lParam), HIWORD(lParam));
@@ -136,60 +108,6 @@ INT_PTR CALLBACK OptionsPage::DialogProc(HWND dlg, UINT msg, WPARAM wParam, LPAR
 	}
 
 	return 0;
-}
-
-INT_PTR OptionsPage::OnPageCtlColorDlg(HWND hwnd, HDC hdc)
-{
-	UNREFERENCED_PARAMETER(hwnd);
-	UNREFERENCED_PARAMETER(hdc);
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (!darkModeHelper.IsDarkModeEnabled())
-	{
-		return FALSE;
-	}
-
-	return reinterpret_cast<INT_PTR>(darkModeHelper.GetBackgroundBrush());
-}
-
-INT_PTR OptionsPage::OnCtlColor(HWND hwnd, HDC hdc)
-{
-	UNREFERENCED_PARAMETER(hwnd);
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (!darkModeHelper.IsDarkModeEnabled())
-	{
-		return FALSE;
-	}
-
-	SetBkColor(hdc, DarkModeHelper::BACKGROUND_COLOR);
-	SetTextColor(hdc, DarkModeHelper::TEXT_COLOR);
-
-	return reinterpret_cast<INT_PTR>(darkModeHelper.GetBackgroundBrush());
-}
-
-INT_PTR OptionsPage::OnCustomDraw(const NMCUSTOMDRAW *customDraw)
-{
-	bool isStoredCheckbox =
-		(m_checkboxControlIds.count(static_cast<int>(customDraw->hdr.idFrom)) == 1);
-	bool isStoredRadioButton =
-		(m_radioButtonControlIds.count(static_cast<int>(customDraw->hdr.idFrom)) == 1);
-
-	if (!isStoredCheckbox && !isStoredRadioButton)
-	{
-		return CDRF_DODEFAULT;
-	}
-
-	switch (customDraw->dwDrawStage)
-	{
-	case CDDS_PREPAINT:
-		DrawButtonText(customDraw, isStoredCheckbox ? ButtonType::Checkbox : ButtonType::Radio);
-		return CDRF_SKIPDEFAULT;
-	}
-
-	return CDRF_DODEFAULT;
 }
 
 void OptionsPage::OnCommand(WPARAM wParam, LPARAM lParam)

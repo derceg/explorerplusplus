@@ -117,14 +117,6 @@ void GeneralOptionsPage::InitializeControls()
 
 	if (darkModeHelper.IsDarkModeEnabled())
 	{
-		darkModeHelper.SetDarkModeForControl(GetDlgItem(GetDialog(), IDC_DEFAULT_NEWTABDIR_BUTTON));
-		darkModeHelper.SetDarkModeForComboBox(GetDlgItem(GetDialog(), IDC_OPTIONS_LANGUAGE));
-
-		m_checkboxControlIds.insert(IDC_OPTION_XML);
-		m_radioButtonControlIds.insert(
-			{ IDC_STARTUP_PREVIOUSTABS, IDC_STARTUP_DEFAULTFOLDER, IDC_OPTION_REPLACEEXPLORER_NONE,
-				IDC_OPTION_REPLACEEXPLORER_FILESYSTEM, IDC_OPTION_REPLACEEXPLORER_ALL });
-
 		m_darkModeGroupBoxes.push_back(
 			std::make_unique<DarkModeGroupBox>(GetDlgItem(GetDialog(), IDC_GROUP_STARTUP)));
 		m_darkModeGroupBoxes.push_back(std::make_unique<DarkModeGroupBox>(

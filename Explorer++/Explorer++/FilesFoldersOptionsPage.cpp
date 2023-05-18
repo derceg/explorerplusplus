@@ -6,7 +6,6 @@
 #include "FilesFoldersOptionsPage.h"
 #include "Config.h"
 #include "CoreInterface.h"
-#include "DarkModeHelper.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -172,24 +171,6 @@ void FilesFoldersOptionsPage::InitializeControls()
 
 	SetInfoTipControlStates();
 	SetFolderSizeControlState();
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		darkModeHelper.SetDarkModeForComboBox(GetDlgItem(GetDialog(), IDC_COMBO_FILESIZES));
-
-		m_checkboxControlIds.insert({ IDC_SETTINGS_CHECK_SYSTEMFILES, IDC_SETTINGS_CHECK_EXTENSIONS,
-			IDC_SETTINGS_CHECK_LINK, IDC_SETTINGS_CHECK_INSERTSORTED,
-			IDC_SETTINGS_CHECK_SINGLECLICK, IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION,
-			IDC_SETTINGS_CHECK_FOLDERSIZES, IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE,
-			IDC_SETTINGS_CHECK_FORCESIZE, IDC_SETTINGS_CHECK_ZIPFILES,
-			IDC_SETTINGS_CHECK_FRIENDLYDATES, IDC_OPTIONS_CHECK_SHOWINFOTIPS,
-			IDC_DISPLAY_MIXED_FILES_AND_FOLDERS, IDC_USE_NATURAL_SORT_ORDER });
-
-		m_radioButtonControlIds.insert(
-			{ IDC_OPTIONS_RADIO_SYSTEMINFOTIPS, IDC_OPTIONS_RADIO_CUSTOMINFOTIPS });
-	}
 }
 
 void FilesFoldersOptionsPage::OnCommand(WPARAM wParam, LPARAM lParam)

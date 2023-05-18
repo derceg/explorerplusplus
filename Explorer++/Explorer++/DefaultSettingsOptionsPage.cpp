@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "DefaultSettingsOptionsPage.h"
 #include "Config.h"
-#include "DarkModeHelper.h"
 #include "MainResource.h"
 #include "SetDefaultColumnsDialog.h"
 #include "ViewModeHelper.h"
@@ -74,17 +73,6 @@ void DefaultSettingsOptionsPage::InitializeControls()
 
 	AddItemsToComboBox(GetDlgItem(GetDialog(), IDC_OPTIONS_DEFAULT_VIEW), viewModeItems,
 		m_config->defaultFolderSettings.viewMode);
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		darkModeHelper.SetDarkModeForControl(GetDlgItem(GetDialog(), IDC_BUTTON_DEFAULTCOLUMNS));
-		darkModeHelper.SetDarkModeForComboBox(GetDlgItem(GetDialog(), IDC_OPTIONS_DEFAULT_VIEW));
-
-		m_checkboxControlIds.insert({ IDC_SHOWHIDDENGLOBAL, IDC_AUTOARRANGEGLOBAL,
-			IDC_SHOWINGROUPSGLOBAL, IDC_SORTASCENDINGGLOBAL, IDC_GROUP_SORT_ASCENDING_GLOBAL });
-	}
 }
 
 void DefaultSettingsOptionsPage::OnCommand(WPARAM wParam, LPARAM lParam)

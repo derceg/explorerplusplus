@@ -34,8 +34,6 @@ protected:
 	const HINSTANCE m_resourceInstance;
 	const HWND m_tooltipWindow;
 
-	std::unordered_set<int> m_checkboxControlIds;
-	std::unordered_set<int> m_radioButtonControlIds;
 	std::vector<std::unique_ptr<DarkModeGroupBox>> m_darkModeGroupBoxes;
 
 	const SettingChangedCallback m_settingChangedCallback;
@@ -43,9 +41,6 @@ protected:
 private:
 	static INT_PTR CALLBACK DialogProcStub(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam);
 	INT_PTR CALLBACK DialogProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam);
-	INT_PTR OnPageCtlColorDlg(HWND hwnd, HDC hdc);
-	INT_PTR OnCtlColor(HWND hwnd, HDC hdc);
-	INT_PTR OnCustomDraw(const NMCUSTOMDRAW *customDraw);
 
 	virtual std::unique_ptr<ResizableDialogHelper> InitializeResizeDialogHelper() = 0;
 	virtual void InitializeControls() = 0;

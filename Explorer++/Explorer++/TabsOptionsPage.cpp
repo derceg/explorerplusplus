@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "TabsOptionsPage.h"
 #include "Config.h"
-#include "DarkModeHelper.h"
 #include "MainResource.h"
 #include "../Helper/ResizableDialogHelper.h"
 
@@ -72,15 +71,6 @@ void TabsOptionsPage::InitializeControls()
 	if (m_config->closeMainWindowOnTabClose)
 	{
 		CheckDlgButton(GetDialog(), IDC_TABS_CLOSEMAINWINDOW, BST_CHECKED);
-	}
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		m_checkboxControlIds.insert({ IDC_TABS_TASKBARTHUMBNAILS, IDC_TABS_SAMEWIDTH,
-			IDC_TABS_CLOSECONFIRMATION, IDC_TABS_OPENNEXTTOCURRENT, IDC_SETTINGS_CHECK_ALWAYSNEWTAB,
-			IDC_TABS_DOUBLECLICKCLOSE, IDC_TABS_CLOSEMAINWINDOW });
 	}
 }
 
