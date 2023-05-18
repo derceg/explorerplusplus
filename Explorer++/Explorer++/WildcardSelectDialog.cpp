@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "WildcardSelectDialog.h"
 #include "CoreInterface.h"
+#include "DarkModeThemeManager.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -22,7 +23,7 @@ const TCHAR WildcardSelectDialogPersistentSettings::SETTING_CURRENT_TEXT[] = _T(
 
 WildcardSelectDialog::WildcardSelectDialog(HINSTANCE resourceInstance, HWND hParent, BOOL bSelect,
 	CoreInterface *coreInterface) :
-	DarkModeDialogBase(resourceInstance, IDD_WILDCARDSELECT, hParent, DialogSizingType::Horizontal)
+	BaseDialog(resourceInstance, IDD_WILDCARDSELECT, hParent, DialogSizingType::Horizontal)
 {
 	m_bSelect = bSelect;
 	m_coreInterface = coreInterface;
@@ -32,6 +33,8 @@ WildcardSelectDialog::WildcardSelectDialog(HINSTANCE resourceInstance, HWND hPar
 
 INT_PTR WildcardSelectDialog::OnInitDialog()
 {
+	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+
 	m_icon.reset(LoadIcon(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_MAIN)));
 	SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
 
@@ -52,8 +55,6 @@ INT_PTR WildcardSelectDialog::OnInitDialog()
 	}
 
 	SetFocus(hComboBox);
-
-	AllowDarkModeForComboBoxes({ IDC_SELECTGROUP_COMBOBOX });
 
 	m_pwsdps->RestoreDialogPosition(m_hDlg, true);
 
