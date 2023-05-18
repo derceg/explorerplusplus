@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ScriptingDialog.h"
+#include "DarkModeThemeManager.h"
 #include "MainResource.h"
 #include "Plugins/Manifest.h"
 #include "../Helper/StringHelper.h"
@@ -12,7 +13,7 @@
 
 ScriptingDialog::ScriptingDialog(HINSTANCE resourceInstance, HWND hParent,
 	PluginInterface *pluginInterface) :
-	DarkModeDialogBase(resourceInstance, IDD_SCRIPTING, hParent, DialogSizingType::Both),
+	BaseDialog(resourceInstance, IDD_SCRIPTING, hParent, DialogSizingType::Both),
 	m_luaPlugin(L"", Plugins::Manifest(), pluginInterface)
 {
 	m_luaPlugin.GetLuaState().open_libraries(sol::lib::base);
@@ -20,10 +21,10 @@ ScriptingDialog::ScriptingDialog(HINSTANCE resourceInstance, HWND hParent,
 
 INT_PTR ScriptingDialog::OnInitDialog()
 {
+	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+
 	HWND commandControl = GetDlgItem(m_hDlg, IDC_COMMAND);
 	SendMessage(m_hDlg, WM_NEXTDLGCTL, reinterpret_cast<WPARAM>(commandControl), TRUE);
-
-	AllowDarkModeForControls({ ID_RUN });
 
 	return FALSE;
 }
