@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "DarkModeDialogBase.h"
+#include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 
 class DisplayColoursDialog;
@@ -26,7 +26,7 @@ private:
 		const DisplayColoursDialogPersistentSettings &);
 };
 
-class DisplayColoursDialog : public DarkModeDialogBase
+class DisplayColoursDialog : public BaseDialog
 {
 public:
 	DisplayColoursDialog(HINSTANCE resourceInstance, HWND hParent, HWND hDisplayWindow,

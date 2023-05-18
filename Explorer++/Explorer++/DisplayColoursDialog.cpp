@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "DisplayColoursDialog.h"
+#include "DarkModeThemeManager.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "MainResource.h"
 #include "../Helper/Macros.h"
@@ -12,7 +13,7 @@ const TCHAR DisplayColoursDialogPersistentSettings::SETTINGS_KEY[] = _T("Display
 
 DisplayColoursDialog::DisplayColoursDialog(HINSTANCE resourceInstance, HWND hParent,
 	HWND hDisplayWindow, COLORREF DefaultCenterColor, COLORREF DefaultSurroundingColor) :
-	DarkModeDialogBase(resourceInstance, IDD_DISPLAYCOLOURS, hParent, DialogSizingType::None),
+	BaseDialog(resourceInstance, IDD_DISPLAYCOLOURS, hParent, DialogSizingType::None),
 	m_hDisplayWindow(hDisplayWindow),
 	m_DefaultCenterColor(DefaultCenterColor),
 	m_DefaultSurroundingColor(DefaultSurroundingColor)
@@ -22,11 +23,10 @@ DisplayColoursDialog::DisplayColoursDialog(HINSTANCE resourceInstance, HWND hPar
 
 INT_PTR DisplayColoursDialog::OnInitDialog()
 {
+	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+
 	InitializeColorGroups();
 	InitializePreviewWindow();
-
-	AllowDarkModeForControls({ IDC_BUTTON_RESTOREDEFAULTS, IDC_BUTTON_DISPLAY_FONT });
-	AllowDarkModeForGroupBoxes({ IDC_GROUP_CENTER_COLOR, IDC_GROUP_SURROUND_COLOR });
 
 	m_pdcdps->RestoreDialogPosition(m_hDlg, false);
 
