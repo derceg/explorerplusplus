@@ -23,6 +23,11 @@ private:
 
 	static LRESULT CALLBACK DialogSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR subclassId, DWORD_PTR data);
+	static LRESULT CALLBACK ToolbarParentSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
+		UINT_PTR subclassId, DWORD_PTR data);
+	static LRESULT OnCustomDraw(NMCUSTOMDRAW *customDraw);
+	static LRESULT OnButtonCustomDraw(NMCUSTOMDRAW *customDraw);
+	static LRESULT OnToolbarCustomDraw(NMTBCUSTOMDRAW *customDraw);
 	static LRESULT CALLBACK ListViewSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR subclassId, DWORD_PTR data);
 };

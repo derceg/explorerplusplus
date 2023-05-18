@@ -9,7 +9,6 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "Config.h"
 #include "CoreInterface.h"
-#include "DarkModeHelper.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -39,17 +38,9 @@ BookmarkListView::BookmarkListView(HWND hListView, HINSTANCE resourceInstance,
 	m_sortAscending(true),
 	m_bookmarkContextMenu(bookmarkTree, resourceInstance, coreInterface, navigator)
 {
-	SetWindowTheme(hListView, L"Explorer", nullptr);
 	ListView_SetExtendedListViewStyleEx(hListView,
 		LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_LABELTIP,
 		LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_LABELTIP);
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		darkModeHelper.SetListViewDarkModeColors(hListView);
-	}
 
 	SetUpListViewImageList(iconFetcher);
 
@@ -187,33 +178,6 @@ LRESULT BookmarkListView::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		{
 			OnShowContextMenu({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
 			return 0;
-		}
-		break;
-
-	case WM_NOTIFY:
-		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == ListView_GetHeader(m_hListView))
-		{
-			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
-			{
-			case NM_CUSTOMDRAW:
-			{
-				if (DarkModeHelper::GetInstance().IsDarkModeEnabled())
-				{
-					auto *customDraw = reinterpret_cast<NMCUSTOMDRAW *>(lParam);
-
-					switch (customDraw->dwDrawStage)
-					{
-					case CDDS_PREPAINT:
-						return CDRF_NOTIFYITEMDRAW;
-
-					case CDDS_ITEMPREPAINT:
-						SetTextColor(customDraw->hdc, DarkModeHelper::TEXT_COLOR);
-						return CDRF_NEWFONT;
-					}
-				}
-			}
-			break;
-			}
 		}
 		break;
 	}

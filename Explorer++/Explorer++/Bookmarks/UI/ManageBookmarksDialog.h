@@ -5,8 +5,8 @@
 #pragma once
 
 #include "Bookmarks/UI/BookmarkListView.h"
-#include "DarkModeDialogBase.h"
 #include "ResourceHelper.h"
+#include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include <boost/signals2.hpp>
@@ -46,7 +46,7 @@ private:
 	std::unordered_set<std::wstring> m_setExpansion;
 };
 
-class ManageBookmarksDialog : public DarkModeDialogBase
+class ManageBookmarksDialog : public BaseDialog
 {
 public:
 	ManageBookmarksDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface,
@@ -79,8 +79,7 @@ private:
 	void SetupTreeView();
 	void SetupListView();
 
-	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	std::optional<LRESULT> OnToolbarCustomDraw(NMTBCUSTOMDRAW *customDraw);
+	LRESULT CALLBACK ToolbarParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	void OnTreeViewSelectionChanged(BookmarkItem *bookmarkFolder);
 	void OnListViewNavigation(BookmarkItem *bookmarkFolder, bool addHistoryEntry);

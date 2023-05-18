@@ -7,7 +7,6 @@
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "CoreInterface.h"
-#include "DarkModeHelper.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
@@ -32,15 +31,6 @@ BookmarkTreeView::BookmarkTreeView(HWND hTreeView, HINSTANCE resourceInstance,
 		std::bind_front(&BookmarkTreeView::TreeViewProc, this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(hTreeView),
 		std::bind_front(&BookmarkTreeView::TreeViewParentProc, this)));
-
-	SetWindowTheme(hTreeView, L"Explorer", nullptr);
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		darkModeHelper.SetTreeViewDarkModeColors(hTreeView);
-	}
 
 	auto &dpiCompat = DpiCompatibility::GetInstance();
 	UINT dpi = dpiCompat.GetDpiForWindow(hTreeView);

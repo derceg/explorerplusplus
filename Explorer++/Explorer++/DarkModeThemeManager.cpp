@@ -108,6 +108,15 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 			charFormat.dwEffects = 0;
 			SendMessage(hwnd, EM_SETCHARFORMAT, SCF_ALL, reinterpret_cast<LPARAM>(&charFormat));
 		}
+		else if (lstrcmp(className, TOOLBARCLASSNAME) == 0)
+		{
+			HWND parent = GetParent(hwnd);
+			assert(parent);
+
+			// This may be called multiple times (if there's more than one toolbar in a particular
+			// window), but that's not an issue, as the subclass will only be installed once.
+			SetWindowSubclass(parent, ToolbarParentSubclass, SUBCLASS_ID, 0);
+		}
 		else if (lstrcmp(className, WC_COMBOBOX) == 0)
 		{
 			SetWindowTheme(hwnd, L"CFD", nullptr);
@@ -202,6 +211,13 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 			charFormat.dwEffects = 0;
 			SendMessage(hwnd, EM_SETCHARFORMAT, SCF_ALL, reinterpret_cast<LPARAM>(&charFormat));
 		}
+		else if (lstrcmp(className, TOOLBARCLASSNAME) == 0)
+		{
+			HWND parent = GetParent(hwnd);
+			assert(parent);
+
+			RemoveWindowSubclass(parent, ToolbarParentSubclass, SUBCLASS_ID);
+		}
 		else if (lstrcmp(className, WC_COMBOBOX) == 0)
 		{
 			SetWindowTheme(hwnd, L"CFD", nullptr);
@@ -240,53 +256,7 @@ LRESULT CALLBACK DarkModeThemeManager::DialogSubclass(HWND hwnd, UINT msg, WPARA
 		switch (nmhdr->code)
 		{
 		case NM_CUSTOMDRAW:
-		{
-			auto *customDraw = reinterpret_cast<NMCUSTOMDRAW *>(lParam);
-
-			switch (customDraw->dwDrawStage)
-			{
-			case CDDS_PREPAINT:
-			{
-				WCHAR className[256];
-				auto res = GetClassName(customDraw->hdr.hwndFrom, className,
-					static_cast<int>(std::size(className)));
-
-				if (res == 0 || lstrcmp(className, WC_BUTTON) != 0)
-				{
-					break;
-				}
-
-				auto style = GetWindowLongPtr(customDraw->hdr.hwndFrom, GWL_STYLE);
-
-				DarkModeButton::ButtonType buttonType;
-
-				// Although the documentation
-				// (https://learn.microsoft.com/en-au/windows/win32/controls/button-styles#constants)
-				// states that BS_TYPEMASK is out of date and shouldn't be used, it's necessary
-				// here, for the reasons discussed in https://stackoverflow.com/a/7293345. That is,
-				// the type flags from BS_PUSHBUTTON to BS_OWNERDRAW are mutually exclusive and the
-				// values in that range can have multiple bits set. So, checking that a single bit
-				// is set isn't going to work.
-				if ((style & BS_TYPEMASK) == BS_AUTOCHECKBOX)
-				{
-					buttonType = DarkModeButton::ButtonType::Checkbox;
-				}
-				else if ((style & BS_TYPEMASK) == BS_AUTORADIOBUTTON)
-				{
-					buttonType = DarkModeButton::ButtonType::Radio;
-				}
-				else
-				{
-					break;
-				}
-
-				DarkModeButton::DrawButtonText(customDraw, buttonType);
-			}
-				return CDRF_SKIPDEFAULT;
-			}
-
-			return CDRF_DODEFAULT;
-		}
+			return OnCustomDraw(reinterpret_cast<NMCUSTOMDRAW *>(lParam));
 		}
 	}
 	break;
@@ -300,6 +270,114 @@ LRESULT CALLBACK DarkModeThemeManager::DialogSubclass(HWND hwnd, UINT msg, WPARA
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+LRESULT CALLBACK DarkModeThemeManager::ToolbarParentSubclass(HWND hwnd, UINT msg, WPARAM wParam,
+	LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data)
+{
+	UNREFERENCED_PARAMETER(data);
+
+	switch (msg)
+	{
+	case WM_NOTIFY:
+	{
+		auto *nmhdr = reinterpret_cast<NMHDR *>(lParam);
+
+		switch (nmhdr->code)
+		{
+		case NM_CUSTOMDRAW:
+			return OnCustomDraw(reinterpret_cast<NMCUSTOMDRAW *>(lParam));
+		}
+	}
+	break;
+
+	case WM_NCDESTROY:
+	{
+		[[maybe_unused]] auto res = RemoveWindowSubclass(hwnd, ToolbarParentSubclass, subclassId);
+		assert(res);
+	}
+	break;
+	}
+
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+LRESULT DarkModeThemeManager::OnCustomDraw(NMCUSTOMDRAW *customDraw)
+{
+	WCHAR className[256];
+	auto res =
+		GetClassName(customDraw->hdr.hwndFrom, className, static_cast<int>(std::size(className)));
+
+	if (res == 0)
+	{
+		assert(false);
+		return CDRF_DODEFAULT;
+	}
+
+	if (lstrcmp(className, WC_BUTTON) == 0)
+	{
+		return OnButtonCustomDraw(customDraw);
+	}
+	else if (lstrcmp(className, TOOLBARCLASSNAME) == 0)
+	{
+		return OnToolbarCustomDraw(reinterpret_cast<NMTBCUSTOMDRAW *>(customDraw));
+	}
+
+	return CDRF_DODEFAULT;
+}
+
+LRESULT DarkModeThemeManager::OnButtonCustomDraw(NMCUSTOMDRAW *customDraw)
+{
+	switch (customDraw->dwDrawStage)
+	{
+	case CDDS_PREPAINT:
+	{
+		auto style = GetWindowLongPtr(customDraw->hdr.hwndFrom, GWL_STYLE);
+
+		DarkModeButton::ButtonType buttonType;
+
+		// Although the documentation
+		// (https://learn.microsoft.com/en-au/windows/win32/controls/button-styles#constants)
+		// states that BS_TYPEMASK is out of date and shouldn't be used, it's necessary
+		// here, for the reasons discussed in https://stackoverflow.com/a/7293345. That is,
+		// the type flags from BS_PUSHBUTTON to BS_OWNERDRAW are mutually exclusive and the
+		// values in that range can have multiple bits set. So, checking that a single bit
+		// is set isn't going to work.
+		if ((style & BS_TYPEMASK) == BS_AUTOCHECKBOX)
+		{
+			buttonType = DarkModeButton::ButtonType::Checkbox;
+		}
+		else if ((style & BS_TYPEMASK) == BS_AUTORADIOBUTTON)
+		{
+			buttonType = DarkModeButton::ButtonType::Radio;
+		}
+		else
+		{
+			break;
+		}
+
+		DarkModeButton::DrawButtonText(customDraw, buttonType);
+	}
+		return CDRF_SKIPDEFAULT;
+	}
+
+	return CDRF_DODEFAULT;
+}
+
+LRESULT DarkModeThemeManager::OnToolbarCustomDraw(NMTBCUSTOMDRAW *customDraw)
+{
+	switch (customDraw->nmcd.dwDrawStage)
+	{
+	case CDDS_PREPAINT:
+		return CDRF_NOTIFYITEMDRAW;
+
+	case CDDS_ITEMPREPAINT:
+		customDraw->clrText = DarkModeHelper::TEXT_COLOR;
+		customDraw->clrHighlightHotTrack = DarkModeHelper::BUTTON_HIGHLIGHT_COLOR;
+		return TBCDRF_USECDCOLORS | TBCDRF_HILITEHOTTRACK;
+	}
+
+	return CDRF_DODEFAULT;
 }
 
 LRESULT CALLBACK DarkModeThemeManager::ListViewSubclass(HWND hwnd, UINT msg, WPARAM wParam,

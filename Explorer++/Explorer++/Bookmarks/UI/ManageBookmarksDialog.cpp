@@ -10,7 +10,7 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarkTreeView.h"
 #include "CoreInterface.h"
-#include "DarkModeHelper.h"
+#include "DarkModeThemeManager.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -26,7 +26,7 @@ const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("Manage
 ManageBookmarksDialog::ManageBookmarksDialog(HINSTANCE resourceInstance, HWND hParent,
 	CoreInterface *coreInterface, Navigator *navigator, IconFetcher *iconFetcher,
 	BookmarkTree *bookmarkTree) :
-	DarkModeDialogBase(resourceInstance, IDD_MANAGE_BOOKMARKS, hParent, DialogSizingType::Both),
+	BaseDialog(resourceInstance, IDD_MANAGE_BOOKMARKS, hParent, DialogSizingType::Both),
 	m_coreInterface(coreInterface),
 	m_navigator(navigator),
 	m_iconFetcher(iconFetcher),
@@ -55,6 +55,8 @@ INT_PTR ManageBookmarksDialog::OnInitDialog()
 	m_navigationController =
 		std::make_unique<BookmarkNavigationController>(m_bookmarkTree, m_bookmarkListView);
 	m_navigationController->Navigate(m_bookmarkTree->GetBookmarksToolbarFolder());
+
+	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
 
 	SetFocus(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW));
 
@@ -86,7 +88,7 @@ void ManageBookmarksDialog::SetupToolbar()
 		0, 0, 0, 0, m_hDlg, nullptr, GetModuleHandle(nullptr), nullptr);
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_toolbarParent,
-		std::bind_front(&ManageBookmarksDialog::ParentWndProc, this)));
+		std::bind_front(&ManageBookmarksDialog::ToolbarParentWndProc, this)));
 
 	m_hToolbar = CreateToolbar(m_toolbarParent,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | TBSTYLE_TOOLTIPS | TBSTYLE_LIST
@@ -189,7 +191,7 @@ void ManageBookmarksDialog::SetupListView()
 		std::bind_front(&ManageBookmarksDialog::OnListViewNavigation, this)));
 }
 
-LRESULT CALLBACK ManageBookmarksDialog::ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam,
+LRESULT CALLBACK ManageBookmarksDialog::ToolbarParentWndProc(HWND hwnd, UINT msg, WPARAM wParam,
 	LPARAM lParam)
 {
 	switch (msg)
@@ -223,13 +225,6 @@ LRESULT CALLBACK ManageBookmarksDialog::ParentWndProc(HWND hwnd, UINT msg, WPARA
 		{
 			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
 			{
-			case NM_CUSTOMDRAW:
-				if (auto result = OnToolbarCustomDraw(reinterpret_cast<NMTBCUSTOMDRAW *>(lParam)))
-				{
-					return *result;
-				}
-				break;
-
 			case TBN_DROPDOWN:
 				OnTbnDropDown(reinterpret_cast<NMTOOLBAR *>(lParam));
 				break;
@@ -239,29 +234,6 @@ LRESULT CALLBACK ManageBookmarksDialog::ParentWndProc(HWND hwnd, UINT msg, WPARA
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
-}
-
-std::optional<LRESULT> ManageBookmarksDialog::OnToolbarCustomDraw(NMTBCUSTOMDRAW *customDraw)
-{
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (!darkModeHelper.IsDarkModeEnabled())
-	{
-		return std::nullopt;
-	}
-
-	switch (customDraw->nmcd.dwDrawStage)
-	{
-	case CDDS_PREPAINT:
-		return CDRF_NOTIFYITEMDRAW;
-
-	case CDDS_ITEMPREPAINT:
-		customDraw->clrText = DarkModeHelper::TEXT_COLOR;
-		customDraw->clrHighlightHotTrack = DarkModeHelper::BUTTON_HIGHLIGHT_COLOR;
-		return TBCDRF_USECDCOLORS | TBCDRF_HILITEHOTTRACK;
-	}
-
-	return std::nullopt;
 }
 
 INT_PTR ManageBookmarksDialog::OnAppCommand(HWND hwnd, UINT uCmd, UINT uDevice, DWORD dwKeys)
