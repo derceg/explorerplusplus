@@ -8,7 +8,7 @@
 #include "ColorRuleListView.h"
 #include "ColorRuleModel.h"
 #include "CoreInterface.h"
-#include "DarkModeHelper.h"
+#include "DarkModeThemeManager.h"
 #include "Explorer++_internal.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
@@ -26,7 +26,7 @@ CustomizeColorsDialog::~CustomizeColorsDialog() = default;
 
 CustomizeColorsDialog::CustomizeColorsDialog(HINSTANCE resourceInstance, HWND parent,
 	CoreInterface *coreInterface, ColorRuleModel *model) :
-	DarkModeDialogBase(resourceInstance, IDD_CUSTOMIZE_COLORS, parent, DialogSizingType::Both),
+	BaseDialog(resourceInstance, IDD_CUSTOMIZE_COLORS, parent, DialogSizingType::Both),
 	m_coreInterface(coreInterface),
 	m_model(model)
 {
@@ -35,6 +35,8 @@ CustomizeColorsDialog::CustomizeColorsDialog(HINSTANCE resourceInstance, HWND pa
 
 INT_PTR CustomizeColorsDialog::OnInitDialog()
 {
+	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+
 	HWND listView = GetDlgItem(m_hDlg, IDC_LISTVIEW_COLOR_RULES);
 	m_colorRuleListView =
 		std::make_unique<ColorRuleListView>(listView, GetResourceInstance(), m_model);
@@ -49,9 +51,6 @@ INT_PTR CustomizeColorsDialog::OnInitDialog()
 	UpdateControlStates();
 
 	SetFocus(listView);
-
-	AllowDarkModeForControls({ IDC_BUTTON_NEW, IDC_BUTTON_EDIT, IDC_BUTTON_MOVE_UP,
-		IDC_BUTTON_MOVE_DOWN, IDC_BUTTON_DELETE, IDC_BUTTON_DELETE_ALL });
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 
