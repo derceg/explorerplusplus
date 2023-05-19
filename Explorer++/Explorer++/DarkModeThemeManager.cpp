@@ -8,6 +8,7 @@
 #include "DarkModeHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowHelper.h"
+#include <wil/resource.h>
 #include <vssym32.h>
 
 static const WCHAR DIALOG_CLASS_NAME[] = L"#32770";
@@ -68,7 +69,8 @@ BOOL CALLBACK DarkModeThemeManager::ProcessThreadWindow(HWND hwnd, LPARAM lParam
 void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 {
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
-	darkModeHelper.AllowDarkModeForWindow(hwnd, true);
+	bool enableDarkMode = darkModeHelper.IsDarkModeEnabled();
+	darkModeHelper.AllowDarkModeForWindow(hwnd, enableDarkMode);
 
 	// The maximum length of a class name is 256 characters (see the documentation for lpszClassName
 	// in https://learn.microsoft.com/en-au/windows/win32/api/winuser/ns-winuser-wndclassw).
@@ -81,233 +83,286 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 		return;
 	}
 
-	if (darkModeHelper.IsDarkModeEnabled())
+	if (lstrcmp(className, DIALOG_CLASS_NAME) == 0)
 	{
-		if (lstrcmp(className, DIALOG_CLASS_NAME) == 0)
-		{
-			BOOL dark = TRUE;
-			DarkModeHelper::WINDOWCOMPOSITIONATTRIBDATA compositionData = {
-				DarkModeHelper::WCA_USEDARKMODECOLORS, &dark, sizeof(dark)
-			};
-			darkModeHelper.SetWindowCompositionAttribute(hwnd, &compositionData);
+		ApplyThemeToDialog(hwnd, enableDarkMode);
+	}
+	else if (lstrcmp(className, WC_LISTVIEW) == 0)
+	{
+		ApplyThemeToListView(hwnd, enableDarkMode);
+	}
+	else if (lstrcmp(className, WC_HEADER) == 0)
+	{
+		ApplyThemeToHeader(hwnd, enableDarkMode);
+	}
+	else if (lstrcmp(className, WC_TREEVIEW) == 0)
+	{
+		ApplyThemeToTreeView(hwnd, enableDarkMode);
+	}
+	else if (lstrcmp(className, MSFTEDIT_CLASS) == 0)
+	{
+		ApplyThemeToRichEdit(hwnd, enableDarkMode);
+	}
+	else if (lstrcmp(className, REBARCLASSNAME) == 0)
+	{
+		ApplyThemeToRebar(hwnd, enableDarkMode);
+	}
+	else if (lstrcmp(className, TOOLBARCLASSNAME) == 0)
+	{
+		ApplyThemeToToolbar(hwnd, enableDarkMode);
+	}
+	else if (lstrcmp(className, WC_COMBOBOXEX) == 0)
+	{
+		ApplyThemeToComboBoxEx(hwnd, enableDarkMode);
+	}
+	else if (lstrcmp(className, WC_COMBOBOX) == 0)
+	{
+		ApplyThemeToComboBox(hwnd, enableDarkMode);
+	}
+	else if (lstrcmp(className, WC_BUTTON) == 0)
+	{
+		ApplyThemeToButton(hwnd, enableDarkMode);
+	}
+	else if (lstrcmp(className, TOOLTIPS_CLASS) == 0)
+	{
+		ApplyThemeToTooltips(hwnd, enableDarkMode);
+	}
+}
 
-			SetWindowSubclass(hwnd, DialogSubclass, SUBCLASS_ID, 0);
+void DarkModeThemeManager::ApplyThemeToDialog(HWND hwnd, bool enableDarkMode)
+{
+	BOOL dark = enableDarkMode;
+	DarkModeHelper::WINDOWCOMPOSITIONATTRIBDATA compositionData = {
+		DarkModeHelper::WCA_USEDARKMODECOLORS, &dark, sizeof(dark)
+	};
+	DarkModeHelper::GetInstance().SetWindowCompositionAttribute(hwnd, &compositionData);
+
+	if (enableDarkMode)
+	{
+		SetWindowSubclass(hwnd, DialogSubclass, SUBCLASS_ID, 0);
+	}
+	else
+	{
+		RemoveWindowSubclass(hwnd, DialogSubclass, SUBCLASS_ID);
+	}
+}
+
+void DarkModeThemeManager::ApplyThemeToListView(HWND hwnd, bool enableDarkMode)
+{
+	if (enableDarkMode)
+	{
+		SetWindowTheme(hwnd, L"ItemsView", nullptr);
+	}
+	else
+	{
+		SetWindowTheme(hwnd, L"Explorer", nullptr);
+	}
+
+	COLORREF backgroundColor;
+	COLORREF textColor;
+
+	if (enableDarkMode)
+	{
+		backgroundColor = DarkModeHelper::BACKGROUND_COLOR;
+		textColor = DarkModeHelper::TEXT_COLOR;
+	}
+	else
+	{
+		backgroundColor = GetSysColor(COLOR_WINDOW);
+		textColor = GetSysColor(COLOR_WINDOWTEXT);
+	}
+
+	ListView_SetBkColor(hwnd, backgroundColor);
+	ListView_SetTextBkColor(hwnd, backgroundColor);
+	ListView_SetTextColor(hwnd, textColor);
+
+	if (enableDarkMode)
+	{
+		SetWindowSubclass(hwnd, ListViewSubclass, SUBCLASS_ID, 0);
+	}
+	else
+	{
+		RemoveWindowSubclass(hwnd, ListViewSubclass, SUBCLASS_ID);
+	}
+}
+
+void DarkModeThemeManager::ApplyThemeToHeader(HWND hwnd, bool enableDarkMode)
+{
+	UNREFERENCED_PARAMETER(enableDarkMode);
+
+	SetWindowTheme(hwnd, L"ItemsView", nullptr);
+}
+
+void DarkModeThemeManager::ApplyThemeToTreeView(HWND hwnd, bool enableDarkMode)
+{
+	// When in dark mode, this theme sets the following colors correctly:
+	//
+	// - the item selection color,
+	// - the colors of the arrows that appear to the left of the items,
+	// - the color of the scrollbars.
+	//
+	// It doesn't, however, change the background color, or the text color.
+	SetWindowTheme(hwnd, L"Explorer", nullptr);
+
+	COLORREF backgroundColor;
+	COLORREF textColor;
+	COLORREF insertMarkColor;
+
+	if (enableDarkMode)
+	{
+		backgroundColor = DarkModeHelper::BACKGROUND_COLOR;
+		textColor = DarkModeHelper::TEXT_COLOR;
+		insertMarkColor = DarkModeHelper::FOREGROUND_COLOR;
+	}
+	else
+	{
+		backgroundColor = GetSysColor(COLOR_WINDOW);
+		textColor = GetSysColor(COLOR_WINDOWTEXT);
+		insertMarkColor = CLR_DEFAULT;
+	}
+
+	TreeView_SetBkColor(hwnd, backgroundColor);
+	TreeView_SetTextColor(hwnd, textColor);
+	TreeView_SetInsertMarkColor(hwnd, insertMarkColor);
+}
+
+void DarkModeThemeManager::ApplyThemeToRichEdit(HWND hwnd, bool enableDarkMode)
+{
+	COLORREF backgroundColor;
+	COLORREF textColor;
+
+	if (enableDarkMode)
+	{
+		backgroundColor = DarkModeHelper::BACKGROUND_COLOR;
+		textColor = DarkModeHelper::TEXT_COLOR;
+	}
+	else
+	{
+		backgroundColor = GetSysColor(COLOR_WINDOW);
+		textColor = GetSysColor(COLOR_WINDOWTEXT);
+	}
+
+	SendMessage(hwnd, EM_SETBKGNDCOLOR, 0, backgroundColor);
+
+	CHARFORMAT charFormat = {};
+	charFormat.cbSize = sizeof(charFormat);
+	charFormat.dwMask = CFM_COLOR;
+	charFormat.crTextColor = textColor;
+	charFormat.dwEffects = 0;
+	SendMessage(hwnd, EM_SETCHARFORMAT, SCF_ALL, reinterpret_cast<LPARAM>(&charFormat));
+}
+
+void DarkModeThemeManager::ApplyThemeToRebar(HWND hwnd, bool enableDarkMode)
+{
+	if (enableDarkMode)
+	{
+		SetWindowSubclass(hwnd, RebarSubclass, SUBCLASS_ID, 0);
+	}
+	else
+	{
+		RemoveWindowSubclass(hwnd, RebarSubclass, SUBCLASS_ID);
+	}
+}
+
+void DarkModeThemeManager::ApplyThemeToToolbar(HWND hwnd, bool enableDarkMode)
+{
+	COLORREF insertMarkColor;
+
+	if (enableDarkMode)
+	{
+		insertMarkColor = DarkModeHelper::FOREGROUND_COLOR;
+	}
+	else
+	{
+		insertMarkColor = CLR_DEFAULT;
+	}
+
+	SendMessage(hwnd, TB_SETINSERTMARKCOLOR, 0, insertMarkColor);
+
+	// The tooltips window won't exist until either it's requested using TB_GETTOOLTIPS, or
+	// the tooltip needs to be shown. Therefore, calling TB_GETTOOLTIPS will create the
+	// tooltip control, if appropriate (the toolbar may not have the TBSTYLE_TOOLTIPS style
+	// set, in which case, no tooltip control will be created).
+	// The tooltip window will then be themed by the call to EnumThreadWindows() above.
+	SendMessage(hwnd, TB_GETTOOLTIPS, 0, 0);
+
+	HWND parent = GetParent(hwnd);
+	assert(parent);
+
+	if (enableDarkMode)
+	{
+		// This may be called multiple times (if there's more than one toolbar in a particular
+		// window), but that's not an issue, as the subclass will only be installed once.
+		SetWindowSubclass(parent, ToolbarParentSubclass, SUBCLASS_ID, 0);
+	}
+	else
+	{
+		RemoveWindowSubclass(parent, ToolbarParentSubclass, SUBCLASS_ID);
+	}
+}
+
+void DarkModeThemeManager::ApplyThemeToComboBoxEx(HWND hwnd, bool enableDarkMode)
+{
+	if (enableDarkMode)
+	{
+		SetWindowSubclass(hwnd, ComboBoxExSubclass, SUBCLASS_ID, 0);
+	}
+	else
+	{
+		RemoveWindowSubclass(hwnd, ComboBoxExSubclass, SUBCLASS_ID);
+	}
+}
+
+void DarkModeThemeManager::ApplyThemeToComboBox(HWND hwnd, bool enableDarkMode)
+{
+	if (enableDarkMode)
+	{
+		HWND parent = GetParent(hwnd);
+		assert(parent);
+
+		WCHAR parentClassName[256];
+		auto parentClassNameResult =
+			GetClassName(parent, parentClassName, static_cast<int>(std::size(parentClassName)));
+
+		if (parentClassNameResult != 0 && lstrcmp(parentClassName, WC_COMBOBOXEX) == 0)
+		{
+			SetWindowTheme(hwnd, L"AddressComposited", nullptr);
 		}
-		else if (lstrcmp(className, WC_LISTVIEW) == 0)
+		else
 		{
-			darkModeHelper.AllowDarkModeForWindow(hwnd, true);
-			SetWindowTheme(hwnd, L"ItemsView", nullptr);
-
-			ListView_SetBkColor(hwnd, DarkModeHelper::BACKGROUND_COLOR);
-			ListView_SetTextBkColor(hwnd, DarkModeHelper::BACKGROUND_COLOR);
-			ListView_SetTextColor(hwnd, DarkModeHelper::TEXT_COLOR);
-
-			SetWindowSubclass(hwnd, ListViewSubclass, SUBCLASS_ID, 0);
-		}
-		else if (lstrcmp(className, WC_HEADER) == 0)
-		{
-			SetWindowTheme(hwnd, L"ItemsView", nullptr);
-		}
-		else if (lstrcmp(className, WC_TREEVIEW) == 0)
-		{
-			// When in dark mode, this theme sets the following colors correctly:
-			//
-			// - the item selection color,
-			// - the colors of the arrows that appear to the left of the items,
-			// - the color of the scrollbars.
-			//
-			// It doesn't, however, change the background color, or the text color.
-			SetWindowTheme(hwnd, L"Explorer", nullptr);
-
-			TreeView_SetBkColor(hwnd, DarkModeHelper::BACKGROUND_COLOR);
-			TreeView_SetTextColor(hwnd, DarkModeHelper::TEXT_COLOR);
-			TreeView_SetInsertMarkColor(hwnd, DarkModeHelper::FOREGROUND_COLOR);
-		}
-		else if (lstrcmp(className, MSFTEDIT_CLASS) == 0)
-		{
-			SendMessage(hwnd, EM_SETBKGNDCOLOR, 0, DarkModeHelper::BACKGROUND_COLOR);
-
-			CHARFORMAT charFormat = {};
-			charFormat.cbSize = sizeof(charFormat);
-			charFormat.dwMask = CFM_COLOR;
-			charFormat.crTextColor = DarkModeHelper::TEXT_COLOR;
-			charFormat.dwEffects = 0;
-			SendMessage(hwnd, EM_SETCHARFORMAT, SCF_ALL, reinterpret_cast<LPARAM>(&charFormat));
-		}
-		else if (lstrcmp(className, REBARCLASSNAME) == 0)
-		{
-			SetWindowSubclass(hwnd, RebarSubclass, SUBCLASS_ID, 0);
-		}
-		else if (lstrcmp(className, TOOLBARCLASSNAME) == 0)
-		{
-			SendMessage(hwnd, TB_SETINSERTMARKCOLOR, 0, darkModeHelper.FOREGROUND_COLOR);
-
-			// The tooltips window won't exist until either it's requested using TB_GETTOOLTIPS, or
-			// the tooltip needs to be shown. Therefore, calling TB_GETTOOLTIPS will create the
-			// tooltip control, if appropriate (the toolbar may not have the TBSTYLE_TOOLTIPS style
-			// set, in which case, no tooltip control will be created).
-			// The tooltip window will then be themed by the call to EnumThreadWindows() above.
-			SendMessage(hwnd, TB_GETTOOLTIPS, 0, 0);
-
-			HWND parent = GetParent(hwnd);
-			assert(parent);
-
-			// This may be called multiple times (if there's more than one toolbar in a particular
-			// window), but that's not an issue, as the subclass will only be installed once.
-			SetWindowSubclass(parent, ToolbarParentSubclass, SUBCLASS_ID, 0);
-		}
-		else if (lstrcmp(className, WC_COMBOBOXEX) == 0)
-		{
-			SetWindowSubclass(hwnd, ComboBoxExSubclass, SUBCLASS_ID, 0);
-		}
-		else if (lstrcmp(className, WC_COMBOBOX) == 0)
-		{
-			HWND parent = GetParent(hwnd);
-			assert(parent);
-
-			WCHAR parentClassName[256];
-			auto parentClassNameResult =
-				GetClassName(parent, parentClassName, static_cast<int>(std::size(parentClassName)));
-
-			if (parentClassNameResult != 0 && lstrcmp(parentClassName, WC_COMBOBOXEX) == 0)
-			{
-				SetWindowTheme(hwnd, L"AddressComposited", nullptr);
-			}
-			else
-			{
-				SetWindowTheme(hwnd, L"CFD", nullptr);
-			}
-		}
-		else if (lstrcmp(className, WC_BUTTON) == 0)
-		{
-			SetWindowTheme(hwnd, L"Explorer", nullptr);
-
-			auto style = GetWindowLongPtr(hwnd, GWL_STYLE);
-
-			if ((style & BS_TYPEMASK) == BS_GROUPBOX)
-			{
-				SetWindowSubclass(hwnd, GroupBoxSubclass, SUBCLASS_ID, 0);
-			}
-		}
-		else if (lstrcmp(className, TOOLTIPS_CLASS) == 0)
-		{
-			SetWindowTheme(hwnd, L"Explorer", nullptr);
+			SetWindowTheme(hwnd, L"CFD", nullptr);
 		}
 	}
 	else
 	{
-		if (lstrcmp(className, DIALOG_CLASS_NAME) == 0)
-		{
-			BOOL dark = FALSE;
-			DarkModeHelper::WINDOWCOMPOSITIONATTRIBDATA compositionData = {
-				DarkModeHelper::WCA_USEDARKMODECOLORS, &dark, sizeof(dark)
-			};
-			darkModeHelper.SetWindowCompositionAttribute(hwnd, &compositionData);
+		SetWindowTheme(hwnd, L"CFD", nullptr);
+	}
+}
 
-			RemoveWindowSubclass(hwnd, DialogSubclass, SUBCLASS_ID);
+void DarkModeThemeManager::ApplyThemeToButton(HWND hwnd, bool enableDarkMode)
+{
+	SetWindowTheme(hwnd, L"Explorer", nullptr);
+
+	auto style = GetWindowLongPtr(hwnd, GWL_STYLE);
+
+	if ((style & BS_TYPEMASK) == BS_GROUPBOX)
+	{
+		if (enableDarkMode)
+		{
+			SetWindowSubclass(hwnd, GroupBoxSubclass, SUBCLASS_ID, 0);
 		}
-		else if (lstrcmp(className, WC_LISTVIEW) == 0)
+		else
 		{
-			SetWindowTheme(hwnd, L"Explorer", nullptr);
-
-			COLORREF backgroundColor = GetSysColor(COLOR_WINDOW);
-			ListView_SetBkColor(hwnd, backgroundColor);
-			ListView_SetTextBkColor(hwnd, backgroundColor);
-
-			wil::unique_htheme theme(OpenThemeData(nullptr, L"ItemsView"));
-
-			if (theme)
-			{
-				COLORREF textColor;
-				HRESULT hr = GetThemeColor(theme.get(), 0, 0, TMT_TEXTCOLOR, &textColor);
-
-				if (SUCCEEDED(hr))
-				{
-					ListView_SetTextColor(hwnd, textColor);
-				}
-			}
-
-			RemoveWindowSubclass(hwnd, ListViewSubclass, SUBCLASS_ID);
-		}
-		else if (lstrcmp(className, WC_HEADER) == 0)
-		{
-			SetWindowTheme(hwnd, L"ItemsView", nullptr);
-		}
-		else if (lstrcmp(className, WC_TREEVIEW) == 0)
-		{
-			SetWindowTheme(hwnd, L"Explorer", nullptr);
-
-			wil::unique_htheme theme(OpenThemeData(nullptr, L"ItemsView"));
-
-			if (theme)
-			{
-				COLORREF textColor;
-				HRESULT hr = GetThemeColor(theme.get(), 0, 0, TMT_TEXTCOLOR, &textColor);
-
-				if (SUCCEEDED(hr))
-				{
-					TreeView_SetTextColor(hwnd, textColor);
-				}
-
-				COLORREF fillColor;
-				hr = GetThemeColor(theme.get(), 0, 0, TMT_FILLCOLOR, &fillColor);
-
-				if (SUCCEEDED(hr))
-				{
-					TreeView_SetBkColor(hwnd, fillColor);
-				}
-			}
-
-			TreeView_SetInsertMarkColor(hwnd, CLR_DEFAULT);
-		}
-		else if (lstrcmp(className, MSFTEDIT_CLASS) == 0)
-		{
-			SendMessage(hwnd, EM_SETBKGNDCOLOR, 0, GetSysColor(COLOR_WINDOW));
-
-			CHARFORMAT charFormat = {};
-			charFormat.cbSize = sizeof(charFormat);
-			charFormat.dwMask = CFM_COLOR;
-			charFormat.crTextColor = GetSysColor(COLOR_WINDOWTEXT);
-			charFormat.dwEffects = 0;
-			SendMessage(hwnd, EM_SETCHARFORMAT, SCF_ALL, reinterpret_cast<LPARAM>(&charFormat));
-		}
-		else if (lstrcmp(className, REBARCLASSNAME) == 0)
-		{
-			RemoveWindowSubclass(hwnd, RebarSubclass, SUBCLASS_ID);
-		}
-		else if (lstrcmp(className, TOOLBARCLASSNAME) == 0)
-		{
-			SendMessage(hwnd, TB_SETINSERTMARKCOLOR, 0, CLR_DEFAULT);
-
-			HWND parent = GetParent(hwnd);
-			assert(parent);
-
-			RemoveWindowSubclass(parent, ToolbarParentSubclass, SUBCLASS_ID);
-		}
-		else if (lstrcmp(className, WC_COMBOBOXEX) == 0)
-		{
-			RemoveWindowSubclass(hwnd, ComboBoxExSubclass, SUBCLASS_ID);
-		}
-		else if (lstrcmp(className, WC_COMBOBOX) == 0)
-		{
-			SetWindowTheme(hwnd, L"CFD", nullptr);
-		}
-		else if (lstrcmp(className, WC_BUTTON) == 0)
-		{
-			SetWindowTheme(hwnd, L"Explorer", nullptr);
-
-			auto style = GetWindowLongPtr(hwnd, GWL_STYLE);
-
-			if ((style & BS_TYPEMASK) == BS_GROUPBOX)
-			{
-				RemoveWindowSubclass(hwnd, GroupBoxSubclass, SUBCLASS_ID);
-			}
-		}
-		else if (lstrcmp(className, TOOLTIPS_CLASS) == 0)
-		{
-			SetWindowTheme(hwnd, L"Explorer", nullptr);
+			RemoveWindowSubclass(hwnd, GroupBoxSubclass, SUBCLASS_ID);
 		}
 	}
+}
+
+void DarkModeThemeManager::ApplyThemeToTooltips(HWND hwnd, bool enableDarkMode)
+{
+	UNREFERENCED_PARAMETER(enableDarkMode);
+
+	SetWindowTheme(hwnd, L"Explorer", nullptr);
 }
 
 LRESULT CALLBACK DarkModeThemeManager::DialogSubclass(HWND hwnd, UINT msg, WPARAM wParam,

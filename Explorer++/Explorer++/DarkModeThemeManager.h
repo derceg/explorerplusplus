@@ -24,6 +24,17 @@ private:
 	static BOOL CALLBACK ProcessChildWindow(HWND hwnd, LPARAM lParam);
 	static BOOL CALLBACK ProcessThreadWindow(HWND hwnd, LPARAM lParam);
 	static void ApplyThemeToWindow(HWND hwnd);
+	static void ApplyThemeToDialog(HWND hwnd, bool enableDarkMode);
+	static void ApplyThemeToListView(HWND hwnd, bool enableDarkMode);
+	static void ApplyThemeToHeader(HWND hwnd, bool enableDarkMode);
+	static void ApplyThemeToTreeView(HWND hwnd, bool enableDarkMode);
+	static void ApplyThemeToRichEdit(HWND hwnd, bool enableDarkMode);
+	static void ApplyThemeToRebar(HWND hwnd, bool enableDarkMode);
+	static void ApplyThemeToToolbar(HWND hwnd, bool enableDarkMode);
+	static void ApplyThemeToComboBoxEx(HWND hwnd, bool enableDarkMode);
+	static void ApplyThemeToComboBox(HWND hwnd, bool enableDarkMode);
+	static void ApplyThemeToButton(HWND hwnd, bool enableDarkMode);
+	static void ApplyThemeToTooltips(HWND hwnd, bool enableDarkMode);
 
 	static LRESULT CALLBACK DialogSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR subclassId, DWORD_PTR data);
