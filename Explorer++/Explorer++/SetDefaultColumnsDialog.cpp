@@ -29,7 +29,7 @@ SetDefaultColumnsDialog::SetDefaultColumnsDialog(HINSTANCE resourceInstance, HWN
 
 INT_PTR SetDefaultColumnsDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
 
 	m_icon.reset(LoadIcon(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_MAIN)));
 	SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));

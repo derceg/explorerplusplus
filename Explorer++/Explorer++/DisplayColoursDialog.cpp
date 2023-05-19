@@ -23,7 +23,7 @@ DisplayColoursDialog::DisplayColoursDialog(HINSTANCE resourceInstance, HWND hPar
 
 INT_PTR DisplayColoursDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
 
 	InitializeColorGroups();
 	InitializePreviewWindow();

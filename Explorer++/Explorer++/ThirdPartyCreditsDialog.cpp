@@ -17,7 +17,7 @@ ThirdPartyCreditsDialog::ThirdPartyCreditsDialog(HINSTANCE resourceInstance, HWN
 
 INT_PTR ThirdPartyCreditsDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
 
 	SendDlgItemMessage(m_hDlg, IDC_CREDITS, EM_AUTOURLDETECT, AURL_ENABLEURL, NULL);
 	SendDlgItemMessage(m_hDlg, IDC_CREDITS, EM_SETEVENTMASK, 0, ENM_LINK);

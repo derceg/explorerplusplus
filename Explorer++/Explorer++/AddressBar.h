@@ -21,20 +21,15 @@ public:
 	static AddressBar *Create(HWND parent, CoreInterface *coreInterface, Navigator *navigator);
 
 private:
-	// This is the same background color as used in the Explorer address bar.
-	static inline constexpr COLORREF DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
-
 	AddressBar(HWND parent, CoreInterface *coreInterface, Navigator *navigator);
 	~AddressBar() = default;
 
 	static HWND CreateAddressBar(HWND parent);
 
-	LRESULT ComboBoxExSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	void Initialize(HWND parent);
-	std::optional<LRESULT> OnComboBoxExCtlColorEdit(HWND hwnd, HDC hdc);
 	void OnEnterPressed();
 	void OnEscapePressed();
 	void OnBeginDrag();
@@ -47,7 +42,6 @@ private:
 
 	CoreInterface *m_coreInterface;
 	Navigator *m_navigator;
-	wil::unique_hbrush m_backgroundBrush;
 
 	boost::signals2::scoped_connection m_historyEntryUpdatedConnection;
 	int m_defaultFolderIconIndex;

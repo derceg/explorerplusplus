@@ -32,7 +32,7 @@ UpdateCheckDialog::UpdateCheckDialog(HINSTANCE resourceInstance, HWND hParent) :
 
 INT_PTR UpdateCheckDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
 
 	SetDlgItemText(m_hDlg, IDC_STATIC_CURRENT_VERSION, VERSION_STRING_W);
 

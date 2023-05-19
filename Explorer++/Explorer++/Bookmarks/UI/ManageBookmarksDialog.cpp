@@ -56,7 +56,7 @@ INT_PTR ManageBookmarksDialog::OnInitDialog()
 		std::make_unique<BookmarkNavigationController>(m_bookmarkTree, m_bookmarkListView);
 	m_navigationController->Navigate(m_bookmarkTree->GetBookmarksToolbarFolder());
 
-	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
 
 	SetFocus(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW));
 

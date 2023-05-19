@@ -24,7 +24,7 @@ ApplicationEditorDialog::ApplicationEditorDialog(HWND parent, HINSTANCE resource
 
 INT_PTR ApplicationEditorDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
 
 	if (m_editDetails->type == EditDetails::Type::NewItem)
 	{

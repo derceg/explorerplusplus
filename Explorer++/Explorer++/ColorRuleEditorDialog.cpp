@@ -31,7 +31,7 @@ ColorRuleEditorDialog::ColorRuleEditorDialog(HINSTANCE resourceInstance, HWND pa
 
 INT_PTR ColorRuleEditorDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
 
 	if (m_editDetails->type == EditDetails::Type::ExistingItem)
 	{

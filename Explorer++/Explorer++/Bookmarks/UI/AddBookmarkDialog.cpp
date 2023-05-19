@@ -57,7 +57,7 @@ AddBookmarkDialog::AddBookmarkDialog(HINSTANCE resourceInstance, HWND hParent,
 
 INT_PTR AddBookmarkDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
 
 	if (m_bookmarkItem->IsFolder())
 	{

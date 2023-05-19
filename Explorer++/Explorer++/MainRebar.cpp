@@ -13,6 +13,7 @@
 #include "Bookmarks/UI/Views/BookmarksToolbarView.h"
 #include "Config.h"
 #include "DarkModeHelper.h"
+#include "DarkModeThemeManager.h"
 #include "DriveEnumeratorImpl.h"
 #include "DriveModel.h"
 #include "DriveWatcherImpl.h"
@@ -201,6 +202,8 @@ void Explorerplusplus::CreateMainControls()
 		SendMessage(m_hMainRebar, RB_INSERTBAND, static_cast<WPARAM>(-1),
 			(LPARAM) &m_ToolbarInformation[i]);
 	}
+
+	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hMainRebar);
 }
 
 LRESULT CALLBACK RebarSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
@@ -234,20 +237,6 @@ LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd, UINT msg, WPARAM wPa
 			OnToolbarRClick(pnmm->hdr.hwndFrom);
 		}
 			return TRUE;
-
-		case NM_CUSTOMDRAW:
-			if (auto result = OnRebarCustomDraw(reinterpret_cast<NMHDR *>(lParam)))
-			{
-				return *result;
-			}
-			break;
-		}
-		break;
-
-	case WM_ERASEBKGND:
-		if (OnRebarEraseBackground(reinterpret_cast<HDC>(wParam)))
-		{
-			return 1;
 		}
 		break;
 	}
@@ -534,53 +523,4 @@ HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 	}
 
 	return hSubMenu;
-}
-
-std::optional<int> Explorerplusplus::OnRebarCustomDraw(NMHDR *nmhdr)
-{
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (!darkModeHelper.IsDarkModeEnabled())
-	{
-		return std::nullopt;
-	}
-
-	if (nmhdr->hwndFrom != m_mainToolbar->GetHWND()
-		&& nmhdr->hwndFrom != m_bookmarksToolbar->GetView()->GetHWND()
-		&& nmhdr->hwndFrom != m_drivesToolbar->GetView()->GetHWND()
-		&& nmhdr->hwndFrom != m_applicationToolbar->GetView()->GetHWND())
-	{
-		return std::nullopt;
-	}
-
-	auto *customDraw = reinterpret_cast<NMTBCUSTOMDRAW *>(nmhdr);
-
-	switch (customDraw->nmcd.dwDrawStage)
-	{
-	case CDDS_PREPAINT:
-		return CDRF_NOTIFYITEMDRAW;
-
-	case CDDS_ITEMPREPAINT:
-		customDraw->clrText = DarkModeHelper::TEXT_COLOR;
-		customDraw->clrHighlightHotTrack = DarkModeHelper::BUTTON_HIGHLIGHT_COLOR;
-		return TBCDRF_USECDCOLORS | TBCDRF_HILITEHOTTRACK;
-	}
-
-	return std::nullopt;
-}
-
-bool Explorerplusplus::OnRebarEraseBackground(HDC hdc)
-{
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (!darkModeHelper.IsDarkModeEnabled())
-	{
-		return false;
-	}
-
-	RECT rc;
-	GetClientRect(m_hMainRebar, &rc);
-	FillRect(hdc, &rc, darkModeHelper.GetBackgroundBrush());
-
-	return true;
 }

@@ -18,13 +18,17 @@ DarkModeThemeManager &DarkModeThemeManager::GetInstance()
 	return themeManager;
 }
 
-void DarkModeThemeManager::ApplyThemeToTopLevelWindow(HWND topLevelWindow)
+void DarkModeThemeManager::ApplyThemeToWindowAndChildren(HWND topLevelWindow)
 {
 	ApplyThemeToWindow(topLevelWindow);
 	EnumChildWindows(topLevelWindow, ProcessChildWindow, 0);
 
 	// Tooltip windows won't be enumerated by EnumChildWindows(). They will, however, be enumerated
 	// by EnumThreadWindows(), which is why that's called here.
+	// Note that this is explicitly called after EnumChildWindows(). That way, tooltip windows can
+	// be initialized during the call to EnumChildWindows() (since they won't necessarily exist
+	// initially). Those tooltip windows will then be processed as part of the call to
+	// EnumThreadWindows().
 	EnumThreadWindows(GetCurrentThreadId(), ProcessThreadWindow, 0);
 
 	RedrawWindow(topLevelWindow, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN | RDW_ERASE);
@@ -130,8 +134,21 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 			charFormat.dwEffects = 0;
 			SendMessage(hwnd, EM_SETCHARFORMAT, SCF_ALL, reinterpret_cast<LPARAM>(&charFormat));
 		}
+		else if (lstrcmp(className, REBARCLASSNAME) == 0)
+		{
+			SetWindowSubclass(hwnd, RebarSubclass, SUBCLASS_ID, 0);
+		}
 		else if (lstrcmp(className, TOOLBARCLASSNAME) == 0)
 		{
+			SendMessage(hwnd, TB_SETINSERTMARKCOLOR, 0, darkModeHelper.FOREGROUND_COLOR);
+
+			// The tooltips window won't exist until either it's requested using TB_GETTOOLTIPS, or
+			// the tooltip needs to be shown. Therefore, calling TB_GETTOOLTIPS will create the
+			// tooltip control, if appropriate (the toolbar may not have the TBSTYLE_TOOLTIPS style
+			// set, in which case, no tooltip control will be created).
+			// The tooltip window will then be themed by the call to EnumThreadWindows() above.
+			SendMessage(hwnd, TB_GETTOOLTIPS, 0, 0);
+
 			HWND parent = GetParent(hwnd);
 			assert(parent);
 
@@ -139,9 +156,27 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 			// window), but that's not an issue, as the subclass will only be installed once.
 			SetWindowSubclass(parent, ToolbarParentSubclass, SUBCLASS_ID, 0);
 		}
+		else if (lstrcmp(className, WC_COMBOBOXEX) == 0)
+		{
+			SetWindowSubclass(hwnd, ComboBoxExSubclass, SUBCLASS_ID, 0);
+		}
 		else if (lstrcmp(className, WC_COMBOBOX) == 0)
 		{
-			SetWindowTheme(hwnd, L"CFD", nullptr);
+			HWND parent = GetParent(hwnd);
+			assert(parent);
+
+			WCHAR parentClassName[256];
+			auto parentClassNameResult =
+				GetClassName(parent, parentClassName, static_cast<int>(std::size(parentClassName)));
+
+			if (parentClassNameResult != 0 && lstrcmp(parentClassName, WC_COMBOBOXEX) == 0)
+			{
+				SetWindowTheme(hwnd, L"AddressComposited", nullptr);
+			}
+			else
+			{
+				SetWindowTheme(hwnd, L"CFD", nullptr);
+			}
 		}
 		else if (lstrcmp(className, WC_BUTTON) == 0)
 		{
@@ -236,12 +271,22 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 			charFormat.dwEffects = 0;
 			SendMessage(hwnd, EM_SETCHARFORMAT, SCF_ALL, reinterpret_cast<LPARAM>(&charFormat));
 		}
+		else if (lstrcmp(className, REBARCLASSNAME) == 0)
+		{
+			RemoveWindowSubclass(hwnd, RebarSubclass, SUBCLASS_ID);
+		}
 		else if (lstrcmp(className, TOOLBARCLASSNAME) == 0)
 		{
+			SendMessage(hwnd, TB_SETINSERTMARKCOLOR, 0, CLR_DEFAULT);
+
 			HWND parent = GetParent(hwnd);
 			assert(parent);
 
 			RemoveWindowSubclass(parent, ToolbarParentSubclass, SUBCLASS_ID);
+		}
+		else if (lstrcmp(className, WC_COMBOBOXEX) == 0)
+		{
+			RemoveWindowSubclass(hwnd, ComboBoxExSubclass, SUBCLASS_ID);
 		}
 		else if (lstrcmp(className, WC_COMBOBOX) == 0)
 		{
@@ -281,7 +326,7 @@ LRESULT CALLBACK DarkModeThemeManager::DialogSubclass(HWND hwnd, UINT msg, WPARA
 		auto hdc = reinterpret_cast<HDC>(wParam);
 		SetBkColor(hdc, DarkModeHelper::BACKGROUND_COLOR);
 		SetTextColor(hdc, DarkModeHelper::TEXT_COLOR);
-		return reinterpret_cast<INT_PTR>(DarkModeHelper::GetInstance().GetBackgroundBrush());
+		return reinterpret_cast<LRESULT>(DarkModeHelper::GetInstance().GetBackgroundBrush());
 	}
 	break;
 
@@ -416,6 +461,45 @@ LRESULT DarkModeThemeManager::OnToolbarCustomDraw(NMTBCUSTOMDRAW *customDraw)
 	return CDRF_DODEFAULT;
 }
 
+LRESULT CALLBACK DarkModeThemeManager::ComboBoxExSubclass(HWND hwnd, UINT msg, WPARAM wParam,
+	LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data)
+{
+	UNREFERENCED_PARAMETER(data);
+
+	switch (msg)
+	{
+	case WM_CTLCOLOREDIT:
+	{
+		auto hdc = reinterpret_cast<HDC>(wParam);
+		SetBkMode(hdc, TRANSPARENT);
+		SetTextColor(hdc, DarkModeHelper::TEXT_COLOR);
+		return reinterpret_cast<LRESULT>(GetComboBoxExBackgroundBrush());
+	}
+	break;
+
+	case WM_NCDESTROY:
+	{
+		[[maybe_unused]] auto res = RemoveWindowSubclass(hwnd, ComboBoxExSubclass, subclassId);
+		assert(res);
+	}
+	break;
+	}
+
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+HBRUSH DarkModeThemeManager::GetComboBoxExBackgroundBrush()
+{
+	static wil::unique_hbrush backgroundBrush;
+
+	if (!backgroundBrush)
+	{
+		backgroundBrush.reset(CreateSolidBrush(COMBO_BOX_EX_DARK_MODE_BACKGROUND_COLOR));
+	}
+
+	return backgroundBrush.get();
+}
+
 LRESULT CALLBACK DarkModeThemeManager::ListViewSubclass(HWND hwnd, UINT msg, WPARAM wParam,
 	LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data)
 {
@@ -447,6 +531,36 @@ LRESULT CALLBACK DarkModeThemeManager::ListViewSubclass(HWND hwnd, UINT msg, WPA
 	case WM_NCDESTROY:
 	{
 		[[maybe_unused]] auto res = RemoveWindowSubclass(hwnd, ListViewSubclass, subclassId);
+		assert(res);
+	}
+	break;
+	}
+
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+LRESULT CALLBACK DarkModeThemeManager::RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam,
+	LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data)
+{
+	UNREFERENCED_PARAMETER(data);
+
+	switch (msg)
+	{
+	case WM_ERASEBKGND:
+	{
+		auto hdc = reinterpret_cast<HDC>(wParam);
+
+		RECT rc;
+		GetClientRect(hwnd, &rc);
+		FillRect(hdc, &rc, DarkModeHelper::GetInstance().GetBackgroundBrush());
+
+		return 1;
+	}
+	break;
+
+	case WM_NCDESTROY:
+	{
+		[[maybe_unused]] auto res = RemoveWindowSubclass(hwnd, RebarSubclass, subclassId);
 		assert(res);
 	}
 	break;

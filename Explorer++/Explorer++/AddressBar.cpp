@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "AddressBar.h"
 #include "CoreInterface.h"
-#include "DarkModeHelper.h"
 #include "Navigator.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
@@ -32,7 +31,6 @@ AddressBar::AddressBar(HWND parent, CoreInterface *coreInterface, Navigator *nav
 	BaseWindow(CreateAddressBar(parent)),
 	m_coreInterface(coreInterface),
 	m_navigator(navigator),
-	m_backgroundBrush(CreateSolidBrush(DARK_MODE_BACKGROUND_COLOR)),
 	m_defaultFolderIconIndex(GetDefaultFolderIconIndex())
 {
 	Initialize(parent);
@@ -50,19 +48,6 @@ void AddressBar::Initialize(HWND parent)
 	HIMAGELIST smallIcons;
 	Shell_GetImageLists(nullptr, &smallIcons);
 	SendMessage(m_hwnd, CBEM_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(smallIcons));
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		HWND comboBox = reinterpret_cast<HWND>(SendMessage(m_hwnd, CBEM_GETCOMBOCONTROL, 0, 0));
-
-		darkModeHelper.AllowDarkModeForWindow(comboBox, true);
-		SetWindowTheme(comboBox, L"AddressComposited", nullptr);
-	}
-
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
-		std::bind_front(&AddressBar::ComboBoxExSubclass, this)));
 
 	HWND hEdit = reinterpret_cast<HWND>(SendMessage(m_hwnd, CBEM_GETEDITCONTROL, 0, 0));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hEdit,
@@ -85,39 +70,6 @@ void AddressBar::Initialize(HWND parent)
 				m_coreInterface->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
 					std::bind_front(&AddressBar::OnNavigationCommitted, this)));
 		});
-}
-
-LRESULT AddressBar::ComboBoxExSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	switch (msg)
-	{
-	case WM_CTLCOLOREDIT:
-		if (auto result = OnComboBoxExCtlColorEdit(reinterpret_cast<HWND>(lParam),
-				reinterpret_cast<HDC>(wParam)))
-		{
-			return *result;
-		}
-		break;
-	}
-
-	return DefSubclassProc(hwnd, msg, wParam, lParam);
-}
-
-std::optional<LRESULT> AddressBar::OnComboBoxExCtlColorEdit(HWND hwnd, HDC hdc)
-{
-	UNREFERENCED_PARAMETER(hwnd);
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (!darkModeHelper.IsDarkModeEnabled())
-	{
-		return std::nullopt;
-	}
-
-	SetBkMode(hdc, TRANSPARENT);
-	SetTextColor(hdc, DarkModeHelper::TEXT_COLOR);
-
-	return reinterpret_cast<LRESULT>(m_backgroundBrush.get());
 }
 
 LRESULT AddressBar::EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

@@ -21,7 +21,7 @@ ScriptingDialog::ScriptingDialog(HINSTANCE resourceInstance, HWND hParent,
 
 INT_PTR ScriptingDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
 
 	HWND commandControl = GetDlgItem(m_hDlg, IDC_COMMAND);
 	SendMessage(m_hDlg, WM_NEXTDLGCTL, reinterpret_cast<WPARAM>(commandControl), TRUE);

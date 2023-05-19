@@ -65,7 +65,7 @@ bool CompareFilenames(const std::wstring &strFirst, const std::wstring &strSecon
 
 INT_PTR MergeFilesDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
 
 	std::wregex rxPattern;
 	bool bAllMatchPattern = true;

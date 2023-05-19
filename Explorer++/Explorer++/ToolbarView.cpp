@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "ToolbarView.h"
-#include "DarkModeHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/Helper.h"
@@ -128,15 +127,6 @@ ToolbarView::ToolbarView(HWND parent, DWORD style, DWORD extendedStyle) :
 		std::bind_front(&ToolbarView::WndProc, this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(m_hwnd),
 		std::bind_front(&ToolbarView::ParentWndProc, this)));
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		darkModeHelper.SetDarkModeForToolbarTooltips(m_hwnd);
-
-		SendMessage(m_hwnd, TB_SETINSERTMARKCOLOR, 0, darkModeHelper.FOREGROUND_COLOR);
-	}
 }
 
 void ToolbarView::SetupSmallShellImageList()
@@ -191,10 +181,7 @@ void ToolbarView::AddButton(std::unique_ptr<ToolbarButton> button, size_t index)
 void ToolbarView::UpdateButton(const ToolbarButton *button)
 {
 	auto itr = std::find_if(m_buttons.begin(), m_buttons.end(),
-		[button](const auto &currentEntry)
-		{
-			return currentEntry.get() == button;
-		});
+		[button](const auto &currentEntry) { return currentEntry.get() == button; });
 	assert(itr != m_buttons.end());
 
 	UpdateButton(itr - m_buttons.begin());

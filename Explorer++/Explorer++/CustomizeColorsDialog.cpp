@@ -36,7 +36,7 @@ CustomizeColorsDialog::CustomizeColorsDialog(HINSTANCE resourceInstance, HWND pa
 
 INT_PTR CustomizeColorsDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
 
 	HWND listView = GetDlgItem(m_hDlg, IDC_LISTVIEW_COLOR_RULES);
 	m_colorRuleListView =

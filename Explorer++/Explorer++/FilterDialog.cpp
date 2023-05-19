@@ -29,7 +29,7 @@ FilterDialog::FilterDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterfa
 
 INT_PTR FilterDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
 
 	HWND hComboBox = GetDlgItem(m_hDlg, IDC_FILTER_COMBOBOX);
 

@@ -25,7 +25,7 @@ RenameTabDialog::RenameTabDialog(HINSTANCE resourceInstance, HWND hParent, int t
 
 INT_PTR RenameTabDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
 
 	HWND hEditName = GetDlgItem(m_hDlg, IDC_RENAMETAB_NEWTABNAME);
 

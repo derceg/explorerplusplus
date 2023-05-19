@@ -11,10 +11,13 @@ class DarkModeThemeManager
 public:
 	static DarkModeThemeManager &GetInstance();
 
-	void ApplyThemeToTopLevelWindow(HWND topLevelWindow);
+	void ApplyThemeToWindowAndChildren(HWND topLevelWindow);
 
 private:
 	static const UINT_PTR SUBCLASS_ID = 0;
+
+	// This is the same background color as used in the Explorer address bar.
+	static inline constexpr COLORREF COMBO_BOX_EX_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
 
 	DarkModeThemeManager() = default;
 
@@ -29,7 +32,12 @@ private:
 	static LRESULT OnCustomDraw(NMCUSTOMDRAW *customDraw);
 	static LRESULT OnButtonCustomDraw(NMCUSTOMDRAW *customDraw);
 	static LRESULT OnToolbarCustomDraw(NMTBCUSTOMDRAW *customDraw);
+	static LRESULT CALLBACK ComboBoxExSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
+		UINT_PTR subclassId, DWORD_PTR data);
+	static HBRUSH GetComboBoxExBackgroundBrush();
 	static LRESULT CALLBACK ListViewSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
+		UINT_PTR subclassId, DWORD_PTR data);
+	static LRESULT CALLBACK RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR subclassId, DWORD_PTR data);
 	static LRESULT CALLBACK GroupBoxSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR subclassId, DWORD_PTR data);

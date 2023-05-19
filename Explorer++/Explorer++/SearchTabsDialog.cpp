@@ -31,7 +31,7 @@ SearchTabsDialog::SearchTabsDialog(HINSTANCE resourceInstance, HWND parent,
 
 INT_PTR SearchTabsDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
 
 	SetupListView();
 	SetupEditControl();

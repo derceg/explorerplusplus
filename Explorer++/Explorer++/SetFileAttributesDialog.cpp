@@ -24,7 +24,7 @@ SetFileAttributesDialog::SetFileAttributesDialog(HINSTANCE resourceInstance, HWN
 
 INT_PTR SetFileAttributesDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
 
 	InitializeAttributesStructure();
 	InitializeDateFields();

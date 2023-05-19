@@ -15,7 +15,7 @@ HelpFileMissingDialog::HelpFileMissingDialog(HINSTANCE resourceInstance, HWND hP
 
 INT_PTR HelpFileMissingDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
 
 	CenterWindow(GetParent(m_hDlg), m_hDlg);
 

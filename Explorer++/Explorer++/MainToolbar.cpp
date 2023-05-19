@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "MainToolbar.h"
 #include "Config.h"
-#include "DarkModeHelper.h"
 #include "DefaultToolbarButtons.h"
 #include "Icon.h"
 #include "MainResource.h"
@@ -185,13 +184,6 @@ void MainToolbar::Initialize(HWND parent)
 		std::bind_front(&MainToolbar::OnUseLargeToolbarIconsUpdated, this)));
 
 	AddClipboardFormatListener(m_hwnd);
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		darkModeHelper.SetDarkModeForToolbarTooltips(m_hwnd);
-	}
 }
 
 MainToolbar::~MainToolbar()
