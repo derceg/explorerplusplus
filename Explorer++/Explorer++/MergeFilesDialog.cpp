@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "MergeFilesDialog.h"
 #include "CoreInterface.h"
+#include "DarkModeThemeManager.h"
 #include "Explorer++_internal.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
@@ -36,7 +37,7 @@ bool CompareFilenames(const std::wstring &strFirst, const std::wstring &strSecon
 MergeFilesDialog::MergeFilesDialog(HINSTANCE resourceInstance, HWND hParent,
 	CoreInterface *coreInterface, const std::wstring &strOutputDirectory,
 	const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates) :
-	DarkModeDialogBase(resourceInstance, IDD_MERGEFILES, hParent, DialogSizingType::Both),
+	BaseDialog(resourceInstance, IDD_MERGEFILES, hParent, DialogSizingType::Both),
 	m_coreInterface(coreInterface),
 	m_strOutputDirectory(strOutputDirectory),
 	m_FullFilenameList(FullFilenameList),
@@ -64,6 +65,8 @@ bool CompareFilenames(const std::wstring &strFirst, const std::wstring &strSecon
 
 INT_PTR MergeFilesDialog::OnInitDialog()
 {
+	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+
 	std::wregex rxPattern;
 	bool bAllMatchPattern = true;
 
@@ -108,8 +111,6 @@ INT_PTR MergeFilesDialog::OnInitDialog()
 	HIMAGELIST himlSmall;
 	Shell_GetImageLists(nullptr, &himlSmall);
 	ListView_SetImageList(hListView, himlSmall, LVSIL_SMALL);
-
-	SetWindowTheme(hListView, L"Explorer", nullptr);
 
 	ListView_SetExtendedListViewStyleEx(hListView,
 		LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES,
@@ -184,10 +185,6 @@ INT_PTR MergeFilesDialog::OnInitDialog()
 
 	SendMessage(GetDlgItem(m_hDlg, IDC_MERGE_EDIT_FILENAME), EM_SETSEL, 0, -1);
 	SetFocus(GetDlgItem(m_hDlg, IDC_MERGE_EDIT_FILENAME));
-
-	AllowDarkModeForControls(
-		{ IDC_MERGE_BUTTON_MOVEUP, IDC_MERGE_BUTTON_MOVEDOWN, IDC_MERGE_BUTTON_OUTPUT });
-	AllowDarkModeForListView(IDC_MERGE_LISTVIEW);
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 

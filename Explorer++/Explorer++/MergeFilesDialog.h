@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "DarkModeDialogBase.h"
+#include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ReferenceCount.h"
 #include "../Helper/ResizableDialogHelper.h"
@@ -48,7 +48,7 @@ private:
 	bool m_bstopMerging;
 };
 
-class MergeFilesDialog : public DarkModeDialogBase
+class MergeFilesDialog : public BaseDialog
 {
 public:
 	MergeFilesDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface,
