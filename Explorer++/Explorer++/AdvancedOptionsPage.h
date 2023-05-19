@@ -8,8 +8,6 @@
 #include <memory>
 #include <vector>
 
-class WindowSubclassWrapper;
-
 class AdvancedOptionsPage : public OptionsPage
 {
 public:
@@ -47,11 +45,9 @@ private:
 	void InsertAdvancedOptionsIntoListView();
 	bool GetBooleanConfigValue(AdvancedOptionId id);
 	void SetBooleanConfigValue(AdvancedOptionId id, bool value);
-	LRESULT CALLBACK ListViewWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	INT_PTR OnNotify(WPARAM wParam, LPARAM lParam);
 	AdvancedOption *GetAdvancedOptionByIndex(int index);
 
 	std::vector<AdvancedOption> m_advancedOptions;
-	std::unique_ptr<WindowSubclassWrapper> m_listViewSubclass;
 };

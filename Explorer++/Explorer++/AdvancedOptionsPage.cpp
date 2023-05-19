@@ -5,13 +5,11 @@
 #include "stdafx.h"
 #include "AdvancedOptionsPage.h"
 #include "Config.h"
-#include "DarkModeHelper.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include "../Helper/RichEditHelper.h"
-#include "../Helper/WindowSubclassWrapper.h"
 
 const boost::bimap<bool, std::wstring> BOOL_MAPPINGS =
 	MakeBimap<bool, std::wstring>({ { true, L"true" }, { false, L"false" } });
@@ -43,34 +41,9 @@ void AdvancedOptionsPage::InitializeControls()
 	ListView_SetExtendedListViewStyle(listView,
 		LVS_EX_LABELTIP | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
 
-	m_listViewSubclass = std::make_unique<WindowSubclassWrapper>(listView,
-		std::bind_front(&AdvancedOptionsPage::ListViewWndProc, this));
-
 	SendDlgItemMessage(GetDialog(), IDC_ADVANCED_OPTION_DESCRIPTION, EM_AUTOURLDETECT,
 		AURL_ENABLEURL, NULL);
 	SendDlgItemMessage(GetDialog(), IDC_ADVANCED_OPTION_DESCRIPTION, EM_SETEVENTMASK, 0, ENM_LINK);
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		darkModeHelper.SetListViewDarkModeColors(listView);
-
-		SendDlgItemMessage(GetDialog(), IDC_ADVANCED_OPTION_DESCRIPTION, EM_SETBKGNDCOLOR, 0,
-			DarkModeHelper::BACKGROUND_COLOR);
-
-		CHARFORMAT charFormat;
-		charFormat.cbSize = sizeof(charFormat);
-		charFormat.dwMask = CFM_COLOR;
-		charFormat.crTextColor = DarkModeHelper::TEXT_COLOR;
-		charFormat.dwEffects = 0;
-		SendDlgItemMessage(GetDialog(), IDC_ADVANCED_OPTION_DESCRIPTION, EM_SETCHARFORMAT, SCF_ALL,
-			reinterpret_cast<LPARAM>(&charFormat));
-	}
-	else
-	{
-		SetWindowTheme(listView, L"Explorer", nullptr);
-	}
 
 	std::wstring valueColumnText =
 		ResourceHelper::LoadString(m_resourceInstance, IDS_ADVANCED_OPTION_VALUE);
@@ -220,42 +193,6 @@ void AdvancedOptionsPage::SetBooleanConfigValue(AdvancedOptionId id, bool value)
 		assert(false);
 		break;
 	}
-}
-
-LRESULT CALLBACK AdvancedOptionsPage::ListViewWndProc(HWND hwnd, UINT msg, WPARAM wParam,
-	LPARAM lParam)
-{
-	switch (msg)
-	{
-	case WM_NOTIFY:
-		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == ListView_GetHeader(hwnd))
-		{
-			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
-			{
-			case NM_CUSTOMDRAW:
-			{
-				if (DarkModeHelper::GetInstance().IsDarkModeEnabled())
-				{
-					auto *customDraw = reinterpret_cast<NMCUSTOMDRAW *>(lParam);
-
-					switch (customDraw->dwDrawStage)
-					{
-					case CDDS_PREPAINT:
-						return CDRF_NOTIFYITEMDRAW;
-
-					case CDDS_ITEMPREPAINT:
-						SetTextColor(customDraw->hdc, DarkModeHelper::TEXT_COLOR);
-						return CDRF_NEWFONT;
-					}
-				}
-			}
-			break;
-			}
-		}
-		break;
-	}
-
-	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
 INT_PTR AdvancedOptionsPage::OnNotify(WPARAM wParam, LPARAM lParam)

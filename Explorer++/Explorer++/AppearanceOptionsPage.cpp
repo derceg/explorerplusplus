@@ -80,12 +80,6 @@ void AppearanceOptionsPage::InitializeControls()
 	}
 
 	AddItemsToComboBox(GetDlgItem(GetDialog(), IDC_OPTIONS_THEME), themeItems, m_config->theme);
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		darkModeHelper.SetDarkModeForComboBox(GetDlgItem(GetDialog(), IDC_OPTIONS_ICON_SET));
-		darkModeHelper.SetDarkModeForComboBox(GetDlgItem(GetDialog(), IDC_OPTIONS_THEME));
-	}
 }
 
 std::wstring GetIconSetText(IconSet iconSet, HINSTANCE resourceInstance)
