@@ -6,7 +6,6 @@
 #include "ColorRuleListView.h"
 #include "ColorRuleEditorDialog.h"
 #include "ColorRuleModel.h"
-#include "DarkModeHelper.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/Helper.h"
@@ -20,24 +19,13 @@ ColorRuleListView::ColorRuleListView(HWND listView, HINSTANCE resourceInstance,
 	m_resourceInstance(resourceInstance),
 	m_model(model)
 {
-	SetWindowTheme(listView, L"Explorer", nullptr);
-
 	ListView_SetExtendedListViewStyleEx(listView,
 		LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES,
 		LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		darkModeHelper.SetListViewDarkModeColors(listView);
-	}
-
 	InsertColumns();
 	InsertColorRules();
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(listView,
-		std::bind_front(&ColorRuleListView::WndProc, this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(listView),
 		std::bind_front(&ColorRuleListView::ParentWndProc, this)));
 
@@ -51,41 +39,6 @@ ColorRuleListView::ColorRuleListView(HWND listView, HINSTANCE resourceInstance,
 		std::bind_front(&ColorRuleListView::OnColorRuleRemoved, this)));
 	m_connections.push_back(model->AddAllItemsRemovedObserver(
 		std::bind_front(&ColorRuleListView::OnAllColorRulesRemoved, this)));
-}
-
-LRESULT CALLBACK ColorRuleListView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	switch (msg)
-	{
-	case WM_NOTIFY:
-		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == ListView_GetHeader(m_listView))
-		{
-			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
-			{
-			case NM_CUSTOMDRAW:
-			{
-				if (DarkModeHelper::GetInstance().IsDarkModeEnabled())
-				{
-					auto *customDraw = reinterpret_cast<NMCUSTOMDRAW *>(lParam);
-
-					switch (customDraw->dwDrawStage)
-					{
-					case CDDS_PREPAINT:
-						return CDRF_NOTIFYITEMDRAW;
-
-					case CDDS_ITEMPREPAINT:
-						SetTextColor(customDraw->hdc, DarkModeHelper::TEXT_COLOR);
-						return CDRF_NEWFONT;
-					}
-				}
-			}
-			break;
-			}
-		}
-		break;
-	}
-
-	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
 LRESULT CALLBACK ColorRuleListView::ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

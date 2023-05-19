@@ -22,7 +22,6 @@ public:
 	SignalWrapper<ColorRuleListView, void()> colorRuleDeselectedSignal;
 
 private:
-	LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnDoubleClick(const NMITEMACTIVATE *itemActivate);
 
