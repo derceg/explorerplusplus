@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "DarkModeDialogBase.h"
+#include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ReferenceCount.h"
 #include <string>
@@ -66,7 +66,7 @@ private:
 	bool m_bStopSplitting;
 };
 
-class SplitFileDialog : public DarkModeDialogBase
+class SplitFileDialog : public BaseDialog
 {
 public:
 	SplitFileDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface,
@@ -76,7 +76,6 @@ public:
 protected:
 	INT_PTR OnInitDialog() override;
 	INT_PTR OnTimer(int iTimerID) override;
-	INT_PTR OnCtlColorStaticExtra(HWND hwnd, HDC hdc) override;
 	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
 	INT_PTR OnClose() override;
 	INT_PTR OnDestroy() override;
@@ -104,8 +103,6 @@ private:
 		OutputDirectoryEmpty,
 		SplitSize
 	};
-
-	static const COLORREF HELPER_TEXT_COLOR = RGB(120, 120, 120);
 
 	static const int KB = (1024);
 	static const int MB = (1024 * 1024);

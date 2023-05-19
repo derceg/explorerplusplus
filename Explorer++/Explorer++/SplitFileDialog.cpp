@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "SplitFileDialog.h"
 #include "CoreInterface.h"
+#include "DarkModeThemeManager.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -38,7 +39,7 @@ const TCHAR SplitFileDialogPersistentSettings::SETTING_SIZE_GROUP[] = _T("SizeGr
 
 SplitFileDialog::SplitFileDialog(HINSTANCE resourceInstance, HWND hParent,
 	CoreInterface *coreInterface, const std::wstring &strFullFilename) :
-	DarkModeDialogBase(resourceInstance, IDD_SPLITFILE, hParent, DialogSizingType::None),
+	BaseDialog(resourceInstance, IDD_SPLITFILE, hParent, DialogSizingType::None),
 	m_coreInterface(coreInterface),
 	m_strFullFilename(strFullFilename),
 	m_bSplittingFile(false),
@@ -60,6 +61,8 @@ SplitFileDialog::~SplitFileDialog()
 
 INT_PTR SplitFileDialog::OnInitDialog()
 {
+	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+
 	SHFILEINFO shfi;
 	DWORD_PTR dwRes = SHGetFileInfo(m_strFullFilename.c_str(), 0, &shfi, sizeof(shfi), SHGFI_ICON);
 
@@ -147,10 +150,6 @@ INT_PTR SplitFileDialog::OnInitDialog()
 
 	SetDlgItemText(m_hDlg, IDC_SPLIT_STATIC_ELAPSEDTIME, _T("00:00:00"));
 
-	AllowDarkModeForControls({ IDC_SPLIT_BUTTON_OUTPUT });
-	AllowDarkModeForGroupBoxes({ IDC_GROUP_FILE_INFORMATION, IDC_GROUP_SPLIT_INFORMATION });
-	AllowDarkModeForComboBoxes({ IDC_SPLIT_COMBOBOX_SIZES });
-
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, false);
 
 	return 0;
@@ -176,19 +175,6 @@ INT_PTR SplitFileDialog::OnTimer(int iTimerID)
 	}
 
 	return 0;
-}
-
-INT_PTR SplitFileDialog::OnCtlColorStaticExtra(HWND hwnd, HDC hdc)
-{
-	if (hwnd == GetDlgItem(m_hDlg, IDC_SPLIT_STATIC_FILENAMEHELPER))
-	{
-		/* Set a custom text color for the helper text. */
-		SetTextColor(hdc, HELPER_TEXT_COLOR);
-		SetBkMode(hdc, TRANSPARENT);
-		return reinterpret_cast<INT_PTR>(GetStockObject(NULL_BRUSH));
-	}
-
-	return FALSE;
 }
 
 INT_PTR SplitFileDialog::OnCommand(WPARAM wParam, LPARAM lParam)
