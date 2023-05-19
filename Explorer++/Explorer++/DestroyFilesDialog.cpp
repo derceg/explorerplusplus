@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "DestroyFilesDialog.h"
+#include "DarkModeThemeManager.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "../Helper/Helper.h"
@@ -19,7 +20,7 @@ const TCHAR DestroyFilesDialogPersistentSettings::SETTING_OVERWRITE_METHOD[] =
 
 DestroyFilesDialog::DestroyFilesDialog(HINSTANCE resourceInstance, HWND hParent,
 	const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates) :
-	DarkModeDialogBase(resourceInstance, IDD_DESTROYFILES, hParent, DialogSizingType::Both)
+	BaseDialog(resourceInstance, IDD_DESTROYFILES, hParent, DialogSizingType::Both)
 {
 	m_FullFilenameList = FullFilenameList;
 	m_bShowFriendlyDates = bShowFriendlyDates;
@@ -29,6 +30,8 @@ DestroyFilesDialog::DestroyFilesDialog(HINSTANCE resourceInstance, HWND hParent,
 
 INT_PTR DestroyFilesDialog::OnInitDialog()
 {
+	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+
 	m_icon.reset(LoadIcon(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_MAIN)));
 	SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
 
@@ -37,8 +40,6 @@ INT_PTR DestroyFilesDialog::OnInitDialog()
 	HIMAGELIST himlSmall;
 	Shell_GetImageLists(nullptr, &himlSmall);
 	ListView_SetImageList(hListView, himlSmall, LVSIL_SMALL);
-
-	SetWindowTheme(hListView, L"Explorer", nullptr);
 
 	ListView_SetExtendedListViewStyleEx(hListView,
 		LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES,
@@ -121,11 +122,6 @@ INT_PTR DestroyFilesDialog::OnInitDialog()
 		break;
 	}
 
-	AllowDarkModeForListView(IDC_DESTROYFILES_LISTVIEW);
-	AllowDarkModeForRadioButtons(
-		{ IDC_DESTROYFILES_RADIO_ONEPASS, IDC_DESTROYFILES_RADIO_THREEPASS });
-	AllowDarkModeForGroupBoxes({ IDC_GROUP_WIPE_METHOD });
-
 	m_pdfdps->RestoreDialogPosition(m_hDlg, true);
 
 	return 0;
@@ -147,18 +143,6 @@ std::vector<ResizableDialogControl> DestroyFilesDialog::GetResizableControls()
 	controls.emplace_back(GetDlgItem(m_hDlg, IDOK), MovingType::Both, SizingType::None);
 	controls.emplace_back(GetDlgItem(m_hDlg, IDCANCEL), MovingType::Both, SizingType::None);
 	return controls;
-}
-
-INT_PTR DestroyFilesDialog::OnCtlColorStaticExtra(HWND hwnd, HDC hdc)
-{
-	if (hwnd == GetDlgItem(m_hDlg, IDC_DESTROYFILES_STATIC_WARNING_MESSAGE))
-	{
-		SetTextColor(hdc, RGB(255, 0, 0));
-		SetBkMode(hdc, TRANSPARENT);
-		return reinterpret_cast<INT_PTR>(GetStockObject(NULL_BRUSH));
-	}
-
-	return FALSE;
 }
 
 INT_PTR DestroyFilesDialog::OnCommand(WPARAM wParam, LPARAM lParam)

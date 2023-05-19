@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "DarkModeDialogBase.h"
+#include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/ResizableDialogHelper.h"
@@ -38,7 +38,7 @@ private:
 	NFileOperations::OverwriteMethod m_overwriteMethod;
 };
 
-class DestroyFilesDialog : public DarkModeDialogBase
+class DestroyFilesDialog : public BaseDialog
 {
 public:
 	DestroyFilesDialog(HINSTANCE resourceInstance, HWND hParent,
@@ -46,7 +46,6 @@ public:
 
 protected:
 	INT_PTR OnInitDialog() override;
-	INT_PTR OnCtlColorStaticExtra(HWND hwnd, HDC hdc) override;
 	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
 	INT_PTR OnClose() override;
 
