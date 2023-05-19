@@ -463,12 +463,6 @@
     <ClCompile Include="DarkModeButton.cpp">
       <Filter>Dark Mode Support</Filter>
     </ClCompile>
-    <ClCompile Include="DarkModeDialogBase.cpp">
-      <Filter>Dark Mode Support</Filter>
-    </ClCompile>
-    <ClCompile Include="DarkModeGroupBox.cpp">
-      <Filter>Dark Mode Support</Filter>
-    </ClCompile>
     <ClCompile Include="DarkModeHelper.cpp">
       <Filter>Dark Mode Support</Filter>
     </ClCompile>
@@ -1018,12 +1012,6 @@
       <Filter>Bookmarks\UI\Views</Filter>
     </ClInclude>
     <ClInclude Include="DarkModeButton.h">
-      <Filter>Dark Mode Support</Filter>
-    </ClInclude>
-    <ClInclude Include="DarkModeDialogBase.h">
-      <Filter>Dark Mode Support</Filter>
-    </ClInclude>
-    <ClInclude Include="DarkModeGroupBox.h">
       <Filter>Dark Mode Support</Filter>
     </ClInclude>
     <ClInclude Include="DarkModeHelper.h">

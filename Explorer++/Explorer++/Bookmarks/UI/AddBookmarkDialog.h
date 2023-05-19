@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "DarkModeDialogBase.h"
+#include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include <wil/resource.h>
@@ -37,7 +37,7 @@ private:
 	std::unordered_set<std::wstring> m_setExpansion;
 };
 
-class AddBookmarkDialog : public DarkModeDialogBase
+class AddBookmarkDialog : public BaseDialog
 {
 public:
 	AddBookmarkDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface,
@@ -47,7 +47,6 @@ public:
 
 protected:
 	INT_PTR OnInitDialog() override;
-	INT_PTR OnCtlColorEditExtra(HWND hwnd, HDC hdc) override;
 	INT_PTR OnCommand(WPARAM wParam, LPARAM lParam) override;
 	INT_PTR OnClose() override;
 	INT_PTR OnNcDestroy() override;
@@ -55,8 +54,6 @@ protected:
 	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
 
 private:
-	static const COLORREF ERROR_BACKGROUND_COLOR = RGB(255, 188, 188);
-
 	AddBookmarkDialog &operator=(const AddBookmarkDialog &abd);
 
 	void UpdateDialogForBookmarkFolder();
@@ -80,8 +77,6 @@ private:
 	std::optional<std::wstring> m_customDialogTitle;
 
 	BookmarkTreeView *m_pBookmarkTreeView;
-
-	wil::unique_hbrush m_ErrorBrush;
 
 	AddBookmarkDialogPersistentSettings *m_persistentSettings;
 };

@@ -766,8 +766,6 @@
     <ClCompile Include="Bookmarks\BookmarkIconManager.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkMenuController.cpp" />
     <ClCompile Include="DarkModeButton.cpp" />
-    <ClCompile Include="DarkModeDialogBase.cpp" />
-    <ClCompile Include="DarkModeGroupBox.cpp" />
     <ClCompile Include="DarkModeHelper.cpp" />
     <ClCompile Include="FolderView.cpp" />
     <ClCompile Include="Plugins\AcceleratorParser.cpp" />
@@ -978,8 +976,6 @@
     <ClInclude Include="Bookmarks\BookmarkIconManager.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkMenuController.h" />
     <ClInclude Include="DarkModeButton.h" />
-    <ClInclude Include="DarkModeDialogBase.h" />
-    <ClInclude Include="DarkModeGroupBox.h" />
     <ClInclude Include="DarkModeHelper.h" />
     <ClInclude Include="FolderView.h" />
     <ClInclude Include="Plugins\AcceleratorParser.h" />

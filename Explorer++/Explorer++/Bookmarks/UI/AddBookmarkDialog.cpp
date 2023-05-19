@@ -9,6 +9,7 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarkTreeView.h"
 #include "CoreInterface.h"
+#include "DarkModeThemeManager.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -20,13 +21,12 @@ AddBookmarkDialog::AddBookmarkDialog(HINSTANCE resourceInstance, HWND hParent,
 	CoreInterface *coreInterface, BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
 	BookmarkItem *defaultParentSelection, BookmarkItem **selectedParentFolder,
 	std::optional<std::wstring> customDialogTitle) :
-	DarkModeDialogBase(resourceInstance, IDD_ADD_BOOKMARK, hParent, DialogSizingType::Both),
+	BaseDialog(resourceInstance, IDD_ADD_BOOKMARK, hParent, DialogSizingType::Both),
 	m_coreInterface(coreInterface),
 	m_bookmarkTree(bookmarkTree),
 	m_bookmarkItem(bookmarkItem),
 	m_selectedParentFolder(selectedParentFolder),
-	m_customDialogTitle(customDialogTitle),
-	m_ErrorBrush(CreateSolidBrush(ERROR_BACKGROUND_COLOR))
+	m_customDialogTitle(customDialogTitle)
 {
 	m_persistentSettings = &AddBookmarkDialogPersistentSettings::GetInstance();
 
@@ -57,6 +57,8 @@ AddBookmarkDialog::AddBookmarkDialog(HINSTANCE resourceInstance, HWND hParent,
 
 INT_PTR AddBookmarkDialog::OnInitDialog()
 {
+	DarkModeThemeManager::GetInstance().ApplyThemeToTopLevelWindow(m_hDlg);
+
 	if (m_bookmarkItem->IsFolder())
 	{
 		UpdateDialogForBookmarkFolder();
@@ -85,8 +87,6 @@ INT_PTR AddBookmarkDialog::OnInitDialog()
 	HWND hEditName = GetDlgItem(m_hDlg, IDC_BOOKMARK_NAME);
 	SendMessage(hEditName, EM_SETSEL, 0, -1);
 	SetFocus(hEditName);
-
-	AllowDarkModeForControls({ IDC_BOOKMARK_NEWFOLDER });
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, false);
 
@@ -200,21 +200,6 @@ std::vector<ResizableDialogControl> AddBookmarkDialog::GetResizableControls()
 	controls.emplace_back(GetDlgItem(m_hDlg, IDOK), MovingType::Both, SizingType::None);
 	controls.emplace_back(GetDlgItem(m_hDlg, IDCANCEL), MovingType::Both, SizingType::None);
 	return controls;
-}
-
-INT_PTR AddBookmarkDialog::OnCtlColorEditExtra(HWND hwnd, HDC hdc)
-{
-	if (hwnd == GetDlgItem(m_hDlg, IDC_BOOKMARK_NAME)
-		|| hwnd == GetDlgItem(m_hDlg, IDC_BOOKMARK_LOCATION))
-	{
-		if (GetWindowTextLength(hwnd) == 0)
-		{
-			SetBkMode(hdc, TRANSPARENT);
-			return reinterpret_cast<INT_PTR>(m_ErrorBrush.get());
-		}
-	}
-
-	return FALSE;
 }
 
 INT_PTR AddBookmarkDialog::OnCommand(WPARAM wParam, LPARAM lParam)
