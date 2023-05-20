@@ -12,7 +12,6 @@
 #include "Bookmarks/UI/BookmarksToolbar.h"
 #include "Bookmarks/UI/Views/BookmarksToolbarView.h"
 #include "Config.h"
-#include "DarkModeThemeManager.h"
 #include "DriveEnumeratorImpl.h"
 #include "DriveModel.h"
 #include "DriveWatcherImpl.h"
@@ -201,8 +200,6 @@ void Explorerplusplus::CreateMainControls()
 		SendMessage(m_hMainRebar, RB_INSERTBAND, static_cast<WPARAM>(-1),
 			(LPARAM) &m_ToolbarInformation[i]);
 	}
-
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hMainRebar);
 }
 
 LRESULT CALLBACK RebarSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,

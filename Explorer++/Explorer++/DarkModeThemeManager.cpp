@@ -6,6 +6,7 @@
 #include "DarkModeThemeManager.h"
 #include "DarkModeButton.h"
 #include "DarkModeHelper.h"
+#include "Explorer++_internal.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowHelper.h"
 #include <wil/resource.h>
@@ -83,7 +84,11 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 		return;
 	}
 
-	if (lstrcmp(className, DIALOG_CLASS_NAME) == 0)
+	if (lstrcmp(className, NExplorerplusplus::CLASS_NAME) == 0)
+	{
+		ApplyThemeToMainWindow(hwnd, enableDarkMode);
+	}
+	else if (lstrcmp(className, DIALOG_CLASS_NAME) == 0)
 	{
 		ApplyThemeToDialog(hwnd, enableDarkMode);
 	}
@@ -131,6 +136,15 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 	{
 		ApplyThemeToStatusBar(hwnd, enableDarkMode);
 	}
+}
+
+void DarkModeThemeManager::ApplyThemeToMainWindow(HWND hwnd, bool enableDarkMode)
+{
+	BOOL dark = enableDarkMode;
+	DarkModeHelper::WINDOWCOMPOSITIONATTRIBDATA compositionData = {
+		DarkModeHelper::WCA_USEDARKMODECOLORS, &dark, sizeof(dark)
+	};
+	DarkModeHelper::GetInstance().SetWindowCompositionAttribute(hwnd, &compositionData);
 }
 
 void DarkModeThemeManager::ApplyThemeToDialog(HWND hwnd, bool enableDarkMode)

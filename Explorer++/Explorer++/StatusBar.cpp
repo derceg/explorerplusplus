@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Config.h"
-#include "DarkModeThemeManager.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -36,8 +35,6 @@ void Explorerplusplus::CreateStatusBar()
 	}
 
 	SetStatusBarParts(width);
-
-	DarkModeThemeManager::ApplyThemeToWindow(m_hStatusBar);
 }
 
 void Explorerplusplus::SetStatusBarParts(int width)

@@ -11,6 +11,7 @@
 #include "ColorRuleModelFactory.h"
 #include "Config.h"
 #include "DarkModeHelper.h"
+#include "DarkModeThemeManager.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"
 #include "LoadSaveInterface.h"
@@ -52,7 +53,7 @@ void Explorerplusplus::OnCreate()
 
 	if (ShouldEnableDarkMode(m_config->theme))
 	{
-		SetUpDarkMode();
+		DarkModeHelper::GetInstance().EnableForApp();
 	}
 
 	m_bookmarksMainMenu = std::make_unique<BookmarksMainMenu>(this, this, &m_bookmarkIconFetcher,
@@ -113,6 +114,8 @@ void Explorerplusplus::OnCreate()
 	CustomGripper::Initialize(m_hContainer, gripperBackgroundColor);
 
 	InitializePlugins();
+
+	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hContainer);
 
 	SetTimer(m_hContainer, AUTOSAVE_TIMER_ID, AUTOSAVE_TIMEOUT, nullptr);
 
@@ -187,23 +190,4 @@ bool Explorerplusplus::ShouldEnableDarkMode(Theme theme)
 {
 	return theme == +Theme::Dark
 		|| (theme == +Theme::System && DarkModeHelper::GetInstance().ShouldAppsUseDarkMode());
-}
-
-void Explorerplusplus::SetUpDarkMode()
-{
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-	darkModeHelper.EnableForApp();
-
-	if (!darkModeHelper.IsDarkModeEnabled())
-	{
-		return;
-	}
-
-	darkModeHelper.AllowDarkModeForWindow(m_hContainer, true);
-
-	BOOL dark = TRUE;
-	DarkModeHelper::WINDOWCOMPOSITIONATTRIBDATA compositionData = {
-		DarkModeHelper::WCA_USEDARKMODECOLORS, &dark, sizeof(dark)
-	};
-	darkModeHelper.SetWindowCompositionAttribute(m_hContainer, &compositionData);
 }

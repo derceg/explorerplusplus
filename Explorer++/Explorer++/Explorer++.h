@@ -521,7 +521,6 @@ private:
 
 	// Dark mode
 	static bool ShouldEnableDarkMode(Theme theme);
-	void SetUpDarkMode();
 
 	// Rebar
 	HMENU CreateRebarHistoryMenu(BOOL bBack);

@@ -18,7 +18,6 @@
 #include "ShellTreeView.h"
 #include "Config.h"
 #include "CoreInterface.h"
-#include "DarkModeThemeManager.h"
 #include "ShellBrowser/ShellNavigator.h"
 #include "ShellTreeNode.h"
 #include "TabContainer.h"
@@ -60,8 +59,6 @@ ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabCont
 	m_shellChangeWatcher(GetHWND(),
 		std::bind_front(&ShellTreeView::ProcessShellChangeNotifications, this))
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hTreeView);
-
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hTreeView,
 		std::bind_front(&ShellTreeView::TreeViewProc, this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hParent,

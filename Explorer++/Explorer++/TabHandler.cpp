@@ -6,7 +6,6 @@
 #include "Explorer++.h"
 #include "Bookmarks/BookmarkTreeFactory.h"
 #include "Config.h"
-#include "DarkModeThemeManager.h"
 #include "LoadSaveInterface.h"
 #include "MenuRanges.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -68,8 +67,6 @@ void Explorerplusplus::InitializeTabs()
 		MENU_RECENT_TABS_STARTID, MENU_RECENT_TABS_ENDID);
 
 	m_tabsInitializedSignal();
-
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hTabBacking);
 }
 
 void Explorerplusplus::OnTabCreated(int tabId, BOOL switchToNewTab)

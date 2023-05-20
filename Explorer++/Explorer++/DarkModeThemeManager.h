@@ -24,6 +24,7 @@ private:
 
 	static BOOL CALLBACK ProcessChildWindow(HWND hwnd, LPARAM lParam);
 	static BOOL CALLBACK ProcessThreadWindow(HWND hwnd, LPARAM lParam);
+	static void ApplyThemeToMainWindow(HWND hwnd, bool enableDarkMode);
 	static void ApplyThemeToDialog(HWND hwnd, bool enableDarkMode);
 	static void ApplyThemeToListView(HWND hwnd, bool enableDarkMode);
 	static void ApplyThemeToHeader(HWND hwnd, bool enableDarkMode);
