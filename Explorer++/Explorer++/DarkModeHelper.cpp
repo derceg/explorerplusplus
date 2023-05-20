@@ -233,35 +233,6 @@ bool DarkModeHelper::IsHighContrast()
 	return WI_IsFlagSet(highContrast.dwFlags, HCF_HIGHCONTRASTON);
 }
 
-void DarkModeHelper::SetDarkModeForToolbarTooltips(HWND toolbar)
-{
-	HWND tooltips = reinterpret_cast<HWND>(SendMessage(toolbar, TB_GETTOOLTIPS, 0, 0));
-
-	if (tooltips)
-	{
-		SetDarkModeForControl(tooltips);
-	}
-}
-
-// Sets the dark mode theme for a control. Works for controls that use the DarkMode_Explorer theme:
-//
-// - Buttons
-// - Scrollbars
-// - TreeViews
-// - Tooltips
-// - Edit controls
-void DarkModeHelper::SetDarkModeForControl(HWND control)
-{
-	AllowDarkModeForWindow(control, true);
-	SetWindowTheme(control, L"Explorer", nullptr);
-}
-
-void DarkModeHelper::SetDarkModeForComboBox(HWND comboBox)
-{
-	AllowDarkModeForWindow(comboBox, true);
-	SetWindowTheme(comboBox, L"CFD", nullptr);
-}
-
 HBRUSH DarkModeHelper::GetBackgroundBrush()
 {
 	if (!m_backgroundBrush)
@@ -270,24 +241,4 @@ HBRUSH DarkModeHelper::GetBackgroundBrush()
 	}
 
 	return m_backgroundBrush.get();
-}
-
-void DarkModeHelper::SetTreeViewDarkModeColors(HWND treeView)
-{
-	AllowDarkModeForWindow(treeView, true);
-
-	// When in dark mode, this theme sets the following colors correctly:
-	//
-	// - the item selection color,
-	// - the colors of the arrows that appear to the left of the items,
-	// - the color of the scrollbars.
-	//
-	// It doesn't, however, change the background color, or the text color.
-	SetWindowTheme(treeView, L"Explorer", nullptr);
-
-	TreeView_SetBkColor(treeView, BACKGROUND_COLOR);
-	TreeView_SetTextColor(treeView, TEXT_COLOR);
-	TreeView_SetInsertMarkColor(treeView, FOREGROUND_COLOR);
-
-	InvalidateRect(treeView, nullptr, TRUE);
 }
