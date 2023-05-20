@@ -8,7 +8,7 @@
 #include "ColorRuleModelFactory.h"
 #include "Config.h"
 #include "CoreInterface.h"
-#include "DarkModeHelper.h"
+#include "DarkModeThemeManager.h"
 #include "FolderView.h"
 #include "ItemData.h"
 #include "MainResource.h"
@@ -194,16 +194,7 @@ void ShellBrowser::InitializeListView()
 	m_connections.push_back(m_config->globalFolderSettings.oneClickActivateHoverTime.addObserver(
 		std::bind_front(&ShellBrowser::OnOneClickActivateHoverTimeUpdated, this)));
 
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		darkModeHelper.SetListViewDarkModeColors(m_hListView);
-	}
-	else
-	{
-		SetWindowTheme(m_hListView, L"Explorer", nullptr);
-	}
+	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hListView);
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hListView,
 		std::bind_front(&ShellBrowser::ListViewProc, this)));

@@ -85,7 +85,6 @@ public:
 	void SetDarkModeForToolbarTooltips(HWND toolbar);
 	void SetDarkModeForControl(HWND control);
 	void SetDarkModeForComboBox(HWND comboBox);
-	void SetListViewDarkModeColors(HWND listView);
 	void SetTreeViewDarkModeColors(HWND treeView);
 
 	HBRUSH GetBackgroundBrush();

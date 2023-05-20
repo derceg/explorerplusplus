@@ -272,26 +272,6 @@ HBRUSH DarkModeHelper::GetBackgroundBrush()
 	return m_backgroundBrush.get();
 }
 
-void DarkModeHelper::SetListViewDarkModeColors(HWND listView)
-{
-	AllowDarkModeForWindow(listView, true);
-	SetWindowTheme(listView, L"ItemsView", nullptr);
-
-	HWND header = ListView_GetHeader(listView);
-	AllowDarkModeForWindow(header, true);
-	SetWindowTheme(header, L"ItemsView", nullptr);
-
-	HWND tooltips = ListView_GetToolTips(listView);
-	AllowDarkModeForWindow(tooltips, true);
-	SetWindowTheme(tooltips, L"Explorer", nullptr);
-
-	ListView_SetBkColor(listView, BACKGROUND_COLOR);
-	ListView_SetTextBkColor(listView, BACKGROUND_COLOR);
-	ListView_SetTextColor(listView, TEXT_COLOR);
-
-	InvalidateRect(listView, nullptr, TRUE);
-}
-
 void DarkModeHelper::SetTreeViewDarkModeColors(HWND treeView)
 {
 	AllowDarkModeForWindow(treeView, true);
