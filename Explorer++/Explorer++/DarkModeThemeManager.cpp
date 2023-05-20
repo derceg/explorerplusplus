@@ -127,6 +127,10 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 	{
 		ApplyThemeToTooltips(hwnd, enableDarkMode);
 	}
+	else if (lstrcmp(className, STATUSCLASSNAME) == 0)
+	{
+		ApplyThemeToStatusBar(hwnd, enableDarkMode);
+	}
 }
 
 void DarkModeThemeManager::ApplyThemeToDialog(HWND hwnd, bool enableDarkMode)
@@ -363,6 +367,20 @@ void DarkModeThemeManager::ApplyThemeToTooltips(HWND hwnd, bool enableDarkMode)
 	UNREFERENCED_PARAMETER(enableDarkMode);
 
 	SetWindowTheme(hwnd, L"Explorer", nullptr);
+}
+
+void DarkModeThemeManager::ApplyThemeToStatusBar(HWND hwnd, bool enableDarkMode)
+{
+	if (enableDarkMode)
+	{
+		SetWindowTheme(hwnd, nullptr, L"ExplorerStatusBar");
+	}
+	else
+	{
+		// Revert the control back to its default theme (see
+		// https://devblogs.microsoft.com/oldnewthing/20181115-00/?p=100225).
+		SetWindowTheme(hwnd, nullptr, nullptr);
+	}
 }
 
 LRESULT CALLBACK DarkModeThemeManager::DialogSubclass(HWND hwnd, UINT msg, WPARAM wParam,

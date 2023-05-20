@@ -12,6 +12,7 @@ public:
 	static DarkModeThemeManager &GetInstance();
 
 	void ApplyThemeToWindowAndChildren(HWND topLevelWindow);
+	static void ApplyThemeToWindow(HWND hwnd);
 
 private:
 	static const UINT_PTR SUBCLASS_ID = 0;
@@ -23,7 +24,6 @@ private:
 
 	static BOOL CALLBACK ProcessChildWindow(HWND hwnd, LPARAM lParam);
 	static BOOL CALLBACK ProcessThreadWindow(HWND hwnd, LPARAM lParam);
-	static void ApplyThemeToWindow(HWND hwnd);
 	static void ApplyThemeToDialog(HWND hwnd, bool enableDarkMode);
 	static void ApplyThemeToListView(HWND hwnd, bool enableDarkMode);
 	static void ApplyThemeToHeader(HWND hwnd, bool enableDarkMode);
@@ -35,6 +35,7 @@ private:
 	static void ApplyThemeToComboBox(HWND hwnd, bool enableDarkMode);
 	static void ApplyThemeToButton(HWND hwnd, bool enableDarkMode);
 	static void ApplyThemeToTooltips(HWND hwnd, bool enableDarkMode);
+	static void ApplyThemeToStatusBar(HWND hwnd, bool enableDarkMode);
 
 	static LRESULT CALLBACK DialogSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR subclassId, DWORD_PTR data);
