@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Config.h"
-#include "DarkModeHelper.h"
 #include "IconResourceLoader.h"
 #include "MainToolbar.h"
 #include "MainToolbarButtons.h"
@@ -48,13 +47,6 @@ HWND Explorerplusplus::CreateTabToolbar(HWND hParent, int idCommand, const std::
 	SendMessage(tabToolbar, TB_INSERTBUTTON, 0, reinterpret_cast<LPARAM>(&tbButton));
 
 	SendMessage(tabToolbar, TB_AUTOSIZE, 0, 0);
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		darkModeHelper.SetDarkModeForToolbarTooltips(tabToolbar);
-	}
 
 	return tabToolbar;
 }

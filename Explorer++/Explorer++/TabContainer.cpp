@@ -7,7 +7,6 @@
 #include "Bookmarks/BookmarkHelper.h"
 #include "Config.h"
 #include "CoreInterface.h"
-#include "DarkModeHelper.h"
 #include "Icon.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
@@ -108,15 +107,6 @@ void TabContainer::Initialize(HWND parent)
 	TabCtrl_SetImageList(m_hwnd, m_tabCtrlImageList.get());
 
 	AddDefaultTabIcons(m_tabCtrlImageList.get());
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		HWND tooltips = TabCtrl_GetToolTips(m_hwnd);
-		darkModeHelper.AllowDarkModeForWindow(tooltips, true);
-		SetWindowTheme(tooltips, L"Explorer", nullptr);
-	}
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
 		std::bind_front(&TabContainer::WndProc, this)));
