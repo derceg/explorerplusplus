@@ -4,21 +4,18 @@
 
 #include "stdafx.h"
 #include "ThirdPartyCreditsDialog.h"
-#include "DarkModeThemeManager.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/RichEditHelper.h"
 #include "../Helper/WindowHelper.h"
 
 ThirdPartyCreditsDialog::ThirdPartyCreditsDialog(HINSTANCE resourceInstance, HWND parent) :
-	BaseDialog(resourceInstance, IDD_THIRD_PARTY_CREDITS, parent, DialogSizingType::None)
+	ThemedDialog(resourceInstance, IDD_THIRD_PARTY_CREDITS, parent, DialogSizingType::None)
 {
 }
 
 INT_PTR ThirdPartyCreditsDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
-
 	SendDlgItemMessage(m_hDlg, IDC_CREDITS, EM_AUTOURLDETECT, AURL_ENABLEURL, NULL);
 	SendDlgItemMessage(m_hDlg, IDC_CREDITS, EM_SETEVENTMASK, 0, ENM_LINK);
 

@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "MergeFilesDialog.h"
 #include "CoreInterface.h"
-#include "DarkModeThemeManager.h"
 #include "Explorer++_internal.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
@@ -37,7 +36,7 @@ bool CompareFilenames(const std::wstring &strFirst, const std::wstring &strSecon
 MergeFilesDialog::MergeFilesDialog(HINSTANCE resourceInstance, HWND hParent,
 	CoreInterface *coreInterface, const std::wstring &strOutputDirectory,
 	const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates) :
-	BaseDialog(resourceInstance, IDD_MERGEFILES, hParent, DialogSizingType::Both),
+	ThemedDialog(resourceInstance, IDD_MERGEFILES, hParent, DialogSizingType::Both),
 	m_coreInterface(coreInterface),
 	m_strOutputDirectory(strOutputDirectory),
 	m_FullFilenameList(FullFilenameList),
@@ -65,8 +64,6 @@ bool CompareFilenames(const std::wstring &strFirst, const std::wstring &strSecon
 
 INT_PTR MergeFilesDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
-
 	std::wregex rxPattern;
 	bool bAllMatchPattern = true;
 

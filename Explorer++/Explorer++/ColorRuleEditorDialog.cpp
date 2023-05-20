@@ -6,7 +6,6 @@
 #include "ColorRuleEditorDialog.h"
 #include "ColorRule.h"
 #include "ColorRuleModel.h"
-#include "DarkModeThemeManager.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/Macros.h"
@@ -22,7 +21,7 @@ const TCHAR ColorRuleEditorDialogPersistentSettings::SETTING_CUSTOM_COLORS[] = _
 
 ColorRuleEditorDialog::ColorRuleEditorDialog(HINSTANCE resourceInstance, HWND parent,
 	ColorRuleModel *model, std::unique_ptr<EditDetails> editDetails) :
-	BaseDialog(resourceInstance, IDD_NEW_COLOR_RULE, parent, DialogSizingType::None),
+	ThemedDialog(resourceInstance, IDD_NEW_COLOR_RULE, parent, DialogSizingType::None),
 	m_model(model),
 	m_editDetails(std::move(editDetails))
 {
@@ -31,8 +30,6 @@ ColorRuleEditorDialog::ColorRuleEditorDialog(HINSTANCE resourceInstance, HWND pa
 
 INT_PTR ColorRuleEditorDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
-
 	if (m_editDetails->type == EditDetails::Type::ExistingItem)
 	{
 		std::wstring editText =

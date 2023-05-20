@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "SearchDialog.h"
 #include "CoreInterface.h"
-#include "DarkModeThemeManager.h"
 #include "DialogConstants.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
@@ -61,7 +60,7 @@ const TCHAR SearchDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern
 SearchDialog::SearchDialog(HINSTANCE resourceInstance, HWND hParent,
 	std::wstring_view searchDirectory, CoreInterface *coreInterface, Navigator *navigator,
 	TabContainer *tabContainer) :
-	BaseDialog(resourceInstance, IDD_SEARCH, hParent, DialogSizingType::Both),
+	ThemedDialog(resourceInstance, IDD_SEARCH, hParent, DialogSizingType::Both),
 	m_searchDirectory(searchDirectory),
 	m_coreInterface(coreInterface),
 	m_navigator(navigator),
@@ -87,8 +86,6 @@ SearchDialog::~SearchDialog()
 
 INT_PTR SearchDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
-
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hDlg);
 	m_directoryIcon =
 		m_coreInterface->GetIconResourceLoader()->LoadIconFromPNGForDpi(Icon::Folder, 16, 16, dpi);

@@ -9,7 +9,6 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarkTreeView.h"
 #include "CoreInterface.h"
-#include "DarkModeThemeManager.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -21,7 +20,7 @@ AddBookmarkDialog::AddBookmarkDialog(HINSTANCE resourceInstance, HWND hParent,
 	CoreInterface *coreInterface, BookmarkTree *bookmarkTree, BookmarkItem *bookmarkItem,
 	BookmarkItem *defaultParentSelection, BookmarkItem **selectedParentFolder,
 	std::optional<std::wstring> customDialogTitle) :
-	BaseDialog(resourceInstance, IDD_ADD_BOOKMARK, hParent, DialogSizingType::Both),
+	ThemedDialog(resourceInstance, IDD_ADD_BOOKMARK, hParent, DialogSizingType::Both),
 	m_coreInterface(coreInterface),
 	m_bookmarkTree(bookmarkTree),
 	m_bookmarkItem(bookmarkItem),
@@ -57,8 +56,6 @@ AddBookmarkDialog::AddBookmarkDialog(HINSTANCE resourceInstance, HWND hParent,
 
 INT_PTR AddBookmarkDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
-
 	if (m_bookmarkItem->IsFolder())
 	{
 		UpdateDialogForBookmarkFolder();

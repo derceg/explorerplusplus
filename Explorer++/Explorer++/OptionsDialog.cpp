@@ -7,7 +7,6 @@
 #include "AdvancedOptionsPage.h"
 #include "AppearanceOptionsPage.h"
 #include "CoreInterface.h"
-#include "DarkModeThemeManager.h"
 #include "DefaultSettingsOptionsPage.h"
 #include "FilesFoldersOptionsPage.h"
 #include "GeneralOptionsPage.h"
@@ -20,7 +19,7 @@
 
 OptionsDialog::OptionsDialog(HINSTANCE resourceInstance, HWND parent,
 	std::shared_ptr<Config> config, CoreInterface *coreInterface) :
-	BaseDialog(resourceInstance, IDD_OPTIONS, parent, DialogSizingType::Both),
+	ThemedDialog(resourceInstance, IDD_OPTIONS, parent, DialogSizingType::Both),
 	m_config(config),
 	m_resourceInstance(resourceInstance),
 	m_coreInterface(coreInterface)
@@ -29,8 +28,6 @@ OptionsDialog::OptionsDialog(HINSTANCE resourceInstance, HWND parent,
 
 INT_PTR OptionsDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
-
 	if (!m_lastSelectedPageId)
 	{
 		m_lastSelectedPageId = m_pageMap.begin()->first;

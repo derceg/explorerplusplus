@@ -11,7 +11,6 @@
 
 #include "stdafx.h"
 #include "UpdateCheckDialog.h"
-#include "DarkModeThemeManager.h"
 #include "MainResource.h"
 #include "Version.h"
 #include <boost\algorithm\string.hpp>
@@ -24,7 +23,7 @@ const TCHAR UpdateCheckDialog::VERSION_FILE_URL[] =
 	_T("https://explorerplusplus.com/software/version.txt");
 
 UpdateCheckDialog::UpdateCheckDialog(HINSTANCE resourceInstance, HWND hParent) :
-	BaseDialog(resourceInstance, IDD_UPDATECHECK, hParent, DialogSizingType::None),
+	ThemedDialog(resourceInstance, IDD_UPDATECHECK, hParent, DialogSizingType::None),
 	m_UpdateCheckComplete(false)
 {
 	m_pucdps = &UpdateCheckDialogPersistentSettings::GetInstance();
@@ -32,8 +31,6 @@ UpdateCheckDialog::UpdateCheckDialog(HINSTANCE resourceInstance, HWND hParent) :
 
 INT_PTR UpdateCheckDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
-
 	SetDlgItemText(m_hDlg, IDC_STATIC_CURRENT_VERSION, VERSION_STRING_W);
 
 	TCHAR szTemp[64];

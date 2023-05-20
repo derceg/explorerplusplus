@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "ThemedDialog.h"
 #include "../Helper/DialogSettings.h"
 #include <list>
 
@@ -37,7 +37,7 @@ private:
 		const SetFileAttributesDialogPersistentSettings &) = delete;
 };
 
-class SetFileAttributesDialog : public BaseDialog
+class SetFileAttributesDialog : public ThemedDialog
 {
 public:
 	SetFileAttributesDialog(HINSTANCE resourceInstance, HWND hParent,

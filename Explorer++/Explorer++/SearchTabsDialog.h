@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "ThemedDialog.h"
 #include "../Helper/DialogSettings.h"
 #include <boost/core/noncopyable.hpp>
 #include <boost/signals2.hpp>
@@ -29,7 +29,7 @@ private:
 	SearchTabsDialogPersistentSettings();
 };
 
-class SearchTabsDialog : public BaseDialog
+class SearchTabsDialog : public ThemedDialog
 {
 public:
 	static SearchTabsDialog *Create(HINSTANCE resourceInstance, HWND parent,

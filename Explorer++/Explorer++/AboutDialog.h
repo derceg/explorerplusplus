@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "ThemedDialog.h"
 #include <wil/resource.h>
 
-class AboutDialog : public BaseDialog
+class AboutDialog : public ThemedDialog
 {
 public:
 	AboutDialog(HINSTANCE resourceInstance, HWND hParent);

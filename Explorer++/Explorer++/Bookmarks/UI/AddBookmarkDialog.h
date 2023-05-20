@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "ThemedDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include <wil/resource.h>
@@ -37,7 +37,7 @@ private:
 	std::unordered_set<std::wstring> m_setExpansion;
 };
 
-class AddBookmarkDialog : public BaseDialog
+class AddBookmarkDialog : public ThemedDialog
 {
 public:
 	AddBookmarkDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface,

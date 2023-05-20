@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "SearchTabsDialog.h"
 #include "CoreInterface.h"
-#include "DarkModeThemeManager.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -23,7 +22,7 @@ SearchTabsDialog *SearchTabsDialog::Create(HINSTANCE resourceInstance, HWND pare
 
 SearchTabsDialog::SearchTabsDialog(HINSTANCE resourceInstance, HWND parent,
 	CoreInterface *coreInterface) :
-	BaseDialog(resourceInstance, IDD_SEARCH_TABS, parent, BaseDialog::DialogSizingType::Both),
+	ThemedDialog(resourceInstance, IDD_SEARCH_TABS, parent, BaseDialog::DialogSizingType::Both),
 	m_coreInterface(coreInterface),
 	m_persistentSettings(&SearchTabsDialogPersistentSettings::GetInstance())
 {
@@ -31,8 +30,6 @@ SearchTabsDialog::SearchTabsDialog(HINSTANCE resourceInstance, HWND parent,
 
 INT_PTR SearchTabsDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
-
 	SetupListView();
 	SetupEditControl();
 

@@ -2,9 +2,9 @@
 
 #include "PluginInterface.h"
 #include "Plugins/LuaPlugin.h"
-#include "../Helper/BaseDialog.h"
+#include "ThemedDialog.h"
 
-class ScriptingDialog : public BaseDialog
+class ScriptingDialog : public ThemedDialog
 {
 public:
 	ScriptingDialog(HINSTANCE resourceInstance, HWND hParent, PluginInterface *pluginInterface);

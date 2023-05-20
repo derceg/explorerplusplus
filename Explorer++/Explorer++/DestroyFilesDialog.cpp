@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "DestroyFilesDialog.h"
-#include "DarkModeThemeManager.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "../Helper/Helper.h"
@@ -20,7 +19,7 @@ const TCHAR DestroyFilesDialogPersistentSettings::SETTING_OVERWRITE_METHOD[] =
 
 DestroyFilesDialog::DestroyFilesDialog(HINSTANCE resourceInstance, HWND hParent,
 	const std::list<std::wstring> &FullFilenameList, BOOL bShowFriendlyDates) :
-	BaseDialog(resourceInstance, IDD_DESTROYFILES, hParent, DialogSizingType::Both)
+	ThemedDialog(resourceInstance, IDD_DESTROYFILES, hParent, DialogSizingType::Both)
 {
 	m_FullFilenameList = FullFilenameList;
 	m_bShowFriendlyDates = bShowFriendlyDates;
@@ -30,8 +29,6 @@ DestroyFilesDialog::DestroyFilesDialog(HINSTANCE resourceInstance, HWND hParent,
 
 INT_PTR DestroyFilesDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
-
 	m_icon.reset(LoadIcon(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_MAIN)));
 	SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
 

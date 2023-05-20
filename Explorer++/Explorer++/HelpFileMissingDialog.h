@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "ThemedDialog.h"
 
-class HelpFileMissingDialog : public BaseDialog
+class HelpFileMissingDialog : public ThemedDialog
 {
 public:
 	HelpFileMissingDialog(HINSTANCE resourceInstance, HWND hParent);

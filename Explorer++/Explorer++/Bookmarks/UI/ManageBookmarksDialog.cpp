@@ -10,7 +10,6 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarkTreeView.h"
 #include "CoreInterface.h"
-#include "DarkModeThemeManager.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -26,7 +25,7 @@ const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("Manage
 ManageBookmarksDialog::ManageBookmarksDialog(HINSTANCE resourceInstance, HWND hParent,
 	CoreInterface *coreInterface, Navigator *navigator, IconFetcher *iconFetcher,
 	BookmarkTree *bookmarkTree) :
-	BaseDialog(resourceInstance, IDD_MANAGE_BOOKMARKS, hParent, DialogSizingType::Both),
+	ThemedDialog(resourceInstance, IDD_MANAGE_BOOKMARKS, hParent, DialogSizingType::Both),
 	m_coreInterface(coreInterface),
 	m_navigator(navigator),
 	m_iconFetcher(iconFetcher),
@@ -56,13 +55,16 @@ INT_PTR ManageBookmarksDialog::OnInitDialog()
 		std::make_unique<BookmarkNavigationController>(m_bookmarkTree, m_bookmarkListView);
 	m_navigationController->Navigate(m_bookmarkTree->GetBookmarksToolbarFolder());
 
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
-
 	SetFocus(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW));
 
 	m_persistentSettings->RestoreDialogPosition(m_hDlg, true);
 
 	return 0;
+}
+
+void ManageBookmarksDialog::AddDynamicControls()
+{
+	CreateToolbar();
 }
 
 std::vector<ResizableDialogControl> ManageBookmarksDialog::GetResizableControls()
@@ -82,19 +84,22 @@ wil::unique_hicon ManageBookmarksDialog::GetDialogIcon(int iconWidth, int iconHe
 		iconWidth, iconHeight);
 }
 
-void ManageBookmarksDialog::SetupToolbar()
+void ManageBookmarksDialog::CreateToolbar()
 {
 	m_toolbarParent = CreateWindow(WC_STATIC, EMPTY_STRING, WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS,
 		0, 0, 0, 0, m_hDlg, nullptr, GetModuleHandle(nullptr), nullptr);
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_toolbarParent,
-		std::bind_front(&ManageBookmarksDialog::ToolbarParentWndProc, this)));
-
-	m_hToolbar = CreateToolbar(m_toolbarParent,
+	m_hToolbar = ::CreateToolbar(m_toolbarParent,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | TBSTYLE_TOOLTIPS | TBSTYLE_LIST
 			| TBSTYLE_TRANSPARENT | TBSTYLE_FLAT | CCS_NODIVIDER | CCS_NORESIZE,
 		TBSTYLE_EX_MIXEDBUTTONS | TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_DOUBLEBUFFER
 			| TBSTYLE_EX_HIDECLIPPEDBUTTONS);
+}
+
+void ManageBookmarksDialog::SetupToolbar()
+{
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_toolbarParent,
+		std::bind_front(&ManageBookmarksDialog::ToolbarParentWndProc, this)));
 
 	SendMessage(m_hToolbar, TB_BUTTONSTRUCTSIZE, static_cast<WPARAM>(sizeof(TBBUTTON)), 0);
 

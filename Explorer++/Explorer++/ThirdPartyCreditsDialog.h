@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "ThemedDialog.h"
 
-class ThirdPartyCreditsDialog : public BaseDialog
+class ThirdPartyCreditsDialog : public ThemedDialog
 {
 public:
 	ThirdPartyCreditsDialog(HINSTANCE resourceInstance, HWND parent);

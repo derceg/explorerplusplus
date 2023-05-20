@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "ThemedDialog.h"
 #include "../Helper/DialogSettings.h"
 
 class DisplayColoursDialog;
@@ -26,7 +26,7 @@ private:
 		const DisplayColoursDialogPersistentSettings &);
 };
 
-class DisplayColoursDialog : public BaseDialog
+class DisplayColoursDialog : public ThemedDialog
 {
 public:
 	DisplayColoursDialog(HINSTANCE resourceInstance, HWND hParent, HWND hDisplayWindow,

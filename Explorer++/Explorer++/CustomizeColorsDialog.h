@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "ThemedDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include <memory>
@@ -31,7 +31,7 @@ private:
 		const CustomizeColorsDialogPersistentSettings &);
 };
 
-class CustomizeColorsDialog : public BaseDialog
+class CustomizeColorsDialog : public ThemedDialog
 {
 public:
 	CustomizeColorsDialog(HINSTANCE resourceInstance, HWND parent, CoreInterface *coreInterface,

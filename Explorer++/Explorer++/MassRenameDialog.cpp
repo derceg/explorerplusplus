@@ -15,7 +15,6 @@
 
 #include "stdafx.h"
 #include "MassRenameDialog.h"
-#include "DarkModeThemeManager.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -36,7 +35,7 @@ const TCHAR MassRenameDialogPersistentSettings::SETTING_COLUMN_WIDTH_2[] = _T("C
 MassRenameDialog::MassRenameDialog(HINSTANCE resourceInstance, HWND hParent,
 	const std::list<std::wstring> &FullFilenameList, IconResourceLoader *iconResourceLoader,
 	FileActionHandler *pFileActionHandler) :
-	BaseDialog(resourceInstance, IDD_MASSRENAME, hParent, DialogSizingType::Both),
+	ThemedDialog(resourceInstance, IDD_MASSRENAME, hParent, DialogSizingType::Both),
 	m_FullFilenameList(FullFilenameList),
 	m_iconResourceLoader(iconResourceLoader),
 	m_pFileActionHandler(pFileActionHandler)
@@ -46,8 +45,6 @@ MassRenameDialog::MassRenameDialog(HINSTANCE resourceInstance, HWND hParent,
 
 INT_PTR MassRenameDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
-
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hDlg);
 	m_moreIcon = m_iconResourceLoader->LoadIconFromPNGForDpi(Icon::ArrowRight, 16, 16, dpi);
 	SendDlgItemMessage(m_hDlg, IDC_MASSRENAME_MORE, BM_SETIMAGE, IMAGE_ICON,

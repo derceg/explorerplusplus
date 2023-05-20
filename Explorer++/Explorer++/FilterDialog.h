@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "ThemedDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include <MsXml2.h>
@@ -39,7 +39,7 @@ private:
 	std::list<std::wstring> m_FilterList;
 };
 
-class FilterDialog : public BaseDialog
+class FilterDialog : public ThemedDialog
 {
 public:
 	FilterDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface);

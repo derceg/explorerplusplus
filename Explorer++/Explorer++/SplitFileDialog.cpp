@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "SplitFileDialog.h"
 #include "CoreInterface.h"
-#include "DarkModeThemeManager.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -39,7 +38,7 @@ const TCHAR SplitFileDialogPersistentSettings::SETTING_SIZE_GROUP[] = _T("SizeGr
 
 SplitFileDialog::SplitFileDialog(HINSTANCE resourceInstance, HWND hParent,
 	CoreInterface *coreInterface, const std::wstring &strFullFilename) :
-	BaseDialog(resourceInstance, IDD_SPLITFILE, hParent, DialogSizingType::None),
+	ThemedDialog(resourceInstance, IDD_SPLITFILE, hParent, DialogSizingType::None),
 	m_coreInterface(coreInterface),
 	m_strFullFilename(strFullFilename),
 	m_bSplittingFile(false),
@@ -61,8 +60,6 @@ SplitFileDialog::~SplitFileDialog()
 
 INT_PTR SplitFileDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
-
 	SHFILEINFO shfi;
 	DWORD_PTR dwRes = SHGetFileInfo(m_strFullFilename.c_str(), 0, &shfi, sizeof(shfi), SHGFI_ICON);
 

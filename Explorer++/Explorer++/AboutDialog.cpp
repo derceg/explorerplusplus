@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "AboutDialog.h"
-#include "DarkModeThemeManager.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ThirdPartyCreditsDialog.h"
@@ -14,14 +13,12 @@
 #include <boost/format.hpp>
 
 AboutDialog::AboutDialog(HINSTANCE resourceInstance, HWND hParent) :
-	BaseDialog(resourceInstance, IDD_ABOUT, hParent, DialogSizingType::None)
+	ThemedDialog(resourceInstance, IDD_ABOUT, hParent, DialogSizingType::None)
 {
 }
 
 INT_PTR AboutDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
-
 	m_icon.reset(reinterpret_cast<HICON>(LoadImage(GetModuleHandle(nullptr),
 		MAKEINTRESOURCE(IDI_MAIN), IMAGE_ICON, 32, 32, LR_VGACOLOR)));
 

@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "FilterDialog.h"
 #include "CoreInterface.h"
-#include "DarkModeThemeManager.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -20,7 +19,7 @@ const TCHAR FilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");
 const TCHAR FilterDialogPersistentSettings::SETTING_FILTER_LIST[] = _T("Filter");
 
 FilterDialog::FilterDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface) :
-	BaseDialog(resourceInstance, IDD_FILTER, hParent, DialogSizingType::Horizontal)
+	ThemedDialog(resourceInstance, IDD_FILTER, hParent, DialogSizingType::Horizontal)
 {
 	m_coreInterface = coreInterface;
 
@@ -29,8 +28,6 @@ FilterDialog::FilterDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterfa
 
 INT_PTR FilterDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
-
 	HWND hComboBox = GetDlgItem(m_hDlg, IDC_FILTER_COMBOBOX);
 
 	SetFocus(hComboBox);

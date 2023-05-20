@@ -762,6 +762,7 @@
     <ClCompile Include="ShellTreeView\ShellTreeNode.cpp" />
     <ClCompile Include="TabsOptionsPage.cpp" />
     <ClCompile Include="Theme.cpp" />
+    <ClCompile Include="ThemedDialog.cpp" />
     <ClCompile Include="ToolbarView.cpp" />
     <ClCompile Include="Bookmarks\BookmarkIconManager.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkMenuController.cpp" />
@@ -972,6 +973,7 @@
     <ClInclude Include="ShellTreeView\ShellTreeNode.h" />
     <ClInclude Include="TabsOptionsPage.h" />
     <ClInclude Include="Theme.h" />
+    <ClInclude Include="ThemedDialog.h" />
     <ClInclude Include="ToolbarView.h" />
     <ClInclude Include="Bookmarks\BookmarkIconManager.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkMenuController.h" />

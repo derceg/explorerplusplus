@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "DisplayColoursDialog.h"
-#include "DarkModeThemeManager.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "MainResource.h"
 #include "../Helper/Macros.h"
@@ -13,7 +12,7 @@ const TCHAR DisplayColoursDialogPersistentSettings::SETTINGS_KEY[] = _T("Display
 
 DisplayColoursDialog::DisplayColoursDialog(HINSTANCE resourceInstance, HWND hParent,
 	HWND hDisplayWindow, COLORREF DefaultCenterColor, COLORREF DefaultSurroundingColor) :
-	BaseDialog(resourceInstance, IDD_DISPLAYCOLOURS, hParent, DialogSizingType::None),
+	ThemedDialog(resourceInstance, IDD_DISPLAYCOLOURS, hParent, DialogSizingType::None),
 	m_hDisplayWindow(hDisplayWindow),
 	m_DefaultCenterColor(DefaultCenterColor),
 	m_DefaultSurroundingColor(DefaultSurroundingColor)
@@ -23,8 +22,6 @@ DisplayColoursDialog::DisplayColoursDialog(HINSTANCE resourceInstance, HWND hPar
 
 INT_PTR DisplayColoursDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
-
 	InitializeColorGroups();
 	InitializePreviewWindow();
 

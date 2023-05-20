@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "SelectColumnsDialog.h"
-#include "DarkModeThemeManager.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -20,7 +19,7 @@ const TCHAR SelectColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SelectCo
 
 SelectColumnsDialog::SelectColumnsDialog(HINSTANCE resourceInstance, HWND hParent,
 	ShellBrowser *shellBrowser, IconResourceLoader *iconResourceLoader) :
-	BaseDialog(resourceInstance, IDD_SELECTCOLUMNS, hParent, DialogSizingType::Both),
+	ThemedDialog(resourceInstance, IDD_SELECTCOLUMNS, hParent, DialogSizingType::Both),
 	m_shellBrowser(shellBrowser),
 	m_iconResourceLoader(iconResourceLoader),
 	m_bColumnsSwapped(FALSE)
@@ -30,8 +29,6 @@ SelectColumnsDialog::SelectColumnsDialog(HINSTANCE resourceInstance, HWND hParen
 
 INT_PTR SelectColumnsDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
-
 	HWND hListView = GetDlgItem(m_hDlg, IDC_COLUMNS_LISTVIEW);
 	ListView_SetExtendedListViewStyleEx(hListView, LVS_EX_CHECKBOXES, LVS_EX_CHECKBOXES);
 

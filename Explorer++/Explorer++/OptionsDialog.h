@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "ThemedDialog.h"
 #include <wil/resource.h>
 #include <optional>
 #include <unordered_map>
@@ -13,7 +13,7 @@ struct Config;
 class CoreInterface;
 class OptionsPage;
 
-class OptionsDialog : public BaseDialog
+class OptionsDialog : public ThemedDialog
 {
 public:
 	OptionsDialog(HINSTANCE resourceInstance, HWND parent, std::shared_ptr<Config> config,

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "ThemedDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ReferenceCount.h"
 #include <string>
@@ -66,7 +66,7 @@ private:
 	bool m_bStopSplitting;
 };
 
-class SplitFileDialog : public BaseDialog
+class SplitFileDialog : public ThemedDialog
 {
 public:
 	SplitFileDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface,

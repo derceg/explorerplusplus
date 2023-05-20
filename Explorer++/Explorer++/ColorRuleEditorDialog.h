@@ -5,7 +5,7 @@
 #pragma once
 
 #include "ColorRule.h"
-#include "../Helper/BaseDialog.h"
+#include "ThemedDialog.h"
 #include "../Helper/DialogSettings.h"
 #include <memory>
 #include <vector>
@@ -41,7 +41,7 @@ private:
 	COLORREF m_customColors[16];
 };
 
-class ColorRuleEditorDialog : public BaseDialog
+class ColorRuleEditorDialog : public ThemedDialog
 {
 public:
 	class EditDetails

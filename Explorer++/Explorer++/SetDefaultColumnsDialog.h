@@ -5,7 +5,7 @@
 #pragma once
 
 #include "ShellBrowser/FolderSettings.h"
-#include "../Helper/BaseDialog.h"
+#include "ThemedDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include <wil/resource.h>
@@ -51,7 +51,7 @@ private:
 	FolderType m_FolderType;
 };
 
-class SetDefaultColumnsDialog : public BaseDialog
+class SetDefaultColumnsDialog : public ThemedDialog
 {
 public:
 	SetDefaultColumnsDialog(HINSTANCE resourceInstance, HWND hParent, FolderColumns &folderColumns);

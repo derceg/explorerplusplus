@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "ThemedDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/Macros.h"
 
@@ -25,7 +25,7 @@ private:
 	DISALLOW_COPY_AND_ASSIGN(UpdateCheckDialogPersistentSettings);
 };
 
-class UpdateCheckDialog : public BaseDialog
+class UpdateCheckDialog : public ThemedDialog
 {
 public:
 	UpdateCheckDialog(HINSTANCE resourceInstance, HWND hParent);

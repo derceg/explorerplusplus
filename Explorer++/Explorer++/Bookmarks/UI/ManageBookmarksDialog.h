@@ -6,7 +6,7 @@
 
 #include "Bookmarks/UI/BookmarkListView.h"
 #include "ResourceHelper.h"
-#include "../Helper/BaseDialog.h"
+#include "ThemedDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include <boost/signals2.hpp>
@@ -46,7 +46,7 @@ private:
 	std::unordered_set<std::wstring> m_setExpansion;
 };
 
-class ManageBookmarksDialog : public BaseDialog
+class ManageBookmarksDialog : public ThemedDialog
 {
 public:
 	ManageBookmarksDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface,
@@ -73,8 +73,10 @@ private:
 
 	ManageBookmarksDialog &operator=(const ManageBookmarksDialog &mbd);
 
+	void AddDynamicControls() override;
 	std::vector<ResizableDialogControl> GetResizableControls() override;
 
+	void CreateToolbar();
 	void SetupToolbar();
 	void SetupTreeView();
 	void SetupListView();

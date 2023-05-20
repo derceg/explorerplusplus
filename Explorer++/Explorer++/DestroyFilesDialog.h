@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "ThemedDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/ResizableDialogHelper.h"
@@ -38,7 +38,7 @@ private:
 	NFileOperations::OverwriteMethod m_overwriteMethod;
 };
 
-class DestroyFilesDialog : public BaseDialog
+class DestroyFilesDialog : public ThemedDialog
 {
 public:
 	DestroyFilesDialog(HINSTANCE resourceInstance, HWND hParent,

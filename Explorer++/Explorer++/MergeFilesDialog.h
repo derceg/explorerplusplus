@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/BaseDialog.h"
+#include "ThemedDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ReferenceCount.h"
 #include "../Helper/ResizableDialogHelper.h"
@@ -48,7 +48,7 @@ private:
 	bool m_bstopMerging;
 };
 
-class MergeFilesDialog : public BaseDialog
+class MergeFilesDialog : public ThemedDialog
 {
 public:
 	MergeFilesDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface,

@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "SetFileAttributesDialog.h"
-#include "DarkModeThemeManager.h"
 #include "MainResource.h"
 #include "../Helper/TimeHelper.h"
 #include <list>
@@ -13,7 +12,7 @@ const TCHAR SetFileAttributesDialogPersistentSettings::SETTINGS_KEY[] = _T("SetF
 
 SetFileAttributesDialog::SetFileAttributesDialog(HINSTANCE resourceInstance, HWND hParent,
 	const std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo> &sfaiList) :
-	BaseDialog(resourceInstance, IDD_SETFILEATTRIBUTES, hParent, DialogSizingType::None)
+	ThemedDialog(resourceInstance, IDD_SETFILEATTRIBUTES, hParent, DialogSizingType::None)
 {
 	assert(!sfaiList.empty());
 
@@ -24,8 +23,6 @@ SetFileAttributesDialog::SetFileAttributesDialog(HINSTANCE resourceInstance, HWN
 
 INT_PTR SetFileAttributesDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
-
 	InitializeAttributesStructure();
 	InitializeDateFields();
 

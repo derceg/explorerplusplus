@@ -544,6 +544,9 @@
     <ClCompile Include="DarkModeThemeManager.cpp">
       <Filter>Dark Mode Support</Filter>
     </ClCompile>
+    <ClCompile Include="ThemedDialog.cpp">
+      <Filter>Dark Mode Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1099,6 +1102,9 @@
       <Filter>General Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="DarkModeThemeManager.h">
+      <Filter>Dark Mode Support</Filter>
+    </ClInclude>
+    <ClInclude Include="ThemedDialog.h">
       <Filter>Dark Mode Support</Filter>
     </ClInclude>
   </ItemGroup>

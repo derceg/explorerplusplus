@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "SetDefaultColumnsDialog.h"
-#include "DarkModeThemeManager.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -21,7 +20,7 @@ const TCHAR SetDefaultColumnsDialogPersistentSettings::SETTING_FOLDER_TYPE[] = _
 
 SetDefaultColumnsDialog::SetDefaultColumnsDialog(HINSTANCE resourceInstance, HWND hParent,
 	FolderColumns &folderColumns) :
-	BaseDialog(resourceInstance, IDD_SETDEFAULTCOLUMNS, hParent, DialogSizingType::Both),
+	ThemedDialog(resourceInstance, IDD_SETDEFAULTCOLUMNS, hParent, DialogSizingType::Both),
 	m_folderColumns(folderColumns)
 {
 	m_psdcdps = &SetDefaultColumnsDialogPersistentSettings::GetInstance();
@@ -29,8 +28,6 @@ SetDefaultColumnsDialog::SetDefaultColumnsDialog(HINSTANCE resourceInstance, HWN
 
 INT_PTR SetDefaultColumnsDialog::OnInitDialog()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
-
 	m_icon.reset(LoadIcon(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_MAIN)));
 	SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
 
