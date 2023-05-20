@@ -50,9 +50,6 @@ private:
 	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 1;
 	static const UINT WM_APP_SUBFOLDERS_RESULT_READY = WM_APP + 2;
 
-	// This is the same background color as used in the Explorer treeview.
-	static inline constexpr COLORREF TREE_VIEW_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
-
 	static const UINT DROP_EXPAND_TIMER_ID = 1;
 	static const UINT DROP_EXPAND_TIMER_ELAPSE = 800;
 

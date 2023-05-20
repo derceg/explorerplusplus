@@ -18,7 +18,7 @@
 #include "ShellTreeView.h"
 #include "Config.h"
 #include "CoreInterface.h"
-#include "DarkModeHelper.h"
+#include "DarkModeThemeManager.h"
 #include "ShellBrowser/ShellNavigator.h"
 #include "ShellTreeNode.h"
 #include "TabContainer.h"
@@ -60,23 +60,7 @@ ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabCont
 	m_shellChangeWatcher(GetHWND(),
 		std::bind_front(&ShellTreeView::ProcessShellChangeNotifications, this))
 {
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (DarkModeHelper::GetInstance().IsDarkModeEnabled())
-	{
-		darkModeHelper.AllowDarkModeForWindow(m_hTreeView, true);
-
-		TreeView_SetBkColor(m_hTreeView, TREE_VIEW_DARK_MODE_BACKGROUND_COLOR);
-		TreeView_SetTextColor(m_hTreeView, DarkModeHelper::TEXT_COLOR);
-
-		InvalidateRect(m_hTreeView, nullptr, TRUE);
-
-		HWND tooltips = TreeView_GetToolTips(m_hTreeView);
-		darkModeHelper.AllowDarkModeForWindow(tooltips, true);
-		SetWindowTheme(tooltips, L"Explorer", nullptr);
-	}
-
-	SetWindowTheme(m_hTreeView, L"Explorer", nullptr);
+	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hTreeView);
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hTreeView,
 		std::bind_front(&ShellTreeView::TreeViewProc, this)));
