@@ -12,7 +12,6 @@
 #include "Bookmarks/UI/BookmarksToolbar.h"
 #include "Bookmarks/UI/Views/BookmarksToolbarView.h"
 #include "Config.h"
-#include "DarkModeHelper.h"
 #include "DarkModeThemeManager.h"
 #include "DriveEnumeratorImpl.h"
 #include "DriveModel.h"
