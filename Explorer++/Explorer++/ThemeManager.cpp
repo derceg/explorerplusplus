@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "DarkModeThemeManager.h"
+#include "ThemeManager.h"
 #include "DarkModeButton.h"
 #include "DarkModeHelper.h"
 #include "Explorer++_internal.h"
@@ -14,13 +14,13 @@
 
 static const WCHAR DIALOG_CLASS_NAME[] = L"#32770";
 
-DarkModeThemeManager &DarkModeThemeManager::GetInstance()
+ThemeManager &ThemeManager::GetInstance()
 {
-	static DarkModeThemeManager themeManager;
+	static ThemeManager themeManager;
 	return themeManager;
 }
 
-void DarkModeThemeManager::ApplyThemeToWindowAndChildren(HWND topLevelWindow)
+void ThemeManager::ApplyThemeToWindowAndChildren(HWND topLevelWindow)
 {
 	ApplyThemeToWindow(topLevelWindow);
 	EnumChildWindows(topLevelWindow, ProcessChildWindow, 0);
@@ -36,7 +36,7 @@ void DarkModeThemeManager::ApplyThemeToWindowAndChildren(HWND topLevelWindow)
 	RedrawWindow(topLevelWindow, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN | RDW_ERASE);
 }
 
-BOOL CALLBACK DarkModeThemeManager::ProcessChildWindow(HWND hwnd, LPARAM lParam)
+BOOL CALLBACK ThemeManager::ProcessChildWindow(HWND hwnd, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -44,7 +44,7 @@ BOOL CALLBACK DarkModeThemeManager::ProcessChildWindow(HWND hwnd, LPARAM lParam)
 	return TRUE;
 }
 
-BOOL CALLBACK DarkModeThemeManager::ProcessThreadWindow(HWND hwnd, LPARAM lParam)
+BOOL CALLBACK ThemeManager::ProcessThreadWindow(HWND hwnd, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -67,7 +67,7 @@ BOOL CALLBACK DarkModeThemeManager::ProcessThreadWindow(HWND hwnd, LPARAM lParam
 	return TRUE;
 }
 
-void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
+void ThemeManager::ApplyThemeToWindow(HWND hwnd)
 {
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
 	bool enableDarkMode = darkModeHelper.IsDarkModeEnabled();
@@ -138,7 +138,7 @@ void DarkModeThemeManager::ApplyThemeToWindow(HWND hwnd)
 	}
 }
 
-void DarkModeThemeManager::ApplyThemeToMainWindow(HWND hwnd, bool enableDarkMode)
+void ThemeManager::ApplyThemeToMainWindow(HWND hwnd, bool enableDarkMode)
 {
 	BOOL dark = enableDarkMode;
 	DarkModeHelper::WINDOWCOMPOSITIONATTRIBDATA compositionData = {
@@ -147,7 +147,7 @@ void DarkModeThemeManager::ApplyThemeToMainWindow(HWND hwnd, bool enableDarkMode
 	DarkModeHelper::GetInstance().SetWindowCompositionAttribute(hwnd, &compositionData);
 }
 
-void DarkModeThemeManager::ApplyThemeToDialog(HWND hwnd, bool enableDarkMode)
+void ThemeManager::ApplyThemeToDialog(HWND hwnd, bool enableDarkMode)
 {
 	BOOL dark = enableDarkMode;
 	DarkModeHelper::WINDOWCOMPOSITIONATTRIBDATA compositionData = {
@@ -165,7 +165,7 @@ void DarkModeThemeManager::ApplyThemeToDialog(HWND hwnd, bool enableDarkMode)
 	}
 }
 
-void DarkModeThemeManager::ApplyThemeToListView(HWND hwnd, bool enableDarkMode)
+void ThemeManager::ApplyThemeToListView(HWND hwnd, bool enableDarkMode)
 {
 	if (enableDarkMode)
 	{
@@ -204,14 +204,14 @@ void DarkModeThemeManager::ApplyThemeToListView(HWND hwnd, bool enableDarkMode)
 	}
 }
 
-void DarkModeThemeManager::ApplyThemeToHeader(HWND hwnd, bool enableDarkMode)
+void ThemeManager::ApplyThemeToHeader(HWND hwnd, bool enableDarkMode)
 {
 	UNREFERENCED_PARAMETER(enableDarkMode);
 
 	SetWindowTheme(hwnd, L"ItemsView", nullptr);
 }
 
-void DarkModeThemeManager::ApplyThemeToTreeView(HWND hwnd, bool enableDarkMode)
+void ThemeManager::ApplyThemeToTreeView(HWND hwnd, bool enableDarkMode)
 {
 	// When in dark mode, this theme sets the following colors correctly:
 	//
@@ -244,7 +244,7 @@ void DarkModeThemeManager::ApplyThemeToTreeView(HWND hwnd, bool enableDarkMode)
 	TreeView_SetInsertMarkColor(hwnd, insertMarkColor);
 }
 
-void DarkModeThemeManager::ApplyThemeToRichEdit(HWND hwnd, bool enableDarkMode)
+void ThemeManager::ApplyThemeToRichEdit(HWND hwnd, bool enableDarkMode)
 {
 	COLORREF backgroundColor;
 	COLORREF textColor;
@@ -270,7 +270,7 @@ void DarkModeThemeManager::ApplyThemeToRichEdit(HWND hwnd, bool enableDarkMode)
 	SendMessage(hwnd, EM_SETCHARFORMAT, SCF_ALL, reinterpret_cast<LPARAM>(&charFormat));
 }
 
-void DarkModeThemeManager::ApplyThemeToRebar(HWND hwnd, bool enableDarkMode)
+void ThemeManager::ApplyThemeToRebar(HWND hwnd, bool enableDarkMode)
 {
 	if (enableDarkMode)
 	{
@@ -282,7 +282,7 @@ void DarkModeThemeManager::ApplyThemeToRebar(HWND hwnd, bool enableDarkMode)
 	}
 }
 
-void DarkModeThemeManager::ApplyThemeToToolbar(HWND hwnd, bool enableDarkMode)
+void ThemeManager::ApplyThemeToToolbar(HWND hwnd, bool enableDarkMode)
 {
 	COLORREF insertMarkColor;
 
@@ -319,7 +319,7 @@ void DarkModeThemeManager::ApplyThemeToToolbar(HWND hwnd, bool enableDarkMode)
 	}
 }
 
-void DarkModeThemeManager::ApplyThemeToComboBoxEx(HWND hwnd, bool enableDarkMode)
+void ThemeManager::ApplyThemeToComboBoxEx(HWND hwnd, bool enableDarkMode)
 {
 	if (enableDarkMode)
 	{
@@ -331,7 +331,7 @@ void DarkModeThemeManager::ApplyThemeToComboBoxEx(HWND hwnd, bool enableDarkMode
 	}
 }
 
-void DarkModeThemeManager::ApplyThemeToComboBox(HWND hwnd, bool enableDarkMode)
+void ThemeManager::ApplyThemeToComboBox(HWND hwnd, bool enableDarkMode)
 {
 	if (enableDarkMode)
 	{
@@ -357,7 +357,7 @@ void DarkModeThemeManager::ApplyThemeToComboBox(HWND hwnd, bool enableDarkMode)
 	}
 }
 
-void DarkModeThemeManager::ApplyThemeToButton(HWND hwnd, bool enableDarkMode)
+void ThemeManager::ApplyThemeToButton(HWND hwnd, bool enableDarkMode)
 {
 	SetWindowTheme(hwnd, L"Explorer", nullptr);
 
@@ -376,14 +376,14 @@ void DarkModeThemeManager::ApplyThemeToButton(HWND hwnd, bool enableDarkMode)
 	}
 }
 
-void DarkModeThemeManager::ApplyThemeToTooltips(HWND hwnd, bool enableDarkMode)
+void ThemeManager::ApplyThemeToTooltips(HWND hwnd, bool enableDarkMode)
 {
 	UNREFERENCED_PARAMETER(enableDarkMode);
 
 	SetWindowTheme(hwnd, L"Explorer", nullptr);
 }
 
-void DarkModeThemeManager::ApplyThemeToStatusBar(HWND hwnd, bool enableDarkMode)
+void ThemeManager::ApplyThemeToStatusBar(HWND hwnd, bool enableDarkMode)
 {
 	if (enableDarkMode)
 	{
@@ -397,8 +397,8 @@ void DarkModeThemeManager::ApplyThemeToStatusBar(HWND hwnd, bool enableDarkMode)
 	}
 }
 
-LRESULT CALLBACK DarkModeThemeManager::DialogSubclass(HWND hwnd, UINT msg, WPARAM wParam,
-	LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data)
+LRESULT CALLBACK ThemeManager::DialogSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR subclassId, DWORD_PTR data)
 {
 	UNREFERENCED_PARAMETER(data);
 
@@ -440,7 +440,7 @@ LRESULT CALLBACK DarkModeThemeManager::DialogSubclass(HWND hwnd, UINT msg, WPARA
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK DarkModeThemeManager::ToolbarParentSubclass(HWND hwnd, UINT msg, WPARAM wParam,
+LRESULT CALLBACK ThemeManager::ToolbarParentSubclass(HWND hwnd, UINT msg, WPARAM wParam,
 	LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data)
 {
 	UNREFERENCED_PARAMETER(data);
@@ -470,7 +470,7 @@ LRESULT CALLBACK DarkModeThemeManager::ToolbarParentSubclass(HWND hwnd, UINT msg
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT DarkModeThemeManager::OnCustomDraw(NMCUSTOMDRAW *customDraw)
+LRESULT ThemeManager::OnCustomDraw(NMCUSTOMDRAW *customDraw)
 {
 	WCHAR className[256];
 	auto res =
@@ -494,7 +494,7 @@ LRESULT DarkModeThemeManager::OnCustomDraw(NMCUSTOMDRAW *customDraw)
 	return CDRF_DODEFAULT;
 }
 
-LRESULT DarkModeThemeManager::OnButtonCustomDraw(NMCUSTOMDRAW *customDraw)
+LRESULT ThemeManager::OnButtonCustomDraw(NMCUSTOMDRAW *customDraw)
 {
 	switch (customDraw->dwDrawStage)
 	{
@@ -532,7 +532,7 @@ LRESULT DarkModeThemeManager::OnButtonCustomDraw(NMCUSTOMDRAW *customDraw)
 	return CDRF_DODEFAULT;
 }
 
-LRESULT DarkModeThemeManager::OnToolbarCustomDraw(NMTBCUSTOMDRAW *customDraw)
+LRESULT ThemeManager::OnToolbarCustomDraw(NMTBCUSTOMDRAW *customDraw)
 {
 	switch (customDraw->nmcd.dwDrawStage)
 	{
@@ -548,8 +548,8 @@ LRESULT DarkModeThemeManager::OnToolbarCustomDraw(NMTBCUSTOMDRAW *customDraw)
 	return CDRF_DODEFAULT;
 }
 
-LRESULT CALLBACK DarkModeThemeManager::ComboBoxExSubclass(HWND hwnd, UINT msg, WPARAM wParam,
-	LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data)
+LRESULT CALLBACK ThemeManager::ComboBoxExSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR subclassId, DWORD_PTR data)
 {
 	UNREFERENCED_PARAMETER(data);
 
@@ -575,7 +575,7 @@ LRESULT CALLBACK DarkModeThemeManager::ComboBoxExSubclass(HWND hwnd, UINT msg, W
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-HBRUSH DarkModeThemeManager::GetComboBoxExBackgroundBrush()
+HBRUSH ThemeManager::GetComboBoxExBackgroundBrush()
 {
 	static wil::unique_hbrush backgroundBrush;
 
@@ -587,8 +587,8 @@ HBRUSH DarkModeThemeManager::GetComboBoxExBackgroundBrush()
 	return backgroundBrush.get();
 }
 
-LRESULT CALLBACK DarkModeThemeManager::ListViewSubclass(HWND hwnd, UINT msg, WPARAM wParam,
-	LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data)
+LRESULT CALLBACK ThemeManager::ListViewSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR subclassId, DWORD_PTR data)
 {
 	UNREFERENCED_PARAMETER(data);
 
@@ -626,8 +626,8 @@ LRESULT CALLBACK DarkModeThemeManager::ListViewSubclass(HWND hwnd, UINT msg, WPA
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK DarkModeThemeManager::RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam,
-	LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data)
+LRESULT CALLBACK ThemeManager::RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR subclassId, DWORD_PTR data)
 {
 	UNREFERENCED_PARAMETER(data);
 
@@ -656,8 +656,8 @@ LRESULT CALLBACK DarkModeThemeManager::RebarSubclass(HWND hwnd, UINT msg, WPARAM
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK DarkModeThemeManager::GroupBoxSubclass(HWND hwnd, UINT msg, WPARAM wParam,
-	LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data)
+LRESULT CALLBACK ThemeManager::GroupBoxSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR subclassId, DWORD_PTR data)
 {
 	UNREFERENCED_PARAMETER(data);
 

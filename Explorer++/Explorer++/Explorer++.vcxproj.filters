@@ -541,7 +541,7 @@
     <ClCompile Include="SearchTabsDialog.cpp">
       <Filter>General Dialogs</Filter>
     </ClCompile>
-    <ClCompile Include="DarkModeThemeManager.cpp">
+    <ClCompile Include="ThemeManager.cpp">
       <Filter>Dark Mode Support</Filter>
     </ClCompile>
     <ClCompile Include="ThemedDialog.cpp">
@@ -1101,7 +1101,7 @@
     <ClInclude Include="SearchTabsDialog.h">
       <Filter>General Dialogs</Filter>
     </ClInclude>
-    <ClInclude Include="DarkModeThemeManager.h">
+    <ClInclude Include="ThemeManager.h">
       <Filter>Dark Mode Support</Filter>
     </ClInclude>
     <ClInclude Include="ThemedDialog.h">

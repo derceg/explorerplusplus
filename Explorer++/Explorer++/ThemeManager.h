@@ -6,10 +6,10 @@
 
 // Based on
 // https://github.com/TortoiseGit/TortoiseGit/blob/2419d47129410d0aa371929d674bf21122c0b581/src/Utils/Theme.cpp.
-class DarkModeThemeManager
+class ThemeManager
 {
 public:
-	static DarkModeThemeManager &GetInstance();
+	static ThemeManager &GetInstance();
 
 	void ApplyThemeToWindowAndChildren(HWND topLevelWindow);
 	static void ApplyThemeToWindow(HWND hwnd);
@@ -20,7 +20,7 @@ private:
 	// This is the same background color as used in the Explorer address bar.
 	static inline constexpr COLORREF COMBO_BOX_EX_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
 
-	DarkModeThemeManager() = default;
+	ThemeManager() = default;
 
 	static BOOL CALLBACK ProcessChildWindow(HWND hwnd, LPARAM lParam);
 	static BOOL CALLBACK ProcessThreadWindow(HWND hwnd, LPARAM lParam);

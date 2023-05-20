@@ -8,7 +8,6 @@
 #include "ColorRuleModelFactory.h"
 #include "Config.h"
 #include "CoreInterface.h"
-#include "DarkModeThemeManager.h"
 #include "FolderView.h"
 #include "ItemData.h"
 #include "MainResource.h"
@@ -17,6 +16,7 @@
 #include "ServiceProvider.h"
 #include "ShellNavigationController.h"
 #include "SortModes.h"
+#include "ThemeManager.h"
 #include "ViewModeHelper.h"
 #include "ViewModes.h"
 #include "../Helper/Controls.h"
@@ -194,7 +194,7 @@ void ShellBrowser::InitializeListView()
 	m_connections.push_back(m_config->globalFolderSettings.oneClickActivateHoverTime.addObserver(
 		std::bind_front(&ShellBrowser::OnOneClickActivateHoverTimeUpdated, this)));
 
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hListView);
+	ThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hListView);
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hListView,
 		std::bind_front(&ShellBrowser::ListViewProc, this)));

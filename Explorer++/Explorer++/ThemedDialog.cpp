@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "ThemedDialog.h"
-#include "DarkModeThemeManager.h"
+#include "ThemeManager.h"
 
 ThemedDialog::ThemedDialog(HINSTANCE resourceInstance, int dialogResourceId, HWND parent,
 	DialogSizingType dialogSizingType) :
@@ -14,5 +14,5 @@ ThemedDialog::ThemedDialog(HINSTANCE resourceInstance, int dialogResourceId, HWN
 
 void ThemedDialog::OnInitDialogBase()
 {
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
+	ThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
 }

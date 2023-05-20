@@ -11,7 +11,6 @@
 #include "ColorRuleModelFactory.h"
 #include "Config.h"
 #include "DarkModeHelper.h"
-#include "DarkModeThemeManager.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"
 #include "LoadSaveInterface.h"
@@ -26,6 +25,7 @@
 #include "Tab.h"
 #include "TabContainer.h"
 #include "TaskbarThumbnails.h"
+#include "ThemeManager.h"
 #include "UiTheming.h"
 #include "ViewModeHelper.h"
 #include "../Helper/CustomGripper.h"
@@ -115,7 +115,7 @@ void Explorerplusplus::OnCreate()
 
 	InitializePlugins();
 
-	DarkModeThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hContainer);
+	ThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hContainer);
 
 	SetTimer(m_hContainer, AUTOSAVE_TIMER_ID, AUTOSAVE_TIMEOUT, nullptr);
 

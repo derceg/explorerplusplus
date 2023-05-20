@@ -748,7 +748,7 @@
     <ClCompile Include="ColorRuleRegistryStorage.cpp" />
     <ClCompile Include="ColorRuleXmlStorage.cpp" />
     <ClCompile Include="CrashHandlerHelper.cpp" />
-    <ClCompile Include="DarkModeThemeManager.cpp" />
+    <ClCompile Include="ThemeManager.cpp" />
     <ClCompile Include="DefaultSettingsOptionsPage.cpp" />
     <ClCompile Include="DriveEnumeratorImpl.cpp" />
     <ClCompile Include="DriveModel.cpp" />
@@ -956,7 +956,7 @@
     <ClInclude Include="ColorRuleRegistryStorage.h" />
     <ClInclude Include="ColorRuleXmlStorage.h" />
     <ClInclude Include="CrashHandlerHelper.h" />
-    <ClInclude Include="DarkModeThemeManager.h" />
+    <ClInclude Include="ThemeManager.h" />
     <ClInclude Include="DefaultSettingsOptionsPage.h" />
     <ClInclude Include="DialogHelper.h" />
     <ClInclude Include="DriveEnumerator.h" />
