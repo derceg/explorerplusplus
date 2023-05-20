@@ -45,7 +45,7 @@ struct Config
 
 	DWORD language = LANG_ENGLISH;
 	IconSet iconSet = IconSet::Color;
-	Theme theme = Theme::Light;
+	ValueWrapper<Theme> theme = Theme::Light;
 	StartupMode startupMode = StartupMode::PreviousTabs;
 	std::wstring defaultTabDirectory = GetComputerFolderPath();
 	const std::wstring defaultTabDirectoryStatic = GetComputerFolderPath();

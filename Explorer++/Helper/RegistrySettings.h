@@ -13,6 +13,8 @@ namespace RegistrySettings
 {
 
 LSTATUS SaveDword(HKEY key, const std::wstring &valueName, DWORD value);
+LSTATUS ReadDword(HKEY key, const std::wstring &subKey, const std::wstring &valueName,
+	DWORD &output);
 LSTATUS ReadDword(HKEY key, const std::wstring &valueName, DWORD &output);
 void ReadDword(HKEY key, const std::wstring &valueName,
 	std::function<void(DWORD value)> successCallback);

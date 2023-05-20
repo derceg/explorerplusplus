@@ -30,8 +30,6 @@ std::unique_ptr<ResizableDialogHelper> AppearanceOptionsPage::InitializeResizeDi
 		MovingType::Horizontal, SizingType::None);
 	controls.emplace_back(GetDlgItem(GetDialog(), IDC_OPTIONS_THEME), MovingType::None,
 		SizingType::Horizontal);
-	controls.emplace_back(GetDlgItem(GetDialog(), IDC_STATIC_RESTART_FOOTNOTE_2),
-		MovingType::Horizontal, SizingType::None);
 	controls.emplace_back(GetDlgItem(GetDialog(), IDC_STATIC_RESTART_NOTICE), MovingType::None,
 		SizingType::Horizontal);
 	return std::make_unique<ResizableDialogHelper>(GetDialog(), controls);
@@ -79,7 +77,8 @@ void AppearanceOptionsPage::InitializeControls()
 		themeItems.emplace_back(theme, GetThemeText(theme, m_resourceInstance));
 	}
 
-	AddItemsToComboBox(GetDlgItem(GetDialog(), IDC_OPTIONS_THEME), themeItems, m_config->theme);
+	AddItemsToComboBox(GetDlgItem(GetDialog(), IDC_OPTIONS_THEME), themeItems,
+		m_config->theme.get());
 }
 
 std::wstring GetIconSetText(IconSet iconSet, HINSTANCE resourceInstance)

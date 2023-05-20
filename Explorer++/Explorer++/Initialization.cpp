@@ -26,6 +26,7 @@
 #include "TabContainer.h"
 #include "TaskbarThumbnails.h"
 #include "ThemeManager.h"
+#include "ThemeWindowTracker.h"
 #include "UiTheming.h"
 #include "ViewModeHelper.h"
 #include "../Helper/CustomGripper.h"
@@ -51,10 +52,8 @@ void Explorerplusplus::OnCreate()
 
 	SetLanguageModule();
 
-	if (ShouldEnableDarkMode(m_config->theme))
-	{
-		DarkModeHelper::GetInstance().EnableForApp();
-	}
+	DarkModeHelper::GetInstance().EnableForApp(ShouldEnableDarkMode(m_config->theme.get()));
+	m_config->theme.addObserver(std::bind_front(&Explorerplusplus::OnThemeUpdated, this));
 
 	m_bookmarksMainMenu = std::make_unique<BookmarksMainMenu>(this, this, &m_bookmarkIconFetcher,
 		BookmarkTreeFactory::GetInstance()->GetBookmarkTree(),
@@ -115,7 +114,7 @@ void Explorerplusplus::OnCreate()
 
 	InitializePlugins();
 
-	ThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hContainer);
+	m_themeWindowTracker = std::make_unique<ThemeWindowTracker>(m_hContainer);
 
 	SetTimer(m_hContainer, AUTOSAVE_TIMER_ID, AUTOSAVE_TIMEOUT, nullptr);
 
@@ -189,5 +188,5 @@ void Explorerplusplus::AddViewModesToMenu(HMENU menu, UINT startPosition, BOOL b
 bool Explorerplusplus::ShouldEnableDarkMode(Theme theme)
 {
 	return theme == +Theme::Dark
-		|| (theme == +Theme::System && DarkModeHelper::GetInstance().ShouldAppsUseDarkMode());
+		|| (theme == +Theme::System && !DarkModeHelper::GetInstance().IsSystemAppModeLight());
 }

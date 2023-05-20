@@ -31,13 +31,14 @@ LSTATUS SaveDword(HKEY key, const std::wstring &valueName, DWORD value)
 //
 // Since using an output parameter makes the first case simpler and also works for the second case,
 // that's what's used here.
-LSTATUS ReadDword(HKEY key, const std::wstring &valueName, DWORD &output)
+LSTATUS ReadDword(HKEY key, const std::wstring &subKey, const std::wstring &valueName,
+	DWORD &output)
 {
 	DWORD value;
 	DWORD size = sizeof(DWORD);
 
-	LSTATUS res =
-		RegGetValue(key, nullptr, valueName.c_str(), RRF_RT_REG_DWORD, nullptr, &value, &size);
+	LSTATUS res = RegGetValue(key, subKey.c_str(), valueName.c_str(), RRF_RT_REG_DWORD, nullptr,
+		&value, &size);
 
 	if (res != ERROR_SUCCESS)
 	{
@@ -47,6 +48,11 @@ LSTATUS ReadDword(HKEY key, const std::wstring &valueName, DWORD &output)
 	output = value;
 
 	return res;
+}
+
+LSTATUS ReadDword(HKEY key, const std::wstring &valueName, DWORD &output)
+{
+	return ReadDword(key, L"", valueName, output);
 }
 
 void ReadDword(HKEY key, const std::wstring &valueName,

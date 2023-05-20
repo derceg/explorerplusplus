@@ -173,7 +173,7 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 			m_config->checkPinnedToNamespaceTreeProperty);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowQuickAccessInTreeView"),
 			m_config->showQuickAccessInTreeView.get());
-		RegistrySettings::SaveDword(hSettingsKey, _T("Theme"), m_config->theme);
+		RegistrySettings::SaveDword(hSettingsKey, _T("Theme"), m_config->theme.get());
 
 		RegistrySettings::SaveString(hSettingsKey, _T("NewTabDirectory"),
 			m_config->defaultTabDirectory);

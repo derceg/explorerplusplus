@@ -463,6 +463,7 @@
     <ClCompile Include="CustomGripper.cpp" />
     <ClCompile Include="DataExchangeHelper.cpp" />
     <ClCompile Include="DataObjectWrapper.cpp" />
+    <ClCompile Include="DetoursHelper.cpp" />
     <ClCompile Include="DialogSettings.cpp" />
     <ClCompile Include="DpiCompatibility.cpp" />
     <ClCompile Include="DragDropHelper.cpp" />
@@ -539,6 +540,7 @@
     <ClInclude Include="CustomGripper.h" />
     <ClInclude Include="DataExchangeHelper.h" />
     <ClInclude Include="DataObjectWrapper.h" />
+    <ClInclude Include="DetoursHelper.h" />
     <ClInclude Include="DialogSettings.h" />
     <ClInclude Include="DisableUnaligned.h" />
     <ClInclude Include="DpiCompatibility.h" />

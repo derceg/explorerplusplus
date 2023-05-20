@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ThemedDialog.h"
 #include "ThemeManager.h"
+#include "ThemeWindowTracker.h"
 
 ThemedDialog::ThemedDialog(HINSTANCE resourceInstance, int dialogResourceId, HWND parent,
 	DialogSizingType dialogSizingType) :
@@ -12,7 +13,9 @@ ThemedDialog::ThemedDialog(HINSTANCE resourceInstance, int dialogResourceId, HWN
 {
 }
 
+ThemedDialog::~ThemedDialog() = default;
+
 void ThemedDialog::OnInitDialogBase()
 {
-	ThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hDlg);
+	m_themeWindowTracker = std::make_unique<ThemeWindowTracker>(m_hDlg);
 }

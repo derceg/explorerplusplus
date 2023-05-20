@@ -283,6 +283,10 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM w
 		}
 		break;
 
+	case WM_SETTINGCHANGE:
+		OnSettingChange(reinterpret_cast<const WCHAR *>(lParam));
+		break;
+
 	case WM_CLOSE:
 		return CloseApplication();
 

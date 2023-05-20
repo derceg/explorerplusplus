@@ -6,12 +6,17 @@
 
 #include "../Helper/BaseDialog.h"
 
+class ThemeWindowTracker;
+
 class ThemedDialog : public BaseDialog
 {
 public:
 	ThemedDialog(HINSTANCE resourceInstance, int dialogResourceId, HWND parent,
 		DialogSizingType dialogSizingType);
+	~ThemedDialog();
 
 private:
 	void OnInitDialogBase() override final;
+
+	std::unique_ptr<ThemeWindowTracker> m_themeWindowTracker;
 };

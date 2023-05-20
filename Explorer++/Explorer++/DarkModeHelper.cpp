@@ -4,6 +4,8 @@
 
 #include "stdafx.h"
 #include "DarkModeHelper.h"
+#include "../Helper/DetoursHelper.h"
+#include "../Helper/RegistrySettings.h"
 #include <wil/common.h>
 #include <detours/detours.h>
 
@@ -58,8 +60,6 @@ DarkModeHelper::DarkModeHelper() : m_darkModeSupported(false), m_darkModeEnabled
 			GetProcAddress(m_uxThemeLib.get(), MAKEINTRESOURCEA(135)));
 	}
 
-	m_ShouldAppsUseDarkMode = reinterpret_cast<ShouldAppsUseDarkModeType>(
-		GetProcAddress(m_uxThemeLib.get(), MAKEINTRESOURCEA(132)));
 	m_FlushMenuThemes = reinterpret_cast<FlushMenuThemesType>(
 		GetProcAddress(m_uxThemeLib.get(), MAKEINTRESOURCEA(136)));
 	m_RefreshImmersiveColorPolicyState = reinterpret_cast<RefreshImmersiveColorPolicyStateType>(
@@ -85,14 +85,14 @@ bool DarkModeHelper::IsDarkModeEnabled() const
 	return m_darkModeEnabled;
 }
 
-void DarkModeHelper::EnableForApp()
+void DarkModeHelper::EnableForApp(bool enable)
 {
-	if (!m_darkModeSupported || IsHighContrast())
+	if (!m_darkModeSupported || IsHighContrast() || enable == m_darkModeEnabled)
 	{
 		return;
 	}
 
-	if (m_isWindows10Version1809 && !m_ShouldAppsUseDarkMode())
+	if (m_isWindows10Version1809 && IsSystemAppModeLight() && enable)
 	{
 		// SetPreferredAppMode() was added in Windows 10 1903. That method allows dark mode to be
 		// force enabled for an application, regardless of any system settings. In Windows 10 1809,
@@ -108,14 +108,26 @@ void DarkModeHelper::EnableForApp()
 		return;
 	}
 
-	AllowDarkModeForApp(true);
+	AllowDarkModeForApp(enable);
 	FlushMenuThemes();
 	RefreshImmersiveColorPolicyState();
 
-	[[maybe_unused]] LONG res = DetourOpenNcThemeData();
+	[[maybe_unused]] LONG res;
+
+	if (enable)
+	{
+		res = DetourOpenNcThemeData();
+	}
+	else
+	{
+		res = RestoreOpenNcThemeData();
+	}
+
 	assert(res == NO_ERROR);
 
-	m_darkModeEnabled = true;
+	m_darkModeEnabled = enable;
+
+	darkModeStatusChanged.m_signal(enable);
 }
 
 void DarkModeHelper::AllowDarkModeForApp(bool allow)
@@ -138,14 +150,28 @@ void DarkModeHelper::AllowDarkModeForWindow(HWND hWnd, bool allow)
 	}
 }
 
-bool DarkModeHelper::ShouldAppsUseDarkMode()
+// Note that uxtheme.dll!ShouldAppsUseDarkMode() doesn't just return the system setting. It also
+// checks whether the current app mode is set to ForceLight (in which case it will return false) or
+// ForceDark (in which case it will return true). That's the reason this function exists. It will
+// always return the value of the system setting, independently of whatever app mode is currently
+// set.
+// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=549713 for some further information about the
+// registry key used here.
+bool DarkModeHelper::IsSystemAppModeLight()
 {
-	if (!m_ShouldAppsUseDarkMode)
+	bool lightMode = true;
+
+	DWORD value;
+	LSTATUS result = RegistrySettings::ReadDword(HKEY_CURRENT_USER,
+		L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", L"AppsUseLightTheme",
+		value);
+
+	if (result == ERROR_SUCCESS)
 	{
-		return false;
+		lightMode = value;
 	}
 
-	return m_ShouldAppsUseDarkMode();
+	return lightMode;
 }
 
 void DarkModeHelper::FlushMenuThemes()
@@ -166,35 +192,14 @@ void DarkModeHelper::RefreshImmersiveColorPolicyState()
 
 LONG DarkModeHelper::DetourOpenNcThemeData()
 {
-	LONG res = DetourTransactionBegin();
+	return DetourTransaction(
+		[] { return DetourAttach(&(PVOID &) m_OpenNcThemeData, DetouredOpenNcThemeData); });
+}
 
-	if (res != NO_ERROR)
-	{
-		return res;
-	}
-
-	res = DetourUpdateThread(GetCurrentThread());
-
-	if (res != NO_ERROR)
-	{
-		return res;
-	}
-
-	res = DetourAttach(&(PVOID &) m_OpenNcThemeData, DetouredOpenNcThemeData);
-
-	if (res != NO_ERROR)
-	{
-		return res;
-	}
-
-	res = DetourTransactionCommit();
-
-	if (res != NO_ERROR)
-	{
-		return res;
-	}
-
-	return res;
+LONG DarkModeHelper::RestoreOpenNcThemeData()
+{
+	return DetourTransaction(
+		[] { return DetourDetach(&(PVOID &) m_OpenNcThemeData, DetouredOpenNcThemeData); });
 }
 
 HTHEME WINAPI DarkModeHelper::DetouredOpenNcThemeData(HWND hwnd, LPCWSTR classList)

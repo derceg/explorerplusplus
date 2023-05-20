@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "SignalWrapper.h"
 #include <wil/resource.h>
 
 // Based on the code contained within:
@@ -74,16 +75,15 @@ public:
 	bool IsDarkModeSupported() const;
 	bool IsDarkModeEnabled() const;
 
-	void EnableForApp();
+	void EnableForApp(bool enable);
 
-	void AllowDarkModeForApp(bool allow);
-	bool ShouldAppsUseDarkMode();
-	void FlushMenuThemes();
-	void RefreshImmersiveColorPolicyState();
+	bool IsSystemAppModeLight();
 	void AllowDarkModeForWindow(HWND hWnd, bool allow);
 	void SetWindowCompositionAttribute(HWND hWnd, WINDOWCOMPOSITIONATTRIBDATA *data);
 
 	HBRUSH GetBackgroundBrush();
+
+	SignalWrapper<DarkModeHelper, void(bool darkModeEnabled)> darkModeStatusChanged;
 
 private:
 	static inline const DWORD BUILD_NUMBER_1809 = 17763;
@@ -96,7 +96,6 @@ private:
 
 	// Windows 10 1809
 	using AllowDarkModeForAppType = bool(WINAPI *)(bool allow);
-	using ShouldAppsUseDarkModeType = bool(WINAPI *)();
 	using FlushMenuThemesType = void(WINAPI *)();
 	using RefreshImmersiveColorPolicyStateType = void(WINAPI *)();
 	using AllowDarkModeForWindowType = bool(WINAPI *)(HWND hWnd, bool allow);
@@ -107,14 +106,18 @@ private:
 
 	DarkModeHelper();
 
+	void AllowDarkModeForApp(bool allow);
+	void FlushMenuThemes();
+	void RefreshImmersiveColorPolicyState();
+
 	static bool IsHighContrast();
 
 	LONG DetourOpenNcThemeData();
+	LONG RestoreOpenNcThemeData();
 	static HTHEME WINAPI DetouredOpenNcThemeData(HWND hwnd, LPCWSTR classList);
 
 	// Windows 10 1809
 	AllowDarkModeForAppType m_AllowDarkModeForApp = nullptr;
-	ShouldAppsUseDarkModeType m_ShouldAppsUseDarkMode = nullptr;
 	FlushMenuThemesType m_FlushMenuThemes = nullptr;
 	RefreshImmersiveColorPolicyStateType m_RefreshImmersiveColorPolicyState = nullptr;
 	AllowDarkModeForWindowType m_AllowDarkModeForWindow = nullptr;

@@ -12,6 +12,7 @@
 #include "MenuRanges.h"
 #include "Plugins/PluginManager.h"
 #include "TabRestorerUI.h"
+#include "ThemeWindowTracker.h"
 #include "UiTheming.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include "../Helper/iDirectoryMonitor.h"

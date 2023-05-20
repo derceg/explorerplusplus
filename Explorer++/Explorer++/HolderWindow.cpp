@@ -31,7 +31,6 @@ HolderWindow::HolderWindow(HWND hHolder)
 ATOM RegisterHolderWindowClass()
 {
 	WNDCLASS wc;
-
 	wc.style = 0;
 	wc.lpfnWndProc = HolderWndProcStub;
 	wc.cbClsExtra = 0;
@@ -39,18 +38,7 @@ ATOM RegisterHolderWindowClass()
 	wc.hInstance = GetModuleHandle(nullptr);
 	wc.hIcon = nullptr;
 	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (darkModeHelper.IsDarkModeEnabled())
-	{
-		wc.hbrBackground = darkModeHelper.GetBackgroundBrush();
-	}
-	else
-	{
-		wc.hbrBackground = GetSysColorBrush(COLOR_BTNFACE);
-	}
-
+	wc.hbrBackground = nullptr;
 	wc.lpszMenuName = nullptr;
 	wc.lpszClassName = HOLDER_CLASS_NAME;
 
@@ -106,12 +94,35 @@ LRESULT CALLBACK HolderWindow::HolderWndProc(HWND hwnd, UINT msg, WPARAM wParam,
 	case WM_MOUSEMOVE:
 		return OnHolderWindowMouseMove(lParam);
 
+	case WM_ERASEBKGND:
+		OnEraseBackground(reinterpret_cast<HDC>(wParam));
+		return 1;
+
 	case WM_PAINT:
 		OnHolderWindowPaint(hwnd);
 		break;
 	}
 
 	return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+void HolderWindow::OnEraseBackground(HDC hdc)
+{
+	auto &darkModeHelper = DarkModeHelper::GetInstance();
+	HBRUSH brush;
+
+	if (darkModeHelper.IsDarkModeEnabled())
+	{
+		brush = darkModeHelper.GetBackgroundBrush();
+	}
+	else
+	{
+		brush = GetSysColorBrush(COLOR_BTNFACE);
+	}
+
+	RECT rc;
+	GetClientRect(m_hHolder, &rc);
+	FillRect(hdc, &rc, brush);
 }
 
 /*

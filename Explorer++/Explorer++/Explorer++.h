@@ -54,6 +54,7 @@ class TabRestorer;
 class TabRestorerUI;
 struct TabSettings;
 class TaskbarThumbnails;
+class ThemeWindowTracker;
 class UiTheming;
 class WindowSubclassWrapper;
 
@@ -179,6 +180,7 @@ private:
 	BOOL OnSize(int MainWindowWidth, int MainWindowHeight);
 	void OnDpiChanged(const RECT *updatedWindowRect);
 	std::optional<LRESULT> OnCtlColorStatic(HWND hwnd, HDC hdc);
+	void OnSettingChange(const WCHAR *systemParameter);
 	int CloseApplication();
 	int OnDestroy();
 	void OnSetFocus();
@@ -521,6 +523,7 @@ private:
 
 	// Dark mode
 	static bool ShouldEnableDarkMode(Theme theme);
+	void OnThemeUpdated(Theme theme);
 
 	// Rebar
 	HMENU CreateRebarHistoryMenu(BOOL bBack);
@@ -600,6 +603,7 @@ private:
 	ToolbarContextMenuSelectedSignal m_toolbarContextMenuSelectedSignal;
 
 	/* Theming. */
+	std::unique_ptr<ThemeWindowTracker> m_themeWindowTracker;
 	std::unique_ptr<UiTheming> m_uiTheming;
 
 	/* Plugins. */

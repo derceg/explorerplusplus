@@ -12,6 +12,7 @@ public:
 	LRESULT CALLBACK HolderWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 private:
+	void OnEraseBackground(HDC hdc);
 	void OnHolderWindowPaint(HWND hwnd);
 	void OnHolderWindowLButtonDown(LPARAM lParam);
 	void OnHolderWindowLButtonUp();

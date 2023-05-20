@@ -20,10 +20,38 @@ ThemeManager &ThemeManager::GetInstance()
 	return themeManager;
 }
 
-void ThemeManager::ApplyThemeToWindowAndChildren(HWND topLevelWindow)
+ThemeManager::ThemeManager()
 {
-	ApplyThemeToWindow(topLevelWindow);
-	EnumChildWindows(topLevelWindow, ProcessChildWindow, 0);
+	m_connections.push_back(DarkModeHelper::GetInstance().darkModeStatusChanged.AddObserver(
+		std::bind(&ThemeManager::OnDarkModeStatusChanged, this)));
+}
+
+void ThemeManager::OnDarkModeStatusChanged()
+{
+	for (HWND hwnd : m_trackedTopLevelWindows)
+	{
+		ApplyThemeToWindowAndChildren(hwnd);
+	}
+}
+
+void ThemeManager::TrackTopLevelWindow(HWND hwnd)
+{
+	ApplyThemeToWindowAndChildren(hwnd);
+
+	[[maybe_unused]] auto insertionResult = m_trackedTopLevelWindows.insert(hwnd);
+	assert(insertionResult.second);
+}
+
+void ThemeManager::UntrackTopLevelWindow(HWND hwnd)
+{
+	[[maybe_unused]] auto numErased = m_trackedTopLevelWindows.erase(hwnd);
+	assert(numErased == 1);
+}
+
+void ThemeManager::ApplyThemeToWindowAndChildren(HWND hwnd)
+{
+	ApplyThemeToWindow(hwnd);
+	EnumChildWindows(hwnd, ProcessChildWindow, 0);
 
 	// Tooltip windows won't be enumerated by EnumChildWindows(). They will, however, be enumerated
 	// by EnumThreadWindows(), which is why that's called here.
@@ -33,7 +61,7 @@ void ThemeManager::ApplyThemeToWindowAndChildren(HWND topLevelWindow)
 	// EnumThreadWindows().
 	EnumThreadWindows(GetCurrentThreadId(), ProcessThreadWindow, 0);
 
-	RedrawWindow(topLevelWindow, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN | RDW_ERASE);
+	RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN | RDW_ERASE);
 }
 
 BOOL CALLBACK ThemeManager::ProcessChildWindow(HWND hwnd, LPARAM lParam)
@@ -98,7 +126,7 @@ void ThemeManager::ApplyThemeToWindow(HWND hwnd)
 	}
 	else if (lstrcmp(className, WC_HEADER) == 0)
 	{
-		ApplyThemeToHeader(hwnd, enableDarkMode);
+		ApplyThemeToHeader(hwnd);
 	}
 	else if (lstrcmp(className, WC_TREEVIEW) == 0)
 	{
@@ -122,7 +150,7 @@ void ThemeManager::ApplyThemeToWindow(HWND hwnd)
 	}
 	else if (lstrcmp(className, WC_COMBOBOX) == 0)
 	{
-		ApplyThemeToComboBox(hwnd, enableDarkMode);
+		ApplyThemeToComboBox(hwnd);
 	}
 	else if (lstrcmp(className, WC_BUTTON) == 0)
 	{
@@ -130,7 +158,7 @@ void ThemeManager::ApplyThemeToWindow(HWND hwnd)
 	}
 	else if (lstrcmp(className, TOOLTIPS_CLASS) == 0)
 	{
-		ApplyThemeToTooltips(hwnd, enableDarkMode);
+		ApplyThemeToTooltips(hwnd);
 	}
 	else if (lstrcmp(className, STATUSCLASSNAME) == 0)
 	{
@@ -204,10 +232,8 @@ void ThemeManager::ApplyThemeToListView(HWND hwnd, bool enableDarkMode)
 	}
 }
 
-void ThemeManager::ApplyThemeToHeader(HWND hwnd, bool enableDarkMode)
+void ThemeManager::ApplyThemeToHeader(HWND hwnd)
 {
-	UNREFERENCED_PARAMETER(enableDarkMode);
-
 	SetWindowTheme(hwnd, L"ItemsView", nullptr);
 }
 
@@ -331,25 +357,18 @@ void ThemeManager::ApplyThemeToComboBoxEx(HWND hwnd, bool enableDarkMode)
 	}
 }
 
-void ThemeManager::ApplyThemeToComboBox(HWND hwnd, bool enableDarkMode)
+void ThemeManager::ApplyThemeToComboBox(HWND hwnd)
 {
-	if (enableDarkMode)
+	HWND parent = GetParent(hwnd);
+	assert(parent);
+
+	WCHAR parentClassName[256];
+	auto parentClassNameResult =
+		GetClassName(parent, parentClassName, static_cast<int>(std::size(parentClassName)));
+
+	if (parentClassNameResult != 0 && lstrcmp(parentClassName, WC_COMBOBOXEX) == 0)
 	{
-		HWND parent = GetParent(hwnd);
-		assert(parent);
-
-		WCHAR parentClassName[256];
-		auto parentClassNameResult =
-			GetClassName(parent, parentClassName, static_cast<int>(std::size(parentClassName)));
-
-		if (parentClassNameResult != 0 && lstrcmp(parentClassName, WC_COMBOBOXEX) == 0)
-		{
-			SetWindowTheme(hwnd, L"AddressComposited", nullptr);
-		}
-		else
-		{
-			SetWindowTheme(hwnd, L"CFD", nullptr);
-		}
+		SetWindowTheme(hwnd, L"AddressComposited", nullptr);
 	}
 	else
 	{
@@ -376,10 +395,8 @@ void ThemeManager::ApplyThemeToButton(HWND hwnd, bool enableDarkMode)
 	}
 }
 
-void ThemeManager::ApplyThemeToTooltips(HWND hwnd, bool enableDarkMode)
+void ThemeManager::ApplyThemeToTooltips(HWND hwnd)
 {
-	UNREFERENCED_PARAMETER(enableDarkMode);
-
 	SetWindowTheme(hwnd, L"Explorer", nullptr);
 }
 

@@ -7,6 +7,7 @@
 #include "ApplicationCrashedDialog.h"
 #include "Explorer++_internal.h"
 #include "Version.h"
+#include "../Helper/DetoursHelper.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Logging.h"
 #include "../Helper/ProcessHelper.h"
@@ -91,36 +92,12 @@ LONG WINAPI TopLevelExceptionFilter(EXCEPTION_POINTERS *exception)
 
 LONG DisableSetUnhandledExceptionFilter()
 {
-	LONG res = DetourTransactionBegin();
-
-	if (res != NO_ERROR)
-	{
-		return res;
-	}
-
-	res = DetourUpdateThread(GetCurrentThread());
-
-	if (res != NO_ERROR)
-	{
-		return res;
-	}
-
-	res = DetourAttach(&(PVOID &) OriginalSetUnhandledExceptionFilter,
-		DetouredSetUnhandledExceptionFilter);
-
-	if (res != NO_ERROR)
-	{
-		return res;
-	}
-
-	res = DetourTransactionCommit();
-
-	if (res != NO_ERROR)
-	{
-		return res;
-	}
-
-	return res;
+	return DetourTransaction(
+		[]
+		{
+			return DetourAttach(&(PVOID &) OriginalSetUnhandledExceptionFilter,
+				DetouredSetUnhandledExceptionFilter);
+		});
 }
 
 LPTOP_LEVEL_EXCEPTION_FILTER WINAPI DetouredSetUnhandledExceptionFilter(

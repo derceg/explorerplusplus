@@ -618,6 +618,24 @@ std::optional<LRESULT> Explorerplusplus::OnCtlColorStatic(HWND hwnd, HDC hdc)
 	return std::nullopt;
 }
 
+void Explorerplusplus::OnSettingChange(const WCHAR *systemParameter)
+{
+	// The "ImmersiveColorSet" change notification will be sent when the user changes the dark mode
+	// setting in Windows (or one of the individual Windows mode/app mode settings). Changes to the
+	// Windows mode settings will be ignored, as the app mode setting is what's used to determine
+	// whether a light or dark theme is used.
+	if (lstrcmp(systemParameter, L"ImmersiveColorSet") == 0
+		&& m_config->theme.get() == +Theme::System)
+	{
+		DarkModeHelper::GetInstance().EnableForApp(ShouldEnableDarkMode(m_config->theme.get()));
+	}
+}
+
+void Explorerplusplus::OnThemeUpdated(Theme theme)
+{
+	DarkModeHelper::GetInstance().EnableForApp(ShouldEnableDarkMode(theme));
+}
+
 boost::signals2::connection Explorerplusplus::AddApplicationShuttingDownObserver(
 	const ApplicationShuttingDownSignal::slot_type &observer)
 {
