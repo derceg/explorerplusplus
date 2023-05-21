@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include "ThemeManager.h"
-
 // This class automatically tracks/untracks a window with the ThemeManager class. It should only be
 // used with top-level windows (e.g. the main window or a dialog).
 class ThemeWindowTracker

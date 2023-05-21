@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ThemeWindowTracker.h"
+#include "ThemeManager.h"
 
 ThemeWindowTracker::ThemeWindowTracker(HWND hwnd) : m_hwnd(hwnd)
 {
