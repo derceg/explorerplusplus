@@ -276,8 +276,6 @@ void AddressBar::UpdateTextAndIcon(const Tab &tab)
 			std::bind_front(&AddressBar::OnHistoryEntryUpdated, this));
 	}
 
-	SendMessage(m_hwnd, CB_RESETCONTENT, 0, 0);
-
 	UpdateTextAndIconInUI(&fullPathForDisplay, iconIndex);
 }
 
