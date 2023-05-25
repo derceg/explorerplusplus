@@ -47,12 +47,10 @@ ATOM RegisterHolderWindowClass()
 
 HWND CreateHolderWindow(HWND hParent, TCHAR *szWindowName, UINT uStyle)
 {
-	HWND hHolder;
-
 	RegisterHolderWindowClass();
 
-	hHolder = CreateWindowEx(0, HOLDER_CLASS_NAME, szWindowName, uStyle, 0, 0, 0, 0, hParent,
-		nullptr, GetModuleHandle(nullptr), nullptr);
+	HWND hHolder = CreateWindowEx(WS_EX_CONTROLPARENT, HOLDER_CLASS_NAME, szWindowName, uStyle, 0,
+		0, 0, 0, hParent, nullptr, GetModuleHandle(nullptr), nullptr);
 
 	return hHolder;
 }

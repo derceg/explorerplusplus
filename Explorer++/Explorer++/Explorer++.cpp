@@ -58,7 +58,7 @@ Explorerplusplus::Explorerplusplus(HWND hwnd, CommandLine::Settings *commandLine
 	m_hDisplayWindow = nullptr;
 	m_foldersToolbarParent = nullptr;
 	m_hFoldersToolbar = nullptr;
-	m_hLastActiveWindow = nullptr;
+	m_lastActiveWindow = nullptr;
 	m_hActiveListView = nullptr;
 	m_zDeltaTotal = 0;
 	m_InitializationFinished.set(false);

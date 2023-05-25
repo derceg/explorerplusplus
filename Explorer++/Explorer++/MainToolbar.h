@@ -91,7 +91,7 @@ private:
 
 	void OnTabSelected(const Tab &tab);
 	void OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams);
-	void OnFocusChanged(WindowFocusSource windowFocusSource);
+	void OnFocusChanged();
 
 	void UpdateToolbarButtonImageIndexes();
 

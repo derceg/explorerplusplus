@@ -587,8 +587,6 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 	window (its height will not change). */
 	MoveWindow(m_hMainRebar, 0, 0, MainWindowWidth, 0, FALSE);
 
-	SetFocus(m_hLastActiveWindow);
-
 	return TRUE;
 }
 
@@ -701,11 +699,6 @@ int Explorerplusplus::CloseApplication()
 	return 0;
 }
 
-void Explorerplusplus::OnSetFocus()
-{
-	SetFocus(m_hLastActiveWindow);
-}
-
 void Explorerplusplus::StartDirectoryMonitoringForTab(const Tab &tab)
 {
 	if (tab.GetShellBrowser()->InVirtualFolder())
@@ -774,83 +767,35 @@ void Explorerplusplus::OnToolbarViews()
 	selectedTab.GetShellBrowser()->CycleViewMode(true);
 }
 
-void Explorerplusplus::OnPreviousWindow()
+// This is used for both Tab/Shift+Tab and F6/Shift+F6. While IsDialogMessage() could be used to
+// handle Tab/Shift+Tab, the key combinations in this case are synonyms for each other. Since
+// F6/Shift+F6 would need to be handled manually anyway, handling both with the same function
+// ensures that they have identical behavior.
+void Explorerplusplus::OnFocusNextWindow(FocusChangeDirection direction)
 {
-	HWND hFocus = GetFocus();
+	HWND focus = GetFocus();
+	HWND initialControl;
 
-	if (hFocus == m_hActiveListView)
+	// The focus should always be on one of the child windows, but this function should still set
+	// the focus even if there is no current focus or the focus is on the parent.
+	// GetNextDlgTabItem() may fail if the initial control is NULL or the parent window, so that
+	// situation is prevented here.
+	if (focus && IsChild(m_hContainer, focus))
 	{
-		if (m_config->showFolders)
-		{
-			SetFocus(m_shellTreeView->GetHWND());
-		}
-		else
-		{
-			if (m_config->showAddressBar)
-			{
-				SetFocus(m_addressBar->GetHWND());
-			}
-		}
+		initialControl = focus;
 	}
-	else if (hFocus == m_shellTreeView->GetHWND())
+	else
 	{
-		if (m_config->showAddressBar)
-		{
-			SetFocus(m_addressBar->GetHWND());
-		}
-		else
-		{
-			/* Always shown. */
-			SetFocus(m_hActiveListView);
-		}
+		initialControl = GetWindow(m_hContainer, GW_CHILD);
 	}
-	else if (hFocus == (HWND) SendMessage(m_addressBar->GetHWND(), CBEM_GETEDITCONTROL, 0, 0))
-	{
-		/* Always shown. */
-		SetFocus(m_hActiveListView);
-	}
-}
 
-/*
- * Shifts focus to the next internal
- * window in the chain.
- */
-void Explorerplusplus::OnNextWindow()
-{
-	HWND hFocus = GetFocus();
+	HWND nextWindow = GetNextDlgTabItem(m_hContainer, initialControl,
+		direction == FocusChangeDirection::Previous);
+	assert(nextWindow);
 
-	/* Check if the next target window is visible.
-	If it is, select it, else select the next
-	window in the chain. */
-	if (hFocus == m_hActiveListView)
+	if (nextWindow)
 	{
-		if (m_config->showAddressBar)
-		{
-			SetFocus(m_addressBar->GetHWND());
-		}
-		else
-		{
-			if (m_config->showFolders)
-			{
-				SetFocus(m_shellTreeView->GetHWND());
-			}
-		}
-	}
-	else if (hFocus == m_shellTreeView->GetHWND())
-	{
-		/* Always shown. */
-		SetFocus(m_hActiveListView);
-	}
-	else if (hFocus == (HWND) SendMessage(m_addressBar->GetHWND(), CBEM_GETEDITCONTROL, 0, 0))
-	{
-		if (m_config->showFolders)
-		{
-			SetFocus(m_shellTreeView->GetHWND());
-		}
-		else
-		{
-			SetFocus(m_hActiveListView);
-		}
+		SetFocus(nextWindow);
 	}
 }
 
@@ -1308,24 +1253,9 @@ void Explorerplusplus::OnShowHiddenFiles()
 	tab.GetShellBrowser()->GetNavigationController()->Refresh();
 }
 
-void Explorerplusplus::FocusChanged(WindowFocusSource windowFocusSource)
+void Explorerplusplus::FocusChanged()
 {
-	switch (windowFocusSource)
-	{
-	case WindowFocusSource::AddressBar:
-		m_hLastActiveWindow = m_addressBar->GetHWND();
-		break;
-
-	case WindowFocusSource::TreeView:
-		m_hLastActiveWindow = m_shellTreeView->GetHWND();
-		break;
-
-	case WindowFocusSource::ListView:
-		m_hLastActiveWindow = m_hActiveListView;
-		break;
-	}
-
-	m_focusChangedSignal(windowFocusSource);
+	m_focusChangedSignal();
 }
 
 boost::signals2::connection Explorerplusplus::AddFocusChangeObserver(
@@ -1343,4 +1273,22 @@ void Explorerplusplus::FocusActiveTab()
 {
 	Tab &selectedTab = m_tabContainer->GetSelectedTab();
 	SetFocus(selectedTab.GetShellBrowser()->GetListView());
+}
+
+bool Explorerplusplus::OnActivate(int activationState, bool minimized)
+{
+	if (activationState == WA_INACTIVE)
+	{
+		m_lastActiveWindow = GetFocus();
+	}
+	else
+	{
+		if (!minimized && m_lastActiveWindow)
+		{
+			SetFocus(m_lastActiveWindow);
+			return true;
+		}
+	}
+
+	return false;
 }

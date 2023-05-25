@@ -54,7 +54,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 		break;
 
 	case WM_SETFOCUS:
-		FocusChanged(WindowFocusSource::ListView);
+		FocusChanged();
 		break;
 
 	case WM_CONTEXTMENU:

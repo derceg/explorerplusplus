@@ -95,9 +95,12 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM w
 		OnCreate();
 		break;
 
-	case WM_SETFOCUS:
-		OnSetFocus();
-		return 0;
+	case WM_ACTIVATE:
+		if (OnActivate(LOWORD(wParam), HIWORD(wParam)))
+		{
+			return 0;
+		}
+		break;
 
 	case WM_INITMENU:
 		OnInitMenu(reinterpret_cast<HMENU>(wParam));
@@ -1357,11 +1360,11 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDA_PREVIOUSWINDOW:
-		OnPreviousWindow();
+		OnFocusNextWindow(FocusChangeDirection::Previous);
 		break;
 
 	case IDA_NEXTWINDOW:
-		OnNextWindow();
+		OnFocusNextWindow(FocusChangeDirection::Next);
 		break;
 
 	case IDA_TAB_DUPLICATETAB:

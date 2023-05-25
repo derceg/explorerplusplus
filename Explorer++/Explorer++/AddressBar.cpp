@@ -90,7 +90,7 @@ LRESULT AddressBar::EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 		break;
 
 	case WM_SETFOCUS:
-		m_coreInterface->FocusChanged(WindowFocusSource::AddressBar);
+		m_coreInterface->FocusChanged();
 		break;
 
 	case WM_MOUSEWHEEL:

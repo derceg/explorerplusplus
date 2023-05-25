@@ -981,10 +981,8 @@ void MainToolbar::OnNavigationCommitted(const Tab &tab, const NavigateParams &na
 	}
 }
 
-void MainToolbar::OnFocusChanged(WindowFocusSource windowFocusSource)
+void MainToolbar::OnFocusChanged()
 {
-	UNREFERENCED_PARAMETER(windowFocusSource);
-
 	UpdateToolbarButtonStates();
 }
 

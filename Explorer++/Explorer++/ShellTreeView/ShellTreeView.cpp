@@ -87,8 +87,8 @@ ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabCont
 HWND ShellTreeView::CreateTreeView(HWND parent)
 {
 	return ::CreateTreeView(parent,
-		WS_CHILD | WS_VISIBLE | TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_EDITLABELS | TVS_HASLINES
-			| TVS_TRACKSELECT);
+		WS_CHILD | WS_VISIBLE | WS_TABSTOP | TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_EDITLABELS
+			| TVS_HASLINES | TVS_TRACKSELECT);
 }
 
 ShellTreeView::~ShellTreeView()

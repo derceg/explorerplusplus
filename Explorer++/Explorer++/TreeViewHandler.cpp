@@ -157,7 +157,7 @@ LRESULT CALLBACK Explorerplusplus::TreeViewSubclass(HWND hwnd, UINT uMsg, WPARAM
 	switch (uMsg)
 	{
 	case WM_SETFOCUS:
-		FocusChanged(WindowFocusSource::TreeView);
+		FocusChanged();
 		break;
 
 	case WM_MOUSEWHEEL:

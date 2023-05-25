@@ -109,8 +109,8 @@ void Explorerplusplus::CreateMainControls()
 	}
 
 	/* Create and subclass the main rebar control. */
-	m_hMainRebar = CreateWindowEx(0, REBARCLASSNAME, EMPTY_STRING, RebarStyles, 0, 0, 0, 0,
-		m_hContainer, nullptr, GetModuleHandle(nullptr), nullptr);
+	m_hMainRebar = CreateWindowEx(WS_EX_CONTROLPARENT, REBARCLASSNAME, EMPTY_STRING, RebarStyles, 0,
+		0, 0, 0, m_hContainer, nullptr, GetModuleHandle(nullptr), nullptr);
 	SetWindowSubclass(m_hMainRebar, RebarSubclassStub, 0, (DWORD_PTR) this);
 
 	for (i = 0; i < NUM_MAIN_TOOLBARS; i++)

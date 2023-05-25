@@ -165,6 +165,12 @@ private:
 		Shortcut
 	};
 
+	enum class FocusChangeDirection
+	{
+		Previous,
+		Next
+	};
+
 	LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
 	static LRESULT CALLBACK ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
@@ -177,16 +183,15 @@ private:
 	LRESULT HandleControlNotification(HWND hwnd, UINT notificationCode);
 	LRESULT CALLBACK NotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnCreate();
+	bool OnActivate(int activationState, bool minimized);
 	BOOL OnSize(int MainWindowWidth, int MainWindowHeight);
 	void OnDpiChanged(const RECT *updatedWindowRect);
 	std::optional<LRESULT> OnCtlColorStatic(HWND hwnd, HDC hdc);
 	void OnSettingChange(const WCHAR *systemParameter);
 	int CloseApplication();
 	int OnDestroy();
-	void OnSetFocus();
 	void OnDeviceChange(WPARAM wParam, LPARAM lParam);
-	void OnPreviousWindow();
-	void OnNextWindow();
+	void OnFocusNextWindow(FocusChangeDirection direction);
 	void OnAppCommand(UINT cmd);
 	void OnDirectoryModified(const Tab &tab);
 	void OnAssocChanged();
@@ -490,7 +495,7 @@ private:
 	CachedIcons *GetCachedIcons() override;
 	BOOL GetSavePreferencesToXmlFile() const override;
 	void SetSavePreferencesToXmlFile(BOOL savePreferencesToXmlFile) override;
-	void FocusChanged(WindowFocusSource windowFocusSource) override;
+	void FocusChanged() override;
 	boost::signals2::connection AddFocusChangeObserver(
 		const FocusChangedSignal::slot_type &observer) override;
 	boost::signals2::connection AddDeviceChangeObserver(
@@ -564,7 +569,7 @@ private:
 	HINSTANCE m_resourceInstance;
 
 	/** Internal state. **/
-	HWND m_hLastActiveWindow;
+	HWND m_lastActiveWindow;
 	bool m_bSelectingTreeViewDirectory;
 	bool m_bAttemptToolbarRestore;
 	bool m_bLanguageLoaded;

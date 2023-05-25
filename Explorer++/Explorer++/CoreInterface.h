@@ -13,13 +13,6 @@ enum class MousewheelSource
 	Other
 };
 
-enum class WindowFocusSource
-{
-	AddressBar,
-	TreeView,
-	ListView
-};
-
 // Stops signal propagation after the first successful handler (i.e. the first handler that returns
 // a result that evaluates to true).
 template <typename T>
@@ -59,7 +52,7 @@ using ToolbarContextMenuSignal =
 	boost::signals2::signal<void(HMENU menu, HWND sourceWindow, const POINT &pt)>;
 using ToolbarContextMenuSelectedSignal =
 	boost::signals2::signal<void(HWND sourceWindow, int menuItemId)>;
-using FocusChangedSignal = boost::signals2::signal<void(WindowFocusSource windowFocusSource)>;
+using FocusChangedSignal = boost::signals2::signal<void()>;
 using DeviceChangeSignal = boost::signals2::signal<void(UINT eventType, LONG_PTR eventData)>;
 using ApplicationShuttingDownSignal = boost::signals2::signal<void()>;
 
@@ -119,7 +112,7 @@ public:
 
 	virtual void SetListViewInitialPosition(HWND hListView) = 0;
 
-	virtual void FocusChanged(WindowFocusSource windowFocusSource) = 0;
+	virtual void FocusChanged() = 0;
 	virtual void FocusActiveTab() = 0;
 
 	// Used to support the options dialog.
