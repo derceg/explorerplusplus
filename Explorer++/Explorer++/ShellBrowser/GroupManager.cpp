@@ -90,7 +90,7 @@ int ShellBrowser::GroupComparison(int id1, int id2)
 	}
 	else
 	{
-		switch (m_folderSettings.sortMode)
+		switch (m_folderSettings.groupMode)
 		{
 		case SortMode::Size:
 		case SortMode::TotalSize:
