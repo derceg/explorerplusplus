@@ -460,9 +460,6 @@
     <ClCompile Include="Bookmarks\UI\Views\BookmarksToolbarView.cpp">
       <Filter>Bookmarks\UI\Views</Filter>
     </ClCompile>
-    <ClCompile Include="DarkModeButton.cpp">
-      <Filter>Dark Mode Support</Filter>
-    </ClCompile>
     <ClCompile Include="DarkModeHelper.cpp">
       <Filter>Dark Mode Support</Filter>
     </ClCompile>
@@ -1016,9 +1013,6 @@
     </ClInclude>
     <ClInclude Include="Bookmarks\UI\Views\BookmarksToolbarView.h">
       <Filter>Bookmarks\UI\Views</Filter>
-    </ClInclude>
-    <ClInclude Include="DarkModeButton.h">
-      <Filter>Dark Mode Support</Filter>
     </ClInclude>
     <ClInclude Include="DarkModeHelper.h">
       <Filter>Dark Mode Support</Filter>
