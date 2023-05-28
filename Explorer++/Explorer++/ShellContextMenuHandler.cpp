@@ -136,7 +136,13 @@ void Explorerplusplus::UpdateBackgroundContextMenu(IContextMenu *contextMenu, HM
 		}
 		else if (StrCmpI(verb, L"undo") == 0 || StrCmpI(verb, L"redo") == 0)
 		{
-			// The undo and redo items are non-functional.
+			// Most context menu items are handled via IContextMenu::InvokeCommand(). However, some
+			// items can't be handled that way. For example, the rename item needs to be handled by
+			// the view, since the view is what's responsible for putting items into rename mode.
+			// Therefore, the context menu handler that the shell constructs will call SendMessage()
+			// to notify the view when certain items are selected. Undo + redo are two items that
+			// are handled by the view, which is why they don't work when the parent menu is hosted
+			// in Explorer++ and why they're removed here.
 			DeleteMenu(menu, i, MF_BYPOSITION);
 		}
 	}
