@@ -53,6 +53,7 @@ private:
 	static void ApplyThemeToButton(HWND hwnd, bool enableDarkMode);
 	static void ApplyThemeToTooltips(HWND hwnd);
 	static void ApplyThemeToStatusBar(HWND hwnd, bool enableDarkMode);
+	static void ApplyThemeToScrollBar(HWND hwnd, bool enableDarkMode);
 
 	static LRESULT CALLBACK DialogSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR subclassId, DWORD_PTR data);
@@ -69,6 +70,8 @@ private:
 	static LRESULT CALLBACK RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR subclassId, DWORD_PTR data);
 	static LRESULT CALLBACK GroupBoxSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
+		UINT_PTR subclassId, DWORD_PTR data);
+	static LRESULT CALLBACK ScrollBarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR subclassId, DWORD_PTR data);
 
 	std::unordered_set<HWND> m_trackedTopLevelWindows;

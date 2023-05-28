@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "BaseDialog.h"
 #include "Controls.h"
-#include "CustomGripper.h"
 #include "DpiCompatibility.h"
 #include "Helper.h"
 #include "WindowHelper.h"
@@ -87,12 +86,15 @@ INT_PTR CALLBACK BaseDialog::BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 			RECT clientRect;
 			GetClientRect(m_hDlg, &clientRect);
 
-			const SIZE gripperSize = CustomGripper::GetDpiScaledSize(m_hDlg);
-
-			HWND gripper = CreateWindow(CustomGripper::CLASS_NAME, L"",
-				WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS, clientRect.right - gripperSize.cx,
-				clientRect.bottom - gripperSize.cy, gripperSize.cx, gripperSize.cy, m_hDlg, 0,
-				GetModuleHandle(nullptr), nullptr);
+			// The presence of the SBS_SIZEBOXBOTTOMRIGHTALIGN style will cause the control to align
+			// itself with the bottom right corner of the rectangle specified by (x, y, width,
+			// height). Additionally, the size of the control will be set to the default size for
+			// system size boxes.
+			HWND gripper = CreateWindow(WC_SCROLLBAR, L"",
+				WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | SBS_SIZEGRIP
+					| SBS_SIZEBOXBOTTOMRIGHTALIGN,
+				0, 0, clientRect.right, clientRect.bottom, m_hDlg, 0, GetModuleHandle(nullptr),
+				nullptr);
 
 			std::vector<ResizableDialogControl> controls = GetResizableControls();
 			controls.emplace_back(gripper, MovingType::Both, SizingType::None);

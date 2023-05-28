@@ -164,6 +164,10 @@ void ThemeManager::ApplyThemeToWindow(HWND hwnd)
 	{
 		ApplyThemeToStatusBar(hwnd, enableDarkMode);
 	}
+	else if (lstrcmp(className, WC_SCROLLBAR) == 0)
+	{
+		ApplyThemeToScrollBar(hwnd, enableDarkMode);
+	}
 }
 
 void ThemeManager::ApplyThemeToMainWindow(HWND hwnd, bool enableDarkMode)
@@ -411,6 +415,23 @@ void ThemeManager::ApplyThemeToStatusBar(HWND hwnd, bool enableDarkMode)
 		// Revert the control back to its default theme (see
 		// https://devblogs.microsoft.com/oldnewthing/20181115-00/?p=100225).
 		SetWindowTheme(hwnd, nullptr, nullptr);
+	}
+}
+
+void ThemeManager::ApplyThemeToScrollBar(HWND hwnd, bool enableDarkMode)
+{
+	auto style = GetWindowLongPtr(hwnd, GWL_STYLE);
+
+	if (WI_IsAnyFlagSet(style, SBS_SIZEGRIP | SBS_SIZEBOX))
+	{
+		if (enableDarkMode)
+		{
+			SetWindowSubclass(hwnd, ScrollBarSubclass, SUBCLASS_ID, 0);
+		}
+		else
+		{
+			RemoveWindowSubclass(hwnd, ScrollBarSubclass, SUBCLASS_ID);
+		}
 	}
 }
 
@@ -736,6 +757,59 @@ LRESULT CALLBACK ThemeManager::GroupBoxSubclass(HWND hwnd, UINT msg, WPARAM wPar
 	case WM_NCDESTROY:
 	{
 		[[maybe_unused]] auto res = RemoveWindowSubclass(hwnd, GroupBoxSubclass, subclassId);
+		assert(res);
+	}
+	break;
+	}
+
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+LRESULT CALLBACK ThemeManager::ScrollBarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR subclassId, DWORD_PTR data)
+{
+	UNREFERENCED_PARAMETER(data);
+
+	switch (msg)
+	{
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hwnd, &ps);
+
+		int partId = SBP_SIZEBOX;
+		int stateId;
+
+		auto style = GetWindowLongPtr(hwnd, GWL_STYLE);
+
+		if (WI_IsFlagSet(style, SBS_SIZEBOXTOPLEFTALIGN))
+		{
+			stateId = SZB_TOPLEFTALIGN;
+		}
+		else
+		{
+			stateId = SZB_RIGHTALIGN;
+		}
+
+		RECT rect;
+		GetClientRect(hwnd, &rect);
+
+		wil::unique_htheme theme(OpenThemeData(hwnd, L"SCROLLBAR"));
+
+		if (IsThemeBackgroundPartiallyTransparent(theme.get(), partId, stateId))
+		{
+			DrawThemeParentBackground(hwnd, hdc, &ps.rcPaint);
+		}
+
+		DrawThemeBackground(theme.get(), hdc, partId, stateId, &rect, &ps.rcPaint);
+
+		EndPaint(hwnd, &ps);
+	}
+		return 0;
+
+	case WM_NCDESTROY:
+	{
+		[[maybe_unused]] auto res = RemoveWindowSubclass(hwnd, ScrollBarSubclass, subclassId);
 		assert(res);
 	}
 	break;
