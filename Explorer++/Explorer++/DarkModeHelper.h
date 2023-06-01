@@ -64,11 +64,13 @@ public:
 	static inline constexpr COLORREF BACKGROUND_COLOR = RGB(32, 32, 32);
 	static inline constexpr COLORREF TEXT_COLOR = RGB(255, 255, 255);
 
+	static inline constexpr COLORREF TEXT_COLOR_DISABLED = RGB(121, 121, 121);
+
 	// The color of foreground elements (e.g. the toolbar insertion mark).
 	static inline constexpr COLORREF FOREGROUND_COLOR = RGB(255, 255, 255);
 
-	static inline constexpr COLORREF TEXT_COLOR_DISABLED = RGB(204, 204, 204);
-	static inline constexpr COLORREF BUTTON_HIGHLIGHT_COLOR = RGB(71, 71, 71);
+	// The color of the hot item (i.e. the item that's selected/under the mouse).
+	static inline constexpr COLORREF HOT_ITEM_HIGHLIGHT_COLOR = RGB(71, 71, 71);
 
 	static DarkModeHelper &GetInstance();
 
@@ -80,6 +82,8 @@ public:
 	bool IsSystemAppModeLight();
 	void AllowDarkModeForWindow(HWND hWnd, bool allow);
 	void SetWindowCompositionAttribute(HWND hWnd, WINDOWCOMPOSITIONATTRIBDATA *data);
+
+	static bool IsHighContrast();
 
 	HBRUSH GetBackgroundBrush();
 
@@ -109,8 +113,6 @@ private:
 	void AllowDarkModeForApp(bool allow);
 	void FlushMenuThemes();
 	void RefreshImmersiveColorPolicyState();
-
-	static bool IsHighContrast();
 
 	LONG DetourOpenNcThemeData();
 	LONG RestoreOpenNcThemeData();

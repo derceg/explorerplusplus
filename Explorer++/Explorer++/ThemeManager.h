@@ -55,6 +55,10 @@ private:
 	static void ApplyThemeToStatusBar(HWND hwnd, bool enableDarkMode);
 	static void ApplyThemeToScrollBar(HWND hwnd, bool enableDarkMode);
 
+	static LRESULT CALLBACK MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
+		UINT_PTR subclassId, DWORD_PTR data);
+	static HBRUSH GetMenuBarBackgroundBrush(bool enableDarkMode);
+	static bool ShouldAlwaysShowAccessKeys();
 	static LRESULT CALLBACK DialogSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR subclassId, DWORD_PTR data);
 	static LRESULT CALLBACK ToolbarParentSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,

@@ -173,4 +173,36 @@ HMENU FindParentMenu(HMENU menu, UINT id)
 	return nullptr;
 }
 
+std::optional<std::wstring> GetMenuItemString(HMENU menu, UINT item, bool byPosition)
+{
+	MENUITEMINFO menuItemInfo = {};
+	menuItemInfo.cbSize = sizeof(menuItemInfo);
+	menuItemInfo.fMask = MIIM_STRING;
+	menuItemInfo.dwTypeData = nullptr;
+	auto res = GetMenuItemInfo(menu, item, byPosition, &menuItemInfo);
+
+	if (!res)
+	{
+		return std::nullopt;
+	}
+
+	// The returned size doesn't include space for the terminating null character.
+	menuItemInfo.cch++;
+
+	std::wstring text;
+	text.resize(menuItemInfo.cch);
+
+	menuItemInfo.dwTypeData = text.data();
+	res = GetMenuItemInfo(menu, item, byPosition, &menuItemInfo);
+
+	if (!res)
+	{
+		return std::nullopt;
+	}
+
+	text.resize(menuItemInfo.cch);
+
+	return text;
+}
+
 }

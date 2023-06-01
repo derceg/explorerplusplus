@@ -8,6 +8,7 @@
 #include "Explorer++_internal.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <wil/resource.h>
 #include <vssym32.h>
@@ -61,7 +62,7 @@ void ThemeManager::ApplyThemeToWindowAndChildren(HWND hwnd)
 	// EnumThreadWindows().
 	EnumThreadWindows(GetCurrentThreadId(), ProcessThreadWindow, 0);
 
-	RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN | RDW_ERASE);
+	RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN | RDW_ERASE | RDW_FRAME);
 }
 
 BOOL CALLBACK ThemeManager::ProcessChildWindow(HWND hwnd, LPARAM lParam)
@@ -177,6 +178,60 @@ void ThemeManager::ApplyThemeToMainWindow(HWND hwnd, bool enableDarkMode)
 		DarkModeHelper::WCA_USEDARKMODECOLORS, &dark, sizeof(dark)
 	};
 	DarkModeHelper::GetInstance().SetWindowCompositionAttribute(hwnd, &compositionData);
+
+	// There's no need to owner-draw the menu bar if dark mode isn't supported (in practice, this
+	// means that the menu bar will only be owner-drawn on Windows 10 and 11). Additionally,
+	// owner-drawing the menu bar is problematic on Windows 7, for at least two reasons:
+	//
+	// 1. In the default theme, the menu bar background isn't a flat color. Rather, it's more like a
+	// gradient that's specified in a bitmap. DrawThemeBackground() can be used to easily draw that
+	// background, however, it appears that Windows only allows you to set the background brush for
+	// the menu bar, rather than providing a DC to paint into.
+	// 2. Visual styles can be turned off, so the current owner-drawing implementation wouldn't work
+	// in that scenario.
+	if (!DarkModeHelper::GetInstance().IsDarkModeSupported())
+	{
+		return;
+	}
+
+	SetWindowSubclass(hwnd, MainWindowSubclass, SUBCLASS_ID, 0);
+
+	auto mainMenu = GetMenu(hwnd);
+	int numItems = GetMenuItemCount(mainMenu);
+
+	for (int i = 0; i < numItems; i++)
+	{
+		MENUITEMINFO menuItemInfo = {};
+		menuItemInfo.cbSize = sizeof(menuItemInfo);
+		menuItemInfo.fMask = MIIM_FTYPE;
+		[[maybe_unused]] auto res = GetMenuItemInfo(mainMenu, i, true, &menuItemInfo);
+		assert(res);
+
+		// Removing the MFT_OWNERDRAW style once it's been applied to the menu bar items appears to
+		// be problematic. The resulting items aren't spaced correctly. Because of that, the menu
+		// bar will always be owner-drawn, regardless of the theme.
+		WI_SetFlag(menuItemInfo.fType, MFT_OWNERDRAW);
+		WI_SetFlag(menuItemInfo.fMask, MIIM_DATA);
+		menuItemInfo.dwItemData = i;
+		res = SetMenuItemInfo(mainMenu, i, true, &menuItemInfo);
+		assert(res);
+	}
+
+	// Turning on owner draw for at least one item in the menu bar will disable visual styles in the
+	// bar. That's useful here, as (1) the items will be oner-drawn, so the presence or absence of
+	// visual styles doesn't matter and (2) disabling visual styles means that the background brush
+	// here will be used to paint the empty section of the bar (the section behind each item will be
+	// painted when drawing the item).
+	// Note that the background should really be drawn by DrawThemeBackground(), however, as noted
+	// above, Windows seemingly doesn't provide any documented way of drawing directly into the menu
+	// bar DC. The most you can do is provide a background brush. That's fine on Windows 10 and
+	// 11, where the background colors are effectively flat and a solid brush works.
+	MENUINFO menuInfo = {};
+	menuInfo.cbSize = sizeof(menuInfo);
+	menuInfo.fMask = MIM_BACKGROUND;
+	menuInfo.hbrBack = GetMenuBarBackgroundBrush(enableDarkMode);
+	[[maybe_unused]] auto res = SetMenuInfo(mainMenu, &menuInfo);
+	assert(res);
 }
 
 void ThemeManager::ApplyThemeToDialog(HWND hwnd, bool enableDarkMode)
@@ -435,6 +490,324 @@ void ThemeManager::ApplyThemeToScrollBar(HWND hwnd, bool enableDarkMode)
 	}
 }
 
+LRESULT CALLBACK ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
+	UINT_PTR subclassId, DWORD_PTR data)
+{
+	UNREFERENCED_PARAMETER(data);
+
+	static wil::unique_htheme theme(OpenThemeData(hwnd, L"Menu"));
+	static wil::unique_hbrush hotBrush(CreateSolidBrush(DarkModeHelper::HOT_ITEM_HIGHLIGHT_COLOR));
+	static constexpr DWORD drawFlagsBase = DT_CENTER | DT_VCENTER | DT_SINGLELINE;
+	static bool alwaysShowAccessKeys = ShouldAlwaysShowAccessKeys();
+
+	switch (msg)
+	{
+	case WM_MEASUREITEM:
+	{
+		auto *measureItem = reinterpret_cast<MEASUREITEMSTRUCT *>(lParam);
+
+		if (measureItem->CtlType != ODT_MENU)
+		{
+			break;
+		}
+
+		auto hdc = wil::GetWindowDC(hwnd);
+
+		// Only items in the menu bar are owner-drawn, so the menu will always be the menu
+		// associated with the window.
+		auto menu = GetMenu(hwnd);
+		assert(menu);
+
+		auto text =
+			MenuHelper::GetMenuItemString(menu, static_cast<UINT>(measureItem->itemData), true);
+
+		if (!text)
+		{
+			throw std::runtime_error("Menu item text retrieval failed");
+		}
+
+		// Note that if the DPI changes while the application is running, GetThemeSysFont() will
+		// return a font that's incorrectly sized. From debugging into the function, that appears to
+		// be because it uses GetDpiForSystem(), which always returns the original DPI for some
+		// reason. That is, if the application is started with a DPI of 120, then 120 will always be
+		// returned, even if the DPI is changed.
+		// That then means that GetThemeSysFont() will scale the font that's returned based on the
+		// original DPI, rather than the current DPI, which can cause the menu to be spaced
+		// incorrectly after a DPI change.
+		LOGFONT logFont;
+		wil::unique_hfont font;
+		wil::unique_select_object selectFont;
+		HRESULT hr = GetThemeSysFont(theme.get(), TMT_MENUFONT, &logFont);
+
+		if (SUCCEEDED(hr))
+		{
+			font.reset(CreateFontIndirect(&logFont));
+
+			if (font)
+			{
+				selectFont = wil::SelectObject(hdc.get(), font.get());
+			}
+		}
+
+		assert(selectFont);
+
+		RECT textRect;
+		hr = GetThemeTextExtent(theme.get(), hdc.get(), MENU_BARITEM, MBI_NORMAL, text->c_str(), -1,
+			drawFlagsBase, nullptr, &textRect);
+		assert(SUCCEEDED(hr));
+
+		measureItem->itemWidth = GetRectWidth(&textRect);
+		measureItem->itemHeight = GetRectHeight(&textRect);
+
+		return TRUE;
+	}
+	break;
+
+	// This contains just enough functionality to owner-draw the items in the menu bar; it's not a
+	// complete owner-drawn menu implementation. For example, neither checked nor bitmap items have
+	// any handling. The code here implicitly assumes that the only menu items that are owner-drawn
+	// are the items in the menu bar.
+	case WM_DRAWITEM:
+	{
+		auto *drawItem = reinterpret_cast<DRAWITEMSTRUCT *>(lParam);
+
+		if (drawItem->CtlType != ODT_MENU)
+		{
+			break;
+		}
+
+		int itemState;
+
+		if (WI_IsAnyFlagSet(drawItem->itemState, ODS_INACTIVE | ODS_GRAYED | ODS_DISABLED))
+		{
+			if (WI_IsFlagSet(drawItem->itemState, ODS_HOTLIGHT))
+			{
+				itemState = MBI_DISABLEDHOT;
+			}
+			else if (WI_IsFlagSet(drawItem->itemState, ODS_SELECTED))
+			{
+				itemState = MBI_DISABLEDPUSHED;
+			}
+			else
+			{
+				itemState = MBI_DISABLED;
+			}
+		}
+		else
+		{
+			if (WI_IsFlagSet(drawItem->itemState, ODS_HOTLIGHT))
+			{
+				itemState = MBI_HOT;
+			}
+			else if (WI_IsFlagSet(drawItem->itemState, ODS_SELECTED))
+			{
+				itemState = MBI_PUSHED;
+			}
+			else
+			{
+				itemState = MBI_NORMAL;
+			}
+		}
+
+		bool darkModeEnabled = DarkModeHelper::GetInstance().IsDarkModeEnabled();
+		bool selected = false;
+		bool selectionPartiallyTransparent = false;
+
+		if (itemState == MBI_HOT || itemState == MBI_PUSHED || itemState == MBI_DISABLEDHOT
+			|| itemState == MBI_DISABLEDPUSHED)
+		{
+			selected = true;
+
+			if (!darkModeEnabled)
+			{
+				selectionPartiallyTransparent =
+					IsThemeBackgroundPartiallyTransparent(theme.get(), MENU_BARITEM, itemState);
+			}
+		}
+
+		// The hot item selection rectangle drawn by DrawThemeBackground() may be partially
+		// transparent. In that case, the menu bar background will need to be drawn first. In dark
+		// mode, the background color and selection color are both opaque, so there's no need to
+		// draw both for a single item.
+		if (!selected || selectionPartiallyTransparent)
+		{
+			// In non-dark mode, the background could be drawn by using:
+			//
+			// DrawThemeBackground(theme.get(), drawItem->hDC, MENU_BARBACKGROUND, MB_ACTIVE,
+			//   &drawItem->rcItem, nullptr);
+			//
+			// However, if that background isn't simply a flat color, the background underneath
+			// each item will differ from the background shown in the empty space. In Windows
+			// 11, for example, the themed background includes a 1px border at the bottom, so
+			// drawing the themed background here would result in a slight difference. It's also
+			// possible the theme could change in the future. So, the safest thing to do is to
+			// use the same brush to draw the bar background and the item background.
+			FillRect(drawItem->hDC, &drawItem->rcItem, GetMenuBarBackgroundBrush(darkModeEnabled));
+		}
+
+		if (selected)
+		{
+			if (darkModeEnabled)
+			{
+				FillRect(drawItem->hDC, &drawItem->rcItem, hotBrush.get());
+			}
+			else
+			{
+				DrawThemeBackground(theme.get(), drawItem->hDC, MENU_BARITEM, itemState,
+					&drawItem->rcItem, nullptr);
+			}
+		}
+
+		// As per the documentation for DRAWITEMSTRUCT, this is the menu handle when a menu is being
+		// drawn.
+		auto menu = reinterpret_cast<HMENU>(drawItem->hwndItem);
+		auto text =
+			MenuHelper::GetMenuItemString(menu, static_cast<UINT>(drawItem->itemData), true);
+
+		if (!text)
+		{
+			throw std::runtime_error("Menu item text retrieval failed");
+		}
+
+		DWORD drawFlags = drawFlagsBase;
+
+		// It appears that Windows passes in the ODS_NOACCEL flag even when the access keys option
+		// is turned on in settings. Therefore, if that setting is on, the ODS_NOACCEL flag will be
+		// ignored.
+		if (!alwaysShowAccessKeys && WI_IsFlagSet(drawItem->itemState, ODS_NOACCEL))
+		{
+			WI_SetFlag(drawFlags, DT_HIDEPREFIX);
+		}
+
+		DTTOPTS options = {};
+		options.dwSize = sizeof(options);
+
+		if (darkModeEnabled)
+		{
+			WI_SetFlag(options.dwFlags, DTT_TEXTCOLOR);
+			COLORREF textColor;
+
+			if (itemState == MBI_DISABLED || itemState == MBI_DISABLEDHOT
+				|| itemState == MBI_DISABLEDPUSHED)
+			{
+				textColor = DarkModeHelper::TEXT_COLOR_DISABLED;
+			}
+			else
+			{
+				textColor = DarkModeHelper::TEXT_COLOR;
+			}
+
+			options.crText = textColor;
+		}
+
+		[[maybe_unused]] HRESULT hr = DrawThemeTextEx(theme.get(), drawItem->hDC, MENU_BARITEM,
+			itemState, text->c_str(), -1, drawFlags, &drawItem->rcItem, &options);
+		assert(SUCCEEDED(hr));
+
+		return TRUE;
+	}
+	break;
+
+	case WM_THEMECHANGED:
+		theme.reset(OpenThemeData(hwnd, L"Menu"));
+		break;
+
+	case WM_SETTINGCHANGE:
+		if (wParam == SPI_SETKEYBOARDCUES)
+		{
+			alwaysShowAccessKeys = ShouldAlwaysShowAccessKeys();
+
+			RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_FRAME);
+		}
+		break;
+
+	// A 1px border will be drawn under the menu bar, in a color specified by the current theme. In
+	// dark mode, the application will draw with custom colors, that aren't derived from the theme.
+	// That then means that the	border can look out of place (e.g. it might be drawn in a light
+	// color when the rest of the application is dark). To fix that, the border will be painted over
+	// here.
+	// This is done in both WM_NCPAINT and WM_NCACTIVATE, since painting over the border in
+	// WM_NCPAINT only will cause it to reappear whenever the window loses focus.
+	// Also see https://github.com/notepad-plus-plus/notepad-plus-plus/pull/9985.
+	case WM_NCPAINT:
+	case WM_NCACTIVATE:
+	{
+		if (!DarkModeHelper::GetInstance().IsDarkModeEnabled())
+		{
+			break;
+		}
+
+		auto defWindowProcResult = DefWindowProc(hwnd, msg, wParam, lParam);
+
+		RECT windowRect;
+		[[maybe_unused]] auto res = GetWindowRect(hwnd, &windowRect);
+		assert(res);
+
+		MENUBARINFO barInfo = {};
+		barInfo.cbSize = sizeof(barInfo);
+		res = GetMenuBarInfo(hwnd, OBJID_MENU, 0, &barInfo);
+		assert(res);
+
+		// The border is drawn directly underneath the menu bar.
+		RECT menuBarBorderRect = { barInfo.rcBar.left, barInfo.rcBar.bottom, barInfo.rcBar.right,
+			barInfo.rcBar.bottom + 1 };
+		OffsetRect(&menuBarBorderRect, -windowRect.left, -windowRect.top);
+
+		auto hdc = wil::GetWindowDC(hwnd);
+		FillRect(hdc.get(), &menuBarBorderRect, DarkModeHelper::GetInstance().GetBackgroundBrush());
+
+		return defWindowProcResult;
+	}
+	break;
+
+	case WM_NCDESTROY:
+	{
+		[[maybe_unused]] auto res = RemoveWindowSubclass(hwnd, MainWindowSubclass, subclassId);
+		assert(res);
+	}
+	break;
+	}
+
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+HBRUSH ThemeManager::GetMenuBarBackgroundBrush(bool enableDarkMode)
+{
+	if (enableDarkMode)
+	{
+		return DarkModeHelper::GetInstance().GetBackgroundBrush();
+	}
+	else
+	{
+		int systemColorIndex;
+
+		if (DarkModeHelper::IsHighContrast())
+		{
+			systemColorIndex = COLOR_BTNFACE;
+		}
+		else
+		{
+			systemColorIndex = COLOR_WINDOW;
+		}
+
+		return GetSysColorBrush(systemColorIndex);
+	}
+}
+
+bool ThemeManager::ShouldAlwaysShowAccessKeys()
+{
+	BOOL alwaysShow;
+	BOOL res = SystemParametersInfo(SPI_GETKEYBOARDCUES, 0, &alwaysShow, 0);
+
+	if (!res)
+	{
+		assert(false);
+		return false;
+	}
+
+	return alwaysShow;
+}
+
 LRESULT CALLBACK ThemeManager::DialogSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
 	UINT_PTR subclassId, DWORD_PTR data)
 {
@@ -630,7 +1003,7 @@ LRESULT ThemeManager::OnToolbarCustomDraw(NMTBCUSTOMDRAW *customDraw)
 
 	case CDDS_ITEMPREPAINT:
 		customDraw->clrText = DarkModeHelper::TEXT_COLOR;
-		customDraw->clrHighlightHotTrack = DarkModeHelper::BUTTON_HIGHLIGHT_COLOR;
+		customDraw->clrHighlightHotTrack = DarkModeHelper::HOT_ITEM_HIGHLIGHT_COLOR;
 		return TBCDRF_USECDCOLORS | TBCDRF_HILITEHOTTRACK;
 	}
 

@@ -226,12 +226,13 @@ void DarkModeHelper::SetWindowCompositionAttribute(HWND hWnd, WINDOWCOMPOSITIONA
 
 bool DarkModeHelper::IsHighContrast()
 {
-	HIGHCONTRAST highContrast;
-	BOOL res =
-		SystemParametersInfo(SPI_GETHIGHCONTRAST, sizeof(highContrast), &highContrast, FALSE);
+	HIGHCONTRAST highContrast = {};
+	highContrast.cbSize = sizeof(highContrast);
+	BOOL res = SystemParametersInfo(SPI_GETHIGHCONTRAST, sizeof(highContrast), &highContrast, 0);
 
 	if (!res)
 	{
+		assert(false);
 		return false;
 	}
 

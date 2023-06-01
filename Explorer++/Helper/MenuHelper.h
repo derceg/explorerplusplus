@@ -28,4 +28,6 @@ void RemoveTrailingSeparators(HMENU menu);
 
 HMENU FindParentMenu(HMENU menu, UINT id);
 
+std::optional<std::wstring> GetMenuItemString(HMENU menu, UINT item, bool byPosition);
+
 }
