@@ -55,9 +55,6 @@
     <ClCompile Include="WildcardSelectDialog.cpp">
       <Filter>General Dialogs</Filter>
     </ClCompile>
-    <ClCompile Include="HelpFileMissingDialog.cpp">
-      <Filter>General Dialogs</Filter>
-    </ClCompile>
     <ClCompile Include="SearchDialog.cpp">
       <Filter>General Dialogs</Filter>
     </ClCompile>
@@ -571,9 +568,6 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="FilterDialog.h">
-      <Filter>General Dialogs</Filter>
-    </ClInclude>
-    <ClInclude Include="HelpFileMissingDialog.h">
       <Filter>General Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="IDropFilesCallback.h">

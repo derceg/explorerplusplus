@@ -248,7 +248,7 @@ const std::unordered_map<std::wstring, int> ACCELERATOR_MAPPINGS = {
 	{L"run_script", IDM_TOOLS_RUNSCRIPT},
 	{L"options", IDM_TOOLS_OPTIONS},
 
-	{L"help", IDM_HELP_HELP},
+	{L"help", IDM_HELP_ONLINE_DOCUMENTATION},
 	{L"check_for_updates", IDM_HELP_CHECKFORUPDATES},
 	{L"about", IDM_HELP_ABOUT}
 };

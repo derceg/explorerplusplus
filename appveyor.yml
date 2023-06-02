@@ -47,8 +47,6 @@ install:
 
     IF DEFINED PFX_ENC_PASS (secure-file\tools\secure-file -decrypt %APPVEYOR_BUILD_FOLDER%\authenticode.pfx.enc -secret %PFX_ENC_PASS%)
 
-    SET PATH=C:\Program Files (x86)\HTML Help Workshop;%PATH%
-
 before_build:
 - ps: >-
     if (Test-Path env:APPVEYOR_REPO_TAG_NAME) {
@@ -75,9 +73,6 @@ after_build:
     SET "archiveName=explorerpp_%arch%.zip"
 
 
-    CALL %APPVEYOR_BUILD_FOLDER%\Scripts\AppVeyor\compile_help_file.bat
-
-
     7z a %archiveName% %APPVEYOR_BUILD_FOLDER%\Explorer++\Explorer++\%PLATFORM%\%CONFIGURATION%\Explorer++.exe
 
     7z a %archiveName% %APPVEYOR_BUILD_FOLDER%\Documentation\User\History.txt
@@ -85,8 +80,6 @@ after_build:
     7z a %archiveName% %APPVEYOR_BUILD_FOLDER%\Documentation\User\License.txt
 
     7z a %archiveName% %APPVEYOR_BUILD_FOLDER%\Documentation\User\Readme.txt
-
-    7z a %archiveName% "%APPVEYOR_BUILD_FOLDER%\Documentation\User\Help Manual\Explorer++ Help.chm"
 
 
     7z a explorerpp_%arch%_symbols.zip %APPVEYOR_BUILD_FOLDER%\Explorer++\Explorer++\%PLATFORM%\%CONFIGURATION%\Explorer++.pdb

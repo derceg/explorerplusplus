@@ -874,7 +874,7 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 		break;
 
 	case APPCOMMAND_HELP:
-		OnShowHelp();
+		OnOpenOnlineDocumentation();
 		break;
 
 	case APPCOMMAND_NEW:

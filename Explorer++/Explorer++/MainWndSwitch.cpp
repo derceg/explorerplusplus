@@ -1330,8 +1330,8 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		OnSearchTabs();
 		break;
 
-	case IDM_HELP_HELP:
-		OnShowHelp();
+	case IDM_HELP_ONLINE_DOCUMENTATION:
+		OnOpenOnlineDocumentation();
 		break;
 
 	case IDM_HELP_CHECKFORUPDATES:

@@ -51,7 +51,7 @@ const std::map<UINT, Icon> MAIN_MENU_IMAGE_MAPPINGS = {
 	{ IDM_TOOLS_CUSTOMIZECOLORS, Icon::CustomizeColors },
 	{ IDM_TOOLS_OPTIONS, Icon::Options },
 
-	{ IDM_HELP_HELP, Icon::Help }
+	{ IDM_HELP_ONLINE_DOCUMENTATION, Icon::Help }
 };
 // clang-format on
 

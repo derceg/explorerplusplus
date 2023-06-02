@@ -11,7 +11,7 @@ namespace NExplorerplusplus
 const TCHAR APP_NAME[] = _T("Explorer++");
 const TCHAR CLASS_NAME[] = _T("Explorer++");
 
-const TCHAR HELP_FILE_NAME[] = _T("Explorer++ Help.chm");
+constexpr WCHAR DOCUMENTATION_LINK[] = L"https://explorerplusplus.readthedocs.io/en/latest/";
 
 /* Registry keys used to store program settings. */
 const TCHAR REG_MAIN_KEY[] = _T("Software\\Explorer++");

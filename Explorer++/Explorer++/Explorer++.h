@@ -233,7 +233,7 @@ private:
 	void OnRunScript();
 	void OnShowOptions();
 	void OnSearchTabs();
-	void OnShowHelp();
+	void OnOpenOnlineDocumentation();
 	void OnCheckForUpdates();
 	void OnAbout();
 

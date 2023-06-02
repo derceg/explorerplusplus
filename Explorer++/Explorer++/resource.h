@@ -386,7 +386,6 @@
 #define IDC_STATIC_UPDATE_STATUS        1317
 #define IDC_OPTIONS_DEFAULT_VIEW        1319
 #define IDC_CHECK_CASE_INSENSITIVE      1320
-#define IDC_SYSLINK_READTHEDOCS         1321
 #define IDC_COMMAND                     1322
 #define IDC_LOG                         1323
 #define ID_RUN                          1324
@@ -694,7 +693,6 @@
 #define IDM_GO_MUSIC                    40098
 #define IDM_GO_PICTURES                 40099
 #define IDM_TOOLS_OPTIONS               40101
-#define IDM_HELP_HELP                   40102
 #define IDM_HELP_ABOUT                  40103
 #define IDM_VIEW_SHOWHIDDENFILES        40104
 #define IDM_VIEW_REFRESH                40105
@@ -853,6 +851,7 @@
 #define IDM_DISPLAYWINDOW_VERTICAL      40542
 #define IDM_POPUP_SHOW_COLUMNS          40543
 #define IDM_WINDOW_SEARCH_TABS          40544
+#define IDM_HELP_ONLINE_DOCUMENTATION   40545
 #define IDM_SORTBY_NAME                 50000
 #define IDM_SORTBY_SIZE                 50001
 #define IDM_SORTBY_TYPE                 50002
@@ -994,7 +993,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        391
-#define _APS_NEXT_COMMAND_VALUE         40545
+#define _APS_NEXT_COMMAND_VALUE         40546
 #define _APS_NEXT_CONTROL_VALUE         1367
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

@@ -13,7 +13,6 @@
 #include "Explorer++_internal.h"
 #include "FileProgressSink.h"
 #include "FilterDialog.h"
-#include "HelpFileMissingDialog.h"
 #include "MainResource.h"
 #include "MergeFilesDialog.h"
 #include "ModelessDialogs.h"
@@ -164,33 +163,10 @@ void Explorerplusplus::OnSearchTabs()
 	}
 }
 
-void Explorerplusplus::OnShowHelp()
+void Explorerplusplus::OnOpenOnlineDocumentation()
 {
-	TCHAR szHelpFile[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), szHelpFile, SIZEOF_ARRAY(szHelpFile));
-	PathRemoveFileSpec(szHelpFile);
-	PathAppend(szHelpFile, NExplorerplusplus::HELP_FILE_NAME);
-
-	unique_pidl_absolute pidl;
-	HRESULT hr = SHParseDisplayName(szHelpFile, nullptr, wil::out_param(pidl), 0, nullptr);
-
-	bool bOpenedHelpFile = false;
-
-	if (SUCCEEDED(hr))
-	{
-		BOOL bRes = ExecuteFileAction(m_hContainer, nullptr, nullptr, nullptr, pidl.get());
-
-		if (bRes)
-		{
-			bOpenedHelpFile = true;
-		}
-	}
-
-	if (!bOpenedHelpFile)
-	{
-		HelpFileMissingDialog helpFileMissingDialog(m_resourceInstance, m_hContainer);
-		helpFileMissingDialog.ShowModalDialog();
-	}
+	ShellExecute(nullptr, L"open", NExplorerplusplus::DOCUMENTATION_LINK, nullptr, nullptr,
+		SW_SHOW);
 }
 
 void Explorerplusplus::OnCheckForUpdates()

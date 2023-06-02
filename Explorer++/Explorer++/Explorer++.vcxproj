@@ -825,7 +825,6 @@
     <ClCompile Include="FilterDialog.cpp" />
     <ClCompile Include="HandleWindowState.cpp" />
     <ClCompile Include="DriveWatcherImpl.cpp" />
-    <ClCompile Include="HelpFileMissingDialog.cpp" />
     <ClCompile Include="HolderWindow.cpp" />
     <ClCompile Include="IDropFilesCallback.cpp" />
     <ClCompile Include="IconResourceLoader.cpp" />
@@ -1025,7 +1024,6 @@
     <ClInclude Include="Explorer++_internal.h" />
     <ClInclude Include="FilterDialog.h" />
     <ClInclude Include="DriveWatcherImpl.h" />
-    <ClInclude Include="HelpFileMissingDialog.h" />
     <ClInclude Include="HolderWindow.h" />
     <ClInclude Include="HolderWindowInternal.h" />
     <ClInclude Include="Icon.h" />
