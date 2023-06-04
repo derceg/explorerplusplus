@@ -585,7 +585,9 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 
 	/* Ensure that the main rebar keeps its width in line with the main
 	window (its height will not change). */
-	MoveWindow(m_hMainRebar, 0, 0, MainWindowWidth, 0, FALSE);
+	RECT rebarRect;
+	GetClientRect(m_hMainRebar, &rebarRect);
+	MoveWindow(m_hMainRebar, 0, 0, MainWindowWidth, GetRectHeight(&rebarRect), FALSE);
 
 	return TRUE;
 }
