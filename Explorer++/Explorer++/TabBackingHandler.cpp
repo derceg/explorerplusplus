@@ -17,9 +17,9 @@
 
 void Explorerplusplus::CreateTabBacking()
 {
-	m_hTabBacking =
-		CreateWindow(WC_STATIC, EMPTY_STRING, WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS | SS_NOTIFY,
-			0, 0, 0, 0, m_hContainer, nullptr, GetModuleHandle(nullptr), nullptr);
+	m_hTabBacking = CreateWindow(WC_STATIC, EMPTY_STRING,
+		WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | SS_NOTIFY, 0, 0, 0, 0,
+		m_hContainer, nullptr, GetModuleHandle(nullptr), nullptr);
 
 	/* Create the toolbar that will appear on the tab control.
 	Only contains the close button used to close tabs. */
