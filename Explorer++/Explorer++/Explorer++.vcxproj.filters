@@ -1101,6 +1101,9 @@
     <ClInclude Include="ThemeWindowTracker.h">
       <Filter>Dark Mode Support</Filter>
     </ClInclude>
+    <ClInclude Include="Literals.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

@@ -7,6 +7,7 @@
 #include "AcceleratorUpdater.h"
 #include "CommandLine.h"
 #include "CoreInterface.h"
+#include "Literals.h"
 #include "Navigator.h"
 #include "PluginInterface.h"
 #include "Plugins/PluginCommandManager.h"
@@ -96,8 +97,11 @@ private:
 	static const int MIN_SHELL_MENU_ID = 1;
 	static const int MAX_SHELL_MENU_ID = 1000;
 
-	static const UINT MINIMUM_DISPLAYWINDOW_WIDTH = 70;
-	static const UINT MINIMUM_DISPLAYWINDOW_HEIGHT = 70;
+	static const UINT DISPLAY_WINDOW_MINIMUM_WIDTH = 70;
+	static const UINT DISPLAY_WINDOW_MINIMUM_HEIGHT = 70;
+
+	static constexpr auto TREEVIEW_MINIMUM_WIDTH = 70_px;
+	static constexpr double TREEVIEW_MAXIMUM_WIDTH_PERCENTAGE = 0.8;
 
 	/* The number of toolbars that appear in the
 	main rebar. */

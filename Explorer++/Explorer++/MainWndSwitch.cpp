@@ -175,13 +175,12 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM w
 
 	case WM_USER_HOLDERRESIZED:
 	{
-		RECT rc;
+		RECT mainWindowRect;
+		GetClientRect(m_hContainer, &mainWindowRect);
 
-		m_config->treeViewWidth = (int) lParam + TREEVIEW_DRAG_OFFSET;
+		m_config->treeViewWidth = static_cast<int>(lParam);
 
-		GetClientRect(m_hContainer, &rc);
-
-		SendMessage(m_hContainer, WM_SIZE, SIZE_RESTORED, MAKELPARAM(rc.right, rc.bottom));
+		OnSize(mainWindowRect.right, mainWindowRect.bottom);
 	}
 	break;
 

@@ -17,6 +17,9 @@ public:
 	int WINAPI GetSystemMetricsForDpi(int nIndex, UINT dpi);
 	UINT WINAPI GetDpiForWindow(HWND hwnd);
 
+	// Scales a value targeted at 96 DPI to the DPI of the specified window.
+	int ScaleValue(HWND hwnd, int value);
+
 private:
 	DpiCompatibility();
 

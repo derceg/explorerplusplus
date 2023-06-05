@@ -66,3 +66,8 @@ UINT DpiCompatibility::GetDpiForWindow(HWND hwnd)
 
 	return USER_DEFAULT_SCREEN_DPI;
 }
+
+int DpiCompatibility::ScaleValue(HWND hwnd, int value)
+{
+	return MulDiv(value, GetDpiForWindow(hwnd), USER_DEFAULT_SCREEN_DPI);
+}

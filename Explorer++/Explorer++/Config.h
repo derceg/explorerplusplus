@@ -77,7 +77,7 @@ struct Config
 	LONG displayWindowWidth = DEFAULT_DISPLAYWINDOW_WIDTH;
 	LONG displayWindowHeight = DEFAULT_DISPLAYWINDOW_HEIGHT;
 	BOOL displayWindowVertical = FALSE;
-	unsigned int treeViewWidth = DEFAULT_TREEVIEW_WIDTH;
+	int treeViewWidth = DEFAULT_TREEVIEW_WIDTH;
 	ShellChangeNotificationType shellChangeNotificationType = ShellChangeNotificationType::All;
 	bool goUpOnDoubleClick = true;
 

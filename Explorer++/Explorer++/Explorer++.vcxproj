@@ -955,6 +955,7 @@
     <ClInclude Include="ColorRuleRegistryStorage.h" />
     <ClInclude Include="ColorRuleXmlStorage.h" />
     <ClInclude Include="CrashHandlerHelper.h" />
+    <ClInclude Include="Literals.h" />
     <ClInclude Include="ThemeManager.h" />
     <ClInclude Include="DefaultSettingsOptionsPage.h" />
     <ClInclude Include="DialogHelper.h" />

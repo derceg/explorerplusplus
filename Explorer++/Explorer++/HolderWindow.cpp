@@ -22,10 +22,10 @@
 ATOM RegisterHolderWindowClass();
 LRESULT CALLBACK HolderWndProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-HolderWindow::HolderWindow(HWND hHolder)
+HolderWindow::HolderWindow(HWND hHolder) :
+	m_hwnd(hHolder),
+	m_sizingCursor(LoadCursor(nullptr, IDC_SIZEWE))
 {
-	m_hHolder = hHolder;
-	m_bHolderResizing = FALSE;
 }
 
 ATOM RegisterHolderWindowClass()
@@ -82,15 +82,22 @@ LRESULT CALLBACK HolderWindow::HolderWndProc(HWND hwnd, UINT msg, WPARAM wParam,
 	switch (msg)
 	{
 	case WM_LBUTTONDOWN:
-		OnHolderWindowLButtonDown(lParam);
+		OnLButtonDown({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
 		break;
 
 	case WM_LBUTTONUP:
-		OnHolderWindowLButtonUp();
+		OnLButtonUp();
 		break;
 
 	case WM_MOUSEMOVE:
-		return OnHolderWindowMouseMove(lParam);
+		return OnMouseMove({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
+
+	case WM_SETCURSOR:
+		if (OnSetCursor(reinterpret_cast<HWND>(wParam)))
+		{
+			return TRUE;
+		}
+		break;
 
 	case WM_ERASEBKGND:
 		OnEraseBackground(reinterpret_cast<HDC>(wParam));
@@ -98,7 +105,7 @@ LRESULT CALLBACK HolderWindow::HolderWndProc(HWND hwnd, UINT msg, WPARAM wParam,
 
 	case WM_PAINT:
 		OnHolderWindowPaint(hwnd);
-		break;
+		return 0;
 	}
 
 	return DefWindowProc(hwnd, msg, wParam, lParam);
@@ -119,7 +126,7 @@ void HolderWindow::OnEraseBackground(HDC hdc)
 	}
 
 	RECT rc;
-	GetClientRect(m_hHolder, &rc);
+	GetClientRect(m_hwnd, &rc);
 	FillRect(hdc, &rc, brush);
 }
 
@@ -168,62 +175,80 @@ void HolderWindow::OnHolderWindowPaint(HWND hwnd)
 	EndPaint(hwnd, &ps);
 }
 
-void HolderWindow::OnHolderWindowLButtonDown(LPARAM lParam)
+void HolderWindow::OnLButtonDown(const POINT &pt)
 {
-	POINTS cursorPos;
-	RECT rc;
-
-	cursorPos = MAKEPOINTS(lParam);
-	GetClientRect(m_hHolder, &rc);
-
-	if (cursorPos.x >= (rc.right - 10))
+	if (IsCursorInResizeStartRange(pt))
 	{
-		SetCursor(LoadCursor(nullptr, IDC_SIZEWE));
+		SetCursor(m_sizingCursor);
 
-		m_bHolderResizing = TRUE;
+		m_resizing = true;
 
-		SetFocus(m_hHolder);
-		SetCapture(m_hHolder);
+		RECT clientRect;
+		GetClientRect(m_hwnd, &clientRect);
+		m_resizeDistanceToEdge = clientRect.right - pt.x;
+
+		SetCapture(m_hwnd);
 	}
 }
 
-void HolderWindow::OnHolderWindowLButtonUp()
+void HolderWindow::OnLButtonUp()
 {
-	m_bHolderResizing = FALSE;
+	m_resizing = false;
+	m_resizeDistanceToEdge.reset();
 
 	ReleaseCapture();
 }
 
-int HolderWindow::OnHolderWindowMouseMove(LPARAM lParam)
+int HolderWindow::OnMouseMove(const POINT &pt)
 {
-	static POINTS ptsPrevCursor;
-	POINTS ptsCursor;
-	RECT rc;
-
-	ptsCursor = MAKEPOINTS(lParam);
-	GetClientRect(m_hHolder, &rc);
-
-	/* Is the window in the process of been resized? */
-	if (m_bHolderResizing)
+	if (m_resizing)
 	{
-		/* Mouse hasn't moved. */
-		if ((ptsPrevCursor.x == ptsCursor.x) && (ptsPrevCursor.y == ptsCursor.y))
-		{
-			return 0;
-		}
+		RECT clientRect;
+		GetClientRect(m_hwnd, &clientRect);
 
-		ptsPrevCursor.x = ptsCursor.x;
-		ptsPrevCursor.y = ptsCursor.y;
-
-		SendMessage(GetParent(m_hHolder), WM_USER_HOLDERRESIZED, (WPARAM) m_hHolder, ptsCursor.x);
+		int newWidth = (std::max)(pt.x + m_resizeDistanceToEdge.value(), 0L);
+		SendMessage(GetParent(m_hwnd), WM_USER_HOLDERRESIZED, 0, newWidth);
 
 		return 1;
 	}
 
-	if (ptsCursor.x >= (rc.right - 10))
+	if (IsCursorInResizeStartRange(pt))
 	{
-		SetCursor(LoadCursor(nullptr, IDC_SIZEWE));
+		SetCursor(m_sizingCursor);
 	}
 
 	return 0;
+}
+
+bool HolderWindow::OnSetCursor(HWND target)
+{
+	if (target != m_hwnd)
+	{
+		return false;
+	}
+
+	DWORD cursorPos = GetMessagePos();
+	POINT ptCursor = { GET_X_LPARAM(cursorPos), GET_Y_LPARAM(cursorPos) };
+	ScreenToClient(m_hwnd, &ptCursor);
+
+	if (IsCursorInResizeStartRange(ptCursor))
+	{
+		// Without this, the cursor would switch back and forth between the sizing cursor and arrow
+		// cursor when near the right edge of the window.
+		SetCursor(m_sizingCursor);
+		return true;
+	}
+
+	return false;
+}
+
+bool HolderWindow::IsCursorInResizeStartRange(const POINT &ptCursor)
+{
+	RECT clientRect;
+	GetClientRect(m_hwnd, &clientRect);
+
+	InflateRect(&clientRect,
+		-DpiCompatibility::GetInstance().ScaleValue(m_hwnd, RESIZE_START_RANGE), 0);
+
+	return ptCursor.x >= clientRect.right;
 }

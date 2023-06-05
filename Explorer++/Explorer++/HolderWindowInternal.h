@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include "Literals.h"
+#include <optional>
+
 class HolderWindow
 {
 public:
@@ -12,12 +15,19 @@ public:
 	LRESULT CALLBACK HolderWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 private:
+	// A resize can be started if the cursor is this many pixels from the right edge of the window.
+	static constexpr int RESIZE_START_RANGE = 6_px;
+
 	void OnEraseBackground(HDC hdc);
 	void OnHolderWindowPaint(HWND hwnd);
-	void OnHolderWindowLButtonDown(LPARAM lParam);
-	void OnHolderWindowLButtonUp();
-	int OnHolderWindowMouseMove(LPARAM lParam);
+	void OnLButtonDown(const POINT &pt);
+	void OnLButtonUp();
+	int OnMouseMove(const POINT &pt);
+	bool OnSetCursor(HWND target);
+	bool IsCursorInResizeStartRange(const POINT &ptCursor);
 
-	HWND m_hHolder;
-	BOOL m_bHolderResizing;
+	const HWND m_hwnd;
+	HCURSOR m_sizingCursor;
+	bool m_resizing = false;
+	std::optional<int> m_resizeDistanceToEdge;
 };

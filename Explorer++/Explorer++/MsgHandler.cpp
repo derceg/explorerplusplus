@@ -413,6 +413,12 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 		return TRUE;
 	}
 
+	auto &dpiCompatibility = DpiCompatibility::GetInstance();
+
+	m_config->treeViewWidth = std::clamp(m_config->treeViewWidth,
+		dpiCompatibility.ScaleValue(m_hHolder, TREEVIEW_MINIMUM_WIDTH),
+		static_cast<int>(TREEVIEW_MAXIMUM_WIDTH_PERCENTAGE * MainWindowWidth));
+
 	if (m_hMainRebar)
 	{
 		GetWindowRect(m_hMainRebar, &rc);
@@ -492,13 +498,15 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 	SetWindowPos(m_tabContainer->GetHWND(), nullptr, 0, 0, iTabBackingWidth - 25, tabWindowHeight,
 		SWP_SHOWWINDOW | SWP_NOZORDER);
 
-	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hContainer);
-
 	/* Tab close button. */
-	int scaledCloseToolbarWidth = MulDiv(CLOSE_TOOLBAR_WIDTH, dpi, USER_DEFAULT_SCREEN_DPI);
-	int scaledCloseToolbarHeight = MulDiv(CLOSE_TOOLBAR_HEIGHT, dpi, USER_DEFAULT_SCREEN_DPI);
-	int scaledCloseToolbarXOffset = MulDiv(CLOSE_TOOLBAR_X_OFFSET, dpi, USER_DEFAULT_SCREEN_DPI);
-	int scaledCloseToolbarYOffset = MulDiv(CLOSE_TOOLBAR_Y_OFFSET, dpi, USER_DEFAULT_SCREEN_DPI);
+	int scaledCloseToolbarWidth =
+		dpiCompatibility.ScaleValue(m_hTabWindowToolbar, CLOSE_TOOLBAR_WIDTH);
+	int scaledCloseToolbarHeight =
+		dpiCompatibility.ScaleValue(m_hTabWindowToolbar, CLOSE_TOOLBAR_HEIGHT);
+	int scaledCloseToolbarXOffset =
+		dpiCompatibility.ScaleValue(m_hTabWindowToolbar, CLOSE_TOOLBAR_X_OFFSET);
+	int scaledCloseToolbarYOffset =
+		dpiCompatibility.ScaleValue(m_hTabWindowToolbar, CLOSE_TOOLBAR_Y_OFFSET);
 
 	SetWindowPos(m_hTabWindowToolbar, nullptr,
 		iTabBackingWidth - scaledCloseToolbarWidth - scaledCloseToolbarXOffset,
@@ -750,11 +758,11 @@ void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
 {
 	if (m_config->displayWindowVertical)
 	{
-		m_config->displayWindowWidth = max(LOWORD(wParam), MINIMUM_DISPLAYWINDOW_WIDTH);
+		m_config->displayWindowWidth = max(LOWORD(wParam), DISPLAY_WINDOW_MINIMUM_WIDTH);
 	}
 	else
 	{
-		m_config->displayWindowHeight = max(HIWORD(wParam), MINIMUM_DISPLAYWINDOW_HEIGHT);
+		m_config->displayWindowHeight = max(HIWORD(wParam), DISPLAY_WINDOW_MINIMUM_HEIGHT);
 	}
 
 	RECT rc;
