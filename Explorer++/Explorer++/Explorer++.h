@@ -129,9 +129,6 @@ private:
 
 	static inline constexpr COLORREF TAB_BAR_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
 
-	static inline const int CLOSE_TOOLBAR_WIDTH = 24;
-	static inline const int CLOSE_TOOLBAR_HEIGHT = 24;
-
 	struct FileContextMenuInfo
 	{
 		UINT uFrom;
@@ -276,12 +273,9 @@ private:
 	void OnTreeViewCopyUniversalPaths() const;
 
 	/* Holder window private message handlers. */
-	std::optional<LRESULT> OnHolderCtlColorStatic(HWND hwnd, HDC hdc);
 	LRESULT CALLBACK TreeViewHolderWindowNotifyHandler(HWND hwnd, UINT msg, WPARAM wParam,
 		LPARAM lParam);
 	void OnTreeViewHolderWindowTimer();
-
-	LRESULT CALLBACK FoldersToolbarParentProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	/* Tab backing. */
 	void CreateTabBacking();
@@ -329,7 +323,6 @@ private:
 	void CreateBookmarksToolbar();
 	void CreateDrivesToolbar();
 	void CreateApplicationToolbar();
-	HWND CreateTabToolbar(HWND hParent, int idCommand, const std::wstring &tip);
 
 	/* Main toolbars. */
 	void InitializeMainToolbars();
@@ -401,10 +394,10 @@ private:
 	/* Window state update. */
 	void UpdateWindowStates(const Tab &tab);
 	void UpdateTreeViewSelection();
-	void ResizeWindows();
 	void SetListViewInitialPosition(HWND hListView) override;
 	void ToggleFolders();
 	void UpdateLayout();
+	void OnTreeViewHolderResized(int newWidth);
 
 	// Status bar
 	void CreateStatusBar();
@@ -560,10 +553,10 @@ private:
 	HWND m_hStatusBar;
 	HWND m_hMainRebar;
 	HWND m_hDisplayWindow;
-	HWND m_hTabWindowToolbar;
-	HWND m_foldersToolbarParent;
-	HWND m_hFoldersToolbar;
 	HWND m_hTabBacking;
+
+	HWND m_hTabWindowToolbar;
+	wil::unique_himagelist m_tabWindowToolbarImageList;
 
 	IDirectoryMonitor *m_pDirMon;
 	HolderWindow *m_treeViewHolder = nullptr;

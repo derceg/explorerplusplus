@@ -23,7 +23,6 @@
 #include "../Helper/ShellHelper.h"
 
 #define TREEVIEW_FOLDER_OPEN_DELAY 500
-#define FOLDERS_TOOLBAR_CLOSE 6000
 
 LRESULT CALLBACK TreeViewHolderProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 	UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
@@ -44,7 +43,13 @@ void Explorerplusplus::CreateFolderControls()
 	}
 
 	m_treeViewHolder = HolderWindow::Create(m_hContainer,
-		ResourceHelper::LoadString(m_resourceInstance, IDS_FOLDERS_WINDOW_TEXT), holderStyle);
+		ResourceHelper::LoadString(m_resourceInstance, IDS_FOLDERS_WINDOW_TEXT), holderStyle,
+		ResourceHelper::LoadString(m_resourceInstance, IDS_HIDE_FOLDERS_PANE), this);
+	m_treeViewHolder->SetCloseButtonClickedCallback(
+		std::bind(&Explorerplusplus::ToggleFolders, this));
+	m_treeViewHolder->SetResizedCallback(
+		std::bind_front(&Explorerplusplus::OnTreeViewHolderResized, this));
+
 	SetWindowSubclass(m_treeViewHolder->GetHWND(), TreeViewHolderProcStub, 0, (DWORD_PTR) this);
 
 	m_shellTreeView = ShellTreeView::Create(m_treeViewHolder->GetHWND(), this, m_tabContainer,
@@ -54,25 +59,6 @@ void Explorerplusplus::CreateFolderControls()
 	such as WM_MOUSEWHEEL, which need to be intercepted before they
 	reach the window procedure provided by ShellTreeView. */
 	SetWindowSubclass(m_shellTreeView->GetHWND(), TreeViewSubclassStub, 1, (DWORD_PTR) this);
-
-	m_foldersToolbarParent =
-		CreateWindow(WC_STATIC, EMPTY_STRING, WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS, 0, 0, 0, 0,
-			m_treeViewHolder->GetHWND(), nullptr, GetModuleHandle(nullptr), nullptr);
-
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_foldersToolbarParent,
-		std::bind_front(&Explorerplusplus::FoldersToolbarParentProc, this)));
-
-	m_hFoldersToolbar = CreateTabToolbar(m_foldersToolbarParent, FOLDERS_TOOLBAR_CLOSE,
-		ResourceHelper::LoadString(m_resourceInstance, IDS_HIDEFOLDERSPANE));
-
-	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_treeViewHolder->GetHWND());
-
-	int scaledCloseToolbarWidth = MulDiv(CLOSE_TOOLBAR_WIDTH, dpi, USER_DEFAULT_SCREEN_DPI);
-	int scaledCloseToolbarHeight = MulDiv(CLOSE_TOOLBAR_HEIGHT, dpi, USER_DEFAULT_SCREEN_DPI);
-	SetWindowPos(m_foldersToolbarParent, nullptr, 0, 0, scaledCloseToolbarWidth,
-		scaledCloseToolbarHeight, SWP_NOZORDER);
-	SetWindowPos(m_hFoldersToolbar, nullptr, 0, 0, scaledCloseToolbarWidth,
-		scaledCloseToolbarHeight, SWP_NOZORDER);
 
 	m_InitializationFinished.addObserver(
 		[this](bool newValue)
@@ -120,24 +106,6 @@ void Explorerplusplus::CreateFolderControls()
 
 			UpdateTreeViewSelection();
 		});
-}
-
-LRESULT CALLBACK Explorerplusplus::FoldersToolbarParentProc(HWND hwnd, UINT msg, WPARAM wParam,
-	LPARAM lParam)
-{
-	switch (msg)
-	{
-	case WM_COMMAND:
-		switch (LOWORD(wParam))
-		{
-		case FOLDERS_TOOLBAR_CLOSE:
-			ToggleFolders();
-			return 0;
-		}
-		break;
-	}
-
-	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
 LRESULT CALLBACK TreeViewSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
@@ -382,14 +350,6 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderProc(HWND hwnd, UINT msg, WPARA
 		}
 		break;
 
-	case WM_CTLCOLORSTATIC:
-		if (auto result = OnHolderCtlColorStatic(reinterpret_cast<HWND>(lParam),
-				reinterpret_cast<HDC>(wParam)))
-		{
-			return *result;
-		}
-		break;
-
 	case WM_NOTIFY:
 		return TreeViewHolderWindowNotifyHandler(hwnd, msg, wParam, lParam);
 
@@ -412,25 +372,6 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowNotifyHandler(HWND hwnd, 
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
-}
-
-std::optional<LRESULT> Explorerplusplus::OnHolderCtlColorStatic(HWND hwnd, HDC hdc)
-{
-	UNREFERENCED_PARAMETER(hdc);
-
-	if (hwnd != m_foldersToolbarParent)
-	{
-		return std::nullopt;
-	}
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
-
-	if (!darkModeHelper.IsDarkModeEnabled())
-	{
-		return std::nullopt;
-	}
-
-	return reinterpret_cast<LRESULT>(darkModeHelper.GetBackgroundBrush());
 }
 
 void Explorerplusplus::OnTreeViewSetFileAttributes() const
@@ -506,4 +447,11 @@ void Explorerplusplus::UpdateTreeViewSelection()
 			SendMessage(m_shellTreeView->GetHWND(), TVM_SELECTITEM, TVGN_CARET, (LPARAM) hItem);
 		}
 	}
+}
+
+void Explorerplusplus::OnTreeViewHolderResized(int newWidth)
+{
+	m_config->treeViewWidth = newWidth;
+
+	UpdateLayout();
 }

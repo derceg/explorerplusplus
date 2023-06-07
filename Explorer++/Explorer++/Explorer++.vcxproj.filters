@@ -544,6 +544,9 @@
     <ClCompile Include="ThemeWindowTracker.cpp">
       <Filter>Dark Mode Support</Filter>
     </ClCompile>
+    <ClCompile Include="ToolbarHelper.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1099,6 +1102,9 @@
       <Filter>Dark Mode Support</Filter>
     </ClInclude>
     <ClInclude Include="Literals.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolbarHelper.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

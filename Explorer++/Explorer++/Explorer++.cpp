@@ -55,8 +55,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd, CommandLine::Settings *commandLine
 	m_hTabBacking = nullptr;
 	m_hTabWindowToolbar = nullptr;
 	m_hDisplayWindow = nullptr;
-	m_foldersToolbarParent = nullptr;
-	m_hFoldersToolbar = nullptr;
 	m_lastActiveWindow = nullptr;
 	m_hActiveListView = nullptr;
 	m_zDeltaTotal = 0;

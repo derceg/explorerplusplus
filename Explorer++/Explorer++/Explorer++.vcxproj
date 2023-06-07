@@ -764,6 +764,7 @@
     <ClCompile Include="Theme.cpp" />
     <ClCompile Include="ThemedDialog.cpp" />
     <ClCompile Include="ThemeWindowTracker.cpp" />
+    <ClCompile Include="ToolbarHelper.cpp" />
     <ClCompile Include="ToolbarView.cpp" />
     <ClCompile Include="Bookmarks\BookmarkIconManager.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkMenuController.cpp" />
@@ -975,6 +976,7 @@
     <ClInclude Include="Theme.h" />
     <ClInclude Include="ThemedDialog.h" />
     <ClInclude Include="ThemeWindowTracker.h" />
+    <ClInclude Include="ToolbarHelper.h" />
     <ClInclude Include="ToolbarView.h" />
     <ClInclude Include="Bookmarks\BookmarkIconManager.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkMenuController.h" />

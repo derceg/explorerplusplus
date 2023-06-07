@@ -78,7 +78,7 @@ void Explorerplusplus::OnCreate()
 	them from this width is to turn auto arrange back on.
 	Therefore, the listview MUST be set to the correct
 	size initially. */
-	ResizeWindows();
+	UpdateLayout();
 
 	m_taskbarThumbnails =
 		TaskbarThumbnails::Create(this, m_tabContainer, m_resourceInstance, m_config);

@@ -13,6 +13,7 @@
 #include "ResourceHelper.h"
 #include "TabBacking.h"
 #include "TabContainer.h"
+#include "ToolbarHelper.h"
 #include "../Helper/Macros.h"
 
 void Explorerplusplus::CreateTabBacking()
@@ -23,8 +24,17 @@ void Explorerplusplus::CreateTabBacking()
 
 	/* Create the toolbar that will appear on the tab control.
 	Only contains the close button used to close tabs. */
-	m_hTabWindowToolbar = CreateTabToolbar(m_hTabBacking, TABTOOLBAR_CLOSE,
-		ResourceHelper::LoadString(m_resourceInstance, IDS_TAB_CLOSE_TIP));
+	std::tie(m_hTabWindowToolbar, m_tabWindowToolbarImageList) =
+		ToolbarHelper::CreateCloseButtonToolbar(m_hTabBacking, TABTOOLBAR_CLOSE,
+			ResourceHelper::LoadString(m_resourceInstance, IDS_TAB_CLOSE_TIP),
+			m_iconResourceLoader.get());
+
+	SIZE toolbarSize;
+	[[maybe_unused]] auto sizeRes =
+		SendMessage(m_hTabWindowToolbar, TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&toolbarSize));
+	assert(sizeRes);
+	SetWindowPos(m_hTabWindowToolbar, nullptr, 0, 0, toolbarSize.cx, toolbarSize.cy,
+		SWP_NOZORDER | SWP_NOMOVE);
 
 	AddTabsInitializedObserver(std::bind_front(&Explorerplusplus::OnTabsInitialized, this));
 }

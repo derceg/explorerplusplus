@@ -173,17 +173,6 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM w
 			OnAssocChanged();
 			break;*/
 
-	case WM_APP_HOLDER_RESIZED:
-	{
-		RECT mainWindowRect;
-		GetClientRect(m_hContainer, &mainWindowRect);
-
-		m_config->treeViewWidth = static_cast<int>(lParam);
-
-		OnSize(mainWindowRect.right, mainWindowRect.bottom);
-	}
-	break;
-
 	case WM_APP_FOLDERSIZECOMPLETED:
 	{
 		DWFolderSizeCompletion *pDWFolderSizeCompletion = nullptr;
@@ -497,7 +486,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 	case IDM_VIEW_STATUSBAR:
 		m_config->showStatusBar = !m_config->showStatusBar;
 		lShowWindow(m_hStatusBar, m_config->showStatusBar);
-		ResizeWindows();
+		UpdateLayout();
 		break;
 
 	case MainToolbarButton::Folders:
@@ -508,13 +497,13 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 	case IDM_VIEW_DISPLAYWINDOW:
 		m_config->showDisplayWindow = !m_config->showDisplayWindow;
 		lShowWindow(m_hDisplayWindow, m_config->showDisplayWindow);
-		ResizeWindows();
+		UpdateLayout();
 		break;
 
 	case IDM_DISPLAYWINDOW_VERTICAL:
 		m_config->displayWindowVertical = !m_config->displayWindowVertical;
 		ApplyDisplayWindowPosition();
-		ResizeWindows();
+		UpdateLayout();
 		break;
 
 	case IDM_TOOLBARS_ADDRESSBAR:
@@ -1422,7 +1411,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 	case IDM_DW_HIDEDISPLAYWINDOW:
 		m_config->showDisplayWindow = FALSE;
 		lShowWindow(m_hDisplayWindow, m_config->showDisplayWindow);
-		ResizeWindows();
+		UpdateLayout();
 		break;
 	}
 
@@ -1476,7 +1465,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 		return 0;
 
 	case RBN_HEIGHTCHANGE:
-		ResizeWindows();
+		UpdateLayout();
 		break;
 
 	case RBN_CHEVRONPUSHED:

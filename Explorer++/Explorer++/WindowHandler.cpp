@@ -15,51 +15,6 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowHelper.h"
 
-HWND Explorerplusplus::CreateTabToolbar(HWND hParent, int idCommand, const std::wstring &tip)
-{
-	HWND tabToolbar = CreateToolbar(hParent,
-		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | TBSTYLE_TOOLTIPS | TBSTYLE_LIST
-			| TBSTYLE_TRANSPARENT | TBSTYLE_FLAT | CCS_NODIVIDER | CCS_NOPARENTALIGN | CCS_NORESIZE,
-		TBSTYLE_EX_MIXEDBUTTONS | TBSTYLE_EX_DOUBLEBUFFER);
-
-	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(tabToolbar);
-	int scaledIconSize = MulDiv(16, dpi, USER_DEFAULT_SCREEN_DPI);
-
-	SendMessage(tabToolbar, TB_SETBITMAPSIZE, 0, MAKELONG(scaledIconSize, scaledIconSize));
-	SendMessage(tabToolbar, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
-	SendMessage(tabToolbar, TB_SETBUTTONSIZE, 0, MAKELPARAM(scaledIconSize, scaledIconSize));
-
-	/* TODO: The image list is been leaked. */
-	HIMAGELIST himl =
-		ImageList_Create(scaledIconSize, scaledIconSize, ILC_COLOR32 | ILC_MASK, 0, 1);
-	wil::unique_hbitmap bitmap =
-		m_iconResourceLoader->LoadBitmapFromPNGForDpi(Icon::CloseButton, 16, 16, dpi);
-	int iIndex = ImageList_Add(himl, bitmap.get(), nullptr);
-	SendMessage(tabToolbar, TB_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(himl));
-
-	/* Add the close button, used to close tabs. */
-	TBBUTTON tbButton;
-	tbButton.iBitmap = iIndex;
-	tbButton.idCommand = idCommand;
-	tbButton.fsState = TBSTATE_ENABLED;
-	tbButton.fsStyle = TBSTYLE_BUTTON | TBSTYLE_AUTOSIZE;
-	tbButton.dwData = 0;
-	tbButton.iString = reinterpret_cast<INT_PTR>(tip.c_str());
-	SendMessage(tabToolbar, TB_INSERTBUTTON, 0, reinterpret_cast<LPARAM>(&tbButton));
-
-	SendMessage(tabToolbar, TB_AUTOSIZE, 0, 0);
-
-	return tabToolbar;
-}
-
-void Explorerplusplus::ResizeWindows()
-{
-	RECT rc;
-
-	GetClientRect(m_hContainer, &rc);
-	SendMessage(m_hContainer, WM_SIZE, SIZE_RESTORED, MAKELPARAM(rc.right, rc.bottom));
-}
-
 /* TODO: This should be linked to OnSize(). */
 void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 {
@@ -148,7 +103,7 @@ void Explorerplusplus::ToggleFolders()
 
 	SendMessage(m_mainToolbar->GetHWND(), TB_CHECKBUTTON, (WPARAM) MainToolbarButton::Folders,
 		m_config->showFolders);
-	ResizeWindows();
+	UpdateLayout();
 }
 
 void Explorerplusplus::UpdateLayout()

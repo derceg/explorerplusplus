@@ -21,6 +21,7 @@
 #include "ShellBrowser/ViewModes.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "TabContainer.h"
+#include "ToolbarHelper.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
@@ -44,9 +45,6 @@ static const int TREEVIEW_X_CLEARANCE = 1;
 /* The spacing between the right edge of
 the treeview and the holder window. */
 static const int TREEVIEW_HOLDER_CLEARANCE = 4;
-
-const int CLOSE_TOOLBAR_X_OFFSET = 4;
-const int CLOSE_TOOLBAR_Y_OFFSET = 1;
 
 void Explorerplusplus::TestConfigFile()
 {
@@ -499,19 +497,16 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 		SWP_SHOWWINDOW | SWP_NOZORDER);
 
 	/* Tab close button. */
-	int scaledCloseToolbarWidth =
-		dpiCompatibility.ScaleValue(m_hTabWindowToolbar, CLOSE_TOOLBAR_WIDTH);
-	int scaledCloseToolbarHeight =
-		dpiCompatibility.ScaleValue(m_hTabWindowToolbar, CLOSE_TOOLBAR_HEIGHT);
 	int scaledCloseToolbarXOffset =
-		dpiCompatibility.ScaleValue(m_hTabWindowToolbar, CLOSE_TOOLBAR_X_OFFSET);
+		dpiCompatibility.ScaleValue(m_hTabWindowToolbar, ToolbarHelper::CLOSE_TOOLBAR_X_OFFSET);
 	int scaledCloseToolbarYOffset =
-		dpiCompatibility.ScaleValue(m_hTabWindowToolbar, CLOSE_TOOLBAR_Y_OFFSET);
+		dpiCompatibility.ScaleValue(m_hTabWindowToolbar, ToolbarHelper::CLOSE_TOOLBAR_Y_OFFSET);
 
+	RECT tabToolbarRect;
+	GetClientRect(m_hTabWindowToolbar, &tabToolbarRect);
 	SetWindowPos(m_hTabWindowToolbar, nullptr,
-		iTabBackingWidth - scaledCloseToolbarWidth - scaledCloseToolbarXOffset,
-		scaledCloseToolbarYOffset, scaledCloseToolbarWidth, scaledCloseToolbarHeight,
-		SWP_SHOWWINDOW | SWP_NOZORDER);
+		iTabBackingWidth - GetRectWidth(&tabToolbarRect) - scaledCloseToolbarXOffset,
+		scaledCloseToolbarYOffset, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 
 	if (m_config->extendTabControl.get() && !m_config->showTabBarAtBottom.get())
 	{
@@ -543,10 +538,6 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 	SetWindowPos(m_shellTreeView->GetHWND(), nullptr, TREEVIEW_X_CLEARANCE, tabWindowHeight,
 		iHolderWidth - TREEVIEW_HOLDER_CLEARANCE - TREEVIEW_X_CLEARANCE,
 		iHolderHeight - tabWindowHeight, SWP_NOZORDER);
-
-	SetWindowPos(m_foldersToolbarParent, nullptr,
-		iHolderWidth - scaledCloseToolbarWidth - scaledCloseToolbarXOffset,
-		scaledCloseToolbarYOffset, 0, 0, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOSIZE);
 
 	/* <---- Display window ----> */
 

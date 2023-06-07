@@ -9,19 +9,23 @@
 
 #include "stdafx.h"
 #include "HolderWindow.h"
+#include "CoreInterface.h"
 #include "DarkModeHelper.h"
+#include "ToolbarHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowHelper.h"
 
 #define FOLDERS_TEXT_X 5
 #define FOLDERS_TEXT_Y 2
 
-HolderWindow *HolderWindow::Create(HWND parent, const std::wstring &caption, DWORD style)
+HolderWindow *HolderWindow::Create(HWND parent, const std::wstring &caption, DWORD style,
+	const std::wstring &closeButtonTooltip, CoreInterface *coreInterface)
 {
-	return new HolderWindow(parent, caption, style);
+	return new HolderWindow(parent, caption, style, closeButtonTooltip, coreInterface);
 }
 
-HolderWindow::HolderWindow(HWND parent, const std::wstring &caption, DWORD style) :
+HolderWindow::HolderWindow(HWND parent, const std::wstring &caption, DWORD style,
+	const std::wstring &closeButtonTooltip, CoreInterface *coreInterface) :
 	m_hwnd(CreateHolderWindow(parent, caption, style)),
 	m_sizingCursor(LoadCursor(nullptr, IDC_SIZEWE))
 {
@@ -37,6 +41,16 @@ HolderWindow::HolderWindow(HWND parent, const std::wstring &caption, DWORD style
 	nonClientMetrics.lfSmCaptionFont.lfWeight = FW_NORMAL;
 	m_font.reset(CreateFontIndirect(&nonClientMetrics.lfSmCaptionFont));
 	assert(m_font);
+
+	std::tie(m_toolbar, m_toolbarImageList) = ToolbarHelper::CreateCloseButtonToolbar(m_hwnd,
+		CLOSE_BUTTON_ID, closeButtonTooltip, coreInterface->GetIconResourceLoader());
+
+	SIZE toolbarSize;
+	[[maybe_unused]] auto sizeRes =
+		SendMessage(m_toolbar, TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&toolbarSize));
+	assert(sizeRes);
+	SetWindowPos(m_toolbar, nullptr, 0, 0, toolbarSize.cx, toolbarSize.cy,
+		SWP_NOZORDER | SWP_NOMOVE);
 }
 
 HWND HolderWindow::CreateHolderWindow(HWND parent, const std::wstring &caption, DWORD style)
@@ -117,58 +131,102 @@ LRESULT CALLBACK HolderWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 		}
 		break;
 
+	case WM_COMMAND:
+		if (HIWORD(wParam) == 0)
+		{
+			switch (LOWORD(wParam))
+			{
+			case CLOSE_BUTTON_ID:
+				if (m_closeButtonClickedCallback)
+				{
+					m_closeButtonClickedCallback();
+				}
+				return 0;
+			}
+		}
+		break;
+
 	case WM_ERASEBKGND:
-		OnEraseBackground(reinterpret_cast<HDC>(wParam));
 		return 1;
 
 	case WM_PAINT:
-		OnPaint(hwnd);
+		OnPaint();
 		return 0;
+
+	// The toolbar that's contained within this window has a transparent background, with the
+	// background from the parent being drawn underneath it. For that background to be correctly
+	// drawn, WM_PRINTCLIENT needs to be handled.
+	case WM_PRINTCLIENT:
+		OnPrintClient(reinterpret_cast<HDC>(wParam));
+		return 0;
+
+	case WM_SIZE:
+		OnSize(LOWORD(lParam), HIWORD(lParam));
+		break;
 	}
 
 	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-void HolderWindow::OnEraseBackground(HDC hdc)
+void HolderWindow::OnPaint()
+{
+	PAINTSTRUCT ps;
+	BeginPaint(m_hwnd, &ps);
+	PerformPaint(ps);
+	EndPaint(m_hwnd, &ps);
+}
+
+void HolderWindow::OnPrintClient(HDC hdc)
+{
+	PAINTSTRUCT ps = {};
+	ps.hdc = hdc;
+	GetClientRect(m_hwnd, &ps.rcPaint);
+	PerformPaint(ps);
+}
+
+void HolderWindow::PerformPaint(const PAINTSTRUCT &ps)
 {
 	auto &darkModeHelper = DarkModeHelper::GetInstance();
-	HBRUSH brush;
+	HBRUSH backgroundBrush;
 
 	if (darkModeHelper.IsDarkModeEnabled())
 	{
-		brush = darkModeHelper.GetBackgroundBrush();
+		backgroundBrush = darkModeHelper.GetBackgroundBrush();
 	}
 	else
 	{
-		brush = GetSysColorBrush(COLOR_BTNFACE);
+		backgroundBrush = GetSysColorBrush(COLOR_BTNFACE);
 	}
 
-	RECT rc;
-	GetClientRect(m_hwnd, &rc);
-	FillRect(hdc, &rc, brush);
-}
+	FillRect(ps.hdc, &ps.rcPaint, backgroundBrush);
 
-void HolderWindow::OnPaint(HWND hwnd)
-{
-	PAINTSTRUCT ps;
-	HDC hdc = BeginPaint(hwnd, &ps);
-
-	wil::unique_select_object object(SelectObject(hdc, m_font.get()));
-
-	std::wstring header = GetWindowString(hwnd);
-
-	SetBkMode(hdc, TRANSPARENT);
-
-	auto &darkModeHelper = DarkModeHelper::GetInstance();
+	std::wstring caption = GetWindowString(m_hwnd);
+	auto selectFont = wil::SelectObject(ps.hdc, m_font.get());
+	SetBkMode(ps.hdc, TRANSPARENT);
 
 	if (darkModeHelper.IsDarkModeEnabled())
 	{
-		SetTextColor(hdc, DarkModeHelper::TEXT_COLOR);
+		SetTextColor(ps.hdc, DarkModeHelper::TEXT_COLOR);
 	}
 
-	TextOut(hdc, FOLDERS_TEXT_X, FOLDERS_TEXT_Y, header.c_str(), static_cast<int>(header.size()));
+	TextOut(ps.hdc, FOLDERS_TEXT_X, FOLDERS_TEXT_Y, caption.c_str(),
+		static_cast<int>(caption.size()));
+}
 
-	EndPaint(hwnd, &ps);
+void HolderWindow::OnSize(int width, int height)
+{
+	UNREFERENCED_PARAMETER(height);
+
+	auto &dpiCompatibility = DpiCompatibility::GetInstance();
+	int scaledCloseToolbarXOffset =
+		dpiCompatibility.ScaleValue(m_toolbar, ToolbarHelper::CLOSE_TOOLBAR_X_OFFSET);
+	int scaledCloseToolbarYOffset =
+		dpiCompatibility.ScaleValue(m_toolbar, ToolbarHelper::CLOSE_TOOLBAR_Y_OFFSET);
+
+	RECT toolbarRect;
+	GetClientRect(m_toolbar, &toolbarRect);
+	SetWindowPos(m_toolbar, nullptr, width - GetRectWidth(&toolbarRect) - scaledCloseToolbarXOffset,
+		scaledCloseToolbarYOffset, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 }
 
 void HolderWindow::OnLButtonDown(const POINT &pt)
@@ -203,7 +261,11 @@ int HolderWindow::OnMouseMove(const POINT &pt)
 		GetClientRect(m_hwnd, &clientRect);
 
 		int newWidth = (std::max)(pt.x + m_resizeDistanceToEdge.value(), 0L);
-		SendMessage(GetParent(m_hwnd), WM_APP_HOLDER_RESIZED, 0, newWidth);
+
+		if (m_resizedCallback)
+		{
+			m_resizedCallback(newWidth);
+		}
 
 		return 1;
 	}
@@ -252,4 +314,14 @@ bool HolderWindow::IsCursorInResizeStartRange(const POINT &ptCursor)
 HWND HolderWindow::GetHWND() const
 {
 	return m_hwnd;
+}
+
+void HolderWindow::SetResizedCallback(ResizedCallback callback)
+{
+	m_resizedCallback = callback;
+}
+
+void HolderWindow::SetCloseButtonClickedCallback(CloseButtonClickedCallback callback)
+{
+	m_closeButtonClickedCallback = callback;
 }
