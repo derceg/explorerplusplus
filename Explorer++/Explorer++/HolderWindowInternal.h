@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Literals.h"
+#include <wil/resource.h>
 #include <optional>
 
 class HolderWindow
@@ -19,7 +20,7 @@ private:
 	static constexpr int RESIZE_START_RANGE = 6_px;
 
 	void OnEraseBackground(HDC hdc);
-	void OnHolderWindowPaint(HWND hwnd);
+	void OnPaint(HWND hwnd);
 	void OnLButtonDown(const POINT &pt);
 	void OnLButtonUp();
 	int OnMouseMove(const POINT &pt);
@@ -27,6 +28,7 @@ private:
 	bool IsCursorInResizeStartRange(const POINT &ptCursor);
 
 	const HWND m_hwnd;
+	wil::unique_hfont m_font;
 	HCURSOR m_sizingCursor;
 	bool m_resizing = false;
 	std::optional<int> m_resizeDistanceToEdge;

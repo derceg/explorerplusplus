@@ -26,6 +26,18 @@ HolderWindow::HolderWindow(HWND hHolder) :
 	m_hwnd(hHolder),
 	m_sizingCursor(LoadCursor(nullptr, IDC_SIZEWE))
 {
+	auto &dpiCompat = DpiCompatibility::GetInstance();
+	UINT dpi = dpiCompat.GetDpiForWindow(m_hwnd);
+
+	NONCLIENTMETRICS nonClientMetrics = {};
+	nonClientMetrics.cbSize = sizeof(nonClientMetrics);
+	[[maybe_unused]] auto res = dpiCompat.SystemParametersInfoForDpi(SPI_GETNONCLIENTMETRICS,
+		sizeof(NONCLIENTMETRICS), &nonClientMetrics, 0, dpi);
+	assert(res);
+
+	nonClientMetrics.lfSmCaptionFont.lfWeight = FW_NORMAL;
+	m_font.reset(CreateFontIndirect(&nonClientMetrics.lfSmCaptionFont));
+	assert(m_font);
 }
 
 ATOM RegisterHolderWindowClass()
@@ -104,7 +116,7 @@ LRESULT CALLBACK HolderWindow::HolderWndProc(HWND hwnd, UINT msg, WPARAM wParam,
 		return 1;
 
 	case WM_PAINT:
-		OnHolderWindowPaint(hwnd);
+		OnPaint(hwnd);
 		return 0;
 	}
 
@@ -130,32 +142,12 @@ void HolderWindow::OnEraseBackground(HDC hdc)
 	FillRect(hdc, &rc, brush);
 }
 
-/*
- * Draws the window text onto the holder
- * window.
- */
-void HolderWindow::OnHolderWindowPaint(HWND hwnd)
+void HolderWindow::OnPaint(HWND hwnd)
 {
 	PAINTSTRUCT ps;
-	NONCLIENTMETRICS ncm;
-	HDC hdc;
-	HFONT hFont;
-	RECT rc;
+	HDC hdc = BeginPaint(hwnd, &ps);
 
-	GetClientRect(hwnd, &rc);
-
-	hdc = BeginPaint(hwnd, &ps);
-
-	auto &dpiCompat = DpiCompatibility::GetInstance();
-	UINT dpi = dpiCompat.GetDpiForWindow(hwnd);
-
-	ncm.cbSize = sizeof(ncm);
-	dpiCompat.SystemParametersInfoForDpi(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0,
-		dpi);
-	ncm.lfSmCaptionFont.lfWeight = FW_NORMAL;
-	hFont = CreateFontIndirect(&ncm.lfSmCaptionFont);
-
-	SelectObject(hdc, hFont);
+	wil::unique_select_object object(SelectObject(hdc, m_font.get()));
 
 	std::wstring header = GetWindowString(hwnd);
 
@@ -169,8 +161,6 @@ void HolderWindow::OnHolderWindowPaint(HWND hwnd)
 	}
 
 	TextOut(hdc, FOLDERS_TEXT_X, FOLDERS_TEXT_Y, header.c_str(), static_cast<int>(header.size()));
-
-	DeleteObject(hFont);
 
 	EndPaint(hwnd, &ps);
 }
