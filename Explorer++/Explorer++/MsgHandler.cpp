@@ -445,8 +445,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 
 	if (m_config->showFolders)
 	{
-		GetClientRect(m_hHolder, &rc);
-		indentLeft = GetRectWidth(&rc);
+		indentLeft = m_config->treeViewWidth;
 	}
 
 	RECT tabWindowRect;
