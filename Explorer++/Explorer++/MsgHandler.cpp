@@ -9,6 +9,7 @@
 #include "Config.h"
 #include "DarkModeHelper.h"
 #include "Explorer++_internal.h"
+#include "HolderWindow.h"
 #include "LoadSaveRegistry.h"
 #include "LoadSaveXml.h"
 #include "MainResource.h"
@@ -416,7 +417,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 	auto &dpiCompatibility = DpiCompatibility::GetInstance();
 
 	m_config->treeViewWidth = std::clamp(m_config->treeViewWidth,
-		dpiCompatibility.ScaleValue(m_hHolder, TREEVIEW_MINIMUM_WIDTH),
+		dpiCompatibility.ScaleValue(m_treeViewHolder->GetHWND(), TREEVIEW_MINIMUM_WIDTH),
 		static_cast<int>(TREEVIEW_MAXIMUM_WIDTH_PERCENTAGE * MainWindowWidth));
 
 	if (m_hMainRebar)
@@ -534,7 +535,8 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 
 	iHolderWidth = m_config->treeViewWidth;
 
-	SetWindowPos(m_hHolder, nullptr, 0, iHolderTop, iHolderWidth, iHolderHeight, SWP_NOZORDER);
+	SetWindowPos(m_treeViewHolder->GetHWND(), nullptr, 0, iHolderTop, iHolderWidth, iHolderHeight,
+		SWP_NOZORDER);
 
 	/* The treeview is only slightly smaller than the holder
 	window, in both the x and y-directions. */

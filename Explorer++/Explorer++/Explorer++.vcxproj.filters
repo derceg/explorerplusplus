@@ -627,9 +627,6 @@
     <ClInclude Include="HolderWindow.h">
       <Filter>Holder Window</Filter>
     </ClInclude>
-    <ClInclude Include="HolderWindowInternal.h">
-      <Filter>Holder Window</Filter>
-    </ClInclude>
     <ClInclude Include="ShellBrowser\SortModes.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>

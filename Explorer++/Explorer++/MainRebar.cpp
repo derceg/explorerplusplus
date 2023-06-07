@@ -350,8 +350,6 @@ void Explorerplusplus::OnToggleApplicationToolbar()
 void Explorerplusplus::OnToggleToolbar(HWND toolbar, bool show)
 {
 	ShowMainRebarBand(toolbar, show);
-	AdjustFolderPanePosition();
-	ResizeWindows();
 }
 
 void Explorerplusplus::OnCustomizeMainToolbar()

@@ -173,7 +173,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM w
 			OnAssocChanged();
 			break;*/
 
-	case WM_USER_HOLDERRESIZED:
+	case WM_APP_HOLDER_RESIZED:
 	{
 		RECT mainWindowRect;
 		GetClientRect(m_hContainer, &mainWindowRect);
@@ -1476,10 +1476,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 		return 0;
 
 	case RBN_HEIGHTCHANGE:
-		/* The listview and treeview may
-		need to be moved to accommodate the new
-		rebar size. */
-		AdjustFolderPanePosition();
 		ResizeWindows();
 		break;
 

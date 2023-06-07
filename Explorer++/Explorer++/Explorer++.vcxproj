@@ -1026,7 +1026,6 @@
     <ClInclude Include="FilterDialog.h" />
     <ClInclude Include="DriveWatcherImpl.h" />
     <ClInclude Include="HolderWindow.h" />
-    <ClInclude Include="HolderWindowInternal.h" />
     <ClInclude Include="Icon.h" />
     <ClInclude Include="IconMappings.h" />
     <ClInclude Include="IconResourceLoader.h" />

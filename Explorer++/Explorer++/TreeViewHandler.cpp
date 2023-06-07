@@ -36,20 +36,19 @@ HTREEITEM g_newSelectionItem;
 
 void Explorerplusplus::CreateFolderControls()
 {
-	TCHAR szTemp[32];
-	UINT uStyle = WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+	UINT holderStyle = WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 
 	if (m_config->showFolders)
 	{
-		uStyle |= WS_VISIBLE;
+		holderStyle |= WS_VISIBLE;
 	}
 
-	LoadString(m_resourceInstance, IDS_FOLDERS_WINDOW_TEXT, szTemp, SIZEOF_ARRAY(szTemp));
-	m_hHolder = CreateHolderWindow(m_hContainer, szTemp, uStyle);
-	SetWindowSubclass(m_hHolder, TreeViewHolderProcStub, 0, (DWORD_PTR) this);
+	m_treeViewHolder = HolderWindow::Create(m_hContainer,
+		ResourceHelper::LoadString(m_resourceInstance, IDS_FOLDERS_WINDOW_TEXT), holderStyle);
+	SetWindowSubclass(m_treeViewHolder->GetHWND(), TreeViewHolderProcStub, 0, (DWORD_PTR) this);
 
-	m_shellTreeView = ShellTreeView::Create(m_hHolder, this, m_tabContainer, &m_FileActionHandler,
-		&m_cachedIcons);
+	m_shellTreeView = ShellTreeView::Create(m_treeViewHolder->GetHWND(), this, m_tabContainer,
+		&m_FileActionHandler, &m_cachedIcons);
 
 	/* Now, subclass the treeview again. This is needed for messages
 	such as WM_MOUSEWHEEL, which need to be intercepted before they
@@ -58,7 +57,7 @@ void Explorerplusplus::CreateFolderControls()
 
 	m_foldersToolbarParent =
 		CreateWindow(WC_STATIC, EMPTY_STRING, WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS, 0, 0, 0, 0,
-			m_hHolder, nullptr, GetModuleHandle(nullptr), nullptr);
+			m_treeViewHolder->GetHWND(), nullptr, GetModuleHandle(nullptr), nullptr);
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_foldersToolbarParent,
 		std::bind_front(&Explorerplusplus::FoldersToolbarParentProc, this)));
@@ -66,7 +65,7 @@ void Explorerplusplus::CreateFolderControls()
 	m_hFoldersToolbar = CreateTabToolbar(m_foldersToolbarParent, FOLDERS_TOOLBAR_CLOSE,
 		ResourceHelper::LoadString(m_resourceInstance, IDS_HIDEFOLDERSPANE));
 
-	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hHolder);
+	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_treeViewHolder->GetHWND());
 
 	int scaledCloseToolbarWidth = MulDiv(CLOSE_TOOLBAR_WIDTH, dpi, USER_DEFAULT_SCREEN_DPI);
 	int scaledCloseToolbarHeight = MulDiv(CLOSE_TOOLBAR_HEIGHT, dpi, USER_DEFAULT_SCREEN_DPI);
@@ -290,7 +289,7 @@ void Explorerplusplus::OnTreeViewHolderWindowTimer()
 	// what can happen is that if access to the folder is denied, a dialog will be shown and the
 	// message loop will run. That will then cause the timer to fire again, which will start another
 	// navigation, ad infinitum.
-	KillTimer(m_hHolder, 0);
+	KillTimer(m_treeViewHolder->GetHWND(), 0);
 
 	auto pidlDirectory = m_shellTreeView->GetNodePidl(g_newSelectionItem);
 	auto pidlCurrentDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
@@ -340,13 +339,13 @@ void Explorerplusplus::OnTreeViewSelChanged(LPARAM lParam)
 			/* Schedule a folder change. This adds enough
 			of a delay for the treeview selection to be changed
 			without the current folder been changed immediately. */
-			SetTimer(m_hHolder, 0, TREEVIEW_FOLDER_OPEN_DELAY, nullptr);
+			SetTimer(m_treeViewHolder->GetHWND(), 0, TREEVIEW_FOLDER_OPEN_DELAY, nullptr);
 		}
 		else
 		{
 			/* The treeview delay is disabled. For simplicity, just
 			set a timer of length 0. */
-			SetTimer(m_hHolder, 0, 0, nullptr);
+			SetTimer(m_treeViewHolder->GetHWND(), 0, 0, nullptr);
 		}
 	}
 	else

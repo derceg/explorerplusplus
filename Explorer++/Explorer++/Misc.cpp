@@ -196,52 +196,6 @@ void Explorerplusplus::ApplyToolbarSettings()
 	}
 }
 
-void Explorerplusplus::AdjustFolderPanePosition()
-{
-	RECT rcMainWindow;
-	int indentTop = 0;
-	int indentBottom = 0;
-	int height;
-
-	GetClientRect(m_hContainer, &rcMainWindow);
-	height = GetRectHeight(&rcMainWindow);
-
-	if (m_hMainRebar)
-	{
-		RECT rebarRect;
-
-		GetWindowRect(m_hMainRebar, &rebarRect);
-
-		indentTop += rebarRect.bottom - rebarRect.top;
-	}
-
-	if (m_config->showStatusBar)
-	{
-		RECT statusBarRect;
-
-		GetWindowRect(m_hStatusBar, &statusBarRect);
-
-		indentBottom += statusBarRect.bottom - statusBarRect.top;
-	}
-
-	if (m_config->showDisplayWindow && !m_config->displayWindowVertical)
-	{
-		RECT rcDisplayWindow;
-		GetWindowRect(m_hDisplayWindow, &rcDisplayWindow);
-
-		indentBottom += rcDisplayWindow.bottom - rcDisplayWindow.top;
-	}
-
-	if (m_config->showFolders)
-	{
-		RECT rcHolder;
-		GetClientRect(m_hHolder, &rcHolder);
-
-		SetWindowPos(m_hHolder, nullptr, 0, indentTop, rcHolder.right,
-			height - indentBottom - indentTop, SWP_SHOWWINDOW | SWP_NOZORDER);
-	}
-}
-
 void Explorerplusplus::CopyToFolder(bool move)
 {
 	if (ListView_GetSelectedCount(m_hActiveListView) == 0)

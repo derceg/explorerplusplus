@@ -10,20 +10,19 @@
 #include "stdafx.h"
 #include "HolderWindow.h"
 #include "DarkModeHelper.h"
-#include "HolderWindowInternal.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowHelper.h"
 
 #define FOLDERS_TEXT_X 5
 #define FOLDERS_TEXT_Y 2
 
-#define HOLDER_CLASS_NAME _T("Holder")
+HolderWindow *HolderWindow::Create(HWND parent, const std::wstring &caption, DWORD style)
+{
+	return new HolderWindow(parent, caption, style);
+}
 
-ATOM RegisterHolderWindowClass();
-LRESULT CALLBACK HolderWndProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-HolderWindow::HolderWindow(HWND hHolder) :
-	m_hwnd(hHolder),
+HolderWindow::HolderWindow(HWND parent, const std::wstring &caption, DWORD style) :
+	m_hwnd(CreateHolderWindow(parent, caption, style)),
 	m_sizingCursor(LoadCursor(nullptr, IDC_SIZEWE))
 {
 	auto &dpiCompat = DpiCompatibility::GetInstance();
@@ -40,11 +39,19 @@ HolderWindow::HolderWindow(HWND hHolder) :
 	assert(m_font);
 }
 
-ATOM RegisterHolderWindowClass()
+HWND HolderWindow::CreateHolderWindow(HWND parent, const std::wstring &caption, DWORD style)
+{
+	RegisterHolderWindowClass();
+
+	return CreateWindowEx(WS_EX_CONTROLPARENT, CLASS_NAME, caption.c_str(), style, 0, 0, 0, 0,
+		parent, nullptr, GetModuleHandle(nullptr), this);
+}
+
+ATOM HolderWindow::RegisterHolderWindowClass()
 {
 	WNDCLASS wc;
 	wc.style = 0;
-	wc.lpfnWndProc = HolderWndProcStub;
+	wc.lpfnWndProc = WndProcStub;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = sizeof(HolderWindow *);
 	wc.hInstance = GetModuleHandle(nullptr);
@@ -52,44 +59,43 @@ ATOM RegisterHolderWindowClass()
 	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	wc.hbrBackground = nullptr;
 	wc.lpszMenuName = nullptr;
-	wc.lpszClassName = HOLDER_CLASS_NAME;
+	wc.lpszClassName = CLASS_NAME;
 
 	return RegisterClass(&wc);
 }
 
-HWND CreateHolderWindow(HWND hParent, TCHAR *szWindowName, UINT uStyle)
+LRESULT CALLBACK HolderWindow::WndProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	RegisterHolderWindowClass();
-
-	HWND hHolder = CreateWindowEx(WS_EX_CONTROLPARENT, HOLDER_CLASS_NAME, szWindowName, uStyle, 0,
-		0, 0, 0, hParent, nullptr, GetModuleHandle(nullptr), nullptr);
-
-	return hHolder;
-}
-
-LRESULT CALLBACK HolderWndProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	auto *pHolderWindow = (HolderWindow *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
+	auto *holderWindow = reinterpret_cast<HolderWindow *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
 	switch (msg)
 	{
 	case WM_CREATE:
 	{
-		pHolderWindow = new HolderWindow(hwnd);
+		auto *createInfo = reinterpret_cast<CREATESTRUCT *>(lParam);
+		holderWindow = reinterpret_cast<HolderWindow *>(createInfo->lpCreateParams);
 
-		SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR) pHolderWindow);
+		SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(holderWindow));
 	}
 	break;
 
 	case WM_NCDESTROY:
-		delete pHolderWindow;
+		SetWindowLongPtr(hwnd, GWLP_USERDATA, 0);
+		delete holderWindow;
 		return 0;
 	}
 
-	return pHolderWindow->HolderWndProc(hwnd, msg, wParam, lParam);
+	if (holderWindow)
+	{
+		return holderWindow->WndProc(hwnd, msg, wParam, lParam);
+	}
+	else
+	{
+		return DefWindowProc(hwnd, msg, wParam, lParam);
+	}
 }
 
-LRESULT CALLBACK HolderWindow::HolderWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK HolderWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -197,7 +203,7 @@ int HolderWindow::OnMouseMove(const POINT &pt)
 		GetClientRect(m_hwnd, &clientRect);
 
 		int newWidth = (std::max)(pt.x + m_resizeDistanceToEdge.value(), 0L);
-		SendMessage(GetParent(m_hwnd), WM_USER_HOLDERRESIZED, 0, newWidth);
+		SendMessage(GetParent(m_hwnd), WM_APP_HOLDER_RESIZED, 0, newWidth);
 
 		return 1;
 	}
@@ -241,4 +247,9 @@ bool HolderWindow::IsCursorInResizeStartRange(const POINT &ptCursor)
 		-DpiCompatibility::GetInstance().ScaleValue(m_hwnd, RESIZE_START_RANGE), 0);
 
 	return ptCursor.x >= clientRect.right;
+}
+
+HWND HolderWindow::GetHWND() const
+{
+	return m_hwnd;
 }

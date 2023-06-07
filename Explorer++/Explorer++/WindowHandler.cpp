@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Config.h"
+#include "HolderWindow.h"
 #include "IconResourceLoader.h"
 #include "MainToolbar.h"
 #include "MainToolbarButtons.h"
@@ -102,7 +103,7 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 
 	if (m_config->showFolders)
 	{
-		GetClientRect(m_hHolder, &rc);
+		GetClientRect(m_treeViewHolder->GetHWND(), &rc);
 		indentLeft = GetRectWidth(&rc);
 	}
 
@@ -142,7 +143,7 @@ void Explorerplusplus::ToggleFolders()
 		UpdateTreeViewSelection();
 	}
 
-	lShowWindow(m_hHolder, m_config->showFolders);
+	lShowWindow(m_treeViewHolder->GetHWND(), m_config->showFolders);
 	lShowWindow(m_shellTreeView->GetHWND(), m_config->showFolders);
 
 	SendMessage(m_mainToolbar->GetHWND(), TB_CHECKBUTTON, (WPARAM) MainToolbarButton::Folders,

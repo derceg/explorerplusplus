@@ -40,6 +40,7 @@ class BookmarksToolbar;
 struct ColumnWidth;
 struct Config;
 class DrivesToolbar;
+class HolderWindow;
 class IconResourceLoader;
 __interface IDirectoryMonitor;
 class ILoadSave;
@@ -402,7 +403,6 @@ private:
 	void UpdateTreeViewSelection();
 	void ResizeWindows();
 	void SetListViewInitialPosition(HWND hListView) override;
-	void AdjustFolderPanePosition();
 	void ToggleFolders();
 	void UpdateLayout();
 
@@ -561,14 +561,14 @@ private:
 	HWND m_hMainRebar;
 	HWND m_hDisplayWindow;
 	HWND m_hTabWindowToolbar;
-	HWND m_hHolder;
 	HWND m_foldersToolbarParent;
 	HWND m_hFoldersToolbar;
 	HWND m_hTabBacking;
 
 	IDirectoryMonitor *m_pDirMon;
-	ShellTreeView *m_shellTreeView;
-	StatusBar *m_pStatusBar;
+	HolderWindow *m_treeViewHolder = nullptr;
+	ShellTreeView *m_shellTreeView = nullptr;
+	StatusBar *m_pStatusBar = nullptr;
 
 	HINSTANCE m_resourceInstance;
 

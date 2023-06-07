@@ -52,7 +52,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd, CommandLine::Settings *commandLine
 	m_pActiveShellBrowser = nullptr;
 	m_hMainRebar = nullptr;
 	m_hStatusBar = nullptr;
-	m_hHolder = nullptr;
 	m_hTabBacking = nullptr;
 	m_hTabWindowToolbar = nullptr;
 	m_hDisplayWindow = nullptr;
