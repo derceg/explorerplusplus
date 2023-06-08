@@ -418,11 +418,12 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 		dpiCompatibility.ScaleValue(m_treeViewHolder->GetHWND(), TREEVIEW_MINIMUM_WIDTH),
 		static_cast<int>(TREEVIEW_MAXIMUM_WIDTH_PERCENTAGE * MainWindowWidth));
 
-	if (m_hMainRebar)
-	{
-		GetWindowRect(m_hMainRebar, &rc);
-		iIndentRebar += GetRectHeight(&rc);
-	}
+	RECT rebarRect;
+	GetClientRect(m_hMainRebar, &rebarRect);
+	SetWindowPos(m_hMainRebar, nullptr, 0, 0, MainWindowWidth, GetRectHeight(&rebarRect),
+		SWP_NOZORDER | SWP_NOMOVE);
+
+	iIndentRebar += GetRectHeight(&rebarRect);
 
 	if (m_config->showStatusBar)
 	{
@@ -580,14 +581,6 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 
 	PinStatusBar(m_hStatusBar, MainWindowWidth, MainWindowHeight);
 	SetStatusBarParts(MainWindowWidth);
-
-	/* <---- Main rebar + child windows ----> */
-
-	/* Ensure that the main rebar keeps its width in line with the main
-	window (its height will not change). */
-	RECT rebarRect;
-	GetClientRect(m_hMainRebar, &rebarRect);
-	MoveWindow(m_hMainRebar, 0, 0, MainWindowWidth, GetRectHeight(&rebarRect), true);
 
 	return TRUE;
 }
