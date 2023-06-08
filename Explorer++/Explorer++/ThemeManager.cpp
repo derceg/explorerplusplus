@@ -1147,7 +1147,7 @@ LRESULT CALLBACK ThemeManager::GroupBoxSubclass(HWND hwnd, UINT msg, WPARAM wPar
 			dpiCompat.GetDpiForWindow(hwnd));
 
 		wil::unique_hfont captionFont(CreateFontIndirect(&metrics.lfCaptionFont));
-		wil::unique_select_object object(SelectObject(hdc, captionFont.get()));
+		auto selectFont = wil::SelectObject(hdc, captionFont.get());
 
 		RECT textRect = rect;
 		DrawText(hdc, text.c_str(), static_cast<int>(text.size()), &textRect, DT_CALCRECT);
