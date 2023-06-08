@@ -21,11 +21,17 @@ public:
 		const std::wstring &closeButtonTooltip, CoreInterface *coreInterface);
 
 	HWND GetHWND() const;
+	void SetContentChild(HWND contentChild);
 	void SetResizedCallback(ResizedCallback callback);
 	void SetCloseButtonClickedCallback(CloseButtonClickedCallback callback);
 
 private:
 	static constexpr WCHAR CLASS_NAME[] = L"Holder";
+
+	static constexpr int CAPTION_SECTION_HORIZONTAL_PADDING = 4_px;
+	static constexpr int CAPTION_SECTION_VERTICAL_PADDING = 1_px;
+
+	static constexpr int CONTENT_SECTION_RIGHT_PADDING = 4_px;
 
 	static constexpr int CLOSE_BUTTON_ID = 1;
 
@@ -50,8 +56,17 @@ private:
 	bool OnSetCursor(HWND target);
 	bool IsCursorInResizeStartRange(const POINT &ptCursor);
 
+	// In the call to CreateWindowEx(), a WM_SIZE message will be dispatched. At that point, this
+	// class won't have been fully initialized, so the WM_SIZE handler shouldn't attempt to access
+	// members of the class. To determine whether or not initialization has finished, this variable
+	// will be used. Because of that, it's important that it appear first, to ensure that it always
+	// has a valid value, regardless of whether or not the constructor has finished running.
+	bool m_initialized = false;
+
 	const HWND m_hwnd;
+	HWND m_contentChild = nullptr;
 	wil::unique_hfont m_font;
+	int m_captionSectionHeight;
 
 	HWND m_toolbar;
 	wil::unique_himagelist m_toolbarImageList;

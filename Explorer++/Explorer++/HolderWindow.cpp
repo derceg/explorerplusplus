@@ -15,9 +15,6 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowHelper.h"
 
-#define FOLDERS_TEXT_X 5
-#define FOLDERS_TEXT_Y 2
-
 HolderWindow *HolderWindow::Create(HWND parent, const std::wstring &caption, DWORD style,
 	const std::wstring &closeButtonTooltip, CoreInterface *coreInterface)
 {
@@ -51,6 +48,19 @@ HolderWindow::HolderWindow(HWND parent, const std::wstring &caption, DWORD style
 	assert(sizeRes);
 	SetWindowPos(m_toolbar, nullptr, 0, 0, toolbarSize.cx, toolbarSize.cy,
 		SWP_NOZORDER | SWP_NOMOVE);
+
+	SIZE textSize;
+	auto hdc = wil::GetDC(m_hwnd);
+	auto selectFont = wil::SelectObject(hdc.get(), m_font.get());
+	auto text = GetWindowString(m_hwnd);
+	[[maybe_unused]] auto textExtentRes =
+		GetTextExtentPoint32(hdc.get(), text.c_str(), static_cast<int>(text.length()), &textSize);
+	assert(textExtentRes);
+
+	auto verticalPadding = dpiCompat.ScaleValue(m_hwnd, CAPTION_SECTION_VERTICAL_PADDING);
+	m_captionSectionHeight = (std::max)(textSize.cy, toolbarSize.cy) + (verticalPadding * 2);
+
+	m_initialized = true;
 }
 
 HWND HolderWindow::CreateHolderWindow(HWND parent, const std::wstring &caption, DWORD style)
@@ -209,24 +219,48 @@ void HolderWindow::PerformPaint(const PAINTSTRUCT &ps)
 		SetTextColor(ps.hdc, DarkModeHelper::TEXT_COLOR);
 	}
 
-	TextOut(ps.hdc, FOLDERS_TEXT_X, FOLDERS_TEXT_Y, caption.c_str(),
-		static_cast<int>(caption.size()));
+	RECT toolbarRect;
+	GetWindowRect(m_toolbar, &toolbarRect);
+	MapWindowPoints(HWND_DESKTOP, m_hwnd, reinterpret_cast<LPPOINT>(&toolbarRect), 2);
+
+	RECT textRect = { CAPTION_SECTION_HORIZONTAL_PADDING, 0, toolbarRect.left,
+		m_captionSectionHeight };
+	DrawText(ps.hdc, caption.c_str(), -1, &textRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
 }
 
 void HolderWindow::OnSize(int width, int height)
 {
 	UNREFERENCED_PARAMETER(height);
 
-	auto &dpiCompatibility = DpiCompatibility::GetInstance();
-	int scaledCloseToolbarXOffset =
-		dpiCompatibility.ScaleValue(m_toolbar, ToolbarHelper::CLOSE_TOOLBAR_X_OFFSET);
-	int scaledCloseToolbarYOffset =
-		dpiCompatibility.ScaleValue(m_toolbar, ToolbarHelper::CLOSE_TOOLBAR_Y_OFFSET);
+	if (!m_initialized)
+	{
+		return;
+	}
+
+	auto deferInfo = BeginDeferWindowPos(2);
 
 	RECT toolbarRect;
 	GetClientRect(m_toolbar, &toolbarRect);
-	SetWindowPos(m_toolbar, nullptr, width - GetRectWidth(&toolbarRect) - scaledCloseToolbarXOffset,
-		scaledCloseToolbarYOffset, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+
+	auto &dpiCompatibility = DpiCompatibility::GetInstance();
+	int captionHorizontalPadding =
+		dpiCompatibility.ScaleValue(m_toolbar, CAPTION_SECTION_HORIZONTAL_PADDING);
+
+	deferInfo = DeferWindowPos(deferInfo, m_toolbar, nullptr,
+		width - GetRectWidth(&toolbarRect) - captionHorizontalPadding,
+		(m_captionSectionHeight - GetRectHeight(&toolbarRect)) / 2, 0, 0,
+		SWP_NOZORDER | SWP_NOSIZE);
+
+	if (m_contentChild)
+	{
+		auto contentHorizontalPadding =
+			dpiCompatibility.ScaleValue(m_hwnd, CONTENT_SECTION_RIGHT_PADDING);
+		deferInfo = DeferWindowPos(deferInfo, m_contentChild, nullptr, 0, m_captionSectionHeight,
+			width - contentHorizontalPadding, height - m_captionSectionHeight, SWP_NOZORDER);
+	}
+
+	[[maybe_unused]] auto res = EndDeferWindowPos(deferInfo);
+	assert(res);
 }
 
 void HolderWindow::OnLButtonDown(const POINT &pt)
@@ -314,6 +348,12 @@ bool HolderWindow::IsCursorInResizeStartRange(const POINT &ptCursor)
 HWND HolderWindow::GetHWND() const
 {
 	return m_hwnd;
+}
+
+void HolderWindow::SetContentChild(HWND contentChild)
+{
+	assert(GetParent(contentChild) == m_hwnd);
+	m_contentChild = contentChild;
 }
 
 void HolderWindow::SetResizedCallback(ResizedCallback callback)

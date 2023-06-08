@@ -38,14 +38,6 @@
 #include <wil/resource.h>
 #include <algorithm>
 
-/* The treeview is offset by a small
-amount on the left. */
-static const int TREEVIEW_X_CLEARANCE = 1;
-
-/* The spacing between the right edge of
-the treeview and the holder window. */
-static const int TREEVIEW_HOLDER_CLEARANCE = 4;
-
 void Explorerplusplus::TestConfigFile()
 {
 	m_bLoadSettingsFromXML = TestConfigFileInternal();
@@ -533,12 +525,6 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 
 	SetWindowPos(m_treeViewHolder->GetHWND(), nullptr, 0, iHolderTop, iHolderWidth, iHolderHeight,
 		SWP_NOZORDER);
-
-	/* The treeview is only slightly smaller than the holder
-	window, in both the x and y-directions. */
-	SetWindowPos(m_shellTreeView->GetHWND(), nullptr, TREEVIEW_X_CLEARANCE, tabWindowHeight,
-		iHolderWidth - TREEVIEW_HOLDER_CLEARANCE - TREEVIEW_X_CLEARANCE,
-		iHolderHeight - tabWindowHeight, SWP_NOZORDER);
 
 	/* <---- Display window ----> */
 
