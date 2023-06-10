@@ -94,7 +94,7 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowExtensions"),
 			m_config->globalFolderSettings.showExtensions);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowStatusBar"), m_config->showStatusBar);
-		RegistrySettings::SaveDword(hSettingsKey, _T("ShowFolders"), m_config->showFolders);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ShowFolders"), m_config->showFolders.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowAddressBar"), m_config->showAddressBar);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowToolbar"), m_config->showMainToolbar);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowBookmarksToolbar"),

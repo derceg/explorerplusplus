@@ -96,6 +96,7 @@ private:
 	void UpdateToolbarButtonImageIndexes();
 
 	void OnUseLargeToolbarIconsUpdated(BOOL newValue);
+	void OnShowFoldersUpdated(bool showFolders);
 
 	void OnClipboardUpdate();
 	void OnMButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT keysDown);

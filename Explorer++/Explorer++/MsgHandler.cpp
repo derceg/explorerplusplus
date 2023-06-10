@@ -443,7 +443,7 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 		}
 	}
 
-	if (m_config->showFolders)
+	if (m_config->showFolders.get())
 	{
 		indentLeft = m_config->treeViewWidth;
 	}

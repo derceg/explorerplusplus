@@ -37,7 +37,7 @@ void Explorerplusplus::CreateFolderControls()
 {
 	UINT holderStyle = WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 
-	if (m_config->showFolders)
+	if (m_config->showFolders.get())
 	{
 		holderStyle |= WS_VISIBLE;
 	}
@@ -413,7 +413,8 @@ void Explorerplusplus::OnTreeViewSetFileAttributes() const
 
 void Explorerplusplus::UpdateTreeViewSelection()
 {
-	if (!m_InitializationFinished.get() || !m_config->synchronizeTreeview || !m_config->showFolders)
+	if (!m_InitializationFinished.get() || !m_config->synchronizeTreeview
+		|| !m_config->showFolders.get())
 	{
 		return;
 	}

@@ -50,7 +50,7 @@ struct Config
 	std::wstring defaultTabDirectory = GetComputerFolderPath();
 	const std::wstring defaultTabDirectoryStatic = GetComputerFolderPath();
 	BOOL showStatusBar = TRUE;
-	BOOL showFolders = TRUE;
+	ValueWrapper<bool> showFolders = true;
 	BOOL showAddressBar = TRUE;
 	BOOL showDisplayWindow = TRUE;
 	BOOL showMainToolbar = TRUE;

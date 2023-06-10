@@ -56,7 +56,7 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 		}
 	}
 
-	if (m_config->showFolders)
+	if (m_config->showFolders.get())
 	{
 		GetClientRect(m_treeViewHolder->GetHWND(), &rc);
 		indentLeft = GetRectWidth(&rc);
@@ -91,18 +91,15 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 
 void Explorerplusplus::ToggleFolders()
 {
-	m_config->showFolders = !m_config->showFolders;
+	m_config->showFolders = !m_config->showFolders.get();
 
-	if (m_config->showFolders)
+	if (m_config->showFolders.get())
 	{
 		UpdateTreeViewSelection();
 	}
 
-	lShowWindow(m_treeViewHolder->GetHWND(), m_config->showFolders);
-	lShowWindow(m_shellTreeView->GetHWND(), m_config->showFolders);
+	lShowWindow(m_treeViewHolder->GetHWND(), m_config->showFolders.get());
 
-	SendMessage(m_mainToolbar->GetHWND(), TB_CHECKBUTTON, (WPARAM) MainToolbarButton::Folders,
-		m_config->showFolders);
 	UpdateLayout();
 }
 

@@ -182,6 +182,8 @@ void MainToolbar::Initialize(HWND parent)
 		std::bind_front(&MainToolbar::OnFocusChanged, this)));
 	m_connections.push_back(m_config->useLargeToolbarIcons.addObserver(
 		std::bind_front(&MainToolbar::OnUseLargeToolbarIconsUpdated, this)));
+	m_connections.push_back(m_config->showFolders.addObserver(
+		std::bind_front(&MainToolbar::OnShowFoldersUpdated, this)));
 
 	AddClipboardFormatListener(m_hwnd);
 }
@@ -537,6 +539,11 @@ void MainToolbar::UpdateToolbarButtonImageIndexes()
 	}
 }
 
+void MainToolbar::OnShowFoldersUpdated(bool showFolders)
+{
+	SendMessage(m_hwnd, TB_CHECKBUTTON, MainToolbarButton::Folders, showFolders);
+}
+
 BOOL MainToolbar::OnTBQueryInsert()
 {
 	return TRUE;
@@ -819,7 +826,7 @@ void MainToolbar::CreateViewsMenu(POINT *ptOrigin)
 // or file selection.
 void MainToolbar::UpdateConfigDependentButtonStates()
 {
-	SendMessage(m_hwnd, TB_CHECKBUTTON, MainToolbarButton::Folders, m_config->showFolders);
+	SendMessage(m_hwnd, TB_CHECKBUTTON, MainToolbarButton::Folders, m_config->showFolders.get());
 }
 
 void MainToolbar::UpdateToolbarButtonStates()

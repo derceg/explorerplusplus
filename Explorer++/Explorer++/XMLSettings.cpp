@@ -633,7 +633,7 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 		NXMLSettings::EncodeBoolValue(m_config->showFilePreviews));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowFolders"),
-		NXMLSettings::EncodeBoolValue(m_config->showFolders));
+		NXMLSettings::EncodeBoolValue(m_config->showFolders.get()));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowFolderSizes"),
 		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.showFolderSizes));
