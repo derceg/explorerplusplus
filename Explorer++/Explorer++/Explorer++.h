@@ -186,7 +186,7 @@ private:
 	LRESULT CALLBACK NotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnCreate();
 	bool OnActivate(int activationState, bool minimized);
-	BOOL OnSize(int MainWindowWidth, int MainWindowHeight);
+	void OnSize(HWND hwnd, UINT state, int mainWindowWidth, int mainWindowHeight);
 	void OnDpiChanged(const RECT *updatedWindowRect);
 	std::optional<LRESULT> OnCtlColorStatic(HWND hwnd, HDC hdc);
 	void OnSettingChange(const WCHAR *systemParameter);

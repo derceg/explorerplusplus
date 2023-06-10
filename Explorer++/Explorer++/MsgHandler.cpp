@@ -384,8 +384,10 @@ OpenFolderDisposition Explorerplusplus::DetermineOpenDisposition(bool isMiddleBu
 	return OpenFolderDisposition::CurrentTab;
 }
 
-BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
+void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int mainWindowHeight)
 {
+	UNREFERENCED_PARAMETER(hwnd);
+
 	RECT rc;
 	UINT uFlags;
 	int indentBottom = 0;
@@ -401,18 +403,24 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 
 	if (!m_InitializationFinished.get())
 	{
-		return TRUE;
+		return;
+	}
+
+	if (state == SIZE_MINIMIZED)
+	{
+		// There's no need to update the layout when the window is being minimized.
+		return;
 	}
 
 	auto &dpiCompatibility = DpiCompatibility::GetInstance();
 
 	m_config->treeViewWidth = std::clamp(m_config->treeViewWidth,
 		dpiCompatibility.ScaleValue(m_treeViewHolder->GetHWND(), TREEVIEW_MINIMUM_WIDTH),
-		static_cast<int>(TREEVIEW_MAXIMUM_WIDTH_PERCENTAGE * MainWindowWidth));
+		static_cast<int>(TREEVIEW_MAXIMUM_WIDTH_PERCENTAGE * mainWindowWidth));
 
 	RECT rebarRect;
 	GetClientRect(m_hMainRebar, &rebarRect);
-	SetWindowPos(m_hMainRebar, nullptr, 0, 0, MainWindowWidth, GetRectHeight(&rebarRect),
+	SetWindowPos(m_hMainRebar, nullptr, 0, 0, mainWindowWidth, GetRectHeight(&rebarRect),
 		SWP_NOZORDER | SWP_NOMOVE);
 
 	iIndentRebar += GetRectHeight(&rebarRect);
@@ -460,12 +468,12 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 	if (m_config->extendTabControl.get())
 	{
 		iTabBackingLeft = 0;
-		iTabBackingWidth = MainWindowWidth;
+		iTabBackingWidth = mainWindowWidth;
 	}
 	else
 	{
 		iTabBackingLeft = indentLeft;
-		iTabBackingWidth = MainWindowWidth - indentLeft - indentRight;
+		iTabBackingWidth = mainWindowWidth - indentLeft - indentRight;
 	}
 
 	uFlags = m_bShowTabBar ? SWP_SHOWWINDOW : SWP_HIDEWINDOW;
@@ -478,7 +486,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 	}
 	else
 	{
-		iTabTop = MainWindowHeight - indentBottom - tabWindowHeight;
+		iTabTop = mainWindowHeight - indentBottom - tabWindowHeight;
 	}
 
 	/* If we're showing the tab bar at the bottom of the listview,
@@ -514,11 +522,11 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 
 	if (m_config->extendTabControl.get() && m_config->showTabBarAtBottom.get() && m_bShowTabBar)
 	{
-		iHolderHeight = MainWindowHeight - indentBottom - iHolderTop - tabWindowHeight;
+		iHolderHeight = mainWindowHeight - indentBottom - iHolderTop - tabWindowHeight;
 	}
 	else
 	{
-		iHolderHeight = MainWindowHeight - indentBottom - iHolderTop;
+		iHolderHeight = mainWindowHeight - indentBottom - iHolderTop;
 	}
 
 	iHolderWidth = m_config->treeViewWidth;
@@ -530,13 +538,13 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 
 	if (m_config->displayWindowVertical)
 	{
-		SetWindowPos(m_hDisplayWindow, NULL, MainWindowWidth - indentRight, iIndentRebar,
-			m_config->displayWindowWidth, MainWindowHeight - iIndentRebar - indentBottom,
+		SetWindowPos(m_hDisplayWindow, NULL, mainWindowWidth - indentRight, iIndentRebar,
+			m_config->displayWindowWidth, mainWindowHeight - iIndentRebar - indentBottom,
 			SWP_SHOWWINDOW | SWP_NOZORDER);
 	}
 	else
 	{
-		SetWindowPos(m_hDisplayWindow, nullptr, 0, MainWindowHeight - indentBottom, MainWindowWidth,
+		SetWindowPos(m_hDisplayWindow, nullptr, 0, mainWindowHeight - indentBottom, mainWindowWidth,
 			m_config->displayWindowHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
 	}
 
@@ -551,8 +559,8 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 			uFlags |= SWP_SHOWWINDOW;
 		}
 
-		int width = MainWindowWidth - indentLeft - indentRight;
-		int height = MainWindowHeight - indentBottom - indentTop;
+		int width = mainWindowWidth - indentLeft - indentRight;
+		int height = mainWindowHeight - indentBottom - indentTop;
 
 		if (m_config->showTabBarAtBottom.get() && m_bShowTabBar)
 		{
@@ -565,10 +573,8 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth, int MainWindowHeight)
 
 	/* <---- Status bar ----> */
 
-	PinStatusBar(m_hStatusBar, MainWindowWidth, MainWindowHeight);
-	SetStatusBarParts(MainWindowWidth);
-
-	return TRUE;
+	PinStatusBar(m_hStatusBar, mainWindowWidth, mainWindowHeight);
+	SetStatusBarParts(mainWindowWidth);
 }
 
 void Explorerplusplus::OnDpiChanged(const RECT *updatedWindowRect)
