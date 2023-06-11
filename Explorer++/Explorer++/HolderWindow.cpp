@@ -267,8 +267,6 @@ void HolderWindow::OnLButtonDown(const POINT &pt)
 {
 	if (IsCursorInResizeStartRange(pt))
 	{
-		SetCursor(m_sizingCursor);
-
 		m_resizing = true;
 
 		RECT clientRect;
@@ -302,11 +300,6 @@ int HolderWindow::OnMouseMove(const POINT &pt)
 		}
 
 		return 1;
-	}
-
-	if (IsCursorInResizeStartRange(pt))
-	{
-		SetCursor(m_sizingCursor);
 	}
 
 	return 0;
