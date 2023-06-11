@@ -1103,7 +1103,7 @@ bool TabContainer::CloseTab(const Tab &tab)
 	{
 		if (m_config->closeMainWindowOnTabClose)
 		{
-			m_coreInterface->CloseApplication();
+			m_coreInterface->RequestCloseApplication();
 			return true;
 		}
 		else

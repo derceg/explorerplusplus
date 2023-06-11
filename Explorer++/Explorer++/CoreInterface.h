@@ -120,7 +120,7 @@ public:
 	virtual BOOL GetSavePreferencesToXmlFile() const = 0;
 	virtual void SetSavePreferencesToXmlFile(BOOL savePreferencesToXmlFile) = 0;
 
-	virtual int CloseApplication() = 0;
+	virtual void RequestCloseApplication() = 0;
 
 	virtual boost::signals2::connection AddTabsInitializedObserver(
 		const TabsInitializedSignal::slot_type &observer) = 0;

@@ -277,8 +277,23 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM w
 		OnSettingChange(reinterpret_cast<const WCHAR *>(lParam));
 		break;
 
+	// COM calls (such as IDropTarget::DragEnter) can result in a call being made to PeekMessage().
+	// That method will then dispatch non-queued messages, with WM_CLOSE being one such message.
+	// That's an issue, as it means if a WM_CLOSE message is in the message queue when a COM method
+	// is called, the WM_CLOSE message could be processed, the main window destroyed and
+	// Explorerplusplus instance deleted, all within the call to the COM method. Once the COM method
+	// returns, the application isn't going to be in a valid state and will crash.
+	// PeekMessage() won't, however, dispatch posted (i.e. queued) messages. So the message that's
+	// posted here will only be processed in the normal message loop. If a COM modal loop is
+	// running, the message won't be processed until that modal loop ends and the normal message
+	// loop resumes.
 	case WM_CLOSE:
-		return CloseApplication();
+		PostMessage(hwnd, WM_APP_CLOSE, 0, 0);
+		return 0;
+
+	case WM_APP_CLOSE:
+		RequestCloseApplication();
+		break;
 
 	case WM_DESTROY:
 		return OnDestroy();
@@ -410,7 +425,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_FILE_EXIT:
-		SendMessage(hwnd, WM_CLOSE, 0, 0);
+		RequestCloseApplication();
 		break;
 
 	case IDM_EDIT_UNDO:

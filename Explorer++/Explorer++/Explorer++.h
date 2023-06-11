@@ -95,6 +95,8 @@ public:
 	static void DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData);
 
 private:
+	static constexpr UINT WM_APP_CLOSE = WM_APP + 1;
+
 	static const int MIN_SHELL_MENU_ID = 1;
 	static const int MAX_SHELL_MENU_ID = 1000;
 
@@ -190,7 +192,7 @@ private:
 	void OnDpiChanged(const RECT *updatedWindowRect);
 	std::optional<LRESULT> OnCtlColorStatic(HWND hwnd, HDC hdc);
 	void OnSettingChange(const WCHAR *systemParameter);
-	int CloseApplication();
+	void RequestCloseApplication() override;
 	int OnDestroy();
 	void OnDeviceChange(WPARAM wParam, LPARAM lParam);
 	void OnFocusNextWindow(FocusChangeDirection direction);

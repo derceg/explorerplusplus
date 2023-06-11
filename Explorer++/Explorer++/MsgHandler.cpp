@@ -651,7 +651,7 @@ int Explorerplusplus::OnDestroy()
 	return 0;
 }
 
-int Explorerplusplus::CloseApplication()
+void Explorerplusplus::RequestCloseApplication()
 {
 	if (m_config->confirmCloseTabs && (m_tabContainer->GetNumTabs() > 1))
 	{
@@ -660,10 +660,10 @@ int Explorerplusplus::CloseApplication()
 		int response = MessageBox(m_hContainer, message.c_str(), NExplorerplusplus::APP_NAME,
 			MB_ICONINFORMATION | MB_YESNO);
 
-		/* If the user clicked no, return without
-		closing. */
 		if (response == IDNO)
-			return 1;
+		{
+			return;
+		}
 	}
 
 	// It's important that the plugins are destroyed before the main
@@ -682,8 +682,6 @@ int Explorerplusplus::CloseApplication()
 	SaveAllSettings();
 
 	DestroyWindow(m_hContainer);
-
-	return 0;
 }
 
 void Explorerplusplus::StartDirectoryMonitoringForTab(const Tab &tab)
