@@ -482,7 +482,7 @@ private:
 	/* CoreInterface methods. */
 	const Config *GetConfig() const override;
 	HINSTANCE GetResourceInstance() const override;
-	HACCEL *GetAcceleratorTable() const;
+	HACCEL *GetAcceleratorTable() const override;
 	HWND GetMainWindow() const override;
 	HWND GetActiveListView() const override;
 	ShellBrowser *GetActiveShellBrowser() const override;
