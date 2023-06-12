@@ -391,3 +391,47 @@ void AddItemsToComboBox(HWND comboBox, const std::vector<ComboBoxItem> &items, i
 		}
 	}
 }
+
+bool DoesComboBoxContainText(HWND comboBox, const std::wstring &text,
+	StringComparatorFunc stringComparator)
+{
+	int numItems = ComboBox_GetCount(comboBox);
+
+	if (numItems == CB_ERR)
+	{
+		assert(false);
+		return false;
+	}
+
+	for (int i = 0; i < numItems; i++)
+	{
+		int numCharacters = ComboBox_GetLBTextLen(comboBox, i);
+
+		if (numCharacters == CB_ERR)
+		{
+			assert(false);
+			continue;
+		}
+
+		// The character count returned by CB_GETLBTEXTLEN doesn't include the terminating NULL.
+		std::wstring listBoxItemText;
+		listBoxItemText.resize(numCharacters + 1);
+
+		numCharacters = ComboBox_GetLBText(comboBox, i, listBoxItemText.data());
+
+		if (numCharacters == CB_ERR)
+		{
+			assert(false);
+			continue;
+		}
+
+		listBoxItemText.resize(numCharacters);
+
+		if (stringComparator(listBoxItemText, text))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}

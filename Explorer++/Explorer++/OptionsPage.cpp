@@ -5,7 +5,9 @@
 #include "stdafx.h"
 #include "OptionsPage.h"
 #include "ResourceHelper.h"
+#include "../Helper/Controls.h"
 #include "../Helper/ResizableDialogHelper.h"
+#include "../Helper/WindowHelper.h"
 #include <memory>
 #include <unordered_set>
 
@@ -121,4 +123,47 @@ INT_PTR OptionsPage::OnNotify(WPARAM wParam, LPARAM lParam)
 	UNREFERENCED_PARAMETER(lParam);
 
 	return 0;
+}
+
+bool OptionsPage::DoesPageContainText(const std::wstring &text,
+	StringComparatorFunc stringComparator)
+{
+	TextSearchData searchData(text, stringComparator);
+	EnumChildWindows(m_dialog, CheckChildWindowForTextMatch, reinterpret_cast<LPARAM>(&searchData));
+	return searchData.textFound;
+}
+
+BOOL CALLBACK OptionsPage::CheckChildWindowForTextMatch(HWND hwnd, LPARAM lParam)
+{
+	WCHAR className[256];
+	auto res = GetClassName(hwnd, className, static_cast<int>(std::size(className)));
+
+	if (res == 0)
+	{
+		assert(false);
+		return TRUE;
+	}
+
+	auto *searchData = reinterpret_cast<TextSearchData *>(lParam);
+	bool matchFound = false;
+
+	if (lstrcmp(className, WC_BUTTON) == 0 || lstrcmp(className, WC_STATIC) == 0)
+	{
+		auto windowText = GetWindowString(hwnd);
+		matchFound = searchData->stringComparator(windowText, searchData->text);
+	}
+	else if (lstrcmp(className, WC_COMBOBOX) == 0)
+	{
+		matchFound = DoesComboBoxContainText(hwnd, searchData->text, searchData->stringComparator);
+	}
+
+	if (matchFound)
+	{
+		searchData->textFound = true;
+
+		// The text has been found, so there's no need to keep searching.
+		return FALSE;
+	}
+
+	return TRUE;
 }

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <windows.h>
+#include <functional>
 #include <optional>
 #include <string>
 
@@ -18,6 +19,9 @@ enum class SizeDisplayFormat
 	TB = 5,
 	PB = 6
 };
+
+using StringComparatorFunc =
+	std::function<bool(const std::wstring &input, const std::wstring &test)>;
 
 [[nodiscard]] std::wstring FormatSizeString(uint64_t size,
 	SizeDisplayFormat sizeDisplayFormat = SizeDisplayFormat::None);

@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "StringHelper.h"
+
 enum class TooltipType
 {
 	Control,
@@ -42,3 +44,8 @@ struct ComboBoxItem
 };
 
 void AddItemsToComboBox(HWND comboBox, const std::vector<ComboBoxItem> &items, int currentItemId);
+
+// Returns true if an item within the list box of the specified combo box contains the text that's
+// provided.
+bool DoesComboBoxContainText(HWND comboBox, const std::wstring &text,
+	StringComparatorFunc stringComparator);

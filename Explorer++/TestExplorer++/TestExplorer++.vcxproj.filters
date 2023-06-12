@@ -103,6 +103,9 @@
     <ClCompile Include="GdiplusHelperTest.cpp">
       <Filter>Helper\Miscellaneous</Filter>
     </ClCompile>
+    <ClCompile Include="ControlsTest.cpp">
+      <Filter>Helper\Control Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -152,6 +155,9 @@
     </Filter>
     <Filter Include="Tabs">
       <UniqueIdentifier>{d70d355e-ee53-4060-8e33-1c5a87ef6f71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helper\Control Support">
+      <UniqueIdentifier>{f38f6dfe-d7e3-42de-a5a3-36fade1c4691}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -18,6 +18,7 @@
 
 // Windows Header Files:
 #include <Windows.h>
+#include <windowsx.h>
 
 // WinRT Header Files:
 #include "../Helper/WinRTBaseWrapper.h"

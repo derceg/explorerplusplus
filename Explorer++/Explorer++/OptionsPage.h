@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "../Helper/StringHelper.h"
 #include <memory>
 #include <string>
 
@@ -27,6 +28,9 @@ public:
 
 	virtual void SaveSettings() = 0;
 
+	virtual bool DoesPageContainText(const std::wstring &text,
+		StringComparatorFunc stringComparator);
+
 protected:
 	Config *const m_config;
 	CoreInterface *const m_coreInterface;
@@ -36,6 +40,19 @@ protected:
 	const SettingChangedCallback m_settingChangedCallback;
 
 private:
+	struct TextSearchData
+	{
+		const std::wstring text;
+		const StringComparatorFunc stringComparator;
+		bool textFound = false;
+
+		TextSearchData(const std::wstring &text, StringComparatorFunc stringComparator) :
+			text(text),
+			stringComparator(stringComparator)
+		{
+		}
+	};
+
 	static INT_PTR CALLBACK DialogProcStub(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam);
 	INT_PTR CALLBACK DialogProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -44,6 +61,8 @@ private:
 
 	virtual void OnCommand(WPARAM wParam, LPARAM lParam);
 	virtual INT_PTR OnNotify(WPARAM wParam, LPARAM lParam);
+
+	static BOOL CALLBACK CheckChildWindowForTextMatch(HWND hwnd, LPARAM lParam);
 
 	HWND m_dialog = nullptr;
 	const HWND m_parent;

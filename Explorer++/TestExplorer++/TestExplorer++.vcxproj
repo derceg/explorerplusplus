@@ -150,6 +150,7 @@
     <ClCompile Include="ColorRulesStorageHelper.cpp" />
     <ClCompile Include="ColorRuleTest.cpp" />
     <ClCompile Include="ColorRuleXmlStorageTest.cpp" />
+    <ClCompile Include="ControlsTest.cpp" />
     <ClCompile Include="DataObjectImplTest.cpp" />
     <ClCompile Include="DriveModelTest.cpp" />
     <ClCompile Include="AcceleratorParserTest.cpp" />
