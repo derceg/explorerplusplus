@@ -24,9 +24,9 @@ copyright = '2018, Explorer++'
 author = 'Allen Titley'
 
 # The short X.Y version
-version = '1.3.5'
+version = '1.4.0'
 # The full version, including alpha/beta/rc tags
-release = '1.3.5'
+release = '1.4.0'
 
 
 # -- General configuration ---------------------------------------------------
