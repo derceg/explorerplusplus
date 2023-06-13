@@ -101,8 +101,8 @@ order.
     - :doc:`Bookmark the current tab <../menus/bookmarks/bookmark_tab>`
     - creates a new bookmark
   * - .. image:: /_static/images/icons/btn_organize_bookmarks.png
-    - :doc:`Organize Bookmarks <../menus/bookmarks/organize_bookmarks>`
-    - opens the **Organize Bookmarks** dialog
+    - :doc:`Manage Bookmarks <../menus/bookmarks/manage_bookmarks>`
+    - opens the **Manage Bookmarks** dialog
   * - .. _new_tab_button:
       .. image:: /_static/images/icons/btn_new_tab.png
     - :doc:`Create a new tab <../menus/file/new_tab>`

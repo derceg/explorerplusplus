@@ -11,4 +11,4 @@ This menu displays bookmarks in the *Bookmarks Menu* folder, followed by bookmar
 
    bookmark_tab
    bookmark_all_tabs
-   organize_bookmarks
+   manage_bookmarks
