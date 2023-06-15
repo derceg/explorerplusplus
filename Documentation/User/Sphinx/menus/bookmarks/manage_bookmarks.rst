@@ -31,4 +31,4 @@ Context Menu
 
 Each bookmark item in this pane has a context (ie. right-click) menu
 which is the same as the context menu for items on the
-:ref:`Bookmarks toolbar <toolbars/bookmarks:Context Menu (button)>`.
+:doc:`Bookmarks toolbar </toolbars/bookmarks>`.
