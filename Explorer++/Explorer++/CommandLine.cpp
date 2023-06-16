@@ -113,9 +113,7 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 		immediatelyHandledOptions.crashedDataTuple);
 
 	CommandLine::Settings settings;
-	settings.createJumplistTab = false;
 
-	settings.enablePlugins = false;
 	app.add_flag("--enable-plugins", settings.enablePlugins, "Enable the Lua plugin system");
 
 	app.add_option("--shell-change-notification-type", settings.shellChangeNotificationType,

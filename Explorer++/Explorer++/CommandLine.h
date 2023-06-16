@@ -12,10 +12,10 @@ namespace CommandLine
 {
 struct Settings
 {
-	bool enablePlugins;
+	bool enablePlugins = false;
 	std::optional<ShellChangeNotificationType> shellChangeNotificationType;
 	std::wstring language;
-	bool createJumplistTab;
+	bool createJumplistTab = false;
 	std::vector<std::wstring> filesToSelect;
 	std::vector<std::wstring> directories;
 };
