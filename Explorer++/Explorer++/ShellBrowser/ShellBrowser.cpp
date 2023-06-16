@@ -915,7 +915,7 @@ void ShellBrowser::QueueRename(PCIDLIST_ABSOLUTE pidlItem)
 		}
 	}
 
-	m_queuedRenameItem.reset(ILCloneFull(pidlItem));
+	m_directoryState.queuedRenameItem.reset(ILCloneFull(pidlItem));
 }
 
 void ShellBrowser::OnDeviceChange(UINT eventType, LONG_PTR eventData)

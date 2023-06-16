@@ -662,8 +662,9 @@ void ShellBrowser::InsertAwaitingItems()
 			SetTileViewItemInfo(iItemIndex, awaitingItem.iItemInternal);
 		}
 
-		if (m_queuedRenameItem
-			&& ArePidlsEquivalent(itemInfo.pidlComplete.get(), m_queuedRenameItem.get()))
+		if (m_directoryState.queuedRenameItem
+			&& ArePidlsEquivalent(itemInfo.pidlComplete.get(),
+				m_directoryState.queuedRenameItem.get()))
 		{
 			itemToRename = iItemIndex;
 		}
@@ -717,7 +718,7 @@ void ShellBrowser::InsertAwaitingItems()
 
 	if (itemToRename)
 	{
-		m_queuedRenameItem.reset();
+		m_directoryState.queuedRenameItem.reset();
 		ListView_EditLabel(m_hListView, *itemToRename);
 	}
 }

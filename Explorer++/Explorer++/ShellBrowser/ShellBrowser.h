@@ -315,6 +315,12 @@ private:
 		// current directory which need to be selected, once added.
 		std::vector<PidlAbsolute> filesToSelect;
 
+		// When an item is created, it may need to be placed into rename mode (e.g. when created via
+		// the "New" menu). However, it can take time for the directory change notification to be
+		// processed. This field keeps track of an item that needs to be put into rename mode, once
+		// it has been added.
+		unique_pidl_absolute queuedRenameItem;
+
 		int numItems;
 		int numFilesSelected;
 		int numFoldersSelected;
@@ -673,9 +679,6 @@ private:
 	static inline winrt::com_ptr<IShellWindows> m_shellWindows;
 	bool m_shellWindowRegistered;
 	unique_shell_window_cookie m_shellWindowCookie;
-
-	/* Shell new. */
-	unique_pidl_absolute m_queuedRenameItem;
 
 	/* Thumbnails. */
 	BOOL m_bThumbnailsSetup;
