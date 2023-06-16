@@ -45,7 +45,10 @@ void Explorerplusplus::OnCreate()
 	LoadAllSettings(&pLoadSave);
 	ApplyToolbarSettings();
 
-	m_config->shellChangeNotificationType = m_commandLineSettings.shellChangeNotificationType;
+	if (m_commandLineSettings.shellChangeNotificationType)
+	{
+		m_config->shellChangeNotificationType = *m_commandLineSettings.shellChangeNotificationType;
+	}
 
 	m_iconResourceLoader = std::make_unique<IconResourceLoader>(m_config->iconSet);
 

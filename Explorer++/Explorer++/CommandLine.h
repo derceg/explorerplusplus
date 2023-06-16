@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Config.h"
+#include <optional>
 #include <variant>
 
 namespace CommandLine
@@ -12,7 +13,7 @@ namespace CommandLine
 struct Settings
 {
 	bool enablePlugins;
-	ShellChangeNotificationType shellChangeNotificationType;
+	std::optional<ShellChangeNotificationType> shellChangeNotificationType;
 	std::wstring language;
 	bool createJumplistTab;
 	std::vector<std::wstring> filesToSelect;
