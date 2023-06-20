@@ -7,6 +7,8 @@
 #include "CoreInterface.h"
 #include "DefaultToolbarButtons.h"
 #include "IconResourceLoader.h"
+#include "MainFontSetter.h"
+#include "SignalWrapper.h"
 #include "Tab.h"
 #include "../Helper/BaseWindow.h"
 #include "../Helper/WindowSubclassWrapper.h"
@@ -47,6 +49,9 @@ public:
 
 	void UpdateConfigDependentButtonStates();
 	void UpdateToolbarButtonStates();
+
+	// Signals
+	SignalWrapper<MainToolbar, void()> sizeUpdatedSignal;
 
 private:
 	enum class HistoryType
@@ -102,6 +107,8 @@ private:
 	void OnMButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT keysDown);
 	void OnMButtonUp(HWND hwnd, int x, int y, UINT keysDown);
 
+	void OnFontUpdated();
+
 	MainToolbarPersistentSettings *m_persistentSettings;
 
 	HINSTANCE m_resourceInstance;
@@ -115,6 +122,9 @@ private:
 	std::unordered_map<int, int> m_toolbarImageMapSmall;
 	std::unordered_map<int, int> m_toolbarImageMapLarge;
 	std::unordered_map<int, int> m_toolbarStringMap;
+
+	MainFontSetter m_fontSetter;
+	MainFontSetter m_tooltipFontSetter;
 
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;

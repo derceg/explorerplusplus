@@ -12,10 +12,10 @@ namespace Applications
 class ApplicationToolbarView : public ToolbarView
 {
 public:
-	static ApplicationToolbarView *Create(HWND parent);
+	static ApplicationToolbarView *Create(HWND parent, const Config *config);
 
 private:
-	ApplicationToolbarView(HWND parent);
+	ApplicationToolbarView(HWND parent, const Config *config);
 };
 
 }

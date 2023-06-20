@@ -108,6 +108,16 @@ INT_PTR CALLBACK OptionsPage::DialogProc(HWND dlg, UINT msg, WPARAM wParam, LPAR
 		return 0;
 	}
 
+	return DialogProcExtra(dlg, msg, wParam, lParam);
+}
+
+INT_PTR OptionsPage::DialogProcExtra(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(dlg);
+	UNREFERENCED_PARAMETER(msg);
+	UNREFERENCED_PARAMETER(wParam);
+	UNREFERENCED_PARAMETER(lParam);
+
 	return 0;
 }
 

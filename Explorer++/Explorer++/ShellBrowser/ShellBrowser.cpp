@@ -90,7 +90,10 @@ ShellBrowser::ShellBrowser(HWND hOwner, CoreInterface *coreInterface,
 	m_draggedDataObject(nullptr),
 	m_shellWindowRegistered(false),
 	m_shellChangeWatcher(GetHWND(),
-		std::bind_front(&ShellBrowser::ProcessShellChangeNotifications, this))
+		std::bind_front(&ShellBrowser::ProcessShellChangeNotifications, this)),
+	m_fontSetter(m_hListView, coreInterface->GetConfig()),
+	m_tooltipFontSetter(reinterpret_cast<HWND>(SendMessage(m_hListView, LVM_GETTOOLTIPS, 0, 0)),
+		coreInterface->GetConfig())
 {
 	InitializeListView();
 	m_iconFetcher = std::make_unique<IconFetcher>(m_hListView, m_cachedIcons);

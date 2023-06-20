@@ -9,8 +9,8 @@
 class DrivesToolbarView : public ToolbarView
 {
 public:
-	static DrivesToolbarView *Create(HWND parent);
+	static DrivesToolbarView *Create(HWND parent, const Config *config);
 
 private:
-	DrivesToolbarView(HWND parent);
+	DrivesToolbarView(HWND parent, const Config *config);
 };

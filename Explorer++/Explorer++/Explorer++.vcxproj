@@ -748,6 +748,11 @@
     <ClCompile Include="ColorRuleRegistryStorage.cpp" />
     <ClCompile Include="ColorRuleXmlStorage.cpp" />
     <ClCompile Include="CrashHandlerHelper.cpp" />
+    <ClCompile Include="CustomFontStorage.cpp" />
+    <ClCompile Include="FontsOptionsPage.cpp" />
+    <ClCompile Include="MainFontSetter.cpp" />
+    <ClCompile Include="FontHelper.cpp" />
+    <ClCompile Include="SystemFontHelper.cpp" />
     <ClCompile Include="ThemeManager.cpp" />
     <ClCompile Include="DefaultSettingsOptionsPage.cpp" />
     <ClCompile Include="DriveEnumeratorImpl.cpp" />
@@ -956,7 +961,13 @@
     <ClInclude Include="ColorRuleRegistryStorage.h" />
     <ClInclude Include="ColorRuleXmlStorage.h" />
     <ClInclude Include="CrashHandlerHelper.h" />
+    <ClInclude Include="CustomFont.h" />
+    <ClInclude Include="CustomFontStorage.h" />
+    <ClInclude Include="FontsOptionsPage.h" />
     <ClInclude Include="Literals.h" />
+    <ClInclude Include="MainFontSetter.h" />
+    <ClInclude Include="FontHelper.h" />
+    <ClInclude Include="SystemFontHelper.h" />
     <ClInclude Include="ThemeManager.h" />
     <ClInclude Include="DefaultSettingsOptionsPage.h" />
     <ClInclude Include="DialogHelper.h" />

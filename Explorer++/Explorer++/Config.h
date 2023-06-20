@@ -5,6 +5,7 @@
 #pragma once
 
 #include "BetterEnumsWrapper.h"
+#include "CustomFont.h"
 #include "DefaultColumns.h"
 #include "IconResourceLoader.h"
 #include "ShellBrowser/FolderSettings.h"
@@ -14,6 +15,7 @@
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/StringHelper.h"
+#include <optional>
 
 enum class InfoTipType
 {
@@ -86,6 +88,8 @@ struct Config
 
 	BOOL showInfoTips = TRUE;
 	InfoTipType infoTipType = InfoTipType::System;
+
+	ValueWrapper<std::optional<CustomFont>> mainFont;
 
 	// Main window
 	ValueWrapper<BOOL> showFullTitlePath = FALSE;

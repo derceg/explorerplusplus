@@ -35,12 +35,14 @@ public:
 		m_value = variableChange.get();
 	}
 
-	T get() const
+	// There's no non-const version of this method, as the value should only be modified by calling
+	// the setter methods on this object.
+	const T &get() const
 	{
 		return m_value;
 	}
 
-	void set(T value)
+	void set(const T &value)
 	{
 		if (value != m_value)
 		{
@@ -49,7 +51,7 @@ public:
 		}
 	}
 
-	ValueWrapper &operator=(T value)
+	ValueWrapper &operator=(const T &value)
 	{
 		set(value);
 		return *this;

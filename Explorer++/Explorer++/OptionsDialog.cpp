@@ -10,6 +10,7 @@
 #include "DarkModeHelper.h"
 #include "DefaultSettingsOptionsPage.h"
 #include "FilesFoldersOptionsPage.h"
+#include "FontsOptionsPage.h"
 #include "GeneralOptionsPage.h"
 #include "Icon.h"
 #include "IconResourceLoader.h"
@@ -127,6 +128,8 @@ void OptionsDialog::AddPages()
 	AddPage(std::make_unique<GeneralOptionsPage>(m_hDlg, GetResourceInstance(), m_config.get(),
 		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
 	AddPage(std::make_unique<AppearanceOptionsPage>(m_hDlg, GetResourceInstance(), m_config.get(),
+		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
+	AddPage(std::make_unique<FontsOptionsPage>(m_hDlg, GetResourceInstance(), m_config.get(),
 		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
 	AddPage(std::make_unique<FilesFoldersOptionsPage>(m_hDlg, GetResourceInstance(), m_config.get(),
 		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));

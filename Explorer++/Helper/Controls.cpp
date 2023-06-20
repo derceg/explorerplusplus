@@ -219,6 +219,75 @@ void AddStyleToToolbar(UINT *fStyle, UINT fStyleToAdd)
 	}
 }
 
+// It appears that changing the font size in a toolbar doesn't result in the layout being correctly
+// updated. For example, the width of a button won't change, which will cause the text for the
+// button to be cut off if the font size is increased. Also, the toolbar height doesn't always seen
+// to get calculated correctly. That means that changing from one font size to another can result in
+// the toolbar reporting the original height, even if that's not enough to accommodate the new font.
+// These issues can be worked around by deleting all buttons in the toolbar and reinserting them.
+void RefreshToolbarAfterFontChange(HWND toolbar)
+{
+	SendMessage(toolbar, WM_SETREDRAW, false, 0);
+
+	auto enableRedraw = wil::scope_exit([toolbar] { SendMessage(toolbar, WM_SETREDRAW, true, 0); });
+
+	struct SavedButton
+	{
+		TBBUTTON button;
+		std::optional<std::wstring> text;
+	};
+
+	int numButtons = static_cast<int>(SendMessage(toolbar, TB_BUTTONCOUNT, 0, 0));
+	std::vector<SavedButton> savedButtons;
+
+	for (int i = 0; i < numButtons; i++)
+	{
+		TBBUTTON button = {};
+		auto res = SendMessage(toolbar, TB_GETBUTTON, 0, reinterpret_cast<LPARAM>(&button));
+
+		if (!res)
+		{
+			assert(false);
+			continue;
+		}
+
+		SavedButton savedButton;
+		savedButton.button = button;
+
+		if (WI_IsFlagClear(button.fsStyle, BTNS_SEP) && !IS_INTRESOURCE(button.iString))
+		{
+			savedButton.text = reinterpret_cast<LPCTSTR>(button.iString);
+		}
+
+		savedButtons.push_back(savedButton);
+
+		res = SendMessage(toolbar, TB_DELETEBUTTON, 0, 0);
+		assert(res);
+	}
+
+	int index = 0;
+
+	for (const auto &savedButton : savedButtons)
+	{
+		TBBUTTON button = savedButton.button;
+
+		if (savedButton.text)
+		{
+			button.iString = reinterpret_cast<INT_PTR>(savedButton.text->c_str());
+		}
+
+		auto res = SendMessage(toolbar, TB_INSERTBUTTON, index, reinterpret_cast<LPARAM>(&button));
+
+		if (!res)
+		{
+			assert(false);
+			continue;
+		}
+
+		index++;
+	}
+}
+
 void AddGripperStyle(UINT *fStyle, BOOL bAddGripper)
 {
 	if (bAddGripper)
@@ -249,42 +318,54 @@ void AddGripperStyle(UINT *fStyle, BOOL bAddGripper)
 	}
 }
 
-// When a toolbar is unlocked, clicking the gripper will resize the toolbar band to its ideal size.
-// Therefore, this function should be called when buttons are added or removed from a toolbar (since
-// the ideal size in this context is considered to be the size needed to show all the toolbar
-// buttons).
-void UpdateToolbarBandSizing(HWND hRebar, HWND hToolbar)
+// This function should be called when the size of a control contained within a rebar changes. For
+// example, adding or removing buttons from a toolbar will change the toolbar's ideal width (i.e.
+// the width needed to show every button). Changing a control's font can change both its ideal width
+// and its height.
+// Setting the ideal width for a band is important, since when a band is unlocked, clicking the
+// gripper will resize the band to its ideal size, which should match the size of the content in the
+// control.
+// Setting the height is also important, since otherwise, the band may end up being too small or too
+// large.
+void UpdateRebarBandSize(HWND rebar, HWND child, int idealWidth, int height)
 {
-	REBARBANDINFO rbbi;
-	SIZE sz;
-	int nBands;
-	int iBand = -1;
-	int i = 0;
+	UINT numBands = static_cast<UINT>(SendMessage(rebar, RB_GETBANDCOUNT, 0, 0));
 
-	nBands = (int) SendMessage(hRebar, RB_GETBANDCOUNT, 0, 0);
+	REBARBANDINFO bandInfo;
+	std::optional<int> childIndex;
 
-	for (i = 0; i < nBands; i++)
+	for (UINT i = 0; i < numBands; i++)
 	{
-		rbbi.cbSize = sizeof(rbbi);
-		rbbi.fMask = RBBIM_CHILD;
-		SendMessage(hRebar, RB_GETBANDINFO, i, reinterpret_cast<LPARAM>(&rbbi));
+		bandInfo = {};
+		bandInfo.cbSize = sizeof(bandInfo);
+		bandInfo.fMask = RBBIM_CHILD | RBBIM_CHILDSIZE;
+		auto res = SendMessage(rebar, RB_GETBANDINFO, i, reinterpret_cast<LPARAM>(&bandInfo));
 
-		if (rbbi.hwndChild == hToolbar)
+		if (res == 0)
 		{
-			iBand = i;
+			assert(false);
+			continue;
+		}
+
+		if (bandInfo.hwndChild == child)
+		{
+			childIndex = i;
 			break;
 		}
 	}
 
-	if (iBand != -1)
+	if (!childIndex)
 	{
-		SendMessage(hToolbar, TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&sz));
-
-		rbbi.cbSize = sizeof(rbbi);
-		rbbi.fMask = RBBIM_IDEALSIZE;
-		rbbi.cxIdeal = sz.cx;
-		SendMessage(hRebar, RB_SETBANDINFO, iBand, reinterpret_cast<LPARAM>(&rbbi));
+		assert(false);
+		return;
 	}
+
+	bandInfo.fMask = RBBIM_IDEALSIZE | RBBIM_CHILDSIZE;
+	bandInfo.cxIdeal = idealWidth;
+	bandInfo.cyMinChild = height;
+	[[maybe_unused]] auto res =
+		SendMessage(rebar, RB_SETBANDINFO, *childIndex, reinterpret_cast<LPARAM>(&bandInfo));
+	assert(res);
 }
 
 SIZE GetCheckboxSize(HWND hwnd)

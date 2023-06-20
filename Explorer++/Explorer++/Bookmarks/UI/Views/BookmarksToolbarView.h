@@ -9,7 +9,7 @@
 class BookmarksToolbarView : public ToolbarView
 {
 public:
-	BookmarksToolbarView(HWND parent);
+	BookmarksToolbarView(HWND parent, const Config *config);
 
 	void SetImageList(HIMAGELIST imageList);
 };

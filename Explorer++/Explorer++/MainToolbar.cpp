@@ -114,7 +114,10 @@ MainToolbar::MainToolbar(HWND parent, HINSTANCE resourceInstance, CoreInterface 
 	m_persistentSettings(&MainToolbarPersistentSettings::GetInstance()),
 	m_resourceInstance(resourceInstance),
 	m_coreInterface(coreInterface),
-	m_config(config)
+	m_config(config),
+	m_fontSetter(m_hwnd, config.get()),
+	m_tooltipFontSetter(reinterpret_cast<HWND>(SendMessage(m_hwnd, TB_GETTOOLTIPS, 0, 0)),
+		config.get())
 {
 	Initialize(parent);
 }
@@ -186,6 +189,8 @@ void MainToolbar::Initialize(HWND parent)
 		std::bind_front(&MainToolbar::OnShowFoldersUpdated, this)));
 
 	AddClipboardFormatListener(m_hwnd);
+
+	m_fontSetter.fontUpdatedSignal.AddObserver(std::bind_front(&MainToolbar::OnFontUpdated, this));
 }
 
 MainToolbar::~MainToolbar()
@@ -501,6 +506,8 @@ void MainToolbar::OnUseLargeToolbarIconsUpdated(BOOL newValue)
 	SetTooolbarImageList();
 	UpdateToolbarButtonImageIndexes();
 	SendMessage(m_hwnd, TB_AUTOSIZE, 0, 0);
+
+	sizeUpdatedSignal.m_signal();
 }
 
 void MainToolbar::UpdateToolbarButtonImageIndexes()
@@ -1052,4 +1059,11 @@ void MainToolbarPersistentSettings::SaveXMLSettings(IXMLDOMDocument *pXMLDom, IX
 
 		index++;
 	}
+}
+
+void MainToolbar::OnFontUpdated()
+{
+	RefreshToolbarAfterFontChange(m_hwnd);
+
+	sizeUpdatedSignal.m_signal();
 }

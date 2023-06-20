@@ -4,7 +4,9 @@
 
 #pragma once
 
+#include "MainFontSetter.h"
 #include "ShellBrowser/HistoryEntry.h"
+#include "SignalWrapper.h"
 #include "../Helper/BaseWindow.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <wil/resource.h>
@@ -19,6 +21,9 @@ class AddressBar : public BaseWindow
 {
 public:
 	static AddressBar *Create(HWND parent, CoreInterface *coreInterface, Navigator *navigator);
+
+	// Signals
+	SignalWrapper<AddressBar, void()> sizeUpdatedSignal;
 
 private:
 	AddressBar(HWND parent, CoreInterface *coreInterface, Navigator *navigator);
@@ -39,9 +44,12 @@ private:
 	void UpdateTextAndIconInUI(std::wstring *text, int iconIndex);
 	void RevertTextInUI();
 	void OnHistoryEntryUpdated(const HistoryEntry &entry, HistoryEntry::PropertyType propertyType);
+	void OnFontUpdated();
 
 	CoreInterface *m_coreInterface;
 	Navigator *m_navigator;
+
+	MainFontSetter m_fontSetter;
 
 	boost::signals2::scoped_connection m_historyEntryUpdatedConnection;
 	int m_defaultFolderIconIndex;

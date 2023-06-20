@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "MainFontSetter.h"
 #include "ShellChangeWatcher.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/ShellDropTargetWindow.h"
@@ -177,6 +178,12 @@ private:
 	const Config *m_config;
 	TabContainer *m_tabContainer;
 	FileActionHandler *m_fileActionHandler;
+
+	// Note that the treeview control sets the font on the tooltip control it creates each time the
+	// tooltip is shown (which can be seen by logging WM_SETFONT calls made on the tooltip control).
+	// That means there's no need to manually set the tooltip font; only the treeview font needs to
+	// be set. Once the treeview font is set, the same font will be applied to the tooltip control.
+	MainFontSetter m_fontSetter;
 
 	ctpl::thread_pool m_iconThreadPool;
 	std::unordered_map<int, std::future<std::optional<IconResult>>> m_iconResults;

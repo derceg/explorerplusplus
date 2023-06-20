@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "MainFontSetter.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/signals2.hpp>
 #include <chrono>
@@ -26,6 +27,7 @@ struct MouseEvent
 	bool ctrlKey;
 };
 
+struct Config;
 class ToolbarView;
 
 class ToolbarButton
@@ -112,6 +114,7 @@ class ToolbarView
 {
 public:
 	using ToolbarUpdatedSignal = boost::signals2::signal<void()>;
+	using ToolbarSizeChangedSignal = boost::signals2::signal<void()>;
 	using WindowDestroyedSignal = boost::signals2::signal<void()>;
 
 	struct DropLocation
@@ -151,13 +154,13 @@ public:
 	size_t FindNextButtonIndex(const POINT &ptClient) const;
 	void SetHotItem(size_t index);
 
-	boost::signals2::connection AddToolbarUpdatedObserver(
-		const ToolbarUpdatedSignal::slot_type &observer);
+	boost::signals2::connection AddToolbarSizeUpdatedObserver(
+		const ToolbarSizeChangedSignal::slot_type &observer);
 	boost::signals2::connection AddWindowDestroyedObserver(
 		const WindowDestroyedSignal::slot_type &observer);
 
 protected:
-	ToolbarView(HWND parent, DWORD style, DWORD extendedStyle);
+	ToolbarView(HWND parent, DWORD style, DWORD extendedStyle, const Config *config);
 	virtual ~ToolbarView() = default;
 
 	void SetupSmallShellImageList();
@@ -182,6 +185,8 @@ private:
 	size_t TransformCommandToIndex(int command);
 	ToolbarButton *GetButtonFromIndex(size_t index);
 
+	void OnFontUpdated();
+
 	void OnNcDestroy();
 
 	std::vector<std::unique_ptr<ToolbarButton>> m_buttons;
@@ -193,11 +198,14 @@ private:
 	// command ID won't be a valid index and vice versa).
 	int m_idCounter = 1000;
 
+	MainFontSetter m_fontSetter;
+	std::unique_ptr<MainFontSetter> m_tooltipFontSetter;
+
 	// Drag and drop
 	std::optional<POINT> m_leftButtonDownPoint;
 
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 
-	ToolbarUpdatedSignal m_toolbarUpdatedSignal;
+	ToolbarSizeChangedSignal m_toolbarSizeUpdatedSignal;
 	WindowDestroyedSignal m_windowDestroyedSignal;
 };

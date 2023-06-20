@@ -372,6 +372,15 @@ boost::signals2::connection Explorerplusplus::AddToolbarContextMenuSelectedObser
 void Explorerplusplus::CreateAddressBar()
 {
 	m_addressBar = AddressBar::Create(m_hMainRebar, this, this);
+	m_addressBar->sizeUpdatedSignal.AddObserver(
+		std::bind_front(&Explorerplusplus::OnAddressBarSizeUpdated, this));
+}
+
+void Explorerplusplus::OnAddressBarSizeUpdated()
+{
+	RECT rect;
+	GetWindowRect(m_addressBar->GetHWND(), &rect);
+	UpdateRebarBandSize(m_hMainRebar, m_addressBar->GetHWND(), 0, GetRectHeight(&rect));
 }
 
 void Explorerplusplus::CreateMainToolbar()
@@ -408,30 +417,24 @@ void Explorerplusplus::CreateMainToolbar()
 		}
 	}
 
-	// The main toolbar will update its size when the useLargeToolbarIcons
-	// option changes. The rebar also needs to be updated, though only after the
-	// toolbar has updated itself. It's possible this would be better done by
-	// having the main toolbar send out a custom event once it's updated its own
-	// size, rather than relying on the observer here running after the one set
-	// up by the main toolbar.
-	m_connections.push_back(m_config->useLargeToolbarIcons.addObserver(
-		std::bind_front(&Explorerplusplus::OnUseLargeToolbarIconsUpdated, this),
-		boost::signals2::at_back));
+	m_mainToolbar->sizeUpdatedSignal.AddObserver(
+		std::bind(&Explorerplusplus::OnRebarToolbarSizeUpdated, this, m_mainToolbar->GetHWND()));
 }
 
 void Explorerplusplus::CreateBookmarksToolbar()
 {
-	auto bookmarksToolbarView = new BookmarksToolbarView(m_hMainRebar);
+	auto bookmarksToolbarView = new BookmarksToolbarView(m_hMainRebar, m_config.get());
 
 	m_bookmarksToolbar = BookmarksToolbar::Create(bookmarksToolbarView, this, this,
 		&m_bookmarkIconFetcher, BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
-	m_bookmarksToolbar->GetView()->AddToolbarUpdatedObserver(std::bind_front(
-		&Explorerplusplus::OnRebarToolbarUpdated, this, m_bookmarksToolbar->GetView()->GetHWND()));
+	m_bookmarksToolbar->GetView()->AddToolbarSizeUpdatedObserver(
+		std::bind(&Explorerplusplus::OnRebarToolbarSizeUpdated, this,
+			m_bookmarksToolbar->GetView()->GetHWND()));
 }
 
 void Explorerplusplus::CreateDrivesToolbar()
 {
-	auto drivesToolbarView = DrivesToolbarView::Create(m_hMainRebar);
+	auto drivesToolbarView = DrivesToolbarView::Create(m_hMainRebar, m_config.get());
 
 	auto driveEnumerator = std::make_unique<DriveEnumeratorImpl>();
 	auto driveWatcher = std::make_unique<DriveWatcherImpl>(m_hContainer);
@@ -439,41 +442,29 @@ void Explorerplusplus::CreateDrivesToolbar()
 		std::make_unique<DriveModel>(std::move(driveEnumerator), std::move(driveWatcher));
 
 	m_drivesToolbar = DrivesToolbar::Create(drivesToolbarView, std::move(driveModel), this, this);
-	m_drivesToolbar->GetView()->AddToolbarUpdatedObserver(std::bind_front(
-		&Explorerplusplus::OnRebarToolbarUpdated, this, m_drivesToolbar->GetView()->GetHWND()));
+	m_drivesToolbar->GetView()->AddToolbarSizeUpdatedObserver(std::bind(
+		&Explorerplusplus::OnRebarToolbarSizeUpdated, this, m_drivesToolbar->GetView()->GetHWND()));
 }
 
 void Explorerplusplus::CreateApplicationToolbar()
 {
-	auto applicationToolbarView = Applications::ApplicationToolbarView::Create(m_hMainRebar);
+	auto applicationToolbarView =
+		Applications::ApplicationToolbarView::Create(m_hMainRebar, m_config.get());
 
 	m_applicationToolbar = Applications::ApplicationToolbar::Create(applicationToolbarView,
 		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel(), this);
-	m_applicationToolbar->GetView()->AddToolbarUpdatedObserver(
-		std::bind_front(&Explorerplusplus::OnRebarToolbarUpdated, this,
+	m_applicationToolbar->GetView()->AddToolbarSizeUpdatedObserver(
+		std::bind(&Explorerplusplus::OnRebarToolbarSizeUpdated, this,
 			m_applicationToolbar->GetView()->GetHWND()));
 }
 
-void Explorerplusplus::OnRebarToolbarUpdated(HWND toolbar)
+void Explorerplusplus::OnRebarToolbarSizeUpdated(HWND toolbar)
 {
-	UpdateToolbarBandSizing(m_hMainRebar, toolbar);
-}
+	SIZE size;
+	auto res = SendMessage(toolbar, TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&size));
+	assert(res);
 
-void Explorerplusplus::OnUseLargeToolbarIconsUpdated(BOOL newValue)
-{
-	UNREFERENCED_PARAMETER(newValue);
-
-	auto buttonSize =
-		static_cast<DWORD>(SendMessage(m_mainToolbar->GetHWND(), TB_GETBUTTONSIZE, 0, 0));
-
-	REBARBANDINFO bandInfo;
-	bandInfo.cbSize = sizeof(bandInfo);
-	bandInfo.fMask = RBBIM_CHILDSIZE;
-	bandInfo.cxMinChild = 0;
-	bandInfo.cyMinChild = HIWORD(buttonSize);
-	bandInfo.cyChild = HIWORD(buttonSize);
-	bandInfo.cyMaxChild = HIWORD(buttonSize);
-	SendMessage(m_hMainRebar, RB_SETBANDINFO, 0, reinterpret_cast<LPARAM>(&bandInfo));
+	UpdateRebarBandSize(m_hMainRebar, toolbar, size.cx, size.cy);
 }
 
 HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)

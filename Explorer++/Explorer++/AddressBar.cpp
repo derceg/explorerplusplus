@@ -31,7 +31,8 @@ AddressBar::AddressBar(HWND parent, CoreInterface *coreInterface, Navigator *nav
 	BaseWindow(CreateAddressBar(parent)),
 	m_coreInterface(coreInterface),
 	m_navigator(navigator),
-	m_defaultFolderIconIndex(GetDefaultFolderIconIndex())
+	m_defaultFolderIconIndex(GetDefaultFolderIconIndex()),
+	m_fontSetter(m_hwnd, coreInterface->GetConfig())
 {
 	Initialize(parent);
 }
@@ -70,6 +71,8 @@ void AddressBar::Initialize(HWND parent)
 				m_coreInterface->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
 					std::bind_front(&AddressBar::OnNavigationCommitted, this)));
 		});
+
+	m_fontSetter.fontUpdatedSignal.AddObserver(std::bind(&AddressBar::OnFontUpdated, this));
 }
 
 LRESULT AddressBar::EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -316,4 +319,9 @@ void AddressBar::OnHistoryEntryUpdated(const HistoryEntry &entry,
 		}
 		break;
 	}
+}
+
+void AddressBar::OnFontUpdated()
+{
+	sizeUpdatedSignal.m_signal();
 }

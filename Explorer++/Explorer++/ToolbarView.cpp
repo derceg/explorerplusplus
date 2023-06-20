@@ -118,15 +118,25 @@ bool ToolbarMenuButton::ShouldSuppressClick() const
 	return (now - m_menuLastClosedTime) <= MINIMUM_TIME_BETWEEN_CLICKS;
 }
 
-ToolbarView::ToolbarView(HWND parent, DWORD style, DWORD extendedStyle) :
-	m_hwnd(CreateToolbar(parent, style, extendedStyle))
+ToolbarView::ToolbarView(HWND parent, DWORD style, DWORD extendedStyle, const Config *config) :
+	m_hwnd(CreateToolbar(parent, style, extendedStyle)),
+	m_fontSetter(m_hwnd, config)
 {
+	auto tooltipControl = reinterpret_cast<HWND>(SendMessage(m_hwnd, TB_GETTOOLTIPS, 0, 0));
+
+	if (tooltipControl)
+	{
+		m_tooltipFontSetter = std::make_unique<MainFontSetter>(tooltipControl, config);
+	}
+
 	SendMessage(m_hwnd, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
 		std::bind_front(&ToolbarView::WndProc, this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(m_hwnd),
 		std::bind_front(&ToolbarView::ParentWndProc, this)));
+
+	m_fontSetter.fontUpdatedSignal.AddObserver(std::bind(&ToolbarView::OnFontUpdated, this));
 }
 
 void ToolbarView::SetupSmallShellImageList()
@@ -175,7 +185,7 @@ void ToolbarView::AddButton(std::unique_ptr<ToolbarButton> button, size_t index)
 	button->SetParent(this);
 	m_buttons.insert(m_buttons.begin() + index, std::move(button));
 
-	m_toolbarUpdatedSignal();
+	m_toolbarSizeUpdatedSignal();
 }
 
 void ToolbarView::UpdateButton(const ToolbarButton *button)
@@ -223,7 +233,7 @@ void ToolbarView::RemoveButton(size_t index)
 
 	SendMessage(m_hwnd, TB_DELETEBUTTON, index, 0);
 
-	m_toolbarUpdatedSignal();
+	m_toolbarSizeUpdatedSignal();
 }
 
 ToolbarButton *ToolbarView::GetButton(size_t index) const
@@ -570,10 +580,17 @@ void ToolbarView::SetHotItem(size_t index)
 	SendMessage(m_hwnd, TB_SETHOTITEM, index, 0);
 }
 
-boost::signals2::connection ToolbarView::AddToolbarUpdatedObserver(
-	const ToolbarUpdatedSignal::slot_type &observer)
+void ToolbarView::OnFontUpdated()
 {
-	return m_toolbarUpdatedSignal.connect(observer);
+	RefreshToolbarAfterFontChange(m_hwnd);
+
+	m_toolbarSizeUpdatedSignal();
+}
+
+boost::signals2::connection ToolbarView::AddToolbarSizeUpdatedObserver(
+	const ToolbarSizeChangedSignal::slot_type &observer)
+{
+	return m_toolbarSizeUpdatedSignal.connect(observer);
 }
 
 boost::signals2::connection ToolbarView::AddWindowDestroyedObserver(

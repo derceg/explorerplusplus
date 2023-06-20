@@ -326,10 +326,10 @@ private:
 	void CreateDrivesToolbar();
 	void CreateApplicationToolbar();
 
-	/* Main toolbars. */
+	// Rebar bands
 	void InitializeMainToolbars();
-	void OnRebarToolbarUpdated(HWND toolbar);
-	void OnUseLargeToolbarIconsUpdated(BOOL newValue);
+	void OnAddressBarSizeUpdated();
+	void OnRebarToolbarSizeUpdated(HWND toolbar);
 	boost::signals2::connection AddToolbarContextMenuObserver(
 		const ToolbarContextMenuSignal::slot_type &observer) override;
 	boost::signals2::connection AddToolbarContextMenuSelectedObserver(

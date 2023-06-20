@@ -1471,7 +1471,10 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 		return OnListViewKeyDown(lParam);
 
 	case TBN_ENDADJUST:
-		UpdateToolbarBandSizing(m_hMainRebar, ((NMHDR *) lParam)->hwndFrom);
+		if (m_InitializationFinished.get())
+		{
+			OnRebarToolbarSizeUpdated(reinterpret_cast<NMHDR *>(lParam)->hwndFrom);
+		}
 		break;
 
 	case RBN_BEGINDRAG:

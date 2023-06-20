@@ -27,8 +27,9 @@ BOOL lCheckDlgButton(HWND hDlg, int buttonId, BOOL bCheck);
 
 /* Toolbar/Rebar. */
 void AddStyleToToolbar(UINT *fStyle, UINT fStyleToAdd);
+void RefreshToolbarAfterFontChange(HWND toolbar);
 void AddGripperStyle(UINT *fStyle, BOOL bAddGripper);
-void UpdateToolbarBandSizing(HWND hRebar, HWND hToolbar);
+void UpdateRebarBandSize(HWND rebar, HWND child, int idealWidth, int height);
 
 SIZE GetCheckboxSize(HWND hwnd);
 SIZE GetRadioButtonSize(HWND hwnd);

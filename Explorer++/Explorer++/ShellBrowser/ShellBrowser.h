@@ -7,6 +7,7 @@
 #include "ColumnDataRetrieval.h"
 #include "Columns.h"
 #include "FolderSettings.h"
+#include "MainFontSetter.h"
 #include "ServiceProvider.h"
 #include "ShellChangeWatcher.h"
 #include "ShellNavigator.h"
@@ -617,6 +618,13 @@ private:
 
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
+
+	// When the listview is assigned a font, it will also set the font for the tooltip control.
+	// However, that font will be reset whenever the theme for the tooltip control changes. Managing
+	// the font for the tooltips control using MainFontSetter is a simple way of ensuring the font
+	// is set consistently.
+	MainFontSetter m_fontSetter;
+	MainFontSetter m_tooltipFontSetter;
 
 	HIMAGELIST m_hListViewImageList;
 

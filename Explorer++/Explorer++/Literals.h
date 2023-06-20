@@ -20,3 +20,9 @@ constexpr int operator"" _px(unsigned long long pixels)
 {
 	return static_cast<int>(pixels);
 }
+
+// Specifies a point (unit for font size) value.
+constexpr int operator"" _pt(unsigned long long points)
+{
+	return static_cast<int>(points);
+}

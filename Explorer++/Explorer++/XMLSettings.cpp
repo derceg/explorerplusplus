@@ -16,6 +16,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Config.h"
+#include "CustomFontStorage.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"
 #include "MainToolbar.h"
@@ -117,6 +118,7 @@ will need to be changed correspondingly. */
 #define HASH_OPEN_TABS_IN_FOREGROUND 2957281235
 #define HASH_GROUP_SORT_DIRECTION_GLOBAL 790225996
 #define HASH_GO_UP_ON_DOUBLE_CLICK 1809284638
+#define HASH_MAIN_FONT 3006124449
 
 struct ColumnXMLSaveData
 {
@@ -754,6 +756,16 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("GoUpOnDoubleClick"),
 		NXMLSettings::EncodeBoolValue(m_config->goUpOnDoubleClick));
+
+	auto &mainFont = m_config->mainFont.get();
+
+	if (mainFont)
+	{
+		NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+		NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
+			_T("MainFont"));
+		SaveCustomFontToXml(pXMLDom, pParentNode.get(), *mainFont);
+	}
 
 	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pe.get());
@@ -1844,6 +1856,17 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 	case HASH_GO_UP_ON_DOUBLE_CLICK:
 		m_config->goUpOnDoubleClick = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
+
+	case HASH_MAIN_FONT:
+	{
+		auto mainFont = LoadCustomFontFromXml(pNode);
+
+		if (mainFont)
+		{
+			m_config->mainFont = *mainFont;
+		}
+	}
+	break;
 	}
 }
 

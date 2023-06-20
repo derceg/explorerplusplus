@@ -547,6 +547,21 @@
     <ClCompile Include="ToolbarHelper.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="FontsOptionsPage.cpp">
+      <Filter>General Dialogs\Options</Filter>
+    </ClCompile>
+    <ClCompile Include="FontHelper.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="MainFontSetter.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemFontHelper.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomFontStorage.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1105,6 +1120,24 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ToolbarHelper.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="FontsOptionsPage.h">
+      <Filter>General Dialogs\Options</Filter>
+    </ClInclude>
+    <ClInclude Include="FontHelper.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomFont.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFontSetter.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemFontHelper.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomFontStorage.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

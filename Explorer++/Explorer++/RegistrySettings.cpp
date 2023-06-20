@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Config.h"
+#include "CustomFontStorage.h"
 #include "DefaultColumns.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"
@@ -14,11 +15,14 @@
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 
+using namespace std::string_literals;
+
 namespace
 {
 const TCHAR REG_TABS_KEY[] = _T("Software\\Explorer++\\Tabs");
 const TCHAR REG_TOOLBARS_KEY[] = _T("Software\\Explorer++\\Toolbars");
 const TCHAR REG_COLUMNS_KEY[] = _T("Software\\Explorer++\\DefaultColumns");
+const TCHAR REG_MAIN_FONT_KEY_NAME[] = _T("MainFont");
 }
 
 void UpdateColumnWidths(std::vector<Column_t> &columns,
@@ -257,6 +261,17 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 		tbSave.pszValueName = _T("ToolbarState");
 
 		SendMessage(m_mainToolbar->GetHWND(), TB_SAVERESTORE, TRUE, (LPARAM) &tbSave);
+
+		SHDeleteKey(hSettingsKey, REG_MAIN_FONT_KEY_NAME);
+
+		auto &mainFont = m_config->mainFont.get();
+
+		if (mainFont)
+		{
+			auto mainFontKeyPath =
+				NExplorerplusplus::REG_SETTINGS_KEY + L"\\"s + REG_MAIN_FONT_KEY_NAME;
+			SaveCustomFontToRegistry(mainFontKeyPath, *mainFont);
+		}
 
 		RegCloseKey(hSettingsKey);
 	}
@@ -533,6 +548,14 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		}
 
 		m_bAttemptToolbarRestore = true;
+
+		auto mainFont = LoadCustomFontFromRegistry(
+			NExplorerplusplus::REG_SETTINGS_KEY + L"\\"s + REG_MAIN_FONT_KEY_NAME);
+
+		if (mainFont)
+		{
+			m_config->mainFont = *mainFont;
+		}
 
 		RegCloseKey(hSettingsKey);
 	}

@@ -57,7 +57,8 @@ ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabCont
 	m_cutItem(nullptr),
 	m_dropExpandItem(nullptr),
 	m_shellChangeWatcher(GetHWND(),
-		std::bind_front(&ShellTreeView::ProcessShellChangeNotifications, this))
+		std::bind_front(&ShellTreeView::ProcessShellChangeNotifications, this)),
+	m_fontSetter(m_hTreeView, coreInterface->GetConfig())
 {
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hTreeView,
 		std::bind_front(&ShellTreeView::TreeViewProc, this)));

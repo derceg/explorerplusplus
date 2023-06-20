@@ -5,11 +5,11 @@
 #include "stdafx.h"
 #include "BookmarksToolbarView.h"
 
-BookmarksToolbarView::BookmarksToolbarView(HWND parent) :
+BookmarksToolbarView::BookmarksToolbarView(HWND parent, const Config *config) :
 	ToolbarView(parent,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | TBSTYLE_TOOLTIPS | TBSTYLE_LIST
 			| TBSTYLE_TRANSPARENT | TBSTYLE_FLAT | CCS_NODIVIDER | CCS_NORESIZE,
-		TBSTYLE_EX_MIXEDBUTTONS | TBSTYLE_EX_DOUBLEBUFFER | TBSTYLE_EX_HIDECLIPPEDBUTTONS)
+		TBSTYLE_EX_MIXEDBUTTONS | TBSTYLE_EX_DOUBLEBUFFER | TBSTYLE_EX_HIDECLIPPEDBUTTONS, config)
 {
 }
 
