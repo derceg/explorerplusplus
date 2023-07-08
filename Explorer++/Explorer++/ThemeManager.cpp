@@ -6,6 +6,7 @@
 #include "ThemeManager.h"
 #include "DarkModeHelper.h"
 #include "Explorer++_internal.h"
+#include "SystemFontHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/MenuHelper.h"
@@ -526,34 +527,20 @@ LRESULT CALLBACK ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wP
 			throw std::runtime_error("Menu item text retrieval failed");
 		}
 
-		// Note that if the DPI changes while the application is running, GetThemeSysFont() will
-		// return a font that's incorrectly sized. From debugging into the function, that appears to
-		// be because it uses GetDpiForSystem(), which always returns the original DPI for some
-		// reason. That is, if the application is started with a DPI of 120, then 120 will always be
-		// returned, even if the DPI is changed.
-		// That then means that GetThemeSysFont() will scale the font that's returned based on the
-		// original DPI, rather than the current DPI, which can cause the menu to be spaced
-		// incorrectly after a DPI change.
-		LOGFONT logFont;
-		wil::unique_hfont font;
+		auto logFont = GetSystemFont(SystemFont::Menu, hwnd);
+		wil::unique_hfont font(CreateFontIndirect(&logFont));
 		wil::unique_select_object selectFont;
-		HRESULT hr = GetThemeSysFont(theme.get(), TMT_MENUFONT, &logFont);
 
-		if (SUCCEEDED(hr))
+		if (font)
 		{
-			font.reset(CreateFontIndirect(&logFont));
-
-			if (font)
-			{
-				selectFont = wil::SelectObject(hdc.get(), font.get());
-			}
+			selectFont = wil::SelectObject(hdc.get(), font.get());
 		}
 
 		assert(selectFont);
 
 		RECT textRect;
-		hr = GetThemeTextExtent(theme.get(), hdc.get(), MENU_BARITEM, MBI_NORMAL, text->c_str(), -1,
-			drawFlagsBase, nullptr, &textRect);
+		HRESULT hr = GetThemeTextExtent(theme.get(), hdc.get(), MENU_BARITEM, MBI_NORMAL,
+			text->c_str(), -1, drawFlagsBase, nullptr, &textRect);
 		assert(SUCCEEDED(hr));
 
 		measureItem->itemWidth = GetRectWidth(&textRect);
