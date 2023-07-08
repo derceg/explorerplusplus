@@ -448,10 +448,11 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 		indentLeft = m_config->treeViewWidth;
 	}
 
-	RECT tabWindowRect;
-	GetClientRect(m_tabContainer->GetHWND(), &tabWindowRect);
-
-	int tabWindowHeight = GetRectHeight(&tabWindowRect);
+	// Since the display area is indicated to start at (0, 0), displayRect.top will contain the
+	// height of the tab control above the display area.
+	RECT displayRect = { 0, 0, 0, 0 };
+	TabCtrl_AdjustRect(m_tabContainer->GetHWND(), true, &displayRect);
+	int tabWindowHeight = std::abs(displayRect.top);
 
 	indentTop = iIndentRebar;
 
@@ -500,14 +501,12 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 	/* Tab close button. */
 	int scaledCloseToolbarXOffset =
 		dpiCompatibility.ScaleValue(m_hTabWindowToolbar, ToolbarHelper::CLOSE_TOOLBAR_X_OFFSET);
-	int scaledCloseToolbarYOffset =
-		dpiCompatibility.ScaleValue(m_hTabWindowToolbar, ToolbarHelper::CLOSE_TOOLBAR_Y_OFFSET);
 
 	RECT tabToolbarRect;
 	GetClientRect(m_hTabWindowToolbar, &tabToolbarRect);
 	SetWindowPos(m_hTabWindowToolbar, nullptr,
 		iTabBackingWidth - GetRectWidth(&tabToolbarRect) - scaledCloseToolbarXOffset,
-		scaledCloseToolbarYOffset, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+		(tabWindowHeight - GetRectHeight(&tabToolbarRect)) / 2, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 
 	if (m_config->extendTabControl.get() && !m_config->showTabBarAtBottom.get())
 	{

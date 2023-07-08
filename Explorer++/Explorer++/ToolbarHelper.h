@@ -14,7 +14,6 @@ namespace ToolbarHelper
 {
 
 static constexpr int CLOSE_TOOLBAR_X_OFFSET = 4;
-static constexpr int CLOSE_TOOLBAR_Y_OFFSET = 1;
 
 std::tuple<HWND, wil::unique_himagelist> CreateCloseButtonToolbar(HWND parent, int closeButtonId,
 	const std::wstring &tooltip, IconResourceLoader *iconResourceLoader);

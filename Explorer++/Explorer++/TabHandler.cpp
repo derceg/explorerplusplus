@@ -11,11 +11,8 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
 #include "TabRestorerUI.h"
-#include "../Helper/DpiCompatibility.h"
 #include "../Helper/Macros.h"
 #include <list>
-
-static const UINT TAB_WINDOW_HEIGHT_96DPI = 24;
 
 void Explorerplusplus::InitializeTabs()
 {
@@ -56,11 +53,6 @@ void Explorerplusplus::InitializeTabs()
 
 	m_connections.push_back(m_config->showTabBarAtBottom.addObserver(updateLayoutObserverMethod));
 	m_connections.push_back(m_config->extendTabControl.addObserver(updateLayoutObserverMethod));
-
-	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_tabContainer->GetHWND());
-	int tabWindowHeight = MulDiv(TAB_WINDOW_HEIGHT_96DPI, dpi, USER_DEFAULT_SCREEN_DPI);
-	SetWindowPos(m_tabContainer->GetHWND(), nullptr, 0, 0, 0, tabWindowHeight,
-		SWP_NOMOVE | SWP_NOZORDER);
 
 	m_tabRestorer = std::make_unique<TabRestorer>(m_tabContainer);
 	m_tabRestorerUI = std::make_unique<TabRestorerUI>(m_resourceInstance, this, m_tabRestorer.get(),
