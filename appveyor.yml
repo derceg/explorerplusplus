@@ -90,6 +90,9 @@ after_build:
 
     7z a explorerpp_translations.zip %APPVEYOR_BUILD_FOLDER%\Explorer++\Win32\%CONFIGURATION%\Explorer++*.dll
 
+
+    (echo.|set /p="%APPVEYOR_BUILD_VERSION%")>latest_version.txt
+
 test_script:
 - ps: >-
     if ($env:PLATFORM -ne "ARM64") {
@@ -118,6 +121,7 @@ artifacts:
 - path: explorerpp_x86_setup.msi
 - path: explorerpp_x64_setup.msi
 - path: explorerpp_translations.zip
+- path: latest_version.txt
 
 before_deploy:
 - ps: >-
@@ -136,15 +140,41 @@ before_deploy:
     }
 
 deploy:
-  provider: GitHub
-  auth_token:
-    secure: iU7ijPhvPEwymBKhGsZBwD9aDO3yPWpAq8iS5vaQcs5YdLRgcICuLOEJZ9UZIh9l
-  tag: $(APPVEYOR_REPO_TAG_NAME)
-  release: $(RELEASE_TITLE)
-  prerelease: $(PRERELEASE)
-  description: ''
-  artifact: /.*\.zip/
-  force_update: true
-  draft: true
-  on:
-    APPVEYOR_REPO_TAG: true
+  - provider: GitHub
+    auth_token:
+      secure: iU7ijPhvPEwymBKhGsZBwD9aDO3yPWpAq8iS5vaQcs5YdLRgcICuLOEJZ9UZIh9l
+    tag: $(APPVEYOR_REPO_TAG_NAME)
+    release: $(RELEASE_TITLE)
+    prerelease: $(PRERELEASE)
+    description: ''
+    artifact: /.*\.zip/
+    force_update: true
+    draft: true
+    on:
+      APPVEYOR_REPO_TAG: true
+
+  - provider: S3
+    access_key_id:
+      secure: C7kIRfyPAfkKkpF7Gh7BqEvqZVMMi2Ps0+iGFgCTiKE=
+    secret_access_key:
+      secure: agLWDF321Coa4wU5Wa07pwLm0QLQ2KPj9M0Ys5vVlOQID3+TDUtrvRX2R47yZbFJ
+    bucket: explorerplusplus-builds
+    region: us-east-1
+    folder: dev/$(APPVEYOR_BUILD_VERSION)
+    artifact: /.*\.zip|.*\.msi/
+    set_content_type: true
+    on:
+      APPVEYOR_REPO_TAG: false
+
+  - provider: S3
+    access_key_id:
+      secure: C7kIRfyPAfkKkpF7Gh7BqEvqZVMMi2Ps0+iGFgCTiKE=
+    secret_access_key:
+      secure: agLWDF321Coa4wU5Wa07pwLm0QLQ2KPj9M0Ys5vVlOQID3+TDUtrvRX2R47yZbFJ
+    bucket: explorerplusplus-builds
+    region: us-east-1
+    folder: dev
+    artifact: latest_version.txt
+    set_content_type: true
+    on:
+      APPVEYOR_REPO_TAG: false
