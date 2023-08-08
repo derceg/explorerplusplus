@@ -85,7 +85,7 @@ after_build:
     7z a explorerpp_%arch%_symbols.zip %APPVEYOR_BUILD_FOLDER%\Explorer++\Explorer++\%PLATFORM%\%CONFIGURATION%\Explorer++.pdb
 
 
-    IF NOT "%PLATFORM%" == "ARM64" ( copy "%APPVEYOR_BUILD_FOLDER%\Explorer++\Installer\bin\%arch%\%CONFIGURATION%\Explorer++ Setup.msi" "Explorer++ Setup.msi" )
+    IF NOT "%PLATFORM%" == "ARM64" ( copy "%APPVEYOR_BUILD_FOLDER%\Explorer++\Installer\bin\%arch%\%CONFIGURATION%\explorerpp_%arch%_setup.msi" . )
 
 
     7z a explorerpp_translations.zip %APPVEYOR_BUILD_FOLDER%\Explorer++\Win32\%CONFIGURATION%\Explorer++*.dll
@@ -115,7 +115,8 @@ artifacts:
 - path: explorerpp_x64_symbols.zip
 - path: explorerpp_arm64.zip
 - path: explorerpp_arm64_symbols.zip
-- path: Explorer++ Setup.msi
+- path: explorerpp_x86_setup.msi
+- path: explorerpp_x64_setup.msi
 - path: explorerpp_translations.zip
 
 before_deploy:

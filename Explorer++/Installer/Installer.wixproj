@@ -6,7 +6,7 @@
     <ProductVersion>3.10</ProductVersion>
     <ProjectGuid>3cd109b0-fb57-446c-ae40-cf4fd45793ef</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>Explorer++ Setup</OutputName>
+    <OutputName>explorerpp_$(Platform)_setup</OutputName>
     <OutputType>Package</OutputType>
     <Name>Installer</Name>
   </PropertyGroup>
