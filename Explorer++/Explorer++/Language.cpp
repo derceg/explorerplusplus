@@ -236,16 +236,7 @@ BOOL Explorerplusplus::VerifyLanguageVersion(const TCHAR *szLanguageModule) cons
 
 		if (bSuccess1 && bSuccess2)
 		{
-			/* For the version of the language DLL to match
-			the version of the executable, the major version,
-			minor version and micro version must match. The
-			build version is ignored. */
-			if (HIWORD(dwpvLanguageMS) == HIWORD(dwpvProcessMS)
-				&& LOWORD(dwpvLanguageMS) == LOWORD(dwpvProcessMS)
-				&& HIWORD(dwpvLanguageLS) == HIWORD(dwpvProcessLS))
-			{
-				return TRUE;
-			}
+			return (dwpvLanguageMS == dwpvProcessMS) && (dwpvLanguageLS == dwpvProcessLS);
 		}
 	}
 
