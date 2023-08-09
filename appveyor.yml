@@ -91,7 +91,7 @@ after_build:
     7z a explorerpp_translations.zip %APPVEYOR_BUILD_FOLDER%\Explorer++\Win32\%CONFIGURATION%\Explorer++*.dll
 
 
-    (echo.|set /p="%APPVEYOR_BUILD_VERSION%")>latest_version.txt
+    (echo.|set /p="%APPVEYOR_BUILD_VERSION%")>latest_version.txt || ver>nul
 
 test_script:
 - ps: >-
