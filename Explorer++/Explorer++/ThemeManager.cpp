@@ -539,8 +539,8 @@ LRESULT CALLBACK ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wP
 		assert(selectFont);
 
 		RECT textRect;
-		HRESULT hr = GetThemeTextExtent(theme.get(), hdc.get(), MENU_BARITEM, MBI_NORMAL,
-			text->c_str(), -1, drawFlagsBase, nullptr, &textRect);
+		[[maybe_unused]] HRESULT hr = GetThemeTextExtent(theme.get(), hdc.get(), MENU_BARITEM,
+			MBI_NORMAL, text->c_str(), -1, drawFlagsBase, nullptr, &textRect);
 		assert(SUCCEEDED(hr));
 
 		measureItem->itemWidth = GetRectWidth(&textRect);

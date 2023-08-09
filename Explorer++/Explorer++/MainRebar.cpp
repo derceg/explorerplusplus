@@ -461,7 +461,8 @@ void Explorerplusplus::CreateApplicationToolbar()
 void Explorerplusplus::OnRebarToolbarSizeUpdated(HWND toolbar)
 {
 	SIZE size;
-	auto res = SendMessage(toolbar, TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&size));
+	[[maybe_unused]] auto res =
+		SendMessage(toolbar, TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&size));
 	assert(res);
 
 	UpdateRebarBandSize(m_hMainRebar, toolbar, size.cx, size.cy);
