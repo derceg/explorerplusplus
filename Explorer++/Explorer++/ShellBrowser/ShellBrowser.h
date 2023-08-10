@@ -418,7 +418,7 @@ private:
 	void ColumnClicked(int iClickedColumn);
 
 	/* Listview. */
-	void OnListViewLeftButtonDoubleClick(const POINT *pt);
+	bool OnListViewLeftButtonDoubleClick(const POINT *pt);
 	void OnListViewMButtonDown(const POINT *pt);
 	void OnListViewMButtonUp(const POINT *pt, UINT keysDown);
 	void OnRButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT keyFlags);

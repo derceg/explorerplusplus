@@ -72,7 +72,12 @@ LRESULT ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
 	{
 		POINT pt;
 		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-		OnListViewLeftButtonDoubleClick(&pt);
+		bool handled = OnListViewLeftButtonDoubleClick(&pt);
+
+		if (handled)
+		{
+			return 0;
+		}
 	}
 	break;
 
@@ -195,21 +200,25 @@ LRESULT ShellBrowser::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM wParam, LP
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-void ShellBrowser::OnListViewLeftButtonDoubleClick(const POINT *pt)
+bool ShellBrowser::OnListViewLeftButtonDoubleClick(const POINT *pt)
 {
 	if (!m_config->goUpOnDoubleClick)
 	{
-		return;
+		return false;
 	}
 
 	LV_HITTESTINFO ht;
 	ht.pt = *pt;
 	ListView_HitTest(m_hListView, &ht);
 
-	if (ht.flags == LVHT_NOWHERE)
+	if (ht.flags != LVHT_NOWHERE)
 	{
-		m_navigationController->GoUp();
+		return false;
 	}
+
+	m_navigationController->GoUp();
+
+	return true;
 }
 
 void ShellBrowser::OnListViewMButtonDown(const POINT *pt)
