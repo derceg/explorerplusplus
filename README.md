@@ -24,31 +24,21 @@ Explorer++ is a lightweight and fast file manager for Windows.
 
 ## Latest Builds
 
-Up-to-date builds can be downloaded via AppVeyor. The links below will be for the most recent build that has taken place:
-
 ### 32-bit
 
-[explorerpp_x86.zip](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/explorerpp_x86.zip?branch=master&pr=false&job=Platform%3A%20Win32)
-
-[explorerpp_x86_symbols.zip](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/explorerpp_x86_symbols.zip?branch=master&pr=false&job=Platform%3A%20Win32)
+[explorerpp_x86.zip](https://download.explorerplusplus.com/dev/latest/explorerpp_x86.zip)
 
 ### 64-bit
 
-[explorerpp_x64.zip](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/explorerpp_x64.zip?branch=master&pr=false&job=Platform%3A%20x64)
-
-[explorerpp_x64_symbols.zip](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/explorerpp_x64_symbols.zip?branch=master&pr=false&job=Platform%3A%20x64)
+[explorerpp_x64.zip](https://download.explorerplusplus.com/dev/latest/explorerpp_x64.zip)
 
 ### ARM64
 
-[explorerpp_arm64.zip](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/explorerpp_arm64.zip?branch=master&pr=false&job=Platform%3A%20ARM64)
-
-[explorerpp_arm64_symbols.zip](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/explorerpp_arm64_symbols.zip?branch=master&pr=false&job=Platform%3A%20ARM64)
+[explorerpp_arm64.zip](https://download.explorerplusplus.com/dev/latest/explorerpp_arm64.zip)
 
 ### Translations
 
-[explorerpp_translations.zip](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/explorerpp_translations.zip?branch=master&pr=false&job=Platform%3A%20Win32)
-
-For a full list of builds, see the [AppVeyor page](https://ci.appveyor.com/project/derceg/explorerplusplus) for this project.
+[explorerpp_translations.zip](https://download.explorerplusplus.com/dev/latest/explorerpp_translations.zip)
 
 ## Building Explorer++
 
