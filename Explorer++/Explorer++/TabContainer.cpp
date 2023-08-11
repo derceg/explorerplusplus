@@ -16,6 +16,7 @@
 #include "ShellBrowser/PreservedHistoryEntry.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
+#include "SystemFontHelper.h"
 #include "TabBacking.h"
 #include "TabRestorer.h"
 #include "../Helper/CachedIcons.h"
@@ -54,6 +55,8 @@ TabContainer::TabContainer(HWND parent, TabNavigationInterface *tabNavigation,
 	CoreInterface *coreInterface, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons,
 	BookmarkTree *bookmarkTree, HINSTANCE resourceInstance, std::shared_ptr<Config> config) :
 	ShellDropTargetWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
+	m_fontSetter(m_hwnd, config.get(), GetDefaultSystemFont(m_hwnd)),
+	m_tooltipFontSetter(TabCtrl_GetToolTips(m_hwnd), config.get()),
 	m_tabNavigation(tabNavigation),
 	m_coreInterface(coreInterface),
 	m_fileActionHandler(fileActionHandler),
@@ -87,18 +90,6 @@ void TabContainer::Initialize(HWND parent)
 	auto &dpiCompat = DpiCompatibility::GetInstance();
 	UINT dpi = dpiCompat.GetDpiForWindow(m_hwnd);
 
-	NONCLIENTMETRICS ncm;
-	ncm.cbSize = sizeof(ncm);
-	dpiCompat.SystemParametersInfoForDpi(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0,
-		dpi);
-	m_tabFont.reset(CreateFontIndirect(&ncm.lfSmCaptionFont));
-
-	if (m_tabFont)
-	{
-		SendMessage(m_hwnd, WM_SETFONT, reinterpret_cast<WPARAM>(m_tabFont.get()),
-			MAKELPARAM(TRUE, 0));
-	}
-
 	SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList));
 
 	int dpiScaledSize = MulDiv(ICON_SIZE_96DPI, dpi, USER_DEFAULT_SCREEN_DPI);
@@ -126,6 +117,8 @@ void TabContainer::Initialize(HWND parent)
 		std::bind_front(&TabContainer::OnAlwaysShowTabBarUpdated, this)));
 	m_connections.push_back(m_config->forceSameTabWidth.addObserver(
 		std::bind_front(&TabContainer::OnForceSameTabWidthUpdated, this)));
+
+	m_fontSetter.fontUpdatedSignal.AddObserver(std::bind_front(&TabContainer::OnFontUpdated, this));
 }
 
 void TabContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
@@ -1577,4 +1570,9 @@ void TabContainer::ScrollTabControl(ScrollDirection direction)
 	}
 
 	SendMessage(m_hwnd, WM_HSCROLL, MAKEWPARAM(SB_THUMBPOSITION, position), NULL);
+}
+
+void TabContainer::OnFontUpdated()
+{
+	sizeUpdatedSignal.m_signal();
 }

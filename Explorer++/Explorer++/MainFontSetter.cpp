@@ -8,7 +8,11 @@
 #include "FontHelper.h"
 #include "../Helper/WindowSubclassWrapper.h"
 
-MainFontSetter::MainFontSetter(HWND hwnd, const Config *config) : m_hwnd(hwnd), m_config(config)
+MainFontSetter::MainFontSetter(HWND hwnd, const Config *config,
+	std::optional<LOGFONT> defaultFont) :
+	m_hwnd(hwnd),
+	m_config(config),
+	m_defaultFont(defaultFont)
 {
 	MaybeSubclassWindow();
 	UpdateFont();
@@ -70,15 +74,23 @@ void MainFontSetter::UpdateFont()
 
 	if (mainFont)
 	{
-		auto font = CreateFontFromNameAndSize(mainFont->name, mainFont->size, m_hwnd);
+		updatedFont = CreateFontFromNameAndSize(mainFont->name, mainFont->size, m_hwnd);
 
-		if (!font)
+		if (!updatedFont)
 		{
 			assert(false);
 			return;
 		}
+	}
+	else if (m_defaultFont)
+	{
+		updatedFont.reset(CreateFontIndirect(&*m_defaultFont));
 
-		updatedFont = std::move(font);
+		if (!updatedFont)
+		{
+			assert(false);
+			return;
+		}
 	}
 
 	SendMessage(m_hwnd, WM_SETFONT, reinterpret_cast<WPARAM>(updatedFont.get()), true);

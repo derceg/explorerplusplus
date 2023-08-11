@@ -44,6 +44,8 @@ void Explorerplusplus::InitializeTabs()
 		std::bind_front(&Explorerplusplus::OnTabListViewSelectionChanged, this),
 		boost::signals2::at_front);
 
+	m_tabContainer->sizeUpdatedSignal.AddObserver([this] { UpdateLayout(); });
+
 	auto updateLayoutObserverMethod = [this](BOOL newValue)
 	{
 		UNREFERENCED_PARAMETER(newValue);

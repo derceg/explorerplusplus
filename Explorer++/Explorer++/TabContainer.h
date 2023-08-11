@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "MainFontSetter.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "SignalWrapper.h"
 #include "Tab.h"
@@ -133,6 +134,8 @@ public:
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabListViewSelectionChangedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabColumnsChangedSignal;
 
+	SignalWrapper<TabContainer, void()> sizeUpdatedSignal;
+
 private:
 	enum class ScrollDirection
 	{
@@ -225,7 +228,10 @@ private:
 	void OnDropScrollTimer();
 	void ScrollTabControl(ScrollDirection direction);
 
-	wil::unique_hfont m_tabFont;
+	void OnFontUpdated();
+
+	MainFontSetter m_fontSetter;
+	MainFontSetter m_tooltipFontSetter;
 	wil::unique_himagelist m_tabCtrlImageList;
 
 	std::unordered_map<int, std::unique_ptr<Tab>> m_tabs;

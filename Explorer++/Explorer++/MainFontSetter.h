@@ -5,6 +5,7 @@
 #pragma once
 
 #include "SignalWrapper.h"
+#include <optional>
 
 struct Config;
 class WindowSubclassWrapper;
@@ -16,7 +17,8 @@ class WindowSubclassWrapper;
 class MainFontSetter
 {
 public:
-	MainFontSetter(HWND hwnd, const Config *config);
+	MainFontSetter(HWND hwnd, const Config *config,
+		std::optional<LOGFONT> defaultFont = std::nullopt);
 
 	// Signals
 	SignalWrapper<MainFontSetter, void()> fontUpdatedSignal;
@@ -29,6 +31,7 @@ private:
 	HWND m_hwnd;
 	const Config *const m_config;
 	wil::unique_hfont m_font;
+	std::optional<LOGFONT> m_defaultFont;
 
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;

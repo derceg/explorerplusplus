@@ -46,6 +46,7 @@ __interface IDirectoryMonitor;
 class ILoadSave;
 class LoadSaveRegistry;
 class LoadSaveXML;
+class MainFontSetter;
 class MainToolbar;
 class MainWindow;
 struct NavigateParams;
@@ -598,6 +599,7 @@ private:
 
 	/* Tabs. */
 	TabContainer *m_tabContainer;
+	std::unique_ptr<MainFontSetter> m_tabToolbarTooltipFontSetter;
 	wil::unique_hbrush m_tabBarBackgroundBrush;
 	std::unique_ptr<TabRestorer> m_tabRestorer;
 	std::unique_ptr<TabRestorerUI> m_tabRestorerUI;

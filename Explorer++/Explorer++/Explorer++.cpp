@@ -9,6 +9,7 @@
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "Config.h"
 #include "Explorer++_internal.h"
+#include "MainFontSetter.h"
 #include "MenuRanges.h"
 #include "Plugins/PluginManager.h"
 #include "TabRestorerUI.h"
