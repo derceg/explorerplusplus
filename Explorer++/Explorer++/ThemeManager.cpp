@@ -1126,15 +1126,13 @@ LRESULT CALLBACK ThemeManager::GroupBoxSubclass(HWND hwnd, UINT msg, WPARAM wPar
 		SetBkMode(hdc, TRANSPARENT);
 		SetTextColor(hdc, DarkModeHelper::TEXT_COLOR);
 
-		auto &dpiCompat = DpiCompatibility::GetInstance();
+		auto font = reinterpret_cast<HFONT>(SendMessage(hwnd, WM_GETFONT, 0, 0));
+		wil::unique_select_object selectFont;
 
-		NONCLIENTMETRICS metrics;
-		metrics.cbSize = sizeof(metrics);
-		dpiCompat.SystemParametersInfoForDpi(SPI_GETNONCLIENTMETRICS, sizeof(metrics), &metrics, 0,
-			dpiCompat.GetDpiForWindow(hwnd));
-
-		wil::unique_hfont captionFont(CreateFontIndirect(&metrics.lfCaptionFont));
-		auto selectFont = wil::SelectObject(hdc, captionFont.get());
+		if (font)
+		{
+			selectFont = wil::SelectObject(hdc, font);
+		}
 
 		RECT textRect = rect;
 		DrawText(hdc, text.c_str(), static_cast<int>(text.size()), &textRect, DT_CALCRECT);
