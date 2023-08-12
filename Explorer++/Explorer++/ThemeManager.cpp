@@ -1149,12 +1149,14 @@ LRESULT CALLBACK ThemeManager::GroupBoxSubclass(HWND hwnd, UINT msg, WPARAM wPar
 		// drawn directly on top of the parent.
 		DrawThemeBackground(theme.get(), hdc, BP_GROUPBOX, GBS_NORMAL, &groupBoxRect, &ps.rcPaint);
 
-		// It appears this offset isn't DPI-adjusted.
-		OffsetRect(&textRect, 9, 0);
+		// When the system draws the group box, it appears appears that the constant below (8) is
+		// embedded within the code, rather than being retrieved dynamically.
+		int xBorder = GetSystemMetrics(SM_CXBORDER);
+		int xEdge = GetSystemMetrics(SM_CXEDGE);
+		OffsetRect(&textRect, 8 - xBorder + xEdge, 0);
 
-		// As with the above, it appears this offset isn't DPI-adjusted.
 		RECT textBackgroundRect = textRect;
-		textBackgroundRect.left -= 2;
+		InflateRect(&textBackgroundRect, xEdge, 0);
 		DrawThemeParentBackground(hwnd, hdc, &textBackgroundRect);
 
 		DrawText(hdc, text.c_str(), static_cast<int>(text.size()), &textRect, DT_LEFT);
