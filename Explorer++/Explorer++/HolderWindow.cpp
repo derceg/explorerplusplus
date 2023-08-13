@@ -11,6 +11,8 @@
 #include "HolderWindow.h"
 #include "CoreInterface.h"
 #include "DarkModeHelper.h"
+#include "MainFontSetter.h"
+#include "SystemFontHelper.h"
 #include "ToolbarHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowHelper.h"
@@ -26,18 +28,11 @@ HolderWindow::HolderWindow(HWND parent, const std::wstring &caption, DWORD style
 	m_hwnd(CreateHolderWindow(parent, caption, style)),
 	m_sizingCursor(LoadCursor(nullptr, IDC_SIZEWE))
 {
-	auto &dpiCompat = DpiCompatibility::GetInstance();
-	UINT dpi = dpiCompat.GetDpiForWindow(m_hwnd);
+	LOGFONT systemFont = GetDefaultSystemFont(m_hwnd);
+	m_defaultFont.reset(CreateFontIndirect(&systemFont));
+	assert(m_defaultFont);
 
-	NONCLIENTMETRICS nonClientMetrics = {};
-	nonClientMetrics.cbSize = sizeof(nonClientMetrics);
-	[[maybe_unused]] auto res = dpiCompat.SystemParametersInfoForDpi(SPI_GETNONCLIENTMETRICS,
-		sizeof(NONCLIENTMETRICS), &nonClientMetrics, 0, dpi);
-	assert(res);
-
-	nonClientMetrics.lfSmCaptionFont.lfWeight = FW_NORMAL;
-	m_font.reset(CreateFontIndirect(&nonClientMetrics.lfSmCaptionFont));
-	assert(m_font);
+	m_font = m_defaultFont.get();
 
 	std::tie(m_toolbar, m_toolbarImageList) = ToolbarHelper::CreateCloseButtonToolbar(m_hwnd,
 		CLOSE_BUTTON_ID, closeButtonTooltip, coreInterface->GetIconResourceLoader());
@@ -49,16 +44,11 @@ HolderWindow::HolderWindow(HWND parent, const std::wstring &caption, DWORD style
 	SetWindowPos(m_toolbar, nullptr, 0, 0, toolbarSize.cx, toolbarSize.cy,
 		SWP_NOZORDER | SWP_NOMOVE);
 
-	SIZE textSize;
-	auto hdc = wil::GetDC(m_hwnd);
-	auto selectFont = wil::SelectObject(hdc.get(), m_font.get());
-	auto text = GetWindowString(m_hwnd);
-	[[maybe_unused]] auto textExtentRes =
-		GetTextExtentPoint32(hdc.get(), text.c_str(), static_cast<int>(text.length()), &textSize);
-	assert(textExtentRes);
+	m_tooltipFontSetter = std::make_unique<MainFontSetter>(
+		reinterpret_cast<HWND>(SendMessage(m_toolbar, TB_GETTOOLTIPS, 0, 0)),
+		coreInterface->GetConfig());
 
-	auto verticalPadding = dpiCompat.ScaleValue(m_hwnd, CAPTION_SECTION_VERTICAL_PADDING);
-	m_captionSectionHeight = (std::max)(textSize.cy, toolbarSize.cy) + (verticalPadding * 2);
+	m_fontSetter = std::make_unique<MainFontSetter>(m_hwnd, coreInterface->GetConfig());
 
 	m_initialized = true;
 }
@@ -156,6 +146,10 @@ LRESULT CALLBACK HolderWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 		}
 		break;
 
+	case WM_SETFONT:
+		OnSetFont(reinterpret_cast<HFONT>(wParam), lParam);
+		break;
+
 	case WM_ERASEBKGND:
 		return 1;
 
@@ -176,6 +170,31 @@ LRESULT CALLBACK HolderWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 	}
 
 	return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+void HolderWindow::OnSetFont(HFONT font, bool redraw)
+{
+	SetFont(font);
+
+	if (redraw)
+	{
+		RedrawWindow(m_hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_UPDATENOW);
+	}
+}
+
+void HolderWindow::SetFont(HFONT font)
+{
+	if (font)
+	{
+		m_font = font;
+	}
+	else
+	{
+		m_font = m_defaultFont.get();
+	}
+
+	m_captionSectionHeight.reset();
+	UpdateLayout();
 }
 
 void HolderWindow::OnPaint()
@@ -211,7 +230,7 @@ void HolderWindow::PerformPaint(const PAINTSTRUCT &ps)
 	FillRect(ps.hdc, &ps.rcPaint, backgroundBrush);
 
 	std::wstring caption = GetWindowString(m_hwnd);
-	auto selectFont = wil::SelectObject(ps.hdc, m_font.get());
+	auto selectFont = wil::SelectObject(ps.hdc, m_font);
 	SetBkMode(ps.hdc, TRANSPARENT);
 
 	if (darkModeHelper.IsDarkModeEnabled())
@@ -224,14 +243,24 @@ void HolderWindow::PerformPaint(const PAINTSTRUCT &ps)
 	MapWindowPoints(HWND_DESKTOP, m_hwnd, reinterpret_cast<LPPOINT>(&toolbarRect), 2);
 
 	RECT textRect = { CAPTION_SECTION_HORIZONTAL_PADDING, 0, toolbarRect.left,
-		m_captionSectionHeight };
+		GetCaptionSectionHeight() };
 	DrawText(ps.hdc, caption.c_str(), -1, &textRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
 }
 
 void HolderWindow::OnSize(int width, int height)
 {
-	UNREFERENCED_PARAMETER(height);
+	UpdateLayout(width, height);
+}
 
+void HolderWindow::UpdateLayout()
+{
+	RECT rc;
+	GetClientRect(m_hwnd, &rc);
+	UpdateLayout(GetRectWidth(&rc), GetRectHeight(&rc));
+}
+
+void HolderWindow::UpdateLayout(int width, int height)
+{
 	if (!m_initialized)
 	{
 		return;
@@ -245,22 +274,51 @@ void HolderWindow::OnSize(int width, int height)
 	auto &dpiCompatibility = DpiCompatibility::GetInstance();
 	int captionHorizontalPadding =
 		dpiCompatibility.ScaleValue(m_toolbar, CAPTION_SECTION_HORIZONTAL_PADDING);
+	int captionSectionHeight = GetCaptionSectionHeight();
 
 	deferInfo = DeferWindowPos(deferInfo, m_toolbar, nullptr,
 		width - GetRectWidth(&toolbarRect) - captionHorizontalPadding,
-		(m_captionSectionHeight - GetRectHeight(&toolbarRect)) / 2, 0, 0,
-		SWP_NOZORDER | SWP_NOSIZE);
+		(captionSectionHeight - GetRectHeight(&toolbarRect)) / 2, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 
 	if (m_contentChild)
 	{
 		auto contentHorizontalPadding =
 			dpiCompatibility.ScaleValue(m_hwnd, CONTENT_SECTION_RIGHT_PADDING);
-		deferInfo = DeferWindowPos(deferInfo, m_contentChild, nullptr, 0, m_captionSectionHeight,
-			width - contentHorizontalPadding, height - m_captionSectionHeight, SWP_NOZORDER);
+		deferInfo = DeferWindowPos(deferInfo, m_contentChild, nullptr, 0, captionSectionHeight,
+			width - contentHorizontalPadding, height - captionSectionHeight, SWP_NOZORDER);
 	}
 
 	[[maybe_unused]] auto res = EndDeferWindowPos(deferInfo);
 	assert(res);
+}
+
+int HolderWindow::GetCaptionSectionHeight()
+{
+	if (!m_captionSectionHeight)
+	{
+		m_captionSectionHeight = CalculateCaptionSectionHeight();
+	}
+
+	return *m_captionSectionHeight;
+}
+
+int HolderWindow::CalculateCaptionSectionHeight()
+{
+	RECT rc;
+	[[maybe_unused]] auto res = GetClientRect(m_toolbar, &rc);
+	assert(res);
+
+	SIZE textSize;
+	auto hdc = wil::GetDC(m_hwnd);
+	auto selectFont = wil::SelectObject(hdc.get(), m_font);
+	auto text = GetWindowString(m_hwnd);
+	[[maybe_unused]] auto textExtentRes =
+		GetTextExtentPoint32(hdc.get(), text.c_str(), static_cast<int>(text.length()), &textSize);
+	assert(textExtentRes);
+
+	auto verticalPadding =
+		DpiCompatibility::GetInstance().ScaleValue(m_hwnd, CAPTION_SECTION_VERTICAL_PADDING);
+	return (std::max)(textSize.cy, rc.bottom) + (verticalPadding * 2);
 }
 
 void HolderWindow::OnLButtonDown(const POINT &pt)

@@ -19,6 +19,7 @@ class MainFontSetter
 public:
 	MainFontSetter(HWND hwnd, const Config *config,
 		std::optional<LOGFONT> defaultFont = std::nullopt);
+	~MainFontSetter();
 
 	// Signals
 	SignalWrapper<MainFontSetter, void()> fontUpdatedSignal;

@@ -10,6 +10,7 @@
 #include <optional>
 
 class CoreInterface;
+class MainFontSetter;
 
 class HolderWindow
 {
@@ -46,10 +47,16 @@ private:
 	static LRESULT CALLBACK WndProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+	void OnSetFont(HFONT font, bool redraw);
+	void SetFont(HFONT font);
 	void OnPaint();
 	void OnPrintClient(HDC hdc);
 	void PerformPaint(const PAINTSTRUCT &ps);
 	void OnSize(int width, int height);
+	void UpdateLayout();
+	void UpdateLayout(int width, int height);
+	int GetCaptionSectionHeight();
+	int CalculateCaptionSectionHeight();
 	void OnLButtonDown(const POINT &pt);
 	void OnLButtonUp();
 	int OnMouseMove(const POINT &pt);
@@ -65,8 +72,11 @@ private:
 
 	const HWND m_hwnd;
 	HWND m_contentChild = nullptr;
-	wil::unique_hfont m_font;
-	int m_captionSectionHeight;
+	HFONT m_font = nullptr;
+	wil::unique_hfont m_defaultFont = nullptr;
+	std::unique_ptr<MainFontSetter> m_fontSetter;
+	std::unique_ptr<MainFontSetter> m_tooltipFontSetter;
+	std::optional<int> m_captionSectionHeight;
 
 	HWND m_toolbar;
 	wil::unique_himagelist m_toolbarImageList;

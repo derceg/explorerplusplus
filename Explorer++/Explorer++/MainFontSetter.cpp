@@ -21,6 +21,8 @@ MainFontSetter::MainFontSetter(HWND hwnd, const Config *config,
 		m_config->mainFont.addObserver(std::bind(&MainFontSetter::UpdateFont, this)));
 }
 
+MainFontSetter::~MainFontSetter() = default;
+
 void MainFontSetter::MaybeSubclassWindow()
 {
 	WCHAR className[256];
