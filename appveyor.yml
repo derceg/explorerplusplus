@@ -178,3 +178,4 @@ deploy:
     set_content_type: true
     on:
       APPVEYOR_REPO_TAG: false
+      platform: ARM64
