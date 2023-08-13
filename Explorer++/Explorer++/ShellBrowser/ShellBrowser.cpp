@@ -127,10 +127,7 @@ ShellBrowser::ShellBrowser(HWND hOwner, CoreInterface *coreInterface,
 	m_connections.push_back(coreInterface->AddApplicationShuttingDownObserver(
 		std::bind_front(&ShellBrowser::OnApplicationShuttingDown, this)));
 
-	if (!m_shellWindows)
-	{
-		m_shellWindows = winrt::try_create_instance<IShellWindows>(CLSID_ShellWindows, CLSCTX_ALL);
-	}
+	m_shellWindows = winrt::try_create_instance<IShellWindows>(CLSID_ShellWindows, CLSCTX_ALL);
 }
 
 ShellBrowser::~ShellBrowser()

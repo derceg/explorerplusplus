@@ -684,7 +684,7 @@ private:
 	int m_middleButtonItem;
 
 	// Shell window integration
-	static inline winrt::com_ptr<IShellWindows> m_shellWindows;
+	winrt::com_ptr<IShellWindows> m_shellWindows;
 	bool m_shellWindowRegistered;
 	unique_shell_window_cookie m_shellWindowCookie;
 
