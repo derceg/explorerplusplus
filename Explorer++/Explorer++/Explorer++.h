@@ -405,6 +405,7 @@ private:
 	// Status bar
 	void CreateStatusBar();
 	void SetStatusBarParts(int width);
+	void UpdateStatusBarMinHeight();
 	LRESULT StatusBarMenuSelect(WPARAM wParam, LPARAM lParam);
 	void OnNavigationStartedStatusBar(const Tab &tab, const NavigateParams &navigateParams);
 	void SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl);
@@ -564,7 +565,6 @@ private:
 	IDirectoryMonitor *m_pDirMon;
 	HolderWindow *m_treeViewHolder = nullptr;
 	ShellTreeView *m_shellTreeView = nullptr;
-	StatusBar *m_pStatusBar = nullptr;
 
 	HINSTANCE m_resourceInstance;
 
@@ -676,4 +676,8 @@ private:
 
 	// WM_DEVICECHANGE notifications
 	DeviceChangeSignal m_deviceChangeSignal;
+
+	// Status bar
+	StatusBar *m_pStatusBar = nullptr;
+	std::unique_ptr<MainFontSetter> m_statusBarFontSetter;
 };

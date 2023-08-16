@@ -35,6 +35,15 @@ void Explorerplusplus::CreateStatusBar()
 	}
 
 	SetStatusBarParts(width);
+
+	m_statusBarFontSetter = std::make_unique<MainFontSetter>(m_hStatusBar, m_config.get());
+	m_statusBarFontSetter->fontUpdatedSignal.AddObserver([this]() { UpdateStatusBarMinHeight(); });
+
+	// Even if the status bar uses the default font, the height won't necessarily be correct. As
+	// detailed below, if the text size is increased in Windows, the height of the status bar won't
+	// change at 96 DPI. Therefore, setting the minimum height here ensures that the status bar is
+	// sized correctly in that situation.
+	UpdateStatusBarMinHeight();
 }
 
 void Explorerplusplus::SetStatusBarParts(int width)
@@ -46,6 +55,48 @@ void Explorerplusplus::SetStatusBarParts(int width)
 	parts[2] = width;
 
 	SendMessage(m_hStatusBar, SB_SETPARTS, 3, (LPARAM) parts);
+}
+
+// This function should be called whenever the font is updated for the status bar control.
+void Explorerplusplus::UpdateStatusBarMinHeight()
+{
+	auto hdc = wil::GetDC(m_hStatusBar);
+
+	auto font = reinterpret_cast<HFONT>(SendMessage(m_hStatusBar, WM_GETFONT, 0, 0));
+	wil::unique_select_object selectFont;
+
+	if (font)
+	{
+		selectFont = wil::SelectObject(hdc.get(), font);
+	}
+
+	wil::unique_htheme theme(OpenThemeData(m_hStatusBar, L"Status"));
+	assert(theme);
+
+	TEXTMETRIC textMetrics;
+	[[maybe_unused]] HRESULT hr = GetThemeTextMetrics(theme.get(), hdc.get(), 0, 0, &textMetrics);
+	assert(SUCCEEDED(hr));
+
+	// From looking into precisely what the status bar control does when it receives a WM_SETFONT
+	// message, it appears that it does recalculate its height. However, for whatever reason, the
+	// font that's passed to WM_SETFONT will only be used as part of the calculation if the DPI is
+	// greater than 96. Otherwise, the default DC font will be used for the calculation.
+	// That means that, confusingly, if the DPI is greater than 96, WM_SETFONT will work as expected
+	// - the font will be set and the control size will be correctly updated. However, if the DPI is
+	// 96, the font will be set, but the control size won't change.
+	// The same issue can also be seen when increasing the text size in Windows. Doing that will
+	// cause the status bar to use the larger font, but the height of the status bar won't change,
+	// leading to the text being potentially cut off.
+	// Therefore, to work around those sorts of issues, the minimum height is set here.
+	// Note that the height set here will be ignored if it's smaller than the text height calculated
+	// by the control. That means that, at 96 DPI, the height will be ignored if the font that's set
+	// is smaller than the default font.
+	// That shouldn't really be a problem, though, since the control will simply be a bit larger
+	// than necessary.
+	SendMessage(m_hStatusBar, SB_SETMINHEIGHT, textMetrics.tmHeight, 0);
+
+	// As per the documentation for SB_SETMINHEIGHT, this will redraw the window.
+	SendMessage(m_hStatusBar, WM_SIZE, 0, 0);
 }
 
 LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
