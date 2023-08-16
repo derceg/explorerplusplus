@@ -602,6 +602,7 @@ private:
 	HolderWindow *m_treeViewHolder = nullptr;
 	ShellTreeView *m_shellTreeView = nullptr;
 	std::optional<NMTREEVIEW> m_treeViewSelectionChangedEventInfo;
+	bool m_treeViewInitialized = false;
 
 	/* Tabs. */
 	TabContainer *m_tabContainer;

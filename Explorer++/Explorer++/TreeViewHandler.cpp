@@ -101,6 +101,8 @@ void Explorerplusplus::CreateFolderControls()
 
 			UpdateTreeViewSelection();
 		});
+
+	m_treeViewInitialized = true;
 }
 
 LRESULT CALLBACK TreeViewSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
@@ -266,6 +268,17 @@ void Explorerplusplus::OnTreeViewSelectionChangedTimer()
 
 void Explorerplusplus::OnTreeViewSelectionChanged(const NMTREEVIEW *eventInfo)
 {
+	if (!m_treeViewInitialized)
+	{
+		// The ShellTreeView will select an item initially (to ensure that there's always a selected
+		// item). That will take place before the treeview has finished initializing. That initial
+		// selection doesn't need to be handled in any way - either the selection will be updated
+		// when a navigation occurs (if the synchronize treeview option is enabled), or the
+		// selection will remain on the initial item (if the synchronize treeview option is
+		// disabled), until the user manually selects another item.
+		return;
+	}
+
 	KillTimer(m_treeViewHolder->GetHWND(), TREEVIEW_SELECTION_CHANGED_TIMER_ID);
 	m_treeViewSelectionChangedEventInfo.reset();
 

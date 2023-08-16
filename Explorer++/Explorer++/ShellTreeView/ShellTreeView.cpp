@@ -275,6 +275,9 @@ void ShellTreeView::AddRootItems()
 	}
 
 	AddShellNamespaceRootItem();
+
+	// This will ensure that the treeview always has a selected item.
+	TreeView_SelectItem(m_hTreeView, TreeView_GetRoot(m_hTreeView));
 }
 
 void ShellTreeView::AddQuickAccessRootItem()
