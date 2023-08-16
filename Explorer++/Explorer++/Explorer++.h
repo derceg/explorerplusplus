@@ -123,6 +123,9 @@ private:
 	static const UINT_PTR AUTOSAVE_TIMER_ID = 100000;
 	static const UINT AUTOSAVE_TIMEOUT = 30000;
 
+	static const UINT_PTR TREEVIEW_SELECTION_CHANGED_TIMER_ID = 0;
+	static const UINT TREEVIEW_SELECTION_CHANGED_TIMEOUT = 500;
+
 	static const UINT_PTR LISTVIEW_ITEM_CHANGED_TIMER_ID = 100001;
 	static const UINT LISTVIEW_ITEM_CHANGED_TIMEOUT = 50;
 
@@ -270,7 +273,8 @@ private:
 
 	/* TreeView private message handlers. */
 	void OnShowTreeViewContextMenu(const POINT &ptScreen);
-	void OnTreeViewSelChanged(LPARAM lParam);
+	void OnTreeViewSelectionChanged(const NMTREEVIEW *eventInfo);
+	void HandleTreeViewSelectionChanged(const NMTREEVIEW *eventInfo);
 	void OnTreeViewCopyItemPath() const;
 	void OnTreeViewSetFileAttributes() const;
 	void OnTreeViewCopyUniversalPaths() const;
@@ -278,7 +282,7 @@ private:
 	/* Holder window private message handlers. */
 	LRESULT CALLBACK TreeViewHolderWindowNotifyHandler(HWND hwnd, UINT msg, WPARAM wParam,
 		LPARAM lParam);
-	void OnTreeViewHolderWindowTimer();
+	void OnTreeViewSelectionChangedTimer();
 
 	/* Tab backing. */
 	void CreateTabBacking();
@@ -563,14 +567,11 @@ private:
 	wil::unique_himagelist m_tabWindowToolbarImageList;
 
 	IDirectoryMonitor *m_pDirMon;
-	HolderWindow *m_treeViewHolder = nullptr;
-	ShellTreeView *m_shellTreeView = nullptr;
 
 	HINSTANCE m_resourceInstance;
 
 	/** Internal state. **/
 	HWND m_lastActiveWindow;
-	bool m_bSelectingTreeViewDirectory;
 	bool m_bAttemptToolbarRestore;
 	bool m_bLanguageLoaded;
 	bool m_bShowTabBar;
@@ -596,6 +597,11 @@ private:
 	FocusChangedSignal m_focusChangedSignal;
 	ApplicationShuttingDownSignal m_applicationShuttingDownSignal;
 	bool m_applicationShuttingDown = false;
+
+	// Treeview
+	HolderWindow *m_treeViewHolder = nullptr;
+	ShellTreeView *m_shellTreeView = nullptr;
+	std::optional<NMTREEVIEW> m_treeViewSelectionChangedEventInfo;
 
 	/* Tabs. */
 	TabContainer *m_tabContainer;

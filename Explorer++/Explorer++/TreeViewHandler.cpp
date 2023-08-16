@@ -22,16 +22,10 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 
-#define TREEVIEW_FOLDER_OPEN_DELAY 500
-
 LRESULT CALLBACK TreeViewHolderProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 	UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 LRESULT CALLBACK TreeViewSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 	UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-
-/* Used to keep track of which item was selected in
-the treeview control. */
-HTREEITEM g_newSelectionItem;
 
 void Explorerplusplus::CreateFolderControls()
 {
@@ -252,74 +246,74 @@ void Explorerplusplus::OnTreeViewCopyUniversalPaths() const
 	}
 }
 
-void Explorerplusplus::OnTreeViewHolderWindowTimer()
+void Explorerplusplus::OnTreeViewSelectionChangedTimer()
 {
 	// It's important that the timer be killed here, before the navigation has started. Otherwise,
 	// what can happen is that if access to the folder is denied, a dialog will be shown and the
 	// message loop will run. That will then cause the timer to fire again, which will start another
 	// navigation, ad infinitum.
-	KillTimer(m_treeViewHolder->GetHWND(), 0);
+	KillTimer(m_treeViewHolder->GetHWND(), TREEVIEW_SELECTION_CHANGED_TIMER_ID);
 
-	auto pidlDirectory = m_shellTreeView->GetNodePidl(g_newSelectionItem);
-	auto pidlCurrentDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
-
-	if (!m_bSelectingTreeViewDirectory
-		&& !ArePidlsEquivalent(pidlDirectory.get(), pidlCurrentDirectory.get()))
+	if (!m_treeViewSelectionChangedEventInfo)
 	{
-		Tab &selectedTab = m_tabContainer->GetSelectedTab();
-		auto navigateParams = NavigateParams::Normal(pidlDirectory.get());
-		HRESULT hr =
-			selectedTab.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
+		throw std::runtime_error("Invalid selection change information");
+	}
 
-		if (SUCCEEDED(hr))
-		{
-			if (m_config->treeViewAutoExpandSelected)
-			{
-				TreeView_Expand(m_shellTreeView->GetHWND(), g_newSelectionItem, TVE_EXPAND);
-			}
-		}
-		else
-		{
-			// The navigation failed, so the current folder hasn't changed. All that's needed is to
-			// update the treeview selection back to the current folder.
-			UpdateTreeViewSelection();
-		}
+	HandleTreeViewSelectionChanged(&*m_treeViewSelectionChangedEventInfo);
+
+	m_treeViewSelectionChangedEventInfo.reset();
+}
+
+void Explorerplusplus::OnTreeViewSelectionChanged(const NMTREEVIEW *eventInfo)
+{
+	KillTimer(m_treeViewHolder->GetHWND(), TREEVIEW_SELECTION_CHANGED_TIMER_ID);
+	m_treeViewSelectionChangedEventInfo.reset();
+
+	if (eventInfo->action == TVC_BYKEYBOARD && m_config->treeViewDelayEnabled)
+	{
+		m_treeViewSelectionChangedEventInfo = *eventInfo;
+
+		// This makes it possible to navigate in the treeview using the keyboard, without triggering
+		// a stream of navigations (in the case where a key is being held down and the selection is
+		// continuously changing).
+		SetTimer(m_treeViewHolder->GetHWND(), TREEVIEW_SELECTION_CHANGED_TIMER_ID,
+			TREEVIEW_SELECTION_CHANGED_TIMEOUT, nullptr);
+	}
+	else
+	{
+		HandleTreeViewSelectionChanged(eventInfo);
 	}
 }
 
-void Explorerplusplus::OnTreeViewSelChanged(LPARAM lParam)
+void Explorerplusplus::HandleTreeViewSelectionChanged(const NMTREEVIEW *eventInfo)
 {
-	NMTREEVIEW *pnmtv = nullptr;
-	TVITEM *tvItem = nullptr;
+	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	auto pidlCurrentDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
 
-	/* Check whether the selection was changed because a new directory
-	was browsed to, or if the treeview control is involved in a
-	drag and drop operation. */
-	if (!m_bSelectingTreeViewDirectory && !m_shellTreeView->IsWithinDrag())
+	auto pidlDirectory = m_shellTreeView->GetNodePidl(eventInfo->itemNew.hItem);
+
+	if (ArePidlsEquivalent(pidlDirectory.get(), pidlCurrentDirectory.get()))
 	{
-		pnmtv = (LPNMTREEVIEW) lParam;
+		return;
+	}
 
-		tvItem = &pnmtv->itemNew;
+	auto navigateParams = NavigateParams::Normal(pidlDirectory.get());
+	HRESULT hr = selectedTab.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
 
-		g_newSelectionItem = tvItem->hItem;
-
-		if (m_config->treeViewDelayEnabled)
+	if (SUCCEEDED(hr))
+	{
+		// The folder will only be expanded if the user explicitly selected it.
+		if (m_config->treeViewAutoExpandSelected
+			&& (eventInfo->action == TVC_BYMOUSE || eventInfo->action == TVC_BYKEYBOARD))
 		{
-			/* Schedule a folder change. This adds enough
-			of a delay for the treeview selection to be changed
-			without the current folder been changed immediately. */
-			SetTimer(m_treeViewHolder->GetHWND(), 0, TREEVIEW_FOLDER_OPEN_DELAY, nullptr);
-		}
-		else
-		{
-			/* The treeview delay is disabled. For simplicity, just
-			set a timer of length 0. */
-			SetTimer(m_treeViewHolder->GetHWND(), 0, 0, nullptr);
+			TreeView_Expand(m_shellTreeView->GetHWND(), eventInfo->itemNew.hItem, TVE_EXPAND);
 		}
 	}
 	else
 	{
-		m_bSelectingTreeViewDirectory = false;
+		// The navigation failed, so the current folder hasn't changed. All that's needed is to
+		// update the treeview selection back to the current folder.
+		UpdateTreeViewSelection();
 	}
 }
 
@@ -355,7 +349,10 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderProc(HWND hwnd, UINT msg, WPARA
 		return TreeViewHolderWindowNotifyHandler(hwnd, msg, wParam, lParam);
 
 	case WM_TIMER:
-		OnTreeViewHolderWindowTimer();
+		if (wParam == TREEVIEW_SELECTION_CHANGED_TIMER_ID)
+		{
+			OnTreeViewSelectionChangedTimer();
+		}
 		break;
 	}
 
@@ -368,7 +365,7 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowNotifyHandler(HWND hwnd, 
 	switch (((LPNMHDR) lParam)->code)
 	{
 	case TVN_SELCHANGED:
-		OnTreeViewSelChanged(lParam);
+		OnTreeViewSelectionChanged(reinterpret_cast<NMTREEVIEW *>(lParam));
 		break;
 	}
 
@@ -436,16 +433,6 @@ void Explorerplusplus::UpdateTreeViewSelection()
 
 		if (hItem != nullptr)
 		{
-			/* TVN_SELCHANGED is NOT sent when the new selected
-			item is the same as the old selected item. It is only
-			sent when the two are different.
-			Therefore, the only case to handle is when the treeview
-			selection is changed by browsing using the listview. */
-			if (TreeView_GetSelection(m_shellTreeView->GetHWND()) != hItem)
-			{
-				m_bSelectingTreeViewDirectory = true;
-			}
-
 			SendMessage(m_shellTreeView->GetHWND(), TVM_SELECTITEM, TVGN_CARET, (LPARAM) hItem);
 		}
 	}

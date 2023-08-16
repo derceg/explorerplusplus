@@ -45,7 +45,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd, CommandLine::Settings *commandLine
 
 	m_config = std::make_shared<Config>();
 
-	m_bSelectingTreeViewDirectory = false;
 	m_bSavePreferencesToXMLFile = FALSE;
 	m_bAttemptToolbarRestore = false;
 	m_bLanguageLoaded = false;
