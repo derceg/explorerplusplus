@@ -256,7 +256,7 @@ private:
 	void OnToolbarViews();
 
 	/* ListView private message handlers. */
-	void OnListViewDoubleClick(NMHDR *nmhdr);
+	void OnListViewDoubleClick(const NMITEMACTIVATE *eventInfo);
 	LRESULT OnListViewKeyDown(LPARAM lParam);
 	void OnShowListViewContextMenu(const POINT &ptScreen);
 	void OnListViewBackgroundRClick(POINT *pCursorPos);

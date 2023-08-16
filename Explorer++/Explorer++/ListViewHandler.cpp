@@ -379,36 +379,29 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 	}
 }
 
-void Explorerplusplus::OnListViewDoubleClick(NMHDR *nmhdr)
+void Explorerplusplus::OnListViewDoubleClick(const NMITEMACTIVATE *eventInfo)
 {
-	if (nmhdr->hwndFrom == m_hActiveListView)
+	// Note that while it's stated in the documentation for both NM_CLICK and NM_DBLCLK that "The
+	// iItem member of lParam is only valid if the icon or first-column label has been clicked.", it
+	// appears that's not actually the case. From testing, iItem will be correctly populated even
+	// when the click/double-click takes place elsewhere in a row. Therefore, it should be ok to use
+	// that value in this function.
+	if (eventInfo->hdr.hwndFrom != m_hActiveListView || eventInfo->iItem == -1)
 	{
-		LV_HITTESTINFO ht;
-		DWORD dwPos;
-		POINT mousePos;
+		return;
+	}
 
-		dwPos = GetMessagePos();
-		mousePos.x = GET_X_LPARAM(dwPos);
-		mousePos.y = GET_Y_LPARAM(dwPos);
-		ScreenToClient(m_hActiveListView, &mousePos);
-
-		ht.pt = mousePos;
-		ListView_HitTest(m_hActiveListView, &ht);
-
-		if (ht.flags != LVHT_NOWHERE && ht.iItem != -1)
-		{
-			if (IsKeyDown(VK_MENU))
-			{
-				auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
-				auto pidl = m_pActiveShellBrowser->GetItemChildIdl(ht.iItem);
-				ShowMultipleFileProperties(pidlDirectory.get(), { pidl.get() }, m_hContainer);
-			}
-			else
-			{
-				OpenListViewItem(ht.iItem,
-					DetermineOpenDisposition(false, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT)));
-			}
-		}
+	if (WI_IsFlagSet(eventInfo->uKeyFlags, LVKF_ALT))
+	{
+		auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
+		auto pidl = m_pActiveShellBrowser->GetItemChildIdl(eventInfo->iItem);
+		ShowMultipleFileProperties(pidlDirectory.get(), { pidl.get() }, m_hContainer);
+	}
+	else
+	{
+		OpenListViewItem(eventInfo->iItem,
+			DetermineOpenDisposition(false, WI_IsFlagSet(eventInfo->uKeyFlags, LVKF_CONTROL),
+				WI_IsFlagSet(eventInfo->uKeyFlags, LVKF_SHIFT)));
 	}
 }
 

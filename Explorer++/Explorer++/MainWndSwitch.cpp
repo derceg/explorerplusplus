@@ -1459,12 +1459,12 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 	case NM_CLICK:
 		if (m_config->globalFolderSettings.oneClickActivate.get())
 		{
-			OnListViewDoubleClick(&((NMITEMACTIVATE *) lParam)->hdr);
+			OnListViewDoubleClick(reinterpret_cast<NMITEMACTIVATE *>(lParam));
 		}
 		break;
 
 	case NM_DBLCLK:
-		OnListViewDoubleClick(nmhdr);
+		OnListViewDoubleClick(reinterpret_cast<NMITEMACTIVATE *>(lParam));
 		break;
 
 	case LVN_KEYDOWN:
