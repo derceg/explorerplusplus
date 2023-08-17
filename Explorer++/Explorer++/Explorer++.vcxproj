@@ -748,6 +748,7 @@
     <ClCompile Include="ColorRuleRegistryStorage.cpp" />
     <ClCompile Include="ColorRuleXmlStorage.cpp" />
     <ClCompile Include="CrashHandlerHelper.cpp" />
+    <ClCompile Include="CustomFont.cpp" />
     <ClCompile Include="CustomFontStorage.cpp" />
     <ClCompile Include="FontsOptionsPage.cpp" />
     <ClCompile Include="MainFontSetter.cpp" />

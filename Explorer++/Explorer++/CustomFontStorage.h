@@ -6,7 +6,7 @@
 
 #include <memory>
 
-struct CustomFont;
+class CustomFont;
 
 std::unique_ptr<CustomFont> LoadCustomFontFromRegistry(const std::wstring &keyPath);
 void SaveCustomFontToRegistry(const std::wstring &keyPath, const CustomFont &customFont);

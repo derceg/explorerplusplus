@@ -76,6 +76,13 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	MenuHelper::CheckItem(hProgramMenu, IDM_TOOLBARS_APPLICATIONTOOLBAR,
 		m_config->showApplicationToolbar);
 	MenuHelper::CheckItem(hProgramMenu, IDM_TOOLBARS_LOCKTOOLBARS, m_config->lockToolbars);
+
+	auto &mainFont = m_config->mainFont.get();
+	MenuHelper::EnableItem(hProgramMenu, IDM_VIEW_DECREASE_TEXT_SIZE,
+		!mainFont || mainFont->GetSize() > CustomFont::MINIMUM_SIZE);
+	MenuHelper::EnableItem(hProgramMenu, IDM_VIEW_INCREASE_TEXT_SIZE,
+		!mainFont || mainFont->GetSize() < CustomFont::MAXIMUM_SIZE);
+
 	MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_SHOWHIDDENFILES,
 		tab.GetShellBrowser()->GetShowHidden());
 	MenuHelper::CheckItem(hProgramMenu, IDM_FILTER_APPLYFILTER,

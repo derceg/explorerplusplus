@@ -135,6 +135,9 @@ private:
 
 	static inline constexpr COLORREF TAB_BAR_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
 
+	// When changing the font size, it will be decreased/increased by this amount.
+	static const int FONT_SIZE_CHANGE_DELTA = 2_pt;
+
 	struct FileContextMenuInfo
 	{
 		UINT uFrom;
@@ -179,6 +182,12 @@ private:
 		Next
 	};
 
+	enum class FontSizeType
+	{
+		Decrease,
+		Increase
+	};
+
 	LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
 	static LRESULT CALLBACK ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
@@ -204,6 +213,7 @@ private:
 	void OnDirectoryModified(const Tab &tab);
 	void OnAssocChanged();
 	void OnSelectTabByIndex(int iTab);
+	void OnChangeMainFontSize(FontSizeType sizeType);
 
 	/* Main menu handlers. */
 	void OnNewTab();

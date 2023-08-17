@@ -81,7 +81,7 @@ void FontsOptionsPage::InitializeFontsControl()
 			continue;
 		}
 
-		if (mainFont && font == mainFont->name)
+		if (mainFont && font == mainFont->GetName())
 		{
 			[[maybe_unused]] auto res = ComboBox_SetCurSel(fontsControl, index);
 			assert(res != CB_ERR);
@@ -144,7 +144,7 @@ void FontsOptionsPage::InitializeSizeControl()
 
 	if (mainFont)
 	{
-		sizeToSelect = mainFont->size;
+		sizeToSelect = mainFont->GetSize();
 	}
 	else
 	{

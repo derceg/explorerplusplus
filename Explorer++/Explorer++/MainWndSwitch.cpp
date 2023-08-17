@@ -548,6 +548,14 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		OnCustomizeMainToolbar();
 		break;
 
+	case IDM_VIEW_DECREASE_TEXT_SIZE:
+		OnChangeMainFontSize(FontSizeType::Decrease);
+		break;
+
+	case IDM_VIEW_INCREASE_TEXT_SIZE:
+		OnChangeMainFontSize(FontSizeType::Increase);
+		break;
+
 	case IDM_VIEW_EXTRALARGEICONS:
 		m_tabContainer->GetSelectedTab().GetShellBrowser()->SetViewMode(ViewMode::ExtraLargeIcons);
 		break;

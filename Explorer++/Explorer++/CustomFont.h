@@ -5,27 +5,26 @@
 #pragma once
 
 #include "Literals.h"
-#include <algorithm>
-#include <cassert>
 #include <string>
 
-struct CustomFont
+class CustomFont
 {
+public:
 	static constexpr int MINIMUM_SIZE = 6_pt;
 	static constexpr int MAXIMUM_SIZE = 24_pt;
 
-	std::wstring name;
+	CustomFont(const std::wstring &name, int size);
 
-	// The size, in points, of this font.
-	int size;
-
-	CustomFont(const std::wstring &name, int size) :
-		name(name),
-		size(std::clamp(size, MINIMUM_SIZE, MAXIMUM_SIZE))
-	{
-	}
+	std::wstring GetName() const;
+	int GetSize() const;
 
 	// This will be used to detect whether or not the font selected by the user is different from
 	// the current custom font.
 	bool operator==(const CustomFont &) const = default;
+
+private:
+	std::wstring m_name;
+
+	// The size, in points, of this font.
+	int m_size;
 };

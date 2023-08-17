@@ -76,7 +76,7 @@ void MainFontSetter::UpdateFont()
 
 	if (mainFont)
 	{
-		updatedFont = CreateFontFromNameAndSize(mainFont->name, mainFont->size, m_hwnd);
+		updatedFont = CreateFontFromNameAndSize(mainFont->GetName(), mainFont->GetSize(), m_hwnd);
 
 		if (!updatedFont)
 		{

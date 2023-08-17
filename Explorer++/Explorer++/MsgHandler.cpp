@@ -20,6 +20,7 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/ViewModes.h"
 #include "ShellTreeView/ShellTreeView.h"
+#include "SystemFontHelper.h"
 #include "TabContainer.h"
 #include "ToolbarHelper.h"
 #include "../Helper/BulkClipboardWriter.h"
@@ -1275,4 +1276,37 @@ bool Explorerplusplus::OnActivate(int activationState, bool minimized)
 	}
 
 	return false;
+}
+
+void Explorerplusplus::OnChangeMainFontSize(FontSizeType sizeType)
+{
+	auto &mainFont = m_config->mainFont.get();
+	std::wstring updatedFontName;
+	int updatedFontSize;
+
+	if (mainFont)
+	{
+		updatedFontName = mainFont->GetName();
+		updatedFontSize = mainFont->GetSize();
+	}
+	else
+	{
+		auto systemLogFont = GetDefaultSystemFont(m_hContainer);
+		int systemFontSize = std::abs(
+			DpiCompatibility::GetInstance().PixelsToPoints(m_hContainer, systemLogFont.lfHeight));
+
+		updatedFontName = systemLogFont.lfFaceName;
+		updatedFontSize = systemFontSize;
+	}
+
+	if (sizeType == FontSizeType::Decrease)
+	{
+		updatedFontSize -= FONT_SIZE_CHANGE_DELTA;
+	}
+	else
+	{
+		updatedFontSize += FONT_SIZE_CHANGE_DELTA;
+	}
+
+	m_config->mainFont = CustomFont(updatedFontName, updatedFontSize);
 }

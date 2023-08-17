@@ -63,8 +63,8 @@ void SaveCustomFontToRegistry(const std::wstring &keyPath, const CustomFont &cus
 
 void SaveCustomFontToKey(HKEY key, const CustomFont &customFont)
 {
-	RegistrySettings::SaveString(key, SETTING_NAME, customFont.name);
-	RegistrySettings::SaveDword(key, SETTING_SIZE, customFont.size);
+	RegistrySettings::SaveString(key, SETTING_NAME, customFont.GetName());
+	RegistrySettings::SaveDword(key, SETTING_SIZE, customFont.GetSize());
 }
 
 std::unique_ptr<CustomFont> LoadCustomFontFromXml(IXMLDOMNode *parentNode)
@@ -100,7 +100,7 @@ void SaveCustomFontToXml(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNod
 	const CustomFont &customFont)
 {
 	NXMLSettings::AddAttributeToNode(xmlDocument, parentNode, SETTING_NAME,
-		customFont.name.c_str());
+		customFont.GetName().c_str());
 	NXMLSettings::AddAttributeToNode(xmlDocument, parentNode, SETTING_SIZE,
-		NXMLSettings::EncodeIntValue(customFont.size));
+		NXMLSettings::EncodeIntValue(customFont.GetSize()));
 }
