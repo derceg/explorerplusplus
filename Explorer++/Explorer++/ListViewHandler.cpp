@@ -386,7 +386,7 @@ void Explorerplusplus::OnListViewDoubleClick(const NMITEMACTIVATE *eventInfo)
 	// appears that's not actually the case. From testing, iItem will be correctly populated even
 	// when the click/double-click takes place elsewhere in a row. Therefore, it should be ok to use
 	// that value in this function.
-	if (eventInfo->hdr.hwndFrom != m_hActiveListView || eventInfo->iItem == -1)
+	if (eventInfo->iItem == -1)
 	{
 		return;
 	}

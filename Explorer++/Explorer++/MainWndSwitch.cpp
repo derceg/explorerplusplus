@@ -1457,14 +1457,18 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 	switch (nmhdr->code)
 	{
 	case NM_CLICK:
-		if (m_config->globalFolderSettings.oneClickActivate.get())
+		if (m_config->globalFolderSettings.oneClickActivate.get()
+			&& nmhdr->hwndFrom == m_hActiveListView)
 		{
 			OnListViewDoubleClick(reinterpret_cast<NMITEMACTIVATE *>(lParam));
 		}
 		break;
 
 	case NM_DBLCLK:
-		OnListViewDoubleClick(reinterpret_cast<NMITEMACTIVATE *>(lParam));
+		if (nmhdr->hwndFrom == m_hActiveListView)
+		{
+			OnListViewDoubleClick(reinterpret_cast<NMITEMACTIVATE *>(lParam));
+		}
 		break;
 
 	case LVN_KEYDOWN:
