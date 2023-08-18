@@ -13,6 +13,7 @@
 #include "../Helper/Controls.h"
 #include "../Helper/DataExchangeHelper.h"
 #include "../Helper/DataObjectImpl.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/DragDropHelper.h"
 #include "../Helper/DropSourceImpl.h"
 #include "../Helper/Helper.h"
@@ -50,6 +51,9 @@ void AddressBar::Initialize(HWND parent)
 	Shell_GetImageLists(nullptr, &smallIcons);
 	SendMessage(m_hwnd, CBEM_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(smallIcons));
 
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
+		std::bind_front(&AddressBar::ComboBoxSubclass, this)));
+
 	HWND hEdit = reinterpret_cast<HWND>(SendMessage(m_hwnd, CBEM_GETEDITCONTROL, 0, 0));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hEdit,
 		std::bind_front(&AddressBar::EditSubclass, this)));
@@ -72,7 +76,19 @@ void AddressBar::Initialize(HWND parent)
 					std::bind_front(&AddressBar::OnNavigationCommitted, this)));
 		});
 
-	m_fontSetter.fontUpdatedSignal.AddObserver(std::bind(&AddressBar::OnFontUpdated, this));
+	m_fontSetter.fontUpdatedSignal.AddObserver(std::bind(&AddressBar::OnFontOrDpiUpdated, this));
+}
+
+LRESULT AddressBar::ComboBoxSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_DPICHANGED_AFTERPARENT:
+		OnFontOrDpiUpdated();
+		break;
+	}
+
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
 LRESULT AddressBar::EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -321,7 +337,7 @@ void AddressBar::OnHistoryEntryUpdated(const HistoryEntry &entry,
 	}
 }
 
-void AddressBar::OnFontUpdated()
+void AddressBar::OnFontOrDpiUpdated()
 {
 	sizeUpdatedSignal.m_signal();
 }

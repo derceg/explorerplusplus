@@ -31,6 +31,7 @@ private:
 
 	static HWND CreateAddressBar(HWND parent);
 
+	LRESULT ComboBoxSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -44,7 +45,7 @@ private:
 	void UpdateTextAndIconInUI(std::wstring *text, int iconIndex);
 	void RevertTextInUI();
 	void OnHistoryEntryUpdated(const HistoryEntry &entry, HistoryEntry::PropertyType propertyType);
-	void OnFontUpdated();
+	void OnFontOrDpiUpdated();
 
 	CoreInterface *m_coreInterface;
 	Navigator *m_navigator;
