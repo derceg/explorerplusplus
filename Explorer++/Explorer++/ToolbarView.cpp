@@ -136,7 +136,7 @@ ToolbarView::ToolbarView(HWND parent, DWORD style, DWORD extendedStyle, const Co
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(m_hwnd),
 		std::bind_front(&ToolbarView::ParentWndProc, this)));
 
-	m_fontSetter.fontUpdatedSignal.AddObserver(std::bind(&ToolbarView::OnFontUpdated, this));
+	m_fontSetter.fontUpdatedSignal.AddObserver(std::bind(&ToolbarView::OnFontOrDpiUpdated, this));
 }
 
 void ToolbarView::SetupSmallShellImageList()
@@ -270,6 +270,10 @@ LRESULT ToolbarView::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 	}
 	break;
+
+	case WM_DPICHANGED_AFTERPARENT:
+		OnFontOrDpiUpdated();
+		break;
 
 	case WM_NCDESTROY:
 		OnNcDestroy();
@@ -580,9 +584,9 @@ void ToolbarView::SetHotItem(size_t index)
 	SendMessage(m_hwnd, TB_SETHOTITEM, index, 0);
 }
 
-void ToolbarView::OnFontUpdated()
+void ToolbarView::OnFontOrDpiUpdated()
 {
-	RefreshToolbarAfterFontChange(m_hwnd);
+	RefreshToolbarAfterFontOrDpiChange(m_hwnd);
 
 	m_toolbarSizeUpdatedSignal();
 }

@@ -27,7 +27,7 @@ BOOL lCheckDlgButton(HWND hDlg, int buttonId, BOOL bCheck);
 
 /* Toolbar/Rebar. */
 void AddStyleToToolbar(UINT *fStyle, UINT fStyleToAdd);
-void RefreshToolbarAfterFontChange(HWND toolbar);
+void RefreshToolbarAfterFontOrDpiChange(HWND toolbar);
 void AddGripperStyle(UINT *fStyle, BOOL bAddGripper);
 void UpdateRebarBandSize(HWND rebar, HWND child, int idealWidth, int height);
 

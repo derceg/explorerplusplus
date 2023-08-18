@@ -224,8 +224,10 @@ void AddStyleToToolbar(UINT *fStyle, UINT fStyleToAdd)
 // button to be cut off if the font size is increased. Also, the toolbar height doesn't always seen
 // to get calculated correctly. That means that changing from one font size to another can result in
 // the toolbar reporting the original height, even if that's not enough to accommodate the new font.
+// Similar problems also exist when the DPI changes. Button text may end up being cut off (if the
+// DPI is increased) and the height of the toolbar may not be correct.
 // These issues can be worked around by deleting all buttons in the toolbar and reinserting them.
-void RefreshToolbarAfterFontChange(HWND toolbar)
+void RefreshToolbarAfterFontOrDpiChange(HWND toolbar)
 {
 	SendMessage(toolbar, WM_SETREDRAW, false, 0);
 

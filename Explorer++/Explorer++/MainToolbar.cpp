@@ -64,9 +64,9 @@ const std::unordered_map<MainToolbarButton, Icon, ToolbarButtonHash> TOOLBAR_BUT
 
 #pragma warning(push)
 #pragma warning(                                                                                   \
-	disable : 4996 4834) // warning STL4010: Various members of std::allocator are
-						 // deprecated in C++17,
-						 // discarding return value of function with 'nodiscard' attribute
+		disable : 4996 4834) // warning STL4010: Various members of std::allocator are
+							 // deprecated in C++17,
+							 // discarding return value of function with 'nodiscard' attribute
 
 // Ideally, toolbar button IDs would be saved in the XML config file, rather
 // than button strings, but that's not especially easy to change now.
@@ -190,7 +190,8 @@ void MainToolbar::Initialize(HWND parent)
 
 	AddClipboardFormatListener(m_hwnd);
 
-	m_fontSetter.fontUpdatedSignal.AddObserver(std::bind_front(&MainToolbar::OnFontUpdated, this));
+	m_fontSetter.fontUpdatedSignal.AddObserver(
+		std::bind_front(&MainToolbar::OnFontOrDpiUpdated, this));
 }
 
 MainToolbar::~MainToolbar()
@@ -252,6 +253,10 @@ LRESULT MainToolbar::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_CLIPBOARDUPDATE:
 		OnClipboardUpdate();
 		return 0;
+
+	case WM_DPICHANGED_AFTERPARENT:
+		OnFontOrDpiUpdated();
+		break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
@@ -1061,9 +1066,9 @@ void MainToolbarPersistentSettings::SaveXMLSettings(IXMLDOMDocument *pXMLDom, IX
 	}
 }
 
-void MainToolbar::OnFontUpdated()
+void MainToolbar::OnFontOrDpiUpdated()
 {
-	RefreshToolbarAfterFontChange(m_hwnd);
+	RefreshToolbarAfterFontOrDpiChange(m_hwnd);
 
 	sizeUpdatedSignal.m_signal();
 }

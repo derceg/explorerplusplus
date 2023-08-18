@@ -185,7 +185,7 @@ private:
 	size_t TransformCommandToIndex(int command);
 	ToolbarButton *GetButtonFromIndex(size_t index);
 
-	void OnFontUpdated();
+	void OnFontOrDpiUpdated();
 
 	void OnNcDestroy();
 

@@ -107,7 +107,7 @@ private:
 	void OnMButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT keysDown);
 	void OnMButtonUp(HWND hwnd, int x, int y, UINT keysDown);
 
-	void OnFontUpdated();
+	void OnFontOrDpiUpdated();
 
 	MainToolbarPersistentSettings *m_persistentSettings;
 
