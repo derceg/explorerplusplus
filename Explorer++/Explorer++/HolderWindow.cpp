@@ -28,7 +28,7 @@ HolderWindow::HolderWindow(HWND parent, const std::wstring &caption, DWORD style
 	m_hwnd(CreateHolderWindow(parent, caption, style)),
 	m_sizingCursor(LoadCursor(nullptr, IDC_SIZEWE))
 {
-	LOGFONT systemFont = GetDefaultSystemFont(m_hwnd);
+	LOGFONT systemFont = GetDefaultSystemFontScaledToWindow(m_hwnd);
 	m_defaultFont.reset(CreateFontIndirect(&systemFont));
 	assert(m_defaultFont);
 

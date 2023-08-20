@@ -1291,7 +1291,7 @@ void Explorerplusplus::OnChangeMainFontSize(FontSizeType sizeType)
 	}
 	else
 	{
-		auto systemLogFont = GetDefaultSystemFont(m_hContainer);
+		auto systemLogFont = GetDefaultSystemFontScaledToWindow(m_hContainer);
 		int systemFontSize = std::abs(
 			DpiCompatibility::GetInstance().PixelsToPoints(m_hContainer, systemLogFont.lfHeight));
 

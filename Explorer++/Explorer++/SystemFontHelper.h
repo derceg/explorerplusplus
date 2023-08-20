@@ -13,5 +13,7 @@ enum class SystemFont
 	Message
 };
 
-LOGFONT GetSystemFont(SystemFont systemFont, HWND hwnd);
-LOGFONT GetDefaultSystemFont(HWND hwnd);
+LOGFONT GetSystemFontScaledToWindow(SystemFont systemFont, HWND hwnd);
+LOGFONT GetSystemFontForDefaultDpi(SystemFont systemFont);
+LOGFONT GetDefaultSystemFontScaledToWindow(HWND hwnd);
+LOGFONT GetDefaultSystemFontForDefaultDpi();

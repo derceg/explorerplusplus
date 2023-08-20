@@ -18,21 +18,24 @@ class MainFontSetter
 {
 public:
 	MainFontSetter(HWND hwnd, const Config *config,
-		std::optional<LOGFONT> defaultFont = std::nullopt);
+		std::optional<LOGFONT> defaultFontAt96Dpi = std::nullopt);
 	~MainFontSetter();
 
 	// Signals
 	SignalWrapper<MainFontSetter, void()> fontUpdatedSignal;
 
 private:
-	void MaybeSubclassWindow();
+	void SubclassWindowForDpiChanges();
+	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	void OnDpiChanged();
+	void MaybeSubclassSpecificWindowClasses();
 	LRESULT TooltipWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void UpdateFont();
 
 	HWND m_hwnd;
 	const Config *const m_config;
 	wil::unique_hfont m_font;
-	std::optional<LOGFONT> m_defaultFont;
+	const std::optional<LOGFONT> m_defaultFontAt96Dpi;
 
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;

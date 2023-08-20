@@ -527,7 +527,7 @@ LRESULT CALLBACK ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wP
 			throw std::runtime_error("Menu item text retrieval failed");
 		}
 
-		auto logFont = GetSystemFont(SystemFont::Menu, hwnd);
+		auto logFont = GetSystemFontScaledToWindow(SystemFont::Menu, hwnd);
 		wil::unique_hfont font(CreateFontIndirect(&logFont));
 		wil::unique_select_object selectFont;
 

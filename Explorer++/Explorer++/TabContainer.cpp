@@ -55,7 +55,7 @@ TabContainer::TabContainer(HWND parent, TabNavigationInterface *tabNavigation,
 	CoreInterface *coreInterface, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons,
 	BookmarkTree *bookmarkTree, HINSTANCE resourceInstance, std::shared_ptr<Config> config) :
 	ShellDropTargetWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
-	m_fontSetter(m_hwnd, config.get(), GetDefaultSystemFont(m_hwnd)),
+	m_fontSetter(m_hwnd, config.get(), GetDefaultSystemFontForDefaultDpi()),
 	m_tooltipFontSetter(TabCtrl_GetToolTips(m_hwnd), config.get()),
 	m_tabNavigation(tabNavigation),
 	m_coreInterface(coreInterface),

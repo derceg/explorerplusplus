@@ -6,15 +6,17 @@
 #include "MainFontSetter.h"
 #include "Config.h"
 #include "FontHelper.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowSubclassWrapper.h"
 
 MainFontSetter::MainFontSetter(HWND hwnd, const Config *config,
-	std::optional<LOGFONT> defaultFont) :
+	std::optional<LOGFONT> defaultFontAt96Dpi) :
 	m_hwnd(hwnd),
 	m_config(config),
-	m_defaultFont(defaultFont)
+	m_defaultFontAt96Dpi(defaultFontAt96Dpi)
 {
-	MaybeSubclassWindow();
+	SubclassWindowForDpiChanges();
+	MaybeSubclassSpecificWindowClasses();
 	UpdateFont();
 
 	m_connections.push_back(
@@ -23,7 +25,37 @@ MainFontSetter::MainFontSetter(HWND hwnd, const Config *config,
 
 MainFontSetter::~MainFontSetter() = default;
 
-void MainFontSetter::MaybeSubclassWindow()
+void MainFontSetter::SubclassWindowForDpiChanges()
+{
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
+		std::bind_front(&MainFontSetter::WndProc, this)));
+}
+
+LRESULT MainFontSetter::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_DPICHANGED_AFTERPARENT:
+		OnDpiChanged();
+		break;
+	}
+
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+void MainFontSetter::OnDpiChanged()
+{
+	if (!m_config->mainFont.get() && !m_defaultFontAt96Dpi)
+	{
+		// In this situation, the control is using its default font, so there's no need to perform
+		// any manual updates.
+		return;
+	}
+
+	UpdateFont();
+}
+
+void MainFontSetter::MaybeSubclassSpecificWindowClasses()
 {
 	WCHAR className[256];
 	auto res = GetClassName(m_hwnd, className, static_cast<int>(std::size(className)));
@@ -84,9 +116,13 @@ void MainFontSetter::UpdateFont()
 			return;
 		}
 	}
-	else if (m_defaultFont)
+	else if (m_defaultFontAt96Dpi)
 	{
-		updatedFont.reset(CreateFontIndirect(&*m_defaultFont));
+		auto scaledFont = *m_defaultFontAt96Dpi;
+		scaledFont.lfHeight =
+			DpiCompatibility::GetInstance().ScaleValue(m_hwnd, scaledFont.lfHeight);
+
+		updatedFont.reset(CreateFontIndirect(&scaledFont));
 
 		if (!updatedFont)
 		{

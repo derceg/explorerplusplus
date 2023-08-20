@@ -6,16 +6,27 @@
 #include "SystemFontHelper.h"
 #include "../Helper/DpiCompatibility.h"
 
-// Returns a system font, scaled to the DPI associated with the provided window.
-LOGFONT GetSystemFont(SystemFont systemFont, HWND hwnd)
-{
-	auto &dpiCompat = DpiCompatibility::GetInstance();
-	UINT dpi = dpiCompat.GetDpiForWindow(hwnd);
+LOGFONT GetSystemFontForDpi(SystemFont systemFont, UINT dpi);
+LOGFONT GetDefaultSystemFontForDpi(UINT dpi);
 
+// Returns a system font, scaled to the DPI associated with the provided window.
+LOGFONT GetSystemFontScaledToWindow(SystemFont systemFont, HWND hwnd)
+{
+	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(hwnd);
+	return GetSystemFontForDpi(systemFont, dpi);
+}
+
+LOGFONT GetSystemFontForDefaultDpi(SystemFont systemFont)
+{
+	return GetSystemFontForDpi(systemFont, USER_DEFAULT_SCREEN_DPI);
+}
+
+LOGFONT GetSystemFontForDpi(SystemFont systemFont, UINT dpi)
+{
 	NONCLIENTMETRICS nonClientMetrics = {};
 	nonClientMetrics.cbSize = sizeof(nonClientMetrics);
-	[[maybe_unused]] auto res = dpiCompat.SystemParametersInfoForDpi(SPI_GETNONCLIENTMETRICS,
-		sizeof(nonClientMetrics), &nonClientMetrics, 0, dpi);
+	[[maybe_unused]] auto res = DpiCompatibility::GetInstance().SystemParametersInfoForDpi(
+		SPI_GETNONCLIENTMETRICS, sizeof(nonClientMetrics), &nonClientMetrics, 0, dpi);
 	assert(res);
 
 	switch (systemFont)
@@ -40,7 +51,18 @@ LOGFONT GetSystemFont(SystemFont systemFont, HWND hwnd)
 	}
 }
 
-LOGFONT GetDefaultSystemFont(HWND hwnd)
+LOGFONT GetDefaultSystemFontScaledToWindow(HWND hwnd)
 {
-	return GetSystemFont(SystemFont::Message, hwnd);
+	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(hwnd);
+	return GetDefaultSystemFontForDpi(dpi);
+}
+
+LOGFONT GetDefaultSystemFontForDefaultDpi()
+{
+	return GetDefaultSystemFontForDpi(USER_DEFAULT_SCREEN_DPI);
+}
+
+LOGFONT GetDefaultSystemFontForDpi(UINT dpi)
+{
+	return GetSystemFontForDpi(SystemFont::Message, dpi);
 }

@@ -37,7 +37,7 @@ std::unique_ptr<ResizableDialogHelper> FontsOptionsPage::InitializeResizeDialogH
 
 void FontsOptionsPage::InitializeControls()
 {
-	m_systemLogFont = GetDefaultSystemFont(GetDialog());
+	m_systemLogFont = GetDefaultSystemFontScaledToWindow(GetDialog());
 
 	InitializeFontsControl();
 	InitializeSizeControl();
@@ -244,7 +244,7 @@ INT_PTR FontsOptionsPage::DialogProcExtra(HWND dlg, UINT msg, WPARAM wParam, LPA
 
 void FontsOptionsPage::OnDpiChanged()
 {
-	m_systemLogFont = GetDefaultSystemFont(GetDialog());
+	m_systemLogFont = GetDefaultSystemFontScaledToWindow(GetDialog());
 	UpdateSampleWindow();
 }
 
