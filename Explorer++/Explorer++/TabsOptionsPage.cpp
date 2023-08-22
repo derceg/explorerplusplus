@@ -21,8 +21,6 @@ std::unique_ptr<ResizableDialogHelper> TabsOptionsPage::InitializeResizeDialogHe
 	std::vector<ResizableDialogControl> controls;
 	controls.emplace_back(GetDlgItem(GetDialog(), IDC_TABS_TASKBARTHUMBNAILS), MovingType::None,
 		SizingType::Horizontal);
-	controls.emplace_back(GetDlgItem(GetDialog(), IDC_TABS_SAMEWIDTH), MovingType::None,
-		SizingType::Horizontal);
 	controls.emplace_back(GetDlgItem(GetDialog(), IDC_TABS_CLOSECONFIRMATION), MovingType::None,
 		SizingType::Horizontal);
 	controls.emplace_back(GetDlgItem(GetDialog(), IDC_TABS_OPENNEXTTOCURRENT), MovingType::None,
@@ -41,11 +39,6 @@ void TabsOptionsPage::InitializeControls()
 	if (m_config->showTaskbarThumbnails)
 	{
 		CheckDlgButton(GetDialog(), IDC_TABS_TASKBARTHUMBNAILS, BST_CHECKED);
-	}
-
-	if (m_config->forceSameTabWidth.get())
-	{
-		CheckDlgButton(GetDialog(), IDC_TABS_SAMEWIDTH, BST_CHECKED);
 	}
 
 	if (m_config->confirmCloseTabs)
@@ -81,7 +74,6 @@ void TabsOptionsPage::OnCommand(WPARAM wParam, LPARAM lParam)
 	switch (LOWORD(wParam))
 	{
 	case IDC_TABS_TASKBARTHUMBNAILS:
-	case IDC_TABS_SAMEWIDTH:
 	case IDC_TABS_CLOSECONFIRMATION:
 	case IDC_TABS_OPENNEXTTOCURRENT:
 	case IDC_SETTINGS_CHECK_ALWAYSNEWTAB:
@@ -96,9 +88,6 @@ void TabsOptionsPage::SaveSettings()
 {
 	m_config->showTaskbarThumbnails =
 		(IsDlgButtonChecked(GetDialog(), IDC_TABS_TASKBARTHUMBNAILS) == BST_CHECKED);
-
-	m_config->forceSameTabWidth.set(
-		IsDlgButtonChecked(GetDialog(), IDC_TABS_SAMEWIDTH) == BST_CHECKED);
 
 	m_config->confirmCloseTabs =
 		(IsDlgButtonChecked(GetDialog(), IDC_TABS_CLOSECONFIRMATION) == BST_CHECKED);

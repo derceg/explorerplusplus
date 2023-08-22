@@ -100,7 +100,6 @@ struct Config
 	ValueWrapper<BOOL> alwaysShowTabBar = TRUE;
 	ValueWrapper<BOOL> showTabBarAtBottom = FALSE;
 	ValueWrapper<BOOL> extendTabControl = FALSE;
-	ValueWrapper<BOOL> forceSameTabWidth = FALSE;
 	bool openTabsInForeground = false;
 
 	// Treeview

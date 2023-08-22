@@ -157,7 +157,7 @@ private:
 		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
 		HINSTANCE resourceInstance, std::shared_ptr<Config> config);
 
-	static HWND CreateTabControl(HWND parent, BOOL forceSameTabWidth);
+	static HWND CreateTabControl(HWND parent);
 
 	LRESULT WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	LRESULT ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -200,7 +200,6 @@ private:
 	void OnTabSelected(const Tab &tab);
 
 	void OnAlwaysShowTabBarUpdated(BOOL newValue);
-	void OnForceSameTabWidthUpdated(BOOL newValue);
 
 	void OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams);
 	void OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);

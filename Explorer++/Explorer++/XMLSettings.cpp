@@ -91,7 +91,6 @@ will need to be changed correspondingly. */
 #define HASH_ALLOWMULTIPLEINSTANCES 3463984536
 #define HASH_ONECLICKACTIVATE 1118178238
 #define HASH_ONECLICKACTIVATEHOVERTIME 3023373873
-#define HASH_FORCESAMETABWIDTH 2315576081
 #define HASH_DOUBLECLICKTABCLOSE 1866215987
 #define HASH_HANDLEZIPFILES 1074212343
 #define HASH_INSERTSORTED 1109371947
@@ -550,9 +549,6 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ExtendTabControl"),
 		NXMLSettings::EncodeBoolValue(m_config->extendTabControl.get()));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ForceSameTabWidth"),
-		NXMLSettings::EncodeBoolValue(m_config->forceSameTabWidth.get()));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ForceSize"),
 		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.forceSize));
@@ -1544,10 +1540,6 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 
 	case HASH_EXTENDTABCONTROL:
 		m_config->extendTabControl.set(NXMLSettings::DecodeBoolValue(wszValue));
-		break;
-
-	case HASH_FORCESAMETABWIDTH:
-		m_config->forceSameTabWidth.set(NXMLSettings::DecodeBoolValue(wszValue));
 		break;
 
 	case HASH_FORCESIZE:

@@ -54,7 +54,7 @@ TabContainer *TabContainer::Create(HWND parent, TabNavigationInterface *tabNavig
 TabContainer::TabContainer(HWND parent, TabNavigationInterface *tabNavigation,
 	CoreInterface *coreInterface, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons,
 	BookmarkTree *bookmarkTree, HINSTANCE resourceInstance, std::shared_ptr<Config> config) :
-	ShellDropTargetWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
+	ShellDropTargetWindow(CreateTabControl(parent)),
 	m_fontSetter(m_hwnd, config.get(), GetDefaultSystemFontForDefaultDpi()),
 	m_tooltipFontSetter(TabCtrl_GetToolTips(m_hwnd), config.get()),
 	m_tabNavigation(tabNavigation),
@@ -73,16 +73,9 @@ TabContainer::TabContainer(HWND parent, TabNavigationInterface *tabNavigation,
 	Initialize(parent);
 }
 
-HWND TabContainer::CreateTabControl(HWND parent, BOOL forceSameTabWidth)
+HWND TabContainer::CreateTabControl(HWND parent)
 {
-	UINT styles = TAB_CONTROL_STYLES;
-
-	if (forceSameTabWidth)
-	{
-		styles |= TCS_FIXEDWIDTH;
-	}
-
-	return ::CreateTabControl(parent, styles);
+	return ::CreateTabControl(parent, TAB_CONTROL_STYLES);
 }
 
 void TabContainer::Initialize(HWND parent)
@@ -115,8 +108,6 @@ void TabContainer::Initialize(HWND parent)
 
 	m_connections.push_back(m_config->alwaysShowTabBar.addObserver(
 		std::bind_front(&TabContainer::OnAlwaysShowTabBarUpdated, this)));
-	m_connections.push_back(m_config->forceSameTabWidth.addObserver(
-		std::bind_front(&TabContainer::OnForceSameTabWidthUpdated, this)));
 
 	m_fontSetter.fontUpdatedSignal.AddObserver(std::bind_front(&TabContainer::OnFontUpdated, this));
 }
@@ -740,11 +731,6 @@ void TabContainer::OnAlwaysShowTabBarUpdated(BOOL newValue)
 			m_coreInterface->HideTabBar();
 		}
 	}
-}
-
-void TabContainer::OnForceSameTabWidthUpdated(BOOL newValue)
-{
-	AddWindowStyle(m_hwnd, TCS_FIXEDWIDTH, newValue);
 }
 
 void TabContainer::OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams)

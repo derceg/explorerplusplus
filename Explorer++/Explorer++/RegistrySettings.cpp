@@ -148,8 +148,6 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 			m_config->globalFolderSettings.oneClickActivate.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("OneClickActivateHoverTime"),
 			m_config->globalFolderSettings.oneClickActivateHoverTime.get());
-		RegistrySettings::SaveDword(hSettingsKey, _T("ForceSameTabWidth"),
-			m_config->forceSameTabWidth.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("DoubleClickTabClose"),
 			m_config->doubleClickTabClose);
 		RegistrySettings::SaveDword(hSettingsKey, _T("HandleZipFiles"), m_config->handleZipFiles);
@@ -364,9 +362,6 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("ExtendTabControl"),
 			[this](DWORD value) { m_config->extendTabControl.set(value); });
-
-		RegistrySettings::ReadDword(hSettingsKey, _T("ForceSameTabWidth"),
-			[this](DWORD value) { m_config->forceSameTabWidth.set(value); });
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("StartupMode"),
 			[this](DWORD value) { m_config->startupMode = static_cast<StartupMode>(value); });
