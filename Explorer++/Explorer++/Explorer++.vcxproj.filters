@@ -565,6 +565,9 @@
     <ClCompile Include="CustomFont.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="FeatureList.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1141,6 +1144,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="CustomFontStorage.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="FeatureList.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

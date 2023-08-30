@@ -864,6 +864,7 @@
 #define IDM_HELP_ONLINE_DOCUMENTATION   40545
 #define IDM_VIEW_DECREASE_TEXT_SIZE     40546
 #define IDM_VIEW_INCREASE_TEXT_SIZE     40547
+#define IDM_VIEW_DUAL_PANE              40548
 #define IDM_SORTBY_NAME                 50000
 #define IDM_SORTBY_SIZE                 50001
 #define IDM_SORTBY_TYPE                 50002
@@ -1005,7 +1006,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        394
-#define _APS_NEXT_COMMAND_VALUE         40548
+#define _APS_NEXT_COMMAND_VALUE         40549
 #define _APS_NEXT_CONTROL_VALUE         1374
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
