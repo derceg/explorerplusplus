@@ -40,6 +40,8 @@ Explorer++ is a lightweight and fast file manager for Windows.
 
 [explorerpp_translations.zip](https://download.explorerplusplus.com/dev/latest/explorerpp_translations.zip)
 
+For a full list of builds, see https://explorerplusplus.com/builds.
+
 ## Building Explorer++
 
 For instructions on how to build Explorer++, see [BUILDING.md](BUILDING.md).
