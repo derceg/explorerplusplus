@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Config.h"
+#include "Feature.h"
 #include <optional>
 #include <variant>
 
@@ -12,7 +13,7 @@ namespace CommandLine
 {
 struct Settings
 {
-	bool enablePlugins = false;
+	std::set<Feature> enableFeatures;
 	std::optional<ShellChangeNotificationType> shellChangeNotificationType;
 	std::wstring language;
 	bool createJumplistTab = false;

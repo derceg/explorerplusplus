@@ -62,12 +62,12 @@ void Explorerplusplus::InitializeMainMenu()
 	// before the tabs are restored.
 	HMENU mainMenu = LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_MAINMENU));
 
-	if (!FeatureList::IsEnabled(Feature::DualPane))
+	if (!FeatureList::GetInstance()->IsEnabled(Feature::DualPane))
 	{
 		DeleteMenu(mainMenu, IDM_VIEW_DUAL_PANE, MF_BYCOMMAND);
 	}
 
-	if (!m_commandLineSettings.enablePlugins)
+	if (!FeatureList::GetInstance()->IsEnabled(Feature::Plugins))
 	{
 		DeleteMenu(mainMenu, IDM_TOOLS_RUNSCRIPT, MF_BYCOMMAND);
 	}

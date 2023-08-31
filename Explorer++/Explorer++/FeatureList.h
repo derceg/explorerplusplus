@@ -4,12 +4,30 @@
 
 #pragma once
 
-enum class Feature
-{
-	DualPane
-};
+#include "Feature.h"
+#include <set>
 
-namespace FeatureList
+namespace CommandLine
 {
-bool IsEnabled(Feature feature);
+struct Settings;
 }
+
+// This class can be used to determine whether a particular in-development feature is enabled or
+// disabled. All the features managed here are disabled by default, but can be enabled with the
+// appropriate command line option.
+class FeatureList
+{
+public:
+	static FeatureList *GetInstance();
+
+	void InitializeFromCommandLine(const CommandLine::Settings &commandLineSettings);
+	bool IsEnabled(Feature feature);
+
+private:
+	FeatureList() = default;
+
+	static inline FeatureList *m_staticInstance = nullptr;
+
+	std::set<Feature> m_enabledFeatures;
+	bool m_initializedFromCommandLine = false;
+};

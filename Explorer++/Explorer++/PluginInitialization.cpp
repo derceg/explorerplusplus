@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
+#include "FeatureList.h"
 #include "MenuHelper.h"
 #include "Plugins/PluginManager.h"
 #include "../Helper/ProcessHelper.h"
@@ -14,7 +15,7 @@ static const std::wstring PLUGIN_FOLDER_NAME = L"plugins";
 
 void Explorerplusplus::InitializePlugins()
 {
-	if (!m_commandLineSettings.enablePlugins)
+	if (!FeatureList::GetInstance()->IsEnabled(Feature::Plugins))
 	{
 		return;
 	}

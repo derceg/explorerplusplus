@@ -965,6 +965,7 @@
     <ClInclude Include="CrashHandlerHelper.h" />
     <ClInclude Include="CustomFont.h" />
     <ClInclude Include="CustomFontStorage.h" />
+    <ClInclude Include="Feature.h" />
     <ClInclude Include="FeatureList.h" />
     <ClInclude Include="FontsOptionsPage.h" />
     <ClInclude Include="Literals.h" />

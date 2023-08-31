@@ -114,7 +114,16 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 
 	CommandLine::Settings settings;
 
-	app.add_flag("--enable-plugins", settings.enablePlugins, "Enable the Lua plugin system");
+	std::map<std::string, Feature> featureMap;
+
+	for (auto item : Feature::_values())
+	{
+		featureMap.insert({ item._to_string(), item });
+	}
+
+	app.add_option("--enable-features", settings.enableFeatures,
+		   "Allows incomplete features that are disabled by default to be enabled")
+		->transform(CLI::CheckedTransformer(featureMap));
 
 	app.add_option("--shell-change-notification-type", settings.shellChangeNotificationType,
 		   "Watch for directory changes through SHChangeNotifyRegister")

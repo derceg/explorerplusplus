@@ -4,18 +4,28 @@
 
 #include "stdafx.h"
 #include "FeatureList.h"
+#include "CommandLine.h"
 
-namespace FeatureList
+FeatureList *FeatureList::GetInstance()
 {
-bool IsEnabled(Feature feature)
-{
-	switch (feature)
+	if (!m_staticInstance)
 	{
-	case Feature::DualPane:
-		return false;
-
-	default:
-		throw std::runtime_error("Invalid feature");
+		m_staticInstance = new FeatureList();
 	}
+
+	return m_staticInstance;
 }
+
+void FeatureList::InitializeFromCommandLine(const CommandLine::Settings &commandLineSettings)
+{
+	assert(!m_initializedFromCommandLine);
+
+	m_enabledFeatures = commandLineSettings.enableFeatures;
+
+	m_initializedFromCommandLine = true;
+}
+
+bool FeatureList::IsEnabled(Feature feature)
+{
+	return m_enabledFeatures.find(feature) != m_enabledFeatures.end();
 }
