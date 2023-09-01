@@ -141,7 +141,7 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
 void Explorerplusplus::OnNavigationStartedStatusBar(const Tab &tab,
 	const NavigateParams &navigateParams)
 {
-	if (m_tabContainer->IsTabSelected(tab))
+	if (GetActivePane()->GetTabContainer()->IsTabSelected(tab))
 	{
 		SetStatusBarLoadingText(navigateParams.pidl.Raw());
 	}
@@ -176,7 +176,7 @@ void Explorerplusplus::OnNavigationCompletedStatusBar(const Tab &tab,
 {
 	UNREFERENCED_PARAMETER(navigateParams);
 
-	if (m_tabContainer->IsTabSelected(tab))
+	if (GetActivePane()->GetTabContainer()->IsTabSelected(tab))
 	{
 		UpdateStatusBarText(tab);
 	}
@@ -187,7 +187,7 @@ void Explorerplusplus::OnNavigationFailedStatusBar(const Tab &tab,
 {
 	UNREFERENCED_PARAMETER(navigateParams);
 
-	if (m_tabContainer->IsTabSelected(tab))
+	if (GetActivePane()->GetTabContainer()->IsTabSelected(tab))
 	{
 		UpdateStatusBarText(tab);
 	}

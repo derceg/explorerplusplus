@@ -260,7 +260,8 @@ void Explorerplusplus::DirectoryAlteredCallback(const TCHAR *szFileName, DWORD d
 	pDirectoryAltered = (DirectoryAltered *) pData;
 	pContainer = (Explorerplusplus *) pDirectoryAltered->pData;
 
-	Tab *tab = pContainer->m_tabContainer->GetTabOptional(pDirectoryAltered->iIndex);
+	Tab *tab =
+		pContainer->GetActivePane()->GetTabContainer()->GetTabOptional(pDirectoryAltered->iIndex);
 
 	if (tab)
 	{
@@ -306,7 +307,8 @@ void Explorerplusplus::FolderSizeCallback(FolderSizeExtraInfo *pfsei, int nFolde
 void Explorerplusplus::OnSelectColumns()
 {
 	SelectColumnsDialog selectColumnsDialog(m_resourceInstance, m_hContainer,
-		m_tabContainer->GetSelectedTab().GetShellBrowser(), m_iconResourceLoader.get());
+		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser(),
+		m_iconResourceLoader.get());
 	selectColumnsDialog.ShowModalDialog();
 }
 

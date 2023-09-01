@@ -5,6 +5,7 @@
 #pragma once
 
 #include "AcceleratorUpdater.h"
+#include "BrowserPane.h"
 #include "CommandLine.h"
 #include "CoreInterface.h"
 #include "Literals.h"
@@ -293,6 +294,8 @@ private:
 	LRESULT CALLBACK TreeViewHolderWindowNotifyHandler(HWND hwnd, UINT msg, WPARAM wParam,
 		LPARAM lParam);
 	void OnTreeViewSelectionChangedTimer();
+
+	BrowserPane *GetActivePane() const;
 
 	/* Tab backing. */
 	void CreateTabBacking();
@@ -614,8 +617,9 @@ private:
 	std::optional<NMTREEVIEW> m_treeViewSelectionChangedEventInfo;
 	bool m_treeViewInitialized = false;
 
+	std::unique_ptr<BrowserPane> m_browserPane;
+
 	/* Tabs. */
-	TabContainer *m_tabContainer;
 	std::unique_ptr<MainFontSetter> m_tabToolbarTooltipFontSetter;
 	wil::unique_hbrush m_tabBarBackgroundBrush;
 	std::unique_ptr<TabRestorer> m_tabRestorer;

@@ -297,7 +297,7 @@ void Explorerplusplus::OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 	{
 	case OpenFolderDisposition::CurrentTab:
 	{
-		Tab &tab = m_tabContainer->GetSelectedTab();
+		Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 		auto navigateParams = NavigateParams::Normal(pidlItem);
 		tab.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
 	}
@@ -306,14 +306,15 @@ void Explorerplusplus::OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 	case OpenFolderDisposition::BackgroundTab:
 	{
 		auto navigateParams = NavigateParams::Normal(pidlItem);
-		m_tabContainer->CreateNewTab(navigateParams);
+		GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams);
 	}
 	break;
 
 	case OpenFolderDisposition::ForegroundTab:
 	{
 		auto navigateParams = NavigateParams::Normal(pidlItem);
-		m_tabContainer->CreateNewTab(navigateParams, TabSettings(_selected = true));
+		GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams,
+			TabSettings(_selected = true));
 	}
 	break;
 
@@ -452,7 +453,7 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 	// Since the display area is indicated to start at (0, 0), displayRect.top will contain the
 	// height of the tab control above the display area.
 	RECT displayRect = { 0, 0, 0, 0 };
-	TabCtrl_AdjustRect(m_tabContainer->GetHWND(), true, &displayRect);
+	TabCtrl_AdjustRect(GetActivePane()->GetTabContainer()->GetHWND(), true, &displayRect);
 	int tabWindowHeight = std::abs(displayRect.top);
 
 	indentTop = iIndentRebar;
@@ -496,8 +497,8 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 	SetWindowPos(m_hTabBacking, m_hDisplayWindow, iTabBackingLeft, iTabTop, iTabBackingWidth,
 		tabWindowHeight, uFlags);
 
-	SetWindowPos(m_tabContainer->GetHWND(), nullptr, 0, 0, iTabBackingWidth - 25, tabWindowHeight,
-		SWP_SHOWWINDOW | SWP_NOZORDER);
+	SetWindowPos(GetActivePane()->GetTabContainer()->GetHWND(), nullptr, 0, 0,
+		iTabBackingWidth - 25, tabWindowHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
 
 	/* Tab close button. */
 	int scaledCloseToolbarXOffset =
@@ -550,11 +551,11 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 
 	/* <---- ALL listview windows ----> */
 
-	for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
+	for (auto &tab : GetActivePane()->GetTabContainer()->GetAllTabs() | boost::adaptors::map_values)
 	{
 		uFlags = SWP_NOZORDER;
 
-		if (m_tabContainer->IsTabSelected(*tab))
+		if (GetActivePane()->GetTabContainer()->IsTabSelected(*tab))
 		{
 			uFlags |= SWP_SHOWWINDOW;
 		}
@@ -653,7 +654,7 @@ int Explorerplusplus::OnDestroy()
 
 void Explorerplusplus::RequestCloseApplication()
 {
-	if (m_config->confirmCloseTabs && (m_tabContainer->GetNumTabs() > 1))
+	if (m_config->confirmCloseTabs && (GetActivePane()->GetTabContainer()->GetNumTabs() > 1))
 	{
 		std::wstring message =
 			ResourceHelper::LoadString(m_resourceInstance, IDS_GENERAL_CLOSE_ALL_TABS);
@@ -748,7 +749,7 @@ void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
 /* Cycle through the current views. */
 void Explorerplusplus::OnToolbarViews()
 {
-	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	selectedTab.GetShellBrowser()->CycleViewMode(true);
 }
 
@@ -880,7 +881,7 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 
 void Explorerplusplus::OnRefresh()
 {
-	Tab &tab = m_tabContainer->GetSelectedTab();
+	Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	tab.GetShellBrowser()->GetNavigationController()->Refresh();
 }
 
@@ -936,7 +937,7 @@ void Explorerplusplus::CopyColumnInfoToClipboard()
 
 void Explorerplusplus::OnDirectoryModified(const Tab &tab)
 {
-	if (m_tabContainer->IsTabSelected(tab))
+	if (GetActivePane()->GetTabContainer()->IsTabSelected(tab))
 	{
 		UpdateStatusBarText(tab);
 		UpdateDisplayWindow(tab);
@@ -1008,7 +1009,7 @@ void Explorerplusplus::OnAssocChanged()
 	needs to be called to get each files icon again. */
 
 	/* Now, go through each tab, and refresh each icon. */
-	for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
+	for (auto &tab : GetActivePane()->GetTabContainer()->GetAllTabs() | boost::adaptors::map_values)
 	{
 		tab->GetShellBrowser()->GetNavigationController()->Refresh();
 	}
@@ -1084,7 +1085,7 @@ void Explorerplusplus::OnDisplayWindowRClick(POINT *ptClient)
 
 void Explorerplusplus::OnSortBy(SortMode sortMode)
 {
-	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	SortMode currentSortMode = selectedTab.GetShellBrowser()->GetSortMode();
 
 	if (sortMode == currentSortMode)
@@ -1100,7 +1101,7 @@ void Explorerplusplus::OnSortBy(SortMode sortMode)
 
 void Explorerplusplus::OnGroupBy(SortMode groupMode)
 {
-	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	SortMode currentGroupMode = selectedTab.GetShellBrowser()->GetGroupMode();
 
 	if (selectedTab.GetShellBrowser()->GetShowInGroups() && groupMode == currentGroupMode)
@@ -1117,25 +1118,25 @@ void Explorerplusplus::OnGroupBy(SortMode groupMode)
 
 void Explorerplusplus::OnGroupByNone()
 {
-	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	selectedTab.GetShellBrowser()->SetShowInGroups(false);
 }
 
 void Explorerplusplus::OnSortDirectionSelected(SortDirection direction)
 {
-	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	selectedTab.GetShellBrowser()->SetSortDirection(direction);
 }
 
 void Explorerplusplus::OnGroupSortDirectionSelected(SortDirection direction)
 {
-	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	selectedTab.GetShellBrowser()->SetGroupSortDirection(direction);
 }
 
 void Explorerplusplus::SaveAllSettings()
 {
-	m_iLastSelectedTab = m_tabContainer->GetSelectedTabIndex();
+	m_iLastSelectedTab = GetActivePane()->GetTabContainer()->GetSelectedTabIndex();
 
 	ILoadSave *pLoadSave = nullptr;
 
@@ -1193,7 +1194,7 @@ CoreInterface *Explorerplusplus::GetCoreInterface()
 
 TabContainer *Explorerplusplus::GetTabContainer() const
 {
-	return m_tabContainer;
+	return GetActivePane()->GetTabContainer();
 }
 
 TabRestorer *Explorerplusplus::GetTabRestorer() const
@@ -1233,7 +1234,7 @@ void Explorerplusplus::SetSavePreferencesToXmlFile(BOOL savePreferencesToXmlFile
 
 void Explorerplusplus::OnShowHiddenFiles()
 {
-	Tab &tab = m_tabContainer->GetSelectedTab();
+	Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	tab.GetShellBrowser()->SetShowHidden(!tab.GetShellBrowser()->GetShowHidden());
 	tab.GetShellBrowser()->GetNavigationController()->Refresh();
 }
@@ -1256,7 +1257,7 @@ boost::signals2::connection Explorerplusplus::AddFocusChangeObserver(
 
 void Explorerplusplus::FocusActiveTab()
 {
-	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	SetFocus(selectedTab.GetShellBrowser()->GetListView());
 }
 

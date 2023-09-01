@@ -568,6 +568,9 @@
     <ClCompile Include="FeatureList.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="BrowserPane.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1150,6 +1153,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Feature.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="BrowserPane.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

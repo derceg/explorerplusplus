@@ -59,7 +59,11 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 
 	case WM_CONTEXTMENU:
 		if (reinterpret_cast<HWND>(wParam)
-			== m_tabContainer->GetSelectedTab().GetShellBrowser()->GetListView())
+			== GetActivePane()
+				   ->GetTabContainer()
+				   ->GetSelectedTab()
+				   .GetShellBrowser()
+				   ->GetListView())
 		{
 			OnShowListViewContextMenu({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
 			return 0;
@@ -131,7 +135,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 
 			m_pActiveShellBrowser->SetCurrentColumns(currentColumns);
 
-			Tab &tab = m_tabContainer->GetSelectedTab();
+			Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 			tab.GetShellBrowser()->GetNavigationController()->Refresh();
 
 			return TRUE;
@@ -174,7 +178,7 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 
 int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 {
-	for (auto &item : m_tabContainer->GetAllTabs())
+	for (auto &item : GetActivePane()->GetTabContainer()->GetAllTabs())
 	{
 		if (item.second->GetShellBrowser()->GetListView() == hListView)
 		{
@@ -196,7 +200,7 @@ void Explorerplusplus::OnShowListViewContextMenu(const POINT &ptScreen)
 		keyboardGenerated = true;
 	}
 
-	Tab &tab = m_tabContainer->GetSelectedTab();
+	Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 
 	if (ListView_GetSelectedCount(tab.GetShellBrowser()->GetListView()) == 0)
 	{
@@ -249,7 +253,7 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 
 void Explorerplusplus::OnListViewBackgroundRClickWindows8OrGreater(POINT *pCursorPos)
 {
-	const auto &selectedTab = m_tabContainer->GetSelectedTab();
+	const auto &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	auto pidlDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
 
 	FileContextMenuManager fcmm(selectedTab.GetShellBrowser()->GetListView(), pidlDirectory.get(),
@@ -279,7 +283,7 @@ void Explorerplusplus::OnListViewBackgroundRClickWindows7(POINT *pCursorPos)
 	auto parentMenu = InitializeRightClickMenu();
 	HMENU menu = GetSubMenu(parentMenu.get(), 0);
 
-	const auto &selectedTab = m_tabContainer->GetSelectedTab();
+	const auto &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	auto pidlDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
 
 	unique_pidl_absolute pidlParent(ILCloneFull(pidlDirectory.get()));
@@ -330,7 +334,8 @@ wil::unique_hmenu Explorerplusplus::InitializeRightClickMenu()
 	DeleteMenu(parentMenu.get(), IDM_RCLICK_VIEW_PLACEHOLDER, MF_BYCOMMAND);
 
 	SortMenuBuilder sortMenuBuilder(m_resourceInstance);
-	auto [sortByMenu, groupByMenu] = sortMenuBuilder.BuildMenus(m_tabContainer->GetSelectedTab());
+	auto [sortByMenu, groupByMenu] =
+		sortMenuBuilder.BuildMenus(GetActivePane()->GetTabContainer()->GetSelectedTab());
 
 	MenuHelper::AttachSubMenu(parentMenu.get(), std::move(sortByMenu), IDM_POPUP_SORTBY, FALSE);
 	MenuHelper::AttachSubMenu(parentMenu.get(), std::move(groupByMenu), IDM_POPUP_GROUPBY, FALSE);
@@ -467,7 +472,7 @@ void Explorerplusplus::OnListViewCopyUniversalPaths() const
 
 void Explorerplusplus::OnListViewSetFileAttributes() const
 {
-	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	selectedTab.GetShellBrowser()->SetFileAttributesForSelection();
 }
 
@@ -481,7 +486,7 @@ void Explorerplusplus::OnListViewPaste()
 		return;
 	}
 
-	const auto &selectedTab = m_tabContainer->GetSelectedTab();
+	const auto &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	auto directory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
 
 	if (CanShellPasteDataObject(directory.get(), clipboardObject.get(),

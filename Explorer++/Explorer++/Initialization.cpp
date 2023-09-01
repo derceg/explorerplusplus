@@ -83,8 +83,8 @@ void Explorerplusplus::OnCreate()
 	size initially. */
 	UpdateLayout();
 
-	m_taskbarThumbnails =
-		TaskbarThumbnails::Create(this, m_tabContainer, m_resourceInstance, m_config);
+	m_taskbarThumbnails = TaskbarThumbnails::Create(this, GetActivePane()->GetTabContainer(),
+		m_resourceInstance, m_config);
 
 	RestoreTabs(pLoadSave);
 	delete pLoadSave;
@@ -99,7 +99,7 @@ void Explorerplusplus::OnCreate()
 
 	SetFocus(m_hActiveListView);
 
-	m_uiTheming = std::make_unique<UiTheming>(this, m_tabContainer);
+	m_uiTheming = std::make_unique<UiTheming>(this, GetActivePane()->GetTabContainer());
 
 	InitializePlugins();
 
@@ -143,7 +143,7 @@ wil::unique_hmenu Explorerplusplus::BuildViewsMenu()
 	wil::unique_hmenu viewsMenu(CreatePopupMenu());
 	AddViewModesToMenu(viewsMenu.get(), 0, TRUE);
 
-	const Tab &tab = m_tabContainer->GetSelectedTab();
+	const Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	ViewMode currentViewMode = tab.GetShellBrowser()->GetViewMode();
 
 	CheckMenuRadioItem(viewsMenu.get(), IDM_VIEW_THUMBNAILS, IDM_VIEW_EXTRALARGEICONS,

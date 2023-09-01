@@ -45,7 +45,7 @@ void Explorerplusplus::CreateTabBacking()
 
 void Explorerplusplus::OnTabsInitialized()
 {
-	m_tabContainer->tabCreatedSignal.AddObserver(
+	GetActivePane()->GetTabContainer()->tabCreatedSignal.AddObserver(
 		[this](int tabId, BOOL switchToNewTab)
 		{
 			UNREFERENCED_PARAMETER(tabId);
@@ -54,10 +54,10 @@ void Explorerplusplus::OnTabsInitialized()
 			UpdateTabToolbar();
 		});
 
-	m_tabContainer->tabUpdatedSignal.AddObserver(
+	GetActivePane()->GetTabContainer()->tabUpdatedSignal.AddObserver(
 		std::bind_front(&Explorerplusplus::OnTabUpdated, this));
 
-	m_tabContainer->tabSelectedSignal.AddObserver(
+	GetActivePane()->GetTabContainer()->tabSelectedSignal.AddObserver(
 		[this](const Tab &tab)
 		{
 			UNREFERENCED_PARAMETER(tab);
@@ -65,7 +65,7 @@ void Explorerplusplus::OnTabsInitialized()
 			UpdateTabToolbar();
 		});
 
-	m_tabContainer->tabRemovedSignal.AddObserver(
+	GetActivePane()->GetTabContainer()->tabRemovedSignal.AddObserver(
 		[this](int tabId)
 		{
 			UNREFERENCED_PARAMETER(tabId);
@@ -82,7 +82,7 @@ void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyTy
 		/* If the tab that was locked/unlocked is the
 		currently selected tab, then the tab close
 		button on the toolbar will need to be updated. */
-		if (m_tabContainer->IsTabSelected(tab))
+		if (GetActivePane()->GetTabContainer()->IsTabSelected(tab))
 		{
 			UpdateTabToolbar();
 		}
@@ -92,9 +92,9 @@ void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyTy
 
 void Explorerplusplus::UpdateTabToolbar()
 {
-	const int nTabs = m_tabContainer->GetNumTabs();
+	const int nTabs = GetActivePane()->GetTabContainer()->GetNumTabs();
 
-	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 
 	if (nTabs > 1 && selectedTab.GetLockState() == Tab::LockState::NotLocked)
 	{

@@ -103,11 +103,11 @@ void Explorerplusplus::OnSearch()
 {
 	if (g_hwndSearch == nullptr)
 	{
-		Tab &selectedTab = m_tabContainer->GetSelectedTab();
+		Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 		std::wstring currentDirectory = selectedTab.GetShellBrowser()->GetDirectory();
 
 		auto *searchDialog = new SearchDialog(m_resourceInstance, m_hContainer, currentDirectory,
-			this, this, m_tabContainer);
+			this, this, GetActivePane()->GetTabContainer());
 		g_hwndSearch = searchDialog->ShowModelessDialog([]() { g_hwndSearch = nullptr; });
 	}
 	else
@@ -258,7 +258,8 @@ void Explorerplusplus::OnResolveLink()
 			StringCchCopy(szPath, SIZEOF_ARRAY(szPath), szFullFileName);
 			PathRemoveFileSpec(szPath);
 
-			Tab &newTab = m_tabContainer->CreateNewTab(szPath, TabSettings(_selected = true));
+			Tab &newTab = GetActivePane()->GetTabContainer()->CreateNewTab(szPath,
+				TabSettings(_selected = true));
 
 			if (newTab.GetShellBrowser()->GetDirectory() == szPath)
 			{
@@ -288,25 +289,25 @@ void Explorerplusplus::OnResolveLink()
 
 HRESULT Explorerplusplus::OnGoBack()
 {
-	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	return selectedTab.GetShellBrowser()->GetNavigationController()->GoBack();
 }
 
 HRESULT Explorerplusplus::OnGoForward()
 {
-	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	return selectedTab.GetShellBrowser()->GetNavigationController()->GoForward();
 }
 
 HRESULT Explorerplusplus::OnNavigateUp()
 {
-	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	return selectedTab.GetShellBrowser()->GetNavigationController()->GoUp();
 }
 
 HRESULT Explorerplusplus::OnGoToOffset(int offset)
 {
-	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	return selectedTab.GetShellBrowser()->GetNavigationController()->GoToOffset(offset);
 }
 
@@ -339,14 +340,14 @@ HRESULT Explorerplusplus::OnGoToPath(const std::wstring &path)
 
 HRESULT Explorerplusplus::GoToPidl(PCIDLIST_ABSOLUTE pidl)
 {
-	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	auto navigateParams = NavigateParams::Normal(pidl);
 	return selectedTab.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
 }
 
 HRESULT Explorerplusplus::OnGoHome()
 {
-	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	HRESULT hr = selectedTab.GetShellBrowser()->GetNavigationController()->Navigate(
 		m_config->defaultTabDirectory);
 

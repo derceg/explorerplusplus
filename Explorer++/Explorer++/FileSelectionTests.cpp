@@ -15,7 +15,7 @@ BOOL Explorerplusplus::AnyItemsSelected() const
 
 	if (hFocus == m_hActiveListView)
 	{
-		const Tab &selectedTab = m_tabContainer->GetSelectedTab();
+		const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 
 		if (ListView_GetSelectedCount(selectedTab.GetShellBrowser()->GetListView()) > 0)
 		{
@@ -35,7 +35,7 @@ BOOL Explorerplusplus::AnyItemsSelected() const
 
 bool Explorerplusplus::CanCreate() const
 {
-	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	auto pidlDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
 
 	SFGAOF attributes = SFGAO_FILESYSTEM;
@@ -106,7 +106,7 @@ HRESULT Explorerplusplus::GetSelectionAttributes(SFGAOF *pItemAttributes) const
 
 	if (hFocus == m_hActiveListView)
 	{
-		const Tab &selectedTab = m_tabContainer->GetSelectedTab();
+		const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 		hr = selectedTab.GetShellBrowser()->GetListViewSelectionAttributes(pItemAttributes);
 	}
 	else if (hFocus == m_shellTreeView->GetHWND())
@@ -161,7 +161,7 @@ BOOL Explorerplusplus::CanPasteShellData(PasteType pastType) const
 
 	if (focus == m_hActiveListView)
 	{
-		const Tab &selectedTab = m_tabContainer->GetSelectedTab();
+		const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 		directory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
 	}
 	else if (focus == m_shellTreeView->GetHWND())

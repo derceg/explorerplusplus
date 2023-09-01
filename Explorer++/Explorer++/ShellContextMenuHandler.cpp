@@ -87,7 +87,8 @@ void Explorerplusplus::UpdateBackgroundContextMenu(IContextMenu *contextMenu, HM
 			DeleteMenu(menu, i, MF_BYPOSITION);
 
 			SortMenuBuilder sortMenuBuilder(m_resourceInstance);
-			auto sortMenus = sortMenuBuilder.BuildMenus(m_tabContainer->GetSelectedTab());
+			auto sortMenus =
+				sortMenuBuilder.BuildMenus(GetActivePane()->GetTabContainer()->GetSelectedTab());
 
 			std::wstring text =
 				ResourceHelper::LoadString(m_resourceInstance, IDS_BACKGROUND_CONTEXT_MENU_SORT_BY);
@@ -98,7 +99,8 @@ void Explorerplusplus::UpdateBackgroundContextMenu(IContextMenu *contextMenu, HM
 			DeleteMenu(menu, i, MF_BYPOSITION);
 
 			SortMenuBuilder sortMenuBuilder(m_resourceInstance);
-			auto sortMenus = sortMenuBuilder.BuildMenus(m_tabContainer->GetSelectedTab());
+			auto sortMenus =
+				sortMenuBuilder.BuildMenus(GetActivePane()->GetTabContainer()->GetSelectedTab());
 
 			std::wstring text = ResourceHelper::LoadString(m_resourceInstance,
 				IDS_BACKGROUND_CONTEXT_MENU_GROUP_BY);
@@ -252,7 +254,7 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	{
 		if (pfcmi->uFrom == FROM_LISTVIEW)
 		{
-			Tab &selectedTab = m_tabContainer->GetSelectedTab();
+			Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 			selectedTab.GetShellBrowser()->CopySelectedItemsToClipboard(true);
 		}
 		else if (pfcmi->uFrom == FROM_TREEVIEW)
@@ -268,7 +270,7 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	{
 		if (pfcmi->uFrom == FROM_LISTVIEW)
 		{
-			Tab &selectedTab = m_tabContainer->GetSelectedTab();
+			Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 			selectedTab.GetShellBrowser()->CopySelectedItemsToClipboard(false);
 		}
 		else if (pfcmi->uFrom == FROM_TREEVIEW)
@@ -316,7 +318,7 @@ void Explorerplusplus::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 
 		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
 		auto navigateParams = NavigateParams::Normal(pidlComplete.get());
-		m_tabContainer->CreateNewTab(navigateParams,
+		GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams,
 			TabSettings(_selected = m_config->openTabsInForeground));
 	}
 	break;

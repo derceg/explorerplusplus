@@ -65,7 +65,7 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 	indentTop = indentRebar;
 
 	RECT tabWindowRect;
-	GetClientRect(m_tabContainer->GetHWND(), &tabWindowRect);
+	GetClientRect(GetActivePane()->GetTabContainer()->GetHWND(), &tabWindowRect);
 
 	int tabWindowHeight = GetRectHeight(&tabWindowRect);
 

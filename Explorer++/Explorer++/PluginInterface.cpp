@@ -7,7 +7,7 @@
 
 TabContainer *Explorerplusplus::GetTabContainer()
 {
-	return m_tabContainer;
+	return GetActivePane()->GetTabContainer();
 }
 
 Plugins::PluginMenuManager *Explorerplusplus::GetPluginMenuManager()

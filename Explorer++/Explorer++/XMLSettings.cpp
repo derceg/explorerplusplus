@@ -926,7 +926,8 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 			}
 		}
 
-		m_tabContainer->CreateNewTab(szDirectory, tabSettings, &folderSettings, &initialColumns);
+		GetActivePane()->GetTabContainer()->CreateNewTab(szDirectory, tabSettings, &folderSettings,
+			&initialColumns);
 
 		nTabsCreated++;
 	}
@@ -956,7 +957,7 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom, IXM
 	auto bstr_wsntt = wil::make_bstr_nothrow(L"\n\t\t");
 	auto bstr_wsnttt = wil::make_bstr_nothrow(L"\n\t\t\t");
 
-	for (auto tabRef : m_tabContainer->GetAllTabsInOrder())
+	for (auto tabRef : GetActivePane()->GetTabContainer()->GetAllTabsInOrder())
 	{
 		auto &tab = tabRef.get();
 

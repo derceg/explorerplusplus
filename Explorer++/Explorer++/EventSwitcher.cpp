@@ -51,7 +51,7 @@ void Explorerplusplus::OnCopy(BOOL bCopy)
 
 	if (hFocus == m_hActiveListView)
 	{
-		Tab &selectedTab = m_tabContainer->GetSelectedTab();
+		Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 		selectedTab.GetShellBrowser()->CopySelectedItemsToClipboard(bCopy);
 	}
 	else if (hFocus == m_shellTreeView->GetHWND())
@@ -66,7 +66,7 @@ void Explorerplusplus::OnFileRename()
 
 	if (hFocus == m_hActiveListView)
 	{
-		Tab &selectedTab = m_tabContainer->GetSelectedTab();
+		Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 		selectedTab.GetShellBrowser()->StartRenamingSelectedItems();
 	}
 	else if (hFocus == m_shellTreeView->GetHWND())
@@ -83,7 +83,7 @@ void Explorerplusplus::OnFileDelete(bool permanent)
 
 	if (hFocus == m_hActiveListView)
 	{
-		Tab &tab = m_tabContainer->GetSelectedTab();
+		Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 		tab.GetShellBrowser()->DeleteSelectedItems(permanent);
 	}
 	else if (hFocus == m_shellTreeView->GetHWND())
@@ -116,7 +116,7 @@ void Explorerplusplus::OnShowFileProperties() const
 
 	if (hFocus == m_hActiveListView)
 	{
-		const Tab &selectedTab = m_tabContainer->GetSelectedTab();
+		const Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 		selectedTab.GetShellBrowser()->ShowPropertiesForSelectedFiles();
 	}
 	else if (hFocus == m_shellTreeView->GetHWND())
@@ -179,7 +179,7 @@ BOOL Explorerplusplus::OnMouseWheel(MousewheelSource mousewheelSource, WPARAM wP
 	{
 		if (wParam & MK_CONTROL)
 		{
-			Tab &selectedTab = m_tabContainer->GetSelectedTab();
+			Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 
 			/* Switch listview views. For each wheel delta
 			(notch) the wheel is scrolled through, switch
@@ -224,11 +224,12 @@ BOOL Explorerplusplus::OnMouseWheel(MousewheelSource mousewheelSource, WPARAM wP
 			SendMessage(m_shellTreeView->GetHWND(), WM_MOUSEWHEEL, wParam, lParam);
 		}
 	}
-	else if (hwnd == m_tabContainer->GetHWND())
+	else if (hwnd == GetActivePane()->GetTabContainer()->GetHWND())
 	{
 		bMessageHandled = TRUE;
 
-		HWND hUpDown = FindWindowEx(m_tabContainer->GetHWND(), nullptr, UPDOWN_CLASS, nullptr);
+		HWND hUpDown = FindWindowEx(GetActivePane()->GetTabContainer()->GetHWND(), nullptr,
+			UPDOWN_CLASS, nullptr);
 
 		if (hUpDown != nullptr)
 		{
@@ -260,7 +261,7 @@ BOOL Explorerplusplus::OnMouseWheel(MousewheelSource mousewheelSource, WPARAM wP
 					}
 				}
 
-				SendMessage(m_tabContainer->GetHWND(), WM_HSCROLL,
+				SendMessage(GetActivePane()->GetTabContainer()->GetHWND(), WM_HSCROLL,
 					MAKEWPARAM(SB_THUMBPOSITION, iScrollPos), NULL);
 			}
 		}

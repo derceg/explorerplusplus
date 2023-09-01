@@ -46,8 +46,8 @@ void Explorerplusplus::CreateFolderControls()
 
 	SetWindowSubclass(m_treeViewHolder->GetHWND(), TreeViewHolderProcStub, 0, (DWORD_PTR) this);
 
-	m_shellTreeView = ShellTreeView::Create(m_treeViewHolder->GetHWND(), this, m_tabContainer,
-		&m_FileActionHandler, &m_cachedIcons);
+	m_shellTreeView = ShellTreeView::Create(m_treeViewHolder->GetHWND(), this,
+		GetActivePane()->GetTabContainer(), &m_FileActionHandler, &m_cachedIcons);
 	m_treeViewHolder->SetContentChild(m_shellTreeView->GetHWND());
 
 	/* Now, subclass the treeview again. This is needed for messages
@@ -68,7 +68,7 @@ void Explorerplusplus::CreateFolderControls()
 			}
 		});
 
-	m_tabContainer->tabCreatedSignal.AddObserver(
+	GetActivePane()->GetTabContainer()->tabCreatedSignal.AddObserver(
 		[this](int tabId, BOOL switchToNewTab)
 		{
 			UNREFERENCED_PARAMETER(tabId);
@@ -77,7 +77,7 @@ void Explorerplusplus::CreateFolderControls()
 			UpdateTreeViewSelection();
 		});
 
-	m_tabContainer->tabNavigationCommittedSignal.AddObserver(
+	GetActivePane()->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
 		[this](const Tab &tab, const NavigateParams &navigateParams)
 		{
 			UNREFERENCED_PARAMETER(tab);
@@ -86,7 +86,7 @@ void Explorerplusplus::CreateFolderControls()
 			UpdateTreeViewSelection();
 		});
 
-	m_tabContainer->tabSelectedSignal.AddObserver(
+	GetActivePane()->GetTabContainer()->tabSelectedSignal.AddObserver(
 		[this](const Tab &tab)
 		{
 			UNREFERENCED_PARAMETER(tab);
@@ -94,7 +94,7 @@ void Explorerplusplus::CreateFolderControls()
 			UpdateTreeViewSelection();
 		});
 
-	m_tabContainer->tabRemovedSignal.AddObserver(
+	GetActivePane()->GetTabContainer()->tabRemovedSignal.AddObserver(
 		[this](int tabId)
 		{
 			UNREFERENCED_PARAMETER(tabId);
@@ -300,7 +300,7 @@ void Explorerplusplus::OnTreeViewSelectionChanged(const NMTREEVIEW *eventInfo)
 
 void Explorerplusplus::HandleTreeViewSelectionChanged(const NMTREEVIEW *eventInfo)
 {
-	Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	auto pidlCurrentDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
 
 	auto pidlDirectory = m_shellTreeView->GetNodePidl(eventInfo->itemNew.hItem);

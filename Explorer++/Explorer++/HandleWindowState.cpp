@@ -26,7 +26,7 @@ void Explorerplusplus::UpdateWindowStates(const Tab &tab)
  */
 void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 {
-	const Tab &tab = m_tabContainer->GetSelectedTab();
+	const Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 
 	ViewMode viewMode = tab.GetShellBrowser()->GetViewMode();
 	bool virtualFolder = tab.GetShellBrowser()->InVirtualFolder();

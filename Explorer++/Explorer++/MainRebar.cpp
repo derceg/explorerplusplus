@@ -474,7 +474,7 @@ HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 	std::vector<HistoryEntry *> history;
 	int iBase;
 
-	const Tab &tab = m_tabContainer->GetSelectedTab();
+	const Tab &tab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 
 	if (bBack)
 	{

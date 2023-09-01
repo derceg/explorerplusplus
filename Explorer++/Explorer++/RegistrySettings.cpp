@@ -580,7 +580,7 @@ void Explorerplusplus::SaveTabSettingsToRegistry()
 	{
 		int tabNum = 0;
 
-		for (auto tabRef : m_tabContainer->GetAllTabsInOrder())
+		for (auto tabRef : GetActivePane()->GetTabContainer()->GetAllTabsInOrder())
 		{
 			auto &tab = tabRef.get();
 
@@ -869,8 +869,8 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 			}
 
 			auto navigateParams = NavigateParams::Normal(pidlDirectory);
-			m_tabContainer->CreateNewTab(navigateParams, tabSettings, &folderSettings,
-				&initialColumns);
+			GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams, tabSettings,
+				&folderSettings, &initialColumns);
 
 			nTabsCreated++;
 
