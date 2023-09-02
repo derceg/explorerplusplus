@@ -111,13 +111,6 @@ LRESULT AddressBar::EditSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 	case WM_SETFOCUS:
 		m_coreInterface->FocusChanged();
 		break;
-
-	case WM_MOUSEWHEEL:
-		if (m_coreInterface->OnMouseWheel(MousewheelSource::Other, wParam, lParam))
-		{
-			return 0;
-		}
-		break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);

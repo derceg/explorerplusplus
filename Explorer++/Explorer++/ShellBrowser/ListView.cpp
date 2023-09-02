@@ -104,6 +104,14 @@ LRESULT ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
 		HANDLE_WM_RBUTTONDOWN(hwnd, wParam, lParam, OnRButtonDown);
 		break;
 
+	case WM_MOUSEWHEEL:
+		if (OnMouseWheel(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), GET_WHEEL_DELTA_WPARAM(wParam),
+				GET_KEYSTATE_WPARAM(wParam)))
+		{
+			return 0;
+		}
+		break;
+
 	case WM_CLIPBOARDUPDATE:
 		OnClipboardUpdate();
 		return 0;
@@ -297,6 +305,37 @@ void ShellBrowser::OnRButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT
 			ListViewHelper::SelectItem(m_hListView, itemAtPoint, TRUE);
 		}
 	}
+}
+
+bool ShellBrowser::OnMouseWheel(int xPos, int yPos, int delta, UINT keys)
+{
+	UNREFERENCED_PARAMETER(xPos);
+	UNREFERENCED_PARAMETER(yPos);
+
+	if (WI_IsFlagSet(keys, MK_CONTROL))
+	{
+		// Switch listview views. For each wheel delta (notch) the wheel is scrolled through, switch
+		// the view once.
+		for (int i = 0; i < abs(delta / WHEEL_DELTA); i++)
+		{
+			CycleViewMode(delta > 0);
+		}
+
+		return true;
+	}
+	else if (WI_IsFlagSet(keys, MK_SHIFT))
+	{
+		int offset = delta / WHEEL_DELTA;
+
+		if (offset != 0)
+		{
+			GetNavigationController()->GoToOffset(offset);
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)

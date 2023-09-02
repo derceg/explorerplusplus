@@ -422,6 +422,7 @@ private:
 	void OnListViewMButtonDown(const POINT *pt);
 	void OnListViewMButtonUp(const POINT *pt, UINT keysDown);
 	void OnRButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT keyFlags);
+	bool OnMouseWheel(int xPos, int yPos, int delta, UINT keys);
 	void OnListViewGetDisplayInfo(LPARAM lParam);
 	LRESULT OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip);
 	BOOL OnListViewGetEmptyMarkup(NMLVEMPTYMARKUP *emptyMarkup);

@@ -6,13 +6,6 @@
 
 #include <boost/signals2.hpp>
 
-enum class MousewheelSource
-{
-	ListView,
-	TreeView,
-	Other
-};
-
 // Stops signal propagation after the first successful handler (i.e. the first handler that returns
 // a result that evaluates to true).
 template <typename T>
@@ -104,8 +97,6 @@ public:
 	virtual BOOL CanDelete() const = 0;
 	virtual BOOL CanShowFileProperties() const = 0;
 	virtual BOOL CanPaste() const = 0;
-
-	virtual BOOL OnMouseWheel(MousewheelSource mousewheelSource, WPARAM wParam, LPARAM lParam) = 0;
 
 	virtual void ShowTabBar() = 0;
 	virtual void HideTabBar() = 0;

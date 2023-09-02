@@ -70,13 +70,6 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 		}
 		break;
 
-	case WM_MOUSEWHEEL:
-		if (OnMouseWheel(MousewheelSource::ListView, wParam, lParam))
-		{
-			return 0;
-		}
-		break;
-
 	case WM_NOTIFY:
 		switch (((LPNMHDR) lParam)->code)
 		{

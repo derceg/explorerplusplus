@@ -557,7 +557,6 @@ private:
 	/* Miscellaneous. */
 	void InitializeDisplayWindow();
 	void ShowMainRebarBand(HWND hwnd, BOOL bShow);
-	BOOL OnMouseWheel(MousewheelSource mousewheelSource, WPARAM wParam, LPARAM lParam) override;
 	StatusBar *GetStatusBar() override;
 	void StartDirectoryMonitoringForTab(const Tab &tab);
 	void StopDirectoryMonitoringForTab(const Tab &tab);
@@ -691,9 +690,6 @@ private:
 
 	/* Menu images. */
 	std::vector<wil::unique_hbitmap> m_menuImages;
-
-	/* Mousewheel. */
-	int m_zDeltaTotal;
 
 	// WM_DEVICECHANGE notifications
 	DeviceChangeSignal m_deviceChangeSignal;

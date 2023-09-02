@@ -123,13 +123,6 @@ LRESULT CALLBACK Explorerplusplus::TreeViewSubclass(HWND hwnd, UINT uMsg, WPARAM
 	case WM_SETFOCUS:
 		FocusChanged();
 		break;
-
-	case WM_MOUSEWHEEL:
-		if (OnMouseWheel(MousewheelSource::TreeView, wParam, lParam))
-		{
-			return 0;
-		}
-		break;
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
