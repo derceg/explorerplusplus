@@ -499,6 +499,10 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		OnResolveLink();
 		break;
 
+	case IDM_VIEW_DUAL_PANE:
+		ToggleDualPane();
+		break;
+
 	case IDM_VIEW_STATUSBAR:
 		m_config->showStatusBar = !m_config->showStatusBar;
 		lShowWindow(m_hStatusBar, m_config->showStatusBar);

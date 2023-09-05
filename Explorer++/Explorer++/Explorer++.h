@@ -418,6 +418,7 @@ private:
 	void ToggleFolders();
 	void UpdateLayout();
 	void OnTreeViewHolderResized(int newWidth);
+	void ToggleDualPane();
 
 	// Status bar
 	void CreateStatusBar();

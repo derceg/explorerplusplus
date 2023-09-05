@@ -109,3 +109,8 @@ void Explorerplusplus::UpdateLayout()
 	GetClientRect(m_hContainer, &rc);
 	SendMessage(m_hContainer, WM_SIZE, SIZE_RESTORED, MAKELPARAM(rc.right, rc.bottom));
 }
+
+void Explorerplusplus::ToggleDualPane()
+{
+	m_config->dualPane = !m_config->dualPane;
+}

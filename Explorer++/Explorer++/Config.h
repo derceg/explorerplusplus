@@ -51,6 +51,7 @@ struct Config
 	StartupMode startupMode = StartupMode::PreviousTabs;
 	std::wstring defaultTabDirectory = GetComputerFolderPath();
 	const std::wstring defaultTabDirectoryStatic = GetComputerFolderPath();
+	bool dualPane = false;
 	BOOL showStatusBar = TRUE;
 	ValueWrapper<bool> showFolders = true;
 	BOOL showAddressBar = TRUE;
