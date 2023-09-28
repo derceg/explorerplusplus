@@ -781,7 +781,6 @@
 #define IDM_TOOLS_SEARCH                40417
 #define IDM_VIEW_SAVECOLUMNLAYOUTASDEFAULT 40419
 #define IDM_TAB_CLOSETABSTORIGHT        40429
-#define IDM_RCLICK_VIEW_PLACEHOLDER     40430
 #define ID_POPUP_RENAME                 40433
 #define ID_POPUP_NEWFOLDER              40434
 #define ID_POPUP_OPENINNEWTAB           40444
@@ -865,6 +864,7 @@
 #define IDM_VIEW_DECREASE_TEXT_SIZE     40546
 #define IDM_VIEW_INCREASE_TEXT_SIZE     40547
 #define IDM_VIEW_DUAL_PANE              40548
+#define IDM_POPUP_VIEW                  40549
 #define IDM_SORTBY_NAME                 50000
 #define IDM_SORTBY_SIZE                 50001
 #define IDM_SORTBY_TYPE                 50002
@@ -1006,7 +1006,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        394
-#define _APS_NEXT_COMMAND_VALUE         40549
+#define _APS_NEXT_COMMAND_VALUE         40550
 #define _APS_NEXT_CONTROL_VALUE         1374
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

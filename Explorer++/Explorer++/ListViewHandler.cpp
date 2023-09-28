@@ -317,14 +317,7 @@ wil::unique_hmenu Explorerplusplus::InitializeRightClickMenu()
 	wil::unique_hmenu parentMenu(
 		LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_MAINMENU_RCLICK)));
 
-	for (auto viewMode : VIEW_MODES)
-	{
-		std::wstring text = GetViewModeMenuText(viewMode, m_resourceInstance);
-		MenuHelper::AddStringItem(parentMenu.get(), GetViewModeMenuId(viewMode), text,
-			IDM_RCLICK_VIEW_PLACEHOLDER, FALSE);
-	}
-
-	DeleteMenu(parentMenu.get(), IDM_RCLICK_VIEW_PLACEHOLDER, MF_BYCOMMAND);
+	MenuHelper::AttachSubMenu(parentMenu.get(), BuildViewsMenu(), IDM_POPUP_VIEW, FALSE);
 
 	SortMenuBuilder sortMenuBuilder(m_resourceInstance);
 	auto [sortByMenu, groupByMenu] =
