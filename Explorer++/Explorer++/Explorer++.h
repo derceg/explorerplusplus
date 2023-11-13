@@ -137,7 +137,7 @@ private:
 	static inline constexpr COLORREF TAB_BAR_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
 
 	// When changing the font size, it will be decreased/increased by this amount.
-	static const int FONT_SIZE_CHANGE_DELTA = 2_pt;
+	static const int FONT_SIZE_CHANGE_DELTA = 1_pt;
 
 	struct FileContextMenuInfo
 	{
