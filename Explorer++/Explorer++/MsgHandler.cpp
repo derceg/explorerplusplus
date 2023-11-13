@@ -1311,3 +1311,25 @@ void Explorerplusplus::OnChangeMainFontSize(FontSizeType sizeType)
 
 	m_config->mainFont = CustomFont(updatedFontName, updatedFontSize);
 }
+
+void Explorerplusplus::OnResetMainFontSize()
+{
+	auto &mainFont = m_config->mainFont.get();
+
+	if (!mainFont)
+	{
+		// The default font is being used, so the font size is currently the default size and
+		// nothing needs to change.
+		return;
+	}
+
+	auto systemLogFont = GetDefaultSystemFontScaledToWindow(m_hContainer);
+	int systemFontSize = std::abs(
+		DpiCompatibility::GetInstance().PixelsToPoints(m_hContainer, systemLogFont.lfHeight));
+
+	// Different fonts can have different metrics, so there isn't really a concept of a "default"
+	// font size. The size of the default system font is taken as a reasonable proxy. This also
+	// means that if the user only changes the font size (while still using the system font),
+	// resetting the font size will work as expected.
+	m_config->mainFont = CustomFont(mainFont->GetName(), systemFontSize);
+}

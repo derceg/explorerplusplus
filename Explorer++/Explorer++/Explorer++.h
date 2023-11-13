@@ -215,6 +215,7 @@ private:
 	void OnAssocChanged();
 	void OnSelectTabByIndex(int iTab);
 	void OnChangeMainFontSize(FontSizeType sizeType);
+	void OnResetMainFontSize();
 
 	/* Main menu handlers. */
 	void OnNewTab();

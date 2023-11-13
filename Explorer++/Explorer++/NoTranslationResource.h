@@ -451,6 +451,7 @@
 #define IDB_SELECT_COLUMNS_FLUENT_UI_48 692
 #define IDB_CLOSE_BUTTON_FLUENT_UI_48   693
 #define IDA_RESTORE_LAST_TAB            32767
+#define IDA_RESET_TEXT_SIZE             32768
 #define IDA_NEXTTAB                     40123
 #define IDA_PREVIOUSTAB                 40125
 #define IDA_TAB_DUPLICATETAB            40247
@@ -474,7 +475,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        40432
-#define _APS_NEXT_COMMAND_VALUE         32768
+#define _APS_NEXT_COMMAND_VALUE         32769
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           40532
 #endif
