@@ -60,6 +60,8 @@ ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabCont
 		std::bind_front(&ShellTreeView::ProcessShellChangeNotifications, this)),
 	m_fontSetter(m_hTreeView, coreInterface->GetConfig())
 {
+	TreeView_SetExtendedStyle(m_hTreeView, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
+
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hTreeView,
 		std::bind_front(&ShellTreeView::TreeViewProc, this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hParent,
