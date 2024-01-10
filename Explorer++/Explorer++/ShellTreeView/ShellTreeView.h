@@ -132,6 +132,7 @@ private:
 	void OnItemRemoved(PCIDLIST_ABSOLUTE simplePidl);
 	void RemoveItem(HTREEITEM item);
 	bool ItemHasMultipleChildren(HTREEITEM item);
+	void OnDirectoryUpdated(PCIDLIST_ABSOLUTE simplePidl);
 
 	/* Icons. */
 	void QueueIconTask(HTREEITEM treeItem);

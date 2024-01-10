@@ -108,6 +108,10 @@ void ShellTreeView::ProcessShellChangeNotification(const ShellChangeNotification
 	case SHCNE_RMDIR:
 		OnItemRemoved(change.pidl1.get());
 		break;
+
+	case SHCNE_UPDATEDIR:
+		OnDirectoryUpdated(change.pidl1.get());
+		break;
 	}
 }
 
@@ -315,4 +319,62 @@ bool ShellTreeView::ItemHasMultipleChildren(HTREEITEM item)
 	}
 
 	return true;
+}
+
+// This notification will also be generated for other directories. However, it's difficult to
+// handle in the general case. For example, if the desktop root folder is expanded several layers
+// deep and a change notification is generated for it, simply collapsing and re-expanding the
+// folder will cause it to lose track of what the user expanded.
+// It would also  be unusual to have an entire tree node collapse and re-expand for seemingly no
+// reason.
+// A better solution might be to update the node in-place. But that's potentially tricky to get
+// right.
+// Therefore, this notification is only handled for the quick access folder as of now. Collapsing
+// and re-expanding that folder specifically isn't too bad, since it will only contain a small
+// number of items at a single level.
+void ShellTreeView::OnDirectoryUpdated(PCIDLIST_ABSOLUTE simplePidl)
+{
+	// Whether or not the quick access item is shown is user-configurable.
+	if (!m_quickAccessRootItem)
+	{
+		return;
+	}
+
+	ShellTreeNode *quickAccessRootNode = GetNodeFromTreeViewItem(m_quickAccessRootItem);
+	unique_pidl_absolute quickAccessPidl = quickAccessRootNode->GetFullPidl();
+
+	if (!ArePidlsEquivalent(simplePidl, quickAccessPidl.get()))
+	{
+		return;
+	}
+
+	auto selectedItem = TreeView_GetSelection(m_hTreeView);
+	unique_pidl_absolute selectedItemPidl;
+
+	if (selectedItem)
+	{
+		ShellTreeNode *selectedNode = GetNodeFromTreeViewItem(selectedItem);
+		selectedItemPidl = selectedNode->GetFullPidl();
+	}
+
+	StopDirectoryMonitoringForNodeAndChildren(quickAccessRootNode);
+	quickAccessRootNode->RemoveAllChildren();
+
+	SendMessage(m_hTreeView, TVM_EXPAND, TVE_COLLAPSE | TVE_COLLAPSERESET,
+		reinterpret_cast<LPARAM>(m_quickAccessRootItem));
+
+	SendMessage(m_hTreeView, TVM_EXPAND, TVE_EXPAND,
+		reinterpret_cast<LPARAM>(m_quickAccessRootItem));
+
+	if (selectedItemPidl)
+	{
+		auto previouslySelectedItem = LocateExistingItem(selectedItemPidl.get());
+
+		// The previously selected item might not exist anymore (e.g. if the selection was a pinned
+		// item that has been unpinned).
+		if (previouslySelectedItem)
+		{
+			TreeView_SelectItem(m_hTreeView, previouslySelectedItem);
+		}
+	}
 }
