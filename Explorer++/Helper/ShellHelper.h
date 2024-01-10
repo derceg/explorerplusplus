@@ -21,8 +21,15 @@
 #define FRIENDLY_NAME_VIDEOS _T("Videos")
 #define FRIENDLY_NAME_DOCUMENTS _T("Documents")
 
-// The path to the quick access/home folder in Windows 10/11.
+// The path to the quick access folder on Windows 10.
 static inline const WCHAR QUICK_ACCESS_PATH[] = L"shell:::{679f85cb-0220-4080-b29b-5540cc05aab6}";
+
+// On Windows 11, the quick access folder is still present, but is effectively replaced with the
+// home folder. The contents of the two folders are similar, but not identical. It's important to
+// use this folder on Windows 11, since pinning/unpinning an item will generate change notifications
+// in the home folder, not the quick access folder (despite the fact that the pinned items are
+// displayed there as well).
+static inline const WCHAR HOME_FOLDER_PATH[] = L"shell:::{f874310e-b6b7-47dc-bc84-b9e6b38f5903}";
 
 // The path to the Linux distributions folder.
 static inline const WCHAR WSL_DISTRIBUTIONS_PATH[] = L"\\\\wsl$";

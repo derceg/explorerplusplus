@@ -289,12 +289,43 @@ void ShellTreeView::AddQuickAccessRootItem()
 
 	unique_pidl_absolute quickAccessPidl;
 	HRESULT hr =
-		SHParseDisplayName(QUICK_ACCESS_PATH, nullptr, wil::out_param(quickAccessPidl), 0, nullptr);
+		ParseShellFolderNameAndCheckExistence(HOME_FOLDER_PATH, wil::out_param(quickAccessPidl));
 
-	if (SUCCEEDED(hr))
+	if (FAILED(hr))
 	{
-		m_quickAccessRootItem = AddRootItem(quickAccessPidl.get(), TVI_FIRST);
+		hr = ParseShellFolderNameAndCheckExistence(QUICK_ACCESS_PATH,
+			wil::out_param(quickAccessPidl));
+
+		if (FAILED(hr))
+		{
+			return;
+		}
 	}
+
+	m_quickAccessRootItem = AddRootItem(quickAccessPidl.get(), TVI_FIRST);
+}
+
+// Typically, something like SHParseDisplayName() will fail if the item doesn't exist. However,
+// that's seemingly not true for shell:{CLSID} paths. When passed one of those paths,
+// SHParseDisplayName() will succeed, regardless of whether or not the item is valid.
+// Therefore, this function will perform a basic check to determine whether the item is valid before
+// returning.
+HRESULT ShellTreeView::ParseShellFolderNameAndCheckExistence(const std::wstring &shellFolderPath,
+	PIDLIST_ABSOLUTE *pidl)
+{
+	wil::com_ptr_nothrow<IShellItem> shellItem;
+	RETURN_IF_FAILED(
+		SHCreateItemFromParsingName(shellFolderPath.c_str(), nullptr, IID_PPV_ARGS(&shellItem)));
+
+	SFGAOF attributes = SFGAO_FOLDER;
+	RETURN_IF_FAILED(shellItem->GetAttributes(attributes, &attributes));
+
+	if (WI_IsFlagClear(attributes, SFGAO_FOLDER))
+	{
+		return E_FAIL;
+	}
+
+	return SHGetIDListFromObject(shellItem.get(), pidl);
 }
 
 void ShellTreeView::AddShellNamespaceRootItem()

@@ -95,6 +95,8 @@ private:
 
 	void AddRootItems();
 	void AddQuickAccessRootItem();
+	static HRESULT ParseShellFolderNameAndCheckExistence(const std::wstring &shellFolderPath,
+		PIDLIST_ABSOLUTE *pidl);
 	void AddShellNamespaceRootItem();
 	HTREEITEM AddRootItem(PCIDLIST_ABSOLUTE pidl, HTREEITEM insertAfter = TVI_LAST);
 	void OnShowQuickAccessUpdated(bool newValue);
