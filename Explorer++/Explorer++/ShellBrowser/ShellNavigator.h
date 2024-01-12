@@ -23,7 +23,12 @@ enum class NavigationType
 struct NavigateParams
 {
 public:
+	// Navigating to a shell link object (i.e. an object that supports the IShellLink interface),
+	// will result in a navigation to the target instead. Therefore, the final pidl may not always
+	// match the request pidl.
+	PidlAbsolute requestPidl;
 	PidlAbsolute pidl;
+
 	std::optional<int> historyEntryId;
 	bool addHistoryEntry = true;
 	NavigationType navigationType = NavigationType::Normal;
@@ -34,6 +39,7 @@ public:
 	static NavigateParams Normal(PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry = true)
 	{
 		NavigateParams params;
+		params.requestPidl = pidl;
 		params.pidl = pidl;
 		params.addHistoryEntry = addHistoryEntry;
 		params.navigationType = NavigationType::Normal;
@@ -43,6 +49,7 @@ public:
 	static NavigateParams History(const HistoryEntry *historyEntry)
 	{
 		NavigateParams params;
+		params.requestPidl = historyEntry->GetPidl().get();
 		params.pidl = historyEntry->GetPidl().get();
 		params.historyEntryId = historyEntry->GetId();
 		params.addHistoryEntry = false;
@@ -53,6 +60,7 @@ public:
 	static NavigateParams Up(PCIDLIST_ABSOLUTE pidl, PCIDLIST_ABSOLUTE originalPidl)
 	{
 		NavigateParams params;
+		params.requestPidl = pidl;
 		params.pidl = pidl;
 		params.originalPidl = originalPidl;
 		params.addHistoryEntry = true;
@@ -76,7 +84,7 @@ class ShellNavigator
 public:
 	virtual ~ShellNavigator() = default;
 
-	virtual HRESULT Navigate(const NavigateParams &navigateParams) = 0;
+	virtual HRESULT Navigate(NavigateParams &navigateParams) = 0;
 	virtual boost::signals2::connection AddNavigationStartedObserver(
 		const NavigationStartedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) = 0;

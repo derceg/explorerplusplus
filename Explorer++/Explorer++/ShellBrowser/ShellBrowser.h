@@ -378,11 +378,11 @@ private:
 	void VerifySortMode();
 
 	/* NavigatorInterface methods. */
-	HRESULT Navigate(const NavigateParams &navigateParams) override;
+	HRESULT Navigate(NavigateParams &navigateParams) override;
 
 	/* Browsing support. */
-	HRESULT PerformEnumeration(const NavigateParams &navigateParams,
-		std::vector<ItemInfo_t> &items);
+	HRESULT PerformEnumeration(NavigateParams &navigateParams, std::vector<ItemInfo_t> &items);
+	std::optional<PidlAbsolute> MaybeGetTargetPidlForNavigation(const PidlAbsolute &pidl);
 	static HRESULT EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owner, bool showHidden,
 		std::vector<ItemInfo_t> &items);
 	static std::optional<ItemInfo_t> GetItemInformation(IShellFolder *shellFolder,

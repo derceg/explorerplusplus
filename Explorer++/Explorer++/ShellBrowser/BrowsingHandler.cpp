@@ -23,7 +23,7 @@
 #include <propvarutil.h>
 #include <list>
 
-HRESULT ShellBrowser::Navigate(const NavigateParams &navigateParams)
+HRESULT ShellBrowser::Navigate(NavigateParams &navigateParams)
 {
 	SetCursor(LoadCursor(nullptr, IDC_WAIT));
 
@@ -122,9 +122,16 @@ void ShellBrowser::StoreCurrentlySelectedItems()
 	entry->SetSelectedItems(selectedItems);
 }
 
-HRESULT ShellBrowser::PerformEnumeration(const NavigateParams &navigateParams,
+HRESULT ShellBrowser::PerformEnumeration(NavigateParams &navigateParams,
 	std::vector<ShellBrowser::ItemInfo_t> &items)
 {
+	auto targetPidl = MaybeGetTargetPidlForNavigation(navigateParams.pidl);
+
+	if (targetPidl)
+	{
+		navigateParams.pidl = *targetPidl;
+	}
+
 	wil::com_ptr_nothrow<IShellFolder> parent;
 	PCITEMID_CHILD child;
 	RETURN_IF_FAILED(SHBindToParent(navigateParams.pidl.Raw(), IID_PPV_ARGS(&parent), &child));
@@ -154,6 +161,44 @@ HRESULT ShellBrowser::PerformEnumeration(const NavigateParams &navigateParams,
 	m_navigationCommittedSignal(navigateParams);
 
 	return S_OK;
+}
+
+// If the specified item supports the IShellLink interface - that is, the item is a shortcut,
+// symlink or virtual link object, this function will return the target pidl. Note that, currently,
+// standard shortcuts aren't handled in the navigation code here, so this function is only used to
+// support the latter two cases.
+// Navigating to the target pidl is important for folders like the quick access folder. Although
+// navigating directly to a recent/pinned folder works as expected, directory monitoring doesn't
+// work. Presumably, that's because directory change notifications are only generated for the
+// original (target) directory. To have things work correctly, the navigation needs to proceed to
+// the original folder instead.
+std::optional<PidlAbsolute> ShellBrowser::MaybeGetTargetPidlForNavigation(const PidlAbsolute &pidl)
+{
+	wil::com_ptr_nothrow<IShellItem> shellItem;
+	HRESULT hr = SHCreateItemFromIDList(pidl.Raw(), IID_PPV_ARGS(&shellItem));
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	wil::com_ptr_nothrow<IShellLink> shellLink;
+	hr = shellItem->BindToHandler(nullptr, BHID_SFUIObject, IID_PPV_ARGS(&shellLink));
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	PidlAbsolute targetPidl;
+	hr = shellLink->GetIDList(PidlOutParam(targetPidl));
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	return targetPidl;
 }
 
 HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owner, bool showHidden,
@@ -310,8 +355,8 @@ HRESULT ShellBrowser::RegisterShellWindow(PCIDLIST_ABSOLUTE pidl)
 	long registeredCookie;
 #pragma warning(push)
 #pragma warning(                                                                                   \
-	disable : 4311 4302) // 'reinterpret_cast': pointer truncation from 'HWND' to 'long',
-						 // 'reinterpret_cast': truncation from 'HWND' to 'long'
+		disable : 4311 4302) // 'reinterpret_cast': pointer truncation from 'HWND' to 'long',
+							 // 'reinterpret_cast': truncation from 'HWND' to 'long'
 	RETURN_IF_FAILED(m_shellWindows->Register(browserApp.get(), reinterpret_cast<long>(m_hOwner),
 		SWC_BROWSER, &registeredCookie));
 #pragma warning(pop)

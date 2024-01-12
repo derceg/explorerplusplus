@@ -6,51 +6,113 @@
 
 #include <wil/resource.h>
 #include <ShlObj.h>
+#include <type_traits>
 
-template <typename IDListType, auto CloneFunction>
-class PidlBase
+// The accessor class here simply stops PidlBase from being accessed directly (since PidlBase is
+// only designed for a few types of template parameters, passing an arbitrary template parameter is
+// wrong).
+class PidlAccessor
+{
+private:
+	// PidlBase wraps a pidl. It's designed to be somewhat similar to how std::string wraps a
+	// character array. That is, std::string makes it simple to copy and move strings from one place
+	// to another, while doing that manually with char* is more cumbersome.
+	// The same principle applies here, with PidlBase being designed to make it easy to copy and
+	// move a pidl.
+	template <typename IDListType, auto CloneFunction>
+	class PidlBase
+	{
+	public:
+		typedef typename IDListType *Pointer;
+
+		PidlBase() = default;
+
+		PidlBase(const IDListType *pidl) : m_pidl(pidl ? CloneFunction(pidl) : nullptr)
+		{
+		}
+
+		PidlBase(const PidlBase &other) :
+			m_pidl(other.m_pidl ? CloneFunction(other.m_pidl.get()) : nullptr)
+		{
+		}
+
+		PidlBase(PidlBase &&other) : m_pidl(std::move(other.m_pidl))
+		{
+		}
+
+		PidlBase &operator=(const IDListType *pidl)
+		{
+			m_pidl.reset(pidl ? CloneFunction(pidl) : nullptr);
+			return *this;
+		}
+
+		PidlBase &operator=(PidlBase other)
+		{
+			std::swap(m_pidl, other.m_pidl);
+			return *this;
+		}
+
+		bool HasValue() const
+		{
+			return m_pidl != nullptr;
+		}
+
+		const IDListType *Raw() const
+		{
+			return m_pidl.get();
+		}
+
+	private:
+		wil::unique_cotaskmem_ptr<IDListType> m_pidl;
+	};
+
+public:
+	using PidlAbsolute = PidlBase<ITEMIDLIST_ABSOLUTE, ILCloneFull>;
+	using PidlRelative = PidlBase<ITEMIDLIST_RELATIVE, ILClone>;
+	using PidlChild = PidlBase<ITEMID_CHILD, ILCloneChild>;
+};
+
+using PidlAbsolute = PidlAccessor::PidlAbsolute;
+using PidlRelative = PidlAccessor::PidlRelative;
+using PidlChild = PidlAccessor::PidlChild;
+
+template <typename T,
+	typename = std::enable_if_t<std::is_same_v<T, PidlAbsolute> || std::is_same_v<T, PidlRelative>
+		|| std::is_same_v<T, PidlChild>>>
+class PidlOutParamType
 {
 public:
-	PidlBase() = default;
+	typedef typename T::Pointer Pointer;
 
-	PidlBase(const IDListType *pidl) : m_pidl(pidl ? CloneFunction(pidl) : nullptr)
+	PidlOutParamType(T &output) : wrapper(output)
 	{
 	}
 
-	PidlBase(PidlBase &other) : m_pidl(other.m_pidl ? CloneFunction(other.m_pidl.get()) : nullptr)
+	operator Pointer *()
 	{
+		return &raw;
 	}
 
-	PidlBase(PidlBase &&other) : m_pidl(std::move(other.m_pidl))
+	~PidlOutParamType()
 	{
-	}
-
-	PidlBase &operator=(const IDListType *pidl)
-	{
-		m_pidl.reset(pidl ? CloneFunction(pidl) : nullptr);
-		return *this;
-	}
-
-	PidlBase &operator=(PidlBase other)
-	{
-		std::swap(m_pidl, other.m_pidl);
-		return *this;
-	}
-
-	bool HasValue() const
-	{
-		return m_pidl != nullptr;
-	}
-
-	const IDListType *Raw() const
-	{
-		return m_pidl.get();
+		wrapper = raw;
 	}
 
 private:
-	wil::unique_cotaskmem_ptr<std::remove_pointer_t<IDListType>> m_pidl;
+	T &wrapper;
+	Pointer raw = nullptr;
 };
 
-using PidlAbsolute = PidlBase<ITEMIDLIST_ABSOLUTE, ILCloneFull>;
-using PidlRelative = PidlBase<ITEMIDLIST_RELATIVE, ILClone>;
-using PidlChild = PidlBase<ITEMID_CHILD, ILCloneChild>;
+// Functions like SHParseDisplayName() take a PIDLIST_ABSOLUTE* out parameter. Using this helper
+// allows one of the types above to be passed in as that parameter, without having to use an
+// intermediate type or add a operator&() method to PidlBase. For example:
+//
+// PidlAbsolute pidl;
+// SHParseDisplayName(L"C:\\", nullptr, PidlOutParam(pidl), 0, nullptr);
+//
+// Designed in a similar way to wil::out_param().
+template <typename T>
+PidlOutParamType<T> PidlOutParam(T &p)
+{
+	return PidlOutParamType<T>(p);
+}

@@ -89,3 +89,24 @@ TEST(PidlAbsolute, MoveAssignment)
 	EXPECT_TRUE(pidl2.HasValue());
 	EXPECT_EQ(pidl2.Raw(), rawPidl);
 }
+
+TEST(PidlAbsolute, OutParam)
+{
+	auto getIdList = [](const std::wstring &path, PIDLIST_ABSOLUTE *pidl)
+	{
+		*pidl = SHSimpleIDListFromPath(path.c_str());
+	};
+
+	PidlAbsolute pidl;
+	getIdList(L"C:\\", PidlOutParam(pidl));
+	unique_pidl_absolute ownedPidl(SHSimpleIDListFromPath(L"C:\\"));
+	EXPECT_TRUE(pidl.HasValue());
+	EXPECT_TRUE(ArePidlsEquivalent(pidl.Raw(), ownedPidl.get()));
+
+	// When using PidlAbsolute as an output parameter, the original pidl should be replaced by the
+	// output pidl.
+	getIdList(L"D:\\", PidlOutParam(pidl));
+	ownedPidl.reset(SHSimpleIDListFromPath(L"D:\\"));
+	EXPECT_TRUE(pidl.HasValue());
+	EXPECT_TRUE(ArePidlsEquivalent(pidl.Raw(), ownedPidl.get()));
+}

@@ -19,7 +19,7 @@ using namespace testing;
 class NavigatorFake : public ShellNavigator
 {
 public:
-	HRESULT Navigate(const NavigateParams &navigateParams) override
+	HRESULT Navigate(NavigateParams &navigateParams) override
 	{
 		m_navigationStartedSignal(navigateParams);
 		m_navigationCommittedSignal(navigateParams);
@@ -68,8 +68,8 @@ public:
 	NavigatorMock()
 	{
 		ON_CALL(*this, NavigateImpl)
-			.WillByDefault([this](const NavigateParams &navigateParams)
-				{ return m_fake.Navigate(navigateParams); });
+			.WillByDefault(
+				[this](NavigateParams &navigateParams) { return m_fake.Navigate(navigateParams); });
 
 		ON_CALL(*this, AddNavigationStartedObserverImpl)
 			.WillByDefault([this](const NavigationStartedSignal::slot_type &observer,
@@ -92,7 +92,7 @@ public:
 				{ return m_fake.AddNavigationFailedObserver(observer, position); });
 	}
 
-	MOCK_METHOD(HRESULT, NavigateImpl, (const NavigateParams &navigateParams));
+	MOCK_METHOD(HRESULT, NavigateImpl, (NavigateParams & navigateParams));
 	MOCK_METHOD(boost::signals2::connection, AddNavigationStartedObserverImpl,
 		(const NavigationStartedSignal::slot_type &observer,
 			boost::signals2::connect_position position));
@@ -106,7 +106,7 @@ public:
 		(const NavigationFailedSignal::slot_type &observer,
 			boost::signals2::connect_position position));
 
-	HRESULT Navigate(const NavigateParams &navigateParams) override
+	HRESULT Navigate(NavigateParams &navigateParams) override
 	{
 		return NavigateImpl(navigateParams);
 	}
