@@ -686,7 +686,7 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 		NXMLSettings::EncodeIntValue(static_cast<int>(m_config->startupMode)));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("SynchronizeTreeview"),
-		NXMLSettings::EncodeBoolValue(m_config->synchronizeTreeview));
+		NXMLSettings::EncodeBoolValue(m_config->synchronizeTreeview.get()));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("TVAutoExpandSelected"),
 		NXMLSettings::EncodeBoolValue(m_config->treeViewAutoExpandSelected));

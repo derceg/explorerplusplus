@@ -107,7 +107,7 @@ void WindowOptionsPage::InitializeControls()
 		CheckDlgButton(GetDialog(), IDC_OPTION_PRIVILEGELEVELINTITLEBAR, BST_CHECKED);
 	}
 
-	if (m_config->synchronizeTreeview)
+	if (m_config->synchronizeTreeview.get())
 	{
 		CheckDlgButton(GetDialog(), IDC_OPTION_SYNCTREEVIEW, BST_CHECKED);
 	}

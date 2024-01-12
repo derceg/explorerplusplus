@@ -76,7 +76,7 @@ struct Config
 	ValueWrapper<BOOL> checkBoxSelection = FALSE;
 	BOOL closeMainWindowOnTabClose = TRUE;
 	BOOL confirmCloseTabs = FALSE;
-	BOOL synchronizeTreeview = TRUE;
+	ValueWrapper<BOOL> synchronizeTreeview = TRUE;
 	LONG displayWindowWidth = DEFAULT_DISPLAYWINDOW_WIDTH;
 	LONG displayWindowHeight = DEFAULT_DISPLAYWINDOW_HEIGHT;
 	BOOL displayWindowVertical = FALSE;

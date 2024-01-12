@@ -214,7 +214,7 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowTaskbarThumbnails"),
 			m_config->showTaskbarThumbnails);
 		RegistrySettings::SaveDword(hSettingsKey, _T("SynchronizeTreeview"),
-			m_config->synchronizeTreeview);
+			m_config->synchronizeTreeview.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("TVAutoExpandSelected"),
 			m_config->treeViewAutoExpandSelected);
 

@@ -68,6 +68,15 @@ void Explorerplusplus::CreateFolderControls()
 			}
 		});
 
+	m_config->synchronizeTreeview.addObserver(
+		[this](BOOL newValue)
+		{
+			if (newValue)
+			{
+				UpdateTreeViewSelection();
+			}
+		});
+
 	GetActivePane()->GetTabContainer()->tabCreatedSignal.AddObserver(
 		[this](int tabId, BOOL switchToNewTab)
 		{
@@ -416,7 +425,7 @@ void Explorerplusplus::OnTreeViewSetFileAttributes() const
 
 void Explorerplusplus::UpdateTreeViewSelection()
 {
-	if (!m_InitializationFinished.get() || !m_config->synchronizeTreeview
+	if (!m_InitializationFinished.get() || !m_config->synchronizeTreeview.get()
 		|| !m_config->showFolders.get())
 	{
 		return;
