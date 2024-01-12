@@ -21,7 +21,7 @@ public:
 	typedef std::vector<PCIDLIST_ABSOLUTE> DeletedItems_t;
 
 	BOOL RenameFiles(const RenamedItems_t &itemList);
-	HRESULT DeleteFiles(HWND hwnd, DeletedItems_t &deletedItems, bool permanent, bool silent);
+	HRESULT DeleteFiles(HWND hwnd, const DeletedItems_t &deletedItems, bool permanent, bool silent);
 
 	void Undo();
 	BOOL CanUndo() const;

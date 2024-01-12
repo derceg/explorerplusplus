@@ -57,8 +57,8 @@ BOOL FileActionHandler::RenameFiles(const RenamedItems_t &itemList)
 	return FALSE;
 }
 
-HRESULT FileActionHandler::DeleteFiles(HWND hwnd, DeletedItems_t &deletedItems, bool permanent,
-	bool silent)
+HRESULT FileActionHandler::DeleteFiles(HWND hwnd, const DeletedItems_t &deletedItems,
+	bool permanent, bool silent)
 {
 	HRESULT hr = NFileOperations::DeleteFiles(hwnd, deletedItems, permanent, silent);
 

@@ -1184,21 +1184,9 @@ void ShellTreeView::ShowPropertiesOfSelectedItem() const
 void ShellTreeView::DeleteSelectedItem(bool permanent)
 {
 	HTREEITEM item = TreeView_GetSelection(m_hTreeView);
-	HTREEITEM parentItem = TreeView_GetParent(m_hTreeView, item);
-
-	// Select the parent item to release the lock and allow deletion.
-	TreeView_Select(m_hTreeView, parentItem, TVGN_CARET);
-
 	auto pidl = GetNodePidl(item);
 
-	DWORD mask = 0;
-
-	if (permanent)
-	{
-		mask = CMIC_MASK_SHIFT_DOWN;
-	}
-
-	ExecuteActionFromContextMenu(pidl.get(), {}, m_hTreeView, _T("delete"), mask, nullptr);
+	m_fileActionHandler->DeleteFiles(m_hTreeView, { pidl.get() }, permanent, false);
 }
 
 bool ShellTreeView::OnEndLabelEdit(const NMTVDISPINFO *dispInfo)

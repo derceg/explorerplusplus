@@ -51,7 +51,7 @@ HRESULT NFileOperations::RenameFile(IShellItem *item, const std::wstring &newNam
 	return hr;
 }
 
-HRESULT NFileOperations::DeleteFiles(HWND hwnd, std::vector<PCIDLIST_ABSOLUTE> &pidls,
+HRESULT NFileOperations::DeleteFiles(HWND hwnd, const std::vector<PCIDLIST_ABSOLUTE> &pidls,
 	bool permanent, bool silent)
 {
 	wil::com_ptr_nothrow<IFileOperation> fo;
