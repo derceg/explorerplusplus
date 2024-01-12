@@ -246,79 +246,35 @@ void ShellTreeView::RemoveItem(HTREEITEM item)
 	auto *node = GetNodeFromTreeViewItem(item);
 	StopDirectoryMonitoringForNodeAndChildren(node);
 
-	TVITEMEX tvItem = {};
-	tvItem.mask = TVIF_PARAM | TVIF_HANDLE;
-	tvItem.hItem = item;
-	[[maybe_unused]] bool itemRetrieved = TreeView_GetItem(m_hTreeView, &tvItem);
-	assert(itemRetrieved);
-
-	bool deleteIndividualItem;
 	auto parent = TreeView_GetParent(m_hTreeView, item);
 
-	// It's valid for the item that's being removed to have no parent, since root items may be
-	// dynamically added and removed.
-	if (parent)
-	{
-		deleteIndividualItem = ItemHasMultipleChildren(parent);
-	}
-	else
-	{
-		// This is a root item.
-		deleteIndividualItem = true;
-	}
-
-	if (deleteIndividualItem)
-	{
-		[[maybe_unused]] bool deleted = TreeView_DeleteItem(m_hTreeView, item);
-		assert(deleted);
-	}
-	else
-	{
-		// There's no need to remove the item specifically, as this call will collapse the parent
-		// and remove its children (i.e. the current item).
-		[[maybe_unused]] auto expanded =
-			TreeView_Expand(m_hTreeView, parent, TVE_COLLAPSE | TVE_COLLAPSERESET);
-		assert(expanded);
-
-		TVITEM tvParentItem = {};
-		tvParentItem.mask = TVIF_CHILDREN;
-		tvParentItem.hItem = parent;
-		tvParentItem.cChildren = 0;
-		[[maybe_unused]] auto updated = TreeView_SetItem(m_hTreeView, &tvParentItem);
-		assert(updated);
-
-		StopDirectoryMonitoringForNode(node->GetParent());
-	}
+	[[maybe_unused]] bool deleted = TreeView_DeleteItem(m_hTreeView, item);
+	assert(deleted);
 
 	if (parent)
 	{
-		node->GetParent()->RemoveChild(node);
+		auto *parentNode = node->GetParent();
+		parentNode->RemoveChild(node);
+
+		if (parentNode->GetChildren().empty())
+		{
+			TVITEM tvParentItem = {};
+			tvParentItem.mask = TVIF_CHILDREN;
+			tvParentItem.hItem = parent;
+			tvParentItem.cChildren = 0;
+			[[maybe_unused]] auto parentUpdated = TreeView_SetItem(m_hTreeView, &tvParentItem);
+			assert(parentUpdated);
+
+			StopDirectoryMonitoringForNode(parentNode);
+		}
 	}
 	else
 	{
+		// If the item has no parent, it's a root node.
 		[[maybe_unused]] auto numErased =
 			std::erase_if(m_nodes, [node](const auto &rootNode) { return rootNode.get() == node; });
 		assert(numErased == 1);
 	}
-}
-
-bool ShellTreeView::ItemHasMultipleChildren(HTREEITEM item)
-{
-	auto firstChild = TreeView_GetChild(m_hTreeView, item);
-
-	if (!firstChild)
-	{
-		return false;
-	}
-
-	auto nextSibling = TreeView_GetNextSibling(m_hTreeView, firstChild);
-
-	if (!nextSibling)
-	{
-		return false;
-	}
-
-	return true;
 }
 
 // This notification will also be generated for other directories. However, it's difficult to
