@@ -731,6 +731,68 @@ bool IsKeyDown(int nVirtKey)
 	return (status != 0);
 }
 
+// Generates a simulated keypress by sending WM_KEYDOWN/WM_KEYUP messages to the specified window.
+// This isn't a general solution to sending input and should only be used if needed to invoke
+// specific behavior in a child window.
+void SendSimulatedKeyPress(HWND hwnd, UINT key)
+{
+	UINT scanCode = MapVirtualKey(key, MAPVK_VK_TO_VSC);
+
+	if (scanCode == 0)
+	{
+		assert(false);
+		return;
+	}
+
+	int repeatCount = 1;
+	LPARAM additionalInfo = repeatCount | (scanCode << 16);
+	UINT flags = 0;
+
+	if (IsExtendedKey(key))
+	{
+		flags |= KF_EXTENDED;
+	}
+
+	additionalInfo |= (flags << 16);
+
+	SendMessage(hwnd, WM_KEYDOWN, key, additionalInfo);
+
+	// Both of these flags are always set for WM_KEYUP messages.
+	flags |= KF_REPEAT;
+	flags |= KF_UP;
+	additionalInfo |= (flags << 16);
+
+	SendMessage(hwnd, WM_KEYUP, key, additionalInfo);
+}
+
+bool IsExtendedKey(UINT key)
+{
+	// clang-format off
+	if (key == VK_LEFT
+		|| key == VK_UP
+		|| key == VK_RIGHT
+		|| key == VK_DOWN
+		|| key == VK_RCONTROL
+		|| key == VK_RMENU
+		|| key == VK_LWIN
+		|| key == VK_RWIN
+		|| key == VK_APPS
+		|| key == VK_PRIOR
+		|| key == VK_NEXT
+		|| key == VK_END
+		|| key == VK_HOME
+		|| key == VK_INSERT
+		|| key == VK_DELETE
+		|| key == VK_DIVIDE
+		|| key == VK_NUMLOCK)
+	// clang-format on
+	{
+		return true;
+	}
+
+	return false;
+}
+
 std::wstring CreateGUID()
 {
 	GUID guid;

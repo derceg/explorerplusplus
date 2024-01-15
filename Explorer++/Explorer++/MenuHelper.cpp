@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "MenuHelper.h"
+#include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include <boost/algorithm/string/join.hpp>
 
@@ -71,10 +72,7 @@ void UpdateMenuItemAcceleratorString(HMENU menu, UINT id, const std::vector<ACCE
 	// Note that there may be multiple key bindings for a particular command. If
 	// there are, the block below will simply return the first one.
 	auto itr = std::find_if(accelerators.begin(), accelerators.end(),
-		[id](const ACCEL &accel)
-		{
-			return accel.cmd == id;
-		});
+		[id](const ACCEL &accel) { return accel.cmd == id; });
 
 	std::wstring text = menuText;
 	auto tabPosition = text.find('\t');
@@ -141,25 +139,7 @@ std::wstring VirtualKeyToString(UINT key)
 {
 	UINT scanCode = MapVirtualKey(key, MAPVK_VK_TO_VSC);
 
-	// clang-format off
-	if (key == VK_LEFT
-		|| key == VK_UP
-		|| key == VK_RIGHT
-		|| key == VK_DOWN
-		|| key == VK_RCONTROL
-		|| key == VK_RMENU
-		|| key == VK_LWIN
-		|| key == VK_RWIN
-		|| key == VK_APPS
-		|| key == VK_PRIOR
-		|| key == VK_NEXT
-		|| key == VK_END
-		|| key == VK_HOME
-		|| key == VK_INSERT
-		|| key == VK_DELETE
-		|| key == VK_DIVIDE
-		|| key == VK_NUMLOCK)
-	// clang-format on
+	if (IsExtendedKey(key))
 	{
 		scanCode |= KF_EXTENDED;
 	}

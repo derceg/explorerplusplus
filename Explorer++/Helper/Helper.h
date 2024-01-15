@@ -58,6 +58,8 @@ HRESULT GetCPUBrandString(std::wstring &cpuBrand);
 void SetFORMATETC(FORMATETC *pftc, CLIPFORMAT cfFormat, DVTARGETDEVICE *ptd, DWORD dwAspect,
 	LONG lindex, DWORD tymed);
 bool IsKeyDown(int nVirtKey);
+void SendSimulatedKeyPress(HWND hwnd, UINT key);
+bool IsExtendedKey(UINT key);
 std::wstring CreateGUID();
 std::optional<std::wstring> GetLastErrorMessage(DWORD error);
 bool IsWindowsPE();

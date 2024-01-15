@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/BaseWindow.h"
+#include "../Helper/WindowSubclassWrapper.h"
 #include <wil/resource.h>
 
 struct Accelerator;
@@ -16,15 +16,10 @@ struct Accelerator;
 // Tab. Although a WM_KEYDOWN event will be sent to the edit control for VK_TAB, the control will
 // process it internally, meaning that the message won't be received by any subclasses. So it makes
 // sense to simply rely on the control to handle Tab/Shift + Tab key presses.
-class ListViewEdit : BaseWindow
+class ListViewEdit
 {
 public:
 	static ListViewEdit *CreateNew(HWND hwnd, HACCEL *acceleratorTable, bool itemIsFile);
-
-protected:
-	void OnEMSetSel(WPARAM &wParam, LPARAM &lParam) override;
-
-	void OnKeyDown(HWND hwnd, UINT key, BOOL down, int repeat, UINT flags) override;
 
 private:
 	enum class RenameStage
@@ -41,8 +36,16 @@ private:
 	void RemoveAcceleratorFromTable(std::vector<ACCEL> &accelerators,
 		const std::vector<Accelerator> &itemsToRemove);
 
+	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	void OnEMSetSel(WPARAM &wParam, LPARAM &lParam);
+	bool OnKeyDown(HWND hwnd, UINT key);
 	int GetExtensionIndex(HWND hwnd);
+	void ErasePreviousWordOrSelectedText(HWND hwnd);
+	bool SelectPreviousWord(HWND hwnd);
+	bool OnChar(TCHAR character);
 
+	const HWND m_hwnd;
+	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	HACCEL *m_acceleratorTable;
 	wil::unique_haccel m_updatedAcceleratorTable;
 	HACCEL m_originalAcceleratorTable;

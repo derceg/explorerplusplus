@@ -73,10 +73,6 @@ INT_PTR MessageForwarder::ForwardMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LP
 		return OnSize(static_cast<int>(wParam), LOWORD(lParam), HIWORD(lParam));
 		break;
 
-	case WM_KEYDOWN:
-		HANDLE_WM_KEYDOWN(hwnd, wParam, lParam, OnKeyDown);
-		break;
-
 	case WM_CLOSE:
 		return OnClose();
 		break;
@@ -87,10 +83,6 @@ INT_PTR MessageForwarder::ForwardMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LP
 
 	case WM_NCDESTROY:
 		return OnNcDestroy();
-		break;
-
-	case EM_SETSEL:
-		OnEMSetSel(wParam, lParam);
 		break;
 	}
 
@@ -197,15 +189,6 @@ INT_PTR MessageForwarder::OnSize(int iType, int iWidth, int iHeight)
 	return GetDefaultReturnValue(m_hwnd, m_uMsg, m_wParam, m_lParam);
 }
 
-void MessageForwarder::OnKeyDown(HWND hwnd, UINT key, BOOL down, int repeat, UINT flags)
-{
-	UNREFERENCED_PARAMETER(hwnd);
-	UNREFERENCED_PARAMETER(key);
-	UNREFERENCED_PARAMETER(down);
-	UNREFERENCED_PARAMETER(repeat);
-	UNREFERENCED_PARAMETER(flags);
-}
-
 INT_PTR MessageForwarder::OnClose()
 {
 	return GetDefaultReturnValue(m_hwnd, m_uMsg, m_wParam, m_lParam);
@@ -219,12 +202,6 @@ INT_PTR MessageForwarder::OnDestroy()
 INT_PTR MessageForwarder::OnNcDestroy()
 {
 	return GetDefaultReturnValue(m_hwnd, m_uMsg, m_wParam, m_lParam);
-}
-
-void MessageForwarder::OnEMSetSel(WPARAM &wParam, LPARAM &lParam)
-{
-	UNREFERENCED_PARAMETER(wParam);
-	UNREFERENCED_PARAMETER(lParam);
 }
 
 INT_PTR MessageForwarder::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
