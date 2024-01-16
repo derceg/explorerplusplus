@@ -17,6 +17,7 @@
 #include "TabNavigationInterface.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/DragDropHelper.h"
+#include "../Helper/FileActionHandler.h"
 #include "../Helper/Helper.h"
 #include "../Helper/IconFetcher.h"
 #include "../Helper/ListViewHelper.h"
@@ -723,6 +724,13 @@ void ShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
 			CopySelectedItemsToClipboard(false);
+		}
+		break;
+
+	case 'Z':
+		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
+		{
+			m_fileActionHandler->Undo();
 		}
 		break;
 
