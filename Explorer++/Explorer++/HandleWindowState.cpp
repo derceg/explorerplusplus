@@ -39,6 +39,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_COPYUNIVERSALFILEPATHS, AnyItemsSelected());
 	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_SETFILEATTRIBUTES, AnyItemsSelected());
 	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_OPENCOMMANDPROMPT, !virtualFolder);
+	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR, !virtualFolder);
 	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_SAVEDIRECTORYLISTING, !virtualFolder);
 	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_COPYCOLUMNTEXT,
 		anySelected && (viewMode == +ViewMode::Details));
