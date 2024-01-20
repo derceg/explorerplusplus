@@ -57,6 +57,8 @@ private:
 	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 10;
 	static const LONG DROP_SCROLL_MARGIN_Y_96DPI = 10;
 
+	static const SIGDN DISPLAY_NAME_TYPE = SIGDN_NORMALDISPLAY;
+
 	struct BasicItemInfo
 	{
 		BasicItemInfo() = default;
@@ -128,8 +130,7 @@ private:
 		const std::vector<ShellChangeNotification> &shellChangeNotifications);
 	void ProcessShellChangeNotification(const ShellChangeNotification &change);
 	void OnItemAdded(PCIDLIST_ABSOLUTE simplePidl);
-	void OnItemRenamed(PCIDLIST_ABSOLUTE simplePidlOld, PCIDLIST_ABSOLUTE simplePidlNew);
-	void OnItemUpdated(PCIDLIST_ABSOLUTE simplePidl);
+	void OnItemUpdated(PCIDLIST_ABSOLUTE simplePidl, PCIDLIST_ABSOLUTE simpleUpdatedPidl);
 	void OnItemRemoved(PCIDLIST_ABSOLUTE simplePidl);
 	void RemoveItem(HTREEITEM item);
 	void OnDirectoryUpdated(PCIDLIST_ABSOLUTE simplePidl);

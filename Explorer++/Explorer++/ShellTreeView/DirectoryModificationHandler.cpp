@@ -97,11 +97,11 @@ void ShellTreeView::ProcessShellChangeNotification(const ShellChangeNotification
 		break;
 
 	case SHCNE_RENAMEFOLDER:
-		OnItemRenamed(change.pidl1.get(), change.pidl2.get());
+		OnItemUpdated(change.pidl1.get(), change.pidl2.get());
 		break;
 
 	case SHCNE_UPDATEITEM:
-		OnItemUpdated(change.pidl1.get());
+		OnItemUpdated(change.pidl1.get(), nullptr);
 		break;
 
 	case SHCNE_DRIVEREMOVED:
@@ -172,44 +172,16 @@ void ShellTreeView::OnItemAdded(PCIDLIST_ABSOLUTE simplePidl)
 	SortChildren(parentItem);
 }
 
-void ShellTreeView::OnItemRenamed(PCIDLIST_ABSOLUTE simplePidlOld, PCIDLIST_ABSOLUTE simplePidlNew)
-{
-	auto item = LocateExistingItem(simplePidlOld);
-
-	if (!item)
-	{
-		return;
-	}
-
-	ShellTreeNode *node = GetNodeFromTreeViewItem(item);
-	node->UpdateItemDetails(simplePidlNew);
-
-	RestartDirectoryMonitoringForNodeAndChildren(node);
-
-	std::wstring name;
-	HRESULT hr = GetDisplayName(simplePidlNew, SHGDN_NORMAL, name);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	TVITEM tvItemUpdate = {};
-	tvItemUpdate.mask = TVIF_TEXT;
-	tvItemUpdate.hItem = item;
-	tvItemUpdate.pszText = name.data();
-	[[maybe_unused]] auto updated = TreeView_SetItem(m_hTreeView, &tvItemUpdate);
-	assert(updated);
-
-	auto parent = TreeView_GetParent(m_hTreeView, item);
-
-	if (parent)
-	{
-		SortChildren(parent);
-	}
-}
-
-void ShellTreeView::OnItemUpdated(PCIDLIST_ABSOLUTE simplePidl)
+// Item renames and updates are both handled by this function. That makes more sense than handling
+// them separately, since:
+//
+// - For some shell items (e.g. the recycle bin), renaming the item generates a SHCNE_UPDATEITEM
+// notification only. That's likely because the parsing name hasn't changed, only the display name.
+// - The set of properties that need to be updated in response to a rename/update are very similar.
+//
+// simpleUpdatedPidl will be null if this function was called in response to an update (as opposed
+// to a rename).
+void ShellTreeView::OnItemUpdated(PCIDLIST_ABSOLUTE simplePidl, PCIDLIST_ABSOLUTE simpleUpdatedPidl)
 {
 	auto item = LocateExistingItem(simplePidl);
 
@@ -218,17 +190,55 @@ void ShellTreeView::OnItemUpdated(PCIDLIST_ABSOLUTE simplePidl)
 		return;
 	}
 
-	// An SHCNE_UPDATEITEM notification will be sent to a folder when one of the items within it
-	// changes. The image and child count for the item will need to be invalidated, as a sub-folder
-	// may have been added/removed, or the item's icon may have changed.
+	PCIDLIST_ABSOLUTE currentPidl = simplePidl;
+
+	if (simpleUpdatedPidl)
+	{
+		currentPidl = simpleUpdatedPidl;
+	}
+
+	ShellTreeNode *node = GetNodeFromTreeViewItem(item);
+	node->UpdateItemDetails(currentPidl);
+
+	// Directory monitoring only needs to be restarted if the parsing name changed. Updates to the
+	// display name aren't relevant.
+	if (simpleUpdatedPidl)
+	{
+		RestartDirectoryMonitoringForNodeAndChildren(node);
+	}
+
+	// The display name might have changed, even if the item wasn't renamed, so the updated display
+	// name should always be retrieved.
+	wil::unique_cotaskmem_string displayName;
+	HRESULT hr = node->GetShellItem()->GetDisplayName(DISPLAY_NAME_TYPE, &displayName);
+
+	if (FAILED(hr))
+	{
+		assert(false);
+
+		displayName = wil::make_cotaskmem_string_nothrow(L"");
+	}
+
+	// The image and child count for the item will need to be invalidated, as a sub-folder may have
+	// been added/removed, or the item's icon may have changed.
 	TVITEM tvItemUpdate = {};
-	tvItemUpdate.mask = TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_CHILDREN;
+	tvItemUpdate.mask = TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_CHILDREN | TVIF_TEXT;
 	tvItemUpdate.hItem = item;
 	tvItemUpdate.iImage = I_IMAGECALLBACK;
 	tvItemUpdate.iSelectedImage = I_IMAGECALLBACK;
 	tvItemUpdate.cChildren = I_CHILDRENCALLBACK;
+	tvItemUpdate.pszText = displayName.get();
 	[[maybe_unused]] auto updated = TreeView_SetItem(m_hTreeView, &tvItemUpdate);
 	assert(updated);
+
+	auto parent = TreeView_GetParent(m_hTreeView, item);
+
+	// Even if the parsing name hasn't changed, the display name might have changed, in which case
+	// the items should be sorted.
+	if (parent)
+	{
+		SortChildren(parent);
+	}
 }
 
 void ShellTreeView::OnItemRemoved(PCIDLIST_ABSOLUTE simplePidl)

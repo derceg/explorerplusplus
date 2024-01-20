@@ -840,7 +840,7 @@ HTREEITEM ShellTreeView::AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl, HTREE
 	auto node = std::make_unique<ShellTreeNode>(pidl, shellItem.get(), nodeType);
 
 	wil::unique_cotaskmem_string displayName;
-	hr = node->GetShellItem()->GetDisplayName(SIGDN_NORMALDISPLAY, &displayName);
+	hr = node->GetShellItem()->GetDisplayName(DISPLAY_NAME_TYPE, &displayName);
 
 	if (FAILED(hr))
 	{
@@ -1270,7 +1270,7 @@ bool ShellTreeView::OnEndLabelEdit(const NMTVDISPINFO *dispInfo)
 	}
 
 	unique_pidl_absolute pidlNew(ILCombine(pidlParent.get(), newChild.get()));
-	OnItemRenamed(node->GetFullPidl().get(), pidlNew.get());
+	OnItemUpdated(node->GetFullPidl().get(), pidlNew.get());
 
 	// There's no need to keep the updated text, as it will have been replaced in the call to
 	// OnItemRenamed().

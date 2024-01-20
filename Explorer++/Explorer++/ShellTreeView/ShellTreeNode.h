@@ -33,7 +33,7 @@ public:
 	ShellTreeNodeType GetType() const;
 	unique_pidl_absolute GetFullPidl() const;
 
-	void UpdateItemDetails(PCIDLIST_ABSOLUTE updatedPidl);
+	void UpdateItemDetails(PCIDLIST_ABSOLUTE simpleUpdatedPidl);
 
 	ULONG GetChangeNotifyId() const;
 	void SetChangeNotifyId(ULONG changeNotifyId);
@@ -48,8 +48,8 @@ public:
 	const ShellTreeNodes &GetChildren() const;
 
 private:
-	void UpdateShellItem();
-	bool ShouldRecreateShellItem();
+	void UpdateShellItem(PCIDLIST_ABSOLUTE simpleUpdatedPidl);
+	bool ShouldRecreateShellItem(PCIDLIST_ABSOLUTE simpleUpdatedPidl);
 
 	const int m_id = idCounter++;
 

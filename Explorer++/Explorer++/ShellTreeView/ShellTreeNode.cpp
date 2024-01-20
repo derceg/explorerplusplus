@@ -52,26 +52,44 @@ unique_pidl_absolute ShellTreeNode::GetFullPidl() const
 	return fullPidl;
 }
 
-void ShellTreeNode::UpdateItemDetails(PCIDLIST_ABSOLUTE updatedPidl)
+void ShellTreeNode::UpdateItemDetails(PCIDLIST_ABSOLUTE simpleUpdatedPidl)
 {
-	if (m_type == ShellTreeNodeType::Root)
+	UpdateShellItem(simpleUpdatedPidl);
+
+	PCIDLIST_ABSOLUTE finalPidl;
+
+	// The simple pidl won't contain proper item information, so it's important to use the full pidl
+	// instead.
+	unique_pidl_absolute updatedPidl;
+	HRESULT hr = SHGetIDListFromObject(m_shellItem.get(), wil::out_param(updatedPidl));
+
+	if (SUCCEEDED(hr))
 	{
-		m_rootPidl.reset(ILCloneFull(updatedPidl));
+		finalPidl = updatedPidl.get();
 	}
 	else
 	{
-		m_childPidl.reset(ILCloneChild(ILFindLastID(updatedPidl)));
+		assert(false);
+
+		finalPidl = simpleUpdatedPidl;
 	}
 
-	UpdateShellItem();
+	if (m_type == ShellTreeNodeType::Root)
+	{
+		m_rootPidl.reset(ILCloneFull(finalPidl));
+	}
+	else
+	{
+		m_childPidl.reset(ILCloneChild(ILFindLastID(finalPidl)));
+	}
 }
 
-void ShellTreeNode::UpdateShellItem()
+void ShellTreeNode::UpdateShellItem(PCIDLIST_ABSOLUTE simpleUpdatedPidl)
 {
-	if (ShouldRecreateShellItem())
+	if (ShouldRecreateShellItem(simpleUpdatedPidl))
 	{
 		wil::com_ptr_nothrow<IShellItem2> updatedShellItem;
-		HRESULT hr = SHCreateItemFromIDList(GetFullPidl().get(), IID_PPV_ARGS(&updatedShellItem));
+		HRESULT hr = SHCreateItemFromIDList(simpleUpdatedPidl, IID_PPV_ARGS(&updatedShellItem));
 
 		if (FAILED(hr))
 		{
@@ -83,22 +101,26 @@ void ShellTreeNode::UpdateShellItem()
 		m_shellItem = updatedShellItem;
 	}
 
+	// This always needs to be done, since the shell item will be out of date if this is an update
+	// and won't contain actual item information if this was a rename and the shell item was
+	// recreated (since the simple pidl won't contain any item information).
 	m_shellItem->Update(nullptr);
 }
 
-// The pidl of the shell item might not match the current pidl if the item was renamed, or one of
+// The pidl of the shell item might not match the updated pidl if the item was renamed, or one of
 // its parents was renamed. In that case, the shell item should be recreated.
-bool ShellTreeNode::ShouldRecreateShellItem()
+bool ShellTreeNode::ShouldRecreateShellItem(PCIDLIST_ABSOLUTE simpleUpdatedPidl)
 {
 	unique_pidl_absolute shellItemPidl;
 	HRESULT hr = SHGetIDListFromObject(m_shellItem.get(), wil::out_param(shellItemPidl));
 
 	if (FAILED(hr))
 	{
+		assert(false);
 		return true;
 	}
 
-	if (!ArePidlsEquivalent(shellItemPidl.get(), GetFullPidl().get()))
+	if (!ArePidlsEquivalent(shellItemPidl.get(), simpleUpdatedPidl))
 	{
 		return true;
 	}
