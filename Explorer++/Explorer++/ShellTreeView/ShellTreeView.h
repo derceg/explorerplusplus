@@ -108,6 +108,7 @@ private:
 	LRESULT OnKeyDown(const NMTVKEYDOWN *keyDown);
 	void OnMiddleButtonDown(const POINT *pt);
 	void OnMiddleButtonUp(const POINT *pt, UINT keysDown);
+	bool OnBeginLabelEdit(const NMTVDISPINFO *dispInfo);
 	bool OnEndLabelEdit(const NMTVDISPINFO *dispInfo);
 
 	void CopyItemToClipboard(HTREEITEM treeItem, bool copy);

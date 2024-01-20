@@ -1272,18 +1272,11 @@ BOOL ShellBrowser::OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo)
 	hr =
 		parent->SetNameOf(m_hListView, child, newFilename.c_str(), flags, wil::out_param(newChild));
 
-	if (FAILED(hr))
-	{
-		return FALSE;
-	}
-
-	hr = parent->CompareIDs(0, child, newChild.get());
-
-	// It's possible for the rename operation to succeed, but for the item name to remain unchanged.
-	// For example, if one or more '.' characters are appended to the end of the item name, the
-	// rename operation will succeed, but the name won't actually change. In those sorts of cases,
-	// the name the user entered should be removed.
-	if (HRESULT_CODE(hr) == 0)
+	// S_FALSE can be returned in certain situations when no rename actually took place. For
+	// example, when changing a drive label, elevation will be requested. If the user declines the
+	// elevation request, the drive label won't be changed and S_FALSE will be returned. In those
+	// situations, there's nothing else that needs to be done.
+	if (FAILED(hr) || hr == S_FALSE)
 	{
 		return FALSE;
 	}
@@ -1295,6 +1288,14 @@ BOOL ShellBrowser::OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo)
 	// with it more generally) will fail, since the item no longer exists with the original name.
 	// Performing an immediate update here means that the user can continue to interact with the
 	// item, without having to wait for the rename notification to be processed.
+	// Note that the name may not actually have changed, even though the SetNameOf() call above
+	// succeeded. For example, if a series of '.' characters are added to the end of a file name,
+	// they will typically be removed. The rename request will succeed, however, and a rename change
+	// notification will be generated. In that sort of situation, this call is superfluous.
+	// Attempting to detect whether or not the name actually changed isn't easy, as there is no
+	// singular name for shell items. The display name of a shell item (e.g. the drive label) can
+	// change, even if the parsing name remains the same. Comparing the parsing names will show that
+	// they're equivalent. It's easier just to update the item, regardless.
 	unique_pidl_absolute pidlNew(ILCombine(m_directoryState.pidlDirectory.get(), newChild.get()));
 	UpdateItem(item.pidlComplete.get(), pidlNew.get());
 

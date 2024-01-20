@@ -5,17 +5,28 @@
 #include "stdafx.h"
 #include "ShellTreeNode.h"
 
-ShellTreeNode::ShellTreeNode(unique_pidl_absolute pidl) : m_rootPidl(std::move(pidl))
-{
-}
-
-ShellTreeNode::ShellTreeNode(unique_pidl_child childPidl) : m_childPidl(std::move(childPidl))
+ShellTreeNode::ShellTreeNode(PCIDLIST_ABSOLUTE pidl, IShellItem2 *shellItem,
+	ShellTreeNodeType type) :
+	m_shellItem(shellItem),
+	m_rootPidl(type == ShellTreeNodeType::Root ? ILCloneFull(pidl) : nullptr),
+	m_childPidl(type == ShellTreeNodeType::Child ? ILCloneChild(ILFindLastID(pidl)) : nullptr),
+	m_type(type)
 {
 }
 
 int ShellTreeNode::GetId() const
 {
 	return m_id;
+}
+
+IShellItem2 *ShellTreeNode::GetShellItem() const
+{
+	return m_shellItem.get();
+}
+
+ShellTreeNodeType ShellTreeNode::GetType() const
+{
+	return m_type;
 }
 
 unique_pidl_absolute ShellTreeNode::GetFullPidl() const
@@ -41,11 +52,58 @@ unique_pidl_absolute ShellTreeNode::GetFullPidl() const
 	return fullPidl;
 }
 
-void ShellTreeNode::UpdateChildPidl(unique_pidl_child childPidl)
+void ShellTreeNode::UpdateItemDetails(PCIDLIST_ABSOLUTE updatedPidl)
 {
-	assert(m_parent != nullptr);
+	if (m_type == ShellTreeNodeType::Root)
+	{
+		m_rootPidl.reset(ILCloneFull(updatedPidl));
+	}
+	else
+	{
+		m_childPidl.reset(ILCloneChild(ILFindLastID(updatedPidl)));
+	}
 
-	m_childPidl = std::move(childPidl);
+	UpdateShellItem();
+}
+
+void ShellTreeNode::UpdateShellItem()
+{
+	if (ShouldRecreateShellItem())
+	{
+		wil::com_ptr_nothrow<IShellItem2> updatedShellItem;
+		HRESULT hr = SHCreateItemFromIDList(GetFullPidl().get(), IID_PPV_ARGS(&updatedShellItem));
+
+		if (FAILED(hr))
+		{
+			// The call above might fail if the item no longer exists. In that case, the item should
+			// be removed soon and keeping the stale shell item isn't much of an issue.
+			return;
+		}
+
+		m_shellItem = updatedShellItem;
+	}
+
+	m_shellItem->Update(nullptr);
+}
+
+// The pidl of the shell item might not match the current pidl if the item was renamed, or one of
+// its parents was renamed. In that case, the shell item should be recreated.
+bool ShellTreeNode::ShouldRecreateShellItem()
+{
+	unique_pidl_absolute shellItemPidl;
+	HRESULT hr = SHGetIDListFromObject(m_shellItem.get(), wil::out_param(shellItemPidl));
+
+	if (FAILED(hr))
+	{
+		return true;
+	}
+
+	if (!ArePidlsEquivalent(shellItemPidl.get(), GetFullPidl().get()))
+	{
+		return true;
+	}
+
+	return false;
 }
 
 ULONG ShellTreeNode::GetChangeNotifyId() const

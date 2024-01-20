@@ -182,7 +182,7 @@ void ShellTreeView::OnItemRenamed(PCIDLIST_ABSOLUTE simplePidlOld, PCIDLIST_ABSO
 	}
 
 	ShellTreeNode *node = GetNodeFromTreeViewItem(item);
-	node->UpdateChildPidl(unique_pidl_child(ILCloneChild(ILFindLastID(simplePidlNew))));
+	node->UpdateItemDetails(simplePidlNew);
 
 	RestartDirectoryMonitoringForNodeAndChildren(node);
 

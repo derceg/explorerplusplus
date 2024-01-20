@@ -259,6 +259,9 @@ LRESULT ShellTreeView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 			case TVN_KEYDOWN:
 				return OnKeyDown(reinterpret_cast<NMTVKEYDOWN *>(lParam));
 
+			case TVN_BEGINLABELEDIT:
+				return OnBeginLabelEdit(reinterpret_cast<NMTVDISPINFO *>(lParam));
+
 			case TVN_ENDLABELEDIT:
 				return OnEndLabelEdit(reinterpret_cast<NMTVDISPINFO *>(lParam));
 			}
@@ -822,38 +825,47 @@ HRESULT ShellTreeView::ExpandDirectory(HTREEITEM hParent)
 
 HTREEITEM ShellTreeView::AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl, HTREEITEM insertAfter)
 {
-	std::wstring name;
-	HRESULT hr = GetDisplayName(pidl, SHGDN_NORMAL, name);
+	wil::com_ptr_nothrow<IShellItem2> shellItem;
+	HRESULT hr = SHCreateItemFromIDList(pidl, IID_PPV_ARGS(&shellItem));
 
 	if (FAILED(hr))
 	{
+		// It's not expected for the SHCreateItemFromIDList() call to fail, so it would be useful to
+		// know if it does.
+		assert(false);
 		return nullptr;
 	}
 
-	ShellTreeNode *node;
+	ShellTreeNodeType nodeType = parent ? ShellTreeNodeType::Child : ShellTreeNodeType::Root;
+	auto node = std::make_unique<ShellTreeNode>(pidl, shellItem.get(), nodeType);
+
+	wil::unique_cotaskmem_string displayName;
+	hr = node->GetShellItem()->GetDisplayName(SIGDN_NORMALDISPLAY, &displayName);
+
+	if (FAILED(hr))
+	{
+		assert(false);
+		return nullptr;
+	}
+
+	auto *rawNode = node.get();
 
 	if (parent)
 	{
-		auto childNode =
-			std::make_unique<ShellTreeNode>(unique_pidl_child(ILCloneChild(ILFindLastID(pidl))));
-
 		auto *parentNode = GetNodeFromTreeViewItem(parent);
-		node = parentNode->AddChild(std::move(childNode));
+		parentNode->AddChild(std::move(node));
 	}
 	else
 	{
-		auto rootNode = std::make_unique<ShellTreeNode>(unique_pidl_absolute(ILCloneFull(pidl)));
-		node = rootNode.get();
-
-		m_nodes.push_back(std::move(rootNode));
+		m_nodes.push_back(std::move(node));
 	}
 
 	TVITEMEX tvItem = {};
 	tvItem.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
-	tvItem.pszText = name.data();
+	tvItem.pszText = displayName.get();
 	tvItem.iImage = I_IMAGECALLBACK;
 	tvItem.iSelectedImage = I_IMAGECALLBACK;
-	tvItem.lParam = reinterpret_cast<LPARAM>(node);
+	tvItem.lParam = reinterpret_cast<LPARAM>(rawNode);
 	tvItem.cChildren = I_CHILDRENCALLBACK;
 
 	TVINSERTSTRUCT tvInsertData = {};
@@ -1189,6 +1201,32 @@ void ShellTreeView::DeleteSelectedItem(bool permanent)
 	m_fileActionHandler->DeleteFiles(m_hTreeView, { pidl.get() }, permanent, false);
 }
 
+bool ShellTreeView::OnBeginLabelEdit(const NMTVDISPINFO *dispInfo)
+{
+	const auto *node = GetNodeFromTreeViewItem(dispInfo->item.hItem);
+
+	SFGAOF attributes = SFGAO_CANRENAME;
+	HRESULT hr = node->GetShellItem()->GetAttributes(attributes, &attributes);
+
+	if (FAILED(hr) || (SUCCEEDED(hr) && WI_IsFlagClear(attributes, SFGAO_CANRENAME)))
+	{
+		return true;
+	}
+
+	wil::unique_cotaskmem_string editingName;
+	hr = node->GetShellItem()->GetDisplayName(SIGDN_PARENTRELATIVEEDITING, &editingName);
+
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	HWND editControl = TreeView_GetEditControl(m_hTreeView);
+	SetWindowText(editControl, editingName.get());
+
+	return false;
+}
+
 bool ShellTreeView::OnEndLabelEdit(const NMTVDISPINFO *dispInfo)
 {
 	// If label editing was canceled or no text was entered, simply notify the control to revert to
@@ -1200,35 +1238,43 @@ bool ShellTreeView::OnEndLabelEdit(const NMTVDISPINFO *dispInfo)
 
 	const auto *node = GetNodeFromTreeViewItem(dispInfo->item.hItem);
 
-	std::wstring oldFileName;
-	HRESULT hr = GetDisplayName(node->GetFullPidl().get(), SHGDN_FORPARSING, oldFileName);
+	// This needs to be copied here, as the call to SHBindToParent() below will return the pidl of
+	// the child item. That pidl points to a location within the full pidl, so it's important that
+	// the full pidl isn't freed.
+	auto currentPidl = node->GetFullPidl();
+
+	wil::com_ptr_nothrow<IShellFolder> parent;
+	PCITEMID_CHILD child;
+	HRESULT hr = SHBindToParent(currentPidl.get(), IID_PPV_ARGS(&parent), &child);
 
 	if (FAILED(hr))
 	{
 		return false;
 	}
 
-	TCHAR newFileName[MAX_PATH];
-	StringCchCopy(newFileName, SIZEOF_ARRAY(newFileName), oldFileName.c_str());
-	PathRemoveFileSpec(newFileName);
-	bool res = PathAppend(newFileName, dispInfo->item.pszText);
+	unique_pidl_child newChild;
+	hr = parent->SetNameOf(m_hTreeView, child, dispInfo->item.pszText, SHGDN_INFOLDER,
+		wil::out_param(newChild));
 
-	if (!res)
+	if (FAILED(hr) || hr == S_FALSE)
 	{
 		return false;
 	}
 
-	FileActionHandler::RenamedItem_t renamedItem;
-	renamedItem.strOldFilename = oldFileName;
-	renamedItem.strNewFilename = newFileName;
+	unique_pidl_absolute pidlParent;
+	hr = SHGetIDListFromObject(parent.get(), wil::out_param(pidlParent));
 
-	TrimStringRight(renamedItem.strNewFilename, _T(" "));
+	if (FAILED(hr))
+	{
+		return false;
+	}
 
-	std::list<FileActionHandler::RenamedItem_t> renamedItemList;
-	renamedItemList.push_back(renamedItem);
-	m_fileActionHandler->RenameFiles(renamedItemList);
+	unique_pidl_absolute pidlNew(ILCombine(pidlParent.get(), newChild.get()));
+	OnItemRenamed(node->GetFullPidl().get(), pidlNew.get());
 
-	return true;
+	// There's no need to keep the updated text, as it will have been replaced in the call to
+	// OnItemRenamed().
+	return false;
 }
 
 void ShellTreeView::CopySelectedItemToClipboard(bool copy)
