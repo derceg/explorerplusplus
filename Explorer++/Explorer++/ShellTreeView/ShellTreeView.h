@@ -6,6 +6,7 @@
 
 #include "MainFontSetter.h"
 #include "ShellChangeWatcher.h"
+#include "SignalWrapper.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/ShellHelper.h"
@@ -84,6 +85,29 @@ private:
 		bool hasSubfolder;
 	};
 
+	// Maintains information about an item that was cut or copied within the treeview.
+	class CutCopiedItemManager
+	{
+	public:
+		void SetCopiedItem(IDataObject *clipboardDataObject);
+		void SetCutItem(HTREEITEM cutItem, IDataObject *clipboardDataObject);
+
+		void ClearCutCopiedItem();
+
+		HTREEITEM GetCutItem() const;
+		IDataObject *GetCutCopiedClipboardDataObject() const;
+
+		// Signals
+		SignalWrapper<CutCopiedItemManager, void(HTREEITEM previousCutItem, HTREEITEM newCutItem)>
+			cutItemChangedSignal;
+
+	private:
+		void SetDataInternal(HTREEITEM cutItem, IDataObject *clipboardDataObject);
+
+		HTREEITEM m_cutItem = nullptr;
+		wil::com_ptr_nothrow<IDataObject> m_clipboardDataObject;
+	};
+
 	ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabContainer *tabContainer,
 		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons);
 	~ShellTreeView();
@@ -114,7 +138,6 @@ private:
 	bool OnEndLabelEdit(const NMTVDISPINFO *dispInfo);
 
 	void CopyItemToClipboard(HTREEITEM treeItem, bool copy);
-	void UpdateCurrentClipboardObject(wil::com_ptr_nothrow<IDataObject> clipboardDataObject);
 	void OnClipboardUpdate();
 
 	unique_pidl_absolute GetSelectedNodePidl() const;
@@ -170,6 +193,10 @@ private:
 
 	HTREEITEM LocateExistingItem(PCIDLIST_ABSOLUTE pidlDirectory);
 	HTREEITEM LocateItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, BOOL bOnlyLocateExistingItem);
+
+	void OnCutItemChanged(HTREEITEM previousCutItem, HTREEITEM newCutItem);
+	bool ShouldGhostItem(HTREEITEM item);
+	bool TestItemAttributes(ShellTreeNode *node, SFGAOF attributes);
 	void UpdateItemState(HTREEITEM item, UINT stateMask, UINT state);
 
 	void OnApplicationShuttingDown();
@@ -215,8 +242,7 @@ private:
 	bool m_performingDrag = false;
 	PCIDLIST_ABSOLUTE m_draggedItemPidl = nullptr;
 
-	HTREEITEM m_cutItem;
-	wil::com_ptr_nothrow<IDataObject> m_clipboardDataObject;
+	CutCopiedItemManager m_cutCopiedItemManager;
 
 	// Directory monitoring
 	ShellChangeWatcher m_shellChangeWatcher;

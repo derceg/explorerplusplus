@@ -54,7 +54,6 @@ ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabCont
 	m_subfoldersThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
 		CoUninitialize),
 	m_subfoldersResultIDCounter(0),
-	m_cutItem(nullptr),
 	m_dropExpandItem(nullptr),
 	m_shellChangeWatcher(GetHWND(),
 		std::bind_front(&ShellTreeView::ProcessShellChangeNotifications, this)),
@@ -81,6 +80,8 @@ ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabCont
 
 	StartDirectoryMonitoringForDrives();
 
+	m_connections.push_back(m_cutCopiedItemManager.cutItemChangedSignal.AddObserver(
+		std::bind_front(&ShellTreeView::OnCutItemChanged, this)));
 	m_connections.push_back(m_config->showQuickAccessInTreeView.addObserver(
 		std::bind_front(&ShellTreeView::OnShowQuickAccessUpdated, this)));
 	m_connections.push_back(coreInterface->AddApplicationShuttingDownObserver(
@@ -101,7 +102,8 @@ ShellTreeView::~ShellTreeView()
 
 void ShellTreeView::OnApplicationShuttingDown()
 {
-	if (m_clipboardDataObject && OleIsCurrentClipboard(m_clipboardDataObject.get()) == S_OK)
+	if (m_cutCopiedItemManager.GetCutCopiedClipboardDataObject()
+		&& OleIsCurrentClipboard(m_cutCopiedItemManager.GetCutCopiedClipboardDataObject()) == S_OK)
 	{
 		OleFlushClipboard();
 	}
@@ -861,12 +863,15 @@ HTREEITEM ShellTreeView::AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl, HTREE
 	}
 
 	TVITEMEX tvItem = {};
-	tvItem.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
+	tvItem.mask =
+		TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN | TVIF_STATE;
 	tvItem.pszText = displayName.get();
 	tvItem.iImage = I_IMAGECALLBACK;
 	tvItem.iSelectedImage = I_IMAGECALLBACK;
 	tvItem.lParam = reinterpret_cast<LPARAM>(rawNode);
 	tvItem.cChildren = I_CHILDRENCALLBACK;
+	tvItem.stateMask = TVIS_CUT;
+	tvItem.state = TestItemAttributes(rawNode, SFGAO_HIDDEN) ? TVIS_CUT : 0;
 
 	TVINSERTSTRUCT tvInsertData = {};
 	tvInsertData.hInsertAfter = insertAfter;
@@ -1310,7 +1315,7 @@ void ShellTreeView::CopyItemToClipboard(HTREEITEM treeItem, bool copy)
 
 		if (SUCCEEDED(hr))
 		{
-			UpdateCurrentClipboardObject(clipboardDataObject);
+			m_cutCopiedItemManager.SetCopiedItem(clipboardDataObject.get());
 		}
 	}
 	else
@@ -1319,10 +1324,7 @@ void ShellTreeView::CopyItemToClipboard(HTREEITEM treeItem, bool copy)
 
 		if (SUCCEEDED(hr))
 		{
-			UpdateCurrentClipboardObject(clipboardDataObject);
-
-			m_cutItem = treeItem;
-			UpdateItemState(treeItem, TVIS_CUT, TVIS_CUT);
+			m_cutCopiedItemManager.SetCutItem(treeItem, clipboardDataObject.get());
 		}
 	}
 }
@@ -1369,34 +1371,59 @@ void ShellTreeView::PasteShortcut()
 		0, nullptr);
 }
 
-void ShellTreeView::UpdateCurrentClipboardObject(
-	wil::com_ptr_nothrow<IDataObject> clipboardDataObject)
-{
-	// When copying an item, the WM_CLIPBOARDUPDATE message will be processed after the copy
-	// operation has been fully completed. Therefore, any previously cut item will need to have its
-	// state restored first. Relying on the WM_CLIPBOARDUPDATE handler wouldn't work, as by the time
-	// it runs, m_cutItem would refer to the newly cut item.
-	if (m_cutItem)
-	{
-		UpdateItemState(m_cutItem, TVIS_CUT, 0);
-	}
-
-	m_clipboardDataObject = clipboardDataObject;
-}
-
 void ShellTreeView::OnClipboardUpdate()
 {
-	if (m_clipboardDataObject && OleIsCurrentClipboard(m_clipboardDataObject.get()) == S_FALSE)
+	if (m_cutCopiedItemManager.GetCutCopiedClipboardDataObject()
+		&& OleIsCurrentClipboard(m_cutCopiedItemManager.GetCutCopiedClipboardDataObject())
+			== S_FALSE)
 	{
-		if (m_cutItem)
-		{
-			UpdateItemState(m_cutItem, TVIS_CUT, 0);
-
-			m_cutItem = nullptr;
-		}
-
-		m_clipboardDataObject.reset();
+		m_cutCopiedItemManager.ClearCutCopiedItem();
 	}
+}
+
+void ShellTreeView::OnCutItemChanged(HTREEITEM previousCutItem, HTREEITEM newCutItem)
+{
+	if (previousCutItem)
+	{
+		UpdateItemState(previousCutItem, TVIS_CUT, ShouldGhostItem(previousCutItem) ? TVIS_CUT : 0);
+	}
+
+	if (newCutItem)
+	{
+		UpdateItemState(newCutItem, TVIS_CUT, ShouldGhostItem(newCutItem) ? TVIS_CUT : 0);
+	}
+}
+
+bool ShellTreeView::ShouldGhostItem(HTREEITEM item)
+{
+	auto *node = GetNodeFromTreeViewItem(item);
+
+	if (TestItemAttributes(node, SFGAO_HIDDEN))
+	{
+		return true;
+	}
+
+	auto cutItem = m_cutCopiedItemManager.GetCutItem();
+
+	if (cutItem && cutItem == item)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool ShellTreeView::TestItemAttributes(ShellTreeNode *node, SFGAOF attributes)
+{
+	SFGAOF commonAttributes = attributes;
+	HRESULT hr = node->GetShellItem()->GetAttributes(commonAttributes, &commonAttributes);
+
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	return (commonAttributes & attributes) == attributes;
 }
 
 void ShellTreeView::UpdateItemState(HTREEITEM item, UINT stateMask, UINT state)
@@ -1408,4 +1435,43 @@ void ShellTreeView::UpdateItemState(HTREEITEM item, UINT stateMask, UINT state)
 	tvItem.state = state;
 	[[maybe_unused]] bool res = TreeView_SetItem(m_hTreeView, &tvItem);
 	assert(res);
+}
+
+void ShellTreeView::CutCopiedItemManager::SetCopiedItem(IDataObject *clipboardDataObject)
+{
+	SetDataInternal(nullptr, clipboardDataObject);
+}
+
+void ShellTreeView::CutCopiedItemManager::SetCutItem(HTREEITEM cutItem,
+	IDataObject *clipboardDataObject)
+{
+	SetDataInternal(cutItem, clipboardDataObject);
+}
+
+void ShellTreeView::CutCopiedItemManager::ClearCutCopiedItem()
+{
+	SetDataInternal(nullptr, nullptr);
+}
+
+void ShellTreeView::CutCopiedItemManager::SetDataInternal(HTREEITEM cutItem,
+	IDataObject *clipboardDataObject)
+{
+	if (cutItem != m_cutItem)
+	{
+		HTREEITEM previousCutItem = m_cutItem;
+		m_cutItem = cutItem;
+		cutItemChangedSignal.m_signal(previousCutItem, cutItem);
+	}
+
+	m_clipboardDataObject = clipboardDataObject;
+}
+
+HTREEITEM ShellTreeView::CutCopiedItemManager::GetCutItem() const
+{
+	return m_cutItem;
+}
+
+IDataObject *ShellTreeView::CutCopiedItemManager::GetCutCopiedClipboardDataObject() const
+{
+	return m_clipboardDataObject.get();
 }

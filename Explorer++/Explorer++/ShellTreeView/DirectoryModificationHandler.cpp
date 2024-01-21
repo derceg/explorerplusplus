@@ -222,12 +222,14 @@ void ShellTreeView::OnItemUpdated(PCIDLIST_ABSOLUTE simplePidl, PCIDLIST_ABSOLUT
 	// The image and child count for the item will need to be invalidated, as a sub-folder may have
 	// been added/removed, or the item's icon may have changed.
 	TVITEM tvItemUpdate = {};
-	tvItemUpdate.mask = TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_CHILDREN | TVIF_TEXT;
+	tvItemUpdate.mask = TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_CHILDREN | TVIF_TEXT | TVIF_STATE;
 	tvItemUpdate.hItem = item;
 	tvItemUpdate.iImage = I_IMAGECALLBACK;
 	tvItemUpdate.iSelectedImage = I_IMAGECALLBACK;
 	tvItemUpdate.cChildren = I_CHILDRENCALLBACK;
 	tvItemUpdate.pszText = displayName.get();
+	tvItemUpdate.stateMask = TVIS_CUT;
+	tvItemUpdate.state = ShouldGhostItem(item) ? TVIS_CUT : 0;
 	[[maybe_unused]] auto updated = TreeView_SetItem(m_hTreeView, &tvItemUpdate);
 	assert(updated);
 
