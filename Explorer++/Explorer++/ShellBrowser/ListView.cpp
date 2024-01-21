@@ -128,6 +128,10 @@ LRESULT ShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
 	case WM_APP_INFO_TIP_READY:
 		ProcessInfoTipResult(static_cast<int>(wParam));
 		break;
+
+	case WM_APP_REQUEST_REFRESH:
+		OnRequestRefreshMessage(static_cast<int>(wParam));
+		break;
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
@@ -1394,4 +1398,26 @@ void ShellBrowser::OnOneClickActivateHoverTimeUpdated(UINT newValue)
 {
 	ListViewHelper::ActivateOneClickSelect(m_hListView,
 		m_config->globalFolderSettings.oneClickActivate.get(), newValue);
+}
+
+// In some situations, it may be useful to refresh the current directory, even if it's not safe to
+// currently do so. This function will request a refresh by posting a message to the message queue,
+// which will then be processed at a future point. Note that this is only a request; a refresh won't
+// occur if the directory changes before this message is processed.
+void ShellBrowser::RequestPendingRefresh()
+{
+	PostMessage(m_hListView, WM_APP_REQUEST_REFRESH, m_uniqueFolderId, 0);
+}
+
+void ShellBrowser::OnRequestRefreshMessage(int uniqueFolderId)
+{
+	// In between the time when this message was sent and the time when it's processed here, the
+	// directory might have already changed, due to another refresh request, or from actions the
+	// user has taken. In those cases, there's nothing that needs to be done.
+	if (uniqueFolderId != m_uniqueFolderId)
+	{
+		return;
+	}
+
+	m_navigationController->Refresh();
 }

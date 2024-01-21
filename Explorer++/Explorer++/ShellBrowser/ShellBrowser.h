@@ -359,6 +359,7 @@ private:
 	static const UINT WM_APP_COLUMN_RESULT_READY = WM_APP + 150;
 	static const UINT WM_APP_THUMBNAIL_RESULT_READY = WM_APP + 151;
 	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 152;
+	static const UINT WM_APP_REQUEST_REFRESH = WM_APP + 153;
 
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
@@ -448,6 +449,8 @@ private:
 	void OnShowGridlinesUpdated(BOOL newValue);
 	void OnOneClickActivateUpdated(BOOL newValue);
 	void OnOneClickActivateHoverTimeUpdated(UINT newValue);
+	void RequestPendingRefresh();
+	void OnRequestRefreshMessage(int uniqueFolderId);
 
 	HRESULT GetListViewItemAttributes(int item, SFGAOF *attributes) const;
 

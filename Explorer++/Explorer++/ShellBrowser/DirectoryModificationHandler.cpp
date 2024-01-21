@@ -6,7 +6,6 @@
 #include "ShellBrowser.h"
 #include "Config.h"
 #include "ItemData.h"
-#include "ShellNavigationController.h"
 #include "ViewModes.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Logging.h"
@@ -73,7 +72,11 @@ void ShellBrowser::ProcessShellChangeNotification(const ShellChangeNotification 
 	case SHCNE_UPDATEDIR:
 		if (ArePidlsEquivalent(m_directoryState.pidlDirectory.get(), change.pidl1.get()))
 		{
-			m_navigationController->Refresh();
+			// It's not safe to perform an immediate refresh here, since doing so would clear
+			// ShellChangeWatcher::m_shellChangeNotifications, which is being actively iterated
+			// through. A pending refresh is requested instead, which will be processed via the
+			// message loop.
+			RequestPendingRefresh();
 		}
 		break;
 
