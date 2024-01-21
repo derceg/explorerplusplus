@@ -88,9 +88,6 @@ void Explorerplusplus::OnNavigationCommitted(const Tab &tab, const NavigateParam
 
 	if (GetActivePane()->GetTabContainer()->IsTabSelected(tab))
 	{
-		std::wstring directory = tab.GetShellBrowser()->GetDirectory();
-		SetCurrentDirectory(directory.c_str());
-
 		UpdateWindowStates(tab);
 	}
 
@@ -242,13 +239,6 @@ void Explorerplusplus::OnTabSelected(const Tab &tab)
 
 	m_hActiveListView = tab.GetShellBrowser()->GetListView();
 	m_pActiveShellBrowser = tab.GetShellBrowser();
-
-	/* The selected tab has changed, so update the current
-	directory. Although this is not needed internally, context
-	menu extensions may need the current directory to be
-	set correctly. */
-	std::wstring directory = tab.GetShellBrowser()->GetDirectory();
-	SetCurrentDirectory(directory.c_str());
 
 	UpdateWindowStates(tab);
 
