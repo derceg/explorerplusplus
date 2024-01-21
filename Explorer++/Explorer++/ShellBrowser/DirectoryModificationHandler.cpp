@@ -386,8 +386,10 @@ void ShellBrowser::UpdateItem(PCIDLIST_ABSOLUTE pidl, PCIDLIST_ABSOLUTE updatedP
 	{
 		InvalidateAllColumnsForItem(*itemIndex);
 	}
-	else if (updatedPidl)
+	else
 	{
+		// The display name can change, even if the parsing name is the same. For example, when the
+		// recycle bin is renamed, the parsing name remains the same.
 		BasicItemInfo_t basicItemInfo = getBasicItemInfo(*internalIndex);
 		std::wstring filename = ProcessItemFileName(basicItemInfo, m_config->globalFolderSettings);
 		ListView_SetItemText(m_hListView, *itemIndex, 0, filename.data());
