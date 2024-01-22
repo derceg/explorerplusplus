@@ -21,11 +21,11 @@ ShellChangeWatcher::~ShellChangeWatcher()
 	StopWatchingAll();
 }
 
-ULONG ShellChangeWatcher::StartWatching(PCIDLIST_ABSOLUTE pidl, LONG events)
+ULONG ShellChangeWatcher::StartWatching(PCIDLIST_ABSOLUTE pidl, LONG events, bool recursive)
 {
 	SHChangeNotifyEntry entry;
 	entry.pidl = pidl;
-	entry.fRecursive = false;
+	entry.fRecursive = recursive;
 	ULONG changeNotifyId = SHChangeNotifyRegister(m_hwnd,
 		SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery, events, WM_APP_SHELL_NOTIFY,
 		1, &entry);

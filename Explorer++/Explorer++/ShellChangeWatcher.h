@@ -34,7 +34,7 @@ public:
 	ShellChangeWatcher(HWND hwnd, ProcessNotificationsCallback processNotificationsCallback);
 	~ShellChangeWatcher();
 
-	ULONG StartWatching(PCIDLIST_ABSOLUTE pidl, LONG events);
+	ULONG StartWatching(PCIDLIST_ABSOLUTE pidl, LONG events, bool recursive = false);
 	void StopWatching(ULONG changeNotifyId);
 	void StopWatchingAll();
 
