@@ -6,6 +6,7 @@
 #include "ShellBrowser.h"
 #include "Config.h"
 #include "ItemData.h"
+#include "ShellNavigationController.h"
 #include "ViewModes.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Logging.h"
@@ -74,9 +75,10 @@ void ShellBrowser::ProcessShellChangeNotification(const ShellChangeNotification 
 		{
 			// It's not safe to perform an immediate refresh here, since doing so would clear
 			// ShellChangeWatcher::m_shellChangeNotifications, which is being actively iterated
-			// through. A pending refresh is requested instead, which will be processed via the
-			// message loop.
-			RequestPendingRefresh();
+			// through. A pending task is created instead, which will be processed via the message
+			// loop.
+			AddTaskToPendingWorkQueue(
+				std::bind_front(&ShellBrowser::RefreshDirectoryAfterUpdate, this));
 		}
 		break;
 
@@ -90,6 +92,13 @@ void ShellBrowser::ProcessShellChangeNotification(const ShellChangeNotification 
 		if (ILIsParent(m_directoryState.pidlDirectory.get(), change.pidl1.get(), TRUE))
 		{
 			OnItemRemoved(change.pidl1.get());
+		}
+		else if (ArePidlsEquivalent(m_directoryState.pidlDirectory.get(), change.pidl1.get()))
+		{
+			// The current folder has been deleted. That makes it necessary to navigate to another
+			// folder. For similarity with Explorer, a navigation to the parent will occur.
+			AddTaskToPendingWorkQueue(
+				std::bind_front(&ShellBrowser::GoUpAfterCurrentDirectoryDeleted, this));
 		}
 		break;
 	}
@@ -474,4 +483,29 @@ void ShellBrowser::InvalidateIconForItem(int itemIndex)
 	lvItem.iSubItem = 0;
 	lvItem.iImage = I_IMAGECALLBACK;
 	ListView_SetItem(m_hListView, &lvItem);
+}
+
+void ShellBrowser::RefreshDirectoryAfterUpdate()
+{
+	m_navigationController->Refresh();
+}
+
+void ShellBrowser::GoUpAfterCurrentDirectoryDeleted()
+{
+	unique_pidl_absolute pidlParent;
+	HRESULT hr =
+		GetVirtualParentPath(m_directoryState.pidlDirectory.get(), wil::out_param(pidlParent));
+
+	if (FAILED(hr))
+	{
+		// The only item that doesn't have a parent is the root folder. However, it's not possible
+		// to delete that folder, so this function should never be called in a situation where
+		// there's no parent folder.
+		return;
+	}
+
+	// The navigation here doesn't use ShellNavigationController::GoUp(), since the navigation
+	// needs to occur in this tab, regardless of whether not the tab is locked.
+	NavigateParams params = NavigateParams::Normal(pidlParent.get());
+	Navigate(params);
 }

@@ -185,6 +185,8 @@ public:
 private:
 	DISALLOW_COPY_AND_ASSIGN(ShellBrowser);
 
+	using PendingWorkQueueTask = std::function<void()>;
+
 	struct ItemInfo_t
 	{
 		unique_pidl_absolute pidlComplete;
@@ -331,6 +333,14 @@ private:
 		/* Cached folder size data. */
 		mutable std::unordered_map<int, ULONGLONG> cachedFolderSizes;
 
+		// These items are queued from the main thread and run on the main thread. The advantage of
+		// this is that it allows tasks that need to run, but can't immediately run (e.g. because
+		// running the task in the middle of something else is going to cause issues) to be run at a
+		// later point, through the message loop.
+		// Only tasks that are relevant to the current directory should be added here, since the
+		// items are cleared on directory changes.
+		std::vector<PendingWorkQueueTask> pendingWorkQueue;
+
 		DirectoryState() :
 			virtualFolder(false),
 			itemIDCounter(0),
@@ -359,7 +369,7 @@ private:
 	static const UINT WM_APP_COLUMN_RESULT_READY = WM_APP + 150;
 	static const UINT WM_APP_THUMBNAIL_RESULT_READY = WM_APP + 151;
 	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 152;
-	static const UINT WM_APP_REQUEST_REFRESH = WM_APP + 153;
+	static const UINT WM_APP_PENDING_TASK_AVAILABLE = WM_APP + 153;
 
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
@@ -449,8 +459,6 @@ private:
 	void OnShowGridlinesUpdated(BOOL newValue);
 	void OnOneClickActivateUpdated(BOOL newValue);
 	void OnOneClickActivateHoverTimeUpdated(UINT newValue);
-	void RequestPendingRefresh();
-	void OnRequestRefreshMessage(int uniqueFolderId);
 
 	HRESULT GetListViewItemAttributes(int item, SFGAOF *attributes) const;
 
@@ -511,6 +519,12 @@ private:
 	void InvalidateAllColumnsForItem(int itemIndex);
 	void InvalidateIconForItem(int itemIndex);
 	int DetermineItemSortedPosition(LPARAM lParam) const;
+	void RefreshDirectoryAfterUpdate();
+	void GoUpAfterCurrentDirectoryDeleted();
+
+	// Tasks
+	void AddTaskToPendingWorkQueue(PendingWorkQueueTask task);
+	void OnPendingTaskAvailableMessage();
 
 	/* Filtering support. */
 	void UpdateFiltering();
