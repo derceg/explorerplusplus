@@ -20,6 +20,20 @@ enum class NavigationType
 	Up
 };
 
+enum class HistoryEntryType
+{
+	// No history entry will be added. Useful when refreshing the current directory or navigating to
+	// an existing history entry.
+	None,
+
+	// A new history entry will be added.
+	AddEntry,
+
+	// The current history entry will be replaced. Useful if the current folder has been renamed,
+	// for example.
+	ReplaceCurrentEntry
+};
+
 struct NavigateParams
 {
 public:
@@ -30,18 +44,19 @@ public:
 	PidlAbsolute pidl;
 
 	std::optional<int> historyEntryId;
-	bool addHistoryEntry = true;
+	HistoryEntryType historyEntryType = HistoryEntryType::AddEntry;
 	NavigationType navigationType = NavigationType::Normal;
 
 	// When navigating up, this will store the pidl of the previous item.
 	PidlAbsolute originalPidl;
 
-	static NavigateParams Normal(PCIDLIST_ABSOLUTE pidl, bool addHistoryEntry = true)
+	static NavigateParams Normal(PCIDLIST_ABSOLUTE pidl,
+		HistoryEntryType historyEntryType = HistoryEntryType::AddEntry)
 	{
 		NavigateParams params;
 		params.requestPidl = pidl;
 		params.pidl = pidl;
-		params.addHistoryEntry = addHistoryEntry;
+		params.historyEntryType = historyEntryType;
 		params.navigationType = NavigationType::Normal;
 		return params;
 	}
@@ -52,7 +67,7 @@ public:
 		params.requestPidl = historyEntry->GetPidl().get();
 		params.pidl = historyEntry->GetPidl().get();
 		params.historyEntryId = historyEntry->GetId();
-		params.addHistoryEntry = false;
+		params.historyEntryType = HistoryEntryType::None;
 		params.navigationType = NavigationType::History;
 		return params;
 	}
@@ -63,7 +78,7 @@ public:
 		params.requestPidl = pidl;
 		params.pidl = pidl;
 		params.originalPidl = originalPidl;
-		params.addHistoryEntry = true;
+		params.historyEntryType = HistoryEntryType::AddEntry;
 		params.navigationType = NavigationType::Up;
 		return params;
 	}

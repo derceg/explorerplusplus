@@ -51,40 +51,28 @@ std::vector<std::unique_ptr<HistoryEntry>> ShellNavigationController::CopyPreser
 
 void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navigateParams)
 {
-	if (navigateParams.addHistoryEntry)
+	if (navigateParams.historyEntryType == HistoryEntryType::AddEntry
+		|| navigateParams.historyEntryType == HistoryEntryType::ReplaceCurrentEntry)
 	{
-		std::wstring displayName;
-		HRESULT hr = GetDisplayName(navigateParams.pidl.Raw(), SHGDN_INFOLDER, displayName);
+		auto entry = BuildEntry(navigateParams);
+		int entryId = entry->GetId();
+		int entryIndex;
 
-		if (FAILED(hr))
+		if (navigateParams.historyEntryType == HistoryEntryType::AddEntry)
 		{
-			// It's not expected that this would happen, so it would be useful to have some
-			// indication if the call above ever does fail.
-			assert(false);
-
-			displayName = L"(Unknown)";
+			entryIndex = AddEntry(std::move(entry));
 		}
-
-		auto fullPathForDisplay = GetFolderPathForDisplay(navigateParams.pidl.Raw());
-
-		if (!fullPathForDisplay)
+		else
 		{
-			assert(false);
-
-			fullPathForDisplay = L"(Unknown)";
+			entryIndex = ReplaceCurrentEntry(std::move(entry));
 		}
-
-		auto newEntry = std::make_unique<HistoryEntry>(navigateParams.pidl.Raw(), displayName,
-			*fullPathForDisplay);
-		int entryId = newEntry->GetId();
-		int index = AddEntry(std::move(newEntry));
 
 		// TODO: It would probably be better to do this somewhere else, since
 		// this class is focused on navigation.
 		m_iconFetcher->QueueIconTask(navigateParams.pidl.Raw(),
-			[this, index, entryId](int iconIndex)
+			[this, entryIndex, entryId](int iconIndex)
 			{
-				auto *entry = GetEntryAtIndex(index);
+				auto *entry = GetEntryAtIndex(entryIndex);
 
 				if (!entry || entry->GetId() != entryId)
 				{
@@ -105,6 +93,34 @@ void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navi
 			SetCurrentIndex(*index);
 		}
 	}
+}
+
+std::unique_ptr<HistoryEntry> ShellNavigationController::BuildEntry(
+	const NavigateParams &navigateParams)
+{
+	std::wstring displayName;
+	HRESULT hr = GetDisplayName(navigateParams.pidl.Raw(), SHGDN_INFOLDER, displayName);
+
+	if (FAILED(hr))
+	{
+		// It's not expected that this would happen, so it would be useful to have some
+		// indication if the call above ever does fail.
+		assert(false);
+
+		displayName = L"(Unknown)";
+	}
+
+	auto fullPathForDisplay = GetFolderPathForDisplay(navigateParams.pidl.Raw());
+
+	if (!fullPathForDisplay)
+	{
+		assert(false);
+
+		fullPathForDisplay = L"(Unknown)";
+	}
+
+	return std::make_unique<HistoryEntry>(navigateParams.pidl.Raw(), displayName,
+		*fullPathForDisplay);
 }
 
 HRESULT ShellNavigationController::GoToOffset(int offset)
@@ -180,13 +196,13 @@ HRESULT ShellNavigationController::Navigate(const HistoryEntry *entry)
 	return Navigate(navigateParams);
 }
 
-HRESULT ShellNavigationController::Navigate(const std::wstring &path, bool addHistoryEntry)
+HRESULT ShellNavigationController::Navigate(const std::wstring &path)
 {
 	unique_pidl_absolute pidlDirectory;
 	RETURN_IF_FAILED(
 		SHParseDisplayName(path.c_str(), nullptr, wil::out_param(pidlDirectory), 0, nullptr));
 
-	auto navigateParams = NavigateParams::Normal(pidlDirectory.get(), addHistoryEntry);
+	auto navigateParams = NavigateParams::Normal(pidlDirectory.get());
 	return Navigate(navigateParams);
 }
 
@@ -203,7 +219,7 @@ HRESULT ShellNavigationController::Navigate(NavigateParams &navigateParams)
 	if (currentEntry
 		&& ArePidlsEquivalent(currentEntry->GetPidl().get(), navigateParams.pidl.Raw()))
 	{
-		navigateParams.addHistoryEntry = false;
+		navigateParams.historyEntryType = HistoryEntryType::None;
 	}
 
 	return m_navigator->Navigate(navigateParams);

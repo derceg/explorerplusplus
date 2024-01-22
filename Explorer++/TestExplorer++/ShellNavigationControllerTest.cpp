@@ -170,7 +170,9 @@ protected:
 	// it into a pidl), it requires that the path exist. This function will
 	// transform the path into a simple pidl, which doesn't require the path to
 	// exist.
-	HRESULT NavigateToFolder(const std::wstring &path)
+	HRESULT NavigateToFolder(const std::wstring &path,
+		HistoryEntryType addHistoryType = HistoryEntryType::AddEntry,
+		unique_pidl_absolute *outputPidl = nullptr)
 	{
 		unique_pidl_absolute pidl(SHSimpleIDListFromPath(path.c_str()));
 
@@ -179,8 +181,15 @@ protected:
 			return E_FAIL;
 		}
 
-		auto navigateParams = NavigateParams::Normal(pidl.get());
-		return m_navigationController.Navigate(navigateParams);
+		auto navigateParams = NavigateParams::Normal(pidl.get(), addHistoryType);
+		HRESULT hr = m_navigationController.Navigate(navigateParams);
+
+		if (outputPidl)
+		{
+			*outputPidl = std::move(pidl);
+		}
+
+		return hr;
 	}
 
 	NavigatorMock m_navigator;
@@ -508,6 +517,47 @@ TEST_F(ShellNavigationControllerTest, SetNavigationModeFirstNavigation)
 	hr = m_navigationController.Navigate(params2);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 }
+
+TEST_F(ShellNavigationControllerTest, HistoryEntryTypes)
+{
+	unique_pidl_absolute pidl1;
+	ASSERT_HRESULT_SUCCEEDED(NavigateToFolder(L"C:\\Fake1", HistoryEntryType::AddEntry, &pidl1));
+
+	unique_pidl_absolute pidl2;
+	ASSERT_HRESULT_SUCCEEDED(
+		NavigateToFolder(L"C:\\Fake2", HistoryEntryType::ReplaceCurrentEntry, &pidl2));
+
+	// The second navigation should have replaced the entry from the first navigation, so there
+	// should only be a single entry.
+	EXPECT_EQ(m_navigationController.GetNumHistoryEntries(), 1);
+	EXPECT_EQ(m_navigationController.GetCurrentIndex(), 0);
+
+	auto entry = m_navigationController.GetCurrentEntry();
+	ASSERT_NE(entry, nullptr);
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl2.get()));
+
+	unique_pidl_absolute pidl3;
+	ASSERT_HRESULT_SUCCEEDED(NavigateToFolder(L"C:\\Fake3", HistoryEntryType::AddEntry, &pidl3));
+
+	EXPECT_EQ(m_navigationController.GetNumHistoryEntries(), 2);
+	EXPECT_EQ(m_navigationController.GetCurrentIndex(), 1);
+
+	entry = m_navigationController.GetCurrentEntry();
+	ASSERT_NE(entry, nullptr);
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl3.get()));
+
+	unique_pidl_absolute pidl4;
+	ASSERT_HRESULT_SUCCEEDED(NavigateToFolder(L"C:\\Fake4", HistoryEntryType::None, &pidl4));
+
+	EXPECT_EQ(m_navigationController.GetNumHistoryEntries(), 2);
+	EXPECT_EQ(m_navigationController.GetCurrentIndex(), 1);
+
+	// No entry should have been added, so the current entry should still be the same as it was
+	// previously.
+	entry = m_navigationController.GetCurrentEntry();
+	ASSERT_NE(entry, nullptr);
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl3.get()));
+};
 
 TEST_F(ShellNavigationControllerPreservedTest, FirstIndexIsCurrent)
 {

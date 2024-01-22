@@ -171,6 +171,21 @@ protected:
 		return m_currentEntry;
 	}
 
+	int ReplaceCurrentEntry(std::unique_ptr<HistoryEntryType> entry)
+	{
+		if (m_currentEntry == -1)
+		{
+			// Shouldn't be attempting to replace the current entry when there is no current entry.
+			assert(false);
+
+			return AddEntry(std::move(entry));
+		}
+
+		m_entries[m_currentEntry] = std::move(entry);
+
+		return m_currentEntry;
+	}
+
 	void SetCurrentIndex(int index)
 	{
 		if (index < 0 || index >= GetNumHistoryEntries())

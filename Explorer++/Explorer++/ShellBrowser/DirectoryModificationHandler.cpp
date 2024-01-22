@@ -72,6 +72,11 @@ void ShellBrowser::ProcessShellChangeNotification(const ShellChangeNotification 
 		{
 			OnItemRenamed(change.pidl1.get(), change.pidl2.get());
 		}
+		else if (ArePidlsEquivalent(m_directoryState.pidlDirectory.get(), change.pidl1.get()))
+		{
+			AddTaskToPendingWorkQueue([this, simplePidlUpdated = PidlAbsolute(change.pidl2.get())]()
+				{ OnCurrentDirectoryRenamed(simplePidlUpdated.Raw()); });
+		}
 		break;
 
 	case SHCNE_UPDATEITEM:
@@ -496,6 +501,19 @@ void ShellBrowser::InvalidateIconForItem(int itemIndex)
 	lvItem.iSubItem = 0;
 	lvItem.iImage = I_IMAGECALLBACK;
 	ListView_SetItem(m_hListView, &lvItem);
+}
+
+void ShellBrowser::OnCurrentDirectoryRenamed(PCIDLIST_ABSOLUTE simplePidlUpdated)
+{
+	unique_pidl_absolute fullPidlUpdated;
+	HRESULT hr = SimplePidlToFullPidl(simplePidlUpdated, wil::out_param(fullPidlUpdated));
+
+	if (SUCCEEDED(hr))
+	{
+		NavigateParams params =
+			NavigateParams::Normal(fullPidlUpdated.get(), HistoryEntryType::ReplaceCurrentEntry);
+		Navigate(params);
+	}
 }
 
 void ShellBrowser::RefreshDirectoryAfterUpdate()

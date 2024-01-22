@@ -519,6 +519,7 @@ private:
 	void InvalidateAllColumnsForItem(int itemIndex);
 	void InvalidateIconForItem(int itemIndex);
 	int DetermineItemSortedPosition(LPARAM lParam) const;
+	void OnCurrentDirectoryRenamed(PCIDLIST_ABSOLUTE simplePidlUpdated);
 	void RefreshDirectoryAfterUpdate();
 	void GoUpAfterCurrentDirectoryDeleted();
 	unique_pidl_absolute GetClosestExistingParent(PCIDLIST_ABSOLUTE pidl);

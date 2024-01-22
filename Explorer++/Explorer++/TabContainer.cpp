@@ -902,7 +902,7 @@ Tab &TabContainer::CreateNewTab(const PreservedTab &preservedTab)
 	TabSettings tabSettings(_index = preservedTab.index, _selected = true);
 
 	PreservedHistoryEntry *entry = preservedTab.history.at(preservedTab.currentEntry).get();
-	auto navigateParams = NavigateParams::Normal(entry->pidl.get(), false);
+	auto navigateParams = NavigateParams::Normal(entry->pidl.get(), HistoryEntryType::None);
 	return SetUpNewTab(tab, navigateParams, tabSettings);
 }
 

@@ -39,7 +39,7 @@ public:
 
 	HRESULT Refresh();
 
-	HRESULT Navigate(const std::wstring &path, bool addHistoryEntry = true);
+	HRESULT Navigate(const std::wstring &path);
 	HRESULT Navigate(NavigateParams &navigateParams);
 
 	void SetNavigationMode(NavigationMode navigationMode);
@@ -58,6 +58,7 @@ private:
 	HRESULT GetFailureValue() override;
 
 	void OnNavigationCommitted(const NavigateParams &navigateParams);
+	std::unique_ptr<HistoryEntry> BuildEntry(const NavigateParams &navigateParams);
 
 	ShellNavigator *m_navigator;
 
