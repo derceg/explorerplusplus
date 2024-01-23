@@ -1280,7 +1280,9 @@ BOOL ShellBrowser::OnListViewEndLabelEdit(const NMLVDISPINFO *dispInfo)
 	// example, when changing a drive label, elevation will be requested. If the user declines the
 	// elevation request, the drive label won't be changed and S_FALSE will be returned. In those
 	// situations, there's nothing else that needs to be done.
-	if (FAILED(hr) || hr == S_FALSE)
+	// The method can also return S_OK, but not set the new child name. That will happen, for
+	// example, if the new name is the same as the old name, in which case, no rename took place.
+	if (FAILED(hr) || hr == S_FALSE || !newChild)
 	{
 		return FALSE;
 	}

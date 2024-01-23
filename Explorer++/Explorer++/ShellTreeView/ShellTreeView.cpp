@@ -1261,7 +1261,7 @@ bool ShellTreeView::OnEndLabelEdit(const NMTVDISPINFO *dispInfo)
 	hr = parent->SetNameOf(m_hTreeView, child, dispInfo->item.pszText, SHGDN_INFOLDER,
 		wil::out_param(newChild));
 
-	if (FAILED(hr) || hr == S_FALSE)
+	if (FAILED(hr) || hr == S_FALSE || !newChild)
 	{
 		return false;
 	}
