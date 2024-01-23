@@ -521,8 +521,9 @@ private:
 	int DetermineItemSortedPosition(LPARAM lParam) const;
 	void OnCurrentDirectoryRenamed(PCIDLIST_ABSOLUTE simplePidlUpdated);
 	void RefreshDirectoryAfterUpdate();
-	void GoUpAfterCurrentDirectoryDeleted();
-	unique_pidl_absolute GetClosestExistingParent(PCIDLIST_ABSOLUTE pidl);
+	void NavigateUpToClosestExistingItemIfNecessary();
+	unique_pidl_absolute GetClosestExistingItem(PCIDLIST_ABSOLUTE pidl);
+	bool DoesItemExist(PCIDLIST_ABSOLUTE pidl);
 
 	// Tasks
 	void AddTaskToPendingWorkQueue(PendingWorkQueueTask task);

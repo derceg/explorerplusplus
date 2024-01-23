@@ -30,10 +30,21 @@ void ShellBrowser::StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl)
 
 	if (SUCCEEDED(hr))
 	{
-		// This allows deletion of a parent folder to be detected. This is also the method used by
-		// Explorer to detect the deletion of a parent folder. Without this, only the direct
-		// deletion of the current folder would be detected.
-		m_shellChangeWatcher.StartWatching(rootPidl.get(), SHCNE_RMDIR, true);
+		// Monitoring a folder allows direct deletion of the folder to be detected. In that case, a
+		// SHCNE_RMDIR notification will be sent.
+		// It doesn't, however, allow indirect deletion to be detected. For example, if a parent
+		// folder is deleted or renamed, no notification will be sent.
+		// Therefore, it's necessary to globally monitor SHCNE_RMDIR notifications here, to detect
+		// when a parent folder is deleted. It's also necessary to globally monitor SHCNE_UPDATEDIR
+		// notifications, for at least two reasons:
+		//
+		// 1. SHCNE_RMDIR isn't sent consistently. It may or may not be sent when a parent folder is
+		// deleted.
+		// 2. When a parent folder is renamed, only a SHCNE_UPDATEDIR notification will be sent.
+		//
+		// This pair of notifications is also what Explorer uses to navigate away from a folder that
+		// no longer exists.
+		m_shellChangeWatcher.StartWatching(rootPidl.get(), SHCNE_RMDIR | SHCNE_UPDATEDIR, true);
 	}
 }
 
@@ -96,6 +107,15 @@ void ShellBrowser::ProcessShellChangeNotification(const ShellChangeNotification 
 			AddTaskToPendingWorkQueue(
 				std::bind_front(&ShellBrowser::RefreshDirectoryAfterUpdate, this));
 		}
+		else if (ILIsParent(change.pidl1.get(), m_directoryState.pidlDirectory.get(), false))
+		{
+			// A parent folder has been updated. It's possible this folder may no longer exist (e.g.
+			// because a parent was renamed or removed). A navigation to a parent item may be
+			// required. It's also possible an unrelated item was updated, in which case no action
+			// will be taken by the task below.
+			AddTaskToPendingWorkQueue(
+				std::bind_front(&ShellBrowser::NavigateUpToClosestExistingItemIfNecessary, this));
+		}
 		break;
 
 	case SHCNE_DRIVEREMOVED:
@@ -116,7 +136,7 @@ void ShellBrowser::ProcessShellChangeNotification(const ShellChangeNotification 
 			// parents. That makes it necessary to navigate to another folder. For similarity with
 			// Explorer, a navigation to a parent will occur.
 			AddTaskToPendingWorkQueue(
-				std::bind_front(&ShellBrowser::GoUpAfterCurrentDirectoryDeleted, this));
+				std::bind_front(&ShellBrowser::NavigateUpToClosestExistingItemIfNecessary, this));
 		}
 		break;
 	}
@@ -522,46 +542,71 @@ void ShellBrowser::RefreshDirectoryAfterUpdate()
 	m_navigationController->Refresh();
 }
 
-void ShellBrowser::GoUpAfterCurrentDirectoryDeleted()
+// Navigates to the closest ancestor of this item that exists. If this item itself exists, no
+// navigation will occur.
+void ShellBrowser::NavigateUpToClosestExistingItemIfNecessary()
 {
-	// The namespace root isn't something that can be deleted, so this function should never be
-	// invoked on the root.
-	assert(!IsNamespaceRoot(m_directoryState.pidlDirectory.get()));
+	auto closestExistingItemPidl = GetClosestExistingItem(m_directoryState.pidlDirectory.get());
 
-	auto closestExistingParentPidl = GetClosestExistingParent(m_directoryState.pidlDirectory.get());
-
-	if (!closestExistingParentPidl)
+	if (!closestExistingItemPidl)
 	{
 		assert(false);
 		return;
 	}
 
-	// The navigation here needs to proceed in this tab, regardless of whether or not the tab is
-	// locked.
-	NavigateParams params = NavigateParams::Normal(closestExistingParentPidl.get());
+	if (ArePidlsEquivalent(closestExistingItemPidl.get(), m_directoryState.pidlDirectory.get()))
+	{
+		// The current directory still exists, so there's no need to do anything.
+		return;
+	}
+
+	// The current directory no longer exists, so the navigation here needs to proceed in this tab,
+	// regardless of whether or not the tab is locked.
+	NavigateParams params = NavigateParams::Normal(closestExistingItemPidl.get());
 	params.overrideNavigationMode = true;
 	m_navigationController->Navigate(params);
 }
 
-// Traverses up from the current item, to find the first parent item that exists.
-unique_pidl_absolute ShellBrowser::GetClosestExistingParent(PCIDLIST_ABSOLUTE pidl)
+// Traverses up from the current item, to find the first item that exists (which might be the item
+// itself).
+unique_pidl_absolute ShellBrowser::GetClosestExistingItem(PCIDLIST_ABSOLUTE pidl)
 {
 	unique_pidl_absolute currentPidl(ILCloneFull(pidl));
 
-	while (ILRemoveLastID(currentPidl.get()))
+	do
 	{
-		wil::com_ptr_nothrow<IShellItem2> shellItem;
-		HRESULT hr = SHCreateItemFromIDList(currentPidl.get(), IID_PPV_ARGS(&shellItem));
-
-		if (SUCCEEDED(hr) && SUCCEEDED(shellItem->Update(nullptr)))
+		if (DoesItemExist(currentPidl.get()))
 		{
 			return currentPidl;
 		}
-	}
+	} while (ILRemoveLastID(currentPidl.get()));
 
 	// This point shouldn't be reached, as there should always be a parent that exists (e.g. the
 	// root folder always exists), so the above loop should always find an existing item.
 	assert(false);
 
 	return nullptr;
+}
+
+bool ShellBrowser::DoesItemExist(PCIDLIST_ABSOLUTE pidl)
+{
+	wil::com_ptr_nothrow<IShellItem> shellItem;
+	HRESULT hr = SHCreateItemFromIDList(pidl, IID_PPV_ARGS(&shellItem));
+
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	SFGAOF attributes = SFGAO_VALIDATE;
+	hr = shellItem->GetAttributes(attributes, &attributes);
+
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	// SFGAO_VALIDATE is never returned in the output attributes, so provided the call above
+	// succeeded, the item exists.
+	return true;
 }
