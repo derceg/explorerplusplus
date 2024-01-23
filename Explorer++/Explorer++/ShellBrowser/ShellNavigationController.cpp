@@ -60,6 +60,24 @@ void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navi
 		historyEntryType = HistoryEntryType::AddEntry;
 	}
 
+	// If navigating to a history entry, the current index will be set here. It's important this is
+	// done before attempting to replace the current entry.
+	if (navigateParams.historyEntryId)
+	{
+		auto *entry = GetEntryById(*navigateParams.historyEntryId);
+
+		if (entry)
+		{
+			auto index = GetIndexOfEntry(entry);
+			SetCurrentIndex(*index);
+		}
+		else if (historyEntryType == HistoryEntryType::ReplaceCurrentEntry)
+		{
+			// The history entry can't be replaced if it doesn't exist, so add a new entry instead.
+			historyEntryType = HistoryEntryType::AddEntry;
+		}
+	}
+
 	if (historyEntryType == HistoryEntryType::AddEntry
 		|| historyEntryType == HistoryEntryType::ReplaceCurrentEntry)
 	{
@@ -90,17 +108,6 @@ void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navi
 
 				entry->SetSystemIconIndex(iconIndex);
 			});
-	}
-
-	if (navigateParams.historyEntryId)
-	{
-		auto *entry = GetEntryById(*navigateParams.historyEntryId);
-
-		if (entry)
-		{
-			auto index = GetIndexOfEntry(entry);
-			SetCurrentIndex(*index);
-		}
 	}
 }
 
@@ -227,7 +234,7 @@ HRESULT ShellNavigationController::Navigate(NavigateParams &navigateParams)
 	if (currentEntry && targetEntry == currentEntry
 		&& ArePidlsEquivalent(currentEntry->GetPidl().get(), navigateParams.pidl.Raw()))
 	{
-		navigateParams.historyEntryType = HistoryEntryType::None;
+		navigateParams.historyEntryType = HistoryEntryType::ReplaceCurrentEntry;
 		navigateParams.overrideNavigationMode = true;
 	}
 

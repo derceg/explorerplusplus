@@ -22,15 +22,17 @@ enum class NavigationType
 
 enum class HistoryEntryType
 {
-	// No history entry will be added. Useful when refreshing the current directory or navigating to
-	// an existing history entry.
+	// No history entry will be added.
 	None,
 
 	// A new history entry will be added.
 	AddEntry,
 
-	// The current history entry will be replaced. Useful if the current folder has been renamed,
-	// for example.
+	// The current history entry will be replaced. Useful both in situations where the current
+	// history entry may be out of date (e.g. a history entry for a past folder may include an out
+	// of date display name), as well as situations where the entry needs to be replaced wholesale
+	// (e.g. because the current directory has been renamed and the entry needs to be replaced by
+	// one that refers to the new location).
 	ReplaceCurrentEntry
 };
 
@@ -73,7 +75,7 @@ public:
 		params.requestPidl = historyEntry->GetPidl().get();
 		params.pidl = historyEntry->GetPidl().get();
 		params.historyEntryId = historyEntry->GetId();
-		params.historyEntryType = HistoryEntryType::None;
+		params.historyEntryType = HistoryEntryType::ReplaceCurrentEntry;
 		params.navigationType = NavigationType::History;
 		return params;
 	}

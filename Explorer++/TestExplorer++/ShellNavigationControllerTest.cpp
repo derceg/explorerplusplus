@@ -586,6 +586,27 @@ TEST_F(ShellNavigationControllerTest, HistoryEntryTypes)
 	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl3.get()));
 }
 
+TEST_F(ShellNavigationControllerTest, ReplacePreviousHistoryEntry)
+{
+	ASSERT_HRESULT_SUCCEEDED(NavigateToFolder(L"C:\\Fake1", HistoryEntryType::AddEntry));
+	ASSERT_HRESULT_SUCCEEDED(NavigateToFolder(L"C:\\Fake2", HistoryEntryType::AddEntry));
+
+	auto *entry = m_navigationController.GetEntryAtIndex(0);
+	ASSERT_NE(entry, nullptr);
+	int originalEntryId = entry->GetId();
+
+	auto params = NavigateParams::History(entry);
+	params.historyEntryType = HistoryEntryType::ReplaceCurrentEntry;
+	ASSERT_HRESULT_SUCCEEDED(m_navigationController.Navigate(params));
+
+	auto *updatedEntry = m_navigationController.GetEntryAtIndex(0);
+	ASSERT_NE(updatedEntry, nullptr);
+
+	// Navigating to the entry should have resulted in it being replaced, so the ID of the first
+	// entry should have changed.
+	EXPECT_NE(updatedEntry->GetId(), originalEntryId);
+}
+
 TEST_F(ShellNavigationControllerTest, HistoryEntryTypeFirstNavigation)
 {
 	unique_pidl_absolute pidl;
