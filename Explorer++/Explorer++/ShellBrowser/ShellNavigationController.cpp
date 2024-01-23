@@ -165,16 +165,7 @@ HRESULT ShellNavigationController::GoUp()
 	}
 
 	auto navigateParams = NavigateParams::Up(pidlParent.get(), currentEntry->GetPidl().get());
-
-	if (m_navigationMode == NavigationMode::ForceNewTab && GetCurrentEntry())
-	{
-		m_tabNavigation->CreateNewTab(navigateParams, true);
-		return S_OK;
-	}
-	else
-	{
-		return m_navigator->Navigate(navigateParams);
-	}
+	return Navigate(navigateParams);
 }
 
 HRESULT ShellNavigationController::Refresh()
@@ -187,7 +178,7 @@ HRESULT ShellNavigationController::Refresh()
 	}
 
 	auto navigateParams = NavigateParams::History(currentEntry);
-	return m_navigator->Navigate(navigateParams);
+	return Navigate(navigateParams);
 }
 
 HRESULT ShellNavigationController::Navigate(const HistoryEntry *entry)
@@ -209,17 +200,33 @@ HRESULT ShellNavigationController::Navigate(const std::wstring &path)
 HRESULT ShellNavigationController::Navigate(NavigateParams &navigateParams)
 {
 	auto currentEntry = GetCurrentEntry();
+	HistoryEntry *targetEntry = nullptr;
 
-	if (m_navigationMode == NavigationMode::ForceNewTab && currentEntry)
+	if (navigateParams.navigationType == NavigationType::History)
 	{
-		m_tabNavigation->CreateNewTab(navigateParams, true);
-		return S_OK;
+		targetEntry = GetEntryById(*navigateParams.historyEntryId);
+	}
+	else
+	{
+		targetEntry = currentEntry;
 	}
 
-	if (currentEntry
+	// Navigations to the current directory should be treated as an implicit refresh and proceed in
+	// the current tab, regardless of whether or not the tab is locked. The only exception is a
+	// navigation to a history entry, except the current history entry (navigating to the current
+	// history entry is an explicit refresh).
+	if (currentEntry && targetEntry == currentEntry
 		&& ArePidlsEquivalent(currentEntry->GetPidl().get(), navigateParams.pidl.Raw()))
 	{
 		navigateParams.historyEntryType = HistoryEntryType::None;
+		navigateParams.overrideNavigationMode = true;
+	}
+
+	if (m_navigationMode == NavigationMode::ForceNewTab && currentEntry
+		&& !navigateParams.overrideNavigationMode)
+	{
+		m_tabNavigation->CreateNewTab(navigateParams, true);
+		return S_OK;
 	}
 
 	return m_navigator->Navigate(navigateParams);

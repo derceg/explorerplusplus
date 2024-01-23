@@ -512,7 +512,8 @@ void ShellBrowser::OnCurrentDirectoryRenamed(PCIDLIST_ABSOLUTE simplePidlUpdated
 	{
 		NavigateParams params =
 			NavigateParams::Normal(fullPidlUpdated.get(), HistoryEntryType::ReplaceCurrentEntry);
-		Navigate(params);
+		params.overrideNavigationMode = true;
+		m_navigationController->Navigate(params);
 	}
 }
 
@@ -535,10 +536,11 @@ void ShellBrowser::GoUpAfterCurrentDirectoryDeleted()
 		return;
 	}
 
-	// The navigation here doesn't go through ShellNavigationController, since the navigation needs
-	// to occur in this tab, regardless of whether not the tab is locked.
+	// The navigation here needs to proceed in this tab, regardless of whether or not the tab is
+	// locked.
 	NavigateParams params = NavigateParams::Normal(closestExistingParentPidl.get());
-	Navigate(params);
+	params.overrideNavigationMode = true;
+	m_navigationController->Navigate(params);
 }
 
 // Traverses up from the current item, to find the first parent item that exists.

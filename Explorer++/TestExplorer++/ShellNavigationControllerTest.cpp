@@ -465,10 +465,10 @@ TEST_F(ShellNavigationControllerTest, HistoryEntries)
 
 TEST_F(ShellNavigationControllerTest, SetNavigationMode)
 {
-	unique_pidl_absolute pidl(SHSimpleIDListFromPath(L"C:\\Fake"));
-	ASSERT_TRUE(pidl);
+	unique_pidl_absolute pidl1(SHSimpleIDListFromPath(L"C:\\Fake1"));
+	ASSERT_TRUE(pidl1);
 
-	auto params = NavigateParams::Normal(pidl.get());
+	auto params = NavigateParams::Normal(pidl1.get());
 
 	EXPECT_CALL(m_navigator, NavigateImpl(Ref(params)));
 
@@ -480,9 +480,36 @@ TEST_F(ShellNavigationControllerTest, SetNavigationMode)
 
 	m_navigationController.SetNavigationMode(NavigationMode::ForceNewTab);
 
-	EXPECT_CALL(m_navigator, NavigateImpl(_)).Times(0);
+	// Although the navigation mode has been set, the navigation is to the same directory, which is
+	// treated as an implicit refresh and should always proceed in the same tab.
+	EXPECT_CALL(m_navigator, NavigateImpl(Ref(params)));
+	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
 
+	hr = m_navigationController.Navigate(params);
+	ASSERT_HRESULT_SUCCEEDED(hr);
+
+	unique_pidl_absolute pidl2(SHSimpleIDListFromPath(L"C:\\Fake2"));
+	ASSERT_TRUE(pidl2);
+
+	params = NavigateParams::Normal(pidl2.get());
+
+	// This is a navigation to a different directory, so the navigation mode above should now apply.
+	EXPECT_CALL(m_navigator, NavigateImpl(_)).Times(0);
 	EXPECT_CALL(m_tabNavigation, CreateNewTab(Ref(params), _));
+
+	hr = m_navigationController.Navigate(params);
+	ASSERT_HRESULT_SUCCEEDED(hr);
+
+	unique_pidl_absolute pidl3(SHSimpleIDListFromPath(L"C:\\Fake3"));
+	ASSERT_TRUE(pidl3);
+
+	params = NavigateParams::Normal(pidl3.get());
+	params.overrideNavigationMode = true;
+
+	// The navigation explicitly overrides the navigation mode, so this navigation should proceed in
+	// the tab, even though a navigation mode was applied above.
+	EXPECT_CALL(m_navigator, NavigateImpl(Ref(params)));
+	EXPECT_CALL(m_tabNavigation, CreateNewTab).Times(0);
 
 	hr = m_navigationController.Navigate(params);
 	ASSERT_HRESULT_SUCCEEDED(hr);
