@@ -51,14 +51,23 @@ std::vector<std::unique_ptr<HistoryEntry>> ShellNavigationController::CopyPreser
 
 void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navigateParams)
 {
-	if (navigateParams.historyEntryType == HistoryEntryType::AddEntry
-		|| navigateParams.historyEntryType == HistoryEntryType::ReplaceCurrentEntry)
+	auto historyEntryType = navigateParams.historyEntryType;
+
+	// If there is no current history entry (i.e. because this is the first navigation), one should
+	// be added, regardless of the requested history entry type.
+	if (!GetCurrentEntry())
+	{
+		historyEntryType = HistoryEntryType::AddEntry;
+	}
+
+	if (historyEntryType == HistoryEntryType::AddEntry
+		|| historyEntryType == HistoryEntryType::ReplaceCurrentEntry)
 	{
 		auto entry = BuildEntry(navigateParams);
 		int entryId = entry->GetId();
 		int entryIndex;
 
-		if (navigateParams.historyEntryType == HistoryEntryType::AddEntry)
+		if (historyEntryType == HistoryEntryType::AddEntry)
 		{
 			entryIndex = AddEntry(std::move(entry));
 		}

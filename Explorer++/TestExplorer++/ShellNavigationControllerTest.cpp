@@ -584,7 +584,22 @@ TEST_F(ShellNavigationControllerTest, HistoryEntryTypes)
 	entry = m_navigationController.GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
 	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl3.get()));
-};
+}
+
+TEST_F(ShellNavigationControllerTest, HistoryEntryTypeFirstNavigation)
+{
+	unique_pidl_absolute pidl;
+	ASSERT_HRESULT_SUCCEEDED(NavigateToFolder(L"C:\\Fake", HistoryEntryType::None, &pidl));
+
+	// The first navigation in a tab should always result in a history entry being added, regardless
+	// of what's requested.
+	EXPECT_EQ(m_navigationController.GetNumHistoryEntries(), 1);
+	EXPECT_EQ(m_navigationController.GetCurrentIndex(), 0);
+
+	auto entry = m_navigationController.GetCurrentEntry();
+	ASSERT_NE(entry, nullptr);
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl.get()));
+}
 
 TEST_F(ShellNavigationControllerPreservedTest, FirstIndexIsCurrent)
 {
