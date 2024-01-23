@@ -18,6 +18,7 @@
 #include "ShellTreeView.h"
 #include "Config.h"
 #include "CoreInterface.h"
+#include "ItemNameEditControl.h"
 #include "ShellBrowser/ShellNavigator.h"
 #include "ShellTreeNode.h"
 #include "TabContainer.h"
@@ -1228,6 +1229,8 @@ bool ShellTreeView::OnBeginLabelEdit(const NMTVDISPINFO *dispInfo)
 
 	HWND editControl = TreeView_GetEditControl(m_hTreeView);
 	SetWindowText(editControl, editingName.get());
+
+	ItemNameEditControl::CreateNew(editControl, nullptr, false);
 
 	return false;
 }

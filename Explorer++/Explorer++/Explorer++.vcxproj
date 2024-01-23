@@ -999,6 +999,7 @@
     <ClCompile Include="CustomFontStorage.cpp" />
     <ClCompile Include="FeatureList.cpp" />
     <ClCompile Include="FontsOptionsPage.cpp" />
+    <ClCompile Include="ItemNameEditControl.cpp" />
     <ClCompile Include="MainFontSetter.cpp" />
     <ClCompile Include="FontHelper.cpp" />
     <ClCompile Include="SystemFontHelper.cpp" />
@@ -1049,7 +1050,6 @@
     <ClCompile Include="ShellBrowser\DocumentServiceProvider.cpp" />
     <ClCompile Include="ShellBrowser\Filtering.cpp" />
     <ClCompile Include="ShellBrowser\HistoryEntry.cpp" />
-    <ClCompile Include="ShellBrowser\ListViewEdit.cpp" />
     <ClCompile Include="ShellBrowser\ShellNavigationController.cpp" />
     <ClCompile Include="ShellBrowser\PreservedFolderState.cpp" />
     <ClCompile Include="ShellBrowser\PreservedHistoryEntry.cpp" />
@@ -1222,6 +1222,7 @@
     <ClInclude Include="Feature.h" />
     <ClInclude Include="FeatureList.h" />
     <ClInclude Include="FontsOptionsPage.h" />
+    <ClInclude Include="ItemNameEditControl.h" />
     <ClInclude Include="Literals.h" />
     <ClInclude Include="MainFontSetter.h" />
     <ClInclude Include="FontHelper.h" />
@@ -1343,7 +1344,6 @@
     <ClInclude Include="ShellBrowser\DocumentServiceProvider.h" />
     <ClInclude Include="ShellBrowser\FolderSettings.h" />
     <ClInclude Include="ShellBrowser\HistoryEntry.h" />
-    <ClInclude Include="ShellBrowser\ListViewEdit.h" />
     <ClInclude Include="ShellBrowser\ShellNavigationController.h" />
     <ClInclude Include="ShellBrowser\ShellNavigator.h" />
     <ClInclude Include="ShellBrowser\PreservedFolderState.h" />

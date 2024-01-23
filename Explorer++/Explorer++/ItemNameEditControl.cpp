@@ -3,18 +3,19 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "ListViewEdit.h"
+#include "ItemNameEditControl.h"
 #include "Accelerator.h"
 #include "../Helper/Helper.h"
 #include "../Helper/WindowHelper.h"
 #include <array>
 
-ListViewEdit *ListViewEdit::CreateNew(HWND hwnd, HACCEL *acceleratorTable, bool itemIsFile)
+ItemNameEditControl *ItemNameEditControl::CreateNew(HWND hwnd, HACCEL *acceleratorTable,
+	bool itemIsFile)
 {
-	return new ListViewEdit(hwnd, acceleratorTable, itemIsFile);
+	return new ItemNameEditControl(hwnd, acceleratorTable, itemIsFile);
 }
 
-ListViewEdit::ListViewEdit(HWND hwnd, HACCEL *acceleratorTable, bool itemIsFile) :
+ItemNameEditControl::ItemNameEditControl(HWND hwnd, HACCEL *acceleratorTable, bool itemIsFile) :
 	m_hwnd(hwnd),
 	m_acceleratorTable(acceleratorTable),
 	m_itemIsFile(itemIsFile),
@@ -22,13 +23,18 @@ ListViewEdit::ListViewEdit(HWND hwnd, HACCEL *acceleratorTable, bool itemIsFile)
 	m_beginRename(true)
 {
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
-		std::bind_front(&ListViewEdit::WndProc, this)));
+		std::bind_front(&ItemNameEditControl::WndProc, this)));
 
 	UpdateAcceleratorTable();
 }
 
-void ListViewEdit::UpdateAcceleratorTable()
+void ItemNameEditControl::UpdateAcceleratorTable()
 {
+	if (!m_acceleratorTable)
+	{
+		return;
+	}
+
 	m_originalAcceleratorTable = *m_acceleratorTable;
 
 	int numAccelerators = CopyAcceleratorTable(*m_acceleratorTable, nullptr, 0);
@@ -57,7 +63,7 @@ void ListViewEdit::UpdateAcceleratorTable()
 	*m_acceleratorTable = m_updatedAcceleratorTable.get();
 }
 
-void ListViewEdit::RemoveAcceleratorFromTable(std::vector<ACCEL> &accelerators,
+void ItemNameEditControl::RemoveAcceleratorFromTable(std::vector<ACCEL> &accelerators,
 	const std::vector<Accelerator> &itemsToRemove)
 {
 	for (auto &item : itemsToRemove)
@@ -73,12 +79,15 @@ void ListViewEdit::RemoveAcceleratorFromTable(std::vector<ACCEL> &accelerators,
 	}
 }
 
-ListViewEdit::~ListViewEdit()
+ItemNameEditControl::~ItemNameEditControl()
 {
-	*m_acceleratorTable = m_originalAcceleratorTable;
+	if (m_acceleratorTable)
+	{
+		*m_acceleratorTable = m_originalAcceleratorTable;
+	}
 }
 
-LRESULT ListViewEdit::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT ItemNameEditControl::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -108,7 +117,7 @@ LRESULT ListViewEdit::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-void ListViewEdit::OnEMSetSel(WPARAM &wParam, LPARAM &lParam)
+void ItemNameEditControl::OnEMSetSel(WPARAM &wParam, LPARAM &lParam)
 {
 	// When editing an item, the listview control will first deselect, then select all text. If an
 	// item has been put into edit mode, and the listview attempts to select all text, modify the
@@ -127,7 +136,7 @@ void ListViewEdit::OnEMSetSel(WPARAM &wParam, LPARAM &lParam)
 	}
 }
 
-bool ListViewEdit::OnKeyDown(HWND hwnd, UINT key)
+bool ItemNameEditControl::OnKeyDown(HWND hwnd, UINT key)
 {
 	switch (key)
 	{
@@ -182,7 +191,7 @@ bool ListViewEdit::OnKeyDown(HWND hwnd, UINT key)
 	return true;
 }
 
-int ListViewEdit::GetExtensionIndex(HWND hwnd)
+int ItemNameEditControl::GetExtensionIndex(HWND hwnd)
 {
 	std::wstring fileName = GetWindowString(hwnd);
 
@@ -201,7 +210,7 @@ int ListViewEdit::GetExtensionIndex(HWND hwnd)
 	return index;
 }
 
-void ListViewEdit::ErasePreviousWordOrSelectedText(HWND hwnd)
+void ItemNameEditControl::ErasePreviousWordOrSelectedText(HWND hwnd)
 {
 	DWORD selectionStart = 0;
 	DWORD selectionEnd = 0;
@@ -218,7 +227,7 @@ void ListViewEdit::ErasePreviousWordOrSelectedText(HWND hwnd)
 	SendMessage(hwnd, EM_REPLACESEL, true, reinterpret_cast<LPARAM>(L""));
 }
 
-bool ListViewEdit::SelectPreviousWord(HWND hwnd)
+bool ItemNameEditControl::SelectPreviousWord(HWND hwnd)
 {
 	std::array<BYTE, 256> keyStates;
 	bool res = GetKeyboardState(keyStates.data());
@@ -256,7 +265,7 @@ bool ListViewEdit::SelectPreviousWord(HWND hwnd)
 	return true;
 }
 
-bool ListViewEdit::OnChar(TCHAR character)
+bool ItemNameEditControl::OnChar(TCHAR character)
 {
 	if (character == 127)
 	{

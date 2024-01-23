@@ -9,6 +9,19 @@
 
 struct Accelerator;
 
+// Wraps an edit control used to rename a shell item. This adds a few pieces of functionality:
+//
+// 1. The last word can be erased using Ctrl + Backspace.
+// 2. It's possible to cycle through the various parts of a filename (name, extension, full name)
+// using F2.
+// 3. Tab/Shift + Tab accelerators are removed, allowing the control to handle those if appropriate.
+// For example, the listview has built-in handling to select the next/previous item when pressing
+// Tab/Shift + Tab.
+//
+// The latter two items are only enabled if the active accelerator table is passed in. If the
+// accelerator table isn't passed in, the F2/Tab/Shift + Tab keys will continue to function as
+// accelerators.
+//
 // Some notes about the handling of Tab/Shift + Tab:
 //
 // When the items are removed from the accelerator table, they can be received as normal by
@@ -16,10 +29,10 @@ struct Accelerator;
 // Tab. Although a WM_KEYDOWN event will be sent to the edit control for VK_TAB, the control will
 // process it internally, meaning that the message won't be received by any subclasses. So it makes
 // sense to simply rely on the control to handle Tab/Shift + Tab key presses.
-class ListViewEdit
+class ItemNameEditControl
 {
 public:
-	static ListViewEdit *CreateNew(HWND hwnd, HACCEL *acceleratorTable, bool itemIsFile);
+	static ItemNameEditControl *CreateNew(HWND hwnd, HACCEL *acceleratorTable, bool itemIsFile);
 
 private:
 	enum class RenameStage
@@ -29,8 +42,8 @@ private:
 		Entire
 	};
 
-	ListViewEdit(HWND hwnd, HACCEL *acceleratorTable, bool itemIsFile);
-	~ListViewEdit();
+	ItemNameEditControl(HWND hwnd, HACCEL *acceleratorTable, bool itemIsFile);
+	~ItemNameEditControl();
 
 	void UpdateAcceleratorTable();
 	void RemoveAcceleratorFromTable(std::vector<ACCEL> &accelerators,
@@ -46,9 +59,9 @@ private:
 
 	const HWND m_hwnd;
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
-	HACCEL *m_acceleratorTable;
+	HACCEL *m_acceleratorTable = nullptr;
 	wil::unique_haccel m_updatedAcceleratorTable;
-	HACCEL m_originalAcceleratorTable;
+	HACCEL m_originalAcceleratorTable = nullptr;
 
 	bool m_itemIsFile;
 	RenameStage m_renameStage;

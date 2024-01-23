@@ -403,9 +403,6 @@
     <ClCompile Include="ShellBrowser\DocumentServiceProvider.cpp">
       <Filter>ShellBrowser\Shell Integration</Filter>
     </ClCompile>
-    <ClCompile Include="ShellBrowser\ListViewEdit.cpp">
-      <Filter>ShellBrowser</Filter>
-    </ClCompile>
     <ClCompile Include="ToolbarView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
@@ -569,6 +566,9 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="BrowserPane.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ItemNameEditControl.cpp">
       <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
@@ -969,9 +969,6 @@
     <ClInclude Include="ShellBrowser\DocumentServiceProvider.h">
       <Filter>ShellBrowser\Shell Integration</Filter>
     </ClInclude>
-    <ClInclude Include="ShellBrowser\ListViewEdit.h">
-      <Filter>ShellBrowser</Filter>
-    </ClInclude>
     <ClInclude Include="ToolbarView.h">
       <Filter>Views</Filter>
     </ClInclude>
@@ -1156,6 +1153,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="BrowserPane.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemNameEditControl.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

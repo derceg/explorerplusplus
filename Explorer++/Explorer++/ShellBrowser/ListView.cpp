@@ -8,7 +8,7 @@
 #include "ColorRuleModelFactory.h"
 #include "Config.h"
 #include "ItemData.h"
-#include "ListViewEdit.h"
+#include "ItemNameEditControl.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "SelectColumnsDialog.h"
@@ -1200,7 +1200,7 @@ BOOL ShellBrowser::OnListViewBeginLabelEdit(const NMLVDISPINFO *dispInfo)
 		SetWindowText(editControl, item.editingName.c_str());
 	}
 
-	ListViewEdit::CreateNew(editControl, m_acceleratorTable,
+	ItemNameEditControl::CreateNew(editControl, m_acceleratorTable,
 		WI_IsFlagClear(item.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY));
 
 	return FALSE;
