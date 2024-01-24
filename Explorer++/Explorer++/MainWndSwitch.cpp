@@ -1329,9 +1329,8 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 	case IDM_BOOKMARKS_MANAGEBOOKMARKS:
 		if (g_hwndManageBookmarks == nullptr)
 		{
-			auto *pManageBookmarksDialog =
-				new ManageBookmarksDialog(m_resourceInstance, hwnd, this, this,
-					&m_bookmarkIconFetcher, BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
+			auto *pManageBookmarksDialog = new ManageBookmarksDialog(m_resourceInstance, hwnd, this,
+				this, &m_iconFetcher, BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
 			g_hwndManageBookmarks = pManageBookmarksDialog->ShowModelessDialog(
 				[]() { g_hwndManageBookmarks = nullptr; });
 		}

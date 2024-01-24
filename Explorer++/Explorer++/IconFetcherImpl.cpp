@@ -3,27 +3,30 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "IconFetcher.h"
-#include "CachedIcons.h"
-#include "WindowSubclassWrapper.h"
+#include "IconFetcherImpl.h"
+#include "../Helper/CachedIcons.h"
+#include "../Helper/WindowSubclassWrapper.h"
 
-IconFetcher::IconFetcher(HWND hwnd, CachedIcons *cachedIcons) :
+IconFetcherImpl::IconFetcherImpl(HWND hwnd, CachedIcons *cachedIcons) :
 	m_hwnd(hwnd),
 	m_cachedIcons(cachedIcons),
 	m_iconThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
 		CoUninitialize),
 	m_iconResultIDCounter(0)
 {
+	FAIL_FAST_IF_FAILED(GetDefaultFileIconIndex(m_defaultFileIconIndex));
+	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(m_defaultFolderIconIndex));
+
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hwnd,
-		std::bind_front(&IconFetcher::WindowSubclass, this)));
+		std::bind_front(&IconFetcherImpl::WindowSubclass, this)));
 }
 
-IconFetcher::~IconFetcher()
+IconFetcherImpl::~IconFetcherImpl()
 {
 	m_iconThreadPool.clear_queue();
 }
 
-LRESULT IconFetcher::WindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT IconFetcherImpl::WindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -36,7 +39,7 @@ LRESULT IconFetcher::WindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-void IconFetcher::QueueIconTask(std::wstring_view path, Callback callback)
+void IconFetcherImpl::QueueIconTask(std::wstring_view path, Callback callback)
 {
 	int iconResultID = m_iconResultIDCounter++;
 
@@ -82,7 +85,7 @@ void IconFetcher::QueueIconTask(std::wstring_view path, Callback callback)
 	m_iconResults.insert({ iconResultID, std::move(futureResult) });
 }
 
-void IconFetcher::QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback)
+void IconFetcherImpl::QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback)
 {
 	int iconResultID = m_iconResultIDCounter++;
 
@@ -123,7 +126,7 @@ void IconFetcher::QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback)
 	m_iconResults.insert({ iconResultID, std::move(futureResult) });
 }
 
-std::optional<int> IconFetcher::FindIconAsync(PCIDLIST_ABSOLUTE pidl)
+std::optional<int> IconFetcherImpl::FindIconAsync(PCIDLIST_ABSOLUTE pidl)
 {
 	// Must use SHGFI_ICON here, rather than SHGFO_SYSICONINDEX, or else
 	// icon overlays won't be applied.
@@ -141,7 +144,7 @@ std::optional<int> IconFetcher::FindIconAsync(PCIDLIST_ABSOLUTE pidl)
 	return shfi.iIcon;
 }
 
-void IconFetcher::ProcessIconResult(int iconResultId)
+void IconFetcherImpl::ProcessIconResult(int iconResultId)
 {
 	auto itr = m_iconResults.find(iconResultId);
 
@@ -167,8 +170,40 @@ void IconFetcher::ProcessIconResult(int iconResultId)
 	futureResult.callback(result->iconIndex);
 }
 
-void IconFetcher::ClearQueue()
+void IconFetcherImpl::ClearQueue()
 {
 	m_iconThreadPool.clear_queue();
 	m_iconResults.clear();
+}
+
+int IconFetcherImpl::GetCachedIconIndexOrDefault(const std::wstring &itemPath,
+	DefaultIconType defaultIconType) const
+{
+	auto cachedIconIndex = GetCachedIconIndex(itemPath);
+
+	if (cachedIconIndex)
+	{
+		return *cachedIconIndex;
+	}
+
+	if (defaultIconType == DefaultIconType::File)
+	{
+		return m_defaultFileIconIndex;
+	}
+	else
+	{
+		return m_defaultFolderIconIndex;
+	}
+}
+
+std::optional<int> IconFetcherImpl::GetCachedIconIndex(const std::wstring &itemPath) const
+{
+	auto cachedItr = m_cachedIcons->findByPath(itemPath);
+
+	if (cachedItr == m_cachedIcons->end())
+	{
+		return std::nullopt;
+	}
+
+	return cachedItr->iconIndex;
 }

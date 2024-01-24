@@ -7,16 +7,16 @@
 #include "Bookmarks/BookmarkItem.h"
 #include "CoreInterface.h"
 #include "Icon.h"
+#include "IconFetcher.h"
 #include "IconResourceLoader.h"
 #include "../Helper/CachedIcons.h"
-#include "../Helper/IconFetcher.h"
 #include "../Helper/ImageHelper.h"
+#include "../Helper/ShellHelper.h"
 
 BookmarkIconManager::BookmarkIconManager(CoreInterface *coreInterface, IconFetcher *iconFetcher,
 	int iconWidth, int iconHeight) :
 	m_coreInterface(coreInterface),
 	m_iconFetcher(iconFetcher),
-	m_defaultFolderIconSystemImageListIndex(GetDefaultFolderIconIndex()),
 	m_destroyed(std::make_shared<bool>(false))
 {
 	m_imageList.reset(ImageList_Create(iconWidth, iconHeight, ILC_COLOR32 | ILC_MASK, 0, 1));
@@ -27,6 +27,8 @@ BookmarkIconManager::BookmarkIconManager(CoreInterface *coreInterface, IconFetch
 	m_bookmarkFolderIconIndex = ImageList_Add(m_imageList.get(), folderIcon.get(), nullptr);
 
 	SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList));
+
+	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(m_defaultFolderIconSystemImageListIndex));
 	m_defaultFolderIconIndex = ImageHelper::CopyImageListIcon(m_imageList.get(),
 		reinterpret_cast<HIMAGELIST>(m_systemImageList.get()),
 		m_defaultFolderIconSystemImageListIndex);
@@ -64,11 +66,11 @@ int BookmarkIconManager::GetIconForBookmark(const BookmarkItem *bookmark,
 {
 	int iconIndex = m_defaultFolderIconIndex;
 
-	auto cachedItr = m_coreInterface->GetCachedIcons()->findByPath(bookmark->GetLocation());
+	auto cachedIconIndex = m_iconFetcher->GetCachedIconIndex(bookmark->GetLocation());
 
-	if (cachedItr != m_coreInterface->GetCachedIcons()->end())
+	if (cachedIconIndex)
 	{
-		iconIndex = AddSystemIconToImageList(cachedItr->iconIndex);
+		iconIndex = AddSystemIconToImageList(*cachedIconIndex);
 	}
 	else
 	{

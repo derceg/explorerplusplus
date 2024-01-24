@@ -39,7 +39,7 @@ Explorerplusplus::Explorerplusplus(HWND hwnd, CommandLine::Settings *commandLine
 	m_pluginMenuManager(hwnd, MENU_PLUGIN_STARTID, MENU_PLUGIN_ENDID),
 	m_acceleratorUpdater(&g_hAccl),
 	m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_ENDID),
-	m_bookmarkIconFetcher(hwnd, &m_cachedIcons),
+	m_iconFetcher(hwnd, &m_cachedIcons),
 	m_tabBarBackgroundBrush(CreateSolidBrush(TAB_BAR_DARK_MODE_BACKGROUND_COLOR))
 {
 	m_resourceInstance = nullptr;

@@ -624,7 +624,6 @@
     <ClCompile Include="GdiplusHelper.cpp" />
     <ClCompile Include="HeaderHelper.cpp" />
     <ClCompile Include="Helper.cpp" />
-    <ClCompile Include="IconFetcher.cpp" />
     <ClCompile Include="DataObjectImpl.cpp" />
     <ClCompile Include="iDirectoryMonitor.cpp" />
     <ClCompile Include="DropSourceImpl.cpp" />
@@ -707,7 +706,6 @@
     <ClInclude Include="GdiplusHelper.h" />
     <ClInclude Include="HeaderHelper.h" />
     <ClInclude Include="Helper.h" />
-    <ClInclude Include="IconFetcher.h" />
     <ClInclude Include="DataObjectImpl.h" />
     <ClInclude Include="iDirectoryMonitor.h" />
     <ClInclude Include="DropSourceImpl.h" />

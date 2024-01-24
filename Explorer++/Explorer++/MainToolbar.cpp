@@ -10,6 +10,7 @@
 #include "MainResource.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
+#include "ShellItemsMenu.h"
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
@@ -103,17 +104,20 @@ const boost::bimap<MainToolbarButton, std::wstring> TOOLBAR_BUTTON_XML_NAME_MAPP
 #pragma warning(pop)
 
 MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE resourceInstance,
-	CoreInterface *coreInterface, std::shared_ptr<Config> config)
+	CoreInterface *coreInterface, Navigator *navigator, IconFetcher *iconFetcher,
+	std::shared_ptr<Config> config)
 {
-	return new MainToolbar(parent, resourceInstance, coreInterface, config);
+	return new MainToolbar(parent, resourceInstance, coreInterface, navigator, iconFetcher, config);
 }
 
 MainToolbar::MainToolbar(HWND parent, HINSTANCE resourceInstance, CoreInterface *coreInterface,
-	std::shared_ptr<Config> config) :
+	Navigator *navigator, IconFetcher *iconFetcher, std::shared_ptr<Config> config) :
 	BaseWindow(CreateMainToolbar(parent)),
 	m_persistentSettings(&MainToolbarPersistentSettings::GetInstance()),
 	m_resourceInstance(resourceInstance),
 	m_coreInterface(coreInterface),
+	m_navigator(navigator),
+	m_iconFetcher(iconFetcher),
 	m_config(config),
 	m_fontSetter(m_hwnd, config.get()),
 	m_tooltipFontSetter(reinterpret_cast<HWND>(SendMessage(m_hwnd, TB_GETTOOLTIPS, 0, 0)),
@@ -142,8 +146,10 @@ void MainToolbar::Initialize(HWND parent)
 
 	SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList));
 
+	int defaultFolderIconIndex;
+	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(defaultFolderIconIndex));
 	m_defaultFolderIconBitmap =
-		ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), GetDefaultFolderIconIndex());
+		ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), defaultFolderIconIndex);
 
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hwnd);
 
@@ -411,6 +417,9 @@ BYTE MainToolbar::LookupToolbarButtonExtraStyles(MainToolbarButton button) const
 		return BTNS_DROPDOWN;
 
 	case MainToolbarButton::Forward:
+		return BTNS_DROPDOWN;
+
+	case MainToolbarButton::Up:
 		return BTNS_DROPDOWN;
 
 	case MainToolbarButton::Folders:
@@ -721,6 +730,11 @@ LRESULT MainToolbar::OnTbnDropDown(const NMTOOLBAR *nmtb)
 
 		return TBDDRET_DEFAULT;
 	}
+	else if (nmtb->iItem == MainToolbarButton::Up)
+	{
+		ShowUpNavigationDropdown();
+		return TBDDRET_DEFAULT;
+	}
 	else if (nmtb->iItem == MainToolbarButton::Views)
 	{
 		ShowToolbarViewsDropdown();
@@ -810,6 +824,38 @@ void MainToolbar::ShowHistoryMenu(HistoryType historyType, const POINT &pt)
 
 	Tab &selectedTab = m_coreInterface->GetTabContainer()->GetSelectedTab();
 	selectedTab.GetShellBrowser()->GetNavigationController()->GoToOffset(cmd);
+}
+
+void MainToolbar::ShowUpNavigationDropdown()
+{
+	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
+	auto pidl = tab.GetShellBrowser()->GetDirectoryIdl();
+
+	auto parentPidls = GetParentPidlCollection(pidl.get());
+
+	if (parentPidls.empty())
+	{
+		// This function should never be called when displaying the root folder.
+		assert(false);
+		return;
+	}
+
+	// Items in the menu will be displayed in the same order they appear in the vector.
+	// GetParentPidlCollection() will return a set of items that starts from the parent and proceeds
+	// to the root. In the menu, the root needs to be shown first.
+	std::reverse(parentPidls.begin(), parentPidls.end());
+
+	RECT rcButton;
+	[[maybe_unused]] auto res =
+		SendMessage(m_hwnd, TB_GETRECT, MainToolbarButton::Up, reinterpret_cast<LPARAM>(&rcButton));
+	assert(res);
+
+	POINT pt = { rcButton.left, rcButton.bottom };
+	res = ClientToScreen(m_hwnd, &pt);
+	assert(res);
+
+	ShellItemsMenu menu(parentPidls, m_navigator, m_iconFetcher);
+	menu.Show(m_hwnd, pt);
 }
 
 void MainToolbar::ShowToolbarViewsDropdown()

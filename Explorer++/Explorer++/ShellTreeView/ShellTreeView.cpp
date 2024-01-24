@@ -67,7 +67,7 @@ ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabCont
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(hParent,
 		std::bind_front(&ShellTreeView::ParentWndProc, this)));
 
-	m_iFolderIcon = GetDefaultFolderIconIndex();
+	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(m_iFolderIcon));
 
 	m_bDragCancelled = FALSE;
 	m_bDragAllowed = FALSE;

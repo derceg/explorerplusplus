@@ -32,7 +32,6 @@ AddressBar::AddressBar(HWND parent, CoreInterface *coreInterface, Navigator *nav
 	BaseWindow(CreateAddressBar(parent)),
 	m_coreInterface(coreInterface),
 	m_navigator(navigator),
-	m_defaultFolderIconIndex(GetDefaultFolderIconIndex()),
 	m_fontSetter(m_hwnd, coreInterface->GetConfig())
 {
 	Initialize(parent);
@@ -47,6 +46,8 @@ HWND AddressBar::CreateAddressBar(HWND parent)
 
 void AddressBar::Initialize(HWND parent)
 {
+	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(m_defaultFolderIconIndex));
+
 	HIMAGELIST smallIcons;
 	Shell_GetImageLists(nullptr, &smallIcons);
 	SendMessage(m_hwnd, CBEM_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(smallIcons));

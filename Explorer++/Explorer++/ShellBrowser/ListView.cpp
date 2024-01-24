@@ -7,6 +7,7 @@
 #include "ColorRuleModel.h"
 #include "ColorRuleModelFactory.h"
 #include "Config.h"
+#include "IconFetcher.h"
 #include "ItemData.h"
 #include "ItemNameEditControl.h"
 #include "MainResource.h"
@@ -19,7 +20,6 @@
 #include "../Helper/DragDropHelper.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/Helper.h"
-#include "../Helper/IconFetcher.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <boost/format.hpp>

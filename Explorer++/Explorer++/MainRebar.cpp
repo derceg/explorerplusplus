@@ -385,7 +385,8 @@ void Explorerplusplus::OnAddressBarSizeUpdated()
 
 void Explorerplusplus::CreateMainToolbar()
 {
-	m_mainToolbar = MainToolbar::Create(m_hMainRebar, m_resourceInstance, this, m_config);
+	m_mainToolbar =
+		MainToolbar::Create(m_hMainRebar, m_resourceInstance, this, this, &m_iconFetcher, m_config);
 
 	// This should be done in the MainToolbar class. However, the TB_SAVERESTORE
 	// message needs to be sent to the toolbar window. That's incompatible with
@@ -425,8 +426,8 @@ void Explorerplusplus::CreateBookmarksToolbar()
 {
 	auto bookmarksToolbarView = new BookmarksToolbarView(m_hMainRebar, m_config.get());
 
-	m_bookmarksToolbar = BookmarksToolbar::Create(bookmarksToolbarView, this, this,
-		&m_bookmarkIconFetcher, BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
+	m_bookmarksToolbar = BookmarksToolbar::Create(bookmarksToolbarView, this, this, &m_iconFetcher,
+		BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
 	m_bookmarksToolbar->GetView()->AddToolbarSizeUpdatedObserver(
 		std::bind(&Explorerplusplus::OnRebarToolbarSizeUpdated, this,
 			m_bookmarksToolbar->GetView()->GetHWND()));

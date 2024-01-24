@@ -4,36 +4,27 @@
 
 #pragma once
 
-#include "ShellHelper.h"
+#include "IconFetcher.h"
+#include "../Helper/ShellHelper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
-#include <ShlObj.h>
-#include <functional>
 #include <future>
-#include <optional>
 #include <unordered_map>
 
 class CachedIcons;
 class WindowSubclassWrapper;
 
-class IconFetcherInterface
+class IconFetcherImpl : public IconFetcher
 {
 public:
-	using Callback = std::function<void(int iconIndex)>;
-
-	virtual void QueueIconTask(std::wstring_view path, Callback callback) = 0;
-	virtual void QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback) = 0;
-	virtual void ClearQueue() = 0;
-};
-
-class IconFetcher : public IconFetcherInterface
-{
-public:
-	IconFetcher(HWND hwnd, CachedIcons *cachedIcons);
-	virtual ~IconFetcher();
+	IconFetcherImpl(HWND hwnd, CachedIcons *cachedIcons);
+	~IconFetcherImpl();
 
 	void QueueIconTask(std::wstring_view path, Callback callback) override;
 	void QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback) override;
 	void ClearQueue() override;
+	int GetCachedIconIndexOrDefault(const std::wstring &itemPath,
+		DefaultIconType defaultIconType) const;
+	std::optional<int> GetCachedIconIndex(const std::wstring &itemPath) const;
 
 private:
 	// This is the end of the range that starts at WM_APP. This class subclasses the window that's
@@ -73,6 +64,8 @@ private:
 
 	const HWND m_hwnd;
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	int m_defaultFileIconIndex;
+	int m_defaultFolderIconIndex;
 
 	ctpl::thread_pool m_iconThreadPool;
 	std::unordered_map<int, FutureResult> m_iconResults;

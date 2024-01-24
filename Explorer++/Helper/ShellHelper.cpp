@@ -361,39 +361,25 @@ HRESULT DecodeFriendlyPath(const std::wstring &friendlyPath, std::wstring &parsi
 	return E_FAIL;
 }
 
-int GetDefaultFolderIconIndex()
+HRESULT GetDefaultFolderIconIndex(int &outputImageIndex)
 {
-	return GetDefaultIcon(DefaultIconType::Folder);
+	return GetDefaultIcon(SIID_FOLDER, outputImageIndex);
 }
 
-int GetDefaultFileIconIndex()
+HRESULT GetDefaultFileIconIndex(int &outputImageIndex)
 {
-	return GetDefaultIcon(DefaultIconType::File);
+	return GetDefaultIcon(SIID_DOCNOASSOC, outputImageIndex);
 }
 
-int GetDefaultIcon(DefaultIconType defaultIconType)
+HRESULT GetDefaultIcon(SHSTOCKICONID iconId, int &outputImageIndex)
 {
-	SHFILEINFO shfi;
-	DWORD dwFileAttributes;
+	SHSTOCKICONINFO info = {};
+	info.cbSize = sizeof(info);
+	RETURN_IF_FAILED(SHGetStockIconInfo(iconId, SHGSI_SYSICONINDEX, &info));
 
-	switch (defaultIconType)
-	{
-	case DefaultIconType::Folder:
-		dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_NORMAL;
-		break;
+	outputImageIndex = info.iSysImageIndex;
 
-	case DefaultIconType::File:
-	default:
-		dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
-		break;
-	}
-
-	/* Under unicode, the filename argument cannot be NULL,
-	as it is not a valid unicode character. */
-	SHGetFileInfo(_T("dummy"), dwFileAttributes, &shfi, sizeof(SHFILEINFO),
-		SHGFI_SYSICONINDEX | SHGFI_USEFILEATTRIBUTES);
-
-	return shfi.iIcon;
+	return S_OK;
 }
 
 HRESULT BindToIdl(PCIDLIST_ABSOLUTE pidl, REFIID riid, void **ppv)
@@ -1103,9 +1089,7 @@ BOOL LoadContextMenuHandlers(const TCHAR *szRegKey,
 				{
 					if (std::none_of(blacklistedCLSIDEntries.begin(), blacklistedCLSIDEntries.end(),
 							[&clsid](const std::wstring &blacklistedEntry)
-							{
-								return boost::iequals(clsid, blacklistedEntry);
-							}))
+							{ return boost::iequals(clsid, blacklistedEntry); }))
 					{
 						ContextMenuHandler contextMenuHandler;
 
@@ -1464,10 +1448,7 @@ std::vector<unique_pidl_absolute> DeepCopyPidls(const std::vector<PCIDLIST_ABSOL
 	std::vector<unique_pidl_absolute> copiedPidls;
 	copiedPidls.reserve(pidls.size());
 	std::transform(pidls.begin(), pidls.end(), std::back_inserter(copiedPidls),
-		[](const PCIDLIST_ABSOLUTE &pidl)
-		{
-			return unique_pidl_absolute(ILCloneFull(pidl));
-		});
+		[](const PCIDLIST_ABSOLUTE &pidl) { return unique_pidl_absolute(ILCloneFull(pidl)); });
 	return copiedPidls;
 }
 
@@ -1477,9 +1458,7 @@ std::vector<unique_pidl_absolute> DeepCopyPidls(const std::vector<unique_pidl_ab
 	copiedPidls.reserve(pidls.size());
 	std::transform(pidls.begin(), pidls.end(), std::back_inserter(copiedPidls),
 		[](const unique_pidl_absolute &pidl)
-		{
-			return unique_pidl_absolute(ILCloneFull(pidl.get()));
-		});
+		{ return unique_pidl_absolute(ILCloneFull(pidl.get())); });
 	return copiedPidls;
 }
 
@@ -1488,11 +1467,23 @@ std::vector<PCIDLIST_ABSOLUTE> ShallowCopyPidls(const std::vector<unique_pidl_ab
 	std::vector<PCIDLIST_ABSOLUTE> rawPidls;
 	rawPidls.reserve(pidls.size());
 	std::transform(pidls.begin(), pidls.end(), std::back_inserter(rawPidls),
-		[](const unique_pidl_absolute &pidl)
-		{
-			return pidl.get();
-		});
+		[](const unique_pidl_absolute &pidl) { return pidl.get(); });
 	return rawPidls;
+}
+
+// Returns a vector containing the pidl of each parent item, proceeding from the first parent to the
+// root.
+std::vector<PidlAbsolute> GetParentPidlCollection(PCIDLIST_ABSOLUTE pidl)
+{
+	std::vector<PidlAbsolute> pidls;
+	unique_pidl_absolute currentPidl(ILCloneFull(pidl));
+
+	while (ILRemoveLastID(currentPidl.get()))
+	{
+		pidls.emplace_back(currentPidl.get());
+	}
+
+	return pidls;
 }
 
 std::size_t hash_value(const IID &iid)

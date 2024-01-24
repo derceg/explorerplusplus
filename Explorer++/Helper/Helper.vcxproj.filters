@@ -121,9 +121,6 @@
     <ClCompile Include="CachedIcons.cpp">
       <Filter>Shell</Filter>
     </ClCompile>
-    <ClCompile Include="IconFetcher.cpp">
-      <Filter>Shell</Filter>
-    </ClCompile>
     <ClCompile Include="DragDropHelper.cpp">
       <Filter>Data Exchange\Drag and Drop</Filter>
     </ClCompile>
@@ -292,9 +289,6 @@
       <Filter>Control Support</Filter>
     </ClInclude>
     <ClInclude Include="CachedIcons.h">
-      <Filter>Shell</Filter>
-    </ClInclude>
-    <ClInclude Include="IconFetcher.h">
       <Filter>Shell</Filter>
     </ClInclude>
     <ClInclude Include="DragDropHelper.h">

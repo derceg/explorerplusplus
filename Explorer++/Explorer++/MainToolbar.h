@@ -18,8 +18,10 @@
 #include <unordered_map>
 
 struct Config;
+class IconFetcher;
 class MainToolbar;
 struct NavigateParams;
+class Navigator;
 
 class MainToolbarPersistentSettings
 {
@@ -45,7 +47,8 @@ class MainToolbar : public BaseWindow
 {
 public:
 	static MainToolbar *Create(HWND parent, HINSTANCE resourceInstance,
-		CoreInterface *coreInterface, std::shared_ptr<Config> config);
+		CoreInterface *coreInterface, Navigator *navigator, IconFetcher *iconFetcher,
+		std::shared_ptr<Config> config);
 
 	void UpdateConfigDependentButtonStates();
 	void UpdateToolbarButtonStates();
@@ -61,7 +64,7 @@ private:
 	};
 
 	MainToolbar(HWND parent, HINSTANCE resourceInstance, CoreInterface *coreInterface,
-		std::shared_ptr<Config> config);
+		Navigator *navigator, IconFetcher *iconFetcher, std::shared_ptr<Config> config);
 	~MainToolbar();
 
 	static HWND CreateMainToolbar(HWND parent);
@@ -91,6 +94,7 @@ private:
 	void OnTBGetInfoTip(LPARAM lParam);
 	LRESULT OnTbnDropDown(const NMTOOLBAR *nmtb);
 	void ShowHistoryMenu(HistoryType historyType, const POINT &pt);
+	void ShowUpNavigationDropdown();
 	void ShowToolbarViewsDropdown();
 	void CreateViewsMenu(POINT *ptOrigin);
 
@@ -112,7 +116,9 @@ private:
 	MainToolbarPersistentSettings *m_persistentSettings;
 
 	HINSTANCE m_resourceInstance;
-	CoreInterface *m_coreInterface;
+	CoreInterface *m_coreInterface = nullptr;
+	Navigator *m_navigator = nullptr;
+	IconFetcher *m_iconFetcher = nullptr;
 	std::shared_ptr<Config> m_config;
 
 	wil::com_ptr_nothrow<IImageList> m_systemImageList;

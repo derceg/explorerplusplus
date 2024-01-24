@@ -22,7 +22,6 @@
 #include "../Helper/CachedIcons.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
-#include "../Helper/IconFetcher.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
@@ -67,7 +66,6 @@ TabContainer::TabContainer(HWND parent, TabNavigationInterface *tabNavigation,
 	m_bTabBeenDragged(FALSE),
 	m_iPreviousTabSelectionId(-1),
 	m_iconFetcher(m_hwnd, cachedIcons),
-	m_defaultFolderIconSystemImageListIndex(GetDefaultFolderIconIndex()),
 	m_dropTargetIndex(-1)
 {
 	Initialize(parent);
@@ -80,6 +78,8 @@ HWND TabContainer::CreateTabControl(HWND parent)
 
 void TabContainer::Initialize(HWND parent)
 {
+	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(m_defaultFolderIconSystemImageListIndex));
+
 	auto &dpiCompat = DpiCompatibility::GetInstance();
 	UINT dpi = dpiCompat.GetDpiForWindow(m_hwnd);
 

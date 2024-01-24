@@ -8,6 +8,7 @@
 #include "BrowserPane.h"
 #include "CommandLine.h"
 #include "CoreInterface.h"
+#include "IconFetcherImpl.h"
 #include "Literals.h"
 #include "Navigator.h"
 #include "PluginInterface.h"
@@ -22,7 +23,6 @@
 #include "../Helper/DropHandler.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/FileContextMenuManager.h"
-#include "../Helper/IconFetcher.h"
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
 #include <optional>
@@ -675,7 +675,7 @@ private:
 	// Ideally, it would be better to cancel operations that are running in the background thread,
 	// but as far as I'm aware, it's not possible to cancel SHGetFileInfo (which is what's
 	// ultimately used to retrieve the icons).
-	IconFetcher m_bookmarkIconFetcher;
+	IconFetcherImpl m_iconFetcher;
 
 	/* Undo support. */
 	FileActionHandler m_FileActionHandler;

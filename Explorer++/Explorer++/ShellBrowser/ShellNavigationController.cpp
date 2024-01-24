@@ -4,12 +4,12 @@
 
 #include "stdafx.h"
 #include "ShellNavigationController.h"
+#include "IconFetcher.h"
 #include "ShellNavigator.h"
 #include "TabNavigationInterface.h"
-#include "../Helper/IconFetcher.h"
 
 ShellNavigationController::ShellNavigationController(ShellNavigator *navigator,
-	TabNavigationInterface *tabNavigation, IconFetcherInterface *iconFetcher) :
+	TabNavigationInterface *tabNavigation, IconFetcher *iconFetcher) :
 	m_navigator(navigator),
 	m_tabNavigation(tabNavigation),
 	m_iconFetcher(iconFetcher)
@@ -18,7 +18,7 @@ ShellNavigationController::ShellNavigationController(ShellNavigator *navigator,
 }
 
 ShellNavigationController::ShellNavigationController(ShellNavigator *navigator,
-	TabNavigationInterface *tabNavigation, IconFetcherInterface *iconFetcher,
+	TabNavigationInterface *tabNavigation, IconFetcher *iconFetcher,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries, int currentEntry) :
 	NavigationController(CopyPreservedHistoryEntries(preservedEntries), currentEntry),
 	m_navigator(navigator),

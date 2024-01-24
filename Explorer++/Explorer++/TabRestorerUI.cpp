@@ -21,8 +21,11 @@ TabRestorerUI::TabRestorerUI(HINSTANCE resourceInstance, CoreInterface *coreInte
 	m_menuEndId(menuEndId)
 {
 	SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList));
+
+	int defaultFolderIconIndex;
+	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(defaultFolderIconIndex));
 	m_defaultFolderIconBitmap =
-		ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), GetDefaultFolderIconIndex());
+		ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), defaultFolderIconIndex);
 
 	m_connections.push_back(m_coreInterface->AddMainMenuPreShowObserver(
 		std::bind_front(&TabRestorerUI::OnMainMenuPreShow, this)));

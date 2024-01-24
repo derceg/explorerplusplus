@@ -571,6 +571,15 @@
     <ClCompile Include="ItemNameEditControl.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="ShellItemsMenu.cpp">
+      <Filter>Core\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="PopupMenuView.cpp">
+      <Filter>Core\UI\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="IconFetcherImpl.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1158,6 +1167,18 @@
     <ClInclude Include="ItemNameEditControl.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="ShellItemsMenu.h">
+      <Filter>Core\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="PopupMenuView.h">
+      <Filter>Core\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="IconFetcher.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="IconFetcherImpl.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1295,6 +1316,12 @@
     </Filter>
     <Filter Include="General Dialogs\Options">
       <UniqueIdentifier>{2904c500-a16e-431c-a86d-9c687bb0bb42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\UI">
+      <UniqueIdentifier>{f7610d99-baa5-4d9f-be3e-708c8822cda3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\UI\Views">
+      <UniqueIdentifier>{6590f498-1426-4089-b90b-9174b6a9462e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

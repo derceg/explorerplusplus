@@ -57,7 +57,7 @@ void Explorerplusplus::OnCreate()
 	DarkModeHelper::GetInstance().EnableForApp(ShouldEnableDarkMode(m_config->theme.get()));
 	m_config->theme.addObserver(std::bind_front(&Explorerplusplus::OnThemeUpdated, this));
 
-	m_bookmarksMainMenu = std::make_unique<BookmarksMainMenu>(this, this, &m_bookmarkIconFetcher,
+	m_bookmarksMainMenu = std::make_unique<BookmarksMainMenu>(this, this, &m_iconFetcher,
 		BookmarkTreeFactory::GetInstance()->GetBookmarkTree(),
 		MenuIdRange{ MENU_BOOKMARK_STARTID, MENU_BOOKMARK_ENDID });
 

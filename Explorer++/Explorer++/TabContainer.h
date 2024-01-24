@@ -4,11 +4,11 @@
 
 #pragma once
 
+#include "IconFetcherImpl.h"
 #include "MainFontSetter.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "SignalWrapper.h"
 #include "Tab.h"
-#include "../Helper/IconFetcher.h"
 #include "../Helper/PidlHelper.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/WindowSubclassWrapper.h"
@@ -235,7 +235,7 @@ private:
 
 	std::unordered_map<int, std::unique_ptr<Tab>> m_tabs;
 
-	IconFetcher m_iconFetcher;
+	IconFetcherImpl m_iconFetcher;
 	CachedIcons *m_cachedIcons;
 	wil::com_ptr_nothrow<IImageList> m_systemImageList;
 	int m_defaultFolderIconSystemImageListIndex;

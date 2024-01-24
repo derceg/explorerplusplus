@@ -9,6 +9,7 @@
 #include "Config.h"
 #include "CoreInterface.h"
 #include "FolderView.h"
+#include "IconFetcherImpl.h"
 #include "ItemData.h"
 #include "MainResource.h"
 #include "MassRenameDialog.h"
@@ -23,7 +24,6 @@
 #include "../Helper/DriveInfo.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/FileOperations.h"
-#include "../Helper/IconFetcher.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
@@ -96,7 +96,7 @@ ShellBrowser::ShellBrowser(HWND hOwner, CoreInterface *coreInterface,
 		coreInterface->GetConfig())
 {
 	InitializeListView();
-	m_iconFetcher = std::make_unique<IconFetcher>(m_hListView, m_cachedIcons);
+	m_iconFetcher = std::make_unique<IconFetcherImpl>(m_hListView, m_cachedIcons);
 	m_navigationController =
 		std::make_unique<ShellNavigationController>(this, tabNavigation, m_iconFetcher.get());
 
@@ -117,8 +117,8 @@ ShellBrowser::ShellBrowser(HWND hOwner, CoreInterface *coreInterface,
 
 	InitializeCriticalSection(&m_csDirectoryAltered);
 
-	m_iFolderIcon = GetDefaultFolderIconIndex();
-	m_iFileIcon = GetDefaultFileIconIndex();
+	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(m_iFolderIcon));
+	FAIL_FAST_IF_FAILED(GetDefaultFileIconIndex(m_iFileIcon));
 
 	AddClipboardFormatListener(m_hListView);
 

@@ -4,11 +4,11 @@
 
 #include "pch.h"
 #include "../Explorer++/ShellBrowser/ShellNavigationController.h"
+#include "IconFetcher.h"
 #include "../Explorer++/ShellBrowser/HistoryEntry.h"
 #include "../Explorer++/ShellBrowser/PreservedHistoryEntry.h"
 #include "../Explorer++/ShellBrowser/ShellNavigator.h"
 #include "../Explorer++/TabNavigationInterface.h"
-#include "../Helper/IconFetcher.h"
 #include "../Helper/ShellHelper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -150,12 +150,16 @@ public:
 	MOCK_METHOD(void, SelectTabById, (int tabId), (override));
 };
 
-class IconFetcherMock : public IconFetcherInterface
+class IconFetcherMock : public IconFetcher
 {
 public:
 	MOCK_METHOD(void, QueueIconTask, (std::wstring_view path, Callback callback), (override));
 	MOCK_METHOD(void, QueueIconTask, (PCIDLIST_ABSOLUTE pidl, Callback callback), (override));
 	MOCK_METHOD(void, ClearQueue, (), (override));
+	MOCK_METHOD(int, GetCachedIconIndexOrDefault,
+		(const std::wstring &itemPath, DefaultIconType defaultIconType), (const, override));
+	MOCK_METHOD(std::optional<int>, GetCachedIconIndex, (const std::wstring &itemPath),
+		(const, override));
 };
 
 class ShellNavigationControllerTest : public Test

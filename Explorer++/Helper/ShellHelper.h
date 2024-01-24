@@ -4,10 +4,12 @@
 
 #pragma once
 
+#include "PidlHelper.h"
 #include <wil/resource.h>
 #include <ShObjIdl.h>
 #include <ShlGuid.h>
 #include <exdisp.h>
+#include <shellapi.h>
 #include <list>
 #include <optional>
 #include <string>
@@ -40,12 +42,6 @@ static inline const WCHAR WSL_DISTRIBUTIONS_PATH[] = L"\\\\wsl$";
 
 const SHCOLUMNID SCID_ORIGINAL_LOCATION = { PSGUID_DISPLACED, PID_DISPLACED_FROM };
 const SHCOLUMNID SCID_DATE_DELETED = { PSGUID_DISPLACED, PID_DISPLACED_DATE };
-
-enum class DefaultIconType
-{
-	Folder,
-	File
-};
 
 enum class EnvVarsExpansion
 {
@@ -128,6 +124,7 @@ HRESULT SimplePidlToFullPidl(PCIDLIST_ABSOLUTE simplePidl, PIDLIST_ABSOLUTE *ful
 std::vector<unique_pidl_absolute> DeepCopyPidls(const std::vector<PCIDLIST_ABSOLUTE> &pidls);
 std::vector<unique_pidl_absolute> DeepCopyPidls(const std::vector<unique_pidl_absolute> &pidls);
 std::vector<PCIDLIST_ABSOLUTE> ShallowCopyPidls(const std::vector<unique_pidl_absolute> &pidls);
+std::vector<PidlAbsolute> GetParentPidlCollection(PCIDLIST_ABSOLUTE pidl);
 
 std::optional<std::wstring> TransformUserEnteredPathToAbsolutePathAndNormalize(
 	const std::wstring &userEnteredPath, const std::wstring &currentDirectory,
@@ -143,9 +140,9 @@ std::optional<std::wstring> PathStripToRootWrapper(const std::wstring &path);
 std::optional<std::wstring> GetCurrentDirectoryWrapper();
 
 /* Default icon indices. */
-int GetDefaultFolderIconIndex();
-int GetDefaultFileIconIndex();
-int GetDefaultIcon(DefaultIconType defaultIconType);
+[[nodiscard]] HRESULT GetDefaultFolderIconIndex(int &outputImageIndex);
+[[nodiscard]] HRESULT GetDefaultFileIconIndex(int &outputImageIndex);
+[[nodiscard]] HRESULT GetDefaultIcon(SHSTOCKICONID iconId, int &outputImageIndex);
 
 /* Infotips. */
 HRESULT GetItemInfoTip(const std::wstring &itemPath, std::wstring &outputInfoTip);

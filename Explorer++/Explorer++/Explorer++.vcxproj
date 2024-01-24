@@ -999,9 +999,12 @@
     <ClCompile Include="CustomFontStorage.cpp" />
     <ClCompile Include="FeatureList.cpp" />
     <ClCompile Include="FontsOptionsPage.cpp" />
+    <ClCompile Include="IconFetcherImpl.cpp" />
     <ClCompile Include="ItemNameEditControl.cpp" />
     <ClCompile Include="MainFontSetter.cpp" />
     <ClCompile Include="FontHelper.cpp" />
+    <ClCompile Include="PopupMenuView.cpp" />
+    <ClCompile Include="ShellItemsMenu.cpp" />
     <ClCompile Include="SystemFontHelper.cpp" />
     <ClCompile Include="ThemeManager.cpp" />
     <ClCompile Include="DefaultSettingsOptionsPage.cpp" />
@@ -1222,10 +1225,14 @@
     <ClInclude Include="Feature.h" />
     <ClInclude Include="FeatureList.h" />
     <ClInclude Include="FontsOptionsPage.h" />
+    <ClInclude Include="IconFetcher.h" />
+    <ClInclude Include="IconFetcherImpl.h" />
     <ClInclude Include="ItemNameEditControl.h" />
     <ClInclude Include="Literals.h" />
     <ClInclude Include="MainFontSetter.h" />
     <ClInclude Include="FontHelper.h" />
+    <ClInclude Include="PopupMenuView.h" />
+    <ClInclude Include="ShellItemsMenu.h" />
     <ClInclude Include="SystemFontHelper.h" />
     <ClInclude Include="ThemeManager.h" />
     <ClInclude Include="DefaultSettingsOptionsPage.h" />
