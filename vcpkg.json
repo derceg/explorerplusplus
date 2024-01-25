@@ -1,6 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
   "dependencies": [
+    "better-enums",
     "boost-algorithm",
     "boost-bimap",
     "boost-circular-buffer",

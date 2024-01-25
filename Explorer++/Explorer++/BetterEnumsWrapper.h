@@ -8,7 +8,4 @@
 public:                                                                                            \
 	Enum() = default;
 
-#pragma warning(push)
-#pragma warning(disable : 4100) // unreferenced formal parameter
-#include "../ThirdParty/BetterEnums/enum.h"
-#pragma warning(pop)
+#include <better-enums/enum.h>
