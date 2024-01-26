@@ -8,6 +8,7 @@
 #include "DefaultToolbarButtons.h"
 #include "Icon.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellItemsMenu.h"
@@ -701,6 +702,54 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, szInfoTip);
 		}
 	}
+	else if (ptbgit->iItem == MainToolbarButton::Up)
+	{
+		auto customizedInfoTip = MaybeGetCustomizedUpInfoTip();
+
+		if (customizedInfoTip)
+		{
+			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, customizedInfoTip->c_str());
+		}
+	}
+}
+
+// If there's a parent folder to navigate up to, a customized infotip will be generated that
+// contains the name of the folder.
+std::optional<std::wstring> MainToolbar::MaybeGetCustomizedUpInfoTip()
+{
+	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
+	auto currentPidl = tab.GetShellBrowser()->GetDirectoryIdl();
+
+	unique_pidl_absolute parentPidl;
+	HRESULT hr = GetVirtualParentPath(currentPidl.get(), wil::out_param(parentPidl));
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	std::wstring parentName;
+	hr = GetDisplayName(parentPidl.get(), SHGDN_NORMAL, parentName);
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	std::wstring infoTipTemplate =
+		ResourceHelper::LoadString(m_resourceInstance, IDS_MAIN_TOOLBAR_UP_TO_FOLDER);
+
+	TCHAR infoTip[512];
+	hr = StringCchPrintf(infoTip, SIZEOF_ARRAY(infoTip), infoTipTemplate.c_str(),
+		parentName.c_str());
+
+	if (FAILED(hr))
+	{
+		assert(false);
+		return std::nullopt;
+	}
+
+	return infoTip;
 }
 
 LRESULT MainToolbar::OnTbnDropDown(const NMTOOLBAR *nmtb)

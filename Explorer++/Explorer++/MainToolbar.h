@@ -92,6 +92,7 @@ private:
 	void OnTBReset();
 	void OnTBChange();
 	void OnTBGetInfoTip(LPARAM lParam);
+	std::optional<std::wstring> MaybeGetCustomizedUpInfoTip();
 	LRESULT OnTbnDropDown(const NMTOOLBAR *nmtb);
 	void ShowHistoryMenu(HistoryType historyType, const POINT &pt);
 	void ShowUpNavigationDropdown();
