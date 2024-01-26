@@ -13,15 +13,6 @@ environment:
   PFX_PASS:
     secure: rgMy2ixSiaW0sk2CwaHwO5pK8U98ynzt/jjiGNRSYPfaAcOTRZ5oX+fsgqn6qP54
 
-for:
-
--
-  branches:
-    only:
-      - /version-.*/
-
-  skip_non_tags: true
-
 init:
 - ps: >-
     if ($env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH -match '^l10n_') {
