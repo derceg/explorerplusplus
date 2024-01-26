@@ -67,7 +67,9 @@ MakeBimap(std::initializer_list<typename boost::bimap<L, R>::value_type> list)
 }
 
 #pragma warning(push)
-#pragma warning(disable:4996) //warning STL4010: Various members of std::allocator are deprecated in C++17.
+// warning STL4010: Various members of std::allocator are deprecated in C++17.
+// warning C4834: discarding return value of function with 'nodiscard' attribute
+#pragma warning(disable: 4996 4834)
 
 // Ideally, toolbar button IDs would be saved in the XML config file, rather
 // than button strings, but that's not especially easy to change now.
