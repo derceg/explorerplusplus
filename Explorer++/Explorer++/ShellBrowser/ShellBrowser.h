@@ -9,6 +9,7 @@
 #include "FolderSettings.h"
 #include "MainFontSetter.h"
 #include "ServiceProvider.h"
+#include "ShellBrowserInterface.h"
 #include "ShellChangeWatcher.h"
 #include "ShellNavigator.h"
 #include "SignalWrapper.h"
@@ -55,6 +56,7 @@ typedef struct
 } FolderInfo_t;
 
 class ShellBrowser :
+	public ShellBrowserInterface,
 	public ShellDropTargetWindow<int>,
 	public ShellNavigator,
 	public std::enable_shared_from_this<ShellBrowser>
@@ -75,7 +77,9 @@ public:
 	HWND GetListView() const;
 	FolderSettings GetFolderSettings() const;
 
-	ShellNavigationController *GetNavigationController() const;
+	// ShellBrowserInterface
+	ShellNavigationController *GetNavigationController() const override;
+
 	boost::signals2::connection AddNavigationStartedObserver(
 		const NavigationStartedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;

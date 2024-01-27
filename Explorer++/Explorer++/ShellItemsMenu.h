@@ -8,8 +8,8 @@
 #include "../Helper/PidlHelper.h"
 #include <wil/resource.h>
 
+class BrowserWindow;
 class IconFetcher;
-class Navigator;
 
 // Displays a set of shell items in a menu, with the name and icon of each item being displayed.
 // An item can be both clicked (to open it in the current tab) and middle-clicked (to open it in a
@@ -17,10 +17,14 @@ class Navigator;
 class ShellItemsMenu : public MenuController
 {
 public:
-	ShellItemsMenu(const std::vector<PidlAbsolute> &pidls, Navigator *navigator,
+	ShellItemsMenu(const std::vector<PidlAbsolute> &pidls, BrowserWindow *browserWindow,
 		IconFetcher *iconFetcher);
 
 	void Show(HWND hwnd, const POINT &point);
+
+	// MenuController
+	void OnMenuItemSelected(int menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown) override;
+	void OnMenuItemMiddleClicked(int menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown) override;
 
 private:
 	std::shared_ptr<PopupMenuView> BuildMenu(const std::vector<PidlAbsolute> &pidls);
@@ -30,10 +34,6 @@ private:
 	static void OnIconRetrieved(std::weak_ptr<PopupMenuView> weakMenuView, int menuItemId,
 		IImageList *systemImageList, int iconIndex);
 
-	// MenuController
-	void OnMenuItemSelected(int menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown) override;
-	void OnMenuItemMiddleClicked(int menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown) override;
-
 	void OpenSelectedItem(int menuItemId, bool isMiddleButtonDown, bool isCtrlKeyDown,
 		bool isShiftKeyDown);
 
@@ -41,9 +41,9 @@ private:
 	// shared_ptr is to allow weak references to the instance to be created.
 	std::shared_ptr<PopupMenuView> m_menuView;
 
-	wil::com_ptr_nothrow<IImageList> m_systemImageList;
-	Navigator *m_navigator = nullptr;
+	BrowserWindow *m_browserWindow = nullptr;
 	IconFetcher *m_iconFetcher = nullptr;
 	int m_idCounter = 1;
+	wil::com_ptr_nothrow<IImageList> m_systemImageList;
 	std::unordered_map<UINT, PidlAbsolute> m_idPidlMap;
 };

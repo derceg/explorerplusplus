@@ -6,11 +6,11 @@
 
 #include "AcceleratorUpdater.h"
 #include "BrowserPane.h"
+#include "BrowserWindow.h"
 #include "CommandLine.h"
 #include "CoreInterface.h"
 #include "IconFetcherImpl.h"
 #include "Literals.h"
-#include "Navigator.h"
 #include "PluginInterface.h"
 #include "Plugins/PluginCommandManager.h"
 #include "Plugins/PluginMenuManager.h"
@@ -73,9 +73,9 @@ class PluginManager;
 }
 
 class Explorerplusplus :
+	public BrowserWindow,
 	public CoreInterface,
 	private FileContextMenuHandler,
-	public Navigator,
 	public PluginInterface,
 	public TabNavigationInterface
 {
@@ -95,6 +95,9 @@ public:
 
 	/* Directory modification. */
 	static void DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData);
+
+	// BrowserWindow
+	BrowserPane *GetActivePane() const override;
 
 private:
 	static constexpr UINT WM_APP_CLOSE = WM_APP + 1;
@@ -295,8 +298,6 @@ private:
 	LRESULT CALLBACK TreeViewHolderWindowNotifyHandler(HWND hwnd, UINT msg, WPARAM wParam,
 		LPARAM lParam);
 	void OnTreeViewSelectionChangedTimer();
-
-	BrowserPane *GetActivePane() const;
 
 	/* Tab backing. */
 	void CreateTabBacking();

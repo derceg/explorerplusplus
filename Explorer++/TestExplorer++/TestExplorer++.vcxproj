@@ -205,6 +205,7 @@
     <ClCompile Include="CachedIconsTest.cpp" />
     <ClCompile Include="GdiplusHelperTest.cpp" />
     <ClCompile Include="HelperTest.cpp" />
+    <ClCompile Include="HistoryMenuTest.cpp" />
     <ClCompile Include="ManifestTest.cpp" />
     <ClCompile Include="MovableModelTest.cpp" />
     <ClCompile Include="pch.cpp">
@@ -227,6 +228,8 @@
     <ClCompile Include="ResourceHelper.cpp" />
     <ClCompile Include="ShellHelperTest.cpp" />
     <ClCompile Include="ShellNavigationControllerTest.cpp" />
+    <ClCompile Include="ShellNavigatorFake.cpp" />
+    <ClCompile Include="ShellNavigatorMock.cpp" />
     <ClCompile Include="StringHelperTest.cpp" />
     <ClCompile Include="TabTest.cpp" />
     <ClCompile Include="ViewModeHelperTest.cpp" />
@@ -245,10 +248,14 @@
     <ClInclude Include="BookmarkStorageHelper.h" />
     <ClInclude Include="BookmarkTreeHelper.h" />
     <ClInclude Include="ColorRulesStorageHelper.h" />
+    <ClInclude Include="IconFetcherMock.h" />
     <ClInclude Include="MovableModelHelper.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RegistryStorageHelper.h" />
     <ClInclude Include="ResourceHelper.h" />
+    <ClInclude Include="ShellNavigatorFake.h" />
+    <ClInclude Include="ShellNavigatorMock.h" />
+    <ClInclude Include="TabNavigationMock.h" />
     <ClInclude Include="XmlStorageHelper.h" />
   </ItemGroup>
   <ItemDefinitionGroup />

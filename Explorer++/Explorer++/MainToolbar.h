@@ -6,6 +6,7 @@
 
 #include "CoreInterface.h"
 #include "DefaultToolbarButtons.h"
+#include "HistoryMenu.h"
 #include "IconResourceLoader.h"
 #include "MainFontSetter.h"
 #include "SignalWrapper.h"
@@ -17,11 +18,11 @@
 #include <optional>
 #include <unordered_map>
 
+class BrowserWindow;
 struct Config;
 class IconFetcher;
 class MainToolbar;
 struct NavigateParams;
-class Navigator;
 
 class MainToolbarPersistentSettings
 {
@@ -47,7 +48,7 @@ class MainToolbar : public BaseWindow
 {
 public:
 	static MainToolbar *Create(HWND parent, HINSTANCE resourceInstance,
-		CoreInterface *coreInterface, Navigator *navigator, IconFetcher *iconFetcher,
+		BrowserWindow *browserWindow, CoreInterface *coreInterface, IconFetcher *iconFetcher,
 		std::shared_ptr<Config> config);
 
 	void UpdateConfigDependentButtonStates();
@@ -57,14 +58,8 @@ public:
 	SignalWrapper<MainToolbar, void()> sizeUpdatedSignal;
 
 private:
-	enum class HistoryType
-	{
-		Back,
-		Forward
-	};
-
-	MainToolbar(HWND parent, HINSTANCE resourceInstance, CoreInterface *coreInterface,
-		Navigator *navigator, IconFetcher *iconFetcher, std::shared_ptr<Config> config);
+	MainToolbar(HWND parent, HINSTANCE resourceInstance, BrowserWindow *browserWindow,
+		CoreInterface *coreInterface, IconFetcher *iconFetcher, std::shared_ptr<Config> config);
 	~MainToolbar();
 
 	static HWND CreateMainToolbar(HWND parent);
@@ -94,9 +89,9 @@ private:
 	void OnTBGetInfoTip(LPARAM lParam);
 	std::optional<std::wstring> MaybeGetCustomizedUpInfoTip();
 	LRESULT OnTbnDropDown(const NMTOOLBAR *nmtb);
-	void ShowHistoryMenu(HistoryType historyType, const POINT &pt);
-	void ShowUpNavigationDropdown();
-	void ShowToolbarViewsDropdown();
+	void ShowHistoryMenu(HistoryMenu::MenuType historyType);
+	void ShowUpNavigationMenu();
+	void ShowToolbarViewsMenu();
 	void CreateViewsMenu(POINT *ptOrigin);
 
 	void OnTabSelected(const Tab &tab);
@@ -117,13 +112,11 @@ private:
 	MainToolbarPersistentSettings *m_persistentSettings;
 
 	HINSTANCE m_resourceInstance;
+	BrowserWindow *m_browserWindow = nullptr;
 	CoreInterface *m_coreInterface = nullptr;
-	Navigator *m_navigator = nullptr;
 	IconFetcher *m_iconFetcher = nullptr;
 	std::shared_ptr<Config> m_config;
 
-	wil::com_ptr_nothrow<IImageList> m_systemImageList;
-	wil::unique_hbitmap m_defaultFolderIconBitmap;
 	wil::unique_himagelist m_imageListSmall;
 	wil::unique_himagelist m_imageListLarge;
 	std::unordered_map<int, int> m_toolbarImageMapSmall;

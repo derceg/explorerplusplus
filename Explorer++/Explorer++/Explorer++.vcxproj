@@ -999,6 +999,7 @@
     <ClCompile Include="CustomFontStorage.cpp" />
     <ClCompile Include="FeatureList.cpp" />
     <ClCompile Include="FontsOptionsPage.cpp" />
+    <ClCompile Include="HistoryMenu.cpp" />
     <ClCompile Include="IconFetcherImpl.cpp" />
     <ClCompile Include="ItemNameEditControl.cpp" />
     <ClCompile Include="MainFontSetter.cpp" />
@@ -1213,6 +1214,7 @@
     <ClInclude Include="Bookmarks\UI\Views\BookmarksToolbarView.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkMenuDropTarget.h" />
     <ClInclude Include="BrowserPane.h" />
+    <ClInclude Include="BrowserWindow.h" />
     <ClInclude Include="ColorRule.h" />
     <ClInclude Include="ColorRuleListView.h" />
     <ClInclude Include="ColorRuleModel.h" />
@@ -1225,6 +1227,7 @@
     <ClInclude Include="Feature.h" />
     <ClInclude Include="FeatureList.h" />
     <ClInclude Include="FontsOptionsPage.h" />
+    <ClInclude Include="HistoryMenu.h" />
     <ClInclude Include="IconFetcher.h" />
     <ClInclude Include="IconFetcherImpl.h" />
     <ClInclude Include="ItemNameEditControl.h" />
@@ -1232,6 +1235,7 @@
     <ClInclude Include="MainFontSetter.h" />
     <ClInclude Include="FontHelper.h" />
     <ClInclude Include="PopupMenuView.h" />
+    <ClInclude Include="ShellBrowser\ShellBrowserInterface.h" />
     <ClInclude Include="ShellItemsMenu.h" />
     <ClInclude Include="SystemFontHelper.h" />
     <ClInclude Include="ThemeManager.h" />

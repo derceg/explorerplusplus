@@ -580,6 +580,9 @@
     <ClCompile Include="IconFetcherImpl.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="HistoryMenu.cpp">
+      <Filter>Core\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1178,6 +1181,15 @@
     </ClInclude>
     <ClInclude Include="IconFetcherImpl.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="HistoryMenu.h">
+      <Filter>Core\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="BrowserWindow.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowser\ShellBrowserInterface.h">
+      <Filter>ShellBrowser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

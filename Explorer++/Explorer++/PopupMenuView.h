@@ -26,6 +26,10 @@ public:
 	void SetBitmapForItem(UINT id, wil::unique_hbitmap bitmap);
 	void Show(HWND hwnd, const POINT &point);
 
+	int GetItemCountForTesting() const;
+	UINT GetItemIdForTesting(int index) const;
+	std::wstring GetItemTextForTesting(int index) const;
+
 private:
 	LRESULT ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnMenuMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown);

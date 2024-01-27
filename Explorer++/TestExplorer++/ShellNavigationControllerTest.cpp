@@ -4,163 +4,16 @@
 
 #include "pch.h"
 #include "../Explorer++/ShellBrowser/ShellNavigationController.h"
-#include "IconFetcher.h"
+#include "IconFetcherMock.h"
+#include "ShellNavigatorMock.h"
+#include "TabNavigationMock.h"
 #include "../Explorer++/ShellBrowser/HistoryEntry.h"
 #include "../Explorer++/ShellBrowser/PreservedHistoryEntry.h"
-#include "../Explorer++/ShellBrowser/ShellNavigator.h"
-#include "../Explorer++/TabNavigationInterface.h"
 #include "../Helper/ShellHelper.h"
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <ShlObj.h>
 
 using namespace testing;
-
-class NavigatorFake : public ShellNavigator
-{
-public:
-	HRESULT Navigate(NavigateParams &navigateParams) override
-	{
-		m_navigationStartedSignal(navigateParams);
-		m_navigationCommittedSignal(navigateParams);
-		m_navigationCompletedSignal(navigateParams);
-		return S_OK;
-	}
-
-	boost::signals2::connection AddNavigationStartedObserver(
-		const NavigationStartedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) override
-	{
-		return m_navigationStartedSignal.connect(observer, position);
-	}
-
-	boost::signals2::connection AddNavigationCommittedObserver(
-		const NavigationCommittedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) override
-	{
-		return m_navigationCommittedSignal.connect(observer, position);
-	}
-
-	boost::signals2::connection AddNavigationCompletedObserver(
-		const NavigationCompletedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) override
-	{
-		return m_navigationCompletedSignal.connect(observer, position);
-	}
-
-	boost::signals2::connection AddNavigationFailedObserver(
-		const NavigationFailedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) override
-	{
-		return m_navigationFailedSignal.connect(observer, position);
-	}
-
-private:
-	NavigationStartedSignal m_navigationStartedSignal;
-	NavigationCommittedSignal m_navigationCommittedSignal;
-	NavigationCompletedSignal m_navigationCompletedSignal;
-	NavigationFailedSignal m_navigationFailedSignal;
-};
-
-class NavigatorMock : public ShellNavigator
-{
-public:
-	NavigatorMock()
-	{
-		ON_CALL(*this, NavigateImpl)
-			.WillByDefault(
-				[this](NavigateParams &navigateParams) { return m_fake.Navigate(navigateParams); });
-
-		ON_CALL(*this, AddNavigationStartedObserverImpl)
-			.WillByDefault([this](const NavigationStartedSignal::slot_type &observer,
-							   boost::signals2::connect_position position)
-				{ return m_fake.AddNavigationStartedObserver(observer, position); });
-
-		ON_CALL(*this, AddNavigationCommittedObserverImpl)
-			.WillByDefault([this](const NavigationCommittedSignal::slot_type &observer,
-							   boost::signals2::connect_position position)
-				{ return m_fake.AddNavigationCommittedObserver(observer, position); });
-
-		ON_CALL(*this, AddNavigationCompletedObserverImpl)
-			.WillByDefault([this](const NavigationCompletedSignal::slot_type &observer,
-							   boost::signals2::connect_position position)
-				{ return m_fake.AddNavigationCompletedObserver(observer, position); });
-
-		ON_CALL(*this, AddNavigationFailedObserverImpl)
-			.WillByDefault([this](const NavigationFailedSignal::slot_type &observer,
-							   boost::signals2::connect_position position)
-				{ return m_fake.AddNavigationFailedObserver(observer, position); });
-	}
-
-	MOCK_METHOD(HRESULT, NavigateImpl, (NavigateParams & navigateParams));
-	MOCK_METHOD(boost::signals2::connection, AddNavigationStartedObserverImpl,
-		(const NavigationStartedSignal::slot_type &observer,
-			boost::signals2::connect_position position));
-	MOCK_METHOD(boost::signals2::connection, AddNavigationCommittedObserverImpl,
-		(const NavigationCommittedSignal::slot_type &observer,
-			boost::signals2::connect_position position));
-	MOCK_METHOD(boost::signals2::connection, AddNavigationCompletedObserverImpl,
-		(const NavigationCompletedSignal::slot_type &observer,
-			boost::signals2::connect_position position));
-	MOCK_METHOD(boost::signals2::connection, AddNavigationFailedObserverImpl,
-		(const NavigationFailedSignal::slot_type &observer,
-			boost::signals2::connect_position position));
-
-	HRESULT Navigate(NavigateParams &navigateParams) override
-	{
-		return NavigateImpl(navigateParams);
-	}
-
-	boost::signals2::connection AddNavigationStartedObserver(
-		const NavigationStartedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) override
-	{
-		return AddNavigationStartedObserver(observer, position);
-	}
-
-	boost::signals2::connection AddNavigationCommittedObserver(
-		const NavigationCommittedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) override
-	{
-		return AddNavigationCommittedObserverImpl(observer, position);
-	}
-
-	boost::signals2::connection AddNavigationCompletedObserver(
-		const NavigationCompletedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) override
-	{
-		return AddNavigationCompletedObserverImpl(observer, position);
-	}
-
-	boost::signals2::connection AddNavigationFailedObserver(
-		const NavigationFailedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back) override
-	{
-		return AddNavigationFailedObserverImpl(observer, position);
-	}
-
-private:
-	NavigatorFake m_fake;
-};
-
-class TabNavigationMock : public TabNavigationInterface
-{
-public:
-	MOCK_METHOD(void, CreateNewTab, (NavigateParams & navigateParams, bool selected), (override));
-	MOCK_METHOD(void, SelectTabById, (int tabId), (override));
-};
-
-class IconFetcherMock : public IconFetcher
-{
-public:
-	MOCK_METHOD(void, QueueIconTask, (std::wstring_view path, Callback callback), (override));
-	MOCK_METHOD(void, QueueIconTask, (PCIDLIST_ABSOLUTE pidl, Callback callback), (override));
-	MOCK_METHOD(void, ClearQueue, (), (override));
-	MOCK_METHOD(int, GetCachedIconIndexOrDefault,
-		(const std::wstring &itemPath, DefaultIconType defaultIconType), (const, override));
-	MOCK_METHOD(std::optional<int>, GetCachedIconIndex, (const std::wstring &itemPath),
-		(const, override));
-};
 
 class ShellNavigationControllerTest : public Test
 {
@@ -196,7 +49,7 @@ protected:
 		return hr;
 	}
 
-	NavigatorMock m_navigator;
+	ShellNavigatorMock m_navigator;
 	TabNavigationMock m_tabNavigation;
 	IconFetcherMock m_iconFetcher;
 	ShellNavigationController m_navigationController;
@@ -245,7 +98,7 @@ protected:
 		return std::make_unique<PreservedHistoryEntry>(entry);
 	}
 
-	NavigatorMock m_navigator;
+	ShellNavigatorMock m_navigator;
 	TabNavigationMock m_tabNavigation;
 	IconFetcherMock m_iconFetcher;
 	std::unique_ptr<ShellNavigationController> m_navigationController;

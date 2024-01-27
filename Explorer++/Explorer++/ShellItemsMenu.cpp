@@ -4,14 +4,14 @@
 
 #include "stdafx.h"
 #include "ShellItemsMenu.h"
+#include "BrowserWindow.h"
 #include "IconFetcher.h"
-#include "Navigator.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/ShellHelper.h"
 
-ShellItemsMenu::ShellItemsMenu(const std::vector<PidlAbsolute> &pidls, Navigator *navigator,
+ShellItemsMenu::ShellItemsMenu(const std::vector<PidlAbsolute> &pidls, BrowserWindow *browserWindow,
 	IconFetcher *iconFetcher) :
-	m_navigator(navigator),
+	m_browserWindow(browserWindow),
 	m_iconFetcher(iconFetcher)
 {
 	[[maybe_unused]] HRESULT hr = SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList));
@@ -140,6 +140,7 @@ void ShellItemsMenu::OpenSelectedItem(int menuItemId, bool isMiddleButtonDown, b
 	bool isShiftKeyDown)
 {
 	auto &pidl = m_idPidlMap.at(menuItemId);
-	m_navigator->OpenItem(pidl.Raw(),
-		m_navigator->DetermineOpenDisposition(isMiddleButtonDown, isCtrlKeyDown, isShiftKeyDown));
+	m_browserWindow->OpenItem(pidl.Raw(),
+		m_browserWindow->DetermineOpenDisposition(isMiddleButtonDown, isCtrlKeyDown,
+			isShiftKeyDown));
 }

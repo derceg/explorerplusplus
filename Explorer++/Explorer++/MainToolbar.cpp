@@ -105,19 +105,20 @@ const boost::bimap<MainToolbarButton, std::wstring> TOOLBAR_BUTTON_XML_NAME_MAPP
 #pragma warning(pop)
 
 MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE resourceInstance,
-	CoreInterface *coreInterface, Navigator *navigator, IconFetcher *iconFetcher,
+	BrowserWindow *browserWindow, CoreInterface *coreInterface, IconFetcher *iconFetcher,
 	std::shared_ptr<Config> config)
 {
-	return new MainToolbar(parent, resourceInstance, coreInterface, navigator, iconFetcher, config);
+	return new MainToolbar(parent, resourceInstance, browserWindow, coreInterface, iconFetcher,
+		config);
 }
 
-MainToolbar::MainToolbar(HWND parent, HINSTANCE resourceInstance, CoreInterface *coreInterface,
-	Navigator *navigator, IconFetcher *iconFetcher, std::shared_ptr<Config> config) :
+MainToolbar::MainToolbar(HWND parent, HINSTANCE resourceInstance, BrowserWindow *browserWindow,
+	CoreInterface *coreInterface, IconFetcher *iconFetcher, std::shared_ptr<Config> config) :
 	BaseWindow(CreateMainToolbar(parent)),
 	m_persistentSettings(&MainToolbarPersistentSettings::GetInstance()),
 	m_resourceInstance(resourceInstance),
+	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
-	m_navigator(navigator),
 	m_iconFetcher(iconFetcher),
 	m_config(config),
 	m_fontSetter(m_hwnd, config.get()),
@@ -144,13 +145,6 @@ void MainToolbar::Initialize(HWND parent)
 	assert(TOOLBAR_BUTTON_ICON_MAPPINGS.size() == (MainToolbarButton::_size() - 1));
 
 	SendMessage(m_hwnd, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
-
-	SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList));
-
-	int defaultFolderIconIndex;
-	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(defaultFolderIconIndex));
-	m_defaultFolderIconBitmap =
-		ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), defaultFolderIconIndex);
 
 	UINT dpi = DpiCompatibility::GetInstance().GetDpiForWindow(m_hwnd);
 
@@ -754,128 +748,66 @@ std::optional<std::wstring> MainToolbar::MaybeGetCustomizedUpInfoTip()
 
 LRESULT MainToolbar::OnTbnDropDown(const NMTOOLBAR *nmtb)
 {
-	RECT toolbarRect;
-	GetWindowRect(m_hwnd, &toolbarRect);
-
-	POINT ptOrigin;
-	ptOrigin.x = toolbarRect.left;
-	ptOrigin.y = toolbarRect.bottom - 4;
-
 	if (nmtb->iItem == MainToolbarButton::Back)
 	{
-		ShowHistoryMenu(HistoryType::Back, ptOrigin);
-
+		ShowHistoryMenu(HistoryMenu::MenuType::Back);
 		return TBDDRET_DEFAULT;
 	}
 	else if (nmtb->iItem == MainToolbarButton::Forward)
 	{
-		RECT backButtonRect;
-		SendMessage(m_hwnd, TB_GETRECT, MainToolbarButton::Back,
-			reinterpret_cast<LPARAM>(&backButtonRect));
-
-		ptOrigin.x += backButtonRect.right;
-
-		ShowHistoryMenu(HistoryType::Forward, ptOrigin);
-
+		ShowHistoryMenu(HistoryMenu::MenuType::Forward);
 		return TBDDRET_DEFAULT;
 	}
 	else if (nmtb->iItem == MainToolbarButton::Up)
 	{
-		ShowUpNavigationDropdown();
+		ShowUpNavigationMenu();
 		return TBDDRET_DEFAULT;
 	}
 	else if (nmtb->iItem == MainToolbarButton::Views)
 	{
-		ShowToolbarViewsDropdown();
-
+		ShowToolbarViewsMenu();
 		return TBDDRET_DEFAULT;
 	}
 
 	return TBDDRET_NODEFAULT;
 }
 
-void MainToolbar::ShowHistoryMenu(HistoryType historyType, const POINT &pt)
+void MainToolbar::ShowHistoryMenu(HistoryMenu::MenuType historyType)
 {
-	std::vector<HistoryEntry *> history;
-
 	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
+	const auto *navigationController = tab.GetShellBrowser()->GetNavigationController();
 
-	if (historyType == HistoryType::Back)
+	if ((historyType == HistoryMenu::MenuType::Back && !navigationController->CanGoBack())
+		|| (historyType == HistoryMenu::MenuType::Forward && !navigationController->CanGoForward()))
 	{
-		history = tab.GetShellBrowser()->GetNavigationController()->GetBackHistory();
+		return;
+	}
+
+	MainToolbarButton button;
+
+	if (historyType == HistoryMenu::MenuType::Back)
+	{
+		button = MainToolbarButton::Back;
 	}
 	else
 	{
-		history = tab.GetShellBrowser()->GetNavigationController()->GetForwardHistory();
+		button = MainToolbarButton::Forward;
 	}
 
-	if (history.empty())
-	{
-		return;
-	}
+	RECT rcButton;
+	[[maybe_unused]] auto res =
+		SendMessage(m_hwnd, TB_GETRECT, button, reinterpret_cast<LPARAM>(&rcButton));
+	assert(res);
 
-	wil::unique_hmenu menu(CreatePopupMenu());
-	std::vector<wil::unique_hbitmap> menuImages;
-	int numInserted = 0;
+	POINT pt = { rcButton.left, rcButton.bottom };
+	res = ClientToScreen(m_hwnd, &pt);
+	assert(res);
 
-	for (auto &entry : history)
-	{
-		std::wstring displayName = entry->GetDisplayName();
-
-		MENUITEMINFO mii;
-		mii.cbSize = sizeof(mii);
-		mii.fMask = MIIM_ID | MIIM_STRING;
-		mii.wID = numInserted + 1;
-		mii.dwTypeData = displayName.data();
-
-		HBITMAP bitmap = nullptr;
-		auto iconIndex = entry->GetSystemIconIndex();
-
-		if (iconIndex)
-		{
-			wil::unique_hbitmap iconBitmap =
-				ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), *iconIndex);
-
-			if (iconBitmap)
-			{
-				bitmap = iconBitmap.get();
-				menuImages.push_back(std::move(iconBitmap));
-			}
-		}
-		else
-		{
-			bitmap = m_defaultFolderIconBitmap.get();
-		}
-
-		if (bitmap)
-		{
-			mii.fMask |= MIIM_BITMAP;
-			mii.hbmpItem = bitmap;
-		}
-
-		InsertMenuItem(menu.get(), numInserted, TRUE, &mii);
-
-		numInserted++;
-	}
-
-	int cmd = TrackPopupMenu(menu.get(), TPM_LEFTALIGN | TPM_VERTICAL | TPM_RETURNCMD, pt.x, pt.y,
-		0, m_hwnd, nullptr);
-
-	if (cmd == 0)
-	{
-		return;
-	}
-
-	if (historyType == HistoryType::Back)
-	{
-		cmd = -cmd;
-	}
-
-	Tab &selectedTab = m_coreInterface->GetTabContainer()->GetSelectedTab();
-	selectedTab.GetShellBrowser()->GetNavigationController()->GoToOffset(cmd);
+	HistoryMenu menu(m_browserWindow, historyType);
+	menu.Show(m_hwnd, pt);
 }
 
-void MainToolbar::ShowUpNavigationDropdown()
+void MainToolbar::ShowUpNavigationMenu()
 {
 	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
 	auto pidl = tab.GetShellBrowser()->GetDirectoryIdl();
@@ -903,11 +835,11 @@ void MainToolbar::ShowUpNavigationDropdown()
 	res = ClientToScreen(m_hwnd, &pt);
 	assert(res);
 
-	ShellItemsMenu menu(parentPidls, m_navigator, m_iconFetcher);
+	ShellItemsMenu menu(parentPidls, m_browserWindow, m_iconFetcher);
 	menu.Show(m_hwnd, pt);
 }
 
-void MainToolbar::ShowToolbarViewsDropdown()
+void MainToolbar::ShowToolbarViewsMenu()
 {
 	POINT ptOrigin;
 	RECT rcButton;

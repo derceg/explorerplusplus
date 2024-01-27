@@ -109,6 +109,15 @@
     <ClCompile Include="CustomFontStorageTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="HistoryMenuTest.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellNavigatorFake.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellNavigatorMock.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -194,6 +203,18 @@
     </ClInclude>
     <ClInclude Include="MovableModelHelper.h">
       <Filter>Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="IconFetcherMock.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="TabNavigationMock.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellNavigatorMock.h">
+      <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellNavigatorFake.h">
+      <Filter>ShellBrowser</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

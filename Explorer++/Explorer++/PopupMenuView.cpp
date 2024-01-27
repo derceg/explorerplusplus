@@ -104,3 +104,32 @@ void PopupMenuView::OnMenuMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown, bo
 
 	m_controller->OnMenuItemMiddleClicked(menuItemId, isCtrlKeyDown, isShiftKeyDown);
 }
+
+int PopupMenuView::GetItemCountForTesting() const
+{
+	return GetMenuItemCount(m_menu.get());
+}
+
+UINT PopupMenuView::GetItemIdForTesting(int index) const
+{
+	return GetMenuItemID(m_menu.get(), index);
+}
+
+std::wstring PopupMenuView::GetItemTextForTesting(int index) const
+{
+	TCHAR text[256];
+
+	MENUITEMINFO menuItemInfo = {};
+	menuItemInfo.cbSize = sizeof(menuItemInfo);
+	menuItemInfo.fMask = MIIM_STRING;
+	menuItemInfo.dwTypeData = text;
+	menuItemInfo.cch = static_cast<UINT>(std::size(text));
+	auto res = GetMenuItemInfo(m_menu.get(), index, true, &menuItemInfo);
+
+	if (!res)
+	{
+		return L"";
+	}
+
+	return text;
+}
