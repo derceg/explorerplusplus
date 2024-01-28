@@ -13,8 +13,8 @@ Misc:
   remove it as the default before you update, then change it back
   to the default after you've updated.
 
-Version 1.4.0
--------------
+Version 1.4.0 (29/01/2024)
+--------------------------
 New features:
 - The bookmarks system has been rewritten. The updated system has
   the following changes from the previous system:
