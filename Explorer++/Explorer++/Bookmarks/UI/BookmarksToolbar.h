@@ -15,16 +15,16 @@
 class BookmarkIconManager;
 class BookmarksToolbarView;
 class BookmarkTree;
+class BrowserWindow;
 class CoreInterface;
 class IconFetcher;
 struct MouseEvent;
-class Navigator;
 
 class BookmarksToolbar : private BookmarkDropTargetWindow
 {
 public:
-	static BookmarksToolbar *Create(BookmarksToolbarView *view, CoreInterface *coreInterface,
-		Navigator *navigator, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
+	static BookmarksToolbar *Create(BookmarksToolbarView *view, BrowserWindow *browserWindow,
+		CoreInterface *coreInterface, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
 
 	BookmarksToolbar(const BookmarksToolbar &) = delete;
 	BookmarksToolbar(BookmarksToolbar &&) = delete;
@@ -48,8 +48,8 @@ private:
 	// main portion of the button.
 	static constexpr double FOLDER_CENTRAL_RECT_INDENT_PERCENTAGE = 0.2;
 
-	BookmarksToolbar(BookmarksToolbarView *view, CoreInterface *coreInterface, Navigator *navigator,
-		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
+	BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browserWindow,
+		CoreInterface *coreInterface, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
 
 	void Initialize(IconFetcher *iconFetcher);
 	void AddBookmarkItems();
@@ -86,8 +86,8 @@ private:
 	BookmarkTree *m_bookmarkTree = nullptr;
 	BookmarksToolbarView *m_view = nullptr;
 
+	BrowserWindow *m_browserWindow = nullptr;
 	CoreInterface *m_coreInterface = nullptr;
-	Navigator *m_navigator = nullptr;
 
 	std::unique_ptr<BookmarkIconManager> m_bookmarkIconManager;
 	BookmarkContextMenu m_contextMenu;

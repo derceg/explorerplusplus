@@ -4,8 +4,8 @@
 
 #include "stdafx.h"
 #include "AddressBar.h"
+#include "BrowserWindow.h"
 #include "CoreInterface.h"
-#include "Navigator.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "Tab.h"
@@ -23,15 +23,16 @@
 #include <wil/common.h>
 #include <wil/resource.h>
 
-AddressBar *AddressBar::Create(HWND parent, CoreInterface *coreInterface, Navigator *navigator)
+AddressBar *AddressBar::Create(HWND parent, BrowserWindow *browserWindow,
+	CoreInterface *coreInterface)
 {
-	return new AddressBar(parent, coreInterface, navigator);
+	return new AddressBar(parent, browserWindow, coreInterface);
 }
 
-AddressBar::AddressBar(HWND parent, CoreInterface *coreInterface, Navigator *navigator) :
+AddressBar::AddressBar(HWND parent, BrowserWindow *browserWindow, CoreInterface *coreInterface) :
 	BaseWindow(CreateAddressBar(parent)),
+	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
-	m_navigator(navigator),
 	m_fontSetter(m_hwnd, coreInterface->GetConfig())
 {
 	Initialize(parent);
@@ -173,9 +174,10 @@ void AddressBar::OnEnterPressed()
 	// the text won't be reverted. That gives the user the chance to update the text and try again.
 	RevertTextInUI();
 
-	m_navigator->OpenItem(*absolutePath,
-		m_navigator->DetermineOpenDisposition(false, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT)));
-	m_coreInterface->FocusActiveTab();
+	m_browserWindow->OpenItem(*absolutePath,
+		m_browserWindow->DetermineOpenDisposition(false, IsKeyDown(VK_CONTROL),
+			IsKeyDown(VK_SHIFT)));
+	m_browserWindow->FocusActiveTab();
 }
 
 void AddressBar::OnEscapePressed()
@@ -192,7 +194,7 @@ void AddressBar::OnEscapePressed()
 	}
 	else
 	{
-		m_coreInterface->FocusActiveTab();
+		m_browserWindow->FocusActiveTab();
 	}
 }
 

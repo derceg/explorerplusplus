@@ -10,10 +10,10 @@
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/Views/BookmarksToolbarView.h"
+#include "BrowserWindow.h"
 #include "Config.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
-#include "Navigator.h"
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/DropSourceImpl.h"
@@ -127,21 +127,21 @@ private:
 	BookmarkIconManager *m_bookmarkIconManager;
 };
 
-BookmarksToolbar *BookmarksToolbar::Create(BookmarksToolbarView *view, CoreInterface *coreInterface,
-	Navigator *navigator, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree)
+BookmarksToolbar *BookmarksToolbar::Create(BookmarksToolbarView *view, BrowserWindow *browserWindow,
+	CoreInterface *coreInterface, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree)
 {
-	return new BookmarksToolbar(view, coreInterface, navigator, iconFetcher, bookmarkTree);
+	return new BookmarksToolbar(view, browserWindow, coreInterface, iconFetcher, bookmarkTree);
 }
 
-BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, CoreInterface *coreInterface,
-	Navigator *navigator, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree) :
+BookmarksToolbar::BookmarksToolbar(BookmarksToolbarView *view, BrowserWindow *browserWindow,
+	CoreInterface *coreInterface, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree) :
 	BookmarkDropTargetWindow(view->GetHWND(), bookmarkTree),
 	m_view(view),
+	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
-	m_navigator(navigator),
 	m_bookmarkTree(bookmarkTree),
-	m_contextMenu(bookmarkTree, coreInterface->GetResourceInstance(), coreInterface, navigator),
-	m_bookmarkMenu(bookmarkTree, coreInterface->GetResourceInstance(), coreInterface, navigator,
+	m_contextMenu(bookmarkTree, coreInterface->GetResourceInstance(), browserWindow, coreInterface),
+	m_bookmarkMenu(bookmarkTree, coreInterface->GetResourceInstance(), browserWindow, coreInterface,
 		iconFetcher, view->GetHWND())
 {
 	Initialize(iconFetcher);
@@ -275,8 +275,8 @@ void BookmarksToolbar::OnBookmarkClicked(BookmarkItem *bookmarkItem, const Mouse
 	UNREFERENCED_PARAMETER(event);
 
 	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
-		m_navigator->DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey),
-		m_coreInterface, m_navigator);
+		m_browserWindow->DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey),
+		m_coreInterface, m_browserWindow);
 }
 
 void BookmarksToolbar::OnBookmarkFolderClicked(BookmarkItem *bookmarkItem, const MouseEvent &event)
@@ -284,8 +284,8 @@ void BookmarksToolbar::OnBookmarkFolderClicked(BookmarkItem *bookmarkItem, const
 	if (event.ctrlKey)
 	{
 		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
-			m_navigator->DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey),
-			m_coreInterface, m_navigator);
+			m_browserWindow->DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey),
+			m_coreInterface, m_browserWindow);
 		return;
 	}
 
@@ -302,8 +302,8 @@ void BookmarksToolbar::OnButtonMiddleClicked(const BookmarkItem *bookmarkItem,
 	const MouseEvent &event)
 {
 	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
-		m_navigator->DetermineOpenDisposition(true, event.ctrlKey, event.shiftKey), m_coreInterface,
-		m_navigator);
+		m_browserWindow->DetermineOpenDisposition(true, event.ctrlKey, event.shiftKey),
+		m_coreInterface, m_browserWindow);
 }
 
 void BookmarksToolbar::OnButtonRightClicked(BookmarkItem *bookmarkItem, const MouseEvent &event)

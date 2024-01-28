@@ -9,6 +9,7 @@
 #include "Bookmarks/BookmarkNavigationController.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "Bookmarks/UI/BookmarkTreeView.h"
+#include "BrowserWindow.h"
 #include "CoreInterface.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
@@ -23,11 +24,11 @@
 const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
 ManageBookmarksDialog::ManageBookmarksDialog(HINSTANCE resourceInstance, HWND hParent,
-	CoreInterface *coreInterface, Navigator *navigator, IconFetcher *iconFetcher,
+	BrowserWindow *browserWindow, CoreInterface *coreInterface, IconFetcher *iconFetcher,
 	BookmarkTree *bookmarkTree) :
 	ThemedDialog(resourceInstance, IDD_MANAGE_BOOKMARKS, hParent, DialogSizingType::Both),
+	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
-	m_navigator(navigator),
 	m_iconFetcher(iconFetcher),
 	m_bookmarkTree(bookmarkTree)
 {
@@ -190,7 +191,7 @@ void ManageBookmarksDialog::SetupListView()
 	HWND hListView = GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW);
 
 	m_bookmarkListView = new BookmarkListView(hListView, GetResourceInstance(), m_bookmarkTree,
-		m_coreInterface, m_navigator, m_iconFetcher, m_persistentSettings->m_listViewColumns);
+		m_browserWindow, m_coreInterface, m_iconFetcher, m_persistentSettings->m_listViewColumns);
 
 	m_connections.push_back(m_bookmarkListView->AddNavigationCompletedObserver(
 		std::bind_front(&ManageBookmarksDialog::OnListViewNavigation, this)));

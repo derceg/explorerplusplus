@@ -104,7 +104,6 @@ public:
 	virtual void SetListViewInitialPosition(HWND hListView) = 0;
 
 	virtual void FocusChanged() = 0;
-	virtual void FocusActiveTab() = 0;
 
 	// Used to support the options dialog.
 	virtual void SaveAllSettings() = 0;

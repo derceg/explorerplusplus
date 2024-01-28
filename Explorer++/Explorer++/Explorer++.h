@@ -98,6 +98,7 @@ public:
 
 	// BrowserWindow
 	BrowserPane *GetActivePane() const override;
+	void FocusActiveTab() override;
 
 private:
 	static constexpr UINT WM_APP_CLOSE = WM_APP + 1;
@@ -523,7 +524,6 @@ private:
 		const DeviceChangeSignal::slot_type &observer) override;
 	boost::signals2::connection AddApplicationShuttingDownObserver(
 		const ApplicationShuttingDownSignal::slot_type &observer) override;
-	void FocusActiveTab() override;
 
 	/* Menus. */
 	void InitializeMainMenu();

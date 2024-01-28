@@ -6,6 +6,7 @@
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkTree.h"
+#include "BrowserWindow.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -15,14 +16,13 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/MenuHelper.h"
 
-BookmarksMainMenu::BookmarksMainMenu(CoreInterface *coreInterface, Navigator *navigator,
+BookmarksMainMenu::BookmarksMainMenu(BrowserWindow *browserWindow, CoreInterface *coreInterface,
 	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, const MenuIdRange &menuIdRange) :
 	m_coreInterface(coreInterface),
-	m_navigator(navigator),
 	m_bookmarkTree(bookmarkTree),
 	m_menuIdRange(menuIdRange),
 	m_menuBuilder(coreInterface, iconFetcher, coreInterface->GetResourceInstance()),
-	m_controller(bookmarkTree, coreInterface, navigator, coreInterface->GetMainWindow())
+	m_controller(bookmarkTree, browserWindow, coreInterface, coreInterface->GetMainWindow())
 {
 	m_connections.push_back(coreInterface->AddMainMenuPreShowObserver(
 		std::bind_front(&BookmarksMainMenu::OnMainMenuPreShow, this)));

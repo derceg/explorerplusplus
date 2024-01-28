@@ -12,21 +12,22 @@
 #include <wil/resource.h>
 #include <optional>
 
+class BrowserWindow;
 class CoreInterface;
 struct NavigateParams;
-class Navigator;
 class Tab;
 
 class AddressBar : public BaseWindow
 {
 public:
-	static AddressBar *Create(HWND parent, CoreInterface *coreInterface, Navigator *navigator);
+	static AddressBar *Create(HWND parent, BrowserWindow *browserWindow,
+		CoreInterface *coreInterface);
 
 	// Signals
 	SignalWrapper<AddressBar, void()> sizeUpdatedSignal;
 
 private:
-	AddressBar(HWND parent, CoreInterface *coreInterface, Navigator *navigator);
+	AddressBar(HWND parent, BrowserWindow *browserWindow, CoreInterface *coreInterface);
 	~AddressBar() = default;
 
 	static HWND CreateAddressBar(HWND parent);
@@ -47,8 +48,8 @@ private:
 	void OnHistoryEntryUpdated(const HistoryEntry &entry, HistoryEntry::PropertyType propertyType);
 	void OnFontOrDpiUpdated();
 
-	CoreInterface *m_coreInterface;
-	Navigator *m_navigator;
+	BrowserWindow *m_browserWindow = nullptr;
+	CoreInterface *m_coreInterface = nullptr;
 
 	MainFontSetter m_fontSetter;
 

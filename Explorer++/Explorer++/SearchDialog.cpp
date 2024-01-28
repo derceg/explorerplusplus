@@ -4,11 +4,11 @@
 
 #include "stdafx.h"
 #include "SearchDialog.h"
+#include "BrowserWindow.h"
 #include "CoreInterface.h"
 #include "DialogConstants.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
-#include "Navigator.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
@@ -58,12 +58,12 @@ const TCHAR SearchDialogPersistentSettings::SETTING_DIRECTORY_LIST[] = _T("Direc
 const TCHAR SearchDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
 
 SearchDialog::SearchDialog(HINSTANCE resourceInstance, HWND hParent,
-	std::wstring_view searchDirectory, CoreInterface *coreInterface, Navigator *navigator,
+	std::wstring_view searchDirectory, BrowserWindow *browserWindow, CoreInterface *coreInterface,
 	TabContainer *tabContainer) :
 	ThemedDialog(resourceInstance, IDD_SEARCH, hParent, DialogSizingType::Both),
 	m_searchDirectory(searchDirectory),
+	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
-	m_navigator(navigator),
 	m_tabContainer(tabContainer),
 	m_bSearching(FALSE),
 	m_bStopSearching(FALSE),
@@ -602,7 +602,7 @@ BOOL SearchDialog::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		for (auto pidlItem : pidlItems)
 		{
 			unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItem));
-			m_navigator->OpenItem(pidlComplete.get());
+			m_browserWindow->OpenItem(pidlComplete.get());
 		}
 
 		return TRUE;
@@ -661,7 +661,7 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 
 					if (hr == S_OK)
 					{
-						m_navigator->OpenItem(pidlFull.get());
+						m_browserWindow->OpenItem(pidlFull.get());
 					}
 				}
 			}

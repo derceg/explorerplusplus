@@ -6,17 +6,18 @@
 #include "Bookmarks/UI/BookmarkMenu.h"
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/UI/BookmarkMenuDropTarget.h"
+#include "BrowserWindow.h"
 #include "../BookmarkDataExchange.h"
 #include "../Helper/DropSourceImpl.h"
 #include "../Helper/MenuHelper.h"
 
 BookmarkMenu::BookmarkMenu(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
-	CoreInterface *coreInterface, Navigator *navigator, IconFetcher *iconFetcher,
+	BrowserWindow *browserWindow, CoreInterface *coreInterface, IconFetcher *iconFetcher,
 	HWND parentWindow) :
 	m_bookmarkTree(bookmarkTree),
 	m_parentWindow(parentWindow),
 	m_menuBuilder(coreInterface, iconFetcher, resourceInstance),
-	m_controller(bookmarkTree, coreInterface, navigator, parentWindow)
+	m_controller(bookmarkTree, browserWindow, coreInterface, parentWindow)
 {
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parentWindow,
 		std::bind_front(&BookmarkMenu::ParentWindowSubclass, this)));

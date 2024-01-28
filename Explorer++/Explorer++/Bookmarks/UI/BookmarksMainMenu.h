@@ -11,15 +11,15 @@
 #include <wil/resource.h>
 
 class BookmarkTree;
+class BrowserWindow;
 class CoreInterface;
 class IconFetcher;
-class Navigator;
 
 class BookmarksMainMenu
 {
 public:
-	BookmarksMainMenu(CoreInterface *coreInterface, Navigator *navigator, IconFetcher *iconFetcher,
-		BookmarkTree *bookmarkTree, const MenuIdRange &menuIdRange);
+	BookmarksMainMenu(BrowserWindow *browserWindow, CoreInterface *coreInterface,
+		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, const MenuIdRange &menuIdRange);
 	~BookmarksMainMenu();
 
 	void OnMenuItemClicked(int menuItemId);
@@ -36,9 +36,8 @@ private:
 	bool OnMenuItemMiddleClicked(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown);
 	bool OnMenuItemRightClicked(HMENU menu, int index, const POINT &pt);
 
-	CoreInterface *m_coreInterface;
-	Navigator *m_navigator;
-	BookmarkTree *m_bookmarkTree;
+	CoreInterface *m_coreInterface = nullptr;
+	BookmarkTree *m_bookmarkTree = nullptr;
 	const MenuIdRange m_menuIdRange;
 	BookmarkMenuBuilder m_menuBuilder;
 

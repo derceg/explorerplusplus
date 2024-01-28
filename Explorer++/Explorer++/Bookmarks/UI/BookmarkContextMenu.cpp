@@ -5,15 +5,16 @@
 #include "stdafx.h"
 #include "Bookmarks/UI/BookmarkContextMenu.h"
 #include "Bookmarks/BookmarkClipboard.h"
+#include "BrowserWindow.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/MenuHelper.h"
 #include <wil/resource.h>
 
 BookmarkContextMenu::BookmarkContextMenu(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
-	CoreInterface *coreInterface, Navigator *navigator) :
+	BrowserWindow *browserWindow, CoreInterface *coreInterface) :
 	m_resourceInstance(resourceInstance),
-	m_controller(bookmarkTree, resourceInstance, coreInterface, navigator),
+	m_controller(bookmarkTree, resourceInstance, browserWindow, coreInterface),
 	m_showingMenu(false)
 {
 }

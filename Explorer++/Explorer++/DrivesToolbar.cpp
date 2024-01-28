@@ -4,12 +4,12 @@
 
 #include "stdafx.h"
 #include "DrivesToolbar.h"
+#include "BrowserWindow.h"
 #include "Config.h"
 #include "CoreInterface.h"
 #include "DriveModel.h"
 #include "DrivesToolbarView.h"
 #include "MainResource.h"
-#include "Navigator.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellNavigator.h"
 #include "TabContainer.h"
@@ -71,17 +71,18 @@ private:
 };
 
 DrivesToolbar *DrivesToolbar::Create(DrivesToolbarView *view,
-	std::unique_ptr<DriveModel> driveModel, CoreInterface *coreInterface, Navigator *navigator)
+	std::unique_ptr<DriveModel> driveModel, BrowserWindow *browserWindow,
+	CoreInterface *coreInterface)
 {
-	return new DrivesToolbar(view, std::move(driveModel), coreInterface, navigator);
+	return new DrivesToolbar(view, std::move(driveModel), browserWindow, coreInterface);
 }
 
 DrivesToolbar::DrivesToolbar(DrivesToolbarView *view, std::unique_ptr<DriveModel> driveModel,
-	CoreInterface *coreInterface, Navigator *navigator) :
+	BrowserWindow *browserWindow, CoreInterface *coreInterface) :
 	m_view(view),
 	m_driveModel(std::move(driveModel)),
-	m_coreInterface(coreInterface),
-	m_navigator(navigator)
+	m_browserWindow(browserWindow),
+	m_coreInterface(coreInterface)
 {
 	Initialize();
 }
@@ -158,14 +159,14 @@ void DrivesToolbar::OnButtonClicked(const std::wstring &drivePath, const MouseEv
 {
 	UNREFERENCED_PARAMETER(event);
 
-	m_navigator->OpenItem(drivePath,
-		m_navigator->DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey));
+	m_browserWindow->OpenItem(drivePath,
+		m_browserWindow->DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey));
 }
 
 void DrivesToolbar::OnButtonMiddleClicked(const std::wstring &drivePath, const MouseEvent &event)
 {
-	m_navigator->OpenItem(drivePath,
-		m_navigator->DetermineOpenDisposition(true, event.ctrlKey, event.shiftKey));
+	m_browserWindow->OpenItem(drivePath,
+		m_browserWindow->DetermineOpenDisposition(true, event.ctrlKey, event.shiftKey));
 }
 
 void DrivesToolbar::OnButtonRightClicked(const std::wstring &drivePath, const MouseEvent &event)
@@ -222,7 +223,7 @@ BOOL DrivesToolbar::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		assert(pidlItems.size() == 1);
 
 		unique_pidl_absolute pidl(ILCombine(pidlParent, pidlItems[0]));
-		m_navigator->OpenItem(pidl.get());
+		m_browserWindow->OpenItem(pidl.get());
 		return TRUE;
 	}
 

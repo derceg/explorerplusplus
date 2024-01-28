@@ -15,10 +15,10 @@
 class BookmarkNavigationController;
 class BookmarkTree;
 class BookmarkTreeView;
+class BrowserWindow;
 class CoreInterface;
 class IconFetcher;
 class ManageBookmarksDialog;
-class Navigator;
 class WindowSubclassWrapper;
 
 class ManageBookmarksDialogPersistentSettings : public DialogSettings
@@ -49,8 +49,8 @@ private:
 class ManageBookmarksDialog : public ThemedDialog
 {
 public:
-	ManageBookmarksDialog(HINSTANCE resourceInstance, HWND hParent, CoreInterface *coreInterface,
-		Navigator *navigator, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
+	ManageBookmarksDialog(HINSTANCE resourceInstance, HWND hParent, BrowserWindow *browserWindow,
+		CoreInterface *coreInterface, IconFetcher *iconFetcher, BookmarkTree *bookmarkTree);
 	~ManageBookmarksDialog();
 
 protected:
@@ -116,21 +116,21 @@ private:
 	wil::unique_himagelist m_imageListToolbar;
 	IconImageListMapping m_imageListToolbarMappings;
 
-	CoreInterface *m_coreInterface;
-	Navigator *m_navigator;
-	IconFetcher *m_iconFetcher;
+	BrowserWindow *m_browserWindow = nullptr;
+	CoreInterface *m_coreInterface = nullptr;
+	IconFetcher *m_iconFetcher = nullptr;
 
-	BookmarkTree *m_bookmarkTree;
+	BookmarkTree *m_bookmarkTree = nullptr;
 
-	BookmarkItem *m_currentBookmarkFolder;
+	BookmarkItem *m_currentBookmarkFolder = nullptr;
 
-	BookmarkTreeView *m_bookmarkTreeView;
-	BookmarkListView *m_bookmarkListView;
+	BookmarkTreeView *m_bookmarkTreeView = nullptr;
+	BookmarkListView *m_bookmarkListView = nullptr;
 
 	std::unique_ptr<BookmarkNavigationController> m_navigationController;
 
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
-	ManageBookmarksDialogPersistentSettings *m_persistentSettings;
+	ManageBookmarksDialogPersistentSettings *m_persistentSettings = nullptr;
 };

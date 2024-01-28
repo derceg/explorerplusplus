@@ -7,6 +7,7 @@
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/BookmarkTree.h"
+#include "BrowserWindow.h"
 #include "Config.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
@@ -25,18 +26,18 @@
 #include <utility>
 
 BookmarkListView::BookmarkListView(HWND hListView, HINSTANCE resourceInstance,
-	BookmarkTree *bookmarkTree, CoreInterface *coreInterface, Navigator *navigator,
+	BookmarkTree *bookmarkTree, BrowserWindow *browserWindow, CoreInterface *coreInterface,
 	IconFetcher *iconFetcher, const std::vector<Column> &initialColumns) :
 	BookmarkDropTargetWindow(hListView, bookmarkTree),
 	m_hListView(hListView),
 	m_resourceInstance(resourceInstance),
 	m_bookmarkTree(bookmarkTree),
+	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
-	m_navigator(navigator),
 	m_columns(initialColumns),
 	m_sortColumn(BookmarkHelper::ColumnType::Default),
 	m_sortAscending(true),
-	m_bookmarkContextMenu(bookmarkTree, resourceInstance, coreInterface, navigator)
+	m_bookmarkContextMenu(bookmarkTree, resourceInstance, browserWindow, coreInterface)
 {
 	ListView_SetExtendedListViewStyleEx(hListView,
 		LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_LABELTIP,
@@ -485,7 +486,7 @@ void BookmarkListView::OnDblClk(const NMITEMACTIVATE *itemActivate)
 			m_coreInterface->GetConfig()->openTabsInForeground
 				? OpenFolderDisposition::ForegroundTab
 				: OpenFolderDisposition::BackgroundTab,
-			m_coreInterface, m_navigator);
+			m_coreInterface, m_browserWindow);
 	}
 }
 
@@ -849,7 +850,7 @@ void BookmarkListView::OnEnterPressed()
 		for (BookmarkItem *bookmarkItem : bookmarkItems)
 		{
 			BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem, disposition,
-				m_coreInterface, m_navigator);
+				m_coreInterface, m_browserWindow);
 
 			disposition = OpenFolderDisposition::BackgroundTab;
 		}

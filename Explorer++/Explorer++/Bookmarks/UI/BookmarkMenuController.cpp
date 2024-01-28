@@ -6,15 +6,16 @@
 #include "Bookmarks/UI/BookmarkMenuController.h"
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkItem.h"
+#include "BrowserWindow.h"
 #include "CoreInterface.h"
 
 BookmarkMenuController::BookmarkMenuController(BookmarkTree *bookmarkTree,
-	CoreInterface *coreInterface, Navigator *navigator, HWND parentWindow) :
+	BrowserWindow *browserWindow, CoreInterface *coreInterface, HWND parentWindow) :
+	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
-	m_navigator(navigator),
 	m_parentWindow(parentWindow),
-	m_bookmarkContextMenu(bookmarkTree, coreInterface->GetResourceInstance(), coreInterface,
-		navigator)
+	m_bookmarkContextMenu(bookmarkTree, coreInterface->GetResourceInstance(), browserWindow,
+		coreInterface)
 {
 }
 
@@ -24,16 +25,16 @@ void BookmarkMenuController::OnMenuItemSelected(const BookmarkItem *bookmarkItem
 	assert(bookmarkItem->IsBookmark());
 
 	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
-		m_navigator->DetermineOpenDisposition(false, isCtrlKeyDown, isShiftKeyDown),
-		m_coreInterface, m_navigator);
+		m_browserWindow->DetermineOpenDisposition(false, isCtrlKeyDown, isShiftKeyDown),
+		m_coreInterface, m_browserWindow);
 }
 
 void BookmarkMenuController::OnMenuItemMiddleClicked(const BookmarkItem *bookmarkItem,
 	bool isCtrlKeyDown, bool isShiftKeyDown)
 {
 	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
-		m_navigator->DetermineOpenDisposition(true, isCtrlKeyDown, isShiftKeyDown), m_coreInterface,
-		m_navigator);
+		m_browserWindow->DetermineOpenDisposition(true, isCtrlKeyDown, isShiftKeyDown),
+		m_coreInterface, m_browserWindow);
 }
 
 void BookmarkMenuController::OnMenuItemRightClicked(BookmarkItem *bookmarkItem, const POINT &pt)

@@ -9,8 +9,8 @@
 #include "Bookmarks/UI/BookmarkContextMenuController.h"
 
 class BookmarkTree;
+class BrowserWindow;
 class CoreInterface;
-class Navigator;
 
 enum class MenuType
 {
@@ -22,7 +22,7 @@ class BookmarkContextMenu
 {
 public:
 	BookmarkContextMenu(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
-		CoreInterface *coreInterface, Navigator *navigator);
+		BrowserWindow *browserWindow, CoreInterface *coreInterface);
 
 	BOOL ShowMenu(HWND parentWindow, BookmarkItem *parentFolder,
 		const RawBookmarkItems &bookmarkItems, const POINT &ptScreen,

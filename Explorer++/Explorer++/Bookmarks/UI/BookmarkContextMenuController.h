@@ -8,14 +8,14 @@
 #include "Bookmarks/BookmarkItem.h"
 
 class BookmarkTree;
+class BrowserWindow;
 class CoreInterface;
-class Navigator;
 
 class BookmarkContextMenuController
 {
 public:
 	BookmarkContextMenuController(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
-		CoreInterface *coreInterface, Navigator *navigator);
+		BrowserWindow *browserWindow, CoreInterface *coreInterface);
 
 	void OnMenuItemSelected(int menuItemId, BookmarkItem *targetParentFolder, size_t targetIndex,
 		const RawBookmarkItems &bookmarkItems, HWND parentWindow);
@@ -29,8 +29,8 @@ private:
 	void OnDelete(const RawBookmarkItems &bookmarkItems);
 	void OnEditBookmarkItem(BookmarkItem *bookmarkItem, HWND parentWindow);
 
-	BookmarkTree *m_bookmarkTree;
+	BookmarkTree *m_bookmarkTree = nullptr;
 	HINSTANCE m_resourceInstance;
-	CoreInterface *m_coreInterface;
-	Navigator *m_navigator;
+	BrowserWindow *m_browserWindow = nullptr;
+	CoreInterface *m_coreInterface = nullptr;
 };

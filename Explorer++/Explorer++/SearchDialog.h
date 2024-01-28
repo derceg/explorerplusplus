@@ -17,8 +17,8 @@
 #include <unordered_map>
 #include <vector>
 
+class BrowserWindow;
 class CoreInterface;
-class Navigator;
 class SearchDialog;
 class TabContainer;
 
@@ -137,7 +137,7 @@ class SearchDialog : public ThemedDialog, private FileContextMenuHandler
 {
 public:
 	SearchDialog(HINSTANCE resourceInstance, HWND hParent, std::wstring_view searchDirectory,
-		CoreInterface *coreInterface, Navigator *navigator, TabContainer *tabContainer);
+		BrowserWindow *browserWindow, CoreInterface *coreInterface, TabContainer *tabContainer);
 	~SearchDialog();
 
 	/* Sorting methods. */
@@ -191,7 +191,7 @@ private:
 	BOOL m_bStopSearching;
 	TCHAR m_szSearchButton[32];
 
-	Search *m_pSearch;
+	Search *m_pSearch = nullptr;
 
 	/* Listview item information. */
 	std::list<PIDLIST_ABSOLUTE> m_AwaitingSearchItems;
@@ -201,9 +201,9 @@ private:
 
 	BOOL m_bSetSearchTimer;
 
-	CoreInterface *m_coreInterface;
-	Navigator *m_navigator;
-	TabContainer *m_tabContainer;
+	BrowserWindow *m_browserWindow = nullptr;
+	CoreInterface *m_coreInterface = nullptr;
+	TabContainer *m_tabContainer = nullptr;
 
-	SearchDialogPersistentSettings *m_persistentSettings;
+	SearchDialogPersistentSettings *m_persistentSettings = nullptr;
 };

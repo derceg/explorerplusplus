@@ -15,4 +15,5 @@ public:
 	virtual ~BrowserWindow() = default;
 
 	virtual BrowserPane *GetActivePane() const = 0;
+	virtual void FocusActiveTab() = 0;
 };
