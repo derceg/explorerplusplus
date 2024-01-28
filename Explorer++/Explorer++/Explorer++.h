@@ -507,7 +507,6 @@ private:
 	HINSTANCE GetResourceInstance() const override;
 	HACCEL *GetAcceleratorTable() const override;
 	HWND GetMainWindow() const override;
-	HWND GetActiveListView() const override;
 	ShellBrowser *GetActiveShellBrowser() const override;
 	TabContainer *GetTabContainer() const override;
 	TabRestorer *GetTabRestorer() const override;

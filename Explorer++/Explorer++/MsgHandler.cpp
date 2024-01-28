@@ -1177,11 +1177,6 @@ HWND Explorerplusplus::GetMainWindow() const
 	return m_hContainer;
 }
 
-HWND Explorerplusplus::GetActiveListView() const
-{
-	return m_hActiveListView;
-}
-
 ShellBrowser *Explorerplusplus::GetActiveShellBrowser() const
 {
 	return m_pActiveShellBrowser;

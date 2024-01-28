@@ -72,7 +72,6 @@ public:
 
 	virtual HWND GetMainWindow() const = 0;
 
-	virtual HWND GetActiveListView() const = 0;
 	virtual ShellBrowser *GetActiveShellBrowser() const = 0;
 
 	virtual TabContainer *GetTabContainer() const = 0;
