@@ -1,8 +1,8 @@
 Explorer++ Version History
 --------------------------
 
-Version 1.4.0
--------------
+Version 1.4.0 (29/01/2024)
+--------------------------
 New features:
 - The bookmarks system has been rewritten. The updated system has
   the following changes from the previous system:
