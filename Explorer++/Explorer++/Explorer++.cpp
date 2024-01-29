@@ -59,7 +59,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd, CommandLine::Settings *commandLine
 	m_hDisplayWindow = nullptr;
 	m_lastActiveWindow = nullptr;
 	m_hActiveListView = nullptr;
-	m_InitializationFinished.set(false);
 
 	m_iDWFolderSizeUniqueId = 0;
 }

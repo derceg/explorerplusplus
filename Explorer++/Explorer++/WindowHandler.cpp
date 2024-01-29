@@ -92,14 +92,7 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 void Explorerplusplus::ToggleFolders()
 {
 	m_config->showFolders = !m_config->showFolders.get();
-
-	if (m_config->showFolders.get())
-	{
-		UpdateTreeViewSelection();
-	}
-
 	lShowWindow(m_treeViewHolder->GetHWND(), m_config->showFolders.get());
-
 	UpdateLayout();
 }
 

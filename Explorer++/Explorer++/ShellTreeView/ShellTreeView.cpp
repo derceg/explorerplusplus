@@ -16,9 +16,12 @@
 
 #include "stdafx.h"
 #include "ShellTreeView.h"
+#include "BrowserPane.h"
+#include "BrowserWindow.h"
 #include "Config.h"
 #include "CoreInterface.h"
 #include "ItemNameEditControl.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigator.h"
 #include "ShellTreeNode.h"
 #include "TabContainer.h"
@@ -35,18 +38,18 @@
 #include <wil/common.h>
 #include <propkey.h>
 
-ShellTreeView *ShellTreeView::Create(HWND hParent, CoreInterface *coreInterface,
-	TabContainer *tabContainer, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons)
+ShellTreeView *ShellTreeView::Create(HWND hParent, BrowserWindow *browserWindow,
+	CoreInterface *coreInterface, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons)
 {
-	return new ShellTreeView(hParent, coreInterface, tabContainer, fileActionHandler, cachedIcons);
+	return new ShellTreeView(hParent, browserWindow, coreInterface, fileActionHandler, cachedIcons);
 }
 
-ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabContainer *tabContainer,
-	FileActionHandler *fileActionHandler, CachedIcons *cachedIcons) :
+ShellTreeView::ShellTreeView(HWND hParent, BrowserWindow *browserWindow,
+	CoreInterface *coreInterface, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons) :
 	ShellDropTargetWindow(CreateTreeView(hParent)),
 	m_hTreeView(GetHWND()),
+	m_browserWindow(browserWindow),
 	m_config(coreInterface->GetConfig()),
-	m_tabContainer(tabContainer),
 	m_fileActionHandler(fileActionHandler),
 	m_cachedIcons(cachedIcons),
 	m_iconThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
@@ -80,6 +83,53 @@ ShellTreeView::ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabCont
 	AddClipboardFormatListener(m_hTreeView);
 
 	StartDirectoryMonitoringForDrives();
+
+	m_connections.push_back(coreInterface->AddApplicationInitializatedObserver(
+		[this]()
+		{
+			m_applicationInitializationFinished = true;
+
+			// Updating the treeview selection is relatively expensive, so it's not done at all
+			// during startup. Therefore, the selection will be set a single time, once the
+			// application initialization is complete and all tabs have been restored.
+			UpdateSelection();
+		}));
+
+	m_connections.push_back(m_config->synchronizeTreeview.addObserver(
+		std::bind(&ShellTreeView::UpdateSelection, this)));
+
+	m_connections.push_back(
+		m_config->showFolders.addObserver(std::bind(&ShellTreeView::UpdateSelection, this)));
+
+	auto *tabContainer = m_browserWindow->GetActivePane()->GetTabContainer();
+
+	m_connections.push_back(tabContainer->tabNavigationCommittedSignal.AddObserver(
+		[this](const Tab &tab, const NavigateParams &navigateParams)
+		{
+			UNREFERENCED_PARAMETER(navigateParams);
+
+			if (m_browserWindow->GetActivePane()->GetTabContainer()->IsTabSelected(tab))
+			{
+				UpdateSelection();
+			}
+		}));
+
+	m_connections.push_back(tabContainer->tabNavigationFailedSignal.AddObserver(
+		[this](const Tab &tab, const NavigateParams &navigateParams)
+		{
+			UNREFERENCED_PARAMETER(navigateParams);
+
+			if (m_browserWindow->GetActivePane()->GetTabContainer()->IsTabSelected(tab))
+			{
+				// When manually selecting an item in the treeview, a navigation will be initiated.
+				// It's possible that navigation may fail, in which case, the selection will be
+				// reset here.
+				UpdateSelection();
+			}
+		}));
+
+	m_connections.push_back(tabContainer->tabSelectedSignal.AddObserver(
+		std::bind(&ShellTreeView::UpdateSelection, this)));
 
 	m_connections.push_back(m_cutCopiedItemManager.cutItemChangedSignal.AddObserver(
 		std::bind_front(&ShellTreeView::OnCutItemChanged, this)));
@@ -1069,8 +1119,7 @@ void ShellTreeView::OnMiddleButtonUp(const POINT *pt, UINT keysDown)
 	}
 
 	auto pidl = GetNodePidl(hitTestInfo.hItem);
-	auto navigateParams = NavigateParams::Normal(pidl.get());
-	m_tabContainer->CreateNewTab(navigateParams, TabSettings(_selected = switchToNewTab));
+	m_browserWindow->OpenItem(pidl.get(), OpenFolderDisposition::ForegroundTab);
 }
 
 void ShellTreeView::SetShowHidden(BOOL bShowHidden)
@@ -1283,6 +1332,42 @@ bool ShellTreeView::OnEndLabelEdit(const NMTVDISPINFO *dispInfo)
 	// There's no need to keep the updated text, as it will have been replaced in the call to
 	// OnItemRenamed().
 	return false;
+}
+
+void ShellTreeView::UpdateSelection()
+{
+	if (!m_applicationInitializationFinished || !m_config->synchronizeTreeview.get()
+		|| !m_config->showFolders.get())
+	{
+		return;
+	}
+
+	auto *selectedShellBrowser =
+		m_browserWindow->GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser();
+
+	// When locating a folder in the treeview, each of the parent folders has to be enumerated. UNC
+	// paths are contained within the Network folder and that folder can take a significant amount
+	// of time to enumerate (e.g. 30 seconds).
+	// Therefore, locating a UNC path can take a non-trivial amount of time, as the Network folder
+	// will have to be enumerated first. As that work is all done on the main thread, the
+	// application will hang while the enumeration completes, something that's especially noticeable
+	// on startup.
+	// Note that mapped drives don't have that specific issue, as they're contained within the This
+	// PC folder. However, there is still the general problem that each parent folder has to be
+	// enumerated and all the work is done on the main thread.
+	if (PathIsUNC(selectedShellBrowser->GetDirectory().c_str()))
+	{
+		return;
+	}
+
+	HTREEITEM item = LocateItem(selectedShellBrowser->GetDirectoryIdl().get());
+
+	if (!item)
+	{
+		return;
+	}
+
+	TreeView_SelectItem(m_hTreeView, item);
 }
 
 void ShellTreeView::CopySelectedItemToClipboard(bool copy)

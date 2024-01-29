@@ -107,7 +107,8 @@ void Explorerplusplus::OnCreate()
 
 	SetTimer(m_hContainer, AUTOSAVE_TIMER_ID, AUTOSAVE_TIMEOUT, nullptr);
 
-	m_InitializationFinished.set(true);
+	m_applicationInitialized = true;
+	m_applicationInitializedSignal();
 }
 
 void Explorerplusplus::InitializeDefaultColorRules()
@@ -178,4 +179,10 @@ bool Explorerplusplus::ShouldEnableDarkMode(Theme theme)
 {
 	return theme == +Theme::Dark
 		|| (theme == +Theme::System && !DarkModeHelper::GetInstance().IsSystemAppModeLight());
+}
+
+boost::signals2::connection Explorerplusplus::AddApplicationInitializatedObserver(
+	const ApplicationInitializedSignal::slot_type &observer)
+{
+	return m_applicationInitializedSignal.connect(observer);
 }

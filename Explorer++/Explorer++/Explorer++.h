@@ -416,7 +416,6 @@ private:
 
 	/* Window state update. */
 	void UpdateWindowStates(const Tab &tab);
-	void UpdateTreeViewSelection();
 	void SetListViewInitialPosition(HWND hListView) override;
 	void ToggleFolders();
 	void UpdateLayout();
@@ -517,6 +516,8 @@ private:
 	BOOL GetSavePreferencesToXmlFile() const override;
 	void SetSavePreferencesToXmlFile(BOOL savePreferencesToXmlFile) override;
 	void FocusChanged() override;
+	boost::signals2::connection AddApplicationInitializatedObserver(
+		const ApplicationInitializedSignal::slot_type &observer) override;
 	boost::signals2::connection AddFocusChangeObserver(
 		const FocusChangedSignal::slot_type &observer) override;
 	boost::signals2::connection AddDeviceChangeObserver(
@@ -591,10 +592,11 @@ private:
 	bool m_bShowTabBar;
 	int m_iLastSelectedTab = 0;
 	ULONG m_SHChangeNotifyID;
-	ValueWrapper<bool> m_InitializationFinished;
 
 	/* Initialization. */
 	BOOL m_bLoadSettingsFromXML;
+	bool m_applicationInitialized = false;
+	ApplicationInitializedSignal m_applicationInitializedSignal;
 
 	MainWindow *m_mainWindow;
 	AddressBar *m_addressBar;

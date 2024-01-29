@@ -17,22 +17,22 @@
 #include <wil/com.h>
 #include <optional>
 
+class BrowserWindow;
 class CachedIcons;
 struct Config;
 class CoreInterface;
 class FileActionHandler;
 class ShellTreeNode;
-class TabContainer;
 
 class ShellTreeView : public ShellDropTargetWindow<HTREEITEM>
 {
 public:
-	static ShellTreeView *Create(HWND hParent, CoreInterface *coreInterface,
-		TabContainer *tabContainer, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons);
+	static ShellTreeView *Create(HWND hParent, BrowserWindow *browserWindow,
+		CoreInterface *coreInterface, FileActionHandler *fileActionHandler,
+		CachedIcons *cachedIcons);
 
 	/* User functions. */
 	unique_pidl_absolute GetNodePidl(HTREEITEM hTreeItem) const;
-	HTREEITEM LocateItem(PCIDLIST_ABSOLUTE pidlDirectory);
 	void SetShowHidden(BOOL bShowHidden);
 	void RefreshAllIcons();
 
@@ -108,7 +108,7 @@ private:
 		wil::com_ptr_nothrow<IDataObject> m_clipboardDataObject;
 	};
 
-	ShellTreeView(HWND hParent, CoreInterface *coreInterface, TabContainer *tabContainer,
+	ShellTreeView(HWND hParent, BrowserWindow *browserWindow, CoreInterface *coreInterface,
 		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons);
 	~ShellTreeView();
 
@@ -136,6 +136,7 @@ private:
 	void OnMiddleButtonUp(const POINT *pt, UINT keysDown);
 	bool OnBeginLabelEdit(const NMTVDISPINFO *dispInfo);
 	bool OnEndLabelEdit(const NMTVDISPINFO *dispInfo);
+	void UpdateSelection();
 
 	void CopyItemToClipboard(HTREEITEM treeItem, bool copy);
 	void OnClipboardUpdate();
@@ -191,6 +192,7 @@ private:
 	/* Icon refresh. */
 	void RefreshAllIconsInternal(HTREEITEM hFirstSibling);
 
+	HTREEITEM LocateItem(PCIDLIST_ABSOLUTE pidlDirectory);
 	HTREEITEM LocateExistingItem(PCIDLIST_ABSOLUTE pidlDirectory);
 	HTREEITEM LocateItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, BOOL bOnlyLocateExistingItem);
 
@@ -202,13 +204,14 @@ private:
 	void OnApplicationShuttingDown();
 
 	HWND m_hTreeView;
+	BrowserWindow *m_browserWindow = nullptr;
 	HTREEITEM m_quickAccessRootItem = nullptr;
 	BOOL m_bShowHidden;
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 	const Config *m_config;
-	TabContainer *m_tabContainer;
 	FileActionHandler *m_fileActionHandler;
+	bool m_applicationInitializationFinished = false;
 
 	// Note that the treeview control sets the font on the tooltip control it creates each time the
 	// tooltip is shown (which can be seen by logging WM_SETFONT calls made on the tooltip control).

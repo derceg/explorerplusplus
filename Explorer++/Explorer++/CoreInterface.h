@@ -31,6 +31,7 @@ struct FirstSuccessfulRequestCombiner
 };
 
 using TabsInitializedSignal = boost::signals2::signal<void()>;
+using ApplicationInitializedSignal = boost::signals2::signal<void()>;
 using MainMenuPreShowSignal = boost::signals2::signal<void(HMENU mainMenu)>;
 using MainMenuItemRightClickedSignal =
 	boost::signals2::signal<bool(HMENU menu, int index, const POINT &pt),
@@ -113,6 +114,8 @@ public:
 
 	virtual boost::signals2::connection AddTabsInitializedObserver(
 		const TabsInitializedSignal::slot_type &observer) = 0;
+	virtual boost::signals2::connection AddApplicationInitializatedObserver(
+		const ApplicationInitializedSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddMainMenuPreShowObserver(
 		const MainMenuPreShowSignal::slot_type &observer) = 0;
 	virtual boost::signals2::connection AddMainMenuItemMiddleClickedObserver(

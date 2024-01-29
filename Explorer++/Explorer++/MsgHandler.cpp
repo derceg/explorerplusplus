@@ -403,7 +403,7 @@ void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int ma
 	int iTabBackingWidth;
 	int iTabBackingLeft;
 
-	if (!m_InitializationFinished.get())
+	if (!m_applicationInitialized)
 	{
 		return;
 	}

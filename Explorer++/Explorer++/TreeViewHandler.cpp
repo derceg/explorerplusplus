@@ -46,70 +46,14 @@ void Explorerplusplus::CreateFolderControls()
 
 	SetWindowSubclass(m_treeViewHolder->GetHWND(), TreeViewHolderProcStub, 0, (DWORD_PTR) this);
 
-	m_shellTreeView = ShellTreeView::Create(m_treeViewHolder->GetHWND(), this,
-		GetActivePane()->GetTabContainer(), &m_FileActionHandler, &m_cachedIcons);
+	m_shellTreeView = ShellTreeView::Create(m_treeViewHolder->GetHWND(), this, this,
+		&m_FileActionHandler, &m_cachedIcons);
 	m_treeViewHolder->SetContentChild(m_shellTreeView->GetHWND());
 
 	/* Now, subclass the treeview again. This is needed for messages
 	such as WM_MOUSEWHEEL, which need to be intercepted before they
 	reach the window procedure provided by ShellTreeView. */
 	SetWindowSubclass(m_shellTreeView->GetHWND(), TreeViewSubclassStub, 1, (DWORD_PTR) this);
-
-	m_InitializationFinished.addObserver(
-		[this](bool newValue)
-		{
-			if (newValue)
-			{
-				// Updating the treeview selection is relatively expensive, so it's
-				// not done at all during startup. Therefore, the selection will be
-				// set a single time, once the application initialization is
-				// complete and all tabs have been restored.
-				UpdateTreeViewSelection();
-			}
-		});
-
-	m_config->synchronizeTreeview.addObserver(
-		[this](BOOL newValue)
-		{
-			if (newValue)
-			{
-				UpdateTreeViewSelection();
-			}
-		});
-
-	GetActivePane()->GetTabContainer()->tabCreatedSignal.AddObserver(
-		[this](int tabId, BOOL switchToNewTab)
-		{
-			UNREFERENCED_PARAMETER(tabId);
-			UNREFERENCED_PARAMETER(switchToNewTab);
-
-			UpdateTreeViewSelection();
-		});
-
-	GetActivePane()->GetTabContainer()->tabNavigationCommittedSignal.AddObserver(
-		[this](const Tab &tab, const NavigateParams &navigateParams)
-		{
-			UNREFERENCED_PARAMETER(tab);
-			UNREFERENCED_PARAMETER(navigateParams);
-
-			UpdateTreeViewSelection();
-		});
-
-	GetActivePane()->GetTabContainer()->tabSelectedSignal.AddObserver(
-		[this](const Tab &tab)
-		{
-			UNREFERENCED_PARAMETER(tab);
-
-			UpdateTreeViewSelection();
-		});
-
-	GetActivePane()->GetTabContainer()->tabRemovedSignal.AddObserver(
-		[this](int tabId)
-		{
-			UNREFERENCED_PARAMETER(tabId);
-
-			UpdateTreeViewSelection();
-		});
 
 	m_treeViewInitialized = true;
 }
@@ -324,12 +268,6 @@ void Explorerplusplus::HandleTreeViewSelectionChanged(const NMTREEVIEW *eventInf
 			TreeView_Expand(m_shellTreeView->GetHWND(), eventInfo->itemNew.hItem, TVE_EXPAND);
 		}
 	}
-	else
-	{
-		// The navigation failed, so the current folder hasn't changed. All that's needed is to
-		// update the treeview selection back to the current folder.
-		UpdateTreeViewSelection();
-	}
 }
 
 LRESULT CALLBACK TreeViewHolderProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
@@ -419,36 +357,6 @@ void Explorerplusplus::OnTreeViewSetFileAttributes() const
 			SetFileAttributesDialog setFileAttributesDialog(m_resourceInstance, m_hContainer,
 				sfaiList);
 			setFileAttributesDialog.ShowModalDialog();
-		}
-	}
-}
-
-void Explorerplusplus::UpdateTreeViewSelection()
-{
-	if (!m_InitializationFinished.get() || !m_config->synchronizeTreeview.get()
-		|| !m_config->showFolders.get())
-	{
-		return;
-	}
-
-	// When locating a folder in the treeview, each of the parent folders has to be enumerated. UNC
-	// paths are contained within the Network folder and that folder can take a significant amount
-	// of time to enumerate (e.g. 30 seconds).
-	// Therefore, locating a UNC path can take a non-trivial amount of time, as the Network folder
-	// will have to be enumerated first. As that work is all done on the main thread, the
-	// application will hang while the enumeration completes, something that's especially noticeable
-	// on startup.
-	// Note that mapped drives don't have that specific issue, as they're contained within the This
-	// PC folder. However, there is still the general problem that each parent folder has to be
-	// enumerated and all the work is done on the main thread.
-	if (!PathIsUNC(m_pActiveShellBrowser->GetDirectory().c_str()))
-	{
-		HTREEITEM hItem =
-			m_shellTreeView->LocateItem(m_pActiveShellBrowser->GetDirectoryIdl().get());
-
-		if (hItem != nullptr)
-		{
-			SendMessage(m_shellTreeView->GetHWND(), TVM_SELECTITEM, TVGN_CARET, (LPARAM) hItem);
 		}
 	}
 }
