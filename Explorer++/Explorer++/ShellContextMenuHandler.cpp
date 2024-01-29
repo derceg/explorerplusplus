@@ -20,18 +20,15 @@
 #define MENU_OPEN_IN_NEW_TAB (MAX_SHELL_MENU_ID + 1)
 
 void Explorerplusplus::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, IContextMenu *contextMenu,
-	HMENU hMenu)
+	const std::vector<PITEMID_CHILD> &pidlItems, IContextMenu *contextMenu, HMENU hMenu)
 {
-	assert(dwData != NULL);
-
 	if (pidlItems.empty())
 	{
 		UpdateBackgroundContextMenu(contextMenu, hMenu);
 	}
 	else
 	{
-		UpdateItemContextMenu(pidlParent, pidlItems, dwData, hMenu);
+		UpdateItemContextMenu(pidlParent, pidlItems, hMenu);
 	}
 }
 
@@ -151,33 +148,21 @@ void Explorerplusplus::UpdateBackgroundContextMenu(IContextMenu *contextMenu, HM
 }
 
 void Explorerplusplus::UpdateItemContextMenu(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR data, HMENU menu)
+	const std::vector<PITEMID_CHILD> &pidlItems, HMENU menu)
 {
-	auto *pfcmi = reinterpret_cast<FileContextMenuInfo *>(data);
-
 	bool addNewTabMenuItem = false;
 
-	if (pfcmi->uFrom == FROM_LISTVIEW)
+	if (pidlItems.size() == 1)
 	{
-		if (pidlItems.size() == 1)
+		SFGAOF fileAttributes = SFGAO_FOLDER;
+
+		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems.front()));
+		GetItemAttributes(pidlComplete.get(), &fileAttributes);
+
+		if (fileAttributes & SFGAO_FOLDER)
 		{
-			SFGAOF fileAttributes = SFGAO_FOLDER;
-
-			unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems.front()));
-			GetItemAttributes(pidlComplete.get(), &fileAttributes);
-
-			if (fileAttributes & SFGAO_FOLDER)
-			{
-				addNewTabMenuItem = true;
-			}
+			addNewTabMenuItem = true;
 		}
-	}
-	else if (pfcmi->uFrom == FROM_TREEVIEW)
-	{
-		/* The treeview only contains folders,
-		so the new tab menu item will always
-		be shown. */
-		addNewTabMenuItem = true;
 	}
 
 	if (addNewTabMenuItem)
@@ -195,10 +180,8 @@ void Explorerplusplus::UpdateItemContextMenu(PCIDLIST_ABSOLUTE pidlParent,
 }
 
 BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd)
+	const std::vector<PITEMID_CHILD> &pidlItems, const TCHAR *szCmd)
 {
-	auto *pfcmi = reinterpret_cast<FileContextMenuInfo *>(dwData);
-
 	if (StrCmpI(szCmd, _T("open")) == 0)
 	{
 		if (pidlItems.empty())
@@ -218,9 +201,7 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	}
 	else if (StrCmpI(szCmd, _T("viewcustomwizard")) == 0)
 	{
-		// This item is only shown on the background context menu and that menu can only be shown
-		// within the listview.
-		assert(pfcmi->uFrom == FROM_LISTVIEW);
+		// This item is only shown on the background context menu.
 		assert(pidlItems.empty());
 
 		// This verb (which corresponds to the "Customize this folder..." menu item shown in the
@@ -237,54 +218,27 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	}
 	else if (StrCmpI(szCmd, _T("rename")) == 0)
 	{
-		if (pfcmi->uFrom == FROM_LISTVIEW)
-		{
-			OnFileRename();
-		}
-		else if (pfcmi->uFrom == FROM_TREEVIEW)
-		{
-			assert(pidlItems.size() == 1);
-			unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
-			m_shellTreeView->StartRenamingItem(pidlComplete.get());
-		}
+		OnFileRename();
 
 		return TRUE;
 	}
 	else if (StrCmpI(szCmd, _T("copy")) == 0)
 	{
-		if (pfcmi->uFrom == FROM_LISTVIEW)
-		{
-			Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-			selectedTab.GetShellBrowser()->CopySelectedItemsToClipboard(true);
-		}
-		else if (pfcmi->uFrom == FROM_TREEVIEW)
-		{
-			assert(pidlItems.size() == 1);
-			unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
-			m_shellTreeView->CopyItemToClipboard(pidlComplete.get(), true);
-		}
+		Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+		selectedTab.GetShellBrowser()->CopySelectedItemsToClipboard(true);
 
 		return TRUE;
 	}
 	else if (StrCmpI(szCmd, _T("cut")) == 0)
 	{
-		if (pfcmi->uFrom == FROM_LISTVIEW)
-		{
-			Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-			selectedTab.GetShellBrowser()->CopySelectedItemsToClipboard(false);
-		}
-		else if (pfcmi->uFrom == FROM_TREEVIEW)
-		{
-			assert(pidlItems.size() == 1);
-			unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
-			m_shellTreeView->CopyItemToClipboard(pidlComplete.get(), false);
-		}
+		Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+		selectedTab.GetShellBrowser()->CopySelectedItemsToClipboard(false);
 
 		return TRUE;
 	}
 	else if (StrCmpI(szCmd, _T("paste")) == 0)
 	{
-		if (pfcmi->uFrom == FROM_LISTVIEW && pidlItems.empty())
+		if (pidlItems.empty())
 		{
 			// The paste item on the background context menu is non-functional, so needs to be
 			// handled here.
@@ -295,7 +249,6 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	else if (StrCmpI(szCmd, _T("pastelink")) == 0)
 	{
 		// This item should only be shown in the background context menu.
-		assert(pfcmi->uFrom == FROM_LISTVIEW);
 		assert(pidlItems.empty());
 
 		GetActiveShellBrowser()->PasteShortcut();

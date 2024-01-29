@@ -561,10 +561,8 @@ int CALLBACK SearchDialog::SortResultsByPath(LPARAM lParam1, LPARAM lParam2)
 }
 
 void SearchDialog::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, IContextMenu *contextMenu,
-	HMENU hMenu)
+	const std::vector<PITEMID_CHILD> &pidlItems, IContextMenu *contextMenu, HMENU hMenu)
 {
-	UNREFERENCED_PARAMETER(dwData);
 	UNREFERENCED_PARAMETER(contextMenu);
 
 	unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems.front()));
@@ -593,10 +591,8 @@ void SearchDialog::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
 }
 
 BOOL SearchDialog::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd)
+	const std::vector<PITEMID_CHILD> &pidlItems, const TCHAR *szCmd)
 {
-	UNREFERENCED_PARAMETER(dwData);
-
 	if (StrCmpI(szCmd, _T("open")) == 0)
 	{
 		for (auto pidlItem : pidlItems)

@@ -21,6 +21,8 @@
 #include "Config.h"
 #include "CoreInterface.h"
 #include "ItemNameEditControl.h"
+#include "MainResource.h"
+#include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigator.h"
 #include "ShellTreeNode.h"
@@ -31,9 +33,11 @@
 #include "../Helper/DragDropHelper.h"
 #include "../Helper/DriveInfo.h"
 #include "../Helper/FileActionHandler.h"
+#include "../Helper/FileContextMenuManager.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/common.h>
 #include <propkey.h>
@@ -49,6 +53,7 @@ ShellTreeView::ShellTreeView(HWND hParent, BrowserWindow *browserWindow,
 	ShellDropTargetWindow(CreateTreeView(hParent)),
 	m_hTreeView(GetHWND()),
 	m_browserWindow(browserWindow),
+	m_coreInterface(coreInterface),
 	m_config(coreInterface->GetConfig()),
 	m_fileActionHandler(fileActionHandler),
 	m_cachedIcons(cachedIcons),
@@ -289,6 +294,19 @@ LRESULT ShellTreeView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 {
 	switch (uMsg)
 	{
+	// WM_CONTEXTMENU will be sent to the treeview window procedure when pressing Shift + F10 or
+	// VK_APPS. However, when right-clicking, the WM_CONTEXTMENU message will be sent to the parent.
+	// Since WM_CONTEXTMENU messages are sent to the parent if they're not handled, it's easiest to
+	// simply handle WM_CONTEXTMENU here, which will cover all three ways in which it can be
+	// triggered.
+	case WM_CONTEXTMENU:
+		if (reinterpret_cast<HWND>(wParam) == m_hTreeView)
+		{
+			OnShowContextMenu({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
+			return 0;
+		}
+		break;
+
 	case WM_NOTIFY:
 		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == m_hTreeView)
 		{
@@ -1332,6 +1350,122 @@ bool ShellTreeView::OnEndLabelEdit(const NMTVDISPINFO *dispInfo)
 	// There's no need to keep the updated text, as it will have been replaced in the call to
 	// OnItemRenamed().
 	return false;
+}
+
+void ShellTreeView::OnShowContextMenu(const POINT &ptScreen)
+{
+	HTREEITEM targetItem;
+	POINT finalPoint;
+	bool highlightTargetItem = false;
+
+	if (ptScreen.x == -1 && ptScreen.y == -1)
+	{
+		HTREEITEM selection = TreeView_GetSelection(m_hTreeView);
+
+		RECT itemRect;
+		TreeView_GetItemRect(m_hTreeView, selection, &itemRect, TRUE);
+
+		finalPoint = { itemRect.left, itemRect.top + (itemRect.bottom - itemRect.top) / 2 };
+		ClientToScreen(m_hTreeView, &finalPoint);
+
+		targetItem = selection;
+	}
+	else
+	{
+		POINT ptClient = ptScreen;
+		ScreenToClient(m_hTreeView, &ptClient);
+
+		TVHITTESTINFO hitTestInfo = {};
+		hitTestInfo.pt = ptClient;
+		auto item = TreeView_HitTest(m_hTreeView, &hitTestInfo);
+
+		if (!item)
+		{
+			return;
+		}
+
+		finalPoint = ptScreen;
+		targetItem = item;
+		highlightTargetItem = true;
+	}
+
+	if (highlightTargetItem)
+	{
+		TreeView_SetItemState(m_hTreeView, targetItem, TVIS_DROPHILITED, TVIS_DROPHILITED);
+	}
+
+	auto pidl = GetNodePidl(targetItem);
+
+	unique_pidl_child child(ILCloneChild(ILFindLastID(pidl.get())));
+
+	ILRemoveLastID(pidl.get());
+
+	FileContextMenuManager contextMenuManager(m_hTreeView, pidl.get(), { child.get() });
+	contextMenuManager.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, &finalPoint,
+		m_coreInterface->GetStatusBar(), nullptr, TRUE, IsKeyDown(VK_SHIFT));
+
+	if (highlightTargetItem)
+	{
+		TreeView_SetItemState(m_hTreeView, targetItem, 0, TVIS_DROPHILITED);
+	}
+}
+
+void ShellTreeView::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PITEMID_CHILD> &pidlItems, IContextMenu *contextMenu, HMENU menu)
+{
+	UNREFERENCED_PARAMETER(pidlParent);
+	UNREFERENCED_PARAMETER(pidlItems);
+	UNREFERENCED_PARAMETER(contextMenu);
+
+	std::wstring openInNewTabText = ResourceHelper::LoadString(
+		m_coreInterface->GetResourceInstance(), IDS_GENERAL_OPEN_IN_NEW_TAB);
+	MenuHelper::AddStringItem(menu, OPEN_IN_NEW_TAB_MENU_ITEM_ID, openInNewTabText, 1, true);
+}
+
+BOOL ShellTreeView::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PITEMID_CHILD> &pidlItems, const TCHAR *verb)
+{
+	assert(pidlItems.size() == 1);
+
+	if (StrCmpI(verb, _T("rename")) == 0)
+	{
+		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
+		StartRenamingItem(pidlComplete.get());
+	}
+	else if (StrCmpI(verb, _T("copy")) == 0)
+	{
+		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
+		CopyItemToClipboard(pidlComplete.get(), true);
+
+		return TRUE;
+	}
+	else if (StrCmpI(verb, _T("cut")) == 0)
+	{
+		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
+		CopyItemToClipboard(pidlComplete.get(), false);
+
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+void ShellTreeView::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PITEMID_CHILD> &pidlItems, int cmd)
+{
+	assert(pidlItems.size() == 1);
+
+	switch (cmd)
+	{
+	case OPEN_IN_NEW_TAB_MENU_ITEM_ID:
+	{
+		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
+		auto disposition = m_config->openTabsInForeground ? OpenFolderDisposition::ForegroundTab
+														  : OpenFolderDisposition::BackgroundTab;
+		m_browserWindow->OpenItem(pidlComplete.get(), disposition);
+	}
+	break;
+	}
 }
 
 void ShellTreeView::UpdateSelection()

@@ -17,7 +17,6 @@
 #include "TabContainer.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/DpiCompatibility.h"
-#include "../Helper/FileContextMenuManager.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
@@ -79,70 +78,6 @@ LRESULT CALLBACK Explorerplusplus::TreeViewSubclass(HWND hwnd, UINT uMsg, WPARAM
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
-}
-
-void Explorerplusplus::OnShowTreeViewContextMenu(const POINT &ptScreen)
-{
-	HTREEITEM targetItem;
-	POINT finalPoint;
-	bool highlightTargetItem = false;
-
-	if (ptScreen.x == -1 && ptScreen.y == -1)
-	{
-		HTREEITEM selection = TreeView_GetSelection(m_shellTreeView->GetHWND());
-
-		RECT itemRect;
-		TreeView_GetItemRect(m_shellTreeView->GetHWND(), selection, &itemRect, TRUE);
-
-		finalPoint = { itemRect.left, itemRect.top + (itemRect.bottom - itemRect.top) / 2 };
-		ClientToScreen(m_shellTreeView->GetHWND(), &finalPoint);
-
-		targetItem = selection;
-	}
-	else
-	{
-		POINT ptClient = ptScreen;
-		ScreenToClient(m_shellTreeView->GetHWND(), &ptClient);
-
-		TVHITTESTINFO hitTestInfo = {};
-		hitTestInfo.pt = ptClient;
-		auto item = TreeView_HitTest(m_shellTreeView->GetHWND(), &hitTestInfo);
-
-		if (!item)
-		{
-			return;
-		}
-
-		finalPoint = ptScreen;
-		targetItem = item;
-		highlightTargetItem = true;
-	}
-
-	if (highlightTargetItem)
-	{
-		TreeView_SetItemState(m_shellTreeView->GetHWND(), targetItem, TVIS_DROPHILITED,
-			TVIS_DROPHILITED);
-	}
-
-	auto pidl = m_shellTreeView->GetNodePidl(targetItem);
-
-	unique_pidl_child child(ILCloneChild(ILFindLastID(pidl.get())));
-
-	ILRemoveLastID(pidl.get());
-
-	FileContextMenuManager contextMenuManager(m_shellTreeView->GetHWND(), pidl.get(),
-		{ child.get() });
-
-	FileContextMenuInfo fcmi;
-	fcmi.uFrom = FROM_TREEVIEW;
-
-	contextMenuManager.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, &finalPoint,
-		m_pStatusBar, nullptr, reinterpret_cast<DWORD_PTR>(&fcmi), TRUE, IsKeyDown(VK_SHIFT));
-
-	if (highlightTargetItem)
-	{
-		TreeView_SetItemState(m_shellTreeView->GetHWND(), targetItem, 0, TVIS_DROPHILITED);
-	}
 }
 
 void Explorerplusplus::OnTreeViewCopyItemPath() const
@@ -285,19 +220,6 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderProc(HWND hwnd, UINT msg, WPARA
 {
 	switch (msg)
 	{
-	// WM_CONTEXTMENU will be sent to the treeview window procedure when pressing Shift + F10 or
-	// VK_APPS. However, when right-clicking, the WM_CONTEXTMENU message will be sent to the parent.
-	// Since WM_CONTEXTMENU messages are sent to the parent if they're not handled, it's easiest to
-	// simply handle WM_CONTEXTMENU here, which will cover all three ways in which it can be
-	// triggered.
-	case WM_CONTEXTMENU:
-		if (reinterpret_cast<HWND>(wParam) == m_shellTreeView->GetHWND())
-		{
-			OnShowTreeViewContextMenu({ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) });
-			return 0;
-		}
-		break;
-
 	case WM_NOTIFY:
 		return TreeViewHolderWindowNotifyHandler(hwnd, msg, wParam, lParam);
 

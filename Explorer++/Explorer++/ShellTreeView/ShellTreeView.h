@@ -8,6 +8,7 @@
 #include "ShellChangeWatcher.h"
 #include "SignalWrapper.h"
 #include "../Helper/DropHandler.h"
+#include "../Helper/FileContextMenuManager.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowSubclassWrapper.h"
@@ -24,7 +25,7 @@ class CoreInterface;
 class FileActionHandler;
 class ShellTreeNode;
 
-class ShellTreeView : public ShellDropTargetWindow<HTREEITEM>
+class ShellTreeView : public ShellDropTargetWindow<HTREEITEM>, public FileContextMenuHandler
 {
 public:
 	static ShellTreeView *Create(HWND hParent, BrowserWindow *browserWindow,
@@ -48,6 +49,15 @@ public:
 	void Paste();
 	void PasteShortcut();
 
+	// FileContextMenuHandler
+	void UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
+		const std::vector<PITEMID_CHILD> &pidlItems, IContextMenu *contextMenu,
+		HMENU menu) override;
+	BOOL HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+		const std::vector<PITEMID_CHILD> &pidlItems, const TCHAR *verb) override;
+	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+		const std::vector<PITEMID_CHILD> &pidlItems, int cmd) override;
+
 private:
 	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 1;
 	static const UINT WM_APP_SUBFOLDERS_RESULT_READY = WM_APP + 2;
@@ -59,6 +69,10 @@ private:
 	static const LONG DROP_SCROLL_MARGIN_Y_96DPI = 10;
 
 	static const SIGDN DISPLAY_NAME_TYPE = SIGDN_NORMALDISPLAY;
+
+	static const int MIN_SHELL_MENU_ID = 1;
+	static const int MAX_SHELL_MENU_ID = 1000;
+	static const int OPEN_IN_NEW_TAB_MENU_ITEM_ID = MAX_SHELL_MENU_ID + 1;
 
 	struct BasicItemInfo
 	{
@@ -136,6 +150,7 @@ private:
 	void OnMiddleButtonUp(const POINT *pt, UINT keysDown);
 	bool OnBeginLabelEdit(const NMTVDISPINFO *dispInfo);
 	bool OnEndLabelEdit(const NMTVDISPINFO *dispInfo);
+	void OnShowContextMenu(const POINT &ptScreen);
 	void UpdateSelection();
 
 	void CopyItemToClipboard(HTREEITEM treeItem, bool copy);
@@ -205,6 +220,7 @@ private:
 
 	HWND m_hTreeView;
 	BrowserWindow *m_browserWindow = nullptr;
+	CoreInterface *m_coreInterface = nullptr;
 	HTREEITEM m_quickAccessRootItem = nullptr;
 	BOOL m_bShowHidden;
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;

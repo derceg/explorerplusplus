@@ -252,9 +252,6 @@ void Explorerplusplus::OnListViewBackgroundRClickWindows8OrGreater(POINT *pCurso
 	FileContextMenuManager fcmm(selectedTab.GetShellBrowser()->GetListView(), pidlDirectory.get(),
 		{});
 
-	FileContextMenuInfo fcmi;
-	fcmi.uFrom = FROM_LISTVIEW;
-
 	auto serviceProvider = winrt::make_self<ServiceProvider>();
 
 	auto newMenuClient = winrt::make<NewMenuClient>(selectedTab.GetShellBrowser());
@@ -268,7 +265,7 @@ void Explorerplusplus::OnListViewBackgroundRClickWindows8OrGreater(POINT *pCurso
 	serviceProvider->RegisterService(SID_DefView, shellView.get());
 
 	fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, pCursorPos, m_pStatusBar,
-		serviceProvider.get(), reinterpret_cast<DWORD_PTR>(&fcmi), FALSE, IsKeyDown(VK_SHIFT));
+		serviceProvider.get(), FALSE, IsKeyDown(VK_SHIFT));
 }
 
 void Explorerplusplus::OnListViewBackgroundRClickWindows7(POINT *pCursorPos)
@@ -361,12 +358,8 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 		auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
 		FileContextMenuManager fcmm(m_hActiveListView, pidlDirectory.get(), pidlItems);
-
-		FileContextMenuInfo fcmi;
-		fcmi.uFrom = FROM_LISTVIEW;
-
 		fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, pCursorPos, m_pStatusBar, nullptr,
-			reinterpret_cast<DWORD_PTR>(&fcmi), TRUE, IsKeyDown(VK_SHIFT));
+			TRUE, IsKeyDown(VK_SHIFT));
 	}
 }
 

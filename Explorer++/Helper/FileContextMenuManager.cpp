@@ -84,8 +84,7 @@ FileContextMenuManager::~FileContextMenuManager()
 }
 
 HRESULT FileContextMenuManager::ShowMenu(FileContextMenuHandler *handler, int iMinID, int iMaxID,
-	const POINT *ppt, StatusBar *pStatusBar, IUnknown *site, DWORD_PTR dwData, BOOL bRename,
-	BOOL bExtended)
+	const POINT *ppt, StatusBar *pStatusBar, IUnknown *site, BOOL bRename, BOOL bExtended)
 {
 	if (m_pActualContext == nullptr)
 	{
@@ -147,7 +146,7 @@ HRESULT FileContextMenuManager::ShowMenu(FileContextMenuHandler *handler, int iM
 		return hr;
 	}
 
-	handler->UpdateMenuEntries(m_pidlParent.get(), m_pidlItems, dwData, m_pActualContext, hMenu);
+	handler->UpdateMenuEntries(m_pidlParent.get(), m_pidlItems, m_pActualContext, hMenu);
 
 	MenuHelper::RemoveTrailingSeparators(hMenu);
 	MenuHelper::RemoveDuplicateSeperators(hMenu);
@@ -183,7 +182,7 @@ HRESULT FileContextMenuManager::ShowMenu(FileContextMenuHandler *handler, int iM
 		// Pass the menu back to the caller to give it the chance to handle it.
 		if (SUCCEEDED(hr))
 		{
-			bHandled = handler->HandleShellMenuItem(m_pidlParent.get(), m_pidlItems, dwData, verb);
+			bHandled = handler->HandleShellMenuItem(m_pidlParent.get(), m_pidlItems, verb);
 		}
 
 		if (!bHandled)

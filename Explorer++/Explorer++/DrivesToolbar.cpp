@@ -194,18 +194,15 @@ void DrivesToolbar::ShowContextMenu(const std::wstring &drivePath, const POINT &
 	assert(res);
 
 	FileContextMenuManager contextMenuManager(m_view->GetHWND(), pidl.get(), { child.get() });
-
 	contextMenuManager.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, &ptScreen,
 		m_coreInterface->GetStatusBar(), NULL, FALSE, showExtended);
 }
 
 void DrivesToolbar::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, IContextMenu *contextMenu,
-	HMENU hMenu)
+	const std::vector<PITEMID_CHILD> &pidlItems, IContextMenu *contextMenu, HMENU hMenu)
 {
 	UNREFERENCED_PARAMETER(pidlParent);
 	UNREFERENCED_PARAMETER(pidlItems);
-	UNREFERENCED_PARAMETER(dwData);
 	UNREFERENCED_PARAMETER(contextMenu);
 
 	std::wstring openInNewTabText = ResourceHelper::LoadString(
@@ -214,10 +211,8 @@ void DrivesToolbar::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
 }
 
 BOOL DrivesToolbar::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd)
+	const std::vector<PITEMID_CHILD> &pidlItems, const TCHAR *szCmd)
 {
-	UNREFERENCED_PARAMETER(dwData);
-
 	if (StrCmpI(szCmd, _T("open")) == 0)
 	{
 		assert(pidlItems.size() == 1);

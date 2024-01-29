@@ -30,10 +30,6 @@
 /* Sent when a folder size calculation has finished. */
 #define WM_APP_FOLDERSIZECOMPLETED WM_APP + 3
 
-/* Private definitions. */
-#define FROM_LISTVIEW 0
-#define FROM_TREEVIEW 1
-
 // Forward declarations.
 class AddressBar;
 class BookmarksMainMenu;
@@ -142,11 +138,6 @@ private:
 
 	// When changing the font size, it will be decreased/increased by this amount.
 	static const int FONT_SIZE_CHANGE_DELTA = 1_pt;
-
-	struct FileContextMenuInfo
-	{
-		UINT uFrom;
-	};
 
 	struct DirectoryAltered
 	{
@@ -288,7 +279,6 @@ private:
 	void OnListViewPaste();
 
 	/* TreeView private message handlers. */
-	void OnShowTreeViewContextMenu(const POINT &ptScreen);
 	void OnTreeViewSelectionChanged(const NMTREEVIEW *eventInfo);
 	void HandleTreeViewSelectionChanged(const NMTREEVIEW *eventInfo);
 	void OnTreeViewCopyItemPath() const;
@@ -462,16 +452,16 @@ private:
 
 	// FileContextMenuHandler
 	void UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, IContextMenu *contextMenu,
+		const std::vector<PITEMID_CHILD> &pidlItems, IContextMenu *contextMenu,
 		HMENU hMenu) override;
 	BOOL HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd) override;
+		const std::vector<PITEMID_CHILD> &pidlItems, const TCHAR *szCmd) override;
 	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		const std::vector<PITEMID_CHILD> &pidlItems, int iCmd) override;
 
 	void UpdateBackgroundContextMenu(IContextMenu *contextMenu, HMENU menu);
 	void UpdateItemContextMenu(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR data, HMENU menu);
+		const std::vector<PITEMID_CHILD> &pidlItems, HMENU menu);
 
 	/* File selection tests. */
 	BOOL AnyItemsSelected() const;
