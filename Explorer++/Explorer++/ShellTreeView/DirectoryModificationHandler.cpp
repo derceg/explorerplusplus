@@ -22,8 +22,7 @@ void ShellTreeView::StartDirectoryMonitoringForDrives()
 
 void ShellTreeView::StartDirectoryMonitoringForNode(ShellTreeNode *node)
 {
-	auto pidl = node->GetFullPidl();
-	node->SetChangeNotifyId(m_shellChangeWatcher.StartWatching(pidl.get(),
+	node->SetChangeNotifyId(m_shellChangeWatcher.StartWatching(node->GetFullPidl().get(),
 		SHCNE_ATTRIBUTES | SHCNE_MKDIR | SHCNE_RENAMEFOLDER | SHCNE_RMDIR | SHCNE_UPDATEDIR
 			| SHCNE_UPDATEITEM));
 }
@@ -309,9 +308,8 @@ void ShellTreeView::OnDirectoryUpdated(PCIDLIST_ABSOLUTE simplePidl)
 	}
 
 	ShellTreeNode *quickAccessRootNode = GetNodeFromTreeViewItem(m_quickAccessRootItem);
-	unique_pidl_absolute quickAccessPidl = quickAccessRootNode->GetFullPidl();
 
-	if (!ArePidlsEquivalent(simplePidl, quickAccessPidl.get()))
+	if (!ArePidlsEquivalent(simplePidl, quickAccessRootNode->GetFullPidl().get()))
 	{
 		return;
 	}
