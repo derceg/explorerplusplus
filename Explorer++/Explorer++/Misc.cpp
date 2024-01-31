@@ -14,10 +14,10 @@
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileOperations.h"
-#include "../Helper/Logging.h"
 #include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/range/adaptor/map.hpp>
+#include <glog/logging.h>
 
 void Explorerplusplus::ValidateLoadedSettings()
 {
@@ -266,9 +266,9 @@ void Explorerplusplus::DirectoryAlteredCallback(const TCHAR *szFileName, DWORD d
 	if (tab)
 	{
 		std::wstring directory = tab->GetShellBrowser()->GetDirectory();
-		LOG(debug) << _T("Directory change notification received for \"") << directory
-				   << _T("\", Action = ") << dwAction << _T(", Filename = \"") << szFileName
-				   << _T("\"");
+		LOG(INFO) << "Directory change notification received for \"" << wstrToUtf8Str(directory)
+				  << "\", Action = " << dwAction << ", Filename = \"" << wstrToUtf8Str(szFileName)
+				  << "\"";
 
 		tab->GetShellBrowser()->FilesModified(dwAction, szFileName, pDirectoryAltered->iIndex,
 			pDirectoryAltered->iFolderIndex);

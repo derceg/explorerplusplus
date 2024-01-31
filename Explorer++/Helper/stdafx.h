@@ -66,6 +66,9 @@
 #include <winioctl.h>
 #include <wmsdk.h>
 
+#define GLOG_NO_ABBREVIATED_SEVERITIES
+#include <glog/logging.h>
+
 // WinRT
 #include "WinRTBaseWrapper.h"
 

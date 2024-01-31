@@ -27,7 +27,6 @@
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/FileOperations.h"
-#include "../Helper/Logging.h"
 #include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ProcessHelper.h"
@@ -36,6 +35,7 @@
 #include "../Helper/WindowHelper.h"
 #include "../Helper/iDirectoryMonitor.h"
 #include <boost/range/adaptor/map.hpp>
+#include <glog/logging.h>
 #include <wil/resource.h>
 #include <algorithm>
 
@@ -701,7 +701,7 @@ void Explorerplusplus::StartDirectoryMonitoringForTab(const Tab &tab)
 	std::wstring directoryToWatch = tab.GetShellBrowser()->GetDirectory();
 
 	/* Start monitoring the directory that was opened. */
-	LOG(debug) << _T("Starting directory monitoring for \"") << directoryToWatch << _T("\"");
+	LOG(INFO) << "Starting directory monitoring for \"" << wstrToUtf8Str(directoryToWatch) << "\"";
 	auto dirMonitorId = m_pDirMon->WatchDirectory(directoryToWatch.c_str(),
 		FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_DIR_NAME
 			| FILE_NOTIFY_CHANGE_ATTRIBUTES | FILE_NOTIFY_CHANGE_LAST_WRITE

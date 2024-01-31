@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "NewMenuClient.h"
 #include "ShellBrowser/ShellBrowser.h"
-#include "../Helper/Logging.h"
+#include <glog/logging.h>
 
 NewMenuClient::NewMenuClient(ShellBrowser *shellBrowser) : m_shellBrowser(shellBrowser)
 {
@@ -40,7 +40,7 @@ IFACEMETHODIMP NewMenuClient::SelectAndEditItem(PCIDLIST_ABSOLUTE pidlItem, NMCS
 	// Now, start an in-place rename of the item.
 	case NMCSAEI_EDIT:
 	case NMCSAEI_EDIT_WINDOWS_10:
-		LOG(info) << _T("Starting in-place rename of item created via new menu");
+		LOG(INFO) << "Starting in-place rename of item created via new menu";
 		m_shellBrowser->QueueRename(pidlItem);
 		break;
 	}

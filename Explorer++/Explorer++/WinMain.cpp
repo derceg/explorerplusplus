@@ -12,22 +12,22 @@
 #include "Console.h"
 #include "CrashHandlerHelper.h"
 #include "Explorer++_internal.h"
-#include "Logging.h"
 #include "MainResource.h"
 #include "ModelessDialogs.h"
 #include "RegistrySettings.h"
 #include "XMLSettings.h"
-#include "../Helper/Logging.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/locale.hpp>
 #include <boost/scope_exit.hpp>
+#include <glog/logging.h>
 #include <wil/resource.h>
+#include <cstdlib>
 #include <format>
 
 #pragma warning(                                                                                   \
-	disable : 4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
+		disable : 4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
 /* Default window size/position. */
 #define DEFAULT_WINDOWPOS_LEFT_PERCENTAGE 0.02
@@ -75,15 +75,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	bool enableLogging =
-#ifdef _DEBUG
-		true;
-#else
-		false;
-#endif
-
-	boost::log::core::get()->set_logging_enabled(enableLogging);
-
 	/* Initialize OLE, as well as the various window classes that
 	will be needed (listview, TreeView, comboboxex, etc.). */
 	INITCOMMONCONTROLSEX ccEx;
@@ -123,15 +114,46 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return std::get<CommandLine::ExitInfo>(commandLineInfo).exitCode;
 	}
 
-	InitializeLogging(NExplorerplusplus::LOG_FILENAME);
-
 	auto &commandLineSettings = std::get<CommandLine::Settings>(commandLineInfo);
+
+	if (!commandLineSettings.enableLogging)
+	{
+		// Logs will only go to stdout. This will effectively disable logging from the user's
+		// perspective.
+		FLAGS_logtostdout = 1;
+
+		// Doing this means that, if the application was launched from the console, for example,
+		// CHECK failures will still be shown, which is somewhat useful.
+		FLAGS_minloglevel = google::GLOG_ERROR;
+	}
+
+	google::InitGoogleLogging(__argv[0]);
+	auto glogCleanup = wil::scope_exit([] { google::ShutdownGoogleLogging(); });
+
+	google::InstallFailureFunction(
+		[]
+		{
+			if (!IsDebuggerPresent())
+			{
+				// By default, glog will call abort() on a CHECK failure. The issue with that is
+				// that it won't invoke the exception handler. By calling DebugBreak() instead, the
+				// exception handler will be called, which gives a chance for the crash dialog to be
+				// shown and a minidump to be generated, before the application is terminated.
+				// This is only done when not debugging. When the application is being debugged,
+				// calling DebugBreak() would simply cause the debugger to break, which isn't
+				// desirable, as the application should exit when a CHECK condition is violated.
+				DebugBreak();
+			}
+			else
+			{
+				std::abort();
+			}
+		});
 
 	BOOL bAllowMultipleInstances = TRUE;
 	BOOL bLoadSettingsFromXML;
 
 	bLoadSettingsFromXML = TestConfigFileInternal();
-	LOG(info) << _T("bLoadSettingsFromXML = ") << bLoadSettingsFromXML;
 
 	if (bLoadSettingsFromXML)
 	{

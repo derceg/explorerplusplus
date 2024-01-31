@@ -1098,7 +1098,6 @@
     <ClCompile Include="ServiceProvider.cpp" />
     <ClCompile Include="Language.cpp" />
     <ClCompile Include="ListViewHandler.cpp" />
-    <ClCompile Include="Logging.cpp" />
     <ClCompile Include="Plugins\LuaPlugin.cpp" />
     <ClCompile Include="MainMenuHandler.cpp" />
     <ClCompile Include="MainRebar.cpp" />
@@ -1318,7 +1317,6 @@
     <ClInclude Include="LoadSaveInterface.h" />
     <ClInclude Include="LoadSaveRegistry.h" />
     <ClInclude Include="LoadSaveXml.h" />
-    <ClInclude Include="Logging.h" />
     <ClInclude Include="Plugins\LuaPlugin.h" />
     <ClInclude Include="MainResource.h" />
     <ClInclude Include="MainToolbar.h" />

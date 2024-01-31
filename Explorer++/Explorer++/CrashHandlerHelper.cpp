@@ -9,9 +9,9 @@
 #include "Version.h"
 #include "../Helper/DetoursHelper.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Logging.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/StringHelper.h"
+#include <glog/logging.h>
 #include <wil/resource.h>
 #include <detours/detours.h>
 #include <format>
@@ -45,7 +45,7 @@ void InitializeCrashHandler()
 	if (res != NO_ERROR)
 	{
 		assert(false);
-		LOG(warning) << L"Error when attempting to disable SetUnhandledExceptionFilter: " << res;
+		LOG(WARNING) << "Error when attempting to disable SetUnhandledExceptionFilter: " << res;
 	}
 }
 

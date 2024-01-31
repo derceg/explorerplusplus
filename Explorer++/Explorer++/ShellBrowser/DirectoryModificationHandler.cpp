@@ -9,7 +9,6 @@
 #include "ShellNavigationController.h"
 #include "ViewModes.h"
 #include "../Helper/ListViewHelper.h"
-#include "../Helper/Logging.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include <list>

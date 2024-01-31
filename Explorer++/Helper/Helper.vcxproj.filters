@@ -103,9 +103,6 @@
     <ClCompile Include="StringHelper.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
-    <ClCompile Include="Logging.cpp">
-      <Filter>Miscellaneous</Filter>
-    </ClCompile>
     <ClCompile Include="ImageHelper.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
@@ -268,9 +265,6 @@
       <Filter>Miscellaneous</Filter>
     </ClInclude>
     <ClInclude Include="..\targetver.h">
-      <Filter>Miscellaneous</Filter>
-    </ClInclude>
-    <ClInclude Include="Logging.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
     <ClInclude Include="ImageHelper.h">

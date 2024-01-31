@@ -4,8 +4,9 @@
 
 #include "stdafx.h"
 #include "ShellChangeWatcher.h"
-#include "../Helper/Logging.h"
+#include "../Helper/StringHelper.h"
 #include "../Helper/WindowSubclassWrapper.h"
+#include <glog/logging.h>
 
 ShellChangeWatcher::ShellChangeWatcher(HWND hwnd,
 	ProcessNotificationsCallback processNotificationsCallback) :
@@ -37,7 +38,8 @@ ULONG ShellChangeWatcher::StartWatching(PCIDLIST_ABSOLUTE pidl, LONG events, boo
 
 		if (SUCCEEDED(hr))
 		{
-			LOG(warning) << L"Couldn't monitor directory \"" << path << L"\" for changes.";
+			LOG(WARNING) << "Couldn't monitor directory \"" << wstrToUtf8Str(path)
+						 << "\" for changes.";
 		}
 
 		return 0;

@@ -21,8 +21,6 @@ const TCHAR REG_SETTINGS_KEY[] = _T("Software\\Explorer++\\Settings");
 saved to/loaded from. */
 const TCHAR XML_FILENAME[] = _T("config.xml");
 
-const TCHAR LOG_FILENAME[] = _T("Explorer++.log");
-
 // Internal command line arguments.
 const TCHAR JUMPLIST_TASK_NEWTAB_ARGUMENT[] = _T("--open-new-tab");
 const TCHAR APPLICATION_CRASHED_ARGUMENT[] = _T("--application-crashed");

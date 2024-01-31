@@ -10,7 +10,6 @@
 #include "ResourceHelper.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/WindowHelper.h"
-#include <boost/log/core.hpp>
 #include <CLI/App.hpp>
 #include <CLI/Config.hpp>
 #include <CLI/Formatter.hpp>
@@ -48,7 +47,6 @@ using namespace DefaultFileManager;
 struct ImmediatelyHandledOptions
 {
 	bool clearRegistrySettings;
-	bool enableLogging;
 	bool removeAsDefault;
 	ReplaceExplorerMode replaceExplorerMode;
 	bool jumplistNewTab;
@@ -81,9 +79,6 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 	immediatelyHandledOptions.clearRegistrySettings = false;
 	app.add_flag("--clear-registry-settings", immediatelyHandledOptions.clearRegistrySettings,
 		"Clear existing registry settings");
-
-	immediatelyHandledOptions.enableLogging = false;
-	app.add_flag("--enable-logging", immediatelyHandledOptions.enableLogging, "Enable logging");
 
 	immediatelyHandledOptions.removeAsDefault = false;
 	auto removeAsDefaultOption = app.add_flag("--remove-as-default",
@@ -120,6 +115,8 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 	{
 		featureMap.insert({ item._to_string(), item });
 	}
+
+	app.add_flag("--enable-logging", settings.enableLogging, "Enable logging");
 
 	app.add_option("--enable-features", settings.enableFeatures,
 		   "Allows incomplete features that are disabled by default to be enabled")
@@ -256,11 +253,6 @@ std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(const CLI::App &app
 	if (immediatelyHandledOptions.clearRegistrySettings)
 	{
 		OnClearRegistrySettings();
-	}
-
-	if (immediatelyHandledOptions.enableLogging)
-	{
-		boost::log::core::get()->set_logging_enabled(true);
 	}
 
 	if (immediatelyHandledOptions.removeAsDefault)

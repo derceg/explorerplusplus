@@ -7,8 +7,8 @@
 #include "DataExchangeHelper.h"
 #include "GdiplusHelper.h"
 #include "Helper.h"
-#include "Logging.h"
 #include "Macros.h"
+#include <glog/logging.h>
 #include <wil/resource.h>
 #include <chrono>
 
@@ -86,19 +86,19 @@ void DropHandler::HandleLeftClickDrop(IDataObject *pDataObject, POINT *pt)
 
 	if (CheckDropFormatSupported(pDataObject, &m_ftcUnicodeText))
 	{
-		LOG(debug) << _T("Helper - Copying CF_UNICODETEXT data");
+		LOG(INFO) << "Helper - Copying CF_UNICODETEXT data";
 		hrCopy = CopyUnicodeTextData(pDataObject, pastedFileList);
 	}
 	else if (CheckDropFormatSupported(pDataObject, &m_ftcPng))
 	{
-		LOG(debug) << _T("Helper - Copying PNG data");
+		LOG(INFO) << "Helper - Copying PNG data";
 
 		bool res = CopyPngData(pDataObject, pastedFileList);
 		hrCopy = res ? S_OK : E_FAIL;
 	}
 	else if (CheckDropFormatSupported(pDataObject, &m_ftcDIB))
 	{
-		LOG(debug) << _T("Helper - Copying CF_DIB data");
+		LOG(INFO) << "Helper - Copying CF_DIB data";
 
 		bool res = CopyDIBData(pDataObject, pastedFileList);
 		hrCopy = res ? S_OK : E_FAIL;

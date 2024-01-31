@@ -631,7 +631,6 @@
     <ClCompile Include="EnumFormatEtcImpl.cpp" />
     <ClCompile Include="ImageHelper.cpp" />
     <ClCompile Include="ListViewHelper.cpp" />
-    <ClCompile Include="Logging.cpp" />
     <ClCompile Include="MenuHelper.cpp" />
     <ClCompile Include="MessageForwarder.cpp" />
     <ClCompile Include="ProcessHelper.cpp" />
@@ -713,7 +712,6 @@
     <ClInclude Include="EnumFormatEtcImpl.h" />
     <ClInclude Include="ImageHelper.h" />
     <ClInclude Include="ListViewHelper.h" />
-    <ClInclude Include="Logging.h" />
     <ClInclude Include="Macros.h" />
     <ClInclude Include="MenuHelper.h" />
     <ClInclude Include="MessageForwarder.h" />

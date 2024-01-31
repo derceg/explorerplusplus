@@ -77,15 +77,19 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/functional/hash.hpp>
-#include <boost/log/common.hpp>
-#include <boost/log/sources/global_logger_storage.hpp>
-#include <boost/log/sources/severity_logger.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index_container.hpp>
 #include <boost/parameter.hpp>
 #include <boost/signals2.hpp>
+
+// glog/logging.h includes windows.h, which specifically needs to be included after Winsock2.h
+// (which is what's done above). Therefore, this is included after the Windows headers.
+// GLOG_NO_ABBREVIATED_SEVERITIES is defined because windows.h defines ERROR, which is also normally
+// defined by glog.
+#define GLOG_NO_ABBREVIATED_SEVERITIES
+#include <glog/logging.h>
 
 // wil/resource.h can use declarations from the Windows header files. For example,
 // wil::unique_htheme depends on uxtheme.h being included first. So, this file is specifically

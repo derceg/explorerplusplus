@@ -115,9 +115,6 @@
     <ClCompile Include="MainMenuHandler.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Logging.cpp">
-      <Filter>Logging</Filter>
-    </ClCompile>
     <ClCompile Include="DisplayWindow.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -659,9 +656,6 @@
     </ClInclude>
     <ClInclude Include="..\targetver.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Logging.h">
-      <Filter>Logging</Filter>
     </ClInclude>
     <ClInclude Include="HolderWindow.h">
       <Filter>Holder Window</Filter>
@@ -1241,9 +1235,6 @@
     </Filter>
     <Filter Include="Tabs">
       <UniqueIdentifier>{e3b2a10c-f5d5-4d00-b7da-606ab09d32ff}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Logging">
-      <UniqueIdentifier>{940a107a-5f25-4710-a60f-cd65b75735f0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Dialog Support">
       <UniqueIdentifier>{de7aee89-b700-43b0-b0ee-0f3e1c0e0414}</UniqueIdentifier>
