@@ -264,8 +264,14 @@ void Explorerplusplus::OnListViewBackgroundRClickWindows8OrGreater(POINT *pCurso
 	auto shellView = winrt::make<ShellView>(selectedTab.GetShellBrowserWeak(), this, false);
 	serviceProvider->RegisterService(SID_DefView, shellView.get());
 
-	fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, pCursorPos, m_pStatusBar,
-		serviceProvider.get(), FALSE, IsKeyDown(VK_SHIFT));
+	FileContextMenuManager::Flags flags = FileContextMenuManager::Flags::Standard;
+
+	if (IsKeyDown(VK_SHIFT))
+	{
+		WI_SetFlag(flags, FileContextMenuManager::Flags::ExtendedVerbs);
+	}
+
+	fcmm.ShowMenu(this, pCursorPos, m_pStatusBar, serviceProvider.get(), flags);
 }
 
 void Explorerplusplus::OnListViewBackgroundRClickWindows7(POINT *pCursorPos)
@@ -305,7 +311,8 @@ void Explorerplusplus::OnListViewBackgroundRClickWindows7(POINT *pCursorPos)
 	ContextMenuManager cmm(ContextMenuManager::ContextMenuType::Background, pidlDirectory.get(),
 		pDataObject.get(), serviceProvider.get(), BLACKLISTED_BACKGROUND_MENU_CLSID_ENTRIES);
 
-	cmm.ShowMenu(m_hContainer, menu, IDM_FILE_COPYFOLDERPATH, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID,
+	cmm.ShowMenu(m_hContainer, menu, IDM_FILE_COPYFOLDERPATH,
+		PREVIOUS_BACKGROUND_CONTEXT_MENU_MIN_ID, PREVIOUS_BACKGROUND_CONTEXT_MENU_MAX_ID,
 		*pCursorPos, *m_pStatusBar);
 }
 
@@ -357,9 +364,15 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 
 		auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
+		FileContextMenuManager::Flags flags = FileContextMenuManager::Flags::Rename;
+
+		if (IsKeyDown(VK_SHIFT))
+		{
+			WI_SetFlag(flags, FileContextMenuManager::Flags::ExtendedVerbs);
+		}
+
 		FileContextMenuManager fcmm(m_hActiveListView, pidlDirectory.get(), pidlItems);
-		fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, pCursorPos, m_pStatusBar, nullptr,
-			TRUE, IsKeyDown(VK_SHIFT));
+		fcmm.ShowMenu(this, pCursorPos, m_pStatusBar, nullptr, flags);
 	}
 }
 

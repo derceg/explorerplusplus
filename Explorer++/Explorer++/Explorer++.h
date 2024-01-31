@@ -99,8 +99,10 @@ public:
 private:
 	static constexpr UINT WM_APP_CLOSE = WM_APP + 1;
 
-	static const int MIN_SHELL_MENU_ID = 1;
-	static const int MAX_SHELL_MENU_ID = 1000;
+	static const int OPEN_IN_NEW_TAB_MENU_ITEM_ID = FileContextMenuManager::MAX_SHELL_MENU_ID + 1;
+
+	static const int PREVIOUS_BACKGROUND_CONTEXT_MENU_MIN_ID = 0;
+	static const int PREVIOUS_BACKGROUND_CONTEXT_MENU_MAX_ID = 1000;
 
 	static const UINT DISPLAY_WINDOW_MINIMUM_WIDTH = 70;
 	static const UINT DISPLAY_WINDOW_MINIMUM_HEIGHT = 70;
@@ -451,17 +453,16 @@ private:
 	HRESULT OnNavigateUp();
 
 	// FileContextMenuHandler
-	void UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, IContextMenu *contextMenu,
-		HMENU hMenu) override;
-	BOOL HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, const TCHAR *szCmd) override;
-	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, int iCmd) override;
+	void UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
+		const std::vector<PidlChild> &pidlItems, IContextMenu *contextMenu) override;
+	bool HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
+		const std::wstring &verb) override;
+	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
+		int cmd) override;
 
-	void UpdateBackgroundContextMenu(IContextMenu *contextMenu, HMENU menu);
-	void UpdateItemContextMenu(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, HMENU menu);
+	void UpdateBackgroundContextMenu(HMENU menu, IContextMenu *contextMenu);
+	void UpdateItemContextMenu(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
+		const std::vector<PidlChild> &pidlItems);
 
 	/* File selection tests. */
 	BOOL AnyItemsSelected() const;

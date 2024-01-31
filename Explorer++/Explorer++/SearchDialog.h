@@ -162,10 +162,8 @@ private:
 	static const int SEARCH_PROCESSITEMS_TIMER_ELAPSED = 50;
 	static const int SEARCH_MAX_ITEMS_BATCH_PROCESS = 100;
 
-	static const int MIN_SHELL_MENU_ID = 1;
-	static const int MAX_SHELL_MENU_ID = 1000;
-
-	static const int MENU_ID_OPEN_FILE_LOCATION = (MAX_SHELL_MENU_ID + 1);
+	static const int OPEN_FILE_LOCATION_MENU_ITEM_ID =
+		FileContextMenuManager::MAX_SHELL_MENU_ID + 1;
 
 	std::vector<ResizableDialogControl> GetResizableControls() override;
 	void SaveState() override;
@@ -177,13 +175,12 @@ private:
 	void UpdateListViewHeader();
 
 	// FileContextMenuHandler
-	void UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, IContextMenu *contextMenu,
-		HMENU hMenu) override;
-	BOOL HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, const TCHAR *szCmd) override;
-	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, int iCmd) override;
+	void UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
+		const std::vector<PidlChild> &pidlItems, IContextMenu *contextMenu) override;
+	bool HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
+		const std::wstring &verb) override;
+	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
+		int cmd) override;
 
 	std::wstring m_searchDirectory;
 	wil::unique_hicon m_directoryIcon;

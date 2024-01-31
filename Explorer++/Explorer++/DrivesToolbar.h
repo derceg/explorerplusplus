@@ -28,10 +28,7 @@ public:
 	DrivesToolbarView *GetView() const;
 
 private:
-	static constexpr int MIN_SHELL_MENU_ID = 1;
-	static constexpr int MAX_SHELL_MENU_ID = 1000;
-
-	static constexpr int MENU_ID_OPEN_IN_NEW_TAB = (MAX_SHELL_MENU_ID + 1);
+	static const int OPEN_IN_NEW_TAB_MENU_ITEM_ID = FileContextMenuManager::MAX_SHELL_MENU_ID + 1;
 
 	DrivesToolbar(DrivesToolbarView *view, std::unique_ptr<DriveModel> driveModel,
 		BrowserWindow *browserWindow, CoreInterface *coreInterface);
@@ -53,13 +50,12 @@ private:
 	void ShowContextMenu(const std::wstring &drivePath, const POINT &ptClient, bool showExtended);
 
 	// FileContextMenuHandler
-	void UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, IContextMenu *contextMenu,
-		HMENU hMenu) override;
-	BOOL HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, const TCHAR *szCmd) override;
-	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, int iCmd) override;
+	void UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
+		const std::vector<PidlChild> &pidlItems, IContextMenu *contextMenu) override;
+	bool HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
+		const std::wstring &verb) override;
+	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
+		int cmd) override;
 
 	void OnWindowDestroyed();
 

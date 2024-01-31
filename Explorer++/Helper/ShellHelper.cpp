@@ -1244,6 +1244,11 @@ HRESULT ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory,
 	if (items.empty())
 	{
 		RETURN_IF_FAILED(shellFolder->CreateViewObject(hwnd, IID_PPV_ARGS(&contextMenu)));
+
+		/*wil::com_ptr_nothrow<IShellView> shellView;
+		HRESULT hr = shellFolder->CreateViewObject(hwnd, IID_PPV_ARGS(&shellView));
+
+		hr = shellView->GetItemObject(SVGIO_BACKGROUND, IID_PPV_ARGS(&contextMenu));*/
 	}
 	else
 	{

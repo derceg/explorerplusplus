@@ -50,13 +50,12 @@ public:
 	void PasteShortcut();
 
 	// FileContextMenuHandler
-	void UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, IContextMenu *contextMenu,
-		HMENU menu) override;
-	BOOL HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, const TCHAR *verb) override;
-	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PITEMID_CHILD> &pidlItems, int cmd) override;
+	void UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
+		const std::vector<PidlChild> &pidlItems, IContextMenu *contextMenu) override;
+	bool HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
+		const std::wstring &verb) override;
+	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
+		int cmd) override;
 
 private:
 	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 1;
@@ -70,9 +69,7 @@ private:
 
 	static const SIGDN DISPLAY_NAME_TYPE = SIGDN_NORMALDISPLAY;
 
-	static const int MIN_SHELL_MENU_ID = 1;
-	static const int MAX_SHELL_MENU_ID = 1000;
-	static const int OPEN_IN_NEW_TAB_MENU_ITEM_ID = MAX_SHELL_MENU_ID + 1;
+	static const int OPEN_IN_NEW_TAB_MENU_ITEM_ID = FileContextMenuManager::MAX_SHELL_MENU_ID + 1;
 
 	struct BasicItemInfo
 	{

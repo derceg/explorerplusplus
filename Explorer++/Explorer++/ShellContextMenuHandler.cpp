@@ -17,22 +17,20 @@
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
 
-#define MENU_OPEN_IN_NEW_TAB (MAX_SHELL_MENU_ID + 1)
-
-void Explorerplusplus::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PITEMID_CHILD> &pidlItems, IContextMenu *contextMenu, HMENU hMenu)
+void Explorerplusplus::UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PidlChild> &pidlItems, IContextMenu *contextMenu)
 {
 	if (pidlItems.empty())
 	{
-		UpdateBackgroundContextMenu(contextMenu, hMenu);
+		UpdateBackgroundContextMenu(menu, contextMenu);
 	}
 	else
 	{
-		UpdateItemContextMenu(pidlParent, pidlItems, hMenu);
+		UpdateItemContextMenu(menu, pidlParent, pidlItems);
 	}
 }
 
-void Explorerplusplus::UpdateBackgroundContextMenu(IContextMenu *contextMenu, HMENU menu)
+void Explorerplusplus::UpdateBackgroundContextMenu(HMENU menu, IContextMenu *contextMenu)
 {
 	int numItems = GetMenuItemCount(menu);
 
@@ -48,8 +46,9 @@ void Explorerplusplus::UpdateBackgroundContextMenu(IContextMenu *contextMenu, HM
 		mii.fMask = MIIM_ID | MIIM_FTYPE;
 		BOOL res = GetMenuItemInfo(menu, i, TRUE, &mii);
 
-		if (!res || WI_IsFlagSet(mii.fType, MFT_SEPARATOR) || mii.wID < MIN_SHELL_MENU_ID
-			|| mii.wID > MAX_SHELL_MENU_ID)
+		if (!res || WI_IsFlagSet(mii.fType, MFT_SEPARATOR)
+			|| mii.wID < FileContextMenuManager::MIN_SHELL_MENU_ID
+			|| mii.wID > FileContextMenuManager::MAX_SHELL_MENU_ID)
 		{
 			continue;
 		}
@@ -58,8 +57,9 @@ void Explorerplusplus::UpdateBackgroundContextMenu(IContextMenu *contextMenu, HM
 		// context menu starting in Windows 8. In Windows 7, verbs are only set for a couple of
 		// items. Therefore, the code below isn't going to work on anything earlier then Windows 8.
 		TCHAR verb[64] = _T("");
-		HRESULT hr = contextMenu->GetCommandString(mii.wID - MIN_SHELL_MENU_ID, GCS_VERB, nullptr,
-			reinterpret_cast<LPSTR>(verb), SIZEOF_ARRAY(verb));
+		HRESULT hr =
+			contextMenu->GetCommandString(mii.wID - FileContextMenuManager::MIN_SHELL_MENU_ID,
+				GCS_VERB, nullptr, reinterpret_cast<LPSTR>(verb), SIZEOF_ARRAY(verb));
 
 		if (FAILED(hr))
 		{
@@ -147,8 +147,8 @@ void Explorerplusplus::UpdateBackgroundContextMenu(IContextMenu *contextMenu, HM
 	}
 }
 
-void Explorerplusplus::UpdateItemContextMenu(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PITEMID_CHILD> &pidlItems, HMENU menu)
+void Explorerplusplus::UpdateItemContextMenu(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PidlChild> &pidlItems)
 {
 	bool addNewTabMenuItem = false;
 
@@ -156,7 +156,7 @@ void Explorerplusplus::UpdateItemContextMenu(PCIDLIST_ABSOLUTE pidlParent,
 	{
 		SFGAOF fileAttributes = SFGAO_FOLDER;
 
-		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems.front()));
+		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
 		GetItemAttributes(pidlComplete.get(), &fileAttributes);
 
 		if (fileAttributes & SFGAO_FOLDER)
@@ -173,33 +173,26 @@ void Explorerplusplus::UpdateItemContextMenu(PCIDLIST_ABSOLUTE pidlParent,
 		MENUITEMINFO mii;
 		mii.cbSize = sizeof(mii);
 		mii.fMask = MIIM_STRING | MIIM_ID;
-		mii.wID = MENU_OPEN_IN_NEW_TAB;
+		mii.wID = OPEN_IN_NEW_TAB_MENU_ITEM_ID;
 		mii.dwTypeData = openInNewTabText.data();
 		InsertMenuItem(menu, 1, TRUE, &mii);
 	}
 }
 
-BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PITEMID_CHILD> &pidlItems, const TCHAR *szCmd)
+bool Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PidlChild> &pidlItems, const std::wstring &verb)
 {
-	if (StrCmpI(szCmd, _T("open")) == 0)
+	if (verb == L"open")
 	{
-		if (pidlItems.empty())
+		for (const auto &pidl : pidlItems)
 		{
-			OpenItem(pidlParent);
-		}
-		else
-		{
-			for (const auto &pidl : pidlItems)
-			{
-				unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidl));
-				OpenItem(pidlComplete.get());
-			}
+			unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidl.Raw()));
+			OpenItem(pidlComplete.get());
 		}
 
-		return TRUE;
+		return true;
 	}
-	else if (StrCmpI(szCmd, _T("viewcustomwizard")) == 0)
+	else if (verb == L"viewcustomwizard")
 	{
 		// This item is only shown on the background context menu.
 		assert(pidlItems.empty());
@@ -210,66 +203,66 @@ BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		return ExecuteFileAction(m_hActiveListView, L"properties", L"customize", nullptr,
 			pidlParent);
 	}
-	else if (StrCmpI(szCmd, _T("refresh")) == 0)
+	else if (verb == L"refresh")
 	{
 		OnRefresh();
 
-		return TRUE;
+		return true;
 	}
-	else if (StrCmpI(szCmd, _T("rename")) == 0)
+	else if (verb == L"rename")
 	{
 		OnFileRename();
 
-		return TRUE;
+		return true;
 	}
-	else if (StrCmpI(szCmd, _T("copy")) == 0)
+	else if (verb == L"copy")
 	{
 		Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 		selectedTab.GetShellBrowser()->CopySelectedItemsToClipboard(true);
 
-		return TRUE;
+		return true;
 	}
-	else if (StrCmpI(szCmd, _T("cut")) == 0)
+	else if (verb == L"cut")
 	{
 		Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 		selectedTab.GetShellBrowser()->CopySelectedItemsToClipboard(false);
 
-		return TRUE;
+		return true;
 	}
-	else if (StrCmpI(szCmd, _T("paste")) == 0)
+	else if (verb == L"paste")
 	{
 		if (pidlItems.empty())
 		{
 			// The paste item on the background context menu is non-functional, so needs to be
 			// handled here.
 			OnListViewPaste();
-			return TRUE;
+			return true;
 		}
 	}
-	else if (StrCmpI(szCmd, _T("pastelink")) == 0)
+	else if (verb == L"pastelink")
 	{
 		// This item should only be shown in the background context menu.
 		assert(pidlItems.empty());
 
 		GetActiveShellBrowser()->PasteShortcut();
 
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 void Explorerplusplus::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PITEMID_CHILD> &pidlItems, int iCmd)
+	const std::vector<PidlChild> &pidlItems, int cmd)
 {
-	switch (iCmd)
+	switch (cmd)
 	{
-	case MENU_OPEN_IN_NEW_TAB:
+	case OPEN_IN_NEW_TAB_MENU_ITEM_ID:
 	{
 		// This menu item should only be added when a single folder is selected.
 		assert(pidlItems.size() == 1);
 
-		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
+		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
 		auto navigateParams = NavigateParams::Normal(pidlComplete.get());
 		GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams,
 			TabSettings(_selected = m_config->openTabsInForeground));
@@ -278,7 +271,7 @@ void Explorerplusplus::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 
 	// Custom items in the background context menu will be handled by the WM_COMMAND handler.
 	default:
-		SendMessage(m_hContainer, WM_COMMAND, MAKEWPARAM(iCmd, 0), 0);
+		SendMessage(m_hContainer, WM_COMMAND, MAKEWPARAM(cmd, 0), 0);
 		break;
 	}
 }

@@ -1400,9 +1400,15 @@ void ShellTreeView::OnShowContextMenu(const POINT &ptScreen)
 
 	ILRemoveLastID(pidl.get());
 
+	FileContextMenuManager::Flags flags = FileContextMenuManager::Flags::Rename;
+
+	if (IsKeyDown(VK_SHIFT))
+	{
+		WI_SetFlag(flags, FileContextMenuManager::Flags::ExtendedVerbs);
+	}
+
 	FileContextMenuManager contextMenuManager(m_hTreeView, pidl.get(), { child.get() });
-	contextMenuManager.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, &finalPoint,
-		m_coreInterface->GetStatusBar(), nullptr, TRUE, IsKeyDown(VK_SHIFT));
+	contextMenuManager.ShowMenu(this, &finalPoint, m_coreInterface->GetStatusBar(), nullptr, flags);
 
 	if (highlightTargetItem)
 	{
@@ -1410,8 +1416,8 @@ void ShellTreeView::OnShowContextMenu(const POINT &ptScreen)
 	}
 }
 
-void ShellTreeView::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PITEMID_CHILD> &pidlItems, IContextMenu *contextMenu, HMENU menu)
+void ShellTreeView::UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PidlChild> &pidlItems, IContextMenu *contextMenu)
 {
 	UNREFERENCED_PARAMETER(pidlParent);
 	UNREFERENCED_PARAMETER(pidlItems);
@@ -1422,36 +1428,38 @@ void ShellTreeView::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
 	MenuHelper::AddStringItem(menu, OPEN_IN_NEW_TAB_MENU_ITEM_ID, openInNewTabText, 1, true);
 }
 
-BOOL ShellTreeView::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PITEMID_CHILD> &pidlItems, const TCHAR *verb)
+bool ShellTreeView::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PidlChild> &pidlItems, const std::wstring &verb)
 {
 	assert(pidlItems.size() == 1);
 
-	if (StrCmpI(verb, _T("rename")) == 0)
+	if (verb == L"rename")
 	{
-		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
+		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
 		StartRenamingItem(pidlComplete.get());
+
+		return true;
 	}
-	else if (StrCmpI(verb, _T("copy")) == 0)
+	else if (verb == L"copy")
 	{
-		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
+		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
 		CopyItemToClipboard(pidlComplete.get(), true);
 
-		return TRUE;
+		return true;
 	}
-	else if (StrCmpI(verb, _T("cut")) == 0)
+	else if (verb == L"cut")
 	{
-		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
+		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
 		CopyItemToClipboard(pidlComplete.get(), false);
 
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 void ShellTreeView::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PITEMID_CHILD> &pidlItems, int cmd)
+	const std::vector<PidlChild> &pidlItems, int cmd)
 {
 	assert(pidlItems.size() == 1);
 
@@ -1459,7 +1467,7 @@ void ShellTreeView::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	{
 	case OPEN_IN_NEW_TAB_MENU_ITEM_ID:
 	{
-		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0]));
+		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
 		auto disposition = m_config->openTabsInForeground ? OpenFolderDisposition::ForegroundTab
 														  : OpenFolderDisposition::BackgroundTab;
 		m_browserWindow->OpenItem(pidlComplete.get(), disposition);

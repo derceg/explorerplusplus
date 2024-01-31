@@ -560,12 +560,12 @@ int CALLBACK SearchDialog::SortResultsByPath(LPARAM lParam1, LPARAM lParam2)
 	return StrCmpLogicalW(szPath1, szPath2);
 }
 
-void SearchDialog::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PITEMID_CHILD> &pidlItems, IContextMenu *contextMenu, HMENU hMenu)
+void SearchDialog::UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PidlChild> &pidlItems, IContextMenu *contextMenu)
 {
 	UNREFERENCED_PARAMETER(contextMenu);
 
-	unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems.front()));
+	unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
 	SFGAOF itemAttributes = SFGAO_FOLDER;
 	GetItemAttributes(pidlComplete.get(), &itemAttributes);
 
@@ -585,39 +585,39 @@ void SearchDialog::UpdateMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(MENUITEMINFO);
 	mii.fMask = MIIM_STRING | MIIM_ID;
-	mii.wID = MENU_ID_OPEN_FILE_LOCATION;
+	mii.wID = OPEN_FILE_LOCATION_MENU_ITEM_ID;
 	mii.dwTypeData = szTemp;
-	InsertMenuItem(hMenu, 1, TRUE, &mii);
+	InsertMenuItem(menu, 1, TRUE, &mii);
 }
 
-BOOL SearchDialog::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PITEMID_CHILD> &pidlItems, const TCHAR *szCmd)
+bool SearchDialog::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PidlChild> &pidlItems, const std::wstring &verb)
 {
-	if (StrCmpI(szCmd, _T("open")) == 0)
+	if (verb == L"open")
 	{
-		for (auto pidlItem : pidlItems)
+		for (const auto &pidlItem : pidlItems)
 		{
-			unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItem));
+			unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItem.Raw()));
 			m_browserWindow->OpenItem(pidlComplete.get());
 		}
 
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 void SearchDialog::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PITEMID_CHILD> &pidlItems, int iCmd)
+	const std::vector<PidlChild> &pidlItems, int cmd)
 {
-	switch (iCmd)
+	switch (cmd)
 	{
-	case MENU_ID_OPEN_FILE_LOCATION:
+	case OPEN_FILE_LOCATION_MENU_ITEM_ID:
 	{
 		auto navigateParams = NavigateParams::Normal(pidlParent);
 		m_tabContainer->CreateNewTab(navigateParams, TabSettings(_selected = true));
 
-		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems.front()));
+		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
 		m_coreInterface->GetActiveShellBrowser()->SelectItems({ pidlComplete.get() });
 	}
 	break;
@@ -723,8 +723,16 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 						ptCursor.x = GET_X_LPARAM(dwCursorPos);
 						ptCursor.y = GET_Y_LPARAM(dwCursorPos);
 
-						fcmm.ShowMenu(this, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID, &ptCursor,
-							m_coreInterface->GetStatusBar(), NULL, FALSE, IsKeyDown(VK_SHIFT));
+						FileContextMenuManager::Flags flags =
+							FileContextMenuManager::Flags::Standard;
+
+						if (IsKeyDown(VK_SHIFT))
+						{
+							WI_SetFlag(flags, FileContextMenuManager::Flags::ExtendedVerbs);
+						}
+
+						fcmm.ShowMenu(this, &ptCursor, m_coreInterface->GetStatusBar(), nullptr,
+							flags);
 					}
 				}
 			}
