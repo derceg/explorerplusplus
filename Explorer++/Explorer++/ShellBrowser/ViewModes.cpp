@@ -6,6 +6,7 @@
 #include "ViewModes.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include <glog/logging.h>
 
 UINT GetViewModeMenuId(ViewMode viewMode)
 {
@@ -36,7 +37,7 @@ UINT GetViewModeMenuId(ViewMode viewMode)
 		return IDM_VIEW_DETAILS;
 
 	default:
-		throw std::runtime_error("ViewMode value not found");
+		LOG(FATAL) << "ViewMode value not found";
 	}
 }
 
@@ -79,7 +80,8 @@ std::wstring GetViewModeMenuText(ViewMode viewMode, HINSTANCE resourceInstance)
 		break;
 
 	default:
-		throw std::runtime_error("ViewMode value not found");
+		LOG(FATAL) << "ViewMode value not found";
+		__assume(0);
 	}
 
 	return ResourceHelper::LoadString(resourceInstance, stringId);

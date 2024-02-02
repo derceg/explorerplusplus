@@ -10,6 +10,7 @@
 #include "ResourceHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ResizableDialogHelper.h"
+#include <glog/logging.h>
 
 std::wstring GetIconSetText(IconSet iconSet, HINSTANCE resourceInstance);
 
@@ -100,7 +101,16 @@ std::wstring GetIconSetText(IconSet iconSet, HINSTANCE resourceInstance)
 		break;
 
 	default:
-		throw std::runtime_error("IconSet value not found");
+		LOG(FATAL) << "Invalid IconSet value";
+
+		// Although LOG(FATAL) results in a call that's marked as noreturn, the compiler may still
+		// issue an uninitialized variable warning (in this case, it warns that stringId may be
+		// uninitialized). That's not correct here, since the LOG(FATAL) call will result in the
+		// application being terminated and stringId is always initialized otherwise. Using
+		// __assume(0) here indicates to the compiler that the code path is unreachable. That then
+		// prevents the warning from being generated.
+		// This can be removed if the compiler no longer issues a warning in this type of situation.
+		__assume(0);
 	}
 
 	return ResourceHelper::LoadString(resourceInstance, stringId);

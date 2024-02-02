@@ -6,6 +6,7 @@
 #include "Theme.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include <glog/logging.h>
 
 std::wstring GetThemeText(Theme theme, HINSTANCE resourceInstance)
 {
@@ -26,7 +27,8 @@ std::wstring GetThemeText(Theme theme, HINSTANCE resourceInstance)
 		break;
 
 	default:
-		throw std::runtime_error("Theme value not found");
+		LOG(FATAL) << "Theme value not found";
+		__assume(0);
 	}
 
 	return ResourceHelper::LoadString(resourceInstance, stringId);

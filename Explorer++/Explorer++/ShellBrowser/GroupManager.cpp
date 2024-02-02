@@ -16,6 +16,7 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/integer_traits.hpp>
+#include <glog/logging.h>
 #include <wil/common.h>
 #include <iphlpapi.h>
 #include <propkey.h>
@@ -480,7 +481,7 @@ std::optional<ShellBrowser::GroupInfo> ShellBrowser::DetermineItemDateGroup(
 		break;
 
 	default:
-		throw std::runtime_error("Incorrect date type");
+		LOG(FATAL) << "Incorrect date type";
 	}
 
 	if (!ret)

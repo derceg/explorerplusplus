@@ -23,6 +23,7 @@
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <boost/format.hpp>
+#include <glog/logging.h>
 #include <wil/common.h>
 
 const std::vector<ColumnType> COMMON_REAL_FOLDER_COLUMNS = { ColumnType::Name, ColumnType::Type,
@@ -793,11 +794,7 @@ int ShellBrowser::GetItemInternalIndex(int item) const
 	lvItem.iItem = item;
 	lvItem.iSubItem = 0;
 	BOOL res = ListView_GetItem(m_hListView, &lvItem);
-
-	if (!res)
-	{
-		throw std::runtime_error("Item lookup failed");
-	}
+	CHECK(res);
 
 	return static_cast<int>(lvItem.lParam);
 }

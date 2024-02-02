@@ -20,6 +20,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
+#include <glog/logging.h>
 
 LRESULT CALLBACK TreeViewHolderProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 	UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
@@ -137,13 +138,8 @@ void Explorerplusplus::OnTreeViewSelectionChangedTimer()
 	// navigation, ad infinitum.
 	KillTimer(m_treeViewHolder->GetHWND(), TREEVIEW_SELECTION_CHANGED_TIMER_ID);
 
-	if (!m_treeViewSelectionChangedEventInfo)
-	{
-		throw std::runtime_error("Invalid selection change information");
-	}
-
+	CHECK(m_treeViewSelectionChangedEventInfo);
 	HandleTreeViewSelectionChanged(&*m_treeViewSelectionChangedEventInfo);
-
 	m_treeViewSelectionChangedEventInfo.reset();
 }
 

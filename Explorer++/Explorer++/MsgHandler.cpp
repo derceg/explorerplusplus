@@ -1242,10 +1242,8 @@ void Explorerplusplus::FocusChanged()
 boost::signals2::connection Explorerplusplus::AddFocusChangeObserver(
 	const FocusChangedSignal::slot_type &observer)
 {
-	if (m_applicationShuttingDown)
-	{
-		throw std::runtime_error("Adding a focus changed observer during shutdown is unsafe");
-	}
+	CHECK(!m_applicationShuttingDown)
+		<< "Adding a focus changed observer during shutdown is unsafe";
 
 	return m_focusChangedSignal.connect(observer);
 }

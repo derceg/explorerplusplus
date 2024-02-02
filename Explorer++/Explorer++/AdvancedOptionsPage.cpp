@@ -10,6 +10,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include "../Helper/RichEditHelper.h"
+#include <glog/logging.h>
 
 const boost::bimap<bool, std::wstring> BOOL_MAPPINGS =
 	MakeBimap<bool, std::wstring>({ { true, L"true" }, { false, L"false" } });
@@ -306,11 +307,7 @@ AdvancedOptionsPage::AdvancedOption *AdvancedOptionsPage::GetAdvancedOptionByInd
 	lvItem.iItem = index;
 	lvItem.iSubItem = 0;
 	BOOL res = ListView_GetItem(GetDlgItem(GetDialog(), IDC_ADVANCED_OPTIONS), &lvItem);
-
-	if (!res)
-	{
-		throw std::runtime_error("Item lookup failed");
-	}
+	CHECK(res) << "Item lookup failed";
 
 	return reinterpret_cast<AdvancedOption *>(lvItem.lParam);
 }

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Bookmarks/BookmarkItem.h"
+#include <glog/logging.h>
 
 BookmarkItem::BookmarkItem(std::optional<std::wstring> guid, std::wstring_view name,
 	std::optional<std::wstring> location) :
@@ -190,11 +191,7 @@ size_t BookmarkItem::GetChildIndex(const BookmarkItem *bookmarkItem) const
 		{
 			return item.get() == bookmarkItem;
 		});
-
-	if (itr == m_children.end())
-	{
-		throw std::invalid_argument("BookmarkItem not found");
-	}
+	CHECK(itr != m_children.end()) << "BookmarkItem not found";
 
 	return itr - m_children.begin();
 }
@@ -209,11 +206,7 @@ const std::unique_ptr<BookmarkItem> &BookmarkItem::GetChildOwnedPtr(
 		{
 			return item.get() == bookmarkItem;
 		});
-
-	if (itr == m_children.end())
-	{
-		throw std::invalid_argument("BookmarkItem not found");
-	}
+	CHECK(itr != m_children.end()) << "BookmarkItem not found";
 
 	return *itr;
 }

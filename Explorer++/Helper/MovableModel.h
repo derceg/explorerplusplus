@@ -92,10 +92,7 @@ public:
 	void RemoveItem(const ItemType *item)
 	{
 		auto itr = std::find_if(m_items.begin(), m_items.end(),
-			[item](const auto &currentEntry)
-			{
-				return currentEntry.get() == item;
-			});
+			[item](const auto &currentEntry) { return currentEntry.get() == item; });
 
 		if (itr == m_items.end())
 		{
@@ -125,15 +122,8 @@ public:
 	size_t GetItemIndex(const ItemType *item) const
 	{
 		auto itr = std::find_if(m_items.begin(), m_items.end(),
-			[item](const auto &currentEntry)
-			{
-				return currentEntry.get() == item;
-			});
-
-		if (itr == m_items.end())
-		{
-			throw std::invalid_argument("Item not found");
-		}
+			[item](const auto &currentEntry) { return currentEntry.get() == item; });
+		CHECK(itr != m_items.end()) << "Item not found";
 
 		return itr - m_items.begin();
 	}

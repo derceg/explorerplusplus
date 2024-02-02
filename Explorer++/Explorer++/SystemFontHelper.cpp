@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "SystemFontHelper.h"
 #include "../Helper/DpiCompatibility.h"
+#include <glog/logging.h>
 
 LOGFONT GetSystemFontForDpi(SystemFont systemFont, UINT dpi);
 LOGFONT GetDefaultSystemFontForDpi(UINT dpi);
@@ -47,7 +48,7 @@ LOGFONT GetSystemFontForDpi(SystemFont systemFont, UINT dpi)
 		return nonClientMetrics.lfMessageFont;
 
 	default:
-		throw std::runtime_error("Invalid SystemFont value");
+		LOG(FATAL) << "Invalid SystemFont value";
 	}
 }
 

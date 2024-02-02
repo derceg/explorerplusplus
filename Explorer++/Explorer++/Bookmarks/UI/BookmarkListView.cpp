@@ -23,6 +23,7 @@
 #include "../Helper/WindowHelper.h"
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/adaptor/indexed.hpp>
+#include <glog/logging.h>
 #include <utility>
 
 BookmarkListView::BookmarkListView(HWND hListView, HINSTANCE resourceInstance,
@@ -156,9 +157,11 @@ UINT BookmarkListView::GetColumnTextResourceId(BookmarkHelper::ColumnType column
 
 	case BookmarkHelper::ColumnType::DateModified:
 		return IDS_BOOKMARKS_COLUMN_DATE_MODIFIED;
-	}
 
-	throw std::runtime_error("Bookmark column string resource not found");
+	default:
+		LOG(FATAL) << "Bookmark column string resource not found";
+		__assume(0);
+	}
 }
 
 LRESULT BookmarkListView::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -697,9 +700,10 @@ std::wstring BookmarkListView::GetBookmarkItemColumnInfo(const BookmarkItem *boo
 		FILETIME dateModified = bookmarkItem->GetDateModified();
 		return FormatDate(&dateModified);
 	}
-	}
 
-	throw std::runtime_error("Bookmark column type not found");
+	default:
+		LOG(FATAL) << "Bookmark column type not found";
+	}
 }
 
 std::wstring BookmarkListView::FormatDate(const FILETIME *date)
@@ -1101,7 +1105,8 @@ BookmarkHelper::ColumnType BookmarkListView::MapPropertyTypeToColumnType(
 		return BookmarkHelper::ColumnType::DateModified;
 
 	default:
-		throw std::runtime_error("Bookmark column not found");
+		LOG(FATAL) << "Bookmark column not found";
+		__assume(0);
 	}
 }
 

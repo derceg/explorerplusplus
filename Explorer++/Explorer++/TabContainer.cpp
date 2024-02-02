@@ -30,6 +30,7 @@
 #include "../Helper/iDirectoryMonitor.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/map.hpp>
+#include <glog/logging.h>
 
 const UINT TAB_CONTROL_STYLES = WS_VISIBLE | WS_CHILD | TCS_FOCUSNEVER | TCS_SINGLELINE
 	| TCS_TOOLTIPS | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
@@ -1260,12 +1261,7 @@ Tab &TabContainer::GetSelectedTab()
 int TabContainer::GetSelectedTabIndex() const
 {
 	int index = TabCtrl_GetCurSel(m_hwnd);
-
-	if (index == -1)
-	{
-		throw std::runtime_error("No selected tab");
-	}
-
+	CHECK_NE(index, -1) << "No selected tab";
 	return index;
 }
 
@@ -1292,11 +1288,7 @@ Tab &TabContainer::GetTabByIndex(int index)
 	TCITEM tcItem;
 	tcItem.mask = TCIF_PARAM;
 	BOOL res = TabCtrl_GetItem(m_hwnd, index, &tcItem);
-
-	if (!res)
-	{
-		throw std::runtime_error("Tab lookup failed");
-	}
+	CHECK(res) << "Tab lookup failed";
 
 	return GetTab(static_cast<int>(tcItem.lParam));
 }
@@ -1318,7 +1310,7 @@ int TabContainer::GetTabIndex(const Tab &tab) const
 	}
 
 	// All internal tab objects should have an index.
-	throw std::runtime_error("Couldn't determine index for tab");
+	LOG(FATAL) << "Couldn't determine index for tab";
 }
 
 int TabContainer::GetNumTabs() const

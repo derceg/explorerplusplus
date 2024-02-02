@@ -11,6 +11,7 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
+#include <glog/logging.h>
 #include <wil/resource.h>
 #include <vssym32.h>
 
@@ -521,11 +522,7 @@ LRESULT CALLBACK ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wP
 
 		auto text =
 			MenuHelper::GetMenuItemString(menu, static_cast<UINT>(measureItem->itemData), true);
-
-		if (!text)
-		{
-			throw std::runtime_error("Menu item text retrieval failed");
-		}
+		CHECK(text) << "Menu item text retrieval failed";
 
 		auto logFont = GetSystemFontScaledToWindow(SystemFont::Menu, hwnd);
 		wil::unique_hfont font(CreateFontIndirect(&logFont));
@@ -650,11 +647,7 @@ LRESULT CALLBACK ThemeManager::MainWindowSubclass(HWND hwnd, UINT msg, WPARAM wP
 		auto menu = reinterpret_cast<HMENU>(drawItem->hwndItem);
 		auto text =
 			MenuHelper::GetMenuItemString(menu, static_cast<UINT>(drawItem->itemData), true);
-
-		if (!text)
-		{
-			throw std::runtime_error("Menu item text retrieval failed");
-		}
+		CHECK(text) << "Menu item text retrieval failed";
 
 		DWORD drawFlags = drawFlagsBase;
 

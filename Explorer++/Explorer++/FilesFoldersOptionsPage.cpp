@@ -15,6 +15,7 @@
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include <boost/range/adaptor/map.hpp>
+#include <glog/logging.h>
 
 std::wstring GetSizeDisplayFormatText(SizeDisplayFormat sizeDisplayFormat,
 	HINSTANCE resourceInstance);
@@ -268,7 +269,6 @@ std::wstring GetSizeDisplayFormatText(SizeDisplayFormat sizeDisplayFormat,
 
 	switch (sizeDisplayFormat)
 	{
-		break;
 	case SizeDisplayFormat::Bytes:
 		stringId = IDS_OPTIONS_DIALOG_FILE_SIZE_BYTES;
 		break;
@@ -297,7 +297,8 @@ std::wstring GetSizeDisplayFormatText(SizeDisplayFormat sizeDisplayFormat,
 	// never be a string lookup for that item.
 	case SizeDisplayFormat::None:
 	default:
-		throw std::runtime_error("SizeDisplayFormat value not found or invalid");
+		LOG(FATAL) << "SizeDisplayFormat value not found or invalid";
+		__assume(0);
 	}
 
 	return ResourceHelper::LoadString(resourceInstance, stringId);

@@ -12,6 +12,7 @@
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/XMLSettings.h"
+#include <glog/logging.h>
 #include <algorithm>
 
 const TCHAR SetDefaultColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SetDefaultColumns");
@@ -302,9 +303,10 @@ std::vector<Column_t> &SetDefaultColumnsDialog::GetCurrentColumnList(FolderType 
 
 	case FolderType::RecycleBin:
 		return m_folderColumns.recycleBinColumns;
-	}
 
-	throw std::runtime_error("Unknown folder type selected");
+	default:
+		LOG(FATAL) << "Unknown folder type selected";
+	}
 }
 
 void SetDefaultColumnsDialog::OnLvnItemChanged(NMLISTVIEW *pnmlv)

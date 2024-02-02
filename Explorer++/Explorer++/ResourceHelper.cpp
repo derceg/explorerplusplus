@@ -5,16 +5,12 @@
 #include "stdafx.h"
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
+#include <glog/logging.h>
 
 std::wstring ResourceHelper::LoadString(HINSTANCE resourceInstance, UINT stringId)
 {
 	auto string = MaybeLoadString(resourceInstance, stringId);
-
-	if (!string)
-	{
-		throw std::runtime_error("String resource not found");
-	}
-
+	CHECK(string) << "String resource not found";
 	return *string;
 }
 

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <glog/logging.h>
 #include <memory>
 #include <vector>
 
@@ -188,10 +189,7 @@ protected:
 
 	void SetCurrentIndex(int index)
 	{
-		if (index < 0 || index >= GetNumHistoryEntries())
-		{
-			throw std::runtime_error("Incorrect history index specified");
-		}
+		CHECK(index >= 0 && index < GetNumHistoryEntries());
 
 		m_currentEntry = index;
 	}

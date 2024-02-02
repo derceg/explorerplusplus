@@ -7,6 +7,7 @@
 #include "DpiCompatibility.h"
 #include "Macros.h"
 #include "WindowHelper.h"
+#include <glog/logging.h>
 #include <VSStyle.h>
 // wil/resource.h needs to be included after uxtheme.h to ensure that wil::unique_htheme is defined.
 // clang-format off
@@ -417,11 +418,7 @@ bool AddTooltipForControl(HWND tipWnd, HWND control, HINSTANCE resourceInstance,
 	WCHAR *rawString;
 	int numCharacters =
 		LoadString(resourceInstance, stringResourceId, reinterpret_cast<LPWSTR>(&rawString), 0);
-
-	if (numCharacters == 0)
-	{
-		throw std::runtime_error("String resource not found");
-	}
+	CHECK_NE(numCharacters, 0) << "String resource not found";
 
 	std::wstring string(rawString, numCharacters);
 

@@ -56,7 +56,6 @@ TEST(BookmarkItemTest, AddRemoveChildren)
 
 	EXPECT_EQ(parentFolder.GetChildren().size(), 1);
 	EXPECT_TRUE(parentFolder.HasChildFolder());
-	EXPECT_THROW(parentFolder.GetChildIndex(rawBookmark), std::invalid_argument);
 	EXPECT_EQ(parentFolder.GetChildIndex(rawFolder), 0);
 
 	EXPECT_EQ(rawBookmark->GetParent(), nullptr);
@@ -65,7 +64,6 @@ TEST(BookmarkItemTest, AddRemoveChildren)
 
 	EXPECT_EQ(parentFolder.GetChildren().size(), 0);
 	EXPECT_FALSE(parentFolder.HasChildFolder());
-	EXPECT_THROW(parentFolder.GetChildIndex(rawFolder), std::invalid_argument);
 
 	EXPECT_EQ(rawFolder->GetParent(), nullptr);
 }

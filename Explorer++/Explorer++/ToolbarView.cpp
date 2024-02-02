@@ -8,6 +8,7 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/Helper.h"
 #include <wil/common.h>
+#include <glog/logging.h>
 
 ToolbarButton::ToolbarButton(ClickedCallback clickedCallback) : m_clickedCallback(clickedCallback)
 {
@@ -468,22 +469,13 @@ std::optional<size_t> ToolbarView::MaybeGetIndexOfButtonAtPoint(const POINT &pt)
 size_t ToolbarView::TransformCommandToIndex(int command)
 {
 	auto index = SendMessage(m_hwnd, TB_COMMANDTOINDEX, command, 0);
-
-	if (index == -1)
-	{
-		throw std::invalid_argument("Invalid command");
-	}
-
+	CHECK_NE(index, -1) << "Invalid command";
 	return index;
 }
 
 ToolbarButton *ToolbarView::GetButtonFromIndex(size_t index)
 {
-	if (index >= m_buttons.size())
-	{
-		throw std::invalid_argument("Invalid index");
-	}
-
+	CHECK_LT(index, m_buttons.size()) << "Invalid index";
 	auto itr = m_buttons.begin() + index;
 	return itr->get();
 }
@@ -548,12 +540,7 @@ RECT ToolbarView::GetButtonRect(size_t index) const
 {
 	RECT buttonRect;
 	auto res = SendMessage(m_hwnd, TB_GETITEMRECT, index, reinterpret_cast<LPARAM>(&buttonRect));
-
-	if (!res)
-	{
-		throw std::invalid_argument("Button not found");
-	}
-
+	CHECK(res) << "Button not found";
 	return buttonRect;
 }
 

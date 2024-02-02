@@ -13,6 +13,7 @@
 #include "../Helper/WindowHelper.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/algorithm/string/predicate.hpp>
+#include <glog/logging.h>
 
 SearchTabsDialog *SearchTabsDialog::Create(HINSTANCE resourceInstance, HWND parent,
 	CoreInterface *coreInterface)
@@ -129,7 +130,8 @@ std::wstring SearchTabsDialog::GetColumnText(ColumnType columnType)
 		break;
 
 	default:
-		throw std::runtime_error("Search tabs column type not found");
+		LOG(FATAL) << "Search tabs column type not found";
+		__assume(0);
 	}
 
 	return ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(), stringId);
@@ -324,7 +326,7 @@ std::wstring SearchTabsDialog::GetTabColumnText(const Tab &tab, ColumnType colum
 		return tab.GetShellBrowser()->GetDirectory();
 
 	default:
-		throw std::runtime_error("Search tabs column type not found");
+		LOG(FATAL) << "Search tabs column type not found";
 	}
 }
 
@@ -404,11 +406,7 @@ Tab &SearchTabsDialog::GetTabFromListView(int index)
 	lvItem.iItem = index;
 	lvItem.iSubItem = 0;
 	BOOL res = ListView_GetItem(GetDlgItem(m_hDlg, IDC_SEARCH_TABS_TAB_LIST), &lvItem);
-
-	if (!res)
-	{
-		throw std::runtime_error("Item lookup failed");
-	}
+	CHECK(res);
 
 	return m_coreInterface->GetTabContainer()->GetTab(static_cast<int>(lvItem.lParam));
 }
