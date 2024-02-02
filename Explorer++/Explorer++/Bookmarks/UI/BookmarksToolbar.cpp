@@ -19,6 +19,7 @@
 #include "../Helper/DropSourceImpl.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
+#include <glog/logging.h>
 #include <wil/com.h>
 #include <format>
 
@@ -32,7 +33,7 @@ public:
 		m_bookmarkIconManager(bookmarkIconManager),
 		m_destroyed(std::make_shared<bool>(false))
 	{
-		assert(bookmarkItem->IsBookmark());
+		DCHECK(bookmarkItem->IsBookmark());
 	}
 
 	~BookmarksToolbarBookmarkButton()
@@ -104,7 +105,7 @@ public:
 		m_bookmarkItem(bookmarkItem),
 		m_bookmarkIconManager(bookmarkIconManager)
 	{
-		assert(bookmarkItem->IsFolder());
+		DCHECK(bookmarkItem->IsFolder());
 	}
 
 	std::wstring GetText() const override
@@ -350,7 +351,7 @@ void BookmarksToolbar::OnToolbarContextMenuItemSelected(HWND sourceWindow, int m
 		return;
 	}
 
-	assert(m_contextMenuLocation);
+	CHECK(m_contextMenuLocation);
 
 	POINT ptClient = *m_contextMenuLocation;
 	ScreenToClient(m_view->GetHWND(), &ptClient);

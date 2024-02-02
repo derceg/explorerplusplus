@@ -30,7 +30,7 @@ void BookmarkContextMenuController::OnMenuItemSelected(int menuItemId,
 	{
 	case IDM_BOOKMARKS_OPEN:
 	{
-		assert(bookmarkItems.size() == 1 && bookmarkItems[0]->IsBookmark());
+		DCHECK(bookmarkItems.size() == 1 && bookmarkItems[0]->IsBookmark());
 
 		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItems[0],
 			OpenFolderDisposition::CurrentTab, m_coreInterface, m_browserWindow);
@@ -38,7 +38,7 @@ void BookmarkContextMenuController::OnMenuItemSelected(int menuItemId,
 	break;
 
 	case IDM_BOOKMARKS_OPEN_IN_NEW_TAB:
-		assert(bookmarkItems.size() == 1 && bookmarkItems[0]->IsBookmark());
+		DCHECK(bookmarkItems.size() == 1 && bookmarkItems[0]->IsBookmark());
 		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItems[0],
 			m_coreInterface->GetConfig()->openTabsInForeground
 				? OpenFolderDisposition::ForegroundTab
@@ -77,12 +77,12 @@ void BookmarkContextMenuController::OnMenuItemSelected(int menuItemId,
 		break;
 
 	case IDM_BOOKMARKS_PROPERTIES:
-		assert(bookmarkItems.size() == 1);
+		DCHECK_EQ(bookmarkItems.size(), 1U);
 		OnEditBookmarkItem(bookmarkItems[0], parentWindow);
 		break;
 
 	default:
-		assert(false);
+		DCHECK(false);
 		break;
 	}
 }

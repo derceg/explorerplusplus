@@ -10,6 +10,7 @@
 #include "../BookmarkDataExchange.h"
 #include "../Helper/DropSourceImpl.h"
 #include "../Helper/MenuHelper.h"
+#include <glog/logging.h>
 
 BookmarkMenu::BookmarkMenu(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
 	BrowserWindow *browserWindow, CoreInterface *coreInterface, IconFetcher *iconFetcher,
@@ -64,7 +65,7 @@ void BookmarkMenu::OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt)
 
 	if (itr == m_menuInfo->itemPositionMap.end())
 	{
-		assert(false);
+		DCHECK(false);
 		return;
 	}
 
@@ -116,7 +117,7 @@ void BookmarkMenu::OnMenuMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown, boo
 
 	if (itr == m_menuInfo->itemPositionMap.end())
 	{
-		assert(false);
+		DCHECK(false);
 		return;
 	}
 
@@ -145,7 +146,7 @@ LRESULT BookmarkMenu::OnMenuDrag(HMENU menu, int itemPosition)
 	{
 		// All menu items should appear in the set of position mappings, so this branch should never
 		// be taken.
-		assert(false);
+		DCHECK(false);
 		return MND_CONTINUE;
 	}
 

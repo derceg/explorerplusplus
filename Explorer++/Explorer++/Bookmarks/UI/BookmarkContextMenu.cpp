@@ -9,6 +9,7 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/MenuHelper.h"
+#include <glog/logging.h>
 #include <wil/resource.h>
 
 BookmarkContextMenu::BookmarkContextMenu(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
@@ -22,7 +23,7 @@ BookmarkContextMenu::BookmarkContextMenu(BookmarkTree *bookmarkTree, HINSTANCE r
 BOOL BookmarkContextMenu::ShowMenu(HWND parentWindow, BookmarkItem *parentFolder,
 	const RawBookmarkItems &bookmarkItems, const POINT &ptScreen, MenuType menuType)
 {
-	assert(!bookmarkItems.empty());
+	DCHECK(!bookmarkItems.empty());
 
 	wil::unique_hmenu parentMenu;
 

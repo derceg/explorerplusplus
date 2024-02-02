@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "BookmarksToolbarView.h"
+#include <glog/logging.h>
 
 BookmarksToolbarView::BookmarksToolbarView(HWND parent, const Config *config) :
 	ToolbarView(parent,
@@ -17,13 +18,11 @@ void BookmarksToolbarView::SetImageList(HIMAGELIST imageList)
 {
 	int iconWidth;
 	int iconHeight;
-	[[maybe_unused]] auto iconSizeRes = ImageList_GetIconSize(imageList, &iconWidth, &iconHeight);
-	assert(iconSizeRes);
+	auto iconSizeRes = ImageList_GetIconSize(imageList, &iconWidth, &iconHeight);
+	DCHECK(iconSizeRes);
 
-	[[maybe_unused]] auto res =
-		SendMessage(m_hwnd, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
-	assert(res);
+	auto res = SendMessage(m_hwnd, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
+	DCHECK(res);
 
-	res = SendMessage(m_hwnd, TB_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(imageList));
-	assert(!res);
+	SendMessage(m_hwnd, TB_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(imageList));
 }

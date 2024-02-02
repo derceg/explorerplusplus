@@ -163,7 +163,7 @@ bool AdvancedOptionsPage::GetBooleanConfigValue(AdvancedOptionId id)
 		return m_config->showQuickAccessInTreeView.get();
 
 	default:
-		assert(false);
+		DCHECK(false);
 		break;
 	}
 
@@ -191,7 +191,7 @@ void AdvancedOptionsPage::SetBooleanConfigValue(AdvancedOptionId id, bool value)
 		break;
 
 	default:
-		assert(false);
+		DCHECK(false);
 		break;
 	}
 }

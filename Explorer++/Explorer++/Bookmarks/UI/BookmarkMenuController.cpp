@@ -8,6 +8,7 @@
 #include "Bookmarks/BookmarkItem.h"
 #include "BrowserWindow.h"
 #include "CoreInterface.h"
+#include <glog/logging.h>
 
 BookmarkMenuController::BookmarkMenuController(BookmarkTree *bookmarkTree,
 	BrowserWindow *browserWindow, CoreInterface *coreInterface, HWND parentWindow) :
@@ -22,7 +23,7 @@ BookmarkMenuController::BookmarkMenuController(BookmarkTree *bookmarkTree,
 void BookmarkMenuController::OnMenuItemSelected(const BookmarkItem *bookmarkItem,
 	bool isCtrlKeyDown, bool isShiftKeyDown)
 {
-	assert(bookmarkItem->IsBookmark());
+	DCHECK(bookmarkItem->IsBookmark());
 
 	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
 		m_browserWindow->DetermineOpenDisposition(false, isCtrlKeyDown, isShiftKeyDown),

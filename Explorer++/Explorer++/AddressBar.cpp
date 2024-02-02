@@ -19,6 +19,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
+#include <glog/logging.h>
 #include <wil/com.h>
 #include <wil/common.h>
 #include <wil/resource.h>
@@ -240,7 +241,7 @@ void AddressBar::OnBeginDrag()
 		WI_SetFlag(allowedEffects, DROPEFFECT_LINK);
 
 		hr = SetPreferredDropEffect(dataObject.get(), DROPEFFECT_LINK);
-		assert(SUCCEEDED(hr));
+		DCHECK(SUCCEEDED(hr));
 	}
 
 	DWORD effect;

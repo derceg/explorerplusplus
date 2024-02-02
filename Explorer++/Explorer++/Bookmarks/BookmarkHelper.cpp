@@ -16,6 +16,7 @@
 #include "TabContainer.h"
 #include "../Helper/ShellHelper.h"
 #include <boost/range/adaptor/filtered.hpp>
+#include <glog/logging.h>
 #include <algorithm>
 
 int CALLBACK SortByDefault(const BookmarkItem *firstItem, const BookmarkItem *secondItem);
@@ -77,7 +78,7 @@ int CALLBACK BookmarkHelper::Sort(ColumnType columnType, const BookmarkItem *fir
 			break;
 
 		default:
-			assert(false);
+			DCHECK(false);
 			break;
 		}
 
@@ -183,7 +184,7 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 
 	if (res == BaseDialog::RETURN_OK)
 	{
-		assert(selectedParentFolder != nullptr);
+		DCHECK_NOTNULL(selectedParentFolder);
 
 		size_t targetIndex;
 
@@ -214,7 +215,7 @@ void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *
 
 	if (res == BaseDialog::RETURN_OK)
 	{
-		assert(selectedParentFolder != nullptr);
+		DCHECK_NOTNULL(selectedParentFolder);
 
 		size_t newIndex;
 
@@ -242,7 +243,7 @@ void BookmarkHelper::OpenBookmarkItemWithDisposition(const BookmarkItem *bookmar
 	// It doesn't make any sense to open a folder in the current tab.
 	if (bookmarkItem->IsFolder() && disposition == OpenFolderDisposition::CurrentTab)
 	{
-		assert(false);
+		DCHECK(false);
 		return;
 	}
 
@@ -278,7 +279,7 @@ void BookmarkHelper::OpenBookmarkItemWithDisposition(const BookmarkItem *bookmar
 void OpenBookmarkWithDisposition(const BookmarkItem *bookmarkItem,
 	OpenFolderDisposition disposition, const std::wstring &currentDirectory, Navigator *navigator)
 {
-	assert(bookmarkItem->IsBookmark());
+	DCHECK(bookmarkItem->IsBookmark());
 
 	auto absolutePath = TransformUserEnteredPathToAbsolutePathAndNormalize(
 		bookmarkItem->GetLocation(), currentDirectory, EnvVarsExpansion::Expand);
@@ -325,7 +326,7 @@ bool BookmarkHelper::CopyBookmarkItems(BookmarkTree *bookmarkTree,
 void BookmarkHelper::PasteBookmarkItems(BookmarkTree *bookmarkTree, BookmarkItem *parentFolder,
 	size_t index)
 {
-	assert(parentFolder->IsFolder());
+	DCHECK(parentFolder->IsFolder());
 
 	BookmarkClipboard bookmarkClipboard;
 	auto bookmarkItems = bookmarkClipboard.ReadBookmarks();

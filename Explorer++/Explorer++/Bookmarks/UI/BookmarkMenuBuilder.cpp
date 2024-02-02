@@ -9,6 +9,7 @@
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/ImageHelper.h"
+#include <glog/logging.h>
 #include <wil/common.h>
 #include <format>
 
@@ -24,7 +25,7 @@ BOOL BookmarkMenuBuilder::BuildMenu(HWND parentWindow, HMENU menu, BookmarkItem 
 	const MenuIdRange &menuIdRange, int startPosition, std::vector<wil::unique_hbitmap> &menuImages,
 	MenuInfo &menuInfo, IncludePredicate includePredicate)
 {
-	assert(bookmarkItem->IsFolder());
+	DCHECK(bookmarkItem->IsFolder());
 
 	m_menuIdRange = menuIdRange;
 	m_idCounter = menuIdRange.startId;

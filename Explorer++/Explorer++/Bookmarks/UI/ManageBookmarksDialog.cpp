@@ -20,6 +20,7 @@
 #include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowSubclassWrapper.h"
+#include <glog/logging.h>
 
 const TCHAR ManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
@@ -474,7 +475,7 @@ void ManageBookmarksDialog::OnViewMenuItemSelected(int menuItemId)
 		break;
 
 	default:
-		assert(false);
+		DCHECK(false);
 		break;
 	}
 }
@@ -583,7 +584,7 @@ void ManageBookmarksDialog::OnOrganizeMenuItemSelected(int menuItemId)
 		break;
 
 	default:
-		assert(false);
+		DCHECK(false);
 		break;
 	}
 }

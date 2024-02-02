@@ -9,6 +9,7 @@
 #include "Bookmarks/BookmarkTree.h"
 #include "../Helper/DataExchangeHelper.h"
 #include "../Helper/ShellHelper.h"
+#include <glog/logging.h>
 #include <wil/com.h>
 
 BookmarkDropper::BookmarkDropper(IDataObject *dataObject, DWORD allowedEffects,
@@ -27,7 +28,7 @@ void BookmarkDropper::SetBlockDrop(bool blockDrop)
 
 DWORD BookmarkDropper::GetDropEffect(const BookmarkItem *targetFolder, size_t index)
 {
-	assert(targetFolder->IsFolder());
+	DCHECK(targetFolder->IsFolder());
 
 	if (m_blockDrop)
 	{
@@ -91,7 +92,7 @@ DWORD BookmarkDropper::GetDropEffect(const BookmarkItem *targetFolder, size_t in
 
 DWORD BookmarkDropper::PerformDrop(BookmarkItem *targetFolder, size_t index)
 {
-	assert(targetFolder->IsFolder());
+	DCHECK(targetFolder->IsFolder());
 
 	auto &extractedInfo = GetExtractedInfo();
 	DWORD targetEffect = GetDropEffect(targetFolder, index);

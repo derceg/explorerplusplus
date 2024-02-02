@@ -7,6 +7,7 @@
 #include "Bookmarks/BookmarkHelper.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include <glog/logging.h>
 
 BookmarkTree::BookmarkTree() :
 	m_root(ROOT_FOLDER_GUID,
@@ -72,7 +73,7 @@ BookmarkItem *BookmarkTree::AddBookmarkItem(BookmarkItem *parent,
 {
 	if (!CanAddChildren(parent))
 	{
-		assert(false);
+		DCHECK(false);
 		return nullptr;
 	}
 
@@ -105,7 +106,7 @@ void BookmarkTree::MoveBookmarkItem(BookmarkItem *bookmarkItem, BookmarkItem *ne
 {
 	if (!CanAddChildren(newParent) || IsPermanentNode(bookmarkItem))
 	{
-		assert(false);
+		DCHECK(false);
 		return;
 	}
 
@@ -137,14 +138,14 @@ void BookmarkTree::RemoveBookmarkItem(BookmarkItem *bookmarkItem)
 {
 	if (IsPermanentNode(bookmarkItem))
 	{
-		assert(false);
+		DCHECK(false);
 		return;
 	}
 
 	bookmarkItemPreRemovalSignal.m_signal(*bookmarkItem);
 
 	BookmarkItem *parent = bookmarkItem->GetParent();
-	assert(bookmarkItem->GetParent() != nullptr);
+	DCHECK_NOTNULL(bookmarkItem->GetParent());
 
 	std::wstring guid = bookmarkItem->GetGUID();
 

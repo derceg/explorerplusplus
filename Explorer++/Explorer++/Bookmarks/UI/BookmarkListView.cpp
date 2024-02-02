@@ -247,7 +247,7 @@ LRESULT BookmarkListView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 
 void BookmarkListView::NavigateToBookmarkFolder(BookmarkItem *bookmarkFolder, bool addHistoryEntry)
 {
-	assert(bookmarkFolder->IsFolder());
+	DCHECK(bookmarkFolder->IsFolder());
 
 	m_currentBookmarkFolder = bookmarkFolder;
 
@@ -274,7 +274,7 @@ boost::signals2::connection BookmarkListView::AddNavigationCompletedObserver(
 
 int BookmarkListView::InsertBookmarkItemIntoListView(BookmarkItem *bookmarkItem, int position)
 {
-	assert(position >= 0 && position <= ListView_GetItemCount(m_hListView));
+	DCHECK(position >= 0 && position <= ListView_GetItemCount(m_hListView));
 
 	TCHAR szName[256];
 	StringCchCopy(szName, SIZEOF_ARRAY(szName), bookmarkItem->GetName().c_str());
@@ -569,7 +569,7 @@ void BookmarkListView::OnMenuItemSelected(int menuItemId)
 		break;
 
 	default:
-		assert(false);
+		DCHECK(false);
 		break;
 	}
 }
@@ -648,7 +648,7 @@ void BookmarkListView::CreateNewFolder()
 		m_currentBookmarkFolder->GetChildren().size());
 
 	auto index = GetBookmarkItemIndex(rawBookmarkItem);
-	assert(index);
+	CHECK(index);
 
 	SetFocus(m_hListView);
 	ListView_EditLabel(m_hListView, *index);
@@ -661,7 +661,7 @@ void BookmarkListView::OnGetDispInfo(NMLVDISPINFO *dispInfo)
 		auto bookmarkItem = GetBookmarkItemFromListView(dispInfo->item.iItem);
 
 		auto columnType = GetColumnTypeByIndex(dispInfo->item.iSubItem);
-		assert(columnType);
+		CHECK(columnType);
 
 		std::wstring columnText = GetBookmarkItemColumnInfo(bookmarkItem, *columnType);
 
@@ -877,7 +877,7 @@ void BookmarkListView::DeleteSelection()
 void BookmarkListView::OnHeaderItemClick(const NMHEADER *header)
 {
 	auto selectedColumn = GetColumnTypeByIndex(header->iItem);
-	assert(selectedColumn);
+	CHECK(selectedColumn);
 
 	BookmarkHelper::ColumnType newSortColumn = m_sortColumn;
 	bool newSortAscending = m_sortAscending;
@@ -1008,7 +1008,7 @@ void BookmarkListView::OnBookmarkItemUpdated(BookmarkItem &bookmarkItem,
 	}
 
 	auto index = GetBookmarkItemIndex(&bookmarkItem);
-	assert(index);
+	CHECK(index);
 
 	BookmarkHelper::ColumnType columnType = MapPropertyTypeToColumnType(propertyType);
 	Column &column = GetColumnByType(columnType);
@@ -1050,7 +1050,7 @@ void BookmarkListView::OnBookmarkItemPreRemoval(BookmarkItem &bookmarkItem)
 void BookmarkListView::RemoveBookmarkItem(const BookmarkItem *bookmarkItem)
 {
 	auto index = GetBookmarkItemIndex(bookmarkItem);
-	assert(index);
+	CHECK(index);
 
 	ListView_DeleteItem(m_hListView, *index);
 }
@@ -1114,9 +1114,7 @@ BookmarkListView::Column &BookmarkListView::GetColumnByType(BookmarkHelper::Colu
 {
 	auto itr = std::find_if(m_columns.begin(), m_columns.end(),
 		[columnType](const Column &column) { return column.columnType == columnType; });
-
-	assert(itr != m_columns.end());
-
+	CHECK(itr != m_columns.end());
 	return *itr;
 }
 
@@ -1151,8 +1149,7 @@ int BookmarkListView::GetColumnIndexByType(BookmarkHelper::ColumnType columnType
 {
 	auto itr = std::find_if(m_columns.begin(), m_columns.end(),
 		[columnType](const Column &column) { return column.columnType == columnType; });
-
-	assert(itr != m_columns.end());
+	CHECK(itr != m_columns.end());
 
 	auto columnIndex =
 		std::count_if(m_columns.begin(), itr, [](const Column &column) { return column.active; });
@@ -1276,7 +1273,7 @@ void BookmarkListView::UpdateUiForDropLocation(const DropLocation &dropLocation)
 		RemoveInsertionMark();
 
 		auto selectedItemIndex = GetBookmarkItemIndex(dropLocation.parentFolder);
-		assert(selectedItemIndex);
+		CHECK(selectedItemIndex);
 
 		ListView_SetItemState(m_hListView, *selectedItemIndex, LVIS_DROPHILITED, LVIS_DROPHILITED);
 		m_previousDropItem = *selectedItemIndex;

@@ -14,6 +14,7 @@
 #include "ResourceHelper.h"
 #include "../Helper/MenuHelper.h"
 #include <boost/algorithm/string/join.hpp>
+#include <glog/logging.h>
 #include <propkey.h>
 
 namespace Applications
@@ -252,7 +253,7 @@ DWORD ApplicationToolbar::Drop(IDataObject *dataObject, DWORD keyState, POINT pt
 
 void ApplicationToolbar::StoreDropShellItemArray(IDataObject *dataObject)
 {
-	assert(!m_dropShellItems);
+	DCHECK(!m_dropShellItems);
 
 	wil::com_ptr_nothrow<IShellItemArray> dropShellItems;
 	HRESULT hr = SHCreateShellItemArrayFromDataObject(dataObject, IID_PPV_ARGS(&dropShellItems));
@@ -352,10 +353,7 @@ DWORD ApplicationToolbar::DropItemsOnButton(size_t target)
 
 	std::transform(extraParametersVector.begin(), extraParametersVector.end(),
 		extraParametersVector.begin(),
-		[](const std::wstring &parameter)
-		{
-			return L"\"" + parameter + L"\"";
-		});
+		[](const std::wstring &parameter) { return L"\"" + parameter + L"\""; });
 
 	std::wstring extraParameters = boost::algorithm::join(extraParametersVector, L" ");
 
