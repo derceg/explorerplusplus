@@ -150,6 +150,35 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			}
 		});
 
+	wil::SetResultLoggingCallback(
+		[](const wil::FailureInfo &failure) noexcept
+		{
+			WCHAR logMessage[2048];
+			HRESULT hr = wil::GetFailureLogString(logMessage, std::size(logMessage), failure);
+
+			if (FAILED(hr))
+			{
+				return;
+			}
+
+			auto logMessageUtf8 = wstrToUtf8Str(logMessage);
+
+			if (failure.type == wil::FailureType::FailFast)
+			{
+				// In this case, a fatal error has been triggered and WIL will terminate the
+				// application after returning.
+				LOG(ERROR) << logMessageUtf8;
+			}
+			else
+			{
+				// Although the message is logged in this case, it's not necessarily an indication
+				// that anything is wrong. For example, if a call to RETURN_IF_FAILED() fails, this
+				// function will be called, even though the failure might be legitimate and fully
+				// expected to happen in some situations.
+				LOG(INFO) << logMessageUtf8;
+			}
+		});
+
 	BOOL bAllowMultipleInstances = TRUE;
 	BOOL bLoadSettingsFromXML;
 
