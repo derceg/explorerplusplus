@@ -5,22 +5,12 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Config.h"
-#include "DarkModeHelper.h"
 #include "HolderWindow.h"
 #include "MainResource.h"
-#include "MainToolbar.h"
 #include "ResourceHelper.h"
 #include "SetFileAttributesDialog.h"
-#include "ShellBrowser/ShellBrowser.h"
-#include "ShellBrowser/ShellNavigationController.h"
 #include "ShellTreeView/ShellTreeView.h"
-#include "TabContainer.h"
 #include "../Helper/BulkClipboardWriter.h"
-#include "../Helper/DpiCompatibility.h"
-#include "../Helper/Helper.h"
-#include "../Helper/Macros.h"
-#include "../Helper/ShellHelper.h"
-#include <glog/logging.h>
 
 void Explorerplusplus::CreateFolderControls()
 {
