@@ -22,9 +22,6 @@
 #include "../Helper/ShellHelper.h"
 #include <glog/logging.h>
 
-LRESULT CALLBACK TreeViewSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-	UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-
 void Explorerplusplus::CreateFolderControls()
 {
 	UINT holderStyle = WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
@@ -45,34 +42,6 @@ void Explorerplusplus::CreateFolderControls()
 	m_shellTreeView = ShellTreeView::Create(m_treeViewHolder->GetHWND(), this, this,
 		&m_FileActionHandler, &m_cachedIcons);
 	m_treeViewHolder->SetContentChild(m_shellTreeView->GetHWND());
-
-	/* Now, subclass the treeview again. This is needed for messages
-	such as WM_MOUSEWHEEL, which need to be intercepted before they
-	reach the window procedure provided by ShellTreeView. */
-	SetWindowSubclass(m_shellTreeView->GetHWND(), TreeViewSubclassStub, 1, (DWORD_PTR) this);
-}
-
-LRESULT CALLBACK TreeViewSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-	UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
-{
-	UNREFERENCED_PARAMETER(uIdSubclass);
-
-	auto *pContainer = (Explorerplusplus *) dwRefData;
-
-	return pContainer->TreeViewSubclass(hwnd, uMsg, wParam, lParam);
-}
-
-LRESULT CALLBACK Explorerplusplus::TreeViewSubclass(HWND hwnd, UINT uMsg, WPARAM wParam,
-	LPARAM lParam)
-{
-	switch (uMsg)
-	{
-	case WM_SETFOCUS:
-		FocusChanged();
-		break;
-	}
-
-	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
 void Explorerplusplus::OnTreeViewCopyItemPath() const

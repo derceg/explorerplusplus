@@ -86,8 +86,6 @@ public:
 
 	LRESULT CALLBACK RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	LRESULT CALLBACK TreeViewSubclass(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
 	/* Directory modification. */
 	static void DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData);
 

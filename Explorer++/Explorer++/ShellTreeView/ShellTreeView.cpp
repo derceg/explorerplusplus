@@ -175,6 +175,10 @@ LRESULT ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 
 	switch (msg)
 	{
+	case WM_SETFOCUS:
+		m_coreInterface->FocusChanged();
+		break;
+
 	case WM_TIMER:
 		if (wParam == DROP_EXPAND_TIMER_ID)
 		{
