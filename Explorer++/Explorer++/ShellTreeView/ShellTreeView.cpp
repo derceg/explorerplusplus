@@ -24,6 +24,7 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/ShellNavigator.h"
 #include "ShellTreeNode.h"
 #include "TabContainer.h"
@@ -178,6 +179,10 @@ LRESULT ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 		if (wParam == DROP_EXPAND_TIMER_ID)
 		{
 			OnDropExpandTimer();
+		}
+		else if (wParam == SELECTION_CHANGED_TIMER_ID)
+		{
+			OnSelectionChangedTimer();
 		}
 		break;
 
@@ -335,6 +340,10 @@ LRESULT ShellTreeView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 
 			case TVN_ENDLABELEDIT:
 				return OnEndLabelEdit(reinterpret_cast<NMTVDISPINFO *>(lParam));
+
+			case TVN_SELCHANGED:
+				OnSelectionChanged(reinterpret_cast<NMTREEVIEW *>(lParam));
+				break;
 			}
 		}
 		break;
@@ -659,6 +668,76 @@ void ShellTreeView::ProcessSubfoldersResult(int subfoldersResultId)
 	tvItem.hItem = result->item;
 	tvItem.cChildren = 0;
 	TreeView_SetItem(m_hTreeView, &tvItem);
+}
+
+void ShellTreeView::OnSelectionChanged(const NMTREEVIEW *eventInfo)
+{
+	if (!m_applicationInitializationFinished)
+	{
+		// This class will select an item initially (to ensure that there's always a selected item).
+		// That will take place before the application has finished initializing. That initial
+		// selection doesn't need to be handled in any way - either the selection will be updated
+		// when a navigation occurs (if the synchronize treeview option is enabled), or the
+		// selection will remain on the initial item (if the synchronize treeview option is
+		// disabled), until the user manually selects another item.
+		return;
+	}
+
+	KillTimer(m_hTreeView, SELECTION_CHANGED_TIMER_ID);
+	m_selectionChangedEventInfo.reset();
+
+	if (eventInfo->action == TVC_BYKEYBOARD && m_config->treeViewDelayEnabled)
+	{
+		m_selectionChangedEventInfo = *eventInfo;
+
+		// This makes it possible to navigate in the treeview using the keyboard, without triggering
+		// a stream of navigations (in the case where a key is being held down and the selection is
+		// continuously changing).
+		SetTimer(m_hTreeView, SELECTION_CHANGED_TIMER_ID, SELECTION_CHANGED_TIMEOUT, nullptr);
+	}
+	else
+	{
+		HandleSelectionChanged(eventInfo);
+	}
+}
+
+void ShellTreeView::OnSelectionChangedTimer()
+{
+	// It's important that the timer be killed here, before the navigation has started. Otherwise,
+	// what can happen is that if access to the folder is denied, a dialog will be shown and the
+	// message loop will run. That will then cause the timer to fire again, which will start another
+	// navigation, ad infinitum.
+	KillTimer(m_hTreeView, SELECTION_CHANGED_TIMER_ID);
+
+	CHECK(m_selectionChangedEventInfo);
+	HandleSelectionChanged(&*m_selectionChangedEventInfo);
+	m_selectionChangedEventInfo.reset();
+}
+
+void ShellTreeView::HandleSelectionChanged(const NMTREEVIEW *eventInfo)
+{
+	auto *shellBrowser = GetSelectedShellBrowser();
+	auto pidlCurrentDirectory = shellBrowser->GetDirectoryIdl();
+
+	auto pidlDirectory = GetNodePidl(eventInfo->itemNew.hItem);
+
+	if (ArePidlsEquivalent(pidlDirectory.get(), pidlCurrentDirectory.get()))
+	{
+		return;
+	}
+
+	auto navigateParams = NavigateParams::Normal(pidlDirectory.get());
+	HRESULT hr = shellBrowser->GetNavigationController()->Navigate(navigateParams);
+
+	if (SUCCEEDED(hr))
+	{
+		// The folder will only be expanded if the user explicitly selected it.
+		if (m_config->treeViewAutoExpandSelected
+			&& (eventInfo->action == TVC_BYMOUSE || eventInfo->action == TVC_BYKEYBOARD))
+		{
+			TreeView_Expand(m_hTreeView, eventInfo->itemNew.hItem, TVE_EXPAND);
+		}
+	}
 }
 
 void ShellTreeView::OnItemExpanding(const NMTREEVIEW *nmtv)
@@ -1484,8 +1563,7 @@ void ShellTreeView::UpdateSelection()
 		return;
 	}
 
-	auto *selectedShellBrowser =
-		m_browserWindow->GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser();
+	auto *selectedShellBrowser = GetSelectedShellBrowser();
 
 	// When locating a folder in the treeview, each of the parent folders has to be enumerated. UNC
 	// paths are contained within the Network folder and that folder can take a significant amount
@@ -1665,6 +1743,11 @@ void ShellTreeView::UpdateItemState(HTREEITEM item, UINT stateMask, UINT state)
 	tvItem.state = state;
 	[[maybe_unused]] bool res = TreeView_SetItem(m_hTreeView, &tvItem);
 	assert(res);
+}
+
+ShellBrowser *ShellTreeView::GetSelectedShellBrowser() const
+{
+	return m_browserWindow->GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser();
 }
 
 void ShellTreeView::CutCopiedItemManager::SetCopiedItem(IDataObject *clipboardDataObject)

@@ -86,7 +86,6 @@ public:
 
 	LRESULT CALLBACK RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	LRESULT CALLBACK TreeViewHolderProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK TreeViewSubclass(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	/* Directory modification. */
@@ -125,9 +124,6 @@ private:
 
 	static const UINT_PTR AUTOSAVE_TIMER_ID = 100000;
 	static const UINT AUTOSAVE_TIMEOUT = 30000;
-
-	static const UINT_PTR TREEVIEW_SELECTION_CHANGED_TIMER_ID = 0;
-	static const UINT TREEVIEW_SELECTION_CHANGED_TIMEOUT = 500;
 
 	static const UINT_PTR LISTVIEW_ITEM_CHANGED_TIMER_ID = 100001;
 	static const UINT LISTVIEW_ITEM_CHANGED_TIMEOUT = 50;
@@ -281,16 +277,9 @@ private:
 	void OnListViewPaste();
 
 	/* TreeView private message handlers. */
-	void OnTreeViewSelectionChanged(const NMTREEVIEW *eventInfo);
-	void HandleTreeViewSelectionChanged(const NMTREEVIEW *eventInfo);
 	void OnTreeViewCopyItemPath() const;
 	void OnTreeViewSetFileAttributes() const;
 	void OnTreeViewCopyUniversalPaths() const;
-
-	/* Holder window private message handlers. */
-	LRESULT CALLBACK TreeViewHolderWindowNotifyHandler(HWND hwnd, UINT msg, WPARAM wParam,
-		LPARAM lParam);
-	void OnTreeViewSelectionChangedTimer();
 
 	/* Tab backing. */
 	void CreateTabBacking();
@@ -608,8 +597,6 @@ private:
 	// Treeview
 	HolderWindow *m_treeViewHolder = nullptr;
 	ShellTreeView *m_shellTreeView = nullptr;
-	std::optional<NMTREEVIEW> m_treeViewSelectionChangedEventInfo;
-	bool m_treeViewInitialized = false;
 
 	std::unique_ptr<BrowserPane> m_browserPane;
 

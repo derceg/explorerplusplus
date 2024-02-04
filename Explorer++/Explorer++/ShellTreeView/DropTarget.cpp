@@ -80,7 +80,7 @@ void ShellTreeView::UpdateUiForTargetItem(HTREEITEM targetItem)
 
 		if (m_dropExpandItem != targetItem)
 		{
-			SetTimer(m_hTreeView, DROP_EXPAND_TIMER_ID, DROP_EXPAND_TIMER_ELAPSE, nullptr);
+			SetTimer(m_hTreeView, DROP_EXPAND_TIMER_ID, DROP_EXPAND_TIMER_TIMEOUT, nullptr);
 		}
 	}
 	else

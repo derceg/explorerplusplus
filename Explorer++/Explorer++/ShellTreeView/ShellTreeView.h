@@ -23,6 +23,7 @@ class CachedIcons;
 struct Config;
 class CoreInterface;
 class FileActionHandler;
+class ShellBrowser;
 class ShellTreeNode;
 
 class ShellTreeView : public ShellDropTargetWindow<HTREEITEM>, public FileContextMenuHandler
@@ -62,7 +63,10 @@ private:
 	static const UINT WM_APP_SUBFOLDERS_RESULT_READY = WM_APP + 2;
 
 	static const UINT DROP_EXPAND_TIMER_ID = 1;
-	static const UINT DROP_EXPAND_TIMER_ELAPSE = 800;
+	static const UINT DROP_EXPAND_TIMER_TIMEOUT = 800;
+
+	static const UINT SELECTION_CHANGED_TIMER_ID = 2;
+	static const UINT SELECTION_CHANGED_TIMEOUT = 500;
 
 	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 10;
 	static const LONG DROP_SCROLL_MARGIN_Y_96DPI = 10;
@@ -141,6 +145,9 @@ private:
 	HTREEITEM AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl, HTREEITEM insertAfter = TVI_LAST);
 	void SortChildren(HTREEITEM parent);
 	void OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi);
+	void OnSelectionChanged(const NMTREEVIEW *eventInfo);
+	void OnSelectionChangedTimer();
+	void HandleSelectionChanged(const NMTREEVIEW *eventInfo);
 	void OnItemExpanding(const NMTREEVIEW *nmtv);
 	LRESULT OnKeyDown(const NMTVKEYDOWN *keyDown);
 	void OnMiddleButtonDown(const POINT *pt);
@@ -213,6 +220,8 @@ private:
 	bool TestItemAttributes(ShellTreeNode *node, SFGAOF attributes);
 	void UpdateItemState(HTREEITEM item, UINT stateMask, UINT state);
 
+	ShellBrowser *GetSelectedShellBrowser() const;
+
 	void OnApplicationShuttingDown();
 
 	HWND m_hTreeView;
@@ -249,6 +258,8 @@ private:
 	int m_iFolderIcon;
 
 	HTREEITEM m_middleButtonItem;
+
+	std::optional<NMTREEVIEW> m_selectionChangedEventInfo;
 
 	/* Drag and drop. */
 	UINT m_getDragImageMessage;
