@@ -32,6 +32,8 @@
 #include <boost/range/adaptor/map.hpp>
 #include <glog/logging.h>
 
+using namespace std::chrono_literals;
+
 const UINT TAB_CONTROL_STYLES = WS_VISIBLE | WS_CHILD | TCS_FOCUSNEVER | TCS_SINGLELINE
 	| TCS_TOOLTIPS | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 
@@ -67,7 +69,7 @@ TabContainer::TabContainer(HWND parent, TabNavigationInterface *tabNavigation,
 	m_bTabBeenDragged(FALSE),
 	m_iPreviousTabSelectionId(-1),
 	m_iconFetcher(m_hwnd, cachedIcons),
-	m_dropTargetIndex(-1)
+	m_timerManager(m_hwnd)
 {
 	Initialize(parent);
 }
@@ -184,17 +186,6 @@ LRESULT TabContainer::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		OnTabCtrlRButtonUp(&pt);
 	}
 	break;
-
-	case WM_TIMER:
-		if (wParam == DROP_SWITCH_TAB_TIMER_ID)
-		{
-			OnDropSwitchTabTimer();
-		}
-		else if (wParam == DROP_SCROLL_TIMER_ID)
-		{
-			OnDropScrollTimer();
-		}
-		break;
 
 	case WM_MENUSELECT:
 		/* Forward the message to the main window so it can
@@ -1288,7 +1279,7 @@ Tab &TabContainer::GetTabByIndex(int index)
 	TCITEM tcItem;
 	tcItem.mask = TCIF_PARAM;
 	BOOL res = TabCtrl_GetItem(m_hwnd, index, &tcItem);
-	CHECK(res) << "Tab lookup failed";
+	CHECK(res) << "Tab lookup failed for tab at index " << index;
 
 	return GetTab(static_cast<int>(tcItem.lParam));
 }
@@ -1419,19 +1410,22 @@ void TabContainer::UpdateUiForDrop(int targetItem, const POINT &pt)
 
 void TabContainer::UpdateUiForTargetItem(int targetItem)
 {
-	if (targetItem != -1)
+	if (!m_dropTargetContext)
 	{
-		if (m_dropTargetIndex != targetItem)
-		{
-			SetTimer(m_hwnd, DROP_SWITCH_TAB_TIMER_ID, DROP_SWITCH_TAB_TIMER_ELAPSE, nullptr);
-		}
-	}
-	else
-	{
-		KillTimer(m_hwnd, DROP_SWITCH_TAB_TIMER_ID);
+		m_dropTargetContext = DropTargetContext(&m_timerManager);
 	}
 
-	m_dropTargetIndex = targetItem;
+	if (targetItem == -1)
+	{
+		m_dropTargetContext->switchTabTimer.Stop();
+	}
+	else if (m_dropTargetContext->targetIndex != targetItem)
+	{
+		m_dropTargetContext->switchTabTimer.Start(500ms,
+			std::bind(&TabContainer::OnDropSwitchTabTimer, this));
+	}
+
+	m_dropTargetContext->targetIndex = targetItem;
 }
 
 void TabContainer::ScrollTabControlForDrop(const POINT &pt)
@@ -1467,45 +1461,42 @@ void TabContainer::ScrollTabControlForDrop(const POINT &pt)
 
 	if (!scrollDirection)
 	{
-		KillTimer(m_hwnd, DROP_SCROLL_TIMER_ID);
+		m_dropTargetContext->scrollTimer.Stop();
 		return;
 	}
 
-	if (!m_dropScrollDirection || scrollDirection != *m_dropScrollDirection)
+	if (!m_dropTargetContext->scrollDirection
+		|| scrollDirection != *m_dropTargetContext->scrollDirection)
 	{
-		m_dropScrollDirection = scrollDirection;
-		SetTimer(m_hwnd, DROP_SCROLL_TIMER_ID, DROP_SCROLL_TIMER_ELAPSE, nullptr);
+		m_dropTargetContext->scrollDirection = scrollDirection;
+		m_dropTargetContext->scrollTimer.Start(1s,
+			std::bind(&TabContainer::OnDropScrollTimer, this));
 	}
 }
 
 void TabContainer::ResetDropUiState()
 {
-	m_dropTargetIndex = -1;
-	KillTimer(m_hwnd, DROP_SWITCH_TAB_TIMER_ID);
-
-	m_dropScrollDirection.reset();
-	KillTimer(m_hwnd, DROP_SCROLL_TIMER_ID);
+	m_dropTargetContext.reset();
 }
 
 void TabContainer::OnDropSwitchTabTimer()
 {
-	assert(m_dropTargetIndex != -1);
+	CHECK(m_dropTargetContext);
+	CHECK_NE(m_dropTargetContext->targetIndex, -1);
 
-	if (m_dropTargetIndex != GetSelectedTabIndex())
+	if (m_dropTargetContext->targetIndex != GetSelectedTabIndex())
 	{
-		SelectTabAtIndex(m_dropTargetIndex);
+		SelectTabAtIndex(m_dropTargetContext->targetIndex);
 	}
-
-	KillTimer(m_hwnd, DROP_SWITCH_TAB_TIMER_ID);
 }
 
 void TabContainer::OnDropScrollTimer()
 {
-	assert(m_dropScrollDirection);
-	ScrollTabControl(*m_dropScrollDirection);
+	CHECK(m_dropTargetContext);
+	CHECK(m_dropTargetContext->scrollDirection);
+	ScrollTabControl(*m_dropTargetContext->scrollDirection);
 
-	m_dropScrollDirection.reset();
-	KillTimer(m_hwnd, DROP_SCROLL_TIMER_ID);
+	m_dropTargetContext->scrollDirection.reset();
 }
 
 void TabContainer::ScrollTabControl(ScrollDirection direction)

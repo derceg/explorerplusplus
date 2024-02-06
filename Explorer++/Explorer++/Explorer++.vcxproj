@@ -1004,6 +1004,8 @@
     <ClCompile Include="ItemNameEditControl.cpp" />
     <ClCompile Include="MainFontSetter.cpp" />
     <ClCompile Include="FontHelper.cpp" />
+    <ClCompile Include="OneShotTimer.cpp" />
+    <ClCompile Include="OneShotTimerManager.cpp" />
     <ClCompile Include="PopupMenuView.cpp" />
     <ClCompile Include="ShellItemsMenu.cpp" />
     <ClCompile Include="SystemFontHelper.cpp" />
@@ -1233,6 +1235,8 @@
     <ClInclude Include="Literals.h" />
     <ClInclude Include="MainFontSetter.h" />
     <ClInclude Include="FontHelper.h" />
+    <ClInclude Include="OneShotTimer.h" />
+    <ClInclude Include="OneShotTimerManager.h" />
     <ClInclude Include="PopupMenuView.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserInterface.h" />
     <ClInclude Include="ShellItemsMenu.h" />

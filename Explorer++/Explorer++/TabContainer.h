@@ -6,6 +6,8 @@
 
 #include "IconFetcherImpl.h"
 #include "MainFontSetter.h"
+#include "OneShotTimer.h"
+#include "OneShotTimerManager.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "SignalWrapper.h"
 #include "Tab.h"
@@ -143,13 +145,22 @@ private:
 		Right
 	};
 
+	// Contains data used when an item is dragged over this window.
+	struct DropTargetContext
+	{
+		int targetIndex = -1;
+		OneShotTimer switchTabTimer;
+		OneShotTimer scrollTimer;
+		std::optional<ScrollDirection> scrollDirection;
+
+		DropTargetContext(OneShotTimerManager *timerManager) :
+			switchTabTimer(timerManager),
+			scrollTimer(timerManager)
+		{
+		}
+	};
+
 	static const int ICON_SIZE_96DPI = 16;
-
-	static const UINT DROP_SWITCH_TAB_TIMER_ID = 1;
-	static const UINT DROP_SWITCH_TAB_TIMER_ELAPSE = 500;
-
-	static const UINT DROP_SCROLL_TIMER_ID = 2;
-	static const UINT DROP_SCROLL_TIMER_ELAPSE = 1000;
 
 	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 40;
 
@@ -232,6 +243,7 @@ private:
 	MainFontSetter m_fontSetter;
 	MainFontSetter m_tooltipFontSetter;
 	wil::unique_himagelist m_tabCtrlImageList;
+	OneShotTimerManager m_timerManager;
 
 	std::unordered_map<int, std::unique_ptr<Tab>> m_tabs;
 
@@ -262,8 +274,7 @@ private:
 	RECT m_rcDraggedTab;
 
 	// Drop handling
-	int m_dropTargetIndex;
-	std::optional<ScrollDirection> m_dropScrollDirection;
+	std::optional<DropTargetContext> m_dropTargetContext;
 
 	BookmarkTree *m_bookmarkTree;
 };
