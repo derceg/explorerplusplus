@@ -23,8 +23,8 @@ public:
 	void QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback) override;
 	void ClearQueue() override;
 	int GetCachedIconIndexOrDefault(const std::wstring &itemPath,
-		DefaultIconType defaultIconType) const;
-	std::optional<int> GetCachedIconIndex(const std::wstring &itemPath) const;
+		DefaultIconType defaultIconType) const override;
+	std::optional<int> GetCachedIconIndex(const std::wstring &itemPath) const override;
 
 private:
 	// This is the end of the range that starts at WM_APP. This class subclasses the window that's

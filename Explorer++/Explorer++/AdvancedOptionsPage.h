@@ -49,7 +49,7 @@ private:
 	bool GetBooleanConfigValue(AdvancedOptionId id);
 	void SetBooleanConfigValue(AdvancedOptionId id, bool value);
 
-	INT_PTR OnNotify(WPARAM wParam, LPARAM lParam);
+	INT_PTR OnNotify(WPARAM wParam, LPARAM lParam) override;
 	AdvancedOption *GetAdvancedOptionByIndex(int index);
 
 	std::vector<AdvancedOption> m_advancedOptions;
