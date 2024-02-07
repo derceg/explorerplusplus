@@ -11,6 +11,7 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "Tab.h"
 #include "TabContainer.h"
+#include "../Helper/ShellHelper.h"
 
 BrowserCommandController::BrowserCommandController(BrowserWindow *browserWindow) :
 	m_browserWindow(browserWindow)
@@ -36,6 +37,58 @@ void BrowserCommandController::ExecuteCommand(int command, OpenFolderDisposition
 
 	case IDM_GO_UP:
 		GoUp(disposition);
+		break;
+
+	case IDM_GO_QUICK_ACCESS:
+		GoToPath(QUICK_ACCESS_PATH, disposition);
+		break;
+
+	case IDM_GO_COMPUTER:
+		GoToKnownFolder(FOLDERID_ComputerFolder, disposition);
+		break;
+
+	case IDM_GO_DOCUMENTS:
+		GoToKnownFolder(FOLDERID_Documents, disposition);
+		break;
+
+	case IDM_GO_DOWNLOADS:
+		GoToKnownFolder(FOLDERID_Downloads, disposition);
+		break;
+
+	case IDM_GO_MUSIC:
+		GoToKnownFolder(FOLDERID_Music, disposition);
+		break;
+
+	case IDM_GO_PICTURES:
+		GoToKnownFolder(FOLDERID_Pictures, disposition);
+		break;
+
+	case IDM_GO_VIDEOS:
+		GoToKnownFolder(FOLDERID_Videos, disposition);
+		break;
+
+	case IDM_GO_DESKTOP:
+		GoToKnownFolder(FOLDERID_Desktop, disposition);
+		break;
+
+	case IDM_GO_RECYCLE_BIN:
+		GoToKnownFolder(FOLDERID_RecycleBinFolder, disposition);
+		break;
+
+	case IDM_GO_CONTROL_PANEL:
+		GoToKnownFolder(FOLDERID_ControlPanelFolder, disposition);
+		break;
+
+	case IDM_GO_PRINTERS:
+		GoToKnownFolder(FOLDERID_PrintersFolder, disposition);
+		break;
+
+	case IDM_GO_NETWORK:
+		GoToKnownFolder(FOLDERID_NetworkFolder, disposition);
+		break;
+
+	case IDM_GO_WSL_DISTRIBUTIONS:
+		GoToPath(WSL_DISTRIBUTIONS_PATH, disposition);
 		break;
 
 	default:
@@ -109,6 +162,26 @@ void BrowserCommandController::GoUp(OpenFolderDisposition disposition)
 
 		m_browserWindow->OpenItem(pidlParent.get(), disposition);
 	}
+}
+
+void BrowserCommandController::GoToPath(const std::wstring &path, OpenFolderDisposition disposition)
+{
+	m_browserWindow->OpenItem(path, disposition);
+}
+
+void BrowserCommandController::GoToKnownFolder(REFKNOWNFOLDERID knownFolderId,
+	OpenFolderDisposition disposition)
+{
+	unique_pidl_absolute pidl;
+	HRESULT hr =
+		SHGetKnownFolderIDList(knownFolderId, KF_FLAG_DEFAULT, nullptr, wil::out_param(pidl));
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	m_browserWindow->OpenItem(pidl.get(), disposition);
 }
 
 ShellBrowserInterface *BrowserCommandController::GetSelectedShellBrowser() const

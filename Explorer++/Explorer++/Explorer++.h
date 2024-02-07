@@ -252,9 +252,6 @@ private:
 
 	HRESULT OnGoToOffset(int offset);
 	HRESULT OnGoHome();
-	HRESULT OnGoToKnownFolder(REFKNOWNFOLDERID knownFolderId);
-	HRESULT OnGoToPath(const std::wstring &path);
-	HRESULT GoToPidl(PCIDLIST_ABSOLUTE pidl);
 
 	int HighlightSimilarFiles(HWND ListView) const;
 

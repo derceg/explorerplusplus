@@ -25,6 +25,8 @@ private:
 	void GoBack(OpenFolderDisposition disposition);
 	void GoForward(OpenFolderDisposition disposition);
 	void GoUp(OpenFolderDisposition disposition);
+	void GoToPath(const std::wstring &path, OpenFolderDisposition disposition);
+	void GoToKnownFolder(REFKNOWNFOLDERID knownFolderId, OpenFolderDisposition disposition);
 
 	ShellBrowserInterface *GetSelectedShellBrowser() const;
 

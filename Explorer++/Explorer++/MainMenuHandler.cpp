@@ -293,40 +293,6 @@ HRESULT Explorerplusplus::OnGoToOffset(int offset)
 	return selectedTab.GetShellBrowser()->GetNavigationController()->GoToOffset(offset);
 }
 
-HRESULT Explorerplusplus::OnGoToKnownFolder(REFKNOWNFOLDERID knownFolderId)
-{
-	unique_pidl_absolute pidl;
-	HRESULT hr =
-		SHGetKnownFolderIDList(knownFolderId, KF_FLAG_DEFAULT, nullptr, wil::out_param(pidl));
-
-	if (FAILED(hr))
-	{
-		return hr;
-	}
-
-	return GoToPidl(pidl.get());
-}
-
-HRESULT Explorerplusplus::OnGoToPath(const std::wstring &path)
-{
-	unique_pidl_absolute pidl;
-	HRESULT hr = SHParseDisplayName(path.c_str(), nullptr, wil::out_param(pidl), 0, nullptr);
-
-	if (FAILED(hr))
-	{
-		return hr;
-	}
-
-	return GoToPidl(pidl.get());
-}
-
-HRESULT Explorerplusplus::GoToPidl(PCIDLIST_ABSOLUTE pidl)
-{
-	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	auto navigateParams = NavigateParams::Normal(pidl);
-	return selectedTab.GetShellBrowser()->GetNavigationController()->Navigate(navigateParams);
-}
-
 HRESULT Explorerplusplus::OnGoHome()
 {
 	Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
