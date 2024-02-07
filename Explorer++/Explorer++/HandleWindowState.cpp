@@ -110,7 +110,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 		tab.GetShellBrowser()->GetNavigationController()->CanGoBack());
 	MenuHelper::EnableItem(hProgramMenu, IDM_GO_FORWARD,
 		tab.GetShellBrowser()->GetNavigationController()->CanGoForward());
-	MenuHelper::EnableItem(hProgramMenu, IDM_GO_UPONELEVEL,
+	MenuHelper::EnableItem(hProgramMenu, IDM_GO_UP,
 		tab.GetShellBrowser()->GetNavigationController()->CanGoUp());
 
 	MenuHelper::EnableItem(hProgramMenu, IDM_VIEW_AUTOSIZECOLUMNS, viewMode == +ViewMode::Details);

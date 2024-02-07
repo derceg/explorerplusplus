@@ -586,6 +586,9 @@
     <ClCompile Include="OneShotTimer.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="BrowserCommandController.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1195,6 +1198,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="OneShotTimer.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="BrowserCommandController.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

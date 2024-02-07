@@ -1249,17 +1249,17 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 
 	case MainToolbarButton::Back:
 	case IDM_GO_BACK:
-		OnGoBack();
+		m_commandController.ExecuteCommand(IDM_GO_BACK, DetermineOpenDisposition(false));
 		break;
 
 	case MainToolbarButton::Forward:
 	case IDM_GO_FORWARD:
-		OnGoForward();
+		m_commandController.ExecuteCommand(IDM_GO_FORWARD, DetermineOpenDisposition(false));
 		break;
 
 	case MainToolbarButton::Up:
-	case IDM_GO_UPONELEVEL:
-		OnNavigateUp();
+	case IDM_GO_UP:
+		m_commandController.ExecuteCommand(IDM_GO_UP, DetermineOpenDisposition(false));
 		break;
 
 	case IDM_GO_QUICK_ACCESS:

@@ -189,6 +189,7 @@
     <ClCompile Include="BookmarkRegistryStorageTest.cpp" />
     <ClCompile Include="BookmarkStorageHelper.cpp" />
     <ClCompile Include="BookmarkXmlStorageTest.cpp" />
+    <ClCompile Include="BrowserCommandControllerTest.cpp" />
     <ClCompile Include="ClipboardTest.cpp" />
     <ClCompile Include="ColorRuleRegistryStorageTest.cpp" />
     <ClCompile Include="ColorRulesStorageHelper.cpp" />
@@ -227,6 +228,7 @@
     <ClCompile Include="RegistrySettingsTest.cpp" />
     <ClCompile Include="RegistryStorageHelper.cpp" />
     <ClCompile Include="ResourceHelper.cpp" />
+    <ClCompile Include="ShellBrowserFake.cpp" />
     <ClCompile Include="ShellHelperTest.cpp" />
     <ClCompile Include="ShellNavigationControllerTest.cpp" />
     <ClCompile Include="ShellNavigatorFake.cpp" />
@@ -254,6 +256,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="RegistryStorageHelper.h" />
     <ClInclude Include="ResourceHelper.h" />
+    <ClInclude Include="ShellBrowserFake.h" />
     <ClInclude Include="ShellNavigatorFake.h" />
     <ClInclude Include="ShellNavigatorMock.h" />
     <ClInclude Include="TabNavigationMock.h" />

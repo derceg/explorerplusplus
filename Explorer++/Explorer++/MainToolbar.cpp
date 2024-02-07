@@ -4,6 +4,8 @@
 
 #include "stdafx.h"
 #include "MainToolbar.h"
+#include "BrowserCommandController.h"
+#include "BrowserWindow.h"
 #include "Config.h"
 #include "DefaultToolbarButtons.h"
 #include "Icon.h"
@@ -953,61 +955,24 @@ void MainToolbar::OnMButtonUp(HWND hwnd, int x, int y, UINT keysDown)
 		return;
 	}
 
-	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
-	unique_pidl_absolute pidl;
+	auto disposition = m_browserWindow->DetermineOpenDisposition(true,
+		WI_IsFlagSet(keysDown, MK_CONTROL), WI_IsFlagSet(keysDown, MK_SHIFT));
+	auto *commandController = m_browserWindow->GetCommandController();
 
-	if (tbButton.idCommand == MainToolbarButton::Back
-		|| tbButton.idCommand == MainToolbarButton::Forward)
+	switch (tbButton.idCommand)
 	{
-		HistoryEntry *entry = nullptr;
+	case MainToolbarButton::Back:
+		commandController->ExecuteCommand(IDM_GO_BACK, disposition);
+		break;
 
-		if (tbButton.idCommand == MainToolbarButton::Back)
-		{
-			entry = tab.GetShellBrowser()->GetNavigationController()->GetEntry(-1);
-		}
-		else
-		{
-			entry = tab.GetShellBrowser()->GetNavigationController()->GetEntry(1);
-		}
+	case MainToolbarButton::Forward:
+		commandController->ExecuteCommand(IDM_GO_FORWARD, disposition);
+		break;
 
-		if (!entry)
-		{
-			return;
-		}
-
-		pidl = entry->GetPidl();
+	case MainToolbarButton::Up:
+		commandController->ExecuteCommand(IDM_GO_UP, disposition);
+		break;
 	}
-	else if (tbButton.idCommand == MainToolbarButton::Up)
-	{
-		auto *currentEntry = tab.GetShellBrowser()->GetNavigationController()->GetCurrentEntry();
-
-		unique_pidl_absolute pidlParent;
-		HRESULT hr =
-			GetVirtualParentPath(currentEntry->GetPidl().get(), wil::out_param(pidlParent));
-
-		if (FAILED(hr))
-		{
-			return;
-		}
-
-		pidl = std::move(pidlParent);
-	}
-
-	if (!pidl)
-	{
-		return;
-	}
-
-	bool switchToNewTab = m_config->openTabsInForeground;
-
-	if (WI_IsFlagSet(keysDown, MK_SHIFT))
-	{
-		switchToNewTab = !switchToNewTab;
-	}
-
-	auto navigateParams = NavigateParams::Normal(pidl.get());
-	m_coreInterface->GetTabContainer()->CreateNewTab(navigateParams,
-		TabSettings(_selected = switchToNewTab));
 }
 
 void MainToolbar::OnTabSelected(const Tab &tab)

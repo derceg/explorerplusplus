@@ -988,6 +988,7 @@
     <ClCompile Include="Bookmarks\UI\BookmarksToolbar.cpp" />
     <ClCompile Include="Bookmarks\UI\Views\BookmarksToolbarView.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkMenuDropTarget.cpp" />
+    <ClCompile Include="BrowserCommandController.cpp" />
     <ClCompile Include="BrowserPane.cpp" />
     <ClCompile Include="ColorRule.cpp" />
     <ClCompile Include="ColorRuleListView.cpp" />
@@ -1214,6 +1215,7 @@
     <ClInclude Include="Bookmarks\UI\BookmarksToolbar.h" />
     <ClInclude Include="Bookmarks\UI\Views\BookmarksToolbarView.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkMenuDropTarget.h" />
+    <ClInclude Include="BrowserCommandController.h" />
     <ClInclude Include="BrowserPane.h" />
     <ClInclude Include="BrowserWindow.h" />
     <ClInclude Include="ColorRule.h" />

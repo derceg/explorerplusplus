@@ -5,6 +5,7 @@
 #pragma once
 
 #include "AcceleratorUpdater.h"
+#include "BrowserCommandController.h"
 #include "BrowserPane.h"
 #include "BrowserWindow.h"
 #include "CommandLine.h"
@@ -91,6 +92,7 @@ public:
 
 	// BrowserWindow
 	BrowserPane *GetActivePane() const override;
+	BrowserCommandController *GetCommandController() override;
 	void FocusActiveTab() override;
 
 private:
@@ -248,8 +250,6 @@ private:
 	void OnCheckForUpdates();
 	void OnAbout();
 
-	HRESULT OnGoBack();
-	HRESULT OnGoForward();
 	HRESULT OnGoToOffset(int offset);
 	HRESULT OnGoHome();
 	HRESULT OnGoToKnownFolder(REFKNOWNFOLDERID knownFolderId);
@@ -429,6 +429,11 @@ private:
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) override;
 	void OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) override;
+
+	// Determines the open disposition, using the state of the ctrl and shift keys as retrieved by
+	// GetKeyState(). That is, the state of the keys at the time the current message was generated.
+	OpenFolderDisposition DetermineOpenDisposition(bool isMiddleButtonDown) override;
+
 	OpenFolderDisposition DetermineOpenDisposition(bool isMiddleButtonDown, bool isCtrlKeyDown,
 		bool isShiftKeyDown) override;
 
@@ -437,7 +442,6 @@ private:
 	void OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters) override;
 
 	void OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory);
-	HRESULT OnNavigateUp();
 
 	// FileContextMenuHandler
 	void UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
@@ -549,6 +553,8 @@ private:
 		PULARGE_INTEGER lTotalFolderSize);
 
 	CommandLine::Settings m_commandLineSettings;
+
+	BrowserCommandController m_commandController;
 
 	HWND m_hContainer;
 	HWND m_hStatusBar;

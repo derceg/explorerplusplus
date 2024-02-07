@@ -225,7 +225,7 @@ const std::unordered_map<std::wstring, int> ACCELERATOR_MAPPINGS = {
 
 	{L"back", IDM_GO_BACK},
 	{L"forward", IDM_GO_FORWARD},
-	{L"up", IDM_GO_UPONELEVEL},
+	{L"up", IDM_GO_UP},
 	{L"go_quick_access", IDM_GO_QUICK_ACCESS},
 	{L"go_computer", IDM_GO_COMPUTER},
 	{L"go_documents", IDM_GO_DOCUMENTS},

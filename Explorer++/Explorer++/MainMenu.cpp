@@ -46,7 +46,7 @@ const std::map<UINT, Icon> MAIN_MENU_IMAGE_MAPPINGS = {
 
 	{ IDM_GO_BACK, Icon::Back },
 	{ IDM_GO_FORWARD, Icon::Forward },
-	{ IDM_GO_UPONELEVEL, Icon::Up },
+	{ IDM_GO_UP, Icon::Up },
 
 	{ IDM_TOOLS_SEARCH, Icon::Search },
 	{ IDM_TOOLS_CUSTOMIZECOLORS, Icon::CustomizeColors },

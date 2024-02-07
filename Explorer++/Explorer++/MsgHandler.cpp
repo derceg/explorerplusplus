@@ -27,6 +27,7 @@
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/FileOperations.h"
+#include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ProcessHelper.h"
@@ -346,6 +347,11 @@ void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szP
 	GetDisplayName(pidlParent.get(), SHGDN_FORPARSING, itemDirectory);
 
 	ExecuteFileAction(m_hContainer, EMPTY_STRING, szParameters, itemDirectory.c_str(), pidlItem);
+}
+
+OpenFolderDisposition Explorerplusplus::DetermineOpenDisposition(bool isMiddleButtonDown)
+{
+	return DetermineOpenDisposition(isMiddleButtonDown, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
 }
 
 OpenFolderDisposition Explorerplusplus::DetermineOpenDisposition(bool isMiddleButtonDown,
@@ -822,12 +828,12 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 		/* This will cancel any menu that may be shown
 		at the moment. */
 		SendMessage(m_hContainer, WM_CANCELMODE, 0, 0);
-		OnGoBack();
+		m_commandController.ExecuteCommand(IDM_GO_BACK);
 		break;
 
 	case APPCOMMAND_BROWSER_FORWARD:
 		SendMessage(m_hContainer, WM_CANCELMODE, 0, 0);
-		OnGoForward();
+		m_commandController.ExecuteCommand(IDM_GO_FORWARD);
 		break;
 
 	case APPCOMMAND_BROWSER_HOME:

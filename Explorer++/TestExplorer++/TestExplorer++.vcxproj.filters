@@ -121,6 +121,12 @@
     <ClCompile Include="OneShotTimerTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="BrowserCommandControllerTest.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBrowserFake.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -217,6 +223,9 @@
       <Filter>ShellBrowser</Filter>
     </ClInclude>
     <ClInclude Include="ShellNavigatorFake.h">
+      <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowserFake.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
   </ItemGroup>

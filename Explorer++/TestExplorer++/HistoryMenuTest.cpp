@@ -7,41 +7,12 @@
 #include "IconFetcherMock.h"
 #include "ShellBrowser/ShellBrowserInterface.h"
 #include "ShellBrowser/ShellNavigationController.h"
+#include "ShellBrowserFake.h"
 #include "ShellNavigatorMock.h"
 #include "TabNavigationMock.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
-
-class ShellBrowserFake : public ShellBrowserInterface
-{
-public:
-	ShellBrowserFake(ShellNavigationController *navigationController) :
-		m_navigationController(navigationController)
-	{
-	}
-
-	HRESULT NavigateToFolder(const std::wstring &path)
-	{
-		unique_pidl_absolute pidl(SHSimpleIDListFromPath(path.c_str()));
-
-		if (!pidl)
-		{
-			return E_FAIL;
-		}
-
-		auto navigateParams = NavigateParams::Normal(pidl.get());
-		return m_navigationController->Navigate(navigateParams);
-	}
-
-	ShellNavigationController *GetNavigationController() const override
-	{
-		return m_navigationController;
-	}
-
-private:
-	ShellNavigationController *m_navigationController = nullptr;
-};
 
 class HistoryMenuTest : public Test
 {

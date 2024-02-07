@@ -322,8 +322,3 @@ void Explorerplusplus::SelectTabById(int tabId)
 	const Tab &tab = GetActivePane()->GetTabContainer()->GetTab(tabId);
 	GetActivePane()->GetTabContainer()->SelectTab(tab);
 }
-
-BrowserPane *Explorerplusplus::GetActivePane() const
-{
-	return m_browserPane.get();
-}

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <shtypes.h>
 #include <string>
 
 enum class OpenFolderDisposition
@@ -23,6 +24,7 @@ public:
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) = 0;
 	virtual void OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) = 0;
+	virtual OpenFolderDisposition DetermineOpenDisposition(bool isMiddleButtonDown) = 0;
 	virtual OpenFolderDisposition DetermineOpenDisposition(bool isMiddleButtonDown,
 		bool isCtrlKeyDown, bool isShiftKeyDown) = 0;
 };

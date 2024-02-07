@@ -35,6 +35,7 @@ const std::vector<std::wstring> Explorerplusplus::BLACKLISTED_BACKGROUND_MENU_CL
 Explorerplusplus::Explorerplusplus(HWND hwnd, CommandLine::Settings *commandLineSettings) :
 	m_hContainer(hwnd),
 	m_commandLineSettings(*commandLineSettings),
+	m_commandController(this),
 	m_cachedIcons(MAX_CACHED_ICONS),
 	m_pluginMenuManager(hwnd, MENU_PLUGIN_STARTID, MENU_PLUGIN_ENDID),
 	m_acceleratorUpdater(&g_hAccl),
@@ -66,4 +67,14 @@ Explorerplusplus::Explorerplusplus(HWND hwnd, CommandLine::Settings *commandLine
 Explorerplusplus::~Explorerplusplus()
 {
 	m_pDirMon->Release();
+}
+
+BrowserCommandController *Explorerplusplus::GetCommandController()
+{
+	return &m_commandController;
+}
+
+BrowserPane *Explorerplusplus::GetActivePane() const
+{
+	return m_browserPane.get();
 }

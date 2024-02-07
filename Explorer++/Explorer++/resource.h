@@ -698,7 +698,7 @@
 #define IDM_VIEW_AUTOARRANGE            40092
 #define IDM_GO_BACK                     40093
 #define IDM_GO_FORWARD                  40094
-#define IDM_GO_UPONELEVEL               40095
+#define IDM_GO_UP                       40095
 #define IDM_GO_COMPUTER                 40096
 #define IDM_GO_DOCUMENTS                40097
 #define IDM_GO_MUSIC                    40098
