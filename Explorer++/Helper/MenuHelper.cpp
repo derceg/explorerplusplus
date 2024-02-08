@@ -87,6 +87,15 @@ void SetMenuStyle(HMENU menu, DWORD style)
 	SetMenuInfo(menu, &menuInfo);
 }
 
+bool SetBitmapForItem(HMENU menu, UINT id, HBITMAP bitmap)
+{
+	MENUITEMINFO menuItemInfo = {};
+	menuItemInfo.cbSize = sizeof(menuItemInfo);
+	menuItemInfo.fMask = MIIM_BITMAP;
+	menuItemInfo.hbmpItem = bitmap;
+	return SetMenuItemInfo(menu, id, false, &menuItemInfo);
+}
+
 void RemoveDuplicateSeperators(HMENU menu)
 {
 	int count = GetMenuItemCount(menu);

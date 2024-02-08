@@ -23,6 +23,8 @@ void EnableItem(HMENU hMenu, UINT itemID, BOOL bEnable);
 
 void SetMenuStyle(HMENU menu, DWORD style);
 
+bool SetBitmapForItem(HMENU menu, UINT id, HBITMAP bitmap);
+
 void RemoveDuplicateSeperators(HMENU menu);
 void RemoveTrailingSeparators(HMENU menu);
 

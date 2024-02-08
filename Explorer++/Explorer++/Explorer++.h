@@ -586,6 +586,8 @@ private:
 
 	CachedIcons m_cachedIcons;
 
+	wil::com_ptr_nothrow<IImageList> m_mainMenuSystemImageList;
+	std::vector<wil::unique_hbitmap> m_mainMenuImages;
 	MainMenuPreShowSignal m_mainMenuPreShowSignal;
 	MainMenuItemMiddleClickedSignal m_mainMenuItemMiddleClickedSignal;
 	MainMenuItemRightClickedSignal m_mainMenuItemRightClickedSignal;
@@ -670,9 +672,6 @@ private:
 	/* Display window folder sizes. */
 	std::list<DWFolderSize> m_DWFolderSizes;
 	int m_iDWFolderSizeUniqueId;
-
-	/* Menu images. */
-	std::vector<wil::unique_hbitmap> m_menuImages;
 
 	// WM_DEVICECHANGE notifications
 	DeviceChangeSignal m_deviceChangeSignal;

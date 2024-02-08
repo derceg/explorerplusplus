@@ -10,6 +10,7 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/ImageHelper.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/resource.h>
@@ -58,6 +59,8 @@ const std::map<UINT, Icon> MAIN_MENU_IMAGE_MAPPINGS = {
 
 void Explorerplusplus::InitializeMainMenu()
 {
+	FAIL_FAST_IF_FAILED(SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_mainMenuSystemImageList)));
+
 	// These need to occur after the language module has been initialized, but
 	// before the tabs are restored.
 	HMENU mainMenu = LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_MAINMENU));
@@ -90,7 +93,7 @@ void Explorerplusplus::SetMainMenuImages()
 	for (const auto &mapping : MAIN_MENU_IMAGE_MAPPINGS)
 	{
 		ResourceHelper::SetMenuItemImage(mainMenu, mapping.first, m_iconResourceLoader.get(),
-			mapping.second, dpi, m_menuImages);
+			mapping.second, dpi, m_mainMenuImages);
 	}
 }
 
@@ -167,6 +170,36 @@ void Explorerplusplus::AddGoMenuItem(HMENU goMenu, UINT id, PCIDLIST_ABSOLUTE pi
 	}
 
 	MenuHelper::AddStringItem(goMenu, id, folderName);
+
+	m_iconFetcher.QueueIconTask(pidl,
+		[this, goMenu, id](int iconIndex)
+		{
+			// Accessing the Explorerplusplus instance here should always be safe. This callback is
+			// run on the main thread and will either run before the instance is destroyed, or not
+			// at all. It's not feasible for the callback to run while the destruction of the
+			// Explorerplusplus instance is ongoing (which would be unsafe), since even if messages
+			// were pumped, the window message handler that the class sets up will no longer be
+			// active. So, once destruction of the Explorerplusplus instance has started, there's no
+			// way for this callback to run.
+			auto bitmap =
+				ImageHelper::ImageListIconToBitmap(m_mainMenuSystemImageList.get(), iconIndex);
+
+			if (!bitmap)
+			{
+				DCHECK(false);
+				return;
+			}
+
+			bool res = MenuHelper::SetBitmapForItem(goMenu, id, bitmap.get());
+
+			if (!res)
+			{
+				DCHECK(false);
+				return;
+			}
+
+			m_mainMenuImages.push_back(std::move(bitmap));
+		});
 }
 
 boost::signals2::connection Explorerplusplus::AddMainMenuPreShowObserver(
