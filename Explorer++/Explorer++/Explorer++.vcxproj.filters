@@ -589,6 +589,18 @@
     <ClCompile Include="BrowserCommandController.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="HistoryService.cpp">
+      <Filter>History</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBrowserHistoryHelper.cpp">
+      <Filter>History</Filter>
+    </ClCompile>
+    <ClCompile Include="HistoryServiceFactory.cpp">
+      <Filter>History</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBrowser\ShellBrowserHelper.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1203,6 +1215,21 @@
     <ClInclude Include="BrowserCommandController.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="HistoryService.h">
+      <Filter>History</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowserHistoryHelper.h">
+      <Filter>History</Filter>
+    </ClInclude>
+    <ClInclude Include="HistoryServiceFactory.h">
+      <Filter>History</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowser\ShellBrowserHelper.h">
+      <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowser\ShellBrowserEmbedder.h">
+      <Filter>ShellBrowser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1343,6 +1370,9 @@
     </Filter>
     <Filter Include="Core\UI\Views">
       <UniqueIdentifier>{6590f498-1426-4089-b90b-9174b6a9462e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="History">
+      <UniqueIdentifier>{415a5098-0a21-44a5-9850-90e513b38ed4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

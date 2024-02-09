@@ -16,6 +16,7 @@
 #include "Plugins/PluginCommandManager.h"
 #include "Plugins/PluginMenuManager.h"
 #include "ShellBrowser/Columns.h"
+#include "ShellBrowser/ShellBrowserEmbedder.h"
 #include "ShellBrowser/SortModes.h"
 #include "Tab.h"
 #include "TabNavigationInterface.h"
@@ -74,6 +75,7 @@ class Explorerplusplus :
 	public CoreInterface,
 	private FileContextMenuHandler,
 	public PluginInterface,
+	private ShellBrowserEmbedder,
 	public TabNavigationInterface
 {
 	friend LoadSaveRegistry;
@@ -298,6 +300,9 @@ private:
 	void SelectTabById(int tabId) override;
 
 	void OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams);
+
+	// ShellBrowserEmbedder
+	void OnShellBrowserCreated(ShellBrowserInterface *shellBrowser) override;
 
 	/* PluginInterface. */
 	CoreInterface *GetCoreInterface() override;

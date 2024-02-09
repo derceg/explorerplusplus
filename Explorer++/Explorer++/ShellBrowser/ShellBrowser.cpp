@@ -15,6 +15,8 @@
 #include "MassRenameDialog.h"
 #include "PreservedFolderState.h"
 #include "ServiceProvider.h"
+#include "ShellBrowserEmbedder.h"
+#include "ShellBrowserHelper.h"
 #include "ShellNavigationController.h"
 #include "SortModes.h"
 #include "ThemeManager.h"
@@ -32,38 +34,41 @@
 
 void CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 
-std::shared_ptr<ShellBrowser> ShellBrowser::CreateNew(HWND hOwner, CoreInterface *coreInterface,
-	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
-	const FolderSettings &folderSettings, const FolderColumns *initialColumns)
+std::shared_ptr<ShellBrowser> ShellBrowser::CreateNew(HWND hOwner, ShellBrowserEmbedder *embedder,
+	CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
+	FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
+	const FolderColumns *initialColumns)
 {
-	return std::shared_ptr<ShellBrowser>(new ShellBrowser(hOwner, coreInterface, tabNavigation,
-		fileActionHandler, folderSettings, initialColumns));
+	return std::shared_ptr<ShellBrowser>(new ShellBrowser(hOwner, embedder, coreInterface,
+		tabNavigation, fileActionHandler, folderSettings, initialColumns));
 }
 
 std::shared_ptr<ShellBrowser> ShellBrowser::CreateFromPreserved(HWND hOwner,
-	CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
-	FileActionHandler *fileActionHandler,
+	ShellBrowserEmbedder *embedder, CoreInterface *coreInterface,
+	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState)
 {
-	return std::shared_ptr<ShellBrowser>(new ShellBrowser(hOwner, coreInterface, tabNavigation,
-		fileActionHandler, history, currentEntry, preservedFolderState));
+	return std::shared_ptr<ShellBrowser>(new ShellBrowser(hOwner, embedder, coreInterface,
+		tabNavigation, fileActionHandler, history, currentEntry, preservedFolderState));
 }
 
-ShellBrowser::ShellBrowser(HWND hOwner, CoreInterface *coreInterface,
-	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
+ShellBrowser::ShellBrowser(HWND hOwner, ShellBrowserEmbedder *embedder,
+	CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
+	FileActionHandler *fileActionHandler,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState) :
-	ShellBrowser(hOwner, coreInterface, tabNavigation, fileActionHandler,
+	ShellBrowser(hOwner, embedder, coreInterface, tabNavigation, fileActionHandler,
 		preservedFolderState.folderSettings, nullptr)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(this, tabNavigation,
 		m_iconFetcher.get(), history, currentEntry);
 }
 
-ShellBrowser::ShellBrowser(HWND hOwner, CoreInterface *coreInterface,
-	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
-	const FolderSettings &folderSettings, const FolderColumns *initialColumns) :
+ShellBrowser::ShellBrowser(HWND hOwner, ShellBrowserEmbedder *embedder,
+	CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
+	FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
+	const FolderColumns *initialColumns) :
 	ShellDropTargetWindow(CreateListView(hOwner)),
 	m_hListView(GetHWND()),
 	m_resourceInstance(coreInterface->GetResourceInstance()),
@@ -128,6 +133,8 @@ ShellBrowser::ShellBrowser(HWND hOwner, CoreInterface *coreInterface,
 		std::bind_front(&ShellBrowser::OnApplicationShuttingDown, this)));
 
 	m_shellWindows = winrt::try_create_instance<IShellWindows>(CLSID_ShellWindows, CLSCTX_ALL);
+
+	embedder->OnShellBrowserCreated(this);
 }
 
 ShellBrowser::~ShellBrowser()
@@ -1339,4 +1346,9 @@ void ShellBrowser::OnPendingTaskAvailableMessage()
 	}
 
 	m_directoryState.pendingWorkQueue.clear();
+}
+
+void ShellBrowser::AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper)
+{
+	m_helpers.push_back(std::move(helper));
 }

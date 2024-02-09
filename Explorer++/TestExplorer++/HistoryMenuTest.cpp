@@ -5,10 +5,8 @@
 #include "pch.h"
 #include "HistoryMenu.h"
 #include "IconFetcherMock.h"
-#include "ShellBrowser/ShellBrowserInterface.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
-#include "ShellNavigatorMock.h"
 #include "TabNavigationMock.h"
 #include <gtest/gtest.h>
 
@@ -17,24 +15,20 @@ using namespace testing;
 class HistoryMenuTest : public Test
 {
 protected:
-	HistoryMenuTest() :
-		m_navigationController(&m_navigator, &m_tabNavigation, &m_iconFetcher),
-		m_shellBrowser(&m_navigationController)
+	HistoryMenuTest() : m_shellBrowser(&m_tabNavigation, &m_iconFetcher)
 	{
 	}
 
-	ShellNavigatorMock m_navigator;
 	TabNavigationMock m_tabNavigation;
 	IconFetcherMock m_iconFetcher;
-	ShellNavigationController m_navigationController;
 	ShellBrowserFake m_shellBrowser;
 };
 
 TEST_F(HistoryMenuTest, BackHistory)
 {
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake1"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake2"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake3"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
 
 	HistoryMenu menu(&m_shellBrowser, HistoryMenu::MenuType::Back);
 
@@ -47,9 +41,9 @@ TEST_F(HistoryMenuTest, BackHistory)
 
 TEST_F(HistoryMenuTest, ForwardHistory)
 {
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake1"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake2"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake3"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
 
 	// Go back to Fake1.
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());
@@ -66,9 +60,9 @@ TEST_F(HistoryMenuTest, ForwardHistory)
 
 TEST_F(HistoryMenuTest, BackSelection)
 {
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake1"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake2"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake3"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
 
 	HistoryMenu menu(&m_shellBrowser, HistoryMenu::MenuType::Back);
 
@@ -81,9 +75,9 @@ TEST_F(HistoryMenuTest, BackSelection)
 
 TEST_F(HistoryMenuTest, ForwardSelection)
 {
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake1"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake2"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake3"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
 
 	// Go back to Fake1.
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());
@@ -100,9 +94,9 @@ TEST_F(HistoryMenuTest, ForwardSelection)
 
 TEST_F(HistoryMenuTest, InvalidSelection)
 {
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake1"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake2"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake3"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
 
 	// Go back to Fake2.
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());
@@ -113,7 +107,7 @@ TEST_F(HistoryMenuTest, InvalidSelection)
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());
 
 	// This will erase the forward history (i.e. Fake2 and Fake3).
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake4"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake4"));
 
 	auto menuView = menu.GetMenuViewForTesting();
 	menu.OnMenuItemSelected(menuView->GetItemIdForTesting(0), false, false);

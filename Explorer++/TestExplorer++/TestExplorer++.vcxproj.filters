@@ -112,12 +112,6 @@
     <ClCompile Include="HistoryMenuTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="ShellNavigatorFake.cpp">
-      <Filter>ShellBrowser</Filter>
-    </ClCompile>
-    <ClCompile Include="ShellNavigatorMock.cpp">
-      <Filter>ShellBrowser</Filter>
-    </ClCompile>
     <ClCompile Include="OneShotTimerTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -126,6 +120,9 @@
     </ClCompile>
     <ClCompile Include="ShellBrowserFake.cpp">
       <Filter>ShellBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBrowserHistoryHelperTest.cpp">
+      <Filter>History</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -183,6 +180,9 @@
     <Filter Include="Core">
       <UniqueIdentifier>{809ce47f-d408-403f-8be2-2b4c3c7de69a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="History">
+      <UniqueIdentifier>{e02a8fdc-5c31-4cb1-9bd5-c1f3d9450e51}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -218,12 +218,6 @@
     </ClInclude>
     <ClInclude Include="TabNavigationMock.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellNavigatorMock.h">
-      <Filter>ShellBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellNavigatorFake.h">
-      <Filter>ShellBrowser</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowserFake.h">
       <Filter>ShellBrowser</Filter>

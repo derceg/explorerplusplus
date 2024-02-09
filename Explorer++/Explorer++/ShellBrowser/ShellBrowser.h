@@ -11,7 +11,6 @@
 #include "ServiceProvider.h"
 #include "ShellBrowserInterface.h"
 #include "ShellChangeWatcher.h"
-#include "ShellNavigator.h"
 #include "SignalWrapper.h"
 #include "SortModes.h"
 #include "ViewModes.h"
@@ -45,6 +44,7 @@ class IconFetcher;
 class IconResourceLoader;
 struct PreservedFolderState;
 struct PreservedHistoryEntry;
+class ShellBrowserEmbedder;
 class ShellNavigationController;
 class TabNavigationInterface;
 class WindowSubclassWrapper;
@@ -58,17 +58,17 @@ typedef struct
 class ShellBrowser :
 	public ShellBrowserInterface,
 	public ShellDropTargetWindow<int>,
-	public ShellNavigator,
 	public std::enable_shared_from_this<ShellBrowser>
 {
 public:
-	static std::shared_ptr<ShellBrowser> CreateNew(HWND hOwner, CoreInterface *coreInterface,
-		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
-		const FolderSettings &folderSettings, const FolderColumns *initialColumns);
+	static std::shared_ptr<ShellBrowser> CreateNew(HWND hOwner, ShellBrowserEmbedder *embedder,
+		CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
+		FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
+		const FolderColumns *initialColumns);
 
 	static std::shared_ptr<ShellBrowser> CreateFromPreserved(HWND hOwner,
-		CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
-		FileActionHandler *fileActionHandler,
+		ShellBrowserEmbedder *embedder, CoreInterface *coreInterface,
+		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 		const PreservedFolderState &preservedFolderState);
 
@@ -79,7 +79,10 @@ public:
 
 	// ShellBrowserInterface
 	ShellNavigationController *GetNavigationController() const override;
+	void AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper) override;
 
+	// ShellNavigator
+	HRESULT Navigate(NavigateParams &navigateParams) override;
 	boost::signals2::connection AddNavigationStartedObserver(
 		const NavigationStartedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back) override;
@@ -378,22 +381,19 @@ private:
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
 
-	ShellBrowser(HWND hOwner, CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
-		FileActionHandler *fileActionHandler,
+	ShellBrowser(HWND hOwner, ShellBrowserEmbedder *embedder, CoreInterface *coreInterface,
+		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 		const PreservedFolderState &preservedFolderState);
-	ShellBrowser(HWND hOwner, CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
-		FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
-		const FolderColumns *initialColumns);
+	ShellBrowser(HWND hOwner, ShellBrowserEmbedder *embedder, CoreInterface *coreInterface,
+		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
+		const FolderSettings &folderSettings, const FolderColumns *initialColumns);
 
 	static HWND CreateListView(HWND parent);
 	void InitializeListView();
 	int GenerateUniqueItemId();
 	void MarkItemAsCut(int item, bool cut);
 	void VerifySortMode();
-
-	/* NavigatorInterface methods. */
-	HRESULT Navigate(NavigateParams &navigateParams) override;
 
 	/* Browsing support. */
 	HRESULT PerformEnumeration(NavigateParams &navigateParams, std::vector<ItemInfo_t> &items);
@@ -631,6 +631,8 @@ private:
 
 	HWND m_hListView;
 	HWND m_hOwner;
+
+	std::vector<std::unique_ptr<ShellBrowserHelperBase>> m_helpers;
 
 	NavigationStartedSignal m_navigationStartedSignal;
 	NavigationCommittedSignal m_navigationCommittedSignal;

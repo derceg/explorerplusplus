@@ -1001,6 +1001,8 @@
     <ClCompile Include="FeatureList.cpp" />
     <ClCompile Include="FontsOptionsPage.cpp" />
     <ClCompile Include="HistoryMenu.cpp" />
+    <ClCompile Include="HistoryService.cpp" />
+    <ClCompile Include="HistoryServiceFactory.cpp" />
     <ClCompile Include="IconFetcherImpl.cpp" />
     <ClCompile Include="ItemNameEditControl.cpp" />
     <ClCompile Include="MainFontSetter.cpp" />
@@ -1008,6 +1010,8 @@
     <ClCompile Include="OneShotTimer.cpp" />
     <ClCompile Include="OneShotTimerManager.cpp" />
     <ClCompile Include="PopupMenuView.cpp" />
+    <ClCompile Include="ShellBrowserHistoryHelper.cpp" />
+    <ClCompile Include="ShellBrowser\ShellBrowserHelper.cpp" />
     <ClCompile Include="ShellItemsMenu.cpp" />
     <ClCompile Include="SystemFontHelper.cpp" />
     <ClCompile Include="ThemeManager.cpp" />
@@ -1231,6 +1235,8 @@
     <ClInclude Include="FeatureList.h" />
     <ClInclude Include="FontsOptionsPage.h" />
     <ClInclude Include="HistoryMenu.h" />
+    <ClInclude Include="HistoryService.h" />
+    <ClInclude Include="HistoryServiceFactory.h" />
     <ClInclude Include="IconFetcher.h" />
     <ClInclude Include="IconFetcherImpl.h" />
     <ClInclude Include="ItemNameEditControl.h" />
@@ -1240,6 +1246,9 @@
     <ClInclude Include="OneShotTimer.h" />
     <ClInclude Include="OneShotTimerManager.h" />
     <ClInclude Include="PopupMenuView.h" />
+    <ClInclude Include="ShellBrowserHistoryHelper.h" />
+    <ClInclude Include="ShellBrowser\ShellBrowserEmbedder.h" />
+    <ClInclude Include="ShellBrowser\ShellBrowserHelper.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserInterface.h" />
     <ClInclude Include="ShellItemsMenu.h" />
     <ClInclude Include="SystemFontHelper.h" />

@@ -207,6 +207,7 @@
     <ClCompile Include="GdiplusHelperTest.cpp" />
     <ClCompile Include="HelperTest.cpp" />
     <ClCompile Include="HistoryMenuTest.cpp" />
+    <ClCompile Include="ShellBrowserHistoryHelperTest.cpp" />
     <ClCompile Include="ManifestTest.cpp" />
     <ClCompile Include="MovableModelTest.cpp" />
     <ClCompile Include="OneShotTimerTest.cpp" />
@@ -231,8 +232,6 @@
     <ClCompile Include="ShellBrowserFake.cpp" />
     <ClCompile Include="ShellHelperTest.cpp" />
     <ClCompile Include="ShellNavigationControllerTest.cpp" />
-    <ClCompile Include="ShellNavigatorFake.cpp" />
-    <ClCompile Include="ShellNavigatorMock.cpp" />
     <ClCompile Include="StringHelperTest.cpp" />
     <ClCompile Include="TabTest.cpp" />
     <ClCompile Include="ViewModeHelperTest.cpp" />
@@ -257,8 +256,6 @@
     <ClInclude Include="RegistryStorageHelper.h" />
     <ClInclude Include="ResourceHelper.h" />
     <ClInclude Include="ShellBrowserFake.h" />
-    <ClInclude Include="ShellNavigatorFake.h" />
-    <ClInclude Include="ShellNavigatorMock.h" />
     <ClInclude Include="TabNavigationMock.h" />
     <ClInclude Include="XmlStorageHelper.h" />
   </ItemGroup>

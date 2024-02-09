@@ -13,6 +13,7 @@
 #include "MainFontSetter.h"
 #include "MenuRanges.h"
 #include "Plugins/PluginManager.h"
+#include "ShellBrowserHistoryHelper.h"
 #include "TabRestorerUI.h"
 #include "ThemeWindowTracker.h"
 #include "UiTheming.h"
@@ -77,4 +78,9 @@ BrowserCommandController *Explorerplusplus::GetCommandController()
 BrowserPane *Explorerplusplus::GetActivePane() const
 {
 	return m_browserPane.get();
+}
+
+void Explorerplusplus::OnShellBrowserCreated(ShellBrowserInterface *shellBrowser)
+{
+	ShellBrowserHistoryHelper::CreateAndAttachToShellBrowser(shellBrowser);
 }

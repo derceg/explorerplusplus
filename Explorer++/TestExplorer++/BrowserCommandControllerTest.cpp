@@ -8,7 +8,6 @@
 #include "MainResource.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
-#include "ShellNavigatorMock.h"
 #include "TabNavigationMock.h"
 #include "../Helper/ShellHelper.h"
 #include <gtest/gtest.h>
@@ -19,25 +18,22 @@ class BrowserCommandControllerTest : public Test
 {
 protected:
 	BrowserCommandControllerTest() :
-		m_navigationController(&m_navigator, &m_tabNavigation, &m_iconFetcher),
-		m_shellBrowser(&m_navigationController),
+		m_shellBrowser(&m_tabNavigation, &m_iconFetcher),
 		m_commandController(&m_shellBrowser)
 	{
 	}
 
-	ShellNavigatorMock m_navigator;
 	TabNavigationMock m_tabNavigation;
 	IconFetcherMock m_iconFetcher;
-	ShellNavigationController m_navigationController;
 	ShellBrowserFake m_shellBrowser;
 	BrowserCommandController m_commandController;
 };
 
 TEST_F(BrowserCommandControllerTest, Back)
 {
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake1"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake2"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake3"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
 
 	m_commandController.ExecuteCommand(IDM_GO_BACK);
 	EXPECT_EQ(m_shellBrowser.GetNavigationController()->GetCurrentIndex(), 1);
@@ -45,9 +41,9 @@ TEST_F(BrowserCommandControllerTest, Back)
 
 TEST_F(BrowserCommandControllerTest, Forward)
 {
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake1"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake2"));
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake3"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
 
 	m_shellBrowser.GetNavigationController()->GoBack();
 	EXPECT_EQ(m_shellBrowser.GetNavigationController()->GetCurrentIndex(), 1);
@@ -58,7 +54,7 @@ TEST_F(BrowserCommandControllerTest, Forward)
 
 TEST_F(BrowserCommandControllerTest, Up)
 {
-	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToFolder(L"C:\\Fake"));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake"));
 
 	m_commandController.ExecuteCommand(IDM_GO_UP);
 	EXPECT_EQ(m_shellBrowser.GetNavigationController()->GetNumHistoryEntries(), 2);
