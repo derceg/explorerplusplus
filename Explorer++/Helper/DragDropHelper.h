@@ -5,12 +5,15 @@
 #pragma once
 
 #include "DataExchangeHelper.h"
+#include "PidlHelper.h"
 #include <wil/result.h>
 #include <ShlObj.h>
 #include <shtypes.h>
 
 STGMEDIUM GetStgMediumForGlobal(HGLOBAL global);
 HRESULT SetPreferredDropEffect(IDataObject *dataObject, DWORD effect);
+HRESULT CreateDataObjectForShellTransfer(const std::vector<PidlAbsolute> &items,
+	IDataObject **dataObjectOut);
 HRESULT CreateDataObjectForShellTransfer(const std::vector<PCIDLIST_ABSOLUTE> &items,
 	IDataObject **dataObjectOut);
 HRESULT SetDropDescription(IDataObject *dataObject, DROPIMAGETYPE type, const std::wstring &message,

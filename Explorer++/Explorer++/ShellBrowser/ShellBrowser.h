@@ -158,7 +158,7 @@ public:
 
 	void SetFileAttributesForSelection();
 
-	void SelectItems(const std::vector<PCIDLIST_ABSOLUTE> &pidls);
+	void SelectItems(const std::vector<PidlAbsolute> &pidls);
 	uint64_t GetTotalDirectorySize();
 	uint64_t GetSelectionSize();
 	int LocateFileItemIndex(const TCHAR *szFileName) const;
@@ -450,7 +450,7 @@ private:
 	void OnListViewItemChanged(const NMLISTVIEW *changeData);
 	void UpdateFileSelectionInfo(int internalIndex, BOOL selected);
 	void OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown);
-	std::vector<PCIDLIST_ABSOLUTE> GetSelectedItemPidls();
+	std::vector<PidlAbsolute> GetSelectedItemPidls() const;
 	void OnListViewBeginDrag(const NMLISTVIEW *info);
 	void OnListViewBeginRightClickDrag(const NMLISTVIEW *info);
 	HRESULT StartDrag(int draggedItem, const POINT &startPoint);
@@ -730,7 +730,7 @@ private:
 	/* Drag and drop related data. */
 	UINT m_getDragImageMessage;
 	winrt::com_ptr<ServiceProvider> m_dropServiceProvider;
-	std::vector<unique_pidl_absolute> m_draggedItems;
+	std::vector<PidlAbsolute> m_draggedItems;
 	POINT m_ptDraggedOffset;
 	bool m_performingDrag;
 	IDataObject *m_draggedDataObject;

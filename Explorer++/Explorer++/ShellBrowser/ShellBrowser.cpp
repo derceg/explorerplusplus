@@ -562,7 +562,7 @@ unique_pidl_absolute ShellBrowser::GetDirectoryIdl() const
 	return pidlDirectory;
 }
 
-void ShellBrowser::SelectItems(const std::vector<PCIDLIST_ABSOLUTE> &pidls)
+void ShellBrowser::SelectItems(const std::vector<PidlAbsolute> &pidls)
 {
 	ListViewHelper::SelectAllItems(m_hListView, FALSE);
 
@@ -570,7 +570,7 @@ void ShellBrowser::SelectItems(const std::vector<PCIDLIST_ABSOLUTE> &pidls)
 
 	for (auto &pidl : pidls)
 	{
-		auto index = GetItemIndexForPidl(pidl);
+		auto index = GetItemIndexForPidl(pidl.Raw());
 
 		if (!index)
 		{
@@ -1217,7 +1217,7 @@ void ShellBrowser::StartRenamingMultipleFiles()
 
 HRESULT ShellBrowser::CopySelectedItemsToClipboard(bool copy)
 {
-	std::vector<PCIDLIST_ABSOLUTE> pidls = GetSelectedItemPidls();
+	auto pidls = GetSelectedItemPidls();
 
 	if (pidls.empty())
 	{

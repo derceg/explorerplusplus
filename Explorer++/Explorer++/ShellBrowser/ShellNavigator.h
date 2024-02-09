@@ -72,8 +72,8 @@ public:
 	static NavigateParams History(const HistoryEntry *historyEntry)
 	{
 		NavigateParams params;
-		params.requestPidl = historyEntry->GetPidl().get();
-		params.pidl = historyEntry->GetPidl().get();
+		params.requestPidl = historyEntry->GetPidl();
+		params.pidl = historyEntry->GetPidl();
 		params.historyEntryId = historyEntry->GetId();
 		params.historyEntryType = HistoryEntryType::ReplaceCurrentEntry;
 		params.navigationType = NavigationType::History;

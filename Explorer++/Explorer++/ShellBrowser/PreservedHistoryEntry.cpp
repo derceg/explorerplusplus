@@ -8,7 +8,7 @@
 
 PreservedHistoryEntry::PreservedHistoryEntry(const HistoryEntry &entry) :
 	id(entry.GetId()),
-	pidl(ILCloneFull(entry.GetPidl().get())),
+	pidl(entry.GetPidl()),
 	displayName(entry.GetDisplayName()),
 	fullPathForDisplay(entry.GetFullPathForDisplay()),
 	systemIconIndex(entry.GetSystemIconIndex())

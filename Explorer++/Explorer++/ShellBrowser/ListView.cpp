@@ -1045,9 +1045,9 @@ HRESULT ShellBrowser::GetListViewItemAttributes(int item, SFGAOF *attributes) co
 	return GetItemAttributes(itemInfo.pidlComplete.get(), attributes);
 }
 
-std::vector<PCIDLIST_ABSOLUTE> ShellBrowser::GetSelectedItemPidls()
+std::vector<PidlAbsolute> ShellBrowser::GetSelectedItemPidls() const
 {
-	std::vector<PCIDLIST_ABSOLUTE> selectedItemPidls;
+	std::vector<PidlAbsolute> selectedItemPidls;
 	int index = -1;
 
 	while ((index = ListView_GetNextItem(m_hListView, index, LVNI_SELECTED)) != -1)
@@ -1071,7 +1071,7 @@ void ShellBrowser::OnListViewBeginRightClickDrag(const NMLISTVIEW *info)
 
 HRESULT ShellBrowser::StartDrag(int draggedItem, const POINT &startPoint)
 {
-	std::vector<PCIDLIST_ABSOLUTE> pidls = GetSelectedItemPidls();
+	auto pidls = GetSelectedItemPidls();
 
 	if (pidls.empty())
 	{
@@ -1083,7 +1083,7 @@ HRESULT ShellBrowser::StartDrag(int draggedItem, const POINT &startPoint)
 
 	m_performingDrag = true;
 	m_draggedDataObject = dataObject.get();
-	m_draggedItems = DeepCopyPidls(pidls);
+	m_draggedItems = pidls;
 
 	POINT ptItem;
 	ListView_GetItemPosition(m_hListView, draggedItem, &ptItem);

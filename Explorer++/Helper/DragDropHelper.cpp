@@ -38,6 +38,19 @@ HRESULT SetDropDescription(IDataObject *dataObject, DROPIMAGETYPE type, const st
 		static_cast<CLIPFORMAT>(RegisterClipboardFormat(CFSTR_DROPDESCRIPTION)), dropDescription);
 }
 
+HRESULT CreateDataObjectForShellTransfer(const std::vector<PidlAbsolute> &items,
+	IDataObject **dataObjectOut)
+{
+	std::vector<PCIDLIST_ABSOLUTE> rawItems;
+
+	for (const auto &pidl : items)
+	{
+		rawItems.push_back(pidl.Raw());
+	}
+
+	return CreateDataObjectForShellTransfer(rawItems, dataObjectOut);
+}
+
 // Returns an IDataObject instance that can be used for clipboard operations and drag and drop.
 HRESULT CreateDataObjectForShellTransfer(const std::vector<PCIDLIST_ABSOLUTE> &items,
 	IDataObject **dataObjectOut)

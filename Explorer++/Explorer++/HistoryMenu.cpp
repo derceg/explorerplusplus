@@ -129,7 +129,7 @@ void HistoryMenu::NavigateToHistoryEntry(int menuItemId, bool isMiddleButtonDown
 
 		if (disposition != OpenFolderDisposition::CurrentTab)
 		{
-			m_browserWindow->OpenItem(entry->GetPidl().get(), disposition);
+			m_browserWindow->OpenItem(entry->GetPidl().Raw(), disposition);
 			return;
 		}
 	}

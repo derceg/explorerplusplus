@@ -114,7 +114,7 @@ void BrowserCommandController::GoBack(OpenFolderDisposition disposition)
 			return;
 		}
 
-		m_browserWindow->OpenItem(entry->GetPidl().get(), disposition);
+		m_browserWindow->OpenItem(entry->GetPidl().Raw(), disposition);
 	}
 }
 
@@ -135,7 +135,7 @@ void BrowserCommandController::GoForward(OpenFolderDisposition disposition)
 			return;
 		}
 
-		m_browserWindow->OpenItem(entry->GetPidl().get(), disposition);
+		m_browserWindow->OpenItem(entry->GetPidl().Raw(), disposition);
 	}
 }
 
@@ -153,7 +153,7 @@ void BrowserCommandController::GoUp(OpenFolderDisposition disposition)
 
 		unique_pidl_absolute pidlParent;
 		HRESULT hr =
-			GetVirtualParentPath(currentEntry->GetPidl().get(), wil::out_param(pidlParent));
+			GetVirtualParentPath(currentEntry->GetPidl().Raw(), wil::out_param(pidlParent));
 
 		if (FAILED(hr))
 		{

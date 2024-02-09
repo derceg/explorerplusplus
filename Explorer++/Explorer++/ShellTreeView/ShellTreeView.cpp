@@ -1617,7 +1617,7 @@ void ShellTreeView::CopyItemToClipboard(HTREEITEM treeItem, bool copy)
 	auto *node = GetNodeFromTreeViewItem(treeItem);
 	auto pidl = node->GetFullPidl();
 
-	std::vector<PCIDLIST_ABSOLUTE> items = { pidl.get() };
+	std::vector<PidlAbsolute> items = { pidl.get() };
 	wil::com_ptr_nothrow<IDataObject> clipboardDataObject;
 	HRESULT hr;
 

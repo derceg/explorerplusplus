@@ -6,7 +6,7 @@
 
 #include "SignalWrapper.h"
 #include "../Helper/Macros.h"
-#include "../Helper/ShellHelper.h"
+#include "../Helper/PidlHelper.h"
 #include <optional>
 #include <vector>
 
@@ -20,18 +20,18 @@ public:
 		SystemIconIndex
 	};
 
-	HistoryEntry(PCIDLIST_ABSOLUTE pidl, std::wstring_view displayName,
+	HistoryEntry(const PidlAbsolute &pidl, std::wstring_view displayName,
 		std::wstring_view fullPathForDisplay, std::optional<int> systemIconIndex = std::nullopt);
 	HistoryEntry(const PreservedHistoryEntry &preservedHistoryEntry);
 
 	int GetId() const;
-	unique_pidl_absolute GetPidl() const;
+	PidlAbsolute GetPidl() const;
 	std::wstring GetDisplayName() const;
 	std::wstring GetFullPathForDisplay() const;
 	std::optional<int> GetSystemIconIndex() const;
 	void SetSystemIconIndex(int iconIndex);
-	std::vector<unique_pidl_absolute> GetSelectedItems() const;
-	void SetSelectedItems(const std::vector<PCIDLIST_ABSOLUTE> &pidls);
+	std::vector<PidlAbsolute> GetSelectedItems() const;
+	void SetSelectedItems(const std::vector<PidlAbsolute> &pidls);
 
 	SignalWrapper<HistoryEntry, void(const HistoryEntry &entry, PropertyType propertyType)>
 		historyEntryUpdatedSignal;
@@ -42,9 +42,9 @@ private:
 	static int idCounter;
 	const int m_id;
 
-	unique_pidl_absolute m_pidl;
+	PidlAbsolute m_pidl;
 	std::wstring m_displayName;
 	std::wstring m_fullPathForDisplay;
 	std::optional<int> m_systemIconIndex;
-	std::vector<unique_pidl_absolute> m_selectedItems;
+	std::vector<PidlAbsolute> m_selectedItems;
 };

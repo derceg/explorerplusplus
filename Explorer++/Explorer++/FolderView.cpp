@@ -351,16 +351,15 @@ IFACEMETHODIMP FolderView::SelectAndPositionItems(UINT numItems, PCUITEMID_CHILD
 
 	if (WI_IsFlagSet(flags, SVSI_SELECT))
 	{
-		std::vector<unique_pidl_absolute> pidls;
+		std::vector<PidlAbsolute> pidls;
 
 		for (UINT i = 0; i < numItems; i++)
 		{
 			unique_pidl_absolute pidl(ILCombine(shellBrowser->GetDirectoryIdl().get(), items[i]));
-			pidls.push_back(std::move(pidl));
+			pidls.emplace_back(pidl.get());
 		}
 
-		auto rawPidls = ShallowCopyPidls(pidls);
-		shellBrowser->SelectItems(rawPidls);
+		shellBrowser->SelectItems(pidls);
 
 		return S_OK;
 	}

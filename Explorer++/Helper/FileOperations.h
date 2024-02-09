@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "PidlHelper.h"
 #include <list>
 #include <vector>
 
@@ -39,9 +40,9 @@ HRESULT ResolveLink(HWND hwnd, DWORD fFlags, const TCHAR *szLinkFilename, TCHAR 
 BOOL CreateBrowseDialog(HWND hOwner, const std::wstring &strTitle, PIDLIST_ABSOLUTE *ppidl);
 };
 
-HRESULT CopyFiles(const std::vector<PCIDLIST_ABSOLUTE> &items, IDataObject **dataObjectOut);
-HRESULT CutFiles(const std::vector<PCIDLIST_ABSOLUTE> &items, IDataObject **dataObjectOut);
-HRESULT CopyFilesToClipboard(const std::vector<PCIDLIST_ABSOLUTE> &items, bool move,
+HRESULT CopyFiles(const std::vector<PidlAbsolute> &items, IDataObject **dataObjectOut);
+HRESULT CutFiles(const std::vector<PidlAbsolute> &items, IDataObject **dataObjectOut);
+HRESULT CopyFilesToClipboard(const std::vector<PidlAbsolute> &items, bool move,
 	IDataObject **dataObjectOut);
 
 int PasteHardLinks(const TCHAR *szDestination);

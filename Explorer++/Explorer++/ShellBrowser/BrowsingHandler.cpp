@@ -118,7 +118,7 @@ void ShellBrowser::StoreCurrentlySelectedItems()
 		return;
 	}
 
-	std::vector<PCIDLIST_ABSOLUTE> selectedItems = GetSelectedItemPidls();
+	auto selectedItems = GetSelectedItemPidls();
 	entry->SetSelectedItems(selectedItems);
 }
 
@@ -585,20 +585,18 @@ void ShellBrowser::OnEnumerationCompleted(std::vector<ShellBrowser::ItemInfo_t> 
 	/* Set the focus back to the first item. */
 	ListView_SetItemState(m_hListView, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
-	if (navigateParams.historyEntryId)
-	{
-		auto entry = m_navigationController->GetEntryById(*navigateParams.historyEntryId);
+	// A history entry should be created when the navigation is committed, so there should always be
+	// a current entry here, and that entry should be for the current navigation.
+	auto currentEntry = m_navigationController->GetCurrentEntry();
+	CHECK(currentEntry);
+	DCHECK(ArePidlsEquivalent(currentEntry->GetPidl().Raw(), navigateParams.pidl.Raw()));
 
-		if (entry)
-		{
-			auto selectedItems = entry->GetSelectedItems();
-			SelectItems(ShallowCopyPidls(selectedItems));
-		}
-	}
+	auto selectedItems = currentEntry->GetSelectedItems();
+	SelectItems(selectedItems);
 
 	if (navigateParams.navigationType == NavigationType::Up)
 	{
-		SelectItems({ navigateParams.originalPidl.Raw() });
+		SelectItems({ navigateParams.originalPidl });
 	}
 
 	if (m_config->shellChangeNotificationType == ShellChangeNotificationType::All

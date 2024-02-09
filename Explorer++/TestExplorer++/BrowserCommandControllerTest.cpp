@@ -10,6 +10,7 @@
 #include "ShellBrowserFake.h"
 #include "ShellNavigatorMock.h"
 #include "TabNavigationMock.h"
+#include "../Helper/ShellHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
@@ -66,5 +67,5 @@ TEST_F(BrowserCommandControllerTest, Up)
 	ASSERT_NE(currentEntry, nullptr);
 
 	unique_pidl_absolute pidlParent(SHSimpleIDListFromPath(L"C:\\"));
-	EXPECT_TRUE(ArePidlsEquivalent(currentEntry->GetPidl().get(), pidlParent.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(currentEntry->GetPidl().Raw(), pidlParent.get()));
 }

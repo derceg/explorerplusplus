@@ -136,9 +136,9 @@ void ShellBrowser::RepositionLocalFiles(const POINT *ppt)
 		ListViewHelper::SetAutoArrange(m_hListView, FALSE);
 	}
 
-	for (auto &pidl : m_draggedItems)
+	for (const auto &pidl : m_draggedItems)
 	{
-		auto index = GetItemIndexForPidl(pidl.get());
+		auto index = GetItemIndexForPidl(pidl.Raw());
 
 		if (!index)
 		{

@@ -252,7 +252,7 @@ TEST_F(ShellNavigationControllerTest, GoUp)
 
 	unique_pidl_absolute pidlParent(SHSimpleIDListFromPath(L"C:\\"));
 	ASSERT_TRUE(pidlParent);
-	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidlParent.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidlParent.get()));
 
 	// The desktop folder is the root of the shell namespace.
 	unique_pidl_absolute pidlDesktop;
@@ -271,7 +271,7 @@ TEST_F(ShellNavigationControllerTest, GoUp)
 
 	entry = m_navigationController.GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidlDesktop.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidlDesktop.get()));
 }
 
 TEST_F(ShellNavigationControllerTest, HistoryEntries)
@@ -293,7 +293,7 @@ TEST_F(ShellNavigationControllerTest, HistoryEntries)
 
 	entry = m_navigationController.GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl1.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidl1.get()));
 
 	EXPECT_EQ(m_navigationController.GetIndexOfEntry(entry), 0);
 	EXPECT_EQ(m_navigationController.GetEntryById(entry->GetId()), entry);
@@ -307,7 +307,7 @@ TEST_F(ShellNavigationControllerTest, HistoryEntries)
 
 	entry = m_navigationController.GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl2.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidl2.get()));
 
 	EXPECT_EQ(m_navigationController.GetIndexOfEntry(entry), 1);
 	EXPECT_EQ(m_navigationController.GetEntryById(entry->GetId()), entry);
@@ -317,7 +317,7 @@ TEST_F(ShellNavigationControllerTest, HistoryEntries)
 
 	entry = m_navigationController.GetEntryAtIndex(0);
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl1.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidl1.get()));
 }
 
 TEST_F(ShellNavigationControllerTest, SetNavigationMode)
@@ -418,7 +418,7 @@ TEST_F(ShellNavigationControllerTest, HistoryEntryTypes)
 
 	auto entry = m_navigationController.GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl2.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidl2.get()));
 
 	unique_pidl_absolute pidl3;
 	ASSERT_HRESULT_SUCCEEDED(NavigateToFolder(L"C:\\Fake3", HistoryEntryType::AddEntry, &pidl3));
@@ -428,7 +428,7 @@ TEST_F(ShellNavigationControllerTest, HistoryEntryTypes)
 
 	entry = m_navigationController.GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl3.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidl3.get()));
 
 	unique_pidl_absolute pidl4;
 	ASSERT_HRESULT_SUCCEEDED(NavigateToFolder(L"C:\\Fake4", HistoryEntryType::None, &pidl4));
@@ -440,7 +440,7 @@ TEST_F(ShellNavigationControllerTest, HistoryEntryTypes)
 	// previously.
 	entry = m_navigationController.GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl3.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidl3.get()));
 }
 
 TEST_F(ShellNavigationControllerTest, ReplacePreviousHistoryEntry)
@@ -476,7 +476,7 @@ TEST_F(ShellNavigationControllerTest, HistoryEntryTypeFirstNavigation)
 
 	auto entry = m_navigationController.GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), pidl.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidl.get()));
 }
 
 TEST_F(ShellNavigationControllerPreservedTest, FirstIndexIsCurrent)
@@ -507,7 +507,7 @@ TEST_F(ShellNavigationControllerPreservedTest, CheckEntries)
 	{
 		auto entry = m_navigationController->GetEntryAtIndex(static_cast<int>(i));
 		ASSERT_NE(entry, nullptr);
-		EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().get(), m_preservedEntries[i]->pidl.get()));
+		EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), m_preservedEntries[i]->pidl.Raw()));
 		EXPECT_EQ(entry->GetDisplayName(), m_preservedEntries[i]->displayName);
 		EXPECT_EQ(entry->GetFullPathForDisplay(), m_preservedEntries[i]->fullPathForDisplay);
 	}

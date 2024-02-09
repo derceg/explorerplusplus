@@ -1448,34 +1448,6 @@ HRESULT SimplePidlToFullPidl(PCIDLIST_ABSOLUTE simplePidl, PIDLIST_ABSOLUTE *ful
 	return S_OK;
 }
 
-std::vector<unique_pidl_absolute> DeepCopyPidls(const std::vector<PCIDLIST_ABSOLUTE> &pidls)
-{
-	std::vector<unique_pidl_absolute> copiedPidls;
-	copiedPidls.reserve(pidls.size());
-	std::transform(pidls.begin(), pidls.end(), std::back_inserter(copiedPidls),
-		[](const PCIDLIST_ABSOLUTE &pidl) { return unique_pidl_absolute(ILCloneFull(pidl)); });
-	return copiedPidls;
-}
-
-std::vector<unique_pidl_absolute> DeepCopyPidls(const std::vector<unique_pidl_absolute> &pidls)
-{
-	std::vector<unique_pidl_absolute> copiedPidls;
-	copiedPidls.reserve(pidls.size());
-	std::transform(pidls.begin(), pidls.end(), std::back_inserter(copiedPidls),
-		[](const unique_pidl_absolute &pidl)
-		{ return unique_pidl_absolute(ILCloneFull(pidl.get())); });
-	return copiedPidls;
-}
-
-std::vector<PCIDLIST_ABSOLUTE> ShallowCopyPidls(const std::vector<unique_pidl_absolute> &pidls)
-{
-	std::vector<PCIDLIST_ABSOLUTE> rawPidls;
-	rawPidls.reserve(pidls.size());
-	std::transform(pidls.begin(), pidls.end(), std::back_inserter(rawPidls),
-		[](const unique_pidl_absolute &pidl) { return pidl.get(); });
-	return rawPidls;
-}
-
 // Returns a vector containing the pidl of each parent item, proceeding from the first parent to the
 // root.
 std::vector<PidlAbsolute> GetParentPidlCollection(PCIDLIST_ABSOLUTE pidl)

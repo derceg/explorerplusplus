@@ -7,6 +7,7 @@
 #include "IconFetcher.h"
 #include "ShellNavigator.h"
 #include "TabNavigationInterface.h"
+#include "../Helper/ShellHelper.h"
 
 ShellNavigationController::ShellNavigationController(ShellNavigator *navigator,
 	TabNavigationInterface *tabNavigation, IconFetcher *iconFetcher) :
@@ -91,6 +92,10 @@ void ShellNavigationController::OnNavigationCommitted(const NavigateParams &navi
 		}
 		else
 		{
+			// When an entry is replaced, the set of selected items should be retained.
+			auto *currentEntry = GetCurrentEntry();
+			entry->SetSelectedItems(currentEntry->GetSelectedItems());
+
 			entryIndex = ReplaceCurrentEntry(std::move(entry));
 		}
 
@@ -160,7 +165,7 @@ bool ShellNavigationController::CanGoUp() const
 		return false;
 	}
 
-	return !IsNamespaceRoot(currentEntry->GetPidl().get());
+	return !IsNamespaceRoot(currentEntry->GetPidl().Raw());
 }
 
 HRESULT ShellNavigationController::GoUp()
@@ -173,14 +178,14 @@ HRESULT ShellNavigationController::GoUp()
 	}
 
 	unique_pidl_absolute pidlParent;
-	HRESULT hr = GetVirtualParentPath(currentEntry->GetPidl().get(), wil::out_param(pidlParent));
+	HRESULT hr = GetVirtualParentPath(currentEntry->GetPidl().Raw(), wil::out_param(pidlParent));
 
 	if (FAILED(hr))
 	{
 		return hr;
 	}
 
-	auto navigateParams = NavigateParams::Up(pidlParent.get(), currentEntry->GetPidl().get());
+	auto navigateParams = NavigateParams::Up(pidlParent.get(), currentEntry->GetPidl().Raw());
 	return Navigate(navigateParams);
 }
 
@@ -232,7 +237,7 @@ HRESULT ShellNavigationController::Navigate(NavigateParams &navigateParams)
 	// navigation to a history entry, except the current history entry (navigating to the current
 	// history entry is an explicit refresh).
 	if (currentEntry && targetEntry == currentEntry
-		&& ArePidlsEquivalent(currentEntry->GetPidl().get(), navigateParams.pidl.Raw()))
+		&& ArePidlsEquivalent(currentEntry->GetPidl().Raw(), navigateParams.pidl.Raw()))
 	{
 		navigateParams.historyEntryType = HistoryEntryType::ReplaceCurrentEntry;
 		navigateParams.overrideNavigationMode = true;

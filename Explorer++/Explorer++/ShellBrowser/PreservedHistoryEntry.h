@@ -5,7 +5,7 @@
 #pragma once
 
 #include "../Helper/Macros.h"
-#include "../Helper/ShellHelper.h"
+#include "../Helper/PidlHelper.h"
 #include <optional>
 
 class HistoryEntry;
@@ -17,7 +17,7 @@ public:
 
 	const int id;
 
-	unique_pidl_absolute pidl;
+	PidlAbsolute pidl;
 	std::wstring displayName;
 	std::wstring fullPathForDisplay;
 	std::optional<int> systemIconIndex;

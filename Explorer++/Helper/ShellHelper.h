@@ -121,9 +121,6 @@ bool IsChildOfLibrariesFolder(PCIDLIST_ABSOLUTE pidl);
 HRESULT CreateSimplePidl(const std::wstring &path, PIDLIST_ABSOLUTE *pidl,
 	IShellFolder *parent = nullptr, ShellItemType shellItemType = ShellItemType::File);
 HRESULT SimplePidlToFullPidl(PCIDLIST_ABSOLUTE simplePidl, PIDLIST_ABSOLUTE *fullPidl);
-std::vector<unique_pidl_absolute> DeepCopyPidls(const std::vector<PCIDLIST_ABSOLUTE> &pidls);
-std::vector<unique_pidl_absolute> DeepCopyPidls(const std::vector<unique_pidl_absolute> &pidls);
-std::vector<PCIDLIST_ABSOLUTE> ShallowCopyPidls(const std::vector<unique_pidl_absolute> &pidls);
 std::vector<PidlAbsolute> GetParentPidlCollection(PCIDLIST_ABSOLUTE pidl);
 
 std::optional<std::wstring> TransformUserEnteredPathToAbsolutePathAndNormalize(

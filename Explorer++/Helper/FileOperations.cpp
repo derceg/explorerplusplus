@@ -394,17 +394,17 @@ BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,
 	return FALSE;
 }
 
-HRESULT CopyFiles(const std::vector<PCIDLIST_ABSOLUTE> &items, IDataObject **dataObjectOut)
+HRESULT CopyFiles(const std::vector<PidlAbsolute> &items, IDataObject **dataObjectOut)
 {
 	return CopyFilesToClipboard(items, false, dataObjectOut);
 }
 
-HRESULT CutFiles(const std::vector<PCIDLIST_ABSOLUTE> &items, IDataObject **dataObjectOut)
+HRESULT CutFiles(const std::vector<PidlAbsolute> &items, IDataObject **dataObjectOut)
 {
 	return CopyFilesToClipboard(items, true, dataObjectOut);
 }
 
-HRESULT CopyFilesToClipboard(const std::vector<PCIDLIST_ABSOLUTE> &items, bool move,
+HRESULT CopyFilesToClipboard(const std::vector<PidlAbsolute> &items, bool move,
 	IDataObject **dataObjectOut)
 {
 	wil::com_ptr_nothrow<IDataObject> dataObject;
