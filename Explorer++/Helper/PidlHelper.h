@@ -19,6 +19,15 @@ private:
 	// to another, while doing that manually with char* is more cumbersome.
 	// The same principle applies here, with PidlBase being designed to make it easy to copy and
 	// move a pidl.
+	// Note that this class always copies a raw pidl that's passed in during
+	// construction/assignment. That means a call like:
+	//
+	// PidlAbsolute pidl(SHSimpleIDListFromPath(path));
+	//
+	// will leak memory, since a copy of the return value from SHSimpleIDListFromPath() will be made
+	// and stored. The original return value will be leaked. That's hard to prevent, since it's
+	// genuinely useful to copy a raw pidl.
+	// The TakeOwnership() function can be used to assume ownership of an existing pidl.
 	template <typename IDListType, auto CloneFunction>
 	class PidlBase
 	{
@@ -50,6 +59,11 @@ private:
 		{
 			std::swap(m_pidl, other.m_pidl);
 			return *this;
+		}
+
+		void TakeOwnership(IDListType *pidl)
+		{
+			m_pidl.reset(pidl);
 		}
 
 		bool HasValue() const
@@ -95,7 +109,7 @@ public:
 
 	~PidlOutParamType()
 	{
-		wrapper = raw;
+		wrapper.TakeOwnership(raw);
 	}
 
 private:

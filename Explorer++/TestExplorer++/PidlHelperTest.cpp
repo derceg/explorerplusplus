@@ -110,3 +110,13 @@ TEST(PidlAbsolute, OutParam)
 	EXPECT_TRUE(pidl.HasValue());
 	EXPECT_TRUE(ArePidlsEquivalent(pidl.Raw(), ownedPidl.get()));
 }
+
+TEST(PidlAbsolute, TakeOwnership)
+{
+	unique_pidl_absolute ownedPidl(SHSimpleIDListFromPath(L"C:\\"));
+	PCIDLIST_ABSOLUTE rawPidl = ownedPidl.get();
+
+	PidlAbsolute pidl;
+	pidl.TakeOwnership(ownedPidl.release());
+	EXPECT_EQ(pidl.Raw(), rawPidl);
+}
