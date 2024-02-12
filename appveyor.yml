@@ -27,13 +27,36 @@ matrix:
       platform: ARM64
 
 for:
-
 -
   branches:
     only:
       - /version-.*/
 
   skip_non_tags: true
+
+-
+  matrix:
+    only:
+      - platform: Win32
+
+  environment:
+    arch: x86
+
+-
+  matrix:
+    only:
+      - platform: x64
+
+  environment:
+    arch: x64
+
+-
+  matrix:
+    only:
+      - platform: ARM64
+
+  environment:
+    arch: arm64
 
 init:
 - ps: >-
@@ -69,37 +92,8 @@ build:
   project: Explorer++\Explorer++.sln
   verbosity: minimal
 
-# Sign and package the executable.
 after_build:
-- cmd: >-
-    cd %APPVEYOR_BUILD_FOLDER%
-
-
-    IF "%PLATFORM%" == "Win32" ( SET "arch=x86" ) ELSE IF "%PLATFORM%" == "x64" ( SET "arch=x64" ) ELSE IF "%PLATFORM%" == "ARM64" ( SET "arch=arm64" )
-
-
-    SET "archiveName=explorerpp_%arch%.zip"
-
-
-    7z a %archiveName% %APPVEYOR_BUILD_FOLDER%\Explorer++\Explorer++\%PLATFORM%\%CONFIGURATION%\Explorer++.exe
-
-    7z a %archiveName% %APPVEYOR_BUILD_FOLDER%\Documentation\User\History.txt
-
-    7z a %archiveName% %APPVEYOR_BUILD_FOLDER%\Documentation\User\License.txt
-
-    7z a %archiveName% %APPVEYOR_BUILD_FOLDER%\Documentation\User\Readme.txt
-
-
-    7z a explorerpp_%arch%_symbols.zip %APPVEYOR_BUILD_FOLDER%\Explorer++\Explorer++\%PLATFORM%\%CONFIGURATION%\Explorer++.pdb
-
-
-    IF "%CONFIGURATION%" == "Release" ( IF NOT "%PLATFORM%" == "ARM64" ( copy "%APPVEYOR_BUILD_FOLDER%\Explorer++\Installer\bin\%arch%\%CONFIGURATION%\explorerpp_%arch%_setup.msi" . ) )
-
-
-    IF "%CONFIGURATION%" == "Release" ( 7z a explorerpp_translations.zip %APPVEYOR_BUILD_FOLDER%\Explorer++\Win32\%CONFIGURATION%\Explorer++*.dll )
-
-
-    (echo.|set /p="%APPVEYOR_BUILD_VERSION%")>latest_version.txt || ver>nul
+- ps: .appveyor\after_build.ps1
 
 test_script:
 - ps: .appveyor\test_script.ps1
