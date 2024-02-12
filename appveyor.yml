@@ -1,7 +1,9 @@
 version: 1.5.0.{build}
 image: Visual Studio 2022
 
-configuration: Release
+configuration:
+- Debug-Asan
+- Release
 
 platform:
 - Win32
@@ -17,6 +19,11 @@ environment:
 cache:
   - vcpkg_installed -> vcpkg.json
   - '%LOCALAPPDATA%\vcpkg\archives -> vcpkg.json'
+
+matrix:
+  exclude:
+    - configuration: Debug-Asan
+      platform: ARM64
 
 for:
 
@@ -88,28 +95,13 @@ after_build:
     IF NOT "%PLATFORM%" == "ARM64" ( copy "%APPVEYOR_BUILD_FOLDER%\Explorer++\Installer\bin\%arch%\%CONFIGURATION%\explorerpp_%arch%_setup.msi" . )
 
 
-    7z a explorerpp_translations.zip %APPVEYOR_BUILD_FOLDER%\Explorer++\Win32\%CONFIGURATION%\Explorer++*.dll
+    IF "%CONFIGURATION%" == "Release" ( 7z a explorerpp_translations.zip %APPVEYOR_BUILD_FOLDER%\Explorer++\Win32\%CONFIGURATION%\Explorer++*.dll )
 
 
     (echo.|set /p="%APPVEYOR_BUILD_VERSION%")>latest_version.txt || ver>nul
 
 test_script:
-- ps: >-
-    if ($env:PLATFORM -ne "ARM64") {
-        cd $env:APPVEYOR_BUILD_FOLDER\Explorer++\TestExplorer++\$env:PLATFORM\$env:CONFIGURATION
-
-
-        # Run the tests.
-
-        .\TestExplorer++.exe --gtest_output=xml:TestExplorer++Output.xml
-
-
-        # Upload results to AppVeyor.
-
-        $wc = New-Object 'System.Net.WebClient'
-
-        $wc.UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\TestExplorer++Output.xml))
-    }
+- ps: .appveyor\test_script.ps1
 
 artifacts:
 - path: explorerpp_x86.zip
@@ -152,6 +144,7 @@ deploy:
     draft: true
     on:
       APPVEYOR_REPO_TAG: true
+      configuration: Release
 
   - provider: S3
     access_key_id:
@@ -165,6 +158,7 @@ deploy:
     set_content_type: true
     on:
       APPVEYOR_REPO_TAG: false
+      configuration: Release
 
   - provider: S3
     access_key_id:
@@ -179,3 +173,4 @@ deploy:
     on:
       APPVEYOR_REPO_TAG: false
       platform: ARM64
+      configuration: Release
