@@ -21,6 +21,7 @@ cache:
   - '%LOCALAPPDATA%\vcpkg\archives -> vcpkg.json'
 
 matrix:
+  fast_finish: true
   exclude:
     - configuration: Debug-Asan
       platform: ARM64
