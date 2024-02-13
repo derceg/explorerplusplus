@@ -32,7 +32,7 @@ function Get-AsanDllPath {
 }
 
 if ($env:platform -eq "ARM64") {
-    return;
+    return
 }
 
 # To be able to run the test executable when ASAN is enabled, the appropriate ASAN DLL needs to be on the path.
