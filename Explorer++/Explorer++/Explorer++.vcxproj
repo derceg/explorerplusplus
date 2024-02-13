@@ -1012,6 +1012,7 @@
     <ClCompile Include="PopupMenuView.cpp" />
     <ClCompile Include="ShellBrowserHistoryHelper.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowserHelper.cpp" />
+    <ClCompile Include="ShellEnumerator.cpp" />
     <ClCompile Include="ShellItemsMenu.cpp" />
     <ClCompile Include="SystemFontHelper.cpp" />
     <ClCompile Include="ThemeManager.cpp" />
@@ -1250,6 +1251,7 @@
     <ClInclude Include="ShellBrowser\ShellBrowserEmbedder.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserHelper.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserInterface.h" />
+    <ClInclude Include="ShellEnumerator.h" />
     <ClInclude Include="ShellItemsMenu.h" />
     <ClInclude Include="SystemFontHelper.h" />
     <ClInclude Include="ThemeManager.h" />

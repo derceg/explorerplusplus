@@ -10,6 +10,7 @@
 #include "IconFetcher.h"
 #include "ItemData.h"
 #include "MainResource.h"
+#include "ShellEnumerator.h"
 #include "ShellNavigationController.h"
 #include "ShellView.h"
 #include "ViewModes.h"
@@ -207,27 +208,20 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owne
 	wil::com_ptr_nothrow<IShellFolder> shellFolder;
 	RETURN_IF_FAILED(BindToIdl(pidlDirectory, IID_PPV_ARGS(&shellFolder)));
 
-	SHCONTF enumFlags = SHCONTF_FOLDERS | SHCONTF_NONFOLDERS;
+	ShellEnumerator::Flags flags = ShellEnumerator::Flags::Standard;
 
 	if (showHidden)
 	{
-		WI_SetAllFlags(enumFlags, SHCONTF_INCLUDEHIDDEN | SHCONTF_INCLUDESUPERHIDDEN);
+		WI_SetFlag(flags, ShellEnumerator::Flags::IncludeHidden);
 	}
 
-	wil::com_ptr_nothrow<IEnumIDList> enumerator;
-	HRESULT hr = shellFolder->EnumObjects(owner, enumFlags, &enumerator);
+	ShellEnumerator enumerator;
+	std::vector<PidlChild> outputPidls;
+	RETURN_IF_FAILED(enumerator.EnumerateDirectory(shellFolder.get(), owner, flags, outputPidls));
 
-	if (FAILED(hr) || !enumerator)
+	for (const auto &pidl : outputPidls)
 	{
-		return hr;
-	}
-
-	ULONG numFetched = 1;
-	unique_pidl_child pidlItem;
-
-	while (enumerator->Next(1, wil::out_param(pidlItem), &numFetched) == S_OK && (numFetched == 1))
-	{
-		auto item = GetItemInformation(shellFolder.get(), pidlDirectory, pidlItem.get());
+		auto item = GetItemInformation(shellFolder.get(), pidlDirectory, pidl.Raw());
 
 		if (item)
 		{
@@ -235,7 +229,7 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owne
 		}
 	}
 
-	return hr;
+	return S_OK;
 }
 
 void ShellBrowser::NotifyShellOfNavigation(PCIDLIST_ABSOLUTE pidl)
