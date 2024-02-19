@@ -18,7 +18,7 @@ public:
 	virtual int LoadPreviousTabs() = 0;
 	virtual void LoadDefaultColumns() = 0;
 	virtual void LoadApplicationToolbar() = 0;
-	virtual void LoadToolbarInformation() = 0;
+	virtual void LoadMainRebarInformation() = 0;
 	virtual void LoadColorRules() = 0;
 	virtual void LoadDialogStates() = 0;
 
@@ -28,7 +28,7 @@ public:
 	virtual void SaveTabs() = 0;
 	virtual void SaveDefaultColumns() = 0;
 	virtual void SaveApplicationToolbar() = 0;
-	virtual void SaveToolbarInformation() = 0;
+	virtual void SaveMainRebarInformation() = 0;
 	virtual void SaveColorRules() = 0;
 	virtual void SaveDialogStates() = 0;
 };

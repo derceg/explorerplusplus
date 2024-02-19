@@ -19,6 +19,8 @@
 #include "CustomFontStorage.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"
+#include "MainRebarStorage.h"
+#include "MainRebarXmlStorage.h"
 #include "MainToolbar.h"
 #include "ShellBrowser/Columns.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -1325,127 +1327,15 @@ void Explorerplusplus::SaveWindowPositionToXMLInternal(IXMLDOMDocument *pXMLDom,
 		NXMLSettings::EncodeIntValue(wndpl.rcNormalPosition.bottom));
 }
 
-void Explorerplusplus::LoadToolbarInformationFromXML(IXMLDOMDocument *pXMLDom)
+void Explorerplusplus::LoadMainRebarInformationFromXML(IXMLDOMDocument *pXMLDom)
 {
-	if (!pXMLDom)
-	{
-		return;
-	}
-
-	wil::com_ptr_nothrow<IXMLDOMNodeList> pNodes;
-	auto bstr = wil::make_bstr_nothrow(L"//Toolbars/*");
-	pXMLDom->selectNodes(bstr.get(), &pNodes);
-
-	if (!pNodes)
-	{
-		return;
-	}
-
-	long length;
-	pNodes->get_length(&length);
-
-	for (long i = 0; i < length; i++)
-	{
-		/* This should never fail, as the number
-		of nodes has already been counted (so
-		they must exist). */
-		wil::com_ptr_nothrow<IXMLDOMNode> pNode;
-		HRESULT hr = pNodes->get_item(i, &pNode);
-
-		if (SUCCEEDED(hr))
-		{
-			wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
-			hr = pNode->get_attributes(&am);
-
-			if (SUCCEEDED(hr))
-			{
-				BOOL bUseChevron = FALSE;
-
-				if (m_ToolbarInformation[i].fStyle & RBBS_USECHEVRON)
-					bUseChevron = TRUE;
-
-				long lChildNodes;
-				am->get_length(&lChildNodes);
-
-				/* For each tab, the first attribute will just be
-				a toolbar number (0,1,2...). This number can be safely
-				ignored. */
-				for (long j = 1; j < lChildNodes; j++)
-				{
-					wil::com_ptr_nothrow<IXMLDOMNode> pChildNode;
-					am->get_item(j, &pChildNode);
-
-					wil::unique_bstr bstrName;
-					pChildNode->get_nodeName(&bstrName);
-
-					wil::unique_bstr bstrValue;
-					pChildNode->get_text(&bstrValue);
-
-					if (lstrcmp(bstrName.get(), L"id") == 0)
-					{
-						m_ToolbarInformation[i].wID = NXMLSettings::DecodeIntValue(bstrValue.get());
-					}
-					else if (lstrcmp(bstrName.get(), L"Style") == 0)
-					{
-						m_ToolbarInformation[i].fStyle =
-							NXMLSettings::DecodeIntValue(bstrValue.get());
-					}
-					else if (lstrcmp(bstrName.get(), L"Length") == 0)
-					{
-						m_ToolbarInformation[i].cx = NXMLSettings::DecodeIntValue(bstrValue.get());
-					}
-				}
-
-				if (bUseChevron)
-					m_ToolbarInformation[i].fStyle |= RBBS_USECHEVRON;
-			}
-		}
-	}
+	m_loadedRebarStorageInfo = MainRebarXmlStorage::Load(pXMLDom);
 }
 
-void Explorerplusplus::SaveToolbarInformationToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
+void Explorerplusplus::SaveMainRebarInformationToXML(IXMLDOMDocument *pXMLDom,
+	IXMLDOMElement *pRoot)
 {
-	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pRoot);
-
-	wil::com_ptr_nothrow<IXMLDOMElement> pe;
-	auto bstr = wil::make_bstr_nothrow(L"Toolbars");
-	pXMLDom->createElement(bstr.get(), &pe);
-
-	SaveToolbarInformationToXMLnternal(pXMLDom, pe.get());
-
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pe.get());
-
-	NXMLSettings::AppendChildToParent(pe.get(), pRoot);
-}
-
-void Explorerplusplus::SaveToolbarInformationToXMLnternal(IXMLDOMDocument *pXMLDom,
-	IXMLDOMElement *pe)
-{
-	int nBands = (int) SendMessage(m_hMainRebar, RB_GETBANDCOUNT, 0, 0);
-	auto bstr_wsntt = wil::make_bstr_nothrow(L"\n\t\t");
-
-	for (int i = 0; i < nBands; i++)
-	{
-		NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe);
-
-		REBARBANDINFO rbi;
-		rbi.cbSize = sizeof(rbi);
-		rbi.fMask = RBBIM_ID | RBBIM_CHILD | RBBIM_SIZE | RBBIM_STYLE;
-		SendMessage(m_hMainRebar, RB_GETBANDINFO, i, (LPARAM) &rbi);
-
-		wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
-		TCHAR szNodeName[32];
-		StringCchPrintf(szNodeName, SIZEOF_ARRAY(szNodeName), _T("%d"), i);
-		NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe, _T("Toolbar"), szNodeName);
-
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("id"),
-			NXMLSettings::EncodeIntValue(rbi.wID));
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Style"),
-			NXMLSettings::EncodeIntValue(rbi.fStyle));
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Length"),
-			NXMLSettings::EncodeIntValue(rbi.cx));
-	}
+	MainRebarXmlStorage::Save(pXMLDom, pRoot, GetMainRebarStorageInfo());
 }
 
 unsigned long hash_setting(unsigned char *str)

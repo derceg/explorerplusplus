@@ -604,6 +604,12 @@
     <ClCompile Include="ShellEnumerator.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="MainRebarRegistryStorage.cpp">
+      <Filter>Main Rebar</Filter>
+    </ClCompile>
+    <ClCompile Include="MainRebarXmlStorage.cpp">
+      <Filter>Main Rebar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1236,6 +1242,15 @@
     <ClInclude Include="ShellEnumerator.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="MainRebarRegistryStorage.h">
+      <Filter>Main Rebar</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRebarStorage.h">
+      <Filter>Main Rebar</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRebarXmlStorage.h">
+      <Filter>Main Rebar</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1379,6 +1394,9 @@
     </Filter>
     <Filter Include="History">
       <UniqueIdentifier>{415a5098-0a21-44a5-9850-90e513b38ed4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main Rebar">
+      <UniqueIdentifier>{fceed596-dd83-4bb7-8b00-39f8e546a708}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

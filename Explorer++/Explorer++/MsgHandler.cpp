@@ -72,7 +72,7 @@ BOOL TestConfigFileInternal()
 	return bLoadSettingsFromXML;
 }
 
-void Explorerplusplus::LoadAllSettings(ILoadSave **pLoadSave)
+std::unique_ptr<ILoadSave> Explorerplusplus::LoadAllSettings()
 {
 	/* Tests for the existence of the configuration
 	file. If the file is present, a flag is set
@@ -80,13 +80,15 @@ void Explorerplusplus::LoadAllSettings(ILoadSave **pLoadSave)
 	to load settings. */
 	TestConfigFile();
 
+	std::unique_ptr<ILoadSave> loadSave;
+
 	/* Initialize the LoadSave interface. Note
 	that this interface must be regenerated when
 	saving, as it's possible for the save/load
 	methods to be different. */
 	if (m_bLoadSettingsFromXML)
 	{
-		*pLoadSave = new LoadSaveXML(this, TRUE);
+		loadSave = std::make_unique<LoadSaveXML>(this, TRUE);
 
 		/* When loading from the config file, also
 		set the option to save back to it on exit. */
@@ -94,18 +96,20 @@ void Explorerplusplus::LoadAllSettings(ILoadSave **pLoadSave)
 	}
 	else
 	{
-		*pLoadSave = new LoadSaveRegistry(this);
+		loadSave = std::make_unique<LoadSaveRegistry>(this);
 	}
 
-	(*pLoadSave)->LoadBookmarks();
-	(*pLoadSave)->LoadGenericSettings();
-	(*pLoadSave)->LoadDefaultColumns();
-	(*pLoadSave)->LoadApplicationToolbar();
-	(*pLoadSave)->LoadToolbarInformation();
-	(*pLoadSave)->LoadColorRules();
-	(*pLoadSave)->LoadDialogStates();
+	loadSave->LoadBookmarks();
+	loadSave->LoadGenericSettings();
+	loadSave->LoadDefaultColumns();
+	loadSave->LoadApplicationToolbar();
+	loadSave->LoadMainRebarInformation();
+	loadSave->LoadColorRules();
+	loadSave->LoadDialogStates();
 
 	ValidateLoadedSettings();
+
+	return loadSave;
 }
 
 void Explorerplusplus::OpenItem(const std::wstring &itemPath,
@@ -793,31 +797,46 @@ void Explorerplusplus::OnFocusNextWindow(FocusChangeDirection direction)
 
 void Explorerplusplus::OnLockToolbars()
 {
-	REBARBANDINFO rbbi;
-	UINT nBands;
-	UINT i = 0;
-
 	m_config->lockToolbars = !m_config->lockToolbars;
 
-	nBands = (UINT) SendMessage(m_hMainRebar, RB_GETBANDCOUNT, 0, 0);
+	auto numBands = static_cast<UINT>(SendMessage(m_hMainRebar, RB_GETBANDCOUNT, 0, 0));
 
-	for (i = 0; i < nBands; i++)
+	for (UINT i = 0; i < numBands; i++)
 	{
-		/* First, retrieve the current style for this band. */
-		rbbi.cbSize = sizeof(REBARBANDINFO);
-		rbbi.fMask = RBBIM_STYLE;
-		SendMessage(m_hMainRebar, RB_GETBANDINFO, i, (LPARAM) &rbbi);
+		REBARBANDINFO bandInfo = {};
+		bandInfo.cbSize = sizeof(REBARBANDINFO);
+		bandInfo.fMask = RBBIM_STYLE;
+		auto res =
+			SendMessage(m_hMainRebar, RB_GETBANDINFO, i, reinterpret_cast<LPARAM>(&bandInfo));
 
-		/* Add the gripper style. */
-		AddGripperStyle(&rbbi.fStyle, !m_config->lockToolbars);
+		if (!res)
+		{
+			DCHECK(false);
+			continue;
+		}
 
-		/* Now, set the new style. */
-		SendMessage(m_hMainRebar, RB_SETBANDINFO, i, (LPARAM) &rbbi);
+		// Without this, the control won't correctly update once the gripper has been added or
+		// removed. That is, the control won't add or remove the space for the gripper. By toggling
+		// the RBBS_GRIPPERALWAYS style, adding or removing the gripper will work as expected. WTL
+		// also does this when toggling the gripper - see
+		// https://sourceforge.net/p/wtl/git/ci/faa1f28fb7fe9277532ed563101b489655b40131/tree/Include/atlctrls.h#l8604.
+		WI_SetFlag(bandInfo.fStyle, RBBS_GRIPPERALWAYS);
+		res = SendMessage(m_hMainRebar, RB_SETBANDINFO, i, reinterpret_cast<LPARAM>(&bandInfo));
+		DCHECK(res);
+		WI_ClearFlag(bandInfo.fStyle, RBBS_GRIPPERALWAYS);
+
+		if (m_config->lockToolbars)
+		{
+			WI_SetFlag(bandInfo.fStyle, RBBS_NOGRIPPER);
+		}
+		else
+		{
+			WI_ClearFlag(bandInfo.fStyle, RBBS_NOGRIPPER);
+		}
+
+		res = SendMessage(m_hMainRebar, RB_SETBANDINFO, i, reinterpret_cast<LPARAM>(&bandInfo));
+		DCHECK(res);
 	}
-
-	/* If the rebar is locked, prevent items from
-	been rearranged. */
-	AddWindowStyle(m_hMainRebar, RBS_FIXEDORDER, m_config->lockToolbars);
 }
 
 void Explorerplusplus::OnAppCommand(UINT cmd)
@@ -1144,23 +1163,25 @@ void Explorerplusplus::SaveAllSettings()
 {
 	m_iLastSelectedTab = GetActivePane()->GetTabContainer()->GetSelectedTabIndex();
 
-	ILoadSave *pLoadSave = nullptr;
+	std::unique_ptr<ILoadSave> loadSave;
 
 	if (m_bSavePreferencesToXMLFile)
-		pLoadSave = new LoadSaveXML(this, FALSE);
+	{
+		loadSave = std::make_unique<LoadSaveXML>(this, FALSE);
+	}
 	else
-		pLoadSave = new LoadSaveRegistry(this);
+	{
+		loadSave = std::make_unique<LoadSaveRegistry>(this);
+	}
 
-	pLoadSave->SaveGenericSettings();
-	pLoadSave->SaveTabs();
-	pLoadSave->SaveDefaultColumns();
-	pLoadSave->SaveBookmarks();
-	pLoadSave->SaveApplicationToolbar();
-	pLoadSave->SaveToolbarInformation();
-	pLoadSave->SaveColorRules();
-	pLoadSave->SaveDialogStates();
-
-	delete pLoadSave;
+	loadSave->SaveGenericSettings();
+	loadSave->SaveTabs();
+	loadSave->SaveDefaultColumns();
+	loadSave->SaveBookmarks();
+	loadSave->SaveApplicationToolbar();
+	loadSave->SaveMainRebarInformation();
+	loadSave->SaveColorRules();
+	loadSave->SaveDialogStates();
 }
 
 const Config *Explorerplusplus::GetConfig() const

@@ -153,9 +153,9 @@ void LoadSaveXML::LoadApplicationToolbar()
 		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
 }
 
-void LoadSaveXML::LoadToolbarInformation()
+void LoadSaveXML::LoadMainRebarInformation()
 {
-	m_pContainer->LoadToolbarInformationFromXML(m_pXMLDom.get());
+	m_pContainer->LoadMainRebarInformationFromXML(m_pXMLDom.get());
 }
 
 void LoadSaveXML::LoadColorRules()
@@ -196,9 +196,9 @@ void LoadSaveXML::SaveApplicationToolbar()
 		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
 }
 
-void LoadSaveXML::SaveToolbarInformation()
+void LoadSaveXML::SaveMainRebarInformation()
 {
-	m_pContainer->SaveToolbarInformationToXML(m_pXMLDom.get(), m_pRoot.get());
+	m_pContainer->SaveMainRebarInformationToXML(m_pXMLDom.get(), m_pRoot.get());
 }
 
 void LoadSaveXML::SaveColorRules()

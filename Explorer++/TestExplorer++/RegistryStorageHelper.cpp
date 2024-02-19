@@ -5,8 +5,16 @@
 #include "pch.h"
 #include "RegistryStorageHelper.h"
 #include "ResourceHelper.h"
+#include <wil/registry.h>
 #include <Shlwapi.h>
 #include <shellapi.h>
+
+void RegistryStorageTest::SetUp()
+{
+	HRESULT hr = wil::reg::create_unique_key_nothrow(HKEY_CURRENT_USER,
+		APPLICATION_TEST_KEY.c_str(), m_applicationTestKey, wil::reg::key_access::readwrite);
+	ASSERT_HRESULT_SUCCEEDED(hr);
+}
 
 void RegistryStorageTest::TearDown()
 {

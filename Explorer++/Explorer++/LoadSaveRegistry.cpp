@@ -15,6 +15,7 @@
 #include "ColorRuleRegistryStorage.h"
 #include "DialogHelper.h"
 #include "Explorer++_internal.h"
+#include <wil/registry.h>
 
 LoadSaveRegistry::LoadSaveRegistry(Explorerplusplus *pContainer) : m_pContainer(pContainer)
 {
@@ -47,9 +48,16 @@ void LoadSaveRegistry::LoadApplicationToolbar()
 		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
 }
 
-void LoadSaveRegistry::LoadToolbarInformation()
+void LoadSaveRegistry::LoadMainRebarInformation()
 {
-	m_pContainer->LoadToolbarInformationFromRegistry();
+	wil::unique_hkey mainKey;
+	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER,
+		NExplorerplusplus::REG_MAIN_KEY, mainKey, wil::reg::key_access::read);
+
+	if (SUCCEEDED(hr))
+	{
+		m_pContainer->LoadMainRebarInformationFromRegistry(mainKey.get());
+	}
 }
 
 void LoadSaveRegistry::LoadColorRules()
@@ -90,9 +98,16 @@ void LoadSaveRegistry::SaveApplicationToolbar()
 		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
 }
 
-void LoadSaveRegistry::SaveToolbarInformation()
+void LoadSaveRegistry::SaveMainRebarInformation()
 {
-	m_pContainer->SaveToolbarInformationToRegistry();
+	wil::unique_hkey mainKey;
+	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER,
+		NExplorerplusplus::REG_MAIN_KEY, mainKey, wil::reg::key_access::readwrite);
+
+	if (SUCCEEDED(hr))
+	{
+		m_pContainer->SaveMainRebarInformationToRegistry(mainKey.get());
+	}
 }
 
 void LoadSaveRegistry::SaveColorRules()

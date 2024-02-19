@@ -207,6 +207,9 @@
     <ClCompile Include="GdiplusHelperTest.cpp" />
     <ClCompile Include="HelperTest.cpp" />
     <ClCompile Include="HistoryMenuTest.cpp" />
+    <ClCompile Include="MainRebarRegistryStorageTest.cpp" />
+    <ClCompile Include="MainRebarStorageHelper.cpp" />
+    <ClCompile Include="MainRebarXmlStorageTest.cpp" />
     <ClCompile Include="ShellBrowserHistoryHelperTest.cpp" />
     <ClCompile Include="ManifestTest.cpp" />
     <ClCompile Include="MovableModelTest.cpp" />
@@ -251,6 +254,7 @@
     <ClInclude Include="BookmarkTreeHelper.h" />
     <ClInclude Include="ColorRulesStorageHelper.h" />
     <ClInclude Include="IconFetcherMock.h" />
+    <ClInclude Include="MainRebarStorageHelper.h" />
     <ClInclude Include="MovableModelHelper.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RegistryStorageHelper.h" />

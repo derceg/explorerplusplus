@@ -9,6 +9,8 @@
 #include "DefaultColumns.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"
+#include "MainRebarRegistryStorage.h"
+#include "MainRebarStorage.h"
 #include "MainToolbar.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
@@ -20,7 +22,6 @@ using namespace std::string_literals;
 namespace
 {
 const TCHAR REG_TABS_KEY[] = _T("Software\\Explorer++\\Tabs");
-const TCHAR REG_TOOLBARS_KEY[] = _T("Software\\Explorer++\\Toolbars");
 const TCHAR REG_COLUMNS_KEY[] = _T("Software\\Explorer++\\DefaultColumns");
 const TCHAR REG_MAIN_FONT_KEY_NAME[] = _T("MainFont");
 }
@@ -1096,99 +1097,12 @@ void Explorerplusplus::LoadDefaultColumnsFromRegistry()
 	}
 }
 
-void Explorerplusplus::SaveToolbarInformationToRegistry()
+void Explorerplusplus::LoadMainRebarInformationFromRegistry(HKEY mainKey)
 {
-	HKEY hKey;
-	HKEY hToolbarKey;
-	REBARBANDINFO rbi;
-	TCHAR szItemKey[128];
-	DWORD disposition;
-	LONG returnValue;
-	int nBands = 0;
-	int i = 0;
-
-	/* First, delete any current rebar key. */
-	SHDeleteKey(HKEY_CURRENT_USER, REG_TOOLBARS_KEY);
-
-	returnValue = RegCreateKeyEx(HKEY_CURRENT_USER, REG_TOOLBARS_KEY, 0, nullptr,
-		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &hKey, &disposition);
-
-	if (returnValue == ERROR_SUCCESS)
-	{
-		nBands = (int) SendMessage(m_hMainRebar, RB_GETBANDCOUNT, 0, 0);
-
-		/* Use RBBIM_ID to map between windows and bands. */
-		for (i = 0; i < nBands; i++)
-		{
-			StringCchPrintf(szItemKey, SIZEOF_ARRAY(szItemKey), _T("%d"), i);
-
-			returnValue = RegCreateKeyEx(hKey, szItemKey, 0, nullptr, REG_OPTION_NON_VOLATILE,
-				KEY_WRITE, nullptr, &hToolbarKey, &disposition);
-
-			if (returnValue == ERROR_SUCCESS)
-			{
-				rbi.cbSize = sizeof(rbi);
-				rbi.fMask = RBBIM_ID | RBBIM_CHILD | RBBIM_SIZE | RBBIM_STYLE;
-				SendMessage(m_hMainRebar, RB_GETBANDINFO, i, (LPARAM) &rbi);
-
-				RegistrySettings::SaveDword(hToolbarKey, _T("id"), rbi.wID);
-				RegistrySettings::SaveDword(hToolbarKey, _T("Style"), rbi.fStyle);
-				RegistrySettings::SaveDword(hToolbarKey, _T("Length"), rbi.cx);
-
-				RegCloseKey(hToolbarKey);
-			}
-		}
-
-		RegCloseKey(hKey);
-	}
+	m_loadedRebarStorageInfo = MainRebarRegistryStorage::Load(mainKey);
 }
 
-void Explorerplusplus::LoadToolbarInformationFromRegistry()
+void Explorerplusplus::SaveMainRebarInformationToRegistry(HKEY mainKey)
 {
-	HKEY hKey;
-	HKEY hToolbarKey;
-	TCHAR szItemKey[128];
-	LONG deturnValue;
-	int i = 0;
-
-	deturnValue = RegOpenKeyEx(HKEY_CURRENT_USER, REG_TOOLBARS_KEY, 0, KEY_READ, &hKey);
-
-	if (deturnValue == ERROR_SUCCESS)
-	{
-		StringCchPrintf(szItemKey, SIZEOF_ARRAY(szItemKey), _T("%d"), i);
-
-		deturnValue = RegOpenKeyEx(hKey, szItemKey, 0, KEY_READ, &hToolbarKey);
-
-		while (deturnValue == ERROR_SUCCESS)
-		{
-			BOOL bUseChevron = FALSE;
-
-			if (m_ToolbarInformation[i].fStyle & RBBS_USECHEVRON)
-			{
-				bUseChevron = TRUE;
-			}
-
-			RegistrySettings::Read32BitValueFromRegistry(hToolbarKey, _T("id"),
-				m_ToolbarInformation[i].wID);
-			RegistrySettings::Read32BitValueFromRegistry(hToolbarKey, _T("Style"),
-				m_ToolbarInformation[i].fStyle);
-			RegistrySettings::Read32BitValueFromRegistry(hToolbarKey, _T("Length"),
-				m_ToolbarInformation[i].cx);
-
-			if (bUseChevron)
-			{
-				m_ToolbarInformation[i].fStyle |= RBBS_USECHEVRON;
-			}
-
-			RegCloseKey(hToolbarKey);
-
-			i++;
-
-			StringCchPrintf(szItemKey, SIZEOF_ARRAY(szItemKey), _T("%d"), i);
-
-			deturnValue = RegOpenKeyEx(hKey, szItemKey, 0, KEY_READ, &hToolbarKey);
-		}
-
-		RegCloseKey(hKey);
-	}
+	MainRebarRegistryStorage::Save(mainKey, GetMainRebarStorageInfo());
 }

@@ -38,12 +38,9 @@
  */
 void Explorerplusplus::OnCreate()
 {
-	InitializeMainToolbars();
 	InitializeDefaultColorRules();
 
-	ILoadSave *pLoadSave = nullptr;
-	LoadAllSettings(&pLoadSave);
-	ApplyToolbarSettings();
+	auto loadSave = LoadAllSettings();
 
 	if (m_commandLineSettings.shellChangeNotificationType)
 	{
@@ -68,7 +65,7 @@ void Explorerplusplus::OnCreate()
 	CreateDirectoryMonitor(&m_pDirMon);
 
 	CreateStatusBar();
-	CreateMainControls();
+	CreateMainRebarAndChildren();
 	InitializeDisplayWindow();
 	InitializeTabs();
 	CreateFolderControls();
@@ -86,8 +83,7 @@ void Explorerplusplus::OnCreate()
 	m_taskbarThumbnails = TaskbarThumbnails::Create(this, GetActivePane()->GetTabContainer(),
 		m_resourceInstance, m_config);
 
-	RestoreTabs(pLoadSave);
-	delete pLoadSave;
+	RestoreTabs(loadSave.get());
 
 	// Register for any shell changes. This should be done after the tabs have
 	// been created.

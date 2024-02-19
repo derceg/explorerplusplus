@@ -11,6 +11,7 @@
 #include "Explorer++_internal.h"
 #include "FeatureList.h"
 #include "MainFontSetter.h"
+#include "MainRebarStorage.h"
 #include "MenuRanges.h"
 #include "Plugins/PluginManager.h"
 #include "ShellBrowserHistoryHelper.h"

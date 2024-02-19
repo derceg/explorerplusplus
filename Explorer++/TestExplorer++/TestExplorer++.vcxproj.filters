@@ -124,6 +124,15 @@
     <ClCompile Include="ShellBrowserHistoryHelperTest.cpp">
       <Filter>History</Filter>
     </ClCompile>
+    <ClCompile Include="MainRebarRegistryStorageTest.cpp">
+      <Filter>Main Rebar</Filter>
+    </ClCompile>
+    <ClCompile Include="MainRebarStorageHelper.cpp">
+      <Filter>Main Rebar</Filter>
+    </ClCompile>
+    <ClCompile Include="MainRebarXmlStorageTest.cpp">
+      <Filter>Main Rebar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -183,6 +192,9 @@
     <Filter Include="History">
       <UniqueIdentifier>{e02a8fdc-5c31-4cb1-9bd5-c1f3d9450e51}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Main Rebar">
+      <UniqueIdentifier>{37c140aa-7806-46a2-b067-48685d705ce9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -221,6 +233,9 @@
     </ClInclude>
     <ClInclude Include="ShellBrowserFake.h">
       <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRebarStorageHelper.h">
+      <Filter>Main Rebar</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

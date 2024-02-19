@@ -149,53 +149,6 @@ void Explorerplusplus::ApplyDisplayWindowPosition()
 		NULL);
 }
 
-void Explorerplusplus::ApplyToolbarSettings()
-{
-	BOOL bVisible = FALSE;
-	int i = 0;
-
-	/* Set the state of the toolbars contained within
-	the main rebar. */
-	for (i = 0; i < NUM_MAIN_TOOLBARS; i++)
-	{
-		switch (m_ToolbarInformation[i].wID)
-		{
-		case ID_MAINTOOLBAR:
-			bVisible = m_config->showMainToolbar;
-			break;
-
-		case ID_ADDRESSTOOLBAR:
-			bVisible = m_config->showAddressBar;
-			break;
-
-		case ID_BOOKMARKSTOOLBAR:
-			bVisible = m_config->showBookmarksToolbar;
-			break;
-
-		case ID_DRIVESTOOLBAR:
-			bVisible = m_config->showDrivesToolbar;
-			break;
-
-		case ID_APPLICATIONSTOOLBAR:
-			bVisible = m_config->showApplicationToolbar;
-			break;
-		}
-
-		if (!bVisible)
-		{
-			AddStyleToToolbar(&m_ToolbarInformation[i].fStyle, RBBS_HIDDEN);
-		}
-	}
-
-	if (m_config->lockToolbars)
-	{
-		for (i = 0; i < NUM_MAIN_TOOLBARS; i++)
-		{
-			AddStyleToToolbar(&m_ToolbarInformation[i].fStyle, RBBS_NOGRIPPER);
-		}
-	}
-}
-
 void Explorerplusplus::CopyToFolder(bool move)
 {
 	if (ListView_GetSelectedCount(m_hActiveListView) == 0)

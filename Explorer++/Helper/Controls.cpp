@@ -212,14 +212,6 @@ BOOL lCheckDlgButton(HWND hDlg, int buttonId, BOOL bCheck)
 	return CheckDlgButton(hDlg, buttonId, uCheck);
 }
 
-void AddStyleToToolbar(UINT *fStyle, UINT fStyleToAdd)
-{
-	if ((*fStyle & fStyleToAdd) != fStyleToAdd)
-	{
-		*fStyle |= fStyleToAdd;
-	}
-}
-
 // It appears that changing the font size in a toolbar doesn't result in the layout being correctly
 // updated. For example, the width of a button won't change, which will cause the text for the
 // button to be cut off if the font size is increased. Also, the toolbar height doesn't always seen
@@ -288,36 +280,6 @@ void RefreshToolbarAfterFontOrDpiChange(HWND toolbar)
 		}
 
 		index++;
-	}
-}
-
-void AddGripperStyle(UINT *fStyle, BOOL bAddGripper)
-{
-	if (bAddGripper)
-	{
-		/* Remove the no-gripper style (if present). */
-		if ((*fStyle & RBBS_NOGRIPPER) == RBBS_NOGRIPPER)
-		{
-			*fStyle &= ~RBBS_NOGRIPPER;
-		}
-
-		/* Only add the gripper style if it isn't already present. */
-		if ((*fStyle & RBBS_GRIPPERALWAYS) != RBBS_GRIPPERALWAYS)
-		{
-			*fStyle |= RBBS_GRIPPERALWAYS;
-		}
-	}
-	else
-	{
-		if ((*fStyle & RBBS_GRIPPERALWAYS) == RBBS_GRIPPERALWAYS)
-		{
-			*fStyle &= ~RBBS_GRIPPERALWAYS;
-		}
-
-		if ((*fStyle & RBBS_NOGRIPPER) != RBBS_NOGRIPPER)
-		{
-			*fStyle |= RBBS_NOGRIPPER;
-		}
 	}
 }
 

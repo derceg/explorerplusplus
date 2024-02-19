@@ -18,6 +18,7 @@
 #include "DrivesToolbar.h"
 #include "DrivesToolbarView.h"
 #include "Explorer++_internal.h"
+#include "MainRebarStorage.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
 #include "ShellBrowser/ShellBrowser.h"
@@ -27,192 +28,181 @@
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowHelper.h"
 
-LRESULT CALLBACK RebarSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-	UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-
-DWORD RebarStyles = WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_BORDER
-	| CCS_NODIVIDER | CCS_TOP | CCS_NOPARENTALIGN | RBS_BANDBORDERS | RBS_VARHEIGHT;
-
-void Explorerplusplus::InitializeMainToolbars()
+void Explorerplusplus::CreateMainRebarAndChildren()
 {
-	/* Initialize the main toolbar styles and settings here. The visibility and gripper
-	styles will be set after the settings have been loaded (needed to keep compatibility
-	with versions older than 0.9.5.4). */
-	m_ToolbarInformation[0].wID = ID_MAINTOOLBAR;
-	m_ToolbarInformation[0].fMask =
-		RBBIM_ID | RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_IDEALSIZE | RBBIM_STYLE;
-	m_ToolbarInformation[0].fStyle = RBBS_BREAK | RBBS_USECHEVRON;
-	m_ToolbarInformation[0].cx = 0;
-	m_ToolbarInformation[0].cxIdeal = 0;
-	m_ToolbarInformation[0].cxMinChild = 0;
-	m_ToolbarInformation[0].cyIntegral = 0;
-	m_ToolbarInformation[0].cxHeader = 0;
-	m_ToolbarInformation[0].lpText = nullptr;
+	m_hMainRebar = CreateWindowEx(WS_EX_CONTROLPARENT, REBARCLASSNAME, L"",
+		WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_BORDER | CCS_NODIVIDER
+			| CCS_TOP | CCS_NOPARENTALIGN | RBS_BANDBORDERS | RBS_VARHEIGHT,
+		0, 0, 0, 0, m_hContainer, nullptr, GetModuleHandle(nullptr), nullptr);
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hMainRebar,
+		std::bind_front(&Explorerplusplus::RebarSubclass, this)));
 
-	m_ToolbarInformation[1].wID = ID_ADDRESSTOOLBAR;
-	m_ToolbarInformation[1].fMask =
-		RBBIM_ID | RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_STYLE;
-	m_ToolbarInformation[1].fStyle = RBBS_BREAK;
-	m_ToolbarInformation[1].cx = 0;
-	m_ToolbarInformation[1].cxIdeal = 0;
-	m_ToolbarInformation[1].cxMinChild = 0;
-	m_ToolbarInformation[1].cyIntegral = 0;
-	m_ToolbarInformation[1].cxHeader = 0;
-	m_ToolbarInformation[1].lpText = nullptr;
+	auto bands = InitializeMainRebarBands();
 
-	m_ToolbarInformation[2].wID = ID_BOOKMARKSTOOLBAR;
-	m_ToolbarInformation[2].fMask =
-		RBBIM_ID | RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_IDEALSIZE | RBBIM_STYLE;
-	m_ToolbarInformation[2].fStyle = RBBS_BREAK | RBBS_USECHEVRON;
-	m_ToolbarInformation[2].cx = 0;
-	m_ToolbarInformation[2].cxIdeal = 0;
-	m_ToolbarInformation[2].cxMinChild = 0;
-	m_ToolbarInformation[2].cyIntegral = 0;
-	m_ToolbarInformation[2].cxHeader = 0;
-	m_ToolbarInformation[2].lpText = nullptr;
-
-	m_ToolbarInformation[3].wID = ID_DRIVESTOOLBAR;
-	m_ToolbarInformation[3].fMask =
-		RBBIM_ID | RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_IDEALSIZE | RBBIM_STYLE;
-	m_ToolbarInformation[3].fStyle = RBBS_BREAK | RBBS_USECHEVRON;
-	m_ToolbarInformation[3].cx = 0;
-	m_ToolbarInformation[3].cxIdeal = 0;
-	m_ToolbarInformation[3].cxMinChild = 0;
-	m_ToolbarInformation[3].cyIntegral = 0;
-	m_ToolbarInformation[3].cxHeader = 0;
-	m_ToolbarInformation[3].lpText = nullptr;
-
-	m_ToolbarInformation[4].wID = ID_APPLICATIONSTOOLBAR;
-	m_ToolbarInformation[4].fMask =
-		RBBIM_ID | RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_IDEALSIZE | RBBIM_STYLE;
-	m_ToolbarInformation[4].fStyle = RBBS_BREAK | RBBS_USECHEVRON;
-	m_ToolbarInformation[4].cx = 0;
-	m_ToolbarInformation[4].cxIdeal = 0;
-	m_ToolbarInformation[4].cxMinChild = 0;
-	m_ToolbarInformation[4].cyIntegral = 0;
-	m_ToolbarInformation[4].cxHeader = 0;
-	m_ToolbarInformation[4].lpText = nullptr;
+	for (const auto &band : bands)
+	{
+		InsertMainRebarBand(band);
+	}
 }
 
-void Explorerplusplus::CreateMainControls()
+std::vector<Explorerplusplus::InternalRebarBandInfo> Explorerplusplus::InitializeMainRebarBands()
 {
-	SIZE sz;
-	RECT rc;
-	DWORD toolbarSize;
-	int i = 0;
+	std::vector<InternalRebarBandInfo> mainRebarBands;
 
-	/* If the rebar is locked, prevent bands from
-	been rearranged. */
-	if (m_config->lockToolbars)
+	CreateMainToolbar();
+	auto internalBandInfo = InitializeToolbarBand(REBAR_BAND_ID_MAIN_TOOLBAR,
+		m_mainToolbar->GetHWND(), m_config->showMainToolbar);
+	mainRebarBands.push_back(internalBandInfo);
+
+	CreateAddressBar();
+	internalBandInfo = InitializeNonToolbarBand(REBAR_BAND_ID_ADDRESS_BAR, m_addressBar->GetHWND(),
+		m_config->showAddressBar);
+	mainRebarBands.push_back(internalBandInfo);
+
+	CreateBookmarksToolbar();
+	internalBandInfo = InitializeToolbarBand(REBAR_BAND_ID_BOOKMARKS_TOOLBAR,
+		m_bookmarksToolbar->GetView()->GetHWND(), m_config->showBookmarksToolbar);
+	mainRebarBands.push_back(internalBandInfo);
+
+	CreateDrivesToolbar();
+	internalBandInfo = InitializeToolbarBand(REBAR_BAND_ID_DRIVES_TOOLBAR,
+		m_drivesToolbar->GetView()->GetHWND(), m_config->showDrivesToolbar);
+	mainRebarBands.push_back(internalBandInfo);
+
+	CreateApplicationToolbar();
+	internalBandInfo = InitializeToolbarBand(REBAR_BAND_ID_APPLICATIONS_TOOLBAR,
+		m_applicationToolbar->GetView()->GetHWND(), m_config->showApplicationToolbar);
+	mainRebarBands.push_back(internalBandInfo);
+
+	UpdateMainRebarBandsFromLoadedInfo(mainRebarBands);
+
+	return mainRebarBands;
+}
+
+Explorerplusplus::InternalRebarBandInfo Explorerplusplus::InitializeToolbarBand(UINT id,
+	HWND toolbar, bool showBand)
+{
+	auto toolbarSize = static_cast<DWORD>(SendMessage(toolbar, TB_GETBUTTONSIZE, 0, 0));
+
+	SIZE size;
+	auto res = SendMessage(toolbar, TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&size));
+	DCHECK(res);
+
+	InternalRebarBandInfo internalBandInfo = {};
+	internalBandInfo.id = id;
+	internalBandInfo.child = toolbar;
+	internalBandInfo.height = HIWORD(toolbarSize);
+	internalBandInfo.newLine = true;
+	internalBandInfo.useChevron = true;
+	internalBandInfo.showBand = showBand;
+	internalBandInfo.idealLength = size.cx;
+	return internalBandInfo;
+}
+
+Explorerplusplus::InternalRebarBandInfo Explorerplusplus::InitializeNonToolbarBand(UINT id,
+	HWND child, bool showBand)
+{
+	RECT rect;
+	auto res = GetWindowRect(child, &rect);
+	DCHECK(res);
+
+	InternalRebarBandInfo internalBandInfo = {};
+	internalBandInfo.id = id;
+	internalBandInfo.child = child;
+	internalBandInfo.height = GetRectHeight(&rect);
+	internalBandInfo.newLine = true;
+	internalBandInfo.useChevron = false;
+	internalBandInfo.showBand = showBand;
+	return internalBandInfo;
+}
+
+void Explorerplusplus::UpdateMainRebarBandsFromLoadedInfo(
+	std::vector<InternalRebarBandInfo> &mainRebarBands)
+{
+	auto getSortedBandIndex = [this, &mainRebarBands](UINT bandId) -> size_t
 	{
-		RebarStyles |= RBS_FIXEDORDER;
-	}
+		auto itr = std::find_if(m_loadedRebarStorageInfo.begin(), m_loadedRebarStorageInfo.end(),
+			[bandId](const auto &loadedBandInfo) { return loadedBandInfo.id == bandId; });
 
-	/* Create and subclass the main rebar control. */
-	m_hMainRebar = CreateWindowEx(WS_EX_CONTROLPARENT, REBARCLASSNAME, EMPTY_STRING, RebarStyles, 0,
-		0, 0, 0, m_hContainer, nullptr, GetModuleHandle(nullptr), nullptr);
-	SetWindowSubclass(m_hMainRebar, RebarSubclassStub, 0, (DWORD_PTR) this);
-
-	for (i = 0; i < NUM_MAIN_TOOLBARS; i++)
-	{
-		switch (m_ToolbarInformation[i].wID)
+		if (itr == m_loadedRebarStorageInfo.end())
 		{
-		case ID_MAINTOOLBAR:
-			CreateMainToolbar();
-			toolbarSize = (DWORD) SendMessage(m_mainToolbar->GetHWND(), TB_GETBUTTONSIZE, 0, 0);
-			m_ToolbarInformation[i].cyMinChild = HIWORD(toolbarSize);
-			m_ToolbarInformation[i].cyMaxChild = HIWORD(toolbarSize);
-			m_ToolbarInformation[i].cyChild = HIWORD(toolbarSize);
-			SendMessage(m_mainToolbar->GetHWND(), TB_GETMAXSIZE, 0, (LPARAM) &sz);
-
-			if (m_ToolbarInformation[i].cx == 0)
-			{
-				m_ToolbarInformation[i].cx = sz.cx;
-			}
-
-			m_ToolbarInformation[i].cxIdeal = sz.cx;
-			m_ToolbarInformation[i].hwndChild = m_mainToolbar->GetHWND();
-			break;
-
-		case ID_ADDRESSTOOLBAR:
-			CreateAddressBar();
-			GetWindowRect(m_addressBar->GetHWND(), &rc);
-			m_ToolbarInformation[i].cyMinChild = GetRectHeight(&rc);
-			m_ToolbarInformation[i].hwndChild = m_addressBar->GetHWND();
-			break;
-
-		case ID_BOOKMARKSTOOLBAR:
-			CreateBookmarksToolbar();
-			toolbarSize = (DWORD) SendMessage(m_bookmarksToolbar->GetView()->GetHWND(),
-				TB_GETBUTTONSIZE, 0, 0);
-			m_ToolbarInformation[i].cyMinChild = HIWORD(toolbarSize);
-			m_ToolbarInformation[i].cyMaxChild = HIWORD(toolbarSize);
-			m_ToolbarInformation[i].cyChild = HIWORD(toolbarSize);
-			SendMessage(m_bookmarksToolbar->GetView()->GetHWND(), TB_GETMAXSIZE, 0, (LPARAM) &sz);
-
-			if (m_ToolbarInformation[i].cx == 0)
-			{
-				m_ToolbarInformation[i].cx = sz.cx;
-			}
-
-			m_ToolbarInformation[i].cxIdeal = sz.cx;
-			m_ToolbarInformation[i].hwndChild = m_bookmarksToolbar->GetView()->GetHWND();
-			break;
-
-		case ID_DRIVESTOOLBAR:
-			CreateDrivesToolbar();
-			toolbarSize =
-				(DWORD) SendMessage(m_drivesToolbar->GetView()->GetHWND(), TB_GETBUTTONSIZE, 0, 0);
-			m_ToolbarInformation[i].cyMinChild = HIWORD(toolbarSize);
-			m_ToolbarInformation[i].cyMaxChild = HIWORD(toolbarSize);
-			m_ToolbarInformation[i].cyChild = HIWORD(toolbarSize);
-			SendMessage(m_drivesToolbar->GetView()->GetHWND(), TB_GETMAXSIZE, 0, (LPARAM) &sz);
-
-			if (m_ToolbarInformation[i].cx == 0)
-			{
-				m_ToolbarInformation[i].cx = sz.cx;
-			}
-
-			m_ToolbarInformation[i].cxIdeal = sz.cx;
-			m_ToolbarInformation[i].hwndChild = m_drivesToolbar->GetView()->GetHWND();
-			break;
-
-		case ID_APPLICATIONSTOOLBAR:
-			CreateApplicationToolbar();
-			toolbarSize = (DWORD) SendMessage(m_applicationToolbar->GetView()->GetHWND(),
-				TB_GETBUTTONSIZE, 0, 0);
-			m_ToolbarInformation[i].cyMinChild = HIWORD(toolbarSize);
-			m_ToolbarInformation[i].cyMaxChild = HIWORD(toolbarSize);
-			m_ToolbarInformation[i].cyChild = HIWORD(toolbarSize);
-			SendMessage(m_applicationToolbar->GetView()->GetHWND(), TB_GETMAXSIZE, 0, (LPARAM) &sz);
-
-			if (m_ToolbarInformation[i].cx == 0)
-			{
-				m_ToolbarInformation[i].cx = sz.cx;
-			}
-
-			m_ToolbarInformation[i].cxIdeal = sz.cx;
-			m_ToolbarInformation[i].hwndChild = m_applicationToolbar->GetView()->GetHWND();
-			break;
+			// Any band that doesn't appear in the loaded data will be placed at the end.
+			return mainRebarBands.size() - 1;
 		}
 
-		m_ToolbarInformation[i].cbSize = sizeof(REBARBANDINFO);
-		SendMessage(m_hMainRebar, RB_INSERTBAND, static_cast<WPARAM>(-1),
-			(LPARAM) &m_ToolbarInformation[i]);
+		return itr - m_loadedRebarStorageInfo.begin();
+	};
+
+	std::stable_sort(mainRebarBands.begin(), mainRebarBands.end(),
+		[getSortedBandIndex](const auto &band1, const auto &band2)
+		{ return getSortedBandIndex(band1.id) < getSortedBandIndex(band2.id); });
+
+	for (auto &band : mainRebarBands)
+	{
+		UpdateMainRebarBandFromLoadedInfo(band);
 	}
 }
 
-LRESULT CALLBACK RebarSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-	UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+void Explorerplusplus::UpdateMainRebarBandFromLoadedInfo(InternalRebarBandInfo &internalBandInfo)
 {
-	UNREFERENCED_PARAMETER(uIdSubclass);
+	auto itr = std::find_if(m_loadedRebarStorageInfo.begin(), m_loadedRebarStorageInfo.end(),
+		[&internalBandInfo](const auto &loadedBandInfo)
+		{ return loadedBandInfo.id == internalBandInfo.id; });
 
-	auto *pContainer = (Explorerplusplus *) dwRefData;
+	if (itr == m_loadedRebarStorageInfo.end())
+	{
+		return;
+	}
 
-	return pContainer->RebarSubclass(hwnd, uMsg, wParam, lParam);
+	internalBandInfo.newLine = WI_IsFlagSet(itr->style, RBBS_BREAK);
+	internalBandInfo.length = itr->length;
 }
 
-LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+void Explorerplusplus::InsertMainRebarBand(const InternalRebarBandInfo &internalBandInfo)
+{
+	REBARBANDINFO bandInfo = {};
+	bandInfo.cbSize = sizeof(bandInfo);
+	bandInfo.fMask = RBBIM_ID | RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_STYLE;
+	bandInfo.fStyle = 0;
+	bandInfo.wID = internalBandInfo.id;
+	bandInfo.hwndChild = internalBandInfo.child;
+	bandInfo.cx = internalBandInfo.length;
+	bandInfo.cxMinChild = 0;
+	bandInfo.cyMinChild = internalBandInfo.height;
+	bandInfo.cyChild = internalBandInfo.height;
+
+	if (m_config->lockToolbars)
+	{
+		WI_SetFlag(bandInfo.fStyle, RBBS_NOGRIPPER);
+	}
+
+	if (internalBandInfo.newLine)
+	{
+		WI_SetFlag(bandInfo.fStyle, RBBS_BREAK);
+	}
+
+	if (internalBandInfo.useChevron)
+	{
+		WI_SetFlag(bandInfo.fStyle, RBBS_USECHEVRON);
+	}
+
+	if (!internalBandInfo.showBand)
+	{
+		WI_SetFlag(bandInfo.fStyle, RBBS_HIDDEN);
+	}
+
+	if (internalBandInfo.idealLength)
+	{
+		WI_SetFlag(bandInfo.fMask, RBBIM_IDEALSIZE);
+		bandInfo.cxIdeal = *internalBandInfo.idealLength;
+	}
+
+	auto res = SendMessage(m_hMainRebar, RB_INSERTBAND, static_cast<WPARAM>(-1),
+		reinterpret_cast<LPARAM>(&bandInfo));
+	DCHECK(res);
+}
+
+LRESULT Explorerplusplus::RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -510,4 +500,33 @@ HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 	}
 
 	return hSubMenu;
+}
+
+std::vector<RebarBandStorageInfo> Explorerplusplus::GetMainRebarStorageInfo()
+{
+	std::vector<RebarBandStorageInfo> rebarStorageInfo;
+	auto numBands = static_cast<UINT>(SendMessage(m_hMainRebar, RB_GETBANDCOUNT, 0, 0));
+
+	for (UINT i = 0; i < numBands; i++)
+	{
+		REBARBANDINFO bandInfo = {};
+		bandInfo.cbSize = sizeof(bandInfo);
+		bandInfo.fMask = RBBIM_ID | RBBIM_SIZE | RBBIM_STYLE;
+		auto res =
+			SendMessage(m_hMainRebar, RB_GETBANDINFO, i, reinterpret_cast<LPARAM>(&bandInfo));
+
+		if (!res)
+		{
+			DCHECK(false);
+			continue;
+		}
+
+		RebarBandStorageInfo bandStorageInfo;
+		bandStorageInfo.id = bandInfo.wID;
+		bandStorageInfo.style = bandInfo.fStyle;
+		bandStorageInfo.length = bandInfo.cx;
+		rebarStorageInfo.push_back(bandStorageInfo);
+	}
+
+	return rebarStorageInfo;
 }

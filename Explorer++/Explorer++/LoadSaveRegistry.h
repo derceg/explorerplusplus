@@ -19,7 +19,7 @@ public:
 	int LoadPreviousTabs() override;
 	void LoadDefaultColumns() override;
 	void LoadApplicationToolbar() override;
-	void LoadToolbarInformation() override;
+	void LoadMainRebarInformation() override;
 	void LoadColorRules() override;
 	void LoadDialogStates() override;
 
@@ -29,7 +29,7 @@ public:
 	void SaveTabs() override;
 	void SaveDefaultColumns() override;
 	void SaveApplicationToolbar() override;
-	void SaveToolbarInformation() override;
+	void SaveMainRebarInformation() override;
 	void SaveColorRules() override;
 	void SaveDialogStates() override;
 

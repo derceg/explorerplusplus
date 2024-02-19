@@ -49,6 +49,7 @@ class MainFontSetter;
 class MainToolbar;
 class MainWindow;
 struct NavigateParams;
+struct RebarBandStorageInfo;
 class ShellBrowser;
 class ShellTreeView;
 class TabContainer;
@@ -87,8 +88,6 @@ public:
 
 	static LRESULT CALLBACK WndProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	LRESULT CALLBACK RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 	/* Directory modification. */
 	static void DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData);
 
@@ -111,16 +110,13 @@ private:
 	static constexpr auto TREEVIEW_MINIMUM_WIDTH = 70_px;
 	static constexpr double TREEVIEW_MAXIMUM_WIDTH_PERCENTAGE = 0.8;
 
-	/* The number of toolbars that appear in the
-	main rebar. */
-	static const int NUM_MAIN_TOOLBARS = 5;
-
-	/* Main toolbar id's. */
-	static const int ID_MAINTOOLBAR = 0;
-	static const int ID_ADDRESSTOOLBAR = 1;
-	static const int ID_BOOKMARKSTOOLBAR = 2;
-	static const int ID_DRIVESTOOLBAR = 3;
-	static const int ID_APPLICATIONSTOOLBAR = 4;
+	// Main rebar band IDs. These are used to load and save data, so the values shouldn't be
+	// changed.
+	static const UINT REBAR_BAND_ID_MAIN_TOOLBAR = 0;
+	static const UINT REBAR_BAND_ID_ADDRESS_BAR = 1;
+	static const UINT REBAR_BAND_ID_BOOKMARKS_TOOLBAR = 2;
+	static const UINT REBAR_BAND_ID_DRIVES_TOOLBAR = 3;
+	static const UINT REBAR_BAND_ID_APPLICATIONS_TOOLBAR = 4;
 
 	static const std::vector<std::wstring> BLACKLISTED_BACKGROUND_MENU_CLSID_ENTRIES;
 
@@ -164,6 +160,18 @@ private:
 	{
 		void *pContainer;
 		int uId;
+	};
+
+	struct InternalRebarBandInfo
+	{
+		UINT id;
+		HWND child;
+		UINT height;
+		bool newLine;
+		bool useChevron;
+		bool showBand;
+		UINT length;
+		std::optional<UINT> idealLength;
 	};
 
 	enum class PasteType
@@ -319,23 +327,29 @@ private:
 	wil::unique_hmenu InitializeRightClickMenu();
 	void SetProgramMenuItemStates(HMENU hProgramMenu);
 
-	/* Control creation. */
-	void CreateMainControls();
+	// Main rebar
+	void CreateMainRebarAndChildren();
+	std::vector<InternalRebarBandInfo> InitializeMainRebarBands();
+	InternalRebarBandInfo InitializeToolbarBand(UINT id, HWND toolbar, bool showBand);
+	InternalRebarBandInfo InitializeNonToolbarBand(UINT id, HWND child, bool showBand);
+	void UpdateMainRebarBandsFromLoadedInfo(std::vector<InternalRebarBandInfo> &mainRebarBands);
+	void UpdateMainRebarBandFromLoadedInfo(InternalRebarBandInfo &internalBandInfo);
+	void InsertMainRebarBand(const InternalRebarBandInfo &internalBandInfo);
+	LRESULT RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void CreateFolderControls();
 	void CreateAddressBar();
 	void CreateMainToolbar();
 	void CreateBookmarksToolbar();
 	void CreateDrivesToolbar();
 	void CreateApplicationToolbar();
-
-	// Rebar bands
-	void InitializeMainToolbars();
 	void OnAddressBarSizeUpdated();
 	void OnRebarToolbarSizeUpdated(HWND toolbar);
 	boost::signals2::connection AddToolbarContextMenuObserver(
 		const ToolbarContextMenuSignal::slot_type &observer) override;
 	boost::signals2::connection AddToolbarContextMenuSelectedObserver(
 		const ToolbarContextMenuSelectedSignal::slot_type &observer) override;
+	HMENU CreateRebarHistoryMenu(BOOL bBack);
+	std::vector<RebarBandStorageInfo> GetMainRebarStorageInfo();
 
 	/* Main toolbar private message handlers. */
 	void OnToolbarRClick(HWND sourceWindow);
@@ -350,12 +364,11 @@ private:
 
 	/* Settings. */
 	void SaveAllSettings() override;
-	void LoadAllSettings(ILoadSave **pLoadSave);
+	std::unique_ptr<ILoadSave> LoadAllSettings();
 	void ValidateLoadedSettings();
 	void ValidateColumns(FolderColumns &folderColumns);
 	void ValidateSingleColumnSet(int iColumnSet, std::vector<Column_t> &columns);
 	void ApplyDisplayWindowPosition();
-	void ApplyToolbarSettings();
 	void TestConfigFile();
 
 	/* Registry settings. */
@@ -371,8 +384,8 @@ private:
 		std::vector<Column_t> *pColumns);
 	void LoadDefaultColumnsFromRegistry();
 	void SaveDefaultColumnsToRegistry();
-	void SaveToolbarInformationToRegistry();
-	void LoadToolbarInformationFromRegistry();
+	void LoadMainRebarInformationFromRegistry(HKEY mainKey);
+	void SaveMainRebarInformationToRegistry(HKEY mainKey);
 
 	/* XML Settings. */
 	void LoadGenericSettingsFromXML(IXMLDOMDocument *pXMLDom);
@@ -388,9 +401,8 @@ private:
 	void SaveDefaultColumnsToXMLInternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pColumnsNode);
 	void SaveWindowPositionToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void SaveWindowPositionToXMLInternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pWndPosNode);
-	void LoadToolbarInformationFromXML(IXMLDOMDocument *pXMLDom);
-	void SaveToolbarInformationToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
-	void SaveToolbarInformationToXMLnternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe);
+	void LoadMainRebarInformationFromXML(IXMLDOMDocument *pXMLDom);
+	void SaveMainRebarInformationToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, WCHAR *wszValue);
 	void MapTabAttributeValue(WCHAR *wszName, WCHAR *wszValue, TabSettings &tabSettings,
 		FolderSettings &folderSettings, bool &groupModeLoaded, bool &groupSortDirectionLoaded);
@@ -535,9 +547,6 @@ private:
 	static bool ShouldEnableDarkMode(Theme theme);
 	void OnThemeUpdated(Theme theme);
 
-	// Rebar
-	HMENU CreateRebarHistoryMenu(BOOL bBack);
-
 	// Customize colors
 	void InitializeDefaultColorRules();
 
@@ -668,8 +677,10 @@ private:
 	/* Undo support. */
 	FileActionHandler m_FileActionHandler;
 
+	// Main rebar
+	std::vector<RebarBandStorageInfo> m_loadedRebarStorageInfo;
+
 	/* Toolbars. */
-	REBARBANDINFO m_ToolbarInformation[NUM_MAIN_TOOLBARS];
 	MainToolbar *m_mainToolbar;
 	DrivesToolbar *m_drivesToolbar = nullptr;
 	Applications::ApplicationToolbar *m_applicationToolbar = nullptr;

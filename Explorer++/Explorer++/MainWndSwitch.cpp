@@ -1508,7 +1508,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 		ptMenu.y = pnmrc->rc.bottom;
 		ClientToScreen(m_hMainRebar, &ptMenu);
 
-		if (pnmrc->wID == ID_BOOKMARKSTOOLBAR)
+		if (pnmrc->wID == REBAR_BAND_ID_BOOKMARKS_TOOLBAR)
 		{
 			m_bookmarksToolbar->ShowOverflowMenu(ptMenu);
 			return 0;
@@ -1522,16 +1522,16 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 
 		switch (pnmrc->wID)
 		{
-		case ID_MAINTOOLBAR:
+		case REBAR_BAND_ID_MAIN_TOOLBAR:
 			hToolbar = m_mainToolbar->GetHWND();
 			break;
 
-		case ID_DRIVESTOOLBAR:
+		case REBAR_BAND_ID_DRIVES_TOOLBAR:
 			hToolbar = m_drivesToolbar->GetView()->GetHWND();
 			himlMenu = himlSmall;
 			break;
 
-		case ID_APPLICATIONSTOOLBAR:
+		case REBAR_BAND_ID_APPLICATIONS_TOOLBAR:
 			hToolbar = m_applicationToolbar->GetView()->GetHWND();
 			himlMenu = himlSmall;
 			break;
@@ -1581,7 +1581,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 
 						switch (pnmrc->wID)
 						{
-						case ID_MAINTOOLBAR:
+						case REBAR_BAND_ID_MAIN_TOOLBAR:
 						{
 							switch (tbButton.idCommand)
 							{

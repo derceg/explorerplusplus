@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!-- Preference file for Explorer++ -->
+<ExplorerPlusPlus>
+	<Toolbars>
+		<Toolbar name="0" id="1" Style="257" Length="0"/>
+		<Toolbar name="1" id="2" Style="769" Length="26"/>
+		<Toolbar name="2" id="0" Style="769" Length="621"/>
+		<Toolbar name="3" id="4" Style="769" Length="651"/>
+		<Toolbar name="4" id="3" Style="768" Length="557"/>
+	</Toolbars>
+</ExplorerPlusPlus>
