@@ -59,7 +59,7 @@ for:
     arch: arm64
 
 init:
-- ps: >-
+- pwsh: >-
     if ($env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH -match '^l10n_') {
       Write-Host 'Skipping translation branch pull request'
       Exit-AppveyorBuild
@@ -79,7 +79,7 @@ install:
     IF DEFINED PFX_ENC_PASS (secure-file\tools\secure-file -decrypt %APPVEYOR_BUILD_FOLDER%\authenticode.pfx.enc -secret %PFX_ENC_PASS%)
 
 before_build:
-- ps: >-
+- pwsh: >-
     if (Test-Path env:APPVEYOR_REPO_TAG_NAME) {
       if ($env:APPVEYOR_REPO_TAG_NAME -match '-beta(-\d)?$') {
         $env:RELEASE_MODE = 'beta'
@@ -93,10 +93,10 @@ build:
   verbosity: minimal
 
 after_build:
-- ps: .appveyor\after_build.ps1
+- pwsh: .appveyor\after_build.ps1
 
 test_script:
-- ps: .appveyor\test_script.ps1
+- pwsh: .appveyor\test_script.ps1
 
 artifacts:
 - path: explorerpp_x86.zip
@@ -111,7 +111,7 @@ artifacts:
 - path: latest_version.txt
 
 before_deploy:
-- ps: >-
+- pwsh: >-
     $versionComponents = $env:APPVEYOR_BUILD_VERSION -split '\.'
 
     $versionComponents = $versionComponents[0, 1, 2]
