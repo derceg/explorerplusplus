@@ -855,7 +855,7 @@ void ShellBrowser::OnListViewHeaderRightClick(const POINTS &cursorPos)
 		auto itr = std::find(commonColumns.begin(), commonColumns.end(), column.type);
 		bool inCommonColumns = (itr != commonColumns.end());
 
-		if (!column.bChecked && !inCommonColumns)
+		if (!column.checked && !inCommonColumns)
 		{
 			continue;
 		}
@@ -867,7 +867,7 @@ void ShellBrowser::OnListViewHeaderRightClick(const POINTS &cursorPos)
 		std::wstring columnText = ResourceHelper::LoadString(m_resourceInstance,
 			LookupColumnNameStringIndex(column.type));
 
-		if (column.bChecked)
+		if (column.checked)
 		{
 			mii.fState = MFS_CHECKED;
 		}
@@ -979,7 +979,7 @@ void ShellBrowser::OnColumnMenuItemSelected(int menuItemId,
 		return;
 	}
 
-	itr->bChecked = !itr->bChecked;
+	itr->checked = !itr->checked;
 
 	SetCurrentColumns(currentColumns);
 

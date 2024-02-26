@@ -460,6 +460,14 @@ HRESULT NXMLSettings::GetStringFromMap(IXMLDOMNamedNodeMap *attributeMap, const 
 		return hr;
 	}
 
+	if (!node)
+	{
+		// When the value isn't found, S_FALSE will be returned (which technically is counted as
+		// success) and the node will be null. As far as this function is concerned, that's also a
+		// failure.
+		return E_FAIL;
+	}
+
 	wil::unique_bstr value;
 	hr = node->get_text(&value);
 

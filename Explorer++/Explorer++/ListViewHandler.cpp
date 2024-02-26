@@ -95,7 +95,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 			auto itr = currentColumns.begin();
 			while (i < (pnmHeader->iItem + 1) && itr != currentColumns.end())
 			{
-				if (itr->bChecked)
+				if (itr->checked)
 				{
 					i++;
 				}
@@ -113,7 +113,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 			itr = currentColumns.begin();
 			while (i < (pnmHeader->pitem->iOrder + 1) && itr != currentColumns.end())
 			{
-				if (itr->bChecked)
+				if (itr->checked)
 				{
 					i++;
 				}

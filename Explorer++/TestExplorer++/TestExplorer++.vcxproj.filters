@@ -133,6 +133,15 @@
     <ClCompile Include="MainRebarXmlStorageTest.cpp">
       <Filter>Main Rebar</Filter>
     </ClCompile>
+    <ClCompile Include="ColumnRegistryStorageTest.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnXmlStorageTest.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnStorageHelper.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -236,6 +245,9 @@
     </ClInclude>
     <ClInclude Include="MainRebarStorageHelper.h">
       <Filter>Main Rebar</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnStorageHelper.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

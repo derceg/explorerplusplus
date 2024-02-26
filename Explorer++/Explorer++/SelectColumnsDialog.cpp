@@ -56,7 +56,7 @@ INT_PTR SelectColumnsDialog::OnInitDialog()
 		lvItem.lParam = static_cast<LPARAM>(column.type);
 		ListView_InsertItem(hListView, &lvItem);
 
-		ListView_SetCheckState(hListView, iItem, column.bChecked);
+		ListView_SetCheckState(hListView, iItem, column.checked);
 
 		iItem++;
 	}
@@ -79,18 +79,18 @@ wil::unique_hicon SelectColumnsDialog::GetDialogIcon(int iconWidth, int iconHeig
 
 bool SelectColumnsDialog::CompareColumns(const Column_t &column1, const Column_t &column2)
 {
-	if (column1.bChecked && column2.bChecked)
+	if (column1.checked && column2.checked)
 	{
 		// If both column are checked, preserve the input ordering (this is
 		// the order that the columns will actually appear in the listview).
 		// This matches the behavior of Windows Explorer.
 		return false;
 	}
-	else if (column1.bChecked && !column2.bChecked)
+	else if (column1.checked && !column2.checked)
 	{
 		return true;
 	}
-	else if (!column1.bChecked && column2.bChecked)
+	else if (!column1.checked && column2.checked)
 	{
 		return false;
 	}
@@ -207,14 +207,16 @@ void SelectColumnsDialog::OnOk()
 		lvItem.iSubItem = 0;
 		ListView_GetItem(hListView, &lvItem);
 
-		ColumnType columnType = static_cast<ColumnType>(lvItem.lParam);
+		auto columnType =
+			ColumnType::_from_integral_nothrow(static_cast<ColumnType::_integral>(lvItem.lParam));
+		CHECK(columnType);
 		auto itr = std::find_if(currentColumns.begin(), currentColumns.end(),
-			[columnType](const Column_t &column) { return column.type == columnType; });
+			[&columnType](const Column_t &column) { return column.type == *columnType; });
 
 		Column_t column;
-		column.type = columnType;
-		column.iWidth = itr->iWidth;
-		column.bChecked = ListView_GetCheckState(hListView, i);
+		column.type = *columnType;
+		column.width = itr->width;
+		column.checked = ListView_GetCheckState(hListView, i);
 		updatedColumns.push_back(column);
 	}
 
@@ -286,8 +288,10 @@ void SelectColumnsDialog::OnLvnItemChanged(const NMLISTVIEW *pnmlv)
 		lvItem.iSubItem = 0;
 		ListView_GetItem(hListView, &lvItem);
 
-		int iDescriptionStringIndex = ShellBrowser::LookupColumnDescriptionStringIndex(
-			static_cast<ColumnType>(lvItem.lParam));
+		auto columnType =
+			ColumnType::_from_integral_nothrow(static_cast<ColumnType::_integral>(lvItem.lParam));
+		CHECK(columnType);
+		int iDescriptionStringIndex = ShellBrowser::LookupColumnDescriptionStringIndex(*columnType);
 
 		TCHAR szColumnDescription[128];
 		LoadString(GetResourceInstance(), iDescriptionStringIndex, szColumnDescription,

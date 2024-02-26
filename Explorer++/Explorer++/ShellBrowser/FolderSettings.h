@@ -30,6 +30,9 @@ struct FolderColumns
 			std::end(NETWORK_CONNECTIONS_DEFAULT_COLUMNS));
 	std::vector<Column_t> myNetworkPlacesColumns = std::vector<Column_t>(
 		std::begin(MY_NETWORK_PLACES_DEFAULT_COLUMNS), std::end(MY_NETWORK_PLACES_DEFAULT_COLUMNS));
+
+	// This is only used in tests.
+	bool operator==(const FolderColumns &) const = default;
 };
 
 struct GlobalFolderSettings

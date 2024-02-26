@@ -195,6 +195,9 @@
     <ClCompile Include="ColorRulesStorageHelper.cpp" />
     <ClCompile Include="ColorRuleTest.cpp" />
     <ClCompile Include="ColorRuleXmlStorageTest.cpp" />
+    <ClCompile Include="ColumnRegistryStorageTest.cpp" />
+    <ClCompile Include="ColumnStorageHelper.cpp" />
+    <ClCompile Include="ColumnXmlStorageTest.cpp" />
     <ClCompile Include="ControlsTest.cpp" />
     <ClCompile Include="CustomFontStorageTest.cpp" />
     <ClCompile Include="DataObjectImplTest.cpp" />
@@ -253,6 +256,7 @@
     <ClInclude Include="BookmarkStorageHelper.h" />
     <ClInclude Include="BookmarkTreeHelper.h" />
     <ClInclude Include="ColorRulesStorageHelper.h" />
+    <ClInclude Include="ColumnStorageHelper.h" />
     <ClInclude Include="IconFetcherMock.h" />
     <ClInclude Include="MainRebarStorageHelper.h" />
     <ClInclude Include="MovableModelHelper.h" />

@@ -349,8 +349,8 @@ HRESULT ShellBrowser::RegisterShellWindow(PCIDLIST_ABSOLUTE pidl)
 	long registeredCookie;
 #pragma warning(push)
 #pragma warning(                                                                                   \
-		disable : 4311 4302) // 'reinterpret_cast': pointer truncation from 'HWND' to 'long',
-							 // 'reinterpret_cast': truncation from 'HWND' to 'long'
+	disable : 4311 4302) // 'reinterpret_cast': pointer truncation from 'HWND' to 'long',
+						 // 'reinterpret_cast': truncation from 'HWND' to 'long'
 	RETURN_IF_FAILED(m_shellWindows->Register(browserApp.get(), reinterpret_cast<long>(m_hOwner),
 		SWC_BROWSER, &registeredCookie));
 #pragma warning(pop)
@@ -661,7 +661,7 @@ void ShellBrowser::InsertAwaitingItems()
 		auto firstColumn = GetFirstCheckedColumn();
 
 		if ((m_folderSettings.viewMode == +ViewMode::Details)
-			&& firstColumn.type != ColumnType::Name)
+			&& firstColumn.type != +ColumnType::Name)
 		{
 			lv.pszText = LPSTR_TEXTCALLBACK;
 		}

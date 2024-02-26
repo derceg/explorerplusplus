@@ -995,6 +995,8 @@
     <ClCompile Include="ColorRuleModelFactory.cpp" />
     <ClCompile Include="ColorRuleRegistryStorage.cpp" />
     <ClCompile Include="ColorRuleXmlStorage.cpp" />
+    <ClCompile Include="ColumnRegistryStorage.cpp" />
+    <ClCompile Include="ColumnXmlStorage.cpp" />
     <ClCompile Include="CrashHandlerHelper.cpp" />
     <ClCompile Include="CustomFont.cpp" />
     <ClCompile Include="CustomFontStorage.cpp" />
@@ -1231,6 +1233,8 @@
     <ClInclude Include="ColorRuleModelFactory.h" />
     <ClInclude Include="ColorRuleRegistryStorage.h" />
     <ClInclude Include="ColorRuleXmlStorage.h" />
+    <ClInclude Include="ColumnRegistryStorage.h" />
+    <ClInclude Include="ColumnXmlStorage.h" />
     <ClInclude Include="CrashHandlerHelper.h" />
     <ClInclude Include="CustomFont.h" />
     <ClInclude Include="CustomFontStorage.h" />

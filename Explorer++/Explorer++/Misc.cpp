@@ -111,8 +111,8 @@ void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet, std::vector<Colum
 		if (!bFound)
 		{
 			column.type = pColumns[i].type;
-			column.bChecked = pColumns[i].bChecked;
-			column.iWidth = DEFAULT_COLUMN_WIDTH;
+			column.checked = pColumns[i].checked;
+			column.width = DEFAULT_COLUMN_WIDTH;
 			columns.push_back(column);
 		}
 	}

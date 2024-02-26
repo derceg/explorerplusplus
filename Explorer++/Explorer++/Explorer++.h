@@ -36,7 +36,6 @@
 class AddressBar;
 class BookmarksMainMenu;
 class BookmarksToolbar;
-struct ColumnWidth;
 struct Config;
 class DrivesToolbar;
 class HolderWindow;
@@ -376,12 +375,6 @@ private:
 	LONG SaveGenericSettingsToRegistry();
 	void SaveTabSettingsToRegistry();
 	int LoadTabSettingsFromRegistry();
-	std::vector<Column_t> LoadColumnFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName);
-	void SaveColumnToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName,
-		std::vector<Column_t> *pColumns);
-	std::vector<ColumnWidth> LoadColumnWidthsFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName);
-	void SaveColumnWidthsToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName,
-		std::vector<Column_t> *pColumns);
 	void LoadDefaultColumnsFromRegistry();
 	void SaveDefaultColumnsToRegistry();
 	void LoadMainRebarInformationFromRegistry(HKEY mainKey);
@@ -393,12 +386,8 @@ private:
 	int LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom);
 	void SaveTabSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe);
-	int LoadColumnFromXML(IXMLDOMNode *pNode, std::vector<Column_t> &outputColumns);
-	void SaveColumnToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pColumnsNode,
-		const std::vector<Column_t> &columns, const TCHAR *szColumnSet, int iIndent);
 	void LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom);
 	void SaveDefaultColumnsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
-	void SaveDefaultColumnsToXMLInternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pColumnsNode);
 	void SaveWindowPositionToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void SaveWindowPositionToXMLInternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pWndPosNode);
 	void LoadMainRebarInformationFromXML(IXMLDOMDocument *pXMLDom);

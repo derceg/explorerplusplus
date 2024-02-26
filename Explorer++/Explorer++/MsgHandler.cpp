@@ -919,7 +919,7 @@ void Explorerplusplus::CopyColumnInfoToClipboard()
 
 	for (const auto &column : currentColumns)
 	{
-		if (column.bChecked)
+		if (column.checked)
 		{
 			TCHAR szText[64];
 			LoadString(m_resourceInstance, ShellBrowser::LookupColumnNameStringIndex(column.type),

@@ -395,7 +395,7 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 	{
 		auto firstColumn = GetFirstCheckedColumn();
 
-		if (firstColumn.type != ColumnType::Name)
+		if (firstColumn.type != +ColumnType::Name)
 		{
 			SetFirstColumnTextToCallback();
 		}
@@ -405,7 +405,7 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 		auto firstColumn = GetFirstCheckedColumn();
 
 		// The item text in non-details view is always the filename.
-		if (firstColumn.type != ColumnType::Name)
+		if (firstColumn.type != +ColumnType::Name)
 		{
 			SetFirstColumnTextToFilename();
 		}
@@ -893,7 +893,7 @@ std::vector<SortMode> ShellBrowser::GetAvailableSortModes() const
 
 	for (const auto &column : *m_pActiveColumns)
 	{
-		if (column.bChecked)
+		if (column.checked)
 		{
 			sortModes.push_back(DetermineColumnSortMode(column.type));
 		}

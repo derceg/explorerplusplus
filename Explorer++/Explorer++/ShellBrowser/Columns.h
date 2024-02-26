@@ -4,8 +4,10 @@
 
 #pragma once
 
-enum class ColumnType
-{
+#include "BetterEnumsWrapper.h"
+
+// clang-format off
+BETTER_ENUM(ColumnType, unsigned int,
 	Name = 1,
 	Type = 2,
 	Size = 3,
@@ -90,17 +92,15 @@ enum class ColumnType
 
 	/* Printer columns. */
 	PrinterModel = 64
-};
+)
+// clang-format on
 
 struct Column_t
 {
 	ColumnType type;
-	BOOL bChecked;
-	int iWidth;
-};
+	BOOL checked;
+	int width;
 
-struct ColumnOld_t
-{
-	unsigned int id;
-	BOOL bChecked;
+	// This is only used in tests.
+	bool operator==(const Column_t &) const = default;
 };

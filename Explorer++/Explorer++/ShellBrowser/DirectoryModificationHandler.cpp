@@ -504,7 +504,7 @@ void ShellBrowser::InvalidateAllColumnsForItem(int itemIndex)
 	}
 
 	auto numColumns = std::count_if(m_pActiveColumns->begin(), m_pActiveColumns->end(),
-		[](const Column_t &column) { return column.bChecked; });
+		[](const Column_t &column) { return column.checked; });
 
 	for (int i = 0; i < numColumns; i++)
 	{

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "ColumnRegistryStorage.h"
 #include "Config.h"
 #include "CustomFontStorage.h"
 #include "DefaultColumns.h"
@@ -16,18 +17,16 @@
 #include "TabContainer.h"
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
+#include <wil/registry.h>
 
 using namespace std::string_literals;
 
 namespace
 {
 const TCHAR REG_TABS_KEY[] = _T("Software\\Explorer++\\Tabs");
-const TCHAR REG_COLUMNS_KEY[] = _T("Software\\Explorer++\\DefaultColumns");
+const TCHAR REG_DEFAULT_COLUMNS_KEY[] = _T("Software\\Explorer++\\DefaultColumns");
 const TCHAR REG_MAIN_FONT_KEY_NAME[] = _T("MainFont");
 }
-
-void UpdateColumnWidths(std::vector<Column_t> &columns,
-	const std::vector<ColumnWidth> &columnWidths);
 
 BOOL LoadWindowPositionFromRegistry(WINDOWPLACEMENT *pwndpl)
 {
@@ -563,7 +562,6 @@ void Explorerplusplus::SaveTabSettingsToRegistry()
 {
 	HKEY hKey;
 	HKEY hTabKey;
-	HKEY hColumnsKey;
 	TCHAR szItemKey[128];
 	DWORD disposition;
 	LONG returnValue;
@@ -623,47 +621,14 @@ void Explorerplusplus::SaveTabSettingsToRegistry()
 				std::wstring filter = tab.GetShellBrowser()->GetFilterText();
 				RegistrySettings::SaveString(hTabKey, _T("Filter"), filter);
 
-				/* Now save the tabs columns. */
-				returnValue = RegCreateKeyEx(hTabKey, _T("Columns"), 0, nullptr,
-					REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &hColumnsKey, &disposition);
+				wil::unique_hkey columnsKey;
+				HRESULT hr = wil::reg::create_unique_key_nothrow(hTabKey, _T("Columns"), columnsKey,
+					wil::reg::key_access::readwrite);
 
-				if (returnValue == ERROR_SUCCESS)
+				if (SUCCEEDED(hr))
 				{
 					FolderColumns folderColumns = tab.GetShellBrowser()->ExportAllColumns();
-
-					SaveColumnToRegistry(hColumnsKey, _T("ControlPanelColumns"),
-						&folderColumns.controlPanelColumns);
-					SaveColumnToRegistry(hColumnsKey, _T("MyComputerColumns"),
-						&folderColumns.myComputerColumns);
-					SaveColumnToRegistry(hColumnsKey, _T("RealFolderColumns"),
-						&folderColumns.realFolderColumns);
-					SaveColumnToRegistry(hColumnsKey, _T("RecycleBinColumns"),
-						&folderColumns.recycleBinColumns);
-					SaveColumnToRegistry(hColumnsKey, _T("PrinterColumns"),
-						&folderColumns.printersColumns);
-					SaveColumnToRegistry(hColumnsKey, _T("NetworkColumns"),
-						&folderColumns.networkConnectionsColumns);
-					SaveColumnToRegistry(hColumnsKey, _T("NetworkPlacesColumns"),
-						&folderColumns.myNetworkPlacesColumns);
-
-					/* Now save column widths. In the future, these keys may be merged with
-					the column keys above. */
-					SaveColumnWidthsToRegistry(hColumnsKey, _T("ControlPanelColumnWidths"),
-						&folderColumns.controlPanelColumns);
-					SaveColumnWidthsToRegistry(hColumnsKey, _T("MyComputerColumnWidths"),
-						&folderColumns.myComputerColumns);
-					SaveColumnWidthsToRegistry(hColumnsKey, _T("RealFolderColumnWidths"),
-						&folderColumns.realFolderColumns);
-					SaveColumnWidthsToRegistry(hColumnsKey, _T("RecycleBinColumnWidths"),
-						&folderColumns.recycleBinColumns);
-					SaveColumnWidthsToRegistry(hColumnsKey, _T("PrinterColumnWidths"),
-						&folderColumns.printersColumns);
-					SaveColumnWidthsToRegistry(hColumnsKey, _T("NetworkColumnWidths"),
-						&folderColumns.networkConnectionsColumns);
-					SaveColumnWidthsToRegistry(hColumnsKey, _T("NetworkPlacesColumnWidths"),
-						&folderColumns.myNetworkPlacesColumns);
-
-					RegCloseKey(hColumnsKey);
+					ColumnRegistryStorage::SaveAllColumnSets(columnsKey.get(), folderColumns);
 				}
 
 				/* High-level settings. */
@@ -692,27 +657,10 @@ void Explorerplusplus::SaveTabSettingsToRegistry()
 	}
 }
 
-void UpdateColumnWidths(std::vector<Column_t> &columns,
-	const std::vector<ColumnWidth> &columnWidths)
-{
-	for (auto itr1 = columnWidths.begin(); itr1 != columnWidths.end(); itr1++)
-	{
-		for (auto itr2 = columns.begin(); itr2 != columns.end(); itr2++)
-		{
-			if (static_cast<unsigned int>(itr2->type) == itr1->id)
-			{
-				itr2->iWidth = itr1->iWidth;
-				break;
-			}
-		}
-	}
-}
-
 int Explorerplusplus::LoadTabSettingsFromRegistry()
 {
 	HKEY hKey;
 	HKEY hTabKey;
-	HKEY hColumnsKey;
 	TCHAR szItemKey[128];
 	PIDLIST_ABSOLUTE pidlDirectory = nullptr;
 	LONG returnValue;
@@ -787,53 +735,15 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 
 			RegistrySettings::ReadString(hTabKey, _T("Filter"), folderSettings.filter);
 
-			/* Now load this tabs columns. */
-			returnValue = RegOpenKeyEx(hTabKey, _T("Columns"), 0, KEY_READ, &hColumnsKey);
+			wil::unique_hkey columnsKey;
+			HRESULT hr = wil::reg::open_unique_key_nothrow(hTabKey, _T("Columns"), columnsKey,
+				wil::reg::key_access::read);
 
 			FolderColumns initialColumns;
 
-			if (returnValue == ERROR_SUCCESS)
+			if (SUCCEEDED(hr))
 			{
-				initialColumns.controlPanelColumns =
-					LoadColumnFromRegistry(hColumnsKey, _T("ControlPanelColumns"));
-				initialColumns.myComputerColumns =
-					LoadColumnFromRegistry(hColumnsKey, _T("MyComputerColumns"));
-				initialColumns.realFolderColumns =
-					LoadColumnFromRegistry(hColumnsKey, _T("RealFolderColumns"));
-				initialColumns.recycleBinColumns =
-					LoadColumnFromRegistry(hColumnsKey, _T("RecycleBinColumns"));
-				initialColumns.printersColumns =
-					LoadColumnFromRegistry(hColumnsKey, _T("PrinterColumns"));
-				initialColumns.networkConnectionsColumns =
-					LoadColumnFromRegistry(hColumnsKey, _T("NetworkColumns"));
-				initialColumns.myNetworkPlacesColumns =
-					LoadColumnFromRegistry(hColumnsKey, _T("NetworkPlacesColumns"));
-
-				auto controlPanelWidths =
-					LoadColumnWidthsFromRegistry(hColumnsKey, _T("ControlPanelColumnWidths"));
-				auto myComputerWidths =
-					LoadColumnWidthsFromRegistry(hColumnsKey, _T("MyComputerColumnWidths"));
-				auto realFolderWidths =
-					LoadColumnWidthsFromRegistry(hColumnsKey, _T("RealFolderColumnWidths"));
-				auto recycleBinWidths =
-					LoadColumnWidthsFromRegistry(hColumnsKey, _T("RecycleBinColumnWidths"));
-				auto printersWidths =
-					LoadColumnWidthsFromRegistry(hColumnsKey, _T("PrinterColumnWidths"));
-				auto networkConnectionsWidths =
-					LoadColumnWidthsFromRegistry(hColumnsKey, _T("NetworkColumnWidths"));
-				auto myNetworkPlacesWidths =
-					LoadColumnWidthsFromRegistry(hColumnsKey, _T("NetworkPlacesColumnWidths"));
-
-				UpdateColumnWidths(initialColumns.controlPanelColumns, controlPanelWidths);
-				UpdateColumnWidths(initialColumns.myComputerColumns, myComputerWidths);
-				UpdateColumnWidths(initialColumns.realFolderColumns, realFolderWidths);
-				UpdateColumnWidths(initialColumns.recycleBinColumns, recycleBinWidths);
-				UpdateColumnWidths(initialColumns.printersColumns, printersWidths);
-				UpdateColumnWidths(initialColumns.networkConnectionsColumns,
-					networkConnectionsWidths);
-				UpdateColumnWidths(initialColumns.myNetworkPlacesColumns, myNetworkPlacesWidths);
-
-				RegCloseKey(hColumnsKey);
+				ColumnRegistryStorage::LoadAllColumnSets(columnsKey.get(), initialColumns);
 			}
 
 			ValidateColumns(initialColumns);
@@ -891,210 +801,36 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 	return nTabsCreated;
 }
 
-void Explorerplusplus::SaveColumnWidthsToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName,
-	std::vector<Column_t> *pColumns)
-{
-	ColumnWidth *pColumnList = nullptr;
-	int iColumn = 0;
-
-	pColumnList = (ColumnWidth *) malloc(pColumns->size() * sizeof(ColumnWidth));
-
-	for (auto itr = pColumns->begin(); itr != pColumns->end(); itr++)
-	{
-		pColumnList[iColumn].id = static_cast<unsigned int>(itr->type);
-		pColumnList[iColumn].iWidth = itr->iWidth;
-
-		iColumn++;
-	}
-
-	RegSetValueEx(hColumnsKey, szKeyName, 0, REG_BINARY, (LPBYTE) pColumnList,
-		(DWORD) (pColumns->size() * sizeof(ColumnWidth)));
-
-	free(pColumnList);
-}
-
-std::vector<ColumnWidth> Explorerplusplus::LoadColumnWidthsFromRegistry(HKEY hColumnsKey,
-	const TCHAR *szKeyName)
-{
-	ColumnWidth columnWidthData[64];
-	DWORD dwType = REG_BINARY;
-	DWORD dwSize = sizeof(columnWidthData);
-
-	LONG ret = RegQueryValueEx(hColumnsKey, szKeyName, nullptr, &dwType, (LPBYTE) columnWidthData,
-		&dwSize);
-
-	std::vector<ColumnWidth> columnWidths;
-
-	if (ret == ERROR_SUCCESS)
-	{
-		for (unsigned int i = 0; i < dwSize / sizeof(ColumnWidth); i++)
-		{
-			ColumnWidth columnWidth;
-			columnWidth.id = columnWidthData[i].id;
-			columnWidth.iWidth = columnWidthData[i].iWidth;
-
-			columnWidths.push_back(columnWidth);
-		}
-	}
-
-	return columnWidths;
-}
-
-void Explorerplusplus::SaveColumnToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName,
-	std::vector<Column_t> *pColumns)
-{
-	ColumnOld_t *pColumnList = nullptr;
-	int iColumn = 0;
-
-	pColumnList = (ColumnOld_t *) malloc(pColumns->size() * sizeof(ColumnOld_t));
-
-	for (auto itr = pColumns->begin(); itr != pColumns->end(); itr++)
-	{
-		pColumnList[iColumn].id = static_cast<unsigned int>(itr->type);
-		pColumnList[iColumn].bChecked = itr->bChecked;
-
-		iColumn++;
-	}
-
-	RegSetValueEx(hColumnsKey, szKeyName, 0, REG_BINARY, (LPBYTE) pColumnList,
-		(DWORD) (pColumns->size() * sizeof(ColumnOld_t)));
-
-	free(pColumnList);
-}
-
-std::vector<Column_t> Explorerplusplus::LoadColumnFromRegistry(HKEY hColumnsKey,
-	const TCHAR *szKeyName)
-{
-	ColumnOld_t columnList[64];
-	Column_t column;
-	DWORD dwSize;
-	DWORD dwType;
-	unsigned int i = 0;
-
-	dwType = REG_BINARY;
-	dwSize = sizeof(columnList);
-
-	RegQueryValueEx(hColumnsKey, szKeyName, nullptr, &dwType, (LPBYTE) columnList, &dwSize);
-
-	std::vector<Column_t> columns;
-
-	for (i = 0; i < dwSize / sizeof(ColumnOld_t); i++)
-	{
-		column.type = static_cast<ColumnType>(columnList[i].id);
-		column.bChecked = columnList[i].bChecked;
-		column.iWidth = DEFAULT_COLUMN_WIDTH;
-
-		columns.push_back(column);
-	}
-
-	return columns;
-}
-
 void Explorerplusplus::SaveDefaultColumnsToRegistry()
 {
-	HKEY hColumnsKey;
-	DWORD disposition;
-	LONG returnValue;
+	wil::unique_hkey defaultColumnsKey;
+	HRESULT hr = wil::reg::create_unique_key_nothrow(HKEY_CURRENT_USER, REG_DEFAULT_COLUMNS_KEY,
+		defaultColumnsKey, wil::reg::key_access::readwrite);
 
-	/* Open/Create the main key that is used to store data. */
-	returnValue = RegCreateKeyEx(HKEY_CURRENT_USER, REG_COLUMNS_KEY, 0, nullptr,
-		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &hColumnsKey, &disposition);
-
-	if (returnValue == ERROR_SUCCESS)
+	if (FAILED(hr))
 	{
-		SaveColumnToRegistry(hColumnsKey, _T("ControlPanelColumns"),
-			&m_config->globalFolderSettings.folderColumns.controlPanelColumns);
-		SaveColumnWidthsToRegistry(hColumnsKey, _T("ControlPanelColumnWidths"),
-			&m_config->globalFolderSettings.folderColumns.controlPanelColumns);
-
-		SaveColumnToRegistry(hColumnsKey, _T("MyComputerColumns"),
-			&m_config->globalFolderSettings.folderColumns.myComputerColumns);
-		SaveColumnWidthsToRegistry(hColumnsKey, _T("MyComputerColumnWidths"),
-			&m_config->globalFolderSettings.folderColumns.myComputerColumns);
-
-		SaveColumnToRegistry(hColumnsKey, _T("RealFolderColumns"),
-			&m_config->globalFolderSettings.folderColumns.realFolderColumns);
-		SaveColumnWidthsToRegistry(hColumnsKey, _T("RealFolderColumnWidths"),
-			&m_config->globalFolderSettings.folderColumns.realFolderColumns);
-
-		SaveColumnToRegistry(hColumnsKey, _T("RecycleBinColumns"),
-			&m_config->globalFolderSettings.folderColumns.recycleBinColumns);
-		SaveColumnWidthsToRegistry(hColumnsKey, _T("RecycleBinColumnWidths"),
-			&m_config->globalFolderSettings.folderColumns.recycleBinColumns);
-
-		SaveColumnToRegistry(hColumnsKey, _T("PrinterColumns"),
-			&m_config->globalFolderSettings.folderColumns.printersColumns);
-		SaveColumnWidthsToRegistry(hColumnsKey, _T("PrinterColumnWidths"),
-			&m_config->globalFolderSettings.folderColumns.printersColumns);
-
-		SaveColumnToRegistry(hColumnsKey, _T("NetworkColumns"),
-			&m_config->globalFolderSettings.folderColumns.networkConnectionsColumns);
-		SaveColumnWidthsToRegistry(hColumnsKey, _T("NetworkColumnWidths"),
-			&m_config->globalFolderSettings.folderColumns.networkConnectionsColumns);
-
-		SaveColumnToRegistry(hColumnsKey, _T("NetworkPlacesColumns"),
-			&m_config->globalFolderSettings.folderColumns.myNetworkPlacesColumns);
-		SaveColumnWidthsToRegistry(hColumnsKey, _T("NetworkPlacesColumnWidths"),
-			&m_config->globalFolderSettings.folderColumns.myNetworkPlacesColumns);
-
-		RegCloseKey(hColumnsKey);
+		return;
 	}
+
+	ColumnRegistryStorage::SaveAllColumnSets(defaultColumnsKey.get(),
+		m_config->globalFolderSettings.folderColumns);
 }
 
 void Explorerplusplus::LoadDefaultColumnsFromRegistry()
 {
-	HKEY hColumnsKey;
-	LONG res;
+	wil::unique_hkey defaultColumnsKey;
+	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER, REG_DEFAULT_COLUMNS_KEY,
+		defaultColumnsKey, wil::reg::key_access::read);
 
-	/* Open/Create the main key that is used to store data. */
-	res = RegOpenKeyEx(HKEY_CURRENT_USER, REG_COLUMNS_KEY, 0, KEY_READ, &hColumnsKey);
-
-	if (res == ERROR_SUCCESS)
+	if (FAILED(hr))
 	{
-		auto &defaultFolderColumns = m_config->globalFolderSettings.folderColumns;
-
-		defaultFolderColumns.controlPanelColumns =
-			LoadColumnFromRegistry(hColumnsKey, _T("ControlPanelColumns"));
-		defaultFolderColumns.myComputerColumns =
-			LoadColumnFromRegistry(hColumnsKey, _T("MyComputerColumns"));
-		defaultFolderColumns.realFolderColumns =
-			LoadColumnFromRegistry(hColumnsKey, _T("RealFolderColumns"));
-		defaultFolderColumns.recycleBinColumns =
-			LoadColumnFromRegistry(hColumnsKey, _T("RecycleBinColumns"));
-		defaultFolderColumns.printersColumns =
-			LoadColumnFromRegistry(hColumnsKey, _T("PrinterColumns"));
-		defaultFolderColumns.networkConnectionsColumns =
-			LoadColumnFromRegistry(hColumnsKey, _T("NetworkColumns"));
-		defaultFolderColumns.myNetworkPlacesColumns =
-			LoadColumnFromRegistry(hColumnsKey, _T("NetworkPlacesColumns"));
-
-		auto controlPanelWidths =
-			LoadColumnWidthsFromRegistry(hColumnsKey, _T("ControlPanelColumnWidths"));
-		auto myComputerWidths =
-			LoadColumnWidthsFromRegistry(hColumnsKey, _T("MyComputerColumnWidths"));
-		auto realFolderWidths =
-			LoadColumnWidthsFromRegistry(hColumnsKey, _T("RealFolderColumnWidths"));
-		auto recycleBinWidths =
-			LoadColumnWidthsFromRegistry(hColumnsKey, _T("RecycleBinColumnWidths"));
-		auto printersWidths = LoadColumnWidthsFromRegistry(hColumnsKey, _T("PrinterColumnWidths"));
-		auto networkConnectionsWidths =
-			LoadColumnWidthsFromRegistry(hColumnsKey, _T("NetworkColumnWidths"));
-		auto myNetworkPlacesWidths =
-			LoadColumnWidthsFromRegistry(hColumnsKey, _T("NetworkPlacesColumnWidths"));
-
-		UpdateColumnWidths(defaultFolderColumns.controlPanelColumns, controlPanelWidths);
-		UpdateColumnWidths(defaultFolderColumns.myComputerColumns, myComputerWidths);
-		UpdateColumnWidths(defaultFolderColumns.realFolderColumns, realFolderWidths);
-		UpdateColumnWidths(defaultFolderColumns.recycleBinColumns, recycleBinWidths);
-		UpdateColumnWidths(defaultFolderColumns.printersColumns, printersWidths);
-		UpdateColumnWidths(defaultFolderColumns.networkConnectionsColumns,
-			networkConnectionsWidths);
-		UpdateColumnWidths(defaultFolderColumns.myNetworkPlacesColumns, myNetworkPlacesWidths);
-
-		ValidateColumns(defaultFolderColumns);
-
-		RegCloseKey(hColumnsKey);
+		return;
 	}
+
+	auto &defaultFolderColumns = m_config->globalFolderSettings.folderColumns;
+	ColumnRegistryStorage::LoadAllColumnSets(defaultColumnsKey.get(), defaultFolderColumns);
+
+	ValidateColumns(defaultFolderColumns);
 }
 
 void Explorerplusplus::LoadMainRebarInformationFromRegistry(HKEY mainKey)

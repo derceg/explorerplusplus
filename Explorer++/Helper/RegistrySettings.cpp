@@ -178,6 +178,12 @@ LSTATUS SaveBinaryValue(HKEY key, const std::wstring &valueName, const BYTE *dat
 	return RegSetValueEx(key, valueName.c_str(), 0, REG_BINARY, data, length);
 }
 
+LSTATUS ReadBinaryValueSize(HKEY key, const std::wstring &valueName, DWORD &length)
+{
+	return RegGetValue(key, nullptr, valueName.c_str(), RRF_RT_REG_BINARY, nullptr, nullptr,
+		&length);
+}
+
 LSTATUS ReadBinaryValue(HKEY key, const std::wstring &valueName, void *data, DWORD length)
 {
 	DWORD outputLength = length;
