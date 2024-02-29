@@ -55,6 +55,7 @@ class TabContainer;
 class TabRestorer;
 class TabRestorerUI;
 struct TabSettings;
+struct TabStorageData;
 class TaskbarThumbnails;
 class ThemeWindowTracker;
 class UiTheming;
@@ -299,7 +300,9 @@ private:
 	void OnTabSelected(const Tab &tab);
 	void ShowTabBar() override;
 	void HideTabBar() override;
-	HRESULT RestoreTabs(ILoadSave *pLoadSave);
+	HRESULT CreateInitialTabs();
+	void RestorePreviousTabs();
+	void CreateCommandLineTabs();
 	void OnTabListViewSelectionChanged(const Tab &tab);
 
 	/* TabNavigationInterface methods. */
@@ -363,10 +366,8 @@ private:
 
 	/* Settings. */
 	void SaveAllSettings() override;
-	std::unique_ptr<ILoadSave> LoadAllSettings();
+	void LoadAllSettings();
 	void ValidateLoadedSettings();
-	void ValidateColumns(FolderColumns &folderColumns);
-	void ValidateSingleColumnSet(int iColumnSet, std::vector<Column_t> &columns);
 	void ApplyDisplayWindowPosition();
 	void TestConfigFile();
 
@@ -374,7 +375,8 @@ private:
 	LONG LoadGenericSettingsFromRegistry();
 	LONG SaveGenericSettingsToRegistry();
 	void SaveTabSettingsToRegistry();
-	int LoadTabSettingsFromRegistry();
+	std::vector<TabStorageData> GetTabListStorageData();
+	void LoadTabSettingsFromRegistry();
 	void LoadDefaultColumnsFromRegistry();
 	void SaveDefaultColumnsToRegistry();
 	void LoadMainRebarInformationFromRegistry(HKEY mainKey);
@@ -383,9 +385,8 @@ private:
 	/* XML Settings. */
 	void LoadGenericSettingsFromXML(IXMLDOMDocument *pXMLDom);
 	void SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
-	int LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom);
+	void LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom);
 	void SaveTabSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
-	void SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe);
 	void LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom);
 	void SaveDefaultColumnsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void SaveWindowPositionToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
@@ -393,8 +394,6 @@ private:
 	void LoadMainRebarInformationFromXML(IXMLDOMDocument *pXMLDom);
 	void SaveMainRebarInformationToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, WCHAR *wszValue);
-	void MapTabAttributeValue(WCHAR *wszName, WCHAR *wszValue, TabSettings &tabSettings,
-		FolderSettings &folderSettings, bool &groupModeLoaded, bool &groupSortDirectionLoaded);
 
 	/* Window state update. */
 	void UpdateWindowStates(const Tab &tab);
@@ -607,6 +606,7 @@ private:
 	std::unique_ptr<BrowserPane> m_browserPane;
 
 	/* Tabs. */
+	std::vector<TabStorageData> m_loadedTabs;
 	std::unique_ptr<MainFontSetter> m_tabToolbarTooltipFontSetter;
 	wil::unique_hbrush m_tabBarBackgroundBrush;
 	std::unique_ptr<TabRestorer> m_tabRestorer;

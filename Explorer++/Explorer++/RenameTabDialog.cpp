@@ -106,11 +106,7 @@ void RenameTabDialog::OnOk()
 		HWND hEditName = GetDlgItem(m_hDlg, IDC_RENAMETAB_NEWTABNAME);
 
 		std::wstring tabText = GetWindowString(hEditName);
-
-		if (!tabText.empty())
-		{
-			tab->SetCustomName(tabText);
-		}
+		tab->SetCustomName(tabText);
 	}
 
 	EndDialog(m_hDlg, 1);

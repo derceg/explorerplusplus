@@ -72,7 +72,7 @@ BOOL TestConfigFileInternal()
 	return bLoadSettingsFromXML;
 }
 
-std::unique_ptr<ILoadSave> Explorerplusplus::LoadAllSettings()
+void Explorerplusplus::LoadAllSettings()
 {
 	/* Tests for the existence of the configuration
 	file. If the file is present, a flag is set
@@ -101,6 +101,7 @@ std::unique_ptr<ILoadSave> Explorerplusplus::LoadAllSettings()
 
 	loadSave->LoadBookmarks();
 	loadSave->LoadGenericSettings();
+	loadSave->LoadPreviousTabs();
 	loadSave->LoadDefaultColumns();
 	loadSave->LoadApplicationToolbar();
 	loadSave->LoadMainRebarInformation();
@@ -108,8 +109,6 @@ std::unique_ptr<ILoadSave> Explorerplusplus::LoadAllSettings()
 	loadSave->LoadDialogStates();
 
 	ValidateLoadedSettings();
-
-	return loadSave;
 }
 
 void Explorerplusplus::OpenItem(const std::wstring &itemPath,

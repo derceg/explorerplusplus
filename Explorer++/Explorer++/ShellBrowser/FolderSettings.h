@@ -69,4 +69,7 @@ struct FolderSettings
 	bool applyFilter = false;
 	bool filterCaseSensitive = false;
 	std::wstring filter;
+
+	// This is only used in tests.
+	bool operator==(const FolderSettings &) const = default;
 };

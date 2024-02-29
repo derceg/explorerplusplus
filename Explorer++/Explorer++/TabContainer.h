@@ -55,6 +55,9 @@ struct TabSettingsImpl
 	std::optional<Tab::LockState> lockState;
 	std::optional<int> index;
 	std::optional<bool> selected;
+
+	// This is only used in tests.
+	bool operator==(const TabSettingsImpl &) const = default;
 };
 
 // Used when creating a tab.
@@ -221,7 +224,7 @@ private:
 	void SetTabIconFromSystemImageList(const Tab &tab, int systemIconIndex);
 	void SetTabIconFromImageList(const Tab &tab, int imageIndex);
 
-	void InsertNewTab(int index, int tabId, const PidlAbsolute &pidlDirectory,
+	int InsertNewTab(int index, int tabId, const PidlAbsolute &pidlDirectory,
 		std::optional<std::wstring> customName);
 
 	void RemoveTabFromControl(const Tab &tab);

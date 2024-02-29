@@ -616,6 +616,15 @@
     <ClCompile Include="ColumnXmlStorage.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="TabRegistryStorage.cpp">
+      <Filter>Tabs</Filter>
+    </ClCompile>
+    <ClCompile Include="TabXmlStorage.cpp">
+      <Filter>Tabs</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnStorage.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1261,6 +1270,18 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ColumnXmlStorage.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="TabRegistryStorage.h">
+      <Filter>Tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="TabXmlStorage.h">
+      <Filter>Tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="TabStorage.h">
+      <Filter>Tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnStorage.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

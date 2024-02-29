@@ -928,7 +928,7 @@ Tab &TabContainer::CreateNewTab(NavigateParams &navigateParams, const TabSetting
 		tab.SetLockState(*tabSettings.lockState);
 	}
 
-	if (tabSettings.name && !tabSettings.name->empty())
+	if (tabSettings.name)
 	{
 		tab.SetCustomName(*tabSettings.name);
 	}
@@ -963,7 +963,7 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 	/* Browse folder sends a message back to the main window, which
 	attempts to contact the new tab (needs to be created before browsing
 	the folder). */
-	InsertNewTab(index, tab.GetId(), navigateParams.pidl, tabSettings.name);
+	index = InsertNewTab(index, tab.GetId(), navigateParams.pidl, tabSettings.name);
 
 	// Note that for the listview window to be shown, it has to have a non-zero
 	// size. If the size is zero at the point it's shown, it will instead remain
@@ -977,6 +977,13 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 	if (tabSettings.selected)
 	{
 		selected = *tabSettings.selected;
+	}
+
+	if (m_tabs.size() == 1)
+	{
+		// This is the first tab being inserted, so it should be selected (to ensure there's always
+		// a selected tab), regardless of what the caller passes in.
+		selected = true;
 	}
 
 	tab.GetShellBrowser()->AddNavigationStartedObserver(
@@ -1026,28 +1033,25 @@ Tab &TabContainer::SetUpNewTab(Tab &tab, NavigateParams &navigateParams,
 		}
 	}
 
-	if (selected)
-	{
-		int previousIndex = TabCtrl_SetCurSel(m_hwnd, index);
-
-		if (previousIndex != -1)
-		{
-			tabSelectedSignal.m_signal(tab);
-		}
-	}
-
 	// There's no need to manually disconnect this. Either it will be
 	// disconnected when the tab is closed and the tab object (and
 	// associated signal) is destroyed or when the tab is destroyed
 	// during application shutdown.
 	tab.AddTabUpdatedObserver(std::bind_front(&TabContainer::OnTabUpdated, this));
 
+	if (selected)
+	{
+		TabCtrl_SetCurSel(m_hwnd, index);
+
+		tabSelectedSignal.m_signal(tab);
+	}
+
 	tabCreatedSignal.m_signal(tab.GetId(), selected);
 
 	return tab;
 }
 
-void TabContainer::InsertNewTab(int index, int tabId, const PidlAbsolute &pidlDirectory,
+int TabContainer::InsertNewTab(int index, int tabId, const PidlAbsolute &pidlDirectory,
 	std::optional<std::wstring> customName)
 {
 	std::wstring name;
@@ -1067,7 +1071,10 @@ void TabContainer::InsertNewTab(int index, int tabId, const PidlAbsolute &pidlDi
 	tcItem.mask = TCIF_TEXT | TCIF_PARAM;
 	tcItem.pszText = name.data();
 	tcItem.lParam = tabId;
-	TabCtrl_InsertItem(m_hwnd, index, &tcItem);
+	int insertedIndex = TabCtrl_InsertItem(m_hwnd, index, &tcItem);
+	CHECK_NE(insertedIndex, -1);
+
+	return insertedIndex;
 }
 
 bool TabContainer::CloseTab(const Tab &tab)
@@ -1234,14 +1241,9 @@ void TabContainer::SelectAdjacentTab(BOOL bNextTab)
 
 void TabContainer::SelectTabAtIndex(int index)
 {
-	assert(index >= 0 && index < GetNumTabs());
+	CHECK(index >= 0 && index < GetNumTabs());
 
-	int previousIndex = TabCtrl_SetCurSel(m_hwnd, index);
-
-	if (previousIndex == -1)
-	{
-		return;
-	}
+	TabCtrl_SetCurSel(m_hwnd, index);
 
 	tabSelectedSignal.m_signal(GetTabByIndex(index));
 }

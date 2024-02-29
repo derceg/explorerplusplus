@@ -44,6 +44,13 @@ TEST_F(TabTest, CustomName)
 	EXPECT_FALSE(m_tab.GetUseCustomName());
 }
 
+TEST_F(TabTest, EmptyName)
+{
+	// An empty string isn't counted as a valid name and should be ignored.
+	m_tab.SetCustomName(L"");
+	EXPECT_FALSE(m_tab.GetUseCustomName());
+}
+
 TEST_F(TabTest, Update)
 {
 	EXPECT_CALL(m_observer, OnTabUpdated(Ref(m_tab), Tab::PropertyType::Name));

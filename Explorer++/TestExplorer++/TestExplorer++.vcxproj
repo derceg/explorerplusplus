@@ -239,7 +239,10 @@
     <ClCompile Include="ShellHelperTest.cpp" />
     <ClCompile Include="ShellNavigationControllerTest.cpp" />
     <ClCompile Include="StringHelperTest.cpp" />
+    <ClCompile Include="TabRegistryStorageTest.cpp" />
+    <ClCompile Include="TabStorageHelper.cpp" />
     <ClCompile Include="TabTest.cpp" />
+    <ClCompile Include="TabXmlStorageTest.cpp" />
     <ClCompile Include="ViewModeHelperTest.cpp" />
     <ClCompile Include="XmlStorageHelper.cpp" />
   </ItemGroup>
@@ -265,6 +268,7 @@
     <ClInclude Include="ResourceHelper.h" />
     <ClInclude Include="ShellBrowserFake.h" />
     <ClInclude Include="TabNavigationMock.h" />
+    <ClInclude Include="TabStorageHelper.h" />
     <ClInclude Include="XmlStorageHelper.h" />
   </ItemGroup>
   <ItemDefinitionGroup />

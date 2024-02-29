@@ -40,7 +40,7 @@ void Explorerplusplus::OnCreate()
 {
 	InitializeDefaultColorRules();
 
-	auto loadSave = LoadAllSettings();
+	LoadAllSettings();
 
 	if (m_commandLineSettings.shellChangeNotificationType)
 	{
@@ -83,7 +83,7 @@ void Explorerplusplus::OnCreate()
 	m_taskbarThumbnails = TaskbarThumbnails::Create(this, GetActivePane()->GetTabContainer(),
 		m_resourceInstance, m_config);
 
-	RestoreTabs(loadSave.get());
+	CreateInitialTabs();
 
 	// Register for any shell changes. This should be done after the tabs have
 	// been created.

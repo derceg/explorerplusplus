@@ -89,6 +89,11 @@ bool Tab::GetUseCustomName() const
 
 void Tab::SetCustomName(const std::wstring &name)
 {
+	if (name.empty())
+	{
+		return;
+	}
+
 	m_useCustomName = true;
 	m_customName = name;
 

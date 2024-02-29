@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!-- Preference file for Explorer++ -->
+<ExplorerPlusPlus>
+	<Tabs>
+		<Tab name="0" Directory="C:\" ApplyFilter="no" AutoArrange="yes" Filter=""
+			FilterCaseSensitive="no" GroupMode="1" ShowHidden="yes" ShowInGroups="no"
+			SortAscending="no" GroupSortDirection="0" SortMode="3" ViewMode="1" Locked="no"
+			AddressLocked="no" UseCustomName="yes" CustomName="C drive">
+			<Columns>
+				<Column name="Generic" Name="yes" Name_Width="150" Type="no" Type_Width="200" />
+				<Column name="MyComputer" Name="yes" Name_Width="150" TotalSize="yes"
+					TotalSize_Width="800" />
+				<Column name="ControlPanel" VirtualComments="yes" VirtualComments_Width="685"
+					Name="yes" Name_Width="150" />
+				<Column name="RecycleBin" Size="no" Size_Width="363" DateModified="yes"
+					DateModified_Width="212" />
+				<Column name="Printers" PrinterComments="yes" PrinterComments_Width="150"
+					PrinterLocation="no" PrinterLocation_Width="150" />
+				<Column name="Network" NetworkAdaptorStatus="yes" NetworkAdaptorStatus_Width="88"
+					Type="yes" Type_Width="150" />
+				<Column name="NetworkPlaces" Name="yes" Name_Width="150" VirtualComments="no"
+					VirtualComments_Width="150" />
+			</Columns>
+		</Tab>
+		<Tab name="1" Directory="C:\Users" ApplyFilter="yes" AutoArrange="no" Filter="*.exe"
+			FilterCaseSensitive="no" GroupMode="3" ShowHidden="no" ShowInGroups="yes"
+			SortAscending="yes" GroupSortDirection="1" SortMode="2" ViewMode="2" Locked="yes"
+			AddressLocked="no" UseCustomName="no" CustomName="">
+			<Columns>
+			</Columns>
+		</Tab>
+		<Tab name="2" Directory="C:\Users\Default" ApplyFilter="yes" AutoArrange="yes"
+			Filter="*.txt" FilterCaseSensitive="yes" GroupMode="1" ShowHidden="yes"
+			ShowInGroups="no" SortAscending="no" GroupSortDirection="0" SortMode="22" ViewMode="4"
+			Locked="no" AddressLocked="yes" UseCustomName="no" CustomName="">
+			<Columns>
+			</Columns>
+		</Tab>
+	</Tabs>
+</ExplorerPlusPlus>

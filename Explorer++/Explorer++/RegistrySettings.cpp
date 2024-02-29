@@ -15,6 +15,8 @@
 #include "MainToolbar.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
+#include "TabRegistryStorage.h"
+#include "TabStorage.h"
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include <wil/registry.h>
@@ -560,245 +562,32 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 
 void Explorerplusplus::SaveTabSettingsToRegistry()
 {
-	HKEY hKey;
-	HKEY hTabKey;
-	TCHAR szItemKey[128];
-	DWORD disposition;
-	LONG returnValue;
-
-	/* First, delete all current tab keys. If these keys
-	are not deleted beforehand, then they may be opened
-	again on the next program run, even when they were
-	closed. */
 	SHDeleteKey(HKEY_CURRENT_USER, REG_TABS_KEY);
 
-	returnValue = RegCreateKeyEx(HKEY_CURRENT_USER, REG_TABS_KEY, 0, nullptr,
-		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &hKey, &disposition);
+	wil::unique_hkey tabsKey;
+	HRESULT hr = wil::reg::create_unique_key_nothrow(HKEY_CURRENT_USER, REG_TABS_KEY, tabsKey,
+		wil::reg::key_access::readwrite);
 
-	if (returnValue == ERROR_SUCCESS)
+	if (FAILED(hr))
 	{
-		int tabNum = 0;
-
-		for (auto tabRef : GetActivePane()->GetTabContainer()->GetAllTabsInOrder())
-		{
-			auto &tab = tabRef.get();
-
-			StringCchPrintf(szItemKey, SIZEOF_ARRAY(szItemKey), _T("%d"), tabNum);
-
-			returnValue = RegCreateKeyEx(hKey, szItemKey, 0, nullptr, REG_OPTION_NON_VOLATILE,
-				KEY_WRITE, nullptr, &hTabKey, &disposition);
-
-			if (returnValue == ERROR_SUCCESS)
-			{
-				auto pidlDirectory = tab.GetShellBrowser()->GetDirectoryIdl();
-				RegSetValueEx(hTabKey, _T("Directory"), 0, REG_BINARY, (LPBYTE) pidlDirectory.get(),
-					ILGetSize(pidlDirectory.get()));
-
-				RegistrySettings::SaveDword(hTabKey, _T("ViewMode"),
-					tab.GetShellBrowser()->GetViewMode());
-				RegistrySettings::SaveDword(hTabKey, _T("SortMode"),
-					tab.GetShellBrowser()->GetSortMode());
-
-				// For backwards compatibility, the value saved here is a bool.
-				RegistrySettings::SaveDword(hTabKey, _T("SortAscending"),
-					tab.GetShellBrowser()->GetSortDirection() == +SortDirection::Ascending);
-
-				RegistrySettings::SaveDword(hTabKey, _T("GroupMode"),
-					tab.GetShellBrowser()->GetGroupMode());
-				RegistrySettings::SaveDword(hTabKey, _T("GroupSortDirection"),
-					tab.GetShellBrowser()->GetGroupSortDirection());
-				RegistrySettings::SaveDword(hTabKey, _T("ShowInGroups"),
-					tab.GetShellBrowser()->GetShowInGroups());
-				RegistrySettings::SaveDword(hTabKey, _T("ApplyFilter"),
-					tab.GetShellBrowser()->IsFilterApplied());
-				RegistrySettings::SaveDword(hTabKey, _T("FilterCaseSensitive"),
-					tab.GetShellBrowser()->GetFilterCaseSensitive());
-				RegistrySettings::SaveDword(hTabKey, _T("ShowHidden"),
-					tab.GetShellBrowser()->GetShowHidden());
-				RegistrySettings::SaveDword(hTabKey, _T("AutoArrange"),
-					tab.GetShellBrowser()->GetAutoArrange());
-
-				std::wstring filter = tab.GetShellBrowser()->GetFilterText();
-				RegistrySettings::SaveString(hTabKey, _T("Filter"), filter);
-
-				wil::unique_hkey columnsKey;
-				HRESULT hr = wil::reg::create_unique_key_nothrow(hTabKey, _T("Columns"), columnsKey,
-					wil::reg::key_access::readwrite);
-
-				if (SUCCEEDED(hr))
-				{
-					FolderColumns folderColumns = tab.GetShellBrowser()->ExportAllColumns();
-					ColumnRegistryStorage::SaveAllColumnSets(columnsKey.get(), folderColumns);
-				}
-
-				/* High-level settings. */
-				RegistrySettings::SaveDword(hTabKey, _T("Locked"),
-					tab.GetLockState() == Tab::LockState::Locked);
-				RegistrySettings::SaveDword(hTabKey, _T("AddressLocked"),
-					tab.GetLockState() == Tab::LockState::AddressLocked);
-				RegistrySettings::SaveDword(hTabKey, _T("UseCustomName"), tab.GetUseCustomName());
-
-				if (tab.GetUseCustomName())
-				{
-					RegistrySettings::SaveString(hTabKey, _T("CustomName"), tab.GetName());
-				}
-				else
-				{
-					RegistrySettings::SaveString(hTabKey, _T("CustomName"), L"");
-				}
-
-				RegCloseKey(hTabKey);
-			}
-
-			tabNum++;
-		}
-
-		RegCloseKey(hKey);
+		return;
 	}
+
+	TabRegistryStorage::Save(tabsKey.get(), GetTabListStorageData());
 }
 
-int Explorerplusplus::LoadTabSettingsFromRegistry()
+void Explorerplusplus::LoadTabSettingsFromRegistry()
 {
-	HKEY hKey;
-	HKEY hTabKey;
-	TCHAR szItemKey[128];
-	PIDLIST_ABSOLUTE pidlDirectory = nullptr;
-	LONG returnValue;
-	DWORD cbData;
-	DWORD type;
-	int nTabsCreated = 0;
-	int i = 0;
+	wil::unique_hkey tabsKey;
+	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER, REG_TABS_KEY, tabsKey,
+		wil::reg::key_access::read);
 
-	returnValue = RegOpenKeyEx(HKEY_CURRENT_USER, REG_TABS_KEY, 0, KEY_READ, &hKey);
-
-	if (returnValue == ERROR_SUCCESS)
+	if (FAILED(hr))
 	{
-		StringCchPrintf(szItemKey, SIZEOF_ARRAY(szItemKey), _T("%d"), i);
-
-		returnValue = RegOpenKeyEx(hKey, szItemKey, 0, KEY_READ, &hTabKey);
-
-		while (returnValue == ERROR_SUCCESS)
-		{
-			if (RegQueryValueEx(hTabKey, _T("Directory"), nullptr, nullptr, nullptr, &cbData)
-				== ERROR_SUCCESS)
-			{
-				pidlDirectory = (PIDLIST_ABSOLUTE) CoTaskMemAlloc(cbData);
-
-				RegQueryValueEx(hTabKey, _T("Directory"), nullptr, &type, (LPBYTE) pidlDirectory,
-					&cbData);
-			}
-
-			FolderSettings folderSettings;
-
-			RegistrySettings::ReadDword(hTabKey, _T("ViewMode"),
-				[&folderSettings](DWORD value)
-				{ folderSettings.viewMode = ViewMode::_from_integral(value); });
-			RegistrySettings::ReadDword(hTabKey, _T("SortMode"),
-				[&folderSettings](DWORD value)
-				{
-					folderSettings.sortMode = SortMode::_from_integral(value);
-
-					// Previously, the group mode and sort mode were always the same. Therefore, the
-					// group mode is set here to preserve the behavior. This will only have an
-					// effect when updating from a version that didn't save a separate group mode.
-					// If a group mode has been saved, it will be loaded below and the value loaded
-					// here will be overwritten.
-					folderSettings.groupMode = SortMode::_from_integral(value);
-				});
-			RegistrySettings::ReadDword(hTabKey, _T("SortAscending"),
-				[&folderSettings](DWORD value)
-				{
-					folderSettings.sortDirection =
-						value ? SortDirection::Ascending : SortDirection::Descending;
-
-					// As with the group mode/sort mode, the group sort direction and standard sort
-					// direction were always the same in previous versions.
-					folderSettings.groupSortDirection =
-						value ? SortDirection::Ascending : SortDirection::Descending;
-				});
-			RegistrySettings::ReadDword(hTabKey, _T("GroupMode"),
-				[&folderSettings](DWORD value)
-				{ folderSettings.groupMode = SortMode::_from_integral(value); });
-			RegistrySettings::ReadDword(hTabKey, _T("GroupSortDirection"),
-				[&folderSettings](DWORD value)
-				{ folderSettings.groupSortDirection = SortDirection::_from_integral(value); });
-			RegistrySettings::Read32BitValueFromRegistry(hTabKey, _T("ShowInGroups"),
-				folderSettings.showInGroups);
-			RegistrySettings::Read32BitValueFromRegistry(hTabKey, _T("ApplyFilter"),
-				folderSettings.applyFilter);
-			RegistrySettings::Read32BitValueFromRegistry(hTabKey, _T("FilterCaseSensitive"),
-				folderSettings.filterCaseSensitive);
-			RegistrySettings::Read32BitValueFromRegistry(hTabKey, _T("ShowHidden"),
-				folderSettings.showHidden);
-			RegistrySettings::Read32BitValueFromRegistry(hTabKey, _T("AutoArrange"),
-				folderSettings.autoArrange);
-
-			RegistrySettings::ReadString(hTabKey, _T("Filter"), folderSettings.filter);
-
-			wil::unique_hkey columnsKey;
-			HRESULT hr = wil::reg::open_unique_key_nothrow(hTabKey, _T("Columns"), columnsKey,
-				wil::reg::key_access::read);
-
-			FolderColumns initialColumns;
-
-			if (SUCCEEDED(hr))
-			{
-				ColumnRegistryStorage::LoadAllColumnSets(columnsKey.get(), initialColumns);
-			}
-
-			ValidateColumns(initialColumns);
-
-			TabSettings tabSettings;
-
-			tabSettings.index = i;
-			tabSettings.selected = true;
-
-			RegistrySettings::ReadDword(hTabKey, _T("Locked"),
-				[&tabSettings](DWORD value)
-				{
-					if (value)
-					{
-						tabSettings.lockState = Tab::LockState::Locked;
-					}
-				});
-
-			RegistrySettings::ReadDword(hTabKey, _T("AddressLocked"),
-				[&tabSettings](DWORD value)
-				{
-					if (value)
-					{
-						tabSettings.lockState = Tab::LockState::AddressLocked;
-					}
-				});
-
-			std::wstring customName;
-			LSTATUS result = RegistrySettings::ReadString(hTabKey, _T("CustomName"), customName);
-
-			if (result == ERROR_SUCCESS)
-			{
-				tabSettings.name = customName;
-			}
-
-			auto navigateParams = NavigateParams::Normal(pidlDirectory);
-			GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams, tabSettings,
-				&folderSettings, &initialColumns);
-
-			nTabsCreated++;
-
-			CoTaskMemFree(pidlDirectory);
-			RegCloseKey(hTabKey);
-
-			i++;
-
-			StringCchPrintf(szItemKey, SIZEOF_ARRAY(szItemKey), _T("%d"), i);
-
-			returnValue = RegOpenKeyEx(hKey, szItemKey, 0, KEY_READ, &hTabKey);
-		}
-
-		RegCloseKey(hKey);
+		return;
 	}
 
-	return nTabsCreated;
+	m_loadedTabs = TabRegistryStorage::Load(tabsKey.get());
 }
 
 void Explorerplusplus::SaveDefaultColumnsToRegistry()
@@ -829,8 +618,6 @@ void Explorerplusplus::LoadDefaultColumnsFromRegistry()
 
 	auto &defaultFolderColumns = m_config->globalFolderSettings.folderColumns;
 	ColumnRegistryStorage::LoadAllColumnSets(defaultColumnsKey.get(), defaultFolderColumns);
-
-	ValidateColumns(defaultFolderColumns);
 }
 
 void Explorerplusplus::LoadMainRebarInformationFromRegistry(HKEY mainKey)

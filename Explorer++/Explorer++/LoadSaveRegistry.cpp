@@ -32,9 +32,9 @@ void LoadSaveRegistry::LoadBookmarks()
 		BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
 }
 
-int LoadSaveRegistry::LoadPreviousTabs()
+void LoadSaveRegistry::LoadPreviousTabs()
 {
-	return m_pContainer->LoadTabSettingsFromRegistry();
+	m_pContainer->LoadTabSettingsFromRegistry();
 }
 
 void LoadSaveRegistry::LoadDefaultColumns()

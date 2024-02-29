@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "ColumnStorage.h"
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"
@@ -12,6 +13,7 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "TabContainer.h"
+#include "TabStorage.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Macros.h"
@@ -32,114 +34,10 @@ void Explorerplusplus::ValidateLoadedSettings()
 	}
 
 	ValidateColumns(m_config->globalFolderSettings.folderColumns);
-}
 
-void Explorerplusplus::ValidateColumns(FolderColumns &folderColumns)
-{
-	ValidateSingleColumnSet(VALIDATE_REALFOLDER_COLUMNS, folderColumns.realFolderColumns);
-	ValidateSingleColumnSet(VALIDATE_CONTROLPANEL_COLUMNS, folderColumns.controlPanelColumns);
-	ValidateSingleColumnSet(VALIDATE_MYCOMPUTER_COLUMNS, folderColumns.myComputerColumns);
-	ValidateSingleColumnSet(VALIDATE_RECYCLEBIN_COLUMNS, folderColumns.recycleBinColumns);
-	ValidateSingleColumnSet(VALIDATE_PRINTERS_COLUMNS, folderColumns.printersColumns);
-	ValidateSingleColumnSet(VALIDATE_NETWORKCONNECTIONS_COLUMNS,
-		folderColumns.networkConnectionsColumns);
-	ValidateSingleColumnSet(VALIDATE_MYNETWORKPLACES_COLUMNS, folderColumns.myNetworkPlacesColumns);
-}
-
-void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet, std::vector<Column_t> &columns)
-{
-	Column_t column;
-	BOOL bFound = FALSE;
-	const Column_t *pColumns = nullptr;
-	unsigned int iTotalColumnSize = 0;
-	unsigned int i = 0;
-
-	switch (iColumnSet)
+	for (auto &loadedTab : m_loadedTabs)
 	{
-	case VALIDATE_REALFOLDER_COLUMNS:
-		iTotalColumnSize = SIZEOF_ARRAY(REAL_FOLDER_DEFAULT_COLUMNS);
-		pColumns = REAL_FOLDER_DEFAULT_COLUMNS;
-		break;
-
-	case VALIDATE_CONTROLPANEL_COLUMNS:
-		iTotalColumnSize = SIZEOF_ARRAY(CONTROL_PANEL_DEFAULT_COLUMNS);
-		pColumns = CONTROL_PANEL_DEFAULT_COLUMNS;
-		break;
-
-	case VALIDATE_MYCOMPUTER_COLUMNS:
-		iTotalColumnSize = SIZEOF_ARRAY(MY_COMPUTER_DEFAULT_COLUMNS);
-		pColumns = MY_COMPUTER_DEFAULT_COLUMNS;
-		break;
-
-	case VALIDATE_RECYCLEBIN_COLUMNS:
-		iTotalColumnSize = SIZEOF_ARRAY(RECYCLE_BIN_DEFAULT_COLUMNS);
-		pColumns = RECYCLE_BIN_DEFAULT_COLUMNS;
-		break;
-
-	case VALIDATE_PRINTERS_COLUMNS:
-		iTotalColumnSize = SIZEOF_ARRAY(PRINTERS_DEFAULT_COLUMNS);
-		pColumns = PRINTERS_DEFAULT_COLUMNS;
-		break;
-
-	case VALIDATE_NETWORKCONNECTIONS_COLUMNS:
-		iTotalColumnSize = SIZEOF_ARRAY(NETWORK_CONNECTIONS_DEFAULT_COLUMNS);
-		pColumns = NETWORK_CONNECTIONS_DEFAULT_COLUMNS;
-		break;
-
-	case VALIDATE_MYNETWORKPLACES_COLUMNS:
-		iTotalColumnSize = SIZEOF_ARRAY(MY_NETWORK_PLACES_DEFAULT_COLUMNS);
-		pColumns = MY_NETWORK_PLACES_DEFAULT_COLUMNS;
-		break;
-	}
-
-	/* Check that every column that is supposed to appear
-	is in the column list. */
-	for (i = 0; i < iTotalColumnSize; i++)
-	{
-		bFound = FALSE;
-
-		for (auto itr = columns.begin(); itr != columns.end(); itr++)
-		{
-			if (itr->type == pColumns[i].type)
-			{
-				bFound = TRUE;
-				break;
-			}
-		}
-
-		/* The column is not currently in the set. Add it in. */
-		if (!bFound)
-		{
-			column.type = pColumns[i].type;
-			column.checked = pColumns[i].checked;
-			column.width = DEFAULT_COLUMN_WIDTH;
-			columns.push_back(column);
-		}
-	}
-
-	/* Check that no unknown column types appear in the column list. */
-	for (auto itr = columns.cbegin(); itr != columns.cend();)
-	{
-		bFound = FALSE;
-
-		for (i = 0; i < iTotalColumnSize; i++)
-		{
-			if (itr->type == pColumns[i].type)
-			{
-				bFound = TRUE;
-				break;
-			}
-		}
-
-		if (!bFound)
-		{
-			/* The column is not recognized in the set. Remove it. */
-			itr = columns.erase(itr);
-		}
-		else
-		{
-			++itr;
-		}
+		ValidateColumns(loadedTab.columns);
 	}
 }
 

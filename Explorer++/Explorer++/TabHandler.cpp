@@ -11,6 +11,7 @@
 #include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
 #include "TabRestorerUI.h"
+#include "TabStorage.h"
 #include "../Helper/Macros.h"
 #include <list>
 
@@ -133,27 +134,64 @@ void Explorerplusplus::OnNewTab()
 		TabSettings(_selected = true));
 }
 
-HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
+HRESULT Explorerplusplus::CreateInitialTabs()
+{
+	if (m_config->startupMode == StartupMode::PreviousTabs)
+	{
+		RestorePreviousTabs();
+	}
+
+	CreateCommandLineTabs();
+
+	if (GetActivePane()->GetTabContainer()->GetNumTabs() == 0)
+	{
+		GetActivePane()->GetTabContainer()->CreateNewTabInDefaultDirectory({});
+	}
+
+	if (!m_config->alwaysShowTabBar.get() && GetActivePane()->GetTabContainer()->GetNumTabs() == 1)
+	{
+		m_bShowTabBar = false;
+	}
+
+	return S_OK;
+}
+
+void Explorerplusplus::RestorePreviousTabs()
+{
+	int index = 0;
+
+	for (auto &loadedTab : m_loadedTabs)
+	{
+		loadedTab.tabSettings.index = index;
+
+		if (loadedTab.pidl.HasValue())
+		{
+			auto navigateParams = NavigateParams::Normal(loadedTab.pidl.Raw());
+			GetActivePane()->GetTabContainer()->CreateNewTab(navigateParams, loadedTab.tabSettings,
+				&loadedTab.folderSettings, &loadedTab.columns);
+		}
+		else
+		{
+			GetActivePane()->GetTabContainer()->CreateNewTab(loadedTab.directory,
+				loadedTab.tabSettings, &loadedTab.folderSettings, &loadedTab.columns);
+		}
+
+		index++;
+	}
+
+	if (m_iLastSelectedTab >= 0
+		&& m_iLastSelectedTab < GetActivePane()->GetTabContainer()->GetNumTabs())
+	{
+		GetActivePane()->GetTabContainer()->SelectTabAtIndex(m_iLastSelectedTab);
+	}
+}
+
+void Explorerplusplus::CreateCommandLineTabs()
 {
 	// It's implicitly assumed that this will succeed. Although the documentation states that
 	// GetCurrentDirectory() can fail, I'm not sure under what circumstances it ever would.
-	// Also note that it's important that this is called before creating any tabs, as
-	// SetCurrentDirectory() is currently called when navigating/switching to a tab.
 	auto currentDirectory = GetCurrentDirectoryWrapper();
-
-	if (m_config->startupMode == StartupMode::PreviousTabs)
-	{
-		pLoadSave->LoadPreviousTabs();
-
-		// It's possible that the above call might not have loaded any tabs (e.g. because there are
-		// no saved settings). So, it's important that tab selection is only set when the last
-		// selected tab value is in the appropriate range.
-		if (m_iLastSelectedTab >= 0
-			&& m_iLastSelectedTab < GetActivePane()->GetTabContainer()->GetNumTabs())
-		{
-			GetActivePane()->GetTabContainer()->SelectTabAtIndex(m_iLastSelectedTab);
-		}
-	}
+	CHECK(currentDirectory);
 
 	for (const auto &fileToSelect : m_commandLineSettings.filesToSelect)
 	{
@@ -217,19 +255,6 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 		GetActivePane()->GetTabContainer()->CreateNewTab(*absolutePath,
 			TabSettings(_selected = true));
 	}
-
-	if (GetActivePane()->GetTabContainer()->GetNumTabs() == 0)
-	{
-		GetActivePane()->GetTabContainer()->CreateNewTabInDefaultDirectory(
-			TabSettings(_selected = true));
-	}
-
-	if (!m_config->alwaysShowTabBar.get() && GetActivePane()->GetTabContainer()->GetNumTabs() == 1)
-	{
-		m_bShowTabBar = false;
-	}
-
-	return S_OK;
 }
 
 void Explorerplusplus::OnTabSelected(const Tab &tab)
@@ -321,4 +346,35 @@ void Explorerplusplus::SelectTabById(int tabId)
 {
 	const Tab &tab = GetActivePane()->GetTabContainer()->GetTab(tabId);
 	GetActivePane()->GetTabContainer()->SelectTab(tab);
+}
+
+std::vector<TabStorageData> Explorerplusplus::GetTabListStorageData()
+{
+	std::vector<TabStorageData> tabListStorageData;
+
+	for (auto tabRef : GetActivePane()->GetTabContainer()->GetAllTabsInOrder())
+	{
+		const auto &tab = tabRef.get();
+
+		TabStorageData tabStorageData;
+		tabStorageData.pidl = tab.GetShellBrowser()->GetDirectoryIdl().get();
+		tabStorageData.directory = tab.GetShellBrowser()->GetDirectory();
+		tabStorageData.folderSettings = tab.GetShellBrowser()->GetFolderSettings();
+		tabStorageData.columns = tab.GetShellBrowser()->ExportAllColumns();
+
+		TabSettings tabSettings;
+
+		if (tab.GetUseCustomName())
+		{
+			tabSettings.name = tab.GetName();
+		}
+
+		tabSettings.lockState = tab.GetLockState();
+
+		tabStorageData.tabSettings = tabSettings;
+
+		tabListStorageData.push_back(tabStorageData);
+	}
+
+	return tabListStorageData;
 }

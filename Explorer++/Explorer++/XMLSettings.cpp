@@ -26,6 +26,8 @@
 #include "ShellBrowser/Columns.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
+#include "TabStorage.h"
+#include "TabXmlStorage.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/XMLSettings.h"
@@ -697,220 +699,39 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	SaveWindowPositionToXML(pXMLDom, pRoot);
 }
 
-int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
+void Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 {
 	if (!pXMLDom)
 	{
-		return 0;
+		return;
 	}
 
-	wil::com_ptr_nothrow<IXMLDOMNodeList> pNodes;
-	auto bstr = wil::make_bstr_nothrow(L"//Tabs/*");
-	pXMLDom->selectNodes(bstr.get(), &pNodes);
+	wil::com_ptr_nothrow<IXMLDOMNode> tabsNode;
+	auto bstr = wil::make_bstr_nothrow(L"//Tabs");
+	pXMLDom->selectSingleNode(bstr.get(), &tabsNode);
 
-	if (!pNodes)
+	if (!tabsNode)
 	{
-		return 0;
+		return;
 	}
 
-	int nTabsCreated = 0;
-
-	long length;
-	pNodes->get_length(&length);
-
-	for (long i = 0; i < length; i++)
-	{
-		/* This should never fail, as the number
-		of nodes has already been counted (so
-		they must exist). */
-		wil::com_ptr_nothrow<IXMLDOMNode> pNode;
-		HRESULT hr = pNodes->get_item(i, &pNode);
-
-		TCHAR szDirectory[MAX_PATH];
-		TabSettings tabSettings;
-		FolderSettings folderSettings;
-		FolderColumns initialColumns;
-
-		if (SUCCEEDED(hr))
-		{
-			wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
-			hr = pNode->get_attributes(&am);
-
-			if (SUCCEEDED(hr))
-			{
-				tabSettings.index = i;
-				tabSettings.selected = true;
-
-				long lChildNodes;
-				am->get_length(&lChildNodes);
-
-				bool groupModeLoaded = false;
-				bool groupSortDirectionLoaded = false;
-
-				/* For each tab, the first attribute will just be
-				a tab number (0,1,2...). This number can be safely
-				ignored. */
-				for (long j = 1; j < lChildNodes; j++)
-				{
-					wil::com_ptr_nothrow<IXMLDOMNode> pChildNode;
-					am->get_item(j, &pChildNode);
-
-					wil::unique_bstr bstrName;
-					pChildNode->get_nodeName(&bstrName);
-
-					wil::unique_bstr bstrValue;
-					pChildNode->get_text(&bstrValue);
-
-					if (lstrcmp(bstrName.get(), L"Directory") == 0)
-					{
-						StringCchCopy(szDirectory, SIZEOF_ARRAY(szDirectory), bstrValue.get());
-					}
-					else
-					{
-						MapTabAttributeValue(bstrName.get(), bstrValue.get(), tabSettings,
-							folderSettings, groupModeLoaded, groupSortDirectionLoaded);
-					}
-				}
-
-				wil::com_ptr_nothrow<IXMLDOMNode> firstNode;
-				hr = pNode->get_firstChild(&firstNode);
-
-				if (hr == S_OK)
-				{
-					wil::com_ptr_nothrow<IXMLDOMNode> pColumnsNode;
-					hr = firstNode->get_nextSibling(&pColumnsNode);
-
-					ColumnXmlStorage::LoadAllColumnSets(pColumnsNode.get(), initialColumns);
-				}
-
-				ValidateSingleColumnSet(VALIDATE_REALFOLDER_COLUMNS,
-					initialColumns.realFolderColumns);
-				ValidateSingleColumnSet(VALIDATE_CONTROLPANEL_COLUMNS,
-					initialColumns.controlPanelColumns);
-				ValidateSingleColumnSet(VALIDATE_MYCOMPUTER_COLUMNS,
-					initialColumns.myComputerColumns);
-				ValidateSingleColumnSet(VALIDATE_RECYCLEBIN_COLUMNS,
-					initialColumns.recycleBinColumns);
-				ValidateSingleColumnSet(VALIDATE_PRINTERS_COLUMNS, initialColumns.printersColumns);
-				ValidateSingleColumnSet(VALIDATE_NETWORKCONNECTIONS_COLUMNS,
-					initialColumns.networkConnectionsColumns);
-				ValidateSingleColumnSet(VALIDATE_MYNETWORKPLACES_COLUMNS,
-					initialColumns.myNetworkPlacesColumns);
-			}
-		}
-
-		GetActivePane()->GetTabContainer()->CreateNewTab(szDirectory, tabSettings, &folderSettings,
-			&initialColumns);
-
-		nTabsCreated++;
-	}
-
-	return nTabsCreated;
+	m_loadedTabs = TabXmlStorage::Load(tabsNode.get());
 }
 
 void Explorerplusplus::SaveTabSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
 {
-	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pRoot);
-
-	wil::com_ptr_nothrow<IXMLDOMElement> pe;
+	wil::com_ptr_nothrow<IXMLDOMElement> tabsNode;
 	auto bstr = wil::make_bstr_nothrow(L"Tabs");
-	pXMLDom->createElement(bstr.get(), &pe);
+	HRESULT hr = pXMLDom->createElement(bstr.get(), &tabsNode);
 
-	SaveTabSettingsToXMLnternal(pXMLDom, pe.get());
-
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pe.get());
-
-	NXMLSettings::AppendChildToParent(pe.get(), pRoot);
-}
-
-void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe)
-{
-	int tabNum = 0;
-	auto bstr_wsntt = wil::make_bstr_nothrow(L"\n\t\t");
-	auto bstr_wsnttt = wil::make_bstr_nothrow(L"\n\t\t\t");
-
-	for (auto tabRef : GetActivePane()->GetTabContainer()->GetAllTabsInOrder())
+	if (FAILED(hr))
 	{
-		auto &tab = tabRef.get();
-
-		NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe);
-
-		wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
-		TCHAR szNodeName[32];
-		StringCchPrintf(szNodeName, SIZEOF_ARRAY(szNodeName), _T("%d"), tabNum);
-		NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe, _T("Tab"), szNodeName);
-
-		std::wstring tabDirectory = tab.GetShellBrowser()->GetDirectory();
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Directory"),
-			tabDirectory.c_str());
-
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("ApplyFilter"),
-			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->IsFilterApplied()));
-
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("AutoArrange"),
-			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetAutoArrange()));
-
-		std::wstring filter = tab.GetShellBrowser()->GetFilterText();
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Filter"), filter.c_str());
-
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("FilterCaseSensitive"),
-			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetFilterCaseSensitive()));
-
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("GroupMode"),
-			NXMLSettings::EncodeIntValue(tab.GetShellBrowser()->GetGroupMode()));
-
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("ShowHidden"),
-			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetShowHidden()));
-
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("ShowInGroups"),
-			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetShowInGroups()));
-
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("SortAscending"),
-			NXMLSettings::EncodeBoolValue(
-				tab.GetShellBrowser()->GetSortDirection() == +SortDirection::Ascending));
-
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("GroupSortDirection"),
-			NXMLSettings::EncodeIntValue(tab.GetShellBrowser()->GetGroupSortDirection()));
-
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("SortMode"),
-			NXMLSettings::EncodeIntValue(tab.GetShellBrowser()->GetSortMode()));
-
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("ViewMode"),
-			NXMLSettings::EncodeIntValue(tab.GetShellBrowser()->GetViewMode()));
-
-		wil::com_ptr_nothrow<IXMLDOMElement> pColumnsNode;
-		auto bstr = wil::make_bstr_nothrow(L"Columns");
-		pXMLDom->createElement(bstr.get(), &pColumnsNode);
-
-		auto folderColumns = tab.GetShellBrowser()->ExportAllColumns();
-		ColumnXmlStorage::SaveAllColumnSets(pXMLDom, pColumnsNode.get(), folderColumns);
-
-		NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnttt.get(), pColumnsNode.get());
-
-		/* High-level settings. */
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Locked"),
-			NXMLSettings::EncodeBoolValue(tab.GetLockState() == Tab::LockState::Locked));
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("AddressLocked"),
-			NXMLSettings::EncodeBoolValue(tab.GetLockState() == Tab::LockState::AddressLocked));
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("UseCustomName"),
-			NXMLSettings::EncodeBoolValue(tab.GetUseCustomName()));
-
-		if (tab.GetUseCustomName())
-			NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("CustomName"),
-				tab.GetName().c_str());
-		else
-			NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("CustomName"),
-				EMPTY_STRING);
-
-		NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnttt.get(), pParentNode.get());
-
-		NXMLSettings::AppendChildToParent(pColumnsNode.get(), pParentNode.get());
-
-		NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pParentNode.get());
-
-		tabNum++;
+		return;
 	}
+
+	TabXmlStorage::Save(pXMLDom, tabsNode.get(), GetTabListStorageData());
+
+	NXMLSettings::AppendChildToParent(tabsNode.get(), pRoot);
 }
 
 void Explorerplusplus::LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom)
@@ -937,7 +758,12 @@ void Explorerplusplus::SaveDefaultColumnsToXML(IXMLDOMDocument *pXMLDom, IXMLDOM
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> defaultColumnsNode;
 	auto bstr = wil::make_bstr_nothrow(L"DefaultColumns");
-	pXMLDom->createElement(bstr.get(), &defaultColumnsNode);
+	HRESULT hr = pXMLDom->createElement(bstr.get(), &defaultColumnsNode);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
 
 	const auto &folderColumns = m_config->globalFolderSettings.folderColumns;
 	ColumnXmlStorage::SaveAllColumnSets(pXMLDom, defaultColumnsNode.get(), folderColumns);
@@ -1418,95 +1244,5 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 		}
 	}
 	break;
-	}
-}
-
-void Explorerplusplus::MapTabAttributeValue(WCHAR *wszName, WCHAR *wszValue,
-	TabSettings &tabSettings, FolderSettings &folderSettings, bool &groupModeLoaded,
-	bool &groupSortDirectionLoaded)
-{
-	if (lstrcmp(wszName, L"ApplyFilter") == 0)
-	{
-		folderSettings.applyFilter = NXMLSettings::DecodeBoolValue(wszValue);
-	}
-	else if (lstrcmp(wszName, L"AutoArrange") == 0)
-	{
-		folderSettings.autoArrange = NXMLSettings::DecodeBoolValue(wszValue);
-	}
-	else if (lstrcmp(wszName, L"Filter") == 0)
-	{
-		folderSettings.filter = wszValue;
-	}
-	else if (lstrcmp(wszName, L"FilterCaseSensitive") == 0)
-	{
-		folderSettings.filterCaseSensitive = NXMLSettings::DecodeBoolValue(wszValue);
-	}
-	else if (lstrcmp(wszName, L"GroupMode") == 0)
-	{
-		folderSettings.groupMode = SortMode::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
-		groupModeLoaded = true;
-	}
-	else if (lstrcmp(wszName, L"ShowHidden") == 0)
-	{
-		folderSettings.showHidden = NXMLSettings::DecodeBoolValue(wszValue);
-	}
-	else if (lstrcmp(wszName, L"ShowInGroups") == 0)
-	{
-		folderSettings.showInGroups = NXMLSettings::DecodeBoolValue(wszValue);
-	}
-	else if (lstrcmp(wszName, L"SortAscending") == 0)
-	{
-		folderSettings.sortDirection = NXMLSettings::DecodeBoolValue(wszValue)
-			? SortDirection::Ascending
-			: SortDirection::Descending;
-
-		if (!groupSortDirectionLoaded)
-		{
-			folderSettings.groupSortDirection = NXMLSettings::DecodeBoolValue(wszValue)
-				? SortDirection::Ascending
-				: SortDirection::Descending;
-		}
-	}
-	else if (lstrcmp(wszName, L"GroupSortDirection") == 0)
-	{
-		folderSettings.groupSortDirection =
-			SortDirection::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
-		groupSortDirectionLoaded = true;
-	}
-	else if (lstrcmp(wszName, L"SortMode") == 0)
-	{
-		folderSettings.sortMode = SortMode::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
-
-		if (!groupModeLoaded)
-		{
-			folderSettings.groupMode =
-				SortMode::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
-		}
-	}
-	else if (lstrcmp(wszName, L"ViewMode") == 0)
-	{
-		folderSettings.viewMode = ViewMode::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
-	}
-	else if (lstrcmp(wszName, L"Locked") == 0)
-	{
-		BOOL locked = NXMLSettings::DecodeBoolValue(wszValue);
-
-		if (locked)
-		{
-			tabSettings.lockState = Tab::LockState::Locked;
-		}
-	}
-	else if (lstrcmp(wszName, L"AddressLocked") == 0)
-	{
-		BOOL addressLocked = NXMLSettings::DecodeBoolValue(wszValue);
-
-		if (addressLocked)
-		{
-			tabSettings.lockState = Tab::LockState::AddressLocked;
-		}
-	}
-	else if (lstrcmp(wszName, L"CustomName") == 0)
-	{
-		tabSettings.name = wszValue;
 	}
 }

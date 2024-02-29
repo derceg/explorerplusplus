@@ -996,6 +996,7 @@
     <ClCompile Include="ColorRuleRegistryStorage.cpp" />
     <ClCompile Include="ColorRuleXmlStorage.cpp" />
     <ClCompile Include="ColumnRegistryStorage.cpp" />
+    <ClCompile Include="ColumnStorage.cpp" />
     <ClCompile Include="ColumnXmlStorage.cpp" />
     <ClCompile Include="CrashHandlerHelper.cpp" />
     <ClCompile Include="CustomFont.cpp" />
@@ -1019,6 +1020,8 @@
     <ClCompile Include="ShellEnumerator.cpp" />
     <ClCompile Include="ShellItemsMenu.cpp" />
     <ClCompile Include="SystemFontHelper.cpp" />
+    <ClCompile Include="TabRegistryStorage.cpp" />
+    <ClCompile Include="TabXmlStorage.cpp" />
     <ClCompile Include="ThemeManager.cpp" />
     <ClCompile Include="DefaultSettingsOptionsPage.cpp" />
     <ClCompile Include="DriveEnumeratorImpl.cpp" />
@@ -1234,6 +1237,7 @@
     <ClInclude Include="ColorRuleRegistryStorage.h" />
     <ClInclude Include="ColorRuleXmlStorage.h" />
     <ClInclude Include="ColumnRegistryStorage.h" />
+    <ClInclude Include="ColumnStorage.h" />
     <ClInclude Include="ColumnXmlStorage.h" />
     <ClInclude Include="CrashHandlerHelper.h" />
     <ClInclude Include="CustomFont.h" />
@@ -1263,6 +1267,9 @@
     <ClInclude Include="ShellEnumerator.h" />
     <ClInclude Include="ShellItemsMenu.h" />
     <ClInclude Include="SystemFontHelper.h" />
+    <ClInclude Include="TabRegistryStorage.h" />
+    <ClInclude Include="TabStorage.h" />
+    <ClInclude Include="TabXmlStorage.h" />
     <ClInclude Include="ThemeManager.h" />
     <ClInclude Include="DefaultSettingsOptionsPage.h" />
     <ClInclude Include="DialogHelper.h" />

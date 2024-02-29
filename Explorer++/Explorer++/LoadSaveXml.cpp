@@ -137,9 +137,9 @@ void LoadSaveXML::LoadBookmarks()
 		BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
 }
 
-int LoadSaveXML::LoadPreviousTabs()
+void LoadSaveXML::LoadPreviousTabs()
 {
-	return m_pContainer->LoadTabSettingsFromXML(m_pXMLDom.get());
+	m_pContainer->LoadTabSettingsFromXML(m_pXMLDom.get());
 }
 
 void LoadSaveXML::LoadDefaultColumns()

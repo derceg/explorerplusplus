@@ -20,7 +20,7 @@ public:
 	/* Loading functions. */
 	void LoadGenericSettings() override;
 	void LoadBookmarks() override;
-	int LoadPreviousTabs() override;
+	void LoadPreviousTabs() override;
 	void LoadDefaultColumns() override;
 	void LoadApplicationToolbar() override;
 	void LoadMainRebarInformation() override;
