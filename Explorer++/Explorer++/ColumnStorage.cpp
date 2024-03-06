@@ -3,27 +3,9 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
+#include "ColumnStorage.h"
 #include "ShellBrowser/FolderSettings.h"
-#include "../Helper/Macros.h"
-
-namespace
-{
-
-enum class ColumnValidationType
-{
-	RealFolder,
-	ControlPanel,
-	MyComputer,
-	RecycleBin,
-	Printers,
-	NetworkConnections,
-	MyNetworkPlaces
-};
-
-void ValidateSingleColumnSet(ColumnValidationType columnValidationType,
-	std::vector<Column_t> &columns);
-
-}
+#include <span>
 
 void ValidateColumns(FolderColumns &folderColumns)
 {
@@ -38,105 +20,58 @@ void ValidateColumns(FolderColumns &folderColumns)
 		folderColumns.myNetworkPlacesColumns);
 }
 
-namespace
-{
-
 void ValidateSingleColumnSet(ColumnValidationType columnValidationType,
 	std::vector<Column_t> &columns)
 {
-	Column_t column;
-	BOOL bFound = FALSE;
-	const Column_t *pColumns = nullptr;
-	unsigned int iTotalColumnSize = 0;
-	unsigned int i = 0;
+	std::span<const Column_t> defaultColumns;
 
 	switch (columnValidationType)
 	{
 	case ColumnValidationType::RealFolder:
-		iTotalColumnSize = SIZEOF_ARRAY(REAL_FOLDER_DEFAULT_COLUMNS);
-		pColumns = REAL_FOLDER_DEFAULT_COLUMNS;
+		defaultColumns = std::span(REAL_FOLDER_DEFAULT_COLUMNS);
 		break;
 
 	case ColumnValidationType::ControlPanel:
-		iTotalColumnSize = SIZEOF_ARRAY(CONTROL_PANEL_DEFAULT_COLUMNS);
-		pColumns = CONTROL_PANEL_DEFAULT_COLUMNS;
+		defaultColumns = std::span(CONTROL_PANEL_DEFAULT_COLUMNS);
 		break;
 
 	case ColumnValidationType::MyComputer:
-		iTotalColumnSize = SIZEOF_ARRAY(MY_COMPUTER_DEFAULT_COLUMNS);
-		pColumns = MY_COMPUTER_DEFAULT_COLUMNS;
+		defaultColumns = std::span(MY_COMPUTER_DEFAULT_COLUMNS);
 		break;
 
 	case ColumnValidationType::RecycleBin:
-		iTotalColumnSize = SIZEOF_ARRAY(RECYCLE_BIN_DEFAULT_COLUMNS);
-		pColumns = RECYCLE_BIN_DEFAULT_COLUMNS;
+		defaultColumns = std::span(RECYCLE_BIN_DEFAULT_COLUMNS);
 		break;
 
 	case ColumnValidationType::Printers:
-		iTotalColumnSize = SIZEOF_ARRAY(PRINTERS_DEFAULT_COLUMNS);
-		pColumns = PRINTERS_DEFAULT_COLUMNS;
+		defaultColumns = std::span(PRINTERS_DEFAULT_COLUMNS);
 		break;
 
 	case ColumnValidationType::NetworkConnections:
-		iTotalColumnSize = SIZEOF_ARRAY(NETWORK_CONNECTIONS_DEFAULT_COLUMNS);
-		pColumns = NETWORK_CONNECTIONS_DEFAULT_COLUMNS;
+		defaultColumns = std::span(NETWORK_CONNECTIONS_DEFAULT_COLUMNS);
 		break;
 
 	case ColumnValidationType::MyNetworkPlaces:
-		iTotalColumnSize = SIZEOF_ARRAY(MY_NETWORK_PLACES_DEFAULT_COLUMNS);
-		pColumns = MY_NETWORK_PLACES_DEFAULT_COLUMNS;
+		defaultColumns = std::span(MY_NETWORK_PLACES_DEFAULT_COLUMNS);
 		break;
 	}
 
-	/* Check that every column that is supposed to appear
-	is in the column list. */
-	for (i = 0; i < iTotalColumnSize; i++)
+	auto doesColumnExist =
+		[]<class ColumnsContainer>(const ColumnsContainer &container, ColumnType columnType)
 	{
-		bFound = FALSE;
+		auto itr = std::find_if(container.begin(), container.end(),
+			[columnType](const auto &column) { return column.type == columnType; });
+		return itr != container.end();
+	};
 
-		for (auto itr = columns.begin(); itr != columns.end(); itr++)
-		{
-			if (itr->type == pColumns[i].type)
-			{
-				bFound = TRUE;
-				break;
-			}
-		}
+	// Add any columns that are missing.
+	std::copy_if(defaultColumns.begin(), defaultColumns.end(), std::back_inserter(columns),
+		[doesColumnExist, &columns](const auto &column)
+		{ return !doesColumnExist(columns, column.type); });
 
-		/* The column is not currently in the set. Add it in. */
-		if (!bFound)
-		{
-			column.type = pColumns[i].type;
-			column.checked = pColumns[i].checked;
-			column.width = DEFAULT_COLUMN_WIDTH;
-			columns.push_back(column);
-		}
-	}
-
-	/* Check that no unknown column types appear in the column list. */
-	for (auto itr = columns.cbegin(); itr != columns.cend();)
-	{
-		bFound = FALSE;
-
-		for (i = 0; i < iTotalColumnSize; i++)
-		{
-			if (itr->type == pColumns[i].type)
-			{
-				bFound = TRUE;
-				break;
-			}
-		}
-
-		if (!bFound)
-		{
-			/* The column is not recognized in the set. Remove it. */
-			itr = columns.erase(itr);
-		}
-		else
-		{
-			++itr;
-		}
-	}
-}
-
+	// Remove any unknown columns. Each column set has its own individual columns and not all
+	// columns appear in all sets.
+	std::erase_if(columns,
+		[doesColumnExist, &defaultColumns](const auto &column)
+		{ return !doesColumnExist(defaultColumns, column.type); });
 }

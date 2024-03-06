@@ -197,6 +197,7 @@
     <ClCompile Include="ColorRuleXmlStorageTest.cpp" />
     <ClCompile Include="ColumnRegistryStorageTest.cpp" />
     <ClCompile Include="ColumnStorageHelper.cpp" />
+    <ClCompile Include="ColumnStorageTest.cpp" />
     <ClCompile Include="ColumnXmlStorageTest.cpp" />
     <ClCompile Include="ControlsTest.cpp" />
     <ClCompile Include="CustomFontStorageTest.cpp" />
