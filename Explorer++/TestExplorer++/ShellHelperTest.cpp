@@ -164,20 +164,11 @@ TEST_F(TransformPathTest, Whitespace)
 class CreateSimplePidlTest : public TestWithParam<ShellItemType>
 {
 protected:
-	void SetUp() override
+	CreateSimplePidlTest()
 	{
-		// This is needed for SHCreateItemFromIDList.
-		HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
-		ASSERT_HRESULT_SUCCEEDED(hr);
-
 		m_parentPath = L"c:\\path\\to";
 		m_itemName = L"item";
 		m_itemPath = m_parentPath + L"\\" + m_itemName;
-	}
-
-	void TearDown() override
-	{
-		CoUninitialize();
 	}
 
 	static void TestPidlProperties(PCIDLIST_ABSOLUTE pidl, const std::wstring &itemPath,

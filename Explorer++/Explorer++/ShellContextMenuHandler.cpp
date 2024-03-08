@@ -200,8 +200,9 @@ bool Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		// This verb (which corresponds to the "Customize this folder..." menu item shown in the
 		// background context menu) doesn't appear to be a standard verb that's handled by the
 		// system. Therefore, it will be handled here.
-		return ExecuteFileAction(m_hActiveListView, L"properties", L"customize", nullptr,
-			pidlParent);
+		ExecuteFileAction(m_hActiveListView, pidlParent, L"properties", L"customize", L"");
+
+		return true;
 	}
 	else if (verb == L"refresh")
 	{

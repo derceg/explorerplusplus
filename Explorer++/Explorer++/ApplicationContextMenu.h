@@ -12,12 +12,14 @@ namespace Applications
 {
 
 class Application;
+class ApplicationExecutor;
 class ApplicationModel;
 
 class ApplicationContextMenu
 {
 public:
-	ApplicationContextMenu(ApplicationModel *model, CoreInterface *coreInterface);
+	ApplicationContextMenu(ApplicationModel *model, ApplicationExecutor *applicationExecutor,
+		CoreInterface *coreInterface);
 
 	void ShowMenu(HWND parentWindow, Application *application, const POINT &ptScreen);
 

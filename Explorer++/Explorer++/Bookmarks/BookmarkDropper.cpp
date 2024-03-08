@@ -164,7 +164,7 @@ BookmarkDropper::ExtractedInfo BookmarkDropper::ExtractBookmarkItems()
 	BookmarkItems bookmarkItems;
 	ExtractionSource extractionSource;
 
-	if (IsDropFormatAvailable(m_dataObject, BookmarkDataExchange::GetFormatEtc()))
+	if (IsDropFormatAvailable(m_dataObject.get(), BookmarkDataExchange::GetFormatEtc()))
 	{
 		bookmarkItems = ExtractBookmarkItemsFromCustomFormat();
 		extractionSource = ExtractionSource::CustomFormat;
@@ -202,7 +202,8 @@ BookmarkItems BookmarkDropper::ExtractBookmarkItemsFromCustomFormat()
 BookmarkItems BookmarkDropper::MaybeExtractBookmarkItemsFromShellItems()
 {
 	wil::com_ptr_nothrow<IShellItemArray> dropShellItems;
-	HRESULT hr = SHCreateShellItemArrayFromDataObject(m_dataObject, IID_PPV_ARGS(&dropShellItems));
+	HRESULT hr =
+		SHCreateShellItemArrayFromDataObject(m_dataObject.get(), IID_PPV_ARGS(&dropShellItems));
 
 	if (FAILED(hr))
 	{

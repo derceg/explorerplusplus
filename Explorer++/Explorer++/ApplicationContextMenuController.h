@@ -9,25 +9,28 @@ class CoreInterface;
 namespace Applications
 {
 
-class ApplicationModel;
 class Application;
+class ApplicationExecutor;
+class ApplicationModel;
 
 class ApplicationContextMenuController
 {
 public:
-	ApplicationContextMenuController(CoreInterface *coreInterface);
+	ApplicationContextMenuController(ApplicationExecutor *applicationExecutor,
+		CoreInterface *coreInterface);
 
 	void OnMenuItemSelected(int menuItemId, ApplicationModel *model, Application *targetApplication,
 		size_t targetIndex, HWND parentWindow);
 
 private:
-	void OnOpen(HWND parentWindow, const Application *targetApplication);
+	void OnOpen(const Application *targetApplication);
 	void OnShowProperties(HWND parentWindow, ApplicationModel *model,
 		Application *targetApplication);
 	void OnDelete(ApplicationModel *model, const Application *targetApplication, HWND parentWindow);
 	void OnNew(HWND parentWindow, ApplicationModel *model, size_t index);
 
-	CoreInterface *m_coreInterface;
+	ApplicationExecutor *m_applicationExecutor = nullptr;
+	CoreInterface *m_coreInterface = nullptr;
 };
 
 }

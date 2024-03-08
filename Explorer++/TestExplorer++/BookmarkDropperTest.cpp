@@ -7,9 +7,7 @@
 #include "BookmarkTreeHelper.h"
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkTree.h"
-#include "../Helper/DataExchangeHelper.h"
-#include "../Helper/DataObjectImpl.h"
-#include "../Helper/DragDropHelper.h"
+#include "DragDropHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <gtest/gtest.h>
 #include <wil/com.h>
@@ -133,26 +131,10 @@ class BookmarkDropperShellItemTest : public TestWithParam<ShellItemType>
 protected:
 	void SetUp() override
 	{
-		// This is needed to be able to successfully call SHCreateShellItemArrayFromIDLists (used by
-		// CreateDataObjectForShellTransfer).
-		HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
-		ASSERT_HRESULT_SUCCEEDED(hr);
-
 		m_itemName = L"item";
 		m_itemPath = L"c:\\path\\to\\" + m_itemName;
 
-		unique_pidl_absolute pidl;
-		hr = CreateSimplePidl(m_itemPath, wil::out_param(pidl), nullptr, GetParam());
-		ASSERT_HRESULT_SUCCEEDED(hr);
-
-		std::vector<PCIDLIST_ABSOLUTE> items = { pidl.get() };
-		hr = CreateDataObjectForShellTransfer(items, &m_dataObject);
-		ASSERT_HRESULT_SUCCEEDED(hr);
-	}
-
-	void TearDown() override
-	{
-		CoUninitialize();
+		CreateShellDataObject(m_itemPath, GetParam(), m_dataObject);
 	}
 
 	BookmarkTree m_bookmarkTree;
@@ -205,19 +187,9 @@ INSTANTIATE_TEST_SUITE_P(FileAndFolder, BookmarkDropperShellItemTest,
 class BookmarkDropperInvalidDataTest : public Test
 {
 protected:
-	BookmarkDropperInvalidDataTest()
+	void SetUp() override
 	{
-		FORMATETC formatEtc = { CF_UNICODETEXT, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-
-		auto global = WriteStringToGlobal(L"Test");
-		STGMEDIUM stgMedium = GetStgMediumForGlobal(global.get());
-
-		m_dataObject = winrt::make_self<DataObjectImpl>(&formatEtc, &stgMedium, 1);
-
-		// The IDataObject instance now owns the STGMEDIUM structure and is responsible for freeing
-		// the memory associated with it.
-		global.release();
-
+		CreateTextDataObject(L"Test", m_dataObject);
 		m_dropper =
 			std::make_unique<BookmarkDropper>(m_dataObject.get(), DROPEFFECT_COPY, &m_bookmarkTree);
 	}

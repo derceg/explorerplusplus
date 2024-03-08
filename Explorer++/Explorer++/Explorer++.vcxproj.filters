@@ -361,7 +361,7 @@
     <ClCompile Include="Bookmarks\BookmarkDropper.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="ApplicationToolbarHelper.cpp">
+    <ClCompile Include="ApplicationHelper.cpp">
       <Filter>Application Toolbar</Filter>
     </ClCompile>
     <ClCompile Include="Bookmarks\UI\BookmarkMenuController.cpp">
@@ -624,6 +624,12 @@
     </ClCompile>
     <ClCompile Include="ColumnStorage.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplicationDropper.cpp">
+      <Filter>Application Toolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplicationExecutorImpl.cpp">
+      <Filter>Application Toolbar</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -978,7 +984,7 @@
     <ClInclude Include="Bookmarks\BookmarkDropper.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
-    <ClInclude Include="ApplicationToolbarHelper.h">
+    <ClInclude Include="ApplicationHelper.h">
       <Filter>Application Toolbar</Filter>
     </ClInclude>
     <ClInclude Include="Bookmarks\UI\BookmarkMenuController.h">
@@ -1283,6 +1289,15 @@
     </ClInclude>
     <ClInclude Include="ColumnStorage.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationDropper.h">
+      <Filter>Application Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationExecutor.h">
+      <Filter>Application Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationExecutorImpl.h">
+      <Filter>Application Toolbar</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

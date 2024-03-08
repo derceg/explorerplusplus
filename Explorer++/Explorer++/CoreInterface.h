@@ -86,7 +86,8 @@ public:
 
 	virtual StatusBar *GetStatusBar() = 0;
 
-	virtual void OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters) = 0;
+	virtual void OpenFileItem(const std::wstring &itemPath, const std::wstring &parameters) = 0;
+	virtual void OpenFileItem(PCIDLIST_ABSOLUTE pidl, const std::wstring &parameters) = 0;
 
 	virtual wil::unique_hmenu BuildViewsMenu() = 0;
 

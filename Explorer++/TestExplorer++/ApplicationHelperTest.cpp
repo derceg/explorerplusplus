@@ -3,12 +3,12 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "ApplicationToolbarHelper.h"
+#include "ApplicationHelper.h"
 #include <gtest/gtest.h>
 
-using namespace Applications::ApplicationToolbarHelper;
+using namespace Applications::ApplicationHelper;
 
-TEST(ApplicationToolbarHelperTest, WithoutQuotes)
+TEST(ApplicationHelperTest, ParseWithoutQuotes)
 {
 	ApplicationInfo applicationInfo = ParseCommandString(L"C:\\Windows\\System32\\notepad.exe");
 	EXPECT_EQ(applicationInfo.application, L"C:\\Windows\\System32\\notepad.exe");
@@ -25,7 +25,7 @@ TEST(ApplicationToolbarHelperTest, WithoutQuotes)
 	EXPECT_EQ(applicationInfo.parameters, L"Files\\PowerShell\\7\\pwsh.exe");
 }
 
-TEST(ApplicationToolbarHelperTest, WithQuotes)
+TEST(ApplicationHelperTest, ParseWithQuotes)
 {
 	ApplicationInfo applicationInfo = ParseCommandString(L"\"C:\\Windows\\System32\\notepad.exe\"");
 	EXPECT_EQ(applicationInfo.application, L"C:\\Windows\\System32\\notepad.exe");
@@ -43,4 +43,16 @@ TEST(ApplicationToolbarHelperTest, WithQuotes)
 		ParseCommandString(L"\"C:\\Program Files\\PowerShell\\7\\pwsh.exe\" -WorkingDirectory ~");
 	EXPECT_EQ(applicationInfo.application, L"C:\\Program Files\\PowerShell\\7\\pwsh.exe");
 	EXPECT_EQ(applicationInfo.parameters, L"-WorkingDirectory ~");
+}
+
+TEST(ApplicationHelperTest, RemoveExtension)
+{
+	auto result = RemoveExtensionFromFileName(L"notepad.exe");
+	EXPECT_EQ(result, L"notepad");
+
+	result = RemoveExtensionFromFileName(L"cmd");
+	EXPECT_EQ(result, L"cmd");
+
+	result = RemoveExtensionFromFileName(L".exe");
+	EXPECT_EQ(result, L".exe");
 }

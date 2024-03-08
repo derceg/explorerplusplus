@@ -13,15 +13,12 @@
 class XmlStorageTest : public testing::Test
 {
 protected:
-	XmlStorageTest();
-	~XmlStorageTest();
-};
+	struct XmlDocumentData
+	{
+		wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument;
+		wil::com_ptr_nothrow<IXMLDOMElement> root;
+	};
 
-struct XmlDocumentData
-{
-	wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument;
-	wil::com_ptr_nothrow<IXMLDOMElement> root;
+	wil::com_ptr_nothrow<IXMLDOMDocument> LoadXmlDocument(const std::wstring &filePath);
+	std::optional<XmlDocumentData> CreateXmlDocument();
 };
-
-wil::com_ptr_nothrow<IXMLDOMDocument> LoadXmlDocument(const std::wstring &filePath);
-std::optional<XmlDocumentData> CreateXmlDocument();

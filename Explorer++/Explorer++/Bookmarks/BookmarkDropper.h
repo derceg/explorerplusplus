@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Bookmarks/BookmarkItem.h"
+#include <wil/com.h>
 #include <ShObjIdl.h>
 #include <memory>
 #include <optional>
@@ -41,7 +42,7 @@ private:
 	BookmarkItems MaybeExtractBookmarkItemsFromShellItems();
 	std::unique_ptr<BookmarkItem> MaybeBuildBookmarkItemFromShellItem(IShellItem *shellItem);
 
-	IDataObject *m_dataObject;
+	wil::com_ptr_nothrow<IDataObject> m_dataObject;
 	DWORD m_allowedEffects;
 	BookmarkTree *m_bookmarkTree;
 	std::optional<ExtractedInfo> m_extractedInfo;

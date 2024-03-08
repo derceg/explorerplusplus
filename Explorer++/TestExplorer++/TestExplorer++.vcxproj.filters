@@ -10,14 +10,13 @@
     <ClCompile Include="BookmarkTreeTest.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="ViewModeHelperTest.cpp" />
     <ClCompile Include="ShellNavigationControllerTest.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
     <ClCompile Include="BookmarkDropperTest.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="ApplicationToolbarHelperTest.cpp">
+    <ClCompile Include="ApplicationHelperTest.cpp">
       <Filter>Application Toolbar</Filter>
     </ClCompile>
     <ClCompile Include="BookmarkXmlStorageTest.cpp">
@@ -154,6 +153,14 @@
     <ClCompile Include="ColumnStorageTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="ApplicationDropperTest.cpp">
+      <Filter>Application Toolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="DragDropHelper.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="ViewModeHelperTest.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -264,5 +271,6 @@
     <ClInclude Include="TabStorageHelper.h">
       <Filter>Tabs</Filter>
     </ClInclude>
+    <ClInclude Include="DragDropHelper.h" />
   </ItemGroup>
 </Project>

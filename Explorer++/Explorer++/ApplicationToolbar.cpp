@@ -6,21 +6,20 @@
 #include "ApplicationToolbar.h"
 #include "Application.h"
 #include "ApplicationEditorDialog.h"
+#include "ApplicationHelper.h"
 #include "ApplicationModel.h"
-#include "ApplicationToolbarHelper.h"
 #include "ApplicationToolbarView.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "../Helper/DragDropHelper.h"
 #include "../Helper/MenuHelper.h"
-#include <boost/algorithm/string/join.hpp>
 #include <glog/logging.h>
-#include <propkey.h>
 
 namespace Applications
 {
 
-using namespace ApplicationToolbarHelper;
+using namespace ApplicationHelper;
 
 class ApplicationToolbarButton : public ToolbarButton
 {
@@ -77,8 +76,9 @@ ApplicationToolbar::ApplicationToolbar(ApplicationToolbarView *view, Application
 	CoreInterface *coreInterface) :
 	m_view(view),
 	m_model(model),
+	m_applicationExecutor(coreInterface),
 	m_coreInterface(coreInterface),
-	m_contextMenu(model, coreInterface)
+	m_contextMenu(model, &m_applicationExecutor, coreInterface)
 {
 	Initialize();
 }
@@ -156,7 +156,7 @@ void ApplicationToolbar::OnButtonClicked(const Application *application, const M
 {
 	UNREFERENCED_PARAMETER(event);
 
-	OpenApplication(m_coreInterface, m_view->GetHWND(), application);
+	m_applicationExecutor.Execute(application);
 }
 
 void ApplicationToolbar::OnButtonRightClicked(Application *application, const MouseEvent &event)
@@ -211,11 +211,12 @@ void ApplicationToolbar::OnWindowDestroyed()
 DWORD ApplicationToolbar::DragEnter(IDataObject *dataObject, DWORD keyState, POINT pt, DWORD effect)
 {
 	UNREFERENCED_PARAMETER(keyState);
-	UNREFERENCED_PARAMETER(effect);
 
-	StoreDropShellItemArray(dataObject);
-	auto target = m_view->GetDropLocation(pt);
-	return GetDropEffect(target);
+	DCHECK(!m_dragData);
+	m_dragData = DragData(dataObject,
+		std::make_unique<ApplicationDropper>(dataObject, effect, m_model, &m_applicationExecutor));
+
+	return OnDragOver(pt);
 }
 
 DWORD ApplicationToolbar::DragOver(DWORD keyState, POINT pt, DWORD effect)
@@ -223,8 +224,7 @@ DWORD ApplicationToolbar::DragOver(DWORD keyState, POINT pt, DWORD effect)
 	UNREFERENCED_PARAMETER(keyState);
 	UNREFERENCED_PARAMETER(effect);
 
-	auto target = m_view->GetDropLocation(pt);
-	return GetDropEffect(target);
+	return OnDragOver(pt);
 }
 
 void ApplicationToolbar::DragLeave()
@@ -238,215 +238,67 @@ DWORD ApplicationToolbar::Drop(IDataObject *dataObject, DWORD keyState, POINT pt
 	UNREFERENCED_PARAMETER(keyState);
 	UNREFERENCED_PARAMETER(effect);
 
-	if (!m_dropShellItems)
-	{
-		return DROPEFFECT_NONE;
-	}
-
-	auto target = m_view->GetDropLocation(pt);
-	DWORD targetEffect = PerformDrop(target);
+	auto dropLocation = m_view->GetDropLocation(pt);
+	auto &dragData = GetDragData();
+	DWORD finalEffect =
+		dragData.GetApplicationDropper()->PerformDrop(DropLocationToTarget(dropLocation));
 
 	ResetDropState();
+
+	return finalEffect;
+}
+
+ApplicationDropper::DropTarget ApplicationToolbar::DropLocationToTarget(
+	const ToolbarView::DropLocation &dropLocation)
+{
+	if (dropLocation.onItem)
+	{
+		return ApplicationDropper::DropTarget::CreateForDropOnApplication(
+			m_model->GetItemAtIndex(dropLocation.index));
+	}
+	else
+	{
+		return ApplicationDropper::DropTarget::CreateForDropAtIndex(dropLocation.index);
+	}
+}
+
+DWORD ApplicationToolbar::OnDragOver(POINT pt)
+{
+	auto &dragData = GetDragData();
+
+	auto dropLocation = m_view->GetDropLocation(pt);
+	auto dropTarget = DropLocationToTarget(dropLocation);
+	auto targetEffect = dragData.GetApplicationDropper()->GetDropEffect(dropTarget);
+
+	if (targetEffect != DROPEFFECT_NONE && dropTarget.GetApplication())
+	{
+		auto applicationInfo =
+			ApplicationHelper::ParseCommandString(dropTarget.GetApplication()->GetCommand());
+
+		auto openWithTemplate = ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),
+			IDS_APPLICATION_TOOLBAR_DRAG_OPEN_WITH);
+		SetDropDescription(dragData.GetDataObject(), DROPIMAGE_COPY, openWithTemplate,
+			applicationInfo.application);
+	}
+	else
+	{
+		ClearDropDescription(dragData.GetDataObject());
+	}
 
 	return targetEffect;
 }
 
-void ApplicationToolbar::StoreDropShellItemArray(IDataObject *dataObject)
-{
-	DCHECK(!m_dropShellItems);
-
-	wil::com_ptr_nothrow<IShellItemArray> dropShellItems;
-	HRESULT hr = SHCreateShellItemArrayFromDataObject(dataObject, IID_PPV_ARGS(&dropShellItems));
-
-	if (SUCCEEDED(hr))
-	{
-		m_dropShellItems = dropShellItems;
-	}
-}
-
-DWORD ApplicationToolbar::GetDropEffect(const ToolbarView::DropLocation &target)
-{
-	if (!m_dropShellItems)
-	{
-		return DROPEFFECT_NONE;
-	}
-
-	// Items of any type (file/folder) may be dropped on a button.
-	if (target.onItem)
-	{
-		return DROPEFFECT_COPY;
-	}
-
-	if (!m_areAllDropItemsFolders)
-	{
-		SFGAOF attributes;
-		HRESULT hr = m_dropShellItems->GetAttributes(SIATTRIBFLAGS_AND, SFGAO_FOLDER, &attributes);
-
-		// If the return value is S_OK, that means the attributes returned exactly match the ones
-		// requested (i.e. every item is a folder).
-		if (hr == S_OK)
-		{
-			m_areAllDropItemsFolders = true;
-		}
-		else
-		{
-			// This branch will be taken if the items aren't all folders, or the call fails. Setting
-			// a value of false here at least means the drop will be attempted if the call fails and
-			// the items are then dropped on the toolbar background (rather than on an existing
-			// button).
-			m_areAllDropItemsFolders = false;
-		}
-	}
-
-	if (*m_areAllDropItemsFolders)
-	{
-		return DROPEFFECT_NONE;
-	}
-
-	return DROPEFFECT_COPY;
-}
-
-DWORD ApplicationToolbar::PerformDrop(const ToolbarView::DropLocation &target)
-{
-	if (target.onItem)
-	{
-		return DropItemsOnButton(target.index);
-	}
-	else
-	{
-		return AddDropItems(target.index);
-	}
-}
-
-DWORD ApplicationToolbar::DropItemsOnButton(size_t target)
-{
-	DWORD numItems;
-	HRESULT hr = m_dropShellItems->GetCount(&numItems);
-
-	if (FAILED(hr))
-	{
-		return DROPEFFECT_NONE;
-	}
-
-	std::vector<std::wstring> extraParametersVector;
-
-	for (DWORD i = 0; i < numItems; i++)
-	{
-		wil::com_ptr_nothrow<IShellItem> shellItem;
-		hr = m_dropShellItems->GetItemAt(i, &shellItem);
-
-		if (FAILED(hr))
-		{
-			continue;
-		}
-
-		wil::unique_cotaskmem_string parsingPath;
-		hr = shellItem->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &parsingPath);
-
-		if (FAILED(hr))
-		{
-			continue;
-		}
-
-		extraParametersVector.push_back(parsingPath.get());
-	}
-
-	std::transform(extraParametersVector.begin(), extraParametersVector.end(),
-		extraParametersVector.begin(),
-		[](const std::wstring &parameter) { return L"\"" + parameter + L"\""; });
-
-	std::wstring extraParameters = boost::algorithm::join(extraParametersVector, L" ");
-
-	auto application = m_model->GetItemAtIndex(target);
-	OpenApplication(m_coreInterface, m_view->GetHWND(), application, extraParameters);
-
-	return DROPEFFECT_COPY;
-}
-
-DWORD ApplicationToolbar::AddDropItems(size_t startingIndex)
-{
-	if (m_areAllDropItemsFolders && *m_areAllDropItemsFolders)
-	{
-		return DROPEFFECT_NONE;
-	}
-
-	DWORD numItems;
-	HRESULT hr = m_dropShellItems->GetCount(&numItems);
-
-	if (FAILED(hr))
-	{
-		return DROPEFFECT_NONE;
-	}
-
-	size_t index = startingIndex;
-
-	for (DWORD i = 0; i < numItems; i++)
-	{
-		wil::com_ptr_nothrow<IShellItem> shellItem;
-		hr = m_dropShellItems->GetItemAt(i, &shellItem);
-
-		if (FAILED(hr))
-		{
-			continue;
-		}
-
-		hr = AddDropItem(shellItem.get(), index);
-
-		if (FAILED(hr))
-		{
-			continue;
-		}
-
-		index++;
-	}
-
-	if (index == startingIndex)
-	{
-		// In this case, no items were actually copied.
-		return DROPEFFECT_NONE;
-	}
-
-	return DROPEFFECT_COPY;
-}
-
-HRESULT ApplicationToolbar::AddDropItem(IShellItem *shellItem, size_t index)
-{
-	SFGAOF attributes;
-	HRESULT hr = shellItem->GetAttributes(SFGAO_FOLDER, &attributes);
-
-	// As with testing shell item array attributes, if the return value is S_OK, the returned
-	// attributes exactly match those passed in (i.e. the item is a folder).
-	if (hr == S_OK || FAILED(hr))
-	{
-		return hr;
-	}
-
-	wil::com_ptr_nothrow<IShellItem2> shellItem2;
-	RETURN_IF_FAILED(shellItem->QueryInterface(IID_PPV_ARGS(&shellItem2)));
-
-	wil::unique_cotaskmem_string displayName;
-	RETURN_IF_FAILED(shellItem2->GetString(PKEY_ItemNameDisplayWithoutExtension, &displayName));
-
-	wil::unique_cotaskmem_string parsingPath;
-	RETURN_IF_FAILED(shellItem->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &parsingPath));
-
-	std::wstring quotedParsingPath = parsingPath.get();
-
-	if (quotedParsingPath.find(' ') != std::wstring::npos)
-	{
-		quotedParsingPath = L"\"" + quotedParsingPath + L"\"";
-	}
-
-	auto application = std::make_unique<Application>(displayName.get(), quotedParsingPath, true);
-	m_model->AddItem(std::move(application), index);
-
-	return S_OK;
-}
-
 void ApplicationToolbar::ResetDropState()
 {
-	m_dropShellItems.reset();
-	m_areAllDropItemsFolders.reset();
+	ClearDropDescription(GetDragData().GetDataObject());
+
+	m_dragData.reset();
+}
+
+const ApplicationToolbar::DragData &ApplicationToolbar::GetDragData() const
+{
+	CHECK(m_dragData);
+	return *m_dragData;
 }
 
 }

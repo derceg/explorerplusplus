@@ -441,7 +441,8 @@ private:
 
 	void OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
-	void OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters) override;
+	void OpenFileItem(const std::wstring &itemPath, const std::wstring &parameters) override;
+	void OpenFileItem(PCIDLIST_ABSOLUTE pidl, const std::wstring &parameters) override;
 
 	void OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory);
 

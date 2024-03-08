@@ -180,8 +180,9 @@
     <VcpkgUseStatic>true</VcpkgUseStatic>
   </PropertyGroup>
   <ItemGroup>
+    <ClCompile Include="ApplicationDropperTest.cpp" />
     <ClCompile Include="ApplicationTest.cpp" />
-    <ClCompile Include="ApplicationToolbarHelperTest.cpp" />
+    <ClCompile Include="ApplicationHelperTest.cpp" />
     <ClCompile Include="ApplicationToolbarRegistryStorageTest.cpp" />
     <ClCompile Include="ApplicationToolbarStorageHelper.cpp" />
     <ClCompile Include="ApplicationToolbarXmlStorageTest.cpp" />
@@ -202,6 +203,7 @@
     <ClCompile Include="ControlsTest.cpp" />
     <ClCompile Include="CustomFontStorageTest.cpp" />
     <ClCompile Include="DataObjectImplTest.cpp" />
+    <ClCompile Include="DragDropHelper.cpp" />
     <ClCompile Include="DriveModelTest.cpp" />
     <ClCompile Include="AcceleratorParserTest.cpp" />
     <ClCompile Include="BookmarkClipboardTest.cpp" />
@@ -211,6 +213,7 @@
     <ClCompile Include="GdiplusHelperTest.cpp" />
     <ClCompile Include="HelperTest.cpp" />
     <ClCompile Include="HistoryMenuTest.cpp" />
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainRebarRegistryStorageTest.cpp" />
     <ClCompile Include="MainRebarStorageHelper.cpp" />
     <ClCompile Include="MainRebarXmlStorageTest.cpp" />
@@ -261,6 +264,7 @@
     <ClInclude Include="BookmarkTreeHelper.h" />
     <ClInclude Include="ColorRulesStorageHelper.h" />
     <ClInclude Include="ColumnStorageHelper.h" />
+    <ClInclude Include="DragDropHelper.h" />
     <ClInclude Include="IconFetcherMock.h" />
     <ClInclude Include="MainRebarStorageHelper.h" />
     <ClInclude Include="MovableModelHelper.h" />
@@ -290,7 +294,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>gmock_main.lib;Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\$(Platform)\$(Configuration);$(ProjectDir)..\Explorer++\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -314,7 +318,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>gmock_main.lib;Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\$(Platform)\$(Configuration);$(ProjectDir)..\Explorer++\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -338,7 +342,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>gmock_main.lib;Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\$(Platform)\$(Configuration);$(ProjectDir)..\Explorer++\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -363,7 +367,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(ProjectDir)..\$(Platform)\$(Configuration);$(ProjectDir)..\Explorer++\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>gmock_main.lib;Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
@@ -387,7 +391,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(ProjectDir)..\$(Platform)\$(Configuration);$(ProjectDir)..\Explorer++\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>gmock_main.lib;Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
@@ -411,7 +415,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(ProjectDir)..\$(Platform)\$(Configuration);$(ProjectDir)..\Explorer++\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>gmock_main.lib;Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
@@ -435,7 +439,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(ProjectDir)..\$(Platform)\$(Configuration);$(ProjectDir)..\Explorer++\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>gmock_main.lib;Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
@@ -459,7 +463,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(ProjectDir)..\$(Platform)\$(Configuration);$(ProjectDir)..\Explorer++\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>gmock_main.lib;Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
@@ -483,7 +487,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(ProjectDir)..\$(Platform)\$(Configuration);$(ProjectDir)..\Explorer++\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>gmock_main.lib;Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
@@ -508,7 +512,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>$(ProjectDir)..\$(Platform)\$(Configuration);$(ProjectDir)..\Explorer++\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>gmock_main.lib;Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
@@ -533,7 +537,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>$(ProjectDir)..\$(Platform)\$(Configuration);$(ProjectDir)..\Explorer++\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>gmock_main.lib;Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>
@@ -558,7 +562,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>$(ProjectDir)..\$(Platform)\$(Configuration);$(ProjectDir)..\Explorer++\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>gmock_main.lib;Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Helper.lib;Explorer++.exe.lib;winmm.lib;propsys.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Resources" "$(TargetDir)Resources\" /s /y</Command>

@@ -5,19 +5,8 @@
 #include "pch.h"
 #include "XmlStorageHelper.h"
 #include "../Helper/XMLSettings.h"
-#include <objbase.h>
 
-XmlStorageTest::XmlStorageTest()
-{
-	CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
-}
-
-XmlStorageTest::~XmlStorageTest()
-{
-	CoUninitialize();
-}
-
-wil::com_ptr_nothrow<IXMLDOMDocument> LoadXmlDocument(const std::wstring &filePath)
+wil::com_ptr_nothrow<IXMLDOMDocument> XmlStorageTest::LoadXmlDocument(const std::wstring &filePath)
 {
 	wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument;
 	xmlDocument.attach(NXMLSettings::DomFromCOM());
@@ -39,7 +28,7 @@ wil::com_ptr_nothrow<IXMLDOMDocument> LoadXmlDocument(const std::wstring &filePa
 	return xmlDocument;
 }
 
-std::optional<XmlDocumentData> CreateXmlDocument()
+std::optional<XmlStorageTest::XmlDocumentData> XmlStorageTest::CreateXmlDocument()
 {
 	wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument;
 	xmlDocument.attach(NXMLSettings::DomFromCOM());

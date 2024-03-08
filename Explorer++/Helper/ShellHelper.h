@@ -106,8 +106,10 @@ BOOL LoadContextMenuHandlers(const TCHAR *szRegKey,
 BOOL LoadIUnknownFromCLSID(const TCHAR *szCLSID, ContextMenuHandler *pContextMenuHandler);
 HRESULT GetItemAttributes(const TCHAR *szItemParsingPath, SFGAOF *pItemAttributes);
 HRESULT GetItemAttributes(PCIDLIST_ABSOLUTE pidl, SFGAOF *pItemAttributes);
-BOOL ExecuteFileAction(HWND hwnd, const TCHAR *szVerb, const TCHAR *szParameters,
-	const TCHAR *szStartDirectory, LPCITEMIDLIST pidl);
+BOOL ExecuteFileAction(HWND hwnd, const std::wstring &itemPath, const std::wstring &verb,
+	const std::wstring &parameters, const std::wstring &startDirectory);
+BOOL ExecuteFileAction(HWND hwnd, PCIDLIST_ABSOLUTE pidl, const std::wstring &verb,
+	const std::wstring &parameters, const std::wstring &startDirectory);
 BOOL ExecuteAndShowCurrentProcess(HWND hwnd, const TCHAR *szParameters);
 BOOL ExecuteAndShowProcess(HWND hwnd, const TCHAR *szProcess, const TCHAR *szParameters);
 HRESULT DecodeFriendlyPath(const std::wstring &friendlyPath, std::wstring &parsingPath);

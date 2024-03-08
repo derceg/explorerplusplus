@@ -14,7 +14,7 @@ namespace Applications
 
 class Application;
 
-namespace ApplicationToolbarHelper
+namespace ApplicationHelper
 {
 
 struct ApplicationInfo
@@ -24,8 +24,10 @@ struct ApplicationInfo
 };
 
 ApplicationInfo ParseCommandString(const std::wstring &command);
-void OpenApplication(CoreInterface *coreInterface, HWND errorDialogParent,
-	const Application *application, std::wstring extraParameters = {});
+
+// When provided with a file name, returns the name with the extension stripped off. If the file
+// name only contains an extension (e.g. ".exe"), the original name will be returned.
+std::wstring RemoveExtensionFromFileName(const std::wstring &name);
 
 }
 

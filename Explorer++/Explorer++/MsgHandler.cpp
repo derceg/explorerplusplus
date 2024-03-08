@@ -341,15 +341,18 @@ void Explorerplusplus::OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory)
 	ExecuteAndShowCurrentProcess(m_hContainer, szParameters);
 }
 
-void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters)
+void Explorerplusplus::OpenFileItem(const std::wstring &itemPath, const std::wstring &parameters)
 {
-	unique_pidl_absolute pidlParent(ILCloneFull(pidlItem));
-	ILRemoveLastID(pidlParent.get());
+	auto shellBrowser = GetActiveShellBrowser();
+	ExecuteFileAction(m_hContainer, itemPath, L"", parameters,
+		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectory().c_str());
+}
 
-	std::wstring itemDirectory;
-	GetDisplayName(pidlParent.get(), SHGDN_FORPARSING, itemDirectory);
-
-	ExecuteFileAction(m_hContainer, EMPTY_STRING, szParameters, itemDirectory.c_str(), pidlItem);
+void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidl, const std::wstring &parameters)
+{
+	auto shellBrowser = GetActiveShellBrowser();
+	ExecuteFileAction(m_hContainer, pidl, L"", parameters,
+		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectory().c_str());
 }
 
 OpenFolderDisposition Explorerplusplus::DetermineOpenDisposition(bool isMiddleButtonDown)

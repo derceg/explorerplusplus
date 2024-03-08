@@ -3,21 +3,14 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "ApplicationToolbarHelper.h"
-#include "Application.h"
-#include "CoreInterface.h"
-#include "Explorer++_internal.h"
-#include "MainResource.h"
-#include "ResourceHelper.h"
-#include "../Helper/Macros.h"
+#include "ApplicationHelper.h"
 #include "../Helper/ShellHelper.h"
-#include <boost/format.hpp>
-#include <comdef.h>
+#include <boost/algorithm/string/trim.hpp>
 
 namespace Applications
 {
 
-namespace ApplicationToolbarHelper
+namespace ApplicationHelper
 {
 
 // Takes a command string entered by the user, and splits it up into two components: an application
@@ -83,36 +76,17 @@ ApplicationInfo ParseCommandString(const std::wstring &command)
 	return applicationInfo;
 }
 
-void OpenApplication(CoreInterface *coreInterface, HWND errorDialogParent,
-	const Application *application, std::wstring extraParameters)
+std::wstring RemoveExtensionFromFileName(const std::wstring &name)
 {
-	ApplicationInfo applicationInfo = ParseCommandString(application->GetCommand());
+	auto extensionPos = name.find_last_of('.');
 
-	unique_pidl_absolute pidl;
-	HRESULT hr = SHParseDisplayName(applicationInfo.application.c_str(), nullptr,
-		wil::out_param(pidl), 0, nullptr);
-
-	if (FAILED(hr))
+	if (extensionPos == std::wstring::npos || extensionPos == 0)
 	{
-		std::wstring messageTemplate = ResourceHelper::LoadString(
-			coreInterface->GetResourceInstance(), IDS_APPLICATION_TOOLBAR_OPEN_ERROR);
-		_com_error error(hr);
-		std::wstring message =
-			(boost::wformat(messageTemplate) % applicationInfo.application % error.ErrorMessage())
-				.str();
-		MessageBox(errorDialogParent, message.c_str(), NExplorerplusplus::APP_NAME,
-			MB_ICONWARNING | MB_OK);
-		return;
+		// Either the name doesn't have an extension, or the name only has an extension.
+		return name;
 	}
 
-	std::wstring combinedParameters = applicationInfo.parameters;
-
-	if (!extraParameters.empty())
-	{
-		combinedParameters += L" " + extraParameters;
-	}
-
-	coreInterface->OpenFileItem(pidl.get(), combinedParameters.c_str());
+	return name.substr(0, extensionPos);
 }
 
 }

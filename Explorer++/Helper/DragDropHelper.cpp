@@ -38,6 +38,11 @@ HRESULT SetDropDescription(IDataObject *dataObject, DROPIMAGETYPE type, const st
 		static_cast<CLIPFORMAT>(RegisterClipboardFormat(CFSTR_DROPDESCRIPTION)), dropDescription);
 }
 
+HRESULT ClearDropDescription(IDataObject *dataObject)
+{
+	return SetDropDescription(dataObject, DROPIMAGE_INVALID, L"", L"");
+}
+
 HRESULT CreateDataObjectForShellTransfer(const std::vector<PidlAbsolute> &items,
 	IDataObject **dataObjectOut)
 {

@@ -17,6 +17,9 @@
 #include <propkey.h>
 #include <wininet.h>
 
+BOOL ExecuteFileAction(HWND hwnd, const void *item, bool isPidl, const std::wstring &verb,
+	const std::wstring &parameters, const std::wstring &startDirectory);
+
 std::optional<std::wstring> TransformUserEnteredPathToAbsolutePath(
 	const std::wstring &userEnteredPath, const std::wstring &currentDirectory,
 	EnvVarsExpansion envVarsExpansionType);
@@ -130,23 +133,41 @@ HRESULT GetItemAttributes(PCIDLIST_ABSOLUTE pidl, SFGAOF *pItemAttributes)
 	return hr;
 }
 
-BOOL ExecuteFileAction(HWND hwnd, const TCHAR *szVerb, const TCHAR *szParameters,
-	const TCHAR *szStartDirectory, LPCITEMIDLIST pidl)
+BOOL ExecuteFileAction(HWND hwnd, const std::wstring &itemPath, const std::wstring &verb,
+	const std::wstring &parameters, const std::wstring &startDirectory)
 {
-	SHELLEXECUTEINFO sei;
+	return ExecuteFileAction(hwnd, itemPath.c_str(), false, verb, parameters, startDirectory);
+}
 
-	sei.cbSize = sizeof(SHELLEXECUTEINFO);
-	sei.fMask = SEE_MASK_INVOKEIDLIST;
-	sei.lpVerb = szVerb;
-	sei.lpIDList = (LPVOID) pidl;
-	sei.hwnd = hwnd;
-	sei.nShow = SW_SHOW;
-	sei.lpParameters = szParameters;
-	sei.lpDirectory = szStartDirectory;
-	sei.lpFile = nullptr;
-	sei.hInstApp = nullptr;
+BOOL ExecuteFileAction(HWND hwnd, PCIDLIST_ABSOLUTE pidl, const std::wstring &verb,
+	const std::wstring &parameters, const std::wstring &startDirectory)
+{
+	return ExecuteFileAction(hwnd, pidl, true, verb, parameters, startDirectory);
+}
 
-	return ShellExecuteEx(&sei);
+BOOL ExecuteFileAction(HWND hwnd, const void *item, bool isPidl, const std::wstring &verb,
+	const std::wstring &parameters, const std::wstring &startDirectory)
+{
+	SHELLEXECUTEINFO executeInfo = {};
+	executeInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+	executeInfo.fMask = SEE_MASK_DEFAULT;
+	executeInfo.lpVerb = verb.empty() ? nullptr : verb.c_str();
+	executeInfo.hwnd = hwnd;
+	executeInfo.nShow = SW_SHOW;
+	executeInfo.lpParameters = parameters.empty() ? nullptr : parameters.c_str();
+	executeInfo.lpDirectory = startDirectory.empty() ? nullptr : startDirectory.c_str();
+
+	if (isPidl)
+	{
+		executeInfo.fMask |= SEE_MASK_INVOKEIDLIST;
+		executeInfo.lpIDList = const_cast<void *>(item);
+	}
+	else
+	{
+		executeInfo.lpFile = static_cast<LPCWSTR>(item);
+	}
+
+	return ShellExecuteEx(&executeInfo);
 }
 
 BOOL ExecuteAndShowCurrentProcess(HWND hwnd, const TCHAR *szParameters)

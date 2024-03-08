@@ -18,6 +18,7 @@ HRESULT CreateDataObjectForShellTransfer(const std::vector<PCIDLIST_ABSOLUTE> &i
 	IDataObject **dataObjectOut);
 HRESULT SetDropDescription(IDataObject *dataObject, DROPIMAGETYPE type, const std::wstring &message,
 	const std::wstring &insert);
+HRESULT ClearDropDescription(IDataObject *dataObject);
 
 template <typename T>
 HRESULT SetBlobData(IDataObject *dataObject, CLIPFORMAT format, const T &data)

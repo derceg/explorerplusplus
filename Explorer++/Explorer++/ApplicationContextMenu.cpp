@@ -13,10 +13,10 @@ namespace Applications
 {
 
 ApplicationContextMenu::ApplicationContextMenu(ApplicationModel *model,
-	CoreInterface *coreInterface) :
+	ApplicationExecutor *applicationExecutor, CoreInterface *coreInterface) :
 	m_model(model),
 	m_resourceInstance(coreInterface->GetResourceInstance()),
-	m_controller(coreInterface)
+	m_controller(applicationExecutor, coreInterface)
 {
 }
 

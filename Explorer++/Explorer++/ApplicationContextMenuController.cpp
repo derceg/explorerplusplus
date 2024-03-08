@@ -6,8 +6,9 @@
 #include "ApplicationContextMenuController.h"
 #include "Application.h"
 #include "ApplicationEditorDialog.h"
+#include "ApplicationExecutor.h"
+#include "ApplicationHelper.h"
 #include "ApplicationModel.h"
-#include "ApplicationToolbarHelper.h"
 #include "CoreInterface.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
@@ -16,7 +17,9 @@
 namespace Applications
 {
 
-ApplicationContextMenuController::ApplicationContextMenuController(CoreInterface *coreInterface) :
+ApplicationContextMenuController::ApplicationContextMenuController(
+	ApplicationExecutor *applicationExecutor, CoreInterface *coreInterface) :
+	m_applicationExecutor(applicationExecutor),
 	m_coreInterface(coreInterface)
 {
 }
@@ -27,7 +30,7 @@ void ApplicationContextMenuController::OnMenuItemSelected(int menuItemId, Applic
 	switch (menuItemId)
 	{
 	case IDM_APP_OPEN:
-		OnOpen(parentWindow, targetApplication);
+		OnOpen(targetApplication);
 		break;
 
 	case IDM_APP_PROPERTIES:
@@ -44,10 +47,9 @@ void ApplicationContextMenuController::OnMenuItemSelected(int menuItemId, Applic
 	}
 }
 
-void ApplicationContextMenuController::OnOpen(HWND parentWindow,
-	const Application *targetApplication)
+void ApplicationContextMenuController::OnOpen(const Application *targetApplication)
 {
-	ApplicationToolbarHelper::OpenApplication(m_coreInterface, parentWindow, targetApplication);
+	m_applicationExecutor->Execute(targetApplication);
 }
 
 void ApplicationContextMenuController::OnShowProperties(HWND parentWindow, ApplicationModel *model,

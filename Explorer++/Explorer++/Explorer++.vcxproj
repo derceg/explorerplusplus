@@ -979,8 +979,10 @@
     <ClCompile Include="ApplicationContextMenu.cpp" />
     <ClCompile Include="ApplicationContextMenuController.cpp" />
     <ClCompile Include="ApplicationCrashedDialog.cpp" />
+    <ClCompile Include="ApplicationDropper.cpp" />
+    <ClCompile Include="ApplicationExecutorImpl.cpp" />
     <ClCompile Include="ApplicationModelFactory.cpp" />
-    <ClCompile Include="ApplicationToolbarHelper.cpp" />
+    <ClCompile Include="ApplicationHelper.cpp" />
     <ClCompile Include="ApplicationToolbarRegistryStorage.cpp" />
     <ClCompile Include="ApplicationToolbarView.cpp" />
     <ClCompile Include="ApplicationToolbarXmlStorage.cpp" />
@@ -1217,9 +1219,12 @@
     <ClInclude Include="ApplicationContextMenu.h" />
     <ClInclude Include="ApplicationContextMenuController.h" />
     <ClInclude Include="ApplicationCrashedDialog.h" />
+    <ClInclude Include="ApplicationDropper.h" />
+    <ClInclude Include="ApplicationExecutor.h" />
+    <ClInclude Include="ApplicationExecutorImpl.h" />
     <ClInclude Include="ApplicationModel.h" />
     <ClInclude Include="ApplicationModelFactory.h" />
-    <ClInclude Include="ApplicationToolbarHelper.h" />
+    <ClInclude Include="ApplicationHelper.h" />
     <ClInclude Include="ApplicationToolbarRegistryStorage.h" />
     <ClInclude Include="ApplicationToolbarView.h" />
     <ClInclude Include="ApplicationToolbarXmlStorage.h" />
