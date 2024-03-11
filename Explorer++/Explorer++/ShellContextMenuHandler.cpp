@@ -198,8 +198,22 @@ bool Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		assert(pidlItems.empty());
 
 		// This verb (which corresponds to the "Customize this folder..." menu item shown in the
-		// background context menu) doesn't appear to be a standard verb that's handled by the
-		// system. Therefore, it will be handled here.
+		// background context menu) is normally handled by the view in Explorer. Because of that,
+		// selecting the item will have no effect, which is why it's manually handled here.
+		// Note that the call below won't always result in the customize tab being selected. That's
+		// because the properties dialog will select the tab based on its display name, which can
+		// change as the display language is changed in Windows.
+		// In Explorer, the title of the dialog is dynamically retrieved. Although it might be
+		// possible to do that here as well, that strategy would break if the properties dialog
+		// resource ID ever changed.
+		// Another alternative might be to load the "customize" string from the string table. But
+		// the language used by the application has nothing to do with the language used by Windows
+		// itself. Also, the text would have to be exactly the same as that used by Windows for a
+		// given language, which probably wouldn't be clear to translators. Minor variations within
+		// a language (e.g. customize vs customise) could cause the tab to not be selected.
+		// Therefore, this will only work when the actual title of the properties dialog is
+		// "customize" (ignoring case). That's not ideal, but not too much of an issue, since the
+		// properties dialog will always be opened, just not always on the customize tab.
 		ExecuteFileAction(m_hActiveListView, pidlParent, L"properties", L"customize", L"");
 
 		return true;
