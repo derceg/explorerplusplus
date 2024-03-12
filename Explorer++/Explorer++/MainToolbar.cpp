@@ -20,8 +20,6 @@
 #include "../Helper/Helper.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
-#include "../Helper/XMLSettings.h"
-#include <boost/bimap.hpp>
 
 // Enable C4062: enumerator 'identifier' in switch of enum 'enumeration' is not handled
 #pragma warning(default : 4062)
@@ -66,58 +64,19 @@ const std::unordered_map<MainToolbarButton, Icon, ToolbarButtonHash> TOOLBAR_BUT
 };
 // clang-format on
 
-#pragma warning(push)
-#pragma warning(                                                                                   \
-		disable : 4996 4834) // warning STL4010: Various members of std::allocator are
-							 // deprecated in C++17,
-							 // discarding return value of function with 'nodiscard' attribute
-
-// Ideally, toolbar button IDs would be saved in the XML config file, rather
-// than button strings, but that's not especially easy to change now.
-// clang-format off
-const boost::bimap<MainToolbarButton, std::wstring> TOOLBAR_BUTTON_XML_NAME_MAPPINGS = MakeBimap<MainToolbarButton, std::wstring>({
-	{MainToolbarButton::Back, L"Back"},
-	{MainToolbarButton::Forward, L"Forward"},
-	{MainToolbarButton::Up, L"Up"},
-	{MainToolbarButton::Folders, L"Folders"},
-	{MainToolbarButton::CopyTo, L"Copy To"},
-	{MainToolbarButton::MoveTo, L"Move To"},
-	{MainToolbarButton::NewFolder, L"New Folder"},
-	{MainToolbarButton::Copy, L"Copy"},
-	{MainToolbarButton::Cut, L"Cut"},
-	{MainToolbarButton::Paste, L"Paste"},
-	{MainToolbarButton::Delete, L"Delete"},
-	{MainToolbarButton::Views, L"Views"},
-	{MainToolbarButton::Search, L"Search"},
-	{MainToolbarButton::Properties, L"Properties"},
-	{MainToolbarButton::Refresh, L"Refresh"},
-	{MainToolbarButton::AddBookmark, L"Bookmark the current tab"},
-	{MainToolbarButton::NewTab, L"Create a new tab"},
-	{MainToolbarButton::OpenCommandPrompt, L"Open Command Prompt"},
-	{MainToolbarButton::Bookmarks, L"Organize Bookmarks"},
-	{MainToolbarButton::DeletePermanently, L"Delete Permanently"},
-	{MainToolbarButton::SplitFile, L"Split File"},
-	{MainToolbarButton::MergeFiles, L"Merge Files"},
-	{MainToolbarButton::CloseTab, L"Close Tab"},
-
-	{MainToolbarButton::Separator, L"Separator"}
-});
-// clang-format on
-
-#pragma warning(pop)
-
 MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE resourceInstance,
 	BrowserWindow *browserWindow, CoreInterface *coreInterface, IconFetcher *iconFetcher,
-	std::shared_ptr<Config> config)
+	std::shared_ptr<Config> config,
+	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons)
 {
 	return new MainToolbar(parent, resourceInstance, browserWindow, coreInterface, iconFetcher,
-		config);
+		config, initialButtons);
 }
 
 MainToolbar::MainToolbar(HWND parent, HINSTANCE resourceInstance, BrowserWindow *browserWindow,
-	CoreInterface *coreInterface, IconFetcher *iconFetcher, std::shared_ptr<Config> config) :
+	CoreInterface *coreInterface, IconFetcher *iconFetcher, std::shared_ptr<Config> config,
+	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons) :
 	BaseWindow(CreateMainToolbar(parent)),
-	m_persistentSettings(&MainToolbarPersistentSettings::GetInstance()),
 	m_resourceInstance(resourceInstance),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
@@ -127,7 +86,7 @@ MainToolbar::MainToolbar(HWND parent, HINSTANCE resourceInstance, BrowserWindow 
 	m_tooltipFontSetter(reinterpret_cast<HWND>(SendMessage(m_hwnd, TB_GETTOOLTIPS, 0, 0)),
 		config.get())
 {
-	Initialize(parent);
+	Initialize(parent, initialButtons);
 }
 
 HWND MainToolbar::CreateMainToolbar(HWND parent)
@@ -139,7 +98,8 @@ HWND MainToolbar::CreateMainToolbar(HWND parent)
 			| TBSTYLE_EX_HIDECLIPPEDBUTTONS);
 }
 
-void MainToolbar::Initialize(HWND parent)
+void MainToolbar::Initialize(HWND parent,
+	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons)
 {
 	// Ideally, this constraint would be checked at compile-time, but the size
 	// of TOOLBAR_BUTTON_ICON_MAPPINGS isn't known at compile-time. Note that
@@ -164,8 +124,7 @@ void MainToolbar::Initialize(HWND parent)
 		m_coreInterface->GetIconResourceLoader(), TOOLBAR_IMAGE_SIZE_LARGE, dpi);
 
 	SetTooolbarImageList();
-	AddStringsToToolbar();
-	AddButtonsToToolbar(m_persistentSettings->m_toolbarButtons);
+	AddButtonsToToolbar(initialButtons ? initialButtons->GetButtons() : GetDefaultButtons());
 	UpdateConfigDependentButtonStates();
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
@@ -311,6 +270,11 @@ LRESULT MainToolbar::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
+std::vector<MainToolbarButton> MainToolbar::GetDefaultButtons() const
+{
+	return { std::begin(DEFAULT_TOOLBAR_BUTTONS), std::end(DEFAULT_TOOLBAR_BUTTONS) };
+}
+
 void MainToolbar::AddButtonsToToolbar(const std::vector<MainToolbarButton> &buttons)
 {
 	for (auto button : buttons)
@@ -321,15 +285,24 @@ void MainToolbar::AddButtonsToToolbar(const std::vector<MainToolbarButton> &butt
 
 void MainToolbar::AddButtonToToolbar(MainToolbarButton button)
 {
+	if (button != +MainToolbarButton::Separator
+		&& SendMessage(m_hwnd, TB_COMMANDTOINDEX, button, 0) != -1)
+	{
+		DCHECK(false) << "Toolbar button already exists";
+		return;
+	}
+
 	TBBUTTON tbButton = GetToolbarButtonDetails(button);
+	auto buttonText = GetToolbarButtonText(button);
+	tbButton.iString = reinterpret_cast<INT_PTR>(buttonText.c_str());
 	SendMessage(m_hwnd, TB_ADDBUTTONS, 1, reinterpret_cast<LPARAM>(&tbButton));
 }
 
+// Returns the button details, excluding the button text, since the TBBUTTON struct only includes
+// space for a pointer to the text, which would create potential lifetime issues.
 TBBUTTON MainToolbar::GetToolbarButtonDetails(MainToolbarButton button) const
 {
-	TBBUTTON tbButton;
-
-	ZeroMemory(&tbButton, sizeof(tbButton));
+	TBBUTTON tbButton = {};
 
 	if (button == +MainToolbarButton::Separator)
 	{
@@ -344,8 +317,6 @@ TBBUTTON MainToolbar::GetToolbarButtonDetails(MainToolbarButton button) const
 	{
 		/* Standard style that all toolbar buttons will have. */
 		BYTE standardStyle = BTNS_AUTOSIZE;
-
-		auto stringIndex = m_toolbarStringMap.at(button);
 
 		int imagePosition;
 
@@ -363,47 +334,15 @@ TBBUTTON MainToolbar::GetToolbarButtonDetails(MainToolbarButton button) const
 		tbButton.fsState = TBSTATE_ENABLED;
 		tbButton.fsStyle = standardStyle | LookupToolbarButtonExtraStyles(button);
 		tbButton.dwData = 0;
-		tbButton.iString = stringIndex;
+		tbButton.iString = 0;
 	}
 
 	return tbButton;
 }
 
-void MainToolbar::AddStringsToToolbar()
+std::wstring MainToolbar::GetToolbarButtonText(MainToolbarButton button) const
 {
-	for (auto button : MainToolbarButton::_values())
-	{
-		if (button == +MainToolbarButton::Separator)
-		{
-			continue;
-		}
-
-		AddStringToToolbar(button);
-	}
-}
-
-void MainToolbar::AddStringToToolbar(MainToolbarButton button)
-{
-	TCHAR szText[64];
-
-	/* The string must be double NULL-terminated. */
-	GetToolbarButtonText(button, szText, SIZEOF_ARRAY(szText));
-	szText[lstrlen(szText) + 1] = '\0';
-
-	int index =
-		static_cast<int>(SendMessage(m_hwnd, TB_ADDSTRING, NULL, reinterpret_cast<LPARAM>(szText)));
-
-	m_toolbarStringMap.insert(std::make_pair(button, index));
-}
-
-void MainToolbar::GetToolbarButtonText(MainToolbarButton button, TCHAR *szText, int bufSize) const
-{
-	int res = LoadString(m_resourceInstance, LookupToolbarButtonTextID(button), szText, bufSize);
-	assert(res != 0);
-
-	/* It doesn't really make sense to return this. If the string isn't in the
-	string table, there's a bug somewhere in the program. */
-	UNUSED(res);
+	return ResourceHelper::LoadString(m_resourceInstance, LookupToolbarButtonTextID(button));
 }
 
 BYTE MainToolbar::LookupToolbarButtonExtraStyles(MainToolbarButton button) const
@@ -578,11 +517,6 @@ BOOL MainToolbar::OnTBRestore()
 	return 0;
 }
 
-/* This function is the reason why the toolbar string pool is used. When
-customizing the toolbar, the text assigned to pszText is used. However, when
-restoring the toolbar (via TB_SAVERESTORE), a TBN_GETBUTTONINFO notification is
-sent for each button, and the iString parameter must be set to a valid string or
-index. */
 BOOL MainToolbar::OnTBGetButtonInfo(LPARAM lParam)
 {
 	auto *pnmtb = reinterpret_cast<NMTOOLBAR *>(lParam);
@@ -590,15 +524,15 @@ BOOL MainToolbar::OnTBGetButtonInfo(LPARAM lParam)
 	if ((pnmtb->iItem >= 0)
 		&& (static_cast<std::size_t>(pnmtb->iItem) < (MainToolbarButton::_size() - 1)))
 	{
-		// Note that the separator (which is the first item in the enumeration)
-		// is skipped.
+		// Note that the separator (which is the first item in the enumeration) is skipped.
 		assert(MainToolbarButton::_values()[0] == +MainToolbarButton::Separator);
 		MainToolbarButton button = MainToolbarButton::_values()[pnmtb->iItem + 1];
 		pnmtb->tbButton = GetToolbarButtonDetails(button);
 
-		TCHAR szText[64];
-		GetToolbarButtonText(button, szText, SIZEOF_ARRAY(szText));
-		StringCchCopy(pnmtb->pszText, pnmtb->cchText, szText);
+		auto buttonText = GetToolbarButtonText(button);
+		StringCchCopy(pnmtb->pszText, pnmtb->cchText, buttonText.c_str());
+
+		pnmtb->tbButton.iString = reinterpret_cast<INT_PTR>(pnmtb->pszText);
 
 		return TRUE;
 	}
@@ -617,46 +551,13 @@ void MainToolbar::OnTBReset()
 		SendMessage(m_hwnd, TB_DELETEBUTTON, i, 0);
 	}
 
-	m_persistentSettings->m_toolbarButtons = { DEFAULT_TOOLBAR_BUTTONS,
-		std::end(DEFAULT_TOOLBAR_BUTTONS) };
-
-	AddButtonsToToolbar(m_persistentSettings->m_toolbarButtons);
+	AddButtonsToToolbar(GetDefaultButtons());
 	UpdateConfigDependentButtonStates();
 	UpdateToolbarButtonStates();
 }
 
 void MainToolbar::OnTBChange()
 {
-	std::vector<MainToolbarButton> toolbarButtons;
-	int numButtons = static_cast<int>(SendMessage(m_hwnd, TB_BUTTONCOUNT, 0, 0));
-
-	for (int i = 0; i < numButtons; i++)
-	{
-		TBBUTTON tbButton;
-		BOOL res = static_cast<BOOL>(
-			SendMessage(m_hwnd, TB_GETBUTTON, i, reinterpret_cast<LPARAM>(&tbButton)));
-
-		if (!res)
-		{
-			continue;
-		}
-
-		int id;
-
-		if (tbButton.idCommand == 0)
-		{
-			id = MainToolbarButton::Separator;
-		}
-		else
-		{
-			id = tbButton.idCommand;
-		}
-
-		toolbarButtons.push_back(MainToolbarButton::_from_integral(id));
-	}
-
-	m_persistentSettings->m_toolbarButtons = toolbarButtons;
-
 	UpdateConfigDependentButtonStates();
 }
 
@@ -997,70 +898,46 @@ void MainToolbar::OnFocusChanged()
 	UpdateToolbarButtonStates();
 }
 
-MainToolbarPersistentSettings::MainToolbarPersistentSettings() :
-	m_toolbarButtons(DEFAULT_TOOLBAR_BUTTONS, std::end(DEFAULT_TOOLBAR_BUTTONS))
-{
-	assert(TOOLBAR_BUTTON_XML_NAME_MAPPINGS.size() == MainToolbarButton::_size());
-}
-
-MainToolbarPersistentSettings &MainToolbarPersistentSettings::GetInstance()
-{
-	static MainToolbarPersistentSettings persistentSettings;
-	return persistentSettings;
-}
-
-void MainToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
-{
-	std::vector<MainToolbarButton> toolbarButtons;
-
-	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> am;
-	pNode->get_attributes(&am);
-
-	long lChildNodes;
-	am->get_length(&lChildNodes);
-
-	for (long j = 1; j < lChildNodes; j++)
-	{
-		wil::com_ptr_nothrow<IXMLDOMNode> pChildNode;
-		am->get_item(j, &pChildNode);
-
-		wil::unique_bstr bstrValue;
-		pChildNode->get_text(&bstrValue);
-
-		auto itr = TOOLBAR_BUTTON_XML_NAME_MAPPINGS.right.find(bstrValue.get());
-
-		if (itr == TOOLBAR_BUTTON_XML_NAME_MAPPINGS.right.end())
-		{
-			continue;
-		}
-
-		toolbarButtons.push_back(itr->second);
-	}
-
-	m_toolbarButtons = toolbarButtons;
-}
-
-void MainToolbarPersistentSettings::SaveXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe)
-{
-	int index = 0;
-
-	for (auto button : m_toolbarButtons)
-	{
-		TCHAR szButtonAttributeName[32];
-		StringCchPrintf(szButtonAttributeName, SIZEOF_ARRAY(szButtonAttributeName), _T("Button%d"),
-			index);
-
-		std::wstring buttonName = TOOLBAR_BUTTON_XML_NAME_MAPPINGS.left.at(button);
-
-		NXMLSettings::AddAttributeToNode(pXMLDom, pe, szButtonAttributeName, buttonName.c_str());
-
-		index++;
-	}
-}
-
 void MainToolbar::OnFontOrDpiUpdated()
 {
 	RefreshToolbarAfterFontOrDpiChange(m_hwnd);
 
 	sizeUpdatedSignal.m_signal();
+}
+
+MainToolbarStorage::MainToolbarButtons MainToolbar::GetButtonsForStorage() const
+{
+	MainToolbarStorage::MainToolbarButtons buttons;
+	int numButtons = static_cast<int>(SendMessage(m_hwnd, TB_BUTTONCOUNT, 0, 0));
+
+	for (int i = 0; i < numButtons; i++)
+	{
+		TBBUTTON tbButton;
+		BOOL res = static_cast<BOOL>(
+			SendMessage(m_hwnd, TB_GETBUTTON, i, reinterpret_cast<LPARAM>(&tbButton)));
+
+		if (!res)
+		{
+			DCHECK(false);
+			continue;
+		}
+
+		int id;
+
+		if (tbButton.idCommand == 0)
+		{
+			id = MainToolbarButton::Separator;
+		}
+		else
+		{
+			id = tbButton.idCommand;
+		}
+
+		auto buttonType = MainToolbarButton::_from_integral_nothrow(id);
+		CHECK(buttonType);
+
+		buttons.AddButton(*buttonType);
+	}
+
+	return buttons;
 }

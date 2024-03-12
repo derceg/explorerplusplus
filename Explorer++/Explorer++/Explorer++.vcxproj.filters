@@ -631,6 +631,9 @@
     <ClCompile Include="ApplicationExecutorImpl.cpp">
       <Filter>Application Toolbar</Filter>
     </ClCompile>
+    <ClCompile Include="MainToolbarStorage.cpp">
+      <Filter>Main Toolbar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1298,6 +1301,9 @@
     </ClInclude>
     <ClInclude Include="ApplicationExecutorImpl.h">
       <Filter>Application Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="MainToolbarStorage.h">
+      <Filter>Main Toolbar</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

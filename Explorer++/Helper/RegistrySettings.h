@@ -8,6 +8,7 @@
 #include <functional>
 #include <list>
 #include <string>
+#include <type_traits>
 
 namespace RegistrySettings
 {
@@ -29,6 +30,46 @@ bool ReadDateTime(HKEY key, const std::wstring &baseValueName, FILETIME &outputD
 LSTATUS SaveBinaryValue(HKEY key, const std::wstring &valueName, const BYTE *data, DWORD length);
 LSTATUS ReadBinaryValueSize(HKEY key, const std::wstring &valueName, DWORD &length);
 LSTATUS ReadBinaryValue(HKEY key, const std::wstring &valueName, void *data, DWORD length);
+
+template <typename T>
+	requires std::is_trivially_copyable_v<T>
+LSTATUS SaveVectorToBinaryValue(HKEY key, const std::wstring &valueName,
+	const std::vector<T> &items)
+{
+	return RegistrySettings::SaveBinaryValue(key, valueName,
+		reinterpret_cast<const BYTE *>(items.data()), static_cast<DWORD>(items.size() * sizeof(T)));
+}
+
+template <typename T>
+	requires std::is_trivially_copyable_v<T>
+LSTATUS ReadVectorFromBinaryValue(HKEY key, const std::wstring &valueName, std::vector<T> &output)
+{
+	DWORD length = 0;
+	auto res = RegistrySettings::ReadBinaryValueSize(key, valueName, length);
+
+	if (res != ERROR_SUCCESS)
+	{
+		return res;
+	}
+
+	if ((length % sizeof(T)) != 0)
+	{
+		return ERROR_BAD_LENGTH;
+	}
+
+	std::vector<T> items(length / sizeof(T));
+	res = RegistrySettings::ReadBinaryValue(key, valueName, items.data(),
+		static_cast<DWORD>(items.size() * sizeof(T)));
+
+	if (res != ERROR_SUCCESS)
+	{
+		return res;
+	}
+
+	output = items;
+
+	return ERROR_SUCCESS;
+}
 
 template <typename T>
 LSTATUS Read32BitValueFromRegistry(HKEY key, const std::wstring &valueName, T &output)

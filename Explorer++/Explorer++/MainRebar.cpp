@@ -375,39 +375,8 @@ void Explorerplusplus::OnAddressBarSizeUpdated()
 
 void Explorerplusplus::CreateMainToolbar()
 {
-	m_mainToolbar =
-		MainToolbar::Create(m_hMainRebar, m_resourceInstance, this, this, &m_iconFetcher, m_config);
-
-	// This should be done in the MainToolbar class. However, the TB_SAVERESTORE
-	// message needs to be sent to the toolbar window. That's incompatible with
-	// how the rest of the settings in the application tend to be loaded.
-	// It's generally assumed that settings and data can be loaded first (early
-	// in the lifetime of the application) and then the controls can be
-	// initialized based on those settings.
-	// Sending TB_SAVERESTORE means that the toolbar window needs to exist.
-	// That's true whether data is being saved or being loaded.
-	// Rather than do this inside the MainToolbar class, which would result in
-	// data being loaded from the registry in a different way to how it's loaded
-	// in other classes, the message is simply sent here for now.
-	// Ultimately, it would likely be better not to use this message, especially
-	// since it can't be used to save data to anything but the registry.
-	if (!m_bLoadSettingsFromXML)
-	{
-		if (m_bAttemptToolbarRestore)
-		{
-			TBSAVEPARAMS tbSave;
-			tbSave.hkr = HKEY_CURRENT_USER;
-			tbSave.pszSubKey = NExplorerplusplus::REG_SETTINGS_KEY;
-			tbSave.pszValueName = _T("ToolbarState");
-			SendMessage(m_mainToolbar->GetHWND(), TB_SAVERESTORE, FALSE,
-				reinterpret_cast<LPARAM>(&tbSave));
-
-			// As part of restoring the toolbar, the state of some items may be
-			// lost, so set their state again here.
-			m_mainToolbar->UpdateConfigDependentButtonStates();
-		}
-	}
-
+	m_mainToolbar = MainToolbar::Create(m_hMainRebar, m_resourceInstance, this, this,
+		&m_iconFetcher, m_config, m_loadedMainToolbarButtons);
 	m_mainToolbar->sizeUpdatedSignal.AddObserver(
 		std::bind(&Explorerplusplus::OnRebarToolbarSizeUpdated, this, m_mainToolbar->GetHWND()));
 }

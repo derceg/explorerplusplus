@@ -161,6 +161,9 @@
     <ClCompile Include="ViewModeHelperTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="MainToolbarStorageTest.cpp">
+      <Filter>Main Toolbar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -222,6 +225,9 @@
     </Filter>
     <Filter Include="Main Rebar">
       <UniqueIdentifier>{37c140aa-7806-46a2-b067-48685d705ce9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main Toolbar">
+      <UniqueIdentifier>{c61de3f5-5b11-4d9f-880d-4afcb5363ac6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

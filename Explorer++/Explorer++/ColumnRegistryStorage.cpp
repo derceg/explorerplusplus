@@ -59,38 +59,11 @@ struct SavedColumnWidth
 
 static_assert(std::is_trivially_copyable_v<SavedColumnWidth>);
 
-template <typename T>
-	requires std::is_trivially_copyable_v<T>
-LSTATUS LoadVectorFromBinaryValue(HKEY parentKey, const std::wstring &keyName,
-	std::vector<T> &output)
-{
-	DWORD length = 0;
-	auto res = RegistrySettings::ReadBinaryValueSize(parentKey, keyName, length);
-
-	if (res != ERROR_SUCCESS || (length % sizeof(T)) != 0)
-	{
-		return res;
-	}
-
-	std::vector<T> items(length / sizeof(T));
-	res = RegistrySettings::ReadBinaryValue(parentKey, keyName, items.data(),
-		static_cast<DWORD>(items.size() * sizeof(T)));
-
-	if (res != ERROR_SUCCESS)
-	{
-		return res;
-	}
-
-	output = items;
-
-	return ERROR_SUCCESS;
-}
-
 void LoadColumnSet(HKEY parentKey, const std::wstring &columnsKeyName,
 	const std::wstring &columnWidthsKeyName, std::vector<Column_t> &outputColumnSet)
 {
 	std::vector<SavedColumn> savedColumns;
-	auto res = LoadVectorFromBinaryValue(parentKey, columnsKeyName, savedColumns);
+	auto res = RegistrySettings::ReadVectorFromBinaryValue(parentKey, columnsKeyName, savedColumns);
 
 	if (res != ERROR_SUCCESS)
 	{
@@ -98,7 +71,8 @@ void LoadColumnSet(HKEY parentKey, const std::wstring &columnsKeyName,
 	}
 
 	std::vector<SavedColumnWidth> savedColumnWidths;
-	res = LoadVectorFromBinaryValue(parentKey, columnWidthsKeyName, savedColumnWidths);
+	res = RegistrySettings::ReadVectorFromBinaryValue(parentKey, columnWidthsKeyName,
+		savedColumnWidths);
 
 	if (res != ERROR_SUCCESS)
 	{
@@ -141,23 +115,14 @@ void LoadColumnSet(HKEY parentKey, const std::wstring &columnsKeyName,
 	outputColumnSet = columns;
 }
 
-template <typename T>
-	requires std::is_trivially_copyable_v<T>
-LSTATUS SaveVectorToBinaryValue(HKEY parentKey, const std::wstring &keyName,
-	const std::vector<T> &items)
-{
-	return RegistrySettings::SaveBinaryValue(parentKey, keyName,
-		reinterpret_cast<const BYTE *>(items.data()), static_cast<DWORD>(items.size() * sizeof(T)));
-}
-
 void SaveColumnSet(HKEY parentKey, const std::wstring &columnsKeyName,
 	const std::wstring &columnWidthsKeyName, const std::vector<Column_t> &columnSet)
 {
 	std::vector<SavedColumn> savedColumns(columnSet.begin(), columnSet.end());
-	SaveVectorToBinaryValue(parentKey, columnsKeyName, savedColumns);
+	RegistrySettings::SaveVectorToBinaryValue(parentKey, columnsKeyName, savedColumns);
 
 	std::vector<SavedColumnWidth> savedColumnWidths(columnSet.begin(), columnSet.end());
-	SaveVectorToBinaryValue(parentKey, columnWidthsKeyName, savedColumnWidths);
+	RegistrySettings::SaveVectorToBinaryValue(parentKey, columnWidthsKeyName, savedColumnWidths);
 }
 
 }

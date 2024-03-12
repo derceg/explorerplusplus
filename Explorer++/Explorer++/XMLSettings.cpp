@@ -23,6 +23,7 @@
 #include "MainRebarStorage.h"
 #include "MainRebarXmlStorage.h"
 #include "MainToolbar.h"
+#include "MainToolbarStorage.h"
 #include "ShellBrowser/Columns.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
@@ -629,8 +630,8 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
 		_T("ToolbarState"));
-
-	MainToolbarPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom, pParentNode.get());
+	MainToolbarStorage::SaveToXml(pXMLDom, pParentNode.get(),
+		m_mainToolbar->GetButtonsForStorage());
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("TreeViewDelayEnabled"),
@@ -1105,7 +1106,7 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 		break;
 
 	case HASH_TOOLBARSTATE:
-		MainToolbarPersistentSettings::GetInstance().LoadXMLSettings(pNode);
+		m_loadedMainToolbarButtons = MainToolbarStorage::LoadFromXml(pNode);
 		break;
 
 	case HASH_TREEVIEWDELAYENABLED:

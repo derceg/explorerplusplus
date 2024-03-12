@@ -12,6 +12,7 @@
 #include "CoreInterface.h"
 #include "IconFetcherImpl.h"
 #include "Literals.h"
+#include "MainToolbarStorage.h"
 #include "PluginInterface.h"
 #include "Plugins/PluginCommandManager.h"
 #include "Plugins/PluginMenuManager.h"
@@ -571,7 +572,6 @@ private:
 
 	/** Internal state. **/
 	HWND m_lastActiveWindow;
-	bool m_bAttemptToolbarRestore;
 	bool m_bLanguageLoaded;
 	bool m_bShowTabBar;
 	int m_iLastSelectedTab = 0;
@@ -672,6 +672,7 @@ private:
 
 	/* Toolbars. */
 	MainToolbar *m_mainToolbar;
+	std::optional<MainToolbarStorage::MainToolbarButtons> m_loadedMainToolbarButtons;
 	DrivesToolbar *m_drivesToolbar = nullptr;
 	Applications::ApplicationToolbar *m_applicationToolbar = nullptr;
 

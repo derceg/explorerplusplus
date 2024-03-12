@@ -9,6 +9,7 @@
 #include "HistoryMenu.h"
 #include "IconResourceLoader.h"
 #include "MainFontSetter.h"
+#include "MainToolbarStorage.h"
 #include "SignalWrapper.h"
 #include "Tab.h"
 #include "../Helper/BaseWindow.h"
@@ -21,45 +22,28 @@
 class BrowserWindow;
 struct Config;
 class IconFetcher;
-class MainToolbar;
 struct NavigateParams;
-
-class MainToolbarPersistentSettings
-{
-public:
-	static MainToolbarPersistentSettings &GetInstance();
-
-	void LoadXMLSettings(IXMLDOMNode *pNode);
-	void SaveXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe);
-
-private:
-	friend MainToolbar;
-
-	MainToolbarPersistentSettings();
-
-	MainToolbarPersistentSettings(const MainToolbarPersistentSettings &);
-	MainToolbarPersistentSettings &operator=(const MainToolbarPersistentSettings &);
-
-	// The current set of toolbar buttons.
-	std::vector<MainToolbarButton> m_toolbarButtons;
-};
 
 class MainToolbar : public BaseWindow
 {
 public:
 	static MainToolbar *Create(HWND parent, HINSTANCE resourceInstance,
 		BrowserWindow *browserWindow, CoreInterface *coreInterface, IconFetcher *iconFetcher,
-		std::shared_ptr<Config> config);
+		std::shared_ptr<Config> config,
+		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
 
 	void UpdateConfigDependentButtonStates();
 	void UpdateToolbarButtonStates();
+
+	MainToolbarStorage::MainToolbarButtons GetButtonsForStorage() const;
 
 	// Signals
 	SignalWrapper<MainToolbar, void()> sizeUpdatedSignal;
 
 private:
 	MainToolbar(HWND parent, HINSTANCE resourceInstance, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, IconFetcher *iconFetcher, std::shared_ptr<Config> config);
+		CoreInterface *coreInterface, IconFetcher *iconFetcher, std::shared_ptr<Config> config,
+		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
 	~MainToolbar();
 
 	static HWND CreateMainToolbar(HWND parent);
@@ -67,16 +51,16 @@ private:
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	void Initialize(HWND parent);
+	void Initialize(HWND parent,
+		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
 	void SetTooolbarImageList();
 	static std::unordered_map<int, int> SetUpToolbarImageList(HIMAGELIST imageList,
 		IconResourceLoader *iconResourceLoader, int iconSize, UINT dpi);
+	std::vector<MainToolbarButton> GetDefaultButtons() const;
 	void AddButtonsToToolbar(const std::vector<MainToolbarButton> &buttons);
 	void AddButtonToToolbar(MainToolbarButton button);
 	TBBUTTON GetToolbarButtonDetails(MainToolbarButton button) const;
-	void AddStringsToToolbar();
-	void AddStringToToolbar(MainToolbarButton button);
-	void GetToolbarButtonText(MainToolbarButton button, TCHAR *szText, int bufSize) const;
+	std::wstring GetToolbarButtonText(MainToolbarButton button) const;
 	BYTE LookupToolbarButtonExtraStyles(MainToolbarButton button) const;
 	int LookupToolbarButtonTextID(MainToolbarButton button) const;
 
@@ -109,8 +93,6 @@ private:
 
 	void OnFontOrDpiUpdated();
 
-	MainToolbarPersistentSettings *m_persistentSettings;
-
 	HINSTANCE m_resourceInstance;
 	BrowserWindow *m_browserWindow = nullptr;
 	CoreInterface *m_coreInterface = nullptr;
@@ -121,7 +103,6 @@ private:
 	wil::unique_himagelist m_imageListLarge;
 	std::unordered_map<int, int> m_toolbarImageMapSmall;
 	std::unordered_map<int, int> m_toolbarImageMapLarge;
-	std::unordered_map<int, int> m_toolbarStringMap;
 
 	MainFontSetter m_fontSetter;
 	MainFontSetter m_tooltipFontSetter;

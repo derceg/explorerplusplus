@@ -13,8 +13,6 @@
 
 using namespace testing;
 
-const WCHAR MAIN_FONT_NODE_NAME[] = L"MainFont";
-
 CustomFont BuildLoadSaveReferenceFont()
 {
 	return { L"Agency FB", 20 };
@@ -52,6 +50,8 @@ TEST_F(CustomFontRegistryStorageTest, Save)
 
 class CustomFontXmlStorageTest : public XmlStorageTest
 {
+protected:
+	static inline const WCHAR MAIN_FONT_NODE_NAME[] = L"MainFont";
 };
 
 TEST_F(CustomFontXmlStorageTest, Load)

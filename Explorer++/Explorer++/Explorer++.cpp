@@ -52,7 +52,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd, CommandLine::Settings *commandLine
 	FeatureList::GetInstance()->InitializeFromCommandLine(*commandLineSettings);
 
 	m_bSavePreferencesToXMLFile = FALSE;
-	m_bAttemptToolbarRestore = false;
 	m_bLanguageLoaded = false;
 	m_bShowTabBar = true;
 	m_pActiveShellBrowser = nullptr;

@@ -13,6 +13,7 @@
 #include "MainRebarRegistryStorage.h"
 #include "MainRebarStorage.h"
 #include "MainToolbar.h"
+#include "MainToolbarStorage.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
 #include "TabRegistryStorage.h"
@@ -25,9 +26,12 @@ using namespace std::string_literals;
 
 namespace
 {
-const TCHAR REG_TABS_KEY[] = _T("Software\\Explorer++\\Tabs");
-const TCHAR REG_DEFAULT_COLUMNS_KEY[] = _T("Software\\Explorer++\\DefaultColumns");
-const TCHAR REG_MAIN_FONT_KEY_NAME[] = _T("MainFont");
+
+const WCHAR MAIN_TOOLBAR_STATE_KEY_NAME[] = L"ToolbarState";
+const WCHAR TABS_KEY[] = L"Software\\Explorer++\\Tabs";
+const WCHAR DEFAULT_COLUMNS_KEY[] = L"Software\\Explorer++\\DefaultColumns";
+const WCHAR MAIN_FONT_KEY_NAME[] = L"MainFont";
+
 }
 
 BOOL LoadWindowPositionFromRegistry(WINDOWPLACEMENT *pwndpl)
@@ -79,7 +83,6 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 	HKEY hSettingsKey;
 	DWORD disposition;
 	LONG returnValue;
-	TBSAVEPARAMS tbSave;
 
 	/* Open/Create the main key that is used to store data. */
 	returnValue = RegCreateKeyEx(HKEY_CURRENT_USER, NExplorerplusplus::REG_SETTINGS_KEY, 0, nullptr,
@@ -253,23 +256,17 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 		RegSetValueEx(hSettingsKey, _T("DisplayFont"), 0, REG_BINARY, (LPBYTE) &logFont,
 			sizeof(LOGFONT));
 
-		/* TODO: This should
-		be done within the
-		main toolbar class. */
-		tbSave.hkr = HKEY_CURRENT_USER;
-		tbSave.pszSubKey = NExplorerplusplus::REG_SETTINGS_KEY;
-		tbSave.pszValueName = _T("ToolbarState");
+		MainToolbarStorage::SaveToRegistry(hSettingsKey, MAIN_TOOLBAR_STATE_KEY_NAME,
+			m_mainToolbar->GetButtonsForStorage());
 
-		SendMessage(m_mainToolbar->GetHWND(), TB_SAVERESTORE, TRUE, (LPARAM) &tbSave);
-
-		SHDeleteKey(hSettingsKey, REG_MAIN_FONT_KEY_NAME);
+		SHDeleteKey(hSettingsKey, MAIN_FONT_KEY_NAME);
 
 		auto &mainFont = m_config->mainFont.get();
 
 		if (mainFont)
 		{
 			auto mainFontKeyPath =
-				NExplorerplusplus::REG_SETTINGS_KEY + L"\\"s + REG_MAIN_FONT_KEY_NAME;
+				NExplorerplusplus::REG_SETTINGS_KEY + L"\\"s + MAIN_FONT_KEY_NAME;
 			SaveCustomFontToRegistry(mainFontKeyPath, *mainFont);
 		}
 
@@ -544,10 +541,11 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 			m_config->displayWindowFont = hFont;
 		}
 
-		m_bAttemptToolbarRestore = true;
+		m_loadedMainToolbarButtons =
+			MainToolbarStorage::LoadFromRegistry(hSettingsKey, MAIN_TOOLBAR_STATE_KEY_NAME);
 
 		auto mainFont = LoadCustomFontFromRegistry(
-			NExplorerplusplus::REG_SETTINGS_KEY + L"\\"s + REG_MAIN_FONT_KEY_NAME);
+			NExplorerplusplus::REG_SETTINGS_KEY + L"\\"s + MAIN_FONT_KEY_NAME);
 
 		if (mainFont)
 		{
@@ -562,10 +560,10 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 
 void Explorerplusplus::SaveTabSettingsToRegistry()
 {
-	SHDeleteKey(HKEY_CURRENT_USER, REG_TABS_KEY);
+	SHDeleteKey(HKEY_CURRENT_USER, TABS_KEY);
 
 	wil::unique_hkey tabsKey;
-	HRESULT hr = wil::reg::create_unique_key_nothrow(HKEY_CURRENT_USER, REG_TABS_KEY, tabsKey,
+	HRESULT hr = wil::reg::create_unique_key_nothrow(HKEY_CURRENT_USER, TABS_KEY, tabsKey,
 		wil::reg::key_access::readwrite);
 
 	if (FAILED(hr))
@@ -579,7 +577,7 @@ void Explorerplusplus::SaveTabSettingsToRegistry()
 void Explorerplusplus::LoadTabSettingsFromRegistry()
 {
 	wil::unique_hkey tabsKey;
-	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER, REG_TABS_KEY, tabsKey,
+	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER, TABS_KEY, tabsKey,
 		wil::reg::key_access::read);
 
 	if (FAILED(hr))
@@ -593,7 +591,7 @@ void Explorerplusplus::LoadTabSettingsFromRegistry()
 void Explorerplusplus::SaveDefaultColumnsToRegistry()
 {
 	wil::unique_hkey defaultColumnsKey;
-	HRESULT hr = wil::reg::create_unique_key_nothrow(HKEY_CURRENT_USER, REG_DEFAULT_COLUMNS_KEY,
+	HRESULT hr = wil::reg::create_unique_key_nothrow(HKEY_CURRENT_USER, DEFAULT_COLUMNS_KEY,
 		defaultColumnsKey, wil::reg::key_access::readwrite);
 
 	if (FAILED(hr))
@@ -608,7 +606,7 @@ void Explorerplusplus::SaveDefaultColumnsToRegistry()
 void Explorerplusplus::LoadDefaultColumnsFromRegistry()
 {
 	wil::unique_hkey defaultColumnsKey;
-	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER, REG_DEFAULT_COLUMNS_KEY,
+	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER, DEFAULT_COLUMNS_KEY,
 		defaultColumnsKey, wil::reg::key_access::read);
 
 	if (FAILED(hr))

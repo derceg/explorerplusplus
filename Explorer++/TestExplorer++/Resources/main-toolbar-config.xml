@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- Preference file for Explorer++ -->
+<ExplorerPlusPlus>
+	<Settings>
+		<Setting name="ToolbarState" Button0="Folders" Button1="Separator" Button2="Up"
+			Button3="Back" Button4="Forward" Button5="Separator" Button6="Search"
+			Button7="Separator" Button8="Paste" Button9="Delete" Button10="Copy" Button11="Cut"
+			Button12="Delete Permanently" Button13="Separator" Button14="New Folder"
+			Button15="Copy To" Button16="Move To" Button17="Separator"
+			Button18="Open Command Prompt" Button19="Refresh" Button20="Separator"
+			Button21="Bookmark the current tab" Button22="Separator" Button23="Create a new tab"
+			Button24="Merge Files" Button25="Separator" Button26="Close Tab" />
+	</Settings>
+</ExplorerPlusPlus>
