@@ -164,6 +164,13 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 			OnListViewPaste();
 		}
 		break;
+
+	case VK_INSERT:
+		if (!IsKeyDown(VK_CONTROL) && IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
+		{
+			OnListViewPaste();
+		}
+		break;
 	}
 
 	return 0;

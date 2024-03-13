@@ -710,6 +710,7 @@ void ShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 		}
 		break;
 
+	case VK_INSERT:
 	case 'C':
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
@@ -763,14 +764,7 @@ void ShellBrowser::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 		break;
 
 	case VK_DELETE:
-		if (IsKeyDown(VK_SHIFT))
-		{
-			DeleteSelectedItems(true);
-		}
-		else
-		{
-			DeleteSelectedItems(false);
-		}
+		DeleteSelectedItems(IsKeyDown(VK_SHIFT));
 		break;
 	}
 }
