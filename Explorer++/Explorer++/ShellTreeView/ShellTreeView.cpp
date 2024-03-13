@@ -807,6 +807,17 @@ LRESULT ShellTreeView::OnKeyDown(const NMTVKEYDOWN *keyDown)
 		}
 		break;
 
+	case VK_INSERT:
+		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
+		{
+			CopySelectedItemToClipboard(true);
+		}
+		if (!IsKeyDown(VK_CONTROL) && IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
+		{
+			Paste();
+		}
+		break;
+
 	case VK_DELETE:
 		if (IsKeyDown(VK_SHIFT))
 		{
