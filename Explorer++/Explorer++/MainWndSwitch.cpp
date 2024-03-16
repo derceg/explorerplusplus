@@ -205,9 +205,9 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM w
 
 		if (bValid)
 		{
-			SizeDisplayFormat displayFormat = m_config->globalFolderSettings.forceSize
+			auto displayFormat = m_config->globalFolderSettings.forceSize
 				? m_config->globalFolderSettings.sizeDisplayFormat
-				: SizeDisplayFormat::None;
+				: +SizeDisplayFormat::None;
 			auto folderSizeText =
 				FormatSizeString(pDWFolderSizeCompletion->liFolderSize.QuadPart, displayFormat);
 

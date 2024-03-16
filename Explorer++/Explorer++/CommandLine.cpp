@@ -259,7 +259,7 @@ std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(const CLI::App &app
 	{
 		OnUpdateReplaceExplorerSetting(ReplaceExplorerMode::None);
 	}
-	else if (immediatelyHandledOptions.replaceExplorerMode != ReplaceExplorerMode::None)
+	else if (immediatelyHandledOptions.replaceExplorerMode != +ReplaceExplorerMode::None)
 	{
 		OnUpdateReplaceExplorerSetting(immediatelyHandledOptions.replaceExplorerMode);
 	}

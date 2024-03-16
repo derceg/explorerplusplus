@@ -136,7 +136,7 @@ void Explorerplusplus::OnNewTab()
 
 HRESULT Explorerplusplus::CreateInitialTabs()
 {
-	if (m_config->startupMode == StartupMode::PreviousTabs)
+	if (m_config->startupMode == +StartupMode::PreviousTabs)
 	{
 		RestorePreviousTabs();
 	}

@@ -234,7 +234,7 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owne
 
 void ShellBrowser::NotifyShellOfNavigation(PCIDLIST_ABSOLUTE pidl)
 {
-	if (m_config->replaceExplorerMode == DefaultFileManager::ReplaceExplorerMode::None)
+	if (m_config->replaceExplorerMode == +DefaultFileManager::ReplaceExplorerMode::None)
 	{
 		return;
 	}

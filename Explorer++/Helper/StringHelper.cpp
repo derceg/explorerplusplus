@@ -18,7 +18,7 @@ std::wstring FormatSizeString(uint64_t size, SizeDisplayFormat sizeDisplayFormat
 	auto sizeAsDouble = static_cast<double>(size);
 	int sizeIndex = 0;
 
-	if (sizeDisplayFormat != SizeDisplayFormat::None)
+	if (sizeDisplayFormat != +SizeDisplayFormat::None)
 	{
 		switch (sizeDisplayFormat)
 		{

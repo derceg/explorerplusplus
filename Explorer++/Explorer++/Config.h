@@ -17,11 +17,12 @@
 #include "../Helper/StringHelper.h"
 #include <optional>
 
-enum class InfoTipType
-{
+// clang-format off
+BETTER_ENUM(InfoTipType, int,
 	System = 0,
 	Custom = 1
-};
+)
+// clang-format on
 
 enum class ShellChangeNotificationType
 {
@@ -32,11 +33,12 @@ enum class ShellChangeNotificationType
 
 // These values are used to save/load configuration data and should not be
 // changed.
-enum class StartupMode
-{
+// clang-format off
+BETTER_ENUM(StartupMode, int,
 	PreviousTabs = 1,
 	DefaultFolder = 2
-};
+)
+// clang-format on
 
 struct Config
 {

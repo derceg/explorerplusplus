@@ -125,15 +125,13 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 			m_config->globalFolderSettings.showFolderSizes);
 		RegistrySettings::SaveDword(hSettingsKey, _T("DisableFolderSizesNetworkRemovable"),
 			m_config->globalFolderSettings.disableFolderSizesNetworkRemovable);
-		RegistrySettings::SaveDword(hSettingsKey, _T("StartupMode"),
-			static_cast<DWORD>(m_config->startupMode));
+		RegistrySettings::SaveDword(hSettingsKey, _T("StartupMode"), m_config->startupMode);
 		RegistrySettings::SaveDword(hSettingsKey, _T("NextToCurrent"),
 			m_config->openNewTabNextToCurrent);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ConfirmCloseTabs"),
 			m_config->confirmCloseTabs);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowInfoTips"), m_config->showInfoTips);
-		RegistrySettings::SaveDword(hSettingsKey, _T("InfoTipType"),
-			static_cast<DWORD>(m_config->infoTipType));
+		RegistrySettings::SaveDword(hSettingsKey, _T("InfoTipType"), m_config->infoTipType);
 		RegistrySettings::SaveDword(hSettingsKey, _T("TreeViewDelayEnabled"),
 			m_config->treeViewDelayEnabled);
 		RegistrySettings::SaveDword(hSettingsKey, _T("LockToolbars"), m_config->lockToolbars);
@@ -144,7 +142,7 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowFilePreviews"),
 			m_config->showFilePreviews);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ReplaceExplorerMode"),
-			static_cast<DWORD>(m_config->replaceExplorerMode));
+			m_config->replaceExplorerMode);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowUserNameTitleBar"),
 			m_config->showUserNameInTitleBar.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("AllowMultipleInstances"),
@@ -167,7 +165,7 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 		RegistrySettings::SaveDword(hSettingsKey, _T("ForceSize"),
 			m_config->globalFolderSettings.forceSize);
 		RegistrySettings::SaveDword(hSettingsKey, _T("SizeDisplayFormat"),
-			static_cast<DWORD>(m_config->globalFolderSettings.sizeDisplayFormat));
+			m_config->globalFolderSettings.sizeDisplayFormat);
 		RegistrySettings::SaveDword(hSettingsKey, _T("CloseMainWindowOnTabClose"),
 			m_config->closeMainWindowOnTabClose);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowTabBarAtBottom"),
@@ -338,11 +336,8 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowFilePreviews"),
 			m_config->showFilePreviews);
 
-		RegistrySettings::ReadDword(hSettingsKey, _T("ReplaceExplorerMode"),
-			[this](DWORD value) {
-				m_config->replaceExplorerMode =
-					static_cast<DefaultFileManager::ReplaceExplorerMode>(value);
-			});
+		RegistrySettings::ReadBetterEnumValue(hSettingsKey, _T("ReplaceExplorerMode"),
+			m_config->replaceExplorerMode);
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("ShowFullTitlePath"),
 			[this](DWORD value) { m_config->showFullTitlePath.set(value); });
@@ -362,17 +357,14 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		RegistrySettings::ReadDword(hSettingsKey, _T("ExtendTabControl"),
 			[this](DWORD value) { m_config->extendTabControl.set(value); });
 
-		RegistrySettings::ReadDword(hSettingsKey, _T("StartupMode"),
-			[this](DWORD value) { m_config->startupMode = static_cast<StartupMode>(value); });
+		RegistrySettings::ReadBetterEnumValue(hSettingsKey, _T("StartupMode"),
+			m_config->startupMode);
 
-		RegistrySettings::ReadDword(hSettingsKey, _T("InfoTipType"),
-			[this](DWORD value) { m_config->infoTipType = static_cast<InfoTipType>(value); });
+		RegistrySettings::ReadBetterEnumValue(hSettingsKey, _T("InfoTipType"),
+			m_config->infoTipType);
 
-		RegistrySettings::ReadDword(hSettingsKey, _T("SizeDisplayFormat"),
-			[this](DWORD value) {
-				m_config->globalFolderSettings.sizeDisplayFormat =
-					static_cast<SizeDisplayFormat>(value);
-			});
+		RegistrySettings::ReadBetterEnumValue(hSettingsKey, _T("SizeDisplayFormat"),
+			m_config->globalFolderSettings.sizeDisplayFormat);
 
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("AllowMultipleInstances"),
 			m_config->allowMultipleInstances);

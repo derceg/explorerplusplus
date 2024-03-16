@@ -494,7 +494,7 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.hideSystemFiles));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("InfoTipType"),
-		NXMLSettings::EncodeIntValue(static_cast<int>(m_config->infoTipType)));
+		NXMLSettings::EncodeIntValue(m_config->infoTipType));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("InsertSorted"),
 		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.insertSorted));
@@ -535,7 +535,7 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 		NXMLSettings::EncodeBoolValue(m_config->overwriteExistingFilesConfirmation));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ReplaceExplorerMode"),
-		NXMLSettings::EncodeIntValue(static_cast<int>(m_config->replaceExplorerMode)));
+		NXMLSettings::EncodeIntValue(m_config->replaceExplorerMode));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowAddressBar"),
 		NXMLSettings::EncodeBoolValue(m_config->showAddressBar));
@@ -604,15 +604,14 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 		NXMLSettings::EncodeBoolValue(m_config->showUserNameInTitleBar.get()));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("SizeDisplayFormat"),
-		NXMLSettings::EncodeIntValue(
-			static_cast<int>(m_config->globalFolderSettings.sizeDisplayFormat)));
+		NXMLSettings::EncodeIntValue(m_config->globalFolderSettings.sizeDisplayFormat));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("SortAscendingGlobal"),
 		NXMLSettings::EncodeBoolValue(
 			m_config->defaultFolderSettings.sortDirection == +SortDirection::Ascending));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("StartupMode"),
-		NXMLSettings::EncodeIntValue(static_cast<int>(m_config->startupMode)));
+		NXMLSettings::EncodeIntValue(m_config->startupMode));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("SynchronizeTreeview"),
 		NXMLSettings::EncodeBoolValue(m_config->synchronizeTreeview.get()));
@@ -983,7 +982,7 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 		break;
 
 	case HASH_REPLACEEXPLORERMODE:
-		m_config->replaceExplorerMode = static_cast<DefaultFileManager::ReplaceExplorerMode>(
+		m_config->replaceExplorerMode = DefaultFileManager::ReplaceExplorerMode::_from_integral(
 			NXMLSettings::DecodeIntValue(wszValue));
 		break;
 
@@ -1073,7 +1072,7 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 
 	case HASH_SIZEDISPLAYFOMRAT:
 		m_config->globalFolderSettings.sizeDisplayFormat =
-			static_cast<SizeDisplayFormat>(NXMLSettings::DecodeIntValue(wszValue));
+			SizeDisplayFormat::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_SORTASCENDINGGLOBAL:
@@ -1090,7 +1089,7 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 		break;
 
 	case HASH_STARTUPMODE:
-		m_config->startupMode = static_cast<StartupMode>(NXMLSettings::DecodeIntValue(wszValue));
+		m_config->startupMode = StartupMode::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_SYNCHRONIZETREEVIEW:
@@ -1183,7 +1182,7 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 		break;
 
 	case HASH_INFOTIPTYPE:
-		m_config->infoTipType = static_cast<InfoTipType>(NXMLSettings::DecodeIntValue(wszValue));
+		m_config->infoTipType = InfoTipType::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_ICON_THEME:

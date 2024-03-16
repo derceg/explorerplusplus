@@ -242,9 +242,9 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 
 	if (numItemsSelected == 0)
 	{
-		SizeDisplayFormat displayFormat = m_config->globalFolderSettings.forceSize
+		auto displayFormat = m_config->globalFolderSettings.forceSize
 			? m_config->globalFolderSettings.sizeDisplayFormat
-			: SizeDisplayFormat::None;
+			: +SizeDisplayFormat::None;
 		sizeText = FormatSizeString(tab.GetShellBrowser()->GetTotalDirectorySize(), displayFormat);
 	}
 	else
@@ -252,9 +252,9 @@ HRESULT Explorerplusplus::UpdateStatusBarText(const Tab &tab)
 		// Note that no size will be shown if only folders are selected.
 		if (tab.GetShellBrowser()->GetNumSelectedFiles() != 0)
 		{
-			SizeDisplayFormat displayFormat = m_config->globalFolderSettings.forceSize
+			auto displayFormat = m_config->globalFolderSettings.forceSize
 				? m_config->globalFolderSettings.sizeDisplayFormat
-				: SizeDisplayFormat::None;
+				: +SizeDisplayFormat::None;
 			sizeText = FormatSizeString(tab.GetShellBrowser()->GetSelectionSize(), displayFormat);
 		}
 	}

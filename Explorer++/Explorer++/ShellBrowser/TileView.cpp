@@ -78,9 +78,9 @@ void ShellBrowser::SetTileViewItemInfo(int iItem, int iItemInternal)
 		ULARGE_INTEGER fileSize = { m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow,
 			m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh };
 
-		SizeDisplayFormat displayFormat = m_config->globalFolderSettings.forceSize
+		auto displayFormat = m_config->globalFolderSettings.forceSize
 			? m_config->globalFolderSettings.sizeDisplayFormat
-			: SizeDisplayFormat::None;
+			: +SizeDisplayFormat::None;
 		std::wstring fileSizeText = FormatSizeString(fileSize.QuadPart, displayFormat);
 		ListView_SetItemText(m_hListView, iItem, 2, fileSizeText.data());
 	}

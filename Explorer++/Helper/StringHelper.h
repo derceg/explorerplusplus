@@ -4,13 +4,14 @@
 
 #pragma once
 
+#include "../Helper/BetterEnumsWrapper.h"
 #include <windows.h>
 #include <functional>
 #include <optional>
 #include <string>
 
-enum class SizeDisplayFormat
-{
+// clang-format off
+BETTER_ENUM(SizeDisplayFormat, int,
 	None = 0,
 	Bytes = 1,
 	KB = 2,
@@ -18,7 +19,8 @@ enum class SizeDisplayFormat
 	GB = 4,
 	TB = 5,
 	PB = 6
-};
+)
+// clang-format on
 
 using StringComparatorFunc =
 	std::function<bool(const std::wstring &input, const std::wstring &test)>;
