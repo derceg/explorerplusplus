@@ -1,1 +1,0 @@
-The projects within this solution make use of the Boost C++ libraries (http://www.boost.org). Boost is included via NuGet and should be automatically installed when building with Visual Studio.
