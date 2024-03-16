@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "BetterEnumsWrapper.h"
 #include "Icon.h"
+#include "../Helper/BetterEnumsWrapper.h"
 #include <wil/resource.h>
 #include <gdiplus.h>
 

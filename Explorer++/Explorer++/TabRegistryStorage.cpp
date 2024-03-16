@@ -74,20 +74,6 @@ unique_pidl_absolute MaybeLoadPidl(HKEY key, const std::wstring &valueName)
 	return pidl;
 }
 
-template <BetterEnum T>
-void LoadBetterEnumValue(HKEY key, const std::wstring &valueName, T &output)
-{
-	DWORD value;
-	auto res = RegistrySettings::ReadDword(key, valueName, value);
-
-	if (res != ERROR_SUCCESS || !T::_is_valid(value))
-	{
-		return;
-	}
-
-	output = T::_from_integral(value);
-}
-
 void LoadBooleanSortDirection(HKEY key, const std::wstring &valueName, SortDirection &output)
 {
 	DWORD sortAscending;
@@ -105,8 +91,8 @@ FolderSettings LoadFolderSettings(HKEY key)
 {
 	FolderSettings folderSettings;
 
-	LoadBetterEnumValue(key, SETTING_VIEW_MODE, folderSettings.viewMode);
-	LoadBetterEnumValue(key, SETTING_SORT_MODE, folderSettings.sortMode);
+	RegistrySettings::ReadBetterEnumValue(key, SETTING_VIEW_MODE, folderSettings.viewMode);
+	RegistrySettings::ReadBetterEnumValue(key, SETTING_SORT_MODE, folderSettings.sortMode);
 
 	// Previously, the group mode and sort mode were always the same. Therefore, the group mode is
 	// set here to preserve the behavior. This will only have an effect when updating from a version
@@ -120,8 +106,9 @@ FolderSettings LoadFolderSettings(HKEY key)
 	// always the same in previous versions.
 	folderSettings.groupSortDirection = folderSettings.sortDirection;
 
-	LoadBetterEnumValue(key, SETTING_GROUP_MODE, folderSettings.groupMode);
-	LoadBetterEnumValue(key, SETTING_GROUP_SORT_DIRECTION, folderSettings.groupSortDirection);
+	RegistrySettings::ReadBetterEnumValue(key, SETTING_GROUP_MODE, folderSettings.groupMode);
+	RegistrySettings::ReadBetterEnumValue(key, SETTING_GROUP_SORT_DIRECTION,
+		folderSettings.groupSortDirection);
 	RegistrySettings::Read32BitValueFromRegistry(key, SETTING_SHOW_IN_GROUPS,
 		folderSettings.showInGroups);
 	RegistrySettings::Read32BitValueFromRegistry(key, SETTING_APPLY_FILTER,

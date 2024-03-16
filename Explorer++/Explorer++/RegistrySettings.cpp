@@ -409,26 +409,13 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("ShowQuickAccessInTreeView"),
 			m_config->showQuickAccessInTreeView);
 
-		bool themeLoaded = false;
-		RegistrySettings::ReadDword(hSettingsKey, _T("Theme"),
-			[this, &themeLoaded](DWORD value)
-			{
-				m_config->theme = Theme::_from_integral(value);
-				themeLoaded = true;
-			});
-
-		if (!themeLoaded)
-		{
-			// Theme data was previously stored using this key.
-			RegistrySettings::ReadDword(hSettingsKey, _T("EnableDarkMode"),
-				[this](DWORD value) { m_config->theme = value ? Theme::Dark : Theme::Light; });
-		}
+		auto theme = m_config->theme.get();
+		RegistrySettings::ReadBetterEnumValue(hSettingsKey, _T("Theme"), theme);
+		m_config->theme = theme;
 
 		RegistrySettings::ReadString(hSettingsKey, _T("NewTabDirectory"),
 			m_config->defaultTabDirectory);
-
-		RegistrySettings::ReadDword(hSettingsKey, _T("IconTheme"),
-			[this](DWORD value) { m_config->iconSet = IconSet::_from_integral(value); });
+		RegistrySettings::ReadBetterEnumValue(hSettingsKey, _T("IconTheme"), m_config->iconSet);
 
 		RegistrySettings::ReadDword(hSettingsKey, _T("Language"),
 			[this](DWORD value)
@@ -465,19 +452,14 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 				m_config->defaultFolderSettings.groupSortDirection =
 					value ? SortDirection::Ascending : SortDirection::Descending;
 			});
-		RegistrySettings::ReadDword(hSettingsKey, _T("GroupSortDirectionGlobal"),
-			[this](DWORD value) {
-				m_config->defaultFolderSettings.groupSortDirection =
-					SortDirection::_from_integral(value);
-			});
+		RegistrySettings::ReadBetterEnumValue(hSettingsKey, _T("GroupSortDirectionGlobal"),
+			m_config->defaultFolderSettings.groupSortDirection);
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("HideSystemFilesGlobal"),
 			m_config->globalFolderSettings.hideSystemFiles);
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("HideLinkExtensionGlobal"),
 			m_config->globalFolderSettings.hideLinkExtension);
-
-		RegistrySettings::ReadDword(hSettingsKey, _T("ViewModeGlobal"),
-			[this](DWORD value)
-			{ m_config->defaultFolderSettings.viewMode = ViewMode::_from_integral(value); });
+		RegistrySettings::ReadBetterEnumValue(hSettingsKey, _T("ViewModeGlobal"),
+			m_config->defaultFolderSettings.viewMode);
 
 		/* Display window settings. */
 		RegistrySettings::Read32BitValueFromRegistry(hSettingsKey, _T("DisplayWindowWidth"),

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "BetterEnumsWrapper.h"
+#include "../Helper/BetterEnumsWrapper.h"
 
 // Note that these values are used to save the toolbar state and should not be changed.
 // clang-format off

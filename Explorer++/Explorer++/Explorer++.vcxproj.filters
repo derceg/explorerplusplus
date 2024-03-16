@@ -816,9 +816,6 @@
     <ClInclude Include="Plugins\TabsApi\TabProperties.h">
       <Filter>Plugins\TabsApi</Filter>
     </ClInclude>
-    <ClInclude Include="BetterEnumsWrapper.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="TaskbarThumbnails.h">
       <Filter>Core</Filter>
     </ClInclude>

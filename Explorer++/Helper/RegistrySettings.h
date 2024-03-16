@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "BetterEnumsWrapper.h"
 #include <windows.h>
 #include <functional>
 #include <list>
@@ -83,6 +84,20 @@ LSTATUS Read32BitValueFromRegistry(HKEY key, const std::wstring &valueName, T &o
 	}
 
 	return res;
+}
+
+template <BetterEnum T>
+void ReadBetterEnumValue(HKEY key, const std::wstring &valueName, T &output)
+{
+	DWORD value;
+	auto res = ReadDword(key, valueName, value);
+
+	if (res != ERROR_SUCCESS || !T::_is_valid(value))
+	{
+		return;
+	}
+
+	output = T::_from_integral(value);
 }
 
 }

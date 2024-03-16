@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "BetterEnumsWrapper.h"
+#include "../Helper/BetterEnumsWrapper.h"
 
 // clang-format off
 BETTER_ENUM(ColumnType, unsigned int,

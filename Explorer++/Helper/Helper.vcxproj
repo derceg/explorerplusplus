@@ -681,6 +681,7 @@
     <ClInclude Include="..\targetver.h" />
     <ClInclude Include="BaseDialog.h" />
     <ClInclude Include="BaseWindow.h" />
+    <ClInclude Include="BetterEnumsWrapper.h" />
     <ClInclude Include="BulkClipboardWriter.h" />
     <ClInclude Include="CachedIcons.h" />
     <ClInclude Include="Clipboard.h" />

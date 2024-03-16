@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "BetterEnumsWrapper.h"
+#include "../Helper/BetterEnumsWrapper.h"
 
 // These are used for both sorting and grouping. For example, it's possible to both sort a folder by
 // name and group a folder by name.

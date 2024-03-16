@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "BetterEnumsWrapper.h"
 #include "CustomFont.h"
 #include "DefaultColumns.h"
 #include "IconResourceLoader.h"
@@ -12,6 +11,7 @@
 #include "ShellBrowser/ViewModes.h"
 #include "Theme.h"
 #include "ValueWrapper.h"
+#include "../Helper/BetterEnumsWrapper.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/StringHelper.h"

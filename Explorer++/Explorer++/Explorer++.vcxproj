@@ -1340,7 +1340,6 @@
     <ClInclude Include="DisplayColoursDialog.h" />
     <ClInclude Include="DisplayWindow\DisplayWindow.h" />
     <ClInclude Include="DrivesToolbar.h" />
-    <ClInclude Include="BetterEnumsWrapper.h" />
     <ClInclude Include="Plugins\Event.h" />
     <ClInclude Include="Explorer++.h" />
     <ClInclude Include="Explorer++VersionInfo.h" />
