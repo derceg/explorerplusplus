@@ -647,18 +647,9 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 				if (bRet)
 				{
 					auto itr = m_SearchItemsMapInternal.find(static_cast<int>(lvItem.lParam));
+					CHECK(itr != m_SearchItemsMapInternal.end());
 
-					/* Item should always exist. */
-					assert(itr != m_SearchItemsMapInternal.end());
-
-					unique_pidl_absolute pidlFull;
-					HRESULT hr = SHParseDisplayName(itr->second.c_str(), nullptr,
-						wil::out_param(pidlFull), 0, nullptr);
-
-					if (hr == S_OK)
-					{
-						m_browserWindow->OpenItem(pidlFull.get());
-					}
+					m_browserWindow->OpenItem(itr->second.c_str());
 				}
 			}
 		}

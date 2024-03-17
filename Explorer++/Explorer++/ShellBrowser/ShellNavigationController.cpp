@@ -211,8 +211,7 @@ HRESULT ShellNavigationController::Navigate(const HistoryEntry *entry)
 HRESULT ShellNavigationController::Navigate(const std::wstring &path)
 {
 	unique_pidl_absolute pidlDirectory;
-	RETURN_IF_FAILED(
-		SHParseDisplayName(path.c_str(), nullptr, wil::out_param(pidlDirectory), 0, nullptr));
+	RETURN_IF_FAILED(ParseDisplayNameForNavigation(path.c_str(), pidlDirectory));
 
 	auto navigateParams = NavigateParams::Normal(pidlDirectory.get());
 	return Navigate(navigateParams);

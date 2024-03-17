@@ -204,8 +204,7 @@ void Explorerplusplus::CreateCommandLineTabs()
 		}
 
 		unique_pidl_absolute fullPidl;
-		HRESULT hr = SHParseDisplayName(absolutePath->c_str(), nullptr, wil::out_param(fullPidl), 0,
-			nullptr);
+		HRESULT hr = ParseDisplayNameForNavigation(absolutePath->c_str(), fullPidl);
 
 		if (FAILED(hr))
 		{

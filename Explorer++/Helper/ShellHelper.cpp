@@ -13,9 +13,16 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/container_hash/hash.hpp>
+#include <glog/logging.h>
 #include <wil/com.h>
 #include <propkey.h>
 #include <wininet.h>
+
+enum class LinkTargetRetrievalType
+{
+	DontResolve,
+	Resolve
+};
 
 BOOL ExecuteFileAction(HWND hwnd, const void *item, bool isPidl, const std::wstring &verb,
 	const std::wstring &parameters, const std::wstring &startDirectory);
@@ -29,6 +36,9 @@ bool AddJumpListTasksInternal(IObjectCollection *objectCollection,
 	const std::list<JumpListTaskInformation> &taskList);
 HRESULT AddJumpListTaskInternal(IObjectCollection *objectCollection, const TCHAR *name,
 	const TCHAR *path, const TCHAR *arguments, const TCHAR *iconPath, int iconIndex);
+
+HRESULT MaybeGetLinkTarget(HWND hwnd, PCIDLIST_ABSOLUTE pidl, LinkTargetRetrievalType retrievalType,
+	unique_pidl_absolute &targetPidl);
 
 HRESULT GetDisplayName(const std::wstring &parsingPath, DWORD flags, std::wstring &output)
 {
@@ -696,6 +706,11 @@ std::optional<std::wstring> TransformUserEnteredPathToAbsolutePath(
 			// SHParseDisplayName().
 			return updatedPath;
 		}
+		else if (parsedUrl.nScheme == URL_SCHEME_SEARCH_MS)
+		{
+			// This is a search-ms: URL.
+			return updatedPath;
+		}
 		else if (parsedUrl.nScheme == URL_SCHEME_FILE)
 		{
 			// If the path is a file: URL, it should be absolute, meaning it can be returned
@@ -733,8 +748,9 @@ bool ShouldNormalizePath(const std::wstring &path)
 	parsedUrl.cbSize = sizeof(parsedUrl);
 	HRESULT hr = ParseURL(path.c_str(), &parsedUrl);
 
-	// Shell folder paths can't contain relative references.
-	if (SUCCEEDED(hr) && parsedUrl.nScheme == URL_SCHEME_SHELL)
+	// These URL types can't contain relative references.
+	if (SUCCEEDED(hr)
+		&& (parsedUrl.nScheme == URL_SCHEME_SHELL || parsedUrl.nScheme == URL_SCHEME_SEARCH_MS))
 	{
 		return false;
 	}
@@ -1492,4 +1508,107 @@ std::size_t hash_value(const IID &iid)
 	boost::hash_combine(seed, iid.Data3);
 	boost::hash_combine(seed, iid.Data4);
 	return seed;
+}
+
+// When calling IBindCtx::RegisterObjectParam(), a valid COM object instance needs to be provided,
+// even if it's not actually used to carry any data. Therefore, this class exists purely for that
+// purpose.
+class DummyUnknown : public winrt::implements<DummyUnknown, IUnknown, winrt::non_agile>
+{
+};
+
+HRESULT CreateBindCtxWithParam(const std::wstring &param,
+	wil::com_ptr_nothrow<IBindCtx> &outputBindCtx)
+{
+	wil::com_ptr_nothrow<IBindCtx> bindCtx;
+	RETURN_IF_FAILED(CreateBindCtx(0, &bindCtx));
+
+	// The second parameter here needs to be a valid pointer to a COM object, even though the
+	// parameter isn't actually used.
+	auto dummyUnknown = winrt::make_self<DummyUnknown>();
+	RETURN_IF_FAILED(
+		bindCtx->RegisterObjectParam(const_cast<PWSTR>(param.c_str()), dummyUnknown.get()));
+
+	outputBindCtx = bindCtx;
+
+	return S_OK;
+}
+
+HRESULT ParseDisplayNameForNavigation(const std::wstring &itemPath, unique_pidl_absolute &pidlItem)
+{
+	// Using this ensures that a search-ms: URL will be treated as a folder. Without this,
+	// attempting to enumerate the items associated with a search-ms: URL will fail.
+	// This also appears to impact the pidl returned for certain paths.
+	// https://explorerplusplus.com/forum/viewtopic.php?t=3185 describes an issue in which the
+	// "Downloads" folder wouldn't be selected in the treeview when navigating to it via its path.
+	// From some investigation, it appears that's because the pidl returned by SHParseDisplayName()
+	// would refer to an item in the root desktop folder, but not the "Downloads" item that normally
+	// appears.
+	// By passing the STR_PARSE_PREFER_FOLDER_BROWSING option, the pidl that's returned in that
+	// situation will be for the filesystem folder specifically, which then means that folder will
+	// be correctly selected in the treeview.
+	// Note that the return value of this function is only DCHECK'd. It's not expected that the call
+	// would fail, but if it does, bindCtx will be empty and the value passed through to
+	// SHParseDisplayName() will be null, which is valid.
+	wil::com_ptr_nothrow<IBindCtx> bindCtx;
+	HRESULT hr = CreateBindCtxWithParam(STR_PARSE_PREFER_FOLDER_BROWSING, bindCtx);
+	DCHECK(SUCCEEDED(hr));
+
+	return SHParseDisplayName(itemPath.c_str(), bindCtx.get(), wil::out_param(pidlItem), 0,
+		nullptr);
+}
+
+HRESULT MaybeGetLinkTarget(PCIDLIST_ABSOLUTE pidl, unique_pidl_absolute &targetPidl)
+{
+	return MaybeGetLinkTarget(nullptr, pidl, LinkTargetRetrievalType::DontResolve, targetPidl);
+}
+
+HRESULT MaybeResolveLinkTarget(HWND hwnd, PCIDLIST_ABSOLUTE pidl, unique_pidl_absolute &targetPidl)
+{
+	return MaybeGetLinkTarget(hwnd, pidl, LinkTargetRetrievalType::Resolve, targetPidl);
+}
+
+// If the specified item supports the IShellLink interface - that is, the item is a shortcut (i.e. a
+// .lnk file), symlink (i.e. created by mklink) or virtual link object (e.g. an item in the quick
+// access folder), this function will return the target pidl.
+// Depending on the LinkTargetRetrievalType, the target will be resolved by the shell, which may
+// result in a dialog being shown to the user (if the target doesn't currently exist).
+HRESULT MaybeGetLinkTarget(HWND hwnd, PCIDLIST_ABSOLUTE pidl, LinkTargetRetrievalType retrievalType,
+	unique_pidl_absolute &targetPidl)
+{
+	wil::com_ptr_nothrow<IShellItem> shellItem;
+	RETURN_IF_FAILED(SHCreateItemFromIDList(pidl, IID_PPV_ARGS(&shellItem)));
+
+	wil::com_ptr_nothrow<IShellLink> shellLink;
+	RETURN_IF_FAILED(shellItem->BindToHandler(nullptr, BHID_SFUIObject, IID_PPV_ARGS(&shellLink)));
+
+	if (retrievalType == LinkTargetRetrievalType::Resolve)
+	{
+		HRESULT hr = shellLink->Resolve(hwnd, SLR_UPDATE);
+
+		if (FAILED(hr))
+		{
+			return hr;
+		}
+
+		// S_FALSE can be returned in situations like the following:
+		//
+		// When the target of a shortcut has been deleted and IShellLink::Resolve() is called, the
+		// shell can show a dialog that contains three options:
+		//
+		// - One that allows the target to be restored from the recycle bin.
+		// - One that allows the shortcut to be deleted.
+		// - One that allows the operation to be canceled.
+		//
+		// In the latter two cases, S_FALSE will be returned and is effectively an error. That is,
+		// if S_FALSE is returned, the target won't exist.
+		if (hr == S_FALSE)
+		{
+			return HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND);
+		}
+	}
+
+	RETURN_IF_FAILED(shellLink->GetIDList(wil::out_param(targetPidl)));
+
+	return S_OK;
 }

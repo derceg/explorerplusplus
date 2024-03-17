@@ -126,11 +126,23 @@ void ShellBrowser::StoreCurrentlySelectedItems()
 HRESULT ShellBrowser::PerformEnumeration(NavigateParams &navigateParams,
 	std::vector<ShellBrowser::ItemInfo_t> &items)
 {
-	auto targetPidl = MaybeGetTargetPidlForNavigation(navigateParams.pidl);
+	// Note that although standard shortcuts (.lnk files) are currently handled outside this class,
+	// symlinks and virtual link objects aren't, so they will be handled here.
+	// Navigating to the target pidl is important for folders like the quick access folder. Although
+	// navigating directly to a recent/pinned folder works as expected, directory monitoring doesn't
+	// work. Presumably, that's because directory change notifications are only generated for the
+	// original (target) directory. To have things work correctly, the navigation needs to proceed
+	// to the original folder instead.
+	// Note that this call simply retrieves the target item, but doesn't attempt to resolve it. That
+	// matches the behavior of Explorer. For example, if a symlink to a directory is created and the
+	// target directory is then removed, Explorer will try to navigate to the target, without
+	// attempting to resolve the link.
+	unique_pidl_absolute targetPidl;
+	HRESULT hr = MaybeGetLinkTarget(navigateParams.pidl.Raw(), targetPidl);
 
-	if (targetPidl)
+	if (SUCCEEDED(hr))
 	{
-		navigateParams.pidl = *targetPidl;
+		navigateParams.pidl = targetPidl.get();
 	}
 
 	wil::com_ptr_nothrow<IShellFolder> parent;
@@ -162,44 +174,6 @@ HRESULT ShellBrowser::PerformEnumeration(NavigateParams &navigateParams,
 	m_navigationCommittedSignal(navigateParams);
 
 	return S_OK;
-}
-
-// If the specified item supports the IShellLink interface - that is, the item is a shortcut,
-// symlink or virtual link object, this function will return the target pidl. Note that, currently,
-// standard shortcuts aren't handled in the navigation code here, so this function is only used to
-// support the latter two cases.
-// Navigating to the target pidl is important for folders like the quick access folder. Although
-// navigating directly to a recent/pinned folder works as expected, directory monitoring doesn't
-// work. Presumably, that's because directory change notifications are only generated for the
-// original (target) directory. To have things work correctly, the navigation needs to proceed to
-// the original folder instead.
-std::optional<PidlAbsolute> ShellBrowser::MaybeGetTargetPidlForNavigation(const PidlAbsolute &pidl)
-{
-	wil::com_ptr_nothrow<IShellItem> shellItem;
-	HRESULT hr = SHCreateItemFromIDList(pidl.Raw(), IID_PPV_ARGS(&shellItem));
-
-	if (FAILED(hr))
-	{
-		return std::nullopt;
-	}
-
-	wil::com_ptr_nothrow<IShellLink> shellLink;
-	hr = shellItem->BindToHandler(nullptr, BHID_SFUIObject, IID_PPV_ARGS(&shellLink));
-
-	if (FAILED(hr))
-	{
-		return std::nullopt;
-	}
-
-	PidlAbsolute targetPidl;
-	hr = shellLink->GetIDList(PidlOutParam(targetPidl));
-
-	if (FAILED(hr))
-	{
-		return std::nullopt;
-	}
-
-	return targetPidl;
 }
 
 HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owner, bool showHidden,

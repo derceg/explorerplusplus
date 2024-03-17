@@ -108,8 +108,7 @@ int Plugins::TabsApi::create(sol::table createProperties)
 	extractTabPropertiesForCreation(createProperties, tabSettings);
 
 	unique_pidl_absolute pidlDirectory;
-	HRESULT hr =
-		SHParseDisplayName(location->c_str(), nullptr, wil::out_param(pidlDirectory), 0, nullptr);
+	HRESULT hr = ParseDisplayNameForNavigation(location->c_str(), pidlDirectory);
 
 	if (FAILED(hr))
 	{

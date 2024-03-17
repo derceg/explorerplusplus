@@ -98,6 +98,12 @@ TEST_F(TransformPathTest, AbsolutePath)
 	// A shell folder path.
 	PerformTest(L"shell:downloads", currentDirectory, L"shell:downloads");
 
+	// A search-ms: URL that represents a search results folder.
+	PerformTest(
+		L"search-ms:displayname=Search%20Results&crumb=fileextension%3A~<*.txt&crumb=location:C%3A%5CUsers%5CDefault",
+		currentDirectory,
+		L"search-ms:displayname=Search%20Results&crumb=fileextension%3A~<*.txt&crumb=location:C%3A%5CUsers%5CDefault");
+
 	// Paths that are separated by forward slashes, rather than backslashes.
 	PerformTest(L"c:/users/public", currentDirectory, L"c:\\users\\public");
 	PerformTest(L"\\nested/directory", L"d:\\path\\to\\item", L"d:\\nested\\directory");
@@ -136,6 +142,12 @@ TEST_F(TransformPathTest, Normalization)
 	// It's not valid to try and perform normalization on a path like this. That is, this shouldn't
 	// be transformed into "shell:public".
 	PerformTest(L"shell:public\\subfolder\\..", currentDirectory, L"shell:public\\subfolder\\..");
+
+	// Normalization shouldn't be performed on search-ms: URLs either.
+	PerformTest(
+		L"search-ms:displayname=Search%20Results&crumb=fileextension%3A~<*.txt&crumb=location:C%3A%5CUsers%5CDefault\\..",
+		currentDirectory,
+		L"search-ms:displayname=Search%20Results&crumb=fileextension%3A~<*.txt&crumb=location:C%3A%5CUsers%5CDefault\\..");
 }
 
 TEST_F(TransformPathTest, Whitespace)

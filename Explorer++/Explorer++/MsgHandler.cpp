@@ -115,8 +115,7 @@ void Explorerplusplus::OpenItem(const std::wstring &itemPath,
 	OpenFolderDisposition openFolderDisposition)
 {
 	unique_pidl_absolute pidlItem;
-	HRESULT hr =
-		SHParseDisplayName(itemPath.c_str(), nullptr, wil::out_param(pidlItem), 0, nullptr);
+	HRESULT hr = ParseDisplayNameForNavigation(itemPath, pidlItem);
 
 	if (SUCCEEDED(hr))
 	{
@@ -127,18 +126,28 @@ void Explorerplusplus::OpenItem(const std::wstring &itemPath,
 void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 	OpenFolderDisposition openFolderDisposition)
 {
-	SFGAOF uAttributes = SFGAO_FOLDER | SFGAO_STREAM | SFGAO_LINK;
-	HRESULT hr = GetItemAttributes(pidlItem, &uAttributes);
+	SFGAOF attributes = SFGAO_FOLDER | SFGAO_STREAM | SFGAO_LINK;
+	HRESULT hr = GetItemAttributes(pidlItem, &attributes);
 
 	if (FAILED(hr))
 	{
 		return;
 	}
 
-	if ((uAttributes & SFGAO_FOLDER) && (uAttributes & SFGAO_STREAM))
+	if (WI_AreAllFlagsSet(attributes, SFGAO_FOLDER | SFGAO_STREAM))
 	{
-		/* Zip file. */
-		if (m_config->handleZipFiles)
+		// This is container file. Examples of these files include:
+		//
+		// - .7z
+		// - .cab
+		// - .search-ms
+		// - .zip
+
+		std::wstring parsingPath;
+		hr = GetDisplayName(pidlItem, SHGDN_FORPARSING, parsingPath);
+		bool isZipFile = (SUCCEEDED(hr) && parsingPath.ends_with(L".zip"));
+
+		if ((isZipFile && m_config->handleZipFiles) || !isZipFile)
 		{
 			OpenFolderItem(pidlItem, openFolderDisposition);
 		}
@@ -147,73 +156,25 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 			OpenFileItem(pidlItem, EMPTY_STRING);
 		}
 	}
-	else if (uAttributes & SFGAO_FOLDER)
+	else if (WI_IsFlagSet(attributes, SFGAO_FOLDER))
 	{
 		OpenFolderItem(pidlItem, openFolderDisposition);
 	}
-	else if (uAttributes & SFGAO_LINK)
+	else if (WI_IsFlagSet(attributes, SFGAO_LINK))
 	{
-		/* This item is a shortcut. */
-		TCHAR szTargetPath[MAX_PATH];
+		unique_pidl_absolute target;
+		hr = MaybeResolveLinkTarget(m_hContainer, pidlItem, target);
 
-		std::wstring itemPath;
-		GetDisplayName(pidlItem, SHGDN_FORPARSING, itemPath);
-
-		hr = NFileOperations::ResolveLink(m_hContainer, 0, itemPath.c_str(), szTargetPath,
-			SIZEOF_ARRAY(szTargetPath));
-
-		if (hr == S_OK)
+		// If the target doesn't exist, MaybeResolveLinkTarget() will show an error message to the
+		// user. So, that case doesn't need to be handled at all here.
+		if (SUCCEEDED(hr))
 		{
-			/* The target of the shortcut was found
-			successfully. Query it to determine whether
-			it is a folder or not. */
-			uAttributes = SFGAO_FOLDER | SFGAO_STREAM;
-			hr = GetItemAttributes(szTargetPath, &uAttributes);
-
-			/* Note this is functionally equivalent to
-			recursively calling this function again.
-			However, the link may be arbitrarily deep
-			(or point to itself). Therefore, DO NOT
-			call this function recursively with itself
-			without some way of stopping. */
-			if (SUCCEEDED(hr))
-			{
-				/* Is this a link to a folder or zip file? */
-				if (((uAttributes & SFGAO_FOLDER) && !(uAttributes & SFGAO_STREAM))
-					|| ((uAttributes & SFGAO_FOLDER) && (uAttributes & SFGAO_STREAM)
-						&& m_config->handleZipFiles))
-				{
-					unique_pidl_absolute pidlTarget;
-					hr = SHParseDisplayName(szTargetPath, nullptr, wil::out_param(pidlTarget), 0,
-						nullptr);
-
-					if (SUCCEEDED(hr))
-					{
-						OpenFolderItem(pidlTarget.get(), openFolderDisposition);
-					}
-				}
-				else
-				{
-					hr = E_FAIL;
-				}
-			}
-		}
-
-		if (FAILED(hr))
-		{
-			/* It is possible the target may not resolve,
-			yet the shortcut is still valid. This is the
-			case with shortcut URL's for example.
-			Also, even if the shortcut points to a dead
-			folder, it should still attempted to be
-			opened. */
-			OpenFileItem(pidlItem, EMPTY_STRING);
+			OpenItem(target.get(), openFolderDisposition);
 		}
 	}
 	else
 	{
-		/* File item. */
-		OpenFileItem(pidlItem, EMPTY_STRING);
+		OpenFileItem(pidlItem, L"");
 	}
 }
 

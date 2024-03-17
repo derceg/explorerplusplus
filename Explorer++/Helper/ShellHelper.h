@@ -146,3 +146,10 @@ HRESULT GetItemInfoTip(const std::wstring &itemPath, std::wstring &outputInfoTip
 HRESULT GetItemInfoTip(PCIDLIST_ABSOLUTE pidlComplete, std::wstring &outputInfoTip);
 
 std::size_t hash_value(const IID &iid);
+
+// Calling this function (rather than SHParseDisplayName() directly) ensures that search-ms: URLs
+// will be treated as folders, which will allow navigations to those locations.
+HRESULT ParseDisplayNameForNavigation(const std::wstring &itemPath, unique_pidl_absolute &pidlItem);
+
+HRESULT MaybeGetLinkTarget(PCIDLIST_ABSOLUTE pidl, unique_pidl_absolute &targetPidl);
+HRESULT MaybeResolveLinkTarget(HWND hwnd, PCIDLIST_ABSOLUTE pidl, unique_pidl_absolute &targetPidl);

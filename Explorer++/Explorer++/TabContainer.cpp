@@ -866,17 +866,15 @@ Tab &TabContainer::CreateNewTab(const std::wstring &directory, const TabSettings
 	const FolderSettings *folderSettings, const FolderColumns *initialColumns)
 {
 	unique_pidl_absolute pidl;
-	HRESULT hr = SHParseDisplayName(directory.c_str(), nullptr, wil::out_param(pidl), 0, nullptr);
+	HRESULT hr = ParseDisplayNameForNavigation(directory.c_str(), pidl);
 
 	if (FAILED(hr))
 	{
-		hr = SHParseDisplayName(m_config->defaultTabDirectory.c_str(), nullptr,
-			wil::out_param(pidl), 0, nullptr);
+		hr = ParseDisplayNameForNavigation(m_config->defaultTabDirectory.c_str(), pidl);
 
 		if (FAILED(hr))
 		{
-			hr = SHParseDisplayName(m_config->defaultTabDirectoryStatic.c_str(), nullptr,
-				wil::out_param(pidl), 0, nullptr);
+			hr = ParseDisplayNameForNavigation(m_config->defaultTabDirectoryStatic.c_str(), pidl);
 		}
 	}
 
