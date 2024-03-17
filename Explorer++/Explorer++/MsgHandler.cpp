@@ -127,165 +127,93 @@ void Explorerplusplus::OpenItem(const std::wstring &itemPath,
 void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 	OpenFolderDisposition openFolderDisposition)
 {
-	BOOL bControlPanelParent = FALSE;
-
-	unique_pidl_absolute pidlControlPanel;
-	HRESULT hr =
-		SHGetFolderLocation(nullptr, CSIDL_CONTROLS, nullptr, 0, wil::out_param(pidlControlPanel));
-
-	if (SUCCEEDED(hr))
-	{
-		/* Check if the parent of the item is the control panel.
-		If it is, pass it to the shell to open, rather than
-		opening it in-place. */
-		if (ILIsParent(pidlControlPanel.get(), pidlItem, FALSE)
-			&& !ArePidlsEquivalent(pidlControlPanel.get(), pidlItem))
-		{
-			bControlPanelParent = TRUE;
-		}
-	}
-
-	/* On Vista and later, the Control Panel was split into
-	two completely separate views:
-	 - Icon View
-	 - Category View
-	Icon view is essentially the same view provided in
-	Windows XP and earlier (i.e. a simple, flat listing of
-	all the items in the control panel).
-	Category view, on the other hand, groups similar
-	Control Panel items under several broad categories.
-	It is important to note that both these 'views' are
-	represented by different GUID's, and are NOT the
-	same folder.
-	 - Icon View:
-	   ::{21EC2020-3AEA-1069-A2DD-08002B30309D} (Vista and Win 7)
-	   ::{26EE0668-A00A-44D7-9371-BEB064C98683}\0 (Win 7)
-	 - Category View:
-	   ::{26EE0668-A00A-44D7-9371-BEB064C98683} (Vista and Win 7)
-	*/
-	if (!bControlPanelParent)
-	{
-		unique_pidl_absolute pidlControlPanelCategoryView;
-		hr = SHParseDisplayName(CONTROL_PANEL_CATEGORY_VIEW, nullptr,
-			wil::out_param(pidlControlPanelCategoryView), 0, nullptr);
-
-		if (SUCCEEDED(hr))
-		{
-			/* Check if the parent of the item is the control panel.
-			If it is, pass it to the shell to open, rather than
-			opening it in-place. */
-			if (ILIsParent(pidlControlPanelCategoryView.get(), pidlItem, FALSE)
-				&& !ArePidlsEquivalent(pidlControlPanelCategoryView.get(), pidlItem))
-			{
-				bControlPanelParent = TRUE;
-			}
-		}
-	}
-
 	SFGAOF uAttributes = SFGAO_FOLDER | SFGAO_STREAM | SFGAO_LINK;
-	hr = GetItemAttributes(pidlItem, &uAttributes);
+	HRESULT hr = GetItemAttributes(pidlItem, &uAttributes);
 
-	if (SUCCEEDED(hr))
+	if (FAILED(hr))
 	{
-		if ((uAttributes & SFGAO_FOLDER) && (uAttributes & SFGAO_STREAM))
-		{
-			/* Zip file. */
-			if (m_config->handleZipFiles)
-			{
-				OpenFolderItem(pidlItem, openFolderDisposition);
-			}
-			else
-			{
-				OpenFileItem(pidlItem, EMPTY_STRING);
-			}
-		}
-		else if (((uAttributes & SFGAO_FOLDER) && !bControlPanelParent))
+		return;
+	}
+
+	if ((uAttributes & SFGAO_FOLDER) && (uAttributes & SFGAO_STREAM))
+	{
+		/* Zip file. */
+		if (m_config->handleZipFiles)
 		{
 			OpenFolderItem(pidlItem, openFolderDisposition);
 		}
-		else if (uAttributes & SFGAO_LINK && !bControlPanelParent)
-		{
-			/* This item is a shortcut. */
-			TCHAR szTargetPath[MAX_PATH];
-
-			std::wstring itemPath;
-			GetDisplayName(pidlItem, SHGDN_FORPARSING, itemPath);
-
-			hr = NFileOperations::ResolveLink(m_hContainer, 0, itemPath.c_str(), szTargetPath,
-				SIZEOF_ARRAY(szTargetPath));
-
-			if (hr == S_OK)
-			{
-				/* The target of the shortcut was found
-				successfully. Query it to determine whether
-				it is a folder or not. */
-				uAttributes = SFGAO_FOLDER | SFGAO_STREAM;
-				hr = GetItemAttributes(szTargetPath, &uAttributes);
-
-				/* Note this is functionally equivalent to
-				recursively calling this function again.
-				However, the link may be arbitrarily deep
-				(or point to itself). Therefore, DO NOT
-				call this function recursively with itself
-				without some way of stopping. */
-				if (SUCCEEDED(hr))
-				{
-					/* Is this a link to a folder or zip file? */
-					if (((uAttributes & SFGAO_FOLDER) && !(uAttributes & SFGAO_STREAM))
-						|| ((uAttributes & SFGAO_FOLDER) && (uAttributes & SFGAO_STREAM)
-							&& m_config->handleZipFiles))
-					{
-						unique_pidl_absolute pidlTarget;
-						hr = SHParseDisplayName(szTargetPath, nullptr, wil::out_param(pidlTarget),
-							0, nullptr);
-
-						if (SUCCEEDED(hr))
-						{
-							OpenFolderItem(pidlTarget.get(), openFolderDisposition);
-						}
-					}
-					else
-					{
-						hr = E_FAIL;
-					}
-				}
-			}
-
-			if (FAILED(hr))
-			{
-				/* It is possible the target may not resolve,
-				yet the shortcut is still valid. This is the
-				case with shortcut URL's for example.
-				Also, even if the shortcut points to a dead
-				folder, it should still attempted to be
-				opened. */
-				OpenFileItem(pidlItem, EMPTY_STRING);
-			}
-		}
-		else if (bControlPanelParent && (uAttributes & SFGAO_FOLDER))
-		{
-			std::wstring parsingPath;
-			GetDisplayName(pidlItem, SHGDN_FORPARSING, parsingPath);
-
-			auto explorerPath = ExpandEnvironmentStringsWrapper(_T("%windir%\\explorer.exe"));
-
-			if (explorerPath)
-			{
-				/* Invoke Windows Explorer directly. Note that only folder
-				items need to be passed directly to Explorer. Two central
-				reasons:
-				1. Explorer can only open folder items.
-				2. Non-folder items can be opened directly (regardless of
-				whether or not they're children of the control panel). */
-				ShellExecute(m_hContainer, _T("open"), explorerPath->c_str(), parsingPath.c_str(),
-					nullptr, SW_SHOWNORMAL);
-			}
-		}
 		else
 		{
-			/* File item. */
 			OpenFileItem(pidlItem, EMPTY_STRING);
 		}
+	}
+	else if (uAttributes & SFGAO_FOLDER)
+	{
+		OpenFolderItem(pidlItem, openFolderDisposition);
+	}
+	else if (uAttributes & SFGAO_LINK)
+	{
+		/* This item is a shortcut. */
+		TCHAR szTargetPath[MAX_PATH];
+
+		std::wstring itemPath;
+		GetDisplayName(pidlItem, SHGDN_FORPARSING, itemPath);
+
+		hr = NFileOperations::ResolveLink(m_hContainer, 0, itemPath.c_str(), szTargetPath,
+			SIZEOF_ARRAY(szTargetPath));
+
+		if (hr == S_OK)
+		{
+			/* The target of the shortcut was found
+			successfully. Query it to determine whether
+			it is a folder or not. */
+			uAttributes = SFGAO_FOLDER | SFGAO_STREAM;
+			hr = GetItemAttributes(szTargetPath, &uAttributes);
+
+			/* Note this is functionally equivalent to
+			recursively calling this function again.
+			However, the link may be arbitrarily deep
+			(or point to itself). Therefore, DO NOT
+			call this function recursively with itself
+			without some way of stopping. */
+			if (SUCCEEDED(hr))
+			{
+				/* Is this a link to a folder or zip file? */
+				if (((uAttributes & SFGAO_FOLDER) && !(uAttributes & SFGAO_STREAM))
+					|| ((uAttributes & SFGAO_FOLDER) && (uAttributes & SFGAO_STREAM)
+						&& m_config->handleZipFiles))
+				{
+					unique_pidl_absolute pidlTarget;
+					hr = SHParseDisplayName(szTargetPath, nullptr, wil::out_param(pidlTarget), 0,
+						nullptr);
+
+					if (SUCCEEDED(hr))
+					{
+						OpenFolderItem(pidlTarget.get(), openFolderDisposition);
+					}
+				}
+				else
+				{
+					hr = E_FAIL;
+				}
+			}
+		}
+
+		if (FAILED(hr))
+		{
+			/* It is possible the target may not resolve,
+			yet the shortcut is still valid. This is the
+			case with shortcut URL's for example.
+			Also, even if the shortcut points to a dead
+			folder, it should still attempted to be
+			opened. */
+			OpenFileItem(pidlItem, EMPTY_STRING);
+		}
+	}
+	else
+	{
+		/* File item. */
+		OpenFileItem(pidlItem, EMPTY_STRING);
 	}
 }
 

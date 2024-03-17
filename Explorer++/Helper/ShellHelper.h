@@ -15,8 +15,6 @@
 #include <string>
 #include <vector>
 
-#define CONTROL_PANEL_CATEGORY_VIEW _T("::{26EE0668-A00A-44D7-9371-BEB064C98683}")
-
 #define FRIENDLY_NAME_DESKTOP _T("Desktop")
 #define FRIENDLY_NAME_PICTURES _T("Pictures")
 #define FRIENDLY_NAME_MUSIC _T("Music")
