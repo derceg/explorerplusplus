@@ -164,6 +164,9 @@
     <ClCompile Include="MainToolbarStorageTest.cpp">
       <Filter>Main Toolbar</Filter>
     </ClCompile>
+    <ClCompile Include="ImageHelperTest.cpp">
+      <Filter>Helper\Miscellaneous</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -234,6 +237,9 @@
     <ResourceCompile Include="TestExplorer++.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="TestResources.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BookmarkTreeHelper.h">
@@ -278,5 +284,13 @@
       <Filter>Tabs</Filter>
     </ClInclude>
     <ClInclude Include="DragDropHelper.h" />
+    <ClInclude Include="TestResources.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="EmbeddedResources\basic.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

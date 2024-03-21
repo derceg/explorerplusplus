@@ -5,28 +5,8 @@
 #include "pch.h"
 #include "../Helper/GdiplusHelper.h"
 #include <gtest/gtest.h>
-#include <gdiplus.h>
 
-class GdiplusTest : public testing::Test
-{
-protected:
-	void SetUp() override
-	{
-		Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-		Gdiplus::Status status =
-			Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, nullptr);
-		ASSERT_EQ(status, Gdiplus::Ok);
-	}
-
-	void TearDown() override
-	{
-		Gdiplus::GdiplusShutdown(m_gdiplusToken);
-	}
-
-	ULONG_PTR m_gdiplusToken;
-};
-
-TEST_F(GdiplusTest, GetEncoderClsid)
+TEST(GdiplusTest, GetEncoderClsid)
 {
 	// As per
 	// https://learn.microsoft.com/en-au/windows/win32/gdiplus/-gdiplus-using-image-encoders-and-decoders-use,

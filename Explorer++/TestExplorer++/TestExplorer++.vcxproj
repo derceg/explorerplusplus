@@ -213,6 +213,7 @@
     <ClCompile Include="GdiplusHelperTest.cpp" />
     <ClCompile Include="HelperTest.cpp" />
     <ClCompile Include="HistoryMenuTest.cpp" />
+    <ClCompile Include="ImageHelperTest.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainRebarRegistryStorageTest.cpp" />
     <ClCompile Include="MainRebarStorageHelper.cpp" />
@@ -258,6 +259,7 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc" />
+    <ResourceCompile Include="TestResources.rc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbarStorageHelper.h" />
@@ -271,11 +273,15 @@
     <ClInclude Include="MovableModelHelper.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RegistryStorageHelper.h" />
+    <ClInclude Include="TestResources.h" />
     <ClInclude Include="ResourceHelper.h" />
     <ClInclude Include="ShellBrowserFake.h" />
     <ClInclude Include="TabNavigationMock.h" />
     <ClInclude Include="TabStorageHelper.h" />
     <ClInclude Include="XmlStorageHelper.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="EmbeddedResources\basic.png" />
   </ItemGroup>
   <ItemDefinitionGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

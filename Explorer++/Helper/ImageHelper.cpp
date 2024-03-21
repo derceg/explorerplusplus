@@ -248,35 +248,18 @@ std::unique_ptr<Gdiplus::Bitmap> ImageHelper::LoadGdiplusBitmapFromPNG(HINSTANCE
 		return nullptr;
 	}
 
-	wil::unique_hglobal global(GlobalAlloc(GMEM_MOVEABLE, resourceSize));
+	std::vector<std::byte> copiedData(resourceSize);
+	std::memcpy(copiedData.data(), resourceData, resourceSize);
 
-	if (!global)
+	wil::com_ptr_nothrow<IStream> stream(SHCreateMemStream(
+		reinterpret_cast<BYTE *>(copiedData.data()), static_cast<UINT>(copiedData.size())));
+
+	if (!stream)
 	{
 		return nullptr;
 	}
 
-	void *buffer = GlobalLock(global.get());
-
-	if (!buffer)
-	{
-		return nullptr;
-	}
-
-	CopyMemory(buffer, resourceData, resourceSize);
-
-	std::unique_ptr<Gdiplus::Bitmap> bitmap;
-
-	wil::com_ptr_nothrow<IStream> stream;
-	HRESULT hr = CreateStreamOnHGlobal(global.get(), false, &stream);
-
-	if (SUCCEEDED(hr))
-	{
-		bitmap = std::make_unique<Gdiplus::Bitmap>(stream.get());
-	}
-
-	GlobalUnlock(global.get());
-
-	return bitmap;
+	return std::make_unique<Gdiplus::Bitmap>(stream.get());
 }
 
 int ImageHelper::CopyImageListIcon(HIMAGELIST destination, HIMAGELIST source, int sourceIconIndex)

@@ -4,6 +4,7 @@
 
 #include "pch.h"
 #include <gtest/gtest.h>
+#include <gdiplus.h>
 
 using namespace testing;
 
@@ -31,9 +32,31 @@ public:
 	}
 };
 
+// A few tests rely on being able to use GDI+.
+class GdiplusEnvironment : public Environment
+{
+public:
+	void SetUp() override
+	{
+		Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+		Gdiplus::Status status =
+			Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, nullptr);
+		ASSERT_EQ(status, Gdiplus::Ok);
+	}
+
+	void TearDown() override
+	{
+		Gdiplus::GdiplusShutdown(m_gdiplusToken);
+	}
+
+private:
+	ULONG_PTR m_gdiplusToken;
+};
+
 int wmain(int argc, wchar_t *argv[])
 {
 	AddGlobalTestEnvironment(new ComEnvironment);
+	AddGlobalTestEnvironment(new GdiplusEnvironment);
 	InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
 }
