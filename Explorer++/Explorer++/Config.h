@@ -67,7 +67,7 @@ struct Config
 	BOOL lockToolbars = TRUE;
 	BOOL treeViewDelayEnabled = FALSE;
 	BOOL treeViewAutoExpandSelected = FALSE;
-	BOOL showTaskbarThumbnails = TRUE;
+	BOOL showTaskbarThumbnails = FALSE;
 	ValueWrapper<BOOL> useFullRowSelect = FALSE;
 	BOOL showFilePreviews = TRUE;
 	BOOL allowMultipleInstances = TRUE;
