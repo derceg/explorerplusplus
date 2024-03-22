@@ -7,12 +7,16 @@
 #include "Controls.h"
 #include "DpiCompatibility.h"
 #include "Helper.h"
+#include "ResourceHelper.h"
 #include "WindowHelper.h"
+#include <glog/logging.h>
 #include <unordered_map>
 
 namespace
 {
+
 std::unordered_map<HWND, BaseDialog *> g_windowMap;
+
 }
 
 BaseDialog::BaseDialog(HINSTANCE resourceInstance, int iResource, HWND hParent,
@@ -208,8 +212,24 @@ INT_PTR BaseDialog::ShowModalDialog()
 		return -1;
 	}
 
-	return DialogBoxParam(m_resourceInstance, MAKEINTRESOURCE(m_iResource), m_hParent,
-		BaseDialogProcStub, reinterpret_cast<LPARAM>(this));
+	if (IsProcessRTL())
+	{
+		// The only legitimate reason this might fail is allocation failure. Given the small amount
+		// of memory involved, that's not very likely to actually happen. If this function does
+		// fail, there's also not any good way of handling it. Therefore, the result is simply
+		// CHECK'd, which will terminate the application if the call fails.
+		auto dialogTemplateEx = MakeRTLDialogTemplate(m_resourceInstance, m_iResource);
+		CHECK(dialogTemplateEx);
+
+		return DialogBoxIndirectParam(m_resourceInstance,
+			reinterpret_cast<DLGTEMPLATE *>(dialogTemplateEx.get()), m_hParent, BaseDialogProcStub,
+			reinterpret_cast<LPARAM>(this));
+	}
+	else
+	{
+		return DialogBoxParam(m_resourceInstance, MAKEINTRESOURCE(m_iResource), m_hParent,
+			BaseDialogProcStub, reinterpret_cast<LPARAM>(this));
+	}
 }
 
 HWND BaseDialog::ShowModelessDialog(std::function<void()> dialogDestroyedObserver)
@@ -219,8 +239,22 @@ HWND BaseDialog::ShowModelessDialog(std::function<void()> dialogDestroyedObserve
 		return nullptr;
 	}
 
-	HWND dialog = CreateDialogParam(m_resourceInstance, MAKEINTRESOURCE(m_iResource), m_hParent,
-		BaseDialogProcStub, reinterpret_cast<LPARAM>(this));
+	HWND dialog = nullptr;
+
+	if (IsProcessRTL())
+	{
+		auto dialogTemplateEx = MakeRTLDialogTemplate(m_resourceInstance, m_iResource);
+		CHECK(dialogTemplateEx);
+
+		dialog = CreateDialogIndirectParam(m_resourceInstance,
+			reinterpret_cast<DLGTEMPLATE *>(dialogTemplateEx.get()), m_hParent, BaseDialogProcStub,
+			reinterpret_cast<LPARAM>(this));
+	}
+	else
+	{
+		dialog = CreateDialogParam(m_resourceInstance, MAKEINTRESOURCE(m_iResource), m_hParent,
+			BaseDialogProcStub, reinterpret_cast<LPARAM>(this));
+	}
 
 	if (!dialog)
 	{

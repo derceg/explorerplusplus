@@ -219,6 +219,7 @@
     <ClCompile Include="MainRebarStorageHelper.cpp" />
     <ClCompile Include="MainRebarXmlStorageTest.cpp" />
     <ClCompile Include="MainToolbarStorageTest.cpp" />
+    <ClCompile Include="ResourceHelperTest.cpp" />
     <ClCompile Include="ShellBrowserHistoryHelperTest.cpp" />
     <ClCompile Include="ManifestTest.cpp" />
     <ClCompile Include="MovableModelTest.cpp" />

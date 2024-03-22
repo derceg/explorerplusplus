@@ -63,6 +63,7 @@ bool IsExtendedKey(UINT key);
 std::wstring CreateGUID();
 std::optional<std::wstring> GetLastErrorMessage(DWORD error);
 bool IsWindowsPE();
+bool IsProcessRTL();
 
 template <typename L, typename R>
 boost::bimap<L, R> MakeBimap(std::initializer_list<typename boost::bimap<L, R>::value_type> list)

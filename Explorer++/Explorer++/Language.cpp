@@ -11,6 +11,16 @@
 #include "../Helper/Helper.h"
 #include "../Helper/ProcessHelper.h"
 
+namespace
+{
+
+bool IsLanguageRTL(WORD primaryLanguageId)
+{
+	return primaryLanguageId == LANG_ARABIC || primaryLanguageId == LANG_HEBREW;
+}
+
+}
+
 /*
  * Selects which language resource DLL based on user preferences and system language. The default
  * language is English.
@@ -213,6 +223,18 @@ void Explorerplusplus::SetLanguageModule()
 		m_resourceInstance = GetModuleHandle(nullptr);
 
 		m_config->language = LANG_ENGLISH;
+	}
+
+	if (IsLanguageRTL(PRIMARYLANGID(m_config->language)))
+	{
+		SetProcessDefaultLayout(LAYOUT_RTL);
+
+		// TODO: As this function is currently called after the main window has been created,
+		// SetProcessDefaultLayout() will have no effect on it. That's the reason why the
+		// WS_EX_LAYOUTRTL style is manually applied here. If the language setting is loaded before
+		// the main window is created, this will no longer be necessary.
+		SetWindowLongPtr(m_hContainer, GWL_EXSTYLE,
+			GetWindowLongPtr(m_hContainer, GWL_EXSTYLE) | WS_EX_LAYOUTRTL);
 	}
 }
 

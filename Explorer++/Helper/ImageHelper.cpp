@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ImageHelper.h"
+#include "ResourceHelper.h"
 #include <wil/com.h>
 
 wil::unique_hbitmap ImageHelper::ImageListIconToBitmap(IImageList *imageList, int iconIndex)
@@ -215,44 +216,18 @@ HBITMAP ImageHelper::IconToBitmapPARGB32(HICON hicon, int width, int height)
 	return hbmp;
 }
 
-// See https://stackoverflow.com/a/24571173.
 std::unique_ptr<Gdiplus::Bitmap> ImageHelper::LoadGdiplusBitmapFromPNG(HINSTANCE resourceInstance,
 	UINT resourceId)
 {
-	HRSRC resourceInformationHandle =
-		FindResource(resourceInstance, MAKEINTRESOURCE(resourceId), L"PNG");
-
-	if (!resourceInformationHandle)
-	{
-		return nullptr;
-	}
-
-	DWORD resourceSize = SizeofResource(resourceInstance, resourceInformationHandle);
-
-	if (resourceSize == 0)
-	{
-		return nullptr;
-	}
-
-	HGLOBAL resourceHandle = LoadResource(resourceInstance, resourceInformationHandle);
-
-	if (!resourceHandle)
-	{
-		return nullptr;
-	}
-
-	const void *resourceData = LockResource(resourceHandle);
+	auto resourceData = CopyResource(resourceInstance, resourceId, L"PNG");
 
 	if (!resourceData)
 	{
 		return nullptr;
 	}
 
-	std::vector<std::byte> copiedData(resourceSize);
-	std::memcpy(copiedData.data(), resourceData, resourceSize);
-
 	wil::com_ptr_nothrow<IStream> stream(SHCreateMemStream(
-		reinterpret_cast<BYTE *>(copiedData.data()), static_cast<UINT>(copiedData.size())));
+		reinterpret_cast<BYTE *>(resourceData->data()), static_cast<UINT>(resourceData->size())));
 
 	if (!stream)
 	{

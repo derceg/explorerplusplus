@@ -31,3 +31,12 @@ TEST(BuildFileAttributesString, All)
 		| FILE_ATTRIBUTE_NOT_CONTENT_INDEXED);
 	EXPECT_EQ(attributesString, L"AHRSDCPEI");
 }
+
+TEST(IsProcessRTL, CheckValue)
+{
+	// The layout will be LTR by default.
+	EXPECT_EQ(IsProcessRTL(), false);
+
+	SetProcessDefaultLayout(LAYOUT_RTL);
+	EXPECT_EQ(IsProcessRTL(), true);
+}

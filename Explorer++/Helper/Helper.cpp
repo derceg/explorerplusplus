@@ -9,6 +9,7 @@
 #include "TimeHelper.h"
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <glog/logging.h>
 #include <wil/com.h>
 #include <wil/resource.h>
 #include <WbemIdl.h>
@@ -831,4 +832,19 @@ bool IsWindowsPE()
 	LSTATUS result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"System\\ControlSet001\\Control\\MiniNT", 0,
 		KEY_READ, &key);
 	return result == ERROR_SUCCESS;
+}
+
+bool IsProcessRTL()
+{
+	DWORD layout = 0;
+	BOOL res = GetProcessDefaultLayout(&layout);
+
+	if (!res)
+	{
+		LOG_SYSRESULT(GetLastError());
+		DCHECK(false);
+		return false;
+	}
+
+	return (layout == LAYOUT_RTL);
 }

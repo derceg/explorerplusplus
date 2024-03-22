@@ -167,6 +167,9 @@
     <ClCompile Include="ImageHelperTest.cpp">
       <Filter>Helper\Miscellaneous</Filter>
     </ClCompile>
+    <ClCompile Include="ResourceHelperTest.cpp">
+      <Filter>Helper\Miscellaneous</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
