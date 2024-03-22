@@ -170,6 +170,9 @@
     <ClCompile Include="ResourceHelperTest.cpp">
       <Filter>Helper\Miscellaneous</Filter>
     </ClCompile>
+    <ClCompile Include="ServiceProviderTest.cpp">
+      <Filter>Context Menu Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -234,6 +237,9 @@
     </Filter>
     <Filter Include="Main Toolbar">
       <UniqueIdentifier>{c61de3f5-5b11-4d9f-880d-4afcb5363ac6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Context Menu Support">
+      <UniqueIdentifier>{eadab4ea-5008-4359-9e40-273fa813fba8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
