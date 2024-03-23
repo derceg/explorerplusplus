@@ -6,6 +6,7 @@
 #include "ShellItemsMenu.h"
 #include "BrowserWindow.h"
 #include "IconFetcher.h"
+#include "NavigationHelper.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/ShellHelper.h"
 
@@ -141,6 +142,5 @@ void ShellItemsMenu::OpenSelectedItem(int menuItemId, bool isMiddleButtonDown, b
 {
 	auto &pidl = m_idPidlMap.at(menuItemId);
 	m_browserWindow->OpenItem(pidl.Raw(),
-		m_browserWindow->DetermineOpenDisposition(isMiddleButtonDown, isCtrlKeyDown,
-			isShiftKeyDown));
+		DetermineOpenDisposition(isMiddleButtonDown, isCtrlKeyDown, isShiftKeyDown));
 }

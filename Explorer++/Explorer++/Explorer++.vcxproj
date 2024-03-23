@@ -1014,6 +1014,7 @@
     <ClCompile Include="FontHelper.cpp" />
     <ClCompile Include="MainRebarXmlStorage.cpp" />
     <ClCompile Include="MainToolbarStorage.cpp" />
+    <ClCompile Include="NavigationHelper.cpp" />
     <ClCompile Include="OneShotTimer.cpp" />
     <ClCompile Include="OneShotTimerManager.cpp" />
     <ClCompile Include="PopupMenuView.cpp" />
@@ -1263,6 +1264,7 @@
     <ClInclude Include="MainRebarStorage.h" />
     <ClInclude Include="MainRebarXmlStorage.h" />
     <ClInclude Include="MainToolbarStorage.h" />
+    <ClInclude Include="NavigationHelper.h" />
     <ClInclude Include="OneShotTimer.h" />
     <ClInclude Include="OneShotTimerManager.h" />
     <ClInclude Include="PopupMenuView.h" />

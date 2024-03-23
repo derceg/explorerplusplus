@@ -433,13 +433,6 @@ private:
 	void OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) override;
 
-	// Determines the open disposition, using the state of the ctrl and shift keys as retrieved by
-	// GetKeyState(). That is, the state of the keys at the time the current message was generated.
-	OpenFolderDisposition DetermineOpenDisposition(bool isMiddleButtonDown) override;
-
-	OpenFolderDisposition DetermineOpenDisposition(bool isMiddleButtonDown, bool isCtrlKeyDown,
-		bool isShiftKeyDown) override;
-
 	void OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
 	void OpenFileItem(const std::wstring &itemPath, const std::wstring &parameters) override;

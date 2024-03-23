@@ -10,6 +10,7 @@
 #include "DefaultToolbarButtons.h"
 #include "Icon.h"
 #include "MainResource.h"
+#include "NavigationHelper.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
@@ -856,8 +857,8 @@ void MainToolbar::OnMButtonUp(HWND hwnd, int x, int y, UINT keysDown)
 		return;
 	}
 
-	auto disposition = m_browserWindow->DetermineOpenDisposition(true,
-		WI_IsFlagSet(keysDown, MK_CONTROL), WI_IsFlagSet(keysDown, MK_SHIFT));
+	auto disposition = DetermineOpenDisposition(true, WI_IsFlagSet(keysDown, MK_CONTROL),
+		WI_IsFlagSet(keysDown, MK_SHIFT));
 	auto *commandController = m_browserWindow->GetCommandController();
 
 	switch (tbButton.idCommand)

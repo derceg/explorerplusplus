@@ -14,6 +14,7 @@
 #include "Config.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
+#include "NavigationHelper.h"
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/DropSourceImpl.h"
@@ -276,8 +277,8 @@ void BookmarksToolbar::OnBookmarkClicked(BookmarkItem *bookmarkItem, const Mouse
 	UNREFERENCED_PARAMETER(event);
 
 	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
-		m_browserWindow->DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey),
-		m_coreInterface, m_browserWindow);
+		DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey), m_coreInterface,
+		m_browserWindow);
 }
 
 void BookmarksToolbar::OnBookmarkFolderClicked(BookmarkItem *bookmarkItem, const MouseEvent &event)
@@ -285,8 +286,8 @@ void BookmarksToolbar::OnBookmarkFolderClicked(BookmarkItem *bookmarkItem, const
 	if (event.ctrlKey)
 	{
 		BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
-			m_browserWindow->DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey),
-			m_coreInterface, m_browserWindow);
+			DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey), m_coreInterface,
+			m_browserWindow);
 		return;
 	}
 
@@ -303,8 +304,8 @@ void BookmarksToolbar::OnButtonMiddleClicked(const BookmarkItem *bookmarkItem,
 	const MouseEvent &event)
 {
 	BookmarkHelper::OpenBookmarkItemWithDisposition(bookmarkItem,
-		m_browserWindow->DetermineOpenDisposition(true, event.ctrlKey, event.shiftKey),
-		m_coreInterface, m_browserWindow);
+		DetermineOpenDisposition(true, event.ctrlKey, event.shiftKey), m_coreInterface,
+		m_browserWindow);
 }
 
 void BookmarksToolbar::OnButtonRightClicked(BookmarkItem *bookmarkItem, const MouseEvent &event)

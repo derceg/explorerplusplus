@@ -6,6 +6,7 @@
 #include "HistoryMenu.h"
 #include "BrowserPane.h"
 #include "BrowserWindow.h"
+#include "NavigationHelper.h"
 #include "ShellBrowser/HistoryEntry.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
@@ -124,8 +125,8 @@ void HistoryMenu::NavigateToHistoryEntry(int menuItemId, bool isMiddleButtonDown
 	// m_browserWindow will be null in tests.
 	if (m_browserWindow)
 	{
-		auto disposition = m_browserWindow->DetermineOpenDisposition(isMiddleButtonDown,
-			isCtrlKeyDown, isShiftKeyDown);
+		auto disposition =
+			DetermineOpenDisposition(isMiddleButtonDown, isCtrlKeyDown, isShiftKeyDown);
 
 		if (disposition != OpenFolderDisposition::CurrentTab)
 		{

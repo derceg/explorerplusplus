@@ -181,9 +181,24 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 void Explorerplusplus::OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 	OpenFolderDisposition openFolderDisposition)
 {
-	if (m_config->alwaysOpenNewTab && openFolderDisposition == OpenFolderDisposition::CurrentTab)
+	if (openFolderDisposition == OpenFolderDisposition::CurrentTab)
 	{
-		openFolderDisposition = OpenFolderDisposition::ForegroundTab;
+		if (m_config->alwaysOpenNewTab)
+		{
+			openFolderDisposition = OpenFolderDisposition::ForegroundTab;
+		}
+	}
+	else if (openFolderDisposition == OpenFolderDisposition::NewTabDefault)
+	{
+		openFolderDisposition = m_config->openTabsInForeground
+			? OpenFolderDisposition::ForegroundTab
+			: OpenFolderDisposition::BackgroundTab;
+	}
+	else if (openFolderDisposition == OpenFolderDisposition::NewTabAlternate)
+	{
+		openFolderDisposition = m_config->openTabsInForeground
+			? OpenFolderDisposition::BackgroundTab
+			: OpenFolderDisposition::ForegroundTab;
 	}
 
 	switch (openFolderDisposition)
@@ -214,6 +229,10 @@ void Explorerplusplus::OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 	case OpenFolderDisposition::NewWindow:
 		OpenDirectoryInNewWindow(pidlItem);
 		break;
+
+	default:
+		DCHECK(false) << "Unhandled disposition";
+		break;
 	}
 }
 
@@ -242,49 +261,6 @@ void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidl, const std::wstring &
 	auto shellBrowser = GetActiveShellBrowser();
 	ExecuteFileAction(m_hContainer, pidl, L"", parameters,
 		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectory().c_str());
-}
-
-OpenFolderDisposition Explorerplusplus::DetermineOpenDisposition(bool isMiddleButtonDown)
-{
-	return DetermineOpenDisposition(isMiddleButtonDown, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
-}
-
-OpenFolderDisposition Explorerplusplus::DetermineOpenDisposition(bool isMiddleButtonDown,
-	bool isCtrlKeyDown, bool isShiftKeyDown)
-{
-	if (isMiddleButtonDown || isCtrlKeyDown)
-	{
-		if (!isShiftKeyDown)
-		{
-			if (m_config->openTabsInForeground)
-			{
-				return OpenFolderDisposition::ForegroundTab;
-			}
-			else
-			{
-				return OpenFolderDisposition::BackgroundTab;
-			}
-		}
-		else
-		{
-			// Shift inverts the usual behavior.
-			if (m_config->openTabsInForeground)
-			{
-				return OpenFolderDisposition::BackgroundTab;
-			}
-			else
-			{
-				return OpenFolderDisposition::ForegroundTab;
-			}
-		}
-	}
-
-	if (isShiftKeyDown)
-	{
-		return OpenFolderDisposition::NewWindow;
-	}
-
-	return OpenFolderDisposition::CurrentTab;
 }
 
 void Explorerplusplus::OnSize(HWND hwnd, UINT state, int mainWindowWidth, int mainWindowHeight)

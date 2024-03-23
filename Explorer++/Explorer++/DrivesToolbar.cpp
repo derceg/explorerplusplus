@@ -10,6 +10,7 @@
 #include "DriveModel.h"
 #include "DrivesToolbarView.h"
 #include "MainResource.h"
+#include "NavigationHelper.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellNavigator.h"
 #include "TabContainer.h"
@@ -160,13 +161,13 @@ void DrivesToolbar::OnButtonClicked(const std::wstring &drivePath, const MouseEv
 	UNREFERENCED_PARAMETER(event);
 
 	m_browserWindow->OpenItem(drivePath,
-		m_browserWindow->DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey));
+		DetermineOpenDisposition(false, event.ctrlKey, event.shiftKey));
 }
 
 void DrivesToolbar::OnButtonMiddleClicked(const std::wstring &drivePath, const MouseEvent &event)
 {
 	m_browserWindow->OpenItem(drivePath,
-		m_browserWindow->DetermineOpenDisposition(true, event.ctrlKey, event.shiftKey));
+		DetermineOpenDisposition(true, event.ctrlKey, event.shiftKey));
 }
 
 void DrivesToolbar::OnButtonRightClicked(const std::wstring &drivePath, const MouseEvent &event)

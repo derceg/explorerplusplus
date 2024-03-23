@@ -6,6 +6,7 @@
 #include "AddressBar.h"
 #include "BrowserWindow.h"
 #include "CoreInterface.h"
+#include "NavigationHelper.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "Tab.h"
@@ -176,8 +177,7 @@ void AddressBar::OnEnterPressed()
 	RevertTextInUI();
 
 	m_browserWindow->OpenItem(*absolutePath,
-		m_browserWindow->DetermineOpenDisposition(false, IsKeyDown(VK_CONTROL),
-			IsKeyDown(VK_SHIFT)));
+		DetermineOpenDisposition(false, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT)));
 	m_browserWindow->FocusActiveTab();
 }
 
