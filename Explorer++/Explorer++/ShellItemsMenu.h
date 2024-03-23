@@ -6,7 +6,9 @@
 
 #include "PopupMenuView.h"
 #include "../Helper/PidlHelper.h"
+#include <wil/com.h>
 #include <wil/resource.h>
+#include <commoncontrols.h>
 
 class BrowserWindow;
 class IconFetcher;
@@ -25,6 +27,8 @@ public:
 	// MenuController
 	void OnMenuItemSelected(int menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown) override;
 	void OnMenuItemMiddleClicked(int menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown) override;
+
+	const PopupMenuView *GetMenuViewForTesting() const;
 
 private:
 	std::shared_ptr<PopupMenuView> BuildMenu(const std::vector<PidlAbsolute> &pidls);

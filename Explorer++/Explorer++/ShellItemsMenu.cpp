@@ -9,14 +9,14 @@
 #include "NavigationHelper.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/ShellHelper.h"
+#include <glog/logging.h>
 
 ShellItemsMenu::ShellItemsMenu(const std::vector<PidlAbsolute> &pidls, BrowserWindow *browserWindow,
 	IconFetcher *iconFetcher) :
 	m_browserWindow(browserWindow),
 	m_iconFetcher(iconFetcher)
 {
-	[[maybe_unused]] HRESULT hr = SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList));
-	assert(SUCCEEDED(hr));
+	FAIL_FAST_IF_FAILED(SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList)));
 
 	m_menuView = BuildMenu(pidls);
 }
@@ -46,7 +46,7 @@ void ShellItemsMenu::AddMenuItemForPidl(std::shared_ptr<PopupMenuView> menuView,
 
 	if (FAILED(hr))
 	{
-		assert(false);
+		DCHECK(false);
 
 		name = L"(Unknown)";
 	}
@@ -119,7 +119,7 @@ void ShellItemsMenu::OnIconRetrieved(std::weak_ptr<PopupMenuView> weakMenuView, 
 
 	if (!bitmap)
 	{
-		assert(false);
+		DCHECK(false);
 		return;
 	}
 
@@ -143,4 +143,9 @@ void ShellItemsMenu::OpenSelectedItem(int menuItemId, bool isMiddleButtonDown, b
 	auto &pidl = m_idPidlMap.at(menuItemId);
 	m_browserWindow->OpenItem(pidl.Raw(),
 		DetermineOpenDisposition(isMiddleButtonDown, isCtrlKeyDown, isShiftKeyDown));
+}
+
+const PopupMenuView *ShellItemsMenu::GetMenuViewForTesting() const
+{
+	return m_menuView.get();
 }

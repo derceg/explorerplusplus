@@ -14,7 +14,18 @@ public:
 	virtual ~Navigator() = default;
 
 	virtual void OpenItem(const std::wstring &itemPath,
-		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) = 0;
+		OpenFolderDisposition openFolderDisposition) = 0;
+
+	void OpenItem(const std::wstring &itemPath)
+	{
+		OpenItem(itemPath, OpenFolderDisposition::CurrentTab);
+	}
+
 	virtual void OpenItem(PCIDLIST_ABSOLUTE pidlItem,
-		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) = 0;
+		OpenFolderDisposition openFolderDisposition) = 0;
+
+	void OpenItem(PCIDLIST_ABSOLUTE pidlItem)
+	{
+		OpenItem(pidlItem, OpenFolderDisposition::CurrentTab);
+	}
 };

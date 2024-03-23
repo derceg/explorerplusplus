@@ -245,6 +245,7 @@
     <ClCompile Include="ResourceHelper.cpp" />
     <ClCompile Include="ShellBrowserFake.cpp" />
     <ClCompile Include="ShellHelperTest.cpp" />
+    <ClCompile Include="ShellItemsMenuTest.cpp" />
     <ClCompile Include="ShellNavigationControllerTest.cpp" />
     <ClCompile Include="StringHelperTest.cpp" />
     <ClCompile Include="TabRegistryStorageTest.cpp" />

@@ -108,9 +108,6 @@
     <ClCompile Include="CustomFontStorageTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="HistoryMenuTest.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="OneShotTimerTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -172,6 +169,12 @@
     </ClCompile>
     <ClCompile Include="ServiceProviderTest.cpp">
       <Filter>Context Menu Support</Filter>
+    </ClCompile>
+    <ClCompile Include="HistoryMenuTest.cpp">
+      <Filter>Core\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellItemsMenuTest.cpp">
+      <Filter>Core\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -240,6 +243,9 @@
     </Filter>
     <Filter Include="Context Menu Support">
       <UniqueIdentifier>{eadab4ea-5008-4359-9e40-273fa813fba8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\UI">
+      <UniqueIdentifier>{7af7278c-c56b-48b1-b069-4346b3f79c17}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

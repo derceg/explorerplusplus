@@ -428,10 +428,10 @@ private:
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
 
 	// Navigator
+	using Navigator::OpenItem;
 	void OpenItem(const std::wstring &itemPath,
-		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) override;
-	void OpenItem(PCIDLIST_ABSOLUTE pidlItem,
-		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab) override;
+		OpenFolderDisposition openFolderDisposition) override;
+	void OpenItem(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition) override;
 
 	void OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
