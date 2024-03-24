@@ -363,7 +363,7 @@ void ShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 	first, or else it may be possible for the
 	thumbnail to be drawn before the initial
 	image. */
-	if (m_folderSettings.viewMode == +ViewMode::Thumbnails
+	if (IsViewModeThumbnail(m_folderSettings.viewMode)
 		&& (plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
 	{
 		const ItemInfo_t &itemInfo = m_itemInfoMap.at(internalIndex);

@@ -111,6 +111,8 @@ ShellBrowser::ShellBrowser(HWND hOwner, ShellBrowserEmbedder *embedder,
 
 	m_performingDrag = false;
 	m_bThumbnailsSetup = FALSE;
+	m_thumbnailItemWidth = DEFAULT_THUMBNAIL_ITEM_WIDTH;
+	m_thumbnailItemHeight = DEFAULT_THUMBNAIL_ITEM_HEIGHT;
 	m_nCurrentColumns = 0;
 	m_pActiveColumns = nullptr;
 	m_nActiveColumns = 0;
@@ -259,7 +261,8 @@ void ShellBrowser::SetViewMode(ViewMode viewMode)
 		return;
 	}
 
-	if (m_folderSettings.viewMode == +ViewMode::Thumbnails && viewMode != +ViewMode::Thumbnails)
+	/* NOTE: also teardown thumbnails view when changing thumbnail modes */
+	if (IsViewModeThumbnail(m_folderSettings.viewMode) && viewMode != m_folderSettings.viewMode)
 	{
 		RemoveThumbnailsView();
 	}
@@ -304,6 +307,8 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 	break;
 
 	/* Do nothing. This will setup the listview by itself. */
+	case ViewMode::ExtraLargeThumbnails:
+	case ViewMode::LargeThumbnails:
 	case ViewMode::Thumbnails:
 		break;
 
@@ -360,12 +365,37 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 		ApplyHeaderSortArrow();
 		break;
 
-	case ViewMode::Thumbnails:
+	/* TODO: maybe determine the largest width/height and dynamically calculate the tile dimensions? */
+	case ViewMode::ExtraLargeThumbnails:
 		dwStyle = LV_VIEW_ICON;
+		SetThumbnailItemWidth(256);
+		SetThumbnailItemHeight(256);
 
 		if (!m_bThumbnailsSetup)
 		{
-			SetupThumbnailsView();
+			SetupThumbnailsView(SHIL_JUMBO);
+		}
+		break;
+
+	case ViewMode::LargeThumbnails:
+		dwStyle = LV_VIEW_ICON;
+		SetThumbnailItemWidth(128);
+		SetThumbnailItemHeight(128);
+
+		if (!m_bThumbnailsSetup)
+		{
+			SetupThumbnailsView(SHIL_EXTRALARGE);
+		}
+		break;
+
+	case ViewMode::Thumbnails:
+		dwStyle = LV_VIEW_ICON;
+		SetThumbnailItemWidth(64);
+		SetThumbnailItemHeight(64);
+
+		if (!m_bThumbnailsSetup)
+		{
+			SetupThumbnailsView(SHIL_LARGE);
 		}
 		break;
 
@@ -809,6 +839,26 @@ int ShellBrowser::GetNumSelectedFolders() const
 int ShellBrowser::GetNumSelected() const
 {
 	return m_directoryState.numFilesSelected + m_directoryState.numFoldersSelected;
+}
+
+int ShellBrowser::GetThumbnailItemWidth() const
+{
+	return m_thumbnailItemWidth;
+}
+
+int ShellBrowser::GetThumbnailItemHeight() const
+{
+	return m_thumbnailItemHeight;
+}
+
+void ShellBrowser::SetThumbnailItemWidth(int width)
+{
+	m_thumbnailItemWidth = width;
+}
+
+void ShellBrowser::SetThumbnailItemHeight(int height)
+{
+	m_thumbnailItemHeight = height;
 }
 
 // Returns the total size of the items in the current directory (not including any sub-directories).

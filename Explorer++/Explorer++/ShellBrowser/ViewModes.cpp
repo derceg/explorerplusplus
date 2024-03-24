@@ -8,6 +8,13 @@
 #include "ResourceHelper.h"
 #include <glog/logging.h>
 
+bool IsViewModeThumbnail(ViewMode viewMode)
+{
+	return (viewMode == +ViewMode::Thumbnails) || 
+		(viewMode == +ViewMode::LargeThumbnails) ||
+  		(viewMode == +ViewMode::ExtraLargeThumbnails);
+}
+
 UINT GetViewModeMenuId(ViewMode viewMode)
 {
 	switch (viewMode)
@@ -35,6 +42,12 @@ UINT GetViewModeMenuId(ViewMode viewMode)
 
 	case ViewMode::Details:
 		return IDM_VIEW_DETAILS;
+
+	case ViewMode::LargeThumbnails:
+		return IDM_VIEW_LARGETHUMBNAILS;
+
+	case ViewMode::ExtraLargeThumbnails:
+		return IDM_VIEW_EXTRALARGETHUMBNAILS;
 
 	default:
 		LOG(FATAL) << "ViewMode value not found";
@@ -77,6 +90,14 @@ std::wstring GetViewModeMenuText(ViewMode viewMode, HINSTANCE resourceInstance)
 
 	case ViewMode::Details:
 		stringId = IDS_VIEW_DETAILS;
+		break;
+
+	case ViewMode::LargeThumbnails:
+		stringId = IDS_VIEW_LARGETHUMBNAILS;
+		break;
+
+	case ViewMode::ExtraLargeThumbnails:
+		stringId = IDS_VIEW_EXTRALARGETHUMBNAILS;
 		break;
 
 	default:

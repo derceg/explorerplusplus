@@ -13,7 +13,7 @@
 #define THUMBNAIL_TYPE_ICON 0
 #define THUMBNAIL_TYPE_EXTRACTED 1
 
-void ShellBrowser::SetupThumbnailsView()
+void ShellBrowser::SetupThumbnailsView(int iImageList)
 {
 	HIMAGELIST himl;
 	LVITEM lvItem;
@@ -27,13 +27,13 @@ void ShellBrowser::SetupThumbnailsView()
 	/* Need to get the normal (32x32) image list for thumbnails, so that
 	the regular size icon is shown for items with a thumbnail that hasn't
 	been found yet (and not the large or extra large icon). */
-	SHGetImageList(SHIL_LARGE, IID_PPV_ARGS(&pImageList));
+	SHGetImageList(iImageList, IID_PPV_ARGS(&pImageList));
 	ListView_SetImageList(m_hListView, (HIMAGELIST) pImageList, LVSIL_NORMAL);
 	pImageList->Release();
 
 	m_hListViewImageList = ListView_GetImageList(m_hListView, LVSIL_NORMAL);
 
-	himl = ImageList_Create(THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT, ILC_COLOR32, nItems,
+	himl = ImageList_Create(GetThumbnailItemWidth(), GetThumbnailItemHeight(), ILC_COLOR32, nItems,
 		nItems + 100);
 	ListView_SetImageList(m_hListView, himl, LVSIL_NORMAL);
 
@@ -143,7 +143,8 @@ wil::unique_hbitmap ShellBrowser::GetThumbnail(PIDLIST_ABSOLUTE pidl, WTS_FLAGS 
 	}
 
 	wil::com_ptr_nothrow<ISharedBitmap> sharedBitmap;
-	hr = thumbnailCache->GetThumbnail(shellItem.get(), THUMBNAIL_ITEM_WIDTH, flags, &sharedBitmap,
+	hr = thumbnailCache->GetThumbnail(shellItem.get(), GetThumbnailItemWidth(), flags,
+		&sharedBitmap,
 		nullptr, nullptr);
 
 	if (FAILED(hr))
@@ -174,7 +175,7 @@ void ShellBrowser::ProcessThumbnailResult(int thumbnailResultId)
 		return;
 	}
 
-	if (m_folderSettings.viewMode != +ViewMode::Thumbnails)
+	if (!IsViewModeThumbnail(m_folderSettings.viewMode))
 	{
 		return;
 	}
@@ -231,13 +232,14 @@ int ShellBrowser::GetThumbnailInternal(int iType, int iInternalIndex,
 	hdcBacking = CreateCompatibleDC(hdc);
 
 	/* Backing bitmap. */
-	hBackingBitmap = CreateCompatibleBitmap(hdc, THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT);
+	hBackingBitmap =
+		CreateCompatibleBitmap(hdc, GetThumbnailItemWidth(), GetThumbnailItemHeight());
 	hBackingBitmapOld = (HBITMAP) SelectObject(hdcBacking, hBackingBitmap);
 
 	/* Set the background of the new bitmap to be the same color as the
 	background in the listview. */
 	hbr = CreateSolidBrush(ListView_GetBkColor(m_hListView));
-	RECT rect = { 0, 0, THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT };
+	RECT rect = { 0, 0, GetThumbnailItemWidth(), GetThumbnailItemHeight() };
 	FillRect(hdcBacking, &rect, hbr);
 
 	if (iType == THUMBNAIL_TYPE_ICON)
@@ -281,8 +283,8 @@ void ShellBrowser::DrawIconThumbnailInternal(HDC hdcBacking, int iInternalIndex)
 
 	ImageList_GetIconSize(m_hListViewImageList, &iIconWidth, &iIconHeight);
 
-	DrawIconEx(hdcBacking, (THUMBNAIL_ITEM_WIDTH - iIconWidth) / 2,
-		(THUMBNAIL_ITEM_HEIGHT - iIconHeight) / 2, hIcon, 0, 0, 0, nullptr, DI_NORMAL);
+	DrawIconEx(hdcBacking, (GetThumbnailItemWidth() - iIconWidth) / 2,
+		(GetThumbnailItemHeight() - iIconHeight) / 2, hIcon, 0, 0, 0, nullptr, DI_NORMAL);
 	DestroyIcon(hIcon);
 }
 
@@ -300,8 +302,9 @@ void ShellBrowser::DrawThumbnailInternal(HDC hdcBacking, HBITMAP hThumbnailBitma
 
 	/* Now, draw the thumbnail bitmap (in its centered position)
 	directly on top of the new bitmap. */
-	BitBlt(hdcBacking, (THUMBNAIL_ITEM_WIDTH - bm.bmWidth) / 2,
-		(THUMBNAIL_ITEM_HEIGHT - bm.bmHeight) / 2, THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT,
+	BitBlt(hdcBacking, (GetThumbnailItemWidth() - bm.bmWidth) / 2,
+		(GetThumbnailItemHeight() - bm.bmHeight) / 2, GetThumbnailItemWidth(),
+		GetThumbnailItemHeight(),
 		hdcThumbnail, 0, 0, SRCCOPY);
 
 	SelectObject(hdcThumbnail, hThumbnailBitmapOld);
