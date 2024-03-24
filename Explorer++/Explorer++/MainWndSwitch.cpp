@@ -610,6 +610,16 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 			ViewMode::Details);
 		break;
 
+	case IDM_VIEW_EXTRALARGETHUMBNAILS:
+		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser()->SetViewMode(
+			ViewMode::ExtraLargeThumbnails);
+		break;
+
+	case IDM_VIEW_LARGETHUMBNAILS:
+		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser()->SetViewMode(
+			ViewMode::LargeThumbnails);
+		break;
+
 	case IDM_VIEW_THUMBNAILS:
 		GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser()->SetViewMode(
 			ViewMode::Thumbnails);

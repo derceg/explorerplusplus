@@ -104,7 +104,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	MenuHelper::EnableItem(hProgramMenu, IDM_ACTIONS_DESTROYFILES, anySelected);
 
 	UINT itemToCheck = GetViewModeMenuId(viewMode);
-	CheckMenuRadioItem(hProgramMenu, IDM_VIEW_THUMBNAILS, IDM_VIEW_EXTRALARGEICONS, itemToCheck,
+	CheckMenuRadioItem(hProgramMenu, IDM_VIEW_EXTRALARGEICONS, IDM_VIEW_TILES, itemToCheck,
 		MF_BYCOMMAND);
 
 	MenuHelper::EnableItem(hProgramMenu, IDM_GO_BACK,

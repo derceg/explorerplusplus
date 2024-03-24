@@ -85,14 +85,14 @@ void ShellBrowserImpl::ResetFolderState()
 {
 	/* If we're in thumbnails view, destroy the current
 	imagelist, and create a new one. */
-	if (m_folderSettings.viewMode == +ViewMode::Thumbnails)
+	if (IsThumbnailsViewMode(m_folderSettings.viewMode))
 	{
 		auto himlOld = ListView_GetImageList(m_hListView, LVSIL_NORMAL);
 
 		int nItems = ListView_GetItemCount(m_hListView);
 
 		/* Create and set the new imagelist. */
-		HIMAGELIST himl = ImageList_Create(THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT, ILC_COLOR32,
+		HIMAGELIST himl = ImageList_Create(m_thumbnailItemWidth, m_thumbnailItemHeight, ILC_COLOR32,
 			nItems, nItems + 100);
 		ListView_SetImageList(m_hListView, himl, LVSIL_NORMAL);
 

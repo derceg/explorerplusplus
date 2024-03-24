@@ -260,7 +260,9 @@ void ShellBrowserImpl::SetViewMode(ViewMode viewMode)
 		return;
 	}
 
-	if (m_folderSettings.viewMode == +ViewMode::Thumbnails && viewMode != +ViewMode::Thumbnails)
+	// The view mode is being changed from thumbnails view to either another thumbnails view, or a
+	// non-thumbnails view. In both cases, the existing thumbnails view needs to be removed.
+	if (IsThumbnailsViewMode(m_folderSettings.viewMode))
 	{
 		RemoveThumbnailsView();
 	}
@@ -304,7 +306,9 @@ void ShellBrowserImpl::SetViewModeInternal(ViewMode viewMode)
 	}
 	break;
 
-	/* Do nothing. This will setup the listview by itself. */
+	/* Do nothing. The image list will be set up below. */
+	case ViewMode::ExtraLargeThumbnails:
+	case ViewMode::LargeThumbnails:
 	case ViewMode::Thumbnails:
 		break;
 
@@ -361,12 +365,36 @@ void ShellBrowserImpl::SetViewModeInternal(ViewMode viewMode)
 		ApplyHeaderSortArrow();
 		break;
 
-	case ViewMode::Thumbnails:
+	case ViewMode::ExtraLargeThumbnails:
 		dwStyle = LV_VIEW_ICON;
+		m_thumbnailItemWidth = 256;
+		m_thumbnailItemHeight = 256;
 
 		if (!m_bThumbnailsSetup)
 		{
-			SetupThumbnailsView();
+			SetupThumbnailsView(SHIL_JUMBO);
+		}
+		break;
+
+	case ViewMode::LargeThumbnails:
+		dwStyle = LV_VIEW_ICON;
+		m_thumbnailItemWidth = 128;
+		m_thumbnailItemHeight = 128;
+
+		if (!m_bThumbnailsSetup)
+		{
+			SetupThumbnailsView(SHIL_EXTRALARGE);
+		}
+		break;
+
+	case ViewMode::Thumbnails:
+		dwStyle = LV_VIEW_ICON;
+		m_thumbnailItemWidth = 64;
+		m_thumbnailItemHeight = 64;
+
+		if (!m_bThumbnailsSetup)
+		{
+			SetupThumbnailsView(SHIL_LARGE);
 		}
 		break;
 

@@ -13,7 +13,7 @@
 #define THUMBNAIL_TYPE_ICON 0
 #define THUMBNAIL_TYPE_EXTRACTED 1
 
-void ShellBrowserImpl::SetupThumbnailsView()
+void ShellBrowserImpl::SetupThumbnailsView(int shellImageListType)
 {
 	HIMAGELIST himl;
 	LVITEM lvItem;
@@ -24,16 +24,15 @@ void ShellBrowserImpl::SetupThumbnailsView()
 
 	IImageList *pImageList = nullptr;
 
-	/* Need to get the normal (32x32) image list for thumbnails, so that
-	the regular size icon is shown for items with a thumbnail that hasn't
-	been found yet (and not the large or extra large icon). */
-	SHGetImageList(SHIL_LARGE, IID_PPV_ARGS(&pImageList));
+	// This will be used in cases where the thumbnail hasn't been retrieved yet and the standard
+	// icon needs to be shown instead.
+	SHGetImageList(shellImageListType, IID_PPV_ARGS(&pImageList));
 	ListView_SetImageList(m_hListView, (HIMAGELIST) pImageList, LVSIL_NORMAL);
 	pImageList->Release();
 
 	m_hListViewImageList = ListView_GetImageList(m_hListView, LVSIL_NORMAL);
 
-	himl = ImageList_Create(THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT, ILC_COLOR32, nItems,
+	himl = ImageList_Create(m_thumbnailItemWidth, m_thumbnailItemHeight, ILC_COLOR32, nItems,
 		nItems + 100);
 	ListView_SetImageList(m_hListView, himl, LVSIL_NORMAL);
 
@@ -85,12 +84,12 @@ void ShellBrowserImpl::QueueThumbnailTask(int internalIndex)
 	BasicItemInfo_t basicItemInfo = getBasicItemInfo(internalIndex);
 
 	auto result = m_thumbnailThreadPool.push(
-		[this, thumbnailResultID, internalIndex, basicItemInfo](
-			int id) -> std::optional<ThumbnailResult_t>
+		[listView = m_hListView, thumbnailResultID, internalIndex, basicItemInfo,
+			thumbnailSize = m_thumbnailItemWidth](int id) -> std::optional<ThumbnailResult_t>
 		{
 			UNREFERENCED_PARAMETER(id);
 
-			auto bitmap = GetThumbnail(basicItemInfo.pidlComplete.get(),
+			auto bitmap = GetThumbnail(basicItemInfo.pidlComplete.get(), thumbnailSize,
 				WTS_EXTRACT | WTS_SCALETOREQUESTEDSIZE);
 
 			if (!bitmap)
@@ -98,7 +97,7 @@ void ShellBrowserImpl::QueueThumbnailTask(int internalIndex)
 				return std::nullopt;
 			}
 
-			PostMessage(m_hListView, WM_APP_THUMBNAIL_RESULT_READY, thumbnailResultID, 0);
+			PostMessage(listView, WM_APP_THUMBNAIL_RESULT_READY, thumbnailResultID, 0);
 
 			ThumbnailResult_t result;
 			result.itemInternalIndex = internalIndex;
@@ -112,8 +111,8 @@ void ShellBrowserImpl::QueueThumbnailTask(int internalIndex)
 
 std::optional<int> ShellBrowserImpl::GetCachedThumbnailIndex(const ItemInfo_t &itemInfo)
 {
-	auto bitmap =
-		GetThumbnail(itemInfo.pidlComplete.get(), WTS_INCACHEONLY | WTS_SCALETOREQUESTEDSIZE);
+	auto bitmap = GetThumbnail(itemInfo.pidlComplete.get(), m_thumbnailItemWidth,
+		WTS_INCACHEONLY | WTS_SCALETOREQUESTEDSIZE);
 
 	if (!bitmap)
 	{
@@ -123,7 +122,8 @@ std::optional<int> ShellBrowserImpl::GetCachedThumbnailIndex(const ItemInfo_t &i
 	return GetExtractedThumbnail(bitmap.get());
 }
 
-wil::unique_hbitmap ShellBrowserImpl::GetThumbnail(PIDLIST_ABSOLUTE pidl, WTS_FLAGS flags)
+wil::unique_hbitmap ShellBrowserImpl::GetThumbnail(PIDLIST_ABSOLUTE pidl, UINT thumbnailSize,
+	WTS_FLAGS flags)
 {
 	wil::com_ptr_nothrow<IShellItem> shellItem;
 	HRESULT hr = SHCreateItemFromIDList(pidl, IID_PPV_ARGS(&shellItem));
@@ -143,8 +143,8 @@ wil::unique_hbitmap ShellBrowserImpl::GetThumbnail(PIDLIST_ABSOLUTE pidl, WTS_FL
 	}
 
 	wil::com_ptr_nothrow<ISharedBitmap> sharedBitmap;
-	hr = thumbnailCache->GetThumbnail(shellItem.get(), THUMBNAIL_ITEM_WIDTH, flags, &sharedBitmap,
-		nullptr, nullptr);
+	hr = thumbnailCache->GetThumbnail(shellItem.get(), thumbnailSize, flags, &sharedBitmap, nullptr,
+		nullptr);
 
 	if (FAILED(hr))
 	{
@@ -174,7 +174,7 @@ void ShellBrowserImpl::ProcessThumbnailResult(int thumbnailResultId)
 		return;
 	}
 
-	if (m_folderSettings.viewMode != +ViewMode::Thumbnails)
+	if (!IsThumbnailsViewMode(m_folderSettings.viewMode))
 	{
 		return;
 	}
@@ -231,13 +231,13 @@ int ShellBrowserImpl::GetThumbnailInternal(int iType, int iInternalIndex,
 	hdcBacking = CreateCompatibleDC(hdc);
 
 	/* Backing bitmap. */
-	hBackingBitmap = CreateCompatibleBitmap(hdc, THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT);
+	hBackingBitmap = CreateCompatibleBitmap(hdc, m_thumbnailItemWidth, m_thumbnailItemHeight);
 	hBackingBitmapOld = (HBITMAP) SelectObject(hdcBacking, hBackingBitmap);
 
 	/* Set the background of the new bitmap to be the same color as the
 	background in the listview. */
 	hbr = CreateSolidBrush(ListView_GetBkColor(m_hListView));
-	RECT rect = { 0, 0, THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT };
+	RECT rect = { 0, 0, m_thumbnailItemWidth, m_thumbnailItemHeight };
 	FillRect(hdcBacking, &rect, hbr);
 
 	if (iType == THUMBNAIL_TYPE_ICON)
@@ -281,8 +281,8 @@ void ShellBrowserImpl::DrawIconThumbnailInternal(HDC hdcBacking, int iInternalIn
 
 	ImageList_GetIconSize(m_hListViewImageList, &iIconWidth, &iIconHeight);
 
-	DrawIconEx(hdcBacking, (THUMBNAIL_ITEM_WIDTH - iIconWidth) / 2,
-		(THUMBNAIL_ITEM_HEIGHT - iIconHeight) / 2, hIcon, 0, 0, 0, nullptr, DI_NORMAL);
+	DrawIconEx(hdcBacking, (m_thumbnailItemWidth - iIconWidth) / 2,
+		(m_thumbnailItemHeight - iIconHeight) / 2, hIcon, 0, 0, 0, nullptr, DI_NORMAL);
 	DestroyIcon(hIcon);
 }
 
@@ -300,8 +300,8 @@ void ShellBrowserImpl::DrawThumbnailInternal(HDC hdcBacking, HBITMAP hThumbnailB
 
 	/* Now, draw the thumbnail bitmap (in its centered position)
 	directly on top of the new bitmap. */
-	BitBlt(hdcBacking, (THUMBNAIL_ITEM_WIDTH - bm.bmWidth) / 2,
-		(THUMBNAIL_ITEM_HEIGHT - bm.bmHeight) / 2, THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT,
+	BitBlt(hdcBacking, (m_thumbnailItemWidth - bm.bmWidth) / 2,
+		(m_thumbnailItemHeight - bm.bmHeight) / 2, m_thumbnailItemWidth, m_thumbnailItemHeight,
 		hdcThumbnail, 0, 0, SRCCOPY);
 
 	SelectObject(hdcThumbnail, hThumbnailBitmapOld);

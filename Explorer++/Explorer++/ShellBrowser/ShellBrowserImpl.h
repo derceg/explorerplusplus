@@ -382,9 +382,6 @@ private:
 	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 152;
 	static const UINT WM_APP_PENDING_TASK_AVAILABLE = WM_APP + 153;
 
-	static const int THUMBNAIL_ITEM_WIDTH = 120;
-	static const int THUMBNAIL_ITEM_HEIGHT = 120;
-
 	ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, CoreInterface *coreInterface,
 		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
@@ -591,9 +588,10 @@ private:
 	/* Thumbnails view. */
 	void QueueThumbnailTask(int internalIndex);
 	std::optional<int> GetCachedThumbnailIndex(const ItemInfo_t &itemInfo);
-	static wil::unique_hbitmap GetThumbnail(PIDLIST_ABSOLUTE pidl, WTS_FLAGS flags);
+	static wil::unique_hbitmap GetThumbnail(PIDLIST_ABSOLUTE pidl, UINT thumbnailSize,
+		WTS_FLAGS flags);
 	void ProcessThumbnailResult(int thumbnailResultId);
-	void SetupThumbnailsView();
+	void SetupThumbnailsView(int shellImageListType);
 	void RemoveThumbnailsView();
 	int GetIconThumbnail(int iInternalIndex) const;
 	int GetExtractedThumbnail(HBITMAP hThumbnailBitmap) const;
@@ -720,6 +718,8 @@ private:
 
 	/* Thumbnails. */
 	BOOL m_bThumbnailsSetup;
+	int m_thumbnailItemWidth;
+	int m_thumbnailItemHeight;
 
 	/* Column related data. */
 	std::vector<Column_t> *m_pActiveColumns;
