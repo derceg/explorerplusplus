@@ -79,6 +79,8 @@ const std::unordered_map<std::wstring, int> ACCELERATOR_MAPPINGS = {
 	{L"view_mode_small_icons", IDM_VIEW_SMALLICONS},
 	{L"view_mode_list", IDM_VIEW_LIST},
 	{L"view_mode_details", IDM_VIEW_DETAILS},
+	{L"view_mode_large_thumbnails", IDM_VIEW_LARGETHUMBNAILS},
+	{L"view_mode_extra_large_thumbnails", IDM_VIEW_EXTRALARGETHUMBNAILS},
 
 	{L"auto_arrange", IDM_VIEW_AUTOARRANGE},
 	{L"toggle_hidden_files", IDM_VIEW_SHOWHIDDENFILES},

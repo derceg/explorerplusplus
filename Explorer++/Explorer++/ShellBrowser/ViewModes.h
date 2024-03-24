@@ -15,9 +15,13 @@ BETTER_ENUM(ViewMode, int,
 	Tiles = 5,
 	Thumbnails = 6,
 	ExtraLargeIcons = 7,
-	LargeIcons = 8
+	LargeIcons = 8,
+	ExtraLargeThumbnails = 9,
+	LargeThumbnails = 10
 )
 // clang-format on
+
+bool IsViewModeThumbnail(ViewMode viewMode);
 
 UINT GetViewModeMenuId(ViewMode viewMode);
 std::wstring GetViewModeMenuText(ViewMode viewMode, HINSTANCE resourceInstance);

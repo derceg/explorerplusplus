@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by Explorer++.rc
+// Microsoft Visual C++ 生成的包含文件。
+// 供 Explorer++.rc 使用
 //
 #define IDD_OPTIONS_FILES_FOLDERS       9
 #define IDD_MANAGE_BOOKMARKS            10
@@ -589,6 +589,8 @@
 #define IDS_SPLIT_FILE_SIZE_MB          2160
 #define IDS_SPLIT_FILE_SIZE_GB          2161
 #define IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH 2162
+#define IDS_VIEW_LARGETHUMBNAILS        2163
+#define IDS_VIEW_EXTRALARGETHUMBNAILS   2164
 #define IDM_FILE_SAVEDIRECTORYLISTING   8002
 #define IDS_MERGE_FILES_COLUMN_FILE     8003
 #define IDS_OK                          8004
@@ -990,17 +992,19 @@
 #define IDM_GROUPBY_MEDIA_PUBLISHER     50161
 #define IDM_GROUPBY_MEDIA_WRITER        50162
 #define IDM_GROUPBY_MEDIA_YEAR          50163
-#define IDM_VIEW_THUMBNAILS             60000
-#define IDM_VIEW_TILES                  60001
-#define IDM_VIEW_ICONS                  60002
-#define IDM_VIEW_SMALLICONS             60003
-#define IDM_VIEW_LIST                   60004
-#define IDM_VIEW_DETAILS                60005
-#define IDM_VIEW_LARGEICONS             60007
-#define IDM_VIEW_EXTRALARGEICONS        60008
 #define IDM_GROUP_SORT_ASCENDING        60009
 #define IDM_GROUP_SORT_DESCENDING       60010
 #define IDM_GROUP_BY_NONE               60011
+#define IDM_VIEW_THUMBNAILS             61000
+#define IDM_VIEW_TILES                  61001
+#define IDM_VIEW_ICONS                  61002
+#define IDM_VIEW_SMALLICONS             61003
+#define IDM_VIEW_LIST                   61004
+#define IDM_VIEW_DETAILS                61005
+#define IDM_VIEW_LARGEICONS             61006
+#define IDM_VIEW_EXTRALARGEICONS        61007
+#define IDM_VIEW_LARGETHUMBNAILS        61008
+#define IDM_VIEW_EXTRALARGETHUMBNAILS   61009
 
 // Next default values for new objects
 // 
