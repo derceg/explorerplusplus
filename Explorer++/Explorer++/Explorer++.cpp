@@ -15,7 +15,7 @@
 #include "MenuRanges.h"
 #include "Plugins/PluginManager.h"
 #include "ShellBrowserHistoryHelper.h"
-#include "TabRestorerUI.h"
+#include "TabRestorerMenu.h"
 #include "TabStorage.h"
 #include "ThemeWindowTracker.h"
 #include "UiTheming.h"

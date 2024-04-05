@@ -54,7 +54,7 @@ class ShellBrowser;
 class ShellTreeView;
 class TabContainer;
 class TabRestorer;
-class TabRestorerUI;
+class TabRestorerMenu;
 struct TabSettings;
 struct TabStorageData;
 class TaskbarThumbnails;
@@ -604,7 +604,7 @@ private:
 	std::unique_ptr<MainFontSetter> m_tabToolbarTooltipFontSetter;
 	wil::unique_hbrush m_tabBarBackgroundBrush;
 	std::unique_ptr<TabRestorer> m_tabRestorer;
-	std::unique_ptr<TabRestorerUI> m_tabRestorerUI;
+	std::unique_ptr<TabRestorerMenu> m_tabRestorerMenu;
 	TabsInitializedSignal m_tabsInitializedSignal;
 
 	ToolbarContextMenuSignal m_toolbarContextMenuSignal;

@@ -10,7 +10,7 @@
 #include "MenuRanges.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "TabContainer.h"
-#include "TabRestorerUI.h"
+#include "TabRestorerMenu.h"
 #include "TabStorage.h"
 #include "../Helper/Macros.h"
 #include <list>
@@ -60,8 +60,8 @@ void Explorerplusplus::InitializeTabs()
 	m_connections.push_back(m_config->extendTabControl.addObserver(updateLayoutObserverMethod));
 
 	m_tabRestorer = std::make_unique<TabRestorer>(tabContainer);
-	m_tabRestorerUI = std::make_unique<TabRestorerUI>(m_resourceInstance, this, m_tabRestorer.get(),
-		MENU_RECENT_TABS_START_ID, MENU_RECENT_TABS_END_ID);
+	m_tabRestorerMenu = std::make_unique<TabRestorerMenu>(m_resourceInstance, this,
+		m_tabRestorer.get(), MENU_RECENT_TABS_START_ID, MENU_RECENT_TABS_END_ID);
 
 	m_tabsInitializedSignal();
 }

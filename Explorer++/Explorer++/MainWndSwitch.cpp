@@ -30,7 +30,7 @@
 #include "ShellBrowser/ViewModes.h"
 #include "TabBacking.h"
 #include "TabContainer.h"
-#include "TabRestorerUI.h"
+#include "TabRestorerMenu.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileOperations.h"
@@ -339,7 +339,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 	else if (notificationCode == 0 && id >= MENU_RECENT_TABS_START_ID
 		&& id < MENU_RECENT_TABS_END_ID)
 	{
-		m_tabRestorerUI->OnMenuItemClicked(id);
+		m_tabRestorerMenu->OnMenuItemClicked(id);
 		return 0;
 	}
 	else if (notificationCode == 0 && id >= MENU_PLUGIN_START_ID && id < MENU_PLUGIN_END_ID)

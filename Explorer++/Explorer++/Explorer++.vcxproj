@@ -1194,7 +1194,7 @@
     <ClCompile Include="Plugins\TabsApi\TabProperties.cpp" />
     <ClCompile Include="Plugins\TabsApi\Events\TabRemoved.cpp" />
     <ClCompile Include="TabRestorer.cpp" />
-    <ClCompile Include="TabRestorerUI.cpp" />
+    <ClCompile Include="TabRestorerMenu.cpp" />
     <ClCompile Include="Plugins\TabsApi\TabsApi.cpp" />
     <ClCompile Include="Plugins\TabsApi\Events\TabUpdated.cpp" />
     <ClCompile Include="TaskbarThumbnails.cpp" />
@@ -1419,7 +1419,7 @@
     <ClInclude Include="Plugins\TabsApi\TabProperties.h" />
     <ClInclude Include="Plugins\TabsApi\Events\TabRemoved.h" />
     <ClInclude Include="TabRestorer.h" />
-    <ClInclude Include="TabRestorerUI.h" />
+    <ClInclude Include="TabRestorerMenu.h" />
     <ClInclude Include="Plugins\TabsApi\TabsApi.h" />
     <ClInclude Include="Plugins\TabsApi\Events\TabUpdated.h" />
     <ClInclude Include="TaskbarThumbnails.h" />

@@ -274,7 +274,7 @@
     <ClCompile Include="TabRestorer.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
-    <ClCompile Include="TabRestorerUI.cpp">
+    <ClCompile Include="TabRestorerMenu.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
     <ClCompile Include="ShellBrowser\HistoryEntry.cpp">
@@ -894,7 +894,7 @@
     <ClInclude Include="TabRestorer.h">
       <Filter>Tabs</Filter>
     </ClInclude>
-    <ClInclude Include="TabRestorerUI.h">
+    <ClInclude Include="TabRestorerMenu.h">
       <Filter>Tabs</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowser\PreservedFolderState.h">

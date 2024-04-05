@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "TabRestorerUI.h"
+#include "TabRestorerMenu.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -12,7 +12,7 @@
 #include "../Helper/ShellHelper.h"
 #include <boost/range/adaptor/sliced.hpp>
 
-TabRestorerUI::TabRestorerUI(HINSTANCE resourceInstance, CoreInterface *coreInterface,
+TabRestorerMenu::TabRestorerMenu(HINSTANCE resourceInstance, CoreInterface *coreInterface,
 	TabRestorer *tabRestorer, UINT menuStartId, UINT menuEndId) :
 	m_resourceInstance(resourceInstance),
 	m_coreInterface(coreInterface),
@@ -28,12 +28,12 @@ TabRestorerUI::TabRestorerUI(HINSTANCE resourceInstance, CoreInterface *coreInte
 		ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), defaultFolderIconIndex);
 
 	m_connections.push_back(m_coreInterface->AddMainMenuPreShowObserver(
-		std::bind_front(&TabRestorerUI::OnMainMenuPreShow, this)));
+		std::bind_front(&TabRestorerMenu::OnMainMenuPreShow, this)));
 	m_connections.push_back(coreInterface->AddGetMenuItemHelperTextObserver(
-		std::bind_front(&TabRestorerUI::MaybeGetMenuItemHelperText, this)));
+		std::bind_front(&TabRestorerMenu::MaybeGetMenuItemHelperText, this)));
 }
 
-TabRestorerUI::~TabRestorerUI()
+TabRestorerMenu::~TabRestorerMenu()
 {
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
@@ -43,7 +43,7 @@ TabRestorerUI::~TabRestorerUI()
 		&mii);
 }
 
-void TabRestorerUI::OnMainMenuPreShow(HMENU mainMenu)
+void TabRestorerMenu::OnMainMenuPreShow(HMENU mainMenu)
 {
 	std::vector<wil::unique_hbitmap> menuImages;
 	IdToClosedTabMap menuItemMappings;
@@ -60,7 +60,7 @@ void TabRestorerUI::OnMainMenuPreShow(HMENU mainMenu)
 	m_menuItemMappings = menuItemMappings;
 }
 
-wil::unique_hmenu TabRestorerUI::BuildRecentlyClosedTabsMenu(
+wil::unique_hmenu TabRestorerMenu::BuildRecentlyClosedTabsMenu(
 	std::vector<wil::unique_hbitmap> &menuImages, IdToClosedTabMap &menuItemMappings)
 {
 	wil::unique_hmenu menu(CreatePopupMenu());
@@ -143,7 +143,7 @@ wil::unique_hmenu TabRestorerUI::BuildRecentlyClosedTabsMenu(
 	return menu;
 }
 
-std::optional<std::wstring> TabRestorerUI::MaybeGetMenuItemHelperText(HMENU menu, UINT id)
+std::optional<std::wstring> TabRestorerMenu::MaybeGetMenuItemHelperText(HMENU menu, UINT id)
 {
 	if (menu != m_recentTabsMenu.get())
 	{
@@ -165,7 +165,7 @@ std::optional<std::wstring> TabRestorerUI::MaybeGetMenuItemHelperText(HMENU menu
 	return currentEntry->fullPathForDisplay;
 }
 
-void TabRestorerUI::OnMenuItemClicked(UINT menuItemId)
+void TabRestorerMenu::OnMenuItemClicked(UINT menuItemId)
 {
 	auto itr = m_menuItemMappings.find(menuItemId);
 

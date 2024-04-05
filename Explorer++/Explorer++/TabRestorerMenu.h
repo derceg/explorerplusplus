@@ -13,17 +13,17 @@
 
 class CoreInterface;
 
-class TabRestorerUI
+class TabRestorerMenu
 {
 public:
-	TabRestorerUI(HINSTANCE resourceInstance, CoreInterface *coreInterface,
+	TabRestorerMenu(HINSTANCE resourceInstance, CoreInterface *coreInterface,
 		TabRestorer *tabRestorer, UINT menuStartId, UINT menuEndId);
-	~TabRestorerUI();
+	~TabRestorerMenu();
 
 	void OnMenuItemClicked(UINT menuItemId);
 
 private:
-	DISALLOW_COPY_AND_ASSIGN(TabRestorerUI);
+	DISALLOW_COPY_AND_ASSIGN(TabRestorerMenu);
 
 	// Maps between menu item IDs and closed tab IDs.
 	using IdToClosedTabMap = std::unordered_map<UINT, int>;
