@@ -1005,7 +1005,7 @@
     <ClCompile Include="CustomFontStorage.cpp" />
     <ClCompile Include="FeatureList.cpp" />
     <ClCompile Include="FontsOptionsPage.cpp" />
-    <ClCompile Include="HistoryMenu.cpp" />
+    <ClCompile Include="TabHistoryMenu.cpp" />
     <ClCompile Include="HistoryService.cpp" />
     <ClCompile Include="HistoryServiceFactory.cpp" />
     <ClCompile Include="IconFetcherImpl.cpp" />
@@ -1252,7 +1252,7 @@
     <ClInclude Include="Feature.h" />
     <ClInclude Include="FeatureList.h" />
     <ClInclude Include="FontsOptionsPage.h" />
-    <ClInclude Include="HistoryMenu.h" />
+    <ClInclude Include="TabHistoryMenu.h" />
     <ClInclude Include="HistoryService.h" />
     <ClInclude Include="HistoryServiceFactory.h" />
     <ClInclude Include="IconFetcher.h" />

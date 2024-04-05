@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "HistoryMenu.h"
+#include "TabHistoryMenu.h"
 #include "BrowserPane.h"
 #include "BrowserWindow.h"
 #include "NavigationHelper.h"
@@ -15,21 +15,21 @@
 #include "../Helper/ImageHelper.h"
 #include "../Helper/ShellHelper.h"
 
-HistoryMenu::HistoryMenu(BrowserWindow *browserWindow, MenuType type) :
+TabHistoryMenu::TabHistoryMenu(BrowserWindow *browserWindow, MenuType type) :
 	m_browserWindow(browserWindow),
 	m_type(type)
 {
 	Initialize();
 }
 
-HistoryMenu::HistoryMenu(ShellBrowserInterface *shellBrowser, MenuType type) :
+TabHistoryMenu::TabHistoryMenu(ShellBrowserInterface *shellBrowser, MenuType type) :
 	m_testShellBrowser(shellBrowser),
 	m_type(type)
 {
 	Initialize();
 }
 
-void HistoryMenu::Initialize()
+void TabHistoryMenu::Initialize()
 {
 	FAIL_FAST_IF_FAILED(SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList)));
 	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(m_defaultFolderIconIndex));
@@ -37,17 +37,17 @@ void HistoryMenu::Initialize()
 	m_menuView = BuildMenu();
 }
 
-const PopupMenuView *HistoryMenu::GetMenuViewForTesting() const
+const PopupMenuView *TabHistoryMenu::GetMenuViewForTesting() const
 {
 	return m_menuView.get();
 }
 
-void HistoryMenu::Show(HWND hwnd, const POINT &point)
+void TabHistoryMenu::Show(HWND hwnd, const POINT &point)
 {
 	m_menuView->Show(hwnd, point);
 }
 
-std::unique_ptr<PopupMenuView> HistoryMenu::BuildMenu()
+std::unique_ptr<PopupMenuView> TabHistoryMenu::BuildMenu()
 {
 	auto *shellBrowser = GetShellBrowser();
 	std::vector<HistoryEntry *> history;
@@ -74,7 +74,7 @@ std::unique_ptr<PopupMenuView> HistoryMenu::BuildMenu()
 	return menuView;
 }
 
-void HistoryMenu::AddMenuItemForHistoryEntry(PopupMenuView *menuView, HistoryEntry *entry)
+void TabHistoryMenu::AddMenuItemForHistoryEntry(PopupMenuView *menuView, HistoryEntry *entry)
 {
 	int id = m_idCounter++;
 
@@ -94,17 +94,18 @@ void HistoryMenu::AddMenuItemForHistoryEntry(PopupMenuView *menuView, HistoryEnt
 	menuView->AppendItem(id, entry->GetDisplayName(), std::move(bitmap));
 }
 
-void HistoryMenu::OnMenuItemSelected(int menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown)
+void TabHistoryMenu::OnMenuItemSelected(int menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
 	NavigateToHistoryEntry(menuItemId, false, isCtrlKeyDown, isShiftKeyDown);
 }
 
-void HistoryMenu::OnMenuItemMiddleClicked(int menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown)
+void TabHistoryMenu::OnMenuItemMiddleClicked(int menuItemId, bool isCtrlKeyDown,
+	bool isShiftKeyDown)
 {
 	NavigateToHistoryEntry(menuItemId, true, isCtrlKeyDown, isShiftKeyDown);
 }
 
-void HistoryMenu::NavigateToHistoryEntry(int menuItemId, bool isMiddleButtonDown,
+void TabHistoryMenu::NavigateToHistoryEntry(int menuItemId, bool isMiddleButtonDown,
 	bool isCtrlKeyDown, bool isShiftKeyDown)
 {
 	int offset = menuItemId;
@@ -138,7 +139,7 @@ void HistoryMenu::NavigateToHistoryEntry(int menuItemId, bool isMiddleButtonDown
 	shellBrowser->GetNavigationController()->GoToOffset(offset);
 }
 
-ShellBrowserInterface *HistoryMenu::GetShellBrowser() const
+ShellBrowserInterface *TabHistoryMenu::GetShellBrowser() const
 {
 	if (m_testShellBrowser)
 	{

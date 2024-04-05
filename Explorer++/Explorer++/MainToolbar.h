@@ -6,12 +6,12 @@
 
 #include "CoreInterface.h"
 #include "DefaultToolbarButtons.h"
-#include "HistoryMenu.h"
 #include "IconResourceLoader.h"
 #include "MainFontSetter.h"
 #include "MainToolbarStorage.h"
 #include "SignalWrapper.h"
 #include "Tab.h"
+#include "TabHistoryMenu.h"
 #include "../Helper/BaseWindow.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <wil/com.h>
@@ -73,7 +73,7 @@ private:
 	void OnTBGetInfoTip(LPARAM lParam);
 	std::optional<std::wstring> MaybeGetCustomizedUpInfoTip();
 	LRESULT OnTbnDropDown(const NMTOOLBAR *nmtb);
-	void ShowHistoryMenu(HistoryMenu::MenuType historyType);
+	void ShowHistoryMenu(TabHistoryMenu::MenuType historyType);
 	void ShowUpNavigationMenu();
 	void ShowToolbarViewsMenu();
 	void CreateViewsMenu(POINT *ptOrigin);

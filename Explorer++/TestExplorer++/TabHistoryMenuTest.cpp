@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "HistoryMenu.h"
+#include "TabHistoryMenu.h"
 #include "IconFetcherMock.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
@@ -12,10 +12,10 @@
 
 using namespace testing;
 
-class HistoryMenuTest : public Test
+class TabHistoryMenuTest : public Test
 {
 protected:
-	HistoryMenuTest() : m_shellBrowser(&m_tabNavigation, &m_iconFetcher)
+	TabHistoryMenuTest() : m_shellBrowser(&m_tabNavigation, &m_iconFetcher)
 	{
 	}
 
@@ -24,13 +24,13 @@ protected:
 	ShellBrowserFake m_shellBrowser;
 };
 
-TEST_F(HistoryMenuTest, BackHistory)
+TEST_F(TabHistoryMenuTest, BackHistory)
 {
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
 
-	HistoryMenu menu(&m_shellBrowser, HistoryMenu::MenuType::Back);
+	TabHistoryMenu menu(&m_shellBrowser, TabHistoryMenu::MenuType::Back);
 
 	auto menuView = menu.GetMenuViewForTesting();
 
@@ -39,7 +39,7 @@ TEST_F(HistoryMenuTest, BackHistory)
 	EXPECT_EQ(menuView->GetItemTextForTesting(1), L"Fake1");
 }
 
-TEST_F(HistoryMenuTest, ForwardHistory)
+TEST_F(TabHistoryMenuTest, ForwardHistory)
 {
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
@@ -49,7 +49,7 @@ TEST_F(HistoryMenuTest, ForwardHistory)
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());
 
-	HistoryMenu menu(&m_shellBrowser, HistoryMenu::MenuType::Forward);
+	TabHistoryMenu menu(&m_shellBrowser, TabHistoryMenu::MenuType::Forward);
 
 	auto menuView = menu.GetMenuViewForTesting();
 
@@ -58,13 +58,13 @@ TEST_F(HistoryMenuTest, ForwardHistory)
 	EXPECT_EQ(menuView->GetItemTextForTesting(1), L"Fake3");
 }
 
-TEST_F(HistoryMenuTest, BackSelection)
+TEST_F(TabHistoryMenuTest, BackSelection)
 {
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
 
-	HistoryMenu menu(&m_shellBrowser, HistoryMenu::MenuType::Back);
+	TabHistoryMenu menu(&m_shellBrowser, TabHistoryMenu::MenuType::Back);
 
 	// Go back to Fake2.
 	auto menuView = menu.GetMenuViewForTesting();
@@ -73,7 +73,7 @@ TEST_F(HistoryMenuTest, BackSelection)
 	EXPECT_EQ(m_shellBrowser.GetNavigationController()->GetCurrentIndex(), 1);
 }
 
-TEST_F(HistoryMenuTest, ForwardSelection)
+TEST_F(TabHistoryMenuTest, ForwardSelection)
 {
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
@@ -83,7 +83,7 @@ TEST_F(HistoryMenuTest, ForwardSelection)
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());
 
-	HistoryMenu menu(&m_shellBrowser, HistoryMenu::MenuType::Forward);
+	TabHistoryMenu menu(&m_shellBrowser, TabHistoryMenu::MenuType::Forward);
 
 	// Go forward to Fake3.
 	auto menuView = menu.GetMenuViewForTesting();
@@ -92,7 +92,7 @@ TEST_F(HistoryMenuTest, ForwardSelection)
 	EXPECT_EQ(m_shellBrowser.GetNavigationController()->GetCurrentIndex(), 2);
 }
 
-TEST_F(HistoryMenuTest, InvalidSelection)
+TEST_F(TabHistoryMenuTest, InvalidSelection)
 {
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
@@ -101,7 +101,7 @@ TEST_F(HistoryMenuTest, InvalidSelection)
 	// Go back to Fake2.
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());
 
-	HistoryMenu menu(&m_shellBrowser, HistoryMenu::MenuType::Forward);
+	TabHistoryMenu menu(&m_shellBrowser, TabHistoryMenu::MenuType::Forward);
 
 	// Go back to Fake1.
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());

@@ -577,7 +577,7 @@
     <ClCompile Include="IconFetcherImpl.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="HistoryMenu.cpp">
+    <ClCompile Include="TabHistoryMenu.cpp">
       <Filter>Core\UI</Filter>
     </ClCompile>
     <ClCompile Include="OneShotTimerManager.cpp">
@@ -1230,7 +1230,7 @@
     <ClInclude Include="IconFetcherImpl.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="HistoryMenu.h">
+    <ClInclude Include="TabHistoryMenu.h">
       <Filter>Core\UI</Filter>
     </ClInclude>
     <ClInclude Include="BrowserWindow.h">

@@ -170,7 +170,7 @@
     <ClCompile Include="ServiceProviderTest.cpp">
       <Filter>Context Menu Support</Filter>
     </ClCompile>
-    <ClCompile Include="HistoryMenuTest.cpp">
+    <ClCompile Include="TabHistoryMenuTest.cpp">
       <Filter>Core\UI</Filter>
     </ClCompile>
     <ClCompile Include="ShellItemsMenuTest.cpp">

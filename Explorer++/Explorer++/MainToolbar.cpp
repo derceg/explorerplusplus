@@ -654,12 +654,12 @@ LRESULT MainToolbar::OnTbnDropDown(const NMTOOLBAR *nmtb)
 {
 	if (nmtb->iItem == MainToolbarButton::Back)
 	{
-		ShowHistoryMenu(HistoryMenu::MenuType::Back);
+		ShowHistoryMenu(TabHistoryMenu::MenuType::Back);
 		return TBDDRET_DEFAULT;
 	}
 	else if (nmtb->iItem == MainToolbarButton::Forward)
 	{
-		ShowHistoryMenu(HistoryMenu::MenuType::Forward);
+		ShowHistoryMenu(TabHistoryMenu::MenuType::Forward);
 		return TBDDRET_DEFAULT;
 	}
 	else if (nmtb->iItem == MainToolbarButton::Up)
@@ -676,20 +676,21 @@ LRESULT MainToolbar::OnTbnDropDown(const NMTOOLBAR *nmtb)
 	return TBDDRET_NODEFAULT;
 }
 
-void MainToolbar::ShowHistoryMenu(HistoryMenu::MenuType historyType)
+void MainToolbar::ShowHistoryMenu(TabHistoryMenu::MenuType historyType)
 {
 	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
 	const auto *navigationController = tab.GetShellBrowser()->GetNavigationController();
 
-	if ((historyType == HistoryMenu::MenuType::Back && !navigationController->CanGoBack())
-		|| (historyType == HistoryMenu::MenuType::Forward && !navigationController->CanGoForward()))
+	if ((historyType == TabHistoryMenu::MenuType::Back && !navigationController->CanGoBack())
+		|| (historyType == TabHistoryMenu::MenuType::Forward
+			&& !navigationController->CanGoForward()))
 	{
 		return;
 	}
 
 	MainToolbarButton button;
 
-	if (historyType == HistoryMenu::MenuType::Back)
+	if (historyType == TabHistoryMenu::MenuType::Back)
 	{
 		button = MainToolbarButton::Back;
 	}
@@ -707,7 +708,7 @@ void MainToolbar::ShowHistoryMenu(HistoryMenu::MenuType historyType)
 	res = ClientToScreen(m_hwnd, &pt);
 	assert(res);
 
-	HistoryMenu menu(m_browserWindow, historyType);
+	TabHistoryMenu menu(m_browserWindow, historyType);
 	menu.Show(m_hwnd, pt);
 }
 

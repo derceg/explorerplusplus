@@ -18,7 +18,7 @@ class ShellBrowserInterface;
 // displayed. An entry can be both clicked (which will cause the current tab to navigate
 // back/forward to that entry) and middle-clicked (which will open the pidl associated with that
 // entry in a new tab), with the ctrl and shift keys used to control exactly how an entry is opened.
-class HistoryMenu : public MenuController
+class TabHistoryMenu : public MenuController
 {
 public:
 	enum class MenuType
@@ -27,12 +27,12 @@ public:
 		Forward
 	};
 
-	HistoryMenu(BrowserWindow *browserWindow, MenuType type);
+	TabHistoryMenu(BrowserWindow *browserWindow, MenuType type);
 
 	// This constructor is only used in tests. Although not ideal, it means that BrowserWindow and a
 	// series of other classes don't have to be mocked, when the intent is to provide a specific
 	// ShellBrowserInterface instance.
-	HistoryMenu(ShellBrowserInterface *shellBrowser, MenuType type);
+	TabHistoryMenu(ShellBrowserInterface *shellBrowser, MenuType type);
 
 	void Show(HWND hwnd, const POINT &point);
 
