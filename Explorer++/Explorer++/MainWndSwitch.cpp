@@ -331,23 +331,24 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd, HWND control, int i
 LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int id,
 	UINT notificationCode)
 {
-	if (notificationCode == 0 && id >= MENU_BOOKMARK_STARTID && id <= MENU_BOOKMARK_ENDID)
+	if (notificationCode == 0 && id >= MENU_BOOKMARK_START_ID && id <= MENU_BOOKMARK_END_ID)
 	{
 		m_bookmarksMainMenu->OnMenuItemClicked(id);
 		return 0;
 	}
-	else if (notificationCode == 0 && id >= MENU_RECENT_TABS_STARTID && id < MENU_RECENT_TABS_ENDID)
+	else if (notificationCode == 0 && id >= MENU_RECENT_TABS_START_ID
+		&& id < MENU_RECENT_TABS_END_ID)
 	{
 		m_tabRestorerUI->OnMenuItemClicked(id);
 		return 0;
 	}
-	else if (notificationCode == 0 && id >= MENU_PLUGIN_STARTID && id < MENU_PLUGIN_ENDID)
+	else if (notificationCode == 0 && id >= MENU_PLUGIN_START_ID && id < MENU_PLUGIN_END_ID)
 	{
 		m_pluginMenuManager.OnMenuItemClicked(id);
 		return 0;
 	}
-	else if (notificationCode == 1 && id >= ACCELERATOR_PLUGIN_STARTID
-		&& id < ACCELERATOR_PLUGIN_ENDID)
+	else if (notificationCode == 1 && id >= ACCELERATOR_PLUGIN_START_ID
+		&& id < ACCELERATOR_PLUGIN_END_ID)
 	{
 		m_pluginCommandManager.onAcceleratorPressed(id);
 		return 0;

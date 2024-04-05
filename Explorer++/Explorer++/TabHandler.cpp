@@ -61,7 +61,7 @@ void Explorerplusplus::InitializeTabs()
 
 	m_tabRestorer = std::make_unique<TabRestorer>(tabContainer);
 	m_tabRestorerUI = std::make_unique<TabRestorerUI>(m_resourceInstance, this, m_tabRestorer.get(),
-		MENU_RECENT_TABS_STARTID, MENU_RECENT_TABS_ENDID);
+		MENU_RECENT_TABS_START_ID, MENU_RECENT_TABS_END_ID);
 
 	m_tabsInitializedSignal();
 }

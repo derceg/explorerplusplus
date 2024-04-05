@@ -40,9 +40,9 @@ Explorerplusplus::Explorerplusplus(HWND hwnd, CommandLine::Settings *commandLine
 	m_commandLineSettings(*commandLineSettings),
 	m_commandController(this),
 	m_cachedIcons(MAX_CACHED_ICONS),
-	m_pluginMenuManager(hwnd, MENU_PLUGIN_STARTID, MENU_PLUGIN_ENDID),
+	m_pluginMenuManager(hwnd, MENU_PLUGIN_START_ID, MENU_PLUGIN_END_ID),
 	m_acceleratorUpdater(&g_hAccl),
-	m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_ENDID),
+	m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_START_ID, ACCELERATOR_PLUGIN_END_ID),
 	m_iconFetcher(hwnd, &m_cachedIcons),
 	m_tabBarBackgroundBrush(CreateSolidBrush(TAB_BAR_DARK_MODE_BACKGROUND_COLOR))
 {
