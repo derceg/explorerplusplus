@@ -190,13 +190,7 @@ void Explorerplusplus::AddGoMenuItem(HMENU goMenu, UINT id, PCIDLIST_ABSOLUTE pi
 				return;
 			}
 
-			bool res = MenuHelper::SetBitmapForItem(goMenu, id, bitmap.get());
-
-			if (!res)
-			{
-				DCHECK(false);
-				return;
-			}
+			MenuHelper::SetBitmapForItem(goMenu, id, bitmap.get());
 
 			m_mainMenuImages.push_back(std::move(bitmap));
 		});

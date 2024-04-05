@@ -49,7 +49,7 @@ private:
 
 	BookmarkTree *m_bookmarkTree = nullptr;
 
-	bool m_showingMenu = false;
+	HMENU m_activeMenu = nullptr;
 	BookmarkMenuBuilder::MenuInfo *m_menuInfo = nullptr;
 	winrt::com_ptr<IDropTarget> m_dropTarget;
 

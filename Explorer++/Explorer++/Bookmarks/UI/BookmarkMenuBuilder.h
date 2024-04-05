@@ -20,7 +20,11 @@ class BookmarkMenuBuilder
 public:
 	enum class MenuItemType
 	{
+		// This item represents a bookmark/bookmark folder.
 		BookmarkItem,
+
+		// This is used when the parent folder contains no items. The associated BookmarkItem will
+		// refer to the parent folder.
 		EmptyItem
 	};
 
@@ -36,27 +40,16 @@ public:
 		MenuItemType menuItemType;
 	};
 
-	// Maps menu item IDs to bookmark items. Note that IDs will only be set for bookmarks (and not
-	// bookmark folders).
-	using ItemIdMap = std::unordered_map<UINT, BookmarkItem *>;
-
-	// Maps menu item positions to bookmark items. Works for both bookmarks and bookmark folders.
-	using MenuPositionPair = std::pair<HMENU, int>;
-	using ItemPositionMap =
-		std::unordered_map<MenuPositionPair, MenuItemEntry, boost::hash<MenuPositionPair>>;
+	// Maps menu item IDs to bookmark items. Note that submenu items will have IDs set as well.
+	using ItemIdMap = std::unordered_map<UINT, MenuItemEntry>;
 
 	using IncludePredicate = std::function<bool(const BookmarkItem *bookmarkItem)>;
 
 	// Contains information about the menu that was built.
 	struct MenuInfo
 	{
-		// Contains a set of all submenus and can be used to determine whether an arbitrary HMENU is
-		// part of the returned menu.
-		std::unordered_set<HMENU> menus;
-
-		// Can be used to retrieve items, based on their ID/position.
+		// Can be used to retrieve items, based on their ID.
 		ItemIdMap itemIdMap;
-		ItemPositionMap itemPositionMap;
 
 		UINT nextMenuId;
 	};

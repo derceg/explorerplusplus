@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "PopupMenuView.h"
 #include "../Helper/Helper.h"
+#include "../Helper/MenuHelper.h"
 #include "../Helper/WindowSubclassWrapper.h"
 
 PopupMenuView::PopupMenuView(MenuController *controller) :
@@ -88,21 +89,14 @@ LRESULT PopupMenuView::ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, 
 
 void PopupMenuView::OnMenuMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
-	int itemIndex = MenuItemFromPoint(nullptr, m_menu.get(), pt);
+	auto menuItemId = MenuHelper::MaybeGetMenuItemAtPoint(m_menu.get(), pt);
 
-	if (itemIndex < 0)
+	if (!menuItemId)
 	{
 		return;
 	}
 
-	auto menuItemId = GetMenuItemID(m_menu.get(), itemIndex);
-
-	if (menuItemId == -1)
-	{
-		return;
-	}
-
-	m_controller->OnMenuItemMiddleClicked(menuItemId, isCtrlKeyDown, isShiftKeyDown);
+	m_controller->OnMenuItemMiddleClicked(*menuItemId, isCtrlKeyDown, isShiftKeyDown);
 }
 
 int PopupMenuView::GetItemCountForTesting() const

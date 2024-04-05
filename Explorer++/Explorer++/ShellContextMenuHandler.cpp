@@ -77,7 +77,7 @@ void Explorerplusplus::UpdateBackgroundContextMenu(HMENU menu, IContextMenu *con
 			auto viewsMenu = BuildViewsMenu();
 			std::wstring text =
 				ResourceHelper::LoadString(m_resourceInstance, IDS_BACKGROUND_CONTEXT_MENU_VIEW);
-			MenuHelper::AddSubMenuItem(menu, text, std::move(viewsMenu), i, TRUE);
+			MenuHelper::AddSubMenuItem(menu, 0, text, std::move(viewsMenu), i, TRUE);
 		}
 		else if (StrCmpI(verb, L"arrange") == 0)
 		{
@@ -89,7 +89,7 @@ void Explorerplusplus::UpdateBackgroundContextMenu(HMENU menu, IContextMenu *con
 
 			std::wstring text =
 				ResourceHelper::LoadString(m_resourceInstance, IDS_BACKGROUND_CONTEXT_MENU_SORT_BY);
-			MenuHelper::AddSubMenuItem(menu, text, std::move(sortMenus.sortByMenu), i, TRUE);
+			MenuHelper::AddSubMenuItem(menu, 0, text, std::move(sortMenus.sortByMenu), i, TRUE);
 		}
 		else if (StrCmpI(verb, L"groupby") == 0)
 		{
@@ -101,7 +101,7 @@ void Explorerplusplus::UpdateBackgroundContextMenu(HMENU menu, IContextMenu *con
 
 			std::wstring text = ResourceHelper::LoadString(m_resourceInstance,
 				IDS_BACKGROUND_CONTEXT_MENU_GROUP_BY);
-			MenuHelper::AddSubMenuItem(menu, text, std::move(sortMenus.groupByMenu), i, TRUE);
+			MenuHelper::AddSubMenuItem(menu, 0, text, std::move(sortMenus.groupByMenu), i, TRUE);
 		}
 		else if (StrCmpI(verb, L"paste") == 0)
 		{

@@ -176,6 +176,9 @@
     <ClCompile Include="ShellItemsMenuTest.cpp">
       <Filter>Core\UI</Filter>
     </ClCompile>
+    <ClCompile Include="MenuHelperTest.cpp">
+      <Filter>Helper\Control Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

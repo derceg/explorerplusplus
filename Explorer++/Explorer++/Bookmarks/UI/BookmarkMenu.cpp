@@ -56,18 +56,14 @@ void BookmarkMenu::OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt)
 {
 	// The bookmark context menu can be shown on top of this menu, so the menu item that was
 	// right-clicked might be from that menu.
-	if (!m_showingMenu || !m_menuInfo->menus.contains(menu))
+	if (!m_activeMenu || !MenuHelper::IsPartOfMenu(m_activeMenu, menu))
 	{
 		return;
 	}
 
-	auto itr = m_menuInfo->itemPositionMap.find({ menu, index });
-
-	if (itr == m_menuInfo->itemPositionMap.end())
-	{
-		DCHECK(false);
-		return;
-	}
+	auto menuItemId = MenuHelper::GetMenuItemIDIncludingSubmenu(menu, index);
+	auto itr = m_menuInfo->itemIdMap.find(menuItemId);
+	CHECK(itr != m_menuInfo->itemIdMap.end());
 
 	m_controller.OnMenuItemRightClicked(itr->second.bookmarkItem, pt);
 }
@@ -80,48 +76,26 @@ void BookmarkMenu::OnMenuMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown, boo
 	// MenuItemFromPoint() will fail for each of the menus that make up this menu, regardless of
 	// where the click occurs.
 	// Therefore, it's not necessary to check here whether the context menu is being shown.
-	if (!m_showingMenu)
+	if (!m_activeMenu)
 	{
 		return;
 	}
 
-	HMENU targetMenu = nullptr;
-	int targetItem = -1;
-	bool targetFound = false;
+	// The POINT passed to the WM_MBUTTONUP handler will be in client coordinates normally and in
+	// screen coordinates if a menu is being shown. As execution can only reach this point if the
+	// bookmark menu is actually being shown, it's known at this stage that the POINT is in screen
+	// coordinates (which is required for MenuHelper::MaybeGetMenuItemAtPoint()).
+	auto menuItemId = MenuHelper::MaybeGetMenuItemAtPoint(m_activeMenu, pt);
 
-	for (auto menu : m_menuInfo->menus)
-	{
-		// Note that the POINT passed to MenuItemFromPoint() needs to be in screen coordinates (even
-		// though the documentation for that method indicates the POINT needs to be in client
-		// coordinates). The POINT passed to the WM_MBUTTONUP handler will be in client coordinates
-		// normally and in screen coordinates if a menu is being shown. As execution can only reach
-		// this point if the bookmark menu is actually being shown, it's known at this stage that
-		// the POINT is in screen coordinates.
-		int item = MenuItemFromPoint(m_parentWindow, menu, pt);
-
-		if (item >= 0)
-		{
-			targetMenu = menu;
-			targetItem = item;
-			targetFound = true;
-			break;
-		}
-	}
-
-	if (!targetFound)
+	if (!menuItemId)
 	{
 		return;
 	}
 
-	auto itr = m_menuInfo->itemPositionMap.find({ targetMenu, targetItem });
+	auto itr = m_menuInfo->itemIdMap.find(*menuItemId);
+	CHECK(itr != m_menuInfo->itemIdMap.end());
 
-	if (itr == m_menuInfo->itemPositionMap.end())
-	{
-		DCHECK(false);
-		return;
-	}
-
-	if (itr->second.menuItemType == BookmarkMenuBuilder::MenuItemType::EmptyItem)
+	if (!MenuHelper::IsMenuItemEnabled(m_activeMenu, *menuItemId, false))
 	{
 		return;
 	}
@@ -135,24 +109,16 @@ LRESULT BookmarkMenu::OnMenuDrag(HMENU menu, int itemPosition)
 	// bottom of the menu (below the last item) will trigger a WM_MENUDRAG message, with a position
 	// of -1. It doesn't make sense to begin a drag here in that case, though, since no actual item
 	// is being dragged.
-	if (!m_showingMenu || !m_menuInfo->menus.contains(menu) || itemPosition == -1)
+	if (!m_activeMenu || !MenuHelper::IsPartOfMenu(m_activeMenu, menu) || itemPosition == -1)
 	{
 		return MND_CONTINUE;
 	}
 
-	auto itr = m_menuInfo->itemPositionMap.find({ menu, itemPosition });
+	auto menuItemId = MenuHelper::GetMenuItemIDIncludingSubmenu(menu, itemPosition);
+	auto itr = m_menuInfo->itemIdMap.find(menuItemId);
+	CHECK(itr != m_menuInfo->itemIdMap.end());
 
-	if (itr == m_menuInfo->itemPositionMap.end())
-	{
-		// All menu items should appear in the set of position mappings, so this branch should never
-		// be taken.
-		DCHECK(false);
-		return MND_CONTINUE;
-	}
-
-	// It's not possible to drag the single item shown in an empty folder (since it doesn't actually
-	// represent any bookmark item).
-	if (itr->second.menuItemType == BookmarkMenuBuilder::MenuItemType::EmptyItem)
+	if (!MenuHelper::IsMenuItemEnabled(menu, itemPosition, true))
 	{
 		return MND_CONTINUE;
 	}
@@ -171,7 +137,7 @@ LRESULT BookmarkMenu::OnMenuDrag(HMENU menu, int itemPosition)
 
 LRESULT BookmarkMenu::OnMenuGetObject(MENUGETOBJECTINFO *objectInfo)
 {
-	if (!m_showingMenu || !m_menuInfo->menus.contains(objectInfo->hmenu))
+	if (!m_activeMenu || !MenuHelper::IsPartOfMenu(m_activeMenu, objectInfo->hmenu))
 	{
 		return MNGO_NOINTERFACE;
 	}
@@ -190,7 +156,10 @@ LRESULT BookmarkMenu::OnMenuGetObject(MENUGETOBJECTINFO *objectInfo)
 	// If neither MNGOF_TOPGAP or MNGOF_BOTTOMGAP is set, the cursor is over an item.
 	if (WI_AreAllFlagsClear(objectInfo->dwFlags, MNGOF_TOPGAP | MNGOF_BOTTOMGAP))
 	{
-		auto itr = m_menuInfo->itemPositionMap.find({ objectInfo->hmenu, objectInfo->uPos });
+		auto menuItemId =
+			MenuHelper::GetMenuItemIDIncludingSubmenu(objectInfo->hmenu, objectInfo->uPos);
+		auto itr = m_menuInfo->itemIdMap.find(menuItemId);
+		CHECK(itr != m_menuInfo->itemIdMap.end());
 
 		if (itr->second.bookmarkItem->IsFolder())
 		{
@@ -205,7 +174,9 @@ LRESULT BookmarkMenu::OnMenuGetObject(MENUGETOBJECTINFO *objectInfo)
 		// Because all items in a specific menu have the same parent, it doesn't matter which item
 		// is used to retrieve that parent. It's also guaranteed that there will be at least a
 		// single entry in each menu, so simply retrieving the first item is safe.
-		auto itr = m_menuInfo->itemPositionMap.find({ objectInfo->hmenu, 0 });
+		auto menuItemId = MenuHelper::GetMenuItemIDIncludingSubmenu(objectInfo->hmenu, 0);
+		auto itr = m_menuInfo->itemIdMap.find(menuItemId);
+		CHECK(itr != m_menuInfo->itemIdMap.end());
 
 		if (itr->second.menuItemType == BookmarkMenuBuilder::MenuItemType::EmptyItem)
 		{
@@ -288,14 +259,14 @@ BOOL BookmarkMenu::ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt,
 		return FALSE;
 	}
 
+	m_activeMenu = menu.get();
 	m_menuInfo = &menuInfo;
-	m_showingMenu = true;
 
 	UINT cmd = TrackPopupMenu(menu.get(), TPM_LEFTALIGN | TPM_RETURNCMD, pt.x, pt.y, 0,
 		m_parentWindow, nullptr);
 
-	m_showingMenu = false;
 	m_menuInfo = nullptr;
+	m_activeMenu = nullptr;
 	m_dropTarget = nullptr;
 
 	if (cmd != 0)
@@ -316,5 +287,6 @@ void BookmarkMenu::OnMenuItemSelected(UINT menuItemId,
 		return;
 	}
 
-	m_controller.OnMenuItemSelected(itr->second, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
+	m_controller.OnMenuItemSelected(itr->second.bookmarkItem, IsKeyDown(VK_CONTROL),
+		IsKeyDown(VK_SHIFT));
 }

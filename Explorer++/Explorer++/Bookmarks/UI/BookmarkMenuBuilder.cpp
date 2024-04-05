@@ -39,7 +39,6 @@ BOOL BookmarkMenuBuilder::BuildMenu(HWND parentWindow, HMENU menu, BookmarkItem 
 
 	BOOL res = BuildMenu(menu, bookmarkItem, startPosition, bookmarkIconManager, menuImages,
 		menuInfo, true, includePredicate);
-	menuInfo.menus.insert(menu);
 	menuInfo.nextMenuId = m_idCounter;
 
 	return res;
@@ -90,13 +89,21 @@ BOOL BookmarkMenuBuilder::BuildMenu(HMENU menu, BookmarkItem *bookmarkItem, int 
 BOOL BookmarkMenuBuilder::AddEmptyBookmarkFolderToMenu(HMENU menu, BookmarkItem *bookmarkItem,
 	int position, MenuInfo &menuInfo)
 {
+	auto id = m_idCounter++;
+
+	if (id >= m_menuIdRange.endId)
+	{
+		return FALSE;
+	}
+
 	std::wstring bookmarkFolderEmpty =
 		ResourceHelper::LoadString(m_resourceInstance, IDS_BOOKMARK_FOLDER_EMPTY);
 	std::wstring menuText = std::format(L"({})", bookmarkFolderEmpty);
 
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
-	mii.fMask = MIIM_STRING | MIIM_STATE;
+	mii.fMask = MIIM_ID | MIIM_STRING | MIIM_STATE;
+	mii.wID = id;
 	mii.fState = MFS_DISABLED;
 	mii.dwTypeData = menuText.data();
 	BOOL res = InsertMenuItem(menu, position, TRUE, &mii);
@@ -110,8 +117,7 @@ BOOL BookmarkMenuBuilder::AddEmptyBookmarkFolderToMenu(HMENU menu, BookmarkItem 
 	// item will be used as the target of any context menu operations (e.g. selecting "Copy" will
 	// copy the parent folder).
 	// To enable similar behavior here, the empty item is mapped to the parent.
-	menuInfo.itemPositionMap.insert(
-		{ { menu, position }, { bookmarkItem, MenuItemType::EmptyItem } });
+	menuInfo.itemIdMap.insert({ id, { bookmarkItem, MenuItemType::EmptyItem } });
 
 	return res;
 }
@@ -120,6 +126,13 @@ BOOL BookmarkMenuBuilder::AddBookmarkFolderToMenu(HMENU menu, BookmarkItem *book
 	int position, BookmarkIconManager &bookmarkIconManager,
 	std::vector<wil::unique_hbitmap> &menuImages, MenuInfo &menuInfo)
 {
+	auto id = m_idCounter++;
+
+	if (id >= m_menuIdRange.endId)
+	{
+		return FALSE;
+	}
+
 	HMENU subMenu = CreatePopupMenu();
 
 	if (subMenu == nullptr)
@@ -131,7 +144,8 @@ BOOL BookmarkMenuBuilder::AddBookmarkFolderToMenu(HMENU menu, BookmarkItem *book
 
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
-	mii.fMask = MIIM_STRING | MIIM_SUBMENU;
+	mii.fMask = MIIM_ID | MIIM_STRING | MIIM_SUBMENU;
+	mii.wID = id;
 	mii.hSubMenu = subMenu;
 	mii.dwTypeData = bookmarkFolderName.data();
 	BOOL res = InsertMenuItem(menu, position, TRUE, &mii);
@@ -143,9 +157,7 @@ BOOL BookmarkMenuBuilder::AddBookmarkFolderToMenu(HMENU menu, BookmarkItem *book
 
 	AddIconToMenuItem(menu, position, bookmarkItem, bookmarkIconManager, menuImages);
 
-	menuInfo.itemPositionMap.insert(
-		{ { menu, position }, { bookmarkItem, MenuItemType::BookmarkItem } });
-	menuInfo.menus.insert(subMenu);
+	menuInfo.itemIdMap.insert({ id, { bookmarkItem, MenuItemType::BookmarkItem } });
 
 	return BuildMenu(subMenu, bookmarkItem, 0, bookmarkIconManager, menuImages, menuInfo, false,
 		nullptr);
@@ -166,7 +178,7 @@ BOOL BookmarkMenuBuilder::AddBookmarkToMenu(HMENU menu, BookmarkItem *bookmarkIt
 
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
-	mii.fMask = MIIM_STRING | MIIM_ID;
+	mii.fMask = MIIM_ID | MIIM_STRING;
 	mii.wID = id;
 	mii.dwTypeData = bookmarkName.data();
 	BOOL res = InsertMenuItem(menu, position, TRUE, &mii);
@@ -178,9 +190,7 @@ BOOL BookmarkMenuBuilder::AddBookmarkToMenu(HMENU menu, BookmarkItem *bookmarkIt
 
 	AddIconToMenuItem(menu, position, bookmarkItem, bookmarkIconManager, menuImages);
 
-	menuInfo.itemIdMap.insert({ id, bookmarkItem });
-	menuInfo.itemPositionMap.insert(
-		{ { menu, position }, { bookmarkItem, MenuItemType::BookmarkItem } });
+	menuInfo.itemIdMap.insert({ id, { bookmarkItem, MenuItemType::BookmarkItem } });
 
 	return res;
 }

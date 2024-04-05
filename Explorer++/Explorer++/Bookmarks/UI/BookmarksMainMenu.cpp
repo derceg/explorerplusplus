@@ -129,13 +129,13 @@ void BookmarksMainMenu::AddOtherBookmarksToMenu(HMENU menu, const MenuIdRange &m
 	m_menuBuilder.BuildMenu(m_coreInterface->GetMainWindow(), subMenu.get(), otherBookmarksFolder,
 		menuIdRange, 0, menuImages, menuInfo);
 
-	std::wstring otherBookmarksName = otherBookmarksFolder->GetName();
-	MenuHelper::AddSubMenuItem(menu, otherBookmarksName, std::move(subMenu), position++, TRUE);
+	MenuHelper::AddSubMenuItem(menu, 0, otherBookmarksFolder->GetName(), std::move(subMenu),
+		position++, TRUE);
 }
 
 std::optional<std::wstring> BookmarksMainMenu::MaybeGetMenuItemHelperText(HMENU menu, UINT id)
 {
-	if (!m_menuInfo.menus.contains(menu))
+	if (!MenuHelper::IsPartOfMenu(m_bookmarksMenu.get(), menu))
 	{
 		return std::nullopt;
 	}
@@ -147,7 +147,7 @@ std::optional<std::wstring> BookmarksMainMenu::MaybeGetMenuItemHelperText(HMENU 
 		return std::nullopt;
 	}
 
-	const BookmarkItem *bookmark = itr->second;
+	const BookmarkItem *bookmark = itr->second.bookmarkItem;
 	return bookmark->GetLocation();
 }
 
@@ -160,49 +160,29 @@ void BookmarksMainMenu::OnMenuItemClicked(UINT menuItemId)
 		return;
 	}
 
-	m_controller.OnMenuItemSelected(itr->second, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
+	m_controller.OnMenuItemSelected(itr->second.bookmarkItem, IsKeyDown(VK_CONTROL),
+		IsKeyDown(VK_SHIFT));
 }
 
 bool BookmarksMainMenu::OnMenuItemMiddleClicked(const POINT &pt, bool isCtrlKeyDown,
 	bool isShiftKeyDown)
 {
-	HMENU targetMenu = nullptr;
-	int targetItem = -1;
-	bool targetFound = false;
+	auto menuItemId = MenuHelper::MaybeGetMenuItemAtPoint(m_bookmarksMenu.get(), pt);
 
-	for (auto menu : m_menuInfo.menus)
-	{
-		int item = MenuItemFromPoint(m_coreInterface->GetMainWindow(), menu, pt);
-
-		// Although the documentation for MenuItemFromPoint() states that it returns -1 if there's
-		// no menu item at the specified position, it appears the method will also return other
-		// negative values on failure. So, it's better to check whether the return value is
-		// positive, rather than checking whether it's equal to -1.
-		if (item >= 0)
-		{
-			targetMenu = menu;
-			targetItem = item;
-			targetFound = true;
-			break;
-		}
-	}
-
-	if (!targetFound)
+	if (!menuItemId)
 	{
 		return false;
 	}
 
-	auto itr = m_menuInfo.itemPositionMap.find({ targetMenu, targetItem });
+	auto itr = m_menuInfo.itemIdMap.find(*menuItemId);
 
-	if (itr == m_menuInfo.itemPositionMap.end())
+	if (itr == m_menuInfo.itemIdMap.end())
 	{
-		// This branch will be taken if one of the other, non-bookmark, items on this menu is
-		// clicked. In that case, there's nothing that needs to happen and there's no need for other
-		// handlers to try and process this event.
+		// The item can be one of the other existing (non-bookmark) menu items.
 		return true;
 	}
 
-	if (itr->second.menuItemType == BookmarkMenuBuilder::MenuItemType::EmptyItem)
+	if (!MenuHelper::IsMenuItemEnabled(m_bookmarksMenu.get(), *menuItemId, false))
 	{
 		return true;
 	}
@@ -214,14 +194,15 @@ bool BookmarksMainMenu::OnMenuItemMiddleClicked(const POINT &pt, bool isCtrlKeyD
 
 bool BookmarksMainMenu::OnMenuItemRightClicked(HMENU menu, int index, const POINT &pt)
 {
-	if (!m_menuInfo.menus.contains(menu))
+	if (!MenuHelper::IsPartOfMenu(m_bookmarksMenu.get(), menu))
 	{
 		return false;
 	}
 
-	auto itr = m_menuInfo.itemPositionMap.find({ menu, index });
+	auto menuItemId = MenuHelper::GetMenuItemIDIncludingSubmenu(menu, index);
+	auto itr = m_menuInfo.itemIdMap.find(menuItemId);
 
-	if (itr == m_menuInfo.itemPositionMap.end())
+	if (itr == m_menuInfo.itemIdMap.end())
 	{
 		// It's valid for the item not to be found, as the bookmarks menu contains several existing
 		// menu items and this class only manages the actual bookmark items on the menu.
