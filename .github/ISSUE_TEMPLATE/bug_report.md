@@ -20,9 +20,6 @@ Steps to reproduce the behavior:
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Crashes**
-Please attach the associated crash dump. This file should be created in %temp% and be named something like Explorer++1.4.0.0-11102020-194414.dmp. Not attaching a crash dump may make it significantly more difficult to diagnose the cause of a crash.
-
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
