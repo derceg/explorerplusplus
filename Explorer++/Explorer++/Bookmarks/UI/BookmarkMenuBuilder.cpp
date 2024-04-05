@@ -155,7 +155,7 @@ BOOL BookmarkMenuBuilder::AddBookmarkToMenu(HMENU menu, BookmarkItem *bookmarkIt
 	BookmarkIconManager &bookmarkIconManager, std::vector<wil::unique_hbitmap> &menuImages,
 	MenuInfo &menuInfo)
 {
-	int id = m_idCounter++;
+	auto id = m_idCounter++;
 
 	if (id >= m_menuIdRange.endId)
 	{

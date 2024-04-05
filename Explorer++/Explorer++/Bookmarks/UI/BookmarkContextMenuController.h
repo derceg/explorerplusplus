@@ -17,7 +17,7 @@ public:
 	BookmarkContextMenuController(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
 		BrowserWindow *browserWindow, CoreInterface *coreInterface);
 
-	void OnMenuItemSelected(int menuItemId, BookmarkItem *targetParentFolder, size_t targetIndex,
+	void OnMenuItemSelected(UINT menuItemId, BookmarkItem *targetParentFolder, size_t targetIndex,
 		const RawBookmarkItems &bookmarkItems, HWND parentWindow);
 
 private:

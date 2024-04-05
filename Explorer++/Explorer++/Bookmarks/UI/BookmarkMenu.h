@@ -30,8 +30,8 @@ public:
 		BookmarkMenuBuilder::IncludePredicate includePredicate = nullptr);
 
 private:
-	static const int MIN_ID = 1;
-	static const int MAX_ID = 1000;
+	static const UINT MIN_ID = 1;
+	static const UINT MAX_ID = 1000;
 
 	LRESULT ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -41,7 +41,7 @@ private:
 	LRESULT OnMenuDrag(HMENU menu, int itemPosition);
 	LRESULT OnMenuGetObject(MENUGETOBJECTINFO *objectInfo);
 
-	void OnMenuItemSelected(int menuItemId, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings);
+	void OnMenuItemSelected(UINT menuItemId, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings);
 
 	HWND m_parentWindow;
 	BookmarkMenuBuilder m_menuBuilder;

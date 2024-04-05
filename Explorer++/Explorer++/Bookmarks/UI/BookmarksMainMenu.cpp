@@ -133,7 +133,7 @@ void BookmarksMainMenu::AddOtherBookmarksToMenu(HMENU menu, const MenuIdRange &m
 	MenuHelper::AddSubMenuItem(menu, otherBookmarksName, std::move(subMenu), position++, TRUE);
 }
 
-std::optional<std::wstring> BookmarksMainMenu::MaybeGetMenuItemHelperText(HMENU menu, int id)
+std::optional<std::wstring> BookmarksMainMenu::MaybeGetMenuItemHelperText(HMENU menu, UINT id)
 {
 	if (!m_menuInfo.menus.contains(menu))
 	{
@@ -151,7 +151,7 @@ std::optional<std::wstring> BookmarksMainMenu::MaybeGetMenuItemHelperText(HMENU 
 	return bookmark->GetLocation();
 }
 
-void BookmarksMainMenu::OnMenuItemClicked(int menuItemId)
+void BookmarksMainMenu::OnMenuItemClicked(UINT menuItemId)
 {
 	auto itr = m_menuInfo.itemIdMap.find(menuItemId);
 

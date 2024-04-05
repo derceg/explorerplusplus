@@ -17,20 +17,23 @@ class TabRestorerUI
 {
 public:
 	TabRestorerUI(HINSTANCE resourceInstance, CoreInterface *coreInterface,
-		TabRestorer *tabRestorer, int menuStartId, int menuEndId);
+		TabRestorer *tabRestorer, UINT menuStartId, UINT menuEndId);
 	~TabRestorerUI();
 
-	void OnMenuItemClicked(int menuItemId);
+	void OnMenuItemClicked(UINT menuItemId);
 
 private:
 	DISALLOW_COPY_AND_ASSIGN(TabRestorerUI);
+
+	// Maps between menu item IDs and closed tab IDs.
+	using IdToClosedTabMap = std::unordered_map<UINT, int>;
 
 	static const int MAX_MENU_ITEMS = 10;
 
 	void OnMainMenuPreShow(HMENU mainMenu);
 	wil::unique_hmenu BuildRecentlyClosedTabsMenu(std::vector<wil::unique_hbitmap> &menuImages,
-		std::unordered_map<int, int> &menuItemMappings);
-	std::optional<std::wstring> MaybeGetMenuItemHelperText(HMENU menu, int id);
+		IdToClosedTabMap &menuItemMappings);
+	std::optional<std::wstring> MaybeGetMenuItemHelperText(HMENU menu, UINT id);
 
 	HINSTANCE m_resourceInstance;
 	CoreInterface *m_coreInterface;
@@ -38,13 +41,13 @@ private:
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	TabRestorer *m_tabRestorer;
-	int m_menuStartId;
-	int m_menuEndId;
+	UINT m_menuStartId;
+	UINT m_menuEndId;
 
 	wil::unique_hmenu m_recentTabsMenu;
 	std::vector<wil::unique_hbitmap> m_menuImages;
 	wil::com_ptr_nothrow<IImageList> m_systemImageList;
 	wil::unique_hbitmap m_defaultFolderIconBitmap;
 
-	std::unordered_map<int, int> m_menuItemMappings;
+	IdToClosedTabMap m_menuItemMappings;
 };

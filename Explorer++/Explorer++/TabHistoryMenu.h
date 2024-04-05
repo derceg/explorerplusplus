@@ -37,8 +37,8 @@ public:
 	void Show(HWND hwnd, const POINT &point);
 
 	// MenuController
-	void OnMenuItemSelected(int menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown) override;
-	void OnMenuItemMiddleClicked(int menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown) override;
+	void OnMenuItemSelected(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown) override;
+	void OnMenuItemMiddleClicked(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown) override;
 
 	const PopupMenuView *GetMenuViewForTesting() const;
 
@@ -47,7 +47,7 @@ private:
 	std::unique_ptr<PopupMenuView> BuildMenu();
 	void AddMenuItemForHistoryEntry(PopupMenuView *menuView, HistoryEntry *entry);
 
-	void NavigateToHistoryEntry(int menuItemId, bool isMiddleButtonDown, bool isCtrlKeyDown,
+	void NavigateToHistoryEntry(UINT menuItemId, bool isMiddleButtonDown, bool isCtrlKeyDown,
 		bool isShiftKeyDown);
 	ShellBrowserInterface *GetShellBrowser() const;
 
@@ -60,5 +60,5 @@ private:
 	std::unique_ptr<PopupMenuView> m_menuView;
 	wil::com_ptr_nothrow<IImageList> m_systemImageList;
 	int m_defaultFolderIconIndex;
-	int m_idCounter = 1;
+	UINT m_idCounter = 1;
 };

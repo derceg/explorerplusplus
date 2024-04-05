@@ -115,7 +115,7 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
 		if (WI_IsFlagClear(HIWORD(wParam), MF_POPUP))
 		{
 			HMENU menu = reinterpret_cast<HMENU>(lParam);
-			int menuItemId = LOWORD(wParam);
+			UINT menuItemId = LOWORD(wParam);
 
 			helperText = m_getMenuItemHelperTextSignal(menu, menuItemId);
 

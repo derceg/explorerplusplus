@@ -19,8 +19,8 @@ public:
 	ApplicationContextMenuController(ApplicationExecutor *applicationExecutor,
 		CoreInterface *coreInterface);
 
-	void OnMenuItemSelected(int menuItemId, ApplicationModel *model, Application *targetApplication,
-		size_t targetIndex, HWND parentWindow);
+	void OnMenuItemSelected(UINT menuItemId, ApplicationModel *model,
+		Application *targetApplication, size_t targetIndex, HWND parentWindow);
 
 private:
 	void OnOpen(const Application *targetApplication);

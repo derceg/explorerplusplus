@@ -51,7 +51,7 @@ void ShellItemsMenu::AddMenuItemForPidl(std::shared_ptr<PopupMenuView> menuView,
 		name = L"(Unknown)";
 	}
 
-	int id = m_idCounter++;
+	auto id = m_idCounter++;
 
 	auto bitmap = GetShellItemIcon(pidl);
 
@@ -103,7 +103,7 @@ wil::unique_hbitmap ShellItemsMenu::GetShellItemIcon(PCIDLIST_ABSOLUTE pidl)
 	return ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), iconIndex);
 }
 
-void ShellItemsMenu::OnIconRetrieved(std::weak_ptr<PopupMenuView> weakMenuView, int menuItemId,
+void ShellItemsMenu::OnIconRetrieved(std::weak_ptr<PopupMenuView> weakMenuView, UINT menuItemId,
 	IImageList *systemImageList, int iconIndex)
 {
 	auto menuView = weakMenuView.lock();
@@ -126,18 +126,18 @@ void ShellItemsMenu::OnIconRetrieved(std::weak_ptr<PopupMenuView> weakMenuView, 
 	menuView->SetBitmapForItem(menuItemId, std::move(bitmap));
 }
 
-void ShellItemsMenu::OnMenuItemSelected(int menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown)
+void ShellItemsMenu::OnMenuItemSelected(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
 	OpenSelectedItem(menuItemId, false, isCtrlKeyDown, isShiftKeyDown);
 }
 
-void ShellItemsMenu::OnMenuItemMiddleClicked(int menuItemId, bool isCtrlKeyDown,
+void ShellItemsMenu::OnMenuItemMiddleClicked(UINT menuItemId, bool isCtrlKeyDown,
 	bool isShiftKeyDown)
 {
 	OpenSelectedItem(menuItemId, true, isCtrlKeyDown, isShiftKeyDown);
 }
 
-void ShellItemsMenu::OpenSelectedItem(int menuItemId, bool isMiddleButtonDown, bool isCtrlKeyDown,
+void ShellItemsMenu::OpenSelectedItem(UINT menuItemId, bool isMiddleButtonDown, bool isCtrlKeyDown,
 	bool isShiftKeyDown)
 {
 	auto &pidl = m_idPidlMap.at(menuItemId);

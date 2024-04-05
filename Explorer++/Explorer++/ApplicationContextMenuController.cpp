@@ -24,7 +24,7 @@ ApplicationContextMenuController::ApplicationContextMenuController(
 {
 }
 
-void ApplicationContextMenuController::OnMenuItemSelected(int menuItemId, ApplicationModel *model,
+void ApplicationContextMenuController::OnMenuItemSelected(UINT menuItemId, ApplicationModel *model,
 	Application *targetApplication, size_t targetIndex, HWND parentWindow)
 {
 	switch (menuItemId)

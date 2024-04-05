@@ -25,8 +25,8 @@ public:
 	void Show(HWND hwnd, const POINT &point);
 
 	// MenuController
-	void OnMenuItemSelected(int menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown) override;
-	void OnMenuItemMiddleClicked(int menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown) override;
+	void OnMenuItemSelected(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown) override;
+	void OnMenuItemMiddleClicked(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown) override;
 
 	const PopupMenuView *GetMenuViewForTesting() const;
 
@@ -35,10 +35,10 @@ private:
 
 	void AddMenuItemForPidl(std::shared_ptr<PopupMenuView> menuView, PCIDLIST_ABSOLUTE pidl);
 	wil::unique_hbitmap GetShellItemIcon(PCIDLIST_ABSOLUTE pidl);
-	static void OnIconRetrieved(std::weak_ptr<PopupMenuView> weakMenuView, int menuItemId,
+	static void OnIconRetrieved(std::weak_ptr<PopupMenuView> weakMenuView, UINT menuItemId,
 		IImageList *systemImageList, int iconIndex);
 
-	void OpenSelectedItem(int menuItemId, bool isMiddleButtonDown, bool isCtrlKeyDown,
+	void OpenSelectedItem(UINT menuItemId, bool isMiddleButtonDown, bool isCtrlKeyDown,
 		bool isShiftKeyDown);
 
 	// The PopupMenuView instance is uniquely owned by this class. The only reason this uses a
@@ -47,7 +47,7 @@ private:
 
 	BrowserWindow *m_browserWindow = nullptr;
 	IconFetcher *m_iconFetcher = nullptr;
-	int m_idCounter = 1;
+	UINT m_idCounter = 1;
 	wil::com_ptr_nothrow<IImageList> m_systemImageList;
 	std::unordered_map<UINT, PidlAbsolute> m_idPidlMap;
 };

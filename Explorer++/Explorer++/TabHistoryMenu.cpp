@@ -76,7 +76,7 @@ std::unique_ptr<PopupMenuView> TabHistoryMenu::BuildMenu()
 
 void TabHistoryMenu::AddMenuItemForHistoryEntry(PopupMenuView *menuView, HistoryEntry *entry)
 {
-	int id = m_idCounter++;
+	auto id = m_idCounter++;
 
 	wil::unique_hbitmap bitmap;
 	auto iconIndex = entry->GetSystemIconIndex();
@@ -94,18 +94,18 @@ void TabHistoryMenu::AddMenuItemForHistoryEntry(PopupMenuView *menuView, History
 	menuView->AppendItem(id, entry->GetDisplayName(), std::move(bitmap));
 }
 
-void TabHistoryMenu::OnMenuItemSelected(int menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown)
+void TabHistoryMenu::OnMenuItemSelected(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown)
 {
 	NavigateToHistoryEntry(menuItemId, false, isCtrlKeyDown, isShiftKeyDown);
 }
 
-void TabHistoryMenu::OnMenuItemMiddleClicked(int menuItemId, bool isCtrlKeyDown,
+void TabHistoryMenu::OnMenuItemMiddleClicked(UINT menuItemId, bool isCtrlKeyDown,
 	bool isShiftKeyDown)
 {
 	NavigateToHistoryEntry(menuItemId, true, isCtrlKeyDown, isShiftKeyDown);
 }
 
-void TabHistoryMenu::NavigateToHistoryEntry(int menuItemId, bool isMiddleButtonDown,
+void TabHistoryMenu::NavigateToHistoryEntry(UINT menuItemId, bool isMiddleButtonDown,
 	bool isCtrlKeyDown, bool isShiftKeyDown)
 {
 	int offset = menuItemId;

@@ -13,7 +13,7 @@
 #include <boost/range/adaptor/sliced.hpp>
 
 TabRestorerUI::TabRestorerUI(HINSTANCE resourceInstance, CoreInterface *coreInterface,
-	TabRestorer *tabRestorer, int menuStartId, int menuEndId) :
+	TabRestorer *tabRestorer, UINT menuStartId, UINT menuEndId) :
 	m_resourceInstance(resourceInstance),
 	m_coreInterface(coreInterface),
 	m_tabRestorer(tabRestorer),
@@ -46,7 +46,7 @@ TabRestorerUI::~TabRestorerUI()
 void TabRestorerUI::OnMainMenuPreShow(HMENU mainMenu)
 {
 	std::vector<wil::unique_hbitmap> menuImages;
-	std::unordered_map<int, int> menuItemMappings;
+	IdToClosedTabMap menuItemMappings;
 	auto recentTabsMenu = BuildRecentlyClosedTabsMenu(menuImages, menuItemMappings);
 
 	MENUITEMINFO mii;
@@ -61,7 +61,7 @@ void TabRestorerUI::OnMainMenuPreShow(HMENU mainMenu)
 }
 
 wil::unique_hmenu TabRestorerUI::BuildRecentlyClosedTabsMenu(
-	std::vector<wil::unique_hbitmap> &menuImages, std::unordered_map<int, int> &menuItemMappings)
+	std::vector<wil::unique_hbitmap> &menuImages, IdToClosedTabMap &menuItemMappings)
 {
 	wil::unique_hmenu menu(CreatePopupMenu());
 
@@ -95,7 +95,7 @@ wil::unique_hmenu TabRestorerUI::BuildRecentlyClosedTabsMenu(
 			menuText += L"\tCtrl+Shift+T";
 		}
 
-		int id = m_menuStartId + numInserted;
+		UINT id = m_menuStartId + numInserted;
 
 		if (id >= m_menuEndId)
 		{
@@ -143,7 +143,7 @@ wil::unique_hmenu TabRestorerUI::BuildRecentlyClosedTabsMenu(
 	return menu;
 }
 
-std::optional<std::wstring> TabRestorerUI::MaybeGetMenuItemHelperText(HMENU menu, int id)
+std::optional<std::wstring> TabRestorerUI::MaybeGetMenuItemHelperText(HMENU menu, UINT id)
 {
 	if (menu != m_recentTabsMenu.get())
 	{
@@ -165,7 +165,7 @@ std::optional<std::wstring> TabRestorerUI::MaybeGetMenuItemHelperText(HMENU menu
 	return currentEntry->fullPathForDisplay;
 }
 
-void TabRestorerUI::OnMenuItemClicked(int menuItemId)
+void TabRestorerUI::OnMenuItemClicked(UINT menuItemId)
 {
 	auto itr = m_menuItemMappings.find(menuItemId);
 

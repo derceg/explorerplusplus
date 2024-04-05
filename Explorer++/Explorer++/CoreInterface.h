@@ -40,7 +40,7 @@ using MainMenuItemMiddleClickedSignal =
 	boost::signals2::signal<bool(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown),
 		FirstSuccessfulRequestCombiner<bool>>;
 using GetMenuItemHelperTextSignal =
-	boost::signals2::signal<std::optional<std::wstring>(HMENU menu, int id),
+	boost::signals2::signal<std::optional<std::wstring>(HMENU menu, UINT id),
 		FirstSuccessfulRequestCombiner<std::optional<std::wstring>>>;
 using ToolbarContextMenuSignal =
 	boost::signals2::signal<void(HMENU menu, HWND sourceWindow, const POINT &pt)>;

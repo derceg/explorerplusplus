@@ -6,8 +6,8 @@
 
 struct MenuIdRange
 {
-	int startId;
-	int endId;
+	UINT startId;
+	UINT endId;
 };
 
 void UpdateMenuAcceleratorStrings(HMENU menu, HACCEL acceleratorTable);

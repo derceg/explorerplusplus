@@ -12,8 +12,8 @@ class MenuController
 public:
 	virtual ~MenuController() = default;
 
-	virtual void OnMenuItemSelected(int menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown) = 0;
-	virtual void OnMenuItemMiddleClicked(int menuItemId, bool isCtrlKeyDown,
+	virtual void OnMenuItemSelected(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown) = 0;
+	virtual void OnMenuItemMiddleClicked(UINT menuItemId, bool isCtrlKeyDown,
 		bool isShiftKeyDown) = 0;
 };
 
@@ -22,7 +22,7 @@ class PopupMenuView
 public:
 	PopupMenuView(MenuController *controller);
 
-	void AppendItem(int id, const std::wstring &text, wil::unique_hbitmap bitmap = nullptr);
+	void AppendItem(UINT id, const std::wstring &text, wil::unique_hbitmap bitmap = nullptr);
 	void SetBitmapForItem(UINT id, wil::unique_hbitmap bitmap);
 	void Show(HWND hwnd, const POINT &point);
 

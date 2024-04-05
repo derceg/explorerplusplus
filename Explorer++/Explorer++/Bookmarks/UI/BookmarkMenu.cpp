@@ -291,7 +291,7 @@ BOOL BookmarkMenu::ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt,
 	m_menuInfo = &menuInfo;
 	m_showingMenu = true;
 
-	int cmd = TrackPopupMenu(menu.get(), TPM_LEFTALIGN | TPM_RETURNCMD, pt.x, pt.y, 0,
+	UINT cmd = TrackPopupMenu(menu.get(), TPM_LEFTALIGN | TPM_RETURNCMD, pt.x, pt.y, 0,
 		m_parentWindow, nullptr);
 
 	m_showingMenu = false;
@@ -306,7 +306,7 @@ BOOL BookmarkMenu::ShowMenu(BookmarkItem *bookmarkItem, const POINT &pt,
 	return TRUE;
 }
 
-void BookmarkMenu::OnMenuItemSelected(int menuItemId,
+void BookmarkMenu::OnMenuItemSelected(UINT menuItemId,
 	BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings)
 {
 	auto itr = menuItemIdMappings.find(menuItemId);

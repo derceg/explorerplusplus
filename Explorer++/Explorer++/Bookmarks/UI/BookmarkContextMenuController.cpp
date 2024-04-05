@@ -22,7 +22,7 @@ BookmarkContextMenuController::BookmarkContextMenuController(BookmarkTree *bookm
 {
 }
 
-void BookmarkContextMenuController::OnMenuItemSelected(int menuItemId,
+void BookmarkContextMenuController::OnMenuItemSelected(UINT menuItemId,
 	BookmarkItem *targetParentFolder, size_t targetIndex, const RawBookmarkItems &bookmarkItems,
 	HWND parentWindow)
 {

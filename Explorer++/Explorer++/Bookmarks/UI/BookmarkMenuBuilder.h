@@ -38,7 +38,7 @@ public:
 
 	// Maps menu item IDs to bookmark items. Note that IDs will only be set for bookmarks (and not
 	// bookmark folders).
-	using ItemIdMap = std::unordered_map<int, BookmarkItem *>;
+	using ItemIdMap = std::unordered_map<UINT, BookmarkItem *>;
 
 	// Maps menu item positions to bookmark items. Works for both bookmarks and bookmark folders.
 	using MenuPositionPair = std::pair<HMENU, int>;
@@ -58,7 +58,7 @@ public:
 		ItemIdMap itemIdMap;
 		ItemPositionMap itemPositionMap;
 
-		int nextMenuId;
+		UINT nextMenuId;
 	};
 
 	BookmarkMenuBuilder(CoreInterface *coreInterface, IconFetcher *iconFetcher,
@@ -88,5 +88,5 @@ private:
 	IconFetcher *m_iconFetcher;
 	HINSTANCE m_resourceInstance;
 	MenuIdRange m_menuIdRange;
-	int m_idCounter;
+	UINT m_idCounter;
 };

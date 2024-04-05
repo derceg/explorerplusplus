@@ -27,7 +27,7 @@ void ApplicationContextMenu::ShowMenu(HWND parentWindow, Application *applicatio
 		LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_APPLICATIONTOOLBAR_MENU)));
 	HMENU menu = GetSubMenu(parentMenu.get(), 0);
 
-	int menuItemId = TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RETURNCMD, ptScreen.x, ptScreen.y, 0,
+	UINT menuItemId = TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RETURNCMD, ptScreen.x, ptScreen.y, 0,
 		parentWindow, nullptr);
 
 	if (menuItemId == 0)

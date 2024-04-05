@@ -13,7 +13,7 @@ PopupMenuView::PopupMenuView(MenuController *controller) :
 {
 }
 
-void PopupMenuView::AppendItem(int id, const std::wstring &text, wil::unique_hbitmap bitmap)
+void PopupMenuView::AppendItem(UINT id, const std::wstring &text, wil::unique_hbitmap bitmap)
 {
 	// The call to TrackPopupMenu() below will return the ID of the item that was selected, with 0
 	// being returned if the menu was canceled, or an error occurred. Therefore, 0 shouldn't be used
