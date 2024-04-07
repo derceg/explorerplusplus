@@ -699,17 +699,8 @@ void MainToolbar::ShowHistoryMenu(TabHistoryMenu::MenuType historyType)
 		button = MainToolbarButton::Forward;
 	}
 
-	RECT rcButton;
-	[[maybe_unused]] auto res =
-		SendMessage(m_hwnd, TB_GETRECT, button, reinterpret_cast<LPARAM>(&rcButton));
-	assert(res);
-
-	POINT pt = { rcButton.left, rcButton.bottom };
-	res = ClientToScreen(m_hwnd, &pt);
-	assert(res);
-
 	TabHistoryMenu menu(m_browserWindow, historyType);
-	menu.Show(m_hwnd, pt);
+	menu.Show(m_hwnd, GetMenuPositionForButton(button));
 }
 
 void MainToolbar::ShowUpNavigationMenu()
@@ -731,38 +722,29 @@ void MainToolbar::ShowUpNavigationMenu()
 	// to the root. In the menu, the root needs to be shown first.
 	std::reverse(parentPidls.begin(), parentPidls.end());
 
-	RECT rcButton;
-	[[maybe_unused]] auto res =
-		SendMessage(m_hwnd, TB_GETRECT, MainToolbarButton::Up, reinterpret_cast<LPARAM>(&rcButton));
-	assert(res);
-
-	POINT pt = { rcButton.left, rcButton.bottom };
-	res = ClientToScreen(m_hwnd, &pt);
-	assert(res);
-
 	ShellItemsMenu menu(parentPidls, m_browserWindow, m_iconFetcher);
-	menu.Show(m_hwnd, pt);
+	menu.Show(m_hwnd, GetMenuPositionForButton(MainToolbarButton::Up));
 }
 
 void MainToolbar::ShowToolbarViewsMenu()
 {
-	POINT ptOrigin;
-	RECT rcButton;
-
-	SendMessage(m_hwnd, TB_GETRECT, (WPARAM) MainToolbarButton::Views, (LPARAM) &rcButton);
-
-	ptOrigin.x = rcButton.left;
-	ptOrigin.y = rcButton.bottom;
-
-	ClientToScreen(m_hwnd, &ptOrigin);
-
-	CreateViewsMenu(&ptOrigin);
+	auto viewsMenu = m_coreInterface->BuildViewsMenu();
+	auto pt = GetMenuPositionForButton(MainToolbarButton::Views);
+	TrackPopupMenu(viewsMenu.get(), TPM_LEFTALIGN, pt.x, pt.y, 0, m_hwnd, nullptr);
 }
 
-void MainToolbar::CreateViewsMenu(POINT *ptOrigin)
+// Returns the position a menu should be anchored at for a particular toolbar button.
+POINT MainToolbar::GetMenuPositionForButton(MainToolbarButton button)
 {
-	auto viewsMenu = m_coreInterface->BuildViewsMenu();
-	TrackPopupMenu(viewsMenu.get(), TPM_LEFTALIGN, ptOrigin->x, ptOrigin->y, 0, m_hwnd, nullptr);
+	RECT rcButton;
+	auto res = SendMessage(m_hwnd, TB_GETRECT, button, reinterpret_cast<LPARAM>(&rcButton));
+	CHECK(res);
+
+	POINT pt = { rcButton.left, rcButton.bottom };
+	res = ClientToScreen(m_hwnd, &pt);
+	CHECK(res);
+
+	return pt;
 }
 
 // For some of the buttons on the toolbar, their state depends on an item from

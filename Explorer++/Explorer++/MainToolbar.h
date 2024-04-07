@@ -76,7 +76,7 @@ private:
 	void ShowHistoryMenu(TabHistoryMenu::MenuType historyType);
 	void ShowUpNavigationMenu();
 	void ShowToolbarViewsMenu();
-	void CreateViewsMenu(POINT *ptOrigin);
+	POINT GetMenuPositionForButton(MainToolbarButton button);
 
 	void OnTabSelected(const Tab &tab);
 	void OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams);
