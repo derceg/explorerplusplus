@@ -129,8 +129,11 @@ void BookmarksMainMenu::AddOtherBookmarksToMenu(HMENU menu, const MenuIdRange &m
 	m_menuBuilder.BuildMenu(m_coreInterface->GetMainWindow(), subMenu.get(), otherBookmarksFolder,
 		menuIdRange, 0, menuImages, menuInfo);
 
-	MenuHelper::AddSubMenuItem(menu, 0, otherBookmarksFolder->GetName(), std::move(subMenu),
-		position++, TRUE);
+	auto otherBookmarksId = menuInfo.nextMenuId++;
+	MenuHelper::AddSubMenuItem(menu, otherBookmarksId, otherBookmarksFolder->GetName(),
+		std::move(subMenu), position++, TRUE);
+	menuInfo.itemIdMap.insert({ otherBookmarksId,
+		{ otherBookmarksFolder, BookmarkMenuBuilder::MenuItemType::BookmarkItem } });
 }
 
 std::optional<std::wstring> BookmarksMainMenu::MaybeGetMenuItemHelperText(HMENU menu, UINT id)

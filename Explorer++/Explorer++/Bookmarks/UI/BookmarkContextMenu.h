@@ -31,8 +31,9 @@ public:
 
 private:
 	void SetUpMenu(HMENU menu, const RawBookmarkItems &bookmarkItems);
-	void SetMenuItemStates(HMENU menu);
+	void SetMenuItemStates(HMENU menu, const RawBookmarkItems &bookmarkItems);
 
+	BookmarkTree *const m_bookmarkTree;
 	HINSTANCE m_resourceInstance;
 	BookmarkContextMenuController m_controller;
 	bool m_showingMenu;

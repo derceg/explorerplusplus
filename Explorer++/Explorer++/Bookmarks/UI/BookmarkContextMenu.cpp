@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Bookmarks/UI/BookmarkContextMenu.h"
 #include "Bookmarks/BookmarkClipboard.h"
+#include "Bookmarks/BookmarkTree.h"
 #include "BrowserWindow.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -14,6 +15,7 @@
 
 BookmarkContextMenu::BookmarkContextMenu(BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
 	BrowserWindow *browserWindow, CoreInterface *coreInterface) :
+	m_bookmarkTree(bookmarkTree),
 	m_resourceInstance(resourceInstance),
 	m_controller(bookmarkTree, resourceInstance, browserWindow, coreInterface),
 	m_showingMenu(false)
@@ -155,11 +157,18 @@ void BookmarkContextMenu::SetUpMenu(HMENU menu, const RawBookmarkItems &bookmark
 		}
 	}
 
-	SetMenuItemStates(menu);
+	SetMenuItemStates(menu, bookmarkItems);
 }
 
-void BookmarkContextMenu::SetMenuItemStates(HMENU menu)
+void BookmarkContextMenu::SetMenuItemStates(HMENU menu, const RawBookmarkItems &bookmarkItems)
 {
+	if ((bookmarkItems.size() == 1) && m_bookmarkTree->IsPermanentNode(bookmarkItems[0]))
+	{
+		MenuHelper::EnableItem(menu, IDM_BOOKMARKS_CUT, false);
+		MenuHelper::EnableItem(menu, IDM_BOOKMARKS_DELETE, false);
+		MenuHelper::EnableItem(menu, IDM_BOOKMARKS_PROPERTIES, false);
+	}
+
 	MenuHelper::EnableItem(menu, IDM_BOOKMARKS_PASTE,
 		IsClipboardFormatAvailable(BookmarkClipboard::GetClipboardFormat()));
 }

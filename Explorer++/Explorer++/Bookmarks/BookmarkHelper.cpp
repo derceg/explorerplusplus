@@ -208,6 +208,12 @@ BookmarkItem *BookmarkHelper::AddBookmarkItem(BookmarkTree *bookmarkTree, Bookma
 void BookmarkHelper::EditBookmarkItem(BookmarkItem *bookmarkItem, BookmarkTree *bookmarkTree,
 	HINSTANCE resourceInstance, HWND parentWindow, CoreInterface *coreInterface)
 {
+	if (bookmarkTree->IsPermanentNode(bookmarkItem))
+	{
+		DCHECK(false);
+		return;
+	}
+
 	BookmarkItem *selectedParentFolder = nullptr;
 	AddBookmarkDialog addBookmarkDialog(resourceInstance, parentWindow, coreInterface, bookmarkTree,
 		bookmarkItem, nullptr, &selectedParentFolder);
