@@ -14,11 +14,17 @@
 ShellItemsMenu::ShellItemsMenu(const std::vector<PidlAbsolute> &pidls, BrowserWindow *browserWindow,
 	IconFetcher *iconFetcher) :
 	m_browserWindow(browserWindow),
-	m_iconFetcher(iconFetcher)
+	m_iconFetcher(iconFetcher),
+	m_destroyed(std::make_shared<bool>(false))
 {
 	FAIL_FAST_IF_FAILED(SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList)));
 
 	m_menuView = BuildMenu(pidls);
+}
+
+ShellItemsMenu::~ShellItemsMenu()
+{
+	*m_destroyed = true;
 }
 
 void ShellItemsMenu::Show(HWND hwnd, const POINT &point)
@@ -26,20 +32,19 @@ void ShellItemsMenu::Show(HWND hwnd, const POINT &point)
 	m_menuView->Show(hwnd, point);
 }
 
-std::shared_ptr<PopupMenuView> ShellItemsMenu::BuildMenu(const std::vector<PidlAbsolute> &pidls)
+std::unique_ptr<PopupMenuView> ShellItemsMenu::BuildMenu(const std::vector<PidlAbsolute> &pidls)
 {
-	auto menu = std::make_shared<PopupMenuView>(this);
+	auto menu = std::make_unique<PopupMenuView>(this);
 
 	for (const auto &pidl : pidls)
 	{
-		AddMenuItemForPidl(menu, pidl.Raw());
+		AddMenuItemForPidl(menu.get(), pidl.Raw());
 	}
 
 	return menu;
 }
 
-void ShellItemsMenu::AddMenuItemForPidl(std::shared_ptr<PopupMenuView> menuView,
-	PCIDLIST_ABSOLUTE pidl)
+void ShellItemsMenu::AddMenuItemForPidl(PopupMenuView *menuView, PCIDLIST_ABSOLUTE pidl)
 {
 	std::wstring name;
 	HRESULT hr = GetDisplayName(pidl, SHGDN_NORMAL, name);
@@ -60,9 +65,17 @@ void ShellItemsMenu::AddMenuItemForPidl(std::shared_ptr<PopupMenuView> menuView,
 	// closed, the menu item will be updated. It's still useful even if the menu is closed
 	// first, since the updated icon will be cached.
 	m_iconFetcher->QueueIconTask(pidl,
-		[weakMenuView = std::weak_ptr<PopupMenuView>(menuView), id,
-			systemImageList = m_systemImageList](int iconIndex)
-		{ OnIconRetrieved(weakMenuView, id, systemImageList.get(), iconIndex); });
+		[this, destroyed = m_destroyed, id](int iconIndex)
+		{
+			if (*destroyed)
+			{
+				// The icon can be returned after the menu has been closed. In that case, there's
+				// nothing that needs to be done.
+				return;
+			}
+
+			OnIconRetrieved(id, iconIndex);
+		});
 
 	menuView->AppendItem(id, name, std::move(bitmap));
 
@@ -103,19 +116,9 @@ wil::unique_hbitmap ShellItemsMenu::GetShellItemIcon(PCIDLIST_ABSOLUTE pidl)
 	return ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), iconIndex);
 }
 
-void ShellItemsMenu::OnIconRetrieved(std::weak_ptr<PopupMenuView> weakMenuView, UINT menuItemId,
-	IImageList *systemImageList, int iconIndex)
+void ShellItemsMenu::OnIconRetrieved(UINT menuItemId, int iconIndex)
 {
-	auto menuView = weakMenuView.lock();
-
-	if (!menuView)
-	{
-		// The icon can be returned after the menu has been closed. In that case, there's
-		// nothing that needs to be done.
-		return;
-	}
-
-	auto bitmap = ImageHelper::ImageListIconToBitmap(systemImageList, iconIndex);
+	auto bitmap = ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), iconIndex);
 
 	if (!bitmap)
 	{
@@ -123,7 +126,7 @@ void ShellItemsMenu::OnIconRetrieved(std::weak_ptr<PopupMenuView> weakMenuView, 
 		return;
 	}
 
-	menuView->SetBitmapForItem(menuItemId, std::move(bitmap));
+	m_menuView->SetBitmapForItem(menuItemId, std::move(bitmap));
 }
 
 void ShellItemsMenu::OnMenuItemSelected(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown)

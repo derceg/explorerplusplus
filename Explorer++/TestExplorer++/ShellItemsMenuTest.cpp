@@ -5,12 +5,40 @@
 #include "pch.h"
 #include "ShellItemsMenu.h"
 #include "BrowserWindow.h"
-#include "IconFetcherMock.h"
+#include "IconFetcher.h"
 #include "../Helper/ShellHelper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 using namespace testing;
+
+namespace
+{
+
+void AddPathToCollection(std::vector<PidlAbsolute> &pidls, const std::wstring &path)
+{
+	unique_pidl_absolute pidl(SHSimpleIDListFromPath(path.c_str()));
+	ASSERT_NE(pidl, nullptr);
+	pidls.push_back(pidl.get());
+}
+
+std::wstring GetNameForItem(size_t index)
+{
+	return L"Fake" + std::to_wstring(index);
+}
+
+std::vector<PidlAbsolute> BuildPidlCollection(int size)
+{
+	std::vector<PidlAbsolute> pidls;
+
+	for (int i = 0; i < size; i++)
+	{
+		auto path = L"C:\\" + GetNameForItem(i);
+		AddPathToCollection(pidls, path);
+	}
+
+	return pidls;
+}
 
 class BrowserWindowMock : public BrowserWindow
 {
@@ -27,7 +55,94 @@ public:
 		(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition), (override));
 };
 
+class IconFetcherFake : public IconFetcher
+{
+public:
+	// IconFetcher
+	void QueueIconTask(std::wstring_view path, Callback callback) override
+	{
+		m_resultCallbacks.push_back(callback);
+	}
+
+	void QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback) override
+	{
+		m_resultCallbacks.push_back(callback);
+	}
+
+	void ClearQueue() override
+	{
+	}
+
+	int GetCachedIconIndexOrDefault(const std::wstring &itemPath,
+		DefaultIconType defaultIconType) const override
+	{
+		return 0;
+	}
+
+	std::optional<int> GetCachedIconIndex(const std::wstring &itemPath) const override
+	{
+		return std::nullopt;
+	}
+
+	// IconFetcherFake custom methods
+	void TriggerPendingResultCallbacks()
+	{
+		for (const auto &callback : m_resultCallbacks)
+		{
+			callback(0);
+		}
+
+		m_resultCallbacks.clear();
+	}
+
+private:
+	std::vector<Callback> m_resultCallbacks;
+};
+
+}
+
 class ShellItemsMenuTest : public Test
+{
+protected:
+	std::unique_ptr<ShellItemsMenu> BuildMenu(const std::vector<PidlAbsolute> &pidls)
+	{
+		return std::make_unique<ShellItemsMenu>(pidls, &m_browserWindow, &m_iconFetcher);
+	}
+
+	BrowserWindowMock m_browserWindow;
+	IconFetcherFake m_iconFetcher;
+};
+
+TEST_F(ShellItemsMenuTest, CheckItems)
+{
+	auto pidls = BuildPidlCollection(3);
+	auto menu = BuildMenu(pidls);
+
+	auto menuView = menu->GetMenuViewForTesting();
+
+	ASSERT_EQ(menuView->GetItemCountForTesting(), pidls.size());
+
+	for (size_t i = 0; i < pidls.size(); i++)
+	{
+		EXPECT_EQ(
+			menuView->GetItemTextForTesting(menuView->GetItemIdForTesting(static_cast<int>(i))),
+			GetNameForItem(i));
+	}
+}
+
+TEST_F(ShellItemsMenuTest, IconRetrievalAfterMenuDestroyed)
+{
+	auto pidls = BuildPidlCollection(3);
+	auto menu = BuildMenu(pidls);
+
+	menu.reset();
+
+	// If one or more icons are retrieved after the menu has been closed and destroyed, the menu
+	// can't be updated, but that should still be a safe operation.
+	m_iconFetcher.TriggerPendingResultCallbacks();
+}
+
+class ShellItemsMenuSelectionTest : public Test
 {
 protected:
 	enum class SelectionType
@@ -36,13 +151,10 @@ protected:
 		MiddleClick
 	};
 
-	ShellItemsMenuTest() : m_pidls(GetPidls()), m_menu(m_pidls, &m_browserWindow, &m_iconFetcher)
+	ShellItemsMenuSelectionTest() :
+		m_pidls(BuildPidlCollection(3)),
+		m_menu(m_pidls, &m_browserWindow, &m_iconFetcher)
 	{
-	}
-
-	std::wstring GetNameForItem(size_t index) const
-	{
-		return L"Fake" + std::to_wstring(index);
 	}
 
 	void TestSelection(SelectionType selectionType)
@@ -53,32 +165,7 @@ protected:
 		}
 	}
 
-	std::vector<PidlAbsolute> m_pidls;
-	BrowserWindowMock m_browserWindow;
-	IconFetcherMock m_iconFetcher;
-	ShellItemsMenu m_menu;
-
 private:
-	std::vector<PidlAbsolute> GetPidls() const
-	{
-		std::vector<PidlAbsolute> pidls;
-
-		for (int i = 0; i < 3; i++)
-		{
-			auto path = L"C:\\" + GetNameForItem(i);
-			AddPath(pidls, path);
-		}
-
-		return pidls;
-	}
-
-	void AddPath(std::vector<PidlAbsolute> &pidls, const std::wstring &path) const
-	{
-		unique_pidl_absolute pidl(SHSimpleIDListFromPath(path.c_str()));
-		ASSERT_NE(pidl, nullptr);
-		pidls.push_back(pidl.get());
-	}
-
 	void TestSelectionForItem(size_t index, SelectionType selectionType)
 	{
 		auto disposition = (selectionType == SelectionType::Click)
@@ -103,23 +190,14 @@ private:
 				false, false);
 		}
 	}
+
+	std::vector<PidlAbsolute> m_pidls;
+	BrowserWindowMock m_browserWindow;
+	IconFetcherFake m_iconFetcher;
+	ShellItemsMenu m_menu;
 };
 
-TEST_F(ShellItemsMenuTest, CheckItems)
-{
-	auto menuView = m_menu.GetMenuViewForTesting();
-
-	EXPECT_EQ(menuView->GetItemCountForTesting(), m_pidls.size());
-
-	for (size_t i = 0; i < m_pidls.size(); i++)
-	{
-		EXPECT_EQ(
-			menuView->GetItemTextForTesting(menuView->GetItemIdForTesting(static_cast<int>(i))),
-			GetNameForItem(i));
-	}
-}
-
-TEST_F(ShellItemsMenuTest, Selection)
+TEST_F(ShellItemsMenuSelectionTest, Selection)
 {
 	TestSelection(SelectionType::Click);
 	TestSelection(SelectionType::MiddleClick);
