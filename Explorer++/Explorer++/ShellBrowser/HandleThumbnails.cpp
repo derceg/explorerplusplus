@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "ShellBrowser.h"
+#include "ShellBrowserImpl.h"
 #include "ItemData.h"
 #include "ViewModes.h"
 #include <wil/com.h>
@@ -13,7 +13,7 @@
 #define THUMBNAIL_TYPE_ICON 0
 #define THUMBNAIL_TYPE_EXTRACTED 1
 
-void ShellBrowser::SetupThumbnailsView()
+void ShellBrowserImpl::SetupThumbnailsView()
 {
 	HIMAGELIST himl;
 	LVITEM lvItem;
@@ -49,7 +49,7 @@ void ShellBrowser::SetupThumbnailsView()
 	m_bThumbnailsSetup = TRUE;
 }
 
-void ShellBrowser::RemoveThumbnailsView()
+void ShellBrowserImpl::RemoveThumbnailsView()
 {
 	LVITEM lvItem;
 	HIMAGELIST himl;
@@ -78,7 +78,7 @@ void ShellBrowser::RemoveThumbnailsView()
 	m_bThumbnailsSetup = FALSE;
 }
 
-void ShellBrowser::QueueThumbnailTask(int internalIndex)
+void ShellBrowserImpl::QueueThumbnailTask(int internalIndex)
 {
 	int thumbnailResultID = m_thumbnailResultIDCounter++;
 
@@ -110,7 +110,7 @@ void ShellBrowser::QueueThumbnailTask(int internalIndex)
 	m_thumbnailResults.insert({ thumbnailResultID, std::move(result) });
 }
 
-std::optional<int> ShellBrowser::GetCachedThumbnailIndex(const ItemInfo_t &itemInfo)
+std::optional<int> ShellBrowserImpl::GetCachedThumbnailIndex(const ItemInfo_t &itemInfo)
 {
 	auto bitmap =
 		GetThumbnail(itemInfo.pidlComplete.get(), WTS_INCACHEONLY | WTS_SCALETOREQUESTEDSIZE);
@@ -123,7 +123,7 @@ std::optional<int> ShellBrowser::GetCachedThumbnailIndex(const ItemInfo_t &itemI
 	return GetExtractedThumbnail(bitmap.get());
 }
 
-wil::unique_hbitmap ShellBrowser::GetThumbnail(PIDLIST_ABSOLUTE pidl, WTS_FLAGS flags)
+wil::unique_hbitmap ShellBrowserImpl::GetThumbnail(PIDLIST_ABSOLUTE pidl, WTS_FLAGS flags)
 {
 	wil::com_ptr_nothrow<IShellItem> shellItem;
 	HRESULT hr = SHCreateItemFromIDList(pidl, IID_PPV_ARGS(&shellItem));
@@ -165,7 +165,7 @@ wil::unique_hbitmap ShellBrowser::GetThumbnail(PIDLIST_ABSOLUTE pidl, WTS_FLAGS 
 		reinterpret_cast<HBITMAP>(CopyImage(bitmap, IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR)));
 }
 
-void ShellBrowser::ProcessThumbnailResult(int thumbnailResultId)
+void ShellBrowserImpl::ProcessThumbnailResult(int thumbnailResultId)
 {
 	auto itr = m_thumbnailResults.find(thumbnailResultId);
 
@@ -205,18 +205,18 @@ void ShellBrowser::ProcessThumbnailResult(int thumbnailResultId)
 }
 
 /* Draws a thumbnail based on an items icon. */
-int ShellBrowser::GetIconThumbnail(int iInternalIndex) const
+int ShellBrowserImpl::GetIconThumbnail(int iInternalIndex) const
 {
 	return GetThumbnailInternal(THUMBNAIL_TYPE_ICON, iInternalIndex, nullptr);
 }
 
 /* Draws an items extracted thumbnail. */
-int ShellBrowser::GetExtractedThumbnail(HBITMAP hThumbnailBitmap) const
+int ShellBrowserImpl::GetExtractedThumbnail(HBITMAP hThumbnailBitmap) const
 {
 	return GetThumbnailInternal(THUMBNAIL_TYPE_EXTRACTED, 0, hThumbnailBitmap);
 }
 
-int ShellBrowser::GetThumbnailInternal(int iType, int iInternalIndex,
+int ShellBrowserImpl::GetThumbnailInternal(int iType, int iInternalIndex,
 	HBITMAP hThumbnailBitmap) const
 {
 	HDC hdc;
@@ -267,7 +267,7 @@ int ShellBrowser::GetThumbnailInternal(int iType, int iInternalIndex,
 	return iImage;
 }
 
-void ShellBrowser::DrawIconThumbnailInternal(HDC hdcBacking, int iInternalIndex) const
+void ShellBrowserImpl::DrawIconThumbnailInternal(HDC hdcBacking, int iInternalIndex) const
 {
 	HICON hIcon;
 	SHFILEINFO shfi;
@@ -286,7 +286,7 @@ void ShellBrowser::DrawIconThumbnailInternal(HDC hdcBacking, int iInternalIndex)
 	DestroyIcon(hIcon);
 }
 
-void ShellBrowser::DrawThumbnailInternal(HDC hdcBacking, HBITMAP hThumbnailBitmap) const
+void ShellBrowserImpl::DrawThumbnailInternal(HDC hdcBacking, HBITMAP hThumbnailBitmap) const
 {
 	HDC hdcThumbnail;
 	HBITMAP hThumbnailBitmapOld;

@@ -23,7 +23,7 @@
 #include "ItemNameEditControl.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/ShellNavigator.h"
 #include "ShellTreeNode.h"
@@ -1760,7 +1760,7 @@ void ShellTreeView::UpdateItemState(HTREEITEM item, UINT stateMask, UINT state)
 	assert(res);
 }
 
-ShellBrowser *ShellTreeView::GetSelectedShellBrowser() const
+ShellBrowserImpl *ShellTreeView::GetSelectedShellBrowser() const
 {
 	return m_browserWindow->GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser();
 }

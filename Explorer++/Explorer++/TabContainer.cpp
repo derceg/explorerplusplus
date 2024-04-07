@@ -14,7 +14,7 @@
 #include "RenameTabDialog.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/PreservedHistoryEntry.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "SystemFontHelper.h"
 #include "TabBacking.h"
@@ -884,7 +884,7 @@ Tab &TabContainer::CreateNewTab(const std::wstring &directory, const TabSettings
 
 Tab &TabContainer::CreateNewTab(const PreservedTab &preservedTab)
 {
-	auto shellBrowser = ShellBrowser::CreateFromPreserved(m_coreInterface->GetMainWindow(),
+	auto shellBrowser = ShellBrowserImpl::CreateFromPreserved(m_coreInterface->GetMainWindow(),
 		m_embedder, m_coreInterface, m_tabNavigation, m_fileActionHandler, preservedTab.history,
 		preservedTab.currentEntry, preservedTab.preservedFolderState);
 	auto tabTemp = std::make_unique<Tab>(preservedTab, shellBrowser);
@@ -914,7 +914,7 @@ Tab &TabContainer::CreateNewTab(NavigateParams &navigateParams, const TabSetting
 		folderSettingsFinal = m_coreInterface->GetConfig()->defaultFolderSettings;
 	}
 
-	auto shellBrowser = ShellBrowser::CreateNew(m_coreInterface->GetMainWindow(), m_embedder,
+	auto shellBrowser = ShellBrowserImpl::CreateNew(m_coreInterface->GetMainWindow(), m_embedder,
 		m_coreInterface, m_tabNavigation, m_fileActionHandler, folderSettingsFinal, initialColumns);
 	auto tabTemp = std::make_unique<Tab>(shellBrowser);
 	auto item = m_tabs.insert({ tabTemp->GetId(), std::move(tabTemp) });

@@ -10,7 +10,7 @@
 #include "stdafx.h"
 #include "IDropFilesCallback.h"
 #include "CoreInterface.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include <list>
 
 DropFilesCallback::DropFilesCallback(CoreInterface *coreInterface) :

@@ -16,7 +16,7 @@
 #include "MainToolbar.h"
 #include "Plugins/PluginManager.h"
 #include "ResourceHelper.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/ViewModes.h"
 #include "ShellTreeView/ShellTreeView.h"
@@ -789,8 +789,9 @@ void Explorerplusplus::CopyColumnInfoToClipboard()
 		if (column.checked)
 		{
 			TCHAR szText[64];
-			LoadString(m_resourceInstance, ShellBrowser::LookupColumnNameStringIndex(column.type),
-				szText, SIZEOF_ARRAY(szText));
+			LoadString(m_resourceInstance,
+				ShellBrowserImpl::LookupColumnNameStringIndex(column.type), szText,
+				SIZEOF_ARRAY(szText));
 
 			strColumnInfo += std::wstring(szText) + _T("\t");
 
@@ -1071,7 +1072,7 @@ HWND Explorerplusplus::GetMainWindow() const
 	return m_hContainer;
 }
 
-ShellBrowser *Explorerplusplus::GetActiveShellBrowser() const
+ShellBrowserImpl *Explorerplusplus::GetActiveShellBrowser() const
 {
 	return m_pActiveShellBrowser;
 }

@@ -11,7 +11,7 @@
 #include <sol/forward.hpp>
 
 class CoreInterface;
-class ShellBrowser;
+class ShellBrowserImpl;
 class TabContainer;
 struct TabSettings;
 
@@ -31,7 +31,7 @@ public:
 		bool showInGroups;
 		bool showHidden;
 
-		FolderSettings(const ShellBrowser &shellBrowser);
+		FolderSettings(const ShellBrowserImpl &shellBrowser);
 		std::wstring toString();
 	};
 

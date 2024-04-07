@@ -4,19 +4,19 @@
 
 #pragma once
 
-#include "ShellBrowserInterface.h"
+#include "ShellBrowser.h"
 
 class ShellBrowserHelperBase
 {
 public:
-	ShellBrowserHelperBase(ShellBrowserInterface *shellBrowser);
+	ShellBrowserHelperBase(ShellBrowser *shellBrowser);
 	virtual ~ShellBrowserHelperBase() = default;
 
 protected:
-	ShellBrowserInterface *GetShellBrowser() const;
+	ShellBrowser *GetShellBrowser() const;
 
 private:
-	ShellBrowserInterface *m_shellBrowser = nullptr;
+	ShellBrowser *m_shellBrowser = nullptr;
 };
 
 // By inheriting from this class, an object can provide functionality that's tied to an individual
@@ -27,13 +27,13 @@ class ShellBrowserHelper : public ShellBrowserHelperBase
 {
 public:
 	template <typename... Args>
-	static void CreateAndAttachToShellBrowser(ShellBrowserInterface *shellBrowser, Args &&...args)
+	static void CreateAndAttachToShellBrowser(ShellBrowser *shellBrowser, Args &&...args)
 	{
 		shellBrowser->AddHelper(
 			std::make_unique<Derived>(shellBrowser, std::forward<Args>(args)...));
 	}
 
-	ShellBrowserHelper(ShellBrowserInterface *shellBrowser) : ShellBrowserHelperBase(shellBrowser)
+	ShellBrowserHelper(ShellBrowser *shellBrowser) : ShellBrowserHelperBase(shellBrowser)
 	{
 	}
 };

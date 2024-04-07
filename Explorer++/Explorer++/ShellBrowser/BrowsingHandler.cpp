@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "ShellBrowser.h"
+#include "ShellBrowserImpl.h"
 #include "Config.h"
 #include "DocumentServiceProvider.h"
 #include "HistoryEntry.h"
@@ -24,7 +24,7 @@
 #include <propvarutil.h>
 #include <list>
 
-HRESULT ShellBrowser::Navigate(NavigateParams &navigateParams)
+HRESULT ShellBrowserImpl::Navigate(NavigateParams &navigateParams)
 {
 	SetCursor(LoadCursor(nullptr, IDC_WAIT));
 
@@ -46,7 +46,7 @@ HRESULT ShellBrowser::Navigate(NavigateParams &navigateParams)
 	return hr;
 }
 
-void ShellBrowser::PrepareToChangeFolders()
+void ShellBrowserImpl::PrepareToChangeFolders()
 {
 	if (m_bFolderVisited)
 	{
@@ -67,7 +67,7 @@ void ShellBrowser::PrepareToChangeFolders()
 	}
 }
 
-void ShellBrowser::ClearPendingResults()
+void ShellBrowserImpl::ClearPendingResults()
 {
 	m_columnThreadPool.clear_queue();
 	m_columnResults.clear();
@@ -81,7 +81,7 @@ void ShellBrowser::ClearPendingResults()
 	m_infoTipResults.clear();
 }
 
-void ShellBrowser::ResetFolderState()
+void ShellBrowserImpl::ResetFolderState()
 {
 	/* If we're in thumbnails view, destroy the current
 	imagelist, and create a new one. */
@@ -110,7 +110,7 @@ void ShellBrowser::ResetFolderState()
 	m_renamedItemOldPidl.reset();
 }
 
-void ShellBrowser::StoreCurrentlySelectedItems()
+void ShellBrowserImpl::StoreCurrentlySelectedItems()
 {
 	auto *entry = m_navigationController->GetCurrentEntry();
 
@@ -123,8 +123,8 @@ void ShellBrowser::StoreCurrentlySelectedItems()
 	entry->SetSelectedItems(selectedItems);
 }
 
-HRESULT ShellBrowser::PerformEnumeration(NavigateParams &navigateParams,
-	std::vector<ShellBrowser::ItemInfo_t> &items)
+HRESULT ShellBrowserImpl::PerformEnumeration(NavigateParams &navigateParams,
+	std::vector<ShellBrowserImpl::ItemInfo_t> &items)
 {
 	// Note that although standard shortcuts (.lnk files) are currently handled outside this class,
 	// symlinks and virtual link objects aren't, so they will be handled here.
@@ -176,8 +176,8 @@ HRESULT ShellBrowser::PerformEnumeration(NavigateParams &navigateParams,
 	return S_OK;
 }
 
-HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owner, bool showHidden,
-	std::vector<ShellBrowser::ItemInfo_t> &items)
+HRESULT ShellBrowserImpl::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owner,
+	bool showHidden, std::vector<ShellBrowserImpl::ItemInfo_t> &items)
 {
 	wil::com_ptr_nothrow<IShellFolder> shellFolder;
 	RETURN_IF_FAILED(BindToIdl(pidlDirectory, IID_PPV_ARGS(&shellFolder)));
@@ -206,7 +206,7 @@ HRESULT ShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory, HWND owne
 	return S_OK;
 }
 
-void ShellBrowser::NotifyShellOfNavigation(PCIDLIST_ABSOLUTE pidl)
+void ShellBrowserImpl::NotifyShellOfNavigation(PCIDLIST_ABSOLUTE pidl)
 {
 	if (m_config->replaceExplorerMode == +DefaultFileManager::ReplaceExplorerMode::None)
 	{
@@ -231,7 +231,7 @@ void ShellBrowser::NotifyShellOfNavigation(PCIDLIST_ABSOLUTE pidl)
 	m_shellWindows->OnNavigate(m_shellWindowCookie.get(), &pidlVariant);
 }
 
-HRESULT ShellBrowser::RegisterShellWindowIfNecessary(PCIDLIST_ABSOLUTE pidl)
+HRESULT ShellBrowserImpl::RegisterShellWindowIfNecessary(PCIDLIST_ABSOLUTE pidl)
 {
 	if (m_shellWindowRegistered)
 	{
@@ -267,7 +267,7 @@ HRESULT ShellBrowser::RegisterShellWindowIfNecessary(PCIDLIST_ABSOLUTE pidl)
 // A similar process also occurs when simply searching for an existing shell window. For example, if
 // the user double clicks the recycle bin icon on the desktop, any existing recycle bin window will
 // be brought to the foreground if present.
-HRESULT ShellBrowser::RegisterShellWindow(PCIDLIST_ABSOLUTE pidl)
+HRESULT ShellBrowserImpl::RegisterShellWindow(PCIDLIST_ABSOLUTE pidl)
 {
 	if (!m_shellWindows)
 	{
@@ -337,7 +337,7 @@ HRESULT ShellBrowser::RegisterShellWindow(PCIDLIST_ABSOLUTE pidl)
 	return S_OK;
 }
 
-std::optional<int> ShellBrowser::AddItemInternal(IShellFolder *shellFolder,
+std::optional<int> ShellBrowserImpl::AddItemInternal(IShellFolder *shellFolder,
 	PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild, int itemIndex, BOOL setPosition)
 {
 	auto itemInfo = GetItemInformation(shellFolder, pidlDirectory, pidlChild);
@@ -350,7 +350,7 @@ std::optional<int> ShellBrowser::AddItemInternal(IShellFolder *shellFolder,
 	return AddItemInternal(itemIndex, std::move(*itemInfo), setPosition);
 }
 
-int ShellBrowser::AddItemInternal(int itemIndex, ItemInfo_t itemInfo, BOOL setPosition)
+int ShellBrowserImpl::AddItemInternal(int itemIndex, ItemInfo_t itemInfo, BOOL setPosition)
 {
 	int itemId = GenerateUniqueItemId();
 	m_itemInfoMap.insert({ itemId, std::move(itemInfo) });
@@ -376,8 +376,8 @@ int ShellBrowser::AddItemInternal(int itemIndex, ItemInfo_t itemInfo, BOOL setPo
 	return itemId;
 }
 
-std::optional<ShellBrowser::ItemInfo_t> ShellBrowser::GetItemInformation(IShellFolder *shellFolder,
-	PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild)
+std::optional<ShellBrowserImpl::ItemInfo_t> ShellBrowserImpl::GetItemInformation(
+	IShellFolder *shellFolder, PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild)
 {
 	ItemInfo_t itemInfo;
 
@@ -482,7 +482,7 @@ std::optional<ShellBrowser::ItemInfo_t> ShellBrowser::GetItemInformation(IShellF
 	return std::move(itemInfo);
 }
 
-HRESULT ShellBrowser::ExtractFindDataUsingPropertyStore(IShellFolder *shellFolder,
+HRESULT ShellBrowserImpl::ExtractFindDataUsingPropertyStore(IShellFolder *shellFolder,
 	PCITEMID_CHILD pidlChild, WIN32_FIND_DATA &output)
 {
 	wil::com_ptr_nothrow<IPropertyStoreFactory> factory;
@@ -529,7 +529,7 @@ HRESULT ShellBrowser::ExtractFindDataUsingPropertyStore(IShellFolder *shellFolde
 	return hr;
 }
 
-void ShellBrowser::OnEnumerationCompleted(std::vector<ShellBrowser::ItemInfo_t> &&items,
+void ShellBrowserImpl::OnEnumerationCompleted(std::vector<ShellBrowserImpl::ItemInfo_t> &&items,
 	const NavigateParams &navigateParams)
 {
 	for (auto &item : items)
@@ -579,7 +579,7 @@ void ShellBrowser::OnEnumerationCompleted(std::vector<ShellBrowser::ItemInfo_t> 
 	m_navigationCompletedSignal(navigateParams);
 }
 
-void ShellBrowser::InsertAwaitingItems()
+void ShellBrowserImpl::InsertAwaitingItems()
 {
 	int nPrevItems = ListView_GetItemCount(m_hListView);
 
@@ -734,7 +734,7 @@ void ShellBrowser::InsertAwaitingItems()
 	}
 }
 
-BOOL ShellBrowser::IsFileFiltered(const ItemInfo_t &itemInfo) const
+BOOL ShellBrowserImpl::IsFileFiltered(const ItemInfo_t &itemInfo) const
 {
 	BOOL bHideSystemFile = FALSE;
 	BOOL bFilenameFiltered = FALSE;
@@ -754,7 +754,7 @@ BOOL ShellBrowser::IsFileFiltered(const ItemInfo_t &itemInfo) const
 	return bFilenameFiltered || bHideSystemFile;
 }
 
-void ShellBrowser::RemoveItem(int iItemInternal)
+void ShellBrowserImpl::RemoveItem(int iItemInternal)
 {
 	ULARGE_INTEGER ulFileSize;
 	LVFINDINFO lvfi;
@@ -804,32 +804,32 @@ void ShellBrowser::RemoveItem(int iItemInternal)
 	m_directoryState.numItems--;
 }
 
-ShellNavigationController *ShellBrowser::GetNavigationController() const
+ShellNavigationController *ShellBrowserImpl::GetNavigationController() const
 {
 	return m_navigationController.get();
 }
 
-boost::signals2::connection ShellBrowser::AddNavigationStartedObserver(
+boost::signals2::connection ShellBrowserImpl::AddNavigationStartedObserver(
 	const NavigationStartedSignal::slot_type &observer, boost::signals2::connect_position position)
 {
 	return m_navigationStartedSignal.connect(observer, position);
 }
 
-boost::signals2::connection ShellBrowser::AddNavigationCommittedObserver(
+boost::signals2::connection ShellBrowserImpl::AddNavigationCommittedObserver(
 	const NavigationCommittedSignal::slot_type &observer,
 	boost::signals2::connect_position position)
 {
 	return m_navigationCommittedSignal.connect(observer, position);
 }
 
-boost::signals2::connection ShellBrowser::AddNavigationCompletedObserver(
+boost::signals2::connection ShellBrowserImpl::AddNavigationCompletedObserver(
 	const NavigationCompletedSignal::slot_type &observer,
 	boost::signals2::connect_position position)
 {
 	return m_navigationCompletedSignal.connect(observer, position);
 }
 
-boost::signals2::connection ShellBrowser::AddNavigationFailedObserver(
+boost::signals2::connection ShellBrowserImpl::AddNavigationFailedObserver(
 	const NavigationFailedSignal::slot_type &observer, boost::signals2::connect_position position)
 {
 	return m_navigationFailedSignal.connect(observer, position);

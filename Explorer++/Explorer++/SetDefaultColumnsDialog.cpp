@@ -6,7 +6,7 @@
 #include "SetDefaultColumnsDialog.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
@@ -262,8 +262,9 @@ void SetDefaultColumnsDialog::SetupFolderColumns(FolderType folderType)
 	for (const auto &column : columns)
 	{
 		TCHAR szText[64];
-		LoadString(GetResourceInstance(), ShellBrowser::LookupColumnNameStringIndex(column.type),
-			szText, SIZEOF_ARRAY(szText));
+		LoadString(GetResourceInstance(),
+			ShellBrowserImpl::LookupColumnNameStringIndex(column.type), szText,
+			SIZEOF_ARRAY(szText));
 
 		LVITEM lvItem;
 		lvItem.mask = LVIF_TEXT | LVIF_PARAM;
@@ -326,7 +327,8 @@ void SetDefaultColumnsDialog::OnLvnItemChanged(NMLISTVIEW *pnmlv)
 		auto columnType =
 			ColumnType::_from_integral_nothrow(static_cast<ColumnType::_integral>(lvItem.lParam));
 		CHECK(columnType);
-		int iDescriptionStringIndex = ShellBrowser::LookupColumnDescriptionStringIndex(*columnType);
+		int iDescriptionStringIndex =
+			ShellBrowserImpl::LookupColumnDescriptionStringIndex(*columnType);
 
 		TCHAR szColumnDescription[128];
 		LoadString(GetResourceInstance(), iDescriptionStringIndex, szColumnDescription,

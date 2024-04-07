@@ -9,7 +9,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "TabContainer.h"
 

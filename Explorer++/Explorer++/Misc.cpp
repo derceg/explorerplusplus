@@ -10,7 +10,7 @@
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "SelectColumnsDialog.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "TabContainer.h"
 #include "TabStorage.h"

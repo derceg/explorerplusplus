@@ -5,12 +5,12 @@
 #include "stdafx.h"
 #include "ShellBrowserHelper.h"
 
-ShellBrowserHelperBase::ShellBrowserHelperBase(ShellBrowserInterface *shellBrowser) :
+ShellBrowserHelperBase::ShellBrowserHelperBase(ShellBrowser *shellBrowser) :
 	m_shellBrowser(shellBrowser)
 {
 }
 
-ShellBrowserInterface *ShellBrowserHelperBase::GetShellBrowser() const
+ShellBrowser *ShellBrowserHelperBase::GetShellBrowser() const
 {
 	return m_shellBrowser;
 }

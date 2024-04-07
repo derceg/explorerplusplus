@@ -4,9 +4,9 @@
 
 #include "stdafx.h"
 #include "PreservedFolderState.h"
-#include "ShellBrowser.h"
+#include "ShellBrowserImpl.h"
 
-PreservedFolderState::PreservedFolderState(const ShellBrowser *shellBrowser) :
+PreservedFolderState::PreservedFolderState(const ShellBrowserImpl *shellBrowser) :
 	folderSettings(shellBrowser->GetFolderSettings())
 {
 }

@@ -7,7 +7,7 @@
 #include "BrowserPane.h"
 #include "BrowserWindow.h"
 #include "MainResource.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "Tab.h"
 #include "TabContainer.h"
@@ -18,7 +18,7 @@ BrowserCommandController::BrowserCommandController(BrowserWindow *browserWindow)
 {
 }
 
-BrowserCommandController::BrowserCommandController(ShellBrowserInterface *shellBrowser) :
+BrowserCommandController::BrowserCommandController(ShellBrowser *shellBrowser) :
 	m_testShellBrowser(shellBrowser)
 {
 }
@@ -184,7 +184,7 @@ void BrowserCommandController::GoToKnownFolder(REFKNOWNFOLDERID knownFolderId,
 	m_browserWindow->OpenItem(pidl.get(), disposition);
 }
 
-ShellBrowserInterface *BrowserCommandController::GetSelectedShellBrowser() const
+ShellBrowser *BrowserCommandController::GetSelectedShellBrowser() const
 {
 	if (m_testShellBrowser)
 	{

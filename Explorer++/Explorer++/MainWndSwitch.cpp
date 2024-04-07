@@ -25,7 +25,7 @@
 #include "MainToolbarButtons.h"
 #include "MenuRanges.h"
 #include "ModelessDialogs.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
 #include "TabBacking.h"

@@ -8,13 +8,13 @@
 #include "CoreInterface.h"
 #include "Plugins/TabsApi/TabProperties.h"
 #include "ShellBrowser/FolderSettings.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/SortModes.h"
 #include "TabContainer.h"
 #include <sol/sol.hpp>
 
-Plugins::TabsApi::FolderSettings::FolderSettings(const ShellBrowser &shellBrowser)
+Plugins::TabsApi::FolderSettings::FolderSettings(const ShellBrowserImpl &shellBrowser)
 {
 	sortMode = shellBrowser.GetSortMode();
 	groupMode = shellBrowser.GetGroupMode();

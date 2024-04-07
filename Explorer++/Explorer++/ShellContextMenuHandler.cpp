@@ -7,7 +7,7 @@
 #include "Config.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellTreeView/ShellTreeView.h"
 #include "SortMenuBuilder.h"
 #include "Tab.h"

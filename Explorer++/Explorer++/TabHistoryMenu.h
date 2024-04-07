@@ -12,7 +12,7 @@
 
 class BrowserWindow;
 class HistoryEntry;
-class ShellBrowserInterface;
+class ShellBrowser;
 
 // Displays a set of history entries for the current tab, with the name and icon of each entry being
 // displayed. An entry can be both clicked (which will cause the current tab to navigate
@@ -32,7 +32,7 @@ public:
 	// This constructor is only used in tests. Although not ideal, it means that BrowserWindow and a
 	// series of other classes don't have to be mocked, when the intent is to provide a specific
 	// ShellBrowserInterface instance.
-	TabHistoryMenu(ShellBrowserInterface *shellBrowser, MenuType type);
+	TabHistoryMenu(ShellBrowser *shellBrowser, MenuType type);
 
 	void Show(HWND hwnd, const POINT &point);
 
@@ -49,12 +49,12 @@ private:
 
 	void NavigateToHistoryEntry(UINT menuItemId, bool isMiddleButtonDown, bool isCtrlKeyDown,
 		bool isShiftKeyDown);
-	ShellBrowserInterface *GetShellBrowser() const;
+	ShellBrowser *GetShellBrowser() const;
 
 	BrowserWindow *m_browserWindow = nullptr;
 
 	// Only used in tests.
-	ShellBrowserInterface *m_testShellBrowser = nullptr;
+	ShellBrowser *m_testShellBrowser = nullptr;
 
 	const MenuType m_type;
 	std::unique_ptr<PopupMenuView> m_menuView;

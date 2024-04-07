@@ -3,10 +3,10 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "ShellBrowser.h"
+#include "ShellBrowserImpl.h"
 #include "Config.h"
 
-void ShellBrowser::InsertTileViewColumns()
+void ShellBrowserImpl::InsertTileViewColumns()
 {
 	LVCOLUMN lvColumn;
 	lvColumn.mask = 0;
@@ -28,7 +28,7 @@ void ShellBrowser::InsertTileViewColumns()
 	ListView_SetTileViewInfo(m_hListView, &lvtvi);
 }
 
-void ShellBrowser::SetTileViewInfo()
+void ShellBrowserImpl::SetTileViewInfo()
 {
 	LVITEM lvItem;
 	BOOL bRes;
@@ -52,7 +52,7 @@ void ShellBrowser::SetTileViewInfo()
 }
 
 /* TODO: Make this function configurable. */
-void ShellBrowser::SetTileViewItemInfo(int iItem, int iItemInternal)
+void ShellBrowserImpl::SetTileViewItemInfo(int iItem, int iItemInternal)
 {
 	SHFILEINFO shfi;
 	LVTILEINFO lvti;

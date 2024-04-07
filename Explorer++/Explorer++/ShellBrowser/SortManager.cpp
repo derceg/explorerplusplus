@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "ShellBrowser.h"
+#include "ShellBrowserImpl.h"
 #include "Config.h"
 #include "ItemData.h"
 #include "SortHelper.h"
@@ -12,7 +12,7 @@
 #include <propkey.h>
 #include <cassert>
 
-void ShellBrowser::SortFolder()
+void ShellBrowserImpl::SortFolder()
 {
 	SendMessage(m_hListView, LVM_SORTITEMS, reinterpret_cast<WPARAM>(this),
 		reinterpret_cast<LPARAM>(SortStub));
@@ -23,14 +23,14 @@ void ShellBrowser::SortFolder()
 	}
 }
 
-int CALLBACK ShellBrowser::SortStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
+int CALLBACK ShellBrowserImpl::SortStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 {
-	auto *pShellBrowser = reinterpret_cast<ShellBrowser *>(lParamSort);
+	auto *pShellBrowser = reinterpret_cast<ShellBrowserImpl *>(lParamSort);
 	return pShellBrowser->Sort(static_cast<int>(lParam1), static_cast<int>(lParam2));
 }
 
 /* Also see NBookmarkHelper::Sort. */
-int CALLBACK ShellBrowser::Sort(int InternalIndex1, int InternalIndex2) const
+int CALLBACK ShellBrowserImpl::Sort(int InternalIndex1, int InternalIndex2) const
 {
 	int comparisonResult = 0;
 

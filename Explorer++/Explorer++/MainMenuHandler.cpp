@@ -20,7 +20,7 @@
 #include "ScriptingDialog.h"
 #include "SearchDialog.h"
 #include "SearchTabsDialog.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "SplitFileDialog.h"
 #include "TabContainer.h"

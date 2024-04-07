@@ -3,16 +3,16 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "ShellBrowser.h"
+#include "ShellBrowserImpl.h"
 #include "MainResource.h"
 #include "../Helper/ListViewHelper.h"
 
-std::wstring ShellBrowser::GetFilterText() const
+std::wstring ShellBrowserImpl::GetFilterText() const
 {
 	return m_folderSettings.filter;
 }
 
-void ShellBrowser::SetFilterText(std::wstring_view filter)
+void ShellBrowserImpl::SetFilterText(std::wstring_view filter)
 {
 	m_folderSettings.filter = filter;
 
@@ -23,29 +23,29 @@ void ShellBrowser::SetFilterText(std::wstring_view filter)
 	}
 }
 
-void ShellBrowser::SetFilterApplied(bool filter)
+void ShellBrowserImpl::SetFilterApplied(bool filter)
 {
 	m_folderSettings.applyFilter = filter;
 
 	UpdateFiltering();
 }
 
-bool ShellBrowser::IsFilterApplied() const
+bool ShellBrowserImpl::IsFilterApplied() const
 {
 	return m_folderSettings.applyFilter;
 }
 
-void ShellBrowser::SetFilterCaseSensitive(bool filterCaseSensitive)
+void ShellBrowserImpl::SetFilterCaseSensitive(bool filterCaseSensitive)
 {
 	m_folderSettings.filterCaseSensitive = filterCaseSensitive;
 }
 
-bool ShellBrowser::GetFilterCaseSensitive() const
+bool ShellBrowserImpl::GetFilterCaseSensitive() const
 {
 	return m_folderSettings.filterCaseSensitive;
 }
 
-void ShellBrowser::UpdateFiltering()
+void ShellBrowserImpl::UpdateFiltering()
 {
 	if (m_folderSettings.applyFilter)
 	{
@@ -57,7 +57,7 @@ void ShellBrowser::UpdateFiltering()
 	}
 }
 
-void ShellBrowser::RemoveFilteredItems()
+void ShellBrowserImpl::RemoveFilteredItems()
 {
 	if (!m_folderSettings.applyFilter)
 	{
@@ -83,7 +83,7 @@ void ShellBrowser::RemoveFilteredItems()
 	SendMessage(m_hOwner, WM_USER_UPDATEWINDOWS, 0, 0);
 }
 
-void ShellBrowser::RemoveFilteredItem(int iItem, int iItemInternal)
+void ShellBrowserImpl::RemoveFilteredItem(int iItem, int iItemInternal)
 {
 	ULARGE_INTEGER ulFileSize;
 
@@ -113,7 +113,7 @@ void ShellBrowser::RemoveFilteredItem(int iItem, int iItemInternal)
 	m_directoryState.filteredItemsList.insert(iItemInternal);
 }
 
-BOOL ShellBrowser::IsFilenameFiltered(const TCHAR *FileName) const
+BOOL ShellBrowserImpl::IsFilenameFiltered(const TCHAR *FileName) const
 {
 	if (CheckWildcardMatch(m_folderSettings.filter.c_str(), FileName,
 			m_folderSettings.filterCaseSensitive))
@@ -124,7 +124,7 @@ BOOL ShellBrowser::IsFilenameFiltered(const TCHAR *FileName) const
 	return TRUE;
 }
 
-void ShellBrowser::UnfilterAllItems()
+void ShellBrowserImpl::UnfilterAllItems()
 {
 	for (int internalIndex : m_directoryState.filteredItemsList)
 	{
@@ -135,7 +135,7 @@ void ShellBrowser::UnfilterAllItems()
 	SendMessage(m_hOwner, WM_USER_UPDATEWINDOWS, 0, 0);
 }
 
-void ShellBrowser::UnfilterItem(int internalIndex)
+void ShellBrowserImpl::UnfilterItem(int internalIndex)
 {
 	assert(m_directoryState.filteredItemsList.count(internalIndex) == 1);
 
@@ -144,7 +144,7 @@ void ShellBrowser::UnfilterItem(int internalIndex)
 	SendMessage(m_hOwner, WM_USER_UPDATEWINDOWS, 0, 0);
 }
 
-void ShellBrowser::RestoreFilteredItem(int internalIndex)
+void ShellBrowserImpl::RestoreFilteredItem(int internalIndex)
 {
 	int sortedPosition = DetermineItemSortedPosition(internalIndex);
 

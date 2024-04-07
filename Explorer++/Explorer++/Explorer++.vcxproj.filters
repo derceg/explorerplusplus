@@ -265,7 +265,7 @@
     <ClCompile Include="ShellBrowser\SortHelper.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
-    <ClCompile Include="ShellBrowser\ShellBrowser.cpp">
+    <ClCompile Include="ShellBrowser\ShellBrowserImpl.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
     <ClCompile Include="ShellBrowser\TileView.cpp">
@@ -882,7 +882,7 @@
     <ClInclude Include="ShellBrowser\SortHelper.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="ShellBrowser\ShellBrowser.h">
+    <ClInclude Include="ShellBrowser\ShellBrowserImpl.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
     <ClInclude Include="ValueWrapper.h">
@@ -1236,7 +1236,7 @@
     <ClInclude Include="BrowserWindow.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="ShellBrowser\ShellBrowserInterface.h">
+    <ClInclude Include="ShellBrowser\ShellBrowser.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
     <ClInclude Include="OneShotTimerManager.h">

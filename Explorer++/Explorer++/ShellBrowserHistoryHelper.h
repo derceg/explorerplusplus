@@ -9,7 +9,7 @@
 class ShellBrowserHistoryHelper : public ShellBrowserHelper<ShellBrowserHistoryHelper>
 {
 public:
-	ShellBrowserHistoryHelper(ShellBrowserInterface *shellBrowser);
+	ShellBrowserHistoryHelper(ShellBrowser *shellBrowser);
 
 private:
 	void OnNavigationCommitted(const NavigateParams &navigateParams);

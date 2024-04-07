@@ -7,12 +7,12 @@
 #include "FolderSettings.h"
 #include "../Helper/Macros.h"
 
-class ShellBrowser;
+class ShellBrowserImpl;
 
 struct PreservedFolderState
 {
 public:
-	PreservedFolderState(const ShellBrowser *shellBrowser);
+	PreservedFolderState(const ShellBrowserImpl *shellBrowser);
 
 	FolderSettings folderSettings;
 

@@ -23,7 +23,7 @@ class CachedIcons;
 struct Config;
 class CoreInterface;
 class FileActionHandler;
-class ShellBrowser;
+class ShellBrowserImpl;
 class ShellTreeNode;
 
 class ShellTreeView : public ShellDropTargetWindow<HTREEITEM>, public FileContextMenuHandler
@@ -220,7 +220,7 @@ private:
 	bool TestItemAttributes(ShellTreeNode *node, SFGAOF attributes);
 	void UpdateItemState(HTREEITEM item, UINT stateMask, UINT state);
 
-	ShellBrowser *GetSelectedShellBrowser() const;
+	ShellBrowserImpl *GetSelectedShellBrowser() const;
 
 	void OnApplicationShuttingDown();
 

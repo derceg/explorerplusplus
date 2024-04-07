@@ -8,7 +8,7 @@
 #include "BrowserWindow.h"
 #include "NavigationHelper.h"
 #include "ShellBrowser/HistoryEntry.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "Tab.h"
 #include "TabContainer.h"
@@ -22,7 +22,7 @@ TabHistoryMenu::TabHistoryMenu(BrowserWindow *browserWindow, MenuType type) :
 	Initialize();
 }
 
-TabHistoryMenu::TabHistoryMenu(ShellBrowserInterface *shellBrowser, MenuType type) :
+TabHistoryMenu::TabHistoryMenu(ShellBrowser *shellBrowser, MenuType type) :
 	m_testShellBrowser(shellBrowser),
 	m_type(type)
 {
@@ -139,7 +139,7 @@ void TabHistoryMenu::NavigateToHistoryEntry(UINT menuItemId, bool isMiddleButton
 	shellBrowser->GetNavigationController()->GoToOffset(offset);
 }
 
-ShellBrowserInterface *TabHistoryMenu::GetShellBrowser() const
+ShellBrowser *TabHistoryMenu::GetShellBrowser() const
 {
 	if (m_testShellBrowser)
 	{

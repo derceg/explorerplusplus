@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ShellBrowser/ShellBrowserInterface.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/ShellHelper.h"
 
 class IconFetcher;
@@ -12,7 +12,7 @@ struct PreservedHistoryEntry;
 class ShellNavigationController;
 class TabNavigationInterface;
 
-class ShellBrowserFake : public ShellBrowserInterface
+class ShellBrowserFake : public ShellBrowser
 {
 public:
 	ShellBrowserFake(TabNavigationInterface *tabNavigation, IconFetcher *iconFetcher,

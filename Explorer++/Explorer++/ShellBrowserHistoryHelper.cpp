@@ -7,7 +7,7 @@
 #include "HistoryService.h"
 #include "HistoryServiceFactory.h"
 
-ShellBrowserHistoryHelper::ShellBrowserHistoryHelper(ShellBrowserInterface *shellBrowser) :
+ShellBrowserHistoryHelper::ShellBrowserHistoryHelper(ShellBrowser *shellBrowser) :
 	ShellBrowserHelper(shellBrowser)
 {
 	// There's no need to explicitly remove this observer, since this object is tied to the

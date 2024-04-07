@@ -4,10 +4,10 @@
 
 #include "stdafx.h"
 #include "NewMenuClient.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include <glog/logging.h>
 
-NewMenuClient::NewMenuClient(ShellBrowser *shellBrowser) : m_shellBrowser(shellBrowser)
+NewMenuClient::NewMenuClient(ShellBrowserImpl *shellBrowser) : m_shellBrowser(shellBrowser)
 {
 }
 

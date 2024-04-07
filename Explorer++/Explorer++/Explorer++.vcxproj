@@ -1150,7 +1150,7 @@
     <ClCompile Include="ShellBrowser\GroupManager.cpp" />
     <ClCompile Include="ShellBrowser\HandleThumbnails.cpp" />
     <ClCompile Include="ShellBrowser\DropTarget.cpp" />
-    <ClCompile Include="ShellBrowser\ShellBrowser.cpp" />
+    <ClCompile Include="ShellBrowser\ShellBrowserImpl.cpp" />
     <ClCompile Include="ShellBrowser\ListView.cpp" />
     <ClCompile Include="ShellBrowser\SortHelper.cpp" />
     <ClCompile Include="ShellBrowser\SortManager.cpp" />
@@ -1272,7 +1272,7 @@
     <ClInclude Include="ShellBrowserHistoryHelper.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserEmbedder.h" />
     <ClInclude Include="ShellBrowser\ShellBrowserHelper.h" />
-    <ClInclude Include="ShellBrowser\ShellBrowserInterface.h" />
+    <ClInclude Include="ShellBrowser\ShellBrowser.h" />
     <ClInclude Include="ShellEnumerator.h" />
     <ClInclude Include="ShellItemsMenu.h" />
     <ClInclude Include="SystemFontHelper.h" />
@@ -1398,7 +1398,7 @@
     <ClInclude Include="ShellBrowser\ShellNavigator.h" />
     <ClInclude Include="ShellBrowser\PreservedFolderState.h" />
     <ClInclude Include="ShellBrowser\PreservedHistoryEntry.h" />
-    <ClInclude Include="ShellBrowser\ShellBrowser.h" />
+    <ClInclude Include="ShellBrowser\ShellBrowserImpl.h" />
     <ClInclude Include="ShellBrowser\ItemData.h" />
     <ClInclude Include="ShellBrowser\SortHelper.h" />
     <ClInclude Include="ShellBrowser\SortModes.h" />

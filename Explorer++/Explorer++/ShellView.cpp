@@ -4,10 +4,10 @@
 
 #include "stdafx.h"
 #include "ShellView.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabNavigationInterface.h"
 
-ShellView::ShellView(std::weak_ptr<ShellBrowser> shellBrowserWeak,
+ShellView::ShellView(std::weak_ptr<ShellBrowserImpl> shellBrowserWeak,
 	TabNavigationInterface *tabNavigation, bool switchToTabOnSelect) :
 	m_shellBrowserWeak(shellBrowserWeak),
 	m_tabNavigation(tabNavigation),

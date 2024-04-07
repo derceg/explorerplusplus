@@ -14,7 +14,7 @@
 #include "MainRebarStorage.h"
 #include "MainToolbar.h"
 #include "MainToolbarStorage.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainer.h"
 #include "TabRegistryStorage.h"
 #include "TabStorage.h"

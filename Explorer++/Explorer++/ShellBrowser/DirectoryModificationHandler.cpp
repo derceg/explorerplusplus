@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "ShellBrowser.h"
+#include "ShellBrowserImpl.h"
 #include "Config.h"
 #include "ItemData.h"
 #include "ShellNavigationController.h"
@@ -13,7 +13,7 @@
 #include "../Helper/ShellHelper.h"
 #include <list>
 
-void ShellBrowser::StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl)
+void ShellBrowserImpl::StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl)
 {
 	// Shouldn't be monitoring the same directory with both directory modification notifications and
 	// shell change notifications.
@@ -47,7 +47,7 @@ void ShellBrowser::StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl)
 	}
 }
 
-void ShellBrowser::ProcessShellChangeNotifications(
+void ShellBrowserImpl::ProcessShellChangeNotifications(
 	const std::vector<ShellChangeNotification> &shellChangeNotifications)
 {
 	SendMessage(m_hListView, WM_SETREDRAW, FALSE, NULL);
@@ -62,7 +62,7 @@ void ShellBrowser::ProcessShellChangeNotifications(
 	directoryModified.m_signal();
 }
 
-void ShellBrowser::ProcessShellChangeNotification(const ShellChangeNotification &change)
+void ShellBrowserImpl::ProcessShellChangeNotification(const ShellChangeNotification &change)
 {
 	switch (change.event)
 	{
@@ -104,7 +104,7 @@ void ShellBrowser::ProcessShellChangeNotification(const ShellChangeNotification 
 			// through. A pending task is created instead, which will be processed via the message
 			// loop.
 			AddTaskToPendingWorkQueue(
-				std::bind_front(&ShellBrowser::RefreshDirectoryAfterUpdate, this));
+				std::bind_front(&ShellBrowserImpl::RefreshDirectoryAfterUpdate, this));
 		}
 		else if (ILIsParent(change.pidl1.get(), m_directoryState.pidlDirectory.get(), false))
 		{
@@ -112,8 +112,8 @@ void ShellBrowser::ProcessShellChangeNotification(const ShellChangeNotification 
 			// because a parent was renamed or removed). A navigation to a parent item may be
 			// required. It's also possible an unrelated item was updated, in which case no action
 			// will be taken by the task below.
-			AddTaskToPendingWorkQueue(
-				std::bind_front(&ShellBrowser::NavigateUpToClosestExistingItemIfNecessary, this));
+			AddTaskToPendingWorkQueue(std::bind_front(
+				&ShellBrowserImpl::NavigateUpToClosestExistingItemIfNecessary, this));
 		}
 		break;
 
@@ -134,14 +134,14 @@ void ShellBrowser::ProcessShellChangeNotification(const ShellChangeNotification 
 			// The current folder has been deleted, either directly, or by deleting one of its
 			// parents. That makes it necessary to navigate to another folder. For similarity with
 			// Explorer, a navigation to a parent will occur.
-			AddTaskToPendingWorkQueue(
-				std::bind_front(&ShellBrowser::NavigateUpToClosestExistingItemIfNecessary, this));
+			AddTaskToPendingWorkQueue(std::bind_front(
+				&ShellBrowserImpl::NavigateUpToClosestExistingItemIfNecessary, this));
 		}
 		break;
 	}
 }
 
-void ShellBrowser::DirectoryAltered()
+void ShellBrowserImpl::DirectoryAltered()
 {
 	EnterCriticalSection(&m_csDirectoryAltered);
 
@@ -224,7 +224,8 @@ void CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 	SendMessage(hwnd, WM_USER_FILESADDED, idEvent, 0);
 }
 
-void ShellBrowser::FilesModified(DWORD Action, const TCHAR *FileName, int EventId, int iFolderIndex)
+void ShellBrowserImpl::FilesModified(DWORD Action, const TCHAR *FileName, int EventId,
+	int iFolderIndex)
 {
 	EnterCriticalSection(&m_csDirectoryAltered);
 
@@ -241,7 +242,7 @@ void ShellBrowser::FilesModified(DWORD Action, const TCHAR *FileName, int EventI
 	LeaveCriticalSection(&m_csDirectoryAltered);
 }
 
-void ShellBrowser::OnItemAdded(PCIDLIST_ABSOLUTE simplePidl)
+void ShellBrowserImpl::OnItemAdded(PCIDLIST_ABSOLUTE simplePidl)
 {
 	auto existingItemInternalIndex = GetItemInternalIndexForPidl(simplePidl);
 
@@ -280,7 +281,7 @@ void ShellBrowser::OnItemAdded(PCIDLIST_ABSOLUTE simplePidl)
 	AddItem(pidl);
 }
 
-void ShellBrowser::AddItem(PCIDLIST_ABSOLUTE pidl)
+void ShellBrowserImpl::AddItem(PCIDLIST_ABSOLUTE pidl)
 {
 	wil::com_ptr_nothrow<IShellFolder> shellFolder;
 	PCITEMID_CHILD pidlChild = nullptr;
@@ -322,7 +323,7 @@ void ShellBrowser::AddItem(PCIDLIST_ABSOLUTE pidl)
 	InsertAwaitingItems();
 }
 
-void ShellBrowser::OnItemRemoved(PCIDLIST_ABSOLUTE simplePidl)
+void ShellBrowserImpl::OnItemRemoved(PCIDLIST_ABSOLUTE simplePidl)
 {
 	auto internalIndex = GetItemInternalIndexForPidl(simplePidl);
 
@@ -332,7 +333,7 @@ void ShellBrowser::OnItemRemoved(PCIDLIST_ABSOLUTE simplePidl)
 	}
 }
 
-void ShellBrowser::OnItemModified(PCIDLIST_ABSOLUTE simplePidl)
+void ShellBrowserImpl::OnItemModified(PCIDLIST_ABSOLUTE simplePidl)
 {
 	unique_pidl_absolute pidlFull;
 	HRESULT hr = SimplePidlToFullPidl(simplePidl, wil::out_param(pidlFull));
@@ -357,7 +358,7 @@ void ShellBrowser::OnItemModified(PCIDLIST_ABSOLUTE simplePidl)
 // When an item is modified, the name shouldn't change, so that does mean that there is at least one
 // difference between the two update types. However, handling both updates in a single method is
 // better than having two very similar methods.
-void ShellBrowser::UpdateItem(PCIDLIST_ABSOLUTE pidl, PCIDLIST_ABSOLUTE updatedPidl)
+void ShellBrowserImpl::UpdateItem(PCIDLIST_ABSOLUTE pidl, PCIDLIST_ABSOLUTE updatedPidl)
 {
 	auto internalIndex = GetItemInternalIndexForPidl(pidl);
 
@@ -464,7 +465,8 @@ void ShellBrowser::UpdateItem(PCIDLIST_ABSOLUTE pidl, PCIDLIST_ABSOLUTE updatedP
 	itemIndex.reset();
 }
 
-void ShellBrowser::OnItemRenamed(PCIDLIST_ABSOLUTE simplePidlOld, PCIDLIST_ABSOLUTE simplePidlNew)
+void ShellBrowserImpl::OnItemRenamed(PCIDLIST_ABSOLUTE simplePidlOld,
+	PCIDLIST_ABSOLUTE simplePidlNew)
 {
 	// When an item is updated, the WIN32_FIND_DATA information cached in the pidl will be
 	// retrieved. As the simple pidl won't contain this information, it's important to convert the
@@ -496,7 +498,7 @@ void ShellBrowser::OnItemRenamed(PCIDLIST_ABSOLUTE simplePidlOld, PCIDLIST_ABSOL
 	UpdateItem(simplePidlOld, pidlNew);
 }
 
-void ShellBrowser::InvalidateAllColumnsForItem(int itemIndex)
+void ShellBrowserImpl::InvalidateAllColumnsForItem(int itemIndex)
 {
 	if (m_folderSettings.viewMode != +ViewMode::Details)
 	{
@@ -512,7 +514,7 @@ void ShellBrowser::InvalidateAllColumnsForItem(int itemIndex)
 	}
 }
 
-void ShellBrowser::InvalidateIconForItem(int itemIndex)
+void ShellBrowserImpl::InvalidateIconForItem(int itemIndex)
 {
 	LVITEM lvItem;
 	lvItem.mask = LVIF_IMAGE;
@@ -522,7 +524,7 @@ void ShellBrowser::InvalidateIconForItem(int itemIndex)
 	ListView_SetItem(m_hListView, &lvItem);
 }
 
-void ShellBrowser::OnCurrentDirectoryRenamed(PCIDLIST_ABSOLUTE simplePidlUpdated)
+void ShellBrowserImpl::OnCurrentDirectoryRenamed(PCIDLIST_ABSOLUTE simplePidlUpdated)
 {
 	unique_pidl_absolute fullPidlUpdated;
 	HRESULT hr = SimplePidlToFullPidl(simplePidlUpdated, wil::out_param(fullPidlUpdated));
@@ -536,14 +538,14 @@ void ShellBrowser::OnCurrentDirectoryRenamed(PCIDLIST_ABSOLUTE simplePidlUpdated
 	}
 }
 
-void ShellBrowser::RefreshDirectoryAfterUpdate()
+void ShellBrowserImpl::RefreshDirectoryAfterUpdate()
 {
 	m_navigationController->Refresh();
 }
 
 // Navigates to the closest ancestor of this item that exists. If this item itself exists, no
 // navigation will occur.
-void ShellBrowser::NavigateUpToClosestExistingItemIfNecessary()
+void ShellBrowserImpl::NavigateUpToClosestExistingItemIfNecessary()
 {
 	auto closestExistingItemPidl = GetClosestExistingItem(m_directoryState.pidlDirectory.get());
 
@@ -568,7 +570,7 @@ void ShellBrowser::NavigateUpToClosestExistingItemIfNecessary()
 
 // Traverses up from the current item, to find the first item that exists (which might be the item
 // itself).
-unique_pidl_absolute ShellBrowser::GetClosestExistingItem(PCIDLIST_ABSOLUTE pidl)
+unique_pidl_absolute ShellBrowserImpl::GetClosestExistingItem(PCIDLIST_ABSOLUTE pidl)
 {
 	unique_pidl_absolute currentPidl(ILCloneFull(pidl));
 
@@ -587,7 +589,7 @@ unique_pidl_absolute ShellBrowser::GetClosestExistingItem(PCIDLIST_ABSOLUTE pidl
 	return nullptr;
 }
 
-bool ShellBrowser::DoesItemExist(PCIDLIST_ABSOLUTE pidl)
+bool ShellBrowserImpl::DoesItemExist(PCIDLIST_ABSOLUTE pidl)
 {
 	wil::com_ptr_nothrow<IShellItem> shellItem;
 	HRESULT hr = SHCreateItemFromIDList(pidl, IID_PPV_ARGS(&shellItem));

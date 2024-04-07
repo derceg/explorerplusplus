@@ -8,13 +8,13 @@
 #include "CoreInterface.h"
 #include "PreservedTab.h"
 #include "ShellBrowser/FolderSettings.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include <wil/resource.h>
 
 int Tab::idCounter = 1;
 
-Tab::Tab(std::shared_ptr<ShellBrowser> shellBrowser) :
+Tab::Tab(std::shared_ptr<ShellBrowserImpl> shellBrowser) :
 	m_id(idCounter++),
 	m_useCustomName(false),
 	m_lockState(LockState::NotLocked),
@@ -27,7 +27,7 @@ Tab::Tab(std::shared_ptr<ShellBrowser> shellBrowser) :
 	}
 }
 
-Tab::Tab(const PreservedTab &preservedTab, std::shared_ptr<ShellBrowser> shellBrowser) :
+Tab::Tab(const PreservedTab &preservedTab, std::shared_ptr<ShellBrowserImpl> shellBrowser) :
 	m_id(idCounter++),
 	m_useCustomName(preservedTab.useCustomName),
 	m_customName(preservedTab.customName),
@@ -45,14 +45,14 @@ int Tab::GetId() const
 	return m_id;
 }
 
-ShellBrowser *Tab::GetShellBrowser() const
+ShellBrowserImpl *Tab::GetShellBrowser() const
 {
 	return m_shellBrowser.get();
 }
 
-std::weak_ptr<ShellBrowser> Tab::GetShellBrowserWeak() const
+std::weak_ptr<ShellBrowserImpl> Tab::GetShellBrowserWeak() const
 {
-	return std::weak_ptr<ShellBrowser>(m_shellBrowser);
+	return std::weak_ptr<ShellBrowserImpl>(m_shellBrowser);
 }
 
 // If a custom name has been set, that will be returned. Otherwise, the

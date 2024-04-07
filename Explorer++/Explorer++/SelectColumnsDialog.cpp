@@ -8,7 +8,7 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/Columns.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
@@ -18,7 +18,7 @@
 const TCHAR SelectColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SelectColumns");
 
 SelectColumnsDialog::SelectColumnsDialog(HINSTANCE resourceInstance, HWND hParent,
-	ShellBrowser *shellBrowser, IconResourceLoader *iconResourceLoader) :
+	ShellBrowserImpl *shellBrowser, IconResourceLoader *iconResourceLoader) :
 	ThemedDialog(resourceInstance, IDD_SELECTCOLUMNS, hParent, DialogSizingType::Both),
 	m_shellBrowser(shellBrowser),
 	m_iconResourceLoader(iconResourceLoader),
@@ -46,7 +46,7 @@ INT_PTR SelectColumnsDialog::OnInitDialog()
 	for (const auto &column : currentColumns)
 	{
 		std::wstring text = ResourceHelper::LoadString(GetResourceInstance(),
-			ShellBrowser::LookupColumnNameStringIndex(column.type));
+			ShellBrowserImpl::LookupColumnNameStringIndex(column.type));
 
 		LVITEM lvItem;
 		lvItem.mask = LVIF_TEXT | LVIF_PARAM;
@@ -96,11 +96,11 @@ bool SelectColumnsDialog::CompareColumns(const Column_t &column1, const Column_t
 	}
 
 	TCHAR column1Text[64];
-	LoadString(GetResourceInstance(), ShellBrowser::LookupColumnNameStringIndex(column1.type),
+	LoadString(GetResourceInstance(), ShellBrowserImpl::LookupColumnNameStringIndex(column1.type),
 		column1Text, SIZEOF_ARRAY(column1Text));
 
 	TCHAR column2Text[64];
-	LoadString(GetResourceInstance(), ShellBrowser::LookupColumnNameStringIndex(column2.type),
+	LoadString(GetResourceInstance(), ShellBrowserImpl::LookupColumnNameStringIndex(column2.type),
 		column2Text, SIZEOF_ARRAY(column2Text));
 
 	int ret = StrCmpLogicalW(column1Text, column2Text);
@@ -291,7 +291,8 @@ void SelectColumnsDialog::OnLvnItemChanged(const NMLISTVIEW *pnmlv)
 		auto columnType =
 			ColumnType::_from_integral_nothrow(static_cast<ColumnType::_integral>(lvItem.lParam));
 		CHECK(columnType);
-		int iDescriptionStringIndex = ShellBrowser::LookupColumnDescriptionStringIndex(*columnType);
+		int iDescriptionStringIndex =
+			ShellBrowserImpl::LookupColumnDescriptionStringIndex(*columnType);
 
 		TCHAR szColumnDescription[128];
 		LoadString(GetResourceInstance(), iDescriptionStringIndex, szColumnDescription,

@@ -81,7 +81,7 @@ BrowserPane *Explorerplusplus::GetActivePane() const
 	return m_browserPane.get();
 }
 
-void Explorerplusplus::OnShellBrowserCreated(ShellBrowserInterface *shellBrowser)
+void Explorerplusplus::OnShellBrowserCreated(ShellBrowser *shellBrowser)
 {
 	ShellBrowserHistoryHelper::CreateAndAttachToShellBrowser(shellBrowser);
 }

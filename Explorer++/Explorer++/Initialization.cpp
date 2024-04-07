@@ -20,7 +20,7 @@
 #include "MenuHelper.h"
 #include "MenuRanges.h"
 #include "ResourceHelper.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ViewModes.h"
 #include "Tab.h"
 #include "TabContainer.h"

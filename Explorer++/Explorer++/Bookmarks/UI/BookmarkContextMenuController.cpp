@@ -9,7 +9,7 @@
 #include "Config.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "TabContainer.h"
 

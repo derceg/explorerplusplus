@@ -50,7 +50,7 @@ class MainToolbar;
 class MainWindow;
 struct NavigateParams;
 struct RebarBandStorageInfo;
-class ShellBrowser;
+class ShellBrowserImpl;
 class ShellTreeView;
 class TabContainer;
 class TabRestorer;
@@ -313,7 +313,7 @@ private:
 	void OnNavigationCommitted(const Tab &tab, const NavigateParams &navigateParams);
 
 	// ShellBrowserEmbedder
-	void OnShellBrowserCreated(ShellBrowserInterface *shellBrowser) override;
+	void OnShellBrowserCreated(ShellBrowser *shellBrowser) override;
 
 	/* PluginInterface. */
 	CoreInterface *GetCoreInterface() override;
@@ -485,7 +485,7 @@ private:
 	HINSTANCE GetResourceInstance() const override;
 	HACCEL *GetAcceleratorTable() const override;
 	HWND GetMainWindow() const override;
-	ShellBrowser *GetActiveShellBrowser() const override;
+	ShellBrowserImpl *GetActiveShellBrowser() const override;
 	TabContainer *GetTabContainer() const override;
 	TabRestorer *GetTabRestorer() const override;
 	HWND GetTreeView() const override;
@@ -621,7 +621,7 @@ private:
 	Plugins::PluginCommandManager m_pluginCommandManager;
 
 	HWND m_hActiveListView;
-	ShellBrowser *m_pActiveShellBrowser;
+	ShellBrowserImpl *m_pActiveShellBrowser;
 
 	/* User options variables. */
 	std::shared_ptr<Config> m_config;

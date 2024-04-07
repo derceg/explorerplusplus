@@ -4,9 +4,9 @@
 
 #include "stdafx.h"
 #include "FolderView.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 
-FolderView::FolderView(std::weak_ptr<ShellBrowser> shellBrowserWeak) :
+FolderView::FolderView(std::weak_ptr<ShellBrowserImpl> shellBrowserWeak) :
 	m_shellBrowserWeak(shellBrowserWeak)
 {
 	auto shellBrowser = m_shellBrowserWeak.lock();

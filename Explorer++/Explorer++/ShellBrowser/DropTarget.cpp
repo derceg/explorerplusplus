@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "ShellBrowser.h"
+#include "ShellBrowserImpl.h"
 #include "FolderView.h"
 #include "ServiceProvider.h"
 #include "ViewModes.h"
@@ -17,7 +17,7 @@
 #define X_SCROLL_AMOUNT 10
 #define Y_SCROLL_AMOUNT 10
 
-int ShellBrowser::GetDropTargetItem(const POINT &pt)
+int ShellBrowserImpl::GetDropTargetItem(const POINT &pt)
 {
 	POINT ptClient = pt;
 	BOOL res = ScreenToClient(m_hListView, &ptClient);
@@ -53,7 +53,7 @@ int ShellBrowser::GetDropTargetItem(const POINT &pt)
 	return index;
 }
 
-unique_pidl_absolute ShellBrowser::GetPidlForTargetItem(int targetItem)
+unique_pidl_absolute ShellBrowserImpl::GetPidlForTargetItem(int targetItem)
 {
 	if (targetItem != -1)
 	{
@@ -64,7 +64,7 @@ unique_pidl_absolute ShellBrowser::GetPidlForTargetItem(int targetItem)
 	return unique_pidl_absolute(ILCloneFull(m_directoryState.pidlDirectory.get()));
 }
 
-IUnknown *ShellBrowser::GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl)
+IUnknown *ShellBrowserImpl::GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl)
 {
 	// It's important to restrict this to the current folder. Otherwise, there can be situations
 	// where an item is dropped in a subfolder, and an item with the same name is selected in the
@@ -85,7 +85,7 @@ IUnknown *ShellBrowser::GetSiteForTargetItem(PCIDLIST_ABSOLUTE targetItemPidl)
 	return m_dropServiceProvider.get();
 }
 
-bool ShellBrowser::IsTargetSourceOfDrop(int targetItem, IDataObject *dataObject)
+bool ShellBrowserImpl::IsTargetSourceOfDrop(int targetItem, IDataObject *dataObject)
 {
 	if (m_performingDrag && dataObject == m_draggedDataObject && targetItem == -1)
 	{
@@ -95,7 +95,7 @@ bool ShellBrowser::IsTargetSourceOfDrop(int targetItem, IDataObject *dataObject)
 	return false;
 }
 
-void ShellBrowser::UpdateUiForDrop(int targetItem, const POINT &pt)
+void ShellBrowserImpl::UpdateUiForDrop(int targetItem, const POINT &pt)
 {
 	ListView_SetItemState(m_hListView, -1, 0, LVIS_DROPHILITED);
 
@@ -110,17 +110,17 @@ void ShellBrowser::UpdateUiForDrop(int targetItem, const POINT &pt)
 /* TODO: This isn't declared. */
 int CALLBACK SortTemporaryStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 {
-	auto *pShellBrowser = reinterpret_cast<ShellBrowser *>(lParamSort);
+	auto *pShellBrowser = reinterpret_cast<ShellBrowserImpl *>(lParamSort);
 	return pShellBrowser->SortTemporary(lParam1, lParam2);
 }
 
-int CALLBACK ShellBrowser::SortTemporary(LPARAM lParam1, LPARAM lParam2)
+int CALLBACK ShellBrowserImpl::SortTemporary(LPARAM lParam1, LPARAM lParam2)
 {
 	return m_itemInfoMap.at(static_cast<int>(lParam1)).iRelativeSort
 		- m_itemInfoMap.at(static_cast<int>(lParam2)).iRelativeSort;
 }
 
-void ShellBrowser::RepositionLocalFiles(const POINT *ppt)
+void ShellBrowserImpl::RepositionLocalFiles(const POINT *ppt)
 {
 	POINT pt;
 	POINT ptOrigin;
@@ -352,7 +352,7 @@ void ShellBrowser::RepositionLocalFiles(const POINT *ppt)
 	m_performingDrag = false;
 }
 
-void ShellBrowser::ScrollListViewForDrop(const POINT &pt)
+void ShellBrowserImpl::ScrollListViewForDrop(const POINT &pt)
 {
 	POINT ptClient = pt;
 	BOOL res = ScreenToClient(m_hListView, &ptClient);
@@ -401,7 +401,7 @@ void ShellBrowser::ScrollListViewForDrop(const POINT &pt)
 	}
 }
 
-void ShellBrowser::ResetDropUiState()
+void ShellBrowserImpl::ResetDropUiState()
 {
 	ListViewHelper::PositionInsertMark(m_hListView, nullptr);
 

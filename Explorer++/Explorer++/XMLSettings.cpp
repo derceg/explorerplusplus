@@ -25,7 +25,7 @@
 #include "MainToolbar.h"
 #include "MainToolbarStorage.h"
 #include "ShellBrowser/Columns.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainer.h"
 #include "TabStorage.h"
 #include "TabXmlStorage.h"

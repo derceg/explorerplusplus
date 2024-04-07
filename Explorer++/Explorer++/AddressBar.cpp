@@ -7,7 +7,7 @@
 #include "BrowserWindow.h"
 #include "CoreInterface.h"
 #include "NavigationHelper.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "Tab.h"
 #include "TabContainer.h"

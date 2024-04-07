@@ -54,7 +54,7 @@ class CachedIcons;
 struct Config;
 class IconResourceLoader;
 __interface IDirectoryMonitor;
-class ShellBrowser;
+class ShellBrowserImpl;
 class StatusBar;
 class TabContainer;
 class TabRestorer;
@@ -73,7 +73,7 @@ public:
 
 	virtual HWND GetMainWindow() const = 0;
 
-	virtual ShellBrowser *GetActiveShellBrowser() const = 0;
+	virtual ShellBrowserImpl *GetActiveShellBrowser() const = 0;
 
 	virtual TabContainer *GetTabContainer() const = 0;
 	virtual TabRestorer *GetTabRestorer() const = 0;

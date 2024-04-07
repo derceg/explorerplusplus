@@ -39,7 +39,7 @@ IncludeBlocks: Merge
 IncludeCategories:
     - Regex:           '^"(stdafx.h|pch.h)"$'
       Priority:        -1
-    - Regex:           '^"(Explorer\+\+\.h|ShellBrowser\.h|ShellTreeView\.h)"$'
+    - Regex:           '^"(Explorer\+\+\.h|ShellBrowserImpl\.h|ShellTreeView\.h)"$'
       Priority:        0
     - Regex:           '^"../ThirdParty/'
       Priority:        3

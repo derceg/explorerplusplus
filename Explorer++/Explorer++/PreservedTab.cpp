@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "PreservedTab.h"
 #include "ShellBrowser/PreservedHistoryEntry.h"
-#include "ShellBrowser/ShellBrowser.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
 
 PreservedTab::PreservedTab(const Tab &tab, int index) :

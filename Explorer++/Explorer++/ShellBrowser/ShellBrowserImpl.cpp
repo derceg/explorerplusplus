@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "ShellBrowser.h"
+#include "ShellBrowserImpl.h"
 #include "ColorRuleModel.h"
 #include "ColorRuleModelFactory.h"
 #include "Config.h"
@@ -34,38 +34,38 @@
 
 void CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 
-std::shared_ptr<ShellBrowser> ShellBrowser::CreateNew(HWND hOwner, ShellBrowserEmbedder *embedder,
-	CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
-	FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
-	const FolderColumns *initialColumns)
+std::shared_ptr<ShellBrowserImpl> ShellBrowserImpl::CreateNew(HWND hOwner,
+	ShellBrowserEmbedder *embedder, CoreInterface *coreInterface,
+	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
+	const FolderSettings &folderSettings, const FolderColumns *initialColumns)
 {
-	return std::shared_ptr<ShellBrowser>(new ShellBrowser(hOwner, embedder, coreInterface,
+	return std::shared_ptr<ShellBrowserImpl>(new ShellBrowserImpl(hOwner, embedder, coreInterface,
 		tabNavigation, fileActionHandler, folderSettings, initialColumns));
 }
 
-std::shared_ptr<ShellBrowser> ShellBrowser::CreateFromPreserved(HWND hOwner,
+std::shared_ptr<ShellBrowserImpl> ShellBrowserImpl::CreateFromPreserved(HWND hOwner,
 	ShellBrowserEmbedder *embedder, CoreInterface *coreInterface,
 	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState)
 {
-	return std::shared_ptr<ShellBrowser>(new ShellBrowser(hOwner, embedder, coreInterface,
+	return std::shared_ptr<ShellBrowserImpl>(new ShellBrowserImpl(hOwner, embedder, coreInterface,
 		tabNavigation, fileActionHandler, history, currentEntry, preservedFolderState));
 }
 
-ShellBrowser::ShellBrowser(HWND hOwner, ShellBrowserEmbedder *embedder,
+ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder,
 	CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
 	FileActionHandler *fileActionHandler,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState) :
-	ShellBrowser(hOwner, embedder, coreInterface, tabNavigation, fileActionHandler,
+	ShellBrowserImpl(hOwner, embedder, coreInterface, tabNavigation, fileActionHandler,
 		preservedFolderState.folderSettings, nullptr)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(this, tabNavigation,
 		m_iconFetcher.get(), history, currentEntry);
 }
 
-ShellBrowser::ShellBrowser(HWND hOwner, ShellBrowserEmbedder *embedder,
+ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder,
 	CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
 	FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
 	const FolderColumns *initialColumns) :
@@ -95,7 +95,7 @@ ShellBrowser::ShellBrowser(HWND hOwner, ShellBrowserEmbedder *embedder,
 	m_draggedDataObject(nullptr),
 	m_shellWindowRegistered(false),
 	m_shellChangeWatcher(GetHWND(),
-		std::bind_front(&ShellBrowser::ProcessShellChangeNotifications, this)),
+		std::bind_front(&ShellBrowserImpl::ProcessShellChangeNotifications, this)),
 	m_fontSetter(m_hListView, coreInterface->GetConfig()),
 	m_tooltipFontSetter(reinterpret_cast<HWND>(SendMessage(m_hListView, LVM_GETTOOLTIPS, 0, 0)),
 		coreInterface->GetConfig())
@@ -128,16 +128,16 @@ ShellBrowser::ShellBrowser(HWND hOwner, ShellBrowserEmbedder *embedder,
 	AddClipboardFormatListener(m_hListView);
 
 	m_connections.push_back(coreInterface->AddDeviceChangeObserver(
-		std::bind_front(&ShellBrowser::OnDeviceChange, this)));
+		std::bind_front(&ShellBrowserImpl::OnDeviceChange, this)));
 	m_connections.push_back(coreInterface->AddApplicationShuttingDownObserver(
-		std::bind_front(&ShellBrowser::OnApplicationShuttingDown, this)));
+		std::bind_front(&ShellBrowserImpl::OnApplicationShuttingDown, this)));
 
 	m_shellWindows = winrt::try_create_instance<IShellWindows>(CLSID_ShellWindows, CLSCTX_ALL);
 
 	embedder->OnShellBrowserCreated(this);
 }
 
-ShellBrowser::~ShellBrowser()
+ShellBrowserImpl::~ShellBrowserImpl()
 {
 	RemoveClipboardFormatListener(m_hListView);
 
@@ -152,7 +152,7 @@ ShellBrowser::~ShellBrowser()
 	/* TODO: Also destroy the thumbnails imagelist. */
 }
 
-HWND ShellBrowser::CreateListView(HWND parent)
+HWND ShellBrowserImpl::CreateListView(HWND parent)
 {
 	// Note that the only reason LVS_REPORT is specified here is so that the listview header theme
 	// can be set immediately when in dark mode. Without this style, ListView_GetHeader() will
@@ -164,7 +164,7 @@ HWND ShellBrowser::CreateListView(HWND parent)
 			| LVS_ALIGNTOP);
 }
 
-void ShellBrowser::InitializeListView()
+void ShellBrowserImpl::InitializeListView()
 {
 	auto dwExtendedStyle = ListView_GetExtendedListViewStyle(m_hListView);
 
@@ -174,7 +174,7 @@ void ShellBrowser::InitializeListView()
 	}
 
 	m_connections.push_back(m_config->useFullRowSelect.addObserver(
-		std::bind_front(&ShellBrowser::OnFullRowSelectUpdated, this)));
+		std::bind_front(&ShellBrowserImpl::OnFullRowSelectUpdated, this)));
 
 	if (m_config->checkBoxSelection.get())
 	{
@@ -182,7 +182,7 @@ void ShellBrowser::InitializeListView()
 	}
 
 	m_connections.push_back(m_config->checkBoxSelection.addObserver(
-		std::bind_front(&ShellBrowser::OnCheckBoxSelectionUpdated, this)));
+		std::bind_front(&ShellBrowserImpl::OnCheckBoxSelectionUpdated, this)));
 
 	ListView_SetExtendedListViewStyle(m_hListView, dwExtendedStyle);
 
@@ -190,39 +190,39 @@ void ShellBrowser::InitializeListView()
 	ListViewHelper::SetGridlines(m_hListView, m_config->globalFolderSettings.showGridlines.get());
 
 	m_connections.push_back(m_config->globalFolderSettings.showGridlines.addObserver(
-		std::bind_front(&ShellBrowser::OnShowGridlinesUpdated, this)));
+		std::bind_front(&ShellBrowserImpl::OnShowGridlinesUpdated, this)));
 
 	ListViewHelper::ActivateOneClickSelect(m_hListView,
 		m_config->globalFolderSettings.oneClickActivate.get(),
 		m_config->globalFolderSettings.oneClickActivateHoverTime.get());
 
 	m_connections.push_back(m_config->globalFolderSettings.oneClickActivate.addObserver(
-		std::bind_front(&ShellBrowser::OnOneClickActivateUpdated, this)));
+		std::bind_front(&ShellBrowserImpl::OnOneClickActivateUpdated, this)));
 	m_connections.push_back(m_config->globalFolderSettings.oneClickActivateHoverTime.addObserver(
-		std::bind_front(&ShellBrowser::OnOneClickActivateHoverTimeUpdated, this)));
+		std::bind_front(&ShellBrowserImpl::OnOneClickActivateHoverTimeUpdated, this)));
 
 	ThemeManager::GetInstance().ApplyThemeToWindowAndChildren(m_hListView);
 
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hListView,
-		std::bind_front(&ShellBrowser::ListViewProc, this)));
+		std::bind_front(&ShellBrowserImpl::ListViewProc, this)));
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(m_hListView),
-		std::bind_front(&ShellBrowser::ListViewParentProc, this)));
+		std::bind_front(&ShellBrowserImpl::ListViewParentProc, this)));
 
 	m_connections.push_back(
 		ColorRuleModelFactory::GetInstance()->GetColorRuleModel()->AddItemAddedObserver(
-			std::bind(&ShellBrowser::OnColorRulesUpdated, this)));
+			std::bind(&ShellBrowserImpl::OnColorRulesUpdated, this)));
 	m_connections.push_back(
 		ColorRuleModelFactory::GetInstance()->GetColorRuleModel()->AddItemUpdatedObserver(
-			std::bind(&ShellBrowser::OnColorRulesUpdated, this)));
+			std::bind(&ShellBrowserImpl::OnColorRulesUpdated, this)));
 	m_connections.push_back(
 		ColorRuleModelFactory::GetInstance()->GetColorRuleModel()->AddItemMovedObserver(
-			std::bind(&ShellBrowser::OnColorRulesUpdated, this)));
+			std::bind(&ShellBrowserImpl::OnColorRulesUpdated, this)));
 	m_connections.push_back(
 		ColorRuleModelFactory::GetInstance()->GetColorRuleModel()->AddItemRemovedObserver(
-			std::bind(&ShellBrowser::OnColorRulesUpdated, this)));
+			std::bind(&ShellBrowserImpl::OnColorRulesUpdated, this)));
 	m_connections.push_back(
 		ColorRuleModelFactory::GetInstance()->GetColorRuleModel()->AddAllItemsRemovedObserver(
-			std::bind(&ShellBrowser::OnColorRulesUpdated, this)));
+			std::bind(&ShellBrowserImpl::OnColorRulesUpdated, this)));
 
 	if (m_folderSettings.showInGroups)
 	{
@@ -230,19 +230,19 @@ void ShellBrowser::InitializeListView()
 	}
 }
 
-bool ShellBrowser::GetAutoArrange() const
+bool ShellBrowserImpl::GetAutoArrange() const
 {
 	return m_folderSettings.autoArrange;
 }
 
-void ShellBrowser::SetAutoArrange(bool autoArrange)
+void ShellBrowserImpl::SetAutoArrange(bool autoArrange)
 {
 	m_folderSettings.autoArrange = autoArrange;
 
 	ListViewHelper::SetAutoArrange(m_hListView, m_folderSettings.autoArrange);
 }
 
-ViewMode ShellBrowser::GetViewMode() const
+ViewMode ShellBrowserImpl::GetViewMode() const
 {
 	return m_folderSettings.viewMode;
 }
@@ -252,7 +252,7 @@ ViewMode ShellBrowser::GetViewMode() const
 not called when a tab is first set up (in which case
 the view mode still needs to be setup), or when entering
 a folder. */
-void ShellBrowser::SetViewMode(ViewMode viewMode)
+void ShellBrowserImpl::SetViewMode(ViewMode viewMode)
 {
 	if (viewMode == m_folderSettings.viewMode)
 	{
@@ -279,7 +279,7 @@ This function also initializes any items needed to support
 the current view mode. This MUST be done within this
 function, as when a tab is first opened, the view settings
 will need to be initialized. */
-void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
+void ShellBrowserImpl::SetViewModeInternal(ViewMode viewMode)
 {
 	DWORD dwStyle;
 
@@ -412,7 +412,7 @@ void ShellBrowser::SetViewModeInternal(ViewMode viewMode)
 	}
 }
 
-void ShellBrowser::SetFirstColumnTextToCallback()
+void ShellBrowserImpl::SetFirstColumnTextToCallback()
 {
 	int numItems = ListView_GetItemCount(m_hListView);
 
@@ -422,7 +422,7 @@ void ShellBrowser::SetFirstColumnTextToCallback()
 	}
 }
 
-void ShellBrowser::SetFirstColumnTextToFilename()
+void ShellBrowserImpl::SetFirstColumnTextToFilename()
 {
 	int numItems = ListView_GetItemCount(m_hListView);
 
@@ -437,7 +437,7 @@ void ShellBrowser::SetFirstColumnTextToFilename()
 	}
 }
 
-void ShellBrowser::CycleViewMode(bool cycleForward)
+void ShellBrowserImpl::CycleViewMode(bool cycleForward)
 {
 	ViewMode newViewMode;
 
@@ -453,12 +453,12 @@ void ShellBrowser::CycleViewMode(bool cycleForward)
 	SetViewMode(newViewMode);
 }
 
-SortMode ShellBrowser::GetSortMode() const
+SortMode ShellBrowserImpl::GetSortMode() const
 {
 	return m_folderSettings.sortMode;
 }
 
-void ShellBrowser::SetSortMode(SortMode sortMode)
+void ShellBrowserImpl::SetSortMode(SortMode sortMode)
 {
 	if (sortMode == m_folderSettings.sortMode)
 	{
@@ -470,12 +470,12 @@ void ShellBrowser::SetSortMode(SortMode sortMode)
 	SortFolder();
 }
 
-SortMode ShellBrowser::GetGroupMode() const
+SortMode ShellBrowserImpl::GetGroupMode() const
 {
 	return m_folderSettings.groupMode;
 }
 
-void ShellBrowser::SetGroupMode(SortMode sortMode)
+void ShellBrowserImpl::SetGroupMode(SortMode sortMode)
 {
 	m_folderSettings.groupMode = sortMode;
 
@@ -485,12 +485,12 @@ void ShellBrowser::SetGroupMode(SortMode sortMode)
 	}
 }
 
-SortDirection ShellBrowser::GetSortDirection() const
+SortDirection ShellBrowserImpl::GetSortDirection() const
 {
 	return m_folderSettings.sortDirection;
 }
 
-void ShellBrowser::SetSortDirection(SortDirection direction)
+void ShellBrowserImpl::SetSortDirection(SortDirection direction)
 {
 	if (direction == m_folderSettings.sortDirection)
 	{
@@ -502,12 +502,12 @@ void ShellBrowser::SetSortDirection(SortDirection direction)
 	SortFolder();
 }
 
-SortDirection ShellBrowser::GetGroupSortDirection() const
+SortDirection ShellBrowserImpl::GetGroupSortDirection() const
 {
 	return m_folderSettings.groupSortDirection;
 }
 
-void ShellBrowser::SetGroupSortDirection(SortDirection direction)
+void ShellBrowserImpl::SetGroupSortDirection(SortDirection direction)
 {
 	if (direction == m_folderSettings.groupSortDirection)
 	{
@@ -519,21 +519,21 @@ void ShellBrowser::SetGroupSortDirection(SortDirection direction)
 	ListView_SortGroups(m_hListView, GroupComparisonStub, this);
 }
 
-void ShellBrowser::SetID(int id)
+void ShellBrowserImpl::SetID(int id)
 {
 	assert(!m_ID);
 
 	m_ID = id;
 }
 
-int ShellBrowser::GetId() const
+int ShellBrowserImpl::GetId() const
 {
 	assert(m_ID);
 
 	return *m_ID;
 }
 
-std::wstring ShellBrowser::GetItemName(int index) const
+std::wstring ShellBrowserImpl::GetItemName(int index) const
 {
 	return GetItemByIndex(index).wfd.cFileName;
 }
@@ -542,7 +542,7 @@ std::wstring ShellBrowser::GetItemName(int index) const
 // For example, if file extensions are hidden, then two or more items might share the same display
 // name (because they only differ in their extensions, which are hidden). Because of this, the
 // display name shouldn't be used to perform item lookups.
-std::wstring ShellBrowser::GetItemDisplayName(int index) const
+std::wstring ShellBrowserImpl::GetItemDisplayName(int index) const
 {
 	// Although the display name for an item is retrieved and cached, that might not be exactly the
 	// same as the text that's displayed. For example, if extensions are shown within Explorer, but
@@ -553,23 +553,23 @@ std::wstring ShellBrowser::GetItemDisplayName(int index) const
 	return ProcessItemFileName(basicItemInfo, m_config->globalFolderSettings);
 }
 
-std::wstring ShellBrowser::GetItemFullName(int index) const
+std::wstring ShellBrowserImpl::GetItemFullName(int index) const
 {
 	return GetItemByIndex(index).parsingName;
 }
 
-std::wstring ShellBrowser::GetDirectory() const
+std::wstring ShellBrowserImpl::GetDirectory() const
 {
 	return m_directoryState.directory;
 }
 
-unique_pidl_absolute ShellBrowser::GetDirectoryIdl() const
+unique_pidl_absolute ShellBrowserImpl::GetDirectoryIdl() const
 {
 	unique_pidl_absolute pidlDirectory(ILCloneFull(m_directoryState.pidlDirectory.get()));
 	return pidlDirectory;
 }
 
-void ShellBrowser::SelectItems(const std::vector<PidlAbsolute> &pidls)
+void ShellBrowserImpl::SelectItems(const std::vector<PidlAbsolute> &pidls)
 {
 	ListViewHelper::SelectAllItems(m_hListView, FALSE);
 
@@ -600,7 +600,7 @@ void ShellBrowser::SelectItems(const std::vector<PidlAbsolute> &pidls)
 	}
 }
 
-int ShellBrowser::LocateFileItemIndex(const TCHAR *szFileName) const
+int ShellBrowserImpl::LocateFileItemIndex(const TCHAR *szFileName) const
 {
 	LV_FINDINFO lvFind;
 	int iItem;
@@ -620,7 +620,7 @@ int ShellBrowser::LocateFileItemIndex(const TCHAR *szFileName) const
 	return -1;
 }
 
-int ShellBrowser::LocateFileItemInternalIndex(const TCHAR *szFileName) const
+int ShellBrowserImpl::LocateFileItemInternalIndex(const TCHAR *szFileName) const
 {
 	for (int i = 0; i < m_directoryState.numItems; i++)
 	{
@@ -635,7 +635,7 @@ int ShellBrowser::LocateFileItemInternalIndex(const TCHAR *szFileName) const
 	return -1;
 }
 
-std::optional<int> ShellBrowser::GetItemIndexForPidl(PCIDLIST_ABSOLUTE pidl) const
+std::optional<int> ShellBrowserImpl::GetItemIndexForPidl(PCIDLIST_ABSOLUTE pidl) const
 {
 	auto internalIndex = GetItemInternalIndexForPidl(pidl);
 
@@ -647,7 +647,7 @@ std::optional<int> ShellBrowser::GetItemIndexForPidl(PCIDLIST_ABSOLUTE pidl) con
 	return LocateItemByInternalIndex(*internalIndex);
 }
 
-std::optional<int> ShellBrowser::GetItemInternalIndexForPidl(PCIDLIST_ABSOLUTE pidl) const
+std::optional<int> ShellBrowserImpl::GetItemInternalIndexForPidl(PCIDLIST_ABSOLUTE pidl) const
 {
 	auto itr = std::find_if(m_itemInfoMap.begin(), m_itemInfoMap.end(),
 		[pidl](const auto &pair)
@@ -661,7 +661,7 @@ std::optional<int> ShellBrowser::GetItemInternalIndexForPidl(PCIDLIST_ABSOLUTE p
 	return itr->first;
 }
 
-std::optional<int> ShellBrowser::LocateItemByInternalIndex(int internalIndex) const
+std::optional<int> ShellBrowserImpl::LocateItemByInternalIndex(int internalIndex) const
 {
 	LVFINDINFO lvfi;
 	lvfi.flags = LVFI_PARAM;
@@ -676,22 +676,22 @@ std::optional<int> ShellBrowser::LocateItemByInternalIndex(int internalIndex) co
 	return item;
 }
 
-WIN32_FIND_DATA ShellBrowser::GetItemFileFindData(int index) const
+WIN32_FIND_DATA ShellBrowserImpl::GetItemFileFindData(int index) const
 {
 	return GetItemByIndex(index).wfd;
 }
 
-unique_pidl_absolute ShellBrowser::GetItemCompleteIdl(int index) const
+unique_pidl_absolute ShellBrowserImpl::GetItemCompleteIdl(int index) const
 {
 	return unique_pidl_absolute(ILCloneFull(GetItemByIndex(index).pidlComplete.get()));
 }
 
-unique_pidl_child ShellBrowser::GetItemChildIdl(int index) const
+unique_pidl_child ShellBrowserImpl::GetItemChildIdl(int index) const
 {
 	return unique_pidl_child(ILCloneChild(GetItemByIndex(index).pridl.get()));
 }
 
-bool ShellBrowser::InVirtualFolder() const
+bool ShellBrowserImpl::InVirtualFolder() const
 {
 	return m_directoryState.virtualFolder;
 }
@@ -699,7 +699,7 @@ bool ShellBrowser::InVirtualFolder() const
 /* We can create files in this folder if it is
 part of the filesystem, or if it is the root of
 the namespace (i.e. the desktop). */
-BOOL ShellBrowser::CanCreate() const
+BOOL ShellBrowserImpl::CanCreate() const
 {
 	BOOL bCanCreate = FALSE;
 	unique_pidl_absolute pidl;
@@ -714,22 +714,22 @@ BOOL ShellBrowser::CanCreate() const
 	return bCanCreate;
 }
 
-void ShellBrowser::SetDirMonitorId(int dirMonitorId)
+void ShellBrowserImpl::SetDirMonitorId(int dirMonitorId)
 {
 	m_dirMonitorId = dirMonitorId;
 }
 
-void ShellBrowser::ClearDirMonitorId()
+void ShellBrowserImpl::ClearDirMonitorId()
 {
 	m_dirMonitorId.reset();
 }
 
-std::optional<int> ShellBrowser::GetDirMonitorId() const
+std::optional<int> ShellBrowserImpl::GetDirMonitorId() const
 {
 	return m_dirMonitorId;
 }
 
-BOOL ShellBrowser::CompareVirtualFolders(UINT uFolderCSIDL) const
+BOOL ShellBrowserImpl::CompareVirtualFolders(UINT uFolderCSIDL) const
 {
 	std::wstring parsingPath;
 	GetCsidlDisplayName(uFolderCSIDL, SHGDN_FORPARSING, parsingPath);
@@ -742,12 +742,12 @@ BOOL ShellBrowser::CompareVirtualFolders(UINT uFolderCSIDL) const
 	return FALSE;
 }
 
-int ShellBrowser::GenerateUniqueItemId()
+int ShellBrowserImpl::GenerateUniqueItemId()
 {
 	return m_directoryState.itemIDCounter++;
 }
 
-int ShellBrowser::DetermineItemSortedPosition(LPARAM lParam) const
+int ShellBrowserImpl::DetermineItemSortedPosition(LPARAM lParam) const
 {
 	LVITEM lvItem;
 	BOOL bItem;
@@ -791,39 +791,39 @@ int ShellBrowser::DetermineItemSortedPosition(LPARAM lParam) const
 	return i - 1;
 }
 
-int ShellBrowser::GetNumItems() const
+int ShellBrowserImpl::GetNumItems() const
 {
 	return m_directoryState.numItems;
 }
 
-int ShellBrowser::GetNumSelectedFiles() const
+int ShellBrowserImpl::GetNumSelectedFiles() const
 {
 	return m_directoryState.numFilesSelected;
 }
 
-int ShellBrowser::GetNumSelectedFolders() const
+int ShellBrowserImpl::GetNumSelectedFolders() const
 {
 	return m_directoryState.numFoldersSelected;
 }
 
-int ShellBrowser::GetNumSelected() const
+int ShellBrowserImpl::GetNumSelected() const
 {
 	return m_directoryState.numFilesSelected + m_directoryState.numFoldersSelected;
 }
 
 // Returns the total size of the items in the current directory (not including any sub-directories).
-uint64_t ShellBrowser::GetTotalDirectorySize()
+uint64_t ShellBrowserImpl::GetTotalDirectorySize()
 {
 	return m_directoryState.totalDirSize;
 }
 
 // Returns the size of the currently selected items.
-uint64_t ShellBrowser::GetSelectionSize()
+uint64_t ShellBrowserImpl::GetSelectionSize()
 {
 	return m_directoryState.fileSelectionSize;
 }
 
-void ShellBrowser::VerifySortMode()
+void ShellBrowserImpl::VerifySortMode()
 {
 	const std::vector<Column_t> *columns = nullptr;
 
@@ -877,17 +877,17 @@ void ShellBrowser::VerifySortMode()
 	}
 }
 
-bool ShellBrowser::GetShowHidden() const
+bool ShellBrowserImpl::GetShowHidden() const
 {
 	return m_folderSettings.showHidden;
 }
 
-void ShellBrowser::SetShowHidden(bool showHidden)
+void ShellBrowserImpl::SetShowHidden(bool showHidden)
 {
 	m_folderSettings.showHidden = showHidden;
 }
 
-std::vector<SortMode> ShellBrowser::GetAvailableSortModes() const
+std::vector<SortMode> ShellBrowserImpl::GetAvailableSortModes() const
 {
 	std::vector<SortMode> sortModes;
 
@@ -907,7 +907,7 @@ This method is used when a file is created
 using the shell new menu, and the item
 may or may not have been inserted into
 the listview yet. */
-void ShellBrowser::QueueRename(PCIDLIST_ABSOLUTE pidlItem)
+void ShellBrowserImpl::QueueRename(PCIDLIST_ABSOLUTE pidlItem)
 {
 	int numItems = ListView_GetItemCount(m_hListView);
 
@@ -925,7 +925,7 @@ void ShellBrowser::QueueRename(PCIDLIST_ABSOLUTE pidlItem)
 	m_directoryState.queuedRenameItem.reset(ILCloneFull(pidlItem));
 }
 
-void ShellBrowser::OnDeviceChange(UINT eventType, LONG_PTR eventData)
+void ShellBrowserImpl::OnDeviceChange(UINT eventType, LONG_PTR eventData)
 {
 	// If shell change notifications are enabled, drive additions/removals will be handled through
 	// that.
@@ -1028,7 +1028,7 @@ void ShellBrowser::OnDeviceChange(UINT eventType, LONG_PTR eventData)
 	}
 }
 
-void ShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
+void ShellBrowserImpl::UpdateDriveIcon(const TCHAR *szDrive)
 {
 	LVITEM lvItem;
 	SHFILEINFO shfi;
@@ -1081,7 +1081,7 @@ void ShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 	}
 }
 
-void ShellBrowser::RemoveDrive(const TCHAR *szDrive)
+void ShellBrowserImpl::RemoveDrive(const TCHAR *szDrive)
 {
 	LVITEM lvItem;
 	int iItemInternal = -1;
@@ -1110,12 +1110,12 @@ void ShellBrowser::RemoveDrive(const TCHAR *szDrive)
 	}
 }
 
-int ShellBrowser::GetUniqueFolderId() const
+int ShellBrowserImpl::GetUniqueFolderId() const
 {
 	return m_uniqueFolderId;
 }
 
-BasicItemInfo_t ShellBrowser::getBasicItemInfo(int internalIndex) const
+BasicItemInfo_t ShellBrowserImpl::getBasicItemInfo(int internalIndex) const
 {
 	const ItemInfo_t &itemInfo = m_itemInfoMap.at(internalIndex);
 
@@ -1131,17 +1131,17 @@ BasicItemInfo_t ShellBrowser::getBasicItemInfo(int internalIndex) const
 	return basicItemInfo;
 }
 
-HWND ShellBrowser::GetListView() const
+HWND ShellBrowserImpl::GetListView() const
 {
 	return m_hListView;
 }
 
-FolderSettings ShellBrowser::GetFolderSettings() const
+FolderSettings ShellBrowserImpl::GetFolderSettings() const
 {
 	return m_folderSettings;
 }
 
-void ShellBrowser::DeleteSelectedItems(bool permanent)
+void ShellBrowserImpl::DeleteSelectedItems(bool permanent)
 {
 	std::vector<PCIDLIST_ABSOLUTE> pidls;
 	int item = -1;
@@ -1160,7 +1160,7 @@ void ShellBrowser::DeleteSelectedItems(bool permanent)
 	m_fileActionHandler->DeleteFiles(m_hListView, pidls, permanent, false);
 }
 
-void ShellBrowser::StartRenamingSelectedItems()
+void ShellBrowserImpl::StartRenamingSelectedItems()
 {
 	int numSelected = ListView_GetSelectedCount(m_hListView);
 
@@ -1176,7 +1176,7 @@ void ShellBrowser::StartRenamingSelectedItems()
 	}
 }
 
-void ShellBrowser::StartRenamingSingleFile()
+void ShellBrowserImpl::StartRenamingSingleFile()
 {
 	int selectedItem = ListView_GetNextItem(m_hListView, -1, LVNI_SELECTED | LVNI_FOCUSED);
 
@@ -1195,7 +1195,7 @@ void ShellBrowser::StartRenamingSingleFile()
 	ListView_EditLabel(m_hListView, selectedItem);
 }
 
-void ShellBrowser::StartRenamingMultipleFiles()
+void ShellBrowserImpl::StartRenamingMultipleFiles()
 {
 	std::list<std::wstring> fullFilenameList;
 	int item = -1;
@@ -1222,7 +1222,7 @@ void ShellBrowser::StartRenamingMultipleFiles()
 	massRenameDialog.ShowModalDialog();
 }
 
-HRESULT ShellBrowser::CopySelectedItemsToClipboard(bool copy)
+HRESULT ShellBrowserImpl::CopySelectedItemsToClipboard(bool copy)
 {
 	auto pidls = GetSelectedItemPidls();
 
@@ -1266,7 +1266,7 @@ HRESULT ShellBrowser::CopySelectedItemsToClipboard(bool copy)
 	return hr;
 }
 
-void ShellBrowser::UpdateCurrentClipboardObject(
+void ShellBrowserImpl::UpdateCurrentClipboardObject(
 	wil::com_ptr_nothrow<IDataObject> clipboardDataObject)
 {
 	RestoreStateOfCutItems();
@@ -1274,7 +1274,7 @@ void ShellBrowser::UpdateCurrentClipboardObject(
 	m_clipboardDataObject = clipboardDataObject;
 }
 
-void ShellBrowser::OnClipboardUpdate()
+void ShellBrowserImpl::OnClipboardUpdate()
 {
 	if (m_clipboardDataObject && OleIsCurrentClipboard(m_clipboardDataObject.get()) == S_FALSE)
 	{
@@ -1285,7 +1285,7 @@ void ShellBrowser::OnClipboardUpdate()
 	}
 }
 
-void ShellBrowser::RestoreStateOfCutItems()
+void ShellBrowserImpl::RestoreStateOfCutItems()
 {
 	// FIXME: Should base this off something other than the filename (which can change).
 	for (const auto &filename : m_cutFileNames)
@@ -1299,7 +1299,7 @@ void ShellBrowser::RestoreStateOfCutItems()
 	}
 }
 
-void ShellBrowser::PasteShortcut()
+void ShellBrowserImpl::PasteShortcut()
 {
 	auto serviceProvider = winrt::make_self<ServiceProvider>();
 
@@ -1310,7 +1310,7 @@ void ShellBrowser::PasteShortcut()
 		L"pastelink", 0, serviceProvider.get());
 }
 
-void ShellBrowser::OnApplicationShuttingDown()
+void ShellBrowserImpl::OnApplicationShuttingDown()
 {
 	if (m_clipboardDataObject && OleIsCurrentClipboard(m_clipboardDataObject.get()) == S_OK)
 	{
@@ -1321,14 +1321,14 @@ void ShellBrowser::OnApplicationShuttingDown()
 	}
 }
 
-void ShellBrowser::AddTaskToPendingWorkQueue(PendingWorkQueueTask task)
+void ShellBrowserImpl::AddTaskToPendingWorkQueue(PendingWorkQueueTask task)
 {
 	m_directoryState.pendingWorkQueue.push_back(task);
 
 	PostMessage(m_hListView, WM_APP_PENDING_TASK_AVAILABLE, 0, 0);
 }
 
-void ShellBrowser::OnPendingTaskAvailableMessage()
+void ShellBrowserImpl::OnPendingTaskAvailableMessage()
 {
 	int originalFolderId = m_uniqueFolderId;
 
@@ -1348,7 +1348,7 @@ void ShellBrowser::OnPendingTaskAvailableMessage()
 	m_directoryState.pendingWorkQueue.clear();
 }
 
-void ShellBrowser::AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper)
+void ShellBrowserImpl::AddHelper(std::unique_ptr<ShellBrowserHelperBase> helper)
 {
 	m_helpers.push_back(std::move(helper));
 }

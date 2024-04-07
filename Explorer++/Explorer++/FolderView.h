@@ -10,7 +10,7 @@
 #include <ShlObj.h>
 #include <memory>
 
-class ShellBrowser;
+class ShellBrowserImpl;
 
 // This isn't a complete implementation. There's only enough functionality to support some context
 // menu items.
@@ -18,7 +18,7 @@ class FolderView :
 	public winrt::implements<FolderView, IFolderView2, IShellFolderView, winrt::non_agile>
 {
 public:
-	FolderView(std::weak_ptr<ShellBrowser> shellBrowserWeak);
+	FolderView(std::weak_ptr<ShellBrowserImpl> shellBrowserWeak);
 
 	// IFolderView2
 	IFACEMETHODIMP SetGroupBy(REFPROPERTYKEY key, BOOL ascending);
@@ -98,7 +98,7 @@ public:
 	IFACEMETHODIMP SetAutomationObject(IDispatch *dispatch);
 
 private:
-	std::weak_ptr<ShellBrowser> m_shellBrowserWeak;
+	std::weak_ptr<ShellBrowserImpl> m_shellBrowserWeak;
 	int m_initialFolderId;
 };
 
