@@ -7,7 +7,10 @@
 #include "ResourceHelper.h"
 #include <wil/com.h>
 
-wil::unique_hbitmap ImageHelper::ImageListIconToBitmap(IImageList *imageList, int iconIndex)
+namespace ImageHelper
+{
+
+wil::unique_hbitmap ImageListIconToBitmap(IImageList *imageList, int iconIndex)
 {
 	wil::unique_hicon icon;
 	HRESULT hr = imageList->GetIcon(iconIndex, ILD_NORMAL, &icon);
@@ -29,8 +32,7 @@ wil::unique_hbitmap ImageHelper::ImageListIconToBitmap(IImageList *imageList, in
 	return wil::unique_hbitmap(IconToBitmapPARGB32(icon.get(), iconWidth, iconHeight));
 }
 
-void ImageHelper::InitBitmapInfo(__out_bcount(cbInfo) BITMAPINFO *pbmi, ULONG cbInfo, LONG cx,
-	LONG cy, WORD bpp)
+void InitBitmapInfo(__out_bcount(cbInfo) BITMAPINFO *pbmi, ULONG cbInfo, LONG cx, LONG cy, WORD bpp)
 {
 	ZeroMemory(pbmi, cbInfo);
 	pbmi->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
@@ -42,7 +44,7 @@ void ImageHelper::InitBitmapInfo(__out_bcount(cbInfo) BITMAPINFO *pbmi, ULONG cb
 	pbmi->bmiHeader.biBitCount = bpp;
 }
 
-HRESULT ImageHelper::Create32BitHBITMAP(HDC hdc, const SIZE *psize, __deref_opt_out void **ppvBits,
+HRESULT Create32BitHBITMAP(HDC hdc, const SIZE *psize, __deref_opt_out void **ppvBits,
 	__out HBITMAP *phBmp)
 {
 	*phBmp = nullptr;
@@ -62,8 +64,7 @@ HRESULT ImageHelper::Create32BitHBITMAP(HDC hdc, const SIZE *psize, __deref_opt_
 	return (nullptr == *phBmp) ? E_OUTOFMEMORY : S_OK;
 }
 
-HRESULT ImageHelper::ConvertToPARGB32(HDC hdc, __inout ARGB *pargb, HBITMAP hbmp, SIZE &sizImage,
-	int cxRow)
+HRESULT ConvertToPARGB32(HDC hdc, __inout ARGB *pargb, HBITMAP hbmp, SIZE &sizImage, int cxRow)
 {
 	BITMAPINFO bmi;
 	InitBitmapInfo(&bmi, sizeof(bmi), sizImage.cx, sizImage.cy, 32);
@@ -108,7 +109,7 @@ HRESULT ImageHelper::ConvertToPARGB32(HDC hdc, __inout ARGB *pargb, HBITMAP hbmp
 	return hr;
 }
 
-bool ImageHelper::HasAlpha(__in ARGB *pargb, SIZE &sizImage, int cxRow)
+bool HasAlpha(__in ARGB *pargb, SIZE &sizImage, int cxRow)
 {
 	ULONG cxDelta = cxRow - sizImage.cx;
 	for (ULONG y = sizImage.cy; y; --y)
@@ -127,8 +128,7 @@ bool ImageHelper::HasAlpha(__in ARGB *pargb, SIZE &sizImage, int cxRow)
 	return false;
 }
 
-HRESULT ImageHelper::ConvertBufferToPARGB32(HPAINTBUFFER hPaintBuffer, HDC hdc, HICON hicon,
-	SIZE &sizIcon)
+HRESULT ConvertBufferToPARGB32(HPAINTBUFFER hPaintBuffer, HDC hdc, HICON hicon, SIZE &sizIcon)
 {
 	RGBQUAD *prgbQuad;
 	int cxRow;
@@ -155,7 +155,7 @@ HRESULT ImageHelper::ConvertBufferToPARGB32(HPAINTBUFFER hPaintBuffer, HDC hdc, 
 	return hr;
 }
 
-HBITMAP ImageHelper::IconToBitmapPARGB32(HICON hicon, int width, int height)
+HBITMAP IconToBitmapPARGB32(HICON hicon, int width, int height)
 {
 	HRESULT hr = E_OUTOFMEMORY;
 	HBITMAP hbmp = nullptr;
@@ -216,7 +216,7 @@ HBITMAP ImageHelper::IconToBitmapPARGB32(HICON hicon, int width, int height)
 	return hbmp;
 }
 
-std::unique_ptr<Gdiplus::Bitmap> ImageHelper::LoadGdiplusBitmapFromPNG(HINSTANCE resourceInstance,
+std::unique_ptr<Gdiplus::Bitmap> LoadGdiplusBitmapFromPNG(HINSTANCE resourceInstance,
 	UINT resourceId)
 {
 	auto resourceData = CopyResource(resourceInstance, resourceId, L"PNG");
@@ -237,7 +237,7 @@ std::unique_ptr<Gdiplus::Bitmap> ImageHelper::LoadGdiplusBitmapFromPNG(HINSTANCE
 	return std::make_unique<Gdiplus::Bitmap>(stream.get());
 }
 
-int ImageHelper::CopyImageListIcon(HIMAGELIST destination, HIMAGELIST source, int sourceIconIndex)
+int CopyImageListIcon(HIMAGELIST destination, HIMAGELIST source, int sourceIconIndex)
 {
 	wil::unique_hicon icon(ImageList_GetIcon(source, sourceIconIndex, ILD_NORMAL));
 
@@ -247,4 +247,33 @@ int ImageHelper::CopyImageListIcon(HIMAGELIST destination, HIMAGELIST source, in
 	}
 
 	return ImageList_AddIcon(destination, icon.get());
+}
+
+wil::unique_hbitmap GdiplusBitmapToBitmap(Gdiplus::Bitmap *gdiplusBitmap)
+{
+	wil::unique_hbitmap bitmap;
+	Gdiplus::Color color(0, 0, 0);
+	Gdiplus::Status status = gdiplusBitmap->GetHBITMAP(color, &bitmap);
+
+	if (status != Gdiplus::Status::Ok)
+	{
+		return nullptr;
+	}
+
+	return bitmap;
+}
+
+wil::unique_hicon GdiplusBitmapToIcon(Gdiplus::Bitmap *gdiplusBitmap)
+{
+	wil::unique_hicon hicon;
+	Gdiplus::Status status = gdiplusBitmap->GetHICON(&hicon);
+
+	if (status != Gdiplus::Status::Ok)
+	{
+		return nullptr;
+	}
+
+	return hicon;
+}
+
 }

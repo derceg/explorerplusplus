@@ -28,7 +28,8 @@ public:
 
 	int GetItemCountForTesting() const;
 	UINT GetItemIdForTesting(int index) const;
-	std::wstring GetItemTextForTesting(int index) const;
+	std::wstring GetItemTextForTesting(UINT id) const;
+	HBITMAP GetItemBitmapForTesting(UINT id) const;
 
 private:
 	LRESULT ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);

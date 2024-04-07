@@ -113,7 +113,9 @@ TEST_F(ShellItemsMenuTest, CheckItems)
 
 	for (size_t i = 0; i < m_pidls.size(); i++)
 	{
-		EXPECT_EQ(menuView->GetItemTextForTesting(static_cast<int>(i)), GetNameForItem(i));
+		EXPECT_EQ(
+			menuView->GetItemTextForTesting(menuView->GetItemIdForTesting(static_cast<int>(i))),
+			GetNameForItem(i));
 	}
 }
 

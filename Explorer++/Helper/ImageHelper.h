@@ -27,4 +27,7 @@ std::unique_ptr<Gdiplus::Bitmap> LoadGdiplusBitmapFromPNG(HINSTANCE resourceInst
 	UINT resourceId);
 int CopyImageListIcon(HIMAGELIST destination, HIMAGELIST source, int sourceIconIndex);
 
+wil::unique_hbitmap GdiplusBitmapToBitmap(Gdiplus::Bitmap *gdiplusBitmap);
+wil::unique_hicon GdiplusBitmapToIcon(Gdiplus::Bitmap *gdiplusBitmap);
+
 }

@@ -179,6 +179,9 @@
     <ClCompile Include="MenuHelperTest.cpp">
       <Filter>Helper\Control Support</Filter>
     </ClCompile>
+    <ClCompile Include="PopupMenuViewTest.cpp">
+      <Filter>Core\UI\Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -249,6 +252,9 @@
     </Filter>
     <Filter Include="Core\UI">
       <UniqueIdentifier>{7af7278c-c56b-48b1-b069-4346b3f79c17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\UI\Views">
+      <UniqueIdentifier>{b80d11e6-4361-4b55-9b78-470549e95b2f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

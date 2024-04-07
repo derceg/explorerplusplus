@@ -19,7 +19,7 @@ void PopupMenuView::AppendItem(UINT id, const std::wstring &text, wil::unique_hb
 	// The call to TrackPopupMenu() below will return the ID of the item that was selected, with 0
 	// being returned if the menu was canceled, or an error occurred. Therefore, 0 shouldn't be used
 	// as an item ID.
-	assert(id != 0);
+	DCHECK_NE(id, 0U);
 
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
@@ -35,9 +35,8 @@ void PopupMenuView::AppendItem(UINT id, const std::wstring &text, wil::unique_hb
 		m_menuImages.push_back(std::move(bitmap));
 	}
 
-	[[maybe_unused]] auto res =
-		InsertMenuItem(m_menu.get(), GetMenuItemCount(m_menu.get()), true, &menuItemInfo);
-	assert(res);
+	auto res = InsertMenuItem(m_menu.get(), GetMenuItemCount(m_menu.get()), true, &menuItemInfo);
+	CHECK(res);
 }
 
 void PopupMenuView::SetBitmapForItem(UINT id, wil::unique_hbitmap bitmap)
@@ -46,8 +45,8 @@ void PopupMenuView::SetBitmapForItem(UINT id, wil::unique_hbitmap bitmap)
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
 	menuItemInfo.fMask = MIIM_BITMAP;
 	menuItemInfo.hbmpItem = bitmap.get();
-	[[maybe_unused]] auto res = SetMenuItemInfo(m_menu.get(), id, false, &menuItemInfo);
-	assert(res);
+	auto res = SetMenuItemInfo(m_menu.get(), id, false, &menuItemInfo);
+	CHECK(res);
 
 	if (bitmap)
 	{
@@ -57,7 +56,7 @@ void PopupMenuView::SetBitmapForItem(UINT id, wil::unique_hbitmap bitmap)
 
 void PopupMenuView::Show(HWND hwnd, const POINT &point)
 {
-	assert(GetMenuItemCount(m_menu.get()) > 0);
+	DCHECK_GT(GetMenuItemCount(m_menu.get()), 0);
 
 	// Subclass the parent window to allow middle clicks to be detected.
 	auto subclass = std::make_unique<WindowSubclassWrapper>(hwnd,
@@ -109,7 +108,7 @@ UINT PopupMenuView::GetItemIdForTesting(int index) const
 	return GetMenuItemID(m_menu.get(), index);
 }
 
-std::wstring PopupMenuView::GetItemTextForTesting(int index) const
+std::wstring PopupMenuView::GetItemTextForTesting(UINT id) const
 {
 	TCHAR text[256];
 
@@ -118,12 +117,19 @@ std::wstring PopupMenuView::GetItemTextForTesting(int index) const
 	menuItemInfo.fMask = MIIM_STRING;
 	menuItemInfo.dwTypeData = text;
 	menuItemInfo.cch = static_cast<UINT>(std::size(text));
-	auto res = GetMenuItemInfo(m_menu.get(), index, true, &menuItemInfo);
-
-	if (!res)
-	{
-		return L"";
-	}
+	auto res = GetMenuItemInfo(m_menu.get(), id, false, &menuItemInfo);
+	CHECK(res);
 
 	return text;
+}
+
+HBITMAP PopupMenuView::GetItemBitmapForTesting(UINT id) const
+{
+	MENUITEMINFO menuItemInfo = {};
+	menuItemInfo.cbSize = sizeof(menuItemInfo);
+	menuItemInfo.fMask = MIIM_BITMAP;
+	auto res = GetMenuItemInfo(m_menu.get(), id, false, &menuItemInfo);
+	CHECK(res);
+
+	return menuItemInfo.hbmpItem;
 }

@@ -213,6 +213,7 @@
     <ClCompile Include="GdiplusHelperTest.cpp" />
     <ClCompile Include="HelperTest.cpp" />
     <ClCompile Include="MenuHelperTest.cpp" />
+    <ClCompile Include="PopupMenuViewTest.cpp" />
     <ClCompile Include="TabHistoryMenuTest.cpp" />
     <ClCompile Include="ImageHelperTest.cpp" />
     <ClCompile Include="Main.cpp" />

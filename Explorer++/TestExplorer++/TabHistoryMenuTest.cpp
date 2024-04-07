@@ -35,8 +35,8 @@ TEST_F(TabHistoryMenuTest, BackHistory)
 	auto menuView = menu.GetMenuViewForTesting();
 
 	EXPECT_EQ(menuView->GetItemCountForTesting(), 2);
-	EXPECT_EQ(menuView->GetItemTextForTesting(0), L"Fake2");
-	EXPECT_EQ(menuView->GetItemTextForTesting(1), L"Fake1");
+	EXPECT_EQ(menuView->GetItemTextForTesting(menuView->GetItemIdForTesting(0)), L"Fake2");
+	EXPECT_EQ(menuView->GetItemTextForTesting(menuView->GetItemIdForTesting(1)), L"Fake1");
 }
 
 TEST_F(TabHistoryMenuTest, ForwardHistory)
@@ -54,8 +54,8 @@ TEST_F(TabHistoryMenuTest, ForwardHistory)
 	auto menuView = menu.GetMenuViewForTesting();
 
 	EXPECT_EQ(menuView->GetItemCountForTesting(), 2);
-	EXPECT_EQ(menuView->GetItemTextForTesting(0), L"Fake2");
-	EXPECT_EQ(menuView->GetItemTextForTesting(1), L"Fake3");
+	EXPECT_EQ(menuView->GetItemTextForTesting(menuView->GetItemIdForTesting(0)), L"Fake2");
+	EXPECT_EQ(menuView->GetItemTextForTesting(menuView->GetItemIdForTesting(1)), L"Fake3");
 }
 
 TEST_F(TabHistoryMenuTest, BackSelection)
