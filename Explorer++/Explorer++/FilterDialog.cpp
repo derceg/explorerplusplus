@@ -38,13 +38,13 @@ INT_PTR FilterDialog::OnInitDialog()
 			reinterpret_cast<LPARAM>(strFilter.c_str()));
 	}
 
-	std::wstring filter = m_coreInterface->GetActiveShellBrowser()->GetFilterText();
+	std::wstring filter = m_coreInterface->GetActiveShellBrowserImpl()->GetFilterText();
 
 	ComboBox_SelectString(hComboBox, -1, filter.c_str());
 
 	SendMessage(hComboBox, CB_SETEDITSEL, 0, MAKELPARAM(0, -1));
 
-	if (m_coreInterface->GetActiveShellBrowser()->GetFilterCaseSensitive())
+	if (m_coreInterface->GetActiveShellBrowserImpl()->GetFilterCaseSensitive())
 	{
 		CheckDlgButton(m_hDlg, IDC_FILTERS_CASESENSITIVE, BST_CHECKED);
 	}
@@ -124,14 +124,14 @@ void FilterDialog::OnOk()
 		m_persistentSettings->m_FilterList.push_front(filter);
 	}
 
-	m_coreInterface->GetActiveShellBrowser()->SetFilterCaseSensitive(
+	m_coreInterface->GetActiveShellBrowserImpl()->SetFilterCaseSensitive(
 		IsDlgButtonChecked(m_hDlg, IDC_FILTERS_CASESENSITIVE) == BST_CHECKED);
 
-	m_coreInterface->GetActiveShellBrowser()->SetFilterText(filter);
+	m_coreInterface->GetActiveShellBrowserImpl()->SetFilterText(filter);
 
-	if (!m_coreInterface->GetActiveShellBrowser()->IsFilterApplied())
+	if (!m_coreInterface->GetActiveShellBrowserImpl()->IsFilterApplied())
 	{
-		m_coreInterface->GetActiveShellBrowser()->SetFilterApplied(TRUE);
+		m_coreInterface->GetActiveShellBrowserImpl()->SetFilterApplied(TRUE);
 	}
 
 	EndDialog(m_hDlg, 1);

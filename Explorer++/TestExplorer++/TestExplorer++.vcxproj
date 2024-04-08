@@ -270,6 +270,7 @@
     <ClInclude Include="ApplicationToolbarStorageHelper.h" />
     <ClInclude Include="BookmarkStorageHelper.h" />
     <ClInclude Include="BookmarkTreeHelper.h" />
+    <ClInclude Include="BrowserWindowMock.h" />
     <ClInclude Include="ColorRulesStorageHelper.h" />
     <ClInclude Include="ColumnStorageHelper.h" />
     <ClInclude Include="DragDropHelper.h" />

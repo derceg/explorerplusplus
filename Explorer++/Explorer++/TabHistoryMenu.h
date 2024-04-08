@@ -29,11 +29,6 @@ public:
 
 	TabHistoryMenu(BrowserWindow *browserWindow, MenuType type);
 
-	// This constructor is only used in tests. Although not ideal, it means that BrowserWindow and a
-	// series of other classes don't have to be mocked, when the intent is to provide a specific
-	// ShellBrowserInterface instance.
-	TabHistoryMenu(ShellBrowser *shellBrowser, MenuType type);
-
 	void Show(HWND hwnd, const POINT &point);
 
 	// MenuController
@@ -52,10 +47,6 @@ private:
 	ShellBrowser *GetShellBrowser() const;
 
 	BrowserWindow *m_browserWindow = nullptr;
-
-	// Only used in tests.
-	ShellBrowser *m_testShellBrowser = nullptr;
-
 	const MenuType m_type;
 	std::unique_ptr<PopupMenuView> m_menuView;
 	wil::com_ptr_nothrow<IImageList> m_systemImageList;

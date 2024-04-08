@@ -22,13 +22,6 @@ TabHistoryMenu::TabHistoryMenu(BrowserWindow *browserWindow, MenuType type) :
 	Initialize();
 }
 
-TabHistoryMenu::TabHistoryMenu(ShellBrowser *shellBrowser, MenuType type) :
-	m_testShellBrowser(shellBrowser),
-	m_type(type)
-{
-	Initialize();
-}
-
 void TabHistoryMenu::Initialize()
 {
 	FAIL_FAST_IF_FAILED(SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList)));
@@ -123,17 +116,12 @@ void TabHistoryMenu::NavigateToHistoryEntry(UINT menuItemId, bool isMiddleButton
 		return;
 	}
 
-	// m_browserWindow will be null in tests.
-	if (m_browserWindow)
-	{
-		auto disposition =
-			DetermineOpenDisposition(isMiddleButtonDown, isCtrlKeyDown, isShiftKeyDown);
+	auto disposition = DetermineOpenDisposition(isMiddleButtonDown, isCtrlKeyDown, isShiftKeyDown);
 
-		if (disposition != OpenFolderDisposition::CurrentTab)
-		{
-			m_browserWindow->OpenItem(entry->GetPidl().Raw(), disposition);
-			return;
-		}
+	if (disposition != OpenFolderDisposition::CurrentTab)
+	{
+		m_browserWindow->OpenItem(entry->GetPidl().Raw(), disposition);
+		return;
 	}
 
 	shellBrowser->GetNavigationController()->GoToOffset(offset);
@@ -141,10 +129,5 @@ void TabHistoryMenu::NavigateToHistoryEntry(UINT menuItemId, bool isMiddleButton
 
 ShellBrowser *TabHistoryMenu::GetShellBrowser() const
 {
-	if (m_testShellBrowser)
-	{
-		return m_testShellBrowser;
-	}
-
-	return m_browserWindow->GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser();
+	return m_browserWindow->GetActiveShellBrowser();
 }

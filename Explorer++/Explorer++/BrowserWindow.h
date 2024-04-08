@@ -8,6 +8,7 @@
 
 class BrowserCommandController;
 class BrowserPane;
+class ShellBrowser;
 
 // Each browser window contains one or more browser panes, with each pane containing a set of tabs.
 class BrowserWindow : public Navigator
@@ -18,4 +19,5 @@ public:
 	virtual BrowserCommandController *GetCommandController() = 0;
 	virtual BrowserPane *GetActivePane() const = 0;
 	virtual void FocusActiveTab() = 0;
+	virtual ShellBrowser *GetActiveShellBrowser() = 0;
 };

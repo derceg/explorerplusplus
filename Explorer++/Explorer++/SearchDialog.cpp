@@ -618,7 +618,7 @@ void SearchDialog::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		m_tabContainer->CreateNewTab(navigateParams, TabSettings(_selected = true));
 
 		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
-		m_coreInterface->GetActiveShellBrowser()->SelectItems({ pidlComplete.get() });
+		m_coreInterface->GetActiveShellBrowserImpl()->SelectItems({ pidlComplete.get() });
 	}
 	break;
 	}

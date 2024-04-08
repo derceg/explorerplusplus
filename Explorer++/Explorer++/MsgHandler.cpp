@@ -251,14 +251,14 @@ void Explorerplusplus::OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory)
 
 void Explorerplusplus::OpenFileItem(const std::wstring &itemPath, const std::wstring &parameters)
 {
-	auto shellBrowser = GetActiveShellBrowser();
+	auto shellBrowser = GetActiveShellBrowserImpl();
 	ExecuteFileAction(m_hContainer, itemPath, L"", parameters,
 		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectory().c_str());
 }
 
 void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidl, const std::wstring &parameters)
 {
-	auto shellBrowser = GetActiveShellBrowser();
+	auto shellBrowser = GetActiveShellBrowserImpl();
 	ExecuteFileAction(m_hContainer, pidl, L"", parameters,
 		shellBrowser->InVirtualFolder() ? L"" : shellBrowser->GetDirectory().c_str());
 }
@@ -1072,7 +1072,7 @@ HWND Explorerplusplus::GetMainWindow() const
 	return m_hContainer;
 }
 
-ShellBrowserImpl *Explorerplusplus::GetActiveShellBrowser() const
+ShellBrowserImpl *Explorerplusplus::GetActiveShellBrowserImpl() const
 {
 	return m_pActiveShellBrowser;
 }

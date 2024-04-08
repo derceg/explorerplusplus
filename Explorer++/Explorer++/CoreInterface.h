@@ -73,7 +73,7 @@ public:
 
 	virtual HWND GetMainWindow() const = 0;
 
-	virtual ShellBrowserImpl *GetActiveShellBrowser() const = 0;
+	virtual ShellBrowserImpl *GetActiveShellBrowserImpl() const = 0;
 
 	virtual TabContainer *GetTabContainer() const = 0;
 	virtual TabRestorer *GetTabRestorer() const = 0;

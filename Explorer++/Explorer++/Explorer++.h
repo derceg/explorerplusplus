@@ -97,6 +97,13 @@ public:
 	BrowserCommandController *GetCommandController() override;
 	void FocusActiveTab() override;
 
+	// Note that there is also GetActiveShellBrowserImpl() declared below. There are some places
+	// where this method can be used, as the calling code only uses methods from the ShellBrowser
+	// interface. However, there are other places where implementation-only methods are used, in
+	// which case GetActiveShellBrowserImpl() is required. That's the reason these two methods
+	// exist.
+	ShellBrowser *GetActiveShellBrowser() override;
+
 private:
 	static constexpr UINT WM_APP_CLOSE = WM_APP + 1;
 
@@ -485,7 +492,7 @@ private:
 	HINSTANCE GetResourceInstance() const override;
 	HACCEL *GetAcceleratorTable() const override;
 	HWND GetMainWindow() const override;
-	ShellBrowserImpl *GetActiveShellBrowser() const override;
+	ShellBrowserImpl *GetActiveShellBrowserImpl() const override;
 	TabContainer *GetTabContainer() const override;
 	TabRestorer *GetTabRestorer() const override;
 	HWND GetTreeView() const override;

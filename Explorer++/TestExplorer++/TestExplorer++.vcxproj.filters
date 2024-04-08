@@ -311,6 +311,9 @@
     <ClInclude Include="TestResources.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
+    <ClInclude Include="BrowserWindowMock.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="EmbeddedResources\basic.png">

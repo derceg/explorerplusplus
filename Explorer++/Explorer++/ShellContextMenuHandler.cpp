@@ -259,7 +259,7 @@ bool Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 		// This item should only be shown in the background context menu.
 		assert(pidlItems.empty());
 
-		GetActiveShellBrowser()->PasteShortcut();
+		GetActiveShellBrowserImpl()->PasteShortcut();
 
 		return true;
 	}

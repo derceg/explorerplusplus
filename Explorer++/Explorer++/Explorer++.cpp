@@ -14,6 +14,7 @@
 #include "MainRebarStorage.h"
 #include "MenuRanges.h"
 #include "Plugins/PluginManager.h"
+#include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowserHistoryHelper.h"
 #include "TabRestorerMenu.h"
 #include "TabStorage.h"
@@ -79,6 +80,11 @@ BrowserCommandController *Explorerplusplus::GetCommandController()
 BrowserPane *Explorerplusplus::GetActivePane() const
 {
 	return m_browserPane.get();
+}
+
+ShellBrowser *Explorerplusplus::GetActiveShellBrowser()
+{
+	return GetActivePane()->GetTabContainer()->GetSelectedTab().GetShellBrowser();
 }
 
 void Explorerplusplus::OnShellBrowserCreated(ShellBrowser *shellBrowser)

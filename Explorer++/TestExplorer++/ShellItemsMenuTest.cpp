@@ -4,7 +4,7 @@
 
 #include "pch.h"
 #include "ShellItemsMenu.h"
-#include "BrowserWindow.h"
+#include "BrowserWindowMock.h"
 #include "IconFetcher.h"
 #include "../Helper/ShellHelper.h"
 #include <gmock/gmock.h>
@@ -39,21 +39,6 @@ std::vector<PidlAbsolute> BuildPidlCollection(int size)
 
 	return pidls;
 }
-
-class BrowserWindowMock : public BrowserWindow
-{
-public:
-	// BrowserWindow
-	MOCK_METHOD(BrowserCommandController *, GetCommandController, (), (override));
-	MOCK_METHOD(BrowserPane *, GetActivePane, (), (const, override));
-	MOCK_METHOD(void, FocusActiveTab, (), (override));
-
-	// Navigator
-	MOCK_METHOD(void, OpenItem,
-		(const std::wstring &itemPath, OpenFolderDisposition openFolderDisposition), (override));
-	MOCK_METHOD(void, OpenItem,
-		(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition), (override));
-};
 
 class IconFetcherFake : public IconFetcher
 {

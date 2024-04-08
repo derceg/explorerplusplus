@@ -71,5 +71,5 @@ void DropFilesCallback::OnDropFile(const std::list<std::wstring> &PastedFileList
 		}
 	}
 
-	m_coreInterface->GetActiveShellBrowser()->SelectItems(pidls);
+	m_coreInterface->GetActiveShellBrowserImpl()->SelectItems(pidls);
 }
