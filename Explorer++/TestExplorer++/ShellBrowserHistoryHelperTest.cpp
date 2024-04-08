@@ -33,6 +33,10 @@ TEST_F(ShellBrowserHistoryHelperTest, NavigationInDifferentTabs)
 	const auto &history = historyService->GetHistoryItems();
 	EXPECT_EQ(history.size(), 0U);
 
+	MockFunction<void()> callback;
+	historyService->AddHistoryChangedObserver(callback.AsStdFunction());
+	EXPECT_CALL(callback, Call()).Times(3);
+
 	unique_pidl_absolute pidlFake1;
 	NavigateInNewTab(L"C:\\Fake1", &pidlFake1);
 	ASSERT_EQ(history.size(), 1U);
