@@ -6,6 +6,7 @@
 #include "ShellItemsMenu.h"
 #include "BrowserWindowMock.h"
 #include "IconFetcher.h"
+#include "PopupMenuView.h"
 #include "../Helper/ShellHelper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -98,9 +99,10 @@ private:
 class ShellItemsMenuTest : public Test
 {
 protected:
-	std::unique_ptr<ShellItemsMenu> BuildMenu(const std::vector<PidlAbsolute> &pidls)
+	std::unique_ptr<ShellItemsMenu> BuildMenu(MenuView *menuView,
+		const std::vector<PidlAbsolute> &pidls)
 	{
-		return std::make_unique<ShellItemsMenu>(pidls, &m_browserWindow, &m_iconFetcher);
+		return std::make_unique<ShellItemsMenu>(menuView, pidls, &m_browserWindow, &m_iconFetcher);
 	}
 
 	BrowserWindowMock m_browserWindow;
@@ -109,25 +111,25 @@ protected:
 
 TEST_F(ShellItemsMenuTest, CheckItems)
 {
+	PopupMenuView popupMenu;
 	auto pidls = BuildPidlCollection(3);
-	auto menu = BuildMenu(pidls);
+	auto menu = BuildMenu(&popupMenu, pidls);
 
-	auto menuView = menu->GetMenuViewForTesting();
-
-	ASSERT_EQ(static_cast<size_t>(menuView->GetItemCountForTesting()), pidls.size());
+	ASSERT_EQ(static_cast<size_t>(popupMenu.GetItemCountForTesting()), pidls.size());
 
 	for (size_t i = 0; i < pidls.size(); i++)
 	{
 		EXPECT_EQ(
-			menuView->GetItemTextForTesting(menuView->GetItemIdForTesting(static_cast<int>(i))),
+			popupMenu.GetItemTextForTesting(popupMenu.GetItemIdForTesting(static_cast<int>(i))),
 			GetNameForItem(i));
 	}
 }
 
 TEST_F(ShellItemsMenuTest, IconRetrievalAfterMenuDestroyed)
 {
+	PopupMenuView popupMenu;
 	auto pidls = BuildPidlCollection(3);
-	auto menu = BuildMenu(pidls);
+	auto menu = BuildMenu(&popupMenu, pidls);
 
 	menu.reset();
 
@@ -147,7 +149,7 @@ protected:
 
 	ShellItemsMenuSelectionTest() :
 		m_pidls(BuildPidlCollection(3)),
-		m_menu(m_pidls, &m_browserWindow, &m_iconFetcher)
+		m_menu(&m_popupMenu, m_pidls, &m_browserWindow, &m_iconFetcher)
 	{
 	}
 
@@ -171,20 +173,19 @@ private:
 						 Truly(std::bind_front(&ArePidlsEquivalent, m_pidls[index].Raw()))),
 				disposition));
 
-		auto menuView = m_menu.GetMenuViewForTesting();
+		auto id = m_popupMenu.GetItemIdForTesting(static_cast<int>(index));
 
 		if (selectionType == SelectionType::Click)
 		{
-			m_menu.OnMenuItemSelected(menuView->GetItemIdForTesting(static_cast<int>(index)), false,
-				false);
+			m_popupMenu.SelectItem(id, false, false);
 		}
 		else
 		{
-			m_menu.OnMenuItemMiddleClicked(menuView->GetItemIdForTesting(static_cast<int>(index)),
-				false, false);
+			m_popupMenu.MiddleClickItem(id, false, false);
 		}
 	}
 
+	PopupMenuView m_popupMenu;
 	std::vector<PidlAbsolute> m_pidls;
 	BrowserWindowMock m_browserWindow;
 	IconFetcherFake m_iconFetcher;

@@ -6,20 +6,27 @@
 #include "ShellItemsMenu.h"
 #include "BrowserWindow.h"
 #include "IconFetcher.h"
+#include "MenuView.h"
 #include "NavigationHelper.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <glog/logging.h>
 
-ShellItemsMenu::ShellItemsMenu(const std::vector<PidlAbsolute> &pidls, BrowserWindow *browserWindow,
-	IconFetcher *iconFetcher) :
+ShellItemsMenu::ShellItemsMenu(MenuView *menuView, const std::vector<PidlAbsolute> &pidls,
+	BrowserWindow *browserWindow, IconFetcher *iconFetcher) :
+	MenuBase(menuView),
 	m_browserWindow(browserWindow),
 	m_iconFetcher(iconFetcher),
 	m_destroyed(std::make_shared<bool>(false))
 {
 	FAIL_FAST_IF_FAILED(SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList)));
 
-	m_menuView = BuildMenu(pidls);
+	BuildMenu(pidls);
+
+	m_connections.push_back(m_menuView->AddItemSelectedObserver(
+		std::bind_front(&ShellItemsMenu::OnMenuItemSelected, this)));
+	m_connections.push_back(m_menuView->AddItemMiddleClickedObserver(
+		std::bind_front(&ShellItemsMenu::OnMenuItemMiddleClicked, this)));
 }
 
 ShellItemsMenu::~ShellItemsMenu()
@@ -27,24 +34,15 @@ ShellItemsMenu::~ShellItemsMenu()
 	*m_destroyed = true;
 }
 
-void ShellItemsMenu::Show(HWND hwnd, const POINT &point)
+void ShellItemsMenu::BuildMenu(const std::vector<PidlAbsolute> &pidls)
 {
-	m_menuView->Show(hwnd, point);
-}
-
-std::unique_ptr<PopupMenuView> ShellItemsMenu::BuildMenu(const std::vector<PidlAbsolute> &pidls)
-{
-	auto menu = std::make_unique<PopupMenuView>(this);
-
 	for (const auto &pidl : pidls)
 	{
-		AddMenuItemForPidl(menu.get(), pidl.Raw());
+		AddMenuItemForPidl(pidl.Raw());
 	}
-
-	return menu;
 }
 
-void ShellItemsMenu::AddMenuItemForPidl(PopupMenuView *menuView, PCIDLIST_ABSOLUTE pidl)
+void ShellItemsMenu::AddMenuItemForPidl(PCIDLIST_ABSOLUTE pidl)
 {
 	std::wstring name;
 	HRESULT hr = GetDisplayName(pidl, SHGDN_NORMAL, name);
@@ -77,7 +75,7 @@ void ShellItemsMenu::AddMenuItemForPidl(PopupMenuView *menuView, PCIDLIST_ABSOLU
 			OnIconRetrieved(id, iconIndex);
 		});
 
-	menuView->AppendItem(id, name, std::move(bitmap));
+	m_menuView->AppendItem(id, name, std::move(bitmap));
 
 	m_idPidlMap.insert({ id, pidl });
 }
@@ -146,9 +144,4 @@ void ShellItemsMenu::OpenSelectedItem(UINT menuItemId, bool isMiddleButtonDown, 
 	auto &pidl = m_idPidlMap.at(menuItemId);
 	m_browserWindow->OpenItem(pidl.Raw(),
 		DetermineOpenDisposition(isMiddleButtonDown, isCtrlKeyDown, isShiftKeyDown));
-}
-
-const PopupMenuView *ShellItemsMenu::GetMenuViewForTesting() const
-{
-	return m_menuView.get();
 }

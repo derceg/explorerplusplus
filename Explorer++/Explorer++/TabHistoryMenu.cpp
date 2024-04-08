@@ -6,6 +6,7 @@
 #include "TabHistoryMenu.h"
 #include "BrowserPane.h"
 #include "BrowserWindow.h"
+#include "MenuView.h"
 #include "NavigationHelper.h"
 #include "ShellBrowser/HistoryEntry.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
@@ -15,7 +16,8 @@
 #include "../Helper/ImageHelper.h"
 #include "../Helper/ShellHelper.h"
 
-TabHistoryMenu::TabHistoryMenu(BrowserWindow *browserWindow, MenuType type) :
+TabHistoryMenu::TabHistoryMenu(MenuView *menuView, BrowserWindow *browserWindow, MenuType type) :
+	MenuBase(menuView),
 	m_browserWindow(browserWindow),
 	m_type(type)
 {
@@ -27,20 +29,15 @@ void TabHistoryMenu::Initialize()
 	FAIL_FAST_IF_FAILED(SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList)));
 	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(m_defaultFolderIconIndex));
 
-	m_menuView = BuildMenu();
+	BuildMenu();
+
+	m_connections.push_back(m_menuView->AddItemSelectedObserver(
+		std::bind_front(&TabHistoryMenu::OnMenuItemSelected, this)));
+	m_connections.push_back(m_menuView->AddItemMiddleClickedObserver(
+		std::bind_front(&TabHistoryMenu::OnMenuItemMiddleClicked, this)));
 }
 
-const PopupMenuView *TabHistoryMenu::GetMenuViewForTesting() const
-{
-	return m_menuView.get();
-}
-
-void TabHistoryMenu::Show(HWND hwnd, const POINT &point)
-{
-	m_menuView->Show(hwnd, point);
-}
-
-std::unique_ptr<PopupMenuView> TabHistoryMenu::BuildMenu()
+void TabHistoryMenu::BuildMenu()
 {
 	auto *shellBrowser = GetShellBrowser();
 	std::vector<HistoryEntry *> history;
@@ -57,17 +54,13 @@ std::unique_ptr<PopupMenuView> TabHistoryMenu::BuildMenu()
 	// This class shouldn't be invoked in a situation where there is no history for a tab.
 	assert(!history.empty());
 
-	auto menuView = std::make_unique<PopupMenuView>(this);
-
 	for (auto *entry : history)
 	{
-		AddMenuItemForHistoryEntry(menuView.get(), entry);
+		AddMenuItemForHistoryEntry(entry);
 	}
-
-	return menuView;
 }
 
-void TabHistoryMenu::AddMenuItemForHistoryEntry(PopupMenuView *menuView, HistoryEntry *entry)
+void TabHistoryMenu::AddMenuItemForHistoryEntry(HistoryEntry *entry)
 {
 	auto id = m_idCounter++;
 
@@ -84,7 +77,7 @@ void TabHistoryMenu::AddMenuItemForHistoryEntry(PopupMenuView *menuView, History
 			ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), m_defaultFolderIconIndex);
 	}
 
-	menuView->AppendItem(id, entry->GetDisplayName(), std::move(bitmap));
+	m_menuView->AppendItem(id, entry->GetDisplayName(), std::move(bitmap));
 }
 
 void TabHistoryMenu::OnMenuItemSelected(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown)

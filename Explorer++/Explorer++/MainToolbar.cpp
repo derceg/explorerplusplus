@@ -11,6 +11,7 @@
 #include "Icon.h"
 #include "MainResource.h"
 #include "NavigationHelper.h"
+#include "PopupMenuView.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
@@ -699,8 +700,9 @@ void MainToolbar::ShowHistoryMenu(TabHistoryMenu::MenuType historyType)
 		button = MainToolbarButton::Forward;
 	}
 
-	TabHistoryMenu menu(m_browserWindow, historyType);
-	menu.Show(m_hwnd, GetMenuPositionForButton(button));
+	PopupMenuView popupMenu;
+	TabHistoryMenu menu(&popupMenu, m_browserWindow, historyType);
+	popupMenu.Show(m_hwnd, GetMenuPositionForButton(button));
 }
 
 void MainToolbar::ShowUpNavigationMenu()
@@ -722,8 +724,9 @@ void MainToolbar::ShowUpNavigationMenu()
 	// to the root. In the menu, the root needs to be shown first.
 	std::reverse(parentPidls.begin(), parentPidls.end());
 
-	ShellItemsMenu menu(parentPidls, m_browserWindow, m_iconFetcher);
-	menu.Show(m_hwnd, GetMenuPositionForButton(MainToolbarButton::Up));
+	PopupMenuView popupMenu;
+	ShellItemsMenu menu(&popupMenu, parentPidls, m_browserWindow, m_iconFetcher);
+	popupMenu.Show(m_hwnd, GetMenuPositionForButton(MainToolbarButton::Up));
 }
 
 void MainToolbar::ShowToolbarViewsMenu()

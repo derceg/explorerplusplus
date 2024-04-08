@@ -13,10 +13,6 @@ using namespace testing;
 class PopupMenuViewTest : public Test
 {
 protected:
-	PopupMenuViewTest() : m_popupMenu(nullptr)
-	{
-	}
-
 	void CheckAppendItem(UINT itemId, const std::wstring &text, wil::unique_hbitmap bitmap)
 	{
 		auto rawBitmap = bitmap.get();

@@ -8,50 +8,8 @@
 #include "../Helper/MenuHelper.h"
 #include "../Helper/WindowSubclassWrapper.h"
 
-PopupMenuView::PopupMenuView(MenuController *controller) :
-	m_menu(CreatePopupMenu()),
-	m_controller(controller)
+PopupMenuView::PopupMenuView() : m_menu(CreatePopupMenu())
 {
-}
-
-void PopupMenuView::AppendItem(UINT id, const std::wstring &text, wil::unique_hbitmap bitmap)
-{
-	// The call to TrackPopupMenu() below will return the ID of the item that was selected, with 0
-	// being returned if the menu was canceled, or an error occurred. Therefore, 0 shouldn't be used
-	// as an item ID.
-	DCHECK_NE(id, 0U);
-
-	MENUITEMINFO menuItemInfo = {};
-	menuItemInfo.cbSize = sizeof(menuItemInfo);
-	menuItemInfo.fMask = MIIM_ID | MIIM_STRING;
-	menuItemInfo.wID = id;
-	menuItemInfo.dwTypeData = const_cast<LPWSTR>(text.c_str());
-
-	if (bitmap)
-	{
-		menuItemInfo.fMask |= MIIM_BITMAP;
-		menuItemInfo.hbmpItem = bitmap.get();
-
-		m_menuImages.push_back(std::move(bitmap));
-	}
-
-	auto res = InsertMenuItem(m_menu.get(), GetMenuItemCount(m_menu.get()), true, &menuItemInfo);
-	CHECK(res);
-}
-
-void PopupMenuView::SetBitmapForItem(UINT id, wil::unique_hbitmap bitmap)
-{
-	MENUITEMINFO menuItemInfo = {};
-	menuItemInfo.cbSize = sizeof(menuItemInfo);
-	menuItemInfo.fMask = MIIM_BITMAP;
-	menuItemInfo.hbmpItem = bitmap.get();
-	auto res = SetMenuItemInfo(m_menu.get(), id, false, &menuItemInfo);
-	CHECK(res);
-
-	if (bitmap)
-	{
-		m_menuImages.push_back(std::move(bitmap));
-	}
 }
 
 void PopupMenuView::Show(HWND hwnd, const POINT &point)
@@ -70,7 +28,7 @@ void PopupMenuView::Show(HWND hwnd, const POINT &point)
 		return;
 	}
 
-	m_controller->OnMenuItemSelected(cmd, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
+	SelectItem(cmd, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
 }
 
 LRESULT PopupMenuView::ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -95,41 +53,10 @@ void PopupMenuView::OnMenuMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown, bo
 		return;
 	}
 
-	m_controller->OnMenuItemMiddleClicked(*menuItemId, isCtrlKeyDown, isShiftKeyDown);
+	MiddleClickItem(*menuItemId, isCtrlKeyDown, isShiftKeyDown);
 }
 
-int PopupMenuView::GetItemCountForTesting() const
+HMENU PopupMenuView::GetMenu() const
 {
-	return GetMenuItemCount(m_menu.get());
-}
-
-UINT PopupMenuView::GetItemIdForTesting(int index) const
-{
-	return GetMenuItemID(m_menu.get(), index);
-}
-
-std::wstring PopupMenuView::GetItemTextForTesting(UINT id) const
-{
-	TCHAR text[256];
-
-	MENUITEMINFO menuItemInfo = {};
-	menuItemInfo.cbSize = sizeof(menuItemInfo);
-	menuItemInfo.fMask = MIIM_STRING;
-	menuItemInfo.dwTypeData = text;
-	menuItemInfo.cch = static_cast<UINT>(std::size(text));
-	auto res = GetMenuItemInfo(m_menu.get(), id, false, &menuItemInfo);
-	CHECK(res);
-
-	return text;
-}
-
-HBITMAP PopupMenuView::GetItemBitmapForTesting(UINT id) const
-{
-	MENUITEMINFO menuItemInfo = {};
-	menuItemInfo.cbSize = sizeof(menuItemInfo);
-	menuItemInfo.fMask = MIIM_BITMAP;
-	auto res = GetMenuItemInfo(m_menu.get(), id, false, &menuItemInfo);
-	CHECK(res);
-
-	return menuItemInfo.hbmpItem;
+	return m_menu.get();
 }
