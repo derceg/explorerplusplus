@@ -35,9 +35,9 @@ TEST(BookmarkItemTest, AddRemoveChildren)
 
 	parentFolder.AddChild(std::move(bookmark));
 
-	EXPECT_EQ(parentFolder.GetChildren().size(), 1);
+	EXPECT_EQ(parentFolder.GetChildren().size(), 1U);
 	EXPECT_FALSE(parentFolder.HasChildFolder());
-	EXPECT_EQ(parentFolder.GetChildIndex(rawBookmark), 0);
+	EXPECT_EQ(parentFolder.GetChildIndex(rawBookmark), 0U);
 
 	EXPECT_EQ(rawBookmark->GetParent(), &parentFolder);
 
@@ -46,23 +46,23 @@ TEST(BookmarkItemTest, AddRemoveChildren)
 
 	parentFolder.AddChild(std::move(folder));
 
-	EXPECT_EQ(parentFolder.GetChildren().size(), 2);
+	EXPECT_EQ(parentFolder.GetChildren().size(), 2U);
 	EXPECT_TRUE(parentFolder.HasChildFolder());
-	EXPECT_EQ(parentFolder.GetChildIndex(rawFolder), 1);
+	EXPECT_EQ(parentFolder.GetChildIndex(rawFolder), 1U);
 
 	EXPECT_EQ(rawFolder->GetParent(), &parentFolder);
 
 	auto removedBookmark = parentFolder.RemoveChild(0);
 
-	EXPECT_EQ(parentFolder.GetChildren().size(), 1);
+	EXPECT_EQ(parentFolder.GetChildren().size(), 1U);
 	EXPECT_TRUE(parentFolder.HasChildFolder());
-	EXPECT_EQ(parentFolder.GetChildIndex(rawFolder), 0);
+	EXPECT_EQ(parentFolder.GetChildIndex(rawFolder), 0U);
 
 	EXPECT_EQ(rawBookmark->GetParent(), nullptr);
 
 	auto removedFolder = parentFolder.RemoveChild(0);
 
-	EXPECT_EQ(parentFolder.GetChildren().size(), 0);
+	EXPECT_EQ(parentFolder.GetChildren().size(), 0U);
 	EXPECT_FALSE(parentFolder.HasChildFolder());
 
 	EXPECT_EQ(rawFolder->GetParent(), nullptr);

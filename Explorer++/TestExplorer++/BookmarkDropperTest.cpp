@@ -60,46 +60,46 @@ TEST_F(BookmarkDropperBookmarkItemTest, DropEffect)
 {
 	// Drops on the root folder should be blocked.
 	DWORD effect = m_dropper->GetDropEffect(m_bookmarkTree.GetRoot(), 0);
-	EXPECT_EQ(effect, DROPEFFECT_NONE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_NONE));
 
 	// An item can't be dropped at its current position.
 	effect = m_dropper->GetDropEffect(m_bookmarkTree.GetBookmarksMenuFolder(), 0);
-	EXPECT_EQ(effect, DROPEFFECT_NONE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_NONE));
 
 	// It also can't be dropped after itself (which would really just be the same as being dropped
 	// at its current position).
 	effect = m_dropper->GetDropEffect(m_bookmarkTree.GetBookmarksMenuFolder(), 1);
-	EXPECT_EQ(effect, DROPEFFECT_NONE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_NONE));
 
 	// It should be possible to move the item to another position, though (such as after the item
 	// that follows it).
 	effect = m_dropper->GetDropEffect(m_bookmarkTree.GetBookmarksMenuFolder(), 2);
-	EXPECT_EQ(effect, DROPEFFECT_MOVE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_MOVE));
 
 	effect = m_dropper->GetDropEffect(m_bookmarkTree.GetBookmarksToolbarFolder(), 0);
-	EXPECT_EQ(effect, DROPEFFECT_MOVE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_MOVE));
 
 	effect = m_dropper->GetDropEffect(m_bookmarkTree.GetOtherBookmarksFolder(), 0);
-	EXPECT_EQ(effect, DROPEFFECT_MOVE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_MOVE));
 
 	// An item can't be dropped on itself.
 	effect = m_dropper->GetDropEffect(m_rawGrandparentFolder, 0);
-	EXPECT_EQ(effect, DROPEFFECT_NONE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_NONE));
 
 	// It also can't be dropped on one of its children.
 	effect = m_dropper->GetDropEffect(m_rawParentFolder, 0);
-	EXPECT_EQ(effect, DROPEFFECT_NONE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_NONE));
 
 	// It shouldn't be possible to drop an item if the drop has been manually blocked.
 	m_dropper->SetBlockDrop(true);
 	effect = m_dropper->GetDropEffect(m_bookmarkTree.GetBookmarksToolbarFolder(), 0);
-	EXPECT_EQ(effect, DROPEFFECT_NONE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_NONE));
 }
 
 TEST_F(BookmarkDropperBookmarkItemTest, DropOnRoot)
 {
 	DWORD effect = m_dropper->PerformDrop(m_bookmarkTree.GetRoot(), 0);
-	EXPECT_EQ(effect, DROPEFFECT_NONE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_NONE));
 	EXPECT_EQ(m_rawGrandparentFolder->GetParent(), m_bookmarkTree.GetBookmarksMenuFolder());
 }
 
@@ -115,14 +115,14 @@ TEST_F(BookmarkDropperBookmarkItemTest, DropOnFolder)
 			m_bookmarkTree.GetBookmarksToolbarFolder(), 0));
 
 	DWORD effect = m_dropper->PerformDrop(m_bookmarkTree.GetBookmarksToolbarFolder(), 0);
-	EXPECT_EQ(effect, DROPEFFECT_MOVE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_MOVE));
 }
 
 TEST_F(BookmarkDropperBookmarkItemTest, DropWhenBlocked)
 {
 	m_dropper->SetBlockDrop(true);
 	DWORD effect = m_dropper->PerformDrop(m_bookmarkTree.GetBookmarksToolbarFolder(), 0);
-	EXPECT_EQ(effect, DROPEFFECT_NONE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_NONE));
 }
 
 // Tests dropping a shell item.
@@ -148,19 +148,19 @@ TEST_P(BookmarkDropperShellItemTest, DropEffect)
 	auto dropper =
 		std::make_unique<BookmarkDropper>(m_dataObject.get(), DROPEFFECT_COPY, &m_bookmarkTree);
 	DWORD effect = dropper->GetDropEffect(m_bookmarkTree.GetBookmarksMenuFolder(), 0);
-	EXPECT_EQ(effect, DROPEFFECT_COPY);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_COPY));
 
 	dropper =
 		std::make_unique<BookmarkDropper>(m_dataObject.get(), DROPEFFECT_LINK, &m_bookmarkTree);
 	effect = dropper->GetDropEffect(m_bookmarkTree.GetBookmarksMenuFolder(), 0);
-	EXPECT_EQ(effect, DROPEFFECT_LINK);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_LINK));
 
 	// It's not possible to move shell items into the bookmarks tree (the only items that can be
 	// moved are actual bookmarks).
 	dropper =
 		std::make_unique<BookmarkDropper>(m_dataObject.get(), DROPEFFECT_MOVE, &m_bookmarkTree);
 	effect = dropper->GetDropEffect(m_bookmarkTree.GetBookmarksMenuFolder(), 0);
-	EXPECT_EQ(effect, DROPEFFECT_NONE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_NONE));
 }
 
 TEST_P(BookmarkDropperShellItemTest, Drop)
@@ -169,8 +169,8 @@ TEST_P(BookmarkDropperShellItemTest, Drop)
 		std::make_unique<BookmarkDropper>(m_dataObject.get(), DROPEFFECT_COPY, &m_bookmarkTree);
 
 	DWORD effect = dropper->PerformDrop(m_bookmarkTree.GetBookmarksMenuFolder(), 0);
-	ASSERT_EQ(effect, DROPEFFECT_COPY);
-	ASSERT_EQ(m_bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1);
+	ASSERT_EQ(effect, static_cast<DWORD>(DROPEFFECT_COPY));
+	ASSERT_EQ(m_bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1U);
 
 	auto bookmarkItem = m_bookmarkTree.GetBookmarksMenuFolder()->GetChildren()[0].get();
 	EXPECT_TRUE(bookmarkItem->IsBookmark());
@@ -204,20 +204,20 @@ TEST_F(BookmarkDropperInvalidDataTest, DropEffect)
 	// It's not possible to extract any bookmarks items from the drop data, so it shouldn't be
 	// possible to drop anywhere.
 	DWORD effect = m_dropper->GetDropEffect(m_bookmarkTree.GetRoot(), 0);
-	EXPECT_EQ(effect, DROPEFFECT_NONE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_NONE));
 
 	effect = m_dropper->GetDropEffect(m_bookmarkTree.GetBookmarksMenuFolder(), 0);
-	EXPECT_EQ(effect, DROPEFFECT_NONE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_NONE));
 
 	effect = m_dropper->GetDropEffect(m_bookmarkTree.GetBookmarksToolbarFolder(), 0);
-	EXPECT_EQ(effect, DROPEFFECT_NONE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_NONE));
 
 	effect = m_dropper->GetDropEffect(m_bookmarkTree.GetOtherBookmarksFolder(), 0);
-	EXPECT_EQ(effect, DROPEFFECT_NONE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_NONE));
 }
 
 TEST_F(BookmarkDropperInvalidDataTest, Drop)
 {
 	DWORD effect = m_dropper->PerformDrop(m_bookmarkTree.GetBookmarksMenuFolder(), 0);
-	EXPECT_EQ(effect, DROPEFFECT_NONE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_NONE));
 }

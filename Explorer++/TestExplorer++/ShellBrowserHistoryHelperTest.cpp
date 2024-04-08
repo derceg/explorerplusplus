@@ -31,20 +31,20 @@ TEST_F(ShellBrowserHistoryHelperTest, NavigationInDifferentTabs)
 {
 	auto *historyService = HistoryServiceFactory::GetInstance()->GetHistoryService();
 	const auto &history = historyService->GetHistoryItems();
-	EXPECT_EQ(history.size(), 0);
+	EXPECT_EQ(history.size(), 0U);
 
 	unique_pidl_absolute pidlFake1;
 	NavigateInNewTab(L"C:\\Fake1", &pidlFake1);
-	ASSERT_EQ(history.size(), 1);
+	ASSERT_EQ(history.size(), 1U);
 	EXPECT_TRUE(ArePidlsEquivalent(history[0].Raw(), pidlFake1.get()));
 
 	unique_pidl_absolute pidlFake2;
 	NavigateInNewTab(L"C:\\Fake2", &pidlFake2);
-	ASSERT_EQ(history.size(), 2);
+	ASSERT_EQ(history.size(), 2U);
 	EXPECT_TRUE(ArePidlsEquivalent(history[0].Raw(), pidlFake2.get()));
 
 	unique_pidl_absolute pidlFake3;
 	NavigateInNewTab(L"C:\\Fake3", &pidlFake3);
-	ASSERT_EQ(history.size(), 3);
+	ASSERT_EQ(history.size(), 3U);
 	EXPECT_TRUE(ArePidlsEquivalent(history[0].Raw(), pidlFake3.get()));
 }

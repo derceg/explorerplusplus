@@ -27,7 +27,7 @@ protected:
 		LSTATUS result = RegCreateKeyEx(HKEY_CURRENT_USER, APPLICATION_TEST_KEY.c_str(), 0, nullptr,
 			REG_OPTION_VOLATILE, KEY_READ | KEY_WRITE, nullptr, &m_testKey, &disposition);
 		ASSERT_EQ(result, ERROR_SUCCESS);
-		ASSERT_EQ(disposition, REG_CREATED_NEW_KEY);
+		ASSERT_EQ(disposition, static_cast<DWORD>(REG_CREATED_NEW_KEY));
 	}
 
 	wil::unique_hkey m_testKey;

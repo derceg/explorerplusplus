@@ -61,11 +61,15 @@ public:
 	// IconFetcher
 	void QueueIconTask(std::wstring_view path, Callback callback) override
 	{
+		UNREFERENCED_PARAMETER(path);
+
 		m_resultCallbacks.push_back(callback);
 	}
 
 	void QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback) override
 	{
+		UNREFERENCED_PARAMETER(pidl);
+
 		m_resultCallbacks.push_back(callback);
 	}
 
@@ -76,11 +80,16 @@ public:
 	int GetCachedIconIndexOrDefault(const std::wstring &itemPath,
 		DefaultIconType defaultIconType) const override
 	{
+		UNREFERENCED_PARAMETER(itemPath);
+		UNREFERENCED_PARAMETER(defaultIconType);
+
 		return 0;
 	}
 
 	std::optional<int> GetCachedIconIndex(const std::wstring &itemPath) const override
 	{
+		UNREFERENCED_PARAMETER(itemPath);
+
 		return std::nullopt;
 	}
 
@@ -120,7 +129,7 @@ TEST_F(ShellItemsMenuTest, CheckItems)
 
 	auto menuView = menu->GetMenuViewForTesting();
 
-	ASSERT_EQ(menuView->GetItemCountForTesting(), pidls.size());
+	ASSERT_EQ(static_cast<size_t>(menuView->GetItemCountForTesting()), pidls.size());
 
 	for (size_t i = 0; i < pidls.size(); i++)
 	{

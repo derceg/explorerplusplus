@@ -26,7 +26,7 @@ protected:
 		AddItemsToComboBox(m_comboBox, items, 0);
 
 		int numItems = ComboBox_GetCount(m_comboBox);
-		ASSERT_EQ(numItems, items.size());
+		ASSERT_EQ(static_cast<size_t>(numItems), items.size());
 	}
 
 	void TearDown() override

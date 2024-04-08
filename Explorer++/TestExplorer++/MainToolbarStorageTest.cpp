@@ -66,12 +66,12 @@ TEST(MainToolbarButtonsTest, DuplicateButtons)
 	MainToolbarStorage::MainToolbarButtons buttons;
 	buttons.AddButton(MainToolbarButton::Up);
 	buttons.AddButton(MainToolbarButton::OpenCommandPrompt);
-	EXPECT_EQ(buttons.GetButtons().size(), 2);
+	EXPECT_EQ(buttons.GetButtons().size(), 2U);
 
 	// It shouldn't be possible to add a standard button more than once, so this call should have no
 	// effect.
 	buttons.AddButton(MainToolbarButton::Up);
-	EXPECT_EQ(buttons.GetButtons().size(), 2);
+	EXPECT_EQ(buttons.GetButtons().size(), 2U);
 }
 
 TEST(MainToolbarButtonsTest, DuplicateSeparators)
@@ -80,11 +80,11 @@ TEST(MainToolbarButtonsTest, DuplicateSeparators)
 	buttons.AddButton(MainToolbarButton::Properties);
 	buttons.AddButton(MainToolbarButton::Separator);
 	buttons.AddButton(MainToolbarButton::Refresh);
-	EXPECT_EQ(buttons.GetButtons().size(), 3);
+	EXPECT_EQ(buttons.GetButtons().size(), 3U);
 
 	// Unlike standard buttons, it should be possible for separators to appear multiple times.
 	buttons.AddButton(MainToolbarButton::Separator);
-	EXPECT_EQ(buttons.GetButtons().size(), 4);
+	EXPECT_EQ(buttons.GetButtons().size(), 4U);
 }
 
 class MainToolbarRegistryStorageTest : public RegistryStorageTest

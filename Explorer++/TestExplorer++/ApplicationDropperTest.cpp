@@ -84,12 +84,12 @@ TEST_P(ApplicationDropperShellItemTest, DropAtIndex)
 
 	if (GetParam() == ShellItemType::Folder)
 	{
-		EXPECT_EQ(effect, DROPEFFECT_NONE);
+		EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_NONE));
 		return;
 	}
 
-	ASSERT_EQ(effect, DROPEFFECT_COPY);
-	ASSERT_EQ(m_applicationModel.GetItems().size(), 2);
+	ASSERT_EQ(effect, static_cast<DWORD>(DROPEFFECT_COPY));
+	ASSERT_EQ(m_applicationModel.GetItems().size(), 2U);
 
 	auto *application = m_applicationModel.GetItemAtIndex(0);
 	EXPECT_EQ(application->GetName(), ApplicationHelper::RemoveExtensionFromFileName(m_itemName));
@@ -106,10 +106,10 @@ TEST_P(ApplicationDropperShellItemTest, DropOnApplication)
 
 	DWORD effect = dropper->PerformDrop(
 		ApplicationDropper::DropTarget::CreateForDropOnApplication(m_application));
-	EXPECT_EQ(effect, DROPEFFECT_COPY);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_COPY));
 
 	// The items were dropped on an existing application, so no new items should have been added.
-	EXPECT_EQ(m_applicationModel.GetItems().size(), 1);
+	EXPECT_EQ(m_applicationModel.GetItems().size(), 1U);
 }
 
 INSTANTIATE_TEST_SUITE_P(FileAndFolder, ApplicationDropperShellItemTest,
@@ -139,19 +139,19 @@ TEST_F(ApplicationDropperInvalidDataTest, DropEffect)
 {
 	DWORD effect =
 		m_dropper->GetDropEffect(ApplicationDropper::DropTarget::CreateForDropAtIndex(0));
-	EXPECT_EQ(effect, DROPEFFECT_NONE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_NONE));
 
 	effect = m_dropper->GetDropEffect(
 		ApplicationDropper::DropTarget::CreateForDropOnApplication(m_application));
-	EXPECT_EQ(effect, DROPEFFECT_NONE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_NONE));
 }
 
 TEST_F(ApplicationDropperInvalidDataTest, Drop)
 {
 	DWORD effect = m_dropper->PerformDrop(ApplicationDropper::DropTarget::CreateForDropAtIndex(0));
-	EXPECT_EQ(effect, DROPEFFECT_NONE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_NONE));
 
 	effect = m_dropper->PerformDrop(
 		ApplicationDropper::DropTarget::CreateForDropOnApplication(m_application));
-	EXPECT_EQ(effect, DROPEFFECT_NONE);
+	EXPECT_EQ(effect, static_cast<DWORD>(DROPEFFECT_NONE));
 }

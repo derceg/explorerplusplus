@@ -67,9 +67,9 @@ TEST(BookmarkTreeTest, AddChildren)
 	auto bookmark = std::make_unique<BookmarkItem>(std::nullopt, L"Test bookmark", L"C:\\");
 	bookmarkTree.AddBookmarkItem(bookmarkTree.GetBookmarksMenuFolder(), std::move(bookmark), 0);
 
-	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1);
-	EXPECT_EQ(bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 0);
-	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0);
+	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1U);
+	EXPECT_EQ(bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 0U);
+	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0U);
 
 	for (int i = 0; i < 10; i++)
 	{
@@ -79,9 +79,9 @@ TEST(BookmarkTreeTest, AddChildren)
 			std::move(currentBookmark), i);
 	}
 
-	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1);
-	EXPECT_EQ(bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 10);
-	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0);
+	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1U);
+	EXPECT_EQ(bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 10U);
+	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0U);
 
 	for (int i = 0; i < 10; i++)
 	{
@@ -94,11 +94,11 @@ TEST(BookmarkTreeTest, AddChildren)
 	auto rawBookmark = bookmark.get();
 	bookmarkTree.AddBookmarkItem(bookmarkTree.GetOtherBookmarksFolder(), std::move(bookmark), 100);
 
-	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1);
-	EXPECT_EQ(bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 10);
-	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 1);
+	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1U);
+	EXPECT_EQ(bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 10U);
+	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 1U);
 
-	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildIndex(rawBookmark), 0);
+	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildIndex(rawBookmark), 0U);
 }
 
 TEST(BookmarkTreeTest, MoveChildren)
@@ -109,15 +109,15 @@ TEST(BookmarkTreeTest, MoveChildren)
 	auto rawBookmark = bookmark.get();
 	bookmarkTree.AddBookmarkItem(bookmarkTree.GetBookmarksMenuFolder(), std::move(bookmark), 0);
 
-	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1);
-	EXPECT_EQ(bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 0);
-	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0);
+	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1U);
+	EXPECT_EQ(bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 0U);
+	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0U);
 
 	bookmarkTree.MoveBookmarkItem(rawBookmark, bookmarkTree.GetBookmarksToolbarFolder(), 0);
 
-	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 0);
-	EXPECT_EQ(bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 1);
-	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0);
+	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 0U);
+	EXPECT_EQ(bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 1U);
+	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0U);
 }
 
 TEST(BookmarkTreeTest, RemoveChildren)
@@ -128,15 +128,15 @@ TEST(BookmarkTreeTest, RemoveChildren)
 	auto rawBookmark = bookmark.get();
 	bookmarkTree.AddBookmarkItem(bookmarkTree.GetBookmarksMenuFolder(), std::move(bookmark), 0);
 
-	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1);
-	EXPECT_EQ(bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 0);
-	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0);
+	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 1U);
+	EXPECT_EQ(bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 0U);
+	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0U);
 
 	bookmarkTree.RemoveBookmarkItem(rawBookmark);
 
-	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 0);
-	EXPECT_EQ(bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 0);
-	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0);
+	EXPECT_EQ(bookmarkTree.GetBookmarksMenuFolder()->GetChildren().size(), 0U);
+	EXPECT_EQ(bookmarkTree.GetBookmarksToolbarFolder()->GetChildren().size(), 0U);
+	EXPECT_EQ(bookmarkTree.GetOtherBookmarksFolder()->GetChildren().size(), 0U);
 }
 
 TEST_F(BookmarkTreeObserverTest, Add)

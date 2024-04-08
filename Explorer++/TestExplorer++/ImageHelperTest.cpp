@@ -13,6 +13,6 @@ TEST(LoadGdiplusBitmapFromPNG, Basic)
 	ASSERT_NE(png, nullptr);
 
 	// This is a basic sanity check that the png has been loaded correctly.
-	EXPECT_EQ(png->GetWidth(), 16);
-	EXPECT_EQ(png->GetHeight(), 16);
+	EXPECT_EQ(png->GetWidth(), 16U);
+	EXPECT_EQ(png->GetHeight(), 16U);
 }

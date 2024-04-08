@@ -131,7 +131,7 @@ TEST_F(ShellNavigationControllerTest, RetrieveHistory)
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
 
 	history = navigationController->GetBackHistory();
-	EXPECT_EQ(history.size(), 1);
+	EXPECT_EQ(history.size(), 1U);
 
 	history = navigationController->GetForwardHistory();
 	EXPECT_TRUE(history.empty());
@@ -139,7 +139,7 @@ TEST_F(ShellNavigationControllerTest, RetrieveHistory)
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
 
 	history = navigationController->GetBackHistory();
-	EXPECT_EQ(history.size(), 2);
+	EXPECT_EQ(history.size(), 2U);
 
 	history = navigationController->GetForwardHistory();
 	EXPECT_TRUE(history.empty());
@@ -147,10 +147,10 @@ TEST_F(ShellNavigationControllerTest, RetrieveHistory)
 	ASSERT_HRESULT_SUCCEEDED(navigationController->GoBack());
 
 	history = navigationController->GetBackHistory();
-	EXPECT_EQ(history.size(), 1);
+	EXPECT_EQ(history.size(), 1U);
 
 	history = navigationController->GetForwardHistory();
-	EXPECT_EQ(history.size(), 1);
+	EXPECT_EQ(history.size(), 1U);
 }
 
 TEST_F(ShellNavigationControllerTest, GoUp)
