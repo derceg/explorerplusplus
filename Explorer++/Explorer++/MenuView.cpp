@@ -4,13 +4,15 @@
 
 #include "stdafx.h"
 #include "MenuView.h"
+#include "../Helper/MenuHelper.h"
 
 MenuView::~MenuView()
 {
 	m_viewDestroyedSignal();
 }
 
-void MenuView::AppendItem(UINT id, const std::wstring &text, wil::unique_hbitmap bitmap)
+void MenuView::AppendItem(UINT id, const std::wstring &text, wil::unique_hbitmap bitmap,
+	const std::wstring &helpText)
 {
 	// The call to TrackPopupMenu() below will return the ID of the item that was selected, with
 	// 0 being returned if the menu was canceled, or an error occurred. Therefore, 0 shouldn't
@@ -33,6 +35,9 @@ void MenuView::AppendItem(UINT id, const std::wstring &text, wil::unique_hbitmap
 
 	auto res = InsertMenuItem(GetMenu(), GetMenuItemCount(GetMenu()), true, &menuItemInfo);
 	CHECK(res);
+
+	auto [itr, didInsert] = m_itemHelpTextMapping.insert({ id, helpText });
+	DCHECK(didInsert);
 }
 
 void MenuView::SetBitmapForItem(UINT id, wil::unique_hbitmap bitmap)
@@ -50,14 +55,48 @@ void MenuView::SetBitmapForItem(UINT id, wil::unique_hbitmap bitmap)
 	}
 }
 
-void MenuView::SelectItem(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown)
+void MenuView::EnableItem(UINT id, bool enable)
 {
-	m_itemSelectedSignal(menuItemId, isCtrlKeyDown, isShiftKeyDown);
+	MenuHelper::EnableItem(GetMenu(), id, enable);
 }
 
-void MenuView::MiddleClickItem(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown)
+void MenuView::ClearMenu()
 {
-	m_itemMiddleClickedSignal(menuItemId, isCtrlKeyDown, isShiftKeyDown);
+	for (int i = GetMenuItemCount(GetMenu()) - 1; i >= 0; i--)
+	{
+		auto res = DeleteMenu(GetMenu(), i, MF_BYPOSITION);
+		DCHECK(res);
+	}
+
+	m_menuImages.clear();
+	m_itemHelpTextMapping.clear();
+}
+
+std::wstring MenuView::GetHelpTextForItem(UINT id) const
+{
+	auto itr = m_itemHelpTextMapping.find(id);
+	CHECK(itr != m_itemHelpTextMapping.end());
+	return itr->second;
+}
+
+void MenuView::SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
+{
+	if (!MenuHelper::IsMenuItemEnabled(GetMenu(), id, false))
+	{
+		return;
+	}
+
+	m_itemSelectedSignal(id, isCtrlKeyDown, isShiftKeyDown);
+}
+
+void MenuView::MiddleClickItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown)
+{
+	if (!MenuHelper::IsMenuItemEnabled(GetMenu(), id, false))
+	{
+		return;
+	}
+
+	m_itemMiddleClickedSignal(id, isCtrlKeyDown, isShiftKeyDown);
 }
 
 boost::signals2::connection MenuView::AddItemSelectedObserver(

@@ -46,6 +46,7 @@ class ILoadSave;
 class LoadSaveRegistry;
 class LoadSaveXML;
 class MainFontSetter;
+class MainMenuSubMenuView;
 class MainToolbar;
 class MainWindow;
 struct NavigateParams;
@@ -532,6 +533,7 @@ private:
 	void OnMenuRightButtonUp(HMENU menu, int index, const POINT &pt);
 	boost::signals2::connection AddGetMenuItemHelperTextObserver(
 		const GetMenuItemHelperTextSignal::slot_type &observer) override;
+	std::optional<std::wstring> MaybeGetMenuItemHelperText(HMENU menu, int id);
 
 	// Dark mode
 	static bool ShouldEnableDarkMode(Theme theme);
@@ -611,6 +613,7 @@ private:
 	std::unique_ptr<MainFontSetter> m_tabToolbarTooltipFontSetter;
 	wil::unique_hbrush m_tabBarBackgroundBrush;
 	std::unique_ptr<TabRestorer> m_tabRestorer;
+	std::unique_ptr<MainMenuSubMenuView> m_tabRestorerMenuView;
 	std::unique_ptr<TabRestorerMenu> m_tabRestorerMenu;
 	TabsInitializedSignal m_tabsInitializedSignal;
 

@@ -7,7 +7,9 @@
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "FeatureList.h"
 #include "Icon.h"
+#include "MainMenuSubMenuView.h"
 #include "MainResource.h"
+#include "MenuRanges.h"
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/ImageHelper.h"
@@ -83,6 +85,9 @@ void Explorerplusplus::InitializeMainMenu()
 	SetMainMenuImages();
 
 	InitializeGoMenu(mainMenu);
+
+	AddGetMenuItemHelperTextObserver(
+		std::bind_front(&Explorerplusplus::MaybeGetMenuItemHelperText, this));
 }
 
 void Explorerplusplus::SetMainMenuImages()
@@ -244,6 +249,17 @@ void Explorerplusplus::OnMenuMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown,
 		return;
 	}
 
+	auto menuItemId = MenuHelper::MaybeGetMenuItemAtPoint(GetMenu(m_hContainer), pt);
+
+	if (menuItemId)
+	{
+		if (*menuItemId >= MENU_RECENT_TABS_START_ID && *menuItemId < MENU_RECENT_TABS_END_ID)
+		{
+			m_tabRestorerMenuView->MiddleClickItem(*menuItemId, isCtrlKeyDown, isShiftKeyDown);
+			return;
+		}
+	}
+
 	m_mainMenuItemMiddleClickedSignal(pt, isCtrlKeyDown, isShiftKeyDown);
 }
 
@@ -267,4 +283,15 @@ boost::signals2::connection Explorerplusplus::AddGetMenuItemHelperTextObserver(
 	const GetMenuItemHelperTextSignal::slot_type &observer)
 {
 	return m_getMenuItemHelperTextSignal.connect(observer);
+}
+
+std::optional<std::wstring> Explorerplusplus::MaybeGetMenuItemHelperText(HMENU menu, int id)
+{
+	if (MenuHelper::IsPartOfMenu(GetMenu(m_hContainer), menu) && id >= MENU_RECENT_TABS_START_ID
+		&& id < MENU_RECENT_TABS_END_ID)
+	{
+		return m_tabRestorerMenuView->GetHelpTextForItem(id);
+	}
+
+	return std::nullopt;
 }

@@ -13,12 +13,17 @@ class TabContainer;
 class TabRestorer
 {
 public:
+	using ItemsChangedSignal = boost::signals2::signal<void()>;
+
 	TabRestorer(TabContainer *tabContainer);
 
 	const std::vector<std::unique_ptr<PreservedTab>> &GetClosedTabs() const;
 	const PreservedTab *GetTabById(int id) const;
 	void RestoreLastTab();
 	void RestoreTabById(int id);
+
+	boost::signals2::connection AddItemsChangedObserver(
+		const ItemsChangedSignal::slot_type &observer);
 
 private:
 	DISALLOW_COPY_AND_ASSIGN(TabRestorer);
@@ -29,4 +34,6 @@ private:
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	std::vector<std::unique_ptr<PreservedTab>> m_closedTabs;
+
+	ItemsChangedSignal m_itemsChangedSignal;
 };

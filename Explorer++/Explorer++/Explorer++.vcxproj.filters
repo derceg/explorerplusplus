@@ -643,6 +643,9 @@
     <ClCompile Include="MenuBase.cpp">
       <Filter>Core\UI</Filter>
     </ClCompile>
+    <ClCompile Include="MainMenuSubMenuView.cpp">
+      <Filter>Core\UI\Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1319,6 +1322,9 @@
     </ClInclude>
     <ClInclude Include="MenuBase.h">
       <Filter>Core\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="MainMenuSubMenuView.h">
+      <Filter>Core\UI\Views</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

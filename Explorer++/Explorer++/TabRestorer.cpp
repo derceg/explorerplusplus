@@ -16,6 +16,7 @@ void TabRestorer::OnTabPreRemoval(const Tab &tab)
 {
 	auto closedTab = std::make_unique<PreservedTab>(tab, m_tabContainer->GetTabIndex(tab));
 	m_closedTabs.insert(m_closedTabs.begin(), std::move(closedTab));
+	m_itemsChangedSignal();
 }
 
 const std::vector<std::unique_ptr<PreservedTab>> &TabRestorer::GetClosedTabs() const
@@ -48,6 +49,7 @@ void TabRestorer::RestoreLastTab()
 	auto lastClosedTab = itr->get();
 	m_tabContainer->CreateNewTab(*lastClosedTab);
 	m_closedTabs.erase(itr);
+	m_itemsChangedSignal();
 }
 
 void TabRestorer::RestoreTabById(int id)
@@ -63,4 +65,11 @@ void TabRestorer::RestoreTabById(int id)
 	auto closedTab = itr->get();
 	m_tabContainer->CreateNewTab(*closedTab);
 	m_closedTabs.erase(itr);
+	m_itemsChangedSignal();
+}
+
+boost::signals2::connection TabRestorer::AddItemsChangedObserver(
+	const ItemsChangedSignal::slot_type &observer)
+{
+	return m_itemsChangedSignal.connect(observer);
 }

@@ -7,9 +7,12 @@
 #include "Bookmarks/BookmarkTreeFactory.h"
 #include "Config.h"
 #include "LoadSaveInterface.h"
+#include "MainMenuSubMenuView.h"
+#include "MainResource.h"
 #include "MenuRanges.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainer.h"
+#include "TabRestorer.h"
 #include "TabRestorerMenu.h"
 #include "TabStorage.h"
 #include "../Helper/Macros.h"
@@ -60,8 +63,14 @@ void Explorerplusplus::InitializeTabs()
 	m_connections.push_back(m_config->extendTabControl.addObserver(updateLayoutObserverMethod));
 
 	m_tabRestorer = std::make_unique<TabRestorer>(tabContainer);
-	m_tabRestorerMenu = std::make_unique<TabRestorerMenu>(m_resourceInstance, this,
-		m_tabRestorer.get(), MENU_RECENT_TABS_START_ID, MENU_RECENT_TABS_END_ID);
+
+	// TODO: These should be initialized when the main menu is initialized, but that's not possible
+	// at the moment, due to the dependence on m_tabRestorer, which itself depends on tabContainer.
+	m_tabRestorerMenuView =
+		std::make_unique<MainMenuSubMenuView>(GetMenu(m_hContainer), IDM_FILE_REOPEN_RECENT_TAB);
+	m_tabRestorerMenu =
+		std::make_unique<TabRestorerMenu>(m_tabRestorerMenuView.get(), m_tabRestorer.get(),
+			m_resourceInstance, MENU_RECENT_TABS_START_ID, MENU_RECENT_TABS_END_ID);
 
 	m_tabsInitializedSignal();
 }

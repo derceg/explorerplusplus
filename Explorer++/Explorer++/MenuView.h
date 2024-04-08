@@ -6,6 +6,7 @@
 
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
+#include <unordered_map>
 #include <vector>
 
 class MenuView
@@ -19,11 +20,15 @@ public:
 
 	virtual ~MenuView();
 
-	void AppendItem(UINT id, const std::wstring &text, wil::unique_hbitmap bitmap = nullptr);
+	void AppendItem(UINT id, const std::wstring &text, wil::unique_hbitmap bitmap = nullptr,
+		const std::wstring &helpText = L"");
 	void SetBitmapForItem(UINT id, wil::unique_hbitmap bitmap);
+	void EnableItem(UINT id, bool enable);
+	void ClearMenu();
+	std::wstring GetHelpTextForItem(UINT id) const;
 
-	void SelectItem(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown);
-	void MiddleClickItem(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown);
+	void SelectItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown);
+	void MiddleClickItem(UINT id, bool isCtrlKeyDown, bool isShiftKeyDown);
 
 	boost::signals2::connection AddItemSelectedObserver(
 		const ItemSelectedSignal::slot_type &observer);
@@ -42,6 +47,7 @@ private:
 	virtual HMENU GetMenu() const = 0;
 
 	std::vector<wil::unique_hbitmap> m_menuImages;
+	std::unordered_map<UINT, std::wstring> m_itemHelpTextMapping;
 	ItemSelectedSignal m_itemSelectedSignal;
 	ItemMiddleClickedSignal m_itemMiddleClickedSignal;
 	ViewDestroyedSignal m_viewDestroyedSignal;

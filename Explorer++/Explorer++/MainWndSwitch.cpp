@@ -20,6 +20,7 @@
 #include "DrivesToolbarView.h"
 #include "Explorer++_internal.h"
 #include "HolderWindow.h"
+#include "MainMenuSubMenuView.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
 #include "MainToolbarButtons.h"
@@ -30,6 +31,7 @@
 #include "ShellBrowser/ViewModes.h"
 #include "TabBacking.h"
 #include "TabContainer.h"
+#include "TabRestorer.h"
 #include "TabRestorerMenu.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/Controls.h"
@@ -339,7 +341,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 	else if (notificationCode == 0 && id >= MENU_RECENT_TABS_START_ID
 		&& id < MENU_RECENT_TABS_END_ID)
 	{
-		m_tabRestorerMenu->OnMenuItemClicked(id);
+		m_tabRestorerMenuView->SelectItem(id, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
 		return 0;
 	}
 	else if (notificationCode == 0 && id >= MENU_PLUGIN_START_ID && id < MENU_PLUGIN_END_ID)
