@@ -4,6 +4,8 @@
 
 #include "stdafx.h"
 #include "TabRestorerMenu.h"
+#include "AcceleratorHelper.h"
+#include "AcceleratorManager.h"
 #include "MainResource.h"
 #include "MenuView.h"
 #include "ResourceHelper.h"
@@ -14,10 +16,12 @@
 #include <ranges>
 
 TabRestorerMenu::TabRestorerMenu(MenuView *menuView, TabRestorer *tabRestorer,
-	HINSTANCE resourceInstance, UINT menuStartId, UINT menuEndId) :
+	const AcceleratorManager *acceleratorManager, HINSTANCE resourceInstance, UINT menuStartId,
+	UINT menuEndId) :
 	MenuBase(menuView),
-	m_resourceInstance(resourceInstance),
 	m_tabRestorer(tabRestorer),
+	m_acceleratorManager(acceleratorManager),
+	m_resourceInstance(resourceInstance),
 	m_menuStartId(menuStartId),
 	m_menuEndId(menuEndId),
 	m_idCounter(menuStartId)
@@ -74,9 +78,12 @@ void TabRestorerMenu::AddMenuItemForClosedTab(const PreservedTab *closedTab,
 
 	if (addAcceleratorText)
 	{
-		// TODO: As accelerator key bindings can be customized, this should be dynamically looked
-		// up.
-		menuText += L"\tCtrl+Shift+T";
+		auto accelerator = m_acceleratorManager->GetAcceleratorForCommand(IDA_RESTORE_LAST_TAB);
+
+		if (accelerator)
+		{
+			menuText += L"\t" + BuildAcceleratorString(*accelerator);
+		}
 	}
 
 	wil::unique_hbitmap bitmap;
