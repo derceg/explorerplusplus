@@ -59,7 +59,7 @@ LRESULT CALLBACK Explorerplusplus::WndProcStub(HWND hwnd, UINT msg, WPARAM wPara
 		auto *createInfo = reinterpret_cast<CREATESTRUCT *>(lParam);
 
 		pContainer = new Explorerplusplus(hwnd,
-			reinterpret_cast<CommandLine::Settings *>(createInfo->lpCreateParams));
+			reinterpret_cast<InitializationData *>(createInfo->lpCreateParams));
 
 		if (!pContainer)
 		{

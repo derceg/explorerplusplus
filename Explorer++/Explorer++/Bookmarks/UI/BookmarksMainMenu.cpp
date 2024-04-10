@@ -17,7 +17,8 @@
 #include "../Helper/MenuHelper.h"
 
 BookmarksMainMenu::BookmarksMainMenu(BrowserWindow *browserWindow, CoreInterface *coreInterface,
-	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, const MenuIdRange &menuIdRange) :
+	IconFetcher *iconFetcher, BookmarkTree *bookmarkTree,
+	const BookmarkMenuBuilder::MenuIdRange &menuIdRange) :
 	m_coreInterface(coreInterface),
 	m_bookmarkTree(bookmarkTree),
 	m_menuIdRange(menuIdRange),
@@ -94,9 +95,9 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(
 	return menu;
 }
 
-void BookmarksMainMenu::AddBookmarkItemsToMenu(HMENU menu, const MenuIdRange &menuIdRange,
-	int position, std::vector<wil::unique_hbitmap> &menuImages,
-	BookmarkMenuBuilder::MenuInfo &menuInfo)
+void BookmarksMainMenu::AddBookmarkItemsToMenu(HMENU menu,
+	const BookmarkMenuBuilder::MenuIdRange &menuIdRange, int position,
+	std::vector<wil::unique_hbitmap> &menuImages, BookmarkMenuBuilder::MenuInfo &menuInfo)
 {
 	BookmarkItem *bookmarksMenuFolder = m_bookmarkTree->GetBookmarksMenuFolder();
 
@@ -111,9 +112,9 @@ void BookmarksMainMenu::AddBookmarkItemsToMenu(HMENU menu, const MenuIdRange &me
 		menuIdRange, position, menuImages, menuInfo);
 }
 
-void BookmarksMainMenu::AddOtherBookmarksToMenu(HMENU menu, const MenuIdRange &menuIdRange,
-	int position, std::vector<wil::unique_hbitmap> &menuImages,
-	BookmarkMenuBuilder::MenuInfo &menuInfo)
+void BookmarksMainMenu::AddOtherBookmarksToMenu(HMENU menu,
+	const BookmarkMenuBuilder::MenuIdRange &menuIdRange, int position,
+	std::vector<wil::unique_hbitmap> &menuImages, BookmarkMenuBuilder::MenuInfo &menuInfo)
 {
 	BookmarkItem *otherBookmarksFolder = m_bookmarkTree->GetOtherBookmarksFolder();
 

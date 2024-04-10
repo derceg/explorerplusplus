@@ -1062,9 +1062,9 @@ HINSTANCE Explorerplusplus::GetResourceInstance() const
 	return m_resourceInstance;
 }
 
-HACCEL *Explorerplusplus::GetAcceleratorTable() const
+AcceleratorManager *Explorerplusplus::GetAcceleratorManager() const
 {
-	return &g_hAccl;
+	return m_acceleratorManager;
 }
 
 HWND Explorerplusplus::GetMainWindow() const

@@ -8,6 +8,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "AcceleratorManager.h"
 #include "CommandLine.h"
 #include "Console.h"
 #include "CrashHandlerHelper.h"
@@ -27,7 +28,7 @@
 #include <format>
 
 #pragma warning(                                                                                   \
-		disable : 4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
+	disable : 4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
 /* Default window size/position. */
 #define DEFAULT_WINDOWPOS_LEFT_PERCENTAGE 0.02
@@ -47,8 +48,6 @@ HWND g_hwndRunScript = nullptr;
 HWND g_hwndOptions = nullptr;
 HWND g_hwndManageBookmarks = nullptr;
 HWND g_hwndSearchTabs = nullptr;
-
-HACCEL g_hAccl;
 
 ATOM RegisterMainWindowClass(HINSTANCE hInstance)
 {
@@ -256,13 +255,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	InitializeLocale();
 
-	g_hAccl = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINACCELERATORS));
+	wil::unique_haccel acceleratorTable(
+		LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINACCELERATORS)));
+	CHECK(acceleratorTable);
+	AcceleratorManager acceleratorManager(std::move(acceleratorTable));
+
+	Explorerplusplus::InitializationData initializationData;
+	initializationData.commandLineSettings = &commandLineSettings;
+	initializationData.acceleratorManager = &acceleratorManager;
 
 	/* Create the main window. This window will act as a
 	container for all child windows created. */
 	HWND hwnd = CreateWindow(NExplorerplusplus::CLASS_NAME, NExplorerplusplus::APP_NAME,
 		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, nullptr,
-		nullptr, hInstance, &commandLineSettings);
+		nullptr, hInstance, &initializationData);
 
 	if (hwnd == nullptr)
 	{
@@ -347,7 +353,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			&& !IsDialogMessage(g_hwndRunScript, &msg) && !IsDialogMessage(g_hwndOptions, &msg)
 			&& !IsDialogMessage(g_hwndSearchTabs, &msg))
 		{
-			if (!TranslateAccelerator(hwnd, g_hAccl, &msg))
+			if (!TranslateAccelerator(hwnd, acceleratorManager.GetAcceleratorTable(), &msg))
 			{
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);

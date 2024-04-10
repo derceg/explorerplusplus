@@ -8,6 +8,7 @@
 #include <wil/resource.h>
 
 struct Accelerator;
+class AcceleratorManager;
 
 // Wraps an edit control used to rename a shell item. This adds a few pieces of functionality:
 //
@@ -32,7 +33,8 @@ struct Accelerator;
 class ItemNameEditControl
 {
 public:
-	static ItemNameEditControl *CreateNew(HWND hwnd, HACCEL *acceleratorTable, bool itemIsFile);
+	static ItemNameEditControl *CreateNew(HWND hwnd, AcceleratorManager *acceleratorManager,
+		bool itemIsFile);
 
 private:
 	enum class RenameStage
@@ -42,7 +44,7 @@ private:
 		Entire
 	};
 
-	ItemNameEditControl(HWND hwnd, HACCEL *acceleratorTable, bool itemIsFile);
+	ItemNameEditControl(HWND hwnd, AcceleratorManager *acceleratorManager, bool itemIsFile);
 	~ItemNameEditControl();
 
 	void UpdateAcceleratorTable();
@@ -59,9 +61,8 @@ private:
 
 	const HWND m_hwnd;
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
-	HACCEL *m_acceleratorTable = nullptr;
-	wil::unique_haccel m_updatedAcceleratorTable;
-	HACCEL m_originalAcceleratorTable = nullptr;
+	AcceleratorManager *const m_acceleratorManager;
+	std::vector<ACCEL> m_originalAccelerators;
 
 	bool m_itemIsFile;
 	RenameStage m_renameStage;

@@ -973,6 +973,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AboutDialog.cpp" />
+    <ClCompile Include="AcceleratorManager.cpp" />
     <ClCompile Include="AdvancedOptionsPage.cpp" />
     <ClCompile Include="AppearanceOptionsPage.cpp" />
     <ClCompile Include="Application.cpp" />
@@ -1115,7 +1116,7 @@
     <ClCompile Include="LoadSaveXml.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="MainWindow.cpp" />
-    <ClCompile Include="MenuHelper.cpp" />
+    <ClCompile Include="AcceleratorHelper.cpp" />
     <ClCompile Include="PluginInterface.cpp" />
     <ClCompile Include="ServiceProvider.cpp" />
     <ClCompile Include="Language.cpp" />
@@ -1217,6 +1218,7 @@
     <ClInclude Include="..\targetver.h" />
     <ClInclude Include="AboutDialog.h" />
     <ClInclude Include="Accelerator.h" />
+    <ClInclude Include="AcceleratorManager.h" />
     <ClInclude Include="AcceleratorMappings.h" />
     <ClInclude Include="AdvancedOptionsPage.h" />
     <ClInclude Include="AppearanceOptionsPage.h" />
@@ -1372,7 +1374,7 @@
     <ClInclude Include="Plugins\Manifest.h" />
     <ClInclude Include="MassRenameDialog.h" />
     <ClInclude Include="Plugins\MenuApi.h" />
-    <ClInclude Include="MenuHelper.h" />
+    <ClInclude Include="AcceleratorHelper.h" />
     <ClInclude Include="MenuRanges.h" />
     <ClInclude Include="MergeFilesDialog.h" />
     <ClInclude Include="ModelessDialogs.h" />

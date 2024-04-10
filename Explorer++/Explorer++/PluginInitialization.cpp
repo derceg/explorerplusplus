@@ -4,9 +4,9 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "AcceleratorHelper.h"
 #include "Explorer++_internal.h"
 #include "FeatureList.h"
-#include "MenuHelper.h"
 #include "Plugins/PluginManager.h"
 #include "../Helper/ProcessHelper.h"
 #include <filesystem>
@@ -30,5 +30,5 @@ void Explorerplusplus::InitializePlugins()
 	m_pluginManager = std::make_unique<Plugins::PluginManager>(this);
 	m_pluginManager->loadAllPlugins(processDirectoryPath);
 
-	UpdateMenuAcceleratorStrings(GetMenu(m_hContainer), g_hAccl);
+	UpdateMenuAcceleratorStrings(GetMenu(m_hContainer), m_acceleratorManager);
 }

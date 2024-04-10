@@ -1191,7 +1191,7 @@ BOOL ShellBrowserImpl::OnListViewBeginLabelEdit(const NMLVDISPINFO *dispInfo)
 		SetWindowText(editControl, item.editingName.c_str());
 	}
 
-	ItemNameEditControl::CreateNew(editControl, m_acceleratorTable,
+	ItemNameEditControl::CreateNew(editControl, m_acceleratorManager,
 		WI_IsFlagClear(item.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY));
 
 	return FALSE;

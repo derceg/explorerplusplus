@@ -6,7 +6,6 @@
 
 #include "Bookmarks/UI/BookmarkMenuBuilder.h"
 #include "Bookmarks/UI/BookmarkMenuController.h"
-#include "MenuHelper.h"
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
 
@@ -19,7 +18,8 @@ class BookmarksMainMenu
 {
 public:
 	BookmarksMainMenu(BrowserWindow *browserWindow, CoreInterface *coreInterface,
-		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree, const MenuIdRange &menuIdRange);
+		IconFetcher *iconFetcher, BookmarkTree *bookmarkTree,
+		const BookmarkMenuBuilder::MenuIdRange &menuIdRange);
 	~BookmarksMainMenu();
 
 	void OnMenuItemClicked(UINT menuItemId);
@@ -28,17 +28,19 @@ private:
 	void OnMainMenuPreShow(HMENU mainMenu);
 	wil::unique_hmenu BuildMainBookmarksMenu(std::vector<wil::unique_hbitmap> &menuImages,
 		BookmarkMenuBuilder::MenuInfo &menuInfo);
-	void AddBookmarkItemsToMenu(HMENU menu, const MenuIdRange &menuIdRange, int position,
-		std::vector<wil::unique_hbitmap> &menuImages, BookmarkMenuBuilder::MenuInfo &menuInfo);
-	void AddOtherBookmarksToMenu(HMENU menu, const MenuIdRange &menuIdRange, int position,
-		std::vector<wil::unique_hbitmap> &menuImages, BookmarkMenuBuilder::MenuInfo &menuInfo);
+	void AddBookmarkItemsToMenu(HMENU menu, const BookmarkMenuBuilder::MenuIdRange &menuIdRange,
+		int position, std::vector<wil::unique_hbitmap> &menuImages,
+		BookmarkMenuBuilder::MenuInfo &menuInfo);
+	void AddOtherBookmarksToMenu(HMENU menu, const BookmarkMenuBuilder::MenuIdRange &menuIdRange,
+		int position, std::vector<wil::unique_hbitmap> &menuImages,
+		BookmarkMenuBuilder::MenuInfo &menuInfo);
 	std::optional<std::wstring> MaybeGetMenuItemHelperText(HMENU menu, UINT id);
 	bool OnMenuItemMiddleClicked(const POINT &pt, bool isCtrlKeyDown, bool isShiftKeyDown);
 	bool OnMenuItemRightClicked(HMENU menu, int index, const POINT &pt);
 
 	CoreInterface *m_coreInterface = nullptr;
 	BookmarkTree *m_bookmarkTree = nullptr;
-	const MenuIdRange m_menuIdRange;
+	const BookmarkMenuBuilder::MenuIdRange m_menuIdRange;
 	BookmarkMenuBuilder m_menuBuilder;
 
 	wil::unique_hmenu m_bookmarksMenu;

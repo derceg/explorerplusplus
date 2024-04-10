@@ -253,7 +253,7 @@
     <ClCompile Include="AcceleratorUpdater.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="MenuHelper.cpp">
+    <ClCompile Include="AcceleratorHelper.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="MainMenu.cpp">
@@ -646,6 +646,9 @@
     <ClCompile Include="MainMenuSubMenuView.cpp">
       <Filter>Core\UI\Views</Filter>
     </ClCompile>
+    <ClCompile Include="AcceleratorManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -873,7 +876,7 @@
     <ClInclude Include="AcceleratorUpdater.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="MenuHelper.h">
+    <ClInclude Include="AcceleratorHelper.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="NoTranslationResource.h">
@@ -1325,6 +1328,9 @@
     </ClInclude>
     <ClInclude Include="MainMenuSubMenuView.h">
       <Filter>Core\UI\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="AcceleratorManager.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

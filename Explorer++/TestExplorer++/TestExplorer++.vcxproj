@@ -180,6 +180,8 @@
     <VcpkgUseStatic>true</VcpkgUseStatic>
   </PropertyGroup>
   <ItemGroup>
+    <ClCompile Include="AcceleratorHelperTest.cpp" />
+    <ClCompile Include="AcceleratorManagerTest.cpp" />
     <ClCompile Include="ApplicationDropperTest.cpp" />
     <ClCompile Include="ApplicationTest.cpp" />
     <ClCompile Include="ApplicationHelperTest.cpp" />

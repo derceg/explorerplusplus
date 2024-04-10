@@ -8,8 +8,11 @@
 #include <optional>
 #include <unordered_map>
 
+class AcceleratorManager;
+
 namespace Plugins
 {
+
 struct Command;
 
 class PluginCommandManager
@@ -17,7 +20,7 @@ class PluginCommandManager
 public:
 	typedef boost::signals2::signal<void(int, const std::wstring &)> CommandInvokedSignal;
 
-	PluginCommandManager(HACCEL *acceleratorTable, int startId, int endId);
+	PluginCommandManager(AcceleratorManager *acceleratorManager, int startId, int endId);
 
 	void addCommands(int pluginId, const std::vector<Command> &commands);
 
@@ -33,7 +36,7 @@ private:
 		std::wstring name;
 	};
 
-	HACCEL *m_acceleratorTable;
+	AcceleratorManager *const m_acceleratorManager;
 	const int m_startId;
 	const int m_endId;
 
@@ -45,4 +48,5 @@ private:
 
 	CommandInvokedSignal m_commandInvokedSignal;
 };
+
 }

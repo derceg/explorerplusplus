@@ -3,27 +3,16 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "MenuHelper.h"
+#include "AcceleratorHelper.h"
+#include "AcceleratorManager.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include <boost/algorithm/string/join.hpp>
 
-void UpdateMenuAcceleratorStringsInternal(HMENU menu, const std::vector<ACCEL> &accelerators);
 void UpdateMenuItemAcceleratorString(HMENU menu, UINT id, const std::vector<ACCEL> &accelerators);
-std::wstring BuildAcceleratorString(const ACCEL &accelerator);
 std::wstring VirtualKeyToString(UINT key);
 
-void UpdateMenuAcceleratorStrings(HMENU menu, HACCEL acceleratorTable)
-{
-	int numAccelerators = CopyAcceleratorTable(acceleratorTable, nullptr, 0);
-
-	std::vector<ACCEL> accelerators(numAccelerators);
-	CopyAcceleratorTable(acceleratorTable, &accelerators[0], static_cast<int>(accelerators.size()));
-
-	UpdateMenuAcceleratorStringsInternal(menu, accelerators);
-}
-
-void UpdateMenuAcceleratorStringsInternal(HMENU menu, const std::vector<ACCEL> &accelerators)
+void UpdateMenuAcceleratorStrings(HMENU menu, const AcceleratorManager *acceleratorManager)
 {
 	int numItems = GetMenuItemCount(menu);
 
@@ -31,6 +20,8 @@ void UpdateMenuAcceleratorStringsInternal(HMENU menu, const std::vector<ACCEL> &
 	{
 		return;
 	}
+
+	const auto &accelerators = acceleratorManager->GetAccelerators();
 
 	for (int i = 0; i < numItems; i++)
 	{
@@ -42,7 +33,7 @@ void UpdateMenuAcceleratorStringsInternal(HMENU menu, const std::vector<ACCEL> &
 
 			if (subMenu)
 			{
-				UpdateMenuAcceleratorStringsInternal(subMenu, accelerators);
+				UpdateMenuAcceleratorStrings(subMenu, acceleratorManager);
 			}
 		}
 		else
@@ -155,4 +146,24 @@ std::wstring VirtualKeyToString(UINT key)
 	}
 
 	return keyString;
+}
+
+std::vector<ACCEL> TableToAcceleratorItems(HACCEL acceleratorTable)
+{
+	int numAccelerators = CopyAcceleratorTable(acceleratorTable, nullptr, 0);
+
+	std::vector<ACCEL> accelerators(numAccelerators);
+	int numAcceleratorsCopied = CopyAcceleratorTable(acceleratorTable, accelerators.data(),
+		static_cast<int>(accelerators.size()));
+	CHECK_EQ(numAcceleratorsCopied, numAccelerators);
+
+	return accelerators;
+}
+
+wil::unique_haccel AcceleratorItemsToTable(const std::vector<ACCEL> &accelerators)
+{
+	wil::unique_haccel acceleratorTable(CreateAcceleratorTable(
+		const_cast<ACCEL *>(accelerators.data()), static_cast<int>(accelerators.size())));
+	CHECK(acceleratorTable);
+	return acceleratorTable;
 }

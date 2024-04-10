@@ -4,36 +4,29 @@
 
 #include "stdafx.h"
 #include "AcceleratorUpdater.h"
+#include "AcceleratorManager.h"
 
-AcceleratorUpdater::AcceleratorUpdater(HACCEL *acceleratorTable) :
-	m_acceleratorTable(acceleratorTable)
+AcceleratorUpdater::AcceleratorUpdater(AcceleratorManager *acceleratorManager) :
+	m_acceleratorManager(acceleratorManager)
 {
 }
 
 void AcceleratorUpdater::update(const std::vector<ShortcutKey> &shortcutKeys)
 {
-	int numAccelerators = CopyAcceleratorTable(*m_acceleratorTable, nullptr, 0);
-
-	std::vector<ACCEL> accelerators(numAccelerators);
-	CopyAcceleratorTable(*m_acceleratorTable, &accelerators[0],
-		static_cast<int>(accelerators.size()));
+	auto accelerators = m_acceleratorManager->GetAccelerators();
 
 	for (const auto &shortcutKey : shortcutKeys)
 	{
 		accelerators.erase(std::remove_if(accelerators.begin(), accelerators.end(),
 							   [shortcutKey](const ACCEL &accel)
-							   {
-								   return accel.cmd == shortcutKey.command;
-							   }),
+							   { return accel.cmd == shortcutKey.command; }),
 			accelerators.end());
 
 		for (const auto &key : shortcutKey.accelerators)
 		{
 			auto itr = std::find_if(accelerators.begin(), accelerators.end(),
 				[key](const ACCEL &accel)
-				{
-					return (accel.fVirt & ~FNOINVERT) == key.modifiers && accel.key == key.key;
-				});
+				{ return (accel.fVirt & ~FNOINVERT) == key.modifiers && accel.key == key.key; });
 
 			if (itr != accelerators.end())
 			{
@@ -48,14 +41,5 @@ void AcceleratorUpdater::update(const std::vector<ShortcutKey> &shortcutKeys)
 		}
 	}
 
-	HACCEL newAcceleratorTable =
-		CreateAcceleratorTable(&accelerators[0], static_cast<int>(accelerators.size()));
-
-	if (newAcceleratorTable == nullptr)
-	{
-		return;
-	}
-
-	DestroyAcceleratorTable(*m_acceleratorTable);
-	*m_acceleratorTable = newAcceleratorTable;
+	m_acceleratorManager->SetAccelerators(accelerators);
 }

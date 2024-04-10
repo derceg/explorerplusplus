@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include "ShellBrowser.h"
 #include "ColumnDataRetrieval.h"
 #include "Columns.h"
 #include "FolderSettings.h"
 #include "MainFontSetter.h"
 #include "ServiceProvider.h"
+#include "ShellBrowser.h"
 #include "ShellChangeWatcher.h"
 #include "SignalWrapper.h"
 #include "SortModes.h"
@@ -35,6 +35,7 @@
 #define WM_USER_UPDATEWINDOWS (WM_APP + 17)
 #define WM_USER_FILESADDED (WM_APP + 51)
 
+class AcceleratorManager;
 struct BasicItemInfo_t;
 class CachedIcons;
 struct Config;
@@ -679,7 +680,7 @@ private:
 
 	/* Internal state. */
 	const HINSTANCE m_resourceInstance;
-	HACCEL *m_acceleratorTable;
+	AcceleratorManager *const m_acceleratorManager;
 	BOOL m_bFolderVisited;
 	std::optional<int> m_dirMonitorId;
 	int m_iFolderIcon;

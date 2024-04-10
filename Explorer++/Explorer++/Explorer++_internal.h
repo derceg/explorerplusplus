@@ -52,6 +52,4 @@ enum ExitCode
 	EXIT_CODE_ERROR
 };
 
-extern HACCEL g_hAccl;
-
 BOOL TestConfigFileInternal(void);

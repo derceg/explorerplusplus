@@ -6,13 +6,15 @@
 
 #include "Accelerator.h"
 
+class AcceleratorManager;
+
 class AcceleratorUpdater
 {
 public:
-	AcceleratorUpdater(HACCEL *acceleratorTable);
+	AcceleratorUpdater(AcceleratorManager *acceleratorManager);
 
 	void update(const std::vector<ShortcutKey> &shortcutKeys);
 
 private:
-	HACCEL *m_acceleratorTable;
+	AcceleratorManager *const m_acceleratorManager;
 };

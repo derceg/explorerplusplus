@@ -50,6 +50,7 @@ using FocusChangedSignal = boost::signals2::signal<void()>;
 using DeviceChangeSignal = boost::signals2::signal<void(UINT eventType, LONG_PTR eventData)>;
 using ApplicationShuttingDownSignal = boost::signals2::signal<void()>;
 
+class AcceleratorManager;
 class CachedIcons;
 struct Config;
 class IconResourceLoader;
@@ -69,7 +70,7 @@ public:
 
 	virtual const Config *GetConfig() const = 0;
 	virtual HINSTANCE GetResourceInstance() const = 0;
-	virtual HACCEL *GetAcceleratorTable() const = 0;
+	virtual AcceleratorManager *GetAcceleratorManager() const = 0;
 
 	virtual HWND GetMainWindow() const = 0;
 

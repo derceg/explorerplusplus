@@ -17,7 +17,6 @@
 #include "MainResource.h"
 #include "MainToolbar.h"
 #include "MainWindow.h"
-#include "MenuHelper.h"
 #include "MenuRanges.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
@@ -42,9 +41,9 @@ void Explorerplusplus::OnCreate()
 
 	LoadAllSettings();
 
-	if (m_commandLineSettings.shellChangeNotificationType)
+	if (m_commandLineSettings->shellChangeNotificationType)
 	{
-		m_config->shellChangeNotificationType = *m_commandLineSettings.shellChangeNotificationType;
+		m_config->shellChangeNotificationType = *m_commandLineSettings->shellChangeNotificationType;
 	}
 
 	m_iconResourceLoader = std::make_unique<IconResourceLoader>(m_config->iconSet);
@@ -56,7 +55,7 @@ void Explorerplusplus::OnCreate()
 
 	m_bookmarksMainMenu = std::make_unique<BookmarksMainMenu>(this, this, &m_iconFetcher,
 		BookmarkTreeFactory::GetInstance()->GetBookmarkTree(),
-		MenuIdRange{ MENU_BOOKMARK_START_ID, MENU_BOOKMARK_END_ID });
+		BookmarkMenuBuilder::MenuIdRange{ MENU_BOOKMARK_START_ID, MENU_BOOKMARK_END_ID });
 
 	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_resourceInstance, this);
 

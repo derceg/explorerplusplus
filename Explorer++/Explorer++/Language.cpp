@@ -37,7 +37,7 @@ void Explorerplusplus::SetLanguageModule()
 	WORD wLanguage;
 	BOOL bRet;
 
-	if (!m_commandLineSettings.language.empty())
+	if (!m_commandLineSettings->language.empty())
 	{
 		/* Language has been forced on the command
 		line by the user. Attempt to find the
@@ -46,7 +46,7 @@ void Explorerplusplus::SetLanguageModule()
 			SIZEOF_ARRAY(szLanguageModule));
 		PathRemoveFileSpec(szLanguageModule);
 		StringCchPrintf(szName, SIZEOF_ARRAY(szName), _T("Explorer++%s.dll"),
-			m_commandLineSettings.language.c_str());
+			m_commandLineSettings->language.c_str());
 		PathAppend(szLanguageModule, szName);
 
 		bRet = GetFileLanguage(szLanguageModule, &wLanguage);

@@ -202,7 +202,7 @@ void Explorerplusplus::CreateCommandLineTabs()
 	auto currentDirectory = GetCurrentDirectoryWrapper();
 	CHECK(currentDirectory);
 
-	for (const auto &fileToSelect : m_commandLineSettings.filesToSelect)
+	for (const auto &fileToSelect : m_commandLineSettings->filesToSelect)
 	{
 		auto absolutePath = TransformUserEnteredPathToAbsolutePathAndNormalize(fileToSelect,
 			currentDirectory.value(), EnvVarsExpansion::DontExpand);
@@ -239,7 +239,7 @@ void Explorerplusplus::CreateCommandLineTabs()
 		}
 	}
 
-	for (const auto &directory : m_commandLineSettings.directories)
+	for (const auto &directory : m_commandLineSettings->directories)
 	{
 		// Windows Explorer doesn't expand environment variables passed in on the command line. The
 		// command-line interpreter that's being used can expand variables - for example, running:

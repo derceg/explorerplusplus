@@ -34,6 +34,7 @@
 #define WM_APP_FOLDERSIZECOMPLETED WM_APP + 3
 
 // Forward declarations.
+class AcceleratorManager;
 class AddressBar;
 class BookmarksMainMenu;
 class BookmarksToolbar;
@@ -85,7 +86,13 @@ class Explorerplusplus :
 	friend LoadSaveXML;
 
 public:
-	Explorerplusplus(HWND hwnd, CommandLine::Settings *commandLineSettings);
+	struct InitializationData
+	{
+		CommandLine::Settings *commandLineSettings = nullptr;
+		AcceleratorManager *acceleratorManager = nullptr;
+	};
+
+	Explorerplusplus(HWND hwnd, InitializationData *initializationData);
 	~Explorerplusplus();
 
 	static LRESULT CALLBACK WndProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -491,7 +498,7 @@ private:
 	/* CoreInterface methods. */
 	const Config *GetConfig() const override;
 	HINSTANCE GetResourceInstance() const override;
-	HACCEL *GetAcceleratorTable() const override;
+	AcceleratorManager *GetAcceleratorManager() const override;
 	HWND GetMainWindow() const override;
 	ShellBrowserImpl *GetActiveShellBrowserImpl() const override;
 	TabContainer *GetTabContainer() const override;
@@ -555,7 +562,8 @@ private:
 	void FolderSizeCallback(FolderSizeExtraInfo *pfsei, int nFolders, int nFiles,
 		PULARGE_INTEGER lTotalFolderSize);
 
-	CommandLine::Settings m_commandLineSettings;
+	const CommandLine::Settings *const m_commandLineSettings;
+	AcceleratorManager *const m_acceleratorManager;
 
 	BrowserCommandController m_commandController;
 

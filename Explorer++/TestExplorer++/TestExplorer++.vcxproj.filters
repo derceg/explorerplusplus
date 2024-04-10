@@ -182,6 +182,12 @@
     <ClCompile Include="PopupMenuViewTest.cpp">
       <Filter>Core\UI\Views</Filter>
     </ClCompile>
+    <ClCompile Include="AcceleratorHelperTest.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="AcceleratorManagerTest.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

@@ -5,7 +5,6 @@
 #pragma once
 
 #include "Bookmarks/BookmarkItem.h"
-#include "MenuHelper.h"
 #include <boost/functional/hash.hpp>
 #include <functional>
 #include <unordered_map>
@@ -26,6 +25,12 @@ public:
 		// This is used when the parent folder contains no items. The associated BookmarkItem will
 		// refer to the parent folder.
 		EmptyItem
+	};
+
+	struct MenuIdRange
+	{
+		UINT startId;
+		UINT endId;
 	};
 
 	struct MenuItemEntry

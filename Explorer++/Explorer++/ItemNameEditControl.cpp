@@ -5,19 +5,21 @@
 #include "stdafx.h"
 #include "ItemNameEditControl.h"
 #include "Accelerator.h"
+#include "AcceleratorManager.h"
 #include "../Helper/Helper.h"
 #include "../Helper/WindowHelper.h"
 #include <array>
 
-ItemNameEditControl *ItemNameEditControl::CreateNew(HWND hwnd, HACCEL *acceleratorTable,
-	bool itemIsFile)
+ItemNameEditControl *ItemNameEditControl::CreateNew(HWND hwnd,
+	AcceleratorManager *acceleratorManager, bool itemIsFile)
 {
-	return new ItemNameEditControl(hwnd, acceleratorTable, itemIsFile);
+	return new ItemNameEditControl(hwnd, acceleratorManager, itemIsFile);
 }
 
-ItemNameEditControl::ItemNameEditControl(HWND hwnd, HACCEL *acceleratorTable, bool itemIsFile) :
+ItemNameEditControl::ItemNameEditControl(HWND hwnd, AcceleratorManager *acceleratorManager,
+	bool itemIsFile) :
 	m_hwnd(hwnd),
-	m_acceleratorTable(acceleratorTable),
+	m_acceleratorManager(acceleratorManager),
 	m_itemIsFile(itemIsFile),
 	m_renameStage(RenameStage::Filename),
 	m_beginRename(true)
@@ -30,18 +32,13 @@ ItemNameEditControl::ItemNameEditControl(HWND hwnd, HACCEL *acceleratorTable, bo
 
 void ItemNameEditControl::UpdateAcceleratorTable()
 {
-	if (!m_acceleratorTable)
+	if (!m_acceleratorManager)
 	{
 		return;
 	}
 
-	m_originalAcceleratorTable = *m_acceleratorTable;
-
-	int numAccelerators = CopyAcceleratorTable(*m_acceleratorTable, nullptr, 0);
-
-	std::vector<ACCEL> accelerators(numAccelerators);
-	CopyAcceleratorTable(*m_acceleratorTable, &accelerators[0],
-		static_cast<int>(accelerators.size()));
+	m_originalAccelerators = m_acceleratorManager->GetAccelerators();
+	auto accelerators = m_acceleratorManager->GetAccelerators();
 
 	// F2 will be handled below and used to cycle the selection between the filename and extension.
 	// Tab/Shift + Tab will be used by the listview edit control. It has handling to move to the
@@ -52,15 +49,7 @@ void ItemNameEditControl::UpdateAcceleratorTable()
 	RemoveAcceleratorFromTable(accelerators,
 		{ { FVIRTKEY, VK_F2 }, { FVIRTKEY, VK_TAB }, { FVIRTKEY | FSHIFT, VK_TAB } });
 
-	m_updatedAcceleratorTable.reset(
-		CreateAcceleratorTable(&accelerators[0], static_cast<int>(accelerators.size())));
-
-	if (!m_updatedAcceleratorTable)
-	{
-		return;
-	}
-
-	*m_acceleratorTable = m_updatedAcceleratorTable.get();
+	m_acceleratorManager->SetAccelerators(accelerators);
 }
 
 void ItemNameEditControl::RemoveAcceleratorFromTable(std::vector<ACCEL> &accelerators,
@@ -81,9 +70,9 @@ void ItemNameEditControl::RemoveAcceleratorFromTable(std::vector<ACCEL> &acceler
 
 ItemNameEditControl::~ItemNameEditControl()
 {
-	if (m_acceleratorTable)
+	if (m_acceleratorManager)
 	{
-		*m_acceleratorTable = m_originalAcceleratorTable;
+		m_acceleratorManager->SetAccelerators(m_originalAccelerators);
 	}
 }
 

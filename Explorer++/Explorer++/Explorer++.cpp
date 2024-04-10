@@ -38,21 +38,23 @@ const std::vector<std::wstring> Explorerplusplus::BLACKLISTED_BACKGROUND_MENU_CL
 	_T("{CB3D0F55-BC2C-4C1A-85ED-23ED75B5106B}")
 };
 
-Explorerplusplus::Explorerplusplus(HWND hwnd, CommandLine::Settings *commandLineSettings) :
+Explorerplusplus::Explorerplusplus(HWND hwnd, InitializationData *initializationData) :
 	m_hContainer(hwnd),
-	m_commandLineSettings(*commandLineSettings),
+	m_commandLineSettings(initializationData->commandLineSettings),
+	m_acceleratorManager(initializationData->acceleratorManager),
 	m_commandController(this),
 	m_cachedIcons(MAX_CACHED_ICONS),
 	m_pluginMenuManager(hwnd, MENU_PLUGIN_START_ID, MENU_PLUGIN_END_ID),
-	m_acceleratorUpdater(&g_hAccl),
-	m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_START_ID, ACCELERATOR_PLUGIN_END_ID),
+	m_acceleratorUpdater(initializationData->acceleratorManager),
+	m_pluginCommandManager(initializationData->acceleratorManager, ACCELERATOR_PLUGIN_START_ID,
+		ACCELERATOR_PLUGIN_END_ID),
 	m_iconFetcher(hwnd, &m_cachedIcons),
 	m_tabBarBackgroundBrush(CreateSolidBrush(TAB_BAR_DARK_MODE_BACKGROUND_COLOR))
 {
 	m_resourceInstance = nullptr;
 
 	m_config = std::make_shared<Config>();
-	FeatureList::GetInstance()->InitializeFromCommandLine(*commandLineSettings);
+	FeatureList::GetInstance()->InitializeFromCommandLine(*initializationData->commandLineSettings);
 
 	m_bSavePreferencesToXMLFile = FALSE;
 	m_bLanguageLoaded = false;

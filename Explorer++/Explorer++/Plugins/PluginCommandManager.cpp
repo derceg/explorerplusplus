@@ -4,11 +4,12 @@
 
 #include "stdafx.h"
 #include "Plugins/PluginCommandManager.h"
+#include "AcceleratorManager.h"
 #include "Plugins/Manifest.h"
 
-Plugins::PluginCommandManager::PluginCommandManager(HACCEL *acceleratorTable, int startId,
-	int endId) :
-	m_acceleratorTable(acceleratorTable),
+Plugins::PluginCommandManager::PluginCommandManager(AcceleratorManager *acceleratorManager,
+	int startId, int endId) :
+	m_acceleratorManager(acceleratorManager),
 	m_startId(startId),
 	m_endId(endId),
 	m_idCounter(startId)
@@ -17,11 +18,7 @@ Plugins::PluginCommandManager::PluginCommandManager(HACCEL *acceleratorTable, in
 
 void Plugins::PluginCommandManager::addCommands(int pluginId, const std::vector<Command> &commands)
 {
-	int numAccelerators = CopyAcceleratorTable(*m_acceleratorTable, nullptr, 0);
-
-	std::vector<ACCEL> accelerators(numAccelerators);
-	CopyAcceleratorTable(*m_acceleratorTable, &accelerators[0],
-		static_cast<int>(accelerators.size()));
+	auto accelerators = m_acceleratorManager->GetAccelerators();
 
 	std::unordered_map<int, PluginCommand> registeredCommands;
 
@@ -70,18 +67,9 @@ void Plugins::PluginCommandManager::addCommands(int pluginId, const std::vector<
 		registeredCommands.insert(std::make_pair(*id, pluginCommand));
 	}
 
-	HACCEL newAcceleratorTable =
-		CreateAcceleratorTable(&accelerators[0], static_cast<int>(accelerators.size()));
-
-	if (newAcceleratorTable == nullptr)
-	{
-		return;
-	}
+	m_acceleratorManager->SetAccelerators(accelerators);
 
 	m_registeredCommands.insert(registeredCommands.begin(), registeredCommands.end());
-
-	DestroyAcceleratorTable(*m_acceleratorTable);
-	*m_acceleratorTable = newAcceleratorTable;
 }
 
 std::optional<int> Plugins::PluginCommandManager::generateId()
