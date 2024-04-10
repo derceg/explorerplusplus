@@ -31,7 +31,7 @@ public:
 private:
 	void Initialize();
 	void BuildMenu();
-	void AddMenuItemForHistoryEntry(HistoryEntry *entry);
+	void AddMenuItemForHistoryEntry(const HistoryEntry *entry);
 
 	void OnMenuItemSelected(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown);
 	void OnMenuItemMiddleClicked(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown);

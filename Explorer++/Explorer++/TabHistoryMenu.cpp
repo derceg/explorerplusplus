@@ -60,7 +60,7 @@ void TabHistoryMenu::BuildMenu()
 	}
 }
 
-void TabHistoryMenu::AddMenuItemForHistoryEntry(HistoryEntry *entry)
+void TabHistoryMenu::AddMenuItemForHistoryEntry(const HistoryEntry *entry)
 {
 	auto id = m_idCounter++;
 
