@@ -285,8 +285,13 @@ std::optional<UINT> MaybeGetMenuItemAtPoint(HMENU menu, const POINT &ptScreen)
 
 	// Although the documentation for MenuItemFromPoint() states that it returns -1 if there's no
 	// menu item at the specified position, it appears the method will also return other negative
-	// values on failure. So, it's better to check whether the return value is positive, rather than
-	// checking whether it's not equal to -1.
+	// values on failure.
+	// That happens, for example, if the HWND parameter passed to MenuItemFromPoint() is non-null,
+	// the menu refers to a submenu of the window menu and the mouse is above the top of the menu
+	// bar.
+	// While the HWND parameter here is always null, it's still probably better to check whether or
+	// not the return value is positive, rather than whether it's not equal to -1. That's because
+	// the function isn't adhering to its documented properties in at least some cases.
 	if (item >= 0)
 	{
 		return GetMenuItemIDIncludingSubmenu(menu, item);
