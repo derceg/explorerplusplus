@@ -23,6 +23,11 @@ void AddPathToCollection(std::vector<PidlAbsolute> &pidls, const std::wstring &p
 	pidls.push_back(pidl.get());
 }
 
+std::wstring GetPathForItem(const std::wstring &name)
+{
+	return L"C:\\" + name;
+}
+
 std::wstring GetNameForItem(size_t index)
 {
 	return L"Fake" + std::to_wstring(index);
@@ -34,7 +39,7 @@ std::vector<PidlAbsolute> BuildPidlCollection(int size)
 
 	for (int i = 0; i < size; i++)
 	{
-		auto path = L"C:\\" + GetNameForItem(i);
+		auto path = GetPathForItem(GetNameForItem(i));
 		AddPathToCollection(pidls, path);
 	}
 
@@ -49,14 +54,14 @@ public:
 	{
 		UNREFERENCED_PARAMETER(path);
 
-		m_resultCallbacks.push_back(callback);
+		AddResultCallback(callback);
 	}
 
 	void QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback) override
 	{
 		UNREFERENCED_PARAMETER(pidl);
 
-		m_resultCallbacks.push_back(callback);
+		AddResultCallback(callback);
 	}
 
 	void ClearQueue() override
@@ -90,8 +95,24 @@ public:
 		m_resultCallbacks.clear();
 	}
 
+	void SetIgnoreRequests(bool ignoreRequests)
+	{
+		m_ignoreRequests = ignoreRequests;
+	}
+
 private:
+	void AddResultCallback(Callback callback)
+	{
+		if (m_ignoreRequests)
+		{
+			return;
+		}
+
+		m_resultCallbacks.push_back(callback);
+	}
+
 	std::vector<Callback> m_resultCallbacks;
+	bool m_ignoreRequests = false;
 };
 
 }
@@ -105,6 +126,26 @@ protected:
 		return std::make_unique<ShellItemsMenu>(menuView, pidls, &m_browserWindow, &m_iconFetcher);
 	}
 
+	std::unique_ptr<ShellItemsMenu> BuildMenu(MenuView *menuView,
+		const std::vector<PidlAbsolute> &pidls, UINT menuStartId, UINT menuEndId)
+	{
+		return std::make_unique<ShellItemsMenu>(menuView, pidls, &m_browserWindow, &m_iconFetcher,
+			menuStartId, menuEndId);
+	}
+
+	void CheckItemDetails(const MenuView &menuView, const std::vector<PidlAbsolute> &pidls)
+	{
+		ASSERT_EQ(static_cast<size_t>(menuView.GetItemCountForTesting()), pidls.size());
+
+		for (size_t i = 0; i < pidls.size(); i++)
+		{
+			auto id = menuView.GetItemIdForTesting(static_cast<int>(i));
+			auto name = GetNameForItem(i);
+			EXPECT_EQ(menuView.GetItemTextForTesting(id), name);
+			EXPECT_EQ(menuView.GetHelpTextForItem(id), GetPathForItem(name));
+		}
+	}
+
 	BrowserWindowMock m_browserWindow;
 	IconFetcherFake m_iconFetcher;
 };
@@ -115,13 +156,64 @@ TEST_F(ShellItemsMenuTest, CheckItems)
 	auto pidls = BuildPidlCollection(3);
 	auto menu = BuildMenu(&popupMenu, pidls);
 
-	ASSERT_EQ(static_cast<size_t>(popupMenu.GetItemCountForTesting()), pidls.size());
+	CheckItemDetails(popupMenu, pidls);
+}
 
-	for (size_t i = 0; i < pidls.size(); i++)
+TEST_F(ShellItemsMenuTest, MaxItems)
+{
+	PopupMenuView popupMenu;
+	auto pidls = BuildPidlCollection(3);
+	auto menu = BuildMenu(&popupMenu, pidls, 1, 2);
+
+	// The menu only has a single ID it can assign from the provided range of [1,2). So, although 3
+	// items were passed in, only the first item should be added to the menu.
+	EXPECT_EQ(popupMenu.GetItemCountForTesting(), 1);
+	EXPECT_EQ(popupMenu.GetItemTextForTesting(popupMenu.GetItemIdForTesting(0)), GetNameForItem(0));
+}
+
+TEST_F(ShellItemsMenuTest, RebuildMenu)
+{
+	PopupMenuView popupMenu;
+	auto pidls = BuildPidlCollection(3);
+	auto menu = BuildMenu(&popupMenu, pidls);
+
+	auto updatedPidls = BuildPidlCollection(5);
+	menu->RebuildMenu(updatedPidls);
+
+	CheckItemDetails(popupMenu, updatedPidls);
+}
+
+TEST_F(ShellItemsMenuTest, IconRetrievalAfterMenuRebuilt)
+{
+	PopupMenuView popupMenu;
+	auto pidls = BuildPidlCollection(3);
+	auto menu = BuildMenu(&popupMenu, pidls);
+
+	// This will cause the icon fetcher to ignore icon tasks that are queued for the menu items
+	// added as part of the rebuild.
+	m_iconFetcher.SetIgnoreRequests(true);
+
+	menu->RebuildMenu(pidls);
+
+	std::vector<HBITMAP> originalBitmaps;
+
+	for (int i = 0; i < popupMenu.GetItemCountForTesting(); i++)
 	{
-		EXPECT_EQ(
-			popupMenu.GetItemTextForTesting(popupMenu.GetItemIdForTesting(static_cast<int>(i))),
-			GetNameForItem(i));
+		auto bitmap = popupMenu.GetItemBitmapForTesting(popupMenu.GetItemIdForTesting(i));
+		originalBitmaps.push_back(bitmap);
+	}
+
+	// This will trigger the icon callbacks for the original menu items (i.e. the menu items that
+	// existed before the menu was rebuilt). This call should have no effect, since the original
+	// menu items no longer exist.
+	m_iconFetcher.TriggerPendingResultCallbacks();
+
+	// As the callbacks that were triggered were for the original items on the menu, the images for
+	// the new items shouldn't have changed.
+	for (int i = 0; i < popupMenu.GetItemCountForTesting(); i++)
+	{
+		auto bitmap = popupMenu.GetItemBitmapForTesting(popupMenu.GetItemIdForTesting(i));
+		EXPECT_EQ(bitmap, originalBitmaps.at(i));
 	}
 }
 

@@ -188,6 +188,9 @@
     <ClCompile Include="AcceleratorManagerTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="GlobalHistoryMenuTest.cpp">
+      <Filter>Core\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

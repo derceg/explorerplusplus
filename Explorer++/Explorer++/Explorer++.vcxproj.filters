@@ -649,6 +649,9 @@
     <ClCompile Include="AcceleratorManager.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="GlobalHistoryMenu.cpp">
+      <Filter>Core\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1331,6 +1334,9 @@
     </ClInclude>
     <ClInclude Include="AcceleratorManager.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalHistoryMenu.h">
+      <Filter>Core\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

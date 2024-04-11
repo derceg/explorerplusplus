@@ -5,10 +5,11 @@
 #include "stdafx.h"
 #include "ShellBrowserHistoryHelper.h"
 #include "HistoryService.h"
-#include "HistoryServiceFactory.h"
 
-ShellBrowserHistoryHelper::ShellBrowserHistoryHelper(ShellBrowser *shellBrowser) :
-	ShellBrowserHelper(shellBrowser)
+ShellBrowserHistoryHelper::ShellBrowserHistoryHelper(ShellBrowser *shellBrowser,
+	HistoryService *historyService) :
+	ShellBrowserHelper(shellBrowser),
+	m_historyService(historyService)
 {
 	// There's no need to explicitly remove this observer, since this object is tied to the
 	// lifetime of the shellBrowser instance.
@@ -18,6 +19,5 @@ ShellBrowserHistoryHelper::ShellBrowserHistoryHelper(ShellBrowser *shellBrowser)
 
 void ShellBrowserHistoryHelper::OnNavigationCommitted(const NavigateParams &navigateParams)
 {
-	auto *historyService = HistoryServiceFactory::GetInstance()->GetHistoryService();
-	historyService->AddHistoryItem(navigateParams.pidl);
+	m_historyService->AddHistoryItem(navigateParams.pidl);
 }

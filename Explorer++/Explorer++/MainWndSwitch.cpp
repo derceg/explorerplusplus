@@ -355,6 +355,12 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		m_pluginCommandManager.onAcceleratorPressed(id);
 		return 0;
 	}
+	else if (notificationCode == 0 && id >= MENU_GLOBAL_HISTORY_START_ID
+		&& id < MENU_GLOBAL_HISTORY_END_ID)
+	{
+		m_globalHistoryMenuView->SelectItem(id, IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT));
+		return 0;
+	}
 
 	switch (id)
 	{

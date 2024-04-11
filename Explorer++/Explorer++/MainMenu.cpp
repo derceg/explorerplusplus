@@ -6,6 +6,8 @@
 #include "Explorer++.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "FeatureList.h"
+#include "GlobalHistoryMenu.h"
+#include "HistoryServiceFactory.h"
 #include "Icon.h"
 #include "MainMenuSubMenuView.h"
 #include "MainResource.h"
@@ -85,6 +87,11 @@ void Explorerplusplus::InitializeMainMenu()
 	SetMainMenuImages();
 
 	InitializeGoMenu(mainMenu);
+
+	m_globalHistoryMenuView = std::make_unique<MainMenuSubMenuView>(mainMenu, IDM_GO_HISTORY);
+	m_globalHistoryMenu = std::make_unique<GlobalHistoryMenu>(m_globalHistoryMenuView.get(),
+		HistoryServiceFactory::GetInstance()->GetHistoryService(), this, &m_iconFetcher,
+		MENU_GLOBAL_HISTORY_START_ID, MENU_GLOBAL_HISTORY_END_ID);
 
 	AddGetMenuItemHelperTextObserver(
 		std::bind_front(&Explorerplusplus::MaybeGetMenuItemHelperText, this));
@@ -258,6 +265,12 @@ void Explorerplusplus::OnMenuMiddleButtonUp(const POINT &pt, bool isCtrlKeyDown,
 			m_tabRestorerMenuView->MiddleClickItem(*menuItemId, isCtrlKeyDown, isShiftKeyDown);
 			return;
 		}
+		else if (*menuItemId >= MENU_GLOBAL_HISTORY_START_ID
+			&& *menuItemId < MENU_GLOBAL_HISTORY_END_ID)
+		{
+			m_globalHistoryMenuView->MiddleClickItem(*menuItemId, isCtrlKeyDown, isShiftKeyDown);
+			return;
+		}
 	}
 
 	m_mainMenuItemMiddleClickedSignal(pt, isCtrlKeyDown, isShiftKeyDown);
@@ -287,10 +300,16 @@ boost::signals2::connection Explorerplusplus::AddGetMenuItemHelperTextObserver(
 
 std::optional<std::wstring> Explorerplusplus::MaybeGetMenuItemHelperText(HMENU menu, int id)
 {
-	if (MenuHelper::IsPartOfMenu(GetMenu(m_hContainer), menu) && id >= MENU_RECENT_TABS_START_ID
-		&& id < MENU_RECENT_TABS_END_ID)
+	if (MenuHelper::IsPartOfMenu(GetMenu(m_hContainer), menu))
 	{
-		return m_tabRestorerMenuView->GetHelpTextForItem(id);
+		if (id >= MENU_RECENT_TABS_START_ID && id < MENU_RECENT_TABS_END_ID)
+		{
+			return m_tabRestorerMenuView->GetHelpTextForItem(id);
+		}
+		else if (id >= MENU_GLOBAL_HISTORY_START_ID && id < MENU_GLOBAL_HISTORY_END_ID)
+		{
+			return m_globalHistoryMenuView->GetHelpTextForItem(id);
+		}
 	}
 
 	return std::nullopt;

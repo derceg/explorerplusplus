@@ -5,7 +5,6 @@
 #include "pch.h"
 #include "ShellBrowserHistoryHelper.h"
 #include "HistoryService.h"
-#include "HistoryServiceFactory.h"
 #include "IconFetcherMock.h"
 #include "ShellBrowserFake.h"
 #include "TabNavigationMock.h"
@@ -19,22 +18,22 @@ protected:
 	void NavigateInNewTab(const std::wstring &path, unique_pidl_absolute *outputPidl)
 	{
 		ShellBrowserFake shellBrowser(&m_tabNavigation, &m_iconFetcher);
-		ShellBrowserHistoryHelper::CreateAndAttachToShellBrowser(&shellBrowser);
+		ShellBrowserHistoryHelper::CreateAndAttachToShellBrowser(&shellBrowser, &m_historyService);
 		ASSERT_HRESULT_SUCCEEDED(
 			shellBrowser.NavigateToPath(path, HistoryEntryType::AddEntry, outputPidl));
 	}
 
 	TabNavigationMock m_tabNavigation;
 	IconFetcherMock m_iconFetcher;
+	HistoryService m_historyService;
 };
 TEST_F(ShellBrowserHistoryHelperTest, NavigationInDifferentTabs)
 {
-	auto *historyService = HistoryServiceFactory::GetInstance()->GetHistoryService();
-	const auto &history = historyService->GetHistoryItems();
+	const auto &history = m_historyService.GetHistoryItems();
 	EXPECT_EQ(history.size(), 0U);
 
 	MockFunction<void()> callback;
-	historyService->AddHistoryChangedObserver(callback.AsStdFunction());
+	m_historyService.AddHistoryChangedObserver(callback.AsStdFunction());
 	EXPECT_CALL(callback, Call()).Times(3);
 
 	unique_pidl_absolute pidlFake1;

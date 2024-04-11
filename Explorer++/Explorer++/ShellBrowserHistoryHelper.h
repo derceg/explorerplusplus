@@ -6,11 +6,15 @@
 
 #include "ShellBrowser/ShellBrowserHelper.h"
 
+class HistoryService;
+
 class ShellBrowserHistoryHelper : public ShellBrowserHelper<ShellBrowserHistoryHelper>
 {
 public:
-	ShellBrowserHistoryHelper(ShellBrowser *shellBrowser);
+	ShellBrowserHistoryHelper(ShellBrowser *shellBrowser, HistoryService *historyService);
 
 private:
 	void OnNavigationCommitted(const NavigateParams &navigateParams);
+
+	HistoryService *const m_historyService;
 };

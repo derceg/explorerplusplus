@@ -20,26 +20,34 @@ class ShellItemsMenu : public MenuBase
 {
 public:
 	ShellItemsMenu(MenuView *menuView, const std::vector<PidlAbsolute> &pidls,
-		BrowserWindow *browserWindow, IconFetcher *iconFetcher);
+		BrowserWindow *browserWindow, IconFetcher *iconFetcher, UINT menuStartId = 1,
+		UINT menuEndId = (std::numeric_limits<UINT>::max)());
 	~ShellItemsMenu();
 
-private:
-	void BuildMenu(const std::vector<PidlAbsolute> &pidls);
+	void RebuildMenu(const std::vector<PidlAbsolute> &pidls);
 
+private:
 	void AddMenuItemForPidl(PCIDLIST_ABSOLUTE pidl);
 	wil::unique_hbitmap GetShellItemIcon(PCIDLIST_ABSOLUTE pidl);
-	void OnIconRetrieved(UINT menuItemId, int iconIndex);
+	void QueueIconUpdateTask(PCIDLIST_ABSOLUTE pidl, UINT menuItemId);
+	void OnIconRetrieved(UINT menuItemId, int iconIndex, int callbackId);
 
 	void OnMenuItemSelected(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown);
 	void OnMenuItemMiddleClicked(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown);
 	void OpenSelectedItem(UINT menuItemId, bool isMiddleButtonDown, bool isCtrlKeyDown,
 		bool isShiftKeyDown);
 
-	BrowserWindow *m_browserWindow = nullptr;
-	IconFetcher *m_iconFetcher = nullptr;
-	UINT m_idCounter = 1;
+	BrowserWindow *const m_browserWindow;
+	IconFetcher *const m_iconFetcher;
+	const UINT m_menuStartId;
+	const UINT m_menuEndId;
+	UINT m_idCounter;
 	wil::com_ptr_nothrow<IImageList> m_systemImageList;
 	std::unordered_map<UINT, PidlAbsolute> m_idPidlMap;
+
+	int m_iconCallbackIdCounter = 0;
+	std::set<int> m_pendingIconCallbackIds;
+
 	std::shared_ptr<bool> m_destroyed;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;

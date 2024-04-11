@@ -40,6 +40,7 @@ class BookmarksMainMenu;
 class BookmarksToolbar;
 struct Config;
 class DrivesToolbar;
+class GlobalHistoryMenu;
 class HolderWindow;
 class IconResourceLoader;
 __interface IDirectoryMonitor;
@@ -606,6 +607,9 @@ private:
 	MainMenuItemRightClickedSignal m_mainMenuItemRightClickedSignal;
 	bool m_mainMenuShowing = false;
 	GetMenuItemHelperTextSignal m_getMenuItemHelperTextSignal;
+	std::unique_ptr<MainMenuSubMenuView> m_globalHistoryMenuView;
+	std::unique_ptr<GlobalHistoryMenu> m_globalHistoryMenu;
+
 	FocusChangedSignal m_focusChangedSignal;
 	ApplicationShuttingDownSignal m_applicationShuttingDownSignal;
 	bool m_applicationShuttingDown = false;

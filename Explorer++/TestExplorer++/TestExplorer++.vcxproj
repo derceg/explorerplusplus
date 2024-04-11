@@ -213,6 +213,7 @@
     <ClCompile Include="BookmarkTreeTest.cpp" />
     <ClCompile Include="CachedIconsTest.cpp" />
     <ClCompile Include="GdiplusHelperTest.cpp" />
+    <ClCompile Include="GlobalHistoryMenuTest.cpp" />
     <ClCompile Include="HelperTest.cpp" />
     <ClCompile Include="MenuHelperTest.cpp" />
     <ClCompile Include="PopupMenuViewTest.cpp" />
