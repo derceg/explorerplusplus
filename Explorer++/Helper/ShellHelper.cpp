@@ -1485,21 +1485,6 @@ HRESULT SimplePidlToFullPidl(PCIDLIST_ABSOLUTE simplePidl, PIDLIST_ABSOLUTE *ful
 	return S_OK;
 }
 
-// Returns a vector containing the pidl of each parent item, proceeding from the first parent to the
-// root.
-std::vector<PidlAbsolute> GetParentPidlCollection(PCIDLIST_ABSOLUTE pidl)
-{
-	std::vector<PidlAbsolute> pidls;
-	unique_pidl_absolute currentPidl(ILCloneFull(pidl));
-
-	while (ILRemoveLastID(currentPidl.get()))
-	{
-		pidls.emplace_back(currentPidl.get());
-	}
-
-	return pidls;
-}
-
 std::size_t hash_value(const IID &iid)
 {
 	std::size_t seed = 0;

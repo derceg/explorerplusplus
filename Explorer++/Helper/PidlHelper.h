@@ -76,6 +76,11 @@ private:
 			return m_pidl.get();
 		}
 
+		IDListType *Raw()
+		{
+			return m_pidl.get();
+		}
+
 	private:
 		wil::unique_cotaskmem_ptr<IDListType> m_pidl;
 	};

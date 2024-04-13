@@ -15,8 +15,8 @@
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "ShellItemsMenu.h"
 #include "TabContainer.h"
+#include "TabParentItemsMenu.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/Helper.h"
@@ -707,25 +707,8 @@ void MainToolbar::ShowHistoryMenu(TabHistoryMenu::MenuType historyType)
 
 void MainToolbar::ShowUpNavigationMenu()
 {
-	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
-	auto pidl = tab.GetShellBrowser()->GetDirectoryIdl();
-
-	auto parentPidls = GetParentPidlCollection(pidl.get());
-
-	if (parentPidls.empty())
-	{
-		// This function should never be called when displaying the root folder.
-		assert(false);
-		return;
-	}
-
-	// Items in the menu will be displayed in the same order they appear in the vector.
-	// GetParentPidlCollection() will return a set of items that starts from the parent and proceeds
-	// to the root. In the menu, the root needs to be shown first.
-	std::reverse(parentPidls.begin(), parentPidls.end());
-
 	PopupMenuView popupMenu;
-	ShellItemsMenu menu(&popupMenu, parentPidls, m_browserWindow, m_iconFetcher);
+	TabParentItemsMenu menu(&popupMenu, m_browserWindow, m_iconFetcher);
 	popupMenu.Show(m_hwnd, GetMenuPositionForButton(MainToolbarButton::Up));
 }
 

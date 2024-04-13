@@ -652,6 +652,9 @@
     <ClCompile Include="GlobalHistoryMenu.cpp">
       <Filter>Core\UI</Filter>
     </ClCompile>
+    <ClCompile Include="TabParentItemsMenu.cpp">
+      <Filter>Core\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1336,6 +1339,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="GlobalHistoryMenu.h">
+      <Filter>Core\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="TabParentItemsMenu.h">
       <Filter>Core\UI</Filter>
     </ClInclude>
   </ItemGroup>

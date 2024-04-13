@@ -1029,6 +1029,7 @@
     <ClCompile Include="ShellEnumerator.cpp" />
     <ClCompile Include="ShellItemsMenu.cpp" />
     <ClCompile Include="SystemFontHelper.cpp" />
+    <ClCompile Include="TabParentItemsMenu.cpp" />
     <ClCompile Include="TabRegistryStorage.cpp" />
     <ClCompile Include="TabXmlStorage.cpp" />
     <ClCompile Include="ThemeManager.cpp" />
@@ -1286,6 +1287,7 @@
     <ClInclude Include="ShellEnumerator.h" />
     <ClInclude Include="ShellItemsMenu.h" />
     <ClInclude Include="SystemFontHelper.h" />
+    <ClInclude Include="TabParentItemsMenu.h" />
     <ClInclude Include="TabRegistryStorage.h" />
     <ClInclude Include="TabStorage.h" />
     <ClInclude Include="TabXmlStorage.h" />
