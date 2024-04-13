@@ -4,9 +4,16 @@
 
 #include "stdafx.h"
 #include "HistoryService.h"
+#include "../Helper/ShellHelper.h"
 
 void HistoryService::AddHistoryItem(const PidlAbsolute &pidl)
 {
+	if (!m_historyItems.empty() && ArePidlsEquivalent(pidl.Raw(), m_historyItems.front().Raw()))
+	{
+		// This item is the same as the most recent history item.
+		return;
+	}
+
 	m_historyItems.push_front(pidl);
 	m_historyChangedSignal();
 }
