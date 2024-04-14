@@ -95,6 +95,8 @@ using PidlAbsolute = PidlAccessor::PidlAbsolute;
 using PidlRelative = PidlAccessor::PidlRelative;
 using PidlChild = PidlAccessor::PidlChild;
 
+bool operator==(const PidlAbsolute &pidl1, const PidlAbsolute &pidl2);
+
 template <typename T,
 	typename = std::enable_if_t<std::is_same_v<T, PidlAbsolute> || std::is_same_v<T, PidlRelative>
 		|| std::is_same_v<T, PidlChild>>>

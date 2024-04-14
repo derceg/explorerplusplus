@@ -160,6 +160,9 @@
     <ClCompile Include="ResourceHelper.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
+    <ClCompile Include="PidlHelper.cpp">
+      <Filter>Shell</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">

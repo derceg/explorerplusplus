@@ -13,7 +13,7 @@ bool operator==(const TabStorageData &first, const TabStorageData &second)
 
 	if (first.pidl.HasValue() && second.pidl.HasValue())
 	{
-		areDirectoriesEquivalent = ArePidlsEquivalent(first.pidl.Raw(), second.pidl.Raw());
+		areDirectoriesEquivalent = (first.pidl == second.pidl);
 	}
 	else
 	{

@@ -89,9 +89,7 @@ TEST_F(TabHistoryMenuTest, BackSelectionMiddleClick)
 	TabHistoryMenu menu(&popupMenu, &m_browserWindow, TabHistoryMenu::MenuType::Back);
 
 	EXPECT_CALL(m_browserWindow,
-		OpenItem(
-			Matcher<PCIDLIST_ABSOLUTE>(Truly(std::bind_front(&ArePidlsEquivalent, fake2.Raw()))),
-			OpenFolderDisposition::NewTabDefault));
+		OpenItem(TypedEq<PCIDLIST_ABSOLUTE>(fake2), OpenFolderDisposition::NewTabDefault));
 
 	// Open Fake2 in a new tab.
 	popupMenu.MiddleClickItem(popupMenu.GetItemIdForTesting(0), false, false);
@@ -135,9 +133,7 @@ TEST_F(TabHistoryMenuTest, ForwardSelectionMiddleClick)
 	TabHistoryMenu menu(&popupMenu, &m_browserWindow, TabHistoryMenu::MenuType::Forward);
 
 	EXPECT_CALL(m_browserWindow,
-		OpenItem(
-			Matcher<PCIDLIST_ABSOLUTE>(Truly(std::bind_front(&ArePidlsEquivalent, fake3.Raw()))),
-			OpenFolderDisposition::NewTabDefault));
+		OpenItem(TypedEq<PCIDLIST_ABSOLUTE>(fake3), OpenFolderDisposition::NewTabDefault));
 
 	// Open Fake3 in a new tab.
 	popupMenu.MiddleClickItem(popupMenu.GetItemIdForTesting(1), false, false);

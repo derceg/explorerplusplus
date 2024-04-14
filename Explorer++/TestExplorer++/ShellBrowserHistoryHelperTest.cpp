@@ -40,15 +40,15 @@ TEST_F(ShellBrowserHistoryHelperTest, NavigationInDifferentTabs)
 	PidlAbsolute pidlFake1;
 	NavigateInNewTab(L"C:\\Fake1", &pidlFake1);
 	ASSERT_EQ(history.size(), 1U);
-	EXPECT_TRUE(ArePidlsEquivalent(history[0].Raw(), pidlFake1.Raw()));
+	EXPECT_EQ(history[0], pidlFake1);
 
 	PidlAbsolute pidlFake2;
 	NavigateInNewTab(L"C:\\Fake2", &pidlFake2);
 	ASSERT_EQ(history.size(), 2U);
-	EXPECT_TRUE(ArePidlsEquivalent(history[0].Raw(), pidlFake2.Raw()));
+	EXPECT_EQ(history[0], pidlFake2);
 
 	PidlAbsolute pidlFake3;
 	NavigateInNewTab(L"C:\\Fake3", &pidlFake3);
 	ASSERT_EQ(history.size(), 3U);
-	EXPECT_TRUE(ArePidlsEquivalent(history[0].Raw(), pidlFake3.Raw()));
+	EXPECT_EQ(history[0], pidlFake3);
 }

@@ -64,5 +64,5 @@ TEST_F(BrowserCommandControllerTest, Up)
 	ASSERT_NE(currentEntry, nullptr);
 
 	PidlAbsolute pidlParent = CreateSimplePidlForTest(L"C:\\");
-	EXPECT_TRUE(ArePidlsEquivalent(currentEntry->GetPidl().Raw(), pidlParent.Raw()));
+	EXPECT_EQ(currentEntry->GetPidl(), pidlParent);
 }

@@ -8,7 +8,7 @@
 
 void HistoryService::AddHistoryItem(const PidlAbsolute &pidl)
 {
-	if (!m_historyItems.empty() && ArePidlsEquivalent(pidl.Raw(), m_historyItems.front().Raw()))
+	if (!m_historyItems.empty() && (pidl == m_historyItems.front()))
 	{
 		// This item is the same as the most recent history item.
 		return;

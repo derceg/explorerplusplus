@@ -255,9 +255,7 @@ private:
 			: OpenFolderDisposition::NewTabDefault;
 
 		EXPECT_CALL(m_browserWindow,
-			OpenItem(Matcher<PCIDLIST_ABSOLUTE>(
-						 Truly(std::bind_front(&ArePidlsEquivalent, m_pidls[index].Raw()))),
-				disposition));
+			OpenItem(TypedEq<PCIDLIST_ABSOLUTE>(m_pidls[index]), disposition));
 
 		auto id = m_popupMenu.GetItemIdForTesting(static_cast<int>(index));
 

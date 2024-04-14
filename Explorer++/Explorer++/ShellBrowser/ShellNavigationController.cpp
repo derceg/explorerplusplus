@@ -236,7 +236,7 @@ HRESULT ShellNavigationController::Navigate(NavigateParams &navigateParams)
 	// navigation to a history entry, except the current history entry (navigating to the current
 	// history entry is an explicit refresh).
 	if (currentEntry && targetEntry == currentEntry
-		&& ArePidlsEquivalent(currentEntry->GetPidl().Raw(), navigateParams.pidl.Raw()))
+		&& currentEntry->GetPidl() == navigateParams.pidl)
 	{
 		navigateParams.historyEntryType = HistoryEntryType::ReplaceCurrentEntry;
 		navigateParams.overrideNavigationMode = true;

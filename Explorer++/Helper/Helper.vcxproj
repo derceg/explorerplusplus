@@ -633,6 +633,7 @@
     <ClCompile Include="ListViewHelper.cpp" />
     <ClCompile Include="MenuHelper.cpp" />
     <ClCompile Include="MessageForwarder.cpp" />
+    <ClCompile Include="PidlHelper.cpp" />
     <ClCompile Include="ProcessHelper.cpp" />
     <ClCompile Include="ReferenceCount.cpp" />
     <ClCompile Include="RegistrySettings.cpp" />

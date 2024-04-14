@@ -557,7 +557,7 @@ void ShellBrowserImpl::OnEnumerationCompleted(std::vector<ShellBrowserImpl::Item
 	// a current entry here, and that entry should be for the current navigation.
 	auto currentEntry = m_navigationController->GetCurrentEntry();
 	CHECK(currentEntry);
-	DCHECK(ArePidlsEquivalent(currentEntry->GetPidl().Raw(), navigateParams.pidl.Raw()));
+	DCHECK(currentEntry->GetPidl() == navigateParams.pidl);
 
 	auto selectedItems = currentEntry->GetSelectedItems();
 	SelectItems(selectedItems);

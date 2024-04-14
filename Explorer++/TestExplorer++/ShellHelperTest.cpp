@@ -12,8 +12,6 @@
 
 using namespace testing;
 
-void TestArePidlsEquivalent(const std::wstring &path1, const std::wstring &path2, bool equivalent);
-
 class TransformPathTest : public Test
 {
 protected:
@@ -267,27 +265,6 @@ TEST(IsNamespaceRoot, Root)
 
 	BOOL res = IsNamespaceRoot(pidl.get());
 	EXPECT_TRUE(res);
-}
-
-TEST(ArePidlsEquivalent, Same)
-{
-	TestArePidlsEquivalent(L"c:\\", L"c:\\", true);
-	TestArePidlsEquivalent(L"c:\\users\\public", L"c:\\users\\public", true);
-}
-
-TEST(ArePidlsEquivalent, Different)
-{
-	TestArePidlsEquivalent(L"c:\\", L"c:\\windows", false);
-	TestArePidlsEquivalent(L"c:\\", L"d:\\path\\to\\item", false);
-}
-
-void TestArePidlsEquivalent(const std::wstring &path1, const std::wstring &path2, bool equivalent)
-{
-	PidlAbsolute pidl1 = CreateSimplePidlForTest(path1);
-	PidlAbsolute pidl2 = CreateSimplePidlForTest(path2);
-
-	BOOL res = ArePidlsEquivalent(pidl1.Raw(), pidl2.Raw());
-	EXPECT_EQ(res, equivalent);
 }
 
 TEST(GetDisplayName, ParsingName)

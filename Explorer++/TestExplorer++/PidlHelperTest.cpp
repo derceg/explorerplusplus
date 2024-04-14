@@ -4,10 +4,25 @@
 
 #include "pch.h"
 #include "../Helper/PidlHelper.h"
+#include "ShellHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
+
+namespace
+{
+
+void TestPidlEquality(const std::wstring &path1, const std::wstring &path2, bool equivalent)
+{
+	PidlAbsolute pidl1 = CreateSimplePidlForTest(path1);
+	PidlAbsolute pidl2 = CreateSimplePidlForTest(path2);
+
+	bool res = (pidl1 == pidl2);
+	EXPECT_EQ(res, equivalent);
+}
+
+}
 
 TEST(PidlAbsolute, Empty)
 {
@@ -119,4 +134,16 @@ TEST(PidlAbsolute, TakeOwnership)
 	PidlAbsolute pidl;
 	pidl.TakeOwnership(ownedPidl.release());
 	EXPECT_EQ(pidl.Raw(), rawPidl);
+}
+
+TEST(PidlAbsoluteEquality, Same)
+{
+	TestPidlEquality(L"c:\\", L"c:\\", true);
+	TestPidlEquality(L"c:\\users\\public", L"c:\\users\\public", true);
+}
+
+TEST(PidlAbsoluteEquality, Different)
+{
+	TestPidlEquality(L"c:\\", L"c:\\windows", false);
+	TestPidlEquality(L"c:\\", L"d:\\path\\to\\item", false);
 }
