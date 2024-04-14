@@ -170,8 +170,8 @@ void ShellBrowserImpl::DirectoryAltered()
 			continue;
 		}
 
-		unique_pidl_absolute simplePidl;
-		hr = CreateSimplePidl(af.szFileName, wil::out_param(simplePidl), parent.get());
+		PidlAbsolute simplePidl;
+		hr = CreateSimplePidl(af.szFileName, simplePidl, parent.get());
 
 		if (FAILED(hr))
 		{
@@ -181,26 +181,26 @@ void ShellBrowserImpl::DirectoryAltered()
 		switch (af.dwAction)
 		{
 		case FILE_ACTION_ADDED:
-			OnItemAdded(simplePidl.get());
+			OnItemAdded(simplePidl.Raw());
 			break;
 
 		case FILE_ACTION_RENAMED_OLD_NAME:
 			assert(!m_renamedItemOldPidl);
-			m_renamedItemOldPidl.reset(ILCloneFull(simplePidl.get()));
+			m_renamedItemOldPidl.reset(ILCloneFull(simplePidl.Raw()));
 			break;
 
 		case FILE_ACTION_RENAMED_NEW_NAME:
-			OnItemRenamed(m_renamedItemOldPidl.get(), simplePidl.get());
+			OnItemRenamed(m_renamedItemOldPidl.get(), simplePidl.Raw());
 
 			m_renamedItemOldPidl.reset();
 			break;
 
 		case FILE_ACTION_MODIFIED:
-			OnItemModified(simplePidl.get());
+			OnItemModified(simplePidl.Raw());
 			break;
 
 		case FILE_ACTION_REMOVED:
-			OnItemRemoved(simplePidl.get());
+			OnItemRemoved(simplePidl.Raw());
 			break;
 		}
 	}

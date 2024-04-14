@@ -8,6 +8,7 @@
 #include "MainResource.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
+#include "ShellHelper.h"
 #include "TabNavigationMock.h"
 #include "../Helper/ShellHelper.h"
 #include <gtest/gtest.h>
@@ -62,6 +63,6 @@ TEST_F(BrowserCommandControllerTest, Up)
 	auto *currentEntry = m_shellBrowser.GetNavigationController()->GetCurrentEntry();
 	ASSERT_NE(currentEntry, nullptr);
 
-	unique_pidl_absolute pidlParent(SHSimpleIDListFromPath(L"C:\\"));
-	EXPECT_TRUE(ArePidlsEquivalent(currentEntry->GetPidl().Raw(), pidlParent.get()));
+	PidlAbsolute pidlParent = CreateSimplePidlForTest(L"C:\\");
+	EXPECT_TRUE(ArePidlsEquivalent(currentEntry->GetPidl().Raw(), pidlParent.Raw()));
 }

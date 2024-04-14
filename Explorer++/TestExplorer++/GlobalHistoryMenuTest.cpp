@@ -8,6 +8,7 @@
 #include "HistoryService.h"
 #include "IconFetcherMock.h"
 #include "PopupMenuView.h"
+#include "ShellHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <gtest/gtest.h>
 
@@ -59,9 +60,8 @@ private:
 	void AddHistoryItem()
 	{
 		auto path = GetPathForItem(GetNameForItem(m_historyItemCount));
-		unique_pidl_absolute pidl(SHSimpleIDListFromPath(path.c_str()));
-		ASSERT_NE(pidl, nullptr);
-		m_historyService.AddHistoryItem(pidl.get());
+		PidlAbsolute pidl = CreateSimplePidlForTest(path);
+		m_historyService.AddHistoryItem(pidl);
 
 		m_historyItemCount++;
 	}

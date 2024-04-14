@@ -4,6 +4,7 @@
 
 #include "pch.h"
 #include "../Helper/ShellHelper.h"
+#include "ShellHelper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <wil/com.h>
@@ -213,29 +214,20 @@ protected:
 
 TEST_P(CreateSimplePidlTest, Absolute)
 {
-	unique_pidl_absolute pidl;
-	HRESULT hr = CreateSimplePidl(m_itemPath, wil::out_param(pidl), nullptr, GetParam());
-	ASSERT_HRESULT_SUCCEEDED(hr);
-
-	TestPidlProperties(pidl.get(), m_itemPath, m_itemName, GetParam());
+	PidlAbsolute pidl = CreateSimplePidlForTest(m_itemPath, nullptr, GetParam());
+	TestPidlProperties(pidl.Raw(), m_itemPath, m_itemName, GetParam());
 }
 
 TEST_P(CreateSimplePidlTest, Relative)
 {
-	unique_pidl_absolute pidlParent;
-	HRESULT hr =
-		CreateSimplePidl(m_parentPath, wil::out_param(pidlParent), nullptr, ShellItemType::Folder);
-	ASSERT_HRESULT_SUCCEEDED(hr);
+	PidlAbsolute pidlParent = CreateSimplePidlForTest(m_parentPath, nullptr, ShellItemType::Folder);
 
 	wil::com_ptr_nothrow<IShellFolder> parent;
-	hr = SHBindToObject(nullptr, pidlParent.get(), nullptr, IID_PPV_ARGS(&parent));
+	HRESULT hr = SHBindToObject(nullptr, pidlParent.Raw(), nullptr, IID_PPV_ARGS(&parent));
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
-	unique_pidl_absolute pidl;
-	hr = CreateSimplePidl(m_itemName, wil::out_param(pidl), parent.get(), GetParam());
-	ASSERT_HRESULT_SUCCEEDED(hr);
-
-	TestPidlProperties(pidl.get(), m_itemPath, m_itemName, GetParam());
+	PidlAbsolute pidl = CreateSimplePidlForTest(m_itemName, parent.get(), GetParam());
+	TestPidlProperties(pidl.Raw(), m_itemPath, m_itemName, GetParam());
 }
 
 INSTANTIATE_TEST_SUITE_P(FileAndFolder, CreateSimplePidlTest,
@@ -261,11 +253,9 @@ TEST(IsPathGUID, NonGUIDPath)
 
 TEST(IsNamespaceRoot, NonRoot)
 {
-	unique_pidl_absolute pidl;
-	HRESULT hr = CreateSimplePidl(L"c:\\", wil::out_param(pidl));
-	ASSERT_HRESULT_SUCCEEDED(hr);
+	PidlAbsolute pidl = CreateSimplePidlForTest(L"c:\\");
 
-	BOOL res = IsNamespaceRoot(pidl.get());
+	BOOL res = IsNamespaceRoot(pidl.Raw());
 	EXPECT_FALSE(res);
 }
 
@@ -293,27 +283,20 @@ TEST(ArePidlsEquivalent, Different)
 
 void TestArePidlsEquivalent(const std::wstring &path1, const std::wstring &path2, bool equivalent)
 {
-	unique_pidl_absolute pidl1;
-	HRESULT hr = CreateSimplePidl(path1, wil::out_param(pidl1));
-	ASSERT_HRESULT_SUCCEEDED(hr);
+	PidlAbsolute pidl1 = CreateSimplePidlForTest(path1);
+	PidlAbsolute pidl2 = CreateSimplePidlForTest(path2);
 
-	unique_pidl_absolute pidl2;
-	hr = CreateSimplePidl(path2, wil::out_param(pidl2));
-	ASSERT_HRESULT_SUCCEEDED(hr);
-
-	BOOL res = ArePidlsEquivalent(pidl1.get(), pidl2.get());
+	BOOL res = ArePidlsEquivalent(pidl1.Raw(), pidl2.Raw());
 	EXPECT_EQ(res, equivalent);
 }
 
 TEST(GetDisplayName, ParsingName)
 {
-	unique_pidl_absolute pidl;
 	std::wstring pidlPath = L"c:\\path\\to\\file.txt";
-	HRESULT hr = CreateSimplePidl(pidlPath, wil::out_param(pidl));
-	ASSERT_HRESULT_SUCCEEDED(hr);
+	PidlAbsolute pidl = CreateSimplePidlForTest(pidlPath);
 
 	std::wstring parsingName;
-	hr = GetDisplayName(pidl.get(), SHGDN_FORPARSING, parsingName);
+	HRESULT hr = GetDisplayName(pidl.Raw(), SHGDN_FORPARSING, parsingName);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	EXPECT_THAT(parsingName, StrCaseEq(pidlPath));

@@ -272,12 +272,12 @@ void Explorerplusplus::OnResolveLink()
 					auto *filename = PathFindFileName(szFullFileName);
 					assert(filename != szFullFileName);
 
-					unique_pidl_absolute pidl;
-					hr = CreateSimplePidl(filename, wil::out_param(pidl), parent.get());
+					PidlAbsolute pidl;
+					hr = CreateSimplePidl(filename, pidl, parent.get());
 
 					if (SUCCEEDED(hr))
 					{
-						m_pActiveShellBrowser->SelectItems({ pidl.get() });
+						m_pActiveShellBrowser->SelectItems({ pidl.Raw() });
 					}
 				}
 			}

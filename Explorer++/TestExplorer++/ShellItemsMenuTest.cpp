@@ -7,6 +7,7 @@
 #include "BrowserWindowMock.h"
 #include "IconFetcher.h"
 #include "PopupMenuView.h"
+#include "ShellHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -15,13 +16,6 @@ using namespace testing;
 
 namespace
 {
-
-void AddPathToCollection(std::vector<PidlAbsolute> &pidls, const std::wstring &path)
-{
-	unique_pidl_absolute pidl(SHSimpleIDListFromPath(path.c_str()));
-	ASSERT_NE(pidl, nullptr);
-	pidls.push_back(pidl.get());
-}
 
 std::wstring GetPathForItem(const std::wstring &name)
 {
@@ -40,7 +34,7 @@ std::vector<PidlAbsolute> BuildPidlCollection(int size)
 	for (int i = 0; i < size; i++)
 	{
 		auto path = GetPathForItem(GetNameForItem(i));
-		AddPathToCollection(pidls, path);
+		pidls.push_back(CreateSimplePidlForTest(path));
 	}
 
 	return pidls;

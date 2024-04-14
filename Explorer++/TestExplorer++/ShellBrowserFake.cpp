@@ -6,6 +6,7 @@
 #include "ShellBrowserFake.h"
 #include "ShellBrowser/ShellBrowserHelper.h"
 #include "ShellBrowser/ShellNavigationController.h"
+#include "ShellHelper.h"
 
 ShellBrowserFake::ShellBrowserFake(TabNavigationInterface *tabNavigation, IconFetcher *iconFetcher,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries, int currentEntry)
@@ -26,21 +27,15 @@ ShellBrowserFake::~ShellBrowserFake() = default;
 // it requires that the path exist. This function will transform the path into a simple pidl, which
 // doesn't require the path to exist.
 HRESULT ShellBrowserFake::NavigateToPath(const std::wstring &path, HistoryEntryType addHistoryType,
-	unique_pidl_absolute *outputPidl)
+	PidlAbsolute *outputPidl)
 {
-	unique_pidl_absolute pidl(SHSimpleIDListFromPath(path.c_str()));
-
-	if (!pidl)
-	{
-		return E_FAIL;
-	}
-
-	auto navigateParams = NavigateParams::Normal(pidl.get(), addHistoryType);
+	PidlAbsolute pidl = CreateSimplePidlForTest(path);
+	auto navigateParams = NavigateParams::Normal(pidl.Raw(), addHistoryType);
 	HRESULT hr = m_navigationController->Navigate(navigateParams);
 
 	if (outputPidl)
 	{
-		*outputPidl = std::move(pidl);
+		*outputPidl = pidl;
 	}
 
 	return hr;

@@ -4,6 +4,7 @@
 
 #include "pch.h"
 #include "TabStorageHelper.h"
+#include "ShellHelper.h"
 #include "TabStorage.h"
 
 bool operator==(const TabStorageData &first, const TabStorageData &second)
@@ -28,8 +29,7 @@ void BuildTabStorageLoadSaveReference(std::vector<TabStorageData> &outputTabs)
 	TabStorageData tab1;
 
 	tab1.directory = L"C:\\";
-	tab1.pidl.TakeOwnership(SHSimpleIDListFromPath(tab1.directory.c_str()));
-	ASSERT_TRUE(tab1.pidl.HasValue());
+	tab1.pidl = CreateSimplePidlForTest(tab1.directory);
 
 	tab1.tabSettings.name = L"C drive";
 
@@ -67,8 +67,7 @@ void BuildTabStorageLoadSaveReference(std::vector<TabStorageData> &outputTabs)
 	TabStorageData tab2;
 
 	tab2.directory = L"C:\\Users";
-	tab2.pidl.TakeOwnership(SHSimpleIDListFromPath(tab2.directory.c_str()));
-	ASSERT_TRUE(tab2.pidl.HasValue());
+	tab2.pidl = CreateSimplePidlForTest(tab2.directory);
 
 	tab2.tabSettings.name = L"";
 	tab2.tabSettings.lockState = Tab::LockState::Locked;
@@ -90,8 +89,7 @@ void BuildTabStorageLoadSaveReference(std::vector<TabStorageData> &outputTabs)
 	TabStorageData tab3;
 
 	tab3.directory = L"C:\\Users\\Default";
-	tab3.pidl.TakeOwnership(SHSimpleIDListFromPath(tab3.directory.c_str()));
-	ASSERT_TRUE(tab3.pidl.HasValue());
+	tab3.pidl = CreateSimplePidlForTest(tab3.directory);
 
 	tab3.tabSettings.name = L"";
 	tab3.tabSettings.lockState = Tab::LockState::AddressLocked;

@@ -218,6 +218,7 @@
     <ClCompile Include="HistoryServiceTest.cpp" />
     <ClCompile Include="MenuHelperTest.cpp" />
     <ClCompile Include="PopupMenuViewTest.cpp" />
+    <ClCompile Include="ShellHelper.cpp" />
     <ClCompile Include="TabHistoryMenuTest.cpp" />
     <ClCompile Include="ImageHelperTest.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -283,6 +284,7 @@
     <ClInclude Include="MovableModelHelper.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RegistryStorageHelper.h" />
+    <ClInclude Include="ShellHelper.h" />
     <ClInclude Include="TestResources.h" />
     <ClInclude Include="ResourceHelper.h" />
     <ClInclude Include="ShellBrowserFake.h" />

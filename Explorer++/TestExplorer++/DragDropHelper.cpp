@@ -4,9 +4,11 @@
 
 #include "pch.h"
 #include "DragDropHelper.h"
+#include "ShellHelper.h"
 #include "../Helper/DataExchangeHelper.h"
 #include "../Helper/DataObjectImpl.h"
 #include "../Helper/DragDropHelper.h"
+#include <gtest/gtest.h>
 
 void CreateTextDataObject(const std::wstring &text, winrt::com_ptr<IDataObject> &dataObject)
 {
@@ -27,9 +29,7 @@ void CreateTextDataObject(const std::wstring &text, winrt::com_ptr<IDataObject> 
 void CreateShellDataObject(const std::wstring &path, ShellItemType shellItemType,
 	wil::com_ptr_nothrow<IDataObject> &dataObject)
 {
-	unique_pidl_absolute pidl;
-	ASSERT_HRESULT_SUCCEEDED(CreateSimplePidl(path, wil::out_param(pidl), nullptr, shellItemType));
-
-	std::vector<PCIDLIST_ABSOLUTE> items = { pidl.get() };
+	PidlAbsolute pidl = CreateSimplePidlForTest(path, nullptr, shellItemType);
+	std::vector<PCIDLIST_ABSOLUTE> items = { pidl.Raw() };
 	ASSERT_HRESULT_SUCCEEDED(CreateDataObjectForShellTransfer(items, &dataObject));
 }

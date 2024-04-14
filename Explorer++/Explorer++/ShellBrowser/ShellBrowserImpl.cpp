@@ -973,12 +973,12 @@ void ShellBrowserImpl::OnDeviceChange(UINT eventType, LONG_PTR eventData)
 				}
 				else
 				{
-					unique_pidl_absolute simplePidl;
-					HRESULT hr = CreateSimplePidl(szDrive, wil::out_param(simplePidl));
+					PidlAbsolute simplePidl;
+					HRESULT hr = CreateSimplePidl(szDrive, simplePidl);
 
 					if (SUCCEEDED(hr))
 					{
-						OnItemAdded(simplePidl.get());
+						OnItemAdded(simplePidl.Raw());
 					}
 				}
 			}

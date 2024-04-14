@@ -6,6 +6,7 @@
 #include "../Explorer++/ShellBrowser/ShellNavigationController.h"
 #include "IconFetcherMock.h"
 #include "ShellBrowserFake.h"
+#include "ShellHelper.h"
 #include "TabNavigationMock.h"
 #include "../Explorer++/ShellBrowser/HistoryEntry.h"
 #include "../Explorer++/ShellBrowser/PreservedHistoryEntry.h"
@@ -157,9 +158,8 @@ TEST_F(ShellNavigationControllerTest, GoUp)
 {
 	auto *navigationController = GetNavigationController();
 
-	unique_pidl_absolute pidlFolder(SHSimpleIDListFromPath(L"C:\\Fake"));
-	ASSERT_TRUE(pidlFolder);
-	auto navigateParamsFolder = NavigateParams::Normal(pidlFolder.get());
+	PidlAbsolute pidlFolder = CreateSimplePidlForTest(L"C:\\Fake");
+	auto navigateParamsFolder = NavigateParams::Normal(pidlFolder.Raw());
 	HRESULT hr = navigationController->Navigate(navigateParamsFolder);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
@@ -171,9 +171,8 @@ TEST_F(ShellNavigationControllerTest, GoUp)
 	auto entry = navigationController->GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
 
-	unique_pidl_absolute pidlParent(SHSimpleIDListFromPath(L"C:\\"));
-	ASSERT_TRUE(pidlParent);
-	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidlParent.get()));
+	PidlAbsolute pidlParent = CreateSimplePidlForTest(L"C:\\");
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidlParent.Raw()));
 
 	// The desktop folder is the root of the shell namespace.
 	unique_pidl_absolute pidlDesktop;
@@ -205,10 +204,8 @@ TEST_F(ShellNavigationControllerTest, HistoryEntries)
 	entry = navigationController->GetEntryAtIndex(0);
 	EXPECT_EQ(entry, nullptr);
 
-	unique_pidl_absolute pidl1(SHSimpleIDListFromPath(L"C:\\Fake1"));
-	ASSERT_TRUE(pidl1);
-
-	auto navigateParams1 = NavigateParams::Normal(pidl1.get());
+	PidlAbsolute pidl1 = CreateSimplePidlForTest(L"C:\\Fake1");
+	auto navigateParams1 = NavigateParams::Normal(pidl1.Raw());
 	HRESULT hr = navigationController->Navigate(navigateParams1);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
@@ -216,21 +213,19 @@ TEST_F(ShellNavigationControllerTest, HistoryEntries)
 
 	entry = navigationController->GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidl1.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidl1.Raw()));
 
 	EXPECT_EQ(navigationController->GetIndexOfEntry(entry), 0);
 	EXPECT_EQ(navigationController->GetEntryById(entry->GetId()), entry);
 
-	unique_pidl_absolute pidl2(SHSimpleIDListFromPath(L"C:\\Fake2"));
-	ASSERT_TRUE(pidl2);
-
-	auto navigateParams2 = NavigateParams::Normal(pidl2.get());
+	PidlAbsolute pidl2 = CreateSimplePidlForTest(L"C:\\Fake2");
+	auto navigateParams2 = NavigateParams::Normal(pidl2.Raw());
 	hr = navigationController->Navigate(navigateParams2);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	entry = navigationController->GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidl2.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidl2.Raw()));
 
 	EXPECT_EQ(navigationController->GetIndexOfEntry(entry), 1);
 	EXPECT_EQ(navigationController->GetEntryById(entry->GetId()), entry);
@@ -240,15 +235,13 @@ TEST_F(ShellNavigationControllerTest, HistoryEntries)
 
 	entry = navigationController->GetEntryAtIndex(0);
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidl1.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidl1.Raw()));
 }
 
 TEST_F(ShellNavigationControllerTest, SetNavigationMode)
 {
-	unique_pidl_absolute pidl1(SHSimpleIDListFromPath(L"C:\\Fake1"));
-	ASSERT_TRUE(pidl1);
-
-	auto params = NavigateParams::Normal(pidl1.get());
+	PidlAbsolute pidl1 = CreateSimplePidlForTest(L"C:\\Fake1");
+	auto params = NavigateParams::Normal(pidl1.Raw());
 
 	MockFunction<void(const NavigateParams &navigateParams)> navigationStartedCallback;
 	m_shellBrowser.AddNavigationStartedObserver(navigationStartedCallback.AsStdFunction());
@@ -273,10 +266,8 @@ TEST_F(ShellNavigationControllerTest, SetNavigationMode)
 	hr = navigationController->Navigate(params);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
-	unique_pidl_absolute pidl2(SHSimpleIDListFromPath(L"C:\\Fake2"));
-	ASSERT_TRUE(pidl2);
-
-	params = NavigateParams::Normal(pidl2.get());
+	PidlAbsolute pidl2 = CreateSimplePidlForTest(L"C:\\Fake2");
+	params = NavigateParams::Normal(pidl2.Raw());
 
 	// This is a navigation to a different directory, so the navigation mode above should now apply.
 	EXPECT_CALL(navigationStartedCallback, Call(_)).Times(0);
@@ -285,10 +276,8 @@ TEST_F(ShellNavigationControllerTest, SetNavigationMode)
 	hr = navigationController->Navigate(params);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
-	unique_pidl_absolute pidl3(SHSimpleIDListFromPath(L"C:\\Fake3"));
-	ASSERT_TRUE(pidl3);
-
-	params = NavigateParams::Normal(pidl3.get());
+	PidlAbsolute pidl3 = CreateSimplePidlForTest(L"C:\\Fake3");
+	params = NavigateParams::Normal(pidl3.Raw());
 	params.overrideNavigationMode = true;
 
 	// The navigation explicitly overrides the navigation mode, so this navigation should proceed in
@@ -305,10 +294,8 @@ TEST_F(ShellNavigationControllerTest, SetNavigationModeFirstNavigation)
 	auto *navigationController = GetNavigationController();
 	navigationController->SetNavigationMode(NavigationMode::ForceNewTab);
 
-	unique_pidl_absolute pidl1(SHSimpleIDListFromPath(L"C:\\Fake1"));
-	ASSERT_TRUE(pidl1);
-
-	auto params = NavigateParams::Normal(pidl1.get());
+	PidlAbsolute pidl1 = CreateSimplePidlForTest(L"C:\\Fake1");
+	auto params = NavigateParams::Normal(pidl1.Raw());
 
 	MockFunction<void(const NavigateParams &navigateParams)> navigationStartedCallback;
 	m_shellBrowser.AddNavigationStartedObserver(navigationStartedCallback.AsStdFunction());
@@ -321,10 +308,8 @@ TEST_F(ShellNavigationControllerTest, SetNavigationModeFirstNavigation)
 	HRESULT hr = navigationController->Navigate(params);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
-	unique_pidl_absolute pidl2(SHSimpleIDListFromPath(L"C:\\Fake2"));
-	ASSERT_TRUE(pidl2);
-
-	auto params2 = NavigateParams::Normal(pidl2.get());
+	PidlAbsolute pidl2 = CreateSimplePidlForTest(L"C:\\Fake2");
+	auto params2 = NavigateParams::Normal(pidl2.Raw());
 
 	// Subsequent navigations should then open in a new tab when necessary.
 	EXPECT_CALL(navigationStartedCallback, Call(Ref(params2))).Times(0);
@@ -336,11 +321,10 @@ TEST_F(ShellNavigationControllerTest, SetNavigationModeFirstNavigation)
 
 TEST_F(ShellNavigationControllerTest, HistoryEntryTypes)
 {
-	unique_pidl_absolute pidl1;
 	ASSERT_HRESULT_SUCCEEDED(
-		m_shellBrowser.NavigateToPath(L"C:\\Fake1", HistoryEntryType::AddEntry, &pidl1));
+		m_shellBrowser.NavigateToPath(L"C:\\Fake1", HistoryEntryType::AddEntry));
 
-	unique_pidl_absolute pidl2;
+	PidlAbsolute pidl2;
 	ASSERT_HRESULT_SUCCEEDED(
 		m_shellBrowser.NavigateToPath(L"C:\\Fake2", HistoryEntryType::ReplaceCurrentEntry, &pidl2));
 
@@ -353,9 +337,9 @@ TEST_F(ShellNavigationControllerTest, HistoryEntryTypes)
 
 	auto entry = navigationController->GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidl2.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidl2.Raw()));
 
-	unique_pidl_absolute pidl3;
+	PidlAbsolute pidl3;
 	ASSERT_HRESULT_SUCCEEDED(
 		m_shellBrowser.NavigateToPath(L"C:\\Fake3", HistoryEntryType::AddEntry, &pidl3));
 
@@ -364,11 +348,9 @@ TEST_F(ShellNavigationControllerTest, HistoryEntryTypes)
 
 	entry = navigationController->GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidl3.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidl3.Raw()));
 
-	unique_pidl_absolute pidl4;
-	ASSERT_HRESULT_SUCCEEDED(
-		m_shellBrowser.NavigateToPath(L"C:\\Fake4", HistoryEntryType::None, &pidl4));
+	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake4", HistoryEntryType::None));
 
 	EXPECT_EQ(navigationController->GetNumHistoryEntries(), 2);
 	EXPECT_EQ(navigationController->GetCurrentIndex(), 1);
@@ -377,7 +359,7 @@ TEST_F(ShellNavigationControllerTest, HistoryEntryTypes)
 	// previously.
 	entry = navigationController->GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidl3.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidl3.Raw()));
 }
 
 TEST_F(ShellNavigationControllerTest, ReplacePreviousHistoryEntry)
@@ -407,7 +389,7 @@ TEST_F(ShellNavigationControllerTest, ReplacePreviousHistoryEntry)
 
 TEST_F(ShellNavigationControllerTest, HistoryEntryTypeFirstNavigation)
 {
-	unique_pidl_absolute pidl;
+	PidlAbsolute pidl;
 	ASSERT_HRESULT_SUCCEEDED(
 		m_shellBrowser.NavigateToPath(L"C:\\Fake", HistoryEntryType::None, &pidl));
 
@@ -420,7 +402,7 @@ TEST_F(ShellNavigationControllerTest, HistoryEntryTypeFirstNavigation)
 
 	auto entry = navigationController->GetCurrentEntry();
 	ASSERT_NE(entry, nullptr);
-	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidl.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(entry->GetPidl().Raw(), pidl.Raw()));
 }
 
 class ShellNavigationControllerPreservedTest : public Test
@@ -452,29 +434,24 @@ protected:
 private:
 	std::unique_ptr<PreservedHistoryEntry> CreatePreservedHistoryEntry(const std::wstring &path)
 	{
-		unique_pidl_absolute pidl(SHSimpleIDListFromPath(path.c_str()));
-
-		if (!pidl)
-		{
-			return nullptr;
-		}
+		PidlAbsolute pidl = CreateSimplePidlForTest(path.c_str());
 
 		std::wstring displayName;
-		HRESULT hr = GetDisplayName(pidl.get(), SHGDN_INFOLDER, displayName);
+		HRESULT hr = GetDisplayName(pidl.Raw(), SHGDN_INFOLDER, displayName);
 
 		if (FAILED(hr))
 		{
 			return nullptr;
 		}
 
-		auto fullPathForDisplay = GetFolderPathForDisplay(pidl.get());
+		auto fullPathForDisplay = GetFolderPathForDisplay(pidl.Raw());
 
 		if (!fullPathForDisplay)
 		{
 			return nullptr;
 		}
 
-		HistoryEntry entry(pidl.get(), displayName, *fullPathForDisplay);
+		HistoryEntry entry(pidl.Raw(), displayName, *fullPathForDisplay);
 		return std::make_unique<PreservedHistoryEntry>(entry);
 	}
 };

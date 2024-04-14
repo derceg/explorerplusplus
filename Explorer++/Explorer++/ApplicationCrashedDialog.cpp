@@ -79,12 +79,12 @@ HRESULT ApplicationCrashedDialog::Callback(HWND hwnd, UINT msg, WPARAM wParam, L
 
 		case SHOW_CRASH_DUMP_BUTTON_ID:
 		{
-			unique_pidl_absolute pidl;
-			HRESULT hr = CreateSimplePidl(m_crashDumpFileName.value(), wil::out_param(pidl));
+			PidlAbsolute pidl;
+			HRESULT hr = CreateSimplePidl(m_crashDumpFileName.value(), pidl);
 
 			if (SUCCEEDED(hr))
 			{
-				SHOpenFolderAndSelectItems(pidl.get(), 0, nullptr, 0);
+				SHOpenFolderAndSelectItems(pidl.Raw(), 0, nullptr, 0);
 			}
 		}
 			return S_FALSE;

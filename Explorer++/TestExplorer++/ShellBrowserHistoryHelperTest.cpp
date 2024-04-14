@@ -8,6 +8,7 @@
 #include "IconFetcherMock.h"
 #include "ShellBrowserFake.h"
 #include "TabNavigationMock.h"
+#include "../Helper/ShellHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
@@ -15,7 +16,7 @@ using namespace testing;
 class ShellBrowserHistoryHelperTest : public Test
 {
 protected:
-	void NavigateInNewTab(const std::wstring &path, unique_pidl_absolute *outputPidl)
+	void NavigateInNewTab(const std::wstring &path, PidlAbsolute *outputPidl)
 	{
 		ShellBrowserFake shellBrowser(&m_tabNavigation, &m_iconFetcher);
 		ShellBrowserHistoryHelper::CreateAndAttachToShellBrowser(&shellBrowser, &m_historyService);
@@ -36,18 +37,18 @@ TEST_F(ShellBrowserHistoryHelperTest, NavigationInDifferentTabs)
 	m_historyService.AddHistoryChangedObserver(callback.AsStdFunction());
 	EXPECT_CALL(callback, Call()).Times(3);
 
-	unique_pidl_absolute pidlFake1;
+	PidlAbsolute pidlFake1;
 	NavigateInNewTab(L"C:\\Fake1", &pidlFake1);
 	ASSERT_EQ(history.size(), 1U);
-	EXPECT_TRUE(ArePidlsEquivalent(history[0].Raw(), pidlFake1.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(history[0].Raw(), pidlFake1.Raw()));
 
-	unique_pidl_absolute pidlFake2;
+	PidlAbsolute pidlFake2;
 	NavigateInNewTab(L"C:\\Fake2", &pidlFake2);
 	ASSERT_EQ(history.size(), 2U);
-	EXPECT_TRUE(ArePidlsEquivalent(history[0].Raw(), pidlFake2.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(history[0].Raw(), pidlFake2.Raw()));
 
-	unique_pidl_absolute pidlFake3;
+	PidlAbsolute pidlFake3;
 	NavigateInNewTab(L"C:\\Fake3", &pidlFake3);
 	ASSERT_EQ(history.size(), 3U);
-	EXPECT_TRUE(ArePidlsEquivalent(history[0].Raw(), pidlFake3.get()));
+	EXPECT_TRUE(ArePidlsEquivalent(history[0].Raw(), pidlFake3.Raw()));
 }

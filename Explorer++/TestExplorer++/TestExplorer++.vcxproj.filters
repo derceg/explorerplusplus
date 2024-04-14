@@ -194,6 +194,7 @@
     <ClCompile Include="HistoryServiceTest.cpp">
       <Filter>History</Filter>
     </ClCompile>
+    <ClCompile Include="ShellHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -326,6 +327,7 @@
     <ClInclude Include="BrowserWindowMock.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="ShellHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="EmbeddedResources\basic.png">

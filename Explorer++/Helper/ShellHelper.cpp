@@ -1421,7 +1421,7 @@ private:
 // This performs the same function as SHSimpleIDListFromPath(), which is deprecated.
 // The path provided should be relative to the parent. If parent is null, the path should be
 // absolute.
-HRESULT CreateSimplePidl(const std::wstring &path, PIDLIST_ABSOLUTE *pidl, IShellFolder *parent,
+HRESULT CreateSimplePidl(const std::wstring &path, PidlAbsolute &outputPidl, IShellFolder *parent,
 	ShellItemType shellItemType)
 {
 	wil::com_ptr_nothrow<IBindCtx> bindCtx;
@@ -1450,7 +1450,8 @@ HRESULT CreateSimplePidl(const std::wstring &path, PIDLIST_ABSOLUTE *pidl, IShel
 
 	if (!parent)
 	{
-		return SHParseDisplayName(path.c_str(), bindCtx.get(), pidl, 0, nullptr);
+		return SHParseDisplayName(path.c_str(), bindCtx.get(), PidlOutParam(outputPidl), 0,
+			nullptr);
 	}
 
 	unique_pidl_relative pidlRelative;
@@ -1460,7 +1461,7 @@ HRESULT CreateSimplePidl(const std::wstring &path, PIDLIST_ABSOLUTE *pidl, IShel
 	unique_pidl_absolute pidlParent;
 	RETURN_IF_FAILED(SHGetIDListFromObject(parent, wil::out_param(pidlParent)));
 
-	*pidl = ILCombine(pidlParent.get(), pidlRelative.get());
+	outputPidl.TakeOwnership(ILCombine(pidlParent.get(), pidlRelative.get()));
 
 	return S_OK;
 }

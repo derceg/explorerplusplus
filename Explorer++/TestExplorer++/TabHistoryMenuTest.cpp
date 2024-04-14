@@ -10,6 +10,7 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
 #include "TabNavigationMock.h"
+#include "../Helper/ShellHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
@@ -78,7 +79,7 @@ TEST_F(TabHistoryMenuTest, BackSelection)
 
 TEST_F(TabHistoryMenuTest, BackSelectionMiddleClick)
 {
-	unique_pidl_absolute fake2;
+	PidlAbsolute fake2;
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
 	ASSERT_HRESULT_SUCCEEDED(
 		m_shellBrowser.NavigateToPath(L"C:\\Fake2", HistoryEntryType::AddEntry, &fake2));
@@ -89,7 +90,7 @@ TEST_F(TabHistoryMenuTest, BackSelectionMiddleClick)
 
 	EXPECT_CALL(m_browserWindow,
 		OpenItem(
-			Matcher<PCIDLIST_ABSOLUTE>(Truly(std::bind_front(&ArePidlsEquivalent, fake2.get()))),
+			Matcher<PCIDLIST_ABSOLUTE>(Truly(std::bind_front(&ArePidlsEquivalent, fake2.Raw()))),
 			OpenFolderDisposition::NewTabDefault));
 
 	// Open Fake2 in a new tab.
@@ -120,7 +121,7 @@ TEST_F(TabHistoryMenuTest, ForwardSelection)
 
 TEST_F(TabHistoryMenuTest, ForwardSelectionMiddleClick)
 {
-	unique_pidl_absolute fake3;
+	PidlAbsolute fake3;
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake1"));
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake2"));
 	ASSERT_HRESULT_SUCCEEDED(
@@ -135,7 +136,7 @@ TEST_F(TabHistoryMenuTest, ForwardSelectionMiddleClick)
 
 	EXPECT_CALL(m_browserWindow,
 		OpenItem(
-			Matcher<PCIDLIST_ABSOLUTE>(Truly(std::bind_front(&ArePidlsEquivalent, fake3.get()))),
+			Matcher<PCIDLIST_ABSOLUTE>(Truly(std::bind_front(&ArePidlsEquivalent, fake3.Raw()))),
 			OpenFolderDisposition::NewTabDefault));
 
 	// Open Fake3 in a new tab.

@@ -5,7 +5,7 @@
 #pragma once
 
 #include "ShellBrowser/ShellBrowser.h"
-#include "../Helper/ShellHelper.h"
+#include "../Helper/PidlHelper.h"
 
 class IconFetcher;
 struct PreservedHistoryEntry;
@@ -23,7 +23,7 @@ public:
 
 	HRESULT NavigateToPath(const std::wstring &path,
 		HistoryEntryType addHistoryType = HistoryEntryType::AddEntry,
-		unique_pidl_absolute *outputPidl = nullptr);
+		PidlAbsolute *outputPidl = nullptr);
 
 	// ShellBrowserInterface
 	ShellNavigationController *GetNavigationController() const override;
