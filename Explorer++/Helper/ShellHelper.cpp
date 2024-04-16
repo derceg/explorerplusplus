@@ -1311,7 +1311,7 @@ HRESULT ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory,
 		}
 	}
 
-	auto actionNarrow = wstrToStr(action);
+	auto actionNarrow = WstrToStr(action);
 
 	if (!actionNarrow)
 	{

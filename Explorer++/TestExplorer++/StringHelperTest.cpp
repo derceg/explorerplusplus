@@ -107,3 +107,16 @@ TEST(TrimString, Simple)
 	TrimString(text, L" ");
 	EXPECT_EQ(text, L"Test text");
 }
+
+TEST(WstrToStr, NullTerminator)
+{
+	// The resulting string shouldn't have a terminating NULL character embedded.
+	auto result = WstrToStr(L"Test string");
+	EXPECT_EQ(result, "Test string");
+}
+
+TEST(StrToWstr, NullTerminator)
+{
+	auto result = StrToWstr("Test string");
+	EXPECT_EQ(result, L"Test string");
+}

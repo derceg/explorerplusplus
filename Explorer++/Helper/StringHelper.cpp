@@ -299,48 +299,52 @@ void TrimString(std::wstring &str, const std::wstring &strWhitespace)
 	TrimStringRight(str, strWhitespace);
 }
 
-std::optional<std::string> wstrToStr(const std::wstring &source)
+std::optional<std::string> WstrToStr(const std::wstring &source)
 {
-	int res = WideCharToMultiByte(CP_ACP, 0, source.c_str(), -1, nullptr, 0, nullptr, nullptr);
+	int length = WideCharToMultiByte(CP_ACP, 0, source.c_str(), -1, nullptr, 0, nullptr, nullptr);
 
-	if (res == 0)
+	if (length == 0)
 	{
 		return std::nullopt;
 	}
 
 	std::string narrowString;
-	narrowString.resize(res);
+	narrowString.resize(length);
 
-	res = WideCharToMultiByte(CP_ACP, 0, source.c_str(), -1, narrowString.data(),
+	length = WideCharToMultiByte(CP_ACP, 0, source.c_str(), -1, narrowString.data(),
 		static_cast<int>(narrowString.size()), nullptr, nullptr);
 
-	if (res == 0)
+	if (length == 0)
 	{
 		return std::nullopt;
 	}
 
+	narrowString.resize(length - 1);
+
 	return narrowString;
 }
 
-std::optional<std::wstring> strToWstr(const std::string &source)
+std::optional<std::wstring> StrToWstr(const std::string &source)
 {
-	int res = MultiByteToWideChar(CP_ACP, 0, source.c_str(), -1, nullptr, 0);
+	int length = MultiByteToWideChar(CP_ACP, 0, source.c_str(), -1, nullptr, 0);
 
-	if (res == 0)
+	if (length == 0)
 	{
 		return std::nullopt;
 	}
 
 	std::wstring wideString;
-	wideString.resize(res);
+	wideString.resize(length);
 
-	res = MultiByteToWideChar(CP_ACP, 0, source.c_str(), -1, wideString.data(),
+	length = MultiByteToWideChar(CP_ACP, 0, source.c_str(), -1, wideString.data(),
 		static_cast<int>(wideString.size()));
 
-	if (res == 0)
+	if (length == 0)
 	{
 		return std::nullopt;
 	}
+
+	wideString.resize(length - 1);
 
 	return wideString;
 }

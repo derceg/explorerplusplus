@@ -203,7 +203,7 @@ std::optional<std::string> FileContextMenuManager::GetFilesystemDirectory()
 
 	if (SUCCEEDED(hr))
 	{
-		return wstrToStr(parsingPath.get());
+		return WstrToStr(parsingPath.get());
 	}
 
 	// In Windows Explorer, it appears that when a menu item is invoked from the background context
@@ -235,7 +235,7 @@ std::optional<std::string> FileContextMenuManager::GetFilesystemDirectory()
 		return std::nullopt;
 	}
 
-	return wstrToStr(parsingPath.get());
+	return WstrToStr(parsingPath.get());
 }
 
 LRESULT FileContextMenuManager::ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam,
