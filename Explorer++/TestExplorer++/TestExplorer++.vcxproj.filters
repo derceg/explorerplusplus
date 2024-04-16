@@ -195,6 +195,9 @@
       <Filter>History</Filter>
     </ClCompile>
     <ClCompile Include="ShellHelper.cpp" />
+    <ClCompile Include="FrequentLocationsServiceTest.cpp">
+      <Filter>Frequent Locations</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -268,6 +271,9 @@
     </Filter>
     <Filter Include="Core\UI\Views">
       <UniqueIdentifier>{b80d11e6-4361-4b55-9b78-470549e95b2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Frequent Locations">
+      <UniqueIdentifier>{608f3f32-fe72-473c-af0b-a9acec71dfcd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

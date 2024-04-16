@@ -97,6 +97,11 @@ using PidlChild = PidlAccessor::PidlChild;
 
 bool operator==(const PidlAbsolute &pidl1, const PidlAbsolute &pidl2);
 
+// This allows PidlAbsolute instances to be used with containers that require items to be hashed.
+// Boost containers will use this hash by default (via boost::hash), while it can be used with
+// standard containers by passing the appropriate template parameter.
+std::size_t hash_value(const PidlAbsolute &pidl);
+
 template <typename T,
 	typename = std::enable_if_t<std::is_same_v<T, PidlAbsolute> || std::is_same_v<T, PidlRelative>
 		|| std::is_same_v<T, PidlChild>>>

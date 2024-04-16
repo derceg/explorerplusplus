@@ -655,6 +655,12 @@
     <ClCompile Include="TabParentItemsMenu.cpp">
       <Filter>Core\UI</Filter>
     </ClCompile>
+    <ClCompile Include="FrequentLocationsService.cpp">
+      <Filter>Frequent Locations</Filter>
+    </ClCompile>
+    <ClCompile Include="LocationVisitInfo.cpp">
+      <Filter>Frequent Locations</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1344,6 +1350,12 @@
     <ClInclude Include="TabParentItemsMenu.h">
       <Filter>Core\UI</Filter>
     </ClInclude>
+    <ClInclude Include="FrequentLocationsService.h">
+      <Filter>Frequent Locations</Filter>
+    </ClInclude>
+    <ClInclude Include="LocationVisitInfo.h">
+      <Filter>Frequent Locations</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1490,6 +1502,9 @@
     </Filter>
     <Filter Include="Main Rebar">
       <UniqueIdentifier>{fceed596-dd83-4bb7-8b00-39f8e546a708}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Frequent Locations">
+      <UniqueIdentifier>{149a5be0-042f-4e01-b96c-9630a577106a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
