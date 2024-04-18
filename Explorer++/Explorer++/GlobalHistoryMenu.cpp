@@ -34,7 +34,7 @@ void GlobalHistoryMenu::OnHistoryChanged()
 	RebuildMenu(GetHistoryItems(m_historyService));
 }
 
-std::vector<PidlAbsolute> GlobalHistoryMenu::GetHistoryItems(HistoryService *historyService)
+std::vector<PidlAbsolute> GlobalHistoryMenu::GetHistoryItems(const HistoryService *historyService)
 {
 	const auto &history = historyService->GetHistoryItems();
 	std::vector<PidlAbsolute> historyVector({ history.begin(), history.end() });

@@ -20,7 +20,7 @@ public:
 private:
 	void Initialize();
 	void OnHistoryChanged();
-	static std::vector<PidlAbsolute> GetHistoryItems(HistoryService *historyService);
+	static std::vector<PidlAbsolute> GetHistoryItems(const HistoryService *historyService);
 
 	HistoryService *const m_historyService;
 	std::vector<boost::signals2::scoped_connection> m_connections;
