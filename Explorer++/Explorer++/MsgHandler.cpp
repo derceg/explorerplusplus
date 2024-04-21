@@ -143,11 +143,7 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 		// - .search-ms
 		// - .zip
 
-		std::wstring parsingPath;
-		hr = GetDisplayName(pidlItem, SHGDN_FORPARSING, parsingPath);
-		bool isZipFile = (SUCCEEDED(hr) && parsingPath.ends_with(L".zip"));
-
-		if ((isZipFile && m_config->handleZipFiles) || !isZipFile)
+		if (ShouldOpenContainerFile(pidlItem))
 		{
 			OpenFolderItem(pidlItem, openFolderDisposition);
 		}
@@ -162,20 +158,78 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem,
 	}
 	else if (WI_IsFlagSet(attributes, SFGAO_LINK))
 	{
-		unique_pidl_absolute target;
-		hr = MaybeResolveLinkTarget(m_hContainer, pidlItem, target);
-
-		// If the target doesn't exist, MaybeResolveLinkTarget() will show an error message to the
-		// user. So, that case doesn't need to be handled at all here.
-		if (SUCCEEDED(hr))
-		{
-			OpenItem(target.get(), openFolderDisposition);
-		}
+		OpenShortcutItem(pidlItem, openFolderDisposition);
 	}
 	else
 	{
 		OpenFileItem(pidlItem, L"");
 	}
+}
+
+void Explorerplusplus::OpenShortcutItem(PCIDLIST_ABSOLUTE pidlItem,
+	OpenFolderDisposition openFolderDisposition)
+{
+	unique_pidl_absolute target;
+	HRESULT hr = MaybeResolveLinkTarget(m_hContainer, pidlItem, target);
+
+	if (FAILED(hr))
+	{
+		// If the target doesn't exist, MaybeResolveLinkTarget() will show an error message to the
+		// user. So, that case doesn't need to be handled at all here.
+		return;
+	}
+
+	bool openAsFolder = false;
+
+	SFGAOF targetAttributes = SFGAO_FOLDER | SFGAO_STREAM;
+	hr = GetItemAttributes(target.get(), &targetAttributes);
+
+	if (SUCCEEDED(hr))
+	{
+		bool isFolder = WI_IsFlagSet(targetAttributes, SFGAO_FOLDER)
+			&& WI_IsFlagClear(targetAttributes, SFGAO_STREAM);
+		bool isContainerFile = WI_IsFlagSet(targetAttributes, SFGAO_FOLDER)
+			&& WI_IsFlagSet(targetAttributes, SFGAO_STREAM);
+
+		openAsFolder = isFolder || (isContainerFile && ShouldOpenContainerFile(target.get()));
+	}
+
+	if (openAsFolder)
+	{
+		// This is a shortcut to a folder item or container file. In either case, it should be
+		// opened here, rather than being opened via the shell (since opening the shortcut via the
+		// shell will result in the item being opened in the default file manager).
+		OpenFolderItem(target.get(), openFolderDisposition);
+	}
+	else
+	{
+		// If the shortcut file points to something other than a folder/container file, the shortcut
+		// should be opened via the shell. It's important to do that, rather than executing the
+		// target directly, since the shortcut can have various start options defined (e.g.
+		// parameters, initial directory, window state). Those options won't be applied if the
+		// target is simply executed.
+		// This branch wil also be taken if the shortcut points to a .zip file and .zip file
+		// handling is turned off. In that situation, the shortcut should still be opened via the
+		// shell. That's because at least one of the shortcut options (window state) will be applied
+		// when opening the shortcut. That won't be the case if the target is executed directly.
+		OpenFileItem(pidlItem, L"");
+	}
+}
+
+// Returns true if the specified container file should be opened as a folder. If false, the file
+// should be opened via the shell.
+bool Explorerplusplus::ShouldOpenContainerFile(PCIDLIST_ABSOLUTE pidlItem)
+{
+	std::wstring parsingPath;
+	HRESULT hr = GetDisplayName(pidlItem, SHGDN_FORPARSING, parsingPath);
+
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	bool isZipFile = (SUCCEEDED(hr) && parsingPath.ends_with(L".zip"));
+	return (isZipFile && m_config->handleZipFiles) || !isZipFile;
 }
 
 void Explorerplusplus::OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,

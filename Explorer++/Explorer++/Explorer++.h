@@ -449,6 +449,9 @@ private:
 		OpenFolderDisposition openFolderDisposition) override;
 	void OpenItem(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition) override;
 
+	void OpenShortcutItem(PCIDLIST_ABSOLUTE pidlItem, OpenFolderDisposition openFolderDisposition);
+	bool ShouldOpenContainerFile(PCIDLIST_ABSOLUTE pidlItem);
+
 	void OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem,
 		OpenFolderDisposition openFolderDisposition = OpenFolderDisposition::CurrentTab);
 	void OpenFileItem(const std::wstring &itemPath, const std::wstring &parameters) override;
