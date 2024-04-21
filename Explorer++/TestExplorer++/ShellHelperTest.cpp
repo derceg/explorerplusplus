@@ -103,6 +103,9 @@ TEST_F(TransformPathTest, AbsolutePath)
 		currentDirectory,
 		L"search-ms:displayname=Search%20Results&crumb=fileextension%3A~<*.txt&crumb=location:C%3A%5CUsers%5CDefault");
 
+	// An FTP path.
+	PerformTest(L"ftp://127.0.0.1/", currentDirectory, L"ftp://127.0.0.1/");
+
 	// Paths that are separated by forward slashes, rather than backslashes.
 	PerformTest(L"c:/users/public", currentDirectory, L"c:\\users\\public");
 	PerformTest(L"\\nested/directory", L"d:\\path\\to\\item", L"d:\\nested\\directory");
@@ -147,6 +150,8 @@ TEST_F(TransformPathTest, Normalization)
 		L"search-ms:displayname=Search%20Results&crumb=fileextension%3A~<*.txt&crumb=location:C%3A%5CUsers%5CDefault\\..",
 		currentDirectory,
 		L"search-ms:displayname=Search%20Results&crumb=fileextension%3A~<*.txt&crumb=location:C%3A%5CUsers%5CDefault\\..");
+
+	PerformTest(L"ftp://127.0.0.1/directory/..", currentDirectory, L"ftp://127.0.0.1/directory/..");
 }
 
 TEST_F(TransformPathTest, Whitespace)

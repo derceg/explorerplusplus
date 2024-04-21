@@ -722,6 +722,10 @@ std::optional<std::wstring> TransformUserEnteredPathToAbsolutePath(
 			// here can still be normalized.
 			return MaybeExtractPathFromFileUrl(updatedPath);
 		}
+		else if (parsedUrl.nScheme == URL_SCHEME_FTP)
+		{
+			return updatedPath;
+		}
 		else
 		{
 			// Other types of URLs aren't supported.
@@ -750,14 +754,19 @@ bool ShouldNormalizePath(const std::wstring &path)
 	parsedUrl.cbSize = sizeof(parsedUrl);
 	HRESULT hr = ParseURL(path.c_str(), &parsedUrl);
 
-	// These URL types can't contain relative references.
-	if (SUCCEEDED(hr)
-		&& (parsedUrl.nScheme == URL_SCHEME_SHELL || parsedUrl.nScheme == URL_SCHEME_SEARCH_MS))
+	if (FAILED(hr))
 	{
-		return false;
+		// The path isn't a URL, so it can be normalized.
+		return true;
 	}
 
-	return true;
+	// These URL types can contain relative references.
+	if (parsedUrl.nScheme == URL_SCHEME_FILE)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 std::optional<std::wstring> MaybeExtractPathFromFileUrl(const std::wstring &url)
