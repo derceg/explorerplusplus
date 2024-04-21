@@ -112,7 +112,7 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam, LPARAM lParam)
 
 		std::optional<std::wstring> helperText;
 
-		if (WI_IsFlagClear(HIWORD(wParam), MF_POPUP))
+		if (WI_AreAllFlagsClear(HIWORD(wParam), MF_POPUP | MF_SEPARATOR))
 		{
 			HMENU menu = reinterpret_cast<HMENU>(lParam);
 			UINT menuItemId = LOWORD(wParam);

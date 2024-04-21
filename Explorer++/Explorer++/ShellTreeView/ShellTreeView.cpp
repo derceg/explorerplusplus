@@ -1501,8 +1501,9 @@ void ShellTreeView::OnShowContextMenu(const POINT &ptScreen)
 		WI_SetFlag(flags, FileContextMenuManager::Flags::ExtendedVerbs);
 	}
 
-	FileContextMenuManager contextMenuManager(m_hTreeView, pidl.get(), { child.get() });
-	contextMenuManager.ShowMenu(this, &finalPoint, m_coreInterface->GetStatusBar(), nullptr, flags);
+	FileContextMenuManager contextMenuManager(pidl.get(), { child.get() }, this,
+		m_coreInterface->GetStatusBar());
+	contextMenuManager.ShowMenu(m_hTreeView, &finalPoint, nullptr, flags);
 
 	if (highlightTargetItem)
 	{
@@ -1520,6 +1521,20 @@ void ShellTreeView::UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
 	std::wstring openInNewTabText = ResourceHelper::LoadString(
 		m_coreInterface->GetResourceInstance(), IDS_GENERAL_OPEN_IN_NEW_TAB);
 	MenuHelper::AddStringItem(menu, OPEN_IN_NEW_TAB_MENU_ITEM_ID, openInNewTabText, 1, true);
+}
+
+std::wstring ShellTreeView::GetHelpTextForItem(UINT menuItemId)
+{
+	switch (menuItemId)
+	{
+	case OPEN_IN_NEW_TAB_MENU_ITEM_ID:
+		return ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),
+			IDS_GENERAL_OPEN_IN_NEW_TAB_HELP_TEXT);
+
+	default:
+		DCHECK(false);
+		return L"";
+	}
 }
 
 bool ShellTreeView::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
@@ -1553,11 +1568,11 @@ bool ShellTreeView::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 }
 
 void ShellTreeView::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, int cmd)
+	const std::vector<PidlChild> &pidlItems, UINT menuItemId)
 {
 	assert(pidlItems.size() == 1);
 
-	switch (cmd)
+	switch (menuItemId)
 	{
 	case OPEN_IN_NEW_TAB_MENU_ITEM_ID:
 	{

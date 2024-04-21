@@ -4,85 +4,24 @@
 
 #include "stdafx.h"
 #include "FileContextMenuManager.h"
-#include "Macros.h"
 #include "MenuHelper.h"
 #include "ShellHelper.h"
 #include "StatusBar.h"
 #include "StringHelper.h"
 #include "WindowSubclassWrapper.h"
 
-FileContextMenuManager::FileContextMenuManager(HWND hwnd, PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PCITEMID_CHILD> &pidlItems) :
-	m_hwnd(hwnd),
-	m_pidlParent(pidlParent)
+FileContextMenuManager::FileContextMenuManager(PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PCITEMID_CHILD> &pidlItems, FileContextMenuHandler *handler,
+	StatusBar *statusBar) :
+	m_pidlParent(pidlParent),
+	m_pidlItems(pidlItems.begin(), pidlItems.end()),
+	m_handler(handler),
+	m_statusBar(statusBar)
 {
-	std::copy(pidlItems.begin(), pidlItems.end(), std::back_inserter(m_pidlItems));
-
-	m_actualContextMenu = nullptr;
-
-	wil::com_ptr_nothrow<IShellFolder> shellFolder;
-	HRESULT hr = BindToIdl(m_pidlParent.Raw(), IID_PPV_ARGS(&shellFolder));
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	wil::com_ptr_nothrow<IContextMenu> contextMenu;
-
-	if (pidlItems.empty())
-	{
-		wil::com_ptr_nothrow<IShellView> shellView;
-		hr = shellFolder->CreateViewObject(m_hwnd, IID_PPV_ARGS(&shellView));
-
-		if (SUCCEEDED(hr))
-		{
-			hr = shellView->GetItemObject(SVGIO_BACKGROUND, IID_PPV_ARGS(&contextMenu));
-		}
-	}
-	else
-	{
-		hr = GetUIObjectOf(shellFolder.get(), hwnd, static_cast<UINT>(pidlItems.size()),
-			pidlItems.data(), IID_PPV_ARGS(&contextMenu));
-	}
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	// First, try to get IContextMenu3, then IContextMenu2, and if neither of these are
-	// available, then use IContextMenu.
-	hr = contextMenu->QueryInterface(IID_PPV_ARGS(&m_contextMenu3));
-
-	if (SUCCEEDED(hr))
-	{
-		m_actualContextMenu = m_contextMenu3.get();
-		return;
-	}
-
-	hr = contextMenu->QueryInterface(IID_PPV_ARGS(&m_contextMenu2));
-
-	if (SUCCEEDED(hr))
-	{
-		m_actualContextMenu = m_contextMenu2.get();
-		return;
-	}
-
-	m_contextMenu = contextMenu;
-	m_actualContextMenu = m_contextMenu.get();
 }
 
-HRESULT FileContextMenuManager::ShowMenu(FileContextMenuHandler *handler, const POINT *pt,
-	StatusBar *statusBar, IUnknown *site, Flags flags)
+void FileContextMenuManager::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flags flags)
 {
-	if (!m_actualContextMenu)
-	{
-		return E_FAIL;
-	}
-
-	m_statusBar = statusBar;
-
 	wil::unique_hmenu menu(CreatePopupMenu());
 
 	UINT contextMenuflags = CMF_NORMAL;
@@ -106,38 +45,38 @@ HRESULT FileContextMenuManager::ShowMenu(FileContextMenuHandler *handler, const 
 		contextMenuflags |= CMF_NODEFAULT;
 	}
 
-	HRESULT hr;
+	m_contextMenu = MaybeGetShellContextMenu(hwnd);
 
-	if (site)
+	if (m_contextMenu)
 	{
-		wil::com_ptr_nothrow<IObjectWithSite> objectWithSite;
-		hr = m_actualContextMenu->QueryInterface(IID_PPV_ARGS(&objectWithSite));
-
-		if (SUCCEEDED(hr))
+		if (site; auto objectWithSite = m_contextMenu.try_query<IObjectWithSite>())
 		{
 			objectWithSite->SetSite(site);
 		}
+
+		m_contextMenu->QueryContextMenu(menu.get(), 0, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID,
+			contextMenuflags);
 	}
 
-	hr = m_actualContextMenu->QueryContextMenu(menu.get(), 0, MIN_SHELL_MENU_ID, MAX_SHELL_MENU_ID,
-		contextMenuflags);
-
-	if (FAILED(hr))
-	{
-		return hr;
-	}
-
-	handler->UpdateMenuEntries(menu.get(), m_pidlParent.Raw(), m_pidlItems, m_actualContextMenu);
+	m_handler->UpdateMenuEntries(menu.get(), m_pidlParent.Raw(), m_pidlItems, m_contextMenu.get());
 
 	MenuHelper::RemoveTrailingSeparators(menu.get());
 	MenuHelper::RemoveDuplicateSeperators(menu.get());
 
+	if (GetMenuItemCount(menu.get()) == 0)
+	{
+		// If the folder doesn't provide any IContextMenu instance, the application can still add
+		// items. If, however, the application doesn't add any items either, there's no menu to show
+		// and it doesn't make sense to continue.
+		return;
+	}
+
 	// Subclass the owner window, so that menu messages can be handled.
-	auto subclass = std::make_unique<WindowSubclassWrapper>(m_hwnd,
+	auto subclass = std::make_unique<WindowSubclassWrapper>(hwnd,
 		std::bind_front(&FileContextMenuManager::ParentWindowSubclass, this));
 
-	int cmd =
-		TrackPopupMenu(menu.get(), TPM_LEFTALIGN | TPM_RETURNCMD, pt->x, pt->y, 0, m_hwnd, nullptr);
+	UINT cmd =
+		TrackPopupMenu(menu.get(), TPM_LEFTALIGN | TPM_RETURNCMD, pt->x, pt->y, 0, hwnd, nullptr);
 
 	// When the selected command is invoked below, it could potentially do anything, including show
 	// another menu. It doesn't make sense for the subclass to be called in that situation and
@@ -146,49 +85,88 @@ HRESULT FileContextMenuManager::ShowMenu(FileContextMenuHandler *handler, const 
 
 	if (cmd == 0)
 	{
-		return S_OK;
+		return;
 	}
 
 	if (cmd >= MIN_SHELL_MENU_ID && cmd <= MAX_SHELL_MENU_ID)
 	{
+		// Items in this range are assigned to shell menu items. If this CHECK is triggered, it
+		// indicates that the application has incorrectly added items within this range.
+		CHECK(m_contextMenu);
+
 		TCHAR verb[64] = _T("");
-		hr = m_actualContextMenu->GetCommandString(cmd - MIN_SHELL_MENU_ID, GCS_VERB, nullptr,
-			reinterpret_cast<LPSTR>(verb), SIZEOF_ARRAY(verb));
+		HRESULT hr = m_contextMenu->GetCommandString(cmd - MIN_SHELL_MENU_ID, GCS_VERB, nullptr,
+			reinterpret_cast<LPSTR>(verb), static_cast<UINT>(std::size(verb)));
 
 		bool handled = false;
 
 		// Pass the menu back to the caller to give it the chance to handle it.
 		if (SUCCEEDED(hr))
 		{
-			handled = handler->HandleShellMenuItem(m_pidlParent.Raw(), m_pidlItems, verb);
+			handled = m_handler->HandleShellMenuItem(m_pidlParent.Raw(), m_pidlItems, verb);
 		}
 
 		if (!handled)
 		{
-			std::optional<std::string> parsingPathOpt = GetFilesystemDirectory();
+			std::optional<std::string> parsingPathOpt = MaybeGetFilesystemDirectory();
 
 			// Note that some menu items require the directory field to be set. For example, the
 			// "Git Bash Here" item (which is added by Git for Windows) requires that.
 			CMINVOKECOMMANDINFO commandInfo = {};
 			commandInfo.cbSize = sizeof(commandInfo);
 			commandInfo.fMask = 0;
-			commandInfo.hwnd = m_hwnd;
+			commandInfo.hwnd = hwnd;
 			commandInfo.lpVerb = reinterpret_cast<LPCSTR>(MAKEINTRESOURCE(cmd - MIN_SHELL_MENU_ID));
 			commandInfo.lpDirectory = parsingPathOpt ? parsingPathOpt->c_str() : nullptr;
 			commandInfo.nShow = SW_SHOWNORMAL;
-			m_actualContextMenu->InvokeCommand(&commandInfo);
+			m_contextMenu->InvokeCommand(&commandInfo);
 		}
 	}
 	else
 	{
-		handler->HandleCustomMenuItem(m_pidlParent.Raw(), m_pidlItems, cmd);
+		m_handler->HandleCustomMenuItem(m_pidlParent.Raw(), m_pidlItems, cmd);
+	}
+}
+
+// It's possible for a folder to not provide any IContextMenu instance (for example, the Home folder
+// in Windows 11 doesn't provide any IContextMenu instance for the background menu). So, this method
+// may return null.
+wil::com_ptr_nothrow<IContextMenu> FileContextMenuManager::MaybeGetShellContextMenu(HWND hwnd) const
+{
+	wil::com_ptr_nothrow<IShellFolder> shellFolder;
+	HRESULT hr = BindToIdl(m_pidlParent.Raw(), IID_PPV_ARGS(&shellFolder));
+
+	if (FAILED(hr))
+	{
+		return nullptr;
 	}
 
-	return S_OK;
+	wil::com_ptr_nothrow<IContextMenu> contextMenu;
+
+	if (m_pidlItems.empty())
+	{
+		hr = shellFolder->CreateViewObject(hwnd, IID_PPV_ARGS(&contextMenu));
+	}
+	else
+	{
+		std::vector<PCITEMID_CHILD> pidlItemsRaw;
+		std::transform(m_pidlItems.begin(), m_pidlItems.end(), std::back_inserter(pidlItemsRaw),
+			[](const PidlChild &pidl) { return pidl.Raw(); });
+
+		hr = GetUIObjectOf(shellFolder.get(), hwnd, static_cast<UINT>(pidlItemsRaw.size()),
+			pidlItemsRaw.data(), IID_PPV_ARGS(&contextMenu));
+	}
+
+	if (FAILED(hr))
+	{
+		return nullptr;
+	}
+
+	return contextMenu;
 }
 
 // Returns the parsing path for the current directory, but only if it's a filesystem path.
-std::optional<std::string> FileContextMenuManager::GetFilesystemDirectory()
+std::optional<std::string> FileContextMenuManager::MaybeGetFilesystemDirectory() const
 {
 	wil::com_ptr_nothrow<IShellItem> shellItem;
 	HRESULT hr = SHCreateItemFromIDList(m_pidlParent.Raw(), IID_PPV_ARGS(&shellItem));
@@ -253,19 +231,24 @@ LRESULT FileContextMenuManager::ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM
 			break;
 		}
 
-		if (m_contextMenu3)
+		if (!m_contextMenu)
+		{
+			break;
+		}
+
+		if (auto contextMenu3 = m_contextMenu.try_query<IContextMenu3>())
 		{
 			LRESULT result;
-			HRESULT hr = m_contextMenu3->HandleMenuMsg2(msg, wParam, lParam, &result);
+			HRESULT hr = contextMenu3->HandleMenuMsg2(msg, wParam, lParam, &result);
 
 			if (SUCCEEDED(hr))
 			{
 				return result;
 			}
 		}
-		else if (m_contextMenu2)
+		else if (auto contextMenu2 = m_contextMenu.try_query<IContextMenu2>())
 		{
-			m_contextMenu2->HandleMenuMsg(msg, wParam, lParam);
+			contextMenu2->HandleMenuMsg(msg, wParam, lParam);
 		}
 		break;
 
@@ -284,25 +267,32 @@ LRESULT FileContextMenuManager::ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM
 		{
 			m_statusBar->HandleStatusBarMenuOpen();
 
-			int cmd = static_cast<int>(LOWORD(wParam));
+			UINT menuItemId = LOWORD(wParam);
 
-			if (WI_IsFlagSet(HIWORD(wParam), MF_POPUP))
+			if (WI_IsAnyFlagSet(HIWORD(wParam), MF_POPUP | MF_SEPARATOR))
 			{
 				m_statusBar->SetPartText(0, L"");
 			}
-			else if (cmd >= MIN_SHELL_MENU_ID && cmd <= MAX_SHELL_MENU_ID)
+			else if (menuItemId >= MIN_SHELL_MENU_ID && menuItemId <= MAX_SHELL_MENU_ID)
 			{
+				CHECK(m_contextMenu);
+
 				TCHAR helpString[512];
-				HRESULT hr =
-					m_actualContextMenu->GetCommandString(cmd - MIN_SHELL_MENU_ID, GCS_HELPTEXT,
-						nullptr, reinterpret_cast<LPSTR>(helpString), SIZEOF_ARRAY(helpString));
+				HRESULT hr = m_contextMenu->GetCommandString(menuItemId - MIN_SHELL_MENU_ID,
+					GCS_HELPTEXT, nullptr, reinterpret_cast<LPSTR>(helpString),
+					static_cast<UINT>(std::size(helpString)));
 
 				if (FAILED(hr))
 				{
-					StringCchCopy(helpString, SIZEOF_ARRAY(helpString), L"");
+					StringCchCopy(helpString, std::size(helpString), L"");
 				}
 
 				m_statusBar->SetPartText(0, helpString);
+			}
+			else
+			{
+				std::wstring helpString = m_handler->GetHelpTextForItem(menuItemId);
+				m_statusBar->SetPartText(0, helpString.c_str());
 			}
 		}
 

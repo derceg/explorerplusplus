@@ -201,8 +201,9 @@ void DrivesToolbar::ShowContextMenu(const std::wstring &drivePath, const POINT &
 		WI_SetFlag(flags, FileContextMenuManager::Flags::ExtendedVerbs);
 	}
 
-	FileContextMenuManager contextMenuManager(m_view->GetHWND(), pidl.get(), { child.get() });
-	contextMenuManager.ShowMenu(this, &ptScreen, m_coreInterface->GetStatusBar(), nullptr, flags);
+	FileContextMenuManager contextMenuManager(pidl.get(), { child.get() }, this,
+		m_coreInterface->GetStatusBar());
+	contextMenuManager.ShowMenu(m_view->GetHWND(), &ptScreen, nullptr, flags);
 }
 
 void DrivesToolbar::UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
@@ -215,6 +216,20 @@ void DrivesToolbar::UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
 	std::wstring openInNewTabText = ResourceHelper::LoadString(
 		m_coreInterface->GetResourceInstance(), IDS_GENERAL_OPEN_IN_NEW_TAB);
 	MenuHelper::AddStringItem(menu, OPEN_IN_NEW_TAB_MENU_ITEM_ID, openInNewTabText, 1, TRUE);
+}
+
+std::wstring DrivesToolbar::GetHelpTextForItem(UINT menuItemId)
+{
+	switch (menuItemId)
+	{
+	case OPEN_IN_NEW_TAB_MENU_ITEM_ID:
+		return ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),
+			IDS_GENERAL_OPEN_IN_NEW_TAB_HELP_TEXT);
+
+	default:
+		DCHECK(false);
+		return L"";
+	}
 }
 
 bool DrivesToolbar::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
@@ -233,11 +248,11 @@ bool DrivesToolbar::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 }
 
 void DrivesToolbar::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, int cmd)
+	const std::vector<PidlChild> &pidlItems, UINT menuItemId)
 {
 	UNREFERENCED_PARAMETER(pidlItems);
 
-	switch (cmd)
+	switch (menuItemId)
 	{
 	case OPEN_IN_NEW_TAB_MENU_ITEM_ID:
 	{

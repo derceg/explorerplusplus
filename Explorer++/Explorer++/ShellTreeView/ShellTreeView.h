@@ -53,10 +53,11 @@ public:
 	// FileContextMenuHandler
 	void UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
 		const std::vector<PidlChild> &pidlItems, IContextMenu *contextMenu) override;
+	std::wstring GetHelpTextForItem(UINT menuItemId) override;
 	bool HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
 		const std::wstring &verb) override;
 	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
-		int cmd) override;
+		UINT menuItemId) override;
 
 private:
 	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 1;

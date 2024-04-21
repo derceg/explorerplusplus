@@ -590,6 +590,20 @@ void SearchDialog::UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
 	InsertMenuItem(menu, 1, TRUE, &mii);
 }
 
+std::wstring SearchDialog::GetHelpTextForItem(UINT menuItemId)
+{
+	switch (menuItemId)
+	{
+	case OPEN_FILE_LOCATION_MENU_ITEM_ID:
+		return ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),
+			IDS_SEARCH_OPEN_ITEM_LOCATION_HELP_TEXT);
+
+	default:
+		DCHECK(false);
+		return L"";
+	}
+}
+
 bool SearchDialog::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	const std::vector<PidlChild> &pidlItems, const std::wstring &verb)
 {
@@ -608,9 +622,9 @@ bool SearchDialog::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 }
 
 void SearchDialog::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PidlChild> &pidlItems, int cmd)
+	const std::vector<PidlChild> &pidlItems, UINT menuItemId)
 {
-	switch (cmd)
+	switch (menuItemId)
 	{
 	case OPEN_FILE_LOCATION_MENU_ITEM_ID:
 	{
@@ -706,7 +720,8 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 						unique_pidl_absolute pidlDirectory(ILCloneFull(pidlFull.get()));
 						ILRemoveLastID(pidlDirectory.get());
 
-						FileContextMenuManager fcmm(m_hDlg, pidlDirectory.get(), pidlItems);
+						FileContextMenuManager fcmm(pidlDirectory.get(), pidlItems, this,
+							m_coreInterface->GetStatusBar());
 
 						DWORD dwCursorPos = GetMessagePos();
 
@@ -722,8 +737,7 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 							WI_SetFlag(flags, FileContextMenuManager::Flags::ExtendedVerbs);
 						}
 
-						fcmm.ShowMenu(this, &ptCursor, m_coreInterface->GetStatusBar(), nullptr,
-							flags);
+						fcmm.ShowMenu(m_hDlg, &ptCursor, nullptr, flags);
 					}
 				}
 			}

@@ -118,9 +118,6 @@ private:
 
 	static const int OPEN_IN_NEW_TAB_MENU_ITEM_ID = FileContextMenuManager::MAX_SHELL_MENU_ID + 1;
 
-	static const int PREVIOUS_BACKGROUND_CONTEXT_MENU_MIN_ID = 0;
-	static const int PREVIOUS_BACKGROUND_CONTEXT_MENU_MAX_ID = 1000;
-
 	static const UINT DISPLAY_WINDOW_MINIMUM_WIDTH = 70;
 	static const UINT DISPLAY_WINDOW_MINIMUM_HEIGHT = 70;
 
@@ -134,8 +131,6 @@ private:
 	static const UINT REBAR_BAND_ID_BOOKMARKS_TOOLBAR = 2;
 	static const UINT REBAR_BAND_ID_DRIVES_TOOLBAR = 3;
 	static const UINT REBAR_BAND_ID_APPLICATIONS_TOOLBAR = 4;
-
-	static const std::vector<std::wstring> BLACKLISTED_BACKGROUND_MENU_CLSID_ENTRIES;
 
 	static const UINT_PTR AUTOSAVE_TIMER_ID = 100000;
 	static const UINT AUTOSAVE_TIMEOUT = 30000;
@@ -290,8 +285,6 @@ private:
 	LRESULT OnListViewKeyDown(LPARAM lParam);
 	void OnShowListViewContextMenu(const POINT &ptScreen);
 	void OnListViewBackgroundRClick(POINT *pCursorPos);
-	void OnListViewBackgroundRClickWindows8OrGreater(POINT *pCursorPos);
-	void OnListViewBackgroundRClickWindows7(POINT *pCursorPos);
 	void OnListViewItemRClick(POINT *pCursorPos);
 	void OnListViewCopyItemPath() const;
 	void OnListViewCopyUniversalPaths() const;
@@ -343,7 +336,6 @@ private:
 	void InitializePlugins();
 
 	/* Menus. */
-	wil::unique_hmenu InitializeRightClickMenu();
 	void SetProgramMenuItemStates(HMENU hProgramMenu);
 
 	// Main rebar
@@ -462,12 +454,13 @@ private:
 	// FileContextMenuHandler
 	void UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
 		const std::vector<PidlChild> &pidlItems, IContextMenu *contextMenu) override;
+	std::wstring GetHelpTextForItem(UINT menuItemId) override;
 	bool HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
 		const std::wstring &verb) override;
 	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
-		int cmd) override;
+		UINT menuItemId) override;
 
-	void UpdateBackgroundContextMenu(HMENU menu, IContextMenu *contextMenu);
+	void UpdateBackgroundContextMenu(HMENU menu, PCIDLIST_ABSOLUTE folderPidl);
 	void UpdateItemContextMenu(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
 		const std::vector<PidlChild> &pidlItems);
 

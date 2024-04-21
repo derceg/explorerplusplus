@@ -43,9 +43,6 @@
     <ClCompile Include="ShellHelper.cpp">
       <Filter>Shell</Filter>
     </ClCompile>
-    <ClCompile Include="ContextMenuManager.cpp">
-      <Filter>Shell\Shell Integration</Filter>
-    </ClCompile>
     <ClCompile Include="FileContextMenuManager.cpp">
       <Filter>Shell\Shell Integration</Filter>
     </ClCompile>
@@ -248,9 +245,6 @@
     </ClInclude>
     <ClInclude Include="Macros.h">
       <Filter>Miscellaneous</Filter>
-    </ClInclude>
-    <ClInclude Include="ContextMenuManager.h">
-      <Filter>Shell\Shell Integration</Filter>
     </ClInclude>
     <ClInclude Include="MenuHelper.h">
       <Filter>Control Support</Filter>

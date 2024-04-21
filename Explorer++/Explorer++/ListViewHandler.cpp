@@ -23,7 +23,6 @@
 #include "ViewModeHelper.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/ClipboardHelper.h"
-#include "../Helper/ContextMenuManager.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/Helper.h"
@@ -241,23 +240,10 @@ void Explorerplusplus::OnShowListViewContextMenu(const POINT &ptScreen)
 
 void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 {
-	if (IsWindows8OrGreater())
-	{
-		OnListViewBackgroundRClickWindows8OrGreater(pCursorPos);
-	}
-	else
-	{
-		OnListViewBackgroundRClickWindows7(pCursorPos);
-	}
-}
-
-void Explorerplusplus::OnListViewBackgroundRClickWindows8OrGreater(POINT *pCursorPos)
-{
 	const auto &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	auto pidlDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
 
-	FileContextMenuManager fcmm(selectedTab.GetShellBrowser()->GetListView(), pidlDirectory.get(),
-		{});
+	FileContextMenuManager fcmm(pidlDirectory.get(), {}, this, m_pStatusBar);
 
 	auto serviceProvider = winrt::make_self<ServiceProvider>();
 
@@ -278,77 +264,8 @@ void Explorerplusplus::OnListViewBackgroundRClickWindows8OrGreater(POINT *pCurso
 		WI_SetFlag(flags, FileContextMenuManager::Flags::ExtendedVerbs);
 	}
 
-	fcmm.ShowMenu(this, pCursorPos, m_pStatusBar, serviceProvider.get(), flags);
-}
-
-void Explorerplusplus::OnListViewBackgroundRClickWindows7(POINT *pCursorPos)
-{
-	auto parentMenu = InitializeRightClickMenu();
-	HMENU menu = GetSubMenu(parentMenu.get(), 0);
-
-	const auto &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-	auto pidlDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
-
-	unique_pidl_absolute pidlParent(ILCloneFull(pidlDirectory.get()));
-	ILRemoveLastID(pidlParent.get());
-
-	wil::com_ptr_nothrow<IShellFolder> pShellFolder;
-	HRESULT hr = BindToIdl(pidlParent.get(), IID_PPV_ARGS(&pShellFolder));
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	wil::com_ptr_nothrow<IDataObject> pDataObject;
-	PCUITEMID_CHILD pidlChildFolder = ILFindLastID(pidlDirectory.get());
-	hr =
-		GetUIObjectOf(pShellFolder.get(), nullptr, 1, &pidlChildFolder, IID_PPV_ARGS(&pDataObject));
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	auto serviceProvider = winrt::make_self<ServiceProvider>();
-
-	auto newMenuClient = winrt::make<NewMenuClient>(selectedTab.GetShellBrowser());
-	serviceProvider->RegisterService(IID_INewMenuClient, newMenuClient.get());
-
-	ContextMenuManager cmm(ContextMenuManager::ContextMenuType::Background, pidlDirectory.get(),
-		pDataObject.get(), serviceProvider.get(), BLACKLISTED_BACKGROUND_MENU_CLSID_ENTRIES);
-
-	cmm.ShowMenu(m_hContainer, menu, IDM_FILE_COPYFOLDERPATH,
-		PREVIOUS_BACKGROUND_CONTEXT_MENU_MIN_ID, PREVIOUS_BACKGROUND_CONTEXT_MENU_MAX_ID,
-		*pCursorPos, *m_pStatusBar);
-}
-
-wil::unique_hmenu Explorerplusplus::InitializeRightClickMenu()
-{
-	wil::unique_hmenu parentMenu(
-		LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_MAINMENU_RCLICK)));
-
-	MenuHelper::AttachSubMenu(parentMenu.get(), BuildViewsMenu(), IDM_POPUP_VIEW, FALSE);
-
-	SortMenuBuilder sortMenuBuilder(m_resourceInstance);
-	auto [sortByMenu, groupByMenu] =
-		sortMenuBuilder.BuildMenus(GetActivePane()->GetTabContainer()->GetSelectedTab());
-
-	MenuHelper::AttachSubMenu(parentMenu.get(), std::move(sortByMenu), IDM_POPUP_SORTBY, FALSE);
-	MenuHelper::AttachSubMenu(parentMenu.get(), std::move(groupByMenu), IDM_POPUP_GROUPBY, FALSE);
-
-	ViewMode viewMode = m_pActiveShellBrowser->GetViewMode();
-
-	if (viewMode == +ViewMode::List)
-	{
-		MenuHelper::EnableItem(parentMenu.get(), IDM_POPUP_GROUPBY, FALSE);
-	}
-	else
-	{
-		MenuHelper::EnableItem(parentMenu.get(), IDM_POPUP_GROUPBY, TRUE);
-	}
-
-	return parentMenu;
+	fcmm.ShowMenu(selectedTab.GetShellBrowser()->GetListView(), pCursorPos, serviceProvider.get(),
+		flags);
 }
 
 void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
@@ -378,8 +295,8 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 			WI_SetFlag(flags, FileContextMenuManager::Flags::ExtendedVerbs);
 		}
 
-		FileContextMenuManager fcmm(m_hActiveListView, pidlDirectory.get(), pidlItems);
-		fcmm.ShowMenu(this, pCursorPos, m_pStatusBar, nullptr, flags);
+		FileContextMenuManager fcmm(pidlDirectory.get(), pidlItems, this, m_pStatusBar);
+		fcmm.ShowMenu(m_hActiveListView, pCursorPos, nullptr, flags);
 	}
 }
 
