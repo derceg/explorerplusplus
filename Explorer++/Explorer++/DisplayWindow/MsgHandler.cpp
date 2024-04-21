@@ -416,7 +416,8 @@ void DisplayWindow::OnLButtonDown(LPARAM lParam)
 		{
 			/* TODO: Parent should be notified. */
 			SetCursor(LoadCursor(nullptr, IDC_HAND));
-			ShellExecute(m_hDisplayWindow, _T("open"), m_ImageFile, nullptr, nullptr, SW_SHOW);
+			ShellExecute(m_hDisplayWindow, _T("open"), m_ImageFile, nullptr, nullptr,
+				SW_SHOWNORMAL);
 		}
 	}
 }

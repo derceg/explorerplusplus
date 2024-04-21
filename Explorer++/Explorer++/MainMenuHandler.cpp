@@ -166,7 +166,7 @@ void Explorerplusplus::OnSearchTabs()
 void Explorerplusplus::OnOpenOnlineDocumentation()
 {
 	ShellExecute(nullptr, L"open", NExplorerplusplus::DOCUMENTATION_LINK, nullptr, nullptr,
-		SW_SHOW);
+		SW_SHOWNORMAL);
 }
 
 void Explorerplusplus::OnCheckForUpdates()

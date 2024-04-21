@@ -266,7 +266,7 @@ INT_PTR UpdateCheckDialog::OnNotify(NMHDR *pnmhdr)
 		if (pnmhdr->hwndFrom == GetDlgItem(m_hDlg, IDC_SYSLINK_DOWNLOAD))
 		{
 			auto pnmlink = reinterpret_cast<PNMLINK>(pnmhdr);
-			ShellExecute(nullptr, L"open", pnmlink->item.szUrl, nullptr, nullptr, SW_SHOW);
+			ShellExecute(nullptr, L"open", pnmlink->item.szUrl, nullptr, nullptr, SW_SHOWNORMAL);
 		}
 		break;
 	}

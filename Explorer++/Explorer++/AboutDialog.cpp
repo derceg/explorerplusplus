@@ -106,7 +106,7 @@ INT_PTR AboutDialog::OnNotify(NMHDR *pnmhdr)
 		{
 			auto pnmlink = reinterpret_cast<PNMLINK>(pnmhdr);
 
-			ShellExecute(nullptr, L"open", pnmlink->item.szUrl, nullptr, nullptr, SW_SHOW);
+			ShellExecute(nullptr, L"open", pnmlink->item.szUrl, nullptr, nullptr, SW_SHOWNORMAL);
 		}
 		else if (pnmhdr->idFrom == IDC_THIRD_PARTY_CREDITS_LINK)
 		{

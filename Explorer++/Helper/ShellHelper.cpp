@@ -158,12 +158,16 @@ BOOL ExecuteFileAction(HWND hwnd, PCIDLIST_ABSOLUTE pidl, const std::wstring &ve
 BOOL ExecuteFileAction(HWND hwnd, const void *item, bool isPidl, const std::wstring &verb,
 	const std::wstring &parameters, const std::wstring &startDirectory)
 {
+	// Note that the SW_SHOWNORMAL display flag is used below. It's important to use that flag,
+	// specifically, rather than something like SW_SHOW. That's because SW_SHOWNORMAL will ensure
+	// that when a shortcut item is opened, the window display state set on the shortcut (i.e.
+	// normal, minimized, maximized) will be correctly obeyed.
 	SHELLEXECUTEINFO executeInfo = {};
 	executeInfo.cbSize = sizeof(SHELLEXECUTEINFO);
 	executeInfo.fMask = SEE_MASK_DEFAULT;
 	executeInfo.lpVerb = verb.empty() ? nullptr : verb.c_str();
 	executeInfo.hwnd = hwnd;
-	executeInfo.nShow = SW_SHOW;
+	executeInfo.nShow = SW_SHOWNORMAL;
 	executeInfo.lpParameters = parameters.empty() ? nullptr : parameters.c_str();
 	executeInfo.lpDirectory = startDirectory.empty() ? nullptr : startDirectory.c_str();
 
@@ -191,7 +195,6 @@ BOOL ExecuteAndShowCurrentProcess(HWND hwnd, const TCHAR *szParameters)
 BOOL ExecuteAndShowProcess(HWND hwnd, const TCHAR *szProcess, const TCHAR *szParameters)
 {
 	SHELLEXECUTEINFO sei;
-
 	sei.cbSize = sizeof(sei);
 	sei.fMask = SEE_MASK_DEFAULT;
 	sei.lpVerb = _T("open");
@@ -199,8 +202,7 @@ BOOL ExecuteAndShowProcess(HWND hwnd, const TCHAR *szProcess, const TCHAR *szPar
 	sei.lpParameters = szParameters;
 	sei.lpDirectory = nullptr;
 	sei.hwnd = hwnd;
-	sei.nShow = SW_SHOW;
-
+	sei.nShow = SW_SHOWNORMAL;
 	return ShellExecuteEx(&sei);
 }
 
@@ -1325,7 +1327,7 @@ HRESULT ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory,
 	commandInfo.lpVerb = actionNarrow->c_str();
 	commandInfo.lpParameters = nullptr;
 	commandInfo.lpDirectory = nullptr;
-	commandInfo.nShow = SW_SHOW;
+	commandInfo.nShow = SW_SHOWNORMAL;
 	RETURN_IF_FAILED(contextMenu->InvokeCommand(&commandInfo));
 
 	return S_OK;

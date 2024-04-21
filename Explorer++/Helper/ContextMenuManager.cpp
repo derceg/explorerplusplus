@@ -421,8 +421,7 @@ void ContextMenuManager::InvokeMenuEntry(HWND hwnd, UINT uCmd)
 			cmici.lpVerb = reinterpret_cast<LPCSTR>(MAKEWORD(uCmd - menuHandler.uStartID, 0));
 			cmici.lpParameters = nullptr;
 			cmici.lpDirectory = nullptr;
-			cmici.nShow = SW_SHOW;
-
+			cmici.nShow = SW_SHOWNORMAL;
 			menuHandler.pContextMenuActual->InvokeCommand(&cmici);
 			break;
 		}

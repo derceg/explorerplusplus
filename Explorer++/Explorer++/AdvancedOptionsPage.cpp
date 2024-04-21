@@ -290,7 +290,7 @@ INT_PTR AdvancedOptionsPage::OnNotify(WPARAM wParam, LPARAM lParam)
 			&& linkNotificationDetails->msg == WM_LBUTTONUP)
 		{
 			std::wstring text = GetRichEditLinkText(linkNotificationDetails);
-			ShellExecute(nullptr, L"open", text.c_str(), nullptr, nullptr, SW_SHOW);
+			ShellExecute(nullptr, L"open", text.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
 			return 1;
 		}
 	}

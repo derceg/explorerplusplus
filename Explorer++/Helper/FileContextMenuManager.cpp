@@ -175,7 +175,7 @@ HRESULT FileContextMenuManager::ShowMenu(FileContextMenuHandler *handler, const 
 			commandInfo.hwnd = m_hwnd;
 			commandInfo.lpVerb = reinterpret_cast<LPCSTR>(MAKEINTRESOURCE(cmd - MIN_SHELL_MENU_ID));
 			commandInfo.lpDirectory = parsingPathOpt ? parsingPathOpt->c_str() : nullptr;
-			commandInfo.nShow = SW_SHOW;
+			commandInfo.nShow = SW_SHOWNORMAL;
 			m_actualContextMenu->InvokeCommand(&commandInfo);
 		}
 	}

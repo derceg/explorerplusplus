@@ -74,7 +74,7 @@ HRESULT ApplicationCrashedDialog::Callback(HWND hwnd, UINT msg, WPARAM wParam, L
 		switch (wParam)
 		{
 		case REPORT_ISSUE_BUTTON_ID:
-			ShellExecute(nullptr, L"open", REPORT_ISSUE_URL, nullptr, nullptr, SW_SHOW);
+			ShellExecute(nullptr, L"open", REPORT_ISSUE_URL, nullptr, nullptr, SW_SHOWNORMAL);
 			return S_FALSE;
 
 		case SHOW_CRASH_DUMP_BUTTON_ID:
