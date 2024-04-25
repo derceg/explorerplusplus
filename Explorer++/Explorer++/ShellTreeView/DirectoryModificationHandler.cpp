@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ShellTreeView.h"
+#include "FeatureList.h"
 #include "ShellTreeNode.h"
 
 // Starts monitoring for drive additions and removals, since they won't necessarily trigger updates
@@ -310,6 +311,11 @@ void ShellTreeView::OnDirectoryUpdated(PCIDLIST_ABSOLUTE simplePidl)
 	ShellTreeNode *quickAccessRootNode = GetNodeFromTreeViewItem(m_quickAccessRootItem);
 
 	if (!ArePidlsEquivalent(simplePidl, quickAccessRootNode->GetFullPidl().get()))
+	{
+		return;
+	}
+
+	if (!FeatureList::GetInstance()->IsEnabled(Feature::AutomaticQuickAccessUpdates))
 	{
 		return;
 	}

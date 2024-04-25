@@ -9,6 +9,9 @@
 // clang-format off
 BETTER_ENUM(Feature, int,
 	DualPane,
-	Plugins
+	Plugins,
+
+	// When enabled, the quick access folder in the treeview will be automatically updated.
+	AutomaticQuickAccessUpdates
 )
 // clang-format on
