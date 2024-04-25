@@ -460,7 +460,9 @@ private:
 	void HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PidlChild> &pidlItems,
 		UINT menuItemId) override;
 
-	void UpdateBackgroundContextMenu(HMENU menu, PCIDLIST_ABSOLUTE folderPidl);
+	void UpdateBackgroundContextMenu(HMENU menu, PCIDLIST_ABSOLUTE folderPidl,
+		IContextMenu *contextMenu);
+	void RemoveNonFunctionalItemsFromBackgroundContextMenu(HMENU menu, IContextMenu *contextMenu);
 	void UpdateItemContextMenu(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
 		const std::vector<PidlChild> &pidlItems);
 

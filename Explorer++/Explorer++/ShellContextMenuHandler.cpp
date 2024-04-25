@@ -20,11 +20,9 @@
 void Explorerplusplus::UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
 	const std::vector<PidlChild> &pidlItems, IContextMenu *contextMenu)
 {
-	UNREFERENCED_PARAMETER(contextMenu);
-
 	if (pidlItems.empty())
 	{
-		UpdateBackgroundContextMenu(menu, pidlParent);
+		UpdateBackgroundContextMenu(menu, pidlParent, contextMenu);
 	}
 	else
 	{
@@ -32,8 +30,11 @@ void Explorerplusplus::UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParen
 	}
 }
 
-void Explorerplusplus::UpdateBackgroundContextMenu(HMENU menu, PCIDLIST_ABSOLUTE folderPidl)
+void Explorerplusplus::UpdateBackgroundContextMenu(HMENU menu, PCIDLIST_ABSOLUTE folderPidl,
+	IContextMenu *contextMenu)
 {
+	RemoveNonFunctionalItemsFromBackgroundContextMenu(menu, contextMenu);
+
 	UINT position = 0;
 
 	auto viewsMenu = BuildViewsMenu();
@@ -86,6 +87,54 @@ void Explorerplusplus::UpdateBackgroundContextMenu(HMENU menu, PCIDLIST_ABSOLUTE
 	}
 
 	MenuHelper::AddSeparator(menu, position++, true);
+}
+
+void Explorerplusplus::RemoveNonFunctionalItemsFromBackgroundContextMenu(HMENU menu,
+	IContextMenu *contextMenu)
+{
+	int numItems = GetMenuItemCount(menu);
+
+	if (numItems == -1)
+	{
+		DCHECK(false);
+		return;
+	}
+
+	for (int i = numItems - 1; i >= 0; i--)
+	{
+		MENUITEMINFO menuItemInfo = {};
+		menuItemInfo.cbSize = sizeof(menuItemInfo);
+		menuItemInfo.fMask = MIIM_ID | MIIM_FTYPE;
+		BOOL res = GetMenuItemInfo(menu, i, TRUE, &menuItemInfo);
+
+		if (!res || WI_IsFlagSet(menuItemInfo.fType, MFT_SEPARATOR)
+			|| menuItemInfo.wID < FileContextMenuManager::MIN_SHELL_MENU_ID
+			|| menuItemInfo.wID > FileContextMenuManager::MAX_SHELL_MENU_ID)
+		{
+			continue;
+		}
+
+		TCHAR verb[64] = _T("");
+		HRESULT hr = contextMenu->GetCommandString(menuItemInfo.wID
+				- FileContextMenuManager::MIN_SHELL_MENU_ID,
+			GCS_VERB, nullptr, reinterpret_cast<LPSTR>(verb), static_cast<UINT>(std::size(verb)));
+
+		if (FAILED(hr))
+		{
+			continue;
+		}
+
+		if (StrCmpI(verb, L"savesearch") == 0)
+		{
+			// This menu item appears on the background context menu for a search results folder.
+			// When it's clicked, the shell will request view information, using IFolderView2, along
+			// with at least one undocumented interface. Because attempting to implement an
+			// undocumented interface is potentially difficult and carries risk, along with the fact
+			// that the view information in Explorer++ doesn't correspond precisely with the view
+			// information in Explorer anyway, this item is removed here.
+			DeleteMenu(menu, i, MF_BYPOSITION);
+		}
+	}
 }
 
 void Explorerplusplus::UpdateItemContextMenu(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
