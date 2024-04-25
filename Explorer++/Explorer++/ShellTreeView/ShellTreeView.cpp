@@ -1680,8 +1680,7 @@ void ShellTreeView::Paste()
 	auto *selectedNode = GetNodeFromTreeViewItem(TreeView_GetSelection(m_hTreeView));
 	auto selectedItemPidl = selectedNode->GetFullPidl();
 
-	if (CanShellPasteDataObject(selectedItemPidl.get(), clipboardObject.get(),
-			DROPEFFECT_COPY | DROPEFFECT_MOVE))
+	if (CanShellPasteDataObject(selectedItemPidl.get(), clipboardObject.get(), PasteType::Normal))
 	{
 		ExecuteActionFromContextMenu(selectedItemPidl.get(), {}, m_hTreeView, L"paste", 0, nullptr);
 	}

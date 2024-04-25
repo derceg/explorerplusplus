@@ -146,7 +146,7 @@ BOOL Explorerplusplus::CanPasteShortcut() const
 	return CanPasteShellData(PasteType::Shortcut);
 }
 
-BOOL Explorerplusplus::CanPasteShellData(PasteType pastType) const
+BOOL Explorerplusplus::CanPasteShellData(PasteType pasteType) const
 {
 	wil::com_ptr_nothrow<IDataObject> clipboardObject;
 	HRESULT hr = OleGetClipboard(&clipboardObject);
@@ -174,20 +174,7 @@ BOOL Explorerplusplus::CanPasteShellData(PasteType pastType) const
 		}
 	}
 
-	DWORD effects = DROPEFFECT_NONE;
-
-	switch (pastType)
-	{
-	case Explorerplusplus::PasteType::Normal:
-		effects = DROPEFFECT_COPY | DROPEFFECT_MOVE;
-		break;
-
-	case Explorerplusplus::PasteType::Shortcut:
-		effects = DROPEFFECT_LINK;
-		break;
-	}
-
-	if (directory && CanShellPasteDataObject(directory.get(), clipboardObject.get(), effects))
+	if (directory && CanShellPasteDataObject(directory.get(), clipboardObject.get(), pasteType))
 	{
 		return TRUE;
 	}

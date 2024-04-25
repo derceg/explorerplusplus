@@ -206,6 +206,7 @@
     <ClCompile Include="CustomFontStorageTest.cpp" />
     <ClCompile Include="DataObjectImplTest.cpp" />
     <ClCompile Include="DragDropHelper.cpp" />
+    <ClCompile Include="DragDropHelperTest.cpp" />
     <ClCompile Include="DriveModelTest.cpp" />
     <ClCompile Include="AcceleratorParserTest.cpp" />
     <ClCompile Include="BookmarkClipboardTest.cpp" />

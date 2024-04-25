@@ -25,6 +25,12 @@ HRESULT SetPreferredDropEffect(IDataObject *dataObject, DWORD effect)
 		static_cast<CLIPFORMAT>(RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT)), effect);
 }
 
+HRESULT GetPreferredDropEffect(IDataObject *dataObject, DWORD &effect)
+{
+	return GetBlobData(dataObject,
+		static_cast<CLIPFORMAT>(RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT)), effect);
+}
+
 HRESULT SetDropDescription(IDataObject *dataObject, DROPIMAGETYPE type, const std::wstring &message,
 	const std::wstring &insert)
 {

@@ -6,4 +6,11 @@
 
 #include <objidl.h>
 
-bool CanShellPasteDataObject(PCIDLIST_ABSOLUTE destination, IDataObject *dataObject, DWORD effects);
+enum class PasteType
+{
+	Normal,
+	Shortcut
+};
+
+bool CanShellPasteDataObject(PCIDLIST_ABSOLUTE destination, IDataObject *dataObject,
+	PasteType pasteType);

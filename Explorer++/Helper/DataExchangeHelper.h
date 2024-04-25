@@ -13,6 +13,32 @@ std::optional<std::wstring> ReadStringFromGlobal(HGLOBAL global);
 wil::unique_hglobal WriteStringToGlobal(const std::wstring &str);
 std::optional<std::string> ReadBinaryDataFromGlobal(HGLOBAL global);
 wil::unique_hglobal WriteBinaryDataToGlobal(const std::string &data);
+
+template <typename T>
+	requires std::is_trivially_copyable_v<T> && std::is_trivially_constructible_v<T>
+std::optional<T> ReadDataFromGlobal(HGLOBAL global)
+{
+	wil::unique_hglobal_locked mem(global);
+
+	if (!mem)
+	{
+		return std::nullopt;
+	}
+
+	auto size = GlobalSize(mem.get());
+
+	// As indicated by the documentation for GlobalSize(), the returned size can be larger than the
+	// size requested when the memory was allocated. If the size is smaller than the size of the
+	// target type, however, something has gone wrong and it doesn't make sense to try and use the
+	// data.
+	if (size < sizeof(T))
+	{
+		return std::nullopt;
+	}
+
+	return *static_cast<T *>(mem.get());
+}
+
 wil::unique_hglobal WriteDataToGlobal(const void *data, size_t size);
 
 bool IsDropFormatAvailable(IDataObject *dataObject, const FORMATETC &formatEtc);

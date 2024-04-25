@@ -14,12 +14,6 @@
 #include <list>
 #include <sstream>
 
-enum class PasteType
-{
-	HardLink
-};
-
-int PasteFilesFromClipboardSpecial(const TCHAR *szDestination, PasteType pasteType);
 BOOL GetFileClusterSize(const std::wstring &strFilename, PLARGE_INTEGER lpRealFileSize);
 
 HRESULT NFileOperations::RenameFile(IShellItem *item, const std::wstring &newName)
@@ -426,13 +420,8 @@ HRESULT CopyFilesToClipboard(const std::vector<PidlAbsolute> &items, bool move,
 	return S_OK;
 }
 
-int PasteHardLinks(const TCHAR *szDestination)
-{
-	return PasteFilesFromClipboardSpecial(szDestination, PasteType::HardLink);
-}
-
 /* TODO: Use CDropHandler. */
-int PasteFilesFromClipboardSpecial(const TCHAR *szDestination, PasteType pasteType)
+int PasteHardLinks(const TCHAR *szDestination)
 {
 	IDataObject *clipboardObject = nullptr;
 	DROPFILES *pdf = nullptr;
@@ -476,12 +465,7 @@ int PasteFilesFromClipboardSpecial(const TCHAR *szDestination, PasteType pasteTy
 
 					PathAppend(szLinkFileName, szFileName);
 
-					switch (pasteType)
-					{
-					case PasteType::HardLink:
-						CreateHardLink(szLinkFileName, szOldFileName, nullptr);
-						break;
-					}
+					CreateHardLink(szLinkFileName, szOldFileName, nullptr);
 				}
 
 				GlobalUnlock(stg.hGlobal);

@@ -23,6 +23,7 @@
 #include "TabNavigationInterface.h"
 #include "ValueWrapper.h"
 #include "../Helper/CachedIcons.h"
+#include "../Helper/ClipboardHelper.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/FileContextMenuManager.h"
@@ -184,12 +185,6 @@ private:
 		bool showBand;
 		UINT length;
 		std::optional<UINT> idealLength;
-	};
-
-	enum class PasteType
-	{
-		Normal,
-		Shortcut
 	};
 
 	enum class FocusChangeDirection
@@ -476,7 +471,7 @@ private:
 	BOOL CanShowFileProperties() const override;
 	BOOL CanPaste() const override;
 	BOOL CanPasteShortcut() const;
-	BOOL CanPasteShellData(PasteType pastType) const;
+	BOOL CanPasteShellData(PasteType pasteType) const;
 	BOOL CanPasteCustomData() const;
 	BOOL TestItemAttributes(SFGAOF attributes) const;
 	HRESULT GetSelectionAttributes(SFGAOF *pItemAttributes) const;

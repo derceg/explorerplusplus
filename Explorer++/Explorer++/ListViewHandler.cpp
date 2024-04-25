@@ -405,8 +405,7 @@ void Explorerplusplus::OnListViewPaste()
 	const auto &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	auto directory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
 
-	if (CanShellPasteDataObject(directory.get(), clipboardObject.get(),
-			DROPEFFECT_COPY | DROPEFFECT_MOVE))
+	if (CanShellPasteDataObject(directory.get(), clipboardObject.get(), PasteType::Normal))
 	{
 		auto serviceProvider = winrt::make_self<ServiceProvider>();
 
