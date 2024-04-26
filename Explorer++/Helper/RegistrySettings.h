@@ -33,7 +33,7 @@ LSTATUS ReadBinaryValueSize(HKEY key, const std::wstring &valueName, DWORD &leng
 LSTATUS ReadBinaryValue(HKEY key, const std::wstring &valueName, void *data, DWORD length);
 
 template <typename T>
-	requires std::is_trivially_copyable_v<T>
+	requires std::is_trivially_copyable_v<T> && std::is_trivially_constructible_v<T>
 LSTATUS SaveVectorToBinaryValue(HKEY key, const std::wstring &valueName,
 	const std::vector<T> &items)
 {
@@ -42,7 +42,7 @@ LSTATUS SaveVectorToBinaryValue(HKEY key, const std::wstring &valueName,
 }
 
 template <typename T>
-	requires std::is_trivially_copyable_v<T>
+	requires std::is_trivially_copyable_v<T> && std::is_trivially_constructible_v<T>
 LSTATUS ReadVectorFromBinaryValue(HKEY key, const std::wstring &valueName, std::vector<T> &output)
 {
 	DWORD length = 0;

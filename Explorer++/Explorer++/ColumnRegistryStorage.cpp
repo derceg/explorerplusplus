@@ -44,6 +44,7 @@ struct SavedColumn
 };
 
 static_assert(std::is_trivially_copyable_v<SavedColumn>);
+static_assert(std::is_trivially_constructible_v<SavedColumn>);
 
 struct SavedColumnWidth
 {
@@ -58,6 +59,7 @@ struct SavedColumnWidth
 };
 
 static_assert(std::is_trivially_copyable_v<SavedColumnWidth>);
+static_assert(std::is_trivially_constructible_v<SavedColumnWidth>);
 
 void LoadColumnSet(HKEY parentKey, const std::wstring &columnsKeyName,
 	const std::wstring &columnWidthsKeyName, std::vector<Column_t> &outputColumnSet)
