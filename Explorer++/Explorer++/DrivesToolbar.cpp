@@ -194,16 +194,16 @@ void DrivesToolbar::ShowContextMenu(const std::wstring &drivePath, const POINT &
 	[[maybe_unused]] BOOL res = ILRemoveLastID(pidl.get());
 	assert(res);
 
-	FileContextMenuManager::Flags flags = FileContextMenuManager::Flags::Standard;
+	ShellContextMenu::Flags flags = ShellContextMenu::Flags::Standard;
 
 	if (showExtended)
 	{
-		WI_SetFlag(flags, FileContextMenuManager::Flags::ExtendedVerbs);
+		WI_SetFlag(flags, ShellContextMenu::Flags::ExtendedVerbs);
 	}
 
-	FileContextMenuManager contextMenuManager(pidl.get(), { child.get() }, this,
+	ShellContextMenu shellContextMenu(pidl.get(), { child.get() }, this,
 		m_coreInterface->GetStatusBar());
-	contextMenuManager.ShowMenu(m_view->GetHWND(), &ptScreen, nullptr, flags);
+	shellContextMenu.ShowMenu(m_view->GetHWND(), &ptScreen, nullptr, flags);
 }
 
 void DrivesToolbar::UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,

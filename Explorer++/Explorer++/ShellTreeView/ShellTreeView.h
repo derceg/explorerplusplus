@@ -8,7 +8,7 @@
 #include "ShellChangeWatcher.h"
 #include "SignalWrapper.h"
 #include "../Helper/DropHandler.h"
-#include "../Helper/FileContextMenuManager.h"
+#include "../Helper/ShellContextMenu.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowSubclassWrapper.h"
@@ -26,7 +26,7 @@ class FileActionHandler;
 class ShellBrowserImpl;
 class ShellTreeNode;
 
-class ShellTreeView : public ShellDropTargetWindow<HTREEITEM>, public FileContextMenuHandler
+class ShellTreeView : public ShellDropTargetWindow<HTREEITEM>, public ShellContextMenuHandler
 {
 public:
 	static ShellTreeView *Create(HWND hParent, BrowserWindow *browserWindow,
@@ -74,7 +74,7 @@ private:
 
 	static const SIGDN DISPLAY_NAME_TYPE = SIGDN_NORMALDISPLAY;
 
-	static const int OPEN_IN_NEW_TAB_MENU_ITEM_ID = FileContextMenuManager::MAX_SHELL_MENU_ID + 1;
+	static const int OPEN_IN_NEW_TAB_MENU_ITEM_ID = ShellContextMenu::MAX_SHELL_MENU_ID + 1;
 
 	struct BasicItemInfo
 	{

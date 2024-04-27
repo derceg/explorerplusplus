@@ -11,10 +11,10 @@
 #include <optional>
 #include <vector>
 
-class FileContextMenuHandler
+class ShellContextMenuHandler
 {
 public:
-	virtual ~FileContextMenuHandler() = default;
+	virtual ~ShellContextMenuHandler() = default;
 
 	// Allows the caller to add/update items on the context menu before it's shown.
 	virtual void UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
@@ -34,7 +34,7 @@ public:
 		const std::vector<PidlChild> &pidlItems, UINT menuItemId) = 0;
 };
 
-class FileContextMenuManager
+class ShellContextMenu
 {
 public:
 	enum class Flags
@@ -47,14 +47,13 @@ public:
 	static const int MIN_SHELL_MENU_ID = 1;
 	static const int MAX_SHELL_MENU_ID = 1000;
 
-	FileContextMenuManager(PCIDLIST_ABSOLUTE pidlParent,
-		const std::vector<PCITEMID_CHILD> &pidlItems, FileContextMenuHandler *handler,
-		StatusBar *statusBar);
+	ShellContextMenu(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PCITEMID_CHILD> &pidlItems,
+		ShellContextMenuHandler *handler, StatusBar *statusBar);
 
 	void ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flags flags);
 
 private:
-	DISALLOW_COPY_AND_ASSIGN(FileContextMenuManager);
+	DISALLOW_COPY_AND_ASSIGN(ShellContextMenu);
 
 	wil::com_ptr_nothrow<IContextMenu> MaybeGetShellContextMenu(HWND hwnd) const;
 	std::optional<std::string> MaybeGetFilesystemDirectory() const;
@@ -63,9 +62,9 @@ private:
 
 	const PidlAbsolute m_pidlParent;
 	const std::vector<PidlChild> m_pidlItems;
-	FileContextMenuHandler *const m_handler;
+	ShellContextMenuHandler *const m_handler;
 	StatusBar *const m_statusBar;
 	wil::com_ptr_nothrow<IContextMenu> m_contextMenu;
 };
 
-DEFINE_ENUM_FLAG_OPERATORS(FileContextMenuManager::Flags);
+DEFINE_ENUM_FLAG_OPERATORS(ShellContextMenu::Flags);

@@ -26,7 +26,7 @@
 #include "../Helper/ClipboardHelper.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/FileActionHandler.h"
-#include "../Helper/FileContextMenuManager.h"
+#include "../Helper/ShellContextMenu.h"
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
 #include <optional>
@@ -79,9 +79,9 @@ class PluginManager;
 class Explorerplusplus :
 	public BrowserWindow,
 	public CoreInterface,
-	private FileContextMenuHandler,
 	public PluginInterface,
 	private ShellBrowserEmbedder,
+	private ShellContextMenuHandler,
 	public TabNavigationInterface
 {
 	friend LoadSaveRegistry;
@@ -117,7 +117,7 @@ public:
 private:
 	static constexpr UINT WM_APP_CLOSE = WM_APP + 1;
 
-	static const int OPEN_IN_NEW_TAB_MENU_ITEM_ID = FileContextMenuManager::MAX_SHELL_MENU_ID + 1;
+	static const int OPEN_IN_NEW_TAB_MENU_ITEM_ID = ShellContextMenu::MAX_SHELL_MENU_ID + 1;
 
 	static const UINT DISPLAY_WINDOW_MINIMUM_WIDTH = 70;
 	static const UINT DISPLAY_WINDOW_MINIMUM_HEIGHT = 70;

@@ -108,15 +108,15 @@ void Explorerplusplus::RemoveNonFunctionalItemsFromBackgroundContextMenu(HMENU m
 		BOOL res = GetMenuItemInfo(menu, i, TRUE, &menuItemInfo);
 
 		if (!res || WI_IsFlagSet(menuItemInfo.fType, MFT_SEPARATOR)
-			|| menuItemInfo.wID < FileContextMenuManager::MIN_SHELL_MENU_ID
-			|| menuItemInfo.wID > FileContextMenuManager::MAX_SHELL_MENU_ID)
+			|| menuItemInfo.wID < ShellContextMenu::MIN_SHELL_MENU_ID
+			|| menuItemInfo.wID > ShellContextMenu::MAX_SHELL_MENU_ID)
 		{
 			continue;
 		}
 
 		TCHAR verb[64] = _T("");
 		HRESULT hr = contextMenu->GetCommandString(menuItemInfo.wID
-				- FileContextMenuManager::MIN_SHELL_MENU_ID,
+				- ShellContextMenu::MIN_SHELL_MENU_ID,
 			GCS_VERB, nullptr, reinterpret_cast<LPSTR>(verb), static_cast<UINT>(std::size(verb)));
 
 		if (FAILED(hr))

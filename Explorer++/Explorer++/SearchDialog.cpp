@@ -16,10 +16,10 @@
 #include "../Helper/ComboBox.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
-#include "../Helper/FileContextMenuManager.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
+#include "../Helper/ShellContextMenu.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/XMLSettings.h"
@@ -720,7 +720,7 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 						unique_pidl_absolute pidlDirectory(ILCloneFull(pidlFull.get()));
 						ILRemoveLastID(pidlDirectory.get());
 
-						FileContextMenuManager fcmm(pidlDirectory.get(), pidlItems, this,
+						ShellContextMenu shellContextMenu(pidlDirectory.get(), pidlItems, this,
 							m_coreInterface->GetStatusBar());
 
 						DWORD dwCursorPos = GetMessagePos();
@@ -729,15 +729,14 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 						ptCursor.x = GET_X_LPARAM(dwCursorPos);
 						ptCursor.y = GET_Y_LPARAM(dwCursorPos);
 
-						FileContextMenuManager::Flags flags =
-							FileContextMenuManager::Flags::Standard;
+						ShellContextMenu::Flags flags = ShellContextMenu::Flags::Standard;
 
 						if (IsKeyDown(VK_SHIFT))
 						{
-							WI_SetFlag(flags, FileContextMenuManager::Flags::ExtendedVerbs);
+							WI_SetFlag(flags, ShellContextMenu::Flags::ExtendedVerbs);
 						}
 
-						fcmm.ShowMenu(m_hDlg, &ptCursor, nullptr, flags);
+						shellContextMenu.ShowMenu(m_hDlg, &ptCursor, nullptr, flags);
 					}
 				}
 			}

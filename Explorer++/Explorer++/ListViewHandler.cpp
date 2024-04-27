@@ -24,11 +24,11 @@
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/ClipboardHelper.h"
 #include "../Helper/DropHandler.h"
-#include "../Helper/FileContextMenuManager.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
+#include "../Helper/ShellContextMenu.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WinRTBaseWrapper.h"
 #include <wil/com.h>
@@ -243,7 +243,7 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 	const auto &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
 	auto pidlDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
 
-	FileContextMenuManager fcmm(pidlDirectory.get(), {}, this, m_pStatusBar);
+	ShellContextMenu shellContextMenu(pidlDirectory.get(), {}, this, m_pStatusBar);
 
 	auto serviceProvider = winrt::make_self<ServiceProvider>();
 
@@ -257,15 +257,15 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 	auto shellView = winrt::make<ShellView>(selectedTab.GetShellBrowserWeak(), this, false);
 	serviceProvider->RegisterService(SID_DefView, shellView.get());
 
-	FileContextMenuManager::Flags flags = FileContextMenuManager::Flags::Standard;
+	ShellContextMenu::Flags flags = ShellContextMenu::Flags::Standard;
 
 	if (IsKeyDown(VK_SHIFT))
 	{
-		WI_SetFlag(flags, FileContextMenuManager::Flags::ExtendedVerbs);
+		WI_SetFlag(flags, ShellContextMenu::Flags::ExtendedVerbs);
 	}
 
-	fcmm.ShowMenu(selectedTab.GetShellBrowser()->GetListView(), pCursorPos, serviceProvider.get(),
-		flags);
+	shellContextMenu.ShowMenu(selectedTab.GetShellBrowser()->GetListView(), pCursorPos,
+		serviceProvider.get(), flags);
 }
 
 void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
@@ -288,15 +288,15 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 
 		auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
-		FileContextMenuManager::Flags flags = FileContextMenuManager::Flags::Rename;
+		ShellContextMenu::Flags flags = ShellContextMenu::Flags::Rename;
 
 		if (IsKeyDown(VK_SHIFT))
 		{
-			WI_SetFlag(flags, FileContextMenuManager::Flags::ExtendedVerbs);
+			WI_SetFlag(flags, ShellContextMenu::Flags::ExtendedVerbs);
 		}
 
-		FileContextMenuManager fcmm(pidlDirectory.get(), pidlItems, this, m_pStatusBar);
-		fcmm.ShowMenu(m_hActiveListView, pCursorPos, nullptr, flags);
+		ShellContextMenu shellContextMenu(pidlDirectory.get(), pidlItems, this, m_pStatusBar);
+		shellContextMenu.ShowMenu(m_hActiveListView, pCursorPos, nullptr, flags);
 	}
 }
 

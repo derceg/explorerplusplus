@@ -43,7 +43,7 @@
     <ClCompile Include="ShellHelper.cpp">
       <Filter>Shell</Filter>
     </ClCompile>
-    <ClCompile Include="FileContextMenuManager.cpp">
+    <ClCompile Include="ShellContextMenu.cpp">
       <Filter>Shell\Shell Integration</Filter>
     </ClCompile>
     <ClCompile Include="SetDefaultFileManager.cpp">
@@ -216,7 +216,7 @@
     <ClInclude Include="stdafx.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
-    <ClInclude Include="FileContextMenuManager.h">
+    <ClInclude Include="ShellContextMenu.h">
       <Filter>Shell\Shell Integration</Filter>
     </ClInclude>
     <ClInclude Include="SetDefaultFileManager.h">

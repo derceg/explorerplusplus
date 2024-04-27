@@ -617,7 +617,7 @@
     <ClCompile Include="DriveInfo.cpp" />
     <ClCompile Include="DropHandler.cpp" />
     <ClCompile Include="FileActionHandler.cpp" />
-    <ClCompile Include="FileContextMenuManager.cpp" />
+    <ClCompile Include="ShellContextMenu.cpp" />
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="FolderSize.cpp" />
     <ClCompile Include="GdiplusHelper.cpp" />
@@ -700,7 +700,7 @@
     <ClInclude Include="DriveInfo.h" />
     <ClInclude Include="DropHandler.h" />
     <ClInclude Include="FileActionHandler.h" />
-    <ClInclude Include="FileContextMenuManager.h" />
+    <ClInclude Include="ShellContextMenu.h" />
     <ClInclude Include="FileOperations.h" />
     <ClInclude Include="FolderSize.h" />
     <ClInclude Include="GdiplusHelper.h" />

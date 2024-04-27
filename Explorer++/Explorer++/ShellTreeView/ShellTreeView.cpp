@@ -34,11 +34,11 @@
 #include "../Helper/DragDropHelper.h"
 #include "../Helper/DriveInfo.h"
 #include "../Helper/FileActionHandler.h"
-#include "../Helper/FileContextMenuManager.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
+#include "../Helper/ShellContextMenu.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/common.h>
 #include <propkey.h>
@@ -1494,16 +1494,16 @@ void ShellTreeView::OnShowContextMenu(const POINT &ptScreen)
 
 	ILRemoveLastID(pidl.get());
 
-	FileContextMenuManager::Flags flags = FileContextMenuManager::Flags::Rename;
+	ShellContextMenu::Flags flags = ShellContextMenu::Flags::Rename;
 
 	if (IsKeyDown(VK_SHIFT))
 	{
-		WI_SetFlag(flags, FileContextMenuManager::Flags::ExtendedVerbs);
+		WI_SetFlag(flags, ShellContextMenu::Flags::ExtendedVerbs);
 	}
 
-	FileContextMenuManager contextMenuManager(pidl.get(), { child.get() }, this,
+	ShellContextMenu shellContextMenu(pidl.get(), { child.get() }, this,
 		m_coreInterface->GetStatusBar());
-	contextMenuManager.ShowMenu(m_hTreeView, &finalPoint, nullptr, flags);
+	shellContextMenu.ShowMenu(m_hTreeView, &finalPoint, nullptr, flags);
 
 	if (highlightTargetItem)
 	{

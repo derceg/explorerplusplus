@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/FileContextMenuManager.h"
+#include "../Helper/ShellContextMenu.h"
 #include <memory>
 #include <string>
 
@@ -14,7 +14,7 @@ class DriveModel;
 class DrivesToolbarView;
 struct MouseEvent;
 
-class DrivesToolbar : private FileContextMenuHandler
+class DrivesToolbar : private ShellContextMenuHandler
 {
 public:
 	static DrivesToolbar *Create(DrivesToolbarView *view, std::unique_ptr<DriveModel> driveModel,
@@ -28,7 +28,7 @@ public:
 	DrivesToolbarView *GetView() const;
 
 private:
-	static const int OPEN_IN_NEW_TAB_MENU_ITEM_ID = FileContextMenuManager::MAX_SHELL_MENU_ID + 1;
+	static const int OPEN_IN_NEW_TAB_MENU_ITEM_ID = ShellContextMenu::MAX_SHELL_MENU_ID + 1;
 
 	DrivesToolbar(DrivesToolbarView *view, std::unique_ptr<DriveModel> driveModel,
 		BrowserWindow *browserWindow, CoreInterface *coreInterface);

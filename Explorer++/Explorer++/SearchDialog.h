@@ -6,8 +6,8 @@
 
 #include "ThemedDialog.h"
 #include "../Helper/DialogSettings.h"
-#include "../Helper/FileContextMenuManager.h"
 #include "../Helper/ReferenceCount.h"
+#include "../Helper/ShellContextMenu.h"
 #include <boost/circular_buffer.hpp>
 #include <MsXml2.h>
 #include <objbase.h>
@@ -133,7 +133,7 @@ private:
 	int m_iFilesFound;
 };
 
-class SearchDialog : public ThemedDialog, private FileContextMenuHandler
+class SearchDialog : public ThemedDialog, private ShellContextMenuHandler
 {
 public:
 	SearchDialog(HINSTANCE resourceInstance, HWND hParent, std::wstring_view searchDirectory,
@@ -162,8 +162,7 @@ private:
 	static const int SEARCH_PROCESSITEMS_TIMER_ELAPSED = 50;
 	static const int SEARCH_MAX_ITEMS_BATCH_PROCESS = 100;
 
-	static const int OPEN_FILE_LOCATION_MENU_ITEM_ID =
-		FileContextMenuManager::MAX_SHELL_MENU_ID + 1;
+	static const int OPEN_FILE_LOCATION_MENU_ITEM_ID = ShellContextMenu::MAX_SHELL_MENU_ID + 1;
 
 	std::vector<ResizableDialogControl> GetResizableControls() override;
 	void SaveState() override;

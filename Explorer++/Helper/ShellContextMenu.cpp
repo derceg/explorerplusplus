@@ -3,15 +3,15 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "FileContextMenuManager.h"
+#include "ShellContextMenu.h"
 #include "MenuHelper.h"
 #include "ShellHelper.h"
 #include "StatusBar.h"
 #include "StringHelper.h"
 #include "WindowSubclassWrapper.h"
 
-FileContextMenuManager::FileContextMenuManager(PCIDLIST_ABSOLUTE pidlParent,
-	const std::vector<PCITEMID_CHILD> &pidlItems, FileContextMenuHandler *handler,
+ShellContextMenu::ShellContextMenu(PCIDLIST_ABSOLUTE pidlParent,
+	const std::vector<PCITEMID_CHILD> &pidlItems, ShellContextMenuHandler *handler,
 	StatusBar *statusBar) :
 	m_pidlParent(pidlParent),
 	m_pidlItems(pidlItems.begin(), pidlItems.end()),
@@ -20,7 +20,7 @@ FileContextMenuManager::FileContextMenuManager(PCIDLIST_ABSOLUTE pidlParent,
 {
 }
 
-void FileContextMenuManager::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flags flags)
+void ShellContextMenu::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flags flags)
 {
 	wil::unique_hmenu menu(CreatePopupMenu());
 
@@ -73,7 +73,7 @@ void FileContextMenuManager::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site
 
 	// Subclass the owner window, so that menu messages can be handled.
 	auto subclass = std::make_unique<WindowSubclassWrapper>(hwnd,
-		std::bind_front(&FileContextMenuManager::ParentWindowSubclass, this));
+		std::bind_front(&ShellContextMenu::ParentWindowSubclass, this));
 
 	UINT cmd =
 		TrackPopupMenu(menu.get(), TPM_LEFTALIGN | TPM_RETURNCMD, pt->x, pt->y, 0, hwnd, nullptr);
@@ -131,7 +131,7 @@ void FileContextMenuManager::ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site
 // It's possible for a folder to not provide any IContextMenu instance (for example, the Home folder
 // in Windows 11 doesn't provide any IContextMenu instance for the background menu). So, this method
 // may return null.
-wil::com_ptr_nothrow<IContextMenu> FileContextMenuManager::MaybeGetShellContextMenu(HWND hwnd) const
+wil::com_ptr_nothrow<IContextMenu> ShellContextMenu::MaybeGetShellContextMenu(HWND hwnd) const
 {
 	wil::com_ptr_nothrow<IShellFolder> shellFolder;
 	HRESULT hr = BindToIdl(m_pidlParent.Raw(), IID_PPV_ARGS(&shellFolder));
@@ -166,7 +166,7 @@ wil::com_ptr_nothrow<IContextMenu> FileContextMenuManager::MaybeGetShellContextM
 }
 
 // Returns the parsing path for the current directory, but only if it's a filesystem path.
-std::optional<std::string> FileContextMenuManager::MaybeGetFilesystemDirectory() const
+std::optional<std::string> ShellContextMenu::MaybeGetFilesystemDirectory() const
 {
 	wil::com_ptr_nothrow<IShellItem> shellItem;
 	HRESULT hr = SHCreateItemFromIDList(m_pidlParent.Raw(), IID_PPV_ARGS(&shellItem));
@@ -216,8 +216,7 @@ std::optional<std::string> FileContextMenuManager::MaybeGetFilesystemDirectory()
 	return WstrToStr(parsingPath.get());
 }
 
-LRESULT FileContextMenuManager::ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam,
-	LPARAM lParam)
+LRESULT ShellContextMenu::ParentWindowSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
