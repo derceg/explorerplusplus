@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "ApplicationToolbarStorageHelper.h"
+#include "ApplicationToolbarStorageTestHelper.h"
 #include "Application.h"
 #include "ApplicationModel.h"
 

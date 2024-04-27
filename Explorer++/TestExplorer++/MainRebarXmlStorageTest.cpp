@@ -5,9 +5,9 @@
 #include "pch.h"
 #include "MainRebarXmlStorage.h"
 #include "MainRebarStorage.h"
-#include "MainRebarStorageHelper.h"
-#include "ResourceHelper.h"
-#include "XmlStorageHelper.h"
+#include "MainRebarStorageTestHelper.h"
+#include "ResourceTestHelper.h"
+#include "XmlStorageTestHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;

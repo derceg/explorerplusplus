@@ -4,9 +4,9 @@
 
 #include "pch.h"
 #include "TabRegistryStorage.h"
-#include "RegistryStorageHelper.h"
+#include "RegistryStorageTestHelper.h"
 #include "TabStorage.h"
-#include "TabStorageHelper.h"
+#include "TabStorageTestHelper.h"
 #include <gtest/gtest.h>
 #include <wil/registry.h>
 

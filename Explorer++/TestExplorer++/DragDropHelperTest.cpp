@@ -3,8 +3,8 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "DragDropHelper.h"
 #include "../Helper/DragDropHelper.h"
+#include "DragDropTestHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;

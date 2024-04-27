@@ -7,7 +7,7 @@
 #include "BookmarkTreeHelper.h"
 #include "Bookmarks/BookmarkDataExchange.h"
 #include "Bookmarks/BookmarkTree.h"
-#include "DragDropHelper.h"
+#include "DragDropTestHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <gtest/gtest.h>
 #include <wil/com.h>

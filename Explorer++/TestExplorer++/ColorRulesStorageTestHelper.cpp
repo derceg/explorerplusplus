@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "ColorRulesStorageHelper.h"
+#include "ColorRulesStorageTestHelper.h"
 #include "ColorRule.h"
 #include "ColorRuleModel.h"
 

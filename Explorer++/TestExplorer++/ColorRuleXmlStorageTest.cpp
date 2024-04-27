@@ -5,10 +5,10 @@
 #include "pch.h"
 #include "ColorRuleXmlStorage.h"
 #include "ColorRuleModel.h"
-#include "ColorRulesStorageHelper.h"
+#include "ColorRulesStorageTestHelper.h"
 #include "MovableModelHelper.h"
-#include "ResourceHelper.h"
-#include "XmlStorageHelper.h"
+#include "ResourceTestHelper.h"
+#include "XmlStorageTestHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;

@@ -22,11 +22,11 @@
     <ClCompile Include="BookmarkXmlStorageTest.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="ResourceHelper.cpp" />
+    <ClCompile Include="ResourceTestHelper.cpp" />
     <ClCompile Include="BookmarkRegistryStorageTest.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkStorageHelper.cpp">
+    <ClCompile Include="BookmarkStorageTestHelper.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
     <ClCompile Include="ManifestTest.cpp">
@@ -47,13 +47,13 @@
     <ClCompile Include="ApplicationToolbarRegistryStorageTest.cpp">
       <Filter>Application Toolbar</Filter>
     </ClCompile>
-    <ClCompile Include="ApplicationToolbarStorageHelper.cpp">
+    <ClCompile Include="ApplicationToolbarStorageTestHelper.cpp">
       <Filter>Application Toolbar</Filter>
     </ClCompile>
-    <ClCompile Include="XmlStorageHelper.cpp">
+    <ClCompile Include="XmlStorageTestHelper.cpp">
       <Filter>Storage</Filter>
     </ClCompile>
-    <ClCompile Include="RegistryStorageHelper.cpp">
+    <ClCompile Include="RegistryStorageTestHelper.cpp">
       <Filter>Storage</Filter>
     </ClCompile>
     <ClCompile Include="CachedIconsTest.cpp">
@@ -78,7 +78,7 @@
     <ClCompile Include="ColorRuleRegistryStorageTest.cpp">
       <Filter>Color Rules</Filter>
     </ClCompile>
-    <ClCompile Include="ColorRulesStorageHelper.cpp">
+    <ClCompile Include="ColorRulesStorageTestHelper.cpp">
       <Filter>Color Rules</Filter>
     </ClCompile>
     <ClCompile Include="ColorRuleXmlStorageTest.cpp">
@@ -123,7 +123,7 @@
     <ClCompile Include="MainRebarRegistryStorageTest.cpp">
       <Filter>Main Rebar</Filter>
     </ClCompile>
-    <ClCompile Include="MainRebarStorageHelper.cpp">
+    <ClCompile Include="MainRebarStorageTestHelper.cpp">
       <Filter>Main Rebar</Filter>
     </ClCompile>
     <ClCompile Include="MainRebarXmlStorageTest.cpp">
@@ -135,7 +135,7 @@
     <ClCompile Include="ColumnXmlStorageTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="ColumnStorageHelper.cpp">
+    <ClCompile Include="ColumnStorageTestHelper.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="TabRegistryStorageTest.cpp">
@@ -144,7 +144,7 @@
     <ClCompile Include="TabXmlStorageTest.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
-    <ClCompile Include="TabStorageHelper.cpp">
+    <ClCompile Include="TabStorageTestHelper.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
     <ClCompile Include="ColumnStorageTest.cpp">
@@ -153,7 +153,7 @@
     <ClCompile Include="ApplicationDropperTest.cpp">
       <Filter>Application Toolbar</Filter>
     </ClCompile>
-    <ClCompile Include="DragDropHelper.cpp" />
+    <ClCompile Include="DragDropTestHelper.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ViewModeHelperTest.cpp">
       <Filter>Core</Filter>
@@ -194,7 +194,7 @@
     <ClCompile Include="HistoryServiceTest.cpp">
       <Filter>History</Filter>
     </ClCompile>
-    <ClCompile Include="ShellHelper.cpp" />
+    <ClCompile Include="ShellTestHelper.cpp" />
     <ClCompile Include="FrequentLocationsServiceTest.cpp">
       <Filter>Frequent Locations</Filter>
     </ClCompile>
@@ -291,21 +291,21 @@
     <ClInclude Include="BookmarkTreeHelper.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceHelper.h" />
-    <ClInclude Include="BookmarkStorageHelper.h">
+    <ClInclude Include="ResourceTestHelper.h" />
+    <ClInclude Include="BookmarkStorageTestHelper.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
-    <ClInclude Include="ApplicationToolbarStorageHelper.h">
+    <ClInclude Include="ApplicationToolbarStorageTestHelper.h">
       <Filter>Application Toolbar</Filter>
     </ClInclude>
-    <ClInclude Include="RegistryStorageHelper.h">
+    <ClInclude Include="RegistryStorageTestHelper.h">
       <Filter>Storage</Filter>
     </ClInclude>
-    <ClInclude Include="XmlStorageHelper.h">
+    <ClInclude Include="XmlStorageTestHelper.h">
       <Filter>Storage</Filter>
     </ClInclude>
     <ClInclude Include="pch.h" />
-    <ClInclude Include="ColorRulesStorageHelper.h">
+    <ClInclude Include="ColorRulesStorageTestHelper.h">
       <Filter>Color Rules</Filter>
     </ClInclude>
     <ClInclude Include="MovableModelHelper.h">
@@ -320,23 +320,23 @@
     <ClInclude Include="ShellBrowserFake.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="MainRebarStorageHelper.h">
+    <ClInclude Include="MainRebarStorageTestHelper.h">
       <Filter>Main Rebar</Filter>
     </ClInclude>
-    <ClInclude Include="ColumnStorageHelper.h">
+    <ClInclude Include="ColumnStorageTestHelper.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="TabStorageHelper.h">
+    <ClInclude Include="TabStorageTestHelper.h">
       <Filter>Tabs</Filter>
     </ClInclude>
-    <ClInclude Include="DragDropHelper.h" />
+    <ClInclude Include="DragDropTestHelper.h" />
     <ClInclude Include="TestResources.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="BrowserWindowMock.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="ShellHelper.h" />
+    <ClInclude Include="ShellTestHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="EmbeddedResources\basic.png">

@@ -5,8 +5,8 @@
 #include "pch.h"
 #include "MainRebarRegistryStorage.h"
 #include "MainRebarStorage.h"
-#include "MainRebarStorageHelper.h"
-#include "RegistryStorageHelper.h"
+#include "MainRebarStorageTestHelper.h"
+#include "RegistryStorageTestHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;

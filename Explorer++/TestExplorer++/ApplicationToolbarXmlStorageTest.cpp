@@ -6,10 +6,10 @@
 #include "ApplicationToolbarXmlStorage.h"
 #include "Application.h"
 #include "ApplicationModel.h"
-#include "ApplicationToolbarStorageHelper.h"
+#include "ApplicationToolbarStorageTestHelper.h"
 #include "MovableModelHelper.h"
-#include "ResourceHelper.h"
-#include "XmlStorageHelper.h"
+#include "ResourceTestHelper.h"
+#include "XmlStorageTestHelper.h"
 #include <gtest/gtest.h>
 
 using namespace Applications;

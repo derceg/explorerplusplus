@@ -8,7 +8,7 @@
 #include "MainResource.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
-#include "ShellHelper.h"
+#include "ShellTestHelper.h"
 #include "TabNavigationMock.h"
 #include "../Helper/ShellHelper.h"
 #include <gtest/gtest.h>

@@ -3,8 +3,8 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "DragDropHelper.h"
-#include "ShellHelper.h"
+#include "DragDropTestHelper.h"
+#include "ShellTestHelper.h"
 #include "../Helper/DataExchangeHelper.h"
 #include "../Helper/DataObjectImpl.h"
 #include "../Helper/DragDropHelper.h"

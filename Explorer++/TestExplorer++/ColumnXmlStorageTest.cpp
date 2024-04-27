@@ -4,10 +4,10 @@
 
 #include "pch.h"
 #include "ColumnXmlStorage.h"
-#include "ColumnStorageHelper.h"
-#include "ResourceHelper.h"
+#include "ColumnStorageTestHelper.h"
+#include "ResourceTestHelper.h"
 #include "ShellBrowser/FolderSettings.h"
-#include "XmlStorageHelper.h"
+#include "XmlStorageTestHelper.h"
 #include <gtest/gtest.h>
 #include <wil/resource.h>
 

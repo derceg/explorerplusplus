@@ -4,7 +4,7 @@
 
 #include "pch.h"
 #include "FrequentLocationsService.h"
-#include "ShellHelper.h"
+#include "ShellTestHelper.h"
 #include "../Helper/StringHelper.h"
 #include <gtest/gtest.h>
 

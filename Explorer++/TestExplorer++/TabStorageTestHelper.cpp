@@ -3,8 +3,8 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "TabStorageHelper.h"
-#include "ShellHelper.h"
+#include "TabStorageTestHelper.h"
+#include "ShellTestHelper.h"
 #include "TabStorage.h"
 
 bool operator==(const TabStorageData &first, const TabStorageData &second)

@@ -4,7 +4,7 @@
 
 #include "pch.h"
 #include "../Helper/RegistrySettings.h"
-#include "RegistryStorageHelper.h"
+#include "RegistryStorageTestHelper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <wil/resource.h>

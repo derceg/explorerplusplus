@@ -4,7 +4,7 @@
 
 #include "pch.h"
 #include "HistoryService.h"
-#include "ShellHelper.h"
+#include "ShellTestHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <gtest/gtest.h>
 

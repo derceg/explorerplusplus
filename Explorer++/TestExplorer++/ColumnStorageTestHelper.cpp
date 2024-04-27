@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "ColumnStorageHelper.h"
+#include "ColumnStorageTestHelper.h"
 #include "ShellBrowser/FolderSettings.h"
 
 FolderColumns BuildFolderColumnsLoadSaveReference()

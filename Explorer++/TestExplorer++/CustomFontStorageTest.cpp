@@ -5,9 +5,9 @@
 #include "pch.h"
 #include "CustomFontStorage.h"
 #include "CustomFont.h"
-#include "RegistryStorageHelper.h"
-#include "ResourceHelper.h"
-#include "XmlStorageHelper.h"
+#include "RegistryStorageTestHelper.h"
+#include "ResourceTestHelper.h"
+#include "XmlStorageTestHelper.h"
 #include "../Helper/XMLSettings.h"
 #include <gtest/gtest.h>
 

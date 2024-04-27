@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "ShellHelper.h"
+#include "ShellTestHelper.h"
 #include <gtest/gtest.h>
 
 namespace

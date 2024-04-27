@@ -4,10 +4,10 @@
 
 #include "pch.h"
 #include "TabXmlStorage.h"
-#include "ResourceHelper.h"
+#include "ResourceTestHelper.h"
 #include "TabStorage.h"
-#include "TabStorageHelper.h"
-#include "XmlStorageHelper.h"
+#include "TabStorageTestHelper.h"
+#include "XmlStorageTestHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;

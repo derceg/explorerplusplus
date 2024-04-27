@@ -7,7 +7,7 @@
 #include "ApplicationExecutor.h"
 #include "ApplicationHelper.h"
 #include "ApplicationModel.h"
-#include "DragDropHelper.h"
+#include "DragDropTestHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

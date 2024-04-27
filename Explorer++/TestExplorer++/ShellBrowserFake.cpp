@@ -6,7 +6,7 @@
 #include "ShellBrowserFake.h"
 #include "ShellBrowser/ShellBrowserHelper.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "ShellHelper.h"
+#include "ShellTestHelper.h"
 
 ShellBrowserFake::ShellBrowserFake(TabNavigationInterface *tabNavigation, IconFetcher *iconFetcher,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries, int currentEntry)

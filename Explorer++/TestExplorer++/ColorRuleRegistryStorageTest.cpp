@@ -5,9 +5,9 @@
 #include "pch.h"
 #include "ColorRuleRegistryStorage.h"
 #include "ColorRuleModel.h"
-#include "ColorRulesStorageHelper.h"
+#include "ColorRulesStorageTestHelper.h"
 #include "MovableModelHelper.h"
-#include "RegistryStorageHelper.h"
+#include "RegistryStorageTestHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;

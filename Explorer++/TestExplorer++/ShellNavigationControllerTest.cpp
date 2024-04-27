@@ -6,7 +6,7 @@
 #include "../Explorer++/ShellBrowser/ShellNavigationController.h"
 #include "IconFetcherMock.h"
 #include "ShellBrowserFake.h"
-#include "ShellHelper.h"
+#include "ShellTestHelper.h"
 #include "TabNavigationMock.h"
 #include "../Explorer++/ShellBrowser/HistoryEntry.h"
 #include "../Explorer++/ShellBrowser/PreservedHistoryEntry.h"

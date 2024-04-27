@@ -4,8 +4,8 @@
 
 #include "pch.h"
 #include "ColumnRegistryStorage.h"
-#include "ColumnStorageHelper.h"
-#include "RegistryStorageHelper.h"
+#include "ColumnStorageTestHelper.h"
+#include "RegistryStorageTestHelper.h"
 #include "ShellBrowser/FolderSettings.h"
 #include <gtest/gtest.h>
 #include <wil/registry.h>

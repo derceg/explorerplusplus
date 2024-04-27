@@ -4,10 +4,10 @@
 
 #include "pch.h"
 #include "Bookmarks/BookmarkXmlStorage.h"
-#include "BookmarkStorageHelper.h"
+#include "BookmarkStorageTestHelper.h"
 #include "Bookmarks/BookmarkTree.h"
-#include "ResourceHelper.h"
-#include "XmlStorageHelper.h"
+#include "ResourceTestHelper.h"
+#include "XmlStorageTestHelper.h"
 #include "../Helper/XMLSettings.h"
 #include <gtest/gtest.h>
 

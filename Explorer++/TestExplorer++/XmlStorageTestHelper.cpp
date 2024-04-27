@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "XmlStorageHelper.h"
+#include "XmlStorageTestHelper.h"
 #include "../Helper/XMLSettings.h"
 
 wil::com_ptr_nothrow<IXMLDOMDocument> XmlStorageTest::LoadXmlDocument(const std::wstring &filePath)

@@ -6,9 +6,9 @@
 #include "ApplicationToolbarRegistryStorage.h"
 #include "Application.h"
 #include "ApplicationModel.h"
-#include "ApplicationToolbarStorageHelper.h"
+#include "ApplicationToolbarStorageTestHelper.h"
 #include "MovableModelHelper.h"
-#include "RegistryStorageHelper.h"
+#include "RegistryStorageTestHelper.h"
 #include <gtest/gtest.h>
 
 using namespace Applications;

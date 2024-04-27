@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "ResourceHelper.h"
+#include "ResourceTestHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include <tchar.h>

@@ -4,9 +4,9 @@
 
 #include "pch.h"
 #include "Bookmarks/BookmarkRegistryStorage.h"
-#include "BookmarkStorageHelper.h"
+#include "BookmarkStorageTestHelper.h"
 #include "Bookmarks/BookmarkTree.h"
-#include "RegistryStorageHelper.h"
+#include "RegistryStorageTestHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;

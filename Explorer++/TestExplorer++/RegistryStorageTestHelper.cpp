@@ -3,8 +3,8 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "RegistryStorageHelper.h"
-#include "ResourceHelper.h"
+#include "RegistryStorageTestHelper.h"
+#include "ResourceTestHelper.h"
 #include <wil/registry.h>
 #include <Shlwapi.h>
 #include <shellapi.h>

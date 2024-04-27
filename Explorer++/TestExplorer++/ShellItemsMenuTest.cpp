@@ -7,7 +7,7 @@
 #include "BrowserWindowMock.h"
 #include "IconFetcher.h"
 #include "PopupMenuView.h"
-#include "ShellHelper.h"
+#include "ShellTestHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

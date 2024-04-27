@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "MainRebarStorageHelper.h"
+#include "MainRebarStorageTestHelper.h"
 #include "MainRebarStorage.h"
 
 std::vector<RebarBandStorageInfo> BuildMainRebarLoadSaveReference()
