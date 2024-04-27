@@ -760,7 +760,8 @@ void MainToolbar::UpdateToolbarButtonStates()
 		m_coreInterface->CanCut() && GetFocus() != m_coreInterface->GetTreeView());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Copy, m_coreInterface->CanCopy());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Cut, m_coreInterface->CanCut());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Paste, m_coreInterface->CanPaste());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Paste,
+		m_coreInterface->CanPaste(PasteType::Normal));
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Properties,
 		m_coreInterface->CanShowFileProperties());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Delete, m_coreInterface->CanDelete());
@@ -777,7 +778,8 @@ void MainToolbar::UpdateToolbarButtonStates()
 
 void MainToolbar::OnClipboardUpdate()
 {
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Paste, m_coreInterface->CanPaste());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Paste,
+		m_coreInterface->CanPaste(PasteType::Normal));
 }
 
 void MainToolbar::OnMButtonDown(HWND hwnd, BOOL doubleClick, int x, int y, UINT keysDown)

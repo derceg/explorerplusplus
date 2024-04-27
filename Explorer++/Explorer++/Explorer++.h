@@ -469,12 +469,11 @@ private:
 	BOOL CanRename() const override;
 	BOOL CanDelete() const override;
 	BOOL CanShowFileProperties() const override;
-	BOOL CanPaste() const override;
-	BOOL CanPasteShortcut() const;
-	BOOL CanPasteShellData(PasteType pasteType) const;
-	BOOL CanPasteCustomData() const;
+	BOOL CanPaste(PasteType pasteType) const override;
+	bool CanCreateHardLink() const;
 	BOOL TestItemAttributes(SFGAOF attributes) const;
 	HRESULT GetSelectionAttributes(SFGAOF *pItemAttributes) const;
+	PidlAbsolute MaybeGetFocusedDirectory() const;
 
 	HRESULT GetTreeViewSelectionAttributes(SFGAOF *pItemAttributes) const;
 

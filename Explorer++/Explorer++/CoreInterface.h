@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "../Helper/ClipboardHelper.h"
 #include <boost/signals2.hpp>
 
 // Stops signal propagation after the first successful handler (i.e. the first handler that returns
@@ -98,7 +99,7 @@ public:
 	virtual BOOL CanRename() const = 0;
 	virtual BOOL CanDelete() const = 0;
 	virtual BOOL CanShowFileProperties() const = 0;
-	virtual BOOL CanPaste() const = 0;
+	virtual BOOL CanPaste(PasteType pasteType) const = 0;
 
 	virtual void ShowTabBar() = 0;
 	virtual void HideTabBar() = 0;

@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Config.h"
+#include "DirectoryOperationsHelper.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
@@ -56,10 +57,7 @@ void Explorerplusplus::UpdateBackgroundContextMenu(HMENU menu, PCIDLIST_ABSOLUTE
 
 	MenuHelper::AddSeparator(menu, position++, true);
 
-	SFGAOF attributes = SFGAO_FILESYSTEM;
-	HRESULT hr = GetItemAttributes(folderPidl, &attributes);
-
-	if (SUCCEEDED(hr) && WI_IsFlagSet(attributes, SFGAO_FILESYSTEM))
+	if (CanCustomizeDirectory(folderPidl))
 	{
 		text =
 			ResourceHelper::LoadString(m_resourceInstance, IDS_BACKGROUND_CONTEXT_MENU_CUSTOMIZE);
@@ -71,7 +69,7 @@ void Explorerplusplus::UpdateBackgroundContextMenu(HMENU menu, PCIDLIST_ABSOLUTE
 	text = ResourceHelper::LoadString(m_resourceInstance, IDS_BACKGROUND_CONTEXT_MENU_PASTE);
 	MenuHelper::AddStringItem(menu, IDM_BACKGROUND_CONTEXT_MENU_PASTE, text, position++, true);
 
-	if (!CanPaste())
+	if (!CanPasteInDirectory(folderPidl, PasteType::Normal))
 	{
 		MenuHelper::EnableItem(menu, IDM_BACKGROUND_CONTEXT_MENU_PASTE, false);
 	}
@@ -81,7 +79,7 @@ void Explorerplusplus::UpdateBackgroundContextMenu(HMENU menu, PCIDLIST_ABSOLUTE
 	MenuHelper::AddStringItem(menu, IDM_BACKGROUND_CONTEXT_MENU_PASTE_SHORTCUT, text, position++,
 		true);
 
-	if (!CanPasteShortcut())
+	if (!CanPasteInDirectory(folderPidl, PasteType::Shortcut))
 	{
 		MenuHelper::EnableItem(menu, IDM_BACKGROUND_CONTEXT_MENU_PASTE_SHORTCUT, false);
 	}

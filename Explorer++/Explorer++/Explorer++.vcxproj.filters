@@ -661,6 +661,9 @@
     <ClCompile Include="LocationVisitInfo.cpp">
       <Filter>Frequent Locations</Filter>
     </ClCompile>
+    <ClCompile Include="DirectoryOperationsHelper.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1355,6 +1358,9 @@
     </ClInclude>
     <ClInclude Include="LocationVisitInfo.h">
       <Filter>Frequent Locations</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectoryOperationsHelper.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

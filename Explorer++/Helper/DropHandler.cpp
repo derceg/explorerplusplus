@@ -26,12 +26,9 @@ DropHandler *DropHandler::CreateNew()
 	return new DropHandler();
 }
 
-HRESULT DropHandler::GetDropFormats(std::list<FORMATETC> &ftcList)
+std::vector<CLIPFORMAT> DropHandler::GetDropFormats()
 {
-	ftcList.push_back(m_ftcUnicodeText);
-	ftcList.push_back(m_ftcDIB);
-
-	return S_OK;
+	return { m_ftcUnicodeText.cfFormat, m_ftcPng.cfFormat, m_ftcDIB.cfFormat };
 }
 
 void DropHandler::CopyClipboardData(IDataObject *pDataObject, HWND hwndDrop,

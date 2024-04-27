@@ -50,9 +50,9 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	MenuHelper::EnableItem(hProgramMenu, IDM_FILE_PROPERTIES, CanShowFileProperties());
 
 	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_UNDO, m_FileActionHandler.CanUndo());
-	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_PASTE, CanPaste());
-	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_PASTESHORTCUT, CanPasteShortcut());
-	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_PASTEHARDLINK, CanPaste());
+	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_PASTE, CanPaste(PasteType::Normal));
+	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_PASTESHORTCUT, CanPaste(PasteType::Shortcut));
+	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_PASTEHARDLINK, CanCreateHardLink());
 
 	/* The following menu items are only enabled when one
 	or more files are selected (they represent file

@@ -34,7 +34,7 @@ public:
 		CachedIcons *cachedIcons);
 
 	/* User functions. */
-	unique_pidl_absolute GetNodePidl(HTREEITEM hTreeItem) const;
+	unique_pidl_absolute GetSelectedNodePidl() const;
 	void SetShowHidden(BOOL bShowHidden);
 	void RefreshAllIcons();
 
@@ -161,7 +161,7 @@ private:
 	void CopyItemToClipboard(HTREEITEM treeItem, bool copy);
 	void OnClipboardUpdate();
 
-	unique_pidl_absolute GetSelectedNodePidl() const;
+	unique_pidl_absolute GetNodePidl(HTREEITEM hTreeItem) const;
 
 	// Directory monitoring
 	void StartDirectoryMonitoringForDrives();

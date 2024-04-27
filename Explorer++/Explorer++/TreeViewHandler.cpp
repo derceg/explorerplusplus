@@ -36,66 +36,45 @@ void Explorerplusplus::CreateFolderControls()
 
 void Explorerplusplus::OnTreeViewCopyItemPath() const
 {
-	auto hItem = TreeView_GetSelection(m_shellTreeView->GetHWND());
+	auto pidl = m_shellTreeView->GetSelectedNodePidl();
 
-	if (hItem != nullptr)
-	{
-		auto pidl = m_shellTreeView->GetNodePidl(hItem);
+	std::wstring fullFileName;
+	GetDisplayName(pidl.get(), SHGDN_FORPARSING, fullFileName);
 
-		std::wstring fullFileName;
-		GetDisplayName(pidl.get(), SHGDN_FORPARSING, fullFileName);
-
-		BulkClipboardWriter clipboardWriter;
-		clipboardWriter.WriteText(fullFileName);
-	}
+	BulkClipboardWriter clipboardWriter;
+	clipboardWriter.WriteText(fullFileName);
 }
 
 void Explorerplusplus::OnTreeViewCopyUniversalPaths() const
 {
-	HTREEITEM hItem;
+	auto pidl = m_shellTreeView->GetSelectedNodePidl();
+
+	std::wstring fullFileName;
+	GetDisplayName(pidl.get(), SHGDN_FORPARSING, fullFileName);
+
 	UNIVERSAL_NAME_INFO uni;
-	DWORD dwBufferSize;
-	DWORD dwRet;
+	DWORD dwBufferSize = sizeof(uni);
+	DWORD dwRet = WNetGetUniversalName(fullFileName.c_str(), UNIVERSAL_NAME_INFO_LEVEL,
+		(void **) &uni, &dwBufferSize);
 
-	hItem = TreeView_GetSelection(m_shellTreeView->GetHWND());
+	BulkClipboardWriter clipboardWriter;
 
-	if (hItem != nullptr)
+	if (dwRet == NO_ERROR)
 	{
-		auto pidl = m_shellTreeView->GetNodePidl(hItem);
-
-		std::wstring fullFileName;
-		GetDisplayName(pidl.get(), SHGDN_FORPARSING, fullFileName);
-
-		dwBufferSize = sizeof(uni);
-		dwRet = WNetGetUniversalName(fullFileName.c_str(), UNIVERSAL_NAME_INFO_LEVEL,
-			(void **) &uni, &dwBufferSize);
-
-		BulkClipboardWriter clipboardWriter;
-
-		if (dwRet == NO_ERROR)
-		{
-			clipboardWriter.WriteText(uni.lpUniversalName);
-		}
-		else
-		{
-			clipboardWriter.WriteText(fullFileName);
-		}
+		clipboardWriter.WriteText(uni.lpUniversalName);
+	}
+	else
+	{
+		clipboardWriter.WriteText(fullFileName);
 	}
 }
 
 void Explorerplusplus::OnTreeViewSetFileAttributes() const
 {
-	auto hItem = TreeView_GetSelection(m_shellTreeView->GetHWND());
-
-	if (hItem == nullptr)
-	{
-		return;
-	}
-
 	std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo> sfaiList;
 	NSetFileAttributesDialogExternal::SetFileAttributesInfo sfai;
 
-	auto pidlItem = m_shellTreeView->GetNodePidl(hItem);
+	auto pidlItem = m_shellTreeView->GetSelectedNodePidl();
 
 	std::wstring fullFileName;
 	HRESULT hr = GetDisplayName(pidlItem.get(), SHGDN_FORPARSING, fullFileName);

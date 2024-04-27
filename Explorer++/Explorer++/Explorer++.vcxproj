@@ -1004,6 +1004,7 @@
     <ClCompile Include="CrashHandlerHelper.cpp" />
     <ClCompile Include="CustomFont.cpp" />
     <ClCompile Include="CustomFontStorage.cpp" />
+    <ClCompile Include="DirectoryOperationsHelper.cpp" />
     <ClCompile Include="FeatureList.cpp" />
     <ClCompile Include="FontsOptionsPage.cpp" />
     <ClCompile Include="FrequentLocationsService.cpp" />
@@ -1258,6 +1259,7 @@
     <ClInclude Include="CrashHandlerHelper.h" />
     <ClInclude Include="CustomFont.h" />
     <ClInclude Include="CustomFontStorage.h" />
+    <ClInclude Include="DirectoryOperationsHelper.h" />
     <ClInclude Include="Feature.h" />
     <ClInclude Include="FeatureList.h" />
     <ClInclude Include="FontsOptionsPage.h" />

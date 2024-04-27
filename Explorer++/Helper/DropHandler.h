@@ -22,7 +22,7 @@ public:
 	get a new instance of this class. */
 	static DropHandler *CreateNew();
 
-	static HRESULT GetDropFormats(std::list<FORMATETC> &ftcList);
+	static std::vector<CLIPFORMAT> GetDropFormats();
 
 	void CopyClipboardData(IDataObject *pDataObject, HWND hwndDrop, const TCHAR *szDestDirectory,
 		IDropFilesCallback *pDropFilesCallback);
