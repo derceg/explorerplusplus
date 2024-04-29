@@ -31,7 +31,7 @@ std::unique_ptr<ColorRule> LoadColorRule(IXMLDOMNode *parentNode)
 	}
 
 	std::wstring description;
-	hr = NXMLSettings::GetStringFromMap(attributeMap.get(), SETTING_DESCRIPTION, description);
+	hr = XMLSettings::GetStringFromMap(attributeMap.get(), SETTING_DESCRIPTION, description);
 
 	if (FAILED(hr))
 	{
@@ -39,7 +39,7 @@ std::unique_ptr<ColorRule> LoadColorRule(IXMLDOMNode *parentNode)
 	}
 
 	std::wstring filenamePattern;
-	hr = NXMLSettings::GetStringFromMap(attributeMap.get(), SETTING_FILENAME_PATTERN,
+	hr = XMLSettings::GetStringFromMap(attributeMap.get(), SETTING_FILENAME_PATTERN,
 		filenamePattern);
 
 	if (FAILED(hr))
@@ -48,8 +48,7 @@ std::unique_ptr<ColorRule> LoadColorRule(IXMLDOMNode *parentNode)
 	}
 
 	bool caseInsensitive;
-	hr =
-		NXMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_CASE_INSENSITIVE, caseInsensitive);
+	hr = XMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_CASE_INSENSITIVE, caseInsensitive);
 
 	if (FAILED(hr))
 	{
@@ -57,7 +56,7 @@ std::unique_ptr<ColorRule> LoadColorRule(IXMLDOMNode *parentNode)
 	}
 
 	int attributes;
-	hr = NXMLSettings::GetIntFromMap(attributeMap.get(), SETTING_ATTRIBUTES, attributes);
+	hr = XMLSettings::GetIntFromMap(attributeMap.get(), SETTING_ATTRIBUTES, attributes);
 
 	if (FAILED(hr))
 	{
@@ -65,7 +64,7 @@ std::unique_ptr<ColorRule> LoadColorRule(IXMLDOMNode *parentNode)
 	}
 
 	COLORREF color;
-	hr = NXMLSettings::ReadRgb(attributeMap.get(), color);
+	hr = XMLSettings::ReadRgb(attributeMap.get(), color);
 
 	if (FAILED(hr))
 	{
@@ -106,15 +105,15 @@ void SaveColorRule(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
 	const ColorRule *colorRule)
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> colorRuleNode;
-	NXMLSettings::CreateElementNode(xmlDocument, &colorRuleNode, parentNode, _T("ColorRule"),
+	XMLSettings::CreateElementNode(xmlDocument, &colorRuleNode, parentNode, _T("ColorRule"),
 		colorRule->GetDescription().c_str());
-	NXMLSettings::AddAttributeToNode(xmlDocument, colorRuleNode.get(), SETTING_FILENAME_PATTERN,
+	XMLSettings::AddAttributeToNode(xmlDocument, colorRuleNode.get(), SETTING_FILENAME_PATTERN,
 		colorRule->GetFilterPattern().c_str());
-	NXMLSettings::AddAttributeToNode(xmlDocument, colorRuleNode.get(), SETTING_CASE_INSENSITIVE,
-		NXMLSettings::EncodeBoolValue(colorRule->GetFilterPatternCaseInsensitive()));
-	NXMLSettings::AddAttributeToNode(xmlDocument, colorRuleNode.get(), SETTING_ATTRIBUTES,
-		NXMLSettings::EncodeIntValue(colorRule->GetFilterAttributes()));
-	NXMLSettings::SaveRgb(xmlDocument, colorRuleNode.get(), colorRule->GetColor());
+	XMLSettings::AddAttributeToNode(xmlDocument, colorRuleNode.get(), SETTING_CASE_INSENSITIVE,
+		XMLSettings::EncodeBoolValue(colorRule->GetFilterPatternCaseInsensitive()));
+	XMLSettings::AddAttributeToNode(xmlDocument, colorRuleNode.get(), SETTING_ATTRIBUTES,
+		XMLSettings::EncodeIntValue(colorRule->GetFilterAttributes()));
+	XMLSettings::SaveRgb(xmlDocument, colorRuleNode.get(), colorRule->GetColor());
 }
 
 void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
@@ -158,7 +157,7 @@ void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *rootNode, const ColorRul
 
 	SaveToNode(xmlDocument, colorRulesNode.get(), model);
 
-	NXMLSettings::AppendChildToParent(colorRulesNode.get(), rootNode);
+	XMLSettings::AppendChildToParent(colorRulesNode.get(), rootNode);
 }
 
 }

@@ -172,7 +172,7 @@ void FilterDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 void FilterDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
 	IXMLDOMElement *pParentNode)
 {
-	NXMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_FILTER_LIST, m_FilterList);
+	XMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_FILTER_LIST, m_FilterList);
 }
 
 void FilterDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue)

@@ -671,8 +671,8 @@ void SplitFileDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 void SplitFileDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
 	IXMLDOMElement *pParentNode)
 {
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SIZE, m_strSplitSize.c_str());
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SIZE_GROUP,
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SIZE, m_strSplitSize.c_str());
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SIZE_GROUP,
 		m_strSplitGroup.c_str());
 }
 

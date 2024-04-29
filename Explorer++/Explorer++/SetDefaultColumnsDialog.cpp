@@ -385,14 +385,14 @@ void SetDefaultColumnsDialogPersistentSettings::LoadExtraRegistrySettings(HKEY h
 void SetDefaultColumnsDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
 	IXMLDOMElement *pParentNode)
 {
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_FOLDER_TYPE,
-		NXMLSettings::EncodeIntValue(static_cast<int>(m_FolderType)));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_FOLDER_TYPE,
+		XMLSettings::EncodeIntValue(static_cast<int>(m_FolderType)));
 }
 
 void SetDefaultColumnsDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue)
 {
 	if (lstrcmpi(bstrName, SETTING_FOLDER_TYPE) == 0)
 	{
-		m_FolderType = static_cast<FolderType>(NXMLSettings::DecodeIntValue(bstrValue));
+		m_FolderType = static_cast<FolderType>(XMLSettings::DecodeIntValue(bstrValue));
 	}
 }

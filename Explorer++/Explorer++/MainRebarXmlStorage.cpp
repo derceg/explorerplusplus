@@ -31,7 +31,7 @@ std::optional<RebarBandStorageInfo> LoadRebarBandInfo(IXMLDOMNode *parentNode)
 	}
 
 	int id;
-	hr = NXMLSettings::GetIntFromMap(attributeMap.get(), SETTING_ID, id);
+	hr = XMLSettings::GetIntFromMap(attributeMap.get(), SETTING_ID, id);
 
 	if (FAILED(hr))
 	{
@@ -39,7 +39,7 @@ std::optional<RebarBandStorageInfo> LoadRebarBandInfo(IXMLDOMNode *parentNode)
 	}
 
 	int style;
-	hr = NXMLSettings::GetIntFromMap(attributeMap.get(), SETTING_STYLE, style);
+	hr = XMLSettings::GetIntFromMap(attributeMap.get(), SETTING_STYLE, style);
 
 	if (FAILED(hr))
 	{
@@ -47,7 +47,7 @@ std::optional<RebarBandStorageInfo> LoadRebarBandInfo(IXMLDOMNode *parentNode)
 	}
 
 	int length;
-	hr = NXMLSettings::GetIntFromMap(attributeMap.get(), SETTING_LENGTH, length);
+	hr = XMLSettings::GetIntFromMap(attributeMap.get(), SETTING_LENGTH, length);
 
 	if (FAILED(hr))
 	{
@@ -94,14 +94,14 @@ void SaveRebarBandInfo(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> bandNode;
 
-	NXMLSettings::CreateElementNode(xmlDocument, &bandNode, parentNode, _T("Toolbar"), L"");
+	XMLSettings::CreateElementNode(xmlDocument, &bandNode, parentNode, _T("Toolbar"), L"");
 
-	NXMLSettings::AddAttributeToNode(xmlDocument, bandNode.get(), SETTING_ID,
-		NXMLSettings::EncodeIntValue(bandInfo.id));
-	NXMLSettings::AddAttributeToNode(xmlDocument, bandNode.get(), SETTING_STYLE,
-		NXMLSettings::EncodeIntValue(bandInfo.style));
-	NXMLSettings::AddAttributeToNode(xmlDocument, bandNode.get(), SETTING_LENGTH,
-		NXMLSettings::EncodeIntValue(bandInfo.length));
+	XMLSettings::AddAttributeToNode(xmlDocument, bandNode.get(), SETTING_ID,
+		XMLSettings::EncodeIntValue(bandInfo.id));
+	XMLSettings::AddAttributeToNode(xmlDocument, bandNode.get(), SETTING_STYLE,
+		XMLSettings::EncodeIntValue(bandInfo.style));
+	XMLSettings::AddAttributeToNode(xmlDocument, bandNode.get(), SETTING_LENGTH,
+		XMLSettings::EncodeIntValue(bandInfo.length));
 }
 
 void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
@@ -144,7 +144,7 @@ void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *rootNode,
 
 	SaveToNode(xmlDocument, mainRebarNode.get(), rebarStorageInfo);
 
-	NXMLSettings::AppendChildToParent(mainRebarNode.get(), rootNode);
+	XMLSettings::AppendChildToParent(mainRebarNode.get(), rootNode);
 }
 
 }

@@ -128,7 +128,7 @@ unsigned long hash_setting(unsigned char *str);
 BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl)
 {
 	wil::com_ptr_nothrow<IXMLDOMDocument> pXMLDom;
-	pXMLDom.attach(NXMLSettings::DomFromCOM());
+	pXMLDom.attach(XMLSettings::DomFromCOM());
 
 	if (!pXMLDom)
 	{
@@ -140,7 +140,7 @@ BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl)
 	PathRemoveFileSpec(szConfigFile);
 	PathAppend(szConfigFile, NExplorerplusplus::XML_FILENAME);
 
-	wil::unique_variant var(NXMLSettings::VariantString(szConfigFile));
+	wil::unique_variant var(XMLSettings::VariantString(szConfigFile));
 	VARIANT_BOOL status;
 	pXMLDom->load(var, &status);
 
@@ -194,43 +194,43 @@ BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl)
 
 			if (lstrcmp(bstrName.get(), _T("Flags")) == 0)
 			{
-				pwndpl->flags = NXMLSettings::DecodeIntValue(bstrValue.get());
+				pwndpl->flags = XMLSettings::DecodeIntValue(bstrValue.get());
 			}
 			else if (lstrcmp(bstrName.get(), _T("ShowCmd")) == 0)
 			{
-				pwndpl->showCmd = NXMLSettings::DecodeIntValue(bstrValue.get());
+				pwndpl->showCmd = XMLSettings::DecodeIntValue(bstrValue.get());
 			}
 			else if (lstrcmp(bstrName.get(), _T("MinPositionX")) == 0)
 			{
-				pwndpl->ptMinPosition.x = NXMLSettings::DecodeIntValue(bstrValue.get());
+				pwndpl->ptMinPosition.x = XMLSettings::DecodeIntValue(bstrValue.get());
 			}
 			else if (lstrcmp(bstrName.get(), _T("MinPositionY")) == 0)
 			{
-				pwndpl->ptMinPosition.y = NXMLSettings::DecodeIntValue(bstrValue.get());
+				pwndpl->ptMinPosition.y = XMLSettings::DecodeIntValue(bstrValue.get());
 			}
 			else if (lstrcmp(bstrName.get(), _T("MaxPositionX")) == 0)
 			{
-				pwndpl->ptMaxPosition.x = NXMLSettings::DecodeIntValue(bstrValue.get());
+				pwndpl->ptMaxPosition.x = XMLSettings::DecodeIntValue(bstrValue.get());
 			}
 			else if (lstrcmp(bstrName.get(), _T("MaxPositionY")) == 0)
 			{
-				pwndpl->ptMaxPosition.y = NXMLSettings::DecodeIntValue(bstrValue.get());
+				pwndpl->ptMaxPosition.y = XMLSettings::DecodeIntValue(bstrValue.get());
 			}
 			else if (lstrcmp(bstrName.get(), _T("NormalPositionLeft")) == 0)
 			{
-				pwndpl->rcNormalPosition.left = NXMLSettings::DecodeIntValue(bstrValue.get());
+				pwndpl->rcNormalPosition.left = XMLSettings::DecodeIntValue(bstrValue.get());
 			}
 			else if (lstrcmp(bstrName.get(), _T("NormalPositionTop")) == 0)
 			{
-				pwndpl->rcNormalPosition.top = NXMLSettings::DecodeIntValue(bstrValue.get());
+				pwndpl->rcNormalPosition.top = XMLSettings::DecodeIntValue(bstrValue.get());
 			}
 			else if (lstrcmp(bstrName.get(), _T("NormalPositionRight")) == 0)
 			{
-				pwndpl->rcNormalPosition.right = NXMLSettings::DecodeIntValue(bstrValue.get());
+				pwndpl->rcNormalPosition.right = XMLSettings::DecodeIntValue(bstrValue.get());
 			}
 			else if (lstrcmp(bstrName.get(), _T("NormalPositionBottom")) == 0)
 			{
-				pwndpl->rcNormalPosition.bottom = NXMLSettings::DecodeIntValue(bstrValue.get());
+				pwndpl->rcNormalPosition.bottom = XMLSettings::DecodeIntValue(bstrValue.get());
 			}
 		}
 	}
@@ -243,7 +243,7 @@ BOOL LoadAllowMultipleInstancesFromXML()
 	BOOL bAllowMultipleInstances = TRUE;
 
 	wil::com_ptr_nothrow<IXMLDOMDocument> pXMLDom;
-	pXMLDom.attach(NXMLSettings::DomFromCOM());
+	pXMLDom.attach(XMLSettings::DomFromCOM());
 
 	if (!pXMLDom)
 	{
@@ -256,7 +256,7 @@ BOOL LoadAllowMultipleInstancesFromXML()
 	PathAppend(szConfigFile, NExplorerplusplus::XML_FILENAME);
 
 	VARIANT_BOOL status;
-	wil::unique_variant var(NXMLSettings::VariantString(szConfigFile));
+	wil::unique_variant var(XMLSettings::VariantString(szConfigFile));
 	pXMLDom->load(var, &status);
 
 	if (status != VARIANT_TRUE)
@@ -299,7 +299,7 @@ BOOL LoadAllowMultipleInstancesFromXML()
 
 				if (lstrcmp(bstrName.get(), _T("AllowMultipleInstances")) == 0)
 				{
-					bAllowMultipleInstances = NXMLSettings::DecodeBoolValue(bstrValue.get());
+					bAllowMultipleInstances = XMLSettings::DecodeBoolValue(bstrValue.get());
 					break;
 				}
 			}
@@ -365,336 +365,333 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 
 	auto bstr_wsntt = wil::make_bstr_nothrow(L"\n\t\t");
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
 		_T("AllowMultipleInstances"),
-		NXMLSettings::EncodeBoolValue(m_config->allowMultipleInstances));
+		XMLSettings::EncodeBoolValue(m_config->allowMultipleInstances));
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("AlwaysOpenInNewTab"),
-		NXMLSettings::EncodeBoolValue(m_config->alwaysOpenNewTab));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("AlwaysShowTabBar"),
-		NXMLSettings::EncodeBoolValue(m_config->alwaysShowTabBar.get()));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("AutoArrangeGlobal"),
-		NXMLSettings::EncodeBoolValue(m_config->defaultFolderSettings.autoArrange));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("CheckBoxSelection"),
-		NXMLSettings::EncodeBoolValue(m_config->checkBoxSelection.get()));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("AlwaysOpenInNewTab"),
+		XMLSettings::EncodeBoolValue(m_config->alwaysOpenNewTab));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("AlwaysShowTabBar"),
+		XMLSettings::EncodeBoolValue(m_config->alwaysShowTabBar.get()));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("AutoArrangeGlobal"),
+		XMLSettings::EncodeBoolValue(m_config->defaultFolderSettings.autoArrange));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("CheckBoxSelection"),
+		XMLSettings::EncodeBoolValue(m_config->checkBoxSelection.get()));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
 		_T("CloseMainWindowOnTabClose"),
-		NXMLSettings::EncodeBoolValue(m_config->closeMainWindowOnTabClose));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ConfirmCloseTabs"),
-		NXMLSettings::EncodeBoolValue(m_config->confirmCloseTabs));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
+		XMLSettings::EncodeBoolValue(m_config->closeMainWindowOnTabClose));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ConfirmCloseTabs"),
+		XMLSettings::EncodeBoolValue(m_config->confirmCloseTabs));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
 		_T("DisableFolderSizesNetworkRemovable"),
-		NXMLSettings::EncodeBoolValue(
+		XMLSettings::EncodeBoolValue(
 			m_config->globalFolderSettings.disableFolderSizesNetworkRemovable));
 
 	COLORREF centreColor;
 
 	wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
 		_T("DisplayCentreColor"));
 	centreColor = (COLORREF) SendMessage(m_hDisplayWindow, DWM_GETCENTRECOLOR, 0, 0);
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("r"),
-		NXMLSettings::EncodeIntValue(GetRValue(centreColor)));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("g"),
-		NXMLSettings::EncodeIntValue(GetGValue(centreColor)));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("b"),
-		NXMLSettings::EncodeIntValue(GetBValue(centreColor)));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("r"),
+		XMLSettings::EncodeIntValue(GetRValue(centreColor)));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("g"),
+		XMLSettings::EncodeIntValue(GetGValue(centreColor)));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("b"),
+		XMLSettings::EncodeIntValue(GetBValue(centreColor)));
 
 	HFONT hFont;
 	LOGFONT fontInfo;
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
 		_T("DisplayFont"));
 	SendMessage(m_hDisplayWindow, DWM_GETFONT, (WPARAM) &hFont, 0);
 	GetObject(hFont, sizeof(LOGFONT), &fontInfo);
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Height"),
-		NXMLSettings::EncodeIntValue(fontInfo.lfHeight));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Width"),
-		NXMLSettings::EncodeIntValue(fontInfo.lfWidth));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Weight"),
-		NXMLSettings::EncodeIntValue(fontInfo.lfWeight));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Italic"),
-		NXMLSettings::EncodeBoolValue(fontInfo.lfItalic));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Underline"),
-		NXMLSettings::EncodeBoolValue(fontInfo.lfUnderline));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Strikeout"),
-		NXMLSettings::EncodeBoolValue(fontInfo.lfStrikeOut));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Font"), fontInfo.lfFaceName);
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Height"),
+		XMLSettings::EncodeIntValue(fontInfo.lfHeight));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Width"),
+		XMLSettings::EncodeIntValue(fontInfo.lfWidth));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Weight"),
+		XMLSettings::EncodeIntValue(fontInfo.lfWeight));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Italic"),
+		XMLSettings::EncodeBoolValue(fontInfo.lfItalic));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Underline"),
+		XMLSettings::EncodeBoolValue(fontInfo.lfUnderline));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Strikeout"),
+		XMLSettings::EncodeBoolValue(fontInfo.lfStrikeOut));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Font"), fontInfo.lfFaceName);
 
 	COLORREF surroundColor;
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
 		_T("DisplaySurroundColor"));
 	surroundColor = (COLORREF) SendMessage(m_hDisplayWindow, DWM_GETSURROUNDCOLOR, 0, 0);
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("r"),
-		NXMLSettings::EncodeIntValue(GetRValue(surroundColor)));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("g"),
-		NXMLSettings::EncodeIntValue(GetGValue(surroundColor)));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("b"),
-		NXMLSettings::EncodeIntValue(GetBValue(surroundColor)));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("r"),
+		XMLSettings::EncodeIntValue(GetRValue(surroundColor)));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("g"),
+		XMLSettings::EncodeIntValue(GetGValue(surroundColor)));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("b"),
+		XMLSettings::EncodeIntValue(GetBValue(surroundColor)));
 
 	COLORREF textColor;
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
 		_T("DisplayTextColor"));
 	textColor = (COLORREF) SendMessage(m_hDisplayWindow, DWM_GETTEXTCOLOR, 0, 0);
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("r"),
-		NXMLSettings::EncodeIntValue(GetRValue(textColor)));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("g"),
-		NXMLSettings::EncodeIntValue(GetGValue(textColor)));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("b"),
-		NXMLSettings::EncodeIntValue(GetBValue(textColor)));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("r"),
+		XMLSettings::EncodeIntValue(GetRValue(textColor)));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("g"),
+		XMLSettings::EncodeIntValue(GetGValue(textColor)));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("b"),
+		XMLSettings::EncodeIntValue(GetBValue(textColor)));
 
 	WCHAR szValue[32];
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	_itow_s(m_config->displayWindowWidth, szValue, SIZEOF_ARRAY(szValue), 10);
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("DisplayWindowWidth"),
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("DisplayWindowWidth"),
 		szValue);
 
 	_itow_s(m_config->displayWindowHeight, szValue, SIZEOF_ARRAY(szValue), 10);
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("DisplayWindowHeight"),
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("DisplayWindowHeight"),
 		szValue);
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
-		_T("DisplayWindowVertical"),
-		NXMLSettings::EncodeBoolValue(m_config->displayWindowVertical));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("DisplayWindowVertical"),
+		XMLSettings::EncodeBoolValue(m_config->displayWindowVertical));
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("DoubleClickTabClose"),
-		NXMLSettings::EncodeBoolValue(m_config->doubleClickTabClose));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ExtendTabControl"),
-		NXMLSettings::EncodeBoolValue(m_config->extendTabControl.get()));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ForceSize"),
-		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.forceSize));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("HandleZipFiles"),
-		NXMLSettings::EncodeBoolValue(m_config->handleZipFiles));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("DoubleClickTabClose"),
+		XMLSettings::EncodeBoolValue(m_config->doubleClickTabClose));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ExtendTabControl"),
+		XMLSettings::EncodeBoolValue(m_config->extendTabControl.get()));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ForceSize"),
+		XMLSettings::EncodeBoolValue(m_config->globalFolderSettings.forceSize));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("HandleZipFiles"),
+		XMLSettings::EncodeBoolValue(m_config->handleZipFiles));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
 		_T("HideLinkExtensionGlobal"),
-		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.hideLinkExtension));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
-		_T("HideSystemFilesGlobal"),
-		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.hideSystemFiles));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("InfoTipType"),
-		NXMLSettings::EncodeIntValue(m_config->infoTipType));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("InsertSorted"),
-		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.insertSorted));
+		XMLSettings::EncodeBoolValue(m_config->globalFolderSettings.hideLinkExtension));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("HideSystemFilesGlobal"),
+		XMLSettings::EncodeBoolValue(m_config->globalFolderSettings.hideSystemFiles));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("InfoTipType"),
+		XMLSettings::EncodeIntValue(m_config->infoTipType));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("InsertSorted"),
+		XMLSettings::EncodeBoolValue(m_config->globalFolderSettings.insertSorted));
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	_itow_s(m_config->language, szValue, SIZEOF_ARRAY(szValue), 10);
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("Language"), szValue);
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("Language"), szValue);
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("LargeToolbarIcons"),
-		NXMLSettings::EncodeBoolValue(m_config->useLargeToolbarIcons.get()));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("LargeToolbarIcons"),
+		XMLSettings::EncodeBoolValue(m_config->useLargeToolbarIcons.get()));
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	_itow_s(m_iLastSelectedTab, szValue, SIZEOF_ARRAY(szValue), 10);
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("LastSelectedTab"),
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("LastSelectedTab"),
 		szValue);
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("LockToolbars"),
-		NXMLSettings::EncodeBoolValue(m_config->lockToolbars));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("NextToCurrent"),
-		NXMLSettings::EncodeBoolValue(m_config->openNewTabNextToCurrent));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("NewTabDirectory"),
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("LockToolbars"),
+		XMLSettings::EncodeBoolValue(m_config->lockToolbars));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("NextToCurrent"),
+		XMLSettings::EncodeBoolValue(m_config->openNewTabNextToCurrent));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("NewTabDirectory"),
 		m_config->defaultTabDirectory.c_str());
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("OneClickActivate"),
-		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.oneClickActivate.get()));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("OneClickActivate"),
+		XMLSettings::EncodeBoolValue(m_config->globalFolderSettings.oneClickActivate.get()));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
 		_T("OneClickActivateHoverTime"),
-		NXMLSettings::EncodeIntValue(
+		XMLSettings::EncodeIntValue(
 			m_config->globalFolderSettings.oneClickActivateHoverTime.get()));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
 		_T("OverwriteExistingFilesConfirmation"),
-		NXMLSettings::EncodeBoolValue(m_config->overwriteExistingFilesConfirmation));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ReplaceExplorerMode"),
-		NXMLSettings::EncodeIntValue(m_config->replaceExplorerMode));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowAddressBar"),
-		NXMLSettings::EncodeBoolValue(m_config->showAddressBar));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
+		XMLSettings::EncodeBoolValue(m_config->overwriteExistingFilesConfirmation));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ReplaceExplorerMode"),
+		XMLSettings::EncodeIntValue(m_config->replaceExplorerMode));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowAddressBar"),
+		XMLSettings::EncodeBoolValue(m_config->showAddressBar));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
 		_T("ShowApplicationToolbar"),
-		NXMLSettings::EncodeBoolValue(m_config->showApplicationToolbar));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowBookmarksToolbar"),
-		NXMLSettings::EncodeBoolValue(m_config->showBookmarksToolbar));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowDrivesToolbar"),
-		NXMLSettings::EncodeBoolValue(m_config->showDrivesToolbar));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowDisplayWindow"),
-		NXMLSettings::EncodeBoolValue(m_config->showDisplayWindow));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowExtensions"),
-		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.showExtensions));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowFilePreviews"),
-		NXMLSettings::EncodeBoolValue(m_config->showFilePreviews));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowFolders"),
-		NXMLSettings::EncodeBoolValue(m_config->showFolders.get()));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowFolderSizes"),
-		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.showFolderSizes));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowFriendlyDates"),
-		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.showFriendlyDates));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowFullTitlePath"),
-		NXMLSettings::EncodeBoolValue(m_config->showFullTitlePath.get()));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowGridlinesGlobal"),
-		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.showGridlines.get()));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowHiddenGlobal"),
-		NXMLSettings::EncodeBoolValue(m_config->defaultFolderSettings.showHidden));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowInfoTips"),
-		NXMLSettings::EncodeBoolValue(m_config->showInfoTips));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowInGroupsGlobal"),
-		NXMLSettings::EncodeBoolValue(m_config->defaultFolderSettings.showInGroups));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
+		XMLSettings::EncodeBoolValue(m_config->showApplicationToolbar));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowBookmarksToolbar"),
+		XMLSettings::EncodeBoolValue(m_config->showBookmarksToolbar));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowDrivesToolbar"),
+		XMLSettings::EncodeBoolValue(m_config->showDrivesToolbar));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowDisplayWindow"),
+		XMLSettings::EncodeBoolValue(m_config->showDisplayWindow));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowExtensions"),
+		XMLSettings::EncodeBoolValue(m_config->globalFolderSettings.showExtensions));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowFilePreviews"),
+		XMLSettings::EncodeBoolValue(m_config->showFilePreviews));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowFolders"),
+		XMLSettings::EncodeBoolValue(m_config->showFolders.get()));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowFolderSizes"),
+		XMLSettings::EncodeBoolValue(m_config->globalFolderSettings.showFolderSizes));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowFriendlyDates"),
+		XMLSettings::EncodeBoolValue(m_config->globalFolderSettings.showFriendlyDates));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowFullTitlePath"),
+		XMLSettings::EncodeBoolValue(m_config->showFullTitlePath.get()));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowGridlinesGlobal"),
+		XMLSettings::EncodeBoolValue(m_config->globalFolderSettings.showGridlines.get()));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowHiddenGlobal"),
+		XMLSettings::EncodeBoolValue(m_config->defaultFolderSettings.showHidden));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowInfoTips"),
+		XMLSettings::EncodeBoolValue(m_config->showInfoTips));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowInGroupsGlobal"),
+		XMLSettings::EncodeBoolValue(m_config->defaultFolderSettings.showInGroups));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
 		_T("ShowPrivilegeLevelInTitleBar"),
-		NXMLSettings::EncodeBoolValue(m_config->showPrivilegeLevelInTitleBar.get()));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowStatusBar"),
-		NXMLSettings::EncodeBoolValue(m_config->showStatusBar));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowTabBarAtBottom"),
-		NXMLSettings::EncodeBoolValue(m_config->showTabBarAtBottom.get()));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
-		_T("ShowTaskbarThumbnails"),
-		NXMLSettings::EncodeBoolValue(m_config->showTaskbarThumbnails));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowToolbar"),
-		NXMLSettings::EncodeBoolValue(m_config->showMainToolbar));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowUserNameTitleBar"),
-		NXMLSettings::EncodeBoolValue(m_config->showUserNameInTitleBar.get()));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("SizeDisplayFormat"),
-		NXMLSettings::EncodeIntValue(m_config->globalFolderSettings.sizeDisplayFormat));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("SortAscendingGlobal"),
-		NXMLSettings::EncodeBoolValue(
+		XMLSettings::EncodeBoolValue(m_config->showPrivilegeLevelInTitleBar.get()));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowStatusBar"),
+		XMLSettings::EncodeBoolValue(m_config->showStatusBar));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowTabBarAtBottom"),
+		XMLSettings::EncodeBoolValue(m_config->showTabBarAtBottom.get()));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowTaskbarThumbnails"),
+		XMLSettings::EncodeBoolValue(m_config->showTaskbarThumbnails));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowToolbar"),
+		XMLSettings::EncodeBoolValue(m_config->showMainToolbar));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowUserNameTitleBar"),
+		XMLSettings::EncodeBoolValue(m_config->showUserNameInTitleBar.get()));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("SizeDisplayFormat"),
+		XMLSettings::EncodeIntValue(m_config->globalFolderSettings.sizeDisplayFormat));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("SortAscendingGlobal"),
+		XMLSettings::EncodeBoolValue(
 			m_config->defaultFolderSettings.sortDirection == +SortDirection::Ascending));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("StartupMode"),
-		NXMLSettings::EncodeIntValue(m_config->startupMode));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("SynchronizeTreeview"),
-		NXMLSettings::EncodeBoolValue(m_config->synchronizeTreeview.get()));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("TVAutoExpandSelected"),
-		NXMLSettings::EncodeBoolValue(m_config->treeViewAutoExpandSelected));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("UseFullRowSelect"),
-		NXMLSettings::EncodeBoolValue(m_config->useFullRowSelect.get()));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("StartupMode"),
+		XMLSettings::EncodeIntValue(m_config->startupMode));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("SynchronizeTreeview"),
+		XMLSettings::EncodeBoolValue(m_config->synchronizeTreeview.get()));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("TVAutoExpandSelected"),
+		XMLSettings::EncodeBoolValue(m_config->treeViewAutoExpandSelected));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("UseFullRowSelect"),
+		XMLSettings::EncodeBoolValue(m_config->useFullRowSelect.get()));
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("IconTheme"),
-		NXMLSettings::EncodeIntValue(m_config->iconSet));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("IconTheme"),
+		XMLSettings::EncodeIntValue(m_config->iconSet));
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
 		_T("ToolbarState"));
 	MainToolbarStorage::SaveToXml(pXMLDom, pParentNode.get(),
 		m_mainToolbar->GetButtonsForStorage());
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("TreeViewDelayEnabled"),
-		NXMLSettings::EncodeBoolValue(m_config->treeViewDelayEnabled));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("TreeViewDelayEnabled"),
+		XMLSettings::EncodeBoolValue(m_config->treeViewDelayEnabled));
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	_itow_s(m_config->treeViewWidth, szValue, SIZEOF_ARRAY(szValue), 10);
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("TreeViewWidth"),
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("TreeViewWidth"),
 		szValue);
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	_itow_s(m_config->defaultFolderSettings.viewMode, szValue, SIZEOF_ARRAY(szValue), 10);
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ViewModeGlobal"),
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ViewModeGlobal"),
 		szValue);
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
 		_T("CheckPinnedToNamespaceTreeProperty"),
-		NXMLSettings::EncodeBoolValue(m_config->checkPinnedToNamespaceTreeProperty));
+		XMLSettings::EncodeBoolValue(m_config->checkPinnedToNamespaceTreeProperty));
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
 		_T("ShowQuickAccessInTreeView"),
-		NXMLSettings::EncodeBoolValue(m_config->showQuickAccessInTreeView.get()));
+		XMLSettings::EncodeBoolValue(m_config->showQuickAccessInTreeView.get()));
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("Theme"),
-		NXMLSettings::EncodeIntValue(m_config->theme.get()));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("Theme"),
+		XMLSettings::EncodeIntValue(m_config->theme.get()));
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
 		_T("DisplayMixedFilesAndFolders"),
-		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.displayMixedFilesAndFolders));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("UseNaturalSortOrder"),
-		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.useNaturalSortOrder));
+		XMLSettings::EncodeBoolValue(m_config->globalFolderSettings.displayMixedFilesAndFolders));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("UseNaturalSortOrder"),
+		XMLSettings::EncodeBoolValue(m_config->globalFolderSettings.useNaturalSortOrder));
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("OpenTabsInForeground"),
-		NXMLSettings::EncodeBoolValue(m_config->openTabsInForeground));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("OpenTabsInForeground"),
+		XMLSettings::EncodeBoolValue(m_config->openTabsInForeground));
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
 		_T("GroupSortDirectionGlobal"),
-		NXMLSettings::EncodeIntValue(m_config->defaultFolderSettings.groupSortDirection));
+		XMLSettings::EncodeIntValue(m_config->defaultFolderSettings.groupSortDirection));
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-	NXMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("GoUpOnDoubleClick"),
-		NXMLSettings::EncodeBoolValue(m_config->goUpOnDoubleClick));
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("GoUpOnDoubleClick"),
+		XMLSettings::EncodeBoolValue(m_config->goUpOnDoubleClick));
 
 	auto &mainFont = m_config->mainFont.get();
 
 	if (mainFont)
 	{
-		NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
-		NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
+		XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
+		XMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe.get(), _T("Setting"),
 			_T("MainFont"));
 		SaveCustomFontToXml(pXMLDom, pParentNode.get(), *mainFont);
 	}
 
 	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pe.get());
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pe.get());
 
-	NXMLSettings::AppendChildToParent(pe.get(), pRoot);
+	XMLSettings::AppendChildToParent(pe.get(), pRoot);
 
 	SaveWindowPositionToXML(pXMLDom, pRoot);
 }
@@ -731,7 +728,7 @@ void Explorerplusplus::SaveTabSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMEle
 
 	TabXmlStorage::Save(pXMLDom, tabsNode.get(), GetTabListStorageData());
 
-	NXMLSettings::AppendChildToParent(tabsNode.get(), pRoot);
+	XMLSettings::AppendChildToParent(tabsNode.get(), pRoot);
 }
 
 void Explorerplusplus::LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom)
@@ -768,7 +765,7 @@ void Explorerplusplus::SaveDefaultColumnsToXML(IXMLDOMDocument *pXMLDom, IXMLDOM
 	const auto &folderColumns = m_config->globalFolderSettings.folderColumns;
 	ColumnXmlStorage::SaveAllColumnSets(pXMLDom, defaultColumnsNode.get(), folderColumns);
 
-	NXMLSettings::AppendChildToParent(defaultColumnsNode.get(), pRoot);
+	XMLSettings::AppendChildToParent(defaultColumnsNode.get(), pRoot);
 }
 
 void Explorerplusplus::SaveWindowPositionToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
@@ -780,10 +777,10 @@ void Explorerplusplus::SaveWindowPositionToXML(IXMLDOMDocument *pXMLDom, IXMLDOM
 	SaveWindowPositionToXMLInternal(pXMLDom, pWndPosNode.get());
 
 	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pWndPosNode.get());
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pRoot);
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pWndPosNode.get());
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsnt.get(), pRoot);
 
-	NXMLSettings::AppendChildToParent(pWndPosNode.get(), pRoot);
+	XMLSettings::AppendChildToParent(pWndPosNode.get(), pRoot);
 }
 
 void Explorerplusplus::SaveWindowPositionToXMLInternal(IXMLDOMDocument *pXMLDom,
@@ -794,31 +791,31 @@ void Explorerplusplus::SaveWindowPositionToXMLInternal(IXMLDOMDocument *pXMLDom,
 	GetWindowPlacement(m_hContainer, &wndpl);
 
 	auto bstr_wsntt = wil::make_bstr_nothrow(L"\n\t\t");
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pWndPosNode);
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pWndPosNode);
 
 	wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
-	NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pWndPosNode, _T("Setting"),
+	XMLSettings::CreateElementNode(pXMLDom, &pParentNode, pWndPosNode, _T("Setting"),
 		_T("Position"));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Flags"),
-		NXMLSettings::EncodeIntValue(wndpl.flags));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("ShowCmd"),
-		NXMLSettings::EncodeIntValue(wndpl.showCmd));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("MinPositionX"),
-		NXMLSettings::EncodeIntValue(wndpl.ptMinPosition.x));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("MinPositionY"),
-		NXMLSettings::EncodeIntValue(wndpl.ptMinPosition.y));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("MaxPositionX"),
-		NXMLSettings::EncodeIntValue(wndpl.ptMaxPosition.x));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("MaxPositionY"),
-		NXMLSettings::EncodeIntValue(wndpl.ptMaxPosition.y));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("NormalPositionLeft"),
-		NXMLSettings::EncodeIntValue(wndpl.rcNormalPosition.left));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("NormalPositionTop"),
-		NXMLSettings::EncodeIntValue(wndpl.rcNormalPosition.top));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("NormalPositionRight"),
-		NXMLSettings::EncodeIntValue(wndpl.rcNormalPosition.right));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("NormalPositionBottom"),
-		NXMLSettings::EncodeIntValue(wndpl.rcNormalPosition.bottom));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("Flags"),
+		XMLSettings::EncodeIntValue(wndpl.flags));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("ShowCmd"),
+		XMLSettings::EncodeIntValue(wndpl.showCmd));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("MinPositionX"),
+		XMLSettings::EncodeIntValue(wndpl.ptMinPosition.x));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("MinPositionY"),
+		XMLSettings::EncodeIntValue(wndpl.ptMinPosition.y));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("MaxPositionX"),
+		XMLSettings::EncodeIntValue(wndpl.ptMaxPosition.x));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("MaxPositionY"),
+		XMLSettings::EncodeIntValue(wndpl.ptMaxPosition.y));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("NormalPositionLeft"),
+		XMLSettings::EncodeIntValue(wndpl.rcNormalPosition.left));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("NormalPositionTop"),
+		XMLSettings::EncodeIntValue(wndpl.rcNormalPosition.top));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("NormalPositionRight"),
+		XMLSettings::EncodeIntValue(wndpl.rcNormalPosition.right));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), _T("NormalPositionBottom"),
+		XMLSettings::EncodeIntValue(wndpl.rcNormalPosition.bottom));
 }
 
 void Explorerplusplus::LoadMainRebarInformationFromXML(IXMLDOMDocument *pXMLDom)
@@ -859,249 +856,249 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 	switch (uNameHash)
 	{
 	case HASH_ALLOWMULTIPLEINSTANCES:
-		m_config->allowMultipleInstances = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->allowMultipleInstances = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_ALWAYSOPENINNEWTAB:
-		m_config->alwaysOpenNewTab = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->alwaysOpenNewTab = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_ALWAYSSHOWTABBAR:
-		m_config->alwaysShowTabBar.set(NXMLSettings::DecodeBoolValue(wszValue));
+		m_config->alwaysShowTabBar.set(XMLSettings::DecodeBoolValue(wszValue));
 		break;
 
 	case HASH_AUTOARRANGEGLOBAL:
-		m_config->defaultFolderSettings.autoArrange = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->defaultFolderSettings.autoArrange = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_CHECKBOXSELECTION:
-		m_config->checkBoxSelection = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->checkBoxSelection = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_CLOSEMAINWINDOWONTABCLOSE:
-		m_config->closeMainWindowOnTabClose = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->closeMainWindowOnTabClose = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_CONFIRMCLOSETABS:
-		m_config->confirmCloseTabs = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->confirmCloseTabs = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_DISABLEFOLDERSIZENETWORKREMOVABLE:
 		m_config->globalFolderSettings.disableFolderSizesNetworkRemovable =
-			NXMLSettings::DecodeBoolValue(wszValue);
+			XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_DISPLAYCENTRECOLOR:
-		m_config->displayWindowCentreColor = NXMLSettings::ReadXMLColorData2(pNode);
+		m_config->displayWindowCentreColor = XMLSettings::ReadXMLColorData2(pNode);
 		break;
 
 	case HASH_DISPLAYFONT:
-		m_config->displayWindowFont = NXMLSettings::ReadXMLFontData(pNode);
+		m_config->displayWindowFont = XMLSettings::ReadXMLFontData(pNode);
 		break;
 
 	case HASH_DISPLAYSURROUNDCOLOR:
-		m_config->displayWindowSurroundColor = NXMLSettings::ReadXMLColorData2(pNode);
+		m_config->displayWindowSurroundColor = XMLSettings::ReadXMLColorData2(pNode);
 		break;
 
 	case HASH_DISPLAYTEXTCOLOR:
-		m_config->displayWindowTextColor = NXMLSettings::ReadXMLColorData(pNode);
+		m_config->displayWindowTextColor = XMLSettings::ReadXMLColorData(pNode);
 		break;
 
 	case HASH_DISPLAYWINDOWWIDTH:
-		m_config->displayWindowWidth = NXMLSettings::DecodeIntValue(wszValue);
+		m_config->displayWindowWidth = XMLSettings::DecodeIntValue(wszValue);
 		break;
 
 	case HASH_DISPLAYWINDOWHEIGHT:
-		m_config->displayWindowHeight = NXMLSettings::DecodeIntValue(wszValue);
+		m_config->displayWindowHeight = XMLSettings::DecodeIntValue(wszValue);
 		break;
 
 	case HASH_DISPLAYWINDOWVERTICAL:
-		m_config->displayWindowVertical = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->displayWindowVertical = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_DOUBLECLICKTABCLOSE:
-		m_config->doubleClickTabClose = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->doubleClickTabClose = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_EXTENDTABCONTROL:
-		m_config->extendTabControl.set(NXMLSettings::DecodeBoolValue(wszValue));
+		m_config->extendTabControl.set(XMLSettings::DecodeBoolValue(wszValue));
 		break;
 
 	case HASH_FORCESIZE:
-		m_config->globalFolderSettings.forceSize = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->globalFolderSettings.forceSize = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_HANDLEZIPFILES:
-		m_config->handleZipFiles = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->handleZipFiles = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_HIDELINKEXTENSIONGLOBAL:
-		m_config->globalFolderSettings.hideLinkExtension = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->globalFolderSettings.hideLinkExtension = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_HIDESYSTEMFILESGLOBAL:
-		m_config->globalFolderSettings.hideSystemFiles = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->globalFolderSettings.hideSystemFiles = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_INSERTSORTED:
-		m_config->globalFolderSettings.insertSorted = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->globalFolderSettings.insertSorted = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_LANGUAGE:
-		m_config->language = NXMLSettings::DecodeIntValue(wszValue);
+		m_config->language = XMLSettings::DecodeIntValue(wszValue);
 		m_bLanguageLoaded = true;
 		break;
 
 	case HASH_LARGETOOLBARICONS:
-		m_config->useLargeToolbarIcons.set(NXMLSettings::DecodeBoolValue(wszValue));
+		m_config->useLargeToolbarIcons.set(XMLSettings::DecodeBoolValue(wszValue));
 		break;
 
 	case HASH_LASTSELECTEDTAB:
-		m_iLastSelectedTab = NXMLSettings::DecodeIntValue(wszValue);
+		m_iLastSelectedTab = XMLSettings::DecodeIntValue(wszValue);
 		break;
 
 	case HASH_LOCKTOOLBARS:
-		m_config->lockToolbars = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->lockToolbars = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_NEXTTOCURRENT:
-		m_config->openNewTabNextToCurrent = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->openNewTabNextToCurrent = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_ONECLICKACTIVATE:
-		m_config->globalFolderSettings.oneClickActivate = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->globalFolderSettings.oneClickActivate = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_ONECLICKACTIVATEHOVERTIME:
 		m_config->globalFolderSettings.oneClickActivateHoverTime =
-			NXMLSettings::DecodeIntValue(wszValue);
+			XMLSettings::DecodeIntValue(wszValue);
 		break;
 
 	case HASH_OVERWRITEEXISTINGFILESCONFIRMATION:
-		m_config->overwriteExistingFilesConfirmation = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->overwriteExistingFilesConfirmation = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_REPLACEEXPLORERMODE:
 		m_config->replaceExplorerMode = DefaultFileManager::ReplaceExplorerMode::_from_integral(
-			NXMLSettings::DecodeIntValue(wszValue));
+			XMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_SHOWADDRESSBAR:
-		m_config->showAddressBar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showAddressBar = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWAPPLICATIONTOOLBAR:
-		m_config->showApplicationToolbar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showApplicationToolbar = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWBOOKMARKSTOOLBAR:
-		m_config->showBookmarksToolbar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showBookmarksToolbar = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWDRIVESTOOLBAR:
-		m_config->showDrivesToolbar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showDrivesToolbar = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWDISPLAYWINDOW:
-		m_config->showDisplayWindow = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showDisplayWindow = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWEXTENSIONS:
-		m_config->globalFolderSettings.showExtensions = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->globalFolderSettings.showExtensions = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWFILEPREVIEWS:
-		m_config->showFilePreviews = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showFilePreviews = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWFOLDERS:
-		m_config->showFolders = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showFolders = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWFOLDERSIZES:
-		m_config->globalFolderSettings.showFolderSizes = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->globalFolderSettings.showFolderSizes = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWFRIENDLYDATES:
-		m_config->globalFolderSettings.showFriendlyDates = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->globalFolderSettings.showFriendlyDates = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWFULLTITLEPATH:
-		m_config->showFullTitlePath.set(NXMLSettings::DecodeBoolValue(wszValue));
+		m_config->showFullTitlePath.set(XMLSettings::DecodeBoolValue(wszValue));
 		break;
 
 	case HASH_SHOWGRIDLINESGLOBAL:
-		m_config->globalFolderSettings.showGridlines = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->globalFolderSettings.showGridlines = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWHIDDENGLOBAL:
-		m_config->defaultFolderSettings.showHidden = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->defaultFolderSettings.showHidden = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWINFOTIPS:
-		m_config->showInfoTips = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showInfoTips = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWINGROUPSGLOBAL:
-		m_config->defaultFolderSettings.showInGroups = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->defaultFolderSettings.showInGroups = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWPRIVILEGETITLEBAR:
-		m_config->showPrivilegeLevelInTitleBar.set(NXMLSettings::DecodeBoolValue(wszValue));
+		m_config->showPrivilegeLevelInTitleBar.set(XMLSettings::DecodeBoolValue(wszValue));
 		break;
 
 	case HASH_SHOWSTATUSBAR:
-		m_config->showStatusBar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showStatusBar = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWTABBARATBOTTOM:
-		m_config->showTabBarAtBottom.set(NXMLSettings::DecodeBoolValue(wszValue));
+		m_config->showTabBarAtBottom.set(XMLSettings::DecodeBoolValue(wszValue));
 		break;
 
 	case HASH_SHOWTASKBARTHUMBNAILS:
-		m_config->showTaskbarThumbnails = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showTaskbarThumbnails = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWTOOLBAR:
-		m_config->showMainToolbar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showMainToolbar = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWUSERNAMETITLEBAR:
-		m_config->showUserNameInTitleBar.set(NXMLSettings::DecodeBoolValue(wszValue));
+		m_config->showUserNameInTitleBar.set(XMLSettings::DecodeBoolValue(wszValue));
 		break;
 
 	case HASH_SIZEDISPLAYFOMRAT:
 		m_config->globalFolderSettings.sizeDisplayFormat =
-			SizeDisplayFormat::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
+			SizeDisplayFormat::_from_integral(XMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_SORTASCENDINGGLOBAL:
-		m_config->defaultFolderSettings.sortDirection = NXMLSettings::DecodeBoolValue(wszValue)
+		m_config->defaultFolderSettings.sortDirection = XMLSettings::DecodeBoolValue(wszValue)
 			? SortDirection::Ascending
 			: SortDirection::Descending;
 
 		if (!m_groupSortDirectionGlobalLoadedFromXml)
 		{
 			m_config->defaultFolderSettings.groupSortDirection =
-				NXMLSettings::DecodeBoolValue(wszValue) ? SortDirection::Ascending
-														: SortDirection::Descending;
+				XMLSettings::DecodeBoolValue(wszValue) ? SortDirection::Ascending
+													   : SortDirection::Descending;
 		}
 		break;
 
 	case HASH_STARTUPMODE:
-		m_config->startupMode = StartupMode::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
+		m_config->startupMode = StartupMode::_from_integral(XMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_SYNCHRONIZETREEVIEW:
-		m_config->synchronizeTreeview = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->synchronizeTreeview = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_TVAUTOEXPAND:
-		m_config->treeViewAutoExpandSelected = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->treeViewAutoExpandSelected = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_USEFULLROWSELECT:
-		m_config->useFullRowSelect = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->useFullRowSelect = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_TOOLBARSTATE:
@@ -1109,16 +1106,16 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 		break;
 
 	case HASH_TREEVIEWDELAYENABLED:
-		m_config->treeViewDelayEnabled = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->treeViewDelayEnabled = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_TREEVIEWWIDTH:
-		m_config->treeViewWidth = NXMLSettings::DecodeIntValue(wszValue);
+		m_config->treeViewWidth = XMLSettings::DecodeIntValue(wszValue);
 		break;
 
 	case HASH_VIEWMODEGLOBAL:
 		m_config->defaultFolderSettings.viewMode =
-			ViewMode::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
+			ViewMode::_from_integral(XMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_POSITION:
@@ -1145,23 +1142,23 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 
 			if (lstrcmp(bstrName.get(), L"Left") == 0)
 			{
-				wndpl.rcNormalPosition.left = NXMLSettings::DecodeIntValue(bstrValue.get());
+				wndpl.rcNormalPosition.left = XMLSettings::DecodeIntValue(bstrValue.get());
 			}
 			else if (lstrcmp(bstrName.get(), L"Top") == 0)
 			{
-				wndpl.rcNormalPosition.top = NXMLSettings::DecodeIntValue(bstrValue.get());
+				wndpl.rcNormalPosition.top = XMLSettings::DecodeIntValue(bstrValue.get());
 			}
 			else if (lstrcmp(bstrName.get(), L"Right") == 0)
 			{
-				wndpl.rcNormalPosition.right = NXMLSettings::DecodeIntValue(bstrValue.get());
+				wndpl.rcNormalPosition.right = XMLSettings::DecodeIntValue(bstrValue.get());
 			}
 			else if (lstrcmp(bstrName.get(), L"Bottom") == 0)
 			{
-				wndpl.rcNormalPosition.bottom = NXMLSettings::DecodeIntValue(bstrValue.get());
+				wndpl.rcNormalPosition.bottom = XMLSettings::DecodeIntValue(bstrValue.get());
 			}
 			else if (lstrcmp(bstrName.get(), L"Maximized") == 0)
 			{
-				bMaximized = NXMLSettings::DecodeBoolValue(bstrValue.get());
+				bMaximized = XMLSettings::DecodeBoolValue(bstrValue.get());
 			}
 		}
 
@@ -1182,56 +1179,55 @@ void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, W
 		break;
 
 	case HASH_INFOTIPTYPE:
-		m_config->infoTipType = InfoTipType::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
+		m_config->infoTipType = InfoTipType::_from_integral(XMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_ICON_THEME:
-		m_config->iconSet = IconSet::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
+		m_config->iconSet = IconSet::_from_integral(XMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_CHECK_PINNED_TO_NAMESPACE_TREE_PROPERTY:
-		m_config->checkPinnedToNamespaceTreeProperty = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->checkPinnedToNamespaceTreeProperty = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOW_QUICK_ACCESS_IN_TREEVIEW:
-		m_config->showQuickAccessInTreeView = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showQuickAccessInTreeView = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_THEME:
-		m_config->theme = Theme::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
+		m_config->theme = Theme::_from_integral(XMLSettings::DecodeIntValue(wszValue));
 		m_themeValueLoadedFromXml = true;
 		break;
 
 	case HASH_ENABLE_DARK_MODE:
 		if (!m_themeValueLoadedFromXml)
 		{
-			bool enableDarkMode = NXMLSettings::DecodeBoolValue(wszValue);
+			bool enableDarkMode = XMLSettings::DecodeBoolValue(wszValue);
 			m_config->theme = enableDarkMode ? Theme::Dark : Theme::Light;
 		}
 		break;
 
 	case HASH_DISPLAY_MIXED_FILES_AND_FOLDERS:
 		m_config->globalFolderSettings.displayMixedFilesAndFolders =
-			NXMLSettings::DecodeBoolValue(wszValue);
+			XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_USE_NATURAL_SORT_ORDER:
-		m_config->globalFolderSettings.useNaturalSortOrder =
-			NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->globalFolderSettings.useNaturalSortOrder = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_OPEN_TABS_IN_FOREGROUND:
-		m_config->openTabsInForeground = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->openTabsInForeground = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_GROUP_SORT_DIRECTION_GLOBAL:
 		m_config->defaultFolderSettings.groupSortDirection =
-			SortDirection::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
+			SortDirection::_from_integral(XMLSettings::DecodeIntValue(wszValue));
 		m_groupSortDirectionGlobalLoadedFromXml = true;
 		break;
 
 	case HASH_GO_UP_ON_DOUBLE_CLICK:
-		m_config->goUpOnDoubleClick = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->goUpOnDoubleClick = XMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_MAIN_FONT:

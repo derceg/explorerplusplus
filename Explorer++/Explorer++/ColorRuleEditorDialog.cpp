@@ -308,14 +308,14 @@ void ColorRuleEditorDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocume
 	for (int i = 0; i < SIZEOF_ARRAY(m_customColors); i++)
 	{
 		StringCchPrintf(szNode, SIZEOF_ARRAY(szNode), _T("r%d"), i);
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, szNode,
-			NXMLSettings::EncodeIntValue(GetRValue(m_customColors[i])));
+		XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, szNode,
+			XMLSettings::EncodeIntValue(GetRValue(m_customColors[i])));
 		StringCchPrintf(szNode, SIZEOF_ARRAY(szNode), _T("g%d"), i);
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, szNode,
-			NXMLSettings::EncodeIntValue(GetGValue(m_customColors[i])));
+		XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, szNode,
+			XMLSettings::EncodeIntValue(GetGValue(m_customColors[i])));
 		StringCchPrintf(szNode, SIZEOF_ARRAY(szNode), _T("b%d"), i);
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, szNode,
-			NXMLSettings::EncodeIntValue(GetBValue(m_customColors[i])));
+		XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, szNode,
+			XMLSettings::EncodeIntValue(GetBValue(m_customColors[i])));
 	}
 }
 
@@ -344,7 +344,7 @@ void ColorRuleEditorDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName
 		}
 
 		COLORREF clr = m_customColors[iIndex];
-		BYTE c = static_cast<BYTE>(NXMLSettings::DecodeIntValue(bstrValue));
+		BYTE c = static_cast<BYTE>(XMLSettings::DecodeIntValue(bstrValue));
 
 		if (CheckWildcardMatch(_T("r*"), bstrName, TRUE))
 		{

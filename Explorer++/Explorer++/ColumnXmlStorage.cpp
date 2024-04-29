@@ -138,7 +138,7 @@ void LoadColumnSetFromXml(IXMLDOMNode *parentNode, const std::wstring &columnSet
 		}
 
 		bool checked;
-		hr = NXMLSettings::GetBoolFromMap(attributeMap.get(), itr->first, checked);
+		hr = XMLSettings::GetBoolFromMap(attributeMap.get(), itr->first, checked);
 
 		if (FAILED(hr))
 		{
@@ -151,7 +151,7 @@ void LoadColumnSetFromXml(IXMLDOMNode *parentNode, const std::wstring &columnSet
 		column.width = DEFAULT_COLUMN_WIDTH;
 
 		int width;
-		hr = NXMLSettings::GetIntFromMap(attributeMap.get(), itr->first + WIDTH_SUFFIX, width);
+		hr = XMLSettings::GetIntFromMap(attributeMap.get(), itr->first + WIDTH_SUFFIX, width);
 
 		if (SUCCEEDED(hr))
 		{
@@ -173,18 +173,18 @@ void SaveColumnSetToXml(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode
 	const std::vector<Column_t> &columnSet, const std::wstring &columnSetName)
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> columnNode;
-	NXMLSettings::CreateElementNode(xmlDocument, &columnNode, parentNode, _T("Column"),
+	XMLSettings::CreateElementNode(xmlDocument, &columnNode, parentNode, _T("Column"),
 		columnSetName.c_str());
 
 	for (const auto &column : columnSet)
 	{
 		auto columnName = COLUMN_TYPE_NAME_MAPPINGS.left.at(column.type);
-		NXMLSettings::AddAttributeToNode(xmlDocument, columnNode.get(), columnName.c_str(),
-			NXMLSettings::EncodeBoolValue(column.checked));
+		XMLSettings::AddAttributeToNode(xmlDocument, columnNode.get(), columnName.c_str(),
+			XMLSettings::EncodeBoolValue(column.checked));
 
 		auto widthFieldName = columnName + WIDTH_SUFFIX;
-		NXMLSettings::AddAttributeToNode(xmlDocument, columnNode.get(), widthFieldName.c_str(),
-			NXMLSettings::EncodeIntValue(column.width));
+		XMLSettings::AddAttributeToNode(xmlDocument, columnNode.get(), widthFieldName.c_str(),
+			XMLSettings::EncodeIntValue(column.width));
 	}
 }
 

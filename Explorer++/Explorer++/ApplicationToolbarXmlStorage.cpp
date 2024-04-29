@@ -35,7 +35,7 @@ std::unique_ptr<Application> LoadApplication(IXMLDOMNode *parentNode)
 	}
 
 	std::wstring name;
-	hr = NXMLSettings::GetStringFromMap(attributeMap.get(), SETTING_NAME, name);
+	hr = XMLSettings::GetStringFromMap(attributeMap.get(), SETTING_NAME, name);
 
 	if (FAILED(hr))
 	{
@@ -43,7 +43,7 @@ std::unique_ptr<Application> LoadApplication(IXMLDOMNode *parentNode)
 	}
 
 	std::wstring command;
-	hr = NXMLSettings::GetStringFromMap(attributeMap.get(), SETTING_COMMAND, command);
+	hr = XMLSettings::GetStringFromMap(attributeMap.get(), SETTING_COMMAND, command);
 
 	if (FAILED(hr))
 	{
@@ -51,7 +51,7 @@ std::unique_ptr<Application> LoadApplication(IXMLDOMNode *parentNode)
 	}
 
 	bool showNameOnToolbar;
-	hr = NXMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_SHOW_NAME_ON_TOOLBAR,
+	hr = XMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_SHOW_NAME_ON_TOOLBAR,
 		showNameOnToolbar);
 
 	if (FAILED(hr))
@@ -92,13 +92,13 @@ void SaveApplication(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
 	const Application *application)
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> applicationNode;
-	NXMLSettings::CreateElementNode(xmlDocument, &applicationNode, parentNode,
+	XMLSettings::CreateElementNode(xmlDocument, &applicationNode, parentNode,
 		_T("ApplicationButton"), application->GetName().c_str());
-	NXMLSettings::AddAttributeToNode(xmlDocument, applicationNode.get(), SETTING_COMMAND,
+	XMLSettings::AddAttributeToNode(xmlDocument, applicationNode.get(), SETTING_COMMAND,
 		application->GetCommand().c_str());
-	NXMLSettings::AddAttributeToNode(xmlDocument, applicationNode.get(),
+	XMLSettings::AddAttributeToNode(xmlDocument, applicationNode.get(),
 		SETTING_SHOW_NAME_ON_TOOLBAR,
-		NXMLSettings::EncodeBoolValue(application->GetShowNameOnToolbar()));
+		XMLSettings::EncodeBoolValue(application->GetShowNameOnToolbar()));
 }
 
 void SaveToNode(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
@@ -141,7 +141,7 @@ void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *rootNode, const Applicat
 
 	SaveToNode(xmlDocument, applicationToolbarNode.get(), model);
 
-	NXMLSettings::AppendChildToParent(applicationToolbarNode.get(), rootNode);
+	XMLSettings::AppendChildToParent(applicationToolbarNode.get(), rootNode);
 }
 
 }

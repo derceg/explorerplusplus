@@ -146,7 +146,7 @@ std::optional<MainToolbarButtons> LoadFromXml(IXMLDOMNode *toolbarNode)
 		auto buttonAttributeName = std::format(XM_BUTTON_ATTRIBUTE_TEMPLATE, index);
 
 		std::wstring buttonName;
-		hr = NXMLSettings::GetStringFromMap(attributeMap.get(), buttonAttributeName, buttonName);
+		hr = XMLSettings::GetStringFromMap(attributeMap.get(), buttonAttributeName, buttonName);
 
 		if (FAILED(hr))
 		{
@@ -175,7 +175,7 @@ void SaveToXml(IXMLDOMDocument *xmlDocument, IXMLDOMElement *toolbarNode,
 	{
 		auto buttonAttributeName = std::format(XM_BUTTON_ATTRIBUTE_TEMPLATE, index);
 		auto buttonName = XML_BUTTON_NAME_MAPPINGS.left.at(button);
-		NXMLSettings::AddAttributeToNode(xmlDocument, toolbarNode, buttonAttributeName.c_str(),
+		XMLSettings::AddAttributeToNode(xmlDocument, toolbarNode, buttonAttributeName.c_str(),
 			buttonName.c_str());
 
 		index++;

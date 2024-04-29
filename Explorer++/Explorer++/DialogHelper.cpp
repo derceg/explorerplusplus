@@ -170,7 +170,7 @@ void LoadDialogStatesFromXML(IXMLDOMDocument *xmlDocument)
 void SaveDialogStatesToXML(IXMLDOMDocument *xmlDocument, IXMLDOMElement *rootNode)
 {
 	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
-	NXMLSettings::AddWhiteSpaceToNode(xmlDocument, bstr_wsnt.get(), rootNode);
+	XMLSettings::AddWhiteSpaceToNode(xmlDocument, bstr_wsnt.get(), rootNode);
 
 	wil::com_ptr_nothrow<IXMLDOMElement> pe;
 	auto bstr = wil::make_bstr_nothrow(DIALOGS_XML_KEY);
@@ -181,8 +181,8 @@ void SaveDialogStatesToXML(IXMLDOMDocument *xmlDocument, IXMLDOMElement *rootNod
 		ds->SaveXMLSettings(xmlDocument, pe.get());
 	}
 
-	NXMLSettings::AddWhiteSpaceToNode(xmlDocument, bstr_wsnt.get(), pe.get());
-	NXMLSettings::AppendChildToParent(pe.get(), rootNode);
+	XMLSettings::AddWhiteSpaceToNode(xmlDocument, bstr_wsnt.get(), pe.get());
+	XMLSettings::AppendChildToParent(pe.get(), rootNode);
 }
 
 }

@@ -56,7 +56,7 @@ std::optional<std::wstring> MaybeLoadDirectory(IXMLDOMNode *tabNode)
 	}
 
 	std::wstring directory;
-	hr = NXMLSettings::GetStringFromMap(attributeMap.get(), SETTING_DIRECTORY, directory);
+	hr = XMLSettings::GetStringFromMap(attributeMap.get(), SETTING_DIRECTORY, directory);
 
 	if (FAILED(hr))
 	{
@@ -71,7 +71,7 @@ void LoadBetterEnumValue(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &
 	T &output)
 {
 	int value;
-	HRESULT hr = NXMLSettings::GetIntFromMap(attributeMap, valueName, value);
+	HRESULT hr = XMLSettings::GetIntFromMap(attributeMap, valueName, value);
 
 	if (FAILED(hr) || !T::_is_valid(value))
 	{
@@ -85,7 +85,7 @@ void LoadBooleanSortDirection(IXMLDOMNamedNodeMap *attributeMap, const std::wstr
 	SortDirection &output)
 {
 	bool sortAscending;
-	HRESULT hr = NXMLSettings::GetBoolFromMap(attributeMap, valueName, sortAscending);
+	HRESULT hr = XMLSettings::GetBoolFromMap(attributeMap, valueName, sortAscending);
 
 	if (FAILED(hr))
 	{
@@ -116,17 +116,16 @@ FolderSettings LoadFolderSettings(IXMLDOMNode *tabNode)
 	LoadBetterEnumValue(attributeMap.get(), SETTING_GROUP_MODE, folderSettings.groupMode);
 	LoadBetterEnumValue(attributeMap.get(), SETTING_GROUP_SORT_DIRECTION,
 		folderSettings.groupSortDirection);
-	NXMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_SHOW_IN_GROUPS,
+	XMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_SHOW_IN_GROUPS,
 		folderSettings.showInGroups);
-	NXMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_APPLY_FILTER,
+	XMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_APPLY_FILTER,
 		folderSettings.applyFilter);
-	NXMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_FILTER_CASE_SENSITIVE,
+	XMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_FILTER_CASE_SENSITIVE,
 		folderSettings.filterCaseSensitive);
-	NXMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_SHOW_HIDDEN,
-		folderSettings.showHidden);
-	NXMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_AUTO_ARRANGE,
+	XMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_SHOW_HIDDEN, folderSettings.showHidden);
+	XMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_AUTO_ARRANGE,
 		folderSettings.autoArrange);
-	NXMLSettings::GetStringFromMap(attributeMap.get(), SETTING_FILTER, folderSettings.filter);
+	XMLSettings::GetStringFromMap(attributeMap.get(), SETTING_FILTER, folderSettings.filter);
 
 	return folderSettings;
 }
@@ -160,10 +159,10 @@ TabSettings LoadTabSettings(IXMLDOMNode *tabNode)
 	}
 
 	bool locked = false;
-	NXMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_TAB_LOCKED, locked);
+	XMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_TAB_LOCKED, locked);
 
 	bool addressLocked = false;
-	NXMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_TAB_ADDRESS_LOCKED, addressLocked);
+	XMLSettings::GetBoolFromMap(attributeMap.get(), SETTING_TAB_ADDRESS_LOCKED, addressLocked);
 
 	if (addressLocked)
 	{
@@ -175,7 +174,7 @@ TabSettings LoadTabSettings(IXMLDOMNode *tabNode)
 	}
 
 	std::wstring customName;
-	NXMLSettings::GetStringFromMap(attributeMap.get(), SETTING_TAB_CUSTOM_NAME, customName);
+	XMLSettings::GetStringFromMap(attributeMap.get(), SETTING_TAB_CUSTOM_NAME, customName);
 	tabSettings.name = customName;
 
 	return tabSettings;
@@ -201,30 +200,30 @@ std::optional<TabStorageData> LoadTabInfo(IXMLDOMNode *tabNode)
 void SaveFolderSettings(IXMLDOMDocument *xmlDocument, IXMLDOMElement *tabNode,
 	const FolderSettings &folderSettings)
 {
-	NXMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_VIEW_MODE,
-		NXMLSettings::EncodeIntValue(folderSettings.viewMode));
-	NXMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_SORT_MODE,
-		NXMLSettings::EncodeIntValue(folderSettings.sortMode));
+	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_VIEW_MODE,
+		XMLSettings::EncodeIntValue(folderSettings.viewMode));
+	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_SORT_MODE,
+		XMLSettings::EncodeIntValue(folderSettings.sortMode));
 
 	// For backwards compatibility, the value saved here is a bool.
-	NXMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_SORT_ASCENDING,
-		NXMLSettings::EncodeBoolValue(folderSettings.sortDirection == +SortDirection::Ascending));
+	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_SORT_ASCENDING,
+		XMLSettings::EncodeBoolValue(folderSettings.sortDirection == +SortDirection::Ascending));
 
-	NXMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_GROUP_MODE,
-		NXMLSettings::EncodeIntValue(folderSettings.groupMode));
-	NXMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_GROUP_SORT_DIRECTION,
-		NXMLSettings::EncodeIntValue(folderSettings.groupSortDirection));
-	NXMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_SHOW_IN_GROUPS,
-		NXMLSettings::EncodeBoolValue(folderSettings.showInGroups));
-	NXMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_APPLY_FILTER,
-		NXMLSettings::EncodeBoolValue(folderSettings.applyFilter));
-	NXMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_FILTER_CASE_SENSITIVE,
-		NXMLSettings::EncodeBoolValue(folderSettings.filterCaseSensitive));
-	NXMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_SHOW_HIDDEN,
-		NXMLSettings::EncodeBoolValue(folderSettings.showHidden));
-	NXMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_AUTO_ARRANGE,
-		NXMLSettings::EncodeBoolValue(folderSettings.autoArrange));
-	NXMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_FILTER,
+	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_GROUP_MODE,
+		XMLSettings::EncodeIntValue(folderSettings.groupMode));
+	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_GROUP_SORT_DIRECTION,
+		XMLSettings::EncodeIntValue(folderSettings.groupSortDirection));
+	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_SHOW_IN_GROUPS,
+		XMLSettings::EncodeBoolValue(folderSettings.showInGroups));
+	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_APPLY_FILTER,
+		XMLSettings::EncodeBoolValue(folderSettings.applyFilter));
+	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_FILTER_CASE_SENSITIVE,
+		XMLSettings::EncodeBoolValue(folderSettings.filterCaseSensitive));
+	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_SHOW_HIDDEN,
+		XMLSettings::EncodeBoolValue(folderSettings.showHidden));
+	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_AUTO_ARRANGE,
+		XMLSettings::EncodeBoolValue(folderSettings.autoArrange));
+	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_FILTER,
 		folderSettings.filter.c_str());
 }
 
@@ -242,28 +241,28 @@ void SaveColumns(IXMLDOMDocument *xmlDocument, IXMLDOMElement *tabNode,
 
 	ColumnXmlStorage::SaveAllColumnSets(xmlDocument, columnsNode.get(), columns);
 
-	NXMLSettings::AppendChildToParent(columnsNode.get(), tabNode);
+	XMLSettings::AppendChildToParent(columnsNode.get(), tabNode);
 }
 
 void SaveTabSettings(IXMLDOMDocument *xmlDocument, IXMLDOMElement *tabNode,
 	const TabSettings &tabSettings)
 {
-	NXMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_TAB_LOCKED,
-		NXMLSettings::EncodeBoolValue(tabSettings.lockState == Tab::LockState::Locked));
-	NXMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_TAB_ADDRESS_LOCKED,
-		NXMLSettings::EncodeBoolValue(tabSettings.lockState == Tab::LockState::AddressLocked));
+	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_TAB_LOCKED,
+		XMLSettings::EncodeBoolValue(tabSettings.lockState == Tab::LockState::Locked));
+	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_TAB_ADDRESS_LOCKED,
+		XMLSettings::EncodeBoolValue(tabSettings.lockState == Tab::LockState::AddressLocked));
 
 	std::wstring customName = tabSettings.name ? *tabSettings.name : L"";
-	NXMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_TAB_CUSTOM_NAME,
+	XMLSettings::AddAttributeToNode(xmlDocument, tabNode, SETTING_TAB_CUSTOM_NAME,
 		customName.c_str());
 }
 
 void SaveTabInfo(IXMLDOMDocument *xmlDocument, IXMLDOMElement *tabsNode, const TabStorageData &tab)
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> tabNode;
-	NXMLSettings::CreateElementNode(xmlDocument, &tabNode, tabsNode, TAB_NODE_NAME, L"");
+	XMLSettings::CreateElementNode(xmlDocument, &tabNode, tabsNode, TAB_NODE_NAME, L"");
 
-	NXMLSettings::AddAttributeToNode(xmlDocument, tabNode.get(), SETTING_DIRECTORY,
+	XMLSettings::AddAttributeToNode(xmlDocument, tabNode.get(), SETTING_DIRECTORY,
 		tab.directory.c_str());
 
 	SaveFolderSettings(xmlDocument, tabNode.get(), tab.folderSettings);

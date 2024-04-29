@@ -47,7 +47,7 @@ LoadSaveXML::~LoadSaveXML()
 
 void LoadSaveXML::InitializeLoadEnvironment()
 {
-	m_pXMLDom.attach(NXMLSettings::DomFromCOM());
+	m_pXMLDom.attach(XMLSettings::DomFromCOM());
 
 	if (!m_pXMLDom)
 	{
@@ -59,7 +59,7 @@ void LoadSaveXML::InitializeLoadEnvironment()
 	PathRemoveFileSpec(szConfigFile);
 	PathAppend(szConfigFile, NExplorerplusplus::XML_FILENAME);
 
-	wil::unique_variant var(NXMLSettings::VariantString(NExplorerplusplus::XML_FILENAME));
+	wil::unique_variant var(XMLSettings::VariantString(NExplorerplusplus::XML_FILENAME));
 	VARIANT_BOOL status;
 	m_pXMLDom->load(var, &status);
 
@@ -71,7 +71,7 @@ void LoadSaveXML::InitializeLoadEnvironment()
 
 void LoadSaveXML::InitializeSaveEnvironment()
 {
-	m_pXMLDom.attach(NXMLSettings::DomFromCOM());
+	m_pXMLDom.attach(XMLSettings::DomFromCOM());
 
 	if (!m_pXMLDom)
 	{
@@ -83,29 +83,29 @@ void LoadSaveXML::InitializeSaveEnvironment()
 	auto bstr = wil::make_bstr_nothrow(L"xml");
 	auto bstr1 = wil::make_bstr_nothrow(L"version='1.0'");
 	m_pXMLDom->createProcessingInstruction(bstr.get(), bstr1.get(), &pi);
-	NXMLSettings::AppendChildToParent(pi.get(), m_pXMLDom.get());
+	XMLSettings::AppendChildToParent(pi.get(), m_pXMLDom.get());
 
 	/* Short header comment, explaining file purpose. */
 	wil::com_ptr_nothrow<IXMLDOMComment> pc;
 	bstr = wil::make_bstr_nothrow(L" Preference file for Explorer++ ");
 	m_pXMLDom->createComment(bstr.get(), &pc);
-	NXMLSettings::AppendChildToParent(pc.get(), m_pXMLDom.get());
+	XMLSettings::AppendChildToParent(pc.get(), m_pXMLDom.get());
 
 	/* Create the root element. CANNOT use '+' signs
 	within the element name. */
 	bstr = wil::make_bstr_nothrow(L"ExplorerPlusPlus");
 	m_pXMLDom->createElement(bstr.get(), &m_pRoot);
 
-	NXMLSettings::AppendChildToParent(m_pRoot.get(), m_pXMLDom.get());
+	XMLSettings::AppendChildToParent(m_pRoot.get(), m_pXMLDom.get());
 
 	auto bstr_wsnt = wil::make_bstr_nothrow(L"\n\t");
-	NXMLSettings::AddWhiteSpaceToNode(m_pXMLDom.get(), bstr_wsnt.get(), m_pRoot.get());
+	XMLSettings::AddWhiteSpaceToNode(m_pXMLDom.get(), bstr_wsnt.get(), m_pRoot.get());
 }
 
 void LoadSaveXML::ReleaseSaveEnvironment()
 {
 	auto bstr_wsn = wil::make_bstr_nothrow(L"\n");
-	NXMLSettings::AddWhiteSpaceToNode(m_pXMLDom.get(), bstr_wsn.get(), m_pRoot.get());
+	XMLSettings::AddWhiteSpaceToNode(m_pXMLDom.get(), bstr_wsn.get(), m_pRoot.get());
 
 	wil::unique_bstr bstr;
 	m_pXMLDom->get_xml(&bstr);
@@ -122,7 +122,7 @@ void LoadSaveXML::ReleaseSaveEnvironment()
 	PathRemoveFileSpec(szConfigFile);
 	PathAppend(szConfigFile, NExplorerplusplus::XML_FILENAME);
 
-	wil::unique_variant var(NXMLSettings::VariantString(szConfigFile));
+	wil::unique_variant var(XMLSettings::VariantString(szConfigFile));
 	m_pXMLDom->save(var);
 }
 

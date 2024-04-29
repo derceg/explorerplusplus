@@ -396,20 +396,20 @@ void MassRenameDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 void MassRenameDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
 	IXMLDOMElement *pParentNode)
 {
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_COLUMN_WIDTH_1,
-		NXMLSettings::EncodeIntValue(m_iColumnWidth1));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_COLUMN_WIDTH_2,
-		NXMLSettings::EncodeIntValue(m_iColumnWidth2));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_COLUMN_WIDTH_1,
+		XMLSettings::EncodeIntValue(m_iColumnWidth1));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_COLUMN_WIDTH_2,
+		XMLSettings::EncodeIntValue(m_iColumnWidth2));
 }
 
 void MassRenameDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue)
 {
 	if (lstrcmpi(bstrName, SETTING_COLUMN_WIDTH_1) == 0)
 	{
-		m_iColumnWidth1 = NXMLSettings::DecodeIntValue(bstrValue);
+		m_iColumnWidth1 = XMLSettings::DecodeIntValue(bstrValue);
 	}
 	else if (lstrcmpi(bstrName, SETTING_COLUMN_WIDTH_2) == 0)
 	{
-		m_iColumnWidth2 = NXMLSettings::DecodeIntValue(bstrValue);
+		m_iColumnWidth2 = XMLSettings::DecodeIntValue(bstrValue);
 	}
 }

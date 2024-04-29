@@ -78,7 +78,7 @@ std::unique_ptr<CustomFont> LoadCustomFontFromXml(IXMLDOMNode *parentNode)
 	}
 
 	std::wstring name;
-	hr = NXMLSettings::GetStringFromMap(attributeMap.get(), SETTING_NAME, name);
+	hr = XMLSettings::GetStringFromMap(attributeMap.get(), SETTING_NAME, name);
 
 	if (hr != S_OK)
 	{
@@ -86,7 +86,7 @@ std::unique_ptr<CustomFont> LoadCustomFontFromXml(IXMLDOMNode *parentNode)
 	}
 
 	int size;
-	hr = NXMLSettings::GetIntFromMap(attributeMap.get(), SETTING_SIZE, size);
+	hr = XMLSettings::GetIntFromMap(attributeMap.get(), SETTING_SIZE, size);
 
 	if (hr != S_OK)
 	{
@@ -99,8 +99,8 @@ std::unique_ptr<CustomFont> LoadCustomFontFromXml(IXMLDOMNode *parentNode)
 void SaveCustomFontToXml(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
 	const CustomFont &customFont)
 {
-	NXMLSettings::AddAttributeToNode(xmlDocument, parentNode, SETTING_NAME,
+	XMLSettings::AddAttributeToNode(xmlDocument, parentNode, SETTING_NAME,
 		customFont.GetName().c_str());
-	NXMLSettings::AddAttributeToNode(xmlDocument, parentNode, SETTING_SIZE,
-		NXMLSettings::EncodeIntValue(customFont.GetSize()));
+	XMLSettings::AddAttributeToNode(xmlDocument, parentNode, SETTING_SIZE,
+		XMLSettings::EncodeIntValue(customFont.GetSize()));
 }

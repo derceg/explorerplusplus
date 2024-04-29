@@ -260,8 +260,8 @@ void DestroyFilesDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 void DestroyFilesDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
 	IXMLDOMElement *pParentNode)
 {
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_OVERWRITE_METHOD,
-		NXMLSettings::EncodeIntValue(static_cast<int>(m_overwriteMethod)));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_OVERWRITE_METHOD,
+		XMLSettings::EncodeIntValue(static_cast<int>(m_overwriteMethod)));
 }
 
 void DestroyFilesDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue)
@@ -269,6 +269,6 @@ void DestroyFilesDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName, B
 	if (lstrcmpi(bstrName, SETTING_OVERWRITE_METHOD) == 0)
 	{
 		m_overwriteMethod =
-			static_cast<FileOperations::OverwriteMethod>(NXMLSettings::DecodeIntValue(bstrValue));
+			static_cast<FileOperations::OverwriteMethod>(XMLSettings::DecodeIntValue(bstrValue));
 	}
 }

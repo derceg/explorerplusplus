@@ -89,11 +89,11 @@ void V2::LoadPermanentFolder(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree
 		childNode->get_attributes(&attributeMap);
 
 		FILETIME dateCreated;
-		NXMLSettings::ReadDateTime(attributeMap.get(), _T("DateCreated"), dateCreated);
+		XMLSettings::ReadDateTime(attributeMap.get(), _T("DateCreated"), dateCreated);
 		bookmarkItem->SetDateCreated(dateCreated);
 
 		FILETIME dateModified;
-		NXMLSettings::ReadDateTime(attributeMap.get(), _T("DateModified"), dateModified);
+		XMLSettings::ReadDateTime(attributeMap.get(), _T("DateModified"), dateModified);
 		bookmarkItem->SetDateModified(dateModified);
 
 		LoadBookmarkChildren(childNode.get(), bookmarkTree, bookmarkItem);
@@ -130,20 +130,20 @@ std::unique_ptr<BookmarkItem> V2::LoadBookmarkItem(IXMLDOMNode *parentNode,
 	parentNode->get_attributes(&attributeMap);
 
 	int type;
-	NXMLSettings::GetIntFromMap(attributeMap.get(), L"Type", type);
+	XMLSettings::GetIntFromMap(attributeMap.get(), L"Type", type);
 
 	std::wstring guid;
-	NXMLSettings::GetStringFromMap(attributeMap.get(), L"GUID", guid);
+	XMLSettings::GetStringFromMap(attributeMap.get(), L"GUID", guid);
 
 	std::wstring name;
-	NXMLSettings::GetStringFromMap(attributeMap.get(), L"ItemName", name);
+	XMLSettings::GetStringFromMap(attributeMap.get(), L"ItemName", name);
 
 	std::optional<std::wstring> locationOptional;
 
 	if (type == static_cast<int>(BookmarkItem::Type::Bookmark))
 	{
 		std::wstring location;
-		NXMLSettings::GetStringFromMap(attributeMap.get(), L"Location", location);
+		XMLSettings::GetStringFromMap(attributeMap.get(), L"Location", location);
 
 		locationOptional = location;
 	}
@@ -151,11 +151,11 @@ std::unique_ptr<BookmarkItem> V2::LoadBookmarkItem(IXMLDOMNode *parentNode,
 	auto bookmarkItem = std::make_unique<BookmarkItem>(guid, name, locationOptional);
 
 	FILETIME dateCreated;
-	NXMLSettings::ReadDateTime(attributeMap.get(), _T("DateCreated"), dateCreated);
+	XMLSettings::ReadDateTime(attributeMap.get(), _T("DateCreated"), dateCreated);
 	bookmarkItem->SetDateCreated(dateCreated);
 
 	FILETIME dateModified;
-	NXMLSettings::ReadDateTime(attributeMap.get(), _T("DateModified"), dateModified);
+	XMLSettings::ReadDateTime(attributeMap.get(), _T("DateModified"), dateModified);
 	bookmarkItem->SetDateModified(dateModified);
 
 	if (type == static_cast<int>(BookmarkItem::Type::Folder))
@@ -220,22 +220,22 @@ std::unique_ptr<BookmarkItem> V1::LoadBookmarkItem(IXMLDOMNode *parentNode,
 	parentNode->get_attributes(&attributeMap);
 
 	int type;
-	NXMLSettings::GetIntFromMap(attributeMap.get(), L"Type", type);
+	XMLSettings::GetIntFromMap(attributeMap.get(), L"Type", type);
 
 	std::wstring name;
-	NXMLSettings::GetStringFromMap(attributeMap.get(), L"name", name);
+	XMLSettings::GetStringFromMap(attributeMap.get(), L"name", name);
 
 	std::wstring showOnToolbar;
-	NXMLSettings::GetStringFromMap(attributeMap.get(), L"ShowOnBookmarksToolbar", showOnToolbar);
+	XMLSettings::GetStringFromMap(attributeMap.get(), L"ShowOnBookmarksToolbar", showOnToolbar);
 
-	showOnToolbarOutput = NXMLSettings::DecodeBoolValue(showOnToolbar.c_str());
+	showOnToolbarOutput = XMLSettings::DecodeBoolValue(showOnToolbar.c_str());
 
 	std::optional<std::wstring> locationOptional;
 
 	if (type == static_cast<int>(BookmarkStorage::BookmarkTypeV1::Bookmark))
 	{
 		std::wstring location;
-		NXMLSettings::GetStringFromMap(attributeMap.get(), L"Location", location);
+		XMLSettings::GetStringFromMap(attributeMap.get(), L"Location", location);
 
 		locationOptional = location;
 	}
@@ -262,7 +262,7 @@ void BookmarkXmlStorage::Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *pare
 {
 	auto newline =
 		wil::make_bstr_nothrow((std::wstring(L"\n") + std::wstring(indent, '\t')).c_str());
-	NXMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), parentNode);
+	XMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), parentNode);
 
 	wil::com_ptr_nothrow<IXMLDOMElement> bookmarksNode;
 	auto bookmarksKeyNodeName = wil::make_bstr_nothrow(V2::bookmarksKeyNodeName);
@@ -272,8 +272,8 @@ void BookmarkXmlStorage::Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *pare
 	{
 		V2::Save(xmlDocument, bookmarksNode.get(), bookmarkTree, indent + 1);
 
-		NXMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), bookmarksNode.get());
-		NXMLSettings::AppendChildToParent(bookmarksNode.get(), parentNode);
+		XMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), bookmarksNode.get());
+		XMLSettings::AppendChildToParent(bookmarksNode.get(), parentNode);
 	}
 }
 
@@ -293,20 +293,20 @@ void V2::SavePermanentFolder(IXMLDOMDocument *xmlDocument, IXMLDOMElement *paren
 {
 	auto newline =
 		wil::make_bstr_nothrow((std::wstring(L"\n") + std::wstring(indent, '\t')).c_str());
-	NXMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), parentNode);
+	XMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), parentNode);
 
 	wil::com_ptr_nothrow<IXMLDOMElement> childNode;
-	NXMLSettings::CreateElementNode(xmlDocument, &childNode, parentNode, L"PermanentItem",
+	XMLSettings::CreateElementNode(xmlDocument, &childNode, parentNode, L"PermanentItem",
 		name.c_str());
 
-	NXMLSettings::SaveDateTime(xmlDocument, childNode.get(), _T("DateCreated"),
+	XMLSettings::SaveDateTime(xmlDocument, childNode.get(), _T("DateCreated"),
 		bookmarkItem->GetDateCreated());
-	NXMLSettings::SaveDateTime(xmlDocument, childNode.get(), _T("DateModified"),
+	XMLSettings::SaveDateTime(xmlDocument, childNode.get(), _T("DateModified"),
 		bookmarkItem->GetDateModified());
 
 	SaveBookmarkChildren(xmlDocument, childNode.get(), bookmarkItem, indent + 1);
 
-	NXMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), childNode.get());
+	XMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), childNode.get());
 }
 
 void V2::SaveBookmarkChildren(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
@@ -318,15 +318,15 @@ void V2::SaveBookmarkChildren(IXMLDOMDocument *xmlDocument, IXMLDOMElement *pare
 	{
 		auto newline =
 			wil::make_bstr_nothrow((std::wstring(L"\n") + std::wstring(indent, '\t')).c_str());
-		NXMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), parentNode);
+		XMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), parentNode);
 
 		wil::com_ptr_nothrow<IXMLDOMElement> childNode;
-		NXMLSettings::CreateElementNode(xmlDocument, &childNode, parentNode, _T("Bookmark"),
+		XMLSettings::CreateElementNode(xmlDocument, &childNode, parentNode, _T("Bookmark"),
 			std::to_wstring(index).c_str());
 
 		SaveBookmarkItem(xmlDocument, childNode.get(), child.get(), indent);
 
-		NXMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), childNode.get());
+		XMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), childNode.get());
 
 		index++;
 	}
@@ -335,22 +335,22 @@ void V2::SaveBookmarkChildren(IXMLDOMDocument *xmlDocument, IXMLDOMElement *pare
 void V2::SaveBookmarkItem(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
 	const BookmarkItem *bookmarkItem, int indent)
 {
-	NXMLSettings::AddAttributeToNode(xmlDocument, parentNode, _T("Type"),
-		NXMLSettings::EncodeIntValue(static_cast<int>(bookmarkItem->GetType())));
-	NXMLSettings::AddAttributeToNode(xmlDocument, parentNode, _T("GUID"),
+	XMLSettings::AddAttributeToNode(xmlDocument, parentNode, _T("Type"),
+		XMLSettings::EncodeIntValue(static_cast<int>(bookmarkItem->GetType())));
+	XMLSettings::AddAttributeToNode(xmlDocument, parentNode, _T("GUID"),
 		bookmarkItem->GetGUID().c_str());
-	NXMLSettings::AddAttributeToNode(xmlDocument, parentNode, _T("ItemName"),
+	XMLSettings::AddAttributeToNode(xmlDocument, parentNode, _T("ItemName"),
 		bookmarkItem->GetName().c_str());
 
 	if (bookmarkItem->GetType() == BookmarkItem::Type::Bookmark)
 	{
-		NXMLSettings::AddAttributeToNode(xmlDocument, parentNode, _T("Location"),
+		XMLSettings::AddAttributeToNode(xmlDocument, parentNode, _T("Location"),
 			bookmarkItem->GetLocation().c_str());
 	}
 
-	NXMLSettings::SaveDateTime(xmlDocument, parentNode, _T("DateCreated"),
+	XMLSettings::SaveDateTime(xmlDocument, parentNode, _T("DateCreated"),
 		bookmarkItem->GetDateCreated());
-	NXMLSettings::SaveDateTime(xmlDocument, parentNode, _T("DateModified"),
+	XMLSettings::SaveDateTime(xmlDocument, parentNode, _T("DateModified"),
 		bookmarkItem->GetDateModified());
 
 	if (bookmarkItem->GetType() == BookmarkItem::Type::Folder)

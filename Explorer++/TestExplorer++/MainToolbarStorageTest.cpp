@@ -158,7 +158,7 @@ TEST_F(MainToolbarXmlStorageTest, Save)
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	wil::com_ptr_nothrow<IXMLDOMElement> mainToolbarNode;
-	NXMLSettings::CreateElementNode(xmlDocumentData->xmlDocument.get(), &mainToolbarNode,
+	XMLSettings::CreateElementNode(xmlDocumentData->xmlDocument.get(), &mainToolbarNode,
 		settingsNode.get(), L"Setting", NODE_NAME);
 	MainToolbarStorage::SaveToXml(xmlDocumentData->xmlDocument.get(), mainToolbarNode.get(),
 		referenceButtons);

@@ -1290,51 +1290,50 @@ void SearchDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 void SearchDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
 	IXMLDOMElement *pParentNode)
 {
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_COLUMN_WIDTH_1,
-		NXMLSettings::EncodeIntValue(m_iColumnWidth1));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_COLUMN_WIDTH_2,
-		NXMLSettings::EncodeIntValue(m_iColumnWidth2));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SEARCH_DIRECTORY_TEXT,
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_COLUMN_WIDTH_1,
+		XMLSettings::EncodeIntValue(m_iColumnWidth1));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_COLUMN_WIDTH_2,
+		XMLSettings::EncodeIntValue(m_iColumnWidth2));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SEARCH_DIRECTORY_TEXT,
 		m_searchPattern.c_str());
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SEARCH_SUB_FOLDERS,
-		NXMLSettings::EncodeBoolValue(m_bSearchSubFolders));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_USE_REGULAR_EXPRESSIONS,
-		NXMLSettings::EncodeBoolValue(m_bUseRegularExpressions));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_CASE_INSENSITIVE,
-		NXMLSettings::EncodeBoolValue(m_bCaseInsensitive));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_ARCHIVE,
-		NXMLSettings::EncodeBoolValue(m_bArchive));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_HIDDEN,
-		NXMLSettings::EncodeBoolValue(m_bHidden));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_READ_ONLY,
-		NXMLSettings::EncodeBoolValue(m_bReadOnly));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SYSTEM,
-		NXMLSettings::EncodeBoolValue(m_bSystem));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SORT_MODE,
-		NXMLSettings::EncodeIntValue(static_cast<int>(m_SortMode)));
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SORT_ASCENDING,
-		NXMLSettings::EncodeBoolValue(m_bSortAscending));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SEARCH_SUB_FOLDERS,
+		XMLSettings::EncodeBoolValue(m_bSearchSubFolders));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_USE_REGULAR_EXPRESSIONS,
+		XMLSettings::EncodeBoolValue(m_bUseRegularExpressions));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_CASE_INSENSITIVE,
+		XMLSettings::EncodeBoolValue(m_bCaseInsensitive));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_ARCHIVE,
+		XMLSettings::EncodeBoolValue(m_bArchive));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_HIDDEN,
+		XMLSettings::EncodeBoolValue(m_bHidden));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_READ_ONLY,
+		XMLSettings::EncodeBoolValue(m_bReadOnly));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SYSTEM,
+		XMLSettings::EncodeBoolValue(m_bSystem));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SORT_MODE,
+		XMLSettings::EncodeIntValue(static_cast<int>(m_SortMode)));
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SORT_ASCENDING,
+		XMLSettings::EncodeBoolValue(m_bSortAscending));
 
 	std::list<std::wstring> searchDirectoriesList;
 	CircularBufferToList(m_searchDirectories, searchDirectoriesList);
-	NXMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_DIRECTORY_LIST,
+	XMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_DIRECTORY_LIST,
 		searchDirectoriesList);
 
 	std::list<std::wstring> searchPatternList;
 	CircularBufferToList(m_searchPatterns, searchPatternList);
-	NXMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_PATTERN_LIST,
-		searchPatternList);
+	XMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_PATTERN_LIST, searchPatternList);
 }
 
 void SearchDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue)
 {
 	if (lstrcmpi(bstrName, SETTING_COLUMN_WIDTH_1) == 0)
 	{
-		m_iColumnWidth1 = NXMLSettings::DecodeIntValue(bstrValue);
+		m_iColumnWidth1 = XMLSettings::DecodeIntValue(bstrValue);
 	}
 	else if (lstrcmpi(bstrName, SETTING_COLUMN_WIDTH_2) == 0)
 	{
-		m_iColumnWidth2 = NXMLSettings::DecodeIntValue(bstrValue);
+		m_iColumnWidth2 = XMLSettings::DecodeIntValue(bstrValue);
 	}
 	else if (lstrcmpi(bstrName, SETTING_SEARCH_DIRECTORY_TEXT) == 0)
 	{
@@ -1342,39 +1341,39 @@ void SearchDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName, BSTR bs
 	}
 	else if (lstrcmpi(bstrName, SETTING_SEARCH_SUB_FOLDERS) == 0)
 	{
-		m_bSearchSubFolders = NXMLSettings::DecodeBoolValue(bstrValue);
+		m_bSearchSubFolders = XMLSettings::DecodeBoolValue(bstrValue);
 	}
 	else if (lstrcmpi(bstrName, SETTING_USE_REGULAR_EXPRESSIONS) == 0)
 	{
-		m_bUseRegularExpressions = NXMLSettings::DecodeBoolValue(bstrValue);
+		m_bUseRegularExpressions = XMLSettings::DecodeBoolValue(bstrValue);
 	}
 	else if (lstrcmpi(bstrName, SETTING_CASE_INSENSITIVE) == 0)
 	{
-		m_bCaseInsensitive = NXMLSettings::DecodeBoolValue(bstrValue);
+		m_bCaseInsensitive = XMLSettings::DecodeBoolValue(bstrValue);
 	}
 	else if (lstrcmpi(bstrName, SETTING_ARCHIVE) == 0)
 	{
-		m_bArchive = NXMLSettings::DecodeBoolValue(bstrValue);
+		m_bArchive = XMLSettings::DecodeBoolValue(bstrValue);
 	}
 	else if (lstrcmpi(bstrName, SETTING_HIDDEN) == 0)
 	{
-		m_bHidden = NXMLSettings::DecodeBoolValue(bstrValue);
+		m_bHidden = XMLSettings::DecodeBoolValue(bstrValue);
 	}
 	else if (lstrcmpi(bstrName, SETTING_READ_ONLY) == 0)
 	{
-		m_bReadOnly = NXMLSettings::DecodeBoolValue(bstrValue);
+		m_bReadOnly = XMLSettings::DecodeBoolValue(bstrValue);
 	}
 	else if (lstrcmpi(bstrName, SETTING_SYSTEM) == 0)
 	{
-		m_bSystem = NXMLSettings::DecodeBoolValue(bstrValue);
+		m_bSystem = XMLSettings::DecodeBoolValue(bstrValue);
 	}
 	else if (lstrcmpi(bstrName, SETTING_SORT_MODE) == 0)
 	{
-		m_SortMode = static_cast<SortMode>(NXMLSettings::DecodeIntValue(bstrValue));
+		m_SortMode = static_cast<SortMode>(XMLSettings::DecodeIntValue(bstrValue));
 	}
 	else if (lstrcmpi(bstrName, SETTING_SORT_ASCENDING) == 0)
 	{
-		m_bSortAscending = NXMLSettings::DecodeBoolValue(bstrValue);
+		m_bSortAscending = XMLSettings::DecodeBoolValue(bstrValue);
 	}
 	else if (CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, bstrName,
 				 lstrlen(SETTING_DIRECTORY_LIST), SETTING_DIRECTORY_LIST,

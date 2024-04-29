@@ -9,8 +9,9 @@
 #include <objbase.h>
 #include <list>
 
-namespace NXMLSettings
+namespace XMLSettings
 {
+
 IXMLDOMDocument *DomFromCOM();
 void WriteStandardSetting(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pGrandparentNode,
 	const TCHAR *szElementName, const TCHAR *szAttributeName, const TCHAR *szAttributeValue);
@@ -43,4 +44,5 @@ HRESULT GetBoolFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &na
 	bool &outputValue);
 HRESULT GetStringFromMap(IXMLDOMNamedNodeMap *attributeMap, const std::wstring &name,
 	std::wstring &outputValue);
+
 }

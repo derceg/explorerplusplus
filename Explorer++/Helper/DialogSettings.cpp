@@ -95,22 +95,22 @@ void DialogSettings::SaveXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *p
 	}
 
 	auto bstr_wsntt = wil::make_bstr_nothrow(L"\n\t\t");
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe);
+	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe);
 
 	wil::com_ptr_nothrow<IXMLDOMElement> pParentNode;
-	NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe, _T("DialogState"),
+	XMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe, _T("DialogState"),
 		m_szSettingsKey.c_str());
 
 	if (m_bSavePosition)
 	{
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), SETTING_POSITION_X,
-			NXMLSettings::EncodeIntValue(m_ptDialog.x));
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), SETTING_POSITION_Y,
-			NXMLSettings::EncodeIntValue(m_ptDialog.y));
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), SETTING_WIDTH,
-			NXMLSettings::EncodeIntValue(m_iWidth));
-		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), SETTING_HEIGHT,
-			NXMLSettings::EncodeIntValue(m_iHeight));
+		XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), SETTING_POSITION_X,
+			XMLSettings::EncodeIntValue(m_ptDialog.x));
+		XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), SETTING_POSITION_Y,
+			XMLSettings::EncodeIntValue(m_ptDialog.y));
+		XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), SETTING_WIDTH,
+			XMLSettings::EncodeIntValue(m_iWidth));
+		XMLSettings::AddAttributeToNode(pXMLDom, pParentNode.get(), SETTING_HEIGHT,
+			XMLSettings::EncodeIntValue(m_iHeight));
 	}
 
 	SaveExtraXMLSettings(pXMLDom, pParentNode.get());
@@ -135,22 +135,22 @@ void DialogSettings::LoadXMLSettings(IXMLDOMNamedNodeMap *pam, long lChildNodes)
 		{
 			if (lstrcmpi(bstrName.get(), SETTING_POSITION_X) == 0)
 			{
-				m_ptDialog.x = NXMLSettings::DecodeIntValue(bstrValue.get());
+				m_ptDialog.x = XMLSettings::DecodeIntValue(bstrValue.get());
 				bHandled = true;
 			}
 			else if (lstrcmpi(bstrName.get(), SETTING_POSITION_Y) == 0)
 			{
-				m_ptDialog.y = NXMLSettings::DecodeIntValue(bstrValue.get());
+				m_ptDialog.y = XMLSettings::DecodeIntValue(bstrValue.get());
 				bHandled = true;
 			}
 			else if (lstrcmpi(bstrName.get(), SETTING_WIDTH) == 0)
 			{
-				m_iWidth = NXMLSettings::DecodeIntValue(bstrValue.get());
+				m_iWidth = XMLSettings::DecodeIntValue(bstrValue.get());
 				bHandled = true;
 			}
 			else if (lstrcmpi(bstrName.get(), SETTING_HEIGHT) == 0)
 			{
-				m_iHeight = NXMLSettings::DecodeIntValue(bstrValue.get());
+				m_iHeight = XMLSettings::DecodeIntValue(bstrValue.get());
 				bHandled = true;
 			}
 		}

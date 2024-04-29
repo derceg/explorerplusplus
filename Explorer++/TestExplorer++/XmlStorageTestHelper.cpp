@@ -9,7 +9,7 @@
 wil::com_ptr_nothrow<IXMLDOMDocument> XmlStorageTest::LoadXmlDocument(const std::wstring &filePath)
 {
 	wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument;
-	xmlDocument.attach(NXMLSettings::DomFromCOM());
+	xmlDocument.attach(XMLSettings::DomFromCOM());
 
 	if (!xmlDocument)
 	{
@@ -17,7 +17,7 @@ wil::com_ptr_nothrow<IXMLDOMDocument> XmlStorageTest::LoadXmlDocument(const std:
 	}
 
 	VARIANT_BOOL status;
-	VARIANT variantFilePath = NXMLSettings::VariantString(filePath.c_str());
+	VARIANT variantFilePath = XMLSettings::VariantString(filePath.c_str());
 	xmlDocument->load(variantFilePath, &status);
 
 	if (status != VARIANT_TRUE)
@@ -31,7 +31,7 @@ wil::com_ptr_nothrow<IXMLDOMDocument> XmlStorageTest::LoadXmlDocument(const std:
 std::optional<XmlStorageTest::XmlDocumentData> XmlStorageTest::CreateXmlDocument()
 {
 	wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument;
-	xmlDocument.attach(NXMLSettings::DomFromCOM());
+	xmlDocument.attach(XMLSettings::DomFromCOM());
 
 	if (!xmlDocument)
 	{
@@ -42,12 +42,12 @@ std::optional<XmlStorageTest::XmlDocumentData> XmlStorageTest::CreateXmlDocument
 	auto attribute = wil::make_bstr_nothrow(L"version='1.0'");
 	wil::com_ptr_nothrow<IXMLDOMProcessingInstruction> processingInstruction;
 	xmlDocument->createProcessingInstruction(tag.get(), attribute.get(), &processingInstruction);
-	NXMLSettings::AppendChildToParent(processingInstruction.get(), xmlDocument.get());
+	XMLSettings::AppendChildToParent(processingInstruction.get(), xmlDocument.get());
 
 	auto rootTag = wil::make_bstr_nothrow(L"ExplorerPlusPlus");
 	wil::com_ptr_nothrow<IXMLDOMElement> root;
 	xmlDocument->createElement(rootTag.get(), &root);
-	NXMLSettings::AppendChildToParent(root.get(), xmlDocument.get());
+	XMLSettings::AppendChildToParent(root.get(), xmlDocument.get());
 
 	return XmlDocumentData{ std::move(xmlDocument), std::move(root) };
 }

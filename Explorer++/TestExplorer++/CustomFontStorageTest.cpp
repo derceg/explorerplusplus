@@ -88,7 +88,7 @@ TEST_F(CustomFontXmlStorageTest, Save)
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	wil::com_ptr_nothrow<IXMLDOMElement> mainFontNode;
-	NXMLSettings::CreateElementNode(xmlDocumentData->xmlDocument.get(), &mainFontNode,
+	XMLSettings::CreateElementNode(xmlDocumentData->xmlDocument.get(), &mainFontNode,
 		settingsNode.get(), L"Setting", MAIN_FONT_NODE_NAME);
 	SaveCustomFontToXml(xmlDocumentData->xmlDocument.get(), mainFontNode.get(), referenceFont);
 

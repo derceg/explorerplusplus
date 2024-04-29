@@ -185,8 +185,8 @@ void WildcardSelectDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey
 void WildcardSelectDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
 	IXMLDOMElement *pParentNode)
 {
-	NXMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_PATTERN_LIST, m_PatternList);
-	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_CURRENT_TEXT, m_pattern.c_str());
+	XMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_PATTERN_LIST, m_PatternList);
+	XMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_CURRENT_TEXT, m_pattern.c_str());
 }
 
 void WildcardSelectDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue)
