@@ -7,51 +7,10 @@
 #include "../Helper/ShellHelper.h"
 #include <wil/com.h>
 
-FileProgressSink *FileProgressSink::CreateNew()
+void FileProgressSink::SetPostNewItemObserver(
+	std::function<void(PIDLIST_ABSOLUTE)> postNewItemObserver)
 {
-	return new FileProgressSink();
-}
-
-FileProgressSink::FileProgressSink() : m_refCount(1)
-{
-}
-
-HRESULT STDMETHODCALLTYPE FileProgressSink::QueryInterface(REFIID riid, void **ppvObject)
-{
-#pragma warning(push)
-#pragma warning(disable : 4838) // conversion from 'DWORD' to 'int' requires a narrowing conversion
-	// clang-format off
-	static const QITAB qit[] =
-	{
-		QITABENT(FileProgressSink, IFileOperationProgressSink),
-		{nullptr}
-	};
-// clang-format on
-#pragma warning(pop)
-
-	return QISearch(this, qit, riid, ppvObject);
-}
-
-ULONG STDMETHODCALLTYPE FileProgressSink::AddRef()
-{
-	return InterlockedIncrement(&m_refCount);
-}
-
-ULONG STDMETHODCALLTYPE FileProgressSink::Release()
-{
-	ULONG refCount = InterlockedDecrement(&m_refCount);
-
-	if (refCount == 0)
-	{
-		delete this;
-	}
-
-	return refCount;
-}
-
-void FileProgressSink::SetPostNewItemObserver(std::function<void(PIDLIST_ABSOLUTE)> f)
-{
-	m_postNewItemObserver = f;
+	m_postNewItemObserver = postNewItemObserver;
 }
 
 HRESULT STDMETHODCALLTYPE FileProgressSink::StartOperations()

@@ -211,7 +211,7 @@ void Explorerplusplus::OnCreateNewFolder()
 		return;
 	}
 
-	FileProgressSink *sink = FileProgressSink::CreateNew();
+	auto sink = winrt::make_self<FileProgressSink>();
 	sink->SetPostNewItemObserver(
 		[this](PIDLIST_ABSOLUTE pidl)
 		{
@@ -223,8 +223,7 @@ void Explorerplusplus::OnCreateNewFolder()
 
 	TCHAR newFolderName[128];
 	LoadString(m_resourceInstance, IDS_NEW_FOLDER_NAME, newFolderName, SIZEOF_ARRAY(newFolderName));
-	hr = NFileOperations::CreateNewFolder(directoryShellItem.get(), newFolderName, sink);
-	sink->Release();
+	hr = NFileOperations::CreateNewFolder(directoryShellItem.get(), newFolderName, sink.get());
 
 	if (FAILED(hr))
 	{

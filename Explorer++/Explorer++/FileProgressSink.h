@@ -4,18 +4,14 @@
 
 #pragma once
 
+#include "../Helper/WinRTBaseWrapper.h"
 #include <functional>
 
-class FileProgressSink : public IFileOperationProgressSink
+class FileProgressSink :
+	public winrt::implements<FileProgressSink, IFileOperationProgressSink, winrt::non_agile>
 {
 public:
-	static FileProgressSink *CreateNew();
-
-	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void **ppvObject) override;
-	ULONG STDMETHODCALLTYPE AddRef() override;
-	ULONG STDMETHODCALLTYPE Release() override;
-
-	void SetPostNewItemObserver(std::function<void(PIDLIST_ABSOLUTE)> f);
+	void SetPostNewItemObserver(std::function<void(PIDLIST_ABSOLUTE)> postNewItemObserver);
 
 	HRESULT STDMETHODCALLTYPE StartOperations() override;
 	HRESULT STDMETHODCALLTYPE FinishOperations(HRESULT hrResult) override;
@@ -47,10 +43,5 @@ public:
 	HRESULT STDMETHODCALLTYPE ResumeTimer() override;
 
 private:
-	FileProgressSink();
-	virtual ~FileProgressSink() = default;
-
-	ULONG m_refCount;
-
 	std::function<void(PIDLIST_ABSOLUTE)> m_postNewItemObserver;
 };

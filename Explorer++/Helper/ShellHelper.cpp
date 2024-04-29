@@ -9,6 +9,7 @@
 #include "ProcessHelper.h"
 #include "RegistrySettings.h"
 #include "StringHelper.h"
+#include "WinRTBaseWrapper.h"
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -1364,64 +1365,28 @@ bool IsChildOfLibrariesFolder(PCIDLIST_ABSOLUTE pidl)
 	return ILIsParent(pidlLibraries.get(), pidl, FALSE);
 }
 
-class FileSystemBindData : public IFileSystemBindData
+class FileSystemBindData :
+	public winrt::implements<FileSystemBindData, IFileSystemBindData, winrt::non_agile>
 {
 public:
-	static wil::com_ptr_nothrow<FileSystemBindData> Create(const WIN32_FIND_DATA *wfd)
+	FileSystemBindData(const WIN32_FIND_DATA *wfd) : m_wfd(*wfd)
 	{
-		wil::com_ptr_nothrow<FileSystemBindData> fsBindData;
-		fsBindData.attach(new FileSystemBindData(wfd));
-		return fsBindData;
 	}
 
-	IFACEMETHODIMP QueryInterface(REFIID riid, void **ppvObject)
-	{
-		// clang-format off
-		static const QITAB qit[] = {
-			QITABENT(FileSystemBindData, IFileSystemBindData),
-			{ nullptr }
-		};
-		// clang-format on
-
-		return QISearch(this, qit, riid, ppvObject);
-	}
-
-	IFACEMETHODIMP_(ULONG) AddRef(void)
-	{
-		return InterlockedIncrement(&m_refCount);
-	}
-
-	IFACEMETHODIMP_(ULONG) Release(void)
-	{
-		ULONG refCount = InterlockedDecrement(&m_refCount);
-
-		if (refCount == 0)
-		{
-			delete this;
-		}
-
-		return refCount;
-	}
-
-	IFACEMETHODIMP SetFindData(const WIN32_FIND_DATAW *wfd)
+	IFACEMETHODIMP SetFindData(const WIN32_FIND_DATA *wfd)
 	{
 		m_wfd = *wfd;
 		return S_OK;
 	}
 
-	IFACEMETHODIMP GetFindData(WIN32_FIND_DATAW *wfd)
+	IFACEMETHODIMP GetFindData(WIN32_FIND_DATA *wfd)
 	{
 		*wfd = m_wfd;
 		return S_OK;
 	}
 
 private:
-	ULONG m_refCount;
 	WIN32_FIND_DATA m_wfd;
-
-	FileSystemBindData(const WIN32_FIND_DATA *wfd) : m_refCount(1), m_wfd(*wfd)
-	{
-	}
 };
 
 // This performs the same function as SHSimpleIDListFromPath(), which is deprecated.
@@ -1449,7 +1414,7 @@ HRESULT CreateSimplePidl(const std::wstring &path, PidlAbsolute &outputPidl, ISh
 		break;
 	}
 
-	auto fsBindData = FileSystemBindData::Create(&wfd);
+	auto fsBindData = winrt::make<FileSystemBindData>(&wfd);
 
 	RETURN_IF_FAILED(
 		bindCtx->RegisterObjectParam(const_cast<PWSTR>(STR_FILE_SYS_BIND_DATA), fsBindData.get()));
