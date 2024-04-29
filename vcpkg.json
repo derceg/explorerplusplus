@@ -17,7 +17,6 @@
     "boost-outcome",
     "boost-parameter",
     "boost-range",
-    "boost-scope-exit",
     "boost-signals2",
     "cereal",
     "cli11",

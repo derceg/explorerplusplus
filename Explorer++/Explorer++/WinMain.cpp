@@ -21,14 +21,10 @@
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/locale.hpp>
-#include <boost/scope_exit.hpp>
 #include <glog/logging.h>
 #include <wil/resource.h>
 #include <cstdlib>
 #include <format>
-
-#pragma warning(                                                                                   \
-	disable : 4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
 /* Default window size/position. */
 #define DEFAULT_WINDOWPOS_LEFT_PERCENTAGE 0.02
@@ -96,15 +92,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		wil::scope_exit([gdiplusToken] { Gdiplus::GdiplusShutdown(gdiplusToken); });
 
 	bool consoleAttached = Console::AttachParentConsole();
-
-	BOOST_SCOPE_EXIT(consoleAttached)
-	{
-		if (consoleAttached)
+	auto consoleCleanup = wil::scope_exit(
+		[consoleAttached]
 		{
-			Console::ReleaseConsole();
-		}
-	}
-	BOOST_SCOPE_EXIT_END
+			if (consoleAttached)
+			{
+				Console::ReleaseConsole();
+			}
+		});
 
 	auto commandLineInfo = CommandLine::ProcessCommandLine();
 
