@@ -195,7 +195,7 @@ void Explorerplusplus::OnSaveDirectoryListing() const
 
 	if (bSaveNameRetrieved)
 	{
-		NFileOperations::SaveDirectoryListing(directory, fileName);
+		FileOperations::SaveDirectoryListing(directory, fileName);
 	}
 }
 
@@ -223,7 +223,7 @@ void Explorerplusplus::OnCreateNewFolder()
 
 	TCHAR newFolderName[128];
 	LoadString(m_resourceInstance, IDS_NEW_FOLDER_NAME, newFolderName, SIZEOF_ARRAY(newFolderName));
-	hr = NFileOperations::CreateNewFolder(directoryShellItem.get(), newFolderName, sink.get());
+	hr = FileOperations::CreateNewFolder(directoryShellItem.get(), newFolderName, sink.get());
 
 	if (FAILED(hr))
 	{
@@ -248,7 +248,7 @@ void Explorerplusplus::OnResolveLink()
 	{
 		std::wstring shortcutFileName = m_pActiveShellBrowser->GetItemFullName(iItem);
 
-		hr = NFileOperations::ResolveLink(m_hContainer, 0, shortcutFileName.c_str(), szFullFileName,
+		hr = FileOperations::ResolveLink(m_hContainer, 0, shortcutFileName.c_str(), szFullFileName,
 			SIZEOF_ARRAY(szFullFileName));
 
 		if (hr == S_OK)

@@ -110,11 +110,11 @@ INT_PTR DestroyFilesDialog::OnInitDialog()
 
 	switch (m_pdfdps->m_overwriteMethod)
 	{
-	case NFileOperations::OverwriteMethod::OnePass:
+	case FileOperations::OverwriteMethod::OnePass:
 		CheckDlgButton(m_hDlg, IDC_DESTROYFILES_RADIO_ONEPASS, BST_CHECKED);
 		break;
 
-	case NFileOperations::OverwriteMethod::ThreePass:
+	case FileOperations::OverwriteMethod::ThreePass:
 		CheckDlgButton(m_hDlg, IDC_DESTROYFILES_RADIO_THREEPASS, BST_CHECKED);
 		break;
 	}
@@ -172,11 +172,11 @@ void DestroyFilesDialog::SaveState()
 
 	if (IsDlgButtonChecked(m_hDlg, IDC_DESTROYFILES_RADIO_ONEPASS) == BST_CHECKED)
 	{
-		m_pdfdps->m_overwriteMethod = NFileOperations::OverwriteMethod::OnePass;
+		m_pdfdps->m_overwriteMethod = FileOperations::OverwriteMethod::OnePass;
 	}
 	else
 	{
-		m_pdfdps->m_overwriteMethod = NFileOperations::OverwriteMethod::ThreePass;
+		m_pdfdps->m_overwriteMethod = FileOperations::OverwriteMethod::ThreePass;
 	}
 
 	m_pdfdps->m_bStateSaved = TRUE;
@@ -212,15 +212,15 @@ void DestroyFilesDialog::OnCancel()
 
 void DestroyFilesDialog::OnConfirmDestroy()
 {
-	NFileOperations::OverwriteMethod overwriteMethod;
+	FileOperations::OverwriteMethod overwriteMethod;
 
 	if (IsDlgButtonChecked(m_hDlg, IDC_DESTROYFILES_RADIO_ONEPASS) == BST_CHECKED)
 	{
-		overwriteMethod = NFileOperations::OverwriteMethod::OnePass;
+		overwriteMethod = FileOperations::OverwriteMethod::OnePass;
 	}
 	else
 	{
-		overwriteMethod = NFileOperations::OverwriteMethod::ThreePass;
+		overwriteMethod = FileOperations::OverwriteMethod::ThreePass;
 	}
 
 	/* TODO: Perform in background thread. */
@@ -235,7 +235,7 @@ void DestroyFilesDialog::OnConfirmDestroy()
 DestroyFilesDialogPersistentSettings::DestroyFilesDialogPersistentSettings() :
 	DialogSettings(SETTINGS_KEY)
 {
-	m_overwriteMethod = NFileOperations::OverwriteMethod::OnePass;
+	m_overwriteMethod = FileOperations::OverwriteMethod::OnePass;
 }
 
 DestroyFilesDialogPersistentSettings &DestroyFilesDialogPersistentSettings::GetInstance()
@@ -254,7 +254,7 @@ void DestroyFilesDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
 	DWORD value;
 	RegistrySettings::Read32BitValueFromRegistry(hKey, SETTING_OVERWRITE_METHOD, value);
-	m_overwriteMethod = static_cast<NFileOperations::OverwriteMethod>(value);
+	m_overwriteMethod = static_cast<FileOperations::OverwriteMethod>(value);
 }
 
 void DestroyFilesDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
@@ -269,6 +269,6 @@ void DestroyFilesDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName, B
 	if (lstrcmpi(bstrName, SETTING_OVERWRITE_METHOD) == 0)
 	{
 		m_overwriteMethod =
-			static_cast<NFileOperations::OverwriteMethod>(NXMLSettings::DecodeIntValue(bstrValue));
+			static_cast<FileOperations::OverwriteMethod>(NXMLSettings::DecodeIntValue(bstrValue));
 	}
 }

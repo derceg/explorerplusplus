@@ -365,7 +365,7 @@ void MergeFilesDialog::OnChangeOutputDirectory()
 	LoadString(GetResourceInstance(), IDS_MERGE_SELECTDESTINATION, szTitle, SIZEOF_ARRAY(szTitle));
 
 	unique_pidl_absolute pidl;
-	BOOL bSucceeded = NFileOperations::CreateBrowseDialog(m_hDlg, szTitle, wil::out_param(pidl));
+	BOOL bSucceeded = FileOperations::CreateBrowseDialog(m_hDlg, szTitle, wil::out_param(pidl));
 
 	if (!bSucceeded)
 	{

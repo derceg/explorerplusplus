@@ -31,7 +31,7 @@ BOOL FileActionHandler::RenameFiles(const RenamedItems_t &itemList)
 
 			/* TODO: Could rename all files in the list in a single
 			operation, rather than one by one.*/
-			hr = NFileOperations::RenameFile(shellItem, newFilename);
+			hr = FileOperations::RenameFile(shellItem, newFilename);
 
 			if (SUCCEEDED(hr))
 			{
@@ -60,7 +60,7 @@ BOOL FileActionHandler::RenameFiles(const RenamedItems_t &itemList)
 HRESULT FileActionHandler::DeleteFiles(HWND hwnd, const DeletedItems_t &deletedItems,
 	bool permanent, bool silent)
 {
-	HRESULT hr = NFileOperations::DeleteFiles(hwnd, deletedItems, permanent, silent);
+	HRESULT hr = FileOperations::DeleteFiles(hwnd, deletedItems, permanent, silent);
 
 	if (SUCCEEDED(hr))
 	{

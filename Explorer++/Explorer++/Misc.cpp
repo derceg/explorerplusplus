@@ -73,7 +73,7 @@ void Explorerplusplus::CopyToFolder(bool move)
 
 	TCHAR szTemp[128];
 	LoadString(m_resourceInstance, IDS_GENERAL_COPY_TO_FOLDER_TITLE, szTemp, SIZEOF_ARRAY(szTemp));
-	NFileOperations::CopyFilesToFolder(m_hContainer, szTemp, pidls, move);
+	FileOperations::CopyFilesToFolder(m_hContainer, szTemp, pidls, move);
 }
 
 void Explorerplusplus::OnDeviceChange(WPARAM wParam, LPARAM lParam)

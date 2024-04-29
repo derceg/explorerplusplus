@@ -107,7 +107,7 @@ protected:
 		{
 			std::list<std::wstring> fileList;
 			fileList.push_back(m_szResourceDirectory);
-			BOOL bRet = NFileOperations::DeleteFiles(NULL, fileList, TRUE, TRUE);
+			BOOL bRet = FileOperations::DeleteFiles(NULL, fileList, TRUE, TRUE);
 			ASSERT_EQ(TRUE, bRet);
 		}
 	}

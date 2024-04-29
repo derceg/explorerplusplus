@@ -8,8 +8,9 @@
 #include <list>
 #include <vector>
 
-namespace NFileOperations
+namespace FileOperations
 {
+
 enum class OverwriteMethod
 {
 	OnePass = 1,
@@ -38,6 +39,7 @@ HRESULT ResolveLink(HWND hwnd, DWORD fFlags, const TCHAR *szLinkFilename, TCHAR 
 	int nBufferSize);
 
 BOOL CreateBrowseDialog(HWND hOwner, const std::wstring &strTitle, PIDLIST_ABSOLUTE *ppidl);
+
 };
 
 HRESULT CopyFiles(const std::vector<PidlAbsolute> &items, IDataObject **dataObjectOut);

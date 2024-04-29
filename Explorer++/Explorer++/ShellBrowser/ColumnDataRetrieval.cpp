@@ -524,7 +524,7 @@ std::wstring GetVersionColumnText(const BasicItemInfo_t &itemInfo, VersionInfoTy
 std::wstring GetShortcutToColumnText(const BasicItemInfo_t &itemInfo)
 {
 	TCHAR resolvedLinkPath[MAX_PATH];
-	HRESULT hr = NFileOperations::ResolveLink(nullptr, SLR_NO_UI, itemInfo.getFullPath().c_str(),
+	HRESULT hr = FileOperations::ResolveLink(nullptr, SLR_NO_UI, itemInfo.getFullPath().c_str(),
 		resolvedLinkPath, SIZEOF_ARRAY(resolvedLinkPath));
 
 	if (FAILED(hr))

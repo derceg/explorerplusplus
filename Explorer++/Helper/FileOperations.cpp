@@ -16,7 +16,7 @@
 
 BOOL GetFileClusterSize(const std::wstring &strFilename, PLARGE_INTEGER lpRealFileSize);
 
-HRESULT NFileOperations::RenameFile(IShellItem *item, const std::wstring &newName)
+HRESULT FileOperations::RenameFile(IShellItem *item, const std::wstring &newName)
 {
 	wil::com_ptr_nothrow<IFileOperation> fo;
 	HRESULT hr = CoCreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&fo));
@@ -45,7 +45,7 @@ HRESULT NFileOperations::RenameFile(IShellItem *item, const std::wstring &newNam
 	return hr;
 }
 
-HRESULT NFileOperations::DeleteFiles(HWND hwnd, const std::vector<PCIDLIST_ABSOLUTE> &pidls,
+HRESULT FileOperations::DeleteFiles(HWND hwnd, const std::vector<PCIDLIST_ABSOLUTE> &pidls,
 	bool permanent, bool silent)
 {
 	wil::com_ptr_nothrow<IFileOperation> fo;
@@ -118,11 +118,11 @@ HRESULT NFileOperations::DeleteFiles(HWND hwnd, const std::vector<PCIDLIST_ABSOL
 	return hr;
 }
 
-HRESULT NFileOperations::CopyFilesToFolder(HWND hOwner, const std::wstring &strTitle,
+HRESULT FileOperations::CopyFilesToFolder(HWND hOwner, const std::wstring &strTitle,
 	std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move)
 {
 	unique_pidl_absolute pidl;
-	BOOL bRes = NFileOperations::CreateBrowseDialog(hOwner, strTitle, wil::out_param(pidl));
+	BOOL bRes = CreateBrowseDialog(hOwner, strTitle, wil::out_param(pidl));
 
 	if (!bRes)
 	{
@@ -142,7 +142,7 @@ HRESULT NFileOperations::CopyFilesToFolder(HWND hOwner, const std::wstring &strT
 	return hr;
 }
 
-HRESULT NFileOperations::CopyFiles(HWND hwnd, IShellItem *destinationFolder,
+HRESULT FileOperations::CopyFiles(HWND hwnd, IShellItem *destinationFolder,
 	std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move)
 {
 	wil::com_ptr_nothrow<IFileOperation> fo;
@@ -203,7 +203,7 @@ HRESULT NFileOperations::CopyFiles(HWND hwnd, IShellItem *destinationFolder,
 	return hr;
 }
 
-TCHAR *NFileOperations::BuildFilenameList(const std::list<std::wstring> &FilenameList)
+TCHAR *FileOperations::BuildFilenameList(const std::list<std::wstring> &FilenameList)
 {
 	TCHAR *pszFilenames = nullptr;
 	int iTotalSize = 0;
@@ -228,7 +228,7 @@ TCHAR *NFileOperations::BuildFilenameList(const std::list<std::wstring> &Filenam
 
 // Creates a new folder. Note that IFileOperation will take care of
 // renaming the folder if one with that name already exists.
-HRESULT NFileOperations::CreateNewFolder(IShellItem *destinationFolder,
+HRESULT FileOperations::CreateNewFolder(IShellItem *destinationFolder,
 	const std::wstring &newFolderName, IFileOperationProgressSink *progressSink)
 {
 	wil::com_ptr_nothrow<IFileOperation> fo;
@@ -259,7 +259,7 @@ HRESULT NFileOperations::CreateNewFolder(IShellItem *destinationFolder,
 	return hr;
 }
 
-BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,
+BOOL FileOperations::SaveDirectoryListing(const std::wstring &strDirectory,
 	const std::wstring &strFilename)
 {
 	std::wstring strContents = _T("Directory\r\n---------\r\n") + strDirectory + _T("\r\n\r\n");
@@ -479,7 +479,7 @@ int PasteHardLinks(const TCHAR *szDestination)
 	return nFilesCopied;
 }
 
-HRESULT NFileOperations::CreateLinkToFile(const std::wstring &strTargetFilename,
+HRESULT FileOperations::CreateLinkToFile(const std::wstring &strTargetFilename,
 	const std::wstring &strLinkFilename, const std::wstring &strLinkDescription)
 {
 	IShellLink *pShellLink = nullptr;
@@ -506,7 +506,7 @@ HRESULT NFileOperations::CreateLinkToFile(const std::wstring &strTargetFilename,
 	return hr;
 }
 
-HRESULT NFileOperations::ResolveLink(HWND hwnd, DWORD fFlags, const TCHAR *szLinkFilename,
+HRESULT FileOperations::ResolveLink(HWND hwnd, DWORD fFlags, const TCHAR *szLinkFilename,
 	TCHAR *szResolvedPath, int nBufferSize)
 {
 	SHFILEINFO shfi;
@@ -550,7 +550,7 @@ HRESULT NFileOperations::ResolveLink(HWND hwnd, DWORD fFlags, const TCHAR *szLin
 	return hr;
 }
 
-BOOL NFileOperations::CreateBrowseDialog(HWND hOwner, const std::wstring &strTitle,
+BOOL FileOperations::CreateBrowseDialog(HWND hOwner, const std::wstring &strTitle,
 	PIDLIST_ABSOLUTE *ppidl)
 {
 	TCHAR szDisplayName[MAX_PATH];
@@ -615,7 +615,7 @@ BOOL GetFileClusterSize(const std::wstring &strFilename, PLARGE_INTEGER lpRealFi
 	return TRUE;
 }
 
-void NFileOperations::DeleteFileSecurely(const std::wstring &strFilename,
+void FileOperations::DeleteFileSecurely(const std::wstring &strFilename,
 	OverwriteMethod overwriteMethod)
 {
 	HANDLE hFile;
