@@ -10,7 +10,7 @@
 namespace
 {
 
-bool CanPasteShellDataInDirectory(PCIDLIST_ABSOLUTE pidl, PasteType pasteType)
+bool CanShellPasteClipboardDataInDirectory(PCIDLIST_ABSOLUTE pidl, PasteType pasteType)
 {
 	wil::com_ptr_nothrow<IDataObject> clipboardObject;
 	HRESULT hr = OleGetClipboard(&clipboardObject);
@@ -62,7 +62,7 @@ bool IsFilesystemFolder(PCIDLIST_ABSOLUTE pidl)
 
 bool CanPasteInDirectory(PCIDLIST_ABSOLUTE pidl, PasteType pasteType)
 {
-	return CanPasteShellDataInDirectory(pidl, pasteType)
+	return CanShellPasteClipboardDataInDirectory(pidl, pasteType)
 		|| (pasteType == PasteType::Normal && CanPasteCustomDataInDirectory(pidl));
 }
 
