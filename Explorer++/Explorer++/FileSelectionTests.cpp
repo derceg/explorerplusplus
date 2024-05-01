@@ -118,10 +118,10 @@ BOOL Explorerplusplus::CanPaste(PasteType pasteType) const
 	return CanPasteInDirectory(directory.Raw(), pasteType);
 }
 
-bool Explorerplusplus::CanCreateHardLink() const
+bool Explorerplusplus::CanPasteHardLink() const
 {
 	const auto *activeShellBrowser = GetActiveShellBrowserImpl();
-	return CanCreateHardLinkInDirectory(activeShellBrowser->GetDirectoryIdl().get());
+	return CanPasteHardLinkInDirectory(activeShellBrowser->GetDirectoryIdl().get());
 }
 
 PidlAbsolute Explorerplusplus::MaybeGetFocusedDirectory() const

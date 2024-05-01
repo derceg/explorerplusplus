@@ -7,6 +7,6 @@
 #include "../Helper/ClipboardHelper.h"
 
 bool CanPasteInDirectory(PCIDLIST_ABSOLUTE pidl, PasteType pasteType);
-bool CanCreateHardLinkInDirectory(PCIDLIST_ABSOLUTE pidl);
+bool CanPasteHardLinkInDirectory(PCIDLIST_ABSOLUTE pidl);
 bool CanCreateInDirectory(PCIDLIST_ABSOLUTE pidl);
 bool CanCustomizeDirectory(PCIDLIST_ABSOLUTE pidl);

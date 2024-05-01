@@ -66,9 +66,9 @@ bool CanPasteInDirectory(PCIDLIST_ABSOLUTE pidl, PasteType pasteType)
 		|| (pasteType == PasteType::Normal && CanPasteCustomDataInDirectory(pidl));
 }
 
-bool CanCreateHardLinkInDirectory(PCIDLIST_ABSOLUTE pidl)
+bool CanPasteHardLinkInDirectory(PCIDLIST_ABSOLUTE pidl)
 {
-	return IsFilesystemFolder(pidl);
+	return IsClipboardFormatAvailable(CF_HDROP) && IsFilesystemFolder(pidl);
 }
 
 bool CanCreateInDirectory(PCIDLIST_ABSOLUTE pidl)
