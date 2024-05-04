@@ -7,25 +7,11 @@
 #include "EnumFormatEtcImpl.h"
 #include <list>
 
-DataObjectImpl::DataObjectImpl(FORMATETC *pFormatEtc, STGMEDIUM *pMedium, int count)
+DataObjectImpl::DataObjectImpl()
 {
-	for (int i = 0; i < count; i++)
-	{
-		DataObjectInternal dao = { pFormatEtc[i], pMedium[i] };
-		m_daoList.push_back(dao);
-	}
-
 	SetAsyncMode(FALSE);
 
 	m_bInOperation = FALSE;
-}
-
-DataObjectImpl::~DataObjectImpl()
-{
-	for (auto dao : m_daoList)
-	{
-		ReleaseStgMedium(&dao.stg);
-	}
 }
 
 // IDataObject
@@ -41,17 +27,13 @@ IFACEMETHODIMP DataObjectImpl::GetData(FORMATETC *pFormatEtc, STGMEDIUM *pMedium
 		return DV_E_FORMATETC;
 	}
 
-	for (const auto &dao : m_daoList)
+	for (const auto &item : m_items)
 	{
-		if (dao.fe.cfFormat == pFormatEtc->cfFormat && dao.fe.tymed & pFormatEtc->tymed
-			&& dao.fe.dwAspect == pFormatEtc->dwAspect)
+		if (item.format.cfFormat == pFormatEtc->cfFormat && item.format.tymed & pFormatEtc->tymed
+			&& item.format.dwAspect == pFormatEtc->dwAspect)
 		{
-			BOOL bRet = DuplicateStorageMedium(pMedium, &dao.stg, &dao.fe);
-
-			if (!bRet)
-			{
-				return STG_E_MEDIUMFULL;
-			}
+			auto duplicatedStg = DuplicateStorageMedium(&item.stg, &item.format);
+			*pMedium = duplicatedStg.release();
 
 			return S_OK;
 		}
@@ -60,37 +42,45 @@ IFACEMETHODIMP DataObjectImpl::GetData(FORMATETC *pFormatEtc, STGMEDIUM *pMedium
 	return DV_E_FORMATETC;
 }
 
-BOOL DataObjectImpl::DuplicateStorageMedium(STGMEDIUM *pstgDest, const STGMEDIUM *pstgSrc,
+wil::unique_stg_medium DataObjectImpl::DuplicateStorageMedium(const STGMEDIUM *pstgSrc,
 	const FORMATETC *pftc)
 {
-	pstgDest->tymed = pstgSrc->tymed;
-	pstgDest->pUnkForRelease = nullptr;
-
-	if (pstgSrc->pUnkForRelease != nullptr)
-	{
-		pstgDest->pUnkForRelease = pstgSrc->pUnkForRelease;
-		pstgSrc->pUnkForRelease->AddRef();
-	}
-
-	BOOL success = TRUE;
+	wil::unique_stg_medium duplicateStg;
 
 	switch (pftc->tymed)
 	{
 	case TYMED_HGLOBAL:
+		duplicateStg.hGlobal =
+			static_cast<HGLOBAL>(OleDuplicateData(pstgSrc->hGlobal, pftc->cfFormat, 0));
+		break;
+
 	case TYMED_FILE:
+		duplicateStg.lpszFileName =
+			static_cast<LPOLESTR>(OleDuplicateData(pstgSrc->lpszFileName, pftc->cfFormat, 0));
+		break;
+
 	case TYMED_GDI:
+		duplicateStg.hBitmap =
+			static_cast<HBITMAP>(OleDuplicateData(pstgSrc->hBitmap, pftc->cfFormat, 0));
+		break;
+
 	case TYMED_MFPICT:
+		duplicateStg.hMetaFilePict =
+			static_cast<HMETAFILEPICT>(OleDuplicateData(pstgSrc->hMetaFilePict, pftc->cfFormat, 0));
+		break;
+
 	case TYMED_ENHMF:
-		success = DuplicateData(pstgDest, pstgSrc, pftc);
+		duplicateStg.hEnhMetaFile =
+			static_cast<HENHMETAFILE>(OleDuplicateData(pstgSrc->hEnhMetaFile, pftc->cfFormat, 0));
 		break;
 
 	case TYMED_ISTREAM:
-		pstgDest->pstm = pstgSrc->pstm;
+		duplicateStg.pstm = pstgSrc->pstm;
 		pstgSrc->pstm->AddRef();
 		break;
 
 	case TYMED_ISTORAGE:
-		pstgDest->pstg = pstgSrc->pstg;
+		duplicateStg.pstg = pstgSrc->pstg;
 		pstgSrc->pstg->AddRef();
 		break;
 
@@ -99,43 +89,15 @@ BOOL DataObjectImpl::DuplicateStorageMedium(STGMEDIUM *pstgDest, const STGMEDIUM
 		break;
 	}
 
-	return success;
-}
+	duplicateStg.tymed = pstgSrc->tymed;
+	duplicateStg.pUnkForRelease = pstgSrc->pUnkForRelease;
 
-BOOL DataObjectImpl::DuplicateData(STGMEDIUM *pstgDest, const STGMEDIUM *pstgSrc,
-	const FORMATETC *pftc)
-{
-	HANDLE hData = OleDuplicateData(pstgSrc->hGlobal, pftc->cfFormat, 0);
-
-	if (hData == nullptr)
+	if (duplicateStg.pUnkForRelease)
 	{
-		return FALSE;
+		duplicateStg.pUnkForRelease->AddRef();
 	}
 
-	switch (pftc->tymed)
-	{
-	case TYMED_HGLOBAL:
-		pstgDest->hGlobal = hData;
-		break;
-
-	case TYMED_FILE:
-		pstgDest->lpszFileName = reinterpret_cast<LPOLESTR>(hData);
-		break;
-
-	case TYMED_GDI:
-		pstgDest->hBitmap = reinterpret_cast<HBITMAP>(hData);
-		break;
-
-	case TYMED_MFPICT:
-		pstgDest->hMetaFilePict = hData;
-		break;
-
-	case TYMED_ENHMF:
-		pstgDest->hEnhMetaFile = reinterpret_cast<HENHMETAFILE>(hData);
-		break;
-	}
-
-	return TRUE;
+	return duplicateStg;
 }
 
 IFACEMETHODIMP DataObjectImpl::GetDataHere(FORMATETC *pFormatEtc, STGMEDIUM *pMedium)
@@ -153,10 +115,10 @@ IFACEMETHODIMP DataObjectImpl::QueryGetData(FORMATETC *pFormatEtc)
 		return E_INVALIDARG;
 	}
 
-	for (const auto &dao : m_daoList)
+	for (const auto &item : m_items)
 	{
-		if (dao.fe.cfFormat == pFormatEtc->cfFormat && dao.fe.tymed & pFormatEtc->tymed
-			&& dao.fe.dwAspect == pFormatEtc->dwAspect)
+		if (item.format.cfFormat == pFormatEtc->cfFormat && item.format.tymed & pFormatEtc->tymed
+			&& item.format.dwAspect == pFormatEtc->dwAspect)
 		{
 			return S_OK;
 		}
@@ -187,25 +149,20 @@ IFACEMETHODIMP DataObjectImpl::SetData(FORMATETC *pFormatEtc, STGMEDIUM *pMedium
 		return E_INVALIDARG;
 	}
 
-	DataObjectInternal dao;
+	ItemData itemData;
 
-	dao.fe = *pFormatEtc;
+	itemData.format = *pFormatEtc;
 
 	if (fRelease)
 	{
-		dao.stg = *pMedium;
+		itemData.stg.reset(*pMedium);
 	}
 	else
 	{
-		BOOL bRet = DuplicateStorageMedium(&dao.stg, pMedium, pFormatEtc);
-
-		if (!bRet)
-		{
-			return E_OUTOFMEMORY;
-		}
+		itemData.stg = DuplicateStorageMedium(pMedium, pFormatEtc);
 	}
 
-	m_daoList.push_back(dao);
+	m_items.push_back(std::move(itemData));
 
 	return S_OK;
 }
@@ -221,9 +178,9 @@ IFACEMETHODIMP DataObjectImpl::EnumFormatEtc(DWORD dwDirection, IEnumFORMATETC *
 	{
 		std::list<FORMATETC> feList;
 
-		for (const auto &dao : m_daoList)
+		for (const auto &item : m_items)
 		{
-			feList.push_back(dao.fe);
+			feList.push_back(item.format);
 		}
 
 		auto enumFormatEtcImpl = winrt::make_self<EnumFormatEtcImpl>(feList);

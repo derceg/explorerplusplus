@@ -10,7 +10,7 @@
 #include <ShlObj.h>
 #include <shtypes.h>
 
-STGMEDIUM GetStgMediumForGlobal(HGLOBAL global);
+wil::unique_stg_medium GetStgMediumForGlobal(wil::unique_hglobal global);
 HRESULT SetPreferredDropEffect(IDataObject *dataObject, DWORD effect);
 HRESULT GetPreferredDropEffect(IDataObject *dataObject, DWORD &effect);
 HRESULT CreateDataObjectForShellTransfer(const std::vector<PidlAbsolute> &items,
@@ -34,14 +34,8 @@ HRESULT SetBlobData(IDataObject *dataObject, CLIPFORMAT format, const T &data)
 		return E_FAIL;
 	}
 
-	STGMEDIUM stg = GetStgMediumForGlobal(global.get());
-	RETURN_IF_FAILED(dataObject->SetData(&ftc, &stg, TRUE));
-
-	// The IDataObject instance has taken ownership of stg at this point, so it's responsible for
-	// freeing the data.
-	global.release();
-
-	return S_OK;
+	auto stg = GetStgMediumForGlobal(std::move(global));
+	return MoveStorageToObject(dataObject, &ftc, std::move(stg));
 }
 
 template <typename T>

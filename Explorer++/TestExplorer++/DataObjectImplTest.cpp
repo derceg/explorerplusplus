@@ -14,9 +14,33 @@ using namespace testing;
 class DataObjectImplTest : public Test
 {
 protected:
-	DataObjectImplTest()
+	DataObjectImplTest() : m_dataObject(winrt::make<DataObjectImpl>())
 	{
-		m_dataObject = winrt::make_self<DataObjectImpl>(nullptr, nullptr, 0);
+	}
+
+	void PerformSetDataGetDataCheck(bool moveData)
+	{
+		FORMATETC formatEtc = { CF_UNICODETEXT, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+
+		std::wstring text = L"Test text";
+		auto global = WriteStringToGlobal(text);
+		auto stgMedium = GetStgMediumForGlobal(std::move(global));
+
+		if (moveData)
+		{
+			EXPECT_HRESULT_SUCCEEDED(
+				MoveStorageToObject(m_dataObject.get(), &formatEtc, std::move(stgMedium)));
+		}
+		else
+		{
+			EXPECT_HRESULT_SUCCEEDED(m_dataObject->SetData(&formatEtc, &stgMedium, false));
+		}
+
+		wil::unique_stg_medium stgMediumOut;
+		ASSERT_HRESULT_SUCCEEDED(m_dataObject->GetData(&formatEtc, &stgMediumOut));
+
+		auto retrievedText = ReadStringFromGlobal(stgMediumOut.hGlobal);
+		EXPECT_EQ(retrievedText, text);
 	}
 
 	winrt::com_ptr<IDataObject> m_dataObject;
@@ -50,19 +74,10 @@ TEST_F(DataObjectImplTest, GetDataEmpty)
 
 TEST_F(DataObjectImplTest, SetDataAndGetData)
 {
-	FORMATETC formatEtc = { CF_UNICODETEXT, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+	PerformSetDataGetDataCheck(false);
+}
 
-	auto global = WriteStringToGlobal(L"Test text");
-	STGMEDIUM stgMedium = GetStgMediumForGlobal(global.get());
-
-	HRESULT hr = m_dataObject->SetData(&formatEtc, &stgMedium, FALSE);
-	ASSERT_HRESULT_SUCCEEDED(hr);
-
-	global.release();
-
-	STGMEDIUM stgMediumOut;
-	hr = m_dataObject->GetData(&formatEtc, &stgMediumOut);
-	ASSERT_HRESULT_SUCCEEDED(hr);
-
-	ReleaseStgMedium(&stgMediumOut);
+TEST_F(DataObjectImplTest, SetDataAndGetDataTakeOwnership)
+{
+	PerformSetDataGetDataCheck(true);
 }

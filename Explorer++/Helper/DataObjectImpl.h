@@ -5,6 +5,7 @@
 #pragma once
 
 #include "WinRTBaseWrapper.h"
+#include <wil/resource.h>
 #include <shlobj.h>
 #include <vector>
 
@@ -13,8 +14,7 @@ class DataObjectImpl :
 		winrt::non_agile>
 {
 public:
-	DataObjectImpl(FORMATETC *pFormatEtc, STGMEDIUM *pMedium, int count);
-	~DataObjectImpl();
+	DataObjectImpl();
 
 	// IDataObject
 	IFACEMETHODIMP GetData(FORMATETC *pFormatEtc, STGMEDIUM *pMedium);
@@ -36,17 +36,15 @@ public:
 	IFACEMETHODIMP StartOperation(IBindCtx *pbcReserved);
 
 private:
-	struct DataObjectInternal
+	struct ItemData
 	{
-		FORMATETC fe;
-		STGMEDIUM stg;
+		FORMATETC format;
+		wil::unique_stg_medium stg;
 	};
 
-	BOOL DuplicateStorageMedium(STGMEDIUM *pstgDest, const STGMEDIUM *pstgSrc,
-		const FORMATETC *pftc);
-	BOOL DuplicateData(STGMEDIUM *pstgDest, const STGMEDIUM *pstgSrc, const FORMATETC *pftc);
+	wil::unique_stg_medium DuplicateStorageMedium(const STGMEDIUM *pstgSrc, const FORMATETC *pftc);
 
-	std::vector<DataObjectInternal> m_daoList;
+	std::vector<ItemData> m_items;
 
 	BOOL m_bInOperation;
 	BOOL m_bDoOpAsync;

@@ -88,3 +88,14 @@ UINT GetPngClipboardFormat()
 	static UINT clipboardFormat = RegisterClipboardFormat(L"PNG");
 	return clipboardFormat;
 }
+
+HRESULT MoveStorageToObject(IDataObject *dataObject, FORMATETC *format, wil::unique_stg_medium stg)
+{
+	RETURN_IF_FAILED(dataObject->SetData(format, &stg, true));
+
+	// The IDataObject instance now owns the STGMEDIUM structure and is responsible for freeing the
+	// memory associated with it.
+	stg.release();
+
+	return S_OK;
+}

@@ -10,11 +10,11 @@
 #include "WinRTBaseWrapper.h"
 #include <wil/com.h>
 
-STGMEDIUM GetStgMediumForGlobal(HGLOBAL global)
+wil::unique_stg_medium GetStgMediumForGlobal(wil::unique_hglobal global)
 {
-	STGMEDIUM storage;
+	wil::unique_stg_medium storage;
 	storage.tymed = TYMED_HGLOBAL;
-	storage.hGlobal = global;
+	storage.hGlobal = global.release();
 	storage.pUnkForRelease = nullptr;
 	return storage;
 }

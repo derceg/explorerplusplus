@@ -25,15 +25,11 @@ winrt::com_ptr<IDataObject> BookmarkDataExchange::CreateDataObject(
 
 	std::string data = SerializeBookmarkItems(bookmarkItems);
 	auto global = WriteBinaryDataToGlobal(data);
-	STGMEDIUM stgMedium = GetStgMediumForGlobal(global.get());
+	auto stgMedium = GetStgMediumForGlobal(std::move(global));
 
-	auto dataObject = winrt::make_self<DataObjectImpl>(&formatEtc, &stgMedium, 1);
-
-	// TODO: Probably worth updating the code so that this doesn't need to be
-	// done manually.
-	// The IDataObject instance now owns the STGMEDIUM structure and is
-	// responsible for freeing the memory associated with it.
-	global.release();
+	auto dataObject = winrt::make<DataObjectImpl>();
+	HRESULT hr = MoveStorageToObject(dataObject.get(), &formatEtc, std::move(stgMedium));
+	DCHECK(SUCCEEDED(hr));
 
 	return dataObject;
 }

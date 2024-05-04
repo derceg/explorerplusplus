@@ -17,13 +17,11 @@ void CreateTextDataObject(const std::wstring &text, winrt::com_ptr<IDataObject> 
 	auto global = WriteStringToGlobal(text);
 	ASSERT_TRUE(global.is_valid());
 
-	STGMEDIUM stgMedium = GetStgMediumForGlobal(global.get());
+	auto stgMedium = GetStgMediumForGlobal(std::move(global));
 
-	dataObject = winrt::make_self<DataObjectImpl>(&formatEtc, &stgMedium, 1);
-
-	// The IDataObject instance now owns the STGMEDIUM structure and is responsible for freeing
-	// the memory associated with it.
-	global.release();
+	dataObject = winrt::make<DataObjectImpl>();
+	ASSERT_HRESULT_SUCCEEDED(
+		MoveStorageToObject(dataObject.get(), &formatEtc, std::move(stgMedium)));
 }
 
 void CreateShellDataObject(const std::wstring &path, ShellItemType shellItemType,
