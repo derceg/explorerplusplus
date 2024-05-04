@@ -14,6 +14,7 @@
 #include "Bookmarks/UI/BookmarksToolbar.h"
 #include "Bookmarks/UI/ManageBookmarksDialog.h"
 #include "Bookmarks/UI/Views/BookmarksToolbarView.h"
+#include "ClipboardOperations.h"
 #include "Config.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "DrivesToolbar.h"
@@ -35,7 +36,6 @@
 #include "TabRestorerMenu.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/Controls.h"
-#include "../Helper/FileOperations.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
@@ -464,7 +464,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_EDIT_PASTEHARDLINK:
-		PasteHardLinks(m_pActiveShellBrowser->GetDirectory().c_str());
+		PasteHardLinks(m_pActiveShellBrowser->GetDirectory());
 		break;
 
 	case IDM_EDIT_COPYTOFOLDER:

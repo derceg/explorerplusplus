@@ -664,6 +664,9 @@
     <ClCompile Include="DirectoryOperationsHelper.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="ClipboardOperations.cpp">
+      <Filter>Data Exchange\Clipboard</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1362,6 +1365,9 @@
     <ClInclude Include="DirectoryOperationsHelper.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="ClipboardOperations.h">
+      <Filter>Data Exchange\Clipboard</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1511,6 +1517,12 @@
     </Filter>
     <Filter Include="Frequent Locations">
       <UniqueIdentifier>{149a5be0-042f-4e01-b96c-9630a577106a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data Exchange">
+      <UniqueIdentifier>{474ab8a9-61ac-4e08-83e4-50ab19a84d37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data Exchange\Clipboard">
+      <UniqueIdentifier>{cadaacd3-aced-4afa-8fbf-e334258b9316}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

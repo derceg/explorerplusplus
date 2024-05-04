@@ -31,6 +31,16 @@ TEST_F(ClipboardTest, ReadWriteText)
 	EXPECT_EQ(*clipboardText, text);
 }
 
+TEST_F(ClipboardTest, ReadWriteHDropData)
+{
+	std::vector<std::wstring> files = { L"C:\\file1", L"C:\\file2", L"C:\\file3" };
+	auto res = m_clipboard.WriteHDropData(files);
+	ASSERT_TRUE(res);
+
+	auto retrievedFiles = m_clipboard.ReadHDropData();
+	EXPECT_EQ(retrievedFiles, files);
+}
+
 TEST_F(ClipboardTest, ReadWriteCustomData)
 {
 	using namespace std::string_literals;

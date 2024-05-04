@@ -11,6 +11,7 @@
 #include "ShellHelper.h"
 #include "StringHelper.h"
 #include <wil/com.h>
+#include <filesystem>
 #include <list>
 #include <sstream>
 
@@ -420,65 +421,6 @@ HRESULT CopyFilesToClipboard(const std::vector<PidlAbsolute> &items, bool move,
 	return S_OK;
 }
 
-/* TODO: Use CDropHandler. */
-int PasteHardLinks(const TCHAR *szDestination)
-{
-	IDataObject *clipboardObject = nullptr;
-	DROPFILES *pdf = nullptr;
-	FORMATETC ftc;
-	STGMEDIUM stg;
-	HRESULT hr;
-	TCHAR szFileName[MAX_PATH];
-	TCHAR szLinkFileName[MAX_PATH];
-	TCHAR szOldFileName[MAX_PATH];
-	int nFilesCopied = -1;
-	int i = 0;
-
-	hr = OleGetClipboard(&clipboardObject);
-
-	if (SUCCEEDED(hr))
-	{
-		ftc.cfFormat = CF_HDROP;
-		ftc.ptd = nullptr;
-		ftc.dwAspect = DVASPECT_CONTENT;
-		ftc.lindex = -1;
-		ftc.tymed = TYMED_HGLOBAL;
-
-		hr = clipboardObject->GetData(&ftc, &stg);
-
-		if (SUCCEEDED(hr))
-		{
-			pdf = (DROPFILES *) GlobalLock(stg.hGlobal);
-
-			if (pdf != nullptr)
-			{
-				nFilesCopied = DragQueryFile((HDROP) pdf, 0xFFFFFFFF, nullptr, 0);
-
-				for (i = 0; i < nFilesCopied; i++)
-				{
-					DragQueryFile((HDROP) pdf, i, szOldFileName, SIZEOF_ARRAY(szOldFileName));
-
-					StringCchCopy(szLinkFileName, SIZEOF_ARRAY(szLinkFileName), szDestination);
-
-					StringCchCopy(szFileName, SIZEOF_ARRAY(szFileName), szOldFileName);
-					PathStripPath(szFileName);
-
-					PathAppend(szLinkFileName, szFileName);
-
-					CreateHardLink(szLinkFileName, szOldFileName, nullptr);
-				}
-
-				GlobalUnlock(stg.hGlobal);
-			}
-
-			ReleaseStgMedium(&stg);
-		}
-		clipboardObject->Release();
-	}
-
-	return nFilesCopied;
-}
-
 HRESULT FileOperations::CreateLinkToFile(const std::wstring &strTargetFilename,
 	const std::wstring &strLinkFilename, const std::wstring &strLinkDescription)
 {
@@ -548,6 +490,22 @@ HRESULT FileOperations::ResolveLink(HWND hwnd, DWORD fFlags, const TCHAR *szLink
 	}
 
 	return hr;
+}
+
+// Creates a hard link to the specified file in the provided destination directory. The hard link
+// will have the same name as the original file.
+std::error_code FileOperations::CreateHardLinkToFile(const std::wstring &sourceFile,
+	const std::wstring &destinationDirectory)
+{
+	std::filesystem::path sourceFilePath(sourceFile);
+
+	std::filesystem::path destinationFilePath(destinationDirectory);
+	destinationFilePath /= sourceFilePath.filename();
+
+	std::error_code error;
+	std::filesystem::create_hard_link(sourceFilePath, destinationFilePath, error);
+
+	return error;
 }
 
 BOOL FileOperations::CreateBrowseDialog(HWND hOwner, const std::wstring &strTitle,

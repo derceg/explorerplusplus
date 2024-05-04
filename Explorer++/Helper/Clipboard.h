@@ -15,9 +15,11 @@ public:
 	~Clipboard();
 
 	std::optional<std::wstring> ReadText();
+	std::optional<std::vector<std::wstring>> ReadHDropData();
 	std::optional<std::string> ReadCustomData(UINT format);
 
 	bool WriteText(const std::wstring &str);
+	bool WriteHDropData(const std::vector<std::wstring> &paths);
 	bool WriteCustomData(UINT format, const std::string &data);
 
 	bool Clear();

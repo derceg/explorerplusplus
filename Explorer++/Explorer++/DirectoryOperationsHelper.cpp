@@ -45,30 +45,12 @@ bool CanPasteCustomDataInDirectory(PCIDLIST_ABSOLUTE pidl)
 	return CanCreateInDirectory(pidl);
 }
 
-bool IsFilesystemFolder(PCIDLIST_ABSOLUTE pidl)
-{
-	SFGAOF attributes = SFGAO_FILESYSTEM;
-	HRESULT hr = GetItemAttributes(pidl, &attributes);
-
-	if (FAILED(hr))
-	{
-		return false;
-	}
-
-	return WI_IsFlagSet(attributes, SFGAO_FILESYSTEM);
-}
-
 }
 
 bool CanPasteInDirectory(PCIDLIST_ABSOLUTE pidl, PasteType pasteType)
 {
 	return CanShellPasteClipboardDataInDirectory(pidl, pasteType)
 		|| (pasteType == PasteType::Normal && CanPasteCustomDataInDirectory(pidl));
-}
-
-bool CanPasteHardLinkInDirectory(PCIDLIST_ABSOLUTE pidl)
-{
-	return IsClipboardFormatAvailable(CF_HDROP) && IsFilesystemFolder(pidl);
 }
 
 bool CanCreateInDirectory(PCIDLIST_ABSOLUTE pidl)
@@ -87,4 +69,17 @@ bool CanCreateInDirectory(PCIDLIST_ABSOLUTE pidl)
 bool CanCustomizeDirectory(PCIDLIST_ABSOLUTE pidl)
 {
 	return IsFilesystemFolder(pidl);
+}
+
+bool IsFilesystemFolder(PCIDLIST_ABSOLUTE pidl)
+{
+	SFGAOF attributes = SFGAO_FILESYSTEM;
+	HRESULT hr = GetItemAttributes(pidl, &attributes);
+
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	return WI_IsFlagSet(attributes, SFGAO_FILESYSTEM);
 }

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "ClipboardOperations.h"
 #include "DirectoryOperationsHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellTreeView/ShellTreeView.h"

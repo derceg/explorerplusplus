@@ -40,6 +40,8 @@ std::optional<T> ReadDataFromGlobal(HGLOBAL global)
 }
 
 wil::unique_hglobal WriteDataToGlobal(const void *data, size_t size);
+std::optional<std::vector<std::wstring>> ReadHDropDataFromGlobal(HGLOBAL global);
+wil::unique_hglobal WriteHDropDataToGlobal(const std::vector<std::wstring> &paths);
 
 bool IsDropFormatAvailable(IDataObject *dataObject, const FORMATETC &formatEtc);
 UINT GetPngClipboardFormat();
