@@ -5,9 +5,7 @@
 #include "stdafx.h"
 #include "DataObjectWrapper.h"
 
-DataObjectWrapper::DataObjectWrapper(IDataObject *dataObject) :
-	m_dataObject(dataObject),
-	m_isOpAsync(FALSE)
+DataObjectWrapper::DataObjectWrapper(IDataObject *dataObject) : m_dataObject(dataObject)
 {
 }
 
@@ -63,21 +61,21 @@ IFACEMETHODIMP DataObjectWrapper::EnumDAdvise(IEnumSTATDATA **enumerator)
 // IDataObjectAsyncCapability
 IFACEMETHODIMP DataObjectWrapper::GetAsyncMode(BOOL *isOpAsync)
 {
-	*isOpAsync = m_isOpAsync;
+	*isOpAsync = m_isOpAsync ? VARIANT_TRUE : VARIANT_FALSE;
 
 	return S_OK;
 }
 
 IFACEMETHODIMP DataObjectWrapper::SetAsyncMode(BOOL doOpAsync)
 {
-	m_isOpAsync = doOpAsync;
+	m_isOpAsync = !!doOpAsync;
 
 	return S_OK;
 }
 
 IFACEMETHODIMP DataObjectWrapper::InOperation(BOOL *inAsyncOp)
 {
-	*inAsyncOp = m_inOperation;
+	*inAsyncOp = m_inOperation ? VARIANT_TRUE : VARIANT_FALSE;
 
 	return S_OK;
 }
@@ -86,7 +84,7 @@ IFACEMETHODIMP DataObjectWrapper::StartOperation(IBindCtx *reserved)
 {
 	UNREFERENCED_PARAMETER(reserved);
 
-	m_inOperation = TRUE;
+	m_inOperation = true;
 
 	return S_OK;
 }
@@ -97,6 +95,6 @@ IFACEMETHODIMP DataObjectWrapper::EndOperation(HRESULT result, IBindCtx *reserve
 	UNREFERENCED_PARAMETER(reserved);
 	UNREFERENCED_PARAMETER(effects);
 
-	m_inOperation = FALSE;
+	m_inOperation = false;
 	return S_OK;
 }

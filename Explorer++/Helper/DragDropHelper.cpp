@@ -85,7 +85,7 @@ HRESULT CreateDataObjectForShellTransfer(const std::vector<PCIDLIST_ABSOLUTE> &i
 	{
 		wil::com_ptr_nothrow<IDataObjectAsyncCapability> asyncCapability;
 		RETURN_IF_FAILED(dataObject->QueryInterface(IID_PPV_ARGS(&asyncCapability)));
-		RETURN_IF_FAILED(asyncCapability->SetAsyncMode(TRUE));
+		RETURN_IF_FAILED(asyncCapability->SetAsyncMode(VARIANT_TRUE));
 	}
 
 	*dataObjectOut = dataObject.detach();

@@ -49,6 +49,6 @@ public:
 private:
 	wil::com_ptr_nothrow<IDataObject> m_dataObject;
 
-	BOOL m_inOperation;
-	BOOL m_isOpAsync;
+	bool m_inOperation = false;
+	bool m_isOpAsync = false;
 };
