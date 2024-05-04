@@ -14,26 +14,23 @@ class DataObjectImpl :
 		winrt::non_agile>
 {
 public:
-	DataObjectImpl();
-
 	// IDataObject
-	IFACEMETHODIMP GetData(FORMATETC *pFormatEtc, STGMEDIUM *pMedium);
-	IFACEMETHODIMP GetDataHere(FORMATETC *pFormatEtc, STGMEDIUM *pMedium);
-	IFACEMETHODIMP QueryGetData(FORMATETC *pFormatEtc);
-	IFACEMETHODIMP GetCanonicalFormatEtc(FORMATETC *pFormatEtcIn, FORMATETC *pFormatEtcOut);
-	IFACEMETHODIMP SetData(FORMATETC *pFormatEtc, STGMEDIUM *pMedium, BOOL fRelease);
-	IFACEMETHODIMP EnumFormatEtc(DWORD dwDirection, IEnumFORMATETC **ppEnumFormatetc);
-	IFACEMETHODIMP DAdvise(FORMATETC *pFormatEtc, DWORD advf, IAdviseSink *pAdvSink,
-		DWORD *pdwConnection);
-	IFACEMETHODIMP DUnadvise(DWORD dwConnection);
-	IFACEMETHODIMP EnumDAdvise(IEnumSTATDATA **ppenumAdvise);
+	IFACEMETHODIMP GetData(FORMATETC *format, STGMEDIUM *stg);
+	IFACEMETHODIMP GetDataHere(FORMATETC *format, STGMEDIUM *stg);
+	IFACEMETHODIMP QueryGetData(FORMATETC *format);
+	IFACEMETHODIMP GetCanonicalFormatEtc(FORMATETC *formatIn, FORMATETC *formatOut);
+	IFACEMETHODIMP SetData(FORMATETC *format, STGMEDIUM *stg, BOOL release);
+	IFACEMETHODIMP EnumFormatEtc(DWORD direction, IEnumFORMATETC **enumFormatEtc);
+	IFACEMETHODIMP DAdvise(FORMATETC *format, DWORD flags, IAdviseSink *sink, DWORD *connection);
+	IFACEMETHODIMP DUnadvise(DWORD connection);
+	IFACEMETHODIMP EnumDAdvise(IEnumSTATDATA **enumAdvise);
 
 	// IDataObjectAsyncCapability
-	IFACEMETHODIMP EndOperation(HRESULT hResult, IBindCtx *pbcReserved, DWORD dwEffects);
-	IFACEMETHODIMP GetAsyncMode(BOOL *pfIsOpAsync);
-	IFACEMETHODIMP InOperation(BOOL *pfInAsyncOp);
-	IFACEMETHODIMP SetAsyncMode(BOOL fDoOpAsync);
-	IFACEMETHODIMP StartOperation(IBindCtx *pbcReserved);
+	IFACEMETHODIMP EndOperation(HRESULT result, IBindCtx *reserved, DWORD effects);
+	IFACEMETHODIMP GetAsyncMode(BOOL *isAsync);
+	IFACEMETHODIMP InOperation(BOOL *inAsyncOp);
+	IFACEMETHODIMP SetAsyncMode(BOOL doOpAsync);
+	IFACEMETHODIMP StartOperation(IBindCtx *reserved);
 
 private:
 	struct ItemData
@@ -42,10 +39,10 @@ private:
 		wil::unique_stg_medium stg;
 	};
 
-	wil::unique_stg_medium DuplicateStorageMedium(const STGMEDIUM *pstgSrc, const FORMATETC *pftc);
+	wil::unique_stg_medium DuplicateStorageMedium(const STGMEDIUM *stg, const FORMATETC *format);
 
 	std::vector<ItemData> m_items;
 
-	BOOL m_bInOperation;
-	BOOL m_bDoOpAsync;
+	bool m_inOperation = false;
+	bool m_doOpAsync = false;
 };
