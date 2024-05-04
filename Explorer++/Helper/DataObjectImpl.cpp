@@ -22,11 +22,6 @@ IFACEMETHODIMP DataObjectImpl::GetData(FORMATETC *pFormatEtc, STGMEDIUM *pMedium
 		return E_INVALIDARG;
 	}
 
-	if (QueryGetData(pFormatEtc) == DV_E_FORMATETC)
-	{
-		return DV_E_FORMATETC;
-	}
-
 	for (const auto &item : m_items)
 	{
 		if (item.format.cfFormat == pFormatEtc->cfFormat && item.format.tymed & pFormatEtc->tymed
