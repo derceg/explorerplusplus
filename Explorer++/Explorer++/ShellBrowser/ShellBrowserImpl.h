@@ -170,6 +170,8 @@ public:
 	BOOL CanCreate() const;
 	HRESULT CopySelectedItemsToClipboard(bool copy);
 	void PasteShortcut();
+	void PasteHardLinks();
+	void OnInternalPaste(const std::vector<std::wstring> &pastedItems);
 	void StartRenamingSelectedItems();
 	void DeleteSelectedItems(bool permanent);
 

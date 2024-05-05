@@ -492,22 +492,6 @@ HRESULT FileOperations::ResolveLink(HWND hwnd, DWORD fFlags, const TCHAR *szLink
 	return hr;
 }
 
-// Creates a hard link to the specified file in the provided destination directory. The hard link
-// will have the same name as the original file.
-std::error_code FileOperations::CreateHardLinkToFile(const std::wstring &sourceFile,
-	const std::wstring &destinationDirectory)
-{
-	std::filesystem::path sourceFilePath(sourceFile);
-
-	std::filesystem::path destinationFilePath(destinationDirectory);
-	destinationFilePath /= sourceFilePath.filename();
-
-	std::error_code error;
-	std::filesystem::create_hard_link(sourceFilePath, destinationFilePath, error);
-
-	return error;
-}
-
 BOOL FileOperations::CreateBrowseDialog(HWND hOwner, const std::wstring &strTitle,
 	PIDLIST_ABSOLUTE *ppidl)
 {

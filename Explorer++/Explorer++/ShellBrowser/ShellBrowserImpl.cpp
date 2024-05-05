@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ShellBrowserImpl.h"
+#include "ClipboardOperations.h"
 #include "ColorRuleModel.h"
 #include "ColorRuleModelFactory.h"
 #include "Config.h"
@@ -1308,6 +1309,29 @@ void ShellBrowserImpl::PasteShortcut()
 
 	ExecuteActionFromContextMenu(m_directoryState.pidlDirectory.get(), {}, m_hListView,
 		L"pastelink", 0, serviceProvider.get());
+}
+
+void ShellBrowserImpl::PasteHardLinks()
+{
+	ClipboardOperations::PasteHardLinks(GetDirectory(),
+		std::bind_front(&ShellBrowserImpl::OnInternalPaste, this));
+}
+
+void ShellBrowserImpl::OnInternalPaste(const std::vector<std::wstring> &pastedItems)
+{
+	std::vector<PidlAbsolute> pidls;
+
+	for (const auto &pastedItem : pastedItems)
+	{
+		unique_pidl_absolute pidl(SHSimpleIDListFromPath(pastedItem.c_str()));
+
+		if (pidl)
+		{
+			pidls.push_back(pidl.get());
+		}
+	}
+
+	SelectItems(pidls);
 }
 
 void ShellBrowserImpl::OnApplicationShuttingDown()

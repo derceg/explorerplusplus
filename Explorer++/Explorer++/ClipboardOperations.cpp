@@ -6,14 +6,16 @@
 #include "ClipboardOperations.h"
 #include "DirectoryOperationsHelper.h"
 #include "../Helper/Clipboard.h"
-#include "../Helper/FileOperations.h"
+
+namespace ClipboardOperations
+{
 
 bool CanPasteHardLinkInDirectory(PCIDLIST_ABSOLUTE pidl)
 {
 	return IsClipboardFormatAvailable(CF_HDROP) && IsFilesystemFolder(pidl);
 }
 
-void PasteHardLinks(const std::wstring &destination)
+void PasteHardLinks(const std::wstring &destination, InternalPasteCallback internalPasteCallback)
 {
 	Clipboard clipboard;
 	auto paths = clipboard.ReadHDropData();
@@ -23,8 +25,30 @@ void PasteHardLinks(const std::wstring &destination)
 		return;
 	}
 
+	std::vector<std::wstring> pastedItems;
+
 	for (const auto &path : *paths)
 	{
-		FileOperations::CreateHardLinkToFile(path, destination);
+		std::filesystem::path sourceFilePath(path);
+
+		std::filesystem::path destinationFilePath(destination);
+		destinationFilePath /= sourceFilePath.filename();
+
+		std::error_code error;
+		std::filesystem::create_hard_link(sourceFilePath, destinationFilePath, error);
+
+		if (!error)
+		{
+			pastedItems.push_back(destinationFilePath);
+		}
 	}
+
+	if (pastedItems.empty())
+	{
+		return;
+	}
+
+	internalPasteCallback(pastedItems);
+}
+
 }

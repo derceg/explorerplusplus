@@ -38,9 +38,6 @@ HRESULT CreateLinkToFile(const std::wstring &strTargetFilename, const std::wstri
 HRESULT ResolveLink(HWND hwnd, DWORD fFlags, const TCHAR *szLinkFilename, TCHAR *szResolvedPath,
 	int nBufferSize);
 
-std::error_code CreateHardLinkToFile(const std::wstring &sourceFile,
-	const std::wstring &destinationDirectory);
-
 BOOL CreateBrowseDialog(HWND hOwner, const std::wstring &strTitle, PIDLIST_ABSOLUTE *ppidl);
 
 };

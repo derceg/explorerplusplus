@@ -464,7 +464,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_EDIT_PASTEHARDLINK:
-		PasteHardLinks(m_pActiveShellBrowser->GetDirectory());
+		GetActiveShellBrowserImpl()->PasteHardLinks();
 		break;
 
 	case IDM_EDIT_COPYTOFOLDER:
