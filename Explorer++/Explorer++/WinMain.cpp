@@ -211,7 +211,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 						COPYDATASTRUCT cds;
 						TCHAR szDirectory[MAX_PATH];
 
-						StringCchCopy(szDirectory, SIZEOF_ARRAY(szDirectory), strDirectory.c_str());
+						StringCchCopy(szDirectory, std::size(szDirectory), strDirectory.c_str());
 
 						cds.cbData = static_cast<DWORD>((strDirectory.size() + 1) * sizeof(TCHAR));
 						cds.lpData = szDirectory;

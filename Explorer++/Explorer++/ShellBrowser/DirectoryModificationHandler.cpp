@@ -233,7 +233,7 @@ void ShellBrowserImpl::FilesModified(DWORD Action, const TCHAR *FileName, int Ev
 
 	AlteredFile_t af;
 
-	StringCchCopy(af.szFileName, SIZEOF_ARRAY(af.szFileName), FileName);
+	StringCchCopy(af.szFileName, std::size(af.szFileName), FileName);
 	af.dwAction = Action;
 	af.iFolderIndex = iFolderIndex;
 

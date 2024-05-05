@@ -205,7 +205,7 @@ std::optional<int> DirectoryMonitor::WatchDirectory(const TCHAR *Directory, UINT
 	CD/DVD drives etc). */
 	SetErrorMode(SEM_FAILCRITICALERRORS);
 
-	StringCchCopy(pDirInfo.m_DirPath, SIZEOF_ARRAY(pDirInfo.m_DirPath), Directory);
+	StringCchCopy(pDirInfo.m_DirPath, std::size(pDirInfo.m_DirPath), Directory);
 
 	pDirInfo.m_hDirectory = CreateFile(pDirInfo.m_DirPath, FILE_LIST_DIRECTORY,
 		FILE_SHARE_READ | FILE_SHARE_DELETE | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING,
@@ -258,7 +258,7 @@ std::optional<int> DirectoryMonitor::WatchDirectory(HANDLE hDirectory, const TCH
 	CD/DVD drives etc). */
 	SetErrorMode(SEM_FAILCRITICALERRORS);
 
-	StringCchCopy(pDirInfo.m_DirPath, SIZEOF_ARRAY(pDirInfo.m_DirPath), Directory);
+	StringCchCopy(pDirInfo.m_DirPath, std::size(pDirInfo.m_DirPath), Directory);
 
 	pDirInfo.m_hDirectory = hDirectory;
 

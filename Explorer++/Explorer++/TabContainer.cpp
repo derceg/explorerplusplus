@@ -674,7 +674,7 @@ void TabContainer::OnGetDispInfo(NMTTDISPINFO *dispInfo)
 		return;
 	}
 
-	StringCchCopy(tabToolTip, SIZEOF_ARRAY(tabToolTip), path->c_str());
+	StringCchCopy(tabToolTip, std::size(tabToolTip), path->c_str());
 
 	dispInfo->lpszText = tabToolTip;
 }

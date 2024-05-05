@@ -36,9 +36,8 @@ HRESULT SetDropDescription(IDataObject *dataObject, DROPIMAGETYPE type, const st
 {
 	DROPDESCRIPTION dropDescription;
 	dropDescription.type = type;
-	StringCchCopy(dropDescription.szMessage, SIZEOF_ARRAY(dropDescription.szMessage),
-		message.c_str());
-	StringCchCopy(dropDescription.szInsert, SIZEOF_ARRAY(dropDescription.szInsert), insert.c_str());
+	StringCchCopy(dropDescription.szMessage, std::size(dropDescription.szMessage), message.c_str());
+	StringCchCopy(dropDescription.szInsert, std::size(dropDescription.szInsert), insert.c_str());
 
 	return SetBlobData(dataObject,
 		static_cast<CLIPFORMAT>(RegisterClipboardFormat(CFSTR_DROPDESCRIPTION)), dropDescription);

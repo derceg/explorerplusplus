@@ -135,7 +135,7 @@ BOOL CheckWildcardMatch(const TCHAR *szWildcard, const TCHAR *szString, BOOL bCa
 		TCHAR *szSearchPattern = nullptr;
 		TCHAR *szRemainingPattern = nullptr;
 
-		StringCchCopy(szWildcardPattern, SIZEOF_ARRAY(szWildcardPattern), szWildcard);
+		StringCchCopy(szWildcardPattern, std::size(szWildcardPattern), szWildcard);
 
 		szSinglePattern = wcstok_s(szWildcardPattern, _T(":"), &szRemainingPattern);
 		PathRemoveBlanks(szSinglePattern);

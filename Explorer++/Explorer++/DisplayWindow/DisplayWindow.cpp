@@ -188,7 +188,7 @@ LRESULT CALLBACK DisplayWindow::DisplayWindowProc(HWND displayWindow, UINT msg, 
 
 		if (pszText != nullptr)
 		{
-			StringCchCopy(ld.szText, SIZEOF_ARRAY(ld.szText), pszText);
+			StringCchCopy(ld.szText, std::size(ld.szText), pszText);
 
 			m_LineList.push_back(ld);
 		}
@@ -220,7 +220,7 @@ LRESULT CALLBACK DisplayWindow::DisplayWindowProc(HWND displayWindow, UINT msg, 
 			{
 				if (i == iLine)
 				{
-					StringCchCopy(itr->szText, SIZEOF_ARRAY(itr->szText), pszText);
+					StringCchCopy(itr->szText, std::size(itr->szText), pszText);
 					break;
 				}
 

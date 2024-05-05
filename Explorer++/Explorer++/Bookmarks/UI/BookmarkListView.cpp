@@ -277,7 +277,7 @@ int BookmarkListView::InsertBookmarkItemIntoListView(BookmarkItem *bookmarkItem,
 	DCHECK(position >= 0 && position <= ListView_GetItemCount(m_hListView));
 
 	TCHAR szName[256];
-	StringCchCopy(szName, SIZEOF_ARRAY(szName), bookmarkItem->GetName().c_str());
+	StringCchCopy(szName, std::size(szName), bookmarkItem->GetName().c_str());
 
 	int iconIndex = m_bookmarkIconManager->GetBookmarkItemIconIndex(bookmarkItem,
 		std::bind_front(&BookmarkListView::OnBookmarkIconAvailable, this, bookmarkItem->GetGUID()));

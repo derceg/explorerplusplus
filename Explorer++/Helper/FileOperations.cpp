@@ -273,7 +273,7 @@ BOOL FileOperations::SaveDirectoryListing(const std::wstring &strDirectory,
 	LocalFileTimeToFileTime(&ft, &lft);
 
 	TCHAR szTime[128];
-	CreateFileTimeString(&lft, szTime, SIZEOF_ARRAY(szTime), FALSE);
+	CreateFileTimeString(&lft, szTime, std::size(szTime), FALSE);
 	strContents += _T("Date\r\n----\r\n") + std::wstring(szTime) + _T("\r\n\r\n");
 
 	std::wstring strSearch = strDirectory + _T("\\*");
@@ -524,7 +524,7 @@ BOOL GetFileClusterSize(const std::wstring &strFilename, PLARGE_INTEGER lpRealFi
 	}
 
 	TCHAR szRoot[MAX_PATH];
-	HRESULT hr = StringCchCopy(szRoot, SIZEOF_ARRAY(szRoot), strFilename.c_str());
+	HRESULT hr = StringCchCopy(szRoot, std::size(szRoot), strFilename.c_str());
 
 	if (FAILED(hr))
 	{

@@ -26,7 +26,7 @@ BOOL FileActionHandler::RenameFiles(const RenamedItems_t &itemList)
 		if (SUCCEEDED(hr))
 		{
 			TCHAR newFilename[MAX_PATH];
-			StringCchCopy(newFilename, SIZEOF_ARRAY(newFilename), item.strNewFilename.c_str());
+			StringCchCopy(newFilename, std::size(newFilename), item.strNewFilename.c_str());
 			PathStripPath(newFilename);
 
 			/* TODO: Could rename all files in the list in a single

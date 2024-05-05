@@ -219,7 +219,7 @@ std::wstring ProcessItemFileName(const BasicItemInfo_t &itemInfo,
 	{
 		TCHAR szDisplayName[MAX_PATH];
 
-		StringCchCopy(szDisplayName, SIZEOF_ARRAY(szDisplayName), itemInfo.szDisplayName);
+		StringCchCopy(szDisplayName, std::size(szDisplayName), itemInfo.szDisplayName);
 
 		/* Strip the extension. */
 		PathRemoveExtension(szDisplayName);
@@ -257,7 +257,7 @@ std::wstring GetSizeColumnText(const BasicItemInfo_t &itemInfo,
 	if ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
 		TCHAR drive[MAX_PATH];
-		StringCchCopy(drive, SIZEOF_ARRAY(drive), itemInfo.getFullPath().c_str());
+		StringCchCopy(drive, std::size(drive), itemInfo.getFullPath().c_str());
 		PathStripToRoot(drive);
 
 		bool bNetworkRemovable = false;
@@ -840,18 +840,18 @@ std::wstring GetMediaMetadataColumnText(const BasicItemInfo_t &itemInfo,
 			boost::posix_time::microseconds(*(reinterpret_cast<QWORD *>(tempBuffer)) / 10);
 		dateStream << duration;
 
-		StringCchCopy(szOutput, SIZEOF_ARRAY(szOutput), dateStream.str().c_str());
+		StringCchCopy(szOutput, std::size(szOutput), dateStream.str().c_str());
 	}
 	break;
 
 	case MediaMetadataType::Protected:
 		if (*(reinterpret_cast<BOOL *>(tempBuffer)))
 		{
-			StringCchCopy(szOutput, SIZEOF_ARRAY(szOutput), L"Yes");
+			StringCchCopy(szOutput, std::size(szOutput), L"Yes");
 		}
 		else
 		{
-			StringCchCopy(szOutput, SIZEOF_ARRAY(szOutput), L"No");
+			StringCchCopy(szOutput, std::size(szOutput), L"No");
 		}
 		break;
 
@@ -877,7 +877,7 @@ std::wstring GetMediaMetadataColumnText(const BasicItemInfo_t &itemInfo,
 	case MediaMetadataType::Writer:
 	case MediaMetadataType::Year:
 	default:
-		StringCchCopy(szOutput, SIZEOF_ARRAY(szOutput), reinterpret_cast<TCHAR *>(tempBuffer));
+		StringCchCopy(szOutput, std::size(szOutput), reinterpret_cast<TCHAR *>(tempBuffer));
 		break;
 	}
 

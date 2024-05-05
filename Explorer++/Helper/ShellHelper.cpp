@@ -889,7 +889,7 @@ std::optional<std::wstring> PathAppendWrapper(const std::wstring &path,
 	}
 
 	TCHAR finalPath[MAX_PATH];
-	StringCchCopy(finalPath, SIZEOF_ARRAY(finalPath), path.c_str());
+	StringCchCopy(finalPath, std::size(finalPath), path.c_str());
 	BOOL res = PathAppend(finalPath, pathToAppend.c_str());
 
 	if (!res)
@@ -908,7 +908,7 @@ std::optional<std::wstring> PathStripToRootWrapper(const std::wstring &path)
 	}
 
 	TCHAR root[MAX_PATH];
-	StringCchCopy(root, SIZEOF_ARRAY(root), path.c_str());
+	StringCchCopy(root, std::size(root), path.c_str());
 	BOOL res = PathStripToRoot(root);
 
 	if (!res)

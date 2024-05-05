@@ -1600,7 +1600,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 						}
 						else
 						{
-							StringCchCopy(szText, SIZEOF_ARRAY(szText), (LPCWSTR) tbButton.iString);
+							StringCchCopy(szText, std::size(szText), (LPCWSTR) tbButton.iString);
 						}
 
 						HMENU hSubMenu = nullptr;

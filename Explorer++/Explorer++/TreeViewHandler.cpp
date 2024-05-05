@@ -82,7 +82,7 @@ void Explorerplusplus::OnTreeViewSetFileAttributes() const
 
 	if (hr == S_OK)
 	{
-		StringCchCopy(sfai.szFullFileName, SIZEOF_ARRAY(sfai.szFullFileName), fullFileName.c_str());
+		StringCchCopy(sfai.szFullFileName, std::size(sfai.szFullFileName), fullFileName.c_str());
 
 		HANDLE hFindFile = FindFirstFile(sfai.szFullFileName, &sfai.wfd);
 

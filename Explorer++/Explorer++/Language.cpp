@@ -79,7 +79,7 @@ void Explorerplusplus::SetLanguageModule()
 			SIZEOF_ARRAY(szLanguageModule));
 		PathRemoveFileSpec(szLanguageModule);
 
-		StringCchCopy(szNamePattern, SIZEOF_ARRAY(szNamePattern), szLanguageModule);
+		StringCchCopy(szNamePattern, std::size(szNamePattern), szLanguageModule);
 		PathAppend(szNamePattern, NExplorerplusplus::LANGUAGE_DLL_FILENAME_PATTERN);
 
 		hFindFile = FindFirstFile(szNamePattern, &wfd);
@@ -89,7 +89,7 @@ void Explorerplusplus::SetLanguageModule()
 		language. */
 		if (hFindFile != INVALID_HANDLE_VALUE)
 		{
-			StringCchCopy(szFullFileName, SIZEOF_ARRAY(szFullFileName), szLanguageModule);
+			StringCchCopy(szFullFileName, std::size(szFullFileName), szLanguageModule);
 			PathAppend(szFullFileName, wfd.cFileName);
 			bRet = GetFileLanguage(szFullFileName, &wLanguage);
 
@@ -115,7 +115,7 @@ void Explorerplusplus::SetLanguageModule()
 			{
 				while (FindNextFile(hFindFile, &wfd) != 0)
 				{
-					StringCchCopy(szFullFileName, SIZEOF_ARRAY(szFullFileName), szLanguageModule);
+					StringCchCopy(szFullFileName, std::size(szFullFileName), szLanguageModule);
 					PathAppend(szFullFileName, wfd.cFileName);
 					bRet = GetFileLanguage(szFullFileName, &wLanguage);
 

@@ -149,7 +149,7 @@ void LoadDialogStatesFromXML(IXMLDOMDocument *xmlDocument)
 					for (DialogSettings *ds : DIALOG_SETTINGS)
 					{
 						TCHAR settingsKey[64];
-						bool success = ds->GetSettingsKey(settingsKey, SIZEOF_ARRAY(settingsKey));
+						bool success = ds->GetSettingsKey(settingsKey, std::size(settingsKey));
 						assert(success);
 
 						if (!success)

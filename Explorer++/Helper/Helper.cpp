@@ -100,12 +100,12 @@ BOOL CreateFriendlySystemTimeString(const SYSTEMTIME *localSystemTime, TCHAR *sz
 
 	if (inputDate == today)
 	{
-		StringCchCopy(dateComponent, SIZEOF_ARRAY(dateComponent), _T("Today"));
+		StringCchCopy(dateComponent, std::size(dateComponent), _T("Today"));
 		dateComponentSet = true;
 	}
 	else if (inputDate == yesterday)
 	{
-		StringCchCopy(dateComponent, SIZEOF_ARRAY(dateComponent), _T("Yesterday"));
+		StringCchCopy(dateComponent, std::size(dateComponent), _T("Yesterday"));
 		dateComponentSet = true;
 	}
 
@@ -152,12 +152,12 @@ HINSTANCE StartCommandPrompt(const std::wstring &directory, bool elevated)
 
 			if (elevated)
 			{
-				StringCchCopy(operation, SIZEOF_ARRAY(operation), _T("runas"));
+				StringCchCopy(operation, std::size(operation), _T("runas"));
 				parameters = _T("/K cd /d ") + directory;
 			}
 			else
 			{
-				StringCchCopy(operation, SIZEOF_ARRAY(operation), _T("open"));
+				StringCchCopy(operation, std::size(operation), _T("open"));
 			}
 
 			hNewInstance = ShellExecute(nullptr, operation, commandPath, parameters.c_str(),
@@ -532,14 +532,14 @@ BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType subBlo
 
 				if (subBlockType == VersionSubBlockType::Root)
 				{
-					StringCchCopy(szSubBlock, SIZEOF_ARRAY(szSubBlock), _T("\\"));
+					StringCchCopy(szSubBlock, std::size(szSubBlock), _T("\\"));
 					pBuffer = reinterpret_cast<LPVOID *>(&pvsffi);
 					uStructureSize = sizeof(VS_FIXEDFILEINFO);
 				}
 				else if (subBlockType == VersionSubBlockType::Translation
 					|| subBlockType == VersionSubBlockType::StringTableValue)
 				{
-					StringCchCopy(szSubBlock, SIZEOF_ARRAY(szSubBlock),
+					StringCchCopy(szSubBlock, std::size(szSubBlock),
 						_T("\\VarFileInfo\\Translation"));
 					pBuffer = reinterpret_cast<LPVOID *>(&plcp);
 					uStructureSize = sizeof(LangAndCodePage);

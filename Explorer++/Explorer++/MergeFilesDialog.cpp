@@ -143,7 +143,7 @@ INT_PTR MergeFilesDialog::OnInitDialog()
 	{
 		TCHAR szFullFilename[MAX_PATH];
 
-		StringCchCopy(szFullFilename, SIZEOF_ARRAY(szFullFilename), strFullFilename.c_str());
+		StringCchCopy(szFullFilename, std::size(szFullFilename), strFullFilename.c_str());
 
 		/* TODO: Perform in background thread. */
 		SHFILEINFO shfi;

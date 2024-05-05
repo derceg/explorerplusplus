@@ -597,7 +597,7 @@ void ShellBrowserImpl::ProcessInfoTipResult(int infoTipResultId)
 	}
 
 	TCHAR infoTipText[256];
-	StringCchCopy(infoTipText, SIZEOF_ARRAY(infoTipText), result->infoTip.c_str());
+	StringCchCopy(infoTipText, std::size(infoTipText), result->infoTip.c_str());
 
 	LVSETINFOTIP infoTip;
 	infoTip.cbSize = sizeof(infoTip);
@@ -744,8 +744,7 @@ void ShellBrowserImpl::OnListViewKeyDown(const NMLVKEYDOWN *lvKeyDown)
 		if (IsKeyDown(VK_CONTROL) && !IsKeyDown(VK_SHIFT) && !IsKeyDown(VK_MENU))
 		{
 			TCHAR root[MAX_PATH];
-			HRESULT hr =
-				StringCchCopy(root, SIZEOF_ARRAY(root), m_directoryState.directory.c_str());
+			HRESULT hr = StringCchCopy(root, std::size(root), m_directoryState.directory.c_str());
 
 			if (SUCCEEDED(hr))
 			{
@@ -995,7 +994,7 @@ void ShellBrowserImpl::SetFileAttributesForSelection()
 
 		const ItemInfo_t &item = GetItemByIndex(index);
 		sfai.wfd = item.wfd;
-		StringCchCopy(sfai.szFullFileName, SIZEOF_ARRAY(sfai.szFullFileName),
+		StringCchCopy(sfai.szFullFileName, std::size(sfai.szFullFileName),
 			item.parsingName.c_str());
 
 		sfaiList.push_back(sfai);

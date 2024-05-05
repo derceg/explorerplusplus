@@ -196,7 +196,7 @@ HTREEITEM BookmarkTreeView::InsertFolderIntoTreeView(HTREEITEM hParent,
 	BookmarkItem *bookmarkFolder, int position)
 {
 	TCHAR szText[256];
-	StringCchCopy(szText, SIZEOF_ARRAY(szText), bookmarkFolder->GetName().c_str());
+	StringCchCopy(szText, std::size(szText), bookmarkFolder->GetName().c_str());
 
 	int nChildren = 0;
 
@@ -291,7 +291,7 @@ void BookmarkTreeView::OnBookmarkItemUpdated(BookmarkItem &bookmarkItem,
 	CHECK(itr != m_mapItem.end());
 
 	TCHAR name[256];
-	StringCchCopy(name, SIZEOF_ARRAY(name), bookmarkItem.GetName().c_str());
+	StringCchCopy(name, std::size(name), bookmarkItem.GetName().c_str());
 
 	TVITEM tvi;
 	tvi.mask = TVIF_TEXT;

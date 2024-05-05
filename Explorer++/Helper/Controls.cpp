@@ -136,7 +136,7 @@ BOOL AddPathsToComboBoxEx(HWND hComboBoxEx, const TCHAR *path)
 	SendMessage(hComboBoxEx, CB_RESETCONTENT, 0, 0);
 
 	TCHAR findPath[MAX_PATH];
-	StringCchCopy(findPath, SIZEOF_ARRAY(findPath), path);
+	StringCchCopy(findPath, std::size(findPath), path);
 	bRet = PathAppend(findPath, _T("*"));
 
 	if (!bRet)

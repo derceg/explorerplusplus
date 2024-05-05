@@ -476,7 +476,7 @@ void DisplayWindow::OnSetThumbnailFile(WPARAM wParam, LPARAM lParam)
 		m_iImageHeight = 0;
 		m_bThumbnailExtracted = FALSE;
 		m_bThumbnailExtractionFailed = FALSE;
-		StringCchCopy(m_ImageFile, SIZEOF_ARRAY(m_ImageFile), (TCHAR *) wParam);
+		StringCchCopy(m_ImageFile, std::size(m_ImageFile), (TCHAR *) wParam);
 	}
 }
 

@@ -255,7 +255,7 @@ void Explorerplusplus::OnResolveLink()
 		if (hr == S_OK)
 		{
 			/* Strip the filename, just leaving the path component. */
-			StringCchCopy(szPath, SIZEOF_ARRAY(szPath), szFullFileName);
+			StringCchCopy(szPath, std::size(szPath), szFullFileName);
 			PathRemoveFileSpec(szPath);
 
 			Tab &newTab = GetActivePane()->GetTabContainer()->CreateNewTab(szPath,

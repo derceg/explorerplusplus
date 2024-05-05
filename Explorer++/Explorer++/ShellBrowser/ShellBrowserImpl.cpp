@@ -1125,7 +1125,7 @@ BasicItemInfo_t ShellBrowserImpl::getBasicItemInfo(int internalIndex) const
 	basicItemInfo.pridl.reset(ILCloneChild(itemInfo.pridl.get()));
 	basicItemInfo.wfd = itemInfo.wfd;
 	basicItemInfo.isFindDataValid = itemInfo.isFindDataValid;
-	StringCchCopy(basicItemInfo.szDisplayName, SIZEOF_ARRAY(basicItemInfo.szDisplayName),
+	StringCchCopy(basicItemInfo.szDisplayName, std::size(basicItemInfo.szDisplayName),
 		itemInfo.displayName.c_str());
 	basicItemInfo.isRoot = itemInfo.bDrive;
 

@@ -86,7 +86,7 @@ INT_PTR MassRenameDialog::OnInitDialog()
 	{
 		SHGetFileInfo(strFilename.c_str(), 0, &shfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX);
 
-		StringCchCopy(szFilename, SIZEOF_ARRAY(szFilename), strFilename.c_str());
+		StringCchCopy(szFilename, std::size(szFilename), strFilename.c_str());
 		PathStripPath(szFilename);
 
 		lvItem.mask = LVIF_TEXT | LVIF_IMAGE;
@@ -156,12 +156,12 @@ INT_PTR MassRenameDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 
 			for (const auto &strFilename : m_FullFilenameList)
 			{
-				StringCchCopy(szFilename, SIZEOF_ARRAY(szFilename), strFilename.c_str());
+				StringCchCopy(szFilename, std::size(szFilename), strFilename.c_str());
 				PathStripPath(szFilename);
 
 				ProcessFileName(szNamePattern, szFilename, iItem, strNewFilename);
 
-				StringCchCopy(szNewFilename, SIZEOF_ARRAY(szNewFilename), strNewFilename.c_str());
+				StringCchCopy(szNewFilename, std::size(szNewFilename), strNewFilename.c_str());
 
 				lvItem.mask = LVIF_TEXT;
 				lvItem.iItem = iItem;
@@ -262,13 +262,13 @@ void MassRenameDialog::OnOk()
 	for (const auto &strOldFilename : m_FullFilenameList)
 	{
 		TCHAR szFilename[MAX_PATH];
-		StringCchCopy(szFilename, SIZEOF_ARRAY(szFilename), strOldFilename.c_str());
+		StringCchCopy(szFilename, std::size(szFilename), strOldFilename.c_str());
 		PathStripPath(szFilename);
 
 		std::wstring strNewFilename;
 		ProcessFileName(szNamePattern, szFilename, iItem, strNewFilename);
 
-		StringCchCopy(szFilename, SIZEOF_ARRAY(szFilename), strOldFilename.c_str());
+		StringCchCopy(szFilename, std::size(szFilename), strOldFilename.c_str());
 		PathRemoveFileSpec(szFilename);
 		strNewFilename = szFilename + std::wstring(_T("\\")) + strNewFilename;
 
@@ -305,7 +305,7 @@ void MassRenameDialog::ProcessFileName(const std::wstring &strTarget,
 	const std::wstring &strFilename, int iFileIndex, std::wstring &strOutput)
 {
 	TCHAR szBaseName[MAX_PATH];
-	StringCchCopy(szBaseName, SIZEOF_ARRAY(szBaseName), strFilename.c_str());
+	StringCchCopy(szBaseName, std::size(szBaseName), strFilename.c_str());
 	PathRemoveExtension(szBaseName);
 
 	TCHAR *pExt = PathFindExtension(strFilename.c_str());

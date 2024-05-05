@@ -317,7 +317,7 @@ void SearchDialog::StartSearching()
 			TCHAR szTemp[MAX_PATH];
 
 			StringCchPrintf(szTemp, SIZEOF_ARRAY(szTemp), _T("*%s*"), szSearchPattern);
-			StringCchCopy(szSearchPattern, SIZEOF_ARRAY(szSearchPattern), szTemp);
+			StringCchCopy(szSearchPattern, std::size(szSearchPattern), szTemp);
 		}
 	}
 
@@ -534,8 +534,8 @@ int CALLBACK SearchDialog::SortResultsByName(LPARAM lParam1, LPARAM lParam2)
 	TCHAR szFilename1[MAX_PATH];
 	TCHAR szFilename2[MAX_PATH];
 
-	StringCchCopy(szFilename1, SIZEOF_ARRAY(szFilename1), itr1->second.c_str());
-	StringCchCopy(szFilename2, SIZEOF_ARRAY(szFilename2), itr2->second.c_str());
+	StringCchCopy(szFilename1, std::size(szFilename1), itr1->second.c_str());
+	StringCchCopy(szFilename2, std::size(szFilename2), itr2->second.c_str());
 
 	PathStripPath(szFilename1);
 	PathStripPath(szFilename2);
@@ -551,8 +551,8 @@ int CALLBACK SearchDialog::SortResultsByPath(LPARAM lParam1, LPARAM lParam2)
 	TCHAR szPath1[MAX_PATH];
 	TCHAR szPath2[MAX_PATH];
 
-	StringCchCopy(szPath1, SIZEOF_ARRAY(szPath1), itr1->second.c_str());
-	StringCchCopy(szPath2, SIZEOF_ARRAY(szPath2), itr2->second.c_str());
+	StringCchCopy(szPath1, std::size(szPath1), itr1->second.c_str());
+	StringCchCopy(szPath2, std::size(szPath2), itr2->second.c_str());
 
 	PathRemoveFileSpec(szPath1);
 	PathRemoveFileSpec(szPath2);
@@ -904,7 +904,7 @@ INT_PTR SearchDialog::OnTimer(int iTimerID)
 		GetDisplayName(pidl, SHGDN_FORPARSING, fullFileName);
 
 		TCHAR directory[MAX_PATH];
-		StringCchCopy(directory, SIZEOF_ARRAY(directory), fullFileName.c_str());
+		StringCchCopy(directory, std::size(directory), fullFileName.c_str());
 		PathRemoveFileSpec(directory);
 
 		std::wstring fileName;
@@ -970,8 +970,8 @@ Search::Search(HWND hDlg, TCHAR *szBaseDirectory, TCHAR *szPattern, DWORD dwAttr
 	m_bCaseInsensitive = bCaseInsensitive;
 	m_bSearchSubFolders = bSearchSubFolders;
 
-	StringCchCopy(m_szBaseDirectory, SIZEOF_ARRAY(m_szBaseDirectory), szBaseDirectory);
-	StringCchCopy(m_szSearchPattern, SIZEOF_ARRAY(m_szSearchPattern), szPattern);
+	StringCchCopy(m_szBaseDirectory, std::size(m_szBaseDirectory), szBaseDirectory);
+	StringCchCopy(m_szSearchPattern, std::size(m_szSearchPattern), szPattern);
 
 	InitializeCriticalSection(&m_csStop);
 	m_bStopSearching = FALSE;

@@ -92,7 +92,7 @@ INT_PTR SplitFileDialog::OnInitDialog()
 	}
 
 	TCHAR szOutputDirectory[MAX_PATH];
-	StringCchCopy(szOutputDirectory, SIZEOF_ARRAY(szOutputDirectory), m_strFullFilename.c_str());
+	StringCchCopy(szOutputDirectory, std::size(szOutputDirectory), m_strFullFilename.c_str());
 	PathRemoveFileSpec(szOutputDirectory);
 	SetDlgItemText(m_hDlg, IDC_SPLIT_EDIT_OUTPUT, szOutputDirectory);
 

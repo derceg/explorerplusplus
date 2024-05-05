@@ -346,7 +346,7 @@ HFONT XMLSettings::ReadXMLFontData(IXMLDOMNode *pNode)
 		}
 		else if (lstrcmp(bstrName.get(), L"Font") == 0)
 		{
-			StringCchCopy(fontInfo.lfFaceName, SIZEOF_ARRAY(fontInfo.lfFaceName), bstrValue.get());
+			StringCchCopy(fontInfo.lfFaceName, std::size(fontInfo.lfFaceName), bstrValue.get());
 		}
 	}
 
