@@ -98,10 +98,6 @@ std::optional<std::wstring> GetFolderPathForDisplay(PCIDLIST_ABSOLUTE pidl);
 bool IsPathGUID(const std::wstring &path);
 BOOL ArePidlsEquivalent(PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2);
 HRESULT AddJumpListTasks(const std::list<JumpListTaskInformation> &taskList);
-BOOL LoadContextMenuHandlers(const TCHAR *szRegKey,
-	std::list<ContextMenuHandler> &contextMenuHandlers,
-	const std::vector<std::wstring> &blacklistedCLSIDEntries);
-BOOL LoadIUnknownFromCLSID(const TCHAR *szCLSID, ContextMenuHandler *pContextMenuHandler);
 HRESULT GetItemAttributes(const TCHAR *szItemParsingPath, SFGAOF *pItemAttributes);
 HRESULT GetItemAttributes(PCIDLIST_ABSOLUTE pidl, SFGAOF *pItemAttributes);
 BOOL ExecuteFileAction(HWND hwnd, const std::wstring &itemPath, const std::wstring &verb,
