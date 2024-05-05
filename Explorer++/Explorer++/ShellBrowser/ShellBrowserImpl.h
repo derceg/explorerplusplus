@@ -14,11 +14,11 @@
 #include "SignalWrapper.h"
 #include "SortModes.h"
 #include "ViewModes.h"
-#include "../Helper/Macros.h"
 #include "../Helper/ShellDropTargetWindow.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WinRTBaseWrapper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
+#include <boost/core/noncopyable.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index_container.hpp>
@@ -59,7 +59,8 @@ typedef struct
 class ShellBrowserImpl :
 	public ShellBrowser,
 	public ShellDropTargetWindow<int>,
-	public std::enable_shared_from_this<ShellBrowserImpl>
+	public std::enable_shared_from_this<ShellBrowserImpl>,
+	private boost::noncopyable
 {
 public:
 	static std::shared_ptr<ShellBrowserImpl> CreateNew(HWND hOwner, ShellBrowserEmbedder *embedder,
@@ -193,8 +194,6 @@ public:
 	SignalWrapper<ShellBrowserImpl, void()> columnsChanged;
 
 private:
-	DISALLOW_COPY_AND_ASSIGN(ShellBrowserImpl);
-
 	using PendingWorkQueueTask = std::function<void()>;
 
 	struct ItemInfo_t

@@ -9,6 +9,7 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/Helper.h"
+#include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 
 namespace

@@ -11,6 +11,7 @@
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainer.h"
 #include "../Helper/Helper.h"
+#include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/WindowSubclassWrapper.h"
 #include <wil/resource.h>

@@ -11,6 +11,7 @@
 #include "TabContainer.h"
 #include "../Helper/FolderSize.h"
 #include "../Helper/Helper.h"
+#include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 
 void Explorerplusplus::UpdateDisplayWindow(const Tab &tab)

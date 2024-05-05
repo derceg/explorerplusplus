@@ -23,6 +23,7 @@
 #include "SplitFileDialog.h"
 #include "UpdateCheckDialog.h"
 #include "WildcardSelectDialog.h"
+#include "../Helper/Macros.h"
 #include "../Helper/XMLSettings.h"
 #include <wil/com.h>
 #include <wil/resource.h>

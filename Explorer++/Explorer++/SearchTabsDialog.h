@@ -6,7 +6,6 @@
 
 #include "ThemedDialog.h"
 #include "../Helper/DialogSettings.h"
-#include <boost/core/noncopyable.hpp>
 #include <boost/signals2.hpp>
 #include <memory>
 #include <vector>
@@ -16,7 +15,7 @@ class SearchTabsDialog;
 class Tab;
 class WindowSubclassWrapper;
 
-class SearchTabsDialogPersistentSettings : public DialogSettings, private boost::noncopyable
+class SearchTabsDialogPersistentSettings : public DialogSettings
 {
 public:
 	static SearchTabsDialogPersistentSettings &GetInstance();

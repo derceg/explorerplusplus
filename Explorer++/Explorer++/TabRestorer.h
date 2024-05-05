@@ -5,12 +5,12 @@
 #pragma once
 
 #include "PreservedTab.h"
-#include "../Helper/Macros.h"
+#include <boost/core/noncopyable.hpp>
 #include <boost/signals2.hpp>
 
 class TabContainer;
 
-class TabRestorer
+class TabRestorer : private boost::noncopyable
 {
 public:
 	using ItemsChangedSignal = boost::signals2::signal<void()>;
@@ -26,8 +26,6 @@ public:
 		const ItemsChangedSignal::slot_type &observer);
 
 private:
-	DISALLOW_COPY_AND_ASSIGN(TabRestorer);
-
 	void OnTabPreRemoval(const Tab &tab);
 
 	TabContainer *m_tabContainer;

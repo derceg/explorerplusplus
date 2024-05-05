@@ -5,14 +5,14 @@
 #pragma once
 
 #include "SignalWrapper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/PidlHelper.h"
+#include <boost/core/noncopyable.hpp>
 #include <optional>
 #include <vector>
 
 struct PreservedHistoryEntry;
 
-class HistoryEntry
+class HistoryEntry : private boost::noncopyable
 {
 public:
 	enum class PropertyType
@@ -37,8 +37,6 @@ public:
 		historyEntryUpdatedSignal;
 
 private:
-	DISALLOW_COPY_AND_ASSIGN(HistoryEntry);
-
 	static int idCounter;
 	const int m_id;
 

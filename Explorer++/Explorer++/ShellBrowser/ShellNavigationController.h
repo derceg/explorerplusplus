@@ -6,7 +6,7 @@
 
 #include "HistoryEntry.h"
 #include "NavigationController.h"
-#include "../Helper/Macros.h"
+#include <boost/core/noncopyable.hpp>
 #include <boost/signals2.hpp>
 #include <vector>
 
@@ -22,7 +22,9 @@ enum class NavigationMode
 	ForceNewTab
 };
 
-class ShellNavigationController : public NavigationController<HistoryEntry, HRESULT>
+class ShellNavigationController :
+	public NavigationController<HistoryEntry, HRESULT>,
+	private boost::noncopyable
 {
 public:
 	ShellNavigationController(ShellNavigator *navigator, TabNavigationInterface *tabNavigation,
@@ -47,8 +49,6 @@ public:
 	HistoryEntry *GetEntryById(int id);
 
 private:
-	DISALLOW_COPY_AND_ASSIGN(ShellNavigationController);
-
 	void Initialize();
 
 	static std::vector<std::unique_ptr<HistoryEntry>> CopyPreservedHistoryEntries(

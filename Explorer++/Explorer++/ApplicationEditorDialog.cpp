@@ -8,6 +8,7 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/Controls.h"
+#include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
 
 namespace Applications

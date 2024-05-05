@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include "Macros.h"
+#include <boost/core/noncopyable.hpp>
 #include <list>
 #include <string>
 
-class StatusBar
+class StatusBar : private boost::noncopyable
 {
 public:
 	StatusBar(HWND hwnd);
@@ -19,8 +19,6 @@ public:
 	void HandleStatusBarMenuClose();
 
 private:
-	DISALLOW_COPY_AND_ASSIGN(StatusBar);
-
 	const HWND m_hwnd;
 
 	int m_nParts;

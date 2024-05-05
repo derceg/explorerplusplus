@@ -11,6 +11,7 @@
 #include "ResourceHelper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/Helper.h"
+#include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include "../Helper/WindowHelper.h"

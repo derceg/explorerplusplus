@@ -6,7 +6,6 @@
 
 #include "ThemedDialog.h"
 #include "../Helper/DialogSettings.h"
-#include "../Helper/Macros.h"
 
 class UpdateCheckDialog;
 
@@ -21,8 +20,6 @@ private:
 	static const TCHAR SETTINGS_KEY[];
 
 	UpdateCheckDialogPersistentSettings();
-
-	DISALLOW_COPY_AND_ASSIGN(UpdateCheckDialogPersistentSettings);
 };
 
 class UpdateCheckDialog : public ThemedDialog

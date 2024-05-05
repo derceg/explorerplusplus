@@ -5,17 +5,14 @@
 #pragma once
 
 #include "FolderSettings.h"
-#include "../Helper/Macros.h"
+#include <boost/core/noncopyable.hpp>
 
 class ShellBrowserImpl;
 
-struct PreservedFolderState
+struct PreservedFolderState : private boost::noncopyable
 {
 public:
 	PreservedFolderState(const ShellBrowserImpl *shellBrowser);
 
 	FolderSettings folderSettings;
-
-private:
-	DISALLOW_COPY_AND_ASSIGN(PreservedFolderState);
 };

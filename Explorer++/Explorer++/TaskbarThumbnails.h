@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Tab.h"
-#include "../Helper/Macros.h"
+#include <boost/core/noncopyable.hpp>
 #include <boost/signals2.hpp>
 #include <wil/com.h>
 #include <wil/resource.h>
@@ -15,15 +15,13 @@ class CoreInterface;
 struct NavigateParams;
 class TabContainer;
 
-class TaskbarThumbnails
+class TaskbarThumbnails : private boost::noncopyable
 {
 public:
 	static TaskbarThumbnails *Create(CoreInterface *coreInterface, TabContainer *tabContainer,
 		HINSTANCE resourceInstance, std::shared_ptr<Config> config);
 
 private:
-	DISALLOW_COPY_AND_ASSIGN(TaskbarThumbnails);
-
 	struct TabProxyInfo
 	{
 		ATOM atomClass;

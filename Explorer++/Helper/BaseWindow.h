@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "Macros.h"
 #include "MessageForwarder.h"
+#include <boost/core/noncopyable.hpp>
 
 /* This lifetime of this object is
 tied to its window. When the window
@@ -15,7 +15,7 @@ automatically delete itself.
 Note that derived classes can
 also safely delete the object
 before the window is destroyed. */
-class BaseWindow : public MessageForwarder
+class BaseWindow : public MessageForwarder, private boost::noncopyable
 {
 public:
 	/* Ideally private, and the
@@ -34,8 +34,6 @@ protected:
 	const HWND m_hwnd;
 
 private:
-	DISALLOW_COPY_AND_ASSIGN(BaseWindow);
-
 	static const UINT_PTR SUBCLASS_ID = 0;
 
 	static LRESULT CALLBACK BaseWindowProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,

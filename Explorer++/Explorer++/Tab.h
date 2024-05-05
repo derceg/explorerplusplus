@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/Macros.h"
+#include <boost/core/noncopyable.hpp>
 #include <boost/signals2.hpp>
 #include <memory>
 
@@ -16,7 +16,7 @@ struct PreservedTab;
 class ShellBrowserImpl;
 class TabNavigationInterface;
 
-class Tab
+class Tab : private boost::noncopyable
 {
 public:
 	enum class PropertyType
@@ -67,8 +67,6 @@ public:
 	// BOOL	bUsingDefaultColumns;
 
 private:
-	DISALLOW_COPY_AND_ASSIGN(Tab);
-
 	static int idCounter;
 	const int m_id;
 

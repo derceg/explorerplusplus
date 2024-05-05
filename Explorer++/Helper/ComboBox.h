@@ -15,8 +15,6 @@ protected:
 	INT_PTR OnDestroy() override;
 
 private:
-	DISALLOW_COPY_AND_ASSIGN(ComboBox);
-
 	ComboBox(HWND hComboBox);
 	~ComboBox() = default;
 

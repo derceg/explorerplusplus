@@ -11,6 +11,7 @@
 
 #include "stdafx.h"
 #include "UpdateCheckDialog.h"
+#include "..\Helper\Macros.h"
 #include "MainResource.h"
 #include "Version.h"
 #include <boost\algorithm\string.hpp>

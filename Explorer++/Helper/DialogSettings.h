@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include "Macros.h"
+#include <boost/core/noncopyable.hpp>
 #include <MsXml2.h>
 #include <objbase.h>
 #include <string>
 
-class DialogSettings
+class DialogSettings : private boost::noncopyable
 {
 public:
 	DialogSettings(const TCHAR *szSettingsKey, bool bSavePosition = true);
@@ -30,8 +30,6 @@ protected:
 	BOOL m_bStateSaved;
 
 private:
-	DISALLOW_COPY_AND_ASSIGN(DialogSettings);
-
 	static const TCHAR SETTING_POSITION[];
 	static const TCHAR SETTING_POSITION_X[];
 	static const TCHAR SETTING_POSITION_Y[];

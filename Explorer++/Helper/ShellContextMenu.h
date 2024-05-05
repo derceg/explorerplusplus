@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "Macros.h"
 #include "PidlHelper.h"
 #include "StatusBar.h"
+#include <boost/core/noncopyable.hpp>
 #include <wil/com.h>
 #include <optional>
 #include <vector>
@@ -34,7 +34,7 @@ public:
 		const std::vector<PidlChild> &pidlItems, UINT menuItemId) = 0;
 };
 
-class ShellContextMenu
+class ShellContextMenu : private boost::noncopyable
 {
 public:
 	enum class Flags
@@ -53,8 +53,6 @@ public:
 	void ShowMenu(HWND hwnd, const POINT *pt, IUnknown *site, Flags flags);
 
 private:
-	DISALLOW_COPY_AND_ASSIGN(ShellContextMenu);
-
 	wil::com_ptr_nothrow<IContextMenu> MaybeGetShellContextMenu(HWND hwnd) const;
 	std::optional<std::string> MaybeGetFilesystemDirectory() const;
 

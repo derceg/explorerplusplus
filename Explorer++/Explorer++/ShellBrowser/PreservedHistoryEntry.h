@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include "../Helper/Macros.h"
 #include "../Helper/PidlHelper.h"
+#include <boost/core/noncopyable.hpp>
 #include <optional>
 
 class HistoryEntry;
 
-struct PreservedHistoryEntry
+struct PreservedHistoryEntry : private boost::noncopyable
 {
 public:
 	PreservedHistoryEntry(const HistoryEntry &entry);
@@ -21,7 +21,4 @@ public:
 	std::wstring displayName;
 	std::wstring fullPathForDisplay;
 	std::optional<int> systemIconIndex;
-
-private:
-	DISALLOW_COPY_AND_ASSIGN(PreservedHistoryEntry);
 };

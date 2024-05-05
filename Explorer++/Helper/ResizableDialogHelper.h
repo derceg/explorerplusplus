@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Macros.h"
+#include <boost/core/noncopyable.hpp>
 #include <vector>
 
 enum class MovingType
@@ -40,7 +40,7 @@ struct ResizableDialogControl
 // Within a resizable dialog, controls either: move, resize, or hold the same size and position. For
 // controls that do move/resize, they may be constrained along one axis. For example, a particular
 // control may resize/move horizontally, but not vertically.
-class ResizableDialogHelper
+class ResizableDialogHelper : private boost::noncopyable
 {
 public:
 	ResizableDialogHelper(HWND dialog, const std::vector<ResizableDialogControl> &controls);
@@ -48,8 +48,6 @@ public:
 	void UpdateControls(int updatedDialogWidth, int updatedDialogHeight);
 
 private:
-	DISALLOW_COPY_AND_ASSIGN(ResizableDialogHelper);
-
 	struct ControlPosition
 	{
 		ResizableDialogControl control;

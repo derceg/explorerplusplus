@@ -6,7 +6,7 @@
 
 #include "SignalWrapper.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Macros.h"
+#include <boost/core/noncopyable.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
 #include <optional>
@@ -18,7 +18,7 @@ using BookmarkItems = std::vector<std::unique_ptr<BookmarkItem>>;
 
 // Represents both a bookmark and a bookmark folder. Each folder has the ability
 // to contain other bookmark items.
-class BookmarkItem
+class BookmarkItem : private boost::noncopyable
 {
 public:
 	enum class Type
@@ -107,8 +107,6 @@ public:
 		updatedSignal;
 
 private:
-	DISALLOW_COPY_AND_ASSIGN(BookmarkItem);
-
 	// Used exclusively when deserializing. The advantage here mainly comes from
 	// the second of these methods. It allows the list of children to be
 	// directly imported. Without that method, you would have to call AddChild()

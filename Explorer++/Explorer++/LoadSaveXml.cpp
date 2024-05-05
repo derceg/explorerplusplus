@@ -15,6 +15,7 @@
 #include "ColorRuleXmlStorage.h"
 #include "DialogHelper.h"
 #include "Explorer++_internal.h"
+#include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/XMLSettings.h"
 #include <wil/com.h>

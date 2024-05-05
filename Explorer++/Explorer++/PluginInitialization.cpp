@@ -8,6 +8,7 @@
 #include "Explorer++_internal.h"
 #include "FeatureList.h"
 #include "Plugins/PluginManager.h"
+#include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include <filesystem>
 

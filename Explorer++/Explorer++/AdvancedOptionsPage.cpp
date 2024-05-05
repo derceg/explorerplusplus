@@ -8,6 +8,7 @@
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "../Helper/Helper.h"
+#include "../Helper/Macros.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include "../Helper/RichEditHelper.h"
 #include <glog/logging.h>

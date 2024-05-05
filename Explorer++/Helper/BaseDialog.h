@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "Macros.h"
 #include "MessageForwarder.h"
 #include "ReferenceCount.h"
 #include "ResizableDialogHelper.h"
+#include <boost/core/noncopyable.hpp>
 #include <wil/resource.h>
 #include <functional>
 
@@ -15,7 +15,7 @@
 For instance, provides the ability for a class to manage
 a dialog without having to handle the dialog procedure
 directly. */
-class BaseDialog : public MessageForwarder
+class BaseDialog : public MessageForwarder, private boost::noncopyable
 {
 	friend INT_PTR CALLBACK BaseDialogProcStub(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -54,8 +54,6 @@ protected:
 	HWND m_tipWnd;
 
 private:
-	DISALLOW_COPY_AND_ASSIGN(BaseDialog);
-
 	INT_PTR CALLBACK BaseDialogProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	virtual void AddDynamicControls();

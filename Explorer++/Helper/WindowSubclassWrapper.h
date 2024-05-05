@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "Macros.h"
+#include <boost/core/noncopyable.hpp>
 #include <functional>
 
-class WindowSubclassWrapper
+class WindowSubclassWrapper : private boost::noncopyable
 {
 public:
 	using Subclass = std::function<LRESULT(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)>;
@@ -16,8 +16,6 @@ public:
 	~WindowSubclassWrapper();
 
 private:
-	DISALLOW_COPY_AND_ASSIGN(WindowSubclassWrapper);
-
 	static LRESULT CALLBACK SubclassProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR subclassId, DWORD_PTR data);
 
