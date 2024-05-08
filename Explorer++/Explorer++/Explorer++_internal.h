@@ -21,10 +21,6 @@ const TCHAR REG_SETTINGS_KEY[] = _T("Software\\Explorer++\\Settings");
 saved to/loaded from. */
 const TCHAR XML_FILENAME[] = _T("config.xml");
 
-// Internal command line arguments.
-const TCHAR JUMPLIST_TASK_NEWTAB_ARGUMENT[] = _T("--open-new-tab");
-const TCHAR APPLICATION_CRASHED_ARGUMENT[] = _T("--application-crashed");
-
 const TCHAR LANGUAGE_DLL_FILENAME_PATTERN[] = _T("Explorer++*.dll");
 
 // The first instance of the application will create a mutex with this name, which later instances

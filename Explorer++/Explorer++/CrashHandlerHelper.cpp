@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "CrashHandlerHelper.h"
 #include "ApplicationCrashedDialog.h"
+#include "CommandLine.h"
 #include "Explorer++_internal.h"
 #include "Version.h"
 #include "../Helper/DetoursHelper.h"
@@ -68,8 +69,8 @@ LONG WINAPI TopLevelExceptionFilter(EXCEPTION_POINTERS *exception)
 
 	// The order of the arguments here needs to match the order of the arguments in CommandLine.cpp.
 	std::wstring arguments = std::format(L"\"{}\" {} {} {} {} {}", currentProcess,
-		NExplorerplusplus::APPLICATION_CRASHED_ARGUMENT, GetCurrentProcessId(),
-		GetCurrentThreadId(), static_cast<void *>(exception), eventName);
+		CommandLine::APPLICATION_CRASHED_ARGUMENT, GetCurrentProcessId(), GetCurrentThreadId(),
+		static_cast<void *>(exception), eventName);
 
 	STARTUPINFO startupInfo = { 0 };
 	startupInfo.cb = sizeof(startupInfo);

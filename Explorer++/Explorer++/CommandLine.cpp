@@ -101,10 +101,10 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 	privateCommands->group("");
 
 	immediatelyHandledOptions.jumplistNewTab = false;
-	privateCommands->add_flag(wstrToUtf8Str(NExplorerplusplus::JUMPLIST_TASK_NEWTAB_ARGUMENT),
+	privateCommands->add_flag(wstrToUtf8Str(JUMPLIST_TASK_NEWTAB_ARGUMENT),
 		immediatelyHandledOptions.jumplistNewTab);
 
-	privateCommands->add_option(wstrToUtf8Str(NExplorerplusplus::APPLICATION_CRASHED_ARGUMENT),
+	privateCommands->add_option(wstrToUtf8Str(APPLICATION_CRASHED_ARGUMENT),
 		immediatelyHandledOptions.crashedDataTuple);
 
 	CommandLine::Settings settings;
@@ -229,7 +229,7 @@ void PreprocessDirectories(std::vector<std::wstring> &directories)
 std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(const CLI::App &app,
 	const ImmediatelyHandledOptions &immediatelyHandledOptions, CommandLine::Settings &settings)
 {
-	if (app.count(wstrToUtf8Str(NExplorerplusplus::APPLICATION_CRASHED_ARGUMENT)) > 0)
+	if (app.count(wstrToUtf8Str(CommandLine::APPLICATION_CRASHED_ARGUMENT)) > 0)
 	{
 		auto &crashedDataTuple = immediatelyHandledOptions.crashedDataTuple;
 		HandleProcessCrashedNotification(

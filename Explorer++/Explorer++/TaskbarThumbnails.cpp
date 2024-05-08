@@ -9,9 +9,9 @@
 
 #include "stdafx.h"
 #include "TaskbarThumbnails.h"
+#include "CommandLine.h"
 #include "Config.h"
 #include "CoreInterface.h"
-#include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
@@ -147,7 +147,7 @@ void TaskbarThumbnails::SetupJumplistTasks()
 	JumpListTaskInformation jlti;
 	jlti.pszName = name.c_str();
 	jlti.pszPath = szCurrentProcess;
-	jlti.pszArguments = NExplorerplusplus::JUMPLIST_TASK_NEWTAB_ARGUMENT;
+	jlti.pszArguments = CommandLine::JUMPLIST_TASK_NEWTAB_ARGUMENT;
 	jlti.pszIconPath = szCurrentProcess;
 	jlti.iIcon = 1;
 

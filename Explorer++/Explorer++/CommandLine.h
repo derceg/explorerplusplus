@@ -11,6 +11,7 @@
 
 namespace CommandLine
 {
+
 struct Settings
 {
 	bool enableLogging = false;
@@ -27,5 +28,10 @@ struct ExitInfo
 	int exitCode;
 };
 
+// Internal command line arguments.
+const TCHAR JUMPLIST_TASK_NEWTAB_ARGUMENT[] = _T("--open-new-tab");
+const TCHAR APPLICATION_CRASHED_ARGUMENT[] = _T("--application-crashed");
+
 std::variant<Settings, ExitInfo> ProcessCommandLine();
+
 }
