@@ -467,6 +467,10 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		GetActiveShellBrowserImpl()->PasteHardLinks();
 		break;
 
+	case IDM_EDIT_PASTE_SYMBOLIC_LINK:
+		GetActiveShellBrowserImpl()->PasteSymLinks();
+		break;
+
 	case IDM_EDIT_COPYTOFOLDER:
 	case MainToolbarButton::CopyTo:
 		CopyToFolder(false);

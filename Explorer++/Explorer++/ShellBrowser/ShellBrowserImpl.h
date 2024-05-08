@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "ClipboardOperations.h"
 #include "ColumnDataRetrieval.h"
 #include "Columns.h"
 #include "FolderSettings.h"
@@ -172,7 +173,8 @@ public:
 	HRESULT CopySelectedItemsToClipboard(bool copy);
 	void PasteShortcut();
 	void PasteHardLinks();
-	void OnInternalPaste(const std::vector<std::wstring> &pastedItems);
+	void PasteSymLinks();
+	void OnInternalPaste(const ClipboardOperations::PastedItems &pastedItems);
 	void StartRenamingSelectedItems();
 	void DeleteSelectedItems(bool permanent);
 

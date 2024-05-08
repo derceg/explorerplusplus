@@ -4,8 +4,22 @@
 
 #pragma once
 
+#include <string>
+#include <system_error>
+#include <vector>
+
 namespace ClipboardOperations
 {
+
+struct PastedItem
+{
+	std::wstring path;
+	std::error_code error;
+};
+
+using PastedItems = std::vector<PastedItem>;
+
+bool CanPasteHardLinkInDirectory(PCIDLIST_ABSOLUTE pidl);
 
 // There are two types of paste operations used within the application:
 //
@@ -13,11 +27,8 @@ namespace ClipboardOperations
 //    the object registered via IObjectWithSite.
 // 2. A paste that is really just a file operation that's performed internally.
 //
-// In the second situation, a callback with the signature here will be invoked when items are
-// pasted.
-using InternalPasteCallback = std::function<void(const std::vector<std::wstring> &pastedItems)>;
-
-bool CanPasteHardLinkInDirectory(PCIDLIST_ABSOLUTE pidl);
-void PasteHardLinks(const std::wstring &destination, InternalPasteCallback internalPasteCallback);
+// These functions allow for the second type of paste operation to be performed.
+PastedItems PasteHardLinks(const std::wstring &destination);
+PastedItems PasteSymLinks(const std::wstring &destination);
 
 }

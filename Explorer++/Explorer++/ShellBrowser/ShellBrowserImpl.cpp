@@ -1313,17 +1313,24 @@ void ShellBrowserImpl::PasteShortcut()
 
 void ShellBrowserImpl::PasteHardLinks()
 {
-	ClipboardOperations::PasteHardLinks(GetDirectory(),
-		std::bind_front(&ShellBrowserImpl::OnInternalPaste, this));
+	auto pastedItems = ClipboardOperations::PasteHardLinks(GetDirectory());
+	OnInternalPaste(pastedItems);
 }
 
-void ShellBrowserImpl::OnInternalPaste(const std::vector<std::wstring> &pastedItems)
+void ShellBrowserImpl::PasteSymLinks()
+{
+	auto pastedItems = ClipboardOperations::PasteSymLinks(GetDirectory());
+	OnInternalPaste(pastedItems);
+}
+
+void ShellBrowserImpl::OnInternalPaste(const ClipboardOperations::PastedItems &pastedItems)
 {
 	std::vector<PidlAbsolute> pidls;
 
-	for (const auto &pastedItem : pastedItems)
+	for (const auto &pastedItem :
+		pastedItems | std::views::filter([](const auto &item) { return !item.error; }))
 	{
-		unique_pidl_absolute pidl(SHSimpleIDListFromPath(pastedItem.c_str()));
+		unique_pidl_absolute pidl(SHSimpleIDListFromPath(pastedItem.path.c_str()));
 
 		if (pidl)
 		{

@@ -7,25 +7,47 @@
 #include "DirectoryOperationsHelper.h"
 #include "../Helper/Clipboard.h"
 
-namespace ClipboardOperations
+namespace
 {
 
-bool CanPasteHardLinkInDirectory(PCIDLIST_ABSOLUTE pidl)
+enum class LinkType
 {
-	return IsClipboardFormatAvailable(CF_HDROP) && IsFilesystemFolder(pidl);
+	HardLink,
+	SymLink
+};
+
+void CreateSymLink(const std::filesystem::path &sourceFilePath,
+	const std::filesystem::path &destinationFilePath, std::error_code &error)
+{
+	bool isDirectory = std::filesystem::is_directory(sourceFilePath, error);
+
+	if (error)
+	{
+		return;
+	}
+
+	if (isDirectory)
+	{
+		std::filesystem::create_directory_symlink(sourceFilePath, destinationFilePath, error);
+	}
+	else
+	{
+		std::filesystem::create_symlink(sourceFilePath, destinationFilePath, error);
+	}
 }
 
-void PasteHardLinks(const std::wstring &destination, InternalPasteCallback internalPasteCallback)
+ClipboardOperations::PastedItems PasteLinksOfType(const std::wstring &destination,
+	LinkType linkType)
 {
 	Clipboard clipboard;
 	auto paths = clipboard.ReadHDropData();
 
 	if (!paths)
 	{
-		return;
+		return {};
 	}
 
-	std::vector<std::wstring> pastedItems;
+	ClipboardOperations::PastedItems pastedItems;
 
 	for (const auto &path : *paths)
 	{
@@ -35,20 +57,45 @@ void PasteHardLinks(const std::wstring &destination, InternalPasteCallback inter
 		destinationFilePath /= sourceFilePath.filename();
 
 		std::error_code error;
-		std::filesystem::create_hard_link(sourceFilePath, destinationFilePath, error);
 
-		if (!error)
+		switch (linkType)
 		{
-			pastedItems.push_back(destinationFilePath);
+		case LinkType::HardLink:
+			std::filesystem::create_hard_link(sourceFilePath, destinationFilePath, error);
+			break;
+
+		case LinkType::SymLink:
+			CreateSymLink(sourceFilePath, destinationFilePath, error);
+			break;
+
+		default:
+			CHECK(false);
 		}
+
+		pastedItems.emplace_back(destinationFilePath, error);
 	}
 
-	if (pastedItems.empty())
-	{
-		return;
-	}
+	return pastedItems;
+}
 
-	internalPasteCallback(pastedItems);
+}
+
+namespace ClipboardOperations
+{
+
+bool CanPasteHardLinkInDirectory(PCIDLIST_ABSOLUTE pidl)
+{
+	return IsClipboardFormatAvailable(CF_HDROP) && IsFilesystemFolder(pidl);
+}
+
+PastedItems PasteHardLinks(const std::wstring &destination)
+{
+	return PasteLinksOfType(destination, LinkType::HardLink);
+}
+
+PastedItems PasteSymLinks(const std::wstring &destination)
+{
+	return PasteLinksOfType(destination, LinkType::SymLink);
 }
 
 }
