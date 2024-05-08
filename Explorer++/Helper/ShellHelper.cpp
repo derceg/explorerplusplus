@@ -144,6 +144,23 @@ HRESULT GetItemAttributes(PCIDLIST_ABSOLUTE pidl, SFGAOF *pItemAttributes)
 	return hr;
 }
 
+BOOL LaunchCurrentProcess(HWND hwnd, const std::wstring &parameters,
+	LaunchCurrentProcessFlags flags)
+{
+	TCHAR currentProcessPath[MAX_PATH];
+	GetProcessImageName(GetCurrentProcessId(), currentProcessPath,
+		static_cast<DWORD>(std::size(currentProcessPath)));
+
+	std::wstring verb;
+
+	if (WI_IsFlagSet(flags, LaunchCurrentProcessFlags::Elevated))
+	{
+		verb = L"runas";
+	}
+
+	return ExecuteFileAction(hwnd, currentProcessPath, verb, parameters, L"");
+}
+
 BOOL ExecuteFileAction(HWND hwnd, const std::wstring &itemPath, const std::wstring &verb,
 	const std::wstring &parameters, const std::wstring &startDirectory)
 {
@@ -183,28 +200,6 @@ BOOL ExecuteFileAction(HWND hwnd, const void *item, bool isPidl, const std::wstr
 	}
 
 	return ShellExecuteEx(&executeInfo);
-}
-
-BOOL ExecuteAndShowCurrentProcess(HWND hwnd, const TCHAR *szParameters)
-{
-	TCHAR szCurrentProcess[MAX_PATH];
-	GetProcessImageName(GetCurrentProcessId(), szCurrentProcess, SIZEOF_ARRAY(szCurrentProcess));
-
-	return ExecuteAndShowProcess(hwnd, szCurrentProcess, szParameters);
-}
-
-BOOL ExecuteAndShowProcess(HWND hwnd, const TCHAR *szProcess, const TCHAR *szParameters)
-{
-	SHELLEXECUTEINFO sei;
-	sei.cbSize = sizeof(sei);
-	sei.fMask = SEE_MASK_DEFAULT;
-	sei.lpVerb = _T("open");
-	sei.lpFile = szProcess;
-	sei.lpParameters = szParameters;
-	sei.lpDirectory = nullptr;
-	sei.hwnd = hwnd;
-	sei.nShow = SW_SHOWNORMAL;
-	return ShellExecuteEx(&sei);
 }
 
 HRESULT GetVirtualParentPath(PCIDLIST_ABSOLUTE pidlDirectory, PIDLIST_ABSOLUTE *pidlParent)

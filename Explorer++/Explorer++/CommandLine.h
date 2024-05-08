@@ -31,6 +31,7 @@ struct ExitInfo
 // Internal command line arguments.
 const TCHAR JUMPLIST_TASK_NEWTAB_ARGUMENT[] = _T("--open-new-tab");
 const TCHAR APPLICATION_CRASHED_ARGUMENT[] = _T("--application-crashed");
+const TCHAR PASTE_SYMLINKS_ARGUMENT[] = _T("--paste-symlinks");
 
 std::variant<Settings, ExitInfo> ProcessCommandLine();
 

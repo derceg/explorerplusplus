@@ -201,6 +201,9 @@
     <ClCompile Include="DragDropHelperTest.cpp">
       <Filter>Helper\Data Exchange\Drag and Drop</Filter>
     </ClCompile>
+    <ClCompile Include="PasteSymLinksServerClientTest.cpp">
+      <Filter>Data Exchange\Clipboard</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -277,6 +280,12 @@
     </Filter>
     <Filter Include="Frequent Locations">
       <UniqueIdentifier>{608f3f32-fe72-473c-af0b-a9acec71dfcd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data Exchange">
+      <UniqueIdentifier>{076a2725-31ce-44cf-a4be-99f710f72705}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data Exchange\Clipboard">
+      <UniqueIdentifier>{5c4bd6f7-12e3-4e04-a155-20a51b38b5fc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -119,10 +119,11 @@ BOOL Explorerplusplus::CanPaste(PasteType pasteType) const
 	return CanPasteInDirectory(directory.Raw(), pasteType);
 }
 
-bool Explorerplusplus::CanPasteHardLink() const
+// Tests whether a hard link or symlink can be pasted.
+bool Explorerplusplus::CanPasteLink() const
 {
 	const auto *activeShellBrowser = GetActiveShellBrowserImpl();
-	return ClipboardOperations::CanPasteHardLinkInDirectory(
+	return ClipboardOperations::CanPasteLinkInDirectory(
 		activeShellBrowser->GetDirectoryIdl().get());
 }
 

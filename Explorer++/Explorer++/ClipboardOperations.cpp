@@ -4,8 +4,12 @@
 
 #include "stdafx.h"
 #include "ClipboardOperations.h"
+#include "CommandLine.h"
 #include "DirectoryOperationsHelper.h"
+#include "PasteSymLinksServer.h"
 #include "../Helper/Clipboard.h"
+
+using namespace std::chrono_literals;
 
 namespace
 {
@@ -78,12 +82,25 @@ ClipboardOperations::PastedItems PasteLinksOfType(const std::wstring &destinatio
 	return pastedItems;
 }
 
+ClipboardOperations::PastedItems PasteSymLinksViaElevatedProcess(const std::wstring &destination)
+{
+	auto clientLauncher = [&destination]
+	{
+		std::wstring parameters =
+			std::format(L"{} \"{}\"", CommandLine::PASTE_SYMLINKS_ARGUMENT, destination);
+		return LaunchCurrentProcess(nullptr, parameters, LaunchCurrentProcessFlags::Elevated);
+	};
+
+	PasteSymLinksServer server;
+	return server.LaunchClientAndWaitForResponse(clientLauncher, 10s);
+}
+
 }
 
 namespace ClipboardOperations
 {
 
-bool CanPasteHardLinkInDirectory(PCIDLIST_ABSOLUTE pidl)
+bool CanPasteLinkInDirectory(PCIDLIST_ABSOLUTE pidl)
 {
 	return IsClipboardFormatAvailable(CF_HDROP) && IsFilesystemFolder(pidl);
 }
@@ -95,7 +112,28 @@ PastedItems PasteHardLinks(const std::wstring &destination)
 
 PastedItems PasteSymLinks(const std::wstring &destination)
 {
-	return PasteLinksOfType(destination, LinkType::SymLink);
+	auto pastedItems = PasteLinksOfType(destination, LinkType::SymLink);
+
+	auto itr = std::find_if(pastedItems.begin(), pastedItems.end(),
+		[](const auto &pastedItem) {
+			return pastedItem.error
+				== std::error_code(ERROR_PRIVILEGE_NOT_HELD, std::system_category());
+		});
+
+	if (itr == pastedItems.end())
+	{
+		// If none of the symlink operations failed because of insufficient privileges, it indicates
+		// that either this process is elevated, or developer mode is enabled. In either case,
+		// there's no need to retry the operations in an elevated process.
+		// Note that this doesn't necessarily indicate that any of the symlink operations actually
+		// succeeded, only that they didn't fail because symlink creation is blocked.
+		return pastedItems;
+	}
+
+	// If at least one symlink operation failed due to insufficient privileges, it's assumed they
+	// all failed for that reason. In which case, the operation needs to be retried in an elevated
+	// process.
+	return PasteSymLinksViaElevatedProcess(destination);
 }
 
 }

@@ -4,9 +4,11 @@
 
 #include "stdafx.h"
 #include "CommandLine.h"
+#include "ClipboardOperations.h"
 #include "CrashHandlerHelper.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
+#include "PasteSymLinksClient.h"
 #include "ResourceHelper.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/WindowHelper.h"
@@ -51,6 +53,7 @@ struct ImmediatelyHandledOptions
 	ReplaceExplorerMode replaceExplorerMode;
 	bool jumplistNewTab;
 	CrashedDataTuple crashedDataTuple;
+	std::wstring pasteSymLinksDestination;
 };
 
 struct ReplaceExplorerResults
@@ -106,6 +109,9 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 
 	privateCommands->add_option(wstrToUtf8Str(APPLICATION_CRASHED_ARGUMENT),
 		immediatelyHandledOptions.crashedDataTuple);
+
+	privateCommands->add_option(wstrToUtf8Str(PASTE_SYMLINKS_ARGUMENT),
+		immediatelyHandledOptions.pasteSymLinksDestination);
 
 	CommandLine::Settings settings;
 
@@ -236,6 +242,17 @@ std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(const CLI::App &app
 			{ std::get<0>(crashedDataTuple), std::get<1>(crashedDataTuple),
 				std::get<2>(crashedDataTuple), std::get<3>(crashedDataTuple) });
 		return CommandLine::ExitInfo{ EXIT_CODE_NORMAL_CRASH_HANDLER };
+	}
+
+	if (app.count(wstrToUtf8Str(CommandLine::PASTE_SYMLINKS_ARGUMENT)) > 0)
+	{
+		auto pastedItems =
+			ClipboardOperations::PasteSymLinks(immediatelyHandledOptions.pasteSymLinksDestination);
+
+		PasteSymLinksClient client;
+		client.NotifyServerOfResult(pastedItems);
+
+		return CommandLine::ExitInfo{ EXIT_CODE_NORMAL };
 	}
 
 	if (immediatelyHandledOptions.jumplistNewTab)

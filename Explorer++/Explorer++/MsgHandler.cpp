@@ -300,7 +300,7 @@ void Explorerplusplus::OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory)
 	TCHAR szParameters[512];
 	StringCchPrintf(szParameters, SIZEOF_ARRAY(szParameters), _T("\"%s\""), path.c_str());
 
-	ExecuteAndShowCurrentProcess(m_hContainer, szParameters);
+	LaunchCurrentProcess(m_hContainer, szParameters);
 }
 
 void Explorerplusplus::OpenFileItem(const std::wstring &itemPath, const std::wstring &parameters)
@@ -975,7 +975,7 @@ void Explorerplusplus::OnCloneWindow()
 	StringCchPrintf(szQuotedCurrentDirectory, SIZEOF_ARRAY(szQuotedCurrentDirectory), _T("\"%s\""),
 		currentDirectory.c_str());
 
-	ExecuteAndShowCurrentProcess(m_hContainer, szQuotedCurrentDirectory);
+	LaunchCurrentProcess(m_hContainer, szQuotedCurrentDirectory);
 }
 
 void Explorerplusplus::ShowMainRebarBand(HWND hwnd, BOOL bShow)

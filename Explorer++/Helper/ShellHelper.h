@@ -53,6 +53,14 @@ enum class ShellItemType
 	Folder
 };
 
+enum class LaunchCurrentProcessFlags
+{
+	None = 0,
+	Elevated = 1 << 0
+};
+
+DEFINE_ENUM_FLAG_OPERATORS(LaunchCurrentProcessFlags);
+
 struct JumpListTaskInformation
 {
 	const TCHAR *pszName;
@@ -100,12 +108,12 @@ BOOL ArePidlsEquivalent(PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2);
 HRESULT AddJumpListTasks(const std::list<JumpListTaskInformation> &taskList);
 HRESULT GetItemAttributes(const TCHAR *szItemParsingPath, SFGAOF *pItemAttributes);
 HRESULT GetItemAttributes(PCIDLIST_ABSOLUTE pidl, SFGAOF *pItemAttributes);
+BOOL LaunchCurrentProcess(HWND hwnd, const std::wstring &parameters,
+	LaunchCurrentProcessFlags flags = LaunchCurrentProcessFlags::None);
 BOOL ExecuteFileAction(HWND hwnd, const std::wstring &itemPath, const std::wstring &verb,
 	const std::wstring &parameters, const std::wstring &startDirectory);
 BOOL ExecuteFileAction(HWND hwnd, PCIDLIST_ABSOLUTE pidl, const std::wstring &verb,
 	const std::wstring &parameters, const std::wstring &startDirectory);
-BOOL ExecuteAndShowCurrentProcess(HWND hwnd, const TCHAR *szParameters);
-BOOL ExecuteAndShowProcess(HWND hwnd, const TCHAR *szProcess, const TCHAR *szParameters);
 HRESULT DecodeFriendlyPath(const std::wstring &friendlyPath, std::wstring &parsingPath);
 HRESULT ShowMultipleFileProperties(PCIDLIST_ABSOLUTE pidlDirectory,
 	const std::vector<PCITEMID_CHILD> &items, HWND hwnd);

@@ -470,7 +470,7 @@ private:
 	BOOL CanDelete() const override;
 	BOOL CanShowFileProperties() const override;
 	BOOL CanPaste(PasteType pasteType) const override;
-	bool CanPasteHardLink() const;
+	bool CanPasteLink() const;
 	BOOL TestItemAttributes(SFGAOF attributes) const;
 	HRESULT GetSelectionAttributes(SFGAOF *pItemAttributes) const;
 	PidlAbsolute MaybeGetFocusedDirectory() const;
@@ -515,6 +515,7 @@ private:
 	/* Menus. */
 	void InitializeMainMenu();
 	void SetMainMenuImages();
+	void SetPasteSymLinkElevationIcon();
 	void InitializeGoMenu(HMENU mainMenu);
 	void AddGoMenuItem(HMENU goMenu, UINT id, const KNOWNFOLDERID &folderId);
 	void AddGoMenuItem(HMENU goMenu, UINT id, const std::wstring &path);

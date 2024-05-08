@@ -219,6 +219,7 @@
     <ClCompile Include="HelperTest.cpp" />
     <ClCompile Include="HistoryServiceTest.cpp" />
     <ClCompile Include="MenuHelperTest.cpp" />
+    <ClCompile Include="PasteSymLinksServerClientTest.cpp" />
     <ClCompile Include="PopupMenuViewTest.cpp" />
     <ClCompile Include="ShellTestHelper.cpp" />
     <ClCompile Include="TabHistoryMenuTest.cpp" />

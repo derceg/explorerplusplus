@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ProcessHelper.h"
 #include "Helper.h"
+#include <wil/resource.h>
 
 DWORD GetProcessImageName(DWORD dwProcessId, TCHAR *szImageName, DWORD nSize)
 {
@@ -107,4 +108,27 @@ BOOL SetProcessTokenPrivilege(DWORD dwProcessId, const TCHAR *PrivilegeName, BOO
 	}
 
 	return success;
+}
+
+bool IsProcessElevated()
+{
+	wil::unique_handle token;
+	BOOL res = OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &token);
+
+	if (!res)
+	{
+		return false;
+	}
+
+	TOKEN_ELEVATION tokenElevation;
+	DWORD outputSize;
+	res = GetTokenInformation(token.get(), TokenElevation, &tokenElevation, sizeof(tokenElevation),
+		&outputSize);
+
+	if (!res)
+	{
+		return false;
+	}
+
+	return tokenElevation.TokenIsElevated;
 }

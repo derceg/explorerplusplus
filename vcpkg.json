@@ -10,6 +10,7 @@
     "boost-format",
     "boost-functional",
     "boost-integer",
+    "boost-interprocess",
     "boost-iterator",
     "boost-lexical-cast",
     "boost-locale",

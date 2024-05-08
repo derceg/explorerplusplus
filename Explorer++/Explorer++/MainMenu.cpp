@@ -16,6 +16,7 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/MenuHelper.h"
+#include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <wil/resource.h>
 #include <map>
@@ -107,6 +108,46 @@ void Explorerplusplus::SetMainMenuImages()
 		ResourceHelper::SetMenuItemImage(mainMenu, mapping.first, m_iconResourceLoader.get(),
 			mapping.second, dpi, m_mainMenuImages);
 	}
+
+	SetPasteSymLinkElevationIcon();
+}
+
+void Explorerplusplus::SetPasteSymLinkElevationIcon()
+{
+	// Creating a symlink typically requires elevation. However, if the application is already
+	// elevated, there's no need to show the shield icon (which is used to indicate that elevation
+	// is required).
+	// Note that elevation isn't required if developer mode is enabled on Windows 10 and above.
+	// Since the status of developer mode isn't checked here, the shield icon may be shown in cases
+	// where elevation isn't actually required. That's not too much of an issue, since the icon here
+	// is considered to be a hint that elevation may be required.
+	if (IsProcessElevated())
+	{
+		return;
+	}
+
+	SHSTOCKICONINFO info = {};
+	info.cbSize = sizeof(info);
+	HRESULT hr = SHGetStockIconInfo(SIID_SHIELD, SHGSI_SYSICONINDEX, &info);
+
+	if (FAILED(hr))
+	{
+		DCHECK(false);
+		return;
+	}
+
+	auto bitmap =
+		ImageHelper::ImageListIconToBitmap(m_mainMenuSystemImageList.get(), info.iSysImageIndex);
+
+	if (!bitmap)
+	{
+		DCHECK(false);
+		return;
+	}
+
+	HMENU mainMenu = GetMenu(m_hContainer);
+	MenuHelper::SetBitmapForItem(mainMenu, IDM_EDIT_PASTE_SYMBOLIC_LINK, bitmap.get());
+	m_mainMenuImages.push_back(std::move(bitmap));
 }
 
 void Explorerplusplus::InitializeGoMenu(HMENU mainMenu)
