@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "CommandLine.h"
 #include "ClipboardOperations.h"
+#include "CommandLineSplitter.h"
 #include "CrashHandlerHelper.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
@@ -64,7 +65,6 @@ struct ReplaceExplorerResults
 	std::optional<LSTATUS> setAll;
 };
 
-void PreprocessDirectories(std::vector<std::wstring> &directories);
 std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(const CLI::App &app,
 	const ImmediatelyHandledOptions &immediatelyHandledOptions, CommandLine::Settings &settings);
 void OnClearRegistrySettings();
@@ -155,29 +155,28 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 
 	app.add_option("directories", settings.directories, "Directories to open");
 
-	int numArgs;
-	LPWSTR *args = CommandLineToArgvW(GetCommandLine(), &numArgs);
+	auto splitResult = CommandLineSplitter::Split(wstrToUtf8Str(GetCommandLine()));
 
-	if (!args)
+	if (!splitResult.succeeded)
 	{
-		return settings;
+		std::cerr << splitResult.errorMessage << std::endl;
+
+		return ExitInfo{ EXIT_CODE_ERROR };
 	}
 
-	auto freeArgs = wil::scope_exit([args] { LocalFree(args); });
+	// There should always be at least one argument present (the executable name). That argument
+	// shouldn't be passed through to CLI11. As CommandLineSplitter expects that there is always at
+	// least one argument, the call above will fail if that's not the case. Which means that this
+	// CHECK() should always succeed.
+	CHECK(!splitResult.arguments.empty());
+	splitResult.arguments.erase(splitResult.arguments.begin());
 
-	std::vector<std::string> utf8Args;
-
-	for (int i = numArgs - 1; i > 0; i--)
-	{
-		// The args here are converted from utf-16 to utf-8. While it wouldn't be safe to pass the
-		// resulting utf-8 strings to Windows API functions, it should be ok to use them as
-		// intermediates (to pass to CLI11).
-		utf8Args.emplace_back(wstrToUtf8Str(args[i]));
-	}
+	// CLI11 requires arguments be provided in reverse order.
+	std::reverse(splitResult.arguments.begin(), splitResult.arguments.end());
 
 	try
 	{
-		app.parse(utf8Args);
+		app.parse(splitResult.arguments);
 	}
 	catch (const CLI::ParseError &e)
 	{
@@ -191,45 +190,7 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 		return *exitInfo;
 	}
 
-	PreprocessDirectories(settings.directories);
-
 	return settings;
-}
-
-void PreprocessDirectories(std::vector<std::wstring> &directories)
-{
-	// When Explorer++ is set as the default file manager, it's invoked in the following way when a
-	// directory is opened:
-	//
-	// C:\path\to\Explorer++.exe "[directory_path]"
-	//
-	// If directory_path is something like C:\, this will result in the following invocation:
-	//
-	// C:\path\to\Explorer++.exe "C:\"
-	//
-	// This path argument is then turned into the following string:
-	//
-	// C:"
-	//
-	// This is due to the C++ command line parsing rules, as described at:
-	//
-	// https://docs.microsoft.com/en-us/cpp/cpp/main-function-command-line-args?view=vs-2019#parsing-c-command-line-arguments
-	//
-	// That is, \" is interpreted as a literal backslash character.
-	//
-	// That isn't what's intended when being passed a directory path. To resolve this, if a
-	// directory path ends in a double quote character, that character is replaced with a backslash
-	// character. This should be safe, as a double quote isn't an allowed file name character, so
-	// the presence of the double quote character is either a mistake (in which case, no directory
-	// will be opened anyway, so the transformation won't make much of a difference), or it's
-	// something that's being interpreted as part of the command line parsing.
-	for (std::wstring &directory : directories)
-	{
-		if (directory[directory.size() - 1] == '\"')
-		{
-			directory[directory.size() - 1] = '\\';
-		}
-	}
 }
 
 std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(const CLI::App &app,

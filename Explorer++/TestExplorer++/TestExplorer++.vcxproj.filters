@@ -204,6 +204,9 @@
     <ClCompile Include="PasteSymLinksServerClientTest.cpp">
       <Filter>Data Exchange\Clipboard</Filter>
     </ClCompile>
+    <ClCompile Include="CommandLineSplitterTest.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

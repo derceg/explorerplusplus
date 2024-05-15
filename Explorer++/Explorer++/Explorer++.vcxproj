@@ -1002,6 +1002,7 @@
     <ClCompile Include="ColumnRegistryStorage.cpp" />
     <ClCompile Include="ColumnStorage.cpp" />
     <ClCompile Include="ColumnXmlStorage.cpp" />
+    <ClCompile Include="CommandLineSplitter.cpp" />
     <ClCompile Include="CrashHandlerHelper.cpp" />
     <ClCompile Include="CustomFont.cpp" />
     <ClCompile Include="CustomFontStorage.cpp" />
@@ -1260,6 +1261,7 @@
     <ClInclude Include="ColumnRegistryStorage.h" />
     <ClInclude Include="ColumnStorage.h" />
     <ClInclude Include="ColumnXmlStorage.h" />
+    <ClInclude Include="CommandLineSplitter.h" />
     <ClInclude Include="CrashHandlerHelper.h" />
     <ClInclude Include="CustomFont.h" />
     <ClInclude Include="CustomFontStorage.h" />

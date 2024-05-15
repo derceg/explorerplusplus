@@ -673,6 +673,9 @@
     <ClCompile Include="PasteSymLinksServer.cpp">
       <Filter>Data Exchange\Clipboard</Filter>
     </ClCompile>
+    <ClCompile Include="CommandLineSplitter.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1385,6 +1388,9 @@
     </ClInclude>
     <ClInclude Include="ManagedWindowsSharedMemoryWrapper.h">
       <Filter>Boost</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandLineSplitter.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

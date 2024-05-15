@@ -27,6 +27,7 @@
     "gtest",
     "lua",
     "nlohmann-json",
+    "pegtl",
     "sol2",
     "wil"
   ],
