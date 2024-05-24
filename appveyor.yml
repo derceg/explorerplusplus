@@ -140,6 +140,7 @@ deploy:
     on:
       APPVEYOR_REPO_TAG: true
       configuration: Release
+      branch: master
 
   - provider: S3
     access_key_id:
@@ -154,6 +155,7 @@ deploy:
     on:
       APPVEYOR_REPO_TAG: false
       configuration: Release
+      branch: master
 
   - provider: S3
     access_key_id:
@@ -169,3 +171,4 @@ deploy:
       APPVEYOR_REPO_TAG: false
       platform: ARM64
       configuration: Release
+      branch: master
