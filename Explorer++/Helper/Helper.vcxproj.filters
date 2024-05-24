@@ -160,6 +160,9 @@
     <ClCompile Include="PidlHelper.cpp">
       <Filter>Shell</Filter>
     </ClCompile>
+    <ClCompile Include="ScopedBitmapReaderLock.cpp">
+      <Filter>Miscellaneous</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
@@ -340,6 +343,9 @@
       <Filter>Miscellaneous</Filter>
     </ClInclude>
     <ClInclude Include="ResourceHelper.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="ScopedBitmapReaderLock.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
   </ItemGroup>

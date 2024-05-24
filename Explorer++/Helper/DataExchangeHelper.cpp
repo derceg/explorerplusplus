@@ -4,6 +4,8 @@
 
 #include "stdafx.h"
 #include "DataExchangeHelper.h"
+#include "GdiplusHelper.h"
+#include <wil/com.h>
 
 std::optional<std::wstring> ReadStringFromGlobal(HGLOBAL global)
 {
@@ -164,6 +166,82 @@ wil::unique_hglobal WriteHDropDataToGlobal(const std::vector<std::wstring> &path
 
 	auto *filenameData = reinterpret_cast<std::byte *>(dropData) + headerSize;
 	std::memcpy(filenameData, concatenatedPaths.data(), concatenatedPathsSize);
+
+	return global;
+}
+
+std::unique_ptr<Gdiplus::Bitmap> ReadPngDataFromGlobal(HGLOBAL global)
+{
+	wil::unique_hglobal_locked mem(global);
+
+	if (!mem)
+	{
+		return nullptr;
+	}
+
+	auto size = GlobalSize(mem.get());
+	using StreamSizeType = UINT;
+
+	if (size == 0 || size > (std::numeric_limits<StreamSizeType>::max)())
+	{
+		return nullptr;
+	}
+
+	// Note that SHCreateMemStream() is used instead of CreateStreamOnHGlobal(), as that function
+	// requires that the backing HGLOBAL remains valid until the stream is destroyed, which doesn't
+	// align with how this function works (the caller shouldn't have worry about the lifetime of the
+	// input parameters after this function has returned). In this case, the Gdiplus::Bitmap
+	// instance will still end up taking a reference on the stream, but that's ok, as the stream is
+	// reference counted and is only initialized by the HGLOBAL, not backed by it.
+	wil::com_ptr_nothrow<IStream> stream(
+		SHCreateMemStream(static_cast<const BYTE *>(mem.get()), static_cast<StreamSizeType>(size)));
+
+	if (!stream)
+	{
+		return nullptr;
+	}
+
+	auto bitmap = std::make_unique<Gdiplus::Bitmap>(stream.get());
+
+	if (bitmap->GetLastStatus() != Gdiplus::Ok)
+	{
+		return nullptr;
+	}
+
+	return bitmap;
+}
+
+wil::unique_hglobal WritePngDataToGlobal(Gdiplus::Bitmap *bitmap)
+{
+	auto pngClsid = GdiplusHelper::GetEncoderClsid(L"image/png");
+
+	if (!pngClsid)
+	{
+		return nullptr;
+	}
+
+	wil::com_ptr_nothrow<IStream> stream;
+	HRESULT hr = CreateStreamOnHGlobal(nullptr, false, &stream);
+
+	if (FAILED(hr))
+	{
+		return nullptr;
+	}
+
+	// As noted in https://devblogs.microsoft.com/oldnewthing/20210929-00/?p=105742, if this
+	// function were to fail, the global inside the stream would be leaked. However, that post also
+	// notes that this function is guaranteed to succeed if the stream it's given came from
+	// CreateStreamOnHGlobal(), hence the CHECK().
+	wil::unique_hglobal global;
+	hr = GetHGlobalFromStream(stream.get(), &global);
+	CHECK(SUCCEEDED(hr));
+
+	auto status = bitmap->Save(stream.get(), &pngClsid.value(), nullptr);
+
+	if (status != Gdiplus::Ok)
+	{
+		return nullptr;
+	}
 
 	return global;
 }

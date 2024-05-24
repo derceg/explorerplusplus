@@ -226,15 +226,23 @@ std::unique_ptr<Gdiplus::Bitmap> LoadGdiplusBitmapFromPNG(HINSTANCE resourceInst
 		return nullptr;
 	}
 
-	wil::com_ptr_nothrow<IStream> stream(SHCreateMemStream(
-		reinterpret_cast<BYTE *>(resourceData->data()), static_cast<UINT>(resourceData->size())));
+	wil::com_ptr_nothrow<IStream> stream(
+		SHCreateMemStream(reinterpret_cast<const BYTE *>(resourceData->data()),
+			static_cast<UINT>(resourceData->size())));
 
 	if (!stream)
 	{
 		return nullptr;
 	}
 
-	return std::make_unique<Gdiplus::Bitmap>(stream.get());
+	auto bitmap = std::make_unique<Gdiplus::Bitmap>(stream.get());
+
+	if (bitmap->GetLastStatus() != Gdiplus::Ok)
+	{
+		return nullptr;
+	}
+
+	return bitmap;
 }
 
 int CopyImageListIcon(HIMAGELIST destination, HIMAGELIST source, int sourceIconIndex)

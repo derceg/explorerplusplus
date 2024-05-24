@@ -207,6 +207,10 @@
     <ClCompile Include="CommandLineSplitterTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="DataExchangeHelperTest.cpp">
+      <Filter>Helper\Data Exchange</Filter>
+    </ClCompile>
+    <ClCompile Include="GdiplusTestHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -349,6 +353,7 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ShellTestHelper.h" />
+    <ClInclude Include="GdiplusTestHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="EmbeddedResources\basic.png">

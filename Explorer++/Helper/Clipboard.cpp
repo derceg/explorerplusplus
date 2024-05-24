@@ -46,6 +46,18 @@ std::optional<std::vector<std::wstring>> Clipboard::ReadHDropData()
 	return ReadHDropDataFromGlobal(clipboardData);
 }
 
+std::unique_ptr<Gdiplus::Bitmap> Clipboard::ReadPng()
+{
+	HANDLE clipboardData = GetClipboardData(GetPngClipboardFormat());
+
+	if (!clipboardData)
+	{
+		return nullptr;
+	}
+
+	return ReadPngDataFromGlobal(clipboardData);
+}
+
 std::optional<std::string> Clipboard::ReadCustomData(UINT format)
 {
 	HANDLE clipboardData = GetClipboardData(format);
@@ -80,6 +92,18 @@ bool Clipboard::WriteHDropData(const std::vector<std::wstring> &paths)
 	}
 
 	return WriteDataToClipboard(CF_HDROP, std::move(global));
+}
+
+bool Clipboard::WritePng(Gdiplus::Bitmap *bitmap)
+{
+	auto global = WritePngDataToGlobal(bitmap);
+
+	if (!global)
+	{
+		return false;
+	}
+
+	return WriteDataToClipboard(GetPngClipboardFormat(), std::move(global));
 }
 
 bool Clipboard::WriteCustomData(UINT format, const std::string &data)

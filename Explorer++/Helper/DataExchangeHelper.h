@@ -5,6 +5,7 @@
 #pragma once
 
 #include <wil/resource.h>
+#include <gdiplus.h>
 #include <optional>
 #include <string>
 #include <vector>
@@ -42,6 +43,8 @@ std::optional<T> ReadDataFromGlobal(HGLOBAL global)
 wil::unique_hglobal WriteDataToGlobal(const void *data, size_t size);
 std::optional<std::vector<std::wstring>> ReadHDropDataFromGlobal(HGLOBAL global);
 wil::unique_hglobal WriteHDropDataToGlobal(const std::vector<std::wstring> &paths);
+std::unique_ptr<Gdiplus::Bitmap> ReadPngDataFromGlobal(HGLOBAL global);
+wil::unique_hglobal WritePngDataToGlobal(Gdiplus::Bitmap *bitmap);
 
 bool IsDropFormatAvailable(IDataObject *dataObject, const FORMATETC &formatEtc);
 UINT GetPngClipboardFormat();
