@@ -32,7 +32,7 @@ private:
 	class PidlBase
 	{
 	public:
-		typedef typename IDListType *Pointer;
+		using Pointer = IDListType *;
 
 		PidlBase() = default;
 
