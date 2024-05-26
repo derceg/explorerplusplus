@@ -58,6 +58,18 @@ std::unique_ptr<Gdiplus::Bitmap> Clipboard::ReadPng()
 	return ReadPngDataFromGlobal(clipboardData);
 }
 
+std::unique_ptr<Gdiplus::Bitmap> Clipboard::ReadDIB()
+{
+	HANDLE clipboardData = GetClipboardData(CF_DIB);
+
+	if (!clipboardData)
+	{
+		return nullptr;
+	}
+
+	return ReadDIBDataFromGlobal(clipboardData);
+}
+
 std::optional<std::string> Clipboard::ReadCustomData(UINT format)
 {
 	HANDLE clipboardData = GetClipboardData(format);
@@ -104,6 +116,18 @@ bool Clipboard::WritePng(Gdiplus::Bitmap *bitmap)
 	}
 
 	return WriteDataToClipboard(GetPngClipboardFormat(), std::move(global));
+}
+
+bool Clipboard::WriteDIB(Gdiplus::Bitmap *bitmap)
+{
+	auto global = WriteDIBDataToGlobal(bitmap);
+
+	if (!global)
+	{
+		return false;
+	}
+
+	return WriteDataToClipboard(CF_DIB, std::move(global));
 }
 
 bool Clipboard::WriteCustomData(UINT format, const std::string &data)

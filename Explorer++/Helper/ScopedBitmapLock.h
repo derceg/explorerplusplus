@@ -6,12 +6,18 @@
 
 #include <gdiplus.h>
 
-class ScopedBitmapReaderLock
+class ScopedBitmapLock
 {
 public:
-	ScopedBitmapReaderLock(Gdiplus::Bitmap *bitmap, const Gdiplus::Rect *rect,
+	enum class LockMode
+	{
+		Read,
+		Write
+	};
+
+	ScopedBitmapLock(Gdiplus::Bitmap *bitmap, const Gdiplus::Rect *rect, LockMode lockMode,
 		Gdiplus::PixelFormat format);
-	~ScopedBitmapReaderLock();
+	~ScopedBitmapLock();
 
 	const Gdiplus::BitmapData *GetBitmapData() const;
 

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <gdiplus.h>
 #include <optional>
 #include <string>
 
@@ -11,5 +12,6 @@ namespace GdiplusHelper
 {
 
 std::optional<CLSID> GetEncoderClsid(const std::wstring &format);
+std::unique_ptr<Gdiplus::Bitmap> DeepCopyBitmap(Gdiplus::Bitmap *bitmap);
 
 }

@@ -45,6 +45,8 @@ std::optional<std::vector<std::wstring>> ReadHDropDataFromGlobal(HGLOBAL global)
 wil::unique_hglobal WriteHDropDataToGlobal(const std::vector<std::wstring> &paths);
 std::unique_ptr<Gdiplus::Bitmap> ReadPngDataFromGlobal(HGLOBAL global);
 wil::unique_hglobal WritePngDataToGlobal(Gdiplus::Bitmap *bitmap);
+std::unique_ptr<Gdiplus::Bitmap> ReadDIBDataFromGlobal(HGLOBAL global);
+wil::unique_hglobal WriteDIBDataToGlobal(Gdiplus::Bitmap *bitmap);
 
 bool IsDropFormatAvailable(IDataObject *dataObject, const FORMATETC &formatEtc);
 UINT GetPngClipboardFormat();

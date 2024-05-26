@@ -4,7 +4,7 @@
 
 #include "pch.h"
 #include "GdiplusTestHelper.h"
-#include "../Helper/ScopedBitmapReaderLock.h"
+#include "../Helper/ScopedBitmapLock.h"
 #include <gtest/gtest.h>
 
 void BuildTestBitmap(int width, int height, std::unique_ptr<Gdiplus::Bitmap> &bitmap)
@@ -30,11 +30,13 @@ bool AreBitmapsEquivalent(Gdiplus::Bitmap *bitmap1, Gdiplus::Bitmap *bitmap2)
 	}
 
 	Gdiplus::Rect rect(0, 0, bitmap1->GetWidth(), bitmap1->GetHeight());
-	ScopedBitmapReaderLock lockedBitmap1(bitmap1, &rect, PixelFormat32bppARGB);
-	ScopedBitmapReaderLock lockedBitmap2(bitmap2, &rect, PixelFormat32bppARGB);
+	ScopedBitmapLock bitmapLock1(bitmap1, &rect, ScopedBitmapLock::LockMode::Read,
+		PixelFormat32bppARGB);
+	ScopedBitmapLock bitmapLock2(bitmap2, &rect, ScopedBitmapLock::LockMode::Read,
+		PixelFormat32bppARGB);
 
-	auto *bitmapData1 = lockedBitmap1.GetBitmapData();
-	auto *bitmapData2 = lockedBitmap2.GetBitmapData();
+	auto *bitmapData1 = bitmapLock1.GetBitmapData();
+	auto *bitmapData2 = bitmapLock2.GetBitmapData();
 
 	if (!bitmapData1 || !bitmapData2)
 	{

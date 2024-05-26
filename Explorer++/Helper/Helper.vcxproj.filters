@@ -160,7 +160,7 @@
     <ClCompile Include="PidlHelper.cpp">
       <Filter>Shell</Filter>
     </ClCompile>
-    <ClCompile Include="ScopedBitmapReaderLock.cpp">
+    <ClCompile Include="ScopedBitmapLock.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
   </ItemGroup>
@@ -345,7 +345,7 @@
     <ClInclude Include="ResourceHelper.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
-    <ClInclude Include="ScopedBitmapReaderLock.h">
+    <ClInclude Include="ScopedBitmapLock.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
   </ItemGroup>

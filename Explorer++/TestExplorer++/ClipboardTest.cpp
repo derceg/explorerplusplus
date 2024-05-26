@@ -56,6 +56,20 @@ TEST_F(ClipboardTest, ReadWritePngData)
 	EXPECT_TRUE(AreBitmapsEquivalent(bitmap.get(), retrievedBitmap.get()));
 }
 
+TEST_F(ClipboardTest, ReadWriteDIBData)
+{
+	std::unique_ptr<Gdiplus::Bitmap> bitmap;
+	BuildTestBitmap(100, 100, bitmap);
+
+	auto res = m_clipboard.WriteDIB(bitmap.get());
+	ASSERT_TRUE(res);
+
+	auto retrievedBitmap = m_clipboard.ReadDIB();
+	ASSERT_NE(retrievedBitmap, nullptr);
+
+	EXPECT_TRUE(AreBitmapsEquivalent(bitmap.get(), retrievedBitmap.get()));
+}
+
 TEST_F(ClipboardTest, ReadWriteCustomData)
 {
 	using namespace std::string_literals;

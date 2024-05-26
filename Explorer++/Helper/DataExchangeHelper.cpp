@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "DataExchangeHelper.h"
 #include "GdiplusHelper.h"
+#include "ScopedBitmapLock.h"
 #include <wil/com.h>
 
 std::optional<std::wstring> ReadStringFromGlobal(HGLOBAL global)
@@ -172,31 +173,10 @@ wil::unique_hglobal WriteHDropDataToGlobal(const std::vector<std::wstring> &path
 
 std::unique_ptr<Gdiplus::Bitmap> ReadPngDataFromGlobal(HGLOBAL global)
 {
-	wil::unique_hglobal_locked mem(global);
+	wil::com_ptr_nothrow<IStream> stream;
+	HRESULT hr = CreateStreamOnHGlobal(global, false, &stream);
 
-	if (!mem)
-	{
-		return nullptr;
-	}
-
-	auto size = GlobalSize(mem.get());
-	using StreamSizeType = UINT;
-
-	if (size == 0 || size > (std::numeric_limits<StreamSizeType>::max)())
-	{
-		return nullptr;
-	}
-
-	// Note that SHCreateMemStream() is used instead of CreateStreamOnHGlobal(), as that function
-	// requires that the backing HGLOBAL remains valid until the stream is destroyed, which doesn't
-	// align with how this function works (the caller shouldn't have worry about the lifetime of the
-	// input parameters after this function has returned). In this case, the Gdiplus::Bitmap
-	// instance will still end up taking a reference on the stream, but that's ok, as the stream is
-	// reference counted and is only initialized by the HGLOBAL, not backed by it.
-	wil::com_ptr_nothrow<IStream> stream(
-		SHCreateMemStream(static_cast<const BYTE *>(mem.get()), static_cast<StreamSizeType>(size)));
-
-	if (!stream)
+	if (FAILED(hr))
 	{
 		return nullptr;
 	}
@@ -208,7 +188,12 @@ std::unique_ptr<Gdiplus::Bitmap> ReadPngDataFromGlobal(HGLOBAL global)
 		return nullptr;
 	}
 
-	return bitmap;
+	// The Gdiplus::Bitmap constructor above doesn't copy the data passed to it. That means that the
+	// input HGLOBAL would have to remain valid for as long as the bitmap exists. That doesn't align
+	// with how this function is designed to work (the caller shouldn't have worry about the
+	// lifetime of the input parameters after this function has returned), which is the reason why a
+	// deep copy of the bitmap is returned here.
+	return GdiplusHelper::DeepCopyBitmap(bitmap.get());
 }
 
 wil::unique_hglobal WritePngDataToGlobal(Gdiplus::Bitmap *bitmap)
@@ -242,6 +227,106 @@ wil::unique_hglobal WritePngDataToGlobal(Gdiplus::Bitmap *bitmap)
 	{
 		return nullptr;
 	}
+
+	return global;
+}
+
+std::unique_ptr<Gdiplus::Bitmap> ReadDIBDataFromGlobal(HGLOBAL global)
+{
+	wil::unique_hglobal_locked mem(global);
+
+	if (!mem)
+	{
+		return nullptr;
+	}
+
+	auto *bitmapInfo = static_cast<BITMAPINFO *>(mem.get());
+
+	int colorTableLength = 0;
+
+	// See
+	// https://source.chromium.org/chromium/chromium/src/+/main:ui/base/clipboard/clipboard_win.cc;l=833;drc=177693cc196465bf71d8d0c0fab8c4f1bb9d95b4.
+	switch (bitmapInfo->bmiHeader.biBitCount)
+	{
+	case 1:
+	case 4:
+	case 8:
+		colorTableLength = bitmapInfo->bmiHeader.biClrUsed ? bitmapInfo->bmiHeader.biClrUsed
+														   : 1 << bitmapInfo->bmiHeader.biBitCount;
+		break;
+
+	case 16:
+	case 32:
+		if (bitmapInfo->bmiHeader.biCompression == BI_BITFIELDS)
+		{
+			colorTableLength = 3;
+		}
+		break;
+	}
+
+	void *data = reinterpret_cast<std::byte *>(bitmapInfo) + bitmapInfo->bmiHeader.biSize
+		+ (colorTableLength * sizeof(RGBQUAD));
+
+	auto bitmap = std::make_unique<Gdiplus::Bitmap>(bitmapInfo, data);
+
+	if (bitmap->GetLastStatus() != Gdiplus::Ok)
+	{
+		return nullptr;
+	}
+
+	return GdiplusHelper::DeepCopyBitmap(bitmap.get());
+}
+
+wil::unique_hglobal WriteDIBDataToGlobal(Gdiplus::Bitmap *bitmap)
+{
+	Gdiplus::Rect rect(0, 0, bitmap->GetWidth(), bitmap->GetHeight());
+	ScopedBitmapLock bitmapLock(bitmap, &rect, ScopedBitmapLock::LockMode::Read,
+		PixelFormat32bppARGB);
+
+	auto *bitmapData = bitmapLock.GetBitmapData();
+
+	if (!bitmapData)
+	{
+		return nullptr;
+	}
+
+	size_t headerSize = sizeof(BITMAPINFOHEADER);
+	size_t pixelDataSize = std::abs(bitmapData->Stride) * bitmapData->Height;
+	size_t totalSize = headerSize + pixelDataSize;
+	wil::unique_hglobal global(GlobalAlloc(GHND, totalSize));
+
+	if (!global)
+	{
+		return nullptr;
+	}
+
+	wil::unique_hglobal_locked mem(global.get());
+
+	if (!mem)
+	{
+		return nullptr;
+	}
+
+	// The CF_DIB format contains a BITMAPINFO structure, which is composed of a BITMAPINFOHEADER,
+	// followed by the color space information and the bitmap bits. However, in this case, there is
+	// no color space information, so the only parts present are the header and the bitmap bits.
+	auto *infoHeader = static_cast<BITMAPINFOHEADER *>(mem.get());
+	infoHeader->biSize = static_cast<DWORD>(headerSize);
+	infoHeader->biWidth = bitmapData->Width;
+	infoHeader->biHeight = bitmapData->Height;
+	infoHeader->biPlanes = 1;
+	infoHeader->biBitCount = 32;
+	infoHeader->biCompression = BI_RGB;
+
+	if (bitmapData->Stride > 0)
+	{
+		// If the stride is positive, this image is top-down. In the BITMAPINFOHEADER struct, a
+		// top-down uncompressed image has a negative height.
+		infoHeader->biHeight = -infoHeader->biHeight;
+	}
+
+	auto *pixelData = reinterpret_cast<std::byte *>(infoHeader) + headerSize;
+	std::memcpy(pixelData, bitmapData->Scan0, pixelDataSize);
 
 	return global;
 }

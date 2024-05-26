@@ -621,7 +621,7 @@
     <ClCompile Include="DriveInfo.cpp" />
     <ClCompile Include="DropHandler.cpp" />
     <ClCompile Include="FileActionHandler.cpp" />
-    <ClCompile Include="ScopedBitmapReaderLock.cpp" />
+    <ClCompile Include="ScopedBitmapLock.cpp" />
     <ClCompile Include="ShellContextMenu.cpp" />
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="FolderSize.cpp" />
@@ -705,7 +705,7 @@
     <ClInclude Include="DriveInfo.h" />
     <ClInclude Include="DropHandler.h" />
     <ClInclude Include="FileActionHandler.h" />
-    <ClInclude Include="ScopedBitmapReaderLock.h" />
+    <ClInclude Include="ScopedBitmapLock.h" />
     <ClInclude Include="ShellContextMenu.h" />
     <ClInclude Include="FileOperations.h" />
     <ClInclude Include="FolderSize.h" />
