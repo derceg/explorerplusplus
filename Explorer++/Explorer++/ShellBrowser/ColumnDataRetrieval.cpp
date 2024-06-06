@@ -742,23 +742,41 @@ BOOL GetPrinterStatusDescription(DWORD dwStatus, TCHAR *szStatus, size_t cchMax)
 
 std::wstring GetNetworkAdapterColumnText(const BasicItemInfo_t &itemInfo)
 {
-	ULONG outBufLen = 0;
-	GetAdaptersAddresses(AF_UNSPEC, 0, nullptr, nullptr, &outBufLen);
-	auto *adapterAddresses = reinterpret_cast<IP_ADAPTER_ADDRESSES *>(new char[outBufLen]);
-	GetAdaptersAddresses(AF_UNSPEC, 0, nullptr, adapterAddresses, &outBufLen);
+	ULONG bufferSize = 0;
+	auto error = GetAdaptersAddresses(AF_UNSPEC, 0, nullptr, nullptr, &bufferSize);
 
-	IP_ADAPTER_ADDRESSES *adapaterAddress = adapterAddresses;
-
-	while (adapaterAddress != nullptr
-		&& lstrcmp(adapaterAddress->FriendlyName, itemInfo.wfd.cFileName) != 0)
+	if (error != ERROR_BUFFER_OVERFLOW)
 	{
-		adapaterAddress = adapaterAddress->Next;
+		return {};
+	}
+
+	std::vector<std::byte> buffer;
+	buffer.resize(bufferSize);
+	auto *adapters = reinterpret_cast<IP_ADAPTER_ADDRESSES *>(buffer.data());
+	error = GetAdaptersAddresses(AF_UNSPEC, 0, nullptr, adapters, &bufferSize);
+
+	if (error != ERROR_SUCCESS)
+	{
+		return {};
+	}
+
+	const auto *currentAdapter = adapters;
+
+	while (currentAdapter != nullptr
+		&& lstrcmp(currentAdapter->FriendlyName, itemInfo.wfd.cFileName) != 0)
+	{
+		currentAdapter = currentAdapter->Next;
+	}
+
+	if (!currentAdapter)
+	{
+		return {};
 	}
 
 	std::wstring status;
 
 	/* TODO: These strings need to be setup correctly. */
-	switch (adapaterAddress->OperStatus)
+	switch (currentAdapter->OperStatus)
 	{
 	case IfOperStatusUp:
 		status = L"Connected";
@@ -788,8 +806,6 @@ std::wstring GetNetworkAdapterColumnText(const BasicItemInfo_t &itemInfo)
 		status = L"Lower layer non-operational";
 		break;
 	}
-
-	delete[] adapterAddresses;
 
 	return status;
 }
