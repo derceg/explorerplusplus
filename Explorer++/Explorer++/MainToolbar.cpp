@@ -134,6 +134,9 @@ void MainToolbar::Initialize(HWND parent,
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(parent,
 		std::bind_front(&MainToolbar::ParentWndProc, this)));
 
+	m_connections.push_back(m_coreInterface->AddApplicationInitializatedObserver(
+		std::bind_front(&MainToolbar::OnApplicationInitialized, this)));
+
 	m_coreInterface->AddTabsInitializedObserver(
 		[this]
 		{
@@ -451,6 +454,12 @@ int MainToolbar::LookupToolbarButtonTextID(MainToolbarButton button) const
 	return 0;
 }
 
+void MainToolbar::OnApplicationInitialized()
+{
+	m_applicationInitialized = true;
+	UpdateToolbarButtonStates();
+}
+
 void MainToolbar::OnUseLargeToolbarIconsUpdated(BOOL newValue)
 {
 	UNREFERENCED_PARAMETER(newValue);
@@ -743,6 +752,11 @@ void MainToolbar::UpdateConfigDependentButtonStates()
 
 void MainToolbar::UpdateToolbarButtonStates()
 {
+	if (!m_applicationInitialized)
+	{
+		return;
+	}
+
 	const Tab &tab = m_coreInterface->GetTabContainer()->GetSelectedTab();
 
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Back,
@@ -778,6 +792,11 @@ void MainToolbar::UpdateToolbarButtonStates()
 
 void MainToolbar::OnClipboardUpdate()
 {
+	if (!m_applicationInitialized)
+	{
+		return;
+	}
+
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, MainToolbarButton::Paste,
 		m_coreInterface->CanPaste(PasteType::Normal));
 }

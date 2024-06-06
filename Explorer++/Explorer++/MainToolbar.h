@@ -84,6 +84,7 @@ private:
 
 	void UpdateToolbarButtonImageIndexes();
 
+	void OnApplicationInitialized();
 	void OnUseLargeToolbarIconsUpdated(BOOL newValue);
 	void OnShowFoldersUpdated(bool showFolders);
 
@@ -98,6 +99,7 @@ private:
 	CoreInterface *m_coreInterface = nullptr;
 	IconFetcher *m_iconFetcher = nullptr;
 	std::shared_ptr<Config> m_config;
+	bool m_applicationInitialized = false;
 
 	wil::unique_himagelist m_imageListSmall;
 	wil::unique_himagelist m_imageListLarge;
