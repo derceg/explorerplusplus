@@ -797,6 +797,7 @@ void ShellBrowserImpl::RemoveItem(int iItemInternal)
 		ListView_DeleteItem(m_hListView, iItem);
 	}
 
+	m_directoryState.filteredItemsList.erase(iItemInternal);
 	m_itemInfoMap.erase(iItemInternal);
 
 	nItems = ListView_GetItemCount(m_hListView);
