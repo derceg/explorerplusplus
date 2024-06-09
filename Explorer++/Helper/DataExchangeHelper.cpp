@@ -4,8 +4,11 @@
 
 #include "stdafx.h"
 #include "DataExchangeHelper.h"
+#include "DragDropHelper.h"
 #include "GdiplusHelper.h"
+#include "Helper.h"
 #include "ScopedBitmapLock.h"
+#include "UniqueVariableSizeStruct.h"
 #include <wil/com.h>
 
 std::optional<std::wstring> ReadStringFromGlobal(HGLOBAL global)
@@ -329,6 +332,85 @@ wil::unique_hglobal WriteDIBDataToGlobal(Gdiplus::Bitmap *bitmap)
 	std::memcpy(pixelData, bitmapData->Scan0, pixelDataSize);
 
 	return global;
+}
+
+HRESULT ReadVirtualFilesFromDataObject(IDataObject *dataObject,
+	std::vector<VirtualFile> &virtualFilesOutput)
+{
+	UniqueVariableSizeStruct<FILEGROUPDESCRIPTOR> fileGroupDescriptor;
+	RETURN_IF_FAILED(GetBlobData(dataObject,
+		static_cast<CLIPFORMAT>(RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR)),
+		fileGroupDescriptor));
+
+	std::vector<VirtualFile> virtualFiles;
+
+	for (UINT i = 0; i < fileGroupDescriptor->cItems; i++)
+	{
+		if (WI_IsFlagSet(fileGroupDescriptor->fgd[i].dwFlags, FD_ATTRIBUTES)
+			&& WI_IsFlagSet(fileGroupDescriptor->fgd[i].dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
+		{
+			continue;
+		}
+
+		FORMATETC contentsFormat = { static_cast<CLIPFORMAT>(
+										 RegisterClipboardFormat(CFSTR_FILECONTENTS)),
+			nullptr, DVASPECT_CONTENT, CheckedNumericCast<LONG>(i), TYMED_HGLOBAL };
+		std::string contents;
+		RETURN_IF_FAILED(GetBlobData(dataObject, &contentsFormat, contents));
+
+		virtualFiles.emplace_back(fileGroupDescriptor->fgd[i].cFileName, contents);
+	}
+
+	if (virtualFiles.empty())
+	{
+		return E_FAIL;
+	}
+
+	virtualFilesOutput = virtualFiles;
+
+	return S_OK;
+}
+
+HRESULT WriteVirtualFilesToDataObject(IDataObject *dataObject,
+	const std::vector<VirtualFile> &virtualFiles)
+{
+	if (virtualFiles.empty())
+	{
+		return E_FAIL;
+	}
+
+	size_t groupDescriptorSize =
+		sizeof(FILEGROUPDESCRIPTOR) + (sizeof(FILEDESCRIPTOR) * virtualFiles.size() - 1);
+	auto groupDescriptor = MakeUniqueVariableSizeStruct<FILEGROUPDESCRIPTOR>(groupDescriptorSize);
+
+	groupDescriptor->cItems = CheckedNumericCast<UINT>(virtualFiles.size());
+
+	for (size_t i = 0; i < virtualFiles.size(); i++)
+	{
+		ULARGE_INTEGER fileSize;
+		fileSize.QuadPart = virtualFiles[i].contents.size();
+
+		FILEDESCRIPTOR fileDescriptor = {};
+		fileDescriptor.nFileSizeLow = fileSize.LowPart;
+		fileDescriptor.nFileSizeHigh = fileSize.HighPart;
+		fileDescriptor.dwFlags = static_cast<DWORD>(FD_UNICODE) | FD_FILESIZE;
+		RETURN_IF_FAILED(StringCchCopy(fileDescriptor.cFileName,
+			std::size(fileDescriptor.cFileName), virtualFiles[i].name.c_str()));
+
+		groupDescriptor->fgd[i] = fileDescriptor;
+
+		FORMATETC contentsFormat = { static_cast<CLIPFORMAT>(
+										 RegisterClipboardFormat(CFSTR_FILECONTENTS)),
+			nullptr, DVASPECT_CONTENT, CheckedNumericCast<LONG>(i), TYMED_HGLOBAL };
+		RETURN_IF_FAILED(SetBlobData(dataObject, &contentsFormat, virtualFiles[i].contents.data(),
+			virtualFiles[i].contents.size()));
+	}
+
+	RETURN_IF_FAILED(SetBlobData(dataObject,
+		static_cast<CLIPFORMAT>(RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR)),
+		groupDescriptor.get(), groupDescriptorSize));
+
+	return S_OK;
 }
 
 bool IsDropFormatAvailable(IDataObject *dataObject, const FORMATETC &formatEtc)

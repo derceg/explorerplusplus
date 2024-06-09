@@ -15,6 +15,7 @@
     "boost-lexical-cast",
     "boost-locale",
     "boost-multi-index",
+    "boost-numeric-conversion",
     "boost-outcome",
     "boost-parameter",
     "boost-range",

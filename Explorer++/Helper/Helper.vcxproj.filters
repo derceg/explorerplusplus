@@ -348,6 +348,9 @@
     <ClInclude Include="ScopedBitmapLock.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
+    <ClInclude Include="UniqueVariableSizeStruct.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dialog Support">

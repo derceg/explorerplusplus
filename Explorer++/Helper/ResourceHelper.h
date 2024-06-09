@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include "UniqueVariableSizeStruct.h"
 #include <cstddef>
-#include <memory>
 #include <optional>
 #include <vector>
 
@@ -26,19 +26,10 @@ struct DLGTEMPLATEEX
 	short cy;
 };
 
-struct DlgTemplateExDeleter
-{
-	void operator()(DLGTEMPLATEEX *dlgTemplateEx) const
-	{
-		::operator delete(dlgTemplateEx);
-	}
-};
-
-using UniqueDlgTemplateEx = std::unique_ptr<DLGTEMPLATEEX, DlgTemplateExDeleter>;
-
 std::optional<std::vector<std::byte>> CopyResource(HINSTANCE resourceInstance, UINT resourceId,
 	const WCHAR *type);
 
 // Creates an in-memory dialog template for an extended dialog box and sets the WS_EX_LAYOUTRTL
 // style on that template.
-UniqueDlgTemplateEx MakeRTLDialogTemplate(HINSTANCE resourceInstance, UINT dialogId);
+UniqueVariableSizeStruct<DLGTEMPLATEEX> MakeRTLDialogTemplate(HINSTANCE resourceInstance,
+	UINT dialogId);

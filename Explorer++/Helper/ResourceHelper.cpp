@@ -58,7 +58,8 @@ std::optional<std::vector<std::byte>> CopyResource(HINSTANCE resourceInstance, U
 	return copiedData;
 }
 
-UniqueDlgTemplateEx MakeRTLDialogTemplate(HINSTANCE resourceInstance, UINT dialogId)
+UniqueVariableSizeStruct<DLGTEMPLATEEX> MakeRTLDialogTemplate(HINSTANCE resourceInstance,
+	UINT dialogId)
 {
 	auto resourceData = CopyResource(resourceInstance, dialogId, RT_DIALOG);
 
@@ -73,15 +74,8 @@ UniqueDlgTemplateEx MakeRTLDialogTemplate(HINSTANCE resourceInstance, UINT dialo
 	CHECK_GT(resourceData->size(), sizeof(DLGTEMPLATEEX));
 
 	// The only reason this struct is allocated and the data is copied into it is to make it
-	// possible to return typed data, rather than an untyped set of bytes. This struct is of
-	// variable size, which is the reason for the use of ::operator new.
-	UniqueDlgTemplateEx dialogTemplateEx(
-		static_cast<DLGTEMPLATEEX *>(::operator new(resourceData->size(), std::nothrow)));
-
-	if (!dialogTemplateEx)
-	{
-		return nullptr;
-	}
+	// possible to return typed data, rather than an untyped set of bytes.
+	auto dialogTemplateEx = MakeUniqueVariableSizeStruct<DLGTEMPLATEEX>(resourceData->size());
 
 	std::memcpy(dialogTemplateEx.get(), resourceData->data(), resourceData->size());
 

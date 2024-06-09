@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "../Helper/DataExchangeHelper.h"
 #include "GdiplusTestHelper.h"
+#include "../Helper/DataObjectImpl.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
@@ -85,4 +86,20 @@ TEST_F(ReadImageDataFromGlobalTest, UseBitmapAfterGlobalFree)
 {
 	PerformTest(ImageType::Png);
 	PerformTest(ImageType::DIB);
+}
+
+TEST(DataExchangeHelperTest, ReadWriteVirtualFiles)
+{
+	auto dataObject = winrt::make<DataObjectImpl>();
+
+	std::vector<VirtualFile> virtualFiles = { { L"test-file-1.txt", "Contents of file 1" },
+		{ L"test-file-2.txt", "Contents of file 2" },
+		{ L"test-file-3.txt", "Contents of file 3" } };
+	ASSERT_HRESULT_SUCCEEDED(WriteVirtualFilesToDataObject(dataObject.get(), virtualFiles));
+
+	std::vector<VirtualFile> retrievedVirtualFiles;
+	ASSERT_HRESULT_SUCCEEDED(
+		ReadVirtualFilesFromDataObject(dataObject.get(), retrievedVirtualFiles));
+
+	EXPECT_EQ(retrievedVirtualFiles, virtualFiles);
 }

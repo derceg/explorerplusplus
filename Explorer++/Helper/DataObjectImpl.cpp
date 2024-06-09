@@ -18,7 +18,7 @@ IFACEMETHODIMP DataObjectImpl::GetData(FORMATETC *format, STGMEDIUM *stg)
 	for (const auto &item : m_items)
 	{
 		if (item.format.cfFormat == format->cfFormat && item.format.tymed & format->tymed
-			&& item.format.dwAspect == format->dwAspect)
+			&& item.format.dwAspect == format->dwAspect && item.format.lindex == format->lindex)
 		{
 			auto duplicatedStg = DuplicateStorageMedium(&item.stg, &item.format);
 			*stg = duplicatedStg.release();

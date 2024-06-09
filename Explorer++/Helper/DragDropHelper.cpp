@@ -91,3 +91,45 @@ HRESULT CreateDataObjectForShellTransfer(const std::vector<PCIDLIST_ABSOLUTE> &i
 
 	return S_OK;
 }
+
+HRESULT SetBlobData(IDataObject *dataObject, CLIPFORMAT format, const void *data, size_t size)
+{
+	FORMATETC ftc = { format, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+	return SetBlobData(dataObject, &ftc, data, size);
+}
+
+HRESULT SetBlobData(IDataObject *dataObject, FORMATETC *ftc, const void *data, size_t size)
+{
+	auto global = WriteDataToGlobal(data, size);
+
+	if (!global)
+	{
+		return E_FAIL;
+	}
+
+	auto stg = GetStgMediumForGlobal(std::move(global));
+	return MoveStorageToObject(dataObject, ftc, std::move(stg));
+}
+
+HRESULT GetBlobData(IDataObject *dataObject, CLIPFORMAT format, std::string &outputData)
+{
+	FORMATETC ftc = { format, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+	return GetBlobData(dataObject, &ftc, outputData);
+}
+
+HRESULT GetBlobData(IDataObject *dataObject, FORMATETC *ftc, std::string &outputData)
+{
+	wil::unique_stg_medium stg;
+	RETURN_IF_FAILED(dataObject->GetData(ftc, &stg));
+
+	auto data = ReadBinaryDataFromGlobal(stg.hGlobal);
+
+	if (!data)
+	{
+		return E_FAIL;
+	}
+
+	outputData = *data;
+
+	return S_OK;
+}
