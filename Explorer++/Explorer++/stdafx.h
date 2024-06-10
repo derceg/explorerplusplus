@@ -21,6 +21,12 @@
 
 #define WIL_SUPPRESS_EXCEPTIONS
 
+// This is required by glog. Previously, glog included a pragma like this directly in its source.
+// However, that's no longer the case. It appears that this should probably be done by CMAKE/vcpkg,
+// though it isn't at the moment. If, in the future, this library is automatically linked in when
+// integrating the glog package with vcpkg, this line can be removed.
+#pragma comment(lib, "dbghelp.lib")
+
 #include "../Helper/DisableUnaligned.h"
 
 // Third-party Header Files:
@@ -89,6 +95,7 @@
 // GLOG_NO_ABBREVIATED_SEVERITIES is defined because windows.h defines ERROR, which is also normally
 // defined by glog.
 #define GLOG_NO_ABBREVIATED_SEVERITIES
+#define GLOG_USE_GLOG_EXPORT
 #include <glog/logging.h>
 
 // wil/resource.h can use declarations from the Windows header files. For example,

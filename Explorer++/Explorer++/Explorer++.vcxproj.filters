@@ -1386,9 +1386,6 @@
     <ClInclude Include="PasteSymLinksServer.h">
       <Filter>Data Exchange\Clipboard</Filter>
     </ClInclude>
-    <ClInclude Include="ManagedWindowsSharedMemoryWrapper.h">
-      <Filter>Boost</Filter>
-    </ClInclude>
     <ClInclude Include="CommandLineSplitter.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -1547,9 +1544,6 @@
     </Filter>
     <Filter Include="Data Exchange\Clipboard">
       <UniqueIdentifier>{cadaacd3-aced-4afa-8fbf-e334258b9316}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Boost">
-      <UniqueIdentifier>{17237a89-ff5b-41b2-a073-f2faf83bf2bc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -67,6 +67,7 @@
 #include <wmsdk.h>
 
 #define GLOG_NO_ABBREVIATED_SEVERITIES
+#define GLOG_USE_GLOG_EXPORT
 #include <glog/logging.h>
 
 // WinRT

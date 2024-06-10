@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "ManagedWindowsSharedMemoryWrapper.h"
 #include <boost/interprocess/containers/string.hpp>
+#include <boost/interprocess/managed_windows_shared_memory.hpp>
 #include <boost/interprocess/sync/interprocess_condition.hpp>
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
 

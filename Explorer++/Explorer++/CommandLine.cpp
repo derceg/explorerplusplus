@@ -13,9 +13,7 @@
 #include "ResourceHelper.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/WindowHelper.h"
-#include <CLI/App.hpp>
-#include <CLI/Config.hpp>
-#include <CLI/Formatter.hpp>
+#include <CLI/CLI.hpp>
 #include <iostream>
 #include <optional>
 
