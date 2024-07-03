@@ -146,12 +146,14 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 	// That could mean: select two items (c:\windows and c:\users\public) or select one item
 	// (c:\windows) and open a directory (c:\users\public).
 	app.add_option("--select", settings.filesToSelect,
-		   "When supplied a path like \"C:\\path\\to\\file\", will open \"C:\\path\\to\" in a tab "
-		   "and select \"file\". This option can be supplied multiple times, in which case each "
-		   "path will be opened in a separate tab.")
+		   R"(When supplied a path like "C:\path\to\file", will open "C:\path\to" in a tab and )"
+		   R"(select "file". This option can be supplied multiple times, in which case each path )"
+		   "will be opened in a separate tab.")
 		->allow_extra_args(false);
 
-	app.add_option("directories", settings.directories, "Directories to open");
+	app.add_option("directories", settings.directories,
+		"Directories to open. Paths with spaces should be enclosed in double quotes (e.g. "
+		R"("C:\path with spaces").)");
 
 	auto splitResult = CommandLineSplitter::Split(wstrToUtf8Str(GetCommandLine()));
 
