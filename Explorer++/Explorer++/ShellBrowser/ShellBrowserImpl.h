@@ -344,6 +344,11 @@ private:
 		/* Cached folder size data. */
 		mutable std::unordered_map<int, ULONGLONG> cachedFolderSizes;
 
+		// Thumbnails
+		// The first imagelist will be used to retrieve item icons in thumbnails mode.
+		HIMAGELIST thumbnailsShellImageList = nullptr;
+		wil::unique_himagelist thumbnailsImageList;
+
 		// These items are queued from the main thread and run on the main thread. The advantage of
 		// this is that it allows tasks that need to run, but can't immediately run (e.g. because
 		// running the task in the middle of something else is going to cause issues) to be run at a
@@ -593,6 +598,7 @@ private:
 	void ProcessThumbnailResult(int thumbnailResultId);
 	void SetupThumbnailsView(int shellImageListType);
 	void RemoveThumbnailsView();
+	void InvalidateAllItemImages();
 	int GetIconThumbnail(int iInternalIndex) const;
 	int GetExtractedThumbnail(HBITMAP hThumbnailBitmap) const;
 	int GetThumbnailInternal(int iType, int iInternalIndex, HBITMAP hThumbnailBitmap) const;
@@ -653,8 +659,6 @@ private:
 	// is set consistently.
 	MainFontSetter m_fontSetter;
 	MainFontSetter m_tooltipFontSetter;
-
-	HIMAGELIST m_hListViewImageList;
 
 	DirectoryState m_directoryState;
 
@@ -717,7 +721,6 @@ private:
 	unique_shell_window_cookie m_shellWindowCookie;
 
 	/* Thumbnails. */
-	BOOL m_bThumbnailsSetup;
 	int m_thumbnailItemWidth;
 	int m_thumbnailItemHeight;
 

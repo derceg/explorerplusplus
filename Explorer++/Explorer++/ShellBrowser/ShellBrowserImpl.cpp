@@ -111,7 +111,6 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder,
 	m_bFolderVisited = FALSE;
 
 	m_performingDrag = false;
-	m_bThumbnailsSetup = FALSE;
 	m_nCurrentColumns = 0;
 	m_pActiveColumns = nullptr;
 	m_nActiveColumns = 0;
@@ -149,8 +148,6 @@ ShellBrowserImpl::~ShellBrowserImpl()
 	m_infoTipsThreadPool.clear_queue();
 
 	DeleteCriticalSection(&m_csDirectoryAltered);
-
-	/* TODO: Also destroy the thumbnails imagelist. */
 }
 
 HWND ShellBrowserImpl::CreateListView(HWND parent)
@@ -286,6 +283,9 @@ void ShellBrowserImpl::SetViewModeInternal(ViewMode viewMode)
 {
 	DWORD dwStyle;
 
+	ListView_SetImageList(m_hListView, nullptr, LVSIL_SMALL);
+	ListView_SetImageList(m_hListView, nullptr, LVSIL_NORMAL);
+
 	switch (viewMode)
 	{
 	case ViewMode::ExtraLargeIcons:
@@ -369,33 +369,21 @@ void ShellBrowserImpl::SetViewModeInternal(ViewMode viewMode)
 		dwStyle = LV_VIEW_ICON;
 		m_thumbnailItemWidth = 256;
 		m_thumbnailItemHeight = 256;
-
-		if (!m_bThumbnailsSetup)
-		{
-			SetupThumbnailsView(SHIL_JUMBO);
-		}
+		SetupThumbnailsView(SHIL_JUMBO);
 		break;
 
 	case ViewMode::LargeThumbnails:
 		dwStyle = LV_VIEW_ICON;
 		m_thumbnailItemWidth = 128;
 		m_thumbnailItemHeight = 128;
-
-		if (!m_bThumbnailsSetup)
-		{
-			SetupThumbnailsView(SHIL_EXTRALARGE);
-		}
+		SetupThumbnailsView(SHIL_EXTRALARGE);
 		break;
 
 	case ViewMode::Thumbnails:
 		dwStyle = LV_VIEW_ICON;
 		m_thumbnailItemWidth = 64;
 		m_thumbnailItemHeight = 64;
-
-		if (!m_bThumbnailsSetup)
-		{
-			SetupThumbnailsView(SHIL_LARGE);
-		}
+		SetupThumbnailsView(SHIL_LARGE);
 		break;
 
 	default:

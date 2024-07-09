@@ -15,66 +15,46 @@
 
 void ShellBrowserImpl::SetupThumbnailsView(int shellImageListType)
 {
-	HIMAGELIST himl;
-	LVITEM lvItem;
-	int nItems;
-	int i = 0;
-
-	nItems = ListView_GetItemCount(m_hListView);
-
-	IImageList *pImageList = nullptr;
-
 	// This will be used in cases where the thumbnail hasn't been retrieved yet and the standard
 	// icon needs to be shown instead.
-	SHGetImageList(shellImageListType, IID_PPV_ARGS(&pImageList));
-	ListView_SetImageList(m_hListView, (HIMAGELIST) pImageList, LVSIL_NORMAL);
-	pImageList->Release();
+	IImageList *imageList = nullptr;
+	FAIL_FAST_IF_FAILED(SHGetImageList(shellImageListType, IID_PPV_ARGS(&imageList)));
+	m_directoryState.thumbnailsShellImageList = reinterpret_cast<HIMAGELIST>(imageList);
 
-	m_hListViewImageList = ListView_GetImageList(m_hListView, LVSIL_NORMAL);
+	int numItems = ListView_GetItemCount(m_hListView);
+	m_directoryState.thumbnailsImageList.reset(
+		ImageList_Create(m_thumbnailItemWidth, m_thumbnailItemHeight, ILC_COLOR32, numItems, 10));
+	ListView_SetImageList(m_hListView, m_directoryState.thumbnailsImageList.get(), LVSIL_NORMAL);
 
-	himl = ImageList_Create(m_thumbnailItemWidth, m_thumbnailItemHeight, ILC_COLOR32, nItems,
-		nItems + 100);
-	ListView_SetImageList(m_hListView, himl, LVSIL_NORMAL);
-
-	for (i = 0; i < nItems; i++)
-	{
-		lvItem.mask = LVIF_IMAGE;
-		lvItem.iItem = i;
-		lvItem.iSubItem = 0;
-		lvItem.iImage = I_IMAGECALLBACK;
-		ListView_SetItem(m_hListView, &lvItem);
-	}
-
-	m_bThumbnailsSetup = TRUE;
+	InvalidateAllItemImages();
 }
 
 void ShellBrowserImpl::RemoveThumbnailsView()
 {
-	LVITEM lvItem;
-	HIMAGELIST himl;
-	int nItems;
-	int i = 0;
-
-	nItems = ListView_GetItemCount(m_hListView);
-
 	m_thumbnailThreadPool.clear_queue();
 	m_thumbnailResults.clear();
 
-	for (i = 0; i < nItems; i++)
+	InvalidateAllItemImages();
+
+	ListView_SetImageList(m_hListView, nullptr, LVSIL_NORMAL);
+
+	m_directoryState.thumbnailsShellImageList = nullptr;
+	m_directoryState.thumbnailsImageList.reset();
+}
+
+void ShellBrowserImpl::InvalidateAllItemImages()
+{
+	int numItems = ListView_GetItemCount(m_hListView);
+
+	for (int i = 0; i < numItems; i++)
 	{
+		LVITEM lvItem;
 		lvItem.mask = LVIF_IMAGE;
 		lvItem.iItem = i;
 		lvItem.iSubItem = 0;
 		lvItem.iImage = I_IMAGECALLBACK;
 		ListView_SetItem(m_hListView, &lvItem);
 	}
-
-	/* Destroy the thumbnails imagelist. */
-	himl = ListView_GetImageList(m_hListView, LVSIL_NORMAL);
-
-	ImageList_Destroy(himl);
-
-	m_bThumbnailsSetup = FALSE;
 }
 
 void ShellBrowserImpl::QueueThumbnailTask(int internalIndex)
@@ -277,9 +257,9 @@ void ShellBrowserImpl::DrawIconThumbnailInternal(HDC hdcBacking, int iInternalIn
 	SHGetFileInfo((LPCTSTR) m_itemInfoMap.at(iInternalIndex).pidlComplete.get(), 0, &shfi,
 		sizeof(shfi), SHGFI_PIDL | SHGFI_SYSICONINDEX);
 
-	hIcon = ImageList_GetIcon(m_hListViewImageList, shfi.iIcon, ILD_NORMAL);
+	hIcon = ImageList_GetIcon(m_directoryState.thumbnailsShellImageList, shfi.iIcon, ILD_NORMAL);
 
-	ImageList_GetIconSize(m_hListViewImageList, &iIconWidth, &iIconHeight);
+	ImageList_GetIconSize(m_directoryState.thumbnailsShellImageList, &iIconWidth, &iIconHeight);
 
 	DrawIconEx(hdcBacking, (m_thumbnailItemWidth - iIconWidth) / 2,
 		(m_thumbnailItemHeight - iIconHeight) / 2, hIcon, 0, 0, 0, nullptr, DI_NORMAL);
