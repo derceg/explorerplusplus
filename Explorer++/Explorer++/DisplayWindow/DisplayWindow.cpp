@@ -75,9 +75,9 @@ DisplayWindow::DisplayWindow(HWND hDisplayWindow, DWInitialSettings_t *pInitialS
 	m_TextColor(pInitialSettings->TextColor),
 	m_CentreColor(pInitialSettings->CentreColor),
 	m_SurroundColor(pInitialSettings->SurroundColor),
+	m_bVertical(FALSE),
 	m_hMainIcon(pInitialSettings->hIcon),
-	m_hDisplayFont(pInitialSettings->hFont),
-	m_bVertical(FALSE)
+	m_hDisplayFont(pInitialSettings->hFont)
 {
 	g_ObjectCount++;
 

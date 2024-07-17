@@ -67,8 +67,8 @@ private:
 	virtual INT_PTR DialogProcExtra(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	HWND m_dialog = nullptr;
-	const HWND m_parent;
 	const UINT m_dialogResourceId;
 	const UINT m_titleResourceId;
+	const HWND m_parent;
 	std::unique_ptr<ResizableDialogHelper> m_resizableDialogHelper;
 };

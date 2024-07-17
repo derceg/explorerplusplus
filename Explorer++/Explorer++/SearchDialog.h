@@ -183,6 +183,9 @@ private:
 		UINT menuItemId) override;
 
 	std::wstring m_searchDirectory;
+	BrowserWindow *m_browserWindow = nullptr;
+	CoreInterface *m_coreInterface = nullptr;
+	TabContainer *m_tabContainer = nullptr;
 	wil::unique_hicon m_directoryIcon;
 	BOOL m_bSearching;
 	BOOL m_bStopSearching;
@@ -197,10 +200,6 @@ private:
 	int m_iPreviousSelectedColumn;
 
 	BOOL m_bSetSearchTimer;
-
-	BrowserWindow *m_browserWindow = nullptr;
-	CoreInterface *m_coreInterface = nullptr;
-	TabContainer *m_tabContainer = nullptr;
 
 	SearchDialogPersistentSettings *m_persistentSettings = nullptr;
 };

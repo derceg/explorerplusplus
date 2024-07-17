@@ -63,17 +63,17 @@ TabContainer::TabContainer(HWND parent, ShellBrowserEmbedder *embedder,
 	m_embedder(embedder),
 	m_fontSetter(m_hwnd, config.get(), GetDefaultSystemFontForDefaultDpi()),
 	m_tooltipFontSetter(TabCtrl_GetToolTips(m_hwnd), config.get()),
+	m_timerManager(m_hwnd),
+	m_iconFetcher(m_hwnd, cachedIcons),
+	m_cachedIcons(cachedIcons),
 	m_tabNavigation(tabNavigation),
 	m_coreInterface(coreInterface),
 	m_fileActionHandler(fileActionHandler),
-	m_cachedIcons(cachedIcons),
-	m_bookmarkTree(bookmarkTree),
 	m_resourceInstance(resourceInstance),
 	m_config(config),
-	m_bTabBeenDragged(FALSE),
 	m_iPreviousTabSelectionId(-1),
-	m_iconFetcher(m_hwnd, cachedIcons),
-	m_timerManager(m_hwnd)
+	m_bTabBeenDragged(FALSE),
+	m_bookmarkTree(bookmarkTree)
 {
 	Initialize(parent);
 }

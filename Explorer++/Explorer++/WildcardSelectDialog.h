@@ -64,8 +64,8 @@ private:
 	void OnCancel();
 	void SelectItems(TCHAR *szPattern);
 
-	BrowserWindow *m_browserWindow = nullptr;
 	BOOL m_bSelect;
+	BrowserWindow *m_browserWindow = nullptr;
 
 	wil::unique_hicon m_icon;
 

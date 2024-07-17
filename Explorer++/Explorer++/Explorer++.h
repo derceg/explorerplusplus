@@ -556,12 +556,12 @@ private:
 	void FolderSizeCallback(FolderSizeExtraInfo *pfsei, int nFolders, int nFiles,
 		PULARGE_INTEGER lTotalFolderSize);
 
+	HWND m_hContainer;
 	const CommandLine::Settings *const m_commandLineSettings;
 	AcceleratorManager *const m_acceleratorManager;
 
 	BrowserCommandController m_commandController;
 
-	HWND m_hContainer;
 	HWND m_hStatusBar;
 	HWND m_hMainRebar;
 	HWND m_hDisplayWindow;

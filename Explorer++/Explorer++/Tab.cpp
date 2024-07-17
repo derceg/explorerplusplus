@@ -16,9 +16,9 @@ int Tab::idCounter = 1;
 
 Tab::Tab(std::shared_ptr<ShellBrowserImpl> shellBrowser) :
 	m_id(idCounter++),
+	m_shellBrowser(shellBrowser),
 	m_useCustomName(false),
-	m_lockState(LockState::NotLocked),
-	m_shellBrowser(shellBrowser)
+	m_lockState(LockState::NotLocked)
 {
 	// The provided ShellBrowser instance may be null in tests.
 	if (m_shellBrowser)
@@ -29,10 +29,10 @@ Tab::Tab(std::shared_ptr<ShellBrowserImpl> shellBrowser) :
 
 Tab::Tab(const PreservedTab &preservedTab, std::shared_ptr<ShellBrowserImpl> shellBrowser) :
 	m_id(idCounter++),
+	m_shellBrowser(shellBrowser),
 	m_useCustomName(preservedTab.useCustomName),
 	m_customName(preservedTab.customName),
-	m_lockState(preservedTab.lockState),
-	m_shellBrowser(shellBrowser)
+	m_lockState(preservedTab.lockState)
 {
 	if (m_shellBrowser)
 	{

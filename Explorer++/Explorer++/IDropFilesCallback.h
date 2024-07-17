@@ -22,6 +22,6 @@ private:
 	/* IDropFilesCallback methods. */
 	void OnDropFile(const std::list<std::wstring> &PastedFileList, const POINT *ppt) override;
 
-	ULONG m_RefCount;
 	CoreInterface *m_coreInterface;
+	ULONG m_RefCount;
 };

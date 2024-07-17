@@ -33,12 +33,12 @@ Explorerplusplus::Explorerplusplus(HWND hwnd, InitializationData *initialization
 	m_acceleratorManager(initializationData->acceleratorManager),
 	m_commandController(this),
 	m_cachedIcons(MAX_CACHED_ICONS),
+	m_tabBarBackgroundBrush(CreateSolidBrush(TAB_BAR_DARK_MODE_BACKGROUND_COLOR)),
 	m_pluginMenuManager(hwnd, MENU_PLUGIN_START_ID, MENU_PLUGIN_END_ID),
 	m_acceleratorUpdater(initializationData->acceleratorManager),
 	m_pluginCommandManager(initializationData->acceleratorManager, ACCELERATOR_PLUGIN_START_ID,
 		ACCELERATOR_PLUGIN_END_ID),
-	m_iconFetcher(hwnd, &m_cachedIcons),
-	m_tabBarBackgroundBrush(CreateSolidBrush(TAB_BAR_DARK_MODE_BACKGROUND_COLOR))
+	m_iconFetcher(hwnd, &m_cachedIcons)
 {
 	m_resourceInstance = nullptr;
 

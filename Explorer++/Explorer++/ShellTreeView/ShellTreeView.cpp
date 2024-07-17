@@ -57,17 +57,17 @@ ShellTreeView::ShellTreeView(HWND hParent, BrowserWindow *browserWindow,
 	m_coreInterface(coreInterface),
 	m_config(coreInterface->GetConfig()),
 	m_fileActionHandler(fileActionHandler),
-	m_cachedIcons(cachedIcons),
+	m_fontSetter(GetHWND(), coreInterface->GetConfig()),
 	m_iconThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
 		CoUninitialize),
 	m_iconResultIDCounter(0),
 	m_subfoldersThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
 		CoUninitialize),
 	m_subfoldersResultIDCounter(0),
+	m_cachedIcons(cachedIcons),
 	m_dropExpandItem(nullptr),
 	m_shellChangeWatcher(GetHWND(),
-		std::bind_front(&ShellTreeView::ProcessShellChangeNotifications, this)),
-	m_fontSetter(m_hTreeView, coreInterface->GetConfig())
+		std::bind_front(&ShellTreeView::ProcessShellChangeNotifications, this))
 {
 	TreeView_SetExtendedStyle(m_hTreeView, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
 
@@ -1002,7 +1002,7 @@ HTREEITEM ShellTreeView::AddItem(HTREEITEM parent, PCIDLIST_ABSOLUTE pidl, HTREE
 	}
 
 	ShellTreeNodeType nodeType = parent ? ShellTreeNodeType::Child : ShellTreeNodeType::Root;
-	auto node = std::make_unique<ShellTreeNode>(pidl, shellItem.get(), nodeType);
+	auto node = std::make_unique<ShellTreeNode>(nodeType, pidl, shellItem.get());
 
 	wil::unique_cotaskmem_string displayName;
 	hr = node->GetShellItem()->GetDisplayName(DISPLAY_NAME_TYPE, &displayName);

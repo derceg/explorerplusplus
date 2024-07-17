@@ -24,8 +24,8 @@ public:
 	void ShowMenu(HWND parentWindow, Application *application, const POINT &ptScreen);
 
 private:
-	HINSTANCE m_resourceInstance;
 	ApplicationModel *m_model;
+	HINSTANCE m_resourceInstance;
 	ApplicationContextMenuController m_controller;
 };
 

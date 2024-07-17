@@ -43,11 +43,10 @@ private:
 
 	void OnMenuItemSelected(UINT menuItemId, BookmarkMenuBuilder::ItemIdMap &menuItemIdMappings);
 
+	BookmarkTree *m_bookmarkTree = nullptr;
 	HWND m_parentWindow;
 	BookmarkMenuBuilder m_menuBuilder;
 	BookmarkMenuController m_controller;
-
-	BookmarkTree *m_bookmarkTree = nullptr;
 
 	HMENU m_activeMenu = nullptr;
 	BookmarkMenuBuilder::MenuInfo *m_menuInfo = nullptr;

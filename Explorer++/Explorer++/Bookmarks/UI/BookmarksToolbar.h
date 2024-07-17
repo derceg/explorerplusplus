@@ -83,11 +83,10 @@ private:
 
 	void RemoveDropHighlight();
 
-	BookmarkTree *m_bookmarkTree = nullptr;
 	BookmarksToolbarView *m_view = nullptr;
-
 	BrowserWindow *m_browserWindow = nullptr;
 	CoreInterface *m_coreInterface = nullptr;
+	BookmarkTree *m_bookmarkTree = nullptr;
 
 	std::unique_ptr<BookmarkIconManager> m_bookmarkIconManager;
 	BookmarkContextMenu m_contextMenu;

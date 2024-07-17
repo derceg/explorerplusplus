@@ -128,12 +128,12 @@ private:
 
 	HWND m_hListView;
 	HINSTANCE m_resourceInstance;
+	BookmarkTree *m_bookmarkTree = nullptr;
 	BrowserWindow *m_browserWindow = nullptr;
 	CoreInterface *m_coreInterface = nullptr;
 	std::unique_ptr<BookmarkIconManager> m_bookmarkIconManager;
 	std::vector<Column> m_columns;
 
-	BookmarkTree *m_bookmarkTree = nullptr;
 	BookmarkItem *m_currentBookmarkFolder = nullptr;
 	BookmarkHelper::ColumnType m_sortColumn;
 	bool m_sortAscending;

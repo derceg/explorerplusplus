@@ -72,34 +72,34 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder,
 	const FolderColumns *initialColumns) :
 	ShellDropTargetWindow(CreateListView(hOwner)),
 	m_hListView(GetHWND()),
-	m_resourceInstance(coreInterface->GetResourceInstance()),
-	m_acceleratorManager(coreInterface->GetAcceleratorManager()),
 	m_hOwner(hOwner),
-	m_cachedIcons(coreInterface->GetCachedIcons()),
-	m_iconResourceLoader(coreInterface->GetIconResourceLoader()),
-	m_config(coreInterface->GetConfig()),
 	m_tabNavigation(tabNavigation),
 	m_fileActionHandler(fileActionHandler),
-	m_folderSettings(folderSettings),
-	m_folderColumns(initialColumns
-			? *initialColumns
-			: coreInterface->GetConfig()->globalFolderSettings.folderColumns),
+	m_fontSetter(GetHWND(), coreInterface->GetConfig()),
+	m_tooltipFontSetter(reinterpret_cast<HWND>(SendMessage(GetHWND(), LVM_GETTOOLTIPS, 0, 0)),
+		coreInterface->GetConfig()),
 	m_columnThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
 		CoUninitialize),
 	m_columnResultIDCounter(0),
+	m_cachedIcons(coreInterface->GetCachedIcons()),
+	m_iconResourceLoader(coreInterface->GetIconResourceLoader()),
 	m_thumbnailThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
 		CoUninitialize),
 	m_thumbnailResultIDCounter(0),
 	m_infoTipsThreadPool(1, std::bind(CoInitializeEx, nullptr, COINIT_APARTMENTTHREADED),
 		CoUninitialize),
 	m_infoTipResultIDCounter(0),
-	m_draggedDataObject(nullptr),
-	m_shellWindowRegistered(false),
+	m_resourceInstance(coreInterface->GetResourceInstance()),
+	m_acceleratorManager(coreInterface->GetAcceleratorManager()),
+	m_config(coreInterface->GetConfig()),
+	m_folderSettings(folderSettings),
 	m_shellChangeWatcher(GetHWND(),
 		std::bind_front(&ShellBrowserImpl::ProcessShellChangeNotifications, this)),
-	m_fontSetter(m_hListView, coreInterface->GetConfig()),
-	m_tooltipFontSetter(reinterpret_cast<HWND>(SendMessage(m_hListView, LVM_GETTOOLTIPS, 0, 0)),
-		coreInterface->GetConfig())
+	m_shellWindowRegistered(false),
+	m_folderColumns(initialColumns
+			? *initialColumns
+			: coreInterface->GetConfig()->globalFolderSettings.folderColumns),
+	m_draggedDataObject(nullptr)
 {
 	InitializeListView();
 	m_iconFetcher = std::make_unique<IconFetcherImpl>(m_hListView, m_cachedIcons);

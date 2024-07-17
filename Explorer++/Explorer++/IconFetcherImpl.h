@@ -63,6 +63,7 @@ private:
 	void ProcessIconResult(int iconResultId);
 
 	const HWND m_hwnd;
+	CachedIcons *const m_cachedIcons;
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	int m_defaultFileIconIndex;
 	int m_defaultFolderIconIndex;
@@ -70,6 +71,5 @@ private:
 	ctpl::thread_pool m_iconThreadPool;
 	std::unordered_map<int, FutureResult> m_iconResults;
 	int m_iconResultIDCounter;
-	CachedIcons *m_cachedIcons;
 	std::function<void(int data)> m_callback;
 };

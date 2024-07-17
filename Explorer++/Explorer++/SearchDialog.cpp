@@ -67,10 +67,10 @@ SearchDialog::SearchDialog(HINSTANCE resourceInstance, HWND hParent,
 	m_tabContainer(tabContainer),
 	m_bSearching(FALSE),
 	m_bStopSearching(FALSE),
-	m_bSetSearchTimer(TRUE),
+	m_pSearch(nullptr),
 	m_iInternalIndex(0),
 	m_iPreviousSelectedColumn(-1),
-	m_pSearch(nullptr)
+	m_bSetSearchTimer(TRUE)
 {
 	m_persistentSettings = &SearchDialogPersistentSettings::GetInstance();
 }

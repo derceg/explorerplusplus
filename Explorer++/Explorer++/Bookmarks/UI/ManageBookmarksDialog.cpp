@@ -780,8 +780,8 @@ void ManageBookmarksDialog::SaveState()
 }
 
 ManageBookmarksDialogPersistentSettings::ManageBookmarksDialogPersistentSettings() :
-	m_bInitialized(false),
-	DialogSettings(SETTINGS_KEY)
+	DialogSettings(SETTINGS_KEY),
+	m_bInitialized(false)
 {
 	SetupDefaultColumns();
 }

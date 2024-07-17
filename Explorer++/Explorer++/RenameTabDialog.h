@@ -49,8 +49,8 @@ private:
 
 	RenameTabDialogPersistentSettings *m_prtdps;
 
-	TabContainer *m_tabContainer;
 	int m_tabId;
+	TabContainer *m_tabContainer;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

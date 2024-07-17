@@ -14,14 +14,14 @@
 OptionsPage::OptionsPage(UINT dialogResourceId, UINT titleResourceId, HWND parent,
 	HINSTANCE resourceInstance, Config *config, CoreInterface *coreInterface,
 	SettingChangedCallback settingChangedCallback, HWND tooltipWindow) :
-	m_dialogResourceId(dialogResourceId),
-	m_titleResourceId(titleResourceId),
-	m_parent(parent),
 	m_config(config),
 	m_coreInterface(coreInterface),
 	m_resourceInstance(resourceInstance),
+	m_tooltipWindow(tooltipWindow),
 	m_settingChangedCallback(settingChangedCallback),
-	m_tooltipWindow(tooltipWindow)
+	m_dialogResourceId(dialogResourceId),
+	m_titleResourceId(titleResourceId),
+	m_parent(parent)
 {
 }
 

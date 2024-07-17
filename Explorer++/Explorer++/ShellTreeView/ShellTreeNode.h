@@ -26,7 +26,7 @@ enum class ShellTreeNodeType
 class ShellTreeNode
 {
 public:
-	ShellTreeNode(PCIDLIST_ABSOLUTE pidl, IShellItem2 *shellItem, ShellTreeNodeType type);
+	ShellTreeNode(ShellTreeNodeType type, PCIDLIST_ABSOLUTE pidl, IShellItem2 *shellItem);
 
 	int GetId() const;
 	IShellItem2 *GetShellItem() const;
@@ -57,6 +57,12 @@ private:
 
 	ShellTreeNodeType m_type;
 
+	// This is only used if this item is a root item.
+	unique_pidl_absolute m_rootPidl;
+
+	// This is only used if this item is a child item.
+	unique_pidl_child m_childPidl;
+
 	// The shell item corresponding to this node. Note that the pidl of the shell item may become
 	// out of date. When a parent item is renamed, the pidl of a child item, as retrieved by
 	// GetFullPidl(), will be correct, since pidls are generated dynamically. The shell item for the
@@ -67,12 +73,6 @@ private:
 	// to an item at its previous path. Only GetFullPidl() should be used to retrieve the pidl of a
 	// node.
 	wil::com_ptr_nothrow<IShellItem2> m_shellItem;
-
-	// This is only used if this item is a root item.
-	unique_pidl_absolute m_rootPidl;
-
-	// This is only used if this item is a child item.
-	unique_pidl_child m_childPidl;
 
 	// This will be non-zero if the directory associated with this item is being monitored for
 	// changes.

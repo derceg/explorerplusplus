@@ -41,9 +41,9 @@ MergeFilesDialog::MergeFilesDialog(HINSTANCE resourceInstance, HWND hParent,
 	m_strOutputDirectory(strOutputDirectory),
 	m_FullFilenameList(FullFilenameList),
 	m_bShowFriendlyDates(bShowFriendlyDates),
+	m_pMergeFiles(nullptr),
 	m_bMergingFiles(false),
-	m_bStopMerging(false),
-	m_pMergeFiles(nullptr)
+	m_bStopMerging(false)
 {
 	m_persistentSettings = &MergeFilesDialogPersistentSettings::GetInstance();
 }

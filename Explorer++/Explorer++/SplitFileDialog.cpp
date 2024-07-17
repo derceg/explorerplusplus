@@ -43,8 +43,8 @@ SplitFileDialog::SplitFileDialog(HINSTANCE resourceInstance, HWND hParent,
 	m_strFullFilename(strFullFilename),
 	m_bSplittingFile(false),
 	m_bStopSplitting(false),
-	m_CurrentError(ErrorType::None),
-	m_pSplitFile(nullptr)
+	m_pSplitFile(nullptr),
+	m_CurrentError(ErrorType::None)
 {
 	m_persistentSettings = &SplitFileDialogPersistentSettings::GetInstance();
 }

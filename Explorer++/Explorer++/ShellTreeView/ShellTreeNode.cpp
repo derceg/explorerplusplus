@@ -5,12 +5,12 @@
 #include "stdafx.h"
 #include "ShellTreeNode.h"
 
-ShellTreeNode::ShellTreeNode(PCIDLIST_ABSOLUTE pidl, IShellItem2 *shellItem,
-	ShellTreeNodeType type) :
-	m_shellItem(shellItem),
+ShellTreeNode::ShellTreeNode(ShellTreeNodeType type, PCIDLIST_ABSOLUTE pidl,
+	IShellItem2 *shellItem) :
+	m_type(type),
 	m_rootPidl(type == ShellTreeNodeType::Root ? ILCloneFull(pidl) : nullptr),
 	m_childPidl(type == ShellTreeNodeType::Child ? ILCloneChild(ILFindLastID(pidl)) : nullptr),
-	m_type(type)
+	m_shellItem(shellItem)
 {
 }
 
