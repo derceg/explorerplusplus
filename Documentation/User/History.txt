@@ -1,9 +1,163 @@
 Explorer++ Version History
 --------------------------
 
-Version 1.4.1
+Version 1.5.0
 -------------
+New features:
+- Dark mode is now available (on Windows 10+) and can be enabled
+  via Tools > Options > Appearance > Theme.
+- The background context menu has been updated and the menu items
+  displayed should be almost identical to those displayed by
+  Explorer (this refers to the standard context menu and not the
+  simplified menu shown in Windows 11).
+- The way in which directories are monitored for changes has been
+  updated and should mean that virtual folders are properly
+  monitored for changes.
+- The main font can now be changed via Tools > Options > Fonts.
+  The updated font will be used by most of the controls in the
+  main window. The font size can also be changed using the
+  shortcuts Ctrl+- and Ctrl++. Ctrl+0 will reset the font size to
+  the default.
+- A Fluent UI icon set has been added. This icon set can be
+  selected from Tools > Options > Appearance > Icon set.
+- The way in which command line paths are handled has been
+  updated. The change means that relative paths like ".." should
+  now be correctly handled and a wider range of paths should be
+  accepted. The updated handling also applies to the address bar.
+- DPI changes are now better handled.
+- A global history menu is now available at Go > History. That
+  menu will display a list of all history items, with more recent
+  items appearing first.
+- When navigating to a history entry, the file selection will now
+  be restored.
+- When being used as the default file manager, Explorer++ now
+  registers itself as a shell window. That means that in certain
+  situations, like when opening an item in Explorer from another
+  application, Explorer++ should be opened instead. See #270.
+- When items are grouped, the sort mode can now be changed. This
+  allows items to be grouped in one way but sorted in another.
+  See #381.
+- A search tabs dialog has been added. That dialog allows tabs to
+  be searched for by both name and path.
+- Pasting in virtual folders has been improved.
+- Symlinks can now be pasted via Edit > Paste Symbolic Link. That
+  operation requires elevation unless developer mode (Windows
+  10+) is enabled.
+- Large and extra large thumbnail views have been added.
+- The options dialog now contains a search field. Entering a term
+  in that field will filter the pages shown, with only pages that
+  contain the search term remaining.
+- The Ctrl and Shift keys can now generally be used to control
+  how an item is opened. When Ctrl is down, the item will be
+  opened in a new foreground tab; when Ctrl and Shift are down,
+  the item will be opened in a new background tab; when Shift is
+  down, the item will be opened in a new window.
+- An option has been added that allows the user to choose whether
+  tabs are opened in the background or foreground by default.
+  This option also alters how the Ctrl and Ctrl+Shift modifiers
+  work; if tabs are opened in the background by default, Ctrl and
+  Ctrl+Shift will work in the opposite way from normal.
+- The back, forward and up toolbar buttons can now be middle
+  clicked.
+- The up toolbar button now has a dropdown menu that displays a
+  list of parent items.
+- When a bookmark folder is clicked on the bookmarks toolbar, a
+  dropdown menu will be shown. It's now possible to drag items
+  from that menu to another location. It's also possible to
+  rearrange the bookmarks on the menu via drag and drop.
+- It's now possible to rename drives (which changes their label).
+- When renaming an item, the display name is switched with the
+  editing name. That ensures that the text being changed is
+  correct when the item is a drive.
+- It's now possible to delete a folder that's open in Explorer++.
+  In that situation, the associated tab will navigate to the
+  parent folder.
+- A --select command line option has been added that will open a
+  directory and select the file specified. See #208.
+- Paths separated by forward slashes are now accepted. See #382.
+- The home folder can now optionally be shown in the treeview.
+- An option to display mixed files and folders has been added and
+  can be set via Tools > Options > File and Folders > Display
+  mixed files and folders. See #30.
+- An option to choose whether to use a natural sort order (i.e. a
+  sort order in which file2.txt comes before file19.txt) has been
+  added and can be set via Tools > Options > File and Folders >
+  Use natural sort order. See #46.
+- An option to disable navigating up when double clicking in an
+  empty area in the listview has been added. The option can be
+  set via Tools > Options > Advanced > Go up on double click
+  in listview.
+- When right-clicking a bookmark in the main menu, a context menu
+  is now shown.
+- Added Arabic (United Arab Emirates), Greek and Portuguese
+  (Brazil) translations.
+- The layout will now be switched to RTL when using the Arabic or
+  Hebrew translations.
+
+Bug fixes:
+- Fixed a crash that could occur on startup when the "Open new
+  tabs next to the current one" option was enabled.
+- Fixed a crash that could occur when autosizing columns.
+- Fixed a crash that could occur when retrieving the icon for a
+  treeview item. See #385.
+- Fixed a crash that could occur when attempting to create a
+  folder in a location where the total path length for the new
+  item would be greater than 260 characters.
+- Fixed a crash that could occur when retrieving the status of a
+  network adapter. See #455.
+- Fixed a crash that could occur after switching from thumbnails
+  view. See #460.
+- Fixed a crash that could occur during application shutdown. See
+  #388.
+- Non US-ASCII characters weren't being properly handled on the
+  command line. See #266.
+- Quoted paths are now consistently handled correctly when passed
+  on the command line. This is important, for example, when
+  multiple paths are being passed in and more than one path
+  contains spaces (and therefore more than one path will need to
+  be enclosed in double quotes).
+- Fixed an issue with handling the properties item on the
+  background context menu.
+- Previously, listview groups were always sorted by name. Now,
+  they're sorted based on the attributes of the groups
+  themselves. See #101.
+- The group an item is in is now updated when the item is
+  updated. See #110.
+- When pressing backspace in a locked tab to navigate up, the
+  navigation would occur in that tab, instead of a new tab. See
+  #265.
+- If a filtered item is renamed, it will now be shown again if it
+  no longer needs to be filtered. Previously, the item would
+  remain hidden until filtering was disabled.
+- When starting the application, the previous window position
+  will only be used if it's visible. If the saved position is
+  off-screen (e.g. because the monitor configuration has
+  changed), the default position will be used instead.
+- A saved dialog position will now only be used if the saved
+  position is visible on screen.
+- When renaming an item, the item is updated immediately if the
+  rename succeeds. Previously, the item details would be updated
+  a short time later. That meant that renaming an item, then
+  immediately pressing enter would fail to open the item. See
+  #281.
+- Renaming virtual items in the treeview now works as expected.
+- Pressing F2 wouldn't cycle between the filename and extension.
+  See #293.
+- Previously, when running the application under Windows PE, the
+  treeview was empty.
+- When selecting "Lock Tab", the tab acted as if "Lock Tab and
+  Address" had been selected.
+- Pasting an image from the clipboard wouldn't always generate a
+  correct image file. See #307.
+- The treeview now has both a minimum width and maximum width.
+  This also means that in situations where the treeview width was
+  previously reduced below 0, it will be shown again.
+- When renaming an item in the listview or treeview,
+  Ctrl+Backspace now erases the last word, rather than inserting
+  a non-printable character. See #299.
+
 Misc:
+- ARM64 builds are now available.
 - When changing the default file manager setting (via Tools >
   Options > General > Default File Manager), Explorer++ will only
   be set/removed as the default file manager for the current
@@ -12,6 +166,35 @@ Misc:
   If you set Explorer++ as the default in a previous version,
   remove it as the default before you update, then change it back
   to the default after you've updated.
+- The HTML Help (chm) documentation has been removed. The help
+  menu item now simply links to the online documentation, from
+  which a PDF can be generated, if needed.
+- Improved crash handling. The updated handling means that the
+  application should show an informational dialog more reliably
+  when a crash occurs.
+- Clicking on a bookmark now has the same effect as entering the
+  bookmark path in the address bar and pressing enter. That means
+  that the handling improvements mentioned above for the command
+  line/address bar also apply to bookmarks. This also means that
+  a bookmark to a file will now open that file and a bookmark can
+  now contain a relative path.
+- If a navigation fails, the current folder won't change.
+  Previously, Explorer++ would seemingly open the folder, though
+  display no items.
+- The clipboard data generated when copying items is now
+  retrieved from the shell, rather than being manually generated.
+  That should mean copying works better, particularly in virtual
+  folders. See #80 and #99.
+- The data generated when dragging an item is now retrieved from
+  the shell, which means drag and drop operations should work
+  better. See #144.
+- Dropping on a non-folder target (e.g. an executable or zip
+  file) should now work. See #75 and #297.
+- The items shown on the "Go" menu have been updated.
+- The ability to play a navigation sound has been removed.
+- The option to use fixed width tabs has been removed, as it
+  doesn't appear to be properly supported by the tab control. See
+  #255.
 
 Version 1.4.0 (29/01/2024)
 --------------------------
