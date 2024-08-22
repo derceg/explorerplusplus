@@ -676,6 +676,12 @@
     <ClCompile Include="CommandLineSplitter.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="VersionHelper.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Version.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1389,6 +1395,12 @@
     <ClInclude Include="CommandLineSplitter.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="VersionHelper.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Version.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1420,7 +1432,7 @@
     <None Include="res\No Preview Available.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="Version.h">
+    <None Include="VersionConstants.h">
       <Filter>Core</Filter>
     </None>
   </ItemGroup>

@@ -8,9 +8,13 @@
 #include "ResourceHelper.h"
 #include "ThirdPartyCreditsDialog.h"
 #include "Version.h"
+#include "VersionHelper.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/format.hpp>
+
+// Enable C4062: enumerator 'identifier' in switch of enum 'enumeration' is not handled
+#pragma warning(default : 4062)
 
 AboutDialog::AboutDialog(HINSTANCE resourceInstance, HWND hParent) :
 	ThemedDialog(resourceInstance, IDD_ABOUT, hParent, DialogSizingType::None)
@@ -34,28 +38,38 @@ INT_PTR AboutDialog::OnInitDialog()
 	std::wstring platform;
 
 	// Indicate which platform we are building for in the version string.
-#if defined(ARM64)
-	platform = ResourceHelper::LoadString(GetResourceInstance(), IDS_ABOUT_ARM64_BUILD);
-#elif defined(WIN64)
-	platform = ResourceHelper::LoadString(GetResourceInstance(), IDS_ABOUT_64BIT_BUILD);
-#elif defined(WIN32)
-	platform = ResourceHelper::LoadString(GetResourceInstance(), IDS_ABOUT_32BIT_BUILD);
-#else
-	static_assert(false, "Unknown target platform");
-#endif
+	switch (VersionHelper::GetPlatform())
+	{
+	case VersionHelper::Platform::x86:
+		platform = ResourceHelper::LoadString(GetResourceInstance(), IDS_ABOUT_32BIT_BUILD);
+		break;
 
-	std::wstring versionAndReleaseMode = VERSION_STRING_W;
+	case VersionHelper::Platform::x64:
+		platform = ResourceHelper::LoadString(GetResourceInstance(), IDS_ABOUT_64BIT_BUILD);
+		break;
 
-#if defined(ENVIRONMENT_RELEASE_STABLE)
-	// There is no release mode shown when building a stable release.
+	case VersionHelper::Platform::Arm64:
+		platform = ResourceHelper::LoadString(GetResourceInstance(), IDS_ABOUT_ARM64_BUILD);
+		break;
+	}
+
+	std::wstring versionAndReleaseMode = VersionHelper::GetVersion().GetString();
 	std::wstring releaseMode;
-#elif defined(ENVIRONMENT_RELEASE_BETA)
-	std::wstring releaseMode =
-		ResourceHelper::LoadString(GetResourceInstance(), IDS_RELEASE_MODE_BETA);
-#else
-	std::wstring releaseMode =
-		ResourceHelper::LoadString(GetResourceInstance(), IDS_RELEASE_MODE_DEV);
-#endif
+
+	switch (VersionHelper::GetChannel())
+	{
+	case VersionHelper::Channel::Stable:
+		// There is no release mode shown when building a stable release.
+		break;
+
+	case VersionHelper::Channel::Beta:
+		releaseMode = ResourceHelper::LoadString(GetResourceInstance(), IDS_RELEASE_MODE_BETA);
+		break;
+
+	case VersionHelper::Channel::Dev:
+		releaseMode = ResourceHelper::LoadString(GetResourceInstance(), IDS_RELEASE_MODE_DEV);
+		break;
+	}
 
 	if (!releaseMode.empty())
 	{
@@ -67,7 +81,8 @@ INT_PTR AboutDialog::OnInitDialog()
 
 	std::wstring buildDateTemplate =
 		ResourceHelper::LoadString(GetResourceInstance(), IDS_ABOUT_BUILD_DATE);
-	std::wstring buildDate = (boost::wformat(buildDateTemplate) % BUILD_DATE_STRING).str();
+	std::wstring buildDate =
+		(boost::wformat(buildDateTemplate) % VersionHelper::GetBuildDate()).str();
 
 	std::wstring versionInfo = version + L"\r\n\r\n" + buildDate;
 	SetDlgItemText(m_hDlg, IDC_VERSION_INFORMATION, versionInfo.c_str());

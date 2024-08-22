@@ -14,6 +14,7 @@
 #include "..\Helper\Macros.h"
 #include "MainResource.h"
 #include "Version.h"
+#include "VersionHelper.h"
 #include <boost\algorithm\string.hpp>
 #include <boost\lexical_cast.hpp>
 #include <stdexcept>
@@ -32,7 +33,8 @@ UpdateCheckDialog::UpdateCheckDialog(HINSTANCE resourceInstance, HWND hParent) :
 
 INT_PTR UpdateCheckDialog::OnInitDialog()
 {
-	SetDlgItemText(m_hDlg, IDC_STATIC_CURRENT_VERSION, VERSION_STRING_W);
+	SetDlgItemText(m_hDlg, IDC_STATIC_CURRENT_VERSION,
+		VersionHelper::GetVersion().GetString().c_str());
 
 	TCHAR szTemp[64];
 	LoadString(GetResourceInstance(), IDS_UPDATE_CHECK_STATUS, szTemp, SIZEOF_ARRAY(szTemp));
@@ -115,13 +117,9 @@ void UpdateCheckDialog::PerformUpdateCheck(HWND hDlg)
 
 				try
 				{
-					UpdateCheckDialog::Version version;
-					version.MajorVersion = boost::lexical_cast<int>(versionNumberComponents.at(0));
-					version.MinorVersion = boost::lexical_cast<int>(versionNumberComponents.at(1));
-					version.MicroVersion = boost::lexical_cast<int>(versionNumberComponents.at(2));
-					MultiByteToWideChar(CP_ACP, 0, versionNumber, -1, version.VersionString,
-						SIZEOF_ARRAY(version.VersionString));
-
+					Version version{ boost::lexical_cast<uint32_t>(versionNumberComponents.at(0)),
+						boost::lexical_cast<uint32_t>(versionNumberComponents.at(1)),
+						boost::lexical_cast<uint32_t>(versionNumberComponents.at(2)) };
 					SendMessage(hDlg, UpdateCheckDialog::WM_APP_UPDATE_CHECK_COMPLETE,
 						UpdateCheckDialog::UPDATE_CHECK_SUCCESS,
 						reinterpret_cast<LPARAM>(&version));
@@ -184,25 +182,26 @@ void UpdateCheckDialog::OnUpdateCheckError()
 	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, szTemp);
 }
 
-void UpdateCheckDialog::OnUpdateCheckSuccess(Version *version)
+void UpdateCheckDialog::OnUpdateCheckSuccess(Version *availableVersion)
 {
 	TCHAR szStatus[128];
 	TCHAR szTemp[128];
 
-	if ((version->MajorVersion > MAJOR_VERSION)
-		|| (version->MajorVersion == MAJOR_VERSION && version->MinorVersion > MINOR_VERSION)
-		|| (version->MajorVersion == MAJOR_VERSION && version->MinorVersion == MINOR_VERSION
-			&& version->MicroVersion > MICRO_VERSION))
+	const auto &currentVersion = VersionHelper::GetVersion();
+
+	if (*availableVersion > currentVersion)
 	{
 		LoadString(GetResourceInstance(), IDS_UPDATE_CHECK_NEW_VERSION_AVAILABLE, szTemp,
 			SIZEOF_ARRAY(szTemp));
-		StringCchPrintf(szStatus, SIZEOF_ARRAY(szStatus), szTemp, version->VersionString);
+		StringCchPrintf(szStatus, SIZEOF_ARRAY(szStatus), szTemp,
+			availableVersion->GetString().c_str());
 	}
 	else
 	{
 		LoadString(GetResourceInstance(), IDS_UPDATE_CHECK_UP_TO_DATE, szTemp,
 			SIZEOF_ARRAY(szTemp));
-		StringCchPrintf(szStatus, SIZEOF_ARRAY(szStatus), szTemp, version->VersionString);
+		StringCchPrintf(szStatus, SIZEOF_ARRAY(szStatus), szTemp,
+			availableVersion->GetString().c_str());
 	}
 
 	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, szStatus);

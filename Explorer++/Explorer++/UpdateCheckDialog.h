@@ -8,6 +8,7 @@
 #include "../Helper/DialogSettings.h"
 
 class UpdateCheckDialog;
+class Version;
 
 class UpdateCheckDialogPersistentSettings : public DialogSettings
 {
@@ -39,15 +40,6 @@ protected:
 	INT_PTR OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 private:
-	struct Version
-	{
-		int MajorVersion;
-		int MinorVersion;
-		int MicroVersion;
-
-		WCHAR VersionString[32];
-	};
-
 	static const int WM_APP_UPDATE_CHECK_COMPLETE = WM_APP + 1;
 
 	static const int UPDATE_CHECK_ERROR = 0;
@@ -61,7 +53,7 @@ private:
 	static void PerformUpdateCheck(HWND hDlg);
 
 	void OnUpdateCheckError();
-	void OnUpdateCheckSuccess(Version *version);
+	void OnUpdateCheckSuccess(Version *availableVersion);
 
 	bool m_UpdateCheckComplete;
 

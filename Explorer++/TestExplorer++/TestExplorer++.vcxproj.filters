@@ -211,6 +211,12 @@
       <Filter>Helper\Data Exchange</Filter>
     </ClCompile>
     <ClCompile Include="GdiplusTestHelper.cpp" />
+    <ClCompile Include="VersionTest.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="VersionHelperTest.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

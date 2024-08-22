@@ -279,6 +279,8 @@
     <ClCompile Include="TabStorageTestHelper.cpp" />
     <ClCompile Include="TabTest.cpp" />
     <ClCompile Include="TabXmlStorageTest.cpp" />
+    <ClCompile Include="VersionHelperTest.cpp" />
+    <ClCompile Include="VersionTest.cpp" />
     <ClCompile Include="ViewModeHelperTest.cpp" />
     <ClCompile Include="XmlStorageTestHelper.cpp" />
   </ItemGroup>

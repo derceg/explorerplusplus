@@ -8,6 +8,7 @@
 #include "CommandLine.h"
 #include "Explorer++_internal.h"
 #include "Version.h"
+#include "VersionHelper.h"
 #include "../Helper/DetoursHelper.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ProcessHelper.h"
@@ -182,10 +183,10 @@ std::optional<std::wstring> CreateMiniDumpForCrashedProcess(const CrashedData &c
 	GetLocalTime(&localTime);
 
 	TCHAR fileName[MAX_PATH];
-	HRESULT hr =
-		StringCchPrintf(fileName, std::size(fileName), _T("%s%s-%02d%02d%04d-%02d%02d%02d.dmp"),
-			NExplorerplusplus::APP_NAME, VERSION_STRING_W, localTime.wDay, localTime.wMonth,
-			localTime.wYear, localTime.wHour, localTime.wMinute, localTime.wSecond);
+	HRESULT hr = StringCchPrintf(fileName, std::size(fileName),
+		_T("%s%s-%02d%02d%04d-%02d%02d%02d.dmp"), NExplorerplusplus::APP_NAME,
+		VersionHelper::GetVersion().GetString().c_str(), localTime.wDay, localTime.wMonth,
+		localTime.wYear, localTime.wHour, localTime.wMinute, localTime.wSecond);
 
 	if (FAILED(hr))
 	{

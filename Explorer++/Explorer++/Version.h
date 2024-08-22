@@ -2,20 +2,23 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // See LICENSE in the top level directory
 
-#define MAJOR_VERSION 1
-#define MINOR_VERSION 5
-#define MICRO_VERSION 0
+#pragma once
 
-#ifdef ENVIRONMENT_BUILD_NUMBER
-	#define BUILD_VERSION ENVIRONMENT_BUILD_NUMBER
-#else
-	#define BUILD_VERSION 0
-#endif
+#include <string>
+#include <vector>
 
-#define QUOTE_(x) #x
-#define QUOTE(x) QUOTE_(x)
+class Version
+{
+public:
+	Version(const std::initializer_list<uint32_t> &segments);
 
-#define VERSION_STRING QUOTE(MAJOR_VERSION.MINOR_VERSION.MICRO_VERSION.BUILD_VERSION)
-#define VERSION_STRING_W _T(QUOTE(MAJOR_VERSION.MINOR_VERSION.MICRO_VERSION.BUILD_VERSION))
+	// The comparison operators for std::vector will do the correct thing here. That is, the version
+	// vectors will be compared lexicographically.
+	auto operator<=>(const Version &) const = default;
 
-#define BUILD_DATE_STRING _T(__DATE__) _T(" ") _T(__TIME__)
+	const std::vector<uint32_t> &GetSegments() const;
+	std::wstring GetString() const;
+
+private:
+	std::vector<uint32_t> m_segments;
+};
