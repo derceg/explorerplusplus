@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "..\targetver.h"
+#include "../targetver.h"
 
 #define ISOLATION_AWARE_ENABLED 1
 

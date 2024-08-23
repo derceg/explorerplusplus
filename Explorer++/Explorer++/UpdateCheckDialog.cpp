@@ -11,12 +11,12 @@
 
 #include "stdafx.h"
 #include "UpdateCheckDialog.h"
-#include "..\Helper\Macros.h"
 #include "MainResource.h"
 #include "Version.h"
 #include "VersionHelper.h"
-#include <boost\algorithm\string.hpp>
-#include <boost\lexical_cast.hpp>
+#include "../Helper/Macros.h"
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <vector>
 

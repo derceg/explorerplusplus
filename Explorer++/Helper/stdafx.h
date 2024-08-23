@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "..\targetver.h"
+#include "../targetver.h"
 
 #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
 
