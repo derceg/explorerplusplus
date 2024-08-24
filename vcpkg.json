@@ -7,7 +7,6 @@
     "boost-circular-buffer",
     "boost-container-hash",
     "boost-date-time",
-    "boost-format",
     "boost-functional",
     "boost-integer",
     "boost-interprocess",

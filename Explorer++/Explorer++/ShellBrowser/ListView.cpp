@@ -22,9 +22,9 @@
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ShellHelper.h"
-#include <boost/format.hpp>
 #include <glog/logging.h>
 #include <wil/common.h>
+#include <format>
 
 const std::vector<ColumnType> COMMON_REAL_FOLDER_COLUMNS = { ColumnType::Name, ColumnType::Type,
 	ColumnType::Size, ColumnType::DateModified, ColumnType::Authors, ColumnType::Title };
@@ -560,7 +560,7 @@ std::optional<ShellBrowserImpl::InfoTipResult> ShellBrowserImpl::GetInfoTipAsync
 			return std::nullopt;
 		}
 
-		infoTip = str(boost::wformat(_T("%s: %s")) % dateModified % fileModificationText);
+		infoTip = std::format(L"{}: {}", dateModified, fileModificationText);
 	}
 
 	PostMessage(listView, WM_APP_INFO_TIP_READY, infoTipResultId, 0);
