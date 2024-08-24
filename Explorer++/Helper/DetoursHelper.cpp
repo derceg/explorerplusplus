@@ -4,8 +4,8 @@
 
 #include "stdafx.h"
 #include "DetoursHelper.h"
-#include <wil/resource.h>
 #include <detours/detours.h>
+#include <wil/resource.h>
 
 LONG DetourTransaction(std::function<LONG()> callback)
 {

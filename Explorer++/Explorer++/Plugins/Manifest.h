@@ -6,8 +6,8 @@
 
 #include "Accelerator.h"
 #include <nlohmann/json.hpp>
-#include <optional>
 #include <sol/sol.hpp>
+#include <optional>
 
 namespace std
 {

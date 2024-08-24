@@ -13,9 +13,9 @@
 #include "../Helper/Helper.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/StringHelper.h"
+#include <detours/detours.h>
 #include <glog/logging.h>
 #include <wil/resource.h>
-#include <detours/detours.h>
 #include <format>
 
 using MiniDumpWriteDumpType = BOOL(WINAPI *)(HANDLE hProcee, DWORD ProcessId, HANDLE hFile,

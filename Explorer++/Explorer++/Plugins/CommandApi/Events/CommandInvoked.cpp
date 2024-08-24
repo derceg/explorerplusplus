@@ -19,9 +19,7 @@ boost::signals2::connection Plugins::CommandInvoked::connectObserver(
 
 	return m_pluginCommandManager->AddCommandInvokedObserver(
 		[this, observer](int pluginId, const std::wstring &name)
-		{
-			onCommandInvoked(pluginId, name, observer);
-		});
+		{ onCommandInvoked(pluginId, name, observer); });
 }
 
 void Plugins::CommandInvoked::onCommandInvoked(int pluginId, const std::wstring &name,

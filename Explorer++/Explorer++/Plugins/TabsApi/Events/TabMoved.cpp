@@ -18,7 +18,5 @@ boost::signals2::connection Plugins::TabMoved::connectObserver(sol::protected_fu
 
 	return m_tabContainer->tabMovedSignal.AddObserver(
 		[observer](const Tab &tab, int fromIndex, int toIndex)
-		{
-			observer(tab.GetId(), fromIndex, toIndex);
-		});
+		{ observer(tab.GetId(), fromIndex, toIndex); });
 }

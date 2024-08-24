@@ -31,11 +31,11 @@
 
 // Third-party Header Files:
 #include "../ThirdParty/CTPL/cpl_stl.h"
-#include <nlohmann/json.hpp>
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/memory.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
+#include <nlohmann/json.hpp>
 #include <sol/sol.hpp>
 
 // Windows Header Files:

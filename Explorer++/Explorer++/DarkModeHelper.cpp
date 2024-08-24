@@ -6,8 +6,8 @@
 #include "DarkModeHelper.h"
 #include "../Helper/DetoursHelper.h"
 #include "../Helper/RegistrySettings.h"
-#include <wil/common.h>
 #include <detours/detours.h>
+#include <wil/common.h>
 
 DarkModeHelper::OpenNcThemeDataType DarkModeHelper::m_OpenNcThemeData = nullptr;
 

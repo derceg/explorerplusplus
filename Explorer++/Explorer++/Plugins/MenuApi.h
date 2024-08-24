@@ -6,8 +6,8 @@
 
 #include "Plugins/PluginMenuManager.h"
 #include <boost/signals2.hpp>
-#include <optional>
 #include <sol/forward.hpp>
+#include <optional>
 #include <unordered_map>
 
 namespace Plugins

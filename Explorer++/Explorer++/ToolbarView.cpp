@@ -7,8 +7,8 @@
 #include "../Helper/Controls.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/Helper.h"
-#include <wil/common.h>
 #include <glog/logging.h>
+#include <wil/common.h>
 
 ToolbarButton::ToolbarButton(ClickedCallback clickedCallback) : m_clickedCallback(clickedCallback)
 {
