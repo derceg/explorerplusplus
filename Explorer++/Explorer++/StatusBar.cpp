@@ -12,6 +12,8 @@
 #include "../Helper/Controls.h"
 #include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
+#include <fmt/format.h>
+#include <fmt/xchar.h>
 
 void Explorerplusplus::CreateStatusBar()
 {
@@ -158,14 +160,14 @@ void Explorerplusplus::SetStatusBarLoadingText(PCIDLIST_ABSOLUTE pidl)
 		return;
 	}
 
-	TCHAR szTemp[64];
-	TCHAR szLoadingText[512];
-	LoadString(m_resourceInstance, IDS_GENERAL_LOADING, szTemp, SIZEOF_ARRAY(szTemp));
-	StringCchPrintf(szLoadingText, SIZEOF_ARRAY(szLoadingText), szTemp, displayName.c_str());
+	std::wstring loadingTemplate =
+		ResourceHelper::LoadString(m_resourceInstance, IDS_GENERAL_LOADING);
+	std::wstring loadingText =
+		fmt::format(fmt::runtime(loadingTemplate), fmt::arg(L"folder_name", displayName));
 
 	/* Browsing of a folder has started. Set the status bar text to indicate that
 	the folder is being loaded. */
-	SendMessage(m_hStatusBar, SB_SETTEXT, 0, (LPARAM) szLoadingText);
+	SendMessage(m_hStatusBar, SB_SETTEXT, 0, (LPARAM) loadingText.c_str());
 
 	/* Clear the text in all other parts of the status bar. */
 	SendMessage(m_hStatusBar, SB_SETTEXT, 1, (LPARAM) EMPTY_STRING);

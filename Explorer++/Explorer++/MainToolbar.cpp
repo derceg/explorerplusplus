@@ -22,6 +22,8 @@
 #include "../Helper/Helper.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
+#include <fmt/format.h>
+#include <fmt/xchar.h>
 
 // Enable C4062: enumerator 'identifier' in switch of enum 'enumeration' is not handled
 #pragma warning(default : 4062)
@@ -586,13 +588,11 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 
 		if (entry)
 		{
-			TCHAR szInfoTip[1024];
-			TCHAR szTemp[64];
-			LoadString(m_resourceInstance, IDS_MAIN_TOOLBAR_BACK, szTemp, SIZEOF_ARRAY(szTemp));
-			StringCchPrintf(szInfoTip, SIZEOF_ARRAY(szInfoTip), szTemp,
-				entry->GetDisplayName().c_str());
-
-			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, szInfoTip);
+			std::wstring infoTipTemplate =
+				ResourceHelper::LoadString(m_resourceInstance, IDS_MAIN_TOOLBAR_BACK);
+			std::wstring infoTip = fmt::format(fmt::runtime(infoTipTemplate),
+				fmt::arg(L"folder_name", entry->GetDisplayName()));
+			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, infoTip.c_str());
 		}
 	}
 	else if (ptbgit->iItem == MainToolbarButton::Forward)
@@ -601,13 +601,11 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 
 		if (entry)
 		{
-			TCHAR szInfoTip[1024];
-			TCHAR szTemp[64];
-			LoadString(m_resourceInstance, IDS_MAIN_TOOLBAR_FORWARD, szTemp, SIZEOF_ARRAY(szTemp));
-			StringCchPrintf(szInfoTip, SIZEOF_ARRAY(szInfoTip), szTemp,
-				entry->GetDisplayName().c_str());
-
-			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, szInfoTip);
+			std::wstring infoTipTemplate =
+				ResourceHelper::LoadString(m_resourceInstance, IDS_MAIN_TOOLBAR_FORWARD);
+			std::wstring infoTip = fmt::format(fmt::runtime(infoTipTemplate),
+				fmt::arg(L"folder_name", entry->GetDisplayName()));
+			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, infoTip.c_str());
 		}
 	}
 	else if (ptbgit->iItem == MainToolbarButton::Up)
@@ -646,16 +644,8 @@ std::optional<std::wstring> MainToolbar::MaybeGetCustomizedUpInfoTip()
 
 	std::wstring infoTipTemplate =
 		ResourceHelper::LoadString(m_resourceInstance, IDS_MAIN_TOOLBAR_UP_TO_FOLDER);
-
-	TCHAR infoTip[512];
-	hr = StringCchPrintf(infoTip, SIZEOF_ARRAY(infoTip), infoTipTemplate.c_str(),
-		parentName.c_str());
-
-	if (FAILED(hr))
-	{
-		assert(false);
-		return std::nullopt;
-	}
+	std::wstring infoTip =
+		fmt::format(fmt::runtime(infoTipTemplate), fmt::arg(L"folder_name", parentName));
 
 	return infoTip;
 }

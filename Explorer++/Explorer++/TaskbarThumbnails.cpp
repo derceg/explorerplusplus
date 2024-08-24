@@ -186,11 +186,10 @@ http://channel9.msdn.com/learn/courses/Windows7/Taskbar/Win7TaskbarNative/Exerci
 */
 void TaskbarThumbnails::CreateTabProxy(int iTabId, BOOL bSwitchToNewTab)
 {
-	static int iCount = 0;
-	TCHAR szClassName[512];
-	StringCchPrintf(szClassName, SIZEOF_ARRAY(szClassName), _T("Explorer++TabProxy%d"), iCount++);
+	static int proxyCount = 0;
+	std::wstring proxyClassName = std::format(L"Explorer++TabProxy{}", proxyCount++);
 
-	ATOM aRet = RegisterTabProxyClass(szClassName);
+	ATOM aRet = RegisterTabProxyClass(proxyClassName.c_str());
 
 	if (aRet == 0)
 	{
@@ -201,8 +200,8 @@ void TaskbarThumbnails::CreateTabProxy(int iTabId, BOOL bSwitchToNewTab)
 	ptp->taskbarThumbnails = this;
 	ptp->iTabId = iTabId;
 
-	HWND hTabProxy = CreateWindow(szClassName, EMPTY_STRING, WS_OVERLAPPEDWINDOW, 0, 0, 0, 0,
-		nullptr, nullptr, GetModuleHandle(nullptr), (LPVOID) ptp);
+	HWND hTabProxy = CreateWindow(proxyClassName.c_str(), EMPTY_STRING, WS_OVERLAPPEDWINDOW, 0, 0,
+		0, 0, nullptr, nullptr, GetModuleHandle(nullptr), (LPVOID) ptp);
 
 	if (!hTabProxy)
 	{

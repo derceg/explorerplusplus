@@ -12,11 +12,14 @@
 #include "stdafx.h"
 #include "UpdateCheckDialog.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "Version.h"
 #include "VersionHelper.h"
 #include "../Helper/Macros.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <fmt/format.h>
+#include <fmt/xchar.h>
 #include <stdexcept>
 #include <vector>
 
@@ -184,27 +187,22 @@ void UpdateCheckDialog::OnUpdateCheckError()
 
 void UpdateCheckDialog::OnUpdateCheckSuccess(Version *availableVersion)
 {
-	TCHAR szStatus[128];
-	TCHAR szTemp[128];
-
+	std::wstring status;
 	const auto &currentVersion = VersionHelper::GetVersion();
 
 	if (*availableVersion > currentVersion)
 	{
-		LoadString(GetResourceInstance(), IDS_UPDATE_CHECK_NEW_VERSION_AVAILABLE, szTemp,
-			SIZEOF_ARRAY(szTemp));
-		StringCchPrintf(szStatus, SIZEOF_ARRAY(szStatus), szTemp,
-			availableVersion->GetString().c_str());
+		std::wstring statusTemplate = ResourceHelper::LoadString(GetResourceInstance(),
+			IDS_UPDATE_CHECK_NEW_VERSION_AVAILABLE);
+		status = fmt::format(fmt::runtime(statusTemplate),
+			fmt::arg(L"available_version", availableVersion->GetString()));
 	}
 	else
 	{
-		LoadString(GetResourceInstance(), IDS_UPDATE_CHECK_UP_TO_DATE, szTemp,
-			SIZEOF_ARRAY(szTemp));
-		StringCchPrintf(szStatus, SIZEOF_ARRAY(szStatus), szTemp,
-			availableVersion->GetString().c_str());
+		status = ResourceHelper::LoadString(GetResourceInstance(), IDS_UPDATE_CHECK_UP_TO_DATE);
 	}
 
-	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, szStatus);
+	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, status.c_str());
 }
 
 INT_PTR UpdateCheckDialog::OnCommand(WPARAM wParam, LPARAM lParam)

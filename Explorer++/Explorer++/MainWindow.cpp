@@ -129,72 +129,60 @@ void MainWindow::UpdateWindowText()
 		GetDisplayName(pidlDirectory.get(), SHGDN_NORMAL, folderDisplayName);
 	}
 
-	TCHAR szTitle[512];
-
-	TCHAR szTemp[64];
-	LoadString(m_resourceInstance, IDS_MAIN_WINDOW_TITLE, szTemp, SIZEOF_ARRAY(szTemp));
-	StringCchPrintf(szTitle, SIZEOF_ARRAY(szTitle), szTemp, folderDisplayName.c_str(),
-		NExplorerplusplus::APP_NAME);
+	std::wstring title = std::format(L"{} - {}", folderDisplayName, NExplorerplusplus::APP_NAME);
 
 	if (m_config->showUserNameInTitleBar.get() || m_config->showPrivilegeLevelInTitleBar.get())
 	{
-		StringCchCat(szTitle, SIZEOF_ARRAY(szTitle), _T(" ["));
+		title += L" [";
 	}
 
 	if (m_config->showUserNameInTitleBar.get())
 	{
-		TCHAR szOwner[512];
-		GetProcessOwner(GetCurrentProcessId(), szOwner, SIZEOF_ARRAY(szOwner));
+		TCHAR owner[512];
+		GetProcessOwner(GetCurrentProcessId(), owner, SIZEOF_ARRAY(owner));
 
-		StringCchCat(szTitle, SIZEOF_ARRAY(szTitle), szOwner);
+		title += owner;
 	}
 
 	if (m_config->showPrivilegeLevelInTitleBar.get())
 	{
-		TCHAR szPrivilegeAddition[64];
-		TCHAR szPrivilege[64];
+		TCHAR privilegeLevel[64];
 
 		if (CheckGroupMembership(GroupType::Administrators))
 		{
-			LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_ADMINISTRATORS, szPrivilege,
-				SIZEOF_ARRAY(szPrivilege));
+			LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_ADMINISTRATORS, privilegeLevel,
+				SIZEOF_ARRAY(privilegeLevel));
 		}
 		else if (CheckGroupMembership(GroupType::PowerUsers))
 		{
-			LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_POWER_USERS, szPrivilege,
-				SIZEOF_ARRAY(szPrivilege));
+			LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_POWER_USERS, privilegeLevel,
+				SIZEOF_ARRAY(privilegeLevel));
 		}
 		else if (CheckGroupMembership(GroupType::Users))
 		{
-			LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_USERS, szPrivilege,
-				SIZEOF_ARRAY(szPrivilege));
+			LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_USERS, privilegeLevel,
+				SIZEOF_ARRAY(privilegeLevel));
 		}
 		else if (CheckGroupMembership(GroupType::UsersRestricted))
 		{
-			LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_USERS_RESTRICTED, szPrivilege,
-				SIZEOF_ARRAY(szPrivilege));
+			LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_USERS_RESTRICTED, privilegeLevel,
+				SIZEOF_ARRAY(privilegeLevel));
 		}
 
 		if (m_config->showUserNameInTitleBar.get())
 		{
-			StringCchPrintf(szPrivilegeAddition, SIZEOF_ARRAY(szPrivilegeAddition), _T(" - %s"),
-				szPrivilege);
-		}
-		else
-		{
-			StringCchPrintf(szPrivilegeAddition, SIZEOF_ARRAY(szPrivilegeAddition), _T("%s"),
-				szPrivilege);
+			title += L" - ";
 		}
 
-		StringCchCat(szTitle, SIZEOF_ARRAY(szTitle), szPrivilegeAddition);
+		title += privilegeLevel;
 	}
 
 	if (m_config->showUserNameInTitleBar.get() || m_config->showPrivilegeLevelInTitleBar.get())
 	{
-		StringCchCat(szTitle, SIZEOF_ARRAY(szTitle), _T("]"));
+		title += L"]";
 	}
 
-	SetWindowText(m_hwnd, szTitle);
+	SetWindowText(m_hwnd, title.c_str());
 }
 
 // DropTargetInternal
