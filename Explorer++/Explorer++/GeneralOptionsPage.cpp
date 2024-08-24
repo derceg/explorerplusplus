@@ -15,7 +15,8 @@
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include "../Helper/WindowHelper.h"
-#include <boost/format.hpp>
+#include <fmt/format.h>
+#include <fmt/xchar.h>
 
 using namespace DefaultFileManager;
 
@@ -483,7 +484,8 @@ bool GeneralOptionsPage::UpdateReplaceExplorerSetting(ReplaceExplorerMode update
 		{
 			std::wstring errorCodeTemplate =
 				ResourceHelper::LoadString(m_resourceInstance, IDS_ERROR_CODE);
-			finalSystemErrorMessage = (boost::wformat(errorCodeTemplate) % res).str();
+			finalSystemErrorMessage =
+				fmt::format(fmt::runtime(errorCodeTemplate), fmt::arg(L"error_code", res));
 		}
 
 		std::wstring errorMessage =

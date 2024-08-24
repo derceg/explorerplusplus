@@ -11,7 +11,8 @@
 #include "VersionHelper.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/WindowHelper.h"
-#include <boost/format.hpp>
+#include <fmt/format.h>
+#include <fmt/xchar.h>
 
 // Enable C4062: enumerator 'identifier' in switch of enum 'enumeration' is not handled
 #pragma warning(default : 4062)
@@ -76,13 +77,13 @@ INT_PTR AboutDialog::OnInitDialog()
 		versionAndReleaseMode += L" " + releaseMode;
 	}
 
-	std::wstring version =
-		(boost::wformat(versionTemplate) % versionAndReleaseMode % platform).str();
+	std::wstring version = fmt::format(fmt::runtime(versionTemplate),
+		fmt::arg(L"version_string", versionAndReleaseMode), fmt::arg(L"platform", platform));
 
 	std::wstring buildDateTemplate =
 		ResourceHelper::LoadString(GetResourceInstance(), IDS_ABOUT_BUILD_DATE);
-	std::wstring buildDate =
-		(boost::wformat(buildDateTemplate) % VersionHelper::GetBuildDate()).str();
+	std::wstring buildDate = fmt::format(fmt::runtime(buildDateTemplate),
+		fmt::arg(L"build_date", VersionHelper::GetBuildDate()));
 
 	std::wstring versionInfo = version + L"\r\n\r\n" + buildDate;
 	SetDlgItemText(m_hDlg, IDC_VERSION_INFORMATION, versionInfo.c_str());

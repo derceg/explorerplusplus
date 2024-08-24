@@ -24,6 +24,7 @@
     "cli11",
     "cppwinrt",
     "detours",
+    "fmt",
     "glog",
     "gtest",
     "lua",
