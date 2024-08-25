@@ -6,6 +6,7 @@
 #include "DestroyFilesDialog.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
@@ -43,27 +44,29 @@ INT_PTR DestroyFilesDialog::OnInitDialog()
 		LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 
 	LVCOLUMN lvColumn;
-	TCHAR szTemp[128];
 
-	LoadString(GetResourceInstance(), IDS_DESTROY_FILES_COLUMN_FILE, szTemp, SIZEOF_ARRAY(szTemp));
+	auto fileText =
+		ResourceHelper::LoadString(GetResourceInstance(), IDS_DESTROY_FILES_COLUMN_FILE);
 	lvColumn.mask = LVCF_TEXT;
-	lvColumn.pszText = szTemp;
+	lvColumn.pszText = fileText.data();
 	ListView_InsertColumn(hListView, 0, &lvColumn);
 
-	LoadString(GetResourceInstance(), IDS_DESTROY_FILES_COLUMN_TYPE, szTemp, SIZEOF_ARRAY(szTemp));
+	auto typeText =
+		ResourceHelper::LoadString(GetResourceInstance(), IDS_DESTROY_FILES_COLUMN_TYPE);
 	lvColumn.mask = LVCF_TEXT;
-	lvColumn.pszText = szTemp;
+	lvColumn.pszText = typeText.data();
 	ListView_InsertColumn(hListView, 1, &lvColumn);
 
-	LoadString(GetResourceInstance(), IDS_DESTROY_FILES_COLUMN_SIZE, szTemp, SIZEOF_ARRAY(szTemp));
+	auto sizeText =
+		ResourceHelper::LoadString(GetResourceInstance(), IDS_DESTROY_FILES_COLUMN_SIZE);
 	lvColumn.mask = LVCF_TEXT;
-	lvColumn.pszText = szTemp;
+	lvColumn.pszText = sizeText.data();
 	ListView_InsertColumn(hListView, 2, &lvColumn);
 
-	LoadString(GetResourceInstance(), IDS_DESTROY_FILES_COLUMN_DATE_MODIFIED, szTemp,
-		SIZEOF_ARRAY(szTemp));
+	auto dateModifiedText =
+		ResourceHelper::LoadString(GetResourceInstance(), IDS_DESTROY_FILES_COLUMN_DATE_MODIFIED);
 	lvColumn.mask = LVCF_TEXT;
-	lvColumn.pszText = szTemp;
+	lvColumn.pszText = dateModifiedText.data();
 	ListView_InsertColumn(hListView, 3, &lvColumn);
 
 	int iItem = 0;
@@ -184,16 +187,15 @@ void DestroyFilesDialog::SaveState()
 
 void DestroyFilesDialog::OnOk()
 {
-	TCHAR szConfirmation[128];
-	LoadString(GetResourceInstance(), IDS_DESTROY_FILES_CONFIRMATION, szConfirmation,
-		SIZEOF_ARRAY(szConfirmation));
+	auto confirmation =
+		ResourceHelper::LoadString(GetResourceInstance(), IDS_DESTROY_FILES_CONFIRMATION);
 
 	/* The default button in this message box will be the second
 	button (i.e. the no button). */
-	int iRes = MessageBox(m_hDlg, szConfirmation, NExplorerplusplus::APP_NAME,
+	int res = MessageBox(m_hDlg, confirmation.c_str(), NExplorerplusplus::APP_NAME,
 		MB_ICONWARNING | MB_SETFOREGROUND | MB_YESNO | MB_DEFBUTTON2);
 
-	switch (iRes)
+	switch (res)
 	{
 	case IDYES:
 		OnConfirmDestroy();

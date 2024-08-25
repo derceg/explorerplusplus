@@ -6,6 +6,7 @@
 #include "DisplayColoursDialog.h"
 #include "DisplayWindow/DisplayWindow.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "../Helper/Macros.h"
 
 const TCHAR DisplayColoursDialogPersistentSettings::SETTINGS_KEY[] = _T("DisplayColors");
@@ -131,16 +132,15 @@ void DisplayColoursDialog::InitializePreviewWindow()
 
 	DisplayWindow_ClearTextBuffer(m_hPreviewDisplayWindow);
 
-	TCHAR szTemp[64];
-	LoadString(GetResourceInstance(), IDS_DISPLAYCOLORS_FILENAME, szTemp, SIZEOF_ARRAY(szTemp));
-	DisplayWindow_BufferText(m_hPreviewDisplayWindow, szTemp);
+	auto fileName = ResourceHelper::LoadString(GetResourceInstance(), IDS_DISPLAYCOLORS_FILENAME);
+	DisplayWindow_BufferText(m_hPreviewDisplayWindow, fileName.c_str());
 
-	LoadString(GetResourceInstance(), IDS_DISPLAYCOLORS_FILE_TYPE, szTemp, SIZEOF_ARRAY(szTemp));
-	DisplayWindow_BufferText(m_hPreviewDisplayWindow, szTemp);
+	auto fileType = ResourceHelper::LoadString(GetResourceInstance(), IDS_DISPLAYCOLORS_FILE_TYPE);
+	DisplayWindow_BufferText(m_hPreviewDisplayWindow, fileType.c_str());
 
-	LoadString(GetResourceInstance(), IDS_DISPLAYCOLORS_MODIFICATION_DATE, szTemp,
-		SIZEOF_ARRAY(szTemp));
-	DisplayWindow_BufferText(m_hPreviewDisplayWindow, szTemp);
+	auto modificationDate =
+		ResourceHelper::LoadString(GetResourceInstance(), IDS_DISPLAYCOLORS_MODIFICATION_DATE);
+	DisplayWindow_BufferText(m_hPreviewDisplayWindow, modificationDate.c_str());
 
 	RECT rc;
 	GetWindowRect(hStatic, &rc);

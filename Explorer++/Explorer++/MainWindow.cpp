@@ -8,6 +8,7 @@
 #include "CoreInterface.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "TabContainer.h"
 #include "../Helper/Helper.h"
@@ -146,27 +147,27 @@ void MainWindow::UpdateWindowText()
 
 	if (m_config->showPrivilegeLevelInTitleBar.get())
 	{
-		TCHAR privilegeLevel[64];
+		std::wstring privilegeLevel;
 
 		if (CheckGroupMembership(GroupType::Administrators))
 		{
-			LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_ADMINISTRATORS, privilegeLevel,
-				SIZEOF_ARRAY(privilegeLevel));
+			privilegeLevel =
+				ResourceHelper::LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_ADMINISTRATORS);
 		}
 		else if (CheckGroupMembership(GroupType::PowerUsers))
 		{
-			LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_POWER_USERS, privilegeLevel,
-				SIZEOF_ARRAY(privilegeLevel));
+			privilegeLevel =
+				ResourceHelper::LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_POWER_USERS);
 		}
 		else if (CheckGroupMembership(GroupType::Users))
 		{
-			LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_USERS, privilegeLevel,
-				SIZEOF_ARRAY(privilegeLevel));
+			privilegeLevel =
+				ResourceHelper::LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_USERS);
 		}
 		else if (CheckGroupMembership(GroupType::UsersRestricted))
 		{
-			LoadString(m_resourceInstance, IDS_PRIVILEGE_LEVEL_USERS_RESTRICTED, privilegeLevel,
-				SIZEOF_ARRAY(privilegeLevel));
+			privilegeLevel = ResourceHelper::LoadString(m_resourceInstance,
+				IDS_PRIVILEGE_LEVEL_USERS_RESTRICTED);
 		}
 
 		if (m_config->showUserNameInTitleBar.get())

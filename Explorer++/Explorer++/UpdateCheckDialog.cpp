@@ -39,9 +39,8 @@ INT_PTR UpdateCheckDialog::OnInitDialog()
 	SetDlgItemText(m_hDlg, IDC_STATIC_CURRENT_VERSION,
 		VersionHelper::GetVersion().GetString().c_str());
 
-	TCHAR szTemp[64];
-	LoadString(GetResourceInstance(), IDS_UPDATE_CHECK_STATUS, szTemp, SIZEOF_ARRAY(szTemp));
-	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, szTemp);
+	auto status = ResourceHelper::LoadString(GetResourceInstance(), IDS_UPDATE_CHECK_STATUS);
+	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, status.c_str());
 
 	SetTimer(m_hDlg, 0, STATUS_TIMER_ELAPSED, nullptr);
 
@@ -180,9 +179,8 @@ INT_PTR UpdateCheckDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lPa
 
 void UpdateCheckDialog::OnUpdateCheckError()
 {
-	TCHAR szTemp[64];
-	LoadString(GetResourceInstance(), IDS_UPDATE_CHECK_ERROR, szTemp, SIZEOF_ARRAY(szTemp));
-	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, szTemp);
+	auto error = ResourceHelper::LoadString(GetResourceInstance(), IDS_UPDATE_CHECK_ERROR);
+	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, error.c_str());
 }
 
 void UpdateCheckDialog::OnUpdateCheckSuccess(Version *availableVersion)
@@ -232,18 +230,11 @@ INT_PTR UpdateCheckDialog::OnTimer(int iTimerID)
 		return 0;
 	}
 
-	TCHAR updateStatus[64];
-	LoadString(GetResourceInstance(), IDS_UPDATE_CHECK_STATUS, updateStatus,
-		SIZEOF_ARRAY(updateStatus));
-
 	static int step = 0;
 
-	for (int i = 0; i < step; i++)
-	{
-		StringCchCat(updateStatus, SIZEOF_ARRAY(updateStatus), _T("."));
-	}
-
-	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, updateStatus);
+	auto updateStatus = ResourceHelper::LoadString(GetResourceInstance(), IDS_UPDATE_CHECK_STATUS);
+	updateStatus += std::wstring(step, '.');
+	SetDlgItemText(m_hDlg, IDC_STATIC_UPDATE_STATUS, updateStatus.c_str());
 
 	step++;
 

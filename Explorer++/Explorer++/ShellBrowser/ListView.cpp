@@ -546,9 +546,7 @@ std::optional<ShellBrowserImpl::InfoTipResult> ShellBrowserImpl::GetInfoTipAsync
 	}
 	else
 	{
-		TCHAR dateModified[64];
-		LoadString(resourceInstance, IDS_GENERAL_DATEMODIFIED, dateModified,
-			SIZEOF_ARRAY(dateModified));
+		auto dateModified = ResourceHelper::LoadString(resourceInstance, IDS_GENERAL_DATEMODIFIED);
 
 		TCHAR fileModificationText[256];
 		BOOL fileTimeResult =

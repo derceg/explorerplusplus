@@ -105,12 +105,11 @@ INT_PTR SearchDialog::OnInitDialog()
 
 	for (const auto &ci : m_persistentSettings->m_Columns)
 	{
-		TCHAR szTemp[128];
-		LoadString(GetResourceInstance(), ci.uStringID, szTemp, SIZEOF_ARRAY(szTemp));
+		auto columnName = ResourceHelper::LoadString(GetResourceInstance(), ci.uStringID);
 
 		LVCOLUMN lvColumn;
 		lvColumn.mask = LVCF_TEXT;
-		lvColumn.pszText = szTemp;
+		lvColumn.pszText = columnName.data();
 		ListView_InsertColumn(hListView, i, &lvColumn);
 
 		i++;
@@ -215,16 +214,15 @@ INT_PTR SearchDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 		BROWSEINFO bi;
 		TCHAR szDirectory[MAX_PATH];
 		TCHAR szDisplayName[MAX_PATH];
-		TCHAR szTitle[256];
 
-		LoadString(GetResourceInstance(), IDS_SEARCHDIALOG_TITLE, szTitle, SIZEOF_ARRAY(szTitle));
+		auto title = ResourceHelper::LoadString(GetResourceInstance(), IDS_SEARCHDIALOG_TITLE);
 
 		GetDlgItemText(m_hDlg, IDC_COMBO_DIRECTORY, szDirectory, SIZEOF_ARRAY(szDirectory));
 
 		bi.hwndOwner = m_hDlg;
 		bi.pidlRoot = nullptr;
 		bi.pszDisplayName = szDisplayName;
-		bi.lpszTitle = szTitle;
+		bi.lpszTitle = title.c_str();
 		bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
 		bi.lpfn = NSearchDialog::BrowseCallbackProc;
 		bi.lParam = reinterpret_cast<LPARAM>(szDirectory);
@@ -378,10 +376,8 @@ void SearchDialog::StartSearching()
 
 	GetDlgItemText(m_hDlg, IDSEARCH, m_szSearchButton, SIZEOF_ARRAY(m_szSearchButton));
 
-	TCHAR szTemp[64];
-
-	LoadString(GetResourceInstance(), IDS_STOP, szTemp, SIZEOF_ARRAY(szTemp));
-	SetDlgItemText(m_hDlg, IDSEARCH, szTemp);
+	auto stopText = ResourceHelper::LoadString(GetResourceInstance(), IDS_STOP);
+	SetDlgItemText(m_hDlg, IDSEARCH, stopText.c_str());
 
 	m_bSearching = TRUE;
 
@@ -569,24 +565,24 @@ void SearchDialog::UpdateMenuEntries(HMENU menu, PCIDLIST_ABSOLUTE pidlParent,
 	SFGAOF itemAttributes = SFGAO_FOLDER;
 	GetItemAttributes(pidlComplete.get(), &itemAttributes);
 
-	TCHAR szTemp[64];
+	std::wstring openLocationText;
 
 	if ((itemAttributes & SFGAO_FOLDER) == SFGAO_FOLDER)
 	{
-		LoadString(GetResourceInstance(), IDS_SEARCH_OPEN_FOLDER_LOCATION, szTemp,
-			SIZEOF_ARRAY(szTemp));
+		openLocationText =
+			ResourceHelper::LoadString(GetResourceInstance(), IDS_SEARCH_OPEN_FOLDER_LOCATION);
 	}
 	else
 	{
-		LoadString(GetResourceInstance(), IDS_SEARCH_OPEN_FILE_LOCATION, szTemp,
-			SIZEOF_ARRAY(szTemp));
+		openLocationText =
+			ResourceHelper::LoadString(GetResourceInstance(), IDS_SEARCH_OPEN_FILE_LOCATION);
 	}
 
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(MENUITEMINFO);
 	mii.fMask = MIIM_STRING | MIIM_ID;
 	mii.wID = OPEN_FILE_LOCATION_MENU_ITEM_ID;
-	mii.dwTypeData = szTemp;
+	mii.dwTypeData = openLocationText.data();
 	InsertMenuItem(menu, 1, TRUE, &mii);
 }
 
@@ -815,10 +811,9 @@ INT_PTR SearchDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		else
 		{
-			TCHAR szTemp[128];
-			LoadString(GetResourceInstance(), IDS_SEARCH_CANCELLED_MESSAGE, szTemp,
-				SIZEOF_ARRAY(szTemp));
-			SetDlgItemText(m_hDlg, IDC_STATIC_STATUS, szTemp);
+			auto cancelledMessage =
+				ResourceHelper::LoadString(GetResourceInstance(), IDS_SEARCH_CANCELLED_MESSAGE);
+			SetDlgItemText(m_hDlg, IDC_STATIC_STATUS, cancelledMessage.c_str());
 		}
 
 		assert(m_pSearch != nullptr);
@@ -856,10 +851,9 @@ INT_PTR SearchDialog::OnPrivateMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		/* The regular expression passed to the search
 		thread was invalid. Show the user an error message. */
-		TCHAR szTemp[128];
-		LoadString(GetResourceInstance(), IDS_SEARCH_REGULAR_EXPRESSION_INVALID, szTemp,
-			SIZEOF_ARRAY(szTemp));
-		SetDlgItemText(m_hDlg, IDC_LINK_STATUS, szTemp);
+		auto errorMessage = ResourceHelper::LoadString(GetResourceInstance(),
+			IDS_SEARCH_REGULAR_EXPRESSION_INVALID);
+		SetDlgItemText(m_hDlg, IDC_LINK_STATUS, errorMessage.c_str());
 
 		assert(m_pSearch != nullptr);
 

@@ -9,6 +9,7 @@
 #include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "SelectColumnsDialog.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellTreeView/ShellTreeView.h"
@@ -71,9 +72,8 @@ void Explorerplusplus::CopyToFolder(bool move)
 		pidlPtrs.push_back(std::move(pidlPtr));
 	}
 
-	TCHAR szTemp[128];
-	LoadString(m_resourceInstance, IDS_GENERAL_COPY_TO_FOLDER_TITLE, szTemp, SIZEOF_ARRAY(szTemp));
-	FileOperations::CopyFilesToFolder(m_hContainer, szTemp, pidls, move);
+	auto title = ResourceHelper::LoadString(m_resourceInstance, IDS_GENERAL_COPY_TO_FOLDER_TITLE);
+	FileOperations::CopyFilesToFolder(m_hContainer, title, pidls, move);
 }
 
 void Explorerplusplus::OnDeviceChange(WPARAM wParam, LPARAM lParam)
