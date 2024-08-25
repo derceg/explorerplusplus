@@ -694,7 +694,7 @@ INT_PTR SearchDialog::OnNotify(NMHDR *pnmhdr)
 				if (bRet)
 				{
 					auto itr = m_SearchItemsMapInternal.find(static_cast<int>(lvItem.lParam));
-					assert(itr != m_SearchItemsMapInternal.end());
+					CHECK(itr != m_SearchItemsMapInternal.end());
 
 					unique_pidl_absolute pidlFull;
 					HRESULT hr = SHParseDisplayName(itr->second.c_str(), nullptr,

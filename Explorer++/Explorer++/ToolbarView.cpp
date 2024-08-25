@@ -150,15 +150,14 @@ void ToolbarView::SetupSmallShellImageList()
 		int iconWidth;
 		int iconHeight;
 		ImageList_GetIconSize(smallShellImageList, &iconWidth, &iconHeight);
-		[[maybe_unused]] auto res =
-			SendMessage(m_hwnd, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
-		assert(res);
+		auto res = SendMessage(m_hwnd, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
+		DCHECK(res);
 
 		res =
 			SendMessage(m_hwnd, TB_SETIMAGELIST, 0, reinterpret_cast<LPARAM>(smallShellImageList));
 
 		// The image list should only be set a single time.
-		assert(!res);
+		DCHECK(!res);
 	}
 }
 
@@ -169,7 +168,7 @@ HWND ToolbarView::GetHWND() const
 
 void ToolbarView::AddButton(std::unique_ptr<ToolbarButton> button, size_t index)
 {
-	assert(index <= m_buttons.size());
+	CHECK(index <= m_buttons.size());
 
 	std::wstring text = button->GetText();
 
@@ -193,7 +192,7 @@ void ToolbarView::UpdateButton(const ToolbarButton *button)
 {
 	auto itr = std::find_if(m_buttons.begin(), m_buttons.end(),
 		[button](const auto &currentEntry) { return currentEntry.get() == button; });
-	assert(itr != m_buttons.end());
+	CHECK(itr != m_buttons.end());
 
 	UpdateButton(itr - m_buttons.begin());
 }
@@ -228,7 +227,7 @@ BYTE ToolbarView::GetToolbarButtonState(const ToolbarButton *button)
 
 void ToolbarView::RemoveButton(size_t index)
 {
-	assert(index < m_buttons.size());
+	CHECK(index < m_buttons.size());
 	auto itr = m_buttons.begin() + index;
 	m_buttons.erase(itr);
 
@@ -369,7 +368,7 @@ void ToolbarView::OnMouseMove(int keys, const POINT &pt)
 		// m_leftButtonDownPoint will only be set if the mouse was on a button, so retrieving the
 		// button here should succeed.
 		auto button = MaybeGetButtonAtPoint(*m_leftButtonDownPoint);
-		assert(button);
+		CHECK(button);
 
 		button->OnDragStarted();
 
@@ -483,11 +482,11 @@ ToolbarButton *ToolbarView::GetButtonFromIndex(size_t index)
 ToolbarView::DropLocation ToolbarView::GetDropLocation(const POINT &ptScreen)
 {
 	POINT ptClient = ptScreen;
-	[[maybe_unused]] BOOL res = ScreenToClient(m_hwnd, &ptClient);
+	BOOL res = ScreenToClient(m_hwnd, &ptClient);
 
 	// ScreenToClient can likely only fail if the window parameter is invalid, which should never be
 	// the case here.
-	assert(res);
+	DCHECK(res);
 
 	auto index = MaybeGetIndexOfButtonAtPoint(ptClient);
 	;

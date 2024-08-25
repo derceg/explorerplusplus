@@ -313,7 +313,7 @@ void ShellBrowserImpl::AddItem(PCIDLIST_ABSOLUTE pidl)
 
 		// The item was added successfully above, so should be in the list of awaiting
 		// items.
-		assert(itr != m_directoryState.awaitingAddList.end());
+		CHECK(itr != m_directoryState.awaitingAddList.end());
 
 		itr->iItem = sortedPosition;
 		itr->bPosition = TRUE;

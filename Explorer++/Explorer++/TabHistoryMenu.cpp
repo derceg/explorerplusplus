@@ -52,7 +52,7 @@ void TabHistoryMenu::BuildMenu()
 	}
 
 	// This class shouldn't be invoked in a situation where there is no history for a tab.
-	assert(!history.empty());
+	DCHECK(!history.empty());
 
 	for (auto *entry : history)
 	{

@@ -319,7 +319,7 @@ HRESULT ShellBrowserImpl::RegisterShellWindow(PCIDLIST_ABSOLUTE pidl)
 	// The call to RegisterPending() above is passed the thread ID. The call to Register() will use
 	// that thread ID to link a pending window to the specified window handle. That means the cookie
 	// values for the two calls should be the same - since they refer to the same window instance.
-	assert(registeredCookie == m_shellWindowCookie.get());
+	DCHECK(registeredCookie == m_shellWindowCookie.get());
 
 	return S_OK;
 }

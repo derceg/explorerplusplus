@@ -27,7 +27,7 @@ template <std::size_t N>
 ViewMode GetNextViewMode(const std::array<ViewMode, N> &viewModes, ViewMode viewMode)
 {
 	auto itr = std::find(viewModes.begin(), viewModes.end(), viewMode);
-	assert(itr != viewModes.end());
+	CHECK(itr != viewModes.end());
 
 	if (itr == viewModes.begin())
 	{
@@ -45,7 +45,7 @@ template <std::size_t N>
 ViewMode GetPreviousViewMode(const std::array<ViewMode, N> &viewModes, ViewMode viewMode)
 {
 	auto itr = std::find(viewModes.begin(), viewModes.end(), viewMode);
-	assert(itr != viewModes.end());
+	CHECK(itr != viewModes.end());
 
 	itr++;
 

@@ -177,7 +177,7 @@ protected:
 		if (m_currentEntry == -1)
 		{
 			// Shouldn't be attempting to replace the current entry when there is no current entry.
-			assert(false);
+			DCHECK(false);
 
 			return AddEntry(std::move(entry));
 		}

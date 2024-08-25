@@ -996,7 +996,7 @@ void ShellBrowserImpl::SetCurrentColumns(const std::vector<Column_t> &columns)
 		{
 			auto firstChecked = std::find_if(columns.begin(), columns.end(),
 				[](const Column_t &currentColumn) { return currentColumn.checked; });
-			assert(firstChecked != columns.end());
+			CHECK(firstChecked != columns.end());
 
 			m_folderSettings.sortMode = DetermineColumnSortMode(firstChecked->type);
 			sortFolder = true;
@@ -1009,7 +1009,7 @@ void ShellBrowserImpl::SetCurrentColumns(const std::vector<Column_t> &columns)
 
 		auto existingColumn = std::find_if(m_pActiveColumns->begin(), m_pActiveColumns->end(),
 			[column](const Column_t &currentColumn) { return currentColumn.type == column.type; });
-		assert(existingColumn != m_pActiveColumns->end());
+		CHECK(existingColumn != m_pActiveColumns->end());
 
 		if (column.checked && !existingColumn->checked)
 		{
@@ -1055,7 +1055,7 @@ Column_t ShellBrowserImpl::GetFirstCheckedColumn()
 		[](const Column_t &column) { return column.checked; });
 
 	// There should always be at least one checked column.
-	assert(itr != m_pActiveColumns->end());
+	CHECK(itr != m_pActiveColumns->end());
 
 	return *itr;
 }

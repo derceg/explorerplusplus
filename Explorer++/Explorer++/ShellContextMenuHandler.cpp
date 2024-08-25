@@ -212,7 +212,7 @@ void Explorerplusplus::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	case OPEN_IN_NEW_TAB_MENU_ITEM_ID:
 	{
 		// This menu item should only be added when a single folder is selected.
-		assert(pidlItems.size() == 1);
+		DCHECK_EQ(pidlItems.size(), 1u);
 
 		unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems[0].Raw()));
 		auto navigateParams = NavigateParams::Normal(pidlComplete.get());

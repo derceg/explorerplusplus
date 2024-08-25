@@ -136,7 +136,7 @@ void ShellTreeView::ScrollTreeViewForDrop(const POINT &pt)
 
 void ShellTreeView::OnDropExpandTimer()
 {
-	assert(m_dropExpandItem);
+	CHECK(m_dropExpandItem);
 	TreeView_Expand(m_hTreeView, m_dropExpandItem, TVE_EXPAND);
 
 	KillTimer(m_hTreeView, DROP_EXPAND_TIMER_ID);

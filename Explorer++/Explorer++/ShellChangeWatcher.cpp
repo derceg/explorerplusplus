@@ -45,21 +45,21 @@ ULONG ShellChangeWatcher::StartWatching(PCIDLIST_ABSOLUTE pidl, LONG events, boo
 		return 0;
 	}
 
-	[[maybe_unused]] auto insertionResult = m_changeNotifyIds.insert(changeNotifyId);
+	auto insertionResult = m_changeNotifyIds.insert(changeNotifyId);
 
 	// Change IDs are unique, so there should never be an attempt to insert a duplicate ID.
-	assert(insertionResult.second);
+	DCHECK(insertionResult.second);
 
 	return changeNotifyId;
 }
 
 void ShellChangeWatcher::StopWatching(ULONG changeNotifyId)
 {
-	[[maybe_unused]] auto res = SHChangeNotifyDeregister(changeNotifyId);
-	assert(res);
+	auto res = SHChangeNotifyDeregister(changeNotifyId);
+	DCHECK(res);
 
-	[[maybe_unused]] auto numErased = m_changeNotifyIds.erase(changeNotifyId);
-	assert(numErased == 1);
+	auto numErased = m_changeNotifyIds.erase(changeNotifyId);
+	DCHECK_EQ(numErased, 1u);
 }
 
 void ShellChangeWatcher::StopWatchingAll()
@@ -69,8 +69,8 @@ void ShellChangeWatcher::StopWatchingAll()
 
 	for (ULONG changeNotifyId : m_changeNotifyIds)
 	{
-		[[maybe_unused]] auto res = SHChangeNotifyDeregister(changeNotifyId);
-		assert(res);
+		auto res = SHChangeNotifyDeregister(changeNotifyId);
+		DCHECK(res);
 	}
 
 	m_changeNotifyIds.clear();

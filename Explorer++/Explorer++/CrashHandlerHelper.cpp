@@ -46,7 +46,7 @@ void InitializeCrashHandler()
 
 	if (res != NO_ERROR)
 	{
-		assert(false);
+		DCHECK(false);
 		LOG(WARNING) << "Error when attempting to disable SetUnhandledExceptionFilter: " << res;
 	}
 }

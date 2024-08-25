@@ -388,7 +388,7 @@ void ShellBrowserImpl::OnListViewGetDisplayInfo(LPARAM lParam)
 	if (m_folderSettings.viewMode == +ViewMode::Details && (plvItem->mask & LVIF_TEXT) == LVIF_TEXT)
 	{
 		auto columnType = GetColumnTypeByIndex(plvItem->iSubItem);
-		assert(columnType);
+		CHECK(columnType);
 
 		QueueColumnTask(internalIndex, *columnType);
 	}

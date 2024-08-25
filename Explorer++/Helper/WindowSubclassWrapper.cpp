@@ -18,8 +18,8 @@ WindowSubclassWrapper::~WindowSubclassWrapper()
 {
 	if (m_subclassInstalled)
 	{
-		[[maybe_unused]] BOOL res = RemoveWindowSubclass(m_hwnd, SubclassProcStub, m_subclassId);
-		assert(res);
+		BOOL res = RemoveWindowSubclass(m_hwnd, SubclassProcStub, m_subclassId);
+		DCHECK(res);
 	}
 }
 

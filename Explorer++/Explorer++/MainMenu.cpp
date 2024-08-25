@@ -155,7 +155,7 @@ void Explorerplusplus::InitializeGoMenu(HMENU mainMenu)
 	// This is a bit indirect, but it's better than using something like GetSubMenu(), which would
 	// rely on the "Go" menu remaining in a fixed position.
 	HMENU goMenu = MenuHelper::FindParentMenu(mainMenu, IDM_GO_BACK);
-	assert(goMenu);
+	CHECK(goMenu);
 
 	MenuHelper::AddSeparator(goMenu);
 

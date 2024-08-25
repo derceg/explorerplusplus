@@ -18,7 +18,7 @@ FeatureList *FeatureList::GetInstance()
 
 void FeatureList::InitializeFromCommandLine(const CommandLine::Settings &commandLineSettings)
 {
-	assert(!m_initializedFromCommandLine);
+	DCHECK(!m_initializedFromCommandLine);
 
 	m_enabledFeatures = commandLineSettings.enableFeatures;
 

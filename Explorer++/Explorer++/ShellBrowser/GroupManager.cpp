@@ -134,7 +134,7 @@ int ShellBrowserImpl::GroupRelativePositionComparison(const ListViewGroup &group
 const ShellBrowserImpl::ListViewGroup ShellBrowserImpl::GetListViewGroupById(int groupId)
 {
 	auto itr = m_listViewGroups.get<0>().find(groupId);
-	assert(itr != m_listViewGroups.get<0>().end());
+	CHECK(itr != m_listViewGroups.get<0>().end());
 
 	return *itr;
 }
@@ -936,7 +936,7 @@ void ShellBrowserImpl::OnItemRemovedFromGroup(int groupId)
 {
 	auto &groupIdIndex = m_listViewGroups.get<0>();
 	auto itr = groupIdIndex.find(groupId);
-	assert(itr != groupIdIndex.end());
+	CHECK(itr != groupIdIndex.end());
 
 	auto updatedGroup = *itr;
 	updatedGroup.numItems--;
@@ -956,7 +956,7 @@ void ShellBrowserImpl::OnItemAddedToGroup(int groupId)
 {
 	auto &groupIdIndex = m_listViewGroups.get<0>();
 	auto itr = groupIdIndex.find(groupId);
-	assert(itr != groupIdIndex.end());
+	CHECK(itr != groupIdIndex.end());
 
 	auto updatedGroup = *itr;
 	updatedGroup.numItems++;

@@ -43,7 +43,7 @@ template <typename DropTargetItemIdentifierType>
 DWORD ShellDropTargetWindow<DropTargetItemIdentifierType>::DragOver(DWORD keyState, POINT pt,
 	DWORD effect)
 {
-	assert(m_currentDropObject);
+	CHECK(m_currentDropObject);
 	return OnDragInWindow(m_currentDropObject, keyState, pt, effect);
 }
 

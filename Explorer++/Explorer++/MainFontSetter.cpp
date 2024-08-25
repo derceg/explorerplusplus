@@ -62,7 +62,7 @@ void MainFontSetter::MaybeSubclassSpecificWindowClasses()
 
 	if (res == 0)
 	{
-		assert(false);
+		DCHECK(false);
 		return;
 	}
 
@@ -112,7 +112,7 @@ void MainFontSetter::UpdateFont()
 
 		if (!updatedFont)
 		{
-			assert(false);
+			DCHECK(false);
 			return;
 		}
 	}
@@ -126,7 +126,7 @@ void MainFontSetter::UpdateFont()
 
 		if (!updatedFont)
 		{
-			assert(false);
+			DCHECK(false);
 			return;
 		}
 	}

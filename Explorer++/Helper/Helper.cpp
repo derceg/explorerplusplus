@@ -741,7 +741,7 @@ void SendSimulatedKeyPress(HWND hwnd, UINT key)
 
 	if (scanCode == 0)
 	{
-		assert(false);
+		DCHECK(false);
 		return;
 	}
 

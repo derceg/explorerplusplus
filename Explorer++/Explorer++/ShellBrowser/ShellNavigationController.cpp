@@ -126,7 +126,7 @@ std::unique_ptr<HistoryEntry> ShellNavigationController::BuildEntry(
 	{
 		// It's not expected that this would happen, so it would be useful to have some
 		// indication if the call above ever does fail.
-		assert(false);
+		DCHECK(false);
 
 		displayName = L"(Unknown)";
 	}
@@ -135,7 +135,7 @@ std::unique_ptr<HistoryEntry> ShellNavigationController::BuildEntry(
 
 	if (!fullPathForDisplay)
 	{
-		assert(false);
+		DCHECK(false);
 
 		fullPathForDisplay = L"(Unknown)";
 	}

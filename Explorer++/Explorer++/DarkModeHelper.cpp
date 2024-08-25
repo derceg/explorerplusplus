@@ -112,7 +112,7 @@ void DarkModeHelper::EnableForApp(bool enable)
 	FlushMenuThemes();
 	RefreshImmersiveColorPolicyState();
 
-	[[maybe_unused]] LONG res;
+	LONG res;
 
 	if (enable)
 	{
@@ -123,7 +123,7 @@ void DarkModeHelper::EnableForApp(bool enable)
 		res = RestoreOpenNcThemeData();
 	}
 
-	assert(res == NO_ERROR);
+	DCHECK_EQ(res, NO_ERROR);
 
 	m_darkModeEnabled = enable;
 
@@ -232,7 +232,7 @@ bool DarkModeHelper::IsHighContrast()
 
 	if (!res)
 	{
-		assert(false);
+		DCHECK(false);
 		return false;
 	}
 

@@ -35,7 +35,7 @@ void OptionsPage::InitializeDialog()
 {
 	if (m_dialog)
 	{
-		assert(false);
+		DCHECK(false);
 		return;
 	}
 
@@ -64,9 +64,9 @@ INT_PTR CALLBACK OptionsPage::DialogProcStub(HWND dlg, UINT msg, WPARAM wParam, 
 		optionsDialogPage = reinterpret_cast<OptionsPage *>(lParam);
 
 		SetLastError(0);
-		[[maybe_unused]] auto res =
+		auto res =
 			SetWindowLongPtr(dlg, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(optionsDialogPage));
-		assert(!(res == 0 && GetLastError() != 0));
+		DCHECK(!(res == 0 && GetLastError() != 0));
 	}
 	break;
 
@@ -150,7 +150,7 @@ BOOL CALLBACK OptionsPage::CheckChildWindowForTextMatch(HWND hwnd, LPARAM lParam
 
 	if (res == 0)
 	{
-		assert(false);
+		DCHECK(false);
 		return TRUE;
 	}
 

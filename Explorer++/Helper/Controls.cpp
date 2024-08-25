@@ -242,7 +242,7 @@ void RefreshToolbarAfterFontOrDpiChange(HWND toolbar)
 
 		if (!res)
 		{
-			assert(false);
+			DCHECK(false);
 			continue;
 		}
 
@@ -257,7 +257,7 @@ void RefreshToolbarAfterFontOrDpiChange(HWND toolbar)
 		savedButtons.push_back(savedButton);
 
 		res = SendMessage(toolbar, TB_DELETEBUTTON, 0, 0);
-		assert(res);
+		DCHECK(res);
 	}
 
 	int index = 0;
@@ -275,7 +275,7 @@ void RefreshToolbarAfterFontOrDpiChange(HWND toolbar)
 
 		if (!res)
 		{
-			assert(false);
+			DCHECK(false);
 			continue;
 		}
 
@@ -308,7 +308,7 @@ void UpdateRebarBandSize(HWND rebar, HWND child, int idealWidth, int height)
 
 		if (res == 0)
 		{
-			assert(false);
+			DCHECK(false);
 			continue;
 		}
 
@@ -321,16 +321,15 @@ void UpdateRebarBandSize(HWND rebar, HWND child, int idealWidth, int height)
 
 	if (!childIndex)
 	{
-		assert(false);
+		DCHECK(false);
 		return;
 	}
 
 	bandInfo.fMask = RBBIM_IDEALSIZE | RBBIM_CHILDSIZE;
 	bandInfo.cxIdeal = idealWidth;
 	bandInfo.cyMinChild = height;
-	[[maybe_unused]] auto res =
-		SendMessage(rebar, RB_SETBANDINFO, *childIndex, reinterpret_cast<LPARAM>(&bandInfo));
-	assert(res);
+	auto res = SendMessage(rebar, RB_SETBANDINFO, *childIndex, reinterpret_cast<LPARAM>(&bandInfo));
+	DCHECK(res);
 }
 
 SIZE GetCheckboxSize(HWND hwnd)
@@ -418,18 +417,17 @@ void AddItemsToComboBox(HWND comboBox, const std::vector<ComboBoxItem> &items, i
 
 		if (index == CB_ERR)
 		{
-			assert(false);
+			DCHECK(false);
 			continue;
 		}
 
-		[[maybe_unused]] auto res =
-			SendMessage(comboBox, CB_SETITEMDATA, index, static_cast<LPARAM>(item.id));
-		assert(res != CB_ERR);
+		auto res = SendMessage(comboBox, CB_SETITEMDATA, index, static_cast<LPARAM>(item.id));
+		DCHECK(res != CB_ERR);
 
 		if (item.id == currentItemId)
 		{
 			res = SendMessage(comboBox, CB_SETCURSEL, index, 0);
-			assert(res != CB_ERR);
+			DCHECK(res != CB_ERR);
 		}
 	}
 }
@@ -441,7 +439,7 @@ bool DoesComboBoxContainText(HWND comboBox, const std::wstring &text,
 
 	if (numItems == CB_ERR)
 	{
-		assert(false);
+		DCHECK(false);
 		return false;
 	}
 
@@ -451,7 +449,7 @@ bool DoesComboBoxContainText(HWND comboBox, const std::wstring &text,
 
 		if (numCharacters == CB_ERR)
 		{
-			assert(false);
+			DCHECK(false);
 			continue;
 		}
 
@@ -463,7 +461,7 @@ bool DoesComboBoxContainText(HWND comboBox, const std::wstring &text,
 
 		if (numCharacters == CB_ERR)
 		{
-			assert(false);
+			DCHECK(false);
 			continue;
 		}
 
