@@ -143,6 +143,19 @@ TEST_F(MovableModelTest, AddItemAtIndex)
 	EXPECT_EQ(m_model.GetItemAtIndex(1), rawItem3);
 	EXPECT_EQ(m_model.GetItemAtIndex(2), rawItem1);
 	EXPECT_EQ(m_model.GetItemAtIndex(3), rawItem4);
+
+	// Attempting to add an item past the end of the model should result in the item being added to
+	// the end.
+	auto item5 = std::make_unique<ItemFake>(L"Item 5");
+	auto *rawItem5 = m_model.AddItem(std::move(item5), 100);
+
+	ASSERT_EQ(m_model.GetItems().size(), 5U);
+
+	EXPECT_EQ(m_model.GetItemAtIndex(0), rawItem2);
+	EXPECT_EQ(m_model.GetItemAtIndex(1), rawItem3);
+	EXPECT_EQ(m_model.GetItemAtIndex(2), rawItem1);
+	EXPECT_EQ(m_model.GetItemAtIndex(3), rawItem4);
+	EXPECT_EQ(m_model.GetItemAtIndex(4), rawItem5);
 }
 
 TEST_F(MovableModelTest, UpdateItem)
@@ -188,6 +201,28 @@ TEST_F(MovableModelTest, MoveItem)
 	EXPECT_EQ(m_model.GetItemAtIndex(1), rawItem1);
 	EXPECT_EQ(m_model.GetItemAtIndex(2), rawItem3);
 	EXPECT_EQ(m_model.GetItemAtIndex(3), rawItem2);
+
+	// Attempting to move an item past the end of the model should result in the item being moved to
+	// the end.
+	EXPECT_CALL(m_observer, OnItemMoved(rawItem1, 1, 3));
+	m_model.MoveItem(rawItem1, 4);
+
+	ASSERT_EQ(m_model.GetItems().size(), 4U);
+
+	EXPECT_EQ(m_model.GetItemAtIndex(0), rawItem4);
+	EXPECT_EQ(m_model.GetItemAtIndex(1), rawItem3);
+	EXPECT_EQ(m_model.GetItemAtIndex(2), rawItem2);
+	EXPECT_EQ(m_model.GetItemAtIndex(3), rawItem1);
+
+	EXPECT_CALL(m_observer, OnItemMoved(rawItem3, 1, 3));
+	m_model.MoveItem(rawItem3, 100);
+
+	ASSERT_EQ(m_model.GetItems().size(), 4U);
+
+	EXPECT_EQ(m_model.GetItemAtIndex(0), rawItem4);
+	EXPECT_EQ(m_model.GetItemAtIndex(1), rawItem2);
+	EXPECT_EQ(m_model.GetItemAtIndex(2), rawItem1);
+	EXPECT_EQ(m_model.GetItemAtIndex(3), rawItem3);
 }
 
 TEST_F(MovableModelTest, RemoveItem)

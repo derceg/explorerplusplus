@@ -55,7 +55,10 @@ public:
 
 	ItemType *AddItem(std::unique_ptr<ItemType> item, size_t index)
 	{
-		assert(index <= m_items.size());
+		if (index > m_items.size())
+		{
+			index = m_items.size();
+		}
 
 		item->AddUpdatedObserver(std::bind_front(&MovableModel::OnItemUpdated, this));
 
@@ -68,9 +71,9 @@ public:
 
 	void MoveItem(ItemType *item, size_t index)
 	{
-		if (index > m_items.size())
+		if (index >= m_items.size())
 		{
-			index = m_items.size();
+			index = m_items.size() - 1;
 		}
 
 		auto oldIndex = GetItemIndex(item);
