@@ -182,12 +182,6 @@
     <ClCompile Include="PopupMenuViewTest.cpp">
       <Filter>Core\UI\Views</Filter>
     </ClCompile>
-    <ClCompile Include="AcceleratorHelperTest.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="AcceleratorManagerTest.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="GlobalHistoryMenuTest.cpp">
       <Filter>Core\UI</Filter>
     </ClCompile>
@@ -216,6 +210,15 @@
     </ClCompile>
     <ClCompile Include="VersionHelperTest.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="AcceleratorHelperTest.cpp">
+      <Filter>Core\Accelerators</Filter>
+    </ClCompile>
+    <ClCompile Include="AcceleratorManagerTest.cpp">
+      <Filter>Core\Accelerators</Filter>
+    </ClCompile>
+    <ClCompile Include="AcceleratorTestHelper.cpp">
+      <Filter>Core\Accelerators</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -300,6 +303,9 @@
     <Filter Include="Data Exchange\Clipboard">
       <UniqueIdentifier>{5c4bd6f7-12e3-4e04-a155-20a51b38b5fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Accelerators">
+      <UniqueIdentifier>{8573b1f7-785d-4e8a-8646-136d0fd51cbd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -360,6 +366,9 @@
     </ClInclude>
     <ClInclude Include="ShellTestHelper.h" />
     <ClInclude Include="GdiplusTestHelper.h" />
+    <ClInclude Include="AcceleratorTestHelper.h">
+      <Filter>Core\Accelerators</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="EmbeddedResources\basic.png">

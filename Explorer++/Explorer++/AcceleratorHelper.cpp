@@ -160,7 +160,7 @@ std::vector<ACCEL> TableToAcceleratorItems(HACCEL acceleratorTable)
 	return accelerators;
 }
 
-wil::unique_haccel AcceleratorItemsToTable(const std::vector<ACCEL> &accelerators)
+wil::unique_haccel AcceleratorItemsToTable(std::span<const ACCEL> accelerators)
 {
 	wil::unique_haccel acceleratorTable(CreateAcceleratorTable(
 		const_cast<ACCEL *>(accelerators.data()), static_cast<int>(accelerators.size())));

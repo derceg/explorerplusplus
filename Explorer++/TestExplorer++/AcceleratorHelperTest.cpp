@@ -4,9 +4,12 @@
 
 #include "pch.h"
 #include "AcceleratorHelper.h"
+#include "AcceleratorTestHelper.h"
 #include <gtest/gtest.h>
 
-TEST(BuildAcceleratorStringTest, BuildString)
+using namespace testing;
+
+TEST(AcceleratorHelperTest, BuildAcceleratorString)
 {
 	ACCEL accelerator = {};
 	accelerator.fVirt = FVIRTKEY;
@@ -25,4 +28,15 @@ TEST(BuildAcceleratorStringTest, BuildString)
 	accelerator.key = 'P';
 	acceleratorText = BuildAcceleratorString(accelerator);
 	EXPECT_EQ(acceleratorText, L"Ctrl+Shift+P");
+}
+
+TEST(AcceleratorHelperTest, AcceleratorTableConversion)
+{
+	WORD commandIdCounter = 1;
+	const ACCEL accelerators[] = { { FVIRTKEY | FCONTROL, 'A', commandIdCounter++ },
+		{ FVIRTKEY | FCONTROL | FSHIFT, VK_F6, commandIdCounter++ },
+		{ FVIRTKEY | FALT, 'K', commandIdCounter++ }, { FVIRTKEY, VK_F2, commandIdCounter++ } };
+	auto table = AcceleratorItemsToTable(accelerators);
+	auto outputAccelerators = TableToAcceleratorItems(table.get());
+	EXPECT_THAT(outputAccelerators, ElementsAreArray(accelerators));
 }

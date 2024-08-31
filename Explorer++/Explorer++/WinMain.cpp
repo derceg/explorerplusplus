@@ -12,6 +12,7 @@
 #include "CommandLine.h"
 #include "Console.h"
 #include "CrashHandlerHelper.h"
+#include "DefaultAccelerators.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ModelessDialogs.h"
@@ -250,10 +251,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	InitializeLocale();
 
-	wil::unique_haccel acceleratorTable(
-		LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINACCELERATORS)));
-	CHECK(acceleratorTable);
-	AcceleratorManager acceleratorManager(std::move(acceleratorTable));
+	auto acceleratorManager = InitializeAcceleratorManager();
 
 	Explorerplusplus::InitializationData initializationData;
 	initializationData.commandLineSettings = &commandLineSettings;

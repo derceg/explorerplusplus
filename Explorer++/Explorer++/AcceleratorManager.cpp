@@ -6,10 +6,9 @@
 #include "AcceleratorManager.h"
 #include "AcceleratorHelper.h"
 
-AcceleratorManager::AcceleratorManager(wil::unique_haccel acceleratorTable)
+AcceleratorManager::AcceleratorManager(std::span<const ACCEL> accelerators)
 {
-	m_acceleratorTable = std::move(acceleratorTable);
-	m_accelerators = TableToAcceleratorItems(m_acceleratorTable.get());
+	SetAccelerators(accelerators);
 }
 
 HACCEL AcceleratorManager::GetAcceleratorTable() const
@@ -22,10 +21,10 @@ const std::vector<ACCEL> &AcceleratorManager::GetAccelerators() const
 	return m_accelerators;
 }
 
-void AcceleratorManager::SetAccelerators(const std::vector<ACCEL> &updatedAccelerators)
+void AcceleratorManager::SetAccelerators(std::span<const ACCEL> updatedAccelerators)
 {
 	m_acceleratorTable = AcceleratorItemsToTable(updatedAccelerators);
-	m_accelerators = updatedAccelerators;
+	m_accelerators = { updatedAccelerators.begin(), updatedAccelerators.end() };
 }
 
 std::optional<ACCEL> AcceleratorManager::GetAcceleratorForCommand(WORD command) const

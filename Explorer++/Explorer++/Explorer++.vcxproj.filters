@@ -250,12 +250,6 @@
     <ClCompile Include="Console.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="AcceleratorUpdater.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="AcceleratorHelper.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="MainMenu.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -646,9 +640,6 @@
     <ClCompile Include="MainMenuSubMenuView.cpp">
       <Filter>Core\UI\Views</Filter>
     </ClCompile>
-    <ClCompile Include="AcceleratorManager.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="GlobalHistoryMenu.cpp">
       <Filter>Core\UI</Filter>
     </ClCompile>
@@ -681,6 +672,18 @@
     </ClCompile>
     <ClCompile Include="Version.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="AcceleratorUpdater.cpp">
+      <Filter>Core\Accelerators</Filter>
+    </ClCompile>
+    <ClCompile Include="DefaultAccelerators.cpp">
+      <Filter>Core\Accelerators</Filter>
+    </ClCompile>
+    <ClCompile Include="AcceleratorManager.cpp">
+      <Filter>Core\Accelerators</Filter>
+    </ClCompile>
+    <ClCompile Include="AcceleratorHelper.cpp">
+      <Filter>Core\Accelerators</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -822,9 +825,6 @@
     <ClInclude Include="Plugins\AcceleratorParser.h">
       <Filter>Plugins</Filter>
     </ClInclude>
-    <ClInclude Include="Accelerator.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="Plugins\PluginCommandManager.h">
       <Filter>Plugins</Filter>
     </ClInclude>
@@ -902,15 +902,6 @@
     </ClInclude>
     <ClInclude Include="TabBacking.h">
       <Filter>Tabs</Filter>
-    </ClInclude>
-    <ClInclude Include="AcceleratorMappings.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="AcceleratorUpdater.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="AcceleratorHelper.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="NoTranslationResource.h">
       <Filter>Resource Files</Filter>
@@ -1362,9 +1353,6 @@
     <ClInclude Include="MainMenuSubMenuView.h">
       <Filter>Core\UI\Views</Filter>
     </ClInclude>
-    <ClInclude Include="AcceleratorManager.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="GlobalHistoryMenu.h">
       <Filter>Core\UI</Filter>
     </ClInclude>
@@ -1400,6 +1388,24 @@
     </ClInclude>
     <ClInclude Include="Version.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="AcceleratorUpdater.h">
+      <Filter>Core\Accelerators</Filter>
+    </ClInclude>
+    <ClInclude Include="DefaultAccelerators.h">
+      <Filter>Core\Accelerators</Filter>
+    </ClInclude>
+    <ClInclude Include="AcceleratorMappings.h">
+      <Filter>Core\Accelerators</Filter>
+    </ClInclude>
+    <ClInclude Include="AcceleratorManager.h">
+      <Filter>Core\Accelerators</Filter>
+    </ClInclude>
+    <ClInclude Include="AcceleratorHelper.h">
+      <Filter>Core\Accelerators</Filter>
+    </ClInclude>
+    <ClInclude Include="Accelerator.h">
+      <Filter>Core\Accelerators</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1556,6 +1562,9 @@
     </Filter>
     <Filter Include="Data Exchange\Clipboard">
       <UniqueIdentifier>{cadaacd3-aced-4afa-8fbf-e334258b9316}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Accelerators">
+      <UniqueIdentifier>{4a6efb22-1fee-46bd-a375-12e500fe4fda}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

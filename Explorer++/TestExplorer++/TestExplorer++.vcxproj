@@ -185,6 +185,7 @@
   <ItemGroup>
     <ClCompile Include="AcceleratorHelperTest.cpp" />
     <ClCompile Include="AcceleratorManagerTest.cpp" />
+    <ClCompile Include="AcceleratorTestHelper.cpp" />
     <ClCompile Include="ApplicationDropperTest.cpp" />
     <ClCompile Include="ApplicationTest.cpp" />
     <ClCompile Include="ApplicationHelperTest.cpp" />
@@ -295,6 +296,7 @@
     <ResourceCompile Include="TestResources.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AcceleratorTestHelper.h" />
     <ClInclude Include="ApplicationToolbarStorageTestHelper.h" />
     <ClInclude Include="BookmarkStorageTestHelper.h" />
     <ClInclude Include="BookmarkTreeHelper.h" />

@@ -11,12 +11,11 @@
 class AcceleratorManager
 {
 public:
-	// Initializes the accelerators from the provided accelerator table.
-	AcceleratorManager(wil::unique_haccel acceleratorTable);
+	AcceleratorManager(std::span<const ACCEL> accelerators);
 
 	HACCEL GetAcceleratorTable() const;
 	const std::vector<ACCEL> &GetAccelerators() const;
-	void SetAccelerators(const std::vector<ACCEL> &updatedAccelerators);
+	void SetAccelerators(std::span<const ACCEL> updatedAccelerators);
 	std::optional<ACCEL> GetAcceleratorForCommand(WORD command) const;
 
 private:

@@ -4,7 +4,6 @@
 //
 #define IDI_MAIN                        105
 #define IDI_DISPLAYWINDOW               106
-#define IDR_MAINACCELERATORS            152
 #define IDB_NOPREVIEWAVAILABLE          236
 #define IDB_CUT_16                      250
 #define IDB_CUT_WINDOWS_10_16           251
