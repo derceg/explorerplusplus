@@ -40,3 +40,19 @@ TEST(AcceleratorHelperTest, AcceleratorTableConversion)
 	auto outputAccelerators = TableToAcceleratorItems(table.get());
 	EXPECT_THAT(outputAccelerators, ElementsAreArray(accelerators));
 }
+
+TEST(AcceleratorHelperTest, Validity)
+{
+	WORD commandIdCounter = 1;
+	EXPECT_FALSE(DoAcceleratorsContainCtrlAlt({ { { FVIRTKEY | FCONTROL, 'T', commandIdCounter++ },
+		{ FVIRTKEY | FCONTROL | FSHIFT, 'N', commandIdCounter++ } } }));
+	EXPECT_TRUE(DoAcceleratorsContainCtrlAlt({ { { FVIRTKEY, VK_F1, commandIdCounter++ },
+		{ FVIRTKEY | FCONTROL | FALT, 'W', commandIdCounter++ } } }));
+
+	EXPECT_FALSE(DoAcceleratorsContainDuplicates(
+		{ { { FVIRTKEY | FCONTROL | FSHIFT, 'P', commandIdCounter++ },
+			{ FVIRTKEY, VK_F3, commandIdCounter++ } } }));
+	EXPECT_TRUE(
+		DoAcceleratorsContainDuplicates({ { { FVIRTKEY | FCONTROL, 'A', commandIdCounter++ },
+			{ FVIRTKEY | FCONTROL, 'A', commandIdCounter++ } } }));
+}

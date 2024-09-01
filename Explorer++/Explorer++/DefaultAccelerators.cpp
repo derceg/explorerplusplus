@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "DefaultAccelerators.h"
+#include "AcceleratorHelper.h"
 #include "AcceleratorManager.h"
 #include "MainResource.h"
 
@@ -50,8 +51,8 @@ constexpr ACCEL g_defaultAccelerators[] = {
 	{ FVIRTKEY | FCONTROL | FSHIFT, 'M', IDM_EDIT_MOVETOFOLDER },
 	{ FVIRTKEY | FCONTROL | FSHIFT, 'V', IDM_EDIT_PASTESHORTCUT },
 	{ FVIRTKEY | FCONTROL | FSHIFT, 'N', IDM_EDIT_SELECTNONE },
-	{ FVIRTKEY | FCONTROL | FALT, 'D', IDM_EDIT_WILDCARDDESELECT },
-	{ FVIRTKEY | FCONTROL | FALT, 'S', IDM_EDIT_WILDCARDSELECTION },
+	{ FVIRTKEY | FCONTROL | FSHIFT, 'W', IDM_EDIT_WILDCARDDESELECT },
+	{ FVIRTKEY | FCONTROL | FSHIFT, 'S', IDM_EDIT_WILDCARDSELECTION },
 	{ FVIRTKEY | FCONTROL, 'W', IDM_FILE_CLOSETAB },
 	{ FVIRTKEY | FCONTROL, VK_F4, IDM_FILE_CLOSETAB },
 	{ FVIRTKEY | FCONTROL | FSHIFT, 'P', IDM_FILE_COPYFOLDERPATH },
@@ -87,6 +88,8 @@ constexpr ACCEL g_defaultAccelerators[] = {
 	{ FVIRTKEY | FCONTROL | FSHIFT, '7', IDM_VIEW_LARGETHUMBNAILS }
 };
 // clang-format on
+
+static_assert(AreAcceleratorsValid(g_defaultAccelerators));
 
 }
 

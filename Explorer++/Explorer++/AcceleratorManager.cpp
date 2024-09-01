@@ -23,6 +23,8 @@ const std::vector<ACCEL> &AcceleratorManager::GetAccelerators() const
 
 void AcceleratorManager::SetAccelerators(std::span<const ACCEL> updatedAccelerators)
 {
+	DCHECK(AreAcceleratorsValid(updatedAccelerators));
+
 	m_acceleratorTable = AcceleratorItemsToTable(updatedAccelerators);
 	m_accelerators = { updatedAccelerators.begin(), updatedAccelerators.end() };
 }
