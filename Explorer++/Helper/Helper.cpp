@@ -785,7 +785,9 @@ bool IsExtendedKey(UINT key)
 		|| key == VK_INSERT
 		|| key == VK_DELETE
 		|| key == VK_DIVIDE
-		|| key == VK_NUMLOCK)
+		|| key == VK_NUMLOCK
+		|| key == VK_ADD
+		|| key == VK_SUBTRACT)
 	// clang-format on
 	{
 		return true;

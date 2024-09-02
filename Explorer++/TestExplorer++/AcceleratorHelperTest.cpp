@@ -28,6 +28,20 @@ TEST(AcceleratorHelperTest, BuildAcceleratorString)
 	accelerator.key = 'P';
 	acceleratorText = BuildAcceleratorString(accelerator);
 	EXPECT_EQ(acceleratorText, L"Ctrl+Shift+P");
+
+	// This should generate the string "Ctrl++" (and not something like "Ctrl+Num +").
+	accelerator = {};
+	accelerator.fVirt = FVIRTKEY | FCONTROL;
+	accelerator.key = VK_ADD;
+	acceleratorText = BuildAcceleratorString(accelerator);
+	EXPECT_EQ(acceleratorText, L"Ctrl++");
+
+	// And this should be "Ctrl+-" (not "Ctrl+Num -").
+	accelerator = {};
+	accelerator.fVirt = FVIRTKEY | FCONTROL;
+	accelerator.key = VK_SUBTRACT;
+	acceleratorText = BuildAcceleratorString(accelerator);
+	EXPECT_EQ(acceleratorText, L"Ctrl+-");
 }
 
 TEST(AcceleratorHelperTest, AcceleratorTableConversion)
