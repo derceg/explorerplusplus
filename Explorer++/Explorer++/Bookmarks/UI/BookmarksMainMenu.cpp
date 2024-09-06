@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
+#include "AcceleratorHelper.h"
 #include "Bookmarks/BookmarkHelper.h"
 #include "Bookmarks/BookmarkTree.h"
 #include "BrowserWindow.h"
@@ -91,6 +92,8 @@ wil::unique_hmenu BookmarksMainMenu::BuildMainBookmarksMenu(
 		menuInfo);
 	AddOtherBookmarksToMenu(menu.get(), { menuInfo.nextMenuId, m_menuIdRange.endId },
 		GetMenuItemCount(menu.get()), menuImages, menuInfo);
+
+	UpdateMenuAcceleratorStrings(menu.get(), m_coreInterface->GetAcceleratorManager());
 
 	return menu;
 }

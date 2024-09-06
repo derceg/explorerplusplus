@@ -91,9 +91,25 @@ constexpr ACCEL g_defaultAccelerators[] = {
 
 static_assert(AreAcceleratorsValid(g_defaultAccelerators));
 
+// Some shortcut combinations are scoped to particular controls. Despite that fact, the shortcuts
+// should still be shown in menu entries. That's the reason for the array here.
+// Note that this is considered temporary. These shortcuts should be handled jointly with the rest
+// of the accelerator items. When that's done, this array can be removed.
+// clang-format off
+constexpr ACCEL g_nonAcceleratorShortcuts[] = {
+	{ FVIRTKEY | FCONTROL, 'C', IDM_EDIT_COPY },
+	{ FVIRTKEY | FCONTROL, 'X', IDM_EDIT_CUT },
+	{ FVIRTKEY | FCONTROL, 'I', IDM_EDIT_INVERTSELECTION },
+	{ FVIRTKEY | FCONTROL, 'V', IDM_EDIT_PASTE },
+	{ FVIRTKEY | FCONTROL, 'A', IDM_EDIT_SELECTALL },
+	{ FVIRTKEY | FCONTROL, 'Z', IDM_EDIT_UNDO },
+	{ FVIRTKEY, VK_DELETE, IDM_FILE_DELETE }
+};
+// clang-format on
+
 }
 
 AcceleratorManager InitializeAcceleratorManager()
 {
-	return { g_defaultAccelerators };
+	return { g_defaultAccelerators, g_nonAcceleratorShortcuts };
 }

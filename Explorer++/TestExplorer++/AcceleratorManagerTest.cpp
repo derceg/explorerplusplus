@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "AcceleratorManager.h"
 #include "AcceleratorTestHelper.h"
+#include <boost/range/join.hpp>
 #include <gtest/gtest.h>
 #include <vector>
 
@@ -17,18 +18,21 @@ protected:
 		m_accelerators({ { FVIRTKEY, VK_DELETE, m_commandIdCounter++ },
 			{ FVIRTKEY, VK_F1, m_commandIdCounter++ },
 			{ FVIRTKEY | FCONTROL, 'C', m_commandIdCounter++ } }),
-		m_acceleratorManager(m_accelerators)
+		m_nonAcceleratorShortcuts({ { FVIRTKEY, VK_BACK, m_commandIdCounter++ },
+			{ FVIRTKEY, VK_UP, m_commandIdCounter++ } }),
+		m_acceleratorManager(m_accelerators, m_nonAcceleratorShortcuts)
 	{
 	}
 
 	WORD m_commandIdCounter = 1;
 	std::vector<ACCEL> m_accelerators;
+	std::vector<ACCEL> m_nonAcceleratorShortcuts;
 	AcceleratorManager m_acceleratorManager;
 };
 
 TEST_F(AcceleratorManagerTest, GetAccelerators)
 {
-	for (const auto &accelerator : m_accelerators)
+	for (const auto &accelerator : boost::range::join(m_accelerators, m_nonAcceleratorShortcuts))
 	{
 		auto retrievedAccelerator = m_acceleratorManager.GetAcceleratorForCommand(accelerator.cmd);
 		EXPECT_EQ(retrievedAccelerator, accelerator);

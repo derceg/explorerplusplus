@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "AcceleratorHelper.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "FeatureList.h"
 #include "GlobalHistoryMenu.h"
@@ -96,6 +97,8 @@ void Explorerplusplus::InitializeMainMenu()
 
 	AddGetMenuItemHelperTextObserver(
 		std::bind_front(&Explorerplusplus::MaybeGetMenuItemHelperText, this));
+
+	UpdateMenuAcceleratorStrings(mainMenu, m_acceleratorManager);
 }
 
 void Explorerplusplus::SetMainMenuImages()

@@ -8,8 +8,10 @@
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include <boost/algorithm/string/join.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
-void UpdateMenuItemAcceleratorString(HMENU menu, UINT id, const std::vector<ACCEL> &accelerators);
+void UpdateMenuItemAcceleratorString(HMENU menu, UINT id,
+	const AcceleratorManager *acceleratorManager);
 std::wstring VirtualKeyToString(UINT key);
 
 void UpdateMenuAcceleratorStrings(HMENU menu, const AcceleratorManager *acceleratorManager)
@@ -20,8 +22,6 @@ void UpdateMenuAcceleratorStrings(HMENU menu, const AcceleratorManager *accelera
 	{
 		return;
 	}
-
-	const auto &accelerators = acceleratorManager->GetAccelerators();
 
 	for (int i = 0; i < numItems; i++)
 	{
@@ -38,12 +38,13 @@ void UpdateMenuAcceleratorStrings(HMENU menu, const AcceleratorManager *accelera
 		}
 		else
 		{
-			UpdateMenuItemAcceleratorString(menu, id, accelerators);
+			UpdateMenuItemAcceleratorString(menu, id, acceleratorManager);
 		}
 	}
 }
 
-void UpdateMenuItemAcceleratorString(HMENU menu, UINT id, const std::vector<ACCEL> &accelerators)
+void UpdateMenuItemAcceleratorString(HMENU menu, UINT id,
+	const AcceleratorManager *acceleratorManager)
 {
 	MENUITEMINFO mii;
 	TCHAR menuText[256];
@@ -60,10 +61,22 @@ void UpdateMenuItemAcceleratorString(HMENU menu, UINT id, const std::vector<ACCE
 		return;
 	}
 
-	// Note that there may be multiple key bindings for a particular command. If
-	// there are, the block below will simply return the first one.
-	auto itr = std::find_if(accelerators.begin(), accelerators.end(),
-		[id](const ACCEL &accel) { return accel.cmd == id; });
+	std::optional<ACCEL> accelerator;
+
+	try
+	{
+		// There is a mismatch here - menu item IDs are UINTs, though the IDs are treated as WORDs
+		// in a few different areas. For example, WM_COMMAND treats the IDs as WORDs, as does
+		// WM_MENUSELECT. Additionally, the accelerator system also treats the IDs as WORDs, which
+		// is the reason for the conversion here.
+		accelerator = acceleratorManager->GetAcceleratorForCommand(boost::numeric_cast<WORD>(id));
+	}
+	catch (const boost::numeric::bad_numeric_cast &)
+	{
+		// Since menu item IDs are typically treated as words, there shouldn't be any IDs that don't
+		// fit within a WORD.
+		DCHECK(false);
+	}
 
 	std::wstring text = menuText;
 	auto tabPosition = text.find('\t');
@@ -77,9 +90,9 @@ void UpdateMenuItemAcceleratorString(HMENU menu, UINT id, const std::vector<ACCE
 		text.erase(tabPosition);
 	}
 
-	if (itr != accelerators.end())
+	if (accelerator)
 	{
-		std::wstring acceleratorString = BuildAcceleratorString(*itr);
+		std::wstring acceleratorString = BuildAcceleratorString(*accelerator);
 
 		if (!acceleratorString.empty())
 		{

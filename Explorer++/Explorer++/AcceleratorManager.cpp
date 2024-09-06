@@ -5,8 +5,11 @@
 #include "stdafx.h"
 #include "AcceleratorManager.h"
 #include "AcceleratorHelper.h"
+#include <boost/range/join.hpp>
 
-AcceleratorManager::AcceleratorManager(std::span<const ACCEL> accelerators)
+AcceleratorManager::AcceleratorManager(std::span<const ACCEL> accelerators,
+	std::span<const ACCEL> nonAcceleratorShortcuts) :
+	m_nonAcceleratorShortcuts(nonAcceleratorShortcuts.begin(), nonAcceleratorShortcuts.end())
 {
 	SetAccelerators(accelerators);
 }
@@ -31,10 +34,11 @@ void AcceleratorManager::SetAccelerators(std::span<const ACCEL> updatedAccelerat
 
 std::optional<ACCEL> AcceleratorManager::GetAcceleratorForCommand(WORD command) const
 {
-	auto itr = std::find_if(m_accelerators.begin(), m_accelerators.end(),
+	auto combinedItems = boost::range::join(m_accelerators, m_nonAcceleratorShortcuts);
+	auto itr = std::ranges::find_if(combinedItems,
 		[command](const ACCEL &accel) { return accel.cmd == command; });
 
-	if (itr == m_accelerators.end())
+	if (itr == combinedItems.end())
 	{
 		return std::nullopt;
 	}
