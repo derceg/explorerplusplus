@@ -1031,6 +1031,7 @@
     <ClCompile Include="MenuView.cpp" />
     <ClCompile Include="PasteSymLinksClient.cpp" />
     <ClCompile Include="PasteSymLinksServer.cpp" />
+    <ClCompile Include="TabContainerBackgroundContextMenu.cpp" />
     <ClCompile Include="TabHistoryMenu.cpp" />
     <ClCompile Include="HistoryService.cpp" />
     <ClCompile Include="HistoryServiceFactory.cpp" />
@@ -1295,6 +1296,7 @@
     <ClInclude Include="PasteSymLinksClient.h" />
     <ClInclude Include="PasteSymLinksServer.h" />
     <ClInclude Include="PasteSymLinksServerClientBase.h" />
+    <ClInclude Include="TabContainerBackgroundContextMenu.h" />
     <ClInclude Include="TabHistoryMenu.h" />
     <ClInclude Include="HistoryService.h" />
     <ClInclude Include="HistoryServiceFactory.h" />

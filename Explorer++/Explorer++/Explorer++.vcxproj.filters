@@ -685,6 +685,9 @@
     <ClCompile Include="AcceleratorHelper.cpp">
       <Filter>Core\Accelerators</Filter>
     </ClCompile>
+    <ClCompile Include="TabContainerBackgroundContextMenu.cpp">
+      <Filter>Tabs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1406,6 +1409,9 @@
     </ClInclude>
     <ClInclude Include="Accelerator.h">
       <Filter>Core\Accelerators</Filter>
+    </ClInclude>
+    <ClInclude Include="TabContainerBackgroundContextMenu.h">
+      <Filter>Tabs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

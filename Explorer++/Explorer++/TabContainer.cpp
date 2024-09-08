@@ -10,6 +10,7 @@
 #include "Icon.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
+#include "PopupMenuView.h"
 #include "PreservedTab.h"
 #include "RenameTabDialog.h"
 #include "ResourceHelper.h"
@@ -18,6 +19,7 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "SystemFontHelper.h"
 #include "TabBacking.h"
+#include "TabContainerBackgroundContextMenu.h"
 #include "TabRestorer.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/Controls.h"
@@ -603,54 +605,12 @@ LRESULT TabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 void TabContainer::ShowBackgroundContextMenu(const POINT &ptClient)
 {
-	wil::unique_hmenu parentMenu(
-		LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_TAB_CONTAINER_CONTEXT_MENU)));
-
-	if (!parentMenu)
-	{
-		return;
-	}
-
-	HMENU menu = GetSubMenu(parentMenu.get(), 0);
-
-	if (m_coreInterface->GetTabRestorer()->GetClosedTabs().empty())
-	{
-		MenuHelper::EnableItem(menu, IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB, FALSE);
-	}
-
 	POINT ptScreen = ptClient;
 	ClientToScreen(m_hwnd, &ptScreen);
 
-	int menuItemId = TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RETURNCMD, ptScreen.x, ptScreen.y, 0,
-		m_hwnd, nullptr);
-
-	if (menuItemId != 0)
-	{
-		OnBackgroundMenuItemSelected(menuItemId);
-	}
-}
-
-void TabContainer::OnBackgroundMenuItemSelected(int menuItemId)
-{
-	switch (menuItemId)
-	{
-	case IDM_TAB_CONTAINER_NEW_TAB:
-		CreateNewTabInDefaultDirectory(TabSettings(_selected = true));
-		break;
-
-	case IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB:
-		m_coreInterface->GetTabRestorer()->RestoreLastTab();
-		break;
-
-	case IDM_TAB_CONTAINER_BOOKMARK_ALL_TABS:
-		BookmarkHelper::BookmarkAllTabs(m_bookmarkTree, m_resourceInstance, m_hwnd,
-			m_coreInterface);
-		break;
-
-	default:
-		assert(false);
-		break;
-	}
+	PopupMenuView popupMenu;
+	TabContainerBackgroundContextMenu menu(&popupMenu, this, m_bookmarkTree, m_coreInterface);
+	popupMenu.Show(m_hwnd, ptScreen);
 }
 
 void TabContainer::OnGetDispInfo(NMTTDISPINFO *dispInfo)
