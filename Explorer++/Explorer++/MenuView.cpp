@@ -14,9 +14,8 @@ MenuView::~MenuView()
 void MenuView::AppendItem(UINT id, const std::wstring &text, wil::unique_hbitmap bitmap,
 	const std::wstring &helpText)
 {
-	// The call to TrackPopupMenu() below will return the ID of the item that was selected, with
-	// 0 being returned if the menu was canceled, or an error occurred. Therefore, 0 shouldn't
-	// be used as an item ID.
+	// The value 0 shouldn't be used as an item ID. That's because a call like TrackPopupMenu() will
+	// use a return value of 0 to indicate the menu was canceled, or an error occurred.
 	DCHECK_NE(id, 0U);
 
 	MENUITEMINFO menuItemInfo = {};
