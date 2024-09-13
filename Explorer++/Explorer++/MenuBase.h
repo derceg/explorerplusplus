@@ -9,6 +9,9 @@
 
 class MenuView;
 
+// This class, along with MenuView, is used to implement an MVP menu system. That is, the view is
+// considered passive and only contains general display logic. A class that derives from this class
+// functions as a presenter and is responsible for retrieving model data and adding it to the view.
 class MenuBase
 {
 public:
