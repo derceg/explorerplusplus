@@ -112,6 +112,11 @@ void DarkModeHelper::EnableForApp(bool enable)
 	FlushMenuThemes();
 	RefreshImmersiveColorPolicyState();
 
+	// This detour seemingly causes an illegal instruction (0xc000001d) crash on ARM64 (see #478),
+	// which is the reason for the check here. Note that while disabling this detour on ARM64
+	// prevents the crash, it also means some scrollbars (e.g. the listview scrollbar) will appear
+	// light when dark mode is enabled on ARM64.
+#if !defined(BUILD_ARM64)
 	LONG res;
 
 	if (enable)
@@ -124,6 +129,7 @@ void DarkModeHelper::EnableForApp(bool enable)
 	}
 
 	DCHECK_EQ(res, NO_ERROR);
+#endif
 
 	m_darkModeEnabled = enable;
 
