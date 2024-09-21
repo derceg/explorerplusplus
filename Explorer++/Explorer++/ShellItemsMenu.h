@@ -19,8 +19,9 @@ class IconFetcher;
 class ShellItemsMenu : public MenuBase
 {
 public:
-	ShellItemsMenu(MenuView *menuView, const std::vector<PidlAbsolute> &pidls,
-		BrowserWindow *browserWindow, IconFetcher *iconFetcher, UINT menuStartId = 1,
+	ShellItemsMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
+		const std::vector<PidlAbsolute> &pidls, BrowserWindow *browserWindow,
+		IconFetcher *iconFetcher, UINT menuStartId = 1,
 		UINT menuEndId = (std::numeric_limits<UINT>::max)());
 	~ShellItemsMenu();
 

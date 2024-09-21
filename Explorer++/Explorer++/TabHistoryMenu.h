@@ -26,7 +26,8 @@ public:
 		Forward
 	};
 
-	TabHistoryMenu(MenuView *menuView, BrowserWindow *browserWindow, MenuType type);
+	TabHistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
+		BrowserWindow *browserWindow, MenuType type);
 
 private:
 	void Initialize();

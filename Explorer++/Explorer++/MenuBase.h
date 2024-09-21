@@ -7,6 +7,7 @@
 #include <boost/signals2.hpp>
 #include <vector>
 
+class AcceleratorManager;
 class MenuView;
 
 // This class, along with MenuView, is used to implement an MVP menu system. That is, the view is
@@ -15,15 +16,18 @@ class MenuView;
 class MenuBase
 {
 public:
-	MenuBase(MenuView *menuView);
+	MenuBase(MenuView *menuView, const AcceleratorManager *acceleratorManager);
 
 	virtual ~MenuBase() = default;
 
 protected:
+	std::optional<std::wstring> GetAcceleratorTextForId(UINT id) const;
+
 	MenuView *const m_menuView;
 
 private:
 	void OnViewDestroyed();
 
+	const AcceleratorManager *const m_acceleratorManager;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

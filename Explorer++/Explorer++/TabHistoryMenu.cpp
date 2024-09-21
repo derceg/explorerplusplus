@@ -16,8 +16,9 @@
 #include "../Helper/ImageHelper.h"
 #include "../Helper/ShellHelper.h"
 
-TabHistoryMenu::TabHistoryMenu(MenuView *menuView, BrowserWindow *browserWindow, MenuType type) :
-	MenuBase(menuView),
+TabHistoryMenu::TabHistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
+	BrowserWindow *browserWindow, MenuType type) :
+	MenuBase(menuView, acceleratorManager),
 	m_browserWindow(browserWindow),
 	m_type(type)
 {

@@ -15,6 +15,10 @@ public:
 	AcceleratorManager(std::span<const ACCEL> accelerators,
 		std::span<const ACCEL> nonAcceleratorShortcuts);
 
+	// This is useful in tests. There are cases where an AcceleratorManager instance needs to be
+	// provided, but there's no need to provide any accelerators.
+	AcceleratorManager() = default;
+
 	HACCEL GetAcceleratorTable() const;
 	const std::vector<ACCEL> &GetAccelerators() const;
 	void SetAccelerators(std::span<const ACCEL> updatedAccelerators);

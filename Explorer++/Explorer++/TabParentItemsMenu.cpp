@@ -9,17 +9,20 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "../Helper/ShellHelper.h"
 
-TabParentItemsMenu::TabParentItemsMenu(MenuView *menuView, BrowserWindow *browserWindow,
+TabParentItemsMenu::TabParentItemsMenu(MenuView *menuView,
+	const AcceleratorManager *acceleratorManager, BrowserWindow *browserWindow,
 	IconFetcher *iconFetcher) :
-	ShellItemsMenu(menuView, GetParentPidlCollection(browserWindow->GetActiveShellBrowser()),
-		browserWindow, iconFetcher)
+	ShellItemsMenu(menuView, acceleratorManager,
+		GetParentPidlCollection(browserWindow->GetActiveShellBrowser()), browserWindow, iconFetcher)
 {
 }
 
-TabParentItemsMenu::TabParentItemsMenu(MenuView *menuView, BrowserWindow *browserWindow,
+TabParentItemsMenu::TabParentItemsMenu(MenuView *menuView,
+	const AcceleratorManager *acceleratorManager, BrowserWindow *browserWindow,
 	IconFetcher *iconFetcher, UINT menuStartId, UINT menuEndId) :
-	ShellItemsMenu(menuView, GetParentPidlCollection(browserWindow->GetActiveShellBrowser()),
-		browserWindow, iconFetcher, menuStartId, menuEndId)
+	ShellItemsMenu(menuView, acceleratorManager,
+		GetParentPidlCollection(browserWindow->GetActiveShellBrowser()), browserWindow, iconFetcher,
+		menuStartId, menuEndId)
 {
 }
 

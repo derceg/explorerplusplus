@@ -13,8 +13,9 @@
 #include "TabRestorer.h"
 
 TabContainerBackgroundContextMenu::TabContainerBackgroundContextMenu(MenuView *menuView,
-	TabContainer *tabContainer, BookmarkTree *bookmarkTree, CoreInterface *coreInterface) :
-	MenuBase(menuView),
+	const AcceleratorManager *acceleratorManager, TabContainer *tabContainer,
+	BookmarkTree *bookmarkTree, CoreInterface *coreInterface) :
+	MenuBase(menuView, acceleratorManager),
 	m_tabContainer(tabContainer),
 	m_bookmarkTree(bookmarkTree),
 	m_coreInterface(coreInterface)
@@ -29,13 +30,16 @@ void TabContainerBackgroundContextMenu::BuildMenu()
 {
 	m_menuView->AppendItem(IDM_TAB_CONTAINER_NEW_TAB,
 		ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),
-			IDS_TAB_CONTAINER_MENU_NEW_TAB));
+			IDS_TAB_CONTAINER_MENU_NEW_TAB),
+		nullptr, L"", GetAcceleratorTextForId(IDM_FILE_NEWTAB));
 	m_menuView->AppendItem(IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB,
 		ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),
-			IDS_TAB_CONTAINER_MENU_REOPEN_CLOSED_TAB));
+			IDS_TAB_CONTAINER_MENU_REOPEN_CLOSED_TAB),
+		nullptr, L"", GetAcceleratorTextForId(IDA_RESTORE_LAST_TAB));
 	m_menuView->AppendItem(IDM_TAB_CONTAINER_BOOKMARK_ALL_TABS,
 		ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),
-			IDS_TAB_CONTAINER_MENU_BOOKMARK_ALL_TABS));
+			IDS_TAB_CONTAINER_MENU_BOOKMARK_ALL_TABS),
+		nullptr, L"", GetAcceleratorTextForId(IDM_BOOKMARKS_BOOKMARK_ALL_TABS));
 
 	if (m_coreInterface->GetTabRestorer()->GetClosedTabs().empty())
 	{

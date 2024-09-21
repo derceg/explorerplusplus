@@ -6,18 +6,21 @@
 #include "GlobalHistoryMenu.h"
 #include "HistoryService.h"
 
-GlobalHistoryMenu::GlobalHistoryMenu(MenuView *menuView, HistoryService *historyService,
+GlobalHistoryMenu::GlobalHistoryMenu(MenuView *menuView,
+	const AcceleratorManager *acceleratorManager, HistoryService *historyService,
 	BrowserWindow *browserWindow, IconFetcher *iconFetcher) :
-	ShellItemsMenu(menuView, GetHistoryItems(historyService), browserWindow, iconFetcher),
+	ShellItemsMenu(menuView, acceleratorManager, GetHistoryItems(historyService), browserWindow,
+		iconFetcher),
 	m_historyService(historyService)
 {
 	Initialize();
 }
 
-GlobalHistoryMenu::GlobalHistoryMenu(MenuView *menuView, HistoryService *historyService,
+GlobalHistoryMenu::GlobalHistoryMenu(MenuView *menuView,
+	const AcceleratorManager *acceleratorManager, HistoryService *historyService,
 	BrowserWindow *browserWindow, IconFetcher *iconFetcher, UINT menuStartId, UINT menuEndId) :
-	ShellItemsMenu(menuView, GetHistoryItems(historyService), browserWindow, iconFetcher,
-		menuStartId, menuEndId),
+	ShellItemsMenu(menuView, acceleratorManager, GetHistoryItems(historyService), browserWindow,
+		iconFetcher, menuStartId, menuEndId),
 	m_historyService(historyService)
 {
 	Initialize();

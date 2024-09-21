@@ -4,6 +4,7 @@
 
 #include "pch.h"
 #include "ShellItemsMenu.h"
+#include "AcceleratorManager.h"
 #include "BrowserWindowMock.h"
 #include "IconFetcher.h"
 #include "PopupMenuView.h"
@@ -117,14 +118,15 @@ protected:
 	std::unique_ptr<ShellItemsMenu> BuildMenu(MenuView *menuView,
 		const std::vector<PidlAbsolute> &pidls)
 	{
-		return std::make_unique<ShellItemsMenu>(menuView, pidls, &m_browserWindow, &m_iconFetcher);
+		return std::make_unique<ShellItemsMenu>(menuView, &m_acceleratorManager, pidls,
+			&m_browserWindow, &m_iconFetcher);
 	}
 
 	std::unique_ptr<ShellItemsMenu> BuildMenu(MenuView *menuView,
 		const std::vector<PidlAbsolute> &pidls, UINT menuStartId, UINT menuEndId)
 	{
-		return std::make_unique<ShellItemsMenu>(menuView, pidls, &m_browserWindow, &m_iconFetcher,
-			menuStartId, menuEndId);
+		return std::make_unique<ShellItemsMenu>(menuView, &m_acceleratorManager, pidls,
+			&m_browserWindow, &m_iconFetcher, menuStartId, menuEndId);
 	}
 
 	void CheckItemDetails(const MenuView &menuView, const std::vector<PidlAbsolute> &pidls)
@@ -140,6 +142,7 @@ protected:
 		}
 	}
 
+	AcceleratorManager m_acceleratorManager;
 	BrowserWindowMock m_browserWindow;
 	IconFetcherFake m_iconFetcher;
 };
@@ -235,7 +238,7 @@ protected:
 
 	ShellItemsMenuSelectionTest() :
 		m_pidls(BuildPidlCollection(3)),
-		m_menu(&m_popupMenu, m_pidls, &m_browserWindow, &m_iconFetcher)
+		m_menu(&m_popupMenu, &m_acceleratorManager, m_pidls, &m_browserWindow, &m_iconFetcher)
 	{
 	}
 
@@ -270,6 +273,7 @@ private:
 	}
 
 	PopupMenuView m_popupMenu;
+	AcceleratorManager m_acceleratorManager;
 	std::vector<PidlAbsolute> m_pidls;
 	BrowserWindowMock m_browserWindow;
 	IconFetcherFake m_iconFetcher;

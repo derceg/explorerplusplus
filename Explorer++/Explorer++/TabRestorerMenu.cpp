@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "TabRestorerMenu.h"
-#include "AcceleratorHelper.h"
 #include "AcceleratorManager.h"
 #include "MainResource.h"
 #include "MenuView.h"
@@ -15,12 +14,10 @@
 #include "../Helper/ShellHelper.h"
 #include <ranges>
 
-TabRestorerMenu::TabRestorerMenu(MenuView *menuView, TabRestorer *tabRestorer,
-	const AcceleratorManager *acceleratorManager, HINSTANCE resourceInstance, UINT menuStartId,
-	UINT menuEndId) :
-	MenuBase(menuView),
+TabRestorerMenu::TabRestorerMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
+	TabRestorer *tabRestorer, HINSTANCE resourceInstance, UINT menuStartId, UINT menuEndId) :
+	MenuBase(menuView, acceleratorManager),
 	m_tabRestorer(tabRestorer),
-	m_acceleratorManager(acceleratorManager),
 	m_resourceInstance(resourceInstance),
 	m_menuStartId(menuStartId),
 	m_menuEndId(menuEndId),
@@ -76,16 +73,6 @@ void TabRestorerMenu::AddMenuItemForClosedTab(const PreservedTab *closedTab,
 
 	std::wstring menuText = currentEntry->displayName;
 
-	if (addAcceleratorText)
-	{
-		auto accelerator = m_acceleratorManager->GetAcceleratorForCommand(IDA_RESTORE_LAST_TAB);
-
-		if (accelerator)
-		{
-			menuText += L"\t" + BuildAcceleratorString(*accelerator);
-		}
-	}
-
 	wil::unique_hbitmap bitmap;
 	auto iconIndex = currentEntry->systemIconIndex;
 
@@ -99,7 +86,15 @@ void TabRestorerMenu::AddMenuItemForClosedTab(const PreservedTab *closedTab,
 			ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), m_defaultFolderIconIndex);
 	}
 
-	m_menuView->AppendItem(id, menuText, std::move(bitmap), currentEntry->fullPathForDisplay);
+	std::optional<std::wstring> acceleratorText;
+
+	if (addAcceleratorText)
+	{
+		acceleratorText = GetAcceleratorTextForId(IDA_RESTORE_LAST_TAB);
+	}
+
+	m_menuView->AppendItem(id, menuText, std::move(bitmap), currentEntry->fullPathForDisplay,
+		acceleratorText);
 
 	auto [itr, didInsert] = m_menuItemMappings.insert({ id, closedTab->id });
 	DCHECK(didInsert);

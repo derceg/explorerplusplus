@@ -4,6 +4,7 @@
 
 #include "pch.h"
 #include "GlobalHistoryMenu.h"
+#include "AcceleratorManager.h"
 #include "BrowserWindowMock.h"
 #include "HistoryService.h"
 #include "IconFetcherMock.h"
@@ -18,7 +19,8 @@ class GlobalHistoryMenuTest : public Test
 {
 protected:
 	GlobalHistoryMenuTest() :
-		m_menu(&m_popupMenu, &m_historyService, &m_browserWindow, &m_iconFetcher)
+		m_menu(&m_popupMenu, &m_acceleratorManager, &m_historyService, &m_browserWindow,
+			&m_iconFetcher)
 	{
 	}
 
@@ -67,6 +69,7 @@ private:
 	}
 
 	PopupMenuView m_popupMenu;
+	AcceleratorManager m_acceleratorManager;
 	HistoryService m_historyService;
 	BrowserWindowMock m_browserWindow;
 	IconFetcherMock m_iconFetcher;

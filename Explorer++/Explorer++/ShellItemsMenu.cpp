@@ -12,9 +12,10 @@
 #include "../Helper/ShellHelper.h"
 #include <glog/logging.h>
 
-ShellItemsMenu::ShellItemsMenu(MenuView *menuView, const std::vector<PidlAbsolute> &pidls,
-	BrowserWindow *browserWindow, IconFetcher *iconFetcher, UINT menuStartId, UINT menuEndId) :
-	MenuBase(menuView),
+ShellItemsMenu::ShellItemsMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
+	const std::vector<PidlAbsolute> &pidls, BrowserWindow *browserWindow, IconFetcher *iconFetcher,
+	UINT menuStartId, UINT menuEndId) :
+	MenuBase(menuView, acceleratorManager),
 	m_browserWindow(browserWindow),
 	m_iconFetcher(iconFetcher),
 	m_menuStartId(menuStartId),

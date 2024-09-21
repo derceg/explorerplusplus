@@ -21,7 +21,8 @@ public:
 	virtual ~MenuView();
 
 	void AppendItem(UINT id, const std::wstring &text, wil::unique_hbitmap bitmap = nullptr,
-		const std::wstring &helpText = L"");
+		const std::wstring &helpText = L"",
+		const std::optional<std::wstring> &acceleratorText = std::nullopt);
 	void SetBitmapForItem(UINT id, wil::unique_hbitmap bitmap);
 	void EnableItem(UINT id, bool enable);
 	void ClearMenu();

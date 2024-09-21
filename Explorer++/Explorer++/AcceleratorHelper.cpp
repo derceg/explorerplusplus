@@ -9,10 +9,11 @@
 #include "../Helper/Macros.h"
 #include <boost/algorithm/string/join.hpp>
 #include <boost/numeric/conversion/cast.hpp>
+#include <format>
 
 void UpdateMenuItemAcceleratorString(HMENU menu, UINT id,
 	const AcceleratorManager *acceleratorManager);
-std::wstring VirtualKeyToString(UINT key);
+std::optional<std::wstring> VirtualKeyToString(UINT key);
 
 void UpdateMenuAcceleratorStrings(HMENU menu, const AcceleratorManager *acceleratorManager)
 {
@@ -93,11 +94,7 @@ void UpdateMenuItemAcceleratorString(HMENU menu, UINT id,
 	if (accelerator)
 	{
 		std::wstring acceleratorString = BuildAcceleratorString(*accelerator);
-
-		if (!acceleratorString.empty())
-		{
-			text += L"\t" + acceleratorString;
-		}
+		text += L"\t" + acceleratorString;
 	}
 
 	ZeroMemory(&mii, sizeof(mii));
@@ -109,13 +106,6 @@ void UpdateMenuItemAcceleratorString(HMENU menu, UINT id,
 
 std::wstring BuildAcceleratorString(const ACCEL &accelerator)
 {
-	std::wstring keyString = VirtualKeyToString(accelerator.key);
-
-	if (keyString.empty())
-	{
-		return L"";
-	}
-
 	std::vector<std::wstring> acceleratorParts;
 
 	if ((accelerator.fVirt & FCONTROL) == FCONTROL)
@@ -133,15 +123,32 @@ std::wstring BuildAcceleratorString(const ACCEL &accelerator)
 		acceleratorParts.emplace_back(L"Shift");
 	}
 
-	acceleratorParts.push_back(keyString);
+	auto keyString = VirtualKeyToString(accelerator.key);
+
+	if (!keyString)
+	{
+		// It's assumed that mapping the single key above will always succeed, so this branch should
+		// never be taken. But if accelerators can be customized by the user, then it seems possible
+		// that mapping a particular key in a particular keyboard layout might fail. In which case,
+		// having at least something to fall back on is useful.
+		DCHECK(false) << std::format("Couldn't convert virtual key {} to string ", accelerator.key);
+		keyString = L"?";
+	}
+
+	acceleratorParts.push_back(*keyString);
 
 	return boost::algorithm::join(acceleratorParts, L"+");
 }
 
 // See https://stackoverflow.com/a/38107083
-std::wstring VirtualKeyToString(UINT key)
+std::optional<std::wstring> VirtualKeyToString(UINT key)
 {
 	UINT scanCode = MapVirtualKey(key, MAPVK_VK_TO_VSC);
+
+	if (scanCode == 0)
+	{
+		return std::nullopt;
+	}
 
 	if (IsExtendedKey(key))
 	{
@@ -155,7 +162,7 @@ std::wstring VirtualKeyToString(UINT key)
 
 	if (ret == 0)
 	{
-		return L"";
+		return std::nullopt;
 	}
 
 	return keyString;

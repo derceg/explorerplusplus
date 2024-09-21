@@ -12,17 +12,24 @@ MenuView::~MenuView()
 }
 
 void MenuView::AppendItem(UINT id, const std::wstring &text, wil::unique_hbitmap bitmap,
-	const std::wstring &helpText)
+	const std::wstring &helpText, const std::optional<std::wstring> &acceleratorText)
 {
 	// The value 0 shouldn't be used as an item ID. That's because a call like TrackPopupMenu() will
 	// use a return value of 0 to indicate the menu was canceled, or an error occurred.
 	DCHECK_NE(id, 0U);
 
+	std::wstring finalText = text;
+
+	if (acceleratorText)
+	{
+		finalText += L"\t" + *acceleratorText;
+	}
+
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
 	menuItemInfo.fMask = MIIM_ID | MIIM_STRING;
 	menuItemInfo.wID = id;
-	menuItemInfo.dwTypeData = const_cast<LPWSTR>(text.c_str());
+	menuItemInfo.dwTypeData = finalText.data();
 
 	if (bitmap)
 	{
