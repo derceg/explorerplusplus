@@ -8,6 +8,8 @@
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "ResourceManager.h"
+#include "Win32ResourceLoader.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
@@ -237,6 +239,8 @@ void Explorerplusplus::SetLanguageModule()
 		SetWindowLongPtr(m_hContainer, GWL_EXSTYLE,
 			GetWindowLongPtr(m_hContainer, GWL_EXSTYLE) | WS_EX_LAYOUTRTL);
 	}
+
+	ResourceManager::Initialize(std::make_unique<Win32ResourceLoader>(m_resourceInstance));
 }
 
 BOOL Explorerplusplus::VerifyLanguageVersion(const TCHAR *szLanguageModule) const
