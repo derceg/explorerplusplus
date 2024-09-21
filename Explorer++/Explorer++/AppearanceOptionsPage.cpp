@@ -7,12 +7,12 @@
 #include "Config.h"
 #include "DarkModeHelper.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceManager.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ResizableDialogHelper.h"
 #include <glog/logging.h>
 
-std::wstring GetIconSetText(IconSet iconSet, HINSTANCE resourceInstance);
+std::wstring GetIconSetText(IconSet iconSet);
 
 AppearanceOptionsPage::AppearanceOptionsPage(HWND parent, HINSTANCE resourceInstance,
 	Config *config, CoreInterface *coreInterface, SettingChangedCallback settingChangedCallback,
@@ -65,7 +65,7 @@ void AppearanceOptionsPage::InitializeControls()
 
 	for (auto iconSet : IconSet::_values())
 	{
-		iconSetItems.emplace_back(iconSet, GetIconSetText(iconSet, m_resourceInstance));
+		iconSetItems.emplace_back(iconSet, GetIconSetText(iconSet));
 	}
 
 	AddItemsToComboBox(GetDlgItem(GetDialog(), IDC_OPTIONS_ICON_SET), iconSetItems,
@@ -75,14 +75,14 @@ void AppearanceOptionsPage::InitializeControls()
 
 	for (auto theme : Theme::_values())
 	{
-		themeItems.emplace_back(theme, GetThemeText(theme, m_resourceInstance));
+		themeItems.emplace_back(theme, GetThemeText(theme));
 	}
 
 	AddItemsToComboBox(GetDlgItem(GetDialog(), IDC_OPTIONS_THEME), themeItems,
 		m_config->theme.get());
 }
 
-std::wstring GetIconSetText(IconSet iconSet, HINSTANCE resourceInstance)
+std::wstring GetIconSetText(IconSet iconSet)
 {
 	UINT stringId;
 
@@ -113,7 +113,7 @@ std::wstring GetIconSetText(IconSet iconSet, HINSTANCE resourceInstance)
 		__assume(0);
 	}
 
-	return ResourceHelper::LoadString(resourceInstance, stringId);
+	return Resources::LoadString(stringId);
 }
 
 void AppearanceOptionsPage::OnCommand(WPARAM wParam, LPARAM lParam)

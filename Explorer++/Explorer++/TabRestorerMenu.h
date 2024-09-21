@@ -16,7 +16,7 @@ class TabRestorerMenu : public MenuBase, private boost::noncopyable
 {
 public:
 	TabRestorerMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		TabRestorer *tabRestorer, HINSTANCE resourceInstance, UINT menuStartId, UINT menuEndId);
+		TabRestorer *tabRestorer, UINT menuStartId, UINT menuEndId);
 
 private:
 	static const int MAX_MENU_ITEMS = 10;
@@ -31,7 +31,6 @@ private:
 	void RestoreTabForMenuItem(UINT menuItemId);
 
 	TabRestorer *const m_tabRestorer;
-	HINSTANCE m_resourceInstance;
 	const UINT m_menuStartId;
 	const UINT m_menuEndId;
 	UINT m_idCounter;
