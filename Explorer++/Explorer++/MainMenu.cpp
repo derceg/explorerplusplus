@@ -186,6 +186,7 @@ void Explorerplusplus::InitializeGoMenu(HMENU mainMenu)
 
 	AddGoMenuItem(goMenu, IDM_GO_WSL_DISTRIBUTIONS, WSL_DISTRIBUTIONS_PATH);
 
+	MenuHelper::RemoveDuplicateSeperators(goMenu);
 	MenuHelper::RemoveTrailingSeparators(goMenu);
 }
 
