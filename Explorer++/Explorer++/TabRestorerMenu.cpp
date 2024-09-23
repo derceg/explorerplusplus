@@ -76,12 +76,12 @@ void TabRestorerMenu::AddMenuItemForClosedTab(const PreservedTab *closedTab,
 
 	if (iconIndex)
 	{
-		bitmap = ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), *iconIndex);
+		ImageHelper::ImageListIconToPBGRABitmap(m_systemImageList.get(), *iconIndex, bitmap);
 	}
 	else
 	{
-		bitmap =
-			ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), m_defaultFolderIconIndex);
+		ImageHelper::ImageListIconToPBGRABitmap(m_systemImageList.get(), m_defaultFolderIconIndex,
+			bitmap);
 	}
 
 	std::optional<std::wstring> acceleratorText;

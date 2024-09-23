@@ -70,12 +70,12 @@ void TabHistoryMenu::AddMenuItemForHistoryEntry(const HistoryEntry *entry)
 
 	if (iconIndex)
 	{
-		bitmap = ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), *iconIndex);
+		ImageHelper::ImageListIconToPBGRABitmap(m_systemImageList.get(), *iconIndex, bitmap);
 	}
 	else
 	{
-		bitmap =
-			ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), m_defaultFolderIconIndex);
+		ImageHelper::ImageListIconToPBGRABitmap(m_systemImageList.get(), m_defaultFolderIconIndex,
+			bitmap);
 	}
 
 	m_menuView->AppendItem(id, entry->GetDisplayName(), std::move(bitmap));

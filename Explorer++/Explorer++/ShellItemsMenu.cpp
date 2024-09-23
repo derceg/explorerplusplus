@@ -117,7 +117,10 @@ wil::unique_hbitmap ShellItemsMenu::GetShellItemIcon(PCIDLIST_ABSOLUTE pidl)
 
 	int iconIndex = m_iconFetcher->GetCachedIconIndexOrDefault(itemPath, defaultIconType);
 
-	return ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), iconIndex);
+	wil::unique_hbitmap bitmap;
+	ImageHelper::ImageListIconToPBGRABitmap(m_systemImageList.get(), iconIndex, bitmap);
+
+	return bitmap;
 }
 
 void ShellItemsMenu::QueueIconUpdateTask(PCIDLIST_ABSOLUTE pidl, UINT menuItemId)
@@ -158,13 +161,8 @@ void ShellItemsMenu::OnIconRetrieved(UINT menuItemId, int iconIndex, int callbac
 
 	m_pendingIconCallbackIds.erase(itr);
 
-	auto bitmap = ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), iconIndex);
-
-	if (!bitmap)
-	{
-		DCHECK(false);
-		return;
-	}
+	wil::unique_hbitmap bitmap;
+	ImageHelper::ImageListIconToPBGRABitmap(m_systemImageList.get(), iconIndex, bitmap);
 
 	m_menuView->SetBitmapForItem(menuItemId, std::move(bitmap));
 }
