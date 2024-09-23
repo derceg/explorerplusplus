@@ -124,7 +124,7 @@ BOOL CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL);
 bool IsChildOfLibrariesFolder(PCIDLIST_ABSOLUTE pidl);
 HRESULT CreateSimplePidl(const std::wstring &path, PidlAbsolute &outputPidl,
 	IShellFolder *parent = nullptr, ShellItemType shellItemType = ShellItemType::File);
-HRESULT SimplePidlToFullPidl(PCIDLIST_ABSOLUTE simplePidl, PIDLIST_ABSOLUTE *fullPidl);
+HRESULT UpdatePidl(PCIDLIST_ABSOLUTE inputPidl, PidlAbsolute &outputPidl);
 
 std::optional<std::wstring> TransformUserEnteredPathToAbsolutePathAndNormalize(
 	const std::wstring &userEnteredPath, const std::wstring &currentDirectory,

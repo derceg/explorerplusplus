@@ -257,8 +257,8 @@ void ShellBrowserImpl::OnItemAdded(PCIDLIST_ABSOLUTE simplePidl)
 		return;
 	}
 
-	unique_pidl_absolute pidlFull;
-	HRESULT hr = SimplePidlToFullPidl(simplePidl, wil::out_param(pidlFull));
+	PidlAbsolute pidlFull;
+	HRESULT hr = UpdatePidl(simplePidl, pidlFull);
 
 	PCIDLIST_ABSOLUTE pidl;
 
@@ -271,7 +271,7 @@ void ShellBrowserImpl::OnItemAdded(PCIDLIST_ABSOLUTE simplePidl)
 	// chance for the user to notice that the item details are wrong.
 	if (SUCCEEDED(hr))
 	{
-		pidl = pidlFull.get();
+		pidl = pidlFull.Raw();
 	}
 	else
 	{
@@ -335,8 +335,8 @@ void ShellBrowserImpl::OnItemRemoved(PCIDLIST_ABSOLUTE simplePidl)
 
 void ShellBrowserImpl::OnItemModified(PCIDLIST_ABSOLUTE simplePidl)
 {
-	unique_pidl_absolute pidlFull;
-	HRESULT hr = SimplePidlToFullPidl(simplePidl, wil::out_param(pidlFull));
+	PidlAbsolute pidlFull;
+	HRESULT hr = UpdatePidl(simplePidl, pidlFull);
 
 	// SimplePidlToFullPidl may fail if this item no longer exists. However, there's nothing that
 	// can be done in that case. Leaving the previous details in place until the rename/deletion
@@ -344,7 +344,7 @@ void ShellBrowserImpl::OnItemModified(PCIDLIST_ABSOLUTE simplePidl)
 	// rename/deletion notification is likely to be processed soon).
 	if (SUCCEEDED(hr))
 	{
-		UpdateItem(pidlFull.get());
+		UpdateItem(pidlFull.Raw());
 	}
 }
 
@@ -471,8 +471,8 @@ void ShellBrowserImpl::OnItemRenamed(PCIDLIST_ABSOLUTE simplePidlOld,
 	// When an item is updated, the WIN32_FIND_DATA information cached in the pidl will be
 	// retrieved. As the simple pidl won't contain this information, it's important to convert the
 	// pidl to a full pidl here.
-	unique_pidl_absolute pidlNewFull;
-	HRESULT hr = SimplePidlToFullPidl(simplePidlNew, wil::out_param(pidlNewFull));
+	PidlAbsolute pidlNewFull;
+	HRESULT hr = UpdatePidl(simplePidlNew, pidlNewFull);
 
 	PCIDLIST_ABSOLUTE pidlNew;
 
@@ -488,7 +488,7 @@ void ShellBrowserImpl::OnItemRenamed(PCIDLIST_ABSOLUTE simplePidlOld,
 	// well.
 	if (SUCCEEDED(hr))
 	{
-		pidlNew = pidlNewFull.get();
+		pidlNew = pidlNewFull.Raw();
 	}
 	else
 	{
@@ -526,13 +526,13 @@ void ShellBrowserImpl::InvalidateIconForItem(int itemIndex)
 
 void ShellBrowserImpl::OnCurrentDirectoryRenamed(PCIDLIST_ABSOLUTE simplePidlUpdated)
 {
-	unique_pidl_absolute fullPidlUpdated;
-	HRESULT hr = SimplePidlToFullPidl(simplePidlUpdated, wil::out_param(fullPidlUpdated));
+	PidlAbsolute fullPidlUpdated;
+	HRESULT hr = UpdatePidl(simplePidlUpdated, fullPidlUpdated);
 
 	if (SUCCEEDED(hr))
 	{
 		NavigateParams params =
-			NavigateParams::Normal(fullPidlUpdated.get(), HistoryEntryType::ReplaceCurrentEntry);
+			NavigateParams::Normal(fullPidlUpdated.Raw(), HistoryEntryType::ReplaceCurrentEntry);
 		params.overrideNavigationMode = true;
 		m_navigationController->Navigate(params);
 	}
