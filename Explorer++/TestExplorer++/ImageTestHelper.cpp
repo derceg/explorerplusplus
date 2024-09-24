@@ -3,11 +3,21 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
-#include "GdiplusTestHelper.h"
+#include "ImageTestHelper.h"
+#include "../Helper/ImageHelper.h"
 #include "../Helper/ScopedBitmapLock.h"
 #include <gtest/gtest.h>
 
-void BuildTestBitmap(int width, int height, std::unique_ptr<Gdiplus::Bitmap> &bitmap)
+void BuildTestBitmap(int width, int height, wil::unique_hbitmap &bitmap)
+{
+	std::unique_ptr<Gdiplus::Bitmap> gdiplusBitmap;
+	BuildTestGdiplusBitmap(width, height, gdiplusBitmap);
+
+	bitmap = ImageHelper::GdiplusBitmapToBitmap(gdiplusBitmap.get());
+	ASSERT_NE(bitmap, nullptr);
+}
+
+void BuildTestGdiplusBitmap(int width, int height, std::unique_ptr<Gdiplus::Bitmap> &bitmap)
 {
 	bitmap = std::make_unique<Gdiplus::Bitmap>(width, height, PixelFormat32bppARGB);
 	ASSERT_EQ(bitmap->GetLastStatus(), Gdiplus::Ok);
@@ -21,7 +31,7 @@ void BuildTestBitmap(int width, int height, std::unique_ptr<Gdiplus::Bitmap> &bi
 	ASSERT_EQ(status, Gdiplus::Ok);
 }
 
-bool AreBitmapsEquivalent(Gdiplus::Bitmap *bitmap1, Gdiplus::Bitmap *bitmap2)
+bool AreGdiplusBitmapsEquivalent(Gdiplus::Bitmap *bitmap1, Gdiplus::Bitmap *bitmap2)
 {
 	if ((bitmap1->GetWidth() != bitmap2->GetWidth())
 		|| (bitmap1->GetHeight() != bitmap2->GetHeight()))

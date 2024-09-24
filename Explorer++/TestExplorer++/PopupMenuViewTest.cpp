@@ -4,8 +4,7 @@
 
 #include "pch.h"
 #include "PopupMenuView.h"
-#include "TestResources.h"
-#include "../Helper/ImageHelper.h"
+#include "ImageTestHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
@@ -30,17 +29,6 @@ protected:
 		EXPECT_EQ(m_popupMenu.GetItemBitmapForTesting(itemId), rawBitmap);
 	}
 
-	void GetBasicBitmap(wil::unique_hbitmap &outputBitmap) const
-	{
-		auto png = ImageHelper::LoadGdiplusBitmapFromPNG(GetModuleHandle(nullptr), IDB_BASIC_PNG);
-		ASSERT_NE(png, nullptr);
-
-		auto bitmap = ImageHelper::GdiplusBitmapToBitmap(png.get());
-		ASSERT_NE(bitmap, nullptr);
-
-		outputBitmap = std::move(bitmap);
-	}
-
 	PopupMenuView m_popupMenu;
 
 private:
@@ -52,7 +40,7 @@ TEST_F(PopupMenuViewTest, AppendItem)
 	UINT idCounter = 100;
 
 	wil::unique_hbitmap bitmap;
-	GetBasicBitmap(bitmap);
+	BuildTestBitmap(10, 10, bitmap);
 
 	CheckAppendItem(idCounter++, L"Item 1", std::move(bitmap), L"Help text for item 1", L"Ctrl+A");
 	CheckAppendItem(idCounter++, L"Item 2", nullptr, L"Help text for item 2", L"Ctrl+Shift+T");
@@ -65,7 +53,7 @@ TEST_F(PopupMenuViewTest, SetBitmapForItem)
 	m_popupMenu.AppendItem(id, L"Item", nullptr);
 
 	wil::unique_hbitmap bitmap;
-	GetBasicBitmap(bitmap);
+	BuildTestBitmap(10, 10, bitmap);
 	auto rawBitmap = bitmap.get();
 	m_popupMenu.SetBitmapForItem(id, std::move(bitmap));
 

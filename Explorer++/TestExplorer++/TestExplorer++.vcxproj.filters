@@ -204,7 +204,7 @@
     <ClCompile Include="DataExchangeHelperTest.cpp">
       <Filter>Helper\Data Exchange</Filter>
     </ClCompile>
-    <ClCompile Include="GdiplusTestHelper.cpp" />
+    <ClCompile Include="ImageTestHelper.cpp" />
     <ClCompile Include="VersionTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -365,7 +365,7 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ShellTestHelper.h" />
-    <ClInclude Include="GdiplusTestHelper.h" />
+    <ClInclude Include="ImageTestHelper.h" />
     <ClInclude Include="AcceleratorTestHelper.h">
       <Filter>Core\Accelerators</Filter>
     </ClInclude>

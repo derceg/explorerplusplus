@@ -4,7 +4,7 @@
 
 #include "pch.h"
 #include "../Helper/ImageHelper.h"
-#include "GdiplusTestHelper.h"
+#include "ImageTestHelper.h"
 #include "TestResources.h"
 #include <gtest/gtest.h>
 
@@ -21,7 +21,7 @@ TEST(ImageHelper, LoadGdiplusBitmapFromPNG)
 TEST(ImageHelper, ConvertIconToBitmap)
 {
 	std::unique_ptr<Gdiplus::Bitmap> gdiplusBitmap;
-	BuildTestBitmap(100, 100, gdiplusBitmap);
+	BuildTestGdiplusBitmap(100, 100, gdiplusBitmap);
 
 	wil::unique_hicon icon;
 	Gdiplus::Status status = gdiplusBitmap->GetHICON(&icon);

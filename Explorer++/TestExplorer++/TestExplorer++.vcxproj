@@ -221,7 +221,7 @@
     <ClCompile Include="CachedIconsTest.cpp" />
     <ClCompile Include="FrequentLocationsServiceTest.cpp" />
     <ClCompile Include="GdiplusHelperTest.cpp" />
-    <ClCompile Include="GdiplusTestHelper.cpp" />
+    <ClCompile Include="ImageTestHelper.cpp" />
     <ClCompile Include="GlobalHistoryMenuTest.cpp" />
     <ClCompile Include="HelperTest.cpp" />
     <ClCompile Include="HistoryServiceTest.cpp" />
@@ -304,7 +304,7 @@
     <ClInclude Include="ColorRulesStorageTestHelper.h" />
     <ClInclude Include="ColumnStorageTestHelper.h" />
     <ClInclude Include="DragDropTestHelper.h" />
-    <ClInclude Include="GdiplusTestHelper.h" />
+    <ClInclude Include="ImageTestHelper.h" />
     <ClInclude Include="IconFetcherMock.h" />
     <ClInclude Include="MainRebarStorageTestHelper.h" />
     <ClInclude Include="MovableModelHelper.h" />

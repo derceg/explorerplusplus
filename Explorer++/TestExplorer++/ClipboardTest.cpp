@@ -4,7 +4,7 @@
 
 #include "pch.h"
 #include "../Helper/Clipboard.h"
-#include "GdiplusTestHelper.h"
+#include "ImageTestHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
@@ -45,7 +45,7 @@ TEST_F(ClipboardTest, ReadWriteHDropData)
 TEST_F(ClipboardTest, ReadWritePngData)
 {
 	std::unique_ptr<Gdiplus::Bitmap> bitmap;
-	BuildTestBitmap(100, 100, bitmap);
+	BuildTestGdiplusBitmap(100, 100, bitmap);
 
 	auto res = m_clipboard.WritePng(bitmap.get());
 	ASSERT_TRUE(res);
@@ -53,13 +53,13 @@ TEST_F(ClipboardTest, ReadWritePngData)
 	auto retrievedBitmap = m_clipboard.ReadPng();
 	ASSERT_NE(retrievedBitmap, nullptr);
 
-	EXPECT_TRUE(AreBitmapsEquivalent(bitmap.get(), retrievedBitmap.get()));
+	EXPECT_TRUE(AreGdiplusBitmapsEquivalent(bitmap.get(), retrievedBitmap.get()));
 }
 
 TEST_F(ClipboardTest, ReadWriteDIBData)
 {
 	std::unique_ptr<Gdiplus::Bitmap> bitmap;
-	BuildTestBitmap(100, 100, bitmap);
+	BuildTestGdiplusBitmap(100, 100, bitmap);
 
 	auto res = m_clipboard.WriteDIB(bitmap.get());
 	ASSERT_TRUE(res);
@@ -67,7 +67,7 @@ TEST_F(ClipboardTest, ReadWriteDIBData)
 	auto retrievedBitmap = m_clipboard.ReadDIB();
 	ASSERT_NE(retrievedBitmap, nullptr);
 
-	EXPECT_TRUE(AreBitmapsEquivalent(bitmap.get(), retrievedBitmap.get()));
+	EXPECT_TRUE(AreGdiplusBitmapsEquivalent(bitmap.get(), retrievedBitmap.get()));
 }
 
 TEST_F(ClipboardTest, ReadWriteCustomData)
