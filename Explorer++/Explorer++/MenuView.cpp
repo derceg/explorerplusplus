@@ -36,7 +36,10 @@ void MenuView::AppendItem(UINT id, const std::wstring &text, wil::unique_hbitmap
 		menuItemInfo.fMask |= MIIM_BITMAP;
 		menuItemInfo.hbmpItem = bitmap.get();
 
-		m_menuImages.push_back(std::move(bitmap));
+		// The CHECK here is present because the bitmap needs to be stored while the menu exists.
+		// There shouldn't be items with duplicate IDs, so this insert should always succeed.
+		auto [itr, didInsert] = m_itemImageMapping.insert({ id, std::move(bitmap) });
+		CHECK(didInsert);
 	}
 
 	auto res = InsertMenuItem(GetMenu(), GetMenuItemCount(GetMenu()), true, &menuItemInfo);
@@ -57,7 +60,7 @@ void MenuView::SetBitmapForItem(UINT id, wil::unique_hbitmap bitmap)
 
 	if (bitmap)
 	{
-		m_menuImages.push_back(std::move(bitmap));
+		m_itemImageMapping.insert_or_assign(id, std::move(bitmap));
 	}
 }
 
@@ -74,7 +77,7 @@ void MenuView::ClearMenu()
 		DCHECK(res);
 	}
 
-	m_menuImages.clear();
+	m_itemImageMapping.clear();
 	m_itemHelpTextMapping.clear();
 }
 

@@ -7,7 +7,6 @@
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
 #include <unordered_map>
-#include <vector>
 
 class MenuView
 {
@@ -47,7 +46,7 @@ public:
 private:
 	virtual HMENU GetMenu() const = 0;
 
-	std::vector<wil::unique_hbitmap> m_menuImages;
+	std::unordered_map<UINT, wil::unique_hbitmap> m_itemImageMapping;
 	std::unordered_map<UINT, std::wstring> m_itemHelpTextMapping;
 	ItemSelectedSignal m_itemSelectedSignal;
 	ItemMiddleClickedSignal m_itemMiddleClickedSignal;
