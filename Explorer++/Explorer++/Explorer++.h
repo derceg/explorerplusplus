@@ -19,6 +19,7 @@
 #include "ShellBrowser/Columns.h"
 #include "ShellBrowser/ShellBrowserEmbedder.h"
 #include "ShellBrowser/SortModes.h"
+#include "ShellIconLoaderImpl.h"
 #include "Tab.h"
 #include "TabNavigationInterface.h"
 #include "ValueWrapper.h"
@@ -671,6 +672,7 @@ private:
 	// but as far as I'm aware, it's not possible to cancel SHGetFileInfo (which is what's
 	// ultimately used to retrieve the icons).
 	IconFetcherImpl m_iconFetcher;
+	ShellIconLoaderImpl m_shellIconLoader;
 
 	/* Undo support. */
 	FileActionHandler m_FileActionHandler;

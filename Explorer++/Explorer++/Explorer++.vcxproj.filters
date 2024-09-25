@@ -694,6 +694,12 @@
     <ClCompile Include="ResourceManager.cpp">
       <Filter>Core\Resource Loading</Filter>
     </ClCompile>
+    <ClCompile Include="ShellIconLoaderImpl.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellIconModel.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1427,6 +1433,15 @@
     </ClInclude>
     <ClInclude Include="ResourceLoader.h">
       <Filter>Core\Resource Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellIconModel.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellIconLoaderImpl.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellIconLoader.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

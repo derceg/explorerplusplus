@@ -38,7 +38,8 @@ Explorerplusplus::Explorerplusplus(HWND hwnd, InitializationData *initialization
 	m_acceleratorUpdater(initializationData->acceleratorManager),
 	m_pluginCommandManager(initializationData->acceleratorManager, ACCELERATOR_PLUGIN_START_ID,
 		ACCELERATOR_PLUGIN_END_ID),
-	m_iconFetcher(hwnd, &m_cachedIcons)
+	m_iconFetcher(hwnd, &m_cachedIcons),
+	m_shellIconLoader(&m_iconFetcher)
 {
 	m_resourceInstance = nullptr;
 

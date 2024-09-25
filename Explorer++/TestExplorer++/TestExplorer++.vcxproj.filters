@@ -220,6 +220,9 @@
     <ClCompile Include="AcceleratorTestHelper.cpp">
       <Filter>Core\Accelerators</Filter>
     </ClCompile>
+    <ClCompile Include="ShellIconLoaderFake.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -368,6 +371,9 @@
     <ClInclude Include="ImageTestHelper.h" />
     <ClInclude Include="AcceleratorTestHelper.h">
       <Filter>Core\Accelerators</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellIconLoaderFake.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

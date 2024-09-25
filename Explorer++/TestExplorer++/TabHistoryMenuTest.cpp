@@ -10,6 +10,7 @@
 #include "PopupMenuView.h"
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowserFake.h"
+#include "ShellIconLoaderFake.h"
 #include "TabNavigationMock.h"
 #include "../Helper/ShellHelper.h"
 #include <gtest/gtest.h>
@@ -30,6 +31,7 @@ protected:
 	ShellBrowserFake m_shellBrowser;
 	AcceleratorManager m_acceleratorManager;
 	BrowserWindowMock m_browserWindow;
+	ShellIconLoaderFake m_shellIconLoader;
 };
 
 TEST_F(TabHistoryMenuTest, BackHistory)
@@ -39,7 +41,7 @@ TEST_F(TabHistoryMenuTest, BackHistory)
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
 
 	PopupMenuView popupMenu;
-	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow,
+	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Back);
 
 	EXPECT_EQ(popupMenu.GetItemCountForTesting(), 2);
@@ -58,7 +60,7 @@ TEST_F(TabHistoryMenuTest, ForwardHistory)
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());
 
 	PopupMenuView popupMenu;
-	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow,
+	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Forward);
 
 	EXPECT_EQ(popupMenu.GetItemCountForTesting(), 2);
@@ -73,7 +75,7 @@ TEST_F(TabHistoryMenuTest, BackSelection)
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
 
 	PopupMenuView popupMenu;
-	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow,
+	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Back);
 
 	// Go back to Fake2.
@@ -91,7 +93,7 @@ TEST_F(TabHistoryMenuTest, BackSelectionMiddleClick)
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.NavigateToPath(L"C:\\Fake3"));
 
 	PopupMenuView popupMenu;
-	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow,
+	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Back);
 
 	EXPECT_CALL(m_browserWindow,
@@ -115,7 +117,7 @@ TEST_F(TabHistoryMenuTest, ForwardSelection)
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());
 
 	PopupMenuView popupMenu;
-	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow,
+	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Forward);
 
 	// Go forward to Fake3.
@@ -137,7 +139,7 @@ TEST_F(TabHistoryMenuTest, ForwardSelectionMiddleClick)
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());
 
 	PopupMenuView popupMenu;
-	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow,
+	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Forward);
 
 	EXPECT_CALL(m_browserWindow,
@@ -159,7 +161,7 @@ TEST_F(TabHistoryMenuTest, InvalidSelection)
 	ASSERT_HRESULT_SUCCEEDED(m_shellBrowser.GetNavigationController()->GoBack());
 
 	PopupMenuView popupMenu;
-	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow,
+	TabHistoryMenu menu(&popupMenu, &m_acceleratorManager, &m_browserWindow, &m_shellIconLoader,
 		TabHistoryMenu::MenuType::Forward);
 
 	// Go back to Fake1.

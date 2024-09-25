@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "ShellItemsMenu.h"
 #include "BrowserWindow.h"
-#include "IconFetcher.h"
 #include "MenuView.h"
 #include "NavigationHelper.h"
 #include "../Helper/ImageHelper.h"
@@ -13,18 +12,15 @@
 #include <glog/logging.h>
 
 ShellItemsMenu::ShellItemsMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-	const std::vector<PidlAbsolute> &pidls, BrowserWindow *browserWindow, IconFetcher *iconFetcher,
-	UINT menuStartId, UINT menuEndId) :
+	const std::vector<PidlAbsolute> &pidls, BrowserWindow *browserWindow,
+	ShellIconLoader *shellIconLoader, UINT menuStartId, UINT menuEndId) :
 	MenuBase(menuView, acceleratorManager),
 	m_browserWindow(browserWindow),
-	m_iconFetcher(iconFetcher),
+	m_shellIconLoader(shellIconLoader),
 	m_menuStartId(menuStartId),
 	m_menuEndId(menuEndId),
-	m_idCounter(menuStartId),
-	m_destroyed(std::make_shared<bool>(false))
+	m_idCounter(menuStartId)
 {
-	FAIL_FAST_IF_FAILED(SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList)));
-
 	m_connections.push_back(m_menuView->AddItemSelectedObserver(
 		std::bind_front(&ShellItemsMenu::OnMenuItemSelected, this)));
 	m_connections.push_back(m_menuView->AddItemMiddleClickedObserver(
@@ -33,17 +29,11 @@ ShellItemsMenu::ShellItemsMenu(MenuView *menuView, const AcceleratorManager *acc
 	RebuildMenu(pidls);
 }
 
-ShellItemsMenu::~ShellItemsMenu()
-{
-	*m_destroyed = true;
-}
-
 void ShellItemsMenu::RebuildMenu(const std::vector<PidlAbsolute> &pidls)
 {
 	m_menuView->ClearMenu();
 	m_idCounter = m_menuStartId;
 	m_idPidlMap.clear();
-	m_pendingIconCallbackIds.clear();
 
 	for (const auto &pidl : pidls)
 	{
@@ -70,9 +60,6 @@ void ShellItemsMenu::AddMenuItemForPidl(PCIDLIST_ABSOLUTE pidl)
 		return;
 	}
 
-	auto bitmap = GetShellItemIcon(pidl);
-	QueueIconUpdateTask(pidl, id);
-
 	std::wstring displayPath;
 
 	if (auto optionalDisplayPath = GetFolderPathForDisplay(pidl))
@@ -80,91 +67,10 @@ void ShellItemsMenu::AddMenuItemForPidl(PCIDLIST_ABSOLUTE pidl)
 		displayPath = *optionalDisplayPath;
 	}
 
-	m_menuView->AppendItem(id, name, std::move(bitmap), displayPath);
+	m_menuView->AppendItem(id, name, ShellIconModel(m_shellIconLoader, pidl), displayPath);
 
 	auto [itr, didInsert] = m_idPidlMap.insert({ id, pidl });
 	DCHECK(didInsert);
-}
-
-wil::unique_hbitmap ShellItemsMenu::GetShellItemIcon(PCIDLIST_ABSOLUTE pidl)
-{
-	std::wstring itemPath;
-	HRESULT hr = GetDisplayName(pidl, SHGDN_FORPARSING, itemPath);
-
-	if (FAILED(hr))
-	{
-		return nullptr;
-	}
-
-	SFGAOF attributes = SFGAO_FOLDER;
-	hr = GetItemAttributes(pidl, &attributes);
-
-	if (FAILED(hr))
-	{
-		return nullptr;
-	}
-
-	DefaultIconType defaultIconType;
-
-	if (WI_IsFlagSet(attributes, SFGAO_FOLDER))
-	{
-		defaultIconType = DefaultIconType::Folder;
-	}
-	else
-	{
-		defaultIconType = DefaultIconType::File;
-	}
-
-	int iconIndex = m_iconFetcher->GetCachedIconIndexOrDefault(itemPath, defaultIconType);
-
-	wil::unique_hbitmap bitmap;
-	ImageHelper::ImageListIconToPBGRABitmap(m_systemImageList.get(), iconIndex, bitmap);
-
-	return bitmap;
-}
-
-void ShellItemsMenu::QueueIconUpdateTask(PCIDLIST_ABSOLUTE pidl, UINT menuItemId)
-{
-	int iconCallbackId = m_iconCallbackIdCounter++;
-
-	// The item may not have a cached icon, or the cached icon may be out of date. Therefore, this
-	// call will retrieve the updated icon. If this finishes before the menu is closed, the menu
-	// item will be updated. It's still useful even if the call finishes after the menu is closed,
-	// since the updated icon will be cached.
-	m_iconFetcher->QueueIconTask(pidl,
-		[this, destroyed = m_destroyed, menuItemId, iconCallbackId](int iconIndex)
-		{
-			if (*destroyed)
-			{
-				// The icon can be returned after the menu has been closed. In that case, there's
-				// nothing that needs to be done.
-				return;
-			}
-
-			OnIconRetrieved(menuItemId, iconIndex, iconCallbackId);
-		});
-
-	auto [itr, didInsert] = m_pendingIconCallbackIds.insert(iconCallbackId);
-	DCHECK(didInsert);
-}
-
-void ShellItemsMenu::OnIconRetrieved(UINT menuItemId, int iconIndex, int callbackId)
-{
-	auto itr = m_pendingIconCallbackIds.find(callbackId);
-
-	// As the menu can be cleared when the set of items changes, this icon notification might be for
-	// a previous menu item. If it is, it can be ignored.
-	if (itr == m_pendingIconCallbackIds.end())
-	{
-		return;
-	}
-
-	m_pendingIconCallbackIds.erase(itr);
-
-	wil::unique_hbitmap bitmap;
-	ImageHelper::ImageListIconToPBGRABitmap(m_systemImageList.get(), iconIndex, bitmap);
-
-	m_menuView->SetBitmapForItem(menuItemId, std::move(bitmap));
 }
 
 void ShellItemsMenu::OnMenuItemSelected(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown)

@@ -15,16 +15,14 @@
 #include <ranges>
 
 TabRestorerMenu::TabRestorerMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-	TabRestorer *tabRestorer, UINT menuStartId, UINT menuEndId) :
+	TabRestorer *tabRestorer, ShellIconLoader *shellIconLoader, UINT menuStartId, UINT menuEndId) :
 	MenuBase(menuView, acceleratorManager),
 	m_tabRestorer(tabRestorer),
+	m_shellIconLoader(shellIconLoader),
 	m_menuStartId(menuStartId),
 	m_menuEndId(menuEndId),
 	m_idCounter(menuStartId)
 {
-	FAIL_FAST_IF_FAILED(SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList)));
-	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(m_defaultFolderIconIndex));
-
 	m_connections.push_back(tabRestorer->AddItemsChangedObserver(
 		std::bind_front(&TabRestorerMenu::OnRestoreItemsChanged, this)));
 	m_connections.push_back(m_menuView->AddItemSelectedObserver(
@@ -71,19 +69,6 @@ void TabRestorerMenu::AddMenuItemForClosedTab(const PreservedTab *closedTab,
 
 	std::wstring menuText = currentEntry->displayName;
 
-	wil::unique_hbitmap bitmap;
-	auto iconIndex = currentEntry->systemIconIndex;
-
-	if (iconIndex)
-	{
-		ImageHelper::ImageListIconToPBGRABitmap(m_systemImageList.get(), *iconIndex, bitmap);
-	}
-	else
-	{
-		ImageHelper::ImageListIconToPBGRABitmap(m_systemImageList.get(), m_defaultFolderIconIndex,
-			bitmap);
-	}
-
 	std::optional<std::wstring> acceleratorText;
 
 	if (addAcceleratorText)
@@ -91,8 +76,9 @@ void TabRestorerMenu::AddMenuItemForClosedTab(const PreservedTab *closedTab,
 		acceleratorText = GetAcceleratorTextForId(IDA_RESTORE_LAST_TAB);
 	}
 
-	m_menuView->AppendItem(id, menuText, std::move(bitmap), currentEntry->fullPathForDisplay,
-		acceleratorText);
+	m_menuView->AppendItem(id, menuText,
+		ShellIconModel(m_shellIconLoader, currentEntry->pidl.Raw()),
+		currentEntry->fullPathForDisplay, acceleratorText);
 
 	auto [itr, didInsert] = m_menuItemMappings.insert({ id, closedTab->id });
 	DCHECK(didInsert);

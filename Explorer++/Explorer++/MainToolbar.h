@@ -21,15 +21,15 @@
 
 class BrowserWindow;
 struct Config;
-class IconFetcher;
 struct NavigateParams;
+class ShellIconLoader;
 
 class MainToolbar : public BaseWindow
 {
 public:
 	static MainToolbar *Create(HWND parent, HINSTANCE resourceInstance,
-		BrowserWindow *browserWindow, CoreInterface *coreInterface, IconFetcher *iconFetcher,
-		std::shared_ptr<Config> config,
+		BrowserWindow *browserWindow, CoreInterface *coreInterface,
+		ShellIconLoader *shellIconLoader, std::shared_ptr<Config> config,
 		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
 
 	void UpdateConfigDependentButtonStates();
@@ -42,7 +42,8 @@ public:
 
 private:
 	MainToolbar(HWND parent, HINSTANCE resourceInstance, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, IconFetcher *iconFetcher, std::shared_ptr<Config> config,
+		CoreInterface *coreInterface, ShellIconLoader *shellIconLoader,
+		std::shared_ptr<Config> config,
 		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
 	~MainToolbar();
 
@@ -97,7 +98,7 @@ private:
 	HINSTANCE m_resourceInstance;
 	BrowserWindow *m_browserWindow = nullptr;
 	CoreInterface *m_coreInterface = nullptr;
-	IconFetcher *m_iconFetcher = nullptr;
+	ShellIconLoader *const m_shellIconLoader;
 	std::shared_ptr<Config> m_config;
 	bool m_applicationInitialized = false;
 

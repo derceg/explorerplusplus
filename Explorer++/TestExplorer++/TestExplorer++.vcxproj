@@ -228,6 +228,7 @@
     <ClCompile Include="MenuHelperTest.cpp" />
     <ClCompile Include="PasteSymLinksServerClientTest.cpp" />
     <ClCompile Include="PopupMenuViewTest.cpp" />
+    <ClCompile Include="ShellIconLoaderFake.cpp" />
     <ClCompile Include="ShellTestHelper.cpp" />
     <ClCompile Include="TabHistoryMenuTest.cpp" />
     <ClCompile Include="ImageHelperTest.cpp" />
@@ -310,6 +311,7 @@
     <ClInclude Include="MovableModelHelper.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RegistryStorageTestHelper.h" />
+    <ClInclude Include="ShellIconLoaderFake.h" />
     <ClInclude Include="ShellTestHelper.h" />
     <ClInclude Include="TestResources.h" />
     <ClInclude Include="ResourceTestHelper.h" />

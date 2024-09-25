@@ -8,9 +8,9 @@
 
 GlobalHistoryMenu::GlobalHistoryMenu(MenuView *menuView,
 	const AcceleratorManager *acceleratorManager, HistoryService *historyService,
-	BrowserWindow *browserWindow, IconFetcher *iconFetcher) :
+	BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader) :
 	ShellItemsMenu(menuView, acceleratorManager, GetHistoryItems(historyService), browserWindow,
-		iconFetcher),
+		shellIconLoader),
 	m_historyService(historyService)
 {
 	Initialize();
@@ -18,9 +18,10 @@ GlobalHistoryMenu::GlobalHistoryMenu(MenuView *menuView,
 
 GlobalHistoryMenu::GlobalHistoryMenu(MenuView *menuView,
 	const AcceleratorManager *acceleratorManager, HistoryService *historyService,
-	BrowserWindow *browserWindow, IconFetcher *iconFetcher, UINT menuStartId, UINT menuEndId) :
+	BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader, UINT menuStartId,
+	UINT menuEndId) :
 	ShellItemsMenu(menuView, acceleratorManager, GetHistoryItems(historyService), browserWindow,
-		iconFetcher, menuStartId, menuEndId),
+		shellIconLoader, menuStartId, menuEndId),
 	m_historyService(historyService)
 {
 	Initialize();

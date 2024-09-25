@@ -6,17 +6,18 @@
 
 #include "MenuBase.h"
 #include <boost/core/noncopyable.hpp>
-#include <wil/com.h>
 #include <unordered_map>
 
 struct PreservedTab;
+class ShellIconLoader;
 class TabRestorer;
 
 class TabRestorerMenu : public MenuBase, private boost::noncopyable
 {
 public:
 	TabRestorerMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		TabRestorer *tabRestorer, UINT menuStartId, UINT menuEndId);
+		TabRestorer *tabRestorer, ShellIconLoader *shellIconLoader, UINT menuStartId,
+		UINT menuEndId);
 
 private:
 	static const int MAX_MENU_ITEMS = 10;
@@ -31,14 +32,12 @@ private:
 	void RestoreTabForMenuItem(UINT menuItemId);
 
 	TabRestorer *const m_tabRestorer;
+	ShellIconLoader *const m_shellIconLoader;
 	const UINT m_menuStartId;
 	const UINT m_menuEndId;
 	UINT m_idCounter;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
-
-	wil::com_ptr_nothrow<IImageList> m_systemImageList;
-	int m_defaultFolderIconIndex;
 
 	// Maps between menu item IDs and closed tab IDs.
 	std::unordered_map<UINT, int> m_menuItemMappings;

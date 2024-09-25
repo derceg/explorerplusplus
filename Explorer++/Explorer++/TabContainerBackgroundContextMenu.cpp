@@ -29,13 +29,13 @@ TabContainerBackgroundContextMenu::TabContainerBackgroundContextMenu(MenuView *m
 void TabContainerBackgroundContextMenu::BuildMenu()
 {
 	m_menuView->AppendItem(IDM_TAB_CONTAINER_NEW_TAB,
-		Resources::LoadString(IDS_TAB_CONTAINER_MENU_NEW_TAB), nullptr, L"",
+		Resources::LoadString(IDS_TAB_CONTAINER_MENU_NEW_TAB), {}, L"",
 		GetAcceleratorTextForId(IDM_FILE_NEWTAB));
 	m_menuView->AppendItem(IDM_TAB_CONTAINER_REOPEN_CLOSED_TAB,
-		Resources::LoadString(IDS_TAB_CONTAINER_MENU_REOPEN_CLOSED_TAB), nullptr, L"",
+		Resources::LoadString(IDS_TAB_CONTAINER_MENU_REOPEN_CLOSED_TAB), {}, L"",
 		GetAcceleratorTextForId(IDA_RESTORE_LAST_TAB));
 	m_menuView->AppendItem(IDM_TAB_CONTAINER_BOOKMARK_ALL_TABS,
-		Resources::LoadString(IDS_TAB_CONTAINER_MENU_BOOKMARK_ALL_TABS), nullptr, L"",
+		Resources::LoadString(IDS_TAB_CONTAINER_MENU_BOOKMARK_ALL_TABS), {}, L"",
 		GetAcceleratorTextForId(IDM_BOOKMARKS_BOOKMARK_ALL_TABS));
 
 	if (m_coreInterface->GetTabRestorer()->GetClosedTabs().empty())

@@ -5,13 +5,11 @@
 #pragma once
 
 #include "MenuBase.h"
-#include <wil/com.h>
-#include <commctrl.h>
-#include <commoncontrols.h>
 
 class BrowserWindow;
 class HistoryEntry;
 class ShellBrowser;
+class ShellIconLoader;
 
 // Displays a set of history entries for the current tab, with the name and icon of each entry being
 // displayed. An entry can be both clicked (which will cause the current tab to navigate
@@ -27,7 +25,7 @@ public:
 	};
 
 	TabHistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
-		BrowserWindow *browserWindow, MenuType type);
+		BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader, MenuType type);
 
 private:
 	void Initialize();
@@ -41,9 +39,8 @@ private:
 	ShellBrowser *GetShellBrowser() const;
 
 	BrowserWindow *m_browserWindow = nullptr;
+	ShellIconLoader *const m_shellIconLoader;
 	const MenuType m_type;
-	wil::com_ptr_nothrow<IImageList> m_systemImageList;
-	int m_defaultFolderIconIndex;
 	UINT m_idCounter = 1;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
