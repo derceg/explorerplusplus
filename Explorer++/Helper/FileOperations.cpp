@@ -46,18 +46,30 @@ HRESULT FileOperations::RenameFile(IShellItem *item, const std::wstring &newName
 	return hr;
 }
 
-HRESULT FileOperations::DeleteFiles(HWND hwnd, const std::vector<PCIDLIST_ABSOLUTE> &pidls,
-	bool permanent, bool silent)
+HRESULT FileOperations::DeleteFiles(HWND hwnd, std::vector<PCIDLIST_ABSOLUTE> &pidls, bool permanent, bool silent)
 {
-	wil::com_ptr_nothrow<IFileOperation> fo;
-	HRESULT hr = CoCreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&fo));
-
+	DWORD cookie{};
+	CComPtr<IFileOperation> pfo{};
+	CComPtr<IFileOperationProgressSink> pSink{};
+	auto hr = pfo.CoCreateInstance(CLSID_FileOperation, nullptr, CLSCTX_INPROC_SERVER);
 	if (FAILED(hr))
 	{
 		return hr;
 	}
 
-	hr = fo->SetOwnerWindow(hwnd);
+	hr = CreateFileOperationProgressSink(pidls, &pSink);
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	hr = pfo->Advise(pSink, &cookie);
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	hr = pfo->SetOwnerWindow(hwnd);
 
 	if (FAILED(hr))
 	{
@@ -82,7 +94,7 @@ HRESULT FileOperations::DeleteFiles(HWND hwnd, const std::vector<PCIDLIST_ABSOLU
 
 	if (flags != 0)
 	{
-		hr = fo->SetOperationFlags(flags);
+		hr = pfo->SetOperationFlags(flags);
 
 		if (FAILED(hr))
 		{
@@ -90,9 +102,8 @@ HRESULT FileOperations::DeleteFiles(HWND hwnd, const std::vector<PCIDLIST_ABSOLU
 		}
 	}
 
-	wil::com_ptr_nothrow<IShellItemArray> shellItemArray;
-	hr = SHCreateShellItemArrayFromIDLists(static_cast<UINT>(pidls.size()), &pidls[0],
-		&shellItemArray);
+	wil::com_ptr_nothrow<IShellItemArray> shellItemArray{};
+	hr = SHCreateShellItemArrayFromIDLists(static_cast<UINT>(pidls.size()), &pidls[0], &shellItemArray);
 
 	if (FAILED(hr))
 	{
@@ -100,21 +111,22 @@ HRESULT FileOperations::DeleteFiles(HWND hwnd, const std::vector<PCIDLIST_ABSOLU
 	}
 
 	wil::com_ptr_nothrow<IUnknown> unknown;
-	hr = shellItemArray->QueryInterface(IID_IUnknown, reinterpret_cast<void **>(&unknown));
+	hr = shellItemArray->QueryInterface(IID_IUnknown, reinterpret_cast<void**>(&unknown));
 
 	if (FAILED(hr))
 	{
 		return hr;
 	}
 
-	hr = fo->DeleteItems(unknown.get());
+	hr = pfo->DeleteItems(unknown.get());
 
 	if (FAILED(hr))
 	{
 		return hr;
 	}
 
-	hr = fo->PerformOperations();
+	hr = pfo->PerformOperations();
+	pfo->Unadvise(cookie);
 
 	return hr;
 }
@@ -425,8 +437,7 @@ HRESULT FileOperations::CreateLinkToFile(const std::wstring &strTargetFilename,
 	const std::wstring &strLinkFilename, const std::wstring &strLinkDescription)
 {
 	IShellLink *pShellLink = nullptr;
-	HRESULT hr =
-		CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pShellLink));
+	HRESULT hr = CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pShellLink));
 
 	if (SUCCEEDED(hr))
 	{
@@ -448,6 +459,17 @@ HRESULT FileOperations::CreateLinkToFile(const std::wstring &strTargetFilename,
 	return hr;
 }
 
+HRESULT CreateFileOperationProgressSink(std::vector<PCIDLIST_ABSOLUTE> &pidls,
+	IFileOperationProgressSink **ppSink)
+{
+	CFileOperationProgressSink* pfo = new (std::nothrow)CFileOperationProgressSink(pidls);
+	if (!pfo)
+		return E_OUTOFMEMORY;
+	const auto hr = pfo->QueryInterface(IID_IFileOperationProgressSink, reinterpret_cast<LPVOID*>(ppSink));
+	pfo->Release();
+	return hr;
+}
+
 HRESULT FileOperations::ResolveLink(HWND hwnd, DWORD fFlags, const TCHAR *szLinkFilename,
 	TCHAR *szResolvedPath, int nBufferSize)
 {
@@ -460,8 +482,7 @@ HRESULT FileOperations::ResolveLink(HWND hwnd, DWORD fFlags, const TCHAR *szLink
 	}
 
 	IShellLink *pShellLink = nullptr;
-	HRESULT hr =
-		CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pShellLink));
+	HRESULT hr = CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pShellLink));
 
 	if (hr == S_OK)
 	{
@@ -492,8 +513,7 @@ HRESULT FileOperations::ResolveLink(HWND hwnd, DWORD fFlags, const TCHAR *szLink
 	return hr;
 }
 
-BOOL FileOperations::CreateBrowseDialog(HWND hOwner, const std::wstring &strTitle,
-	PIDLIST_ABSOLUTE *ppidl)
+BOOL FileOperations::CreateBrowseDialog(HWND hOwner, const std::wstring &strTitle, PIDLIST_ABSOLUTE *ppidl)
 {
 	TCHAR szDisplayName[MAX_PATH];
 
@@ -560,26 +580,22 @@ BOOL GetFileClusterSize(const std::wstring &strFilename, PLARGE_INTEGER lpRealFi
 void FileOperations::DeleteFileSecurely(const std::wstring &strFilename,
 	OverwriteMethod overwriteMethod)
 {
-	HANDLE hFile;
 	WIN32_FIND_DATA wfd;
-	HANDLE hFindFile;
 	HCRYPTPROV hProv;
 	LARGE_INTEGER lRealFileSize;
 	BYTE pass1Data;
 	BYTE pass2Data;
 	BYTE pass3Data;
 	DWORD nBytesWritten;
-	BOOL bFolder;
-	int i = 0;
 
-	hFindFile = FindFirstFile(strFilename.c_str(), &wfd);
+	HANDLE hFindFile = FindFirstFile(strFilename.c_str(), &wfd);
 
 	if (hFindFile == INVALID_HANDLE_VALUE)
 	{
 		return;
 	}
 
-	bFolder = (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
+	BOOL bFolder = (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
 
 	FindClose(hFindFile);
 
@@ -594,8 +610,7 @@ void FileOperations::DeleteFileSecurely(const std::wstring &strFilename,
 
 	/* Open the file, block any sharing mode, to stop the file
 	been opened while it is overwritten. */
-	hFile =
-		CreateFile(strFilename.c_str(), FILE_WRITE_DATA, 0, nullptr, OPEN_EXISTING, NULL, nullptr);
+	HANDLE hFile = CreateFile(strFilename.c_str(), FILE_WRITE_DATA, 0, nullptr, OPEN_EXISTING, NULL, nullptr);
 
 	if (hFile == INVALID_HANDLE_VALUE)
 	{
@@ -612,7 +627,7 @@ void FileOperations::DeleteFileSecurely(const std::wstring &strFilename,
 	SetFilePointer(hFile, 0, nullptr, FILE_BEGIN);
 	pass1Data = 0x00;
 
-	for (i = 0; i < lRealFileSize.QuadPart; i++)
+	for (int i = 0; i < lRealFileSize.QuadPart; i++)
 	{
 		WriteFile(hFile, (LPVOID) &pass1Data, 1, &nBytesWritten, nullptr);
 	}
@@ -625,7 +640,7 @@ void FileOperations::DeleteFileSecurely(const std::wstring &strFilename,
 		SetFilePointer(hFile, 0, nullptr, FILE_BEGIN);
 		pass2Data = 0xFF;
 
-		for (i = 0; i < lRealFileSize.QuadPart; i++)
+		for (int i = 0; i < lRealFileSize.QuadPart; i++)
 		{
 			WriteFile(hFile, (LPVOID) &pass2Data, 1, &nBytesWritten, nullptr);
 		}
@@ -634,7 +649,7 @@ void FileOperations::DeleteFileSecurely(const std::wstring &strFilename,
 
 		CryptAcquireContext(&hProv, _T("SecureDelete"), nullptr, PROV_RSA_AES, CRYPT_NEWKEYSET);
 
-		for (i = 0; i < lRealFileSize.QuadPart; i++)
+		for (int i = 0; i < lRealFileSize.QuadPart; i++)
 		{
 			CryptGenRandom(hProv, 1, (LPBYTE) &pass3Data);
 			WriteFile(hFile, (LPVOID) &pass3Data, 1, &nBytesWritten, nullptr);
@@ -649,3 +664,77 @@ void FileOperations::DeleteFileSecurely(const std::wstring &strFilename,
 
 	DeleteFile(strFilename.c_str());
 }
+
+HRESULT FileOperations::Undelete(const PCIDLIST_ABSOLUTE &pidl)
+{
+	CComPtr<IShellFolder> pDesktop{};
+	HRESULT hr = SHGetDesktopFolder(&pDesktop);
+	if (SUCCEEDED(hr) && pDesktop)
+	{
+		CComHeapPtr<ITEMIDLIST_ABSOLUTE> pidlbin{};
+		hr = SHGetKnownFolderIDList(FOLDERID_RecycleBinFolder, KF_FLAG_DEFAULT, NULL, &pidlbin);
+		if (SUCCEEDED(hr) && pidlbin)
+		{
+			CComPtr<IShellFolder> pShellFolder{};
+			hr = pDesktop->BindToObject(pidlbin, nullptr, IID_PPV_ARGS(&pShellFolder));
+			if (SUCCEEDED(hr) && pShellFolder)
+			{
+				CComPtr<IEnumIDList> pEnum{};
+				hr = pShellFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &pEnum);
+				if (SUCCEEDED(hr) && pEnum)
+				{
+					ULONG fetched{};
+					for (PITEMID_CHILD pidChild{}; pEnum->Next(1, &pidChild, &fetched) == S_OK; pidChild = nullptr)
+					{
+						const auto pidlRelative = ILFindLastID(static_cast<PCUIDLIST_RELATIVE>(pidl));
+						hr = pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidlRelative, pidChild);
+						if (0 == static_cast<short>(HRESULT_CODE(hr)))
+						{
+							hr = PerformUndeleting(pShellFolder, pidChild);
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return hr;
+}
+
+HRESULT FileOperations::PerformUndeleting(CComPtr<IShellFolder>& shellFolder, const PITEMID_CHILD& pidChild)
+{
+	PITEMID_CHILD* item = static_cast<PITEMID_CHILD*>(CoTaskMemAlloc(sizeof(PITEMID_CHILD)));
+	SecureZeroMemory(item, sizeof(PITEMID_CHILD));
+	item[0] = pidChild;
+
+	CComPtr<IContextMenu> pContextMenu{};
+	HRESULT hr = shellFolder->GetUIObjectOf(nullptr, 1, reinterpret_cast<PCUITEMID_CHILD_ARRAY>(item),
+		__uuidof(IContextMenu), nullptr, reinterpret_cast<void **>(&pContextMenu));
+	if (SUCCEEDED(hr) && pContextMenu)
+		hr = InvokeVerb(pContextMenu, "undelete");
+
+	CoTaskMemFree(item);
+
+	return hr;
+}
+
+HRESULT FileOperations::InvokeVerb(IContextMenu* pContextMenu, PCSTR pszVerb)
+{
+	HRESULT hr{};
+	const HMENU hmenu = CreatePopupMenu();
+	if (pContextMenu && hmenu)
+	{
+		hr = pContextMenu->QueryContextMenu(hmenu, 0, 1, 0x7FFF, CMF_NORMAL);
+		if (SUCCEEDED(hr))
+		{
+			CMINVOKECOMMANDINFO info = { 0 };
+			info.cbSize = sizeof(info);
+			info.lpVerb = pszVerb;
+			hr = pContextMenu->InvokeCommand(&info);
+		}
+		DestroyMenu(hmenu);
+	}
+	return hr;
+}
+

@@ -1362,9 +1362,7 @@ void ShellTreeView::ShowPropertiesOfSelectedItem() const
 
 void ShellTreeView::DeleteSelectedItem(bool permanent)
 {
-	HTREEITEM item = TreeView_GetSelection(m_hTreeView);
-	auto pidl = GetNodePidl(item);
-
+	auto pidl = GetNodePidl(TreeView_GetSelection(m_hTreeView));
 	m_fileActionHandler->DeleteFiles(m_hTreeView, { pidl.get() }, permanent, false);
 }
 

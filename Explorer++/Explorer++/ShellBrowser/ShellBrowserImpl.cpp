@@ -1160,8 +1160,8 @@ FolderSettings ShellBrowserImpl::GetFolderSettings() const
 
 void ShellBrowserImpl::DeleteSelectedItems(bool permanent)
 {
+	int item{ -1 };
 	std::vector<PCIDLIST_ABSOLUTE> pidls;
-	int item = -1;
 
 	while ((item = ListView_GetNextItem(m_hListView, item, LVNI_SELECTED)) != -1)
 	{
@@ -1179,7 +1179,7 @@ void ShellBrowserImpl::DeleteSelectedItems(bool permanent)
 
 void ShellBrowserImpl::StartRenamingSelectedItems()
 {
-	int numSelected = ListView_GetSelectedCount(m_hListView);
+	const auto numSelected = ListView_GetSelectedCount(m_hListView);
 
 	// If there is only item selected, start editing it in-place. If multiple items are selected,
 	// show the mass rename dialog.
