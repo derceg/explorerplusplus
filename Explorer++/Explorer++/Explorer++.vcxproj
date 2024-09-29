@@ -329,7 +329,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;WIN32;BUILD_WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;WIN32;BUILD_WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -387,7 +387,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;WIN32;BUILD_WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;WIN32;BUILD_WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -445,7 +445,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;WIN32;BUILD_WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;WIN32;BUILD_WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -503,7 +503,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;BUILD_WIN64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;BUILD_WIN64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -562,7 +562,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;BUILD_WIN64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;BUILD_WIN64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -619,7 +619,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;BUILD_ARM64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;BUILD_ARM64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -675,7 +675,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;BUILD_ARM64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;BUILD_ARM64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -733,7 +733,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;BUILD_WIN64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;BUILD_WIN64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -787,7 +787,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;BUILD_ARM64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;BUILD_ARM64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -840,7 +840,7 @@
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;WIN32;BUILD_WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;WIN32;BUILD_WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
@@ -894,7 +894,7 @@
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;BUILD_WIN64;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;BUILD_WIN64;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
@@ -945,7 +945,7 @@
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='beta'">ENVIRONMENT_RELEASE_BETA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(RELEASE_MODE)'=='stable'">ENVIRONMENT_RELEASE_STABLE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;BUILD_ARM64;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;NOMINMAX;BUILD_ARM64;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>

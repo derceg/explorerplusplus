@@ -665,11 +665,13 @@ void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
 {
 	if (m_config->displayWindowVertical)
 	{
-		m_config->displayWindowWidth = max(LOWORD(wParam), DISPLAY_WINDOW_MINIMUM_WIDTH);
+		m_config->displayWindowWidth =
+			std::max(static_cast<UINT>(LOWORD(wParam)), DISPLAY_WINDOW_MINIMUM_WIDTH);
 	}
 	else
 	{
-		m_config->displayWindowHeight = max(HIWORD(wParam), DISPLAY_WINDOW_MINIMUM_HEIGHT);
+		m_config->displayWindowHeight =
+			std::max(static_cast<UINT>(HIWORD(wParam)), DISPLAY_WINDOW_MINIMUM_HEIGHT);
 	}
 
 	RECT rc;

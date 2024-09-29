@@ -23,6 +23,7 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/XMLSettings.h"
+#include <algorithm>
 #include <regex>
 
 namespace NSearchDialog
@@ -881,7 +882,7 @@ INT_PTR SearchDialog::OnTimer(int iTimerID)
 	int nListViewItems = ListView_GetItemCount(hListView);
 
 	int nItems =
-		min(static_cast<int>(m_AwaitingSearchItems.size()), SEARCH_MAX_ITEMS_BATCH_PROCESS);
+		std::min(static_cast<int>(m_AwaitingSearchItems.size()), SEARCH_MAX_ITEMS_BATCH_PROCESS);
 	int i = 0;
 
 	auto itr = m_AwaitingSearchItems.begin();

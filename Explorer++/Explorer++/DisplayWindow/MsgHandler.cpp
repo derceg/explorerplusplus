@@ -7,6 +7,7 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
+#include <algorithm>
 
 /* Defines how close the text can get to the bottom
 of the display window before it is moved into the
@@ -306,7 +307,7 @@ void DisplayWindow::PaintText(HDC hdc, unsigned int x)
 			iLine = 0;
 		}
 
-		iCurrentColumnWidth = max(iCurrentColumnWidth, stringSize.cx);
+		iCurrentColumnWidth = std::max(iCurrentColumnWidth, static_cast<int>(stringSize.cx));
 
 		rcText.left = xCurrent;
 		rcText.top = (iLine * stringSize.cy) + m_LineSpacing;
@@ -356,7 +357,8 @@ LONG DisplayWindow::OnMouseMove(LPARAM lParam)
 		/* Notify the main window, so that it can redraw/reposition
 		its other windows. */
 		SendMessage(GetParent(m_hDisplayWindow), WM_USER_DISPLAYWINDOWRESIZED,
-			MAKEWPARAM(max(rc.right - cursorPos.x, 0), max(rc.bottom - cursorPos.y, 0)), 0);
+			MAKEWPARAM(std::max(rc.right - cursorPos.x, 0L), std::max(rc.bottom - cursorPos.y, 0L)),
+			0);
 	}
 
 	if (m_bVertical && cursorPos.x <= (rc.left + 5) || !m_bVertical && cursorPos.y <= (rc.top + 5))
