@@ -286,7 +286,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Asan|Win32'" Label="Vcpkg">
     <VcpkgUseStatic>true</VcpkgUseStatic>
     <VcpkgTriplet>x86-windows-asan</VcpkgTriplet>
-    <VcpkgAdditionalInstallOptions>--overlay-triplets=..\..\VcpkgCustomTriplets</VcpkgAdditionalInstallOptions>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug-LLVM|Win32'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
@@ -299,7 +298,6 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Asan|x64'" Label="Vcpkg">
     <VcpkgUseStatic>true</VcpkgUseStatic>
-    <VcpkgAdditionalInstallOptions>--overlay-triplets=..\..\VcpkgCustomTriplets</VcpkgAdditionalInstallOptions>
     <VcpkgTriplet>x64-windows-asan</VcpkgTriplet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Vcpkg">
