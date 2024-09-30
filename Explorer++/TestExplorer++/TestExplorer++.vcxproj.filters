@@ -223,6 +223,9 @@
     <ClCompile Include="ShellIconLoaderFake.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="UIThreadExecutorTest.cpp">
+      <Filter>Executors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -308,6 +311,9 @@
     </Filter>
     <Filter Include="Core\Accelerators">
       <UniqueIdentifier>{8573b1f7-785d-4e8a-8646-136d0fd51cbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Executors">
+      <UniqueIdentifier>{de6aab16-37e4-436f-817b-780f1e35ee98}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
