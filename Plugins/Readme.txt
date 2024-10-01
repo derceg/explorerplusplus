@@ -5,4 +5,4 @@ To load the plugins here, go through the following steps:
 1. Copy the desired plugins into a "plugins" folder in the same directory as the Explorer++ executable.
 2. Start Explorer++ with plugin support enabled:
 
-explorer++.exe --enable-plugins
+explorer++.exe --enable-features Plugins
