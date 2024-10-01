@@ -12,9 +12,11 @@ class ShellBrowser;
 class TabParentItemsMenu : public ShellItemsMenu
 {
 public:
-	TabParentItemsMenu(MenuView *menuView, BrowserWindow *browserWindow, IconFetcher *iconFetcher);
-	TabParentItemsMenu(MenuView *menuView, BrowserWindow *browserWindow, IconFetcher *iconFetcher,
-		UINT menuStartId, UINT menuEndId);
+	TabParentItemsMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
+		BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader);
+	TabParentItemsMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
+		BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader, UINT menuStartId,
+		UINT menuEndId);
 
 private:
 	static std::vector<PidlAbsolute> GetParentPidlCollection(const ShellBrowser *shellBrowser);

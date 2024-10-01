@@ -21,6 +21,7 @@
     "boost-signals2",
     "cereal",
     "cli11",
+    "concurrencpp",
     "cppwinrt",
     "detours",
     "fmt",

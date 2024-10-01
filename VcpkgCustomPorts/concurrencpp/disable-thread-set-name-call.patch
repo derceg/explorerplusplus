@@ -1,0 +1,17 @@
+diff --git a/source/threads/thread.cpp b/source/threads/thread.cpp
+index e00a28a..b39d21f 100644
+--- a/source/threads/thread.cpp
++++ b/source/threads/thread.cpp
+@@ -46,12 +46,7 @@ size_t thread::hardware_concurrency() noexcept {
+ 
+ #ifdef CRCPP_WIN_OS
+ 
+-#    include <Windows.h>
+-
+ void thread::set_name(std::string_view name) noexcept {
+-    const std::wstring utf16_name(name.begin(),
+-                                  name.end());  // concurrencpp strings are always ASCII (english only)
+-    ::SetThreadDescription(::GetCurrentThread(), utf16_name.data());
+ }
+ 
+ #elif defined(CRCPP_MINGW_OS)

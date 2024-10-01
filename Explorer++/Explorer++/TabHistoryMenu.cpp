@@ -4,21 +4,18 @@
 
 #include "stdafx.h"
 #include "TabHistoryMenu.h"
-#include "BrowserPane.h"
 #include "BrowserWindow.h"
 #include "MenuView.h"
 #include "NavigationHelper.h"
 #include "ShellBrowser/HistoryEntry.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/ShellNavigationController.h"
-#include "Tab.h"
-#include "TabContainer.h"
-#include "../Helper/ImageHelper.h"
-#include "../Helper/ShellHelper.h"
 
-TabHistoryMenu::TabHistoryMenu(MenuView *menuView, BrowserWindow *browserWindow, MenuType type) :
-	MenuBase(menuView),
+TabHistoryMenu::TabHistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
+	BrowserWindow *browserWindow, ShellIconLoader *shellIconLoader, MenuType type) :
+	MenuBase(menuView, acceleratorManager),
 	m_browserWindow(browserWindow),
+	m_shellIconLoader(shellIconLoader),
 	m_type(type)
 {
 	Initialize();
@@ -26,9 +23,6 @@ TabHistoryMenu::TabHistoryMenu(MenuView *menuView, BrowserWindow *browserWindow,
 
 void TabHistoryMenu::Initialize()
 {
-	FAIL_FAST_IF_FAILED(SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList)));
-	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(m_defaultFolderIconIndex));
-
 	BuildMenu();
 
 	m_connections.push_back(m_menuView->AddItemSelectedObserver(
@@ -64,20 +58,8 @@ void TabHistoryMenu::AddMenuItemForHistoryEntry(const HistoryEntry *entry)
 {
 	auto id = m_idCounter++;
 
-	wil::unique_hbitmap bitmap;
-	auto iconIndex = entry->GetSystemIconIndex();
-
-	if (iconIndex)
-	{
-		bitmap = ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), *iconIndex);
-	}
-	else
-	{
-		bitmap =
-			ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), m_defaultFolderIconIndex);
-	}
-
-	m_menuView->AppendItem(id, entry->GetDisplayName(), std::move(bitmap));
+	m_menuView->AppendItem(id, entry->GetDisplayName(),
+		ShellIconModel(m_shellIconLoader, entry->GetPidl().Raw()));
 }
 
 void TabHistoryMenu::OnMenuItemSelected(UINT menuItemId, bool isCtrlKeyDown, bool isShiftKeyDown)

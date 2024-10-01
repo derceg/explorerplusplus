@@ -97,7 +97,23 @@ void IconFetcherImpl::QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback)
 		{
 			UNREFERENCED_PARAMETER(id);
 
-			auto iconIndex = FindIconAsync(basicItemInfo.pidl.get());
+			// It's important that pidl is updated. Otherwise, the icon that's retrieved may be the
+			// original icon.
+			PidlAbsolute updatedPidl;
+			HRESULT hr = UpdatePidl(basicItemInfo.pidl.get(), updatedPidl);
+
+			PCIDLIST_ABSOLUTE finalPidl;
+
+			if (SUCCEEDED(hr))
+			{
+				finalPidl = updatedPidl.Raw();
+			}
+			else
+			{
+				finalPidl = basicItemInfo.pidl.get();
+			}
+
+			auto iconIndex = FindIconAsync(finalPidl);
 
 			if (!iconIndex)
 			{
@@ -108,7 +124,7 @@ void IconFetcherImpl::QueueIconTask(PCIDLIST_ABSOLUTE pidl, Callback callback)
 			result.iconIndex = *iconIndex;
 
 			std::wstring filePath;
-			HRESULT hr = GetDisplayName(basicItemInfo.pidl.get(), SHGDN_FORPARSING, filePath);
+			hr = GetDisplayName(finalPidl, SHGDN_FORPARSING, filePath);
 
 			if (SUCCEEDED(hr))
 			{

@@ -1282,23 +1282,14 @@ HRESULT CreateSimplePidl(const std::wstring &path, PidlAbsolute &outputPidl, ISh
 	return S_OK;
 }
 
-// This performs the same function as SHGetRealIDL, which is deprecated.
-HRESULT SimplePidlToFullPidl(PCIDLIST_ABSOLUTE simplePidl, PIDLIST_ABSOLUTE *fullPidl)
+// Updates a PIDL. This can be used both to transform a simple pidl into a full pidl, as well as
+// update an existing full pidl.
+HRESULT UpdatePidl(PCIDLIST_ABSOLUTE inputPidl, PidlAbsolute &outputPidl)
 {
 	wil::com_ptr_nothrow<IShellItem2> shellItem2;
-	RETURN_IF_FAILED(SHCreateItemFromIDList(simplePidl, IID_PPV_ARGS(&shellItem2)));
+	RETURN_IF_FAILED(SHCreateItemFromIDList(inputPidl, IID_PPV_ARGS(&shellItem2)));
 	RETURN_IF_FAILED(shellItem2->Update(nullptr));
-
-	wil::com_ptr_nothrow<IParentAndItem> parentAndItem;
-	RETURN_IF_FAILED(shellItem2->QueryInterface(IID_PPV_ARGS(&parentAndItem)));
-
-	unique_pidl_absolute parent;
-	unique_pidl_child child;
-	RETURN_IF_FAILED(
-		parentAndItem->GetParentAndItem(wil::out_param(parent), nullptr, wil::out_param(child)));
-
-	*fullPidl = ILCombine(parent.get(), child.get());
-
+	RETURN_IF_FAILED(SHGetIDListFromObject(shellItem2.get(), PidlOutParam(outputPidl)));
 	return S_OK;
 }
 

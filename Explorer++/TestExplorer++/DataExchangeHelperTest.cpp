@@ -4,7 +4,7 @@
 
 #include "pch.h"
 #include "../Helper/DataExchangeHelper.h"
-#include "GdiplusTestHelper.h"
+#include "ImageTestHelper.h"
 #include "../Helper/DataObjectImpl.h"
 #include <gtest/gtest.h>
 
@@ -22,7 +22,7 @@ protected:
 	void PerformTest(ImageType imageType)
 	{
 		std::unique_ptr<Gdiplus::Bitmap> bitmap;
-		BuildTestBitmap(100, 100, bitmap);
+		BuildTestGdiplusBitmap(100, 100, bitmap);
 
 		wil::unique_hglobal global;
 

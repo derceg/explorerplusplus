@@ -5,10 +5,10 @@
 #include "stdafx.h"
 #include "Theme.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceManager.h"
 #include <glog/logging.h>
 
-std::wstring GetThemeText(Theme theme, HINSTANCE resourceInstance)
+std::wstring GetThemeText(Theme theme)
 {
 	UINT stringId;
 
@@ -31,5 +31,5 @@ std::wstring GetThemeText(Theme theme, HINSTANCE resourceInstance)
 		__assume(0);
 	}
 
-	return ResourceHelper::LoadString(resourceInstance, stringId);
+	return Resources::LoadString(stringId);
 }

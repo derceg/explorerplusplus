@@ -376,7 +376,7 @@ void Explorerplusplus::OnAddressBarSizeUpdated()
 void Explorerplusplus::CreateMainToolbar()
 {
 	m_mainToolbar = MainToolbar::Create(m_hMainRebar, m_resourceInstance, this, this,
-		&m_iconFetcher, m_config, m_loadedMainToolbarButtons);
+		&m_shellIconLoader, m_config, m_loadedMainToolbarButtons);
 	m_mainToolbar->sizeUpdatedSignal.AddObserver(
 		std::bind(&Explorerplusplus::OnRebarToolbarSizeUpdated, this, m_mainToolbar->GetHWND()));
 }

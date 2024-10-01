@@ -69,22 +69,22 @@ const std::unordered_map<MainToolbarButton, Icon, ToolbarButtonHash> TOOLBAR_BUT
 // clang-format on
 
 MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE resourceInstance,
-	BrowserWindow *browserWindow, CoreInterface *coreInterface, IconFetcher *iconFetcher,
+	BrowserWindow *browserWindow, CoreInterface *coreInterface, ShellIconLoader *shellIconLoader,
 	std::shared_ptr<Config> config,
 	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons)
 {
-	return new MainToolbar(parent, resourceInstance, browserWindow, coreInterface, iconFetcher,
+	return new MainToolbar(parent, resourceInstance, browserWindow, coreInterface, shellIconLoader,
 		config, initialButtons);
 }
 
 MainToolbar::MainToolbar(HWND parent, HINSTANCE resourceInstance, BrowserWindow *browserWindow,
-	CoreInterface *coreInterface, IconFetcher *iconFetcher, std::shared_ptr<Config> config,
+	CoreInterface *coreInterface, ShellIconLoader *shellIconLoader, std::shared_ptr<Config> config,
 	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons) :
 	BaseWindow(CreateMainToolbar(parent)),
 	m_resourceInstance(resourceInstance),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
-	m_iconFetcher(iconFetcher),
+	m_shellIconLoader(shellIconLoader),
 	m_config(config),
 	m_fontSetter(m_hwnd, config.get()),
 	m_tooltipFontSetter(reinterpret_cast<HWND>(SendMessage(m_hwnd, TB_GETTOOLTIPS, 0, 0)),
@@ -700,14 +700,16 @@ void MainToolbar::ShowHistoryMenu(TabHistoryMenu::MenuType historyType)
 	}
 
 	PopupMenuView popupMenu;
-	TabHistoryMenu menu(&popupMenu, m_browserWindow, historyType);
+	TabHistoryMenu menu(&popupMenu, m_coreInterface->GetAcceleratorManager(), m_browserWindow,
+		m_shellIconLoader, historyType);
 	popupMenu.Show(m_hwnd, GetMenuPositionForButton(button));
 }
 
 void MainToolbar::ShowUpNavigationMenu()
 {
 	PopupMenuView popupMenu;
-	TabParentItemsMenu menu(&popupMenu, m_browserWindow, m_iconFetcher);
+	TabParentItemsMenu menu(&popupMenu, m_coreInterface->GetAcceleratorManager(), m_browserWindow,
+		m_shellIconLoader);
 	popupMenu.Show(m_hwnd, GetMenuPositionForButton(MainToolbarButton::Up));
 }
 

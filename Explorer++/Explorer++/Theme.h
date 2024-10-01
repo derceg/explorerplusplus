@@ -15,4 +15,4 @@ BETTER_ENUM(Theme, int,
 )
 // clang-format on
 
-std::wstring GetThemeText(Theme theme, HINSTANCE resourceInstance);
+std::wstring GetThemeText(Theme theme);

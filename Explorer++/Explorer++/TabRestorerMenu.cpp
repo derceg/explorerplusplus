@@ -4,31 +4,25 @@
 
 #include "stdafx.h"
 #include "TabRestorerMenu.h"
-#include "AcceleratorHelper.h"
 #include "AcceleratorManager.h"
 #include "MainResource.h"
 #include "MenuView.h"
-#include "ResourceHelper.h"
+#include "ResourceManager.h"
 #include "ShellBrowser/PreservedHistoryEntry.h"
 #include "TabRestorer.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <ranges>
 
-TabRestorerMenu::TabRestorerMenu(MenuView *menuView, TabRestorer *tabRestorer,
-	const AcceleratorManager *acceleratorManager, HINSTANCE resourceInstance, UINT menuStartId,
-	UINT menuEndId) :
-	MenuBase(menuView),
+TabRestorerMenu::TabRestorerMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
+	TabRestorer *tabRestorer, ShellIconLoader *shellIconLoader, UINT menuStartId, UINT menuEndId) :
+	MenuBase(menuView, acceleratorManager),
 	m_tabRestorer(tabRestorer),
-	m_acceleratorManager(acceleratorManager),
-	m_resourceInstance(resourceInstance),
+	m_shellIconLoader(shellIconLoader),
 	m_menuStartId(menuStartId),
 	m_menuEndId(menuEndId),
 	m_idCounter(menuStartId)
 {
-	FAIL_FAST_IF_FAILED(SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList)));
-	FAIL_FAST_IF_FAILED(GetDefaultFolderIconIndex(m_defaultFolderIconIndex));
-
 	m_connections.push_back(tabRestorer->AddItemsChangedObserver(
 		std::bind_front(&TabRestorerMenu::OnRestoreItemsChanged, this)));
 	m_connections.push_back(m_menuView->AddItemSelectedObserver(
@@ -48,8 +42,7 @@ void TabRestorerMenu::RebuildMenu()
 	if (m_tabRestorer->GetClosedTabs().empty())
 	{
 		auto id = m_idCounter++;
-		m_menuView->AppendItem(id,
-			ResourceHelper::LoadString(m_resourceInstance, IDS_NO_RECENT_TABS));
+		m_menuView->AppendItem(id, Resources::LoadString(IDS_NO_RECENT_TABS));
 		m_menuView->EnableItem(id, false);
 		return;
 	}
@@ -76,30 +69,16 @@ void TabRestorerMenu::AddMenuItemForClosedTab(const PreservedTab *closedTab,
 
 	std::wstring menuText = currentEntry->displayName;
 
+	std::optional<std::wstring> acceleratorText;
+
 	if (addAcceleratorText)
 	{
-		auto accelerator = m_acceleratorManager->GetAcceleratorForCommand(IDA_RESTORE_LAST_TAB);
-
-		if (accelerator)
-		{
-			menuText += L"\t" + BuildAcceleratorString(*accelerator);
-		}
+		acceleratorText = GetAcceleratorTextForId(IDA_RESTORE_LAST_TAB);
 	}
 
-	wil::unique_hbitmap bitmap;
-	auto iconIndex = currentEntry->systemIconIndex;
-
-	if (iconIndex)
-	{
-		bitmap = ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), *iconIndex);
-	}
-	else
-	{
-		bitmap =
-			ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), m_defaultFolderIconIndex);
-	}
-
-	m_menuView->AppendItem(id, menuText, std::move(bitmap), currentEntry->fullPathForDisplay);
+	m_menuView->AppendItem(id, menuText,
+		ShellIconModel(m_shellIconLoader, currentEntry->pidl.Raw()),
+		currentEntry->fullPathForDisplay, acceleratorText);
 
 	auto [itr, didInsert] = m_menuItemMappings.insert({ id, closedTab->id });
 	DCHECK(didInsert);

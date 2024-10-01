@@ -688,6 +688,21 @@
     <ClCompile Include="TabContainerBackgroundContextMenu.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
+    <ClCompile Include="Win32ResourceLoader.cpp">
+      <Filter>Core\Resource Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceManager.cpp">
+      <Filter>Core\Resource Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellIconLoaderImpl.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellIconModel.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="UIThreadExecutor.cpp">
+      <Filter>Executors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1413,6 +1428,27 @@
     <ClInclude Include="TabContainerBackgroundContextMenu.h">
       <Filter>Tabs</Filter>
     </ClInclude>
+    <ClInclude Include="Win32ResourceLoader.h">
+      <Filter>Core\Resource Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManager.h">
+      <Filter>Core\Resource Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceLoader.h">
+      <Filter>Core\Resource Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellIconModel.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellIconLoaderImpl.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellIconLoader.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="UIThreadExecutor.h">
+      <Filter>Executors</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1571,6 +1607,12 @@
     </Filter>
     <Filter Include="Core\Accelerators">
       <UniqueIdentifier>{4a6efb22-1fee-46bd-a375-12e500fe4fda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Resource Loading">
+      <UniqueIdentifier>{e7f03946-8121-4ea7-a8ea-894d7fc97109}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Executors">
+      <UniqueIdentifier>{931447cd-9040-4f5c-9726-28d9d840b1e5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

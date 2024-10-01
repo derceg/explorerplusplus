@@ -6,30 +6,64 @@
 #include "MenuView.h"
 #include "../Helper/MenuHelper.h"
 
+MenuView::MenuView() : m_destroyed(std::make_shared<bool>(false))
+{
+}
+
 MenuView::~MenuView()
 {
 	m_viewDestroyedSignal();
+
+	*m_destroyed = true;
 }
 
-void MenuView::AppendItem(UINT id, const std::wstring &text, wil::unique_hbitmap bitmap,
-	const std::wstring &helpText)
+void MenuView::AppendItem(UINT id, const std::wstring &text, const ShellIconModel &shellIcon,
+	const std::wstring &helpText, const std::optional<std::wstring> &acceleratorText)
 {
 	// The value 0 shouldn't be used as an item ID. That's because a call like TrackPopupMenu() will
 	// use a return value of 0 to indicate the menu was canceled, or an error occurred.
 	DCHECK_NE(id, 0U);
 
+	std::wstring finalText = text;
+
+	if (acceleratorText)
+	{
+		finalText += L"\t" + *acceleratorText;
+	}
+
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
 	menuItemInfo.fMask = MIIM_ID | MIIM_STRING;
 	menuItemInfo.wID = id;
-	menuItemInfo.dwTypeData = const_cast<LPWSTR>(text.c_str());
+	menuItemInfo.dwTypeData = finalText.data();
+
+	int iconCallbackId = m_iconCallbackIdCounter++;
+
+	auto bitmap = shellIcon.GetBitmap(ShellIconSize::Small,
+		[this, id, iconCallbackId, destroyed = m_destroyed](wil::unique_hbitmap updatedIcon)
+		{
+			if (*destroyed)
+			{
+				// The icon can be returned after the menu has been closed. In that case, there's
+				// nothing that needs to be done.
+				return;
+			}
+
+			OnUpdatedIconRetrieved(id, iconCallbackId, std::move(updatedIcon));
+		});
+
+	auto [itrIconCallback, didInsertIconCallback] = m_pendingIconCallbackIds.insert(iconCallbackId);
+	DCHECK(didInsertIconCallback);
 
 	if (bitmap)
 	{
 		menuItemInfo.fMask |= MIIM_BITMAP;
 		menuItemInfo.hbmpItem = bitmap.get();
 
-		m_menuImages.push_back(std::move(bitmap));
+		// The CHECK here is present because the bitmap needs to be stored while the menu exists.
+		// There shouldn't be items with duplicate IDs, so this insert should always succeed.
+		auto [itr, didInsert] = m_itemImageMapping.insert({ id, std::move(bitmap) });
+		CHECK(didInsert);
 	}
 
 	auto res = InsertMenuItem(GetMenu(), GetMenuItemCount(GetMenu()), true, &menuItemInfo);
@@ -39,7 +73,23 @@ void MenuView::AppendItem(UINT id, const std::wstring &text, wil::unique_hbitmap
 	DCHECK(didInsert);
 }
 
-void MenuView::SetBitmapForItem(UINT id, wil::unique_hbitmap bitmap)
+void MenuView::OnUpdatedIconRetrieved(UINT id, int iconCallbackId, wil::unique_hbitmap updatedIcon)
+{
+	auto itr = m_pendingIconCallbackIds.find(iconCallbackId);
+
+	// As the menu can be cleared when the set of items changes, this icon notification might be for
+	// a previous menu item. If it is, it can be ignored.
+	if (itr == m_pendingIconCallbackIds.end())
+	{
+		return;
+	}
+
+	m_pendingIconCallbackIds.erase(itr);
+
+	UpdateBitmapForItem(id, std::move(updatedIcon));
+}
+
+void MenuView::UpdateBitmapForItem(UINT id, wil::unique_hbitmap bitmap)
 {
 	MENUITEMINFO menuItemInfo = {};
 	menuItemInfo.cbSize = sizeof(menuItemInfo);
@@ -50,7 +100,7 @@ void MenuView::SetBitmapForItem(UINT id, wil::unique_hbitmap bitmap)
 
 	if (bitmap)
 	{
-		m_menuImages.push_back(std::move(bitmap));
+		m_itemImageMapping.insert_or_assign(id, std::move(bitmap));
 	}
 }
 
@@ -67,7 +117,8 @@ void MenuView::ClearMenu()
 		DCHECK(res);
 	}
 
-	m_menuImages.clear();
+	m_itemImageMapping.clear();
+	m_pendingIconCallbackIds.clear();
 	m_itemHelpTextMapping.clear();
 }
 

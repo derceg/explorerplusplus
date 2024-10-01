@@ -12,10 +12,12 @@ class HistoryService;
 class GlobalHistoryMenu : public ShellItemsMenu
 {
 public:
-	GlobalHistoryMenu(MenuView *menuView, HistoryService *historyService,
-		BrowserWindow *browserWindow, IconFetcher *iconFetcher);
-	GlobalHistoryMenu(MenuView *menuView, HistoryService *historyService,
-		BrowserWindow *browserWindow, IconFetcher *iconFetcher, UINT menuStartId, UINT menuEndId);
+	GlobalHistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
+		HistoryService *historyService, BrowserWindow *browserWindow,
+		ShellIconLoader *shellIconLoader);
+	GlobalHistoryMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
+		HistoryService *historyService, BrowserWindow *browserWindow,
+		ShellIconLoader *shellIconLoader, UINT menuStartId, UINT menuEndId);
 
 private:
 	void Initialize();

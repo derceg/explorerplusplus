@@ -16,7 +16,8 @@ class TabContainer;
 class TabContainerBackgroundContextMenu : public MenuBase
 {
 public:
-	TabContainerBackgroundContextMenu(MenuView *menuView, TabContainer *tabContainer,
+	TabContainerBackgroundContextMenu(MenuView *menuView,
+		const AcceleratorManager *acceleratorManager, TabContainer *tabContainer,
 		BookmarkTree *bookmarkTree, CoreInterface *coreInterface);
 
 private:

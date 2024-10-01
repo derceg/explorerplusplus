@@ -204,7 +204,7 @@
     <ClCompile Include="DataExchangeHelperTest.cpp">
       <Filter>Helper\Data Exchange</Filter>
     </ClCompile>
-    <ClCompile Include="GdiplusTestHelper.cpp" />
+    <ClCompile Include="ImageTestHelper.cpp" />
     <ClCompile Include="VersionTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -219,6 +219,12 @@
     </ClCompile>
     <ClCompile Include="AcceleratorTestHelper.cpp">
       <Filter>Core\Accelerators</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellIconLoaderFake.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="UIThreadExecutorTest.cpp">
+      <Filter>Executors</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -306,6 +312,9 @@
     <Filter Include="Core\Accelerators">
       <UniqueIdentifier>{8573b1f7-785d-4e8a-8646-136d0fd51cbd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Executors">
+      <UniqueIdentifier>{de6aab16-37e4-436f-817b-780f1e35ee98}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -365,9 +374,12 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ShellTestHelper.h" />
-    <ClInclude Include="GdiplusTestHelper.h" />
+    <ClInclude Include="ImageTestHelper.h" />
     <ClInclude Include="AcceleratorTestHelper.h">
       <Filter>Core\Accelerators</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellIconLoaderFake.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

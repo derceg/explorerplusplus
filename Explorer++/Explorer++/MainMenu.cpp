@@ -92,8 +92,8 @@ void Explorerplusplus::InitializeMainMenu()
 
 	m_globalHistoryMenuView = std::make_unique<MainMenuSubMenuView>(mainMenu, IDM_GO_HISTORY);
 	m_globalHistoryMenu = std::make_unique<GlobalHistoryMenu>(m_globalHistoryMenuView.get(),
-		HistoryServiceFactory::GetInstance()->GetHistoryService(), this, &m_iconFetcher,
-		MENU_GLOBAL_HISTORY_START_ID, MENU_GLOBAL_HISTORY_END_ID);
+		m_acceleratorManager, HistoryServiceFactory::GetInstance()->GetHistoryService(), this,
+		&m_shellIconLoader, MENU_GLOBAL_HISTORY_START_ID, MENU_GLOBAL_HISTORY_END_ID);
 
 	AddGetMenuItemHelperTextObserver(
 		std::bind_front(&Explorerplusplus::MaybeGetMenuItemHelperText, this));
@@ -139,14 +139,9 @@ void Explorerplusplus::SetPasteSymLinkElevationIcon()
 		return;
 	}
 
-	auto bitmap =
-		ImageHelper::ImageListIconToBitmap(m_mainMenuSystemImageList.get(), info.iSysImageIndex);
-
-	if (!bitmap)
-	{
-		DCHECK(false);
-		return;
-	}
+	wil::unique_hbitmap bitmap;
+	ImageHelper::ImageListIconToPBGRABitmap(m_mainMenuSystemImageList.get(), info.iSysImageIndex,
+		bitmap);
 
 	HMENU mainMenu = GetMenu(m_hContainer);
 	MenuHelper::SetBitmapForItem(mainMenu, IDM_EDIT_PASTE_SYMBOLIC_LINK, bitmap.get());
@@ -186,6 +181,7 @@ void Explorerplusplus::InitializeGoMenu(HMENU mainMenu)
 
 	AddGoMenuItem(goMenu, IDM_GO_WSL_DISTRIBUTIONS, WSL_DISTRIBUTIONS_PATH);
 
+	MenuHelper::RemoveDuplicateSeperators(goMenu);
 	MenuHelper::RemoveTrailingSeparators(goMenu);
 }
 
@@ -237,14 +233,9 @@ void Explorerplusplus::AddGoMenuItem(HMENU goMenu, UINT id, PCIDLIST_ABSOLUTE pi
 			// were pumped, the window message handler that the class sets up will no longer be
 			// active. So, once destruction of the Explorerplusplus instance has started, there's no
 			// way for this callback to run.
-			auto bitmap =
-				ImageHelper::ImageListIconToBitmap(m_mainMenuSystemImageList.get(), iconIndex);
-
-			if (!bitmap)
-			{
-				DCHECK(false);
-				return;
-			}
+			wil::unique_hbitmap bitmap;
+			ImageHelper::ImageListIconToPBGRABitmap(m_mainMenuSystemImageList.get(), iconIndex,
+				bitmap);
 
 			MenuHelper::SetBitmapForItem(goMenu, id, bitmap.get());
 

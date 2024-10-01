@@ -154,14 +154,14 @@ void ShellTreeView::OnItemAdded(PCIDLIST_ABSOLUTE simplePidl)
 		return;
 	}
 
-	unique_pidl_absolute pidlFull;
-	HRESULT hr = SimplePidlToFullPidl(simplePidl, wil::out_param(pidlFull));
+	PidlAbsolute pidlFull;
+	HRESULT hr = UpdatePidl(simplePidl, pidlFull);
 
 	PCIDLIST_ABSOLUTE pidl;
 
 	if (SUCCEEDED(hr))
 	{
-		pidl = pidlFull.get();
+		pidl = pidlFull.Raw();
 	}
 	else
 	{
