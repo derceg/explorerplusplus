@@ -53,10 +53,25 @@ private:
 	ULONG_PTR m_gdiplusToken;
 };
 
+// This listener will ensure that when as ASSERT_* fails in a subroutine, the entire test will fail.
+// See https://google.github.io/googletest/advanced.html#asserting-on-subroutines-with-an-exception.
+class ThrowListener : public EmptyTestEventListener
+{
+public:
+	void OnTestPartResult(const TestPartResult &result) override
+	{
+		if (result.type() == TestPartResult::kFatalFailure)
+		{
+			throw AssertionException(result);
+		}
+	}
+};
+
 int wmain(int argc, wchar_t *argv[])
 {
 	AddGlobalTestEnvironment(new ComEnvironment);
 	AddGlobalTestEnvironment(new GdiplusEnvironment);
 	InitGoogleTest(&argc, argv);
+	UnitTest::GetInstance()->listeners().Append(new ThrowListener);
 	return RUN_ALL_TESTS();
 }
