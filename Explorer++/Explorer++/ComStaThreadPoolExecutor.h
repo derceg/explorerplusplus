@@ -4,18 +4,20 @@
 
 #pragma once
 
-#include "../Helper/WindowSubclassWrapper.h"
 #include <concurrencpp/concurrencpp.h>
+#include <wil/resource.h>
 #include <atomic>
-#include <memory>
 #include <mutex>
 #include <queue>
+#include <thread>
 #include <vector>
 
-class UIThreadExecutor : public concurrencpp::derivable_executor<UIThreadExecutor>
+// Represents a pool of threads, where COM has been initialized on each thread with the
+// single-threaded apartment model. Each thread will both pump messages and run any queued tasks.
+class ComStaThreadPoolExecutor : public concurrencpp::derivable_executor<ComStaThreadPoolExecutor>
 {
 public:
-	UIThreadExecutor();
+	ComStaThreadPoolExecutor(int numThreads);
 
 	void enqueue(concurrencpp::task task) override;
 	void enqueue(std::span<concurrencpp::task> tasks) override;
@@ -24,16 +26,17 @@ public:
 	void shutdown() noexcept override;
 
 private:
-	static constexpr UINT WM_USER_TASK_QUEUED = WM_USER;
-	static constexpr UINT WM_USER_DESTROY_WINDOW = WM_USER + 1;
+	void ThreadMain();
+	void RunLoop();
+	bool PerformWork();
+	bool PumpMessageLoop();
+	bool RunTask();
+	void WaitForWork();
 
-	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	void OnTaskQueued();
-	void OnDestroyWindow();
-
-	const HWND m_hwnd;
-	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
+	std::vector<std::jthread> m_threads;
 	std::mutex m_mutex;
 	std::queue<concurrencpp::task> m_queue;
+	wil::unique_event_failfast m_taskQueuedEvent;
+	wil::unique_event_failfast m_shutDownEvent;
 	std::atomic_bool m_shutdownRequested = false;
 };

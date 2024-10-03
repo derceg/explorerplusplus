@@ -226,6 +226,12 @@
     <ClCompile Include="UIThreadExecutorTest.cpp">
       <Filter>Executors</Filter>
     </ClCompile>
+    <ClCompile Include="ComStaThreadPoolExecutorTest.cpp">
+      <Filter>Executors</Filter>
+    </ClCompile>
+    <ClCompile Include="ExecutorTestBase.cpp">
+      <Filter>Executors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -380,6 +386,9 @@
     </ClInclude>
     <ClInclude Include="ShellIconLoaderFake.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ExecutorTestBase.h">
+      <Filter>Executors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -4,12 +4,14 @@
 
 #include "stdafx.h"
 #include "UIThreadExecutor.h"
-#include <CommCtrl.h>
+#include "../Helper/WindowHelper.h"
 
 UIThreadExecutor::UIThreadExecutor() :
 	concurrencpp::derivable_executor<UIThreadExecutor>("UIThreadExecutor"),
 	m_hwnd(CreateMessageOnlyWindow())
 {
+	CHECK(m_hwnd);
+
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
 		std::bind_front(&UIThreadExecutor::WndProc, this)));
 }
@@ -64,24 +66,6 @@ void UIThreadExecutor::shutdown() noexcept
 
 	auto res = SendMessage(m_hwnd, WM_USER_DESTROY_WINDOW, 0, 0);
 	DCHECK_EQ(res, 1);
-}
-
-HWND UIThreadExecutor::CreateMessageOnlyWindow()
-{
-	WNDCLASS windowClass = {};
-	windowClass.lpfnWndProc = DefWindowProc;
-	windowClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	windowClass.lpszClassName = MESSAGE_CLASS_NAME;
-	windowClass.hInstance = GetModuleHandle(nullptr);
-	windowClass.style = CS_HREDRAW | CS_VREDRAW;
-	RegisterClass(&windowClass);
-
-	HWND hwnd = CreateWindow(MESSAGE_CLASS_NAME, MESSAGE_CLASS_NAME, WS_DISABLED, CW_USEDEFAULT,
-		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, HWND_MESSAGE, nullptr,
-		GetModuleHandle(nullptr), nullptr);
-	CHECK(hwnd);
-
-	return hwnd;
 }
 
 LRESULT UIThreadExecutor::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

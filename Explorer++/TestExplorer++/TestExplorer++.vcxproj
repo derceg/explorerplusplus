@@ -205,6 +205,7 @@
     <ClCompile Include="ColumnStorageTest.cpp" />
     <ClCompile Include="ColumnXmlStorageTest.cpp" />
     <ClCompile Include="CommandLineSplitterTest.cpp" />
+    <ClCompile Include="ComStaThreadPoolExecutorTest.cpp" />
     <ClCompile Include="ControlsTest.cpp" />
     <ClCompile Include="CustomFontStorageTest.cpp" />
     <ClCompile Include="DataExchangeHelperTest.cpp" />
@@ -217,6 +218,7 @@
     <ClCompile Include="BookmarkItemTest.cpp" />
     <ClCompile Include="BookmarkTreeTest.cpp" />
     <ClCompile Include="CachedIconsTest.cpp" />
+    <ClCompile Include="ExecutorTestBase.cpp" />
     <ClCompile Include="FrequentLocationsServiceTest.cpp" />
     <ClCompile Include="GdiplusHelperTest.cpp" />
     <ClCompile Include="ImageTestHelper.cpp" />
@@ -304,6 +306,7 @@
     <ClInclude Include="ColorRulesStorageTestHelper.h" />
     <ClInclude Include="ColumnStorageTestHelper.h" />
     <ClInclude Include="DragDropTestHelper.h" />
+    <ClInclude Include="ExecutorTestBase.h" />
     <ClInclude Include="ImageTestHelper.h" />
     <ClInclude Include="IconFetcherMock.h" />
     <ClInclude Include="MainRebarStorageTestHelper.h" />

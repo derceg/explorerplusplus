@@ -703,6 +703,9 @@
     <ClCompile Include="UIThreadExecutor.cpp">
       <Filter>Executors</Filter>
     </ClCompile>
+    <ClCompile Include="ComStaThreadPoolExecutor.cpp">
+      <Filter>Executors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1447,6 +1450,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="UIThreadExecutor.h">
+      <Filter>Executors</Filter>
+    </ClInclude>
+    <ClInclude Include="ComStaThreadPoolExecutor.h">
       <Filter>Executors</Filter>
     </ClInclude>
   </ItemGroup>

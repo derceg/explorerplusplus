@@ -4,18 +4,16 @@
 
 #include "pch.h"
 #include "UIThreadExecutor.h"
+#include "ExecutorTestBase.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
 
-class UIThreadExecutorTest : public Test
+class UIThreadExecutorTest : public ExecutorTestBase
 {
 protected:
-	~UIThreadExecutorTest()
+	UIThreadExecutorTest() : ExecutorTestBase(std::make_unique<UIThreadExecutor>())
 	{
-		// A test may call this method, but that's not an issue, since it's explicitly safe to call
-		// the method multiple times.
-		m_executor.shutdown();
 	}
 
 	void PumpMessageLoopUntilIdle()
@@ -28,18 +26,16 @@ protected:
 			DispatchMessage(&msg);
 		}
 	}
-
-	UIThreadExecutor m_executor;
 };
 
 TEST_F(UIThreadExecutorTest, Submit)
 {
 	MockFunction<void()> task1;
-	m_executor.submit(task1.AsStdFunction());
+	m_executor->submit(task1.AsStdFunction());
 	EXPECT_CALL(task1, Call());
 
 	MockFunction<void()> task2;
-	m_executor.submit(task2.AsStdFunction());
+	m_executor->submit(task2.AsStdFunction());
 	EXPECT_CALL(task2, Call());
 
 	PumpMessageLoopUntilIdle();
@@ -57,28 +53,28 @@ TEST_F(UIThreadExecutorTest, BulkSubmit)
 		tasksAsFunctions.push_back(task.AsStdFunction());
 	}
 
-	m_executor.bulk_submit<std::function<void()>>(tasksAsFunctions);
+	m_executor->bulk_submit<std::function<void()>>(tasksAsFunctions);
 
 	PumpMessageLoopUntilIdle();
 }
 
 TEST_F(UIThreadExecutorTest, ShutdownRequested)
 {
-	EXPECT_FALSE(m_executor.shutdown_requested());
+	EXPECT_FALSE(m_executor->shutdown_requested());
 
-	m_executor.shutdown();
-	EXPECT_TRUE(m_executor.shutdown_requested());
+	m_executor->shutdown();
+	EXPECT_TRUE(m_executor->shutdown_requested());
 }
 
 TEST_F(UIThreadExecutorTest, ShutdownDuringTaskLoop)
 {
 	// If shutdown() is called while a task is being run, any remaining tasks should be skipped.
 	MockFunction<void()> task1;
-	m_executor.submit(task1.AsStdFunction());
-	EXPECT_CALL(task1, Call()).WillOnce([this] { m_executor.shutdown(); });
+	m_executor->submit(task1.AsStdFunction());
+	EXPECT_CALL(task1, Call()).WillOnce([this] { m_executor->shutdown(); });
 
 	MockFunction<void()> task2;
-	m_executor.submit(task2.AsStdFunction());
+	m_executor->submit(task2.AsStdFunction());
 	EXPECT_CALL(task2, Call()).Times(0);
 
 	PumpMessageLoopUntilIdle();
@@ -86,11 +82,11 @@ TEST_F(UIThreadExecutorTest, ShutdownDuringTaskLoop)
 
 TEST_F(UIThreadExecutorTest, EnqueueAfterShutdown)
 {
-	m_executor.shutdown();
+	m_executor->shutdown();
 
-	EXPECT_THROW(m_executor.enqueue(concurrencpp::task()), concurrencpp::errors::runtime_shutdown);
+	EXPECT_THROW(m_executor->enqueue(concurrencpp::task()), concurrencpp::errors::runtime_shutdown);
 
 	concurrencpp::task tasks[4];
 	std::span<concurrencpp::task> tasksSpan = tasks;
-	EXPECT_THROW(m_executor.enqueue(tasksSpan), concurrencpp::errors::runtime_shutdown);
+	EXPECT_THROW(m_executor->enqueue(tasksSpan), concurrencpp::errors::runtime_shutdown);
 }

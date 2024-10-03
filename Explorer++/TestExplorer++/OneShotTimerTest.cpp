@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "OneShotTimer.h"
 #include "OneShotTimerManager.h"
+#include "../Helper/WindowHelper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <CommCtrl.h>
@@ -17,8 +18,7 @@ class OneShotTimerTest : public Test
 protected:
 	void SetUp() override
 	{
-		m_messageWindow.reset(CreateWindow(WC_STATIC, L"", 0, 0, 0, 0, 0, HWND_MESSAGE, nullptr,
-			GetModuleHandle(nullptr), nullptr));
+		m_messageWindow.reset(CreateMessageOnlyWindow());
 		ASSERT_NE(m_messageWindow, nullptr);
 
 		m_timerManager = std::make_unique<OneShotTimerManager>(m_messageWindow.get());
