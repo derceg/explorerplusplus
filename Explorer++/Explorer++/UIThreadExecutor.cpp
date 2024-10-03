@@ -51,12 +51,12 @@ bool UIThreadExecutor::shutdown_requested() const noexcept
 
 void UIThreadExecutor::shutdown() noexcept
 {
-	if (m_shutdownRequested)
+	const auto shutdownRequested = m_shutdownRequested.exchange(true);
+
+	if (shutdownRequested)
 	{
 		return;
 	}
-
-	m_shutdownRequested = true;
 
 	std::unique_lock<std::mutex> lock(m_mutex);
 	m_queue = {};
