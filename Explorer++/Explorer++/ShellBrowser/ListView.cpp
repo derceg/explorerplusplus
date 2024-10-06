@@ -396,7 +396,7 @@ void ShellBrowserImpl::OnListViewGetDisplayInfo(LPARAM lParam)
 	if ((plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
 	{
 		const ItemInfo_t &itemInfo = m_itemInfoMap.at(internalIndex);
-		auto cachedIconIndex = GetCachedIconIndex(itemInfo);
+		auto cachedIconIndex = m_cachedIcons->MaybeGetIconIndex(itemInfo.parsingName);
 
 		if (cachedIconIndex)
 		{
@@ -435,18 +435,6 @@ void ShellBrowserImpl::OnListViewGetDisplayInfo(LPARAM lParam)
 	}
 
 	plvItem->mask |= LVIF_DI_SETITEM;
-}
-
-std::optional<int> ShellBrowserImpl::GetCachedIconIndex(const ItemInfo_t &itemInfo)
-{
-	auto cachedItr = m_cachedIcons->findByPath(itemInfo.parsingName);
-
-	if (cachedItr == m_cachedIcons->end())
-	{
-		return std::nullopt;
-	}
-
-	return cachedItr->iconIndex;
 }
 
 void ShellBrowserImpl::ProcessIconResult(int internalIndex, int iconIndex)

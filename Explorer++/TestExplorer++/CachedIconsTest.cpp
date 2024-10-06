@@ -6,84 +6,61 @@
 #include "../Helper/CachedIcons.h"
 #include <gtest/gtest.h>
 
-TEST(CachedIconsTest, TestMaxSize)
+TEST(CachedIconsTest, MaxSize)
 {
 	CachedIcons cachedIcons(2);
 
-	CachedIcon cachedIcon;
-	cachedIcon.filePath = L"C:\\file1";
-	cachedIcon.iconIndex = 0;
-	cachedIcons.insert(cachedIcon);
+	cachedIcons.AddOrUpdateIcon(L"C:\\file1", 0);
+	cachedIcons.AddOrUpdateIcon(L"C:\\file2", 0);
 
-	cachedIcon.filePath = L"C:\\file2";
-	cachedIcon.iconIndex = 0;
-	cachedIcons.insert(cachedIcon);
+	auto iconIndex = cachedIcons.MaybeGetIconIndex(L"C:\\file1");
+	EXPECT_NE(iconIndex, std::nullopt);
 
-	auto itr = cachedIcons.findByPath(L"C:\\file1");
-	EXPECT_TRUE(itr != cachedIcons.end());
+	cachedIcons.AddOrUpdateIcon(L"C:\\file3", 0);
 
-	cachedIcon.filePath = L"C:\\file3";
-	cachedIcon.iconIndex = 0;
-	cachedIcons.insert(cachedIcon);
-
-	// The cache can hold a maximum of 2 icons, so the addition of the third
-	// icon above should have pushed out the oldest item.
-	itr = cachedIcons.findByPath(L"C:\\file1");
-	EXPECT_TRUE(itr == cachedIcons.end());
+	// The cache can hold a maximum of 2 icons, so the addition of the third icon above should have
+	// pushed out the oldest item.
+	iconIndex = cachedIcons.MaybeGetIconIndex(L"C:\\file1");
+	EXPECT_EQ(iconIndex, std::nullopt);
 
 	// But the second item should still be there.
-	itr = cachedIcons.findByPath(L"C:\\file2");
-	EXPECT_TRUE(itr != cachedIcons.end());
+	iconIndex = cachedIcons.MaybeGetIconIndex(L"C:\\file2");
+	EXPECT_NE(iconIndex, std::nullopt);
 }
 
-TEST(CachedIconsTest, TestLookup)
+TEST(CachedIconsTest, Lookup)
 {
 	CachedIcons cachedIcons(2);
 
-	CachedIcon cachedIcon;
-	cachedIcon.filePath = L"C:\\file1";
-	cachedIcon.iconIndex = 0;
-	cachedIcons.insert(cachedIcon);
+	cachedIcons.AddOrUpdateIcon(L"C:\\file1", 0);
 
-	auto itr = cachedIcons.findByPath(L"C:\\file1");
-	EXPECT_TRUE(itr != cachedIcons.end());
+	auto iconIndex = cachedIcons.MaybeGetIconIndex(L"C:\\file1");
+	EXPECT_NE(iconIndex, std::nullopt);
 
-	itr = cachedIcons.findByPath(L"C:\\non-existent");
-	EXPECT_TRUE(itr == cachedIcons.end());
+	iconIndex = cachedIcons.MaybeGetIconIndex(L"C:\\non-existent");
+	EXPECT_EQ(iconIndex, std::nullopt);
 }
 
-TEST(CachedIconsTest, TestReplace)
+TEST(CachedIconsTest, Update)
 {
 	CachedIcons cachedIcons(2);
 
-	CachedIcon cachedIcon;
-	cachedIcon.filePath = L"C:\\file1";
-	cachedIcon.iconIndex = 0;
-	cachedIcons.insert(cachedIcon);
+	cachedIcons.AddOrUpdateIcon(L"C:\\file1", 0);
+	cachedIcons.AddOrUpdateIcon(L"C:\\file2", 0);
 
-	cachedIcon.filePath = L"C:\\file2";
-	cachedIcon.iconIndex = 0;
-	cachedIcons.insert(cachedIcon);
+	// This should update the existing entry.
+	cachedIcons.AddOrUpdateIcon(L"C:\\file1", 1);
+	auto iconIndex = cachedIcons.MaybeGetIconIndex(L"C:\\file1");
+	EXPECT_EQ(iconIndex, 1);
 
-	auto itr = cachedIcons.findByPath(L"C:\\file1");
-	cachedIcon = *itr;
-	cachedIcon.iconIndex = 1;
-	cachedIcons.replace(itr, cachedIcon);
+	cachedIcons.AddOrUpdateIcon(L"C:\\file3", 0);
 
-	itr = cachedIcons.findByPath(L"C:\\file1");
-	EXPECT_EQ(itr->iconIndex, 1);
-
-	cachedIcon.filePath = L"C:\\file3";
-	cachedIcon.iconIndex = 0;
-	cachedIcons.insert(cachedIcon);
-
-	// Replacing the item above should have moved it to the front of the
-	// list. This means that when the third item was inserted, the
-	// second item is what should have been removed.
-	itr = cachedIcons.findByPath(L"C:\\file2");
-	EXPECT_TRUE(itr == cachedIcons.end());
+	// Replacing the item above should have moved it to the front of the list. This means that when
+	// the third item was inserted, the second item is what should have been removed.
+	iconIndex = cachedIcons.MaybeGetIconIndex(L"C:\\file2");
+	EXPECT_EQ(iconIndex, std::nullopt);
 
 	// The replaced item should still exist.
-	itr = cachedIcons.findByPath(L"C:\\file1");
-	EXPECT_TRUE(itr != cachedIcons.end());
+	iconIndex = cachedIcons.MaybeGetIconIndex(L"C:\\file1");
+	EXPECT_NE(iconIndex, std::nullopt);
 }

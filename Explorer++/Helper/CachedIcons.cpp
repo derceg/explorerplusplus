@@ -9,56 +9,39 @@ CachedIcons::CachedIcons(std::size_t maxItems) : m_maxItems(maxItems)
 {
 }
 
-CachedIcons::iterator CachedIcons::end()
+void CachedIcons::AddOrUpdateIcon(const std::wstring &itemPath, int iconIndex)
 {
-	CachedIconSetByPath &pathIndex = m_cachedIconSet.get<1>();
-	return pathIndex.end();
-}
+	auto [itr, inserted] = m_cachedIconSet.push_front({ itemPath, iconIndex });
 
-void CachedIcons::addOrUpdateFileIcon(const std::wstring &filePath, int iconIndex)
-{
-	auto cachedItr = findByPath(filePath);
-
-	if (cachedItr != end())
+	if (inserted)
 	{
-		CachedIcon existingCachedIcon = *cachedItr;
-		existingCachedIcon.iconIndex = iconIndex;
-		replace(cachedItr, existingCachedIcon);
+		if (m_cachedIconSet.size() > m_maxItems)
+		{
+			m_cachedIconSet.pop_back();
+		}
 	}
 	else
 	{
-		CachedIcon cachedIcon;
-		cachedIcon.filePath = filePath;
-		cachedIcon.iconIndex = iconIndex;
-		insert(cachedIcon);
+		bool res = m_cachedIconSet.modify(itr,
+			[iconIndex](auto &cachedIcon) { cachedIcon.iconIndex = iconIndex; });
+		DCHECK(res);
+
+		// Move the icon to the front of the list, which will stop it from being removed if the list
+		// grows over the maximum allowed size (the first icons to be removed are those at the back
+		// of the list).
+		m_cachedIconSet.relocate(m_cachedIconSet.begin(), itr);
 	}
 }
 
-void CachedIcons::insert(const CachedIcon &cachedIcon)
+std::optional<int> CachedIcons::MaybeGetIconIndex(const std::wstring &itemPath)
 {
-	m_cachedIconSet.push_front(cachedIcon);
+	auto &pathIndex = m_cachedIconSet.get<ByPath>();
+	auto itr = pathIndex.find(itemPath);
 
-	if (m_cachedIconSet.size() > m_maxItems)
+	if (itr == pathIndex.end())
 	{
-		m_cachedIconSet.pop_back();
+		return std::nullopt;
 	}
-}
 
-// Replaces an existing cached icon. The icon will also be moved to the
-// front of the list, which will stop it from being removed if the list
-// grows over the maximum allowed size (the first icons to be removed
-// are those at the back of the list).
-void CachedIcons::replace(CachedIconSetByPath::iterator itr, const CachedIcon &cachedIcon)
-{
-	CachedIconSetByPath &pathIndex = m_cachedIconSet.get<1>();
-	pathIndex.replace(itr, cachedIcon);
-
-	auto sequenceItr = m_cachedIconSet.iterator_to(*itr);
-	m_cachedIconSet.relocate(m_cachedIconSet.begin(), sequenceItr);
-}
-
-CachedIcons::iterator CachedIcons::findByPath(const std::wstring &filePath)
-{
-	CachedIconSetByPath &pathIndex = m_cachedIconSet.get<1>();
-	return pathIndex.find(filePath);
+	return itr->iconIndex;
 }

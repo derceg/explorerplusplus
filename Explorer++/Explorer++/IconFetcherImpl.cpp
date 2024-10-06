@@ -180,7 +180,7 @@ void IconFetcherImpl::ProcessIconResult(int iconResultId)
 
 	if (!result->path.empty())
 	{
-		m_cachedIcons->addOrUpdateFileIcon(result->path, result->iconIndex);
+		m_cachedIcons->AddOrUpdateIcon(result->path, result->iconIndex);
 	}
 
 	futureResult.callback(result->iconIndex);
@@ -214,12 +214,5 @@ int IconFetcherImpl::GetCachedIconIndexOrDefault(const std::wstring &itemPath,
 
 std::optional<int> IconFetcherImpl::GetCachedIconIndex(const std::wstring &itemPath) const
 {
-	auto cachedItr = m_cachedIcons->findByPath(itemPath);
-
-	if (cachedItr == m_cachedIcons->end())
-	{
-		return std::nullopt;
-	}
-
-	return cachedItr->iconIndex;
+	return m_cachedIcons->MaybeGetIconIndex(itemPath);
 }

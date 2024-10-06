@@ -494,14 +494,7 @@ std::optional<int> ShellTreeView::GetCachedIconIndex(const ShellTreeNode *node)
 		return std::nullopt;
 	}
 
-	auto cachedItr = m_cachedIcons->findByPath(filePath);
-
-	if (cachedItr == m_cachedIcons->end())
-	{
-		return std::nullopt;
-	}
-
-	return cachedItr->iconIndex;
+	return m_cachedIcons->MaybeGetIconIndex(filePath);
 }
 
 void ShellTreeView::QueueIconTask(HTREEITEM treeItem)
@@ -581,7 +574,7 @@ void ShellTreeView::ProcessIconResult(int iconResultId)
 
 	if (SUCCEEDED(hr))
 	{
-		m_cachedIcons->addOrUpdateFileIcon(filePath, result->iconIndex);
+		m_cachedIcons->AddOrUpdateIcon(filePath, result->iconIndex);
 	}
 
 	TVITEM tvItem;

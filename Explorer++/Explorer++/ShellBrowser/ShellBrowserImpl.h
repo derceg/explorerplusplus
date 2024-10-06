@@ -588,7 +588,6 @@ private:
 
 	/* Listview icons. */
 	void ProcessIconResult(int internalIndex, int iconIndex);
-	std::optional<int> GetCachedIconIndex(const ItemInfo_t &itemInfo);
 
 	/* Thumbnails view. */
 	void QueueThumbnailTask(int internalIndex);

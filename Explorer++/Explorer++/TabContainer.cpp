@@ -733,11 +733,12 @@ void TabContainer::SetTabIcon(const Tab &tab)
 	}
 	else
 	{
-		auto itr = m_cachedIcons->findByPath(tab.GetShellBrowser()->GetDirectory());
+		auto cachedIconIndex =
+			m_cachedIcons->MaybeGetIconIndex(tab.GetShellBrowser()->GetDirectory());
 
-		if (itr != m_cachedIcons->end())
+		if (cachedIconIndex)
 		{
-			SetTabIconFromSystemImageList(tab, itr->iconIndex);
+			SetTabIconFromSystemImageList(tab, *cachedIconIndex);
 		}
 		else
 		{

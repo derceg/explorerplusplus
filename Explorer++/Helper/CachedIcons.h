@@ -9,34 +9,46 @@
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index_container.hpp>
 
-struct CachedIcon
-{
-	std::wstring filePath;
-	int iconIndex;
-};
-
 class CachedIcons
 {
 public:
-	typedef boost::multi_index_container<CachedIcon,
-		boost::multi_index::indexed_by<boost::multi_index::sequenced<>,
-			boost::multi_index::hashed_unique<
-				boost::multi_index::member<CachedIcon, std::wstring, &CachedIcon::filePath>>>>
-		CachedIconSet;
-
-	using CachedIconSetByPath = CachedIconSet::nth_index<1>::type;
-	using iterator = CachedIconSetByPath::iterator;
-
 	CachedIcons(std::size_t maxItems);
 
-	iterator end();
-
-	void addOrUpdateFileIcon(const std::wstring &filePath, int iconIndex);
-	void insert(const CachedIcon &cachedIcon);
-	void replace(CachedIconSetByPath::iterator itr, const CachedIcon &cachedIcon);
-	iterator findByPath(const std::wstring &filePath);
+	void AddOrUpdateIcon(const std::wstring &itemPath, int iconIndex);
+	std::optional<int> MaybeGetIconIndex(const std::wstring &itemPath);
 
 private:
+	struct CachedIcon
+	{
+		std::wstring itemPath;
+		int iconIndex;
+	};
+
+	struct ByInsertionOrder
+	{
+	};
+
+	struct ByPath
+	{
+	};
+
+	// clang-format off
+	using CachedIconSet = boost::multi_index_container<CachedIcon,
+		boost::multi_index::indexed_by<
+			// An index of items, sorted by their insertion order.
+			boost::multi_index::sequenced<
+				boost::multi_index::tag<ByInsertionOrder>
+			>,
+
+			// A non-sorted index of items, based on the item path.
+			boost::multi_index::hashed_unique<
+				boost::multi_index::tag<ByPath>,
+				boost::multi_index::member<CachedIcon, std::wstring, &CachedIcon::itemPath>
+			>
+		>
+	>;
+	// clang-format on
+
 	CachedIconSet m_cachedIconSet;
-	std::size_t m_maxItems;
+	const std::size_t m_maxItems;
 };
