@@ -676,33 +676,33 @@ HRESULT FileOperations::Undelete(const PCIDLIST_ABSOLUTE &pidl)
 {
 	wil::com_ptr_nothrow<IShellFolder> pDesktop{};
 	HRESULT hr = SHGetDesktopFolder(&pDesktop);
-	if (SUCCEEDED(hr) && pDesktop)
+	if (FAILED(hr) || !pDesktop)
+		return hr;
+
+	CComHeapPtr<ITEMIDLIST_ABSOLUTE> pidlbin{};
+	hr = SHGetKnownFolderIDList(FOLDERID_RecycleBinFolder, KF_FLAG_DEFAULT, NULL, &pidlbin);
+	if (FAILED(hr) || !pidlbin)
+		return hr;
+
+	wil::com_ptr_nothrow<IShellFolder> pShellFolder{};
+	hr = pDesktop->BindToObject(pidlbin, nullptr, IID_PPV_ARGS(&pShellFolder));
+	if (FAILED(hr) || !pShellFolder)
+		return hr;
+
+	wil::com_ptr_nothrow<IEnumIDList> pEnum{};
+	hr = pShellFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &pEnum);
+	if (FAILED(hr) || !pEnum)
+		return hr;
+
+	ULONG fetched{};
+	for (PITEMID_CHILD pidChild{}; pEnum->Next(1, &pidChild, &fetched) == S_OK; pidChild = nullptr)
 	{
-		CComHeapPtr<ITEMIDLIST_ABSOLUTE> pidlbin{};
-		hr = SHGetKnownFolderIDList(FOLDERID_RecycleBinFolder, KF_FLAG_DEFAULT, NULL, &pidlbin);
-		if (SUCCEEDED(hr) && pidlbin)
+		const auto pidlRelative = ILFindLastID(static_cast<PCUIDLIST_RELATIVE>(pidl));
+		hr = pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidlRelative, pidChild);
+		if (0 == static_cast<short>(HRESULT_CODE(hr)))
 		{
-			wil::com_ptr_nothrow<IShellFolder> pShellFolder{};
-			hr = pDesktop->BindToObject(pidlbin, nullptr, IID_PPV_ARGS(&pShellFolder));
-			if (SUCCEEDED(hr) && pShellFolder)
-			{
-				wil::com_ptr_nothrow<IEnumIDList> pEnum{};
-				hr = pShellFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &pEnum);
-				if (SUCCEEDED(hr) && pEnum)
-				{
-					ULONG fetched{};
-					for (PITEMID_CHILD pidChild{}; pEnum->Next(1, &pidChild, &fetched) == S_OK; pidChild = nullptr)
-					{
-						const auto pidlRelative = ILFindLastID(static_cast<PCUIDLIST_RELATIVE>(pidl));
-						hr = pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidlRelative, pidChild);
-						if (0 == static_cast<short>(HRESULT_CODE(hr)))
-						{
-							hr = PerformUndeleting(pShellFolder, pidChild);
-							break;
-						}
-					}
-				}
-			}
+			hr = PerformUndeleting(pShellFolder, pidChild);
+			break;
 		}
 	}
 
