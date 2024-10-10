@@ -224,13 +224,25 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="UIThreadExecutorTest.cpp">
-      <Filter>Executors</Filter>
+      <Filter>Async\Executors</Filter>
     </ClCompile>
     <ClCompile Include="ComStaThreadPoolExecutorTest.cpp">
-      <Filter>Executors</Filter>
+      <Filter>Async\Executors</Filter>
     </ClCompile>
     <ClCompile Include="ExecutorTestBase.cpp">
-      <Filter>Executors</Filter>
+      <Filter>Async\Executors</Filter>
+    </ClCompile>
+    <ClCompile Include="ExecutorTestHelper.cpp">
+      <Filter>Async\Executors</Filter>
+    </ClCompile>
+    <ClCompile Include="RuntimeTest.cpp">
+      <Filter>Async</Filter>
+    </ClCompile>
+    <ClCompile Include="RuntimeHelperTest.cpp">
+      <Filter>Async</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageLoopTestHelper.cpp">
+      <Filter>Async</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -318,7 +330,10 @@
     <Filter Include="Core\Accelerators">
       <UniqueIdentifier>{8573b1f7-785d-4e8a-8646-136d0fd51cbd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Executors">
+    <Filter Include="Async">
+      <UniqueIdentifier>{cfea53f6-fa8f-44e2-bab6-aec5d3922741}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Async\Executors">
       <UniqueIdentifier>{de6aab16-37e4-436f-817b-780f1e35ee98}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -388,7 +403,13 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ExecutorTestBase.h">
-      <Filter>Executors</Filter>
+      <Filter>Async\Executors</Filter>
+    </ClInclude>
+    <ClInclude Include="ExecutorTestHelper.h">
+      <Filter>Async\Executors</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageLoopTestHelper.h">
+      <Filter>Async</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

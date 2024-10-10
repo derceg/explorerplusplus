@@ -701,10 +701,16 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="UIThreadExecutor.cpp">
-      <Filter>Executors</Filter>
+      <Filter>Async\Executors</Filter>
     </ClCompile>
     <ClCompile Include="ComStaThreadPoolExecutor.cpp">
-      <Filter>Executors</Filter>
+      <Filter>Async\Executors</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime.cpp">
+      <Filter>Async</Filter>
+    </ClCompile>
+    <ClCompile Include="RuntimeHelper.cpp">
+      <Filter>Async</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1450,10 +1456,16 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="UIThreadExecutor.h">
-      <Filter>Executors</Filter>
+      <Filter>Async\Executors</Filter>
     </ClInclude>
     <ClInclude Include="ComStaThreadPoolExecutor.h">
-      <Filter>Executors</Filter>
+      <Filter>Async\Executors</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime.h">
+      <Filter>Async</Filter>
+    </ClInclude>
+    <ClInclude Include="RuntimeHelper.h">
+      <Filter>Async</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1617,7 +1629,10 @@
     <Filter Include="Core\Resource Loading">
       <UniqueIdentifier>{e7f03946-8121-4ea7-a8ea-894d7fc97109}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Executors">
+    <Filter Include="Async">
+      <UniqueIdentifier>{60028131-154b-40db-b067-625afba46c39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Async\Executors">
       <UniqueIdentifier>{931447cd-9040-4f5c-9726-28d9d840b1e5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "UIThreadExecutor.h"
 #include "ExecutorTestBase.h"
+#include "MessageLoopTestHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
@@ -14,17 +15,6 @@ class UIThreadExecutorTest : public ExecutorTestBase
 protected:
 	UIThreadExecutorTest() : ExecutorTestBase(std::make_unique<UIThreadExecutor>())
 	{
-	}
-
-	void PumpMessageLoopUntilIdle()
-	{
-		MSG msg;
-
-		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
 	}
 };
 

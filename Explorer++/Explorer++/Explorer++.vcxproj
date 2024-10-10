@@ -1026,6 +1026,8 @@
     <ClCompile Include="GlobalHistoryMenu.cpp" />
     <ClCompile Include="LocationVisitInfo.cpp" />
     <ClCompile Include="MainMenuSubMenuView.cpp" />
+    <ClCompile Include="Runtime.cpp" />
+    <ClCompile Include="RuntimeHelper.cpp" />
     <ClCompile Include="UIThreadExecutor.cpp" />
     <ClCompile Include="MenuBase.cpp" />
     <ClCompile Include="MenuView.cpp" />
@@ -1296,6 +1298,8 @@
     <ClInclude Include="GlobalHistoryMenu.h" />
     <ClInclude Include="LocationVisitInfo.h" />
     <ClInclude Include="MainMenuSubMenuView.h" />
+    <ClInclude Include="Runtime.h" />
+    <ClInclude Include="RuntimeHelper.h" />
     <ClInclude Include="UIThreadExecutor.h" />
     <ClInclude Include="MenuBase.h" />
     <ClInclude Include="MenuView.h" />
