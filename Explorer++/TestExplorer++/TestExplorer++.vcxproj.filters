@@ -241,7 +241,13 @@
     <ClCompile Include="RuntimeHelperTest.cpp">
       <Filter>Async</Filter>
     </ClCompile>
-    <ClCompile Include="MessageLoopTestHelper.cpp">
+    <ClCompile Include="AsyncIconFetcherTest.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="RuntimeTestHelper.cpp">
+      <Filter>Async</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageLoop.cpp">
       <Filter>Async</Filter>
     </ClCompile>
   </ItemGroup>
@@ -408,7 +414,10 @@
     <ClInclude Include="ExecutorTestHelper.h">
       <Filter>Async\Executors</Filter>
     </ClInclude>
-    <ClInclude Include="MessageLoopTestHelper.h">
+    <ClInclude Include="RuntimeTestHelper.h">
+      <Filter>Async</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageLoop.h">
       <Filter>Async</Filter>
     </ClInclude>
   </ItemGroup>

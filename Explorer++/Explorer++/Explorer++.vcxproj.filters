@@ -712,6 +712,9 @@
     <ClCompile Include="RuntimeHelper.cpp">
       <Filter>Async</Filter>
     </ClCompile>
+    <ClCompile Include="AsyncIconFetcher.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1466,6 +1469,9 @@
     </ClInclude>
     <ClInclude Include="RuntimeHelper.h">
       <Filter>Async</Filter>
+    </ClInclude>
+    <ClInclude Include="AsyncIconFetcher.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1024,6 +1024,7 @@
     <ClCompile Include="FontsOptionsPage.cpp" />
     <ClCompile Include="FrequentLocationsService.cpp" />
     <ClCompile Include="GlobalHistoryMenu.cpp" />
+    <ClCompile Include="AsyncIconFetcher.cpp" />
     <ClCompile Include="LocationVisitInfo.cpp" />
     <ClCompile Include="MainMenuSubMenuView.cpp" />
     <ClCompile Include="Runtime.cpp" />
@@ -1296,6 +1297,7 @@
     <ClInclude Include="FontsOptionsPage.h" />
     <ClInclude Include="FrequentLocationsService.h" />
     <ClInclude Include="GlobalHistoryMenu.h" />
+    <ClInclude Include="AsyncIconFetcher.h" />
     <ClInclude Include="LocationVisitInfo.h" />
     <ClInclude Include="MainMenuSubMenuView.h" />
     <ClInclude Include="Runtime.h" />

@@ -4,4 +4,6 @@
 
 #pragma once
 
-void PumpMessageLoopUntilIdle();
+class Runtime;
+
+Runtime BuildRuntimeForTest();

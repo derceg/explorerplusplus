@@ -5,7 +5,7 @@
 #include "pch.h"
 #include "UIThreadExecutor.h"
 #include "ExecutorTestBase.h"
-#include "MessageLoopTestHelper.h"
+#include "MessageLoop.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
@@ -28,7 +28,8 @@ TEST_F(UIThreadExecutorTest, Submit)
 	m_executor->submit(task2.AsStdFunction());
 	EXPECT_CALL(task2, Call());
 
-	PumpMessageLoopUntilIdle();
+	MessageLoop messageLoop;
+	messageLoop.RunUntilIdle();
 }
 
 TEST_F(UIThreadExecutorTest, BulkSubmit)
@@ -45,7 +46,8 @@ TEST_F(UIThreadExecutorTest, BulkSubmit)
 
 	m_executor->bulk_submit<std::function<void()>>(tasksAsFunctions);
 
-	PumpMessageLoopUntilIdle();
+	MessageLoop messageLoop;
+	messageLoop.RunUntilIdle();
 }
 
 TEST_F(UIThreadExecutorTest, ShutdownRequested)
@@ -67,7 +69,8 @@ TEST_F(UIThreadExecutorTest, ShutdownDuringTaskLoop)
 	m_executor->submit(task2.AsStdFunction());
 	EXPECT_CALL(task2, Call()).Times(0);
 
-	PumpMessageLoopUntilIdle();
+	MessageLoop messageLoop;
+	messageLoop.RunUntilIdle();
 }
 
 TEST_F(UIThreadExecutorTest, EnqueueAfterShutdown)

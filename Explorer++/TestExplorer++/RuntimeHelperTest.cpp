@@ -4,11 +4,10 @@
 
 #include "pch.h"
 #include "RuntimeHelper.h"
-#include "ComStaThreadPoolExecutor.h"
 #include "ExecutorTestHelper.h"
-#include "MessageLoopTestHelper.h"
+#include "MessageLoop.h"
 #include "Runtime.h"
-#include "UIThreadExecutor.h"
+#include "RuntimeTestHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
@@ -16,9 +15,7 @@ using namespace testing;
 class RuntimeHelperTest : public Test
 {
 protected:
-	RuntimeHelperTest() :
-		m_runtime(std::make_unique<UIThreadExecutor>(),
-			std::make_unique<ComStaThreadPoolExecutor>(1))
+	RuntimeHelperTest() : m_runtime(BuildRuntimeForTest())
 	{
 	}
 
@@ -65,5 +62,6 @@ TEST_F(RuntimeHelperTest, ResumeOnUiThreadFromBackgroundThread)
 
 	// At this point, the lambda above has been invoked on the COM STA executor. The only thing left
 	// to do is pump messages until the RunTaskOnUiThread() coroutine completes.
-	PumpMessageLoopUntilIdle();
+	MessageLoop messageLoop;
+	messageLoop.RunUntilIdle();
 }
