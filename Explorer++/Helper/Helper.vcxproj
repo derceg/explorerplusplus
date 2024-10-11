@@ -713,6 +713,7 @@
     <ClCompile Include="StringHelper.cpp" />
     <ClCompile Include="TabHelper.cpp" />
     <ClCompile Include="TimeHelper.cpp" />
+    <ClCompile Include="UniqueThreadId.cpp" />
     <ClCompile Include="WindowHelper.cpp" />
     <ClCompile Include="WindowSubclassWrapper.cpp" />
     <ClCompile Include="XMLSettings.cpp" />
@@ -774,6 +775,7 @@
     <ClInclude Include="StringHelper.h" />
     <ClInclude Include="TabHelper.h" />
     <ClInclude Include="TimeHelper.h" />
+    <ClInclude Include="UniqueThreadId.h" />
     <ClInclude Include="UniqueVariableSizeStruct.h" />
     <ClInclude Include="WindowHelper.h" />
     <ClInclude Include="WindowSubclassWrapper.h" />

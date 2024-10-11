@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "../Helper/UniqueThreadId.h"
 #include <boost/core/noncopyable.hpp>
 #include <concurrencpp/concurrencpp.h>
 #include <memory>
@@ -23,5 +24,5 @@ public:
 private:
 	const std::unique_ptr<concurrencpp::executor> m_uiThreadExecutor;
 	const std::unique_ptr<concurrencpp::executor> m_comStaExecutor;
-	const std::thread::id m_uiThreadId;
+	const UniqueThreadId m_uiThreadId;
 };

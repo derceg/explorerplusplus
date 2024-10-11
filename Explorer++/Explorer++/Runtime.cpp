@@ -9,7 +9,7 @@ Runtime::Runtime(std::unique_ptr<concurrencpp::executor> uiThreadExecutor,
 	std::unique_ptr<concurrencpp::executor> comStaExecutor) :
 	m_uiThreadExecutor(std::move(uiThreadExecutor)),
 	m_comStaExecutor(std::move(comStaExecutor)),
-	m_uiThreadId(std::this_thread::get_id())
+	m_uiThreadId(UniqueThreadId::GetForCurrentThread())
 {
 }
 
@@ -31,5 +31,5 @@ concurrencpp::executor *Runtime::GetComStaExecutor() const
 
 bool Runtime::IsUiThread() const
 {
-	return std::this_thread::get_id() == m_uiThreadId;
+	return UniqueThreadId::GetForCurrentThread() == m_uiThreadId;
 }
