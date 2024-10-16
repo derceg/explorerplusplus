@@ -39,7 +39,7 @@ void Explorerplusplus::CreateStatusBar()
 
 	SetStatusBarParts(width);
 
-	m_statusBarFontSetter = std::make_unique<MainFontSetter>(m_hStatusBar, m_config.get());
+	m_statusBarFontSetter = std::make_unique<MainFontSetter>(m_hStatusBar, m_config);
 	m_statusBarFontSetter->fontUpdatedSignal.AddObserver([this]() { UpdateStatusBarMinHeight(); });
 
 	// Even if the status bar uses the default font, the height won't necessarily be correct. As

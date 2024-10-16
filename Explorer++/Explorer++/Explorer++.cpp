@@ -37,12 +37,12 @@ Explorerplusplus::Explorerplusplus(App *app, HWND hwnd) :
 	m_acceleratorUpdater(app->GetAcceleratorManager()),
 	m_pluginCommandManager(app->GetAcceleratorManager(), ACCELERATOR_PLUGIN_START_ID,
 		ACCELERATOR_PLUGIN_END_ID),
+	m_config(app->GetConfig()),
 	m_iconFetcher(hwnd, m_app->GetCachedIcons()),
 	m_shellIconLoader(&m_iconFetcher)
 {
 	m_resourceInstance = nullptr;
 
-	m_config = std::make_shared<Config>();
 	FeatureList::GetInstance()->InitializeFromCommandLine(*app->GetCommandLineSettings());
 
 	m_bSavePreferencesToXMLFile = FALSE;

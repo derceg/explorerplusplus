@@ -383,7 +383,7 @@ void Explorerplusplus::CreateMainToolbar()
 
 void Explorerplusplus::CreateBookmarksToolbar()
 {
-	auto bookmarksToolbarView = new BookmarksToolbarView(m_hMainRebar, m_config.get());
+	auto bookmarksToolbarView = new BookmarksToolbarView(m_hMainRebar, m_config);
 
 	m_bookmarksToolbar = BookmarksToolbar::Create(bookmarksToolbarView, this, this, &m_iconFetcher,
 		BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
@@ -394,7 +394,7 @@ void Explorerplusplus::CreateBookmarksToolbar()
 
 void Explorerplusplus::CreateDrivesToolbar()
 {
-	auto drivesToolbarView = DrivesToolbarView::Create(m_hMainRebar, m_config.get());
+	auto drivesToolbarView = DrivesToolbarView::Create(m_hMainRebar, m_config);
 
 	auto driveEnumerator = std::make_unique<DriveEnumeratorImpl>();
 	auto driveWatcher = std::make_unique<DriveWatcherImpl>(m_hContainer);
@@ -409,7 +409,7 @@ void Explorerplusplus::CreateDrivesToolbar()
 void Explorerplusplus::CreateApplicationToolbar()
 {
 	auto applicationToolbarView =
-		Applications::ApplicationToolbarView::Create(m_hMainRebar, m_config.get());
+		Applications::ApplicationToolbarView::Create(m_hMainRebar, m_config);
 
 	m_applicationToolbar = Applications::ApplicationToolbar::Create(applicationToolbarView,
 		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel(), this);

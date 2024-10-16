@@ -70,7 +70,7 @@ const std::unordered_map<MainToolbarButton, Icon, ToolbarButtonHash> TOOLBAR_BUT
 
 MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE resourceInstance,
 	BrowserWindow *browserWindow, CoreInterface *coreInterface, ShellIconLoader *shellIconLoader,
-	std::shared_ptr<Config> config,
+	const Config *config,
 	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons)
 {
 	return new MainToolbar(parent, resourceInstance, browserWindow, coreInterface, shellIconLoader,
@@ -78,7 +78,7 @@ MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE resourceInstance,
 }
 
 MainToolbar::MainToolbar(HWND parent, HINSTANCE resourceInstance, BrowserWindow *browserWindow,
-	CoreInterface *coreInterface, ShellIconLoader *shellIconLoader, std::shared_ptr<Config> config,
+	CoreInterface *coreInterface, ShellIconLoader *shellIconLoader, const Config *config,
 	const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons) :
 	BaseWindow(CreateMainToolbar(parent)),
 	m_resourceInstance(resourceInstance),
@@ -86,9 +86,8 @@ MainToolbar::MainToolbar(HWND parent, HINSTANCE resourceInstance, BrowserWindow 
 	m_coreInterface(coreInterface),
 	m_shellIconLoader(shellIconLoader),
 	m_config(config),
-	m_fontSetter(m_hwnd, config.get()),
-	m_tooltipFontSetter(reinterpret_cast<HWND>(SendMessage(m_hwnd, TB_GETTOOLTIPS, 0, 0)),
-		config.get())
+	m_fontSetter(m_hwnd, config),
+	m_tooltipFontSetter(reinterpret_cast<HWND>(SendMessage(m_hwnd, TB_GETTOOLTIPS, 0, 0)), config)
 {
 	Initialize(parent, initialButtons);
 }

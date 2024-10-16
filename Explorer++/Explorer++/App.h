@@ -16,6 +16,7 @@ public:
 
 	const CommandLine::Settings *GetCommandLineSettings() const;
 	AcceleratorManager *GetAcceleratorManager();
+	Config *GetConfig();
 	CachedIcons *GetCachedIcons();
 
 private:
@@ -25,5 +26,6 @@ private:
 
 	const CommandLine::Settings *const m_commandLineSettings;
 	AcceleratorManager m_acceleratorManager;
+	Config m_config;
 	CachedIcons m_cachedIcons;
 };

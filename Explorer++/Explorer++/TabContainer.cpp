@@ -51,7 +51,7 @@ const std::map<UINT, Icon> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
 TabContainer *TabContainer::Create(HWND parent, ShellBrowserEmbedder *embedder,
 	TabNavigationInterface *tabNavigation, CoreInterface *coreInterface,
 	FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-	HINSTANCE resourceInstance, std::shared_ptr<Config> config)
+	HINSTANCE resourceInstance, const Config *config)
 {
 	return new TabContainer(parent, embedder, tabNavigation, coreInterface, fileActionHandler,
 		cachedIcons, bookmarkTree, resourceInstance, config);
@@ -60,11 +60,11 @@ TabContainer *TabContainer::Create(HWND parent, ShellBrowserEmbedder *embedder,
 TabContainer::TabContainer(HWND parent, ShellBrowserEmbedder *embedder,
 	TabNavigationInterface *tabNavigation, CoreInterface *coreInterface,
 	FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-	HINSTANCE resourceInstance, std::shared_ptr<Config> config) :
+	HINSTANCE resourceInstance, const Config *config) :
 	ShellDropTargetWindow(CreateTabControl(parent)),
 	m_embedder(embedder),
-	m_fontSetter(m_hwnd, config.get(), GetDefaultSystemFontForDefaultDpi()),
-	m_tooltipFontSetter(TabCtrl_GetToolTips(m_hwnd), config.get()),
+	m_fontSetter(m_hwnd, config, GetDefaultSystemFontForDefaultDpi()),
+	m_tooltipFontSetter(TabCtrl_GetToolTips(m_hwnd), config),
 	m_timerManager(m_hwnd),
 	m_iconFetcher(m_hwnd, cachedIcons),
 	m_cachedIcons(cachedIcons),

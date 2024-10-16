@@ -19,7 +19,7 @@ class TaskbarThumbnails : private boost::noncopyable
 {
 public:
 	static TaskbarThumbnails *Create(CoreInterface *coreInterface, TabContainer *tabContainer,
-		HINSTANCE resourceInstance, std::shared_ptr<Config> config);
+		HINSTANCE resourceInstance, const Config *config);
 
 private:
 	struct TabProxyInfo
@@ -31,7 +31,7 @@ private:
 	};
 
 	TaskbarThumbnails(CoreInterface *coreInterface, TabContainer *tabContainer,
-		HINSTANCE resourceInstance, std::shared_ptr<Config> config);
+		HINSTANCE resourceInstance, const Config *config);
 	~TaskbarThumbnails() = default;
 
 	static LRESULT CALLBACK MainWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,

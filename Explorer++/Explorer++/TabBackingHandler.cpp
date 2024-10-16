@@ -37,8 +37,7 @@ void Explorerplusplus::CreateTabBacking()
 		SWP_NOZORDER | SWP_NOMOVE);
 
 	m_tabToolbarTooltipFontSetter = std::make_unique<MainFontSetter>(
-		reinterpret_cast<HWND>(SendMessage(m_hTabWindowToolbar, TB_GETTOOLTIPS, 0, 0)),
-		m_config.get());
+		reinterpret_cast<HWND>(SendMessage(m_hTabWindowToolbar, TB_GETTOOLTIPS, 0, 0)), m_config);
 
 	AddTabsInitializedObserver(std::bind_front(&Explorerplusplus::OnTabsInitialized, this));
 }

@@ -18,7 +18,7 @@ class WindowSubclassWrapper;
 class OptionsDialog : public ThemedDialog
 {
 public:
-	OptionsDialog(HINSTANCE resourceInstance, HWND parent, std::shared_ptr<Config> config,
+	OptionsDialog(HINSTANCE resourceInstance, HWND parent, Config *config,
 		CoreInterface *coreInterface);
 
 private:
@@ -57,7 +57,7 @@ private:
 	INT_PTR OnDestroy() override;
 	INT_PTR OnNcDestroy() override;
 
-	std::shared_ptr<Config> m_config;
+	Config *const m_config;
 	HINSTANCE m_resourceInstance;
 	CoreInterface *m_coreInterface;
 

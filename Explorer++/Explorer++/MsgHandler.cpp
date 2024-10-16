@@ -1108,7 +1108,7 @@ void Explorerplusplus::SaveAllSettings()
 
 const Config *Explorerplusplus::GetConfig() const
 {
-	return m_config.get();
+	return m_config;
 }
 
 HINSTANCE Explorerplusplus::GetResourceInstance() const

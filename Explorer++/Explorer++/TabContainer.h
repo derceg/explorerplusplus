@@ -84,7 +84,7 @@ public:
 	static TabContainer *Create(HWND parent, ShellBrowserEmbedder *embedder,
 		TabNavigationInterface *tabNavigation, CoreInterface *coreInterface,
 		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
-		HINSTANCE resourceInstance, std::shared_ptr<Config> config);
+		HINSTANCE resourceInstance, const Config *config);
 
 	void CreateNewTabInDefaultDirectory(const TabSettings &tabSettings);
 	Tab &CreateNewTab(const std::wstring &directory, const TabSettings &tabSettings = {},
@@ -171,7 +171,7 @@ private:
 	TabContainer(HWND parent, ShellBrowserEmbedder *embedder, TabNavigationInterface *tabNavigation,
 		CoreInterface *coreInterface, FileActionHandler *fileActionHandler,
 		CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
-		std::shared_ptr<Config> config);
+		const Config *config);
 
 	static HWND CreateTabControl(HWND parent);
 
@@ -265,7 +265,7 @@ private:
 	FileActionHandler *m_fileActionHandler;
 
 	HINSTANCE m_resourceInstance;
-	std::shared_ptr<Config> m_config;
+	const Config *const m_config;
 
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;

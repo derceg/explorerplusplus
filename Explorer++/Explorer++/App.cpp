@@ -23,6 +23,11 @@ AcceleratorManager *App::GetAcceleratorManager()
 	return &m_acceleratorManager;
 }
 
+Config *App::GetConfig()
+{
+	return &m_config;
+}
+
 CachedIcons *App::GetCachedIcons()
 {
 	return &m_cachedIcons;

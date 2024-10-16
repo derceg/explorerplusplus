@@ -29,7 +29,7 @@ class MainToolbar : public BaseWindow
 public:
 	static MainToolbar *Create(HWND parent, HINSTANCE resourceInstance,
 		BrowserWindow *browserWindow, CoreInterface *coreInterface,
-		ShellIconLoader *shellIconLoader, std::shared_ptr<Config> config,
+		ShellIconLoader *shellIconLoader, const Config *config,
 		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
 
 	void UpdateConfigDependentButtonStates();
@@ -42,8 +42,7 @@ public:
 
 private:
 	MainToolbar(HWND parent, HINSTANCE resourceInstance, BrowserWindow *browserWindow,
-		CoreInterface *coreInterface, ShellIconLoader *shellIconLoader,
-		std::shared_ptr<Config> config,
+		CoreInterface *coreInterface, ShellIconLoader *shellIconLoader, const Config *config,
 		const std::optional<MainToolbarStorage::MainToolbarButtons> &initialButtons);
 	~MainToolbar();
 
@@ -99,7 +98,7 @@ private:
 	BrowserWindow *m_browserWindow = nullptr;
 	CoreInterface *m_coreInterface = nullptr;
 	ShellIconLoader *const m_shellIconLoader;
-	std::shared_ptr<Config> m_config;
+	const Config *const m_config;
 	bool m_applicationInitialized = false;
 
 	wil::unique_himagelist m_imageListSmall;

@@ -23,8 +23,8 @@
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/algorithm/string/predicate.hpp>
 
-OptionsDialog::OptionsDialog(HINSTANCE resourceInstance, HWND parent,
-	std::shared_ptr<Config> config, CoreInterface *coreInterface) :
+OptionsDialog::OptionsDialog(HINSTANCE resourceInstance, HWND parent, Config *config,
+	CoreInterface *coreInterface) :
 	ThemedDialog(resourceInstance, IDD_OPTIONS, parent, DialogSizingType::Both),
 	m_config(config),
 	m_resourceInstance(resourceInstance),
@@ -125,22 +125,21 @@ std::vector<ResizableDialogControl> OptionsDialog::GetResizableControls()
 
 void OptionsDialog::AddPages()
 {
-	AddPage(std::make_unique<GeneralOptionsPage>(m_hDlg, GetResourceInstance(), m_config.get(),
+	AddPage(std::make_unique<GeneralOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
 		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
-	AddPage(std::make_unique<AppearanceOptionsPage>(m_hDlg, GetResourceInstance(), m_config.get(),
+	AddPage(std::make_unique<AppearanceOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
 		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
-	AddPage(std::make_unique<FontsOptionsPage>(m_hDlg, GetResourceInstance(), m_config.get(),
+	AddPage(std::make_unique<FontsOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
 		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
-	AddPage(std::make_unique<FilesFoldersOptionsPage>(m_hDlg, GetResourceInstance(), m_config.get(),
+	AddPage(std::make_unique<FilesFoldersOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
 		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
-	AddPage(std::make_unique<WindowOptionsPage>(m_hDlg, GetResourceInstance(), m_config.get(),
+	AddPage(std::make_unique<WindowOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
 		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
-	AddPage(std::make_unique<TabsOptionsPage>(m_hDlg, GetResourceInstance(), m_config.get(),
+	AddPage(std::make_unique<TabsOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
 		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
-	AddPage(
-		std::make_unique<DefaultSettingsOptionsPage>(m_hDlg, GetResourceInstance(), m_config.get(),
-			m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
-	AddPage(std::make_unique<AdvancedOptionsPage>(m_hDlg, GetResourceInstance(), m_config.get(),
+	AddPage(std::make_unique<DefaultSettingsOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
+		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
+	AddPage(std::make_unique<AdvancedOptionsPage>(m_hDlg, GetResourceInstance(), m_config,
 		m_coreInterface, std::bind(&OptionsDialog::OnSettingChanged, this), m_tipWnd));
 }
 

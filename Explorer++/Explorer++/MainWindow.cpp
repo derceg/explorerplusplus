@@ -17,13 +17,13 @@
 #include "../Helper/WindowSubclassWrapper.h"
 #include <wil/resource.h>
 
-MainWindow *MainWindow::Create(HWND hwnd, std::shared_ptr<Config> config,
-	HINSTANCE resourceInstance, CoreInterface *coreInterface)
+MainWindow *MainWindow::Create(HWND hwnd, const Config *config, HINSTANCE resourceInstance,
+	CoreInterface *coreInterface)
 {
 	return new MainWindow(hwnd, config, resourceInstance, coreInterface);
 }
 
-MainWindow::MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE resourceInstance,
+MainWindow::MainWindow(HWND hwnd, const Config *config, HINSTANCE resourceInstance,
 	CoreInterface *coreInterface) :
 	m_hwnd(hwnd),
 	m_config(config),

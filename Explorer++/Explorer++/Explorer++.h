@@ -628,7 +628,7 @@ private:
 	ShellBrowserImpl *m_pActiveShellBrowser;
 
 	/* User options variables. */
-	std::shared_ptr<Config> m_config;
+	Config *const m_config;
 	BOOL m_bSavePreferencesToXMLFile;
 
 	bool m_themeValueLoadedFromXml = false;
