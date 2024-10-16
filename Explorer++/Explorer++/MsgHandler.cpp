@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "AddressBar.h"
+#include "App.h"
 #include "ColorRule.h"
 #include "Config.h"
 #include "DarkModeHelper.h"
@@ -1117,7 +1118,7 @@ HINSTANCE Explorerplusplus::GetResourceInstance() const
 
 AcceleratorManager *Explorerplusplus::GetAcceleratorManager() const
 {
-	return m_acceleratorManager;
+	return m_app->GetAcceleratorManager();
 }
 
 HWND Explorerplusplus::GetMainWindow() const
@@ -1162,7 +1163,7 @@ IconResourceLoader *Explorerplusplus::GetIconResourceLoader() const
 
 CachedIcons *Explorerplusplus::GetCachedIcons()
 {
-	return &m_cachedIcons;
+	return m_app->GetCachedIcons();
 }
 
 BOOL Explorerplusplus::GetSavePreferencesToXmlFile() const

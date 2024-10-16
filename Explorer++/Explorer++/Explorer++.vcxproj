@@ -985,6 +985,7 @@
   <ItemGroup>
     <ClCompile Include="AboutDialog.cpp" />
     <ClCompile Include="AcceleratorManager.cpp" />
+    <ClCompile Include="App.cpp" />
     <ClCompile Include="ComStaThreadPoolExecutor.cpp" />
     <ClCompile Include="DefaultAccelerators.cpp" />
     <ClCompile Include="AdvancedOptionsPage.cpp" />
@@ -1253,6 +1254,7 @@
     <ClInclude Include="Accelerator.h" />
     <ClInclude Include="AcceleratorManager.h" />
     <ClInclude Include="AcceleratorMappings.h" />
+    <ClInclude Include="App.h" />
     <ClInclude Include="ComStaThreadPoolExecutor.h" />
     <ClInclude Include="DefaultAccelerators.h" />
     <ClInclude Include="AdvancedOptionsPage.h" />

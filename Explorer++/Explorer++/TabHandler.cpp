@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "App.h"
 #include "Bookmarks/BookmarkTreeFactory.h"
 #include "Config.h"
 #include "LoadSaveInterface.h"
@@ -23,9 +24,9 @@ void Explorerplusplus::InitializeTabs()
 	/* The tab backing will hold the tab window. */
 	CreateTabBacking();
 
-	auto *tabContainer =
-		TabContainer::Create(m_hTabBacking, this, this, this, &m_FileActionHandler, &m_cachedIcons,
-			BookmarkTreeFactory::GetInstance()->GetBookmarkTree(), m_resourceInstance, m_config);
+	auto *tabContainer = TabContainer::Create(m_hTabBacking, this, this, this, &m_FileActionHandler,
+		m_app->GetCachedIcons(), BookmarkTreeFactory::GetInstance()->GetBookmarkTree(),
+		m_resourceInstance, m_config);
 	m_browserPane = std::make_unique<BrowserPane>(tabContainer);
 
 	tabContainer->tabCreatedSignal.AddObserver(
@@ -69,8 +70,8 @@ void Explorerplusplus::InitializeTabs()
 	m_tabRestorerMenuView =
 		std::make_unique<MainMenuSubMenuView>(GetMenu(m_hContainer), IDM_FILE_REOPEN_RECENT_TAB);
 	m_tabRestorerMenu = std::make_unique<TabRestorerMenu>(m_tabRestorerMenuView.get(),
-		m_acceleratorManager, m_tabRestorer.get(), &m_shellIconLoader, MENU_RECENT_TABS_START_ID,
-		MENU_RECENT_TABS_END_ID);
+		m_app->GetAcceleratorManager(), m_tabRestorer.get(), &m_shellIconLoader,
+		MENU_RECENT_TABS_START_ID, MENU_RECENT_TABS_END_ID);
 
 	m_tabsInitializedSignal();
 }
@@ -202,7 +203,7 @@ void Explorerplusplus::CreateCommandLineTabs()
 	auto currentDirectory = GetCurrentDirectoryWrapper();
 	CHECK(currentDirectory);
 
-	for (const auto &fileToSelect : m_commandLineSettings->filesToSelect)
+	for (const auto &fileToSelect : m_app->GetCommandLineSettings()->filesToSelect)
 	{
 		auto absolutePath = TransformUserEnteredPathToAbsolutePathAndNormalize(fileToSelect,
 			currentDirectory.value(), EnvVarsExpansion::DontExpand);
@@ -239,7 +240,7 @@ void Explorerplusplus::CreateCommandLineTabs()
 		}
 	}
 
-	for (const auto &directory : m_commandLineSettings->directories)
+	for (const auto &directory : m_app->GetCommandLineSettings()->directories)
 	{
 		// Windows Explorer doesn't expand environment variables passed in on the command line. The
 		// command-line interpreter that's being used can expand variables - for example, running:

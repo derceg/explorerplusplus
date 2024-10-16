@@ -23,7 +23,6 @@
 #include "Tab.h"
 #include "TabNavigationInterface.h"
 #include "ValueWrapper.h"
-#include "../Helper/CachedIcons.h"
 #include "../Helper/ClipboardHelper.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/FileActionHandler.h"
@@ -38,8 +37,10 @@
 // Forward declarations.
 class AcceleratorManager;
 class AddressBar;
+class App;
 class BookmarksMainMenu;
 class BookmarksToolbar;
+class CachedIcons;
 struct Config;
 class DrivesToolbar;
 class GlobalHistoryMenu;
@@ -89,13 +90,7 @@ class Explorerplusplus :
 	friend LoadSaveXML;
 
 public:
-	struct InitializationData
-	{
-		CommandLine::Settings *commandLineSettings = nullptr;
-		AcceleratorManager *acceleratorManager = nullptr;
-	};
-
-	Explorerplusplus(HWND hwnd, InitializationData *initializationData);
+	Explorerplusplus(App *app, HWND hwnd);
 	~Explorerplusplus();
 
 	static LRESULT CALLBACK WndProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -139,10 +134,6 @@ private:
 
 	static const UINT_PTR LISTVIEW_ITEM_CHANGED_TIMER_ID = 100001;
 	static const UINT LISTVIEW_ITEM_CHANGED_TIMEOUT = 50;
-
-	// Represents the maximum number of icons that can be cached. This cache is
-	// shared between various components in the application.
-	static const int MAX_CACHED_ICONS = 1000;
 
 	static inline constexpr COLORREF TAB_BAR_DARK_MODE_BACKGROUND_COLOR = RGB(25, 25, 25);
 
@@ -557,9 +548,8 @@ private:
 	void FolderSizeCallback(FolderSizeExtraInfo *pfsei, int nFolders, int nFiles,
 		PULARGE_INTEGER lTotalFolderSize);
 
+	App *const m_app;
 	HWND m_hContainer;
-	const CommandLine::Settings *const m_commandLineSettings;
-	AcceleratorManager *const m_acceleratorManager;
 
 	BrowserCommandController m_commandController;
 
@@ -591,8 +581,6 @@ private:
 	AddressBar *m_addressBar;
 
 	std::unique_ptr<IconResourceLoader> m_iconResourceLoader;
-
-	CachedIcons m_cachedIcons;
 
 	wil::com_ptr_nothrow<IImageList> m_mainMenuSystemImageList;
 	std::vector<wil::unique_hbitmap> m_mainMenuImages;

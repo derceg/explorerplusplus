@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "App.h"
 #include "Config.h"
 #include "HolderWindow.h"
 #include "MainResource.h"
@@ -31,7 +32,7 @@ void Explorerplusplus::CreateFolderControls()
 		std::bind_front(&Explorerplusplus::OnTreeViewHolderResized, this));
 
 	m_shellTreeView = ShellTreeView::Create(m_treeViewHolder->GetHWND(), this, this,
-		&m_FileActionHandler, &m_cachedIcons);
+		&m_FileActionHandler, m_app->GetCachedIcons());
 	m_treeViewHolder->SetContentChild(m_shellTreeView->GetHWND());
 }
 

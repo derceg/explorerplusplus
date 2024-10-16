@@ -9,10 +9,10 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "AcceleratorManager.h"
+#include "App.h"
 #include "CommandLine.h"
 #include "Console.h"
 #include "CrashHandlerHelper.h"
-#include "DefaultAccelerators.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ModelessDialogs.h"
@@ -251,17 +251,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	InitializeLocale();
 
-	auto acceleratorManager = InitializeAcceleratorManager();
-
-	Explorerplusplus::InitializationData initializationData;
-	initializationData.commandLineSettings = &commandLineSettings;
-	initializationData.acceleratorManager = &acceleratorManager;
+	App app(&commandLineSettings);
 
 	/* Create the main window. This window will act as a
 	container for all child windows created. */
 	HWND hwnd = CreateWindow(NExplorerplusplus::CLASS_NAME, NExplorerplusplus::APP_NAME,
 		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, nullptr,
-		nullptr, hInstance, &initializationData);
+		nullptr, hInstance, &app);
 
 	if (hwnd == nullptr)
 	{
@@ -346,7 +342,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			&& !IsDialogMessage(g_hwndRunScript, &msg) && !IsDialogMessage(g_hwndOptions, &msg)
 			&& !IsDialogMessage(g_hwndSearchTabs, &msg))
 		{
-			if (!TranslateAccelerator(hwnd, acceleratorManager.GetAcceleratorTable(), &msg))
+			if (!TranslateAccelerator(hwnd, app.GetAcceleratorManager()->GetAcceleratorTable(),
+					&msg))
 			{
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);

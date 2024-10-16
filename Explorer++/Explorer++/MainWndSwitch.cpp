@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "AddressBar.h"
+#include "App.h"
 #include "Application.h"
 #include "ApplicationEditorDialog.h"
 #include "ApplicationToolbar.h"
@@ -58,8 +59,7 @@ LRESULT CALLBACK Explorerplusplus::WndProcStub(HWND hwnd, UINT msg, WPARAM wPara
 	{
 		auto *createInfo = reinterpret_cast<CREATESTRUCT *>(lParam);
 
-		pContainer = new Explorerplusplus(hwnd,
-			reinterpret_cast<InitializationData *>(createInfo->lpCreateParams));
+		pContainer = new Explorerplusplus(static_cast<App *>(createInfo->lpCreateParams), hwnd);
 
 		if (!pContainer)
 		{

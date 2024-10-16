@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "App.h"
 #include "Application.h"
 #include "Bookmarks/BookmarkIconManager.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
@@ -27,24 +28,22 @@
 #include "../Helper/WindowSubclassWrapper.h"
 #include "../Helper/iDirectoryMonitor.h"
 
-Explorerplusplus::Explorerplusplus(HWND hwnd, InitializationData *initializationData) :
+Explorerplusplus::Explorerplusplus(App *app, HWND hwnd) :
+	m_app(app),
 	m_hContainer(hwnd),
-	m_commandLineSettings(initializationData->commandLineSettings),
-	m_acceleratorManager(initializationData->acceleratorManager),
 	m_commandController(this),
-	m_cachedIcons(MAX_CACHED_ICONS),
 	m_tabBarBackgroundBrush(CreateSolidBrush(TAB_BAR_DARK_MODE_BACKGROUND_COLOR)),
 	m_pluginMenuManager(hwnd, MENU_PLUGIN_START_ID, MENU_PLUGIN_END_ID),
-	m_acceleratorUpdater(initializationData->acceleratorManager),
-	m_pluginCommandManager(initializationData->acceleratorManager, ACCELERATOR_PLUGIN_START_ID,
+	m_acceleratorUpdater(app->GetAcceleratorManager()),
+	m_pluginCommandManager(app->GetAcceleratorManager(), ACCELERATOR_PLUGIN_START_ID,
 		ACCELERATOR_PLUGIN_END_ID),
-	m_iconFetcher(hwnd, &m_cachedIcons),
+	m_iconFetcher(hwnd, m_app->GetCachedIcons()),
 	m_shellIconLoader(&m_iconFetcher)
 {
 	m_resourceInstance = nullptr;
 
 	m_config = std::make_shared<Config>();
-	FeatureList::GetInstance()->InitializeFromCommandLine(*initializationData->commandLineSettings);
+	FeatureList::GetInstance()->InitializeFromCommandLine(*app->GetCommandLineSettings());
 
 	m_bSavePreferencesToXMLFile = FALSE;
 	m_bLanguageLoaded = false;

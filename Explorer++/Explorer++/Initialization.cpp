@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "App.h"
 #include "Bookmarks/BookmarkTreeFactory.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "ColorRule.h"
@@ -41,9 +42,10 @@ void Explorerplusplus::OnCreate()
 
 	LoadAllSettings();
 
-	if (m_commandLineSettings->shellChangeNotificationType)
+	if (m_app->GetCommandLineSettings()->shellChangeNotificationType)
 	{
-		m_config->shellChangeNotificationType = *m_commandLineSettings->shellChangeNotificationType;
+		m_config->shellChangeNotificationType =
+			*m_app->GetCommandLineSettings()->shellChangeNotificationType;
 	}
 
 	m_iconResourceLoader = std::make_unique<IconResourceLoader>(m_config->iconSet);

@@ -715,6 +715,9 @@
     <ClCompile Include="AsyncIconFetcher.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="App.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1471,6 +1474,9 @@
       <Filter>Async</Filter>
     </ClInclude>
     <ClInclude Include="AsyncIconFetcher.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="App.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
