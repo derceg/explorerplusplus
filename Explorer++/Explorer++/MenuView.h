@@ -26,6 +26,7 @@ public:
 	void AppendItem(UINT id, const std::wstring &text, const ShellIconModel &shellIcon = {},
 		const std::wstring &helpText = L"",
 		const std::optional<std::wstring> &acceleratorText = std::nullopt);
+	void AppendSeparator();
 	void EnableItem(UINT id, bool enable);
 	void ClearMenu();
 	std::wstring GetHelpTextForItem(UINT id) const;

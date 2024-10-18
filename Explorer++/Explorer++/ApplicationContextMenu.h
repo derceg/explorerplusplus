@@ -5,8 +5,12 @@
 #pragma once
 
 #include "ApplicationContextMenuController.h"
+#include "MenuBase.h"
+#include <boost/signals2.hpp>
+#include <vector>
 
 class CoreInterface;
+class MenuView;
 
 namespace Applications
 {
@@ -15,18 +19,19 @@ class Application;
 class ApplicationExecutor;
 class ApplicationModel;
 
-class ApplicationContextMenu
+class ApplicationContextMenu : public MenuBase
 {
 public:
-	ApplicationContextMenu(ApplicationModel *model, ApplicationExecutor *applicationExecutor,
+	ApplicationContextMenu(MenuView *menuView, const AcceleratorManager *acceleratorManager,
+		ApplicationModel *model, Application *application, ApplicationExecutor *applicationExecutor,
 		CoreInterface *coreInterface);
 
-	void ShowMenu(HWND parentWindow, Application *application, const POINT &ptScreen);
-
 private:
-	ApplicationModel *m_model;
-	HINSTANCE m_resourceInstance;
+	void BuildMenu();
+	void OnMenuItemSelected(UINT menuItemId);
+
 	ApplicationContextMenuController m_controller;
+	std::vector<boost::signals2::scoped_connection> m_connections;
 };
 
 }

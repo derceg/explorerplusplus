@@ -16,21 +16,21 @@ class ApplicationModel;
 class ApplicationContextMenuController
 {
 public:
-	ApplicationContextMenuController(ApplicationExecutor *applicationExecutor,
-		CoreInterface *coreInterface);
+	ApplicationContextMenuController(ApplicationModel *model, Application *application,
+		ApplicationExecutor *applicationExecutor, CoreInterface *coreInterface);
 
-	void OnMenuItemSelected(UINT menuItemId, ApplicationModel *model,
-		Application *targetApplication, size_t targetIndex, HWND parentWindow);
+	void OnMenuItemSelected(UINT menuItemId);
 
 private:
-	void OnOpen(const Application *targetApplication);
-	void OnShowProperties(HWND parentWindow, ApplicationModel *model,
-		Application *targetApplication);
-	void OnDelete(ApplicationModel *model, const Application *targetApplication, HWND parentWindow);
-	void OnNew(HWND parentWindow, ApplicationModel *model, size_t index);
+	void OnOpen();
+	void OnNew();
+	void OnDelete();
+	void OnShowProperties();
 
-	ApplicationExecutor *m_applicationExecutor = nullptr;
-	CoreInterface *m_coreInterface = nullptr;
+	ApplicationModel *const m_model;
+	Application *const m_application;
+	ApplicationExecutor *const m_applicationExecutor;
+	CoreInterface *const m_coreInterface;
 };
 
 }

@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "ApplicationContextMenu.h"
 #include "ApplicationDropper.h"
 #include "ApplicationExecutorImpl.h"
 #include "ToolbarView.h"
@@ -96,7 +95,6 @@ private:
 	ApplicationModel *m_model;
 	ApplicationExecutorImpl m_applicationExecutor;
 	CoreInterface *m_coreInterface;
-	ApplicationContextMenu m_contextMenu;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 

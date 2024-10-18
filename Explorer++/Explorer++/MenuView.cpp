@@ -104,6 +104,11 @@ void MenuView::UpdateBitmapForItem(UINT id, wil::unique_hbitmap bitmap)
 	}
 }
 
+void MenuView::AppendSeparator()
+{
+	MenuHelper::AddSeparator(GetMenu());
+}
+
 void MenuView::EnableItem(UINT id, bool enable)
 {
 	MenuHelper::EnableItem(GetMenu(), id, enable);

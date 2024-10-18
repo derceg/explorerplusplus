@@ -7,82 +7,86 @@
 #include "Application.h"
 #include "ApplicationEditorDialog.h"
 #include "ApplicationExecutor.h"
-#include "ApplicationHelper.h"
 #include "ApplicationModel.h"
 #include "CoreInterface.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
+#include "ResourceManager.h"
 
 namespace Applications
 {
 
-ApplicationContextMenuController::ApplicationContextMenuController(
-	ApplicationExecutor *applicationExecutor, CoreInterface *coreInterface) :
+ApplicationContextMenuController::ApplicationContextMenuController(ApplicationModel *model,
+	Application *application, ApplicationExecutor *applicationExecutor,
+	CoreInterface *coreInterface) :
+	m_model(model),
+	m_application(application),
 	m_applicationExecutor(applicationExecutor),
 	m_coreInterface(coreInterface)
 {
 }
 
-void ApplicationContextMenuController::OnMenuItemSelected(UINT menuItemId, ApplicationModel *model,
-	Application *targetApplication, size_t targetIndex, HWND parentWindow)
+void ApplicationContextMenuController::OnMenuItemSelected(UINT menuItemId)
 {
 	switch (menuItemId)
 	{
-	case IDM_APP_OPEN:
-		OnOpen(targetApplication);
+	case IDM_APPLICATION_CONTEXT_MENU_OPEN:
+		OnOpen();
 		break;
 
-	case IDM_APP_PROPERTIES:
-		OnShowProperties(parentWindow, model, targetApplication);
+	case IDM_APPLICATION_CONTEXT_MENU_NEW:
+		OnNew();
 		break;
 
-	case IDM_APP_DELETE:
-		OnDelete(model, targetApplication, parentWindow);
+	case IDM_APPLICATION_CONTEXT_MENU_DELETE:
+		OnDelete();
 		break;
 
-	case IDM_APP_NEW:
-		OnNew(parentWindow, model, targetIndex);
+	case IDM_APPLICATION_CONTEXT_MENU_PROPERTIES:
+		OnShowProperties();
+		break;
+
+	default:
+		DCHECK(false);
 		break;
 	}
 }
 
-void ApplicationContextMenuController::OnOpen(const Application *targetApplication)
+void ApplicationContextMenuController::OnOpen()
 {
-	m_applicationExecutor->Execute(targetApplication);
+	m_applicationExecutor->Execute(m_application);
 }
 
-void ApplicationContextMenuController::OnShowProperties(HWND parentWindow, ApplicationModel *model,
-	Application *targetApplication)
+void ApplicationContextMenuController::OnNew()
 {
-	ApplicationEditorDialog editorDialog(parentWindow, m_coreInterface->GetResourceInstance(),
-		model, ApplicationEditorDialog::EditDetails::EditApplication(targetApplication));
+	auto index = m_model->GetItemIndex(m_application);
+
+	ApplicationEditorDialog editorDialog(m_coreInterface->GetMainWindow(),
+		m_coreInterface->GetResourceInstance(), m_model,
+		ApplicationEditorDialog::EditDetails::AddNewApplication(
+			std::make_unique<Application>(L"", L""), index));
 	editorDialog.ShowModalDialog();
 }
 
-void ApplicationContextMenuController::OnDelete(ApplicationModel *model,
-	const Application *targetApplication, HWND parentWindow)
+void ApplicationContextMenuController::OnDelete()
 {
-	std::wstring message = ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),
-		IDS_APPLICATIONBUTTON_DELETE);
-	int messageBoxReturn = MessageBox(parentWindow, message.c_str(), NExplorerplusplus::APP_NAME,
-		MB_YESNO | MB_ICONINFORMATION | MB_DEFBUTTON2);
+	std::wstring message = Resources::LoadString(IDS_APPLICATIONBUTTON_DELETE);
+	int messageBoxReturn = MessageBox(m_coreInterface->GetMainWindow(), message.c_str(),
+		NExplorerplusplus::APP_NAME, MB_YESNO | MB_ICONINFORMATION | MB_DEFBUTTON2);
 
 	if (messageBoxReturn != IDYES)
 	{
 		return;
 	}
 
-	model->RemoveItem(targetApplication);
+	m_model->RemoveItem(m_application);
 }
 
-void ApplicationContextMenuController::OnNew(HWND parentWindow, ApplicationModel *model,
-	size_t index)
+void ApplicationContextMenuController::OnShowProperties()
 {
-	ApplicationEditorDialog editorDialog(parentWindow, m_coreInterface->GetResourceInstance(),
-		model,
-		ApplicationEditorDialog::EditDetails::AddNewApplication(
-			std::make_unique<Application>(L"", L""), index));
+	ApplicationEditorDialog editorDialog(m_coreInterface->GetMainWindow(),
+		m_coreInterface->GetResourceInstance(), m_model,
+		ApplicationEditorDialog::EditDetails::EditApplication(m_application));
 	editorDialog.ShowModalDialog();
 }
 

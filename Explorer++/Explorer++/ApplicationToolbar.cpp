@@ -5,12 +5,14 @@
 #include "stdafx.h"
 #include "ApplicationToolbar.h"
 #include "Application.h"
+#include "ApplicationContextMenu.h"
 #include "ApplicationEditorDialog.h"
 #include "ApplicationHelper.h"
 #include "ApplicationModel.h"
 #include "ApplicationToolbarView.h"
 #include "CoreInterface.h"
 #include "MainResource.h"
+#include "PopupMenuView.h"
 #include "ResourceHelper.h"
 #include "../Helper/DragDropHelper.h"
 #include "../Helper/MenuHelper.h"
@@ -77,8 +79,7 @@ ApplicationToolbar::ApplicationToolbar(ApplicationToolbarView *view, Application
 	m_view(view),
 	m_model(model),
 	m_applicationExecutor(coreInterface),
-	m_coreInterface(coreInterface),
-	m_contextMenu(model, &m_applicationExecutor, coreInterface)
+	m_coreInterface(coreInterface)
 {
 	Initialize();
 }
@@ -164,7 +165,10 @@ void ApplicationToolbar::OnButtonRightClicked(Application *application, const Mo
 	POINT ptScreen = event.ptClient;
 	ClientToScreen(m_view->GetHWND(), &ptScreen);
 
-	m_contextMenu.ShowMenu(m_view->GetHWND(), application, ptScreen);
+	PopupMenuView popupMenu;
+	ApplicationContextMenu menu(&popupMenu, m_coreInterface->GetAcceleratorManager(), m_model,
+		application, &m_applicationExecutor, m_coreInterface);
+	popupMenu.Show(m_view->GetHWND(), ptScreen);
 }
 
 void ApplicationToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow, const POINT &pt)
@@ -178,7 +182,8 @@ void ApplicationToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWind
 
 	std::wstring newText = ResourceHelper::LoadString(m_coreInterface->GetResourceInstance(),
 		IDS_APPLICATIONBUTTON_NEW);
-	MenuHelper::AddStringItem(menu, IDM_APP_NEW, newText, IDM_TOOLBARS_CUSTOMIZE, FALSE);
+	MenuHelper::AddStringItem(menu, IDM_APPLICATION_CONTEXT_MENU_NEW, newText,
+		IDM_TOOLBARS_CUSTOMIZE, FALSE);
 }
 
 void ApplicationToolbar::OnToolbarContextMenuItemSelected(HWND sourceWindow, int menuItemId)
@@ -190,7 +195,7 @@ void ApplicationToolbar::OnToolbarContextMenuItemSelected(HWND sourceWindow, int
 
 	switch (menuItemId)
 	{
-	case IDM_APP_NEW:
+	case IDM_APPLICATION_CONTEXT_MENU_NEW:
 	{
 		ApplicationEditorDialog editorDialog(m_view->GetHWND(),
 			m_coreInterface->GetResourceInstance(), m_model,

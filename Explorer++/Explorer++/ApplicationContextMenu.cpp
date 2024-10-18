@@ -4,40 +4,46 @@
 
 #include "stdafx.h"
 #include "ApplicationContextMenu.h"
-#include "ApplicationModel.h"
-#include "CoreInterface.h"
 #include "MainResource.h"
-#include <wil/resource.h>
+#include "MenuView.h"
+#include "ResourceManager.h"
 
 namespace Applications
 {
 
-ApplicationContextMenu::ApplicationContextMenu(ApplicationModel *model,
+ApplicationContextMenu::ApplicationContextMenu(MenuView *menuView,
+	const AcceleratorManager *acceleratorManager, ApplicationModel *model, Application *application,
 	ApplicationExecutor *applicationExecutor, CoreInterface *coreInterface) :
-	m_model(model),
-	m_resourceInstance(coreInterface->GetResourceInstance()),
-	m_controller(applicationExecutor, coreInterface)
+	MenuBase(menuView, acceleratorManager),
+	m_controller(model, application, applicationExecutor, coreInterface)
 {
+	BuildMenu();
+
+	m_connections.push_back(m_menuView->AddItemSelectedObserver(
+		std::bind(&ApplicationContextMenu::OnMenuItemSelected, this, std::placeholders::_1)));
 }
 
-void ApplicationContextMenu::ShowMenu(HWND parentWindow, Application *application,
-	const POINT &ptScreen)
+void ApplicationContextMenu::BuildMenu()
 {
-	wil::unique_hmenu parentMenu(
-		LoadMenu(m_resourceInstance, MAKEINTRESOURCE(IDR_APPLICATIONTOOLBAR_MENU)));
-	HMENU menu = GetSubMenu(parentMenu.get(), 0);
+	m_menuView->AppendItem(IDM_APPLICATION_CONTEXT_MENU_OPEN,
+		Resources::LoadString(IDS_APPLICATION_CONTEXT_MENU_OPEN), {},
+		Resources::LoadString(IDS_APPLICATION_CONTEXT_MENU_OPEN_HELP_TEXT));
+	m_menuView->AppendSeparator();
+	m_menuView->AppendItem(IDM_APPLICATION_CONTEXT_MENU_NEW,
+		Resources::LoadString(IDS_APPLICATION_CONTEXT_MENU_NEW), {},
+		Resources::LoadString(IDS_APPLICATION_CONTEXT_MENU_NEW_HELP_TEXT));
+	m_menuView->AppendSeparator();
+	m_menuView->AppendItem(IDM_APPLICATION_CONTEXT_MENU_DELETE,
+		Resources::LoadString(IDS_APPLICATION_CONTEXT_MENU_DELETE), {},
+		Resources::LoadString(IDS_APPLICATION_CONTEXT_MENU_DELETE_HELP_TEXT));
+	m_menuView->AppendItem(IDM_APPLICATION_CONTEXT_MENU_PROPERTIES,
+		Resources::LoadString(IDS_APPLICATION_CONTEXT_MENU_PROPERTIES), {},
+		Resources::LoadString(IDS_APPLICATION_CONTEXT_MENU_PROPERTIES_HELP_TEXT));
+}
 
-	UINT menuItemId = TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RETURNCMD, ptScreen.x, ptScreen.y, 0,
-		parentWindow, nullptr);
-
-	if (menuItemId == 0)
-	{
-		return;
-	}
-
-	auto index = m_model->GetItemIndex(application);
-
-	m_controller.OnMenuItemSelected(menuItemId, m_model, application, index + 1, parentWindow);
+void ApplicationContextMenu::OnMenuItemSelected(UINT menuItemId)
+{
+	m_controller.OnMenuItemSelected(menuItemId);
 }
 
 }
