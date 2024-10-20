@@ -22,7 +22,6 @@
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/locale.hpp>
-#include <glog/logging.h>
 #include <wil/resource.h>
 #include <cstdlib>
 #include <format>
@@ -110,8 +109,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		FLAGS_minloglevel = google::GLOG_ERROR;
 	}
 
-	google::InitGoogleLogging(__argv[0]);
-	auto glogCleanup = wil::scope_exit([] { google::ShutdownGoogleLogging(); });
+	auto glogCleanup = InitializeGoogleLogging();
 
 	google::InstallFailureFunction(
 		[]

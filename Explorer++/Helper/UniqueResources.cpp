@@ -14,3 +14,9 @@ unique_gdiplus_shutdown CheckedGdiplusStartup()
 
 	return unique_gdiplus_shutdown(gdiplusToken);
 }
+
+unique_glog_shutdown_call InitializeGoogleLogging()
+{
+	google::InitGoogleLogging(__argv[0]);
+	return unique_glog_shutdown_call();
+}
