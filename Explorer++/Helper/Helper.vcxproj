@@ -645,6 +645,7 @@
     <ClCompile Include="ClipboardHelper.cpp" />
     <ClCompile Include="ComboBox.cpp" />
     <ClCompile Include="ComboBoxHelper.cpp" />
+    <ClCompile Include="Console.cpp" />
     <ClCompile Include="Controls.cpp" />
     <ClCompile Include="DataExchangeHelper.cpp" />
     <ClCompile Include="DataObjectWrapper.cpp" />
@@ -730,6 +731,7 @@
     <ClInclude Include="ClipboardHelper.h" />
     <ClInclude Include="ComboBox.h" />
     <ClInclude Include="ComboBoxHelper.h" />
+    <ClInclude Include="Console.h" />
     <ClInclude Include="Controls.h" />
     <ClInclude Include="DataExchangeHelper.h" />
     <ClInclude Include="DataObjectWrapper.h" />

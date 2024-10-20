@@ -247,9 +247,6 @@
     <ClCompile Include="CommandLine.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Console.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="MainMenu.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -925,9 +922,6 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="CommandLine.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Console.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="SignalWrapper.h">

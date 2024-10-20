@@ -20,3 +20,8 @@ unique_glog_shutdown_call InitializeGoogleLogging()
 	google::InitGoogleLogging(__argv[0]);
 	return unique_glog_shutdown_call();
 }
+
+unique_release_console_call AttachParentConsole()
+{
+	return unique_release_console_call(Console::AttachParentConsole());
+}

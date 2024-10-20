@@ -1124,7 +1124,6 @@
     <ClCompile Include="ColorRuleEditorDialog.cpp" />
     <ClCompile Include="Plugins\CommandApi\Events\CommandInvoked.cpp" />
     <ClCompile Include="CommandLine.cpp" />
-    <ClCompile Include="Console.cpp" />
     <ClCompile Include="CustomizeColorsDialog.cpp" />
     <ClCompile Include="DestroyFilesDialog.cpp" />
     <ClCompile Include="DialogHelper.cpp" />
@@ -1397,7 +1396,6 @@
     <ClInclude Include="ColorRuleEditorDialog.h" />
     <ClInclude Include="Plugins\CommandApi\Events\CommandInvoked.h" />
     <ClInclude Include="CommandLine.h" />
-    <ClInclude Include="Console.h" />
     <ClInclude Include="CoreInterface.h" />
     <ClInclude Include="CustomizeColorsDialog.h" />
     <ClInclude Include="DefaultColumns.h" />

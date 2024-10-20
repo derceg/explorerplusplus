@@ -11,7 +11,6 @@
 #include "AcceleratorManager.h"
 #include "App.h"
 #include "CommandLine.h"
-#include "Console.h"
 #include "CrashHandlerHelper.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
@@ -81,15 +80,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	auto oleCleanup = wil::OleInitialize_failfast();
 
-	bool consoleAttached = Console::AttachParentConsole();
-	auto consoleCleanup = wil::scope_exit(
-		[consoleAttached]
-		{
-			if (consoleAttached)
-			{
-				Console::ReleaseConsole();
-			}
-		});
+	auto consoleCleanup = AttachParentConsole();
 
 	auto commandLineInfo = CommandLine::ProcessCommandLine();
 
