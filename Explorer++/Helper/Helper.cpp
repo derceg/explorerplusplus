@@ -350,15 +350,6 @@ DWORD GetNumFileHardLinks(const TCHAR *lpszFileName)
 
 BOOL ReadImageProperty(const TCHAR *lpszImage, PROPID propId, TCHAR *szProperty, int cchMax)
 {
-	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-	ULONG_PTR token;
-	Gdiplus::Status status = GdiplusStartup(&token, &gdiplusStartupInput, nullptr);
-
-	if (status != Gdiplus::Ok)
-	{
-		return FALSE;
-	}
-
 	BOOL bSuccess = FALSE;
 
 	/* This object needs to be
@@ -393,7 +384,7 @@ BOOL ReadImageProperty(const TCHAR *lpszImage, PROPID propId, TCHAR *szProperty,
 
 				if (propertyItem != nullptr)
 				{
-					status = image->GetPropertyItem(propId, size, propertyItem);
+					Gdiplus::Status status = image->GetPropertyItem(propId, size, propertyItem);
 
 					if (status == Gdiplus::Ok)
 					{
@@ -417,7 +408,6 @@ BOOL ReadImageProperty(const TCHAR *lpszImage, PROPID propId, TCHAR *szProperty,
 	}
 
 	delete image;
-	Gdiplus::GdiplusShutdown(token);
 
 	return bSuccess;
 }

@@ -9,7 +9,8 @@
 App::App(const CommandLine::Settings *commandLineSettings) :
 	m_commandLineSettings(commandLineSettings),
 	m_acceleratorManager(InitializeAcceleratorManager()),
-	m_cachedIcons(MAX_CACHED_ICONS)
+	m_cachedIcons(MAX_CACHED_ICONS),
+	m_uniqueGdiplusShutdown(CheckedGdiplusStartup())
 {
 }
 

@@ -80,18 +80,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	auto oleCleanup = wil::OleInitialize_failfast();
 
-	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-	ULONG_PTR gdiplusToken;
-	Gdiplus::Status status = Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
-
-	if (status != Gdiplus::Status::Ok)
-	{
-		return EXIT_CODE_ERROR;
-	}
-
-	auto gdiplusCleanup =
-		wil::scope_exit([gdiplusToken] { Gdiplus::GdiplusShutdown(gdiplusToken); });
-
 	bool consoleAttached = Console::AttachParentConsole();
 	auto consoleCleanup = wil::scope_exit(
 		[consoleAttached]

@@ -28,14 +28,10 @@ const TCHAR CLASS_NAME[] = _T("DisplayWindow");
 const TCHAR WINDOW_NAME[] = _T("DisplayWindow");
 }
 
-ULONG_PTR token;
-
 namespace
 {
 BOOL RegisterDisplayWindowClass()
 {
-	Gdiplus::GdiplusStartupInput startupInput;
-
 	WNDCLASS wc;
 	wc.style = 0;
 	wc.lpfnWndProc = DisplayWindow::DisplayWindowProcStub;
@@ -52,8 +48,6 @@ BOOL RegisterDisplayWindowClass()
 	{
 		return FALSE;
 	}
-
-	Gdiplus::GdiplusStartup(&token, &startupInput, nullptr);
 
 	return TRUE;
 }
@@ -79,8 +73,6 @@ DisplayWindow::DisplayWindow(HWND hDisplayWindow, DWInitialSettings_t *pInitialS
 	m_hMainIcon(pInitialSettings->hIcon),
 	m_hDisplayFont(pInitialSettings->hFont)
 {
-	g_ObjectCount++;
-
 	m_LineSpacing = 20;
 	m_LeftIndent = 80;
 
@@ -102,13 +94,6 @@ DisplayWindow::~DisplayWindow()
 	DeleteObject(m_hBitmapBackground);
 
 	DestroyIcon(m_hMainIcon);
-
-	g_ObjectCount--;
-
-	if (g_ObjectCount == 0)
-	{
-		Gdiplus::GdiplusShutdown(token);
-	}
 }
 
 LRESULT CALLBACK DisplayWindow::DisplayWindowProcStub(HWND hwnd, UINT msg, WPARAM wParam,

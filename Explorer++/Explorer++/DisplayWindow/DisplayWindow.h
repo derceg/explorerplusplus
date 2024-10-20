@@ -75,8 +75,6 @@ typedef struct
 	BOOL bCancelled;
 } ThumbnailEntry_t;
 
-static int g_ObjectCount = 0;
-
 class DisplayWindow
 {
 public:

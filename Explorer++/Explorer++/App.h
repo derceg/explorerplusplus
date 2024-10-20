@@ -7,6 +7,7 @@
 #include "AcceleratorManager.h"
 #include "CommandLine.h"
 #include "../Helper/CachedIcons.h"
+#include "../Helper/UniqueResources.h"
 #include <boost/core/noncopyable.hpp>
 
 class App : private boost::noncopyable
@@ -28,4 +29,6 @@ private:
 	AcceleratorManager m_acceleratorManager;
 	Config m_config;
 	CachedIcons m_cachedIcons;
+
+	unique_gdiplus_shutdown m_uniqueGdiplusShutdown;
 };

@@ -3,6 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "pch.h"
+#include "../Helper/UniqueResources.h"
 #include <gtest/gtest.h>
 #include <gdiplus.h>
 
@@ -36,21 +37,12 @@ public:
 class GdiplusEnvironment : public Environment
 {
 public:
-	void SetUp() override
+	GdiplusEnvironment() : m_uniqueGdiplusShutdown(CheckedGdiplusStartup())
 	{
-		Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-		Gdiplus::Status status =
-			Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, nullptr);
-		ASSERT_EQ(status, Gdiplus::Ok);
-	}
-
-	void TearDown() override
-	{
-		Gdiplus::GdiplusShutdown(m_gdiplusToken);
 	}
 
 private:
-	ULONG_PTR m_gdiplusToken;
+	unique_gdiplus_shutdown m_uniqueGdiplusShutdown;
 };
 
 // This listener will ensure that when as ASSERT_* fails in a subroutine, the entire test will fail.
