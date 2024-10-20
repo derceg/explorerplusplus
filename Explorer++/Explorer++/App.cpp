@@ -5,14 +5,15 @@
 #include "stdafx.h"
 #include "App.h"
 #include "DefaultAccelerators.h"
+#include "../Helper/Helper.h"
 
 App::App(const CommandLine::Settings *commandLineSettings) :
 	m_commandLineSettings(commandLineSettings),
 	m_acceleratorManager(InitializeAcceleratorManager()),
 	m_cachedIcons(MAX_CACHED_ICONS),
 	m_uniqueGdiplusShutdown(CheckedGdiplusStartup()),
-	m_richEditLib(
-		LoadLibrary(L"Msftedit.dll")) // This is needed for version 5 of the Rich Edit control.
+	m_richEditLib(LoadSystemLibrary(
+		L"Msftedit.dll")) // This is needed for version 5 of the Rich Edit control.
 {
 	CHECK(m_richEditLib);
 

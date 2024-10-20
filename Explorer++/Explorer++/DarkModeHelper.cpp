@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "DarkModeHelper.h"
 #include "../Helper/DetoursHelper.h"
+#include "../Helper/Helper.h"
 #include "../Helper/RegistrySettings.h"
 #include <detours/detours.h>
 #include <wil/common.h>
@@ -42,7 +43,7 @@ DarkModeHelper::DarkModeHelper() : m_darkModeSupported(false), m_darkModeEnabled
 		m_isWindows10Version1809 = true;
 	}
 
-	m_uxThemeLib.reset(LoadLibrary(_T("uxtheme.dll")));
+	m_uxThemeLib = LoadSystemLibrary(L"uxtheme.dll");
 
 	if (!m_uxThemeLib)
 	{

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "DpiCompatibility.h"
+#include "Helper.h"
 #include <wil/win32_helpers.h>
 
 DpiCompatibility &DpiCompatibility::GetInstance()
@@ -17,7 +18,7 @@ DpiCompatibility::DpiCompatibility() :
 	m_GetSystemMetricsForDpi(nullptr),
 	m_GetDpiForWindow(nullptr)
 {
-	m_user32.reset(LoadLibrary(L"user32.dll"));
+	m_user32 = LoadSystemLibrary(L"user32.dll");
 
 	if (m_user32)
 	{

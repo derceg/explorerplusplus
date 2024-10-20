@@ -840,3 +840,9 @@ bool IsProcessRTL()
 
 	return (layout == LAYOUT_RTL);
 }
+
+wil::unique_hmodule LoadSystemLibrary(const std::wstring &libraryName)
+{
+	return wil::unique_hmodule(
+		LoadLibraryEx(libraryName.c_str(), nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32));
+}

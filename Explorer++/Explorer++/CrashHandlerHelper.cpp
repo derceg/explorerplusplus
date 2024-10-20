@@ -156,7 +156,7 @@ std::optional<std::wstring> CreateMiniDumpForCrashedProcess(const CrashedData &c
 	EXCEPTION_POINTERS *exceptionAddress =
 		reinterpret_cast<EXCEPTION_POINTERS *>(crashedData.exceptionPointersAddress);
 
-	wil::unique_hmodule dbgHelp(LoadLibrary(_T("Dbghelp.dll")));
+	auto dbgHelp = LoadSystemLibrary(L"Dbghelp.dll");
 
 	if (!dbgHelp)
 	{
