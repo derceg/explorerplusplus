@@ -33,6 +33,8 @@
 #define DEFAULT_WINDOWPOS_HEIGHT_PERCENTAGE 0.82
 
 ATOM RegisterMainWindowClass(HINSTANCE hInstance);
+[[nodiscard]] unique_glog_shutdown_call InitializeLogging(
+	const CommandLine::Settings *commandLineSettings);
 void InitializeLocale();
 
 DWORD dwControlClasses = ICC_BAR_CLASSES | ICC_COOL_CLASSES | ICC_LISTVIEW_CLASSES
@@ -98,67 +100,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	auto &commandLineSettings = std::get<CommandLine::Settings>(commandLineInfo);
 
-	if (!commandLineSettings.enableLogging)
-	{
-		// Logs will only go to stdout. This will effectively disable logging from the user's
-		// perspective.
-		FLAGS_logtostdout = 1;
-
-		// Doing this means that, if the application was launched from the console, for example,
-		// CHECK failures will still be shown, which is somewhat useful.
-		FLAGS_minloglevel = google::GLOG_ERROR;
-	}
-
-	auto glogCleanup = InitializeGoogleLogging();
-
-	google::InstallFailureFunction(
-		[]
-		{
-			if (!IsDebuggerPresent())
-			{
-				// By default, glog will call abort() on a CHECK failure. The issue with that is
-				// that it won't invoke the exception handler. By calling DebugBreak() instead, the
-				// exception handler will be called, which gives a chance for the crash dialog to be
-				// shown and a minidump to be generated, before the application is terminated.
-				// This is only done when not debugging. When the application is being debugged,
-				// calling DebugBreak() would simply cause the debugger to break, which isn't
-				// desirable, as the application should exit when a CHECK condition is violated.
-				DebugBreak();
-			}
-			else
-			{
-				std::abort();
-			}
-		});
-
-	wil::SetResultLoggingCallback(
-		[](const wil::FailureInfo &failure) noexcept
-		{
-			WCHAR logMessage[2048];
-			HRESULT hr = wil::GetFailureLogString(logMessage, std::size(logMessage), failure);
-
-			if (FAILED(hr))
-			{
-				return;
-			}
-
-			auto logMessageUtf8 = wstrToUtf8Str(logMessage);
-
-			if (failure.type == wil::FailureType::FailFast)
-			{
-				// In this case, a fatal error has been triggered and WIL will terminate the
-				// application after returning.
-				LOG(ERROR) << logMessageUtf8;
-			}
-			else
-			{
-				// Although the message is logged in this case, it's not necessarily an indication
-				// that anything is wrong. For example, if a call to RETURN_IF_FAILED() fails, this
-				// function will be called, even though the failure might be legitimate and fully
-				// expected to happen in some situations.
-				LOG(INFO) << logMessageUtf8;
-			}
-		});
+	auto glogCleanup = InitializeLogging(&commandLineSettings);
 
 	BOOL bAllowMultipleInstances = TRUE;
 	BOOL bLoadSettingsFromXML;
@@ -338,6 +280,73 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	return (int) msg.wParam;
+}
+
+unique_glog_shutdown_call InitializeLogging(const CommandLine::Settings *commandLineSettings)
+{
+	if (!commandLineSettings->enableLogging)
+	{
+		// Logs will only go to stdout. This will effectively disable logging from the user's
+		// perspective.
+		FLAGS_logtostdout = 1;
+
+		// Doing this means that, if the application was launched from the console, for example,
+		// CHECK failures will still be shown, which is somewhat useful.
+		FLAGS_minloglevel = google::GLOG_ERROR;
+	}
+
+	auto glogCleanup = InitializeGoogleLogging();
+
+	google::InstallFailureFunction(
+		[]
+		{
+			if (!IsDebuggerPresent())
+			{
+				// By default, glog will call abort() on a CHECK failure. The issue with that is
+				// that it won't invoke the exception handler. By calling DebugBreak() instead, the
+				// exception handler will be called, which gives a chance for the crash dialog to be
+				// shown and a minidump to be generated, before the application is terminated.
+				// This is only done when not debugging. When the application is being debugged,
+				// calling DebugBreak() would simply cause the debugger to break, which isn't
+				// desirable, as the application should exit when a CHECK condition is violated.
+				DebugBreak();
+			}
+			else
+			{
+				std::abort();
+			}
+		});
+
+	wil::SetResultLoggingCallback(
+		[](const wil::FailureInfo &failure) noexcept
+		{
+			WCHAR logMessage[2048];
+			HRESULT hr = wil::GetFailureLogString(logMessage, std::size(logMessage), failure);
+
+			if (FAILED(hr))
+			{
+				return;
+			}
+
+			auto logMessageUtf8 = wstrToUtf8Str(logMessage);
+
+			if (failure.type == wil::FailureType::FailFast)
+			{
+				// In this case, a fatal error has been triggered and WIL will terminate the
+				// application after returning.
+				LOG(ERROR) << logMessageUtf8;
+			}
+			else
+			{
+				// Although the message is logged in this case, it's not necessarily an indication
+				// that anything is wrong. For example, if a call to RETURN_IF_FAILED() fails, this
+				// function will be called, even though the failure might be legitimate and fully
+				// expected to happen in some situations.
+				LOG(INFO) << logMessageUtf8;
+			}
+		});
+
+	return glogCleanup;
 }
 
 void InitializeLocale()
