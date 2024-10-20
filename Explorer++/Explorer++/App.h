@@ -9,6 +9,7 @@
 #include "../Helper/CachedIcons.h"
 #include "../Helper/UniqueResources.h"
 #include <boost/core/noncopyable.hpp>
+#include <wil/resource.h>
 
 class App : private boost::noncopyable
 {
@@ -31,4 +32,5 @@ private:
 	CachedIcons m_cachedIcons;
 
 	unique_gdiplus_shutdown m_uniqueGdiplusShutdown;
+	wil::unique_hmodule m_richEditLib;
 };

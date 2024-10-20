@@ -36,9 +36,6 @@ ATOM RegisterMainWindowClass(HINSTANCE hInstance);
 	const CommandLine::Settings *commandLineSettings);
 void InitializeLocale();
 
-DWORD dwControlClasses = ICC_BAR_CLASSES | ICC_COOL_CLASSES | ICC_LISTVIEW_CLASSES
-	| ICC_USEREX_CLASSES | ICC_STANDARD_CLASSES | ICC_LINK_CLASS;
-
 /* Modeless dialog handles. */
 HWND g_hwndSearch = nullptr;
 HWND g_hwndRunScript = nullptr;
@@ -71,17 +68,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	/* Initialize OLE, as well as the various window classes that
-	will be needed (listview, TreeView, comboboxex, etc.). */
-	INITCOMMONCONTROLSEX ccEx;
-	ccEx.dwSize = sizeof(INITCOMMONCONTROLSEX);
-	ccEx.dwICC = dwControlClasses;
-	InitCommonControlsEx(&ccEx);
-
 	auto oleCleanup = wil::OleInitialize_failfast();
 
 	auto consoleCleanup = AttachParentConsole();
-
 	auto commandLineInfo = CommandLine::ProcessCommandLine();
 
 	if (std::holds_alternative<CommandLine::ExitInfo>(commandLineInfo))
@@ -152,9 +141,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			}
 		}
 	}
-
-	/* This dll is needed to create a richedit control. */
-	wil::unique_hmodule richEditLib(LoadLibrary(_T("Msftedit.dll")));
 
 	LONG res = RegisterMainWindowClass(hInstance);
 
