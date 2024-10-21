@@ -37,6 +37,8 @@ public:
 
 	MainToolbarStorage::MainToolbarButtons GetButtonsForStorage() const;
 
+	void StartCustomization();
+
 	// Signals
 	SignalWrapper<MainToolbar, void()> sizeUpdatedSignal;
 

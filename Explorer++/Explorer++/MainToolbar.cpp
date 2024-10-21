@@ -923,3 +923,8 @@ MainToolbarStorage::MainToolbarButtons MainToolbar::GetButtonsForStorage() const
 
 	return buttons;
 }
+
+void MainToolbar::StartCustomization()
+{
+	SendMessage(m_hwnd, TB_CUSTOMIZE, 0, 0);
+}

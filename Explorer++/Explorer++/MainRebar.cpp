@@ -344,7 +344,7 @@ void Explorerplusplus::OnToggleToolbar(HWND toolbar, bool show)
 
 void Explorerplusplus::OnCustomizeMainToolbar()
 {
-	SendMessage(m_mainToolbar->GetHWND(), TB_CUSTOMIZE, 0, 0);
+	m_mainToolbar->StartCustomization();
 }
 
 boost::signals2::connection Explorerplusplus::AddToolbarContextMenuObserver(
