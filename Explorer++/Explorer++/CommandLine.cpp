@@ -51,7 +51,7 @@ struct ImmediatelyHandledOptions
 	ReplaceExplorerMode replaceExplorerMode;
 	bool jumplistNewTab;
 	std::optional<CrashedData> crashedData;
-	std::wstring pasteSymLinksDestination;
+	std::optional<std::wstring> pasteSymLinksDestination;
 };
 
 struct ReplaceExplorerResults
@@ -62,7 +62,7 @@ struct ReplaceExplorerResults
 	std::optional<LSTATUS> setAll;
 };
 
-std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(const CLI::App &app,
+std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(
 	const ImmediatelyHandledOptions &immediatelyHandledOptions, CommandLine::Settings &settings);
 void OnClearRegistrySettings();
 void OnUpdateReplaceExplorerSetting(ReplaceExplorerMode updatedReplaceMode);
@@ -192,7 +192,7 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 		return ExitInfo{ app.exit(e) };
 	}
 
-	auto exitInfo = ProcessCommandLineFlags(app, immediatelyHandledOptions, settings);
+	auto exitInfo = ProcessCommandLineFlags(immediatelyHandledOptions, settings);
 
 	if (exitInfo)
 	{
@@ -202,7 +202,7 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 	return settings;
 }
 
-std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(const CLI::App &app,
+std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(
 	const ImmediatelyHandledOptions &immediatelyHandledOptions, CommandLine::Settings &settings)
 {
 	if (immediatelyHandledOptions.crashedData)
@@ -211,10 +211,10 @@ std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(const CLI::App &app
 		return CommandLine::ExitInfo{ EXIT_CODE_NORMAL_CRASH_HANDLER };
 	}
 
-	if (app.count(wstrToUtf8Str(CommandLine::PASTE_SYMLINKS_ARGUMENT)) > 0)
+	if (immediatelyHandledOptions.pasteSymLinksDestination)
 	{
 		auto pastedItems =
-			ClipboardOperations::PasteSymLinks(immediatelyHandledOptions.pasteSymLinksDestination);
+			ClipboardOperations::PasteSymLinks(*immediatelyHandledOptions.pasteSymLinksDestination);
 
 		PasteSymLinksClient client;
 		client.NotifyServerOfResult(pastedItems);
