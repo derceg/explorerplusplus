@@ -14,6 +14,7 @@
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/WindowHelper.h"
 #include <CLI/CLI.hpp>
+#include <boost/pfr.hpp>
 #include <iostream>
 #include <optional>
 
@@ -40,8 +41,6 @@ bool lexical_cast(const std::string &input, std::wstring &output)
 }
 }
 
-using CrashedDataTuple = std::tuple<DWORD, DWORD, intptr_t, std::string>;
-
 using namespace DefaultFileManager;
 
 // The items here are handled immediately and don't need to be passed to the Explorerplusplus class.
@@ -51,7 +50,7 @@ struct ImmediatelyHandledOptions
 	bool removeAsDefault;
 	ReplaceExplorerMode replaceExplorerMode;
 	bool jumplistNewTab;
-	CrashedDataTuple crashedDataTuple;
+	std::optional<CrashedData> crashedData;
 	std::wstring pasteSymLinksDestination;
 };
 
@@ -105,8 +104,18 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 	privateCommands->add_flag(wstrToUtf8Str(JUMPLIST_TASK_NEWTAB_ARGUMENT),
 		immediatelyHandledOptions.jumplistNewTab);
 
-	privateCommands->add_option(wstrToUtf8Str(APPLICATION_CRASHED_ARGUMENT),
-		immediatelyHandledOptions.crashedDataTuple);
+	// CLI11 can parse a set of different value types for a single option, provided those types are
+	// specified by a tuple. That's the reason the appropriate tuple type is derived here. If the
+	// application crashed argument is supplied, the tuple will be converted back to a struct by the
+	// callback. The callback itself runs as part of the parse() call made below, so capturing local
+	// variables here is safe.
+	using CrashedDataTuple = decltype(boost::pfr::structure_to_tuple(std::declval<CrashedData>()));
+	privateCommands->add_option_function<CrashedDataTuple>(
+		wstrToUtf8Str(APPLICATION_CRASHED_ARGUMENT),
+		[&immediatelyHandledOptions](const CrashedDataTuple &crashedDataTuple) {
+			immediatelyHandledOptions.crashedData =
+				std::make_from_tuple<CrashedData>(crashedDataTuple);
+		});
 
 	privateCommands->add_option(wstrToUtf8Str(PASTE_SYMLINKS_ARGUMENT),
 		immediatelyHandledOptions.pasteSymLinksDestination);
@@ -196,12 +205,9 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(const CLI::App &app,
 	const ImmediatelyHandledOptions &immediatelyHandledOptions, CommandLine::Settings &settings)
 {
-	if (app.count(wstrToUtf8Str(CommandLine::APPLICATION_CRASHED_ARGUMENT)) > 0)
+	if (immediatelyHandledOptions.crashedData)
 	{
-		auto &crashedDataTuple = immediatelyHandledOptions.crashedDataTuple;
-		HandleProcessCrashedNotification(
-			{ std::get<0>(crashedDataTuple), std::get<1>(crashedDataTuple),
-				std::get<2>(crashedDataTuple), std::get<3>(crashedDataTuple) });
+		HandleProcessCrashedNotification(*immediatelyHandledOptions.crashedData);
 		return CommandLine::ExitInfo{ EXIT_CODE_NORMAL_CRASH_HANDLER };
 	}
 

@@ -17,6 +17,7 @@
     "boost-numeric-conversion",
     "boost-outcome",
     "boost-parameter",
+    "boost-pfr",
     "boost-range",
     "boost-signals2",
     "cereal",
