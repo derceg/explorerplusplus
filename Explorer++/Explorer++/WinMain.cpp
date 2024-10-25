@@ -68,8 +68,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	auto oleCleanup = wil::OleInitialize_failfast();
-
 	auto consoleCleanup = AttachParentConsole();
 	auto commandLineInfo = CommandLine::ProcessCommandLine();
 

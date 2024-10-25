@@ -33,4 +33,5 @@ private:
 
 	unique_gdiplus_shutdown m_uniqueGdiplusShutdown;
 	wil::unique_hmodule m_richEditLib;
+	wil::unique_oleuninitialize_call m_oleCleanup;
 };

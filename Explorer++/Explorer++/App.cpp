@@ -13,7 +13,8 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_cachedIcons(MAX_CACHED_ICONS),
 	m_uniqueGdiplusShutdown(CheckedGdiplusStartup()),
 	m_richEditLib(LoadSystemLibrary(
-		L"Msftedit.dll")) // This is needed for version 5 of the Rich Edit control.
+		L"Msftedit.dll")), // This is needed for version 5 of the Rich Edit control.
+	m_oleCleanup(wil::OleInitialize_failfast())
 {
 	CHECK(m_richEditLib);
 
