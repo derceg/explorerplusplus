@@ -77,8 +77,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	auto &commandLineSettings = std::get<CommandLine::Settings>(commandLineInfo);
-
 	auto glogCleanup = InitializeLogging(&commandLineSettings);
+	InitializeCrashHandler();
 
 	BOOL bAllowMultipleInstances = TRUE;
 	BOOL bLoadSettingsFromXML;
@@ -149,8 +149,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		return EXIT_CODE_ERROR;
 	}
-
-	InitializeCrashHandler();
 
 	InitializeLocale();
 
