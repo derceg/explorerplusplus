@@ -12,6 +12,7 @@
 #include "App.h"
 #include "CommandLine.h"
 #include "CrashHandlerHelper.h"
+#include "ExitCode.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ModelessDialogs.h"

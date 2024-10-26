@@ -20,6 +20,7 @@
 #include "DisplayWindow/DisplayWindow.h"
 #include "DrivesToolbar.h"
 #include "DrivesToolbarView.h"
+#include "ExitCode.h"
 #include "Explorer++_internal.h"
 #include "HolderWindow.h"
 #include "MainMenuSubMenuView.h"

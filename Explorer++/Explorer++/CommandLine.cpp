@@ -7,6 +7,7 @@
 #include "ClipboardOperations.h"
 #include "CommandLineSplitter.h"
 #include "CrashHandlerHelper.h"
+#include "ExitCode.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "PasteSymLinksClient.h"

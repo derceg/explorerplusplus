@@ -1293,6 +1293,7 @@
     <ClInclude Include="CustomFont.h" />
     <ClInclude Include="CustomFontStorage.h" />
     <ClInclude Include="DirectoryOperationsHelper.h" />
+    <ClInclude Include="ExitCode.h" />
     <ClInclude Include="Feature.h" />
     <ClInclude Include="FeatureList.h" />
     <ClInclude Include="FontsOptionsPage.h" />
