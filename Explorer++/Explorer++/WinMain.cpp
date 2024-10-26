@@ -32,8 +32,7 @@
 #define DEFAULT_WINDOWPOS_HEIGHT_PERCENTAGE 0.82
 
 ATOM RegisterMainWindowClass(HINSTANCE hInstance);
-[[nodiscard]] unique_glog_shutdown_call InitializeLogging(
-	const CommandLine::Settings *commandLineSettings);
+[[nodiscard]] unique_glog_shutdown_call InitializeLogging();
 void InitializeLocale();
 
 /* Modeless dialog handles. */
@@ -68,7 +67,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
+	// It's important that this is what's done first for two reasons:
+	//
+	// 1. By default, logging is disabled. What that means, specifically, is that logging error
+	// statements will go to stdout by default. That's pointless unless there's a console attached.
+	// Doing this first means that early CHECK failures (ones that occur before file logging has the
+	// chance to be set up, which occurs after the command line has been parsed) can still be
+	// potentially shown somewhere. It also means that this is the only point in the application
+	// where log statements can be silently discarded.
+	//
+	// 2. As part of parsing the command line, text (e.g. help text) can be printed to the console.
+	// As with the above, that's not useful unless there's a console attached.
 	auto consoleCleanup = AttachParentConsole();
+
+	// Logging and crash handling are both explicitly initialized early, so that they're available
+	// for almost the entire lifetime of the application (the only exception being the above block).
+	auto glogCleanup = InitializeLogging();
+	InitializeCrashHandler();
+
 	auto commandLineInfo = CommandLine::ProcessCommandLine();
 
 	if (std::holds_alternative<CommandLine::ExitInfo>(commandLineInfo))
@@ -77,8 +93,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	auto &commandLineSettings = std::get<CommandLine::Settings>(commandLineInfo);
-	auto glogCleanup = InitializeLogging(&commandLineSettings);
-	InitializeCrashHandler();
 
 	BOOL bAllowMultipleInstances = TRUE;
 	BOOL bLoadSettingsFromXML;
@@ -255,18 +269,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	return (int) msg.wParam;
 }
 
-unique_glog_shutdown_call InitializeLogging(const CommandLine::Settings *commandLineSettings)
+unique_glog_shutdown_call InitializeLogging()
 {
-	if (!commandLineSettings->enableLogging)
-	{
-		// Logs will only go to stdout. This will effectively disable logging from the user's
-		// perspective.
-		FLAGS_logtostdout = 1;
+	// By default, logging will be disabled. That is, logs will only go to stdout, which effectively
+	// disables them from the user's perspective.
+	FLAGS_logtostdout = true;
 
-		// Doing this means that, if the application was launched from the console, for example,
-		// CHECK failures will still be shown, which is somewhat useful.
-		FLAGS_minloglevel = google::GLOG_ERROR;
-	}
+	// Doing this means that, if the application was launched from the console, for example, CHECK
+	// failures will still be shown, which is somewhat useful.
+	FLAGS_minloglevel = google::GLOG_ERROR;
 
 	auto glogCleanup = InitializeGoogleLogging();
 

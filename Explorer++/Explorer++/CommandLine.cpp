@@ -248,6 +248,12 @@ std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(
 		OnUpdateReplaceExplorerSetting(immediatelyHandledOptions.replaceExplorerMode);
 	}
 
+	if (settings.enableLogging)
+	{
+		FLAGS_logtostdout = false;
+		FLAGS_minloglevel = google::GLOG_INFO;
+	}
+
 	return std::nullopt;
 }
 
