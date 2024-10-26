@@ -171,7 +171,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM w
 		break;
 
 		// See https://github.com/derceg/explorerplusplus/issues/169.
-		/*case WM_APP_ASSOCCHANGED:
+		/*case WM_APP_ASSOC_CHANGED:
 			OnAssocChanged();
 			break;*/
 

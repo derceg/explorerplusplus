@@ -92,7 +92,7 @@ void Explorerplusplus::OnCreate()
 	shcne.fRecursive = TRUE;
 	shcne.pidl = nullptr;
 	m_SHChangeNotifyID = SHChangeNotifyRegister(m_hContainer, SHCNRF_ShellLevel, SHCNE_ASSOCCHANGED,
-		WM_APP_ASSOCCHANGED, 1, &shcne);
+		WM_APP_ASSOC_CHANGED, 1, &shcne);
 
 	SetFocus(m_hActiveListView);
 

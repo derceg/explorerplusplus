@@ -32,8 +32,6 @@ const TCHAR APPLICATION_MUTEX_NAME[] = _T("Explorer++");
 file manager. */
 static const TCHAR SHELL_DEFAULT_INTERNAL_COMMAND_NAME[] = _T("openinexplorer++");
 
-#define WM_APP_ASSOCCHANGED (WM_APP + 54)
-
 /* Rebar menu id's. */
 #define ID_REBAR_MENU_BACK_START 2000
 #define ID_REBAR_MENU_BACK_END 2999

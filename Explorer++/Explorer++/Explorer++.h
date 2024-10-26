@@ -112,6 +112,7 @@ public:
 
 private:
 	static constexpr UINT WM_APP_CLOSE = WM_APP + 1;
+	static constexpr UINT WM_APP_ASSOC_CHANGED = WM_APP + 2;
 
 	static const int OPEN_IN_NEW_TAB_MENU_ITEM_ID = ShellContextMenu::MAX_SHELL_MENU_ID + 1;
 
