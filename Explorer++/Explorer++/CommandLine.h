@@ -4,8 +4,10 @@
 
 #pragma once
 
-#include "Config.h"
+#include "CrashHandlerHelper.h"
 #include "Feature.h"
+#include "ShellChangeNotificationType.h"
+#include "../Helper/SetDefaultFileManager.h"
 #include <optional>
 #include <variant>
 
@@ -18,7 +20,13 @@ struct Settings
 	std::set<Feature> enableFeatures;
 	std::optional<ShellChangeNotificationType> shellChangeNotificationType;
 	std::wstring language;
-	bool createJumplistTab = false;
+	bool clearRegistrySettings = false;
+	bool removeAsDefault = false;
+	DefaultFileManager::ReplaceExplorerMode replaceExplorerMode =
+		DefaultFileManager::ReplaceExplorerMode::None;
+	bool jumplistNewTab = false;
+	std::optional<CrashedData> crashedData;
+	std::optional<std::wstring> pasteSymLinksDestination;
 	std::vector<std::wstring> filesToSelect;
 	std::vector<std::wstring> directories;
 };
@@ -29,10 +37,10 @@ struct ExitInfo
 };
 
 // Internal command line arguments.
-const TCHAR JUMPLIST_TASK_NEWTAB_ARGUMENT[] = _T("--open-new-tab");
-const TCHAR APPLICATION_CRASHED_ARGUMENT[] = _T("--application-crashed");
-const TCHAR PASTE_SYMLINKS_ARGUMENT[] = _T("--paste-symlinks");
+const wchar_t JUMPLIST_TASK_NEWTAB_ARGUMENT[] = L"--open-new-tab";
+const wchar_t APPLICATION_CRASHED_ARGUMENT[] = L"--application-crashed";
+const wchar_t PASTE_SYMLINKS_ARGUMENT[] = L"--paste-symlinks";
 
-std::variant<Settings, ExitInfo> ProcessCommandLine();
+std::variant<Settings, ExitInfo> Parse(const std::wstring &commandLine);
 
 }

@@ -17,6 +17,7 @@
 #include "MainResource.h"
 #include "ModelessDialogs.h"
 #include "RegistrySettings.h"
+#include "StartupCommandLineProcessor.h"
 #include "XMLSettings.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
@@ -86,14 +87,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	auto glogCleanup = InitializeLogging();
 	InitializeCrashHandler();
 
-	auto commandLineInfo = CommandLine::ProcessCommandLine();
+	auto commandLineInfo = CommandLine::Parse(GetCommandLine());
 
 	if (std::holds_alternative<CommandLine::ExitInfo>(commandLineInfo))
 	{
 		return std::get<CommandLine::ExitInfo>(commandLineInfo).exitCode;
 	}
 
-	auto &commandLineSettings = std::get<CommandLine::Settings>(commandLineInfo);
+	const auto &commandLineSettings = std::get<CommandLine::Settings>(commandLineInfo);
+
+	auto exitCode = StartupCommandLineProcessor::Process(&commandLineSettings);
+
+	if (exitCode)
+	{
+		return *exitCode;
+	}
 
 	BOOL bAllowMultipleInstances = TRUE;
 	BOOL bLoadSettingsFromXML;

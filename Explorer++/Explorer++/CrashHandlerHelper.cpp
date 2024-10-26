@@ -12,7 +12,8 @@
 #include "../Helper/DetoursHelper.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ProcessHelper.h"
-#include "../Helper/StringHelper.h"
+#include <boost/algorithm/string/join.hpp>
+#include <boost/pfr.hpp>
 #include <detours/detours.h>
 #include <glog/logging.h>
 #include <wil/resource.h>
@@ -68,10 +69,14 @@ LONG WINAPI TopLevelExceptionFilter(EXCEPTION_POINTERS *exception)
 		return EXCEPTION_CONTINUE_SEARCH;
 	}
 
-	// The order of the arguments here needs to match the order of the arguments in CommandLine.cpp.
-	std::wstring arguments = std::format(L"\"{}\" {} {} {} {} {}", currentProcess,
-		CommandLine::APPLICATION_CRASHED_ARGUMENT, GetCurrentProcessId(), GetCurrentThreadId(),
-		static_cast<void *>(exception), eventName);
+	CrashedData crashedData;
+	crashedData.processId = GetCurrentProcessId();
+	crashedData.threadId = GetCurrentThreadId();
+	crashedData.exceptionPointersAddress = std::bit_cast<intptr_t>(exception);
+	crashedData.eventName = eventName;
+
+	std::wstring arguments = std::format(L"\"{}\" {} {}", currentProcess,
+		CommandLine::APPLICATION_CRASHED_ARGUMENT, FormatCrashedDataForCommandLine(crashedData));
 
 	STARTUPINFO startupInfo = { 0 };
 	startupInfo.cb = sizeof(startupInfo);
@@ -90,6 +95,14 @@ LONG WINAPI TopLevelExceptionFilter(EXCEPTION_POINTERS *exception)
 	event.wait(30000);
 
 	return EXCEPTION_EXECUTE_HANDLER;
+}
+
+std::wstring FormatCrashedDataForCommandLine(const CrashedData &crashedData)
+{
+	std::vector<std::wstring> fields;
+	boost::pfr::for_each_field(crashedData,
+		[&fields](const auto &field) { fields.push_back(std::format(L"{}", field)); });
+	return boost::algorithm::join(fields, L" ");
 }
 
 LONG DisableSetUnhandledExceptionFilter()
@@ -124,7 +137,7 @@ void HandleProcessCrashedNotification(const CrashedData &crashedData)
 std::optional<std::wstring> CreateMiniDumpForCrashedProcess(const CrashedData &crashedData)
 {
 	wil::unique_event_nothrow event;
-	bool res = event.try_open(utf8StrToWstr(crashedData.eventName).c_str());
+	bool res = event.try_open(crashedData.eventName.c_str());
 
 	if (!res)
 	{

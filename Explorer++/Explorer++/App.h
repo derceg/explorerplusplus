@@ -6,6 +6,7 @@
 
 #include "AcceleratorManager.h"
 #include "CommandLine.h"
+#include "Config.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/UniqueResources.h"
 #include <boost/core/noncopyable.hpp>

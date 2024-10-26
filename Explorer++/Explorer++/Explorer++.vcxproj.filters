@@ -715,6 +715,9 @@
     <ClCompile Include="App.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="StartupCommandLineProcessor.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1474,6 +1477,12 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ExitCode.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="StartupCommandLineProcessor.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellChangeNotificationType.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

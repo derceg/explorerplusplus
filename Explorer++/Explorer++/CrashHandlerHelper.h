@@ -9,8 +9,12 @@ struct CrashedData
 	DWORD processId;
 	DWORD threadId;
 	intptr_t exceptionPointersAddress;
-	std::string eventName;
+	std::wstring eventName;
+
+	// This is only used in tests.
+	bool operator==(const CrashedData &) const = default;
 };
 
 void InitializeCrashHandler();
+std::wstring FormatCrashedDataForCommandLine(const CrashedData &crashedData);
 void HandleProcessCrashedNotification(const CrashedData &crashedData);

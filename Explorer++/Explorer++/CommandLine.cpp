@@ -4,25 +4,18 @@
 
 #include "stdafx.h"
 #include "CommandLine.h"
-#include "ClipboardOperations.h"
 #include "CommandLineSplitter.h"
-#include "CrashHandlerHelper.h"
 #include "ExitCode.h"
-#include "Explorer++_internal.h"
-#include "MainResource.h"
-#include "PasteSymLinksClient.h"
-#include "ResourceHelper.h"
-#include "../Helper/SetDefaultFileManager.h"
-#include "../Helper/WindowHelper.h"
+#include "../Helper/StringHelper.h"
 #include <CLI/CLI.hpp>
 #include <boost/pfr.hpp>
 #include <iostream>
-#include <optional>
 
 // Allows std::wstring to be used as a custom type for add_option.
 // See https://github.com/CLIUtils/CLI11/issues/704#issuecomment-1047954575.
 namespace CLI::detail
 {
+
 template <>
 struct classify_object<std::wstring, void>
 {
@@ -40,58 +33,32 @@ bool lexical_cast(const std::string &input, std::wstring &output)
 	output = utf8StrToWstr(input);
 	return true;
 }
+
 }
 
-using namespace DefaultFileManager;
-
-// The items here are handled immediately and don't need to be passed to the Explorerplusplus class.
-struct ImmediatelyHandledOptions
+namespace CommandLine
 {
-	bool clearRegistrySettings;
-	bool removeAsDefault;
-	ReplaceExplorerMode replaceExplorerMode;
-	bool jumplistNewTab;
-	std::optional<CrashedData> crashedData;
-	std::optional<std::wstring> pasteSymLinksDestination;
-};
 
-struct ReplaceExplorerResults
-{
-	std::optional<LSTATUS> removedFileSystem;
-	std::optional<LSTATUS> removedAll;
-	std::optional<LSTATUS> setFileSystem;
-	std::optional<LSTATUS> setAll;
-};
-
-std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(
-	const ImmediatelyHandledOptions &immediatelyHandledOptions, CommandLine::Settings &settings);
-void OnClearRegistrySettings();
-void OnUpdateReplaceExplorerSetting(ReplaceExplorerMode updatedReplaceMode);
-ReplaceExplorerResults UpdateReplaceExplorerSetting(ReplaceExplorerMode updatedReplaceMode);
-std::optional<CommandLine::ExitInfo> OnJumplistNewTab();
-
-std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
+std::variant<Settings, ExitInfo> Parse(const std::wstring &commandLine)
 {
 	CLI::App app("Explorer++");
 	app.allow_extras();
 
-	ImmediatelyHandledOptions immediatelyHandledOptions;
+	Settings settings;
 
-	immediatelyHandledOptions.clearRegistrySettings = false;
-	app.add_flag("--clear-registry-settings", immediatelyHandledOptions.clearRegistrySettings,
+	app.add_flag("--clear-registry-settings", settings.clearRegistrySettings,
 		"Clear existing registry settings");
 
-	immediatelyHandledOptions.removeAsDefault = false;
-	auto removeAsDefaultOption = app.add_flag("--remove-as-default",
-		immediatelyHandledOptions.removeAsDefault, "Remove Explorer++ as the default file manager");
+	auto removeAsDefaultOption = app.add_flag("--remove-as-default", settings.removeAsDefault,
+		"Remove Explorer++ as the default file manager");
 
-	immediatelyHandledOptions.replaceExplorerMode = ReplaceExplorerMode::None;
 	auto setAsDefaultOption =
-		app.add_option("--set-as-default", immediatelyHandledOptions.replaceExplorerMode,
+		app.add_option("--set-as-default", settings.replaceExplorerMode,
 			   "Set Explorer++ as the default file manager for the current user")
-			->transform(CLI::CheckedTransformer(CLI::TransformPairs<ReplaceExplorerMode>{
-				{ "filesystem", ReplaceExplorerMode::FileSystem },
-				{ "all", ReplaceExplorerMode::All } }));
+			->transform(CLI::CheckedTransformer(
+				CLI::TransformPairs<DefaultFileManager::ReplaceExplorerMode>{
+					{ "filesystem", DefaultFileManager::ReplaceExplorerMode::FileSystem },
+					{ "all", DefaultFileManager::ReplaceExplorerMode::All } }));
 
 	removeAsDefaultOption->excludes(setAsDefaultOption);
 	setAsDefaultOption->excludes(removeAsDefaultOption);
@@ -101,9 +68,8 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 	CLI::App *privateCommands = app.add_subcommand();
 	privateCommands->group("");
 
-	immediatelyHandledOptions.jumplistNewTab = false;
 	privateCommands->add_flag(wstrToUtf8Str(JUMPLIST_TASK_NEWTAB_ARGUMENT),
-		immediatelyHandledOptions.jumplistNewTab);
+		settings.jumplistNewTab);
 
 	// CLI11 can parse a set of different value types for a single option, provided those types are
 	// specified by a tuple. That's the reason the appropriate tuple type is derived here. If the
@@ -113,15 +79,11 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 	using CrashedDataTuple = decltype(boost::pfr::structure_to_tuple(std::declval<CrashedData>()));
 	privateCommands->add_option_function<CrashedDataTuple>(
 		wstrToUtf8Str(APPLICATION_CRASHED_ARGUMENT),
-		[&immediatelyHandledOptions](const CrashedDataTuple &crashedDataTuple) {
-			immediatelyHandledOptions.crashedData =
-				std::make_from_tuple<CrashedData>(crashedDataTuple);
-		});
+		[&settings](const CrashedDataTuple &crashedDataTuple)
+		{ settings.crashedData = std::make_from_tuple<CrashedData>(crashedDataTuple); });
 
 	privateCommands->add_option(wstrToUtf8Str(PASTE_SYMLINKS_ARGUMENT),
-		immediatelyHandledOptions.pasteSymLinksDestination);
-
-	CommandLine::Settings settings;
+		settings.pasteSymLinksDestination);
 
 	std::map<std::string, Feature> featureMap;
 
@@ -165,7 +127,7 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 		"Directories to open. Paths with spaces should be enclosed in double quotes (e.g. "
 		R"("C:\path with spaces").)");
 
-	auto splitResult = CommandLineSplitter::Split(wstrToUtf8Str(GetCommandLine()));
+	auto splitResult = CommandLineSplitter::Split(wstrToUtf8Str(commandLine));
 
 	if (!splitResult.succeeded)
 	{
@@ -193,177 +155,7 @@ std::variant<CommandLine::Settings, CommandLine::ExitInfo> CommandLine::ProcessC
 		return ExitInfo{ app.exit(e) };
 	}
 
-	auto exitInfo = ProcessCommandLineFlags(immediatelyHandledOptions, settings);
-
-	if (exitInfo)
-	{
-		return *exitInfo;
-	}
-
 	return settings;
 }
 
-std::optional<CommandLine::ExitInfo> ProcessCommandLineFlags(
-	const ImmediatelyHandledOptions &immediatelyHandledOptions, CommandLine::Settings &settings)
-{
-	if (immediatelyHandledOptions.crashedData)
-	{
-		HandleProcessCrashedNotification(*immediatelyHandledOptions.crashedData);
-		return CommandLine::ExitInfo{ EXIT_CODE_NORMAL_CRASH_HANDLER };
-	}
-
-	if (immediatelyHandledOptions.pasteSymLinksDestination)
-	{
-		auto pastedItems =
-			ClipboardOperations::PasteSymLinks(*immediatelyHandledOptions.pasteSymLinksDestination);
-
-		PasteSymLinksClient client;
-		client.NotifyServerOfResult(pastedItems);
-
-		return CommandLine::ExitInfo{ EXIT_CODE_NORMAL };
-	}
-
-	if (immediatelyHandledOptions.jumplistNewTab)
-	{
-		auto exitInfo = OnJumplistNewTab();
-
-		if (exitInfo)
-		{
-			return exitInfo;
-		}
-
-		settings.createJumplistTab = true;
-	}
-
-	if (immediatelyHandledOptions.clearRegistrySettings)
-	{
-		OnClearRegistrySettings();
-	}
-
-	if (immediatelyHandledOptions.removeAsDefault)
-	{
-		OnUpdateReplaceExplorerSetting(ReplaceExplorerMode::None);
-	}
-	else if (immediatelyHandledOptions.replaceExplorerMode != +ReplaceExplorerMode::None)
-	{
-		OnUpdateReplaceExplorerSetting(immediatelyHandledOptions.replaceExplorerMode);
-	}
-
-	if (settings.enableLogging)
-	{
-		FLAGS_logtostdout = false;
-		FLAGS_minloglevel = google::GLOG_INFO;
-	}
-
-	return std::nullopt;
-}
-
-void OnClearRegistrySettings()
-{
-	LSTATUS lStatus;
-
-	lStatus = SHDeleteKey(HKEY_CURRENT_USER, NExplorerplusplus::REG_MAIN_KEY);
-
-	if (lStatus == ERROR_SUCCESS)
-	{
-		std::wcout << L"Settings cleared successfully." << std::endl;
-	}
-	else
-	{
-		std::wcerr << L"Settings could not be cleared.\n" << std::endl;
-	}
-}
-
-void OnUpdateReplaceExplorerSetting(ReplaceExplorerMode updatedReplaceMode)
-{
-	auto results = UpdateReplaceExplorerSetting(updatedReplaceMode);
-
-	switch (updatedReplaceMode)
-	{
-	case DefaultFileManager::ReplaceExplorerMode::None:
-		if ((results.removedFileSystem && *results.removedFileSystem == ERROR_SUCCESS)
-			|| (results.removedAll && *results.removedAll == ERROR_SUCCESS))
-		{
-			std::wcout << L"Explorer++ successfully removed as default file manager.\n"
-					   << std::endl;
-		}
-		else
-		{
-			std::wcerr << L"Could not remove Explorer++ as default file manager." << std::endl;
-		}
-		break;
-
-	case DefaultFileManager::ReplaceExplorerMode::FileSystem:
-	case DefaultFileManager::ReplaceExplorerMode::All:
-		if ((results.setFileSystem && *results.setFileSystem == ERROR_SUCCESS)
-			|| (results.setAll && *results.setAll == ERROR_SUCCESS))
-		{
-			std::wcout << L"Explorer++ successfully set as default file manager." << std::endl;
-		}
-		else
-		{
-			std::wcerr << L"Could not set Explorer++ as default file manager." << std::endl;
-		}
-		break;
-	}
-}
-
-ReplaceExplorerResults UpdateReplaceExplorerSetting(ReplaceExplorerMode updatedReplaceMode)
-{
-	ReplaceExplorerResults results;
-
-	// TODO: This text should be retrieved from the appropriate translation DLL (if necessary).
-	std::wstring menuText =
-		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_OPEN_IN_EXPLORERPLUSPLUS);
-
-	// Whether Explorer++ is being set as the default file manager, or being removed, the first step
-	// is always to remove any existing entries.
-	results.removedFileSystem =
-		RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
-	results.removedAll = RemoveAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
-
-	switch (updatedReplaceMode)
-	{
-	case ReplaceExplorerMode::None:
-		// This case is effectively handled above.
-		break;
-
-	case ReplaceExplorerMode::FileSystem:
-		results.setFileSystem = SetAsDefaultFileManagerFileSystem(
-			SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
-		break;
-
-	case ReplaceExplorerMode::All:
-		results.setAll =
-			SetAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
-		break;
-	}
-
-	return results;
-}
-
-std::optional<CommandLine::ExitInfo> OnJumplistNewTab()
-{
-	wil::unique_mutex_nothrow mutex;
-
-	if (!mutex.try_open(NExplorerplusplus::APPLICATION_MUTEX_NAME))
-	{
-		return std::nullopt;
-	}
-
-	HWND existingWindow = FindWindow(NExplorerplusplus::CLASS_NAME, nullptr);
-
-	if (!existingWindow)
-	{
-		return std::nullopt;
-	}
-
-	COPYDATASTRUCT cds;
-	cds.cbData = 0;
-	cds.lpData = nullptr;
-	SendMessage(existingWindow, WM_COPYDATA, NULL, reinterpret_cast<LPARAM>(&cds));
-
-	BringWindowToForeground(existingWindow);
-
-	return CommandLine::ExitInfo{ EXIT_CODE_NORMAL_EXISTING_PROCESS };
 }

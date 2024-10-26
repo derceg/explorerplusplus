@@ -22,6 +22,7 @@
 #include "ShellIconLoaderImpl.h"
 #include "Tab.h"
 #include "TabNavigationInterface.h"
+#include "Theme.h"
 #include "ValueWrapper.h"
 #include "../Helper/ClipboardHelper.h"
 #include "../Helper/DropHandler.h"

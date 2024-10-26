@@ -8,6 +8,7 @@
 #include "DirectoryOperationsHelper.h"
 #include "PasteSymLinksServer.h"
 #include "../Helper/Clipboard.h"
+#include "../Helper/ShellHelper.h"
 
 using namespace std::chrono_literals;
 

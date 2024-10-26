@@ -9,6 +9,7 @@
 #include "IconResourceLoader.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ViewModes.h"
+#include "ShellChangeNotificationType.h"
 #include "Theme.h"
 #include "ValueWrapper.h"
 #include "../Helper/BetterEnumsWrapper.h"
@@ -23,13 +24,6 @@ BETTER_ENUM(InfoTipType, int,
 	Custom = 1
 )
 // clang-format on
-
-enum class ShellChangeNotificationType
-{
-	Disabled,
-	NonFilesystem,
-	All
-};
 
 // These values are used to save/load configuration data and should not be
 // changed.

@@ -4,10 +4,9 @@
 
 #pragma once
 
-enum ExitCode : int
+enum class ShellChangeNotificationType
 {
-	EXIT_CODE_NORMAL,
-	EXIT_CODE_NORMAL_EXISTING_PROCESS,
-	EXIT_CODE_NORMAL_CRASH_HANDLER,
-	EXIT_CODE_ERROR
+	Disabled,
+	NonFilesystem,
+	All
 };

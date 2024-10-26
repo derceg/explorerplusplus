@@ -250,6 +250,9 @@
     <ClCompile Include="MessageLoop.cpp">
       <Filter>Async</Filter>
     </ClCompile>
+    <ClCompile Include="CommandLineTest.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
