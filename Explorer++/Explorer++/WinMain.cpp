@@ -36,6 +36,7 @@
 ATOM RegisterMainWindowClass(HINSTANCE hInstance);
 [[nodiscard]] unique_glog_shutdown_call InitializeLogging();
 void InitializeLocale();
+HWND CreateMainWindow(App *app);
 
 /* Modeless dialog handles. */
 HWND g_hwndSearch = nullptr;
@@ -66,6 +67,7 @@ ATOM RegisterMainWindowClass(HINSTANCE hInstance)
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	UNREFERENCED_PARAMETER(hInstance);
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
@@ -164,31 +166,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 	}
 
-	LONG res = RegisterMainWindowClass(hInstance);
-
-	if (res == 0)
-	{
-		MessageBox(nullptr, _T("Could not register class"), NExplorerplusplus::APP_NAME,
-			MB_OK | MB_ICONERROR);
-
-		return EXIT_CODE_ERROR;
-	}
-
 	App app(&commandLineSettings);
 
-	/* Create the main window. This window will act as a
-	container for all child windows created. */
-	HWND hwnd = CreateWindow(NExplorerplusplus::CLASS_NAME, NExplorerplusplus::APP_NAME,
-		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, nullptr,
-		nullptr, hInstance, &app);
-
-	if (hwnd == nullptr)
-	{
-		MessageBox(nullptr, _T("Could not create main window."), NExplorerplusplus::APP_NAME,
-			MB_OK | MB_ICONERROR);
-
-		return EXIT_CODE_ERROR;
-	}
+	HWND hwnd = CreateMainWindow(&app);
 
 	WINDOWPLACEMENT wndpl;
 	BOOL bWindowPosLoaded = FALSE;
@@ -350,4 +330,17 @@ void InitializeLocale()
 	// Use the system default locale.
 	boost::locale::generator gen;
 	std::locale::global(gen(""));
+}
+
+HWND CreateMainWindow(App *app)
+{
+	LONG res = RegisterMainWindowClass(GetModuleHandle(nullptr));
+	CHECK(res);
+
+	HWND hwnd = CreateWindow(NExplorerplusplus::CLASS_NAME, NExplorerplusplus::APP_NAME,
+		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, nullptr,
+		nullptr, GetModuleHandle(nullptr), app);
+	CHECK(hwnd);
+
+	return hwnd;
 }
