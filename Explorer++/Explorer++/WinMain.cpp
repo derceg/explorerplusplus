@@ -86,6 +86,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// for almost the entire lifetime of the application (the only exception being the above block).
 	auto glogCleanup = InitializeLogging();
 	InitializeCrashHandler();
+	InitializeLocale();
 
 	auto commandLineInfo = CommandLine::Parse(GetCommandLine());
 
@@ -172,8 +173,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		return EXIT_CODE_ERROR;
 	}
-
-	InitializeLocale();
 
 	App app(&commandLineSettings);
 
