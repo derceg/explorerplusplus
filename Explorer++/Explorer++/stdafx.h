@@ -21,12 +21,6 @@
 
 #define WIL_SUPPRESS_EXCEPTIONS
 
-// This is required by glog. Previously, glog included a pragma like this directly in its source.
-// However, that's no longer the case. It appears that this should probably be done by CMAKE/vcpkg,
-// though it isn't at the moment. If, in the future, this library is automatically linked in when
-// integrating the glog package with vcpkg, this line can be removed.
-#pragma comment(lib, "dbghelp.lib")
-
 #include "../Helper/DisableUnaligned.h"
 
 // Third-party Header Files:
@@ -43,7 +37,6 @@
 #include <Winsock2.h>
 #include <windows.h>
 // clang-format on
-#include <Imagehlp.h>
 #include <VersionHelpers.h>
 #include <WinInet.h>
 #include <commctrl.h>

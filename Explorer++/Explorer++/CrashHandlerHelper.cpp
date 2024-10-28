@@ -17,12 +17,8 @@
 #include <detours/detours.h>
 #include <glog/logging.h>
 #include <wil/resource.h>
+#include <DbgHelp.h>
 #include <format>
-
-using MiniDumpWriteDumpType = BOOL(WINAPI *)(HANDLE hProcee, DWORD ProcessId, HANDLE hFile,
-	MINIDUMP_TYPE DumpType, PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
-	PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
-	PMINIDUMP_CALLBACK_INFORMATION CallbackParam);
 
 LONG WINAPI TopLevelExceptionFilter(EXCEPTION_POINTERS *exception);
 LONG DisableSetUnhandledExceptionFilter();
@@ -166,24 +162,6 @@ std::optional<std::wstring> CreateMiniDumpForCrashedProcess(const CrashedData &c
 		return std::nullopt;
 	}
 
-	EXCEPTION_POINTERS *exceptionAddress =
-		reinterpret_cast<EXCEPTION_POINTERS *>(crashedData.exceptionPointersAddress);
-
-	auto dbgHelp = LoadSystemLibrary(L"Dbghelp.dll");
-
-	if (!dbgHelp)
-	{
-		return std::nullopt;
-	}
-
-	auto miniDumpWriteDump =
-		reinterpret_cast<MiniDumpWriteDumpType>(GetProcAddress(dbgHelp.get(), "MiniDumpWriteDump"));
-
-	if (!miniDumpWriteDump)
-	{
-		return std::nullopt;
-	}
-
 	TCHAR fullPath[MAX_PATH];
 	DWORD pathRes = GetTempPath(static_cast<DWORD>(std::size(fullPath)), fullPath);
 
@@ -223,9 +201,10 @@ std::optional<std::wstring> CreateMiniDumpForCrashedProcess(const CrashedData &c
 
 	MINIDUMP_EXCEPTION_INFORMATION mei;
 	mei.ThreadId = crashedData.threadId;
-	mei.ExceptionPointers = exceptionAddress;
+	mei.ExceptionPointers =
+		std::bit_cast<EXCEPTION_POINTERS *>(crashedData.exceptionPointersAddress);
 	mei.ClientPointers = true;
-	res = miniDumpWriteDump(process.get(), crashedData.processId, file.get(), MiniDumpNormal, &mei,
+	res = MiniDumpWriteDump(process.get(), crashedData.processId, file.get(), MiniDumpNormal, &mei,
 		nullptr, nullptr);
 
 	if (!res)

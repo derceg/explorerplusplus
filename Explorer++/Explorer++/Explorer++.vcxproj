@@ -351,7 +351,7 @@
       <ResourceOutputFileName>$(IntDir)Explorer++Main.res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)Explorer++.exe</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -409,7 +409,7 @@
       <ResourceOutputFileName>$(IntDir)Explorer++Main.res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)Explorer++.exe</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -464,7 +464,7 @@
       <ResourceOutputFileName>$(IntDir)Explorer++Main.res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)Explorer++.exe</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -525,7 +525,7 @@
       <Culture>0x0c09</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)Explorer++.exe</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -584,7 +584,7 @@
       <Culture>0x0c09</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)Explorer++.exe</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -641,7 +641,7 @@
       <Culture>0x0c09</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)Explorer++.exe</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -697,7 +697,7 @@
       <Culture>0x0c09</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)Explorer++.exe</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -752,7 +752,7 @@
       <Culture>0x0c09</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)Explorer++.exe</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -806,7 +806,7 @@
       <Culture>0x0c09</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)Explorer++.exe</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -860,7 +860,7 @@
       <ResourceOutputFileName>$(IntDir)Explorer++Main.res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)Explorer++.exe</OutputFile>
       <TypeLibraryFile>
       </TypeLibraryFile>
@@ -914,7 +914,7 @@
       <ResourceOutputFileName>$(IntDir)Explorer++Main.res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)Explorer++.exe</OutputFile>
       <TypeLibraryFile>shobjidl.idl</TypeLibraryFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -965,7 +965,7 @@
       <ResourceOutputFileName>$(IntDir)Explorer++Main.res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;rpcrt4.lib;propsys.lib;msxml2.lib;dwmapi.lib;windowscodecs.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)Explorer++.exe</OutputFile>
       <TypeLibraryFile>shobjidl.idl</TypeLibraryFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
