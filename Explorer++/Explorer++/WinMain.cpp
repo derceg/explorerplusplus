@@ -27,16 +27,18 @@
 #include <cstdlib>
 #include <format>
 
-/* Default window size/position. */
-#define DEFAULT_WINDOWPOS_LEFT_PERCENTAGE 0.02
-#define DEFAULT_WINDOWPOS_TOP_PERCENTAGE 0.05
-#define DEFAULT_WINDOWPOS_WIDTH_PERCENTAGE 0.96
-#define DEFAULT_WINDOWPOS_HEIGHT_PERCENTAGE 0.82
+struct WindowState
+{
+	RECT bounds;
+	int showState;
+};
 
 ATOM RegisterMainWindowClass(HINSTANCE hInstance);
 [[nodiscard]] unique_glog_shutdown_call InitializeLogging();
 void InitializeLocale();
-HWND CreateMainWindow(App *app);
+RECT GetDefaultMainWindowBounds();
+std::optional<WindowState> LoadMainWindowState(bool loadSettingsFromXML);
+HWND CreateMainWindow(App *app, const RECT *initialBounds, int showState);
 
 /* Modeless dialog handles. */
 HWND g_hwndSearch = nullptr;
@@ -168,74 +170,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	App app(&commandLineSettings);
 
-	HWND hwnd = CreateMainWindow(&app);
+	WindowState windowState(GetDefaultMainWindowBounds(), nCmdShow);
+	auto loadedWindowState = LoadMainWindowState(bLoadSettingsFromXML);
 
-	WINDOWPLACEMENT wndpl;
-	BOOL bWindowPosLoaded = FALSE;
-
-	if (bLoadSettingsFromXML)
+	if (loadedWindowState)
 	{
-		bWindowPosLoaded = LoadWindowPositionFromXML(&wndpl);
-	}
-	else
-	{
-		bWindowPosLoaded = LoadWindowPositionFromRegistry(&wndpl);
+		windowState = *loadedWindowState;
 	}
 
-	if (bWindowPosLoaded)
-	{
-		// When shown in its normal size, the window for the application should at least be on
-		// screen somewhere, even if it's not completely visible. Therefore, the position should be
-		// reset if the window won't be visible on any monitor.
-		// Checking this on startup makes sense, since the monitor setup can change in between
-		// executions.
-		HMONITOR monitor = MonitorFromRect(&wndpl.rcNormalPosition, MONITOR_DEFAULTTONULL);
-
-		if (!monitor)
-		{
-			bWindowPosLoaded = FALSE;
-		}
-	}
-
-	/* If no window position was loaded, use
-	the default position. */
-	if (!bWindowPosLoaded)
-	{
-		wndpl.length = sizeof(wndpl);
-		wndpl.showCmd = nCmdShow;
-		wndpl.flags = 0;
-
-		wndpl.ptMinPosition.x = 0;
-		wndpl.ptMinPosition.y = 0;
-		wndpl.ptMaxPosition.x = -1;
-		wndpl.ptMaxPosition.y = -1;
-
-		int iScreenWidth = GetSystemMetrics(SM_CXSCREEN);
-		int iScreenHeight = GetSystemMetrics(SM_CYSCREEN);
-
-		wndpl.rcNormalPosition.left = (LONG) (DEFAULT_WINDOWPOS_LEFT_PERCENTAGE * iScreenWidth);
-		wndpl.rcNormalPosition.top = (LONG) (DEFAULT_WINDOWPOS_TOP_PERCENTAGE * iScreenHeight);
-
-		wndpl.rcNormalPosition.right = wndpl.rcNormalPosition.left
-			+ (LONG) (DEFAULT_WINDOWPOS_WIDTH_PERCENTAGE * iScreenWidth);
-		wndpl.rcNormalPosition.bottom = wndpl.rcNormalPosition.top
-			+ (LONG) (DEFAULT_WINDOWPOS_HEIGHT_PERCENTAGE * iScreenHeight);
-	}
-
-	/* If the incoming state (nCmdShow) is minimized
-	or maximized, use that state, instead of the
-	saved state. */
-	if (nCmdShow == SW_MINIMIZE || nCmdShow == SW_SHOWMINIMIZED || nCmdShow == SW_MAXIMIZE)
-	{
-		wndpl.showCmd = nCmdShow;
-	}
-
-	SetWindowPlacement(hwnd, &wndpl);
-	UpdateWindow(hwnd);
+	HWND hwnd = CreateMainWindow(&app, &windowState.bounds, windowState.showState);
 
 	MSG msg;
 
-	/* Enter the message loop... */
 	while (GetMessage(&msg, nullptr, 0, 0) > 0)
 	{
 		/* TranslateMessage() must be in the inner loop,
@@ -332,15 +278,73 @@ void InitializeLocale()
 	std::locale::global(gen(""));
 }
 
-HWND CreateMainWindow(App *app)
+RECT GetDefaultMainWindowBounds()
+{
+	RECT workArea;
+	BOOL res = SystemParametersInfo(SPI_GETWORKAREA, 0, &workArea, 0);
+	CHECK(res);
+
+	// The strategy here is fairly simple - the window will be sized to a portion of the work area
+	// of the primary monitor and centered.
+	auto width = static_cast<int>(GetRectWidth(&workArea) * 0.60);
+	auto height = static_cast<int>(GetRectHeight(&workArea) * 0.60);
+	int x = (GetRectWidth(&workArea) - width) / 2;
+	int y = (GetRectHeight(&workArea) - height) / 2;
+
+	return { x, y, x + width, y + height };
+}
+
+std::optional<WindowState> LoadMainWindowState(bool loadSettingsFromXML)
+{
+	WINDOWPLACEMENT placement;
+	BOOL loaded;
+
+	if (loadSettingsFromXML)
+	{
+		loaded = LoadWindowPositionFromXML(&placement);
+	}
+	else
+	{
+		loaded = LoadWindowPositionFromRegistry(&placement);
+	}
+
+	if (!loaded)
+	{
+		return std::nullopt;
+	}
+
+	// When shown in its normal size, the window for the application should at least be on screen
+	// somewhere, even if it's not completely visible. Therefore, the position should be reset if
+	// the window won't be visible on any monitor.
+	// Checking this on startup makes sense, since the monitor setup can change in between
+	// executions.
+	HMONITOR monitor = MonitorFromRect(&placement.rcNormalPosition, MONITOR_DEFAULTTONULL);
+
+	if (!monitor)
+	{
+		return std::nullopt;
+	}
+
+	if (placement.showCmd != SW_SHOWNORMAL && placement.showCmd != SW_SHOWMAXIMIZED)
+	{
+		placement.showCmd = SW_SHOWNORMAL;
+	}
+
+	return WindowState(placement.rcNormalPosition, placement.showCmd);
+}
+
+HWND CreateMainWindow(App *app, const RECT *initialBounds, int showState)
 {
 	LONG res = RegisterMainWindowClass(GetModuleHandle(nullptr));
 	CHECK(res);
 
 	HWND hwnd = CreateWindow(NExplorerplusplus::CLASS_NAME, NExplorerplusplus::APP_NAME,
-		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, nullptr,
-		nullptr, GetModuleHandle(nullptr), app);
+		WS_OVERLAPPEDWINDOW, initialBounds->left, initialBounds->top, GetRectWidth(initialBounds),
+		GetRectHeight(initialBounds), nullptr, nullptr, GetModuleHandle(nullptr), app);
 	CHECK(hwnd);
+
+	ShowWindow(hwnd, showState);
+	UpdateWindow(hwnd);
 
 	return hwnd;
 }
