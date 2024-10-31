@@ -43,16 +43,18 @@
 #include <wil/common.h>
 #include <propkey.h>
 
-ShellTreeView *ShellTreeView::Create(HWND hParent, BrowserWindow *browserWindow,
+ShellTreeView *ShellTreeView::Create(HWND hParent, App *app, BrowserWindow *browserWindow,
 	CoreInterface *coreInterface, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons)
 {
-	return new ShellTreeView(hParent, browserWindow, coreInterface, fileActionHandler, cachedIcons);
+	return new ShellTreeView(hParent, app, browserWindow, coreInterface, fileActionHandler,
+		cachedIcons);
 }
 
-ShellTreeView::ShellTreeView(HWND hParent, BrowserWindow *browserWindow,
+ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindow,
 	CoreInterface *coreInterface, FileActionHandler *fileActionHandler, CachedIcons *cachedIcons) :
 	ShellDropTargetWindow(CreateTreeView(hParent)),
 	m_hTreeView(GetHWND()),
+	m_app(app),
 	m_browserWindow(browserWindow),
 	m_coreInterface(coreInterface),
 	m_config(coreInterface->GetConfig()),

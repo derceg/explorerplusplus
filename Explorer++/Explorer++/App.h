@@ -8,6 +8,7 @@
 #include "BrowserList.h"
 #include "CommandLine.h"
 #include "Config.h"
+#include "FeatureList.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/UniqueResources.h"
 #include <boost/core/noncopyable.hpp>
@@ -19,6 +20,7 @@ public:
 	App(const CommandLine::Settings *commandLineSettings);
 
 	const CommandLine::Settings *GetCommandLineSettings() const;
+	FeatureList *GetFeatureList();
 	AcceleratorManager *GetAcceleratorManager();
 	Config *GetConfig();
 	CachedIcons *GetCachedIcons();
@@ -30,6 +32,7 @@ private:
 	static constexpr int MAX_CACHED_ICONS = 1000;
 
 	const CommandLine::Settings *const m_commandLineSettings;
+	FeatureList m_featureList;
 	AcceleratorManager m_acceleratorManager;
 	Config m_config;
 	CachedIcons m_cachedIcons;

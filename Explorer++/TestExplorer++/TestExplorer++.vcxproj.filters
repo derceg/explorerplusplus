@@ -256,6 +256,9 @@
     <ClCompile Include="BrowserTrackerTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="FeatureListTest.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

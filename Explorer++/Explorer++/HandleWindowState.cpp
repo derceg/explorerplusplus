@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "App.h"
 #include "Config.h"
 #include "FeatureList.h"
 #include "MainResource.h"
@@ -68,7 +69,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_SELECTNONE, anySelected);
 	MenuHelper::EnableItem(hProgramMenu, IDM_EDIT_RESOLVELINK, anySelected);
 
-	if (FeatureList::GetInstance()->IsEnabled(Feature::DualPane))
+	if (m_app->GetFeatureList()->IsEnabled(Feature::DualPane))
 	{
 		MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_DUAL_PANE, m_config->dualPane);
 	}

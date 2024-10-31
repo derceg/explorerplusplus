@@ -17,7 +17,7 @@ namespace CommandLine
 struct Settings
 {
 	bool enableLogging = false;
-	std::set<Feature> enableFeatures;
+	std::set<Feature> featuresToEnable;
 	std::optional<ShellChangeNotificationType> shellChangeNotificationType;
 	std::wstring language;
 	bool clearRegistrySettings = false;

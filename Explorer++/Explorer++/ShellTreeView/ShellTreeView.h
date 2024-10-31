@@ -18,6 +18,7 @@
 #include <wil/com.h>
 #include <optional>
 
+class App;
 class BrowserWindow;
 class CachedIcons;
 struct Config;
@@ -29,7 +30,7 @@ class ShellTreeNode;
 class ShellTreeView : public ShellDropTargetWindow<HTREEITEM>, public ShellContextMenuHandler
 {
 public:
-	static ShellTreeView *Create(HWND hParent, BrowserWindow *browserWindow,
+	static ShellTreeView *Create(HWND hParent, App *app, BrowserWindow *browserWindow,
 		CoreInterface *coreInterface, FileActionHandler *fileActionHandler,
 		CachedIcons *cachedIcons);
 
@@ -124,8 +125,9 @@ private:
 		wil::com_ptr_nothrow<IDataObject> m_clipboardDataObject;
 	};
 
-	ShellTreeView(HWND hParent, BrowserWindow *browserWindow, CoreInterface *coreInterface,
-		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons);
+	ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindow,
+		CoreInterface *coreInterface, FileActionHandler *fileActionHandler,
+		CachedIcons *cachedIcons);
 	~ShellTreeView();
 
 	static HWND CreateTreeView(HWND parent);
@@ -226,6 +228,7 @@ private:
 	void OnApplicationShuttingDown();
 
 	HWND m_hTreeView;
+	App *const m_app;
 	BrowserWindow *m_browserWindow = nullptr;
 	CoreInterface *m_coreInterface = nullptr;
 	HTREEITEM m_quickAccessRootItem = nullptr;

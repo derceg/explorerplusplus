@@ -9,6 +9,7 @@
 
 App::App(const CommandLine::Settings *commandLineSettings) :
 	m_commandLineSettings(commandLineSettings),
+	m_featureList(commandLineSettings->featuresToEnable),
 	m_acceleratorManager(InitializeAcceleratorManager()),
 	m_cachedIcons(MAX_CACHED_ICONS),
 	m_uniqueGdiplusShutdown(CheckedGdiplusStartup()),
@@ -29,6 +30,11 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 const CommandLine::Settings *App::GetCommandLineSettings() const
 {
 	return m_commandLineSettings;
+}
+
+FeatureList *App::GetFeatureList()
+{
+	return &m_featureList;
 }
 
 AcceleratorManager *App::GetAcceleratorManager()

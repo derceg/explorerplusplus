@@ -10,7 +10,6 @@
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "Config.h"
 #include "Explorer++_internal.h"
-#include "FeatureList.h"
 #include "GlobalHistoryMenu.h"
 #include "HistoryServiceFactory.h"
 #include "MainFontSetter.h"
@@ -50,8 +49,6 @@ Explorerplusplus::Explorerplusplus(App *app, const RECT *initialBounds, int show
 	m_shellIconLoader(&m_iconFetcher)
 {
 	m_resourceInstance = nullptr;
-
-	FeatureList::GetInstance()->InitializeFromCommandLine(*app->GetCommandLineSettings());
 
 	m_bSavePreferencesToXMLFile = FALSE;
 	m_bLanguageLoaded = false;

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ShellTreeView.h"
+#include "App.h"
 #include "FeatureList.h"
 #include "ShellTreeNode.h"
 
@@ -315,7 +316,7 @@ void ShellTreeView::OnDirectoryUpdated(PCIDLIST_ABSOLUTE simplePidl)
 		return;
 	}
 
-	if (!FeatureList::GetInstance()->IsEnabled(Feature::AutomaticQuickAccessUpdates))
+	if (!m_app->GetFeatureList()->IsEnabled(Feature::AutomaticQuickAccessUpdates))
 	{
 		return;
 	}

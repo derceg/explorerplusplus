@@ -7,27 +7,15 @@
 #include "Feature.h"
 #include <set>
 
-namespace CommandLine
-{
-struct Settings;
-}
-
 // This class can be used to determine whether a particular in-development feature is enabled or
 // disabled. All the features managed here are disabled by default, but can be enabled with the
 // appropriate command line option.
 class FeatureList
 {
 public:
-	static FeatureList *GetInstance();
-
-	void InitializeFromCommandLine(const CommandLine::Settings &commandLineSettings);
-	bool IsEnabled(Feature feature);
+	FeatureList(const std::set<Feature> &featuresToEnable);
+	bool IsEnabled(Feature feature) const;
 
 private:
-	FeatureList() = default;
-
-	static inline FeatureList *m_staticInstance = nullptr;
-
 	std::set<Feature> m_enabledFeatures;
-	bool m_initializedFromCommandLine = false;
 };

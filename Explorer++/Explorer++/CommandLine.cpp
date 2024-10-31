@@ -85,6 +85,8 @@ std::variant<Settings, ExitInfo> Parse(const std::wstring &commandLine)
 	privateCommands->add_option(wstrToUtf8Str(PASTE_SYMLINKS_ARGUMENT),
 		settings.pasteSymLinksDestination);
 
+	app.add_flag("--enable-logging", settings.enableLogging, "Enable logging");
+
 	std::map<std::string, Feature> featureMap;
 
 	for (auto item : Feature::_values())
@@ -92,9 +94,7 @@ std::variant<Settings, ExitInfo> Parse(const std::wstring &commandLine)
 		featureMap.insert({ item._to_string(), item });
 	}
 
-	app.add_flag("--enable-logging", settings.enableLogging, "Enable logging");
-
-	app.add_option("--enable-features", settings.enableFeatures,
+	app.add_option("--enable-features", settings.featuresToEnable,
 		   "Allows incomplete features that are disabled by default to be enabled")
 		->transform(CLI::CheckedTransformer(featureMap));
 

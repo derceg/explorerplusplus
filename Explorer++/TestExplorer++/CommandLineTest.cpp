@@ -61,10 +61,10 @@ TEST_F(CommandLineTest, Options)
 	EXPECT_TRUE(commandLineSettings.enableLogging);
 
 	commandLineSettings = ParseCommandLine(L"explorer++.exe");
-	EXPECT_THAT(commandLineSettings.enableFeatures, IsEmpty());
+	EXPECT_THAT(commandLineSettings.featuresToEnable, IsEmpty());
 
 	commandLineSettings = ParseCommandLine(L"explorer++.exe --enable-features Plugins");
-	EXPECT_THAT(commandLineSettings.enableFeatures, ElementsAre(Feature::Plugins));
+	EXPECT_THAT(commandLineSettings.featuresToEnable, ElementsAre(Feature::Plugins));
 }
 
 TEST_F(CommandLineTest, CrashedData)

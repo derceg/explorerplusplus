@@ -4,28 +4,13 @@
 
 #include "stdafx.h"
 #include "FeatureList.h"
-#include "CommandLine.h"
 
-FeatureList *FeatureList::GetInstance()
+FeatureList::FeatureList(const std::set<Feature> &featuresToEnable) :
+	m_enabledFeatures(featuresToEnable)
 {
-	if (!m_staticInstance)
-	{
-		m_staticInstance = new FeatureList();
-	}
-
-	return m_staticInstance;
 }
 
-void FeatureList::InitializeFromCommandLine(const CommandLine::Settings &commandLineSettings)
+bool FeatureList::IsEnabled(Feature feature) const
 {
-	DCHECK(!m_initializedFromCommandLine);
-
-	m_enabledFeatures = commandLineSettings.enableFeatures;
-
-	m_initializedFromCommandLine = true;
-}
-
-bool FeatureList::IsEnabled(Feature feature)
-{
-	return m_enabledFeatures.find(feature) != m_enabledFeatures.end();
+	return m_enabledFeatures.contains(feature);
 }
