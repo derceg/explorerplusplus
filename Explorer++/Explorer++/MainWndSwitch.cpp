@@ -50,54 +50,10 @@ and the right edge of the treeview during
 a resizing operation. */
 static const int TREEVIEW_DRAG_OFFSET = 8;
 
-LRESULT CALLBACK Explorerplusplus::WndProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	auto *pContainer = (Explorerplusplus *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
-
 	switch (msg)
 	{
-	case WM_NCCREATE:
-	{
-		auto *createInfo = reinterpret_cast<CREATESTRUCT *>(lParam);
-
-		pContainer = new Explorerplusplus(static_cast<App *>(createInfo->lpCreateParams), hwnd);
-
-		if (!pContainer)
-		{
-			PostQuitMessage(EXIT_CODE_ERROR);
-			return FALSE;
-		}
-
-		SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR) pContainer);
-	}
-		return TRUE;
-
-	case WM_NCDESTROY:
-		SetWindowLongPtr(hwnd, GWLP_USERDATA, 0);
-		delete pContainer;
-		PostQuitMessage(EXIT_CODE_NORMAL);
-		return 0;
-	}
-
-	if (pContainer != nullptr)
-	{
-		return pContainer->WindowProcedure(hwnd, msg, wParam, lParam);
-	}
-	else
-	{
-		return DefWindowProc(hwnd, msg, wParam, lParam);
-	}
-}
-
-LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM wParam,
-	LPARAM lParam)
-{
-	switch (Msg)
-	{
-	case WM_CREATE:
-		OnCreate();
-		break;
-
 	case WM_ACTIVATE:
 		if (OnActivate(LOWORD(wParam), HIWORD(wParam)))
 		{
@@ -262,7 +218,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM w
 		return CommandHandler(hwnd, reinterpret_cast<HWND>(lParam), LOWORD(wParam), HIWORD(wParam));
 
 	case WM_NOTIFY:
-		return NotifyHandler(hwnd, Msg, wParam, lParam);
+		return NotifyHandler(hwnd, msg, wParam, lParam);
 
 		HANDLE_MSG(hwnd, WM_SIZE, OnSize);
 
@@ -302,9 +258,14 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd, UINT Msg, WPARAM w
 
 	case WM_DESTROY:
 		return OnDestroy();
+
+	case WM_NCDESTROY:
+		delete this;
+		PostQuitMessage(EXIT_CODE_NORMAL);
+		return 0;
 	}
 
-	return DefWindowProc(hwnd, Msg, wParam, lParam);
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
 LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd, HWND control, int id,
@@ -1706,5 +1667,5 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 	break;
 	}
 
-	return DefWindowProc(hwnd, msg, wParam, lParam);
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }

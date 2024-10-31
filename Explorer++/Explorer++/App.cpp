@@ -45,3 +45,8 @@ CachedIcons *App::GetCachedIcons()
 {
 	return &m_cachedIcons;
 }
+
+BrowserList *App::GetBrowserList()
+{
+	return &m_browserList;
+}

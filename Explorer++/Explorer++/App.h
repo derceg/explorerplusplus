@@ -5,6 +5,7 @@
 #pragma once
 
 #include "AcceleratorManager.h"
+#include "BrowserList.h"
 #include "CommandLine.h"
 #include "Config.h"
 #include "../Helper/CachedIcons.h"
@@ -21,6 +22,7 @@ public:
 	AcceleratorManager *GetAcceleratorManager();
 	Config *GetConfig();
 	CachedIcons *GetCachedIcons();
+	BrowserList *GetBrowserList();
 
 private:
 	// Represents the maximum number of icons that can be cached. This cache is shared between
@@ -31,6 +33,7 @@ private:
 	AcceleratorManager m_acceleratorManager;
 	Config m_config;
 	CachedIcons m_cachedIcons;
+	BrowserList m_browserList;
 
 	unique_gdiplus_shutdown m_uniqueGdiplusShutdown;
 	wil::unique_hmodule m_richEditLib;

@@ -2,10 +2,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // See LICENSE in the top level directory
 
-/*
- * This is the main module for Explorer++. Handles startup.
- */
-
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "AcceleratorManager.h"
@@ -14,13 +10,10 @@
 #include "CrashHandlerHelper.h"
 #include "ExitCode.h"
 #include "Explorer++_internal.h"
-#include "MainResource.h"
 #include "ModelessDialogs.h"
 #include "RegistrySettings.h"
 #include "StartupCommandLineProcessor.h"
 #include "XMLSettings.h"
-#include "../Helper/Macros.h"
-#include "../Helper/ProcessHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/locale.hpp>
 #include <wil/resource.h>
@@ -33,12 +26,11 @@ struct WindowState
 	int showState;
 };
 
-ATOM RegisterMainWindowClass(HINSTANCE hInstance);
 [[nodiscard]] unique_glog_shutdown_call InitializeLogging();
 void InitializeLocale();
 RECT GetDefaultMainWindowBounds();
 std::optional<WindowState> LoadMainWindowState(bool loadSettingsFromXML);
-HWND CreateMainWindow(App *app, const RECT *initialBounds, int showState);
+bool MaybeTranslateAccelerator(App *app, MSG *msg);
 
 /* Modeless dialog handles. */
 HWND g_hwndSearch = nullptr;
@@ -46,26 +38,6 @@ HWND g_hwndRunScript = nullptr;
 HWND g_hwndOptions = nullptr;
 HWND g_hwndManageBookmarks = nullptr;
 HWND g_hwndSearchTabs = nullptr;
-
-ATOM RegisterMainWindowClass(HINSTANCE hInstance)
-{
-	WNDCLASSEX wcex;
-	wcex.cbSize = sizeof(wcex);
-	wcex.style = 0;
-	wcex.lpfnWndProc = Explorerplusplus::WndProcStub;
-	wcex.cbClsExtra = 0;
-	wcex.cbWndExtra = sizeof(Explorerplusplus *);
-	wcex.hInstance = hInstance;
-	wcex.hIcon = (HICON) LoadImage(hInstance, MAKEINTRESOURCE(IDI_MAIN), IMAGE_ICON,
-		GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON), LR_DEFAULTCOLOR);
-	wcex.hIconSm = (HICON) LoadImage(hInstance, MAKEINTRESOURCE(IDI_MAIN), IMAGE_ICON,
-		GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
-	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	wcex.hbrBackground = (HBRUSH) nullptr;
-	wcex.lpszMenuName = nullptr;
-	wcex.lpszClassName = NExplorerplusplus::CLASS_NAME;
-	return RegisterClassEx(&wcex);
-}
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -178,7 +150,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		windowState = *loadedWindowState;
 	}
 
-	HWND hwnd = CreateMainWindow(&app, &windowState.bounds, windowState.showState);
+	Explorerplusplus::Create(&app, &windowState.bounds, windowState.showState);
 
 	MSG msg;
 
@@ -191,8 +163,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			&& !IsDialogMessage(g_hwndRunScript, &msg) && !IsDialogMessage(g_hwndOptions, &msg)
 			&& !IsDialogMessage(g_hwndSearchTabs, &msg))
 		{
-			if (!TranslateAccelerator(hwnd, app.GetAcceleratorManager()->GetAcceleratorTable(),
-					&msg))
+			if (!MaybeTranslateAccelerator(&app, &msg))
 			{
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
@@ -333,18 +304,21 @@ std::optional<WindowState> LoadMainWindowState(bool loadSettingsFromXML)
 	return WindowState(placement.rcNormalPosition, placement.showCmd);
 }
 
-HWND CreateMainWindow(App *app, const RECT *initialBounds, int showState)
+bool MaybeTranslateAccelerator(App *app, MSG *msg)
 {
-	LONG res = RegisterMainWindowClass(GetModuleHandle(nullptr));
-	CHECK(res);
+	for (auto *browser : app->GetBrowserList()->GetList())
+	{
+		if (!IsChild(browser->GetHWND(), msg->hwnd))
+		{
+			continue;
+		}
 
-	HWND hwnd = CreateWindow(NExplorerplusplus::CLASS_NAME, NExplorerplusplus::APP_NAME,
-		WS_OVERLAPPEDWINDOW, initialBounds->left, initialBounds->top, GetRectWidth(initialBounds),
-		GetRectHeight(initialBounds), nullptr, nullptr, GetModuleHandle(nullptr), app);
-	CHECK(hwnd);
+		if (TranslateAccelerator(browser->GetHWND(),
+				app->GetAcceleratorManager()->GetAcceleratorTable(), msg))
+		{
+			return true;
+		}
+	}
 
-	ShowWindow(hwnd, showState);
-	UpdateWindow(hwnd);
-
-	return hwnd;
+	return false;
 }

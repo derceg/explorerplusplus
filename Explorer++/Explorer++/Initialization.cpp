@@ -31,12 +31,7 @@
 #include "ViewModeHelper.h"
 #include "../Helper/iDirectoryMonitor.h"
 
-/*
- * Main window creation.
- *
- * Settings are loaded very early on. Any initial settings must be in place before this.
- */
-void Explorerplusplus::OnCreate()
+void Explorerplusplus::Initialize()
 {
 	InitializeDefaultColorRules();
 

@@ -7,6 +7,7 @@
 #include "AcceleratorUpdater.h"
 #include "BrowserCommandController.h"
 #include "BrowserPane.h"
+#include "BrowserTracker.h"
 #include "BrowserWindow.h"
 #include "CommandLine.h"
 #include "CoreInterface.h"
@@ -91,10 +92,9 @@ class Explorerplusplus :
 	friend LoadSaveXML;
 
 public:
-	Explorerplusplus(App *app, HWND hwnd);
-	~Explorerplusplus();
+	static Explorerplusplus *Create(App *app, const RECT *initialBounds, int showState);
 
-	static LRESULT CALLBACK WndProcStub(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	~Explorerplusplus();
 
 	/* Directory modification. */
 	static void DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData);
@@ -110,6 +110,8 @@ public:
 	// which case GetActiveShellBrowserImpl() is required. That's the reason these two methods
 	// exist.
 	ShellBrowser *GetActiveShellBrowser() override;
+
+	HWND GetHWND() const override;
 
 private:
 	static constexpr UINT WM_APP_CLOSE = WM_APP + 1;
@@ -193,7 +195,12 @@ private:
 		Increase
 	};
 
-	LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+	Explorerplusplus(App *app, const RECT *initialBounds, int showState);
+
+	static HWND CreateMainWindow(const RECT *initialBounds);
+	static ATOM RegisterMainWindowClass(HINSTANCE instance);
+
+	LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	static LRESULT CALLBACK ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
@@ -204,7 +211,7 @@ private:
 	LRESULT HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int id, UINT notificationCode);
 	LRESULT HandleControlNotification(HWND hwnd, UINT notificationCode);
 	LRESULT CALLBACK NotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	void OnCreate();
+	void Initialize();
 	bool OnActivate(int activationState, bool minimized);
 	void OnSize(HWND hwnd, UINT state, int mainWindowWidth, int mainWindowHeight);
 	void OnDpiChanged(const RECT *updatedWindowRect);
@@ -552,6 +559,7 @@ private:
 
 	App *const m_app;
 	HWND m_hContainer;
+	BrowserTracker m_browserTracker;
 
 	BrowserCommandController m_commandController;
 

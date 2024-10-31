@@ -1028,6 +1028,8 @@
     <ClCompile Include="AsyncIconFetcher.cpp" />
     <ClCompile Include="LocationVisitInfo.cpp" />
     <ClCompile Include="MainMenuSubMenuView.cpp" />
+    <ClCompile Include="BrowserList.cpp" />
+    <ClCompile Include="BrowserTracker.cpp" />
     <ClCompile Include="Runtime.cpp" />
     <ClCompile Include="RuntimeHelper.cpp" />
     <ClCompile Include="StartupCommandLineProcessor.cpp" />
@@ -1303,6 +1305,8 @@
     <ClInclude Include="AsyncIconFetcher.h" />
     <ClInclude Include="LocationVisitInfo.h" />
     <ClInclude Include="MainMenuSubMenuView.h" />
+    <ClInclude Include="BrowserList.h" />
+    <ClInclude Include="BrowserTracker.h" />
     <ClInclude Include="Runtime.h" />
     <ClInclude Include="RuntimeHelper.h" />
     <ClInclude Include="ShellChangeNotificationType.h" />

@@ -20,4 +20,5 @@ public:
 	virtual BrowserPane *GetActivePane() const = 0;
 	virtual void FocusActiveTab() = 0;
 	virtual ShellBrowser *GetActiveShellBrowser() = 0;
+	virtual HWND GetHWND() const = 0;
 };

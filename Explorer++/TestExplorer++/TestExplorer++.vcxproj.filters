@@ -253,6 +253,9 @@
     <ClCompile Include="CommandLineTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="BrowserTrackerTest.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">

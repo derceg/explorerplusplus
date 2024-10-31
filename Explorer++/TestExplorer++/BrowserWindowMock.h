@@ -15,6 +15,7 @@ public:
 	MOCK_METHOD(BrowserPane *, GetActivePane, (), (const, override));
 	MOCK_METHOD(void, FocusActiveTab, (), (override));
 	MOCK_METHOD(ShellBrowser *, GetActiveShellBrowser, (), (override));
+	MOCK_METHOD(HWND, GetHWND, (), (const, override));
 
 	// Navigator
 	MOCK_METHOD(void, OpenItem,
