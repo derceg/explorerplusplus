@@ -554,15 +554,8 @@ void Explorerplusplus::OnThemeUpdated(Theme theme)
 	DarkModeHelper::GetInstance().EnableForApp(ShouldEnableDarkMode(theme));
 }
 
-boost::signals2::connection Explorerplusplus::AddApplicationShuttingDownObserver(
-	const ApplicationShuttingDownSignal::slot_type &observer)
-{
-	return m_applicationShuttingDownSignal.connect(observer);
-}
-
 int Explorerplusplus::OnDestroy()
 {
-	m_applicationShuttingDownSignal();
 	m_browserClosing = true;
 
 	// Broadcasting focus changed events when the browser is being closed is both unnecessary and

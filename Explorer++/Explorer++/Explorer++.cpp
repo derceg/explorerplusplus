@@ -23,6 +23,7 @@
 #include "TabRestorer.h"
 #include "TabRestorerMenu.h"
 #include "TabStorage.h"
+#include "TaskbarThumbnails.h"
 #include "ThemeWindowTracker.h"
 #include "UiTheming.h"
 #include "../Helper/WindowHelper.h"

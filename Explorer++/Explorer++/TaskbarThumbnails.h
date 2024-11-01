@@ -9,17 +9,20 @@
 #include <boost/signals2.hpp>
 #include <wil/com.h>
 #include <wil/resource.h>
+#include <memory>
 
 struct Config;
 class CoreInterface;
 struct NavigateParams;
 class TabContainer;
+class WindowSubclassWrapper;
 
 class TaskbarThumbnails : private boost::noncopyable
 {
 public:
-	static TaskbarThumbnails *Create(CoreInterface *coreInterface, TabContainer *tabContainer,
+	TaskbarThumbnails(CoreInterface *coreInterface, TabContainer *tabContainer,
 		HINSTANCE resourceInstance, const Config *config);
+	~TaskbarThumbnails();
 
 private:
 	struct TabProxyInfo
@@ -30,13 +33,7 @@ private:
 		wil::unique_hicon icon;
 	};
 
-	TaskbarThumbnails(CoreInterface *coreInterface, TabContainer *tabContainer,
-		HINSTANCE resourceInstance, const Config *config);
-	~TaskbarThumbnails() = default;
-
-	static LRESULT CALLBACK MainWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-	LRESULT CALLBACK MainWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	LRESULT MainWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	static LRESULT CALLBACK TabProxyWndProcStub(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK TabProxyWndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam, int iTabId);
@@ -59,12 +56,12 @@ private:
 	void SetTabProxyIcon(const Tab &tab);
 	void InvalidateTaskbarThumbnailBitmap(const Tab &tab);
 	void UpdateTaskbarThumbnailTitle(const Tab &tab);
-	void OnApplicationShuttingDown();
 
 	CoreInterface *m_coreInterface;
 	TabContainer *m_tabContainer;
 	HINSTANCE m_instance;
 	std::vector<boost::signals2::scoped_connection> m_connections;
+	std::unique_ptr<WindowSubclassWrapper> m_mainWindowSubclass;
 
 	wil::com_ptr_nothrow<ITaskbarList4> m_taskbarList;
 	std::list<TabProxyInfo> m_TabProxyList;

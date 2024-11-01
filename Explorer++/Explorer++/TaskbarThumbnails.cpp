@@ -20,6 +20,7 @@
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
+#include "../Helper/WindowSubclassWrapper.h"
 #include <dwmapi.h>
 
 namespace
@@ -31,12 +32,6 @@ struct TabProxy
 };
 }
 
-TaskbarThumbnails *TaskbarThumbnails::Create(CoreInterface *coreInterface,
-	TabContainer *tabContainer, HINSTANCE resourceInstance, const Config *config)
-{
-	return new TaskbarThumbnails(coreInterface, tabContainer, resourceInstance, config);
-}
-
 TaskbarThumbnails::TaskbarThumbnails(CoreInterface *coreInterface, TabContainer *tabContainer,
 	HINSTANCE resourceInstance, const Config *config) :
 	m_coreInterface(coreInterface),
@@ -45,6 +40,16 @@ TaskbarThumbnails::TaskbarThumbnails(CoreInterface *coreInterface, TabContainer 
 	m_enabled(config->showTaskbarThumbnails)
 {
 	Initialize();
+}
+
+TaskbarThumbnails::~TaskbarThumbnails()
+{
+	for (auto &tabProxy : m_TabProxyList)
+	{
+		DestroyTabProxy(tabProxy);
+	}
+
+	m_TabProxyList.clear();
 }
 
 void TaskbarThumbnails::Initialize()
@@ -60,29 +65,19 @@ void TaskbarThumbnails::Initialize()
 	ChangeWindowMessageFilter(WM_DWMSENDICONICTHUMBNAIL, MSGFLT_ADD);
 	ChangeWindowMessageFilter(WM_DWMSENDICONICLIVEPREVIEWBITMAP, MSGFLT_ADD);
 
-	/* Subclass the main window until the above message (TaskbarButtonCreated) is caught. */
-	SetWindowSubclass(m_coreInterface->GetMainWindow(), MainWndProcStub, 0,
-		reinterpret_cast<DWORD_PTR>(this));
+	// Subclass the main window until the above message (TaskbarButtonCreated) is caught.
+	m_mainWindowSubclass = std::make_unique<WindowSubclassWrapper>(m_coreInterface->GetMainWindow(),
+		std::bind_front(&TaskbarThumbnails::MainWndProc, this));
 }
 
-LRESULT CALLBACK TaskbarThumbnails::MainWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
-	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
-{
-	UNREFERENCED_PARAMETER(uIdSubclass);
-
-	auto *taskbarThumbnails = reinterpret_cast<TaskbarThumbnails *>(dwRefData);
-
-	return taskbarThumbnails->MainWndProc(hwnd, uMsg, wParam, lParam);
-}
-
-LRESULT CALLBACK TaskbarThumbnails::MainWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT TaskbarThumbnails::MainWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	// Note that this message won't be received in environments like Windows PE, where there is no
 	// shell/taskbar.
 	if (uMsg == m_uTaskbarButtonCreatedMessage)
 	{
 		OnTaskbarButtonCreated();
-		RemoveWindowSubclass(hwnd, MainWndProcStub, 0);
+		m_mainWindowSubclass.reset();
 		return 0;
 	}
 
@@ -131,9 +126,6 @@ void TaskbarThumbnails::SetUpObservers()
 		std::bind_front(&TaskbarThumbnails::OnTabSelectionChanged, this)));
 	m_connections.push_back(m_tabContainer->tabRemovedSignal.AddObserver(
 		std::bind_front(&TaskbarThumbnails::RemoveTabProxy, this)));
-
-	m_connections.push_back(m_coreInterface->AddApplicationShuttingDownObserver(
-		std::bind_front(&TaskbarThumbnails::OnApplicationShuttingDown, this)));
 }
 
 void TaskbarThumbnails::SetupJumplistTasks()
@@ -675,14 +667,4 @@ void TaskbarThumbnails::SetTabProxyIcon(const Tab &tab)
 			break;
 		}
 	}
-}
-
-void TaskbarThumbnails::OnApplicationShuttingDown()
-{
-	for (auto &tabProxy : m_TabProxyList)
-	{
-		DestroyTabProxy(tabProxy);
-	}
-
-	m_TabProxyList.clear();
 }

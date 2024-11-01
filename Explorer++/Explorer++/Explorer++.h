@@ -510,8 +510,6 @@ private:
 		const FocusChangedSignal::slot_type &observer) override;
 	boost::signals2::connection AddDeviceChangeObserver(
 		const DeviceChangeSignal::slot_type &observer) override;
-	boost::signals2::connection AddApplicationShuttingDownObserver(
-		const ApplicationShuttingDownSignal::slot_type &observer) override;
 
 	/* Menus. */
 	void InitializeMainMenu();
@@ -603,7 +601,6 @@ private:
 	std::unique_ptr<GlobalHistoryMenu> m_globalHistoryMenu;
 
 	FocusChangedSignal m_focusChangedSignal;
-	ApplicationShuttingDownSignal m_applicationShuttingDownSignal;
 	bool m_browserClosing = false;
 
 	// Treeview
@@ -644,7 +641,7 @@ private:
 	bool m_themeValueLoadedFromXml = false;
 	bool m_groupSortDirectionGlobalLoadedFromXml = false;
 
-	TaskbarThumbnails *m_taskbarThumbnails;
+	std::unique_ptr<TaskbarThumbnails> m_taskbarThumbnails;
 
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
