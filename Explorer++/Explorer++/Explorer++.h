@@ -604,7 +604,7 @@ private:
 
 	FocusChangedSignal m_focusChangedSignal;
 	ApplicationShuttingDownSignal m_applicationShuttingDownSignal;
-	bool m_applicationShuttingDown = false;
+	bool m_browserClosing = false;
 
 	// Treeview
 	HolderWindow *m_treeViewHolder = nullptr;

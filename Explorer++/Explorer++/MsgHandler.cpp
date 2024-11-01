@@ -563,15 +563,15 @@ boost::signals2::connection Explorerplusplus::AddApplicationShuttingDownObserver
 int Explorerplusplus::OnDestroy()
 {
 	m_applicationShuttingDownSignal();
-	m_applicationShuttingDown = true;
+	m_browserClosing = true;
 
-	// Broadcasting focus changed events during shutdown is both unnecessary and unsafe. It's
-	// unsafe, because guarantees that are normally upheld while the application is running won't
-	// necessarily be upheld while the application is shutting down. For example, normally there
-	// should always be at least one tab. During shutdown, the tab container will be destroyed, so
-	// the assumption that there is at least a single tab won't necessarily hold.
-	// Therefore, all slots are disconnected here, as focus changes during shutdown aren't
-	// meaningful anyway.
+	// Broadcasting focus changed events when the browser is being closed is both unnecessary and
+	// unsafe. It's unsafe, because guarantees that are normally upheld during the lifetime of the
+	// browser window won't necessarily be upheld while the browser window is closing. For example,
+	// normally there should always be at least one tab. When the browser window is closing, the tab
+	// container will be destroyed, so the assumption that there is at least a single tab won't
+	// necessarily hold.
+	// Therefore, all slots are disconnected here.
 	m_focusChangedSignal.disconnect_all_slots();
 
 	if (m_SHChangeNotifyID != 0)
@@ -1191,8 +1191,8 @@ void Explorerplusplus::FocusChanged()
 boost::signals2::connection Explorerplusplus::AddFocusChangeObserver(
 	const FocusChangedSignal::slot_type &observer)
 {
-	CHECK(!m_applicationShuttingDown)
-		<< "Adding a focus changed observer during shutdown is unsafe";
+	CHECK(!m_browserClosing)
+		<< "Adding a focus changed observer to a browser window while it's being closed is unsafe";
 
 	return m_focusChangedSignal.connect(observer);
 }
