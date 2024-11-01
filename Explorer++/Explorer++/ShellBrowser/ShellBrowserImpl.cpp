@@ -129,8 +129,6 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder,
 
 	m_connections.push_back(coreInterface->AddDeviceChangeObserver(
 		std::bind_front(&ShellBrowserImpl::OnDeviceChange, this)));
-	m_connections.push_back(coreInterface->AddApplicationShuttingDownObserver(
-		std::bind_front(&ShellBrowserImpl::OnApplicationShuttingDown, this)));
 
 	m_shellWindows = winrt::try_create_instance<IShellWindows>(CLSID_ShellWindows, CLSCTX_ALL);
 
@@ -139,6 +137,16 @@ ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder,
 
 ShellBrowserImpl::~ShellBrowserImpl()
 {
+	if (m_clipboardDataObject && OleIsCurrentClipboard(m_clipboardDataObject.get()) == S_OK)
+	{
+		// Ensure that any data that was copied to the clipboard remains there. Technically, this
+		// only needs to be done when the application is closed. However, determining whether the
+		// application set the current data on the clipboard when the tab that set the data has
+		// already been closed is difficult, so the easiest thing to do is just flush the clipboard
+		// here.
+		OleFlushClipboard();
+	}
+
 	RemoveClipboardFormatListener(m_hListView);
 
 	DestroyWindow(m_hListView);
@@ -1355,17 +1363,6 @@ void ShellBrowserImpl::OnInternalPaste(const ClipboardOperations::PastedItems &p
 	}
 
 	SelectItems(pidls);
-}
-
-void ShellBrowserImpl::OnApplicationShuttingDown()
-{
-	if (m_clipboardDataObject && OleIsCurrentClipboard(m_clipboardDataObject.get()) == S_OK)
-	{
-		// Ensure that any data that was copied to the clipboard remains there. It's only necessary
-		// to call this when the application is going to be closed. While the application is
-		// running, any clipboard objects will still be available.
-		OleFlushClipboard();
-	}
 }
 
 void ShellBrowserImpl::AddTaskToPendingWorkQueue(PendingWorkQueueTask task)

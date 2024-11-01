@@ -116,6 +116,11 @@ Bug fixes:
   multiple paths are being passed in and more than one path
   contains spaces (and therefore more than one path will need to
   be enclosed in double quotes).
+- Previously, if an item was cut or copied within a tab and the
+  tab was closed, the clipboard data would be lost when the
+  application exited. Now, the clipboard is flushed when the tab
+  is closed, which ensures the data will be retained, even once
+  the application has exited.
 - Fixed an issue with handling the properties item on the
   background context menu.
 - Previously, listview groups were always sorted by name. Now,

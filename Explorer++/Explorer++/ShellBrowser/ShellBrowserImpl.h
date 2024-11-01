@@ -625,8 +625,6 @@ private:
 	void RepositionLocalFiles(const POINT *ppt);
 	void ScrollListViewForDrop(const POINT &pt);
 
-	void OnApplicationShuttingDown();
-
 	/* Miscellaneous. */
 	BOOL CompareVirtualFolders(UINT uFolderCSIDL) const;
 	int LocateFileItemInternalIndex(const TCHAR *szFileName) const;
