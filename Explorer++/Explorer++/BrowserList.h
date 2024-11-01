@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "SignalWrapper.h"
 #include <concurrencpp/concurrencpp.h>
 #include <unordered_set>
 
@@ -17,6 +18,11 @@ public:
 	void RemoveBrowser(BrowserWindow *browser);
 
 	concurrencpp::generator<BrowserWindow *> GetList() const;
+	bool IsEmpty() const;
+
+	// Signals
+	SignalWrapper<BrowserList, void()> browserAddedSignal;
+	SignalWrapper<BrowserList, void()> browserRemovedSignal;
 
 private:
 	std::unordered_set<BrowserWindow *> m_browsers;

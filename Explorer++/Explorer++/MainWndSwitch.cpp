@@ -20,7 +20,6 @@
 #include "DisplayWindow/DisplayWindow.h"
 #include "DrivesToolbar.h"
 #include "DrivesToolbarView.h"
-#include "ExitCode.h"
 #include "Explorer++_internal.h"
 #include "HolderWindow.h"
 #include "MainMenuSubMenuView.h"
@@ -261,7 +260,6 @@ LRESULT Explorerplusplus::WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LP
 
 	case WM_NCDESTROY:
 		delete this;
-		PostQuitMessage(EXIT_CODE_NORMAL);
 		return 0;
 	}
 

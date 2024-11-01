@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "App.h"
 #include "DefaultAccelerators.h"
+#include "ExitCode.h"
 #include "../Helper/Helper.h"
 
 App::App(const CommandLine::Settings *commandLineSettings) :
@@ -19,12 +20,28 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 {
 	CHECK(m_richEditLib);
 
+	Initialize();
+}
+
+void App::Initialize()
+{
 	INITCOMMONCONTROLSEX commonControls = {};
 	commonControls.dwSize = sizeof(commonControls);
 	commonControls.dwICC = ICC_BAR_CLASSES | ICC_COOL_CLASSES | ICC_LISTVIEW_CLASSES
 		| ICC_USEREX_CLASSES | ICC_STANDARD_CLASSES | ICC_LINK_CLASS;
 	BOOL res = InitCommonControlsEx(&commonControls);
 	CHECK(res);
+
+	m_browserList.browserRemovedSignal.AddObserver(std::bind_front(&App::OnBrowserRemoved, this));
+}
+
+void App::OnBrowserRemoved()
+{
+	if (m_browserList.IsEmpty())
+	{
+		// The last top-level browser window has been closed, so exit the application.
+		PostQuitMessage(EXIT_CODE_NORMAL);
+	}
 }
 
 const CommandLine::Settings *App::GetCommandLineSettings() const

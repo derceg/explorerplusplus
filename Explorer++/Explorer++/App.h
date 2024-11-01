@@ -31,6 +31,9 @@ private:
 	// various components in the application.
 	static constexpr int MAX_CACHED_ICONS = 1000;
 
+	void Initialize();
+	void OnBrowserRemoved();
+
 	const CommandLine::Settings *const m_commandLineSettings;
 	FeatureList m_featureList;
 	AcceleratorManager m_acceleratorManager;

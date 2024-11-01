@@ -195,6 +195,8 @@
     <ClCompile Include="BookmarkStorageTestHelper.cpp" />
     <ClCompile Include="BookmarkXmlStorageTest.cpp" />
     <ClCompile Include="BrowserCommandControllerTest.cpp" />
+    <ClCompile Include="BrowserListTest.cpp" />
+    <ClCompile Include="BrowserListTestHelper.cpp" />
     <ClCompile Include="ClipboardTest.cpp" />
     <ClCompile Include="ColorRuleRegistryStorageTest.cpp" />
     <ClCompile Include="ColorRulesStorageTestHelper.cpp" />
@@ -311,6 +313,7 @@
     <ClInclude Include="ApplicationToolbarStorageTestHelper.h" />
     <ClInclude Include="BookmarkStorageTestHelper.h" />
     <ClInclude Include="BookmarkTreeHelper.h" />
+    <ClInclude Include="BrowserListTestHelper.h" />
     <ClInclude Include="BrowserWindowMock.h" />
     <ClInclude Include="ColorRulesStorageTestHelper.h" />
     <ClInclude Include="ColumnStorageTestHelper.h" />
