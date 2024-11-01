@@ -225,8 +225,6 @@ private:
 
 	ShellBrowserImpl *GetSelectedShellBrowser() const;
 
-	void OnApplicationShuttingDown();
-
 	HWND m_hTreeView;
 	App *const m_app;
 	BrowserWindow *m_browserWindow = nullptr;

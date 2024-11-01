@@ -143,8 +143,6 @@ ShellTreeView::ShellTreeView(HWND hParent, App *app, BrowserWindow *browserWindo
 		std::bind_front(&ShellTreeView::OnCutItemChanged, this)));
 	m_connections.push_back(m_config->showQuickAccessInTreeView.addObserver(
 		std::bind_front(&ShellTreeView::OnShowQuickAccessUpdated, this)));
-	m_connections.push_back(coreInterface->AddApplicationShuttingDownObserver(
-		std::bind_front(&ShellTreeView::OnApplicationShuttingDown, this)));
 }
 
 HWND ShellTreeView::CreateTreeView(HWND parent)
@@ -156,16 +154,13 @@ HWND ShellTreeView::CreateTreeView(HWND parent)
 
 ShellTreeView::~ShellTreeView()
 {
-	m_iconThreadPool.clear_queue();
-}
-
-void ShellTreeView::OnApplicationShuttingDown()
-{
 	if (m_cutCopiedItemManager.GetCutCopiedClipboardDataObject()
 		&& OleIsCurrentClipboard(m_cutCopiedItemManager.GetCutCopiedClipboardDataObject()) == S_OK)
 	{
 		OleFlushClipboard();
 	}
+
+	m_iconThreadPool.clear_queue();
 }
 
 LRESULT ShellTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
