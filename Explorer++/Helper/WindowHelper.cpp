@@ -157,7 +157,7 @@ bool BringWindowToForeground(HWND wnd)
 	return SetForegroundWindow(wnd);
 }
 
-HWND CreateMessageOnlyWindow()
+wil::unique_hwnd CreateMessageOnlyWindow()
 {
 	static constexpr WCHAR MESSAGE_CLASS_NAME[] = L"MessageClass";
 
@@ -169,7 +169,7 @@ HWND CreateMessageOnlyWindow()
 	windowClass.style = CS_HREDRAW | CS_VREDRAW;
 	RegisterClass(&windowClass);
 
-	return CreateWindow(MESSAGE_CLASS_NAME, MESSAGE_CLASS_NAME, WS_DISABLED, CW_USEDEFAULT,
-		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, HWND_MESSAGE, nullptr,
-		GetModuleHandle(nullptr), nullptr);
+	return wil::unique_hwnd(CreateWindow(MESSAGE_CLASS_NAME, MESSAGE_CLASS_NAME, WS_DISABLED,
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, HWND_MESSAGE, nullptr,
+		GetModuleHandle(nullptr), nullptr));
 }

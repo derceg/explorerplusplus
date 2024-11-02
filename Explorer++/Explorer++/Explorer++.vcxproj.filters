@@ -724,6 +724,12 @@
     <ClCompile Include="BrowserList.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="ModelessDialogList.cpp">
+      <Filter>Dialog Support</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelessDialogHelper.cpp">
+      <Filter>Dialog Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -794,9 +800,6 @@
     </ClInclude>
     <ClInclude Include="RegistrySettings.h">
       <Filter>Settings</Filter>
-    </ClInclude>
-    <ClInclude Include="ModelessDialogs.h">
-      <Filter>Dialog Support</Filter>
     </ClInclude>
     <ClInclude Include="..\targetver.h">
       <Filter>Core</Filter>
@@ -1496,6 +1499,12 @@
     </ClInclude>
     <ClInclude Include="BrowserList.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelessDialogList.h">
+      <Filter>Dialog Support</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelessDialogHelper.h">
+      <Filter>Dialog Support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

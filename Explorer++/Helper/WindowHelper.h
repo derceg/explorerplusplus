@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wil/resource.h>
+
 BOOL CenterWindow(HWND hParent, HWND hChild);
 std::wstring GetDlgItemString(HWND dlg, int controlId);
 std::wstring GetWindowString(HWND hwnd);
@@ -12,4 +14,4 @@ BOOL AddWindowStyle(HWND hwnd, UINT fStyle, BOOL bAdd);
 int GetRectHeight(const RECT *rc);
 int GetRectWidth(const RECT *rc);
 bool BringWindowToForeground(HWND wnd);
-HWND CreateMessageOnlyWindow();
+wil::unique_hwnd CreateMessageOnlyWindow();

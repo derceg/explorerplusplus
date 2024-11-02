@@ -1030,6 +1030,8 @@
     <ClCompile Include="MainMenuSubMenuView.cpp" />
     <ClCompile Include="BrowserList.cpp" />
     <ClCompile Include="BrowserTracker.cpp" />
+    <ClCompile Include="ModelessDialogHelper.cpp" />
+    <ClCompile Include="ModelessDialogList.cpp" />
     <ClCompile Include="Runtime.cpp" />
     <ClCompile Include="RuntimeHelper.cpp" />
     <ClCompile Include="StartupCommandLineProcessor.cpp" />
@@ -1307,6 +1309,8 @@
     <ClInclude Include="MainMenuSubMenuView.h" />
     <ClInclude Include="BrowserList.h" />
     <ClInclude Include="BrowserTracker.h" />
+    <ClInclude Include="ModelessDialogHelper.h" />
+    <ClInclude Include="ModelessDialogList.h" />
     <ClInclude Include="Runtime.h" />
     <ClInclude Include="RuntimeHelper.h" />
     <ClInclude Include="ShellChangeNotificationType.h" />
@@ -1440,7 +1444,6 @@
     <ClInclude Include="AcceleratorHelper.h" />
     <ClInclude Include="MenuRanges.h" />
     <ClInclude Include="MergeFilesDialog.h" />
-    <ClInclude Include="ModelessDialogs.h" />
     <ClInclude Include="NavigationController.h" />
     <ClInclude Include="NoTranslationResource.h" />
     <ClInclude Include="Config.h" />

@@ -12,7 +12,7 @@ UIThreadExecutor::UIThreadExecutor() :
 {
 	CHECK(m_hwnd);
 
-	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd,
+	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(m_hwnd.get(),
 		std::bind_front(&UIThreadExecutor::WndProc, this)));
 }
 
@@ -38,7 +38,7 @@ void UIThreadExecutor::enqueue(std::span<concurrencpp::task> tasks)
 
 	lock.unlock();
 
-	PostMessage(m_hwnd, WM_USER_TASK_QUEUED, 0, 0);
+	PostMessage(m_hwnd.get(), WM_USER_TASK_QUEUED, 0, 0);
 }
 
 int UIThreadExecutor::max_concurrency_level() const noexcept
@@ -64,7 +64,7 @@ void UIThreadExecutor::shutdown() noexcept
 	m_queue = {};
 	lock.unlock();
 
-	auto res = SendMessage(m_hwnd, WM_USER_DESTROY_WINDOW, 0, 0);
+	auto res = SendMessage(m_hwnd.get(), WM_USER_DESTROY_WINDOW, 0, 0);
 	DCHECK_EQ(res, 1);
 }
 
@@ -77,7 +77,7 @@ LRESULT UIThreadExecutor::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 		return 1;
 
 	case WM_USER_DESTROY_WINDOW:
-		OnDestroyWindow();
+		m_hwnd.reset();
 		return 1;
 	}
 
@@ -104,10 +104,4 @@ void UIThreadExecutor::OnTaskQueued()
 
 		task();
 	}
-}
-
-void UIThreadExecutor::OnDestroyWindow()
-{
-	BOOL res = DestroyWindow(m_hwnd);
-	DCHECK(res);
 }

@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "AboutDialog.h"
+#include "App.h"
 #include "ColorRuleModelFactory.h"
 #include "Config.h"
 #include "CustomizeColorsDialog.h"
@@ -15,7 +16,7 @@
 #include "FilterDialog.h"
 #include "MainResource.h"
 #include "MergeFilesDialog.h"
-#include "ModelessDialogs.h"
+#include "ModelessDialogHelper.h"
 #include "OptionsDialog.h"
 #include "ResourceHelper.h"
 #include "ScriptingDialog.h"
@@ -103,19 +104,15 @@ void Explorerplusplus::OnWildcardSelect(BOOL bSelect)
 
 void Explorerplusplus::OnSearch()
 {
-	if (g_hwndSearch == nullptr)
-	{
-		Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
-		std::wstring currentDirectory = selectedTab.GetShellBrowser()->GetDirectory();
+	CreateOrSwitchToModelessDialog(m_app->GetModelessDialogList(), L"SearchDialog",
+		[this]
+		{
+			Tab &selectedTab = GetActivePane()->GetTabContainer()->GetSelectedTab();
+			std::wstring currentDirectory = selectedTab.GetShellBrowser()->GetDirectory();
 
-		auto *searchDialog = new SearchDialog(m_resourceInstance, m_hContainer, currentDirectory,
-			this, this, GetActivePane()->GetTabContainer());
-		g_hwndSearch = searchDialog->ShowModelessDialog([]() { g_hwndSearch = nullptr; });
-	}
-	else
-	{
-		SetFocus(g_hwndSearch);
-	}
+			return new SearchDialog(m_resourceInstance, m_hContainer, currentDirectory, this, this,
+				GetActivePane()->GetTabContainer());
+		});
 }
 
 void Explorerplusplus::OnCustomizeColors()
@@ -127,42 +124,20 @@ void Explorerplusplus::OnCustomizeColors()
 
 void Explorerplusplus::OnRunScript()
 {
-	if (g_hwndRunScript == nullptr)
-	{
-		auto *scriptingDialog = new ScriptingDialog(m_resourceInstance, m_hContainer, this);
-		g_hwndRunScript = scriptingDialog->ShowModelessDialog([]() { g_hwndRunScript = nullptr; });
-	}
-	else
-	{
-		SetFocus(g_hwndRunScript);
-	}
+	CreateOrSwitchToModelessDialog(m_app->GetModelessDialogList(), L"ScriptingDialog",
+		[this] { return new ScriptingDialog(m_resourceInstance, m_hContainer, this); });
 }
 
 void Explorerplusplus::OnShowOptions()
 {
-	if (g_hwndOptions == nullptr)
-	{
-		auto *optionsDialog = new OptionsDialog(m_resourceInstance, m_hContainer, m_config, this);
-		g_hwndOptions = optionsDialog->ShowModelessDialog([]() { g_hwndOptions = nullptr; });
-	}
-	else
-	{
-		SetFocus(g_hwndOptions);
-	}
+	CreateOrSwitchToModelessDialog(m_app->GetModelessDialogList(), L"OptionsDialog",
+		[this] { return new OptionsDialog(m_resourceInstance, m_hContainer, m_config, this); });
 }
 
 void Explorerplusplus::OnSearchTabs()
 {
-	if (g_hwndSearchTabs == nullptr)
-	{
-		auto *searchTabsDialog = SearchTabsDialog::Create(m_resourceInstance, m_hContainer, this);
-		g_hwndSearchTabs =
-			searchTabsDialog->ShowModelessDialog([]() { g_hwndSearchTabs = nullptr; });
-	}
-	else
-	{
-		SetFocus(g_hwndSearchTabs);
-	}
+	CreateOrSwitchToModelessDialog(m_app->GetModelessDialogList(), L"SearchTabsDialog",
+		[this] { return SearchTabsDialog::Create(m_resourceInstance, m_hContainer, this); });
 }
 
 void Explorerplusplus::OnOpenOnlineDocumentation()

@@ -27,7 +27,7 @@
 #include "MainToolbar.h"
 #include "MainToolbarButtons.h"
 #include "MenuRanges.h"
-#include "ModelessDialogs.h"
+#include "ModelessDialogHelper.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
@@ -1276,17 +1276,12 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 
 	case MainToolbarButton::Bookmarks:
 	case IDM_BOOKMARKS_MANAGEBOOKMARKS:
-		if (g_hwndManageBookmarks == nullptr)
-		{
-			auto *pManageBookmarksDialog = new ManageBookmarksDialog(m_resourceInstance, hwnd, this,
-				this, &m_iconFetcher, BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
-			g_hwndManageBookmarks = pManageBookmarksDialog->ShowModelessDialog(
-				[]() { g_hwndManageBookmarks = nullptr; });
-		}
-		else
-		{
-			SetFocus(g_hwndManageBookmarks);
-		}
+		CreateOrSwitchToModelessDialog(m_app->GetModelessDialogList(), L"ManageBookmarksDialog",
+			[this, hwnd]
+			{
+				return new ManageBookmarksDialog(m_resourceInstance, hwnd, this, this,
+					&m_iconFetcher, BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
+			});
 		break;
 
 	case MainToolbarButton::Search:

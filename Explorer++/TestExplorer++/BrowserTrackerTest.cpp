@@ -5,8 +5,8 @@
 #include "pch.h"
 #include "BrowserTracker.h"
 #include "BrowserList.h"
-#include "BrowserListTestHelper.h"
 #include "BrowserWindow.h"
+#include "GeneratorTestHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
@@ -65,15 +65,15 @@ TEST(BrowserTrackerTest, AddRemove)
 	BrowserList browserList;
 
 	auto browser1 = std::make_unique<BrowserWindowFake>(&browserList);
-	EXPECT_THAT(GetBrowserListAsVector(&browserList), UnorderedElementsAre(browser1.get()));
+	EXPECT_THAT(GeneratorToVector(browserList.GetList()), UnorderedElementsAre(browser1.get()));
 
 	auto browser2 = std::make_unique<BrowserWindowFake>(&browserList);
-	EXPECT_THAT(GetBrowserListAsVector(&browserList),
+	EXPECT_THAT(GeneratorToVector(browserList.GetList()),
 		UnorderedElementsAre(browser1.get(), browser2.get()));
 
 	browser1.reset();
-	EXPECT_THAT(GetBrowserListAsVector(&browserList), UnorderedElementsAre(browser2.get()));
+	EXPECT_THAT(GeneratorToVector(browserList.GetList()), UnorderedElementsAre(browser2.get()));
 
 	browser2.reset();
-	EXPECT_THAT(GetBrowserListAsVector(&browserList), IsEmpty());
+	EXPECT_THAT(GeneratorToVector(browserList.GetList()), IsEmpty());
 }

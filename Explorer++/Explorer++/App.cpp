@@ -73,3 +73,8 @@ BrowserList *App::GetBrowserList()
 {
 	return &m_browserList;
 }
+
+ModelessDialogList *App::GetModelessDialogList()
+{
+	return &m_modelessDialogList;
+}

@@ -10,7 +10,6 @@
 #include "CrashHandlerHelper.h"
 #include "ExitCode.h"
 #include "Explorer++_internal.h"
-#include "ModelessDialogs.h"
 #include "RegistrySettings.h"
 #include "StartupCommandLineProcessor.h"
 #include "XMLSettings.h"
@@ -30,14 +29,8 @@ struct WindowState
 void InitializeLocale();
 RECT GetDefaultMainWindowBounds();
 std::optional<WindowState> LoadMainWindowState(bool loadSettingsFromXML);
+bool IsModelessDialogMessage(App *app, MSG *msg);
 bool MaybeTranslateAccelerator(App *app, MSG *msg);
-
-/* Modeless dialog handles. */
-HWND g_hwndSearch = nullptr;
-HWND g_hwndRunScript = nullptr;
-HWND g_hwndOptions = nullptr;
-HWND g_hwndManageBookmarks = nullptr;
-HWND g_hwndSearchTabs = nullptr;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -156,22 +149,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	while (GetMessage(&msg, nullptr, 0, 0) > 0)
 	{
-		/* TranslateMessage() must be in the inner loop,
-		otherwise various accelerator keys (such as tab)
-		would be taken even when the dialog has focus. */
-		if (!IsDialogMessage(g_hwndSearch, &msg) && !IsDialogMessage(g_hwndManageBookmarks, &msg)
-			&& !IsDialogMessage(g_hwndRunScript, &msg) && !IsDialogMessage(g_hwndOptions, &msg)
-			&& !IsDialogMessage(g_hwndSearchTabs, &msg))
+		if (!IsModelessDialogMessage(&app, &msg) && !MaybeTranslateAccelerator(&app, &msg))
 		{
-			if (!MaybeTranslateAccelerator(&app, &msg))
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
 		}
 	}
 
-	return (int) msg.wParam;
+	return static_cast<int>(msg.wParam);
 }
 
 unique_glog_shutdown_call InitializeLogging()
@@ -304,19 +289,27 @@ std::optional<WindowState> LoadMainWindowState(bool loadSettingsFromXML)
 	return WindowState(placement.rcNormalPosition, placement.showCmd);
 }
 
+bool IsModelessDialogMessage(App *app, MSG *msg)
+{
+	for (auto modelessDialog : app->GetModelessDialogList()->GetList())
+	{
+		if (IsChild(modelessDialog, msg->hwnd))
+		{
+			return IsDialogMessage(modelessDialog, msg);
+		}
+	}
+
+	return false;
+}
+
 bool MaybeTranslateAccelerator(App *app, MSG *msg)
 {
 	for (auto *browser : app->GetBrowserList()->GetList())
 	{
-		if (!IsChild(browser->GetHWND(), msg->hwnd))
+		if (IsChild(browser->GetHWND(), msg->hwnd))
 		{
-			continue;
-		}
-
-		if (TranslateAccelerator(browser->GetHWND(),
-				app->GetAcceleratorManager()->GetAcceleratorTable(), msg))
-		{
-			return true;
+			return TranslateAccelerator(browser->GetHWND(),
+				app->GetAcceleratorManager()->GetAcceleratorTable(), msg);
 		}
 	}
 

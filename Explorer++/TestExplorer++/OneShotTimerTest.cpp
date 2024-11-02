@@ -18,7 +18,7 @@ class OneShotTimerTest : public Test
 protected:
 	void SetUp() override
 	{
-		m_messageWindow.reset(CreateMessageOnlyWindow());
+		m_messageWindow = CreateMessageOnlyWindow();
 		ASSERT_NE(m_messageWindow, nullptr);
 
 		m_timerManager = std::make_unique<OneShotTimerManager>(m_messageWindow.get());

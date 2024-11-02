@@ -6,6 +6,7 @@
 
 #include "../Helper/WindowSubclassWrapper.h"
 #include <concurrencpp/concurrencpp.h>
+#include <wil/resource.h>
 #include <atomic>
 #include <memory>
 #include <mutex>
@@ -29,9 +30,8 @@ private:
 
 	LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void OnTaskQueued();
-	void OnDestroyWindow();
 
-	const HWND m_hwnd;
+	wil::unique_hwnd m_hwnd;
 	std::vector<std::unique_ptr<WindowSubclassWrapper>> m_windowSubclasses;
 	std::mutex m_mutex;
 	std::queue<concurrencpp::task> m_queue;

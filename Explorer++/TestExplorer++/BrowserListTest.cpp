@@ -4,8 +4,8 @@
 
 #include "pch.h"
 #include "BrowserList.h"
-#include "BrowserListTestHelper.h"
 #include "BrowserWindowMock.h"
+#include "GeneratorTestHelper.h"
 #include <gtest/gtest.h>
 
 using namespace testing;
@@ -32,17 +32,18 @@ TEST_F(BrowserListTest, AddRemoveBrowser)
 {
 	BrowserWindowMock browser1;
 	m_browserList.AddBrowser(&browser1);
-	EXPECT_THAT(GetBrowserListAsVector(&m_browserList), UnorderedElementsAre(&browser1));
+	EXPECT_THAT(GeneratorToVector(m_browserList.GetList()), UnorderedElementsAre(&browser1));
 
 	BrowserWindowMock browser2;
 	m_browserList.AddBrowser(&browser2);
-	EXPECT_THAT(GetBrowserListAsVector(&m_browserList), UnorderedElementsAre(&browser1, &browser2));
+	EXPECT_THAT(GeneratorToVector(m_browserList.GetList()),
+		UnorderedElementsAre(&browser1, &browser2));
 
 	m_browserList.RemoveBrowser(&browser1);
-	EXPECT_THAT(GetBrowserListAsVector(&m_browserList), UnorderedElementsAre(&browser2));
+	EXPECT_THAT(GeneratorToVector(m_browserList.GetList()), UnorderedElementsAre(&browser2));
 
 	m_browserList.RemoveBrowser(&browser2);
-	EXPECT_THAT(GetBrowserListAsVector(&m_browserList), IsEmpty());
+	EXPECT_THAT(GeneratorToVector(m_browserList.GetList()), IsEmpty());
 }
 
 TEST_F(BrowserListTest, AddedSignal)

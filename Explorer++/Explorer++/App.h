@@ -9,6 +9,7 @@
 #include "CommandLine.h"
 #include "Config.h"
 #include "FeatureList.h"
+#include "ModelessDialogList.h"
 #include "../Helper/CachedIcons.h"
 #include "../Helper/UniqueResources.h"
 #include <boost/core/noncopyable.hpp>
@@ -25,6 +26,7 @@ public:
 	Config *GetConfig();
 	CachedIcons *GetCachedIcons();
 	BrowserList *GetBrowserList();
+	ModelessDialogList *GetModelessDialogList();
 
 private:
 	// Represents the maximum number of icons that can be cached. This cache is shared between
@@ -40,6 +42,7 @@ private:
 	Config m_config;
 	CachedIcons m_cachedIcons;
 	BrowserList m_browserList;
+	ModelessDialogList m_modelessDialogList;
 
 	unique_gdiplus_shutdown m_uniqueGdiplusShutdown;
 	wil::unique_hmodule m_richEditLib;

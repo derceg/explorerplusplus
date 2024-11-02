@@ -46,7 +46,8 @@ TEST_F(ComStaThreadPoolExecutorTest, QueueMessagesAndRunTasks)
 			// which is only going to be doable if it's possible to invoke code on that thread.
 			// The window will, however, be automatically cleaned up when its creating thread exits
 			// (at the end of this test).
-			hwnd = CreateMessageOnlyWindow();
+			auto ownedWindow = CreateMessageOnlyWindow();
+			hwnd = ownedWindow.release();
 		});
 
 	// Assertions from multiple threads aren't currently supported on Windows (see

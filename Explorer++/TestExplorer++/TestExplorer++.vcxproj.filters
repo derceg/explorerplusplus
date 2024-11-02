@@ -262,8 +262,8 @@
     <ClCompile Include="BrowserListTest.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="BrowserListTestHelper.cpp">
-      <Filter>Core</Filter>
+    <ClCompile Include="ModelessDialogListTest.cpp">
+      <Filter>Dialog Support</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -357,6 +357,9 @@
     <Filter Include="Async\Executors">
       <UniqueIdentifier>{de6aab16-37e4-436f-817b-780f1e35ee98}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Dialog Support">
+      <UniqueIdentifier>{c92534bc-73a2-4e24-8f9d-d7552e2acd5b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -435,7 +438,7 @@
     <ClInclude Include="MessageLoop.h">
       <Filter>Async</Filter>
     </ClInclude>
-    <ClInclude Include="BrowserListTestHelper.h">
+    <ClInclude Include="GeneratorTestHelper.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
