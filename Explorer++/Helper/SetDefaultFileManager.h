@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/BetterEnumsWrapper.h"
+#include "BetterEnumsWrapper.h"
 
 namespace DefaultFileManager
 {

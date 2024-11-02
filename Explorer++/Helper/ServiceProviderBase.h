@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Helper/ShellHelper.h"
+#include "ShellHelper.h"
 #include <boost/container_hash/hash.hpp>
 #include <wil/com.h>
 #include <unordered_map>

@@ -9,8 +9,7 @@
 
 #include "stdafx.h"
 #include "FileActionHandler.h"
-#include "../Helper/FileOperations.h"
-#include "../Helper/Macros.h"
+#include "FileOperations.h"
 
 BOOL FileActionHandler::RenameFiles(const RenamedItems_t &itemList)
 {

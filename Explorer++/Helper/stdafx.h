@@ -9,7 +9,10 @@
 
 #pragma once
 
+#pragma warning(push)
+#pragma warning(disable : 4464) // relative include path contains '..'
 #include "../targetver.h"
+#pragma warning(pop)
 
 #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
 
