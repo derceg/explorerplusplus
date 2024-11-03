@@ -77,14 +77,14 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_STATUSBAR, m_config->showStatusBar);
 	MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_FOLDERS, m_config->showFolders.get());
 	MenuHelper::CheckItem(hProgramMenu, IDM_VIEW_DISPLAYWINDOW, m_config->showDisplayWindow);
-	MenuHelper::CheckItem(hProgramMenu, IDM_TOOLBARS_ADDRESSBAR, m_config->showAddressBar);
-	MenuHelper::CheckItem(hProgramMenu, IDM_TOOLBARS_MAINTOOLBAR, m_config->showMainToolbar);
+	MenuHelper::CheckItem(hProgramMenu, IDM_TOOLBARS_ADDRESSBAR, m_config->showAddressBar.get());
+	MenuHelper::CheckItem(hProgramMenu, IDM_TOOLBARS_MAINTOOLBAR, m_config->showMainToolbar.get());
 	MenuHelper::CheckItem(hProgramMenu, IDM_TOOLBARS_BOOKMARKSTOOLBAR,
-		m_config->showBookmarksToolbar);
-	MenuHelper::CheckItem(hProgramMenu, IDM_TOOLBARS_DRIVES, m_config->showDrivesToolbar);
+		m_config->showBookmarksToolbar.get());
+	MenuHelper::CheckItem(hProgramMenu, IDM_TOOLBARS_DRIVES, m_config->showDrivesToolbar.get());
 	MenuHelper::CheckItem(hProgramMenu, IDM_TOOLBARS_APPLICATIONTOOLBAR,
-		m_config->showApplicationToolbar);
-	MenuHelper::CheckItem(hProgramMenu, IDM_TOOLBARS_LOCKTOOLBARS, m_config->lockToolbars);
+		m_config->showApplicationToolbar.get());
+	MenuHelper::CheckItem(hProgramMenu, IDM_TOOLBARS_LOCKTOOLBARS, m_config->lockToolbars.get());
 
 	auto &mainFont = m_config->mainFont.get();
 	MenuHelper::EnableItem(hProgramMenu, IDM_VIEW_DECREASE_TEXT_SIZE,

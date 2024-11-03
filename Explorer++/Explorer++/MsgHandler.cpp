@@ -712,50 +712,6 @@ void Explorerplusplus::OnFocusNextWindow(FocusChangeDirection direction)
 	}
 }
 
-void Explorerplusplus::OnLockToolbars()
-{
-	m_config->lockToolbars = !m_config->lockToolbars;
-
-	auto numBands = static_cast<UINT>(SendMessage(m_hMainRebar, RB_GETBANDCOUNT, 0, 0));
-
-	for (UINT i = 0; i < numBands; i++)
-	{
-		REBARBANDINFO bandInfo = {};
-		bandInfo.cbSize = sizeof(REBARBANDINFO);
-		bandInfo.fMask = RBBIM_STYLE;
-		auto res =
-			SendMessage(m_hMainRebar, RB_GETBANDINFO, i, reinterpret_cast<LPARAM>(&bandInfo));
-
-		if (!res)
-		{
-			DCHECK(false);
-			continue;
-		}
-
-		// Without this, the control won't correctly update once the gripper has been added or
-		// removed. That is, the control won't add or remove the space for the gripper. By toggling
-		// the RBBS_GRIPPERALWAYS style, adding or removing the gripper will work as expected. WTL
-		// also does this when toggling the gripper - see
-		// https://sourceforge.net/p/wtl/git/ci/faa1f28fb7fe9277532ed563101b489655b40131/tree/Include/atlctrls.h#l8604.
-		WI_SetFlag(bandInfo.fStyle, RBBS_GRIPPERALWAYS);
-		res = SendMessage(m_hMainRebar, RB_SETBANDINFO, i, reinterpret_cast<LPARAM>(&bandInfo));
-		DCHECK(res);
-		WI_ClearFlag(bandInfo.fStyle, RBBS_GRIPPERALWAYS);
-
-		if (m_config->lockToolbars)
-		{
-			WI_SetFlag(bandInfo.fStyle, RBBS_NOGRIPPER);
-		}
-		else
-		{
-			WI_ClearFlag(bandInfo.fStyle, RBBS_NOGRIPPER);
-		}
-
-		res = SendMessage(m_hMainRebar, RB_SETBANDINFO, i, reinterpret_cast<LPARAM>(&bandInfo));
-		DCHECK(res);
-	}
-}
-
 void Explorerplusplus::OnAppCommand(UINT cmd)
 {
 	switch (cmd)
@@ -969,32 +925,6 @@ void Explorerplusplus::OnCloneWindow()
 		currentDirectory.c_str());
 
 	LaunchCurrentProcess(m_hContainer, szQuotedCurrentDirectory);
-}
-
-void Explorerplusplus::ShowMainRebarBand(HWND hwnd, BOOL bShow)
-{
-	REBARBANDINFO rbi;
-	LRESULT lResult;
-	UINT nBands;
-	UINT i = 0;
-
-	nBands = (UINT) SendMessage(m_hMainRebar, RB_GETBANDCOUNT, 0, 0);
-
-	for (i = 0; i < nBands; i++)
-	{
-		rbi.cbSize = sizeof(rbi);
-		rbi.fMask = RBBIM_CHILD;
-		lResult = SendMessage(m_hMainRebar, RB_GETBANDINFO, i, (LPARAM) &rbi);
-
-		if (lResult)
-		{
-			if (hwnd == rbi.hwndChild)
-			{
-				SendMessage(m_hMainRebar, RB_SHOWBAND, i, bShow);
-				break;
-			}
-		}
-	}
 }
 
 void Explorerplusplus::OnDisplayWindowRClick(POINT *ptClient)

@@ -43,6 +43,9 @@ void Explorerplusplus::CreateMainRebarAndChildren()
 	{
 		InsertMainRebarBand(band);
 	}
+
+	m_rebarConnections.push_back(m_config->lockToolbars.addObserver(
+		std::bind_front(&Explorerplusplus::OnLockToolbarsUpdated, this)));
 }
 
 std::vector<Explorerplusplus::InternalRebarBandInfo> Explorerplusplus::InitializeMainRebarBands()
@@ -51,28 +54,43 @@ std::vector<Explorerplusplus::InternalRebarBandInfo> Explorerplusplus::Initializ
 
 	CreateMainToolbar();
 	auto internalBandInfo = InitializeToolbarBand(REBAR_BAND_ID_MAIN_TOOLBAR,
-		m_mainToolbar->GetHWND(), m_config->showMainToolbar);
+		m_mainToolbar->GetHWND(), m_config->showMainToolbar.get());
 	mainRebarBands.push_back(internalBandInfo);
+
+	m_rebarConnections.push_back(m_config->showMainToolbar.addObserver(
+		std::bind_front(&Explorerplusplus::ShowMainRebarBand, this, m_mainToolbar->GetHWND())));
 
 	CreateAddressBar();
 	internalBandInfo = InitializeNonToolbarBand(REBAR_BAND_ID_ADDRESS_BAR, m_addressBar->GetHWND(),
-		m_config->showAddressBar);
+		m_config->showAddressBar.get());
 	mainRebarBands.push_back(internalBandInfo);
+
+	m_rebarConnections.push_back(m_config->showAddressBar.addObserver(
+		std::bind_front(&Explorerplusplus::ShowMainRebarBand, this, m_addressBar->GetHWND())));
 
 	CreateBookmarksToolbar();
 	internalBandInfo = InitializeToolbarBand(REBAR_BAND_ID_BOOKMARKS_TOOLBAR,
-		m_bookmarksToolbar->GetView()->GetHWND(), m_config->showBookmarksToolbar);
+		m_bookmarksToolbar->GetView()->GetHWND(), m_config->showBookmarksToolbar.get());
 	mainRebarBands.push_back(internalBandInfo);
+
+	m_rebarConnections.push_back(m_config->showBookmarksToolbar.addObserver(std::bind_front(
+		&Explorerplusplus::ShowMainRebarBand, this, m_bookmarksToolbar->GetView()->GetHWND())));
 
 	CreateDrivesToolbar();
 	internalBandInfo = InitializeToolbarBand(REBAR_BAND_ID_DRIVES_TOOLBAR,
-		m_drivesToolbar->GetView()->GetHWND(), m_config->showDrivesToolbar);
+		m_drivesToolbar->GetView()->GetHWND(), m_config->showDrivesToolbar.get());
 	mainRebarBands.push_back(internalBandInfo);
+
+	m_rebarConnections.push_back(m_config->showDrivesToolbar.addObserver(std::bind_front(
+		&Explorerplusplus::ShowMainRebarBand, this, m_drivesToolbar->GetView()->GetHWND())));
 
 	CreateApplicationToolbar();
 	internalBandInfo = InitializeToolbarBand(REBAR_BAND_ID_APPLICATIONS_TOOLBAR,
-		m_applicationToolbar->GetView()->GetHWND(), m_config->showApplicationToolbar);
+		m_applicationToolbar->GetView()->GetHWND(), m_config->showApplicationToolbar.get());
 	mainRebarBands.push_back(internalBandInfo);
+
+	m_rebarConnections.push_back(m_config->showApplicationToolbar.addObserver(std::bind_front(
+		&Explorerplusplus::ShowMainRebarBand, this, m_applicationToolbar->GetView()->GetHWND())));
 
 	UpdateMainRebarBandsFromLoadedInfo(mainRebarBands);
 
@@ -171,7 +189,7 @@ void Explorerplusplus::InsertMainRebarBand(const InternalRebarBandInfo &internal
 	bandInfo.cyMinChild = internalBandInfo.height;
 	bandInfo.cyChild = internalBandInfo.height;
 
-	if (m_config->lockToolbars)
+	if (m_config->lockToolbars.get())
 	{
 		WI_SetFlag(bandInfo.fStyle, RBBS_NOGRIPPER);
 	}
@@ -225,6 +243,10 @@ LRESULT Explorerplusplus::RebarSubclass(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 			return TRUE;
 		}
 		break;
+
+	case WM_DESTROY:
+		m_rebarConnections.clear();
+		break;
 	}
 
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
@@ -242,12 +264,14 @@ void Explorerplusplus::OnToolbarRClick(HWND sourceWindow)
 
 	HMENU menu = GetSubMenu(parentMenu.get(), 0);
 
-	MenuHelper::CheckItem(menu, IDM_TOOLBARS_ADDRESSBAR, m_config->showAddressBar);
-	MenuHelper::CheckItem(menu, IDM_TOOLBARS_MAINTOOLBAR, m_config->showMainToolbar);
-	MenuHelper::CheckItem(menu, IDM_TOOLBARS_BOOKMARKSTOOLBAR, m_config->showBookmarksToolbar);
-	MenuHelper::CheckItem(menu, IDM_TOOLBARS_DRIVES, m_config->showDrivesToolbar);
-	MenuHelper::CheckItem(menu, IDM_TOOLBARS_APPLICATIONTOOLBAR, m_config->showApplicationToolbar);
-	MenuHelper::CheckItem(menu, IDM_TOOLBARS_LOCKTOOLBARS, m_config->lockToolbars);
+	MenuHelper::CheckItem(menu, IDM_TOOLBARS_ADDRESSBAR, m_config->showAddressBar.get());
+	MenuHelper::CheckItem(menu, IDM_TOOLBARS_MAINTOOLBAR, m_config->showMainToolbar.get());
+	MenuHelper::CheckItem(menu, IDM_TOOLBARS_BOOKMARKSTOOLBAR,
+		m_config->showBookmarksToolbar.get());
+	MenuHelper::CheckItem(menu, IDM_TOOLBARS_DRIVES, m_config->showDrivesToolbar.get());
+	MenuHelper::CheckItem(menu, IDM_TOOLBARS_APPLICATIONTOOLBAR,
+		m_config->showApplicationToolbar.get());
+	MenuHelper::CheckItem(menu, IDM_TOOLBARS_LOCKTOOLBARS, m_config->lockToolbars.get());
 
 	DWORD dwPos = GetMessagePos();
 
@@ -294,7 +318,7 @@ void Explorerplusplus::OnToolbarMenuItemSelected(HWND sourceWindow, int menuItem
 		break;
 
 	case IDM_TOOLBARS_LOCKTOOLBARS:
-		OnLockToolbars();
+		OnToggleLockToolbars();
 		break;
 
 	case IDM_TOOLBARS_CUSTOMIZE:
@@ -309,37 +333,100 @@ void Explorerplusplus::OnToolbarMenuItemSelected(HWND sourceWindow, int menuItem
 
 void Explorerplusplus::OnToggleAddressBar()
 {
-	m_config->showAddressBar = !m_config->showAddressBar;
-	OnToggleToolbar(m_addressBar->GetHWND(), m_config->showAddressBar);
+	m_config->showAddressBar = !m_config->showAddressBar.get();
 }
 
 void Explorerplusplus::OnToggleMainToolbar()
 {
-	m_config->showMainToolbar = !m_config->showMainToolbar;
-	OnToggleToolbar(m_mainToolbar->GetHWND(), m_config->showMainToolbar);
+	m_config->showMainToolbar = !m_config->showMainToolbar.get();
 }
 
 void Explorerplusplus::OnToggleBookmarksToolbar()
 {
-	m_config->showBookmarksToolbar = !m_config->showBookmarksToolbar;
-	OnToggleToolbar(m_bookmarksToolbar->GetView()->GetHWND(), m_config->showBookmarksToolbar);
+	m_config->showBookmarksToolbar = !m_config->showBookmarksToolbar.get();
 }
 
 void Explorerplusplus::OnToggleDrivesToolbar()
 {
-	m_config->showDrivesToolbar = !m_config->showDrivesToolbar;
-	OnToggleToolbar(m_drivesToolbar->GetView()->GetHWND(), m_config->showDrivesToolbar);
+	m_config->showDrivesToolbar = !m_config->showDrivesToolbar.get();
 }
 
 void Explorerplusplus::OnToggleApplicationToolbar()
 {
-	m_config->showApplicationToolbar = !m_config->showApplicationToolbar;
-	OnToggleToolbar(m_applicationToolbar->GetView()->GetHWND(), m_config->showApplicationToolbar);
+	m_config->showApplicationToolbar = !m_config->showApplicationToolbar.get();
 }
 
-void Explorerplusplus::OnToggleToolbar(HWND toolbar, bool show)
+void Explorerplusplus::ShowMainRebarBand(HWND toolbar, bool show)
 {
-	ShowMainRebarBand(toolbar, show);
+	auto numBands = static_cast<UINT>(SendMessage(m_hMainRebar, RB_GETBANDCOUNT, 0, 0));
+
+	for (UINT i = 0; i < numBands; i++)
+	{
+		REBARBANDINFO bandInfo = {};
+		bandInfo.cbSize = sizeof(bandInfo);
+		bandInfo.fMask = RBBIM_CHILD;
+		auto res =
+			SendMessage(m_hMainRebar, RB_GETBANDINFO, i, reinterpret_cast<LPARAM>(&bandInfo));
+
+		if (!res)
+		{
+			DCHECK(false);
+			continue;
+		}
+
+		if (toolbar == bandInfo.hwndChild)
+		{
+			SendMessage(m_hMainRebar, RB_SHOWBAND, i, show);
+			break;
+		}
+	}
+}
+
+void Explorerplusplus::OnToggleLockToolbars()
+{
+	m_config->lockToolbars = !m_config->lockToolbars.get();
+}
+
+void Explorerplusplus::OnLockToolbarsUpdated(bool lock)
+{
+	auto numBands = static_cast<UINT>(SendMessage(m_hMainRebar, RB_GETBANDCOUNT, 0, 0));
+
+	for (UINT i = 0; i < numBands; i++)
+	{
+		REBARBANDINFO bandInfo = {};
+		bandInfo.cbSize = sizeof(REBARBANDINFO);
+		bandInfo.fMask = RBBIM_STYLE;
+		auto res =
+			SendMessage(m_hMainRebar, RB_GETBANDINFO, i, reinterpret_cast<LPARAM>(&bandInfo));
+
+		if (!res)
+		{
+			DCHECK(false);
+			continue;
+		}
+
+		// Without this, the control won't correctly update once the gripper has been added or
+		// removed. That is, the control won't add or remove the space for the gripper. By toggling
+		// the RBBS_GRIPPERALWAYS style, adding or removing the gripper will work as expected. WTL
+		// also does this when toggling the gripper - see
+		// https://sourceforge.net/p/wtl/git/ci/faa1f28fb7fe9277532ed563101b489655b40131/tree/Include/atlctrls.h#l8604.
+		WI_SetFlag(bandInfo.fStyle, RBBS_GRIPPERALWAYS);
+		res = SendMessage(m_hMainRebar, RB_SETBANDINFO, i, reinterpret_cast<LPARAM>(&bandInfo));
+		DCHECK(res);
+		WI_ClearFlag(bandInfo.fStyle, RBBS_GRIPPERALWAYS);
+
+		if (lock)
+		{
+			WI_SetFlag(bandInfo.fStyle, RBBS_NOGRIPPER);
+		}
+		else
+		{
+			WI_ClearFlag(bandInfo.fStyle, RBBS_NOGRIPPER);
+		}
+
+		res = SendMessage(m_hMainRebar, RB_SETBANDINFO, i, reinterpret_cast<LPARAM>(&bandInfo));
+		DCHECK(res);
+	}
 }
 
 void Explorerplusplus::OnCustomizeMainToolbar()

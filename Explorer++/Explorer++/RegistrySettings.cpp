@@ -104,14 +104,16 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 			m_config->globalFolderSettings.showExtensions);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowStatusBar"), m_config->showStatusBar);
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowFolders"), m_config->showFolders.get());
-		RegistrySettings::SaveDword(hSettingsKey, _T("ShowAddressBar"), m_config->showAddressBar);
-		RegistrySettings::SaveDword(hSettingsKey, _T("ShowToolbar"), m_config->showMainToolbar);
+		RegistrySettings::SaveDword(hSettingsKey, _T("ShowAddressBar"),
+			m_config->showAddressBar.get());
+		RegistrySettings::SaveDword(hSettingsKey, _T("ShowToolbar"),
+			m_config->showMainToolbar.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowBookmarksToolbar"),
-			m_config->showBookmarksToolbar);
+			m_config->showBookmarksToolbar.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowDrivesToolbar"),
-			m_config->showDrivesToolbar);
+			m_config->showDrivesToolbar.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowApplicationToolbar"),
-			m_config->showApplicationToolbar);
+			m_config->showApplicationToolbar.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("ShowFullTitlePath"),
 			m_config->showFullTitlePath.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("AlwaysOpenNewTab"),
@@ -134,7 +136,7 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 		RegistrySettings::SaveDword(hSettingsKey, _T("InfoTipType"), m_config->infoTipType);
 		RegistrySettings::SaveDword(hSettingsKey, _T("TreeViewDelayEnabled"),
 			m_config->treeViewDelayEnabled);
-		RegistrySettings::SaveDword(hSettingsKey, _T("LockToolbars"), m_config->lockToolbars);
+		RegistrySettings::SaveDword(hSettingsKey, _T("LockToolbars"), m_config->lockToolbars.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("ExtendTabControl"),
 			m_config->extendTabControl.get());
 		RegistrySettings::SaveDword(hSettingsKey, _T("UseFullRowSelect"),

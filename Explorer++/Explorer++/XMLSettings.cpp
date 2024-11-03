@@ -512,7 +512,7 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("LockToolbars"),
-		XMLSettings::EncodeBoolValue(m_config->lockToolbars));
+		XMLSettings::EncodeBoolValue(m_config->lockToolbars.get()));
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("NextToCurrent"),
 		XMLSettings::EncodeBoolValue(m_config->openNewTabNextToCurrent));
@@ -536,17 +536,17 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 		XMLSettings::EncodeIntValue(m_config->replaceExplorerMode));
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowAddressBar"),
-		XMLSettings::EncodeBoolValue(m_config->showAddressBar));
+		XMLSettings::EncodeBoolValue(m_config->showAddressBar.get()));
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"),
 		_T("ShowApplicationToolbar"),
-		XMLSettings::EncodeBoolValue(m_config->showApplicationToolbar));
+		XMLSettings::EncodeBoolValue(m_config->showApplicationToolbar.get()));
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowBookmarksToolbar"),
-		XMLSettings::EncodeBoolValue(m_config->showBookmarksToolbar));
+		XMLSettings::EncodeBoolValue(m_config->showBookmarksToolbar.get()));
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowDrivesToolbar"),
-		XMLSettings::EncodeBoolValue(m_config->showDrivesToolbar));
+		XMLSettings::EncodeBoolValue(m_config->showDrivesToolbar.get()));
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowDisplayWindow"),
 		XMLSettings::EncodeBoolValue(m_config->showDisplayWindow));
@@ -595,7 +595,7 @@ void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDO
 		XMLSettings::EncodeBoolValue(m_config->showTaskbarThumbnails));
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowToolbar"),
-		XMLSettings::EncodeBoolValue(m_config->showMainToolbar));
+		XMLSettings::EncodeBoolValue(m_config->showMainToolbar.get()));
 	XMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt.get(), pe.get());
 	XMLSettings::WriteStandardSetting(pXMLDom, pe.get(), _T("Setting"), _T("ShowUserNameTitleBar"),
 		XMLSettings::EncodeBoolValue(m_config->showUserNameInTitleBar.get()));

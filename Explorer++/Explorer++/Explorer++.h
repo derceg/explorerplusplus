@@ -244,7 +244,7 @@ private:
 	void OnPasteShortcut();
 	void OnWildcardSelect(BOOL bSelect);
 	void OnResolveLink();
-	void OnLockToolbars();
+	void OnToggleLockToolbars();
 	void OnChangeDisplayColors();
 	void OnFilterResults();
 	void OnSortBy(SortMode sortMode);
@@ -357,6 +357,8 @@ private:
 		const ToolbarContextMenuSelectedSignal::slot_type &observer) override;
 	HMENU CreateRebarHistoryMenu(BOOL bBack);
 	std::vector<RebarBandStorageInfo> GetMainRebarStorageInfo();
+	void ShowMainRebarBand(HWND toolbar, bool show);
+	void OnLockToolbarsUpdated(bool lock);
 
 	/* Main toolbar private message handlers. */
 	void OnToolbarRClick(HWND sourceWindow);
@@ -366,7 +368,6 @@ private:
 	void OnToggleBookmarksToolbar();
 	void OnToggleDrivesToolbar();
 	void OnToggleApplicationToolbar();
-	void OnToggleToolbar(HWND toolbar, bool show);
 	void OnCustomizeMainToolbar();
 
 	/* Settings. */
@@ -544,7 +545,6 @@ private:
 
 	/* Miscellaneous. */
 	void InitializeDisplayWindow();
-	void ShowMainRebarBand(HWND hwnd, BOOL bShow);
 	StatusBar *GetStatusBar() override;
 	void StartDirectoryMonitoringForTab(const Tab &tab);
 	void StopDirectoryMonitoringForTab(const Tab &tab);
@@ -674,6 +674,7 @@ private:
 
 	// Main rebar
 	std::vector<RebarBandStorageInfo> m_loadedRebarStorageInfo;
+	std::vector<boost::signals2::scoped_connection> m_rebarConnections;
 
 	/* Toolbars. */
 	MainToolbar *m_mainToolbar;

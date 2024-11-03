@@ -521,7 +521,7 @@ LRESULT Explorerplusplus::HandleMenuOrToolbarButtonOrAccelerator(HWND hwnd, int 
 		break;
 
 	case IDM_TOOLBARS_LOCKTOOLBARS:
-		OnLockToolbars();
+		OnToggleLockToolbars();
 		break;
 
 	case IDM_TOOLBARS_CUSTOMIZE:

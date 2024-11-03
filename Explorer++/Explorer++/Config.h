@@ -49,16 +49,9 @@ struct Config
 	const std::wstring defaultTabDirectoryStatic = GetComputerFolderPath();
 	bool dualPane = false;
 	BOOL showStatusBar = TRUE;
-	ValueWrapper<bool> showFolders = true;
-	BOOL showAddressBar = TRUE;
 	BOOL showDisplayWindow = TRUE;
-	BOOL showMainToolbar = TRUE;
-	BOOL showBookmarksToolbar = FALSE;
-	BOOL showDrivesToolbar = TRUE;
-	BOOL showApplicationToolbar = FALSE;
 	BOOL alwaysOpenNewTab = FALSE;
 	BOOL openNewTabNextToCurrent = FALSE;
-	BOOL lockToolbars = TRUE;
 	BOOL treeViewDelayEnabled = FALSE;
 	BOOL treeViewAutoExpandSelected = FALSE;
 	BOOL showTaskbarThumbnails = FALSE;
@@ -92,6 +85,15 @@ struct Config
 	ValueWrapper<BOOL> showFullTitlePath = FALSE;
 	ValueWrapper<BOOL> showUserNameInTitleBar = FALSE;
 	ValueWrapper<BOOL> showPrivilegeLevelInTitleBar = FALSE;
+
+	// Toolbar display settings
+	ValueWrapper<bool> showFolders = true;
+	ValueWrapper<bool> showAddressBar = true;
+	ValueWrapper<bool> showMainToolbar = true;
+	ValueWrapper<bool> showBookmarksToolbar = false;
+	ValueWrapper<bool> showDrivesToolbar = true;
+	ValueWrapper<bool> showApplicationToolbar = false;
+	ValueWrapper<bool> lockToolbars = true;
 
 	// Tabs
 	ValueWrapper<BOOL> alwaysShowTabBar = TRUE;
