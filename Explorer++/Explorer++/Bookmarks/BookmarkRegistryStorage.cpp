@@ -45,14 +45,12 @@ std::unique_ptr<BookmarkItem> LoadBookmarkItem(HKEY key, BookmarkTree *bookmarkT
 std::wstring BuildFullKeyPath(const std::wstring &applicationKeyPath,
 	const std::wstring &relativeKeyPath);
 
-void BookmarkRegistryStorage::Load(const std::wstring &applicationKeyPath,
-	BookmarkTree *bookmarkTree)
+void BookmarkRegistryStorage::Load(HKEY applicationKey, BookmarkTree *bookmarkTree)
 {
 	// The V2 key always takes precedence (i.e. it will be used even if the V1
 	// key exists).
 	wil::unique_hkey bookmarksKey;
-	std::wstring v2KeyPath = BuildFullKeyPath(applicationKeyPath, V2::bookmarksKeyPath);
-	LSTATUS res = RegOpenKeyEx(HKEY_CURRENT_USER, v2KeyPath.c_str(), 0, KEY_READ, &bookmarksKey);
+	LSTATUS res = RegOpenKeyEx(applicationKey, V2::bookmarksKeyPath, 0, KEY_READ, &bookmarksKey);
 
 	if (res == ERROR_SUCCESS)
 	{
@@ -60,8 +58,7 @@ void BookmarkRegistryStorage::Load(const std::wstring &applicationKeyPath,
 		return;
 	}
 
-	std::wstring v1KeyPath = BuildFullKeyPath(applicationKeyPath, V1::bookmarksKeyPath);
-	res = RegOpenKeyEx(HKEY_CURRENT_USER, v1KeyPath.c_str(), 0, KEY_READ, &bookmarksKey);
+	res = RegOpenKeyEx(applicationKey, V1::bookmarksKeyPath, 0, KEY_READ, &bookmarksKey);
 
 	if (res == ERROR_SUCCESS)
 	{
@@ -257,14 +254,12 @@ std::unique_ptr<BookmarkItem> V1::LoadBookmarkItem(HKEY key, BookmarkTree *bookm
 	return bookmarkItem;
 }
 
-void BookmarkRegistryStorage::Save(const std::wstring &applicationKeyPath,
-	BookmarkTree *bookmarkTree)
+void BookmarkRegistryStorage::Save(HKEY applicationKey, BookmarkTree *bookmarkTree)
 {
-	std::wstring v2KeyPath = BuildFullKeyPath(applicationKeyPath, V2::bookmarksKeyPath);
-	SHDeleteKey(HKEY_CURRENT_USER, v2KeyPath.c_str());
+	SHDeleteKey(applicationKey, V2::bookmarksKeyPath);
 
 	wil::unique_hkey bookmarksKey;
-	LSTATUS res = RegCreateKeyEx(HKEY_CURRENT_USER, v2KeyPath.c_str(), 0, nullptr,
+	LSTATUS res = RegCreateKeyEx(applicationKey, V2::bookmarksKeyPath, 0, nullptr,
 		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &bookmarksKey, nullptr);
 
 	if (res == ERROR_SUCCESS)

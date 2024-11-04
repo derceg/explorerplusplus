@@ -35,6 +35,7 @@ private:
 
 	void Initialize();
 	void OnBrowserRemoved();
+	void LoadSettings();
 
 	const CommandLine::Settings *const m_commandLineSettings;
 	FeatureList m_featureList;

@@ -730,6 +730,18 @@
     <ClCompile Include="ModelessDialogHelper.cpp">
       <Filter>Dialog Support</Filter>
     </ClCompile>
+    <ClCompile Include="RegistryAppStorage.cpp">
+      <Filter>Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="XmlAppStorage.cpp">
+      <Filter>Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="RegistryAppStorageFactory.cpp">
+      <Filter>Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="XmlAppStorageFactory.cpp">
+      <Filter>Storage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bookmarks\BookmarkHelper.h">
@@ -1506,6 +1518,21 @@
     <ClInclude Include="ModelessDialogHelper.h">
       <Filter>Dialog Support</Filter>
     </ClInclude>
+    <ClInclude Include="RegistryAppStorage.h">
+      <Filter>Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="XmlAppStorage.h">
+      <Filter>Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="RegistryAppStorageFactory.h">
+      <Filter>Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="XmlAppStorageFactory.h">
+      <Filter>Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="AppStorage.h">
+      <Filter>Storage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -1673,6 +1700,9 @@
     </Filter>
     <Filter Include="Async\Executors">
       <UniqueIdentifier>{931447cd-9040-4f5c-9726-28d9d840b1e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Storage">
+      <UniqueIdentifier>{14059d93-4cf2-4298-9adb-4545937a7534}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

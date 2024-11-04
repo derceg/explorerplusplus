@@ -4,8 +4,14 @@
 
 #include "stdafx.h"
 #include "App.h"
+#include "Bookmarks/BookmarkTreeFactory.h"
 #include "DefaultAccelerators.h"
 #include "ExitCode.h"
+#include "Explorer++_internal.h"
+#include "RegistryAppStorage.h"
+#include "RegistryAppStorageFactory.h"
+#include "XmlAppStorage.h"
+#include "XmlAppStorageFactory.h"
 #include "../Helper/Helper.h"
 
 App::App(const CommandLine::Settings *commandLineSettings) :
@@ -33,6 +39,8 @@ void App::Initialize()
 	CHECK(res);
 
 	m_browserList.browserRemovedSignal.AddObserver(std::bind_front(&App::OnBrowserRemoved, this));
+
+	LoadSettings();
 }
 
 void App::OnBrowserRemoved()
@@ -42,6 +50,28 @@ void App::OnBrowserRemoved()
 		// The last top-level browser window has been closed, so exit the application.
 		PostQuitMessage(EXIT_CODE_NORMAL);
 	}
+}
+
+void App::LoadSettings()
+{
+	BOOL loadSettingsFromXML = TestConfigFileInternal();
+	std::unique_ptr<AppStorage> appStorage;
+
+	if (loadSettingsFromXML)
+	{
+		appStorage = XmlAppStorageFactory::MaybeCreate();
+	}
+	else
+	{
+		appStorage = RegistryAppStorageFactory::MaybeCreate();
+	}
+
+	if (!appStorage)
+	{
+		return;
+	}
+
+	appStorage->LoadBookmarks(BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
 }
 
 const CommandLine::Settings *App::GetCommandLineSettings() const

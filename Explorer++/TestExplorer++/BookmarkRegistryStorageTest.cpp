@@ -20,7 +20,7 @@ protected:
 		ImportRegistryResource(filename);
 
 		BookmarkTree loadedBookmarkTree;
-		BookmarkRegistryStorage::Load(APPLICATION_TEST_KEY, &loadedBookmarkTree);
+		BookmarkRegistryStorage::Load(m_applicationTestKey.get(), &loadedBookmarkTree);
 
 		CompareBookmarkTrees(&loadedBookmarkTree, referenceBookmarkTree, compareGuids);
 	}
@@ -39,10 +39,10 @@ TEST_F(BookmarkRegistryStorageTest, V2Save)
 	BookmarkTree referenceBookmarkTree;
 	BuildV2LoadSaveReferenceTree(&referenceBookmarkTree);
 
-	BookmarkRegistryStorage::Save(APPLICATION_TEST_KEY, &referenceBookmarkTree);
+	BookmarkRegistryStorage::Save(m_applicationTestKey.get(), &referenceBookmarkTree);
 
 	BookmarkTree loadedBookmarkTree;
-	BookmarkRegistryStorage::Load(APPLICATION_TEST_KEY, &loadedBookmarkTree);
+	BookmarkRegistryStorage::Load(m_applicationTestKey.get(), &loadedBookmarkTree);
 
 	CompareBookmarkTrees(&loadedBookmarkTree, &referenceBookmarkTree, true);
 }

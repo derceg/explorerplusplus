@@ -1032,6 +1032,8 @@
     <ClCompile Include="BrowserTracker.cpp" />
     <ClCompile Include="ModelessDialogHelper.cpp" />
     <ClCompile Include="ModelessDialogList.cpp" />
+    <ClCompile Include="RegistryAppStorage.cpp" />
+    <ClCompile Include="RegistryAppStorageFactory.cpp" />
     <ClCompile Include="Runtime.cpp" />
     <ClCompile Include="RuntimeHelper.cpp" />
     <ClCompile Include="StartupCommandLineProcessor.cpp" />
@@ -1250,6 +1252,8 @@
     <ClCompile Include="WindowHandler.cpp" />
     <ClCompile Include="WindowOptionsPage.cpp" />
     <ClCompile Include="WinMain.cpp" />
+    <ClCompile Include="XmlAppStorage.cpp" />
+    <ClCompile Include="XmlAppStorageFactory.cpp" />
     <ClCompile Include="XMLSettings.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -1259,6 +1263,7 @@
     <ClInclude Include="AcceleratorManager.h" />
     <ClInclude Include="AcceleratorMappings.h" />
     <ClInclude Include="App.h" />
+    <ClInclude Include="AppStorage.h" />
     <ClInclude Include="ComStaThreadPoolExecutor.h" />
     <ClInclude Include="DefaultAccelerators.h" />
     <ClInclude Include="AdvancedOptionsPage.h" />
@@ -1311,6 +1316,8 @@
     <ClInclude Include="BrowserTracker.h" />
     <ClInclude Include="ModelessDialogHelper.h" />
     <ClInclude Include="ModelessDialogList.h" />
+    <ClInclude Include="RegistryAppStorage.h" />
+    <ClInclude Include="RegistryAppStorageFactory.h" />
     <ClInclude Include="Runtime.h" />
     <ClInclude Include="RuntimeHelper.h" />
     <ClInclude Include="ShellChangeNotificationType.h" />
@@ -1510,6 +1517,8 @@
     <ClInclude Include="WildcardSelectDialog.h" />
     <ClInclude Include="Win32ResourceLoader.h" />
     <ClInclude Include="WindowOptionsPage.h" />
+    <ClInclude Include="XmlAppStorage.h" />
+    <ClInclude Include="XmlAppStorageFactory.h" />
     <ClInclude Include="XMLSettings.h" />
   </ItemGroup>
   <ItemGroup>

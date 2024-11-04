@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <wil/com.h>
 #include <MsXml2.h>
 #include <gdiplus.h>
 #include <objbase.h>
@@ -12,7 +13,7 @@
 namespace XMLSettings
 {
 
-IXMLDOMDocument *DomFromCOM();
+wil::com_ptr_nothrow<IXMLDOMDocument> CreateXmlDocument();
 void WriteStandardSetting(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pGrandparentNode,
 	const TCHAR *szElementName, const TCHAR *szAttributeName, const TCHAR *szAttributeValue);
 VARIANT VariantString(const WCHAR *str);

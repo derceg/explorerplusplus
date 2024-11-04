@@ -127,8 +127,7 @@ unsigned long hash_setting(unsigned char *str);
 
 BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl)
 {
-	wil::com_ptr_nothrow<IXMLDOMDocument> pXMLDom;
-	pXMLDom.attach(XMLSettings::DomFromCOM());
+	auto pXMLDom = XMLSettings::CreateXmlDocument();
 
 	if (!pXMLDom)
 	{
@@ -242,8 +241,7 @@ BOOL LoadAllowMultipleInstancesFromXML()
 {
 	BOOL bAllowMultipleInstances = TRUE;
 
-	wil::com_ptr_nothrow<IXMLDOMDocument> pXMLDom;
-	pXMLDom.attach(XMLSettings::DomFromCOM());
+	auto pXMLDom = XMLSettings::CreateXmlDocument();
 
 	if (!pXMLDom)
 	{

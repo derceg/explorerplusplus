@@ -26,12 +26,6 @@ void LoadSaveRegistry::LoadGenericSettings()
 	m_pContainer->LoadGenericSettingsFromRegistry();
 }
 
-void LoadSaveRegistry::LoadBookmarks()
-{
-	BookmarkRegistryStorage::Load(NExplorerplusplus::REG_MAIN_KEY,
-		BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
-}
-
 void LoadSaveRegistry::LoadPreviousTabs()
 {
 	m_pContainer->LoadTabSettingsFromRegistry();
@@ -78,8 +72,15 @@ void LoadSaveRegistry::SaveGenericSettings()
 
 void LoadSaveRegistry::SaveBookmarks()
 {
-	BookmarkRegistryStorage::Save(NExplorerplusplus::REG_MAIN_KEY,
-		BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
+	wil::unique_hkey mainKey;
+	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER,
+		NExplorerplusplus::REG_MAIN_KEY, mainKey, wil::reg::key_access::readwrite);
+
+	if (SUCCEEDED(hr))
+	{
+		BookmarkRegistryStorage::Save(mainKey.get(),
+			BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
+	}
 }
 
 void LoadSaveRegistry::SaveTabs()

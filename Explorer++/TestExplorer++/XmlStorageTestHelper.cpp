@@ -8,8 +8,7 @@
 
 wil::com_ptr_nothrow<IXMLDOMDocument> XmlStorageTest::LoadXmlDocument(const std::wstring &filePath)
 {
-	wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument;
-	xmlDocument.attach(XMLSettings::DomFromCOM());
+	auto xmlDocument = XMLSettings::CreateXmlDocument();
 
 	if (!xmlDocument)
 	{
@@ -17,8 +16,8 @@ wil::com_ptr_nothrow<IXMLDOMDocument> XmlStorageTest::LoadXmlDocument(const std:
 	}
 
 	VARIANT_BOOL status;
-	VARIANT variantFilePath = XMLSettings::VariantString(filePath.c_str());
-	xmlDocument->load(variantFilePath, &status);
+	auto filePathVariant = wil::make_variant_bstr_failfast(filePath.c_str());
+	xmlDocument->load(filePathVariant, &status);
 
 	if (status != VARIANT_TRUE)
 	{
@@ -30,8 +29,7 @@ wil::com_ptr_nothrow<IXMLDOMDocument> XmlStorageTest::LoadXmlDocument(const std:
 
 std::optional<XmlStorageTest::XmlDocumentData> XmlStorageTest::CreateXmlDocument()
 {
-	wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument;
-	xmlDocument.attach(XMLSettings::DomFromCOM());
+	auto xmlDocument = XMLSettings::CreateXmlDocument();
 
 	if (!xmlDocument)
 	{

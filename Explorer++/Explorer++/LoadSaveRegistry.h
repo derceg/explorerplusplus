@@ -15,7 +15,6 @@ public:
 
 	/* Loading functions. */
 	void LoadGenericSettings() override;
-	void LoadBookmarks() override;
 	void LoadPreviousTabs() override;
 	void LoadDefaultColumns() override;
 	void LoadApplicationToolbar() override;

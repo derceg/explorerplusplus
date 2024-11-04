@@ -18,22 +18,23 @@
 static const TCHAR BOOL_YES[] = _T("yes");
 static const TCHAR BOOL_NO[] = _T("no");
 
-/* Helper function to create a DOM instance. */
-IXMLDOMDocument *XMLSettings::DomFromCOM()
+wil::com_ptr_nothrow<IXMLDOMDocument> XMLSettings::CreateXmlDocument()
 {
-	IXMLDOMDocument *pxmldoc = nullptr;
-	HRESULT hr = CoCreateInstance(__uuidof(DOMDocument30), nullptr, CLSCTX_INPROC_SERVER,
-		__uuidof(IXMLDOMDocument), reinterpret_cast<LPVOID *>(&pxmldoc));
+	wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument;
+	HRESULT hr = CoCreateInstance(CLSID_DOMDocument30, nullptr, CLSCTX_INPROC_SERVER,
+		IID_PPV_ARGS(&xmlDocument));
 
-	if (SUCCEEDED(hr))
+	if (FAILED(hr))
 	{
-		pxmldoc->put_async(VARIANT_FALSE);
-		pxmldoc->put_validateOnParse(VARIANT_FALSE);
-		pxmldoc->put_resolveExternals(VARIANT_FALSE);
-		pxmldoc->put_preserveWhiteSpace(VARIANT_TRUE);
+		return nullptr;
 	}
 
-	return pxmldoc;
+	xmlDocument->put_async(VARIANT_FALSE);
+	xmlDocument->put_validateOnParse(VARIANT_FALSE);
+	xmlDocument->put_resolveExternals(VARIANT_FALSE);
+	xmlDocument->put_preserveWhiteSpace(VARIANT_TRUE);
+
+	return xmlDocument;
 }
 
 void XMLSettings::WriteStandardSetting(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pGrandparentNode,

@@ -48,7 +48,7 @@ LoadSaveXML::~LoadSaveXML()
 
 void LoadSaveXML::InitializeLoadEnvironment()
 {
-	m_pXMLDom.attach(XMLSettings::DomFromCOM());
+	m_pXMLDom = XMLSettings::CreateXmlDocument();
 
 	if (!m_pXMLDom)
 	{
@@ -72,7 +72,7 @@ void LoadSaveXML::InitializeLoadEnvironment()
 
 void LoadSaveXML::InitializeSaveEnvironment()
 {
-	m_pXMLDom.attach(XMLSettings::DomFromCOM());
+	m_pXMLDom = XMLSettings::CreateXmlDocument();
 
 	if (!m_pXMLDom)
 	{
@@ -130,12 +130,6 @@ void LoadSaveXML::ReleaseSaveEnvironment()
 void LoadSaveXML::LoadGenericSettings()
 {
 	m_pContainer->LoadGenericSettingsFromXML(m_pXMLDom.get());
-}
-
-void LoadSaveXML::LoadBookmarks()
-{
-	BookmarkXmlStorage::Load(m_pXMLDom.get(),
-		BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
 }
 
 void LoadSaveXML::LoadPreviousTabs()

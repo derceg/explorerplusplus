@@ -100,7 +100,6 @@ void Explorerplusplus::LoadAllSettings()
 		loadSave = std::make_unique<LoadSaveRegistry>(this);
 	}
 
-	loadSave->LoadBookmarks();
 	loadSave->LoadGenericSettings();
 	loadSave->LoadPreviousTabs();
 	loadSave->LoadDefaultColumns();
