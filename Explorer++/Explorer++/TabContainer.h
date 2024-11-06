@@ -22,6 +22,7 @@
 #include <optional>
 #include <unordered_map>
 
+class App;
 class BookmarkTree;
 class CachedIcons;
 struct Config;
@@ -82,7 +83,7 @@ class TabContainer : public ShellDropTargetWindow<int>
 {
 public:
 	static TabContainer *Create(HWND parent, ShellBrowserEmbedder *embedder,
-		TabNavigationInterface *tabNavigation, CoreInterface *coreInterface,
+		TabNavigationInterface *tabNavigation, App *app, CoreInterface *coreInterface,
 		FileActionHandler *fileActionHandler, CachedIcons *cachedIcons, BookmarkTree *bookmarkTree,
 		HINSTANCE resourceInstance, const Config *config);
 
@@ -169,7 +170,7 @@ private:
 	static const LONG DROP_SCROLL_MARGIN_X_96DPI = 40;
 
 	TabContainer(HWND parent, ShellBrowserEmbedder *embedder, TabNavigationInterface *tabNavigation,
-		CoreInterface *coreInterface, FileActionHandler *fileActionHandler,
+		App *app, CoreInterface *coreInterface, FileActionHandler *fileActionHandler,
 		CachedIcons *cachedIcons, BookmarkTree *bookmarkTree, HINSTANCE resourceInstance,
 		const Config *config);
 
@@ -245,6 +246,10 @@ private:
 	void OnFontUpdated();
 
 	ShellBrowserEmbedder *m_embedder = nullptr;
+	TabNavigationInterface *m_tabNavigation;
+	App *const m_app;
+	CoreInterface *m_coreInterface;
+	FileActionHandler *m_fileActionHandler;
 
 	MainFontSetter m_fontSetter;
 	MainFontSetter m_tooltipFontSetter;
@@ -259,10 +264,6 @@ private:
 	int m_defaultFolderIconSystemImageListIndex;
 	int m_defaultFolderIconIndex;
 	int m_tabIconLockIndex;
-
-	TabNavigationInterface *m_tabNavigation;
-	CoreInterface *m_coreInterface;
-	FileActionHandler *m_fileActionHandler;
 
 	HINSTANCE m_resourceInstance;
 	const Config *const m_config;

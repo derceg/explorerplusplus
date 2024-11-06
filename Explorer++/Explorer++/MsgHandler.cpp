@@ -89,7 +89,7 @@ void Explorerplusplus::LoadAllSettings()
 	methods to be different. */
 	if (m_bLoadSettingsFromXML)
 	{
-		loadSave = std::make_unique<LoadSaveXML>(this, TRUE);
+		loadSave = std::make_unique<LoadSaveXML>(m_app, this, TRUE);
 
 		/* When loading from the config file, also
 		set the option to save back to it on exit. */
@@ -97,7 +97,7 @@ void Explorerplusplus::LoadAllSettings()
 	}
 	else
 	{
-		loadSave = std::make_unique<LoadSaveRegistry>(this);
+		loadSave = std::make_unique<LoadSaveRegistry>(m_app, this);
 	}
 
 	loadSave->LoadGenericSettings();
@@ -1011,11 +1011,11 @@ void Explorerplusplus::SaveAllSettings()
 
 	if (m_bSavePreferencesToXMLFile)
 	{
-		loadSave = std::make_unique<LoadSaveXML>(this, FALSE);
+		loadSave = std::make_unique<LoadSaveXML>(m_app, this, FALSE);
 	}
 	else
 	{
-		loadSave = std::make_unique<LoadSaveRegistry>(this);
+		loadSave = std::make_unique<LoadSaveRegistry>(m_app, this);
 	}
 
 	loadSave->SaveGenericSettings();

@@ -6,7 +6,6 @@
 #include "Explorer++.h"
 #include "AboutDialog.h"
 #include "App.h"
-#include "ColorRuleModelFactory.h"
 #include "Config.h"
 #include "CustomizeColorsDialog.h"
 #include "DestroyFilesDialog.h"
@@ -118,7 +117,7 @@ void Explorerplusplus::OnSearch()
 void Explorerplusplus::OnCustomizeColors()
 {
 	CustomizeColorsDialog customizeColorsDialog(m_resourceInstance, m_hContainer, this,
-		ColorRuleModelFactory::GetInstance()->GetColorRuleModel());
+		m_app->GetColorRuleModel());
 	customizeColorsDialog.ShowModalDialog();
 }
 

@@ -540,9 +540,6 @@ private:
 	static bool ShouldEnableDarkMode(Theme theme);
 	void OnThemeUpdated(Theme theme);
 
-	// Customize colors
-	void InitializeDefaultColorRules();
-
 	/* Miscellaneous. */
 	void InitializeDisplayWindow();
 	StatusBar *GetStatusBar() override;

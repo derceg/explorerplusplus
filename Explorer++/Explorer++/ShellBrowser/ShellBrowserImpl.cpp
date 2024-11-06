@@ -4,9 +4,9 @@
 
 #include "stdafx.h"
 #include "ShellBrowserImpl.h"
+#include "App.h"
 #include "ClipboardOperations.h"
 #include "ColorRuleModel.h"
-#include "ColorRuleModelFactory.h"
 #include "Config.h"
 #include "CoreInterface.h"
 #include "FolderView.h"
@@ -36,43 +36,45 @@
 void CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 
 std::shared_ptr<ShellBrowserImpl> ShellBrowserImpl::CreateNew(HWND hOwner,
-	ShellBrowserEmbedder *embedder, CoreInterface *coreInterface,
+	ShellBrowserEmbedder *embedder, App *app, CoreInterface *coreInterface,
 	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 	const FolderSettings &folderSettings, const FolderColumns *initialColumns)
 {
-	return std::shared_ptr<ShellBrowserImpl>(new ShellBrowserImpl(hOwner, embedder, coreInterface,
-		tabNavigation, fileActionHandler, folderSettings, initialColumns));
+	return std::shared_ptr<ShellBrowserImpl>(new ShellBrowserImpl(hOwner, embedder, app,
+		coreInterface, tabNavigation, fileActionHandler, folderSettings, initialColumns));
 }
 
 std::shared_ptr<ShellBrowserImpl> ShellBrowserImpl::CreateFromPreserved(HWND hOwner,
-	ShellBrowserEmbedder *embedder, CoreInterface *coreInterface,
+	ShellBrowserEmbedder *embedder, App *app, CoreInterface *coreInterface,
 	TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState)
 {
-	return std::shared_ptr<ShellBrowserImpl>(new ShellBrowserImpl(hOwner, embedder, coreInterface,
-		tabNavigation, fileActionHandler, history, currentEntry, preservedFolderState));
+	return std::shared_ptr<ShellBrowserImpl>(
+		new ShellBrowserImpl(hOwner, embedder, app, coreInterface, tabNavigation, fileActionHandler,
+			history, currentEntry, preservedFolderState));
 }
 
-ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder,
+ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, App *app,
 	CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
 	FileActionHandler *fileActionHandler,
 	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 	const PreservedFolderState &preservedFolderState) :
-	ShellBrowserImpl(hOwner, embedder, coreInterface, tabNavigation, fileActionHandler,
+	ShellBrowserImpl(hOwner, embedder, app, coreInterface, tabNavigation, fileActionHandler,
 		preservedFolderState.folderSettings, nullptr)
 {
 	m_navigationController = std::make_unique<ShellNavigationController>(this, tabNavigation,
 		m_iconFetcher.get(), history, currentEntry);
 }
 
-ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder,
+ShellBrowserImpl::ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, App *app,
 	CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
 	FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
 	const FolderColumns *initialColumns) :
 	ShellDropTargetWindow(CreateListView(hOwner)),
 	m_hListView(GetHWND()),
 	m_hOwner(hOwner),
+	m_app(app),
 	m_tabNavigation(tabNavigation),
 	m_fileActionHandler(fileActionHandler),
 	m_fontSetter(GetHWND(), coreInterface->GetConfig()),
@@ -214,21 +216,16 @@ void ShellBrowserImpl::InitializeListView()
 	m_windowSubclasses.push_back(std::make_unique<WindowSubclassWrapper>(GetParent(m_hListView),
 		std::bind_front(&ShellBrowserImpl::ListViewParentProc, this)));
 
-	m_connections.push_back(
-		ColorRuleModelFactory::GetInstance()->GetColorRuleModel()->AddItemAddedObserver(
-			std::bind(&ShellBrowserImpl::OnColorRulesUpdated, this)));
-	m_connections.push_back(
-		ColorRuleModelFactory::GetInstance()->GetColorRuleModel()->AddItemUpdatedObserver(
-			std::bind(&ShellBrowserImpl::OnColorRulesUpdated, this)));
-	m_connections.push_back(
-		ColorRuleModelFactory::GetInstance()->GetColorRuleModel()->AddItemMovedObserver(
-			std::bind(&ShellBrowserImpl::OnColorRulesUpdated, this)));
-	m_connections.push_back(
-		ColorRuleModelFactory::GetInstance()->GetColorRuleModel()->AddItemRemovedObserver(
-			std::bind(&ShellBrowserImpl::OnColorRulesUpdated, this)));
-	m_connections.push_back(
-		ColorRuleModelFactory::GetInstance()->GetColorRuleModel()->AddAllItemsRemovedObserver(
-			std::bind(&ShellBrowserImpl::OnColorRulesUpdated, this)));
+	m_connections.push_back(m_app->GetColorRuleModel()->AddItemAddedObserver(
+		std::bind(&ShellBrowserImpl::OnColorRulesUpdated, this)));
+	m_connections.push_back(m_app->GetColorRuleModel()->AddItemUpdatedObserver(
+		std::bind(&ShellBrowserImpl::OnColorRulesUpdated, this)));
+	m_connections.push_back(m_app->GetColorRuleModel()->AddItemMovedObserver(
+		std::bind(&ShellBrowserImpl::OnColorRulesUpdated, this)));
+	m_connections.push_back(m_app->GetColorRuleModel()->AddItemRemovedObserver(
+		std::bind(&ShellBrowserImpl::OnColorRulesUpdated, this)));
+	m_connections.push_back(m_app->GetColorRuleModel()->AddAllItemsRemovedObserver(
+		std::bind(&ShellBrowserImpl::OnColorRulesUpdated, this)));
 
 	if (m_folderSettings.showInGroups)
 	{

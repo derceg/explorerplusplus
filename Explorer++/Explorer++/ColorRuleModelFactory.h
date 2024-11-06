@@ -11,15 +11,6 @@ class ColorRuleModel;
 class ColorRuleModelFactory
 {
 public:
-	static ColorRuleModelFactory *GetInstance();
-
-	ColorRuleModel *GetColorRuleModel();
-
-private:
-	ColorRuleModelFactory() = default;
-	~ColorRuleModelFactory();
-
-	static inline ColorRuleModelFactory *m_staticInstance = nullptr;
-
-	std::unique_ptr<ColorRuleModel> m_colorRuleModel;
+	// Creates a color rule model, initialized with the default set of color rules.
+	static std::unique_ptr<ColorRuleModel> Create();
 };

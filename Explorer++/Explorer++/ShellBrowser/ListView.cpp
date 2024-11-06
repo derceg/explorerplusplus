@@ -4,8 +4,8 @@
 
 #include "stdafx.h"
 #include "ShellBrowserImpl.h"
+#include "App.h"
 #include "ColorRuleModel.h"
-#include "ColorRuleModelFactory.h"
 #include "Config.h"
 #include "IconFetcher.h"
 #include "ItemData.h"
@@ -1298,8 +1298,7 @@ LRESULT ShellBrowserImpl::OnListViewCustomDraw(NMLVCUSTOMDRAW *listViewCustomDra
 		const auto &itemInfo =
 			GetItemByIndex(static_cast<int>(listViewCustomDraw->nmcd.dwItemSpec));
 
-		for (const auto &colorRule :
-			ColorRuleModelFactory::GetInstance()->GetColorRuleModel()->GetItems())
+		for (const auto &colorRule : m_app->GetColorRuleModel()->GetItems())
 		{
 			bool matchedFileName = false;
 			bool matchedAttributes = false;

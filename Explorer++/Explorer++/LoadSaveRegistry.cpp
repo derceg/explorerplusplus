@@ -7,17 +7,19 @@
 // clang-format off
 #include "Explorer++.h"
 // clang-format on
+#include "App.h"
 #include "ApplicationModelFactory.h"
 #include "ApplicationToolbarRegistryStorage.h"
 #include "Bookmarks/BookmarkRegistryStorage.h"
 #include "Bookmarks/BookmarkTreeFactory.h"
-#include "ColorRuleModelFactory.h"
 #include "ColorRuleRegistryStorage.h"
 #include "DialogHelper.h"
 #include "Explorer++_internal.h"
 #include <wil/registry.h>
 
-LoadSaveRegistry::LoadSaveRegistry(Explorerplusplus *pContainer) : m_pContainer(pContainer)
+LoadSaveRegistry::LoadSaveRegistry(App *app, Explorerplusplus *pContainer) :
+	m_app(app),
+	m_pContainer(pContainer)
 {
 }
 
@@ -56,8 +58,7 @@ void LoadSaveRegistry::LoadMainRebarInformation()
 
 void LoadSaveRegistry::LoadColorRules()
 {
-	ColorRuleRegistryStorage::Load(NExplorerplusplus::REG_MAIN_KEY,
-		ColorRuleModelFactory::GetInstance()->GetColorRuleModel());
+	ColorRuleRegistryStorage::Load(NExplorerplusplus::REG_MAIN_KEY, m_app->GetColorRuleModel());
 }
 
 void LoadSaveRegistry::LoadDialogStates()
@@ -113,8 +114,7 @@ void LoadSaveRegistry::SaveMainRebarInformation()
 
 void LoadSaveRegistry::SaveColorRules()
 {
-	ColorRuleRegistryStorage::Save(NExplorerplusplus::REG_MAIN_KEY,
-		ColorRuleModelFactory::GetInstance()->GetColorRuleModel());
+	ColorRuleRegistryStorage::Save(NExplorerplusplus::REG_MAIN_KEY, m_app->GetColorRuleModel());
 }
 
 void LoadSaveRegistry::SaveDialogStates()

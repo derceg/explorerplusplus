@@ -7,9 +7,6 @@
 #include "App.h"
 #include "Bookmarks/BookmarkTreeFactory.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
-#include "ColorRule.h"
-#include "ColorRuleModel.h"
-#include "ColorRuleModelFactory.h"
 #include "Config.h"
 #include "DarkModeHelper.h"
 #include "DisplayWindow/DisplayWindow.h"
@@ -33,8 +30,6 @@
 
 void Explorerplusplus::Initialize()
 {
-	InitializeDefaultColorRules();
-
 	LoadAllSettings();
 
 	if (m_app->GetCommandLineSettings()->shellChangeNotificationType)
@@ -101,19 +96,6 @@ void Explorerplusplus::Initialize()
 
 	m_applicationInitialized = true;
 	m_applicationInitializedSignal();
-}
-
-void Explorerplusplus::InitializeDefaultColorRules()
-{
-	auto *colorRuleModel = ColorRuleModelFactory::GetInstance()->GetColorRuleModel();
-
-	colorRuleModel->AddItem(std::make_unique<ColorRule>(
-		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_GENERAL_COLOR_RULE_COMPRESSED),
-		L"", false, FILE_ATTRIBUTE_COMPRESSED, RGB(0, 116, 232)));
-
-	colorRuleModel->AddItem(std::make_unique<ColorRule>(
-		ResourceHelper::LoadString(GetModuleHandle(nullptr), IDS_GENERAL_COLOR_RULE_ENCRYPTED), L"",
-		false, FILE_ATTRIBUTE_ENCRYPTED, RGB(0, 128, 0)));
 }
 
 void Explorerplusplus::InitializeDisplayWindow()

@@ -9,12 +9,13 @@
 #include <MsXml2.h>
 #include <objbase.h>
 
+class App;
 class Explorerplusplus;
 
 class LoadSaveXML : public ILoadSave
 {
 public:
-	LoadSaveXML(Explorerplusplus *pContainer, BOOL bLoad);
+	LoadSaveXML(App *app, Explorerplusplus *pContainer, BOOL bLoad);
 	~LoadSaveXML();
 
 	/* Loading functions. */
@@ -42,6 +43,7 @@ private:
 	void InitializeSaveEnvironment();
 	void ReleaseSaveEnvironment();
 
+	App *const m_app;
 	Explorerplusplus *m_pContainer;
 	BOOL m_bLoad;
 

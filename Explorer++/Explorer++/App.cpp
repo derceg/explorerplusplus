@@ -5,6 +5,8 @@
 #include "stdafx.h"
 #include "App.h"
 #include "Bookmarks/BookmarkTreeFactory.h"
+#include "ColorRuleModel.h"
+#include "ColorRuleModelFactory.h"
 #include "DefaultAccelerators.h"
 #include "ExitCode.h"
 #include "Explorer++_internal.h"
@@ -19,6 +21,7 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 	m_featureList(commandLineSettings->featuresToEnable),
 	m_acceleratorManager(InitializeAcceleratorManager()),
 	m_cachedIcons(MAX_CACHED_ICONS),
+	m_colorRuleModel(ColorRuleModelFactory::Create()),
 	m_uniqueGdiplusShutdown(CheckedGdiplusStartup()),
 	m_richEditLib(LoadSystemLibrary(
 		L"Msftedit.dll")), // This is needed for version 5 of the Rich Edit control.
@@ -28,6 +31,8 @@ App::App(const CommandLine::Settings *commandLineSettings) :
 
 	Initialize();
 }
+
+App::~App() = default;
 
 void App::Initialize()
 {
@@ -107,4 +112,9 @@ BrowserList *App::GetBrowserList()
 ModelessDialogList *App::GetModelessDialogList()
 {
 	return &m_modelessDialogList;
+}
+
+ColorRuleModel *App::GetColorRuleModel() const
+{
+	return m_colorRuleModel.get();
 }

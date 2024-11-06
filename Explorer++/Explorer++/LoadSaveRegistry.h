@@ -6,12 +6,13 @@
 
 #include "LoadSaveInterface.h"
 
+class App;
 class Explorerplusplus;
 
 class LoadSaveRegistry : public ILoadSave
 {
 public:
-	LoadSaveRegistry(Explorerplusplus *pContainer);
+	LoadSaveRegistry(App *app, Explorerplusplus *pContainer);
 
 	/* Loading functions. */
 	void LoadGenericSettings() override;
@@ -33,5 +34,6 @@ public:
 	void SaveDialogStates() override;
 
 private:
+	App *const m_app;
 	Explorerplusplus *m_pContainer;
 };

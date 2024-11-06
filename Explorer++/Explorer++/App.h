@@ -15,10 +15,13 @@
 #include <boost/core/noncopyable.hpp>
 #include <wil/resource.h>
 
+class ColorRuleModel;
+
 class App : private boost::noncopyable
 {
 public:
 	App(const CommandLine::Settings *commandLineSettings);
+	~App();
 
 	const CommandLine::Settings *GetCommandLineSettings() const;
 	FeatureList *GetFeatureList();
@@ -27,6 +30,7 @@ public:
 	CachedIcons *GetCachedIcons();
 	BrowserList *GetBrowserList();
 	ModelessDialogList *GetModelessDialogList();
+	ColorRuleModel *GetColorRuleModel() const;
 
 private:
 	// Represents the maximum number of icons that can be cached. This cache is shared between
@@ -44,6 +48,7 @@ private:
 	CachedIcons m_cachedIcons;
 	BrowserList m_browserList;
 	ModelessDialogList m_modelessDialogList;
+	std::unique_ptr<ColorRuleModel> m_colorRuleModel;
 
 	unique_gdiplus_shutdown m_uniqueGdiplusShutdown;
 	wil::unique_hmodule m_richEditLib;

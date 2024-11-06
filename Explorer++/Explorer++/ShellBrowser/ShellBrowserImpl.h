@@ -37,6 +37,7 @@
 #define WM_USER_FILESADDED (WM_APP + 51)
 
 class AcceleratorManager;
+class App;
 struct BasicItemInfo_t;
 class CachedIcons;
 struct Config;
@@ -65,12 +66,12 @@ class ShellBrowserImpl :
 {
 public:
 	static std::shared_ptr<ShellBrowserImpl> CreateNew(HWND hOwner, ShellBrowserEmbedder *embedder,
-		CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
+		App *app, CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
 		FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
 		const FolderColumns *initialColumns);
 
 	static std::shared_ptr<ShellBrowserImpl> CreateFromPreserved(HWND hOwner,
-		ShellBrowserEmbedder *embedder, CoreInterface *coreInterface,
+		ShellBrowserEmbedder *embedder, App *app, CoreInterface *coreInterface,
 		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 		const PreservedFolderState &preservedFolderState);
@@ -387,13 +388,15 @@ private:
 	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 152;
 	static const UINT WM_APP_PENDING_TASK_AVAILABLE = WM_APP + 153;
 
-	ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, CoreInterface *coreInterface,
-		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
+	ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, App *app,
+		CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
+		FileActionHandler *fileActionHandler,
 		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &history, int currentEntry,
 		const PreservedFolderState &preservedFolderState);
-	ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, CoreInterface *coreInterface,
-		TabNavigationInterface *tabNavigation, FileActionHandler *fileActionHandler,
-		const FolderSettings &folderSettings, const FolderColumns *initialColumns);
+	ShellBrowserImpl(HWND hOwner, ShellBrowserEmbedder *embedder, App *app,
+		CoreInterface *coreInterface, TabNavigationInterface *tabNavigation,
+		FileActionHandler *fileActionHandler, const FolderSettings &folderSettings,
+		const FolderColumns *initialColumns);
 
 	static HWND CreateListView(HWND parent);
 	void InitializeListView();
@@ -635,6 +638,8 @@ private:
 
 	HWND m_hListView;
 	HWND m_hOwner;
+
+	App *const m_app;
 
 	std::vector<std::unique_ptr<ShellBrowserHelperBase>> m_helpers;
 

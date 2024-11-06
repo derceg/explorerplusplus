@@ -7,11 +7,11 @@
 // clang-format off
 #include "Explorer++.h"
 // clang-format on
+#include "App.h"
 #include "ApplicationModelFactory.h"
 #include "ApplicationToolbarXmlStorage.h"
 #include "Bookmarks/BookmarkTreeFactory.h"
 #include "Bookmarks/BookmarkXmlStorage.h"
-#include "ColorRuleModelFactory.h"
 #include "ColorRuleXmlStorage.h"
 #include "DialogHelper.h"
 #include "Explorer++_internal.h"
@@ -21,7 +21,8 @@
 #include <wil/com.h>
 #include <wil/resource.h>
 
-LoadSaveXML::LoadSaveXML(Explorerplusplus *pContainer, BOOL bLoad) :
+LoadSaveXML::LoadSaveXML(App *app, Explorerplusplus *pContainer, BOOL bLoad) :
+	m_app(app),
 	m_pContainer(pContainer),
 	m_bLoad(bLoad)
 {
@@ -155,8 +156,7 @@ void LoadSaveXML::LoadMainRebarInformation()
 
 void LoadSaveXML::LoadColorRules()
 {
-	ColorRuleXmlStorage::Load(m_pXMLDom.get(),
-		ColorRuleModelFactory::GetInstance()->GetColorRuleModel());
+	ColorRuleXmlStorage::Load(m_pXMLDom.get(), m_app->GetColorRuleModel());
 }
 
 void LoadSaveXML::LoadDialogStates()
@@ -198,8 +198,7 @@ void LoadSaveXML::SaveMainRebarInformation()
 
 void LoadSaveXML::SaveColorRules()
 {
-	ColorRuleXmlStorage::Save(m_pXMLDom.get(), m_pRoot.get(),
-		ColorRuleModelFactory::GetInstance()->GetColorRuleModel());
+	ColorRuleXmlStorage::Save(m_pXMLDom.get(), m_pRoot.get(), m_app->GetColorRuleModel());
 }
 
 void LoadSaveXML::SaveDialogStates()
