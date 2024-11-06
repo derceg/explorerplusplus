@@ -118,3 +118,8 @@ ColorRuleModel *App::GetColorRuleModel() const
 {
 	return m_colorRuleModel.get();
 }
+
+Applications::ApplicationModel *App::GetApplicationModel()
+{
+	return &m_applicationModel;
+}

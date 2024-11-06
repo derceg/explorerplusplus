@@ -8,7 +8,6 @@
 #include "Explorer++.h"
 // clang-format on
 #include "App.h"
-#include "ApplicationModelFactory.h"
 #include "ApplicationToolbarXmlStorage.h"
 #include "Bookmarks/BookmarkTreeFactory.h"
 #include "Bookmarks/BookmarkXmlStorage.h"
@@ -145,8 +144,7 @@ void LoadSaveXML::LoadDefaultColumns()
 
 void LoadSaveXML::LoadApplicationToolbar()
 {
-	Applications::ApplicationToolbarXmlStorage::Load(m_pXMLDom.get(),
-		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
+	Applications::ApplicationToolbarXmlStorage::Load(m_pXMLDom.get(), m_app->GetApplicationModel());
 }
 
 void LoadSaveXML::LoadMainRebarInformation()
@@ -188,7 +186,7 @@ void LoadSaveXML::SaveDefaultColumns()
 void LoadSaveXML::SaveApplicationToolbar()
 {
 	Applications::ApplicationToolbarXmlStorage::Save(m_pXMLDom.get(), m_pRoot.get(),
-		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
+		m_app->GetApplicationModel());
 }
 
 void LoadSaveXML::SaveMainRebarInformation()

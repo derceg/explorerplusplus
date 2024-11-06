@@ -5,6 +5,7 @@
 #pragma once
 
 #include "AcceleratorManager.h"
+#include "ApplicationModel.h"
 #include "BrowserList.h"
 #include "CommandLine.h"
 #include "Config.h"
@@ -31,6 +32,7 @@ public:
 	BrowserList *GetBrowserList();
 	ModelessDialogList *GetModelessDialogList();
 	ColorRuleModel *GetColorRuleModel() const;
+	Applications::ApplicationModel *GetApplicationModel();
 
 private:
 	// Represents the maximum number of icons that can be cached. This cache is shared between
@@ -49,6 +51,7 @@ private:
 	BrowserList m_browserList;
 	ModelessDialogList m_modelessDialogList;
 	std::unique_ptr<ColorRuleModel> m_colorRuleModel;
+	Applications::ApplicationModel m_applicationModel;
 
 	unique_gdiplus_shutdown m_uniqueGdiplusShutdown;
 	wil::unique_hmodule m_richEditLib;

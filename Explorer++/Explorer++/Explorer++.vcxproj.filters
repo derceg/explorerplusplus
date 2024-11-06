@@ -454,9 +454,6 @@
     <ClCompile Include="Bookmarks\BookmarkTreeFactory.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="ApplicationModelFactory.cpp">
-      <Filter>Application Toolbar</Filter>
-    </ClCompile>
     <ClCompile Include="ColorRuleRegistryStorage.cpp">
       <Filter>Color Rules</Filter>
     </ClCompile>
@@ -1190,9 +1187,6 @@
     </ClInclude>
     <ClInclude Include="Bookmarks\BookmarkTreeFactory.h">
       <Filter>Bookmarks</Filter>
-    </ClInclude>
-    <ClInclude Include="ApplicationModelFactory.h">
-      <Filter>Application Toolbar</Filter>
     </ClInclude>
     <ClInclude Include="ColorRuleRegistryStorage.h">
       <Filter>Color Rules</Filter>

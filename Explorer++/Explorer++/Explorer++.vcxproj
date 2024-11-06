@@ -996,7 +996,6 @@
     <ClCompile Include="ApplicationCrashedDialog.cpp" />
     <ClCompile Include="ApplicationDropper.cpp" />
     <ClCompile Include="ApplicationExecutorImpl.cpp" />
-    <ClCompile Include="ApplicationModelFactory.cpp" />
     <ClCompile Include="ApplicationHelper.cpp" />
     <ClCompile Include="ApplicationToolbarRegistryStorage.cpp" />
     <ClCompile Include="ApplicationToolbarView.cpp" />
@@ -1276,7 +1275,6 @@
     <ClInclude Include="ApplicationExecutor.h" />
     <ClInclude Include="ApplicationExecutorImpl.h" />
     <ClInclude Include="ApplicationModel.h" />
-    <ClInclude Include="ApplicationModelFactory.h" />
     <ClInclude Include="ApplicationHelper.h" />
     <ClInclude Include="ApplicationToolbarRegistryStorage.h" />
     <ClInclude Include="ApplicationToolbarView.h" />

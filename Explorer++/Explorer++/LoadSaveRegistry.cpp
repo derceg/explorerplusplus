@@ -8,7 +8,6 @@
 #include "Explorer++.h"
 // clang-format on
 #include "App.h"
-#include "ApplicationModelFactory.h"
 #include "ApplicationToolbarRegistryStorage.h"
 #include "Bookmarks/BookmarkRegistryStorage.h"
 #include "Bookmarks/BookmarkTreeFactory.h"
@@ -41,7 +40,7 @@ void LoadSaveRegistry::LoadDefaultColumns()
 void LoadSaveRegistry::LoadApplicationToolbar()
 {
 	Applications::ApplicationToolbarRegistryStorage::Load(NExplorerplusplus::REG_MAIN_KEY,
-		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
+		m_app->GetApplicationModel());
 }
 
 void LoadSaveRegistry::LoadMainRebarInformation()
@@ -97,7 +96,7 @@ void LoadSaveRegistry::SaveDefaultColumns()
 void LoadSaveRegistry::SaveApplicationToolbar()
 {
 	Applications::ApplicationToolbarRegistryStorage::Save(NExplorerplusplus::REG_MAIN_KEY,
-		Applications::ApplicationModelFactory::GetInstance()->GetApplicationModel());
+		m_app->GetApplicationModel());
 }
 
 void LoadSaveRegistry::SaveMainRebarInformation()
