@@ -16,6 +16,7 @@ public:
 	XmlAppStorage(wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument);
 
 	void LoadBookmarks(BookmarkTree *bookmarkTree) override;
+	void LoadColorRules(ColorRuleModel *model) override;
 
 private:
 	const wil::com_ptr_nothrow<IXMLDOMDocument> m_xmlDocument;

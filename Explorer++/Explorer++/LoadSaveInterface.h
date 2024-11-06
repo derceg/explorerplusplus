@@ -18,7 +18,6 @@ public:
 	virtual void LoadDefaultColumns() = 0;
 	virtual void LoadApplicationToolbar() = 0;
 	virtual void LoadMainRebarInformation() = 0;
-	virtual void LoadColorRules() = 0;
 	virtual void LoadDialogStates() = 0;
 
 	/* Saving functions. */

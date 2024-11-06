@@ -5,6 +5,7 @@
 #pragma once
 
 class BookmarkTree;
+class ColorRuleModel;
 
 class AppStorage
 {
@@ -12,4 +13,5 @@ public:
 	virtual ~AppStorage() = default;
 
 	virtual void LoadBookmarks(BookmarkTree *bookmarkTree) = 0;
+	virtual void LoadColorRules(ColorRuleModel *model) = 0;
 };

@@ -105,7 +105,6 @@ void Explorerplusplus::LoadAllSettings()
 	loadSave->LoadDefaultColumns();
 	loadSave->LoadApplicationToolbar();
 	loadSave->LoadMainRebarInformation();
-	loadSave->LoadColorRules();
 	loadSave->LoadDialogStates();
 
 	ValidateLoadedSettings();

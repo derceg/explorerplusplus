@@ -152,11 +152,6 @@ void LoadSaveXML::LoadMainRebarInformation()
 	m_pContainer->LoadMainRebarInformationFromXML(m_pXMLDom.get());
 }
 
-void LoadSaveXML::LoadColorRules()
-{
-	ColorRuleXmlStorage::Load(m_pXMLDom.get(), m_app->GetColorRuleModel());
-}
-
 void LoadSaveXML::LoadDialogStates()
 {
 	DialogHelper::LoadDialogStatesFromXML(m_pXMLDom.get());

@@ -20,7 +20,6 @@ public:
 	void LoadDefaultColumns() override;
 	void LoadApplicationToolbar() override;
 	void LoadMainRebarInformation() override;
-	void LoadColorRules() override;
 	void LoadDialogStates() override;
 
 	/* Saving functions. */

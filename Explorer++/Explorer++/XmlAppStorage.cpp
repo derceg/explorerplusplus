@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "XmlAppStorage.h"
 #include "Bookmarks/BookmarkXmlStorage.h"
+#include "ColorRuleXmlStorage.h"
 
 XmlAppStorage::XmlAppStorage(wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument) :
 	m_xmlDocument(xmlDocument)
@@ -14,4 +15,9 @@ XmlAppStorage::XmlAppStorage(wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument) 
 void XmlAppStorage::LoadBookmarks(BookmarkTree *bookmarkTree)
 {
 	BookmarkXmlStorage::Load(m_xmlDocument.get(), bookmarkTree);
+}
+
+void XmlAppStorage::LoadColorRules(ColorRuleModel *model)
+{
+	ColorRuleXmlStorage::Load(m_xmlDocument.get(), model);
 }

@@ -24,7 +24,7 @@ TEST_F(ColorRuleRegistryStorageTest, Load)
 	ImportRegistryResource(L"color-rules.reg");
 
 	ColorRuleModel loadedModel;
-	ColorRuleRegistryStorage::Load(APPLICATION_TEST_KEY, &loadedModel);
+	ColorRuleRegistryStorage::Load(m_applicationTestKey.get(), &loadedModel);
 
 	EXPECT_EQ(loadedModel, referenceModel);
 }
@@ -34,10 +34,10 @@ TEST_F(ColorRuleRegistryStorageTest, Save)
 	ColorRuleModel referenceModel;
 	BuildLoadSaveReferenceModel(&referenceModel);
 
-	ColorRuleRegistryStorage::Save(APPLICATION_TEST_KEY, &referenceModel);
+	ColorRuleRegistryStorage::Save(m_applicationTestKey.get(), &referenceModel);
 
 	ColorRuleModel loadedModel;
-	ColorRuleRegistryStorage::Load(APPLICATION_TEST_KEY, &loadedModel);
+	ColorRuleRegistryStorage::Load(m_applicationTestKey.get(), &loadedModel);
 
 	EXPECT_EQ(loadedModel, referenceModel);
 }

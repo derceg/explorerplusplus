@@ -121,11 +121,10 @@ void SaveToKey(HKEY parentKey, const ColorRuleModel *model)
 
 }
 
-void Load(const std::wstring &mainKeyPath, ColorRuleModel *model)
+void Load(HKEY applicationKey, ColorRuleModel *model)
 {
 	wil::unique_hkey colorRulesKey;
-	std::wstring fullKeyPath = mainKeyPath + L"\\" + COLOR_RULES_KEY_PATH;
-	LSTATUS res = RegOpenKeyEx(HKEY_CURRENT_USER, fullKeyPath.c_str(), 0, KEY_READ, &colorRulesKey);
+	LSTATUS res = RegOpenKeyEx(applicationKey, COLOR_RULES_KEY_PATH, 0, KEY_READ, &colorRulesKey);
 
 	if (res == ERROR_SUCCESS)
 	{
@@ -135,13 +134,12 @@ void Load(const std::wstring &mainKeyPath, ColorRuleModel *model)
 	}
 }
 
-void Save(const std::wstring &mainKeyPath, const ColorRuleModel *model)
+void Save(HKEY applicationKey, const ColorRuleModel *model)
 {
-	std::wstring fullKeyPath = mainKeyPath + L"\\" + COLOR_RULES_KEY_PATH;
-	SHDeleteKey(HKEY_CURRENT_USER, fullKeyPath.c_str());
+	SHDeleteKey(applicationKey, COLOR_RULES_KEY_PATH);
 
 	wil::unique_hkey colorRulesKey;
-	LSTATUS res = RegCreateKeyEx(HKEY_CURRENT_USER, fullKeyPath.c_str(), 0, nullptr,
+	LSTATUS res = RegCreateKeyEx(applicationKey, COLOR_RULES_KEY_PATH, 0, nullptr,
 		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &colorRulesKey, nullptr);
 
 	if (res == ERROR_SUCCESS)

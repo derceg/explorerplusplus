@@ -15,6 +15,7 @@ public:
 	RegistryAppStorage(wil::unique_hkey applicationKey);
 
 	void LoadBookmarks(BookmarkTree *bookmarkTree) override;
+	void LoadColorRules(ColorRuleModel *model) override;
 
 private:
 	const wil::unique_hkey m_applicationKey;

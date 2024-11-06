@@ -55,11 +55,6 @@ void LoadSaveRegistry::LoadMainRebarInformation()
 	}
 }
 
-void LoadSaveRegistry::LoadColorRules()
-{
-	ColorRuleRegistryStorage::Load(NExplorerplusplus::REG_MAIN_KEY, m_app->GetColorRuleModel());
-}
-
 void LoadSaveRegistry::LoadDialogStates()
 {
 	DialogHelper::LoadDialogStatesFromRegistry();
@@ -113,7 +108,14 @@ void LoadSaveRegistry::SaveMainRebarInformation()
 
 void LoadSaveRegistry::SaveColorRules()
 {
-	ColorRuleRegistryStorage::Save(NExplorerplusplus::REG_MAIN_KEY, m_app->GetColorRuleModel());
+	wil::unique_hkey mainKey;
+	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER,
+		NExplorerplusplus::REG_MAIN_KEY, mainKey, wil::reg::key_access::readwrite);
+
+	if (SUCCEEDED(hr))
+	{
+		ColorRuleRegistryStorage::Save(mainKey.get(), m_app->GetColorRuleModel());
+	}
 }
 
 void LoadSaveRegistry::SaveDialogStates()

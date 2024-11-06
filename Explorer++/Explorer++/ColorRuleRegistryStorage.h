@@ -11,7 +11,7 @@ class ColorRuleModel;
 namespace ColorRuleRegistryStorage
 {
 
-void Load(const std::wstring &mainKeyPath, ColorRuleModel *model);
-void Save(const std::wstring &mainKeyPath, const ColorRuleModel *model);
+void Load(HKEY applicationKey, ColorRuleModel *model);
+void Save(HKEY applicationKey, const ColorRuleModel *model);
 
 }
