@@ -451,9 +451,6 @@
     <ClCompile Include="ApplicationCrashedDialog.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Bookmarks\BookmarkTreeFactory.cpp">
-      <Filter>Bookmarks</Filter>
-    </ClCompile>
     <ClCompile Include="ColorRuleRegistryStorage.cpp">
       <Filter>Color Rules</Filter>
     </ClCompile>
@@ -1184,9 +1181,6 @@
     </ClInclude>
     <ClInclude Include="ApplicationCrashedDialog.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Bookmarks\BookmarkTreeFactory.h">
-      <Filter>Bookmarks</Filter>
     </ClInclude>
     <ClInclude Include="ColorRuleRegistryStorage.h">
       <Filter>Color Rules</Filter>

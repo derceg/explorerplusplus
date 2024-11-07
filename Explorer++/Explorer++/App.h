@@ -6,6 +6,7 @@
 
 #include "AcceleratorManager.h"
 #include "ApplicationModel.h"
+#include "Bookmarks/BookmarkTree.h"
 #include "BrowserList.h"
 #include "CommandLine.h"
 #include "Config.h"
@@ -31,6 +32,7 @@ public:
 	CachedIcons *GetCachedIcons();
 	BrowserList *GetBrowserList();
 	ModelessDialogList *GetModelessDialogList();
+	BookmarkTree *GetBookmarkTree();
 	ColorRuleModel *GetColorRuleModel() const;
 	Applications::ApplicationModel *GetApplicationModel();
 
@@ -50,6 +52,7 @@ private:
 	CachedIcons m_cachedIcons;
 	BrowserList m_browserList;
 	ModelessDialogList m_modelessDialogList;
+	BookmarkTree m_bookmarkTree;
 	std::unique_ptr<ColorRuleModel> m_colorRuleModel;
 	Applications::ApplicationModel m_applicationModel;
 

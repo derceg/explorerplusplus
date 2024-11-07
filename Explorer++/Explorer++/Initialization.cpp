@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "App.h"
-#include "Bookmarks/BookmarkTreeFactory.h"
 #include "Bookmarks/UI/BookmarksMainMenu.h"
 #include "Config.h"
 #include "DarkModeHelper.h"
@@ -45,9 +44,9 @@ void Explorerplusplus::Initialize()
 	DarkModeHelper::GetInstance().EnableForApp(ShouldEnableDarkMode(m_config->theme.get()));
 	m_config->theme.addObserver(std::bind_front(&Explorerplusplus::OnThemeUpdated, this));
 
-	m_bookmarksMainMenu = std::make_unique<BookmarksMainMenu>(this, this, &m_iconFetcher,
-		BookmarkTreeFactory::GetInstance()->GetBookmarkTree(),
-		BookmarkMenuBuilder::MenuIdRange{ MENU_BOOKMARK_START_ID, MENU_BOOKMARK_END_ID });
+	m_bookmarksMainMenu =
+		std::make_unique<BookmarksMainMenu>(this, this, &m_iconFetcher, m_app->GetBookmarkTree(),
+			BookmarkMenuBuilder::MenuIdRange{ MENU_BOOKMARK_START_ID, MENU_BOOKMARK_END_ID });
 
 	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_resourceInstance, this);
 

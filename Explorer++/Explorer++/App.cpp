@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "App.h"
-#include "Bookmarks/BookmarkTreeFactory.h"
 #include "ColorRuleModel.h"
 #include "ColorRuleModelFactory.h"
 #include "DefaultAccelerators.h"
@@ -76,7 +75,7 @@ void App::LoadSettings()
 		return;
 	}
 
-	appStorage->LoadBookmarks(BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
+	appStorage->LoadBookmarks(&m_bookmarkTree);
 	appStorage->LoadColorRules(m_colorRuleModel.get());
 	appStorage->LoadApplications(&m_applicationModel);
 	appStorage->LoadDialogStates();
@@ -115,6 +114,11 @@ BrowserList *App::GetBrowserList()
 ModelessDialogList *App::GetModelessDialogList()
 {
 	return &m_modelessDialogList;
+}
+
+BookmarkTree *App::GetBookmarkTree()
+{
+	return &m_bookmarkTree;
 }
 
 ColorRuleModel *App::GetColorRuleModel() const

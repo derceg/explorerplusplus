@@ -9,7 +9,6 @@
 // clang-format on
 #include "App.h"
 #include "ApplicationToolbarXmlStorage.h"
-#include "Bookmarks/BookmarkTreeFactory.h"
 #include "Bookmarks/BookmarkXmlStorage.h"
 #include "ColorRuleXmlStorage.h"
 #include "DialogHelper.h"
@@ -154,8 +153,7 @@ void LoadSaveXML::SaveGenericSettings()
 
 void LoadSaveXML::SaveBookmarks()
 {
-	BookmarkXmlStorage::Save(m_pXMLDom.get(), m_pRoot.get(),
-		BookmarkTreeFactory::GetInstance()->GetBookmarkTree(), 1);
+	BookmarkXmlStorage::Save(m_pXMLDom.get(), m_pRoot.get(), m_app->GetBookmarkTree(), 1);
 }
 
 void LoadSaveXML::SaveTabs()

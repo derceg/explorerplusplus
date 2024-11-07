@@ -1000,7 +1000,6 @@
     <ClCompile Include="ApplicationToolbarRegistryStorage.cpp" />
     <ClCompile Include="ApplicationToolbarView.cpp" />
     <ClCompile Include="ApplicationToolbarXmlStorage.cpp" />
-    <ClCompile Include="Bookmarks\BookmarkTreeFactory.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarksToolbar.cpp" />
     <ClCompile Include="Bookmarks\UI\Views\BookmarksToolbarView.cpp" />
     <ClCompile Include="Bookmarks\UI\BookmarkMenuDropTarget.cpp" />
@@ -1279,7 +1278,6 @@
     <ClInclude Include="ApplicationToolbarRegistryStorage.h" />
     <ClInclude Include="ApplicationToolbarView.h" />
     <ClInclude Include="ApplicationToolbarXmlStorage.h" />
-    <ClInclude Include="Bookmarks\BookmarkTreeFactory.h" />
     <ClInclude Include="Bookmarks\UI\BookmarksToolbar.h" />
     <ClInclude Include="Bookmarks\UI\Views\BookmarksToolbarView.h" />
     <ClInclude Include="Bookmarks\UI\BookmarkMenuDropTarget.h" />

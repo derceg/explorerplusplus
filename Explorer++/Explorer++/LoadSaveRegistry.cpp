@@ -10,7 +10,6 @@
 #include "App.h"
 #include "ApplicationToolbarRegistryStorage.h"
 #include "Bookmarks/BookmarkRegistryStorage.h"
-#include "Bookmarks/BookmarkTreeFactory.h"
 #include "ColorRuleRegistryStorage.h"
 #include "DialogHelper.h"
 #include "Explorer++_internal.h"
@@ -62,8 +61,7 @@ void LoadSaveRegistry::SaveBookmarks()
 
 	if (SUCCEEDED(hr))
 	{
-		BookmarkRegistryStorage::Save(mainKey.get(),
-			BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
+		BookmarkRegistryStorage::Save(mainKey.get(), m_app->GetBookmarkTree());
 	}
 }
 
