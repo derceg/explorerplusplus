@@ -142,11 +142,6 @@ void LoadSaveXML::LoadDefaultColumns()
 	m_pContainer->LoadDefaultColumnsFromXML(m_pXMLDom.get());
 }
 
-void LoadSaveXML::LoadApplicationToolbar()
-{
-	Applications::ApplicationToolbarXmlStorage::Load(m_pXMLDom.get(), m_app->GetApplicationModel());
-}
-
 void LoadSaveXML::LoadMainRebarInformation()
 {
 	m_pContainer->LoadMainRebarInformationFromXML(m_pXMLDom.get());

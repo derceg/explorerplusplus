@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "XmlAppStorage.h"
+#include "ApplicationToolbarXmlStorage.h"
 #include "Bookmarks/BookmarkXmlStorage.h"
 #include "ColorRuleXmlStorage.h"
 
@@ -20,4 +21,9 @@ void XmlAppStorage::LoadBookmarks(BookmarkTree *bookmarkTree)
 void XmlAppStorage::LoadColorRules(ColorRuleModel *model)
 {
 	ColorRuleXmlStorage::Load(m_xmlDocument.get(), model);
+}
+
+void XmlAppStorage::LoadApplications(Applications::ApplicationModel *model)
+{
+	Applications::ApplicationToolbarXmlStorage::Load(m_xmlDocument.get(), model);
 }

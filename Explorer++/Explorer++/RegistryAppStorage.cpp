@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "RegistryAppStorage.h"
+#include "ApplicationToolbarRegistryStorage.h"
 #include "Bookmarks/BookmarkRegistryStorage.h"
 #include "ColorRuleRegistryStorage.h"
 
@@ -20,4 +21,9 @@ void RegistryAppStorage::LoadBookmarks(BookmarkTree *bookmarkTree)
 void RegistryAppStorage::LoadColorRules(ColorRuleModel *model)
 {
 	ColorRuleRegistryStorage::Load(m_applicationKey.get(), model);
+}
+
+void RegistryAppStorage::LoadApplications(Applications::ApplicationModel *model)
+{
+	Applications::ApplicationToolbarRegistryStorage::Load(m_applicationKey.get(), model);
 }

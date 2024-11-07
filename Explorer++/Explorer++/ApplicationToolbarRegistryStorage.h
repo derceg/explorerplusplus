@@ -14,8 +14,8 @@ class ApplicationModel;
 namespace ApplicationToolbarRegistryStorage
 {
 
-void Load(const std::wstring &mainKeyPath, ApplicationModel *model);
-void Save(const std::wstring &mainKeyPath, const ApplicationModel *model);
+void Load(HKEY applicationKey, ApplicationModel *model);
+void Save(HKEY applicationKey, const ApplicationModel *model);
 
 }
 

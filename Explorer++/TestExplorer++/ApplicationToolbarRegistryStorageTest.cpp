@@ -26,7 +26,7 @@ TEST_F(ApplicationToolbarRegistryStorageTest, Load)
 	ImportRegistryResource(L"application-toolbar.reg");
 
 	ApplicationModel loadedModel;
-	ApplicationToolbarRegistryStorage::Load(APPLICATION_TEST_KEY, &loadedModel);
+	ApplicationToolbarRegistryStorage::Load(m_applicationTestKey.get(), &loadedModel);
 
 	EXPECT_EQ(loadedModel, referenceModel);
 }
@@ -36,10 +36,10 @@ TEST_F(ApplicationToolbarRegistryStorageTest, Save)
 	ApplicationModel referenceModel;
 	BuildLoadSaveReferenceModel(&referenceModel);
 
-	ApplicationToolbarRegistryStorage::Save(APPLICATION_TEST_KEY, &referenceModel);
+	ApplicationToolbarRegistryStorage::Save(m_applicationTestKey.get(), &referenceModel);
 
 	ApplicationModel loadedModel;
-	ApplicationToolbarRegistryStorage::Load(APPLICATION_TEST_KEY, &loadedModel);
+	ApplicationToolbarRegistryStorage::Load(m_applicationTestKey.get(), &loadedModel);
 
 	EXPECT_EQ(loadedModel, referenceModel);
 }

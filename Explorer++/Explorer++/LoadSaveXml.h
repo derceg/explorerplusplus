@@ -22,7 +22,6 @@ public:
 	void LoadGenericSettings() override;
 	void LoadPreviousTabs() override;
 	void LoadDefaultColumns() override;
-	void LoadApplicationToolbar() override;
 	void LoadMainRebarInformation() override;
 	void LoadDialogStates() override;
 

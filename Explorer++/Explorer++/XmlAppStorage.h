@@ -17,6 +17,7 @@ public:
 
 	void LoadBookmarks(BookmarkTree *bookmarkTree) override;
 	void LoadColorRules(ColorRuleModel *model) override;
+	void LoadApplications(Applications::ApplicationModel *model) override;
 
 private:
 	const wil::com_ptr_nothrow<IXMLDOMDocument> m_xmlDocument;

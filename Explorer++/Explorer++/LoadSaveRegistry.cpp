@@ -37,12 +37,6 @@ void LoadSaveRegistry::LoadDefaultColumns()
 	m_pContainer->LoadDefaultColumnsFromRegistry();
 }
 
-void LoadSaveRegistry::LoadApplicationToolbar()
-{
-	Applications::ApplicationToolbarRegistryStorage::Load(NExplorerplusplus::REG_MAIN_KEY,
-		m_app->GetApplicationModel());
-}
-
 void LoadSaveRegistry::LoadMainRebarInformation()
 {
 	wil::unique_hkey mainKey;
@@ -90,8 +84,15 @@ void LoadSaveRegistry::SaveDefaultColumns()
 
 void LoadSaveRegistry::SaveApplicationToolbar()
 {
-	Applications::ApplicationToolbarRegistryStorage::Save(NExplorerplusplus::REG_MAIN_KEY,
-		m_app->GetApplicationModel());
+	wil::unique_hkey mainKey;
+	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER,
+		NExplorerplusplus::REG_MAIN_KEY, mainKey, wil::reg::key_access::readwrite);
+
+	if (SUCCEEDED(hr))
+	{
+		Applications::ApplicationToolbarRegistryStorage::Save(mainKey.get(),
+			m_app->GetApplicationModel());
+	}
 }
 
 void LoadSaveRegistry::SaveMainRebarInformation()
