@@ -22,4 +22,5 @@ public:
 	virtual void LoadBookmarks(BookmarkTree *bookmarkTree) = 0;
 	virtual void LoadColorRules(ColorRuleModel *model) = 0;
 	virtual void LoadApplications(Applications::ApplicationModel *model) = 0;
+	virtual void LoadDialogStates() = 0;
 };

@@ -17,6 +17,7 @@ public:
 	void LoadBookmarks(BookmarkTree *bookmarkTree) override;
 	void LoadColorRules(ColorRuleModel *model) override;
 	void LoadApplications(Applications::ApplicationModel *model) override;
+	void LoadDialogStates() override;
 
 private:
 	const wil::unique_hkey m_applicationKey;

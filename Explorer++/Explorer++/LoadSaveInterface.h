@@ -17,7 +17,6 @@ public:
 	virtual void LoadPreviousTabs() = 0;
 	virtual void LoadDefaultColumns() = 0;
 	virtual void LoadMainRebarInformation() = 0;
-	virtual void LoadDialogStates() = 0;
 
 	/* Saving functions. */
 	virtual void SaveGenericSettings() = 0;

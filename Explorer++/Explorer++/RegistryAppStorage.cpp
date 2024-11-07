@@ -7,6 +7,7 @@
 #include "ApplicationToolbarRegistryStorage.h"
 #include "Bookmarks/BookmarkRegistryStorage.h"
 #include "ColorRuleRegistryStorage.h"
+#include "DialogHelper.h"
 
 RegistryAppStorage::RegistryAppStorage(wil::unique_hkey applicationKey) :
 	m_applicationKey(std::move(applicationKey))
@@ -26,4 +27,9 @@ void RegistryAppStorage::LoadColorRules(ColorRuleModel *model)
 void RegistryAppStorage::LoadApplications(Applications::ApplicationModel *model)
 {
 	Applications::ApplicationToolbarRegistryStorage::Load(m_applicationKey.get(), model);
+}
+
+void RegistryAppStorage::LoadDialogStates()
+{
+	DialogHelper::LoadDialogStatesFromRegistry(m_applicationKey.get());
 }

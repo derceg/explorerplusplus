@@ -49,11 +49,6 @@ void LoadSaveRegistry::LoadMainRebarInformation()
 	}
 }
 
-void LoadSaveRegistry::LoadDialogStates()
-{
-	DialogHelper::LoadDialogStatesFromRegistry();
-}
-
 void LoadSaveRegistry::SaveGenericSettings()
 {
 	m_pContainer->SaveGenericSettingsToRegistry();
@@ -121,5 +116,12 @@ void LoadSaveRegistry::SaveColorRules()
 
 void LoadSaveRegistry::SaveDialogStates()
 {
-	DialogHelper::SaveDialogStatesToRegistry();
+	wil::unique_hkey mainKey;
+	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER,
+		NExplorerplusplus::REG_MAIN_KEY, mainKey, wil::reg::key_access::readwrite);
+
+	if (SUCCEEDED(hr))
+	{
+		DialogHelper::SaveDialogStatesToRegistry(mainKey.get());
+	}
 }

@@ -7,6 +7,7 @@
 #include "ApplicationToolbarXmlStorage.h"
 #include "Bookmarks/BookmarkXmlStorage.h"
 #include "ColorRuleXmlStorage.h"
+#include "DialogHelper.h"
 
 XmlAppStorage::XmlAppStorage(wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument) :
 	m_xmlDocument(xmlDocument)
@@ -26,4 +27,9 @@ void XmlAppStorage::LoadColorRules(ColorRuleModel *model)
 void XmlAppStorage::LoadApplications(Applications::ApplicationModel *model)
 {
 	Applications::ApplicationToolbarXmlStorage::Load(m_xmlDocument.get(), model);
+}
+
+void XmlAppStorage::LoadDialogStates()
+{
+	DialogHelper::LoadDialogStatesFromXML(m_xmlDocument.get());
 }

@@ -79,6 +79,7 @@ void App::LoadSettings()
 	appStorage->LoadBookmarks(BookmarkTreeFactory::GetInstance()->GetBookmarkTree());
 	appStorage->LoadColorRules(m_colorRuleModel.get());
 	appStorage->LoadApplications(&m_applicationModel);
+	appStorage->LoadDialogStates();
 }
 
 const CommandLine::Settings *App::GetCommandLineSettings() const

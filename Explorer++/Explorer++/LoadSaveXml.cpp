@@ -147,11 +147,6 @@ void LoadSaveXML::LoadMainRebarInformation()
 	m_pContainer->LoadMainRebarInformationFromXML(m_pXMLDom.get());
 }
 
-void LoadSaveXML::LoadDialogStates()
-{
-	DialogHelper::LoadDialogStatesFromXML(m_pXMLDom.get());
-}
-
 void LoadSaveXML::SaveGenericSettings()
 {
 	m_pContainer->SaveGenericSettingsToXML(m_pXMLDom.get(), m_pRoot.get());

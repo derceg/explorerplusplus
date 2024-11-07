@@ -19,7 +19,6 @@ public:
 	void LoadPreviousTabs() override;
 	void LoadDefaultColumns() override;
 	void LoadMainRebarInformation() override;
-	void LoadDialogStates() override;
 
 	/* Saving functions. */
 	void SaveGenericSettings() override;
