@@ -103,7 +103,6 @@ void Explorerplusplus::LoadAllSettings()
 
 	loadSave->LoadGenericSettings();
 	loadSave->LoadPreviousTabs();
-	loadSave->LoadDefaultColumns();
 	loadSave->LoadMainRebarInformation();
 
 	ValidateLoadedSettings();

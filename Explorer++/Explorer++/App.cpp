@@ -79,6 +79,7 @@ void App::LoadSettings()
 	appStorage->LoadColorRules(m_colorRuleModel.get());
 	appStorage->LoadApplications(&m_applicationModel);
 	appStorage->LoadDialogStates();
+	appStorage->LoadDefaultColumns(m_config.globalFolderSettings.folderColumns);
 }
 
 const CommandLine::Settings *App::GetCommandLineSettings() const

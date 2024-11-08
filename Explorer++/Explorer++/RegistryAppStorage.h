@@ -18,6 +18,7 @@ public:
 	void LoadColorRules(ColorRuleModel *model) override;
 	void LoadApplications(Applications::ApplicationModel *model) override;
 	void LoadDialogStates() override;
+	void LoadDefaultColumns(FolderColumns &defaultColumns) override;
 
 private:
 	const wil::unique_hkey m_applicationKey;

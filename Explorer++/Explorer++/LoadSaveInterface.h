@@ -15,7 +15,6 @@ public:
 	/* Loading functions. */
 	virtual void LoadGenericSettings() = 0;
 	virtual void LoadPreviousTabs() = 0;
-	virtual void LoadDefaultColumns() = 0;
 	virtual void LoadMainRebarInformation() = 0;
 
 	/* Saving functions. */

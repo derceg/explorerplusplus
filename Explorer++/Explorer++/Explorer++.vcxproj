@@ -1018,6 +1018,8 @@
     <ClCompile Include="CrashHandlerHelper.cpp" />
     <ClCompile Include="CustomFont.cpp" />
     <ClCompile Include="CustomFontStorage.cpp" />
+    <ClCompile Include="DefaultColumnRegistryStorage.cpp" />
+    <ClCompile Include="DefaultColumnXmlStorage.cpp" />
     <ClCompile Include="DirectoryOperationsHelper.cpp" />
     <ClCompile Include="FeatureList.cpp" />
     <ClCompile Include="FontsOptionsPage.cpp" />
@@ -1298,6 +1300,8 @@
     <ClInclude Include="CrashHandlerHelper.h" />
     <ClInclude Include="CustomFont.h" />
     <ClInclude Include="CustomFontStorage.h" />
+    <ClInclude Include="DefaultColumnRegistryStorage.h" />
+    <ClInclude Include="DefaultColumnXmlStorage.h" />
     <ClInclude Include="DirectoryOperationsHelper.h" />
     <ClInclude Include="ExitCode.h" />
     <ClInclude Include="Feature.h" />

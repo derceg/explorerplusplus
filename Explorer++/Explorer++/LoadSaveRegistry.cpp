@@ -11,6 +11,7 @@
 #include "ApplicationToolbarRegistryStorage.h"
 #include "Bookmarks/BookmarkRegistryStorage.h"
 #include "ColorRuleRegistryStorage.h"
+#include "DefaultColumnRegistryStorage.h"
 #include "DialogHelper.h"
 #include "Explorer++_internal.h"
 #include <wil/registry.h>
@@ -29,11 +30,6 @@ void LoadSaveRegistry::LoadGenericSettings()
 void LoadSaveRegistry::LoadPreviousTabs()
 {
 	m_pContainer->LoadTabSettingsFromRegistry();
-}
-
-void LoadSaveRegistry::LoadDefaultColumns()
-{
-	m_pContainer->LoadDefaultColumnsFromRegistry();
 }
 
 void LoadSaveRegistry::LoadMainRebarInformation()
@@ -72,7 +68,15 @@ void LoadSaveRegistry::SaveTabs()
 
 void LoadSaveRegistry::SaveDefaultColumns()
 {
-	m_pContainer->SaveDefaultColumnsToRegistry();
+	wil::unique_hkey mainKey;
+	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER,
+		NExplorerplusplus::REG_MAIN_KEY, mainKey, wil::reg::key_access::readwrite);
+
+	if (SUCCEEDED(hr))
+	{
+		DefaultColumnRegistryStorage::Save(mainKey.get(),
+			m_app->GetConfig()->globalFolderSettings.folderColumns);
+	}
 }
 
 void LoadSaveRegistry::SaveApplicationToolbar()

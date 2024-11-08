@@ -11,6 +11,7 @@
 #include "ApplicationToolbarXmlStorage.h"
 #include "Bookmarks/BookmarkXmlStorage.h"
 #include "ColorRuleXmlStorage.h"
+#include "DefaultColumnXmlStorage.h"
 #include "DialogHelper.h"
 #include "Explorer++_internal.h"
 #include "../Helper/Macros.h"
@@ -136,11 +137,6 @@ void LoadSaveXML::LoadPreviousTabs()
 	m_pContainer->LoadTabSettingsFromXML(m_pXMLDom.get());
 }
 
-void LoadSaveXML::LoadDefaultColumns()
-{
-	m_pContainer->LoadDefaultColumnsFromXML(m_pXMLDom.get());
-}
-
 void LoadSaveXML::LoadMainRebarInformation()
 {
 	m_pContainer->LoadMainRebarInformationFromXML(m_pXMLDom.get());
@@ -163,7 +159,8 @@ void LoadSaveXML::SaveTabs()
 
 void LoadSaveXML::SaveDefaultColumns()
 {
-	m_pContainer->SaveDefaultColumnsToXML(m_pXMLDom.get(), m_pRoot.get());
+	DefaultColumnXmlStorage::Save(m_pXMLDom.get(), m_pRoot.get(),
+		m_app->GetConfig()->globalFolderSettings.folderColumns);
 }
 
 void LoadSaveXML::SaveApplicationToolbar()

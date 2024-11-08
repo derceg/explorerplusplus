@@ -7,6 +7,7 @@
 #include "ApplicationToolbarXmlStorage.h"
 #include "Bookmarks/BookmarkXmlStorage.h"
 #include "ColorRuleXmlStorage.h"
+#include "DefaultColumnXmlStorage.h"
 #include "DialogHelper.h"
 
 XmlAppStorage::XmlAppStorage(wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument) :
@@ -32,4 +33,9 @@ void XmlAppStorage::LoadApplications(Applications::ApplicationModel *model)
 void XmlAppStorage::LoadDialogStates()
 {
 	DialogHelper::LoadDialogStatesFromXML(m_xmlDocument.get());
+}
+
+void XmlAppStorage::LoadDefaultColumns(FolderColumns &defaultColumns)
+{
+	DefaultColumnXmlStorage::Load(m_xmlDocument.get(), defaultColumns);
 }

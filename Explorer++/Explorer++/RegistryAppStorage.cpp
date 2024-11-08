@@ -7,6 +7,7 @@
 #include "ApplicationToolbarRegistryStorage.h"
 #include "Bookmarks/BookmarkRegistryStorage.h"
 #include "ColorRuleRegistryStorage.h"
+#include "DefaultColumnRegistryStorage.h"
 #include "DialogHelper.h"
 
 RegistryAppStorage::RegistryAppStorage(wil::unique_hkey applicationKey) :
@@ -32,4 +33,9 @@ void RegistryAppStorage::LoadApplications(Applications::ApplicationModel *model)
 void RegistryAppStorage::LoadDialogStates()
 {
 	DialogHelper::LoadDialogStatesFromRegistry(m_applicationKey.get());
+}
+
+void RegistryAppStorage::LoadDefaultColumns(FolderColumns &defaultColumns)
+{
+	DefaultColumnRegistryStorage::Load(m_applicationKey.get(), defaultColumns);
 }

@@ -595,20 +595,11 @@
     <ClCompile Include="MainRebarXmlStorage.cpp">
       <Filter>Main Rebar</Filter>
     </ClCompile>
-    <ClCompile Include="ColumnRegistryStorage.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="ColumnXmlStorage.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="TabRegistryStorage.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
     <ClCompile Include="TabXmlStorage.cpp">
       <Filter>Tabs</Filter>
-    </ClCompile>
-    <ClCompile Include="ColumnStorage.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="ApplicationDropper.cpp">
       <Filter>Application Toolbar</Filter>
@@ -735,6 +726,21 @@
     </ClCompile>
     <ClCompile Include="XmlAppStorageFactory.cpp">
       <Filter>Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="DefaultColumnRegistryStorage.cpp">
+      <Filter>Column Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="DefaultColumnXmlStorage.cpp">
+      <Filter>Column Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnRegistryStorage.cpp">
+      <Filter>Column Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnStorage.cpp">
+      <Filter>Column Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnXmlStorage.cpp">
+      <Filter>Column Storage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1350,12 +1356,6 @@
     <ClInclude Include="MainRebarXmlStorage.h">
       <Filter>Main Rebar</Filter>
     </ClInclude>
-    <ClInclude Include="ColumnRegistryStorage.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="ColumnXmlStorage.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="TabRegistryStorage.h">
       <Filter>Tabs</Filter>
     </ClInclude>
@@ -1364,9 +1364,6 @@
     </ClInclude>
     <ClInclude Include="TabStorage.h">
       <Filter>Tabs</Filter>
-    </ClInclude>
-    <ClInclude Include="ColumnStorage.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ApplicationDropper.h">
       <Filter>Application Toolbar</Filter>
@@ -1520,6 +1517,21 @@
     </ClInclude>
     <ClInclude Include="AppStorage.h">
       <Filter>Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="DefaultColumnRegistryStorage.h">
+      <Filter>Column Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="DefaultColumnXmlStorage.h">
+      <Filter>Column Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnRegistryStorage.h">
+      <Filter>Column Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnStorage.h">
+      <Filter>Column Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnXmlStorage.h">
+      <Filter>Column Storage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1691,6 +1703,9 @@
     </Filter>
     <Filter Include="Storage">
       <UniqueIdentifier>{14059d93-4cf2-4298-9adb-4545937a7534}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Column Storage">
+      <UniqueIdentifier>{0324c360-b481-474e-88d6-1c784d571dfd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

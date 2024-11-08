@@ -212,6 +212,8 @@
     <ClCompile Include="CustomFontStorageTest.cpp" />
     <ClCompile Include="DataExchangeHelperTest.cpp" />
     <ClCompile Include="DataObjectImplTest.cpp" />
+    <ClCompile Include="DefaultColumnRegistryStorageTest.cpp" />
+    <ClCompile Include="DefaultColumnXmlStorageTest.cpp" />
     <ClCompile Include="DragDropTestHelper.cpp" />
     <ClCompile Include="DragDropHelperTest.cpp" />
     <ClCompile Include="DriveModelTest.cpp" />

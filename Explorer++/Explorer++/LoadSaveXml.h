@@ -21,7 +21,6 @@ public:
 	/* Loading functions. */
 	void LoadGenericSettings() override;
 	void LoadPreviousTabs() override;
-	void LoadDefaultColumns() override;
 	void LoadMainRebarInformation() override;
 
 	/* Saving functions. */

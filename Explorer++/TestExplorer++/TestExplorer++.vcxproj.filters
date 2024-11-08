@@ -129,15 +129,6 @@
     <ClCompile Include="MainRebarXmlStorageTest.cpp">
       <Filter>Main Rebar</Filter>
     </ClCompile>
-    <ClCompile Include="ColumnRegistryStorageTest.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="ColumnXmlStorageTest.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="ColumnStorageTestHelper.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="TabRegistryStorageTest.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
@@ -146,9 +137,6 @@
     </ClCompile>
     <ClCompile Include="TabStorageTestHelper.cpp">
       <Filter>Tabs</Filter>
-    </ClCompile>
-    <ClCompile Include="ColumnStorageTest.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="ApplicationDropperTest.cpp">
       <Filter>Application Toolbar</Filter>
@@ -265,6 +253,24 @@
     <ClCompile Include="ModelessDialogListTest.cpp">
       <Filter>Dialog Support</Filter>
     </ClCompile>
+    <ClCompile Include="ColumnRegistryStorageTest.cpp">
+      <Filter>Column Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnStorageTest.cpp">
+      <Filter>Column Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnStorageTestHelper.cpp">
+      <Filter>Column Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnXmlStorageTest.cpp">
+      <Filter>Column Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="DefaultColumnXmlStorageTest.cpp">
+      <Filter>Column Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="DefaultColumnRegistryStorageTest.cpp">
+      <Filter>Column Storage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Bookmarks">
@@ -360,6 +366,9 @@
     <Filter Include="Dialog Support">
       <UniqueIdentifier>{c92534bc-73a2-4e24-8f9d-d7552e2acd5b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Column Storage">
+      <UniqueIdentifier>{99c509cf-2bb8-492a-8fdb-e3a588b04f69}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestExplorer++.rc">
@@ -405,9 +414,6 @@
     <ClInclude Include="MainRebarStorageTestHelper.h">
       <Filter>Main Rebar</Filter>
     </ClInclude>
-    <ClInclude Include="ColumnStorageTestHelper.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="TabStorageTestHelper.h">
       <Filter>Tabs</Filter>
     </ClInclude>
@@ -440,6 +446,9 @@
     </ClInclude>
     <ClInclude Include="GeneratorTestHelper.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnStorageTestHelper.h">
+      <Filter>Column Storage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

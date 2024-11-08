@@ -729,43 +729,6 @@ void Explorerplusplus::SaveTabSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMEle
 	XMLSettings::AppendChildToParent(tabsNode.get(), pRoot);
 }
 
-void Explorerplusplus::LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom)
-{
-	if (!pXMLDom)
-	{
-		return;
-	}
-
-	wil::com_ptr_nothrow<IXMLDOMNode> defaultColumnsNode;
-	auto bstr = wil::make_bstr_nothrow(L"//DefaultColumns");
-	pXMLDom->selectSingleNode(bstr.get(), &defaultColumnsNode);
-
-	if (!defaultColumnsNode)
-	{
-		return;
-	}
-
-	auto &folderColumns = m_config->globalFolderSettings.folderColumns;
-	ColumnXmlStorage::LoadAllColumnSets(defaultColumnsNode.get(), folderColumns);
-}
-
-void Explorerplusplus::SaveDefaultColumnsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
-{
-	wil::com_ptr_nothrow<IXMLDOMElement> defaultColumnsNode;
-	auto bstr = wil::make_bstr_nothrow(L"DefaultColumns");
-	HRESULT hr = pXMLDom->createElement(bstr.get(), &defaultColumnsNode);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	const auto &folderColumns = m_config->globalFolderSettings.folderColumns;
-	ColumnXmlStorage::SaveAllColumnSets(pXMLDom, defaultColumnsNode.get(), folderColumns);
-
-	XMLSettings::AppendChildToParent(defaultColumnsNode.get(), pRoot);
-}
-
 void Explorerplusplus::SaveWindowPositionToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot)
 {
 	wil::com_ptr_nothrow<IXMLDOMElement> pWndPosNode;

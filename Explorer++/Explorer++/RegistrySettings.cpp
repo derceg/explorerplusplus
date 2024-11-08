@@ -29,7 +29,6 @@ namespace
 
 const WCHAR MAIN_TOOLBAR_STATE_KEY_NAME[] = L"ToolbarState";
 const WCHAR TABS_KEY[] = L"Software\\Explorer++\\Tabs";
-const WCHAR DEFAULT_COLUMNS_KEY[] = L"Software\\Explorer++\\DefaultColumns";
 const WCHAR MAIN_FONT_KEY_NAME[] = L"MainFont";
 
 }
@@ -562,36 +561,6 @@ void Explorerplusplus::LoadTabSettingsFromRegistry()
 	}
 
 	m_loadedTabs = TabRegistryStorage::Load(tabsKey.get());
-}
-
-void Explorerplusplus::SaveDefaultColumnsToRegistry()
-{
-	wil::unique_hkey defaultColumnsKey;
-	HRESULT hr = wil::reg::create_unique_key_nothrow(HKEY_CURRENT_USER, DEFAULT_COLUMNS_KEY,
-		defaultColumnsKey, wil::reg::key_access::readwrite);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	ColumnRegistryStorage::SaveAllColumnSets(defaultColumnsKey.get(),
-		m_config->globalFolderSettings.folderColumns);
-}
-
-void Explorerplusplus::LoadDefaultColumnsFromRegistry()
-{
-	wil::unique_hkey defaultColumnsKey;
-	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER, DEFAULT_COLUMNS_KEY,
-		defaultColumnsKey, wil::reg::key_access::read);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	auto &defaultFolderColumns = m_config->globalFolderSettings.folderColumns;
-	ColumnRegistryStorage::LoadAllColumnSets(defaultColumnsKey.get(), defaultFolderColumns);
 }
 
 void Explorerplusplus::LoadMainRebarInformationFromRegistry(HKEY mainKey)

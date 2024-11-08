@@ -383,8 +383,6 @@ private:
 	void SaveTabSettingsToRegistry();
 	std::vector<TabStorageData> GetTabListStorageData();
 	void LoadTabSettingsFromRegistry();
-	void LoadDefaultColumnsFromRegistry();
-	void SaveDefaultColumnsToRegistry();
 	void LoadMainRebarInformationFromRegistry(HKEY mainKey);
 	void SaveMainRebarInformationToRegistry(HKEY mainKey);
 
@@ -393,8 +391,6 @@ private:
 	void SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom);
 	void SaveTabSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
-	void LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom);
-	void SaveDefaultColumnsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void SaveWindowPositionToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
 	void SaveWindowPositionToXMLInternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pWndPosNode);
 	void LoadMainRebarInformationFromXML(IXMLDOMDocument *pXMLDom);

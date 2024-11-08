@@ -13,6 +13,7 @@ class ApplicationModel;
 
 class BookmarkTree;
 class ColorRuleModel;
+struct FolderColumns;
 
 class AppStorage
 {
@@ -23,4 +24,5 @@ public:
 	virtual void LoadColorRules(ColorRuleModel *model) = 0;
 	virtual void LoadApplications(Applications::ApplicationModel *model) = 0;
 	virtual void LoadDialogStates() = 0;
+	virtual void LoadDefaultColumns(FolderColumns &defaultColumns) = 0;
 };
