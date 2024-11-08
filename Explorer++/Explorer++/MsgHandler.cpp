@@ -23,6 +23,7 @@
 #include "ShellTreeView/ShellTreeView.h"
 #include "SystemFontHelper.h"
 #include "TabContainer.h"
+#include "TaskbarThumbnails.h"
 #include "ToolbarHelper.h"
 #include "../Helper/BulkClipboardWriter.h"
 #include "../Helper/Controls.h"
@@ -567,6 +568,10 @@ int Explorerplusplus::OnDestroy()
 	{
 		SHChangeNotifyDeregister(m_SHChangeNotifyID);
 	}
+
+	// This class depends on the TabContainer instance and needs to be destroyed before the
+	// TabContainer instance is destroyed.
+	m_taskbarThumbnails.reset();
 
 	delete m_pStatusBar;
 
