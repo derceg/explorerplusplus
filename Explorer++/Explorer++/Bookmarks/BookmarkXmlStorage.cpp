@@ -10,8 +10,12 @@
 #include "../Helper/XMLSettings.h"
 #include <wil/com.h>
 
+namespace
+{
+
 namespace V2
 {
+
 const TCHAR bookmarksKeyNodeName[] = _T("Bookmarksv2");
 
 void Load(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree);
@@ -29,10 +33,12 @@ void SaveBookmarkChildren(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNo
 	const BookmarkItem *parentBookmarkItem, int indent);
 void SaveBookmarkItem(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
 	const BookmarkItem *bookmarkItem, int indent);
+
 }
 
 namespace V1
 {
+
 const TCHAR bookmarksKeyNodeName[] = _T("Bookmarks");
 
 void Load(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree);
@@ -40,9 +46,15 @@ void LoadBookmarkChildren(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
 	BookmarkItem *parentBookmarkItem);
 std::unique_ptr<BookmarkItem> LoadBookmarkItem(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
 	bool &showOnToolbarOutput);
+
 }
 
-void BookmarkXmlStorage::Load(IXMLDOMDocument *xmlDocument, BookmarkTree *bookmarkTree)
+}
+
+namespace BookmarkXmlStorage
+{
+
+void Load(IXMLDOMDocument *xmlDocument, BookmarkTree *bookmarkTree)
 {
 	wil::com_ptr_nothrow<IXMLDOMNode> bookmarksNode;
 	auto queryString = wil::make_bstr_nothrow(
@@ -66,7 +78,35 @@ void BookmarkXmlStorage::Load(IXMLDOMDocument *xmlDocument, BookmarkTree *bookma
 	}
 }
 
-void V2::Load(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree)
+void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode, BookmarkTree *bookmarkTree,
+	int indent)
+{
+	auto newline =
+		wil::make_bstr_nothrow((std::wstring(L"\n") + std::wstring(indent, '\t')).c_str());
+	XMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), parentNode);
+
+	wil::com_ptr_nothrow<IXMLDOMElement> bookmarksNode;
+	auto bookmarksKeyNodeName = wil::make_bstr_nothrow(V2::bookmarksKeyNodeName);
+	HRESULT hr = xmlDocument->createElement(bookmarksKeyNodeName.get(), &bookmarksNode);
+
+	if (hr == S_OK)
+	{
+		V2::Save(xmlDocument, bookmarksNode.get(), bookmarkTree, indent + 1);
+
+		XMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), bookmarksNode.get());
+		XMLSettings::AppendChildToParent(bookmarksNode.get(), parentNode);
+	}
+}
+
+}
+
+namespace
+{
+
+namespace V2
+{
+
+void Load(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree)
 {
 	LoadPermanentFolder(parentNode, bookmarkTree, bookmarkTree->GetBookmarksToolbarFolder(),
 		BookmarkStorage::BOOKMARKS_TOOLBAR_NODE_NAME);
@@ -76,7 +116,7 @@ void V2::Load(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree)
 		BookmarkStorage::OTHER_BOOKMARKS_NODE_NAME);
 }
 
-void V2::LoadPermanentFolder(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
+void LoadPermanentFolder(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
 	BookmarkItem *bookmarkItem, const std::wstring &name)
 {
 	wil::com_ptr_nothrow<IXMLDOMNode> childNode;
@@ -100,7 +140,7 @@ void V2::LoadPermanentFolder(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree
 	}
 }
 
-void V2::LoadBookmarkChildren(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
+void LoadBookmarkChildren(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
 	BookmarkItem *parentBookmarkItem)
 {
 	auto makeQueryString = [](int index)
@@ -123,8 +163,7 @@ void V2::LoadBookmarkChildren(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTre
 	}
 }
 
-std::unique_ptr<BookmarkItem> V2::LoadBookmarkItem(IXMLDOMNode *parentNode,
-	BookmarkTree *bookmarkTree)
+std::unique_ptr<BookmarkItem> LoadBookmarkItem(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree)
 {
 	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> attributeMap;
 	parentNode->get_attributes(&attributeMap);
@@ -166,12 +205,99 @@ std::unique_ptr<BookmarkItem> V2::LoadBookmarkItem(IXMLDOMNode *parentNode,
 	return bookmarkItem;
 }
 
-void V1::Load(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree)
+void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode, BookmarkTree *bookmarkTree,
+	int indent)
+{
+	SavePermanentFolder(xmlDocument, parentNode, bookmarkTree->GetBookmarksToolbarFolder(),
+		BookmarkStorage::BOOKMARKS_TOOLBAR_NODE_NAME, indent);
+	SavePermanentFolder(xmlDocument, parentNode, bookmarkTree->GetBookmarksMenuFolder(),
+		BookmarkStorage::BOOKMARKS_MENU_NODE_NAME, indent);
+	SavePermanentFolder(xmlDocument, parentNode, bookmarkTree->GetOtherBookmarksFolder(),
+		BookmarkStorage::OTHER_BOOKMARKS_NODE_NAME, indent);
+}
+
+void SavePermanentFolder(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
+	const BookmarkItem *bookmarkItem, const std::wstring &name, int indent)
+{
+	auto newline =
+		wil::make_bstr_nothrow((std::wstring(L"\n") + std::wstring(indent, '\t')).c_str());
+	XMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), parentNode);
+
+	wil::com_ptr_nothrow<IXMLDOMElement> childNode;
+	XMLSettings::CreateElementNode(xmlDocument, &childNode, parentNode, L"PermanentItem",
+		name.c_str());
+
+	XMLSettings::SaveDateTime(xmlDocument, childNode.get(), _T("DateCreated"),
+		bookmarkItem->GetDateCreated());
+	XMLSettings::SaveDateTime(xmlDocument, childNode.get(), _T("DateModified"),
+		bookmarkItem->GetDateModified());
+
+	SaveBookmarkChildren(xmlDocument, childNode.get(), bookmarkItem, indent + 1);
+
+	XMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), childNode.get());
+}
+
+void SaveBookmarkChildren(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
+	const BookmarkItem *parentBookmarkItem, int indent)
+{
+	int index = 0;
+
+	for (auto &child : parentBookmarkItem->GetChildren())
+	{
+		auto newline =
+			wil::make_bstr_nothrow((std::wstring(L"\n") + std::wstring(indent, '\t')).c_str());
+		XMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), parentNode);
+
+		wil::com_ptr_nothrow<IXMLDOMElement> childNode;
+		XMLSettings::CreateElementNode(xmlDocument, &childNode, parentNode, _T("Bookmark"),
+			std::to_wstring(index).c_str());
+
+		SaveBookmarkItem(xmlDocument, childNode.get(), child.get(), indent);
+
+		XMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), childNode.get());
+
+		index++;
+	}
+}
+
+void SaveBookmarkItem(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
+	const BookmarkItem *bookmarkItem, int indent)
+{
+	XMLSettings::AddAttributeToNode(xmlDocument, parentNode, _T("Type"),
+		XMLSettings::EncodeIntValue(static_cast<int>(bookmarkItem->GetType())));
+	XMLSettings::AddAttributeToNode(xmlDocument, parentNode, _T("GUID"),
+		bookmarkItem->GetGUID().c_str());
+	XMLSettings::AddAttributeToNode(xmlDocument, parentNode, _T("ItemName"),
+		bookmarkItem->GetName().c_str());
+
+	if (bookmarkItem->GetType() == BookmarkItem::Type::Bookmark)
+	{
+		XMLSettings::AddAttributeToNode(xmlDocument, parentNode, _T("Location"),
+			bookmarkItem->GetLocation().c_str());
+	}
+
+	XMLSettings::SaveDateTime(xmlDocument, parentNode, _T("DateCreated"),
+		bookmarkItem->GetDateCreated());
+	XMLSettings::SaveDateTime(xmlDocument, parentNode, _T("DateModified"),
+		bookmarkItem->GetDateModified());
+
+	if (bookmarkItem->GetType() == BookmarkItem::Type::Folder)
+	{
+		SaveBookmarkChildren(xmlDocument, parentNode, bookmarkItem, indent + 1);
+	}
+}
+
+}
+
+namespace V1
+{
+
+void Load(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree)
 {
 	LoadBookmarkChildren(parentNode, bookmarkTree, nullptr);
 }
 
-void V1::LoadBookmarkChildren(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
+void LoadBookmarkChildren(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
 	BookmarkItem *parentBookmarkItem)
 {
 	wil::com_ptr_nothrow<IXMLDOMNodeList> children;
@@ -213,8 +339,8 @@ void V1::LoadBookmarkChildren(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTre
 	}
 }
 
-std::unique_ptr<BookmarkItem> V1::LoadBookmarkItem(IXMLDOMNode *parentNode,
-	BookmarkTree *bookmarkTree, bool &showOnToolbarOutput)
+std::unique_ptr<BookmarkItem> LoadBookmarkItem(IXMLDOMNode *parentNode, BookmarkTree *bookmarkTree,
+	bool &showOnToolbarOutput)
 {
 	wil::com_ptr_nothrow<IXMLDOMNamedNodeMap> attributeMap;
 	parentNode->get_attributes(&attributeMap);
@@ -257,104 +383,6 @@ std::unique_ptr<BookmarkItem> V1::LoadBookmarkItem(IXMLDOMNode *parentNode,
 	return bookmarkItem;
 }
 
-void BookmarkXmlStorage::Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
-	BookmarkTree *bookmarkTree, int indent)
-{
-	auto newline =
-		wil::make_bstr_nothrow((std::wstring(L"\n") + std::wstring(indent, '\t')).c_str());
-	XMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), parentNode);
-
-	wil::com_ptr_nothrow<IXMLDOMElement> bookmarksNode;
-	auto bookmarksKeyNodeName = wil::make_bstr_nothrow(V2::bookmarksKeyNodeName);
-	HRESULT hr = xmlDocument->createElement(bookmarksKeyNodeName.get(), &bookmarksNode);
-
-	if (hr == S_OK)
-	{
-		V2::Save(xmlDocument, bookmarksNode.get(), bookmarkTree, indent + 1);
-
-		XMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), bookmarksNode.get());
-		XMLSettings::AppendChildToParent(bookmarksNode.get(), parentNode);
-	}
 }
 
-void V2::Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode, BookmarkTree *bookmarkTree,
-	int indent)
-{
-	SavePermanentFolder(xmlDocument, parentNode, bookmarkTree->GetBookmarksToolbarFolder(),
-		BookmarkStorage::BOOKMARKS_TOOLBAR_NODE_NAME, indent);
-	SavePermanentFolder(xmlDocument, parentNode, bookmarkTree->GetBookmarksMenuFolder(),
-		BookmarkStorage::BOOKMARKS_MENU_NODE_NAME, indent);
-	SavePermanentFolder(xmlDocument, parentNode, bookmarkTree->GetOtherBookmarksFolder(),
-		BookmarkStorage::OTHER_BOOKMARKS_NODE_NAME, indent);
-}
-
-void V2::SavePermanentFolder(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
-	const BookmarkItem *bookmarkItem, const std::wstring &name, int indent)
-{
-	auto newline =
-		wil::make_bstr_nothrow((std::wstring(L"\n") + std::wstring(indent, '\t')).c_str());
-	XMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), parentNode);
-
-	wil::com_ptr_nothrow<IXMLDOMElement> childNode;
-	XMLSettings::CreateElementNode(xmlDocument, &childNode, parentNode, L"PermanentItem",
-		name.c_str());
-
-	XMLSettings::SaveDateTime(xmlDocument, childNode.get(), _T("DateCreated"),
-		bookmarkItem->GetDateCreated());
-	XMLSettings::SaveDateTime(xmlDocument, childNode.get(), _T("DateModified"),
-		bookmarkItem->GetDateModified());
-
-	SaveBookmarkChildren(xmlDocument, childNode.get(), bookmarkItem, indent + 1);
-
-	XMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), childNode.get());
-}
-
-void V2::SaveBookmarkChildren(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
-	const BookmarkItem *parentBookmarkItem, int indent)
-{
-	int index = 0;
-
-	for (auto &child : parentBookmarkItem->GetChildren())
-	{
-		auto newline =
-			wil::make_bstr_nothrow((std::wstring(L"\n") + std::wstring(indent, '\t')).c_str());
-		XMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), parentNode);
-
-		wil::com_ptr_nothrow<IXMLDOMElement> childNode;
-		XMLSettings::CreateElementNode(xmlDocument, &childNode, parentNode, _T("Bookmark"),
-			std::to_wstring(index).c_str());
-
-		SaveBookmarkItem(xmlDocument, childNode.get(), child.get(), indent);
-
-		XMLSettings::AddWhiteSpaceToNode(xmlDocument, newline.get(), childNode.get());
-
-		index++;
-	}
-}
-
-void V2::SaveBookmarkItem(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode,
-	const BookmarkItem *bookmarkItem, int indent)
-{
-	XMLSettings::AddAttributeToNode(xmlDocument, parentNode, _T("Type"),
-		XMLSettings::EncodeIntValue(static_cast<int>(bookmarkItem->GetType())));
-	XMLSettings::AddAttributeToNode(xmlDocument, parentNode, _T("GUID"),
-		bookmarkItem->GetGUID().c_str());
-	XMLSettings::AddAttributeToNode(xmlDocument, parentNode, _T("ItemName"),
-		bookmarkItem->GetName().c_str());
-
-	if (bookmarkItem->GetType() == BookmarkItem::Type::Bookmark)
-	{
-		XMLSettings::AddAttributeToNode(xmlDocument, parentNode, _T("Location"),
-			bookmarkItem->GetLocation().c_str());
-	}
-
-	XMLSettings::SaveDateTime(xmlDocument, parentNode, _T("DateCreated"),
-		bookmarkItem->GetDateCreated());
-	XMLSettings::SaveDateTime(xmlDocument, parentNode, _T("DateModified"),
-		bookmarkItem->GetDateModified());
-
-	if (bookmarkItem->GetType() == BookmarkItem::Type::Folder)
-	{
-		SaveBookmarkChildren(xmlDocument, parentNode, bookmarkItem, indent + 1);
-	}
 }

@@ -10,7 +10,9 @@ class BookmarkTree;
 
 namespace BookmarkXmlStorage
 {
+
 void Load(IXMLDOMDocument *xmlDocument, BookmarkTree *bookmarkTree);
 void Save(IXMLDOMDocument *xmlDocument, IXMLDOMElement *parentNode, BookmarkTree *bookmarkTree,
 	int indent);
+
 }
