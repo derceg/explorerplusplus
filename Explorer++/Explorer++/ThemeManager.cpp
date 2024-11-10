@@ -15,7 +15,7 @@
 #include <wil/resource.h>
 #include <vssym32.h>
 
-static const WCHAR DIALOG_CLASS_NAME[] = L"#32770";
+static const wchar_t DIALOG_CLASS_NAME[] = L"#32770";
 
 ThemeManager &ThemeManager::GetInstance()
 {

@@ -27,9 +27,9 @@ using namespace std::string_literals;
 namespace
 {
 
-const WCHAR MAIN_TOOLBAR_STATE_KEY_NAME[] = L"ToolbarState";
-const WCHAR TABS_KEY[] = L"Software\\Explorer++\\Tabs";
-const WCHAR MAIN_FONT_KEY_NAME[] = L"MainFont";
+const wchar_t MAIN_TOOLBAR_STATE_KEY_NAME[] = L"ToolbarState";
+const wchar_t TABS_KEY[] = L"Software\\Explorer++\\Tabs";
+const wchar_t MAIN_FONT_KEY_NAME[] = L"MainFont";
 
 }
 

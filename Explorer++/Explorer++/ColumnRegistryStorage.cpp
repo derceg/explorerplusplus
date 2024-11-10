@@ -13,20 +13,20 @@ namespace ColumnRegistryStorage
 namespace
 {
 
-const WCHAR REAL_FOLDER_COLUMNS_KEY_NAME[] = L"RealFolderColumns";
-const WCHAR REAL_FOLDER_COLUMN_WIDTHS_KEY_NAME[] = L"RealFolderColumnWidths";
-const WCHAR MY_COMPUTER_COLUMNS_KEY_NAME[] = L"MyComputerColumns";
-const WCHAR MY_COMPUTER_COLUMN_WIDTHS_KEY_NAME[] = L"MyComputerColumnWidths";
-const WCHAR CONTROL_PANEL_COLUMNS_KEY_NAME[] = L"ControlPanelColumns";
-const WCHAR CONTROL_PANEL_COLUMN_WIDTHS_KEY_NAME[] = L"ControlPanelColumnWidths";
-const WCHAR RECYCLE_BIN_COLUMNS_KEY_NAME[] = L"RecycleBinColumns";
-const WCHAR RECYCLE_BIN_COLUMN_WIDTHS_KEY_NAME[] = L"RecycleBinColumnWidths";
-const WCHAR PRINTERS_COLUMNS_KEY_NAME[] = L"PrinterColumns";
-const WCHAR PRINTERS_COLUMN_WIDTHS_KEY_NAME[] = L"PrinterColumnWidths";
-const WCHAR NETWORK_COLUMNS_KEY_NAME[] = L"NetworkColumns";
-const WCHAR NETWORK_COLUMN_WIDTHS_KEY_NAME[] = L"NetworkColumnWidths";
-const WCHAR NETWORK_PLACES_COLUMNS_KEY_NAME[] = L"NetworkPlacesColumns";
-const WCHAR NETWORK_PLACES_COLUMN_WIDTHS_KEY_NAME[] = L"NetworkPlacesColumnWidths";
+const wchar_t REAL_FOLDER_COLUMNS_KEY_NAME[] = L"RealFolderColumns";
+const wchar_t REAL_FOLDER_COLUMN_WIDTHS_KEY_NAME[] = L"RealFolderColumnWidths";
+const wchar_t MY_COMPUTER_COLUMNS_KEY_NAME[] = L"MyComputerColumns";
+const wchar_t MY_COMPUTER_COLUMN_WIDTHS_KEY_NAME[] = L"MyComputerColumnWidths";
+const wchar_t CONTROL_PANEL_COLUMNS_KEY_NAME[] = L"ControlPanelColumns";
+const wchar_t CONTROL_PANEL_COLUMN_WIDTHS_KEY_NAME[] = L"ControlPanelColumnWidths";
+const wchar_t RECYCLE_BIN_COLUMNS_KEY_NAME[] = L"RecycleBinColumns";
+const wchar_t RECYCLE_BIN_COLUMN_WIDTHS_KEY_NAME[] = L"RecycleBinColumnWidths";
+const wchar_t PRINTERS_COLUMNS_KEY_NAME[] = L"PrinterColumns";
+const wchar_t PRINTERS_COLUMN_WIDTHS_KEY_NAME[] = L"PrinterColumnWidths";
+const wchar_t NETWORK_COLUMNS_KEY_NAME[] = L"NetworkColumns";
+const wchar_t NETWORK_COLUMN_WIDTHS_KEY_NAME[] = L"NetworkColumnWidths";
+const wchar_t NETWORK_PLACES_COLUMNS_KEY_NAME[] = L"NetworkPlacesColumns";
+const wchar_t NETWORK_PLACES_COLUMN_WIDTHS_KEY_NAME[] = L"NetworkPlacesColumnWidths";
 
 // For compatibility with past versions, columns and their widths are saved independently. That's
 // the reason for this struct and the one below. They represent column data, as it's stored in the

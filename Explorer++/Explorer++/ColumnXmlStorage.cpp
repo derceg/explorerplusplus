@@ -15,15 +15,15 @@ namespace ColumnXmlStorage
 namespace
 {
 
-const WCHAR REAL_FOLDER_COLUMNS_NODE_NAME[] = L"Generic";
-const WCHAR MY_COMPUTER_COLUMNS_NODE_NAME[] = L"MyComputer";
-const WCHAR CONTROL_PANEL_COLUMNS_NODE_NAME[] = L"ControlPanel";
-const WCHAR RECYCLE_BIN_COLUMNS_NODE_NAME[] = L"RecycleBin";
-const WCHAR PRINTERS_COLUMNS_NODE_NAME[] = L"Printers";
-const WCHAR NETWORK_COLUMNS_NODE_NAME[] = L"Network";
-const WCHAR NETWORK_PLACES_COLUMNS_NODE_NAME[] = L"NetworkPlaces";
+const wchar_t REAL_FOLDER_COLUMNS_NODE_NAME[] = L"Generic";
+const wchar_t MY_COMPUTER_COLUMNS_NODE_NAME[] = L"MyComputer";
+const wchar_t CONTROL_PANEL_COLUMNS_NODE_NAME[] = L"ControlPanel";
+const wchar_t RECYCLE_BIN_COLUMNS_NODE_NAME[] = L"RecycleBin";
+const wchar_t PRINTERS_COLUMNS_NODE_NAME[] = L"Printers";
+const wchar_t NETWORK_COLUMNS_NODE_NAME[] = L"Network";
+const wchar_t NETWORK_PLACES_COLUMNS_NODE_NAME[] = L"NetworkPlaces";
 
-const WCHAR WIDTH_SUFFIX[] = L"_Width";
+const wchar_t WIDTH_SUFFIX[] = L"_Width";
 
 // These names are used when loading and saving columns and shouldn't be changed.
 // clang-format off

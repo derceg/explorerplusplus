@@ -16,9 +16,9 @@ namespace
 
 const TCHAR MAIN_REBAR_NODE_NAME[] = _T("Toolbars");
 
-const WCHAR SETTING_ID[] = L"id";
-const WCHAR SETTING_STYLE[] = L"Style";
-const WCHAR SETTING_LENGTH[] = L"Length";
+const wchar_t SETTING_ID[] = L"id";
+const wchar_t SETTING_STYLE[] = L"Style";
+const wchar_t SETTING_LENGTH[] = L"Length";
 
 std::optional<RebarBandStorageInfo> LoadRebarBandInfo(IXMLDOMNode *parentNode)
 {

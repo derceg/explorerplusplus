@@ -16,5 +16,5 @@ public:
 	static UINT GetClipboardFormat();
 
 private:
-	static inline const WCHAR CLIPBOARD_FORMAT_STRING[] = L"explorerplusplus/bookmarks";
+	static inline const wchar_t CLIPBOARD_FORMAT_STRING[] = L"explorerplusplus/bookmarks";
 };

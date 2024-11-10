@@ -19,31 +19,31 @@ namespace TabXmlStorage
 namespace
 {
 
-const WCHAR TAB_NODE_NAME[] = L"Tab";
+const wchar_t TAB_NODE_NAME[] = L"Tab";
 
 // Required values
-const WCHAR SETTING_DIRECTORY[] = L"Directory";
+const wchar_t SETTING_DIRECTORY[] = L"Directory";
 
 // Folder settings
-const WCHAR SETTING_VIEW_MODE[] = L"ViewMode";
-const WCHAR SETTING_SORT_MODE[] = L"SortMode";
-const WCHAR SETTING_SORT_ASCENDING[] = L"SortAscending";
-const WCHAR SETTING_GROUP_MODE[] = L"GroupMode";
-const WCHAR SETTING_GROUP_SORT_DIRECTION[] = L"GroupSortDirection";
-const WCHAR SETTING_SHOW_IN_GROUPS[] = L"ShowInGroups";
-const WCHAR SETTING_APPLY_FILTER[] = L"ApplyFilter";
-const WCHAR SETTING_FILTER_CASE_SENSITIVE[] = L"FilterCaseSensitive";
-const WCHAR SETTING_SHOW_HIDDEN[] = L"ShowHidden";
-const WCHAR SETTING_AUTO_ARRANGE[] = L"AutoArrange";
-const WCHAR SETTING_FILTER[] = L"Filter";
+const wchar_t SETTING_VIEW_MODE[] = L"ViewMode";
+const wchar_t SETTING_SORT_MODE[] = L"SortMode";
+const wchar_t SETTING_SORT_ASCENDING[] = L"SortAscending";
+const wchar_t SETTING_GROUP_MODE[] = L"GroupMode";
+const wchar_t SETTING_GROUP_SORT_DIRECTION[] = L"GroupSortDirection";
+const wchar_t SETTING_SHOW_IN_GROUPS[] = L"ShowInGroups";
+const wchar_t SETTING_APPLY_FILTER[] = L"ApplyFilter";
+const wchar_t SETTING_FILTER_CASE_SENSITIVE[] = L"FilterCaseSensitive";
+const wchar_t SETTING_SHOW_HIDDEN[] = L"ShowHidden";
+const wchar_t SETTING_AUTO_ARRANGE[] = L"AutoArrange";
+const wchar_t SETTING_FILTER[] = L"Filter";
 
 // Columns
-const WCHAR SETTING_COLUMNS[] = L"Columns";
+const wchar_t SETTING_COLUMNS[] = L"Columns";
 
 // Tab settings
-const WCHAR SETTING_TAB_LOCKED[] = L"Locked";
-const WCHAR SETTING_TAB_ADDRESS_LOCKED[] = L"AddressLocked";
-const WCHAR SETTING_TAB_CUSTOM_NAME[] = L"CustomName";
+const wchar_t SETTING_TAB_LOCKED[] = L"Locked";
+const wchar_t SETTING_TAB_ADDRESS_LOCKED[] = L"AddressLocked";
+const wchar_t SETTING_TAB_CUSTOM_NAME[] = L"CustomName";
 
 std::optional<std::wstring> MaybeLoadDirectory(IXMLDOMNode *tabNode)
 {
