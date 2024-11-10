@@ -21,7 +21,6 @@ protected:
 	{
 		std::wstring xmlFilePath = GetResourcePath(filename);
 		auto xmlDocument = LoadXmlDocument(xmlFilePath);
-		ASSERT_TRUE(xmlDocument);
 
 		BookmarkTree loadedBookmarkTree;
 		BookmarkXmlStorage::Load(xmlDocument.get(), &loadedBookmarkTree);
@@ -44,13 +43,12 @@ TEST_F(BookmarkXmlStorageTest, V2Save)
 	BuildV2LoadSaveReferenceTree(&referenceBookmarkTree);
 
 	auto xmlDocumentData = CreateXmlDocument();
-	ASSERT_TRUE(xmlDocumentData);
 
-	BookmarkXmlStorage::Save(xmlDocumentData->xmlDocument.get(), xmlDocumentData->root.get(),
+	BookmarkXmlStorage::Save(xmlDocumentData.xmlDocument.get(), xmlDocumentData.root.get(),
 		&referenceBookmarkTree, 1);
 
 	BookmarkTree loadedBookmarkTree;
-	BookmarkXmlStorage::Load(xmlDocumentData->xmlDocument.get(), &loadedBookmarkTree);
+	BookmarkXmlStorage::Load(xmlDocumentData.xmlDocument.get(), &loadedBookmarkTree);
 
 	CompareBookmarkTrees(&loadedBookmarkTree, &referenceBookmarkTree, true);
 }

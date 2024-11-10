@@ -131,7 +131,6 @@ TEST_F(MainToolbarXmlStorageTest, Load)
 
 	std::wstring xmlFilePath = GetResourcePath(L"main-toolbar-config.xml");
 	auto xmlDocument = LoadXmlDocument(xmlFilePath);
-	ASSERT_TRUE(xmlDocument);
 
 	wil::com_ptr_nothrow<IXMLDOMNode> mainToolbarNode;
 	auto queryString = wil::make_bstr_nothrow(
@@ -150,17 +149,16 @@ TEST_F(MainToolbarXmlStorageTest, Save)
 	auto referenceButtons = BuildMainToolbarLoadSaveReference();
 
 	auto xmlDocumentData = CreateXmlDocument();
-	ASSERT_TRUE(xmlDocumentData);
 
 	wil::com_ptr_nothrow<IXMLDOMElement> settingsNode;
 	auto bstr = wil::make_bstr_nothrow(L"Settings");
-	HRESULT hr = xmlDocumentData->xmlDocument->createElement(bstr.get(), &settingsNode);
+	HRESULT hr = xmlDocumentData.xmlDocument->createElement(bstr.get(), &settingsNode);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	wil::com_ptr_nothrow<IXMLDOMElement> mainToolbarNode;
-	XMLSettings::CreateElementNode(xmlDocumentData->xmlDocument.get(), &mainToolbarNode,
+	XMLSettings::CreateElementNode(xmlDocumentData.xmlDocument.get(), &mainToolbarNode,
 		settingsNode.get(), L"Setting", NODE_NAME);
-	MainToolbarStorage::SaveToXml(xmlDocumentData->xmlDocument.get(), mainToolbarNode.get(),
+	MainToolbarStorage::SaveToXml(xmlDocumentData.xmlDocument.get(), mainToolbarNode.get(),
 		referenceButtons);
 
 	auto loadedButtons = MainToolbarStorage::LoadFromXml(mainToolbarNode.get());

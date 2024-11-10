@@ -60,7 +60,6 @@ TEST_F(CustomFontXmlStorageTest, Load)
 
 	std::wstring xmlFilePath = GetResourcePath(L"custom-font-config.xml");
 	auto xmlDocument = LoadXmlDocument(xmlFilePath);
-	ASSERT_TRUE(xmlDocument);
 
 	wil::com_ptr_nothrow<IXMLDOMNode> mainFontNode;
 	auto queryString = wil::make_bstr_nothrow(
@@ -80,17 +79,16 @@ TEST_F(CustomFontXmlStorageTest, Save)
 	CustomFont referenceFont = BuildLoadSaveReferenceFont();
 
 	auto xmlDocumentData = CreateXmlDocument();
-	ASSERT_TRUE(xmlDocumentData);
 
 	wil::com_ptr_nothrow<IXMLDOMElement> settingsNode;
 	auto bstr = wil::make_bstr_nothrow(L"Settings");
-	HRESULT hr = xmlDocumentData->xmlDocument->createElement(bstr.get(), &settingsNode);
+	HRESULT hr = xmlDocumentData.xmlDocument->createElement(bstr.get(), &settingsNode);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
 	wil::com_ptr_nothrow<IXMLDOMElement> mainFontNode;
-	XMLSettings::CreateElementNode(xmlDocumentData->xmlDocument.get(), &mainFontNode,
+	XMLSettings::CreateElementNode(xmlDocumentData.xmlDocument.get(), &mainFontNode,
 		settingsNode.get(), L"Setting", MAIN_FONT_NODE_NAME);
-	SaveCustomFontToXml(xmlDocumentData->xmlDocument.get(), mainFontNode.get(), referenceFont);
+	SaveCustomFontToXml(xmlDocumentData.xmlDocument.get(), mainFontNode.get(), referenceFont);
 
 	auto loadedFont = LoadCustomFontFromXml(mainFontNode.get());
 	ASSERT_NE(loadedFont, nullptr);

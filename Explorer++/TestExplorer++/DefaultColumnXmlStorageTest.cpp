@@ -20,7 +20,6 @@ TEST_F(DefaultColumnXmlStorageTest, Load)
 
 	std::wstring xmlFilePath = GetResourcePath(L"default-columns-config.xml");
 	auto xmlDocument = LoadXmlDocument(xmlFilePath);
-	ASSERT_TRUE(xmlDocument);
 
 	FolderColumns loadedColumns;
 	DefaultColumnXmlStorage::Load(xmlDocument.get(), loadedColumns);
@@ -33,13 +32,12 @@ TEST_F(DefaultColumnXmlStorageTest, Save)
 	auto referenceColumns = BuildFolderColumnsLoadSaveReference();
 
 	auto xmlDocumentData = CreateXmlDocument();
-	ASSERT_TRUE(xmlDocumentData);
 
-	DefaultColumnXmlStorage::Save(xmlDocumentData->xmlDocument.get(), xmlDocumentData->root.get(),
+	DefaultColumnXmlStorage::Save(xmlDocumentData.xmlDocument.get(), xmlDocumentData.root.get(),
 		referenceColumns);
 
 	FolderColumns loadedColumns;
-	DefaultColumnXmlStorage::Load(xmlDocumentData->xmlDocument.get(), loadedColumns);
+	DefaultColumnXmlStorage::Load(xmlDocumentData.xmlDocument.get(), loadedColumns);
 
 	EXPECT_EQ(loadedColumns, referenceColumns);
 }

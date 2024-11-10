@@ -26,7 +26,6 @@ TEST_F(ApplicationToolbarXmlStorageTest, Load)
 
 	std::wstring xmlFilePath = GetResourcePath(L"application-toolbar-config.xml");
 	auto xmlDocument = LoadXmlDocument(xmlFilePath);
-	ASSERT_TRUE(xmlDocument);
 
 	ApplicationModel loadedModel;
 	ApplicationToolbarXmlStorage::Load(xmlDocument.get(), &loadedModel);
@@ -40,13 +39,12 @@ TEST_F(ApplicationToolbarXmlStorageTest, Save)
 	BuildLoadSaveReferenceModel(&referenceModel);
 
 	auto xmlDocumentData = CreateXmlDocument();
-	ASSERT_TRUE(xmlDocumentData);
 
-	ApplicationToolbarXmlStorage::Save(xmlDocumentData->xmlDocument.get(),
-		xmlDocumentData->root.get(), &referenceModel);
+	ApplicationToolbarXmlStorage::Save(xmlDocumentData.xmlDocument.get(),
+		xmlDocumentData.root.get(), &referenceModel);
 
 	ApplicationModel loadedModel;
-	ApplicationToolbarXmlStorage::Load(xmlDocumentData->xmlDocument.get(), &loadedModel);
+	ApplicationToolbarXmlStorage::Load(xmlDocumentData.xmlDocument.get(), &loadedModel);
 
 	EXPECT_EQ(loadedModel, referenceModel);
 }

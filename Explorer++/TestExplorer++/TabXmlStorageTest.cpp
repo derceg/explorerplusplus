@@ -25,7 +25,6 @@ TEST_F(TabXmlStorageTest, Load)
 
 	std::wstring xmlFilePath = GetResourcePath(L"tabs-config.xml");
 	auto xmlDocument = LoadXmlDocument(xmlFilePath);
-	ASSERT_TRUE(xmlDocument);
 
 	wil::com_ptr_nothrow<IXMLDOMNode> tabsNode;
 	auto queryString =
@@ -44,14 +43,13 @@ TEST_F(TabXmlStorageTest, Save)
 	BuildTabStorageLoadSaveReference(referenceTabs);
 
 	auto xmlDocumentData = CreateXmlDocument();
-	ASSERT_TRUE(xmlDocumentData);
 
 	wil::com_ptr_nothrow<IXMLDOMElement> tabsNode;
 	auto nodeName = wil::make_bstr_nothrow(TABS_NODE_NAME);
-	HRESULT hr = xmlDocumentData->xmlDocument->createElement(nodeName.get(), &tabsNode);
+	HRESULT hr = xmlDocumentData.xmlDocument->createElement(nodeName.get(), &tabsNode);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
-	TabXmlStorage::Save(xmlDocumentData->xmlDocument.get(), tabsNode.get(), referenceTabs);
+	TabXmlStorage::Save(xmlDocumentData.xmlDocument.get(), tabsNode.get(), referenceTabs);
 	auto loadedTabs = TabXmlStorage::Load(tabsNode.get());
 
 	EXPECT_EQ(loadedTabs, referenceTabs);

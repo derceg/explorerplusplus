@@ -6,35 +6,38 @@
 #include "XmlStorageTestHelper.h"
 #include "../Helper/XMLSettings.h"
 
+using namespace testing;
+
 wil::com_ptr_nothrow<IXMLDOMDocument> XmlStorageTest::LoadXmlDocument(const std::wstring &filePath)
 {
-	auto xmlDocument = XMLSettings::CreateXmlDocument();
-
-	if (!xmlDocument)
-	{
-		return nullptr;
-	}
-
-	VARIANT_BOOL status;
-	auto filePathVariant = wil::make_variant_bstr_failfast(filePath.c_str());
-	xmlDocument->load(filePathVariant, &status);
-
-	if (status != VARIANT_TRUE)
-	{
-		return nullptr;
-	}
-
+	wil::com_ptr_nothrow<IXMLDOMDocument> xmlDocument;
+	LoadXmlDocumentHelper(filePath, xmlDocument);
 	return xmlDocument;
 }
 
-std::optional<XmlStorageTest::XmlDocumentData> XmlStorageTest::CreateXmlDocument()
+void XmlStorageTest::LoadXmlDocumentHelper(const std::wstring &filePath,
+	wil::com_ptr_nothrow<IXMLDOMDocument> &outputXmlDocument)
+{
+	outputXmlDocument = XMLSettings::CreateXmlDocument();
+	ASSERT_THAT(outputXmlDocument, NotNull());
+
+	VARIANT_BOOL status;
+	auto filePathVariant = wil::make_variant_bstr_failfast(filePath.c_str());
+	outputXmlDocument->load(filePathVariant, &status);
+	ASSERT_EQ(status, VARIANT_TRUE);
+}
+
+XmlStorageTest::XmlDocumentData XmlStorageTest::CreateXmlDocument()
+{
+	XmlDocumentData xmlDocumentData;
+	CreateXmlDocumentHelper(xmlDocumentData);
+	return xmlDocumentData;
+}
+
+void XmlStorageTest::CreateXmlDocumentHelper(XmlDocumentData &outputXmlDocumentData)
 {
 	auto xmlDocument = XMLSettings::CreateXmlDocument();
-
-	if (!xmlDocument)
-	{
-		return {};
-	}
+	ASSERT_THAT(xmlDocument, NotNull());
 
 	auto tag = wil::make_bstr_nothrow(L"xml");
 	auto attribute = wil::make_bstr_nothrow(L"version='1.0'");
@@ -47,5 +50,5 @@ std::optional<XmlStorageTest::XmlDocumentData> XmlStorageTest::CreateXmlDocument
 	xmlDocument->createElement(rootTag.get(), &root);
 	XMLSettings::AppendChildToParent(root.get(), xmlDocument.get());
 
-	return XmlDocumentData{ std::move(xmlDocument), std::move(root) };
+	outputXmlDocumentData = { std::move(xmlDocument), std::move(root) };
 }

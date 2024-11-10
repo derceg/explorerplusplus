@@ -25,7 +25,6 @@ TEST_F(ColumnXmlStorageTest, Load)
 
 	std::wstring xmlFilePath = GetResourcePath(L"columns-config.xml");
 	auto xmlDocument = LoadXmlDocument(xmlFilePath);
-	ASSERT_TRUE(xmlDocument);
 
 	wil::com_ptr_nothrow<IXMLDOMNode> columnsNode;
 	auto queryString =
@@ -44,14 +43,13 @@ TEST_F(ColumnXmlStorageTest, Save)
 	auto referenceColumns = BuildFolderColumnsLoadSaveReference();
 
 	auto xmlDocumentData = CreateXmlDocument();
-	ASSERT_TRUE(xmlDocumentData);
 
 	wil::com_ptr_nothrow<IXMLDOMElement> columnsNode;
 	auto nodeName = wil::make_bstr_nothrow(COLUMNS_NODE_NAME);
-	HRESULT hr = xmlDocumentData->xmlDocument->createElement(nodeName.get(), &columnsNode);
+	HRESULT hr = xmlDocumentData.xmlDocument->createElement(nodeName.get(), &columnsNode);
 	ASSERT_HRESULT_SUCCEEDED(hr);
 
-	ColumnXmlStorage::SaveAllColumnSets(xmlDocumentData->xmlDocument.get(), columnsNode.get(),
+	ColumnXmlStorage::SaveAllColumnSets(xmlDocumentData.xmlDocument.get(), columnsNode.get(),
 		referenceColumns);
 
 	FolderColumns loadedColumns;

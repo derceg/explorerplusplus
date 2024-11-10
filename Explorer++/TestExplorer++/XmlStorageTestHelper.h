@@ -20,5 +20,10 @@ protected:
 	};
 
 	wil::com_ptr_nothrow<IXMLDOMDocument> LoadXmlDocument(const std::wstring &filePath);
-	std::optional<XmlDocumentData> CreateXmlDocument();
+	XmlDocumentData CreateXmlDocument();
+
+private:
+	void LoadXmlDocumentHelper(const std::wstring &filePath,
+		wil::com_ptr_nothrow<IXMLDOMDocument> &outputXmlDocument);
+	void CreateXmlDocumentHelper(XmlDocumentData &outputXmlDocumentData);
 };
