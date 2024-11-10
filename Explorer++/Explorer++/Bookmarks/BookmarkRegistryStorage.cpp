@@ -42,9 +42,6 @@ std::unique_ptr<BookmarkItem> LoadBookmarkItem(HKEY key, BookmarkTree *bookmarkT
 	bool &showOnToolbarOutput);
 }
 
-std::wstring BuildFullKeyPath(const std::wstring &applicationKeyPath,
-	const std::wstring &relativeKeyPath);
-
 void BookmarkRegistryStorage::Load(HKEY applicationKey, BookmarkTree *bookmarkTree)
 {
 	// The V2 key always takes precedence (i.e. it will be used even if the V1
@@ -333,10 +330,4 @@ void V2::SaveBookmarkItem(HKEY key, const BookmarkItem *bookmarkItem)
 	{
 		SaveBookmarkChildren(key, bookmarkItem);
 	}
-}
-
-std::wstring BuildFullKeyPath(const std::wstring &applicationKeyPath,
-	const std::wstring &relativeKeyPath)
-{
-	return applicationKeyPath + L"\\" + relativeKeyPath;
 }
