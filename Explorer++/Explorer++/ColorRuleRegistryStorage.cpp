@@ -136,8 +136,6 @@ void Load(HKEY applicationKey, ColorRuleModel *model)
 
 void Save(HKEY applicationKey, const ColorRuleModel *model)
 {
-	SHDeleteKey(applicationKey, COLOR_RULES_KEY_PATH);
-
 	wil::unique_hkey colorRulesKey;
 	LSTATUS res = RegCreateKeyEx(applicationKey, COLOR_RULES_KEY_PATH, 0, nullptr,
 		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &colorRulesKey, nullptr);

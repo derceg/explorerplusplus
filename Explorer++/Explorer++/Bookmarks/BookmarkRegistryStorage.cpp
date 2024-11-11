@@ -78,8 +78,6 @@ void Load(HKEY applicationKey, BookmarkTree *bookmarkTree)
 
 void Save(HKEY applicationKey, BookmarkTree *bookmarkTree)
 {
-	SHDeleteKey(applicationKey, V2::bookmarksKeyPath);
-
 	wil::unique_hkey bookmarksKey;
 	LSTATUS res = RegCreateKeyEx(applicationKey, V2::bookmarksKeyPath, 0, nullptr,
 		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &bookmarksKey, nullptr);

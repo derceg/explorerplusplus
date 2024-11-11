@@ -99,7 +99,7 @@ void Explorerplusplus::LoadAllSettings()
 	}
 	else
 	{
-		loadSave = std::make_unique<LoadSaveRegistry>(m_app, this);
+		loadSave = std::make_unique<LoadSaveRegistry>(m_app, this, true);
 	}
 
 	loadSave->LoadGenericSettings();
@@ -1017,7 +1017,7 @@ void Explorerplusplus::SaveAllSettings()
 	}
 	else
 	{
-		loadSave = std::make_unique<LoadSaveRegistry>(m_app, this);
+		loadSave = std::make_unique<LoadSaveRegistry>(m_app, this, false);
 	}
 
 	loadSave->SaveGenericSettings();

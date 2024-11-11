@@ -261,8 +261,6 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry(HKEY applicationKey)
 		MainToolbarStorage::SaveToRegistry(hSettingsKey, MAIN_TOOLBAR_STATE_KEY_NAME,
 			m_mainToolbar->GetButtonsForStorage());
 
-		SHDeleteKey(hSettingsKey, MAIN_FONT_KEY_NAME);
-
 		auto &mainFont = m_config->mainFont.get();
 
 		if (mainFont)
@@ -538,8 +536,6 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry(HKEY applicationKey)
 
 void Explorerplusplus::SaveTabSettingsToRegistry()
 {
-	SHDeleteKey(HKEY_CURRENT_USER, TABS_KEY);
-
 	wil::unique_hkey tabsKey;
 	HRESULT hr = wil::reg::create_unique_key_nothrow(HKEY_CURRENT_USER, TABS_KEY, tabsKey,
 		wil::reg::key_access::readwrite);

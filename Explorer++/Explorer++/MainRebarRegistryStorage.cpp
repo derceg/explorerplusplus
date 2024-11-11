@@ -120,8 +120,6 @@ std::vector<RebarBandStorageInfo> Load(HKEY mainKey)
 
 void Save(HKEY mainKey, const std::vector<RebarBandStorageInfo> &rebarStorageInfo)
 {
-	SHDeleteKey(mainKey, MAIN_REBAR_KEY_PATH);
-
 	wil::unique_hkey mainRebarKey;
 	HRESULT hr = wil::reg::create_unique_key_nothrow(mainKey, MAIN_REBAR_KEY_PATH, mainRebarKey,
 		wil::reg::key_access::readwrite);

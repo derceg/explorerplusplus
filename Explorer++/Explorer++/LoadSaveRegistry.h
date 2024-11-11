@@ -12,7 +12,7 @@ class Explorerplusplus;
 class LoadSaveRegistry : public ILoadSave
 {
 public:
-	LoadSaveRegistry(App *app, Explorerplusplus *pContainer);
+	LoadSaveRegistry(App *app, Explorerplusplus *pContainer, bool load);
 
 	/* Loading functions. */
 	void LoadGenericSettings() override;

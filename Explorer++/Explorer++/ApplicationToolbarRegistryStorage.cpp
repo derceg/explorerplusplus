@@ -115,8 +115,6 @@ void Load(HKEY applicationKey, ApplicationModel *model)
 
 void Save(HKEY applicationKey, const ApplicationModel *model)
 {
-	SHDeleteKey(applicationKey, APPLICATION_TOOLBAR_KEY_PATH);
-
 	wil::unique_hkey applicationToolbarKey;
 	LSTATUS res = RegCreateKeyEx(applicationKey, APPLICATION_TOOLBAR_KEY_PATH, 0, nullptr,
 		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &applicationToolbarKey, nullptr);
