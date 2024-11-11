@@ -13,14 +13,6 @@ const TCHAR CLASS_NAME[] = _T("Explorer++");
 
 constexpr WCHAR DOCUMENTATION_LINK[] = L"https://explorerplusplus.readthedocs.io/en/latest/";
 
-/* Registry keys used to store program settings. */
-const TCHAR REG_MAIN_KEY[] = _T("Software\\Explorer++");
-const TCHAR REG_SETTINGS_KEY[] = _T("Software\\Explorer++\\Settings");
-
-/* The name of the XML file that preferences are
-saved to/loaded from. */
-const TCHAR XML_FILENAME[] = _T("config.xml");
-
 const TCHAR LANGUAGE_DLL_FILENAME_PATTERN[] = _T("Explorer++*.dll");
 
 // The first instance of the application will create a mutex with this name, which later instances

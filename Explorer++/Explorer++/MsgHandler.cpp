@@ -21,6 +21,7 @@
 #include "ShellBrowser/ShellNavigationController.h"
 #include "ShellBrowser/ViewModes.h"
 #include "ShellTreeView/ShellTreeView.h"
+#include "Storage.h"
 #include "SystemFontHelper.h"
 #include "TabContainer.h"
 #include "TaskbarThumbnails.h"
@@ -59,7 +60,7 @@ BOOL TestConfigFileInternal()
 	GetProcessImageName(GetCurrentProcessId(), szConfigFile, SIZEOF_ARRAY(szConfigFile));
 
 	PathRemoveFileSpec(szConfigFile);
-	PathAppend(szConfigFile, NExplorerplusplus::XML_FILENAME);
+	PathAppend(szConfigFile, Storage::CONFIG_FILE_FILENAME);
 
 	hConfigFile =
 		CreateFile(szConfigFile, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);

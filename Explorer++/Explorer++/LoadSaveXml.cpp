@@ -13,7 +13,7 @@
 #include "ColorRuleXmlStorage.h"
 #include "DefaultColumnXmlStorage.h"
 #include "DialogHelper.h"
-#include "Explorer++_internal.h"
+#include "Storage.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/XMLSettings.h"
@@ -58,9 +58,9 @@ void LoadSaveXML::InitializeLoadEnvironment()
 	TCHAR szConfigFile[MAX_PATH];
 	GetProcessImageName(GetCurrentProcessId(), szConfigFile, SIZEOF_ARRAY(szConfigFile));
 	PathRemoveFileSpec(szConfigFile);
-	PathAppend(szConfigFile, NExplorerplusplus::XML_FILENAME);
+	PathAppend(szConfigFile, Storage::CONFIG_FILE_FILENAME);
 
-	wil::unique_variant var(XMLSettings::VariantString(NExplorerplusplus::XML_FILENAME));
+	wil::unique_variant var(XMLSettings::VariantString(Storage::CONFIG_FILE_FILENAME));
 	VARIANT_BOOL status;
 	m_pXMLDom->load(var, &status);
 
@@ -121,7 +121,7 @@ void LoadSaveXML::ReleaseSaveEnvironment()
 	GetModuleFileNameEx(process.get(), nullptr, szConfigFile, SIZEOF_ARRAY(szConfigFile));
 
 	PathRemoveFileSpec(szConfigFile);
-	PathAppend(szConfigFile, NExplorerplusplus::XML_FILENAME);
+	PathAppend(szConfigFile, Storage::CONFIG_FILE_FILENAME);
 
 	wil::unique_variant var(XMLSettings::VariantString(szConfigFile));
 	m_pXMLDom->save(var);

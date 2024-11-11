@@ -1533,6 +1533,9 @@
     <ClInclude Include="ColumnXmlStorage.h">
       <Filter>Column Storage</Filter>
     </ClInclude>
+    <ClInclude Include="Storage.h">
+      <Filter>Storage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

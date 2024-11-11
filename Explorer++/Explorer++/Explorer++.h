@@ -378,8 +378,8 @@ private:
 	void TestConfigFile();
 
 	/* Registry settings. */
-	LONG LoadGenericSettingsFromRegistry();
-	LONG SaveGenericSettingsToRegistry();
+	LONG LoadGenericSettingsFromRegistry(HKEY applicationKey);
+	LONG SaveGenericSettingsToRegistry(HKEY applicationKey);
 	void SaveTabSettingsToRegistry();
 	std::vector<TabStorageData> GetTabListStorageData();
 	void LoadTabSettingsFromRegistry();

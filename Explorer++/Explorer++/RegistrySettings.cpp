@@ -9,12 +9,12 @@
 #include "CustomFontStorage.h"
 #include "DefaultColumns.h"
 #include "DisplayWindow/DisplayWindow.h"
-#include "Explorer++_internal.h"
 #include "MainRebarRegistryStorage.h"
 #include "MainRebarStorage.h"
 #include "MainToolbar.h"
 #include "MainToolbarStorage.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
+#include "Storage.h"
 #include "TabContainer.h"
 #include "TabRegistryStorage.h"
 #include "TabStorage.h"
@@ -38,8 +38,10 @@ BOOL LoadWindowPositionFromRegistry(WINDOWPLACEMENT *pwndpl)
 	HKEY hSettingsKey;
 	BOOL bRes = FALSE;
 
-	LONG lRes = RegOpenKeyEx(HKEY_CURRENT_USER, NExplorerplusplus::REG_SETTINGS_KEY, 0, KEY_READ,
-		&hSettingsKey);
+	auto settingsKeyPath =
+		Storage::REGISTRY_APPLICATION_KEY_PATH + L"\\"s + Storage::REGISTRY_SETTINGS_KEY_NAME;
+	LONG lRes =
+		RegOpenKeyEx(HKEY_CURRENT_USER, settingsKeyPath.c_str(), 0, KEY_READ, &hSettingsKey);
 
 	if (lRes == ERROR_SUCCESS)
 	{
@@ -63,8 +65,10 @@ BOOL LoadAllowMultipleInstancesFromRegistry()
 	BOOL bAllowMultipleInstances = TRUE;
 
 	HKEY hSettingsKey;
-	LONG lRes = RegOpenKeyEx(HKEY_CURRENT_USER, NExplorerplusplus::REG_SETTINGS_KEY, 0, KEY_READ,
-		&hSettingsKey);
+	auto settingsKeyPath =
+		Storage::REGISTRY_APPLICATION_KEY_PATH + L"\\"s + Storage::REGISTRY_SETTINGS_KEY_NAME;
+	LONG lRes =
+		RegOpenKeyEx(HKEY_CURRENT_USER, settingsKeyPath.c_str(), 0, KEY_READ, &hSettingsKey);
 
 	if (lRes == ERROR_SUCCESS)
 	{
@@ -77,14 +81,13 @@ BOOL LoadAllowMultipleInstancesFromRegistry()
 	return bAllowMultipleInstances;
 }
 
-LONG Explorerplusplus::SaveGenericSettingsToRegistry()
+LONG Explorerplusplus::SaveGenericSettingsToRegistry(HKEY applicationKey)
 {
 	HKEY hSettingsKey;
 	DWORD disposition;
 	LONG returnValue;
 
-	/* Open/Create the main key that is used to store data. */
-	returnValue = RegCreateKeyEx(HKEY_CURRENT_USER, NExplorerplusplus::REG_SETTINGS_KEY, 0, nullptr,
+	returnValue = RegCreateKeyEx(applicationKey, Storage::REGISTRY_SETTINGS_KEY_NAME, 0, nullptr,
 		REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &hSettingsKey, &disposition);
 
 	if (returnValue == ERROR_SUCCESS)
@@ -264,8 +267,8 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 
 		if (mainFont)
 		{
-			auto mainFontKeyPath =
-				NExplorerplusplus::REG_SETTINGS_KEY + L"\\"s + MAIN_FONT_KEY_NAME;
+			auto mainFontKeyPath = Storage::REGISTRY_APPLICATION_KEY_PATH + L"\\"s
+				+ Storage::REGISTRY_SETTINGS_KEY_NAME + L"\\"s + MAIN_FONT_KEY_NAME;
 			SaveCustomFontToRegistry(mainFontKeyPath, *mainFont);
 		}
 
@@ -275,7 +278,7 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 	return returnValue;
 }
 
-LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
+LONG Explorerplusplus::LoadGenericSettingsFromRegistry(HKEY applicationKey)
 {
 	HKEY hSettingsKey;
 	LONG returnValue;
@@ -284,8 +287,7 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 	LONG textColorStatus = TRUE;
 	LONG fontStatus = TRUE;
 
-	/* Open/Create the main key that is used to store data. */
-	returnValue = RegOpenKeyEx(HKEY_CURRENT_USER, NExplorerplusplus::REG_SETTINGS_KEY, 0, KEY_READ,
+	returnValue = RegOpenKeyEx(applicationKey, Storage::REGISTRY_SETTINGS_KEY_NAME, 0, KEY_READ,
 		&hSettingsKey);
 
 	if (returnValue == ERROR_SUCCESS)
@@ -519,8 +521,9 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		m_loadedMainToolbarButtons =
 			MainToolbarStorage::LoadFromRegistry(hSettingsKey, MAIN_TOOLBAR_STATE_KEY_NAME);
 
-		auto mainFont = LoadCustomFontFromRegistry(
-			NExplorerplusplus::REG_SETTINGS_KEY + L"\\"s + MAIN_FONT_KEY_NAME);
+		auto mainFontKeyPath = Storage::REGISTRY_APPLICATION_KEY_PATH + L"\\"s
+			+ Storage::REGISTRY_SETTINGS_KEY_NAME + L"\\"s + MAIN_FONT_KEY_NAME;
+		auto mainFont = LoadCustomFontFromRegistry(mainFontKeyPath);
 
 		if (mainFont)
 		{

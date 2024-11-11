@@ -13,7 +13,7 @@
 #include "ColorRuleRegistryStorage.h"
 #include "DefaultColumnRegistryStorage.h"
 #include "DialogHelper.h"
-#include "Explorer++_internal.h"
+#include "Storage.h"
 #include <wil/registry.h>
 
 LoadSaveRegistry::LoadSaveRegistry(App *app, Explorerplusplus *pContainer) :
@@ -24,7 +24,14 @@ LoadSaveRegistry::LoadSaveRegistry(App *app, Explorerplusplus *pContainer) :
 
 void LoadSaveRegistry::LoadGenericSettings()
 {
-	m_pContainer->LoadGenericSettingsFromRegistry();
+	wil::unique_hkey mainKey;
+	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER,
+		Storage::REGISTRY_APPLICATION_KEY_PATH, mainKey, wil::reg::key_access::read);
+
+	if (SUCCEEDED(hr))
+	{
+		m_pContainer->LoadGenericSettingsFromRegistry(mainKey.get());
+	}
 }
 
 void LoadSaveRegistry::LoadPreviousTabs()
@@ -36,7 +43,7 @@ void LoadSaveRegistry::LoadMainRebarInformation()
 {
 	wil::unique_hkey mainKey;
 	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER,
-		NExplorerplusplus::REG_MAIN_KEY, mainKey, wil::reg::key_access::read);
+		Storage::REGISTRY_APPLICATION_KEY_PATH, mainKey, wil::reg::key_access::read);
 
 	if (SUCCEEDED(hr))
 	{
@@ -46,14 +53,21 @@ void LoadSaveRegistry::LoadMainRebarInformation()
 
 void LoadSaveRegistry::SaveGenericSettings()
 {
-	m_pContainer->SaveGenericSettingsToRegistry();
+	wil::unique_hkey mainKey;
+	HRESULT hr = wil::reg::create_unique_key_nothrow(HKEY_CURRENT_USER,
+		Storage::REGISTRY_APPLICATION_KEY_PATH, mainKey, wil::reg::key_access::readwrite);
+
+	if (SUCCEEDED(hr))
+	{
+		m_pContainer->SaveGenericSettingsToRegistry(mainKey.get());
+	}
 }
 
 void LoadSaveRegistry::SaveBookmarks()
 {
 	wil::unique_hkey mainKey;
-	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER,
-		NExplorerplusplus::REG_MAIN_KEY, mainKey, wil::reg::key_access::readwrite);
+	HRESULT hr = wil::reg::create_unique_key_nothrow(HKEY_CURRENT_USER,
+		Storage::REGISTRY_APPLICATION_KEY_PATH, mainKey, wil::reg::key_access::readwrite);
 
 	if (SUCCEEDED(hr))
 	{
@@ -69,8 +83,8 @@ void LoadSaveRegistry::SaveTabs()
 void LoadSaveRegistry::SaveDefaultColumns()
 {
 	wil::unique_hkey mainKey;
-	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER,
-		NExplorerplusplus::REG_MAIN_KEY, mainKey, wil::reg::key_access::readwrite);
+	HRESULT hr = wil::reg::create_unique_key_nothrow(HKEY_CURRENT_USER,
+		Storage::REGISTRY_APPLICATION_KEY_PATH, mainKey, wil::reg::key_access::readwrite);
 
 	if (SUCCEEDED(hr))
 	{
@@ -82,8 +96,8 @@ void LoadSaveRegistry::SaveDefaultColumns()
 void LoadSaveRegistry::SaveApplicationToolbar()
 {
 	wil::unique_hkey mainKey;
-	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER,
-		NExplorerplusplus::REG_MAIN_KEY, mainKey, wil::reg::key_access::readwrite);
+	HRESULT hr = wil::reg::create_unique_key_nothrow(HKEY_CURRENT_USER,
+		Storage::REGISTRY_APPLICATION_KEY_PATH, mainKey, wil::reg::key_access::readwrite);
 
 	if (SUCCEEDED(hr))
 	{
@@ -95,8 +109,8 @@ void LoadSaveRegistry::SaveApplicationToolbar()
 void LoadSaveRegistry::SaveMainRebarInformation()
 {
 	wil::unique_hkey mainKey;
-	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER,
-		NExplorerplusplus::REG_MAIN_KEY, mainKey, wil::reg::key_access::readwrite);
+	HRESULT hr = wil::reg::create_unique_key_nothrow(HKEY_CURRENT_USER,
+		Storage::REGISTRY_APPLICATION_KEY_PATH, mainKey, wil::reg::key_access::readwrite);
 
 	if (SUCCEEDED(hr))
 	{
@@ -107,8 +121,8 @@ void LoadSaveRegistry::SaveMainRebarInformation()
 void LoadSaveRegistry::SaveColorRules()
 {
 	wil::unique_hkey mainKey;
-	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER,
-		NExplorerplusplus::REG_MAIN_KEY, mainKey, wil::reg::key_access::readwrite);
+	HRESULT hr = wil::reg::create_unique_key_nothrow(HKEY_CURRENT_USER,
+		Storage::REGISTRY_APPLICATION_KEY_PATH, mainKey, wil::reg::key_access::readwrite);
 
 	if (SUCCEEDED(hr))
 	{
@@ -119,8 +133,8 @@ void LoadSaveRegistry::SaveColorRules()
 void LoadSaveRegistry::SaveDialogStates()
 {
 	wil::unique_hkey mainKey;
-	HRESULT hr = wil::reg::open_unique_key_nothrow(HKEY_CURRENT_USER,
-		NExplorerplusplus::REG_MAIN_KEY, mainKey, wil::reg::key_access::readwrite);
+	HRESULT hr = wil::reg::create_unique_key_nothrow(HKEY_CURRENT_USER,
+		Storage::REGISTRY_APPLICATION_KEY_PATH, mainKey, wil::reg::key_access::readwrite);
 
 	if (SUCCEEDED(hr))
 	{

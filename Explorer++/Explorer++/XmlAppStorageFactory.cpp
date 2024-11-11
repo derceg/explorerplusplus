@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "XmlAppStorageFactory.h"
-#include "Explorer++_internal.h"
+#include "Storage.h"
 #include "XmlAppStorage.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
@@ -24,7 +24,7 @@ std::unique_ptr<XmlAppStorage> XmlAppStorageFactory::MaybeCreate()
 		SIZEOF_ARRAY(currentProcessPath));
 
 	std::filesystem::path configFilePath(currentProcessPath);
-	configFilePath.replace_filename(NExplorerplusplus::XML_FILENAME);
+	configFilePath.replace_filename(Storage::CONFIG_FILE_FILENAME);
 
 	auto configFilePathVariant = wil::make_variant_bstr_failfast(configFilePath.c_str());
 	VARIANT_BOOL status;

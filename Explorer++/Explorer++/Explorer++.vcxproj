@@ -1322,6 +1322,7 @@
     <ClInclude Include="RuntimeHelper.h" />
     <ClInclude Include="ShellChangeNotificationType.h" />
     <ClInclude Include="StartupCommandLineProcessor.h" />
+    <ClInclude Include="Storage.h" />
     <ClInclude Include="UIThreadExecutor.h" />
     <ClInclude Include="MenuBase.h" />
     <ClInclude Include="MenuView.h" />

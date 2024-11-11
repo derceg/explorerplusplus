@@ -10,6 +10,7 @@
 #include "MainResource.h"
 #include "PasteSymLinksClient.h"
 #include "ResourceHelper.h"
+#include "Storage.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/WindowHelper.h"
 
@@ -123,7 +124,7 @@ void OnClearRegistrySettings()
 {
 	LSTATUS lStatus;
 
-	lStatus = SHDeleteKey(HKEY_CURRENT_USER, NExplorerplusplus::REG_MAIN_KEY);
+	lStatus = SHDeleteKey(HKEY_CURRENT_USER, Storage::REGISTRY_APPLICATION_KEY_PATH);
 
 	if (lStatus == ERROR_SUCCESS)
 	{

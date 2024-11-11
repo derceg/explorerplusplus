@@ -19,13 +19,13 @@
 #include "Config.h"
 #include "CustomFontStorage.h"
 #include "DisplayWindow/DisplayWindow.h"
-#include "Explorer++_internal.h"
 #include "MainRebarStorage.h"
 #include "MainRebarXmlStorage.h"
 #include "MainToolbar.h"
 #include "MainToolbarStorage.h"
 #include "ShellBrowser/Columns.h"
 #include "ShellBrowser/ShellBrowserImpl.h"
+#include "Storage.h"
 #include "TabContainer.h"
 #include "TabStorage.h"
 #include "TabXmlStorage.h"
@@ -137,7 +137,7 @@ BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl)
 	TCHAR szConfigFile[MAX_PATH];
 	GetProcessImageName(GetCurrentProcessId(), szConfigFile, SIZEOF_ARRAY(szConfigFile));
 	PathRemoveFileSpec(szConfigFile);
-	PathAppend(szConfigFile, NExplorerplusplus::XML_FILENAME);
+	PathAppend(szConfigFile, Storage::CONFIG_FILE_FILENAME);
 
 	wil::unique_variant var(XMLSettings::VariantString(szConfigFile));
 	VARIANT_BOOL status;
@@ -251,7 +251,7 @@ BOOL LoadAllowMultipleInstancesFromXML()
 	TCHAR szConfigFile[MAX_PATH];
 	GetProcessImageName(GetCurrentProcessId(), szConfigFile, SIZEOF_ARRAY(szConfigFile));
 	PathRemoveFileSpec(szConfigFile);
-	PathAppend(szConfigFile, NExplorerplusplus::XML_FILENAME);
+	PathAppend(szConfigFile, Storage::CONFIG_FILE_FILENAME);
 
 	VARIANT_BOOL status;
 	wil::unique_variant var(XMLSettings::VariantString(szConfigFile));
